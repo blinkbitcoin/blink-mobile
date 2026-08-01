@@ -1,4 +1,38 @@
 {
+  "ApiScreen": {
+    "keysGroupTitle": "API-sleutels",
+    "noKeys": "Nog geen API-sleutels",
+    "createKey": "API-sleutel aanmaken",
+    "createTitle": "Nieuwe API-sleutel",
+    "keyCreatedTitle": "API-sleutel aangemaakt",
+    "keyName": "Sleutelnaam",
+    "keyNamePlaceholder": "bijv. BTCPay Server",
+    "scopeRead": "Lezen",
+    "scopeReadDescription": "Saldo en transactiegeschiedenis bekijken",
+    "scopeReceive": "Ontvangen",
+    "scopeReceiveDescription": "Facturen aanmaken en betalingen ontvangen",
+    "scopeWrite": "Schrijven",
+    "writeScopeDashboardOnly": "Sleutels die betalingen kunnen verzenden, kunnen alleen op dashboard.blink.sv worden aangemaakt",
+    "expiry": "Verloopt",
+    "expiry30Days": "30 dagen",
+    "expiry90Days": "90 dagen",
+    "expiryNever": "Nooit",
+    "expiresOn": "Verloopt op {date: string}",
+    "neverExpires": "Verloopt nooit",
+    "revoked": "Ingetrokken",
+    "expired": "Verlopen op {date: string}",
+    "expiredNoDate": "Verlopen",
+    "secretWarning": "Dit is de enige keer dat de sleutel wordt getoond. Kopieer of deel hem nu en bewaar hem veilig.",
+    "secretCopied": "API-sleutel gekopieerd. Klembord wordt over 1 minuut gewist",
+    "revokeTitle": "API-sleutel intrekken?",
+    "revokeBody": "\"{name: string}\" stopt onmiddellijk met werken. Dit kan niet ongedaan worden gemaakt.",
+    "revoke": "Intrekken",
+    "revokeSuccess": "API-sleutel ingetrokken",
+    "createError": "Kan de API-sleutel niet aanmaken. Probeer het opnieuw.",
+    "revokeError": "Kan de API-sleutel niet intrekken. Probeer het opnieuw.",
+    "loadError": "Kan je API-sleutels niet laden. Probeer het later opnieuw.",
+    "done": "Klaar"
+  },
   "GaloyAddressScreen": {
     "title": "Betaling ontvangen door gebruik te maken van:",
     "buttonTitle": "Stel je adres in",
@@ -2003,7 +2037,7 @@
     "satAccumulated": "Sats verzameld",
     "satsEarned": "{formattedNumber | sats} verdiend",
     "sectionsCompleted": "Je hebt voltooid",
-    "title": "Verdien",
+    "title": "Leren",
     "unlockQuestion": "Beantwoord de vraag om te ontgrendelen:",
     "youEarned": "Jij hebt verdiend",
     "registerTitle": "U moet uw account upgraden",
@@ -2011,6 +2045,7 @@
     "oneSectionADay": "Eén sectie per dag!",
     "availableTomorrow": "Kom morgen terug om verder te verdienen terwijl je leert.\n\nOf klik op doorgaan om te blijven leren zonder beloningen.",
     "motivatingBadger": "Graaf je een weg door deze lessen en verdien terwijl je leert",
+    "motivatingBadgerNoRewards": "Graaf je een weg door deze lessen en leer over Bitcoin",
     "continueNoRewards": "Doorgaan (Zonder beloningen)",
     "somethingNotRight": "Er klopt iets niet...",
     "defaultErrorMessage": "{errorMessage: string} Probeer het later opnieuw.\nOf klik op doorgaan om te blijven leren zonder beloningen.",
@@ -2049,7 +2084,7 @@
     "login": "Inloggen",
     "loginOrRestore": "Inloggen / Herstellen",
     "logBackInWith": "Log opnieuw in met",
-    "headline": "Wallet mogelijk gemaakt door Galoy",
+    "headline": "Wallet mogelijk gemaakt door Blink",
     "startTrialAccount": "Begin met een proefaccount",
     "startWithTrialAccount": "Begin met een proefaccount",
     "registerPhoneAccount": "Registreer telefoonaccount",
@@ -2163,6 +2198,9 @@
     "lightningInvoice": "Lightning-factuur",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Stortingskosten: {fee} SAT voor bedragen onder {threshold} SAT of {overFee} SAT voor stortingen boven {threshold} SAT",
+    "depositFeeTiers": "Deposit fees: {tiers: string}",
+    "depositFeeTierUpTo": "{fee: string} SAT up to {max: string} SAT",
+    "depositFeeTierAbove": "{fee: string} SAT above {min: string} SAT",
     "autoConvertMinAmount": "Bedragen onder {minSats: number} sats / {minFiat: string} kunnen niet automatisch worden omgezet naar Dollar. Je ontvangt Bitcoin in plaats daarvan.",
     "autoConvertFailed": "Betaling ontvangen maar de conversie is mislukt.",
     "pleaseWaitForConversion": "Wacht tot de omzetting is voltooid"
@@ -2261,6 +2299,10 @@
     "invalidPhoneNumber": "Voer een geldig mobiel nummer in",
     "phoneNotAllowed": "Dit veld accepteert geen telefoonnummers"
   },
+  "MerchantSelectionScreen": {
+    "title": "Kies betaaloptie",
+    "empty": "Er zijn geen betaalopties beschikbaar."
+  },
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Transactie wordt naar de mempool verzonden",
     "amount": "Bedrag",
@@ -2319,7 +2361,7 @@
   },
   "SettingsScreen": {
     "createAddress": "Adres aanmaken",
-    "donationButton": "Donatieknop",
+    "donationButton": "Doneerknop",
     "btcpayServer": "BTCPay Server",
     "woocommerce": "WooCommerce",
     "staticQr": "Afdrukbare statische QR",
@@ -2546,6 +2588,7 @@
     "lightningTransactions": "Lightning-transacties",
     "onchainBelowThreshold": "Onchain onder {threshold: string} SAT",
     "onchainAboveThreshold": "Onchain boven {threshold: string} SAT",
+    "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Overschrijvingskosten",
     "noFee": "geen kosten",
     "lightningSendFee": "{fee: string} + ~{routingFee: string} routeringskosten",
@@ -2596,7 +2639,8 @@
       "tooLong": "Het adres mag maximaal 50 tekens lang zijn",
       "invalidCharacter": "Adres mag alleen letters, cijfers en onderstrepingstekens bevatten",
       "addressUnavailable": "Sorry, dit adres is al in gebruik",
-      "unknownError": "Er is een onbekende fout opgetreden. Probeer het later opnieuw"
+      "unknownError": "Er is een onbekende fout opgetreden. Probeer het later opnieuw",
+      "backupRequired": "Back up your wallet before creating a Lightning address"
     },
     "receiveMoney": "Ontvang geld van andere Lightning-wallets en {bankName: string}-gebruikers met dit adres.",
     "itCannotBeChanged": "Het kan later niet meer worden gewijzigd."
@@ -3794,6 +3838,11 @@
     "modalDescription": "We raden u ten zeerste aan om een back-up van uw portemonnee te maken om volledig verlies van fondsen te voorkomen als u dit apparaat kwijtraakt.",
     "secureMe": "Portemonnee beveiligen"
   },
+  "BackupRequired": {
+    "modalTitle": "Back up your wallet first",
+    "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
+    "backupNow": "Back up wallet"
+  },
   "NonCustodialInfoBulletin": {
     "title": "Dit is een niet-bewaarde rekening",
     "body": "Lees ons blogbericht voor meer informatie",
@@ -3832,7 +3881,7 @@
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
     "featureCircles": "Circles",
-    "featureEarn": "Earn",
+    "featureEarn": "Leren",
     "featureCard": "Card"
   },
   "WalletCreationScreen": {

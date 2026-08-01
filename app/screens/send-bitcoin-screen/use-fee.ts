@@ -14,7 +14,7 @@ import {
 import type { SelfCustodialFeeResult } from "@app/self-custodial/payment-details/send-helpers"
 import { WalletAmount } from "@app/types/amounts"
 import { ConvertAmountAdjustment } from "@app/types/payment"
-import crashlytics from "@react-native-firebase/crashlytics"
+import { reportError } from "@app/utils/error-logging"
 
 import { GetFee } from "./payment-details/index.types"
 
@@ -153,9 +153,7 @@ const useFee = <T extends WalletCurrency>(getFeeFn?: GetFee<T> | null): FeeType 
           amountAdjustment,
         })
       } catch (err) {
-        if (err instanceof Error) {
-          crashlytics().recordError(err)
-        }
+        reportError("use-fee", err)
         return setFee({
           status: "error",
         })

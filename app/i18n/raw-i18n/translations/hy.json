@@ -1,4 +1,38 @@
 {
+  "ApiScreen": {
+    "keysGroupTitle": "API բանալիներ",
+    "noKeys": "Դեռ API բանալիներ չկան",
+    "createKey": "Ստեղծել API բանալի",
+    "createTitle": "Նոր API բանալի",
+    "keyCreatedTitle": "API բանալին ստեղծվեց",
+    "keyName": "Բանալու անուն",
+    "keyNamePlaceholder": "օր. BTCPay Server",
+    "scopeRead": "Կարդալ",
+    "scopeReadDescription": "Դիտել մնացորդը և գործարքների պատմությունը",
+    "scopeReceive": "Ստանալ",
+    "scopeReceiveDescription": "Ստեղծել հաշիվներ և ստանալ վճարումներ",
+    "scopeWrite": "Գրել",
+    "writeScopeDashboardOnly": "Վճարումներ ուղարկելու հնարավորությամբ բանալիները կարելի է ստեղծել միայն dashboard.blink.sv-ում",
+    "expiry": "Ավարտվում է",
+    "expiry30Days": "30 օր",
+    "expiry90Days": "90 օր",
+    "expiryNever": "Երբեք",
+    "expiresOn": "Ավարտվում է {date: string}",
+    "neverExpires": "Երբեք չի ավարտվում",
+    "revoked": "Չեղարկված",
+    "expired": "Ավարտվել է {date: string}",
+    "expiredNoDate": "Ավարտված",
+    "secretWarning": "Սա միակ անգամն է, երբ բանալին ցուցադրվում է. Պատճենեք կամ կիսվեք այժմ և պահեք ապահով տեղում:",
+    "secretCopied": "API բանալին պատճենվեց: Սեղմատախտակը կմաքրվի 1 րոպեից",
+    "revokeTitle": "Չեղարկե՞լ API բանալին",
+    "revokeBody": "\"{name: string}\"-ը անմիջապես կդադարի աշխատել: Սա հնարավոր չէ հետարկել:",
+    "revoke": "Չեղարկել",
+    "revokeSuccess": "API բանալին չեղարկվեց",
+    "createError": "API բանալին չհաջողվեց ստեղծել: Փորձեք նորից:",
+    "revokeError": "API բանալին չհաջողվեց չեղարկել: Փորձեք նորից:",
+    "loadError": "Ձեր API բանալիները չհաջողվեց բեռնել: Փորձեք ավելի ուշ:",
+    "done": "Պատրաստ է"
+  },
   "GaloyAddressScreen": {
     "title": "Ստացեք վճարում՝ օգտագործելով",
     "buttonTitle": "Գրանցեք Ձեր հասցեն",
@@ -2003,7 +2037,7 @@
     "satAccumulated": "Սատերը կուտակվել են",
     "satsEarned": "{formattedNumber | sats} վաստակել եք",
     "sectionsCompleted": "Դուք ավարտել եք",
-    "title": "Վաստակել",
+    "title": "Սովորել",
     "unlockQuestion": "Բացելու համար՝ պատասխանեք հարցին",
     "youEarned": "Դուք վաստակեցիք",
     "registerTitle": "Հարկավոր է թարմացնել Ձեր հաշիվը։ ",
@@ -2011,6 +2045,7 @@
     "oneSectionADay": "Օրը մեկ բաժին։",
     "availableTomorrow": "Վերադարձեք վաղը։ Վերադարձեք վաղը, որպեսզի շարունակեք sats վաստակելը՝ սովորելով։\n\nԿամ սեղմեք «Շարունակել»՝ առանց պարգևատրման սովորելը շարունակելու համար։",
     "motivatingBadger": "Անցեք այս դասերով և վաստակեք՝ սովորելով",
+    "motivatingBadgerNoRewards": "Անցեք այս դասերով և սովորեք Բիթքոինի մասին",
     "continueNoRewards": "Շարունակել (Առանց պարգևատրման)",
     "somethingNotRight": "Ինչ-որ բան այնպես չէ...",
     "defaultErrorMessage": "{errorMessage: string} Խնդրում ենք փորձել ավելի ուշ։\nԿամ սեղմեք՝ առանց պարգևատրման սովորելը շարունակելու համար։",
@@ -2049,7 +2084,7 @@
     "login": "Մուտք գործել",
     "loginOrRestore": "Մուտք գործել / վերականգնել",
     "logBackInWith": "Մուտք գործել գործածելով",
-    "headline": "Դրամապանակն աջակցվում է Galoy-ի կողմից",
+    "headline": "Դրամապանակն աջակցվում է Blink-ի կողմից",
     "startTrialAccount": "Սկսել փորձնական հաշվով ",
     "startWithTrialAccount": "Սկսել փորձնական հաշվով ",
     "registerPhoneAccount": "Գրանցել հեռախոսահամարը ",
@@ -2163,6 +2198,9 @@
     "lightningInvoice": "lightning վճարման հարցում",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Ավանդի վճար: {fee} SAT մինչև {threshold} SAT գումարների համար կամ {overFee} SAT {threshold} SAT-ից բարձր ավանդների համար",
+    "depositFeeTiers": "Deposit fees: {tiers: string}",
+    "depositFeeTierUpTo": "{fee: string} SAT up to {max: string} SAT",
+    "depositFeeTierAbove": "{fee: string} SAT above {min: string} SAT",
     "autoConvertMinAmount": "{minSats: number} սաթ / {minFiat: string}-ից պակաս գումարները չեն կարող ավտոմատ կերպով փոխարկվել Դոլարի։ Դուք կստանաք Bitcoin։",
     "autoConvertFailed": "Վճարումը ստացվեց, սակայն փոխարկումը չհաջողվեց։",
     "pleaseWaitForConversion": "Խնդրում ենք սպասել, մինչև փոխարկումն ավարտվի"
@@ -2260,6 +2298,10 @@
     "pastedClipboardSuccess": "Տեղադրվեց ջամանակավոր շտեմարանից",
     "invalidPhoneNumber": "Մուտքագրեք վավեր բջջային հեռախոսահամար",
     "phoneNotAllowed": "Այս դաշտը չի ընդունում հեռախոսահամարներ"
+  },
+  "MerchantSelectionScreen": {
+    "title": "Ընտրեք վճարման տարբերակ",
+    "empty": "Վճարման տարբերակներ չկան։"
   },
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Գործարքը պետք է ուղարկվի mempool",
@@ -2546,6 +2588,7 @@
     "lightningTransactions": "Lightning գործարքներ",
     "onchainBelowThreshold": "Onchain {threshold: string} SAT-ից ցածր",
     "onchainAboveThreshold": "Onchain {threshold: string} SAT-ից բարձր",
+    "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Փոխանցման վճար",
     "noFee": "առանց վճարի",
     "lightningSendFee": "{fee: string} + ~{routingFee: string} երթուղավորման վճար",
@@ -2596,7 +2639,8 @@
       "tooLong": "Հասցեն պետք է ունենա առնվազն 50 նիշ",
       "invalidCharacter": "րՀասցեն կարող է ունենալ միայն նամակներ, թվեր, և ստորագծեր",
       "addressUnavailable": "Ներողություն, այս հասցեն արդեն կիրառվում է",
-      "unknownError": "Անհայտ սխալ։ Խնդրում ենք կրկին փորձել ավելի ուշ"
+      "unknownError": "Անհայտ սխալ։ Խնդրում ենք կրկին փորձել ավելի ուշ",
+      "backupRequired": "Back up your wallet before creating a Lightning address"
     },
     "receiveMoney": "Ստանալ գումար այլ lightning դրամապանակներից և {bankName: string} օգտատերերից այս հասցեով։ ",
     "itCannotBeChanged": "Այն չի կարող փոփոխվել ավելի ուշ։"
@@ -3794,6 +3838,11 @@
     "modalDescription": "Խիստ խորհուրդ ենք տալիս պահուստավորել ձեր դրամապանակը՝ միջոցների ամբողջական կորուստը կանխելու համար, եթե կորցնեք այս սարքը։",
     "secureMe": "Ապահովել դրամապանակը"
   },
+  "BackupRequired": {
+    "modalTitle": "Back up your wallet first",
+    "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
+    "backupNow": "Back up wallet"
+  },
   "NonCustodialInfoBulletin": {
     "title": "Սա ոչ պահպանող հաշիվ է",
     "body": "Ավելին իմանալու համար կարդացեք մեր բլոգի գրառումը",
@@ -3832,7 +3881,7 @@
     "noAccountTitle": "Պահառու հաշիվ է պահանջվում",
     "noAccountDescription": "{featureName: string}-ի համար անհրաժեշտ է Blink պահառու հաշիվ։",
     "featureCircles": "Circles",
-    "featureEarn": "Վաստակել",
+    "featureEarn": "Սովորել",
     "featureCard": "Քարտ"
   },
   "WalletCreationScreen": {

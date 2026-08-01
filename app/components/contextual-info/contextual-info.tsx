@@ -7,14 +7,55 @@ import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { ExpirationTimeModal } from "@app/components/expiration-time-chooser/expiration-time-modal"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { TranslationFunctions } from "@app/i18n/i18n-types"
 import {
   Invoice,
   InvoiceType,
 } from "@app/screens/receive-bitcoin-screen/payment/index.types"
-import { DepositFeesInformation, formatDepositFees } from "@app/utils/deposit-fees"
+import {
+  DepositFeesInformation,
+  FormattedDepositFeeTier,
+  formatDepositFeeTiers,
+} from "@app/utils/deposit-fees"
 
 type FeesInformation = {
   deposit: DepositFeesInformation
+}
+
+/**
+ * Two tiers — the only shape in production — keep the long-standing sentence
+ * so the 28 existing translations stay accurate. Any other tier count is
+ * composed from per-tier fragments instead of being silently misreported.
+ */
+const depositFeeText = (
+  LL: TranslationFunctions,
+  tiers: readonly FormattedDepositFeeTier[],
+): string => {
+  const [first, last] = [tiers[0], tiers[tiers.length - 1]]
+
+  if (tiers.length === 2 && first.maxAmount !== null && last.maxAmount === null) {
+    return LL.ReceiveScreen.depositFee({
+      fee: first.amount,
+      threshold: first.maxAmount,
+      overFee: last.amount,
+    })
+  }
+
+  return LL.ReceiveScreen.depositFeeTiers({
+    tiers: tiers
+      .map((tier) =>
+        tier.maxAmount === null
+          ? LL.ReceiveScreen.depositFeeTierAbove({
+              fee: tier.amount,
+              min: tier.minAmount ?? "0",
+            })
+          : LL.ReceiveScreen.depositFeeTierUpTo({
+              fee: tier.amount,
+              max: tier.maxAmount,
+            }),
+      )
+      .join(", "),
+  })
 }
 
 type ContextualInfoProps = {
@@ -101,14 +142,12 @@ export const ContextualInfo: React.FC<ContextualInfoProps> = ({
   }
 
   if (type === Invoice.OnChain && feesInformation) {
-    const { fee, threshold, overFee } = formatDepositFees(feesInformation.deposit)
+    const tiers = formatDepositFeeTiers(feesInformation.deposit)
 
     return (
       <View style={styles.depositFeeContainer}>
         <GaloyIcon name="warning" size={16} color={colors.grey1} />
-        <Text style={styles.depositFeeText}>
-          {LL.ReceiveScreen.depositFee({ fee, threshold, overFee })}
-        </Text>
+        <Text style={styles.depositFeeText}>{depositFeeText(LL, tiers)}</Text>
       </View>
     )
   }

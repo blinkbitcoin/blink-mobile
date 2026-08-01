@@ -1,4 +1,38 @@
 {
+    "ApiScreen": {
+        "keysGroupTitle": "Claves API",
+        "noKeys": "Aún no hay claves API",
+        "createKey": "Crear clave API",
+        "createTitle": "Nueva clave API",
+        "keyCreatedTitle": "Clave API creada",
+        "keyName": "Nombre de la clave",
+        "keyNamePlaceholder": "p. ej. BTCPay Server",
+        "scopeRead": "Lectura",
+        "scopeReadDescription": "Ver el saldo y el historial de transacciones",
+        "scopeReceive": "Recibir",
+        "scopeReceiveDescription": "Crear facturas y recibir pagos",
+        "scopeWrite": "Escritura",
+        "writeScopeDashboardOnly": "Las claves que pueden enviar pagos solo se pueden crear en dashboard.blink.sv",
+        "expiry": "Vence",
+        "expiry30Days": "30 días",
+        "expiry90Days": "90 días",
+        "expiryNever": "Nunca",
+        "expiresOn": "Vence el {date: string}",
+        "neverExpires": "No vence nunca",
+        "revoked": "Revocada",
+        "expired": "Venció el {date: string}",
+        "expiredNoDate": "Vencida",
+        "secretWarning": "Esta es la única vez que se muestra la clave. Cópiala o compártela ahora y guárdala en un lugar seguro.",
+        "secretCopied": "Clave API copiada. El portapapeles se borra en 1 minuto",
+        "revokeTitle": "¿Revocar la clave API?",
+        "revokeBody": "\"{name: string}\" dejará de funcionar de inmediato. Esto no se puede deshacer.",
+        "revoke": "Revocar",
+        "revokeSuccess": "Clave API revocada",
+        "createError": "No se pudo crear la clave API. Inténtalo de nuevo.",
+        "revokeError": "No se pudo revocar la clave API. Inténtalo de nuevo.",
+        "loadError": "No se pudieron cargar tus claves API. Inténtalo más tarde.",
+        "done": "Listo"
+    },
     "GaloyAddressScreen": {
         "title": "Recibe pagos usando: ",
         "buttonTitle": "Establece tu dirección ",
@@ -2003,7 +2037,7 @@
         "satAccumulated": "Satoshis acumulados",
         "satsEarned": "{formattedNumber | sats} ganados",
         "sectionsCompleted": "Has completado",
-        "title": "Ganar",
+        "title": "Aprender",
         "unlockQuestion": "Para desbloquear, responda la pregunta:",
         "youEarned": "Has Ganado",
         "registerTitle": "Necesitas actualizar tu cuenta",
@@ -2011,6 +2045,7 @@
         "oneSectionADay": "¡Una sección al día!",
         "availableTomorrow": "Regresa mañana para seguir ganando sats mientras aprendes.\n\nO, haz clic en continuar para seguir aprendiendo sin recompensas.",
         "motivatingBadger": "Ábrete camino a través de estas lecciones y gana mientras aprendes",
+        "motivatingBadgerNoRewards": "Ábrete camino a través de estas lecciones y aprende sobre Bitcoin",
         "continueNoRewards": "Continuar (Sin Recompensas)",
         "somethingNotRight": "Algo no está bien...",
         "defaultErrorMessage": "{errorMessage: string} Inténtalo de nuevo más tarde.\nO, haz clic para continuar aprendiendo sin recompensas.",
@@ -2049,7 +2084,7 @@
         "logBackInWith": "Reinicia sesión con",
         "login": "Iniciar sesión",
         "loginOrRestore": "Iniciar sesión / Restaurar",
-        "headline": "El banco con dinero sólido",
+        "headline": "Billetera desarrollada por Blink",
         "startTrialAccount": "Empieza con una cuenta de prueba.",
         "startWithTrialAccount": "Empezar con la cuenta de prueba",
         "registerPhoneAccount": "Registra cuenta de teléfono",
@@ -2163,6 +2198,9 @@
         "lightningInvoice": "Factura lightning",
         "bitcoinOnchain": "Bitcoin onchain",
         "depositFee": "Comisión de depósito: {fee} SAT para montos menores a {threshold} SAT o {overFee} SAT para depósitos mayores a {threshold} SAT",
+        "depositFeeTiers": "Deposit fees: {tiers: string}",
+        "depositFeeTierUpTo": "{fee: string} SAT up to {max: string} SAT",
+        "depositFeeTierAbove": "{fee: string} SAT above {min: string} SAT",
         "autoConvertMinAmount": "Los montos por debajo de {minSats: number} sats / {minFiat: string} no pueden convertirse a Dólar automáticamente. Recibirás Bitcoin.",
         "autoConvertFailed": "Pago recibido pero la conversión falló.",
         "pleaseWaitForConversion": "Por favor espera hasta que la conversión se complete"
@@ -2261,6 +2299,10 @@
         "invalidPhoneNumber": "Introduzca un número de teléfono válido",
         "phoneNotAllowed": "Este campo no acepta números de teléfono"
     },
+    "MerchantSelectionScreen": {
+        "title": "Elige una opción de pago",
+        "empty": "No hay opciones de pago disponibles."
+    },
     "SendBitcoinScreen": {
         "willBeSentToMempoolBy": "La transacción debe enviarse a la Mempool.",
         "amount": "Cantidad",
@@ -2319,7 +2361,7 @@
     },
     "SettingsScreen": {
         "createAddress": "Crear dirección",
-        "donationButton": "Botón de donación",
+        "donationButton": "Botón Donar",
         "btcpayServer": "BTCPay Server",
         "woocommerce": "WooCommerce",
         "staticQr": "QR estático imprimible",
@@ -2546,6 +2588,7 @@
         "lightningTransactions": "Transacciones Lightning",
         "onchainBelowThreshold": "Onchain por debajo de {threshold: string} SAT",
         "onchainAboveThreshold": "Onchain por encima de {threshold: string} SAT",
+        "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
         "transferFee": "Comisión por transferencia",
         "noFee": "sin comisión",
         "lightningSendFee": "{fee: string} + ~{routingFee: string} de comisión de enrutamiento",
@@ -2596,7 +2639,8 @@
             "tooLong": "La dirección debe tener como máximo 50 carácteres",
             "invalidCharacter": "La dirección solo puede contener letras, números y guiones bajos",
             "addressUnavailable": "Lo siento, esta dirección ya está ocupada por otro usuario.",
-            "unknownError": "Se produjo un error desconocido, inténtelo de nuevo más tarde"
+            "unknownError": "Se produjo un error desconocido, inténtelo de nuevo más tarde",
+            "backupRequired": "Back up your wallet before creating a Lightning address"
         },
         "receiveMoney": "Reciba dinero de otras billeteras lightning y  de usuarios de {bankName: string} con esta dirección.",
         "itCannotBeChanged": "Elígela bien – ¡no se puede cambiar después!"
@@ -3794,6 +3838,11 @@
         "modalDescription": "Te recomendamos encarecidamente respaldar tu billetera para prevenir una pérdida total de fondos en caso de que pierdas este dispositivo.",
         "secureMe": "Asegurar billetera"
     },
+    "BackupRequired": {
+        "modalTitle": "Back up your wallet first",
+        "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
+        "backupNow": "Back up wallet"
+    },
     "NonCustodialInfoBulletin": {
         "title": "Esta es una cuenta no custodial",
         "body": "Para saber más, lee nuestra entrada del blog",
@@ -3832,7 +3881,7 @@
         "noAccountTitle": "Cuenta custodial requerida",
         "noAccountDescription": "{featureName} requiere una cuenta custodial de Blink.",
         "featureCircles": "Círculos",
-        "featureEarn": "Aprende",
+        "featureEarn": "Aprender",
         "featureCard": "Tarjeta"
     },
     "WalletCreationScreen": {

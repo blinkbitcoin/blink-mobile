@@ -62,6 +62,14 @@ describe("NotificationCardUI", () => {
     expect(getByText("Test Body")).toBeTruthy()
   })
 
+  it("styles the title with the themed bold preset so it outranks the body", () => {
+    const { getByText } = render(<NotificationCardUI {...defaultProps} />)
+
+    expect(getByText("Test Title").props).toMatchObject({ type: "p3", bold: true })
+    expect(getByText("Test Body").props).toMatchObject({ type: "p3" })
+    expect(getByText("Test Body").props.bold).toBeUndefined()
+  })
+
   it("renders icon when provided", () => {
     const { queryByTestId } = render(
       <NotificationCardUI {...defaultProps} icon="warning" />,

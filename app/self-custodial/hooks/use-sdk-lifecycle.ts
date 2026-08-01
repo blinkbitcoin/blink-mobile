@@ -232,7 +232,6 @@ export const useSdkLifecycle = (
         })
         .catch((err) => {
           logSdkEvent(SdkLogLevel.Error, `getUserSettings failed: ${err}`)
-          crashlytics().recordError(new Error(`getUserSettings failed: ${err}`))
         })
     }
 

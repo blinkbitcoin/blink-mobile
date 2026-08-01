@@ -1,4 +1,38 @@
 {
+  "ApiScreen": {
+    "keysGroupTitle": "Klíče API",
+    "noKeys": "Zatím žádné klíče API",
+    "createKey": "Vytvořit klíč API",
+    "createTitle": "Nový klíč API",
+    "keyCreatedTitle": "Klíč API vytvořen",
+    "keyName": "Název klíče",
+    "keyNamePlaceholder": "např. BTCPay Server",
+    "scopeRead": "Čtení",
+    "scopeReadDescription": "Zobrazit zůstatek a historii transakcí",
+    "scopeReceive": "Přijímání",
+    "scopeReceiveDescription": "Vytvářet faktury a přijímat platby",
+    "scopeWrite": "Zápis",
+    "writeScopeDashboardOnly": "Klíče, které mohou odesílat platby, lze vytvořit pouze na dashboard.blink.sv",
+    "expiry": "Vyprší",
+    "expiry30Days": "30 dní",
+    "expiry90Days": "90 dní",
+    "expiryNever": "Nikdy",
+    "expiresOn": "Vyprší {date: string}",
+    "neverExpires": "Nikdy nevyprší",
+    "revoked": "Zrušeno",
+    "expired": "Vypršel {date: string}",
+    "expiredNoDate": "Vypršel",
+    "secretWarning": "Toto je jediný okamžik, kdy se klíč zobrazí. Zkopírujte jej nebo sdílejte hned a bezpečně uložte.",
+    "secretCopied": "Klíč API zkopírován. Schránka se vymaže za 1 minutu",
+    "revokeTitle": "Zrušit klíč API?",
+    "revokeBody": "\"{name: string}\" okamžitě přestane fungovat. Tuto akci nelze vrátit zpět.",
+    "revoke": "Zrušit",
+    "revokeSuccess": "Klíč API zrušen",
+    "createError": "Klíč API se nepodařilo vytvořit. Zkuste to znovu.",
+    "revokeError": "Klíč API se nepodařilo zrušit. Zkuste to znovu.",
+    "loadError": "Vaše klíče API se nepodařilo načíst. Zkuste to později.",
+    "done": "Hotovo"
+  },
   "GaloyAddressScreen": {
     "title": "Přijměte platbu pomocí:",
     "buttonTitle": "Nastavte svou adresu",
@@ -2003,7 +2037,7 @@
     "satAccumulated": "Nahromaděné saty",
     "satsEarned": "{formattedNumber | sats} získáno",
     "sectionsCompleted": "Dokončil jste",
-    "title": "Získej saty",
+    "title": "Učit se",
     "unlockQuestion": "Pro odemčení odpovězte na otázku:",
     "youEarned": "Získal jste",
     "registerTitle": "Musíme aktualizovat váš účet",
@@ -2011,6 +2045,7 @@
     "oneSectionADay": "Jedna sekce denně!",
     "availableTomorrow": "Vraťte se zítra a pokračujte ve vydělávání satů při učení.\n\nNebo klikněte na pokračovat a učte se dál bez odměn.",
     "motivatingBadger": "Prokopejte se těmito lekcemi a vydělávejte při učení",
+    "motivatingBadgerNoRewards": "Prokopejte se těmito lekcemi a učte se o Bitcoinu",
     "continueNoRewards": "Pokračovat (bez odměn)",
     "somethingNotRight": "Něco není v pořádku...",
     "defaultErrorMessage": "{errorMessage: string} Zkuste to prosím později.\nNebo klikněte na pokračovat a učte se dál bez odměn.",
@@ -2049,7 +2084,7 @@
     "login": "Přihlásit se",
     "loginOrRestore": "Přihlásit se / Obnovit",
     "logBackInWith": "Přihlaste se zpět pomocí",
-    "headline": "Peněženka od společnosti Galoy",
+    "headline": "Peněženka od společnosti Blink",
     "startTrialAccount": "Začněte se zkušebním účtem",
     "startWithTrialAccount": "Začněte s demo účtem",
     "registerPhoneAccount": "Registrace telefonního účtu",
@@ -2163,6 +2198,9 @@
     "lightningInvoice": "Lightning faktura",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Poplatek za vklad: {fee} SAT pro částky pod {threshold} SAT nebo {overFee} SAT pro vklady nad {threshold} SAT",
+    "depositFeeTiers": "Deposit fees: {tiers: string}",
+    "depositFeeTierUpTo": "{fee: string} SAT up to {max: string} SAT",
+    "depositFeeTierAbove": "{fee: string} SAT above {min: string} SAT",
     "autoConvertMinAmount": "Částky pod {minSats: number} satoshi / {minFiat: string} nelze automaticky převést na dolary. Obdržíte místo toho Bitcoin.",
     "autoConvertFailed": "Platba přijata, ale konverze selhala.",
     "pleaseWaitForConversion": "Počkejte, prosím, dokud se převod nedokončí"
@@ -2260,6 +2298,10 @@
     "pastedClipboardSuccess": "Vloženo ze schránky",
     "invalidPhoneNumber": "Zadejte platné telefonní číslo",
     "phoneNotAllowed": "Toto pole nepřijímá telefonní čísla"
+  },
+  "MerchantSelectionScreen": {
+    "title": "Vyberte možnost platby",
+    "empty": "Nejsou k dispozici žádné možnosti platby."
   },
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Transakce by měla být odeslána do mempoolu",
@@ -2546,6 +2588,7 @@
     "lightningTransactions": "Lightning transakce",
     "onchainBelowThreshold": "Onchain pod {threshold: string} SAT",
     "onchainAboveThreshold": "Onchain nad {threshold: string} SAT",
+    "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Poplatek za převod",
     "noFee": "bez poplatku",
     "lightningSendFee": "{fee: string} + ~{routingFee: string} směrovací poplatek",
@@ -2596,7 +2639,8 @@
       "tooLong": "Adresa může mít maximálně 50 znaků",
       "invalidCharacter": "Adresa může obsahovat pouze písmena, číslice a podtržítka.",
       "addressUnavailable": "Tato adresa je již obsazena",
-      "unknownError": "Došlo k neznámé chybě, zkuste to prosím později"
+      "unknownError": "Došlo k neznámé chybě, zkuste to prosím později",
+      "backupRequired": "Back up your wallet before creating a Lightning address"
     },
     "receiveMoney": "Přijímejte peníze z jiných Lightning peněženek a od uživatelů {bankName: string} s touto adresou.",
     "itCannotBeChanged": "Později ji nelze změnit."
@@ -3794,6 +3838,11 @@
     "modalDescription": "Důrazně doporučujeme zálohovat peněženku, abyste předešli úplné ztrátě prostředků v případě ztráty tohoto zařízení.",
     "secureMe": "Zabezpečit peněženku"
   },
+  "BackupRequired": {
+    "modalTitle": "Back up your wallet first",
+    "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
+    "backupNow": "Back up wallet"
+  },
   "NonCustodialInfoBulletin": {
     "title": "Toto je nesvěřenský účet",
     "body": "Chcete-li se dozvědět více, přečtěte si náš příspěvek na blogu",
@@ -3832,7 +3881,7 @@
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
     "featureCircles": "Circles",
-    "featureEarn": "Earn",
+    "featureEarn": "Učit se",
     "featureCard": "Card"
   },
   "WalletCreationScreen": {

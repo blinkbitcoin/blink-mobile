@@ -223,6 +223,43 @@ mutation accountUpdateDisplayCurrency($input: AccountUpdateDisplayCurrencyInput!
   }
 }
 
+mutation apiKeyCreate($input: ApiKeyCreateInput!) {
+  apiKeyCreate(input: $input) {
+    apiKey {
+      id
+      name
+      createdAt
+      revoked
+      expired
+      lastUsedAt
+      expiresAt
+      scopes
+      readOnly
+      __typename
+    }
+    apiKeySecret
+    __typename
+  }
+}
+
+mutation apiKeyRevoke($input: ApiKeyRevokeInput!) {
+  apiKeyRevoke(input: $input) {
+    apiKey {
+      id
+      name
+      createdAt
+      revoked
+      expired
+      lastUsedAt
+      expiresAt
+      scopes
+      readOnly
+      __typename
+    }
+    __typename
+  }
+}
+
 mutation captchaCreateChallenge {
   captchaCreateChallenge {
     errors {
@@ -1141,6 +1178,25 @@ query analytics {
   }
 }
 
+query apiKeys {
+  me {
+    id
+    apiKeys {
+      id
+      name
+      createdAt
+      revoked
+      expired
+      lastUsedAt
+      expiresAt
+      scopes
+      readOnly
+      __typename
+    }
+    __typename
+  }
+}
+
 query btcPriceList($range: PriceGraphRange!) {
   btcPriceList(range: $range) {
     timestamp
@@ -1311,7 +1367,11 @@ query feeRates {
       deposit {
         minBankFee
         minBankFeeThreshold
-        ratio
+        tiers {
+          maxAmount
+          amount
+          __typename
+        }
         __typename
       }
       __typename
@@ -1604,7 +1664,11 @@ query paymentRequest {
       deposit {
         minBankFee
         minBankFeeThreshold
-        ratio
+        tiers {
+          maxAmount
+          amount
+          __typename
+        }
         __typename
       }
       __typename
@@ -1981,6 +2045,28 @@ query transactionOwnershipProbe($first: Int) {
             id
             __typename
           }
+          __typename
+        }
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+}
+
+query transactionsByPaymentHash($walletId: WalletId!, $paymentHash: PaymentHash!) {
+  me {
+    id
+    defaultAccount {
+      id
+      walletById(walletId: $walletId) {
+        id
+        transactionsByPaymentHash(paymentHash: $paymentHash) {
+          id
+          status
+          direction
+          createdAt
           __typename
         }
         __typename

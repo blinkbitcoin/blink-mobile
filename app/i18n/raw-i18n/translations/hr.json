@@ -1,4 +1,38 @@
 {
+  "ApiScreen": {
+    "keysGroupTitle": "API ključevi",
+    "noKeys": "Još nema API ključeva",
+    "createKey": "Stvori API ključ",
+    "createTitle": "Novi API ključ",
+    "keyCreatedTitle": "API ključ je stvoren",
+    "keyName": "Naziv ključa",
+    "keyNamePlaceholder": "npr. BTCPay Server",
+    "scopeRead": "Čitanje",
+    "scopeReadDescription": "Pregled stanja i povijesti transakcija",
+    "scopeReceive": "Primanje",
+    "scopeReceiveDescription": "Stvaranje računa i primanje uplata",
+    "scopeWrite": "Pisanje",
+    "writeScopeDashboardOnly": "Ključevi koji mogu slati uplate mogu se stvoriti samo na dashboard.blink.sv",
+    "expiry": "Istječe",
+    "expiry30Days": "30 dana",
+    "expiry90Days": "90 dana",
+    "expiryNever": "Nikad",
+    "expiresOn": "Istječe {date: string}",
+    "neverExpires": "Nikad ne istječe",
+    "revoked": "Opozvan",
+    "expired": "Istekao {date: string}",
+    "expiredNoDate": "Istekao",
+    "secretWarning": "Ovo je jedini put da se ključ prikazuje. Kopirajte ga ili podijelite sada i sigurno ga pohranite.",
+    "secretCopied": "API ključ kopiran. Međuspremnik se briše za 1 minutu",
+    "revokeTitle": "Opozvati API ključ?",
+    "revokeBody": "\"{name: string}\" odmah će prestati raditi. Ovo se ne može poništiti.",
+    "revoke": "Opozovi",
+    "revokeSuccess": "API ključ opozvan",
+    "createError": "API ključ nije moguće stvoriti. Pokušajte ponovno.",
+    "revokeError": "API ključ nije moguće opozvati. Pokušajte ponovno.",
+    "loadError": "Vaše API ključeve nije moguće učitati. Pokušajte kasnije.",
+    "done": "Gotovo"
+  },
   "GaloyAddressScreen": {
     "title": "Primi plaćanje koristeći:",
     "buttonTitle": "Postavi svoju adresu",
@@ -2003,7 +2037,7 @@
     "satAccumulated": "Sat akumulirani",
     "satsEarned": "{formattedNumber | sats} osvojeno",
     "sectionsCompleted": "Završili ste",
-    "title": "Zaradi",
+    "title": "Učenje",
     "unlockQuestion": "Za otključavanje odgovorite na pitanje:",
     "youEarned": "Zaradio si",
     "registerTitle": "Morate nadograditi svoj račun",
@@ -2011,6 +2045,7 @@
     "oneSectionADay": "Jedna sekcija dnevno!",
     "availableTomorrow": "Vratite se sutra i nastavite zarađivati satove dok učite.\n\nIli kliknite nastavi za nastavak učenja bez nagrada.",
     "motivatingBadger": "Prokopajte se kroz ove lekcije i zarađujte dok učite",
+    "motivatingBadgerNoRewards": "Prokopajte se kroz ove lekcije i naučite više o Bitcoinu",
     "continueNoRewards": "Nastavi (bez nagrada)",
     "somethingNotRight": "Nešto nije u redu...",
     "defaultErrorMessage": "{errorMessage: string} Molimo pokušajte ponovo kasnije.\nIli kliknite nastavi za nastavak učenja bez nagrada.",
@@ -2049,7 +2084,7 @@
     "login": "Prijava",
     "loginOrRestore": "Prijava / Obnova",
     "logBackInWith": "Prijavi se ponovo s",
-    "headline": "Novčanik koji pokreće Galoy",
+    "headline": "Novčanik koji pokreće Blink",
     "startTrialAccount": "Započni s probnim računom",
     "startWithTrialAccount": "Započni s probnim računom",
     "registerPhoneAccount": "Registrirajte telefonski račun",
@@ -2163,6 +2198,9 @@
     "lightningInvoice": "Lightning račun",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Naknada za polog: {fee} SAT za iznose ispod {threshold} SAT ili {overFee} SAT za pologe iznad {threshold} SAT",
+    "depositFeeTiers": "Deposit fees: {tiers: string}",
+    "depositFeeTierUpTo": "{fee: string} SAT up to {max: string} SAT",
+    "depositFeeTierAbove": "{fee: string} SAT above {min: string} SAT",
     "autoConvertMinAmount": "Iznosi manji od {minSats: number} satoshija / {minFiat: string} ne mogu se automatski pretvoriti u Dolare. Primit ćete Bitcoin.",
     "autoConvertFailed": "Uplata primljena, ali konverzija nije uspjela.",
     "pleaseWaitForConversion": "Pričekajte dok se konverzija ne dovrši"
@@ -2261,6 +2299,10 @@
     "invalidPhoneNumber": "Unesite valjani broj mobitela",
     "phoneNotAllowed": "Ovo polje ne prihvaća telefonske brojeve"
   },
+  "MerchantSelectionScreen": {
+    "title": "Odaberite opciju plaćanja",
+    "empty": "Nema dostupnih opcija plaćanja."
+  },
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Transakcija bi trebala biti poslana u mempool",
     "amount": "Iznos",
@@ -2319,7 +2361,7 @@
   },
   "SettingsScreen": {
     "createAddress": "Stvori adresu",
-    "donationButton": "Gumb za donacije",
+    "donationButton": "Gumb za doniranje",
     "btcpayServer": "BTCPay Server",
     "woocommerce": "WooCommerce",
     "staticQr": "Statični QR za ispis",
@@ -2546,6 +2588,7 @@
     "lightningTransactions": "Lightning transakcije",
     "onchainBelowThreshold": "Onchain ispod {threshold: string} SAT",
     "onchainAboveThreshold": "Onchain iznad {threshold: string} SAT",
+    "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Naknada za prijenos",
     "noFee": "bez naknade",
     "lightningSendFee": "{fee: string} + ~{routingFee: string} naknada za usmjeravanje",
@@ -2596,7 +2639,8 @@
       "tooLong": "Adresa mora imati najviše 50 znakova",
       "invalidCharacter": "Adresa može sadržavati samo slova, brojke i donje crte",
       "addressUnavailable": "Nažalost, ova adresa je već zauzeta",
-      "unknownError": "Došlo je do nepoznate pogreške, molimo pokušajte ponovno kasnije"
+      "unknownError": "Došlo je do nepoznate pogreške, molimo pokušajte ponovno kasnije",
+      "backupRequired": "Back up your wallet before creating a Lightning address"
     },
     "receiveMoney": "Primajte novac od drugih Lightning novčanika i korisnika {bankName: string} s ovom adresom.",
     "itCannotBeChanged": "Kasnije se ne može promijeniti."
@@ -3794,6 +3838,11 @@
     "modalDescription": "Preporučujemo da napravite sigurnosnu kopiju novčanika kako biste spriječili potpuni gubitak sredstava u slučaju da izgubite ovaj uređaj.",
     "secureMe": "Osiguraj novčanik"
   },
+  "BackupRequired": {
+    "modalTitle": "Back up your wallet first",
+    "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
+    "backupNow": "Back up wallet"
+  },
   "NonCustodialInfoBulletin": {
     "title": "Ovo je račun bez skrbništva",
     "body": "Da biste saznali više, pročitajte naš blog post",
@@ -3832,7 +3881,7 @@
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
     "featureCircles": "Circles",
-    "featureEarn": "Earn",
+    "featureEarn": "Učenje",
     "featureCard": "Card"
   },
   "WalletCreationScreen": {

@@ -1,4 +1,38 @@
 {
+  "ApiScreen": {
+    "keysGroupTitle": "Κλειδιά API",
+    "noKeys": "Δεν υπάρχουν ακόμη κλειδιά API",
+    "createKey": "Δημιουργία κλειδιού API",
+    "createTitle": "Νέο κλειδί API",
+    "keyCreatedTitle": "Το κλειδί API δημιουργήθηκε",
+    "keyName": "Όνομα κλειδιού",
+    "keyNamePlaceholder": "π.χ. BTCPay Server",
+    "scopeRead": "Ανάγνωση",
+    "scopeReadDescription": "Προβολή υπολοίπου και ιστορικού συναλλαγών",
+    "scopeReceive": "Λήψη",
+    "scopeReceiveDescription": "Δημιουργία τιμολογίων και λήψη πληρωμών",
+    "scopeWrite": "Εγγραφή",
+    "writeScopeDashboardOnly": "Τα κλειδιά που μπορούν να στέλνουν πληρωμές μπορούν να δημιουργηθούν μόνο στο dashboard.blink.sv",
+    "expiry": "Λήγει",
+    "expiry30Days": "30 ημέρες",
+    "expiry90Days": "90 ημέρες",
+    "expiryNever": "Ποτέ",
+    "expiresOn": "Λήγει στις {date: string}",
+    "neverExpires": "Δεν λήγει ποτέ",
+    "revoked": "Ανακλήθηκε",
+    "expired": "Έληξε στις {date: string}",
+    "expiredNoDate": "Έληξε",
+    "secretWarning": "Αυτή είναι η μόνη φορά που εμφανίζεται το κλειδί. Αντιγράψτε ή μοιραστείτε το τώρα και φυλάξτε το με ασφάλεια.",
+    "secretCopied": "Το κλειδί API αντιγράφηκε. Το πρόχειρο καθαρίζεται σε 1 λεπτό",
+    "revokeTitle": "Ανάκληση κλειδιού API;",
+    "revokeBody": "Το \"{name: string}\" θα σταματήσει να λειτουργεί αμέσως. Αυτό δεν μπορεί να αναιρεθεί.",
+    "revoke": "Ανάκληση",
+    "revokeSuccess": "Το κλειδί API ανακλήθηκε",
+    "createError": "Δεν ήταν δυνατή η δημιουργία του κλειδιού API. Προσπαθήστε ξανά.",
+    "revokeError": "Δεν ήταν δυνατή η ανάκληση του κλειδιού API. Προσπαθήστε ξανά.",
+    "loadError": "Δεν ήταν δυνατή η φόρτωση των κλειδιών API σας. Προσπαθήστε αργότερα.",
+    "done": "Έτοιμο"
+  },
   "GaloyAddressScreen": {
     "title": "Λάβετε πληρωμή χρησιμοποιώντας:",
     "buttonTitle": "Ορίστε την διεύθυνσή σας",
@@ -2003,7 +2037,7 @@
     "satAccumulated": "Συσσωρευμένα sats ",
     "satsEarned": "{formattedNumber | sats} earned",
     "sectionsCompleted": "Ολοκληρώσατε",
-    "title": "Κερδίστε ",
+    "title": "Μάθηση",
     "unlockQuestion": "Για να ξεκλειδώσετε, απαντήστε στην ερώτηση:",
     "youEarned": "Έχετε κερδίσει",
     "registerTitle": "Χρειάζεται να αναβαθμίσετε τον λογαριασμό σας",
@@ -2011,6 +2045,7 @@
     "oneSectionADay": "Μια ενότητα την ημέρα!",
     "availableTomorrow": "Επιστρέψτε αύριο και συνεχίστε να μαθαίνετε για το Bitcoin!",
     "motivatingBadger": "Ανακαλύψτε το δρόμο σας μέσα από αυτά τα μαθήματα και κερδίστε καθώς μαθαίνετε",
+    "motivatingBadgerNoRewards": "Ανακαλύψτε το δρόμο σας μέσα από αυτά τα μαθήματα και μάθετε για το Bitcoin",
     "continueNoRewards": "Συνέχεια (Χωρίς Ανταμοιβές)",
     "somethingNotRight": "Κάτι Δεν Πάει Καλά...",
     "defaultErrorMessage": "{errorMessage: string} Παρακαλούμε δοκιμάστε ξανά αργότερα.\nΉ, κάντε κλικ για να συνεχίσετε τη μάθηση χωρίς ανταμοιβές.",
@@ -2049,7 +2084,7 @@
     "login": "Σύνδεση",
     "loginOrRestore": "Σύνδεση / Επαναφορά",
     "logBackInWith": "Συνδεθείτε ξανά με",
-    "headline": "Πορτοφόλι που παρέχεται από την Galoy",
+    "headline": "Πορτοφόλι που παρέχεται από την Blink",
     "startTrialAccount": "Ξεκινήστε με έναν δοκιμαστικό λογαριασμό",
     "startWithTrialAccount": "Ξεκινήστε μ' έναν δοκιμαστικό λογαριασμό",
     "registerPhoneAccount": "Καταχώριση λογαριασμού τηλεφώνου",
@@ -2163,6 +2198,9 @@
     "lightningInvoice": "Τιμολόγιο lightning",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Χρέωση κατάθεσης: {fee} SAT για ποσά κάτω από {threshold} SAT ή {overFee} SAT για καταθέσεις πάνω από {threshold} SAT",
+    "depositFeeTiers": "Deposit fees: {tiers: string}",
+    "depositFeeTierUpTo": "{fee: string} SAT up to {max: string} SAT",
+    "depositFeeTierAbove": "{fee: string} SAT above {min: string} SAT",
     "autoConvertMinAmount": "Ποσά κάτω από {minSats: number} sats / {minFiat: string} δεν μπορούν να μετατραπούν αυτόματα σε Δολάρια. Θα λάβετε Bitcoin.",
     "autoConvertFailed": "Η πληρωμή ελήφθη αλλά η μετατροπή απέτυχε.",
     "pleaseWaitForConversion": "Παρακαλούμε περιμένετε μέχρι να ολοκληρωθεί η μετατροπή"
@@ -2260,6 +2298,10 @@
     "pastedClipboardSuccess": "Επικόλληση από πρόχειρο",
     "invalidPhoneNumber": "Εισαγάγετε έγκυρο αριθμό κινητού",
     "phoneNotAllowed": "Αυτό το πεδίο δεν δέχεται αριθμούς τηλεφώνου"
+  },
+  "MerchantSelectionScreen": {
+    "title": "Επιλέξτε επιλογή πληρωμής",
+    "empty": "Δεν υπάρχουν διαθέσιμες επιλογές πληρωμής."
   },
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Η συναλλαγή πρέπει να υποβληθεί στη mempool",
@@ -2546,6 +2588,7 @@
     "lightningTransactions": "Συναλλαγές Lightning",
     "onchainBelowThreshold": "Onchain κάτω από {threshold: string} SAT",
     "onchainAboveThreshold": "Onchain πάνω από {threshold: string} SAT",
+    "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Τέλος μεταφοράς",
     "noFee": "χωρίς τέλη",
     "lightningSendFee": "{fee: string} + ~{routingFee: string} τέλος δρομολόγησης",
@@ -2596,7 +2639,8 @@
       "tooLong": "Η διεύθυνση πρέπει να είναι μέχρι 50 χαρακτήσρες",
       "invalidCharacter": "Η διεύθυνση μπορεί να περιέχει μόνο γράμματα, αριθμούς και κάτω παύλες",
       "addressUnavailable": "Λυπούμαστε, αυτή η διεύθυνση είναι κατειλημμένη ",
-      "unknownError": "Προέκυψε άγνωστο σφάλμα, παρακαλούμε δοκιμάστε ξανά αργότερα "
+      "unknownError": "Προέκυψε άγνωστο σφάλμα, παρακαλούμε δοκιμάστε ξανά αργότερα ",
+      "backupRequired": "Back up your wallet before creating a Lightning address"
     },
     "receiveMoney": "Λάβετε χρήματα από άλλα πορτοφόλια lightning και {bankName: string} χρήστες με αυτή τη διεύθυνση.",
     "itCannotBeChanged": "Αυτό δεν μπορεί ν' αλλάξει αργότερα."
@@ -3794,6 +3838,11 @@
     "modalDescription": "Σας συνιστούμε ανεπιφύλακτα να δημιουργήσετε αντίγραφο ασφαλείας του πορτοφολιού σας για να αποτρέψετε πλήρη απώλεια κεφαλαίων σε περίπτωση που χάσετε αυτήν τη συσκευή.",
     "secureMe": "Ασφάλιση πορτοφολιού"
   },
+  "BackupRequired": {
+    "modalTitle": "Back up your wallet first",
+    "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
+    "backupNow": "Back up wallet"
+  },
   "NonCustodialInfoBulletin": {
     "title": "Αυτός είναι ένας λογαριασμός μη φύλαξης",
     "body": "Για να μάθετε περισσότερα, διαβάστε την ανάρτηση του ιστολογίου μας",
@@ -3832,7 +3881,7 @@
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
     "featureCircles": "Circles",
-    "featureEarn": "Earn",
+    "featureEarn": "Μάθηση",
     "featureCard": "Card"
   },
   "WalletCreationScreen": {

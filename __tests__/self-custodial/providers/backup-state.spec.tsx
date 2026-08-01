@@ -54,6 +54,7 @@ const makeAccount = (id: string) => ({
 
 jest.mock("@react-native-firebase/crashlytics", () => () => ({
   recordError: jest.fn(),
+  log: jest.fn(),
 }))
 
 const wrapper: React.FC<React.PropsWithChildren> = ({ children }) => (

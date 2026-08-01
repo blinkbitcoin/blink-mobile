@@ -40,6 +40,7 @@ jest.mock("@app/utils/toast", () => ({
 const mockRecordError = jest.fn()
 jest.mock("@react-native-firebase/crashlytics", () => () => ({
   recordError: (...args: readonly unknown[]) => mockRecordError(...args),
+  log: jest.fn(),
 }))
 
 const mockLogBackupCompleted = jest.fn()

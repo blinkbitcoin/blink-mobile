@@ -39,6 +39,7 @@ import SendBitcoinCompletedScreen from "@app/screens/send-bitcoin-screen/send-bi
 import SendBitcoinConfirmationScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-confirmation-screen"
 import SendBitcoinDestinationScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-destination-screen"
 import SendBitcoinDetailsScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-details-screen"
+import MerchantSelectionScreen from "@app/screens/send-bitcoin-screen/merchant-selection-screen"
 import { SetLightningAddressScreen } from "@app/screens/lightning-address-screen/set-lightning-address-screen"
 import { AccountScreen, SwitchAccount } from "@app/screens/settings-screen/account"
 import { DefaultWalletScreen } from "@app/screens/settings-screen/default-wallet"
@@ -173,6 +174,7 @@ import { AcceptTermsAndConditionsScreen } from "@app/screens/accept-t-and-c"
 import { TouchableOpacity } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import { ApiScreen } from "@app/screens/settings-screen/api-screen"
+import { ApiKeyCreateScreen } from "@app/screens/settings-screen/api/api-key-create-screen"
 
 const RootNavigator = createNativeStackNavigator<RootStackParamList>()
 
@@ -190,6 +192,7 @@ const ScanningQRCodeGated = withOfflineGate(ScanningQRCodeScreen)
 const SendBitcoinDestinationGated = withOfflineGate(SendBitcoinDestinationScreen)
 const SendBitcoinDetailsGated = withOfflineGate(SendBitcoinDetailsScreen)
 const SendBitcoinConfirmationGated = withOfflineGate(SendBitcoinConfirmationScreen)
+const MerchantSelectionGated = withOfflineGate(MerchantSelectionScreen)
 const ReceiveOfflineGated = withOfflineGate(ReceiveScreen)
 const ReceiveGated: React.FC = () => (
   <WindDownReceiveGate>
@@ -317,6 +320,11 @@ export const RootStack = () => {
         name="sendBitcoinDetails"
         component={SendBitcoinDetailsGated}
         options={{ title: LL.SendBitcoinScreen.title() }}
+      />
+      <RootNavigator.Screen
+        name="merchantSelection"
+        component={MerchantSelectionGated}
+        options={{ title: LL.MerchantSelectionScreen.title() }}
       />
       <RootNavigator.Screen
         name="sendBitcoinConfirmation"
@@ -530,6 +538,13 @@ export const RootStack = () => {
         component={ApiScreen}
         options={{
           title: LL.SettingsScreen.apiAcess(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="apiKeyCreateScreen"
+        component={ApiKeyCreateScreen}
+        options={{
+          title: LL.ApiScreen.createTitle(),
         }}
       />
       <RootNavigator.Screen

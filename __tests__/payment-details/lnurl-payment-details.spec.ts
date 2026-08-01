@@ -117,6 +117,22 @@ describe("lnurl payment details", () => {
     )
   })
 
+  it("exposes the fetched bolt11 invoice as paymentRequest", () => {
+    const paymentDetails = createLnurlPaymentDetails(defaultParamsWithInvoice)
+    if (paymentDetails.paymentType !== "lnurl") {
+      throw new Error("expected an lnurl payment detail")
+    }
+    expect(paymentDetails.paymentRequest).toBe(defaultParamsWithInvoice.paymentRequest)
+  })
+
+  it("has no paymentRequest before an invoice is fetched", () => {
+    const paymentDetails = createLnurlPaymentDetails(defaultParamsWithoutInvoice)
+    if (paymentDetails.paymentType !== "lnurl") {
+      throw new Error("expected an lnurl payment detail")
+    }
+    expect(paymentDetails.paymentRequest).toBeUndefined()
+  })
+
   describe("sending from a btc wallet", () => {
     const btcSendingWalletParams = {
       ...defaultParamsWithInvoice,

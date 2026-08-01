@@ -1,4 +1,38 @@
 {
+  "ApiScreen": {
+    "keysGroupTitle": "API-kulcsok",
+    "noKeys": "Még nincsenek API-kulcsok",
+    "createKey": "API-kulcs létrehozása",
+    "createTitle": "Új API-kulcs",
+    "keyCreatedTitle": "API-kulcs létrehozva",
+    "keyName": "Kulcs neve",
+    "keyNamePlaceholder": "pl. BTCPay Server",
+    "scopeRead": "Olvasás",
+    "scopeReadDescription": "Egyenleg és tranzakciós előzmények megtekintése",
+    "scopeReceive": "Fogadás",
+    "scopeReceiveDescription": "Számlák létrehozása és fizetések fogadása",
+    "scopeWrite": "Írás",
+    "writeScopeDashboardOnly": "A fizetések küldésére alkalmas kulcsok csak a dashboard.blink.sv oldalon hozhatók létre",
+    "expiry": "Lejár",
+    "expiry30Days": "30 nap",
+    "expiry90Days": "90 nap",
+    "expiryNever": "Soha",
+    "expiresOn": "Lejár: {date: string}",
+    "neverExpires": "Soha nem jár le",
+    "revoked": "Visszavonva",
+    "expired": "Lejárt: {date: string}",
+    "expiredNoDate": "Lejárt",
+    "secretWarning": "A kulcs csak most jelenik meg. Másolja ki vagy ossza meg most, és tárolja biztonságosan.",
+    "secretCopied": "API-kulcs kimásolva. A vágólap 1 perc múlva törlődik",
+    "revokeTitle": "Visszavonja az API-kulcsot?",
+    "revokeBody": "A(z) \"{name: string}\" azonnal működésképtelenné válik. Ez nem vonható vissza.",
+    "revoke": "Visszavonás",
+    "revokeSuccess": "API-kulcs visszavonva",
+    "createError": "Az API-kulcs létrehozása nem sikerült. Próbálja újra.",
+    "revokeError": "Az API-kulcs visszavonása nem sikerült. Próbálja újra.",
+    "loadError": "Az API-kulcsok betöltése nem sikerült. Próbálja később.",
+    "done": "Kész"
+  },
   "GaloyAddressScreen": {
     "title": "Fizetés fogadása így:",
     "buttonTitle": "Állítsd be a címed",
@@ -2003,7 +2037,7 @@
     "satAccumulated": "Keresett satoshik",
     "satsEarned": "{formattedNumber | sats}-ot kaptál",
     "sectionsCompleted": "Befejezett szakaszok",
-    "title": "Kvíz",
+    "title": "Tanulás",
     "unlockQuestion": "Feloldáshoz, válaszolj a kérdésre:",
     "youEarned": "Kerestél",
     "registerTitle": "A magasabb szintű számlára kell váltanod",
@@ -2011,6 +2045,7 @@
     "oneSectionADay": "Naponta csak egy fejezet lehetséges!",
     "availableTomorrow": "Gyere vissza holnap, hogy folytathasd a tanulást!",
     "motivatingBadger": "Haladj végig ezeken a leckéken, és keress a tanulás során",
+    "motivatingBadgerNoRewards": "Haladj végig ezeken a leckéken, és tanulj a Bitcoinról",
     "continueNoRewards": "Folytatás (jutalom nélkül)",
     "somethingNotRight": "Valami nem stimmel...",
     "defaultErrorMessage": "{errorMessage: string} Kérjük, próbáld újra később.\nVagy kattints a folytatásra, hogy jutalom nélkül tanulhass tovább.",
@@ -2049,7 +2084,7 @@
     "login": "Bejelentkezés",
     "loginOrRestore": "Bejelentkezés / Visszaállítás",
     "logBackInWith": "Újra bejelentkezés ezzel:",
-    "headline": "A Galoy által biztosított tárca",
+    "headline": "A Blink által biztosított tárca",
     "startTrialAccount": "Kezdés próba fiókkal",
     "startWithTrialAccount": "Kezdés próba fiókkal",
     "registerPhoneAccount": "Telefon alapú fiók regisztrálása",
@@ -2163,6 +2198,9 @@
     "lightningInvoice": "Lightning számla",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Befizetési díj: {fee} SAT az {threshold} SAT alatti összegekre vagy {overFee} SAT az {threshold} SAT feletti befizetésekre",
+    "depositFeeTiers": "Deposit fees: {tiers: string}",
+    "depositFeeTierUpTo": "{fee: string} SAT up to {max: string} SAT",
+    "depositFeeTierAbove": "{fee: string} SAT above {min: string} SAT",
     "autoConvertMinAmount": "A {minSats: number} satoshi / {minFiat: string} alatti összegek nem konvertálhatók automatikusan Dollárra. Bitcoint fogsz kapni helyette.",
     "autoConvertFailed": "Fizetés beérkezett, de a konverzió nem sikerült.",
     "pleaseWaitForConversion": "Kérjük, várjon, amíg a konverzió befejeződik"
@@ -2260,6 +2298,10 @@
     "pastedClipboardSuccess": "Beillesztve a vágólapról",
     "invalidPhoneNumber": "Adj meg egy érvényes mobilszámot",
     "phoneNotAllowed": "Ez a mező nem fogad el telefonszámokat"
+  },
+  "MerchantSelectionScreen": {
+    "title": "Fizetési mód kiválasztása",
+    "empty": "Nincsenek elérhető fizetési lehetőségek."
   },
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "A tranzakciót elküldjük a mempoolba",
@@ -2546,6 +2588,7 @@
     "lightningTransactions": "Lightning tranzakciók",
     "onchainBelowThreshold": "Onchain {threshold: string} SAT alatt",
     "onchainAboveThreshold": "Onchain {threshold: string} SAT felett",
+    "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Átutalási díj",
     "noFee": "díjmentes",
     "lightningSendFee": "{fee: string} + ~{routingFee: string} útválasztási díj",
@@ -2596,7 +2639,8 @@
       "tooLong": "A cím legfeljebb 50 karakter hosszú lehet",
       "invalidCharacter": "A cím csak betűket, számokat és aláhúzásjeleket tartalmazhat",
       "addressUnavailable": "Sajnáljuk, ez a cím már foglalt",
-      "unknownError": "Ismeretlen hiba történt, kérjük, próbálja újra később"
+      "unknownError": "Ismeretlen hiba történt, kérjük, próbálja újra később",
+      "backupRequired": "Back up your wallet before creating a Lightning address"
     },
     "receiveMoney": "Fogadj pénzt más Lightning tárcákból és {bankName: string} felhasználóktól ezzel a címmel.",
     "itCannotBeChanged": "Később nem lehet megváltoztatni."
@@ -3794,6 +3838,11 @@
     "modalDescription": "Nyomatékosan javasoljuk, hogy készíts biztonsági mentést a tárcádról, hogy megelőzd a pénzeszközeid teljes elvesztését, ha elveszíted ezt az eszközt.",
     "secureMe": "Tárca biztosítása"
   },
+  "BackupRequired": {
+    "modalTitle": "Back up your wallet first",
+    "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
+    "backupNow": "Back up wallet"
+  },
   "NonCustodialInfoBulletin": {
     "title": "Ez egy nem letétkezelt fiók",
     "body": "További információért olvasd el blogbejegyzésünket",
@@ -3832,7 +3881,7 @@
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
     "featureCircles": "Circles",
-    "featureEarn": "Earn",
+    "featureEarn": "Tanulás",
     "featureCard": "Card"
   },
   "WalletCreationScreen": {

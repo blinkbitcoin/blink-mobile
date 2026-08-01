@@ -36,7 +36,7 @@ const mockToastShow = jest.fn()
 
 jest.mock("@react-native-firebase/crashlytics", () => ({
   __esModule: true,
-  default: () => ({ recordError: mockRecordError }),
+  default: () => ({ recordError: mockRecordError, log: jest.fn() }),
 }))
 
 jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({

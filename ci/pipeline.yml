@@ -153,6 +153,7 @@ jobs:
         IPINFO_API_KEY: #@ data.values.ipinfo_api_key
         IPAPI_API_KEY: #@ data.values.ipapi_api_key
         PROXYCHECK_API_KEY: #@ data.values.proxycheck_api_key
+        CRASHLYTICS_SERVICE_ACCOUNT_JSON: #@ data.values.crashlytics_service_account_json
         MIN_BUILD_FREE_GB: 30
   - task: upload-to-gcs
     config:
@@ -325,6 +326,7 @@ jobs:
         IPINFO_API_KEY: #@ data.values.ipinfo_api_key
         IPAPI_API_KEY: #@ data.values.ipapi_api_key
         PROXYCHECK_API_KEY: #@ data.values.proxycheck_api_key
+        CRASHLYTICS_SERVICE_ACCOUNT_JSON: #@ data.values.crashlytics_service_account_json
         MIN_BUILD_FREE_GB: 30
   - task: upload-to-gcs
     config:

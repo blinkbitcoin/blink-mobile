@@ -1,4 +1,38 @@
 {
+  "ApiScreen": {
+    "keysGroupTitle": "คีย์ API",
+    "noKeys": "ยังไม่มีคีย์ API",
+    "createKey": "สร้างคีย์ API",
+    "createTitle": "คีย์ API ใหม่",
+    "keyCreatedTitle": "สร้างคีย์ API แล้ว",
+    "keyName": "ชื่อคีย์",
+    "keyNamePlaceholder": "เช่น BTCPay Server",
+    "scopeRead": "อ่าน",
+    "scopeReadDescription": "ดูยอดคงเหลือและประวัติธุรกรรม",
+    "scopeReceive": "รับ",
+    "scopeReceiveDescription": "สร้างใบแจ้งหนี้และรับการชำระเงิน",
+    "scopeWrite": "เขียน",
+    "writeScopeDashboardOnly": "คีย์ที่สามารถส่งการชำระเงินได้สามารถสร้างได้ที่ dashboard.blink.sv เท่านั้น",
+    "expiry": "หมดอายุ",
+    "expiry30Days": "30 วัน",
+    "expiry90Days": "90 วัน",
+    "expiryNever": "ไม่มีวันหมดอายุ",
+    "expiresOn": "หมดอายุวันที่ {date: string}",
+    "neverExpires": "ไม่มีวันหมดอายุ",
+    "revoked": "เพิกถอนแล้ว",
+    "expired": "หมดอายุเมื่อ {date: string}",
+    "expiredNoDate": "หมดอายุแล้ว",
+    "secretWarning": "นี่เป็นครั้งเดียวที่จะแสดงคีย์นี้ คัดลอกหรือแชร์ทันทีและเก็บไว้อย่างปลอดภัย",
+    "secretCopied": "คัดลอกคีย์ API แล้ว คลิปบอร์ดจะถูกล้างใน 1 นาที",
+    "revokeTitle": "เพิกถอนคีย์ API หรือไม่?",
+    "revokeBody": "\"{name: string}\" จะหยุดทำงานทันที การกระทำนี้ไม่สามารถเลิกทำได้",
+    "revoke": "เพิกถอน",
+    "revokeSuccess": "เพิกถอนคีย์ API แล้ว",
+    "createError": "ไม่สามารถสร้างคีย์ API ได้ โปรดลองอีกครั้ง",
+    "revokeError": "ไม่สามารถเพิกถอนคีย์ API ได้ โปรดลองอีกครั้ง",
+    "loadError": "ไม่สามารถโหลดคีย์ API ของคุณได้ โปรดลองอีกครั้งในภายหลัง",
+    "done": "เสร็จสิ้น"
+  },
   "GaloyAddressScreen": {
     "title": "Receive payment by using:",
     "buttonTitle": "Set your address",
@@ -2003,7 +2037,7 @@
     "satAccumulated": "การรวบรวม sats เสร็จสิ้น",
     "satsEarned": "ได้รับ {formattedNumber | sats}",
     "sectionsCompleted": "คุณทำแบบทดสอบเสร็จสิ้น",
-    "title": "รับเงิน",
+    "title": "เรียนรู้",
     "unlockQuestion": "ตอบคำถามเพื่อปลดล็อค:",
     "youEarned": "คุณได้รับ",
     "registerTitle": "Need to upgrade your account",
@@ -2011,6 +2045,7 @@
     "oneSectionADay": "วันละหนึ่งบท!",
     "availableTomorrow": "กลับมาอีกครั้งพรุ่งนี้เพื่อเรียนรู้และรับ sats ต่อ\n\nหรือกดดำเนินการต่อเพื่อเรียนรู้ต่อโดยไม่รับรางวัล",
     "motivatingBadger": "ขุดค้นผ่านบทเรียนเหล่านี้และรับรางวัลขณะเรียนรู้",
+    "motivatingBadgerNoRewards": "ขุดค้นผ่านบทเรียนเหล่านี้และเรียนรู้เกี่ยวกับบิตคอยน์",
     "continueNoRewards": "ดำเนินการต่อ (ไม่มีรางวัล)",
     "somethingNotRight": "มีบางอย่างไม่ถูกต้อง...",
     "defaultErrorMessage": "{errorMessage: string} กรุณาลองอีกครั้งในภายหลัง\nหรือกดเพื่อเรียนรู้ต่อโดยไม่รับรางวัล",
@@ -2049,7 +2084,7 @@
     "login": "เข้าสู่ระบบ",
     "loginOrRestore": "เข้าสู่ระบบ / กู้คืน",
     "logBackInWith": "Log back in with",
-    "headline": "สนับสนุนโดย Galoy",
+    "headline": "สนับสนุนโดย Blink",
     "startTrialAccount": "Start with a trial account",
     "startWithTrialAccount": "Start with trial account",
     "registerPhoneAccount": "Register phone account",
@@ -2163,6 +2198,9 @@
     "lightningInvoice": "ใบแจ้งหนี้ lightning",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "ค่าธรรมเนียมการฝาก: {fee} SAT สำหรับจำนวนต่ำกว่า {threshold} SAT หรือ {overFee} SAT สำหรับการฝากมากกว่า {threshold} SAT",
+    "depositFeeTiers": "Deposit fees: {tiers: string}",
+    "depositFeeTierUpTo": "{fee: string} SAT up to {max: string} SAT",
+    "depositFeeTierAbove": "{fee: string} SAT above {min: string} SAT",
     "autoConvertMinAmount": "จำนวนต่ำกว่า {minSats: number} satoshi / {minFiat: string} ไม่สามารถแปลงเป็นดอลลาร์อัตโนมัติได้ คุณจะได้รับ Bitcoin แทน",
     "autoConvertFailed": "รับการชำระเงินแล้ว แต่การแปลงล้มเหลว",
     "pleaseWaitForConversion": "โปรดรอจนกว่าการแปลงจะเสร็จสิ้น"
@@ -2260,6 +2298,10 @@
     "pastedClipboardSuccess": "วางจากคลิปบอร์ดแล้ว",
     "invalidPhoneNumber": "กรุณาป้อนหมายเลขโทรศัพท์มือถือที่ถูกต้อง",
     "phoneNotAllowed": "ช่องนี้ไม่รับหมายเลขโทรศัพท์"
+  },
+  "MerchantSelectionScreen": {
+    "title": "เลือกตัวเลือกการชำระเงิน",
+    "empty": "ไม่มีตัวเลือกการชำระเงิน"
   },
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "ธุรกรรมจะถูกส่งไปยัง Mempool",
@@ -2546,6 +2588,7 @@
     "lightningTransactions": "ธุรกรรม Lightning",
     "onchainBelowThreshold": "Onchain ต่ำกว่า {threshold: string} SAT",
     "onchainAboveThreshold": "Onchain มากกว่า {threshold: string} SAT",
+    "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "ค่าธรรมเนียมการโอน",
     "noFee": "ไม่มีค่าธรรมเนียม",
     "lightningSendFee": "{fee: string} + ~{routingFee: string} ค่าธรรมเนียมการกำหนดเส้นทาง",
@@ -2596,7 +2639,8 @@
       "tooLong": "Address must be at most 50 characters long",
       "invalidCharacter": "Address can only contain letters, numbers, and underscores",
       "addressUnavailable": "Sorry, this address is already taken",
-      "unknownError": "An unknown error occurred, please try again later"
+      "unknownError": "An unknown error occurred, please try again later",
+      "backupRequired": "Back up your wallet before creating a Lightning address"
     },
     "receiveMoney": "Receive money from other lightning wallets and {bankName: string} users with this address.",
     "itCannotBeChanged": "It can't be changed later."
@@ -3794,6 +3838,11 @@
     "modalDescription": "เราขอแนะนำอย่างยิ่งให้คุณสำรองข้อมูลกระเป๋าเงินเพื่อป้องกันการสูญเสียเงินทั้งหมดในกรณีที่คุณทำอุปกรณ์นี้หาย",
     "secureMe": "รักษาความปลอดภัยกระเป๋าเงิน"
   },
+  "BackupRequired": {
+    "modalTitle": "Back up your wallet first",
+    "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
+    "backupNow": "Back up wallet"
+  },
   "NonCustodialInfoBulletin": {
     "title": "นี่คือบัญชีแบบไม่ฝากดูแล",
     "body": "อ่านบล็อกโพสต์ของเราเพื่อเรียนรู้เพิ่มเติม",
@@ -3832,7 +3881,7 @@
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
     "featureCircles": "Circles",
-    "featureEarn": "Earn",
+    "featureEarn": "เรียนรู้",
     "featureCard": "Card"
   },
   "WalletCreationScreen": {

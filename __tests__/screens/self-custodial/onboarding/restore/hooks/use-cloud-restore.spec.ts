@@ -96,6 +96,7 @@ jest.mock(
 
 jest.mock("@react-native-firebase/crashlytics", () => () => ({
   recordError: (...args: Error[]) => mockRecordError(...args),
+  log: jest.fn(),
 }))
 
 jest.mock("@app/i18n/i18n-react", () => ({

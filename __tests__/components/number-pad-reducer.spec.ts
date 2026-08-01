@@ -1,3 +1,9 @@
+/**
+ * The @wdio/mocha-framework types in tsconfig.jest.json shadow jest's, and
+ * mocha's `describe` has no `.each`; same import the screen specs use.
+ */
+import { describe } from "@jest/globals"
+
 import { WalletCurrency } from "@app/graphql/generated"
 import { CurrencyInfo } from "@app/hooks/use-display-currency"
 import { WalletOrDisplayCurrency } from "@app/types/amounts"
@@ -7,6 +13,7 @@ import {
   formatNumberPadNumber,
   NumberPadNumber,
 } from "@app/components/amount-input-screen/number-pad-reducer"
+import { groupedInLocale, withDeviceLocale } from "../helpers/device-locale"
 
 const currencyInfo: Record<WalletOrDisplayCurrency, CurrencyInfo> = {
   BTC: {
@@ -139,6 +146,14 @@ describe("numberPadToString", () => {
 })
 
 describe("formatNumberPadNumber", () => {
+  /**
+   * The literals below are how en-US groups digits. formatNumberPadNumber
+   * deliberately follows the device locale, so the locale has to be stated for
+   * them to mean anything; otherwise they assert whatever locale the machine
+   * running the suite is set to. The block after this one covers the others.
+   */
+  withDeviceLocale("en-US")
+
   it("returns empty string for empty amounts with non-BTC currency", () => {
     expect(
       formatNumberPadNumber({
@@ -259,5 +274,74 @@ describe("formatNumberPadNumber", () => {
         currencyInfo,
       }),
     ).toBe("25.50")
+  })
+})
+
+/**
+ * The amount being typed is grouped the way the user's own device groups
+ * digits — that is what the bare `toLocaleString()` in formatNumberPadNumber is
+ * for. These run the same code as if the device were set to each locale in
+ * turn; converted amounts elsewhere in the app stay pinned to "en-US" (see
+ * formatCurrencyHelper in @app/hooks/use-display-currency).
+ */
+describe("formatNumberPadNumber follows the device locale", () => {
+  const formatBtc = (majorAmount: string, minorAmount = "") =>
+    formatNumberPadNumber({
+      numberPadNumber: { majorAmount, minorAmount, hasDecimal: Boolean(minorAmount) },
+      currency: WalletCurrency.Btc,
+      currencyInfo,
+    })
+
+  /**
+   * Locales that group with a plain "," or "." are stable enough across CLDR
+   * releases to spell out, which keeps a real oracle in the suite rather than
+   * one derived from the same ICU data as the code. hi-IN groups in lakhs, so
+   * it also catches swapping the separator while keeping en-US's pattern.
+   */
+  const STABLE_GROUPING = [
+    { deviceLocale: "en-US", hundredThousand: "100,000", million: "1,000,000" },
+    { deviceLocale: "de-DE", hundredThousand: "100.000", million: "1.000.000" },
+    { deviceLocale: "hi-IN", hundredThousand: "1,00,000", million: "10,00,000" },
+  ]
+
+  describe.each(STABLE_GROUPING)(
+    "on a device set to $deviceLocale",
+    ({ deviceLocale, hundredThousand, million }) => {
+      withDeviceLocale(deviceLocale)
+
+      it("groups the major amount the way the device does", () => {
+        expect(formatBtc("100000")).toBe(`${hundredThousand} SAT`)
+        expect(formatBtc("1000000")).toBe(`${million} SAT`)
+      })
+
+      it("leaves the decimal separator as the '.' the keypad types", () => {
+        /**
+         * Only grouping is localised: the minor amount is appended verbatim
+         * after a literal ".", because "." is the key the number pad offers.
+         * In de-DE that reads as "100.000.5", the group and decimal separators
+         * being the same character.
+         */
+        expect(formatBtc("100000", "5")).toBe(`${hundredThousand}.5 SAT`)
+      })
+    },
+  )
+
+  /**
+   * Which space these group with is CLDR-version dependent (fr-FR moved from
+   * U+00A0 to U+202F in CLDR 34, and en-ZA is still on U+00A0), so the
+   * separator is read from the same ICU data rather than hardcoded. The
+   * assertion is that the number pad followed the device, not which byte that
+   * locale uses this year; the en-US check below is what makes that bite.
+   */
+  describe.each(["fr-FR", "en-ZA"])("on a device set to %s", (deviceLocale) => {
+    withDeviceLocale(deviceLocale)
+
+    it("groups the major amount the way the device does", () => {
+      expect(formatBtc("100000")).toBe(`${groupedInLocale(100000, deviceLocale)} SAT`)
+    })
+
+    it("does not fall back to en-US grouping", () => {
+      expect(formatBtc("100000")).not.toBe("100,000 SAT")
+    })
   })
 })

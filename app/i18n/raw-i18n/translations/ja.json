@@ -1,4 +1,38 @@
 {
+    "ApiScreen": {
+        "keysGroupTitle": "APIキー",
+        "noKeys": "APIキーはまだありません",
+        "createKey": "APIキーを作成",
+        "createTitle": "新しいAPIキー",
+        "keyCreatedTitle": "APIキーを作成しました",
+        "keyName": "キー名",
+        "keyNamePlaceholder": "例: BTCPay Server",
+        "scopeRead": "読み取り",
+        "scopeReadDescription": "残高と取引履歴を表示",
+        "scopeReceive": "受け取り",
+        "scopeReceiveDescription": "請求書を作成し支払いを受け取る",
+        "scopeWrite": "書き込み",
+        "writeScopeDashboardOnly": "支払いを送信できるキーは dashboard.blink.sv でのみ作成できます",
+        "expiry": "有効期限",
+        "expiry30Days": "30日",
+        "expiry90Days": "90日",
+        "expiryNever": "なし",
+        "expiresOn": "{date: string} に期限切れ",
+        "neverExpires": "有効期限なし",
+        "revoked": "取り消し済み",
+        "expired": "{date: string} に期限切れ",
+        "expiredNoDate": "期限切れ",
+        "secretWarning": "キーが表示されるのはこの一度だけです。今すぐコピーまたは共有し、安全に保管してください。",
+        "secretCopied": "APIキーをコピーしました。クリップボードは1分後に消去されます",
+        "revokeTitle": "APIキーを取り消しますか？",
+        "revokeBody": "「{name: string}」は直ちに機能しなくなります。この操作は元に戻せません。",
+        "revoke": "取り消す",
+        "revokeSuccess": "APIキーを取り消しました",
+        "createError": "APIキーを作成できませんでした。もう一度お試しください。",
+        "revokeError": "APIキーを取り消せませんでした。もう一度お試しください。",
+        "loadError": "APIキーを読み込めませんでした。後でもう一度お試しください。",
+        "done": "完了"
+    },
     "GaloyAddressScreen": {
         "title": "以下の方法で受金できます：",
         "buttonTitle": "アドレスを設定",
@@ -2003,7 +2037,7 @@
         "satAccumulated": "累計 sats",
         "satsEarned": "{formattedNumber | sats}を獲得しました",
         "sectionsCompleted": "完了しました",
-        "title": "獲得する",
+        "title": "学ぶ",
         "unlockQuestion": "アンロックするには、質問に答えてください：",
         "youEarned": "獲得額",
         "registerTitle": "ウォレットのアップグレードが必要です",
@@ -2011,6 +2045,7 @@
         "oneSectionADay": "1日1セクション！",
         "availableTomorrow": "明日また戻ってきて、学びながらsatsを獲得しましょう。\n\nまたは、「続ける」をタップして報酬なしで学習を続けることもできます。",
         "motivatingBadger": "レッスンを掘り進めて、学びながら稼ごう",
+        "motivatingBadgerNoRewards": "レッスンを掘り進めて、ビットコインについて学ぼう",
         "continueNoRewards": "続ける（報酬なし）",
         "somethingNotRight": "問題が発生しました...",
         "defaultErrorMessage": "{errorMessage: string} 後でもう一度お試しください。\nまたは、タップして報酬なしで学習を続けることもできます。",
@@ -2049,7 +2084,7 @@
         "login": "ログイン",
         "loginOrRestore": "ログイン / 復元",
         "logBackInWith": "再ログイン：",
-        "headline": "Galoyが提供するウォレット",
+        "headline": "Blinkが提供するウォレット",
         "startTrialAccount": "トライアルウォレットで始める",
         "startWithTrialAccount": "トライアルウォレットで始める",
         "registerPhoneAccount": "電話番号でウォレット登録する",
@@ -2163,6 +2198,9 @@
         "lightningInvoice": "Lightningインボイス",
         "bitcoinOnchain": "Bitcoin onchain",
         "depositFee": "入金手数料：{threshold} SAT未満は{fee} SAT、{threshold} SAT以上の入金は{overFee} SAT",
+        "depositFeeTiers": "Deposit fees: {tiers: string}",
+        "depositFeeTierUpTo": "{fee: string} SAT up to {max: string} SAT",
+        "depositFeeTierAbove": "{fee: string} SAT above {min: string} SAT",
         "autoConvertMinAmount": "{minSats: number} sats / {minFiat: string}未満の金額はドルに自動変換できません。代わりにビットコインを受け取ります。",
         "autoConvertFailed": "支払いは受け取りましたが、変換に失敗しました。",
         "pleaseWaitForConversion": "変換が完了するまでお待ちください"
@@ -2260,6 +2298,10 @@
         "pastedClipboardSuccess": "クリップボードから貼り付けました",
         "invalidPhoneNumber": "有効な携帯電話番号を入力してください",
         "phoneNotAllowed": "このフィールドでは電話番号を使用できません"
+    },
+    "MerchantSelectionScreen": {
+        "title": "支払いオプションを選択",
+        "empty": "利用できる支払いオプションはありません。"
     },
     "SendBitcoinScreen": {
         "willBeSentToMempoolBy": "トランザクションはメモリプールに送信されます",
@@ -2546,6 +2588,7 @@
         "lightningTransactions": "ライトニング取引",
         "onchainBelowThreshold": "オンチェーン {threshold: string} SAT未満",
         "onchainAboveThreshold": "オンチェーン {threshold: string} SAT超",
+        "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
         "transferFee": "振替手数料",
         "noFee": "手数料なし",
         "lightningSendFee": "{fee: string} + ~{routingFee: string} ルーティング手数料",
@@ -2596,7 +2639,8 @@
             "tooLong": "アドレスは50文字以上でなければなりません",
             "invalidCharacter": "アドレスにはアルファベット、数字、アンダースコアのみ使用できます",
             "addressUnavailable": "申し訳ありませんが、このアドレスは既に使われています",
-            "unknownError": "不明なエラーが発生しました。時間をあけてもう一度トライしてみてください"
+            "unknownError": "不明なエラーが発生しました。時間をあけてもう一度トライしてみてください",
+            "backupRequired": "Back up your wallet before creating a Lightning address"
         },
         "receiveMoney": "このアドレスで他のライトニング・ウォレットや{bankName: string}ユーザーからお金を受け取ります。",
         "itCannotBeChanged": "あとから変更することはできません"
@@ -3794,6 +3838,11 @@
         "modalDescription": "このデバイスを紛失した場合の資金の完全な喪失を防ぐために、ウォレットのバックアップを強くお勧めします。",
         "secureMe": "ウォレットを保護"
     },
+    "BackupRequired": {
+        "modalTitle": "Back up your wallet first",
+        "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
+        "backupNow": "Back up wallet"
+    },
     "NonCustodialInfoBulletin": {
         "title": "これは非カストディアルアカウントです",
         "body": "詳しくはブログ記事をご覧ください",
@@ -3832,7 +3881,7 @@
         "noAccountTitle": "Custodial account required",
         "noAccountDescription": "{featureName} requires a Blink custodial account.",
         "featureCircles": "Circles",
-        "featureEarn": "Earn",
+        "featureEarn": "学ぶ",
         "featureCard": "Card"
     },
     "WalletCreationScreen": {
