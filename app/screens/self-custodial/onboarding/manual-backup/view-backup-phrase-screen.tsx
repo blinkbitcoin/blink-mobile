@@ -7,7 +7,10 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloyTertiaryButton } from "@app/components/atomic/galoy-tertiary-button"
-import { headerRightNoGlass } from "@app/components/header-no-glass/header-no-glass"
+import {
+  headerRightNoGlass,
+  noHeaderRight,
+} from "@app/components/header-no-glass/header-no-glass"
 import { WarningCard } from "@app/components/warning-card"
 import { MnemonicWordsGrid } from "@app/components/mnemonic-words-grid"
 import { Screen } from "@app/components/screen"
@@ -45,7 +48,15 @@ export const ViewBackupPhraseScreen: React.FC = () => {
 
   const copyLabel = LL.BackupScreen.ManualBackup.Phrase.copy()
 
+  // The header sits outside the `!authenticated` early return below, so it has to
+  // gate itself: without this the Copy button is mounted — and copies the full
+  // mnemonic — while the biometric prompt is still pending.
   useLayoutEffect(() => {
+    if (!authenticated) {
+      navigation.setOptions(noHeaderRight)
+      return
+    }
+
     navigation.setOptions(
       headerRightNoGlass(() => (
         <GaloyTertiaryButton
@@ -59,7 +70,7 @@ export const ViewBackupPhraseScreen: React.FC = () => {
         />
       )),
     )
-  }, [navigation, copyLabel, handleCopy, styles])
+  }, [navigation, authenticated, copyLabel, handleCopy, styles])
 
   if (!authenticated) {
     return (

@@ -29,6 +29,17 @@ export const headerRightNoGlass = (
   ],
 })
 
+/**
+ * Removes a header-right item previously installed by `headerRightNoGlass`. Both
+ * keys have to be cleared, since `headerRightNoGlass` writes both: `headerRight`
+ * for Android and `unstable_headerRightItems` for iOS.
+ */
+export const noHeaderRight: Partial<NativeStackNavigationOptions> = {
+  headerRight: undefined,
+  // eslint-disable-next-line camelcase -- name dictated by @react-navigation/native-stack
+  unstable_headerRightItems: undefined,
+}
+
 export const headerLeftNoGlass = (
   render: RenderItem,
 ): Partial<NativeStackNavigationOptions> => ({
