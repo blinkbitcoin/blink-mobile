@@ -6501,7 +6501,7 @@ type RootTranslation = {
 			 */
 			recoveryOption: string
 			/**
-			 * U​S​D​ ​1​,​0​0​0​ ​d​a​i​l​y​ ​t​r​a​n​s​a​c​t​i​o​n​ ​l​i​m​i​t
+			 * U​S​D​ ​9​9​9​ ​d​a​i​l​y​ ​t​r​a​n​s​a​c​t​i​o​n​ ​l​i​m​i​t
 			 */
 			dailyLimit: string
 			/**
@@ -8832,7 +8832,7 @@ type RootTranslation = {
 			 */
 			receiveBitcoinDescription: string
 			/**
-			 * S​e​n​d​ ​u​p​ ​t​o​ ​U​S​D​ ​1​,​0​0​0​ ​p​e​r​ ​d​a​y
+			 * S​e​n​d​ ​u​p​ ​t​o​ ​U​S​D​ ​9​9​9​ ​p​e​r​ ​d​a​y
 			 */
 			dailyLimitDescription: string
 			/**
@@ -19646,7 +19646,7 @@ export type TranslationFunctions = {
 			 */
 			recoveryOption: () => LocalizedString
 			/**
-			 * USD 1,000 daily transaction limit
+			 * USD 999 daily transaction limit
 			 */
 			dailyLimit: () => LocalizedString
 			/**
@@ -21899,7 +21899,7 @@ export type TranslationFunctions = {
 			 */
 			receiveBitcoinDescription: () => LocalizedString
 			/**
-			 * Send up to USD 1,000 per day
+			 * Send up to USD 999 per day
 			 */
 			dailyLimitDescription: () => LocalizedString
 			/**

@@ -2097,7 +2097,7 @@
       "sendingLimit": "Reduced daily sending limit",
       "noOnchain": "No receiving bitcoin onchain",
       "recoveryOption": "SMS utaq correo electrónico nisqawan qullqiykita kutichiy",
-      "dailyLimit": "USD 1,000 sapa p'unchaw ruwana tope",
+      "dailyLimit": "USD 999 sapa p'unchaw ruwana tope",
       "onchainReceive": "Bitcoin onchain nisqapi chaskiy"
     }
   },
@@ -2683,7 +2683,7 @@
       "mainTitle": "¡Bienvenido Nivel 1 man!",
       "title": "Cuentaykipaq musuq ruwanakuna kichasqa:",
       "receiveBitcoinDescription": "Teléfono yupayniykiwan Bitcoin chaskiy",
-      "dailyLimitDescription": "Apachiy USD 1,000-kama sapa p'unchaw",
+      "dailyLimitDescription": "Apachiy USD 999-kama sapa p'unchaw",
       "onchainDescription": "On-chain nisqa pagokunata chaskiy"
     },
     "emailBenefits": {

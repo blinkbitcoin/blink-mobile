@@ -2097,7 +2097,7 @@
       "sendingLimit": "Reduced daily sending limit",
       "noOnchain": "No receiving bitcoin onchain",
       "recoveryOption": "Buyisela imali nge-SMS okanye i-imeyili",
-      "dailyLimit": "USD 1,000 umda wentengiselo yosuku",
+      "dailyLimit": "USD 999 umda wentengiselo yosuku",
       "onchainReceive": "Fumana iBitcoin kwi-onchain"
     }
   },
@@ -2683,7 +2683,7 @@
       "mainTitle": "Wamkelekile kwiNqanaba 1",
       "title": "Iimpawu ezintsha ezivuliweyo kwi-akhawunti yakho:",
       "receiveBitcoinDescription": "Fumana Bitcoin usebenzisa inombolo yakho yomnxeba",
-      "dailyLimitDescription": "Thumela ukuya kuthi ga USD 1,000 ngosuku",
+      "dailyLimitDescription": "Thumela ukuya kuthi ga USD 999 ngosuku",
       "onchainDescription": "Fumana iintlawulo ze-onchain"
     },
     "emailBenefits": {

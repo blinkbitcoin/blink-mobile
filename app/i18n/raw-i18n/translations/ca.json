@@ -2097,7 +2097,7 @@
       "sendingLimit": "Límit diari d'enviament reduït",
       "noOnchain": "No rebre bitcoin \"onchain\"",
       "recoveryOption": "Recupera fons per SMS o correu electrònic",
-      "dailyLimit": "Límit diari de transaccions de USD 1,000",
+      "dailyLimit": "Límit diari de transaccions de USD 999",
       "onchainReceive": "Rep bitcoin onchain"
     }
   },
@@ -2683,7 +2683,7 @@
       "mainTitle": "Benvingut al nivell 1",
       "title": "Noves funcionalitats desbloquejades per al teu compte:",
       "receiveBitcoinDescription": "Rep Bitcoin utilitzant el teu número de telèfon",
-      "dailyLimitDescription": "Envia fins a USD 1,000 al dia",
+      "dailyLimitDescription": "Envia fins a USD 999 al dia",
       "onchainDescription": "Rep pagaments on-chain"
     },
     "emailBenefits": {
