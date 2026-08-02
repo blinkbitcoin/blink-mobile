@@ -2568,7 +2568,7 @@
         "sending": "Envoi en cours",
         "receivingAccount": "Solde destinataire",
         "sendingAccount": "Solde expéditeur",
-        "txNotBroadcast": "Votre transaction est actuellement en attente et sera transmise au réseau Bitcoin dans un moment.",
+        "txNotBroadcast": "Votre transaction est en attente. Elle devrait apparaître dans le mempool {countdown: string}.",
         "momentarily": "dans un instant",
         "findingAccount": "Recherche du compte associé à ce paiement...",
         "txNotFoundInAccounts": "Ce paiement est introuvable dans les comptes de cet appareil. Il appartient peut-être à un compte déconnecté.",
