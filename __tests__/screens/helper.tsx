@@ -71,7 +71,9 @@ export const ContextForScreen: React.FC<PropsWithChildren<{ headerShown?: boolea
               <PersistentStateWrapper>
                 <TypesafeI18n locale={detectDefaultLocale()}>
                   <IsAuthedContextProvider value={true}>
-                    <AccountRegistryProvider>{children}</AccountRegistryProvider>
+                    <AccountRegistryProvider skipHydration>
+                      {children}
+                    </AccountRegistryProvider>
                   </IsAuthedContextProvider>
                 </TypesafeI18n>
               </PersistentStateWrapper>
@@ -95,7 +97,9 @@ export const ContextForScreenWithTheme: React.FC<
               <PersistentStateWrapper>
                 <TypesafeI18n locale={detectDefaultLocale()}>
                   <IsAuthedContextProvider value={true}>
-                    <AccountRegistryProvider>{children}</AccountRegistryProvider>
+                    <AccountRegistryProvider skipHydration>
+                      {children}
+                    </AccountRegistryProvider>
                   </IsAuthedContextProvider>
                 </TypesafeI18n>
               </PersistentStateWrapper>
