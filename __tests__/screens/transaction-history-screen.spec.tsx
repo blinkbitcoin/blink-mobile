@@ -397,16 +397,17 @@ describe("TransactionHistoryScreen", () => {
       </ContextForScreen>,
     )
 
+    // The screen transiently highlights the latest tx per currency until the
+    // markTxSeen -> cache -> baseline-backfill roundtrip settles, so wait for
+    // the settled state instead of asserting right after the rows appear.
     await waitFor(() => {
-      expect(screen.getByTestId("transaction-by-index-0")).toBeTruthy()
+      expect(screen.getByTestId("transaction-by-index-0").props.children).toContain(
+        "no-highlight",
+      )
+      expect(screen.getByTestId("transaction-by-index-1").props.children).toContain(
+        "no-highlight",
+      )
     })
-
-    expect(screen.getByTestId("transaction-by-index-0").props.children).toContain(
-      "no-highlight",
-    )
-    expect(screen.getByTestId("transaction-by-index-1").props.children).toContain(
-      "no-highlight",
-    )
   })
 
   it("highlights transactions newer than min lastSeen when ALL", async () => {
@@ -426,25 +427,26 @@ describe("TransactionHistoryScreen", () => {
       </ContextForScreen>,
     )
 
+    // min(lastSeenBtcId,lastSeenUsdId) = ...9015 and both are unseen => highlighted.
+    // Match ":highlight" (not "highlight", which is a substring of "no-highlight")
+    // and wait for the settled state: the first data render briefly shows
+    // no-highlight until the highlight baseline is initialized.
     await waitFor(() => {
-      expect(screen.getByTestId("transaction-by-index-0")).toBeTruthy()
+      expect(screen.getByTestId("transaction-by-index-0").props.children).toContain(
+        ":highlight",
+      )
+      expect(screen.getByTestId("transaction-by-index-1").props.children).toContain(
+        ":highlight",
+      )
     })
-
-    // min(lastSeenBtcId,lastSeenUsdId) = ...9015 and both are unseen => highlighted
-    expect(screen.getByTestId("transaction-by-index-0").props.children).toContain(
-      "highlight",
-    )
-    expect(screen.getByTestId("transaction-by-index-1").props.children).toContain(
-      "highlight",
-    )
 
     // ensure highlight doesn't flip off after `markTxSeen` updates cache
     await waitFor(() => {
       expect(screen.getByTestId("transaction-by-index-0").props.children).toContain(
-        "highlight",
+        ":highlight",
       )
       expect(screen.getByTestId("transaction-by-index-1").props.children).toContain(
-        "highlight",
+        ":highlight",
       )
     })
   })
