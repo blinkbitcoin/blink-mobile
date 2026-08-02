@@ -1128,222 +1128,222 @@
                 }
             },
             "BitcoinWhyWasItCreated": {
-                "title": "Bitcoin: Why was it created?",
+                "title": "Bitcoin : pourquoi a-t-il été créé ?",
                 "questions": {
                     "rootProblem": {
                         "answers": [
-                            "The trust that is required to make it work",
-                            "The color of the physical bills",
-                            "The fact that it requires physical storage"
+                            "La confiance nécessaire à son fonctionnement",
+                            "La couleur des billets physiques",
+                            "Le fait qu'elle nécessite un stockage physique"
                         ],
                         "feedback": [
-                            "You got it right! The root problem with conventional currency is the trust that is required to make it work. It's an interesting point, as trust is a fundamental aspect of any currency system",
-                            "Interesting take, but unfortunately not the correct answer. Conventional currency isn't just about the aesthetics of its physical form, although I'm sure some people might argue otherwise",
-                            "Haha, while it might be inconvenient to lug around a wallet full of cash, that's not the root problem with conventional currency. But don't worry, you can try again!"
+                            "C'est la bonne réponse ! Le problème fondamental de la monnaie conventionnelle est la confiance nécessaire à son fonctionnement. C'est un point intéressant, car la confiance est un aspect fondamental de tout système monétaire.",
+                            "Point de vue intéressant, mais malheureusement ce n'est pas la bonne réponse. La monnaie conventionnelle ne se résume pas à l'esthétique de sa forme physique, même si certains pourraient argumenter le contraire.",
+                            "Haha, transporter un portefeuille rempli de liquide peut être encombrant, mais ce n'est pas le problème fondamental de la monnaie conventionnelle. Mais ne vous inquiétez pas, vous pouvez réessayer !"
                         ],
-                        "question": "What is the root problem with conventional currency according to Satoshi Nakamoto",
-                        "text": "So what was the motivation to create Bitcoin? In his announcement of the project, Satoshi Nakamoto gave the following explanation:\n\n\"The root problem with conventional currency is all the trust that’s required to make it work. The central bank must be trusted not to debase the currency, but the history of fiat currencies is full of breaches of that trust. Banks must be trusted to hold our money and transfer it electronically, but they lend it out in waves of credit bubbles with barely a fraction in reserve.\"\n",
-                        "title": "The Root Problem"
+                        "question": "Quel est le problème fondamental de la monnaie conventionnelle selon Satoshi Nakamoto ?",
+                        "text": "Alors, quelle était la motivation derrière la création du Bitcoin ? Dans l'annonce du projet, Satoshi Nakamoto a donné l'explication suivante :\n\n« Le problème fondamental de la monnaie conventionnelle, c'est toute la confiance nécessaire à son fonctionnement. Il faut faire confiance à la banque centrale pour ne pas dévaluer la monnaie, mais l'histoire des monnaies fiduciaires est pleine de trahisons de cette confiance. Il faut faire confiance aux banques pour conserver notre argent et le transférer électroniquement, mais elles le prêtent par vagues de bulles de crédit en ne conservant qu'une fraction en réserve. »\n",
+                        "title": "Le problème fondamental"
                     },
                     "bitcoinCreator": {
                         "answers": [
-                            "An unknown programmer who used the pseudonym \"Satoshi Nakamoto\"",
+                            "Un programmeur inconnu ayant utilisé le pseudonyme « Satoshi Nakamoto »",
                             "Craig Wright",
                             "Elon Musk"
                         ],
                         "feedback": [
-                            "Correct! It's an interesting mystery, but it's worth noting that the bitcoin protocol is based on open source code, meaning that anyone can review it. This transparency makes it the most reviewed code in existence. Despite the mystery of its creator, bitcoin itself is an open and transparent monetary network that can be examined and used by anyone",
-                            "I'm sorry, but it looks like Craig Wright's claim to being the creator of bitcoin has been thoroughly debunked. Better luck with the next answer",
-                            "Nope! Elon Musk's talents might be better suited to launching rockets and building electric cars rather than creating revolutionary digital currencies. Try again!"
+                            "Exact ! C'est un mystère intéressant, mais il faut noter que le protocole Bitcoin repose sur un code open source, ce qui signifie que n'importe qui peut l'examiner. Cette transparence en fait le code le plus revu qui existe. Malgré le mystère entourant son créateur, le Bitcoin lui-même est un réseau monétaire ouvert et transparent, que n'importe qui peut examiner et utiliser.",
+                            "Désolé, mais l'affirmation de Craig Wright selon laquelle il serait le créateur du bitcoin a été largement démentie. Bonne chance pour la prochaine réponse.",
+                            "Non ! Les talents d'Elon Musk sont sans doute mieux adaptés au lancement de fusées et à la fabrication de voitures électriques qu'à la création de monnaies numériques révolutionnaires. Réessayez !"
                         ],
-                        "question": "Who is the creator of bitcoin",
-                        "text": "The creator of bitcoin, who used the pseudonym \"Satoshi Nakamoto,\" is unknown and no claims of being the creator have been verified. Satoshi was only involved in the project for a short time before disappearing.\n\nThe bitcoin protocol is based on open source code, meaning that anyone can review it. This transparency makes it the most reviewed code in existence. Despite the mystery of its creator, bitcoin itself is an open and transparent monetary network that can be examined and used by anyone.\n",
-                        "title": "Bitcoin's Creator Satoshi Nakamoto"
+                        "question": "Qui est le créateur du bitcoin ?",
+                        "text": "Le créateur du bitcoin, qui a utilisé le pseudonyme « Satoshi Nakamoto », est inconnu, et aucune revendication concernant son identité n'a été vérifiée. Satoshi n'a été impliqué dans le projet que peu de temps avant de disparaître.\n\nLe protocole Bitcoin repose sur un code open source, ce qui signifie que n'importe qui peut l'examiner. Cette transparence en fait le code le plus revu qui existe. Malgré le mystère entourant son créateur, le Bitcoin lui-même est un réseau monétaire ouvert et transparent, que n'importe qui peut examiner et utiliser.\n",
+                        "title": "Satoshi Nakamoto, le créateur du Bitcoin"
                     },
                     "fiatRequiresTrust": {
                         "answers": [
-                            "The need for trusted third parties to make a currency work",
-                            "Lack of a physical form for currency",
-                            "Inflation caused by central authorities issuing more units"
+                            "Le besoin de tiers de confiance pour faire fonctionner une monnaie",
+                            "L'absence de forme physique pour la monnaie",
+                            "L'inflation causée par les autorités centrales qui émettent davantage d'unités"
                         ],
                         "feedback": [
-                            "Exactly. Bitcoin requires no trusted third party and allows for transactions to be made directly between individuals, called peer-to-peer, rather than through a central authority or intermediaries",
-                            "Nope. That's not it. Try again",
-                            "Arbitrary inflation of the money supply by centralized issuers is indeed a problem that bitcoin solves elegantly, but there's a more foundational problem that Satoshi addressed. Try again!"
+                            "Exactement. Le Bitcoin ne nécessite aucun tiers de confiance et permet d'effectuer des transactions directement entre individus, appelées « pair à pair », plutôt que par l'intermédiaire d'une autorité centrale ou de tiers.",
+                            "Non, ce n'est pas ça. Réessayez.",
+                            "L'inflation arbitraire de la masse monétaire par des émetteurs centralisés est bien un problème que le bitcoin résout élégamment, mais Satoshi s'attaquait à un problème encore plus fondamental. Réessayez !"
                         ],
-                        "question": "What was the main issue that Satoshi Nakamoto aimed to address with the creation of bitcoin",
-                        "text": "The post-1971 fiat currency system requires trust at all levels because it is debt-based and lacks a scarce anchor. This includes trust in the ability to pay off debts in the future, trust in commercial and central banks not to debase the currency, and trust in their ability to allow access to and freedom to use funds for transactions.\n\nThis trust has been violated numerous times, including during the 2008/09 Global Financial Crisis. In order to address this issue, Satoshi Nakamoto aimed to create a digital form of money that did not require trusting third parties for transactions and could not be debased by a central authority issuing more units.\n",
-                        "title": "Fiat Currencies Require Trust"
+                        "question": "Quel était le principal problème que Satoshi Nakamoto cherchait à résoudre en créant le bitcoin ?",
+                        "text": "Le système de monnaie fiduciaire d'après 1971 exige de la confiance à tous les niveaux, car il repose sur la dette et ne dispose d'aucun ancrage rare. Cela inclut la confiance dans la capacité à rembourser les dettes futures, la confiance envers les banques commerciales et centrales pour qu'elles ne dévaluent pas la monnaie, et la confiance en leur volonté de garantir l'accès et la liberté d'utiliser les fonds pour effectuer des transactions.\n\nCette confiance a été trahie à de nombreuses reprises, notamment lors de la crise financière mondiale de 2008-2009. Pour résoudre ce problème, Satoshi Nakamoto a cherché à créer une forme de monnaie numérique qui ne nécessite pas de faire confiance à des tiers pour les transactions, et qui ne puisse pas être dévaluée par une autorité centrale émettant davantage d'unités.\n",
+                        "title": "Les monnaies fiduciaires exigent de la confiance"
                     },
                     "moneyPrinting": {
                         "answers": [
-                            "Asset bubbles in stock and real estate markets that experience corrections roughly every decade",
-                            "A sudden increase in the popularity of polka music",
-                            "A decrease in the number of people who believe in extraterrestrial life forms"
+                            "Des bulles spéculatives sur les marchés boursiers et immobiliers, qui subissent des corrections environ tous les dix ans",
+                            "Une soudaine hausse de la popularité de la musique polka",
+                            "Une baisse du nombre de personnes croyant en la vie extraterrestre"
                         ],
                         "feedback": [
-                            "Bullseye! Asset bubbles in stock and real estate markets are indeed one of the main consequences of excessive money printing and credit expansion. It's worth noting that these bubbles often disproportionately benefit those closest to the source of new money, while lower income individuals are often the most affected by the inflation and economic booms and busts that result",
-                            "That's not the right wavelength here! While some believe easy money has a negative impact on music, this is not the right answer",
-                            "Your guess is out of this world. While it's certainly interesting to speculate about the existence of aliens, it has nothing to do with the consequences of excessive money printing and credit expansion."
+                            "Dans le mille ! Les bulles spéculatives sur les marchés boursiers et immobiliers sont effectivement l'une des principales conséquences d'une création monétaire et d'une expansion du crédit excessives. Il faut noter que ces bulles profitent souvent de manière disproportionnée à ceux les plus proches de la source de la nouvelle monnaie, tandis que les personnes à faible revenu sont souvent les plus touchées par l'inflation et les cycles d'expansion-récession qui en résultent.",
+                            "Ce n'est pas la bonne fréquence ! Certains pensent que l'argent facile a un impact négatif sur la musique, mais ce n'est pas la bonne réponse.",
+                            "Votre réponse est complètement extraterrestre. Il est certes intéressant de spéculer sur l'existence des extraterrestres, mais cela n'a rien à voir avec les conséquences d'une création monétaire et d'une expansion du crédit excessives."
                         ],
-                        "question": "What is one of the main consequences of excessive money printing and credit expansion",
-                        "text": "Excessive money printing and credit expansion can cause numerous social and economic issues, including asset bubbles in stocks and real estate markets which tend to experience corrections roughly every decade.\n\nWhile those closest to the source of new money often benefit greatly from these cycles, lower income individuals who don't own valuable assets and rely on regular paychecks are often the most affected by inflation and economic booms and busts created by the fiat currency system.\n\nA well-known example of this is the Global Financial Crisis that began in 2008, which was preceded by a significant accumulation of debt and risk in the commercial banking sector.\n",
-                        "title": "Money Printing and Credit Expansion"
+                        "question": "Quelle est l'une des principales conséquences d'une création monétaire et d'une expansion du crédit excessives ?",
+                        "text": "Une création monétaire et une expansion du crédit excessives peuvent provoquer de nombreux problèmes sociaux et économiques, notamment des bulles spéculatives sur les marchés boursiers et immobiliers, qui subissent généralement des corrections environ tous les dix ans.\n\nSi ceux qui sont les plus proches de la source de la nouvelle monnaie profitent souvent largement de ces cycles, les personnes à faible revenu, qui ne possèdent pas d'actifs de valeur et dépendent de salaires réguliers, sont souvent les plus touchées par l'inflation et les cycles d'expansion-récession créés par le système de monnaie fiduciaire.\n\nLa crise financière mondiale de 2008 en est un exemple bien connu : elle a été précédée d'une accumulation importante de dette et de risque dans le secteur bancaire commercial.\n",
+                        "title": "Création monétaire et expansion du crédit"
                     },
                     "genesisBlock": {
                         "answers": [
-                            "To take financial control back from financial elites, giving ordinary people a chance to take part in a decentralized financial system",
-                            "To create a digital form of money that could be easily debased by a central authority",
-                            "To make it easier for third parties to facilitate transactions"
+                            "Pour reprendre le contrôle financier des mains des élites financières, en donnant aux gens ordinaires la possibilité de participer à un système financier décentralisé",
+                            "Pour créer une forme de monnaie numérique facilement dévaluable par une autorité centrale",
+                            "Pour faciliter le rôle des tiers dans les transactions"
                         ],
                         "feedback": [
-                            "That's exactly right. Take a wild guess what those financial elites think about bitcoin",
-                            "No, silly. We already have that with fiat. Try again and think about Satoshi's message in the Genesis Block before you answer",
-                            "Sorry, that's not quite right. While third parties can be useful for facilitating transactions, trust in these intermediaries was one of the issues that Satoshi Nakamoto aimed to address with the creation of Bitcoin. Maybe try again with a different answer."
+                            "C'est exactement ça. Devinez ce que ces élites financières pensent du bitcoin.",
+                            "Non, voyons. On a déjà ça avec la monnaie fiduciaire. Réessayez, et repensez au message de Satoshi dans le bloc genèse avant de répondre.",
+                            "Dommage, ce n'est pas tout à fait ça. Les tiers peuvent être utiles pour faciliter les transactions, mais la confiance envers ces intermédiaires était justement l'un des problèmes que Satoshi Nakamoto cherchait à résoudre en créant le Bitcoin. Essayez une autre réponse."
                         ],
-                        "question": "Why did Satoshi Nakamoto create Bitcoin",
-                        "text": "It is clear why Satoshi Nakamoto created Bitcoin when we examine the first block of the Bitcoin blockchain, called the Genesis block.\n\nThis block was created by Satoshi when he launched Bitcoin in 2009 and includes a reference to banks receiving bailouts following the 2008/09 Global Financial Crisis.\n\n\"The Times 03/Jan/2009 Chancellor on the brink of second bailout for banks\"\n\nThis crisis, in which trust in traditional financial systems was severely damaged, inspired Satoshi to create a digital form of money that does not require trusting third parties for transactions and cannot be debased by a central authority issuing more units.\n",
-                        "title": "The Genesis Block"
+                        "question": "Pourquoi Satoshi Nakamoto a-t-il créé le Bitcoin ?",
+                        "text": "On comprend clairement pourquoi Satoshi Nakamoto a créé le Bitcoin en examinant le tout premier bloc de sa blockchain, appelé le « bloc genèse ».\n\nCe bloc a été créé par Satoshi lors du lancement du Bitcoin en 2009, et contient une référence aux plans de sauvetage accordés aux banques suite à la crise financière mondiale de 2008-2009.\n\n« The Times, 03/01/2009 : le chancelier au bord d'un second plan de sauvetage pour les banques »\n\nCette crise, au cours de laquelle la confiance envers les systèmes financiers traditionnels a été gravement ébranlée, a inspiré Satoshi à créer une forme de monnaie numérique qui ne nécessite pas de faire confiance à des tiers pour les transactions, et qui ne peut pas être dévaluée par une autorité centrale émettant davantage d'unités.\n",
+                        "title": "Le bloc genèse"
                     },
                     "cypherpunks": {
                         "answers": [
-                            "The Cypherpunks are a group of individuals who seek to use cryptography to promote privacy and security in the digital age",
-                            "The Cypherpunks are a group of hackers who aim to steal personal data and sensitive information through the use of cryptography",
-                            "The Cypherpunks are a group of cryptographers who seek to create complex mathematical equations that are difficult to solve"
+                            "Les Cypherpunks sont un groupe d'individus qui cherchent à utiliser la cryptographie pour promouvoir la vie privée et la sécurité à l'ère numérique",
+                            "Les Cypherpunks sont un groupe de pirates informatiques qui cherchent à voler des données personnelles et sensibles grâce à la cryptographie",
+                            "Les Cypherpunks sont un groupe de cryptographes qui cherchent à créer des équations mathématiques complexes et difficiles à résoudre"
                         ],
                         "feedback": [
-                            "Well done! It's interesting to note that the Cypherpunks' goal of using cryptography to promote privacy and security is particularly relevant in today's digital age, where increasing surveillance can lead to the erosion of freedoms",
-                            "Sorry, that's not quite right. While the use of cryptography can certainly be beneficial for hackers, the Cypherpunks seek to use cryptography for the opposite purpose. Maybe try again with a different answer",
-                            "Nope. While cryptography does involve the use of complex mathematical equations, the Cypherpunks are not primarily interested in creating these equations for their own sake. Try again!"
+                            "Bien joué ! Il est intéressant de noter que l'objectif des Cypherpunks d'utiliser la cryptographie pour promouvoir la vie privée et la sécurité est particulièrement pertinent à l'ère numérique actuelle, où la surveillance croissante peut mener à l'érosion des libertés.",
+                            "Dommage, ce n'est pas tout à fait ça. La cryptographie peut certes être utile aux pirates informatiques, mais les Cypherpunks cherchent à l'utiliser dans un but exactement opposé. Essayez une autre réponse.",
+                            "Non. La cryptographie implique bien des équations mathématiques complexes, mais les Cypherpunks ne cherchent pas avant tout à créer ces équations pour elles-mêmes. Réessayez !"
                         ],
-                        "question": "Who are the Cypherpunks and what is their goal",
-                        "text": "Bitcoin is the result of decades of research work by a group of individuals who call themselves Cypherpunks. They are interested in using cryptography to promote privacy and security in a world where increasing surveillance in the digital age can lead to erosion of freedoms.\n\nEarlier digital cash systems that relied on peer-to-peer (P2P) networks had one or both of the following problems:\n\n  * They required a central authority to manage the ledger of ownership.\n  * The currency units could be copied, resulting in the \"double-spending problem\" where a single unit could be spent multiple times.\n\n  Satoshi addressed both of these issues by combining existing technologies in the creation of Bitcoin. The first issue is resolved because the decentralized nature of the Bitcoin network means that there is no central authority that users need to trust. The second issue is addressed because the unique cryptographic techniques used in Bitcoin make it impossible to copy the currency units.\n",
-                        "title": "Bitcoin is the Result of Decades of Research"
+                        "question": "Qui sont les Cypherpunks et quel est leur objectif ?",
+                        "text": "Le Bitcoin est l'aboutissement de décennies de travaux de recherche menés par un groupe d'individus qui se surnomment les Cypherpunks. Ils cherchent à utiliser la cryptographie pour promouvoir la vie privée et la sécurité, dans un monde où la surveillance croissante à l'ère numérique peut entraîner l'érosion des libertés.\n\nLes précédents systèmes de cash numérique reposant sur des réseaux pair-à-pair (P2P) souffraient d'un ou des deux problèmes suivants :\n\n  * Ils nécessitaient une autorité centrale pour gérer le registre de propriété.\n  * Les unités monétaires pouvaient être copiées, entraînant le « problème de la double dépense », où une même unité pouvait être dépensée plusieurs fois.\n\n  Satoshi a résolu ces deux problèmes en combinant des technologies existantes pour créer le Bitcoin. Le premier problème est résolu car la nature décentralisée du réseau Bitcoin signifie qu'il n'existe aucune autorité centrale à laquelle les utilisateurs doivent faire confiance. Le second est résolu car les techniques cryptographiques uniques utilisées par le Bitcoin rendent impossible la copie des unités monétaires.\n",
+                        "title": "Le Bitcoin est l'aboutissement de décennies de recherche"
                     }
                 }
             },
             "BitcoinHowDoesItWork": {
-                "title": "Bitcoin: How does it work?",
+                "title": "Bitcoin : comment ça marche ?",
                 "questions": {
                     "peer2Peer": {
                         "answers": [
-                            "The blockchain",
-                            "The internet",
-                            "A decentralized network of nodes"
+                            "La blockchain",
+                            "Internet",
+                            "Un réseau décentralisé de nœuds"
                         ],
                         "feedback": [
-                            "Correct! Satoshi was the first to successfully implement the blockchain - a concept first described in 1991 by Stuart Haber and W. Scott Stornetta. It's a decentralized form of bookkeeping that is resistant to tampering and allows users to make and verify transactions without the need for a central authority",
-                            "No. The internet is a global network of interconnected computers, but it was not invented by Satoshi and does not solve issues of centralization and double spends. Try again",
-                            "A decentralized network of nodes is an important part of Bitcoin, but it does not solve issues of centralization and double spends by itself. Try again!"
+                            "Exact ! Satoshi a été le premier à mettre en œuvre avec succès la blockchain, un concept décrit pour la première fois en 1991 par Stuart Haber et W. Scott Stornetta. C'est une forme décentralisée de tenue de registre, résistante à la falsification, qui permet aux utilisateurs d'effectuer et de vérifier des transactions sans autorité centrale.",
+                            "Non. Internet est un réseau mondial d'ordinateurs interconnectés, mais il n'a pas été inventé par Satoshi et ne résout pas les problèmes de centralisation et de double dépense. Réessayez.",
+                            "Un réseau décentralisé de nœuds est un élément important du Bitcoin, mais il ne résout pas à lui seul les problèmes de centralisation et de double dépense. Réessayez !"
                         ],
-                        "question": "Which technology did Satoshi implement to solve issues of centralization and double spends",
-                        "text": "To solve the earlier mentioned issues of centralization and possible double spends, Satoshi invented a solution based on a decentralized network of nodes.\n\nNodes are computers that are in constant contact with each other. This by itself is nothing new. The internet itself has a similar infrastructure of interconnected nodes.\n\nAll bitcoin nodes, however, store a copy of the ledger of all transactions in the history of the Bitcoin network.\n\nThis new, decentralized form of bookkeeping, called blockchain, was first successfully implemented in Bitcoin and is extremely resistant to tampering.\n",
-                        "title": "Peer-to-Peer Network"
+                        "question": "Quelle technologie Satoshi a-t-il mise en œuvre pour résoudre les problèmes de centralisation et de double dépense ?",
+                        "text": "Pour résoudre les problèmes de centralisation et de double dépense évoqués précédemment, Satoshi a inventé une solution basée sur un réseau décentralisé de nœuds.\n\nLes nœuds sont des ordinateurs en contact permanent les uns avec les autres. En soi, ce n'est pas nouveau : Internet lui-même repose sur une infrastructure similaire de nœuds interconnectés.\n\nCependant, tous les nœuds Bitcoin conservent une copie du registre de toutes les transactions de l'histoire du réseau Bitcoin.\n\nCette nouvelle forme décentralisée de tenue de registre, appelée blockchain, a été mise en œuvre avec succès pour la première fois dans le Bitcoin, et elle est extrêmement résistante à la falsification.\n",
+                        "title": "Réseau pair-à-pair"
                     },
                     "blockchain": {
                         "answers": [
-                            "To create a tamper-evident record of all transactions on the blockchain",
-                            "To ensure that blocks can be altered or replaced easily",
-                            "To make sure that the Artificial Intelligence that created Bitcoin has enough computation power to take over the world"
+                            "Créer un registre inviolable de toutes les transactions de la blockchain",
+                            "Garantir que les blocs puissent être facilement modifiés ou remplacés",
+                            "S'assurer que l'intelligence artificielle qui a créé le Bitcoin dispose d'assez de puissance de calcul pour dominer le monde"
                         ],
                         "feedback": [
-                            "Correct! The cryptographic hash function helps to create a tamper-evident record of all transactions on the blockchain, which can be used to verify the integrity of the data stored on the chain. Did you know that the cryptographic hash function is also an essential part of the proof-of-work mechanism that helps to secure the Bitcoin network",
-                            "That's a hilarious idea, but no, the cryptographic hash function actually ensures the opposite. Try again",
-                            "Ha! I'm not sure who told you that the Bitcoin blockchain was created by AI, but I think they might have been pulling your leg. Try again!"
+                            "Exact ! La fonction de hachage cryptographique aide à créer un registre inviolable de toutes les transactions de la blockchain, utilisable pour vérifier l'intégrité des données qui y sont stockées. Saviez-vous que la fonction de hachage cryptographique est aussi un élément essentiel du mécanisme de preuve de travail qui aide à sécuriser le réseau Bitcoin ?",
+                            "C'est une idée amusante, mais non : la fonction de hachage cryptographique garantit en réalité l'inverse. Réessayez.",
+                            "Ha ! Je ne sais pas qui vous a dit que la blockchain Bitcoin avait été créée par une IA, mais on dirait qu'on vous a raconté des histoires. Réessayez !"
                         ],
-                        "question": "What is the purpose of the cryptographic hash function in the Bitcoin blockchain",
-                        "text": "The Bitcoin blockchain is a distributed database that maintains a continuously growing list of Bitcoin transactions called blocks.\n\nBlocks are anchored to each other through the use of cryptographic hashes. Each block contains a cryptographic hash of the previous block, as well as a timestamp and transaction data. This creates a chain of blocks that are all linked together, with each block building on the one before it.\n\nThe cryptographic hash function ensures that once a block has been added to the chain, it cannot be altered or replaced without also changing all of the subsequent blocks in the chain.\n\nThis creates a tamper-evident record of all transactions that have occurred on the blockchain, which can be used to verify the integrity of the data stored on the chain.\n",
-                        "title": "What is a blockchain exactly?"
+                        "question": "Quel est le rôle de la fonction de hachage cryptographique dans la blockchain Bitcoin ?",
+                        "text": "La blockchain Bitcoin est une base de données distribuée qui maintient une liste sans cesse croissante de transactions Bitcoin, appelées blocs.\n\nLes blocs sont ancrés les uns aux autres grâce à des empreintes cryptographiques (hash). Chaque bloc contient l'empreinte cryptographique du bloc précédent, ainsi qu'un horodatage et des données de transaction. Cela crée une chaîne de blocs tous reliés entre eux, chaque bloc s'appuyant sur le précédent.\n\nLa fonction de hachage cryptographique garantit qu'une fois un bloc ajouté à la chaîne, il ne peut être modifié ou remplacé sans devoir aussi modifier tous les blocs suivants de la chaîne.\n\nCela crée un registre inviolable de toutes les transactions ayant eu lieu sur la blockchain, utilisable pour vérifier l'intégrité des données qui y sont stockées.\n",
+                        "title": "Qu'est-ce qu'une blockchain, exactement ?"
                     },
                     "privateKey": {
                         "answers": [
-                            "To sign transactions and prove ownership of Bitcoins",
-                            "To verify the ownership of a Bitcoin address",
-                            "To make a stranger fall in love by posting it on social media"
+                            "Signer les transactions et prouver la propriété des bitcoins",
+                            "Vérifier la propriété d'une adresse Bitcoin",
+                            "Faire tomber amoureux un inconnu en la publiant sur les réseaux sociaux"
                         ],
                         "feedback": [
-                            "Correct! The private key is used to sign transactions and prove ownership of Bitcoins. It's an essential part of the process of sending and receiving Bitcoin payments, and it's important to keep it secret and secure. Good job",
-                            "Almost. **** While the private key can be used to verify the ownership of a Bitcoin address, that's not its primary purpose",
-                            "Posting it on social media would be like posting your bank account login information online - it's a surefire way to get your Bitcoins stolen. Better stick to more traditional methods of winning someone's heart!"
+                            "Exact ! La clé privée sert à signer les transactions et à prouver la propriété des bitcoins. C'est un élément essentiel du processus d'envoi et de réception de paiements en bitcoin, et il est important de la garder secrète et en sécurité. Bien joué.",
+                            "Presque. La clé privée peut effectivement servir à vérifier la propriété d'une adresse Bitcoin, mais ce n'est pas sa fonction première.",
+                            "La publier sur les réseaux sociaux reviendrait à publier vos identifiants bancaires en ligne : un moyen sûr de vous faire voler vos bitcoins. Mieux vaut s'en tenir à des méthodes plus classiques pour conquérir un cœur !"
                         ],
-                        "question": "What is the purpose of the private key in a Bitcoin transaction",
-                        "text": "Another cornerstone of Bitcoin is Public Key Cryptography that uses a pair of keys - a public key and a private key - to sign transactions and verify the ownership of Bitcoin addresses.\n\nThe private key is a long string of characters that is used to authorize Bitcoin transactions. It is often represented as a combination of 12 words (sometimes 24). Only in the correct order do the words result in the corresponding private key.\n\nWhoever knows the private key of a bitcoin address can control the bitcoin in that address. Therefore it is important that it is kept secret and never shared with anyone. Ideally, it should be stored offline, so that no unwanted program can access it. \n",
-                        "title": "Public Key Cryptography"
+                        "question": "Quel est le rôle de la clé privée dans une transaction Bitcoin ?",
+                        "text": "Un autre pilier du Bitcoin est la cryptographie à clé publique, qui utilise une paire de clés — une clé publique et une clé privée — pour signer les transactions et vérifier la propriété des adresses Bitcoin.\n\nLa clé privée est une longue chaîne de caractères utilisée pour autoriser les transactions Bitcoin. Elle est souvent représentée sous la forme d'une combinaison de 12 mots (parfois 24). Ce n'est que dans le bon ordre que ces mots donnent la clé privée correspondante.\n\nQuiconque connaît la clé privée d'une adresse Bitcoin peut contrôler les bitcoins qui s'y trouvent. Il est donc essentiel de la garder secrète et de ne jamais la partager avec qui que ce soit. Idéalement, elle devrait être conservée hors ligne, à l'abri de tout programme indésirable.\n",
+                        "title": "La cryptographie à clé publique"
                     },
                     "publicKey": {
                         "answers": [
-                            "To generate an unlimited number of Bitcoin addresses from a single key",
-                            "To authorize Bitcoin transactions",
-                            "To verify that the supply of all bitcoin in existence does not exceed 21 million"
+                            "Générer un nombre illimité d'adresses Bitcoin à partir d'une seule clé",
+                            "Autoriser les transactions Bitcoin",
+                            "Vérifier que l'offre totale de bitcoins en circulation ne dépasse pas 21 millions"
                         ],
                         "feedback": [
-                            "Correct! It's worth noting that, while funds can only be moved with the private key, it might be a good idea to not share the master public key on a public forum to preserve financial privacy. Only share Bitcoin addresses with payers to receive payments",
-                            "No, the master public key is not used to authorize Bitcoin transactions. That's the job of the private key. Try again",
-                            "No. While every user can independently verify the monetary supply of in the bitcoin network with a bitcoin node, this is not what the master public key is used for. Try again."
+                            "Exact ! Il faut noter que même si les fonds ne peuvent être déplacés qu'avec la clé privée, il est préférable de ne pas partager sa clé publique maîtresse sur un forum public, pour préserver sa confidentialité financière. Ne partagez que des adresses Bitcoin avec les payeurs pour recevoir des paiements.",
+                            "Non, la clé publique maîtresse ne sert pas à autoriser les transactions Bitcoin. C'est le rôle de la clé privée. Réessayez.",
+                            "Non. Chaque utilisateur peut vérifier indépendamment l'offre monétaire du réseau Bitcoin grâce à un nœud Bitcoin, mais ce n'est pas à cela que sert la clé publique maîtresse. Réessayez."
                         ],
-                        "question": "What is the purpose of a master public key in Bitcoin",
-                        "text": "A master public key in Bitcoin is a key that is cryptographically derived from a Bitcoin private key and is used to generate Bitcoin addresses that payers can send Bitcoin to.\n\nIt can be used to generate an unlimited number of Bitcoin addresses from a single master public key.\n\nWhile the private key is used to authorize Bitcoin transactions and therefore needs to be kept private, the Bitcoin addresses derived from the public key can be shared with a payer to receive payments from them.\n\nMaster public keys consist of a long sequence of numbers and letters and begin with xpub, ypub or zpub.\n\nA Bitcoin address for receiving payments starts with either 1, 3 or bc1.\n",
-                        "title": "Bitcoin Addresses and the Master Public Key"
+                        "question": "Quel est le rôle d'une clé publique maîtresse (master public key) dans le Bitcoin ?",
+                        "text": "Une clé publique maîtresse (master public key) dans le Bitcoin est une clé dérivée cryptographiquement d'une clé privée Bitcoin, utilisée pour générer des adresses Bitcoin auxquelles les payeurs peuvent envoyer des bitcoins.\n\nElle permet de générer un nombre illimité d'adresses Bitcoin à partir d'une seule clé publique maîtresse.\n\nAlors que la clé privée sert à autoriser les transactions Bitcoin et doit donc rester confidentielle, les adresses Bitcoin dérivées de la clé publique peuvent être partagées avec un payeur pour recevoir des paiements.\n\nLes clés publiques maîtresses se composent d'une longue séquence de chiffres et de lettres, et commencent par xpub, ypub ou zpub.\n\nUne adresse Bitcoin destinée à recevoir des paiements commence quant à elle par 1, 3 ou bc1.\n",
+                        "title": "Les adresses Bitcoin et la clé publique maîtresse"
                     },
                     "mining": {
                         "answers": [
-                            "To add transactions to the blockchain and secure the network",
-                            "To make a lot of money",
-                            "To amass giant amounts of computation power for AI to take over the world"
+                            "Ajouter des transactions à la blockchain et sécuriser le réseau",
+                            "Gagner beaucoup d'argent",
+                            "Accumuler d'énormes quantités de puissance de calcul pour permettre à une IA de dominer le monde"
                         ],
                         "feedback": [
-                            "Correct! Miners perform work in the form of computations and compete with other miners for who can add the next block of transactions to the blockchain and earn the block reward",
-                            "That's not the main purpose of mining. **** While it's true that miners do receive a reward in bitcoin for their efforts, they also have to pay for the electricity they use to perform computations. Try again",
-                            "Wow, that's an ambitious goal! While it's true that mining requires a significant amount of computational power, I'm pretty sure the main purpose is not to create an army of AI overlords. Better luck next time!"
+                            "Exact ! Les mineurs effectuent un travail sous forme de calculs et sont en compétition avec les autres mineurs pour déterminer qui ajoutera le prochain bloc de transactions à la blockchain et gagnera la récompense de bloc.",
+                            "Ce n'est pas le rôle principal du minage. Il est vrai que les mineurs reçoivent une récompense en bitcoin pour leurs efforts, mais ils doivent aussi payer l'électricité consommée pour effectuer leurs calculs. Réessayez.",
+                            "Wow, quel objectif ambitieux ! Le minage nécessite effectivement une grande quantité de puissance de calcul, mais son but principal n'est certainement pas de créer une armée de suzerains IA. Ce sera pour une prochaine fois !"
                         ],
-                        "question": "What is the main purpose of mining in the bitcoin network",
-                        "text": "When a user wants to send a transaction in the bitcoin network, they need to sign the transaction with their private key to prove that they are the owner of the funds being transferred. Once the transaction is signed, it is broadcasted to the peer-to-peer network.\n\nMining is the process of adding transactions to the bitcoin blockchain. When a transaction is broadcasted to the network, it is picked up by miners, who verify that the transaction is valid (i.e., the user has the necessary funds and the private key used to sign the transaction corresponds to the public key associated with the funds).\n\nOnce a transaction has been verified, it is added to a block of transactions, along with a mathematical puzzle. Miners compete to solve the puzzle, and the first one to solve it gets to add the block to the blockchain and claim a reward in bitcoin. The reward is currently 6.25 bitcoins, plus any transaction fees that were included in the block.\n\nIn addition to adding transactions to the blockchain, mining also serves to secure the bitcoin network. This is because solving the puzzle requires a significant amount of computational power, and adding a block to the blockchain requires other miners to verify the solution. This makes it very difficult for any one person or group to manipulate the blockchain.\n",
-                        "title": "Mining"
+                        "question": "Quel est le rôle principal du minage dans le réseau Bitcoin ?",
+                        "text": "Lorsqu'un utilisateur souhaite envoyer une transaction sur le réseau Bitcoin, il doit la signer avec sa clé privée pour prouver qu'il est bien le propriétaire des fonds transférés. Une fois la transaction signée, elle est diffusée sur le réseau pair-à-pair.\n\nLe minage est le processus d'ajout des transactions à la blockchain Bitcoin. Lorsqu'une transaction est diffusée sur le réseau, elle est récupérée par les mineurs, qui vérifient qu'elle est valide (c'est-à-dire que l'utilisateur dispose des fonds nécessaires et que la clé privée utilisée pour signer la transaction correspond bien à la clé publique associée aux fonds).\n\nUne fois vérifiée, la transaction est ajoutée à un bloc de transactions, accompagné d'une énigme mathématique. Les mineurs se disputent la résolution de cette énigme, et le premier à y parvenir ajoute le bloc à la blockchain et remporte une récompense en bitcoin. Cette récompense est actuellement de 3,125 bitcoins, plus les éventuels frais de transaction inclus dans le bloc.\n\nEn plus d'ajouter des transactions à la blockchain, le minage sert aussi à sécuriser le réseau Bitcoin. En effet, résoudre l'énigme nécessite une quantité importante de puissance de calcul, et l'ajout d'un bloc à la blockchain exige que d'autres mineurs en vérifient la solution. Cela rend très difficile pour une seule personne ou un seul groupe de manipuler la blockchain.\n",
+                        "title": "Le minage"
                     },
                     "proofOfWork": {
                         "answers": [
-                            "Through proof of work, which involves miners competing to solve a mathematical puzzle",
-                            "By holding a lottery among all those that have bitcoins in a wallet",
-                            "Through a process of majority voting"
+                            "Grâce à la preuve de travail, où les mineurs s'affrontent pour résoudre une énigme mathématique",
+                            "En organisant une loterie parmi tous ceux qui détiennent des bitcoins dans un portefeuille",
+                            "Par un processus de vote majoritaire"
                         ],
                         "feedback": [
-                            "Correct! Congrats on understanding how the bitcoin network creates a source of truth that cannot be manipulated by wealthy elites or insiders",
-                            "No, this would be proof of stake, which is a different consensus mechanism that involves choosing the next block producer proportional to their stake (how many coins they hold) in the network. Try again",
-                            "Wrong, but it's an interesting idea. The bitcoin network does not use a process of majority voting to create a source of truth. Try again!"
+                            "Exact ! Bravo, vous comprenez comment le réseau Bitcoin crée une source de vérité qui ne peut être manipulée ni par des élites fortunées, ni par des initiés.",
+                            "Non, ce serait la preuve d'enjeu (proof of stake), un mécanisme de consensus différent où le prochain producteur de bloc est choisi proportionnellement à sa participation (le nombre de pièces qu'il détient) dans le réseau. Réessayez.",
+                            "Faux, mais c'est une idée intéressante. Le réseau Bitcoin n'utilise pas de processus de vote majoritaire pour créer une source de vérité. Réessayez !"
                         ],
-                        "question": "How does the Bitcoin network create a source of truth despite having no central authority",
-                        "text": "Decentralized systems, by definition, do not have a single source of truth.\n\nSatoshi's breakthrough was to build a system that allows all participants to zero in on the same truth independently. Proof of work is what allows this to happen. The point of proof of work is to create an irrefutable history. If two histories compete, the one with the most work embedded in it wins.\n\nThe chain with the most work is the truth, by definition. This is called Nakamoto consensus. This works because work requires energy. In Bitcoin, work is computation. Not any kind of computation, but computation that has no shortcut: guessing.\n\n  In the absence of a central authority, proof of work is necessary because it ensures that there is no shortcut to adding transactions to the blockchain.\n\n  Miners must compete to solve the puzzle through brute force computation, which is probabilistic in nature, and the proof that the work has been done becomes self-evident in the outcome of the work. This makes it very difficult for any one person or group to manipulate the transaction history.\n",
-                        "title": "Proof of Work"
+                        "question": "Comment le réseau Bitcoin crée-t-il une source de vérité malgré l'absence d'autorité centrale ?",
+                        "text": "Par définition, les systèmes décentralisés n'ont pas de source de vérité unique.\n\nLa percée de Satoshi a été de construire un système qui permet à tous les participants de converger indépendamment vers la même vérité. C'est la preuve de travail qui rend cela possible. Le but de la preuve de travail est de créer un historique irréfutable. Si deux historiques s'affrontent, celui qui contient le plus de travail l'emporte.\n\nLa chaîne qui contient le plus de travail est, par définition, la vérité. On appelle cela le consensus de Nakamoto. Cela fonctionne parce que le travail nécessite de l'énergie. Dans le Bitcoin, le travail est du calcul. Pas n'importe quel calcul, mais un calcul sans raccourci possible : deviner.\n\n  En l'absence d'autorité centrale, la preuve de travail est nécessaire, car elle garantit qu'il n'existe aucun raccourci pour ajouter des transactions à la blockchain.\n\n  Les mineurs doivent s'affronter pour résoudre l'énigme par force brute, un processus de nature probabiliste, et la preuve que le travail a été effectué devient une évidence dans le résultat obtenu. Cela rend très difficile pour une seule personne ou un seul groupe de manipuler l'historique des transactions.\n",
+                        "title": "La preuve de travail"
                     },
                     "difficultyAdjustment": {
                         "answers": [
-                            "It is reduced by half",
-                            "It is doubled",
-                            "It is multiplied by a random number chosen by the bitcoin software"
+                            "Il s'ajuste toutes les 2 semaines pour maintenir un temps de bloc stable de 10 minutes",
+                            "Il s'ajuste une fois par an en fonction du prix du marché",
+                            "Il est modifié aléatoirement par les mineurs via un consensus"
                         ],
                         "feedback": [
-                            "That's right! Satoshi determined the reduction of new bitcoin supply by half in the very first release of the Bitcoin software in 2009 and it is practically impossible to change",
-                            "Sorry, but the block reward is not doubled every four years. You must be confusing Bitcoin with the supplies of fiat currencies which are ever expanding at a faster rate. Try again",
-                            "Very creative, but wrong. The Bitcoin supply schedule is anything but random. Its predictability provides certainty for economic actors unlike anything in the history of mankind. Try again!"
+                            "C'est exact ! Le logiciel Bitcoin ajuste automatiquement la difficulté de minage tous les 2016 blocs — environ toutes les deux semaines — pour viser un rythme stable d'un bloc toutes les 10 minutes. C'est l'une des fonctionnalités les plus élégantes du protocole.",
+                            "Pas tout à fait. Le prix influence bien le nombre de mineurs actifs, mais l'ajustement de la difficulté n'a rien à voir avec le prix. Il repose uniquement sur le temps — plus précisément, le temps qu'il a fallu pour miner les 2016 derniers blocs. Réessayez !",
+                            "Belle tentative, mais non. Les mineurs ne peuvent pas modifier la difficulté aléatoirement. Elle est intégrée au protocole et s'ajuste automatiquement. Cela empêche toute manipulation et garantit un calendrier d'émission cohérent. Réessayez !"
                         ],
-                        "question": "What happens to the block reward in the bitcoin network every four years",
-                        "text": "A crucial element of the Bitcoin protocol is the Difficulty Adjustment. This algorithm ensures that new blocks are found every 10 minutes on average.\n\nWhen more miners join the network, the average time required to find a new block goes down. In the opposite case, when miners leave the network, it takes longer to add a new block. The Difficulty Adjustment algorithm adjusts the difficulty of the mathematical puzzle to match changes in the combined computing power of all miners. This prevents the creation of more (or less) bitcoin units than the predetermined supply schedule.\n\nThis is in stark contrast to physical mining of precious metals like gold where adding more gold miners leads to a higher supply of gold and therefore a decrease in its price. In Bitcoin however, the addition of new miners only adds more security to the network.\n",
-                        "title": "Difficulty Adjustment"
+                        "question": "Comment le réseau Bitcoin garantit-il que de nouveaux blocs sont ajoutés environ toutes les 10 minutes ?",
+                        "text": "Un autre élément essentiel du réseau Bitcoin est l'« ajustement de la difficulté » — un mécanisme de recalibrage automatique qui garantit que les blocs sont trouvés à un intervalle régulier d'environ 10 minutes, quel que soit le nombre de mineurs participant.\n\nTous les 2016 blocs — environ toutes les deux semaines — le logiciel Bitcoin vérifie combien de temps a été nécessaire pour miner le lot précédent. Si les blocs étaient minés trop rapidement, l'énigme cryptographique est rendue plus difficile. S'ils étaient trop lents, elle est rendue plus facile. Cela permet de maintenir l'émission de nouveaux bitcoins selon un calendrier prévisible.\n\nCe mécanisme n'a aucun équivalent dans le monde physique. Par exemple, quand davantage de mineurs se lancent dans la recherche d'or, l'offre d'or augmente. Dans le Bitcoin, davantage de mineurs ne fait qu'accroître la sécurité du réseau, pas le rythme d'émission. L'ajustement de la difficulté est ce qui permet à la machine Bitcoin de tourner à l'heure.",
+                        "title": "L'ajustement de la difficulté"
                     },
                     "halving": {
                         "answers": [
-                            "It is reduced by half",
-                            "It is doubled",
-                            "It is multiplied by a random number chosen by the bitcoin software"
+                            "Elle est réduite de moitié",
+                            "Elle est doublée",
+                            "Elle est multipliée par un nombre aléatoire choisi par le logiciel Bitcoin"
                         ],
                         "feedback": [
-                            "That's right! Satoshi determined the reduction of new bitcoin supply by half in the very first release of the Bitcoin software in 2009 and it is practically impossible to change",
-                            "Sorry, but the block reward is not doubled every four years. You must be confusing Bitcoin with the supplies of fiat currencies which are ever expanding at a faster rate. Try again",
-                            "Very creative, but wrong. The Bitcoin supply schedule is anything but random. Its predictability provides certainty for economic actors unlike anything in the history of mankind. Try again!"
+                            "C'est exact ! Satoshi a fixé cette réduction de moitié de l'offre de nouveaux bitcoins dès la toute première version du logiciel Bitcoin en 2009, et il est pratiquement impossible de la modifier.",
+                            "Dommage, la récompense de bloc n'est pas doublée tous les quatre ans. Vous confondez sans doute avec l'offre des monnaies fiduciaires, qui ne cesse de s'étendre à un rythme toujours plus rapide. Réessayez.",
+                            "Très créatif, mais faux. Le calendrier d'émission du Bitcoin n'a rien d'aléatoire. Sa prévisibilité offre aux acteurs économiques une certitude sans précédent dans l'histoire de l'humanité. Réessayez !"
                         ],
-                        "question": "What happens to the block reward in the bitcoin network every four years",
-                        "text": "One final element that is important to understand, is that the block reward in the bitcoin network is reduced by half every four years, or every 210,000 blocks.\n\nThis event, known as the \"halving\", is programmed into the bitcoin software that all users run. When bitcoin was first launched, miners received 50 new bitcoins for each block they added to the blockchain. Currently, the block reward is 6.25 bitcoins, but it will be reduced to 3.125 bitcoins in 2024 when the next halving occurs.\n\nThese halvings will continue to take place until the year 2140, at which point the total number of bitcoins that will have been mined will be capped at 21 million. As of 2023, around 92% of all bitcoins (\\~19.3 million) have already been mined.\n\nUnlike fiat currencies, which can be inflationary, bitcoin is disinflationary in nature. This makes it more scarce than fiat and precious metals such as gold and silver, or anything else known in the universe.\n",
-                        "title": "The Halving"
+                        "question": "Que se passe-t-il pour la récompense de bloc du réseau Bitcoin tous les quatre ans ?",
+                        "text": "Un dernier élément important à comprendre est que la récompense de bloc du réseau Bitcoin est réduite de moitié tous les quatre ans, soit tous les 210 000 blocs.\n\nCet événement, appelé « halving », est programmé dans le logiciel Bitcoin utilisé par tous les utilisateurs. Au lancement du Bitcoin, les mineurs recevaient 50 nouveaux bitcoins pour chaque bloc ajouté à la blockchain. Actuellement, la récompense de bloc est de 3,125 bitcoins, mais elle sera réduite à 1,5625 bitcoin en 2028, lors du prochain halving.\n\nCes halvings se poursuivront jusqu'en 2140, date à laquelle le nombre total de bitcoins minés sera plafonné à 21 millions. En 2023, environ 92 % de tous les bitcoins (~19,3 millions) avaient déjà été minés.\n\nContrairement aux monnaies fiduciaires, qui peuvent être inflationnistes, le bitcoin est de nature désinflationniste. Cela le rend plus rare que la monnaie fiduciaire et que les métaux précieux comme l'or et l'argent, ou que toute autre chose connue dans l'univers.\n",
+                        "title": "Le halving"
                     }
                 }
             },
