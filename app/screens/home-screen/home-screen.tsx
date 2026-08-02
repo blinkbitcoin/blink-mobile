@@ -213,14 +213,25 @@ export const HomeScreen: React.FC = () => {
 
   const isAuthed = useIsAuthed()
   const activeWallet = useActiveWallet()
-  const { isSelfCustodial } = activeWallet
+  /** Which account the home screen renders is decided by the registry descriptor, never
+   *  by the SDK connection: `activeWallet.isSelfCustodial` only turns true once Breez is
+   *  connected, so from the moment of a switch until the first successful connect — and
+   *  permanently for an account that cannot connect at all (mnemonic missing from the
+   *  keystore, stored network mismatch) — it still describes the *previous* account.
+   *  Gating on `accountType` is what the restriction and transfer-block policies already
+   *  do, and it keeps every account-scoped branch below agreeing with each other. */
+  const isCustodialAccount = activeWallet.accountType === AccountType.Custodial
+  const isSelfCustodialAccount = !isCustodialAccount
   useSelfCustodialNetworkMismatchToast()
   const {
     refreshWallets: refreshSelfCustodialWallets,
+    retry: retrySelfCustodialConnection,
+    sdk: selfCustodialSdk,
     isStableBalanceActive,
     lightningAddress: selfCustodialLightningAddress,
   } = useSelfCustodialWallet()
   const { accounts, activeAccount } = useAccountRegistry()
+  const activeAccountId = activeAccount?.id
   const hasMultipleAccounts = accounts.length > 1
   const { stableBalanceEnabled } = useFeatureFlags()
   const { mode: balanceMode, toggleMode: toggleBalanceMode } = useBalanceMode()
@@ -244,7 +255,7 @@ export const HomeScreen: React.FC = () => {
     error,
     refetch: refetchAuthed,
   } = useHomeAuthedQuery({
-    skip: !isAuthed || isSelfCustodial,
+    skip: !isAuthed || isSelfCustodialAccount,
     fetchPolicy: "network-only",
     errorPolicy: "all",
 
@@ -253,7 +264,7 @@ export const HomeScreen: React.FC = () => {
   })
 
   const { loading: loadingPrice, refetch: refetchRealtimePrice } = useRealtimePriceQuery({
-    skip: !isAuthed || isSelfCustodial,
+    skip: !isAuthed || isSelfCustodialAccount,
     fetchPolicy: "network-only",
 
     // this enables offline mode use-case
@@ -293,7 +304,7 @@ export const HomeScreen: React.FC = () => {
 
   // not loaded yet: no wallets while not ready (a loaded account keeps its balance
   // when a refresh goes offline, and a ready empty account shows zero, not a skeleton)
-  const queryLoading = isSelfCustodial
+  const queryLoading = isSelfCustodialAccount
     ? !activeWallet.isReady && activeWallet.wallets.length === 0
     : loadingAuthed || loadingPrice || loadingUnauthed || loadingSettings
 
@@ -303,17 +314,30 @@ export const HomeScreen: React.FC = () => {
   const selfCustodialUsername = extractLightningAddressUsername(
     selfCustodialLightningAddress,
   )
-  const usernameTitle = isSelfCustodial
+  const usernameTitle = isSelfCustodialAccount
     ? selfCustodialUsername ?? selfCustodialFallbackTitle
     : username || phone || LL.common.blinkUser()
-  const canSwitchAccount = isSelfCustodial ? hasMultipleAccounts : isAtLeastLevelOne
+  /** Anything the switcher can reach keeps the caret: gating the self-custodial side on
+   *  a live SDK used to hide it exactly when the user most needs it (an account that
+   *  fails to connect), stranding them on a screen with no way back to another account.
+   *  Level one still qualifies on its own — the custodial switcher also lists session
+   *  profiles, which the registry collapses into a single descriptor. */
+  const canSwitchAccount = hasMultipleAccounts || isAtLeastLevelOne
 
-  const wallets = isSelfCustodial
-    ? activeWallet.wallets.map((w) => ({
+  /** Memoized: an inline map would hand `useTotalBalance`, `WalletOverview` and the
+   *  wallet-count effect a new array on every render. */
+  const selfCustodialWallets = useMemo(
+    () =>
+      activeWallet.wallets.map((w) => ({
         id: w.id,
         balance: w.balance.amount,
         walletCurrency: w.walletCurrency,
-      }))
+      })),
+    [activeWallet.wallets],
+  )
+
+  const wallets = isSelfCustodialAccount
+    ? selfCustodialWallets
     : dataAuthed?.me?.defaultAccount?.wallets
 
   /**
@@ -323,7 +347,12 @@ export const HomeScreen: React.FC = () => {
    * Ref PR #3899.
    */
   const isCardBackendAvailable = galoyInstanceId === "Staging"
-  const { card: homeCard } = useCardData({ skip: !isCardBackendAvailable })
+  /** The card belongs to the custodial account, so it must not survive a switch: the
+   *  query is cache-first, and a self-custodial account would otherwise keep rendering
+   *  the previous account's card row under its own balances. */
+  const { card: homeCard } = useCardData({
+    skip: !isCardBackendAvailable || !isCustodialAccount,
+  })
   const hasCard = homeCard !== undefined && isCardUsable(homeCard.status)
   const cardLastFour = homeCard?.lastFour
 
@@ -336,7 +365,7 @@ export const HomeScreen: React.FC = () => {
   const loading = queryLoading || balanceConversionLoading
 
   const showStableBalanceToggle =
-    stableBalanceEnabled && isSelfCustodial && isStableBalanceActive
+    stableBalanceEnabled && isSelfCustodialAccount && isStableBalanceActive
 
   const { formatMoneyAmount } = useDisplayCurrency()
 
@@ -364,14 +393,23 @@ export const HomeScreen: React.FC = () => {
     return txs
   }, [pendingIncomingTransactions, transactionsEdges])
 
-  const { hasUnseenBtcTx, hasUnseenUsdTx, markTxSeen } = useTransactionSeenState(
-    accountId || "",
-    transactions,
-  )
+  const {
+    hasUnseenBtcTx: hasUnseenBtcTxForAccount,
+    hasUnseenUsdTx: hasUnseenUsdTxForAccount,
+    markTxSeen,
+  } = useTransactionSeenState(accountId || "", transactions)
+
+  /** Unseen-tx state is custodial-only: the hook falls back to the custodial home cache
+   *  whenever the transaction list it is handed is empty (which it always is off the
+   *  custodial account), and it would key the "seen" marker on an empty account id
+   *  shared by every self-custodial account. Left ungated, a self-custodial account
+   *  shows notification dots for the custodial account's transactions. */
+  const hasUnseenBtcTx = isCustodialAccount && hasUnseenBtcTxForAccount
+  const hasUnseenUsdTx = isCustodialAccount && hasUnseenUsdTxForAccount
 
   const { canShowUpgradeModal, markShownUpgradeModal } = useAutoShowUpgradeModal({
     cooldownDays: upgradeModalCooldownDays,
-    enabled: isAuthed && levelAccount === AccountLevel.Zero,
+    enabled: isAuthed && isCustodialAccount && levelAccount === AccountLevel.Zero,
   })
 
   const { latestUnseenTx, unseenAmountText, handleUnseenBadgePress, isOutgoing } =
@@ -405,6 +443,21 @@ export const HomeScreen: React.FC = () => {
   const [isStablesatModalVisible, setIsStablesatModalVisible] = React.useState(false)
   const [isUpgradeModalVisible, setIsUpgradeModalVisible] = React.useState(false)
   const [isRestrictionModalVisible, setIsRestrictionModalVisible] = React.useState(false)
+
+  /** The home screen outlives an account switch — the switcher only flips the active id —
+   *  so every modal it owns must close with the account that opened it, the same way the
+   *  forced-conversion latch resets. Otherwise the next account inherits a modal about
+   *  wallets, levels or restrictions that are not its own; the pending upgrade reopen is
+   *  cleared for the same reason, since it fires unconditionally on the next focus. */
+  React.useEffect(() => {
+    setModalVisible(false)
+    setIsStablesatModalVisible(false)
+    setIsUpgradeModalVisible(false)
+    setIsRestrictionModalVisible(false)
+    setSetDefaultAccountModalVisible(false)
+    reopenUpgradeModal.current = false
+  }, [activeAccountId])
+
   const isDollarBalanceRestricted = useDollarBalanceRestricted()
   useDollarBalanceRestrictionSync()
 
@@ -413,12 +466,11 @@ export const HomeScreen: React.FC = () => {
 
   const restrictedUsdWallet = getUsdWallet(dataAuthed?.me?.defaultAccount?.wallets)
   const restrictedBtcWallet = getBtcWallet(dataAuthed?.me?.defaultAccount?.wallets)
-  /** Balance and restriction policy must resolve for the SAME account type: right
-   *  after switching to self-custodial the SDK is still connecting (so
-   *  `isSelfCustodial` is false) while the restriction already applies the
-   *  self-custodial policy; reading the cached custodial balance in that window
-   *  would trigger the previous account's modal. */
-  const isCustodialAccount = activeWallet.accountType === AccountType.Custodial
+  /** Balance and restriction policy resolve for the SAME account type (see
+   *  `isCustodialAccount` above): right after switching to self-custodial the SDK is
+   *  still connecting while the restriction already applies the self-custodial policy,
+   *  and reading the cached custodial balance in that window would trigger the previous
+   *  account's modal. */
   const selfCustodialUsdWallet = activeWallet.wallets.find(
     (w) => w.walletCurrency === WalletCurrency.Usd,
   )
@@ -470,7 +522,8 @@ export const HomeScreen: React.FC = () => {
     isCustodialAccount && restrictedUsdWallet && restrictedBtcWallet
       ? { usdWalletId: restrictedUsdWallet.id, btcWalletId: restrictedBtcWallet.id }
       : null
-  const shouldShowStableTokenConvertModal = isSelfCustodial && isConvertModalVisible
+  const shouldShowStableTokenConvertModal =
+    isSelfCustodialAccount && isConvertModalVisible
 
   const { migrateNowPrompt, offboardBulletin, reminderBulletin, receiveBlocked } =
     useWindDownHomeNudges()
@@ -498,12 +551,14 @@ export const HomeScreen: React.FC = () => {
   }, [])
 
   const triggerUpgradeModal = React.useCallback(() => {
+    if (!isCustodialAccount) return
     if (!accountId || levelAccount !== AccountLevel.Zero) return
     if (!canShowUpgradeModal || satsBalance <= balanceLimitToTriggerUpgradeModal) return
 
     openUpgradeModal()
     markShownUpgradeModal()
   }, [
+    isCustodialAccount,
     accountId,
     levelAccount,
     canShowUpgradeModal,
@@ -514,8 +569,13 @@ export const HomeScreen: React.FC = () => {
   ])
 
   const refetch = React.useCallback(() => {
-    if (isSelfCustodial) {
-      refreshSelfCustodialWallets()
+    if (isSelfCustodialAccount) {
+      /** A refresh without a live SDK is a no-op, which would leave pull-to-refresh dead
+       *  on an account whose connect failed; reconnecting is the only recovery from
+       *  there. A connected-but-offline wallet still refreshes, so its retained balance
+       *  is never thrown away by a teardown. */
+      if (selfCustodialSdk) refreshSelfCustodialWallets()
+      else retrySelfCustodialConnection()
       return
     }
 
@@ -532,8 +592,10 @@ export const HomeScreen: React.FC = () => {
     })
   }, [
     isAuthed,
-    isSelfCustodial,
+    isSelfCustodialAccount,
+    selfCustodialSdk,
     refreshSelfCustodialWallets,
+    retrySelfCustodialConnection,
     refetchAuthed,
     refetchBulletins,
     refetchRealtimePrice,
@@ -544,13 +606,17 @@ export const HomeScreen: React.FC = () => {
   const numberOfTxs = transactions.length
 
   const onMenuClick = (target: Target) => {
-    if (!isSelfCustodial && !isAuthed) {
+    /** Only a custodial account can be missing a backend session. A self-custodial
+     *  account is unauthed by design (its Apollo token is empty), so keying this on the
+     *  SDK connection turned every home action into a "create an account" prompt while
+     *  the wallet was still connecting. */
+    if (isCustodialAccount && !isAuthed) {
       setModalVisible(true)
       return
     }
 
     if (
-      !isSelfCustodial &&
+      isCustodialAccount &&
       !isDollarBalanceRestricted &&
       target === "receiveBitcoin" &&
       !defaultAccountModalShown &&
@@ -572,17 +638,17 @@ export const HomeScreen: React.FC = () => {
   // debug code. verify that we have 2 wallets. mobile doesn't work well with only one wallet
   // TODO: add this code in a better place
   React.useEffect(() => {
-    if (isSelfCustodial) return
+    if (!isCustodialAccount) return
     if (wallets?.length !== undefined && wallets?.length !== 2) {
       Alert.alert(LL.HomeScreen.walletCountNotTwo())
     }
-  }, [wallets, LL, isSelfCustodial])
+  }, [wallets, LL, isCustodialAccount])
 
   // Trigger the upgrade trial account modal
   useFocusEffect(
     React.useCallback(() => {
       if (reopenUpgradeModal.current) {
-        openUpgradeModal()
+        if (isCustodialAccount) openUpgradeModal()
         reopenUpgradeModal.current = false
         return
       }
@@ -592,7 +658,7 @@ export const HomeScreen: React.FC = () => {
       }, UPGRADE_MODAL_INITIAL_DELAY_MS)
 
       return () => clearTimeout(id)
-    }, [openUpgradeModal, triggerUpgradeModal]),
+    }, [isCustodialAccount, openUpgradeModal, triggerUpgradeModal]),
   )
 
   type Target =
@@ -631,7 +697,7 @@ export const HomeScreen: React.FC = () => {
   ]
 
   const passesIosGate =
-    isSelfCustodial ||
+    isSelfCustodialAccount ||
     !isIos ||
     dataUnauthed?.globals?.network !== "mainnet" ||
     levelAccount === AccountLevel.Two ||
@@ -693,7 +759,7 @@ export const HomeScreen: React.FC = () => {
       <StableSatsModal
         isVisible={isStablesatModalVisible}
         setIsVisible={setIsStablesatModalVisible}
-        variant={isSelfCustodial ? "selfCustodial" : "custodial"}
+        variant={isSelfCustodialAccount ? "selfCustodial" : "custodial"}
       />
       <TrialAccountLimitsModal
         isVisible={isUpgradeModalVisible}
@@ -830,7 +896,7 @@ export const HomeScreen: React.FC = () => {
             </React.Fragment>
           ))}
         </View>
-        {isSelfCustodial && <UnclaimedDepositBanner />}
+        {isSelfCustodialAccount && <UnclaimedDepositBanner />}
         <NetworkStatusBanner />
         {shouldShowBanner && <BackupNudgeBanner onDismiss={dismissBanner} />}
         {offboardBulletin.isVisible && <OffboardOnlyBulletin />}
