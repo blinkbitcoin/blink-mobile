@@ -44,6 +44,12 @@ source:
   repository: #@ release_concourse_image()
 #@ end
 
+#@ def nix_task_image_config():
+type: registry-image
+source:
+  repository: nixpkgs/nix-flakes
+#@ end
+
 #@ def slack_failure_notification():
 #@ fail_url = "<$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME| :face_with_symbols_on_mouth: $BUILD_JOB_NAME> failed!"
 put: slack
@@ -52,6 +58,25 @@ params:
   username: concourse
   icon_url: https://cl.ly/2F421Y300u07/concourse-logo-blue-transparent.png
   text:    #@ fail_url
+#@ end
+
+#@ def check_code():
+name: check-code
+serial: true
+plan:
+- in_parallel:
+  - { get: repo, trigger: true }
+  - { get: pipeline-tasks }
+- task: check-code
+  config:
+    platform: linux
+    image_resource: #@ nix_task_image_config()
+    inputs:
+    - name: pipeline-tasks
+    - name: repo
+    run:
+      path: pipeline-tasks/ci/vendor/tasks/check-code.sh
+on_failure: #@ slack_failure_notification()
 #@ end
 
 #@ def nodejs_check_code():
