@@ -1,1 +1,1 @@
-export * from "./warning-card"
+export { WarningCard } from "./warning-card"

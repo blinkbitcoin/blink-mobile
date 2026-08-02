@@ -1,1 +1,1 @@
-export * from "./spark-compatible-info"
+export { SparkCompatibleInfo } from "./spark-compatible-info"
