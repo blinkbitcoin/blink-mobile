@@ -14,6 +14,7 @@ import { ContactTransactions } from "@app/screens/people-screen/contacts/contact
 import { AccountType } from "@app/types/wallet"
 
 const mockUseQuery = jest.fn()
+const mockUseIsAuthed = jest.fn()
 const mockUseContactTransactions = jest.fn()
 const mockLoadMore = jest.fn()
 const mockActiveAccountType = jest.fn()
@@ -47,7 +48,7 @@ jest.mock("@app/graphql/generated", () => ({
 }))
 
 jest.mock("@app/graphql/is-authed-context", () => ({
-  useIsAuthed: () => true,
+  useIsAuthed: () => mockUseIsAuthed(),
 }))
 
 jest.mock("@app/hooks/use-account-registry", () => ({
@@ -134,6 +135,7 @@ describe("ContactTransactions", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockRowProps.length = 0
+    mockUseIsAuthed.mockReturnValue(true)
     mockActiveAccountType.mockReturnValue(AccountType.Custodial)
     mockUseContactTransactions.mockReturnValue(contactTransactions())
     mockFragments.mockReturnValue([])
@@ -179,6 +181,16 @@ describe("ContactTransactions", () => {
 
       expect(getByTestId("contact-transactions-loading")).toBeTruthy()
       expect(queryByTestId("contact-no-transactions")).toBeNull()
+    })
+
+    it("does not spin forever on a query it never ran", () => {
+      mockUseIsAuthed.mockReturnValue(false)
+      mockUseQuery.mockReturnValue(custodialQuery({ data: undefined }))
+
+      const { getByTestId, queryByTestId } = renderContactTransactions()
+
+      expect(getByTestId("contact-no-transactions")).toBeTruthy()
+      expect(queryByTestId("contact-transactions-loading")).toBeNull()
     })
 
     it("reports a failed query through a toast", () => {
