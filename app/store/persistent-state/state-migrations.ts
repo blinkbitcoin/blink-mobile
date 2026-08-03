@@ -261,9 +261,10 @@ const stateMigrations: StateMigrations = {
 export type PersistentState = PersistentState_14
 
 /**
- * The one place the current schema version is written down. Bumping
- * `PersistentState` above without bumping this fails to compile, and nothing
- * else — app code or tests — should spell the number out.
+ * The current schema version, written down once. Bumping `PersistentState`
+ * above without bumping this fails to compile. Outside the migration chain —
+ * where each step deliberately targets one specific version — nothing should
+ * spell the number out, tests included.
  */
 export const CURRENT_SCHEMA_VERSION: PersistentState["schemaVersion"] = 14
 
