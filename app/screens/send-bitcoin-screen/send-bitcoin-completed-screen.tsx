@@ -185,7 +185,9 @@ const PaymentDetailsSection: React.FC<{
       <View style={styles.successActionFieldContainer}>
         <SuccessActionComponent
           title={LL.SendBitcoinScreen.time()}
-          text={createdAt ? formatUnixTimestampYMDHM(createdAt) : ""}
+          text={
+            createdAt ? formatUnixTimestampYMDHM({ timestampSeconds: createdAt }) : ""
+          }
           key="time"
           visible={Boolean(createdAt)}
         />

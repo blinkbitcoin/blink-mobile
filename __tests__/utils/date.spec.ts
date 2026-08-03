@@ -12,6 +12,7 @@ import {
   formatDuration,
   formatMonth,
   formatShortDate,
+  formatUnixTimestampYMDHM,
   getLastDayOfMonth,
   isSameDay,
   isToday,
@@ -201,6 +202,58 @@ describe("date utils", () => {
       expect(formatShortDate({ createdAt })).toMatch(/2024-06-10/)
 
       jest.useRealTimers()
+    })
+  })
+
+  describe("formatUnixTimestampYMDHM", () => {
+    it.each([
+      {
+        name: "keeps the UTC wall clock when the zone is UTC",
+        timestampSeconds: Math.floor(Date.parse("2026-08-03T19:04:00Z") / 1000),
+        timezone: "UTC",
+        expected: "2026-08-03 19:04",
+      },
+      {
+        name: "shifts back for a negative offset zone",
+        timestampSeconds: Math.floor(Date.parse("2026-08-03T19:04:00Z") / 1000),
+        timezone: "America/El_Salvador",
+        expected: "2026-08-03 13:04",
+      },
+      {
+        name: "rolls to the next day for a positive offset zone",
+        timestampSeconds: Math.floor(Date.parse("2026-08-03T19:04:00Z") / 1000),
+        timezone: "Asia/Tokyo",
+        expected: "2026-08-04 04:04",
+      },
+      {
+        name: "rolls back a day for a negative offset zone",
+        timestampSeconds: Math.floor(Date.parse("2024-01-01T00:30:00Z") / 1000),
+        timezone: "America/Los_Angeles",
+        expected: "2023-12-31 16:30",
+      },
+      {
+        name: "renders midnight as 00 and not 24",
+        timestampSeconds: Math.floor(Date.parse("2024-01-01T00:00:00Z") / 1000),
+        timezone: "UTC",
+        expected: "2024-01-01 00:00",
+      },
+      {
+        name: "pads single digit month, day, hour and minute",
+        timestampSeconds: Math.floor(Date.parse("2024-03-05T04:07:00Z") / 1000),
+        timezone: "UTC",
+        expected: "2024-03-05 04:07",
+      },
+    ])("returns $expected when it $name", ({ timestampSeconds, timezone, expected }) => {
+      expect(formatUnixTimestampYMDHM({ timestampSeconds, timezone })).toBe(expected)
+    })
+
+    it("uses the device timezone when none is injected", () => {
+      const timestampSeconds = Math.floor(Date.parse("2026-08-03T19:04:00Z") / 1000)
+      const deviceTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+
+      expect(formatUnixTimestampYMDHM({ timestampSeconds })).toBe(
+        formatUnixTimestampYMDHM({ timestampSeconds, timezone: deviceTimezone }),
+      )
     })
   })
 
