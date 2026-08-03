@@ -265,6 +265,10 @@ export type PersistentState = PersistentState_14
  * above without bumping this fails to compile. Outside the migration chain —
  * where each step deliberately targets one specific version — nothing should
  * spell the number out, tests included.
+ *
+ * The compiler cannot see the other half of a bump: registering the new
+ * version in `stateMigrations`. `state-migrations.spec.ts` pins that, since
+ * skipping it leaves the app writing a version it can no longer read back.
  */
 export const CURRENT_SCHEMA_VERSION: PersistentState["schemaVersion"] = 14
 

@@ -289,6 +289,28 @@ describe("state-migrations schema 10", () => {
     ).toBeUndefined()
   })
 
+  // Half of a version bump is invisible to the compiler: adding the type and
+  // moving the alias typechecks even if the new version is never registered in
+  // `stateMigrations`. The app would then write a version it cannot read back,
+  // and every launch would silently reset persisted state — auth token included.
+  it("reads back the state it writes: the current version has a registered migration", async () => {
+    const result = await migratePersistentState(defaultPersistentState)
+
+    expect(result.status).toBe(MigrationStatus.Ok)
+    if (result.status === MigrationStatus.Ok) {
+      expect(result.state).toEqual(defaultPersistentState)
+    }
+  })
+
+  it("registers nothing above the current version", async () => {
+    const result = await migratePersistentState({
+      ...defaultPersistentState,
+      schemaVersion: CURRENT_SCHEMA_VERSION + 1,
+    })
+
+    expect(result).toEqual({ status: MigrationStatus.NoData })
+  })
+
   it("attributes legacy 'USD' from schema 8 to the active self-custodial slot and clears the legacy field", async () => {
     const state8 = {
       schemaVersion: 8,
