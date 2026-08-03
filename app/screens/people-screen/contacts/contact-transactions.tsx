@@ -6,10 +6,16 @@ import {
   MemoizedTransactionItem,
   TRANSACTION_LIST_WINDOW_SIZE,
 } from "@app/components/transaction-item"
-import { useTransactionListForContactQuery } from "@app/graphql/generated"
+import { UserContact, useTransactionListForContactQuery } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { groupTransactionsByDate } from "@app/graphql/transactions"
+import { useAccountRegistry } from "@app/hooks/use-account-registry"
+import { useContacts } from "@app/hooks/use-contacts"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { useSelfCustodialTransactionFragments } from "@app/self-custodial/hooks/use-self-custodial-transaction-fragments"
+import { NormalizedTransaction } from "@app/types/transaction"
+import { AccountType } from "@app/types/wallet"
+import { useFocusEffect } from "@react-navigation/native"
 import { makeStyles } from "@rn-vui/themed"
 
 import { toastShow } from "../../../utils/toast"
@@ -34,7 +40,7 @@ gql`
 `
 
 type Props = {
-  contactUsername: string
+  contact: UserContact
 }
 
 const keyExtractor = (item: { id: string }) => item.id
@@ -45,26 +51,53 @@ const renderItem = ({ item }: { item: { id: string } }) => (
   <MemoizedTransactionItem txid={item.id} />
 )
 
-export const ContactTransactions = ({ contactUsername }: Props) => {
+export const ContactTransactions = ({ contact }: Props) => {
   const styles = useStyles()
   const { LL, locale } = useI18nContext()
   const isAuthed = useIsAuthed()
+  const { activeAccount } = useAccountRegistry()
+  const isSelfCustodial = activeAccount?.type === AccountType.SelfCustodial
 
+  const { getTransactions } = useContacts()
+  const [selfCustodialTransactions, setSelfCustodialTransactions] = React.useState<
+    NormalizedTransaction[]
+  >([])
+
+  /**
+   * The custodial query resolves through `me`, which a self-custodial account has no
+   * session for, so it is skipped and the contact adapter answers instead.
+   */
   const { error, data, fetchMore } = useTransactionListForContactQuery({
-    variables: { username: contactUsername },
-    skip: !isAuthed,
+    variables: { username: contact.username },
+    skip: !isAuthed || isSelfCustodial,
   })
 
-  const transactions = data?.me?.contactByUsername?.transactions
+  useFocusEffect(
+    React.useCallback(() => {
+      if (!isSelfCustodial) return undefined
+
+      let isActive = true
+      getTransactions(contact.id).then((transactions) => {
+        if (isActive) setSelfCustodialTransactions(transactions)
+      })
+
+      return () => {
+        isActive = false
+      }
+    }, [isSelfCustodial, contact.id, getTransactions]),
+  )
+
+  const selfCustodialTxs = useSelfCustodialTransactionFragments(selfCustodialTransactions)
+  const custodialTransactions = data?.me?.contactByUsername?.transactions
+
+  const txs = React.useMemo(() => {
+    if (isSelfCustodial) return selfCustodialTxs
+    return custodialTransactions?.edges?.map((edge) => edge.node) ?? []
+  }, [isSelfCustodial, selfCustodialTxs, custodialTransactions])
 
   const sections = React.useMemo(
-    () =>
-      groupTransactionsByDate({
-        txs: transactions?.edges?.map((edge) => edge.node) ?? [],
-        LL,
-        locale,
-      }),
-    [transactions, LL, locale],
+    () => groupTransactionsByDate({ txs, LL, locale }),
+    [txs, LL, locale],
   )
 
   // Declared above the early returns below to keep hook order stable.
@@ -77,6 +110,19 @@ export const ContactTransactions = ({ contactUsername }: Props) => {
     [styles.sectionHeaderContainer, styles.sectionHeaderText],
   )
 
+  const fetchNextTransactionsPage = () => {
+    const pageInfo = custodialTransactions?.pageInfo
+
+    if (pageInfo?.hasNextPage) {
+      fetchMore({
+        variables: {
+          username: contact.username,
+          after: pageInfo.endCursor,
+        },
+      })
+    }
+  }
+
   if (error) {
     toastShow({
       message: (translations) => translations.common.transactionsError(),
@@ -85,32 +131,16 @@ export const ContactTransactions = ({ contactUsername }: Props) => {
     return <></>
   }
 
-  if (!transactions) {
-    return <></>
-  }
-
-  const fetchNextTransactionsPage = () => {
-    const pageInfo = transactions?.pageInfo
-
-    if (pageInfo.hasNextPage) {
-      fetchMore({
-        variables: {
-          username: contactUsername,
-          after: pageInfo.endCursor,
-        },
-      })
-    }
-  }
-
   return (
     <View style={styles.screen}>
       <SectionList
+        testID="contact-transactions-list"
         renderItem={renderItem}
         initialNumToRender={20}
         windowSize={TRANSACTION_LIST_WINDOW_SIZE}
         renderSectionHeader={renderSectionHeader}
         ListEmptyComponent={
-          <View style={styles.noTransactionView}>
+          <View style={styles.noTransactionView} testID="contact-no-transactions">
             <Text style={styles.noTransactionText}>
               {LL.TransactionScreen.noTransaction()}
             </Text>
