@@ -3,8 +3,6 @@ import { SectionList } from "react-native"
 
 import { fireEvent, render } from "@testing-library/react-native"
 
-import { flushEffects } from "../../../helpers/flush-effects"
-
 import { ThemeProvider } from "@rn-vui/themed"
 
 import { TRANSACTION_LIST_WINDOW_SIZE } from "@app/components/transaction-item"
@@ -16,11 +14,32 @@ import { ContactTransactions } from "@app/screens/people-screen/contacts/contact
 import { AccountType } from "@app/types/wallet"
 
 const mockUseQuery = jest.fn()
-const mockGetTransactions = jest.fn()
-const mockContactsLoading = jest.fn()
+const mockUseContactTransactions = jest.fn()
+const mockLoadMore = jest.fn()
 const mockActiveAccountType = jest.fn()
 const mockToastShow = jest.fn()
 const mockFragments = jest.fn()
+
+const contactTransactions = (overrides: Record<string, unknown> = {}) => ({
+  transactions: [],
+  isLoading: false,
+  hasError: false,
+  loadMore: mockLoadMore,
+  ...overrides,
+})
+
+/** An answered query: `data` present means the backend has spoken, empty edges or not. */
+const custodialQuery = ({
+  edges = [] as unknown[],
+  pageInfo = { hasNextPage: false, endCursor: null },
+  ...overrides
+}: Record<string, unknown> = {}) => ({
+  error: undefined,
+  loading: false,
+  fetchMore: jest.fn(),
+  data: { me: { contactByUsername: { transactions: { edges, pageInfo } } } },
+  ...overrides,
+})
 
 jest.mock("@app/graphql/generated", () => ({
   ...jest.requireActual("@app/graphql/generated"),
@@ -35,11 +54,9 @@ jest.mock("@app/hooks/use-account-registry", () => ({
   useAccountRegistry: () => ({ activeAccount: { type: mockActiveAccountType() } }),
 }))
 
-jest.mock("@app/hooks/use-contacts", () => ({
-  useContacts: () => ({
-    getTransactions: mockGetTransactions,
-    loading: mockContactsLoading(),
-  }),
+jest.mock("@app/hooks/use-contact-transactions", () => ({
+  useContactTransactions: (contactId: string, isEnabled: boolean) =>
+    mockUseContactTransactions(contactId, isEnabled),
 }))
 
 jest.mock("@app/self-custodial/hooks/use-self-custodial-transaction-fragments", () => ({
@@ -118,32 +135,16 @@ describe("ContactTransactions", () => {
     jest.clearAllMocks()
     mockRowProps.length = 0
     mockActiveAccountType.mockReturnValue(AccountType.Custodial)
-    mockContactsLoading.mockReturnValue(false)
-    mockGetTransactions.mockResolvedValue([])
+    mockUseContactTransactions.mockReturnValue(contactTransactions())
     mockFragments.mockReturnValue([])
-    mockUseQuery.mockReturnValue({
-      error: undefined,
-      data: undefined,
-      fetchMore: jest.fn(),
-    })
+    mockUseQuery.mockReturnValue(custodialQuery())
   })
 
   describe("custodial account", () => {
     it("runs the contact query and lists what it returns", async () => {
-      mockUseQuery.mockReturnValue({
-        error: undefined,
-        fetchMore: jest.fn(),
-        data: {
-          me: {
-            contactByUsername: {
-              transactions: {
-                edges: [{ node: makeFragment("custodial-tx") }],
-                pageInfo: { hasNextPage: false, endCursor: null },
-              },
-            },
-          },
-        },
-      })
+      mockUseQuery.mockReturnValue(
+        custodialQuery({ edges: [{ node: makeFragment("custodial-tx") }] }),
+      )
 
       const { getByTestId } = renderContactTransactions()
 
@@ -180,20 +181,13 @@ describe("ContactTransactions", () => {
 
     it("asks for the next page when the list reaches its end", async () => {
       const fetchMore = jest.fn()
-      mockUseQuery.mockReturnValue({
-        error: undefined,
-        fetchMore,
-        data: {
-          me: {
-            contactByUsername: {
-              transactions: {
-                edges: [{ node: makeFragment("custodial-tx") }],
-                pageInfo: { hasNextPage: true, endCursor: "cursor-1" },
-              },
-            },
-          },
-        },
-      })
+      mockUseQuery.mockReturnValue(
+        custodialQuery({
+          fetchMore,
+          edges: [{ node: makeFragment("custodial-tx") }],
+          pageInfo: { hasNextPage: true, endCursor: "cursor-1" },
+        }),
+      )
 
       const { getByTestId } = renderContactTransactions()
       fireEvent(getByTestId("contact-transactions-list"), "endReached")
@@ -201,24 +195,14 @@ describe("ContactTransactions", () => {
       expect(fetchMore).toHaveBeenCalledWith({
         variables: { username: contact.username, after: "cursor-1" },
       })
+      expect(mockLoadMore).not.toHaveBeenCalled()
     })
 
     it("does not page past the last cursor", () => {
       const fetchMore = jest.fn()
-      mockUseQuery.mockReturnValue({
-        error: undefined,
-        fetchMore,
-        data: {
-          me: {
-            contactByUsername: {
-              transactions: {
-                edges: [{ node: makeFragment("custodial-tx") }],
-                pageInfo: { hasNextPage: false, endCursor: null },
-              },
-            },
-          },
-        },
-      })
+      mockUseQuery.mockReturnValue(
+        custodialQuery({ fetchMore, edges: [{ node: makeFragment("custodial-tx") }] }),
+      )
 
       const { getByTestId } = renderContactTransactions()
       fireEvent(getByTestId("contact-transactions-list"), "endReached")
@@ -226,10 +210,10 @@ describe("ContactTransactions", () => {
       expect(fetchMore).not.toHaveBeenCalled()
     })
 
-    it("does not ask the contact adapter for transactions", () => {
+    it("leaves the contact adapter switched off", () => {
       renderContactTransactions()
 
-      expect(mockGetTransactions).not.toHaveBeenCalled()
+      expect(mockUseContactTransactions).toHaveBeenCalledWith(contact.handle, false)
     })
   })
 
@@ -238,115 +222,50 @@ describe("ContactTransactions", () => {
       mockActiveAccountType.mockReturnValue(AccountType.SelfCustodial)
     })
 
-    it("skips the custodial query, which has no session to resolve through", async () => {
+    it("skips the custodial query, which has no session to resolve through", () => {
       renderContactTransactions()
-      await flushEffects()
 
       expect(mockUseQuery).toHaveBeenCalledWith(expect.objectContaining({ skip: true }))
     })
 
-    it("lists the transactions the contact adapter returns", async () => {
-      const normalized = [{ id: "sc-tx" }]
-      mockGetTransactions.mockResolvedValue(normalized)
+    it("drives the adapter for this contact", () => {
+      renderContactTransactions()
+
+      expect(mockUseContactTransactions).toHaveBeenCalledWith(contact.handle, true)
+    })
+
+    it("lists the transactions the adapter returns", () => {
+      mockUseContactTransactions.mockReturnValue(
+        contactTransactions({ transactions: [{ id: "sc-tx" }] }),
+      )
       mockFragments.mockImplementation((txs: unknown[]) =>
         txs.length ? [makeFragment("sc-tx")] : [],
       )
 
       const { getByTestId } = renderContactTransactions()
-      await flushEffects()
 
-      expect(mockGetTransactions).toHaveBeenCalledWith(contact.id)
       expect(getByTestId("transaction-sc-tx")).toBeTruthy()
     })
 
-    it("shows the empty state when the contact has no matching payments", async () => {
+    it("shows the empty state when the contact has no matching payments", () => {
       const { getByTestId } = renderContactTransactions()
-      await flushEffects()
 
-      expect(mockGetTransactions).toHaveBeenCalledWith(contact.id)
       expect(getByTestId("contact-no-transactions")).toBeTruthy()
     })
 
-    it("ignores a late adapter answer after it unmounts", async () => {
-      let resolveTransactions: (value: unknown[]) => void = () => {}
-      mockGetTransactions.mockReturnValue(
-        new Promise((resolve) => {
-          resolveTransactions = resolve
-        }),
-      )
+    it("spins instead of claiming the contact has no payments", () => {
+      mockUseContactTransactions.mockReturnValue(contactTransactions({ isLoading: true }))
 
-      const { unmount } = renderContactTransactions()
-      unmount()
-      resolveTransactions([{ id: "late-tx" }])
-      await flushEffects()
+      const { getByTestId, queryByTestId } = renderContactTransactions()
 
-      expect(mockGetTransactions).toHaveBeenCalled()
-      expect(mockFragments).not.toHaveBeenCalledWith([{ id: "late-tx" }])
+      expect(getByTestId("contact-transactions-loading")).toBeTruthy()
+      expect(queryByTestId("contact-no-transactions")).toBeNull()
     })
 
-    it("ignores a late adapter failure after it unmounts", async () => {
-      let rejectTransactions: (reason: Error) => void = () => {}
-      mockGetTransactions.mockReturnValue(
-        new Promise((_resolve, reject) => {
-          rejectTransactions = reject
-        }),
-      )
-
-      const { unmount } = renderContactTransactions()
-      unmount()
-      rejectTransactions(new Error("sdk unavailable"))
-      await flushEffects()
-
-      expect(mockGetTransactions).toHaveBeenCalled()
-      expect(mockToastShow).not.toHaveBeenCalled()
-    })
-
-    it("does not page, because the adapter answers without a cursor", async () => {
-      const fetchMore = jest.fn()
-      mockUseQuery.mockReturnValue({ error: undefined, data: undefined, fetchMore })
-
-      const { getByTestId } = renderContactTransactions()
-      await flushEffects()
-      fireEvent(getByTestId("contact-transactions-list"), "endReached")
-
-      expect(fetchMore).not.toHaveBeenCalled()
-    })
-
-    describe("while the adapter is still answering", () => {
-      it("waits for the contact list before asking for transactions", () => {
-        mockContactsLoading.mockReturnValue(true)
-
-        renderContactTransactions()
-
-        expect(mockGetTransactions).not.toHaveBeenCalled()
-      })
-
-      it("spins instead of claiming the contact has no payments", () => {
-        mockContactsLoading.mockReturnValue(true)
-
-        const { getByTestId, queryByTestId } = renderContactTransactions()
-
-        expect(getByTestId("contact-transactions-loading")).toBeTruthy()
-        expect(queryByTestId("contact-no-transactions")).toBeNull()
-      })
-
-      it("keeps spinning until the adapter answers", async () => {
-        mockGetTransactions.mockReturnValue(new Promise(() => {}))
-
-        const { getByTestId, queryByTestId } = renderContactTransactions()
-        await flushEffects()
-
-        expect(mockGetTransactions).toHaveBeenCalledWith(contact.id)
-        expect(getByTestId("contact-transactions-loading")).toBeTruthy()
-        expect(queryByTestId("contact-no-transactions")).toBeNull()
-      })
-    })
-
-    it("reports a failed adapter call through a toast", async () => {
-      mockGetTransactions.mockRejectedValue(new Error("sdk unavailable"))
+    it("reports a failed adapter call through a toast", () => {
+      mockUseContactTransactions.mockReturnValue(contactTransactions({ hasError: true }))
 
       const { queryByTestId } = renderContactTransactions()
-      await flushEffects()
 
       expect(mockToastShow).toHaveBeenCalledTimes(1)
       expect(queryByTestId("contact-transactions-list")).toBeNull()
@@ -356,24 +275,21 @@ describe("ContactTransactions", () => {
       expect(message(i18nObject("en"))).toBe("Error loading transactions")
     })
 
-    it("clears a previous failure when the contact changes", async () => {
-      mockGetTransactions.mockRejectedValueOnce(new Error("sdk unavailable"))
+    it("asks the adapter for the next page when the list reaches its end", () => {
+      const { getByTestId } = renderContactTransactions()
+      fireEvent(getByTestId("contact-transactions-list"), "endReached")
 
-      const { queryByTestId, rerender } = renderContactTransactions()
-      await flushEffects()
+      expect(mockLoadMore).toHaveBeenCalledTimes(1)
+    })
 
-      expect(queryByTestId("contact-transactions-list")).toBeNull()
+    it("never pages the custodial query, which has no session to resolve through", () => {
+      const fetchMore = jest.fn()
+      mockUseQuery.mockReturnValue({ error: undefined, data: undefined, fetchMore })
 
-      mockGetTransactions.mockResolvedValue([])
-      rerender(
-        <ThemeProvider theme={theme}>
-          <ContactTransactions contact={{ ...contact, id: "contact-2" }} />
-        </ThemeProvider>,
-      )
-      await flushEffects()
+      const { getByTestId } = renderContactTransactions()
+      fireEvent(getByTestId("contact-transactions-list"), "endReached")
 
-      expect(mockGetTransactions).toHaveBeenCalledWith("contact-2")
-      expect(queryByTestId("contact-no-transactions")).toBeTruthy()
+      expect(fetchMore).not.toHaveBeenCalled()
     })
   })
 
