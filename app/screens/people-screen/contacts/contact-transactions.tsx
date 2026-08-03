@@ -71,6 +71,8 @@ export const ContactTransactions = ({ contact }: Props) => {
     fetchMore,
     loading: custodialLoading,
   } = useTransactionListForContactQuery({
+    /** The argument is a `Username` scalar, so this stays on the deprecated field even
+     *  though the adapter above is keyed by `handle`. */
     variables: { username: contact.username },
     skip: shouldSkipContactQuery,
   })
@@ -120,10 +122,12 @@ export const ContactTransactions = ({ contact }: Props) => {
 
   /**
    * Until the query answers there is nothing to say about this contact, so the custodial
-   * list spins rather than claiming it has no transactions. A skipped query never answers
-   * at all, which is why an absent `data` counts as still loading and not as empty.
+   * list spins rather than claiming it has no transactions. An absent `data` counts as
+   * still loading, but only while the query is actually running: a skipped one never
+   * answers, and would otherwise spin forever.
    */
-  const isLoadingCustodial = !isSelfCustodial && (custodialLoading || !data)
+  const isCustodialQueryRunning = !shouldSkipContactQuery
+  const isLoadingCustodial = isCustodialQueryRunning && (custodialLoading || !data)
   const isLoadingTransactions = isLoadingSelfCustodial || isLoadingCustodial
 
   const ListEmptyContent = isLoadingTransactions ? (
