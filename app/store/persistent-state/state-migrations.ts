@@ -272,6 +272,15 @@ export type PersistentState = PersistentState_14
  */
 export const CURRENT_SCHEMA_VERSION: PersistentState["schemaVersion"] = 14
 
+/**
+ * Newest version `stateMigrations` can actually handle, derived from the map so
+ * it cannot drift on its own. Exported for the invariant in
+ * `state-migrations.spec.ts`: it must equal `CURRENT_SCHEMA_VERSION`.
+ */
+export const LATEST_REGISTERED_SCHEMA_VERSION = Math.max(
+  ...Object.keys(stateMigrations).map(Number),
+)
+
 export const defaultPersistentState: PersistentState = {
   schemaVersion: CURRENT_SCHEMA_VERSION,
   galoyInstance: { id: "Main" },

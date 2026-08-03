@@ -1,6 +1,7 @@
 import {
   CURRENT_SCHEMA_VERSION,
   defaultPersistentState,
+  LATEST_REGISTERED_SCHEMA_VERSION,
   migratePersistentState,
   MigrationStatus,
   type PersistentState,
@@ -302,13 +303,8 @@ describe("state-migrations schema 10", () => {
     }
   })
 
-  it("registers nothing above the current version", async () => {
-    const result = await migratePersistentState({
-      ...defaultPersistentState,
-      schemaVersion: CURRENT_SCHEMA_VERSION + 1,
-    })
-
-    expect(result).toEqual({ status: MigrationStatus.NoData })
+  it("registers no migration newer than the current version", () => {
+    expect(LATEST_REGISTERED_SCHEMA_VERSION).toBe(CURRENT_SCHEMA_VERSION)
   })
 
   it("attributes legacy 'USD' from schema 8 to the active self-custodial slot and clears the legacy field", async () => {
