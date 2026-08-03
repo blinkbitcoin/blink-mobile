@@ -85,11 +85,12 @@ export const formatShortDate = ({
 }
 
 /**
- * e.g. 1747691078 -> "2025-05-19 15:44". Renders in the device timezone, matching the
- * transaction list and detail screens; `timezone` is only injected so tests can pin a
- * zone. The two halves are formatted apart and joined here so the shape stays
- * `YYYY-MM-DD HH:mm` whatever separator the locale would pick, and `hourCycle: "h23"`
- * keeps midnight as `00` rather than `24`.
+ * e.g. 1747691078 at UTC-6 -> "2025-05-19 15:44". Renders in the device timezone,
+ * matching the transaction list and detail screens; `timezone` is only injected so tests
+ * can pin a zone. Each half borrows the locale whose shape it needs, `en-CA` for the
+ * `YYYY-MM-DD` order and `en-GB` for the 24 hour clock, and joining them here keeps the
+ * result stable whatever separator a locale would pick; `hourCycle: "h23"` keeps midnight
+ * as `00` rather than `24`.
  */
 export const formatUnixTimestampYMDHM = ({
   timestampSeconds,
