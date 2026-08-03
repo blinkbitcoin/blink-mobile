@@ -1,6 +1,7 @@
 import {
   CURRENT_SCHEMA_VERSION,
   defaultPersistentState,
+  LATEST_REGISTERED_SCHEMA_VERSION,
   migratePersistentState,
   MigrationStatus,
   type PersistentState,
@@ -287,6 +288,23 @@ describe("state-migrations schema 10", () => {
     expect(
       defaultPersistentState.selfCustodialDefaultWalletCurrencyByAccountId,
     ).toBeUndefined()
+  })
+
+  // Half of a version bump is invisible to the compiler: adding the type and
+  // moving the alias typechecks even if the new version is never registered in
+  // `stateMigrations`. The app would then write a version it cannot read back,
+  // and every launch would silently reset persisted state — auth token included.
+  it("reads back the state it writes: the current version has a registered migration", async () => {
+    const result = await migratePersistentState(defaultPersistentState)
+
+    expect(result.status).toBe(MigrationStatus.Ok)
+    if (result.status === MigrationStatus.Ok) {
+      expect(result.state).toEqual(defaultPersistentState)
+    }
+  })
+
+  it("registers no migration newer than the current version", () => {
+    expect(LATEST_REGISTERED_SCHEMA_VERSION).toBe(CURRENT_SCHEMA_VERSION)
   })
 
   it("attributes legacy 'USD' from schema 8 to the active self-custodial slot and clears the legacy field", async () => {

@@ -265,8 +265,21 @@ export type PersistentState = PersistentState_14
  * above without bumping this fails to compile. Outside the migration chain —
  * where each step deliberately targets one specific version — nothing should
  * spell the number out, tests included.
+ *
+ * The compiler cannot see the other half of a bump: registering the new
+ * version in `stateMigrations`. `state-migrations.spec.ts` pins that, since
+ * skipping it leaves the app writing a version it can no longer read back.
  */
 export const CURRENT_SCHEMA_VERSION: PersistentState["schemaVersion"] = 14
+
+/**
+ * Newest version `stateMigrations` can actually handle, derived from the map so
+ * it cannot drift on its own. Exported for the invariant in
+ * `state-migrations.spec.ts`: it must equal `CURRENT_SCHEMA_VERSION`.
+ */
+export const LATEST_REGISTERED_SCHEMA_VERSION = Math.max(
+  ...Object.keys(stateMigrations).map(Number),
+)
 
 export const defaultPersistentState: PersistentState = {
   schemaVersion: CURRENT_SCHEMA_VERSION,
