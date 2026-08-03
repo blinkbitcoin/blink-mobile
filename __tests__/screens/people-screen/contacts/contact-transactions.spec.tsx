@@ -149,6 +149,24 @@ describe("ContactTransactions", () => {
       expect(getByTestId("contact-no-transactions")).toBeTruthy()
     })
 
+    it("spins while the query is still in flight", () => {
+      mockUseQuery.mockReturnValue(custodialQuery({ loading: true }))
+
+      const { getByTestId, queryByTestId } = renderContactTransactions()
+
+      expect(getByTestId("contact-transactions-loading")).toBeTruthy()
+      expect(queryByTestId("contact-no-transactions")).toBeNull()
+    })
+
+    it("does not claim a contact has no transactions before the query answers", () => {
+      mockUseQuery.mockReturnValue(custodialQuery({ data: undefined }))
+
+      const { getByTestId, queryByTestId } = renderContactTransactions()
+
+      expect(getByTestId("contact-transactions-loading")).toBeTruthy()
+      expect(queryByTestId("contact-no-transactions")).toBeNull()
+    })
+
     it("reports a failed query through a toast", () => {
       mockUseQuery.mockReturnValue({
         error: new Error("network"),
