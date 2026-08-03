@@ -80,6 +80,55 @@ describe("useContactTransactions", () => {
     expect(result.current.isLoading).toBe(true)
   })
 
+  describe("a page that holds nothing for this contact", () => {
+    it("keeps reading, because an empty list has no scroll to ask with", async () => {
+      mockGetTransactions
+        .mockResolvedValueOnce(page([], "20"))
+        .mockResolvedValueOnce(page([], "40"))
+        .mockResolvedValueOnce(page(["tx-1"], null))
+
+      const { result } = renderContactTransactions()
+      await flushEffects()
+
+      expect(mockGetTransactions).toHaveBeenCalledTimes(3)
+      expect(mockGetTransactions).toHaveBeenLastCalledWith(IDENTIFIER, "40")
+      expect(result.current.transactions).toEqual([{ id: "tx-1" }])
+    })
+
+    it("reads as loading while it is still searching", async () => {
+      mockGetTransactions.mockResolvedValueOnce(page([], "20"))
+      mockGetTransactions.mockReturnValue(new Promise(() => {}))
+
+      const { result } = renderContactTransactions()
+      await flushEffects()
+
+      expect(result.current.isLoading).toBe(true)
+    })
+
+    it("settles on the empty state once the history runs out", async () => {
+      mockGetTransactions
+        .mockResolvedValueOnce(page([], "20"))
+        .mockResolvedValueOnce(page([], null))
+
+      const { result } = renderContactTransactions()
+      await flushEffects()
+
+      expect(mockGetTransactions).toHaveBeenCalledTimes(2)
+      expect(result.current.transactions).toEqual([])
+      expect(result.current.isLoading).toBe(false)
+    })
+
+    it("stops searching, rather than spinning on, when a page fails", async () => {
+      mockGetTransactions.mockResolvedValueOnce(page([], "20"))
+      mockGetTransactions.mockRejectedValue(new Error("sdk unavailable"))
+
+      const { result } = renderContactTransactions()
+      await flushEffects()
+
+      expect(result.current.hasError).toBe(true)
+    })
+  })
+
   it("reports a failed first page through hasError", async () => {
     mockGetTransactions.mockRejectedValue(new Error("sdk unavailable"))
 
@@ -258,6 +307,31 @@ describe("useContactTransactions", () => {
       })
 
       expect(result.current.isLoading).toBe(true)
+    })
+
+    it("does not fail the contact that replaced it when a later page rejects", async () => {
+      const { result, rerender } = await renderWithFirstPage()
+
+      let rejectStalePage: (reason: Error) => void = () => {}
+      mockGetTransactions.mockReturnValueOnce(
+        new Promise((_resolve, reject) => {
+          rejectStalePage = reject
+        }),
+      )
+      act(() => {
+        result.current.loadMore()
+      })
+
+      mockGetTransactions.mockResolvedValueOnce(page(["bob-tx"], null))
+      rerender({ id: "bob@blink.sv", enabled: true })
+      await flushEffects()
+
+      await act(async () => {
+        rejectStalePage(new Error("sdk unavailable"))
+      })
+
+      expect(result.current.hasError).toBe(false)
+      expect(result.current.transactions).toEqual([{ id: "bob-tx" }])
     })
 
     it("does not fail the contact that replaced it", async () => {
