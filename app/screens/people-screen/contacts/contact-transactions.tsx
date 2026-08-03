@@ -63,13 +63,15 @@ export const ContactTransactions = ({ contact }: Props) => {
     NormalizedTransaction[]
   >([])
 
+  const shouldSkipContactQuery = !isAuthed || isSelfCustodial
+
   /**
    * The custodial query resolves through `me`, which a self-custodial account has no
    * session for, so it is skipped and the contact adapter answers instead.
    */
   const { error, data, fetchMore } = useTransactionListForContactQuery({
     variables: { username: contact.username },
-    skip: !isAuthed || isSelfCustodial,
+    skip: shouldSkipContactQuery,
   })
 
   useFocusEffect(
@@ -90,10 +92,12 @@ export const ContactTransactions = ({ contact }: Props) => {
   const selfCustodialTxs = useSelfCustodialTransactionFragments(selfCustodialTransactions)
   const custodialTransactions = data?.me?.contactByUsername?.transactions
 
-  const txs = React.useMemo(() => {
-    if (isSelfCustodial) return selfCustodialTxs
-    return custodialTransactions?.edges?.map((edge) => edge.node) ?? []
-  }, [isSelfCustodial, selfCustodialTxs, custodialTransactions])
+  const custodialTxs = React.useMemo(
+    () => custodialTransactions?.edges?.map((edge) => edge.node) ?? [],
+    [custodialTransactions],
+  )
+
+  const txs = isSelfCustodial ? selfCustodialTxs : custodialTxs
 
   const sections = React.useMemo(
     () => groupTransactionsByDate({ txs, LL, locale }),
@@ -131,6 +135,12 @@ export const ContactTransactions = ({ contact }: Props) => {
     return <></>
   }
 
+  const ListEmptyContent = (
+    <View style={styles.noTransactionView} testID="contact-no-transactions">
+      <Text style={styles.noTransactionText}>{LL.TransactionScreen.noTransaction()}</Text>
+    </View>
+  )
+
   return (
     <View style={styles.screen}>
       <SectionList
@@ -139,13 +149,7 @@ export const ContactTransactions = ({ contact }: Props) => {
         initialNumToRender={20}
         windowSize={TRANSACTION_LIST_WINDOW_SIZE}
         renderSectionHeader={renderSectionHeader}
-        ListEmptyComponent={
-          <View style={styles.noTransactionView} testID="contact-no-transactions">
-            <Text style={styles.noTransactionText}>
-              {LL.TransactionScreen.noTransaction()}
-            </Text>
-          </View>
-        }
+        ListEmptyComponent={ListEmptyContent}
         sections={sections}
         keyExtractor={keyExtractor}
         onEndReached={fetchNextTransactionsPage}
