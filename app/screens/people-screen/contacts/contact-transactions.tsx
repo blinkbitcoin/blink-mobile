@@ -76,7 +76,12 @@ export const ContactTransactions = ({ contact }: Props) => {
    * The custodial query resolves through `me`, which a self-custodial account has no
    * session for, so it is skipped and the contact adapter answers instead.
    */
-  const { error, data, fetchMore } = useTransactionListForContactQuery({
+  const {
+    error,
+    data,
+    fetchMore,
+    loading: custodialLoading,
+  } = useTransactionListForContactQuery({
     variables: { username: contact.username },
     skip: shouldSkipContactQuery,
   })
@@ -134,7 +139,15 @@ export const ContactTransactions = ({ contact }: Props) => {
     return <></>
   }
 
-  const ListEmptyContent = isLoadingSelfCustodial ? (
+  /**
+   * Until the query answers there is nothing to say about this contact, so the custodial
+   * list spins rather than claiming it has no transactions. A skipped query never answers
+   * at all, which is why an absent `data` counts as still loading and not as empty.
+   */
+  const isLoadingCustodial = !isSelfCustodial && (custodialLoading || !data)
+  const isLoadingTransactions = isLoadingSelfCustodial || isLoadingCustodial
+
+  const ListEmptyContent = isLoadingTransactions ? (
     <View style={styles.activityIndicatorView} testID="contact-transactions-loading">
       <ActivityIndicator size="large" color={colors.primary} />
     </View>
