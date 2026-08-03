@@ -22,6 +22,23 @@ import { ContextForScreen, ContextForScreenWithTheme } from "./helper"
 import { Linking, View, ViewStyle } from "react-native"
 import { light, dark } from "@app/rne-theme/colors"
 
+const screenshotState = { isTakingScreenshot: false }
+const mockCaptureAndShare = jest.fn()
+const mockNavigate = jest.fn()
+
+jest.mock("@app/hooks", () => ({
+  ...jest.requireActual("@app/hooks"),
+  useScreenshot: () => ({
+    isTakingScreenshot: screenshotState.isTakingScreenshot,
+    captureAndShare: mockCaptureAndShare,
+  }),
+}))
+
+jest.mock("@react-navigation/native", () => ({
+  ...jest.requireActual("@react-navigation/native"),
+  useNavigation: () => ({ navigate: mockNavigate }),
+}))
+
 jest.mock("react-native-view-shot", () => {
   return {
     __esModule: true,
@@ -92,6 +109,9 @@ describe("SendBitcoinCompletedScreen", () => {
   beforeEach(() => {
     loadLocale("en")
     LL = i18nObject("en")
+    screenshotState.isTakingScreenshot = false
+    mockCaptureAndShare.mockClear()
+    mockNavigate.mockClear()
   })
 
   it("renders the Success state correctly", async () => {
@@ -494,6 +514,125 @@ describe("SendBitcoinCompletedScreen", () => {
     })
 
     expect(screen.queryByText(LL.SendBitcoinScreen.noteLabel())).toBeNull()
+  })
+
+  describe("transaction time", () => {
+    const timedRoute = {
+      key: "sendBitcoinCompleted",
+      name: "sendBitcoinCompleted",
+      params: {
+        status: "SUCCESS",
+        currencyAmount: "$0.03",
+        satAmount: "25 SAT",
+        currencyFeeAmount: "$0.00",
+        satFeeAmount: "0 SAT",
+        destination: "alice",
+        paymentType: "lightning",
+        createdAt: 1747691078,
+      },
+    } as const
+
+    it("renders the time as a wall-clock date, never as an ISO string", async () => {
+      render(
+        <ContextForScreen>
+          <SuccessAction route={timedRoute} />
+        </ContextForScreen>,
+      )
+
+      act(() => {
+        jest.advanceTimersByTime(2300)
+      })
+
+      expect(screen.getByText(LL.SendBitcoinScreen.time())).toBeTruthy()
+      expect(screen.getByText(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/)).toBeTruthy()
+      expect(screen.queryByText(/T\d{2}:\d{2}/)).toBeNull()
+    })
+
+    it("hides the time row when the payment carries no timestamp", async () => {
+      const untimedRoute = {
+        ...timedRoute,
+        params: { ...timedRoute.params, createdAt: undefined },
+      } as const
+
+      render(
+        <ContextForScreen>
+          <SuccessAction route={untimedRoute} />
+        </ContextForScreen>,
+      )
+
+      act(() => {
+        jest.advanceTimersByTime(2300)
+      })
+
+      expect(screen.queryByText(LL.SendBitcoinScreen.time())).toBeNull()
+    })
+
+    it("hides the type row when the payment carries no type", async () => {
+      const untypedRoute = {
+        ...timedRoute,
+        params: { ...timedRoute.params, paymentType: undefined },
+      } as const
+
+      render(
+        <ContextForScreen>
+          <SuccessAction route={untypedRoute} />
+        </ContextForScreen>,
+      )
+
+      act(() => {
+        jest.advanceTimersByTime(2300)
+      })
+
+      expect(screen.queryByText(LL.SendBitcoinScreen.type())).toBeNull()
+    })
+
+    it("goes back to the home stack from the close button", async () => {
+      render(
+        <ContextForScreen>
+          <SuccessAction route={timedRoute} />
+        </ContextForScreen>,
+      )
+
+      act(() => {
+        jest.advanceTimersByTime(2300)
+      })
+
+      fireEvent.press(screen.getByTestId("close"))
+
+      expect(mockNavigate).toHaveBeenCalledWith("Primary")
+    })
+
+    it("shares the receipt from the share button", async () => {
+      render(
+        <ContextForScreen>
+          <SuccessAction route={timedRoute} />
+        </ContextForScreen>,
+      )
+
+      act(() => {
+        jest.advanceTimersByTime(2300)
+      })
+
+      fireEvent.press(screen.getByText(LL.common.share()))
+
+      expect(mockCaptureAndShare).toHaveBeenCalled()
+    })
+
+    it("drops the close button out of the capture while sharing", async () => {
+      screenshotState.isTakingScreenshot = true
+
+      render(
+        <ContextForScreen>
+          <SuccessAction route={timedRoute} />
+        </ContextForScreen>,
+      )
+
+      act(() => {
+        jest.advanceTimersByTime(2300)
+      })
+
+      expect(screen.queryByTestId("close")).toBeNull()
+    })
   })
 
   describe("ViewShot background color for screenshot", () => {

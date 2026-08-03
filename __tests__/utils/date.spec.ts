@@ -5,6 +5,7 @@ jest.mock("@app/utils/error-logging", () => ({
   reportError: (...args: readonly unknown[]) => mockReportError(...args),
 }))
 
+import { MASK_CHAR } from "@app/config/appinfo"
 import {
   formatCardValidThruDisplay,
   formatDateFromNow,
@@ -14,6 +15,7 @@ import {
   formatShortDate,
   formatUnixTimestampYMDHM,
   getLastDayOfMonth,
+  getTimeLeft,
   isSameDay,
   isToday,
   isYesterday,
@@ -205,6 +207,51 @@ describe("date utils", () => {
     })
   })
 
+  describe("getTimeLeft", () => {
+    const NOW = Date.parse("2024-06-10T12:00:00Z")
+    const SECOND = 1000
+    const MINUTE = 60 * SECOND
+    const HOUR = 60 * MINUTE
+    const DAY = 24 * HOUR
+
+    beforeEach(() => {
+      jest.useFakeTimers()
+      jest.setSystemTime(NOW)
+    })
+
+    afterEach(() => {
+      jest.useRealTimers()
+    })
+
+    it.each([
+      {
+        name: "counts down days, hours, minutes and seconds",
+        until: NOW + 2 * DAY + 3 * HOUR + 4 * MINUTE + 5 * SECOND,
+        expected: "02:03:04:05",
+      },
+      {
+        name: "pads every segment to two digits",
+        until: NOW + MINUTE + SECOND,
+        expected: "00:00:01:01",
+      },
+      {
+        name: "returns all zeros the instant the window closes",
+        until: NOW,
+        expected: "00:00:00:00",
+      },
+    ])("returns $expected when it $name", ({ until, expected }) => {
+      expect(getTimeLeft({ after: NOW - DAY, until })).toBe(expected)
+    })
+
+    it("returns an empty string once the window has passed", () => {
+      expect(getTimeLeft({ after: NOW - 2 * DAY, until: NOW - DAY })).toBe("")
+    })
+
+    it("returns an empty string before the window opens", () => {
+      expect(getTimeLeft({ after: NOW + DAY, until: NOW + 2 * DAY })).toBe("")
+    })
+  })
+
   describe("formatUnixTimestampYMDHM", () => {
     it.each([
       {
@@ -307,6 +354,12 @@ describe("date utils", () => {
         formatCardValidThruDisplay(new Date("2031-01-15T12:00:00Z"), true, "*"),
       ).toBe("01/ 31")
     })
+
+    it("masks with the default mask character when none is given", () => {
+      expect(formatCardValidThruDisplay("2024-12-05", false)).toBe(
+        `${MASK_CHAR}${MASK_CHAR} / ${MASK_CHAR}${MASK_CHAR}`,
+      )
+    })
   })
 
   describe("getLastDayOfMonth", () => {
@@ -384,6 +437,12 @@ describe("date utils", () => {
 
     it("rolls months over into the following year", () => {
       expect(formatDateFromNow({ months: 18, locale: "en-US" })).toBe("Sep 12, 2027")
+    })
+
+    it("falls back to en-US when no locale is given", () => {
+      expect(formatDateFromNow({ years: 1 })).toBe(
+        formatDateFromNow({ years: 1, locale: "en-US" }),
+      )
     })
   })
 
