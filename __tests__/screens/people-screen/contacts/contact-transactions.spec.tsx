@@ -17,6 +17,7 @@ import { AccountType } from "@app/types/wallet"
 
 const mockUseQuery = jest.fn()
 const mockGetTransactions = jest.fn()
+const mockContactsLoading = jest.fn()
 const mockActiveAccountType = jest.fn()
 const mockToastShow = jest.fn()
 const mockFragments = jest.fn()
@@ -35,7 +36,10 @@ jest.mock("@app/hooks/use-account-registry", () => ({
 }))
 
 jest.mock("@app/hooks/use-contacts", () => ({
-  useContacts: () => ({ getTransactions: mockGetTransactions }),
+  useContacts: () => ({
+    getTransactions: mockGetTransactions,
+    loading: mockContactsLoading(),
+  }),
 }))
 
 jest.mock("@app/self-custodial/hooks/use-self-custodial-transaction-fragments", () => ({
@@ -114,6 +118,7 @@ describe("ContactTransactions", () => {
     jest.clearAllMocks()
     mockRowProps.length = 0
     mockActiveAccountType.mockReturnValue(AccountType.Custodial)
+    mockContactsLoading.mockReturnValue(false)
     mockGetTransactions.mockResolvedValue([])
     mockFragments.mockReturnValue([])
     mockUseQuery.mockReturnValue({
@@ -221,18 +226,6 @@ describe("ContactTransactions", () => {
       expect(fetchMore).not.toHaveBeenCalled()
     })
 
-    it("does not page a self-custodial list, which the adapter answers in full", async () => {
-      mockActiveAccountType.mockReturnValue(AccountType.SelfCustodial)
-      const fetchMore = jest.fn()
-      mockUseQuery.mockReturnValue({ error: undefined, data: undefined, fetchMore })
-
-      const { getByTestId } = renderContactTransactions()
-      await flushEffects()
-      fireEvent(getByTestId("contact-transactions-list"), "endReached")
-
-      expect(fetchMore).not.toHaveBeenCalled()
-    })
-
     it("does not ask the contact adapter for transactions", () => {
       renderContactTransactions()
 
@@ -289,6 +282,98 @@ describe("ContactTransactions", () => {
 
       expect(mockGetTransactions).toHaveBeenCalled()
       expect(mockFragments).not.toHaveBeenCalledWith([{ id: "late-tx" }])
+    })
+
+    it("ignores a late adapter failure after it unmounts", async () => {
+      let rejectTransactions: (reason: Error) => void = () => {}
+      mockGetTransactions.mockReturnValue(
+        new Promise((_resolve, reject) => {
+          rejectTransactions = reject
+        }),
+      )
+
+      const { unmount } = renderContactTransactions()
+      unmount()
+      rejectTransactions(new Error("sdk unavailable"))
+      await flushEffects()
+
+      expect(mockGetTransactions).toHaveBeenCalled()
+      expect(mockToastShow).not.toHaveBeenCalled()
+    })
+
+    it("does not page, because the adapter answers without a cursor", async () => {
+      const fetchMore = jest.fn()
+      mockUseQuery.mockReturnValue({ error: undefined, data: undefined, fetchMore })
+
+      const { getByTestId } = renderContactTransactions()
+      await flushEffects()
+      fireEvent(getByTestId("contact-transactions-list"), "endReached")
+
+      expect(fetchMore).not.toHaveBeenCalled()
+    })
+
+    describe("while the adapter is still answering", () => {
+      it("waits for the contact list before asking for transactions", () => {
+        mockContactsLoading.mockReturnValue(true)
+
+        renderContactTransactions()
+
+        expect(mockGetTransactions).not.toHaveBeenCalled()
+      })
+
+      it("spins instead of claiming the contact has no payments", () => {
+        mockContactsLoading.mockReturnValue(true)
+
+        const { getByTestId, queryByTestId } = renderContactTransactions()
+
+        expect(getByTestId("contact-transactions-loading")).toBeTruthy()
+        expect(queryByTestId("contact-no-transactions")).toBeNull()
+      })
+
+      it("keeps spinning until the adapter answers", async () => {
+        mockGetTransactions.mockReturnValue(new Promise(() => {}))
+
+        const { getByTestId, queryByTestId } = renderContactTransactions()
+        await flushEffects()
+
+        expect(mockGetTransactions).toHaveBeenCalledWith(contact.id)
+        expect(getByTestId("contact-transactions-loading")).toBeTruthy()
+        expect(queryByTestId("contact-no-transactions")).toBeNull()
+      })
+    })
+
+    it("reports a failed adapter call through a toast", async () => {
+      mockGetTransactions.mockRejectedValue(new Error("sdk unavailable"))
+
+      const { queryByTestId } = renderContactTransactions()
+      await flushEffects()
+
+      expect(mockToastShow).toHaveBeenCalledTimes(1)
+      expect(queryByTestId("contact-transactions-list")).toBeNull()
+
+      loadLocale("en")
+      const [{ message }] = mockToastShow.mock.calls[0]
+      expect(message(i18nObject("en"))).toBe("Error loading transactions")
+    })
+
+    it("clears a previous failure when the contact changes", async () => {
+      mockGetTransactions.mockRejectedValueOnce(new Error("sdk unavailable"))
+
+      const { queryByTestId, rerender } = renderContactTransactions()
+      await flushEffects()
+
+      expect(queryByTestId("contact-transactions-list")).toBeNull()
+
+      mockGetTransactions.mockResolvedValue([])
+      rerender(
+        <ThemeProvider theme={theme}>
+          <ContactTransactions contact={{ ...contact, id: "contact-2" }} />
+        </ThemeProvider>,
+      )
+      await flushEffects()
+
+      expect(mockGetTransactions).toHaveBeenCalledWith("contact-2")
+      expect(queryByTestId("contact-no-transactions")).toBeTruthy()
     })
   })
 
