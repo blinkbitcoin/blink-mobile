@@ -56,40 +56,6 @@ export const getTimeLeft = ({ after, until }: { after: number; until: number }) 
   return secondsToDDMMSS(sLeft)
 }
 
-/**
- * e.g. 1747691078 -> "2025-05-19 15:44". Renders in the device timezone, matching the
- * transaction list and detail screens; `timezone` is only injected so tests can pin a
- * zone. Parts are assembled by hand because the locale separator between date and time
- * is not stable across ICU versions.
- */
-export const formatUnixTimestampYMDHM = ({
-  timestampSeconds,
-  timezone,
-}: {
-  timestampSeconds: number
-  timezone?: string
-}): string => {
-  const options: Intl.DateTimeFormatOptions = {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    hourCycle: "h23",
-    timeZone: timezone,
-  }
-
-  const parts = new Intl.DateTimeFormat("en-CA", options).formatToParts(
-    new Date(timestampSeconds * 1000),
-  )
-  const partValue = (type: Intl.DateTimeFormatPartTypes) =>
-    parts.find((part) => part.type === type)?.value ?? ""
-
-  return `${partValue("year")}-${partValue("month")}-${partValue("day")} ${partValue(
-    "hour",
-  )}:${partValue("minute")}`
-}
-
 export const isSameDay = (a: Date, b: Date) =>
   a.getFullYear() === b.getFullYear() &&
   a.getMonth() === b.getMonth() &&
@@ -116,6 +82,30 @@ export const formatShortDate = ({
   }
 
   return new Date(createdAt * 1000).toLocaleDateString("en-CA", options)
+}
+
+/**
+ * e.g. 1747691078 -> "2025-05-19 15:44". Renders in the device timezone, matching the
+ * transaction list and detail screens; `timezone` is only injected so tests can pin a
+ * zone. The two halves are formatted apart and joined here so the shape stays
+ * `YYYY-MM-DD HH:mm` whatever separator the locale would pick, and `hourCycle: "h23"`
+ * keeps midnight as `00` rather than `24`.
+ */
+export const formatUnixTimestampYMDHM = ({
+  timestampSeconds,
+  timezone,
+}: {
+  timestampSeconds: number
+  timezone?: string
+}): string => {
+  const time = new Date(timestampSeconds * 1000).toLocaleTimeString("en-GB", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+    timeZone: timezone,
+  })
+
+  return `${formatShortDate({ createdAt: timestampSeconds, timezone })} ${time}`
 }
 
 export const formatDayAndMonth = ({
