@@ -367,6 +367,7 @@ jest.mock("@app/self-custodial/providers/wallet", () => ({
     mockSelfCustodialWalletOverride ?? {
       sdk: null,
       wallets: [],
+      allTransactions: [],
       status: "unavailable",
       isStableBalanceActive: false,
       lastReceivedPaymentId: null,
@@ -1515,6 +1516,7 @@ describe("HomeScreen", () => {
       mockSelfCustodialWalletOverride = {
         sdk: { id: "fake-sdk" },
         wallets: selfCustodialWallets,
+        allTransactions: [],
         status: "ready",
         isStableBalanceActive: true,
         lastReceivedPaymentId: null,
