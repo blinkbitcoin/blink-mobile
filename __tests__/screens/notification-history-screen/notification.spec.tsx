@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Linking, StyleSheet, View } from "react-native"
+import { Linking, StyleSheet } from "react-native"
 import { fireEvent, render } from "@testing-library/react-native"
 
 import { ThemeProvider } from "@rn-vui/themed"
@@ -12,9 +12,16 @@ import { Notification } from "@app/screens/notification-history-screen/notificat
 
 import { findPressableParent } from "../helper"
 
-jest.mock("@app/components/atomic/galoy-icon", () => ({
-  GaloyIcon: ({ name }: { name: string }) => <View testID={`galoy-icon-${name}`} />,
-}))
+/**
+ * `timeAgo` reads the wall clock, so the relative-time assertion only stays
+ * stable if both the clock and the notification timestamp are pinned.
+ */
+const FIXED_NOW_MS = Date.UTC(2026, 0, 15, 12, 0, 0)
+const THIRTY_SECONDS_AGO = Math.floor(FIXED_NOW_MS / 1000) - 30
+const ACKNOWLEDGED_AT = Math.floor(FIXED_NOW_MS / 1000) - 60
+
+/** An icon the backend can send but the app ships no asset for. */
+const UNMAPPED_ICON = "ROCKET" as Icon
 
 const makeNotification = (
   overrides: Partial<StatefulNotification> = {},
@@ -23,7 +30,7 @@ const makeNotification = (
   id: "notification-1",
   title: "Self-custodial accounts have arrived",
   body: "Move your funds to a wallet where only you hold the keys.",
-  createdAt: Math.floor(Date.now() / 1000) - 30,
+  createdAt: THIRTY_SECONDS_AGO,
   acknowledgedAt: null,
   bulletinEnabled: false,
   icon: null,
@@ -41,7 +48,12 @@ const renderNotification = (notification: StatefulNotification) =>
 describe("Notification", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    jest.useFakeTimers({ now: FIXED_NOW_MS })
     jest.spyOn(Linking, "openURL").mockResolvedValue(undefined)
+  })
+
+  afterEach(() => {
+    jest.useRealTimers()
   })
 
   it("renders title, body and relative time", () => {
@@ -65,32 +77,42 @@ describe("Notification", () => {
   it("renders the mapped galoy icon when the notification has one", () => {
     const { getByTestId } = renderNotification(makeNotification({ icon: Icon.Bell }))
 
-    expect(getByTestId("galoy-icon-bell")).toBeTruthy()
+    expect(getByTestId("icon-bell")).toBeTruthy()
   })
 
-  it("maps every underscore of the icon enum to the dashed icon name", () => {
+  it("maps every underscore of the icon enum to an icon that has an asset", () => {
     const { getByTestId } = renderNotification(
       makeNotification({ icon: Icon.WarningWithBackground }),
     )
 
-    expect(getByTestId("galoy-icon-warning-with-background")).toBeTruthy()
+    expect(getByTestId("icon-warning-with-background")).toBeTruthy()
   })
 
   it("falls back to the default ionicon when the notification has no icon", () => {
-    const { queryAllByTestId } = renderNotification(makeNotification())
+    const { getByTestId } = renderNotification(makeNotification())
 
-    expect(queryAllByTestId(/^galoy-icon-/)).toHaveLength(0)
+    expect(getByTestId("notification-default-icon")).toBeTruthy()
   })
 
-  it("renders unacknowledged text in the primary color", () => {
-    const notification = makeNotification()
-    const { getByText } = renderNotification(notification)
+  it("falls back to the default ionicon when the icon has no asset", () => {
+    const { getByTestId, queryByTestId } = renderNotification(
+      makeNotification({ icon: UNMAPPED_ICON }),
+    )
+
+    expect(getByTestId("notification-default-icon")).toBeTruthy()
+    expect(queryByTestId("icon-rocket")).toBeNull()
+  })
+
+  it("renders unacknowledged text and icon in the primary color", () => {
+    const notification = makeNotification({ icon: Icon.Bell })
+    const { getByText, getByTestId } = renderNotification(notification)
 
     expect(getByText(notification.body)).toHaveStyle({ color: light.black })
+    expect(getByTestId("icon-bell").props.color).toBe(light.black)
   })
 
   it("renders acknowledged text greyed out", () => {
-    const notification = makeNotification({ acknowledgedAt: 1700000000 })
+    const notification = makeNotification({ acknowledgedAt: ACKNOWLEDGED_AT })
     const { getByText } = renderNotification(notification)
 
     expect(getByText(notification.body)).toHaveStyle({ color: light.grey2 })
@@ -99,11 +121,11 @@ describe("Notification", () => {
   it("greys out the icon variant once acknowledged", () => {
     const notification = makeNotification({
       icon: Icon.Bell,
-      acknowledgedAt: 1700000000,
+      acknowledgedAt: ACKNOWLEDGED_AT,
     })
-    const { getByText } = renderNotification(notification)
+    const { getByTestId } = renderNotification(notification)
 
-    expect(getByText(notification.body)).toHaveStyle({ color: light.grey2 })
+    expect(getByTestId("icon-bell").props.color).toBe(light.grey2)
   })
 
   it("greys out the text when acknowledgedAt arrives after mount", () => {
@@ -114,7 +136,7 @@ describe("Notification", () => {
 
     rerender(
       <ThemeProvider theme={theme}>
-        <Notification {...notification} acknowledgedAt={1700000000} />
+        <Notification {...notification} acknowledgedAt={ACKNOWLEDGED_AT} />
       </ThemeProvider>,
     )
 
