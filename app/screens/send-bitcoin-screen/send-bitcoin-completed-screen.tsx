@@ -151,6 +151,10 @@ const PaymentDetailsSection: React.FC<{
 }) => {
   const styles = useStyles()
 
+  const formattedTime = createdAt
+    ? formatUnixTimestampYMDHM({ timestampSeconds: createdAt })
+    : ""
+
   return (
     <>
       <View style={styles.successActionFieldContainer}>
@@ -185,9 +189,7 @@ const PaymentDetailsSection: React.FC<{
       <View style={styles.successActionFieldContainer}>
         <SuccessActionComponent
           title={LL.SendBitcoinScreen.time()}
-          text={
-            createdAt ? formatUnixTimestampYMDHM({ timestampSeconds: createdAt }) : ""
-          }
+          text={formattedTime}
           key="time"
           visible={Boolean(createdAt)}
         />
