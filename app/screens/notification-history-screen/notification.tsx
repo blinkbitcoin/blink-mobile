@@ -2,10 +2,10 @@ import React, { useEffect, useState } from "react"
 import { StatefulNotification } from "@app/graphql/generated"
 import { Icon, Text, makeStyles, useTheme } from "@rn-vui/themed"
 import { View, Linking } from "react-native"
-import { timeAgo } from "./utils"
+import { timeAgo, toGaloyIconName } from "./utils"
 import { TouchableWithoutFeedback } from "react-native-gesture-handler"
 import { BLINK_DEEP_LINK_PREFIX } from "@app/config"
-import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 
 export const Notification: React.FC<StatefulNotification> = ({
   title,
@@ -27,6 +27,9 @@ export const Notification: React.FC<StatefulNotification> = ({
     }
   }, [acknowledgedAt, isAcknowledged])
 
+  const iconName = toGaloyIconName(icon)
+  const iconColor = isAcknowledged ? colors.grey2 : colors.black
+
   return (
     <TouchableWithoutFeedback
       onPress={() => {
@@ -37,18 +40,15 @@ export const Notification: React.FC<StatefulNotification> = ({
       }}
     >
       <View style={styles.container}>
-        {icon ? (
-          <GaloyIcon
-            name={icon.toLowerCase().replace(/_/g, "-") as IconNamesType}
-            color={isAcknowledged ? colors.grey2 : colors.black}
-            size={26}
-          />
+        {iconName ? (
+          <GaloyIcon name={iconName} color={iconColor} size={26} />
         ) : (
           <Icon
             type="ionicon"
             name="notifications-outline"
-            color={isAcknowledged ? colors.grey2 : colors.black}
+            color={iconColor}
             size={26}
+            testID="notification-default-icon"
           />
         )}
         <View style={styles.content} testID="notification-content">
