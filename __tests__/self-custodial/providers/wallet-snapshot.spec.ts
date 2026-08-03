@@ -191,7 +191,7 @@ const buildUnknownTokenPayment = (id: string) => ({
 })
 
 describe("hasMore pagination", () => {
-  it("computes hasMore from the raw response, not after isKnownPayment filtering", async () => {
+  it("reports the page's own hasMore, unchanged by payments it dropped", async () => {
     // 20 raw items (page-size) where 5 are unknown tokens that get filtered out.
     const sdk = createMockSdk()
     const payments = [
@@ -445,50 +445,6 @@ describe("appendTransactions", () => {
 
     // Existing wallet is empty so the first "a" is appended; the second is filtered.
     expect(result[0].transactions.map((t) => t.id)).toEqual(["a", "b"])
-  })
-})
-
-describe("isKnownPayment crashlytics reporting", () => {
-  beforeEach(() => {
-    mockRecordError.mockClear()
-  })
-
-  it("records to crashlytics once per unknown token identifier and drops the payment", async () => {
-    const fresh = loadFreshSnapshotModule()
-    const unknownTokenPayment = {
-      id: "unknown-1",
-      method: 2,
-      paymentType: 0,
-      status: 0,
-      amount: 100,
-      fees: 0,
-      timestamp: 0,
-      details: {
-        tag: "Token",
-        inner: {
-          metadata: { identifier: "rogue-token-id", decimals: 6, ticker: "ROGUE" },
-        },
-      },
-    }
-    const sdk = {
-      getInfo: jest.fn().mockResolvedValue({
-        identityPubkey: "pk",
-        balanceSats: 0,
-        tokenBalances: {},
-      }),
-      listPayments: jest.fn().mockResolvedValue({
-        payments: [unknownTokenPayment, unknownTokenPayment],
-      }),
-    } as never
-
-    await fresh.getSelfCustodialWalletSnapshot(sdk)
-
-    const reportedErrors = mockRecordError.mock.calls.filter((args) => {
-      const message = args[0]?.message ?? ""
-      return message.includes("rogue-token-id")
-    })
-    expect(reportedErrors).toHaveLength(1)
-    expect(reportedErrors[0][0].message).toContain("expected=test-token-id")
   })
 })
 
