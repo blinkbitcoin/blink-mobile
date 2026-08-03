@@ -1,201 +1,338 @@
-import React from "react"
+import * as React from "react"
 import { SectionList } from "react-native"
-import { MockedResponse } from "@apollo/client/testing"
-import { render, waitFor } from "@testing-library/react-native"
 
-import { ContactTransactions } from "@app/screens/people-screen/contacts/contact-transactions"
-import { TransactionListForContactDocument } from "@app/graphql/generated"
+import { fireEvent, render } from "@testing-library/react-native"
+
+import { flushEffects } from "../../../helpers/flush-effects"
+
+import { ThemeProvider } from "@rn-vui/themed"
+
 import { TRANSACTION_LIST_WINDOW_SIZE } from "@app/components/transaction-item"
+import { TxStatus, UserContact } from "@app/graphql/generated"
+import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
+import theme from "@app/rne-theme/theme"
+import { ContactTransactions } from "@app/screens/people-screen/contacts/contact-transactions"
+import { AccountType } from "@app/types/wallet"
 
-import { ContextForScreen } from "../../helper"
+const mockUseQuery = jest.fn()
+const mockGetTransactions = jest.fn()
+const mockActiveAccountType = jest.fn()
+const mockToastShow = jest.fn()
+const mockFragments = jest.fn()
 
-const CONTACT_USERNAME = "test_contact"
+jest.mock("@app/graphql/generated", () => ({
+  ...jest.requireActual("@app/graphql/generated"),
+  useTransactionListForContactQuery: (options: unknown) => mockUseQuery(options),
+}))
 
-let currentMocks: MockedResponse[] = []
+jest.mock("@app/graphql/is-authed-context", () => ({
+  useIsAuthed: () => true,
+}))
 
-jest.mock("@app/graphql/mocks", () => {
-  const actual = jest.requireActual("@app/graphql/mocks")
-  return {
-    __esModule: true,
-    get default() {
-      // Spec-specific mocks first so they take precedence; the shared mocks
-      // backfill every other query fired by mounted components, keeping
-      // Apollo's MockLink warning-free.
-      return [...currentMocks, ...actual.default]
-    },
-  }
-})
+jest.mock("@app/hooks/use-account-registry", () => ({
+  useAccountRegistry: () => ({ activeAccount: { type: mockActiveAccountType() } }),
+}))
 
-// Records the props each row is handed, so the list's contract with the row
-// (one shared handler, or none at all) is assertable from here.
+jest.mock("@app/hooks/use-contacts", () => ({
+  useContacts: () => ({ getTransactions: mockGetTransactions }),
+}))
+
+jest.mock("@app/self-custodial/hooks/use-self-custodial-transaction-fragments", () => ({
+  useSelfCustodialTransactionFragments: (transactions: unknown) =>
+    mockFragments(transactions),
+}))
+
+/** Records the props each row is handed, so the list's contract with the row is assertable. */
 const mockRowProps: Array<{ txid: string; onPress?: (txid: string) => void }> = []
 
-jest.mock("@app/components/transaction-item", () => {
-  const actual = jest.requireActual("@app/components/transaction-item")
-  const React = jest.requireActual("react")
-  const { Text } = jest.requireActual("react-native")
-
-  type Props = { txid: string; onPress?: (txid: string) => void }
-
-  const MemoizedTransactionItem = ({ txid, onPress }: Props) => {
+jest.mock("@app/components/transaction-item", () => ({
+  ...jest.requireActual("@app/components/transaction-item"),
+  MemoizedTransactionItem: ({
+    txid,
+    onPress,
+  }: {
+    txid: string
+    onPress?: (txid: string) => void
+  }) => {
+    const { View } = jest.requireActual("react-native")
     mockRowProps.push({ txid, onPress })
-    return React.createElement(Text, { testID: `row-${txid}` }, txid)
-  }
-
-  return {
-    __esModule: true,
-    ...actual,
-    MemoizedTransactionItem,
-  }
-})
-
-const makeEdge = (id: string, cursor: string, createdAt: number) => ({
-  __typename: "TransactionEdge",
-  cursor,
-  node: {
-    __typename: "Transaction",
-    id,
-    status: "SUCCESS",
-    direction: "RECEIVE",
-    memo: null,
-    createdAt,
-    settlementAmount: 1000,
-    settlementFee: 0,
-    settlementDisplayFee: "0.00",
-    settlementCurrency: "BTC",
-    settlementDisplayAmount: "0.10",
-    settlementDisplayCurrency: "USD",
-    settlementPrice: {
-      __typename: "PriceOfOneSettlementMinorUnitInDisplayMinorUnit",
-      base: 105000000000,
-      offset: 12,
-      currencyUnit: "MINOR",
-      formattedAmount: "0.105",
-    },
-    initiationVia: {
-      __typename: "InitiationViaLn",
-      paymentHash: `hash-${id}`,
-      paymentRequest: `payment-request-${id}`,
-    },
-    settlementVia: {
-      __typename: "SettlementViaIntraLedger",
-      counterPartyWalletId: null,
-      counterPartyUsername: CONTACT_USERNAME,
-      preImage: null,
-    },
+    return <View testID={`transaction-${txid}`} />
   },
+}))
+
+jest.mock("@app/utils/toast", () => ({
+  toastShow: (args: unknown) => mockToastShow(args),
+}))
+
+/** Real translations so the section headers and empty state read like production. */
+jest.mock("@app/i18n/i18n-react", () => {
+  const { loadLocale } = jest.requireActual("@app/i18n/i18n-util.sync")
+  const { i18nObject } = jest.requireActual("@app/i18n/i18n-util")
+  loadLocale("en")
+
+  return { useI18nContext: () => ({ LL: i18nObject("en"), locale: "en" }) }
 })
 
-const buildContactMocks = (): MockedResponse[] => {
-  const result = {
-    data: {
-      me: {
-        __typename: "User",
-        id: "user-id",
-        contactByUsername: {
-          __typename: "UserContact",
-          transactions: {
-            __typename: "TransactionConnection",
-            pageInfo: {
-              __typename: "PageInfo",
-              hasNextPage: false,
-              hasPreviousPage: false,
-              startCursor: "cursor-1",
-              endCursor: "cursor-2",
-            },
-            edges: [
-              makeEdge("507f1f77bcf86cd799439011", "cursor-1", 1700000001),
-              makeEdge("507f1f77bcf86cd799439012", "cursor-2", 1700000000),
-            ],
-          },
-        },
-      },
-    },
-  }
+jest.mock("@react-navigation/native", () => ({
+  ...jest.requireActual("@react-navigation/native"),
+  useFocusEffect: (callback: () => undefined | (() => void)) => {
+    const { useEffect } = jest.requireActual("react")
+    useEffect(callback, [callback])
+  },
+}))
 
-  return [
-    {
-      request: {
-        query: TransactionListForContactDocument,
-        variables: { username: CONTACT_USERNAME },
-      },
-      maxUsageCount: Number.POSITIVE_INFINITY,
-      result,
-    },
-  ]
+const contact: UserContact = {
+  __typename: "UserContact",
+  id: "contact-1",
+  handle: "alice@blink.sv",
+  username: "alice@blink.sv",
+  alias: "Alice",
+  transactionsCount: 2,
 }
+
+const makeFragment = (id: string) => ({
+  __typename: "Transaction" as const,
+  id,
+  status: TxStatus.Success,
+  createdAt: 1747691078,
+  direction: "SEND",
+  memo: null,
+  settlementAmount: 100,
+  settlementCurrency: "BTC",
+})
 
 const renderContactTransactions = () =>
   render(
-    <ContextForScreen>
-      <ContactTransactions contactUsername={CONTACT_USERNAME} />
-    </ContextForScreen>,
+    <ThemeProvider theme={theme}>
+      <ContactTransactions contact={contact} />
+    </ThemeProvider>,
   )
 
 describe("ContactTransactions", () => {
   beforeEach(() => {
-    loadLocale("en")
+    jest.clearAllMocks()
     mockRowProps.length = 0
-    currentMocks = buildContactMocks()
+    mockActiveAccountType.mockReturnValue(AccountType.Custodial)
+    mockGetTransactions.mockResolvedValue([])
+    mockFragments.mockReturnValue([])
+    mockUseQuery.mockReturnValue({
+      error: undefined,
+      data: undefined,
+      fetchMore: jest.fn(),
+    })
   })
 
-  it("renders a row per transaction of the contact", async () => {
-    const screen = renderContactTransactions()
+  describe("custodial account", () => {
+    it("runs the contact query and lists what it returns", async () => {
+      mockUseQuery.mockReturnValue({
+        error: undefined,
+        fetchMore: jest.fn(),
+        data: {
+          me: {
+            contactByUsername: {
+              transactions: {
+                edges: [{ node: makeFragment("custodial-tx") }],
+                pageInfo: { hasNextPage: false, endCursor: null },
+              },
+            },
+          },
+        },
+      })
 
-    await waitFor(() => {
-      expect(screen.getByTestId("row-507f1f77bcf86cd799439011")).toBeTruthy()
+      const { getByTestId } = renderContactTransactions()
+
+      expect(getByTestId("transaction-custodial-tx")).toBeTruthy()
+      expect(mockUseQuery).toHaveBeenCalledWith(
+        expect.objectContaining({
+          skip: false,
+          variables: { username: contact.username },
+        }),
+      )
     })
-    expect(screen.getByTestId("row-507f1f77bcf86cd799439012")).toBeTruthy()
+
+    it("shows the empty state instead of a blank area when there is nothing", () => {
+      const { getByTestId } = renderContactTransactions()
+
+      expect(getByTestId("contact-no-transactions")).toBeTruthy()
+    })
+
+    it("reports a failed query through a toast", () => {
+      mockUseQuery.mockReturnValue({
+        error: new Error("network"),
+        data: undefined,
+        fetchMore: jest.fn(),
+      })
+
+      renderContactTransactions()
+
+      expect(mockToastShow).toHaveBeenCalledTimes(1)
+
+      loadLocale("en")
+      const [{ message }] = mockToastShow.mock.calls[0]
+      expect(message(i18nObject("en"))).toBe("Error loading transactions")
+    })
+
+    it("asks for the next page when the list reaches its end", async () => {
+      const fetchMore = jest.fn()
+      mockUseQuery.mockReturnValue({
+        error: undefined,
+        fetchMore,
+        data: {
+          me: {
+            contactByUsername: {
+              transactions: {
+                edges: [{ node: makeFragment("custodial-tx") }],
+                pageInfo: { hasNextPage: true, endCursor: "cursor-1" },
+              },
+            },
+          },
+        },
+      })
+
+      const { getByTestId } = renderContactTransactions()
+      fireEvent(getByTestId("contact-transactions-list"), "endReached")
+
+      expect(fetchMore).toHaveBeenCalledWith({
+        variables: { username: contact.username, after: "cursor-1" },
+      })
+    })
+
+    it("does not page past the last cursor", () => {
+      const fetchMore = jest.fn()
+      mockUseQuery.mockReturnValue({
+        error: undefined,
+        fetchMore,
+        data: {
+          me: {
+            contactByUsername: {
+              transactions: {
+                edges: [{ node: makeFragment("custodial-tx") }],
+                pageInfo: { hasNextPage: false, endCursor: null },
+              },
+            },
+          },
+        },
+      })
+
+      const { getByTestId } = renderContactTransactions()
+      fireEvent(getByTestId("contact-transactions-list"), "endReached")
+
+      expect(fetchMore).not.toHaveBeenCalled()
+    })
+
+    it("does not page a self-custodial list, which the adapter answers in full", async () => {
+      mockActiveAccountType.mockReturnValue(AccountType.SelfCustodial)
+      const fetchMore = jest.fn()
+      mockUseQuery.mockReturnValue({ error: undefined, data: undefined, fetchMore })
+
+      const { getByTestId } = renderContactTransactions()
+      await flushEffects()
+      fireEvent(getByTestId("contact-transactions-list"), "endReached")
+
+      expect(fetchMore).not.toHaveBeenCalled()
+    })
+
+    it("does not ask the contact adapter for transactions", () => {
+      renderContactTransactions()
+
+      expect(mockGetTransactions).not.toHaveBeenCalled()
+    })
   })
 
-  it("leaves its rows non-pressable", async () => {
-    // This list only shows the history with one contact; it does not navigate
-    // into a transaction, and a row handed a handler here would look tappable
-    // and go nowhere.
-    const screen = renderContactTransactions()
-
-    await waitFor(() => {
-      expect(screen.getByTestId("row-507f1f77bcf86cd799439011")).toBeTruthy()
+  describe("self-custodial account", () => {
+    beforeEach(() => {
+      mockActiveAccountType.mockReturnValue(AccountType.SelfCustodial)
     })
 
-    expect(mockRowProps.length).toBeGreaterThan(0)
-    expect(mockRowProps.every((props) => props.onPress === undefined)).toBe(true)
+    it("skips the custodial query, which has no session to resolve through", async () => {
+      renderContactTransactions()
+      await flushEffects()
+
+      expect(mockUseQuery).toHaveBeenCalledWith(expect.objectContaining({ skip: true }))
+    })
+
+    it("lists the transactions the contact adapter returns", async () => {
+      const normalized = [{ id: "sc-tx" }]
+      mockGetTransactions.mockResolvedValue(normalized)
+      mockFragments.mockImplementation((txs: unknown[]) =>
+        txs.length ? [makeFragment("sc-tx")] : [],
+      )
+
+      const { getByTestId } = renderContactTransactions()
+      await flushEffects()
+
+      expect(mockGetTransactions).toHaveBeenCalledWith(contact.id)
+      expect(getByTestId("transaction-sc-tx")).toBeTruthy()
+    })
+
+    it("shows the empty state when the contact has no matching payments", async () => {
+      const { getByTestId } = renderContactTransactions()
+      await flushEffects()
+
+      expect(mockGetTransactions).toHaveBeenCalledWith(contact.id)
+      expect(getByTestId("contact-no-transactions")).toBeTruthy()
+    })
+
+    it("ignores a late adapter answer after it unmounts", async () => {
+      let resolveTransactions: (value: unknown[]) => void = () => {}
+      mockGetTransactions.mockReturnValue(
+        new Promise((resolve) => {
+          resolveTransactions = resolve
+        }),
+      )
+
+      const { unmount } = renderContactTransactions()
+      unmount()
+      resolveTransactions([{ id: "late-tx" }])
+      await flushEffects()
+
+      expect(mockGetTransactions).toHaveBeenCalled()
+      expect(mockFragments).not.toHaveBeenCalledWith([{ id: "late-tx" }])
+    })
   })
 
-  it("hands the list the same render callbacks across re-renders", async () => {
-    // A fresh arrow per render defeats the row's React.memo, which is the whole
-    // point of the memoization: every mounted row would re-render with it.
-    const screen = renderContactTransactions()
-
-    await waitFor(() => {
-      expect(screen.getByTestId("row-507f1f77bcf86cd799439011")).toBeTruthy()
+  describe("list", () => {
+    beforeEach(() => {
+      mockUseQuery.mockReturnValue(
+        custodialQuery({ edges: [{ node: makeFragment("custodial-tx") }] }),
+      )
     })
 
-    const first = screen.UNSAFE_getByType(SectionList).props
+    it("leaves its rows non-pressable", () => {
+      /**
+       * This list only shows the history with one contact; it does not navigate into a
+       * transaction, and a row handed a handler here would look tappable and go nowhere.
+       */
+      renderContactTransactions()
 
-    screen.rerender(
-      <ContextForScreen>
-        <ContactTransactions contactUsername={CONTACT_USERNAME} />
-      </ContextForScreen>,
-    )
-
-    const second = screen.UNSAFE_getByType(SectionList).props
-
-    expect(second.renderItem).toBe(first.renderItem)
-    expect(second.keyExtractor).toBe(first.keyExtractor)
-    expect(second.renderSectionHeader).toBe(first.renderSectionHeader)
-  })
-
-  it("bounds the mounted row set with the shared window size", async () => {
-    const screen = renderContactTransactions()
-
-    await waitFor(() => {
-      expect(screen.getByTestId("row-507f1f77bcf86cd799439011")).toBeTruthy()
+      expect(mockRowProps.length).toBeGreaterThan(0)
+      expect(mockRowProps.every((props) => props.onPress === undefined)).toBe(true)
     })
 
-    expect(screen.UNSAFE_getByType(SectionList).props.windowSize).toBe(
-      TRANSACTION_LIST_WINDOW_SIZE,
-    )
+    it("hands the list the same render callbacks across re-renders", () => {
+      /**
+       * A fresh arrow per render defeats the row's React.memo, which is the whole point of
+       * the memoization: every mounted row would re-render with it.
+       */
+      const screen = renderContactTransactions()
+      const first = screen.UNSAFE_getByType(SectionList).props
+
+      screen.rerender(contactTransactionsScreen())
+
+      const second = screen.UNSAFE_getByType(SectionList).props
+
+      expect(second.renderItem).toBe(first.renderItem)
+      expect(second.keyExtractor).toBe(first.keyExtractor)
+      expect(second.renderSectionHeader).toBe(first.renderSectionHeader)
+    })
+
+    it("bounds the mounted row set with the shared window size", () => {
+      const screen = renderContactTransactions()
+
+      expect(screen.UNSAFE_getByType(SectionList).props.windowSize).toBe(
+        TRANSACTION_LIST_WINDOW_SIZE,
+      )
+    })
   })
 })
