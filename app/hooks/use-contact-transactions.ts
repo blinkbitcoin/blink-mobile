@@ -49,13 +49,26 @@ export const useContactTransactions = (
   const generationRef = React.useRef(0)
 
   /**
+   * Mirrors how much is on screen so a rejected page can tell whether the reader has
+   * something to lose. Read from callbacks that must not re-run when the list grows.
+   */
+  const loadedCountRef = React.useRef(0)
+  loadedCountRef.current = transactions.length
+
+  /**
    * Whatever is loaded belongs to the contact it was read for. Pointing the hook at a new
    * one clears it during render, before anything is painted, so the incoming contact is
    * never shown the previous contact's payments while its own first page is in flight.
+   *
+   * The generation moves here rather than only in the focus effect, which runs a paint
+   * later: a page resolving in between would otherwise still pass for current and land on
+   * the contact that replaced it.
    */
   const loadedIdentifierRef = React.useRef(paymentIdentifier)
   if (loadedIdentifierRef.current !== paymentIdentifier) {
     loadedIdentifierRef.current = paymentIdentifier
+    generationRef.current += 1
+    isLoadingMoreRef.current = false
     setTransactions([])
     setCursor(null)
     setHasLoaded(false)
@@ -125,14 +138,37 @@ export const useContactTransactions = (
        * A page that fails leaves the cursor untouched and the list intact, so the reader
        * keeps what they were already looking at and the next scroll retries. Wiping the
        * screen over a page they have not seen yet would cost them the one they had.
+       *
+       * With nothing on screen there is nothing to protect, and no list to scroll into a
+       * retry either, so that failure is reported instead of swallowed.
        */
-      .catch(() => undefined)
+      .catch(() => {
+        if (generation !== generationRef.current) return
+        if (loadedCountRef.current === 0) setHasError(true)
+      })
       .finally(() => {
         if (generation === generationRef.current) isLoadingMoreRef.current = false
       })
   }, [canLoadMore, cursor, getTransactions, paymentIdentifier])
 
-  const isLoadingFirstPage = isEnabled && !hasLoaded
+  /**
+   * A page can come back with nothing for this contact and still leave more history to
+   * read, because matching happens on the client and a request stops at its page budget.
+   * An empty list has nothing to scroll, so no `onEndReached` will ever ask for the rest:
+   * it keeps reading here until something shows up or the history runs out.
+   */
+  const hasNothingToScroll = transactions.length === 0 && cursor !== null
+
+  React.useEffect(() => {
+    if (hasNothingToScroll) loadMore()
+  }, [hasNothingToScroll, loadMore])
+
+  /**
+   * Still loading while it has nothing to show and more to read, so the reader sees the
+   * search continue rather than an empty state that is about to be replaced.
+   */
+  const hasSettled = hasLoaded && !hasNothingToScroll
+  const isLoadingFirstPage = isEnabled && !hasSettled
 
   return {
     transactions,
