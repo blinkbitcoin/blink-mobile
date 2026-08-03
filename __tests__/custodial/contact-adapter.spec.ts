@@ -128,12 +128,12 @@ describe("useCustodialContactAdapter", () => {
     )
   })
 
-  it("returns an empty transactions list (custodial does not back this)", async () => {
+  it("returns an exhausted empty page (the contact query backs this instead)", async () => {
     const { result } = renderHook(() => useCustodialContactAdapter())
 
-    const txs = await result.current.getTransactions("c1")
+    const page = await result.current.getTransactions("c1")
 
-    expect(txs).toEqual([])
+    expect(page).toEqual({ transactions: [], nextCursor: null })
   })
 
   it("propagates the loading flag from the underlying query", () => {

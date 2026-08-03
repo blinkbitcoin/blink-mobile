@@ -7,12 +7,10 @@ import { UserContact, useTransactionListForContactQuery } from "@app/graphql/gen
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { groupTransactionsByDate } from "@app/graphql/transactions"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
-import { useContacts } from "@app/hooks/use-contacts"
+import { useContactTransactions } from "@app/hooks/use-contact-transactions"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { useSelfCustodialTransactionFragments } from "@app/self-custodial/hooks/use-self-custodial-transaction-fragments"
-import { NormalizedTransaction } from "@app/types/transaction"
 import { AccountType } from "@app/types/wallet"
-import { useFocusEffect } from "@react-navigation/native"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
 import { toastShow } from "../../../utils/toast"
@@ -50,12 +48,16 @@ export const ContactTransactions = ({ contact }: Props) => {
   const { activeAccount } = useAccountRegistry()
   const isSelfCustodial = activeAccount?.type === AccountType.SelfCustodial
 
-  const { getTransactions, loading: contactsLoading } = useContacts()
-  const [selfCustodialTransactions, setSelfCustodialTransactions] = React.useState<
-    NormalizedTransaction[]
-  >([])
-  const [hasLoadedSelfCustodial, setHasLoadedSelfCustodial] = React.useState(false)
-  const [hasSelfCustodialError, setHasSelfCustodialError] = React.useState(false)
+  /**
+   * The adapter matches payments by counterparty address, which is what `username` holds
+   * for a self-custodial contact, so it never has to resolve a contact list to answer.
+   */
+  const {
+    transactions: selfCustodialTransactions,
+    isLoading: isLoadingSelfCustodial,
+    hasError: hasSelfCustodialError,
+    loadMore: loadMoreSelfCustodial,
+  } = useContactTransactions(contact.handle, isSelfCustodial)
 
   const shouldSkipContactQuery = !isAuthed || isSelfCustodial
 
@@ -67,36 +69,6 @@ export const ContactTransactions = ({ contact }: Props) => {
     variables: { username: contact.username },
     skip: shouldSkipContactQuery,
   })
-
-  /**
-   * The adapter matches payments against the contact's payment identifier, so asking it
-   * before its own contact list has loaded would only ever answer with an empty list and
-   * flash the empty state at a contact that does have payments.
-   */
-  const shouldLoadSelfCustodial = isSelfCustodial && !contactsLoading
-
-  useFocusEffect(
-    React.useCallback(() => {
-      if (!shouldLoadSelfCustodial) return undefined
-
-      let isActive = true
-      setHasSelfCustodialError(false)
-      getTransactions(contact.id)
-        .then((transactions) => {
-          if (isActive) setSelfCustodialTransactions(transactions)
-        })
-        .catch(() => {
-          if (isActive) setHasSelfCustodialError(true)
-        })
-        .finally(() => {
-          if (isActive) setHasLoadedSelfCustodial(true)
-        })
-
-      return () => {
-        isActive = false
-      }
-    }, [shouldLoadSelfCustodial, contact.id, getTransactions]),
-  )
 
   const selfCustodialTxs = useSelfCustodialTransactionFragments(selfCustodialTransactions)
   const custodialTransactions = data?.me?.contactByUsername?.transactions
@@ -114,6 +86,11 @@ export const ContactTransactions = ({ contact }: Props) => {
   )
 
   const fetchNextTransactionsPage = () => {
+    if (isSelfCustodial) {
+      loadMoreSelfCustodial()
+      return
+    }
+
     const pageInfo = custodialTransactions?.pageInfo
 
     if (pageInfo?.hasNextPage) {
@@ -135,8 +112,6 @@ export const ContactTransactions = ({ contact }: Props) => {
     })
     return <></>
   }
-
-  const isLoadingSelfCustodial = isSelfCustodial && !hasLoadedSelfCustodial
 
   const ListEmptyContent = isLoadingSelfCustodial ? (
     <View style={styles.activityIndicatorView} testID="contact-transactions-loading">
