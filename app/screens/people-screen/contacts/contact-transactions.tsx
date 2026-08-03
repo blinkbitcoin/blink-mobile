@@ -1,5 +1,5 @@
 import * as React from "react"
-import { SectionList, Text, View } from "react-native"
+import { ActivityIndicator, SectionList, Text, View } from "react-native"
 
 import { gql } from "@apollo/client"
 import { MemoizedTransactionItem } from "@app/components/transaction-item"
@@ -13,7 +13,7 @@ import { useSelfCustodialTransactionFragments } from "@app/self-custodial/hooks/
 import { NormalizedTransaction } from "@app/types/transaction"
 import { AccountType } from "@app/types/wallet"
 import { useFocusEffect } from "@react-navigation/native"
-import { makeStyles } from "@rn-vui/themed"
+import { makeStyles, useTheme } from "@rn-vui/themed"
 
 import { toastShow } from "../../../utils/toast"
 
@@ -42,15 +42,20 @@ type Props = {
 
 export const ContactTransactions = ({ contact }: Props) => {
   const styles = useStyles()
+  const {
+    theme: { colors },
+  } = useTheme()
   const { LL, locale } = useI18nContext()
   const isAuthed = useIsAuthed()
   const { activeAccount } = useAccountRegistry()
   const isSelfCustodial = activeAccount?.type === AccountType.SelfCustodial
 
-  const { getTransactions } = useContacts()
+  const { getTransactions, loading: contactsLoading } = useContacts()
   const [selfCustodialTransactions, setSelfCustodialTransactions] = React.useState<
     NormalizedTransaction[]
   >([])
+  const [hasLoadedSelfCustodial, setHasLoadedSelfCustodial] = React.useState(false)
+  const [hasSelfCustodialError, setHasSelfCustodialError] = React.useState(false)
 
   const shouldSkipContactQuery = !isAuthed || isSelfCustodial
 
@@ -63,19 +68,34 @@ export const ContactTransactions = ({ contact }: Props) => {
     skip: shouldSkipContactQuery,
   })
 
+  /**
+   * The adapter matches payments against the contact's payment identifier, so asking it
+   * before its own contact list has loaded would only ever answer with an empty list and
+   * flash the empty state at a contact that does have payments.
+   */
+  const shouldLoadSelfCustodial = isSelfCustodial && !contactsLoading
+
   useFocusEffect(
     React.useCallback(() => {
-      if (!isSelfCustodial) return undefined
+      if (!shouldLoadSelfCustodial) return undefined
 
       let isActive = true
-      getTransactions(contact.id).then((transactions) => {
-        if (isActive) setSelfCustodialTransactions(transactions)
-      })
+      setHasSelfCustodialError(false)
+      getTransactions(contact.id)
+        .then((transactions) => {
+          if (isActive) setSelfCustodialTransactions(transactions)
+        })
+        .catch(() => {
+          if (isActive) setHasSelfCustodialError(true)
+        })
+        .finally(() => {
+          if (isActive) setHasLoadedSelfCustodial(true)
+        })
 
       return () => {
         isActive = false
       }
-    }, [isSelfCustodial, contact.id, getTransactions]),
+    }, [shouldLoadSelfCustodial, contact.id, getTransactions]),
   )
 
   const selfCustodialTxs = useSelfCustodialTransactionFragments(selfCustodialTransactions)
@@ -106,7 +126,9 @@ export const ContactTransactions = ({ contact }: Props) => {
     }
   }
 
-  if (error) {
+  const hasTransactionsError = Boolean(error) || hasSelfCustodialError
+
+  if (hasTransactionsError) {
     toastShow({
       message: (translations) => translations.common.transactionsError(),
       LL,
@@ -114,7 +136,13 @@ export const ContactTransactions = ({ contact }: Props) => {
     return <></>
   }
 
-  const ListEmptyContent = (
+  const isLoadingSelfCustodial = isSelfCustodial && !hasLoadedSelfCustodial
+
+  const ListEmptyContent = isLoadingSelfCustodial ? (
+    <View style={styles.activityIndicatorView} testID="contact-transactions-loading">
+      <ActivityIndicator size="large" color={colors.primary} />
+    </View>
+  ) : (
     <View style={styles.noTransactionView} testID="contact-no-transactions">
       <Text style={styles.noTransactionText}>{LL.TransactionScreen.noTransaction()}</Text>
     </View>
@@ -144,6 +172,13 @@ export const ContactTransactions = ({ contact }: Props) => {
 }
 
 const useStyles = makeStyles(({ colors }) => ({
+  activityIndicatorView: {
+    alignItems: "center",
+    flex: 1,
+    justifyContent: "center",
+    marginVertical: 48,
+  },
+
   noTransactionText: {
     fontSize: 24,
   },
