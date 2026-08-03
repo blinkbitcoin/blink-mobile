@@ -44,7 +44,7 @@ export const useSelfCustodialTransactionFragments = (
     const describe = (tx: Parameters<typeof getTransactionDescription>[0]) =>
       getTransactionDescription(tx, LL)
 
-    return toTransactionFragments([...transactions], displayInfo, describe).filter(
+    return toTransactionFragments(transactions, displayInfo, describe).filter(
       (tx) => tx.status !== TxStatus.Failure,
     )
   }, [transactions, displayInfo, LL])
