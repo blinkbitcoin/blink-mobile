@@ -616,7 +616,7 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
     if (destinationState.destinationState === DestinationState.Validating) return
     onFocusedInput(InputType.Search)
     try {
-      const clipboard = await Clipboard.getString()
+      const clipboard = (await Clipboard.getString()).trim()
       updateMatchingContacts(clipboard)
       dispatchDestinationStateAction({
         type: SendBitcoinActions.SetUnparsedPastedDestination,

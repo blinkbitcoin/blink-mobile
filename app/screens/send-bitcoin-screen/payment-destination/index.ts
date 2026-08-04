@@ -35,8 +35,9 @@ export const parseDestination = async ({
   displayCurrency,
   preferLnurlForInternalHandles,
 }: ParseDestinationParams): Promise<ParseDestinationResult> => {
+  const destination = rawInput.trim()
   const parsedDestination = parsePaymentDestination({
-    destination: rawInput,
+    destination,
     network: bitcoinNetwork as NetworkGaloyClient,
     lnAddressDomains: lnurlDomains,
     inputSource,
@@ -105,7 +106,7 @@ export const parseDestination = async ({
       // BIP-21 unified URIs carrying a lightning=LNURL param end up here because
       // parsePaymentDestination only resolves bolt11 lightning params. Prefer the
       // lightning option and keep the onchain address as fallback.
-      const lnurl = getLnurlFromUnifiedUri(rawInput)
+      const lnurl = getLnurlFromUnifiedUri(destination)
       if (lnurl) {
         try {
           const lnurlDestination = await resolveLnurlDestination({
