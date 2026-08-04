@@ -22,6 +22,7 @@ import { storageDirFor } from "../config"
 import { logSdkEvent, SdkLogLevel } from "../logging"
 import {
   paymentEventKey,
+  paymentIdFromEventKey,
   PAYMENT_RECEIVED_EVENTS,
   REFRESH_EVENTS,
 } from "../providers/sdk-events"
@@ -363,10 +364,8 @@ export const useSdkLifecycle = (
 
   // Derived, not separate state: equal-by-value ids keep effect deps stable
   // across a Pending -> Succeeded transition, preserving the id-keyed
-  // consumers' behavior. Event tags never contain ":", payment ids may.
-  const lastReceivedPaymentId = lastPaymentEventKey
-    ? lastPaymentEventKey.slice(lastPaymentEventKey.indexOf(":") + 1)
-    : null
+  // consumers' behavior.
+  const lastReceivedPaymentId = paymentIdFromEventKey(lastPaymentEventKey)
 
   return {
     wallets,
