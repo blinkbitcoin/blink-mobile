@@ -5,37 +5,15 @@ import { fireEvent, render } from "@testing-library/react-native"
 import type { ResolveTransactionAccountStatus } from "@app/hooks/use-resolve-transaction-account"
 import { TransactionDetailScreen } from "@app/screens/transaction-detail-screen/transaction-detail-screen"
 
-jest.mock("@rn-vui/themed", () => {
-  const colors: Record<string, string> = {
-    grey5: "#f5f5f5",
-    primary: "#fc5805",
-    black: "#000",
-    white: "#fff",
-  }
-  return {
-    makeStyles:
-      (
-        fn: (
-          theme: { colors: Record<string, string> },
-          params: Record<string, unknown>,
-        ) => Record<string, object>,
-      ) =>
-      (params: Record<string, unknown> = {}) =>
-        fn({ colors }, params),
-    Text: ({ children, ...props }: { children: React.ReactNode }) =>
-      React.createElement("Text", props, children),
-    useTheme: () => ({ theme: { colors, mode: "light" } }),
-  }
-})
-
-jest.mock("react-native-safe-area-context", () => ({
-  useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
-}))
-
-jest.mock("@app/components/screen", () => ({
-  Screen: ({ children }: { children: React.ReactNode }) =>
-    React.createElement("View", { testID: "screen" }, children),
-}))
+jest.mock("@rn-vui/themed", () =>
+  jest.requireActual("../helpers/transaction-detail-mocks").mockThemedText(),
+)
+jest.mock("react-native-safe-area-context", () =>
+  jest.requireActual("../helpers/transaction-detail-mocks").mockSafeAreaInsets(),
+)
+jest.mock("@app/components/screen", () =>
+  jest.requireActual("../helpers/transaction-detail-mocks").mockScreen(),
+)
 
 jest.mock("@app/components/icon-transactions", () => ({
   IconTransaction: () => null,
@@ -53,27 +31,12 @@ jest.mock("@app/components/atomic/galoy-info", () => ({
   GaloyInfo: () => null,
 }))
 
-jest.mock("@app/components/atomic/galoy-icon-button", () => {
-  const ReactActual = jest.requireActual<typeof React>("react")
-  const { Pressable: RNPressable } = jest.requireActual("react-native")
-  return {
-    GaloyIconButton: ({ name, onPress }: { name: string; onPress: () => void }) =>
-      ReactActual.createElement(RNPressable, { testID: name, onPress }),
-  }
-})
-
-jest.mock("@app/components/atomic/galoy-primary-button", () => {
-  const ReactActual = jest.requireActual<typeof React>("react")
-  const { Pressable: RNPressable, Text: RNText } = jest.requireActual("react-native")
-  return {
-    GaloyPrimaryButton: ({ title, onPress }: { title: string; onPress: () => void }) =>
-      ReactActual.createElement(
-        RNPressable,
-        { testID: "primary-button", onPress },
-        ReactActual.createElement(RNText, null, title),
-      ),
-  }
-})
+jest.mock("@app/components/atomic/galoy-icon-button", () =>
+  jest.requireActual("../helpers/transaction-detail-mocks").mockGaloyIconButton(),
+)
+jest.mock("@app/components/atomic/galoy-primary-button", () =>
+  jest.requireActual("../helpers/transaction-detail-mocks").mockGaloyPrimaryButton(),
+)
 
 jest.mock("@app/components/transaction-item", () => ({
   useDescriptionDisplay: () => "some description",
@@ -85,35 +48,15 @@ jest.mock("@apollo/client", () => ({
   useFragment: () => mockUseFragment(),
 }))
 
-jest.mock("@app/graphql/generated", () => ({
-  TransactionFragmentDoc: {},
-  WalletCurrency: { Btc: "BTC", Usd: "USD" },
-  useTransactionListForDefaultAccountLazyQuery: () => [jest.fn()],
-  useHomeAuthedQuery: () => ({ data: undefined }),
-}))
-
-const galoyInstance = {
-  name: "Blink",
-  blockExplorer: "https://mempool.space/tx/",
-  sparkExplorer: "https://sparkscan.io/tx/",
-}
-
-jest.mock("@app/hooks", () => ({
-  useAppConfig: () => ({ appConfig: { galoyInstance } }),
-  useClipboard: () => ({ copyToClipboard: jest.fn() }),
-  useTransactionSeenState: () => ({
-    latestBtcTxId: undefined,
-    latestUsdTxId: undefined,
-    markTxSeen: jest.fn(),
-  }),
-}))
-
-jest.mock("@app/hooks/use-display-currency", () => ({
-  useDisplayCurrency: () => ({
-    formatMoneyAmount: () => "1,000 sats",
-    formatCurrency: () => "$1.00",
-  }),
-}))
+jest.mock("@app/graphql/generated", () =>
+  jest.requireActual("../helpers/transaction-detail-mocks").mockGeneratedGraphql(),
+)
+jest.mock("@app/hooks", () =>
+  jest.requireActual("../helpers/transaction-detail-mocks").mockAppHooks(),
+)
+jest.mock("@app/hooks/use-display-currency", () =>
+  jest.requireActual("../helpers/transaction-detail-mocks").mockDisplayCurrency(),
+)
 
 let mockActiveWallet: { isSelfCustodial: boolean; wallets: unknown[] } = {
   isSelfCustodial: false,
@@ -123,9 +66,9 @@ jest.mock("@app/hooks/use-active-wallet", () => ({
   useActiveWallet: () => mockActiveWallet,
 }))
 
-jest.mock("@react-navigation/native", () => ({
-  useNavigation: () => ({ goBack: jest.fn() }),
-}))
+jest.mock("@react-navigation/native", () =>
+  jest.requireActual("../helpers/transaction-detail-mocks").mockNavigation(),
+)
 
 const LLText = () => ""
 jest.mock("@app/i18n/i18n-react", () => ({
