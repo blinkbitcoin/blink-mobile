@@ -206,4 +206,56 @@ describe("useCloudBackupForm", () => {
     expect(result.current.confirmPassword).toBe("")
     expect(result.current.passwordError).toBeUndefined()
   })
+
+  describe("recovery-backup cloud sync (D4/D9)", () => {
+    const setPasswordProtected = (result: {
+      current: ReturnType<typeof useCloudBackupForm>
+    }) => {
+      act(() => result.current.toggleEncryption())
+      act(() => {
+        result.current.setPassword("hunter2hunter2")
+        result.current.setConfirmPassword("hunter2hunter2")
+      })
+    }
+
+    it("is off by default and not offered without a password", () => {
+      const { result } = renderHook(() => useCloudBackupForm())
+
+      expect(result.current.autoBundleSync).toBe(false)
+      // D9: a seed-encrypted bundle must never be stored next to an
+      // unencrypted seed, so sync is not on offer until a password exists.
+      expect(result.current.canSyncBundle).toBe(false)
+    })
+
+    it("becomes available once the seed backup carries a valid password", () => {
+      const { result } = renderHook(() => useCloudBackupForm())
+
+      setPasswordProtected(result)
+
+      expect(result.current.canSyncBundle).toBe(true)
+    })
+
+    it("can be turned on", () => {
+      const { result } = renderHook(() => useCloudBackupForm())
+
+      setPasswordProtected(result)
+      act(() => result.current.toggleAutoBundleSync())
+
+      expect(result.current.autoBundleSync).toBe(true)
+    })
+
+    it("is cleared when the password is removed again", () => {
+      const { result } = renderHook(() => useCloudBackupForm())
+
+      setPasswordProtected(result)
+      act(() => result.current.toggleAutoBundleSync())
+      expect(result.current.autoBundleSync).toBe(true)
+
+      act(() => result.current.toggleEncryption())
+
+      // Leaving it checked would promise a sync that D9 forbids.
+      expect(result.current.autoBundleSync).toBe(false)
+      expect(result.current.canSyncBundle).toBe(false)
+    })
+  })
 })
