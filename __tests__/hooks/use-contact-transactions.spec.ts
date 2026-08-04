@@ -7,9 +7,12 @@ import { flushEffects } from "../helpers/flush-effects"
 const mockGetTransactions = jest.fn()
 const mockContactsLoading = jest.fn()
 
+/** Held on an object so a test can swap the reader the way a reconnect does. */
+const mockContactAdapter = { getTransactions: mockGetTransactions }
+
 jest.mock("@app/hooks/use-contacts", () => ({
   useContacts: () => ({
-    getTransactions: mockGetTransactions,
+    getTransactions: mockContactAdapter.getTransactions,
     loading: mockContactsLoading(),
   }),
 }))
@@ -48,6 +51,7 @@ describe("useContactTransactions", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockContactsLoading.mockReturnValue(false)
+    mockContactAdapter.getTransactions = mockGetTransactions
     mockGetTransactions.mockResolvedValue(page([], null))
   })
 
@@ -70,14 +74,30 @@ describe("useContactTransactions", () => {
     expect(result.current.isLoading).toBe(false)
   })
 
-  it("waits for the adapter to be ready, and reads as loading meanwhile", async () => {
+  it("reads without waiting on a contact list it never consults", async () => {
     mockContactsLoading.mockReturnValue(true)
+    mockGetTransactions.mockResolvedValue(page(["tx-1"], null))
 
     const { result } = renderContactTransactions()
     await flushEffects()
 
-    expect(mockGetTransactions).not.toHaveBeenCalled()
-    expect(result.current.isLoading).toBe(true)
+    expect(mockGetTransactions).toHaveBeenCalledWith(IDENTIFIER)
+    expect(result.current.transactions).toEqual([{ id: "tx-1" }])
+  })
+
+  it("re-reads when the adapter reconnects and hands over a new reader", async () => {
+    mockGetTransactions.mockResolvedValue(page([], null))
+
+    const { rerender } = renderContactTransactions()
+    await flushEffects()
+    expect(mockGetTransactions).toHaveBeenCalledTimes(1)
+
+    const reconnectedGetTransactions = jest.fn().mockResolvedValue(page(["tx-1"], null))
+    mockContactAdapter.getTransactions = reconnectedGetTransactions
+    rerender({ id: IDENTIFIER, enabled: true })
+    await flushEffects()
+
+    expect(reconnectedGetTransactions).toHaveBeenCalledWith(IDENTIFIER)
   })
 
   describe("a page that holds nothing for this contact", () => {
