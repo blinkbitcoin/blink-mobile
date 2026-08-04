@@ -26,7 +26,7 @@ describe("validatePassword", () => {
   })
 
   describe("policy constant", () => {
-    it("exposes the minimum length the default pattern enforces", () => {
+    it("exposes the minimum length the policy enforces", () => {
       expect(MIN_PASSWORD_LENGTH).toBe(12)
       expect(validatePassword("x".repeat(MIN_PASSWORD_LENGTH)).valid).toBe(true)
       expect(validatePassword("x".repeat(MIN_PASSWORD_LENGTH - 1)).valid).toBe(false)
@@ -38,15 +38,6 @@ describe("validatePassword", () => {
 
       expect(passwordPlaceholder).toContain(String(MIN_PASSWORD_LENGTH))
       expect(passwordTooShort).toContain(String(MIN_PASSWORD_LENGTH))
-    })
-  })
-
-  describe("custom policy regex", () => {
-    it("validates against the provided pattern instead of the default", () => {
-      const requiresDigit = /\d/
-
-      expect(validatePassword("abc1", requiresDigit).valid).toBe(true)
-      expect(validatePassword("abcd", requiresDigit).valid).toBe(false)
     })
   })
 })
