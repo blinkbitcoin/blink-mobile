@@ -119,7 +119,7 @@ describe("resolveDestination (integration: real parser)", () => {
 
     const result = await resolveDestination(
       {
-        rawInput: "  esaudeveloper@blink.sv  ",
+        rawInput: "\t esaudeveloper@blink.sv \n",
         myWalletIds: ["my-wallet-id"],
         bitcoinNetwork: Network.Mainnet,
         lnurlDomains: [lnAddressHostname],
@@ -131,25 +131,12 @@ describe("resolveDestination (integration: real parser)", () => {
 
     expect(result.valid).toBe(true)
     expect(result.valid && result.validDestination.paymentType).toBe(PaymentType.Lnurl)
-  })
-
-  it("trims input in parseDestination itself so direct callers (NFC) are covered", async () => {
-    const accountDefaultWalletQuery = jest.fn().mockResolvedValue({
-      data: { accountDefaultWallet: { id: "recipient-wallet-id" } },
-    })
-
-    const result = await parseDestination({
-      rawInput: "  esaudeveloper@blink.sv  ",
-      myWalletIds: ["my-wallet-id"],
-      bitcoinNetwork: Network.Mainnet,
-      lnurlDomains: [lnAddressHostname],
-      accountDefaultWalletQuery: accountDefaultWalletQuery as never,
-    })
-
-    expect(result.valid).toBe(true)
-    expect(result.valid && result.validDestination.paymentType).toBe(
-      PaymentType.Intraledger,
-    )
+    // no whitespace may leak into the resolved destination
+    const identifier =
+      result.valid && "lnurlParams" in result.validDestination
+        ? result.validDestination.lnurlParams.identifier
+        : undefined
+    expect(identifier).toBe("esaudeveloper@blink.sv")
   })
 
   it("resolves a matching-network Spark address to a valid Spark destination", async () => {
@@ -196,5 +183,30 @@ describe("resolveDestination (integration: real parser)", () => {
 
     expect(result.valid).toBe(false)
     expect(!result.valid && result.invalidReason).toBe("WrongNetwork")
+  })
+})
+
+describe("parseDestination (integration: real parser)", () => {
+  // parseDestination is also called directly, bypassing resolveDestination
+  // (e.g. modal-nfc.tsx), so its own trim is pinned here.
+  it("trims surrounding whitespace before parsing", async () => {
+    const accountDefaultWalletQuery = jest.fn().mockResolvedValue({
+      data: { accountDefaultWallet: { id: "recipient-wallet-id" } },
+    })
+
+    const result = await parseDestination({
+      rawInput: "  esaudeveloper@blink.sv  ",
+      myWalletIds: ["my-wallet-id"],
+      bitcoinNetwork: Network.Mainnet,
+      lnurlDomains: ["blink.sv"],
+      accountDefaultWalletQuery: accountDefaultWalletQuery as never,
+    })
+
+    expect(result.valid).toBe(true)
+    expect(
+      result.valid &&
+        result.validDestination.paymentType === PaymentType.Intraledger &&
+        result.validDestination.handle,
+    ).toBe("esaudeveloper")
   })
 })
