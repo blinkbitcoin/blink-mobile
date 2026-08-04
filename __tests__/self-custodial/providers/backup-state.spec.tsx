@@ -60,6 +60,12 @@ jest.mock("@react-native-firebase/crashlytics", () => () => ({
   log: jest.fn(),
 }))
 
+const mockReportError = jest.fn()
+
+jest.mock("@app/utils/error-logging", () => ({
+  reportError: (...args: unknown[]) => mockReportError(...args),
+}))
+
 const wrapper: React.FC<React.PropsWithChildren> = ({ children }) => (
   <BackupStateProvider>{children}</BackupStateProvider>
 )
@@ -238,6 +244,48 @@ describe("BackupStateProvider", () => {
 
     expect(result.current.backupState.status).toBe(BackupStatus.None)
     expect(result.current.backupState.method).toBeNull()
+    expect(result.current.backupState.completedMethods).toBeUndefined()
+  })
+
+  it("never writes when the active account is not self-custodial", async () => {
+    mockActiveAccount = {
+      id: "custodial-default",
+      type: AccountType.Custodial,
+      label: "Custodial",
+      selected: true,
+      status: AccountStatus.RequiresRestore,
+    }
+
+    const { result } = renderHook(() => useBackupState(), { wrapper })
+
+    await act(async () => {})
+
+    await act(async () => {
+      result.current.setBackupCompleted("manual")
+    })
+
+    expect(mockSetItem).not.toHaveBeenCalled()
+    expect(result.current.backupState.status).toBe(BackupStatus.None)
+  })
+
+  it("keeps the in-memory state and reports when the persist write fails", async () => {
+    mockSetItem.mockRejectedValue(new Error("disk full"))
+
+    const { result } = renderHook(() => useBackupState(), { wrapper })
+
+    await act(async () => {})
+
+    await act(async () => {
+      result.current.setBackupCompleted("manual")
+    })
+
+    expect(result.current.backupState.status).toBe(BackupStatus.Completed)
+    await waitFor(() =>
+      expect(mockReportError).toHaveBeenCalledWith(
+        "Backup state persist",
+        expect.any(Error),
+      ),
+    )
   })
 
   describe("account-switch transition", () => {
