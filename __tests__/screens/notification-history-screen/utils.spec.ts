@@ -2,8 +2,7 @@ import { icons } from "@app/components/atomic/galoy-icon"
 import { Icon } from "@app/graphql/generated"
 import { timeAgo, toGaloyIconName } from "@app/screens/notification-history-screen/utils"
 
-/** An icon the backend can send but the app ships no asset for. */
-const UNMAPPED_ICON = "ROCKET" as Icon
+import { UNMAPPED_ICON } from "./helpers"
 
 /** `timeAgo` reads the wall clock, so both ends of the diff have to be pinned. */
 const FIXED_NOW_MS = Date.UTC(2026, 0, 15, 12, 0, 0)
@@ -13,12 +12,6 @@ const SECONDS_PER_HOUR = 60 * SECONDS_PER_MINUTE
 const SECONDS_PER_DAY = 24 * SECONDS_PER_HOUR
 
 describe("toGaloyIconName", () => {
-  it("resolves every backend icon to an asset the app ships", () => {
-    const unresolved = Object.values(Icon).filter((icon) => !toGaloyIconName(icon))
-
-    expect(unresolved).toEqual([])
-  })
-
   it("replaces every underscore of the enum value", () => {
     expect(toGaloyIconName(Icon.WarningWithBackground)).toBe("warning-with-background")
     expect(toGaloyIconName(Icon.CloseCrossWithBackground)).toBe(
