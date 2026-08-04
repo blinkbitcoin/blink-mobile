@@ -5,6 +5,7 @@ import {
   deriveWalletIdentityPubkey,
   getUserSettings,
   getWalletInfo,
+  listAllPayments,
   listPayments,
   registerLightningAddress,
 } from "@app/self-custodial/bridge/wallet"
@@ -74,6 +75,68 @@ describe("listPayments", () => {
       limit: 50,
       sortAscending: false,
     })
+  })
+})
+
+describe("listAllPayments", () => {
+  const payment = (id: string) => ({ id })
+
+  it("returns a single short page as-is", async () => {
+    const listPaymentsFn = jest
+      .fn()
+      .mockResolvedValue({ payments: [payment("a"), payment("b")] })
+
+    const all = await listAllPayments({ listPayments: listPaymentsFn } as never, 3)
+
+    expect(all.map((p) => p.id)).toEqual(["a", "b"])
+    expect(listPaymentsFn).toHaveBeenCalledTimes(1)
+    expect(listPaymentsFn).toHaveBeenCalledWith(
+      expect.objectContaining({ offset: 0, limit: 3, sortAscending: false }),
+    )
+  })
+
+  it("pages with increasing offsets until a short page", async () => {
+    const listPaymentsFn = jest
+      .fn()
+      .mockResolvedValueOnce({ payments: [payment("a"), payment("b")] })
+      .mockResolvedValueOnce({ payments: [payment("c"), payment("d")] })
+      .mockResolvedValueOnce({ payments: [payment("e")] })
+
+    const all = await listAllPayments({ listPayments: listPaymentsFn } as never, 2)
+
+    expect(all.map((p) => p.id)).toEqual(["a", "b", "c", "d", "e"])
+    expect(listPaymentsFn).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({ offset: 2, limit: 2 }),
+    )
+    expect(listPaymentsFn).toHaveBeenNthCalledWith(
+      3,
+      expect.objectContaining({ offset: 4, limit: 2 }),
+    )
+  })
+
+  it("drops a payment repeated across a page boundary by a mid-export write", async () => {
+    const listPaymentsFn = jest
+      .fn()
+      .mockResolvedValueOnce({ payments: [payment("a"), payment("b")] })
+      .mockResolvedValueOnce({ payments: [payment("b"), payment("c")] })
+      .mockResolvedValueOnce({ payments: [] })
+
+    const all = await listAllPayments({ listPayments: listPaymentsFn } as never, 2)
+
+    expect(all.map((p) => p.id)).toEqual(["a", "b", "c"])
+  })
+
+  it("throws instead of looping forever when the SDK keeps returning full pages", async () => {
+    let counter = 0
+    const listPaymentsFn = jest.fn().mockImplementation(() => {
+      counter += 1
+      return Promise.resolve({ payments: [payment(`p${counter}`)] })
+    })
+
+    await expect(
+      listAllPayments({ listPayments: listPaymentsFn } as never, 1),
+    ).rejects.toThrow(/pages/)
   })
 })
 
