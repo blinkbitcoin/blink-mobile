@@ -59,7 +59,15 @@ const defaultContextValue: BackupStateContextValue = {
 const BackupStateContext = createContext<BackupStateContextValue>(defaultContextValue)
 
 const readBackupState = async (key: string): Promise<BackupState | null> => {
-  const raw = await AsyncStorage.getItem(key)
+  /** The provider mounts above the app ErrorBoundary, so a rejection from this read has
+   *  no net at all; a failed read reports and falls back to the default state. */
+  let raw: string | null
+  try {
+    raw = await AsyncStorage.getItem(key)
+  } catch (err) {
+    reportError("Backup state read", err)
+    return null
+  }
   if (!raw) return null
   try {
     const parsed = JSON.parse(raw)
@@ -104,7 +112,9 @@ export const BackupStateProvider: React.FC<React.PropsWithChildren> = ({ childre
       if (!mounted) return
       setBackupState(fresh ?? defaultState)
     }
-    load()
+    load().catch((err) => {
+      reportError("Backup state load", err)
+    })
     return () => {
       mounted = false
     }

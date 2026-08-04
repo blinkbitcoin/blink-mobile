@@ -3816,6 +3816,7 @@
     "phraseSubtitleStep2": "Zadajte zvyšok vašej zálohovacej frázy",
     "nextWords": "Ďalších 6 slov",
     "paste": "Prilepiť",
+    "pasteFailed": "Nepodarilo sa čítať zo schránky. Zadajte prosím zálohovaciu frázu ručne.",
     "enterWord": "Slovo",
     "invalidMnemonic": "Neplatná zálohovacia fráza. Skontroluj, či je poradie slov správne.",
     "restoring": "Obnovovanie peňaženky...",

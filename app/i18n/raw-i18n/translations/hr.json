@@ -3816,6 +3816,7 @@
     "phraseSubtitleStep2": "Unesite ostatak vaše sigurnosne fraze",
     "nextWords": "Sljedećih 6 riječi",
     "paste": "Zalijepi",
+    "pasteFailed": "Čitanje iz međuspremnika nije uspjelo. Unesite svoju sigurnosnu frazu ručno.",
     "enterWord": "Riječ",
     "invalidMnemonic": "Neispravna pričuvna fraza. Provjerite je li redoslijed riječi točan.",
     "restoring": "Obnavljanje vašeg novčanika...",

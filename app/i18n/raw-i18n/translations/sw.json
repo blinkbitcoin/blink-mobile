@@ -3816,6 +3816,7 @@
     "phraseSubtitleStep2": "Ingiza maneno yaliyobaki ya msemo wako wa hifadhi",
     "nextWords": "Maneno 6 yanayofuata",
     "paste": "Bandika",
+    "pasteFailed": "Imeshindwa kusoma kutoka kwenye ubao wa kunakili. Tafadhali ingiza msemo wako wa hifadhi mwenyewe.",
     "enterWord": "Neno",
     "invalidMnemonic": "Kifungu cha akiba si sahihi. Tafadhali angalia kama mpangilio wa maneno ni sahihi.",
     "restoring": "Kurudisha mkoba wako...",

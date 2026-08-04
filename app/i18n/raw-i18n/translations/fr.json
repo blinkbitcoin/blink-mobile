@@ -3816,6 +3816,7 @@
         "phraseSubtitleStep2": "Entrez le reste de votre phrase de sauvegarde",
         "nextWords": "6 mots suivants",
         "paste": "Coller",
+        "pasteFailed": "Impossible de lire le presse-papier. Veuillez saisir votre phrase de sauvegarde manuellement.",
         "enterWord": "Mot",
         "invalidMnemonic": "Phrase de sauvegarde invalide. Veuillez vérifier si l'ordre des mots est correct.",
         "restoring": "Restauration de votre portefeuille...",

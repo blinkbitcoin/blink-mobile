@@ -3816,6 +3816,7 @@
         "phraseSubtitleStep2": "Gib den Rest deiner Sicherungsphrase ein",
         "nextWords": "Nächste 6 Wörter",
         "paste": "Einfügen",
+        "pasteFailed": "Zwischenablage konnte nicht gelesen werden. Bitte gib deine Sicherungsphrase manuell ein.",
         "enterWord": "Wort",
         "invalidMnemonic": "Ungültige Backup-Phrase. Bitte überprüfe, ob die Wortreihenfolge korrekt ist.",
         "restoring": "Wallet wird wiederhergestellt...",

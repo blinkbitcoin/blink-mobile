@@ -48,6 +48,12 @@ jest.mock("@app/utils/toast", () => ({
   toastShow: (...args: readonly unknown[]) => mockToastShow(...args),
 }))
 
+const mockReportError = jest.fn()
+jest.mock("@app/utils/error-logging", () => ({
+  ...jest.requireActual("@app/utils/error-logging"),
+  reportError: (...args: readonly unknown[]) => mockReportError(...args),
+}))
+
 jest.mock("@app/components/atomic/galoy-primary-button", () => ({
   GaloyPrimaryButton: ({ title, onPress }: { title: string; onPress: () => void }) => (
     <Pressable testID={`primary-${title}`} onPress={onPress}>
@@ -232,6 +238,60 @@ describe("RestoreMethodScreen", () => {
       expect(mockToastShow).toHaveBeenCalledWith(
         expect.objectContaining({ message: LL.RestoreScreen.noBackupFound() }),
       )
+    })
+
+    /** The native module can return an error string no CredentialError models; the
+     *  exhaustiveness branch used to throw, which from this un-awaited onPress became an
+     *  unhandled promise rejection. It reports and toasts instead. */
+    it("reports and toasts an unmodelled credential error instead of throwing", async () => {
+      mockRead.mockResolvedValue({ success: false, error: "bogus-new-error" })
+
+      const { getByTestId } = render(
+        <ContextForScreen>
+          <RestoreMethodScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      await act(async () => {
+        fireEvent.press(getByTestId(passwordManagerTestId()))
+      })
+
+      expect(mockReportError).toHaveBeenCalledWith(
+        "Restore credential error unhandled",
+        expect.any(Error),
+        expect.objectContaining({ alwaysRecord: true }),
+      )
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({ message: LL.RestoreScreen.restoreFailed() }),
+      )
+      expect(mockRestore).not.toHaveBeenCalled()
+    })
+
+    /** read() itself can reject (native module failure); the async onPress handler must
+     *  not surface that as an unhandled rejection. */
+    it("reports and toasts a rejecting credential read", async () => {
+      mockRead.mockRejectedValue(new Error("keystore unavailable"))
+
+      const { getByTestId } = render(
+        <ContextForScreen>
+          <RestoreMethodScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      await act(async () => {
+        fireEvent.press(getByTestId(passwordManagerTestId()))
+      })
+
+      expect(mockReportError).toHaveBeenCalledWith(
+        "Restore credential read",
+        expect.any(Error),
+      )
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({ message: LL.RestoreScreen.restoreFailed() }),
+      )
+      expect(mockRestore).not.toHaveBeenCalled()
     })
 
     it("shows the restoreFailed toast on unknown errors", async () => {

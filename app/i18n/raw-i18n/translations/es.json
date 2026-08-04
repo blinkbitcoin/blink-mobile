@@ -3816,6 +3816,7 @@
         "phraseSubtitleStep2": "Ingresa el resto de tu frase de respaldo",
         "nextWords": "Siguientes 6 palabras",
         "paste": "Pegar",
+        "pasteFailed": "No se pudo leer del portapapeles. Por favor ingresa tu frase de respaldo manualmente.",
         "enterWord": "Palabra",
         "invalidMnemonic": "Frase de respaldo no válida. Por favor verifica si el orden de las palabras es correcto.",
         "restoring": "Restaurando tu billetera...",

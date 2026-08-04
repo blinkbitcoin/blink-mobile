@@ -57,6 +57,12 @@ jest.mock("@react-native-firebase/crashlytics", () => () => ({
   log: jest.fn(),
 }))
 
+const mockReportError = jest.fn()
+jest.mock("@app/utils/error-logging", () => ({
+  ...jest.requireActual("@app/utils/error-logging"),
+  reportError: (...args: readonly unknown[]) => mockReportError(...args),
+}))
+
 const wrapper: React.FC<React.PropsWithChildren> = ({ children }) => (
   <BackupStateProvider>{children}</BackupStateProvider>
 )
@@ -108,6 +114,19 @@ describe("BackupStateProvider", () => {
       BACKUP_KEY,
       JSON.stringify({ status: "completed", method: "manual" }),
     )
+  })
+
+  /** The provider mounts above the app ErrorBoundary, so an unhandled rejection from the
+   *  storage read has no net at all; a failed read reports and settles to the default. */
+  it("reports a failing storage read and settles to the default state", async () => {
+    mockGetItem.mockRejectedValue(new Error("storage unavailable"))
+
+    const { result } = renderHook(() => useBackupState(), { wrapper })
+
+    await act(async () => {})
+
+    expect(result.current.backupState.status).toBe(BackupStatus.None)
+    expect(mockReportError).toHaveBeenCalledWith("Backup state read", expect.any(Error))
   })
 
   it("ignores corrupted persisted data", async () => {
