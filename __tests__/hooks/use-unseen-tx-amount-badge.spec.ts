@@ -48,10 +48,12 @@ jest.mock("@app/config/feature-flags-context", () => ({
   }),
 }))
 
+const mockReadQuery = jest.fn(() => null as unknown)
+
 jest.mock("@apollo/client", () => ({
   ...jest.requireActual("@apollo/client"),
   useApolloClient: () => ({
-    readQuery: jest.fn(() => null),
+    readQuery: mockReadQuery,
   }),
 }))
 
@@ -90,6 +92,50 @@ const tx = (overrides: Partial<TransactionFragment>): TransactionFragment =>
 describe("useUnseenTxAmountBadge", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+  })
+
+  it("falls back to the cached custodial transactions when none are provided", () => {
+    mockReadQuery.mockReturnValue({
+      me: {
+        defaultAccount: {
+          pendingIncomingTransactions: [tx({ id: "cached", createdAt: 9 })],
+          transactions: { edges: [] },
+        },
+      },
+    })
+
+    const { result } = renderHook(() =>
+      useUnseenTxAmountBadge({
+        transactions: [],
+        hasUnseenBtcTx: true,
+        hasUnseenUsdTx: false,
+      }),
+    )
+
+    expect(result.current.latestUnseenTx?.id).toBe("cached")
+  })
+
+  it("never reads the custodial cache for a self-custodial account", () => {
+    mockReadQuery.mockReturnValue({
+      me: {
+        defaultAccount: {
+          pendingIncomingTransactions: [tx({ id: "cached", createdAt: 9 })],
+          transactions: { edges: [] },
+        },
+      },
+    })
+
+    const { result } = renderHook(() =>
+      useUnseenTxAmountBadge({
+        transactions: [],
+        isSelfCustodial: true,
+        hasUnseenBtcTx: true,
+        hasUnseenUsdTx: false,
+      }),
+    )
+
+    expect(mockReadQuery).not.toHaveBeenCalled()
+    expect(result.current.latestUnseenTx).toBeUndefined()
   })
 
   it("returns null when nothing unseen", () => {

@@ -115,6 +115,15 @@ jest.mock("@app/hooks/use-active-wallet", () => ({
   useActiveWallet: () => ({ isSelfCustodial: false, wallets: [] }),
 }))
 
+const mockNoTransactions: unknown[] = []
+jest.mock("@app/self-custodial/hooks/use-self-custodial-transaction-fragments", () => ({
+  useSelfCustodialTransactionFragments: () => mockNoTransactions,
+}))
+
+jest.mock("@app/self-custodial/providers/wallet", () => ({
+  useSelfCustodialWallet: () => ({ allTransactions: mockNoTransactions }),
+}))
+
 jest.mock("@react-navigation/native", () => ({
   useNavigation: () => ({ goBack: jest.fn() }),
 }))

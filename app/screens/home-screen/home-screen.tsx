@@ -30,9 +30,7 @@ import SlideUpHandle from "@app/components/slide-up-handle"
 import { Screen } from "@app/components/screen"
 import {
   UnseenTxAmountBadge,
-  useUnseenTxAmountBadge,
-  useOutgoingBadgeVisibility,
-  useIncomingBadgeAutoSeen,
+  useUnseenTxBadgeState,
 } from "@app/components/unseen-tx-amount-badge"
 
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -74,16 +72,9 @@ import { UnclaimedDepositBanner } from "@app/components/unclaimed-deposit-banner
 import { testProps } from "@app/utils/testProps"
 import { isIos } from "@app/utils/helper"
 import { extractLightningAddressUsername } from "@app/utils/pay-links"
-import {
-  useAppConfig,
-  useAutoShowUpgradeModal,
-  useTransactionSeenState,
-} from "@app/hooks"
+import { useAppConfig, useAutoShowUpgradeModal } from "@app/hooks"
 import {
   AccountLevel,
-  TransactionFragment,
-  TxDirection,
-  TxStatus,
   useBulletinsQuery,
   useHomeAuthedQuery,
   useHomeUnauthedQuery,
@@ -219,6 +210,7 @@ export const HomeScreen: React.FC = () => {
     refreshWallets: refreshSelfCustodialWallets,
     isStableBalanceActive,
     lightningAddress: selfCustodialLightningAddress,
+    allTransactions: selfCustodialAllTransactions,
   } = useSelfCustodialWallet()
   const { accounts, activeAccount } = useAccountRegistry()
   const hasMultipleAccounts = accounts.length > 1
@@ -351,54 +343,28 @@ export const HomeScreen: React.FC = () => {
     dataAuthed?.me?.defaultAccount?.pendingIncomingTransactions
   const transactionsEdges = dataAuthed?.me?.defaultAccount?.transactions?.edges
 
-  const transactions = useMemo(() => {
-    const txs: TransactionFragment[] = []
-    if (pendingIncomingTransactions) txs.push(...pendingIncomingTransactions)
-    const settled =
-      transactionsEdges
-        ?.map((e) => e.node)
-        .filter(
-          (tx) => tx.status !== TxStatus.Pending || tx.direction === TxDirection.Send,
-        ) ?? []
-    txs.push(...settled)
-    return txs
-  }, [pendingIncomingTransactions, transactionsEdges])
-
-  const { hasUnseenBtcTx, hasUnseenUsdTx, markTxSeen } = useTransactionSeenState(
-    accountId || "",
-    transactions,
-  )
-
   const { canShowUpgradeModal, markShownUpgradeModal } = useAutoShowUpgradeModal({
     cooldownDays: upgradeModalCooldownDays,
     enabled: isAuthed && levelAccount === AccountLevel.Zero,
   })
 
-  const { latestUnseenTx, unseenAmountText, handleUnseenBadgePress, isOutgoing } =
-    useUnseenTxAmountBadge({
-      transactions,
-      hasUnseenBtcTx,
-      hasUnseenUsdTx,
-    })
-
-  const handleOutgoingBadgeHide = React.useCallback(() => {
-    if (latestUnseenTx?.settlementCurrency) {
-      markTxSeen(latestUnseenTx.settlementCurrency)
-    }
-  }, [latestUnseenTx?.settlementCurrency, markTxSeen])
-
-  const showOutgoingBadge = useOutgoingBadgeVisibility({
-    txId: latestUnseenTx?.id,
-    amountText: unseenAmountText,
+  const {
+    hasUnseenBtcTx,
+    hasUnseenUsdTx,
+    unseenAmountText,
+    handleUnseenBadgePress,
+    showIncomingBadge,
+    showOutgoingBadge,
     isOutgoing,
-    onHide: handleOutgoingBadgeHide,
-  })
-
-  const showIncomingBadge = useIncomingBadgeAutoSeen({
+    latestUnseenTxId,
+    transactionCount,
+  } = useUnseenTxBadgeState({
+    isSelfCustodial,
     isFocused,
-    isOutgoing,
-    unseenCurrency: latestUnseenTx?.settlementCurrency,
-    markTxSeen,
+    custodialAccountId: accountId,
+    selfCustodialTransactions: selfCustodialAllTransactions,
+    pendingIncomingTransactions,
+    transactionEdges: transactionsEdges,
   })
 
   const [modalVisible, setModalVisible] = React.useState(false)
@@ -541,7 +507,7 @@ export const HomeScreen: React.FC = () => {
     triggerUpgradeModal,
   ])
 
-  const numberOfTxs = transactions.length
+  const numberOfTxs = transactionCount
 
   const onMenuClick = (target: Target) => {
     if (!isSelfCustodial && !isAuthed) {
@@ -775,7 +741,7 @@ export const HomeScreen: React.FC = () => {
       />
       <View style={styles.badgeSlot}>
         <UnseenTxAmountBadge
-          key={latestUnseenTx?.id}
+          key={latestUnseenTxId}
           amountText={unseenAmountText ?? ""}
           visible={
             isOutgoing

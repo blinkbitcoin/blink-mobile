@@ -18,6 +18,12 @@ import {
 import { IsAuthedContextProvider } from "@app/graphql/is-authed-context"
 import { mockCurrencyList } from "@app/graphql/mocks"
 import { ConvertDirection } from "@app/types/payment"
+import {
+  NormalizedTransaction,
+  PaymentType,
+  TransactionDirection,
+  TransactionStatus,
+} from "@app/types/transaction"
 
 let currentMocks: MockedResponse[] = []
 
@@ -285,6 +291,7 @@ jest.mock("@app/self-custodial/providers/wallet", () => ({
     mockSelfCustodialWalletOverride ?? {
       sdk: null,
       wallets: [],
+      allTransactions: [],
       status: "unavailable",
       isStableBalanceActive: false,
       lastReceivedPaymentId: null,
@@ -1228,6 +1235,7 @@ describe("HomeScreen", () => {
       mockSelfCustodialWalletOverride = {
         sdk: { id: "fake-sdk" },
         wallets: selfCustodialWallets,
+        allTransactions: [],
         status: "ready",
         isStableBalanceActive: true,
         lastReceivedPaymentId: null,
@@ -1245,6 +1253,44 @@ describe("HomeScreen", () => {
       mockSelfCustodialWalletOverride = null
       mockFeatureFlagsOverride = null
       mockBalanceModeValue = "usd"
+    })
+
+    it("shows the unseen badge for a received self-custodial transaction", async () => {
+      const receivedTransaction: NormalizedTransaction = {
+        id: "sc-received-tx",
+        amount: { amount: 1000, currency: "BTC", currencyCode: "BTC" },
+        direction: TransactionDirection.Receive,
+        status: TransactionStatus.Completed,
+        timestamp: 1747691078,
+        paymentType: PaymentType.Lightning,
+      }
+
+      mockSelfCustodialWalletOverride = {
+        ...mockSelfCustodialWalletOverride,
+        allTransactions: [receivedTransaction],
+      }
+
+      const { findByLabelText } = render(
+        <ContextForScreen>
+          <HomeScreen />
+        </ContextForScreen>,
+      )
+
+      expect(await findByLabelText(/^\+/)).toBeTruthy()
+
+      await flushEffects()
+    })
+
+    it("shows no unseen badge when the self-custodial wallet has no transactions", async () => {
+      const { queryByLabelText } = render(
+        <ContextForScreen>
+          <HomeScreen />
+        </ContextForScreen>,
+      )
+
+      await flushEffects()
+
+      expect(queryByLabelText(/^\+/)).toBeNull()
     })
 
     it("shows the balance mode toggle when SB is enabled and active", async () => {
