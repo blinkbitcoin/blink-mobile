@@ -155,14 +155,27 @@ describe("recovery-bundle storage", () => {
       )
     })
 
-    it("recovers the payload from a stranded tmp file (crash between unlink and rename)", async () => {
+    it("recovers the payload from a stranded tmp file without renaming it", async () => {
       fsState.files.set(MAINNET_TMP_PATH, "payload-from-tmp")
 
       expect(await loadEncryptedBundleFile(ACCOUNT_ID, Network.Mainnet)).toBe(
         "payload-from-tmp",
       )
-      // The interrupted rename was finished, not just read around.
-      expect(fsState.files.get(MAINNET_PATH)).toBe("payload-from-tmp")
+      // Read in place: a rename here could steal a concurrent save's own
+      // rename out of its unlink-to-move window. Repair belongs to save/delete.
+      expect(fsState.files.has(MAINNET_PATH)).toBe(false)
+      expect(fsState.files.get(MAINNET_TMP_PATH)).toBe("payload-from-tmp")
+    })
+
+    it("a save after a stranded-tmp load still lands cleanly and sweeps the tmp", async () => {
+      fsState.files.set(MAINNET_TMP_PATH, "payload-from-tmp")
+      await loadEncryptedBundleFile(ACCOUNT_ID, Network.Mainnet)
+
+      await saveEncryptedBundleFile(ACCOUNT_ID, Network.Mainnet, "payload-new")
+
+      expect(await loadEncryptedBundleFile(ACCOUNT_ID, Network.Mainnet)).toBe(
+        "payload-new",
+      )
       expect(fsState.files.has(MAINNET_TMP_PATH)).toBe(false)
     })
 
