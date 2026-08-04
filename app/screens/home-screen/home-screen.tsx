@@ -38,12 +38,14 @@ import {
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useFeatureFlags, useRemoteConfig } from "@app/config/feature-flags-context"
 import { BackupNudgeBanner } from "@app/components/backup-nudge-banner"
+import { RecoveryBackupNudgeBanner } from "@app/components/recovery-backup-nudge-banner"
 import { SelfCustodialInfoBulletin } from "@app/components/self-custodial-info-bulletin"
 import { BackupNudgeModal } from "@app/components/backup-nudge-modal"
 import { NetworkStatusBanner } from "@app/components/network-status-banner"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
+import { useRecoveryBackupNudge } from "@app/hooks/use-recovery-backup-nudge"
 import { useDefaultAccountModalShown } from "@app/hooks/use-default-account-modal-shown"
 import {
   useDollarBalanceRestricted,
@@ -225,6 +227,14 @@ export const HomeScreen: React.FC = () => {
   const { stableBalanceEnabled } = useFeatureFlags()
   const { mode: balanceMode, toggleMode: toggleBalanceMode } = useBalanceMode()
   const { shouldShowBanner, shouldShowModal, dismissBanner } = useBackupNudgeState()
+
+  /** Any positive balance means there is something a recovery backup could
+   *  actually recover; an empty wallet has nothing to warn about. */
+  const hasAnyBalance = isSelfCustodial
+    ? activeWallet.wallets.some((w) => Number(w.balance.amount) > 0)
+    : false
+  const { variant: recoveryNudgeVariant, dismiss: dismissRecoveryNudge } =
+    useRecoveryBackupNudge(hasAnyBalance)
   const {
     shouldShow: shouldShowSelfCustodialInfoBulletin,
     dismiss: dismissSelfCustodialInfoBulletin,
@@ -833,6 +843,12 @@ export const HomeScreen: React.FC = () => {
         {isSelfCustodial && <UnclaimedDepositBanner />}
         <NetworkStatusBanner />
         {shouldShowBanner && <BackupNudgeBanner onDismiss={dismissBanner} />}
+        {recoveryNudgeVariant && (
+          <RecoveryBackupNudgeBanner
+            variant={recoveryNudgeVariant}
+            onDismiss={dismissRecoveryNudge}
+          />
+        )}
         {offboardBulletin.isVisible && <OffboardOnlyBulletin />}
         {reminderBulletin.isVisible && (
           <MigrationReminderBulletin
