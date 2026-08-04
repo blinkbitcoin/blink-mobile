@@ -58,16 +58,22 @@ export const MigrationContactSupportScreen: React.FC = () => {
    * blind goBack would land on. The resume handover is pushed from the root navigator with
    * no migration screens beneath it, so Back dismisses instead of fabricating a fresh commit
    * screen over an already-completed migration, which would re-arm the lock and re-hand the
-   * user to support with the wrong reason. A restore with no origin keeps the commit path.
+   * user to support with the wrong reason. The gate handover (a lock with nothing to
+   * resume, #4070) has nothing behind it either way: the gate underneath would only replay
+   * the handover, and the commit path would fabricate a commit screen for an account with
+   * no provisioned wallet, so support is terminal and Back goes nowhere. A restore with no
+   * origin keeps the commit path.
    */
   const isResumeOrigin = params?.origin === MigrationSupportOrigin.Resume
+  const isGateOrigin = params?.origin === MigrationSupportOrigin.Gate
   const handleBack = useCallback(() => {
+    if (isGateOrigin) return
     if (isResumeOrigin) {
       navigation.goBack()
       return
     }
     navigation.navigate("accountMigrationBalancesOverview")
-  }, [isResumeOrigin, navigation])
+  }, [isGateOrigin, isResumeOrigin, navigation])
   useHardwareBackGuard(handleBack)
 
   /** The back control lives in the navigator header, but its target is set from here so it
@@ -75,17 +81,18 @@ export const MigrationContactSupportScreen: React.FC = () => {
    *  transfer-time failure would land on the swallowing transfer screen. */
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => (
-        <HeaderBackButton
-          tintColor={colors.black}
-          pressColor={colors.grey5}
-          pressOpacity={1}
-          onPress={handleBack}
-          {...testProps("migration-contact-support-back")}
-        />
-      ),
+      headerLeft: () =>
+        isGateOrigin ? null : (
+          <HeaderBackButton
+            tintColor={colors.black}
+            pressColor={colors.grey5}
+            pressOpacity={1}
+            onPress={handleBack}
+            {...testProps("migration-contact-support-back")}
+          />
+        ),
     })
-  }, [navigation, handleBack, colors.black, colors.grey5])
+  }, [navigation, handleBack, isGateOrigin, colors.black, colors.grey5])
 
   const { supportEmailAddress } = useContactSupport()
   const { copyToClipboard } = useClipboard()

@@ -169,6 +169,35 @@ describe("MigrationContactSupportScreen", () => {
     expect(mockNavigate).not.toHaveBeenCalledWith("accountMigrationBalancesOverview")
   })
 
+  /** From the gate handover (a lock with nothing to resume, #4070) there is nothing behind
+   *  this screen: the gate underneath would only replay the handover, and the commit path
+   *  would fabricate a commit screen for an account with no provisioned wallet. Support is
+   *  terminal, so the hardware back is swallowed without navigating anywhere. */
+  it("swallows the hardware back when opened from the gate handover", async () => {
+    mockOrigin = MigrationSupportOrigin.Gate
+    const { BackHandler } =
+      jest.requireActual<typeof import("react-native")>("react-native")
+    const addListenerSpy = jest.spyOn(BackHandler, "addEventListener")
+    renderScreen()
+    await flushEffects()
+
+    const handler = addListenerSpy.mock.calls[0][1] as () => boolean
+
+    expect(handler()).toBe(true)
+    expect(mockGoBack).not.toHaveBeenCalled()
+    expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  it("hides the header back control when opened from the gate handover", async () => {
+    mockOrigin = MigrationSupportOrigin.Gate
+    renderScreen()
+    await flushEffects()
+
+    const options = mockSetOptions.mock.calls.at(-1)?.[0]
+
+    expect(options?.headerLeft?.()).toBeNull()
+  })
+
   it("renders the hero, every diagnostics row and the contact action", async () => {
     renderScreen()
     await flushEffects()
