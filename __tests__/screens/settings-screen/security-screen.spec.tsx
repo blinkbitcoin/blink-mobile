@@ -9,6 +9,8 @@ import { AccountType } from "@app/types/wallet"
 const mockActiveAccount = jest.fn()
 const mockBackupState = jest.fn()
 const mockNavigate = jest.fn()
+const mockIsAtLeastLevelOne = jest.fn()
+const mockSettingsData = jest.fn()
 
 jest.mock("@app/hooks/use-account-registry", () => ({
   useAccountRegistry: () => ({ activeAccount: mockActiveAccount() }),
@@ -21,6 +23,15 @@ jest.mock("@app/self-custodial/providers/backup-state", () => ({
 
 jest.mock("@app/graphql/generated", () => ({
   useHideBalanceQuery: () => ({ data: { hideBalance: false } }),
+  useSettingsScreenQuery: () => ({ data: mockSettingsData() }),
+}))
+
+jest.mock("@app/graphql/is-authed-context", () => ({
+  useIsAuthed: () => true,
+}))
+
+jest.mock("@app/graphql/level-context", () => ({
+  useLevel: () => ({ isAtLeastLevelOne: mockIsAtLeastLevelOne() }),
 }))
 
 jest.mock("@apollo/client", () => ({
@@ -87,6 +98,8 @@ jest.mock("@app/i18n/i18n-react", () => ({
             manualBackup: () => "Manual backup",
             appLock: () => "App lock (biometrics or PIN)",
             hideBalance: () => "Hide balance",
+            twoFactor: () => "Two-factor authentication (2FA)",
+            emailVerified: () => "Verified email",
           },
         },
       },
@@ -111,6 +124,10 @@ describe("SecurityScreen security score card", () => {
     jest.clearAllMocks()
     mockActiveAccount.mockReturnValue({ type: AccountType.SelfCustodial })
     mockBackupState.mockReturnValue({ status: "none", method: null })
+    mockIsAtLeastLevelOne.mockReturnValue(true)
+    mockSettingsData.mockReturnValue({
+      me: { totpEnabled: false, email: { address: null, verified: false } },
+    })
   })
 
   it("shows the card for a self-custodial account", () => {
@@ -119,13 +136,44 @@ describe("SecurityScreen security score card", () => {
     expect(getByTestId("security-score-card")).toBeTruthy()
   })
 
-  it("hides the card for a custodial account, leaving the screen as before", () => {
+  it("shows account signals for a custodial account instead of backup rows", () => {
     mockActiveAccount.mockReturnValue({ type: AccountType.Custodial })
 
-    const { queryByTestId, getByText } = renderScreen()
+    const { getByTestId, queryByTestId } = renderScreen()
 
-    expect(queryByTestId("security-score-card")).toBeNull()
-    expect(getByText("Biometric")).toBeTruthy()
+    expect(getByTestId("security-score-twoFactor")).toBeTruthy()
+    expect(getByTestId("security-score-emailVerified")).toBeTruthy()
+    expect(queryByTestId("security-score-cloudBackup")).toBeNull()
+  })
+
+  it("shows only device signals for a level-0 custodial account", () => {
+    mockActiveAccount.mockReturnValue({ type: AccountType.Custodial })
+    mockIsAtLeastLevelOne.mockReturnValue(false)
+
+    const { getByTestId, queryByTestId } = renderScreen()
+
+    expect(getByTestId("security-score-appLock")).toBeTruthy()
+    expect(getByTestId("security-score-hideBalance")).toBeTruthy()
+    expect(queryByTestId("security-score-twoFactor")).toBeNull()
+    expect(queryByTestId("security-score-emailVerified")).toBeNull()
+  })
+
+  it("routes the 2FA signal to TOTP registration", () => {
+    mockActiveAccount.mockReturnValue({ type: AccountType.Custodial })
+
+    const { getByTestId } = renderScreen()
+    fireEvent.press(getByTestId("security-score-twoFactor"))
+
+    expect(mockNavigate).toHaveBeenCalledWith("totpRegistrationInitiate")
+  })
+
+  it("routes the email signal to email registration", () => {
+    mockActiveAccount.mockReturnValue({ type: AccountType.Custodial })
+
+    const { getByTestId } = renderScreen()
+    fireEvent.press(getByTestId("security-score-emailVerified"))
+
+    expect(mockNavigate).toHaveBeenCalledWith("emailRegistrationInitiate")
   })
 
   it("routes the cloud-backup signal straight to the cloud backup screen", () => {

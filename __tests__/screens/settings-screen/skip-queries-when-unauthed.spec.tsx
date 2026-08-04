@@ -132,6 +132,7 @@ jest.mock("react-native-share", () => ({
 
 import { AccountBanner } from "@app/screens/settings-screen/account/banner"
 import { useLoginMethods } from "@app/screens/settings-screen/account/login-methods-hook"
+import { useCustodialSecuritySignals } from "@app/custodial/hooks/use-security-signals"
 import { DefaultWallet } from "@app/screens/settings-screen/settings/account-default-wallet"
 import { AccountLNAddress } from "@app/screens/settings-screen/settings/account-ln-address"
 import { AccountPOS } from "@app/screens/settings-screen/settings/account-pos"
@@ -248,6 +249,34 @@ describe("settings skips graphql queries when unauthenticated", () => {
       expect(mockUseSettingsScreenQuery).toHaveBeenCalledWith({
         skip: false,
         fetchPolicy: "cache-and-network",
+      })
+    })
+  })
+
+  describe("useCustodialSecuritySignals", () => {
+    const wrap = (isAuthed: boolean) => {
+      const Wrapper = ({ children }: { children: React.ReactNode }) => (
+        <IsAuthedContextProvider value={isAuthed}>{children}</IsAuthedContextProvider>
+      )
+      Wrapper.displayName = "AuthWrapper"
+      return Wrapper
+    }
+
+    it("applies skip: !isAuthed while preserving fetchPolicy: cache-first", () => {
+      renderHook(() => useCustodialSecuritySignals(), { wrapper: wrap(false) })
+
+      expect(mockUseSettingsScreenQuery).toHaveBeenCalledWith({
+        skip: true,
+        fetchPolicy: "cache-first",
+      })
+    })
+
+    it("does not skip when authed and keeps fetchPolicy: cache-first", () => {
+      renderHook(() => useCustodialSecuritySignals(), { wrapper: wrap(true) })
+
+      expect(mockUseSettingsScreenQuery).toHaveBeenCalledWith({
+        skip: false,
+        fetchPolicy: "cache-first",
       })
     })
   })

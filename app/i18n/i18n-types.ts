@@ -7108,6 +7108,14 @@ type RootTranslation = {
 				 * H​i​d​e​ ​b​a​l​a​n​c​e
 				 */
 				hideBalance: string
+				/**
+				 * T​w​o​-​f​a​c​t​o​r​ ​a​u​t​h​e​n​t​i​c​a​t​i​o​n​ ​(​2​F​A​)
+				 */
+				twoFactor: string
+				/**
+				 * V​e​r​i​f​i​e​d​ ​e​m​a​i​l
+				 */
+				emailVerified: string
 			}
 		}
 	}
@@ -20273,6 +20281,14 @@ export type TranslationFunctions = {
 				 * Hide balance
 				 */
 				hideBalance: () => LocalizedString
+				/**
+				 * Two-factor authentication (2FA)
+				 */
+				twoFactor: () => LocalizedString
+				/**
+				 * Verified email
+				 */
+				emailVerified: () => LocalizedString
 			}
 		}
 	}

@@ -11,7 +11,8 @@ import { makeStyles, ListItem } from "@rn-vui/themed"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { SecurityScoreCard } from "@app/components/security-score-card"
-import { useSecurityScore, type SecuritySignalKey } from "@app/hooks/use-security-score"
+import { useSecurityScore } from "@app/hooks/use-security-score"
+import type { SecuritySignalKey } from "@app/types/security-score"
 import { Screen } from "../../components/screen"
 import {
   saveHiddenBalanceToolTip,
@@ -119,6 +120,8 @@ export const SecurityScreen: React.FC<Props> = ({ route, navigation }) => {
     manualBackup: () => navigation.navigate("selfCustodialBackupSecurityChecks"),
     appLock: () => onBiometricsValueChanged(true),
     hideBalance: () => onHideBalanceValueChanged(true),
+    twoFactor: () => navigation.navigate("totpRegistrationInitiate"),
+    emailVerified: () => navigation.navigate("emailRegistrationInitiate"),
   }
 
   return (
