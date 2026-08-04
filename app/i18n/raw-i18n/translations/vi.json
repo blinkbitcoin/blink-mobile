@@ -3677,10 +3677,22 @@
         "testSuccess": "Cụm từ sao lưu của bạn là chính xác"
       }
     },
+    "BundleExport": {
+      "title": "Trước khi bạn bắt đầu",
+      "subtitle": "Nếu Spark hoặc Blink ngừng hoạt động, hãy dùng tệp này để rút on-chain. Tệp này nhạy cảm. Hãy giữ riêng tư.",
+      "subtitlePending": "Bản sao lưu khôi phục được tạo tự động ngay khi bạn nhận tiền, và được cập nhật liên tục sau đó. Bạn có thể tải xuống bất cứ lúc nào trong Cài đặt.",
+      "download": "Tải xuống",
+      "copy": "Sao chép",
+      "sensitiveTitle": "Nhạy cảm",
+      "sensitiveBody": "Tệp này chứa dữ liệu ví nhạy cảm và phải được giữ riêng tư. Nếu bạn mất thiết bị này, bạn sẽ không thể dùng khôi phục khẩn cấp."
+    },
     "CloudBackup": {
       "title": "Hãy sao lưu ví của bạn",
       "description": "Chúng tôi sẽ lưu bản sao cụm từ khôi phục của bạn vào {provider} của bạn.",
       "encryptCheckbox": "Mã hóa bằng mật khẩu bổ sung",
+      "autoBundleCheckbox": "Sao lưu tự động",
+      "autoBundleHint": "Cho phép rút đơn phương nếu các nhà vận hành Spark ngừng hoạt động.",
+      "autoBundleNeedsPassword": "Thêm mật khẩu ở trên để bật tính năng này. Nếu không có mật khẩu, bản sao lưu khôi phục sẽ nằm cạnh cụm từ khôi phục không được bảo vệ.",
       "password": "Mật khẩu",
       "passwordPlaceholder": "(tối thiểu 12 ký tự)",
       "confirmPassword": "Xác nhận mật khẩu",

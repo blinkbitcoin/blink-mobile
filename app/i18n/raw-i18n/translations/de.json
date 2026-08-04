@@ -3677,10 +3677,22 @@
                 "testSuccess": "Deine Wiederherstellungsphrase ist korrekt"
             }
         },
+        "BundleExport": {
+            "title": "Bevor du startest",
+            "subtitle": "Falls Spark oder Blink offline gehen, nutze diese Datei, um On-Chain auszusteigen. Diese Datei ist sensibel. Halte sie privat.",
+            "subtitlePending": "Dein Wiederherstellungs-Backup wird automatisch erstellt, sobald du Geld empfängst, und danach aktuell gehalten. Du kannst es jederzeit in den Einstellungen herunterladen.",
+            "download": "Herunterladen",
+            "copy": "Kopieren",
+            "sensitiveTitle": "Sensibel",
+            "sensitiveBody": "Diese Datei enthält sensible Wallet-Daten und muss privat bleiben. Wenn du dieses Gerät verlierst, kannst du die Notfall-Wiederherstellung nicht nutzen."
+        },
         "CloudBackup": {
             "title": "Sichern wir Ihre Brieftasche",
             "description": "Wir speichern eine Kopie Ihrer Sicherungsphrase in Ihrem {provider}.",
             "encryptCheckbox": "Mit zusätzlichem Passwort verschlüsseln",
+            "autoBundleCheckbox": "Automatische Backups",
+            "autoBundleHint": "Ermöglicht den einseitigen Ausstieg, falls Spark-Betreiber offline gehen.",
+            "autoBundleNeedsPassword": "Füge oben ein Passwort hinzu, um dies zu aktivieren. Ohne Passwort läge dein Wiederherstellungs-Backup neben einer ungeschützten Wiederherstellungsphrase.",
             "password": "Passwort",
             "passwordPlaceholder": "(mindestens 12 Zeichen)",
             "confirmPassword": "Passwort bestätigen",

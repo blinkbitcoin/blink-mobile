@@ -3677,10 +3677,22 @@
         "testSuccess": "Bakuy rimasqaykiqa allinmi"
       }
     },
+    "BundleExport": {
+      "title": "Manaraq qallarichkaptiyki",
+      "subtitle": "Spark utaq Blink mana llamkaptin, kay willañiqita on-chain lloqsinaykipaq servichikuy. Kay willañiqi sinchi allin waqaychana. Pakallapi waqaychay.",
+      "subtitlePending": "Kutichiy waqaychayniyki qullqita chaskiptiyki kikinmanta ruwakun, chaymantam musuqchasqa qipan. Ajustes nisqapi mayqin pachapipas urqumuwaqmi.",
+      "download": "Uraqichiy",
+      "copy": "Kopiyay",
+      "sensitiveTitle": "Sinchi allin waqaychana",
+      "sensitiveBody": "Kay willañiqipi qullqi wasiykipa sinchi allin willakuynin kachkan, pakallapi waqaychana. Kay antawata chinkachiptiyki, utqay kutichiyta mana atiwaqchu."
+    },
     "CloudBackup": {
       "title": "Qullqikuqniykita waqaychasun",
       "description": "Waqaychay simiykipa huknin kaqta {provider} nisqaykiman waqaychasaqku.",
       "encryptCheckbox": "Yapay contraseñawan pakay",
+      "autoBundleCheckbox": "Kikinmanta waqaychaykuna",
+      "autoBundleHint": "Spark llamkaqkuna mana llamkaptinku sapallayki lloqsiyta atinaykipaq.",
+      "autoBundleNeedsPassword": "Kayta kachaykunaykipaq hanaqpi huk yaykuna simita churay. Mana chayqa, kutichiy waqaychayniyki mana harkasqa kutichiy simikuna ladunpi kanman.",
       "password": "Contraseña",
       "passwordPlaceholder": "(pisi kaptinpas 12 sanampakuna)",
       "confirmPassword": "Contraseñata takyachiy",

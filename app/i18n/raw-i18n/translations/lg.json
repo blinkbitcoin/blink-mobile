@@ -3677,10 +3677,22 @@
         "testSuccess": "Ebigambo byo ebya bbakappu birongoofu"
       }
     },
+    "BundleExport": {
+      "title": "Nga tonnatandika",
+      "subtitle": "Singa Spark oba Blink bigaana okukola, kozesa fayiro eno okufuluma ku chain. Fayiro eno ya kyama. Gikuume mu kyama.",
+      "subtitlePending": "Bakaapu yo ey'okuzza obuggya ekolebwa yokka ng'ofunye ssente, era eyongera okutereezebwa. Osobola okugiggya buli kiseera mu Settings.",
+      "download": "Sika",
+      "copy": "Koppa",
+      "sensitiveTitle": "Kya kyama",
+      "sensitiveBody": "Fayiro eno erimu data ya wallet ey'ekyama era eteekwa okukuumibwa mu kyama. Bw'oba ofiiriddwa ekyuma kino, tojja kusobola kukozesa kuzza buggya kwa bwangu."
+    },
     "CloudBackup": {
       "title": "Ka tukoppe akawunti yo",
       "description": "Tujja kutereka kopi y'ekigambo kyo eky'okukuuma mu {provider} yo.",
       "encryptCheckbox": "Kiziyiza n'ekigambo eky'okustreyitinga ekirala",
+      "autoBundleCheckbox": "Bakaapu ez'obwannamu",
+      "autoBundleHint": "Kisobozesa okufuluma ku lwo bw'oba abakozesa ba Spark bagaanye okukola.",
+      "autoBundleNeedsPassword": "Yongerako ekigambo eky'ekyama waggulu okukisobozesa. Awatali kyo, bakaapu yo ey'okuzza obuggya yandibadde kumpi n'ebigambo by'okuzza obuggya ebitakuumiddwa.",
       "password": "Ekigambo eky'okuyingira",
       "passwordPlaceholder": "(obunene 12 ennukuta)",
       "confirmPassword": "Kakasa ekigambo eky'okuyingira",

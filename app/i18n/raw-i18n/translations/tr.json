@@ -3677,10 +3677,22 @@
         "testSuccess": "Yedekleme ifaden doğru"
       }
     },
+    "BundleExport": {
+      "title": "Başlamadan önce",
+      "subtitle": "Spark veya Blink kullanılamaz hale gelirse, zincir üzerinden çıkmak için bu dosyayı kullan. Bu dosya hassastır. Gizli tut.",
+      "subtitlePending": "Kurtarma yedeğin, para aldığın anda otomatik olarak oluşturulur ve o andan itibaren güncel tutulur. Ayarlar'dan istediğin zaman indirebilirsin.",
+      "download": "İndir",
+      "copy": "Kopyala",
+      "sensitiveTitle": "Hassas",
+      "sensitiveBody": "Bu dosya hassas cüzdan verileri içerir ve gizli tutulmalıdır. Bu cihazı kaybedersen acil kurtarmayı kullanamazsın."
+    },
     "CloudBackup": {
       "title": "Cüzdanınızı yedekleyelim",
       "description": "Yedek ifadenizin bir kopyasını {provider} hesabınıza kaydedeceğiz.",
       "encryptCheckbox": "Ek şifre ile şifrele",
+      "autoBundleCheckbox": "Otomatik yedeklemeler",
+      "autoBundleHint": "Spark operatörleri kullanılamaz hale gelirse tek taraflı çıkışı mümkün kılar.",
+      "autoBundleNeedsPassword": "Bunu etkinleştirmek için yukarıya bir parola ekle. Parola olmadan kurtarma yedeğin, korunmayan bir kurtarma ifadesinin yanında dururdu.",
       "password": "Şifre",
       "passwordPlaceholder": "(en az 12 karakter)",
       "confirmPassword": "Şifreyi onayla",

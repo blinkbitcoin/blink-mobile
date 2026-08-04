@@ -3677,10 +3677,22 @@
         "testSuccess": "La teva frase de còpia de seguretat és correcta"
       }
     },
+    "BundleExport": {
+      "title": "Abans de començar",
+      "subtitle": "Si Spark o Blink deixen d'estar disponibles, utilitza aquest fitxer per sortir a la cadena. Aquest fitxer és sensible. Mantén-lo privat.",
+      "subtitlePending": "La teva còpia de recuperació es crea automàticament quan reps fons, i es manté actualitzada a partir de llavors. Pots baixar-la en qualsevol moment des de Configuració.",
+      "download": "Baixa",
+      "copy": "Copiar",
+      "sensitiveTitle": "Sensible",
+      "sensitiveBody": "Aquest fitxer conté dades sensibles del moneder i s'ha de mantenir privat. Si perds aquest dispositiu, no podràs fer servir la recuperació d'emergència."
+    },
     "CloudBackup": {
       "title": "Fem una còpia de seguretat de la teva cartera",
       "description": "Desarem una còpia de la teva frase de seguretat al teu {provider}.",
       "encryptCheckbox": "Xifrar amb contrasenya addicional",
+      "autoBundleCheckbox": "Còpies automàtiques",
+      "autoBundleHint": "Permet la sortida unilateral si els operadors de Spark deixen d'estar disponibles.",
+      "autoBundleNeedsPassword": "Afegeix una contrasenya a dalt per activar-ho. Sense contrasenya, la còpia de recuperació quedaria al costat d'una frase de recuperació desprotegida.",
       "password": "Contrasenya",
       "passwordPlaceholder": "(mínim 12 caràcters)",
       "confirmPassword": "Confirmar contrasenya",

@@ -3677,10 +3677,22 @@
         "testSuccess": "Maneno yako ya hifadhi ni sahihi"
       }
     },
+    "BundleExport": {
+      "title": "Kabla hujaanza",
+      "subtitle": "Iwapo Spark au Blink hazitapatikana, tumia faili hili kutoka on-chain. Faili hili ni nyeti. Liweke faragha.",
+      "subtitlePending": "Nakala yako ya urejeshaji huundwa kiotomatiki mara tu unapopokea fedha, na huendelea kusasishwa. Unaweza kuipakua wakati wowote kwenye Mipangilio.",
+      "download": "Pakua",
+      "copy": "Nakili",
+      "sensitiveTitle": "Nyeti",
+      "sensitiveBody": "Faili hili lina data nyeti ya pochi na lazima liwekwe faragha. Ukipoteza kifaa hiki, hutaweza kutumia urejeshaji wa dharura."
+    },
     "CloudBackup": {
       "title": "Tuhifadhi nakala ya mkoba wako",
       "description": "Tutahifadhi nakala ya neno lako la kurejesha kwenye {provider} yako.",
       "encryptCheckbox": "Ficha kwa nywila ya ziada",
+      "autoBundleCheckbox": "Nakala rudufu za kiotomatiki",
+      "autoBundleHint": "Huwezesha kutoka kwa upande mmoja iwapo waendeshaji wa Spark hawatapatikana.",
+      "autoBundleNeedsPassword": "Ongeza nenosiri hapo juu ili kuwezesha hili. Bila nenosiri, nakala yako ya urejeshaji ingekaa kando ya fungu la maneno lisilolindwa.",
       "password": "Nywila",
       "passwordPlaceholder": "(herufi 12 ndogo zaidi)",
       "confirmPassword": "Thibitisha nywila",

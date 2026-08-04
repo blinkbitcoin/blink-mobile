@@ -3677,10 +3677,22 @@
         "testSuccess": "A biztonsági mentési kifejezésed helyes"
       }
     },
+    "BundleExport": {
+      "title": "Mielőtt elkezded",
+      "subtitle": "Ha a Spark vagy a Blink elérhetetlenné válik, ezzel a fájllal léphetsz ki on-chain. Ez a fájl érzékeny. Tartsd titokban.",
+      "subtitlePending": "A helyreállítási mentés automatikusan létrejön, amint pénzt kapsz, és onnantól naprakész marad. Bármikor letöltheted a Beállításokból.",
+      "download": "Letöltés",
+      "copy": "Másolás",
+      "sensitiveTitle": "Érzékeny",
+      "sensitiveBody": "Ez a fájl érzékeny tárcaadatokat tartalmaz, és titokban kell tartani. Ha elveszíted ezt az eszközt, nem tudod használni a vészhelyzeti helyreállítást."
+    },
     "CloudBackup": {
       "title": "Készítsünk biztonsági mentést a tárcádról",
       "description": "Elmentjük a biztonsági kifejezésed másolatát a {provider} tárhelyedre.",
       "encryptCheckbox": "Titkosítás további jelszóval",
+      "autoBundleCheckbox": "Automatikus mentések",
+      "autoBundleHint": "Lehetővé teszi az egyoldalú kilépést, ha a Spark üzemeltetői elérhetetlenné válnak.",
+      "autoBundleNeedsPassword": "A bekapcsoláshoz adj meg fent egy jelszót. Enélkül a helyreállítási mentés egy védtelen helyreállítási kifejezés mellett állna.",
       "password": "Jelszó",
       "passwordPlaceholder": "(legalább 12 karakter)",
       "confirmPassword": "Jelszó megerősítése",

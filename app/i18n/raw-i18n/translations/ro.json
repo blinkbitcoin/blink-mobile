@@ -3677,10 +3677,22 @@
         "testSuccess": "Fraza ta de rezervă este corectă"
       }
     },
+    "BundleExport": {
+      "title": "Înainte să începi",
+      "subtitle": "Dacă Spark sau Blink devin indisponibile, folosește acest fișier pentru a ieși on-chain. Acest fișier este sensibil. Păstrează-l privat.",
+      "subtitlePending": "Copia de recuperare este creată automat imediat ce primești fonduri și este menținută actualizată de atunci. O poți descărca oricând din Setări.",
+      "download": "Descarcă",
+      "copy": "Copiază",
+      "sensitiveTitle": "Sensibil",
+      "sensitiveBody": "Acest fișier conține date sensibile ale portofelului și trebuie păstrat privat. Dacă pierzi acest dispozitiv, nu vei putea folosi recuperarea de urgență."
+    },
     "CloudBackup": {
       "title": "Să facem o copie de siguranță a portofelului tău",
       "description": "Vom salva o copie a frazei de recuperare în {provider} tău.",
       "encryptCheckbox": "Criptează cu o parolă suplimentară",
+      "autoBundleCheckbox": "Copii de rezervă automate",
+      "autoBundleHint": "Permite ieșirea unilaterală dacă operatorii Spark devin indisponibili.",
+      "autoBundleNeedsPassword": "Adaugă o parolă mai sus pentru a activa. Fără parolă, copia de recuperare ar sta lângă o frază de recuperare neprotejată.",
       "password": "Parolă",
       "passwordPlaceholder": "(minim 12 caractere)",
       "confirmPassword": "Confirmă parola",

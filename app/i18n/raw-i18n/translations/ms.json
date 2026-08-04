@@ -3677,10 +3677,22 @@
         "testSuccess": "Frasa sandaran anda betul"
       }
     },
+    "BundleExport": {
+      "title": "Sebelum anda mula",
+      "subtitle": "Jika Spark atau Blink tidak tersedia, gunakan fail ini untuk keluar on-chain. Fail ini sensitif. Rahsiakannya.",
+      "subtitlePending": "Sandaran pemulihan anda dicipta secara automatik sebaik sahaja anda menerima dana, dan dikemas kini selepas itu. Anda boleh memuat turunnya bila-bila masa daripada Tetapan.",
+      "download": "Muat turun",
+      "copy": "Salin",
+      "sensitiveTitle": "Sensitif",
+      "sensitiveBody": "Fail ini mengandungi data dompet yang sensitif dan mesti dirahsiakan. Jika anda kehilangan peranti ini, anda tidak akan dapat menggunakan pemulihan kecemasan."
+    },
     "CloudBackup": {
       "title": "Mari sandarkan dompet anda",
       "description": "Kami akan menyimpan sandaran frasa pemulihan anda ke {provider} anda.",
       "encryptCheckbox": "Sulitkan dengan kata laluan tambahan",
+      "autoBundleCheckbox": "Sandaran automatik",
+      "autoBundleHint": "Membolehkan keluar secara unilateral jika pengendali Spark tidak tersedia.",
+      "autoBundleNeedsPassword": "Tambah kata laluan di atas untuk mengaktifkannya. Tanpanya, sandaran pemulihan anda akan berada bersebelahan frasa sandaran yang tidak dilindungi.",
       "password": "Kata laluan",
       "passwordPlaceholder": "(minimum 12 aksara)",
       "confirmPassword": "Sahkan kata laluan",
