@@ -28,7 +28,7 @@ export const useContactTransactions = (
   paymentIdentifier: string,
   isEnabled: boolean,
 ): ContactTransactionsResult => {
-  const { getTransactions, loading: contactsLoading } = useContacts()
+  const { getTransactions } = useContacts()
 
   const [transactions, setTransactions] = React.useState<NormalizedTransaction[]>([])
   const [cursor, setCursor] = React.useState<string | null>(null)
@@ -76,20 +76,19 @@ export const useContactTransactions = (
   }
 
   /**
-   * The adapter answers from the wallet it is connected to, so asking before it is ready
-   * would resolve empty and flash the empty state at a contact that does have payments.
-   */
-  const shouldLoad = isEnabled && !contactsLoading
-
-  /**
    * Coming back to the screen restarts from the first page rather than merging into what
    * is already listed: the cursor is an offset into the wallet history, so a payment made
    * while away shifts every later offset and pages read across that boundary would repeat
    * or skip entries.
+   *
+   * Reading does not wait on the contact list: `getTransactions` is keyed by payment
+   * identifier and never consults it, so a slow or failed list fetch has no answer to
+   * contribute here. Adapter readiness is what matters, and `getTransactions` changes
+   * identity when the wallet connects, which re-runs this effect on its own.
    */
   useFocusEffect(
     React.useCallback(() => {
-      if (!shouldLoad) return undefined
+      if (!isEnabled) return undefined
 
       generationRef.current += 1
       isLoadingMoreRef.current = false
@@ -112,10 +111,10 @@ export const useContactTransactions = (
       return () => {
         isActive = false
       }
-    }, [shouldLoad, paymentIdentifier, getTransactions]),
+    }, [isEnabled, paymentIdentifier, getTransactions]),
   )
 
-  const canLoadMore = shouldLoad && cursor !== null
+  const canLoadMore = isEnabled && cursor !== null
 
   const loadMore = React.useCallback(() => {
     if (!canLoadMore || isLoadingMoreRef.current) return
