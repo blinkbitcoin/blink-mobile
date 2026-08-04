@@ -115,6 +115,16 @@ jest.mock("@app/hooks/use-display-currency", () => ({
   }),
 }))
 
+const mockNoFragments: unknown[] = []
+jest.mock("@app/self-custodial/hooks/use-self-custodial-transaction-fragments", () => ({
+  useSelfCustodialTransactionFragments: () => mockNoFragments,
+}))
+
+const mockSelfCustodialWallet: { allTransactions: unknown[] } = { allTransactions: [] }
+jest.mock("@app/self-custodial/providers/wallet", () => ({
+  useSelfCustodialWallet: () => mockSelfCustodialWallet,
+}))
+
 let mockActiveWallet: { isSelfCustodial: boolean; wallets: unknown[] } = {
   isSelfCustodial: false,
   wallets: [],
@@ -186,6 +196,7 @@ describe("TransactionDetailScreen resolver fallback", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockActiveWallet = { isSelfCustodial: false, wallets: [] }
+    mockSelfCustodialWallet.allTransactions = []
   })
 
   it("passes txid, cache state and the payload hint to the resolver", () => {
@@ -237,10 +248,8 @@ describe("TransactionDetailScreen resolver fallback", () => {
     // hasTx keeps the resolver settled on "resolved"; with the fragment still
     // empty the screen must show the actionable failure state, not a spinner.
     mockResolveStatus = "resolved"
-    mockActiveWallet = {
-      isSelfCustodial: true,
-      wallets: [{ transactions: [{ id: "tx-1", paymentType: "spark" }] }],
-    }
+    mockActiveWallet = { isSelfCustodial: true, wallets: [] }
+    mockSelfCustodialWallet.allTransactions = [{ id: "tx-1", paymentType: "spark" }]
     mockUseFragment.mockReturnValue({ data: {} })
     const { getByText, queryByText } = render(<TransactionDetailScreen route={route} />)
 
