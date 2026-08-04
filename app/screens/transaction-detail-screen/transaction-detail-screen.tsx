@@ -400,12 +400,15 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
               pending={false}
               onChain={settlementVia?.__typename === "SettlementViaOnChain"}
             />
-            {/* Pinned to one line: this heading is short in every locale, and
-                leaving it unbounded lets Android re-break it after the first
-                word on a re-layout. The container height is already fixed by
-                the first measure pass, so the wrapped word lands outside it and
-                is clipped — "You spent" silently renders as "You". */}
-            <Text type="h2" numberOfLines={1}>
+            {/* Pinned to one line: leaving it unbounded lets Android re-break
+                it after the first word on a re-layout, and since the container
+                height is already fixed by the first measure pass the wrapped
+                word lands outside it and is clipped — "You spent" silently
+                renders as "You". Shrink rather than ellipsize when the line
+                genuinely doesn't fit, so a long locale (the longest is ms
+                "Anda dah belanjakan") stays whole under accessibility font
+                scaling instead of losing its tail. */}
+            <Text type="h2" numberOfLines={1} adjustsFontSizeToFit>
               {spendOrReceiveText}
             </Text>
             <Text type="h1">{displayAmount}</Text>

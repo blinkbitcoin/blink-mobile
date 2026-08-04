@@ -109,7 +109,17 @@ describe("TransactionDetailScreen heading", () => {
     expect(heading?.props.numberOfLines).toBe(1)
   })
 
-  it("applies the same guarantee to the receive copy", () => {
+  // One line alone would trade the dropped word for a tail ellipsis once the
+  // line genuinely doesn't fit; shrinking keeps a long locale whole.
+  it("shrinks rather than ellipsizing when the line cannot fit", () => {
+    mockUseFragment.mockReturnValue({ data: lightningSend })
+
+    const heading = headingOf(render(<TransactionDetailScreen route={route} />))
+
+    expect(heading?.props.adjustsFontSizeToFit).toBe(true)
+  })
+
+  it("applies the same guarantees to the receive copy", () => {
     mockUseFragment.mockReturnValue({
       data: { ...lightningSend, direction: "RECEIVE", settlementAmount: 23 },
     })
@@ -118,5 +128,6 @@ describe("TransactionDetailScreen heading", () => {
 
     expect(heading?.props.children).toBe("You received")
     expect(heading?.props.numberOfLines).toBe(1)
+    expect(heading?.props.adjustsFontSizeToFit).toBe(true)
   })
 })
