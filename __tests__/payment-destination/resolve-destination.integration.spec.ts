@@ -3,6 +3,7 @@ import { requestPayServiceParams } from "lnurl-pay"
 import { Network as mockSparkNetwork } from "@breeztech/breez-sdk-spark-react-native"
 
 import { Network } from "@app/graphql/generated"
+import { parseDestination } from "@app/screens/send-bitcoin-screen/payment-destination"
 import { resolveDestination } from "@app/screens/send-bitcoin-screen/payment-destination/resolve-destination"
 import { PaymentType } from "@blinkbitcoin/blink-client"
 
@@ -109,6 +110,46 @@ describe("resolveDestination (integration: real parser)", () => {
 
     expect(result.valid).toBe(true)
     expect(result.valid && result.validDestination.paymentType).toBe(PaymentType.Lnurl)
+  })
+
+  it("resolves a lightning address with surrounding whitespace", async () => {
+    const accountDefaultWalletQuery = jest.fn().mockResolvedValue({
+      data: { accountDefaultWallet: null },
+    })
+
+    const result = await resolveDestination(
+      {
+        rawInput: "  esaudeveloper@blink.sv  ",
+        myWalletIds: ["my-wallet-id"],
+        bitcoinNetwork: Network.Mainnet,
+        lnurlDomains: [lnAddressHostname],
+        accountDefaultWalletQuery: accountDefaultWalletQuery as never,
+      },
+      { sdk: null, network: mockSparkNetwork.Regtest },
+      lnAddressHostname,
+    )
+
+    expect(result.valid).toBe(true)
+    expect(result.valid && result.validDestination.paymentType).toBe(PaymentType.Lnurl)
+  })
+
+  it("trims input in parseDestination itself so direct callers (NFC) are covered", async () => {
+    const accountDefaultWalletQuery = jest.fn().mockResolvedValue({
+      data: { accountDefaultWallet: { id: "recipient-wallet-id" } },
+    })
+
+    const result = await parseDestination({
+      rawInput: "  esaudeveloper@blink.sv  ",
+      myWalletIds: ["my-wallet-id"],
+      bitcoinNetwork: Network.Mainnet,
+      lnurlDomains: [lnAddressHostname],
+      accountDefaultWalletQuery: accountDefaultWalletQuery as never,
+    })
+
+    expect(result.valid).toBe(true)
+    expect(result.valid && result.validDestination.paymentType).toBe(
+      PaymentType.Intraledger,
+    )
   })
 
   it("resolves a matching-network Spark address to a valid Spark destination", async () => {

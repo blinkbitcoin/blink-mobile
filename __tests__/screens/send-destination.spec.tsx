@@ -725,6 +725,79 @@ describe("SendBitcoinDestinationScreen", () => {
     await flushEffects()
   })
 
+  it("trims pasted clipboard content before validating", async () => {
+    jest.mocked(Clipboard.getString).mockResolvedValueOnce("  clipboard  ")
+    parseDestinationMock.mockResolvedValue({
+      valid: true,
+      destinationDirection: DestinationDirection.Send,
+      validDestination: {
+        valid: true,
+        paymentType: PaymentType.Intraledger,
+        handle: "clipboard",
+        walletId: "wallet-id",
+      },
+      createPaymentDetail: jest.fn(),
+    })
+
+    render(
+      <ContextForScreen>
+        <SendBitcoinDestinationScreen route={sendBitcoinDestination} />
+      </ContextForScreen>,
+    )
+
+    const searchResponder = getResponderByLabel(LL.SendBitcoinScreen.placeholder())
+    const pasteButton = within(searchResponder).getByText(LL.common.paste())
+    fireEvent.press(pasteButton)
+
+    await flushAsync()
+    await flushAsync()
+
+    expect(parseDestinationMock).toHaveBeenCalledWith(
+      expect.objectContaining({ rawInput: "clipboard" }),
+    )
+    // the input box shows the cleaned value, not the raw clipboard content
+    expect(screen.getByLabelText(LL.SendBitcoinScreen.placeholder()).props.value).toBe(
+      "clipboard",
+    )
+
+    await flushEffects()
+  })
+
+  it("trims a typed destination with surrounding whitespace when pressing next", async () => {
+    parseDestinationMock.mockResolvedValue({
+      valid: true,
+      destinationDirection: DestinationDirection.Send,
+      validDestination: {
+        valid: true,
+        paymentType: PaymentType.Intraledger,
+        handle: "clipboard",
+        walletId: "wallet-id",
+      },
+      createPaymentDetail: jest.fn(),
+    })
+
+    render(
+      <ContextForScreen>
+        <SendBitcoinDestinationScreen route={sendBitcoinDestination} />
+      </ContextForScreen>,
+    )
+
+    fireEvent.changeText(
+      screen.getByLabelText(LL.SendBitcoinScreen.placeholder()),
+      "  clipboard  ",
+    )
+    fireEvent.press(screen.getByLabelText(LL.common.next()))
+
+    await flushAsync()
+    await flushAsync()
+
+    expect(parseDestinationMock).toHaveBeenCalledWith(
+      expect.objectContaining({ rawInput: "clipboard" }),
+    )
+
+    await flushEffects()
+  })
+
   it("navigates merchant choices to the merchant selection screen", async () => {
     const merchants = [
       {
