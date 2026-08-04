@@ -5,7 +5,7 @@ import { AccountType } from "@app/types/wallet"
 
 const mockActiveAccount = jest.fn()
 const mockBackupState = jest.fn()
-const mockHideBalance = jest.fn()
+const mockHideBalanceQuery = jest.fn()
 
 jest.mock("@app/hooks/use-account-registry", () => ({
   useAccountRegistry: () => ({ activeAccount: mockActiveAccount() }),
@@ -17,7 +17,7 @@ jest.mock("@app/self-custodial/providers/backup-state", () => ({
 }))
 
 jest.mock("@app/graphql/generated", () => ({
-  useHideBalanceQuery: () => ({ data: { hideBalance: mockHideBalance() } }),
+  useHideBalanceQuery: () => mockHideBalanceQuery(),
 }))
 
 const NO_LOCK = { isBiometricsEnabled: false, isPinEnabled: false }
@@ -86,7 +86,7 @@ describe("useSecurityScore", () => {
     jest.clearAllMocks()
     mockActiveAccount.mockReturnValue({ type: AccountType.SelfCustodial })
     mockBackupState.mockReturnValue({ status: "none", method: null })
-    mockHideBalance.mockReturnValue(false)
+    mockHideBalanceQuery.mockReturnValue({ data: { hideBalance: false } })
   })
 
   it("returns null for a custodial account", () => {
@@ -127,10 +127,18 @@ describe("useSecurityScore", () => {
   })
 
   it("reads hide balance from the client-only query", () => {
-    mockHideBalance.mockReturnValue(true)
+    mockHideBalanceQuery.mockReturnValue({ data: { hideBalance: true } })
 
     const { result } = renderHook(() => useSecurityScore(NO_LOCK))
 
     expect(result.current?.signals.find((s) => s.key === "hideBalance")?.done).toBe(true)
+  })
+
+  it("treats a not-yet-loaded hide-balance query as not hidden", () => {
+    mockHideBalanceQuery.mockReturnValue({})
+
+    const { result } = renderHook(() => useSecurityScore(NO_LOCK))
+
+    expect(result.current?.signals.find((s) => s.key === "hideBalance")?.done).toBe(false)
   })
 })

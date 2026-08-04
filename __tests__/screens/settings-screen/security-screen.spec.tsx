@@ -1,5 +1,5 @@
 import React from "react"
-import { fireEvent, render } from "@testing-library/react-native"
+import { fireEvent, render, waitFor } from "@testing-library/react-native"
 import { ThemeProvider } from "@rn-vui/themed"
 
 import { SecurityScreen } from "@app/screens/settings-screen/security-screen"
@@ -65,6 +65,9 @@ jest.mock("@app/components/screen", () => ({
 jest.mock("@app/i18n/i18n-react", () => ({
   useI18nContext: () => ({
     LL: {
+      AuthenticationScreen: {
+        setUpAuthenticationDescription: () => "Set up authentication",
+      },
       SecurityScreen: {
         biometricTitle: () => "Biometric",
         biometricDescription: () => "Unlock with fingerprint or facial recognition.",
@@ -139,6 +142,31 @@ describe("SecurityScreen security score card", () => {
     fireEvent.press(getByTestId("security-score-manualBackup"))
 
     expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSecurityChecks")
+  })
+
+  it("routes the app-lock signal into the existing biometric enrollment flow", async () => {
+    const BiometricWrapper = jest.requireMock(
+      "@app/utils/biometricAuthentication",
+    ).default
+    BiometricWrapper.isSensorAvailable.mockResolvedValue(true)
+
+    const { getByTestId } = renderScreen()
+
+    fireEvent.press(getByTestId("security-score-appLock"))
+
+    await waitFor(() => expect(BiometricWrapper.authenticate).toHaveBeenCalled())
+    expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  it("turns hide balance on in place from its Set row", () => {
+    const { saveHideBalance } = jest.requireMock("@app/graphql/client-only-query")
+
+    const { getByTestId } = renderScreen()
+
+    fireEvent.press(getByTestId("security-score-hideBalance"))
+
+    expect(saveHideBalance).toHaveBeenCalledWith(expect.anything(), true)
+    expect(mockNavigate).not.toHaveBeenCalled()
   })
 
   it("keeps a completed backup signal tappable so the flow can be re-run (#3828)", () => {

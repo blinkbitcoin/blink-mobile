@@ -94,6 +94,27 @@ describe("SecurityScoreCard", () => {
     expect(mockOnSignalPress).not.toHaveBeenCalled()
   })
 
+  it("switches the header to the high state at full score", () => {
+    const score = scoreWith({
+      signals: [
+        { key: "cloudBackup", done: true, retriggerable: true },
+        { key: "manualBackup", done: true, retriggerable: true },
+        { key: "appLock", done: true, retriggerable: false },
+        { key: "hideBalance", done: true, retriggerable: false },
+      ],
+      done: 4,
+      level: "high",
+    })
+
+    const { getByText, queryByText } = renderWithTheme(
+      <SecurityScoreCard score={score} onSignalPress={mockOnSignalPress} />,
+    )
+
+    expect(getByText(/Security score 4\/4/)).toBeTruthy()
+    expect(getByText(/high/)).toBeTruthy()
+    expect(queryByText("Set")).toBeNull()
+  })
+
   it("keeps a done backup signal pressable — backups must stay re-triggerable (#3828)", () => {
     const score = scoreWith({
       signals: [
