@@ -10,6 +10,8 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, ListItem } from "@rn-vui/themed"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
+import { SecurityScoreCard } from "@app/components/security-score-card"
+import { useSecurityScore, type SecuritySignalKey } from "@app/hooks/use-security-score"
 import { Screen } from "../../components/screen"
 import {
   saveHiddenBalanceToolTip,
@@ -113,8 +115,32 @@ export const SecurityScreen: React.FC<Props> = ({ route, navigation }) => {
     }
   }
 
+  const securityScore = useSecurityScore({ isBiometricsEnabled, isPinEnabled })
+
+  // The card stays dumb; the screen owns what each "Set" does. Backup rows
+  // remain tappable after completion so the flow is always re-runnable (#3828).
+  const onSignalPress = (key: SecuritySignalKey) => {
+    switch (key) {
+      case "cloudBackup":
+        navigation.navigate("selfCustodialCloudBackup")
+        break
+      case "manualBackup":
+        navigation.navigate("selfCustodialBackupSecurityChecks")
+        break
+      case "appLock":
+        onBiometricsValueChanged(true)
+        break
+      case "hideBalance":
+        onHideBalanceValueChanged(true)
+        break
+    }
+  }
+
   return (
     <Screen style={styles.container} preset="scroll">
+      {securityScore && (
+        <SecurityScoreCard score={securityScore} onSignalPress={onSignalPress} />
+      )}
       <View style={styles.settingContainer}>
         <ListItem containerStyle={styles.listItemContainer}>
           <GaloyIcon name="fingerprint" size={24} />

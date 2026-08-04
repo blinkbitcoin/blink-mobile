@@ -7069,6 +7069,52 @@ type RootTranslation = {
 		 * S​e​t​ ​P​I​N
 		 */
 		setPin: string
+		securityScore: {
+			/**
+			 * S​e​c​u​r​i​t​y​ ​s​c​o​r​e​ ​{​d​o​n​e​}​/​{​t​o​t​a​l​}
+			 * @param {number} done
+			 * @param {number} total
+			 */
+			title: RequiredParams<'done' | 'total'>
+			/**
+			 * l​o​w
+			 */
+			levelLow: string
+			/**
+			 * m​e​d​i​u​m
+			 */
+			levelMedium: string
+			/**
+			 * h​i​g​h
+			 */
+			levelHigh: string
+			/**
+			 * S​e​t
+			 */
+			set: string
+			/**
+			 * E​n​a​b​l​e​d
+			 */
+			enabled: string
+			signals: {
+				/**
+				 * C​l​o​u​d​ ​b​a​c​k​u​p
+				 */
+				cloudBackup: string
+				/**
+				 * M​a​n​u​a​l​ ​b​a​c​k​u​p
+				 */
+				manualBackup: string
+				/**
+				 * A​p​p​ ​l​o​c​k​ ​(​b​i​o​m​e​t​r​i​c​s​ ​o​r​ ​P​I​N​)
+				 */
+				appLock: string
+				/**
+				 * H​i​d​e​ ​b​a​l​a​n​c​e
+				 */
+				hideBalance: string
+			}
+		}
 	}
 	SendBitcoinConfirmationScreen: {
 		/**
@@ -20296,6 +20342,50 @@ export type TranslationFunctions = {
 		 * Set PIN
 		 */
 		setPin: () => LocalizedString
+		securityScore: {
+			/**
+			 * Security score {done}/{total}
+			 */
+			title: (arg: { done: number, total: number }) => LocalizedString
+			/**
+			 * low
+			 */
+			levelLow: () => LocalizedString
+			/**
+			 * medium
+			 */
+			levelMedium: () => LocalizedString
+			/**
+			 * high
+			 */
+			levelHigh: () => LocalizedString
+			/**
+			 * Set
+			 */
+			set: () => LocalizedString
+			/**
+			 * Enabled
+			 */
+			enabled: () => LocalizedString
+			signals: {
+				/**
+				 * Cloud backup
+				 */
+				cloudBackup: () => LocalizedString
+				/**
+				 * Manual backup
+				 */
+				manualBackup: () => LocalizedString
+				/**
+				 * App lock (biometrics or PIN)
+				 */
+				appLock: () => LocalizedString
+				/**
+				 * Hide balance
+				 */
+				hideBalance: () => LocalizedString
+			}
+		}
 	}
 	SendBitcoinConfirmationScreen: {
 		/**
