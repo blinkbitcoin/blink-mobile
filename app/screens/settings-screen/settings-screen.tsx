@@ -185,9 +185,9 @@ export const SettingsScreen: React.FC = () => {
           name={LL.common.securityAndPrivacy()}
           items={items.securityAndPrivacy}
         />
-        {!isSelfCustodialMode && (
-          <SettingsGroup name={LL.common.advanced()} items={items.advanced} />
-        )}
+        {/* Rows gate themselves by account mode (CSV export branches, API access is
+            custodial-only) and SettingsGroup collapses when every row returns null. */}
+        <SettingsGroup name={LL.common.advanced()} items={items.advanced} />
         <SettingsGroup name={LL.common.support()} items={items.community} />
         <VersionComponent />
       </ScrollView>
