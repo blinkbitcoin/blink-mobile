@@ -99,6 +99,9 @@ describe("BundleExportScreen", () => {
       fireEvent.press(screen.getByTestId("bundle-download-button"))
 
       expect(screen.getByText(LL.BackupScreen.BundleExport.sensitiveTitle())).toBeTruthy()
+      // Assert the body too: React Native drops a bare string inside a View,
+      // so passing one to CustomModal renders a warning with no warning in it.
+      expect(screen.getByText(LL.BackupScreen.BundleExport.sensitiveBody())).toBeTruthy()
       expect(mockActions.handleShare).not.toHaveBeenCalled()
 
       // Two "Download" labels once the modal is open: the modal renders inside
