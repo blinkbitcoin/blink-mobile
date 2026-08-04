@@ -44,9 +44,11 @@ jest.mock("@app/screens/self-custodial/onboarding/hooks", () => ({
   useCompleteBackup: () => mockCompleteBackup,
 }))
 
+const mockNavigate = jest.fn()
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
   useRoute: () => ({ params: { successMessage: "done" } }),
+  useNavigation: () => ({ navigate: mockNavigate }),
 }))
 
 const renderScreen = () =>
@@ -86,11 +88,16 @@ describe("BundleExportScreen", () => {
       expect(screen.queryByText(/cloud/i)).toBeNull()
     })
 
-    it("blocks continuing until the backup has actually been exported", () => {
+    it("lets the user skip the export", () => {
       renderScreen()
 
-      fireEvent.press(screen.getByTestId("bundle-continue-button"))
-      expect(mockCompleteBackup).not.toHaveBeenCalled()
+      // Skipping does not leave them unprotected: the encrypted on-device copy
+      // is written automatically, and the home nudge brings them back.
+      fireEvent.press(screen.getByTestId("bundle-skip-button"))
+      expect(mockCompleteBackup).toHaveBeenCalledWith({
+        method: BackupMethod.Manual,
+        message: "done",
+      })
     })
 
     it("warns before the first download and exports only on confirmation", async () => {
@@ -104,12 +111,9 @@ describe("BundleExportScreen", () => {
       expect(screen.getByText(LL.BackupScreen.BundleExport.sensitiveBody())).toBeTruthy()
       expect(mockActions.handleShare).not.toHaveBeenCalled()
 
-      // Two "Download" labels once the modal is open: the modal renders inside
-      // the layout's content, the screen's own button in the footer after it.
-      const downloads = screen.getAllByText(LL.BackupScreen.BundleExport.download())
-      expect(downloads).toHaveLength(2)
-
-      fireEvent.press(downloads[0])
+      // The modal's confirm is labelled differently from the screen's button,
+      // so it can be targeted directly.
+      fireEvent.press(screen.getByText(LL.BackupScreen.BundleExport.sensitiveConfirm()))
       await waitFor(() => expect(mockActions.handleShare).toHaveBeenCalledTimes(1))
     })
 
@@ -117,8 +121,7 @@ describe("BundleExportScreen", () => {
       renderScreen()
 
       fireEvent.press(screen.getByTestId("bundle-download-button"))
-      const downloads = screen.getAllByText(LL.BackupScreen.BundleExport.download())
-      fireEvent.press(downloads[0])
+      fireEvent.press(screen.getByText(LL.BackupScreen.BundleExport.sensitiveConfirm()))
       await waitFor(() => expect(mockActions.handleShare).toHaveBeenCalledTimes(1))
 
       // The warning has been read; a second press exports directly, with no
@@ -127,17 +130,61 @@ describe("BundleExportScreen", () => {
       await waitFor(() => expect(mockActions.handleShare).toHaveBeenCalledTimes(2))
     })
 
-    it("completes the backup once an export has happened", async () => {
+    it("confirms the download on its own screen rather than finishing here", async () => {
+      renderScreen()
+
+      fireEvent.press(screen.getByTestId("bundle-download-button"))
+      fireEvent.press(screen.getByText(LL.BackupScreen.BundleExport.sensitiveConfirm()))
+      await waitFor(() => expect(mockActions.handleShare).toHaveBeenCalled())
+
+      expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBundleSaved", {
+        successMessage: "done",
+      })
+      expect(mockCompleteBackup).not.toHaveBeenCalled()
+    })
+
+    it("copies without leaving the screen", async () => {
       renderScreen()
 
       fireEvent.press(screen.getByTestId("bundle-copy-button"))
       await waitFor(() => expect(mockActions.handleCopy).toHaveBeenCalled())
 
-      fireEvent.press(screen.getByTestId("bundle-continue-button"))
-      expect(mockCompleteBackup).toHaveBeenCalledWith({
-        method: BackupMethod.Manual,
-        message: "done",
-      })
+      // Copy is a one-shot export (R10), not a step in the flow.
+      expect(mockNavigate).not.toHaveBeenCalled()
+      expect(mockCompleteBackup).not.toHaveBeenCalled()
+    })
+
+    it("explains unilateral exit on request", () => {
+      renderScreen()
+
+      expect(screen.queryByText(LL.BackupScreen.BundleExport.learnMoreBody())).toBeNull()
+      fireEvent.press(screen.getByTestId("bundle-learn-more"))
+      expect(screen.getByText(LL.BackupScreen.BundleExport.learnMoreBody())).toBeTruthy()
+    })
+
+    it("closes the explainer again without exporting or advancing", () => {
+      renderScreen()
+
+      fireEvent.press(screen.getByTestId("bundle-learn-more"))
+      fireEvent.press(screen.getByText(LL.common.ok()))
+      expect(mockActions.handleShare).not.toHaveBeenCalled()
+      expect(mockNavigate).not.toHaveBeenCalled()
+
+      fireEvent.press(screen.getByTestId("bundle-learn-more"))
+      fireEvent.press(screen.getByTestId("modal-close"))
+      expect(mockActions.handleShare).not.toHaveBeenCalled()
+    })
+
+    it("can back out of the download warning without exporting", () => {
+      renderScreen()
+
+      fireEvent.press(screen.getByTestId("bundle-download-button"))
+      expect(screen.getByText(LL.BackupScreen.BundleExport.sensitiveTitle())).toBeTruthy()
+
+      // Closing the warning must neither download nor advance the flow.
+      fireEvent.press(screen.getByTestId("modal-close"))
+      expect(mockActions.handleShare).not.toHaveBeenCalled()
+      expect(mockNavigate).not.toHaveBeenCalled()
     })
   })
 
@@ -167,6 +214,12 @@ describe("BundleExportScreen", () => {
         message: "done",
       })
     })
+  })
+
+  it("does not offer a learn-more link with no bundle to explain", () => {
+    mockActions.bundleState = null
+    renderScreen()
+    expect(screen.queryByTestId("bundle-learn-more")).toBeNull()
   })
 
   it("does not let the user past the loading state", () => {
