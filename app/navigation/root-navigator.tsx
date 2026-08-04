@@ -143,6 +143,7 @@ import {
   ViewBackupPhraseScreen,
   BackupPhraseConfirmScreen,
   BundleExportScreen,
+  BundleSavedScreen,
   BackupSuccessScreen,
   ChooseExperienceScreen,
   WalletCreationScreen,
@@ -917,6 +918,11 @@ export const RootStack = () => {
         options={{
           title: LL.BackupScreen.BundleExport.title(),
         }}
+      />
+      <RootNavigator.Screen
+        name="selfCustodialBundleSaved"
+        component={BundleSavedScreen}
+        options={{ headerShown: false, gestureEnabled: false }}
       />
       <RootNavigator.Screen
         name="selfCustodialBackupSuccess"

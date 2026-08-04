@@ -3766,13 +3766,19 @@
             }
         },
         "BundleExport": {
-            "title": "Avant de commencer",
-            "subtitle": "Si Spark ou Blink devient indisponible, utilisez ce fichier pour sortir on-chain. Ce fichier est sensible. Gardez-le privé.",
-            "subtitlePending": "Votre sauvegarde de récupération est créée automatiquement dès que vous recevez des fonds, puis maintenue à jour. Vous pouvez la télécharger à tout moment depuis les Paramètres.",
-            "download": "Télécharger",
+            "title": "Une dernière chose",
+            "subtitle": "Si Spark devient indisponible, utilisez ce paquet pour sortir on-chain. Ce paquet est sensible. Gardez-le privé.",
+            "subtitlePending": "Votre paquet d'urgence est créé automatiquement dès que vous recevez des fonds, puis maintenu à jour. Vous pouvez le télécharger à tout moment depuis les Paramètres.",
+            "download": "Télécharger le paquet",
             "copy": "Copier",
             "sensitiveTitle": "Sensible",
-            "sensitiveBody": "Ce fichier contient des données sensibles du portefeuille et doit rester privé. Si vous perdez cet appareil, vous ne pourrez pas utiliser la récupération d'urgence."
+            "skip": "Passer",
+            "learnMore": "En savoir plus sur la sortie unilatérale",
+            "learnMoreTitle": "Sortie unilatérale",
+            "learnMoreBody": "Spark garde vos bitcoins hors chaîne pour que les paiements soient instantanés et bon marché. Si ses opérateurs devenaient indisponibles, ce paquet et votre phrase de récupération vous permettent de déplacer vos fonds on-chain vous-même, sans Blink. Cela prend plusieurs semaines et coûte des frais on-chain : c'est un filet de sécurité, pas une voie quotidienne.",
+            "sensitiveConfirm": "Télécharger",
+            "savedTitle": "Paquet d'urgence enregistré",
+            "sensitiveBody": "Ce fichier contient des données sensibles du portefeuille et doit rester privé. Si vous perdez cet appareil, vous ne pourrez pas utiliser la récupération par paquet d'urgence."
         },
         "CloudBackup": {
             "title": "Sauvegardons votre portefeuille",

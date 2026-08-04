@@ -3766,13 +3766,19 @@
       }
     },
     "BundleExport": {
-      "title": "Skôr než začneš",
-      "subtitle": "Ak Spark alebo Blink prestanú byť dostupné, použi tento súbor na odchod on-chain. Tento súbor je citlivý. Uchovaj ho v súkromí.",
-      "subtitlePending": "Tvoja záloha na obnovu sa vytvorí automaticky hneď, ako prijmeš prostriedky, a odvtedy sa udržiava aktuálna. Kedykoľvek si ju môžeš stiahnuť v Nastaveniach.",
-      "download": "Stiahnuť",
+      "title": "Ešte jedna vec",
+      "subtitle": "Ak Spark prestane byť dostupný, použi tento balík na odchod on-chain. Tento balík je citlivý. Uchovaj ho v súkromí.",
+      "subtitlePending": "Tvoj núdzový balík sa vytvorí automaticky hneď, ako prijmeš prostriedky, a ďalej sa udržiava aktuálny. Kedykoľvek si ho môžeš stiahnuť v Nastaveniach.",
+      "download": "Stiahnuť balík",
       "copy": "Kopírovať",
       "sensitiveTitle": "Citlivé",
-      "sensitiveBody": "Tento súbor obsahuje citlivé údaje peňaženky a musí zostať súkromný. Ak toto zariadenie stratíš, núdzovú obnovu nebude možné použiť."
+      "skip": "Preskočiť",
+      "learnMore": "Viac o jednostrannom odchode",
+      "learnMoreTitle": "Jednostranný odchod",
+      "learnMoreBody": "Spark drží tvoje bitcoiny mimo reťazca, aby boli platby okamžité a lacné. Ak by jeho operátori prestali byť dostupní, tento balík spolu s tvojou obnovovacou frázou ti umožní presunúť prostriedky on-chain sám, bez Blinku. Trvá to týždne a stojí on-chain poplatky, takže ide o záchrannú sieť, nie o každodennú cestu.",
+      "sensitiveConfirm": "Stiahnuť",
+      "savedTitle": "Núdzový balík uložený",
+      "sensitiveBody": "Tento súbor obsahuje citlivé údaje peňaženky a musí zostať súkromný. Ak toto zariadenie stratíš, obnovu z núdzového balíka nebude možné použiť."
     },
     "CloudBackup": {
       "title": "Zálohujme vašu peňaženku",

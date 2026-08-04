@@ -3776,13 +3776,19 @@
             "networkError": "Network error. Please check your connection and try again."
         },
         "BundleExport": {
-            "title": "Before you start",
-            "subtitle": "In case of Spark or Blink going offline, use this file to exit onchain. This file is sensitive. Keep it private.",
-            "subtitlePending": "Your recovery backup is created automatically once you receive funds, and kept up to date from then on. You can download it any time from Settings.",
-            "download": "Download",
+            "title": "One last thing",
+            "subtitle": "In case of Spark going offline, use this bundle to exit onchain. This bundle is sensitive. Keep it private.",
+            "subtitlePending": "Your emergency bundle is created automatically once you receive funds, and kept up to date from then on. You can download it any time from Settings.",
+            "learnMore": "Learn more about unilateral exit",
+            "learnMoreTitle": "Unilateral exit",
+            "learnMoreBody": "Spark keeps your bitcoin off-chain so payments are instant and cheap. If its operators ever became unavailable, this bundle plus your backup phrase lets you move your funds onchain yourself, without Blink. It is a multi-week process and costs onchain fees, so it is a safety net rather than an everyday route.",
+            "download": "Download bundle",
             "copy": "Copy",
+            "skip": "Skip",
             "sensitiveTitle": "Sensitive",
-            "sensitiveBody": "This file is sensitive wallet data and must be kept private. If you lose this device, you will not be able to use emergency recovery."
+            "sensitiveBody": "This file is sensitive wallet data and must be kept private. If you lose this device, you will not be able to use emergency bundle recovery.",
+            "sensitiveConfirm": "Download",
+            "savedTitle": "Emergency bundle saved"
         },
         "ManualBackup": {
             "Alerts": {

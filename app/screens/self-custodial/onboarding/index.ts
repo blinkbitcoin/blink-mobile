@@ -6,6 +6,7 @@ export { ViewBackupSecurityChecksScreen } from "./manual-backup/view-backup-secu
 export { ViewBackupPhraseScreen } from "./manual-backup/view-backup-phrase-screen"
 export { BackupPhraseConfirmScreen } from "./manual-backup/backup-phrase-confirm-screen"
 export { BundleExportScreen } from "./manual-backup/bundle-export-screen"
+export { BundleSavedScreen } from "./manual-backup/bundle-saved-screen"
 export { BackupSuccessScreen } from "./backup-success-screen"
 export { ChooseExperienceScreen } from "./choose-experience-screen"
 export { WalletCreationScreen } from "./wallet-creation-screen"

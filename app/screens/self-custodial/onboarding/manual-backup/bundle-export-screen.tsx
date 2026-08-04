@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react"
 
-import { RouteProp, useRoute } from "@react-navigation/native"
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
@@ -37,6 +38,11 @@ type BundleExportRouteProp = RouteProp<
  * No cloud button here, deliberately (R7): a single cloud shortcut inside the
  * manual flow is what produces "I did the backup, it's in Google Drive" support
  * calls years later where only the bundle was ever saved.
+ *
+ * Skipping is allowed. It does not leave the user unprotected: the encrypted
+ * on-device copy is written automatically for every self-custodial account
+ * regardless, and the home-screen nudge brings them back once a bundle exists.
+ * What is mandatory is that a backup exists, not that the user exports it here.
  */
 export const BundleExportScreen: React.FC = () => {
   const { LL } = useI18nContext()
@@ -45,12 +51,19 @@ export const BundleExportScreen: React.FC = () => {
     theme: { colors },
   } = useTheme()
   const { successMessage } = useRoute<BundleExportRouteProp>().params ?? {}
+  const navigation =
+    useNavigation<
+      NativeStackNavigationProp<RootStackParamList, "selfCustodialBackupBundleExport">
+    >()
 
   const { bundleState, sharing, copying, reloadState, handleShare, handleCopy } =
     useRecoveryBundleActions()
 
   const [confirmingDownload, setConfirmingDownload] = useState(false)
-  const [hasExported, setHasExported] = useState(false)
+  const [showLearnMore, setShowLearnMore] = useState(false)
+  /** Only controls whether the warning is repeated, not whether the user may
+   *  move on. */
+  const [hasDownloaded, setHasDownloaded] = useState(false)
 
   useEffect(() => {
     reloadState().catch(() => {})
@@ -63,26 +76,29 @@ export const BundleExportScreen: React.FC = () => {
     completeBackup({ method: BackupMethod.Manual, message: successMessage })
   }, [completeBackup, successMessage])
 
+  /** A completed download gets its own confirmation screen, which then finishes
+   *  the backup; every other route finishes here directly. */
+  const onDownloaded = useCallback(() => {
+    navigation.navigate("selfCustodialBundleSaved", { successMessage })
+  }, [navigation, successMessage])
+
   /** The warning is shown once, before the first export; a user who has already
    *  read it and comes back for the clipboard copy does not need it again. */
-  const onDownloadPress = useCallback(() => {
-    if (hasExported) {
-      handleShare()
+  const onDownloadPress = useCallback(async () => {
+    if (hasDownloaded) {
+      await handleShare()
+      onDownloaded()
       return
     }
     setConfirmingDownload(true)
-  }, [hasExported, handleShare])
+  }, [hasDownloaded, handleShare, onDownloaded])
 
   const onConfirmDownload = useCallback(async () => {
     setConfirmingDownload(false)
     await handleShare()
-    setHasExported(true)
-  }, [handleShare])
-
-  const onCopyPress = useCallback(async () => {
-    await handleCopy()
-    setHasExported(true)
-  }, [handleCopy])
+    setHasDownloaded(true)
+    onDownloaded()
+  }, [handleShare, onDownloaded])
 
   const isLoading = bundleState === undefined
   const hasBundle = Boolean(bundleState)
@@ -101,16 +117,15 @@ export const BundleExportScreen: React.FC = () => {
             />
             <GaloySecondaryButton
               title={LL.BackupScreen.BundleExport.copy()}
-              onPress={onCopyPress}
+              onPress={handleCopy}
               loading={copying}
               disabled={sharing}
               {...testProps("bundle-copy-button")}
             />
             <GaloySecondaryButton
-              title={LL.common.next()}
+              title={LL.BackupScreen.BundleExport.skip()}
               onPress={finish}
-              disabled={!hasExported}
-              {...testProps("bundle-continue-button")}
+              {...testProps("bundle-skip-button")}
             />
           </>
         ) : (
@@ -124,7 +139,7 @@ export const BundleExportScreen: React.FC = () => {
       }
     >
       <IconHero
-        icon={hasBundle ? "eye-slash" : "shield"}
+        icon="emergency-kit"
         iconColor={colors._green}
         title={LL.BackupScreen.BundleExport.title()}
         subtitle={
@@ -133,6 +148,16 @@ export const BundleExportScreen: React.FC = () => {
             : LL.BackupScreen.BundleExport.subtitlePending()
         }
       />
+
+      {hasBundle && (
+        <Text
+          style={styles.learnMore}
+          onPress={() => setShowLearnMore(true)}
+          {...testProps("bundle-learn-more")}
+        >
+          {LL.BackupScreen.BundleExport.learnMore()}
+        </Text>
+      )}
 
       <CustomModal
         isVisible={confirmingDownload}
@@ -145,15 +170,36 @@ export const BundleExportScreen: React.FC = () => {
             {LL.BackupScreen.BundleExport.sensitiveBody()}
           </Text>
         }
-        primaryButtonTitle={LL.BackupScreen.BundleExport.download()}
+        primaryButtonTitle={LL.BackupScreen.BundleExport.sensitiveConfirm()}
         primaryButtonOnPress={onConfirmDownload}
         primaryButtonLoading={sharing}
+      />
+
+      <CustomModal
+        isVisible={showLearnMore}
+        toggleModal={() => setShowLearnMore(false)}
+        showCloseIconButton={true}
+        title={LL.BackupScreen.BundleExport.learnMoreTitle()}
+        body={
+          <Text style={styles.modalBody}>
+            {LL.BackupScreen.BundleExport.learnMoreBody()}
+          </Text>
+        }
+        primaryButtonTitle={LL.common.ok()}
+        primaryButtonOnPress={() => setShowLearnMore(false)}
       />
     </OnboardingScreenLayout>
   )
 }
 
 const useStyles = makeStyles(({ colors }) => ({
+  learnMore: {
+    marginTop: 24,
+    textAlign: "center",
+    textDecorationLine: "underline",
+    fontSize: 16,
+    lineHeight: 24,
+  },
   modalBody: {
     fontSize: 16,
     lineHeight: 24,

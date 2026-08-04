@@ -3766,13 +3766,19 @@
       }
     },
     "BundleExport": {
-      "title": "Sebelum anda mula",
-      "subtitle": "Jika Spark atau Blink tidak tersedia, gunakan fail ini untuk keluar on-chain. Fail ini sensitif. Rahsiakannya.",
-      "subtitlePending": "Sandaran pemulihan anda dicipta secara automatik sebaik sahaja anda menerima dana, dan dikemas kini selepas itu. Anda boleh memuat turunnya bila-bila masa daripada Tetapan.",
-      "download": "Muat turun",
+      "title": "Satu perkara terakhir",
+      "subtitle": "Jika Spark tidak tersedia, gunakan bundel ini untuk keluar on-chain. Bundel ini sensitif. Rahsiakannya.",
+      "subtitlePending": "Bundel kecemasan anda dicipta secara automatik sebaik sahaja anda menerima dana, dan dikemas kini selepas itu. Anda boleh memuat turunnya bila-bila masa daripada Tetapan.",
+      "download": "Muat turun bundel",
       "copy": "Salin",
       "sensitiveTitle": "Sensitif",
-      "sensitiveBody": "Fail ini mengandungi data dompet yang sensitif dan mesti dirahsiakan. Jika anda kehilangan peranti ini, anda tidak akan dapat menggunakan pemulihan kecemasan."
+      "skip": "Langkau",
+      "learnMore": "Ketahui lebih lanjut tentang keluar unilateral",
+      "learnMoreTitle": "Keluar unilateral",
+      "learnMoreBody": "Spark menyimpan bitcoin anda di luar rantai supaya pembayaran pantas dan murah. Jika pengendalinya tidak tersedia, bundel ini bersama frasa sandaran anda membolehkan anda memindahkan dana on-chain sendiri, tanpa Blink. Ia mengambil masa berminggu-minggu dan melibatkan yuran on-chain, jadi ia jaring keselamatan, bukan laluan harian.",
+      "sensitiveConfirm": "Muat turun",
+      "savedTitle": "Bundel kecemasan disimpan",
+      "sensitiveBody": "Fail ini mengandungi data dompet yang sensitif dan mesti dirahsiakan. Jika anda kehilangan peranti ini, anda tidak boleh menggunakan pemulihan bundel kecemasan."
     },
     "CloudBackup": {
       "title": "Mari sandarkan dompet anda",

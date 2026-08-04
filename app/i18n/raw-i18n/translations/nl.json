@@ -3766,13 +3766,19 @@
       }
     },
     "BundleExport": {
-      "title": "Voordat je begint",
-      "subtitle": "Als Spark of Blink offline gaat, gebruik je dit bestand om on-chain uit te stappen. Dit bestand is gevoelig. Houd het privé.",
-      "subtitlePending": "Je herstelback-up wordt automatisch aangemaakt zodra je geld ontvangt, en daarna up-to-date gehouden. Je kunt hem altijd downloaden via Instellingen.",
-      "download": "Downloaden",
+      "title": "Nog één ding",
+      "subtitle": "Als Spark offline gaat, gebruik je deze bundel om on-chain uit te stappen. Deze bundel is gevoelig. Houd hem privé.",
+      "subtitlePending": "Je noodbundel wordt automatisch aangemaakt zodra je geld ontvangt, en daarna up-to-date gehouden. Je kunt hem altijd downloaden via Instellingen.",
+      "download": "Bundel downloaden",
       "copy": "Kopiëren",
       "sensitiveTitle": "Gevoelig",
-      "sensitiveBody": "Dit bestand bevat gevoelige walletgegevens en moet privé blijven. Als je dit apparaat verliest, kun je noodherstel niet gebruiken."
+      "skip": "Overslaan",
+      "learnMore": "Meer over eenzijdige uitstap",
+      "learnMoreTitle": "Eenzijdige uitstap",
+      "learnMoreBody": "Spark houdt je bitcoin buiten de keten zodat betalingen direct en goedkoop zijn. Mochten de operators ooit onbereikbaar worden, dan kun je met deze bundel en je herstelzin je geld zelf on-chain verplaatsen, zonder Blink. Het duurt weken en kost on-chain kosten: een vangnet, geen dagelijkse route.",
+      "sensitiveConfirm": "Downloaden",
+      "savedTitle": "Noodbundel opgeslagen",
+      "sensitiveBody": "Dit bestand bevat gevoelige walletgegevens en moet privé blijven. Als je dit apparaat verliest, kun je herstel via de noodbundel niet gebruiken."
     },
     "CloudBackup": {
       "title": "Laten we een back-up maken van je portemonnee",

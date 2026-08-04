@@ -3766,13 +3766,19 @@
       }
     },
     "BundleExport": {
-      "title": "Mielőtt elkezded",
-      "subtitle": "Ha a Spark vagy a Blink elérhetetlenné válik, ezzel a fájllal léphetsz ki on-chain. Ez a fájl érzékeny. Tartsd titokban.",
-      "subtitlePending": "A helyreállítási mentés automatikusan létrejön, amint pénzt kapsz, és onnantól naprakész marad. Bármikor letöltheted a Beállításokból.",
-      "download": "Letöltés",
+      "title": "Még egy dolog",
+      "subtitle": "Ha a Spark elérhetetlenné válik, ezzel a csomaggal léphetsz ki on-chain. Ez a csomag érzékeny. Tartsd titokban.",
+      "subtitlePending": "A vészhelyzeti csomag automatikusan létrejön, amint pénzt kapsz, és onnantól naprakész marad. Bármikor letöltheted a Beállításokból.",
+      "download": "Csomag letöltése",
       "copy": "Másolás",
       "sensitiveTitle": "Érzékeny",
-      "sensitiveBody": "Ez a fájl érzékeny tárcaadatokat tartalmaz, és titokban kell tartani. Ha elveszíted ezt az eszközt, nem tudod használni a vészhelyzeti helyreállítást."
+      "skip": "Kihagyás",
+      "learnMore": "Tudj meg többet az egyoldalú kilépésről",
+      "learnMoreTitle": "Egyoldalú kilépés",
+      "learnMoreBody": "A Spark a láncon kívül tartja a bitcoinodat, hogy a fizetések azonnaliak és olcsók legyenek. Ha az üzemeltetői elérhetetlenné válnának, ez a csomag a helyreállítási kifejezéseddel együtt lehetővé teszi, hogy magad mozgasd a pénzed on-chain, Blink nélkül. Több hetes folyamat, on-chain díjakkal – biztonsági háló, nem mindennapi útvonal.",
+      "sensitiveConfirm": "Letöltés",
+      "savedTitle": "Vészhelyzeti csomag mentve",
+      "sensitiveBody": "Ez a fájl érzékeny tárcaadatokat tartalmaz, és titokban kell tartani. Ha elveszíted ezt az eszközt, nem tudod használni a vészhelyzeti csomagból való helyreállítást."
     },
     "CloudBackup": {
       "title": "Készítsünk biztonsági mentést a tárcádról",

@@ -3766,13 +3766,19 @@
       }
     },
     "BundleExport": {
-      "title": "Nga tonnatandika",
-      "subtitle": "Singa Spark oba Blink bigaana okukola, kozesa fayiro eno okufuluma ku chain. Fayiro eno ya kyama. Gikuume mu kyama.",
-      "subtitlePending": "Bakaapu yo ey'okuzza obuggya ekolebwa yokka ng'ofunye ssente, era eyongera okutereezebwa. Osobola okugiggya buli kiseera mu Settings.",
-      "download": "Sika",
+      "title": "Ekintu ekimu eky'enkomerero",
+      "subtitle": "Singa Spark egaana okukola, kozesa ekipakiti kino okufuluma ku chain. Ekipakiti kino kya kyama. Kikuume mu kyama.",
+      "subtitlePending": "Ekipakiti kyo eky'obwangu kikolebwa kyokka ng'ofunye ssente, era kyongera okutereezebwa. Osobola okukiggya buli kiseera mu Settings.",
+      "download": "Ggya ekipakiti",
       "copy": "Koppa",
       "sensitiveTitle": "Kya kyama",
-      "sensitiveBody": "Fayiro eno erimu data ya wallet ey'ekyama era eteekwa okukuumibwa mu kyama. Bw'oba ofiiriddwa ekyuma kino, tojja kusobola kukozesa kuzza buggya kwa bwangu."
+      "skip": "Buuka",
+      "learnMore": "Manya ebisingawo ku kufuluma ku lwo",
+      "learnMoreTitle": "Okufuluma ku lwo",
+      "learnMoreBody": "Spark ekuuma bitcoin yo ebweru wa chain okusobozesa okusasula okw'amangu era okutali kwa bbeeyi. Singa abakozesa baayo bagaana okukola, ekipakiti kino awamu n'ebigambo byo eby'okuzza obuggya bikusobozesa okutwala ssente zo ku chain wekka, awatali Blink. Kitwala wiiki nnyingi era kirimu ebisale bya chain, kale kya bukuumi so si kkubo lya buli lunaku.",
+      "sensitiveConfirm": "Ggya",
+      "savedTitle": "Ekipakiti eky'obwangu kikuumiddwa",
+      "sensitiveBody": "Fayiro eno erimu data ya wallet ey'ekyama era eteekwa okukuumibwa mu kyama. Bw'oba ofiiriddwa ekyuma kino, tojja kusobola kukozesa kuzza buggya okuva mu kipakiti eky'obwangu."
     },
     "CloudBackup": {
       "title": "Ka tukoppe akawunti yo",
