@@ -30,6 +30,8 @@ import {
 import { RECOVERY_BUNDLE_SCHEMA } from "@app/self-custodial/recovery-bundle/types"
 import type { DecodedTreeNode } from "@app/self-custodial/recovery-bundle/protocol/messages"
 
+import packageJson from "../../../package.json"
+
 const TEST_MNEMONIC =
   "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about"
 
@@ -96,18 +98,22 @@ const encodeQueryNodesResponse = (nodes: TestNode[], offset = 0): Uint8Array => 
   return writer.varint(2, offset).finish()
 }
 
+/** The exact ProtectedChallenge bytes the mock serves; verify_challenge must echo them. */
+const PROTECTED_CHALLENGE_BYTES = new ProtoWriter()
+  .varint(1, 1)
+  .bytes(
+    2,
+    new ProtoWriter()
+      .varint(1, 1)
+      .varint(2, 1752300000)
+      .bytes(3, Uint8Array.from(Buffer.alloc(32, 0x11)))
+      .finish(),
+  )
+  .bytes(3, Uint8Array.from(Buffer.alloc(32, 0xaa)))
+  .finish()
+
 const encodeChallengeResponse = (): Uint8Array => {
-  const challenge = new ProtoWriter()
-    .varint(1, 1)
-    .varint(2, 1752300000)
-    .bytes(3, Uint8Array.from(Buffer.alloc(32, 0x11)))
-    .finish()
-  const protectedChallenge = new ProtoWriter()
-    .varint(1, 1)
-    .bytes(2, challenge)
-    .bytes(3, Uint8Array.from(Buffer.alloc(32, 0xaa)))
-    .finish()
-  return new ProtoWriter().bytes(1, protectedChallenge).finish()
+  return new ProtoWriter().bytes(1, PROTECTED_CHALLENGE_BYTES).finish()
 }
 
 const encodeVerifyResponse = (): Uint8Array =>
@@ -128,6 +134,11 @@ const mockOperator = ({
 }) => {
   const byIdRequests: string[][] = []
   const ownerQueryOffsets: number[] = []
+  const verifyRequests: {
+    protectedChallenge: Uint8Array
+    signature: Uint8Array
+    publicKey: Uint8Array
+  }[] = []
 
   global.fetch = jest.fn(async (url: string, init: { body: Uint8Array }) => {
     const respond = (message: Uint8Array) => ({
@@ -144,6 +155,15 @@ const mockOperator = ({
       return respond(encodeChallengeResponse())
     }
     if (url.endsWith("/spark_authn.SparkAuthnService/verify_challenge")) {
+      // Record what the exporter actually sent: field numbers here mirror
+      // spark_authn.proto, so an encoder regression fails these assertions
+      // instead of only failing against the real coordinator.
+      const request = decodeFields(Uint8Array.from(init.body).subarray(5))
+      verifyRequests.push({
+        protectedChallenge: lastField(request, 1)?.bytes ?? new Uint8Array(0),
+        signature: lastField(request, 2)?.bytes ?? new Uint8Array(0),
+        publicKey: lastField(request, 3)?.bytes ?? new Uint8Array(0),
+      })
       return respond(encodeVerifyResponse())
     }
     if (url.endsWith("/spark.SparkService/query_nodes")) {
@@ -169,7 +189,7 @@ const mockOperator = ({
     throw new Error(`unexpected url: ${url}`)
   }) as unknown as typeof fetch
 
-  return { byIdRequests, ownerQueryOffsets }
+  return { byIdRequests, ownerQueryOffsets, verifyRequests }
 }
 
 describe("findMissingAncestors", () => {
@@ -233,7 +253,7 @@ describe("fetchRecoveryBundle", () => {
     }
 
     // Owner query omits the tree root (the legacy-tree operator bug)
-    const { byIdRequests } = mockOperator({
+    const { byIdRequests, verifyRequests } = mockOperator({
       ownerQueryNodes: [leaf, mid],
       byIdNodes: { "root-1": root },
     })
@@ -259,6 +279,19 @@ describe("fetchRecoveryBundle", () => {
     )
     expect(bundle.nodes.map((n) => n.id)).toEqual(["leaf-1", "mid-1", "root-1"])
     expect(bundle.balances.btcSats).toBe("32768")
+    // Name + pinned version of the SDK, from the same package.json source
+    expect(bundle.sparkSdkVersion).toBe(
+      `breez-sdk-spark-react-native@${packageJson.dependencies["@breeztech/breez-sdk-spark-react-native"]}`,
+    )
+
+    // verify_challenge carried the served ProtectedChallenge bytes, a
+    // signature, and the wallet identity key in the proto's fields 1-3
+    expect(verifyRequests).toHaveLength(1)
+    expect(Buffer.from(verifyRequests[0].protectedChallenge)).toEqual(
+      Buffer.from(PROTECTED_CHALLENGE_BYTES),
+    )
+    expect(Buffer.from(verifyRequests[0].publicKey)).toEqual(Buffer.from(identity))
+    expect(verifyRequests[0].signature.length).toBeGreaterThan(0)
   })
 
   it("refuses to build a bundle with an open exit chain", async () => {
@@ -641,6 +674,46 @@ describe("fetchRecoveryBundle", () => {
     expect(byIdRequests).toEqual([["mid-1"], ["root-1"]])
     expect(bundle.leaves.map((l) => l.id)).toEqual(["leaf-1"])
     expect(bundle.nodes.map((n) => n.id)).toEqual(["leaf-1", "mid-1", "root-1"])
+  })
+
+  it("chunks a by-id refetch round larger than one page", async () => {
+    // 101 leaves, each missing its own root: one refetch round with 101
+    // missing ancestors must split into by-id requests of 100 + 1, and two
+    // calls within the same round must not trip the progress check.
+    const chunkLeaves: TestNode[] = Array.from({ length: 101 }, (_, i) => ({
+      id: `leaf-${String(i).padStart(3, "0")}`,
+      valueSats: 10,
+      parentNodeId: `root-${String(i).padStart(3, "0")}`,
+      owner: identity,
+      available: true,
+    }))
+    const byIdNodes = Object.fromEntries(
+      chunkLeaves.map((leaf) => [
+        leaf.parentNodeId,
+        {
+          id: leaf.parentNodeId as string,
+          valueSats: 20,
+          owner: otherOwner,
+          available: false,
+        },
+      ]),
+    )
+    const { byIdRequests } = mockOperator({ ownerQueryNodes: chunkLeaves, byIdNodes })
+
+    const bundle = await fetchRecoveryBundle({
+      mnemonic: TEST_MNEMONIC,
+      network: Network.Mainnet,
+      appVersion: "1.0.1-test",
+    })
+
+    // Missing ids surface in leaf order, so the slices are deterministic
+    expect(byIdRequests).toEqual([
+      chunkLeaves.slice(0, 100).map((leaf) => leaf.parentNodeId),
+      [chunkLeaves[100].parentNodeId],
+    ])
+    expect(bundle.leaves).toHaveLength(101)
+    expect(bundle.nodes).toHaveLength(202)
+    expect(bundle.balances.btcSats).toBe("1010")
   })
 
   it("tolerates a truncated by-id round and completes on the next one", async () => {
