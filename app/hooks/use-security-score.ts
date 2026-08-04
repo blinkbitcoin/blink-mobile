@@ -1,5 +1,7 @@
-import { useCustodialSecuritySignals } from "@app/custodial/hooks/use-security-signals"
+import { useCustodialSecuritySignals } from "@app/custodial/hooks"
 import { useHideBalanceQuery } from "@app/graphql/generated"
+// Deep import on purpose: the self-custodial barrel pulls the payment-request
+// module graph into every consumer, which the score hook doesn't need.
 import { useSelfCustodialSecuritySignals } from "@app/self-custodial/hooks/use-security-signals"
 import type {
   SecurityScore,
@@ -29,7 +31,9 @@ export const computeSecurityScore = (
   signals: SecuritySignalDescriptor[],
 ): SecurityScore => {
   const done = signals.filter((signal) => signal.done).length
-  const ratio = done / signals.length
+  // Guard the empty list: 0/0 must not score as NaN-medium. Unreachable via
+  // useSecurityScore (device signals always contribute), but this is exported.
+  const ratio = signals.length === 0 ? 0 : done / signals.length
   const level: SecurityScoreLevel = ratio === 1 ? "high" : ratio < 0.5 ? "low" : "medium"
 
   return { signals, done, total: signals.length, level }

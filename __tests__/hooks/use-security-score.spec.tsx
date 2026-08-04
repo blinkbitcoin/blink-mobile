@@ -48,6 +48,10 @@ describe("computeSecurityScore", () => {
       ]).level,
     ).toBe("low")
   })
+
+  it("scores an empty signal list as 0/0 low, not NaN", () => {
+    expect(computeSecurityScore([])).toMatchObject({ done: 0, total: 0, level: "low" })
+  })
 })
 
 describe("useSecurityScore", () => {
