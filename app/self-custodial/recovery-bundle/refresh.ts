@@ -13,9 +13,9 @@
  */
 
 import { type Network } from "@breeztech/breez-sdk-spark-react-native"
-import crashlytics from "@react-native-firebase/crashlytics"
 
 import { CloudBackupErrorReason } from "@app/types/cloud-backup"
+import { recordAppError, toError } from "@app/utils/error-reporting"
 
 import { networkLabelFor } from "../config"
 import {
@@ -85,6 +85,18 @@ export const isCloudSyncAllowedFor = async (accountId: string): Promise<boolean>
   return settings.cloudSync && isPasswordProtectedCloudSeedBackup(backupState)
 }
 
+// Silent-upload failures that are user/device states, not defects - the same
+// set the interactive Drive hook treats as expected (EXPECTED_DRIVE_REASONS in
+// use-google-drive-backup.ts), plus Auth: on the silent path it means no
+// usable cloud session (never linked, signed out, or a token revoked
+// out-of-band), never a code defect.
+const EXPECTED_SILENT_UPLOAD_REASONS: ReadonlySet<CloudBackupErrorReason> = new Set([
+  CloudBackupErrorReason.Auth,
+  CloudBackupErrorReason.PermissionDenied,
+  CloudBackupErrorReason.Cancelled,
+  CloudBackupErrorReason.Transient,
+])
+
 /**
  * Uploads the already-saved encrypted bundle to the seed backup's cloud
  * provider. No-op (false) when cloud sync is not allowed (not opted in, or no
@@ -104,9 +116,9 @@ export const syncExistingBundleToCloud = async (
   if (!metadata) {
     // A saved file that no longer parses means on-disk corruption, not an
     // expected state - record it, the refresh path will rewrite the file.
-    crashlytics().recordError(
-      new Error("[recovery-bundle] saved bundle payload failed to parse"),
-    )
+    recordAppError(new Error("[recovery-bundle] saved bundle payload failed to parse"), {
+      dedupKey: "recovery-bundle-corrupt-payload",
+    })
     return false
   }
 
@@ -115,20 +127,17 @@ export const syncExistingBundleToCloud = async (
     getRecoveryBundleFilename(metadata.network, metadata.walletIdentityPublicKey),
   )
   if (!upload.success) {
-    if (upload.reason === CloudBackupErrorReason.Auth) {
-      // Expected state: the user never linked a cloud account on this device.
-      crashlytics().log(`[recovery-bundle] silent cloud upload skipped: ${upload.reason}`)
-    } else {
-      // recordError, not a breadcrumb: a provider failure that starts hitting
-      // every user (e.g. iCloud writes breaking on a new iOS version) must
-      // show up as standalone Crashlytics events carrying the original error,
-      // not be visible only when attached to some later recorded error.
-      const wrapped =
-        upload.error instanceof Error
-          ? upload.error
-          : new Error(`[recovery-bundle] silent cloud upload failed: ${upload.reason}`)
-      crashlytics().recordError(wrapped, "recovery-bundle-cloud-sync")
-    }
+    // A remaining failure reason (Unknown) is a provider defect that must
+    // surface as a standalone non-fatal carrying the original error - e.g.
+    // iCloud writes breaking on a new iOS version.
+    const error =
+      upload.error instanceof Error
+        ? upload.error
+        : new Error(`[recovery-bundle] silent cloud upload failed: ${upload.reason}`)
+    recordAppError(error, {
+      expected: EXPECTED_SILENT_UPLOAD_REASONS.has(upload.reason),
+      dedupKey: "recovery-bundle-cloud-sync",
+    })
     return false
   }
 
@@ -218,10 +227,7 @@ const runRefresh = async ({
     const finalState = (await readRecoveryBundleState(accountId, network)) ?? state
     return { success: true, state: finalState }
   } catch (error) {
-    crashlytics().recordError(
-      error instanceof Error ? error : new Error(String(error)),
-      "recovery-bundle-cloud-sync",
-    )
+    recordAppError(toError(error), { dedupKey: "recovery-bundle-cloud-sync-step" })
     return { success: true, state }
   }
 }
