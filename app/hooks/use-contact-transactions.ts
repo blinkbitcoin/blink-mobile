@@ -155,6 +155,12 @@ export const useContactTransactions = (
    * read, because matching happens on the client and a request stops at its page budget.
    * An empty list has nothing to scroll, so no `onEndReached` will ever ask for the rest:
    * it keeps reading here until something shows up or the history runs out.
+   *
+   * That budget bounds one request, not this walk. A contact with no payments in a large
+   * wallet is therefore read to the end, one round per 100 raw payments — some 100 rounds
+   * behind the spinner for a 10,000-payment wallet. It is the deliberate trade-off: giving
+   * up early would claim the contact has no transactions while history is still unread,
+   * and an empty list leaves the reader no scroll to resume the search with.
    */
   const hasNothingToScroll = transactions.length === 0 && cursor !== null
 
