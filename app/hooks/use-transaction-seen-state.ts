@@ -81,10 +81,13 @@ export const useTransactionSeenState = ({
     [baseTransactions, feeReimbursementMemo],
   )
 
+  /** Skipped for self-custodial: that account reads the device store below, so leaving
+   *  the query on would keep a cache watch alive for a result nothing consumes. */
   const { data: lastSeenData } = useTxLastSeenQuery({
     fetchPolicy: "cache-only",
     returnPartialData: true,
     variables: { accountId },
+    skip: isSelfCustodial,
   })
 
   const cachedLastSeenBtcId = lastSeenData?.txLastSeen?.btcId || ""
