@@ -3678,13 +3678,19 @@
             }
         },
         "BundleExport": {
-            "title": "Bevor du startest",
-            "subtitle": "Falls Spark oder Blink offline gehen, nutze diese Datei, um On-Chain auszusteigen. Diese Datei ist sensibel. Halte sie privat.",
-            "subtitlePending": "Dein Wiederherstellungs-Backup wird automatisch erstellt, sobald du Geld empfängst, und danach aktuell gehalten. Du kannst es jederzeit in den Einstellungen herunterladen.",
-            "download": "Herunterladen",
+            "title": "Eine letzte Sache",
+            "subtitle": "Falls Spark offline geht, nutze dieses Bundle, um On-Chain auszusteigen. Dieses Bundle ist sensibel. Halte es privat.",
+            "subtitlePending": "Dein Notfall-Bundle wird automatisch erstellt, sobald du Geld empfängst, und danach aktuell gehalten. Du kannst es jederzeit in den Einstellungen herunterladen.",
+            "download": "Bundle herunterladen",
             "copy": "Kopieren",
             "sensitiveTitle": "Sensibel",
-            "sensitiveBody": "Diese Datei enthält sensible Wallet-Daten und muss privat bleiben. Wenn du dieses Gerät verlierst, kannst du die Notfall-Wiederherstellung nicht nutzen."
+            "skip": "Überspringen",
+            "learnMore": "Mehr über den einseitigen Ausstieg",
+            "learnMoreTitle": "Einseitiger Ausstieg",
+            "learnMoreBody": "Spark hält deine Bitcoin außerhalb der Kette, damit Zahlungen sofort und günstig sind. Sollten die Betreiber je nicht mehr verfügbar sein, kannst du mit diesem Bundle und deiner Wiederherstellungsphrase dein Guthaben selbst On-Chain bewegen, ohne Blink. Das dauert mehrere Wochen und kostet On-Chain-Gebühren – ein Sicherheitsnetz, kein Alltagsweg.",
+            "sensitiveConfirm": "Herunterladen",
+            "savedTitle": "Notfall-Bundle gespeichert",
+            "sensitiveBody": "Diese Datei enthält sensible Wallet-Daten und muss privat bleiben. Wenn du dieses Gerät verlierst, kannst du die Notfall-Bundle-Wiederherstellung nicht nutzen."
         },
         "CloudBackup": {
             "title": "Sichern wir Ihre Brieftasche",

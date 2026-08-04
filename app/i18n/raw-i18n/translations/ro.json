@@ -3678,13 +3678,19 @@
       }
     },
     "BundleExport": {
-      "title": "Înainte să începi",
-      "subtitle": "Dacă Spark sau Blink devin indisponibile, folosește acest fișier pentru a ieși on-chain. Acest fișier este sensibil. Păstrează-l privat.",
-      "subtitlePending": "Copia de recuperare este creată automat imediat ce primești fonduri și este menținută actualizată de atunci. O poți descărca oricând din Setări.",
-      "download": "Descarcă",
+      "title": "Încă un lucru",
+      "subtitle": "Dacă Spark devine indisponibil, folosește acest pachet pentru a ieși on-chain. Acest pachet este sensibil. Păstrează-l privat.",
+      "subtitlePending": "Pachetul tău de urgență este creat automat imediat ce primești fonduri și este menținut actualizat. Îl poți descărca oricând din Setări.",
+      "download": "Descarcă pachetul",
       "copy": "Copiază",
       "sensitiveTitle": "Sensibil",
-      "sensitiveBody": "Acest fișier conține date sensibile ale portofelului și trebuie păstrat privat. Dacă pierzi acest dispozitiv, nu vei putea folosi recuperarea de urgență."
+      "skip": "Omite",
+      "learnMore": "Află mai multe despre ieșirea unilaterală",
+      "learnMoreTitle": "Ieșire unilaterală",
+      "learnMoreBody": "Spark îți ține bitcoinii în afara lanțului pentru ca plățile să fie instantanee și ieftine. Dacă operatorii ar deveni indisponibili, acest pachet împreună cu fraza ta de recuperare îți permite să îți muți fondurile on-chain singur, fără Blink. Durează săptămâni și implică comisioane on-chain, deci e o plasă de siguranță, nu o rută zilnică.",
+      "sensitiveConfirm": "Descarcă",
+      "savedTitle": "Pachet de urgență salvat",
+      "sensitiveBody": "Acest fișier conține date sensibile ale portofelului și trebuie păstrat privat. Dacă pierzi acest dispozitiv, nu vei putea folosi recuperarea din pachetul de urgență."
     },
     "CloudBackup": {
       "title": "Să facem o copie de siguranță a portofelului tău",

@@ -3678,13 +3678,19 @@
       }
     },
     "BundleExport": {
-      "title": "Manaraq qallarichkaptiyki",
-      "subtitle": "Spark utaq Blink mana llamkaptin, kay willañiqita on-chain lloqsinaykipaq servichikuy. Kay willañiqi sinchi allin waqaychana. Pakallapi waqaychay.",
-      "subtitlePending": "Kutichiy waqaychayniyki qullqita chaskiptiyki kikinmanta ruwakun, chaymantam musuqchasqa qipan. Ajustes nisqapi mayqin pachapipas urqumuwaqmi.",
-      "download": "Uraqichiy",
+      "title": "Huk qipa ruwana",
+      "subtitle": "Spark mana llamkaptin, kay qipita servichikuy on-chain lloqsinaykipaq. Kay qipi sinchi allin waqaychana. Pakallapi waqaychay.",
+      "subtitlePending": "Utqay qipiyki qullqita chaskiptiyki kikinmanta ruwakun, chaymantam musuqchasqa qipan. Ajustes nisqapi mayqin pachapipas urqumuwaqmi.",
+      "download": "Qipita urquy",
       "copy": "Kopiyay",
       "sensitiveTitle": "Sinchi allin waqaychana",
-      "sensitiveBody": "Kay willañiqipi qullqi wasiykipa sinchi allin willakuynin kachkan, pakallapi waqaychana. Kay antawata chinkachiptiyki, utqay kutichiyta mana atiwaqchu."
+      "skip": "Saqiy",
+      "learnMore": "Sapallanchik lloqsiymanta astawan yachay",
+      "learnMoreTitle": "Sapallanchik lloqsiy",
+      "learnMoreBody": "Spark bitcoin-niykita chain hawapi waqaychan, pagaykuna utqay ka'ananpaq, mana chaninpaq ima. Llamkaqninkuna mana llamkaptinku, kay qipi kutichiy simikunawan kuska qullqiykita kikiyki on-chain astanaykipaq yanapasunki, mana Blink-wan. Achka simanata apan, chain pagaykunapas kan, chayrayku kayqa harkakuy, manam sapa p'unchaw ñanchu.",
+      "sensitiveConfirm": "Urquy",
+      "savedTitle": "Utqay qipi waqaychasqa",
+      "sensitiveBody": "Kay willañiqipi qullqi wasiykipa sinchi allin willakuynin kachkan, pakallapi waqaychana. Kay antawata chinkachiptiyki, utqay qipimanta kutichiyta mana atiwaqchu."
     },
     "CloudBackup": {
       "title": "Qullqikuqniykita waqaychasun",

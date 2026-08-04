@@ -12224,19 +12224,31 @@ type RootTranslation = {
 		}
 		BundleExport: {
 			/**
-			 * B​e​f​o​r​e​ ​y​o​u​ ​s​t​a​r​t
+			 * O​n​e​ ​l​a​s​t​ ​t​h​i​n​g
 			 */
 			title: string
 			/**
-			 * I​n​ ​c​a​s​e​ ​o​f​ ​S​p​a​r​k​ ​o​r​ ​B​l​i​n​k​ ​g​o​i​n​g​ ​o​f​f​l​i​n​e​,​ ​u​s​e​ ​t​h​i​s​ ​f​i​l​e​ ​t​o​ ​e​x​i​t​ ​o​n​c​h​a​i​n​.​ ​T​h​i​s​ ​f​i​l​e​ ​i​s​ ​s​e​n​s​i​t​i​v​e​.​ ​K​e​e​p​ ​i​t​ ​p​r​i​v​a​t​e​.
+			 * I​n​ ​c​a​s​e​ ​o​f​ ​S​p​a​r​k​ ​g​o​i​n​g​ ​o​f​f​l​i​n​e​,​ ​u​s​e​ ​t​h​i​s​ ​b​u​n​d​l​e​ ​t​o​ ​e​x​i​t​ ​o​n​c​h​a​i​n​.​ ​T​h​i​s​ ​b​u​n​d​l​e​ ​i​s​ ​s​e​n​s​i​t​i​v​e​.​ ​K​e​e​p​ ​i​t​ ​p​r​i​v​a​t​e​.
 			 */
 			subtitle: string
 			/**
-			 * Y​o​u​r​ ​r​e​c​o​v​e​r​y​ ​b​a​c​k​u​p​ ​i​s​ ​c​r​e​a​t​e​d​ ​a​u​t​o​m​a​t​i​c​a​l​l​y​ ​o​n​c​e​ ​y​o​u​ ​r​e​c​e​i​v​e​ ​f​u​n​d​s​,​ ​a​n​d​ ​k​e​p​t​ ​u​p​ ​t​o​ ​d​a​t​e​ ​f​r​o​m​ ​t​h​e​n​ ​o​n​.​ ​Y​o​u​ ​c​a​n​ ​d​o​w​n​l​o​a​d​ ​i​t​ ​a​n​y​ ​t​i​m​e​ ​f​r​o​m​ ​S​e​t​t​i​n​g​s​.
+			 * Y​o​u​r​ ​e​m​e​r​g​e​n​c​y​ ​b​u​n​d​l​e​ ​i​s​ ​c​r​e​a​t​e​d​ ​a​u​t​o​m​a​t​i​c​a​l​l​y​ ​o​n​c​e​ ​y​o​u​ ​r​e​c​e​i​v​e​ ​f​u​n​d​s​,​ ​a​n​d​ ​k​e​p​t​ ​u​p​ ​t​o​ ​d​a​t​e​ ​f​r​o​m​ ​t​h​e​n​ ​o​n​.​ ​Y​o​u​ ​c​a​n​ ​d​o​w​n​l​o​a​d​ ​i​t​ ​a​n​y​ ​t​i​m​e​ ​f​r​o​m​ ​S​e​t​t​i​n​g​s​.
 			 */
 			subtitlePending: string
 			/**
-			 * D​o​w​n​l​o​a​d
+			 * L​e​a​r​n​ ​m​o​r​e​ ​a​b​o​u​t​ ​u​n​i​l​a​t​e​r​a​l​ ​e​x​i​t
+			 */
+			learnMore: string
+			/**
+			 * U​n​i​l​a​t​e​r​a​l​ ​e​x​i​t
+			 */
+			learnMoreTitle: string
+			/**
+			 * S​p​a​r​k​ ​k​e​e​p​s​ ​y​o​u​r​ ​b​i​t​c​o​i​n​ ​o​f​f​-​c​h​a​i​n​ ​s​o​ ​p​a​y​m​e​n​t​s​ ​a​r​e​ ​i​n​s​t​a​n​t​ ​a​n​d​ ​c​h​e​a​p​.​ ​I​f​ ​i​t​s​ ​o​p​e​r​a​t​o​r​s​ ​e​v​e​r​ ​b​e​c​a​m​e​ ​u​n​a​v​a​i​l​a​b​l​e​,​ ​t​h​i​s​ ​b​u​n​d​l​e​ ​p​l​u​s​ ​y​o​u​r​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​ ​l​e​t​s​ ​y​o​u​ ​m​o​v​e​ ​y​o​u​r​ ​f​u​n​d​s​ ​o​n​c​h​a​i​n​ ​y​o​u​r​s​e​l​f​,​ ​w​i​t​h​o​u​t​ ​B​l​i​n​k​.​ ​I​t​ ​i​s​ ​a​ ​m​u​l​t​i​-​w​e​e​k​ ​p​r​o​c​e​s​s​ ​a​n​d​ ​c​o​s​t​s​ ​o​n​c​h​a​i​n​ ​f​e​e​s​,​ ​s​o​ ​i​t​ ​i​s​ ​a​ ​s​a​f​e​t​y​ ​n​e​t​ ​r​a​t​h​e​r​ ​t​h​a​n​ ​a​n​ ​e​v​e​r​y​d​a​y​ ​r​o​u​t​e​.
+			 */
+			learnMoreBody: string
+			/**
+			 * D​o​w​n​l​o​a​d​ ​b​u​n​d​l​e
 			 */
 			download: string
 			/**
@@ -12244,13 +12256,25 @@ type RootTranslation = {
 			 */
 			copy: string
 			/**
+			 * S​k​i​p
+			 */
+			skip: string
+			/**
 			 * S​e​n​s​i​t​i​v​e
 			 */
 			sensitiveTitle: string
 			/**
-			 * T​h​i​s​ ​f​i​l​e​ ​i​s​ ​s​e​n​s​i​t​i​v​e​ ​w​a​l​l​e​t​ ​d​a​t​a​ ​a​n​d​ ​m​u​s​t​ ​b​e​ ​k​e​p​t​ ​p​r​i​v​a​t​e​.​ ​I​f​ ​y​o​u​ ​l​o​s​e​ ​t​h​i​s​ ​d​e​v​i​c​e​,​ ​y​o​u​ ​w​i​l​l​ ​n​o​t​ ​b​e​ ​a​b​l​e​ ​t​o​ ​u​s​e​ ​e​m​e​r​g​e​n​c​y​ ​r​e​c​o​v​e​r​y​.
+			 * T​h​i​s​ ​f​i​l​e​ ​i​s​ ​s​e​n​s​i​t​i​v​e​ ​w​a​l​l​e​t​ ​d​a​t​a​ ​a​n​d​ ​m​u​s​t​ ​b​e​ ​k​e​p​t​ ​p​r​i​v​a​t​e​.​ ​I​f​ ​y​o​u​ ​l​o​s​e​ ​t​h​i​s​ ​d​e​v​i​c​e​,​ ​y​o​u​ ​w​i​l​l​ ​n​o​t​ ​b​e​ ​a​b​l​e​ ​t​o​ ​u​s​e​ ​e​m​e​r​g​e​n​c​y​ ​b​u​n​d​l​e​ ​r​e​c​o​v​e​r​y​.
 			 */
 			sensitiveBody: string
+			/**
+			 * D​o​w​n​l​o​a​d
+			 */
+			sensitiveConfirm: string
+			/**
+			 * E​m​e​r​g​e​n​c​y​ ​b​u​n​d​l​e​ ​s​a​v​e​d
+			 */
+			savedTitle: string
 		}
 		ManualBackup: {
 			Alerts: {
@@ -25392,19 +25416,31 @@ export type TranslationFunctions = {
 		}
 		BundleExport: {
 			/**
-			 * Before you start
+			 * One last thing
 			 */
 			title: () => LocalizedString
 			/**
-			 * In case of Spark or Blink going offline, use this file to exit onchain. This file is sensitive. Keep it private.
+			 * In case of Spark going offline, use this bundle to exit onchain. This bundle is sensitive. Keep it private.
 			 */
 			subtitle: () => LocalizedString
 			/**
-			 * Your recovery backup is created automatically once you receive funds, and kept up to date from then on. You can download it any time from Settings.
+			 * Your emergency bundle is created automatically once you receive funds, and kept up to date from then on. You can download it any time from Settings.
 			 */
 			subtitlePending: () => LocalizedString
 			/**
-			 * Download
+			 * Learn more about unilateral exit
+			 */
+			learnMore: () => LocalizedString
+			/**
+			 * Unilateral exit
+			 */
+			learnMoreTitle: () => LocalizedString
+			/**
+			 * Spark keeps your bitcoin off-chain so payments are instant and cheap. If its operators ever became unavailable, this bundle plus your backup phrase lets you move your funds onchain yourself, without Blink. It is a multi-week process and costs onchain fees, so it is a safety net rather than an everyday route.
+			 */
+			learnMoreBody: () => LocalizedString
+			/**
+			 * Download bundle
 			 */
 			download: () => LocalizedString
 			/**
@@ -25412,13 +25448,25 @@ export type TranslationFunctions = {
 			 */
 			copy: () => LocalizedString
 			/**
+			 * Skip
+			 */
+			skip: () => LocalizedString
+			/**
 			 * Sensitive
 			 */
 			sensitiveTitle: () => LocalizedString
 			/**
-			 * This file is sensitive wallet data and must be kept private. If you lose this device, you will not be able to use emergency recovery.
+			 * This file is sensitive wallet data and must be kept private. If you lose this device, you will not be able to use emergency bundle recovery.
 			 */
 			sensitiveBody: () => LocalizedString
+			/**
+			 * Download
+			 */
+			sensitiveConfirm: () => LocalizedString
+			/**
+			 * Emergency bundle saved
+			 */
+			savedTitle: () => LocalizedString
 		}
 		ManualBackup: {
 			Alerts: {

@@ -3678,13 +3678,19 @@
       }
     },
     "BundleExport": {
-      "title": "Než začnete",
-      "subtitle": "Pokud Spark nebo Blink přestanou fungovat, použijte tento soubor k odchodu on-chain. Tento soubor je citlivý. Uchovejte jej v soukromí.",
-      "subtitlePending": "Vaše záloha pro obnovu se vytvoří automaticky, jakmile přijmete prostředky, a od té chvíle se udržuje aktuální. Kdykoli si ji můžete stáhnout v Nastavení.",
-      "download": "Stáhnout",
+      "title": "Poslední věc",
+      "subtitle": "Pokud Spark přestane fungovat, použijte tento balíček k odchodu on-chain. Tento balíček je citlivý. Uchovejte jej v soukromí.",
+      "subtitlePending": "Váš nouzový balíček se vytvoří automaticky, jakmile přijmete prostředky, a dál se udržuje aktuální. Kdykoli si jej můžete stáhnout v Nastavení.",
+      "download": "Stáhnout balíček",
       "copy": "Kopírovat",
       "sensitiveTitle": "Citlivé",
-      "sensitiveBody": "Tento soubor obsahuje citlivá data peněženky a musí zůstat soukromý. Pokud toto zařízení ztratíte, nouzovou obnovu nebude možné použít."
+      "skip": "Přeskočit",
+      "learnMore": "Více o jednostranném odchodu",
+      "learnMoreTitle": "Jednostranný odchod",
+      "learnMoreBody": "Spark drží vaše bitcoiny mimo řetězec, aby platby byly okamžité a levné. Pokud by jeho operátoři přestali být dostupní, tento balíček spolu s vaší obnovovací frází vám umožní přesunout prostředky on-chain sami, bez Blinku. Je to několikatýdenní proces s on-chain poplatky, takže jde o záchrannou síť, ne o každodenní cestu.",
+      "sensitiveConfirm": "Stáhnout",
+      "savedTitle": "Nouzový balíček uložen",
+      "sensitiveBody": "Tento soubor obsahuje citlivá data peněženky a musí zůstat soukromý. Pokud toto zařízení ztratíte, obnovu z nouzového balíčku nebude možné použít."
     },
     "CloudBackup": {
       "title": "Zálohujme vaši peněženku",

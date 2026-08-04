@@ -3678,13 +3678,19 @@
             }
         },
         "BundleExport": {
-            "title": "Antes de empezar",
-            "subtitle": "Si Spark o Blink dejan de estar disponibles, usa este archivo para salir on-chain. Este archivo es sensible. Mantenlo privado.",
-            "subtitlePending": "Tu copia de recuperación se crea automáticamente cuando recibes fondos, y se mantiene actualizada a partir de entonces. Puedes descargarla en cualquier momento desde Configuración.",
-            "download": "Descargar",
+            "title": "Una última cosa",
+            "subtitle": "Si Spark deja de estar disponible, usa este paquete para salir on-chain. Este paquete es sensible. Mantenlo privado.",
+            "subtitlePending": "Tu paquete de emergencia se crea automáticamente cuando recibes fondos, y se mantiene actualizado. Puedes descargarlo en cualquier momento desde Configuración.",
+            "download": "Descargar paquete",
             "copy": "Copiar",
             "sensitiveTitle": "Sensible",
-            "sensitiveBody": "Este archivo contiene datos sensibles de la billetera y debe mantenerse privado. Si pierdes este dispositivo, no podrás usar la recuperación de emergencia."
+            "skip": "Omitir",
+            "learnMore": "Más información sobre la salida unilateral",
+            "learnMoreTitle": "Salida unilateral",
+            "learnMoreBody": "Spark mantiene tus bitcoins fuera de la cadena para que los pagos sean instantáneos y baratos. Si sus operadores dejaran de estar disponibles, este paquete junto con tu frase de respaldo te permite mover los fondos on-chain por tu cuenta, sin Blink. Es un proceso de varias semanas y tiene comisiones on-chain, así que es una red de seguridad, no una vía cotidiana.",
+            "sensitiveConfirm": "Descargar",
+            "savedTitle": "Paquete de emergencia guardado",
+            "sensitiveBody": "Este archivo contiene datos sensibles de la billetera y debe mantenerse privado. Si pierdes este dispositivo, no podrás usar la recuperación del paquete de emergencia."
         },
         "CloudBackup": {
             "title": "Respaldemos tu billetera",

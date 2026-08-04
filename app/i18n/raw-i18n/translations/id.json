@@ -3678,13 +3678,19 @@
       }
     },
     "BundleExport": {
-      "title": "Sebelum kamu mulai",
-      "subtitle": "Jika Spark atau Blink tidak tersedia, gunakan berkas ini untuk keluar on-chain. Berkas ini sensitif. Jaga kerahasiaannya.",
-      "subtitlePending": "Cadangan pemulihanmu dibuat otomatis begitu kamu menerima dana, dan terus diperbarui setelahnya. Kamu bisa mengunduhnya kapan saja dari Pengaturan.",
-      "download": "Unduh",
+      "title": "Satu hal terakhir",
+      "subtitle": "Jika Spark tidak tersedia, gunakan paket ini untuk keluar on-chain. Paket ini sensitif. Jaga kerahasiaannya.",
+      "subtitlePending": "Paket daruratmu dibuat otomatis begitu kamu menerima dana, dan terus diperbarui. Kamu bisa mengunduhnya kapan saja dari Pengaturan.",
+      "download": "Unduh paket",
       "copy": "Salin",
       "sensitiveTitle": "Sensitif",
-      "sensitiveBody": "Berkas ini berisi data dompet yang sensitif dan harus dirahasiakan. Jika kamu kehilangan perangkat ini, kamu tidak akan bisa memakai pemulihan darurat."
+      "skip": "Lewati",
+      "learnMore": "Pelajari lebih lanjut tentang keluar sepihak",
+      "learnMoreTitle": "Keluar sepihak",
+      "learnMoreBody": "Spark menyimpan bitcoinmu di luar rantai agar pembayaran instan dan murah. Jika operatornya tidak tersedia, paket ini bersama frasa cadanganmu memungkinkanmu memindahkan dana on-chain sendiri, tanpa Blink. Prosesnya berminggu-minggu dan ada biaya on-chain, jadi ini jaring pengaman, bukan jalur sehari-hari.",
+      "sensitiveConfirm": "Unduh",
+      "savedTitle": "Paket darurat tersimpan",
+      "sensitiveBody": "Berkas ini berisi data dompet yang sensitif dan harus dirahasiakan. Jika kamu kehilangan perangkat ini, kamu tidak bisa memakai pemulihan paket darurat."
     },
     "CloudBackup": {
       "title": "Mari cadangkan dompet Anda",

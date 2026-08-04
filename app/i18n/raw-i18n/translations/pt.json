@@ -3678,13 +3678,19 @@
             }
         },
         "BundleExport": {
-            "title": "Antes de começar",
-            "subtitle": "Se o Spark ou o Blink ficarem indisponíveis, use este arquivo para sair on-chain. Este arquivo é sensível. Mantenha-o privado.",
-            "subtitlePending": "Seu backup de recuperação é criado automaticamente assim que você recebe fundos, e é mantido atualizado a partir daí. Você pode baixá-lo a qualquer momento nas Configurações.",
-            "download": "Baixar",
+            "title": "Só mais uma coisa",
+            "subtitle": "Se o Spark ficar indisponível, use este pacote para sair on-chain. Este pacote é sensível. Mantenha-o privado.",
+            "subtitlePending": "Seu pacote de emergência é criado automaticamente assim que você recebe fundos, e é mantido atualizado. Você pode baixá-lo a qualquer momento nas Configurações.",
+            "download": "Baixar pacote",
             "copy": "Copiar",
             "sensitiveTitle": "Sensível",
-            "sensitiveBody": "Este arquivo contém dados sensíveis da carteira e deve ser mantido privado. Se você perder este dispositivo, não poderá usar a recuperação de emergência."
+            "skip": "Pular",
+            "learnMore": "Saiba mais sobre a saída unilateral",
+            "learnMoreTitle": "Saída unilateral",
+            "learnMoreBody": "O Spark mantém seus bitcoins fora da cadeia para que os pagamentos sejam instantâneos e baratos. Se os operadores ficarem indisponíveis, este pacote junto com sua frase de recuperação permite mover os fundos on-chain você mesmo, sem o Blink. Leva semanas e tem taxas on-chain, então é uma rede de segurança, não um caminho do dia a dia.",
+            "sensitiveConfirm": "Baixar",
+            "savedTitle": "Pacote de emergência salvo",
+            "sensitiveBody": "Este arquivo contém dados sensíveis da carteira e deve ser mantido privado. Se você perder este dispositivo, não poderá usar a recuperação pelo pacote de emergência."
         },
         "CloudBackup": {
             "title": "Vamos fazer backup da sua carteira",

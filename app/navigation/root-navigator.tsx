@@ -143,6 +143,7 @@ import {
   ViewBackupPhraseScreen,
   BackupPhraseConfirmScreen,
   BundleExportScreen,
+  BundleSavedScreen,
   BackupSuccessScreen,
   WalletCreationScreen,
 } from "@app/screens/self-custodial/onboarding"
@@ -865,6 +866,11 @@ export const RootStack = () => {
         options={{
           title: LL.BackupScreen.BundleExport.title(),
         }}
+      />
+      <RootNavigator.Screen
+        name="selfCustodialBundleSaved"
+        component={BundleSavedScreen}
+        options={{ headerShown: false, gestureEnabled: false }}
       />
       <RootNavigator.Screen
         name="selfCustodialBackupSuccess"

@@ -3678,13 +3678,19 @@
       }
     },
     "BundleExport": {
-      "title": "Prije nego počneš",
-      "subtitle": "Ako Spark ili Blink postanu nedostupni, upotrijebi ovu datoteku za izlazak on-chain. Ova je datoteka osjetljiva. Čuvaj je privatno.",
-      "subtitlePending": "Tvoja sigurnosna kopija za oporavak stvara se automatski čim primiš sredstva i od tada se održava ažurnom. Možeš je preuzeti u bilo kojem trenutku u Postavkama.",
-      "download": "Preuzmi",
+      "title": "Još jedna stvar",
+      "subtitle": "Ako Spark postane nedostupan, upotrijebi ovaj paket za izlazak on-chain. Ovaj je paket osjetljiv. Čuvaj ga privatno.",
+      "subtitlePending": "Tvoj paket za hitne slučajeve stvara se automatski čim primiš sredstva i od tada se održava ažurnim. Možeš ga preuzeti bilo kada u Postavkama.",
+      "download": "Preuzmi paket",
       "copy": "Kopiraj",
       "sensitiveTitle": "Osjetljivo",
-      "sensitiveBody": "Ova datoteka sadrži osjetljive podatke novčanika i mora ostati privatna. Ako izgubiš ovaj uređaj, nećeš moći upotrijebiti hitni oporavak."
+      "skip": "Preskoči",
+      "learnMore": "Saznaj više o jednostranom izlasku",
+      "learnMoreTitle": "Jednostrani izlazak",
+      "learnMoreBody": "Spark drži tvoje bitcoine izvan lanca kako bi plaćanja bila trenutna i jeftina. Ako njegovi operateri postanu nedostupni, ovaj paket uz tvoju frazu za oporavak omogućuje da sam premjestiš sredstva on-chain, bez Blinka. Traje tjednima i košta on-chain naknade, pa je sigurnosna mreža, a ne svakodnevni put.",
+      "sensitiveConfirm": "Preuzmi",
+      "savedTitle": "Paket za hitne slučajeve spremljen",
+      "sensitiveBody": "Ova datoteka sadrži osjetljive podatke novčanika i mora ostati privatna. Ako izgubiš ovaj uređaj, nećeš moći upotrijebiti oporavak iz paketa za hitne slučajeve."
     },
     "CloudBackup": {
       "title": "Napravimo sigurnosnu kopiju vašeg novčanika",

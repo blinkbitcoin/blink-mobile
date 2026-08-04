@@ -3678,13 +3678,19 @@
       }
     },
     "BundleExport": {
-      "title": "Før du starter",
-      "subtitle": "Hvis Spark eller Blink går offline, kan du bruge denne fil til at gå on-chain. Denne fil er følsom. Hold den privat.",
-      "subtitlePending": "Din gendannelsessikkerhedskopi oprettes automatisk, når du modtager midler, og holdes opdateret derefter. Du kan altid downloade den fra Indstillinger.",
-      "download": "Download",
+      "title": "En sidste ting",
+      "subtitle": "Hvis Spark går offline, kan du bruge dette bundt til at gå on-chain. Dette bundt er følsomt. Hold det privat.",
+      "subtitlePending": "Dit nødbundt oprettes automatisk, når du modtager midler, og holdes opdateret derefter. Du kan altid downloade det fra Indstillinger.",
+      "download": "Download bundt",
       "copy": "Kopiér",
       "sensitiveTitle": "Følsom",
-      "sensitiveBody": "Denne fil indeholder følsomme tegnebogsdata og skal holdes privat. Hvis du mister denne enhed, kan du ikke bruge nødgendannelse."
+      "skip": "Spring over",
+      "learnMore": "Læs mere om ensidig exit",
+      "learnMoreTitle": "Ensidig exit",
+      "learnMoreBody": "Spark holder dine bitcoin uden for kæden, så betalinger er øjeblikkelige og billige. Skulle operatørerne blive utilgængelige, lader dette bundt sammen med din gendannelsessætning dig selv flytte midlerne on-chain, uden Blink. Det tager uger og koster on-chain-gebyrer, så det er et sikkerhedsnet, ikke en daglig rute.",
+      "sensitiveConfirm": "Download",
+      "savedTitle": "Nødbundt gemt",
+      "sensitiveBody": "Denne fil indeholder følsomme tegnebogsdata og skal holdes privat. Hvis du mister denne enhed, kan du ikke bruge gendannelse fra nødbundtet."
     },
     "CloudBackup": {
       "title": "Lad os sikkerhedskopiere din tegnebog",

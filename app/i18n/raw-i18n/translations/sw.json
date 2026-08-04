@@ -3678,13 +3678,19 @@
       }
     },
     "BundleExport": {
-      "title": "Kabla hujaanza",
-      "subtitle": "Iwapo Spark au Blink hazitapatikana, tumia faili hili kutoka on-chain. Faili hili ni nyeti. Liweke faragha.",
-      "subtitlePending": "Nakala yako ya urejeshaji huundwa kiotomatiki mara tu unapopokea fedha, na huendelea kusasishwa. Unaweza kuipakua wakati wowote kwenye Mipangilio.",
-      "download": "Pakua",
+      "title": "Jambo la mwisho",
+      "subtitle": "Iwapo Spark haitapatikana, tumia kifurushi hiki kutoka on-chain. Kifurushi hiki ni nyeti. Kiweke faragha.",
+      "subtitlePending": "Kifurushi chako cha dharura huundwa kiotomatiki mara tu unapopokea fedha, na huendelea kusasishwa. Unaweza kukipakua wakati wowote kwenye Mipangilio.",
+      "download": "Pakua kifurushi",
       "copy": "Nakili",
       "sensitiveTitle": "Nyeti",
-      "sensitiveBody": "Faili hili lina data nyeti ya pochi na lazima liwekwe faragha. Ukipoteza kifaa hiki, hutaweza kutumia urejeshaji wa dharura."
+      "skip": "Ruka",
+      "learnMore": "Jifunze zaidi kuhusu kutoka kwa upande mmoja",
+      "learnMoreTitle": "Kutoka kwa upande mmoja",
+      "learnMoreBody": "Spark huhifadhi bitcoin yako nje ya mnyororo ili malipo yawe ya papo hapo na ya bei nafuu. Iwapo waendeshaji wake hawatapatikana, kifurushi hiki pamoja na fungu lako la maneno hukuwezesha kuhamisha fedha on-chain mwenyewe, bila Blink. Huchukua wiki kadhaa na hugharimu ada za on-chain, hivyo ni wavu wa usalama, si njia ya kila siku.",
+      "sensitiveConfirm": "Pakua",
+      "savedTitle": "Kifurushi cha dharura kimehifadhiwa",
+      "sensitiveBody": "Faili hili lina data nyeti ya pochi na lazima liwekwe faragha. Ukipoteza kifaa hiki, hutaweza kutumia urejeshaji wa kifurushi cha dharura."
     },
     "CloudBackup": {
       "title": "Tuhifadhi nakala ya mkoba wako",

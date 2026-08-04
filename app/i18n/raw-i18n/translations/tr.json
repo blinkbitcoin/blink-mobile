@@ -3678,13 +3678,19 @@
       }
     },
     "BundleExport": {
-      "title": "Başlamadan önce",
-      "subtitle": "Spark veya Blink kullanılamaz hale gelirse, zincir üzerinden çıkmak için bu dosyayı kullan. Bu dosya hassastır. Gizli tut.",
-      "subtitlePending": "Kurtarma yedeğin, para aldığın anda otomatik olarak oluşturulur ve o andan itibaren güncel tutulur. Ayarlar'dan istediğin zaman indirebilirsin.",
-      "download": "İndir",
+      "title": "Son bir şey",
+      "subtitle": "Spark kullanılamaz hale gelirse, zincir üzerinden çıkmak için bu paketi kullan. Bu paket hassastır. Gizli tut.",
+      "subtitlePending": "Acil durum paketin, para aldığın anda otomatik olarak oluşturulur ve güncel tutulur. Ayarlar'dan istediğin zaman indirebilirsin.",
+      "download": "Paketi indir",
       "copy": "Kopyala",
       "sensitiveTitle": "Hassas",
-      "sensitiveBody": "Bu dosya hassas cüzdan verileri içerir ve gizli tutulmalıdır. Bu cihazı kaybedersen acil kurtarmayı kullanamazsın."
+      "skip": "Atla",
+      "learnMore": "Tek taraflı çıkış hakkında daha fazla bilgi",
+      "learnMoreTitle": "Tek taraflı çıkış",
+      "learnMoreBody": "Spark, ödemelerin anında ve ucuz olması için bitcoin'ini zincir dışında tutar. Operatörleri bir gün kullanılamaz hale gelirse, bu paket ve kurtarma ifadenle paranı Blink olmadan kendin zincir üzerine taşıyabilirsin. Haftalar sürer ve zincir ücretleri vardır; yani günlük bir yol değil, bir güvenlik ağıdır.",
+      "sensitiveConfirm": "İndir",
+      "savedTitle": "Acil durum paketi kaydedildi",
+      "sensitiveBody": "Bu dosya hassas cüzdan verileri içerir ve gizli tutulmalıdır. Bu cihazı kaybedersen acil durum paketiyle kurtarmayı kullanamazsın."
     },
     "CloudBackup": {
       "title": "Cüzdanınızı yedekleyelim",
