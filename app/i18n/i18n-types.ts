@@ -12430,6 +12430,18 @@ type RootTranslation = {
 			 */
 			description: RequiredParams<'provider'>
 			/**
+			 * A​u​t​o​m​a​t​i​c​ ​b​a​c​k​u​p​s
+			 */
+			autoBundleCheckbox: string
+			/**
+			 * E​n​a​b​l​e​s​ ​u​n​i​l​a​t​e​r​a​l​ ​e​x​i​t​ ​i​n​ ​c​a​s​e​ ​S​p​a​r​k​ ​o​p​e​r​a​t​o​r​s​ ​g​o​ ​o​f​f​l​i​n​e
+			 */
+			autoBundleHint: string
+			/**
+			 * A​d​d​ ​a​ ​p​a​s​s​w​o​r​d​ ​a​b​o​v​e​ ​t​o​ ​e​n​a​b​l​e​ ​t​h​i​s​.​ ​W​i​t​h​o​u​t​ ​o​n​e​,​ ​y​o​u​r​ ​r​e​c​o​v​e​r​y​ ​b​a​c​k​u​p​ ​w​o​u​l​d​ ​s​i​t​ ​n​e​x​t​ ​t​o​ ​a​n​ ​u​n​p​r​o​t​e​c​t​e​d​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​.
+			 */
+			autoBundleNeedsPassword: string
+			/**
 			 * E​n​c​r​y​p​t​ ​w​i​t​h​ ​a​d​d​i​t​i​o​n​a​l​ ​p​a​s​s​w​o​r​d
 			 */
 			encryptCheckbox: string
@@ -26061,6 +26073,18 @@ export type TranslationFunctions = {
 			 * We will save a backup of your backup phrase to your {provider}.
 			 */
 			description: (arg: { provider: string }) => LocalizedString
+			/**
+			 * Automatic backups
+			 */
+			autoBundleCheckbox: () => LocalizedString
+			/**
+			 * Enables unilateral exit in case Spark operators go offline
+			 */
+			autoBundleHint: () => LocalizedString
+			/**
+			 * Add a password above to enable this. Without one, your recovery backup would sit next to an unprotected backup phrase.
+			 */
+			autoBundleNeedsPassword: () => LocalizedString
 			/**
 			 * Encrypt with additional password
 			 */

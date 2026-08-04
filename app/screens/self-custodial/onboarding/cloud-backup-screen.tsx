@@ -1,7 +1,7 @@
 import React from "react"
 import { View } from "react-native"
 
-import { makeStyles, useTheme } from "@rn-vui/themed"
+import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { CheckboxRow } from "@app/components/checkbox-row"
@@ -31,6 +31,9 @@ export const CloudBackupScreen: React.FC = () => {
 
   const {
     isEncrypted,
+    autoBundleSync,
+    canSyncBundle,
+    toggleAutoBundleSync,
     password,
     confirmPassword,
     toggleEncryption,
@@ -43,7 +46,11 @@ export const CloudBackupScreen: React.FC = () => {
     isValid,
   } = useCloudBackupForm()
 
-  const { handleBackup, loading } = useCloudBackup({ isEncrypted, password })
+  const { handleBackup, loading } = useCloudBackup({
+    isEncrypted,
+    password,
+    autoBundleSync,
+  })
 
   useMigrationBackupCheckpoint(MigrationCheckpoint.CloudBackup)
 
@@ -63,6 +70,20 @@ export const CloudBackupScreen: React.FC = () => {
           </View>
 
           <View style={styles.formContainer}>
+            <CheckboxRow
+              label={LL.BackupScreen.CloudBackup.autoBundleCheckbox()}
+              isChecked={autoBundleSync}
+              onPress={toggleAutoBundleSync}
+              disabled={!canSyncBundle}
+              centered
+              {...testProps("auto-bundle-checkbox")}
+            />
+            <Text style={styles.hint}>
+              {canSyncBundle
+                ? LL.BackupScreen.CloudBackup.autoBundleHint()
+                : LL.BackupScreen.CloudBackup.autoBundleNeedsPassword()}
+            </Text>
+
             <CheckboxRow
               label={LL.BackupScreen.CloudBackup.encryptCheckbox()}
               isChecked={isEncrypted}
@@ -122,7 +143,7 @@ export const CloudBackupScreen: React.FC = () => {
   )
 }
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles(({ colors }) => ({
   container: {
     flex: 1,
     justifyContent: "space-between",
@@ -135,6 +156,12 @@ const useStyles = makeStyles(() => ({
     paddingTop: 20,
     gap: 14,
     alignItems: "center",
+  },
+  hint: {
+    fontSize: 14,
+    lineHeight: 18,
+    textAlign: "center",
+    color: colors.grey2,
   },
   encryptionFields: {
     gap: 0,

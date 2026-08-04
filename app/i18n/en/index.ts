@@ -3907,6 +3907,10 @@ const en: BaseTranslation = {
       title: "Let's back up your wallet",
       description:
         "We will save a backup of your backup phrase to your {provider: string}.",
+      autoBundleCheckbox: "Automatic backups",
+      autoBundleHint: "Enables unilateral exit in case Spark operators go offline",
+      autoBundleNeedsPassword:
+        "Add a password above to enable this. Without one, your recovery backup would sit next to an unprotected backup phrase.",
       encryptCheckbox: "Encrypt with additional password",
       password: "Password",
       passwordPlaceholder: "(12 characters minimum)",
