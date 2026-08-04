@@ -2,7 +2,7 @@ import React from "react"
 import { it } from "@jest/globals"
 import { MockedResponse } from "@apollo/client/testing"
 import { act, fireEvent, render, waitFor } from "@testing-library/react-native"
-import { StyleSheet } from "react-native"
+import { RefreshControl, StyleSheet } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 
 import { HomeScreen } from "../../app/screens/home-screen"
@@ -1906,6 +1906,50 @@ describe("HomeScreen pending receive badge", () => {
     await flushEffects()
 
     expect(queryByTestId("balance-status-badge")).toBeNull()
+  })
+})
+
+describe("HomeScreen pull-to-refresh", () => {
+  beforeEach(resetHomeScreenMocks)
+
+  /** iOS renders a programmatically-pinned UIRefreshControl as a frozen,
+   *  non-spinning spinner. The control must reflect only user-initiated pulls
+   *  (which the gesture animates natively), never background query loading —
+   *  binding it to `loading` pinned a dead spinner on every mount and forever
+   *  while a self-custodial wallet connects. */
+  it("does not pin the refresh spinner while queries load in the background", async () => {
+    // eslint-disable-next-line camelcase -- testing-library exposes this API verbatim
+    const { UNSAFE_getByType } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    expect(UNSAFE_getByType(RefreshControl).props.refreshing).toBe(false)
+
+    await flushEffects()
+
+    expect(UNSAFE_getByType(RefreshControl).props.refreshing).toBe(false)
+  })
+
+  it("spins only for the duration of a user-initiated refresh", async () => {
+    // eslint-disable-next-line camelcase -- testing-library exposes this API verbatim
+    const { UNSAFE_getByType } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    act(() => {
+      UNSAFE_getByType(RefreshControl).props.onRefresh()
+    })
+
+    expect(UNSAFE_getByType(RefreshControl).props.refreshing).toBe(true)
+
+    await waitFor(() =>
+      expect(UNSAFE_getByType(RefreshControl).props.refreshing).toBe(false),
+    )
   })
 })
 

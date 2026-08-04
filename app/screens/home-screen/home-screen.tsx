@@ -529,23 +529,22 @@ export const HomeScreen: React.FC = () => {
     openUpgradeModal,
   ])
 
-  const refetch = React.useCallback(() => {
+  const refetch = React.useCallback(async () => {
     if (isSelfCustodial) {
-      refreshSelfCustodialWallets()
+      await refreshSelfCustodialWallets()
       return
     }
 
     if (!isAuthed) return
 
-    Promise.all([
+    await Promise.all([
       refetchRealtimePrice(),
       refetchAuthed(),
       refetchUnauthed(),
       refetchBulletins(),
-    ]).then(() => {
-      // Triggers the upgrade trial account modal after refetch
-      triggerUpgradeModal()
-    })
+    ])
+    // Triggers the upgrade trial account modal after refetch
+    triggerUpgradeModal()
   }, [
     isAuthed,
     isSelfCustodial,
@@ -556,6 +555,20 @@ export const HomeScreen: React.FC = () => {
     refetchUnauthed,
     triggerUpgradeModal,
   ])
+
+  /** The refresh control reflects only user-initiated pulls: iOS renders a
+   *  programmatically-pinned UIRefreshControl as a frozen spinner, so binding
+   *  it to background query loading pinned a dead spinner on every mount (and
+   *  indefinitely while a self-custodial wallet connects). */
+  const [isPullRefreshing, setIsPullRefreshing] = React.useState(false)
+  const handlePullToRefresh = React.useCallback(async () => {
+    setIsPullRefreshing(true)
+    try {
+      await refetch()
+    } finally {
+      setIsPullRefreshing(false)
+    }
+  }, [refetch])
 
   const numberOfTxs = transactions.length
 
@@ -808,8 +821,8 @@ export const HomeScreen: React.FC = () => {
         contentContainerStyle={styles.scrollViewContainer}
         refreshControl={
           <RefreshControl
-            refreshing={loading && isFocused}
-            onRefresh={refetch}
+            refreshing={isPullRefreshing}
+            onRefresh={handlePullToRefresh}
             colors={[colors.primary]}
             tintColor={colors.primary}
           />
