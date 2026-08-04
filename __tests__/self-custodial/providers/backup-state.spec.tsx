@@ -7,7 +7,10 @@ import {
   BackupMethod,
   BackupStatus,
   completedMethodsOf,
+  isCloudSeedBackupCompleted,
+  isPasswordProtectedCloudSeedBackup,
   markBackupCompletedFor,
+  readBackupStateFor,
   removeBackupStateFor,
 } from "@app/self-custodial/providers/backup-state"
 import { AccountType, AccountStatus } from "@app/types/wallet"
@@ -562,6 +565,61 @@ describe("BackupStateProvider", () => {
         method: "manual",
         completedMethods: ["manual"],
       })
+    })
+  })
+
+  describe("cloudPasswordProtected persistence (D9 gate)", () => {
+    it("persists the flag when setBackupCompleted records a password-protected cloud backup", async () => {
+      const { result } = renderHook(() => useBackupState(), { wrapper })
+
+      await act(async () => {})
+
+      await act(async () => {
+        result.current.setBackupCompleted("cloud", { cloudPasswordProtected: true })
+      })
+
+      // Exact JSON: dropping the flag on write would silently close the D9
+      // gate for every future bundle cloud sync, and nothing else covers it.
+      expect(mockSetItem).toHaveBeenCalledWith(
+        BACKUP_KEY,
+        JSON.stringify({
+          status: "completed",
+          method: "cloud",
+          cloudPasswordProtected: true,
+        }),
+      )
+    })
+
+    it("round-trips the flag through markBackupCompletedFor into the D9 gate", async () => {
+      let persisted: string | null = null
+      mockSetItem.mockImplementation(async (_key: string, value: string) => {
+        persisted = value
+      })
+      mockGetItem.mockImplementation(async () => persisted)
+
+      await markBackupCompletedFor(TEST_SC_ACCOUNT_ID, BackupMethod.Cloud, {
+        cloudPasswordProtected: true,
+      })
+
+      const state = await readBackupStateFor(TEST_SC_ACCOUNT_ID)
+      expect(isCloudSeedBackupCompleted(state)).toBe(true)
+      expect(isPasswordProtectedCloudSeedBackup(state)).toBe(true)
+    })
+
+    it("defaults closed: a cloud backup completed without the flag never opens the gate", async () => {
+      let persisted: string | null = null
+      mockSetItem.mockImplementation(async (_key: string, value: string) => {
+        persisted = value
+      })
+      mockGetItem.mockImplementation(async () => persisted)
+
+      await markBackupCompletedFor(TEST_SC_ACCOUNT_ID, BackupMethod.Cloud)
+
+      const state = await readBackupStateFor(TEST_SC_ACCOUNT_ID)
+      // Pre-existing states and passwordless cloud backups look identical:
+      // the seed is in the cloud, but the bundle must not be (PRD rule D9).
+      expect(isCloudSeedBackupCompleted(state)).toBe(true)
+      expect(isPasswordProtectedCloudSeedBackup(state)).toBe(false)
     })
   })
 
