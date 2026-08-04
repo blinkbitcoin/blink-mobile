@@ -65,7 +65,9 @@ export const useSaveSessionProfile = () => {
           username ||
           phone ||
           email?.address ||
-          `${blinkUserText} - ${defaultAccount.id.slice(-6)}`
+          // defaultAccount can be transiently missing right after device-account
+          // creation; a thrown error here would silently skip profile persistence
+          `${blinkUserText}${defaultAccount ? ` - ${defaultAccount.id.slice(-6)}` : ""}`
 
         return {
           userId: id,

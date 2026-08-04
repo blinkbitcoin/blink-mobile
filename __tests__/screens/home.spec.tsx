@@ -491,6 +491,50 @@ describe("HomeScreen", () => {
     expect(getByTestId("slide-up-handle")).toBeTruthy()
   })
 
+  it("renders when the authed response is temporarily missing defaultAccount", async () => {
+    // Right after device-account creation, /me can resolve before defaultAccount
+    // does; a throw here left the app crashing on every reopen (#3895)
+    const [unauthedMock] = generateHomeMock({
+      level: AccountLevel.Zero,
+      network: Network.Mainnet,
+      btcBalance: 0,
+      usdBalance: 0,
+    })
+    currentMocks = [
+      unauthedMock,
+      {
+        request: { query: HomeAuthedDocument },
+        maxUsageCount: Number.POSITIVE_INFINITY,
+        result: {
+          data: {
+            me: {
+              __typename: "User",
+              id: "user-id",
+              language: "en",
+              username: null,
+              phone: null,
+              email: {
+                __typename: "Email",
+                address: null,
+                verified: false,
+              },
+              defaultAccount: null,
+            },
+          },
+        },
+      },
+    ]
+
+    const { getByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    expect(getByTestId("slide-up-handle")).toBeTruthy()
+  })
+
   it.each([...iosCases, ...androidCases] satisfies ConvertButtonCase[])(
     "%s",
     async ({ isIos, level, network, btcBalance, usdBalance, expectConvertButton }) => {

@@ -66,7 +66,7 @@ const setUserMe = (me: {
   username?: string | null
   phone?: string | null
   email?: { address: string } | null
-  defaultAccount: { id: string }
+  defaultAccount: { id: string } | null
 }) => {
   mockFetchUsername.mockResolvedValue({ data: { me } })
 }
@@ -162,6 +162,24 @@ describe("useSaveSessionProfile", () => {
       expect(mockUpdateState).toHaveBeenCalledTimes(1)
       expect(mockFetchUsername).not.toHaveBeenCalled()
       expect(mockSaveSessionProfiles).not.toHaveBeenCalled()
+    })
+
+    it("still persists the profile when /me is temporarily missing defaultAccount", async () => {
+      // A fresh device account has no username/phone/email, so the identifier
+      // falls back to the defaultAccount id — which can lag right after creation
+      setUserMe({ id: "u1", defaultAccount: null })
+
+      const { result } = renderHook(() => useSaveSessionProfile())
+
+      await result.current.saveProfile("new-token")
+
+      expect(mockRecordError).not.toHaveBeenCalled()
+      expect(mockSaveSessionProfiles).toHaveBeenCalledTimes(1)
+      const saved = mockSaveSessionProfiles.mock.calls[0][0]
+      expect(saved).toHaveLength(1)
+      expect(saved[0].identifier).toBe("Blink user")
+      expect(saved[0].accountId).toBeUndefined()
+      expect(saved[0].selected).toBe(true)
     })
 
     it("saves a brand-new profile alongside the deselected previous ones", async () => {
