@@ -1,10 +1,10 @@
 import { useCallback } from "react"
 import { gql, useApolloClient } from "@apollo/client"
-import crashlytics from "@react-native-firebase/crashlytics"
 
 import { updateDeviceSessionCount } from "@app/graphql/client-only-query"
 import { useGetUsernamesLazyQuery } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { reportError } from "@app/utils/error-logging"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
 import { usePersistentStateContext } from "../store/persistent-state"
@@ -79,7 +79,7 @@ export const useSaveSessionProfile = () => {
           lnAddressHostname: hostName,
         }
       } catch (err) {
-        if (err instanceof Error) crashlytics().recordError(err)
+        reportError("save-session-profile", err)
       }
     },
     [blinkUserText, hostName],

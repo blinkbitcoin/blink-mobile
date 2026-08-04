@@ -176,13 +176,3 @@ export const logToastShown = (params: LogToastShownParams) => {
     is_translated: params.isTranslated,
   })
 }
-
-type LogAppFeedbackParams = {
-  isEnjoingApp: boolean
-}
-
-export const logAppFeedback = (params: LogAppFeedbackParams) => {
-  analytics().logEvent("app_feedback", {
-    is_enjoying_app: params.isEnjoingApp,
-  })
-}

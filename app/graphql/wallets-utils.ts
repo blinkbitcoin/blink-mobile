@@ -18,6 +18,11 @@ export const getUsdWallet = (wallets: readonly WalletBalance[] | undefined) => {
   return wallets.find((wallet) => wallet.walletCurrency === WalletCurrency.Usd)
 }
 
+export const getWalletIds = (wallets: readonly WalletBalance[] | undefined): string[] =>
+  [getBtcWallet(wallets)?.id, getUsdWallet(wallets)?.id].filter((id): id is string =>
+    Boolean(id),
+  )
+
 export const getDefaultWallet = (
   wallets: readonly WalletBalance[] | undefined,
   defaultWalletId: string | undefined,

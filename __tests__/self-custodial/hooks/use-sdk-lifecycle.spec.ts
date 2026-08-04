@@ -85,6 +85,13 @@ jest.mock("@app/self-custodial/config", () => ({
   storageDirFor: (id: string) => `/tmp/${id}`,
 }))
 
+let mockDepositClaimLeewayVbyte = 7
+jest.mock("@app/config/feature-flags-context", () => ({
+  useRemoteConfig: () => ({
+    selfCustodialDepositClaimLeewayVbyte: mockDepositClaimLeewayVbyte,
+  }),
+}))
+
 const mockRecordError = jest.fn()
 const mockCrashlyticsLog = jest.fn()
 jest.mock("@react-native-firebase/crashlytics", () => () => ({
@@ -110,6 +117,7 @@ const buildSdk = (id: string) => ({ id }) as unknown as object
 describe("useSdkLifecycle", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockDepositClaimLeewayVbyte = 7
     mockGetMnemonicForAccount.mockResolvedValue("word1 word2 word3")
     mockValidateStoredNetwork.mockResolvedValue(true)
     mockGetSnapshot.mockResolvedValue({
@@ -171,6 +179,30 @@ describe("useSdkLifecycle", () => {
     })
   })
 
+  describe("remote-config leeway changes", () => {
+    it("does not reconnect the SDK when only the deposit-claim leeway changes", async () => {
+      mockInitSdk.mockResolvedValue(buildSdk("sdk-1"))
+      captureListener()
+
+      const { rerender, result } = renderHook(
+        ({ accountId }: { accountId: string }) => useSdkLifecycle(accountId, 0),
+        { initialProps: { accountId: "acct-1" } },
+      )
+
+      await waitFor(() => {
+        expect(result.current.sdk).not.toBeNull()
+      })
+      expect(mockInitSdk).toHaveBeenCalledTimes(1)
+
+      mockDepositClaimLeewayVbyte = 9
+      rerender({ accountId: "acct-1" })
+      await act(async () => {})
+
+      expect(mockInitSdk).toHaveBeenCalledTimes(1)
+      expect(mockDisconnectSdk).not.toHaveBeenCalled()
+    })
+  })
+
   describe("happy path", () => {
     it("loads the mnemonic, validates the network, initializes the SDK, and reaches Ready after the Synced event", async () => {
       const sdk = buildSdk("sdk-1")
@@ -188,11 +220,12 @@ describe("useSdkLifecycle", () => {
         "acct-1",
         mockSparkNetwork.Regtest,
       )
-      expect(mockInitSdk).toHaveBeenCalledWith(
-        "word1 word2 word3",
-        "/tmp/acct-1",
-        mockSparkNetwork.Regtest,
-      )
+      expect(mockInitSdk).toHaveBeenCalledWith({
+        mnemonic: "word1 word2 word3",
+        storageDir: "/tmp/acct-1",
+        network: mockSparkNetwork.Regtest,
+        leewaySatPerVbyte: 7,
+      })
       expect(result.current.connectedAccountId).toBe("acct-1")
 
       await waitFor(() => {
@@ -252,11 +285,12 @@ describe("useSdkLifecycle", () => {
       )
 
       await waitFor(() => {
-        expect(mockInitSdk).toHaveBeenCalledWith(
-          "word1 word2 word3",
-          "/tmp/acct-A",
-          mockSparkNetwork.Regtest,
-        )
+        expect(mockInitSdk).toHaveBeenCalledWith({
+          mnemonic: "word1 word2 word3",
+          storageDir: "/tmp/acct-A",
+          network: mockSparkNetwork.Regtest,
+          leewaySatPerVbyte: 7,
+        })
       })
 
       rerender({ accountId: "acct-B" })
@@ -265,11 +299,12 @@ describe("useSdkLifecycle", () => {
         expect(mockDisconnectSdk).toHaveBeenCalledWith(sdkA)
       })
       await waitFor(() => {
-        expect(mockInitSdk).toHaveBeenCalledWith(
-          "word1 word2 word3",
-          "/tmp/acct-B",
-          mockSparkNetwork.Regtest,
-        )
+        expect(mockInitSdk).toHaveBeenCalledWith({
+          mnemonic: "word1 word2 word3",
+          storageDir: "/tmp/acct-B",
+          network: mockSparkNetwork.Regtest,
+          leewaySatPerVbyte: 7,
+        })
       })
 
       expect(mockDisconnectSdk.mock.invocationCallOrder[0]).toBeLessThan(

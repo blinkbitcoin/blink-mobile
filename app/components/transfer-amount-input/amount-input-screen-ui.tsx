@@ -10,12 +10,14 @@ export type AmountInputScreenUIProps = {
   errorMessage?: string
   onKeyPress: (key: Key) => void
   disabledKeys?: ReadonlySet<Key>
+  disabled?: boolean
 }
 
 export const AmountInputScreenUI: React.FC<AmountInputScreenUIProps> = ({
   errorMessage,
   onKeyPress,
   disabledKeys,
+  disabled = false,
 }) => {
   const styles = useStyles()
   const {
@@ -37,7 +39,12 @@ export const AmountInputScreenUI: React.FC<AmountInputScreenUIProps> = ({
         </Text>
       </View>
       <View style={styles.keyboardContainer}>
-        <CurrencyKeyboard onPress={onKeyPress} disabledKeys={disabledKeys} safeMode />
+        <CurrencyKeyboard
+          onPress={onKeyPress}
+          disabledKeys={disabledKeys}
+          disabled={disabled}
+          safeMode
+        />
       </View>
     </View>
   )

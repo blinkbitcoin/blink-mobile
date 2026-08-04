@@ -1,4 +1,38 @@
 {
+  "ApiScreen": {
+    "keysGroupTitle": "Izitshixo ze-API",
+    "noKeys": "Akukho zitshixo ze-API okwangoku",
+    "createKey": "Yenza isitshixo se-API",
+    "createTitle": "Isitshixo se-API esitsha",
+    "keyCreatedTitle": "Isitshixo se-API senziwe",
+    "keyName": "Igama lesitshixo",
+    "keyNamePlaceholder": "umz. BTCPay Server",
+    "scopeRead": "Funda",
+    "scopeReadDescription": "Jonga ibhalansi kunye nembali yentengiselwano",
+    "scopeReceive": "Yamkela",
+    "scopeReceiveDescription": "Yenza ii-invoyisi kwaye wamkele iintlawulo",
+    "scopeWrite": "Bhala",
+    "writeScopeDashboardOnly": "Izitshixo ezinokuthumela iintlawulo zingenziwa kuphela ku-dashboard.blink.sv",
+    "expiry": "Iphelelwa",
+    "expiry30Days": "Iintsuku ezingama-30",
+    "expiry90Days": "Iintsuku ezingama-90",
+    "expiryNever": "Ayihlali",
+    "expiresOn": "Iphelelwa nge-{date: string}",
+    "neverExpires": "Ayipheleli",
+    "revoked": "Irhoxisiwe",
+    "expired": "Iphelelwe nge-{date: string}",
+    "expiredNoDate": "Iphelelwe",
+    "secretWarning": "Eli lelona xesha kuphela isitshixo esiboniswa ngalo. Sikhuphele okanye usabelane ngoku kwaye usigcine ngokukhuselekileyo.",
+    "secretCopied": "Isitshixo se-API sikhutshelwe. Ibhodi yokukhuphela iza kucocwa emva komzuzu omnye",
+    "revokeTitle": "Rhoxisa isitshixo se-API?",
+    "revokeBody": "\"{name: string}\" iza kuyeka ukusebenza ngokukhawuleza. Oku akunakuguqulwa.",
+    "revoke": "Rhoxisa",
+    "revokeSuccess": "Isitshixo se-API sirhoxisiwe",
+    "createError": "Ayikwazanga ukwenza isitshixo se-API. Nceda uzame kwakhona.",
+    "revokeError": "Ayikwazanga ukurhoxisa isitshixo se-API. Nceda uzame kwakhona.",
+    "loadError": "Ayikwazanga ukulayisha izitshixo zakho ze-API. Nceda uzame kamva.",
+    "done": "Kwenziwe"
+  },
   "GaloyAddressScreen": {
     "title": "Receive payment by using:",
     "buttonTitle": "Set your address",
@@ -2003,7 +2037,7 @@
     "satAccumulated": "IiSats ziqokelelene",
     "satsEarned": "{formattedNumber | sats} efunyenweyo",
     "sectionsCompleted": "Ugqibile",
-    "title": "Zuza",
+    "title": "Funda",
     "unlockQuestion": "Ukuvula, phendula umbuzo:",
     "youEarned": "Uzuzile",
     "registerTitle": "Need to upgrade your account",
@@ -2011,6 +2045,7 @@
     "oneSectionADay": "Icandelo elinye ngosuku!",
     "availableTomorrow": "Buya ngomso ukuqhubeka uzuza iiSats ngelixa ufunda.\n\nOkanye, cofa qhubeka ukuze uqhubeke ufunda ngaphandle kwemivuzo.",
     "motivatingBadger": "Mba indlela yakho kwezi zifundo kwaye uzuze ngelixa ufunda",
+    "motivatingBadgerNoRewards": "Mba indlela yakho kwezi zifundo kwaye ufunde ngeBitcoin",
     "continueNoRewards": "Qhubeka (Ngaphandle kweMivuzo)",
     "somethingNotRight": "Kukho into engahambi kakuhle...",
     "defaultErrorMessage": "{errorMessage: string} Nceda uzame kwakhona emva kwethuba.\nOkanye, cofa ukuqhubeka ukuze uqhubeke ufunda ngaphandle kwemivuzo.",
@@ -2049,7 +2084,7 @@
     "login": "Ngena",
     "loginOrRestore": "Ngena / Buyisela",
     "logBackInWith": "Ngena kwakhona nge",
-    "headline": "Isipaji siqhutywa nguGaloy",
+    "headline": "Isipaji siqhutywa nguBlink",
     "startTrialAccount": "Start with a trial account",
     "startWithTrialAccount": "Start with trial account",
     "registerPhoneAccount": "Register phone account",
@@ -2163,6 +2198,9 @@
     "lightningInvoice": "I-invoyisi ye-lightning",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Imali yokufaka: {fee} SAT kwimali engaphantsi kwe-{threshold} SAT okanye {overFee} SAT kwimali efakwe engaphezulu kwe-{threshold} SAT",
+    "depositFeeTiers": "Deposit fees: {tiers: string}",
+    "depositFeeTierUpTo": "{fee: string} SAT up to {max: string} SAT",
+    "depositFeeTierAbove": "{fee: string} SAT above {min: string} SAT",
     "autoConvertMinAmount": "Amaxabiso angaphantsi kwe-{minSats: number} sats / {minFiat: string} awanakho ukuguqulelwa ngokuzenzekelayo kwi-Dollar. Uya kufumana i-Bitcoin endaweni yoko.",
     "autoConvertFailed": "Intlawulo ifumenekile kodwa ukuguqulwa kusilele.",
     "pleaseWaitForConversion": "Nceda linda de ukuguqulwa kugqitywe"
@@ -2261,6 +2299,10 @@
     "invalidPhoneNumber": "Faka inombolo yomnxeba esebenzayo",
     "phoneNotAllowed": "Eli candelo alamkeli iinombolo zomnxeba"
   },
+  "MerchantSelectionScreen": {
+    "title": "Khetha indlela yokuhlawula",
+    "empty": "Akukho ndlela zokuhlawula zikhoyo."
+  },
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Intlawulo kufuneka ithunyelwe kwi-mempool",
     "amount": "Isixa",
@@ -2279,7 +2321,6 @@
     "notConfirmed": "Intlawulo ithunyelwe kodwa ayikaqinisekiswa okwangoku Ungajonga ubume yentlawulo kwiiNtengiselwano",
     "note": "Qaphela",
     "success": "Intlawulo ithunyelwe ngempumelelo",
-    "suggestionInput": "Faka isiphakamiso sakho",
     "max": "Max",
     "maxAmount": "Max Amount",
     "title": "Thumela iBitcoin",
@@ -2319,6 +2360,10 @@
     "sdkGenericError": "Ayikwazi ukuqikelela iintlawulo. Nceda uzame imali eyahlukileyo."
   },
   "SettingsScreen": {
+    "createAddress": "Yenza idilesi",
+    "donationButton": "Iqhosha lomnikelo",
+    "btcpayServer": "BTCPay Server",
+    "woocommerce": "WooCommerce",
     "staticQr": "I-QR esisigxina enokuprintwa",
     "staticQrCopied": "Ilinki yakho ye-QR esisigxina ikopishiwe",
     "setByOs": "Isetwe yi-OS",
@@ -2327,7 +2372,6 @@
     "apiDashboard": "Ukufikelela kwi-API nedashbhodi",
     "pos": "Indawo Yokuthengisa",
     "posCopied": "Ilinki yakho yendawo yokuthengisa ikopishiwe",
-    "setYourLightningAddress": "Seta idilesi yakho ye-Lightning",
     "activated": "Yenziwe yasebenza",
     "addressScreen": "Iindlela zokuhlawulwa",
     "nonCustodialAccount": "Iakhawunti engagcinwanga",
@@ -2525,7 +2569,32 @@
     "receivingAccount": "Ukufumana iAkhawunti",
     "sendingAccount": "Ukuthumela iAkhawunti",
     "txNotBroadcast": "Your transaction is currently pending and will be broadcasted to the Bitcoin network in a moment.",
-    "momentarily": "okwethutyana"
+    "momentarily": "okwethutyana",
+    "findingAccount": "Ikhangela i-akhawunti yale ntlawulo...",
+    "txNotFoundInAccounts": "Le ntlawulo ayifumanekanga kuyo nayiphi na i-akhawunti kwesi sixhobo. Isenokuba yeye-akhawunti ephume ngaphandle.",
+    "txLoadFailed": "Ayikwazanga ukulayisha le ntlawulo. Khangela uqhagamshelo lwakho uzame kwakhona.",
+    "switchedForPayment": "Itshintshele ku-{identifier: string} ukubonisa le ntlawulo"
+  },
+  "FeeRatesScreen": {
+    "title": "Amazinga emirhumo",
+    "send": "Thumela",
+    "receive": "Yamkela",
+    "transfer": "Dlulisela",
+    "lightning": "Lightning",
+    "intraledger": "Intraledger",
+    "onchainPriority": "I-Onchain ephambili (ngokukhawuleza)",
+    "onchainStandard": "I-Onchain eqhelekileyo (~4h)",
+    "onchainEconomy": "I-Onchain elondolozayo",
+    "lightningTransactions": "Iintengiselwano ze-Lightning",
+    "onchainBelowThreshold": "I-Onchain ngaphantsi kwe-{threshold: string} SAT",
+    "onchainAboveThreshold": "I-Onchain ngaphezulu kwe-{threshold: string} SAT",
+    "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
+    "transferFee": "Umrhumo wokudlulisela",
+    "noFee": "akukho mrhumo",
+    "lightningSendFee": "{fee: string} + ~{routingFee: string} umrhumo wokuthumela",
+    "fromApprox": "ukusuka ku-~{fee: string}",
+    "satAmount": "{amount: string} SAT",
+    "error": "Ayikwazanga kufumana imirhumo ngeli xesha"
   },
   "TransactionLimitsScreen": {
     "receive": "Yamkela",
@@ -2570,7 +2639,8 @@
       "tooLong": "Address must be at most 50 characters long",
       "invalidCharacter": "Address can only contain letters, numbers, and underscores",
       "addressUnavailable": "Sorry, this address is already taken",
-      "unknownError": "An unknown error occurred, please try again later"
+      "unknownError": "An unknown error occurred, please try again later",
+      "backupRequired": "Back up your wallet before creating a Lightning address"
     },
     "receiveMoney": "Receive money from other lightning wallets and {bankName: string} users with this address.",
     "itCannotBeChanged": "It can't be changed later."
@@ -2700,6 +2770,8 @@
   },
   "common": {
     "country": "Ilizwe",
+    "registered": "Bhalisiwe",
+    "detected": "Ifunyenwe",
     "unknown": "Ayaziwa",
     "enabled": "Ivuliwe",
     "switch": "Iswitshi",
@@ -2719,6 +2791,7 @@
     "anonymousUser": "Umsebenzisi ongaziwayo",
     "blinkToBlink": "Blink ukuya Blink",
     "transactionLimits": "Transaction Limits",
+    "feeRates": "Amazinga emirhumo",
     "activateWallet": "Activate Wallet",
     "amountRequired": "Imali iyafuneka",
     "back": "Back",
@@ -2732,6 +2805,7 @@
     "bitcoinPrice": "Bitcoin Price",
     "btcAccount": "I-Akhawunti ye-Bitcoin",
     "cancel": "Rhoxisa",
+    "card": "Ikhadi",
     "close": "Close",
     "confirm": "Confirm",
     "convert": "Guqula",
@@ -2799,6 +2873,7 @@
     "total": "Total",
     "transactions": "Iintengiselwano/ utshintshwelano",
     "transactionsError": "Error loading transactions",
+    "transfer": "Dlulisela",
     "tryAgain": "Try Again",
     "type": "Type",
     "usdAccount": "I-Akhawunti ye-Idola",
@@ -2815,6 +2890,7 @@
     "problemMaybeReauth": "There was a problem with your request. Please retry in one minute. If the problem persist, we recommend that you log out and log back in. You can log out by going into Settings > Account > Log out",
     "warning": "Warning",
     "continue": "Qhubeka",
+    "skip": "Tsiba",
     "correct": "Kulungile",
     "recommended": "Econyiweyo",
     "expirationTime": "Ixesha Lokuphelelwa",
@@ -2870,11 +2946,9 @@
     "email": "Email",
     "sms": "SMS",
     "faq": "Imibuzo Ebuzwa Rhoqo",
-    "enjoyingApp": "Uyayithanda i-app?",
     "statusPage": "Status Page",
     "telegram": "Telegram",
     "mattermost": "Mattermost",
-    "thankYouText": "Enkosi ngempendulo, ungathanda ukuphakamisa ukuphuculwa?",
     "defaultEmailSubject": "{bankName: string} - Support",
     "defaultSupportMessage": "Hey there! I need some help with {bankName: string}, I'm using the version {version: string} on {os: string}.",
     "emailCopied": "email {email: string} copied to clipboard",
@@ -3044,6 +3118,66 @@
       "limitUpdateSuccess": "Umda uhlaziywe ngempumelelo",
       "limitUpdateError": "Ayiphumelelanga ukuhlaziya umda",
       "limitMustBePositive": "Umda kufuneka ube ngaphezu kwezero"
+    },
+    "CardFeeSchedule": {
+      "title": "Uludwe lweentlawulo zeKhadi leBlink",
+      "effectiveDate": "Iqala ngomhla woku-1 kuJulayi 2026",
+      "sections": {
+        "cardFees": "Iintlawulo zekhadi",
+        "transactionFees": "Iintlawulo zentengiselwano",
+        "overdraft": "Ukubhatala ngaphezulu (imowudi exhaswe ngemali)"
+      },
+      "fees": {
+        "annualFee": {
+          "title": "Intlawulo yonyaka",
+          "subtitle": "Ixolelwe unyaka wokuqala ukususela kumhla wokukhutshwa kweKhadi",
+          "value": "{amount: string} / ngonyaka"
+        },
+        "cardReplacement": {
+          "title": "Ukutshintshwa kwekhadi"
+        },
+        "usdTransactionFee": {
+          "title": "Intlawulo yentengiselwano yeUSD",
+          "subtitle": "Isetyenziswa kuyo yonke intengiselwano ngeedola zaseMelika"
+        },
+        "foreignTransactionFee": {
+          "title": "Intlawulo yentengiselwano yangaphandle",
+          "subtitle": "Isetyenziswa kuyo yonke intengiselwano ngemali engeyodola yaseMelika"
+        },
+        "maximumOverdraft": {
+          "title": "Ukubhatala ngaphezulu okuphezulu",
+          "subtitle": "Kufuneka kubuyiselwe kwiintsuku ezi-7"
+        },
+        "lateRepaymentFee": {
+          "title": "Intlawulo yokubuyisela kade",
+          "subtitle": "Ihlawuliswa ukuba ukubhatala ngaphezulu akubuyiselwanga kwiintsuku ezi-7"
+        }
+      },
+      "btcConversion": {
+        "title": "Uguqulo lweBTC",
+        "body": "Xa intengiselwano ifuna uguqulo lweBTC ukuya kwiUSD, uguqulo lwenziwa ngezinga lotshintshiselwano elikhoyo, elinokuquka umahluko obonisa iindleko zoguqulo."
+      },
+      "feesUpdateNotice": {
+        "text": "Iintlawulo zinokuhlaziywa ngamaxesha athile. IBlink iya kwazisa ubuncinane iintsuku ezingama-30 ngaphambi kokuba naluphi na utshintsho lweentlawulo luqalise ukusebenza, ngokuvumelana",
+        "linkText": "neSivumelwano soMniniKhadi"
+      },
+      "creditModeNotice": "Imowudi yeKredithi ayisebenzi okwangoku. Ukuba iMowudi yeKredithi iyavulwa, amazinga enzala asebenzayo, iintlawulo, kunye nokuchazwa kwamalungelo okubhatala kuya kunikwa ngaphambi kokuvulwa.",
+      "additionalDetails": {
+        "title": "Iinkcukacha ezongezelelweyo zeentlawulo",
+        "overdraft": {
+          "label": "Ukubhatala ngaphezulu",
+          "text": ". Kwiimeko ezithile, intengiselwano inokuvunywa ebangela ukuba iBhalansi yeKhadi lakho ihle ngaphantsi kweqanda. Ukubhatala ngaphezulu okuphezulu yi-{maxOverdraft: string}. Kufuneka ubuyisele ukubhatala ngaphezulu kwiintsuku ezi-7 ngokudlulisela imali eyongezelelweyo kwiBhalansi yeKhadi lakho."
+        },
+        "foreignCurrency": {
+          "label": "Imali yangaphandle",
+          "text": ". Ukuba wenza intengiselwano ngemali yangaphandle, uthungelwano lwekhadi luyiguqula ibe yiUSD lusebenzisa iinkqubo zalo zoguqulo. Izinga ngomhla wokuqhutywa linokwahluka kumhla wentengiselwano."
+        },
+        "noHiddenFees": {
+          "label": "Akukho ntlawulo zifihlakeleyo",
+          "text": ". Akukho ntlawulo zokusetha iakhawunti, ukungasebenzi, imibuzo yebhalansi, okanye ukuvala ikhadi lakho."
+        }
+      },
+      "backButton": "Emva"
     },
     "CardDetails": {
       "title": "Iinkcukacha zekhadi",
@@ -3390,6 +3524,7 @@
         "perYear": "ngonyaka",
         "status": {
           "label": "Isimo",
+          "specialOfferLabel": "Inikelo elikhethekileyo",
           "paymentPending": "Intlawulo Ilindile",
           "firstYearFree": "Unyaka wokuqala simahla"
         },
@@ -3403,7 +3538,11 @@
           "cardholderAgreement": "Isivumelwano soMpathi weKhadi",
           "and": "kunye"
         },
-        "renew": "Ndiyaqonda ukuba ubhaliso lwam luya kuhlaziywa ngokuzenzekelayo kwisithuba sonyaka omnye"
+        "feeSchedule": {
+          "text": "Ndiyiphengululile kwaye ndiyavuma",
+          "linkText": "Ishedyuli Yeentlawulo ye-Blink Card"
+        },
+        "renew": "Ndiyaqonda ukuba ubhaliso lwam luya kuhlaziywa ngokuzenzekelayo kwiinyanga ezili-{months: number}"
       },
       "CardIntroducing": {
         "title": "Ukwazisa",
@@ -3465,13 +3604,29 @@
         "buttonText": "Ngenisa isicelo",
         "select": "khetha"
       },
+      "Acknowledgement": {
+        "title": "Imigaqo nemiqathango",
+        "acceptButton": "Yamkela",
+        "eSignConsent": {
+          "text": "Ndiyamkela",
+          "linkText": "Imvume yoSayino lweElektroniki"
+        },
+        "privacyAndTerms": {
+          "text": "Ndiyamkela",
+          "privacyPolicyLinkText": "uMgaqo-nkqubo wabucala womkhuphi",
+          "and": ", kunye",
+          "cardTermsLinkText": "neMigaqo yeKhadi leBlink"
+        },
+        "certifyAccuracy": "Ndiqinisekisa ukuba ulwazi endilunikile luchanekile nokuba ndiza kuthobela yonke imithetho neemfuno ezinxulumene neKhadi lam leBlink Visa",
+        "acknowledgeSolicitation": "Ndiyavuma ukuba ukufaka isicelo seKhadi leBlink Visa akubuyisi sicelo esingagunyaziswanga"
+      },
       "CardPreapproved": {
         "title": "Uvunyiwe ngaphambili ikhadi le-Blink Visa!",
         "buttonText": "Vala"
       },
       "CardProcessing": {
         "title": "Siqhuba isicelo sakho",
-        "subtitle": "Ixesha lokulinda eliqikelelweyo: {waitTime: string}",
+        "subtitle": "Siza kukwazisa xa sele silungile",
         "buttonText": "Vala"
       }
     }
@@ -3499,6 +3654,7 @@
       },
       "Phrase": {
         "headerTitle": "Ibinzana lokugcina",
+        "authDescription": "Qinisekisa ukuze ubone ibinzana lakho lokugcina",
         "sparkCompatible": "Eli binzana lokugcina lisebenza kuyo nayiphi na {sparkCompatibleLink}",
         "sparkCompatibleLink": "isikhwama esihambisanayo ne-Spark",
         "copiedToast": "Ibinzana lokugcina likopishwe kwibhodi",
@@ -3538,6 +3694,7 @@
       "uploadSuccess": "Ikopi igcinwe kwi-{provider}",
       "uploadFailed": "Ukufaka ikopi akuphumelelanga",
       "signInFailed": "Akuphumelelanga ukungena ku-{provider}",
+      "storageAccessRequired": "Vumela {provider: string} ukufikelela kugcino lwesipaji sakho, uze uzame kwakhona.",
       "cloudNotAvailable": "I-iCloud Drive ayifumaneki. Nceda ngena ku-iCloud kwiisetingi uvule i-iCloud Drive.",
       "networkError": "Impazamo yothungelwano. Nceda ujonge uxhumano lwakho uphinde uzame.",
       "existingBackupTitle": "Ikopi ifunyenwe",
@@ -3549,13 +3706,89 @@
     }
   },
   "AccountMigration": {
+    "contactSupport": {
+      "title": "Qhagamshelana nenkxaso",
+      "body": "Kukho into engahambanga kakuhle, kodwa ungakhathazeki, imali yakho ikhuselekile. Nceda uqhagamshelane nenkxaso ukuze ufumane uncedo.\n\nUsenokufuna olu lwazi ukunceda inkxaso isombulule ityala lakho:",
+      "reasonLabel": "Isizathu",
+      "accountIdLabel": "I-ID yeakhawunti",
+      "pubKeyLabel": "pubKey",
+      "usernameLabel": "Igama lomsebenzisi",
+      "emailLabel": "I-imeyile",
+      "phoneLabel": "Inombolo yefowuni",
+      "appVersionLabel": "Uhlelo lwe-app",
+      "platformLabel": "Iqonga",
+      "countryLabel": "Ilizwe",
+      "emailSubject": "Isicelo senkxaso yofuduso",
+      "emailDescribeProblem": "Chaza ingxaki:",
+      "emailAccountInfo": "Inkcazelo yeakhawunti yenkxaso:",
+      "contactUsCta": "Qhagamshelana nathi",
+      "copy": "Khuphela"
+    },
+    "migrateNowModal": {
+      "title": "Fudukela ngoku kwiakhawunti engagcinwanga",
+      "body": "Awusakwazi ukufumana imali kwiakhawunti yakho egcinwayo. UBlink uyekile inkonzo yokugcina kummandla wakho kwaye le akhawunti iza kuvalwa ekupheleni kuka-{date}.\n\nFudukela ngoku kwiakhawunti engagcinwanga.",
+      "migrateCta": "Fuduka ngoku"
+    },
+    "reminderBulletin": {
+      "title": "Kubalulekile",
+      "body": "Yiya kwiakhawunti engagcinwanga ngofuduko olukhokelwayo, okanye ukhuphe imali yakho, phambi kwe-{date}. Ukufumana kuyakuma nge-{receiveStopsDate}.",
+      "migrateCta": "Fuduka"
+    },
+    "offboardBulletin": {
+      "title": "Kubalulekile",
+      "body": "I-akhawunti yakho ibhaliswe kwingingqi apho singenako ukunikezela ngee-akhawunti. Rhoxisa imali yakho phambi komhla wama-31 ku-Agasti. Ukwamkela kuyayeka ngomhla we-10 ku-Agasti."
+    },
+    "dollarBalanceModal": {
+      "title": "Asikwazi ukufudusa ibhalansi yakho yedola",
+      "body": "Qala ukhuphe yonke ibhalansi yakho yedola. Ungayidlulisela kwibhalansi yakho yeBitcoin kuBlink okanye kwenye indawo."
+    },
+    "balancesOverview": {
+      "title": "Hambisa ibhalansi yakho",
+      "body": "Hambisa imali yakho ngokukhuselekileyo kwiakhawunti yakho entsha.",
+      "currentBitcoinBalance": "Ibhalansi ye-Bitcoin yangoku",
+      "currentDollarBalance": "Ibhalansi yeDola yangoku",
+      "newBitcoinBalance": "Ibhalansi entsha ye-Bitcoin",
+      "newDollarBalance": "Ibhalansi entsha yeDola",
+      "dollarBalanceNotAvailable": "ayifumaneki",
+      "networkFee": "Umrhumo wothungelwano: <bold>{fee: string}</bold>",
+      "networkFeeCoveredByBlink": "Umrhumo wothungelwano: <bold>{fee: string}</bold> (uhlawulwa nguBlink)",
+      "retryCta": "Zama kwakhona",
+      "approveCta": "Yamkela",
+      "contactSupportCta": "Qhagamshelana nenkxaso"
+    },
+    "migrationRequiredTitle": "Lixesha lokuphucula",
+    "keepReceivingTitle": "Qhubeka ufumana njengesiqhelo",
+    "keepReceivingBody": "Idilesi yakho ye-Lightning iya kudluliselwa kwi-akhawunti yakho entsha ye-non-custodial.",
+    "keepReceivingLnAddressLabel": "Idilesi yakho ye-LN",
+    "keepReceivingCta": "Kuhle",
+    "receivingDisabledToast": "Ukufumana kuvaliwe okwangoku.",
+    "downloadHistoryTitle": "Khuphela imbali yezenzo zakho zemali",
+    "downloadHistoryBody": "I-akhawunti yakho entsha iza kuqala kwakhona. Ukuba ufuna ukugcina irekhodi lezenzo zakho zemali, zikhuphele ngoku njenge-CSV.",
+    "downloadHistoryDownloadCta": "Khuphela",
+    "apiServiceTitle": "Inkonzo ye-API ayifumaneki",
+    "apiServiceBody": "Siyaqaphela ukuba unezitshixo ze-API ezisebenzayo. I-Blink ayikwazi ukubonelela nge-API kwimo ye-non-custodial.\n\nUkuba uxhomekeke kwi-API ye-Blink, qhagamshelana nathi ngokukhawuleza kwaye siya kwenza konke okusemandleni ukunceda utshintsho olugudileyo.",
+    "apiServiceContactCta": "Qhagamshelana nathi",
+    "apiServiceContinueCta": "Qhubeka nokuba kunjalo",
+    "resumeFailed": "Kukho into engahambanga kakuhle ekuqhubekeni nofuduko lwakho. Nceda uqale kwakhona.",
+    "migrationRequiredBody": "Lixesha lokufudusela iakhawunti yakho egcinwayo kwiakhawunti engagcinwanga.",
+    "migrationRequiredForcedBody": "Lixesha lokufudusela iakhawunti yakho egcinwayo kwiakhawunti engagcinwanga. Iyafuneka ngenxa yezizathu zolawulo.\n\nSukukhathazeka, i-non-custodial iya kuba ngcono kuwe kwixesha elide.",
+    "migrationGateTitle": "Iakhawunti ayifikeleleki",
+    "migrationGateBody": "Ngenxa yezizathu zolawulo asikwazi ukubonelela ngeeakhawunti ze-custodial kwingingqi yakho. Dlulisela imali yakho kwiakhawunti ye-non-custodial ne-Blink ngokulandela amanyathelo alandelayo okanye uqhagamshelane nathi ku-<link>{email}</link>",
+    "bitcoinBalance": "Ibhalansi yeBitcoin",
+    "dollarBalance": "Ibhalansi yedola",
     "moveToNonCustodial": "Fudukela kwi-non-custodial",
     "explainerTitle": "Kuthetha ntoni ukufudukela kwi-non-custodial?",
-    "explainerStep1": "Uza kudala i-akhawunti ye-non-custodial kwi-Spark protocol, <link>funda ngakumbi apha</link>",
-    "explainerStep2": "Sidlulisela imali yakho kwi-akhawunti yakho entsha ye-non-custodial kwaye i-akhawunti yakho yangoku iya kucinywa",
-    "explainerStep3": "Qhubeka usebenzise i-Blink njengoko uqhele",
-    "letsMove": "Masiqale",
-    "transferringFunds": "Sidlulisela imali yakho. Kufanele kugqitywe ngomzuzwana nje."
+    "explainerCheck1": "Uza kudala i-akhawunti ye-non-custodial kwi-Spark protocol",
+    "explainerCheck2": "Sidlulisela imali yakho kwi-akhawunti yakho entsha ye-non-custodial",
+    "explainerCheck3": "I-akhawunti yakho yangoku kunye nayo yonke idata yayo kuquka imbali yezenzo zemali iya kuvalwa",
+    "explainerCheck4": "I-Blink API ayiyi kufumaneka",
+    "explainerCheck5": "I-akhawunti yakho iya kukhutshelwa intlawulo yothungelwano lwe-Spark",
+    "explainerCta": "Ndiyaqonda",
+    "transferringFunds": "Sidlulisela imali yakho. Kufanele kugqitywe ngomzuzwana nje.",
+    "clockOutOfSync": {
+      "body": "Umhla nexesha lesixhobo sakho azihambelani. Zimisele ukuba zizenzekele ukuze uqhubeke.",
+      "retryCta": "Zama kwakhona"
+    }
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Igciniwe",
@@ -3605,6 +3838,16 @@
     "modalDescription": "Siyakucebisa kakhulu ukuba wenze isipele songeno lwengxowa yakho ukukhusela ukuphulukana ngokupheleleyo neemali zakho xa uphulukana nale divayisi.",
     "secureMe": "Khuseleka ingxowa"
   },
+  "BackupRequired": {
+    "modalTitle": "Back up your wallet first",
+    "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
+    "backupNow": "Back up wallet"
+  },
+  "NonCustodialInfoBulletin": {
+    "title": "Le yiakhawunti engagcinwanga",
+    "body": "Ukufunda okungakumbi, funda ipowusti yebhlog yethu",
+    "cta": "Funda"
+  },
   "StableBalance": {
     "title": "Ibhalansi ezinzileyo",
     "description": "Gcina ibhalansi ye-USD exhaswe yi-USDB kwi-Spark.",
@@ -3638,7 +3881,7 @@
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
     "featureCircles": "Circles",
-    "featureEarn": "Earn",
+    "featureEarn": "Funda",
     "featureCard": "Card"
   },
   "WalletCreationScreen": {
@@ -3652,10 +3895,10 @@
     "lightningPayment": "Intlawulo ye-Lightning",
     "onchainDeposit": "Idipozithi ye-On-chain",
     "onchainWithdrawal": "Ukurhoxiswa kwe-On-chain",
-    "conversionFromBitcoin": "Ukuguqulwa kwe-Bitcoin",
-    "conversionToBitcoin": "Ukuguqulwa kuya kwi-Bitcoin",
-    "conversionFromToken": "Ukuguqulwa kwe-{token}",
-    "conversionToToken": "Ukuguqulwa kuya kwi-{token}",
+    "transferFromBitcoinBalance": "Ukudlulisela ukusuka kwiBhalansi yeBitcoin",
+    "transferToBitcoinBalance": "Ukudlulisela kwiBhalansi yeBitcoin",
+    "transferFromTokenBalance": "Ukudlulisela ukusuka kwibhalansi ye-{token}",
+    "transferToTokenBalance": "Ukudlulisela kwibhalansi ye-{token}",
     "tokenTransfer": "Ukudluliswa kwe-{token}",
     "payTo": "Hlawula ku-{address}",
     "payment": "Intlawulo"

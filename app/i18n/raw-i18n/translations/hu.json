@@ -1,4 +1,38 @@
 {
+  "ApiScreen": {
+    "keysGroupTitle": "API-kulcsok",
+    "noKeys": "Még nincsenek API-kulcsok",
+    "createKey": "API-kulcs létrehozása",
+    "createTitle": "Új API-kulcs",
+    "keyCreatedTitle": "API-kulcs létrehozva",
+    "keyName": "Kulcs neve",
+    "keyNamePlaceholder": "pl. BTCPay Server",
+    "scopeRead": "Olvasás",
+    "scopeReadDescription": "Egyenleg és tranzakciós előzmények megtekintése",
+    "scopeReceive": "Fogadás",
+    "scopeReceiveDescription": "Számlák létrehozása és fizetések fogadása",
+    "scopeWrite": "Írás",
+    "writeScopeDashboardOnly": "A fizetések küldésére alkalmas kulcsok csak a dashboard.blink.sv oldalon hozhatók létre",
+    "expiry": "Lejár",
+    "expiry30Days": "30 nap",
+    "expiry90Days": "90 nap",
+    "expiryNever": "Soha",
+    "expiresOn": "Lejár: {date: string}",
+    "neverExpires": "Soha nem jár le",
+    "revoked": "Visszavonva",
+    "expired": "Lejárt: {date: string}",
+    "expiredNoDate": "Lejárt",
+    "secretWarning": "A kulcs csak most jelenik meg. Másolja ki vagy ossza meg most, és tárolja biztonságosan.",
+    "secretCopied": "API-kulcs kimásolva. A vágólap 1 perc múlva törlődik",
+    "revokeTitle": "Visszavonja az API-kulcsot?",
+    "revokeBody": "A(z) \"{name: string}\" azonnal működésképtelenné válik. Ez nem vonható vissza.",
+    "revoke": "Visszavonás",
+    "revokeSuccess": "API-kulcs visszavonva",
+    "createError": "Az API-kulcs létrehozása nem sikerült. Próbálja újra.",
+    "revokeError": "Az API-kulcs visszavonása nem sikerült. Próbálja újra.",
+    "loadError": "Az API-kulcsok betöltése nem sikerült. Próbálja később.",
+    "done": "Kész"
+  },
   "GaloyAddressScreen": {
     "title": "Fizetés fogadása így:",
     "buttonTitle": "Állítsd be a címed",
@@ -2003,7 +2037,7 @@
     "satAccumulated": "Keresett satoshik",
     "satsEarned": "{formattedNumber | sats}-ot kaptál",
     "sectionsCompleted": "Befejezett szakaszok",
-    "title": "Kvíz",
+    "title": "Tanulás",
     "unlockQuestion": "Feloldáshoz, válaszolj a kérdésre:",
     "youEarned": "Kerestél",
     "registerTitle": "A magasabb szintű számlára kell váltanod",
@@ -2011,6 +2045,7 @@
     "oneSectionADay": "Naponta csak egy fejezet lehetséges!",
     "availableTomorrow": "Gyere vissza holnap, hogy folytathasd a tanulást!",
     "motivatingBadger": "Haladj végig ezeken a leckéken, és keress a tanulás során",
+    "motivatingBadgerNoRewards": "Haladj végig ezeken a leckéken, és tanulj a Bitcoinról",
     "continueNoRewards": "Folytatás (jutalom nélkül)",
     "somethingNotRight": "Valami nem stimmel...",
     "defaultErrorMessage": "{errorMessage: string} Kérjük, próbáld újra később.\nVagy kattints a folytatásra, hogy jutalom nélkül tanulhass tovább.",
@@ -2049,7 +2084,7 @@
     "login": "Bejelentkezés",
     "loginOrRestore": "Bejelentkezés / Visszaállítás",
     "logBackInWith": "Újra bejelentkezés ezzel:",
-    "headline": "A Galoy által biztosított tárca",
+    "headline": "A Blink által biztosított tárca",
     "startTrialAccount": "Kezdés próba fiókkal",
     "startWithTrialAccount": "Kezdés próba fiókkal",
     "registerPhoneAccount": "Telefon alapú fiók regisztrálása",
@@ -2163,6 +2198,9 @@
     "lightningInvoice": "Lightning számla",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Befizetési díj: {fee} SAT az {threshold} SAT alatti összegekre vagy {overFee} SAT az {threshold} SAT feletti befizetésekre",
+    "depositFeeTiers": "Deposit fees: {tiers: string}",
+    "depositFeeTierUpTo": "{fee: string} SAT up to {max: string} SAT",
+    "depositFeeTierAbove": "{fee: string} SAT above {min: string} SAT",
     "autoConvertMinAmount": "A {minSats: number} satoshi / {minFiat: string} alatti összegek nem konvertálhatók automatikusan Dollárra. Bitcoint fogsz kapni helyette.",
     "autoConvertFailed": "Fizetés beérkezett, de a konverzió nem sikerült.",
     "pleaseWaitForConversion": "Kérjük, várjon, amíg a konverzió befejeződik"
@@ -2261,6 +2299,10 @@
     "invalidPhoneNumber": "Adj meg egy érvényes mobilszámot",
     "phoneNotAllowed": "Ez a mező nem fogad el telefonszámokat"
   },
+  "MerchantSelectionScreen": {
+    "title": "Fizetési mód kiválasztása",
+    "empty": "Nincsenek elérhető fizetési lehetőségek."
+  },
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "A tranzakciót elküldjük a mempoolba",
     "amount": "Összeg",
@@ -2279,7 +2321,6 @@
     "notConfirmed": "A fizetés elküldve,\nde még nincs megerősítve\n\nA fizetés állapotát a Tranzakciók menüpontban tekintheted meg",
     "note": "Megjegyzés vagy címke",
     "success": "A fizetés sikeresen elküldve",
-    "suggestionInput": "Írd be a javaslatodat",
     "max": "Max",
     "maxAmount": "Max. összeg",
     "title": "Bitcoin küldése",
@@ -2319,6 +2360,10 @@
     "sdkGenericError": "Nem sikerült megbecsülni a díjakat. Próbáljon másik összeget."
   },
   "SettingsScreen": {
+    "createAddress": "Cím létrehozása",
+    "donationButton": "Adományozás gomb",
+    "btcpayServer": "BTCPay Server",
+    "woocommerce": "WooCommerce",
     "staticQr": "Nyomtatható statikus QR-kód",
     "staticQrCopied": "A statikus QR-kód hivatkozásod másolva lett",
     "setByOs": "Az operációs rendszer által beállítva",
@@ -2327,7 +2372,6 @@
     "apiDashboard": "API hozzáférés és kezelőpanel",
     "pos": "Értékesítési pont",
     "posCopied": "Az értékesítési pont hivatkozásod másolva lett",
-    "setYourLightningAddress": "Állítsd be a Lightning címed",
     "activated": "Aktiválva",
     "addressScreen": "Fizetési módok",
     "nonCustodialAccount": "Nem letétkezelt fiók",
@@ -2525,7 +2569,32 @@
     "receivingAccount": "Fogadó egyenleg",
     "sendingAccount": "Küldő egyenleg",
     "txNotBroadcast": "Az Ön tranzakciója sorban áll. Meg fog jelenni a mempoolban {countdown: string}.",
-    "momentarily": "pillanatokon belül"
+    "momentarily": "pillanatokon belül",
+    "findingAccount": "A fizetéshez tartozó fiók keresése...",
+    "txNotFoundInAccounts": "Ez a fizetés nem található az eszköz egyik fiókjában sem. Lehet, hogy egy kijelentkezett fiókhoz tartozik.",
+    "txLoadFailed": "Nem sikerült betölteni ezt a fizetést. Ellenőrizze a kapcsolatot, és próbálja újra.",
+    "switchedForPayment": "Átváltás erre: {identifier: string}, hogy megjelenjen ez a fizetés"
+  },
+  "FeeRatesScreen": {
+    "title": "Díjszabás",
+    "send": "Küldés",
+    "receive": "Fogadás",
+    "transfer": "Átutalás",
+    "lightning": "Lightning",
+    "intraledger": "Intraledger",
+    "onchainPriority": "Onchain elsőbbségi (mihamarabb)",
+    "onchainStandard": "Onchain normál (~4 óra)",
+    "onchainEconomy": "Onchain gazdaságos",
+    "lightningTransactions": "Lightning tranzakciók",
+    "onchainBelowThreshold": "Onchain {threshold: string} SAT alatt",
+    "onchainAboveThreshold": "Onchain {threshold: string} SAT felett",
+    "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
+    "transferFee": "Átutalási díj",
+    "noFee": "díjmentes",
+    "lightningSendFee": "{fee: string} + ~{routingFee: string} útválasztási díj",
+    "fromApprox": "~{fee: string}-tól",
+    "satAmount": "{amount: string} SAT",
+    "error": "Jelenleg nem lehet lekérdezni a díjakat"
   },
   "TransactionLimitsScreen": {
     "receive": "Fogadás",
@@ -2570,7 +2639,8 @@
       "tooLong": "A cím legfeljebb 50 karakter hosszú lehet",
       "invalidCharacter": "A cím csak betűket, számokat és aláhúzásjeleket tartalmazhat",
       "addressUnavailable": "Sajnáljuk, ez a cím már foglalt",
-      "unknownError": "Ismeretlen hiba történt, kérjük, próbálja újra később"
+      "unknownError": "Ismeretlen hiba történt, kérjük, próbálja újra később",
+      "backupRequired": "Back up your wallet before creating a Lightning address"
     },
     "receiveMoney": "Fogadj pénzt más Lightning tárcákból és {bankName: string} felhasználóktól ezzel a címmel.",
     "itCannotBeChanged": "Később nem lehet megváltoztatni."
@@ -2700,6 +2770,8 @@
   },
   "common": {
     "country": "Ország",
+    "registered": "Regisztrált",
+    "detected": "Észlelt",
     "unknown": "Ismeretlen",
     "enabled": "Engedélyezve",
     "switch": "Kapcsoló",
@@ -2719,6 +2791,7 @@
     "anonymousUser": "Névtelen felhasználó",
     "blinkToBlink": "Blinkről Blinkre",
     "transactionLimits": "Tranzakciós Limitek",
+    "feeRates": "Díjszabás",
     "activateWallet": "Tárca Aktiválása",
     "amountRequired": "Összeg szükséges",
     "back": "Vissza",
@@ -2732,6 +2805,7 @@
     "bitcoinPrice": "Bitcoin Ár",
     "btcAccount": "Bitcoin Egyenleg",
     "cancel": "Mégse",
+    "card": "Kártya",
     "close": "Bezárás",
     "confirm": "Megerősítés",
     "convert": "Átváltás",
@@ -2799,6 +2873,7 @@
     "total": "Összesen",
     "transactions": "Tranzakciók",
     "transactionsError": "Hiba a tranzakciók betöltése közben",
+    "transfer": "Átutalás",
     "tryAgain": "Próbáld újra",
     "type": "Típus",
     "usdAccount": "Dollár Egyenleg",
@@ -2815,6 +2890,7 @@
     "problemMaybeReauth": "Probléma merült fel a kérés során. Kérjük, próbáld újra egy perc múlva. Ha a probléma továbbra is fennáll, javasoljuk, hogy jelentkezz ki, majd jelentkezz be újra. Kijelentkezni a Beállítások > Számla > Kijelentkezés menüpontban tudsz.",
     "warning": "Figyelmeztetés",
     "continue": "Folytatás",
+    "skip": "Kihagyás",
     "correct": "Helyes",
     "recommended": "Ajánlott",
     "expirationTime": "Lejárati idő",
@@ -2870,11 +2946,9 @@
     "email": "Email",
     "sms": "SMS",
     "faq": "GYIK",
-    "enjoyingApp": "Tetszik az alkalmazás?",
     "statusPage": "Állapotoldal",
     "telegram": "Telegram",
     "mattermost": "Mattermost",
-    "thankYouText": "Köszönjük a visszajelzést! Szeretnél javaslatot tenni a fejlesztésre?",
     "defaultEmailSubject": "{bankName: string} - Támogatás",
     "defaultSupportMessage": "Szia! Segítségre van szükségem a {bankName: string}kel kapcsolatban, a(z) {version: string} verziót használom a(z) {os: string} operációs rendszeren.",
     "emailCopied": "{email: string} email cím a vágólapra másolva",
@@ -3044,6 +3118,66 @@
       "limitUpdateSuccess": "Korlát sikeresen frissítve",
       "limitUpdateError": "Nem sikerült frissíteni a korlátot",
       "limitMustBePositive": "A korlátnak nullánál nagyobbnak kell lennie"
+    },
+    "CardFeeSchedule": {
+      "title": "Blink kártya díjszabása",
+      "effectiveDate": "Hatályos 2026. július 1-jétől",
+      "sections": {
+        "cardFees": "Kártyadíjak",
+        "transactionFees": "Tranzakciós díjak",
+        "overdraft": "Folyószámlahitel (finanszírozott mód)"
+      },
+      "fees": {
+        "annualFee": {
+          "title": "Éves díj",
+          "subtitle": "Az első évben elengedve a kártya kibocsátásának dátumától",
+          "value": "{amount: string} / év"
+        },
+        "cardReplacement": {
+          "title": "Kártyacsere"
+        },
+        "usdTransactionFee": {
+          "title": "USD tranzakciós díj",
+          "subtitle": "Minden amerikai dollárban végzett tranzakcióra vonatkozik"
+        },
+        "foreignTransactionFee": {
+          "title": "Külföldi tranzakciós díj",
+          "subtitle": "Minden nem amerikai dollárban végzett tranzakcióra vonatkozik"
+        },
+        "maximumOverdraft": {
+          "title": "Maximális folyószámlahitel",
+          "subtitle": "7 napon belül vissza kell fizetni"
+        },
+        "lateRepaymentFee": {
+          "title": "Késedelmes visszafizetési díj",
+          "subtitle": "Felszámításra kerül, ha a folyószámlahitelt nem fizetik vissza 7 napon belül"
+        }
+      },
+      "btcConversion": {
+        "title": "BTC átváltás",
+        "body": "Amikor egy tranzakció BTC USD-re való átváltását igényli, az átváltás az aktuális árfolyamon történik, amely tartalmazhat egy felárat, amely az átváltás költségét tükrözi."
+      },
+      "feesUpdateNotice": {
+        "text": "A díjak időről időre módosulhatnak. A Blink legalább 30 nappal korábban értesítést küld, mielőtt bármely díjváltozás hatályba lépne, a",
+        "linkText": "Kártyabirtokosi szerződéssel"
+      },
+      "creditModeNotice": "A Hitel mód jelenleg nem aktív. Ha a Hitel mód aktiválásra kerül, az alkalmazandó kamatlábak, díjak és számlázási jogokra vonatkozó közlemények az aktiválás előtt kerülnek megadásra.",
+      "additionalDetails": {
+        "title": "További díjrészletek",
+        "overdraft": {
+          "label": "Folyószámlahitel",
+          "text": ". Bizonyos körülmények között jóváhagyható olyan tranzakció, amely miatt a kártyaegyenlege nulla alá csökken. A maximális folyószámlahitel {maxOverdraft: string}. A folyószámlahitelt 7 napon belül vissza kell fizetnie további összegek átutalásával a kártyaegyenlegére."
+        },
+        "foreignCurrency": {
+          "label": "Külföldi pénznem",
+          "text": ". Ha külföldi pénznemben végez tranzakciót, a kártyahálózat saját átváltási eljárásaival átváltja USD-re. A feldolgozás napján érvényes árfolyam eltérhet a tranzakció dátumától."
+        },
+        "noHiddenFees": {
+          "label": "Nincsenek rejtett díjak",
+          "text": ". Nincs díj a számlanyitásért, inaktivitásért, egyenleglekérdezésekért vagy a kártya lezárásáért."
+        }
+      },
+      "backButton": "Vissza"
     },
     "CardDetails": {
       "title": "Kártya részletei",
@@ -3390,6 +3524,7 @@
         "perYear": "évente",
         "status": {
           "label": "Állapot",
+          "specialOfferLabel": "Különleges ajánlat",
           "paymentPending": "Fizetés Függőben",
           "firstYearFree": "Első év ingyenes"
         },
@@ -3403,7 +3538,11 @@
           "cardholderAgreement": "Kártyabirtokosi Megállapodást",
           "and": "és"
         },
-        "renew": "Megértem, hogy az előfizetésem automatikusan megújul 1 év múlva"
+        "feeSchedule": {
+          "text": "Átnéztem és elfogadom a következőt:",
+          "linkText": "Blink Card díjszabása"
+        },
+        "renew": "Megértem, hogy az előfizetésem {months: number} hónap múlva automatikusan megújul"
       },
       "CardIntroducing": {
         "title": "Bemutatjuk",
@@ -3465,13 +3604,29 @@
         "buttonText": "Pályázat beküldése",
         "select": "kiválaszt"
       },
+      "Acknowledgement": {
+        "title": "Általános szerződési feltételek",
+        "acceptButton": "Elfogadás",
+        "eSignConsent": {
+          "text": "Elfogadom az",
+          "linkText": "elektronikus aláírási hozzájárulást"
+        },
+        "privacyAndTerms": {
+          "text": "Elfogadom az",
+          "privacyPolicyLinkText": "a kibocsátó adatvédelmi szabályzatát",
+          "and": ", és a",
+          "cardTermsLinkText": "Blink kártya feltételeit"
+        },
+        "certifyAccuracy": "Igazolom, hogy az általam megadott információk pontosak, és hogy betartok minden, a Blink Visa kártyámmal kapcsolatos szabályt és követelményt",
+        "acknowledgeSolicitation": "Tudomásul veszem, hogy a Blink Visa kártya igénylése nem minősül jogosulatlan megkeresésnek"
+      },
       "CardPreapproved": {
         "title": "Előzetesen jóváhagyták a Blink Visa kártyáját!",
         "buttonText": "Bezárás"
       },
       "CardProcessing": {
         "title": "Pályázatod feldolgozása",
-        "subtitle": "Becsült várakozási idő: {waitTime: string}",
+        "subtitle": "Értesítünk, amint készen állunk",
         "buttonText": "Bezárás"
       }
     }
@@ -3499,6 +3654,7 @@
       },
       "Phrase": {
         "headerTitle": "Biztonsági mentési kifejezés",
+        "authDescription": "Feloldás a biztonsági mentési kifejezés megtekintéséhez",
         "sparkCompatible": "Ez a kifejezés bármely {sparkCompatibleLink} működik",
         "sparkCompatibleLink": "Spark-kompatibilis pénztárcában",
         "copiedToast": "Biztonsági mentési kifejezés vágólapra másolva",
@@ -3538,6 +3694,7 @@
       "uploadSuccess": "Biztonsági mentés elmentve a {provider} tárhelyre",
       "uploadFailed": "A biztonsági mentés feltöltése sikertelen",
       "signInFailed": "Nem sikerült bejelentkezni a következőbe: {provider}",
+      "storageAccessRequired": "Engedélyezze a(z) {provider: string} hozzáférést a tárca biztonsági mentéséhez, majd próbálja újra.",
       "cloudNotAvailable": "Az iCloud Drive nem érhető el. Jelentkezz be az iCloudba a Beállításokban, és engedélyezd az iCloud Drive-ot.",
       "networkError": "Hálózati hiba. Ellenőrizd a kapcsolatot, és próbáld újra.",
       "existingBackupTitle": "Biztonsági mentés találva",
@@ -3549,13 +3706,89 @@
     }
   },
   "AccountMigration": {
+    "contactSupport": {
+      "title": "Kapcsolatfelvétel az ügyfélszolgálattal",
+      "body": "Valami hiba történt, de ne aggódjon, a pénze biztonságban van. Kérjük, forduljon az ügyfélszolgálathoz segítségért.\n\nEzekre az adatokra szüksége lehet, hogy az ügyfélszolgálat megoldja az esetét:",
+      "reasonLabel": "Ok",
+      "accountIdLabel": "Fiókazonosító",
+      "pubKeyLabel": "pubKey",
+      "usernameLabel": "Felhasználónév",
+      "emailLabel": "E-mail",
+      "phoneLabel": "Telefonszám",
+      "appVersionLabel": "Alkalmazásverzió",
+      "platformLabel": "Platform",
+      "countryLabel": "Ország",
+      "emailSubject": "Átköltöztetési támogatási kérelem",
+      "emailDescribeProblem": "Írja le a problémát:",
+      "emailAccountInfo": "Fiókadatok az ügyfélszolgálat számára:",
+      "contactUsCta": "Lépjen kapcsolatba velünk",
+      "copy": "Másol"
+    },
+    "migrateNowModal": {
+      "title": "Költözzön át most egy nem letétkezelt fiókba",
+      "body": "Már nem fogadhat pénzt a letétkezelt fiókjába. A Blink megszüntette a letétkezelési szolgáltatást az Ön régiójában, és ez a fiók {date} végéig inaktiválásra kerül.\n\nKöltözzön át most egy nem letétkezelt fiókba.",
+      "migrateCta": "Átköltözés most"
+    },
+    "reminderBulletin": {
+      "title": "Fontos",
+      "body": "Váltson át egy nem letétkezelt fiókra az irányított átköltöztetéssel, vagy vegye fel az egyenlegét {date} előtt. A fogadás megszűnik: {receiveStopsDate}.",
+      "migrateCta": "Átköltözés"
+    },
+    "offboardBulletin": {
+      "title": "Fontos",
+      "body": "A fiókod olyan régióban van regisztrálva, ahol nem tudunk fiókokat kínálni. Vedd fel a pénzed augusztus 31. előtt. A fogadás augusztus 10-én leáll."
+    },
+    "dollarBalanceModal": {
+      "title": "Nem tudjuk átköltöztetni a dollár egyenlegedet",
+      "body": "Először ürítsd ki a dollár egyenlegedet. Átutalhatod a Bitcoin egyenlegedre a Blinkben vagy máshová."
+    },
+    "balancesOverview": {
+      "title": "Mozgasd az egyenleged",
+      "body": "Mozgasd biztonságosan a pénzed az új fiókodba.",
+      "currentBitcoinBalance": "Jelenlegi Bitcoin-egyenleg",
+      "currentDollarBalance": "Jelenlegi dolláregyenleg",
+      "newBitcoinBalance": "Új Bitcoin-egyenleg",
+      "newDollarBalance": "Új dolláregyenleg",
+      "dollarBalanceNotAvailable": "nem elérhető",
+      "networkFee": "Hálózati díj: <bold>{fee: string}</bold>",
+      "networkFeeCoveredByBlink": "Hálózati díj: <bold>{fee: string}</bold> (a Blink fedezi)",
+      "retryCta": "Próbáld újra",
+      "approveCta": "Jóváhagyás",
+      "contactSupportCta": "Kapcsolat a támogatással"
+    },
+    "migrationRequiredTitle": "Ideje frissíteni",
+    "keepReceivingTitle": "Fogadj továbbra is a megszokott módon",
+    "keepReceivingBody": "A Lightning címed átkerül az új önrendelkező fiókodba.",
+    "keepReceivingLnAddressLabel": "Az LN címed",
+    "keepReceivingCta": "Remek",
+    "receivingDisabledToast": "A fogadás jelenleg le van tiltva.",
+    "downloadHistoryTitle": "Töltsd le a tranzakciós előzményeidet",
+    "downloadHistoryBody": "Az új fiókod tiszta lappal indul. Ha meg szeretnéd őrizni a tranzakcióid nyilvántartását, töltsd le őket most CSV formátumban.",
+    "downloadHistoryDownloadCta": "Letöltés",
+    "apiServiceTitle": "Az API szolgáltatás nem elérhető",
+    "apiServiceBody": "Észrevettük, hogy aktív API-kulcsaid vannak. A Blink nem tudja biztosítani az API-t önrendelkező módban.\n\nHa a Blink API-jától függsz, vedd fel velünk mielőbb a kapcsolatot, és mindent megteszünk a zökkenőmentes átállásért.",
+    "apiServiceContactCta": "Lépj kapcsolatba velünk",
+    "apiServiceContinueCta": "Folytatás mindenképp",
+    "resumeFailed": "Hiba történt az átköltözés folytatása közben. Kérjük, kezdje újra.",
+    "migrationRequiredBody": "Itt az ideje átköltöztetni letétkezelt fiókját egy nem letétkezelt fiókba.",
+    "migrationRequiredForcedBody": "Itt az ideje átköltöztetni letétkezelt fiókját egy nem letétkezelt fiókba. Ez szabályozási okokból kötelező.\n\nNe aggódj, a nem letéti mód hosszú távon jobb lesz neked.",
+    "migrationGateTitle": "A fiók nem elérhető",
+    "migrationGateBody": "Szabályozási okokból nem tudunk letéti fiókokat biztosítani a régiódban. Utald át a pénzed egy nem letéti fiókba a Blinknél a következő lépéseket követve, vagy lépj kapcsolatba velünk itt: <link>{email}</link>",
+    "bitcoinBalance": "Bitcoin-egyenleg",
+    "dollarBalance": "Dollár-egyenleg",
     "moveToNonCustodial": "Áttérés önrendelkezőre",
     "explainerTitle": "Mit jelent az önrendelkező módra való áttérés?",
-    "explainerStep1": "Létrehozol egy önrendelkező fiókot a Spark protokollon, <link>tudj meg többet itt</link>",
-    "explainerStep2": "Átutaljuk az egyenlegedet az új önrendelkező fiókodba, és a jelenlegi fiókod törlésre kerül",
-    "explainerStep3": "Használd tovább a Blinket a megszokott módon",
-    "letsMove": "Rajta",
-    "transferringFunds": "Átutalás folyamatban. Néhány másodperc alatt befejeződik."
+    "explainerCheck1": "Létrehozol egy önrendelkező fiókot a Spark protokollon",
+    "explainerCheck2": "Átvezetjük a pénzed az új önrendelkező fiókodba",
+    "explainerCheck3": "A jelenlegi fiókod és minden adata, beleértve a tranzakciós előzményeket, lezárásra kerül",
+    "explainerCheck4": "A Blink API nem lesz elérhető",
+    "explainerCheck5": "A fiókodból levonásra kerül egy Spark hálózati díj",
+    "explainerCta": "Megértettem",
+    "transferringFunds": "Átutalás folyamatban. Néhány másodperc alatt befejeződik.",
+    "clockOutOfSync": {
+      "body": "Az eszközöd dátuma és ideje nincs szinkronban. Állítsd automatikusra a folytatáshoz.",
+      "retryCta": "Próbáld újra"
+    }
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Letéti",
@@ -3605,6 +3838,16 @@
     "modalDescription": "Nyomatékosan javasoljuk, hogy készíts biztonsági mentést a tárcádról, hogy megelőzd a pénzeszközeid teljes elvesztését, ha elveszíted ezt az eszközt.",
     "secureMe": "Tárca biztosítása"
   },
+  "BackupRequired": {
+    "modalTitle": "Back up your wallet first",
+    "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
+    "backupNow": "Back up wallet"
+  },
+  "NonCustodialInfoBulletin": {
+    "title": "Ez egy nem letétkezelt fiók",
+    "body": "További információért olvasd el blogbejegyzésünket",
+    "cta": "Olvasás"
+  },
   "StableBalance": {
     "title": "Stabil egyenleg",
     "description": "Tartson USD egyenleget USDB-vel a Sparkon.",
@@ -3638,7 +3881,7 @@
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
     "featureCircles": "Circles",
-    "featureEarn": "Earn",
+    "featureEarn": "Tanulás",
     "featureCard": "Card"
   },
   "WalletCreationScreen": {
@@ -3652,10 +3895,10 @@
     "lightningPayment": "Lightning fizetés",
     "onchainDeposit": "On-chain befizetés",
     "onchainWithdrawal": "On-chain kivétel",
-    "conversionFromBitcoin": "Átváltás Bitcoinból",
-    "conversionToBitcoin": "Átváltás Bitcoinra",
-    "conversionFromToken": "Átváltás {token}-ból",
-    "conversionToToken": "Átváltás {token}-ra",
+    "transferFromBitcoinBalance": "Átutalás Bitcoin egyenlegről",
+    "transferToBitcoinBalance": "Átutalás Bitcoin egyenlegre",
+    "transferFromTokenBalance": "Átutalás {token} egyenlegről",
+    "transferToTokenBalance": "Átutalás {token} egyenlegre",
     "tokenTransfer": "{token} átutalás",
     "payTo": "Fizetés: {address}",
     "payment": "Fizetés"

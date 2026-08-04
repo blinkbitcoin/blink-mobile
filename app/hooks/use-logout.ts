@@ -5,8 +5,8 @@ import { SCHEMA_VERSION_KEY } from "@app/config"
 import { useUserLogoutMutation } from "@app/graphql/generated"
 import { usePersistentStateContext } from "@app/store/persistent-state"
 import { logLogout } from "@app/utils/analytics"
+import { reportError } from "@app/utils/error-logging"
 import AsyncStorage from "@react-native-async-storage/async-storage"
-import crashlytics from "@react-native-firebase/crashlytics"
 import messaging from "@react-native-firebase/messaging"
 
 import KeyStoreWrapper from "../utils/storage/secureStorage"
@@ -71,7 +71,7 @@ const useLogout = () => {
         }
       } catch (err: unknown) {
         if (err instanceof Error) {
-          crashlytics().recordError(err)
+          reportError("logout", err)
           console.debug({ err }, `error logout`)
         }
       } finally {

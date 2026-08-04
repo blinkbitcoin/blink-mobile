@@ -39,7 +39,7 @@ export const CardPersonalInformationScreen: React.FC = () => {
     // Mock delay — replace with actual API call when backend is ready
     setTimeout(() => {
       setLoading(false)
-      navigation.navigate("cardOnboardingProcessingScreen")
+      navigation.navigate("cardOnboardingAcknowledgementScreen")
     }, 500)
   }
 

@@ -27,7 +27,6 @@ import {
   Network as NetworkLibGaloy,
   PaymentType,
 } from "@blinkbitcoin/blink-client"
-import crashlytics from "@react-native-firebase/crashlytics"
 import { NavigationProp, RouteProp, useNavigation } from "@react-navigation/native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
@@ -42,6 +41,7 @@ import {
   toUsdMoneyAmount,
   WalletOrDisplayCurrency,
 } from "@app/types/amounts"
+import { reportError } from "@app/utils/error-logging"
 
 import { FeeTierSelector } from "./fee-tier-selector"
 import { useOnchainFeeAlert } from "./hooks/use-onchain-fee-alert"
@@ -411,9 +411,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
           }
         } catch (error) {
           setIsLoadingLnurl(false)
-          if (error instanceof Error) {
-            crashlytics().recordError(error)
-          }
+          reportError("send-bitcoin-details", error)
           setAsyncErrorMessage(LL.SendBitcoinScreen.failedToFetchLnurlInvoice())
           return
         }

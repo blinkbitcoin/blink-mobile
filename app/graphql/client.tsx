@@ -38,39 +38,13 @@ import { useEffectiveAuthToken } from "./hooks/use-effective-auth-token"
 import { AnalyticsContainer } from "./analytics"
 import { createCache } from "./cache"
 import { useRealtimePriceQuery } from "./generated"
+import { createServerTimeLink } from "./server-time"
 import { HideAmountContainer } from "./hide-amount-component"
 import { IsAuthedContextProvider, useIsAuthed } from "./is-authed-context"
 import { LevelContainer } from "./level-component"
 import { MessagingContainer } from "./messaging"
 import { NetworkErrorContextProvider } from "./network-error-context"
-
-const noRetryOperations = [
-  "intraLedgerPaymentSend",
-  "intraLedgerUsdPaymentSend",
-
-  "lnInvoiceFeeProbe",
-  "lnInvoicePaymentSend",
-  "lnNoAmountInvoiceFeeProbe",
-  "lnNoAmountInvoicePaymentSend",
-  "lnNoAmountUsdInvoiceFeeProbe",
-  "lnUsdInvoiceFeeProbe",
-  "lnNoAmountUsdInvoicePaymentSend",
-
-  "onChainPaymentSend",
-  "onChainUsdPaymentSend",
-  "onChainUsdPaymentSendAsBtcDenominated",
-  "onChainTxFee",
-  "onChainUsdTxFee",
-  "onChainUsdTxFeeAsBtcDenominated",
-
-  // no need to retry to upload the token
-  // specially as it's running on app start
-  // and can create some unwanted loop when token is not valid
-  "deviceNotificationTokenCreate",
-
-  // Self-custodial payments go through Breez SDK directly, not Apollo.
-  // Add any future self-custodial GraphQL operations here if needed.
-]
+import { hasIdempotencyKey, shouldRetryOperation } from "./retry-policy"
 
 const getAuthorizationHeader = (token: string): string => {
   return `Bearer ${token}`
@@ -186,9 +160,8 @@ const GaloyClient: React.FC<PropsWithChildren> = ({ children }) => {
           retryIf: (error, operation) => {
             console.debug(JSON.stringify(error), "retry on error")
             return (
-              Boolean(error) &&
-              !noRetryOperations.includes(operation.operationName) &&
-              error.statusCode !== 401
+              !hasIdempotencyKey(operation) &&
+              shouldRetryOperation(error, operation.operationName)
             )
           },
         },
@@ -197,8 +170,10 @@ const GaloyClient: React.FC<PropsWithChildren> = ({ children }) => {
       const retry401ErrorLink = new RetryLink({
         attempts: {
           max: 2,
-          retryIf: (error) => {
-            return error && error.statusCode === 401
+          retryIf: (error, operation) => {
+            return (
+              Boolean(error) && error.statusCode === 401 && !hasIdempotencyKey(operation)
+            )
           },
         },
         delay: {
@@ -242,6 +217,10 @@ const GaloyClient: React.FC<PropsWithChildren> = ({ children }) => {
         uri: appConfig.galoyInstance.graphqlUri,
       })
 
+      /** Records the server clock from each response's Date header, so a migration proof
+       *  the backend later rejects for device clock skew can be told from a real failure. */
+      const serverTimeLink = createServerTimeLink()
+
       const link = split(
         ({ query }) => {
           const definition = getMainDefinition(query)
@@ -253,6 +232,7 @@ const GaloyClient: React.FC<PropsWithChildren> = ({ children }) => {
         wsLink,
         ApolloLink.from([
           errorLink,
+          serverTimeLink,
           retryLink,
           appCheckLink,
           authLink,

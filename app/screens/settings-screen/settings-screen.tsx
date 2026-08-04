@@ -29,7 +29,11 @@ import { AccountLevelSetting } from "./settings/account-level"
 import { AccountLNAddress } from "./settings/account-ln-address"
 import { PhoneLnAddress } from "./settings/phone-ln-address"
 import { AccountPOS } from "./settings/account-pos"
+import { AccountDonationButton } from "./settings/account-donation-button"
+import { AccountBtcpay } from "./settings/account-btcpay"
+import { AccountWoocommerce } from "./settings/account-woocommerce"
 import { TxLimits } from "./settings/account-tx-limits"
+import { FeeRatesSetting } from "./settings/fee-rates"
 import { ApiAccessSetting } from "./settings/advanced-api-access"
 import { ExportCsvSetting } from "./settings/advanced-export-csv"
 import { JoinCommunitySetting } from "./settings/community-join"
@@ -41,8 +45,7 @@ import { NotificationSetting } from "./settings/sp-notifications"
 import { OnDeviceSecuritySetting } from "./settings/sp-security"
 import { TotpSetting } from "./totp"
 import { AccountStaticQR } from "./settings/account-static-qr"
-// TODO: re-enable once the custodial → non-custodial migration is complete
-// import { MoveToNonCustodialSetting } from "./settings/account-move-to-noncustodial"
+import { MoveToNonCustodialSetting } from "./settings/account-move-to-noncustodial"
 import { SwitchAccountSetting } from "./settings/multi-account"
 import { StableBalanceSetting } from "./settings/stable-balance"
 import { ViewBackupPhraseSetting } from "./settings/view-backup-phrase"
@@ -104,11 +107,19 @@ export const SettingsScreen: React.FC = () => {
     account: [
       AccountLevelSetting,
       TxLimits,
+      FeeRatesSetting,
       SwitchAccountSetting,
-      // TODO: re-enable once the custodial → non-custodial migration is complete
-      // MoveToNonCustodialSetting,
+      MoveToNonCustodialSetting,
     ],
-    waysToGetPaid: [AccountLNAddress, PhoneLnAddress, AccountPOS, AccountStaticQR],
+    waysToGetPaid: [
+      AccountLNAddress,
+      PhoneLnAddress,
+      AccountPOS,
+      AccountStaticQR,
+      AccountDonationButton,
+      AccountBtcpay,
+      AccountWoocommerce,
+    ],
     loginMethods: [EmailSetting, PhoneSetting],
     preferences: [
       NotificationSetting,

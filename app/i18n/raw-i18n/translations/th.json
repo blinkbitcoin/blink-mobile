@@ -1,4 +1,38 @@
 {
+  "ApiScreen": {
+    "keysGroupTitle": "คีย์ API",
+    "noKeys": "ยังไม่มีคีย์ API",
+    "createKey": "สร้างคีย์ API",
+    "createTitle": "คีย์ API ใหม่",
+    "keyCreatedTitle": "สร้างคีย์ API แล้ว",
+    "keyName": "ชื่อคีย์",
+    "keyNamePlaceholder": "เช่น BTCPay Server",
+    "scopeRead": "อ่าน",
+    "scopeReadDescription": "ดูยอดคงเหลือและประวัติธุรกรรม",
+    "scopeReceive": "รับ",
+    "scopeReceiveDescription": "สร้างใบแจ้งหนี้และรับการชำระเงิน",
+    "scopeWrite": "เขียน",
+    "writeScopeDashboardOnly": "คีย์ที่สามารถส่งการชำระเงินได้สามารถสร้างได้ที่ dashboard.blink.sv เท่านั้น",
+    "expiry": "หมดอายุ",
+    "expiry30Days": "30 วัน",
+    "expiry90Days": "90 วัน",
+    "expiryNever": "ไม่มีวันหมดอายุ",
+    "expiresOn": "หมดอายุวันที่ {date: string}",
+    "neverExpires": "ไม่มีวันหมดอายุ",
+    "revoked": "เพิกถอนแล้ว",
+    "expired": "หมดอายุเมื่อ {date: string}",
+    "expiredNoDate": "หมดอายุแล้ว",
+    "secretWarning": "นี่เป็นครั้งเดียวที่จะแสดงคีย์นี้ คัดลอกหรือแชร์ทันทีและเก็บไว้อย่างปลอดภัย",
+    "secretCopied": "คัดลอกคีย์ API แล้ว คลิปบอร์ดจะถูกล้างใน 1 นาที",
+    "revokeTitle": "เพิกถอนคีย์ API หรือไม่?",
+    "revokeBody": "\"{name: string}\" จะหยุดทำงานทันที การกระทำนี้ไม่สามารถเลิกทำได้",
+    "revoke": "เพิกถอน",
+    "revokeSuccess": "เพิกถอนคีย์ API แล้ว",
+    "createError": "ไม่สามารถสร้างคีย์ API ได้ โปรดลองอีกครั้ง",
+    "revokeError": "ไม่สามารถเพิกถอนคีย์ API ได้ โปรดลองอีกครั้ง",
+    "loadError": "ไม่สามารถโหลดคีย์ API ของคุณได้ โปรดลองอีกครั้งในภายหลัง",
+    "done": "เสร็จสิ้น"
+  },
   "GaloyAddressScreen": {
     "title": "Receive payment by using:",
     "buttonTitle": "Set your address",
@@ -2003,7 +2037,7 @@
     "satAccumulated": "การรวบรวม sats เสร็จสิ้น",
     "satsEarned": "ได้รับ {formattedNumber | sats}",
     "sectionsCompleted": "คุณทำแบบทดสอบเสร็จสิ้น",
-    "title": "รับเงิน",
+    "title": "เรียนรู้",
     "unlockQuestion": "ตอบคำถามเพื่อปลดล็อค:",
     "youEarned": "คุณได้รับ",
     "registerTitle": "Need to upgrade your account",
@@ -2011,6 +2045,7 @@
     "oneSectionADay": "วันละหนึ่งบท!",
     "availableTomorrow": "กลับมาอีกครั้งพรุ่งนี้เพื่อเรียนรู้และรับ sats ต่อ\n\nหรือกดดำเนินการต่อเพื่อเรียนรู้ต่อโดยไม่รับรางวัล",
     "motivatingBadger": "ขุดค้นผ่านบทเรียนเหล่านี้และรับรางวัลขณะเรียนรู้",
+    "motivatingBadgerNoRewards": "ขุดค้นผ่านบทเรียนเหล่านี้และเรียนรู้เกี่ยวกับบิตคอยน์",
     "continueNoRewards": "ดำเนินการต่อ (ไม่มีรางวัล)",
     "somethingNotRight": "มีบางอย่างไม่ถูกต้อง...",
     "defaultErrorMessage": "{errorMessage: string} กรุณาลองอีกครั้งในภายหลัง\nหรือกดเพื่อเรียนรู้ต่อโดยไม่รับรางวัล",
@@ -2049,7 +2084,7 @@
     "login": "เข้าสู่ระบบ",
     "loginOrRestore": "เข้าสู่ระบบ / กู้คืน",
     "logBackInWith": "Log back in with",
-    "headline": "สนับสนุนโดย Galoy",
+    "headline": "สนับสนุนโดย Blink",
     "startTrialAccount": "Start with a trial account",
     "startWithTrialAccount": "Start with trial account",
     "registerPhoneAccount": "Register phone account",
@@ -2163,6 +2198,9 @@
     "lightningInvoice": "ใบแจ้งหนี้ lightning",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "ค่าธรรมเนียมการฝาก: {fee} SAT สำหรับจำนวนต่ำกว่า {threshold} SAT หรือ {overFee} SAT สำหรับการฝากมากกว่า {threshold} SAT",
+    "depositFeeTiers": "Deposit fees: {tiers: string}",
+    "depositFeeTierUpTo": "{fee: string} SAT up to {max: string} SAT",
+    "depositFeeTierAbove": "{fee: string} SAT above {min: string} SAT",
     "autoConvertMinAmount": "จำนวนต่ำกว่า {minSats: number} satoshi / {minFiat: string} ไม่สามารถแปลงเป็นดอลลาร์อัตโนมัติได้ คุณจะได้รับ Bitcoin แทน",
     "autoConvertFailed": "รับการชำระเงินแล้ว แต่การแปลงล้มเหลว",
     "pleaseWaitForConversion": "โปรดรอจนกว่าการแปลงจะเสร็จสิ้น"
@@ -2261,6 +2299,10 @@
     "invalidPhoneNumber": "กรุณาป้อนหมายเลขโทรศัพท์มือถือที่ถูกต้อง",
     "phoneNotAllowed": "ช่องนี้ไม่รับหมายเลขโทรศัพท์"
   },
+  "MerchantSelectionScreen": {
+    "title": "เลือกตัวเลือกการชำระเงิน",
+    "empty": "ไม่มีตัวเลือกการชำระเงิน"
+  },
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "ธุรกรรมจะถูกส่งไปยัง Mempool",
     "amount": "จำนวนเงิน",
@@ -2279,7 +2321,6 @@
     "notConfirmed": "การชำระเงินถูกส่งไปแล้ว\nแต่ยังไม่ได้รับการยืนยัน\n\nคุณสามารถตรวจสอบสถานะ\nของการชำระเงินได้ในหน้า 'ธุรกรรม'",
     "note": "บันทึกช่วยจำ",
     "success": "ทำการชำระเงินเรียบร้อยแล้ว",
-    "suggestionInput": "Enter your suggestion",
     "max": "Max",
     "maxAmount": "Max Amount",
     "title": "ส่งบิตคอยน์",
@@ -2319,6 +2360,10 @@
     "sdkGenericError": "ไม่สามารถประมาณค่าธรรมเนียมได้ กรุณาลองจำนวนอื่น"
   },
   "SettingsScreen": {
+    "createAddress": "สร้างแอดเดรส",
+    "donationButton": "ปุ่มบริจาค",
+    "btcpayServer": "BTCPay Server",
+    "woocommerce": "WooCommerce",
     "staticQr": "QR แบบคงที่สำหรับพิมพ์",
     "staticQrCopied": "คัดลอกลิงก์ QR แบบคงที่ของคุณแล้ว",
     "setByOs": "ตั้งค่าโดยระบบปฏิบัติการ",
@@ -2327,7 +2372,6 @@
     "apiDashboard": "การเข้าถึงและแดชบอร์ด API",
     "pos": "จุดขาย",
     "posCopied": "คัดลอกลิงก์จุดขายของคุณแล้ว",
-    "setYourLightningAddress": "ตั้งค่าแอดเดรส Lightning ของคุณ",
     "activated": "เปิดใช้งานเป็นที่เรียบร้อย",
     "addressScreen": "Ways to get paid",
     "nonCustodialAccount": "บัญชีแบบไม่ฝากดูแล",
@@ -2525,7 +2569,32 @@
     "receivingAccount": "Receiving Account",
     "sendingAccount": "Sending Account",
     "txNotBroadcast": "Your transaction is currently pending and will be broadcasted to the Bitcoin network in a moment.",
-    "momentarily": "ในอีกสักครู่"
+    "momentarily": "ในอีกสักครู่",
+    "findingAccount": "กำลังค้นหาบัญชีของการชำระเงินนี้...",
+    "txNotFoundInAccounts": "ไม่พบการชำระเงินนี้ในบัญชีใด ๆ บนอุปกรณ์นี้ อาจเป็นของบัญชีที่ออกจากระบบไปแล้ว",
+    "txLoadFailed": "ไม่สามารถโหลดการชำระเงินนี้ได้ ตรวจสอบการเชื่อมต่อของคุณแล้วลองอีกครั้ง",
+    "switchedForPayment": "สลับไปที่ {identifier: string} เพื่อแสดงการชำระเงินนี้"
+  },
+  "FeeRatesScreen": {
+    "title": "อัตราค่าธรรมเนียม",
+    "send": "ส่ง",
+    "receive": "รับเงิน",
+    "transfer": "โอน",
+    "lightning": "Lightning",
+    "intraledger": "Intraledger",
+    "onchainPriority": "Onchain ด่วน (เร็วที่สุด)",
+    "onchainStandard": "Onchain มาตรฐาน (~4 ชม.)",
+    "onchainEconomy": "Onchain ประหยัด",
+    "lightningTransactions": "ธุรกรรม Lightning",
+    "onchainBelowThreshold": "Onchain ต่ำกว่า {threshold: string} SAT",
+    "onchainAboveThreshold": "Onchain มากกว่า {threshold: string} SAT",
+    "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
+    "transferFee": "ค่าธรรมเนียมการโอน",
+    "noFee": "ไม่มีค่าธรรมเนียม",
+    "lightningSendFee": "{fee: string} + ~{routingFee: string} ค่าธรรมเนียมการกำหนดเส้นทาง",
+    "fromApprox": "เริ่มต้น ~{fee: string}",
+    "satAmount": "{amount: string} SAT",
+    "error": "ไม่สามารถเรียกค่าธรรมเนียมได้ในขณะนี้"
   },
   "TransactionLimitsScreen": {
     "receive": "รับเงิน",
@@ -2570,7 +2639,8 @@
       "tooLong": "Address must be at most 50 characters long",
       "invalidCharacter": "Address can only contain letters, numbers, and underscores",
       "addressUnavailable": "Sorry, this address is already taken",
-      "unknownError": "An unknown error occurred, please try again later"
+      "unknownError": "An unknown error occurred, please try again later",
+      "backupRequired": "Back up your wallet before creating a Lightning address"
     },
     "receiveMoney": "Receive money from other lightning wallets and {bankName: string} users with this address.",
     "itCannotBeChanged": "It can't be changed later."
@@ -2700,6 +2770,8 @@
   },
   "common": {
     "country": "ประเทศ",
+    "registered": "ลงทะเบียนแล้ว",
+    "detected": "ตรวจพบ",
     "unknown": "ไม่ทราบ",
     "enabled": "เปิดใช้งาน",
     "switch": "สวิตช์",
@@ -2719,6 +2791,7 @@
     "anonymousUser": "ผู้ใช้นิรนาม",
     "blinkToBlink": "Blink ไปยัง Blink",
     "transactionLimits": "จำกัดธุรกรรม",
+    "feeRates": "อัตราค่าธรรมเนียม",
     "activateWallet": "เปิดใช้งานกระเป๋า",
     "amountRequired": "ต้องใส่จำนวนเงิน",
     "back": "กลับ",
@@ -2732,6 +2805,7 @@
     "bitcoinPrice": "ราคาบิตคอยน์",
     "btcAccount": "บัญชีบิตคอยน์",
     "cancel": "ยกเลิก",
+    "card": "บัตร",
     "close": "ปิด",
     "confirm": "ยืนยัน",
     "convert": "แลกเปลี่ยน",
@@ -2799,6 +2873,7 @@
     "total": "รวม",
     "transactions": "ธุรกรรม",
     "transactionsError": "ไม่สามารถโหลดข้อมูลธุรกรรมได้",
+    "transfer": "โอน",
     "tryAgain": "โปรดลองใหม่อีกครั้ง",
     "type": "ประเภท",
     "usdAccount": "บัญชีเงินดอลล่าร์",
@@ -2815,6 +2890,7 @@
     "problemMaybeReauth": "There was a problem with your request. Please retry in one minute. If the problem persist, we recommend that you log out and log back in. You can log out by going into Settings > Account > Log out",
     "warning": "Warning",
     "continue": "ดำเนินการต่อ",
+    "skip": "ข้าม",
     "correct": "ถูกต้อง",
     "recommended": "แนะนำ",
     "expirationTime": "เวลาหมดอายุ",
@@ -2870,11 +2946,9 @@
     "email": "อีเมล",
     "sms": "SMS",
     "faq": "FAQ",
-    "enjoyingApp": "Enjoying the app?",
     "statusPage": "Status Page",
     "telegram": "Telegram",
     "mattermost": "Mattermost",
-    "thankYouText": "Thank you for the feedback, would you like to suggest an improvement?",
     "defaultEmailSubject": "{bankName: string} - Support",
     "defaultSupportMessage": "Hey there! I need some help with {bankName: string}, I'm using the version {version: string} on {os: string}.",
     "emailCopied": "email {email: string} ปยังคลิปบอร์ดแล้ว",
@@ -3044,6 +3118,66 @@
       "limitUpdateSuccess": "อัปเดตขีดจำกัดสำเร็จ",
       "limitUpdateError": "ไม่สามารถอัปเดตขีดจำกัดได้",
       "limitMustBePositive": "ขีดจำกัดต้องมากกว่าศูนย์"
+    },
+    "CardFeeSchedule": {
+      "title": "ตารางค่าธรรมเนียมบัตร Blink",
+      "effectiveDate": "มีผลตั้งแต่วันที่ 1 กรกฎาคม 2026",
+      "sections": {
+        "cardFees": "ค่าธรรมเนียมบัตร",
+        "transactionFees": "ค่าธรรมเนียมธุรกรรม",
+        "overdraft": "เบิกเกินบัญชี (โหมดที่มีเงินทุน)"
+      },
+      "fees": {
+        "annualFee": {
+          "title": "ค่าธรรมเนียมรายปี",
+          "subtitle": "ยกเว้นในปีแรกนับจากวันที่ออกบัตร",
+          "value": "{amount: string} / ปี"
+        },
+        "cardReplacement": {
+          "title": "การเปลี่ยนบัตร"
+        },
+        "usdTransactionFee": {
+          "title": "ค่าธรรมเนียมธุรกรรม USD",
+          "subtitle": "เรียกเก็บกับทุกธุรกรรมที่เป็นดอลลาร์สหรัฐ"
+        },
+        "foreignTransactionFee": {
+          "title": "ค่าธรรมเนียมธุรกรรมต่างประเทศ",
+          "subtitle": "เรียกเก็บกับทุกธุรกรรมในสกุลเงินอื่นที่ไม่ใช่ดอลลาร์สหรัฐ"
+        },
+        "maximumOverdraft": {
+          "title": "วงเงินเบิกเกินบัญชีสูงสุด",
+          "subtitle": "ต้องชำระคืนภายใน 7 วัน"
+        },
+        "lateRepaymentFee": {
+          "title": "ค่าธรรมเนียมการชำระล่าช้า",
+          "subtitle": "เรียกเก็บหากไม่ชำระคืนเงินเบิกเกินบัญชีภายใน 7 วัน"
+        }
+      },
+      "btcConversion": {
+        "title": "การแปลง BTC",
+        "body": "เมื่อธุรกรรมจำเป็นต้องแปลง BTC เป็น USD การแปลงจะดำเนินการตามอัตราแลกเปลี่ยนที่ใช้อยู่ ซึ่งอาจรวมถึงส่วนต่างที่สะท้อนต้นทุนของการแปลง"
+      },
+      "feesUpdateNotice": {
+        "text": "ค่าธรรมเนียมอาจมีการปรับปรุงเป็นครั้งคราว Blink จะแจ้งให้ทราบล่วงหน้าอย่างน้อย 30 วันก่อนที่การเปลี่ยนแปลงค่าธรรมเนียมใดๆ จะมีผล ตาม",
+        "linkText": "ข้อตกลงผู้ถือบัตร"
+      },
+      "creditModeNotice": "โหมดเครดิตยังไม่เปิดใช้งานในขณะนี้ หากเปิดใช้งานโหมดเครดิต อัตราดอกเบี้ย ค่าธรรมเนียม และการเปิดเผยสิทธิ์การเรียกเก็บเงินที่เกี่ยวข้องจะจัดเตรียมไว้ก่อนการเปิดใช้งาน",
+      "additionalDetails": {
+        "title": "รายละเอียดค่าธรรมเนียมเพิ่มเติม",
+        "overdraft": {
+          "label": "เบิกเกินบัญชี",
+          "text": ". ในบางสถานการณ์ ธุรกรรมอาจได้รับการอนุมัติที่ทำให้ยอดคงเหลือในบัตรของคุณต่ำกว่าศูนย์ วงเงินเบิกเกินบัญชีสูงสุดคือ {maxOverdraft: string} คุณต้องชำระคืนเงินเบิกเกินบัญชีภายใน 7 วันโดยการโอนเงินเพิ่มเติมเข้ายอดคงเหลือในบัตรของคุณ"
+        },
+        "foreignCurrency": {
+          "label": "สกุลเงินต่างประเทศ",
+          "text": ". หากคุณทำธุรกรรมในสกุลเงินต่างประเทศ เครือข่ายบัตรจะแปลงเป็น USD โดยใช้ขั้นตอนการแปลงของตนเอง อัตราในวันที่ประมวลผลอาจแตกต่างจากวันที่ทำธุรกรรม"
+        },
+        "noHiddenFees": {
+          "label": "ไม่มีค่าธรรมเนียมแอบแฝง",
+          "text": ". ไม่มีค่าธรรมเนียมสำหรับการตั้งค่าบัญชี การไม่ใช้งาน การสอบถามยอดคงเหลือ หรือการปิดบัตรของคุณ"
+        }
+      },
+      "backButton": "ย้อนกลับ"
     },
     "CardDetails": {
       "title": "รายละเอียดบัตร",
@@ -3390,6 +3524,7 @@
         "perYear": "ต่อปี",
         "status": {
           "label": "สถานะ",
+          "specialOfferLabel": "ข้อเสนอพิเศษ",
           "paymentPending": "รอการชำระเงิน",
           "firstYearFree": "ปีแรกฟรี"
         },
@@ -3403,7 +3538,11 @@
           "cardholderAgreement": "ข้อตกลงผู้ถือบัตร",
           "and": "และ"
         },
-        "renew": "ฉันเข้าใจว่าการสมัครสมาชิกของฉันจะต่ออายุโดยอัตโนมัติใน 1 ปี"
+        "feeSchedule": {
+          "text": "ฉันได้ตรวจสอบและยอมรับ",
+          "linkText": "ตารางค่าธรรมเนียม Blink Card"
+        },
+        "renew": "ฉันเข้าใจว่าการสมัครสมาชิกของฉันจะต่ออายุโดยอัตโนมัติใน {months: number} เดือน"
       },
       "CardIntroducing": {
         "title": "แนะนำ",
@@ -3465,13 +3604,29 @@
         "buttonText": "ส่งใบสมัคร",
         "select": "เลือก"
       },
+      "Acknowledgement": {
+        "title": "ข้อกำหนดและเงื่อนไข",
+        "acceptButton": "ยอมรับ",
+        "eSignConsent": {
+          "text": "ฉันยอมรับ",
+          "linkText": "ความยินยอมในการลงนามอิเล็กทรอนิกส์"
+        },
+        "privacyAndTerms": {
+          "text": "ฉันยอมรับ",
+          "privacyPolicyLinkText": "นโยบายความเป็นส่วนตัวของผู้ออกบัตร",
+          "and": " และ",
+          "cardTermsLinkText": "ข้อกำหนดบัตร Blink"
+        },
+        "certifyAccuracy": "ฉันรับรองว่าข้อมูลที่ให้ไว้ถูกต้อง และฉันจะปฏิบัติตามกฎและข้อกำหนดทั้งหมดที่เกี่ยวข้องกับบัตร Blink Visa ของฉัน",
+        "acknowledgeSolicitation": "ฉันรับทราบว่าการสมัครบัตร Blink Visa ไม่ถือเป็นการชักชวนที่ไม่ได้รับอนุญาต"
+      },
       "CardPreapproved": {
         "title": "คุณได้รับการอนุมัติล่วงหน้าสำหรับบัตร Blink Visa แล้ว!",
         "buttonText": "ปิด"
       },
       "CardProcessing": {
         "title": "กำลังดำเนินการใบสมัครของคุณ",
-        "subtitle": "เวลารอโดยประมาณ: {waitTime: string}",
+        "subtitle": "เราจะแจ้งให้คุณทราบเมื่อเราพร้อม",
         "buttonText": "ปิด"
       }
     }
@@ -3499,6 +3654,7 @@
       },
       "Phrase": {
         "headerTitle": "วลีสำรอง",
+        "authDescription": "ยืนยันตัวตนเพื่อดูวลีสำรองของคุณ",
         "sparkCompatible": "วลีสำรองนี้ใช้ได้ใน{sparkCompatibleLink}",
         "sparkCompatibleLink": "กระเป๋าเงินที่รองรับ Spark",
         "copiedToast": "คัดลอกวลีสำรองไปยังคลิปบอร์ดแล้ว",
@@ -3538,6 +3694,7 @@
       "uploadSuccess": "สำรองข้อมูลไปยัง {provider} แล้ว",
       "uploadFailed": "อัปโหลดข้อมูลสำรองไม่สำเร็จ",
       "signInFailed": "ลงชื่อเข้าใช้ {provider} ไม่สำเร็จ",
+      "storageAccessRequired": "อนุญาตให้ {provider: string} เข้าถึงข้อมูลสำรองกระเป๋าเงินของคุณ แล้วลองอีกครั้ง",
       "cloudNotAvailable": "iCloud Drive ไม่พร้อมใช้งาน โปรดลงชื่อเข้าใช้ iCloud ในการตั้งค่าและเปิดใช้ iCloud Drive",
       "networkError": "เกิดข้อผิดพลาดของเครือข่าย โปรดตรวจสอบการเชื่อมต่อและลองอีกครั้ง",
       "existingBackupTitle": "พบข้อมูลสำรอง",
@@ -3549,13 +3706,89 @@
     }
   },
   "AccountMigration": {
+    "contactSupport": {
+      "title": "ติดต่อฝ่ายสนับสนุน",
+      "body": "เกิดข้อผิดพลาดบางอย่าง แต่ไม่ต้องกังวล เงินของคุณปลอดภัย โปรดติดต่อฝ่ายสนับสนุนเพื่อขอความช่วยเหลือ\n\nคุณอาจต้องใช้ข้อมูลนี้เพื่อช่วยให้ฝ่ายสนับสนุนแก้ไขกรณีของคุณ:",
+      "reasonLabel": "สาเหตุ",
+      "accountIdLabel": "รหัสบัญชี",
+      "pubKeyLabel": "pubKey",
+      "usernameLabel": "ชื่อผู้ใช้",
+      "emailLabel": "อีเมล",
+      "phoneLabel": "หมายเลขโทรศัพท์",
+      "appVersionLabel": "เวอร์ชันแอป",
+      "platformLabel": "แพลตฟอร์ม",
+      "countryLabel": "ประเทศ",
+      "emailSubject": "คำขอความช่วยเหลือเรื่องการย้ายบัญชี",
+      "emailDescribeProblem": "อธิบายปัญหา:",
+      "emailAccountInfo": "ข้อมูลบัญชีสำหรับฝ่ายสนับสนุน:",
+      "contactUsCta": "ติดต่อเรา",
+      "copy": "คัดลอก"
+    },
+    "migrateNowModal": {
+      "title": "ย้ายตอนนี้ไปยังบัญชีแบบไม่ฝากดูแล",
+      "body": "คุณไม่สามารถรับเงินเข้าบัญชีแบบฝากดูแลของคุณได้อีกต่อไป Blink ได้ยุติบริการฝากดูแลในภูมิภาคของคุณ และบัญชีนี้จะถูกปิดใช้งานภายในสิ้นวันที่ {date}\n\nย้ายตอนนี้ไปยังบัญชีแบบไม่ฝากดูแล",
+      "migrateCta": "ย้ายตอนนี้"
+    },
+    "reminderBulletin": {
+      "title": "สำคัญ",
+      "body": "ย้ายไปยังบัญชีแบบไม่ฝากดูแลผ่านการย้ายแบบมีคำแนะนำ หรือถอนเงินของคุณ ก่อน {date} การรับจะหยุดในวันที่ {receiveStopsDate}",
+      "migrateCta": "ย้าย"
+    },
+    "offboardBulletin": {
+      "title": "สำคัญ",
+      "body": "บัญชีของคุณลงทะเบียนอยู่ในภูมิภาคที่เราไม่สามารถให้บริการบัญชีได้ ถอนเงินของคุณก่อนวันที่ 31 สิงหาคม การรับเงินจะหยุดในวันที่ 10 สิงหาคม"
+    },
+    "dollarBalanceModal": {
+      "title": "เราไม่สามารถย้ายยอดดอลลาร์ของคุณได้",
+      "body": "โปรดล้างยอดดอลลาร์ของคุณก่อน คุณสามารถโอนไปยังยอดบิตคอยน์ใน Blink หรือที่อื่นได้"
+    },
+    "balancesOverview": {
+      "title": "ย้ายยอดเงินของคุณ",
+      "body": "ย้ายเงินของคุณไปยังบัญชีใหม่อย่างปลอดภัย",
+      "currentBitcoinBalance": "ยอด Bitcoin ปัจจุบัน",
+      "currentDollarBalance": "ยอดดอลลาร์ปัจจุบัน",
+      "newBitcoinBalance": "ยอด Bitcoin ใหม่",
+      "newDollarBalance": "ยอดดอลลาร์ใหม่",
+      "dollarBalanceNotAvailable": "ไม่พร้อมใช้งาน",
+      "networkFee": "ค่าธรรมเนียมเครือข่าย: <bold>{fee: string}</bold>",
+      "networkFeeCoveredByBlink": "ค่าธรรมเนียมเครือข่าย: <bold>{fee: string}</bold> (Blink ออกให้)",
+      "retryCta": "ลองอีกครั้ง",
+      "approveCta": "อนุมัติ",
+      "contactSupportCta": "ติดต่อฝ่ายสนับสนุน"
+    },
+    "migrationRequiredTitle": "ถึงเวลาอัปเกรด",
+    "keepReceivingTitle": "รับเงินต่อได้ตามปกติ",
+    "keepReceivingBody": "แอดเดรส Lightning ของคุณจะถูกโอนไปยังบัญชี non-custodial ใหม่ของคุณ",
+    "keepReceivingLnAddressLabel": "แอดเดรส LN ของคุณ",
+    "keepReceivingCta": "เยี่ยม",
+    "receivingDisabledToast": "ขณะนี้การรับถูกปิดใช้งาน",
+    "downloadHistoryTitle": "ดาวน์โหลดประวัติธุรกรรมของคุณ",
+    "downloadHistoryBody": "บัญชีใหม่ของคุณจะเริ่มต้นใหม่ หากคุณต้องการเก็บบันทึกธุรกรรมของคุณ ให้ดาวน์โหลดเป็นไฟล์ CSV ตอนนี้",
+    "downloadHistoryDownloadCta": "ดาวน์โหลด",
+    "apiServiceTitle": "บริการ API ไม่พร้อมใช้งาน",
+    "apiServiceBody": "เราสังเกตว่าคุณมีคีย์ API ที่ใช้งานอยู่ Blink ไม่สามารถให้บริการ API ในโหมด non-custodial ได้\n\nหากคุณต้องพึ่งพา API ของ Blink โปรดติดต่อเราโดยเร็วและเราจะพยายามอย่างเต็มที่เพื่อช่วยให้การเปลี่ยนผ่านราบรื่น",
+    "apiServiceContactCta": "ติดต่อเรา",
+    "apiServiceContinueCta": "ดำเนินการต่อไป",
+    "resumeFailed": "เกิดข้อผิดพลาดขณะดำเนินการย้ายของคุณต่อ โปรดเริ่มใหม่อีกครั้ง",
+    "migrationRequiredBody": "ถึงเวลาย้ายบัญชีแบบฝากดูแลของคุณไปยังบัญชีแบบไม่ฝากดูแลแล้ว จำเป็นต้องทำด้วยเหตุผลด้านกฎระเบียบ แต่ก็ดีต่อคุณด้วย!",
+    "migrationRequiredForcedBody": "ถึงเวลาย้ายบัญชีแบบฝากดูแลของคุณไปยังบัญชีแบบไม่ฝากดูแลแล้ว จำเป็นต้องทำด้วยเหตุผลด้านกฎระเบียบ แต่ก็ดีต่อคุณด้วย!จำเป็นต้องทำด้วยเหตุผลด้านกฎระเบียบ\n\nไม่ต้องกังวล ในระยะยาวแบบ non-custodial จะดีกว่าสำหรับคุณ",
+    "migrationGateTitle": "ไม่สามารถเข้าถึงบัญชีได้",
+    "migrationGateBody": "ด้วยเหตุผลด้านกฎระเบียบ เราไม่สามารถให้บริการบัญชีแบบ custodial ในภูมิภาคของคุณได้ โอนเงินของคุณไปยังบัญชี non-custodial กับ Blink โดยทำตามขั้นตอนถัดไป หรือติดต่อเราที่ <link>{email}</link>",
+    "bitcoinBalance": "ยอดคงเหลือ Bitcoin",
+    "dollarBalance": "ยอดคงเหลือดอลลาร์",
     "moveToNonCustodial": "ย้ายไปแบบ non-custodial",
     "explainerTitle": "การย้ายไปแบบ non-custodial หมายความว่าอย่างไร?",
-    "explainerStep1": "คุณจะสร้างบัญชีแบบ non-custodial บนโปรโตคอล Spark <link>เรียนรู้เพิ่มเติมที่นี่</link>",
-    "explainerStep2": "เราจะโอนเงินของคุณไปยังบัญชี non-custodial ใหม่และบัญชีปัจจุบันของคุณจะถูกลบ",
-    "explainerStep3": "ใช้ Blink ต่อไปได้ตามปกติ",
-    "letsMove": "ไปกันเลย",
-    "transferringFunds": "กำลังโอนเงินของคุณ จะเสร็จสิ้นภายในไม่กี่วินาที"
+    "explainerCheck1": "คุณจะสร้างบัญชีแบบ non-custodial บนโปรโตคอล Spark",
+    "explainerCheck2": "เราโอนเงินของคุณไปยังบัญชี non-custodial ใหม่ของคุณ",
+    "explainerCheck3": "บัญชีปัจจุบันของคุณและข้อมูลทั้งหมดรวมถึงประวัติธุรกรรมจะถูกปิด",
+    "explainerCheck4": "Blink API จะไม่พร้อมใช้งาน",
+    "explainerCheck5": "บัญชีของคุณจะถูกหักค่าธรรมเนียมเครือข่าย Spark",
+    "explainerCta": "เข้าใจแล้ว",
+    "transferringFunds": "กำลังโอนเงินของคุณ จะเสร็จสิ้นภายในไม่กี่วินาที",
+    "clockOutOfSync": {
+      "body": "วันที่และเวลาของอุปกรณ์ของคุณไม่ตรงกัน ตั้งค่าเป็นอัตโนมัติเพื่อดำเนินการต่อ",
+      "retryCta": "ลองอีกครั้ง"
+    }
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "ควบคุมโดยผู้ดูแล",
@@ -3605,6 +3838,16 @@
     "modalDescription": "เราขอแนะนำอย่างยิ่งให้คุณสำรองข้อมูลกระเป๋าเงินเพื่อป้องกันการสูญเสียเงินทั้งหมดในกรณีที่คุณทำอุปกรณ์นี้หาย",
     "secureMe": "รักษาความปลอดภัยกระเป๋าเงิน"
   },
+  "BackupRequired": {
+    "modalTitle": "Back up your wallet first",
+    "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
+    "backupNow": "Back up wallet"
+  },
+  "NonCustodialInfoBulletin": {
+    "title": "นี่คือบัญชีแบบไม่ฝากดูแล",
+    "body": "อ่านบล็อกโพสต์ของเราเพื่อเรียนรู้เพิ่มเติม",
+    "cta": "อ่าน"
+  },
   "StableBalance": {
     "title": "ยอดคงเหลือมั่นคง",
     "description": "ถือยอดคงเหลือเป็น USD ขับเคลื่อนโดย USDB บน Spark",
@@ -3638,7 +3881,7 @@
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
     "featureCircles": "Circles",
-    "featureEarn": "Earn",
+    "featureEarn": "เรียนรู้",
     "featureCard": "Card"
   },
   "WalletCreationScreen": {
@@ -3652,10 +3895,10 @@
     "lightningPayment": "ชำระเงิน Lightning",
     "onchainDeposit": "ฝาก On-chain",
     "onchainWithdrawal": "ถอน On-chain",
-    "conversionFromBitcoin": "แปลงจาก Bitcoin",
-    "conversionToBitcoin": "แปลงเป็น Bitcoin",
-    "conversionFromToken": "แปลงจาก {token}",
-    "conversionToToken": "แปลงเป็น {token}",
+    "transferFromBitcoinBalance": "โอนจากยอดเงิน Bitcoin",
+    "transferToBitcoinBalance": "โอนไปยังยอดเงิน Bitcoin",
+    "transferFromTokenBalance": "โอนจากยอดเงิน {token}",
+    "transferToTokenBalance": "โอนไปยังยอดเงิน {token}",
     "tokenTransfer": "โอน {token}",
     "payTo": "จ่ายไปที่ {address}",
     "payment": "การชำระเงิน"

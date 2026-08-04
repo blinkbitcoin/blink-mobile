@@ -3,6 +3,8 @@ import { Linking } from "react-native"
 import ReactNativeModal from "react-native-modal"
 
 import { CONTACT_EMAIL_ADDRESS, WHATSAPP_CONTACT_NUMBER } from "@app/config"
+import { useClipboard } from "@app/hooks/use-clipboard"
+import { useContactSupport } from "@app/hooks/use-contact-support"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { openWhatsApp } from "@app/utils/external"
 import { Icon, ListItem, makeStyles, useTheme, Text } from "@rn-vui/themed"
@@ -11,6 +13,7 @@ import TelegramOutline from "./telegram.svg"
 
 export const SupportChannels = {
   Email: "email",
+  EmailCopy: "emailCopy",
   Telegram: "telegram",
   WhatsApp: "whatsapp",
   StatusPage: "statusPage",
@@ -43,8 +46,16 @@ const ContactModal: React.FC<Props> = ({
   const {
     theme: { colors },
   } = useTheme()
+  const { supportEmailAddress } = useContactSupport()
+  const { copyToClipboard } = useClipboard()
 
-  const contactOptionList = [
+  const contactOptionList: {
+    id: SupportChannels
+    name: string
+    icon: React.ReactElement
+    rightIcon?: React.ReactElement
+    action: () => void
+  }[] = [
     {
       id: SupportChannels.StatusPage,
       name: LL.support.statusPage(),
@@ -110,6 +121,21 @@ const ContactModal: React.FC<Props> = ({
         toggleModal()
       },
     },
+    {
+      id: SupportChannels.EmailCopy,
+      name: supportEmailAddress,
+      icon: <Icon name={"mail-outline"} type="ionicon" color={colors.black} size={20} />,
+      rightIcon: (
+        <Icon name={"copy-outline"} type="ionicon" color={colors.primary} size={20} />
+      ),
+      action: () => {
+        copyToClipboard({
+          content: supportEmailAddress,
+          message: LL.support.emailCopied({ email: supportEmailAddress }),
+        })
+        toggleModal()
+      },
+    },
   ]
 
   return (
@@ -136,12 +162,14 @@ const ContactModal: React.FC<Props> = ({
                   <Text type="p2">{item.name}</Text>
                 </ListItem.Title>
               </ListItem.Content>
-              <ListItem.Chevron
-                name={"chevron-forward"}
-                type="ionicon"
-                color={colors.primary}
-                size={20}
-              />
+              {item.rightIcon ?? (
+                <ListItem.Chevron
+                  name={"chevron-forward"}
+                  type="ionicon"
+                  color={colors.primary}
+                  size={20}
+                />
+              )}
             </ListItem>
           )
         })}

@@ -5,13 +5,23 @@ on:
 jobs:
   check-code:
     name: Tests
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, blink, heavy]
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
           node-version-file: .nvmrc
-      - run: yarn install
+      # The self-hosted runners ship no system yarn, unlike the GH-hosted
+      # images.
+      - run: npm install -g yarn
+      # Prebuilt deps, same idea as the bundled-deps tarball in Concourse
+      # (that one lives in a private GCS bucket; fork PRs have no secrets,
+      # so the GitHub-side equivalent is the Actions cache).
+      - uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: node-modules-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
+      - run: yarn install --frozen-lockfile
       # Flake handling happens at test granularity now: jest retries individual
       # failing tests in CI (see jest.setup-after-env.ts) and logs each retried
       # error, instead of silently re-running the whole job.

@@ -5,6 +5,7 @@ import { i18nObject } from "@app/i18n/i18n-util"
 
 import { BackupPhraseScreen } from "@app/screens/self-custodial/onboarding/manual-backup/backup-phrase-screen"
 import { ContextForScreen } from "../../../helper"
+import { flushEffects } from "../../../../helpers/flush-effects"
 
 const mockNavigate = jest.fn()
 let mockStep = 1
@@ -67,34 +68,37 @@ describe("BackupPhraseScreen", () => {
           <BackupPhraseScreen />
         </ContextForScreen>,
       )
+      await flushEffects()
 
       await waitFor(() => expect(getByText("youth")).toBeTruthy())
       expect(getByText("execute")).toBeTruthy()
       expect(queryByText("ritual")).toBeNull()
     })
 
-    it("shows Continue button when timer expired", () => {
+    it("shows Continue button when timer expired", async () => {
       const { getByText } = render(
         <ContextForScreen>
           <BackupPhraseScreen />
         </ContextForScreen>,
       )
+      await flushEffects()
 
       expect(getByText(LL.BackupScreen.ManualBackup.Phrase.continueButton())).toBeTruthy()
     })
 
-    it("navigates to step 2 on continue press", () => {
+    it("navigates to step 2 on continue press", async () => {
       const { getByText } = render(
         <ContextForScreen>
           <BackupPhraseScreen />
         </ContextForScreen>,
       )
+      await flushEffects()
 
       fireEvent.press(getByText(LL.BackupScreen.ManualBackup.Phrase.continueButton()))
       expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupPhrase", { step: 2 })
     })
 
-    it("shows countdown in button when timer is active", () => {
+    it("shows countdown in button when timer is active", async () => {
       mockCountdown = { remainingSeconds: 5, isExpired: false }
 
       const { getByText } = render(
@@ -102,13 +106,14 @@ describe("BackupPhraseScreen", () => {
           <BackupPhraseScreen />
         </ContextForScreen>,
       )
+      await flushEffects()
 
       expect(
         getByText(new RegExp(LL.BackupScreen.ManualBackup.Phrase.saveItNow())),
       ).toBeTruthy()
     })
 
-    it("disables button during countdown", () => {
+    it("disables button during countdown", async () => {
       mockCountdown = { remainingSeconds: 5, isExpired: false }
 
       const { getByText } = render(
@@ -116,6 +121,7 @@ describe("BackupPhraseScreen", () => {
           <BackupPhraseScreen />
         </ContextForScreen>,
       )
+      await flushEffects()
 
       fireEvent.press(
         getByText(new RegExp(LL.BackupScreen.ManualBackup.Phrase.saveItNow())),
@@ -135,18 +141,20 @@ describe("BackupPhraseScreen", () => {
           <BackupPhraseScreen />
         </ContextForScreen>,
       )
+      await flushEffects()
 
       await waitFor(() => expect(getByText("ritual")).toBeTruthy())
       expect(getByText("captain")).toBeTruthy()
       expect(queryByText("youth")).toBeNull()
     })
 
-    it("shows I have saved it button", () => {
+    it("shows I have saved it button", async () => {
       const { getByText } = render(
         <ContextForScreen>
           <BackupPhraseScreen />
         </ContextForScreen>,
       )
+      await flushEffects()
 
       expect(getByText(LL.BackupScreen.ManualBackup.Phrase.savedConfirm())).toBeTruthy()
     })
@@ -157,6 +165,7 @@ describe("BackupPhraseScreen", () => {
           <BackupPhraseScreen />
         </ContextForScreen>,
       )
+      await flushEffects()
 
       await waitFor(() => expect(getByText("ritual")).toBeTruthy())
       fireEvent.press(getByText(LL.BackupScreen.ManualBackup.Phrase.savedConfirm()))
@@ -175,12 +184,13 @@ describe("BackupPhraseScreen", () => {
   })
 
   describe("shared", () => {
-    it("renders copy button", () => {
+    it("renders copy button", async () => {
       const { getByText } = render(
         <ContextForScreen>
           <BackupPhraseScreen />
         </ContextForScreen>,
       )
+      await flushEffects()
 
       expect(getByText(LL.BackupScreen.ManualBackup.Phrase.copy())).toBeTruthy()
     })
@@ -191,6 +201,7 @@ describe("BackupPhraseScreen", () => {
           <BackupPhraseScreen />
         </ContextForScreen>,
       )
+      await flushEffects()
 
       await waitFor(() => expect(getByText("youth")).toBeTruthy())
       fireEvent.press(getByText(LL.BackupScreen.ManualBackup.Phrase.copy()))
@@ -202,12 +213,13 @@ describe("BackupPhraseScreen", () => {
       )
     })
 
-    it("renders spark compatible link", () => {
+    it("renders spark compatible link", async () => {
       const { getByText } = render(
         <ContextForScreen>
           <BackupPhraseScreen />
         </ContextForScreen>,
       )
+      await flushEffects()
 
       expect(
         getByText(LL.BackupScreen.ManualBackup.Phrase.sparkCompatibleLink()),

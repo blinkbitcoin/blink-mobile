@@ -21,6 +21,17 @@ jest.mock("@app/components/set-lightning-address-modal", () => ({
   SetLightningAddressModal: mockCustodialModal,
 }))
 
+const mockBackupRequiredModal = jest.fn((_props: Record<string, unknown>) => null)
+jest.mock("@app/components/backup-required-modal", () => ({
+  BackupRequiredModal: mockBackupRequiredModal,
+}))
+
+let mockBackupStatus = "completed"
+jest.mock("@app/self-custodial/providers/backup-state", () => ({
+  BackupStatus: { None: "none", Pending: "pending", Completed: "completed" },
+  useBackupState: () => ({ backupState: { status: mockBackupStatus, method: null } }),
+}))
+
 jest.mock("@app/components/atomic/galoy-icon", () => ({
   GaloyIcon: () => null,
 }))
@@ -56,7 +67,9 @@ jest.mock("@rn-vui/themed", () => ({
 jest.mock("@app/i18n/i18n-react", () => ({
   useI18nContext: () => ({
     LL: {
-      SettingsScreen: { setYourLightningAddress: () => "Set your lightning address" },
+      SettingsScreen: {
+        createAddress: () => "Create address",
+      },
       GaloyAddressScreen: { copiedLightningAddressToClipboard: () => "Copied" },
     },
   }),
@@ -72,6 +85,7 @@ const SC_ADDRESS = "alice@staging.blink.sv"
 describe("AccountLNAddress (self-custodial)", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockBackupStatus = "completed"
     mockSettingsScreenQuery.mockReturnValue({ data: undefined, loading: false })
     mockUseAccountRegistry.mockReturnValue({
       activeAccount: { id: "sc-1", type: AccountType.SelfCustodial },
@@ -79,12 +93,12 @@ describe("AccountLNAddress (self-custodial)", () => {
     })
   })
 
-  it("prompts to set an address and opens the modal when none is registered", () => {
+  it("prompts to create an address and opens the modal when none is registered", () => {
     mockUseSelfCustodialWallet.mockReturnValue({ lightningAddress: null })
 
     render(<AccountLNAddress />)
 
-    expect(lastRowProps().title).toBe("Set your lightning address")
+    expect(lastRowProps().title).toBe("Create address")
     expect(lastRowProps().rightIcon).toBeUndefined()
     expect(mockScModal.mock.calls.at(-1)?.[0]?.isVisible).toBe(false)
 
@@ -110,6 +124,62 @@ describe("AccountLNAddress (self-custodial)", () => {
     expect(mockScModal.mock.calls.at(-1)?.[0]?.isVisible).toBe(false)
   })
 
+  it("opens the backup-required modal instead of the create modal when backup is not completed", () => {
+    mockBackupStatus = "none"
+    mockUseSelfCustodialWallet.mockReturnValue({ lightningAddress: null })
+
+    render(<AccountLNAddress />)
+
+    expect(lastRowProps().title).toBe("Create address")
+    expect(mockBackupRequiredModal.mock.calls.at(-1)?.[0]?.isVisible).toBe(false)
+
+    act(() => (lastRowProps().action as () => void)())
+
+    expect(mockBackupRequiredModal.mock.calls.at(-1)?.[0]?.isVisible).toBe(true)
+    expect(mockScModal).not.toHaveBeenCalled()
+    expect(mockCopyToClipboard).not.toHaveBeenCalled()
+  })
+
+  it("also gates address creation while the backup is still pending", () => {
+    mockBackupStatus = "pending"
+    mockUseSelfCustodialWallet.mockReturnValue({ lightningAddress: null })
+
+    render(<AccountLNAddress />)
+
+    act(() => (lastRowProps().action as () => void)())
+
+    expect(mockBackupRequiredModal.mock.calls.at(-1)?.[0]?.isVisible).toBe(true)
+    expect(mockScModal).not.toHaveBeenCalled()
+  })
+
+  it("closes the backup-required modal through its onClose prop", () => {
+    mockBackupStatus = "none"
+    mockUseSelfCustodialWallet.mockReturnValue({ lightningAddress: null })
+
+    render(<AccountLNAddress />)
+
+    act(() => (lastRowProps().action as () => void)())
+    expect(mockBackupRequiredModal.mock.calls.at(-1)?.[0]?.isVisible).toBe(true)
+
+    act(() => (mockBackupRequiredModal.mock.calls.at(-1)?.[0]?.onClose as () => void)())
+
+    expect(mockBackupRequiredModal.mock.calls.at(-1)?.[0]?.isVisible).toBe(false)
+  })
+
+  it("still copies an existing address on press when backup is not completed", () => {
+    mockBackupStatus = "none"
+    mockUseSelfCustodialWallet.mockReturnValue({ lightningAddress: SC_ADDRESS })
+
+    render(<AccountLNAddress />)
+
+    act(() => (lastRowProps().action as () => void)())
+
+    expect(mockCopyToClipboard).toHaveBeenCalledWith(
+      expect.objectContaining({ content: SC_ADDRESS }),
+    )
+    expect(mockBackupRequiredModal.mock.calls.at(-1)?.[0]?.isVisible).toBe(false)
+  })
+
   it("shows the persisted address (not the set prompt) while the live address is still resolving", () => {
     mockUseSelfCustodialWallet.mockReturnValue({ lightningAddress: null })
     mockUseAccountRegistry.mockReturnValue({
@@ -127,13 +197,15 @@ describe("AccountLNAddress (self-custodial)", () => {
 describe("AccountLNAddress (custodial)", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    // an incomplete backup must never gate the custodial flow
+    mockBackupStatus = "none"
     mockUseSelfCustodialWallet.mockReturnValue({ lightningAddress: null })
     mockUseAccountRegistry.mockReturnValue({
       activeAccount: { id: "cust-1", type: AccountType.Custodial },
     })
   })
 
-  it("prompts to set an address and opens the custodial modal when there is no username", () => {
+  it("prompts to create an address and opens the custodial modal when there is no username", () => {
     mockSettingsScreenQuery.mockReturnValue({
       data: { me: { username: null } },
       loading: false,
@@ -141,13 +213,14 @@ describe("AccountLNAddress (custodial)", () => {
 
     render(<AccountLNAddress />)
 
-    expect(lastRowProps().title).toBe("Set your lightning address")
+    expect(lastRowProps().title).toBe("Create address")
     expect(lastRowProps().rightIcon).toBeUndefined()
     expect(mockCustodialModal.mock.calls.at(-1)?.[0]?.isVisible).toBe(false)
 
     act(() => (lastRowProps().action as () => void)())
 
     expect(mockCustodialModal.mock.calls.at(-1)?.[0]?.isVisible).toBe(true)
+    expect(mockBackupRequiredModal).not.toHaveBeenCalled()
     expect(mockCopyToClipboard).not.toHaveBeenCalled()
   })
 

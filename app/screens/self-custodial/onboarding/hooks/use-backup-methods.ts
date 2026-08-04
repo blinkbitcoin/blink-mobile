@@ -8,8 +8,9 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { TranslationFunctions } from "@app/i18n/i18n-types"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { logSelfCustodialBackupCompleted } from "@app/self-custodial/analytics"
-import { useSelfCustodialAccountInfo } from "@app/self-custodial/hooks/use-self-custodial-account-info"
-import { BackupMethod, useBackupState } from "@app/self-custodial/providers/backup-state"
+import { deriveWalletIdentityPubkey } from "@app/self-custodial/bridge"
+import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
+import { BackupMethod } from "@app/self-custodial/providers/backup-state"
 import { toastShow } from "@app/utils/toast"
 
 import {
@@ -17,7 +18,8 @@ import {
   isCredentialBackupAvailable,
   useCredentialBackup,
 } from "./use-credential-backup"
-import { useWalletMnemonic } from "./use-wallet-mnemonic"
+import { useCompleteBackup } from "./use-complete-backup"
+import { useLoadWalletMnemonic } from "./use-wallet-mnemonic"
 
 const showBackupErrorToast = (error: CredentialError, LL: TranslationFunctions): void => {
   switch (error) {
@@ -46,9 +48,9 @@ const showBackupErrorToast = (error: CredentialError, LL: TranslationFunctions):
 export const useBackupMethods = () => {
   const { LL } = useI18nContext()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-  const mnemonic = useWalletMnemonic()
-  const { identityPubkey } = useSelfCustodialAccountInfo()
-  const { setBackupCompleted } = useBackupState()
+  const loadMnemonic = useLoadWalletMnemonic()
+  const network = useSparkNetwork()
+  const completeBackup = useCompleteBackup()
   const { selfCustodialEntries } = useAccountRegistry()
   const credentialBackupAvailable = isCredentialBackupAvailable(
     selfCustodialEntries.length,
@@ -56,7 +58,11 @@ export const useBackupMethods = () => {
 
   const { save, loading: credentialLoading } = useCredentialBackup()
 
+  /** The phrase is read from the keychain here, on the credential tap, rather than eagerly
+   *  on mount: cloud and manual leave this screen and load it themselves. */
   const handleCredentialBackup = useCallback(async () => {
+    const mnemonic = await loadMnemonic()
+    const identityPubkey = mnemonic ? deriveWalletIdentityPubkey(mnemonic, network) : ""
     if (!identityPubkey) {
       toastShow({
         message: LL.BackupScreen.BackupMethod.passwordManagerBackupFailed(),
@@ -71,15 +77,14 @@ export const useBackupMethods = () => {
       return
     }
 
-    setBackupCompleted(BackupMethod.Keychain)
     logSelfCustodialBackupCompleted({ backupMethod: "keychain" })
     toastShow({
       message: LL.BackupScreen.BackupMethod.passwordManagerBackupSaved(),
       type: "success",
       LL,
     })
-    navigation.navigate("selfCustodialBackupSuccess")
-  }, [save, navigation, LL, mnemonic, identityPubkey, setBackupCompleted])
+    completeBackup({ method: BackupMethod.Keychain })
+  }, [save, completeBackup, LL, loadMnemonic, network])
 
   const handleCloudBackup = useCallback(() => {
     navigation.navigate("selfCustodialCloudBackup")

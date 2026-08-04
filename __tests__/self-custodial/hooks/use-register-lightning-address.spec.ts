@@ -19,12 +19,19 @@ jest.mock("@app/self-custodial/providers/wallet", () => ({
   }),
 }))
 
+let mockBackupStatus = "completed"
+jest.mock("@app/self-custodial/providers/backup-state", () => ({
+  BackupStatus: { None: "none", Pending: "pending", Completed: "completed" },
+  useBackupState: () => ({ backupState: { status: mockBackupStatus, method: null } }),
+}))
+
 const FAKE_SDK = { id: "sdk" }
 
 describe("useRegisterLightningAddress", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockSdk = FAKE_SDK
+    mockBackupStatus = "completed"
     mockCheckAvailable.mockResolvedValue(true)
     mockRegister.mockResolvedValue({ lightningAddress: "alice@staging.blink.sv" })
     mockUpdateAccount.mockResolvedValue(undefined)
@@ -60,6 +67,36 @@ describe("useRegisterLightningAddress", () => {
     expect(mockCheckAvailable).not.toHaveBeenCalled()
     expect(mockRegister).not.toHaveBeenCalled()
     expect(onRegistered).not.toHaveBeenCalled()
+  })
+
+  it("refuses to register when the backup is not completed", async () => {
+    mockBackupStatus = "none"
+    const onRegistered = jest.fn()
+    const { result } = renderHook(() => useRegisterLightningAddress(onRegistered))
+
+    act(() => result.current.setLnAddress("alice"))
+    await act(async () => {
+      await result.current.register()
+    })
+
+    expect(result.current.error).toBe(SetUsernameError.BACKUP_REQUIRED)
+    expect(mockCheckAvailable).not.toHaveBeenCalled()
+    expect(mockRegister).not.toHaveBeenCalled()
+    expect(onRegistered).not.toHaveBeenCalled()
+    expect(result.current.loading).toBe(false)
+  })
+
+  it("refuses to register while the backup is still pending", async () => {
+    mockBackupStatus = "pending"
+    const { result } = renderHook(() => useRegisterLightningAddress(jest.fn()))
+
+    act(() => result.current.setLnAddress("alice"))
+    await act(async () => {
+      await result.current.register()
+    })
+
+    expect(result.current.error).toBe(SetUsernameError.BACKUP_REQUIRED)
+    expect(mockRegister).not.toHaveBeenCalled()
   })
 
   it("reports an unknown error when the SDK is not connected", async () => {

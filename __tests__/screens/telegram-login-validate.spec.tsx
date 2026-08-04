@@ -2,7 +2,10 @@ import React from "react"
 import { render, screen, waitFor } from "@testing-library/react-native"
 import { RouteProp } from "@react-navigation/native"
 
-import { TelegramLogin } from "@app/screens/telegram-login-screen/telegram-login-validate.stories"
+import { MockedProvider } from "@apollo/client/testing"
+
+import { createCache } from "@app/graphql/cache"
+import { TelegramLoginScreen } from "@app/screens/telegram-login-screen/telegram-login-validate"
 import { PhoneValidationStackParamList } from "@app/navigation/stack-param-lists"
 import {
   useTelegramLogin,
@@ -32,6 +35,16 @@ const mockRoute: RouteProp<PhoneValidationStackParamList, "telegramLoginValidate
     type: "Login",
   },
 }
+
+const TelegramLogin = ({
+  mockRoute,
+}: {
+  mockRoute: RouteProp<PhoneValidationStackParamList, "telegramLoginValidate">
+}) => (
+  <MockedProvider cache={createCache()}>
+    <TelegramLoginScreen route={mockRoute} />
+  </MockedProvider>
+)
 
 describe("Telegram Login Screen", () => {
   let LL: ReturnType<typeof i18nObject>

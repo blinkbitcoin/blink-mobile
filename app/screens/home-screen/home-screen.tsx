@@ -24,7 +24,7 @@ import { BalanceHeader, useTotalBalance } from "@app/components/balance-header"
 import { BalanceMode, useBalanceMode } from "@app/hooks/use-balance-mode"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
-import { AccountType } from "@app/types/wallet"
+import { StableTokenConvertToBtcModal } from "@app/screens/conversion-flow/stable-token-convert-to-btc-modal"
 import { TrialAccountLimitsModal } from "@app/components/upgrade-account-modal"
 import SlideUpHandle from "@app/components/slide-up-handle"
 import { Screen } from "@app/components/screen"
@@ -38,6 +38,7 @@ import {
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useFeatureFlags, useRemoteConfig } from "@app/config/feature-flags-context"
 import { BackupNudgeBanner } from "@app/components/backup-nudge-banner"
+import { SelfCustodialInfoBulletin } from "@app/components/self-custodial-info-bulletin"
 import { BackupNudgeModal } from "@app/components/backup-nudge-modal"
 import { NetworkStatusBanner } from "@app/components/network-status-banner"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
@@ -48,16 +49,26 @@ import {
   useDollarBalanceRestricted,
   useDollarBalanceRestrictionSync,
 } from "@app/hooks/use-dollar-balance-restricted"
-import { useStablesatsForcedConversion } from "@app/hooks/use-stablesats-forced-conversion"
+import { useDollarBalanceForcedConversion } from "@app/hooks/use-dollar-balance-forced-conversion"
+import { MigrateNowModal } from "@app/components/migrate-now-modal"
+import { MigrationReminderBulletin } from "@app/components/migration-reminder-bulletin"
+import { OffboardOnlyBulletin } from "@app/components/offboard-only-bulletin"
+/** Deep import on purpose: keeps the migration hooks barrel out of the home graph. */
+import { useWindDownHomeNudges } from "@app/screens/account-migration/hooks/use-wind-down-home-nudges"
 import {
   useTransferBlocked,
   useTransferBlockedSync,
 } from "@app/hooks/use-transfer-blocked"
 import { useSelfCustodialNetworkMismatchToast } from "@app/self-custodial/hooks/use-network-mismatch-toast"
+import { useNonCustodialConversionLimits } from "@app/self-custodial/hooks"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
+import { ConvertDirection } from "@app/types/payment"
 import { useBackupNudgeState } from "@app/hooks/use-backup-nudge-state"
+import { useSelfCustodialInfoBulletinState } from "@app/hooks/use-self-custodial-info-bulletin-state"
 import { getErrorMessages } from "@app/graphql/utils"
 import { getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
+import { useCardData } from "@app/screens/card-screen/hooks/use-card-data"
+import { isCardUsable } from "@app/screens/card-screen/utils/card-display"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { UnclaimedDepositBanner } from "@app/components/unclaimed-deposit-banner"
 import { testProps } from "@app/utils/testProps"
@@ -78,11 +89,23 @@ import {
   useHomeUnauthedQuery,
   useRealtimePriceQuery,
   useSettingsScreenQuery,
+  WalletCurrency,
 } from "@app/graphql/generated"
+import { AccountType } from "@app/types/wallet"
 import { useLevel } from "@app/graphql/level-context"
 
 const TransactionCountToTriggerSetDefaultAccountModal = 1
 const UPGRADE_MODAL_INITIAL_DELAY_MS = 1500
+/** Floor for conversions without a pool minimum (custodial intraledger always,
+ *  self-custodial when the SDK reports none): any positive cent converts. */
+const ANY_POSITIVE_CENT_MINIMUM = 1
+/** The SlideUpHandle floats over the bottom 97pt of the scroll view (82pt touch
+ *  area anchored 15pt up); content needs at least that much bottom padding for
+ *  the last bulletin to be readable at max scroll. */
+const SCROLL_BOTTOM_CLEARANCE = 100
+/** Header chrome (username row, balance) sits between fixed-size icon buttons;
+ *  uncapped Dynamic Type pushes the settings menu out of reach. */
+const MAX_HEADER_FONT_SIZE_MULTIPLIER = 1.4
 
 gql`
   query homeAuthed {
@@ -169,6 +192,7 @@ gql`
   }
 `
 
+// eslint-disable-next-line max-statements -- HomeScreen orchestrates the entire home; splitting solely to meet the 100-statement cap would fragment cohesive setup without improving readability
 export const HomeScreen: React.FC = () => {
   const styles = useStyles()
   const {
@@ -189,18 +213,22 @@ export const HomeScreen: React.FC = () => {
 
   const isAuthed = useIsAuthed()
   const activeWallet = useActiveWallet()
-  const { isSelfCustodial, accountType } = activeWallet
+  const { isSelfCustodial } = activeWallet
   useSelfCustodialNetworkMismatchToast()
   const {
     refreshWallets: refreshSelfCustodialWallets,
     isStableBalanceActive,
     lightningAddress: selfCustodialLightningAddress,
   } = useSelfCustodialWallet()
-  const { accounts } = useAccountRegistry()
+  const { accounts, activeAccount } = useAccountRegistry()
   const hasMultipleAccounts = accounts.length > 1
   const { stableBalanceEnabled } = useFeatureFlags()
   const { mode: balanceMode, toggleMode: toggleBalanceMode } = useBalanceMode()
   const { shouldShowBanner, shouldShowModal, dismissBanner } = useBackupNudgeState()
+  const {
+    shouldShow: shouldShowSelfCustodialInfoBulletin,
+    dismiss: dismissSelfCustodialInfoBulletin,
+  } = useSelfCustodialInfoBulletinState()
   const { LL } = useI18nContext()
   const {
     appConfig: {
@@ -287,6 +315,18 @@ export const HomeScreen: React.FC = () => {
         walletCurrency: w.walletCurrency,
       }))
     : dataAuthed?.me?.defaultAccount?.wallets
+
+  /**
+   * TODO(card): `cards` on ConsumerAccount only exists on the staging backend
+   * today, so gate the home card row to staging until the card service ships to
+   * every instance; then drop `isCardBackendAvailable` and query unconditionally.
+   * Ref PR #3899.
+   */
+  const isCardBackendAvailable = galoyInstanceId === "Staging"
+  const { card: homeCard } = useCardData({ skip: !isCardBackendAvailable })
+  const hasCard = homeCard !== undefined && isCardUsable(homeCard.status)
+  const cardLastFour = homeCard?.lastFour
+
   const {
     formattedBalance: defaultFormattedBalance,
     satsBalance,
@@ -373,12 +413,83 @@ export const HomeScreen: React.FC = () => {
 
   const restrictedUsdWallet = getUsdWallet(dataAuthed?.me?.defaultAccount?.wallets)
   const restrictedBtcWallet = getBtcWallet(dataAuthed?.me?.defaultAccount?.wallets)
-  const restrictedUsdWalletBalance = restrictedUsdWallet?.balance ?? 0
+  /** Balance and restriction policy must resolve for the SAME account type: right
+   *  after switching to self-custodial the SDK is still connecting (so
+   *  `isSelfCustodial` is false) while the restriction already applies the
+   *  self-custodial policy; reading the cached custodial balance in that window
+   *  would trigger the previous account's modal. */
+  const isCustodialAccount = activeWallet.accountType === AccountType.Custodial
+  const selfCustodialUsdWallet = activeWallet.wallets.find(
+    (w) => w.walletCurrency === WalletCurrency.Usd,
+  )
+  const custodialUsdWalletBalance = restrictedUsdWallet?.balance ?? 0
+  const selfCustodialUsdWalletBalance = selfCustodialUsdWallet?.balance.amount ?? 0
+  const restrictedUsdWalletBalance = isCustodialAccount
+    ? custodialUsdWalletBalance
+    : selfCustodialUsdWalletBalance
+  /** Memoized so the self-custodial quote does not refire on unrelated re-renders. */
+  const restrictedUsdMoneyAmount = useMemo(
+    () => toUsdMoneyAmount(restrictedUsdWalletBalance),
+    [restrictedUsdWalletBalance],
+  )
 
-  const { isConvertModalVisible, closeConvertModal } = useStablesatsForcedConversion({
-    isRestricted: isDollarBalanceRestricted && accountType === AccountType.Custodial,
+  /** The limits fetch only runs when a forced conversion is actually on the
+   *  table (the hook skips entirely on an undefined direction), and gating on
+   *  focus re-runs it on each home visit, so one failed fetch cannot mute the
+   *  trigger for the whole session. Below the Breez pool minimum the trigger
+   *  stays closed: the bridge rejects below-minimum conversions, so the modal
+   *  would nag with a retry that can never succeed. */
+  const shouldCheckConversionMinimum =
+    !isCustodialAccount &&
+    isDollarBalanceRestricted &&
+    restrictedUsdWalletBalance > 0 &&
+    isFocused
+  const { limits: stableTokenConversionLimits } = useNonCustodialConversionLimits(
+    shouldCheckConversionMinimum ? ConvertDirection.UsdToBtc : undefined,
+  )
+  /** A fetched limits response without a minimum means "none": mirror the bridge
+   *  (`checkConversionMinimum`), which lets any positive amount through. */
+  const stableTokenConversionMinimum = stableTokenConversionLimits
+    ? stableTokenConversionLimits.minFromAmount ?? ANY_POSITIVE_CENT_MINIMUM
+    : null
+  const minimumConvertibleBalance = isCustodialAccount
+    ? ANY_POSITIVE_CENT_MINIMUM
+    : stableTokenConversionMinimum
+
+  const { isConvertModalVisible, closeConvertModal } = useDollarBalanceForcedConversion({
+    accountId: activeAccount?.id,
+    isRestricted: isDollarBalanceRestricted,
     usdWalletBalance: restrictedUsdWalletBalance,
+    minimumBalance: minimumConvertibleBalance,
+    isFocused,
   })
+
+  /** Each account type renders its own convert modal; the guards keep them exclusive
+   *  locally instead of relying on the skipped custodial query staying empty. */
+  const custodialConvertWallets =
+    isCustodialAccount && restrictedUsdWallet && restrictedBtcWallet
+      ? { usdWalletId: restrictedUsdWallet.id, btcWalletId: restrictedBtcWallet.id }
+      : null
+  const shouldShowStableTokenConvertModal = isSelfCustodial && isConvertModalVisible
+
+  const { migrateNowPrompt, offboardBulletin, reminderBulletin, receiveBlocked } =
+    useWindDownHomeNudges()
+  const { dismissForSession: dismissMigrateNowPrompt } = migrateNowPrompt
+  /** Dismissing first keeps the modal from floating over the pushed migration flow. */
+  const goToMigration = React.useCallback(() => {
+    dismissMigrateNowPrompt()
+    navigation.navigate("accountMigrationEntry")
+  }, [dismissMigrateNowPrompt, navigation])
+  /** The migrate-now push is the lowest-priority nudge: two native modals cannot
+   *  present at once on iOS, so it waits while any other home modal is up. */
+  const isAnotherHomeModalVisible =
+    isConvertModalVisible ||
+    isUpgradeModalVisible ||
+    isRestrictionModalVisible ||
+    isStablesatModalVisible ||
+    modalVisible
+  const shouldShowMigrateNowPrompt =
+    migrateNowPrompt.isVisible && !isAnotherHomeModalVisible
 
   const closeUpgradeModal = () => setIsUpgradeModalVisible(false)
   const closeRestrictionModal = () => setIsRestrictionModalVisible(false)
@@ -504,6 +615,8 @@ export const HomeScreen: React.FC = () => {
       title: LL.HomeScreen.receive(),
       target: "receiveBitcoin",
       icon: "receive",
+      disabled: receiveBlocked.isBlocked,
+      onDisabledPress: receiveBlocked.onDisabledPress,
     },
     {
       title: LL.HomeScreen.send(),
@@ -517,16 +630,20 @@ export const HomeScreen: React.FC = () => {
     },
   ]
 
-  const isIosWithBalance = isIos && satsBalance > 0
+  const passesIosGate =
+    isSelfCustodial ||
+    !isIos ||
+    dataUnauthed?.globals?.network !== "mainnet" ||
+    levelAccount === AccountLevel.Two ||
+    levelAccount === AccountLevel.Three ||
+    (isIos && satsBalance > 0)
 
+  /** A transfer-blocked country must not hide the button while the dollar
+   *  balance is restricted — the disabled button is the user's entry point to
+   *  the restriction explanation (WalletOverview greys the row from the same
+   *  hook). Only the iOS zero-balance gate may hide it in that state. */
   const shouldShowTransferButton =
-    !isTransferBlocked &&
-    (isSelfCustodial ||
-      !isIos ||
-      dataUnauthed?.globals?.network !== "mainnet" ||
-      levelAccount === AccountLevel.Two ||
-      levelAccount === AccountLevel.Three ||
-      isIosWithBalance)
+    passesIosGate && (!isTransferBlocked || isDollarBalanceRestricted)
 
   if (shouldShowTransferButton) {
     buttons.unshift({
@@ -571,7 +688,7 @@ export const HomeScreen: React.FC = () => {
   }
 
   return (
-    <Screen headerShown={false}>
+    <Screen headerShown={false} edges={["top", "left", "right"]}>
       {AccountCreationNeededModal}
       <StableSatsModal
         isVisible={isStablesatModalVisible}
@@ -589,17 +706,33 @@ export const HomeScreen: React.FC = () => {
         isVisible={isRestrictionModalVisible}
         toggleModal={closeRestrictionModal}
       />
-      {restrictedUsdWallet && restrictedBtcWallet && (
+      {custodialConvertWallets && (
         <UsdConvertToBtcModal
           isVisible={isConvertModalVisible}
           toggleModal={closeConvertModal}
-          usdWalletBalance={toUsdMoneyAmount(restrictedUsdWalletBalance)}
-          usdWalletId={restrictedUsdWallet.id}
-          btcWalletId={restrictedBtcWallet.id}
+          usdWalletBalance={restrictedUsdMoneyAmount}
+          usdWalletId={custodialConvertWallets.usdWalletId}
+          btcWalletId={custodialConvertWallets.btcWalletId}
         />
       )}
-      <View style={styles.balanceContainer}>
-        <View style={styles.header}>
+      {shouldShowStableTokenConvertModal && (
+        <StableTokenConvertToBtcModal
+          isVisible={isConvertModalVisible}
+          toggleModal={closeConvertModal}
+          usdWalletBalance={restrictedUsdMoneyAmount}
+          conversionMinimum={stableTokenConversionMinimum}
+        />
+      )}
+      {/* Kept mounted (not conditionally rendered) so its exit animation plays on dismiss. */}
+      <MigrateNowModal
+        isVisible={shouldShowMigrateNowPrompt}
+        toggleModal={migrateNowPrompt.dismissForSession}
+        onMigrate={goToMigration}
+        deadlineTimestamp={migrateNowPrompt.deadlineTimestamp}
+        timezone={migrateNowPrompt.timezone}
+      />
+      <View {...testProps("home-header")} style={styles.balanceContainer}>
+        <View {...testProps("home-header-row")} style={styles.header}>
           <GaloyIconButton
             onPress={() => navigation.navigate("priceHistory")}
             size={"medium"}
@@ -611,13 +744,20 @@ export const HomeScreen: React.FC = () => {
             {!loading && usernameTitle && (
               <Pressable onPress={canSwitchAccount ? handleSwitchPress : null}>
                 <View style={styles.profileContainer}>
-                  <Text type="p2">{usernameTitle}</Text>
+                  <Text
+                    {...testProps("home-username")}
+                    type="p2"
+                    maxFontSizeMultiplier={MAX_HEADER_FONT_SIZE_MULTIPLIER}
+                  >
+                    {usernameTitle}
+                  </Text>
                   {canSwitchAccount && <GaloyIcon name={"caret-down"} size={18} />}
                 </View>
               </Pressable>
             )}
           </View>
           <GaloyIconButton
+            {...testProps("home-settings-button")}
             onPress={() => navigation.navigate("settings")}
             size={"medium"}
             name="menu"
@@ -663,6 +803,8 @@ export const HomeScreen: React.FC = () => {
           setIsStablesatModalVisible={setIsStablesatModalVisible}
           onRestrictedTap={() => setIsRestrictionModalVisible(true)}
           wallets={wallets}
+          hasCard={hasCard}
+          cardLastFour={cardLastFour}
           showBtcNotification={isOutgoing ? false : hasUnseenBtcTx}
           showUsdNotification={isOutgoing ? false : hasUnseenUsdTx}
         />
@@ -691,6 +833,18 @@ export const HomeScreen: React.FC = () => {
         {isSelfCustodial && <UnclaimedDepositBanner />}
         <NetworkStatusBanner />
         {shouldShowBanner && <BackupNudgeBanner onDismiss={dismissBanner} />}
+        {offboardBulletin.isVisible && <OffboardOnlyBulletin />}
+        {reminderBulletin.isVisible && (
+          <MigrationReminderBulletin
+            onMigrate={goToMigration}
+            deadlineTimestamp={reminderBulletin.deadlineTimestamp}
+            receiveDisabledTimestamp={reminderBulletin.receiveDisabledTimestamp}
+            timezone={reminderBulletin.timezone}
+          />
+        )}
+        {shouldShowSelfCustodialInfoBulletin && (
+          <SelfCustodialInfoBulletin onDismiss={dismissSelfCustodialInfoBulletin} />
+        )}
         <BulletinsCard loading={bulletinsLoading} bulletins={bulletins} />
         <AppUpdate />
         <SetDefaultAccountModal
@@ -716,7 +870,7 @@ export const HomeScreen: React.FC = () => {
 const useStyles = makeStyles(({ colors }) => ({
   scrollViewContainer: {
     paddingHorizontal: 20,
-    paddingBottom: 20,
+    paddingBottom: SCROLL_BOTTOM_CLEARANCE,
     rowGap: 20,
   },
   listItemsContainer: {
@@ -780,13 +934,10 @@ const useStyles = makeStyles(({ colors }) => ({
   balanceContainer: {
     marginTop: 7,
     flexDirection: "column",
-    flex: 1,
-    height: 40,
-    maxHeight: 40,
+    minHeight: 40,
   },
   header: {
     flexDirection: "row",
-    flex: 1,
     justifyContent: "space-between",
     alignItems: "center",
     marginHorizontal: 20,

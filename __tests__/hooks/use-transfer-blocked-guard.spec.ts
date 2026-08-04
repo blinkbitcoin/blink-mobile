@@ -63,4 +63,15 @@ describe("useTransferBlockedGuard", () => {
 
     expect(mockDispatch).toHaveBeenCalledTimes(1)
   })
+
+  /** The migration conversion turns the guard off so a blocked-transfer user can empty
+   *  their dollar balance instead of being bounced home. */
+  it("stays off and never bounces when disabled, even while blocked", () => {
+    mockUseTransferBlocked.mockReturnValue(true)
+
+    const { result } = renderHook(() => useTransferBlockedGuard({ enabled: false }))
+
+    expect(result.current).toBe(false)
+    expect(mockDispatch).not.toHaveBeenCalled()
+  })
 })

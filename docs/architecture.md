@@ -91,7 +91,7 @@ RootStack (Stack Navigator)
 │   ├── Map             # Merchant map
 │   └── Earn            # Educational content
 ├── scanningQRCode      # QR scanner
-├── sendBitcoin*        # Send flow (4 screens)
+├── sendBitcoin*        # Send flow (5 screens)
 ├── receiveBitcoin      # Receive flow
 ├── conversion*         # Currency conversion (3 screens)
 ├── settings            # Settings screen

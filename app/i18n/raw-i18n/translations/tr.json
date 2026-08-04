@@ -1,4 +1,38 @@
 {
+  "ApiScreen": {
+    "keysGroupTitle": "API anahtarları",
+    "noKeys": "Henüz API anahtarı yok",
+    "createKey": "API anahtarı oluştur",
+    "createTitle": "Yeni API anahtarı",
+    "keyCreatedTitle": "API anahtarı oluşturuldu",
+    "keyName": "Anahtar adı",
+    "keyNamePlaceholder": "ör. BTCPay Server",
+    "scopeRead": "Okuma",
+    "scopeReadDescription": "Bakiyeyi ve işlem geçmişini görüntüle",
+    "scopeReceive": "Alma",
+    "scopeReceiveDescription": "Fatura oluştur ve ödeme al",
+    "scopeWrite": "Yazma",
+    "writeScopeDashboardOnly": "Ödeme gönderebilen anahtarlar yalnızca dashboard.blink.sv üzerinde oluşturulabilir",
+    "expiry": "Sona erer",
+    "expiry30Days": "30 gün",
+    "expiry90Days": "90 gün",
+    "expiryNever": "Asla",
+    "expiresOn": "{date: string} tarihinde sona erer",
+    "neverExpires": "Asla sona ermez",
+    "revoked": "İptal edildi",
+    "expired": "{date: string} tarihinde sona erdi",
+    "expiredNoDate": "Süresi doldu",
+    "secretWarning": "Anahtar yalnızca bu bir kez gösterilir. Şimdi kopyalayın veya paylaşın ve güvenli bir yerde saklayın.",
+    "secretCopied": "API anahtarı kopyalandı. Pano 1 dakika içinde temizlenir",
+    "revokeTitle": "API anahtarı iptal edilsin mi?",
+    "revokeBody": "\"{name: string}\" hemen çalışmayı durduracak. Bu işlem geri alınamaz.",
+    "revoke": "İptal et",
+    "revokeSuccess": "API anahtarı iptal edildi",
+    "createError": "API anahtarı oluşturulamadı. Lütfen tekrar deneyin.",
+    "revokeError": "API anahtarı iptal edilemedi. Lütfen tekrar deneyin.",
+    "loadError": "API anahtarlarınız yüklenemedi. Lütfen daha sonra tekrar deneyin.",
+    "done": "Tamam"
+  },
   "GaloyAddressScreen": {
     "title": "Şunu kullanarak ödeme alın:",
     "buttonTitle": "Adresinizi belirleyin",
@@ -2003,7 +2037,7 @@
     "satAccumulated": "Biriktirilen satsler",
     "satsEarned": "{formattedNumber | sats} earned",
     "sectionsCompleted": "Tamamladınız",
-    "title": "Kazan",
+    "title": "Öğren",
     "unlockQuestion": "Kilidi açmak için soruya cevap ver:",
     "youEarned": "Kazandınız",
     "registerTitle": "Hesabınızı güncellemeniz gerekiyor",
@@ -2011,6 +2045,7 @@
     "oneSectionADay": "Günde bir bölüm!",
     "availableTomorrow": "Bitcoin hakkında daha fazla şey öğrenmek için yarın tekrar gel!",
     "motivatingBadger": "Bu derslerde yolunuzu kazın ve öğrendikçe kazanın",
+    "motivatingBadgerNoRewards": "Bu derslerde yolunuzu kazın ve Bitcoin hakkında bilgi edinin",
     "continueNoRewards": "Devam et (Ödülsüz)",
     "somethingNotRight": "Bir Şeyler Doğru Değil...",
     "defaultErrorMessage": "{errorMessage: string} Lütfen daha sonra tekrar deneyin.\nVeya ödülsüz olarak öğrenmeye devam etmek için tıklayın.",
@@ -2049,7 +2084,7 @@
     "login": "Giriş yap",
     "loginOrRestore": "Giriş yap / Geri yükle",
     "logBackInWith": "Şununla tekrar giriş yap",
-    "headline": "Cüzdan Galoy tarafından çalıştırılmakta",
+    "headline": "Cüzdan Blink tarafından çalıştırılmakta",
     "startTrialAccount": "Bir deneme hesabı ile başla",
     "startWithTrialAccount": "Denem hesabı ile başla",
     "registerPhoneAccount": "Telefon numaranı kaydet",
@@ -2163,6 +2198,9 @@
     "lightningInvoice": "Lightning faturası",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Yatırma ücreti: {threshold} SAT altındaki tutarlar için {fee} SAT veya {threshold} SAT üzerindeki yatırmalar için {overFee} SAT",
+    "depositFeeTiers": "Deposit fees: {tiers: string}",
+    "depositFeeTierUpTo": "{fee: string} SAT up to {max: string} SAT",
+    "depositFeeTierAbove": "{fee: string} SAT above {min: string} SAT",
     "autoConvertMinAmount": "{minSats: number} sats / {minFiat: string} altındaki tutarlar otomatik olarak Dolara çevrilemez. Bunun yerine Bitcoin alacaksınız.",
     "autoConvertFailed": "Ödeme alındı ancak dönüşüm başarısız oldu.",
     "pleaseWaitForConversion": "Lütfen dönüştürme tamamlanana kadar bekleyin"
@@ -2261,6 +2299,10 @@
     "invalidPhoneNumber": "Geçerli bir cep telefonu numarası girin",
     "phoneNotAllowed": "Bu alan telefon numarası kabul etmez"
   },
+  "MerchantSelectionScreen": {
+    "title": "Ödeme seçeneği seçin",
+    "empty": "Kullanılabilir ödeme seçeneği yok."
+  },
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "İşlem mempool'a gönderilmelidir",
     "amount": "Miktar",
@@ -2279,7 +2321,6 @@
     "notConfirmed": "Ödeme gönderildi\nancak henüz onaylanmadı\n\nDurumu kontrol edebilirsiniz\nİşlemler'deki ödemenin",
     "note": "Not veya etiket",
     "success": "Ödeme başarı ile gönderildi",
-    "suggestionInput": "Önerinizi girin",
     "max": "En Fazla",
     "maxAmount": "En Fazla Miktar",
     "title": "Bitcoin Gönder",
@@ -2319,6 +2360,10 @@
     "sdkGenericError": "Ücretler tahmin edilemiyor. Lütfen farklı bir tutar deneyin."
   },
   "SettingsScreen": {
+    "createAddress": "Adres oluştur",
+    "donationButton": "Bağış düğmesi",
+    "btcpayServer": "BTCPay Server",
+    "woocommerce": "WooCommerce",
     "staticQr": "Basılabilir Statik QR Kodu",
     "staticQrCopied": "Statik QR kod bağlantınız kopyalandı",
     "setByOs": "İşletim sistemi tarafından ayarlandı",
@@ -2327,7 +2372,6 @@
     "apiDashboard": "API erişimi ve kontrol paneli",
     "pos": "Satış Noktası",
     "posCopied": "Satış noktası bağlantınız kopyalandı",
-    "setYourLightningAddress": "Lightning Adresinizi Ayarlayın",
     "activated": "Aktive edildi",
     "addressScreen": "Ödeme alma yolları",
     "nonCustodialAccount": "Saklamasız hesap",
@@ -2525,7 +2569,32 @@
     "receivingAccount": "Alıcı Bakiye",
     "sendingAccount": "Gönderen Bakiye",
     "txNotBroadcast": "İşleminiz sıraya alındı. Mempool'da görünmelidir {countdown: string}.",
-    "momentarily": "anlık olarak"
+    "momentarily": "anlık olarak",
+    "findingAccount": "Bu ödemenin hesabı aranıyor...",
+    "txNotFoundInAccounts": "Bu ödeme bu cihazdaki hiçbir hesapta bulunamadı. Oturumu kapatılmış bir hesaba ait olabilir.",
+    "txLoadFailed": "Bu ödeme yüklenemedi. Bağlantınızı kontrol edip tekrar deneyin.",
+    "switchedForPayment": "Bu ödemeyi göstermek için {identifier: string} hesabına geçildi"
+  },
+  "FeeRatesScreen": {
+    "title": "Ücret oranları",
+    "send": "Gönder",
+    "receive": "Al",
+    "transfer": "Transfer",
+    "lightning": "Lightning",
+    "intraledger": "Intraledger",
+    "onchainPriority": "Onchain öncelikli (en kısa sürede)",
+    "onchainStandard": "Onchain standart (~4 saat)",
+    "onchainEconomy": "Onchain ekonomik",
+    "lightningTransactions": "Lightning işlemleri",
+    "onchainBelowThreshold": "Onchain {threshold: string} SAT altı",
+    "onchainAboveThreshold": "Onchain {threshold: string} SAT üzeri",
+    "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
+    "transferFee": "Transfer ücreti",
+    "noFee": "ücretsiz",
+    "lightningSendFee": "{fee: string} + ~{routingFee: string} yönlendirme ücreti",
+    "fromApprox": "en az ~{fee: string}",
+    "satAmount": "{amount: string} SAT",
+    "error": "Şu an için ücretlere ulaşamıyoruz"
   },
   "TransactionLimitsScreen": {
     "receive": "Al",
@@ -2570,7 +2639,8 @@
       "tooLong": "Adres en fazla 50 karakter uzunluğunda olabilir",
       "invalidCharacter": "Adres yalnızca harf, sayı ve alttan çizgi içerebilir",
       "addressUnavailable": "Üzgünüm, bu adres çoktan alındı",
-      "unknownError": "Bilinmeyen bir hata yaşandı, lütfen daha sonra tekrar deneyin"
+      "unknownError": "Bilinmeyen bir hata yaşandı, lütfen daha sonra tekrar deneyin",
+      "backupRequired": "Back up your wallet before creating a Lightning address"
     },
     "receiveMoney": "Bu adresle diğer lightning cüzdanlarından ve {bankName: string} kullanıcılarından para alın.",
     "itCannotBeChanged": "Bu daha sonra değiştirilebilir."
@@ -2700,6 +2770,8 @@
   },
   "common": {
     "country": "Ülke",
+    "registered": "Kayıtlı",
+    "detected": "Tespit edildi",
     "unknown": "Bilinmiyor",
     "enabled": "Etkin",
     "switch": "Anahtar",
@@ -2719,6 +2791,7 @@
     "anonymousUser": "Anonim kullanıcı",
     "blinkToBlink": "Blink'ten Blink'e",
     "transactionLimits": "İşlem Limitleri",
+    "feeRates": "Ücret oranları",
     "activateWallet": "Cüzdanı aktive et",
     "amountRequired": "Miktar girilmesi gerekli",
     "back": "Geri",
@@ -2732,6 +2805,7 @@
     "bitcoinPrice": "Bitcoin fiyatı",
     "btcAccount": "Bitcoin Bakiyesi",
     "cancel": "İptal",
+    "card": "Kart",
     "close": "Kapat",
     "confirm": "Onayla",
     "convert": "Çevir",
@@ -2799,6 +2873,7 @@
     "total": "Toplam",
     "transactions": "İşlemler",
     "transactionsError": "İşlemleri yüklerken hata oluştu",
+    "transfer": "Transfer",
     "tryAgain": "Tekrar deneyin",
     "type": "Tip",
     "usdAccount": "Dolar Bakiyesi",
@@ -2815,6 +2890,7 @@
     "problemMaybeReauth": "İsteğinizle ilgili bir sorun oluştu. Lütfen bir dakika içinde tekrar deneyin. Sorun devam ederse, oturumu kapatıp tekrar giriş yapmanızı öneririz. Ayarlar > Hesap > Oturumu kapat seçeneğine giderek oturumu kapatabilirsiniz",
     "warning": "Uyarı",
     "continue": "Devam",
+    "skip": "Atla",
     "correct": "Doğru",
     "recommended": "Önerilen",
     "expirationTime": "Son Kullanma Süresi",
@@ -2870,11 +2946,9 @@
     "email": "E-posta",
     "sms": "SMS",
     "faq": "SSS",
-    "enjoyingApp": "Uygulamayı beğendiniz mi?",
     "statusPage": "Durum Sayfası",
     "telegram": "Telegram",
     "mattermost": "Mattermost",
-    "thankYouText": "Geri bildiriminiz için teşekkür ederiz, bir iyileştirme önermek ister misiniz?",
     "defaultEmailSubject": "{bankName: string}  - Destek",
     "defaultSupportMessage": "Selamlar! {bankName: string} ile ilgili yardıma ihtiyacım var. {os: string} cihazımda {version: string} sürümünü kullanıyorum.",
     "emailCopied": "E-posta {email: string} panoya kopyalandı",
@@ -3044,6 +3118,66 @@
       "limitUpdateSuccess": "Limit başarıyla güncellendi",
       "limitUpdateError": "Limit güncellenemedi",
       "limitMustBePositive": "Limit sıfırdan büyük olmalıdır"
+    },
+    "CardFeeSchedule": {
+      "title": "Blink Kart ücret çizelgesi",
+      "effectiveDate": "1 Temmuz 2026 tarihinden itibaren geçerlidir",
+      "sections": {
+        "cardFees": "Kart ücretleri",
+        "transactionFees": "İşlem ücretleri",
+        "overdraft": "Ek hesap (fonlanmış mod)"
+      },
+      "fees": {
+        "annualFee": {
+          "title": "Yıllık ücret",
+          "subtitle": "Kartın verildiği tarihten itibaren ilk yıl için muaf",
+          "value": "{amount: string} / yıl"
+        },
+        "cardReplacement": {
+          "title": "Kart değişimi"
+        },
+        "usdTransactionFee": {
+          "title": "USD işlem ücreti",
+          "subtitle": "ABD doları cinsinden her işleme uygulanır"
+        },
+        "foreignTransactionFee": {
+          "title": "Yurt dışı işlem ücreti",
+          "subtitle": "ABD doları dışındaki bir para biriminde yapılan her işleme uygulanır"
+        },
+        "maximumOverdraft": {
+          "title": "Maksimum ek hesap",
+          "subtitle": "7 gün içinde geri ödenmelidir"
+        },
+        "lateRepaymentFee": {
+          "title": "Geç ödeme ücreti",
+          "subtitle": "Ek hesap 7 gün içinde geri ödenmezse tahsil edilir"
+        }
+      },
+      "btcConversion": {
+        "title": "BTC dönüşümü",
+        "body": "Bir işlem BTC'nin USD'ye dönüştürülmesini gerektirdiğinde, dönüşüm geçerli döviz kuru üzerinden gerçekleştirilir ve bu, dönüşüm maliyetini yansıtan bir spread içerebilir."
+      },
+      "feesUpdateNotice": {
+        "text": "Ücretler zaman zaman güncellenebilir. Blink, herhangi bir ücret değişikliği yürürlüğe girmeden önce en az 30 gün önceden bildirimde bulunacaktır;",
+        "linkText": "Kart Sahibi Sözleşmesi"
+      },
+      "creditModeNotice": "Kredi Modu şu anda etkin değil. Kredi Modu etkinleştirilirse, geçerli faiz oranları, ücretler ve faturalandırma hakları açıklamaları etkinleştirmeden önce sağlanacaktır.",
+      "additionalDetails": {
+        "title": "Ek ücret ayrıntıları",
+        "overdraft": {
+          "label": "Ek hesap",
+          "text": ". Belirli durumlarda, Kart Bakiyenizin sıfırın altına düşmesine neden olan bir işlem onaylanabilir. Maksimum ek hesap {maxOverdraft: string}'dur. Ek hesabı, Kart Bakiyenize ek fon aktararak 7 gün içinde geri ödemelisiniz."
+        },
+        "foreignCurrency": {
+          "label": "Yabancı para birimi",
+          "text": ". Yabancı bir para biriminde işlem yaparsanız, kart ağı kendi dönüşüm prosedürlerini kullanarak bunu USD'ye dönüştürür. İşlem tarihindeki kur, işlem tarihinden farklı olabilir."
+        },
+        "noHiddenFees": {
+          "label": "Gizli ücret yok",
+          "text": ". Hesap kurulumu, işlem yapılmaması, bakiye sorgulamaları veya kartınızı kapatma için ücret alınmaz."
+        }
+      },
+      "backButton": "Geri"
     },
     "CardDetails": {
       "title": "Kart detayları",
@@ -3390,6 +3524,7 @@
         "perYear": "yıllık",
         "status": {
           "label": "Durum",
+          "specialOfferLabel": "Özel teklif",
           "paymentPending": "Ödeme Bekliyor",
           "firstYearFree": "İlk yıl ücretsiz"
         },
@@ -3403,7 +3538,11 @@
           "cardholderAgreement": "Kart Sahibi Sözleşmesi",
           "and": "ve"
         },
-        "renew": "Aboneliğimin 1 yıl içinde otomatik olarak yenileneceğini anlıyorum"
+        "feeSchedule": {
+          "text": "İnceledim ve şunu kabul ediyorum:",
+          "linkText": "Blink Card Ücret Çizelgesi"
+        },
+        "renew": "Aboneliğimin {months: number} ay içinde otomatik olarak yenileneceğini anlıyorum"
       },
       "CardIntroducing": {
         "title": "Tanıtım",
@@ -3465,13 +3604,29 @@
         "buttonText": "Başvuruyu gönder",
         "select": "seç"
       },
+      "Acknowledgement": {
+        "title": "Şartlar ve koşullar",
+        "acceptButton": "Kabul et",
+        "eSignConsent": {
+          "text": "Kabul ediyorum:",
+          "linkText": "Elektronik İmza Onayı'nı"
+        },
+        "privacyAndTerms": {
+          "text": "Kabul ediyorum:",
+          "privacyPolicyLinkText": "ihraç edenin Gizlilik Politikası'nı",
+          "and": " ve",
+          "cardTermsLinkText": "Blink Kart Koşulları'nı"
+        },
+        "certifyAccuracy": "Sağladığım bilgilerin doğru olduğunu ve Blink Visa Kartımla ilgili tüm kural ve gerekliliklere uyacağımı beyan ederim",
+        "acknowledgeSolicitation": "Blink Visa Kartı için başvurmanın yetkisiz bir talep oluşturmadığını kabul ediyorum"
+      },
       "CardPreapproved": {
         "title": "Blink Visa kartı için ön onay aldınız!",
         "buttonText": "Kapat"
       },
       "CardProcessing": {
         "title": "Başvurunuz işleniyor",
-        "subtitle": "Tahmini bekleme süresi: {waitTime: string}",
+        "subtitle": "Hazır olduğumuzda sizi bilgilendireceğiz",
         "buttonText": "Kapat"
       }
     }
@@ -3499,6 +3654,7 @@
       },
       "Phrase": {
         "headerTitle": "Yedekleme ifadesi",
+        "authDescription": "Yedekleme ifadeni görüntülemek için doğrula",
         "sparkCompatible": "Bu yedekleme ifadesi herhangi bir {sparkCompatibleLink} çalışır",
         "sparkCompatibleLink": "Spark uyumlu cüzdanda",
         "copiedToast": "Yedekleme ifadesi panoya kopyalandı",
@@ -3538,6 +3694,7 @@
       "uploadSuccess": "Yedek {provider} hesabına kaydedildi",
       "uploadFailed": "Yedek yüklenemedi",
       "signInFailed": "{provider} hesabınıza giriş yapılamadı",
+      "storageAccessRequired": "Cüzdan yedeğiniz için {provider: string} erişimine izin verin, ardından tekrar deneyin.",
       "cloudNotAvailable": "iCloud Drive kullanılamıyor. Lütfen Ayarlar'dan iCloud'da oturum açın ve iCloud Drive'ı etkinleştirin.",
       "networkError": "Ağ hatası. Lütfen bağlantınızı kontrol edip tekrar deneyin.",
       "existingBackupTitle": "Yedek bulundu",
@@ -3549,13 +3706,89 @@
     }
   },
   "AccountMigration": {
+    "contactSupport": {
+      "title": "Destek ile iletişime geçin",
+      "body": "Bir şeyler ters gitti ama endişelenmeyin, paranız güvende. Yardım için lütfen destek ile iletişime geçin.\n\nDesteğin durumunuzu çözmesine yardımcı olmak için bu bilgilere ihtiyacınız olabilir:",
+      "reasonLabel": "Neden",
+      "accountIdLabel": "Hesap kimliği",
+      "pubKeyLabel": "pubKey",
+      "usernameLabel": "Kullanıcı adı",
+      "emailLabel": "E-posta",
+      "phoneLabel": "Telefon numarası",
+      "appVersionLabel": "Uygulama sürümü",
+      "platformLabel": "Platform",
+      "countryLabel": "Ülke",
+      "emailSubject": "Taşıma destek talebi",
+      "emailDescribeProblem": "Sorunu açıklayın:",
+      "emailAccountInfo": "Destek için hesap bilgileri:",
+      "contactUsCta": "Bize ulaşın",
+      "copy": "Kopyala"
+    },
+    "migrateNowModal": {
+      "title": "Şimdi saklamasız bir hesaba taşının",
+      "body": "Saklamalı hesabınıza artık para alamazsınız. Blink bölgenizde saklama hizmetini sonlandırdı ve bu hesap {date} sonuna kadar devre dışı bırakılacak.\n\nŞimdi saklamasız bir hesaba taşının.",
+      "migrateCta": "Şimdi taşı"
+    },
+    "reminderBulletin": {
+      "title": "Önemli",
+      "body": "{date} tarihinden önce rehberli taşıma ile saklamasız bir hesaba geçin veya paranızı çekin. Alma, {receiveStopsDate} tarihinde durur.",
+      "migrateCta": "Taşı"
+    },
+    "offboardBulletin": {
+      "title": "Önemli",
+      "body": "Hesabınız, hesap sunamadığımız bir bölgede kayıtlı. Paranızı 31 Ağustos'tan önce çekin. Para alımı 10 Ağustos'ta duruyor."
+    },
+    "dollarBalanceModal": {
+      "title": "Dolar bakiyenizi taşıyamıyoruz",
+      "body": "Önce dolar bakiyenizi boşaltın. Blink içindeki Bitcoin bakiyenize veya başka bir yere aktarabilirsiniz."
+    },
+    "balancesOverview": {
+      "title": "Bakiyeni taşı",
+      "body": "Fonlarını güvenle yeni hesabına taşı.",
+      "currentBitcoinBalance": "Mevcut Bitcoin bakiyesi",
+      "currentDollarBalance": "Mevcut Dolar bakiyesi",
+      "newBitcoinBalance": "Yeni Bitcoin bakiyesi",
+      "newDollarBalance": "Yeni Dolar bakiyesi",
+      "dollarBalanceNotAvailable": "kullanılamıyor",
+      "networkFee": "Ağ ücreti: <bold>{fee: string}</bold>",
+      "networkFeeCoveredByBlink": "Ağ ücreti: <bold>{fee: string}</bold> (Blink tarafından karşılanır)",
+      "retryCta": "Tekrar dene",
+      "approveCta": "Onayla",
+      "contactSupportCta": "Desteğe ulaş"
+    },
+    "migrationRequiredTitle": "Yükseltme zamanı",
+    "keepReceivingTitle": "Her zamanki gibi almaya devam et",
+    "keepReceivingBody": "Lightning adresin yeni non-custodial hesabına aktarılacak.",
+    "keepReceivingLnAddressLabel": "LN Adresin",
+    "keepReceivingCta": "Harika",
+    "receivingDisabledToast": "Alma şu anda devre dışı.",
+    "downloadHistoryTitle": "İşlem geçmişini indir",
+    "downloadHistoryBody": "Yeni hesabın sıfırdan başlayacak. İşlemlerinin bir kaydını tutmak istersen, şimdi CSV olarak indir.",
+    "downloadHistoryDownloadCta": "İndir",
+    "apiServiceTitle": "API hizmeti kullanılamıyor",
+    "apiServiceBody": "Etkin API anahtarlarınız olduğunu fark ettik. Blink, non-custodial modda API sağlayamaz.\n\nBlink'in API'sine bağımlıysanız, lütfen bizimle en kısa sürede iletişime geçin; sorunsuz bir geçiş için elimizden geleni yapacağız.",
+    "apiServiceContactCta": "Bize ulaşın",
+    "apiServiceContinueCta": "Yine de devam et",
+    "resumeFailed": "Taşıma işleminiz devam ettirilirken bir sorun oluştu. Lütfen yeniden başlatın.",
+    "migrationRequiredBody": "Saklamalı hesabınızı saklamasız bir hesaba taşımanın zamanı geldi.",
+    "migrationRequiredForcedBody": "Saklamalı hesabınızı saklamasız bir hesaba taşımanın zamanı geldi. Bu, düzenleyici nedenlerle zorunludur.\n\nEndişelenme, non-custodial uzun vadede senin için daha iyi olacak.",
+    "migrationGateTitle": "Hesap erişilebilir değil",
+    "migrationGateBody": "Düzenleyici nedenlerle bölgende custodial hesaplar sağlayamıyoruz. Sonraki adımları izleyerek fonlarını Blink'te bir non-custodial hesaba aktar ya da <link>{email}</link> adresinden bize ulaş",
+    "bitcoinBalance": "Bitcoin bakiyesi",
+    "dollarBalance": "Dolar bakiyesi",
     "moveToNonCustodial": "Non-custodial'a geç",
     "explainerTitle": "Non-custodial'a geçmek ne anlama gelir?",
-    "explainerStep1": "Spark protokolünde bir non-custodial hesap oluşturacaksınız, <link>buradan daha fazla bilgi edinin</link>",
-    "explainerStep2": "Bakiyenizi yeni non-custodial hesabınıza aktarıyoruz ve mevcut hesabınız silinecek",
-    "explainerStep3": "Blink'i her zamanki gibi kullanmaya devam edin",
-    "letsMove": "Hadi başlayalım",
-    "transferringFunds": "Bakiyeniz aktarılıyor. Birkaç saniye içinde tamamlanacaktır."
+    "explainerCheck1": "Spark protokolünde bir non-custodial hesap oluşturacaksınız",
+    "explainerCheck2": "Fonlarını yeni non-custodial hesabına aktarıyoruz",
+    "explainerCheck3": "Mevcut hesabın ve işlem geçmişi dahil tüm verileri kapatılacak",
+    "explainerCheck4": "Blink API kullanılamayacak",
+    "explainerCheck5": "Hesabından bir Spark ağ ücreti düşülecek",
+    "explainerCta": "Anladım",
+    "transferringFunds": "Bakiyeniz aktarılıyor. Birkaç saniye içinde tamamlanacaktır.",
+    "clockOutOfSync": {
+      "body": "Cihazının tarih ve saati eşitlenmemiş. Devam etmek için otomatik olarak ayarla.",
+      "retryCta": "Tekrar dene"
+    }
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Emanetli",
@@ -3605,6 +3838,16 @@
     "modalDescription": "Cüzdanınızı yedeklemenizi şiddetle tavsiye ederiz. Bu cihazı kaybetmeniz durumunda fonlarınızın tamamen kaybolmasını önlemek için.",
     "secureMe": "Cüzdanı güvenceye al"
   },
+  "BackupRequired": {
+    "modalTitle": "Back up your wallet first",
+    "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
+    "backupNow": "Back up wallet"
+  },
+  "NonCustodialInfoBulletin": {
+    "title": "Bu, saklamasız bir hesaptır",
+    "body": "Daha fazla bilgi için blog yazımızı okuyun",
+    "cta": "Oku"
+  },
   "StableBalance": {
     "title": "Sabit bakiye",
     "description": "Spark üzerinde USDB tarafından desteklenen USD bakiyesi tutun.",
@@ -3638,7 +3881,7 @@
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
     "featureCircles": "Circles",
-    "featureEarn": "Earn",
+    "featureEarn": "Öğren",
     "featureCard": "Card"
   },
   "WalletCreationScreen": {
@@ -3652,10 +3895,10 @@
     "lightningPayment": "Lightning Ödemesi",
     "onchainDeposit": "On-chain Yatırma",
     "onchainWithdrawal": "On-chain Çekim",
-    "conversionFromBitcoin": "Bitcoin'den dönüşüm",
-    "conversionToBitcoin": "Bitcoin'e dönüşüm",
-    "conversionFromToken": "{token}'den dönüşüm",
-    "conversionToToken": "{token}'e dönüşüm",
+    "transferFromBitcoinBalance": "Bitcoin bakiyesinden transfer",
+    "transferToBitcoinBalance": "Bitcoin bakiyesine transfer",
+    "transferFromTokenBalance": "{token} bakiyesinden transfer",
+    "transferToTokenBalance": "{token} bakiyesine transfer",
     "tokenTransfer": "{token} Transferi",
     "payTo": "{address} adresine öde",
     "payment": "Ödeme"

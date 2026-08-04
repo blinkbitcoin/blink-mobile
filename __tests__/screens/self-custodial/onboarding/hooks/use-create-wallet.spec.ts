@@ -1,4 +1,3 @@
-import { Network as mockSparkNetwork } from "@breeztech/breez-sdk-spark-react-native"
 import { renderHook, act } from "@testing-library/react-native"
 
 import {
@@ -6,32 +5,17 @@ import {
   useCreateWallet,
 } from "@app/screens/self-custodial/onboarding/hooks/use-create-wallet"
 
-const mockCreateWallet = jest.fn()
+const mockProvision = jest.fn()
 const mockUpdateState = jest.fn()
 const mockDispatch = jest.fn()
-const mockRecordError = jest.fn()
+const mockReportError = jest.fn()
 const mockReinitSdk = jest.fn()
-const mockReloadSelfCustodialAccounts = jest.fn()
 const mockToastShow = jest.fn()
 
-const TEST_ACCOUNT_ID = "test-account-id-123"
+const TEST_ACCOUNT_ID = "sc-account-1"
 
-jest.mock("react-native-quick-crypto", () => ({
-  randomUUID: () => "test-account-id-123",
-}))
-
-jest.mock("@app/self-custodial/hooks/use-spark-network", () => ({
-  useSparkNetwork: () => mockSparkNetwork.Regtest,
-}))
-
-jest.mock("@app/self-custodial/bridge", () => ({
-  selfCustodialCreateWallet: (...args: unknown[]) => mockCreateWallet(...args),
-}))
-
-jest.mock("@app/hooks/use-account-registry", () => ({
-  useAccountRegistry: () => ({
-    reloadSelfCustodialAccounts: mockReloadSelfCustodialAccounts,
-  }),
+jest.mock("@app/self-custodial/hooks/use-provision-self-custodial-account", () => ({
+  useProvisionSelfCustodialAccount: () => ({ provision: mockProvision }),
 }))
 
 jest.mock("@app/store/persistent-state", () => ({
@@ -51,8 +35,8 @@ jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () => ({ retry: mockReinitSdk }),
 }))
 
-jest.mock("@react-native-firebase/crashlytics", () => () => ({
-  recordError: (...args: Error[]) => mockRecordError(...args),
+jest.mock("@app/utils/error-logging", () => ({
+  reportError: (...args: readonly unknown[]) => mockReportError(...args),
 }))
 
 jest.mock("@app/utils/toast", () => ({
@@ -72,8 +56,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
 describe("useCreateWallet", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockCreateWallet.mockResolvedValue(undefined)
-    mockReloadSelfCustodialAccounts.mockResolvedValue(undefined)
+    mockProvision.mockResolvedValue(TEST_ACCOUNT_ID)
   })
 
   it("starts with idle status", () => {
@@ -83,10 +66,10 @@ describe("useCreateWallet", () => {
   })
 
   it("sets creating status during creation", async () => {
-    let resolveCreate: () => void
-    mockCreateWallet.mockReturnValue(
+    let resolveProvision: () => void
+    mockProvision.mockReturnValue(
       new Promise((resolve) => {
-        resolveCreate = () => resolve("mnemonic")
+        resolveProvision = () => resolve(TEST_ACCOUNT_ID)
       }),
     )
 
@@ -99,17 +82,18 @@ describe("useCreateWallet", () => {
     expect(result.current.status).toBe(CreationStatus.Creating)
 
     await act(async () => {
-      resolveCreate!()
+      resolveProvision!()
     })
   })
 
-  it("updates activeAccountId on success", async () => {
+  it("activates the provisioned account id on success", async () => {
     const { result } = renderHook(() => useCreateWallet())
 
     await act(async () => {
       await result.current.create()
     })
 
+    expect(mockProvision).toHaveBeenCalledTimes(1)
     expect(mockUpdateState).toHaveBeenCalledTimes(1)
 
     const updater = mockUpdateState.mock.calls[0][0]
@@ -130,19 +114,6 @@ describe("useCreateWallet", () => {
     expect(mockReinitSdk).toHaveBeenCalledTimes(1)
   })
 
-  it("creates the wallet for the generated account id on the active spark network", async () => {
-    const { result } = renderHook(() => useCreateWallet())
-
-    await act(async () => {
-      await result.current.create()
-    })
-
-    expect(mockCreateWallet).toHaveBeenCalledWith(
-      TEST_ACCOUNT_ID,
-      mockSparkNetwork.Regtest,
-    )
-  })
-
   it("navigates to Primary on success", async () => {
     const { result } = renderHook(() => useCreateWallet())
 
@@ -160,8 +131,8 @@ describe("useCreateWallet", () => {
     )
   })
 
-  it("sets error status on failure", async () => {
-    mockCreateWallet.mockRejectedValue(new Error("creation failed"))
+  it("sets error status, reports and toasts when provisioning fails", async () => {
+    mockProvision.mockRejectedValue(new Error("creation failed"))
 
     const { result } = renderHook(() => useCreateWallet())
 
@@ -170,17 +141,7 @@ describe("useCreateWallet", () => {
     })
 
     expect(result.current.status).toBe(CreationStatus.Error)
-  })
-
-  it("shows a toast with the createFailed message on failure", async () => {
-    mockCreateWallet.mockRejectedValue(new Error("creation failed"))
-
-    const { result } = renderHook(() => useCreateWallet())
-
-    await act(async () => {
-      await result.current.create()
-    })
-
+    expect(mockReportError).toHaveBeenCalledWith("Wallet creation", expect.any(Error))
     expect(mockToastShow).toHaveBeenCalledWith(
       expect.objectContaining({
         message: "Failed to create wallet. Please try again.",
@@ -188,23 +149,8 @@ describe("useCreateWallet", () => {
     )
   })
 
-  it("wraps non-Error rejection for crashlytics", async () => {
-    mockCreateWallet.mockRejectedValue("string error")
-
-    const { result } = renderHook(() => useCreateWallet())
-
-    await act(async () => {
-      await result.current.create()
-    })
-
-    expect(result.current.status).toBe(CreationStatus.Error)
-    expect(mockRecordError).toHaveBeenCalledWith(
-      expect.objectContaining({ message: "Wallet creation failed: string error" }),
-    )
-  })
-
   it("does not update state on failure", async () => {
-    mockCreateWallet.mockRejectedValue(new Error("fail"))
+    mockProvision.mockRejectedValue(new Error("fail"))
 
     const { result } = renderHook(() => useCreateWallet())
 
@@ -218,10 +164,10 @@ describe("useCreateWallet", () => {
   })
 
   it("ignores reentrant create while one is already in flight", async () => {
-    let resolveFirst: () => void
-    mockCreateWallet.mockImplementationOnce(
+    let resolveFirst: (accountId: string) => void
+    mockProvision.mockImplementationOnce(
       () =>
-        new Promise<void>((resolve) => {
+        new Promise<string>((resolve) => {
           resolveFirst = resolve
         }),
     )
@@ -238,13 +184,13 @@ describe("useCreateWallet", () => {
       await result.current.create()
     })
 
-    expect(mockCreateWallet).toHaveBeenCalledTimes(1)
+    expect(mockProvision).toHaveBeenCalledTimes(1)
     expect(mockUpdateState).not.toHaveBeenCalled()
     expect(mockDispatch).not.toHaveBeenCalled()
     expect(mockReinitSdk).not.toHaveBeenCalled()
 
     await act(async () => {
-      resolveFirst!()
+      resolveFirst!(TEST_ACCOUNT_ID)
     })
   })
 })

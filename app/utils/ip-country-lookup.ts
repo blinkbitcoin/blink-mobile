@@ -9,11 +9,13 @@ const DEFAULT_TIMEOUT_MS = 5000
 export type IpLookupAdapter = (timeout: number) => Promise<CountryCode | undefined>
 
 // ipinfoAdapter runs first: free tier available without a key (IPINFO_API_KEY raises rate limits)
-// Authenticated: api.ipinfo.io/lite + Bearer header → field "country_code"
-// Free tier:     ipinfo.io/json (no auth)            → field "country"
+// Authenticated: api.ipinfo.io/lite/me + Bearer header → field "country_code"
+// Free tier:     ipinfo.io/json (no auth)               → field "country"
+// The /me segment is required: api.ipinfo.io/lite/ (no IP) is not a real endpoint and
+// returns a 404, which would drop this adapter and let the country default to a fallback.
 const ipinfoAdapter: IpLookupAdapter = async (timeout) => {
   if (Config.IPINFO_API_KEY) {
-    const { data } = await axios.get("https://api.ipinfo.io/lite/", {
+    const { data } = await axios.get("https://api.ipinfo.io/lite/me", {
       headers: { Authorization: `Bearer ${Config.IPINFO_API_KEY}` },
       timeout,
     })
@@ -87,4 +89,22 @@ export const resolveIpCountryCode = async (
     }
   }
   return undefined
+}
+
+/**
+ * One shared lookup per app session: the device's country rarely changes
+ * mid-session and several screens mount hooks that need it, so the external
+ * services are hit once instead of once per mount. A failed lookup is not
+ * cached, so a later mount can retry (e.g. the app started offline).
+ */
+let sharedLookup: Promise<CountryCode | undefined> | null = null
+
+export const resolveIpCountryCodeCached = (): Promise<CountryCode | undefined> => {
+  if (!sharedLookup) {
+    sharedLookup = resolveIpCountryCode().then((countryCode) => {
+      if (!countryCode) sharedLookup = null
+      return countryCode
+    })
+  }
+  return sharedLookup
 }

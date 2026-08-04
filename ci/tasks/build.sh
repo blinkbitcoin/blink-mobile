@@ -8,6 +8,7 @@ DISK_CLEANUP_TASK="${CI_ROOT}/pipeline-tasks/ci/tasks/macos-build-disk-cleanup.s
 
 cleanup_build_task() {
   rm -f "$REACT_NATIVE_CONFIG_ENV"
+  rm -f "${CI_ROOT}/crashlytics-sa.json"
   lsof -ti:8080,8081 | xargs kill -9 || true
   /bin/bash "$DISK_CLEANUP_TASK" post || true
 }
@@ -66,6 +67,16 @@ export BUILD_NUMBER=$(cat ${CI_ROOT}/build-number-android/android)
 sed -i'' -e "s/versionCode .*$/versionCode $BUILD_NUMBER/g" android/app/build.gradle
 
 echo $ANDROID_KEYSTORE | base64 -d > android/app/release.keystore
+
+# The Crashlytics gradle plugin needs GOOGLE_APPLICATION_CREDENTIALS to be a path to a
+# service-account file, not the JSON value; absolute because gradle runs from repo/android.
+# When the secret is empty the fastlane lane logs a skip and the build ships without symbols.
+if [ -n "${CRASHLYTICS_SERVICE_ACCOUNT_JSON:-}" ]; then
+  printf '%s' "$CRASHLYTICS_SERVICE_ACCOUNT_JSON" > "${CI_ROOT}/crashlytics-sa.json"
+  chmod 600 "${CI_ROOT}/crashlytics-sa.json"
+  export GOOGLE_APPLICATION_CREDENTIALS="${CI_ROOT}/crashlytics-sa.json"
+fi
+
 nix develop -c sh -c 'cd android && bundle exec fastlane android build --verbose'
 
 # Assert react-native-config values survived R8/ProGuard in the release build.

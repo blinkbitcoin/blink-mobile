@@ -1,4 +1,38 @@
 {
+  "ApiScreen": {
+    "keysGroupTitle": "مفاتيح API",
+    "noKeys": "لا توجد مفاتيح API بعد",
+    "createKey": "إنشاء مفتاح API",
+    "createTitle": "مفتاح API جديد",
+    "keyCreatedTitle": "تم إنشاء مفتاح API",
+    "keyName": "اسم المفتاح",
+    "keyNamePlaceholder": "مثال: BTCPay Server",
+    "scopeRead": "قراءة",
+    "scopeReadDescription": "عرض الرصيد وسجل المعاملات",
+    "scopeReceive": "استلام",
+    "scopeReceiveDescription": "إنشاء الفواتير واستلام المدفوعات",
+    "scopeWrite": "كتابة",
+    "writeScopeDashboardOnly": "لا يمكن إنشاء المفاتيح القادرة على إرسال المدفوعات إلا على dashboard.blink.sv",
+    "expiry": "ينتهي",
+    "expiry30Days": "30 يومًا",
+    "expiry90Days": "90 يومًا",
+    "expiryNever": "أبدًا",
+    "expiresOn": "ينتهي في {date: string}",
+    "neverExpires": "لا ينتهي أبدًا",
+    "revoked": "مُلغى",
+    "expired": "انتهى في {date: string}",
+    "expiredNoDate": "منتهي",
+    "secretWarning": "هذه هي المرة الوحيدة التي يُعرض فيها المفتاح. انسخه أو شاركه الآن واحفظه في مكان آمن.",
+    "secretCopied": "تم نسخ مفتاح API. ستُمسح الحافظة خلال دقيقة واحدة",
+    "revokeTitle": "إلغاء مفتاح API؟",
+    "revokeBody": "\"{name: string}\" سيتوقف عن العمل فورًا. لا يمكن التراجع عن هذا.",
+    "revoke": "إلغاء",
+    "revokeSuccess": "تم إلغاء مفتاح API",
+    "createError": "تعذّر إنشاء مفتاح API. يرجى المحاولة مرة أخرى.",
+    "revokeError": "تعذّر إلغاء مفتاح API. يرجى المحاولة مرة أخرى.",
+    "loadError": "تعذّر تحميل مفاتيح API الخاصة بك. يرجى المحاولة لاحقًا.",
+    "done": "تم"
+  },
   "GaloyAddressScreen": {
     "title": "Receive payment by using:",
     "buttonTitle": "Set your address",
@@ -2003,7 +2037,7 @@
     "satAccumulated": "ساتس تم تجميعها",
     "satsEarned": "{formattedNumber | sats}\nحصلت عليها",
     "sectionsCompleted": "لقد أتممت",
-    "title": "إكسب",
+    "title": "تعلّم",
     "unlockQuestion": "لتفتح القفل، قم بلإجابة عن السؤال:",
     "youEarned": "لقد كسبت",
     "registerTitle": "Need to upgrade your account",
@@ -2011,6 +2045,7 @@
     "oneSectionADay": "قسم واحد في اليوم!",
     "availableTomorrow": "عُد غدًا لمواصلة كسب sats أثناء التعلم.\n\nأو انقر على متابعة لمواصلة التعلم بدون مكافآت.",
     "motivatingBadger": "شق طريقك عبر هذه الدروس واكسب أثناء تعلمك",
+    "motivatingBadgerNoRewards": "شق طريقك عبر هذه الدروس وتعلّم عن البيتكوين",
     "continueNoRewards": "متابعة (بدون مكافآت)",
     "somethingNotRight": "هناك خطأ ما...",
     "defaultErrorMessage": "{errorMessage: string} يرجى المحاولة مرة أخرى لاحقًا.\nأو انقر للمتابعة لمواصلة التعلم بدون مكافآت.",
@@ -2049,7 +2084,7 @@
     "login": "تسجيل الدخول",
     "loginOrRestore": "تسجيل الدخول / استعادة",
     "logBackInWith": "Log back in with",
-    "headline": "المحفظة مشغلة بواسطة Galoy",
+    "headline": "المحفظة مشغلة بواسطة Blink",
     "startTrialAccount": "Start with a trial account",
     "startWithTrialAccount": "Start with trial account",
     "registerPhoneAccount": "Register phone account",
@@ -2163,6 +2198,9 @@
     "lightningInvoice": "فاتورة lightning",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "رسوم الإيداع: {fee} SAT للمبالغ تحت {threshold} SAT أو {overFee} SAT للإيداعات فوق {threshold} SAT",
+    "depositFeeTiers": "Deposit fees: {tiers: string}",
+    "depositFeeTierUpTo": "{fee: string} SAT up to {max: string} SAT",
+    "depositFeeTierAbove": "{fee: string} SAT above {min: string} SAT",
     "autoConvertMinAmount": "لا يمكن تحويل المبالغ الأقل من {minSats: number} ساتوشي / {minFiat: string} إلى دولار تلقائيًا. ستتلقى بيتكوين بدلاً من ذلك.",
     "autoConvertFailed": "تم استلام الدفعة لكن فشل التحويل.",
     "pleaseWaitForConversion": "يرجى الانتظار حتى اكتمال التحويل"
@@ -2261,6 +2299,10 @@
     "invalidPhoneNumber": "أدخل رقم هاتف محمول صالح",
     "phoneNotAllowed": "هذا الحقل لا يقبل أرقام الهواتف"
   },
+  "MerchantSelectionScreen": {
+    "title": "اختر خيار الدفع",
+    "empty": "لا توجد خيارات دفع متاحة."
+  },
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "يجب إرسال المعاملة إلى mempool",
     "amount": "الكمية",
@@ -2279,7 +2321,6 @@
     "notConfirmed": "لقد أُرسل الدفع\nلكنّه لم يؤكَّد بعد\n\nيمكنك أن تراجع حالة الدفع في تبويب المعاملات",
     "note": "ملاحظة أو ملصق",
     "success": "تم إرسال الدفع بنجاح",
-    "suggestionInput": "Enter your suggestion",
     "max": "Max",
     "maxAmount": "Max Amount",
     "title": "أرسل بيتكوين",
@@ -2319,6 +2360,10 @@
     "sdkGenericError": "تعذّر تقدير الرسوم. يرجى تجربة مبلغ مختلف."
   },
   "SettingsScreen": {
+    "createAddress": "إنشاء عنوان",
+    "donationButton": "زر التبرع",
+    "btcpayServer": "BTCPay Server",
+    "woocommerce": "WooCommerce",
     "staticQr": "رمز QR ثابت قابل للطباعة",
     "staticQrCopied": "تم نسخ رابط رمز QR الثابت الخاص بك",
     "setByOs": "محدد بواسطة نظام التشغيل",
@@ -2327,7 +2372,6 @@
     "apiDashboard": "الوصول إلى API ولوحة التحكم",
     "pos": "نقطة البيع",
     "posCopied": "تم نسخ رابط نقطة البيع الخاص بك",
-    "setYourLightningAddress": "اضبط عنوان Lightning الخاص بك",
     "activated": "تم التفعيل",
     "addressScreen": "Ways to get paid",
     "nonCustodialAccount": "حساب غير حافظ",
@@ -2525,7 +2569,32 @@
     "receivingAccount": "Receiving Account",
     "sendingAccount": "Sending Account",
     "txNotBroadcast": "Your transaction is currently pending and will be broadcasted to the Bitcoin network in a moment.",
-    "momentarily": "بعد لحظات"
+    "momentarily": "بعد لحظات",
+    "findingAccount": "جارٍ البحث عن حساب هذه الدفعة...",
+    "txNotFoundInAccounts": "لم يتم العثور على هذه الدفعة في أي حساب على هذا الجهاز. قد تكون تابعة لحساب تم تسجيل خروجه.",
+    "txLoadFailed": "تعذر تحميل هذه الدفعة. تحقق من اتصالك وحاول مرة أخرى.",
+    "switchedForPayment": "تم التبديل إلى {identifier: string} لعرض هذه الدفعة"
+  },
+  "FeeRatesScreen": {
+    "title": "معدلات الرسوم",
+    "send": "إرسال",
+    "receive": "استقبال",
+    "transfer": "تحويل",
+    "lightning": "Lightning",
+    "intraledger": "Intraledger",
+    "onchainPriority": "أولوية Onchain (بأسرع وقت)",
+    "onchainStandard": "Onchain عادي (~4 ساعات)",
+    "onchainEconomy": "Onchain اقتصادي",
+    "lightningTransactions": "معاملات Lightning",
+    "onchainBelowThreshold": "Onchain أقل من {threshold: string} SAT",
+    "onchainAboveThreshold": "Onchain أكثر من {threshold: string} SAT",
+    "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
+    "transferFee": "رسوم التحويل",
+    "noFee": "بدون رسوم",
+    "lightningSendFee": "{fee: string} + ~{routingFee: string} رسوم توجيه",
+    "fromApprox": "من ~{fee: string}",
+    "satAmount": "{amount: string} SAT",
+    "error": "لم يُستطَع الحصول على الرسوم الآن"
   },
   "TransactionLimitsScreen": {
     "receive": "استقبال",
@@ -2570,7 +2639,8 @@
       "tooLong": "Address must be at most 50 characters long",
       "invalidCharacter": "Address can only contain letters, numbers, and underscores",
       "addressUnavailable": "Sorry, this address is already taken",
-      "unknownError": "An unknown error occurred, please try again later"
+      "unknownError": "An unknown error occurred, please try again later",
+      "backupRequired": "Back up your wallet before creating a Lightning address"
     },
     "receiveMoney": "Receive money from other lightning wallets and {bankName: string} users with this address.",
     "itCannotBeChanged": "It can't be changed later."
@@ -2700,6 +2770,8 @@
   },
   "common": {
     "country": "البلد",
+    "registered": "مُسجّل",
+    "detected": "مُكتشَف",
     "unknown": "غير معروف",
     "enabled": "مُفعَّل",
     "switch": "مفتاح",
@@ -2719,6 +2791,7 @@
     "anonymousUser": "مستخدم مجهول",
     "blinkToBlink": "من Blink إلى Blink",
     "transactionLimits": "قيود المعاملات",
+    "feeRates": "معدلات الرسوم",
     "activateWallet": "تفعيل المحفظة",
     "amountRequired": "المبلغ مطلوب",
     "back": "رجوع",
@@ -2732,6 +2805,7 @@
     "bitcoinPrice": "سعر البيتكوين",
     "btcAccount": "حساب البيتكوين",
     "cancel": "إلغاء",
+    "card": "بطاقة",
     "close": "إغلاق",
     "confirm": "تأكيد",
     "convert": "تحويل",
@@ -2799,6 +2873,7 @@
     "total": "المجموع",
     "transactions": "المعاملات",
     "transactionsError": "لقد حصل خطأ في تحميل المعاملات",
+    "transfer": "تحويل",
     "tryAgain": "حاول مرة اخرى",
     "type": "يتم الكتابة",
     "usdAccount": "حساب بالدولار",
@@ -2815,6 +2890,7 @@
     "problemMaybeReauth": "There was a problem with your request. Please retry in one minute. If the problem persist, we recommend that you log out and log back in. You can log out by going into Settings > Account > Log out",
     "warning": "Warning",
     "continue": "متابعة",
+    "skip": "تخطي",
     "correct": "صحيح",
     "recommended": "مُوصى به",
     "expirationTime": "وقت انتهاء الصلاحية",
@@ -2870,11 +2946,9 @@
     "email": "البريد الالكتروني",
     "sms": "SMS",
     "faq": "FAQ",
-    "enjoyingApp": "Enjoying the app?",
     "statusPage": "Status Page",
     "telegram": "Telegram",
     "mattermost": "Mattermost",
-    "thankYouText": "Thank you for the feedback, would you like to suggest an improvement?",
     "defaultEmailSubject": "{bankName: string} - مركز الدعم",
     "defaultSupportMessage": "مرحبا! أحتاج إلى بعض المساعدة في {bankName: string}، أنا أستخدم الإصدار {version: string} على {os: string}.",
     "emailCopied": "نُسخ عنوان البريد {email: string}  إلى الحافظة",
@@ -3044,6 +3118,66 @@
       "limitUpdateSuccess": "تم تحديث الحد بنجاح",
       "limitUpdateError": "فشل تحديث الحد",
       "limitMustBePositive": "يجب أن يكون الحد أكبر من الصفر"
+    },
+    "CardFeeSchedule": {
+      "title": "جدول رسوم بطاقة Blink",
+      "effectiveDate": "ساري المفعول من 1 يوليو 2026",
+      "sections": {
+        "cardFees": "رسوم البطاقة",
+        "transactionFees": "رسوم المعاملات",
+        "overdraft": "السحب على المكشوف (وضع التمويل)"
+      },
+      "fees": {
+        "annualFee": {
+          "title": "الرسوم السنوية",
+          "subtitle": "معفاة للسنة الأولى من تاريخ إصدار البطاقة",
+          "value": "{amount: string} / سنة"
+        },
+        "cardReplacement": {
+          "title": "استبدال البطاقة"
+        },
+        "usdTransactionFee": {
+          "title": "رسوم المعاملات بالدولار الأمريكي",
+          "subtitle": "تُطبق على كل معاملة بالدولار الأمريكي"
+        },
+        "foreignTransactionFee": {
+          "title": "رسوم المعاملات الأجنبية",
+          "subtitle": "تُطبق على كل معاملة بعملة غير الدولار الأمريكي"
+        },
+        "maximumOverdraft": {
+          "title": "الحد الأقصى للسحب على المكشوف",
+          "subtitle": "يجب سداده خلال 7 أيام"
+        },
+        "lateRepaymentFee": {
+          "title": "رسوم السداد المتأخر",
+          "subtitle": "تُفرض إذا لم يُسدد السحب على المكشوف خلال 7 أيام"
+        }
+      },
+      "btcConversion": {
+        "title": "تحويل BTC",
+        "body": "عندما تتطلب المعاملة تحويل BTC إلى USD، يُنفَّذ التحويل بسعر الصرف السائد، والذي قد يتضمن هامشًا يعكس تكلفة التحويل."
+      },
+      "feesUpdateNotice": {
+        "text": "قد يتم تحديث الرسوم من وقت لآخر. ستقدم Blink إشعارًا قبل 30 يومًا على الأقل قبل سريان أي تغييرات في الرسوم، وفقًا لـ",
+        "linkText": "اتفاقية حامل البطاقة"
+      },
+      "creditModeNotice": "وضع الائتمان غير مُفعَّل حاليًا. في حال تفعيل وضع الائتمان، ستُقدَّم أسعار الفائدة والرسوم وإفصاحات حقوق الفوترة المعمول بها قبل التفعيل.",
+      "additionalDetails": {
+        "title": "تفاصيل إضافية عن الرسوم",
+        "overdraft": {
+          "label": "السحب على المكشوف",
+          "text": ". في ظروف معينة، قد تتم الموافقة على معاملة تؤدي إلى انخفاض رصيد بطاقتك دون الصفر. الحد الأقصى للسحب على المكشوف هو {maxOverdraft: string}. يجب عليك سداد السحب على المكشوف خلال 7 أيام عن طريق تحويل أموال إضافية إلى رصيد بطاقتك."
+        },
+        "foreignCurrency": {
+          "label": "العملة الأجنبية",
+          "text": ". إذا أجريت معاملة بعملة أجنبية، تقوم شبكة البطاقة بتحويلها إلى USD باستخدام إجراءات التحويل الخاصة بها. قد يختلف السعر في تاريخ المعالجة عن تاريخ المعاملة."
+        },
+        "noHiddenFees": {
+          "label": "لا رسوم خفية",
+          "text": ". لا توجد رسوم لإعداد الحساب أو عدم النشاط أو استعلامات الرصيد أو إغلاق بطاقتك."
+        }
+      },
+      "backButton": "رجوع"
     },
     "CardDetails": {
       "title": "تفاصيل البطاقة",
@@ -3390,6 +3524,7 @@
         "perYear": "سنوياً",
         "status": {
           "label": "الحالة",
+          "specialOfferLabel": "عرض خاص",
           "paymentPending": "الدفع معلق",
           "firstYearFree": "السنة الأولى مجانية"
         },
@@ -3403,7 +3538,11 @@
           "cardholderAgreement": "اتفاقية حامل البطاقة",
           "and": "و"
         },
-        "renew": "أفهم أن اشتراكي سيتجدد تلقائياً خلال سنة واحدة"
+        "feeSchedule": {
+          "text": "لقد راجعتُ وأوافق على",
+          "linkText": "جدول رسوم Blink Card"
+        },
+        "renew": "أفهم أن اشتراكي سيتجدد تلقائيًا خلال {months: number} شهرًا"
       },
       "CardIntroducing": {
         "title": "تقديم",
@@ -3465,13 +3604,29 @@
         "buttonText": "تقديم الطلب",
         "select": "اختر"
       },
+      "Acknowledgement": {
+        "title": "الشروط والأحكام",
+        "acceptButton": "قبول",
+        "eSignConsent": {
+          "text": "أوافق على",
+          "linkText": "موافقة التوقيع الإلكتروني"
+        },
+        "privacyAndTerms": {
+          "text": "أوافق على",
+          "privacyPolicyLinkText": "سياسة خصوصية المُصدِر",
+          "and": "، و",
+          "cardTermsLinkText": "شروط بطاقة Blink"
+        },
+        "certifyAccuracy": "أُقر بأن المعلومات التي قدمتها دقيقة وأنني سألتزم بجميع القواعد والمتطلبات المتعلقة ببطاقة Blink Visa الخاصة بي",
+        "acknowledgeSolicitation": "أُقر بأن التقدم بطلب للحصول على بطاقة Blink Visa لا يشكل التماسًا غير مصرح به"
+      },
       "CardPreapproved": {
         "title": "لقد تمت الموافقة المسبقة على بطاقة Blink Visa الخاصة بك!",
         "buttonText": "إغلاق"
       },
       "CardProcessing": {
         "title": "جارٍ معالجة طلبك",
-        "subtitle": "وقت الانتظار المقدر: {waitTime: string}",
+        "subtitle": "سنُعلمك بمجرد أن نكون جاهزين",
         "buttonText": "إغلاق"
       }
     }
@@ -3499,6 +3654,7 @@
       },
       "Phrase": {
         "headerTitle": "عبارة النسخ الاحتياطي",
+        "authDescription": "قم بالتحقّق لعرض عبارة النسخ الاحتياطي الخاصة بك",
         "sparkCompatible": "تعمل عبارة النسخ الاحتياطي هذه في أي {sparkCompatibleLink}",
         "sparkCompatibleLink": "محفظة متوافقة مع Spark",
         "copiedToast": "تم نسخ عبارة النسخ الاحتياطي إلى الحافظة",
@@ -3538,6 +3694,7 @@
       "uploadSuccess": "تم حفظ النسخة الاحتياطية في {provider}",
       "uploadFailed": "فشل رفع النسخة الاحتياطية",
       "signInFailed": "فشل تسجيل الدخول إلى {provider}",
+      "storageAccessRequired": "امنح {provider: string} صلاحية الوصول إلى نسخة محفظتك الاحتياطية، ثم حاول مرة أخرى.",
       "cloudNotAvailable": "iCloud Drive غير متوفر. يُرجى تسجيل الدخول إلى iCloud من الإعدادات وتفعيل iCloud Drive.",
       "networkError": "خطأ في الشبكة. يُرجى التحقق من اتصالك والمحاولة مرة أخرى.",
       "existingBackupTitle": "تم العثور على نسخة احتياطية",
@@ -3549,13 +3706,89 @@
     }
   },
   "AccountMigration": {
+    "contactSupport": {
+      "title": "تواصل مع الدعم",
+      "body": "حدث خطأ ما، لكن لا تقلق، أموالك آمنة. يرجى التواصل مع الدعم للمساعدة.\n\nقد تحتاج إلى هذه المعلومات لمساعدة الدعم في حل حالتك:",
+      "reasonLabel": "السبب",
+      "accountIdLabel": "معرّف الحساب",
+      "pubKeyLabel": "pubKey",
+      "usernameLabel": "اسم المستخدم",
+      "emailLabel": "البريد الإلكتروني",
+      "phoneLabel": "رقم الهاتف",
+      "appVersionLabel": "إصدار التطبيق",
+      "platformLabel": "المنصة",
+      "countryLabel": "البلد",
+      "emailSubject": "طلب دعم للترحيل",
+      "emailDescribeProblem": "صف المشكلة:",
+      "emailAccountInfo": "معلومات الحساب للدعم:",
+      "contactUsCta": "تواصل معنا",
+      "copy": "نسخ"
+    },
+    "migrateNowModal": {
+      "title": "رحّل الآن إلى حساب غير حافظ",
+      "body": "لم يعد بإمكانك استقبال الأموال في حسابك الحافظ. أوقفت Blink خدمة الحفظ في منطقتك وسيتم تعطيل هذا الحساب بحلول نهاية {date}.\n\nرحّل الآن إلى حساب غير حافظ.",
+      "migrateCta": "رحّل الآن"
+    },
+    "reminderBulletin": {
+      "title": "مهم",
+      "body": "انتقل إلى حساب غير حافظ عبر الترحيل الموجّه، أو اسحب أموالك، قبل {date}. يتوقف الاستلام في {receiveStopsDate}.",
+      "migrateCta": "رحّل"
+    },
+    "offboardBulletin": {
+      "title": "مهم",
+      "body": "حسابك مُسجَّل في منطقة لا يمكننا تقديم الحسابات فيها. اسحب أموالك قبل 31 أغسطس. يتوقف الاستلام في 10 أغسطس."
+    },
+    "dollarBalanceModal": {
+      "title": "لا يمكننا ترحيل رصيدك بالدولار",
+      "body": "أفرغ رصيدك بالدولار أولًا. يمكنك تحويله إلى رصيد البيتكوين في Blink أو في مكان آخر."
+    },
+    "balancesOverview": {
+      "title": "انقل رصيدك",
+      "body": "انقل أموالك بأمان إلى حسابك الجديد.",
+      "currentBitcoinBalance": "رصيد البيتكوين الحالي",
+      "currentDollarBalance": "رصيد الدولار الحالي",
+      "newBitcoinBalance": "رصيد البيتكوين الجديد",
+      "newDollarBalance": "رصيد الدولار الجديد",
+      "dollarBalanceNotAvailable": "غير متاح",
+      "networkFee": "رسوم الشبكة: <bold>{fee: string}</bold>",
+      "networkFeeCoveredByBlink": "رسوم الشبكة: <bold>{fee: string}</bold> (تغطيها Blink)",
+      "retryCta": "حاول مرة أخرى",
+      "approveCta": "موافقة",
+      "contactSupportCta": "تواصل مع الدعم"
+    },
+    "migrationRequiredTitle": "حان وقت الترقية",
+    "keepReceivingTitle": "استمر في الاستلام كالمعتاد",
+    "keepReceivingBody": "سيتم نقل عنوان Lightning الخاص بك إلى حسابك الجديد غير الحفظي.",
+    "keepReceivingLnAddressLabel": "عنوان LN الخاص بك",
+    "keepReceivingCta": "رائع",
+    "receivingDisabledToast": "الاستلام معطّل حاليًا.",
+    "downloadHistoryTitle": "نزّل سجل معاملاتك",
+    "downloadHistoryBody": "سيبدأ حسابك الجديد من جديد. إذا كنت ترغب في الاحتفاظ بسجل لمعاملاتك، فنزّلها الآن كملف CSV.",
+    "downloadHistoryDownloadCta": "تنزيل",
+    "apiServiceTitle": "خدمة API غير متوفرة",
+    "apiServiceBody": "نلاحظ أن لديك مفاتيح API نشطة. لا يمكن لـ Blink توفير API في الوضع غير الحفظي.\n\nإذا كنت تعتمد على API الخاص بـ Blink، فتواصل معنا فورًا وسنبذل قصارى جهدنا لمساعدتك في انتقال سلس.",
+    "apiServiceContactCta": "تواصل معنا",
+    "apiServiceContinueCta": "المتابعة على أي حال",
+    "resumeFailed": "حدث خطأ ما أثناء استئناف ترحيلك. يرجى البدء من جديد.",
+    "migrationRequiredBody": "حان الوقت لترحيل حسابك الحافظ إلى حساب غير حافظ.",
+    "migrationRequiredForcedBody": "حان الوقت لترحيل حسابك الحافظ إلى حساب غير حافظ. هذا مطلوب لأسباب تنظيمية.\n\nلا داعي للقلق، سيكون الوضع غير الحفظي أفضل لك على المدى الطويل.",
+    "migrationGateTitle": "الحساب غير متاح",
+    "migrationGateBody": "لأسباب تنظيمية لا يمكننا توفير حسابات حفظية في منطقتك. حوّل أموالك إلى حساب غير حفظي مع Blink باتباع الخطوات التالية أو تواصل معنا على <link>{email}</link>",
+    "bitcoinBalance": "رصيد البيتكوين",
+    "dollarBalance": "رصيد الدولار",
     "moveToNonCustodial": "الانتقال إلى غير حفظي",
     "explainerTitle": "ماذا يعني الانتقال إلى غير حفظي؟",
-    "explainerStep1": "ستقوم بإنشاء حساب غير حفظي على بروتوكول Spark، <link>اعرف المزيد هنا</link>",
-    "explainerStep2": "سننقل أموالك إلى حسابك الجديد غير الحفظي وسيتم حذف حسابك الحالي",
-    "explainerStep3": "استمر في استخدام Blink كالمعتاد",
-    "letsMove": "هيا بنا",
-    "transferringFunds": "جارٍ تحويل أموالك. سيتم الانتهاء في غضون ثوانٍ قليلة."
+    "explainerCheck1": "ستقوم بإنشاء حساب غير حفظي على بروتوكول Spark",
+    "explainerCheck2": "ننقل أموالك إلى حسابك الجديد غير الحفظي",
+    "explainerCheck3": "سيتم إغلاق حسابك الحالي وجميع بياناته بما في ذلك سجل المعاملات",
+    "explainerCheck4": "لن تكون واجهة برمجة تطبيقات Blink متاحة",
+    "explainerCheck5": "سيتم خصم رسوم شبكة Spark من حسابك",
+    "explainerCta": "فهمت",
+    "transferringFunds": "جارٍ تحويل أموالك. سيتم الانتهاء في غضون ثوانٍ قليلة.",
+    "clockOutOfSync": {
+      "body": "تاريخ ووقت جهازك غير متزامنين. اضبطهما على الوضع التلقائي للمتابعة.",
+      "retryCta": "حاول مرة أخرى"
+    }
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "محفوظ",
@@ -3605,6 +3838,16 @@
     "modalDescription": "نوصي بشدة بعمل نسخة احتياطية لمحفظتك لمنع فقدان كامل للأموال في حال فقدت هذا الجهاز.",
     "secureMe": "تأمين المحفظة"
   },
+  "BackupRequired": {
+    "modalTitle": "Back up your wallet first",
+    "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
+    "backupNow": "Back up wallet"
+  },
+  "NonCustodialInfoBulletin": {
+    "title": "هذا حساب غير حافظ",
+    "body": "لمعرفة المزيد، اقرأ منشور مدونتنا",
+    "cta": "اقرأ"
+  },
   "StableBalance": {
     "title": "الرصيد المستقر",
     "description": "احتفظ برصيد مقوّم بالدولار مدعوم بـ USDB على Spark.",
@@ -3638,7 +3881,7 @@
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
     "featureCircles": "Circles",
-    "featureEarn": "Earn",
+    "featureEarn": "تعلّم",
     "featureCard": "Card"
   },
   "WalletCreationScreen": {
@@ -3652,10 +3895,10 @@
     "lightningPayment": "دفعة Lightning",
     "onchainDeposit": "إيداع On-chain",
     "onchainWithdrawal": "سحب On-chain",
-    "conversionFromBitcoin": "تحويل من Bitcoin",
-    "conversionToBitcoin": "تحويل إلى Bitcoin",
-    "conversionFromToken": "تحويل من {token}",
-    "conversionToToken": "تحويل إلى {token}",
+    "transferFromBitcoinBalance": "تحويل من رصيد البيتكوين",
+    "transferToBitcoinBalance": "تحويل إلى رصيد البيتكوين",
+    "transferFromTokenBalance": "تحويل من رصيد {token}",
+    "transferToTokenBalance": "تحويل إلى رصيد {token}",
     "tokenTransfer": "تحويل {token}",
     "payTo": "دفع إلى {address}",
     "payment": "دفعة"

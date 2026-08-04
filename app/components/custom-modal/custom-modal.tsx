@@ -88,6 +88,7 @@ const CustomModal: React.FC<CustomModalProps> = ({
       backdropTransitionOutTiming={0}
       avoidKeyboard={true}
       onBackdropPress={dismissable ? toggleModal : undefined}
+      onBackButtonPress={dismissable ? toggleModal : undefined}
     >
       <View style={styles.container}>
         <View style={styles.headerContainer}>

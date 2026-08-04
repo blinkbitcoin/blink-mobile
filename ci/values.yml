@@ -40,6 +40,7 @@ geo_ipify_api_key: ((mobile-ip-country-lookup.geo_ipify_api_key))
 ipinfo_api_key: ((mobile-ip-country-lookup.ipinfo_api_key))
 ipapi_api_key: ((mobile-ip-country-lookup.ipapi_api_key))
 proxycheck_api_key: ((mobile-ip-country-lookup.proxycheck_api_key))
+crashlytics_service_account_json: ((mobile-crashlytics.creds_json))
 
 android_keystore: ((android.keystore))
 fastlane_match_password: ((fastlane.match_password))

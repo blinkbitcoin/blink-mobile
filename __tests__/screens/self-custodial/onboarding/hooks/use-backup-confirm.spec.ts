@@ -39,6 +39,21 @@ describe("useBackupConfirm", () => {
     expect(result.current.allFilled).toBe(false)
   })
 
+  it("refuses to auto-complete when there are no challenges (empty phrase)", () => {
+    const { result } = renderHook(() =>
+      useBackupConfirm({ challenges: [], onComplete: mockOnComplete }),
+    )
+
+    expect(result.current.allCorrect).toBe(false)
+    expect(result.current.allFilled).toBe(false)
+
+    act(() => {
+      jest.advanceTimersByTime(1000)
+    })
+
+    expect(mockOnComplete).not.toHaveBeenCalled()
+  })
+
   it("updates input at specific index", () => {
     const { result } = renderHook(() =>
       useBackupConfirm({ challenges, onComplete: mockOnComplete }),

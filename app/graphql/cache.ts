@@ -101,9 +101,6 @@ export const createCache = () =>
           region: {
             read: (value) => value ?? null,
           },
-          feedbackModalShown: {
-            read: (value) => value ?? false,
-          },
           introducingCirclesModalShown: {
             read: (value) => value ?? false,
           },

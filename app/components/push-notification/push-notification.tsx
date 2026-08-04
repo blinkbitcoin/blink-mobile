@@ -1,6 +1,7 @@
 import React, { useEffect } from "react"
 
 import { useApolloClient } from "@apollo/client"
+import { BulletinsDocument } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { addDeviceToken, hasNotificationPermission } from "@app/utils/notifications"
 import messaging, { FirebaseMessagingTypes } from "@react-native-firebase/messaging"
@@ -21,7 +22,19 @@ export const PushNotificationComponent = (): JSX.Element => {
           linkToScreen &&
           linkToScreen.startsWith("/")
         ) {
-          Linking.openURL("blink:" + linkToScreen)
+          // Forward the receiving account hint when the payload provides one so
+          // multi-account devices can resolve the tx with a single probe (#3826).
+          // Only transaction links understand the hint — appending it elsewhere
+          // would leak a stray param into unrelated screens.
+          const recipientUserId = remoteMessage.data?.recipientUserId
+          const link =
+            typeof recipientUserId === "string" &&
+            recipientUserId &&
+            linkToScreen.startsWith("/transaction/") &&
+            !linkToScreen.includes("?")
+              ? `${linkToScreen}?recipientUserId=${encodeURIComponent(recipientUserId)}`
+              : linkToScreen
+          Linking.openURL("blink:" + link)
         }
         // linkTo throws an error if the link is invalid
       } catch (error) {
@@ -36,9 +49,8 @@ export const PushNotificationComponent = (): JSX.Element => {
       },
     )
 
-    const unsubscribeInApp = messaging().onMessage(async (remoteMessage) => {
-      console.log("A new FCM message arrived!", remoteMessage)
-      // TODO: add notifee library to show local notifications
+    const unsubscribeInApp = messaging().onMessage(async () => {
+      client.refetchQueries({ include: [BulletinsDocument] })
     })
 
     // When the application is opened from a quit state.
@@ -54,7 +66,7 @@ export const PushNotificationComponent = (): JSX.Element => {
       unsubscribeInApp()
       unsubscribeBackground()
     }
-  }, [])
+  }, [client])
 
   useEffect(() => {
     ;(async () => {

@@ -28,12 +28,12 @@ export const getTransactionDescription = (
     if (tx.tokenTicker) {
       const token = displayTicker(tx.tokenTicker)
       return isSend
-        ? LL.TransactionDescription.conversionFromToken({ token })
-        : LL.TransactionDescription.conversionToToken({ token })
+        ? LL.TransactionDescription.transferFromTokenBalance({ token })
+        : LL.TransactionDescription.transferToTokenBalance({ token })
     }
     return isSend
-      ? LL.TransactionDescription.conversionFromBitcoin()
-      : LL.TransactionDescription.conversionToBitcoin()
+      ? LL.TransactionDescription.transferFromBitcoinBalance()
+      : LL.TransactionDescription.transferToBitcoinBalance()
   }
 
   if (tx.tokenTicker) {

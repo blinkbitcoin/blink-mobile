@@ -4,22 +4,25 @@ import { render } from "@testing-library/react-native"
 
 import { VersionComponent } from "@app/components/version"
 
-const mockUseDeviceLocation = jest.fn()
+const mockUsePhoneCountryCode = jest.fn()
+const mockUseIpCountryCode = jest.fn()
 
 jest.mock("@app/hooks/use-device-location", () => ({
   __esModule: true,
-  default: () => mockUseDeviceLocation(),
+  usePhoneCountryCode: () => mockUsePhoneCountryCode(),
+  useIpCountryCode: () => mockUseIpCountryCode(),
 }))
 
 jest.mock("@app/i18n/i18n-react", () => ({
   useI18nContext: () => ({
     LL: {
       common: {
-        country: () => "Country",
+        registered: () => "Registered",
+        detected: () => "Detected",
         unknown: () => "Unknown",
       },
       GetStartedScreen: {
-        headline: () => "Bitcoin is money",
+        headline: () => "Wallet powered by Blink",
       },
     },
   }),
@@ -43,22 +46,43 @@ jest.mock("@rn-vui/themed", () => ({
 
 describe("VersionComponent", () => {
   beforeEach(() => {
-    mockUseDeviceLocation.mockReset()
+    mockUsePhoneCountryCode.mockReset()
+    mockUseIpCountryCode.mockReset()
   })
 
-  it("shows the device-detected country below the version", () => {
-    mockUseDeviceLocation.mockReturnValue({ countryCode: "HK" })
+  it("shows the registered and detected countries below the version", () => {
+    mockUsePhoneCountryCode.mockReturnValue("US")
+    mockUseIpCountryCode.mockReturnValue("SE")
 
     const { getByText } = render(<VersionComponent />)
 
-    expect(getByText(/Country: HK/)).toBeTruthy()
+    expect(getByText(/Registered: US · Detected: SE/)).toBeTruthy()
   })
 
-  it("falls back to the unknown label when the country is not detected", () => {
-    mockUseDeviceLocation.mockReturnValue({ countryCode: undefined })
+  it("shows the headline below the countries", () => {
+    mockUsePhoneCountryCode.mockReturnValue("US")
+    mockUseIpCountryCode.mockReturnValue("SE")
 
     const { getByText } = render(<VersionComponent />)
 
-    expect(getByText(/Country: Unknown/)).toBeTruthy()
+    expect(getByText(/Wallet powered by Blink/)).toBeTruthy()
+  })
+
+  it("shows unknown as registered country when there is no phone-derived country", () => {
+    mockUsePhoneCountryCode.mockReturnValue(undefined)
+    mockUseIpCountryCode.mockReturnValue("SE")
+
+    const { getByText } = render(<VersionComponent />)
+
+    expect(getByText(/Registered: Unknown · Detected: SE/)).toBeTruthy()
+  })
+
+  it("shows unknown as detected country when the ip lookup fails", () => {
+    mockUsePhoneCountryCode.mockReturnValue("US")
+    mockUseIpCountryCode.mockReturnValue(undefined)
+
+    const { getByText } = render(<VersionComponent />)
+
+    expect(getByText(/Registered: US · Detected: Unknown/)).toBeTruthy()
   })
 })
