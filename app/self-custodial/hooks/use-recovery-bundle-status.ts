@@ -2,16 +2,31 @@ import { useCallback, useEffect, useState } from "react"
 
 import { useFocusEffect } from "@react-navigation/native"
 
+import { WalletCurrency } from "@app/graphql/generated"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
+import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { AccountType } from "@app/types/wallet"
 
 import { readRecoveryBundleState } from "../recovery-bundle/storage"
 import { useSparkNetwork } from "./use-spark-network"
 
-/** Matches the refresh scheduler's own fallback window: a bundle the scheduler
- *  would already be re-fetching is exactly the one worth flagging, and two
- *  different thresholds would show "up to date" while a refresh was pending. */
-export const BUNDLE_STALE_AFTER_MS = 24 * 60 * 60 * 1000
+/**
+ * Age alone does not make a recovery backup wrong.
+ *
+ * The bundle records which outputs the wallet owns, and that only changes when
+ * the user transacts - which is exactly when the refresh scheduler rebuilds it.
+ * A wallet left untouched for a month therefore has a backup that describes it
+ * perfectly, and warning about it would be a false alarm. False alarms are how
+ * users learn to ignore the real one.
+ *
+ * So age is only a backstop, for the case a balance comparison cannot see: a
+ * swap or consolidation that leaves the total unchanged while the underlying
+ * outputs move. That is rare and self-correcting (the same operations trigger a
+ * refresh), so the window is long and deliberately not the scheduler's 24h
+ * fallback - that value is a good trigger to re-fetch, and a bad claim to make
+ * to the user.
+ */
+export const BUNDLE_BACKSTOP_MS = 30 * 24 * 60 * 60 * 1000
 
 export const RecoveryBundleStatus = {
   /** First read still in flight - render nothing rather than a wrong state. */
@@ -25,18 +40,37 @@ export const RecoveryBundleStatus = {
 export type RecoveryBundleStatus =
   (typeof RecoveryBundleStatus)[keyof typeof RecoveryBundleStatus]
 
-export const statusFor = (
-  savedAt: number | null,
-  now: number,
-  staleAfterMs = BUNDLE_STALE_AFTER_MS,
-): RecoveryBundleStatus => {
-  if (savedAt === null) return RecoveryBundleStatus.Missing
+type StatusInput = {
+  savedAt: number | null
+  /** Balance recorded when the bundle was built, in sats. */
+  savedTotalSats: string | null
+  /** Current wallet balance in sats, or null while it is still loading. */
+  currentTotalSats: string | null
+  now: number
+  backstopMs?: number
+}
+
+export const statusFor = ({
+  savedAt,
+  savedTotalSats,
+  currentTotalSats,
+  now,
+  backstopMs = BUNDLE_BACKSTOP_MS,
+}: StatusInput): RecoveryBundleStatus => {
+  if (savedAt === null || savedTotalSats === null) return RecoveryBundleStatus.Missing
+
+  /** The balance moved, so the backup no longer describes the wallet - true
+   *  even if it was written a minute ago. */
+  if (currentTotalSats !== null && currentTotalSats !== savedTotalSats) {
+    return RecoveryBundleStatus.Stale
+  }
+
   /** A clock moved backwards makes the age negative; treat that as stale rather
-   *  than fresh, so a wound-back clock cannot hide an out-of-date backup. */
+   *  than fresh, so a wound-back clock cannot hide a backup from the backstop. */
   const age = now - savedAt
-  return age >= 0 && age < staleAfterMs
-    ? RecoveryBundleStatus.Fresh
-    : RecoveryBundleStatus.Stale
+  if (age < 0 || age >= backstopMs) return RecoveryBundleStatus.Stale
+
+  return RecoveryBundleStatus.Fresh
 }
 
 type RecoveryBundleStatusResult = {
@@ -55,32 +89,39 @@ type RecoveryBundleStatusResult = {
  */
 export const useRecoveryBundleStatus = (): RecoveryBundleStatusResult => {
   const { activeAccount } = useAccountRegistry()
+  const { wallets } = useActiveWallet()
   const network = useSparkNetwork()
-  const [state, setState] = useState<{
-    status: RecoveryBundleStatus
+  const [saved, setSaved] = useState<{
+    loaded: boolean
     savedAt: number | null
+    savedTotalSats: string | null
     leafCount: number | null
-  }>({ status: RecoveryBundleStatus.Unknown, savedAt: null, leafCount: null })
+  }>({ loaded: false, savedAt: null, savedTotalSats: null, leafCount: null })
 
   const accountId =
     activeAccount?.type === AccountType.SelfCustodial ? activeAccount.id : null
 
+  const btcWallet = wallets.find((w) => w.walletCurrency === WalletCurrency.Btc)
+  const currentTotalSats =
+    btcWallet === undefined ? null : String(btcWallet.balance.amount)
+
   const reload = useCallback(async () => {
     if (!accountId) {
-      setState({ status: RecoveryBundleStatus.Unknown, savedAt: null, leafCount: null })
+      setSaved({ loaded: false, savedAt: null, savedTotalSats: null, leafCount: null })
       return
     }
     try {
-      const saved = await readRecoveryBundleState(accountId, network)
-      setState({
-        status: statusFor(saved?.savedAt ?? null, Date.now()),
-        savedAt: saved?.savedAt ?? null,
-        leafCount: saved?.leafCount ?? null,
+      const state = await readRecoveryBundleState(accountId, network)
+      setSaved({
+        loaded: true,
+        savedAt: state?.savedAt ?? null,
+        savedTotalSats: state?.totalSats ?? null,
+        leafCount: state?.leafCount ?? null,
       })
     } catch {
       /** An unreadable state file is indistinguishable from no backup, and the
        *  honest reading of "we cannot confirm you have one" is Missing. */
-      setState({ status: RecoveryBundleStatus.Missing, savedAt: null, leafCount: null })
+      setSaved({ loaded: true, savedAt: null, savedTotalSats: null, leafCount: null })
     }
   }, [accountId, network])
 
@@ -96,5 +137,15 @@ export const useRecoveryBundleStatus = (): RecoveryBundleStatusResult => {
     }, [reload]),
   )
 
-  return { ...state, reload }
+  const status =
+    !accountId || !saved.loaded
+      ? RecoveryBundleStatus.Unknown
+      : statusFor({
+          savedAt: saved.savedAt,
+          savedTotalSats: saved.savedTotalSats,
+          currentTotalSats,
+          now: Date.now(),
+        })
+
+  return { status, savedAt: saved.savedAt, leafCount: saved.leafCount, reload }
 }
