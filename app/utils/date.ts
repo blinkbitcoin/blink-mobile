@@ -33,8 +33,6 @@ export const JULY_1_2024_12_AM_UTC_MINUS_6 = new Date(
 ).getTime()
 
 const secondsToDDMMSS = (totalSeconds: number) => {
-  if (totalSeconds < 0) return ""
-
   const days = Math.floor(totalSeconds / 86400) // There are 86400 seconds in a day
   const hours = Math.floor((totalSeconds - days * 86400) / 3600) // 3600 seconds in an hour
   const minutes = Math.floor((totalSeconds - days * 86400 - hours * 3600) / 60)
