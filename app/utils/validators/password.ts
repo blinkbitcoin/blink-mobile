@@ -1,4 +1,8 @@
-const MIN_LENGTH_PATTERN = /.{12,}/s
+export const MIN_PASSWORD_LENGTH = 12
+
+// The `s` flag lets newlines count toward the length, so multi-line
+// passphrases are accepted.
+const MIN_LENGTH_PATTERN = new RegExp(`.{${MIN_PASSWORD_LENGTH},}`, "s")
 
 export type PasswordValidationResult = {
   valid: boolean
