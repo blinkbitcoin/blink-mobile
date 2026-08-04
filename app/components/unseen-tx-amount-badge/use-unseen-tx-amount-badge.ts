@@ -1,23 +1,16 @@
 import { useCallback, useMemo } from "react"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { useNavigation } from "@react-navigation/native"
-import { useApolloClient } from "@apollo/client"
 
 import type { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useDisplayCurrency } from "@app/hooks"
+import { useAccountTransactions } from "@app/hooks/use-account-transactions"
 import { toWalletAmount } from "@app/types/amounts"
-import {
-  TransactionFragment,
-  TxDirection,
-  WalletCurrency,
-  HomeAuthedDocument,
-  HomeAuthedQuery,
-  TxStatus,
-} from "@app/graphql/generated"
+import { TransactionFragment, TxDirection, WalletCurrency } from "@app/graphql/generated"
 
 type UnseenTxAmountBadgeParams = {
-  transactions?: TransactionFragment[] | null
+  transactions?: readonly TransactionFragment[] | null
   isSelfCustodial?: boolean
   hasUnseenUsdTx: boolean
   hasUnseenBtcTx: boolean
@@ -32,36 +25,10 @@ export const useUnseenTxAmountBadge = ({
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { formatCurrency, formatMoneyAmount } = useDisplayCurrency()
   const { feeReimbursementMemo } = useRemoteConfig()
-  const client = useApolloClient()
 
-  const readCachedTransactions = useCallback((): ReadonlyArray<TransactionFragment> => {
-    const data = client.readQuery<HomeAuthedQuery>({ query: HomeAuthedDocument })
-    const pendingTransactions =
-      data?.me?.defaultAccount?.pendingIncomingTransactions || []
-    const transactionEdges = data?.me?.defaultAccount?.transactions?.edges
-    if (!transactionEdges?.length) return pendingTransactions
-
-    const settledTransactions = transactionEdges
-      .map((edge) => edge.node)
-      .filter(
-        (transaction) =>
-          transaction.status !== TxStatus.Pending ||
-          transaction.direction === TxDirection.Send,
-      )
-    if (pendingTransactions.length === 0) return settledTransactions
-
-    return [...pendingTransactions, ...settledTransactions]
-  }, [client])
+  const baseTransactions = useAccountTransactions({ isSelfCustodial, transactions })
 
   const latestUnseenTx = useMemo(() => {
-    const hasProvidedTransactions = Boolean(transactions && transactions.length > 0)
-    /** A self-custodial account has no `me` behind the cached home query, so an empty
-     *  list is genuinely empty and must never fall back to custodial transactions. */
-    const canReadCachedTransactions = !hasProvidedTransactions && !isSelfCustodial
-    const baseTransactions = canReadCachedTransactions
-      ? readCachedTransactions()
-      : transactions ?? []
-
     if (baseTransactions.length === 0) return
     if (!hasUnseenBtcTx && !hasUnseenUsdTx) return
 
@@ -82,14 +49,7 @@ export const useUnseenTxAmountBadge = ({
     return unseenTransactions.reduce((latest, tx) =>
       tx.createdAt > latest.createdAt ? tx : latest,
     )
-  }, [
-    transactions,
-    isSelfCustodial,
-    hasUnseenBtcTx,
-    hasUnseenUsdTx,
-    feeReimbursementMemo,
-    readCachedTransactions,
-  ])
+  }, [baseTransactions, hasUnseenBtcTx, hasUnseenUsdTx, feeReimbursementMemo])
 
   const unseenAmountText = useMemo(() => {
     if (!latestUnseenTx) return null

@@ -20,7 +20,7 @@ import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { shouldHighlightById } from "@app/custodial/mappers/transaction-highlight"
 import { useSelfCustodialTransactionFragments } from "@app/self-custodial/hooks/use-self-custodial-transaction-fragments"
-import { NormalizedTransaction } from "@app/types/transaction"
+import { NO_TRANSACTIONS } from "@app/types/transaction"
 import {
   resolveHighlightBaseline,
   shouldHighlightByTimestamp,
@@ -64,9 +64,6 @@ gql`
     }
   }
 `
-
-/** Stable identity so the fragment hook does not re-run on every custodial render. */
-const EMPTY_TRANSACTIONS: NormalizedTransaction[] = []
 
 const INITIAL_ITEMS_TO_RENDER = 14
 const RENDER_BATCH_SIZE = 14
@@ -164,8 +161,7 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
   const transactions = dataToRender?.me?.defaultAccount?.transactions
 
   const selfCustodialSourceTransactions = React.useMemo(
-    () =>
-      activeWallet.isSelfCustodial ? selfCustodialAllTransactions : EMPTY_TRANSACTIONS,
+    () => (activeWallet.isSelfCustodial ? selfCustodialAllTransactions : NO_TRANSACTIONS),
     [activeWallet.isSelfCustodial, selfCustodialAllTransactions],
   )
 
