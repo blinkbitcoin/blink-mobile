@@ -172,7 +172,12 @@ describe("useCloudBackup", () => {
       "blink-spark-backup-blink-test-pubkey-1234.json",
       noExistingFile,
     )
-    expect(mockCompleteBackup).toHaveBeenCalledWith({ method: "cloud" })
+    // Recorded as NOT password-protected: the recovery-bundle cloud sync gate
+    // (D9) must stay closed next to this unencrypted seed backup.
+    expect(mockCompleteBackup).toHaveBeenCalledWith({
+      method: "cloud",
+      backupOptions: { cloudPasswordProtected: false },
+    })
   })
 
   /** The success path tags the analytics event by platform; on android that is google_drive. */
@@ -211,7 +216,10 @@ describe("useCloudBackup", () => {
       "blink-spark-backup-blink-test-pubkey-1234.json",
       noExistingFile,
     )
-    expect(mockCompleteBackup).toHaveBeenCalledWith({ method: "cloud" })
+    expect(mockCompleteBackup).toHaveBeenCalledWith({
+      method: "cloud",
+      backupOptions: { cloudPasswordProtected: true },
+    })
   })
 
   it("shows the resolved failure message on upload failure", async () => {

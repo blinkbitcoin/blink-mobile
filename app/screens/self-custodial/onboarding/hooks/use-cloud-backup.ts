@@ -141,7 +141,12 @@ export const useCloudBackup = ({
       type: "success",
       LL,
     })
-    completeBackup({ method: BackupMethod.Cloud })
+    completeBackup({
+      method: BackupMethod.Cloud,
+      // Whether the seed backup carries an extra password gates the
+      // recovery-bundle cloud sync (D9), so record it with the completion.
+      backupOptions: { cloudPasswordProtected: isEncrypted && password.length > 0 },
+    })
   }, [
     isEncrypted,
     password,
