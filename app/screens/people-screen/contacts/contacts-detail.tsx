@@ -98,7 +98,7 @@ export const ContactsDetailScreenJSX: React.FC<ContactDetailScreenProps> = ({
               username: contact.alias || contact.username,
             })}
           </Text>
-          <ContactTransactions contactUsername={contact.username} />
+          <ContactTransactions contact={contact} />
         </View>
         <View style={styles.actionsContainer}>
           <GaloyIconButton

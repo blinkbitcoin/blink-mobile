@@ -9,8 +9,8 @@ import {
   type Contact,
   type ContactAdapter,
   type ContactListResult,
+  type ContactTransactionsPage,
 } from "@app/types/contact"
-import { type NormalizedTransaction } from "@app/types/transaction"
 import { AccountType } from "@app/types/wallet"
 
 const unsupported = (operation: string): Error =>
@@ -82,8 +82,15 @@ export const useCustodialContactAdapter = (): ContactAdapter & {
     throw unsupported("deleting contacts")
   }, [])
 
+  /**
+   * Custodial contact history is resolved by the `transactionListForContact` query, which
+   * pages through Apollo, so the adapter has nothing to answer here.
+   */
   const getTransactions = useCallback(
-    async (_contactId: string): Promise<NormalizedTransaction[]> => [],
+    async (_contactId: string): Promise<ContactTransactionsPage> => ({
+      transactions: [],
+      nextCursor: null,
+    }),
     [],
   )
 
