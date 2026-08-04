@@ -1,7 +1,7 @@
 import React from "react"
 import { it } from "@jest/globals"
 import { MockedResponse } from "@apollo/client/testing"
-import { fireEvent, render, waitFor } from "@testing-library/react-native"
+import { act, fireEvent, render, waitFor } from "@testing-library/react-native"
 import { StyleSheet } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 
@@ -408,11 +408,13 @@ export const generateHomeMock = ({
   network,
   btcBalance,
   usdBalance,
+  pendingIncomingTransactions = [],
 }: {
   level: AccountLevel
   network: Network
   btcBalance: number
   usdBalance: number
+  pendingIncomingTransactions?: Array<Record<string, unknown>>
 }): MockedResponse[] => {
   return [
     {
@@ -477,13 +479,46 @@ export const generateHomeMock = ({
                   endCursor: null,
                 },
               },
-              pendingIncomingTransactions: [],
+              pendingIncomingTransactions,
             },
           },
         },
       },
     },
   ]
+}
+
+/** Unconfirmed onchain deposit, shaped to the full Transaction fragment so the
+ *  Apollo cache accepts it without data-loss warnings. */
+const pendingOnchainReceiveTx = {
+  __typename: "Transaction",
+  id: "pending-onchain-receive-1",
+  status: "PENDING",
+  direction: "RECEIVE",
+  memo: null,
+  createdAt: 1678093528,
+  settlementAmount: 50_000,
+  settlementFee: 0,
+  settlementDisplayFee: "0.00",
+  settlementCurrency: "BTC",
+  settlementDisplayAmount: "500.00",
+  settlementDisplayCurrency: "USD",
+  settlementPrice: {
+    base: 10320000000000,
+    offset: 12,
+    currencyUnit: "USDCENT",
+    formattedAmount: "10.32",
+    __typename: "Price",
+  },
+  initiationVia: {
+    __typename: "InitiationViaOnChain",
+    address: "bc1q-pending-deposit-address",
+  },
+  settlementVia: {
+    __typename: "SettlementViaOnChain",
+    transactionHash: "pending-tx-hash",
+    arrivalInMempoolEstimatedAt: null,
+  },
 }
 
 type ConvertButtonCase = {
@@ -1796,6 +1831,81 @@ describe("HomeScreen wind-down states", () => {
     onMigrate()
 
     expect(mockNavigate).toHaveBeenCalledWith("accountMigrationEntry")
+  })
+})
+
+describe("HomeScreen pending receive badge", () => {
+  beforeEach(resetHomeScreenMocks)
+
+  const mocksWithPendingDeposit = () =>
+    generateHomeMock({
+      level: AccountLevel.One,
+      network: Network.Mainnet,
+      btcBalance: 1000,
+      usdBalance: 0,
+      pendingIncomingTransactions: [pendingOnchainReceiveTx],
+    })
+
+  it("shows the pending amount beside the balance while a deposit is unconfirmed", async () => {
+    currentMocks = mocksWithPendingDeposit()
+
+    const { findByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    expect(await findByTestId("balance-status-badge")).toBeTruthy()
+
+    await flushEffects()
+  })
+
+  /** The regression in blink-wip#937: the only pending signal at the top was the
+   *  unseen-tx badge, which auto-dismisses after ~5s. The pending badge is
+   *  state-driven and must outlive that window. */
+  it("keeps the pending badge past the unseen-badge auto-dismiss window", async () => {
+    jest.useFakeTimers({ doNotFake: ["setImmediate"] })
+    try {
+      currentMocks = mocksWithPendingDeposit()
+
+      const { findByTestId, getByTestId } = render(
+        <ContextForScreen>
+          <HomeScreen />
+        </ContextForScreen>,
+      )
+
+      expect(await findByTestId("balance-status-badge")).toBeTruthy()
+
+      // 5s auto-seen delay + 180ms hide-to-mark gap + slack
+      act(() => {
+        jest.advanceTimersByTime(5_500)
+      })
+
+      expect(getByTestId("balance-status-badge")).toBeTruthy()
+
+      await flushEffects()
+    } finally {
+      jest.useRealTimers()
+    }
+  })
+
+  it("hides the badge while nothing is pending", async () => {
+    currentMocks = generateHomeMock({
+      level: AccountLevel.One,
+      network: Network.Mainnet,
+      btcBalance: 1000,
+      usdBalance: 0,
+    })
+
+    const { queryByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    expect(queryByTestId("balance-status-badge")).toBeNull()
   })
 })
 

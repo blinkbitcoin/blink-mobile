@@ -6538,6 +6538,11 @@ type RootTranslation = {
 	}
 	HomeScreen: {
 		/**
+		 * +​{​a​m​o​u​n​t​}​ ​p​e​n​d​i​n​g
+		 * @param {string} amount
+		 */
+		pendingReceiveBadge: RequiredParams<'amount'>
+		/**
 		 * R​e​c​e​i​v​e
 		 */
 		receive: string
@@ -19682,6 +19687,10 @@ export type TranslationFunctions = {
 		error: () => LocalizedString
 	}
 	HomeScreen: {
+		/**
+		 * +{amount} pending
+		 */
+		pendingReceiveBadge: (arg: { amount: string }) => LocalizedString
 		/**
 		 * Receive
 		 */

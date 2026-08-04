@@ -145,4 +145,14 @@ describe("BalanceHeader", () => {
 
     expect(queryByTestId("balance-status-badge")).toBeNull()
   })
+
+  it("does not render the status badge while amounts are hidden", () => {
+    mockHideAmount = true
+
+    const { queryByTestId } = renderHeader({
+      statusBadge: { label: "+$1.00 pending", status: "warning" },
+    })
+
+    expect(queryByTestId("balance-status-badge")).toBeNull()
+  })
 })

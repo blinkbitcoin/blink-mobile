@@ -20,7 +20,11 @@ import { StableSatsModal } from "@app/components/stablesats-modal"
 import { DollarBalanceRestrictionModal } from "@app/components/dollar-balance-restriction-modal"
 import { UsdConvertToBtcModal } from "@app/components/usd-convert-to-btc-modal"
 import WalletOverview from "@app/components/wallet-overview/wallet-overview"
-import { BalanceHeader, useTotalBalance } from "@app/components/balance-header"
+import {
+  BalanceHeader,
+  usePendingReceiveAmount,
+  useTotalBalance,
+} from "@app/components/balance-header"
 import { BalanceMode, useBalanceMode } from "@app/hooks/use-balance-mode"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
@@ -350,6 +354,18 @@ export const HomeScreen: React.FC = () => {
   const pendingIncomingTransactions =
     dataAuthed?.me?.defaultAccount?.pendingIncomingTransactions
   const transactionsEdges = dataAuthed?.me?.defaultAccount?.transactions?.edges
+
+  /** Pending deposits stay visible beside the balance until confirmed —
+   *  unlike the unseen-tx badge below, which auto-dismisses (blink-wip#937). */
+  const { pendingReceiveAmountText } = usePendingReceiveAmount({
+    pendingIncomingTransactions,
+  })
+  const pendingStatusBadge = pendingReceiveAmountText
+    ? {
+        label: LL.HomeScreen.pendingReceiveBadge({ amount: pendingReceiveAmountText }),
+        status: "warning" as const,
+      }
+    : undefined
 
   const transactions = useMemo(() => {
     const txs: TransactionFragment[] = []
@@ -772,6 +788,7 @@ export const HomeScreen: React.FC = () => {
         showStableBalanceToggle={showStableBalanceToggle}
         mode={balanceMode}
         onModeChange={toggleBalanceMode}
+        statusBadge={pendingStatusBadge}
       />
       <View style={styles.badgeSlot}>
         <UnseenTxAmountBadge
