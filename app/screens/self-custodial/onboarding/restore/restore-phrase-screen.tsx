@@ -9,7 +9,12 @@ import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { SuggestionBar } from "@app/components/suggestion-bar"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { PhraseStep, RootStackParamList } from "@app/navigation/stack-param-lists"
+import {
+  isPhraseStep,
+  PhraseStep,
+  RootStackParamList,
+} from "@app/navigation/stack-param-lists"
+import { reportError } from "@app/utils/error-logging"
 import { testProps } from "@app/utils/testProps"
 
 import {
@@ -29,7 +34,29 @@ export const RestorePhraseScreen: React.FC = () => {
     theme: { colors },
   } = useTheme()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-  const { step, words: initialWords } = useRoute<RestorePhraseRouteProp>().params
+
+  /** Deep links and navigation-state rehydration can deliver missing or malformed params
+   *  despite the route type; a bare destructure here threw into the app-wide ErrorBoundary,
+   *  replacing the whole navigation tree (#4070). Fall back to step 1, where a restore
+   *  starts anyway. */
+  const { params } = useRoute<RestorePhraseRouteProp>()
+  const stepParam = params?.step
+  const wordsParam = params?.words
+  const hasValidStep = isPhraseStep(stepParam)
+  const step = hasValidStep ? stepParam : PhraseStep.First
+  const initialWords =
+    Array.isArray(wordsParam) && wordsParam.every((word) => typeof word === "string")
+      ? wordsParam
+      : undefined
+
+  useEffect(() => {
+    if (hasValidStep) return
+    reportError(
+      "Restore phrase route params missing",
+      new Error("Route delivered no valid step"),
+      { dedupKey: "restore-phrase-params-missing", alwaysRecord: true },
+    )
+  }, [hasValidStep])
 
   const {
     stepWords,

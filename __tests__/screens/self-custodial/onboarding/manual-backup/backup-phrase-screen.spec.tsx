@@ -8,11 +8,18 @@ import { ContextForScreen } from "../../../helper"
 import { flushEffects } from "../../../../helpers/flush-effects"
 
 const mockNavigate = jest.fn()
-let mockStep = 1
+let mockStep: unknown = 1
+let mockHasParams = true
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
   useNavigation: () => ({ navigate: mockNavigate }),
-  useRoute: () => ({ params: { step: mockStep } }),
+  useRoute: () => ({ params: mockHasParams ? { step: mockStep } : undefined }),
+}))
+
+const mockReportError = jest.fn()
+jest.mock("@app/utils/error-logging", () => ({
+  ...jest.requireActual("@app/utils/error-logging"),
+  reportError: (...args: readonly unknown[]) => mockReportError(...args),
 }))
 
 const mockCopyToClipboard = jest.fn()
@@ -58,7 +65,62 @@ describe("BackupPhraseScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockStep = 1
+    mockHasParams = true
     mockCountdown = { remainingSeconds: 0, isExpired: true }
+  })
+
+  /** Deep links and navigation-state rehydration can deliver missing or malformed params;
+   *  the screen falls back to step 1 (the first six words) instead of throwing into the
+   *  app-wide ErrorBoundary, which replaces the whole navigation tree (#4070). */
+  describe("route param guards", () => {
+    it("falls back to step 1 when the route delivers no params", async () => {
+      mockHasParams = false
+
+      const { getByText, queryByText } = render(
+        <ContextForScreen>
+          <BackupPhraseScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      await waitFor(() => expect(getByText("youth")).toBeTruthy())
+      expect(queryByText("ritual")).toBeNull()
+      expect(mockReportError).toHaveBeenCalledTimes(1)
+      expect(mockReportError).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.any(Error),
+        expect.objectContaining({
+          dedupKey: "backup-phrase-params-missing",
+          alwaysRecord: true,
+        }),
+      )
+    })
+
+    it("falls back to step 1 when the route delivers an out-of-range step", async () => {
+      mockStep = 7
+
+      const { getByText, queryByText } = render(
+        <ContextForScreen>
+          <BackupPhraseScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      await waitFor(() => expect(getByText("youth")).toBeTruthy())
+      expect(queryByText("ritual")).toBeNull()
+      expect(mockReportError).toHaveBeenCalledTimes(1)
+    })
+
+    it("does not report valid params", async () => {
+      render(
+        <ContextForScreen>
+          <BackupPhraseScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      expect(mockReportError).not.toHaveBeenCalled()
+    })
   })
 
   describe("step 1", () => {

@@ -12,17 +12,24 @@ const mockUseRestorePhrase = jest.fn()
 jest.mock(
   "@app/screens/self-custodial/onboarding/restore/hooks/use-restore-phrase",
   () => ({
-    useRestorePhrase: () => mockUseRestorePhrase(),
+    useRestorePhrase: (args: unknown) => mockUseRestorePhrase(args),
     RestoreStatus: { Idle: "idle", Restoring: "restoring", Error: "error" },
   }),
 )
 
 const mockNavigate = jest.fn()
 const mockSetOptions = jest.fn()
+let mockRouteParams: unknown
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
   useNavigation: () => ({ navigate: mockNavigate, setOptions: mockSetOptions }),
-  useRoute: () => ({ params: { step: 2, words: Array(12).fill("") } }),
+  useRoute: () => ({ params: mockRouteParams }),
+}))
+
+const mockReportError = jest.fn()
+jest.mock("@app/utils/error-logging", () => ({
+  ...jest.requireActual("@app/utils/error-logging"),
+  reportError: (...args: readonly unknown[]) => mockReportError(...args),
 }))
 
 type MnemonicWordInputProps = {
@@ -80,7 +87,71 @@ const renderScreen = () =>
 describe("RestorePhraseScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockRouteParams = { step: 2, words: Array(12).fill("") }
     mockUseRestorePhrase.mockReturnValue(defaultHookReturn)
+  })
+
+  /** Deep links and navigation-state rehydration can deliver missing or malformed params;
+   *  the screen falls back to step 1 (where a restore starts) instead of throwing into the
+   *  app-wide ErrorBoundary, which replaces the whole navigation tree (#4070). */
+  describe("route param guards", () => {
+    it("falls back to step 1 when the route delivers no params", async () => {
+      mockRouteParams = undefined
+
+      const { getByText } = renderScreen()
+      await flushEffects()
+
+      expect(getByText(LL.RestoreScreen.phraseSubtitleStep1())).toBeTruthy()
+      expect(mockUseRestorePhrase).toHaveBeenCalledWith({
+        step: 1,
+        initialWords: undefined,
+      })
+    })
+
+    it("falls back to step 1 when the route delivers an out-of-range step", async () => {
+      mockRouteParams = { step: 5 }
+
+      const { getByText } = renderScreen()
+      await flushEffects()
+
+      expect(getByText(LL.RestoreScreen.phraseSubtitleStep1())).toBeTruthy()
+    })
+
+    it("drops malformed words instead of seeding the inputs with them", async () => {
+      mockRouteParams = { step: 2, words: "not-an-array" }
+
+      renderScreen()
+      await flushEffects()
+
+      expect(mockUseRestorePhrase).toHaveBeenCalledWith({
+        step: 2,
+        initialWords: undefined,
+      })
+    })
+
+    it("reports the malformed params once", async () => {
+      mockRouteParams = undefined
+
+      renderScreen()
+      await flushEffects()
+
+      expect(mockReportError).toHaveBeenCalledTimes(1)
+      expect(mockReportError).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.any(Error),
+        expect.objectContaining({
+          dedupKey: "restore-phrase-params-missing",
+          alwaysRecord: true,
+        }),
+      )
+    })
+
+    it("does not report valid params", async () => {
+      renderScreen()
+      await flushEffects()
+
+      expect(mockReportError).not.toHaveBeenCalled()
+    })
   })
 
   it("renders the inline invalidMnemonic message when step 2 is fully filled but invalid", async () => {
