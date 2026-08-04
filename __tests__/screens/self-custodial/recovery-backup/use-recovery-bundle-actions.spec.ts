@@ -455,6 +455,11 @@ describe("useRecoveryBundleActions", () => {
       const synced = { ...savedState, cloudSyncedAt: 1_700_000_444_000 }
       mockReadRecoveryBundleState.mockResolvedValue(synced)
       const { result } = renderHook(() => useRecoveryBundleActions())
+      // The immediate sync only runs with a loaded bundle state, as on the
+      // screen (reloadState fires on focus before the switch is reachable).
+      await act(async () => {
+        await result.current.reloadState()
+      })
 
       await act(async () => {
         await result.current.handleSetCloudSync(true)
@@ -475,6 +480,47 @@ describe("useRecoveryBundleActions", () => {
           type: "success",
         }),
       )
+    })
+
+    it("handleSetCloudSync(true) falls back to an interactive session when silent sync cannot run", async () => {
+      mockSyncExistingBundleToCloud.mockResolvedValue(false)
+      const synced = { ...savedState, cloudSyncedAt: 1_700_000_555_000 }
+      mockMarkCloudSynced.mockResolvedValue(synced)
+      const { result } = renderHook(() => useRecoveryBundleActions())
+      await act(async () => {
+        await result.current.reloadState()
+      })
+
+      await act(async () => {
+        await result.current.handleSetCloudSync(true)
+      })
+
+      // Same production filename derivation as handleCloudUpload: from the
+      // saved bundle's metadata (MAINNET), not the active network (regtest).
+      expect(mockStartSession).toHaveBeenCalledWith(
+        "blink-spark-recovery-bundle-mainnet-pubkey.json",
+      )
+      expect(mockUpload).toHaveBeenCalled()
+      expect(result.current.bundleState).toEqual(synced)
+    })
+
+    it("handleSetCloudSync(true) with no saved bundle persists the opt-in without any upload attempt", async () => {
+      mockReadRecoveryBundleState.mockResolvedValue(null)
+      const { result } = renderHook(() => useRecoveryBundleActions())
+      await act(async () => {
+        await result.current.reloadState()
+      })
+
+      await act(async () => {
+        await result.current.handleSetCloudSync(true)
+      })
+
+      expect(mockWriteRecoveryBundleSettings).toHaveBeenCalledWith(ACCOUNT_ID, {
+        autoRefresh: true,
+        cloudSync: true,
+      })
+      expect(mockSyncExistingBundleToCloud).not.toHaveBeenCalled()
+      expect(mockStartSession).not.toHaveBeenCalled()
     })
 
     it("handleSetCloudSync(false) persists the opt-out without syncing", async () => {
