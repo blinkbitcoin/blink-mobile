@@ -41,6 +41,10 @@ const matchesContact = (tx: NormalizedTransaction, identifier: string): boolean 
  * empty page would stall an infinite scroll, because the list would not grow and so would
  * never ask for more. This keeps pulling raw pages until it fills a page, exhausts the
  * history or reaches its page budget, and reports the offset it stopped at.
+ *
+ * `TRANSACTIONS_PER_PAGE` is a floor, not a cap: the raw page that crosses it contributes
+ * all of its matches, so a page can come back with close to twice that many. Callers
+ * append and dedupe by id, so the overshoot only means the reader gets more at once.
  */
 export const fetchContactPaymentsPage = async (
   sdk: BreezSdkInterface,
