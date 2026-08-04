@@ -5,6 +5,7 @@ import {
   encodeChallenge,
   encodeGetChallengeRequest,
   encodeQueryNodesRequest,
+  encodeVerifyChallengeRequest,
   SparkProtoNetwork,
 } from "@app/self-custodial/recovery-bundle/protocol/messages"
 import {
@@ -45,6 +46,27 @@ describe("spark auth messages", () => {
     expect(Buffer.from(encodeChallenge(decoded.challenge))).toEqual(
       Buffer.from(challengeBytes),
     )
+  })
+
+  it("encodes verify_challenge request with challenge, signature and key in fields 1-3", () => {
+    // Field numbers mirror spark_authn.proto; nothing else in the suite pins
+    // them, so a swapped field would otherwise only fail against the real
+    // coordinator.
+    const protectedChallengeRaw = Uint8Array.from(Buffer.alloc(16, 0x0a))
+    const signatureDer = Uint8Array.from(Buffer.alloc(70, 0x0b))
+    const publicKey = Uint8Array.from(Buffer.alloc(33, 0x02))
+
+    const fields = decodeFields(
+      encodeVerifyChallengeRequest({ protectedChallengeRaw, signatureDer, publicKey }),
+    )
+
+    expect(Buffer.from(lastField(fields, 1)?.bytes ?? [])).toEqual(
+      Buffer.from(protectedChallengeRaw),
+    )
+    expect(Buffer.from(lastField(fields, 2)?.bytes ?? [])).toEqual(
+      Buffer.from(signatureDer),
+    )
+    expect(Buffer.from(lastField(fields, 3)?.bytes ?? [])).toEqual(Buffer.from(publicKey))
   })
 
   it("decodes verify_challenge response", () => {
