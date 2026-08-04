@@ -216,12 +216,18 @@ jest.mock("@app/components/migration-reminder-bulletin", () => {
 })
 
 const mockUseNonCustodialConversionLimits = jest.fn()
+// eslint-disable-next-line prefer-const
+let mockPendingDepositsOverride: { deposits: unknown[] } | null = null
 
-jest.mock("@app/self-custodial/hooks", () => ({
-  ...jest.requireActual("@app/self-custodial/hooks"),
-  useNonCustodialConversionLimits: (direction: string | undefined) =>
-    mockUseNonCustodialConversionLimits(direction),
-}))
+jest.mock("@app/self-custodial/hooks", () => {
+  const actual = jest.requireActual("@app/self-custodial/hooks")
+  return {
+    ...actual,
+    useNonCustodialConversionLimits: (direction: string | undefined) =>
+      mockUseNonCustodialConversionLimits(direction),
+    usePendingDeposits: () => mockPendingDepositsOverride ?? actual.usePendingDeposits(),
+  }
+})
 
 jest.mock("@app/components/dollar-balance-restriction-modal", () => {
   const ReactActual = jest.requireActual("react")
@@ -1906,6 +1912,67 @@ describe("HomeScreen pending receive badge", () => {
     await flushEffects()
 
     expect(queryByTestId("balance-status-badge")).toBeNull()
+  })
+
+  describe("self-custodial", () => {
+    const selfCustodialWallet = {
+      wallets: [
+        {
+          id: "btc-1",
+          walletCurrency: "BTC",
+          balance: { amount: 0, currency: "BTC", currencyCode: "BTC" },
+          transactions: [],
+        },
+      ],
+      status: "ready",
+      accountType: "self-custodial",
+      isReady: true,
+      isSelfCustodial: true,
+      needsBackendAuth: false,
+    }
+    const sparkDeposit = (status: string) => ({
+      id: "abc:0",
+      txid: "abc",
+      vout: 0,
+      amount: { amount: 50_000, currency: "BTC", currencyCode: "BTC" },
+      status,
+      errorReason: null,
+    })
+
+    afterEach(() => {
+      mockActiveWalletOverride = null
+      mockPendingDepositsOverride = null
+    })
+
+    it("shows the badge for an immature (unconfirmed) Spark deposit", async () => {
+      mockActiveWalletOverride = selfCustodialWallet
+      mockPendingDepositsOverride = { deposits: [sparkDeposit("immature")] }
+
+      const { findByTestId } = render(
+        <ContextForScreen>
+          <HomeScreen />
+        </ContextForScreen>,
+      )
+
+      expect(await findByTestId("balance-status-badge")).toBeTruthy()
+
+      await flushEffects()
+    })
+
+    it("leaves the badge to the unclaimed-deposit banner for claimable deposits", async () => {
+      mockActiveWalletOverride = selfCustodialWallet
+      mockPendingDepositsOverride = { deposits: [sparkDeposit("claimable")] }
+
+      const { queryByTestId } = render(
+        <ContextForScreen>
+          <HomeScreen />
+        </ContextForScreen>,
+      )
+
+      await flushEffects()
+
+      expect(queryByTestId("balance-status-badge")).toBeNull()
+    })
   })
 })
 

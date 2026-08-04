@@ -128,6 +128,32 @@ describe("usePendingReceiveAmount", () => {
 
       expect(result.current.pendingReceiveAmountText).toBeNull()
     })
+
+    it("ignores negative-amount transactions (defensive: pending receives are positive)", () => {
+      const { result } = renderHook(() =>
+        usePendingReceiveAmount({
+          pendingIncomingTransactions: [
+            pendingReceiveTx({ id: "tx-neg", settlementAmount: -500 }),
+          ],
+        }),
+      )
+
+      expect(result.current.pendingReceiveAmountText).toBeNull()
+    })
+
+    it("returns null when conversion rounds the total to zero", () => {
+      mockConvertMoneyAmount.mockReturnValue(() => ({
+        amount: 0,
+        currency: "DisplayCurrency",
+        currencyCode: "USD",
+      }))
+
+      const { result } = renderHook(() =>
+        usePendingReceiveAmount({ pendingIncomingTransactions: [pendingReceiveTx()] }),
+      )
+
+      expect(result.current.pendingReceiveAmountText).toBeNull()
+    })
   })
 
   describe("self-custodial", () => {
@@ -170,6 +196,21 @@ describe("usePendingReceiveAmount", () => {
     })
 
     it("returns null when there are no deposits", () => {
+      const { result } = renderHook(() => usePendingReceiveAmount({}))
+
+      expect(result.current.pendingReceiveAmountText).toBeNull()
+    })
+
+    it("returns null when the only immature deposit has a zero amount", () => {
+      mockUsePendingDeposits.mockReturnValue({
+        deposits: [
+          deposit({
+            id: "z:0",
+            amount: { amount: 0, currency: WalletCurrency.Btc, currencyCode: "BTC" },
+          }),
+        ],
+      })
+
       const { result } = renderHook(() => usePendingReceiveAmount({}))
 
       expect(result.current.pendingReceiveAmountText).toBeNull()
