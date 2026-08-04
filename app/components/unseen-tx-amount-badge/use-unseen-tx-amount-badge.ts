@@ -18,12 +18,14 @@ import {
 
 type UnseenTxAmountBadgeParams = {
   transactions?: TransactionFragment[] | null
+  isSelfCustodial?: boolean
   hasUnseenUsdTx: boolean
   hasUnseenBtcTx: boolean
 }
 
 export const useUnseenTxAmountBadge = ({
   transactions,
+  isSelfCustodial = false,
   hasUnseenUsdTx,
   hasUnseenBtcTx,
 }: UnseenTxAmountBadgeParams) => {
@@ -52,10 +54,15 @@ export const useUnseenTxAmountBadge = ({
   }, [client])
 
   const latestUnseenTx = useMemo(() => {
-    const baseTransactions =
-      transactions && transactions.length > 0 ? transactions : readCachedTransactions()
+    const hasProvidedTransactions = Boolean(transactions && transactions.length > 0)
+    /** A self-custodial account has no `me` behind the cached home query, so an empty
+     *  list is genuinely empty and must never fall back to custodial transactions. */
+    const canReadCachedTransactions = !hasProvidedTransactions && !isSelfCustodial
+    const baseTransactions = canReadCachedTransactions
+      ? readCachedTransactions()
+      : transactions ?? []
 
-    if (!baseTransactions || baseTransactions.length === 0) return
+    if (baseTransactions.length === 0) return
     if (!hasUnseenBtcTx && !hasUnseenUsdTx) return
 
     const unseenCurrencies: WalletCurrency[] = []
@@ -77,6 +84,7 @@ export const useUnseenTxAmountBadge = ({
     )
   }, [
     transactions,
+    isSelfCustodial,
     hasUnseenBtcTx,
     hasUnseenUsdTx,
     feeReimbursementMemo,
