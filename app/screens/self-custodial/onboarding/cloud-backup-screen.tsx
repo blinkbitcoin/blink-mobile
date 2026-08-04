@@ -77,20 +77,6 @@ export const CloudBackupScreen: React.FC = () => {
 
           <View style={styles.formContainer}>
             <CheckboxRow
-              label={LL.BackupScreen.CloudBackup.autoBundleCheckbox()}
-              isChecked={autoBundleSync}
-              onPress={toggleAutoBundleSync}
-              disabled={!canSyncBundle}
-              centered
-              {...testProps("auto-bundle-checkbox")}
-            />
-            <Text style={styles.hint}>
-              {canSyncBundle
-                ? LL.BackupScreen.CloudBackup.autoBundleHint()
-                : LL.BackupScreen.CloudBackup.autoBundleNeedsPassword()}
-            </Text>
-
-            <CheckboxRow
               label={LL.BackupScreen.CloudBackup.encryptCheckbox()}
               isChecked={isEncrypted}
               onPress={toggleEncryption}
@@ -132,6 +118,20 @@ export const CloudBackupScreen: React.FC = () => {
                 </InfoBanner>
               </View>
             )}
+
+            <CheckboxRow
+              label={LL.BackupScreen.CloudBackup.autoBundleCheckbox()}
+              isChecked={autoBundleSync}
+              onPress={toggleAutoBundleSync}
+              disabled={!canSyncBundle}
+              centered
+              {...testProps("auto-bundle-checkbox")}
+            />
+            <Text style={styles.hint}>
+              {canSyncBundle
+                ? LL.BackupScreen.CloudBackup.autoBundleHint()
+                : LL.BackupScreen.CloudBackup.autoBundleNeedsPassword()}
+            </Text>
           </View>
         </View>
 
