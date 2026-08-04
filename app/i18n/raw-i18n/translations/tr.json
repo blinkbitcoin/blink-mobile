@@ -2110,6 +2110,7 @@
     "error": "Hay aksi. Konum bilgini alırken bir şeyler yanlış gitti."
   },
   "HomeScreen": {
+    "pendingReceiveBadge": "+{amount: string} beklemede",
     "receive": "Al",
     "send": "Gönder",
     "title": "Ev",

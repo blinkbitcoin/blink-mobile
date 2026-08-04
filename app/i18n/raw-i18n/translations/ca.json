@@ -2110,6 +2110,7 @@
     "error": "Oops. Alguna cosa ha anat malament mentre s'obtenia la teva ubicació."
   },
   "HomeScreen": {
+    "pendingReceiveBadge": "+{amount: string} pendent",
     "receive": "Rebre",
     "send": "Enviar",
     "title": "Inici",

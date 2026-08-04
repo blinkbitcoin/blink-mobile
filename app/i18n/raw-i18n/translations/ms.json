@@ -2110,6 +2110,7 @@
     "error": "Alamak. Sesuatu tidak kena semasa mendapatkan lokasi anda"
   },
   "HomeScreen": {
+    "pendingReceiveBadge": "+{amount: string} tergendala",
     "receive": "Terima",
     "send": "Hantar",
     "title": "Rumah",

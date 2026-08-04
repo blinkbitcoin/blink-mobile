@@ -2110,6 +2110,7 @@
     "error": "Uyuyuy. Imapas mana allinchu kasqa maypi kasqaykita maskhashaspa"
   },
   "HomeScreen": {
+    "pendingReceiveBadge": "+{amount: string} Kanqaqmi",
     "receive": "Allinmi",
     "send": "Kawsaynin",
     "title": "Ayllu",

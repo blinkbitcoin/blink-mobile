@@ -2110,6 +2110,7 @@
     "error": "เกิดข้อผิดพลาดขณะรับตำแหน่งของคุณ"
   },
   "HomeScreen": {
+    "pendingReceiveBadge": "+{amount: string} อยู่ระหว่างดำเนินการ",
     "receive": "รับเงิน",
     "send": "ส่ง",
     "title": "หน้าหลัก",

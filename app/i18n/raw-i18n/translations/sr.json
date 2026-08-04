@@ -2110,6 +2110,7 @@
     "error": "Упс. Нешто је пошло наопако приликом добијања ваше локације"
   },
   "HomeScreen": {
+    "pendingReceiveBadge": "+{amount: string} на чекању",
     "receive": "Прими",
     "send": "Пошаљи",
     "title": "Почетна",

@@ -2110,6 +2110,7 @@
     "error": "Ups. Terjadi kesalahan saat mendapatkan lokasi Anda."
   },
   "HomeScreen": {
+    "pendingReceiveBadge": "+{amount: string} tertunda",
     "receive": "Terima",
     "send": "Kirim",
     "title": "Beranda",

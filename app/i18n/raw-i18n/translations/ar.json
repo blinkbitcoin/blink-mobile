@@ -2110,6 +2110,7 @@
     "error": "عفوًا. حدث خطأ أثناء الحصول على موقعك"
   },
   "HomeScreen": {
+    "pendingReceiveBadge": "+{amount: string} يتم الارسال",
     "receive": "استقبال",
     "send": "إرسال",
     "title": "الرئيسية",

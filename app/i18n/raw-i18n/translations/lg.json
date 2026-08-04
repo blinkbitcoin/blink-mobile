@@ -2110,6 +2110,7 @@
     "error": "Oops. Waliwo ekyatambude bulungi kukufuna ekifo kyo"
   },
   "HomeScreen": {
+    "pendingReceiveBadge": "+{amount: string} tekinagwa",
     "receive": "Funa",
     "send": "Sindika",
     "title": "Ewaka",

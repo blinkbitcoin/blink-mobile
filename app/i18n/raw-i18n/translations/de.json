@@ -2110,6 +2110,7 @@
         "error": "Ups. Bei der Ermittlung Ihres Standorts ist etwas schief gelaufen"
     },
     "HomeScreen": {
+        "pendingReceiveBadge": "+{amount: string} Ausstehend",
         "receive": "Erhalten",
         "send": "Senden",
         "title": "Home",

@@ -2110,6 +2110,7 @@
     "error": "Rất tiếc. Đã xảy ra lỗi khi lấy vị trí của bạn"
   },
   "HomeScreen": {
+    "pendingReceiveBadge": "+{amount: string} Đang xử lí",
     "receive": "Nhận",
     "send": "Gửi",
     "title": "Nhà",

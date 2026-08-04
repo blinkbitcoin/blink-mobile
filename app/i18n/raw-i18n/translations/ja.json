@@ -2110,6 +2110,7 @@
         "error": "位置情報の取得中にエラーが発生しました"
     },
     "HomeScreen": {
+        "pendingReceiveBadge": "+{amount: string} 保留",
         "receive": "受金",
         "send": "送金",
         "title": "ホーム",

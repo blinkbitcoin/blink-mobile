@@ -2110,6 +2110,7 @@
     "error": "Ups. Nešto je pošlo po zlu prilikom dohvaćanja vaše lokacije"
   },
   "HomeScreen": {
+    "pendingReceiveBadge": "+{amount: string} u tijeku",
     "receive": "Primi",
     "send": "Šalji",
     "title": "Doma",

@@ -2110,6 +2110,7 @@
     "error": "Ups. Při zjišťování vaší polohy se něco pokazilo"
   },
   "HomeScreen": {
+    "pendingReceiveBadge": "+{amount: string} čekající",
     "receive": "Přijmout",
     "send": "Odeslat",
     "title": "Domů",

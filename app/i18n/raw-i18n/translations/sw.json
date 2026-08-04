@@ -2110,6 +2110,7 @@
     "error": "Lo! Hitilafu fulani imetokea wakati wa kupata eneo lako"
   },
   "HomeScreen": {
+    "pendingReceiveBadge": "+{amount: string} inasubiri",
     "receive": "Pokea",
     "send": "Tuma",
     "title": "Nyumbani",
