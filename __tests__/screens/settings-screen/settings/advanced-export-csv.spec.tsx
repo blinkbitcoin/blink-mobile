@@ -128,6 +128,21 @@ describe("ExportCsvSetting", () => {
     expect(lastRowProps().loading).toBe(true)
   })
 
+  it("reports the error and toasts when the custodial export fails", async () => {
+    mockUseAccountRegistry.mockReturnValue({
+      activeAccount: { id: "c-1", type: AccountType.Custodial },
+    })
+    mockCustodialExportCsv.mockRejectedValue(new Error("boom"))
+
+    render(<ExportCsvSetting />)
+    await pressRow()
+
+    expect(mockReportError).toHaveBeenCalledWith("export-csv", expect.any(Error))
+    expect(mockToastShow).toHaveBeenCalledWith(
+      expect.objectContaining({ message: "Export failed" }),
+    )
+  })
+
   it("reports the error and toasts when the self-custodial export fails", async () => {
     mockUseAccountRegistry.mockReturnValue({
       activeAccount: { id: "sc-1", type: AccountType.SelfCustodial },

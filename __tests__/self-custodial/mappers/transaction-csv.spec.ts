@@ -412,6 +412,42 @@ describe("buildTransactionsCsv", () => {
     expect(rows(csv)[1].split(",")[3]).toBe("9007199254740993")
   })
 
+  it("types detail-less payments from the payment method", () => {
+    const bareWith = (method: number, paymentType: number, id: string) =>
+      ({
+        ...basePayment,
+        id,
+        paymentType,
+        method,
+        amount: 1000n,
+        fees: 0n,
+        details: undefined,
+      }) as never as Payment
+
+    const barePayments = [
+      bareWith(PaymentMethod.Deposit, PaymentType.Receive, "bare-dep"),
+      bareWith(PaymentMethod.Withdraw, PaymentType.Send, "bare-wd"),
+      bareWith(PaymentMethod.Spark, PaymentType.Send, "bare-spark"),
+      bareWith(PaymentMethod.Token, PaymentType.Send, "bare-token"),
+      bareWith(PaymentMethod.Unknown, PaymentType.Send, "bare-send"),
+    ]
+
+    const csv = buildTransactionsCsv(barePayments, { identityPubkey: IDENTITY_PUBKEY })
+
+    expect(rows(csv)[1].split(",")[2]).toBe("onchain_receipt")
+    expect(rows(csv)[2].split(",")[2]).toBe("onchain_payment")
+    expect(rows(csv)[3].split(",")[2]).toBe("spark_transfer")
+    expect(rows(csv)[4].split(",")[2]).toBe("spark_transfer")
+    expect(rows(csv)[5].split(",")[2]).toBe("payment")
+
+    const compat = buildTransactionsCsv(barePayments, {
+      identityPubkey: IDENTITY_PUBKEY,
+      vocabulary: CsvTypeVocabulary.CustodialCompat,
+    })
+
+    expect(rows(compat)[3].split(",")[2]).toBe("on_us")
+  })
+
   it("falls back to lightning typing by direction when details are missing", () => {
     const bare = {
       ...basePayment,
