@@ -189,6 +189,12 @@ const advanceTime = (ms: number) => {
   })
 }
 
+/** Moves the clock the hook reads without firing the success-icon timer, so a trip can be
+ *  taken from the icon phase rather than the receipt. */
+const travelWithoutTimers = (ms: number) => {
+  jest.setSystemTime(Date.now() + ms)
+}
+
 const renderSuccess = () => {
   render(
     <ContextForScreen>
@@ -763,6 +769,36 @@ describe("SendBitcoinCompletedScreen", () => {
       expect(mockPopToTop).not.toHaveBeenCalled()
     })
 
+    it("dismisses on a stale trip that follows a quick one", () => {
+      /** The quick return clears the recorded departure, and a departure it failed to clear
+       *  would measure the second trip from the first one and dismiss for the wrong reason. */
+      renderSuccess()
+
+      triggerAppStateChange("background")
+      advanceTime(QUICK_TRIP_MS)
+      triggerAppStateChange("active")
+      expect(mockPopToTop).not.toHaveBeenCalled()
+
+      triggerAppStateChange("background")
+      advanceTime(STALE_TRIP_MS)
+      triggerAppStateChange("active")
+
+      expect(mockPopToTop).toHaveBeenCalledTimes(1)
+    })
+
+    it("dismisses on a stale return taken during the success icon phase", () => {
+      /** The hook is live behind the icon too, so a trip taken before the receipt is drawn
+       *  has to land on Home rather than finish the animation onto a stale receipt. */
+      renderSuccess()
+
+      triggerAppStateChange("background")
+      travelWithoutTimers(STALE_TRIP_MS)
+      triggerAppStateChange("active")
+
+      expect(screen.getByTestId("Success Text")).toBeTruthy()
+      expect(mockPopToTop).toHaveBeenCalledTimes(1)
+    })
+
     it("does not dismiss while the app stays in the foreground", () => {
       renderSuccess()
 
@@ -833,6 +869,20 @@ describe("SendBitcoinCompletedScreen", () => {
       triggerAppStateChange("active")
 
       expect(mockPopToTop).not.toHaveBeenCalled()
+    })
+
+    it("pops from inside the app state event, before the resume lock can cover it", () => {
+      /** Ordering contract with AppStateWrapper: its relock awaits the keystore, so this
+       *  listener runs first and still finds the receipt focused. Were the pop deferred to
+       *  a later tick, the unlock screen would already be over it and the dismissal would
+       *  be held back to a focus that only arrives once the user has unlocked. */
+      renderSuccess()
+
+      triggerAppStateChange("background")
+      advanceTime(STALE_TRIP_MS)
+      mockAppStateListeners[0]("active")
+
+      expect(mockPopToTop).toHaveBeenCalledTimes(1)
     })
 
     it("removes its listeners on unmount", () => {
