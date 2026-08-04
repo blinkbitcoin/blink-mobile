@@ -66,7 +66,7 @@ export const listAllPayments = async (
   pageSize: number = EXPORT_PAGE_SIZE,
 ): Promise<Payment[]> => {
   const byId = new Map<string, Payment>()
-  for (let page = 0; page < EXPORT_MAX_PAGES; page++) {
+  for (let page = 0; page < EXPORT_MAX_PAGES; page += 1) {
     const { payments } = await listPayments(sdk, page * pageSize, pageSize)
     for (const payment of payments) byId.set(payment.id, payment)
     if (payments.length < pageSize) return [...byId.values()]

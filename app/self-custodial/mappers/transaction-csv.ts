@@ -60,8 +60,7 @@ export const CsvTypeVocabulary = {
   Descriptive: "descriptive",
   CustodialCompat: "custodial-compat",
 } as const
-export type CsvTypeVocabulary =
-  (typeof CsvTypeVocabulary)[keyof typeof CsvTypeVocabulary]
+export type CsvTypeVocabulary = (typeof CsvTypeVocabulary)[keyof typeof CsvTypeVocabulary]
 
 export const DEFAULT_CSV_TYPE_VOCABULARY: CsvTypeVocabulary =
   CsvTypeVocabulary.Descriptive
