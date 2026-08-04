@@ -27,7 +27,7 @@ jest.mock("@app/hooks/use-active-wallet", () => ({
   useActiveWallet: () => mockUseActiveWallet(),
 }))
 
-import { useTransferBlocked } from "@app/hooks/use-transfer-blocked"
+import { useTransferBlock, useTransferBlocked } from "@app/hooks/use-transfer-blocked"
 
 const setup = (): void => {
   jest.clearAllMocks()
@@ -78,5 +78,27 @@ describe("useTransferBlocked", () => {
   it("returns false without a resolved country", () => {
     mockUseDeviceLocation.mockReturnValue({ countryCode: undefined })
     expect(read()).toBe(false)
+  })
+
+  describe("while the region is still resolving", () => {
+    const readBlock = () => renderHook(() => useTransferBlock()).result.current
+
+    it("reports the region as pending without claiming a block", () => {
+      mockUseDeviceLocation.mockReturnValue({ countryCode: undefined, loading: true })
+
+      expect(readBlock()).toEqual({ isBlocked: false, isRegionPending: true })
+    })
+
+    it("blocks once the region resolves to a blocked country", () => {
+      mockUseDeviceLocation.mockReturnValue({ countryCode: "FR", loading: false })
+
+      expect(readBlock()).toEqual({ isBlocked: true, isRegionPending: false })
+    })
+
+    it("settles unblocked once the region resolves to an allowed country", () => {
+      mockUseDeviceLocation.mockReturnValue({ countryCode: "AR", loading: false })
+
+      expect(readBlock()).toEqual({ isBlocked: false, isRegionPending: false })
+    })
   })
 })

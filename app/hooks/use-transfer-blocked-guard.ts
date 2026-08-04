@@ -2,7 +2,7 @@ import { useEffect } from "react"
 
 import { CommonActions, useNavigation } from "@react-navigation/native"
 
-import { useTransferBlocked } from "./use-transfer-blocked"
+import { useTransferBlock } from "./use-transfer-blocked"
 
 type UseTransferBlockedGuardOptions = {
   /** Turns the guard off for a caller that must let a blocked-transfer user through (the
@@ -13,15 +13,18 @@ type UseTransferBlockedGuardOptions = {
 export const useTransferBlockedGuard = ({
   enabled = true,
 }: UseTransferBlockedGuardOptions = {}): boolean => {
-  const isTransferBlocked = useTransferBlocked()
+  const { isBlocked, isRegionPending } = useTransferBlock()
   const navigation = useNavigation()
 
-  const shouldBlock = enabled && isTransferBlocked
+  const shouldLeaveScreen = enabled && isBlocked
 
   useEffect(() => {
-    if (!shouldBlock) return
+    if (!shouldLeaveScreen) return
     navigation.dispatch(CommonActions.reset({ index: 0, routes: [{ name: "Primary" }] }))
-  }, [shouldBlock, navigation])
+  }, [shouldLeaveScreen, navigation])
 
-  return shouldBlock
+  /** The screen also hides while the region resolves, so a user who lands here on a cold
+   *  start cannot act on it before the verdict arrives; only a resolved block bounces
+   *  them out. */
+  return enabled && (isBlocked || isRegionPending)
 }

@@ -29,7 +29,10 @@ jest.mock("@app/hooks/use-active-wallet", () => ({
   useActiveWallet: () => mockUseActiveWallet(),
 }))
 
-import { useDollarBalanceRestricted } from "@app/hooks/use-dollar-balance-restricted"
+import {
+  useDollarBalanceRestricted,
+  useDollarBalanceRestriction,
+} from "@app/hooks/use-dollar-balance-restricted"
 
 const remoteConfig = {
   custodialDollarBalanceBlockedCountries: ["HK"],
@@ -45,6 +48,9 @@ const setup = (accountType: AccountType): void => {
 }
 
 const read = () => renderHook(() => useDollarBalanceRestricted()).result.current
+
+const readRestriction = (accountTypeOverride?: AccountType) =>
+  renderHook(() => useDollarBalanceRestriction(accountTypeOverride)).result.current
 
 describe("useDollarBalanceRestricted", () => {
   describe("custodial", () => {
@@ -125,6 +131,44 @@ describe("useDollarBalanceRestricted", () => {
       read()
       expect(mockUseIpCountryCode).not.toHaveBeenCalledWith(true)
       expect(mockUseIpCountryCode).toHaveBeenCalledWith(false)
+    })
+  })
+
+  describe("while the region is still resolving", () => {
+    beforeEach(() => setup(AccountType.Custodial))
+
+    it("reports the region as pending without claiming a restriction", () => {
+      mockUseDeviceLocation.mockReturnValue({ countryCode: undefined, loading: true })
+
+      expect(readRestriction()).toEqual({ isRestricted: false, isRegionPending: true })
+    })
+
+    it("restricts once the region resolves to a blocked country", () => {
+      mockUseDeviceLocation.mockReturnValue({ countryCode: "HK", loading: false })
+
+      expect(readRestriction()).toEqual({ isRestricted: true, isRegionPending: false })
+    })
+
+    it("settles unrestricted once the region resolves to an allowed country", () => {
+      mockUseDeviceLocation.mockReturnValue({ countryCode: "US", loading: false })
+
+      expect(readRestriction()).toEqual({ isRestricted: false, isRegionPending: false })
+    })
+
+    it("settles on a finished lookup that produced no country", () => {
+      mockUseDeviceLocation.mockReturnValue({ countryCode: undefined, loading: false })
+
+      expect(readRestriction()).toEqual({ isRestricted: false, isRegionPending: false })
+    })
+
+    it("settles the self-custodial prediction on the IP even while the device keeps loading", () => {
+      mockUseDeviceLocation.mockReturnValue({ countryCode: undefined, loading: true })
+      mockUseIpCountryCode.mockReturnValue("FR")
+
+      expect(readRestriction(AccountType.SelfCustodial)).toEqual({
+        isRestricted: true,
+        isRegionPending: false,
+      })
     })
   })
 })

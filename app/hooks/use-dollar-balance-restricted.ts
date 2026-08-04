@@ -30,32 +30,54 @@ const useDollarBalanceBlockedCountries = (
     : custodialDollarBalanceBlockedCountries
 }
 
+type RestrictionRegion = {
+  countryCode: CountryCode | undefined
+  isPending: boolean
+}
+
 /**
  * The country whose block-list decides the restriction. A self-custodial account has no
  * phone, so evaluating its policy resolves by IP; every other case reads the device's own
  * country. The IP wins whenever it resolves, but while predicting the self-custodial policy
  * from a still-custodial session an unreachable IP falls back to the session country, so a
  * failed IP lookup does not read as unrestricted and preview a dollar balance the account
- * cannot hold.
+ * cannot hold. A country that already resolved settles the region even while the device
+ * location keeps loading, since the prediction's IP lookup can land first.
  */
-const useRestrictionRegion = (
-  accountTypeOverride?: AccountType,
-): CountryCode | undefined => {
-  const { countryCode: deviceCountryCode } = useDeviceLocation()
+const useRestrictionRegion = (accountTypeOverride?: AccountType): RestrictionRegion => {
+  const { countryCode: deviceCountryCode, loading: isDeviceLocationLoading } =
+    useDeviceLocation()
 
   const isSelfCustodialPrediction = accountTypeOverride === AccountType.SelfCustodial
   const ipCountryCode = useIpCountryCode(isSelfCustodialPrediction)
 
-  return isSelfCustodialPrediction
+  const countryCode = isSelfCustodialPrediction
     ? ipCountryCode ?? deviceCountryCode
     : deviceCountryCode
+
+  return { countryCode, isPending: isDeviceLocationLoading && !countryCode }
 }
 
-export const useDollarBalanceRestricted = (
+/** `isRestricted` needs a resolved country, so it never accuses an unrestricted user.
+ *  Gated surfaces hold on `isRegionPending` instead of reading the unresolved region as
+ *  unrestricted, which is what the removed latch used to cover at launch. */
+type DollarBalanceRestriction = {
+  isRestricted: boolean
+  isRegionPending: boolean
+}
+
+export const useDollarBalanceRestriction = (
   accountTypeOverride?: AccountType,
-): boolean => {
+): DollarBalanceRestriction => {
   const blockedCountries = useDollarBalanceBlockedCountries(accountTypeOverride)
-  const regionCountryCode = useRestrictionRegion(accountTypeOverride)
+  const { countryCode, isPending: isRegionPending } =
+    useRestrictionRegion(accountTypeOverride)
 
-  return isBlockedCountry(regionCountryCode, blockedCountries)
+  return {
+    isRestricted: isBlockedCountry(countryCode, blockedCountries),
+    isRegionPending,
+  }
 }
+
+export const useDollarBalanceRestricted = (accountTypeOverride?: AccountType): boolean =>
+  useDollarBalanceRestriction(accountTypeOverride).isRestricted

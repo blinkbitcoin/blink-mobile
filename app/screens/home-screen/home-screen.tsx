@@ -45,7 +45,7 @@ import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useDefaultAccountModalShown } from "@app/hooks/use-default-account-modal-shown"
-import { useDollarBalanceRestricted } from "@app/hooks/use-dollar-balance-restricted"
+import { useDollarBalanceRestriction } from "@app/hooks/use-dollar-balance-restricted"
 import { useDollarBalanceForcedConversion } from "@app/hooks/use-dollar-balance-forced-conversion"
 import { MigrateNowModal } from "@app/components/migrate-now-modal"
 import { MigrationReminderBulletin } from "@app/components/migration-reminder-bulletin"
@@ -399,7 +399,8 @@ export const HomeScreen: React.FC = () => {
   const [isStablesatModalVisible, setIsStablesatModalVisible] = React.useState(false)
   const [isUpgradeModalVisible, setIsUpgradeModalVisible] = React.useState(false)
   const [isRestrictionModalVisible, setIsRestrictionModalVisible] = React.useState(false)
-  const isDollarBalanceRestricted = useDollarBalanceRestricted()
+  const { isRestricted: isDollarBalanceRestricted, isRegionPending } =
+    useDollarBalanceRestriction()
 
   const isTransferBlocked = useTransferBlocked()
 
@@ -637,13 +638,21 @@ export const HomeScreen: React.FC = () => {
   const shouldShowTransferButton =
     passesIosGate && (!isTransferBlocked || isDollarBalanceRestricted)
 
+  /** Disabled while the region resolves so a fast tap cannot reach the gated flow before
+   *  the verdict lands; the explanation waits, since it would be wrong for a user who
+   *  turns out to be unrestricted. */
+  const isTransferDisabled = isDollarBalanceRestricted || isRegionPending
+  const onTransferDisabledPress = isRegionPending
+    ? undefined
+    : () => setIsRestrictionModalVisible(true)
+
   if (shouldShowTransferButton) {
     buttons.unshift({
       title: LL.ConversionDetailsScreen.transfer(),
       target: "conversionDetails",
       icon: "transfer",
-      disabled: isDollarBalanceRestricted,
-      onDisabledPress: () => setIsRestrictionModalVisible(true),
+      disabled: isTransferDisabled,
+      onDisabledPress: onTransferDisabledPress,
     })
   }
 
