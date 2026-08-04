@@ -319,6 +319,11 @@ const SendBitcoinCompletedScreen: React.FC<Props> = ({ route }) => {
 
   const handleNavigateHome = useCallback(() => navigation.popToTop(), [navigation])
 
+  /** Carries a stale return that arrived while the receipt was covered, until the focus
+   *  listener below can spend it. Dropping it instead would strand the receipt for the rest
+   *  of the session, which is the very thing this screen dismisses itself to avoid. */
+  const isDismissalDeferred = useRef(false)
+
   /** A covered receipt must not steal navigation: on a second background trip taken from
    *  the app-lock screen, popping would tear the lock off the stack and expose Home while
    *  the app is still locked. The first trip is never covered, because AppStateWrapper
@@ -327,12 +332,26 @@ const SendBitcoinCompletedScreen: React.FC<Props> = ({ route }) => {
    *  runs, the receipt would survive underneath and the isResume goBack would land the user
    *  right back on it. */
   const handleStaleReturn = useCallback(() => {
-    if (navigation.isFocused()) {
-      handleNavigateHome()
+    if (!navigation.isFocused()) {
+      isDismissalDeferred.current = true
+      return
     }
+    handleNavigateHome()
   }, [navigation, handleNavigateHome])
 
   useOnStaleBackgroundReturn(handleStaleReturn)
+
+  /** Whatever covered the receipt is gone and the stale one is on screen again, so the
+   *  dismissal held back above is safe to run now. */
+  useEffect(
+    () =>
+      navigation.addListener("focus", () => {
+        if (!isDismissalDeferred.current) return
+        isDismissalDeferred.current = false
+        handleNavigateHome()
+      }),
+    [navigation, handleNavigateHome],
+  )
 
   if (showSuccessIcon) {
     return (

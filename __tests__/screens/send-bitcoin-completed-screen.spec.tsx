@@ -47,10 +47,23 @@ jest.mock("react-native-view-shot", () => {
 const mockNavigate = jest.fn()
 const mockPopToTop = jest.fn()
 const mockIsFocused = jest.fn(() => true)
+const mockFocusListeners: Array<() => void> = []
 const mockNavigation = {
   navigate: mockNavigate,
   popToTop: mockPopToTop,
   isFocused: mockIsFocused,
+  addListener: (event: string, handler: () => void) => {
+    if (event !== "focus") {
+      throw new Error(`Trying to subscribe to unknown navigation event: ${event}`)
+    }
+    mockFocusListeners.push(handler)
+    return () => {
+      const index = mockFocusListeners.indexOf(handler)
+      if (index !== -1) {
+        mockFocusListeners.splice(index, 1)
+      }
+    }
+  },
 }
 jest.mock("@react-navigation/native", () => {
   const actual = jest.requireActual("@react-navigation/native")
@@ -160,6 +173,13 @@ const triggerAppStateChange = (nextState: AppStateStatus) => {
   expect(mockAppStateListeners).toHaveLength(1)
   act(() => {
     mockAppStateListeners[0](nextState)
+  })
+}
+
+const triggerFocus = () => {
+  expect(mockFocusListeners).toHaveLength(1)
+  act(() => {
+    mockFocusListeners[0]()
   })
 }
 
@@ -706,6 +726,7 @@ describe("SendBitcoinCompletedScreen", () => {
     beforeEach(() => {
       mockAppStateCurrentState = "active"
       mockAppStateListeners.length = 0
+      mockFocusListeners.length = 0
     })
 
     it("dismisses to home when returning from a stale background trip", () => {
@@ -752,13 +773,52 @@ describe("SendBitcoinCompletedScreen", () => {
       expect(mockPopToTop).not.toHaveBeenCalled()
     })
 
-    it("does not dismiss when the screen is covered by another screen", () => {
+    it("does not dismiss while the screen is covered by another screen", () => {
       renderSuccess()
       mockIsFocused.mockReturnValue(false)
 
       triggerAppStateChange("background")
       advanceTime(STALE_TRIP_MS)
       triggerAppStateChange("active")
+
+      expect(mockPopToTop).not.toHaveBeenCalled()
+    })
+
+    it("dismisses a covered receipt once the screen over it goes away", () => {
+      /** Skipping the dismissal outright would strand the receipt for the rest of the
+       *  session, which is the case this screen exists to avoid. */
+      renderSuccess()
+      mockIsFocused.mockReturnValue(false)
+
+      triggerAppStateChange("background")
+      advanceTime(STALE_TRIP_MS)
+      triggerAppStateChange("active")
+
+      mockIsFocused.mockReturnValue(true)
+      triggerFocus()
+
+      expect(mockPopToTop).toHaveBeenCalledTimes(1)
+    })
+
+    it("spends the held dismissal on the first focus only", () => {
+      renderSuccess()
+      mockIsFocused.mockReturnValue(false)
+
+      triggerAppStateChange("background")
+      advanceTime(STALE_TRIP_MS)
+      triggerAppStateChange("active")
+
+      mockIsFocused.mockReturnValue(true)
+      triggerFocus()
+      triggerFocus()
+
+      expect(mockPopToTop).toHaveBeenCalledTimes(1)
+    })
+
+    it("stays put when the screen regains focus with no stale trip behind it", () => {
+      renderSuccess()
+
+      triggerFocus()
 
       expect(mockPopToTop).not.toHaveBeenCalled()
     })
@@ -775,13 +835,15 @@ describe("SendBitcoinCompletedScreen", () => {
       expect(mockPopToTop).not.toHaveBeenCalled()
     })
 
-    it("removes the app state listener on unmount", () => {
+    it("removes its listeners on unmount", () => {
       renderSuccess()
       expect(mockAppStateListeners).toHaveLength(1)
+      expect(mockFocusListeners).toHaveLength(1)
 
       screen.unmount()
 
       expect(mockAppStateListeners).toHaveLength(0)
+      expect(mockFocusListeners).toHaveLength(0)
     })
   })
 
