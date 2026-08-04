@@ -24,7 +24,6 @@ import { light, dark } from "@app/rne-theme/colors"
 
 const screenshotState = { isTakingScreenshot: false }
 const mockCaptureAndShare = jest.fn()
-const mockNavigate = jest.fn()
 
 jest.mock("@app/hooks", () => ({
   ...jest.requireActual("@app/hooks"),
@@ -32,11 +31,6 @@ jest.mock("@app/hooks", () => ({
     isTakingScreenshot: screenshotState.isTakingScreenshot,
     captureAndShare: mockCaptureAndShare,
   }),
-}))
-
-jest.mock("@react-navigation/native", () => ({
-  ...jest.requireActual("@react-navigation/native"),
-  useNavigation: () => ({ navigate: mockNavigate }),
 }))
 
 jest.mock("react-native-view-shot", () => {
