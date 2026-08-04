@@ -40,3 +40,10 @@ export const paymentEventKey = (event: PaymentEvent): string | null => {
   const id = extractPaymentId(event)
   return id ? `${event.tag}:${id}` : null
 }
+
+/**
+ * Inverse of paymentEventKey for consumers that need the payment id alone.
+ * Splits on the FIRST ":" - tags never contain ":", payment ids may.
+ */
+export const paymentIdFromEventKey = (eventKey: string | null): string | null =>
+  eventKey ? eventKey.slice(eventKey.indexOf(":") + 1) : null
