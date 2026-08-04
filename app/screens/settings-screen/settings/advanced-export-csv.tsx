@@ -9,8 +9,8 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { useExportSelfCustodialTransactionsCsv } from "@app/self-custodial/hooks/use-export-transactions-csv"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { AccountType } from "@app/types/wallet"
+import { reportError } from "@app/utils/error-logging"
 import { toastShow } from "@app/utils/toast"
-import crashlytics from "@react-native-firebase/crashlytics"
 
 import { SettingsRow } from "../row"
 
@@ -36,9 +36,7 @@ const CustodialExportCsvRow: React.FC = () => {
     try {
       await exportCsv(walletIds)
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        crashlytics().recordError(err)
-      }
+      reportError("export-csv", err)
       toastShow({ message: LL.SettingsScreen.csvTransactionsError(), LL })
     }
   }
@@ -68,9 +66,7 @@ const SelfCustodialExportCsvRow: React.FC = () => {
     try {
       await exportCsv()
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        crashlytics().recordError(err)
-      }
+      reportError("self-custodial-export-csv", err)
       toastShow({ message: LL.SettingsScreen.csvTransactionsError(), LL })
     }
   }

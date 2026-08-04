@@ -58,10 +58,9 @@ jest.mock("@app/utils/toast", () => ({
   toastShow: (...args: unknown[]) => mockToastShow(...args),
 }))
 
-const mockRecordError = jest.fn()
-jest.mock("@react-native-firebase/crashlytics", () => ({
-  __esModule: true,
-  default: () => ({ recordError: mockRecordError, log: jest.fn() }),
+const mockReportError = jest.fn()
+jest.mock("@app/utils/error-logging", () => ({
+  reportError: (...args: unknown[]) => mockReportError(...args),
 }))
 
 jest.mock("@app/i18n/i18n-react", () => ({
@@ -138,7 +137,10 @@ describe("ExportCsvSetting", () => {
     render(<ExportCsvSetting />)
     await pressRow()
 
-    expect(mockRecordError).toHaveBeenCalled()
+    expect(mockReportError).toHaveBeenCalledWith(
+      "self-custodial-export-csv",
+      expect.any(Error),
+    )
     expect(mockToastShow).toHaveBeenCalledWith(
       expect.objectContaining({ message: "Export failed" }),
     )
