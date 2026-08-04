@@ -3,7 +3,12 @@ import { fireEvent, render } from "@testing-library/react-native"
 import { ThemeProvider } from "@rn-vui/themed"
 
 import { SecurityScoreCard } from "@app/components/security-score-card"
-import { computeSecurityScore } from "@app/hooks/use-security-score"
+import {
+  computeSecurityScore,
+  deviceSecuritySignals,
+} from "@app/hooks/use-security-score"
+import type { BackupMethod } from "@app/self-custodial/providers/backup-state"
+import { selfCustodialSecuritySignals } from "@app/self-custodial/hooks/use-security-signals"
 import theme from "@app/rne-theme/theme"
 
 const renderWithTheme = (component: React.ReactElement) =>
@@ -35,15 +40,20 @@ jest.mock("@app/i18n/i18n-react", () => ({
   }),
 }))
 
-// Fixtures come from the real scoring function, so done/total/level can never
-// disagree with the signal list the way hand-written literals could.
-const score = (inputs: Partial<Parameters<typeof computeSecurityScore>[0]> = {}) =>
-  computeSecurityScore({
-    completedMethods: [],
-    isAppLockEnabled: false,
-    isHideBalanceEnabled: false,
-    ...inputs,
-  })
+// Fixtures come from the real signal builders + scorer, so done/total/level can
+// never disagree with the signal list the way hand-written literals could.
+const score = ({
+  completedMethods = [] as BackupMethod[],
+  isAppLockEnabled = false,
+  isHideBalanceEnabled = false,
+} = {}) =>
+  computeSecurityScore([
+    ...selfCustodialSecuritySignals(completedMethods),
+    ...deviceSecuritySignals(
+      { isBiometricsEnabled: isAppLockEnabled, isPinEnabled: false },
+      isHideBalanceEnabled,
+    ),
+  ])
 
 describe("SecurityScoreCard", () => {
   beforeEach(() => {

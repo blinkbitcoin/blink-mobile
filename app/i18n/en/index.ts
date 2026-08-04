@@ -2275,6 +2275,8 @@ const en: BaseTranslation = {
         manualBackup: "Manual backup",
         appLock: "App lock (biometrics or PIN)",
         hideBalance: "Hide balance",
+        twoFactor: "Two-factor authentication (2FA)",
+        emailVerified: "Verified email",
       },
     },
   },

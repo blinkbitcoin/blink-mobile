@@ -8,7 +8,7 @@ import type {
   SecurityScore,
   SecurityScoreLevel,
   SecuritySignalKey,
-} from "@app/hooks/use-security-score"
+} from "@app/types/security-score"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
 

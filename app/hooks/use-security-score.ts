@@ -1,67 +1,33 @@
+import { useCustodialSecuritySignals } from "@app/custodial/hooks/use-security-signals"
 import { useHideBalanceQuery } from "@app/graphql/generated"
-import {
-  BackupMethod,
-  completedMethodsOf,
-  useBackupState,
-} from "@app/self-custodial/providers/backup-state"
-import { AccountType } from "@app/types/wallet"
-
-import { useAccountRegistry } from "./use-account-registry"
-
-export type SecuritySignalKey = "cloudBackup" | "manualBackup" | "appLock" | "hideBalance"
-
-export type SecuritySignalDescriptor = {
-  key: SecuritySignalKey
-  done: boolean
-  // Backup rows stay tappable after completion so the flow can always be
-  // re-run (#3828); toggle-backed rows go inert once done.
-  retriggerable: boolean
-}
-
-export type SecurityScoreLevel = "low" | "medium" | "high"
-
-export type SecurityScore = {
-  signals: SecuritySignalDescriptor[]
-  done: number
-  total: number
-  level: SecurityScoreLevel
-}
-
-type SecurityScoreInputs = {
-  completedMethods: BackupMethod[]
-  isAppLockEnabled: boolean
-  isHideBalanceEnabled: boolean
-}
+import { useSelfCustodialSecuritySignals } from "@app/self-custodial/hooks/use-security-signals"
+import type {
+  SecurityScore,
+  SecurityScoreLevel,
+  SecuritySignalDescriptor,
+} from "@app/types/security-score"
 
 type DeviceLockState = {
   isBiometricsEnabled: boolean
   isPinEnabled: boolean
 }
 
-export const computeSecurityScore = ({
-  completedMethods,
-  isAppLockEnabled,
-  isHideBalanceEnabled,
-}: SecurityScoreInputs): SecurityScore => {
-  const signals: SecuritySignalDescriptor[] = [
-    {
-      key: "cloudBackup",
-      // Keychain/password-manager backups are off-device automated backups
-      // too, so they satisfy this signal.
-      done: [BackupMethod.Cloud, BackupMethod.Keychain].some((method) =>
-        completedMethods.includes(method),
-      ),
-      retriggerable: true,
-    },
-    {
-      key: "manualBackup",
-      done: completedMethods.includes(BackupMethod.Manual),
-      retriggerable: true,
-    },
-    { key: "appLock", done: isAppLockEnabled, retriggerable: false },
-    { key: "hideBalance", done: isHideBalanceEnabled, retriggerable: false },
-  ]
+// Shared by both account modes: these protect the device surface, not the account.
+export const deviceSecuritySignals = (
+  deviceLock: DeviceLockState,
+  isHideBalanceEnabled: boolean,
+): SecuritySignalDescriptor[] => [
+  {
+    key: "appLock",
+    done: deviceLock.isBiometricsEnabled || deviceLock.isPinEnabled,
+    retriggerable: false,
+  },
+  { key: "hideBalance", done: isHideBalanceEnabled, retriggerable: false },
+]
 
+export const computeSecurityScore = (
+  signals: SecuritySignalDescriptor[],
+): SecurityScore => {
   const done = signals.filter((signal) => signal.done).length
   const ratio = done / signals.length
   const level: SecurityScoreLevel = ratio === 1 ? "high" : ratio < 0.5 ? "low" : "medium"
@@ -69,19 +35,19 @@ export const computeSecurityScore = ({
   return { signals, done, total: signals.length, level }
 }
 
-// Device lock comes in as a parameter: the security screen already owns that
-// async keystore state and updates it synchronously on toggle, so the score
-// reacts instantly and there is a single keystore reader.
+// Mode-agnostic aggregator: each mode hook returns its contribution or null for
+// "not my mode". Device lock comes in as a parameter because the security screen
+// owns that async keystore state and updates it synchronously on toggle.
 export const useSecurityScore = (deviceLock: DeviceLockState): SecurityScore | null => {
-  const { activeAccount } = useAccountRegistry()
-  const { backupState } = useBackupState()
+  const selfCustodial = useSelfCustodialSecuritySignals()
+  const custodial = useCustodialSecuritySignals()
   const { data: { hideBalance } = { hideBalance: false } } = useHideBalanceQuery()
 
-  if (activeAccount?.type !== AccountType.SelfCustodial) return null
+  const modeSignals = selfCustodial ?? custodial
+  if (!modeSignals) return null
 
-  return computeSecurityScore({
-    completedMethods: completedMethodsOf(backupState),
-    isAppLockEnabled: deviceLock.isBiometricsEnabled || deviceLock.isPinEnabled,
-    isHideBalanceEnabled: hideBalance,
-  })
+  return computeSecurityScore([
+    ...modeSignals,
+    ...deviceSecuritySignals(deviceLock, hideBalance),
+  ])
 }
