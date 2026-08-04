@@ -230,7 +230,7 @@ describe("BackupPhraseConfirmScreen", () => {
     )
   }
 
-  it("routes to the balances overview when migrating", async () => {
+  it("hands off to the recovery-backup export step instead of completing here", async () => {
     mockCheckpoint.mockReturnValue("backupAlerts")
     mockBackupStateValue.mockReturnValue({
       backupState: { status: "none", method: null },
@@ -248,88 +248,19 @@ describe("BackupPhraseConfirmScreen", () => {
     act(() => {
       jest.advanceTimersByTime(500)
     })
-
     await act(async () => {})
 
-    expect(mockMarkBackupCompletedFor).toHaveBeenCalledWith(
-      "migration-uuid",
-      "manual",
-      undefined,
-    )
-    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationBalancesOverview")
+    // The phrase is only half of what the user needs; the backup is not
+    // complete until the recovery backup has been handed over too.
+    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupBundleExport", {
+      successMessage: undefined,
+    })
+    expect(mockSetBackupCompleted).not.toHaveBeenCalled()
+    expect(mockMarkBackupCompletedFor).not.toHaveBeenCalled()
   })
 
-  it("routes to backup success screen with reBackup=true when re-backing-up from settings", async () => {
-    mockCheckpoint.mockReturnValue("backupAlerts")
-    mockBackupStateValue.mockReturnValue({
-      backupState: { status: "completed", method: "manual" },
-      setBackupCompleted: mockSetBackupCompleted,
-    })
-
-    const { getByPlaceholderText } = render(
-      <ContextForScreen>
-        <BackupPhraseConfirmScreen />
-      </ContextForScreen>,
-    )
-    await flushEffects()
-
-    fillAllChallenges(getByPlaceholderText)
-    act(() => {
-      jest.advanceTimersByTime(500)
-    })
-
-    expect(mockNavigate).toHaveBeenCalledWith(
-      "selfCustodialBackupSuccess",
-      expect.objectContaining({ reBackup: true }),
-    )
-  })
-
-  it("routes to backup success screen with reBackup=false during fresh manual backup without checkpoint", async () => {
+  it("forwards the route's successMessage to the export step", async () => {
     mockCheckpoint.mockReturnValue(null)
-
-    const { getByPlaceholderText } = render(
-      <ContextForScreen>
-        <BackupPhraseConfirmScreen />
-      </ContextForScreen>,
-    )
-    await flushEffects()
-
-    fillAllChallenges(getByPlaceholderText)
-    act(() => {
-      jest.advanceTimersByTime(500)
-    })
-
-    expect(mockSetBackupCompleted).toHaveBeenCalledWith("manual", undefined)
-    expect(mockNavigate).toHaveBeenCalledWith(
-      "selfCustodialBackupSuccess",
-      expect.objectContaining({ reBackup: false }),
-    )
-  })
-
-  it("routes a no-funds migration to the balances overview too", async () => {
-    mockCheckpoint.mockReturnValue("backupAlerts")
-    mockActiveWalletValue.mockReturnValue({
-      wallets: [{ id: "btc-1", balance: { amount: 0 }, walletCurrency: "BTC" }],
-    })
-
-    const { getByPlaceholderText } = render(
-      <ContextForScreen>
-        <BackupPhraseConfirmScreen />
-      </ContextForScreen>,
-    )
-    await flushEffects()
-
-    fillAllChallenges(getByPlaceholderText)
-    act(() => {
-      jest.advanceTimersByTime(500)
-    })
-    // The migration persists the backup asynchronously before navigating.
-    await act(async () => {})
-
-    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationBalancesOverview")
-  })
-
-  it("forwards the route's successMessage to the success screen when provided", async () => {
     mockRouteParams.mockReturnValue({
       challenges: [
         { index: 0, word: "youth" },
@@ -339,7 +270,7 @@ describe("BackupPhraseConfirmScreen", () => {
       successMessage: "Your backup phrase is correct",
     })
     mockBackupStateValue.mockReturnValue({
-      backupState: { status: "completed", method: "manual" },
+      backupState: { status: "none", method: null },
       setBackupCompleted: mockSetBackupCompleted,
     })
 
@@ -354,21 +285,22 @@ describe("BackupPhraseConfirmScreen", () => {
     act(() => {
       jest.advanceTimersByTime(500)
     })
+    await act(async () => {})
 
-    expect(mockNavigate).toHaveBeenCalledWith(
-      "selfCustodialBackupSuccess",
-      expect.objectContaining({
-        reBackup: true,
-        message: "Your backup phrase is correct",
-      }),
-    )
+    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupBundleExport", {
+      successMessage: "Your backup phrase is correct",
+    })
   })
 
   it("does not auto-navigate while the migration checkpoint is still loading", async () => {
-    mockCheckpoint.mockReturnValue(null)
     mockCheckpointLoading.mockReturnValue(true)
+    mockCheckpoint.mockReturnValue("backupAlerts")
+    mockBackupStateValue.mockReturnValue({
+      backupState: { status: "none", method: null },
+      setBackupCompleted: mockSetBackupCompleted,
+    })
 
-    const { getByPlaceholderText, rerender } = render(
+    const { getByPlaceholderText } = render(
       <ContextForScreen>
         <BackupPhraseConfirmScreen />
       </ContextForScreen>,
@@ -379,21 +311,8 @@ describe("BackupPhraseConfirmScreen", () => {
     act(() => {
       jest.advanceTimersByTime(500)
     })
-
-    expect(mockNavigate).not.toHaveBeenCalled()
-
-    mockCheckpoint.mockReturnValue("backupAlerts")
-    mockCheckpointLoading.mockReturnValue(false)
-    rerender(
-      <ContextForScreen>
-        <BackupPhraseConfirmScreen />
-      </ContextForScreen>,
-    )
-    act(() => {
-      jest.advanceTimersByTime(500)
-    })
     await act(async () => {})
 
-    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationBalancesOverview")
+    expect(mockNavigate).not.toHaveBeenCalled()
   })
 })
