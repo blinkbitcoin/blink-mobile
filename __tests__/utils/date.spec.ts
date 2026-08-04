@@ -294,14 +294,9 @@ describe("date utils", () => {
       expect(formatUnixTimestampYMDHM({ timestampSeconds, timezone })).toBe(expected)
     })
 
-    it("uses the device timezone when none is injected", () => {
-      const timestampSeconds = Math.floor(Date.parse("2026-08-03T19:04:00Z") / 1000)
-      const deviceTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
-
-      expect(formatUnixTimestampYMDHM({ timestampSeconds })).toBe(
-        formatUnixTimestampYMDHM({ timestampSeconds, timezone: deviceTimezone }),
-      )
-    })
+    /** The device-zone default cannot be asserted here, where the process zone is UTC on
+     *  CI and any expectation built from it would compare UTC against UTC; that case lives
+     *  in `date-device-timezone.spec.ts`, which pins a non-UTC zone. */
   })
 
   describe("parseCardValidThru", () => {
