@@ -2234,6 +2234,22 @@
     "imageLibraryPermissionsNotGranted": "Ons het nie toestemming om die beelde of fotos te sien nie. Gaan na die app-verstellings op jou platform."
   },
   "SecurityScreen": {
+    "securityScore": {
+      "title": "Sekuriteitstelling {done: number}/{total: number}",
+      "levelLow": "laag",
+      "levelMedium": "middelmatig",
+      "levelHigh": "hoog",
+      "set": "Stel",
+      "enabled": "Geaktiveer",
+      "signals": {
+        "cloudBackup": "Wolk-rugsteun",
+        "manualBackup": "Handmatige rugsteun",
+        "appLock": "Appslot (biometrie of PIN)",
+        "hideBalance": "Versteek balans",
+        "twoFactor": "Twee-faktor-verifikasie (2FA)",
+        "emailVerified": "Geverifieerde e-pos"
+      }
+    },
     "title": "Sekuriteit en Privaatheid",
     "biometricDescription": "Kry toegang met vingerafdruk of gesigsherkenning",
     "biometricTitle": "Biometriese",

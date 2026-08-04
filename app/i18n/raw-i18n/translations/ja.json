@@ -2234,6 +2234,22 @@
         "imageLibraryPermissionsNotGranted": "画像ライブラリにアクセスする権限がありません。 アプリの設定を確認してください。"
     },
     "SecurityScreen": {
+        "securityScore": {
+            "title": "セキュリティスコア {done: number}/{total: number}",
+            "levelLow": "低",
+            "levelMedium": "中",
+            "levelHigh": "高",
+            "set": "設定",
+            "enabled": "有効",
+            "signals": {
+                "cloudBackup": "クラウドバックアップ",
+                "manualBackup": "手動バックアップ",
+                "appLock": "アプリロック（生体認証またはPIN）",
+                "hideBalance": "残高を非表示",
+                "twoFactor": "二要素認証（2FA）",
+                "emailVerified": "確認済みメールアドレス"
+            }
+        },
         "title": "セキュリティとプライバシー",
         "biometricDescription": "指紋認証または顔認証でロックを解除する。",
         "biometricTitle": "生体認証",

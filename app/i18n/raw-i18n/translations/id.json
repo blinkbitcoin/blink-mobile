@@ -2234,6 +2234,22 @@
     "imageLibraryPermissionsNotGranted": "Kami tidak memiliki izin untuk mengakses pustaka gambar. Silakan periksa pengaturan aplikasi untuk platform Anda."
   },
   "SecurityScreen": {
+    "securityScore": {
+      "title": "Skor keamanan {done: number}/{total: number}",
+      "levelLow": "rendah",
+      "levelMedium": "sedang",
+      "levelHigh": "tinggi",
+      "set": "Atur",
+      "enabled": "Aktif",
+      "signals": {
+        "cloudBackup": "Cadangan cloud",
+        "manualBackup": "Cadangan manual",
+        "appLock": "Kunci aplikasi (biometrik atau PIN)",
+        "hideBalance": "Sembunyikan saldo",
+        "twoFactor": "Autentikasi dua faktor (2FA)",
+        "emailVerified": "Email terverifikasi"
+      }
+    },
     "title": "Keamanan dan Privasi",
     "biometricDescription": "Buka dengan sidik jari atau pengenalan wajah.",
     "biometricTitle": "Biometrik",

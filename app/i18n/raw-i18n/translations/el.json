@@ -2234,6 +2234,22 @@
     "imageLibraryPermissionsNotGranted": "Δεν έχουμε άδεια πρόσβασης στο αρχείο εικόνων. Ελέγξτε τις ρυθμίσεις της εφαρμογής για την πλατφόρμα σας."
   },
   "SecurityScreen": {
+    "securityScore": {
+      "title": "Βαθμολογία ασφαλείας {done: number}/{total: number}",
+      "levelLow": "χαμηλή",
+      "levelMedium": "μέτρια",
+      "levelHigh": "υψηλή",
+      "set": "Ορισμός",
+      "enabled": "Ενεργό",
+      "signals": {
+        "cloudBackup": "Αντίγραφο ασφαλείας στο cloud",
+        "manualBackup": "Χειροκίνητο αντίγραφο ασφαλείας",
+        "appLock": "Κλείδωμα εφαρμογής (βιομετρικά ή PIN)",
+        "hideBalance": "Απόκρυψη υπολοίπου",
+        "twoFactor": "Έλεγχος ταυτότητας δύο παραγόντων (2FA)",
+        "emailVerified": "Επαληθευμένο email"
+      }
+    },
     "title": "Ασφάλεια και Ιδιωτικότητα",
     "biometricDescription": "Ξεκλείδωμα με αναγνώριση δακτυλικού αποτυπώματος ή προσώπου.",
     "biometricTitle": "Βιομετρικά",

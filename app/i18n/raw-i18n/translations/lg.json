@@ -2234,6 +2234,22 @@
     "imageLibraryPermissionsNotGranted": "Tetulina lukusa kuyingira mu tterekero ly'ebifaananyi. Nsaba okebere ensengeka za app."
   },
   "SecurityScreen": {
+    "securityScore": {
+      "title": "Omuwendo gw'obukuumi {done: number}/{total: number}",
+      "levelLow": "wansi",
+      "levelMedium": "wakati",
+      "levelHigh": "waggulu",
+      "set": "Tegeka",
+      "enabled": "Kikola",
+      "signals": {
+        "cloudBackup": "Koppi y'okukuuma ku cloud",
+        "manualBackup": "Koppi y'okukuuma ey'omu ngalo",
+        "appLock": "Okusiba app (biometrics oba PIN)",
+        "hideBalance": "Kweka omuwendo",
+        "twoFactor": "Okukakasa okubiri (2FA)",
+        "emailVerified": "Email ekakasiddwa"
+      }
+    },
     "title": "Obukuumi n'Ekyama",
     "biometricDescription": "Gulawo n'ekinkumu oba okukakasa endabika. ",
     "biometricTitle": "Biometric",

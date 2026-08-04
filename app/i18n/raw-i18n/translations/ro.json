@@ -2234,6 +2234,22 @@
     "imageLibraryPermissionsNotGranted": "Nu avem permisiuni pentru a accesa biblioteca de imagini. Vă rugăm să verificați setările aplicației pentru platforma dvs."
   },
   "SecurityScreen": {
+    "securityScore": {
+      "title": "Scor de securitate {done: number}/{total: number}",
+      "levelLow": "scăzut",
+      "levelMedium": "mediu",
+      "levelHigh": "ridicat",
+      "set": "Configurează",
+      "enabled": "Activat",
+      "signals": {
+        "cloudBackup": "Copie de rezervă în cloud",
+        "manualBackup": "Copie de rezervă manuală",
+        "appLock": "Blocarea aplicației (biometrie sau PIN)",
+        "hideBalance": "Ascunde soldul",
+        "twoFactor": "Autentificare cu doi factori (2FA)",
+        "emailVerified": "E-mail verificat"
+      }
+    },
     "title": "Securitate și Confidențialitate",
     "biometricDescription": "Deblocați cu amprentă sau recunoaștere facială.",
     "biometricTitle": "Biometric",
