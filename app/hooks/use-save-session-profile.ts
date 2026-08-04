@@ -61,11 +61,11 @@ export const useSaveSessionProfile = () => {
         if (!me) return
 
         const { id, username, phone, email, defaultAccount } = me
+        // defaultAccount can be transiently missing right after device-account
+        // creation; a thrown error here would silently skip profile persistence
+        const accountSuffix = defaultAccount ? ` - ${defaultAccount.id.slice(-6)}` : ""
         const identifier =
-          username ||
-          phone ||
-          email?.address ||
-          `${blinkUserText} - ${defaultAccount.id.slice(-6)}`
+          username || phone || email?.address || `${blinkUserText}${accountSuffix}`
 
         return {
           userId: id,
@@ -97,8 +97,10 @@ export const useSaveSessionProfile = () => {
 
       const profiles = await KeyStoreWrapper.getSessionProfiles()
 
+      // A profile stored without accountId was saved while defaultAccount was
+      // still missing; fall through and re-fetch so this login heals it
       const alreadyStored = profiles.find((p) => p.token === token)
-      if (alreadyStored) return
+      if (alreadyStored?.accountId) return
 
       const profile = await tryFetchUserProps({ token, fetchUsername })
       if (!profile) return
@@ -106,8 +108,11 @@ export const useSaveSessionProfile = () => {
       resetUpgradeModal()
       updateDeviceSessionCount(client, { reset: true })
 
-      const exists = profiles.some((p) => p.accountId === profile.accountId)
-      const cleaned = profiles.map((p) => ({ ...p, selected: false }))
+      const others = profiles.filter((p) => p.token !== token)
+      const exists =
+        profile.accountId !== undefined &&
+        others.some((p) => p.accountId === profile.accountId)
+      const cleaned = others.map((p) => ({ ...p, selected: false }))
       if (!exists) {
         await KeyStoreWrapper.saveSessionProfiles([{ ...profile }, ...cleaned])
         return
@@ -127,9 +132,12 @@ export const useSaveSessionProfile = () => {
     const profiles = await KeyStoreWrapper.getSessionProfiles()
     const currentProfile = await tryFetchUserProps({ token: currentToken, fetchUsername })
     if (!currentProfile) return
-    const updatedProfiles = profiles.map((p) =>
-      p.accountId === currentProfile.accountId ? currentProfile : p,
-    )
+    const updatedProfiles = profiles.map((p) => {
+      const sameAccount =
+        currentProfile.accountId !== undefined && p.accountId === currentProfile.accountId
+      // token match heals a profile saved while its accountId was still missing
+      return sameAccount || p.token === currentProfile.token ? currentProfile : p
+    })
     await KeyStoreWrapper.saveSessionProfiles(updatedProfiles)
   }, [fetchUsername, tryFetchUserProps, currentToken])
 
