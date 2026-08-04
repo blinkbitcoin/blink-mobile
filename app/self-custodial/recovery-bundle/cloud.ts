@@ -15,6 +15,7 @@ import {
   findAppDataFile as driveFindAppDataFile,
   uploadAppDataFile as driveUploadAppDataFile,
 } from "@app/utils/google-drive-client"
+import { callDrive } from "@app/utils/google-drive-session"
 import {
   assertICloudAvailable,
   uploadAppDataFile as iCloudUploadAppDataFile,
@@ -67,8 +68,16 @@ export const attemptSilentCloudUpload = async (
 
     const accessToken = await silentDriveAccessToken()
     if (!accessToken) return { success: false, reason: CloudBackupErrorReason.Auth }
-    const existingId = await driveFindAppDataFile(fileName, accessToken)
-    await driveUploadAppDataFile({ content, fileName, accessToken, existingId })
+    // callDrive: the sign-in cache keeps handing back a token revoked
+    // out-of-band; on a 401 it clears the cache and retries once with a fresh
+    // token, so one revocation cannot permanently kill silent sync.
+    const { value: existingId, token: freshToken } = await callDrive(
+      accessToken,
+      (token) => driveFindAppDataFile(fileName, token),
+    )
+    await callDrive(freshToken, (token) =>
+      driveUploadAppDataFile({ content, fileName, accessToken: token, existingId }),
+    )
     return { success: true }
   } catch (err) {
     const reason =

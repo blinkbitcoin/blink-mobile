@@ -25,6 +25,7 @@ import {
   downloadAppDataFile,
   DriveError,
 } from "@app/utils/google-drive-client"
+import { callDrive } from "@app/utils/google-drive-session"
 
 const DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.appdata"
 
@@ -86,37 +87,6 @@ const signIn = async (): Promise<string> => {
   await ensureDriveScope(response)
   const { accessToken } = await GoogleSignin.getTokens()
   return accessToken
-}
-
-/** Not `reason`: 403 shares it but means a withheld permission, which a new token cannot fix. */
-const isDeadAccessToken = (err: unknown): boolean =>
-  err instanceof DriveError && err.status === 401
-
-/**
- * A revoked token stays in the sign-in cache, so the SDK keeps handing back the same dead
- * one. Clearing it forces a refresh, retried once. The working token comes back because the
- * caller holds it for the rest of the session.
- */
-const callDrive = async <T>(
-  token: string,
-  call: (token: string) => Promise<T>,
-): Promise<{ value: T; token: string }> => {
-  try {
-    return { value: await call(token), token }
-  } catch (err) {
-    if (!isDeadAccessToken(err)) throw err
-
-    let refreshed: string
-    try {
-      await GoogleSignin.clearCachedAccessToken(token)
-      refreshed = (await GoogleSignin.getTokens()).accessToken
-    } catch {
-      /** The 401 is the diagnosis; a failure to refresh only says the retry never ran. */
-      throw err
-    }
-
-    return { value: await call(refreshed), token: refreshed }
-  }
 }
 
 const DriveOperation = {
