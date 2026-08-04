@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from "react"
+import React, { useCallback, useMemo, useState } from "react"
 import { ActivityIndicator, View } from "react-native"
 
 import { useFocusEffect } from "@react-navigation/native"
@@ -6,9 +6,11 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
+import CustomModal from "@app/components/custom-modal/custom-modal"
 import { Switch } from "@app/components/atomic/switch"
 import { IconHero } from "@app/components/icon-hero"
 import { InfoBanner } from "@app/components/info-banner"
+import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import {
@@ -16,6 +18,7 @@ import {
   isPasswordProtectedCloudSeedBackup,
   useBackupState,
 } from "@app/self-custodial/providers/backup-state"
+import { WalletCurrency } from "@app/graphql/generated"
 import { testProps } from "@app/utils/testProps"
 
 import { getCloudProviderName } from "../onboarding/utils"
@@ -56,6 +59,15 @@ export const RecoveryBackupScreen: React.FC = () => {
     useCallback(() => {
       reloadState().catch(() => {})
     }, [reloadState]),
+  )
+
+  const [showHowItWorks, setShowHowItWorks] = useState(false)
+
+  /** R3: on-chain recovery moves Bitcoin only. A user holding Dollars would
+   *  otherwise read "covers your balance" as covering all of it. */
+  const { wallets } = useActiveWallet()
+  const hasDollarBalance = wallets.some(
+    (w) => w.walletCurrency === WalletCurrency.Usd && Number(w.balance.amount) > 0,
   )
 
   const loading = bundleState === undefined
@@ -110,6 +122,36 @@ export const RecoveryBackupScreen: React.FC = () => {
             <Text type="p2">{LL.RecoveryBundleScreen.noBundleYet()}</Text>
           )}
         </View>
+
+        {hasDollarBalance && (
+          <View style={styles.noteContainer}>
+            <InfoBanner icon="info" iconColor="primary">
+              <Text type="p3">{LL.RecoveryBundleScreen.dollarNotCovered()}</Text>
+            </InfoBanner>
+          </View>
+        )}
+
+        <View style={styles.noteContainer}>
+          <GaloySecondaryButton
+            title={LL.RecoveryBundleScreen.howItWorksCta()}
+            onPress={() => setShowHowItWorks(true)}
+            {...testProps("recovery-how-it-works")}
+          />
+        </View>
+
+        <CustomModal
+          isVisible={showHowItWorks}
+          toggleModal={() => setShowHowItWorks(false)}
+          showCloseIconButton={true}
+          title={LL.RecoveryBundleScreen.howItWorksTitle()}
+          body={
+            <Text type="p2" style={styles.modalBody}>
+              {LL.RecoveryBundleScreen.howItWorksBody()}
+            </Text>
+          }
+          primaryButtonTitle={LL.common.ok()}
+          primaryButtonOnPress={() => setShowHowItWorks(false)}
+        />
 
         <View style={styles.settingsContainer}>
           <View style={styles.settingRow}>
@@ -209,6 +251,13 @@ const useStyles = makeStyles(() => ({
   },
   heroContainer: {
     paddingBottom: 10,
+  },
+  noteContainer: {
+    paddingHorizontal: 20,
+    paddingTop: 12,
+  },
+  modalBody: {
+    textAlign: "center",
   },
   statusContainer: {
     paddingHorizontal: 20,
