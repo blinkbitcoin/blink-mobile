@@ -565,6 +565,10 @@ export const HomeScreen: React.FC = () => {
     setIsPullRefreshing(true)
     try {
       await refetch()
+    } catch {
+      // A failed pull (e.g. offline) already surfaces through each query's
+      // error state; RefreshControl ignores the promise, so don't let the
+      // rejection escape as unhandled.
     } finally {
       setIsPullRefreshing(false)
     }

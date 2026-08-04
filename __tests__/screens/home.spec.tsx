@@ -1951,6 +1951,52 @@ describe("HomeScreen pull-to-refresh", () => {
       expect(UNSAFE_getByType(RefreshControl).props.refreshing).toBe(false),
     )
   })
+
+  /** A failed pull (offline is routine) must unpin the spinner and must not
+   *  escape as an unhandled rejection — RefreshControl ignores the promise. */
+  it("recovers the spinner when the refresh fails", async () => {
+    mockActiveWalletOverride = {
+      wallets: [],
+      status: "ready",
+      accountType: "self-custodial",
+      isReady: true,
+      isSelfCustodial: true,
+      needsBackendAuth: false,
+    }
+    mockSelfCustodialWalletOverride = {
+      sdk: null,
+      wallets: [],
+      status: "ready",
+      isStableBalanceActive: false,
+      lastReceivedPaymentId: null,
+      hasMoreTransactions: false,
+      loadingMore: false,
+      loadMore: jest.fn(),
+      refreshWallets: jest.fn().mockRejectedValue(new Error("offline")),
+      refreshStableBalanceActive: jest.fn(),
+      retry: jest.fn(),
+    }
+    try {
+      // eslint-disable-next-line camelcase -- testing-library exposes this API verbatim
+      const { UNSAFE_getByType } = render(
+        <ContextForScreen>
+          <HomeScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      await act(async () => {
+        await expect(
+          UNSAFE_getByType(RefreshControl).props.onRefresh(),
+        ).resolves.toBeUndefined()
+      })
+
+      expect(UNSAFE_getByType(RefreshControl).props.refreshing).toBe(false)
+    } finally {
+      mockActiveWalletOverride = null
+      mockSelfCustodialWalletOverride = null
+    }
+  })
 })
 
 describe("bulletins auth gating", () => {
