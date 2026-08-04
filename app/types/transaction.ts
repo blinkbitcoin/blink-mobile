@@ -42,3 +42,10 @@ export type NormalizedTransaction = {
   fee?: MoneyAmount<WalletCurrency>
   sourceAccountType?: AccountType
 }
+
+/**
+ * Shared empty list for the screens that only hold self-custodial transactions when a
+ * self-custodial account is active. A fresh literal there would change identity on every
+ * custodial render and re-run the hooks that map and cache those transactions.
+ */
+export const NO_TRANSACTIONS: readonly NormalizedTransaction[] = []
