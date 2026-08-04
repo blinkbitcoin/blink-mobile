@@ -436,6 +436,34 @@ describe("BackupStateProvider", () => {
       expect(result.current.backupState.method).toBeNull()
     })
 
+    it("ignores a stale read that resolves after the account has switched", async () => {
+      let resolveStaleRead: (raw: string) => void = () => {}
+      mockGetItem.mockImplementation((key: string) => {
+        if (key === BACKUP_KEY) {
+          return new Promise((resolve) => {
+            resolveStaleRead = resolve
+          })
+        }
+        if (key === OTHER_BACKUP_KEY) {
+          return Promise.resolve(JSON.stringify({ status: "completed", method: "cloud" }))
+        }
+        return Promise.resolve(null)
+      })
+
+      const { result, rerender } = renderHook(() => useBackupState(), { wrapper })
+
+      mockActiveAccount = makeAccount(OTHER_SC_ACCOUNT_ID)
+      rerender(undefined)
+
+      await waitFor(() => expect(result.current.backupState.method).toBe("cloud"))
+
+      await act(async () => {
+        resolveStaleRead(JSON.stringify({ status: "completed", method: "manual" }))
+      })
+
+      expect(result.current.backupState.method).toBe("cloud")
+    })
+
     it("clears the backup state when the active account becomes a non-self-custodial account", async () => {
       mockGetItem.mockResolvedValue(
         JSON.stringify({ status: "completed", method: "manual" }),
