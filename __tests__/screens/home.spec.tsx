@@ -83,6 +83,7 @@ const mockToggleBalanceMode = jest.fn()
 // eslint-disable-next-line prefer-const
 let mockBalanceModeValue: "btc" | "usd" = "usd"
 let mockDollarBalanceRestrictedOverride = false
+let mockRegionPendingOverride = false
 let mockTransferBlockedOverride = false
 let mockDollarBalanceModalVisible = false
 
@@ -145,6 +146,10 @@ jest.mock("@app/hooks/use-transfer-blocked", () => ({
 
 jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
   useDollarBalanceRestricted: () => mockDollarBalanceRestrictedOverride,
+  useDollarBalanceRestriction: () => ({
+    isRestricted: mockDollarBalanceRestrictedOverride,
+    isRegionPending: mockRegionPendingOverride,
+  }),
 }))
 
 type ForcedConversionParams = {
@@ -816,6 +821,7 @@ const resetHomeScreenMocks = () => {
   mockActiveWalletOverride = null
   mockActiveAccountOverride = null
   mockDollarBalanceRestrictedOverride = false
+  mockRegionPendingOverride = false
   mockMigratePromptVisible = false
   mockCanReopen = false
   mockReceiveBlocked = false
@@ -1197,6 +1203,65 @@ describe("HomeScreen", () => {
     fireEvent.press(getByTestId("transfer"))
 
     expect(mockDollarBalanceModalVisible).toBe(true)
+
+    mockActiveWalletOverride = null
+  })
+
+  it("keeps the transfer button inert and unexplained while the region is still resolving", async () => {
+    mockRegionPendingOverride = true
+    mockActiveWalletOverride = selfCustodialReadyWalletOverride(5000)
+    currentMocks = generateHomeMock({
+      level: AccountLevel.One,
+      network: Network.Mainnet,
+      btcBalance: 1000,
+      usdBalance: 5000,
+    })
+
+    const { getByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    fireEvent.press(getByTestId("transfer"))
+
+    expect(mockNavigate).not.toHaveBeenCalledWith("conversionDetails")
+    expect(mockDollarBalanceModalVisible).toBe(false)
+
+    mockActiveWalletOverride = null
+  })
+
+  it("enables the transfer button once the pending region resolves to no restriction", async () => {
+    mockRegionPendingOverride = true
+    mockActiveWalletOverride = selfCustodialReadyWalletOverride(5000)
+    currentMocks = generateHomeMock({
+      level: AccountLevel.One,
+      network: Network.Mainnet,
+      btcBalance: 1000,
+      usdBalance: 5000,
+    })
+
+    const { getByTestId, rerender } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    mockRegionPendingOverride = false
+    rerender(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    fireEvent.press(getByTestId("transfer"))
+
+    expect(mockNavigate).toHaveBeenCalledWith("conversionDetails")
 
     mockActiveWalletOverride = null
   })

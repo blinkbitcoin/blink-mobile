@@ -33,6 +33,7 @@ jest.mock("@react-navigation/native", () => ({
 
 jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
   useDollarBalanceRestricted: () => false,
+  useDollarBalanceRestriction: () => ({ isRestricted: false, isRegionPending: false }),
 }))
 
 jest.mock("@app/i18n/i18n-react", () => ({

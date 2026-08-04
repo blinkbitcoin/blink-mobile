@@ -2,7 +2,7 @@ import { useEffect } from "react"
 
 import { CommonActions, useNavigation } from "@react-navigation/native"
 
-import { useDollarBalanceRestricted } from "./use-dollar-balance-restricted"
+import { useDollarBalanceRestriction } from "./use-dollar-balance-restricted"
 
 type UseDollarBalanceRestrictionGuardOptions = {
   /** Turns the guard off for a caller that must let a restricted user through (the
@@ -13,15 +13,18 @@ type UseDollarBalanceRestrictionGuardOptions = {
 export const useDollarBalanceRestrictionGuard = ({
   enabled = true,
 }: UseDollarBalanceRestrictionGuardOptions = {}): boolean => {
-  const isRestricted = useDollarBalanceRestricted()
+  const { isRestricted, isRegionPending } = useDollarBalanceRestriction()
   const navigation = useNavigation()
 
-  const shouldBlock = enabled && isRestricted
+  const shouldLeaveScreen = enabled && isRestricted
 
   useEffect(() => {
-    if (!shouldBlock) return
+    if (!shouldLeaveScreen) return
     navigation.dispatch(CommonActions.reset({ index: 0, routes: [{ name: "Primary" }] }))
-  }, [shouldBlock, navigation])
+  }, [shouldLeaveScreen, navigation])
 
-  return shouldBlock
+  /** The screen also hides while the region resolves, so a user who lands here on a cold
+   *  start cannot act on it before the verdict arrives; only a resolved restriction
+   *  bounces them out. */
+  return enabled && (isRestricted || isRegionPending)
 }

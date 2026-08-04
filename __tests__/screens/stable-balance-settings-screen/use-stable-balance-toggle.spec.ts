@@ -19,6 +19,10 @@ let mockIsDollarBalanceRestricted = false
 
 jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
   useDollarBalanceRestricted: () => mockIsDollarBalanceRestricted,
+  useDollarBalanceRestriction: () => ({
+    isRestricted: mockIsDollarBalanceRestricted,
+    isRegionPending: false,
+  }),
 }))
 
 const mockLogActivated = jest.fn()

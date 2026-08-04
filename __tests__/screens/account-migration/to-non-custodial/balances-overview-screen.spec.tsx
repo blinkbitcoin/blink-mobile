@@ -162,6 +162,11 @@ jest.mock("@app/config/feature-flags-context", () => ({
 jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
   useDollarBalanceRestricted: (accountType: string) =>
     accountType === "custodial" ? mockCurrentDollarRestricted : mockDollarRestricted,
+  useDollarBalanceRestriction: (accountType: string) => ({
+    isRestricted:
+      accountType === "custodial" ? mockCurrentDollarRestricted : mockDollarRestricted,
+    isRegionPending: false,
+  }),
 }))
 
 jest.mock("@app/hooks/use-display-currency", () => ({

@@ -54,6 +54,10 @@ jest.mock("@app/graphql/ln-update-context", () => ({
 const mockUseDollarBalanceRestricted = jest.fn(() => false)
 jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
   useDollarBalanceRestricted: () => mockUseDollarBalanceRestricted(),
+  useDollarBalanceRestriction: () => ({
+    isRestricted: mockUseDollarBalanceRestricted(),
+    isRegionPending: false,
+  }),
 }))
 
 const mockUseDeviceLocation = jest.fn(() => ({ countryCode: "SV", loading: false }))

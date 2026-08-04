@@ -15,9 +15,19 @@ const useTransferBlockedCountries = (): string[] => {
     : custodialTransferBlockedCountries
 }
 
-export const useTransferBlocked = (): boolean => {
-  const blockedCountries = useTransferBlockedCountries()
-  const { countryCode } = useDeviceLocation()
-
-  return isBlockedCountry(countryCode, blockedCountries)
+/** `isBlocked` needs a resolved country, so it never ejects an allowed user. Gated
+ *  surfaces hold on `isRegionPending` instead of reading the unresolved region as
+ *  allowed, which is what the removed latch used to cover at launch. */
+type TransferBlock = {
+  isBlocked: boolean
+  isRegionPending: boolean
 }
+
+export const useTransferBlock = (): TransferBlock => {
+  const blockedCountries = useTransferBlockedCountries()
+  const { countryCode, loading: isRegionPending } = useDeviceLocation()
+
+  return { isBlocked: isBlockedCountry(countryCode, blockedCountries), isRegionPending }
+}
+
+export const useTransferBlocked = (): boolean => useTransferBlock().isBlocked
