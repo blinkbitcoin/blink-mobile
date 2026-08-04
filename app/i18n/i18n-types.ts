@@ -12535,6 +12535,36 @@ type RootTranslation = {
 			 */
 			networkError: string
 		}
+		BundleExport: {
+			/**
+			 * B​e​f​o​r​e​ ​y​o​u​ ​s​t​a​r​t
+			 */
+			title: string
+			/**
+			 * I​n​ ​c​a​s​e​ ​o​f​ ​S​p​a​r​k​ ​o​r​ ​B​l​i​n​k​ ​g​o​i​n​g​ ​o​f​f​l​i​n​e​,​ ​u​s​e​ ​t​h​i​s​ ​f​i​l​e​ ​t​o​ ​e​x​i​t​ ​o​n​c​h​a​i​n​.​ ​T​h​i​s​ ​f​i​l​e​ ​i​s​ ​s​e​n​s​i​t​i​v​e​.​ ​K​e​e​p​ ​i​t​ ​p​r​i​v​a​t​e​.
+			 */
+			subtitle: string
+			/**
+			 * Y​o​u​r​ ​r​e​c​o​v​e​r​y​ ​b​a​c​k​u​p​ ​i​s​ ​c​r​e​a​t​e​d​ ​a​u​t​o​m​a​t​i​c​a​l​l​y​ ​o​n​c​e​ ​y​o​u​ ​r​e​c​e​i​v​e​ ​f​u​n​d​s​,​ ​a​n​d​ ​k​e​p​t​ ​u​p​ ​t​o​ ​d​a​t​e​ ​f​r​o​m​ ​t​h​e​n​ ​o​n​.​ ​Y​o​u​ ​c​a​n​ ​d​o​w​n​l​o​a​d​ ​i​t​ ​a​n​y​ ​t​i​m​e​ ​f​r​o​m​ ​S​e​t​t​i​n​g​s​.
+			 */
+			subtitlePending: string
+			/**
+			 * D​o​w​n​l​o​a​d
+			 */
+			download: string
+			/**
+			 * C​o​p​y
+			 */
+			copy: string
+			/**
+			 * S​e​n​s​i​t​i​v​e
+			 */
+			sensitiveTitle: string
+			/**
+			 * T​h​i​s​ ​f​i​l​e​ ​i​s​ ​s​e​n​s​i​t​i​v​e​ ​w​a​l​l​e​t​ ​d​a​t​a​ ​a​n​d​ ​m​u​s​t​ ​b​e​ ​k​e​p​t​ ​p​r​i​v​a​t​e​.​ ​I​f​ ​y​o​u​ ​l​o​s​e​ ​t​h​i​s​ ​d​e​v​i​c​e​,​ ​y​o​u​ ​w​i​l​l​ ​n​o​t​ ​b​e​ ​a​b​l​e​ ​t​o​ ​u​s​e​ ​e​m​e​r​g​e​n​c​y​ ​r​e​c​o​v​e​r​y​.
+			 */
+			sensitiveBody: string
+		}
 		ManualBackup: {
 			Alerts: {
 				/**
@@ -26128,6 +26158,36 @@ export type TranslationFunctions = {
 			 * Network error. Please check your connection and try again.
 			 */
 			networkError: () => LocalizedString
+		}
+		BundleExport: {
+			/**
+			 * Before you start
+			 */
+			title: () => LocalizedString
+			/**
+			 * In case of Spark or Blink going offline, use this file to exit onchain. This file is sensitive. Keep it private.
+			 */
+			subtitle: () => LocalizedString
+			/**
+			 * Your recovery backup is created automatically once you receive funds, and kept up to date from then on. You can download it any time from Settings.
+			 */
+			subtitlePending: () => LocalizedString
+			/**
+			 * Download
+			 */
+			download: () => LocalizedString
+			/**
+			 * Copy
+			 */
+			copy: () => LocalizedString
+			/**
+			 * Sensitive
+			 */
+			sensitiveTitle: () => LocalizedString
+			/**
+			 * This file is sensitive wallet data and must be kept private. If you lose this device, you will not be able to use emergency recovery.
+			 */
+			sensitiveBody: () => LocalizedString
 		}
 		ManualBackup: {
 			Alerts: {
