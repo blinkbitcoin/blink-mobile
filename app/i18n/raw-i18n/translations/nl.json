@@ -2235,6 +2235,22 @@
     "imageLibraryPermissionsNotGranted": "We hebben geen toestemming om toegang te krijgen tot de beeldbibliotheek. Controleer de app-instellingen voor uw platform."
   },
   "SecurityScreen": {
+    "securityScore": {
+      "title": "Beveiligingsscore {done: number}/{total: number}",
+      "levelLow": "laag",
+      "levelMedium": "gemiddeld",
+      "levelHigh": "hoog",
+      "set": "Instellen",
+      "enabled": "Ingeschakeld",
+      "signals": {
+        "cloudBackup": "Cloudback-up",
+        "manualBackup": "Handmatige back-up",
+        "appLock": "App-vergrendeling (biometrie of pincode)",
+        "hideBalance": "Saldo verbergen",
+        "twoFactor": "Tweefactorauthenticatie (2FA)",
+        "emailVerified": "Geverifieerd e-mailadres"
+      }
+    },
     "title": "Beveiliging en privacy",
     "biometricDescription": "Ontgrendel met vingerafdruk of gezichtsherkenning.",
     "biometricTitle": "Biometrisch",

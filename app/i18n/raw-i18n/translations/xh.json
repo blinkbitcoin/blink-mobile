@@ -2235,6 +2235,22 @@
     "imageLibraryPermissionsNotGranted": "Asinayo imvume yokufikelela kwithala lemifanekiso. Nceda ujonge iisetingi ze-app kwiqonga lakho."
   },
   "SecurityScreen": {
+    "securityScore": {
+      "title": "Amanqaku okhuseleko {done: number}/{total: number}",
+      "levelLow": "phantsi",
+      "levelMedium": "phakathi",
+      "levelHigh": "phezulu",
+      "set": "Misela",
+      "enabled": "Ivuliwe",
+      "signals": {
+        "cloudBackup": "Ukugcina kwilifu",
+        "manualBackup": "Ukugcina ngesandla",
+        "appLock": "Ukutshixa i-app (ibhayometriki okanye i-PIN)",
+        "hideBalance": "Fihla ibhalansi",
+        "twoFactor": "Ungqinisiso lwezinto ezimbini (2FA)",
+        "emailVerified": "I-imeyile eqinisekisiweyo"
+      }
+    },
     "title": "Ukhuseleko noBucala",
     "biometricDescription": "Vula ngomnwe okanye ukuqaphela ubuso.",
     "biometricTitle": "Ibhayometriki",

@@ -2235,6 +2235,22 @@
     "imageLibraryPermissionsNotGranted": "We don't have permissions to access the image library.  Please check app settings for your platform."
   },
   "SecurityScreen": {
+    "securityScore": {
+      "title": "Անվտանգության միավոր {done: number}/{total: number}",
+      "levelLow": "ցածր",
+      "levelMedium": "միջին",
+      "levelHigh": "բարձր",
+      "set": "Կարգավորել",
+      "enabled": "Միացված է",
+      "signals": {
+        "cloudBackup": "Ամպային կրկնօրինակում",
+        "manualBackup": "Ձեռքով կրկնօրինակում",
+        "appLock": "Հավելվածի կողպեք (կենսաչափություն կամ PIN)",
+        "hideBalance": "Թաքցնել մնացորդը",
+        "twoFactor": "Երկգործոն նույնականացում (2FA)",
+        "emailVerified": "Հաստատված էլ. փոստ"
+      }
+    },
     "title": "Անվտանգություն և գաղտնիություն",
     "biometricDescription": "Բացել մատնահետքով կամ դիմային ճանաչման համակարգով։ ",
     "biometricTitle": "Բիոմետրիկ համակարգ",

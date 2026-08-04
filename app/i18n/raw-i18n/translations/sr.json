@@ -2235,6 +2235,22 @@
     "imageLibraryPermissionsNotGranted": "We don't have permissions to access the image library.  Please check app settings for your platform."
   },
   "SecurityScreen": {
+    "securityScore": {
+      "title": "Оцена безбедности {done: number}/{total: number}",
+      "levelLow": "ниска",
+      "levelMedium": "средња",
+      "levelHigh": "висока",
+      "set": "Подеси",
+      "enabled": "Укључено",
+      "signals": {
+        "cloudBackup": "Резервна копија у облаку",
+        "manualBackup": "Ручна резервна копија",
+        "appLock": "Закључавање апликације (биометрија или PIN)",
+        "hideBalance": "Сакриј стање",
+        "twoFactor": "Двофакторска аутентификација (2FA)",
+        "emailVerified": "Потврђена имејл адреса"
+      }
+    },
     "title": "Безбедност и приватност",
     "biometricDescription": "Откључајте отиском прста или препознавањем лица.",
     "biometricTitle": "Биометријски",

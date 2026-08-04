@@ -2235,6 +2235,22 @@
     "imageLibraryPermissionsNotGranted": "We don't have permissions to access the image library.  Please check app settings for your platform."
   },
   "SecurityScreen": {
+    "securityScore": {
+      "title": "Điểm bảo mật {done: number}/{total: number}",
+      "levelLow": "thấp",
+      "levelMedium": "trung bình",
+      "levelHigh": "cao",
+      "set": "Thiết lập",
+      "enabled": "Đã bật",
+      "signals": {
+        "cloudBackup": "Sao lưu đám mây",
+        "manualBackup": "Sao lưu thủ công",
+        "appLock": "Khóa ứng dụng (sinh trắc học hoặc PIN)",
+        "hideBalance": "Ẩn số dư",
+        "twoFactor": "Xác thực hai yếu tố (2FA)",
+        "emailVerified": "Email đã xác minh"
+      }
+    },
     "title": "Bảo mật và Quyền riêng tư",
     "biometricDescription": "Mở khóa bằng vân tay hoặc nhận dạng khuôn mặt.",
     "biometricTitle": "Vân tay",

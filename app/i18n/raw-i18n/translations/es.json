@@ -2235,6 +2235,22 @@
         "imageLibraryPermissionsNotGranted": "No tenemos permisos para acceder a la biblioteca de imágenes. Verifica en la configuración de la aplicación para tu plataforma."
     },
     "SecurityScreen": {
+        "securityScore": {
+            "title": "Puntuación de seguridad {done: number}/{total: number}",
+            "levelLow": "baja",
+            "levelMedium": "media",
+            "levelHigh": "alta",
+            "set": "Configurar",
+            "enabled": "Activado",
+            "signals": {
+                "cloudBackup": "Copia de seguridad en la nube",
+                "manualBackup": "Copia de seguridad manual",
+                "appLock": "Bloqueo de la aplicación (biometría o PIN)",
+                "hideBalance": "Ocultar saldo",
+                "twoFactor": "Autenticación de dos factores (2FA)",
+                "emailVerified": "Correo electrónico verificado"
+            }
+        },
         "title": "Seguridad y Privacidad",
         "biometricDescription": "Desbloqueo con huella dactilar o reconocimiento facial.",
         "biometricTitle": "Biométrica",

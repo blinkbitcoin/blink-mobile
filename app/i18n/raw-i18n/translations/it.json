@@ -2235,6 +2235,22 @@
         "imageLibraryPermissionsNotGranted": "Non abbiamo i permessi per accedere alla libreria immagini. Controlla le impostazioni dell'app per la tua piattaforma."
     },
     "SecurityScreen": {
+        "securityScore": {
+            "title": "Punteggio di sicurezza {done: number}/{total: number}",
+            "levelLow": "basso",
+            "levelMedium": "medio",
+            "levelHigh": "alto",
+            "set": "Imposta",
+            "enabled": "Attivo",
+            "signals": {
+                "cloudBackup": "Backup su cloud",
+                "manualBackup": "Backup manuale",
+                "appLock": "Blocco dell'app (biometria o PIN)",
+                "hideBalance": "Nascondi saldo",
+                "twoFactor": "Autenticazione a due fattori (2FA)",
+                "emailVerified": "Email verificata"
+            }
+        },
         "title": "Sicurezza e Privacy",
         "biometricDescription": "Sblocca il riconoscimento facciale o con impronta digitale.",
         "biometricTitle": "Biometrico",

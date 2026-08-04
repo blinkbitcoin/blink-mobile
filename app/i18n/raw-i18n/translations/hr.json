@@ -2235,6 +2235,22 @@
     "imageLibraryPermissionsNotGranted": "Nemamo dopuštenja za pristup biblioteci slika. Provjerite postavke aplikacije za svoju platformu."
   },
   "SecurityScreen": {
+    "securityScore": {
+      "title": "Ocjena sigurnosti {done: number}/{total: number}",
+      "levelLow": "niska",
+      "levelMedium": "srednja",
+      "levelHigh": "visoka",
+      "set": "Postavi",
+      "enabled": "Uključeno",
+      "signals": {
+        "cloudBackup": "Sigurnosna kopija u oblaku",
+        "manualBackup": "Ručna sigurnosna kopija",
+        "appLock": "Zaključavanje aplikacije (biometrija ili PIN)",
+        "hideBalance": "Sakrij stanje",
+        "twoFactor": "Dvofaktorska autentifikacija (2FA)",
+        "emailVerified": "Potvrđena e-pošta"
+      }
+    },
     "title": "Sigurnost i privatnost",
     "biometricDescription": "Otključajte otiskom prsta ili prepoznavanjem lica.",
     "biometricTitle": "Biometrijski",

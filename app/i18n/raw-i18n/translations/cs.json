@@ -2235,6 +2235,22 @@
     "imageLibraryPermissionsNotGranted": "We don't have permissions to access the image library.  Please check app settings for your platform."
   },
   "SecurityScreen": {
+    "securityScore": {
+      "title": "Skóre zabezpečení {done: number}/{total: number}",
+      "levelLow": "nízké",
+      "levelMedium": "střední",
+      "levelHigh": "vysoké",
+      "set": "Nastavit",
+      "enabled": "Zapnuto",
+      "signals": {
+        "cloudBackup": "Cloudová záloha",
+        "manualBackup": "Ruční záloha",
+        "appLock": "Zámek aplikace (biometrie nebo PIN)",
+        "hideBalance": "Skrýt zůstatek",
+        "twoFactor": "Dvoufaktorové ověření (2FA)",
+        "emailVerified": "Ověřený e-mail"
+      }
+    },
     "title": "Zabezpečení a soukromí",
     "biometricDescription": "Odemykání pomocí otisku prstu nebo rozpoznání obličeje.",
     "biometricTitle": "Biometrické údaje",

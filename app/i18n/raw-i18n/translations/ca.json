@@ -2235,6 +2235,22 @@
     "imageLibraryPermissionsNotGranted": "No tenim permí per accedir a la biblioteca d'imatges. Comprova la configuració de l'aplicació."
   },
   "SecurityScreen": {
+    "securityScore": {
+      "title": "Puntuació de seguretat {done: number}/{total: number}",
+      "levelLow": "baixa",
+      "levelMedium": "mitjana",
+      "levelHigh": "alta",
+      "set": "Configura",
+      "enabled": "Activat",
+      "signals": {
+        "cloudBackup": "Còpia de seguretat al núvol",
+        "manualBackup": "Còpia de seguretat manual",
+        "appLock": "Bloqueig de l'aplicació (biometria o PIN)",
+        "hideBalance": "Amaga el saldo",
+        "twoFactor": "Autenticació de dos factors (2FA)",
+        "emailVerified": "Correu electrònic verificat"
+      }
+    },
     "title": "Seguretat i Privacitat",
     "biometricDescription": "Desbloqueja amb l'empremta digital o el reconeixement facial.",
     "biometricTitle": "Biomètric",

@@ -2235,6 +2235,22 @@
     "imageLibraryPermissionsNotGranted": "Hatuna ruhusa ya kupata maktaba ya picha. Tafadhali angalia vipimo vya programu kwenye jukwaa lako."
   },
   "SecurityScreen": {
+    "securityScore": {
+      "title": "Alama ya usalama {done: number}/{total: number}",
+      "levelLow": "chini",
+      "levelMedium": "wastani",
+      "levelHigh": "juu",
+      "set": "Weka",
+      "enabled": "Imewashwa",
+      "signals": {
+        "cloudBackup": "Hifadhi rudufu ya wingu",
+        "manualBackup": "Hifadhi rudufu ya mkono",
+        "appLock": "Kufuli ya programu (bayometriki au PIN)",
+        "hideBalance": "Ficha salio",
+        "twoFactor": "Uthibitishaji wa hatua mbili (2FA)",
+        "emailVerified": "Barua pepe iliyothibitishwa"
+      }
+    },
     "title": "Usalama na Faragha",
     "biometricDescription": "Fungua kutumia alama za vidole au utambuzi kwa uso.",
     "biometricTitle": "Biometriki",
