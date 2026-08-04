@@ -240,23 +240,14 @@ export const useRecoveryBundleActions = (): RecoveryBundleActions => {
     } catch {
       return
     }
-    if (!enabled || !accountId) return
-    // Opting in with a bundle already on disk: sync right away instead of
-    // waiting for the next refresh. Best-effort - the background sync path
-    // retries after every refresh.
-    try {
-      const synced = await syncExistingBundleToCloud(accountId, network)
-      if (synced) {
-        await reloadState()
-        toastShow({
-          message: LL.RecoveryBundleScreen.cloudUploadSuccess(),
-          type: "success",
-          LL,
-        })
-      }
-    } catch (err) {
-      recordAndToast(err, LL.RecoveryBundleScreen.exportFailed())
-    }
+    if (!enabled || !bundleState) return
+    // Opting in with a bundle already on disk: run the full upload flow
+    // right away (silent first, then interactive sign-in fallback) instead
+    // of waiting for the next refresh - a silent-only attempt is invisible
+    // exactly when the provider needs a re-sign-in, which is when the user
+    // most needs feedback after opting in. The D9 gate is re-checked inside,
+    // against the settings persisted above.
+    await handleCloudUpload()
   }
 
   const handleCloudUpload = async () => {
