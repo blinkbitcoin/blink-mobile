@@ -19,12 +19,11 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import SendBitcoinCompletedScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-completed-screen"
 
 import { ContextForScreen, ContextForScreenWithTheme } from "./helper"
-import { Linking, View, ViewStyle } from "react-native"
+import { AppStateStatus, Linking, View, ViewStyle } from "react-native"
 import { light, dark } from "@app/rne-theme/colors"
 
 const screenshotState = { isTakingScreenshot: false }
 const mockCaptureAndShare = jest.fn()
-const mockNavigate = jest.fn()
 
 jest.mock("@app/hooks", () => ({
   ...jest.requireActual("@app/hooks"),
@@ -32,11 +31,6 @@ jest.mock("@app/hooks", () => ({
     isTakingScreenshot: screenshotState.isTakingScreenshot,
     captureAndShare: mockCaptureAndShare,
   }),
-}))
-
-jest.mock("@react-navigation/native", () => ({
-  ...jest.requireActual("@react-navigation/native"),
-  useNavigation: () => ({ navigate: mockNavigate }),
 }))
 
 jest.mock("react-native-view-shot", () => {
@@ -49,6 +43,60 @@ jest.mock("react-native-view-shot", () => {
     ),
   }
 })
+
+const mockNavigate = jest.fn()
+const mockPopToTop = jest.fn()
+const mockIsFocused = jest.fn(() => true)
+const mockFocusListeners: Array<() => void> = []
+const mockNavigation = {
+  navigate: mockNavigate,
+  popToTop: mockPopToTop,
+  isFocused: mockIsFocused,
+  addListener: (event: string, handler: () => void) => {
+    if (event !== "focus") {
+      throw new Error(`Trying to subscribe to unknown navigation event: ${event}`)
+    }
+    mockFocusListeners.push(handler)
+    return () => {
+      const index = mockFocusListeners.indexOf(handler)
+      if (index !== -1) {
+        mockFocusListeners.splice(index, 1)
+      }
+    }
+  },
+}
+jest.mock("@react-navigation/native", () => {
+  const actual = jest.requireActual("@react-navigation/native")
+  return {
+    ...actual,
+    useNavigation: () => mockNavigation,
+  }
+})
+
+let mockAppStateCurrentState: AppStateStatus = "active"
+const mockAppStateListeners: Array<(state: AppStateStatus) => void> = []
+jest.mock("react-native/Libraries/AppState/AppState", () => ({
+  __esModule: true,
+  default: {
+    get currentState() {
+      return mockAppStateCurrentState
+    },
+    addEventListener: (event: string, handler: (state: AppStateStatus) => void) => {
+      if (event !== "change") {
+        throw new Error(`Trying to subscribe to unknown event: ${event}`)
+      }
+      mockAppStateListeners.push(handler)
+      return {
+        remove: () => {
+          const index = mockAppStateListeners.indexOf(handler)
+          if (index !== -1) {
+            mockAppStateListeners.splice(index, 1)
+          }
+        },
+      }
+    },
+  },
+}))
 
 jest.useFakeTimers()
 
@@ -103,15 +151,72 @@ const SuccessAction = ({
   route: RouteProp<RootStackParamList, "sendBitcoinCompleted">
 }) => <MockedScreen route={route} />
 
+const timedRoute = {
+  key: "sendBitcoinCompleted",
+  name: "sendBitcoinCompleted",
+  params: {
+    status: "SUCCESS",
+    currencyAmount: "$0.03",
+    satAmount: "25 SAT",
+    currencyFeeAmount: "$0.00",
+    satFeeAmount: "0 SAT",
+    destination: "alice",
+    paymentType: "lightning",
+    createdAt: 1747691078,
+  },
+} as const
+
+const STALE_TRIP_MS = 31_000
+const QUICK_TRIP_MS = 5_000
+
+const triggerAppStateChange = (nextState: AppStateStatus) => {
+  expect(mockAppStateListeners).toHaveLength(1)
+  act(() => {
+    mockAppStateListeners[0](nextState)
+  })
+}
+
+const triggerFocus = () => {
+  expect(mockFocusListeners).toHaveLength(1)
+  act(() => {
+    mockFocusListeners[0]()
+  })
+}
+
+const advanceTime = (ms: number) => {
+  act(() => {
+    jest.advanceTimersByTime(ms)
+  })
+}
+
+/** Moves the clock the hook reads without firing the success-icon timer, so a trip can be
+ *  taken from the icon phase rather than the receipt. */
+const travelWithoutTimers = (ms: number) => {
+  jest.setSystemTime(Date.now() + ms)
+}
+
+const renderSuccess = () => {
+  render(
+    <ContextForScreen>
+      <Success />
+    </ContextForScreen>,
+  )
+  screen.getByTestId("Success Text")
+}
+
 describe("SendBitcoinCompletedScreen", () => {
   let LL: ReturnType<typeof i18nObject>
 
   beforeEach(() => {
+    jest.clearAllMocks()
+    mockIsFocused.mockReturnValue(true)
     loadLocale("en")
     LL = i18nObject("en")
     screenshotState.isTakingScreenshot = false
-    mockCaptureAndShare.mockClear()
-    mockNavigate.mockClear()
+  })
+
+  afterEach(() => {
+    jest.clearAllTimers()
   })
 
   it("renders the Success state correctly", async () => {
@@ -516,21 +621,6 @@ describe("SendBitcoinCompletedScreen", () => {
     expect(screen.queryByText(LL.SendBitcoinScreen.noteLabel())).toBeNull()
   })
 
-  const timedRoute = {
-    key: "sendBitcoinCompleted",
-    name: "sendBitcoinCompleted",
-    params: {
-      status: "SUCCESS",
-      currencyAmount: "$0.03",
-      satAmount: "25 SAT",
-      currencyFeeAmount: "$0.00",
-      satFeeAmount: "0 SAT",
-      destination: "alice",
-      paymentType: "lightning",
-      createdAt: 1747691078,
-    },
-  } as const
-
   describe("transaction time", () => {
     it("renders the time as a wall-clock date", () => {
       render(
@@ -602,7 +692,7 @@ describe("SendBitcoinCompletedScreen", () => {
 
       fireEvent.press(screen.getByTestId("close"))
 
-      expect(mockNavigate).toHaveBeenCalledWith("Primary")
+      expect(mockPopToTop).toHaveBeenCalledTimes(1)
     })
 
     it("shares the receipt from the share button", () => {
@@ -638,26 +728,180 @@ describe("SendBitcoinCompletedScreen", () => {
     })
   })
 
-  describe("ViewShot background color for screenshot", () => {
-    const successRoute = {
-      key: "sendBitcoinCompleted",
-      name: "sendBitcoinCompleted",
-      params: {
-        status: "SUCCESS",
-        currencyAmount: "$0.03",
-        satAmount: "25 SAT",
-        currencyFeeAmount: "$0.00",
-        satFeeAmount: "0 SAT",
-        destination: "testuser",
-        paymentType: "lightning",
-        createdAt: 1747691078,
-      },
-    } as const
+  describe("dismiss after a stale background trip", () => {
+    beforeEach(() => {
+      mockAppStateCurrentState = "active"
+      mockAppStateListeners.length = 0
+      mockFocusListeners.length = 0
+    })
 
+    it("dismisses to home when returning from a stale background trip", () => {
+      renderSuccess()
+
+      triggerAppStateChange("background")
+      advanceTime(STALE_TRIP_MS)
+      expect(mockPopToTop).not.toHaveBeenCalled()
+
+      triggerAppStateChange("active")
+
+      expect(mockPopToTop).toHaveBeenCalledTimes(1)
+      expect(mockNavigate).not.toHaveBeenCalled()
+    })
+
+    it("dismisses when the stale trip started through the iOS inactive state", () => {
+      renderSuccess()
+
+      triggerAppStateChange("inactive")
+      triggerAppStateChange("background")
+      advanceTime(STALE_TRIP_MS)
+      triggerAppStateChange("active")
+
+      expect(mockPopToTop).toHaveBeenCalledTimes(1)
+    })
+
+    it("keeps the receipt on a quick background trip", () => {
+      renderSuccess()
+
+      triggerAppStateChange("background")
+      advanceTime(QUICK_TRIP_MS)
+      triggerAppStateChange("active")
+
+      expect(mockPopToTop).not.toHaveBeenCalled()
+    })
+
+    it("dismisses on a stale trip that follows a quick one", () => {
+      /** The quick return clears the recorded departure, and a departure it failed to clear
+       *  would measure the second trip from the first one and dismiss for the wrong reason. */
+      renderSuccess()
+
+      triggerAppStateChange("background")
+      advanceTime(QUICK_TRIP_MS)
+      triggerAppStateChange("active")
+      expect(mockPopToTop).not.toHaveBeenCalled()
+
+      triggerAppStateChange("background")
+      advanceTime(STALE_TRIP_MS)
+      triggerAppStateChange("active")
+
+      expect(mockPopToTop).toHaveBeenCalledTimes(1)
+    })
+
+    it("dismisses on a stale return taken during the success icon phase", () => {
+      /** The hook is live behind the icon too, so a trip taken before the receipt is drawn
+       *  has to land on Home rather than finish the animation onto a stale receipt. */
+      renderSuccess()
+
+      triggerAppStateChange("background")
+      travelWithoutTimers(STALE_TRIP_MS)
+      triggerAppStateChange("active")
+
+      expect(screen.getByTestId("Success Text")).toBeTruthy()
+      expect(mockPopToTop).toHaveBeenCalledTimes(1)
+    })
+
+    it("does not dismiss while the app stays in the foreground", () => {
+      renderSuccess()
+
+      triggerAppStateChange("inactive")
+      advanceTime(STALE_TRIP_MS)
+      triggerAppStateChange("active")
+
+      expect(mockPopToTop).not.toHaveBeenCalled()
+    })
+
+    it("does not dismiss while the screen is covered by another screen", () => {
+      renderSuccess()
+      mockIsFocused.mockReturnValue(false)
+
+      triggerAppStateChange("background")
+      advanceTime(STALE_TRIP_MS)
+      triggerAppStateChange("active")
+
+      expect(mockPopToTop).not.toHaveBeenCalled()
+    })
+
+    it("dismisses a covered receipt once the screen over it goes away", () => {
+      /** Skipping the dismissal outright would strand the receipt for the rest of the
+       *  session, which is the case this screen exists to avoid. */
+      renderSuccess()
+      mockIsFocused.mockReturnValue(false)
+
+      triggerAppStateChange("background")
+      advanceTime(STALE_TRIP_MS)
+      triggerAppStateChange("active")
+
+      mockIsFocused.mockReturnValue(true)
+      triggerFocus()
+
+      expect(mockPopToTop).toHaveBeenCalledTimes(1)
+    })
+
+    it("spends the held dismissal on the first focus only", () => {
+      renderSuccess()
+      mockIsFocused.mockReturnValue(false)
+
+      triggerAppStateChange("background")
+      advanceTime(STALE_TRIP_MS)
+      triggerAppStateChange("active")
+
+      mockIsFocused.mockReturnValue(true)
+      triggerFocus()
+      triggerFocus()
+
+      expect(mockPopToTop).toHaveBeenCalledTimes(1)
+    })
+
+    it("stays put when the screen regains focus with no stale trip behind it", () => {
+      renderSuccess()
+
+      triggerFocus()
+
+      expect(mockPopToTop).not.toHaveBeenCalled()
+    })
+
+    it("does not dismiss when mounted while the app was already backgrounded", () => {
+      /** The screen never reads AppState.currentState, so what carries this case is the
+       *  absence of a preceding "background" event rather than the state set here. */
+      mockAppStateCurrentState = "background"
+      renderSuccess()
+
+      advanceTime(STALE_TRIP_MS)
+      triggerAppStateChange("active")
+
+      expect(mockPopToTop).not.toHaveBeenCalled()
+    })
+
+    it("pops from inside the app state event, before the resume lock can cover it", () => {
+      /** Ordering contract with AppStateWrapper: its relock awaits the keystore, so this
+       *  listener runs first and still finds the receipt focused. Were the pop deferred to
+       *  a later tick, the unlock screen would already be over it and the dismissal would
+       *  be held back to a focus that only arrives once the user has unlocked. */
+      renderSuccess()
+
+      triggerAppStateChange("background")
+      advanceTime(STALE_TRIP_MS)
+      mockAppStateListeners[0]("active")
+
+      expect(mockPopToTop).toHaveBeenCalledTimes(1)
+    })
+
+    it("removes its listeners on unmount", () => {
+      renderSuccess()
+      expect(mockAppStateListeners).toHaveLength(1)
+      expect(mockFocusListeners).toHaveLength(1)
+
+      screen.unmount()
+
+      expect(mockAppStateListeners).toHaveLength(0)
+      expect(mockFocusListeners).toHaveLength(0)
+    })
+  })
+
+  describe("ViewShot background color for screenshot", () => {
     it("has white background in light mode for screenshot capture", async () => {
       render(
         <ContextForScreenWithTheme mode="light">
-          <SuccessAction route={successRoute} />
+          <SuccessAction route={timedRoute} />
         </ContextForScreenWithTheme>,
       )
 
@@ -674,7 +918,7 @@ describe("SendBitcoinCompletedScreen", () => {
     it("has dark background in dark mode for screenshot capture", async () => {
       render(
         <ContextForScreenWithTheme mode="dark">
-          <SuccessAction route={successRoute} />
+          <SuccessAction route={timedRoute} />
         </ContextForScreenWithTheme>,
       )
 
