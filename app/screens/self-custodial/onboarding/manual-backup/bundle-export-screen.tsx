@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react"
 
 import { RouteProp, useRoute } from "@react-navigation/native"
-import { useTheme } from "@rn-vui/themed"
+import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
@@ -40,6 +40,7 @@ type BundleExportRouteProp = RouteProp<
  */
 export const BundleExportScreen: React.FC = () => {
   const { LL } = useI18nContext()
+  const styles = useStyles()
   const {
     theme: { colors },
   } = useTheme()
@@ -139,7 +140,11 @@ export const BundleExportScreen: React.FC = () => {
         showCloseIconButton={true}
         image={<GaloyIcon name="eye-slash" size={52} color={colors.primary} />}
         title={LL.BackupScreen.BundleExport.sensitiveTitle()}
-        body={LL.BackupScreen.BundleExport.sensitiveBody()}
+        body={
+          <Text style={styles.modalBody}>
+            {LL.BackupScreen.BundleExport.sensitiveBody()}
+          </Text>
+        }
         primaryButtonTitle={LL.BackupScreen.BundleExport.download()}
         primaryButtonOnPress={onConfirmDownload}
         primaryButtonLoading={sharing}
@@ -147,3 +152,12 @@ export const BundleExportScreen: React.FC = () => {
     </OnboardingScreenLayout>
   )
 }
+
+const useStyles = makeStyles(({ colors }) => ({
+  modalBody: {
+    fontSize: 16,
+    lineHeight: 24,
+    textAlign: "center",
+    color: colors.black,
+  },
+}))
