@@ -51,7 +51,8 @@ export type RecoveryBundleActions = {
   settings: RecoveryBundleSettings
   refreshing: boolean
   uploading: boolean
-  exporting: boolean
+  sharing: boolean
+  copying: boolean
   reloadState: () => Promise<void>
   handleRefresh: () => Promise<void>
   handleShare: () => Promise<void>
@@ -85,7 +86,9 @@ export const useRecoveryBundleActions = (): RecoveryBundleActions => {
   )
   const [refreshing, setRefreshing] = useState(false)
   const [uploading, setUploading] = useState(false)
-  const [exporting, setExporting] = useState(false)
+  // One export at a time (both paths decrypt the saved bundle), but tracked
+  // per action so each button can show its own spinner.
+  const [exportAction, setExportAction] = useState<"share" | "copy" | null>(null)
 
   const reloadState = useCallback(async () => {
     if (!accountId) {
@@ -172,8 +175,8 @@ export const useRecoveryBundleActions = (): RecoveryBundleActions => {
   }
 
   const handleShare = async () => {
-    if (exporting) return
-    setExporting(true)
+    if (exportAction) return
+    setExportAction("share")
     try {
       const json = await loadDecryptedBundleJson()
       if (!json) return
@@ -196,15 +199,13 @@ export const useRecoveryBundleActions = (): RecoveryBundleActions => {
         recordAndToast(err, LL.RecoveryBundleScreen.exportFailed())
       }
     } finally {
-      setExporting(false)
+      setExportAction(null)
     }
   }
 
   const handleCopy = async () => {
-    // Shares the exporting flag with handleShare: both decrypt the bundle,
-    // and a tap burst must not run concurrent decrypts.
-    if (exporting) return
-    setExporting(true)
+    if (exportAction) return
+    setExportAction("copy")
     try {
       const json = await loadDecryptedBundleJson()
       if (!json) return
@@ -212,7 +213,7 @@ export const useRecoveryBundleActions = (): RecoveryBundleActions => {
     } catch (err) {
       recordAndToast(err, LL.RecoveryBundleScreen.exportFailed())
     } finally {
-      setExporting(false)
+      setExportAction(null)
     }
   }
 
@@ -324,7 +325,8 @@ export const useRecoveryBundleActions = (): RecoveryBundleActions => {
     settings,
     refreshing,
     uploading,
-    exporting,
+    sharing: exportAction === "share",
+    copying: exportAction === "copy",
     reloadState,
     handleRefresh,
     handleShare,
