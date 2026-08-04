@@ -1,41 +1,99 @@
 import {
-  BUNDLE_STALE_AFTER_MS,
+  BUNDLE_BACKSTOP_MS,
   RecoveryBundleStatus,
   statusFor,
 } from "@app/self-custodial/hooks/use-recovery-bundle-status"
 
 const NOW = 1_700_000_000_000
+const DAY = 24 * 60 * 60 * 1000
+
+const check = (over: Partial<Parameters<typeof statusFor>[0]> = {}) =>
+  statusFor({
+    savedAt: NOW - 60_000,
+    savedTotalSats: "21000",
+    currentTotalSats: "21000",
+    now: NOW,
+    ...over,
+  })
 
 describe("statusFor", () => {
-  it("reports missing when no bundle has ever been saved", () => {
-    expect(statusFor(null, NOW)).toBe(RecoveryBundleStatus.Missing)
+  describe("no backup", () => {
+    it("reports missing when nothing has ever been saved", () => {
+      expect(check({ savedAt: null, savedTotalSats: null })).toBe(
+        RecoveryBundleStatus.Missing,
+      )
+    })
+
+    it("reports missing when the saved balance is absent", () => {
+      // A state file without a recorded balance cannot be compared against the
+      // wallet, so it cannot be claimed as current.
+      expect(check({ savedTotalSats: null })).toBe(RecoveryBundleStatus.Missing)
+    })
   })
 
-  it("reports fresh for a bundle saved within the window", () => {
-    expect(statusFor(NOW - 60_000, NOW)).toBe(RecoveryBundleStatus.Fresh)
+  describe("the wallet has not changed", () => {
+    it("is fresh right after a save", () => {
+      expect(check()).toBe(RecoveryBundleStatus.Fresh)
+    })
+
+    it("stays fresh a week later", () => {
+      // The bundle records which outputs the wallet owns. Those only change
+      // when the user transacts, so an untouched wallet's backup still
+      // describes it exactly - warning here would be a false alarm.
+      expect(check({ savedAt: NOW - 7 * DAY })).toBe(RecoveryBundleStatus.Fresh)
+    })
+
+    it("stays fresh well past the refresh scheduler's 24h window", () => {
+      // 24h is a good trigger to re-fetch and a bad claim to make to the user.
+      expect(check({ savedAt: NOW - 2 * DAY })).toBe(RecoveryBundleStatus.Fresh)
+    })
   })
 
-  it("reports stale once the window has passed", () => {
-    expect(statusFor(NOW - BUNDLE_STALE_AFTER_MS - 1, NOW)).toBe(
-      RecoveryBundleStatus.Stale,
-    )
+  describe("the wallet has changed", () => {
+    it("is stale when the balance grew", () => {
+      expect(check({ currentTotalSats: "31000" })).toBe(RecoveryBundleStatus.Stale)
+    })
+
+    it("is stale when the balance shrank", () => {
+      expect(check({ currentTotalSats: "11000" })).toBe(RecoveryBundleStatus.Stale)
+    })
+
+    it("is stale even for a backup written moments ago", () => {
+      // Age is irrelevant: what matters is that the backup no longer matches.
+      expect(check({ savedAt: NOW - 1000, currentTotalSats: "31000" })).toBe(
+        RecoveryBundleStatus.Stale,
+      )
+    })
+
+    it("does not guess while the balance is still loading", () => {
+      // A null balance is "not known yet", not "changed"; claiming stale here
+      // would flash a warning on every cold start.
+      expect(check({ currentTotalSats: null })).toBe(RecoveryBundleStatus.Fresh)
+    })
   })
 
-  it("treats the boundary itself as stale", () => {
-    // The refresh scheduler re-fetches at exactly this age, so anything older
-    // is something it would already be replacing.
-    expect(statusFor(NOW - BUNDLE_STALE_AFTER_MS, NOW)).toBe(RecoveryBundleStatus.Stale)
-  })
+  describe("age backstop", () => {
+    it("goes stale past the backstop even at an unchanged balance", () => {
+      // Catches what a balance comparison cannot see: a swap or consolidation
+      // that moves the underlying outputs while the total stays put.
+      expect(check({ savedAt: NOW - BUNDLE_BACKSTOP_MS - 1 })).toBe(
+        RecoveryBundleStatus.Stale,
+      )
+    })
 
-  it("treats a backwards clock as stale rather than fresh", () => {
-    // A wound-back device clock makes the age negative; reading that as fresh
-    // would let a user hide an out-of-date backup by changing the date.
-    expect(statusFor(NOW + 60_000, NOW)).toBe(RecoveryBundleStatus.Stale)
-  })
+    it("treats the backstop boundary itself as stale", () => {
+      expect(check({ savedAt: NOW - BUNDLE_BACKSTOP_MS })).toBe(
+        RecoveryBundleStatus.Stale,
+      )
+    })
 
-  it("matches the refresh scheduler's own fallback window", () => {
-    // Two different thresholds would show "up to date" while a refresh was
-    // already pending.
-    expect(BUNDLE_STALE_AFTER_MS).toBe(24 * 60 * 60 * 1000)
+    it("is far longer than the refresh scheduler's fallback window", () => {
+      expect(BUNDLE_BACKSTOP_MS).toBeGreaterThan(DAY)
+    })
+
+    it("treats a backwards clock as stale rather than fresh", () => {
+      // Otherwise winding the date back would hide a backup from the backstop.
+      expect(check({ savedAt: NOW + 60_000 })).toBe(RecoveryBundleStatus.Stale)
+    })
   })
 })
