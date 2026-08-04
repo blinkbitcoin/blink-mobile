@@ -18,12 +18,11 @@ const mockSeenState = jest.fn()
 const mockAmountBadge = jest.fn()
 const mockFragments = jest.fn()
 const mockOutgoingVisibility = jest.fn()
-const mockIncomingVisibility = jest.fn()
+const mockIncomingAutoSeen = jest.fn()
 const mockMarkTxSeen = jest.fn()
 
 jest.mock("@app/hooks/use-transaction-seen-state", () => ({
-  useTransactionSeenState: (accountId: string, transactions: unknown) =>
-    mockSeenState(accountId, transactions),
+  useTransactionSeenState: (params: unknown) => mockSeenState(params),
 }))
 
 jest.mock("@app/self-custodial/hooks/use-self-custodial-transaction-fragments", () => ({
@@ -40,11 +39,10 @@ jest.mock("@app/components/unseen-tx-amount-badge/use-outgoing-badge-visibility"
 }))
 
 jest.mock("@app/components/unseen-tx-amount-badge/use-incoming-badge-auto-seen", () => ({
-  useIncomingBadgeAutoSeen: (params: unknown) => mockIncomingVisibility(params),
+  useIncomingBadgeAutoSeen: (params: unknown) => mockIncomingAutoSeen(params),
 }))
 
 const CUSTODIAL_ACCOUNT_ID = "custodial-account"
-const SELF_CUSTODIAL_ACCOUNT_ID = "self-custodial-account"
 
 const makeSelfCustodialTransaction = (): NormalizedTransaction => ({
   id: "sc-tx",
@@ -95,7 +93,6 @@ const renderBadgeState = (
       isSelfCustodial: false,
       isFocused: true,
       custodialAccountId: CUSTODIAL_ACCOUNT_ID,
-      selfCustodialAccountId: SELF_CUSTODIAL_ACCOUNT_ID,
       selfCustodialTransactions: [],
       pendingIncomingTransactions: null,
       transactionEdges: null,
@@ -119,7 +116,7 @@ describe("useUnseenTxBadgeState", () => {
       isOutgoing: false,
     })
     mockOutgoingVisibility.mockReturnValue(false)
-    mockIncomingVisibility.mockReturnValue(true)
+    mockIncomingAutoSeen.mockReturnValue(true)
   })
 
   describe("custodial account", () => {
@@ -131,7 +128,7 @@ describe("useUnseenTxBadgeState", () => {
         transactionEdges: [{ node: makeCustodialFragment("settled") }],
       })
 
-      const [, transactions] = mockSeenState.mock.calls[0]
+      const [{ transactions }] = mockSeenState.mock.calls[0]
       expect(transactions.map((tx: { id: string }) => tx.id)).toEqual([
         "pending",
         "settled",
@@ -148,7 +145,7 @@ describe("useUnseenTxBadgeState", () => {
         ],
       })
 
-      const [, transactions] = mockSeenState.mock.calls[0]
+      const [{ transactions }] = mockSeenState.mock.calls[0]
       expect(transactions.map((tx: { id: string }) => tx.id)).toEqual(["settled"])
     })
 
@@ -160,14 +157,18 @@ describe("useUnseenTxBadgeState", () => {
 
       renderBadgeState({ transactionEdges: [{ node: pendingSend }] })
 
-      const [, transactions] = mockSeenState.mock.calls[0]
+      const [{ transactions }] = mockSeenState.mock.calls[0]
       expect(transactions.map((tx: { id: string }) => tx.id)).toEqual(["pending-send"])
     })
 
     it("keys the seen state by the custodial account", () => {
       renderBadgeState()
 
-      expect(mockSeenState).toHaveBeenCalledWith(CUSTODIAL_ACCOUNT_ID, [])
+      expect(mockSeenState).toHaveBeenCalledWith({
+        accountId: CUSTODIAL_ACCOUNT_ID,
+        isSelfCustodial: false,
+        transactions: [],
+      })
     })
 
     it("never maps self-custodial transactions", () => {
@@ -188,7 +189,8 @@ describe("useUnseenTxBadgeState", () => {
       })
 
       expect(mockFragments).toHaveBeenCalledWith([makeSelfCustodialTransaction()])
-      expect(mockSeenState).toHaveBeenCalledWith(SELF_CUSTODIAL_ACCOUNT_ID, mapped)
+      const [{ transactions }] = mockSeenState.mock.calls[0]
+      expect(transactions).toEqual(mapped)
     })
 
     it("ignores whatever the custodial home query returned", () => {
@@ -199,13 +201,18 @@ describe("useUnseenTxBadgeState", () => {
         transactionEdges: [{ node: makeCustodialFragment("custodial-tx") }],
       })
 
-      expect(mockSeenState).toHaveBeenCalledWith(SELF_CUSTODIAL_ACCOUNT_ID, [])
+      const [{ transactions }] = mockSeenState.mock.calls[0]
+      expect(transactions).toEqual([])
     })
 
-    it("falls back to an empty account key while the account is still loading", () => {
-      renderBadgeState({ isSelfCustodial: true, selfCustodialAccountId: undefined })
+    it("leaves the self-custodial seen-state key to the seen-state hook", () => {
+      renderBadgeState({ isSelfCustodial: true, custodialAccountId: undefined })
 
-      expect(mockSeenState).toHaveBeenCalledWith("", [])
+      expect(mockSeenState).toHaveBeenCalledWith({
+        accountId: "",
+        isSelfCustodial: true,
+        transactions: [],
+      })
     })
   })
 

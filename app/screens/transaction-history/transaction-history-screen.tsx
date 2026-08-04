@@ -221,7 +221,11 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
     latestBtcTxId,
     latestUsdTxId,
     markTxSeen,
-  } = useTransactionSeenState(accountId || "", allTransactions)
+  } = useTransactionSeenState({
+    accountId: accountId || "",
+    isSelfCustodial: activeWallet.isSelfCustodial,
+    transactions: allTransactions,
+  })
 
   const [seenTxIds, setSeenTxIds] = React.useState<Set<string>>(new Set())
 

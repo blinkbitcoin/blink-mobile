@@ -362,7 +362,6 @@ export const HomeScreen: React.FC = () => {
     isSelfCustodial,
     isFocused,
     custodialAccountId: accountId,
-    selfCustodialAccountId: activeAccount?.id,
     selfCustodialTransactions: selfCustodialAllTransactions,
     pendingIncomingTransactions,
     transactionEdges: transactionsEdges,

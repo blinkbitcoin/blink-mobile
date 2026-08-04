@@ -16,7 +16,6 @@ type UnseenTxBadgeStateParams = {
   isSelfCustodial: boolean
   isFocused: boolean
   custodialAccountId?: string
-  selfCustodialAccountId?: string
   selfCustodialTransactions: readonly NormalizedTransaction[]
   pendingIncomingTransactions?: readonly TransactionFragment[] | null
   transactionEdges?: readonly { readonly node: TransactionFragment }[] | null
@@ -29,23 +28,21 @@ type UnseenTxBadgeStateParams = {
  * the shared fragment shape here. Mapping also primes the Apollo cache, which is what
  * lets the transaction detail behind the badge load.
  *
- * The seen state is stored per account id, so the active account keys it in self-custodial
- * mode instead of the custodial account the home query would return.
+ * `custodialAccountId` only keys the custodial seen state; `useTransactionSeenState`
+ * resolves the self-custodial key from the active account itself, so this hook and the
+ * history and detail screens all agree on it.
  */
 export const useUnseenTxBadgeState = ({
   isSelfCustodial,
   isFocused,
   custodialAccountId,
-  selfCustodialAccountId,
   selfCustodialTransactions,
   pendingIncomingTransactions,
   transactionEdges,
 }: UnseenTxBadgeStateParams) => {
-  const selfCustodialSource = useMemo(
-    () =>
-      isSelfCustodial ? selfCustodialTransactions : EMPTY_SELF_CUSTODIAL_TRANSACTIONS,
-    [isSelfCustodial, selfCustodialTransactions],
-  )
+  const selfCustodialSource = isSelfCustodial
+    ? selfCustodialTransactions
+    : EMPTY_SELF_CUSTODIAL_TRANSACTIONS
 
   const selfCustodialFragments = useSelfCustodialTransactionFragments(selfCustodialSource)
 
@@ -65,16 +62,17 @@ export const useUnseenTxBadgeState = ({
   }, [pendingIncomingTransactions, transactionEdges])
 
   const transactions = isSelfCustodial ? selfCustodialFragments : custodialFragments
-  const seenStateAccountId = isSelfCustodial ? selfCustodialAccountId : custodialAccountId
 
-  const { hasUnseenBtcTx, hasUnseenUsdTx, markTxSeen } = useTransactionSeenState(
-    seenStateAccountId || "",
+  const { hasUnseenBtcTx, hasUnseenUsdTx, markTxSeen } = useTransactionSeenState({
+    accountId: custodialAccountId || "",
+    isSelfCustodial,
     transactions,
-  )
+  })
 
   const { latestUnseenTx, unseenAmountText, handleUnseenBadgePress, isOutgoing } =
     useUnseenTxAmountBadge({
       transactions,
+      isSelfCustodial,
       hasUnseenBtcTx,
       hasUnseenUsdTx,
     })
