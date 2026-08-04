@@ -235,6 +235,16 @@ describe("useTransactionSeenState", () => {
     expect(result.current.latestUsdTxId).toBe("usd-array")
   })
 
+  it("runs the last-seen query for the custodial account it is keyed by", () => {
+    renderHook(() =>
+      useTransactionSeenState({ accountId, isSelfCustodial: mockIsSelfCustodial }),
+    )
+
+    expect(mockUseTxLastSeenQuery).toHaveBeenCalledWith(
+      expect.objectContaining({ variables: { accountId }, skip: false }),
+    )
+  })
+
   it("marks the latest transaction as seen for the requested currency", () => {
     const transactions = [
       buildTx({
@@ -302,6 +312,20 @@ describe("useTransactionSeenState", () => {
 
       expect(result.current.hasUnseenBtcTx).toBe(true)
       expect(result.current.hasUnseenUsdTx).toBe(true)
+    })
+
+    it("skips the last-seen query instead of watching a cache nothing reads", () => {
+      renderHook(() =>
+        useTransactionSeenState({
+          accountId,
+          isSelfCustodial: mockIsSelfCustodial,
+          transactions: [btcTx, usdTx],
+        }),
+      )
+
+      expect(mockUseTxLastSeenQuery).toHaveBeenCalledWith(
+        expect.objectContaining({ skip: true }),
+      )
     })
 
     it("treats a stored transaction as already seen across a cold start", () => {
