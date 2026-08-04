@@ -540,6 +540,34 @@ describe("useRecoveryBundleActions", () => {
       expect(mockShareOpen).not.toHaveBeenCalled()
       expect(mockDecryptBundleBackupPayload).not.toHaveBeenCalled()
     })
+
+    it("ignores a copy tap while a share export is in flight (one export at a time)", async () => {
+      let resolveLoad: (value: string | null) => void = () => {}
+      mockLoadEncryptedBundleFile.mockReturnValue(
+        new Promise((resolve) => {
+          resolveLoad = resolve
+        }),
+      )
+      const { result } = renderHook(() => useRecoveryBundleActions())
+
+      let sharePromise: Promise<void> = Promise.resolve()
+      act(() => {
+        sharePromise = result.current.handleShare()
+      })
+      expect(result.current.sharing).toBe(true)
+      expect(result.current.copying).toBe(false)
+
+      await act(async () => {
+        await result.current.handleCopy()
+      })
+      expect(mockCopyToClipboard).not.toHaveBeenCalled()
+
+      await act(async () => {
+        resolveLoad("encrypted-payload")
+        await sharePromise
+      })
+      expect(result.current.sharing).toBe(false)
+    })
   })
 
   describe("handleCopy", () => {
