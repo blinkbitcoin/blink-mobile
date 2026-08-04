@@ -83,51 +83,60 @@ const lightningSend = {
   initiationVia: { __typename: "InitiationViaLn", paymentHash: "c94e998a" },
 }
 
-const headingOf = (tree: ReturnType<typeof render>) =>
-  tree.UNSAFE_getAllByType("Text" as never).find((n) => n.props.type === "h2")
+// transactionHash === null is what marks an onchain send as still queued.
+const queuedOnChainSend = {
+  ...lightningSend,
+  settlementVia: {
+    __typename: "SettlementViaOnChain",
+    transactionHash: null,
+    arrivalInMempoolEstimatedAt: null,
+  },
+  initiationVia: { __typename: "InitiationViaOnChain", address: "bc1qexample" },
+}
+
+const renderHeading = (tx: unknown) => {
+  mockUseFragment.mockReturnValue({ data: tx })
+  const tree = render(<TransactionDetailScreen route={route} />)
+  const heading = tree
+    .UNSAFE_getAllByType("Text" as never)
+    .find((node) => node.props.type === "h2")
+
+  return { heading, tree }
+}
 
 // The heading lost its trailing word intermittently on Android: the Text was
 // measured as one line, then re-broken after "You" on a later layout pass, and
 // the wrapped word fell outside the already-fixed container height. Pinning it
-// to a single line makes that unrepresentable.
+// to a single line makes that unrepresentable; adjustsFontSizeToFit keeps a
+// long locale whole under font scaling rather than trading the drop for an
+// ellipsis.
 describe("TransactionDetailScreen heading", () => {
   beforeEach(() => jest.clearAllMocks())
 
-  it("renders the full spend copy, never a truncated prefix", () => {
-    mockUseFragment.mockReturnValue({ data: lightningSend })
+  const cases: Array<{ name: string; tx: unknown; copy: string }> = [
+    { name: "spend", tx: lightningSend, copy: "You spent" },
+    {
+      name: "receive",
+      tx: { ...lightningSend, direction: "RECEIVE", settlementAmount: 23 },
+      copy: "You received",
+    },
+    { name: "queued onchain send", tx: queuedOnChainSend, copy: "Sending" },
+  ]
 
-    const heading = headingOf(render(<TransactionDetailScreen route={route} />))
+  cases.forEach(({ name, tx, copy }) => {
+    it(`renders the full ${name} copy, never a truncated prefix`, () => {
+      const { heading, tree } = renderHeading(tx)
 
-    expect(heading?.props.children).toBe("You spent")
-  })
-
-  it("keeps the heading on a single line so a re-break cannot drop a word", () => {
-    mockUseFragment.mockReturnValue({ data: lightningSend })
-
-    const heading = headingOf(render(<TransactionDetailScreen route={route} />))
-
-    expect(heading?.props.numberOfLines).toBe(1)
-  })
-
-  // One line alone would trade the dropped word for a tail ellipsis once the
-  // line genuinely doesn't fit; shrinking keeps a long locale whole.
-  it("shrinks rather than ellipsizing when the line cannot fit", () => {
-    mockUseFragment.mockReturnValue({ data: lightningSend })
-
-    const heading = headingOf(render(<TransactionDetailScreen route={route} />))
-
-    expect(heading?.props.adjustsFontSizeToFit).toBe(true)
-  })
-
-  it("applies the same guarantees to the receive copy", () => {
-    mockUseFragment.mockReturnValue({
-      data: { ...lightningSend, direction: "RECEIVE", settlementAmount: 23 },
+      expect(heading?.props.children).toBe(copy)
+      tree.unmount()
     })
 
-    const heading = headingOf(render(<TransactionDetailScreen route={route} />))
+    it(`keeps the ${name} heading on one line, shrinking rather than clipping`, () => {
+      const { heading, tree } = renderHeading(tx)
 
-    expect(heading?.props.children).toBe("You received")
-    expect(heading?.props.numberOfLines).toBe(1)
-    expect(heading?.props.adjustsFontSizeToFit).toBe(true)
+      expect(heading?.props.numberOfLines).toBe(1)
+      expect(heading?.props.adjustsFontSizeToFit).toBe(true)
+      tree.unmount()
+    })
   })
 })
