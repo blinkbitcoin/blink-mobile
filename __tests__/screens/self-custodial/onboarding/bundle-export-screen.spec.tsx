@@ -110,6 +110,20 @@ describe("BundleExportScreen", () => {
       await waitFor(() => expect(mockActions.handleShare).toHaveBeenCalledTimes(1))
     })
 
+    it("does not re-warn on a second download", async () => {
+      renderScreen()
+
+      fireEvent.press(screen.getByTestId("bundle-download-button"))
+      const downloads = screen.getAllByText(LL.BackupScreen.BundleExport.download())
+      fireEvent.press(downloads[0])
+      await waitFor(() => expect(mockActions.handleShare).toHaveBeenCalledTimes(1))
+
+      // The warning has been read; a second press exports directly, with no
+      // modal confirmation in between.
+      fireEvent.press(screen.getByTestId("bundle-download-button"))
+      await waitFor(() => expect(mockActions.handleShare).toHaveBeenCalledTimes(2))
+    })
+
     it("completes the backup once an export has happened", async () => {
       renderScreen()
 
