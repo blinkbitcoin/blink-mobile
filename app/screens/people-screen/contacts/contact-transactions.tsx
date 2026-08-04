@@ -133,13 +133,21 @@ export const ContactTransactions = ({ contact }: Props) => {
 
   const hasTransactionsError = Boolean(error) || hasSelfCustodialError
 
-  if (hasTransactionsError) {
+  /**
+   * In an effect rather than the render body: the flag stays raised until the next read,
+   * so any unrelated re-render while it is up would queue a second toast for a failure
+   * the reader was already told about.
+   */
+  React.useEffect(() => {
+    if (!hasTransactionsError) return
+
     toastShow({
       message: (translations) => translations.common.transactionsError(),
       LL,
     })
-    return <></>
-  }
+  }, [hasTransactionsError, LL])
+
+  if (hasTransactionsError) return <></>
 
   /**
    * Until the query answers there is nothing to say about this contact, so the custodial

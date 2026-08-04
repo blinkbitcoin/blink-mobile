@@ -87,13 +87,17 @@ jest.mock("@app/utils/toast", () => ({
   toastShow: (args: unknown) => mockToastShow(args),
 }))
 
-/** Real translations so the section headers and empty state read like production. */
+/**
+ * Real translations so the section headers and empty state read like production, resolved
+ * once so `LL` keeps the stable identity the real context hands out.
+ */
 jest.mock("@app/i18n/i18n-react", () => {
   const { loadLocale } = jest.requireActual("@app/i18n/i18n-util.sync")
   const { i18nObject } = jest.requireActual("@app/i18n/i18n-util")
   loadLocale("en")
+  const LL = i18nObject("en")
 
-  return { useI18nContext: () => ({ LL: i18nObject("en"), locale: "en" }) }
+  return { useI18nContext: () => ({ LL, locale: "en" }) }
 })
 
 jest.mock("@react-navigation/native", () => ({
@@ -124,12 +128,14 @@ const makeFragment = (id: string) => ({
   settlementCurrency: "BTC",
 })
 
-const renderContactTransactions = () =>
-  render(
-    <ThemeProvider theme={theme}>
-      <ContactTransactions contact={contact} />
-    </ThemeProvider>,
-  )
+/** A fresh element each call: re-rendering the same one lets React bail out entirely. */
+const contactTransactionsScreen = () => (
+  <ThemeProvider theme={theme}>
+    <ContactTransactions contact={contact} />
+  </ThemeProvider>
+)
+
+const renderContactTransactions = () => render(contactTransactionsScreen())
 
 describe("ContactTransactions", () => {
   beforeEach(() => {
@@ -303,6 +309,16 @@ describe("ContactTransactions", () => {
       loadLocale("en")
       const [{ message }] = mockToastShow.mock.calls[0]
       expect(message(i18nObject("en"))).toBe("Error loading transactions")
+    })
+
+    it("does not toast again when the screen re-renders with the error still up", () => {
+      mockUseContactTransactions.mockReturnValue(contactTransactions({ hasError: true }))
+
+      const { rerender } = renderContactTransactions()
+      rerender(contactTransactionsScreen())
+      rerender(contactTransactionsScreen())
+
+      expect(mockToastShow).toHaveBeenCalledTimes(1)
     })
 
     it("asks the adapter for the next page when the list reaches its end", () => {
