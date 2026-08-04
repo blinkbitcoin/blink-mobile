@@ -175,16 +175,15 @@ describe("useRecoveryBundleRefresh", () => {
       })
     })
 
-    it("does not schedule a second refresh when the same payment id is re-delivered", async () => {
+    it("does not schedule a second refresh after the same payment id was handled", async () => {
       setWallet(ActiveWalletStatus.Ready, "payment-1")
       const { rerender } = renderHook(() => useRecoveryBundleRefresh())
 
       await advance(PAYMENT_DEBOUNCE_MS)
       expect(mockRefreshRecoveryBundle).toHaveBeenCalledTimes(1)
 
-      // Wallet drops out of Ready and comes back with the same last payment
-      // id (e.g. a reconnect re-emits state) - the effect re-runs, but the
-      // dedupe ref must block a second schedule.
+      // The first debounce already fired, so a reconnect that re-emits the
+      // same last payment id must not refresh it a second time.
       setWallet(ActiveWalletStatus.Loading, "payment-1")
       rerender(undefined)
       setWallet(ActiveWalletStatus.Ready, "payment-1")
@@ -271,7 +270,7 @@ describe("useRecoveryBundleRefresh", () => {
       expect(mockRefreshRecoveryBundle).toHaveBeenCalledTimes(1)
     })
 
-    it("cancels a pending refresh when the wallet drops out of Ready before the deadline", async () => {
+    it("retries the same payment event after readiness cancels its pending debounce", async () => {
       setWallet(ActiveWalletStatus.Ready, "payment-1")
       const { rerender } = renderHook(() => useRecoveryBundleRefresh())
 
@@ -290,6 +289,17 @@ describe("useRecoveryBundleRefresh", () => {
       // The startup-staleness path is gated on walletReady too: the not-ready
       // render must not even read the saved bundle state to schedule from it.
       expect(mockReadRecoveryBundleState).not.toHaveBeenCalled()
+
+      // Returning to Ready with the same latest event must schedule a fresh
+      // debounce because the previous one never reached its run decision.
+      setWallet(ActiveWalletStatus.Ready, "payment-1")
+      rerender(undefined)
+
+      await advance(PAYMENT_DEBOUNCE_MS - 1)
+      expect(mockRefreshRecoveryBundle).not.toHaveBeenCalled()
+
+      await advance(1)
+      expect(mockRefreshRecoveryBundle).toHaveBeenCalledTimes(1)
     })
   })
 

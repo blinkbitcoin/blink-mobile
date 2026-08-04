@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react"
+import { useCallback, useEffect, useRef } from "react"
 
 import crashlytics from "@react-native-firebase/crashlytics"
 import DeviceInfo from "react-native-device-info"
@@ -65,6 +65,26 @@ export const useRecoveryBundleRefresh = (): void => {
 
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const lastHandledEventKeyRef = useRef<string | null>(null)
+  const pendingPaymentEventKeyRef = useRef<string | null>(null)
+
+  const cancelPendingRefresh = useCallback(() => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current)
+      timerRef.current = null
+    }
+
+    const pendingPaymentEventKey = pendingPaymentEventKeyRef.current
+    pendingPaymentEventKeyRef.current = null
+    if (
+      pendingPaymentEventKey &&
+      lastHandledEventKeyRef.current === pendingPaymentEventKey
+    ) {
+      // The event was claimed when its debounce was armed, but canceling the
+      // timer before it fires means it was never handled. Let a subsequent
+      // Ready render retry the same latest event.
+      lastHandledEventKeyRef.current = null
+    }
+  }, [])
 
   const walletReady =
     status === ActiveWalletStatus.Ready || status === ActiveWalletStatus.Degraded
@@ -77,13 +97,10 @@ export const useRecoveryBundleRefresh = (): void => {
   // old timer's non-null ref.
   useEffect(() => {
     return () => {
-      if (timerRef.current) {
-        clearTimeout(timerRef.current)
-        timerRef.current = null
-      }
+      cancelPendingRefresh()
       lastHandledEventKeyRef.current = null
     }
-  }, [accountId, network])
+  }, [accountId, network, cancelPendingRefresh])
 
   useEffect(() => {
     // No account, or the wallet dropped out of Ready: a pending refresh would
@@ -92,10 +109,7 @@ export const useRecoveryBundleRefresh = (): void => {
     // scheduler the only effect that manages the timer besides the
     // identity-change cleanup above.
     if (!accountId || !walletReady) {
-      if (timerRef.current) {
-        clearTimeout(timerRef.current)
-        timerRef.current = null
-      }
+      cancelPendingRefresh()
       return undefined
     }
     const currentAccountId = accountId
@@ -126,10 +140,15 @@ export const useRecoveryBundleRefresh = (): void => {
       }
     }
 
-    const schedule = (delayMs: number) => {
-      if (timerRef.current) clearTimeout(timerRef.current)
+    const schedule = (delayMs: number, paymentEventKey: string | null = null) => {
+      cancelPendingRefresh()
+      if (paymentEventKey) {
+        lastHandledEventKeyRef.current = paymentEventKey
+        pendingPaymentEventKeyRef.current = paymentEventKey
+      }
       timerRef.current = setTimeout(() => {
         timerRef.current = null
+        pendingPaymentEventKeyRef.current = null
         runRefresh().catch((err) => {
           crashlytics().recordError(
             err instanceof Error ? err : new Error(String(err)),
@@ -141,8 +160,7 @@ export const useRecoveryBundleRefresh = (): void => {
 
     // Event-driven: a payment completed or was claimed
     if (lastPaymentEventKey && lastPaymentEventKey !== lastHandledEventKeyRef.current) {
-      lastHandledEventKeyRef.current = lastPaymentEventKey
-      schedule(PAYMENT_DEBOUNCE_MS)
+      schedule(PAYMENT_DEBOUNCE_MS, lastPaymentEventKey)
       return undefined
     }
 
@@ -167,7 +185,7 @@ export const useRecoveryBundleRefresh = (): void => {
     }
 
     return undefined
-  }, [accountId, network, walletReady, lastPaymentEventKey])
+  }, [accountId, network, walletReady, lastPaymentEventKey, cancelPendingRefresh])
 
   // When the user completes a cloud seed backup and a bundle is already on
   // disk but never uploaded, sync it right away instead of waiting for the
