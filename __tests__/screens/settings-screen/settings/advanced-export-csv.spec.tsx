@@ -14,7 +14,7 @@ jest.mock("@app/hooks/use-account-registry", () => ({
 }))
 
 const mockCustodialExportCsv = jest.fn()
-jest.mock("@app/hooks/use-export-transactions-csv", () => ({
+jest.mock("@app/custodial/hooks/use-export-transactions-csv", () => ({
   useExportTransactionsCsv: () => ({
     exportCsv: mockCustodialExportCsv,
     loading: false,

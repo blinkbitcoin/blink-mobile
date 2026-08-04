@@ -1,7 +1,7 @@
 import { renderHook, act } from "@testing-library/react-native"
 import { Platform } from "react-native"
 
-import { useExportTransactionsCsv } from "@app/hooks/use-export-transactions-csv"
+import { useExportTransactionsCsv } from "@app/custodial/hooks/use-export-transactions-csv"
 
 const CSV_BASE64 = "Y3N2LWNvbnRlbnQ="
 const DEFAULT_PLATFORM_OS = Platform.OS
