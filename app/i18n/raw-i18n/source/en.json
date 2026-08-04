@@ -3685,6 +3685,15 @@
             "cloudNotAvailable": "iCloud Drive is not available. Please sign in to iCloud in Settings and enable iCloud Drive.",
             "networkError": "Network error. Please check your connection and try again."
         },
+        "BundleExport": {
+            "title": "Before you start",
+            "subtitle": "In case of Spark or Blink going offline, use this file to exit onchain. This file is sensitive. Keep it private.",
+            "subtitlePending": "Your recovery backup is created automatically once you receive funds, and kept up to date from then on. You can download it any time from Settings.",
+            "download": "Download",
+            "copy": "Copy",
+            "sensitiveTitle": "Sensitive",
+            "sensitiveBody": "This file is sensitive wallet data and must be kept private. If you lose this device, you will not be able to use emergency recovery."
+        },
         "ManualBackup": {
             "Alerts": {
                 "title": "Keep your backup phrase secret!",
