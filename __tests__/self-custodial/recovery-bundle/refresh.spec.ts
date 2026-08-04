@@ -9,12 +9,20 @@ const mockLoadEncryptedBundleFile = jest.fn()
 const mockReadRecoveryBundleState = jest.fn()
 const mockWriteRecoveryBundleState = jest.fn()
 const mockParseBundleBackupMetadata = jest.fn()
-const mockCrashlyticsLog = jest.fn()
-const mockCrashlyticsRecordError = jest.fn()
+const mockRecordAppError = jest.fn()
 
+// The reporting boundary is mocked (not crashlytics underneath it) so the
+// expected/dedupKey classification is asserted directly, and because
+// recordAppError's module-level dedup set would swallow repeat asserts
+// across tests. crashlytics stays mocked for the requireActual import below.
 jest.mock("@react-native-firebase/crashlytics", () => () => ({
-  log: (...args: string[]) => mockCrashlyticsLog(...args),
-  recordError: (...args: Error[]) => mockCrashlyticsRecordError(...args),
+  log: jest.fn(),
+  recordError: jest.fn(),
+}))
+
+jest.mock("@app/utils/error-reporting", () => ({
+  ...jest.requireActual("@app/utils/error-reporting"),
+  recordAppError: (...args: unknown[]) => mockRecordAppError(...args),
 }))
 
 jest.mock("@app/self-custodial/recovery-bundle/exporter", () => ({
@@ -321,10 +329,9 @@ describe("refreshRecoveryBundle cloud gating", () => {
     if (result.success) {
       expect(result.state).toMatchObject({ leafCount: 1, totalSats: "32768" })
     }
-    expect(mockCrashlyticsRecordError).toHaveBeenCalledWith(
-      syncFailure,
-      "recovery-bundle-cloud-sync",
-    )
+    expect(mockRecordAppError).toHaveBeenCalledWith(syncFailure, {
+      dedupKey: "recovery-bundle-cloud-sync-step",
+    })
   })
 })
 
@@ -451,13 +458,15 @@ describe("syncExistingBundleToCloud", () => {
     )
   })
 
-  it("records a crashlytics error and returns false when the saved payload no longer parses", async () => {
+  it("records an app error and returns false when the saved payload no longer parses", async () => {
     mockReadBackupStateFor.mockResolvedValue(cloudBackupState)
     mockLoadEncryptedBundleFile.mockResolvedValue("corrupt-on-disk")
     mockParseBundleBackupMetadata.mockReturnValue(null)
 
     expect(await syncExistingBundleToCloud(ACCOUNT_ID, Network.Mainnet)).toBe(false)
-    expect(mockCrashlyticsRecordError).toHaveBeenCalledWith(expect.any(Error))
+    expect(mockRecordAppError).toHaveBeenCalledWith(expect.any(Error), {
+      dedupKey: "recovery-bundle-corrupt-payload",
+    })
     expect(mockAttemptSilentCloudUpload).not.toHaveBeenCalled()
     expect(mockWriteRecoveryBundleState).not.toHaveBeenCalled()
   })
@@ -469,12 +478,14 @@ describe("syncExistingBundleToCloud", () => {
 
     expect(await syncExistingBundleToCloud(ACCOUNT_ID, Network.Mainnet)).toBe(false)
     expect(mockWriteRecoveryBundleState).not.toHaveBeenCalled()
-    expect(mockCrashlyticsLog).toHaveBeenCalledWith(expect.stringContaining("auth"))
-    // Auth failures are expected (cloud never linked): breadcrumb only.
-    expect(mockCrashlyticsRecordError).not.toHaveBeenCalled()
+    // No usable cloud session is a user/device state: expected, never a defect.
+    expect(mockRecordAppError).toHaveBeenCalledWith(
+      expect.objectContaining({ message: expect.stringContaining("auth") }),
+      { expected: true, dedupKey: "recovery-bundle-cloud-sync" },
+    )
   })
 
-  it("records the original error for a non-auth upload failure", async () => {
+  it("records the original error as a defect for an unclassified upload failure", async () => {
     mockReadBackupStateFor.mockResolvedValue(cloudBackupState)
     mockLoadEncryptedBundleFile.mockResolvedValue(savedPayload)
     const providerError = new Error("iCloud write rejected")
@@ -485,13 +496,32 @@ describe("syncExistingBundleToCloud", () => {
     })
 
     expect(await syncExistingBundleToCloud(ACCOUNT_ID, Network.Mainnet)).toBe(false)
-    // A systemic provider failure must surface as a standalone Crashlytics
-    // event carrying the original error, not just a breadcrumb reason enum.
-    expect(mockCrashlyticsRecordError).toHaveBeenCalledWith(
-      providerError,
-      "recovery-bundle-cloud-sync",
-    )
+    // A systemic provider failure must reach the boundary as the original
+    // error, unexpected, so it records as a standalone non-fatal.
+    expect(mockRecordAppError).toHaveBeenCalledWith(providerError, {
+      expected: false,
+      dedupKey: "recovery-bundle-cloud-sync",
+    })
     expect(mockWriteRecoveryBundleState).not.toHaveBeenCalled()
+  })
+
+  it("treats a transient network failure as expected, not a defect", async () => {
+    mockReadBackupStateFor.mockResolvedValue(cloudBackupState)
+    mockLoadEncryptedBundleFile.mockResolvedValue(savedPayload)
+    const networkError = new Error("Drive network error: request timed out")
+    mockAttemptSilentCloudUpload.mockResolvedValue({
+      success: false,
+      reason: "transient",
+      error: networkError,
+    })
+
+    expect(await syncExistingBundleToCloud(ACCOUNT_ID, Network.Mainnet)).toBe(false)
+    // The opening scenario: a dropped connection during the post-payment
+    // upload must not file a non-fatal defect for every user on a flaky link.
+    expect(mockRecordAppError).toHaveBeenCalledWith(networkError, {
+      expected: true,
+      dedupKey: "recovery-bundle-cloud-sync",
+    })
   })
 })
 
