@@ -435,9 +435,7 @@ describe("date utils", () => {
     })
 
     it("falls back to en-US when no locale is given", () => {
-      expect(formatDateFromNow({ years: 1 })).toBe(
-        formatDateFromNow({ years: 1, locale: "en-US" }),
-      )
+      expect(formatDateFromNow({ years: 1 })).toBe("Mar 12, 2027")
     })
   })
 
