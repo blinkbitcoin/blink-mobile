@@ -12,6 +12,8 @@
 
 import { Network } from "@breeztech/breez-sdk-spark-react-native"
 
+import packageJson from "../../../package.json"
+
 import { deriveIdentityKeyPair, signChallenge, type IdentityKeyPair } from "./identity"
 import { grpcWebUnaryCall } from "./protocol/grpc-web"
 import {
@@ -41,6 +43,13 @@ import {
  */
 export const SPARK_COORDINATOR_URL = "https://0.spark.lightspark.com"
 const OPERATOR_SET = "breez-sdk"
+
+/**
+ * Name and exact version of the SDK whose wallet state this bundle snapshots,
+ * read from the pinned dependency so it tracks upgrades automatically. The
+ * exit tooling can key version-specific workarounds off it.
+ */
+const SPARK_SDK_VERSION = `breez-sdk-spark-react-native@${packageJson.dependencies["@breeztech/breez-sdk-spark-react-native"]}`
 
 const GET_CHALLENGE_PATH = "/spark_authn.SparkAuthnService/get_challenge"
 const VERIFY_CHALLENGE_PATH = "/spark_authn.SparkAuthnService/verify_challenge"
@@ -367,7 +376,7 @@ export const fetchRecoveryBundle = async ({
     network: bundleNetworkLabelFor(network),
     operatorSet: OPERATOR_SET,
     walletIdentityPublicKey: hexEncode(keyPair.publicKey),
-    sparkSdkVersion: "breez-sdk-spark-react-native",
+    sparkSdkVersion: SPARK_SDK_VERSION,
     appVersion,
     leaves: sortedByIdAsc(leaves).map((leaf) => ({
       id: leaf.id,
