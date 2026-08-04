@@ -12,6 +12,11 @@ import {
   TxStatus,
   TxDirection,
 } from "@app/graphql/generated"
+import { usePersistentStateContext } from "@app/store/persistent-state"
+import {
+  getTxLastSeenIds,
+  withTxLastSeenId,
+} from "@app/store/persistent-state/tx-last-seen"
 
 const getLatestTransactionId = (
   transactions: ReadonlyArray<TransactionFragment>,
@@ -32,12 +37,33 @@ const getLatestTransactionId = (
   return latestTransaction.id
 }
 
-export const useTransactionSeenState = (
-  accountId: string,
-  transactions?: ReadonlyArray<TransactionFragment>,
-) => {
+type TransactionSeenStateParams = {
+  /** Keys the custodial store only; self-custodial keys off the active account. */
+  accountId: string
+  isSelfCustodial: boolean
+  transactions?: ReadonlyArray<TransactionFragment>
+}
+
+/**
+ * Which transaction the user has already been shown, per currency, and how to mark the
+ * current one as seen. Where that answer is stored depends on the account: custodial
+ * keeps it in the Apollo cache, which the persistor restores on launch, while a
+ * self-custodial account never restores that cache and so keeps it on device instead.
+ *
+ * The caller passes `isSelfCustodial` rather than the hook resolving it, so the flag that
+ * picks the transactions fed in is the same one that picks where they are stored. Deriving
+ * it here would mean a second, looser predicate that can only agree with the caller's by
+ * accident. Self-custodial keys off the active account through `resolveAccountKey`, so
+ * every screen agrees on the key without sourcing an id the custodial query cannot answer.
+ */
+export const useTransactionSeenState = ({
+  accountId,
+  isSelfCustodial,
+  transactions,
+}: TransactionSeenStateParams) => {
   const client = useApolloClient()
   const { feeReimbursementMemo } = useRemoteConfig()
+  const { persistentState, updateState } = usePersistentStateContext()
 
   const readCachedTransactions = useCallback((): ReadonlyArray<TransactionFragment> => {
     const data = client.readQuery<HomeAuthedQuery>({ query: HomeAuthedDocument })
@@ -58,8 +84,13 @@ export const useTransactionSeenState = (
   }, [client])
 
   const latestTransactionIds = useMemo(() => {
-    const baseTransactions =
-      transactions && transactions.length > 0 ? transactions : readCachedTransactions()
+    const hasProvidedTransactions = Boolean(transactions && transactions.length > 0)
+    /** A self-custodial account has no `me` behind the cached home query, so an empty
+     *  list is genuinely empty and must never fall back to custodial transactions. */
+    const canReadCachedTransactions = !hasProvidedTransactions && !isSelfCustodial
+    const baseTransactions = canReadCachedTransactions
+      ? readCachedTransactions()
+      : transactions ?? []
 
     return {
       btcId: getLatestTransactionId(
@@ -73,7 +104,7 @@ export const useTransactionSeenState = (
         feeReimbursementMemo,
       ),
     }
-  }, [readCachedTransactions, transactions, feeReimbursementMemo])
+  }, [readCachedTransactions, transactions, feeReimbursementMemo, isSelfCustodial])
 
   const { data: lastSeenData } = useTxLastSeenQuery({
     fetchPolicy: "cache-only",
@@ -81,8 +112,12 @@ export const useTransactionSeenState = (
     variables: { accountId },
   })
 
-  const lastSeenBtcId = lastSeenData?.txLastSeen?.btcId || ""
-  const lastSeenUsdId = lastSeenData?.txLastSeen?.usdId || ""
+  const cachedLastSeenBtcId = lastSeenData?.txLastSeen?.btcId || ""
+  const cachedLastSeenUsdId = lastSeenData?.txLastSeen?.usdId || ""
+  const deviceLastSeen = getTxLastSeenIds(persistentState)
+
+  const lastSeenBtcId = isSelfCustodial ? deviceLastSeen.btcId : cachedLastSeenBtcId
+  const lastSeenUsdId = isSelfCustodial ? deviceLastSeen.usdId : cachedLastSeenUsdId
   const latestBtcTxId = latestTransactionIds.btcId
   const latestUsdTxId = latestTransactionIds.usdId
 
@@ -100,11 +135,18 @@ export const useTransactionSeenState = (
     (currency: WalletCurrency) => {
       const transactionIdToMark =
         currency === WalletCurrency.Btc ? latestBtcTxId : latestUsdTxId
-      if (transactionIdToMark) {
-        markTxLastSeenId({ client, accountId, currency, id: transactionIdToMark })
+      if (!transactionIdToMark) return
+
+      if (isSelfCustodial) {
+        updateState(
+          (prev) => prev && withTxLastSeenId(prev, currency, transactionIdToMark),
+        )
+        return
       }
+
+      markTxLastSeenId({ client, accountId, currency, id: transactionIdToMark })
     },
-    [client, latestBtcTxId, latestUsdTxId, accountId],
+    [client, latestBtcTxId, latestUsdTxId, accountId, isSelfCustodial, updateState],
   )
 
   return {

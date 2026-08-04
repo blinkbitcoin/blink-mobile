@@ -205,9 +205,10 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
       ? formatTimeToMempool(timeDiff, LL, locale)
       : ""
 
-  const { latestBtcTxId, latestUsdTxId, markTxSeen } = useTransactionSeenState(
-    homeData?.me?.defaultAccount?.id || "",
-  )
+  const { latestBtcTxId, latestUsdTxId, markTxSeen } = useTransactionSeenState({
+    accountId: homeData?.me?.defaultAccount?.id || "",
+    isSelfCustodial,
+  })
 
   React.useEffect(() => {
     let intervalId: NodeJS.Timeout
