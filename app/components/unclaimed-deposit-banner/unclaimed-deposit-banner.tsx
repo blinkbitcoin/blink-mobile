@@ -1,14 +1,13 @@
-import React, { useCallback, useEffect, useRef, useState } from "react"
+import React, { useMemo } from "react"
 import { Pressable, View } from "react-native"
 
-import { useFocusEffect, useNavigation } from "@react-navigation/native"
+import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
-import { usePayments } from "@app/hooks/use-payments"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
+import { usePendingDeposits } from "@app/self-custodial/hooks"
 import { DepositStatus } from "@app/types/payment"
 import { testProps } from "@app/utils/testProps"
 
@@ -21,34 +20,15 @@ export const UnclaimedDepositBanner: React.FC = () => {
   } = useTheme()
   const { LL } = useI18nContext()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-  const { listPendingDeposits } = usePayments()
-  // Re-fetch whenever wallets refresh (e.g. ClaimedDeposits / NewDeposits SDK events).
-  const { wallets } = useSelfCustodialWallet()
-  const [count, setCount] = useState(0)
-  const [totalSats, setTotalSats] = useState(0)
-  // Coordinates concurrent fetches (focus + wallet-refresh) so only the latest
-  // in-flight resolution commits state.
-  const fetchGenerationRef = useRef(0)
+  const { deposits } = usePendingDeposits()
 
-  const fetchDeposits = useCallback(() => {
-    if (!listPendingDeposits) return
-    fetchGenerationRef.current += 1
-    const generation = fetchGenerationRef.current
-    listPendingDeposits().then(({ deposits }) => {
-      if (generation !== fetchGenerationRef.current) return
-      const active = deposits.filter(({ status }) => status !== DepositStatus.Refunded)
-      setCount(active.length)
-      setTotalSats(active.reduce((sum, { amount }) => sum + amount.amount, 0))
-    })
-    return () => {
-      fetchGenerationRef.current += 1
+  const { count, totalSats } = useMemo(() => {
+    const active = deposits.filter(({ status }) => status !== DepositStatus.Refunded)
+    return {
+      count: active.length,
+      totalSats: active.reduce((sum, { amount }) => sum + amount.amount, 0),
     }
-  }, [listPendingDeposits])
-
-  // Re-fetch on SDK wallet refresh + every time the banner comes back into focus
-  // (covers the user returning from the unclaimed-deposits screen after claiming).
-  useFocusEffect(fetchDeposits)
-  useEffect(fetchDeposits, [fetchDeposits, wallets])
+  }, [deposits])
 
   if (count === 0) return null
 
