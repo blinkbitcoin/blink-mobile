@@ -85,10 +85,13 @@ export const formatShortDate = ({
 /**
  * e.g. 1747691078 at UTC-6 -> "2025-05-19 15:44". Renders in the device timezone,
  * matching the transaction list and detail screens; `timezone` is only injected so tests
- * can pin a zone. Each half borrows the locale whose shape it needs, `en-CA` for the
- * `YYYY-MM-DD` order and `en-GB` for the 24 hour clock, and joining them here keeps the
- * result stable whatever separator a locale would pick; `hourCycle: "h23"` keeps midnight
- * as `00` rather than `24`.
+ * can pin a zone, so no production caller passes one and a malformed string never reaches
+ * `toLocaleTimeString`, which would throw a RangeError: give this the guard
+ * `formatDayAndMonth` carries if a backend zone ever arrives here. Each half borrows the
+ * locale whose shape it needs, `en-CA` for the `YYYY-MM-DD` order and `en-GB` for the 24
+ * hour clock, and joining them here keeps the result stable whatever separator a locale
+ * would pick; `en-GB` already defaults to `h23`, so `hourCycle` is not load-bearing and
+ * only guards a device ICU that would resolve it otherwise and render midnight as `24`.
  */
 export const formatUnixTimestampYMDHM = ({
   timestampSeconds,
