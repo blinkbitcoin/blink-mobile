@@ -21,17 +21,18 @@ import { GetFee } from "./payment-details/index.types"
 
 type FeeType =
   | {
-      status: "loading" | "error" | "unset"
+      status: "loading" | "unset"
       amount?: undefined | null
-      errors?: readonly GraphQlApplicationError[]
     }
   | {
       amount: WalletAmount<WalletCurrency>
       status: "set"
       amountAdjustment?: ConvertAmountAdjustment
     }
+  // The only arm that carries errors: a quote that failed, with the classified reason.
+  // `null` because GetFee may report a failure alongside an absent amount.
   | {
-      amount?: WalletAmount<WalletCurrency>
+      amount?: WalletAmount<WalletCurrency> | null
       status: "error"
       errors?: readonly GraphQlApplicationError[]
     }

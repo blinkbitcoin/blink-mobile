@@ -31,7 +31,6 @@ import {
   type WalletOrDisplayCurrency,
 } from "@app/types/amounts"
 import { ConvertDirection } from "@app/types/payment"
-import { reportError } from "@app/utils/error-logging"
 
 import {
   buildConversionType,
@@ -42,6 +41,8 @@ import {
   toSdkSendAmount,
 } from "../bridge"
 import { classifySdkError } from "../sdk-error"
+
+import { feeFailure } from "./send-helpers"
 
 const SAT_TO_MILLISAT = BigInt(1000)
 
@@ -204,16 +205,7 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
             const feeSats = extractLnurlFee(prepared)
             return { amount: asBtcSettlementAmount<T>(feeSats) }
           } catch (err) {
-            reportError("Self-custodial LNURL fee", err)
-            return {
-              amount: undefined,
-              errors: [
-                {
-                  __typename: "GraphQLApplicationError" as const,
-                  message: classifySdkError(err),
-                },
-              ],
-            }
+            return feeFailure<T>("Self-custodial LNURL fee", err)
           }
         },
         sendPaymentMutation: async () => {

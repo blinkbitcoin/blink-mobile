@@ -214,7 +214,7 @@ describe("createGetFee", () => {
 
   // `use-fee` only reports thrown errors, and this never throws — so without reporting
   // here the failure is invisible in Crashlytics.
-  it("records fee failures to crashlytics with a scoped Error", async () => {
+  it("records an unexplained fee failure to crashlytics", async () => {
     mockPrepareSendPayment.mockRejectedValue(new Error("prepare refused"))
 
     const getFee = createGetFee({
@@ -227,6 +227,53 @@ describe("createGetFee", () => {
     expect(mockRecordError).toHaveBeenCalledWith(
       expect.objectContaining({ message: "prepare refused" }),
     )
+  })
+
+  // The SDK adds the fee on top of the amount, so sending the full balance is the common
+  // way to fail a quote. The user lowers the amount and succeeds — not a defect, and it
+  // would otherwise fire a non-fatal per attempt, per user, on a flow that works.
+  it("keeps an InsufficientFunds quote failure a breadcrumb, not a non-fatal", async () => {
+    mockPrepareSendPayment.mockRejectedValue(sdkError("InsufficientFunds"))
+
+    const getFee = createGetFee({
+      sdk: mockSdk,
+      paymentRequest: "lnbc1...",
+      amount: undefined,
+    })
+    const result = await getFee()
+
+    expect(result.errors?.[0]?.message).toBe(SelfCustodialErrorCode.InsufficientFunds)
+    expect(mockRecordError).not.toHaveBeenCalled()
+  })
+
+  it("keeps a BelowMinimum quote failure a breadcrumb, not a non-fatal", async () => {
+    mockPrepareSendPayment.mockRejectedValue(
+      sdkError("Generic", ["amount below minimum"]),
+    )
+
+    const getFee = createGetFee({
+      sdk: mockSdk,
+      paymentRequest: "lnbc1...",
+      amount: undefined,
+    })
+    const result = await getFee()
+
+    expect(result.errors?.[0]?.message).toBe(SelfCustodialErrorCode.BelowMinimum)
+    expect(mockRecordError).not.toHaveBeenCalled()
+  })
+
+  it("still records an InvalidInput quote failure — it can mean our own bug", async () => {
+    mockPrepareSendPayment.mockRejectedValue(sdkError("InvalidInput"))
+
+    const getFee = createGetFee({
+      sdk: mockSdk,
+      paymentRequest: "lnbc1...",
+      amount: undefined,
+    })
+    const result = await getFee()
+
+    expect(result.errors?.[0]?.message).toBe(SelfCustodialErrorCode.InvalidInput)
+    expect(mockRecordError).toHaveBeenCalled()
   })
 
   it("records non-Error throws as a scoped Error so Sentry never gets a bare string", async () => {

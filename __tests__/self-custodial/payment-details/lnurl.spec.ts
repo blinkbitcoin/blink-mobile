@@ -57,6 +57,9 @@ jest.mock("@app/self-custodial/sdk-error", () => {
 jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
   AesSuccessActionDataResult_Tags: { Decrypted: "Decrypted", ErrorStatus: "ErrorStatus" },
   FeePolicy: { FeesExcluded: 0, FeesIncluded: 1 },
+  // The shared fee-failure helper lives in send-helpers, which builds its tier→speed map
+  // at module scope.
+  OnchainConfirmationSpeed: { Fast: 0, Medium: 1, Slow: 2 },
   SuccessActionProcessed_Tags: { Aes: "Aes", Message: "Message", Url: "Url" },
   PaymentDetails: {
     Lightning: {

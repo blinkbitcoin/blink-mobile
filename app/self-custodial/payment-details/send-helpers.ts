@@ -28,7 +28,7 @@ import {
   mapAmountAdjustment,
   prepareSend,
 } from "../bridge"
-import { classifySdkError } from "../sdk-error"
+import { classifySdkError, SelfCustodialErrorCode } from "../sdk-error"
 
 type PrepareParams = {
   sdk: BreezSdkInterface
@@ -55,18 +55,30 @@ const asGetFeeAmount = <T extends WalletCurrency>(feeSats: number) =>
   toBtcMoneyAmount(feeSats) as unknown as WalletAmount<T>
 
 /**
+ * Quote failures the user resolves themselves by changing the amount. They are the common
+ * way to fail a quote — the SDK adds the fee on top, so sending the full balance throws
+ * InsufficientFunds — and a flow that ends in a successful send is not a defect, so they
+ * stay breadcrumbs and leave the non-fatals to the failures actually worth chasing.
+ */
+const EXPECTED_FEE_CODES: ReadonlySet<SelfCustodialErrorCode> = new Set([
+  SelfCustodialErrorCode.InsufficientFunds,
+  SelfCustodialErrorCode.BelowMinimum,
+])
+
+/**
  * A fee quote the SDK could not produce. The classified code travels in `errors` so the
  * confirmation screen can name the cause — an unclassified failure leaves the user staring
  * at a generic "unable to calculate fee" with a disabled slider and no way forward.
  */
-const feeFailure = <T extends WalletCurrency>(
+export const feeFailure = <T extends WalletCurrency>(
   scope: string,
   err: unknown,
 ): SelfCustodialFeeResult<T> => {
-  reportError(scope, err)
+  const message = classifySdkError(err)
+  reportError(scope, err, { expected: EXPECTED_FEE_CODES.has(message) })
   return {
     amount: undefined,
-    errors: [{ __typename: "GraphQLApplicationError", message: classifySdkError(err) }],
+    errors: [{ __typename: "GraphQLApplicationError", message }],
   }
 }
 
