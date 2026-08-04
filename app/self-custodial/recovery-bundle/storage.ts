@@ -56,10 +56,13 @@ export const loadEncryptedBundleFile = async (
   const path = recoveryBundlePathFor(accountId, network)
   if (!(await RNFS.exists(path))) {
     // A crash between the atomic-save's unlink and rename leaves the payload
-    // only in the tmp file; finish the rename instead of reporting no bundle.
+    // only in the tmp file; read it in place instead of reporting no bundle.
+    // No rename here: repair belongs to the save and delete paths, so a load
+    // racing a concurrent save's unlink-to-rename window cannot steal the
+    // rename out from under it. The next successful save or delete cleans up.
     const tmpPath = `${path}.tmp`
     if (!(await RNFS.exists(tmpPath))) return null
-    await RNFS.moveFile(tmpPath, path)
+    return RNFS.readFile(tmpPath, "utf8")
   }
   return RNFS.readFile(path, "utf8")
 }
