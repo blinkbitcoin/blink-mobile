@@ -7,16 +7,14 @@ import {
   TransactionFragment,
   useTxLastSeenQuery,
   WalletCurrency,
-  HomeAuthedDocument,
-  HomeAuthedQuery,
-  TxStatus,
-  TxDirection,
 } from "@app/graphql/generated"
 import { usePersistentStateContext } from "@app/store/persistent-state"
 import {
   getTxLastSeenIds,
   withTxLastSeenId,
 } from "@app/store/persistent-state/tx-last-seen"
+
+import { useAccountTransactions } from "./use-account-transactions"
 
 const getLatestTransactionId = (
   transactions: ReadonlyArray<TransactionFragment>,
@@ -65,34 +63,10 @@ export const useTransactionSeenState = ({
   const { feeReimbursementMemo } = useRemoteConfig()
   const { persistentState, updateState } = usePersistentStateContext()
 
-  const readCachedTransactions = useCallback((): ReadonlyArray<TransactionFragment> => {
-    const data = client.readQuery<HomeAuthedQuery>({ query: HomeAuthedDocument })
-    const pendingTransactions =
-      data?.me?.defaultAccount?.pendingIncomingTransactions || []
-    const transactionEdges = data?.me?.defaultAccount?.transactions?.edges
-    if (!transactionEdges?.length) return pendingTransactions
+  const baseTransactions = useAccountTransactions({ isSelfCustodial, transactions })
 
-    const settledTransactions = transactionEdges
-      .map((edge) => edge.node)
-      .filter(
-        (transaction) =>
-          transaction.status !== TxStatus.Pending ||
-          transaction.direction === TxDirection.Send,
-      )
-    if (pendingTransactions.length === 0) return settledTransactions
-    return [...pendingTransactions, ...settledTransactions]
-  }, [client])
-
-  const latestTransactionIds = useMemo(() => {
-    const hasProvidedTransactions = Boolean(transactions && transactions.length > 0)
-    /** A self-custodial account has no `me` behind the cached home query, so an empty
-     *  list is genuinely empty and must never fall back to custodial transactions. */
-    const canReadCachedTransactions = !hasProvidedTransactions && !isSelfCustodial
-    const baseTransactions = canReadCachedTransactions
-      ? readCachedTransactions()
-      : transactions ?? []
-
-    return {
+  const latestTransactionIds = useMemo(
+    () => ({
       btcId: getLatestTransactionId(
         baseTransactions,
         WalletCurrency.Btc,
@@ -103,8 +77,9 @@ export const useTransactionSeenState = ({
         WalletCurrency.Usd,
         feeReimbursementMemo,
       ),
-    }
-  }, [readCachedTransactions, transactions, feeReimbursementMemo, isSelfCustodial])
+    }),
+    [baseTransactions, feeReimbursementMemo],
+  )
 
   const { data: lastSeenData } = useTxLastSeenQuery({
     fetchPolicy: "cache-only",

@@ -1,16 +1,14 @@
 import { useCallback, useMemo } from "react"
 
-import { TransactionFragment, TxDirection, TxStatus } from "@app/graphql/generated"
+import { TransactionFragment } from "@app/graphql/generated"
+import { toCustodialTransactions } from "@app/hooks/use-account-transactions"
 import { useTransactionSeenState } from "@app/hooks/use-transaction-seen-state"
 import { useSelfCustodialTransactionFragments } from "@app/self-custodial/hooks/use-self-custodial-transaction-fragments"
-import { NormalizedTransaction } from "@app/types/transaction"
+import { NormalizedTransaction, NO_TRANSACTIONS } from "@app/types/transaction"
 
 import { useIncomingBadgeAutoSeen } from "./use-incoming-badge-auto-seen"
 import { useOutgoingBadgeVisibility } from "./use-outgoing-badge-visibility"
 import { useUnseenTxAmountBadge } from "./use-unseen-tx-amount-badge"
-
-/** Stable identity so the fragment hook does not re-run on every custodial render. */
-const EMPTY_SELF_CUSTODIAL_TRANSACTIONS: NormalizedTransaction[] = []
 
 type UnseenTxBadgeStateParams = {
   isSelfCustodial: boolean
@@ -42,24 +40,14 @@ export const useUnseenTxBadgeState = ({
 }: UnseenTxBadgeStateParams) => {
   const selfCustodialSource = isSelfCustodial
     ? selfCustodialTransactions
-    : EMPTY_SELF_CUSTODIAL_TRANSACTIONS
+    : NO_TRANSACTIONS
 
   const selfCustodialFragments = useSelfCustodialTransactionFragments(selfCustodialSource)
 
-  const custodialFragments = useMemo(() => {
-    const txs: TransactionFragment[] = []
-    if (pendingIncomingTransactions) txs.push(...pendingIncomingTransactions)
-
-    const settled =
-      transactionEdges
-        ?.map((edge) => edge.node)
-        .filter(
-          (tx) => tx.status !== TxStatus.Pending || tx.direction === TxDirection.Send,
-        ) ?? []
-    txs.push(...settled)
-
-    return txs
-  }, [pendingIncomingTransactions, transactionEdges])
+  const custodialFragments = useMemo(
+    () => toCustodialTransactions(pendingIncomingTransactions, transactionEdges),
+    [pendingIncomingTransactions, transactionEdges],
+  )
 
   const transactions = isSelfCustodial ? selfCustodialFragments : custodialFragments
 
