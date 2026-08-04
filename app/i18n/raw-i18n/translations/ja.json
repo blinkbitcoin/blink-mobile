@@ -3765,10 +3765,22 @@
                 "testSuccess": "バックアップフレーズは正しいです"
             }
         },
+        "BundleExport": {
+            "title": "はじめる前に",
+            "subtitle": "Spark または Blink が利用できなくなった場合は、このファイルを使ってオンチェーンで出金します。このファイルは機密情報です。他人に見せないでください。",
+            "subtitlePending": "リカバリーバックアップは資金を受け取ると自動的に作成され、その後は最新の状態に保たれます。設定からいつでもダウンロードできます。",
+            "download": "ダウンロード",
+            "copy": "コピー",
+            "sensitiveTitle": "機密情報",
+            "sensitiveBody": "このファイルには機密性の高いウォレットデータが含まれており、非公開に保つ必要があります。この端末を紛失すると、緊急リカバリーは利用できません。"
+        },
         "CloudBackup": {
             "title": "ウォレットをバックアップしましょう",
             "description": "{provider}にバックアップフレーズのコピーを保存します。",
             "encryptCheckbox": "追加パスワードで暗号化",
+            "autoBundleCheckbox": "自動バックアップ",
+            "autoBundleHint": "Spark のオペレーターが利用できなくなった場合の一方的な出金を可能にします。",
+            "autoBundleNeedsPassword": "有効にするには上でパスワードを設定してください。パスワードがないと、リカバリーバックアップが保護されていないバックアップフレーズの隣に保存されます。",
             "password": "パスワード",
             "passwordPlaceholder": "（12文字以上）",
             "confirmPassword": "パスワード確認",

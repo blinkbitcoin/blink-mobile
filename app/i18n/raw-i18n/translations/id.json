@@ -3765,10 +3765,22 @@
         "testSuccess": "Frasa cadanganmu sudah benar"
       }
     },
+    "BundleExport": {
+      "title": "Sebelum kamu mulai",
+      "subtitle": "Jika Spark atau Blink tidak tersedia, gunakan berkas ini untuk keluar on-chain. Berkas ini sensitif. Jaga kerahasiaannya.",
+      "subtitlePending": "Cadangan pemulihanmu dibuat otomatis begitu kamu menerima dana, dan terus diperbarui setelahnya. Kamu bisa mengunduhnya kapan saja dari Pengaturan.",
+      "download": "Unduh",
+      "copy": "Salin",
+      "sensitiveTitle": "Sensitif",
+      "sensitiveBody": "Berkas ini berisi data dompet yang sensitif dan harus dirahasiakan. Jika kamu kehilangan perangkat ini, kamu tidak akan bisa memakai pemulihan darurat."
+    },
     "CloudBackup": {
       "title": "Mari cadangkan dompet Anda",
       "description": "Kami akan menyimpan cadangan frasa pemulihan Anda ke {provider} Anda.",
       "encryptCheckbox": "Enkripsi dengan kata sandi tambahan",
+      "autoBundleCheckbox": "Cadangan otomatis",
+      "autoBundleHint": "Memungkinkan keluar sepihak jika operator Spark tidak tersedia.",
+      "autoBundleNeedsPassword": "Tambahkan kata sandi di atas untuk mengaktifkannya. Tanpa kata sandi, cadangan pemulihanmu akan berada di samping frasa cadangan yang tidak terlindungi.",
       "password": "Kata sandi",
       "passwordPlaceholder": "(minimal 12 karakter)",
       "confirmPassword": "Konfirmasi kata sandi",

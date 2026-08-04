@@ -3765,10 +3765,22 @@
         "testSuccess": "Vaše záložní fráze je správná"
       }
     },
+    "BundleExport": {
+      "title": "Než začnete",
+      "subtitle": "Pokud Spark nebo Blink přestanou fungovat, použijte tento soubor k odchodu on-chain. Tento soubor je citlivý. Uchovejte jej v soukromí.",
+      "subtitlePending": "Vaše záloha pro obnovu se vytvoří automaticky, jakmile přijmete prostředky, a od té chvíle se udržuje aktuální. Kdykoli si ji můžete stáhnout v Nastavení.",
+      "download": "Stáhnout",
+      "copy": "Kopírovat",
+      "sensitiveTitle": "Citlivé",
+      "sensitiveBody": "Tento soubor obsahuje citlivá data peněženky a musí zůstat soukromý. Pokud toto zařízení ztratíte, nouzovou obnovu nebude možné použít."
+    },
     "CloudBackup": {
       "title": "Zálohujme vaši peněženku",
       "description": "Uložíme zálohu vaší záložní fráze do vašeho {provider}.",
       "encryptCheckbox": "Šifrovat dodatečným heslem",
+      "autoBundleCheckbox": "Automatické zálohy",
+      "autoBundleHint": "Umožňuje jednostranný odchod, pokud operátoři Spark přestanou být dostupní.",
+      "autoBundleNeedsPassword": "Pro zapnutí zadejte výše heslo. Bez něj by záloha pro obnovu ležela vedle nechráněné obnovovací fráze.",
       "password": "Heslo",
       "passwordPlaceholder": "(minimálně 12 znaků)",
       "confirmPassword": "Potvrdit heslo",

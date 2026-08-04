@@ -3765,10 +3765,22 @@
                 "testSuccess": "Votre phrase de sauvegarde est correcte"
             }
         },
+        "BundleExport": {
+            "title": "Avant de commencer",
+            "subtitle": "Si Spark ou Blink devient indisponible, utilisez ce fichier pour sortir on-chain. Ce fichier est sensible. Gardez-le privé.",
+            "subtitlePending": "Votre sauvegarde de récupération est créée automatiquement dès que vous recevez des fonds, puis maintenue à jour. Vous pouvez la télécharger à tout moment depuis les Paramètres.",
+            "download": "Télécharger",
+            "copy": "Copier",
+            "sensitiveTitle": "Sensible",
+            "sensitiveBody": "Ce fichier contient des données sensibles du portefeuille et doit rester privé. Si vous perdez cet appareil, vous ne pourrez pas utiliser la récupération d'urgence."
+        },
         "CloudBackup": {
             "title": "Sauvegardons votre portefeuille",
             "description": "Nous enregistrerons une copie de votre phrase de sauvegarde dans votre {provider}.",
             "encryptCheckbox": "Chiffrer avec un mot de passe supplémentaire",
+            "autoBundleCheckbox": "Sauvegardes automatiques",
+            "autoBundleHint": "Permet la sortie unilatérale si les opérateurs Spark deviennent indisponibles.",
+            "autoBundleNeedsPassword": "Ajoutez un mot de passe ci-dessus pour l'activer. Sans mot de passe, votre sauvegarde de récupération se trouverait à côté d'une phrase de récupération non protégée.",
             "password": "Mot de passe",
             "passwordPlaceholder": "(12 caractères minimum)",
             "confirmPassword": "Confirmer le mot de passe",

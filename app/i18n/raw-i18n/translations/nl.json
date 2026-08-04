@@ -3765,10 +3765,22 @@
         "testSuccess": "Je back-upzin is correct"
       }
     },
+    "BundleExport": {
+      "title": "Voordat je begint",
+      "subtitle": "Als Spark of Blink offline gaat, gebruik je dit bestand om on-chain uit te stappen. Dit bestand is gevoelig. Houd het privé.",
+      "subtitlePending": "Je herstelback-up wordt automatisch aangemaakt zodra je geld ontvangt, en daarna up-to-date gehouden. Je kunt hem altijd downloaden via Instellingen.",
+      "download": "Downloaden",
+      "copy": "Kopiëren",
+      "sensitiveTitle": "Gevoelig",
+      "sensitiveBody": "Dit bestand bevat gevoelige walletgegevens en moet privé blijven. Als je dit apparaat verliest, kun je noodherstel niet gebruiken."
+    },
     "CloudBackup": {
       "title": "Laten we een back-up maken van je portemonnee",
       "description": "We slaan een back-up van je herstelzin op in je {provider}.",
       "encryptCheckbox": "Versleutelen met extra wachtwoord",
+      "autoBundleCheckbox": "Automatische back-ups",
+      "autoBundleHint": "Maakt eenzijdige uitstap mogelijk als Spark-operators offline gaan.",
+      "autoBundleNeedsPassword": "Voeg hierboven een wachtwoord toe om dit in te schakelen. Zonder wachtwoord zou je herstelback-up naast een onbeschermde herstelzin staan.",
       "password": "Wachtwoord",
       "passwordPlaceholder": "(minimaal 12 tekens)",
       "confirmPassword": "Bevestig wachtwoord",
