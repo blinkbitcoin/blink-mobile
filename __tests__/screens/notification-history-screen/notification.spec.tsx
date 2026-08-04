@@ -12,6 +12,8 @@ import { Notification } from "@app/screens/notification-history-screen/notificat
 
 import { findPressableParent } from "../helper"
 
+import { UNMAPPED_ICON } from "./helpers"
+
 /**
  * `timeAgo` reads the wall clock, so the relative-time assertion only stays
  * stable if both the clock and the notification timestamp are pinned.
@@ -19,9 +21,6 @@ import { findPressableParent } from "../helper"
 const FIXED_NOW_MS = Date.UTC(2026, 0, 15, 12, 0, 0)
 const THIRTY_SECONDS_AGO = Math.floor(FIXED_NOW_MS / 1000) - 30
 const ACKNOWLEDGED_AT = Math.floor(FIXED_NOW_MS / 1000) - 60
-
-/** An icon the backend can send but the app ships no asset for. */
-const UNMAPPED_ICON = "ROCKET" as Icon
 
 const makeNotification = (
   overrides: Partial<StatefulNotification> = {},
@@ -100,7 +99,7 @@ describe("Notification", () => {
     )
 
     expect(getByTestId("notification-default-icon")).toBeTruthy()
-    expect(queryByTestId("icon-rocket")).toBeNull()
+    expect(queryByTestId(`icon-${UNMAPPED_ICON.toLowerCase()}`)).toBeNull()
   })
 
   it("renders unacknowledged text and icon in the primary color", () => {
