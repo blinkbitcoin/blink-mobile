@@ -41,7 +41,8 @@ export const RecoveryBackupScreen: React.FC = () => {
     settings,
     refreshing,
     uploading,
-    exporting,
+    sharing,
+    copying,
     reloadState,
     handleRefresh,
     handleShare,
@@ -184,13 +185,14 @@ export const RecoveryBackupScreen: React.FC = () => {
           )}
           <GaloySecondaryButton
             title={LL.RecoveryBundleScreen.exportFile()}
-            loading={exporting}
+            loading={sharing}
             disabled={!hasBundle}
             onPress={handleShare}
             {...testProps("recovery-bundle-share")}
           />
           <GaloySecondaryButton
             title={LL.RecoveryBundleScreen.copyJson()}
+            loading={copying}
             disabled={!hasBundle}
             onPress={handleCopy}
             {...testProps("recovery-bundle-copy")}
