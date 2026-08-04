@@ -13360,6 +13360,54 @@ type RootTranslation = {
 	}
 	RecoveryBundleScreen: {
 		/**
+		 * H​o​w​ ​r​e​c​o​v​e​r​y​ ​w​o​r​k​s
+		 */
+		howItWorksCta: string
+		/**
+		 * H​o​w​ ​r​e​c​o​v​e​r​y​ ​w​o​r​k​s
+		 */
+		howItWorksTitle: string
+		/**
+		 * I​f​ ​S​p​a​r​k​ ​b​e​c​o​m​e​s​ ​u​n​a​v​a​i​l​a​b​l​e​,​ ​t​h​i​s​ ​b​a​c​k​u​p​ ​l​e​t​s​ ​y​o​u​ ​m​o​v​e​ ​y​o​u​r​ ​f​u​n​d​s​ ​o​n​c​h​a​i​n​ ​y​o​u​r​s​e​l​f​,​ ​w​i​t​h​o​u​t​ ​B​l​i​n​k​.​ ​R​e​c​o​v​e​r​y​ ​i​s​ ​a​ ​m​u​l​t​i​-​w​e​e​k​ ​p​r​o​c​e​s​s​:​ ​t​r​a​n​s​a​c​t​i​o​n​s​ ​a​r​e​ ​b​r​o​a​d​c​a​s​t​,​ ​t​h​e​n​ ​a​ ​w​a​i​t​i​n​g​ ​p​e​r​i​o​d​ ​p​a​s​s​e​s​ ​b​e​f​o​r​e​ ​t​h​e​ ​f​u​n​d​s​ ​c​a​n​ ​b​e​ ​s​w​e​p​t​ ​t​o​ ​a​ ​w​a​l​l​e​t​ ​y​o​u​ ​c​h​o​o​s​e​.​ ​I​t​ ​a​l​s​o​ ​c​o​s​t​s​ ​o​n​c​h​a​i​n​ ​f​e​e​s​,​ ​w​h​i​c​h​ ​y​o​u​ ​p​a​y​ ​f​r​o​m​ ​a​ ​s​e​p​a​r​a​t​e​ ​B​i​t​c​o​i​n​ ​b​a​l​a​n​c​e​.​ ​S​m​a​l​l​ ​a​m​o​u​n​t​s​ ​m​a​y​ ​c​o​s​t​ ​m​o​r​e​ ​t​o​ ​r​e​c​o​v​e​r​ ​t​h​a​n​ ​t​h​e​y​ ​a​r​e​ ​w​o​r​t​h​.
+		 */
+		howItWorksBody: string
+		/**
+		 * Y​o​u​r​ ​D​o​l​l​a​r​ ​b​a​l​a​n​c​e​ ​i​s​ ​n​o​t​ ​c​o​v​e​r​e​d​ ​b​y​ ​o​n​c​h​a​i​n​ ​r​e​c​o​v​e​r​y​.​ ​O​n​l​y​ ​B​i​t​c​o​i​n​ ​c​a​n​ ​b​e​ ​r​e​c​o​v​e​r​e​d​ ​t​h​i​s​ ​w​a​y​.
+		 */
+		dollarNotCovered: string
+		/**
+		 * Y​o​u​r​ ​f​u​n​d​s​ ​h​a​v​e​ ​n​o​ ​r​e​c​o​v​e​r​y​ ​b​a​c​k​u​p
+		 */
+		nudgeMissingTitle: string
+		/**
+		 * S​e​t​ ​u​p​ ​y​o​u​r​ ​r​e​c​o​v​e​r​y​ ​b​a​c​k​u​p​ ​s​o​ ​y​o​u​ ​c​a​n​ ​m​o​v​e​ ​y​o​u​r​ ​f​u​n​d​s​ ​o​n​c​h​a​i​n​ ​i​f​ ​S​p​a​r​k​ ​b​e​c​o​m​e​s​ ​u​n​a​v​a​i​l​a​b​l​e​.
+		 */
+		nudgeMissingBody: string
+		/**
+		 * Y​o​u​r​ ​r​e​c​o​v​e​r​y​ ​b​a​c​k​u​p​ ​i​s​ ​o​u​t​ ​o​f​ ​d​a​t​e
+		 */
+		nudgeStaleTitle: string
+		/**
+		 * I​t​ ​n​o​ ​l​o​n​g​e​r​ ​m​a​t​c​h​e​s​ ​y​o​u​r​ ​b​a​l​a​n​c​e​.​ ​R​e​f​r​e​s​h​ ​i​t​ ​s​o​ ​a​ ​r​e​c​o​v​e​r​y​ ​w​o​u​l​d​ ​r​e​t​u​r​n​ ​e​v​e​r​y​t​h​i​n​g​ ​y​o​u​ ​h​o​l​d​.
+		 */
+		nudgeStaleBody: string
+		/**
+		 * O​p​e​n​ ​r​e​c​o​v​e​r​y​ ​b​a​c​k​u​p
+		 */
+		nudgeCta: string
+		/**
+		 * B​a​c​k​e​d​ ​u​p
+		 */
+		chipFresh: string
+		/**
+		 * O​u​t​ ​o​f​ ​d​a​t​e
+		 */
+		chipStale: string
+		/**
+		 * N​o​t​ ​s​e​t​ ​u​p
+		 */
+		chipMissing: string
+		/**
 		 * R​e​c​o​v​e​r​y​ ​b​a​c​k​u​p
 		 */
 		settingsTitle: string
@@ -27011,6 +27059,54 @@ export type TranslationFunctions = {
 		cta: () => LocalizedString
 	}
 	RecoveryBundleScreen: {
+		/**
+		 * How recovery works
+		 */
+		howItWorksCta: () => LocalizedString
+		/**
+		 * How recovery works
+		 */
+		howItWorksTitle: () => LocalizedString
+		/**
+		 * If Spark becomes unavailable, this backup lets you move your funds onchain yourself, without Blink. Recovery is a multi-week process: transactions are broadcast, then a waiting period passes before the funds can be swept to a wallet you choose. It also costs onchain fees, which you pay from a separate Bitcoin balance. Small amounts may cost more to recover than they are worth.
+		 */
+		howItWorksBody: () => LocalizedString
+		/**
+		 * Your Dollar balance is not covered by onchain recovery. Only Bitcoin can be recovered this way.
+		 */
+		dollarNotCovered: () => LocalizedString
+		/**
+		 * Your funds have no recovery backup
+		 */
+		nudgeMissingTitle: () => LocalizedString
+		/**
+		 * Set up your recovery backup so you can move your funds onchain if Spark becomes unavailable.
+		 */
+		nudgeMissingBody: () => LocalizedString
+		/**
+		 * Your recovery backup is out of date
+		 */
+		nudgeStaleTitle: () => LocalizedString
+		/**
+		 * It no longer matches your balance. Refresh it so a recovery would return everything you hold.
+		 */
+		nudgeStaleBody: () => LocalizedString
+		/**
+		 * Open recovery backup
+		 */
+		nudgeCta: () => LocalizedString
+		/**
+		 * Backed up
+		 */
+		chipFresh: () => LocalizedString
+		/**
+		 * Out of date
+		 */
+		chipStale: () => LocalizedString
+		/**
+		 * Not set up
+		 */
+		chipMissing: () => LocalizedString
 		/**
 		 * Recovery backup
 		 */
