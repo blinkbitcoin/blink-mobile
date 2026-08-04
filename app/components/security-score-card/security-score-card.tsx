@@ -28,17 +28,12 @@ export const SecurityScoreCard: React.FC<SecurityScoreCardProps> = ({
   const { LL } = useI18nContext()
 
   const copy = LL.SecurityScreen.securityScore
-  const levelLabel: Record<SecurityScoreLevel, string> = {
-    low: copy.levelLow(),
-    medium: copy.levelMedium(),
-    high: copy.levelHigh(),
+  const levels: Record<SecurityScoreLevel, { label: () => string; color: string }> = {
+    low: { label: copy.levelLow, color: colors.error },
+    medium: { label: copy.levelMedium, color: colors.warning },
+    high: { label: copy.levelHigh, color: colors._green },
   }
-  const levelColor: Record<SecurityScoreLevel, string> = {
-    low: colors.error,
-    medium: colors.warning,
-    high: colors._green,
-  }
-  const headerColor = levelColor[score.level]
+  const level = levels[score.level]
 
   return (
     <View style={styles.container} {...testProps("security-score-card")}>
@@ -46,11 +41,10 @@ export const SecurityScoreCard: React.FC<SecurityScoreCardProps> = ({
         <GaloyIcon
           name={score.level === "high" ? "check-circle" : "warning"}
           size={20}
-          color={headerColor}
+          color={level.color}
         />
-        <Text type="p2" bold style={{ color: headerColor }}>
-          {copy.title({ done: score.done, total: score.total })} -{" "}
-          {levelLabel[score.level]}
+        <Text type="p2" bold color={level.color}>
+          {copy.title({ done: score.done, total: score.total })} - {level.label()}
         </Text>
       </View>
       {score.signals.map((signal) => {
@@ -61,6 +55,7 @@ export const SecurityScoreCard: React.FC<SecurityScoreCardProps> = ({
             style={styles.row}
             onPress={pressable ? () => onSignalPress(signal.key) : undefined}
             disabled={!pressable}
+            accessibilityRole={pressable ? "button" : "text"}
             {...testProps(`security-score-${signal.key}`)}
           >
             <Text type="p2">{copy.signals[signal.key]()}</Text>

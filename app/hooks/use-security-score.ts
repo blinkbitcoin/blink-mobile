@@ -48,9 +48,9 @@ export const computeSecurityScore = ({
       key: "cloudBackup",
       // Keychain/password-manager backups are off-device automated backups
       // too, so they satisfy this signal.
-      done:
-        completedMethods.includes(BackupMethod.Cloud) ||
-        completedMethods.includes(BackupMethod.Keychain),
+      done: [BackupMethod.Cloud, BackupMethod.Keychain].some((method) =>
+        completedMethods.includes(method),
+      ),
       retriggerable: true,
     },
     {

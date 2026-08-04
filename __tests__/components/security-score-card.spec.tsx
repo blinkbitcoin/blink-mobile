@@ -3,7 +3,7 @@ import { fireEvent, render } from "@testing-library/react-native"
 import { ThemeProvider } from "@rn-vui/themed"
 
 import { SecurityScoreCard } from "@app/components/security-score-card"
-import type { SecurityScore } from "@app/hooks/use-security-score"
+import { computeSecurityScore } from "@app/hooks/use-security-score"
 import theme from "@app/rne-theme/theme"
 
 const renderWithTheme = (component: React.ReactElement) =>
@@ -35,18 +35,15 @@ jest.mock("@app/i18n/i18n-react", () => ({
   }),
 }))
 
-const scoreWith = (overrides: Partial<SecurityScore> = {}): SecurityScore => ({
-  signals: [
-    { key: "cloudBackup", done: false, retriggerable: true },
-    { key: "manualBackup", done: false, retriggerable: true },
-    { key: "appLock", done: false, retriggerable: false },
-    { key: "hideBalance", done: false, retriggerable: false },
-  ],
-  done: 0,
-  total: 4,
-  level: "low",
-  ...overrides,
-})
+// Fixtures come from the real scoring function, so done/total/level can never
+// disagree with the signal list the way hand-written literals could.
+const score = (inputs: Partial<Parameters<typeof computeSecurityScore>[0]> = {}) =>
+  computeSecurityScore({
+    completedMethods: [],
+    isAppLockEnabled: false,
+    isHideBalanceEnabled: false,
+    ...inputs,
+  })
 
 describe("SecurityScoreCard", () => {
   beforeEach(() => {
@@ -55,7 +52,7 @@ describe("SecurityScoreCard", () => {
 
   it("shows the score and level in the header", () => {
     const { getByText } = renderWithTheme(
-      <SecurityScoreCard score={scoreWith()} onSignalPress={mockOnSignalPress} />,
+      <SecurityScoreCard score={score()} onSignalPress={mockOnSignalPress} />,
     )
 
     expect(getByText(/Security score 0\/4/)).toBeTruthy()
@@ -64,7 +61,7 @@ describe("SecurityScoreCard", () => {
 
   it("shows Set on an undone signal and reports presses", () => {
     const { getByTestId, getAllByText } = renderWithTheme(
-      <SecurityScoreCard score={scoreWith()} onSignalPress={mockOnSignalPress} />,
+      <SecurityScoreCard score={score()} onSignalPress={mockOnSignalPress} />,
     )
 
     expect(getAllByText("Set")).toHaveLength(4)
@@ -74,18 +71,11 @@ describe("SecurityScoreCard", () => {
   })
 
   it("renders a done toggle-backed signal as Enabled and inert", () => {
-    const score = scoreWith({
-      signals: [
-        { key: "cloudBackup", done: false, retriggerable: true },
-        { key: "manualBackup", done: false, retriggerable: true },
-        { key: "appLock", done: true, retriggerable: false },
-        { key: "hideBalance", done: false, retriggerable: false },
-      ],
-      done: 1,
-    })
-
     const { getByTestId, getByText } = renderWithTheme(
-      <SecurityScoreCard score={score} onSignalPress={mockOnSignalPress} />,
+      <SecurityScoreCard
+        score={score({ isAppLockEnabled: true })}
+        onSignalPress={mockOnSignalPress}
+      />,
     )
 
     expect(getByText("Enabled")).toBeTruthy()
@@ -95,19 +85,15 @@ describe("SecurityScoreCard", () => {
   })
 
   it("switches the header to the high state at full score", () => {
-    const score = scoreWith({
-      signals: [
-        { key: "cloudBackup", done: true, retriggerable: true },
-        { key: "manualBackup", done: true, retriggerable: true },
-        { key: "appLock", done: true, retriggerable: false },
-        { key: "hideBalance", done: true, retriggerable: false },
-      ],
-      done: 4,
-      level: "high",
-    })
-
     const { getByText, queryByText } = renderWithTheme(
-      <SecurityScoreCard score={score} onSignalPress={mockOnSignalPress} />,
+      <SecurityScoreCard
+        score={score({
+          completedMethods: ["cloud", "manual"],
+          isAppLockEnabled: true,
+          isHideBalanceEnabled: true,
+        })}
+        onSignalPress={mockOnSignalPress}
+      />,
     )
 
     expect(getByText(/Security score 4\/4/)).toBeTruthy()
@@ -116,18 +102,11 @@ describe("SecurityScoreCard", () => {
   })
 
   it("keeps a done backup signal pressable — backups must stay re-triggerable (#3828)", () => {
-    const score = scoreWith({
-      signals: [
-        { key: "cloudBackup", done: true, retriggerable: true },
-        { key: "manualBackup", done: false, retriggerable: true },
-        { key: "appLock", done: false, retriggerable: false },
-        { key: "hideBalance", done: false, retriggerable: false },
-      ],
-      done: 1,
-    })
-
     const { getByTestId } = renderWithTheme(
-      <SecurityScoreCard score={score} onSignalPress={mockOnSignalPress} />,
+      <SecurityScoreCard
+        score={score({ completedMethods: ["cloud"] })}
+        onSignalPress={mockOnSignalPress}
+      />,
     )
 
     fireEvent.press(getByTestId("security-score-cloudBackup"))

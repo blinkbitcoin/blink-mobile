@@ -7,7 +7,6 @@ import {
   BackupMethod,
   BackupStatus,
   completedMethodsOf,
-  hasCompletedMethod,
   markBackupCompletedFor,
   removeBackupStateFor,
 } from "@app/self-custodial/providers/backup-state"
@@ -188,7 +187,7 @@ describe("BackupStateProvider", () => {
     })
   })
 
-  describe("completedMethodsOf / hasCompletedMethod", () => {
+  describe("completedMethodsOf", () => {
     it("derives the list from legacy stored state without completedMethods", () => {
       expect(completedMethodsOf({ status: "completed", method: "cloud" })).toEqual([
         "cloud",
@@ -208,17 +207,6 @@ describe("BackupStateProvider", () => {
     it("returns empty for non-completed or null state", () => {
       expect(completedMethodsOf({ status: "none", method: null })).toEqual([])
       expect(completedMethodsOf(null)).toEqual([])
-    })
-
-    it("answers per-method questions the last-wins method field cannot", () => {
-      const state = {
-        status: "completed" as const,
-        method: "manual" as const,
-        completedMethods: ["cloud" as const, "manual" as const],
-      }
-
-      expect(hasCompletedMethod(state, "cloud")).toBe(true)
-      expect(hasCompletedMethod(state, "keychain")).toBe(false)
     })
   })
 

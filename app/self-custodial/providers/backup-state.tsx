@@ -48,12 +48,9 @@ export const completedMethodsOf = (state: BackupState | null): BackupMethod[] =>
   state?.completedMethods ??
   (state?.status === BackupStatus.Completed && state.method ? [state.method] : [])
 
-export const hasCompletedMethod = (
-  state: BackupState | null,
-  method: BackupMethod,
-): boolean => completedMethodsOf(state).includes(method)
-
 // Spreads prev so fields this module doesn't know about survive the write.
+// Note the two writers hand it different prevs: markBackupCompletedFor re-reads
+// storage, while the provider merges against its in-memory state.
 const withCompletedMethod = (
   prev: BackupState | null,
   method: BackupMethod,
