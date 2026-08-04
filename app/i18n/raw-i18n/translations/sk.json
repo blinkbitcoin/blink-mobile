@@ -3677,10 +3677,28 @@
         "testSuccess": "Vaša záložná fráza je správna"
       }
     },
+    "BundleExport": {
+      "title": "Ešte jedna vec",
+      "subtitle": "Ak Spark prestane byť dostupný, použi tento balík na odchod on-chain. Tento balík je citlivý. Uchovaj ho v súkromí.",
+      "subtitlePending": "Tvoj núdzový balík sa vytvorí automaticky hneď, ako prijmeš prostriedky, a ďalej sa udržiava aktuálny. Kedykoľvek si ho môžeš stiahnuť v Nastaveniach.",
+      "download": "Stiahnuť balík",
+      "copy": "Kopírovať",
+      "sensitiveTitle": "Citlivé",
+      "skip": "Preskočiť",
+      "learnMore": "Viac o jednostrannom odchode",
+      "learnMoreTitle": "Jednostranný odchod",
+      "learnMoreBody": "Spark drží tvoje bitcoiny mimo reťazca, aby boli platby okamžité a lacné. Ak by jeho operátori prestali byť dostupní, tento balík spolu s tvojou obnovovacou frázou ti umožní presunúť prostriedky on-chain sám, bez Blinku. Trvá to týždne a stojí on-chain poplatky, takže ide o záchrannú sieť, nie o každodennú cestu.",
+      "sensitiveConfirm": "Stiahnuť",
+      "savedTitle": "Núdzový balík uložený",
+      "sensitiveBody": "Tento súbor obsahuje citlivé údaje peňaženky a musí zostať súkromný. Ak toto zariadenie stratíš, obnovu z núdzového balíka nebude možné použiť."
+    },
     "CloudBackup": {
       "title": "Zálohujme vašu peňaženku",
       "description": "Uložíme zálohu vašej záložnej frázy do vášho {provider}.",
       "encryptCheckbox": "Šifrovať dodatočným heslom",
+      "autoBundleCheckbox": "Automatické zálohy",
+      "autoBundleHint": "Umožňuje jednostranný odchod, ak operátori Spark prestanú byť dostupní.",
+      "autoBundleNeedsPassword": "Na zapnutie zadaj vyššie heslo. Bez neho by záloha na obnovu ležala vedľa nechránenej obnovovacej frázy.",
       "password": "Heslo",
       "passwordPlaceholder": "(minimálne 12 znakov)",
       "confirmPassword": "Potvrdiť heslo",

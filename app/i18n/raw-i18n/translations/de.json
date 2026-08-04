@@ -3677,10 +3677,28 @@
                 "testSuccess": "Deine Wiederherstellungsphrase ist korrekt"
             }
         },
+        "BundleExport": {
+            "title": "Eine letzte Sache",
+            "subtitle": "Falls Spark offline geht, nutze dieses Bundle, um On-Chain auszusteigen. Dieses Bundle ist sensibel. Halte es privat.",
+            "subtitlePending": "Dein Notfall-Bundle wird automatisch erstellt, sobald du Geld empfängst, und danach aktuell gehalten. Du kannst es jederzeit in den Einstellungen herunterladen.",
+            "download": "Bundle herunterladen",
+            "copy": "Kopieren",
+            "sensitiveTitle": "Sensibel",
+            "skip": "Überspringen",
+            "learnMore": "Mehr über den einseitigen Ausstieg",
+            "learnMoreTitle": "Einseitiger Ausstieg",
+            "learnMoreBody": "Spark hält deine Bitcoin außerhalb der Kette, damit Zahlungen sofort und günstig sind. Sollten die Betreiber je nicht mehr verfügbar sein, kannst du mit diesem Bundle und deiner Wiederherstellungsphrase dein Guthaben selbst On-Chain bewegen, ohne Blink. Das dauert mehrere Wochen und kostet On-Chain-Gebühren – ein Sicherheitsnetz, kein Alltagsweg.",
+            "sensitiveConfirm": "Herunterladen",
+            "savedTitle": "Notfall-Bundle gespeichert",
+            "sensitiveBody": "Diese Datei enthält sensible Wallet-Daten und muss privat bleiben. Wenn du dieses Gerät verlierst, kannst du die Notfall-Bundle-Wiederherstellung nicht nutzen."
+        },
         "CloudBackup": {
             "title": "Sichern wir Ihre Brieftasche",
             "description": "Wir speichern eine Kopie Ihrer Sicherungsphrase in Ihrem {provider}.",
             "encryptCheckbox": "Mit zusätzlichem Passwort verschlüsseln",
+            "autoBundleCheckbox": "Automatische Backups",
+            "autoBundleHint": "Ermöglicht den einseitigen Ausstieg, falls Spark-Betreiber offline gehen.",
+            "autoBundleNeedsPassword": "Füge oben ein Passwort hinzu, um dies zu aktivieren. Ohne Passwort läge dein Wiederherstellungs-Backup neben einer ungeschützten Wiederherstellungsphrase.",
             "password": "Passwort",
             "passwordPlaceholder": "(mindestens 12 Zeichen)",
             "confirmPassword": "Passwort bestätigen",

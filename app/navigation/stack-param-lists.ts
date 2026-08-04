@@ -216,6 +216,8 @@ export type RootStackParamList = {
     challenges: Array<{ index: number; word: string }>
     successMessage?: string
   }
+  selfCustodialBackupBundleExport: { successMessage?: string } | undefined
+  selfCustodialBundleSaved: { successMessage?: string } | undefined
   selfCustodialBackupSuccess: { reBackup?: boolean; message?: string } | undefined
   accountMigrationEntry: undefined
   accountMigrationStart: undefined

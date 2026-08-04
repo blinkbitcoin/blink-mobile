@@ -3677,10 +3677,28 @@
         "testSuccess": "Jou rugsteunfrase is korrek"
       }
     },
+    "BundleExport": {
+      "title": "Nog een laaste ding",
+      "subtitle": "Indien Spark aflyn gaan, gebruik hierdie bundel om na die ketting toe uit te gaan. Hierdie bundel is sensitief. Hou dit privaat.",
+      "subtitlePending": "Jou noodbundel word outomaties geskep sodra jy fondse ontvang, en word daarna op datum gehou. Jy kan dit enige tyd vanaf Instellings aflaai.",
+      "download": "Laai bundel af",
+      "copy": "Kopieer",
+      "sensitiveTitle": "Sensitief",
+      "skip": "Slaan oor",
+      "learnMore": "Leer meer oor eensydige uitgang",
+      "learnMoreTitle": "Eensydige uitgang",
+      "learnMoreBody": "Spark hou jou bitcoin buite die ketting sodat betalings onmiddellik en goedkoop is. Sou sy operateurs ooit onbeskikbaar raak, laat hierdie bundel saam met jou rugsteunfrase jou toe om jou fondse self na die ketting te skuif, sonder Blink. Dit is 'n proses van etlike weke en kos kettingfooie, dus is dit 'n veiligheidsnet eerder as 'n alledaagse roete.",
+      "sensitiveConfirm": "Laai af",
+      "savedTitle": "Noodbundel gestoor",
+      "sensitiveBody": "Hierdie lêer is sensitiewe beursiedata en moet privaat gehou word. As jy hierdie toestel verloor, sal jy nie noodbundelherstel kan gebruik nie."
+    },
     "CloudBackup": {
       "title": "Kom ons rugsteun jou beursie",
       "description": "Ons sal 'n rugsteun van jou rugsteunfrase in jou {provider} stoor.",
       "encryptCheckbox": "Enkripteer met bykomende wagwoord",
+      "autoBundleCheckbox": "Outomatiese rugsteune",
+      "autoBundleHint": "Maak eensydige uitgang moontlik indien Spark-operateurs aflyn gaan.",
+      "autoBundleNeedsPassword": "Voeg hierbo 'n wagwoord by om dit te aktiveer. Daarsonder sou jou herstel-rugsteun langs 'n onbeskermde rugsteunfrase lê.",
       "password": "Wagwoord",
       "passwordPlaceholder": "(minimum 12 karakters)",
       "confirmPassword": "Bevestig wagwoord",

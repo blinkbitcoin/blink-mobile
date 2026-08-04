@@ -3677,10 +3677,28 @@
         "testSuccess": "Bakuy rimasqaykiqa allinmi"
       }
     },
+    "BundleExport": {
+      "title": "Huk qipa ruwana",
+      "subtitle": "Spark mana llamkaptin, kay qipita servichikuy on-chain lloqsinaykipaq. Kay qipi sinchi allin waqaychana. Pakallapi waqaychay.",
+      "subtitlePending": "Utqay qipiyki qullqita chaskiptiyki kikinmanta ruwakun, chaymantam musuqchasqa qipan. Ajustes nisqapi mayqin pachapipas urqumuwaqmi.",
+      "download": "Qipita urquy",
+      "copy": "Kopiyay",
+      "sensitiveTitle": "Sinchi allin waqaychana",
+      "skip": "Saqiy",
+      "learnMore": "Sapallanchik lloqsiymanta astawan yachay",
+      "learnMoreTitle": "Sapallanchik lloqsiy",
+      "learnMoreBody": "Spark bitcoin-niykita chain hawapi waqaychan, pagaykuna utqay ka'ananpaq, mana chaninpaq ima. Llamkaqninkuna mana llamkaptinku, kay qipi kutichiy simikunawan kuska qullqiykita kikiyki on-chain astanaykipaq yanapasunki, mana Blink-wan. Achka simanata apan, chain pagaykunapas kan, chayrayku kayqa harkakuy, manam sapa p'unchaw ñanchu.",
+      "sensitiveConfirm": "Urquy",
+      "savedTitle": "Utqay qipi waqaychasqa",
+      "sensitiveBody": "Kay willañiqipi qullqi wasiykipa sinchi allin willakuynin kachkan, pakallapi waqaychana. Kay antawata chinkachiptiyki, utqay qipimanta kutichiyta mana atiwaqchu."
+    },
     "CloudBackup": {
       "title": "Qullqikuqniykita waqaychasun",
       "description": "Waqaychay simiykipa huknin kaqta {provider} nisqaykiman waqaychasaqku.",
       "encryptCheckbox": "Yapay contraseñawan pakay",
+      "autoBundleCheckbox": "Kikinmanta waqaychaykuna",
+      "autoBundleHint": "Spark llamkaqkuna mana llamkaptinku sapallayki lloqsiyta atinaykipaq.",
+      "autoBundleNeedsPassword": "Kayta kachaykunaykipaq hanaqpi huk yaykuna simita churay. Mana chayqa, kutichiy waqaychayniyki mana harkasqa kutichiy simikuna ladunpi kanman.",
       "password": "Contraseña",
       "passwordPlaceholder": "(pisi kaptinpas 12 sanampakuna)",
       "confirmPassword": "Contraseñata takyachiy",

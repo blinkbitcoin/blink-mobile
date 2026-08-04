@@ -3677,10 +3677,28 @@
         "testSuccess": "Cụm từ sao lưu của bạn là chính xác"
       }
     },
+    "BundleExport": {
+      "title": "Một điều cuối cùng",
+      "subtitle": "Nếu Spark ngừng hoạt động, hãy dùng gói này để rút on-chain. Gói này nhạy cảm. Hãy giữ riêng tư.",
+      "subtitlePending": "Gói khẩn cấp của bạn được tạo tự động ngay khi bạn nhận tiền, và được cập nhật liên tục. Bạn có thể tải xuống bất cứ lúc nào trong Cài đặt.",
+      "download": "Tải gói xuống",
+      "copy": "Sao chép",
+      "sensitiveTitle": "Nhạy cảm",
+      "skip": "Bỏ qua",
+      "learnMore": "Tìm hiểu thêm về rút đơn phương",
+      "learnMoreTitle": "Rút đơn phương",
+      "learnMoreBody": "Spark giữ bitcoin của bạn ngoài chuỗi để thanh toán tức thì và rẻ. Nếu các nhà vận hành ngừng hoạt động, gói này cùng cụm từ khôi phục cho phép bạn tự chuyển tiền on-chain mà không cần Blink. Quá trình kéo dài nhiều tuần và tốn phí on-chain, nên đây là lưới an toàn chứ không phải lối đi hằng ngày.",
+      "sensitiveConfirm": "Tải xuống",
+      "savedTitle": "Đã lưu gói khẩn cấp",
+      "sensitiveBody": "Tệp này chứa dữ liệu ví nhạy cảm và phải được giữ riêng tư. Nếu bạn mất thiết bị này, bạn sẽ không thể dùng khôi phục từ gói khẩn cấp."
+    },
     "CloudBackup": {
       "title": "Hãy sao lưu ví của bạn",
       "description": "Chúng tôi sẽ lưu bản sao cụm từ khôi phục của bạn vào {provider} của bạn.",
       "encryptCheckbox": "Mã hóa bằng mật khẩu bổ sung",
+      "autoBundleCheckbox": "Sao lưu tự động",
+      "autoBundleHint": "Cho phép rút đơn phương nếu các nhà vận hành Spark ngừng hoạt động.",
+      "autoBundleNeedsPassword": "Thêm mật khẩu ở trên để bật tính năng này. Nếu không có mật khẩu, bản sao lưu khôi phục sẽ nằm cạnh cụm từ khôi phục không được bảo vệ.",
       "password": "Mật khẩu",
       "passwordPlaceholder": "(tối thiểu 12 ký tự)",
       "confirmPassword": "Xác nhận mật khẩu",

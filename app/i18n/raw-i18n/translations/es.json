@@ -3677,10 +3677,28 @@
                 "testSuccess": "Tus frases de respaldo son correctas"
             }
         },
+        "BundleExport": {
+            "title": "Una última cosa",
+            "subtitle": "Si Spark deja de estar disponible, usa este paquete para salir on-chain. Este paquete es sensible. Mantenlo privado.",
+            "subtitlePending": "Tu paquete de emergencia se crea automáticamente cuando recibes fondos, y se mantiene actualizado. Puedes descargarlo en cualquier momento desde Configuración.",
+            "download": "Descargar paquete",
+            "copy": "Copiar",
+            "sensitiveTitle": "Sensible",
+            "skip": "Omitir",
+            "learnMore": "Más información sobre la salida unilateral",
+            "learnMoreTitle": "Salida unilateral",
+            "learnMoreBody": "Spark mantiene tus bitcoins fuera de la cadena para que los pagos sean instantáneos y baratos. Si sus operadores dejaran de estar disponibles, este paquete junto con tu frase de respaldo te permite mover los fondos on-chain por tu cuenta, sin Blink. Es un proceso de varias semanas y tiene comisiones on-chain, así que es una red de seguridad, no una vía cotidiana.",
+            "sensitiveConfirm": "Descargar",
+            "savedTitle": "Paquete de emergencia guardado",
+            "sensitiveBody": "Este archivo contiene datos sensibles de la billetera y debe mantenerse privado. Si pierdes este dispositivo, no podrás usar la recuperación del paquete de emergencia."
+        },
         "CloudBackup": {
             "title": "Respaldemos tu billetera",
             "description": "Guardaremos una copia de tu frase de respaldo en tu {provider}.",
             "encryptCheckbox": "Encriptar con contraseña adicional",
+            "autoBundleCheckbox": "Copias automáticas",
+            "autoBundleHint": "Permite la salida unilateral si los operadores de Spark dejan de estar disponibles.",
+            "autoBundleNeedsPassword": "Añade una contraseña arriba para activarlo. Sin ella, tu copia de recuperación quedaría junto a una frase de respaldo desprotegida.",
             "password": "Contraseña",
             "passwordPlaceholder": "(mínimo 12 caracteres)",
             "confirmPassword": "Confirmar contraseña",

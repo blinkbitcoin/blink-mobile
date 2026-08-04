@@ -11,6 +11,8 @@ import Modal from "react-native-modal"
 
 import { makeStyles, Text, TextProps, useTheme } from "@rn-vui/themed"
 
+import { testProps } from "@app/utils/testProps"
+
 import { GaloyIcon } from "../atomic/galoy-icon"
 import { GaloyPrimaryButton } from "../atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "../atomic/galoy-secondary-button"
@@ -106,7 +108,7 @@ const CustomModal: React.FC<CustomModalProps> = ({
           )}
 
           {showCloseIconButton && (
-            <TouchableOpacity onPress={toggleModal}>
+            <TouchableOpacity onPress={toggleModal} {...testProps("modal-close")}>
               <GaloyIcon name="close" size={30} color={colors.grey0} />
             </TouchableOpacity>
           )}

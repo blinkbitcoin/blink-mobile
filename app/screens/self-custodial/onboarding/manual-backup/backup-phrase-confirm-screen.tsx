@@ -2,7 +2,8 @@ import React, { useCallback, useEffect, useRef } from "react"
 import { TextInput, View } from "react-native"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
-import { useRoute, RouteProp } from "@react-navigation/native"
+import { useNavigation, useRoute, RouteProp } from "@react-navigation/native"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
@@ -11,11 +12,9 @@ import { SuggestionBar } from "@app/components/suggestion-bar"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useMigrationCheckpoint } from "@app/screens/account-migration/hooks"
-import { logSelfCustodialBackupCompleted } from "@app/self-custodial/analytics"
-import { BackupMethod } from "@app/self-custodial/providers/backup-state"
 import { testProps } from "@app/utils/testProps"
 
-import { useBackupConfirm, useCompleteBackup } from "../hooks"
+import { useBackupConfirm } from "../hooks"
 
 type ConfirmRouteProp = RouteProp<RootStackParamList, "selfCustodialBackupPhraseConfirm">
 
@@ -28,12 +27,17 @@ export const BackupPhraseConfirmScreen: React.FC = () => {
   const { challenges, successMessage } = useRoute<ConfirmRouteProp>().params
 
   const { loading: checkpointLoading } = useMigrationCheckpoint()
-  const completeBackup = useCompleteBackup()
+  const navigation =
+    useNavigation<
+      NativeStackNavigationProp<RootStackParamList, "selfCustodialBackupPhraseConfirm">
+    >()
 
+  /** The phrase is only half of what a self-custodial user needs; the recovery
+   *  backup is the other half. Hand it over before declaring the backup done,
+   *  so completion is recorded on the export step rather than here. */
   const onComplete = useCallback(() => {
-    logSelfCustodialBackupCompleted({ backupMethod: "manual" })
-    completeBackup({ method: BackupMethod.Manual, message: successMessage })
-  }, [completeBackup, successMessage])
+    navigation.navigate("selfCustodialBackupBundleExport", { successMessage })
+  }, [navigation, successMessage])
 
   const {
     inputs,
