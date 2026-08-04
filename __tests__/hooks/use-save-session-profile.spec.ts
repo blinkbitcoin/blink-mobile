@@ -178,7 +178,27 @@ describe("useSaveSessionProfile", () => {
       const saved = mockSaveSessionProfiles.mock.calls[0][0]
       expect(saved).toHaveLength(1)
       expect(saved[0].identifier).toBe("Blink user")
+      // transitional state — backfilled by the next login or profile update,
+      // covered by the two healing tests below
       expect(saved[0].accountId).toBeUndefined()
+      expect(saved[0].selected).toBe(true)
+    })
+
+    it("re-fetches and replaces a degraded profile (no accountId) instead of returning early", async () => {
+      setUserMe({ id: "u1", username: "alice", defaultAccount: { id: "acct-1" } })
+      mockGetSessionProfiles.mockResolvedValue([
+        { token: "new-token", identifier: "Blink user", selected: true },
+      ])
+
+      const { result } = renderHook(() => useSaveSessionProfile())
+
+      await result.current.saveProfile("new-token")
+
+      expect(mockSaveSessionProfiles).toHaveBeenCalledTimes(1)
+      const saved = mockSaveSessionProfiles.mock.calls[0][0]
+      expect(saved).toHaveLength(1)
+      expect(saved[0].accountId).toBe("acct-1")
+      expect(saved[0].identifier).toBe("alice")
       expect(saved[0].selected).toBe(true)
     })
 
@@ -221,6 +241,25 @@ describe("useSaveSessionProfile", () => {
       expect(existing.selected).toBe(true)
       expect(existing.token).toBe("fresh-token")
       expect(other.selected).toBe(false)
+    })
+  })
+
+  describe("updateCurrentProfile", () => {
+    it("heals a degraded profile by token match once defaultAccount resolves", async () => {
+      setUserMe({ id: "u1", username: "alice", defaultAccount: { id: "acct-1" } })
+      mockGetSessionProfiles.mockResolvedValue([
+        { token: "current-token", identifier: "Blink user", selected: true },
+      ])
+
+      const { result } = renderHook(() => useSaveSessionProfile())
+
+      await result.current.updateCurrentProfile()
+
+      expect(mockSaveSessionProfiles).toHaveBeenCalledTimes(1)
+      const saved = mockSaveSessionProfiles.mock.calls[0][0]
+      expect(saved).toHaveLength(1)
+      expect(saved[0].accountId).toBe("acct-1")
+      expect(saved[0].identifier).toBe("alice")
     })
   })
 })
