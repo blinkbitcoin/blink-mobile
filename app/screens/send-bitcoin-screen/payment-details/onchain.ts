@@ -52,12 +52,19 @@ export const createNoAmountOnchainPaymentDetails = <T extends WalletCurrency>(
     canGetFee: false,
   }
 
-  const feeQuote =
-    sendingWalletDescriptor.currency === WalletCurrency.Btc
-      ? OnchainFeeQuote.Btc
-      : OnchainFeeQuote.Usd
+  /**
+   * Assigned beside the getFee it stands for, never derived alongside it. A second predicate
+   * for the same decision is free to drift from the branch that actually picks the endpoint,
+   * which is the drift this field exists to prevent.
+   */
+  let feeQuote: OnchainFeeQuote | undefined
 
   if (isSendingMax) {
+    feeQuote =
+      sendingWalletDescriptor.currency === WalletCurrency.Btc
+        ? OnchainFeeQuote.Btc
+        : OnchainFeeQuote.Usd
+
     const sendPaymentMutation: SendPaymentMutation = async (paymentMutations) => {
       const { data } = await paymentMutations.onChainPaymentSendAll({
         variables: {
@@ -137,6 +144,8 @@ export const createNoAmountOnchainPaymentDetails = <T extends WalletCurrency>(
     settlementAmount.amount &&
     sendingWalletDescriptor.currency === WalletCurrency.Btc
   ) {
+    feeQuote = OnchainFeeQuote.Btc
+
     const sendPaymentMutation: SendPaymentMutation = async (paymentMutations) => {
       const { data } = await paymentMutations.onChainPaymentSend({
         variables: {
@@ -204,6 +213,8 @@ export const createNoAmountOnchainPaymentDetails = <T extends WalletCurrency>(
     let getFee: GetFee<T>
 
     if (settlementAmount.currency === WalletCurrency.Usd) {
+      feeQuote = OnchainFeeQuote.Usd
+
       sendPaymentMutation = async (paymentMutations) => {
         const { data } = await paymentMutations.onChainUsdPaymentSend({
           variables: {
@@ -247,6 +258,8 @@ export const createNoAmountOnchainPaymentDetails = <T extends WalletCurrency>(
         }
       }
     } else {
+      feeQuote = OnchainFeeQuote.UsdAsBtcDenominated
+
       sendPaymentMutation = async (paymentMutations) => {
         const { data } = await paymentMutations.onChainUsdPaymentSendAsBtcDenominated({
           variables: {
@@ -402,12 +415,12 @@ export const createAmountOnchainPaymentDetails = <T extends WalletCurrency>(
   let sendPaymentMutation: SendPaymentMutation
   let getFee: GetFee<T>
 
-  const feeQuote =
-    sendingWalletDescriptor.currency === WalletCurrency.Btc
-      ? OnchainFeeQuote.Btc
-      : OnchainFeeQuote.UsdAsBtcDenominated
+  /** Assigned beside the getFee it stands for, for the reason given in the no-amount case. */
+  let feeQuote: OnchainFeeQuote
 
   if (sendingWalletDescriptor.currency === WalletCurrency.Btc) {
+    feeQuote = OnchainFeeQuote.Btc
+
     sendPaymentMutation = async (paymentMutations) => {
       const { data } = await paymentMutations.onChainPaymentSend({
         variables: {
@@ -459,6 +472,8 @@ export const createAmountOnchainPaymentDetails = <T extends WalletCurrency>(
     }
   } else {
     // sendingWalletDescriptor.currency === WalletCurrency.Usd
+    feeQuote = OnchainFeeQuote.UsdAsBtcDenominated
+
     sendPaymentMutation = async (paymentMutations) => {
       const { data } = await paymentMutations.onChainUsdPaymentSendAsBtcDenominated({
         variables: {

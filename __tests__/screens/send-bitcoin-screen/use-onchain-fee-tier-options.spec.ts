@@ -652,6 +652,39 @@ describe("useOnchainFeeTierOptions", () => {
       )
     })
 
+    it("quotes the destination-specified amount rather than the settled one", () => {
+      renderHook(() =>
+        useOnchainFeeTierOptions({
+          paymentDetail: buildCustodialOnchainDetail({
+            sendingWalletDescriptor: { currency: WalletCurrency.Usd, id: "usd-w" },
+            feeQuote: OnchainFeeQuote.UsdAsBtcDenominated,
+            destinationSpecifiedAmount: {
+              amount: 5000,
+              currency: WalletCurrency.Btc,
+              currencyCode: "BTC",
+            },
+            settlementAmount: {
+              amount: 320,
+              currency: WalletCurrency.Usd,
+              currencyCode: "USD",
+            },
+          }),
+          isSelfCustodial: false,
+          paymentDestination: undefined,
+          convertMoneyAmount: undefined,
+        }),
+      )
+
+      // A BIP21 amount is sats and this endpoint takes SatAmount, so forwarding the
+      // wallet's cents would quote a different transaction than the one that broadcasts.
+      expect(mockUseCustodialOnchainFeeTiers).toHaveBeenCalledWith(
+        expect.objectContaining({
+          quote: OnchainFeeQuote.UsdAsBtcDenominated,
+          amount: 5000,
+        }),
+      )
+    })
+
     it("does not quote custodial fees while on a self-custodial account", () => {
       renderHook(() =>
         useOnchainFeeTierOptions({
