@@ -1,7 +1,7 @@
 import { useCallback } from "react"
 
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
-import { useDollarBalanceRestricted } from "@app/hooks/use-dollar-balance-restricted"
+import { useDollarBalanceRestriction } from "@app/hooks/use-dollar-balance-restricted"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { AccountType } from "@app/types/wallet"
@@ -52,12 +52,20 @@ export const useMigrationBalancesPreview = () => {
     refetch: refetchBalances,
   } = useCustodialWalletBalances({ fetchPolicy: "cache-and-network" })
   const { formatMoneyAmount, moneyAmountToDisplayCurrencyString } = useDisplayCurrency()
-  const isNewDollarBalanceRestricted = useDollarBalanceRestricted(
-    AccountType.SelfCustodial,
-  )
-  const isCurrentDollarBalanceRestricted = useDollarBalanceRestricted(
-    AccountType.Custodial,
-  )
+  /** Both sides gate the screen alongside the figures: rendering an unresolved region as
+   *  unrestricted would show the user a Dollar Balance the new account cannot hold and
+   *  then swap it for "not available" once the verdict lands, in the one step they cannot
+   *  take back. The self-custodial side waits on the IP lookup, which the still-custodial
+   *  session has no phone country to shortcut. */
+  const {
+    isRestricted: isNewDollarBalanceRestricted,
+    isRegionPending: isNewDollarRegionPending,
+  } = useDollarBalanceRestriction(AccountType.SelfCustodial)
+  const {
+    isRestricted: isCurrentDollarBalanceRestricted,
+    isRegionPending: isCurrentDollarRegionPending,
+  } = useDollarBalanceRestriction(AccountType.Custodial)
+  const isDollarRegionPending = isNewDollarRegionPending || isCurrentDollarRegionPending
 
   /** The server owns the fee, the de-minimis subsidy, and the resulting amount; the
    *  client renders the preview verbatim and never does the arithmetic itself. */
@@ -72,8 +80,8 @@ export const useMigrationBalancesPreview = () => {
   /** Both sources gate the screen: the balances feed the current Dollar Balance, the
    *  preview feeds every bitcoin figure, and neither may render before it is known. */
   const hasPreview = preview !== null
-  const isLoading = isPreviewLoading || areBalancesLoading
-  const isReady = areBalancesReady && hasPreview
+  const isLoading = isPreviewLoading || areBalancesLoading || isDollarRegionPending
+  const isReady = areBalancesReady && hasPreview && !isDollarRegionPending
 
   /**
    * A query that never ran is not an answer. Both sources skip while nobody is
