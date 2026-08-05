@@ -433,6 +433,58 @@ describe("ChooseExperienceScreen", () => {
     expect(mockSetActiveAccountMode).not.toHaveBeenCalled()
   })
 
+  /** The drain conversion resets back here on a stale cached balance. */
+  it("holds Continue until the entry refresh lands, even with the wallet already ready", async () => {
+    mockRouteParams = { entry: "settings" }
+    mockAccountMode = AccountMode.Enhanced
+    mockWalletReady = true
+    mockRefreshWallets.mockReturnValue(new Promise(() => {}))
+
+    await renderScreen()
+
+    expect(mockPrimaryButton).toHaveBeenLastCalledWith(
+      expect.objectContaining({ disabled: true, loading: true }),
+    )
+  })
+
+  it("releases Continue once the entry refresh settles", async () => {
+    mockRouteParams = { entry: "settings" }
+    mockAccountMode = AccountMode.Enhanced
+    mockWalletReady = true
+
+    await renderScreen()
+
+    expect(mockPrimaryButton).toHaveBeenLastCalledWith(
+      expect.objectContaining({ disabled: false, loading: false }),
+    )
+  })
+
+  /** A refresh that never answers must not strand the screen. */
+  it("releases Continue when the entry refresh fails", async () => {
+    mockRouteParams = { entry: "settings" }
+    mockAccountMode = AccountMode.Enhanced
+    mockWalletReady = true
+    mockRefreshWallets.mockRejectedValue(new Error("offline"))
+
+    await renderScreen()
+
+    expect(mockPrimaryButton).toHaveBeenLastCalledWith(
+      expect.objectContaining({ disabled: false, loading: false }),
+    )
+  })
+
+  it("never holds Continue on the onboarding entries, which run no refresh", async () => {
+    mockWalletReady = false
+    mockRefreshWallets.mockReturnValue(new Promise(() => {}))
+
+    await renderScreen()
+
+    expect(mockRefreshWallets).not.toHaveBeenCalled()
+    expect(mockPrimaryButton).toHaveBeenLastCalledWith(
+      expect.objectContaining({ disabled: false, loading: false }),
+    )
+  })
+
   it("holds Continue while the wallet is still syncing on the settings entry", async () => {
     mockRouteParams = { entry: "settings" }
     mockAccountMode = AccountMode.Enhanced
