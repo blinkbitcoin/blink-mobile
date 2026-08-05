@@ -51,13 +51,13 @@ export const UnclaimedDepositsScreen: React.FC = () => {
       [FeeTierOption.Medium]: LL.SendBitcoinScreen.medium(),
       [FeeTierOption.Slow]: LL.SendBitcoinScreen.slow(),
     },
-    formatSats: (rate) => LL.UnclaimedDeposit.feeRateUnit({ rate }),
+    formatFee: ({ feeAmount }) => LL.UnclaimedDeposit.feeRateUnit({ rate: feeAmount }),
     locale,
   })
 
   const isRefundMode = refundDepositId !== null
   const hasAddress = refundAddress.trim().length > 0
-  const selectedFeeRate = feeTiers[feeTier].feeSats
+  const selectedFeeRate = feeTiers[feeTier].feeAmount
   const canSubmitRefund = hasAddress && feeTiersError === null && selectedFeeRate > 0
 
   const resetRefund = () => {

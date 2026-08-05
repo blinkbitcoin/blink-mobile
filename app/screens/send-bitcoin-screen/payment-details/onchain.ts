@@ -1,4 +1,4 @@
-import { WalletCurrency } from "@app/graphql/generated"
+import { PayoutSpeed, WalletCurrency } from "@app/graphql/generated"
 import {
   BtcMoneyAmount,
   MoneyAmount,
@@ -9,6 +9,7 @@ import { PaymentType } from "@blinkbitcoin/blink-client"
 
 import {
   ConvertMoneyAmount,
+  OnchainFeeQuote,
   PaymentDetail,
   SetAmount,
   SetSendingWalletDescriptor,
@@ -23,6 +24,7 @@ export type CreateNoAmountOnchainPaymentDetailsParams<T extends WalletCurrency> 
   address: string
   isSendingMax?: boolean
   unitOfAccountAmount: MoneyAmount<WalletOrDisplayCurrency>
+  payoutSpeed?: PayoutSpeed
 } & BaseCreatePaymentDetailsParams<T>
 
 export const createNoAmountOnchainPaymentDetails = <T extends WalletCurrency>(
@@ -36,6 +38,7 @@ export const createNoAmountOnchainPaymentDetails = <T extends WalletCurrency>(
     senderSpecifiedMemo,
     isSendingMax,
     address,
+    payoutSpeed = PayoutSpeed.Fast,
   } = params
 
   const settlementAmount = convertMoneyAmount(
@@ -49,12 +52,18 @@ export const createNoAmountOnchainPaymentDetails = <T extends WalletCurrency>(
     canGetFee: false,
   }
 
+  const feeQuote =
+    sendingWalletDescriptor.currency === WalletCurrency.Btc
+      ? OnchainFeeQuote.Btc
+      : OnchainFeeQuote.Usd
+
   if (isSendingMax) {
     const sendPaymentMutation: SendPaymentMutation = async (paymentMutations) => {
       const { data } = await paymentMutations.onChainPaymentSendAll({
         variables: {
           input: {
             walletId: sendingWalletDescriptor.id,
+            speed: payoutSpeed,
             address,
             memo,
           },
@@ -73,6 +82,7 @@ export const createNoAmountOnchainPaymentDetails = <T extends WalletCurrency>(
         const { data } = await getFeeFns.onChainTxFee({
           variables: {
             walletId: sendingWalletDescriptor.id,
+            speed: payoutSpeed,
             address,
             amount: settlementAmount.amount,
           },
@@ -94,6 +104,7 @@ export const createNoAmountOnchainPaymentDetails = <T extends WalletCurrency>(
         const { data } = await getFeeFns.onChainUsdTxFee({
           variables: {
             walletId: sendingWalletDescriptor.id,
+            speed: payoutSpeed,
             address,
             amount: settlementAmount.amount,
           },
@@ -131,6 +142,7 @@ export const createNoAmountOnchainPaymentDetails = <T extends WalletCurrency>(
         variables: {
           input: {
             walletId: sendingWalletDescriptor.id,
+            speed: payoutSpeed,
             address,
             amount: settlementAmount.amount,
             memo,
@@ -158,6 +170,7 @@ export const createNoAmountOnchainPaymentDetails = <T extends WalletCurrency>(
       const { data } = await getFeeFns.onChainTxFee({
         variables: {
           walletId: sendingWalletDescriptor.id,
+          speed: payoutSpeed,
           address,
           amount: settlementAmount.amount,
         },
@@ -196,6 +209,7 @@ export const createNoAmountOnchainPaymentDetails = <T extends WalletCurrency>(
           variables: {
             input: {
               walletId: sendingWalletDescriptor.id,
+              speed: payoutSpeed,
               address,
               amount: settlementAmount.amount,
             },
@@ -213,6 +227,7 @@ export const createNoAmountOnchainPaymentDetails = <T extends WalletCurrency>(
         const { data } = await getFeeFns.onChainUsdTxFee({
           variables: {
             walletId: sendingWalletDescriptor.id,
+            speed: payoutSpeed,
             address,
             amount: settlementAmount.amount,
           },
@@ -237,6 +252,7 @@ export const createNoAmountOnchainPaymentDetails = <T extends WalletCurrency>(
           variables: {
             input: {
               walletId: sendingWalletDescriptor.id,
+              speed: payoutSpeed,
               address,
               amount: settlementAmount.amount,
             },
@@ -254,6 +270,7 @@ export const createNoAmountOnchainPaymentDetails = <T extends WalletCurrency>(
         const { data } = await getFeeFns.onChainUsdTxFeeAsBtcDenominated({
           variables: {
             walletId: sendingWalletDescriptor.id,
+            speed: payoutSpeed,
             address,
             amount: settlementAmount.amount,
           },
@@ -320,6 +337,13 @@ export const createNoAmountOnchainPaymentDetails = <T extends WalletCurrency>(
     })
   }
 
+  const setPayoutSpeed = (newPayoutSpeed: PayoutSpeed) => {
+    return createNoAmountOnchainPaymentDetails({
+      ...params,
+      payoutSpeed: newPayoutSpeed,
+    })
+  }
+
   return {
     destination: address,
     settlementAmount,
@@ -334,6 +358,9 @@ export const createNoAmountOnchainPaymentDetails = <T extends WalletCurrency>(
     ...setMemo,
     setAmount,
     canSetAmount: true,
+    setPayoutSpeed,
+    payoutSpeed,
+    feeQuote,
     ...sendPaymentAndGetFee,
     canSendMax: true,
     isSendingMax,
@@ -343,6 +370,7 @@ export const createNoAmountOnchainPaymentDetails = <T extends WalletCurrency>(
 export type CreateAmountOnchainPaymentDetailsParams<T extends WalletCurrency> = {
   address: string
   destinationSpecifiedAmount: BtcMoneyAmount
+  payoutSpeed?: PayoutSpeed
 } & BaseCreatePaymentDetailsParams<T>
 
 export const createAmountOnchainPaymentDetails = <T extends WalletCurrency>(
@@ -355,6 +383,7 @@ export const createAmountOnchainPaymentDetails = <T extends WalletCurrency>(
     destinationSpecifiedMemo,
     senderSpecifiedMemo,
     address,
+    payoutSpeed = PayoutSpeed.Fast,
   } = params
 
   const settlementAmount = convertMoneyAmount(
@@ -373,12 +402,18 @@ export const createAmountOnchainPaymentDetails = <T extends WalletCurrency>(
   let sendPaymentMutation: SendPaymentMutation
   let getFee: GetFee<T>
 
+  const feeQuote =
+    sendingWalletDescriptor.currency === WalletCurrency.Btc
+      ? OnchainFeeQuote.Btc
+      : OnchainFeeQuote.UsdAsBtcDenominated
+
   if (sendingWalletDescriptor.currency === WalletCurrency.Btc) {
     sendPaymentMutation = async (paymentMutations) => {
       const { data } = await paymentMutations.onChainPaymentSend({
         variables: {
           input: {
             walletId: sendingWalletDescriptor.id,
+            speed: payoutSpeed,
             address,
             amount: settlementAmount.amount,
             memo,
@@ -396,6 +431,7 @@ export const createAmountOnchainPaymentDetails = <T extends WalletCurrency>(
       const { data } = await getFeeFns.onChainTxFee({
         variables: {
           walletId: sendingWalletDescriptor.id,
+          speed: payoutSpeed,
           address,
           amount: settlementAmount.amount,
         },
@@ -428,6 +464,7 @@ export const createAmountOnchainPaymentDetails = <T extends WalletCurrency>(
         variables: {
           input: {
             walletId: sendingWalletDescriptor.id,
+            speed: payoutSpeed,
             address,
             amount: unitOfAccountAmount.amount,
           },
@@ -444,6 +481,7 @@ export const createAmountOnchainPaymentDetails = <T extends WalletCurrency>(
       const { data } = await getFeeFns.onChainUsdTxFeeAsBtcDenominated({
         variables: {
           walletId: sendingWalletDescriptor.id,
+          speed: payoutSpeed,
           address,
           amount: unitOfAccountAmount.amount,
         },
@@ -500,6 +538,13 @@ export const createAmountOnchainPaymentDetails = <T extends WalletCurrency>(
     })
   }
 
+  const setPayoutSpeed = (newPayoutSpeed: PayoutSpeed) => {
+    return createAmountOnchainPaymentDetails({
+      ...params,
+      payoutSpeed: newPayoutSpeed,
+    })
+  }
+
   return {
     destination: address,
     destinationSpecifiedAmount,
@@ -514,6 +559,9 @@ export const createAmountOnchainPaymentDetails = <T extends WalletCurrency>(
     ...setMemo,
     memo,
     paymentType: PaymentType.Onchain,
+    setPayoutSpeed,
+    payoutSpeed,
+    feeQuote,
     ...sendPaymentAndGetFee,
   } as const
 }

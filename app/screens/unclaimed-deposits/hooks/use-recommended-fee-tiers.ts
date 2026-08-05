@@ -10,16 +10,14 @@ import {
   SdkFeeError,
 } from "@app/screens/send-bitcoin-screen/hooks/use-onchain-fee-tiers"
 import {
+  buildZeroTiers,
+  FeeUnit,
   type FeeTierInfo,
   FeeTierOption,
   FeeTierOption as Tier,
 } from "@app/screens/send-bitcoin-screen/hooks/fee-tiers.types"
 
-const DEFAULT_TIERS: Record<FeeTierOption, FeeTierInfo> = {
-  [Tier.Fast]: { feeSats: 0, etaMinutes: ETA_MINUTES[Tier.Fast] },
-  [Tier.Medium]: { feeSats: 0, etaMinutes: ETA_MINUTES[Tier.Medium] },
-  [Tier.Slow]: { feeSats: 0, etaMinutes: ETA_MINUTES[Tier.Slow] },
-}
+const DEFAULT_TIERS = buildZeroTiers(ETA_MINUTES, FeeUnit.SatPerVbyte)
 
 type RecommendedFeeTiersResult = {
   tiers: Record<FeeTierOption, FeeTierInfo>
@@ -43,15 +41,18 @@ export const useRecommendedFeeTiers = (
       const rates = await getRecommendedFees(sdk)
       setTiers({
         [Tier.Fast]: {
-          feeSats: rates.fastest,
+          feeAmount: rates.fastest,
+          feeUnit: FeeUnit.SatPerVbyte,
           etaMinutes: ETA_MINUTES[Tier.Fast],
         },
         [Tier.Medium]: {
-          feeSats: rates.halfHour,
+          feeAmount: rates.halfHour,
+          feeUnit: FeeUnit.SatPerVbyte,
           etaMinutes: ETA_MINUTES[Tier.Medium],
         },
         [Tier.Slow]: {
-          feeSats: rates.economy,
+          feeAmount: rates.economy,
+          feeUnit: FeeUnit.SatPerVbyte,
           etaMinutes: ETA_MINUTES[Tier.Slow],
         },
       })
@@ -71,7 +72,7 @@ export const useRecommendedFeeTiers = (
 export const getFeeRateSatPerVb = (
   tiers: Record<FeeTierOption, FeeTierInfo>,
 ): Record<FeeTierOption, number> => ({
-  [Tier.Fast]: tiers[Tier.Fast].feeSats,
-  [Tier.Medium]: tiers[Tier.Medium].feeSats,
-  [Tier.Slow]: tiers[Tier.Slow].feeSats,
+  [Tier.Fast]: tiers[Tier.Fast].feeAmount,
+  [Tier.Medium]: tiers[Tier.Medium].feeAmount,
+  [Tier.Slow]: tiers[Tier.Slow].feeAmount,
 })

@@ -21,7 +21,7 @@ describe("useRecommendedFeeTiers", () => {
     const { result } = renderHook(() => useRecommendedFeeTiers(mockSdk, false))
 
     await waitFor(() => expect(result.current.error).toBeNull())
-    expect(result.current.tiers[FeeTierOption.Fast].feeSats).toBe(0)
+    expect(result.current.tiers[FeeTierOption.Fast].feeAmount).toBe(0)
     expect(mockGetRecommendedFees).not.toHaveBeenCalled()
   })
 
@@ -36,9 +36,11 @@ describe("useRecommendedFeeTiers", () => {
 
     const { result } = renderHook(() => useRecommendedFeeTiers(mockSdk, true))
 
-    await waitFor(() => expect(result.current.tiers[FeeTierOption.Fast].feeSats).toBe(30))
-    expect(result.current.tiers[FeeTierOption.Medium].feeSats).toBe(20)
-    expect(result.current.tiers[FeeTierOption.Slow].feeSats).toBe(10)
+    await waitFor(() =>
+      expect(result.current.tiers[FeeTierOption.Fast].feeAmount).toBe(30),
+    )
+    expect(result.current.tiers[FeeTierOption.Medium].feeAmount).toBe(20)
+    expect(result.current.tiers[FeeTierOption.Slow].feeAmount).toBe(10)
     expect(result.current.error).toBeNull()
   })
 
@@ -57,9 +59,9 @@ describe("useRecommendedFeeTiers", () => {
     const { result } = renderHook(() => useRecommendedFeeTiers(mockSdk, true))
 
     await waitFor(() => expect(result.current.error).not.toBeNull())
-    expect(result.current.tiers[FeeTierOption.Fast].feeSats).toBe(0)
-    expect(result.current.tiers[FeeTierOption.Medium].feeSats).toBe(0)
-    expect(result.current.tiers[FeeTierOption.Slow].feeSats).toBe(0)
+    expect(result.current.tiers[FeeTierOption.Fast].feeAmount).toBe(0)
+    expect(result.current.tiers[FeeTierOption.Medium].feeAmount).toBe(0)
+    expect(result.current.tiers[FeeTierOption.Slow].feeAmount).toBe(0)
   })
 
   it("clears error on successful retry after a previous failure", async () => {
@@ -83,7 +85,9 @@ describe("useRecommendedFeeTiers", () => {
     rerender({ enabled: false })
     rerender({ enabled: true })
 
-    await waitFor(() => expect(result.current.tiers[FeeTierOption.Fast].feeSats).toBe(25))
+    await waitFor(() =>
+      expect(result.current.tiers[FeeTierOption.Fast].feeAmount).toBe(25),
+    )
     expect(result.current.error).toBeNull()
   })
 })
