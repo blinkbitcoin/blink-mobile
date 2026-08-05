@@ -33,7 +33,12 @@ export const useTotalBalance = (
     toBtcMoneyAmount(btcWallet?.balance),
     DisplayCurrency,
   )
-  const usdAmount = isDollarBalanceRestricted
+  /** An unresolved region counts the dollars out of every figure, not just out of the
+   *  loader: `satsBalance` feeds thresholds that are read without consulting `isLoading`
+   *  (the backup nudge), so leaving the dollars in would arm a nudge against a total that
+   *  drops the moment the verdict lands. */
+  const isDollarBalanceUnavailable = isDollarBalanceRestricted || isRegionPending
+  const usdAmount = isDollarBalanceUnavailable
     ? convertMoneyAmount?.(toUsdMoneyAmount(0), DisplayCurrency)
     : convertMoneyAmount?.(toUsdMoneyAmount(usdWallet?.balance), DisplayCurrency)
 
