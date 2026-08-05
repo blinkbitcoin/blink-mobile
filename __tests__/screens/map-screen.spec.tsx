@@ -15,6 +15,9 @@ let capturedHandleCalloutPress:
     }) => void)
   | undefined
 let capturedScreenProps: Record<string, unknown> | undefined
+let capturedUserLocation:
+  | { latitude: number; longitude: number; latitudeDelta: number; longitudeDelta: number }
+  | undefined
 
 jest.mock("@react-navigation/native", () => ({
   useFocusEffect: jest.fn(),
@@ -28,9 +31,27 @@ jest.mock("@app/hooks/use-active-wallet", () => ({
   useActiveWallet: () => mockUseActiveWallet(),
 }))
 
+const STORED_REGION = {
+  latitude: 13.5,
+  longitude: -89.4,
+  latitudeDelta: 0.05,
+  longitudeDelta: 0.05,
+}
+/** Region null is the first-ever visit: the screen falls back to the detected country. */
+let mockLastRegion: { region: typeof STORED_REGION | null } = { region: STORED_REGION }
+
+/** Mirrors the screen's own default, which it does not export. */
+const EL_ZONTE_COORDS = {
+  latitude: 13.496743,
+  longitude: -89.439462,
+  latitudeDelta: 0.02,
+  longitudeDelta: 0.02,
+}
+
+let mockCountryCode: string | undefined = "SV"
 jest.mock("@app/hooks/use-device-location", () => ({
   __esModule: true,
-  default: () => ({ countryCode: "SV", loading: false }),
+  default: () => ({ countryCode: mockCountryCode, loading: false }),
 }))
 
 jest.mock("@app/i18n/i18n-react", () => ({
@@ -48,17 +69,7 @@ jest.mock("@app/graphql/generated", () => ({
     error: undefined,
     refetch: jest.fn(),
   }),
-  useRegionQuery: () => ({
-    data: {
-      region: {
-        latitude: 13.5,
-        longitude: -89.4,
-        latitudeDelta: 0.05,
-        longitudeDelta: 0.05,
-      },
-    },
-    error: undefined,
-  }),
+  useRegionQuery: () => ({ data: mockLastRegion, error: undefined }),
 }))
 
 jest.mock("@apollo/client", () => ({
@@ -106,6 +117,7 @@ jest.mock("@app/components/map-component", () => {
     default: (props: Record<string, unknown>) => {
       capturedHandleCalloutPress =
         props.handleCalloutPress as typeof capturedHandleCalloutPress
+      capturedUserLocation = props.userLocation as typeof capturedUserLocation
       return ReactActual.createElement(RN.View, { testID: "map-component" })
     },
   }
@@ -144,6 +156,9 @@ describe("MapScreen.handleCalloutPress", () => {
     jest.clearAllMocks()
     capturedHandleCalloutPress = undefined
     capturedScreenProps = undefined
+    capturedUserLocation = undefined
+    mockCountryCode = "SV"
+    mockLastRegion = { region: STORED_REGION }
   })
 
   it("excludes the bottom safe-area edge the tab bar already reserves", async () => {
@@ -203,5 +218,50 @@ describe("MapScreen.handleCalloutPress", () => {
     await waitForCalloutHandler()
 
     expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  describe("initial region", () => {
+    const renderMap = async () => {
+      mockUseIsAuthed.mockReturnValue(true)
+      mockUseActiveWallet.mockReturnValue({ isSelfCustodial: false })
+      render(<MapScreen navigation={{ navigate: mockNavigate } as never} />)
+      await waitFor(() => expect(capturedUserLocation).toBeDefined())
+    }
+
+    it("reuses the stored region from a previous visit", async () => {
+      await renderMap()
+
+      expect(capturedUserLocation).toEqual(STORED_REGION)
+    })
+
+    it("centres on the detected country on a first visit", async () => {
+      mockLastRegion = { region: null }
+
+      await renderMap()
+
+      expect(capturedUserLocation).toEqual(
+        expect.objectContaining({ latitude: expect.any(Number) }),
+      )
+      expect(capturedUserLocation).not.toEqual(STORED_REGION)
+    })
+
+    /** Anon resolves no country at all, and the last-region path no longer waits for one. */
+    it("falls back to the default coords without a resolved country", async () => {
+      mockLastRegion = { region: null }
+      mockCountryCode = undefined
+
+      await renderMap()
+
+      expect(capturedUserLocation).toEqual(EL_ZONTE_COORDS)
+    })
+
+    it("falls back to the default coords for an unrecognised country", async () => {
+      mockLastRegion = { region: null }
+      mockCountryCode = "ZZ"
+
+      await renderMap()
+
+      expect(capturedUserLocation).toEqual(EL_ZONTE_COORDS)
+    })
   })
 })

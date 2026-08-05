@@ -14,7 +14,11 @@ type CreationBlock = {
  * so the signup flow can redirect to the Unsupported region screen.
  */
 export const useCreationBlock = (): CreationBlock => {
-  const { countryCode, loading } = useDeviceLocation()
+  /** Resolves the region even from an Anon session: the account being created has no mode
+   *  of its own yet, and a custodial one never will, so neither may inherit another
+   *  account's Anon. Without this the country reads undefined and creation passes
+   *  unchecked. */
+  const { countryCode, loading } = useDeviceLocation({ isCustodialFlow: true })
   const { custodialCreationBlockedCountries, selfCustodialCreationBlockedCountries } =
     useRemoteConfig()
 

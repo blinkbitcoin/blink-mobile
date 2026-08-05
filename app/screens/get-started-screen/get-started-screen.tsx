@@ -8,9 +8,11 @@ import { useAppConfig } from "@app/hooks"
 import {
   useAccountTypeOptions,
   ACCOUNT_OPTION_TO_FLOW,
+  AccountOption,
 } from "@app/hooks/use-account-type-options"
 import { useCreationBlock } from "@app/hooks/use-creation-block"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { ChooseExperienceContinueRoute } from "@app/navigation/stack-param-lists"
 import theme from "@app/rne-theme/theme"
 import { AccountTypeMode } from "@app/types/account"
 import { logGetStartedAction } from "@app/utils/analytics"
@@ -68,6 +70,14 @@ export const GetStartedScreen: React.FC = () => {
       action: "create_device_account",
       createDeviceAccountEnabled: Boolean(appCheckToken),
     })
+
+    /** The shortcut must still pass through the mode choice. */
+    if (defaultSelected === AccountOption.SelfCustodial) {
+      navigation.navigate("selfCustodialChooseExperience", {
+        onContinue: { route: ChooseExperienceContinueRoute.AcceptTerms },
+      })
+      return
+    }
 
     if (defaultSelected) {
       navigation.navigate("acceptTermsAndConditions", {

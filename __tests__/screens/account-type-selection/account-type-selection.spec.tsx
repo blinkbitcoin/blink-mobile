@@ -47,6 +47,7 @@ jest.mock("@app/hooks/use-account-type-options", () => ({
 
 const mockIsCreationBlocked = jest.fn()
 const mockRegionLoading = jest.fn(() => false)
+
 jest.mock("@app/hooks/use-creation-block", () => ({
   useCreationBlock: () => ({
     isCreationBlocked: mockIsCreationBlocked,

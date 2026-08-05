@@ -36,20 +36,25 @@ export const OptionCardGroup = <Key extends string>({
 
   return (
     <View style={styles.grid}>
-      {options.map((option) => (
-        <Pressable
-          key={option.key}
-          style={[styles.card, selectedKey === option.key && styles.cardSelected]}
-          onPress={() => onSelect(option.key)}
-          {...(option.testID ? testProps(option.testID) : {})}
-        >
-          <View style={styles.iconContainer}>
-            <GaloyIcon name={option.icon} size={option.iconSize ?? DEFAULT_ICON_SIZE} />
-          </View>
-          <Text style={styles.cardTitle}>{option.title}</Text>
-          <Text style={styles.cardDescription}>{option.description}</Text>
-        </Pressable>
-      ))}
+      {options.map((option) => {
+        const isSelected = selectedKey === option.key
+        const cardTestProps = option.testID ? testProps(option.testID) : {}
+
+        return (
+          <Pressable
+            key={option.key}
+            style={[styles.card, isSelected && styles.cardSelected]}
+            onPress={() => onSelect(option.key)}
+            {...cardTestProps}
+          >
+            <View style={styles.iconContainer}>
+              <GaloyIcon name={option.icon} size={option.iconSize ?? DEFAULT_ICON_SIZE} />
+            </View>
+            <Text style={styles.cardTitle}>{option.title}</Text>
+            <Text style={styles.cardDescription}>{option.description}</Text>
+          </Pressable>
+        )
+      })}
     </View>
   )
 }

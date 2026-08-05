@@ -2,7 +2,7 @@ import { useEffect } from "react"
 
 import { CommonActions, useNavigation } from "@react-navigation/native"
 
-import { useDollarBalanceRestriction } from "./use-dollar-balance-restricted"
+import { useDollarBalanceGate } from "./use-dollar-balance-restricted"
 
 type UseDollarBalanceRestrictionGuardOptions = {
   /** Turns the guard off for a caller that must let a restricted user through (the
@@ -13,10 +13,10 @@ type UseDollarBalanceRestrictionGuardOptions = {
 export const useDollarBalanceRestrictionGuard = ({
   enabled = true,
 }: UseDollarBalanceRestrictionGuardOptions = {}): boolean => {
-  const { isRestricted, isRegionPending } = useDollarBalanceRestriction()
+  const { isGated, isRegionPending } = useDollarBalanceGate()
   const navigation = useNavigation()
 
-  const shouldLeaveScreen = enabled && isRestricted
+  const shouldLeaveScreen = enabled && isGated
 
   useEffect(() => {
     if (!shouldLeaveScreen) return
@@ -24,7 +24,7 @@ export const useDollarBalanceRestrictionGuard = ({
   }, [shouldLeaveScreen, navigation])
 
   /** The screen also hides while the region resolves, so a user who lands here on a cold
-   *  start cannot act on it before the verdict arrives; only a resolved restriction
-   *  bounces them out. */
-  return enabled && (isRestricted || isRegionPending)
+   *  start cannot act on it before the verdict arrives; only a resolved gate bounces them
+   *  out. */
+  return enabled && (isGated || isRegionPending)
 }

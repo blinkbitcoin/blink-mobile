@@ -2370,6 +2370,7 @@
     "apiAcess": "การเชื่อมต่อ API",
     "apiDocumentation": "เอกสาร API",
     "apiDashboard": "การเข้าถึงและแดชบอร์ด API",
+    "mode": "โหมด",
     "pos": "จุดขาย",
     "posCopied": "คัดลอกลิงก์จุดขายของคุณแล้ว",
     "activated": "เปิดใช้งานเป็นที่เรียบร้อย",
@@ -2501,7 +2502,21 @@
     "removedAccount": "คุณได้ลบบัญชี {identifier: string} แล้ว"
   },
   "StablesatsRestriction": {
-    "walletLabel": "ไม่พร้อมใช้งานในภูมิภาคของคุณ"
+    "walletLabel": "ไม่พร้อมใช้งานในภูมิภาคของคุณ",
+    "anonModeWalletLabel": "ไม่พร้อมใช้งานในโหมด Anon"
+  },
+  "AnonModeConvertModal": {
+    "title": "โอนยอดคงเหลือดอลลาร์ของคุณก่อน",
+    "body": "โหมด Anon รองรับเฉพาะยอดคงเหลือ Bitcoin เท่านั้น โอนยอดคงเหลือดอลลาร์ของคุณไปยังยอดคงเหลือ Bitcoin เพื่อสลับโหมด"
+  },
+  "EnhancedModePrompt": {
+    "title": "ฟีเจอร์นี้ต้องใช้โหมด Enhanced",
+    "body": "คุณอยู่ในโหมด Anon Blink ไม่ทราบภูมิภาคของคุณ ฟีเจอร์บางอย่างจึงใช้งานไม่ได้ สลับไปใช้ Enhanced เพื่อตรวจสอบตำแหน่งและปลดล็อกฟีเจอร์ทั้งหมดสำหรับภูมิภาคของคุณ",
+    "switchButton": "สลับไปใช้ Enhanced"
+  },
+  "ModeSwitchSuccessScreen": {
+    "enhanced": "สลับไปใช้โหมด Enhanced ควบคุมด้วยตัวเองแล้ว",
+    "anon": "สลับไปใช้โหมด Anon ควบคุมด้วยตัวเองแล้ว"
   },
   "DollarBalanceRestriction": {
     "modalTitle": "ยอดเงินดอลลาร์ไม่พร้อมใช้งานในภูมิภาคของคุณ"
@@ -2627,7 +2642,6 @@
     "letsGo": "Let's go!",
     "stayInTrialMode": "Stay in trial mode",
     "upgradeToLevel": "อัปเกรดเป็นระดับ {level: number}",
-    "notNow": "ไม่ใช่ตอนนี้",
     "setUpLevelAccount": "ตั้งค่าบัญชีระดับ {level: number}"
   },
   "SetAddressModal": {
@@ -2805,6 +2819,7 @@
     "bitcoinPrice": "ราคาบิตคอยน์",
     "btcAccount": "บัญชีบิตคอยน์",
     "cancel": "ยกเลิก",
+    "notNow": "ไม่ใช่ตอนนี้",
     "card": "บัตร",
     "close": "ปิด",
     "confirm": "ยืนยัน",

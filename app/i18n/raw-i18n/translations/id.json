@@ -2370,6 +2370,7 @@
     "apiAcess": "Akses API",
     "apiDocumentation": "Dokumentasi API",
     "apiDashboard": "Akses API dan dasbor",
+    "mode": "Mode",
     "pos": "Tempat Penjualan",
     "posCopied": "Tautan tempat penjualan Anda telah disalin",
     "activated": "Diaktifkan",
@@ -2501,7 +2502,21 @@
     "removedAccount": "Anda menghapus akun {identifier: string}."
   },
   "StablesatsRestriction": {
-    "walletLabel": "tidak tersedia di wilayah Anda"
+    "walletLabel": "tidak tersedia di wilayah Anda",
+    "anonModeWalletLabel": "tidak tersedia dalam mode Anon"
+  },
+  "AnonModeConvertModal": {
+    "title": "Transfer saldo Dolar Anda terlebih dahulu",
+    "body": "Mode Anon hanya mendukung saldo Bitcoin. Transfer saldo Dolar Anda ke saldo Bitcoin untuk beralih."
+  },
+  "EnhancedModePrompt": {
+    "title": "Fitur ini memerlukan mode Enhanced",
+    "body": "Anda dalam mode Anon, Blink tidak mengetahui wilayah Anda, jadi beberapa fitur tidak tersedia. Beralih ke Enhanced untuk menjalankan pemeriksaan lokasi dan membuka semua fitur untuk wilayah Anda.",
+    "switchButton": "Beralih ke Enhanced"
+  },
+  "ModeSwitchSuccessScreen": {
+    "enhanced": "Beralih ke mode Enhanced non-kustodian",
+    "anon": "Beralih ke mode Anon non-kustodian"
   },
   "DollarBalanceRestriction": {
     "modalTitle": "Saldo dolar tidak tersedia di wilayah Anda"
@@ -2627,7 +2642,6 @@
     "letsGo": "Ayo mulai!",
     "stayInTrialMode": "Tetap di mode percobaan",
     "upgradeToLevel": "Tingkatkan ke Level {level: number}",
-    "notNow": "Tidak sekarang",
     "setUpLevelAccount": "Atur akun Level {level: number}"
   },
   "SetAddressModal": {
@@ -2805,6 +2819,7 @@
     "bitcoinPrice": "Harga Bitcoin",
     "btcAccount": "Akun Bitcoin",
     "cancel": "Batal",
+    "notNow": "Tidak sekarang",
     "card": "Kartu",
     "close": "Tutup",
     "confirm": "Konfirmasi",

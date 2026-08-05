@@ -17,7 +17,7 @@ jest.mock("@app/hooks/use-account-type-options", () => ({
 jest.mock("@app/hooks/use-device-location", () => ({
   __esModule: true,
   ...jest.requireActual("@app/hooks/use-device-location"),
-  default: () => mockUseDeviceLocation(),
+  default: (options?: unknown) => mockUseDeviceLocation(options),
 }))
 
 const setUp = ({
@@ -85,5 +85,14 @@ describe("useCreationBlock", () => {
   it("passes through the location loading flag", () => {
     expect(setUp({ countryCode: undefined, loading: true }).loading).toBe(true)
     expect(setUp({ countryCode: "SV", loading: false }).loading).toBe(false)
+  })
+
+  /** The account being created has no mode of its own yet, and a custodial one never
+   *  will, so neither may inherit another account's Anon: an unresolved country reads as
+   *  "not blocked" and lets creation through unchecked. */
+  it("resolves the region even from an Anon session", () => {
+    setUp({ countryCode: "KP" })
+
+    expect(mockUseDeviceLocation).toHaveBeenCalledWith({ isCustodialFlow: true })
   })
 })

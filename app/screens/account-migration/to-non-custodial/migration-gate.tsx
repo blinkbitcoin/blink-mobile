@@ -23,7 +23,7 @@ import {
 } from "@app/screens/account-migration/hooks"
 import { useCustodialWindDown } from "@app/screens/account-migration/hooks/use-custodial-wind-down"
 import { useMigrationLock } from "@app/screens/account-migration/hooks/use-migration-lock"
-import { armMigrationConversion } from "@app/screens/account-migration/hooks/use-migration-conversion"
+import { armMigrationConversion } from "@app/screens/conversion-flow/drain-conversion"
 import { useSelfCustodialDisabled } from "@app/screens/account-migration/hooks/use-self-custodial-disabled"
 
 import { MigrationApiServiceScreen } from "./api-service-screen"

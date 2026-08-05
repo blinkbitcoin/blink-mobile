@@ -2370,6 +2370,7 @@
     "apiAcess": "Udityaniswo lwe-API",
     "apiDocumentation": "Amaxwebhu e-API",
     "apiDashboard": "Ukufikelela kwi-API nedashbhodi",
+    "mode": "Imo",
     "pos": "Indawo Yokuthengisa",
     "posCopied": "Ilinki yakho yendawo yokuthengisa ikopishiwe",
     "activated": "Yenziwe yasebenza",
@@ -2501,7 +2502,21 @@
     "removedAccount": "Ususile i-akhawunti {identifier: string}."
   },
   "StablesatsRestriction": {
-    "walletLabel": "ayifumaneki kummandla wakho"
+    "walletLabel": "ayifumaneki kummandla wakho",
+    "anonModeWalletLabel": "ayifumaneki kwimo ye-Anon"
+  },
+  "AnonModeConvertModal": {
+    "title": "Qala udlulisele ibhalansi yakho yeDola",
+    "body": "Imo ye-Anon ixhasa ibhalansi ye-Bitcoin kuphela. Dlulisela ibhalansi yakho yeDola kwibhalansi ye-Bitcoin ukuze utshintshe."
+  },
+  "EnhancedModePrompt": {
+    "title": "Olu phawu lufuna imo ye-Enhanced",
+    "body": "Ukwimo ye-Anon, uBlink akawazi ummandla wakho, ngoko amanye amaphawu awafumaneki. Tshintshela kwi-Enhanced ukuze kwenziwe ukhangelo lwendawo kuvulwe onke amaphawu ommandla wakho.",
+    "switchButton": "Tshintshela kwi-Enhanced"
+  },
+  "ModeSwitchSuccessScreen": {
+    "enhanced": "Utshintshele kwimo ye-Enhanced engagciniwe",
+    "anon": "Utshintshele kwimo ye-Anon engagciniwe"
   },
   "DollarBalanceRestriction": {
     "modalTitle": "Ibhalansi yedola ayifumaneki kummandla wakho"
@@ -2627,7 +2642,6 @@
     "letsGo": "Let's go!",
     "stayInTrialMode": "Stay in trial mode",
     "upgradeToLevel": "Nyusela kwiNqanaba {level: number}",
-    "notNow": "Hayi ngoku",
     "setUpLevelAccount": "Cwangcisa i-akhawunti yeNqanaba {level: number}"
   },
   "SetAddressModal": {
@@ -2805,6 +2819,7 @@
     "bitcoinPrice": "Bitcoin Price",
     "btcAccount": "I-Akhawunti ye-Bitcoin",
     "cancel": "Rhoxisa",
+    "notNow": "Hayi ngoku",
     "card": "Ikhadi",
     "close": "Close",
     "confirm": "Confirm",

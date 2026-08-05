@@ -2,7 +2,7 @@ import { useEffect } from "react"
 
 import { CommonActions, useNavigation } from "@react-navigation/native"
 
-import { useTransferBlock } from "./use-transfer-blocked"
+import { useTransferGate } from "./use-transfer-blocked"
 
 type UseTransferBlockedGuardOptions = {
   /** Turns the guard off for a caller that must let a blocked-transfer user through (the
@@ -13,10 +13,10 @@ type UseTransferBlockedGuardOptions = {
 export const useTransferBlockedGuard = ({
   enabled = true,
 }: UseTransferBlockedGuardOptions = {}): boolean => {
-  const { isBlocked, isRegionPending } = useTransferBlock()
+  const { isGated, isRegionPending } = useTransferGate()
   const navigation = useNavigation()
 
-  const shouldLeaveScreen = enabled && isBlocked
+  const shouldLeaveScreen = enabled && isGated
 
   useEffect(() => {
     if (!shouldLeaveScreen) return
@@ -24,7 +24,7 @@ export const useTransferBlockedGuard = ({
   }, [shouldLeaveScreen, navigation])
 
   /** The screen also hides while the region resolves, so a user who lands here on a cold
-   *  start cannot act on it before the verdict arrives; only a resolved block bounces
-   *  them out. */
-  return enabled && (isBlocked || isRegionPending)
+   *  start cannot act on it before the verdict arrives; only a resolved gate bounces them
+   *  out. */
+  return enabled && (isGated || isRegionPending)
 }

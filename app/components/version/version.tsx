@@ -3,6 +3,7 @@ import { Pressable } from "react-native"
 import DeviceInfo from "react-native-device-info"
 
 import { useIpCountryCode, usePhoneCountryCode } from "@app/hooks/use-device-location"
+import { useSelfCustodialAccountMode } from "@app/hooks/use-self-custodial-account-mode"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { useNavigation } from "@react-navigation/native"
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack"
@@ -28,8 +29,14 @@ export const VersionComponent = () => {
   const styles = useStyles()
   const { navigate } = useNavigation<VersionComponentNavigationProp>()
   const { LL } = useI18nContext()
-  const registeredCountry = usePhoneCountryCode() ?? LL.common.unknown()
-  const detectedCountry = useIpCountryCode(true) ?? LL.common.unknown()
+  const { isAnonMode } = useSelfCustodialAccountMode()
+  const phoneCountry = usePhoneCountryCode()
+  const ipCountry = useIpCountryCode(true)
+  const unknown = LL.common.unknown()
+  /** Anon Mode never resolves a region, so the footer states none instead of detecting one. */
+  const countryLine = isAnonMode
+    ? `${LL.common.country()}: ${unknown}`
+    : `${LL.common.registered()}: ${phoneCountry ?? unknown} · ${LL.common.detected()}: ${ipCountry ?? unknown}`
   const [secretMenuCounter, setSecretMenuCounter] = React.useState(0)
   React.useEffect(() => {
     if (secretMenuCounter > 2) {
@@ -45,8 +52,7 @@ export const VersionComponent = () => {
       <Text {...testProps("Version Build Text")} style={styles.version}>
         {readableVersion}
         {"\n"}
-        {LL.common.registered()}: {registeredCountry} · {LL.common.detected()}:{" "}
-        {detectedCountry}
+        {countryLine}
         {"\n"}
         {LL.GetStartedScreen.headline()}
       </Text>

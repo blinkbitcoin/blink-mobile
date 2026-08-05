@@ -58,7 +58,7 @@ export const LightningBenefitsScreen: React.FC<LightningBenefitsScreenProps> = (
       ]}
       primaryLabel={LL.OnboardingScreen.lightningBenefits.primaryButton()}
       onPrimaryAction={handlePrimaryAction}
-      secondaryLabel={LL.UpgradeAccountModal.notNow()}
+      secondaryLabel={LL.common.notNow()}
       onSecondaryAction={handleSecondaryAction}
       iconName="lightning-address"
     />

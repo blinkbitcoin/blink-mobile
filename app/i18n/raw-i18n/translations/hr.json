@@ -2370,6 +2370,7 @@
     "apiAcess": "API integracija",
     "apiDocumentation": "API dokumentacija",
     "apiDashboard": "API pristup i nadzorna ploča",
+    "mode": "Način",
     "pos": "Prodajno mjesto",
     "posCopied": "Vaša poveznica prodajnog mjesta je kopirana",
     "activated": "Aktivirano",
@@ -2501,7 +2502,21 @@
     "removedAccount": "Uklonili ste račun {identifier: string}."
   },
   "StablesatsRestriction": {
-    "walletLabel": "nije dostupan u vašoj regiji"
+    "walletLabel": "nije dostupan u vašoj regiji",
+    "anonModeWalletLabel": "nije dostupno u Anon načinu"
+  },
+  "AnonModeConvertModal": {
+    "title": "Najprije prenesite svoj dolarski saldo",
+    "body": "Anon način podržava samo Bitcoin saldo. Prenesite svoj dolarski saldo na Bitcoin saldo kako biste se prebacili."
+  },
+  "EnhancedModePrompt": {
+    "title": "Ova značajka zahtijeva Enhanced način",
+    "body": "U Anon ste načinu, Blink ne zna vašu regiju, pa neke značajke nisu dostupne. Prebacite se na Enhanced kako bi se izvršila provjera lokacije i otključale sve značajke za vašu regiju.",
+    "switchButton": "Prebaci na Enhanced"
+  },
+  "ModeSwitchSuccessScreen": {
+    "enhanced": "Prebačeno na Enhanced način bez skrbništva",
+    "anon": "Prebačeno na Anon način bez skrbništva"
   },
   "DollarBalanceRestriction": {
     "modalTitle": "Dolarski saldo nije dostupan u vašoj regiji"
@@ -2627,7 +2642,6 @@
     "letsGo": "Idemo!",
     "stayInTrialMode": "Ostani u probnom načinu rada",
     "upgradeToLevel": "Nadogradite na razinu {level: number}",
-    "notNow": "Ne sada",
     "setUpLevelAccount": "Postavite račun razine {level: number}"
   },
   "SetAddressModal": {
@@ -2805,6 +2819,7 @@
     "bitcoinPrice": "Cijena Bitcoina",
     "btcAccount": "Bitcoin račun",
     "cancel": "Poništi",
+    "notNow": "Ne sada",
     "card": "Kartica",
     "close": "Zatvori",
     "confirm": "Potvrdi",

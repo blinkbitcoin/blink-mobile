@@ -15,8 +15,8 @@ import { ThemeProvider } from "@rn-vui/themed"
 import { ConversionDetailsScreen } from "@app/screens/conversion-flow/conversion-details-screen"
 import {
   armMigrationConversion,
-  resetMigrationConversionArmed,
-} from "@app/screens/account-migration/hooks/use-migration-conversion"
+  resetDrainConversionArmed,
+} from "@app/screens/conversion-flow/drain-conversion"
 import {
   WalletCurrency,
   ConversionScreenDocument,
@@ -1330,7 +1330,7 @@ describe("Migration conversion prefill", () => {
 
   afterEach(() => {
     jest.useRealTimers()
-    resetMigrationConversionArmed()
+    resetDrainConversionArmed()
   })
 
   /**

@@ -17,8 +17,8 @@ jest.mock("@app/screens/settings-screen/row", () => ({
 }))
 
 jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
-  useDollarBalanceRestriction: () => ({
-    isRestricted: mockIsRestricted(),
+  useDollarBalanceGate: () => ({
+    isGated: mockIsRestricted(),
     isRegionPending: mockIsRegionPending(),
   }),
 }))

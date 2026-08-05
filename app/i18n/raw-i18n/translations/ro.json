@@ -2370,6 +2370,7 @@
     "apiAcess": "Acces API",
     "apiDocumentation": "Documentație API",
     "apiDashboard": "Acces API și panou de control",
+    "mode": "Mod",
     "pos": "Punct de vânzare POS",
     "posCopied": "Link-ul punctului de vânzare a fost copiat",
     "activated": "Activat",
@@ -2501,7 +2502,21 @@
     "removedAccount": "Ați eliminat contul {identifier: string}."
   },
   "StablesatsRestriction": {
-    "walletLabel": "nu este disponibil în regiunea ta"
+    "walletLabel": "nu este disponibil în regiunea ta",
+    "anonModeWalletLabel": "indisponibil în modul Anon"
+  },
+  "AnonModeConvertModal": {
+    "title": "Transferă mai întâi soldul tău în dolari",
+    "body": "Modul Anon acceptă doar soldul Bitcoin. Transferă soldul tău în dolari în soldul Bitcoin pentru a comuta."
+  },
+  "EnhancedModePrompt": {
+    "title": "Această funcție necesită modul Enhanced",
+    "body": "Ești în modul Anon, Blink nu îți cunoaște regiunea, așa că unele funcții nu sunt disponibile. Treci la Enhanced pentru a rula o verificare a locației și a debloca toate funcțiile pentru regiunea ta.",
+    "switchButton": "Treci la Enhanced"
+  },
+  "ModeSwitchSuccessScreen": {
+    "enhanced": "Ai trecut la modul Enhanced fără custodie",
+    "anon": "Ai trecut la modul Anon fără custodie"
   },
   "DollarBalanceRestriction": {
     "modalTitle": "Soldul în dolari nu este disponibil în regiunea ta"
@@ -2627,7 +2642,6 @@
     "letsGo": "Să pornim!",
     "stayInTrialMode": "Rămâneți în modul de test",
     "upgradeToLevel": "Faceți upgrade la Nivelul {level: number}",
-    "notNow": "Nu acum",
     "setUpLevelAccount": "Configurați contul de Nivel {level: number}"
   },
   "SetAddressModal": {
@@ -2805,6 +2819,7 @@
     "bitcoinPrice": "Preț Bitcoin",
     "btcAccount": "Cont Bitcoin",
     "cancel": "Anulare",
+    "notNow": "Nu acum",
     "card": "Card",
     "close": "Închide",
     "confirm": "Confirmare",

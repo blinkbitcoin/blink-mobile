@@ -197,7 +197,7 @@ describe("GetStartedScreen", () => {
     expect(mockNavigate).toHaveBeenCalledWith("accountTypeSelection", { mode: "create" })
   })
 
-  it("routes directly to self-custodial T&C when only the self-custodial option exists (e.g. US)", () => {
+  it("routes the self-custodial-only shortcut through the mode choice", () => {
     mockUseAccountTypeOptions.mockReturnValue({
       options: ["selfCustodial"],
       defaultSelected: "selfCustodial",
@@ -208,8 +208,8 @@ describe("GetStartedScreen", () => {
     const { getByTestId } = render(<GetStartedScreen />)
     fireEvent.press(getByTestId("create-account-button"))
 
-    expect(mockNavigate).toHaveBeenCalledWith("acceptTermsAndConditions", {
-      flow: "selfCustodial",
+    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialChooseExperience", {
+      onContinue: { route: "acceptTermsAndConditions" },
     })
   })
 
