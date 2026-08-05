@@ -3817,6 +3817,15 @@
         "restoreComingSoonDescription": "Restore flow will be available in a future update.",
         "createFailed": "Failed to create wallet. Please try again."
     },
+    "ChooseExperienceScreen": {
+        "title": "Choose your experience",
+        "subtitle": "Your choice decides which features are available. For maximum privacy choose Anon.\n\nYou can switch between the modes later.",
+        "enhancedLabel": "Enhanced\nNon-custodial",
+        "enhancedDescription": "The app checks your location to set your region.",
+        "anonLabel": "Anon\nNon-custodial",
+        "anonDescription": "No checks. No region data. Bitcoin Balance only.",
+        "continueButton": "Continue"
+    },
     "UnsupportedRegionScreen": {
         "title": "Unsupported region",
         "description": "Unfortunately we can not serve users from your current region."

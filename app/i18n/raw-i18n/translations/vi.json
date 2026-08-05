@@ -3804,6 +3804,15 @@
     "createFailed": "Không thể tạo ví. Vui lòng thử lại.",
     "selfCustodialDisabled": "Phi giám sát hiện không khả dụng."
   },
+  "ChooseExperienceScreen": {
+    "title": "Chọn trải nghiệm của bạn",
+    "subtitle": "Lựa chọn của bạn quyết định những tính năng nào khả dụng. Để có quyền riêng tư tối đa, hãy chọn Anon.\n\nBạn có thể chuyển đổi giữa các chế độ sau.",
+    "enhancedLabel": "Enhanced\nPhi lưu ký",
+    "enhancedDescription": "Ứng dụng kiểm tra vị trí của bạn để thiết lập khu vực của bạn.",
+    "anonLabel": "Anon\nPhi lưu ký",
+    "anonDescription": "Không kiểm tra. Không có dữ liệu khu vực. Chỉ số dư Bitcoin.",
+    "continueButton": "Tiếp tục"
+  },
   "UnsupportedRegionScreen": {
     "title": "Khu vực không được hỗ trợ",
     "description": "Rất tiếc, chúng tôi không thể phục vụ người dùng từ khu vực hiện tại của bạn."

@@ -3804,6 +3804,15 @@
         "createFailed": "Impossibile creare il wallet. Riprova.",
         "selfCustodialDisabled": "La modalità non custodial è temporaneamente non disponibile."
     },
+    "ChooseExperienceScreen": {
+        "title": "Scegli la tua esperienza",
+        "subtitle": "La tua scelta determina quali funzioni sono disponibili. Per la massima privacy scegli Anon.\n\nPuoi cambiare modalità in seguito.",
+        "enhancedLabel": "Enhanced\nNon custodito",
+        "enhancedDescription": "L'app verifica la tua posizione per impostare la tua regione.",
+        "anonLabel": "Anon\nNon custodito",
+        "anonDescription": "Nessuna verifica. Nessun dato sulla regione. Solo saldo in Bitcoin.",
+        "continueButton": "Continua"
+    },
     "UnsupportedRegionScreen": {
         "title": "Regione non supportata",
         "description": "Purtroppo non possiamo servire gli utenti dalla tua regione attuale."

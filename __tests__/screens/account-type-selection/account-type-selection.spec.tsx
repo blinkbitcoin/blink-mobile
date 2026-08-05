@@ -144,14 +144,14 @@ describe("AccountTypeSelectionScreen", () => {
     expect(getByText("Choose method")).toBeTruthy()
   })
 
-  it("navigates to T&C with selfCustodial flow when self-custodial selected in create mode", () => {
+  it("navigates to the mode choice when self-custodial selected in create mode", () => {
     const { getByTestId } = render(<AccountTypeSelectionScreen />)
 
     fireEvent.press(getByTestId("self-custodial-option"))
     fireEvent.press(getByTestId("continue-button"))
 
-    expect(mockNavigate).toHaveBeenCalledWith("acceptTermsAndConditions", {
-      flow: "selfCustodial",
+    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialChooseExperience", {
+      onContinue: { route: "acceptTermsAndConditions" },
     })
   })
 
@@ -188,8 +188,8 @@ describe("AccountTypeSelectionScreen", () => {
     fireEvent.press(getByTestId("self-custodial-option"))
     fireEvent.press(getByTestId("continue-button"))
 
-    expect(mockNavigate).toHaveBeenCalledWith("acceptTermsAndConditions", {
-      flow: "selfCustodial",
+    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialChooseExperience", {
+      onContinue: { route: "acceptTermsAndConditions" },
     })
     expect(mockNavigate).not.toHaveBeenCalledWith("unsupportedRegion")
   })
@@ -299,8 +299,8 @@ describe("AccountTypeSelectionScreen", () => {
     const { getByTestId } = render(<AccountTypeSelectionScreen />)
 
     fireEvent.press(getByTestId("continue-button"))
-    expect(mockNavigate).toHaveBeenCalledWith("acceptTermsAndConditions", {
-      flow: "selfCustodial",
+    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialChooseExperience", {
+      onContinue: { route: "acceptTermsAndConditions" },
     })
   })
 

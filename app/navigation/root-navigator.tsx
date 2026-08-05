@@ -143,6 +143,7 @@ import {
   ViewBackupPhraseScreen,
   BackupPhraseConfirmScreen,
   BackupSuccessScreen,
+  ChooseExperienceScreen,
   WalletCreationScreen,
 } from "@app/screens/self-custodial/onboarding"
 import {
@@ -861,6 +862,11 @@ export const RootStack = () => {
         name="selfCustodialBackupSuccess"
         component={BackupSuccessScreen}
         options={{ headerShown: false }}
+      />
+      <RootNavigator.Screen
+        name="selfCustodialChooseExperience"
+        component={ChooseExperienceScreen}
+        options={{ headerShown: false, gestureEnabled: false }}
       />
       <RootNavigator.Screen
         name="selfCustodialWalletCreation"

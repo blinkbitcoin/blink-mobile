@@ -30,7 +30,7 @@ export const AcceptTermsAndConditionsScreen: React.FC = () => {
     >()
 
   const route = useRoute<RouteProp<RootStackParamList, "acceptTermsAndConditions">>()
-  const { flow } = route.params || { flow: "phone" }
+  const { flow, mode } = route.params || { flow: "phone" }
   const { saveCheckpoint } = useMigrationCheckpoint()
 
   const { deviceAccountEnabled } = useFeatureFlags()
@@ -55,7 +55,7 @@ export const AcceptTermsAndConditionsScreen: React.FC = () => {
     }
 
     if (flow === "selfCustodial") {
-      navigation.navigate("selfCustodialWalletCreation")
+      navigation.navigate("selfCustodialWalletCreation", { mode })
       return
     }
 

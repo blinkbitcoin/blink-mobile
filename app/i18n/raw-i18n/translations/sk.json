@@ -3804,6 +3804,15 @@
     "createFailed": "Nepodarilo sa vytvoriť peňaženku. Skúste to znova.",
     "selfCustodialDisabled": "Nesprávcovský režim je dočasne nedostupný."
   },
+  "ChooseExperienceScreen": {
+    "title": "Vyberte si svoj zážitok",
+    "subtitle": "Vaša voľba určuje, ktoré funkcie sú dostupné. Pre maximálne súkromie zvoľte Anon.\n\nMedzi režimami môžete prepínať neskôr.",
+    "enhancedLabel": "Enhanced\nVlastná správa",
+    "enhancedDescription": "Aplikácia skontroluje vašu polohu a nastaví váš región.",
+    "anonLabel": "Anon\nVlastná správa",
+    "anonDescription": "Žiadne kontroly. Žiadne údaje o regióne. Iba zostatok v Bitcoine.",
+    "continueButton": "Pokračovať"
+  },
   "UnsupportedRegionScreen": {
     "title": "Nepodporovaný región",
     "description": "Bohužiaľ nemôžeme obsluhovať používateľov z vášho aktuálneho regiónu."

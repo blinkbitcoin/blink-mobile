@@ -3804,6 +3804,15 @@
         "createFailed": "Error al crear la billetera. Por favor intenta de nuevo.",
         "selfCustodialDisabled": "La modalidad no custodial no está disponible temporalmente."
     },
+    "ChooseExperienceScreen": {
+        "title": "Elige tu experiencia",
+        "subtitle": "Tu elección decide qué funciones están disponibles. Para máxima privacidad elige Anon.\n\nPuedes cambiar entre los modos más tarde.",
+        "enhancedLabel": "Enhanced\nNo custodiada",
+        "enhancedDescription": "La app verifica tu ubicación para definir tu región.",
+        "anonLabel": "Anon\nNo custodiada",
+        "anonDescription": "Sin verificaciones. Sin datos de región. Solo saldo en Bitcoin.",
+        "continueButton": "Continuar"
+    },
     "UnsupportedRegionScreen": {
         "title": "Región no compatible",
         "description": "Lamentablemente no podemos atender a usuarios de tu región actual."

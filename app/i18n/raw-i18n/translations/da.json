@@ -3804,6 +3804,15 @@
     "createFailed": "Kunne ikke oprette tegnebog. Prøv venligst igen.",
     "selfCustodialDisabled": "Ikke-forvaltning er midlertidigt utilgængelig."
   },
+  "ChooseExperienceScreen": {
+    "title": "Vælg din oplevelse",
+    "subtitle": "Dit valg bestemmer, hvilke funktioner der er tilgængelige. Vælg Anon for maksimalt privatliv.\n\nDu kan skifte mellem tilstandene senere.",
+    "enhancedLabel": "Enhanced\nSelvforvaltet",
+    "enhancedDescription": "Appen tjekker din placering for at indstille din region.",
+    "anonLabel": "Anon\nSelvforvaltet",
+    "anonDescription": "Ingen tjek. Ingen regionsdata. Kun Bitcoin-saldo.",
+    "continueButton": "Fortsæt"
+  },
   "UnsupportedRegionScreen": {
     "title": "Ikke-understøttet region",
     "description": "Desværre kan vi ikke betjene brugere fra din nuværende region."

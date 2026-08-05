@@ -1,12 +1,12 @@
 import { renderHook, act, waitFor } from "@testing-library/react-native"
+import { CommonActions, StackActions } from "@react-navigation/native"
 
 import {
   useMigrationCheckpoint,
   MigrationCheckpoint,
 } from "@app/screens/account-migration/hooks"
 
-const mockNavigate = jest.fn()
-const mockReplace = jest.fn()
+const mockDispatch = jest.fn()
 const mockLoadCheckpoint = jest.fn()
 const mockSaveCheckpointToStorage = jest.fn()
 const mockClearCheckpointFromStorage = jest.fn()
@@ -17,7 +17,7 @@ let mockFocusCallback: (() => void | (() => void)) | null = null
 
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
-  useNavigation: () => ({ navigate: mockNavigate, replace: mockReplace }),
+  useNavigation: () => ({ dispatch: mockDispatch }),
   useFocusEffect: (callback: () => void | (() => void)) => {
     const { useEffect } = jest.requireActual("react")
     useEffect(() => {
@@ -271,7 +271,9 @@ describe("useMigrationCheckpoint", () => {
       result.current.navigateToCheckpoint()
     })
 
-    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationExplainer")
+    expect(mockDispatch).toHaveBeenCalledWith(
+      CommonActions.navigate({ name: "accountMigrationExplainer" }),
+    )
   })
 
   it("navigates to the checkpoint's screen for a provisioned checkpoint", async () => {
@@ -289,7 +291,9 @@ describe("useMigrationCheckpoint", () => {
       result.current.navigateToCheckpoint()
     })
 
-    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupMethod")
+    expect(mockDispatch).toHaveBeenCalledWith(
+      CommonActions.navigate({ name: "selfCustodialBackupMethod" }),
+    )
   })
 
   it("forwards the migration flow param when resuming at the terms screen", async () => {
@@ -307,9 +311,12 @@ describe("useMigrationCheckpoint", () => {
       result.current.navigateToCheckpoint()
     })
 
-    expect(mockNavigate).toHaveBeenCalledWith("acceptTermsAndConditions", {
-      flow: "migration",
-    })
+    expect(mockDispatch).toHaveBeenCalledWith(
+      CommonActions.navigate({
+        name: "acceptTermsAndConditions",
+        params: { flow: "migration" },
+      }),
+    )
   })
 
   it("resumes at the balances overview after reaching the commit point", async () => {
@@ -327,7 +334,37 @@ describe("useMigrationCheckpoint", () => {
       result.current.navigateToCheckpoint()
     })
 
-    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationBalancesOverview")
+    expect(mockDispatch).toHaveBeenCalledWith(
+      CommonActions.navigate({ name: "accountMigrationBalancesOverview" }),
+    )
+  })
+
+  it("resumes onto the mode screen carrying the provisioned account", async () => {
+    mockLoadCheckpoint.mockResolvedValue({
+      step: MigrationCheckpoint.ChooseExperience,
+      savedAt: Date.now(),
+      accountId: "sc-account-1",
+    })
+
+    const { result } = renderHook(() => useMigrationCheckpoint())
+
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    act(() => {
+      result.current.navigateToCheckpoint()
+    })
+
+    expect(mockDispatch).toHaveBeenCalledWith(
+      CommonActions.navigate({
+        name: "selfCustodialChooseExperience",
+        params: {
+          onContinue: {
+            route: "accountMigrationBalancesOverview",
+            accountId: "sc-account-1",
+          },
+        },
+      }),
+    )
   })
 
   it("replaces the current screen when resuming through replaceToCheckpoint", async () => {
@@ -345,10 +382,10 @@ describe("useMigrationCheckpoint", () => {
       result.current.replaceToCheckpoint()
     })
 
-    expect(mockReplace).toHaveBeenCalledWith("acceptTermsAndConditions", {
-      flow: "migration",
-    })
-    expect(mockNavigate).not.toHaveBeenCalled()
+    expect(mockDispatch).toHaveBeenCalledWith(
+      StackActions.replace("acceptTermsAndConditions", { flow: "migration" }),
+    )
+    expect(mockDispatch).toHaveBeenCalledTimes(1)
   })
 
   it("replaces to a param-less destination when the checkpoint is past the terms", async () => {
@@ -366,7 +403,34 @@ describe("useMigrationCheckpoint", () => {
       result.current.replaceToCheckpoint()
     })
 
-    expect(mockReplace).toHaveBeenCalledWith("selfCustodialBackupMethod")
+    expect(mockDispatch).toHaveBeenCalledWith(
+      StackActions.replace("selfCustodialBackupMethod", undefined),
+    )
+  })
+
+  it("replaces onto the mode screen carrying the provisioned account", async () => {
+    mockLoadCheckpoint.mockResolvedValue({
+      step: MigrationCheckpoint.ChooseExperience,
+      savedAt: Date.now(),
+      accountId: "sc-account-1",
+    })
+
+    const { result } = renderHook(() => useMigrationCheckpoint())
+
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    act(() => {
+      result.current.replaceToCheckpoint()
+    })
+
+    expect(mockDispatch).toHaveBeenCalledWith(
+      StackActions.replace("selfCustodialChooseExperience", {
+        onContinue: {
+          route: "accountMigrationBalancesOverview",
+          accountId: "sc-account-1",
+        },
+      }),
+    )
   })
 
   it("resumes from the explainer when the checkpoint has no provisioned account", async () => {
@@ -383,7 +447,9 @@ describe("useMigrationCheckpoint", () => {
       result.current.navigateToCheckpoint()
     })
 
-    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationExplainer")
+    expect(mockDispatch).toHaveBeenCalledWith(
+      CommonActions.navigate({ name: "accountMigrationExplainer" }),
+    )
   })
 
   it("reports a resumable checkpoint only when a provisioned account exists", async () => {
@@ -443,7 +509,9 @@ describe("useMigrationCheckpoint", () => {
       result.current.navigateToCheckpoint()
     })
 
-    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationExplainer")
+    expect(mockDispatch).toHaveBeenCalledWith(
+      CommonActions.navigate({ name: "accountMigrationExplainer" }),
+    )
   })
 
   it("keeps resuming a checkpoint owned by the active custodial account", async () => {
@@ -554,7 +622,9 @@ describe("useMigrationCheckpoint", () => {
       result2.current.navigateToCheckpoint()
     })
 
-    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSecurityChecks")
+    expect(mockDispatch).toHaveBeenCalledWith(
+      CommonActions.navigate({ name: "selfCustodialBackupSecurityChecks" }),
+    )
   })
 
   it("does not update state when the load fails after unmount", async () => {

@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react"
-import { ActivityIndicator, Pressable, View } from "react-native"
+import { ActivityIndicator, View } from "react-native"
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
-import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { OptionCard, OptionCardGroup } from "@app/components/option-card-group"
 import { Screen } from "@app/components/screen"
 import {
   ACCOUNT_OPTION_TO_FLOW,
@@ -14,7 +14,10 @@ import {
 } from "@app/hooks/use-account-type-options"
 import { useCreationBlock } from "@app/hooks/use-creation-block"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import {
+  ChooseExperienceContinueRoute,
+  RootStackParamList,
+} from "@app/navigation/stack-param-lists"
 import { AccountTypeMode } from "@app/types/account"
 import { testProps } from "@app/utils/testProps"
 
@@ -51,6 +54,12 @@ export const AccountTypeSelectionScreen: React.FC = () => {
         navigation.navigate("unsupportedRegion")
         return
       }
+      if (selected === AccountOption.SelfCustodial) {
+        navigation.navigate("selfCustodialChooseExperience", {
+          onContinue: { route: ChooseExperienceContinueRoute.AcceptTerms },
+        })
+        return
+      }
       navigation.navigate("acceptTermsAndConditions", {
         flow: ACCOUNT_OPTION_TO_FLOW[selected],
       })
@@ -67,11 +76,30 @@ export const AccountTypeSelectionScreen: React.FC = () => {
     navigation.navigate("selfCustodialRestoreMethod")
   }
 
-  const isSelected = (option: AccountOption) => selected === option
   const showSelfCustodial = options.includes(AccountOption.SelfCustodial)
   const showCustodial = options.includes(AccountOption.Custodial)
   const isContinueDisabled =
     !selected || detectingCountry || (isCreateMode && detectingRegion)
+
+  const cardOptions: OptionCard<AccountOption>[] = []
+  if (showCustodial) {
+    cardOptions.push({
+      key: AccountOption.Custodial,
+      icon: "cloud",
+      title: LL.AccountTypeSelectionScreen.custodialLabel(),
+      description: LL.AccountTypeSelectionScreen.custodialDescription(),
+      testID: "custodial-option",
+    })
+  }
+  if (showSelfCustodial) {
+    cardOptions.push({
+      key: AccountOption.SelfCustodial,
+      icon: "key-outline",
+      title: LL.AccountTypeSelectionScreen.selfCustodialLabel(),
+      description: LL.AccountTypeSelectionScreen.selfCustodialDescription(),
+      testID: "self-custodial-option",
+    })
+  }
 
   return (
     <Screen>
@@ -96,55 +124,11 @@ export const AccountTypeSelectionScreen: React.FC = () => {
               <ActivityIndicator color={colors.primary} />
             </View>
           ) : (
-            <View style={styles.grid}>
-              {showCustodial && (
-                <Pressable
-                  style={[
-                    styles.card,
-                    isSelected(AccountOption.Custodial) && {
-                      borderColor: colors.primary,
-                      backgroundColor: colors.grey6,
-                    },
-                  ]}
-                  onPress={() => setSelected(AccountOption.Custodial)}
-                  {...testProps("custodial-option")}
-                >
-                  <View style={styles.iconContainer}>
-                    <GaloyIcon name="cloud" size={20} />
-                  </View>
-                  <Text style={styles.cardTitle}>
-                    {LL.AccountTypeSelectionScreen.custodialLabel()}
-                  </Text>
-                  <Text style={styles.cardDescription}>
-                    {LL.AccountTypeSelectionScreen.custodialDescription()}
-                  </Text>
-                </Pressable>
-              )}
-
-              {showSelfCustodial && (
-                <Pressable
-                  style={[
-                    styles.card,
-                    isSelected(AccountOption.SelfCustodial) && {
-                      borderColor: colors.primary,
-                      backgroundColor: colors.grey6,
-                    },
-                  ]}
-                  onPress={() => setSelected(AccountOption.SelfCustodial)}
-                  {...testProps("self-custodial-option")}
-                >
-                  <View style={styles.iconContainer}>
-                    <GaloyIcon name="key-outline" size={20} />
-                  </View>
-                  <Text style={styles.cardTitle}>
-                    {LL.AccountTypeSelectionScreen.selfCustodialLabel()}
-                  </Text>
-                  <Text style={styles.cardDescription}>
-                    {LL.AccountTypeSelectionScreen.selfCustodialDescription()}
-                  </Text>
-                </Pressable>
-              )}
-            </View>
+            <OptionCardGroup
+              options={cardOptions}
+              selectedKey={selected}
+              onSelect={setSelected}
+            />
           )}
         </View>
 
@@ -196,41 +180,6 @@ const useStyles = makeStyles(({ colors }) => ({
   loaderContainer: {
     paddingVertical: 40,
     alignItems: "center",
-  },
-  grid: {
-    flexDirection: "row",
-    gap: 10,
-  },
-  card: {
-    flex: 1,
-    maxWidth: "50%",
-    backgroundColor: colors.grey5,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "transparent",
-    paddingHorizontal: 14,
-    paddingVertical: 30,
-    alignItems: "center",
-    gap: 10,
-  },
-  iconContainer: {
-    width: 32,
-    height: 32,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  cardTitle: {
-    fontSize: 14,
-    fontWeight: "700",
-    lineHeight: 20,
-    color: colors.black,
-    textAlign: "center",
-  },
-  cardDescription: {
-    fontSize: 12,
-    lineHeight: 18,
-    color: colors.grey2,
-    textAlign: "center",
   },
   ctaContainer: {
     paddingHorizontal: 20,

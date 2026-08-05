@@ -3804,6 +3804,15 @@
     "createFailed": "Nem sikerült létrehozni a pénztárcát. Kérjük, próbáld újra.",
     "selfCustodialDisabled": "Az önrendelkező mód átmenetileg nem érhető el."
   },
+  "ChooseExperienceScreen": {
+    "title": "Válaszd ki az élményed",
+    "subtitle": "A választásod dönti el, mely funkciók érhetők el. A maximális adatvédelemért válaszd az Anont.\n\nKésőbb válthatsz a módok között.",
+    "enhancedLabel": "Enhanced\nÖnrendelkező",
+    "enhancedDescription": "Az alkalmazás ellenőrzi a helyzeted a régiód beállításához.",
+    "anonLabel": "Anon\nÖnrendelkező",
+    "anonDescription": "Nincs ellenőrzés. Nincs régióadat. Csak Bitcoin-egyenleg.",
+    "continueButton": "Folytatás"
+  },
   "UnsupportedRegionScreen": {
     "title": "Nem támogatott régió",
     "description": "Sajnos nem tudjuk kiszolgálni a jelenlegi régiódból érkező felhasználókat."

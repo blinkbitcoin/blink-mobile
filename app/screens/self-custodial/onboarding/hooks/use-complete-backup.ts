@@ -5,8 +5,14 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { useMigrationCheckpointState } from "@app/screens/account-migration/hooks"
+import {
+  ChooseExperienceContinueRoute,
+  RootStackParamList,
+} from "@app/navigation/stack-param-lists"
+import {
+  MigrationCheckpoint,
+  useMigrationCheckpointState,
+} from "@app/screens/account-migration/hooks"
 import {
   BackupMethod,
   BackupStatus,
@@ -31,8 +37,11 @@ export const useCompleteBackup = () => {
   const { LL } = useI18nContext()
   const { isSelfCustodial } = useActiveWallet()
   const { backupState, setBackupCompleted } = useBackupState()
-  const { checkpoint: migrationCheckpoint, accountId: migrationAccountId } =
-    useMigrationCheckpointState()
+  const {
+    checkpoint: migrationCheckpoint,
+    accountId: migrationAccountId,
+    saveCheckpoint,
+  } = useMigrationCheckpointState()
 
   const isAlreadyBackedUp = backupState.status === BackupStatus.Completed
   /** Migration only applies on a custodial account; self-custodial backups are standalone. */
@@ -69,7 +78,23 @@ export const useCompleteBackup = () => {
           toastShow({ message: LL.errors.generic(), LL })
           return
         }
-        navigation.navigate("accountMigrationBalancesOverview")
+        /** Commit the mode-screen checkpoint before navigating, so an interruption there
+         *  resumes on the mode screen (the choice is still captured) without re-running the
+         *  backup. A failed write stops here so that resume promise holds; the screen stays
+         *  and a retry re-runs it. */
+        const isCheckpointSaved = await saveCheckpoint(
+          MigrationCheckpoint.ChooseExperience,
+        )
+        if (!isCheckpointSaved) {
+          toastShow({ message: LL.errors.generic(), LL })
+          return
+        }
+        navigation.navigate("selfCustodialChooseExperience", {
+          onContinue: {
+            route: ChooseExperienceContinueRoute.BalancesOverview,
+            accountId: migrationAccountId,
+          },
+        })
         return
       }
 
@@ -83,6 +108,7 @@ export const useCompleteBackup = () => {
       navigation,
       isMigrating,
       migrationAccountId,
+      saveCheckpoint,
       isAlreadyBackedUp,
       setBackupCompleted,
       LL,

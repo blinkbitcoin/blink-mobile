@@ -18,13 +18,13 @@ const mockMigrationAccountId = jest.fn<string | null, []>()
 jest.mock("@app/screens/account-migration/hooks", () => ({
   ...jest.requireActual("@app/screens/account-migration/hooks"),
   useMigrationCheckpoint: () => ({
-    saveCheckpoint: jest.fn(),
+    saveCheckpoint: jest.fn().mockResolvedValue(true),
     checkpoint: mockCheckpoint(),
     accountId: mockMigrationAccountId(),
     loading: mockCheckpointLoading(),
   }),
   useMigrationCheckpointState: () => ({
-    saveCheckpoint: jest.fn(),
+    saveCheckpoint: jest.fn().mockResolvedValue(true),
     checkpoint: mockCheckpoint(),
     accountId: mockMigrationAccountId(),
     loading: mockCheckpointLoading(),
@@ -38,6 +38,7 @@ jest.mock("@app/screens/account-migration/hooks", () => ({
     BackupMethod: "backupMethod",
     CloudBackup: "cloudBackup",
     BackupAlerts: "backupAlerts",
+    ChooseExperience: "chooseExperience",
   },
 }))
 
@@ -252,7 +253,12 @@ describe("BackupPhraseConfirmScreen", () => {
     await act(async () => {})
 
     expect(mockMarkBackupCompletedFor).toHaveBeenCalledWith("migration-uuid", "manual")
-    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationBalancesOverview")
+    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialChooseExperience", {
+      onContinue: {
+        route: "accountMigrationBalancesOverview",
+        accountId: "migration-uuid",
+      },
+    })
   })
 
   it("routes to backup success screen with reBackup=true when re-backing-up from settings", async () => {
@@ -322,7 +328,12 @@ describe("BackupPhraseConfirmScreen", () => {
     // The migration persists the backup asynchronously before navigating.
     await act(async () => {})
 
-    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationBalancesOverview")
+    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialChooseExperience", {
+      onContinue: {
+        route: "accountMigrationBalancesOverview",
+        accountId: "migration-uuid",
+      },
+    })
   })
 
   it("forwards the route's successMessage to the success screen when provided", async () => {
@@ -390,6 +401,11 @@ describe("BackupPhraseConfirmScreen", () => {
     })
     await act(async () => {})
 
-    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationBalancesOverview")
+    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialChooseExperience", {
+      onContinue: {
+        route: "accountMigrationBalancesOverview",
+        accountId: "migration-uuid",
+      },
+    })
   })
 })

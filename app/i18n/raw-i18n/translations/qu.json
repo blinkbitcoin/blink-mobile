@@ -3804,6 +3804,15 @@
     "createFailed": "Manan walletta paqarichiyta atinkuchu. Allinta llamk'apuy.",
     "selfCustodialDisabled": "Mana-waqaychay manaraqmi atikunchu."
   },
+  "ChooseExperienceScreen": {
+    "title": "Ruwayniykita akllay",
+    "subtitle": "Akllayniyki mayqin funcionkunas kanqanta churan. Astawan pakaypaq, Anon akllay.\n\nModokunapi qhipaman tikrachiwaq.",
+    "enhancedLabel": "Enhanced\nMana waqaychasqa",
+    "enhancedDescription": "Aplicacionqa maypi kasqaykita qhawan regionniykita churanapaq.",
+    "anonLabel": "Anon\nMana waqaychasqa",
+    "anonDescription": "Mana qhawaykuna. Mana region willakuykuna. Bitcoin qullqilla.",
+    "continueButton": "Hinaspa"
+  },
   "UnsupportedRegionScreen": {
     "title": "Mana yanapasqa suyu",
     "description": "Llakikuypaq, kunan suyuykimanta ruraqkunata mana yanapayta atiykuchu."

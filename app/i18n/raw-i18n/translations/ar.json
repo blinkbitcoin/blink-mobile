@@ -3804,6 +3804,15 @@
     "createFailed": "فشل في إنشاء المحفظة. يرجى المحاولة مرة أخرى.",
     "selfCustodialDisabled": "غير الحفظ غير متاح مؤقتًا."
   },
+  "ChooseExperienceScreen": {
+    "title": "اختر تجربتك",
+    "subtitle": "اختيارك يحدد الميزات المتاحة. للحصول على أقصى قدر من الخصوصية، اختر Anon.\n\nيمكنك التبديل بين الأوضاع لاحقًا.",
+    "enhancedLabel": "Enhanced\nمحفوظ ذاتيًا",
+    "enhancedDescription": "يتحقق التطبيق من موقعك لتحديد منطقتك.",
+    "anonLabel": "Anon\nمحفوظ ذاتيًا",
+    "anonDescription": "لا عمليات تحقق. لا بيانات عن المنطقة. رصيد Bitcoin فقط.",
+    "continueButton": "متابعة"
+  },
   "UnsupportedRegionScreen": {
     "title": "منطقة غير مدعومة",
     "description": "للأسف لا يمكننا خدمة المستخدمين من منطقتك الحالية."
