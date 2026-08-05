@@ -87,7 +87,9 @@ describe("createBuildTransactionsCsvBase64", () => {
   })
 
   it("resolves null when nothing is exportable", async () => {
-    const buildCsv = createBuildTransactionsCsvBase64(createSdkStub([failedSend]) as never)
+    const buildCsv = createBuildTransactionsCsvBase64(
+      createSdkStub([failedSend]) as never,
+    )
 
     await expect(buildCsv()).resolves.toBeNull()
   })
