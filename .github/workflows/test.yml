@@ -5,7 +5,7 @@ on:
 jobs:
   check-code:
     name: Tests
-    runs-on: [self-hosted, blink, heavy]
+    runs-on: [self-hosted, blink, small]
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -26,4 +26,6 @@ jobs:
       # failing tests in CI (see jest.setup-after-env.ts) and logs each retried
       # error, instead of silently re-running the whole job.
       - run: yarn test
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
         timeout-minutes: 20
