@@ -6,6 +6,7 @@ import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 
 import { IconHero } from "@app/components/icon-hero"
+import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { ChooseExperienceScreen } from "@app/screens/self-custodial/onboarding/choose-experience-screen"
 import { AccountMode } from "@app/types/account"
 
@@ -13,10 +14,7 @@ import { ContextForScreen } from "../../helper"
 import { flushEffects } from "../../../helpers/flush-effects"
 
 const mockNavigate = jest.fn()
-type OnContinue =
-  | { route: "acceptTermsAndConditions" }
-  | { route: "selfCustodialBackupSuccess"; accountId: string }
-  | { route: "accountMigrationBalancesOverview"; accountId: string }
+type OnContinue = RootStackParamList["selfCustodialChooseExperience"]["onContinue"]
 let mockOnContinue: OnContinue = {
   route: "selfCustodialBackupSuccess",
   accountId: "sc-account-1",

@@ -101,8 +101,11 @@ describe("WalletCreationScreen", () => {
     expect(getByText("Try again")).toBeTruthy()
   })
 
-  it("calls create on retry press", async () => {
+  /** Anon rather than the default, so a retry that dropped the mode and fell back to
+   *  Enhanced would fail here instead of passing on the call count alone. */
+  it("carries the chosen mode through a retry press", async () => {
     mockStatus = "error"
+    mockRouteParams = { mode: AccountMode.Anon }
     const { getByText } = render(<WalletCreationScreen />)
 
     fireEvent.press(getByText("Try again"))
@@ -110,5 +113,6 @@ describe("WalletCreationScreen", () => {
     await waitFor(() => {
       expect(mockCreate).toHaveBeenCalledTimes(2)
     })
+    expect(mockCreate).toHaveBeenNthCalledWith(2, AccountMode.Anon)
   })
 })
