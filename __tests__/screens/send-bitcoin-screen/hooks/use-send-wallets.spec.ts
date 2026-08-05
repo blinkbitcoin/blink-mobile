@@ -233,11 +233,7 @@ describe("useSendWallets", () => {
     expect(result.current.network).toBe("mainnet")
   })
 
-  /** Characterizes what the pending hold does not cover here: the restriction reads
-   *  false until the region lands, so the dollar wallet stays offered through the
-   *  pending window. This expectation flips once the send list holds on
-   *  isRegionPending. */
-  it("still offers the dollar wallet while the region is pending", () => {
+  it("holds the self-custodial send list while the region is pending", () => {
     mockActiveWallet.mockReturnValue({
       isSelfCustodial: true,
       isReady: true,
@@ -250,7 +246,52 @@ describe("useSendWallets", () => {
 
     const { result } = renderHook(() => useSendWallets())
 
-    expect(result.current.wallets).toHaveLength(2)
+    expect(result.current.loading).toBe(true)
+  })
+
+  it("holds the custodial send list while the region is pending", () => {
+    mockActiveWallet.mockReturnValue({
+      isSelfCustodial: false,
+      isReady: false,
+      wallets: [],
+    })
+    mockIsAuthed.mockReturnValue(true)
+    mockDetailsQuery.mockReturnValue({
+      data: {
+        me: {
+          defaultAccount: {
+            defaultWalletId: "cust-btc",
+            wallets: [
+              { id: "cust-btc", walletCurrency: WalletCurrency.Btc, balance: 10000 },
+              { id: "cust-usd", walletCurrency: WalletCurrency.Usd, balance: 500 },
+            ],
+          },
+        },
+      },
+      loading: false,
+    })
+    mockUseDollarBalanceRestricted.mockReturnValue(false)
+    mockIsRegionPending.mockReturnValue(true)
+
+    const { result } = renderHook(() => useSendWallets())
+
+    expect(result.current.loading).toBe(true)
+  })
+
+  it("releases the send list once the region settles unrestricted", () => {
+    mockActiveWallet.mockReturnValue({
+      isSelfCustodial: true,
+      isReady: true,
+      wallets: [btcWallet, usdWallet],
+    })
+    mockIsAuthed.mockReturnValue(false)
+    mockDetailsQuery.mockReturnValue({ data: undefined, loading: false })
+    mockUseDollarBalanceRestricted.mockReturnValue(false)
+    mockIsRegionPending.mockReturnValue(false)
+
+    const { result } = renderHook(() => useSendWallets())
+
+    expect(result.current.loading).toBe(false)
     expect(result.current.usdWallet?.id).toBe("usd-w1")
   })
 
