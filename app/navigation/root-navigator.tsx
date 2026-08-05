@@ -866,7 +866,7 @@ export const RootStack = () => {
       <RootNavigator.Screen
         name="selfCustodialChooseExperience"
         component={ChooseExperienceScreen}
-        options={{ headerShown: false }}
+        options={{ headerShown: false, gestureEnabled: false }}
       />
       <RootNavigator.Screen
         name="selfCustodialWalletCreation"
