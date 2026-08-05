@@ -8,7 +8,6 @@ import { i18nObject } from "@app/i18n/i18n-util"
 import { IconHero } from "@app/components/icon-hero"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { ChooseExperienceScreen } from "@app/screens/self-custodial/onboarding/choose-experience-screen"
-import { PersistentStateContext } from "@app/store/persistent-state"
 import { AccountMode } from "@app/types/account"
 
 import { ContextForScreen } from "../../helper"
@@ -27,9 +26,13 @@ jest.mock("@react-navigation/native", () => ({
   useRoute: () => ({ params: { onContinue: mockOnContinue } }),
 }))
 
+const mockGetAccountMode = jest.fn()
 const mockSetAccountMode = jest.fn()
 jest.mock("@app/hooks/use-self-custodial-account-mode", () => ({
-  useSelfCustodialAccountMode: () => ({ setAccountMode: mockSetAccountMode }),
+  useSelfCustodialAccountMode: () => ({
+    getAccountMode: mockGetAccountMode,
+    setAccountMode: mockSetAccountMode,
+  }),
 }))
 
 jest.mock("@app/components/atomic/galoy-primary-button", () => ({
@@ -63,33 +66,16 @@ const renderScreen = async () => {
   return utils
 }
 
-/** Seeds the map a seeding implementation would read, overriding the helper's provider. */
-const renderScreenWithStoredMode = async (accountId: string, mode: AccountMode) => {
-  const utils = render(
-    <ContextForScreen>
-      <PersistentStateContext.Provider
-        value={{
-          persistentState: {
-            schemaVersion: 17,
-            galoyInstance: { id: "Main" },
-            galoyAuthToken: "",
-            selfCustodialAccountModeByAccountId: { [accountId]: mode },
-          },
-          updateState: () => {},
-          resetState: () => {},
-        }}
-      >
-        <ChooseExperienceScreen />
-      </PersistentStateContext.Provider>
-    </ContextForScreen>,
-  )
-  await flushEffects()
-  return utils
+/** Stands in for the account already having recorded a mode on an earlier visit. */
+const renderScreenWithStoredMode = async (mode: AccountMode) => {
+  mockGetAccountMode.mockReturnValue(mode)
+  return renderScreen()
 }
 
 describe("ChooseExperienceScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockGetAccountMode.mockReturnValue(undefined)
     mockOnContinue = { route: "selfCustodialBackupSuccess", accountId: "sc-account-1" }
   })
 
@@ -160,15 +146,35 @@ describe("ChooseExperienceScreen", () => {
     expect(mockNavigate).toHaveBeenCalledWith("accountMigrationBalancesOverview")
   })
 
-  /** Pins today's behavior: the screen takes a fresh choice on every entry and never
-   *  consults the stored mode, so re-entering for an account that already chose Anon
-   *  overwrites it with Enhanced on a single Continue. This expectation flips if the
-   *  selection is ever seeded from the stored mode. */
-  it("preselects Enhanced even when the account already has a stored mode", async () => {
-    const { getByTestId } = await renderScreenWithStoredMode(
-      "sc-account-1",
-      AccountMode.Anon,
-    )
+  it("reads the stored mode of the account the caller passed", async () => {
+    mockOnContinue = { route: "selfCustodialBackupSuccess", accountId: "sc-account-2" }
+    await renderScreen()
+
+    expect(mockGetAccountMode).toHaveBeenCalledWith("sc-account-2")
+  })
+
+  /** Re-entry is reachable: a back press out of the next screen, or a migration resume
+   *  landing back here. Continuing must not downgrade a deliberate Anon to the default. */
+  it("preselects the stored mode so a re-entry does not overwrite a deliberate Anon", async () => {
+    const { getByTestId } = await renderScreenWithStoredMode(AccountMode.Anon)
+
+    fireEvent.press(getByTestId(continueTestId))
+
+    expect(mockSetAccountMode).toHaveBeenCalledWith("sc-account-1", AccountMode.Anon)
+  })
+
+  it("still lets the user switch away from the stored mode", async () => {
+    const { getByTestId } = await renderScreenWithStoredMode(AccountMode.Anon)
+
+    fireEvent.press(getByTestId("mode-enhanced"))
+    fireEvent.press(getByTestId(continueTestId))
+
+    expect(mockSetAccountMode).toHaveBeenCalledWith("sc-account-1", AccountMode.Enhanced)
+  })
+
+  it("falls back to Enhanced when the account stored no mode", async () => {
+    mockGetAccountMode.mockReturnValue(undefined)
+    const { getByTestId } = await renderScreen()
 
     fireEvent.press(getByTestId(continueTestId))
 
@@ -186,5 +192,7 @@ describe("ChooseExperienceScreen", () => {
       mode: AccountMode.Enhanced,
     })
     expect(mockSetAccountMode).not.toHaveBeenCalled()
+    /** No account exists yet, so there is nothing to read a stored mode from. */
+    expect(mockGetAccountMode).not.toHaveBeenCalled()
   })
 })
