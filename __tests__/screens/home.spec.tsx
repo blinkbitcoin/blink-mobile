@@ -415,12 +415,14 @@ export const generateHomeMock = ({
   btcBalance,
   usdBalance,
   pendingIncomingTransactions = [],
+  defaultAccountMissing = false,
 }: {
   level: AccountLevel
   network: Network
   btcBalance: number
   usdBalance: number
   pendingIncomingTransactions?: Array<Record<string, unknown>>
+  defaultAccountMissing?: boolean
 }): MockedResponse[] => {
   return [
     {
@@ -455,38 +457,40 @@ export const generateHomeMock = ({
               address: null,
               verified: false,
             },
-            defaultAccount: {
-              __typename: "ConsumerAccount",
-              id: "account-id",
-              level,
-              defaultWalletId: "btc-wallet",
-              wallets: [
-                {
-                  __typename: "BTCWallet",
-                  id: "btc-wallet",
-                  balance: btcBalance,
-                  walletCurrency: "BTC",
+            defaultAccount: defaultAccountMissing
+              ? null
+              : {
+                  __typename: "ConsumerAccount",
+                  id: "account-id",
+                  level,
+                  defaultWalletId: "btc-wallet",
+                  wallets: [
+                    {
+                      __typename: "BTCWallet",
+                      id: "btc-wallet",
+                      balance: btcBalance,
+                      walletCurrency: "BTC",
+                    },
+                    {
+                      __typename: "UsdWallet",
+                      id: "usd-wallet",
+                      balance: usdBalance,
+                      walletCurrency: "USD",
+                    },
+                  ],
+                  transactions: {
+                    __typename: "TransactionConnection",
+                    edges: [],
+                    pageInfo: {
+                      __typename: "PageInfo",
+                      hasNextPage: false,
+                      hasPreviousPage: false,
+                      startCursor: null,
+                      endCursor: null,
+                    },
+                  },
+                  pendingIncomingTransactions,
                 },
-                {
-                  __typename: "UsdWallet",
-                  id: "usd-wallet",
-                  balance: usdBalance,
-                  walletCurrency: "USD",
-                },
-              ],
-              transactions: {
-                __typename: "TransactionConnection",
-                edges: [],
-                pageInfo: {
-                  __typename: "PageInfo",
-                  hasNextPage: false,
-                  hasPreviousPage: false,
-                  startCursor: null,
-                  endCursor: null,
-                },
-              },
-              pendingIncomingTransactions,
-            },
           },
         },
       },
@@ -806,6 +810,27 @@ describe("HomeScreen", () => {
   beforeEach(resetHomeScreenMocks)
 
   it("renders home screen for custodial user", async () => {
+    const { getByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    expect(getByTestId("slide-up-handle")).toBeTruthy()
+  })
+
+  it("renders when the authed response is temporarily missing defaultAccount", async () => {
+    // Right after device-account creation, /me can resolve before defaultAccount
+    // does; a throw here left the app crashing on every reopen (#4082)
+    currentMocks = generateHomeMock({
+      level: AccountLevel.Zero,
+      network: Network.Mainnet,
+      btcBalance: 0,
+      usdBalance: 0,
+      defaultAccountMissing: true,
+    })
+
     const { getByTestId } = render(
       <ContextForScreen>
         <HomeScreen />

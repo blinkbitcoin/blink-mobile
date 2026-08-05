@@ -58,6 +58,10 @@ const mockedKeyStore = jest.mocked(KeyStoreWrapper)
 /** Drives the real AppState listener the wrapper subscribes with. */
 let emitAppState: (state: AppStateStatus) => Promise<void>
 
+/** The same listener, left mid-flight so that what the wrapper does synchronously can be
+ *  told apart from what it does once the keystore has answered. */
+let emitAppStateWithoutSettling: (state: AppStateStatus) => void
+
 const START_TIME_MS = 1_790_000_000_000
 const GRACE_PERIOD_SECONDS = 60
 
@@ -100,8 +104,9 @@ describe("AppStateWrapper", () => {
       if (type === "change") listener = handler as (state: AppStateStatus) => void
       return { remove: jest.fn() } as ReturnType<typeof AppState.addEventListener>
     })
+    emitAppStateWithoutSettling = (state) => listener(state)
     emitAppState = async (state) => {
-      listener(state)
+      emitAppStateWithoutSettling(state)
       await flushEffects()
     }
   })
@@ -175,6 +180,29 @@ describe("AppStateWrapper", () => {
       await emitAppState("background")
       jest.setSystemTime(START_TIME_MS - 60 * 60 * 1000)
       await emitAppState("active")
+
+      expect(mockSetAppLocked).toHaveBeenCalledTimes(1)
+      expect(mockNavigate).toHaveBeenCalledWith("authenticationCheck", { isResume: true })
+    })
+
+    it("raises the lock only once the keystore has answered, never in the same tick", async () => {
+      /** Screens that dismiss themselves on a stale return, the send receipt among them,
+       *  run from their own synchronous AppState listener and rely on still being focused
+       *  when they do. Locking in this tick would cover them first, so the await before the
+       *  navigate is a contract those screens depend on rather than an implementation
+       *  detail free to change. */
+      renderWrapper()
+      await flushEffects()
+
+      await emitAppState("background")
+      jest.setSystemTime(START_TIME_MS + (GRACE_PERIOD_SECONDS + 1) * 1000)
+
+      emitAppStateWithoutSettling("active")
+
+      expect(mockSetAppLocked).not.toHaveBeenCalled()
+      expect(mockNavigate).not.toHaveBeenCalled()
+
+      await flushEffects()
 
       expect(mockSetAppLocked).toHaveBeenCalledTimes(1)
       expect(mockNavigate).toHaveBeenCalledWith("authenticationCheck", { isResume: true })
