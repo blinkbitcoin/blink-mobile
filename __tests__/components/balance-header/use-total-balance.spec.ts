@@ -9,6 +9,7 @@ const mockFormatMoneyAmount = jest.fn(
     `$${(moneyAmount.amount / 100).toFixed(2)}`,
 )
 const mockUseDollarBalanceRestricted = jest.fn()
+const mockIsRegionPending = jest.fn()
 
 jest.mock("@app/hooks", () => ({
   usePriceConversion: () => ({ convertMoneyAmount: mockConvertMoneyAmount() }),
@@ -20,6 +21,10 @@ jest.mock("@app/hooks/use-display-currency", () => ({
 
 jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
   useDollarBalanceRestricted: () => mockUseDollarBalanceRestricted(),
+  useDollarBalanceRestriction: () => ({
+    isRestricted: mockUseDollarBalanceRestricted(),
+    isRegionPending: mockIsRegionPending(),
+  }),
 }))
 
 const wallets = [
@@ -31,6 +36,20 @@ describe("useTotalBalance", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockUseDollarBalanceRestricted.mockReturnValue(false)
+    mockIsRegionPending.mockReturnValue(false)
+  })
+
+  it("holds the header on its loader while the region is pending", () => {
+    mockConvertMoneyAmount.mockReturnValue(({ amount }: { amount: number }) => ({
+      amount,
+      currency: "DisplayCurrency",
+      currencyCode: "USD",
+    }))
+    mockIsRegionPending.mockReturnValue(true)
+
+    const { result } = renderHook(() => useTotalBalance(wallets))
+
+    expect(result.current.isLoading).toBe(true)
   })
 
   it("flags isLoading=true while price conversion is bootstrapping (account-switch window)", () => {
