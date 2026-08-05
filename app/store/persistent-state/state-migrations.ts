@@ -168,8 +168,30 @@ type PersistentState_17 = {
   selfCustodialAccountModeByAccountId?: Record<string, AccountMode>
 }
 
-const migrate17ToCurrent = (state: PersistentState_17): Promise<PersistentState> =>
+type PersistentState_18 = {
+  schemaVersion: 18
+  galoyInstance: GaloyInstanceInput
+  galoyAuthToken: string
+  activeAccountId?: string
+  selfCustodialDefaultWalletCurrency?: "BTC" | "USD"
+  selfCustodialDefaultWalletCurrencyByAccountId?: Record<string, "BTC" | "USD">
+  selfCustodialDisplayCurrencyByAccountId?: Record<string, string>
+  selfCustodialLanguageByAccountId?: Record<string, string>
+  themeByAccountId?: Record<string, "system" | "light" | "dark">
+  defaultAccountModalShownByAccountId?: Record<string, boolean>
+  // Quiz progress for accounts the backend keeps no quiz record for (self-custodial).
+  completedQuizIdsByAccountId?: Record<string, string[]>
+  selfCustodialAccountModeByAccountId?: Record<string, AccountMode>
+  // Accounts whose Stable Balance was switched off by Anon Mode, not by the user.
+  stableBalanceAnonPausedByAccountId?: Record<string, boolean>
+}
+
+const migrate18ToCurrent = (state: PersistentState_18): Promise<PersistentState> =>
   Promise.resolve(state)
+
+/** Adds the optional per-account Anon pause marker; nothing to backfill. */
+const migrate17ToCurrent = (state: PersistentState_17): Promise<PersistentState> =>
+  migrate18ToCurrent({ ...state, schemaVersion: 18 })
 
 /** Adds the optional per-account self-custodial region mode; nothing to backfill. */
 const migrate16ToCurrent = (state: PersistentState_16): Promise<PersistentState> =>
@@ -319,6 +341,7 @@ type StateMigrations = {
   15: (state: PersistentState_15) => Promise<PersistentState>
   16: (state: PersistentState_16) => Promise<PersistentState>
   17: (state: PersistentState_17) => Promise<PersistentState>
+  18: (state: PersistentState_18) => Promise<PersistentState>
 }
 
 const stateMigrations: StateMigrations = {
@@ -337,12 +360,13 @@ const stateMigrations: StateMigrations = {
   15: migrate15ToCurrent,
   16: migrate16ToCurrent,
   17: migrate17ToCurrent,
+  18: migrate18ToCurrent,
 }
 
-export type PersistentState = PersistentState_17
+export type PersistentState = PersistentState_18
 
 export const defaultPersistentState: PersistentState = {
-  schemaVersion: 17,
+  schemaVersion: 18,
   galoyInstance: { id: "Main" },
   galoyAuthToken: "",
 }
@@ -369,8 +393,23 @@ export const migratePersistentState = async (
   if (!data || !(data.schemaVersion in stateMigrations)) {
     return { status: MigrationStatus.NoData }
   }
-  const schemaVersion: 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 =
-    data.schemaVersion
+  const schemaVersion:
+    | 3
+    | 4
+    | 5
+    | 6
+    | 7
+    | 8
+    | 9
+    | 10
+    | 11
+    | 12
+    | 13
+    | 14
+    | 15
+    | 16
+    | 17
+    | 18 = data.schemaVersion
   try {
     const migration = stateMigrations[schemaVersion]
     const state = await migration(data)
