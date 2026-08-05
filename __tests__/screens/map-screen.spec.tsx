@@ -8,9 +8,27 @@ import { check, PermissionStatus, RESULTS } from "react-native-permissions"
 let capturedMapProps: Record<string, unknown> | undefined
 let capturedScreenProps: Record<string, unknown> | undefined
 
+const STORED_REGION = {
+  latitude: 13.5,
+  longitude: -89.4,
+  latitudeDelta: 0.05,
+  longitudeDelta: 0.05,
+}
+/** Region null is the first-ever visit: the screen falls back to the detected country. */
+let mockLastRegion: { region: typeof STORED_REGION | null } = { region: STORED_REGION }
+
+/** Mirrors the screen's own default, which it does not export. */
+const EL_ZONTE_COORDS = {
+  latitude: 13.496743,
+  longitude: -89.439462,
+  latitudeDelta: 0.02,
+  longitudeDelta: 0.02,
+}
+
+let mockCountryCode: string | undefined = "SV"
 jest.mock("@app/hooks/use-device-location", () => ({
   __esModule: true,
-  default: () => ({ countryCode: "SV", loading: false }),
+  default: () => ({ countryCode: mockCountryCode, loading: false }),
 }))
 
 jest.mock("@app/i18n/i18n-react", () => ({
@@ -23,17 +41,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
 }))
 
 jest.mock("@app/graphql/generated", () => ({
-  useRegionQuery: () => ({
-    data: {
-      region: {
-        latitude: 13.5,
-        longitude: -89.4,
-        latitudeDelta: 0.05,
-        longitudeDelta: 0.05,
-      },
-    },
-    error: undefined,
-  }),
+  useRegionQuery: () => ({ data: mockLastRegion, error: undefined }),
 }))
 
 jest.mock("@react-native-community/geolocation", () => ({
@@ -95,6 +103,8 @@ describe("MapScreen", () => {
     capturedMapProps = undefined
     capturedScreenProps = undefined
     mockedCheck.mockResolvedValue(RESULTS.DENIED)
+    mockCountryCode = "SV"
+    mockLastRegion = { region: STORED_REGION }
   })
 
   it("excludes the bottom safe-area edge the tab bar already reserves", async () => {
@@ -141,5 +151,48 @@ describe("MapScreen", () => {
     await waitForMap()
 
     expect(capturedMapProps?.userCoords).toEqual({ latitude: 51.5, longitude: -0.12 })
+  })
+
+  describe("initial region", () => {
+    const renderMap = async () => {
+      render(<MapScreen />)
+      await waitForMap()
+    }
+
+    it("reuses the stored region from a previous visit", async () => {
+      await renderMap()
+
+      expect(capturedMapProps?.userLocation).toEqual(STORED_REGION)
+    })
+
+    it("centres on the detected country on a first visit", async () => {
+      mockLastRegion = { region: null }
+
+      await renderMap()
+
+      expect(capturedMapProps?.userLocation).toEqual(
+        expect.objectContaining({ latitude: expect.any(Number) }),
+      )
+      expect(capturedMapProps?.userLocation).not.toEqual(STORED_REGION)
+    })
+
+    /** Anon resolves no country at all, and the last-region path no longer waits for one. */
+    it("falls back to the default coords without a resolved country", async () => {
+      mockLastRegion = { region: null }
+      mockCountryCode = undefined
+
+      await renderMap()
+
+      expect(capturedMapProps?.userLocation).toEqual(EL_ZONTE_COORDS)
+    })
+
+    it("falls back to the default coords for an unrecognised country", async () => {
+      mockLastRegion = { region: null }
+      mockCountryCode = "ZZ"
+
+      await renderMap()
+
+      expect(capturedMapProps?.userLocation).toEqual(EL_ZONTE_COORDS)
+    })
   })
 })

@@ -199,6 +199,20 @@ jest.mock("@apollo/client", () => {
 
 jest.mock("@app/utils/ip-country-lookup")
 
+let mockIsAnonMode = false
+jest.mock("@app/self-custodial/hooks/use-self-custodial-account-mode", () => ({
+  useSelfCustodialAccountMode: () => ({ isAnonMode: mockIsAnonMode }),
+}))
+
+const mockPromptEnhancedMode = jest.fn()
+jest.mock("@app/components/enhanced-mode-prompt", () => ({
+  ...jest.requireActual("@app/components/enhanced-mode-prompt"),
+  useEnhancedModePrompt: () => ({
+    promptEnhancedMode: mockPromptEnhancedMode,
+    isEnhancedModePromptVisible: false,
+  }),
+}))
+
 /** The fake Apollo client above has no writeQuery, so the real updateCountryCode would throw and warn on every device-location render. */
 jest.mock("@app/graphql/client-only-query", () => ({
   ...jest.requireActual("@app/graphql/client-only-query"),
@@ -687,5 +701,54 @@ describe("Settings Screen", () => {
     )
 
     await flushEffects()
+  })
+})
+
+describe("Settings Screen Anon gating", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    loadLocale("en")
+    mockIsAnonMode = false
+    mockUseIsAuthed.mockReturnValue(true)
+  })
+
+  it("leaves the Ways-to-get-paid group open outside Anon mode", async () => {
+    render(
+      <ContextForScreen>
+        <SettingsScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    expect(screen.queryByLabelText("Ways to get paid")).toBeNull()
+  })
+
+  it("gates the Ways-to-get-paid group in Anon mode", async () => {
+    mockIsAnonMode = true
+
+    render(
+      <ContextForScreen>
+        <SettingsScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    /** The gated rows leave the accessibility tree; the gate stands in by name. */
+    expect(screen.getByLabelText("Ways to get paid")).toBeTruthy()
+  })
+
+  it("routes a tap on the gated group to the Enhanced prompt", async () => {
+    mockIsAnonMode = true
+
+    render(
+      <ContextForScreen>
+        <SettingsScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    fireEvent.press(screen.getByLabelText("Ways to get paid"))
+
+    expect(mockPromptEnhancedMode).toHaveBeenCalledTimes(1)
   })
 })
