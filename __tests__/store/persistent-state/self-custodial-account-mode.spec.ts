@@ -54,6 +54,21 @@ describe("withSelfCustodialAccountMode", () => {
     })
   })
 
+  /** Absent is a real state a consumer must handle: an account onboarded through a path
+   *  that never reached the mode screen keeps no entry, and writing another account's
+   *  mode does not invent one for it. */
+  it("leaves an account that never passed the mode screen absent from the map", () => {
+    const next = withSelfCustodialAccountMode(
+      baseState,
+      "self-custodial-1",
+      AccountMode.Anon,
+    )
+
+    expect(
+      next.selfCustodialAccountModeByAccountId?.["restored-without-mode"],
+    ).toBeUndefined()
+  })
+
   it("overwrites the existing mode for the given id", () => {
     const state: PersistentState = {
       ...baseState,
