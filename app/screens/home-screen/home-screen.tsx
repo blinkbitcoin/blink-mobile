@@ -59,7 +59,7 @@ import { MigrationReminderBulletin } from "@app/components/migration-reminder-bu
 import { OffboardOnlyBulletin } from "@app/components/offboard-only-bulletin"
 /** Deep import on purpose: keeps the migration hooks barrel out of the home graph. */
 import { useWindDownHomeNudges } from "@app/screens/account-migration/hooks/use-wind-down-home-nudges"
-import { useTransferBlocked } from "@app/hooks/use-transfer-blocked"
+import { useTransferBlock } from "@app/hooks/use-transfer-blocked"
 import { useSelfCustodialNetworkMismatchToast } from "@app/self-custodial/hooks/use-network-mismatch-toast"
 import {
   useNonCustodialConversionLimits,
@@ -457,7 +457,8 @@ export const HomeScreen: React.FC = () => {
   const { isRestricted: isDollarBalanceRestricted, isRegionPending } =
     useDollarBalanceRestriction()
 
-  const isTransferBlocked = useTransferBlocked()
+  const { isBlocked: isTransferBlocked, isRegionPending: isTransferRegionPending } =
+    useTransferBlock()
 
   const restrictedUsdWallet = getUsdWallet(dataAuthed?.me?.defaultAccount?.wallets)
   const restrictedBtcWallet = getBtcWallet(dataAuthed?.me?.defaultAccount?.wallets)
@@ -708,11 +709,19 @@ export const HomeScreen: React.FC = () => {
     (isIos && satsBalance > 0)
 
   /** A transfer-blocked country must not hide the button while the dollar
-   *  balance is restricted — the disabled button is the user's entry point to
+   *  balance is restricted: the disabled button is the user's entry point to
    *  the restriction explanation (WalletOverview greys the row from the same
-   *  hook). Only the iOS zero-balance gate may hide it in that state. */
+   *  hook). Only the iOS zero-balance gate may hide it in that state.
+   *
+   *  Visibility also holds on the pending region, like every other gated surface here.
+   *  Reading an unresolved region as allowed would offer the button and then take it
+   *  away once the verdict lands, in a transfer-blocked but dollar-allowed country. The
+   *  hold costs a frame: the settings query behind the country is cache-first and the
+   *  phone parse is synchronous. */
   const shouldShowTransferButton =
-    passesIosGate && (!isTransferBlocked || isDollarBalanceRestricted)
+    passesIosGate &&
+    !isTransferRegionPending &&
+    (!isTransferBlocked || isDollarBalanceRestricted)
 
   /** Disabled while the region resolves so a fast tap cannot reach the gated flow before
    *  the verdict lands; the explanation waits, since it would be wrong for a user who
