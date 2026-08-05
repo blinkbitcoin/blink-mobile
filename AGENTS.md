@@ -14,6 +14,15 @@ Based on the PR's changed files, read relevant docs thoroughly:
 
 **Then read /docs/index.md** - it's the master index linking to additional docs (dev setup, E2E testing, i18n guide, etc.). Follow relevant references if they apply to the PR.
 
+## Skills
+
+Executable agent workflows live in `.claude/skills/` — isolated iOS simulator
+sessions (`react-native-ios-simulator`), PR demo capture
+(`react-native-demo-screenshots`, `react-native-demo-videos`), and embedding
+images in PR comments (`github-pr-image-attachments`). Use them instead of
+improvising `simctl`/Metro/capture commands. After editing any skill's
+scripts, run its `tests/run.sh` (or `.claude/skills/run-all-tests.sh` for all).
+
 ## Critical Rules (Always Apply)
 - `app/graphql/generated.ts` is AUTO-GENERATED - never modify manually
 - Payment mutations must NOT have retry logic (handled specially in client.tsx)
