@@ -1,6 +1,9 @@
 import { PayoutSpeed, WalletCurrency } from "@app/graphql/generated"
 import * as PaymentDetails from "@app/screens/send-bitcoin-screen/payment-details/onchain"
-import { OnchainFeeQuote } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
+import {
+  type ConvertMoneyAmount,
+  OnchainFeeQuote,
+} from "@app/screens/send-bitcoin-screen/payment-details/index.types"
 
 import {
   testAmount,
@@ -164,6 +167,42 @@ describe("no amount lightning payment details", () => {
         },
       })
     })
+
+    it("returns status, errors and transaction when the send resolves", async () => {
+      const sendPaymentMocks = createSendPaymentMocks()
+      ;(sendPaymentMocks.onChainUsdPaymentSend as jest.Mock).mockResolvedValue({
+        data: {
+          onChainUsdPaymentSend: {
+            status: "SUCCESS",
+            errors: [],
+            transaction: { id: "tx-1" },
+          },
+        },
+      })
+      if (!paymentDetails.canSendPayment) throw new Error("Cannot send payment")
+
+      const result = await paymentDetails.sendPaymentMutation(sendPaymentMocks)
+
+      expect(result).toEqual({
+        status: "SUCCESS",
+        errors: [],
+        transaction: { id: "tx-1" },
+      })
+    })
+
+    it("maps the quoted fee to cents", async () => {
+      const feeParamsMocks = createGetFeeMocks()
+      ;(feeParamsMocks.onChainUsdTxFee as jest.Mock).mockResolvedValue({
+        data: { onChainUsdTxFee: { amount: 12 } },
+      })
+      if (!paymentDetails.canGetFee) throw new Error("Cannot get fee")
+
+      const fee = await paymentDetails.getFee(feeParamsMocks)
+
+      expect(fee.amount).toEqual(
+        expect.objectContaining({ amount: 12, currency: WalletCurrency.Usd }),
+      )
+    })
   })
 
   it("cannot calculate fee or send payment with zero amount", () => {
@@ -221,6 +260,20 @@ describe("no amount lightning payment details", () => {
       sendingWalletDescriptor,
     )
     expect(newPaymentDetails.sendingWalletDescriptor).toEqual(sendingWalletDescriptor)
+  })
+
+  it("can set convertMoneyAmount", () => {
+    const paymentDetails = createNoAmountOnchainPaymentDetails(defaultParams)
+    const newConvertMoneyAmount: ConvertMoneyAmount = (amount, currency) => ({
+      amount: amount.amount * 2,
+      currency,
+      currencyCode: currency,
+    })
+
+    const newPaymentDetails = paymentDetails.setConvertMoneyAmount(newConvertMoneyAmount)
+
+    expect(newPaymentDetails.convertMoneyAmount).toBe(newConvertMoneyAmount)
+    expect(newPaymentDetails.settlementAmount.amount).toEqual(testAmount.amount * 2)
   })
 
   describe("payout speed", () => {
@@ -394,6 +447,47 @@ describe("no amount lightning payment details", () => {
             input: expect.objectContaining({ speed: PayoutSpeed.Slow }),
           }),
         }),
+      )
+    })
+  })
+
+  describe("when the fee query resolves without data", () => {
+    const expectUndefinedFee = async (
+      params: PaymentDetails.CreateNoAmountOnchainPaymentDetailsParams<WalletCurrency>,
+      feeFn: keyof ReturnType<typeof createGetFeeMocks>,
+    ) => {
+      const feeParamsMocks = createGetFeeMocks()
+      ;(feeParamsMocks[feeFn] as jest.Mock).mockResolvedValue({ data: undefined })
+      const paymentDetails = createNoAmountOnchainPaymentDetails(params)
+      if (!paymentDetails.canGetFee) throw new Error("Cannot get fee")
+
+      // A GraphQL error leaves data unset, so the amount passes through unconverted.
+      expect((await paymentDetails.getFee(feeParamsMocks)).amount).toBeUndefined()
+    }
+
+    it("passes through an absent btc fee", async () => {
+      await expectUndefinedFee(defaultParams, "onChainTxFee")
+    })
+
+    it("passes through an absent usd fee", async () => {
+      await expectUndefinedFee(
+        { ...defaultParams, sendingWalletDescriptor: usdSendingWalletDescriptor },
+        "onChainUsdTxFee",
+      )
+    })
+
+    it("passes through an absent btc fee when sending max", async () => {
+      await expectUndefinedFee({ ...defaultParams, isSendingMax: true }, "onChainTxFee")
+    })
+
+    it("passes through an absent usd fee when sending max", async () => {
+      await expectUndefinedFee(
+        {
+          ...defaultParams,
+          isSendingMax: true,
+          sendingWalletDescriptor: usdSendingWalletDescriptor,
+        },
+        "onChainUsdTxFee",
       )
     })
   })

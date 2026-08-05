@@ -116,6 +116,27 @@ describe("useOnchainFeeAlert (self-custodial gate)", () => {
     )
   })
 
+  it("probes with a network-appropriate address", async () => {
+    const probeAddressFor = async (network: Network) => {
+      mockGetOnChainTxFee.mockClear()
+      renderHook(() =>
+        useOnchainFeeAlert({
+          paymentDetail: buildOnchainPaymentDetail(100),
+          walletId: "btc-wallet-1",
+          network,
+          isSelfCustodial: false,
+        }),
+      )
+      await flushEffects()
+
+      return mockGetOnChainTxFee.mock.calls[0][0].variables.address
+    }
+
+    // A mainnet bech32 probe against signet is rejected outright, so the fee never resolves.
+    expect(await probeAddressFor(Network.Mainnet)).toMatch(/^bc1/)
+    expect(await probeAddressFor(Network.Signet)).toMatch(/^tb1/)
+  })
+
   it("falls back to the schema default speed when the payment carries none", async () => {
     renderHook(() =>
       useOnchainFeeAlert({

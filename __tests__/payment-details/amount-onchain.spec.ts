@@ -1,6 +1,9 @@
 import { PayoutSpeed, WalletCurrency } from "@app/graphql/generated"
 import * as PaymentDetails from "@app/screens/send-bitcoin-screen/payment-details/onchain"
-import { OnchainFeeQuote } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
+import {
+  type ConvertMoneyAmount,
+  OnchainFeeQuote,
+} from "@app/screens/send-bitcoin-screen/payment-details/index.types"
 
 import {
   btcSendingWalletDescriptor,
@@ -191,6 +194,20 @@ describe("no amount onchain payment details", () => {
     expect(newPaymentDetails.sendingWalletDescriptor).toEqual(sendingWalletDescriptor)
   })
 
+  it("can set convertMoneyAmount", () => {
+    const paymentDetails = createAmountOnchainPaymentDetails(defaultParams)
+    const newConvertMoneyAmount: ConvertMoneyAmount = (amount, currency) => ({
+      amount: amount.amount * 2,
+      currency,
+      currencyCode: currency,
+    })
+
+    const newPaymentDetails = paymentDetails.setConvertMoneyAmount(newConvertMoneyAmount)
+
+    expect(newPaymentDetails.convertMoneyAmount).toBe(newConvertMoneyAmount)
+    expect(newPaymentDetails.settlementAmount.amount).toEqual(testAmount.amount * 2)
+  })
+
   describe("payout speed", () => {
     it("defaults to the schema default so behaviour is unchanged until the user picks", () => {
       const paymentDetails = createAmountOnchainPaymentDetails(defaultParams)
@@ -289,6 +306,26 @@ describe("no amount onchain payment details", () => {
       expect(fee.amount).toEqual(
         expect.objectContaining({ amount: 12, currency: WalletCurrency.Usd }),
       )
+    })
+
+    it("returns status and errors when a usd wallet sends as-btc-denominated", async () => {
+      const sendPaymentMocks = createSendPaymentMocks()
+      ;(
+        sendPaymentMocks.onChainUsdPaymentSendAsBtcDenominated as jest.Mock
+      ).mockResolvedValue({
+        data: {
+          onChainUsdPaymentSendAsBtcDenominated: { status: "SUCCESS", errors: [] },
+        },
+      })
+      const paymentDetails = createAmountOnchainPaymentDetails({
+        ...defaultParams,
+        sendingWalletDescriptor: usdSendingWalletDescriptor,
+      })
+      if (!paymentDetails.canSendPayment) throw new Error("Cannot send payment")
+
+      const result = await paymentDetails.sendPaymentMutation(sendPaymentMocks)
+
+      expect(result).toEqual({ status: "SUCCESS", errors: [] })
     })
   })
 
