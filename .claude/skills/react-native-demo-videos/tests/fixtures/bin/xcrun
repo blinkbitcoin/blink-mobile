@@ -1,0 +1,57 @@
+#!/bin/bash
+# Fake `xcrun simctl io <udid> recordVideo` for the tests.
+#
+# Stands in for the recorder so the suite can assert the thing that actually
+# matters: which signal it received. A real recordVideo finalises the QuickTime
+# container on SIGINT and leaves an unplayable file on anything else, so the
+# fake writes the signal name to $FAKE_SIGNAL_LOG and only produces a "valid"
+# file when it was interrupted properly.
+
+set -uo pipefail
+
+[ "${1:-}" = "simctl" ] || { echo "fake xcrun: only simctl is supported" >&2; exit 64; }
+shift
+
+LOG="${FAKE_SIGNAL_LOG:-/dev/null}"
+ARGS_LOG="${FAKE_ARGS_LOG:-/dev/null}"
+
+case "${1:-}" in
+  io)
+    UDID="${2:?fake xcrun: io needs a udid}"
+    shift 2
+    [ "${1:-}" = "recordVideo" ] || { echo "fake xcrun: unsupported io op '${1:-}'" >&2; exit 64; }
+
+    # Last positional argument is the output path.
+    OUT=""
+    for a in "$@"; do case "$a" in --*) : ;; recordVideo) : ;; *) OUT="$a" ;; esac; done
+    [ -n "$OUT" ] || { echo "fake xcrun: no output path" >&2; exit 64; }
+
+    echo "recordVideo udid=$UDID args=$*" >> "$ARGS_LOG"
+
+    # A device that does not exist cannot be recorded.
+    if [ -n "${FAKE_DEVICES:-}" ] && [ -f "${FAKE_DEVICES}" ]; then
+      grep -q "^${UDID}|" "$FAKE_DEVICES" || { echo "fake xcrun: no device $UDID" >&2; exit 1; }
+    fi
+
+    # On a clean interrupt, write a genuinely playable file, so the caller's
+    # ffprobe validation is exercised for real rather than against a sentinel.
+    # On any other signal, leave the truncated header: that is exactly what a
+    # real recorder leaves behind when it never finalises the container.
+    finalise() {
+      echo "INT" >> "$LOG"
+      if [ -n "${FAKE_RECORD_CORRUPT:-}" ]; then exit 0; fi
+      ffmpeg -y -v error -f lavfi -i "testsrc=duration=1:size=180x320:rate=15" \
+             -c:v libx264 -pix_fmt yuv420p "$OUT" 2>/dev/null
+      exit 0
+    }
+    botched() { echo "$1" >> "$LOG"; exit 1; }
+    trap 'finalise' INT
+    trap 'botched TERM' TERM
+
+    # Opening the file is what record-flow.sh polls for.
+    printf 'FAKE-MOV-HEADER-NOT-YET-FINALISED' > "$OUT"
+    while :; do sleep 0.1; done
+    ;;
+
+  *) echo "fake xcrun: unsupported verb '${1:-}'" >&2; exit 64 ;;
+esac

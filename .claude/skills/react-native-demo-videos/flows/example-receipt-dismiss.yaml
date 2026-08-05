@@ -1,0 +1,37 @@
+> Worked example: the PR #3712 behaviour — a payment receipt that should
+> disappear after a long trip away from the app.
+>
+> Read this for the shape, not the taps. Two things generalise:
+>   - clearState + launchApp at the top, so a re-run starts where the last one did
+>   - waitForAnimationToEnd between steps, so the recording never catches a
+>     half-finished transition
+appId: io.galoy.bitcoinbeach
+---
+- clearState
+- launchApp
+- waitForAnimationToEnd:
+    timeout: 10000
+
+# The receipt is reached via a TEMP initialRouteName rather than by paying —
+# see the simulator skill. Give the viewer a beat to read it.
+- assertVisible: "Success Text"
+- waitForAnimationToEnd:
+    timeout: 3000
+
+# The trip away. Backgrounding is what the fix keys on.
+- pressKey: Home
+- waitForAnimationToEnd:
+    timeout: 2000
+
+# 30s+ is what makes the trip stale. Long waits are why demos need a size
+# budget — consider trimming this in post rather than recording the full wait.
+- extendedWaitUntil:
+    notVisible: "Success Text"
+    timeout: 35000
+
+- launchApp
+- waitForAnimationToEnd:
+    timeout: 5000
+
+# The payoff: Home, not a stale receipt.
+- assertNotVisible: "Success Text"
