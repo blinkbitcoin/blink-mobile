@@ -78,8 +78,9 @@ gql`
     $walletId: WalletId!
     $address: OnChainAddress!
     $amount: SatAmount!
+    $speed: PayoutSpeed!
   ) {
-    onChainTxFee(walletId: $walletId, address: $address, amount: $amount) {
+    onChainTxFee(walletId: $walletId, address: $address, amount: $amount, speed: $speed) {
       amount
     }
   }
@@ -88,8 +89,14 @@ gql`
     $walletId: WalletId!
     $address: OnChainAddress!
     $amount: CentAmount!
+    $speed: PayoutSpeed!
   ) {
-    onChainUsdTxFee(walletId: $walletId, address: $address, amount: $amount) {
+    onChainUsdTxFee(
+      walletId: $walletId
+      address: $address
+      amount: $amount
+      speed: $speed
+    ) {
       amount
     }
   }
@@ -98,11 +105,13 @@ gql`
     $walletId: WalletId!
     $address: OnChainAddress!
     $amount: SatAmount!
+    $speed: PayoutSpeed!
   ) {
     onChainUsdTxFeeAsBtcDenominated(
       walletId: $walletId
       address: $address
       amount: $amount
+      speed: $speed
     ) {
       amount
     }

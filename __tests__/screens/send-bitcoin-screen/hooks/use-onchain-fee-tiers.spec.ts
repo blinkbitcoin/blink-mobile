@@ -25,16 +25,16 @@ describe("useOnchainFeeTiers", () => {
     const { result } = renderHook(() => useOnchainFeeTiers(null, "bc1qtest", 1000))
 
     expect(result.current.error).toBeNull()
-    expect(result.current.tiers.fast.feeSats).toBe(0)
-    expect(result.current.tiers.medium.feeSats).toBe(0)
-    expect(result.current.tiers.slow.feeSats).toBe(0)
+    expect(result.current.tiers.fast.feeAmount).toBe(0)
+    expect(result.current.tiers.medium.feeAmount).toBe(0)
+    expect(result.current.tiers.slow.feeAmount).toBe(0)
   })
 
   it("returns default tiers when address is undefined", () => {
     const { result } = renderHook(() => useOnchainFeeTiers(mockSdk, undefined, 1000))
 
     expect(result.current.error).toBeNull()
-    expect(result.current.tiers.fast.feeSats).toBe(0)
+    expect(result.current.tiers.fast.feeAmount).toBe(0)
   })
 
   it("returns default tiers when amountSats is undefined", () => {
@@ -43,7 +43,7 @@ describe("useOnchainFeeTiers", () => {
     )
 
     expect(result.current.error).toBeNull()
-    expect(result.current.tiers.fast.feeSats).toBe(0)
+    expect(result.current.tiers.fast.feeAmount).toBe(0)
   })
 
   it("fetches and sets fee tiers on success", async () => {
@@ -54,11 +54,11 @@ describe("useOnchainFeeTiers", () => {
     const { result } = renderHook(() => useOnchainFeeTiers(mockSdk, "bc1qtest", 5000))
 
     await waitFor(() => {
-      expect(result.current.tiers.fast.feeSats).toBe(500)
+      expect(result.current.tiers.fast.feeAmount).toBe(500)
     })
 
-    expect(result.current.tiers.medium.feeSats).toBe(300)
-    expect(result.current.tiers.slow.feeSats).toBe(150)
+    expect(result.current.tiers.medium.feeAmount).toBe(300)
+    expect(result.current.tiers.slow.feeAmount).toBe(150)
     expect(result.current.error).toBeNull()
     expect(mockPrepareSend).toHaveBeenCalledWith(mockSdk, {
       paymentRequest: "bc1qtest",
@@ -73,7 +73,7 @@ describe("useOnchainFeeTiers", () => {
     const { result } = renderHook(() => useOnchainFeeTiers(mockSdk, "bc1qtest", 2000))
 
     await waitFor(() => {
-      expect(result.current.tiers.fast.feeSats).toBe(100)
+      expect(result.current.tiers.fast.feeAmount).toBe(100)
     })
 
     expect(result.current.tiers[FeeTierOption.Fast].etaMinutes).toBe(10)
@@ -93,7 +93,7 @@ describe("useOnchainFeeTiers", () => {
       expect(result.current.error).toBe(SdkFeeError.Generic)
     })
 
-    expect(result.current.tiers.fast.feeSats).toBe(0)
+    expect(result.current.tiers.fast.feeAmount).toBe(0)
   })
 
   it("classifies typed SdkError instances by tag (prefers tag over message)", async () => {
@@ -139,9 +139,9 @@ describe("useOnchainFeeTiers", () => {
       expect(result.current.error).toBe(SdkFeeError.Generic)
     })
 
-    expect(result.current.tiers.fast.feeSats).toBe(0)
-    expect(result.current.tiers.medium.feeSats).toBe(0)
-    expect(result.current.tiers.slow.feeSats).toBe(0)
+    expect(result.current.tiers.fast.feeAmount).toBe(0)
+    expect(result.current.tiers.medium.feeAmount).toBe(0)
+    expect(result.current.tiers.slow.feeAmount).toBe(0)
   })
 
   it("classifies non-Error rejections as Generic", async () => {
@@ -176,7 +176,7 @@ describe("useOnchainFeeTiers", () => {
       expect(result.current.error).toBeNull()
     })
 
-    expect(result.current.tiers.fast.feeSats).toBe(500)
+    expect(result.current.tiers.fast.feeAmount).toBe(500)
   })
 
   it("clears error when amount becomes undefined", async () => {
@@ -223,7 +223,7 @@ describe("useOnchainFeeTiers", () => {
     rerender({ amount: 5000 })
 
     await waitFor(() => {
-      expect(result.current.tiers.fast.feeSats).toBe(100)
+      expect(result.current.tiers.fast.feeAmount).toBe(100)
     })
 
     // Now resolve the stale request — it must NOT overwrite the fresh tiers.
@@ -232,7 +232,41 @@ describe("useOnchainFeeTiers", () => {
       setTimeout(resolve, 0)
     })
 
-    expect(result.current.tiers.fast.feeSats).toBe(100)
-    expect(result.current.tiers.fast.feeSats).not.toBe(999)
+    expect(result.current.tiers.fast.feeAmount).toBe(100)
+    expect(result.current.tiers.fast.feeAmount).not.toBe(999)
+  })
+
+  it("does not surface a stale failure once a newer quote already succeeded", async () => {
+    // clearAllMocks leaves queued once-implementations behind, so start from a clean queue.
+    mockPrepareSend.mockReset()
+    mockExtractOnchainFees.mockReset()
+
+    let rejectStale: (reason: unknown) => void = () => undefined
+    const stalePrepared = new Promise((_resolve, reject) => {
+      rejectStale = reject
+    })
+    // First call rejects, but only after a newer request has already landed.
+    mockPrepareSend.mockImplementationOnce(() => stalePrepared)
+    mockPrepareSend.mockResolvedValueOnce({ id: "fresh" })
+    mockExtractOnchainFees.mockReturnValueOnce({ fast: 100, medium: 80, slow: 50 })
+
+    const { result, rerender } = renderHook(
+      ({ amount }: { amount: number }) => useOnchainFeeTiers(mockSdk, "bc1qtest", amount),
+      { initialProps: { amount: 1000 as number } },
+    )
+
+    rerender({ amount: 5000 })
+
+    await waitFor(() => {
+      expect(result.current.tiers.fast.feeAmount).toBe(100)
+    })
+
+    rejectStale(new Error("stale request failed"))
+    await new Promise<void>((resolve) => {
+      setTimeout(resolve, 0)
+    })
+
+    expect(result.current.error).toBeNull()
+    expect(result.current.tiers.fast.feeAmount).toBe(100)
   })
 })

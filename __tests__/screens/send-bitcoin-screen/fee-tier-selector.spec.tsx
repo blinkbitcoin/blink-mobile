@@ -61,6 +61,28 @@ describe("FeeTierSelector", () => {
     expect(onSelect).toHaveBeenCalledWith("slow")
   })
 
+  it("swaps the caret for a spinner while the fees are being quoted", () => {
+    const { getByTestId } = renderSelector({ loading: true })
+
+    expect(getByTestId("fee-tier-spinner")).toBeTruthy()
+  })
+
+  it("shows no spinner once the quote has landed", () => {
+    const { queryByTestId } = renderSelector()
+
+    expect(queryByTestId("fee-tier-spinner")).toBeNull()
+  })
+
+  it("still opens the tier list while quoting", () => {
+    const onSelect = jest.fn()
+    const { getByTestId } = renderSelector({ loading: true, onSelect })
+
+    fireEvent.press(getByTestId("fee-tier-dropdown"))
+    fireEvent.press(getByTestId("fee-tier-slow"))
+
+    expect(onSelect).toHaveBeenCalledWith("slow")
+  })
+
   it("renders gracefully when the selected id is unknown", () => {
     // Pass a selected id that isn't in options to ensure no crash.
     const { getByTestId } = renderSelector({ selected: "nonexistent" as never })
