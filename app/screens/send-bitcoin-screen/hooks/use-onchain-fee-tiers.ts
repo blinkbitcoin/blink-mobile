@@ -32,6 +32,7 @@ export type SdkFeeError = (typeof SdkFeeError)[keyof typeof SdkFeeError]
 type OnchainFeeTiersResult = {
   tiers: Record<FeeTierOption, FeeTierInfo>
   error: SdkFeeError | null
+  isQuoting: boolean
 }
 
 const SDK_ERROR_TAG_MAP: Partial<Record<SdkErrorTags, SdkFeeError>> = {
@@ -54,6 +55,8 @@ export const useOnchainFeeTiers = (
 ): OnchainFeeTiersResult => {
   const [tiers, setTiers] = useState(DEFAULT_TIERS)
   const [error, setError] = useState<SdkFeeError | null>(null)
+  /** True from the first render when a quote is already due, so no frame claims a zero fee. */
+  const [isQuoting, setIsQuoting] = useState(() => Boolean(sdk && address && amountSats))
   // Discards stale prepareSend resolutions when deps change mid-flight.
   const requestTokenRef = useRef(0)
 
@@ -63,8 +66,11 @@ export const useOnchainFeeTiers = (
 
     if (!sdk || !address || !amountSats) {
       setError(null)
+      setIsQuoting(false)
       return
     }
+
+    setIsQuoting(true)
 
     try {
       const prepared = await prepareSend(sdk, {
@@ -100,6 +106,8 @@ export const useOnchainFeeTiers = (
     } catch (err) {
       if (token !== requestTokenRef.current) return
       setError(classifySdkFeeError(err))
+    } finally {
+      if (token === requestTokenRef.current) setIsQuoting(false)
     }
   }, [sdk, address, amountSats])
 
@@ -107,5 +115,5 @@ export const useOnchainFeeTiers = (
     fetchFees()
   }, [fetchFees])
 
-  return { tiers, error }
+  return { tiers, error, isQuoting }
 }

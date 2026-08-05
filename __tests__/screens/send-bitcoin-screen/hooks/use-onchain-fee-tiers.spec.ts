@@ -46,6 +46,51 @@ describe("useOnchainFeeTiers", () => {
     expect(result.current.tiers.fast.feeAmount).toBe(0)
   })
 
+  it("quotes from the very first render when the params are already in hand", () => {
+    mockPrepareSend.mockImplementation(
+      () =>
+        new Promise(() => {
+          // deliberately never resolves
+        }),
+    )
+
+    const { result } = renderHook(() => useOnchainFeeTiers(mockSdk, "bc1qtest", 5000))
+
+    // Read before any effect flush: false here would label the tiers with a zero fee.
+    expect(result.current.isQuoting).toBe(true)
+  })
+
+  it("is not quoting when a param is missing", () => {
+    const { result } = renderHook(() =>
+      useOnchainFeeTiers(mockSdk, "bc1qtest", undefined),
+    )
+
+    expect(result.current.isQuoting).toBe(false)
+  })
+
+  it("stops quoting once the fees land", async () => {
+    mockPrepareSend.mockResolvedValue({ id: "prepared" })
+    mockExtractOnchainFees.mockReturnValue({ fast: 500, medium: 300, slow: 150 })
+
+    const { result } = renderHook(() => useOnchainFeeTiers(mockSdk, "bc1qtest", 5000))
+
+    await waitFor(() => {
+      expect(result.current.isQuoting).toBe(false)
+    })
+    expect(result.current.tiers.fast.feeAmount).toBe(500)
+  })
+
+  it("stops quoting when the sdk throws", async () => {
+    mockPrepareSend.mockRejectedValue(new Error("network down"))
+
+    const { result } = renderHook(() => useOnchainFeeTiers(mockSdk, "bc1qtest", 5000))
+
+    await waitFor(() => {
+      expect(result.current.error).not.toBeNull()
+    })
+    expect(result.current.isQuoting).toBe(false)
+  })
+
   it("fetches and sets fee tiers on success", async () => {
     const prepared = { id: "prepared" }
     mockPrepareSend.mockResolvedValue(prepared)

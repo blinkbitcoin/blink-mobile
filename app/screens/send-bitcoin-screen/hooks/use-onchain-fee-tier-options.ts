@@ -92,11 +92,11 @@ export const useOnchainFeeTierOptions = ({
 
   const selfCustodialAddress = isSelfCustodialOnchain ? address : undefined
 
-  const { tiers: selfCustodialTiers, error: selfCustodialError } = useOnchainFeeTiers(
-    sdk ?? null,
-    selfCustodialAddress,
-    selfCustodialAmountSats,
-  )
+  const {
+    tiers: selfCustodialTiers,
+    error: selfCustodialError,
+    isQuoting: isQuotingSelfCustodialFees,
+  } = useOnchainFeeTiers(sdk ?? null, selfCustodialAddress, selfCustodialAmountSats)
 
   /** Read from the payment detail so the tiers always quote the endpoint the send uses. */
   const custodialQuote = isCustodialOnchain ? paymentDetail?.feeQuote : undefined
@@ -143,7 +143,16 @@ export const useOnchainFeeTierOptions = ({
    */
   const isFeeTierErrorBlocking = isSelfCustodial && Boolean(selfCustodialErrorMessage)
 
+  /**
+   * Label-level only: both rails hide the fee until it is quoted. The spinner stays
+   * custodial-only, because the SDK answers fast enough that one would merely flicker.
+   */
+  const isQuotingFeeLabels = isSelfCustodial
+    ? isQuotingSelfCustodialFees
+    : isQuotingCustodialFees
+
   const feeTierOptions = buildFeeTierOptions({
+    isQuoting: isQuotingFeeLabels,
     tiers: feeTiers,
     labels: {
       [FeeTierOption.Fast]: LL.SendBitcoinScreen.fast(),
