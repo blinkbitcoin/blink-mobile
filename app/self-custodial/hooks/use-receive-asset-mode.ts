@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react"
 
 import { WalletCurrency } from "@app/graphql/generated"
-import { useDollarBalanceRestricted } from "@app/hooks/use-dollar-balance-restricted"
+import { useDollarBalanceRestriction } from "@app/hooks/use-dollar-balance-restricted"
 import { usePersistentStateContext } from "@app/store/persistent-state"
 import { getSelfCustodialDefaultCurrency } from "@app/store/persistent-state/self-custodial-default-currency"
 
@@ -40,7 +40,8 @@ const resolveInitialMode = (
 export const useReceiveAssetMode = (): UseReceiveAssetModeResult => {
   const { isStableBalanceActive } = useSelfCustodialWallet()
   const { persistentState } = usePersistentStateContext()
-  const isDollarBalanceRestricted = useDollarBalanceRestricted()
+  const { isRestricted: isDollarBalanceRestricted, isRegionPending } =
+    useDollarBalanceRestriction()
   const defaultCurrency = getSelfCustodialDefaultCurrency(persistentState)
 
   const [assetMode, setAssetMode] = useState<ReceiveAssetMode>(
@@ -77,6 +78,9 @@ export const useReceiveAssetMode = (): UseReceiveAssetModeResult => {
     setAssetMode,
     isToggleDisabled: isDollarBalanceRestricted || Boolean(isStableBalanceActive),
     availableModesForRail,
-    loading: isStableBalanceActive === undefined,
+    /** Also loading while the region resolves: the caller gates request generation on
+     *  this, so a restricted user never gets a Dollar request issued before the verdict
+     *  lands. */
+    loading: isStableBalanceActive === undefined || isRegionPending,
   }
 }

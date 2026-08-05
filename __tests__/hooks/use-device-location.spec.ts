@@ -3,6 +3,7 @@ import { renderHook, act } from "@testing-library/react-hooks"
 import useDeviceLocation, {
   isBlockedCountry,
   useIpCountryCode,
+  useIpCountryLookup,
   usePhoneCountryCode,
 } from "@app/hooks/use-device-location"
 
@@ -309,6 +310,63 @@ describe("useIpCountryCode", () => {
     await act(async () => {})
 
     expect(result.current).toBeUndefined()
+  })
+})
+
+describe("useIpCountryLookup", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockResolveIpCountryCode.mockResolvedValue(undefined)
+  })
+
+  it("reports settled while disabled, since the lookup will never run", () => {
+    const { result } = renderHook(() => useIpCountryLookup(false))
+
+    expect(result.current).toEqual({ countryCode: undefined, isSettled: true })
+  })
+
+  it("is unsettled while the lookup is in flight", () => {
+    mockResolveIpCountryCode.mockReturnValue(new Promise(() => {}))
+
+    const { result } = renderHook(() => useIpCountryLookup(true))
+
+    expect(result.current.isSettled).toBe(false)
+  })
+
+  it("settles with the country once the lookup resolves", async () => {
+    mockResolveIpCountryCode.mockResolvedValue("HK")
+
+    const { result } = renderHook(() => useIpCountryLookup(true))
+
+    await act(async () => {})
+
+    expect(result.current).toEqual({ countryCode: "HK", isSettled: true })
+  })
+
+  it("settles without a country when every adapter returns nothing", async () => {
+    mockResolveIpCountryCode.mockResolvedValue(undefined)
+
+    const { result } = renderHook(() => useIpCountryLookup(true))
+
+    await act(async () => {})
+
+    expect(result.current).toEqual({ countryCode: undefined, isSettled: true })
+  })
+
+  it("drops a resolved country the moment the lookup is disabled", async () => {
+    mockResolveIpCountryCode.mockResolvedValue("HK")
+
+    const { result, rerender } = renderHook(
+      ({ enabled }) => useIpCountryLookup(enabled),
+      { initialProps: { enabled: true } },
+    )
+
+    await act(async () => {})
+    expect(result.current.countryCode).toBe("HK")
+
+    rerender({ enabled: false })
+
+    expect(result.current).toEqual({ countryCode: undefined, isSettled: true })
   })
 })
 

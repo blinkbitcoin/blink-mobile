@@ -1,7 +1,7 @@
 import { WalletBalance, getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
-import { useDollarBalanceRestricted } from "@app/hooks/use-dollar-balance-restricted"
+import { useDollarBalanceRestriction } from "@app/hooks/use-dollar-balance-restricted"
 import { usePriceConversion } from "@app/hooks"
 import {
   addMoneyAmounts,
@@ -20,7 +20,8 @@ export const useTotalBalance = (
 } => {
   const { formatMoneyAmount } = useDisplayCurrency()
   const { convertMoneyAmount } = usePriceConversion()
-  const isDollarBalanceRestricted = useDollarBalanceRestricted()
+  const { isRestricted: isDollarBalanceRestricted, isRegionPending } =
+    useDollarBalanceRestriction()
 
   // TODO: check that there are 2 wallets.
   // otherwise fail (account with more/less 2 wallets will not be working with the current mobile app)
@@ -32,11 +33,17 @@ export const useTotalBalance = (
     toBtcMoneyAmount(btcWallet?.balance),
     DisplayCurrency,
   )
-  const usdAmount = isDollarBalanceRestricted
+  /** An unresolved region counts the dollars out of every figure, not just out of the
+   *  loader: `satsBalance` feeds thresholds that are read without consulting `isLoading`
+   *  (the backup nudge), so leaving the dollars in would arm a nudge against a total that
+   *  drops the moment the verdict lands. */
+  const isDollarBalanceUnavailable = isDollarBalanceRestricted || isRegionPending
+  const usdAmount = isDollarBalanceUnavailable
     ? convertMoneyAmount?.(toUsdMoneyAmount(0), DisplayCurrency)
     : convertMoneyAmount?.(toUsdMoneyAmount(usdWallet?.balance), DisplayCurrency)
 
-  const isLoading = !convertMoneyAmount
+  const isPriceConversionPending = !convertMoneyAmount
+  const isLoading = isPriceConversionPending || isRegionPending
 
   if (!btcAmount || !usdAmount) {
     return {

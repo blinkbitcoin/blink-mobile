@@ -139,6 +139,10 @@ jest.mock("@app/hooks/use-transfer-blocked", () => ({
 
 jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
   useDollarBalanceRestricted: () => mockUseDollarBalanceRestricted(),
+  useDollarBalanceRestriction: () => ({
+    isRestricted: mockUseDollarBalanceRestricted(),
+    isRegionPending: false,
+  }),
 }))
 
 jest.mock("@app/graphql/generated", () => ({

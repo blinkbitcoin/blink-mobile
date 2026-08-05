@@ -128,21 +128,46 @@ export const usePhoneCountryCode = (): CountryCode | undefined => {
   }, [phone])
 }
 
-export const useIpCountryCode = (enabled: boolean): CountryCode | undefined => {
+type IpCountryLookup = {
+  countryCode: CountryCode | undefined
+  /** True once waiting is pointless: the lookup finished (with or without a country) or
+   *  it is disabled and will never run. Gates that hold UI on the lookup read this. */
+  isSettled: boolean
+}
+
+export const useIpCountryLookup = (enabled: boolean): IpCountryLookup => {
   const [ipCountryCode, setIpCountryCode] = useState<CountryCode | undefined>()
+  const [hasLookupFinished, setHasLookupFinished] = useState(false)
 
   useEffect(() => {
-    if (!enabled) return undefined
+    if (!enabled) {
+      setIpCountryCode(undefined)
+      setHasLookupFinished(false)
+      return undefined
+    }
     let active = true
     resolveIpCountryCodeCached().then((code) => {
-      if (active && code) setIpCountryCode(code)
+      if (!active) return
+      if (code) setIpCountryCode(code)
+      setHasLookupFinished(true)
     })
     return () => {
       active = false
     }
   }, [enabled])
 
-  return ipCountryCode
+  const isLookupSettled = !enabled || hasLookupFinished
+
+  /** Both fields derive from `enabled` in the same render: the effect clears the stored
+   *  country a commit later, and returning it in between would leak a stale country as a
+   *  settled verdict on the render where the lookup disables. */
+  return {
+    countryCode: enabled ? ipCountryCode : undefined,
+    isSettled: isLookupSettled,
+  }
 }
+
+export const useIpCountryCode = (enabled: boolean): CountryCode | undefined =>
+  useIpCountryLookup(enabled).countryCode
 
 export default useDeviceLocation
