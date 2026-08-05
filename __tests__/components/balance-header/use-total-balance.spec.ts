@@ -52,6 +52,34 @@ describe("useTotalBalance", () => {
     expect(result.current.isLoading).toBe(true)
   })
 
+  it("keeps the dollars out of satsBalance while the region is pending", () => {
+    mockConvertMoneyAmount.mockReturnValue(({ amount }: { amount: number }) => ({
+      amount,
+      currency: "DisplayCurrency",
+      currencyCode: "USD",
+    }))
+    mockIsRegionPending.mockReturnValue(true)
+
+    const { result } = renderHook(() => useTotalBalance(wallets))
+
+    /** Read without consulting isLoading by the backup nudge, so a pending region must
+     *  not inflate it with dollars that vanish once the verdict lands. */
+    expect(result.current.satsBalance).toBe(1_000_000)
+  })
+
+  it("counts the dollars back into satsBalance once the region settles unrestricted", () => {
+    mockConvertMoneyAmount.mockReturnValue(({ amount }: { amount: number }) => ({
+      amount,
+      currency: "DisplayCurrency",
+      currencyCode: "USD",
+    }))
+    mockIsRegionPending.mockReturnValue(false)
+
+    const { result } = renderHook(() => useTotalBalance(wallets))
+
+    expect(result.current.satsBalance).toBe(1_050_000)
+  })
+
   it("flags isLoading=true while price conversion is bootstrapping (account-switch window)", () => {
     mockConvertMoneyAmount.mockReturnValue(undefined)
 
