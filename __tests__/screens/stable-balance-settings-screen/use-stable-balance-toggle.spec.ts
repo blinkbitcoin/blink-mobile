@@ -16,12 +16,13 @@ jest.mock("@app/self-custodial/bridge", () => ({
 }))
 
 let mockIsDollarBalanceRestricted = false
+let mockIsRegionPending = false
 
 jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
   useDollarBalanceRestricted: () => mockIsDollarBalanceRestricted,
   useDollarBalanceRestriction: () => ({
     isRestricted: mockIsDollarBalanceRestricted,
-    isRegionPending: false,
+    isRegionPending: mockIsRegionPending,
   }),
 }))
 
@@ -69,6 +70,7 @@ describe("useStableBalanceToggle", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockIsDollarBalanceRestricted = false
+    mockIsRegionPending = false
     mockActivateStableBalance.mockResolvedValue(undefined)
     mockDeactivateStableBalance.mockResolvedValue(undefined)
     mockRefreshWallets.mockResolvedValue(undefined)
@@ -114,6 +116,22 @@ describe("useStableBalanceToggle", () => {
     expect(blockedMessage(LL)).toBe("Dollar Balance is not available in your region")
     expect(result.current.switchKey).toBe(initialSwitchKey + 1)
     expect(mockRefreshWallets).not.toHaveBeenCalled()
+  })
+
+  /** Characterizes what the pending hold does not cover here: the gate reads only the
+   *  resolved restriction, which is false until the region lands, so a restricted user
+   *  who taps on a cold start activates before the verdict arrives. This expectation
+   *  flips once the activation is gated on isRegionPending. */
+  it("activates while the region is still pending, since the gate reads only the resolved restriction", async () => {
+    mockIsRegionPending = true
+    const { result } = renderToggle()
+
+    await act(async () => {
+      await result.current.apply(true)
+    })
+
+    expect(mockActivateStableBalance).toHaveBeenCalledTimes(1)
+    expect(mockToastShow).not.toHaveBeenCalled()
   })
 
   it("still allows deactivating while restricted, so an active balance can be freed", async () => {

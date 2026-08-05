@@ -13,6 +13,7 @@ const mockConfirmationQuery = jest.fn()
 const mockUnauthedQuery = jest.fn()
 const mockPersistentState = jest.fn()
 const mockUseDollarBalanceRestricted = jest.fn()
+const mockIsRegionPending = jest.fn()
 
 jest.mock("@app/hooks/use-active-wallet", () => ({
   useActiveWallet: () => mockActiveWallet(),
@@ -22,7 +23,7 @@ jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
   useDollarBalanceRestricted: () => mockUseDollarBalanceRestricted(),
   useDollarBalanceRestriction: () => ({
     isRestricted: mockUseDollarBalanceRestricted(),
-    isRegionPending: false,
+    isRegionPending: mockIsRegionPending(),
   }),
 }))
 
@@ -66,6 +67,7 @@ describe("useSendWallets", () => {
     })
     mockPersistentState.mockReturnValue({})
     mockUseDollarBalanceRestricted.mockReturnValue(false)
+    mockIsRegionPending.mockReturnValue(false)
   })
 
   it("returns wallets when self-custodial", () => {
@@ -229,6 +231,27 @@ describe("useSendWallets", () => {
     expect(result.current.defaultWallet?.id).toBe("cust-btc")
     expect(result.current.usdWallet).toBeUndefined()
     expect(result.current.network).toBe("mainnet")
+  })
+
+  /** Characterizes what the pending hold does not cover here: the restriction reads
+   *  false until the region lands, so the dollar wallet stays offered through the
+   *  pending window. This expectation flips once the send list holds on
+   *  isRegionPending. */
+  it("still offers the dollar wallet while the region is pending", () => {
+    mockActiveWallet.mockReturnValue({
+      isSelfCustodial: true,
+      isReady: true,
+      wallets: [btcWallet, usdWallet],
+    })
+    mockIsAuthed.mockReturnValue(false)
+    mockDetailsQuery.mockReturnValue({ data: undefined, loading: false })
+    mockUseDollarBalanceRestricted.mockReturnValue(false)
+    mockIsRegionPending.mockReturnValue(true)
+
+    const { result } = renderHook(() => useSendWallets())
+
+    expect(result.current.wallets).toHaveLength(2)
+    expect(result.current.usdWallet?.id).toBe("usd-w1")
   })
 
   it("leaves wallets untouched when restricted but no Bitcoin wallet exists", () => {
