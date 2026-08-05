@@ -118,11 +118,20 @@ describe("useStableBalanceToggle", () => {
     expect(mockRefreshWallets).not.toHaveBeenCalled()
   })
 
-  /** Characterizes what the pending hold does not cover here: the gate reads only the
-   *  resolved restriction, which is false until the region lands, so a restricted user
-   *  who taps on a cold start activates before the verdict arrives. This expectation
-   *  flips once the activation is gated on isRegionPending. */
-  it("activates while the region is still pending, since the gate reads only the resolved restriction", async () => {
+  it("refuses the activation while the region is still pending and snaps the switch back", async () => {
+    mockIsRegionPending = true
+    const { result } = renderToggle()
+    const initialSwitchKey = result.current.switchKey
+
+    await act(async () => {
+      await result.current.apply(true)
+    })
+
+    expect(mockActivateStableBalance).not.toHaveBeenCalled()
+    expect(result.current.switchKey).toBe(initialSwitchKey + 1)
+  })
+
+  it("does not accuse the region while it is still pending", async () => {
     mockIsRegionPending = true
     const { result } = renderToggle()
 
@@ -130,8 +139,29 @@ describe("useStableBalanceToggle", () => {
       await result.current.apply(true)
     })
 
-    expect(mockActivateStableBalance).toHaveBeenCalledTimes(1)
     expect(mockToastShow).not.toHaveBeenCalled()
+  })
+
+  it("still allows deactivating while the region is pending", async () => {
+    mockIsRegionPending = true
+    const { result } = renderToggle({ isStableBalanceActive: true })
+
+    await act(async () => {
+      await result.current.apply(false)
+    })
+
+    expect(mockDeactivateStableBalance).toHaveBeenCalledTimes(1)
+  })
+
+  it("activates normally once the region settles unrestricted", async () => {
+    mockIsRegionPending = false
+    const { result } = renderToggle()
+
+    await act(async () => {
+      await result.current.apply(true)
+    })
+
+    expect(mockActivateStableBalance).toHaveBeenCalledTimes(1)
   })
 
   it("still allows deactivating while restricted, so an active balance can be freed", async () => {
