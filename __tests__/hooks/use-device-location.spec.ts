@@ -319,6 +319,77 @@ describe("useDeviceLocation", () => {
       expect(result.current.loading).toBe(false)
       expect(mockResolveIpCountryCode).toHaveBeenCalled()
     })
+
+    /** The in-flight answer must not land on a mode not allowed to know it. */
+    it("discards a lookup already in flight when Anon switches on", async () => {
+      let resolveLookup: (code: string) => void = () => undefined
+      mockResolveIpCountryCode.mockReturnValue(
+        new Promise<string>((resolve) => {
+          resolveLookup = resolve
+        }),
+      )
+      mockUseCountryCodeQuery.mockReturnValue({
+        data: { countryCode: "SV" },
+        error: undefined,
+      })
+
+      const { result, rerender } = renderHook(() => useDeviceLocation())
+
+      expect(result.current.loading).toBe(true)
+
+      mockIsAnonMode = true
+      rerender()
+
+      await act(async () => {
+        resolveLookup("DE")
+      })
+
+      expect(result.current.countryCode).toBeUndefined()
+      expect(result.current.loading).toBe(false)
+    })
+
+    it("re-arms loading for a fresh resolve when Anon switches off", async () => {
+      mockIsAnonMode = true
+      mockUseCountryCodeQuery.mockReturnValue({
+        data: { countryCode: "SV" },
+        error: undefined,
+      })
+      mockResolveIpCountryCode.mockResolvedValue("DE")
+
+      const { result, rerender } = renderHook(() => useDeviceLocation())
+
+      expect(result.current.loading).toBe(false)
+
+      mockIsAnonMode = false
+      rerender()
+
+      /** Not settled-without-a-country: the previous answer was discarded. */
+      expect(result.current.loading).toBe(true)
+
+      await act(async () => {})
+
+      expect(result.current.countryCode).toBe("DE")
+      expect(result.current.loading).toBe(false)
+    })
+
+    it("drops a country resolved before Anon switched on", async () => {
+      mockUseCountryCodeQuery.mockReturnValue({
+        data: { countryCode: "SV" },
+        error: undefined,
+      })
+      mockResolveIpCountryCode.mockResolvedValue("DE")
+
+      const { result, rerender } = renderHook(() => useDeviceLocation())
+
+      await act(async () => {})
+      expect(result.current.countryCode).toBe("DE")
+
+      mockIsAnonMode = true
+      rerender()
+
+      expect(result.current.countryCode).toBeUndefined()
+      expect(result.current.detectionFailed).toBe(false)
+    })
   })
 
   it("marks detection failed on Apollo query error (falls back to SV)", () => {
@@ -394,6 +465,7 @@ describe("useIpCountryCode", () => {
 describe("useIpCountryLookup", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockIsAnonMode = false
     mockResolveIpCountryCode.mockResolvedValue(undefined)
   })
 
@@ -445,6 +517,52 @@ describe("useIpCountryLookup", () => {
     rerender({ enabled: false })
 
     expect(result.current).toEqual({ countryCode: undefined, isSettled: true })
+  })
+
+  /** Anon overrides the caller, so no surface can leak a region through this hook. */
+  describe("anon mode", () => {
+    it("skips the lookup even when the caller enables it", async () => {
+      mockIsAnonMode = true
+      mockResolveIpCountryCode.mockResolvedValue("HK")
+
+      const { result } = renderHook(() => useIpCountryLookup(true))
+
+      await act(async () => {})
+
+      expect(result.current).toEqual({ countryCode: undefined, isSettled: true })
+      expect(mockResolveIpCountryCode).not.toHaveBeenCalled()
+    })
+
+    it("clears a country it had already resolved when Anon switches on", async () => {
+      mockResolveIpCountryCode.mockResolvedValue("HK")
+
+      const { result, rerender } = renderHook(() => useIpCountryLookup(true))
+
+      await act(async () => {})
+      expect(result.current.countryCode).toBe("HK")
+
+      mockIsAnonMode = true
+      rerender()
+
+      expect(result.current).toEqual({ countryCode: undefined, isSettled: true })
+    })
+
+    it("runs the lookup again once Anon switches off", async () => {
+      mockIsAnonMode = true
+      mockResolveIpCountryCode.mockResolvedValue("HK")
+
+      const { result, rerender } = renderHook(() => useIpCountryLookup(true))
+
+      await act(async () => {})
+      expect(mockResolveIpCountryCode).not.toHaveBeenCalled()
+
+      mockIsAnonMode = false
+      rerender()
+
+      await act(async () => {})
+
+      expect(result.current).toEqual({ countryCode: "HK", isSettled: true })
+    })
   })
 })
 
