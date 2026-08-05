@@ -112,7 +112,9 @@ import CaretUpCircle from "@app/assets/icons-redesign/caret-up-circle.svg"
 import Limits from "@app/assets/icons-redesign/limits.svg"
 import Chain from "@app/assets/icons/chain.svg"
 import Location from "@app/assets/icons-redesign/location.svg"
-import LocationSlash from "@app/assets/icons-redesign/location-slash.svg"
+import HandTap from "@app/assets/icons-redesign/hand-tap.svg"
+import MagicWand from "@app/assets/icons-redesign/magic-wand.svg"
+import Sunglasses from "@app/assets/icons-redesign/sunglasses.svg"
 
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
@@ -247,7 +249,9 @@ const customSvgMap = {
   "limits": Limits,
   "chain": Chain,
   "location": Location,
-  "location-slash": LocationSlash,
+  "hand-tap": HandTap,
+  "magic-wand": MagicWand,
+  "sunglasses": Sunglasses,
 } as const
 
 export const icons = { ...phosphorIconMap, ...customSvgMap } as const

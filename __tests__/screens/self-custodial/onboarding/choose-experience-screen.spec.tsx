@@ -79,13 +79,13 @@ describe("ChooseExperienceScreen", () => {
     mockOnContinue = { route: "selfCustodialBackupSuccess", accountId: "sc-account-1" }
   })
 
-  it("renders the location hero with the title", async () => {
+  it("renders the hand-tap hero with the title", async () => {
     await renderScreen()
 
     const iconHeroMock = IconHero as unknown as jest.Mock
     const props = iconHeroMock.mock.calls[0][0]
 
-    expect(props.icon).toBe("location")
+    expect(props.icon).toBe("hand-tap")
     expect(props.title).toBe(LL.ChooseExperienceScreen.title())
   })
 
@@ -96,13 +96,13 @@ describe("ChooseExperienceScreen", () => {
     expect(getByTestId("mode-anon")).toBeTruthy()
   })
 
-  it("marks Enhanced with the location icon and Anon with its slashed pair", async () => {
+  it("marks Enhanced with the magic-wand icon and Anon with the sunglasses one", async () => {
     const { getByTestId } = await renderScreen()
 
-    expect(within(getByTestId("mode-enhanced")).getByTestId("icon-location")).toBeTruthy()
     expect(
-      within(getByTestId("mode-anon")).getByTestId("icon-location-slash"),
+      within(getByTestId("mode-enhanced")).getByTestId("icon-magic-wand"),
     ).toBeTruthy()
+    expect(within(getByTestId("mode-anon")).getByTestId("icon-sunglasses")).toBeTruthy()
   })
 
   it("defaults to Enhanced when the user continues without changing the selection", async () => {

@@ -80,9 +80,21 @@ describe("GaloyIcon", () => {
       ).not.toBeNull()
     })
 
-    it("renders the slashed location icon", () => {
+    it("renders the hand-tap icon", () => {
       expect(
-        renderWithTheme(<GaloyIcon name="location-slash" size={24} />).toJSON(),
+        renderWithTheme(<GaloyIcon name="hand-tap" size={24} />).toJSON(),
+      ).not.toBeNull()
+    })
+
+    it("renders the magic-wand icon", () => {
+      expect(
+        renderWithTheme(<GaloyIcon name="magic-wand" size={24} />).toJSON(),
+      ).not.toBeNull()
+    })
+
+    it("renders the sunglasses icon", () => {
+      expect(
+        renderWithTheme(<GaloyIcon name="sunglasses" size={24} />).toJSON(),
       ).not.toBeNull()
     })
   })
