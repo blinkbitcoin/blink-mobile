@@ -22,6 +22,7 @@ const DEFAULT_TIERS = buildZeroTiers(ETA_MINUTES, FeeUnit.SatPerVbyte)
 type RecommendedFeeTiersResult = {
   tiers: Record<FeeTierOption, FeeTierInfo>
   error: SdkFeeError | null
+  isQuoting: boolean
 }
 
 export const useRecommendedFeeTiers = (
@@ -30,12 +31,17 @@ export const useRecommendedFeeTiers = (
 ): RecommendedFeeTiersResult => {
   const [tiers, setTiers] = useState(DEFAULT_TIERS)
   const [error, setError] = useState<SdkFeeError | null>(null)
+  /** True from the first render when a quote is already due, so no frame claims a zero rate. */
+  const [isQuoting, setIsQuoting] = useState(() => Boolean(sdk && enabled))
 
   const fetchFees = useCallback(async () => {
     if (!sdk || !enabled) {
       setError(null)
+      setIsQuoting(false)
       return
     }
+
+    setIsQuoting(true)
 
     try {
       const rates = await getRecommendedFees(sdk)
@@ -59,6 +65,8 @@ export const useRecommendedFeeTiers = (
       setError(null)
     } catch (err) {
       setError(classifySdkFeeError(err))
+    } finally {
+      setIsQuoting(false)
     }
   }, [sdk, enabled])
 
@@ -66,7 +74,7 @@ export const useRecommendedFeeTiers = (
     fetchFees()
   }, [fetchFees])
 
-  return { tiers, error }
+  return { tiers, error, isQuoting }
 }
 
 export const getFeeRateSatPerVb = (

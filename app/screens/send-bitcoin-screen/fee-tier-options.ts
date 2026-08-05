@@ -29,6 +29,12 @@ type BuildFeeTierOptionsParams = {
   /** Receives the whole tier so the formatter reads the unit rather than assuming one. */
   formatFee: (tier: FeeTierInfo) => string
   locale: string
+  /**
+   * Drops the fee from the label until a quote lands. Keyed on the request in flight rather
+   * than on a zero amount, so a fee that is genuinely zero still reads as zero instead of
+   * looking like one that was never quoted.
+   */
+  isQuoting?: boolean
 }
 
 export const buildFeeTierOptions = ({
@@ -36,11 +42,11 @@ export const buildFeeTierOptions = ({
   labels,
   formatFee,
   locale,
+  isQuoting = false,
 }: BuildFeeTierOptionsParams) =>
   [Tier.Fast, Tier.Medium, Tier.Slow].map((tier) => {
     const info = tiers[tier]
-    const hasFee = info.feeAmount > 0
-    const label = hasFee ? `${labels[tier]} (${formatFee(info)})` : labels[tier]
+    const label = isQuoting ? labels[tier] : `${labels[tier]} (${formatFee(info)})`
 
     return { id: tier, label, detail: `~ ${formatEta(info.etaMinutes, locale)}` }
   })

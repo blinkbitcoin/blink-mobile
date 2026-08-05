@@ -99,7 +99,24 @@ describe("buildFeeTierOptions", () => {
     expect(result[1].detail).toBe("~ 90m")
   })
 
-  it("omits the fee from the label until a fee is known", () => {
+  it("omits the fee from the label while a quote is in flight", () => {
+    const result = buildFeeTierOptions({
+      tiers: {
+        fast: { feeAmount: 0, feeUnit: FeeUnit.Sats, etaMinutes: 10 },
+        medium: { feeAmount: 0, feeUnit: FeeUnit.Sats, etaMinutes: 60 },
+        slow: { feeAmount: 0, feeUnit: FeeUnit.Sats, etaMinutes: 1440 },
+      },
+      labels,
+      formatFee: ({ feeAmount }) => `${feeAmount} sats`,
+      locale: "en",
+      isQuoting: true,
+    })
+
+    expect(result.map((option) => option.label)).toEqual(["Fast", "Medium", "Slow"])
+    expect(result.map((option) => option.detail)).toEqual(["~ 10m", "~ 60m", "~ 24h"])
+  })
+
+  it("shows a settled zero fee as zero rather than as an absent one", () => {
     const result = buildFeeTierOptions({
       tiers: {
         fast: { feeAmount: 0, feeUnit: FeeUnit.Sats, etaMinutes: 10 },
@@ -111,7 +128,12 @@ describe("buildFeeTierOptions", () => {
       locale: "en",
     })
 
-    expect(result.map((option) => option.label)).toEqual(["Fast", "Medium", "Slow"])
-    expect(result.map((option) => option.detail)).toEqual(["~ 10m", "~ 60m", "~ 24h"])
+    // An onchain address that resolves intraledger really is free; saying nothing reads
+    // as "not quoted yet" instead.
+    expect(result.map((option) => option.label)).toEqual([
+      "Fast (0 sats)",
+      "Medium (0 sats)",
+      "Slow (0 sats)",
+    ])
   })
 })

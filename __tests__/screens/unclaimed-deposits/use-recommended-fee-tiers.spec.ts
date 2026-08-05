@@ -25,6 +25,50 @@ describe("useRecommendedFeeTiers", () => {
     expect(mockGetRecommendedFees).not.toHaveBeenCalled()
   })
 
+  it("quotes from the very first render once refund mode is entered", () => {
+    mockGetRecommendedFees.mockImplementation(
+      () =>
+        new Promise(() => {
+          // deliberately never resolves
+        }),
+    )
+
+    const { result } = renderHook(() => useRecommendedFeeTiers(mockSdk, true))
+
+    // Read before any effect flush: false here would label the tiers with a zero rate.
+    expect(result.current.isQuoting).toBe(true)
+  })
+
+  it("is not quoting while disabled", () => {
+    const { result } = renderHook(() => useRecommendedFeeTiers(mockSdk, false))
+
+    expect(result.current.isQuoting).toBe(false)
+  })
+
+  it("stops quoting once the rates land", async () => {
+    mockGetRecommendedFees.mockResolvedValue({
+      fastest: 30,
+      halfHour: 20,
+      hour: 15,
+      economy: 10,
+      minimum: 5,
+    })
+
+    const { result } = renderHook(() => useRecommendedFeeTiers(mockSdk, true))
+
+    await waitFor(() => expect(result.current.isQuoting).toBe(false))
+    expect(result.current.tiers[FeeTierOption.Fast].feeAmount).toBe(30)
+  })
+
+  it("stops quoting when the sdk throws", async () => {
+    mockGetRecommendedFees.mockRejectedValue(new Error("network down"))
+
+    const { result } = renderHook(() => useRecommendedFeeTiers(mockSdk, true))
+
+    await waitFor(() => expect(result.current.error).not.toBeNull())
+    expect(result.current.isQuoting).toBe(false)
+  })
+
   it("populates tiers when fetch succeeds", async () => {
     mockGetRecommendedFees.mockResolvedValue({
       fastest: 30,
