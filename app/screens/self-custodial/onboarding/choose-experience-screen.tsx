@@ -32,9 +32,18 @@ export const ChooseExperienceScreen: React.FC = () => {
   const LLScreen = LL.ChooseExperienceScreen
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const route = useRoute<RouteProp<RootStackParamList, "selfCustodialChooseExperience">>()
-  const { setAccountMode } = useSelfCustodialAccountMode()
+  const { getAccountMode, setAccountMode } = useSelfCustodialAccountMode()
 
-  const [selected, setSelected] = useState<AccountMode>(AccountMode.Enhanced)
+  const { onContinue } = route.params
+  const isAccountPending = onContinue.route === ChooseExperienceContinueRoute.AcceptTerms
+  /** Re-entry (a back press out of the next screen, or a migration resume onto this
+   *  screen) must not silently downgrade a deliberate Anon to the Enhanced default, so
+   *  seed from what the account already stored. Creation has no account to read yet. */
+  const storedMode = isAccountPending ? undefined : getAccountMode(onContinue.accountId)
+
+  const [selected, setSelected] = useState<AccountMode>(
+    storedMode ?? AccountMode.Enhanced,
+  )
 
   const options: OptionCard<AccountMode>[] = [
     {
@@ -54,8 +63,6 @@ export const ChooseExperienceScreen: React.FC = () => {
   ]
 
   const handleContinue = () => {
-    const { onContinue } = route.params
-
     /** Creation has no account yet, so the mode rides through terms to wallet creation. */
     if (onContinue.route === ChooseExperienceContinueRoute.AcceptTerms) {
       navigation.navigate("acceptTermsAndConditions", {

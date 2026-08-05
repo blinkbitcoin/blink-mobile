@@ -26,6 +26,48 @@ describe("useSelfCustodialAccountMode", () => {
     mockPersistentState = { ...baseState }
   })
 
+  describe("getAccountMode (read)", () => {
+    it("returns the stored mode for the given account id", () => {
+      mockPersistentState = {
+        ...baseState,
+        selfCustodialAccountModeByAccountId: { "self-custodial-1": AccountMode.Anon },
+      }
+      const { result } = renderHook(() => useSelfCustodialAccountMode())
+
+      expect(result.current.getAccountMode("self-custodial-1")).toBe(AccountMode.Anon)
+    })
+
+    it("returns undefined for an account that never passed the mode screen", () => {
+      mockPersistentState = {
+        ...baseState,
+        selfCustodialAccountModeByAccountId: { "self-custodial-1": AccountMode.Anon },
+      }
+      const { result } = renderHook(() => useSelfCustodialAccountMode())
+
+      expect(result.current.getAccountMode("restored-without-mode")).toBeUndefined()
+    })
+
+    it("returns undefined when no account has ever stored a mode", () => {
+      const { result } = renderHook(() => useSelfCustodialAccountMode())
+
+      expect(result.current.getAccountMode("self-custodial-1")).toBeUndefined()
+    })
+
+    it("reads the mode of the requested account, not of the active one", () => {
+      mockPersistentState = {
+        ...baseState,
+        activeAccountId: "self-custodial-1",
+        selfCustodialAccountModeByAccountId: {
+          "self-custodial-1": AccountMode.Enhanced,
+          "provisioned-sc-2": AccountMode.Anon,
+        },
+      }
+      const { result } = renderHook(() => useSelfCustodialAccountMode())
+
+      expect(result.current.getAccountMode("provisioned-sc-2")).toBe(AccountMode.Anon)
+    })
+  })
+
   describe("setAccountMode (write)", () => {
     it("calls updateState with a functional updater, not a direct value", () => {
       const { result } = renderHook(() => useSelfCustodialAccountMode())

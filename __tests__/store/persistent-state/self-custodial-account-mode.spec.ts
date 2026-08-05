@@ -1,4 +1,7 @@
-import { withSelfCustodialAccountMode } from "@app/store/persistent-state/self-custodial-account-mode"
+import {
+  getSelfCustodialAccountMode,
+  withSelfCustodialAccountMode,
+} from "@app/store/persistent-state/self-custodial-account-mode"
 import { PersistentState } from "@app/store/persistent-state/state-migrations"
 import { AccountMode } from "@app/types/account"
 import { DefaultAccountId } from "@app/types/wallet"
@@ -80,5 +83,46 @@ describe("withSelfCustodialAccountMode", () => {
     expect(next.selfCustodialAccountModeByAccountId).toEqual({
       "self-custodial-1": AccountMode.Anon,
     })
+  })
+})
+
+describe("getSelfCustodialAccountMode", () => {
+  it("reads back the mode the writer stored", () => {
+    const next = withSelfCustodialAccountMode(
+      baseState,
+      "self-custodial-1",
+      AccountMode.Anon,
+    )
+
+    expect(getSelfCustodialAccountMode(next, "self-custodial-1")).toBe(AccountMode.Anon)
+  })
+
+  it("returns undefined when the map has no entry for the account", () => {
+    const state: PersistentState = {
+      ...baseState,
+      selfCustodialAccountModeByAccountId: { "self-custodial-1": AccountMode.Enhanced },
+    }
+
+    expect(getSelfCustodialAccountMode(state, "restored-without-mode")).toBeUndefined()
+  })
+
+  /** The map is optional on the schema, so a state written before v17 has none at all. */
+  it("returns undefined when the map is absent entirely", () => {
+    expect(getSelfCustodialAccountMode(baseState, "self-custodial-1")).toBeUndefined()
+  })
+
+  it("keeps each account's mode separate (multi-account)", () => {
+    const state: PersistentState = {
+      ...baseState,
+      selfCustodialAccountModeByAccountId: {
+        "self-custodial-1": AccountMode.Enhanced,
+        "self-custodial-2": AccountMode.Anon,
+      },
+    }
+
+    expect(getSelfCustodialAccountMode(state, "self-custodial-1")).toBe(
+      AccountMode.Enhanced,
+    )
+    expect(getSelfCustodialAccountMode(state, "self-custodial-2")).toBe(AccountMode.Anon)
   })
 })
