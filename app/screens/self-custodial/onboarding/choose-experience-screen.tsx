@@ -61,16 +61,30 @@ export const ChooseExperienceScreen: React.FC = () => {
     : settingsInitialMode ?? accountMode ?? AccountMode.Enhanced
   const [selected, setSelected] = useState<AccountMode>(initialMode)
 
-  /** The settings gate decides on the live balance, so it is refreshed on entry. */
+  /** Tracked, not fired and forgotten: the drain conversion resets back here with
+   *  `isWalletReady` already true on the pre-conversion balance, so Continue must wait
+   *  for the refresh. A failure releases it rather than stranding the screen. */
+  const [isRefreshingWallets, setIsRefreshingWallets] = useState(false)
+
   useEffect(() => {
-    if (isSettingsEntry) refreshWallets().catch(() => undefined)
+    if (!isSettingsEntry) return
+    let isActive = true
+    setIsRefreshingWallets(true)
+    refreshWallets()
+      .catch(() => undefined)
+      .finally(() => {
+        if (isActive) setIsRefreshingWallets(false)
+      })
+    return () => {
+      isActive = false
+    }
   }, [isSettingsEntry, refreshWallets])
 
   const usdWallet = wallets.find((wallet) => wallet.walletCurrency === WalletCurrency.Usd)
   const hasDollarBalance = (usdWallet?.balance.amount ?? 0) > 0
   /** The settings entry gates the Anon switch on the live balance, which is unknown
    *  until the wallet syncs: wait rather than let a cold start skip the gate. */
-  const isContinueWaiting = !onContinue && !isWalletReady
+  const isContinueWaiting = isSettingsEntry && (!isWalletReady || isRefreshingWallets)
 
   const options: OptionCard<AccountMode>[] = [
     {
