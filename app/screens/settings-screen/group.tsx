@@ -42,7 +42,11 @@ export const SettingsGroup: React.FC<SettingsGroupProps> = ({
         </Text>
       )}
       <View style={[styles.groupCard, containerStyle]}>
-        <DisabledFeature disabled={disabled} onDisabledPress={onDisabledPress}>
+        <DisabledFeature
+          disabled={disabled}
+          onDisabledPress={onDisabledPress}
+          accessibilityLabel={name}
+        >
           {filteredItems.map((Element, index) => {
             const hasDividerBelow = index < filteredItems.length - 1
             return (

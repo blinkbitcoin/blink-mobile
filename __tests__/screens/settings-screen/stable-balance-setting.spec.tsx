@@ -78,9 +78,10 @@ describe("StableBalanceSetting", () => {
   it("greys the row and offers the Enhanced prompt in Anon mode", () => {
     mockIsAnonMode = true
 
-    const { getByText } = renderRow()
+    const { getByLabelText } = renderRow()
 
-    fireEvent.press(getByText("Stable Balance"))
+    /** The gated row leaves the accessibility tree; the gate stands in for it. */
+    fireEvent.press(getByLabelText("Stable Balance"))
 
     expect(mockPromptEnhancedMode).toHaveBeenCalledTimes(1)
     expect(mockNavigate).not.toHaveBeenCalled()

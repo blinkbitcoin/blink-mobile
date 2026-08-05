@@ -36,7 +36,11 @@ export const NeedHelpSetting: React.FC = () => {
 
   return (
     <>
-      <DisabledFeature disabled={isAnonMode} onDisabledPress={promptEnhancedMode}>
+      <DisabledFeature
+        disabled={isAnonMode}
+        onDisabledPress={promptEnhancedMode}
+        accessibilityLabel={LL.support.contactUs()}
+      >
         <SettingsRow
           title={LL.support.contactUs()}
           leftGaloyIcon="headset"
