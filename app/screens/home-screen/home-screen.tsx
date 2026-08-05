@@ -64,7 +64,10 @@ import {
   useTransferBlockedSync,
 } from "@app/hooks/use-transfer-blocked"
 import { useSelfCustodialNetworkMismatchToast } from "@app/self-custodial/hooks/use-network-mismatch-toast"
-import { useNonCustodialConversionLimits } from "@app/self-custodial/hooks"
+import {
+  useNonCustodialConversionLimits,
+  usePendingDeposits,
+} from "@app/self-custodial/hooks"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { ConvertDirection } from "@app/types/payment"
 import { useBackupNudgeState } from "@app/hooks/use-backup-nudge-state"
@@ -355,10 +358,15 @@ export const HomeScreen: React.FC = () => {
     dataAuthed?.me?.defaultAccount?.pendingIncomingTransactions
   const transactionsEdges = dataAuthed?.me?.defaultAccount?.transactions?.edges
 
+  /** Fetched once here and shared with the UnclaimedDepositBanner below, so the
+   *  pending pill and that banner can never disagree about the same deposits. */
+  const { deposits } = usePendingDeposits()
+
   /** Pending deposits stay visible beside the balance until confirmed —
    *  unlike the unseen-tx badge below, which auto-dismisses (blink-wip#937). */
   const { pendingReceiveAmountText } = usePendingReceiveAmount({
     pendingIncomingTransactions,
+    deposits,
   })
   const pendingStatusBadge = pendingReceiveAmountText
     ? {
@@ -864,7 +872,7 @@ export const HomeScreen: React.FC = () => {
             </React.Fragment>
           ))}
         </View>
-        {isSelfCustodial && <UnclaimedDepositBanner />}
+        {isSelfCustodial && <UnclaimedDepositBanner deposits={deposits} />}
         <NetworkStatusBanner />
         {shouldShowBanner && <BackupNudgeBanner onDismiss={dismissBanner} />}
         {offboardBulletin.isVisible && <OffboardOnlyBulletin />}

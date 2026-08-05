@@ -7,20 +7,27 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { usePendingDeposits } from "@app/self-custodial/hooks"
-import { DepositStatus } from "@app/types/payment"
+import { DepositStatus, type PendingDeposit } from "@app/types/payment"
 import { testProps } from "@app/utils/testProps"
 
 import { GaloyIcon } from "../atomic/galoy-icon"
 
-export const UnclaimedDepositBanner: React.FC = () => {
+type Props = {
+  deposits: readonly PendingDeposit[]
+}
+
+/**
+ * The screen owns the deposit fetch (usePendingDeposits) and feeds both this
+ * banner and the balance header's pending pill, so the two can never disagree
+ * about the same deposits.
+ */
+export const UnclaimedDepositBanner: React.FC<Props> = ({ deposits }) => {
   const styles = useStyles()
   const {
     theme: { colors },
   } = useTheme()
   const { LL } = useI18nContext()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-  const { deposits } = usePendingDeposits()
 
   const { count, totalSats } = useMemo(() => {
     const active = deposits.filter(({ status }) => status !== DepositStatus.Refunded)

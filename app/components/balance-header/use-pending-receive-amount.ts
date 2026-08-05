@@ -4,7 +4,6 @@ import { TransactionFragment, TxDirection } from "@app/graphql/generated"
 import { usePriceConversion } from "@app/hooks"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
-import { usePendingDeposits } from "@app/self-custodial/hooks"
 import {
   addMoneyAmounts,
   DisplayCurrency,
@@ -12,26 +11,31 @@ import {
   toBtcMoneyAmount,
   toWalletMoneyAmount,
 } from "@app/types/amounts"
-import { DepositStatus } from "@app/types/payment"
+import { DepositStatus, type PendingDeposit } from "@app/types/payment"
 
 type Params = {
   pendingIncomingTransactions?: readonly TransactionFragment[] | null
+  deposits?: readonly PendingDeposit[]
 }
+
+/** Stable empty default, so an absent deposit list does not rebuild the memo. */
+const NO_DEPOSITS: readonly PendingDeposit[] = []
 
 /**
  * Total unconfirmed incoming amount for the balance header, in display
  * currency. Custodial reads the home query's pendingIncomingTransactions;
- * self-custodial reads immature (unconfirmed) Spark deposits — claimable and
- * errored deposits stay with the UnclaimedDepositBanner, which carries the
- * action to resolve them.
+ * self-custodial reads the immature (unconfirmed) Spark deposits passed in by
+ * the screen. Claimable and errored ones stay with the UnclaimedDepositBanner,
+ * which carries the action to resolve them. The screen owns the deposit fetch
+ * so the header and that banner always read the same list.
  */
 export const usePendingReceiveAmount = ({
   pendingIncomingTransactions,
+  deposits = NO_DEPOSITS,
 }: Params): { pendingReceiveAmountText: string | null } => {
   const { formatMoneyAmount } = useDisplayCurrency()
   const { convertMoneyAmount } = usePriceConversion()
   const { isSelfCustodial } = useActiveWallet()
-  const { deposits } = usePendingDeposits()
 
   const totalPendingDisplayAmount = useMemo(():
     | MoneyAmount<typeof DisplayCurrency>

@@ -2,6 +2,7 @@ import { renderHook } from "@testing-library/react-native"
 
 import { usePendingReceiveAmount } from "@app/components/balance-header/use-pending-receive-amount"
 import { TransactionFragment, TxDirection, WalletCurrency } from "@app/graphql/generated"
+import { DisplayCurrency } from "@app/types/amounts"
 import { DepositStatus, PendingDeposit } from "@app/types/payment"
 
 const mockConvertMoneyAmount = jest.fn()
@@ -10,9 +11,9 @@ const mockFormatMoneyAmount = jest.fn(
     `$${(moneyAmount.amount / 100).toFixed(2)}`,
 )
 const mockUseActiveWallet = jest.fn()
-const mockUsePendingDeposits = jest.fn()
 
 jest.mock("@app/hooks", () => ({
+  ...jest.requireActual("@app/hooks"),
   usePriceConversion: () => ({ convertMoneyAmount: mockConvertMoneyAmount() }),
 }))
 
@@ -24,15 +25,20 @@ jest.mock("@app/hooks/use-active-wallet", () => ({
   useActiveWallet: () => mockUseActiveWallet(),
 }))
 
-jest.mock("@app/self-custodial/hooks", () => ({
-  usePendingDeposits: () => mockUsePendingDeposits(),
-}))
+/**
+ * BTC passes through, USD is scaled by a distinct factor. A converter that
+ * ignored the incoming currency would still make a BTC-only total add up, so
+ * the mix has to be priced per settlement currency to reach the expected sum.
+ */
+const USD_TO_DISPLAY_FACTOR = 10
 
-const identityConverter = ({ amount }: { amount: number }) => ({
-  amount,
-  currency: "DisplayCurrency",
-  currencyCode: "USD",
-})
+const mockConverter = jest.fn(
+  ({ amount, currency }: { amount: number; currency: string }) => ({
+    amount: currency === WalletCurrency.Usd ? amount * USD_TO_DISPLAY_FACTOR : amount,
+    currency: "DisplayCurrency",
+    currencyCode: "USD",
+  }),
+)
 
 const pendingReceiveTx = (
   overrides: Partial<TransactionFragment> = {},
@@ -59,9 +65,8 @@ const deposit = (overrides: Partial<PendingDeposit> = {}): PendingDeposit => ({
 describe("usePendingReceiveAmount", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockConvertMoneyAmount.mockReturnValue(identityConverter)
+    mockConvertMoneyAmount.mockReturnValue(mockConverter)
     mockUseActiveWallet.mockReturnValue({ isSelfCustodial: false })
-    mockUsePendingDeposits.mockReturnValue({ deposits: [] })
   })
 
   describe("custodial", () => {
@@ -87,7 +92,12 @@ describe("usePendingReceiveAmount", () => {
         }),
       )
 
-      expect(result.current.pendingReceiveAmountText).toBe("$120.00")
+      // 10_000 sats + (2_000 cents x 10), i.e. each priced by its own currency
+      expect(result.current.pendingReceiveAmountText).toBe("$300.00")
+      expect(mockConverter).toHaveBeenCalledWith(
+        expect.objectContaining({ amount: 2_000, currency: WalletCurrency.Usd }),
+        DisplayCurrency,
+      )
     })
 
     it("returns null when there are no pending transactions", () => {
@@ -162,35 +172,43 @@ describe("usePendingReceiveAmount", () => {
     })
 
     it("sums immature (unconfirmed) deposits", () => {
-      mockUsePendingDeposits.mockReturnValue({
-        deposits: [
-          deposit({
-            id: "a:0",
-            amount: { amount: 4_000, currency: WalletCurrency.Btc, currencyCode: "BTC" },
-          }),
-          deposit({
-            id: "b:1",
-            amount: { amount: 6_000, currency: WalletCurrency.Btc, currencyCode: "BTC" },
-          }),
-        ],
-      })
-
-      const { result } = renderHook(() => usePendingReceiveAmount({}))
+      const { result } = renderHook(() =>
+        usePendingReceiveAmount({
+          deposits: [
+            deposit({
+              id: "a:0",
+              amount: {
+                amount: 4_000,
+                currency: WalletCurrency.Btc,
+                currencyCode: "BTC",
+              },
+            }),
+            deposit({
+              id: "b:1",
+              amount: {
+                amount: 6_000,
+                currency: WalletCurrency.Btc,
+                currencyCode: "BTC",
+              },
+            }),
+          ],
+        }),
+      )
 
       expect(result.current.pendingReceiveAmountText).toBe("$100.00")
     })
 
     it("excludes non-immature deposits (claimable, error, refunded are the banner's job)", () => {
-      mockUsePendingDeposits.mockReturnValue({
-        deposits: [
-          deposit({ id: "a:0", status: DepositStatus.Claimable }),
-          deposit({ id: "b:0", status: DepositStatus.FeeExceeded }),
-          deposit({ id: "c:0", status: DepositStatus.Error }),
-          deposit({ id: "d:0", status: DepositStatus.Refunded }),
-        ],
-      })
-
-      const { result } = renderHook(() => usePendingReceiveAmount({}))
+      const { result } = renderHook(() =>
+        usePendingReceiveAmount({
+          deposits: [
+            deposit({ id: "a:0", status: DepositStatus.Claimable }),
+            deposit({ id: "b:0", status: DepositStatus.FeeExceeded }),
+            deposit({ id: "c:0", status: DepositStatus.Error }),
+            deposit({ id: "d:0", status: DepositStatus.Refunded }),
+          ],
+        }),
+      )
 
       expect(result.current.pendingReceiveAmountText).toBeNull()
     })
@@ -202,16 +220,16 @@ describe("usePendingReceiveAmount", () => {
     })
 
     it("returns null when the only immature deposit has a zero amount", () => {
-      mockUsePendingDeposits.mockReturnValue({
-        deposits: [
-          deposit({
-            id: "z:0",
-            amount: { amount: 0, currency: WalletCurrency.Btc, currencyCode: "BTC" },
-          }),
-        ],
-      })
-
-      const { result } = renderHook(() => usePendingReceiveAmount({}))
+      const { result } = renderHook(() =>
+        usePendingReceiveAmount({
+          deposits: [
+            deposit({
+              id: "z:0",
+              amount: { amount: 0, currency: WalletCurrency.Btc, currencyCode: "BTC" },
+            }),
+          ],
+        }),
+      )
 
       expect(result.current.pendingReceiveAmountText).toBeNull()
     })

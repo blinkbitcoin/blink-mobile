@@ -216,7 +216,6 @@ jest.mock("@app/components/migration-reminder-bulletin", () => {
 })
 
 const mockUseNonCustodialConversionLimits = jest.fn()
-// eslint-disable-next-line prefer-const
 let mockPendingDepositsOverride: { deposits: unknown[] } | null = null
 
 jest.mock("@app/self-custodial/hooks", () => {
