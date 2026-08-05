@@ -151,6 +151,9 @@ const EMPTY_TIERS = Object.freeze(
   buildZeroTiers(CUSTODIAL_PAYOUT_ETA_MINUTES, FeeUnit.Sats),
 )
 
+/** Object.freeze stops at the record, so each tier is frozen in turn to match the promise. */
+Object.values(EMPTY_TIERS).forEach((tier) => Object.freeze(tier))
+
 /** The three queries differ only in the fee type they resolve to, so one mapper serves all. */
 type FeeBySpeedData =
   | OnChainTxFeeBySpeedQuery
