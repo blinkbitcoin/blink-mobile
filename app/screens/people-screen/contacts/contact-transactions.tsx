@@ -1,13 +1,17 @@
 import * as React from "react"
-import { SectionList, Text, View } from "react-native"
+import { ActivityIndicator, SectionList, Text, View } from "react-native"
 
 import { gql } from "@apollo/client"
 import { MemoizedTransactionItem } from "@app/components/transaction-item"
-import { useTransactionListForContactQuery } from "@app/graphql/generated"
+import { UserContact, useTransactionListForContactQuery } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { groupTransactionsByDate } from "@app/graphql/transactions"
+import { useAccountRegistry } from "@app/hooks/use-account-registry"
+import { useContactTransactions } from "@app/hooks/use-contact-transactions"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { makeStyles } from "@rn-vui/themed"
+import { useSelfCustodialTransactionFragments } from "@app/self-custodial/hooks/use-self-custodial-transaction-fragments"
+import { AccountType } from "@app/types/wallet"
+import { makeStyles, useTheme } from "@rn-vui/themed"
 
 import { toastShow } from "../../../utils/toast"
 
@@ -31,59 +35,123 @@ gql`
 `
 
 type Props = {
-  contactUsername: string
+  contact: UserContact
 }
 
-export const ContactTransactions = ({ contactUsername }: Props) => {
+export const ContactTransactions = ({ contact }: Props) => {
   const styles = useStyles()
+  const {
+    theme: { colors },
+  } = useTheme()
   const { LL, locale } = useI18nContext()
   const isAuthed = useIsAuthed()
+  const { activeAccount } = useAccountRegistry()
+  const isSelfCustodial = activeAccount?.type === AccountType.SelfCustodial
 
-  const { error, data, fetchMore } = useTransactionListForContactQuery({
-    variables: { username: contactUsername },
-    skip: !isAuthed,
+  /**
+   * The adapter matches payments by counterparty address, which is what `username` holds
+   * for a self-custodial contact, so it never has to resolve a contact list to answer.
+   */
+  const {
+    transactions: selfCustodialTransactions,
+    isLoading: isLoadingSelfCustodial,
+    hasError: hasSelfCustodialError,
+    loadMore: loadMoreSelfCustodial,
+  } = useContactTransactions(contact.handle, isSelfCustodial)
+
+  const shouldSkipContactQuery = !isAuthed || isSelfCustodial
+
+  /**
+   * The custodial query resolves through `me`, which a self-custodial account has no
+   * session for, so it is skipped and the contact adapter answers instead.
+   */
+  const {
+    error,
+    data,
+    fetchMore,
+    loading: custodialLoading,
+  } = useTransactionListForContactQuery({
+    /** The argument is a `Username` scalar, so this stays on the deprecated field even
+     *  though the adapter above is keyed by `handle`. */
+    variables: { username: contact.username },
+    skip: shouldSkipContactQuery,
   })
 
-  const transactions = data?.me?.contactByUsername?.transactions
+  const selfCustodialTxs = useSelfCustodialTransactionFragments(selfCustodialTransactions)
+  const custodialTransactions = data?.me?.contactByUsername?.transactions
 
-  const sections = React.useMemo(
-    () =>
-      groupTransactionsByDate({
-        txs: transactions?.edges?.map((edge) => edge.node) ?? [],
-        LL,
-        locale,
-      }),
-    [transactions, LL, locale],
+  const custodialTxs = React.useMemo(
+    () => custodialTransactions?.edges?.map((edge) => edge.node) ?? [],
+    [custodialTransactions],
   )
 
-  if (error) {
-    toastShow({
-      message: (translations) => translations.common.transactionsError(),
-      LL,
-    })
-    return <></>
-  }
+  const txs = isSelfCustodial ? selfCustodialTxs : custodialTxs
 
-  if (!transactions) {
-    return <></>
-  }
+  const sections = React.useMemo(
+    () => groupTransactionsByDate({ txs, LL, locale }),
+    [txs, LL, locale],
+  )
 
   const fetchNextTransactionsPage = () => {
-    const pageInfo = transactions?.pageInfo
+    if (isSelfCustodial) {
+      loadMoreSelfCustodial()
+      return
+    }
 
-    if (pageInfo.hasNextPage) {
+    const pageInfo = custodialTransactions?.pageInfo
+
+    if (pageInfo?.hasNextPage) {
       fetchMore({
         variables: {
-          username: contactUsername,
+          username: contact.username,
           after: pageInfo.endCursor,
         },
       })
     }
   }
 
+  const hasTransactionsError = Boolean(error) || hasSelfCustodialError
+
+  /**
+   * In an effect rather than the render body: the flag stays raised until the next read,
+   * so any unrelated re-render while it is up would queue a second toast for a failure
+   * the reader was already told about.
+   */
+  React.useEffect(() => {
+    if (!hasTransactionsError) return
+
+    toastShow({
+      message: (translations) => translations.common.transactionsError(),
+      LL,
+    })
+  }, [hasTransactionsError, LL])
+
+  if (hasTransactionsError) return <></>
+
+  /**
+   * Until the query answers there is nothing to say about this contact, so the custodial
+   * list spins rather than claiming it has no transactions. An absent `data` counts as
+   * still loading, but only while the query is actually running: a skipped one never
+   * answers, and would otherwise spin forever.
+   */
+  const isCustodialQueryRunning = !shouldSkipContactQuery
+  const isLoadingCustodial = isCustodialQueryRunning && (custodialLoading || !data)
+  const isLoadingTransactions = isLoadingSelfCustodial || isLoadingCustodial
+
+  const ListEmptyContent = isLoadingTransactions ? (
+    <View style={styles.activityIndicatorView} testID="contact-transactions-loading">
+      <ActivityIndicator size="large" color={colors.primary} />
+    </View>
+  ) : (
+    <View style={styles.noTransactionView} testID="contact-no-transactions">
+      <Text style={styles.noTransactionText}>{LL.TransactionScreen.noTransaction()}</Text>
+    </View>
+  )
+
   return (
     <View style={styles.screen}>
       <SectionList
+        testID="contact-transactions-list"
         renderItem={({ item }) => (
           <MemoizedTransactionItem key={`txn-${item.id}`} txid={item.id} />
         )}
@@ -93,13 +161,7 @@ export const ContactTransactions = ({ contactUsername }: Props) => {
             <Text style={styles.sectionHeaderText}>{title}</Text>
           </View>
         )}
-        ListEmptyComponent={
-          <View style={styles.noTransactionView}>
-            <Text style={styles.noTransactionText}>
-              {LL.TransactionScreen.noTransaction()}
-            </Text>
-          </View>
-        }
+        ListEmptyComponent={ListEmptyContent}
         sections={sections}
         keyExtractor={(item) => item.id}
         onEndReached={fetchNextTransactionsPage}
@@ -110,6 +172,13 @@ export const ContactTransactions = ({ contactUsername }: Props) => {
 }
 
 const useStyles = makeStyles(({ colors }) => ({
+  activityIndicatorView: {
+    alignItems: "center",
+    flex: 1,
+    justifyContent: "center",
+    marginVertical: 48,
+  },
+
   noTransactionText: {
     fontSize: 24,
   },

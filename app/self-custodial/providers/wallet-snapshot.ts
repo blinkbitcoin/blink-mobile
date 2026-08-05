@@ -1,8 +1,5 @@
 import {
-  PaymentDetails,
-  PaymentMethod,
   type BreezSdkInterface,
-  type Payment,
   type TokenBalance,
 } from "@breeztech/breez-sdk-spark-react-native"
 
@@ -12,53 +9,19 @@ import { toWalletMoneyAmount } from "@app/types/amounts"
 import { type NormalizedTransaction } from "@app/types/transaction"
 import { toWalletId, type WalletState } from "@app/types/wallet"
 
-import { findUsdbToken, getWalletInfo, listPayments } from "../bridge"
-import { requireSparkTokenIdentifier } from "../config"
+import { findUsdbToken, getWalletInfo } from "../bridge"
 import { recordErrorOnce } from "../logging"
-import { mapSelfCustodialTransactions } from "../mappers/transaction"
 
-const TRANSACTIONS_PER_PAGE = 20
+import {
+  fetchAndMapPayments,
+  TRANSACTIONS_PER_PAGE,
+  type PaymentsPage,
+} from "./payments-page"
 
 const getStableBalance = (token: TokenBalance | undefined): number => {
   if (!token) return 0
   const decimals = token.tokenMetadata?.decimals ?? 0
   return tokenBaseUnitsToCents(Number(token.balance), decimals)
-}
-
-const isKnownPayment = (payment: Payment): boolean => {
-  if (payment.method !== PaymentMethod.Token) return true
-  if (!payment.details || !PaymentDetails.Token.instanceOf(payment.details)) return false
-  const expectedIdentifier = requireSparkTokenIdentifier()
-  const observedIdentifier = payment.details.inner.metadata.identifier
-  if (observedIdentifier === expectedIdentifier) return true
-  recordErrorOnce(
-    `spark-unknown-token-payment:${observedIdentifier}`,
-    new Error(
-      `Unknown token payment dropped: id=${observedIdentifier} expected=${expectedIdentifier}`,
-    ),
-  )
-  return false
-}
-
-type PaymentsPage = {
-  transactions: NormalizedTransaction[]
-  rawCount: number
-  hasMore: boolean
-}
-
-const fetchAndMapPayments = async (
-  sdk: BreezSdkInterface,
-  offset: number,
-): Promise<PaymentsPage> => {
-  const response = await listPayments(sdk, offset, TRANSACTIONS_PER_PAGE)
-  const transactions = mapSelfCustodialTransactions(
-    response.payments.filter(isKnownPayment),
-  )
-  return {
-    transactions,
-    rawCount: response.payments.length,
-    hasMore: response.payments.length >= TRANSACTIONS_PER_PAGE,
-  }
 }
 
 type WalletBalances = {
