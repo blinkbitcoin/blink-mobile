@@ -232,6 +232,28 @@ describe("useCustodialOnchainFeeTiers", () => {
     expect(result.current.isQuoting).toBe(false)
   })
 
+  it("quotes from the very first render when the params are already in hand", () => {
+    mockFetchBtcFees.mockImplementation(
+      () =>
+        new Promise(() => {
+          // deliberately never resolves
+        }),
+    )
+
+    const { result } = renderHook(() => useCustodialOnchainFeeTiers(btcParams))
+
+    // Read before any effect flush: false here would paint bare tier names with no spinner.
+    expect(result.current.isQuoting).toBe(true)
+  })
+
+  it("is not quoting on first render when a param is missing", () => {
+    const { result } = renderHook(() =>
+      useCustodialOnchainFeeTiers({ ...btcParams, amount: undefined }),
+    )
+
+    expect(result.current.isQuoting).toBe(false)
+  })
+
   it("never quotes without the params it needs", async () => {
     const { result } = renderHook(() =>
       useCustodialOnchainFeeTiers({ ...btcParams, amount: undefined }),
