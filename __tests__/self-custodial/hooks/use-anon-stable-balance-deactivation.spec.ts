@@ -1,11 +1,29 @@
 import { renderHook, waitFor } from "@testing-library/react-native"
 
 import { useAnonStableBalanceDeactivation } from "@app/self-custodial/hooks/use-anon-stable-balance-deactivation"
+import { isStableBalanceAnonPaused } from "@app/store/persistent-state/stable-balance-anon-pause"
+import { PersistentState } from "@app/store/persistent-state/state-migrations"
 import { ActiveWalletStatus } from "@app/types/wallet"
 
 const mockDeactivateStableBalance = jest.fn()
+const mockActivateStableBalance = jest.fn()
 jest.mock("@app/self-custodial/bridge", () => ({
   deactivateStableBalance: (...args: unknown[]) => mockDeactivateStableBalance(...args),
+  activateStableBalance: (...args: unknown[]) => mockActivateStableBalance(...args),
+}))
+
+let mockPersistentState: PersistentState = {
+  schemaVersion: 19,
+  galoyInstance: { id: "Main" },
+  galoyAuthToken: "",
+  activeAccountId: "sc-1",
+}
+const mockUpdateState = jest.fn()
+jest.mock("@app/store/persistent-state", () => ({
+  usePersistentStateContext: () => ({
+    persistentState: mockPersistentState,
+    updateState: mockUpdateState,
+  }),
 }))
 
 let mockIsAnonMode = false
@@ -54,7 +72,14 @@ describe("useAnonStableBalanceDeactivation", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockIsAnonMode = true
+    mockPersistentState = {
+      schemaVersion: 19,
+      galoyInstance: { id: "Main" },
+      galoyAuthToken: "",
+      activeAccountId: "sc-1",
+    }
     mockDeactivateStableBalance.mockResolvedValue(undefined)
+    mockActivateStableBalance.mockResolvedValue(undefined)
     mockRefreshStableBalanceActive.mockResolvedValue(undefined)
   })
 
@@ -141,5 +166,98 @@ describe("useAnonStableBalanceDeactivation", () => {
       )
     })
     expect(mockRefreshStableBalanceActive).not.toHaveBeenCalled()
+  })
+
+  it("records the drop against the account so leaving Anon can undo it", async () => {
+    setupWallet()
+
+    renderHook(() => useAnonStableBalanceDeactivation())
+
+    await waitFor(() => expect(mockUpdateState).toHaveBeenCalledTimes(1))
+
+    const updater = mockUpdateState.mock.calls[0][0]
+    expect(isStableBalanceAnonPaused(updater(mockPersistentState), "sc-1")).toBe(true)
+    expect(updater(undefined)).toBeUndefined()
+  })
+
+  describe("leaving Anon Mode", () => {
+    const setupPausedByAnon = () => {
+      mockIsAnonMode = false
+      mockPersistentState = {
+        ...mockPersistentState,
+        stableBalanceAnonPausedByAccountId: { "sc-1": true },
+      }
+      setupWallet({ isStableBalanceActive: false })
+    }
+
+    it("puts back the stable balance Anon switched off", async () => {
+      setupPausedByAnon()
+
+      renderHook(() => useAnonStableBalanceDeactivation())
+
+      await waitFor(() => expect(mockActivateStableBalance).toHaveBeenCalledTimes(1))
+      await waitFor(() => expect(mockRefreshStableBalanceActive).toHaveBeenCalledTimes(1))
+    })
+
+    it("clears the marker so it never reactivates twice", async () => {
+      setupPausedByAnon()
+
+      renderHook(() => useAnonStableBalanceDeactivation())
+
+      await waitFor(() => expect(mockUpdateState).toHaveBeenCalledTimes(1))
+
+      const updater = mockUpdateState.mock.calls[0][0]
+      expect(isStableBalanceAnonPaused(updater(mockPersistentState), "sc-1")).toBe(false)
+    })
+
+    /** A user who switched it off themselves left no marker, so nothing may switch it
+     *  back on behind them: activating sweeps their bitcoin and charges a fee. */
+    it("leaves an unmarked account alone", async () => {
+      mockIsAnonMode = false
+      setupWallet({ isStableBalanceActive: false })
+
+      renderHook(() => useAnonStableBalanceDeactivation())
+      await Promise.resolve()
+
+      expect(mockActivateStableBalance).not.toHaveBeenCalled()
+    })
+
+    it("does not reactivate while the mode is still Anon", async () => {
+      mockPersistentState = {
+        ...mockPersistentState,
+        stableBalanceAnonPausedByAccountId: { "sc-1": true },
+      }
+      setupWallet({ isStableBalanceActive: false })
+
+      renderHook(() => useAnonStableBalanceDeactivation())
+      await Promise.resolve()
+
+      expect(mockActivateStableBalance).not.toHaveBeenCalled()
+    })
+
+    it("waits for the balance to settle before reactivating", async () => {
+      setupPausedByAnon()
+      setupWallet({ isStableBalanceActive: false, status: ActiveWalletStatus.Loading })
+
+      renderHook(() => useAnonStableBalanceDeactivation())
+      await Promise.resolve()
+
+      expect(mockActivateStableBalance).not.toHaveBeenCalled()
+    })
+
+    it("reports a failed reactivation instead of clearing the marker", async () => {
+      setupPausedByAnon()
+      mockActivateStableBalance.mockRejectedValue(new Error("sdk down"))
+
+      renderHook(() => useAnonStableBalanceDeactivation())
+
+      await waitFor(() =>
+        expect(mockReportError).toHaveBeenCalledWith(
+          "anon stable balance reactivation",
+          expect.any(Error),
+        ),
+      )
+      expect(mockUpdateState).not.toHaveBeenCalled()
+    })
   })
 })
