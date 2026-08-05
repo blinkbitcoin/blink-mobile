@@ -5,7 +5,7 @@ import { AccountType } from "@app/types/wallet"
 
 import useDeviceLocation, {
   isBlockedCountry,
-  useIpCountryCode,
+  useIpCountryLookup,
 } from "./use-device-location"
 import { useActiveWallet } from "./use-active-wallet"
 
@@ -42,20 +42,27 @@ type RestrictionRegion = {
  * from a still-custodial session an unreachable IP falls back to the session country, so a
  * failed IP lookup does not read as unrestricted and preview a dollar balance the account
  * cannot hold. A country that already resolved settles the region even while the device
- * location keeps loading, since the prediction's IP lookup can land first.
+ * location keeps loading, since the prediction's IP lookup can land first. The prediction
+ * also holds until the IP lookup settles, or a fast phone parse would report
+ * settled-unrestricted and then flip once the IP lands.
  */
 const useRestrictionRegion = (accountTypeOverride?: AccountType): RestrictionRegion => {
   const { countryCode: deviceCountryCode, loading: isDeviceLocationLoading } =
     useDeviceLocation()
 
   const isSelfCustodialPrediction = accountTypeOverride === AccountType.SelfCustodial
-  const ipCountryCode = useIpCountryCode(isSelfCustodialPrediction)
+  const { countryCode: ipCountryCode, isSettled: isIpLookupSettled } = useIpCountryLookup(
+    isSelfCustodialPrediction,
+  )
 
   const countryCode = isSelfCustodialPrediction
     ? ipCountryCode ?? deviceCountryCode
     : deviceCountryCode
 
-  return { countryCode, isPending: isDeviceLocationLoading && !countryCode }
+  const isDeviceRegionPending = isDeviceLocationLoading && !countryCode
+  const isPredictedRegionPending = isSelfCustodialPrediction && !isIpLookupSettled
+
+  return { countryCode, isPending: isDeviceRegionPending || isPredictedRegionPending }
 }
 
 /** `isRestricted` needs a resolved country, so it never accuses an unrestricted user.
