@@ -9,11 +9,19 @@ let mockListPendingDepositsImpl: typeof mockListPendingDeposits | undefined =
   mockListPendingDeposits
 let mockWallets: unknown[] = []
 
-jest.mock("@react-navigation/native", () => ({
-  useFocusEffect: (cb: () => void) => {
-    cb()
-  },
-}))
+/**
+ * Stands in for a screen that is focused from mount onwards: react-navigation
+ * runs the effect in a real useEffect and honours the cleanup it returns, so
+ * the hook's generation guard is exercised the way it is in the app.
+ */
+jest.mock("@react-navigation/native", () => {
+  const ReactActual = jest.requireActual("react")
+  return {
+    useFocusEffect: (effect: () => (() => void) | undefined) => {
+      ReactActual.useEffect(effect, [effect])
+    },
+  }
+})
 
 jest.mock("@app/hooks/use-payments", () => ({
   usePayments: () => ({ listPendingDeposits: mockListPendingDepositsImpl }),
