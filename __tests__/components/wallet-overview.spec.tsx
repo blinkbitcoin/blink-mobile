@@ -168,7 +168,7 @@ describe("WalletOverview", () => {
       const { getByText } = renderOverview()
       await flushEffects()
 
-      expect(getByText("usd-underlying")).toBeTruthy()
+      expect(getByText("usd-underlying", { includeHiddenElements: true })).toBeTruthy()
     })
 
     it("shows the formatted balances by default", async () => {
@@ -187,9 +187,11 @@ describe("WalletOverview", () => {
       await flushEffects()
 
       expect(queryByText("not available in your region")).toBeNull()
-      expect(getByTestId("stablesats-balance")).toBeTruthy()
+      expect(
+        getByTestId("stablesats-balance", { includeHiddenElements: true }),
+      ).toBeTruthy()
 
-      fireEvent.press(getByTestId("stablesats-balance"))
+      fireEvent.press(getByTestId("stablesats-balance", { includeHiddenElements: true }))
       expect(onGatedTap).toHaveBeenCalledTimes(1)
     })
 
@@ -206,7 +208,9 @@ describe("WalletOverview", () => {
       })
       await flushEffects()
 
-      expect(getByText("not available in your region")).toBeTruthy()
+      expect(
+        getByText("not available in your region", { includeHiddenElements: true }),
+      ).toBeTruthy()
     })
 
     it("shows the Anon mode label when the mode is Anon and the balance is empty", async () => {
@@ -222,7 +226,9 @@ describe("WalletOverview", () => {
       })
       await flushEffects()
 
-      expect(getByText("not available in Anon mode")).toBeTruthy()
+      expect(
+        getByText("not available in Anon mode", { includeHiddenElements: true }),
+      ).toBeTruthy()
       expect(queryByText("not available in your region")).toBeNull()
     })
 
@@ -234,9 +240,11 @@ describe("WalletOverview", () => {
       await flushEffects()
 
       expect(queryByText("not available in Anon mode")).toBeNull()
-      expect(getByTestId("stablesats-balance")).toBeTruthy()
+      expect(
+        getByTestId("stablesats-balance", { includeHiddenElements: true }),
+      ).toBeTruthy()
 
-      fireEvent.press(getByTestId("stablesats-balance"))
+      fireEvent.press(getByTestId("stablesats-balance", { includeHiddenElements: true }))
       expect(onGatedTap).toHaveBeenCalledTimes(1)
     })
 
@@ -275,7 +283,7 @@ describe("WalletOverview", () => {
       rerender(overviewTree({ onGatedTap: jest.fn() }))
       await flushEffects()
 
-      expect(getByText("usd-underlying")).toBeTruthy()
+      expect(getByText("usd-underlying", { includeHiddenElements: true })).toBeTruthy()
     })
 
     it("routes the gated dollar tap to onGatedTap in Anon mode", async () => {
@@ -289,7 +297,9 @@ describe("WalletOverview", () => {
       const { getByText } = renderOverview({ wallets: emptyUsdWallets, onGatedTap })
       await flushEffects()
 
-      fireEvent.press(getByText("not available in Anon mode"))
+      fireEvent.press(
+        getByText("not available in Anon mode", { includeHiddenElements: true }),
+      )
 
       expect(onGatedTap).toHaveBeenCalledTimes(1)
       expect(mockNavigate).not.toHaveBeenCalled()
@@ -304,7 +314,7 @@ describe("WalletOverview", () => {
       const { getByText } = renderOverview({ onGatedTap })
       await flushEffects()
 
-      fireEvent.press(getByText("Dollar"))
+      fireEvent.press(getByText("Dollar", { includeHiddenElements: true }))
 
       expect(onGatedTap).not.toHaveBeenCalled()
       expect(mockNavigate).not.toHaveBeenCalled()

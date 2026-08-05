@@ -161,6 +161,10 @@ const WalletOverview: React.FC<Props> = ({
   const isDollarBalanceLoading = loading || isRegionPending
   const isDollarRowInert = isDollarRowUnavailable || isRegionPending
   const onDollarGatedPress = isRegionPending ? undefined : onGatedTap
+  /** Carries the reason, since gating the row hides the label that states it. */
+  const dollarRowAccessibilityLabel = isDollarRowUnavailable
+    ? `${LL.common.dollar()}, ${unavailableLabel}`
+    : LL.common.dollar()
 
   return (
     <View style={styles.container}>
@@ -218,7 +222,11 @@ const WalletOverview: React.FC<Props> = ({
 
       <View style={styles.separator} />
 
-      <DisabledFeature disabled={isDollarRowInert} onDisabledPress={onDollarGatedPress}>
+      <DisabledFeature
+        disabled={isDollarRowInert}
+        onDisabledPress={onDollarGatedPress}
+        accessibilityLabel={dollarRowAccessibilityLabel}
+      >
         <Pressable
           onPressIn={() => setPressedUsd(true)}
           onPressOut={() => setPressedUsd(false)}

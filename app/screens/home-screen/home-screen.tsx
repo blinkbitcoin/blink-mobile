@@ -925,6 +925,7 @@ export const HomeScreen: React.FC = () => {
                 <DisabledFeature
                   disabled={Boolean(item.disabled)}
                   onDisabledPress={item.onDisabledPress}
+                  accessibilityLabel={item.title}
                 >
                   <GaloyIconButton
                     name={item.icon}

@@ -26,7 +26,11 @@ export const StableBalanceSetting: React.FC = () => {
   if (activeAccount?.type !== AccountType.SelfCustodial) return null
 
   return (
-    <DisabledFeature disabled={isAnonMode} onDisabledPress={promptEnhancedMode}>
+    <DisabledFeature
+      disabled={isAnonMode}
+      onDisabledPress={promptEnhancedMode}
+      accessibilityLabel={LL.StableBalance.settingsRowTitle()}
+    >
       <SettingsRow
         title={LL.StableBalance.settingsRowTitle()}
         leftGaloyIcon="dollar"

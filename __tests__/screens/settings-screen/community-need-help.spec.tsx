@@ -77,9 +77,10 @@ describe("NeedHelpSetting", () => {
   it("opens the Enhanced prompt instead of the contact modal in Anon mode", () => {
     mockIsAnonMode = true
 
-    const { getByText } = renderRow()
+    const { getByLabelText } = renderRow()
 
-    fireEvent.press(getByText("Need help? Contact support"))
+    /** The gated row leaves the accessibility tree; the gate stands in for it. */
+    fireEvent.press(getByLabelText("Need help? Contact support"))
 
     expect(mockPromptEnhancedMode).toHaveBeenCalledTimes(1)
     expect(mockContactModal).toHaveBeenLastCalledWith(

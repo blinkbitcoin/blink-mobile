@@ -49,10 +49,18 @@ describe("SettingsGroup", () => {
   it("routes every tap to onDisabledPress when disabled", () => {
     const onDisabledPress = jest.fn()
 
-    const { getByText } = renderGroup({ disabled: true, onDisabledPress })
+    const { getByLabelText } = renderGroup({ disabled: true, onDisabledPress })
 
-    fireEvent.press(getByText("Row A"))
+    /** The gated rows leave the accessibility tree; the gate stands in by name. */
+    fireEvent.press(getByLabelText("Group"))
 
     expect(onDisabledPress).toHaveBeenCalledTimes(1)
+  })
+
+  it("hides its rows from screen readers while the group is disabled", () => {
+    const { queryByText } = renderGroup({ disabled: true, onDisabledPress: jest.fn() })
+
+    expect(queryByText("Row A")).toBeNull()
+    expect(queryByText("Row A", { includeHiddenElements: true })).toBeTruthy()
   })
 })
