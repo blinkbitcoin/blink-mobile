@@ -66,6 +66,21 @@ Then crop both sides with one box:
 It refuses to run when the inputs differ in size, or when the box doesn't fit —
 both of which silently produce a comparison that flatters one side.
 
+## Shooting Both Themes
+
+Designs frequently arrive dark-mode only while the app defaults to light. Shoot
+both and put them side by side rather than asserting the other one works:
+
+```bash
+xcrun simctl ui "$BLINK_UDID" appearance dark
+xcrun simctl terminate "$BLINK_UDID" io.galoy.bitcoinbeach
+xcrun simctl launch "$BLINK_UDID" io.galoy.bitcoinbeach -RCT_jsLocation "localhost:$BLINK_PORT"
+```
+
+A screen built from theme tokens works in both by construction, but "by
+construction" is a claim; a pair of screenshots is evidence. Reviewers of a
+dark-only mock have no other way to see that light mode survived.
+
 ## Comparing Against a Design Mock
 
 Measure, never eyeball. ImageMagick is installed.
@@ -123,7 +138,7 @@ simulated. Caption honestly what was forced.
 | Shooting without waiting for the screen to settle | Splash screen or mid-transition on the PR |
 | Different crop boxes per side | The comparison flatters whichever side was cropped tighter |
 | Shooting the pair on different devices, or one side per platform | Different sizes and chrome; no honest comparison possible |
-| `simctl ui appearance dark` | Doesn't work — Blink themes from its own preference |
+| Assuming `simctl ui appearance dark` never works | It does while the theme preference is `system` (fresh install). It only fails once a preference is set — see the simulator skill |
 | `adb shell screencap -p > file` | Old adb mangles the PNG's line endings — `exec-out` (what capture.sh uses) is the binary-safe channel |
 | Shooting a ScreenGuard screen on Android | A black frame, not the screen |
 | Judging a mock comparison by eye | Misses 15–40% size errors that look fine |
