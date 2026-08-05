@@ -202,7 +202,13 @@ export const useCustodialOnchainFeeTiers = ({
 }: CustodialOnchainFeeTiersParams): CustodialOnchainFeeTiersResult => {
   const [tiers, setTiers] = useState(EMPTY_TIERS)
   const [hasError, setHasError] = useState(false)
-  const [isQuoting, setIsQuoting] = useState(false)
+  /**
+   * Starts true when the inputs are already in hand, because a fetch is then certain to
+   * follow. Starting false would paint one frame of bare tier names with no spinner.
+   */
+  const [isQuoting, setIsQuoting] = useState(() =>
+    Boolean(walletId && address && amount && quote),
+  )
   // Discards stale resolutions when the amount or destination changes mid-flight.
   const requestTokenRef = useRef(0)
 
