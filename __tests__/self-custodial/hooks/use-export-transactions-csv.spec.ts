@@ -165,4 +165,53 @@ describe("useExportSelfCustodialTransactionsCsv", () => {
 
     expect(result.current.loading).toBe(false)
   })
+
+  it("clears loading once the CSV is built, while the share sheet is still pending", async () => {
+    /** A share target can hold the intent open indefinitely (seen with Google Drive on
+     *  an unsynced account); the spinner must not wait for it. */
+    mockShareOpen.mockReturnValue(new Promise(() => {}))
+    const sdk = createSdkStub([completedReceive])
+    mockUseSelfCustodialWallet.mockReturnValue({ sdk })
+    const { result } = renderHook(() => useExportSelfCustodialTransactionsCsv())
+
+    let exportPromise: Promise<boolean> | undefined
+    await act(async () => {
+      exportPromise = result.current.exportCsv()
+      /** Flush the CSV generation microtasks without awaiting the share result. */
+      await new Promise(process.nextTick)
+    })
+
+    expect(mockShareOpen).toHaveBeenCalledTimes(1)
+    expect(result.current.loading).toBe(false)
+    /** The promise itself stays pending: callers that consume the share outcome
+     *  (the migration download screen) still get it once the target resolves. */
+    exportPromise?.catch(() => {})
+  })
+
+  it("clears loading and rejects when CSV generation fails", async () => {
+    const sdk = createSdkStub([completedReceive])
+    sdk.listPayments.mockRejectedValue(new Error("sdk exploded"))
+    mockUseSelfCustodialWallet.mockReturnValue({ sdk })
+    const { result } = renderHook(() => useExportSelfCustodialTransactionsCsv())
+
+    await act(async () => {
+      await expect(result.current.exportCsv()).rejects.toThrow("sdk exploded")
+    })
+
+    expect(result.current.loading).toBe(false)
+    expect(mockShareOpen).not.toHaveBeenCalled()
+  })
+
+  it("rejects when the share sheet itself fails", async () => {
+    mockShareOpen.mockRejectedValue(new Error("share broke"))
+    const sdk = createSdkStub([completedReceive])
+    mockUseSelfCustodialWallet.mockReturnValue({ sdk })
+    const { result } = renderHook(() => useExportSelfCustodialTransactionsCsv())
+
+    await act(async () => {
+      await expect(result.current.exportCsv()).rejects.toThrow("share broke")
+    })
+
+    expect(result.current.loading).toBe(false)
+  })
 })

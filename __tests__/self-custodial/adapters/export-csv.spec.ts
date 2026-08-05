@@ -4,13 +4,7 @@ import {
   PaymentType,
 } from "@breeztech/breez-sdk-spark-react-native"
 
-import { createExportTransactionsCsv } from "@app/self-custodial/adapters/export-csv"
-
-const mockShareCsvBase64 = jest.fn()
-
-jest.mock("@app/utils/share-csv", () => ({
-  shareCsvBase64: (...args: unknown[]) => mockShareCsvBase64(...args),
-}))
+import { createBuildTransactionsCsvBase64 } from "@app/self-custodial/adapters/export-csv"
 
 jest.mock("@app/self-custodial/config", () => ({
   requireSparkTokenIdentifier: () => "test-token-id",
@@ -64,47 +58,37 @@ const createSdkStub = (payments: unknown[]) => ({
   listPayments: jest.fn().mockResolvedValue({ payments }),
 })
 
-const sharedCsv = (): string => {
-  const base64 = mockShareCsvBase64.mock.calls[0][0]
-  return Buffer.from(base64, "base64").toString("utf8")
-}
+const decodeCsv = (base64: string | null): string =>
+  Buffer.from(base64 ?? "", "base64").toString("utf8")
 
-describe("createExportTransactionsCsv", () => {
-  beforeEach(() => {
-    jest.clearAllMocks()
-    mockShareCsvBase64.mockResolvedValue(true)
-  })
-
-  it("builds the CSV from the full history and shares it base64-encoded", async () => {
-    const exportCsv = createExportTransactionsCsv(
+describe("createBuildTransactionsCsvBase64", () => {
+  it("builds a base64 CSV from the full history", async () => {
+    const buildCsv = createBuildTransactionsCsvBase64(
       createSdkStub([completedReceive]) as never,
     )
 
-    await expect(exportCsv()).resolves.toBe(true)
+    const csv = decodeCsv(await buildCsv())
 
-    const csv = sharedCsv()
     expect(csv.startsWith("id,walletId,type,")).toBe(true)
     expect(csv).toContain("keep-1")
     expect(csv).toContain("pubkey123-btc")
   })
 
   it("excludes failed and unknown-token payments", async () => {
-    const exportCsv = createExportTransactionsCsv(
+    const buildCsv = createBuildTransactionsCsvBase64(
       createSdkStub([completedReceive, failedSend, unknownTokenPayment]) as never,
     )
 
-    await exportCsv()
+    const csv = decodeCsv(await buildCsv())
 
-    const csv = sharedCsv()
     expect(csv).toContain("keep-1")
     expect(csv).not.toContain("failed-1")
     expect(csv).not.toContain("unknown-token-1")
   })
 
-  it("resolves false without sharing when nothing is exportable", async () => {
-    const exportCsv = createExportTransactionsCsv(createSdkStub([failedSend]) as never)
+  it("resolves null when nothing is exportable", async () => {
+    const buildCsv = createBuildTransactionsCsvBase64(createSdkStub([failedSend]) as never)
 
-    await expect(exportCsv()).resolves.toBe(false)
-    expect(mockShareCsvBase64).not.toHaveBeenCalled()
+    await expect(buildCsv()).resolves.toBeNull()
   })
 })
