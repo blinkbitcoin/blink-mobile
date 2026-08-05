@@ -353,6 +353,33 @@ describe("state-migrations schema 10", () => {
     expect(result.selfCustodialAccountModeByAccountId).toBeUndefined()
   })
 
+  it("v18 identity migration preserves the stored account modes untouched", async () => {
+    const state18 = {
+      schemaVersion: 18,
+      galoyInstance: { id: "Main" },
+      galoyAuthToken: "token",
+      activeAccountId: "self-custodial-id-1",
+      selfCustodialAccountModeByAccountId: {
+        "self-custodial-id-1": "anon",
+        "self-custodial-id-2": "enhanced",
+      },
+      completedQuizIdsByAccountId: {
+        "self-custodial-id-1": ["whatIsBitcoin", "sat"],
+      },
+    }
+
+    const result = await migrateAndGetPersistentState(state18)
+
+    expect(result.schemaVersion).toBe(18)
+    expect(result.selfCustodialAccountModeByAccountId).toEqual({
+      "self-custodial-id-1": "anon",
+      "self-custodial-id-2": "enhanced",
+    })
+    expect(result.completedQuizIdsByAccountId).toEqual({
+      "self-custodial-id-1": ["whatIsBitcoin", "sat"],
+    })
+  })
+
   it("returns default state for invalid data", async () => {
     const result = await migrateAndGetPersistentState({ schemaVersion: 999 })
 
