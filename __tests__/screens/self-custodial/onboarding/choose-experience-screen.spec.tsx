@@ -8,6 +8,7 @@ import { i18nObject } from "@app/i18n/i18n-util"
 import { IconHero } from "@app/components/icon-hero"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { ChooseExperienceScreen } from "@app/screens/self-custodial/onboarding/choose-experience-screen"
+import { PersistentStateContext } from "@app/store/persistent-state"
 import { AccountMode } from "@app/types/account"
 
 import { ContextForScreen } from "../../helper"
@@ -56,6 +57,30 @@ const renderScreen = async () => {
   const utils = render(
     <ContextForScreen>
       <ChooseExperienceScreen />
+    </ContextForScreen>,
+  )
+  await flushEffects()
+  return utils
+}
+
+/** Seeds the map a seeding implementation would read, overriding the helper's provider. */
+const renderScreenWithStoredMode = async (accountId: string, mode: AccountMode) => {
+  const utils = render(
+    <ContextForScreen>
+      <PersistentStateContext.Provider
+        value={{
+          persistentState: {
+            schemaVersion: 17,
+            galoyInstance: { id: "Main" },
+            galoyAuthToken: "",
+            selfCustodialAccountModeByAccountId: { [accountId]: mode },
+          },
+          updateState: () => {},
+          resetState: () => {},
+        }}
+      >
+        <ChooseExperienceScreen />
+      </PersistentStateContext.Provider>
     </ContextForScreen>,
   )
   await flushEffects()
@@ -133,6 +158,21 @@ describe("ChooseExperienceScreen", () => {
     fireEvent.press(getByTestId(continueTestId))
 
     expect(mockNavigate).toHaveBeenCalledWith("accountMigrationBalancesOverview")
+  })
+
+  /** Pins today's behavior: the screen takes a fresh choice on every entry and never
+   *  consults the stored mode, so re-entering for an account that already chose Anon
+   *  overwrites it with Enhanced on a single Continue. This expectation flips if the
+   *  selection is ever seeded from the stored mode. */
+  it("preselects Enhanced even when the account already has a stored mode", async () => {
+    const { getByTestId } = await renderScreenWithStoredMode(
+      "sc-account-1",
+      AccountMode.Anon,
+    )
+
+    fireEvent.press(getByTestId(continueTestId))
+
+    expect(mockSetAccountMode).toHaveBeenCalledWith("sc-account-1", AccountMode.Enhanced)
   })
 
   it("carries the mode through terms without storing it when the account is new", async () => {
