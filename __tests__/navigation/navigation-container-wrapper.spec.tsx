@@ -26,13 +26,48 @@ let mockBlockerVisible = false
 /** The navigationRef is module-level, so the container ref is stubbed to observe reset()
  *  and the container itself just renders its children (its onReady is not needed: the same
  *  reset runs from the mid-session effect, which fires on mount once isReady() is true). */
-jest.mock("@react-navigation/native", () => ({
-  ...jest.requireActual("@react-navigation/native"),
-  createNavigationContainerRef: () => ({
-    reset: (...args: unknown[]) => mockReset(...args),
-    isReady: () => true,
-  }),
-  NavigationContainer: ({ children }: { children?: React.ReactNode }) => children ?? null,
+jest.mock("@react-navigation/native", () => {
+  const ReactActual = jest.requireActual("react")
+  return {
+    ...jest.requireActual("@react-navigation/native"),
+    createNavigationContainerRef: () => ({
+      reset: (...args: unknown[]) => mockReset(...args),
+      isReady: () => true,
+    }),
+    /** Stands in for the real container: renders children and fires onReady once,
+     *  which is where the boot-splash hide is wired. */
+    NavigationContainer: ({
+      children,
+      onReady,
+    }: {
+      children?: React.ReactNode
+      onReady?: () => void
+    }) => {
+      const hasFiredRef = ReactActual.useRef(false)
+      ReactActual.useEffect(() => {
+        if (hasFiredRef.current) return
+        hasFiredRef.current = true
+        onReady?.()
+      }, [onReady])
+      return children ?? null
+    },
+  }
+})
+
+/** Hand-driven gate so a test can hold the splash and release it on demand. */
+let releaseBootSplashGate: () => void = () => {}
+const mockWhenReleased = jest.fn(
+  () =>
+    new Promise<void>((resolve) => {
+      releaseBootSplashGate = resolve
+    }),
+)
+jest.mock("@app/navigation/boot-splash-gate", () => ({
+  bootSplashGate: {
+    hold: jest.fn(),
+    release: jest.fn(),
+    whenReleased: () => mockWhenReleased(),
+  },
 }))
 
 jest.mock("@app/screens/account-migration/hooks/use-migration-blocker", () => ({
@@ -59,7 +94,8 @@ jest.mock("@rn-vui/themed", () => ({
 
 import * as React from "react"
 import { Text } from "react-native"
-import { render, screen, waitFor } from "@testing-library/react-native"
+import { act, render, screen, waitFor } from "@testing-library/react-native"
+import RNBootSplash from "react-native-bootsplash"
 
 import { Action } from "@app/components/actions"
 import {
@@ -171,6 +207,32 @@ const LockStateProbe: React.FC = () => {
   }, [setAppUnlocked])
   return <Text testID="lock-state">{isAppLocked ? "locked" : "unlocked"}</Text>
 }
+
+describe("NavigationContainerWrapper boot splash", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockBlockerVisible = false
+  })
+
+  /** A restricted custodial verdict replaces the whole session with the full-screen
+   *  block, so revealing Home before the gate releases would flash it first. */
+  it("defers hiding the boot splash until the gate releases", async () => {
+    render(
+      <NavigationContainerWrapper>
+        <Text testID="child">child</Text>
+      </NavigationContainerWrapper>,
+    )
+
+    await waitFor(() => expect(mockWhenReleased).toHaveBeenCalled())
+    expect(RNBootSplash.hide).not.toHaveBeenCalled()
+
+    await act(async () => {
+      releaseBootSplashGate()
+    })
+
+    expect(RNBootSplash.hide).toHaveBeenCalledWith({ fade: true })
+  })
+})
 
 describe("NavigationContainerWrapper armed-gate reset", () => {
   beforeEach(() => {
