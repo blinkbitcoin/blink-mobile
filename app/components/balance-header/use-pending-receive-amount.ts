@@ -1,10 +1,6 @@
 import { useMemo } from "react"
 
-import {
-  TransactionFragment,
-  TxDirection,
-  WalletCurrency,
-} from "@app/graphql/generated"
+import { TransactionFragment, TxDirection, WalletCurrency } from "@app/graphql/generated"
 import { usePriceConversion } from "@app/hooks"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
