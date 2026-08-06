@@ -182,7 +182,7 @@ export const useSdkLifecycle = (
     // everything); each iteration serves the waiters registered before it
     // started, and anyone arriving mid-iteration re-arms pendingRefreshRef to
     // be served by the next.
-    void (async () => {
+    ;(async () => {
       try {
         do {
           const waiters = refreshWaitersRef.current

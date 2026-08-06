@@ -611,7 +611,9 @@ describe("useSdkLifecycle", () => {
       await finishIteration() // iteration 2 completes → the pull settles
       expect(pullSettled).toBe(true)
       // The loop is still draining the third caller.
-      expect(pendingSnapshots.length + mockGetSnapshot.mock.calls.length).toBeGreaterThan(0)
+      expect(pendingSnapshots.length + mockGetSnapshot.mock.calls.length).toBeGreaterThan(
+        0,
+      )
 
       await finishIteration() // let iteration 3 finish cleanly
     })
