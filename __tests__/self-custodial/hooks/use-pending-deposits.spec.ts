@@ -143,6 +143,66 @@ describe("usePendingDeposits", () => {
     expect(result.current.deposits[0].status).toBe(DepositStatus.Claimable)
   })
 
+  it("fetches once on mount (the focus effect owns the mount fetch)", async () => {
+    mockListPendingDeposits.mockResolvedValue({ deposits: [] })
+
+    renderHook(() => usePendingDeposits())
+    await flush()
+
+    expect(mockListPendingDeposits).toHaveBeenCalledTimes(1)
+  })
+
+  it("clears the deposits when the adapter disappears (account switch / SDK teardown)", async () => {
+    mockListPendingDeposits.mockResolvedValue({ deposits: [deposit()] })
+
+    const { result, rerender } = renderHook(() => usePendingDeposits())
+    await flush()
+    expect(result.current.deposits).toEqual([deposit()])
+
+    mockListPendingDepositsImpl = undefined
+    rerender({})
+    await flush()
+
+    expect(result.current.deposits).toEqual([])
+  })
+
+  it("ignores an in-flight listing that resolves after the adapter disappears", async () => {
+    let resolveListing: (value: { deposits: PendingDeposit[] }) => void = () => {}
+    mockListPendingDeposits.mockReturnValue(
+      new Promise<{ deposits: PendingDeposit[] }>((resolve) => {
+        resolveListing = resolve
+      }),
+    )
+
+    const { result, rerender } = renderHook(() => usePendingDeposits())
+
+    mockListPendingDepositsImpl = undefined
+    rerender({})
+    await flush()
+    expect(result.current.deposits).toEqual([])
+
+    act(() => {
+      resolveListing({ deposits: [deposit()] })
+    })
+    await flush()
+
+    expect(result.current.deposits).toEqual([])
+  })
+
+  it("exposes refetch, resolving after the fresh listing is committed", async () => {
+    mockListPendingDeposits.mockResolvedValue({ deposits: [] })
+
+    const { result } = renderHook(() => usePendingDeposits())
+    await flush()
+
+    mockListPendingDeposits.mockResolvedValue({ deposits: [deposit()] })
+    await act(async () => {
+      await result.current.refetch()
+    })
+
+    expect(result.current.deposits).toEqual([deposit()])
+  })
+
   it("ignores a stale fetch that resolves after a newer one started", async () => {
     let resolveStale: (value: { deposits: PendingDeposit[] }) => void = () => {}
     const stale = new Promise<{ deposits: PendingDeposit[] }>((resolve) => {
