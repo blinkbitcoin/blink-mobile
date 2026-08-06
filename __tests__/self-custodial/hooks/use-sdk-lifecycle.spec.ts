@@ -553,6 +553,78 @@ describe("useSdkLifecycle", () => {
       })
       expect(result.current.status).toBe(ActiveWalletStatus.Ready)
     })
+
+    it("hands overlapping callers the in-flight run's completion (pull-to-refresh must not retract early)", async () => {
+      mockInitSdk.mockResolvedValue(buildSdk("sdk-1"))
+      captureListener()
+      mockGetSnapshot.mockResolvedValue({
+        wallets: [],
+        hasMore: false,
+        rawTransactionCount: 0,
+      })
+
+      const { result } = renderHook(() => useSdkLifecycle("acct-1", 0))
+      await waitFor(() => {
+        expect(result.current.status).toBe(ActiveWalletStatus.Ready)
+      })
+
+      type Snapshot = {
+        wallets: unknown[]
+        hasMore: boolean
+        rawTransactionCount: number
+      }
+      const emptySnapshot: Snapshot = {
+        wallets: [],
+        hasMore: false,
+        rawTransactionCount: 0,
+      }
+      let resolveSnapshot: (value: Snapshot) => void = () => {}
+      mockGetSnapshot.mockImplementation(
+        () =>
+          new Promise((resolve) => {
+            resolveSnapshot = resolve
+          }),
+      )
+
+      let firstSettled = false
+      let secondSettled = false
+      let first: Promise<void> = Promise.resolve()
+      let second: Promise<void> = Promise.resolve()
+      act(() => {
+        first = result.current.refreshWallets().then(() => {
+          firstSettled = true
+        })
+        second = result.current.refreshWallets().then(() => {
+          secondSettled = true
+        })
+      })
+
+      await act(async () => {
+        await new Promise<void>((r) => {
+          setImmediate(r)
+        })
+      })
+      // The overlapping call must not resolve before any snapshot landed.
+      expect(secondSettled).toBe(false)
+
+      // The queued rerun issues a second snapshot fetch; drain both.
+      await act(async () => {
+        resolveSnapshot(emptySnapshot)
+        await new Promise<void>((r) => {
+          setImmediate(r)
+        })
+        resolveSnapshot(emptySnapshot)
+        await new Promise<void>((r) => {
+          setImmediate(r)
+        })
+      })
+
+      await act(async () => {
+        await Promise.all([first, second])
+      })
+      expect(firstSettled).toBe(true)
+      expect(secondSettled).toBe(true)
+    })
   })
 
   describe("offline / degraded transitions", () => {

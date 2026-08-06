@@ -93,6 +93,7 @@ export const useSdkLifecycle = (
   const abortRef = useRef(false)
   const refreshingRef = useRef(false)
   const pendingRefreshRef = useRef(false)
+  const inflightRefreshRef = useRef<Promise<void> | null>(null)
   const rawTxOffsetRef = useRef(0)
   /**
    * The leeway only feeds the SDK config at connect time, so hold it in a ref:
@@ -105,14 +106,20 @@ export const useSdkLifecycle = (
 
   // `refreshingRef` linearizes concurrent refreshes (10s poll, AppState change,
   // SDK events): only one runOnce executes at a time, and any overlapping call
-  // sets `pendingRefreshRef` so the in-flight loop reruns once it returns. The
-  // two require-atomic-updates disables below (post-await ref writes) are safe
+  // sets `pendingRefreshRef` so the in-flight loop reruns once it returns —
+  // overlapping callers await that loop via `inflightRefreshRef`. The
+  // require-atomic-updates disables below (post-await ref writes) are safe
   // under that invariant.
   const refreshWallets = useCallback(async () => {
     const sdk = sdkRef.current
     if (!sdk) return
     if (refreshingRef.current) {
       pendingRefreshRef.current = true
+      // The in-flight do/while below reruns while pendingRefreshRef is set, so
+      // its completion also covers this queued refresh — hand the caller that
+      // promise instead of resolving before any data landed (pull-to-refresh
+      // would retract its spinner on stale values otherwise).
+      await inflightRefreshRef.current
       return
     }
     refreshingRef.current = true
@@ -164,14 +171,19 @@ export const useSdkLifecycle = (
       }
     }
 
-    try {
-      do {
-        pendingRefreshRef.current = false
-        await runOnce()
-      } while (pendingRefreshRef.current)
-    } finally {
-      refreshingRef.current = false // eslint-disable-line require-atomic-updates
-    }
+    const run = (async () => {
+      try {
+        do {
+          pendingRefreshRef.current = false
+          await runOnce()
+        } while (pendingRefreshRef.current)
+      } finally {
+        refreshingRef.current = false // eslint-disable-line require-atomic-updates
+        inflightRefreshRef.current = null // eslint-disable-line require-atomic-updates
+      }
+    })()
+    inflightRefreshRef.current = run
+    await run
   }, [resetBackoff, scheduleBackoffRetry])
 
   useEffect(() => {
