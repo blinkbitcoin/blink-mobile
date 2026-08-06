@@ -27,6 +27,12 @@ jest.mock("@app/hooks/use-payments", () => ({
   usePayments: () => ({ listPendingDeposits: mockListPendingDepositsImpl }),
 }))
 
+let mockActiveAccount: { id: string } | null = { id: "acct-1" }
+
+jest.mock("@app/hooks/use-account-registry", () => ({
+  useAccountRegistry: () => ({ activeAccount: mockActiveAccount }),
+}))
+
 jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () => ({ wallets: mockWallets }),
 }))
@@ -51,6 +57,7 @@ describe("usePendingDeposits", () => {
     jest.clearAllMocks()
     mockListPendingDepositsImpl = mockListPendingDeposits
     mockWallets = []
+    mockActiveAccount = { id: "acct-1" }
   })
 
   it("returns the fetched deposits", async () => {
@@ -152,13 +159,31 @@ describe("usePendingDeposits", () => {
     expect(mockListPendingDeposits).toHaveBeenCalledTimes(1)
   })
 
-  it("clears the deposits when the adapter disappears (account switch / SDK teardown)", async () => {
+  it("keeps the deposits through a same-account SDK teardown (transient adapter loss)", async () => {
     mockListPendingDeposits.mockResolvedValue({ deposits: [deposit()] })
 
     const { result, rerender } = renderHook(() => usePendingDeposits())
     await flush()
     expect(result.current.deposits).toEqual([deposit()])
 
+    // Spark-network flip / manual retry: the lifecycle effect nulls the sdk and
+    // empties the wallets while the SAME account reconnects.
+    mockListPendingDepositsImpl = undefined
+    mockWallets = []
+    rerender({})
+    await flush()
+
+    expect(result.current.deposits).toEqual([deposit()])
+  })
+
+  it("clears the deposits when the active account changes", async () => {
+    mockListPendingDeposits.mockResolvedValue({ deposits: [deposit()] })
+
+    const { result, rerender } = renderHook(() => usePendingDeposits())
+    await flush()
+    expect(result.current.deposits).toEqual([deposit()])
+
+    mockActiveAccount = { id: "acct-2" }
     mockListPendingDepositsImpl = undefined
     rerender({})
     await flush()
@@ -200,6 +225,59 @@ describe("usePendingDeposits", () => {
       await result.current.refetch()
     })
 
+    expect(result.current.deposits).toEqual([deposit()])
+  })
+
+  it("refetch converges on a superseding listing before resolving", async () => {
+    mockListPendingDeposits.mockResolvedValue({ deposits: [] })
+
+    const { result, rerender } = renderHook(() => usePendingDeposits())
+    await flush()
+
+    // First explicit refetch listing, deferred.
+    let resolveFirst: (value: { deposits: PendingDeposit[] }) => void = () => {}
+    mockListPendingDeposits.mockReturnValueOnce(
+      new Promise<{ deposits: PendingDeposit[] }>((resolve) => {
+        resolveFirst = resolve
+      }),
+    )
+    // The superseding listing (fired by the wallets refresh), also deferred.
+    let resolveSecond: (value: { deposits: PendingDeposit[] }) => void = () => {}
+    mockListPendingDeposits.mockReturnValueOnce(
+      new Promise<{ deposits: PendingDeposit[] }>((resolve) => {
+        resolveSecond = resolve
+      }),
+    )
+
+    let refetchSettled = false
+    let refetchPromise: Promise<void> = Promise.resolve()
+    act(() => {
+      refetchPromise = result.current.refetch().then(() => {
+        refetchSettled = true
+      })
+    })
+
+    // A wallet refresh lands mid-listing and supersedes the refetch's fetch.
+    mockWallets = [{ id: "refreshed" }]
+    rerender({})
+    await flush()
+
+    act(() => {
+      resolveFirst({ deposits: [deposit({ id: "stale:0", txid: "stale" })] })
+    })
+    await flush()
+    // The superseded listing was discarded — refetch must keep waiting.
+    expect(refetchSettled).toBe(false)
+    expect(result.current.deposits).toEqual([])
+
+    act(() => {
+      resolveSecond({ deposits: [deposit()] })
+    })
+    await act(async () => {
+      await refetchPromise
+    })
+
+    expect(refetchSettled).toBe(true)
     expect(result.current.deposits).toEqual([deposit()])
   })
 

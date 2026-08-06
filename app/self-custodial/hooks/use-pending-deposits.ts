@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react"
 
 import { useFocusEffect } from "@react-navigation/native"
 
+import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { usePayments } from "@app/hooks/use-payments"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { type PendingDeposit } from "@app/types/payment"
@@ -27,6 +28,8 @@ export const usePendingDeposits = (): {
   refetch: () => Promise<void>
 } => {
   const { listPendingDeposits } = usePayments()
+  const { activeAccount } = useAccountRegistry()
+  const activeAccountId = activeAccount?.id
   // Wallet refreshes proxy the SDK's deposit events (ClaimedDeposits /
   // NewDeposits land as wallet refreshes), so they drive the re-fetch below.
   const { wallets } = useSelfCustodialWallet()
@@ -34,31 +37,60 @@ export const usePendingDeposits = (): {
   // Coordinates concurrent fetches (focus + wallet-refresh + pull-to-refresh)
   // so only the latest in-flight resolution commits state.
   const fetchGenerationRef = useRef(0)
+  // The most recently issued listing; refetch converges on it so a caller
+  // resolves only after a listing nothing newer has superseded.
+  const latestFetchRef = useRef<Promise<void>>(Promise.resolve())
 
-  const fetchDeposits = useCallback(async (): Promise<void> => {
-    // Every call invalidates older in-flight listings — including one that is
-    // still resolving when the adapter has just vanished.
-    fetchGenerationRef.current += 1
+  const fetchDeposits = useCallback((): Promise<void> => {
+    const fetch = (async (): Promise<void> => {
+      // Every call invalidates older in-flight listings — including one that
+      // is still resolving when the adapter has just vanished.
+      fetchGenerationRef.current += 1
 
-    if (!listPendingDeposits) {
-      // The adapter disappears on account switch or SDK teardown: stale
-      // deposits must not linger beside another account's balance.
-      setDeposits((prev) => (prev.length === 0 ? prev : []))
-      return
-    }
+      // The adapter also vanishes on a same-account SDK teardown (spark-network
+      // change, reconnect): keep the last known deposits — clearing here made
+      // the pill and banner flash on every reconnect. The account-switch
+      // effect below owns the reset.
+      if (!listPendingDeposits) return
 
-    const generation = fetchGenerationRef.current
-    const { deposits: fetched, errors } = await listPendingDeposits()
-    if (generation !== fetchGenerationRef.current) return
-    // A failed listing resolves with an empty array plus `errors` rather than
-    // rejecting. Committing it would read as "the deposit confirmed", so an
-    // untrusted listing keeps the last known deposits. Tradeoff: nothing
-    // retries and no error surfaces — the stale list stands until the next
-    // focus / wallet-refresh / pull-to-refresh fetch, and only adapter loss
-    // (above) resets it.
-    if (errors?.length) return
-    setDeposits((prev) => (sameDeposits(prev, fetched) ? prev : fetched))
+      const generation = fetchGenerationRef.current
+      const { deposits: fetched, errors } = await listPendingDeposits()
+      if (generation !== fetchGenerationRef.current) return
+      // A failed listing resolves with an empty array plus `errors` rather
+      // than rejecting. Committing it would read as "the deposit confirmed",
+      // so an untrusted listing keeps the last known deposits. Tradeoff:
+      // nothing retries and no error surfaces — the stale list stands until
+      // the next focus / wallet-refresh / pull-to-refresh fetch, and only an
+      // account switch resets it.
+      if (errors?.length) return
+      setDeposits((prev) => (sameDeposits(prev, fetched) ? prev : fetched))
+    })()
+    latestFetchRef.current = fetch
+    return fetch
   }, [listPendingDeposits])
+
+  const refetch = useCallback(async (): Promise<void> => {
+    await fetchDeposits()
+    // A wallet refresh landing mid-listing supersedes it (generation bump), so
+    // the awaited listing may have been discarded. Settle only once the latest
+    // listing has run to completion, so pull-to-refresh retracts on the values
+    // that actually rendered.
+    for (;;) {
+      const latest = latestFetchRef.current
+      await latest
+      if (latestFetchRef.current === latest) return
+    }
+  }, [fetchDeposits])
+
+  // Stale deposits must not follow the user across accounts: reset state and
+  // invalidate anything in flight the moment the active account changes.
+  const lastAccountRef = useRef(activeAccountId)
+  useEffect(() => {
+    if (lastAccountRef.current === activeAccountId) return
+    lastAccountRef.current = activeAccountId
+    fetchGenerationRef.current += 1
+    setDeposits((prev) => (prev.length === 0 ? prev : []))
+  }, [activeAccountId])
 
   // The focus effect owns the mount fetch and re-fires when the adapter
   // changes; it also covers the user returning from the unclaimed-deposits
@@ -83,5 +115,5 @@ export const usePendingDeposits = (): {
     fetchDeposits()
   }, [fetchDeposits, wallets])
 
-  return { deposits, refetch: fetchDeposits }
+  return { deposits, refetch }
 }
