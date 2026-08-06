@@ -27,8 +27,9 @@ const NO_DEPOSITS: readonly PendingDeposit[] = []
  * settlement time), so the pill sums the same source — otherwise the two
  * indicators show different numbers for the same receive. Returns null when any
  * transaction lacks a usable display amount or the display currencies disagree;
- * the caller then falls back to live-rate conversion, mirroring the badge's
- * own fallback in use-unseen-tx-amount-badge.ts.
+ * the caller then falls back to live-rate conversion. (The badge's own
+ * fallback formats the raw wallet amount instead, so the two can differ there
+ * — an edge the schema makes rare: settlementDisplayAmount is non-nullable.)
  */
 const sumSettlementDisplayAmounts = (
   txs: readonly TransactionFragment[],
@@ -64,9 +65,10 @@ export const usePendingReceiveAmount = ({
   const { convertMoneyAmount } = usePriceConversion()
   const { activeAccount } = useAccountRegistry()
   // Branch on the account type alone (same predicate as use-price-conversion):
-  // `useActiveWallet().isSelfCustodial` also encodes SDK readiness, so it is
-  // false while the Spark SDK connects — and the custodial account's pending
-  // receives would leak in beside the self-custodial balance.
+  // `useActiveWallet().isSelfCustodial` also encodes SDK availability, so it
+  // is false during the Unavailable renders at cold start / right after an
+  // account switch — exactly when the custodial account's pending receives
+  // would leak in beside the self-custodial balance.
   const isSelfCustodialAccount = activeAccount?.type === AccountType.SelfCustodial
 
   // Until the currency list resolves the preferred display currency (cold
