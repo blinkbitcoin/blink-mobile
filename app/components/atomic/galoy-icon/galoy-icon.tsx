@@ -110,7 +110,23 @@ import DonationButton from "@app/assets/icons-redesign/donation-button.svg"
 import Woocommerce from "@app/assets/icons-redesign/woocommerce.svg"
 import CaretUpCircle from "@app/assets/icons-redesign/caret-up-circle.svg"
 import Limits from "@app/assets/icons-redesign/limits.svg"
-
+import Calculator from "@app/assets/icons-redesign/calculator.svg"
+import DocumentSvg from "@app/assets/icons-redesign/document.svg"
+import KeySvg from "@app/assets/icons-redesign/key.svg"
+import HouseSvg from "@app/assets/icons-redesign/house-outline.svg"
+import Headset from "@app/assets/icons-redesign/headset.svg"
+import Gps from "@app/assets/icons-redesign/gps.svg"
+import Plus from "@app/assets/icons-redesign/plus.svg"
+import People2 from "@app/assets/icons-redesign/people2.svg"
+import List from "@app/assets/icons-redesign/list.svg"
+import CheckFuzzyCircle from "@app/assets/icons-redesign/check-fuzzy-circle.svg"
+import Pin from "@app/assets/icons-redesign/pin.svg"
+import Clock from "@app/assets/icons-redesign/clock.svg"
+import Phone from "@app/assets/icons-redesign/phone.svg"
+import Web from "@app/assets/icons-redesign/web.svg"
+import ArrowRightTurn from "@app/assets/icons-redesign/arrow-right-turn.svg"
+import ThumbsUp from "@app/assets/icons-redesign/thumbs-up.svg"
+import ThumbsDown from "@app/assets/icons-redesign/thumbs-down.svg"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
 // ── Size presets ────────────────────────────────────────────────────────────
@@ -242,6 +258,23 @@ const customSvgMap = {
   "woocommerce": Woocommerce,
   "caret-up-circle": CaretUpCircle,
   "limits": Limits,
+  "calculator": Calculator,
+  "document-outline": DocumentSvg,
+  "key-outline": KeySvg,
+  "house-outline": HouseSvg,
+  "headset": Headset,
+  "plus": Plus,
+  "people-2": People2,
+  "list": List,
+  "gps": Gps,
+  "check-fuzzy-circle": CheckFuzzyCircle,
+  "pin": Pin,
+  "clock": Clock,
+  "phone": Phone,
+  "web": Web,
+  "arrow-right-turn": ArrowRightTurn,
+  "thumbs-up": ThumbsUp,
+  "thumbs-down": ThumbsDown,
 } as const
 
 export const icons = { ...phosphorIconMap, ...customSvgMap } as const
