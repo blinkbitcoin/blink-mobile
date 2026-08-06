@@ -16,7 +16,14 @@ let mockLockLoading = false
 let mockLockError = false
 const mockRefetchLock = jest.fn()
 let mockCheckpointLoading = false
+let mockCheckpointError = false
+const mockRefetchCheckpoint = jest.fn()
+let mockHasResumableCheckpoint = true
 const mockNavigateToCheckpoint = jest.fn()
+let mockReusablePendingAccountId: string | null = null
+let mockPendingWalletLoading = false
+let mockPendingWalletError = false
+const mockRefetchPendingWallet = jest.fn()
 const mockUseTransferBlocked = jest.fn()
 const mockUseDollarBalanceRestricted = jest.fn()
 const mockUseWalletOverviewScreenQuery = jest.fn()
@@ -117,6 +124,18 @@ jest.mock("@app/screens/account-migration/hooks", () => ({
   useMigrationCheckpoint: () => ({
     navigateToCheckpoint: mockNavigateToCheckpoint,
     loading: mockCheckpointLoading,
+    hasError: mockCheckpointError,
+    refetch: mockRefetchCheckpoint,
+    hasResumableCheckpoint: mockHasResumableCheckpoint,
+  }),
+}))
+
+jest.mock("@app/screens/account-migration/hooks/use-reusable-pending-wallet", () => ({
+  useReusablePendingWallet: () => ({
+    reusablePendingAccountId: mockReusablePendingAccountId,
+    loading: mockPendingWalletLoading,
+    hasError: mockPendingWalletError,
+    refetch: mockRefetchPendingWallet,
   }),
 }))
 
@@ -208,7 +227,10 @@ jest.mock("@app/components/atomic/galoy-icon", () => ({
 
 jest.mock("@app/utils/error-logging", () => ({
   ...jest.requireActual("@app/utils/error-logging"),
-  reportError: (operation: string, err: unknown) => mockReportError(operation, err),
+  reportError: (operation: string, err: unknown, options?: unknown) =>
+    options === undefined
+      ? mockReportError(operation, err)
+      : mockReportError(operation, err, options),
 }))
 
 describe("MigrationGate", () => {
@@ -221,6 +243,11 @@ describe("MigrationGate", () => {
     mockLockLoading = false
     mockLockError = false
     mockCheckpointLoading = false
+    mockCheckpointError = false
+    mockHasResumableCheckpoint = true
+    mockReusablePendingAccountId = null
+    mockPendingWalletLoading = false
+    mockPendingWalletError = false
     mockUseActiveApiKeys.mockReturnValue(apiKeysState())
     mockUseTransferBlocked.mockReturnValue(false)
     mockUseDollarBalanceRestricted.mockReturnValue(false)
@@ -615,6 +642,154 @@ describe("MigrationGate", () => {
     expect(mockRequiredScreen).toHaveBeenCalledWith(
       expect.objectContaining({ mode: "forcedPreDeadline", isExitBlocked: true }),
     )
+  })
+
+  /** A locked account with nothing to resume and no wallet to reuse would restart at the
+   *  explainer and provision a fresh orphan every crash-reinstall cycle (#4070); only
+   *  support can release the server-side lock, so the gate hands over instead. */
+  it("hands a locked migration with nothing to resume over to support", () => {
+    mockIsMigrationLocked = true
+    mockHasResumableCheckpoint = false
+
+    render(<MigrationGate />)
+
+    expect(mockNavigate).toHaveBeenCalledTimes(1)
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
+      reason: "locked-without-checkpoint",
+      origin: "gate",
+    })
+    expect(mockNavigateToCheckpoint).not.toHaveBeenCalled()
+    expect(mockRequiredScreen).not.toHaveBeenCalled()
+  })
+
+  it("records the lockout once when handing over to support", () => {
+    mockIsMigrationLocked = true
+    mockHasResumableCheckpoint = false
+
+    render(<MigrationGate />)
+
+    expect(mockReportError).toHaveBeenCalledTimes(1)
+    expect(mockReportError).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.any(Error),
+      expect.objectContaining({
+        dedupKey: "migration-locked-without-checkpoint",
+        alwaysRecord: true,
+      }),
+    )
+  })
+
+  /** A crash or 48h checkpoint expiry without a reinstall keeps the pending record and its
+   *  wallet: the restart at the explainer reuses that wallet, so no handover is needed. */
+  it("restarts a locked migration normally when a provisioned wallet is still reusable", () => {
+    mockIsMigrationLocked = true
+    mockHasResumableCheckpoint = false
+    mockReusablePendingAccountId = "sc-account-1"
+
+    render(<MigrationGate />)
+
+    expect(mockNavigateToCheckpoint).toHaveBeenCalledTimes(1)
+    expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  it("waits for the pending-wallet read before deciding between resume and handover", () => {
+    mockIsMigrationLocked = true
+    mockHasResumableCheckpoint = false
+    mockPendingWalletLoading = true
+
+    render(<MigrationGate />)
+
+    expect(mockNavigateToCheckpoint).not.toHaveBeenCalled()
+    expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  it("hands over to support only once per mount", () => {
+    mockIsMigrationLocked = true
+    mockHasResumableCheckpoint = false
+
+    const { rerender } = render(<MigrationGate />)
+    rerender(<MigrationGate />)
+
+    expect(mockNavigate).toHaveBeenCalledTimes(1)
+  })
+
+  /** A failed checkpoint read is indistinguishable from a wiped device by its data alone,
+   *  and reading it as one would hand a resumable user to terminal support; the gate
+   *  blocks with a retry instead, the same treatment its network reads get. */
+  it("shows a retry instead of handing over when the checkpoint read fails while locked", () => {
+    mockIsMigrationLocked = true
+    mockHasResumableCheckpoint = false
+    mockCheckpointError = true
+
+    const { getByTestId } = render(<MigrationGate />)
+
+    expect(getByTestId("gate-retry-button")).toBeTruthy()
+    expect(mockNavigate).not.toHaveBeenCalled()
+    expect(mockNavigateToCheckpoint).not.toHaveBeenCalled()
+    expect(mockReportError).not.toHaveBeenCalled()
+  })
+
+  it("shows a retry instead of handing over when the pending-wallet read fails while locked", () => {
+    mockIsMigrationLocked = true
+    mockHasResumableCheckpoint = false
+    mockPendingWalletError = true
+
+    const { getByTestId } = render(<MigrationGate />)
+
+    expect(getByTestId("gate-retry-button")).toBeTruthy()
+    expect(mockNavigate).not.toHaveBeenCalled()
+    expect(mockNavigateToCheckpoint).not.toHaveBeenCalled()
+  })
+
+  /** The once-per-mount claim must not be spent while the reads are in error: a retry that
+   *  then succeeds still owes the user its resume-or-handover decision. */
+  it("still decides after a retry recovers from a failed checkpoint read", () => {
+    mockIsMigrationLocked = true
+    mockHasResumableCheckpoint = false
+    mockCheckpointError = true
+
+    const { rerender } = render(<MigrationGate />)
+    expect(mockNavigate).not.toHaveBeenCalled()
+
+    mockCheckpointError = false
+    rerender(<MigrationGate />)
+
+    expect(mockNavigate).toHaveBeenCalledTimes(1)
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
+      reason: "locked-without-checkpoint",
+      origin: "gate",
+    })
+  })
+
+  it("refetches the local reads too when the retry button is pressed", async () => {
+    mockIsMigrationLocked = true
+    mockCheckpointError = true
+    mockUseActiveApiKeys.mockReturnValue(
+      apiKeysState({ refetch: jest.fn().mockResolvedValue(undefined) }),
+    )
+    mockUseWalletOverviewScreenQuery.mockReturnValue({
+      ...walletOverviewQueryResult({ usdBalance: 0 }),
+      refetch: jest.fn().mockResolvedValue(undefined),
+    })
+
+    const { getByTestId } = render(<MigrationGate />)
+    fireEvent.press(getByTestId("gate-retry-button"))
+    await act(async () => {})
+
+    expect(mockRefetchCheckpoint).toHaveBeenCalledTimes(1)
+    expect(mockRefetchPendingWallet).toHaveBeenCalledTimes(1)
+  })
+
+  /** The local reads only feed the locked resume-or-handover decision, so their failure
+   *  must not block an unlocked entry the way a failed lock or balance read does. */
+  it("ignores a failed checkpoint read when nothing is locked", () => {
+    mockCheckpointError = true
+    mockPendingWalletError = true
+
+    render(<MigrationGate />)
+
+    expect(mockRequiredScreen).toHaveBeenCalled()
+    expect(mockPrimaryButton).not.toHaveBeenCalled()
   })
 
   it("does not resume an account the server has not locked", () => {

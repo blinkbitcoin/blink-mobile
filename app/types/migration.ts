@@ -28,6 +28,10 @@ export const MigrationSupportReason = {
    *  longer on this device (its key is gone, e.g. after a reinstall), so the resume swap
    *  cannot run and no retry brings it back. */
   SelfCustodialAccountNotOnDevice: "self-custodial-account-not-on-device",
+  /** The server has this account locked mid-migration, but the device holds neither a
+   *  resumable checkpoint nor a reusable pending wallet (e.g. after a reinstall), so a
+   *  restart would only provision another orphan; support is the only way forward. */
+  LockedWithoutCheckpoint: "locked-without-checkpoint",
   /** The transfer itself failed or threw. */
   TransferFailed: "transfer-failed",
   /** The lightning-address re-point onto the migrated account failed. */
@@ -45,11 +49,14 @@ export type MigrationSupportReason =
  * has the commit point (Step 8) underneath, so Back returns there, skipping the
  * back-swallowing transfer screen. The resume handover is pushed from the root navigator
  * with no migration screens beneath it, so Back dismisses to where it came from rather than
- * fabricating a fresh commit screen over an already-completed migration.
+ * fabricating a fresh commit screen over an already-completed migration. The gate handover
+ * has nothing behind it at all — the gate underneath would only replay the handover — so
+ * support becomes the terminal screen with no Back.
  */
 export const MigrationSupportOrigin = {
   Commit: "commit",
   Resume: "resume",
+  Gate: "gate",
 } as const
 
 export type MigrationSupportOrigin =

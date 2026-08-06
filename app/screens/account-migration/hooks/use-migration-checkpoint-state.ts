@@ -26,6 +26,7 @@ export const useMigrationCheckpointState = () => {
   const { ownerId, loading: ownerLoading } = useCustodialOwnerId()
   const [stored, setStored] = useState<StoredCheckpoint | null>(null)
   const [loading, setLoading] = useState(true)
+  const [hasError, setHasError] = useState(false)
   const isFocusedRef = useRef(true)
 
   const {
@@ -36,25 +37,38 @@ export const useMigrationCheckpointState = () => {
 
   const storageKey = getStorageKey(environment)
 
+  /** The error only clears on a read that succeeds, never at the start of one: a retry
+   *  that cleared it up front would hand consumers the still-empty state as settled data
+   *  for the length of the read, and the gate would act on it (the handover this flag
+   *  exists to hold back). Resolves instead of rejecting; the failure already traveled
+   *  through reportError and hasError. */
+  const load = useCallback(
+    (): Promise<void> =>
+      loadCheckpoint(storageKey)
+        .then((storedCheckpoint) => {
+          if (!isFocusedRef.current) return
+          setStored(storedCheckpoint ?? null)
+          setHasError(false)
+          setLoading(false)
+        })
+        .catch((err) => {
+          reportError("Checkpoint load", err)
+          if (!isFocusedRef.current) return
+          setHasError(true)
+          setLoading(false)
+        }),
+    [storageKey],
+  )
+
   const reloadCheckpoint = useCallback(() => {
     isFocusedRef.current = true
 
-    loadCheckpoint(storageKey)
-      .then((storedCheckpoint) => {
-        if (!isFocusedRef.current) return
-        setStored(storedCheckpoint ?? null)
-        setLoading(false)
-      })
-      .catch((err) => {
-        reportError("Checkpoint load", err)
-        if (!isFocusedRef.current) return
-        setLoading(false)
-      })
+    load()
 
     return () => {
       isFocusedRef.current = false
     }
-  }, [storageKey])
+  }, [load])
 
   /** Reloads on every focus: the root blocker and the settings entry stay mounted below
    *  the flow while it advances, so a mount-only read would keep offering a restart
@@ -111,6 +125,13 @@ export const useMigrationCheckpointState = () => {
     checkpoint,
     accountId,
     loading: loading || ownerLoading,
+    /** A read failure surfaced, not swallowed: without it an unreadable store is
+     *  indistinguishable from a wiped device, and the gate would hand a resumable user
+     *  to support (terminal for that origin) on a transient storage error. */
+    hasError,
+    /** Imperative reload for retry screens. Leaves the focus flag alone on purpose: a
+     *  retry resolving after blur still drops its update, same as the focus reload. */
+    refetch: load,
     saveCheckpoint,
     clearCheckpoint,
     hasResumableCheckpoint,

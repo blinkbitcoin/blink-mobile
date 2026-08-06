@@ -12,6 +12,7 @@ import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { TemporarilyUnavailableScreen } from "@app/screens/feature-unavailable/temporarily-unavailable-screen"
+import { MigrationSupportOrigin, MigrationSupportReason } from "@app/types/migration"
 import { WindDownStatus } from "@app/types/wind-down"
 import { reportError } from "@app/utils/error-logging"
 import { testProps } from "@app/utils/testProps"
@@ -24,6 +25,7 @@ import {
 import { useCustodialWindDown } from "@app/screens/account-migration/hooks/use-custodial-wind-down"
 import { useMigrationLock } from "@app/screens/account-migration/hooks/use-migration-lock"
 import { armMigrationConversion } from "@app/screens/account-migration/hooks/use-migration-conversion"
+import { useReusablePendingWallet } from "@app/screens/account-migration/hooks/use-reusable-pending-wallet"
 import { useSelfCustodialDisabled } from "@app/screens/account-migration/hooks/use-self-custodial-disabled"
 
 import { MigrationApiServiceScreen } from "./api-service-screen"
@@ -89,7 +91,19 @@ export const MigrationGate: React.FC = () => {
     hasError: balancesError,
     refetch: refetchBalances,
   } = useCustodialWalletBalances()
-  const { navigateToCheckpoint, loading: checkpointLoading } = useMigrationCheckpoint()
+  const {
+    navigateToCheckpoint,
+    loading: checkpointLoading,
+    hasError: checkpointError,
+    refetch: refetchCheckpoint,
+    hasResumableCheckpoint,
+  } = useMigrationCheckpoint()
+  const {
+    reusablePendingAccountId,
+    loading: pendingWalletLoading,
+    hasError: pendingWalletError,
+    refetch: refetchPendingWallet,
+  } = useReusablePendingWallet()
 
   const acknowledgeApiWarning = useCallback(() => setIsApiWarningAcknowledged(true), [])
 
@@ -111,13 +125,25 @@ export const MigrationGate: React.FC = () => {
   const retryGateData = useCallback(async () => {
     setIsRetrying(true)
     try {
-      await Promise.all([refetchApiKeys(), refetchBalances(), refetchLock()])
+      await Promise.all([
+        refetchApiKeys(),
+        refetchBalances(),
+        refetchLock(),
+        refetchCheckpoint(),
+        refetchPendingWallet(),
+      ])
     } catch (err) {
       reportError("Migration gate retry", err)
     } finally {
       setIsRetrying(false)
     }
-  }, [refetchApiKeys, refetchBalances, refetchLock])
+  }, [
+    refetchApiKeys,
+    refetchBalances,
+    refetchLock,
+    refetchCheckpoint,
+    refetchPendingWallet,
+  ])
 
   /** Returning from the dollar-transfer conversion, refetch so the balance reflects the
    *  now-empty dollars instead of the cached pre-transfer figure. */
@@ -139,8 +165,15 @@ export const MigrationGate: React.FC = () => {
 
   /** A failed query read as its empty default would wave a user with API keys or a live
    *  dollar balance straight in, or re-pitch the intro to a user a failed lock read makes
-   *  look unlocked, so a settled error blocks with a retry instead. */
-  const hasGateDataError = apiKeysError || balancesError || lockError
+   *  look unlocked, so a settled error blocks with a retry instead. The local reads join
+   *  only when locked — that is the only decision they feed, and an unreadable store there
+   *  would impersonate a wiped device and hand a resumable user to terminal support. */
+  const hasResumeDataError = checkpointError || pendingWalletError
+  const hasGateDataError =
+    apiKeysError ||
+    balancesError ||
+    lockError ||
+    (isMigrationLocked && hasResumeDataError)
 
   /** The API-key warning outranks the Dollar-Balance precondition in the entry order
    *  (entry, API-key check, Dollar Balance check, intro). */
@@ -173,13 +206,50 @@ export const MigrationGate: React.FC = () => {
   const hasResumedRef = useRef(false)
 
   useEffect(() => {
-    if (!shouldResumeLockedMigration || checkpointLoading || hasResumedRef.current) return
+    /** The error guard runs here, not only in render: the retry screen committing does
+     *  not stop this effect, and a read failure read as "nothing on device" would claim
+     *  the once-per-mount ref and navigate a resumable user to terminal support over it.
+     *  Unclaimed, a retry that succeeds re-runs this with real data. */
+    if (
+      !shouldResumeLockedMigration ||
+      checkpointLoading ||
+      pendingWalletLoading ||
+      hasResumeDataError ||
+      hasResumedRef.current
+    )
+      return
 
     /** Claimed once per mount: the checkpoint moves as the user advances, and a second
      *  run would yank them back from wherever they got to. */
     hasResumedRef.current = true
+
+    /** A locked account with nothing to resume and no wallet to reuse would restart at the
+     *  explainer and provision a fresh orphan every crash-reinstall cycle (#4070). No
+     *  client mutation can release the server-side lock, so support is the only way
+     *  forward; each cold start replays this handover until the lock is cleared. */
+    if (!hasResumableCheckpoint && !reusablePendingAccountId) {
+      reportError(
+        "Migration locked without resumable checkpoint",
+        new Error("Server lock present but no checkpoint or pending wallet on device"),
+        { dedupKey: "migration-locked-without-checkpoint", alwaysRecord: true },
+      )
+      navigation.navigate("accountMigrationContactSupport", {
+        reason: MigrationSupportReason.LockedWithoutCheckpoint,
+        origin: MigrationSupportOrigin.Gate,
+      })
+      return
+    }
     navigateToCheckpoint()
-  }, [shouldResumeLockedMigration, checkpointLoading, navigateToCheckpoint])
+  }, [
+    shouldResumeLockedMigration,
+    checkpointLoading,
+    pendingWalletLoading,
+    hasResumeDataError,
+    hasResumableCheckpoint,
+    reusablePendingAccountId,
+    navigateToCheckpoint,
+    navigation,
+  ])
 
   /** The emergency-disable net. Every entry funnels through the gate, so blocking here
    *  pauses the whole flow the moment ops disables the stack, whatever path the user
