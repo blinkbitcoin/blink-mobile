@@ -112,9 +112,17 @@ export const BackupPhraseConfirmScreen: React.FC = () => {
                       wrong && styles.inputError,
                     ]}
                   >
-                    {inputs[i].trim().length > 0 && (
-                      <Text style={styles.wordNumber}>{challenge.index + 1}.</Text>
-                    )}
+                    {/* Always mounted, fixed width: the row's layout must not depend on
+                     *  the input's content, or the first keystroke reflows the field
+                     *  under the user's finger. */}
+                    <Text
+                      style={[
+                        styles.wordNumber,
+                        inputs[i].trim().length === 0 && styles.wordNumberHidden,
+                      ]}
+                    >
+                      {challenge.index + 1}.
+                    </Text>
                     <TextInput
                       ref={(ref) => {
                         inputRefs.current[i] = ref
@@ -204,10 +212,15 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingHorizontal: 14,
     gap: 12,
   },
+  /** Same typeface and no lineHeight override on number and input, so both center on
+   *  one baseline (see MnemonicWordInput). */
   wordNumber: {
+    width: 24,
     fontSize: 14,
-    lineHeight: 20,
     color: colors.grey2,
+  },
+  wordNumberHidden: {
+    opacity: 0,
   },
   inputCorrect: {
     borderColor: colors._green,
@@ -218,9 +231,8 @@ const useStyles = makeStyles(({ colors }) => ({
   input: {
     flex: 1,
     fontSize: 14,
-    lineHeight: 20,
     color: colors.black,
-    fontFamily: "Source Sans Pro",
+    fontFamily: "SourceSansPro-Regular",
   },
   errorContainer: {
     flexDirection: "row",
