@@ -4,9 +4,10 @@ import { Linking } from "react-native"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { BLOCKED_COUNTRIES_FAQ_LINK } from "@app/config"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { makeStyles, Text, useTheme } from "@rn-vui/themed"
+import { makeStyles, useTheme } from "@rn-vui/themed"
 
 import CustomModal from "../custom-modal/custom-modal"
+import { RestrictedRegionBody } from "./restricted-region-body"
 
 type RestrictedRegionModalProps = {
   isVisible: boolean
@@ -32,13 +33,7 @@ export const RestrictedRegionModal: React.FC<RestrictedRegionModalProps> = ({
       showCloseIconButton={true}
       image={<GaloyIcon name="warning" size={80} color={colors.warning} />}
       title={LL.RestrictedRegion.title()}
-      body={
-        <Text style={styles.body}>
-          {LL.RestrictedRegion.body()}
-          {"\n\n"}
-          {LL.RestrictedRegion.bodyReturn()}
-        </Text>
-      }
+      body={<RestrictedRegionBody style={styles.body} />}
       primaryButtonTitle={LL.common.close()}
       primaryButtonOnPress={onDismiss}
       secondaryButtonTitle={LL.RestrictedRegion.learnMore()}
