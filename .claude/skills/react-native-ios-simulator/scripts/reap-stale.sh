@@ -18,13 +18,16 @@
 set -uo pipefail
 
 REGISTRY="${DEMO_SIM_REGISTRY:-$HOME/.claude/rn-sim-sessions}"
+PREFIX="${DEMO_SIM_PREFIX:-rn-demo}"
 TTL_HOURS="${DEMO_SIM_TTL_HOURS:-24}"
 NOW=$(date +%s)
 TTL_SECONDS=$((TTL_HOURS * 3600))
 
 [ -d "$REGISTRY" ] || exit 0
 
-for SESSION_DIR in "$REGISTRY"/pr*/; do
+# Only this prefix's sessions: another repo's expired sessions in the shared
+# registry are its own reaper's to sweep, never ours.
+for SESSION_DIR in "$REGISTRY/${PREFIX}-pr"*/; do
   [ -d "$SESSION_DIR" ] || continue
   STAMP_FILE="$SESSION_DIR/released-at"
   [ -f "$STAMP_FILE" ] || continue          # active or crashed session: not ours to judge
@@ -35,8 +38,7 @@ for SESSION_DIR in "$REGISTRY"/pr*/; do
   esac
   [ $((NOW - RELEASED_AT)) -ge "$TTL_SECONDS" ] || continue
 
-  PR=$(basename "$SESSION_DIR" | sed 's/^pr//')
-  EXPECTED_NAME="${DEMO_SIM_PREFIX:-rn-demo}-pr${PR}"
+  EXPECTED_NAME=$(basename "$SESSION_DIR")
   UDID=$(cat "$SESSION_DIR/udid" 2>/dev/null || echo "")
 
   if [ -n "$UDID" ]; then

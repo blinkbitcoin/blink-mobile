@@ -22,7 +22,10 @@ esac
 
 REGISTRY="${DEMO_SIM_REGISTRY:-$HOME/.claude/rn-sim-sessions}"
 SIM_NAME="${DEMO_SIM_PREFIX:-rn-demo}-pr${PR}"
-SESSION_DIR="$REGISTRY/pr${PR}"
+# Keyed by the full device name, not the bare PR number: the registry is shared
+# machine-wide, and two repos using these skills can hold the same PR number at
+# once. The prefix is what keeps their sessions apart.
+SESSION_DIR="$REGISTRY/${SIM_NAME}"
 
 # Sweep simulators from sessions released more than the TTL ago (default 24h),
 # then un-mark our own session: an active claim is never reaped.
@@ -48,7 +51,7 @@ reserve_port() {
     candidate=$((base + offset))
     [ "$candidate" -eq 8081 ] && continue
     if mkdir "$REGISTRY/ports/$candidate" 2>/dev/null; then
-      echo "$PR" > "$REGISTRY/ports/$candidate/owner"
+      echo "$SIM_NAME" > "$REGISTRY/ports/$candidate/owner"
       # Re-check after winning the reservation: another process outside this
       # registry (a stray Metro, an unrelated dev server) may already hold it.
       if lsof -nP -iTCP:"$candidate" -sTCP:LISTEN >/dev/null 2>&1; then
@@ -60,7 +63,7 @@ reserve_port() {
     # Reclaim a reservation whose owning session no longer exists.
     stale_pid=$(cat "$REGISTRY/ports/$candidate/metro.pid" 2>/dev/null || echo "")
     if [ -n "$stale_pid" ] && ! kill -0 "$stale_pid" 2>/dev/null; then
-      if [ "$(cat "$REGISTRY/ports/$candidate/owner" 2>/dev/null)" = "$PR" ]; then
+      if [ "$(cat "$REGISTRY/ports/$candidate/owner" 2>/dev/null)" = "$SIM_NAME" ]; then
         echo "$candidate"; return 0
       fi
     fi

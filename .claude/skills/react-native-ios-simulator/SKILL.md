@@ -55,6 +55,11 @@ boots it, reserves a port in 8100–8499 by atomic mkdir in
 redirect onto that device only (needs `DEMO_APP_ID_IOS`; skipped with a note
 otherwise), and snapshots which devices were booted beforehand.
 
+Session state is keyed by the full device name (`<prefix>-pr<N>`), so repos
+using these skills on the same machine never share or reap each other's
+sessions even when their PR numbers coincide — provided each repo sets its own
+`DEMO_SIM_PREFIX` (this repo's value lives in `AGENTS.md`).
+
 Re-running is idempotent — same sim, same port. Sessions created before the
 2026-08 rename keep their old device prefix; release them by setting
 `DEMO_SIM_PREFIX=<old prefix>` for that one call.

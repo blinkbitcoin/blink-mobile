@@ -22,8 +22,10 @@ case "$PR" in
 esac
 
 REGISTRY="${DEMO_SIM_REGISTRY:-$HOME/.claude/rn-sim-sessions}"
-SESSION_DIR="$REGISTRY/pr${PR}"
 EXPECTED_NAME="${DEMO_SIM_PREFIX:-rn-demo}-pr${PR}"
+# Same (prefix, PR) key as claim-session.sh: a release run under a different
+# prefix cannot even see this session, let alone touch its device.
+SESSION_DIR="$REGISTRY/${EXPECTED_NAME}"
 
 [ -d "$SESSION_DIR" ] || { echo "FATAL: no claimed session for PR #$PR" >&2; exit 1; }
 
@@ -79,7 +81,7 @@ if [ -n "$UDID" ]; then
 fi
 
 # --- Port release ------------------------------------------------------------
-if [ -n "$PORT" ] && [ "$(cat "$REGISTRY/ports/$PORT/owner" 2>/dev/null)" = "$PR" ]; then
+if [ -n "$PORT" ] && [ "$(cat "$REGISTRY/ports/$PORT/owner" 2>/dev/null)" = "$EXPECTED_NAME" ]; then
   rm -rf "$REGISTRY/ports/$PORT"
 fi
 
