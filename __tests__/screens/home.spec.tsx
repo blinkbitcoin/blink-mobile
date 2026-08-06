@@ -1,7 +1,7 @@
 import React from "react"
 import { it } from "@jest/globals"
 import { MockedResponse } from "@apollo/client/testing"
-import { fireEvent, render, waitFor } from "@testing-library/react-native"
+import { act, fireEvent, render, waitFor } from "@testing-library/react-native"
 import { StyleSheet } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 
@@ -151,15 +151,36 @@ jest.mock("@app/components/enhanced-mode-prompt", () => ({
   }),
 }))
 
+/** The screen arms the upgrade prompt on a 1500ms timer; a little slack keeps the
+ *  test from racing the exact boundary. */
+const UPGRADE_MODAL_DELAY_WITH_SLACK_MS = 2000
+
 let mockIsRestrictedRegion = false
+let mockIsRestrictedRegionEvaluationPending = false
+let mockCanShowUpgradeModal = false
 const mockPresentRestrictedRegionModal = jest.fn()
 jest.mock("@app/components/restricted-region", () => ({
   useRestrictedRegion: () => ({
     isRestrictedRegion: mockIsRestrictedRegion,
+    isRestrictedRegionEvaluationPending: mockIsRestrictedRegionEvaluationPending,
     isRestrictedRegionModalVisible: false,
     presentRestrictedRegionModal: mockPresentRestrictedRegionModal,
   }),
 }))
+
+const mockTrialAccountLimitsModal = jest.fn()
+jest.mock("@app/components/upgrade-account-modal", () => {
+  const ReactActual = jest.requireActual("react")
+  const { View } = jest.requireActual("react-native")
+  return {
+    TrialAccountLimitsModal: (props: { isVisible: boolean }) => {
+      mockTrialAccountLimitsModal(props)
+      return props.isVisible
+        ? ReactActual.createElement(View, { testID: "trial-account-limits-modal" })
+        : null
+    },
+  }
+})
 
 type ForcedConversionParams = {
   isRestricted: boolean
@@ -356,6 +377,14 @@ jest.mock("@app/hooks", () => {
         currency: "DisplayCurrency",
         currencyCode: "USD",
       }),
+    }),
+    /** Clears the cooldown so the auto-present path depends only on the guards
+     *  under test rather than on session bookkeeping. */
+    useAutoShowUpgradeModal: () => ({
+      canShowUpgradeModal: mockCanShowUpgradeModal,
+      lastShownUpgradeModalAt: null,
+      markShownUpgradeModal: jest.fn(),
+      resetUpgradeModal: jest.fn(),
     }),
   }
 })
@@ -798,6 +827,8 @@ const resetHomeScreenMocks = () => {
   mockForcedConversionParams = null
   mockIsAnonMode = false
   mockIsRestrictedRegion = false
+  mockIsRestrictedRegionEvaluationPending = false
+  mockCanShowUpgradeModal = false
   jest.clearAllMocks()
   mockUseNonCustodialConversionLimits.mockReturnValue({
     limits: null,
@@ -2290,5 +2321,92 @@ describe("HomeScreen restricted region", () => {
     expect(queryByTestId("sc-convert-modal")).toBeNull()
 
     mockActiveWalletOverride = null
+  })
+})
+
+describe("HomeScreen sanctioned session", () => {
+  beforeEach(resetHomeScreenMocks)
+
+  const levelZeroWithBalance = () =>
+    generateHomeMock({
+      level: AccountLevel.Zero,
+      network: Network.Mainnet,
+      // Above the 2100-sat remote-config floor that arms the upgrade prompt
+      btcBalance: 5000,
+      usdBalance: 0,
+    })
+
+  const renderAndSettleUpgradeDelay = async () => {
+    const view = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+    /** The focus effect re-arms its timer whenever triggerUpgradeModal changes
+     *  identity, which it does as the queries resolve. Settle, advance, then
+     *  settle and advance again so the final timer is the one that fires. */
+    await flushEffects()
+    await act(async () => {
+      jest.advanceTimersByTime(UPGRADE_MODAL_DELAY_WITH_SLACK_MS)
+    })
+    await flushEffects()
+    await act(async () => {
+      jest.advanceTimersByTime(UPGRADE_MODAL_DELAY_WITH_SLACK_MS)
+    })
+    return view
+  }
+
+  beforeEach(() => {
+    jest.useFakeTimers({ doNotFake: ["setImmediate", "nextTick", "queueMicrotask"] })
+    mockCanShowUpgradeModal = true
+    currentMocks = levelZeroWithBalance()
+  })
+
+  afterEach(() => {
+    jest.useRealTimers()
+  })
+
+  /** Control for the two guards below: without it a broken setup would make them
+   *  pass for the wrong reason. */
+  it("auto-presents the trial upgrade modal on an unrestricted level-zero account", async () => {
+    const { queryByTestId } = await renderAndSettleUpgradeDelay()
+
+    expect(queryByTestId("trial-account-limits-modal")).toBeTruthy()
+  })
+
+  it("keeps the upgrade modal away while the region is restricted", async () => {
+    mockIsRestrictedRegion = true
+
+    const { queryByTestId } = await renderAndSettleUpgradeDelay()
+
+    expect(queryByTestId("trial-account-limits-modal")).toBeNull()
+  })
+
+  /** The late-verdict case: the splash cap can reveal Home before the lookup settles,
+   *  and a modal presented in that window would end up behind the full-screen block. */
+  it("keeps the upgrade modal away while the region verdict is still pending", async () => {
+    mockIsRestrictedRegionEvaluationPending = true
+
+    const { queryByTestId } = await renderAndSettleUpgradeDelay()
+
+    expect(queryByTestId("trial-account-limits-modal")).toBeNull()
+  })
+
+  it("suppresses the migrate-now prompt while the region is restricted", async () => {
+    mockMigratePromptVisible = true
+    mockIsRestrictedRegion = true
+
+    const { queryByTestId } = await renderAndSettleUpgradeDelay()
+
+    expect(queryByTestId("migrate-now-modal")).toBeNull()
+  })
+
+  it("suppresses the migrate-now prompt while the region verdict is still pending", async () => {
+    mockMigratePromptVisible = true
+    mockIsRestrictedRegionEvaluationPending = true
+
+    const { queryByTestId } = await renderAndSettleUpgradeDelay()
+
+    expect(queryByTestId("migrate-now-modal")).toBeNull()
   })
 })
