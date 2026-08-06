@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Linking } from "react-native"
+import { InAppBrowser } from "react-native-inappbrowser-reborn"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { BLOCKED_COUNTRIES_FAQ_LINK } from "@app/config"
@@ -37,7 +37,7 @@ export const RestrictedRegionModal: React.FC<RestrictedRegionModalProps> = ({
       primaryButtonTitle={LL.common.close()}
       primaryButtonOnPress={onDismiss}
       secondaryButtonTitle={LL.RestrictedRegion.learnMore()}
-      secondaryButtonOnPress={() => Linking.openURL(BLOCKED_COUNTRIES_FAQ_LINK)}
+      secondaryButtonOnPress={() => InAppBrowser.open(BLOCKED_COUNTRIES_FAQ_LINK)}
     />
   )
 }

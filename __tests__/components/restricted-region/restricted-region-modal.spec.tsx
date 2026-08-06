@@ -1,7 +1,7 @@
 import React from "react"
-import { Linking } from "react-native"
 
 import { fireEvent, render } from "@testing-library/react-native"
+import { InAppBrowser } from "react-native-inappbrowser-reborn"
 import { ThemeProvider } from "@rn-vui/themed"
 import TypesafeI18n from "@app/i18n/i18n-react"
 import { i18nObject } from "@app/i18n/i18n-util"
@@ -64,14 +64,14 @@ describe("RestrictedRegionModal", () => {
     expect(onDismiss).toHaveBeenCalledTimes(1)
   })
 
-  it("opens the explanation link on Learn more", () => {
-    const openUrlSpy = jest
-      .spyOn(Linking, "openURL")
-      .mockResolvedValue(undefined as never)
+  /** In-app browser, unlike the full-screen custodial block: this modal is a JS
+   *  overlay, so a browser can present above it and the user keeps the session. */
+  it("opens the explanation link in the in-app browser on Learn more", () => {
+    const openSpy = jest.spyOn(InAppBrowser, "open").mockResolvedValue(undefined as never)
     const { getByText } = renderModal(jest.fn())
 
     fireEvent.press(getByText(LL.RestrictedRegion.learnMore()))
 
-    expect(openUrlSpy).toHaveBeenCalledWith(BLOCKED_COUNTRIES_FAQ_LINK)
+    expect(openSpy).toHaveBeenCalledWith(BLOCKED_COUNTRIES_FAQ_LINK)
   })
 })

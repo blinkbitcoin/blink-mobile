@@ -111,6 +111,9 @@ export const RestrictedRegionScreen: React.FC = () => {
               onPress={openSupport}
               {...testProps("restricted-region-contact-support")}
             />
+            {/* The external browser is deliberate here: this block renders inside a
+                native Modal, which nothing (InAppBrowser included) can present above.
+                The dismissible non-custodial modal uses the in-app browser instead. */}
             <GaloySecondaryButton
               title={LL.RestrictedRegion.learnMore()}
               onPress={() => Linking.openURL(BLOCKED_COUNTRIES_FAQ_LINK)}
