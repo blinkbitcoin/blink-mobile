@@ -39,6 +39,17 @@ describe("StatusPill", () => {
     expect(getByTestId("balance-stale-pill")).toBeTruthy()
   })
 
+  it("truncates long labels to a single line instead of wrapping", () => {
+    const { getByText } = renderPill({
+      label: "PENDING +$1,234,567.89",
+      status: "warning",
+    })
+
+    const label = getByText("PENDING +$1,234,567.89")
+    expect(label.props.numberOfLines).toBe(1)
+    expect(label.props.ellipsizeMode).toBe("tail")
+  })
+
   it("hides itself from accessibility and ignores the testID when ghost", () => {
     const { queryByTestId } = renderPill({
       label: "STALE",

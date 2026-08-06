@@ -1,9 +1,11 @@
 import React from "react"
+import { StyleSheet } from "react-native"
 import { fireEvent, render } from "@testing-library/react-native"
 import { ThemeProvider } from "@rn-vui/themed"
 
 import theme from "@app/rne-theme/theme"
 import { BalanceMode } from "@app/hooks/use-balance-mode"
+import { StatusPill } from "@app/components/status-pill"
 
 import { BalanceHeader } from "@app/components/balance-header/balance-header"
 
@@ -144,6 +146,24 @@ describe("BalanceHeader", () => {
     })
 
     expect(queryByTestId("balance-status-badge")).toBeNull()
+  })
+
+  it("caps and shrinks the real pill and the centering ghost identically", () => {
+    // eslint-disable-next-line camelcase -- testing-library exposes this API verbatim
+    const { UNSAFE_getAllByType } = renderHeader({
+      statusBadge: { label: "+$1,234,567.89 pending", status: "warning" },
+    })
+
+    const pills = UNSAFE_getAllByType(StatusPill)
+    expect(pills).toHaveLength(2)
+
+    const [ghostStyle, realStyle] = pills.map((pill) =>
+      StyleSheet.flatten(pill.props.style),
+    )
+    expect(ghostStyle.flexShrink).toBe(1)
+    expect(realStyle.flexShrink).toBe(1)
+    expect(ghostStyle.maxWidth).toBeDefined()
+    expect(ghostStyle.maxWidth).toBe(realStyle.maxWidth)
   })
 
   it("does not render the status badge while amounts are hidden", () => {

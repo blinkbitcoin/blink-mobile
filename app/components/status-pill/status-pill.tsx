@@ -18,7 +18,11 @@ type Props = {
 export const StatusPill: React.FC<Props> = ({ label, status, ghost, testID, style }) => {
   const styles = useStyles({ status })
 
-  const body = <Text style={styles.label}>{label}</Text>
+  const body = (
+    <Text style={styles.label} numberOfLines={1} ellipsizeMode="tail">
+      {label}
+    </Text>
+  )
 
   if (ghost) {
     return (
