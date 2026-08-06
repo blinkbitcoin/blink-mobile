@@ -3259,7 +3259,7 @@ SPEC CHECKSUMS:
   GT3Captcha-iOS: aeb6fed2e8594099821430a89208679e5a55b740
   GTMAppAuth: 217a876b249c3c585a54fd6f73e6b58c4f5c4238
   GTMSessionFetcher: 5aea5ba6bd522a239e236100971f10cb71b96ab6
-  hermes-engine: bbd6961e9f635999892e6d1e935fa272c050fec1
+  hermes-engine: 6653d25f5f43feaf527c53772e34e1e95b846caf
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
   NitroModules: 4b3ee576b2ee9967dfcdd4fe755832a0ab837556
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
@@ -3353,7 +3353,7 @@ SPEC CHECKSUMS:
   ReactCodegen: 01edc8d202005315c06ca3826d1eaad2c619cae7
   ReactCommon: ced9cfa50957cb9e6b7a1a7cd4ee20f5da6fa3a4
   ReactNativeCameraKit: 1a06006322ddc7966a419df6217331e50236375d
-  ReactNativeDependencies: 1735688f7e6db23afb8058697a5e961b477886f3
+  ReactNativeDependencies: 4d94ba042d8f6b79854c9cb9e7fd62e6177e29b5
   RNBootSplash: 5e5bb0963e855048a8c51396756d4c772006b6e1
   RNCAsyncStorage: a455ed0edb854f0c8471b3049935680d5868796a
   RNCClipboard: ee9d1bdca545c481f20cd976b738da771c2ec63d
@@ -3371,7 +3371,7 @@ SPEC CHECKSUMS:
   RNInAppBrowser: 6d3eb68d471b9834335c664704719b8be1bfdb20
   RNKeychain: 1fdd8401d8c8d05da80a9e1843d837ccfb947ea2
   RNLocalize: 1d140ef314f96c5bb8ad47e13aaa6b34e27b8b35
-  RNPermissions: 4a06981d318437808d96bdb257b35a33dd1a8a7b
+  RNPermissions: ce2315bade79599eb39a12493293b76bbe31a4a6
   RNQrGenerator: b467624cdcb0e88108a8b4ca74c94b0978efa265
   RNReactNativeHapticFeedback: 71068ee2dd8b54feae784437353342c57c1cffa9
   RNReanimated: 669dcac7a77261e2c491333be34dd2eb9a5206c3
