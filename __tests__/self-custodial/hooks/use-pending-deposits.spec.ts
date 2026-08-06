@@ -71,6 +71,41 @@ describe("usePendingDeposits", () => {
     expect(result.current.deposits).toEqual([])
   })
 
+  /** The adapter reports SDK failures as an empty list plus `errors`, so
+   *  committing it would wipe the badge and the banner as if the deposit had
+   *  confirmed. A pull that failed has to leave the screen as it was. */
+  it("keeps the known deposits when the listing comes back with errors", async () => {
+    mockListPendingDeposits.mockResolvedValue({ deposits: [deposit()] })
+
+    const { result, rerender } = renderHook(() => usePendingDeposits())
+    await flush()
+    expect(result.current.deposits).toEqual([deposit()])
+
+    mockListPendingDeposits.mockResolvedValue({
+      deposits: [],
+      errors: [{ message: "offline" }],
+    })
+    mockWallets = [{ id: "refreshed" }]
+    rerender({})
+    await flush()
+
+    expect(result.current.deposits).toEqual([deposit()])
+  })
+
+  it("commits an empty list when the listing succeeds with no deposits", async () => {
+    mockListPendingDeposits.mockResolvedValue({ deposits: [deposit()] })
+
+    const { result, rerender } = renderHook(() => usePendingDeposits())
+    await flush()
+
+    mockListPendingDeposits.mockResolvedValue({ deposits: [], errors: [] })
+    mockWallets = [{ id: "refreshed" }]
+    rerender({})
+    await flush()
+
+    expect(result.current.deposits).toEqual([])
+  })
+
   it("keeps the same array identity when a refetch returns an unchanged list", async () => {
     mockListPendingDeposits.mockImplementation(() =>
       // A fresh array each call: only the identity guard can keep state stable.

@@ -32,8 +32,12 @@ export const usePendingDeposits = (): { deposits: PendingDeposit[] } => {
     if (!listPendingDeposits) return
     fetchGenerationRef.current += 1
     const generation = fetchGenerationRef.current
-    listPendingDeposits().then(({ deposits: fetched }) => {
+    listPendingDeposits().then(({ deposits: fetched, errors }) => {
       if (generation !== fetchGenerationRef.current) return
+      // A failed listing resolves with an empty array rather than rejecting.
+      // Committing it would read as "the deposit confirmed", so a listing we
+      // could not trust leaves the last known deposits on screen.
+      if (errors?.length) return
       if (sameDeposits(depositsRef.current, fetched)) return
       depositsRef.current = fetched
       setDeposits(fetched)
