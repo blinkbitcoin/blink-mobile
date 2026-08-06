@@ -360,7 +360,7 @@ export const HomeScreen: React.FC = () => {
 
   /** Fetched once here and shared with the UnclaimedDepositBanner below, so the
    *  pending pill and that banner can never disagree about the same deposits. */
-  const { deposits } = usePendingDeposits()
+  const { deposits, refetch: refetchPendingDeposits } = usePendingDeposits()
 
   /** Pending deposits stay visible beside the balance until confirmed —
    *  unlike the unseen-tx badge below, which auto-dismisses (blink-wip#937). */
@@ -539,7 +539,10 @@ export const HomeScreen: React.FC = () => {
 
   const refetch = React.useCallback(async () => {
     if (isSelfCustodial) {
-      await refreshSelfCustodialWallets()
+      // Both must land before the pull-to-refresh spinner retracts: the wallet
+      // snapshot feeds the balance, the deposit listing feeds the pending pill
+      // and the unclaimed-deposit banner.
+      await Promise.all([refreshSelfCustodialWallets(), refetchPendingDeposits()])
       return
     }
 
@@ -557,6 +560,7 @@ export const HomeScreen: React.FC = () => {
     isAuthed,
     isSelfCustodial,
     refreshSelfCustodialWallets,
+    refetchPendingDeposits,
     refetchAuthed,
     refetchBulletins,
     refetchRealtimePrice,

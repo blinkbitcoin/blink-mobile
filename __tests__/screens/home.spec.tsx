@@ -232,7 +232,10 @@ jest.mock("@app/components/migration-reminder-bulletin", () => {
 })
 
 const mockUseNonCustodialConversionLimits = jest.fn()
-let mockPendingDepositsOverride: { deposits: unknown[] } | null = null
+let mockPendingDepositsOverride: {
+  deposits: unknown[]
+  refetch?: () => Promise<void>
+} | null = null
 
 jest.mock("@app/self-custodial/hooks", () => {
   const actual = jest.requireActual("@app/self-custodial/hooks")
@@ -240,7 +243,10 @@ jest.mock("@app/self-custodial/hooks", () => {
     ...actual,
     useNonCustodialConversionLimits: (direction: string | undefined) =>
       mockUseNonCustodialConversionLimits(direction),
-    usePendingDeposits: () => mockPendingDepositsOverride ?? actual.usePendingDeposits(),
+    usePendingDeposits: () =>
+      mockPendingDepositsOverride
+        ? { refetch: async () => {}, ...mockPendingDepositsOverride }
+        : actual.usePendingDeposits(),
   }
 })
 
@@ -2141,6 +2147,37 @@ describe("HomeScreen pull-to-refresh", () => {
     } finally {
       mockActiveWalletOverride = null
       mockSelfCustodialWalletOverride = null
+    }
+  })
+
+  it("refreshes the pending deposits before a self-custodial pull retracts", async () => {
+    const refetchDeposits = jest.fn().mockResolvedValue(undefined)
+    mockActiveWalletOverride = {
+      wallets: [],
+      status: "ready",
+      accountType: "self-custodial",
+      isReady: true,
+      isSelfCustodial: true,
+      needsBackendAuth: false,
+    }
+    mockPendingDepositsOverride = { deposits: [], refetch: refetchDeposits }
+    try {
+      // eslint-disable-next-line camelcase -- testing-library exposes this API verbatim
+      const { UNSAFE_getByType } = render(
+        <ContextForScreen>
+          <HomeScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      await act(async () => {
+        await UNSAFE_getByType(RefreshControl).props.onRefresh()
+      })
+
+      expect(refetchDeposits).toHaveBeenCalledTimes(1)
+    } finally {
+      mockActiveWalletOverride = null
+      mockPendingDepositsOverride = null
     }
   })
 })
