@@ -214,12 +214,13 @@ jest.mock("@app/components/enhanced-mode-prompt", () => ({
 }))
 
 let mockIsRestrictedRegion = false
+const mockPresentRestrictedRegionModal = jest.fn()
 jest.mock("@app/components/restricted-region", () => ({
   ...jest.requireActual("@app/components/restricted-region"),
   useRestrictedRegion: () => ({
     isRestrictedRegion: mockIsRestrictedRegion,
     isRestrictedRegionModalVisible: false,
-    presentRestrictedRegionModal: jest.fn(),
+    presentRestrictedRegionModal: mockPresentRestrictedRegionModal,
   }),
 }))
 
@@ -340,6 +341,7 @@ describe("Settings Screen", () => {
     mockUseIsAuthed.mockReturnValue(true)
     mockAccountRegistryOverride.activeAccount = undefined
     mockIsRestrictedRegion = false
+    mockIsAnonMode = false
     loadLocale("en")
     testState = createTestState()
   })
@@ -524,6 +526,27 @@ describe("Settings Screen", () => {
     await flushEffects()
 
     expect(screen.queryByTestId("restricted-region-banner")).toBeNull()
+  })
+
+  /** While sanctioned the group is gated behind DisabledFeature, which takes its
+   *  children out of the accessibility tree and stands in for them: the label only
+   *  resolves to a pressable while the gate is on. */
+  it("gates Ways to get paid behind the sanctions modal while restricted", async () => {
+    mockIsRestrictedRegion = true
+
+    render(
+      <ContextForScreen>
+        <LoggedInWithUsername mock={mocksWithUsername} />
+      </ContextForScreen>,
+    )
+
+    const gate = await screen.findByLabelText("Ways to get paid")
+    fireEvent.press(gate)
+
+    expect(mockPresentRestrictedRegionModal).toHaveBeenCalledTimes(1)
+    expect(mockPromptEnhancedMode).not.toHaveBeenCalled()
+
+    await flushEffects()
   })
 
   it("shows phone ln address when phone is verified", async () => {
