@@ -81,6 +81,7 @@ export const MigrationContactSupportScreen: React.FC = () => {
    *  transfer-time failure would land on the swallowing transfer screen. */
   useLayoutEffect(() => {
     navigation.setOptions({
+      headerBackVisible: false,
       headerLeft: () =>
         isGateOrigin ? null : (
           <HeaderBackButton

@@ -198,6 +198,19 @@ describe("MigrationContactSupportScreen", () => {
     expect(options?.headerLeft?.()).toBeNull()
   })
 
+  /** A null headerLeft is not enough on native-stack: without headerBackVisible false the
+   *  navigator falls back to its native back button, which popped this cohort onto the
+   *  gate's spent spinner (caught on-device while demoing #4070). */
+  it("suppresses the native back button so null headerLeft cannot fall back to it", async () => {
+    mockOrigin = MigrationSupportOrigin.Gate
+    renderScreen()
+    await flushEffects()
+
+    const options = mockSetOptions.mock.calls.at(-1)?.[0]
+
+    expect(options?.headerBackVisible).toBe(false)
+  })
+
   it("renders the hero, every diagnostics row and the contact action", async () => {
     renderScreen()
     await flushEffects()
