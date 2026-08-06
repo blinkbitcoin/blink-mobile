@@ -30,10 +30,17 @@ export const UnclaimedDepositBanner: React.FC<Props> = ({ deposits }) => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   const { count, totalSats } = useMemo(() => {
-    const active = deposits.filter(({ status }) => status !== DepositStatus.Refunded)
+    // Only actionable deposits belong in this banner: Immature ones are the
+    // balance header pill's job until they confirm, and Refunded ones are
+    // already resolved. The remaining statuses (Claimable, FeeExceeded, Error)
+    // all carry an action on the unclaimed-deposits screen.
+    const actionable = deposits.filter(
+      ({ status }) =>
+        status !== DepositStatus.Immature && status !== DepositStatus.Refunded,
+    )
     return {
-      count: active.length,
-      totalSats: active.reduce((sum, { amount }) => sum + amount.amount, 0),
+      count: actionable.length,
+      totalSats: actionable.reduce((sum, { amount }) => sum + amount.amount, 0),
     }
   }, [deposits])
 

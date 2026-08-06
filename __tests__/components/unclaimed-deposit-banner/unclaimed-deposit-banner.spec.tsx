@@ -90,6 +90,37 @@ describe("UnclaimedDepositBanner", () => {
     expect(queryByTestId("unclaimed-deposit-banner")).toBeNull()
   })
 
+  it("excludes immature deposits — the balance pill owns them until they confirm", () => {
+    const { getByText } = renderBanner([
+      buildDeposit({ id: "1", status: DepositStatus.Claimable }),
+      buildDeposit({
+        id: "2",
+        status: DepositStatus.Immature,
+        amount: { amount: 7777, currency: WalletCurrency.Btc, currencyCode: "BTC" },
+      }),
+    ])
+
+    expect(getByText("1 pending")).toBeTruthy()
+    expect(getByText("1000 sats")).toBeTruthy()
+  })
+
+  it("renders nothing when every deposit is immature", () => {
+    const { queryByTestId } = renderBanner([
+      buildDeposit({ id: "1", status: DepositStatus.Immature }),
+    ])
+
+    expect(queryByTestId("unclaimed-deposit-banner")).toBeNull()
+  })
+
+  it("still counts fee-exceeded and errored deposits", () => {
+    const { getByText } = renderBanner([
+      buildDeposit({ id: "1", status: DepositStatus.FeeExceeded }),
+      buildDeposit({ id: "2", status: DepositStatus.Error }),
+    ])
+
+    expect(getByText("2 pending")).toBeTruthy()
+  })
+
   it("navigates to the unclaimed-deposits screen on press", () => {
     const { getByTestId } = renderBanner([buildDeposit()])
 
