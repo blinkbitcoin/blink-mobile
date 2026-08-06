@@ -2518,6 +2518,13 @@
         "enhanced": "Passé en mode Enhanced sans garde",
         "anon": "Passé en mode Anon sans garde"
     },
+    "RestrictedRegion": {
+        "title": "Région restreinte détectée",
+        "body": "Votre connexion semble provenir d'une région restreinte. Blink ne peut pas fournir de services depuis cet emplacement. Vos soldes ne sont pas affectés.",
+        "bodyReturn": "Dès que vous quitterez cette région, toutes les fonctionnalités redeviendront normales.",
+        "learnMore": "En savoir plus",
+        "contactSupport": "Contacter le support"
+    },
     "DollarBalanceRestriction": {
         "modalTitle": "Le solde en dollars n'est pas disponible dans votre région"
     },

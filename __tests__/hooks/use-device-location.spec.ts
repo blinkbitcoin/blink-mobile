@@ -469,21 +469,31 @@ describe("useIpCountryLookup", () => {
     mockResolveIpCountryCode.mockResolvedValue(undefined)
   })
 
-  it("reports settled while disabled, since the lookup will never run", () => {
+  it("reports settled without a lookup while disabled", () => {
     const { result } = renderHook(() => useIpCountryLookup(false))
 
+    expect(mockResolveIpCountryCode).not.toHaveBeenCalled()
     expect(result.current).toEqual({ countryCode: undefined, isSettled: true })
   })
 
-  it("is unsettled while the lookup is in flight", () => {
+  it("reports settled without a lookup in Anon Mode", () => {
+    mockIsAnonMode = true
+
+    const { result } = renderHook(() => useIpCountryLookup(true))
+
+    expect(mockResolveIpCountryCode).not.toHaveBeenCalled()
+    expect(result.current).toEqual({ countryCode: undefined, isSettled: true })
+  })
+
+  it("stays unsettled while the lookup is in flight", () => {
     mockResolveIpCountryCode.mockReturnValue(new Promise(() => {}))
 
     const { result } = renderHook(() => useIpCountryLookup(true))
 
-    expect(result.current.isSettled).toBe(false)
+    expect(result.current).toEqual({ countryCode: undefined, isSettled: false })
   })
 
-  it("settles with the country once the lookup resolves", async () => {
+  it("settles with the country when the lookup resolves", async () => {
     mockResolveIpCountryCode.mockResolvedValue("HK")
 
     const { result } = renderHook(() => useIpCountryLookup(true))
@@ -493,7 +503,7 @@ describe("useIpCountryLookup", () => {
     expect(result.current).toEqual({ countryCode: "HK", isSettled: true })
   })
 
-  it("settles without a country when every adapter returns nothing", async () => {
+  it("settles without a country when every adapter fails", async () => {
     mockResolveIpCountryCode.mockResolvedValue(undefined)
 
     const { result } = renderHook(() => useIpCountryLookup(true))
@@ -503,16 +513,44 @@ describe("useIpCountryLookup", () => {
     expect(result.current).toEqual({ countryCode: undefined, isSettled: true })
   })
 
-  it("drops a resolved country the moment the lookup is disabled", async () => {
-    mockResolveIpCountryCode.mockResolvedValue("HK")
-
-    const { result, rerender } = renderHook(
-      ({ enabled }) => useIpCountryLookup(enabled),
-      { initialProps: { enabled: true } },
+  it("discards a lookup still in flight when it gets disabled and relooks up on re-enable", async () => {
+    let resolveLookup: (code: string | undefined) => void = () => {}
+    mockResolveIpCountryCode.mockReturnValue(
+      new Promise((resolve) => {
+        resolveLookup = resolve
+      }),
     )
 
+    const { result, rerender } = renderHook(
+      ({ enabled }: { enabled: boolean }) => useIpCountryLookup(enabled),
+      { initialProps: { enabled: true } },
+    )
+    rerender({ enabled: false })
+
+    await act(async () => {
+      resolveLookup("HK")
+    })
+
+    expect(result.current).toEqual({ countryCode: undefined, isSettled: true })
+    expect(mockResolveIpCountryCode).toHaveBeenCalledTimes(1)
+
+    mockResolveIpCountryCode.mockResolvedValue("DE")
+    rerender({ enabled: true })
     await act(async () => {})
-    expect(result.current.countryCode).toBe("HK")
+
+    expect(mockResolveIpCountryCode).toHaveBeenCalledTimes(2)
+    expect(result.current).toEqual({ countryCode: "DE", isSettled: true })
+  })
+
+  it("stops reporting the country once the lookup disables", async () => {
+    mockResolveIpCountryCode.mockResolvedValue("KP")
+
+    const { result, rerender } = renderHook(
+      ({ enabled }: { enabled: boolean }) => useIpCountryLookup(enabled),
+      { initialProps: { enabled: true } },
+    )
+    await act(async () => {})
+    expect(result.current).toEqual({ countryCode: "KP", isSettled: true })
 
     rerender({ enabled: false })
 

@@ -2518,6 +2518,13 @@
         "enhanced": "Zum selbstverwahrten Enhanced-Modus gewechselt",
         "anon": "Zum selbstverwahrten Anon-Modus gewechselt"
     },
+    "RestrictedRegion": {
+        "title": "Eingeschränkte Region erkannt",
+        "body": "Deine Verbindung scheint aus einer eingeschränkten Region zu stammen. Blink kann von diesem Standort aus keine Dienste anbieten. Deine Guthaben sind nicht betroffen.",
+        "bodyReturn": "Sobald du diese Region verlässt, funktioniert wieder alles wie gewohnt.",
+        "learnMore": "Mehr erfahren",
+        "contactSupport": "Support kontaktieren"
+    },
     "DollarBalanceRestriction": {
         "modalTitle": "Dollar-Guthaben ist in deiner Region nicht verfügbar"
     },

@@ -2518,6 +2518,13 @@
     "enhanced": "Bertukar kepada mod Enhanced bukan kustodian",
     "anon": "Bertukar kepada mod Anon bukan kustodian"
   },
+  "RestrictedRegion": {
+    "title": "Rantau terhad dikesan",
+    "body": "Sambungan anda nampaknya datang dari rantau terhad. Blink tidak dapat menyediakan perkhidmatan dari lokasi ini. Baki anda tidak terjejas.",
+    "bodyReturn": "Setelah anda meninggalkan rantau ini, semua fungsi akan kembali normal.",
+    "learnMore": "Ketahui lebih lanjut",
+    "contactSupport": "Hubungi sokongan"
+  },
   "DollarBalanceRestriction": {
     "modalTitle": "Baki dolar tidak tersedia di rantau anda"
   },

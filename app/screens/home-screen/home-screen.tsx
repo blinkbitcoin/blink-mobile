@@ -51,6 +51,7 @@ import {
 } from "@app/hooks/use-dollar-balance-restricted"
 import { useDollarBalanceForcedConversion } from "@app/hooks/use-dollar-balance-forced-conversion"
 import { useEnhancedModePrompt } from "@app/components/enhanced-mode-prompt"
+import { useRestrictedRegion } from "@app/components/restricted-region"
 import { useSelfCustodialAccountMode } from "@app/hooks/use-self-custodial-account-mode"
 import { MigrateNowModal } from "@app/components/migrate-now-modal"
 import { MigrationReminderBulletin } from "@app/components/migration-reminder-bulletin"
@@ -409,6 +410,11 @@ export const HomeScreen: React.FC = () => {
   const { isGated: isDollarBalanceGated, isRegionPending } = useDollarBalanceGate()
   const { isAnonMode } = useSelfCustodialAccountMode()
   const { promptEnhancedMode, isEnhancedModePromptVisible } = useEnhancedModePrompt()
+  const {
+    isRestrictedRegion,
+    isRestrictedRegionEvaluationPending,
+    presentRestrictedRegionModal,
+  } = useRestrictedRegion()
 
   const { isGated: isTransferGated, isRegionPending: isTransferRegionPending } =
     useTransferGate()
@@ -458,9 +464,12 @@ export const HomeScreen: React.FC = () => {
     ? ANY_POSITIVE_CENT_MINIMUM
     : stableTokenConversionMinimum
 
+  /** The sanctions block outranks the forced conversion: a sanctioned session must not
+   *  auto-present the convert modal over the restriction surfaces. */
+  const isForcedConversionEligible = isDollarBalanceRestricted && !isRestrictedRegion
   const { isConvertModalVisible, closeConvertModal } = useDollarBalanceForcedConversion({
     accountId: activeAccount?.id,
-    isRestricted: isDollarBalanceRestricted,
+    isRestricted: isForcedConversionEligible,
     usdWalletBalance: restrictedUsdWalletBalance,
     minimumBalance: minimumConvertibleBalance,
     isFocused,
@@ -483,23 +492,31 @@ export const HomeScreen: React.FC = () => {
     navigation.navigate("accountMigrationEntry")
   }, [dismissMigrateNowPrompt, navigation])
   /** The migrate-now push is the lowest-priority nudge: two native modals cannot
-   *  present at once on iOS, so it waits while any other home modal is up. */
+   *  present at once on iOS, so it waits while any other home modal is up — or may
+   *  still arrive, which is what the pending region evaluation signals. */
   const isAnotherHomeModalVisible =
     isConvertModalVisible ||
     isUpgradeModalVisible ||
     isRestrictionModalVisible ||
     isStablesatModalVisible ||
     isEnhancedModePromptVisible ||
+    isRestrictedRegion ||
+    isRestrictedRegionEvaluationPending ||
     modalVisible
   const shouldShowMigrateNowPrompt =
     migrateNowPrompt.isVisible && !isAnotherHomeModalVisible
 
   const closeUpgradeModal = () => setIsUpgradeModalVisible(false)
   const closeRestrictionModal = () => setIsRestrictionModalVisible(false)
-  /** Anon outranks the region explanation: its remedy is switching modes. */
+  /** Anon outranks the region explanation (its remedy is switching modes), and the
+   *  sanctions block outranks the compliance one (it is the stricter layer). */
   const onGatedDollarTap = () => {
     if (isAnonMode) {
       promptEnhancedMode()
+      return
+    }
+    if (isRestrictedRegion) {
+      presentRestrictedRegionModal()
       return
     }
     setIsRestrictionModalVisible(true)
@@ -508,13 +525,20 @@ export const HomeScreen: React.FC = () => {
     setIsUpgradeModalVisible(true)
   }, [])
 
+  /** Also waits on the pending verdict: a late restricted result would otherwise
+   *  mount the full-screen block over an already-presented modal. Posponing costs
+   *  nothing, since this callback is a dependency of the focus effect below and
+   *  the effect re-arms its timer once the evaluation settles. */
   const triggerUpgradeModal = React.useCallback(() => {
+    if (isRestrictedRegion || isRestrictedRegionEvaluationPending) return
     if (!accountId || levelAccount !== AccountLevel.Zero) return
     if (!canShowUpgradeModal || satsBalance <= balanceLimitToTriggerUpgradeModal) return
 
     openUpgradeModal()
     markShownUpgradeModal()
   }, [
+    isRestrictedRegion,
+    isRestrictedRegionEvaluationPending,
     accountId,
     levelAccount,
     canShowUpgradeModal,
@@ -649,27 +673,25 @@ export const HomeScreen: React.FC = () => {
     levelAccount === AccountLevel.Three ||
     (isIos && satsBalance > 0)
 
-  /** A gated transfer must not hide the button while the dollar balance is gated too:
+  /** Disabled while the region resolves so a fast tap cannot reach the gated flow before
+   *  the verdict lands; the explanation waits, since it would be wrong for a user who
+   *  turns out to be ungated. A sanctioned region disables it outright. */
+  const isTransferDisabled = isDollarBalanceGated || isRestrictedRegion || isRegionPending
+  const onTransferDisabledPress = isRegionPending ? undefined : onGatedDollarTap
+
+  /** A gated transfer must not hide the button while something else already disables it:
    *  the disabled button is the user's entry point to the explanation (WalletOverview
    *  greys the row from the same hook). Only the iOS zero-balance gate may hide it in
    *  that state.
    *
-   *  Visibility also holds on the pending region, like every other gated surface here.
+   *  Visibility still holds on the pending region, like every other gated surface here.
    *  Reading an unresolved region as allowed would offer the button and then take it
-   *  away once the verdict lands, for a user whose transfers are region-gated but whose
-   *  dollar balance is not. Anon resolves no region, so nothing pends there. The hold
-   *  costs a frame: the settings query behind the country is cache-first and the phone
-   *  parse is synchronous. */
+   *  away once the verdict lands, for a user whose transfers are region-gated but who is
+   *  otherwise ungated. Anon resolves no region, so nothing pends there. The hold costs a
+   *  frame: the settings query behind the country is cache-first and the phone parse is
+   *  synchronous. */
   const shouldShowTransferButton =
-    passesIosGate &&
-    !isTransferRegionPending &&
-    (!isTransferGated || isDollarBalanceGated)
-
-  /** Disabled while the region resolves so a fast tap cannot reach the gated flow before
-   *  the verdict lands; the explanation waits, since it would be wrong for a user who
-   *  turns out to be ungated. */
-  const isTransferDisabled = isDollarBalanceGated || isRegionPending
-  const onTransferDisabledPress = isRegionPending ? undefined : onGatedDollarTap
+    passesIosGate && !isTransferRegionPending && (!isTransferGated || isTransferDisabled)
 
   if (shouldShowTransferButton) {
     buttons.unshift({

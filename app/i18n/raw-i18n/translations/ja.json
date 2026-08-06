@@ -2518,6 +2518,13 @@
         "enhanced": "Enhanced ノンカストディアルモードに切り替えました",
         "anon": "Anon ノンカストディアルモードに切り替えました"
     },
+    "RestrictedRegion": {
+        "title": "制限された地域が検出されました",
+        "body": "接続元が制限された地域のようです。Blinkはこの場所からサービスを提供できません。残高には影響ありません。",
+        "bodyReturn": "この地域を離れると、すべての機能が通常どおりに戻ります。",
+        "learnMore": "詳細はこちら",
+        "contactSupport": "サポートに問い合わせる"
+    },
     "DollarBalanceRestriction": {
         "modalTitle": "ドル残高はあなたの地域ではご利用いただけません"
     },

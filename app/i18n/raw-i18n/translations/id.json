@@ -2518,6 +2518,13 @@
     "enhanced": "Beralih ke mode Enhanced non-kustodian",
     "anon": "Beralih ke mode Anon non-kustodian"
   },
+  "RestrictedRegion": {
+    "title": "Wilayah terbatas terdeteksi",
+    "body": "Koneksi Anda tampaknya berasal dari wilayah terbatas. Blink tidak dapat menyediakan layanan dari lokasi ini. Saldo Anda tidak terpengaruh.",
+    "bodyReturn": "Setelah Anda meninggalkan wilayah ini, semua fungsi akan kembali normal.",
+    "learnMore": "Pelajari lebih lanjut",
+    "contactSupport": "Hubungi dukungan"
+  },
   "DollarBalanceRestriction": {
     "modalTitle": "Saldo dolar tidak tersedia di wilayah Anda"
   },

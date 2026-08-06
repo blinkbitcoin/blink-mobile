@@ -101,10 +101,18 @@ let sharedLookup: Promise<CountryCode | undefined> | null = null
 
 export const resolveIpCountryCodeCached = (): Promise<CountryCode | undefined> => {
   if (!sharedLookup) {
-    sharedLookup = resolveIpCountryCode().then((countryCode) => {
-      if (!countryCode) sharedLookup = null
-      return countryCode
-    })
+    sharedLookup = resolveIpCountryCode()
+      .then((countryCode) => {
+        if (!countryCode) sharedLookup = null
+        return countryCode
+      })
+      /** resolveIpCountryCode only rejects if error reporting itself throws, but a
+       *  rejection must never stay cached: consumers gate UI on this promise settling,
+       *  and a cached rejection would poison every later mount for the whole session. */
+      .catch(() => {
+        sharedLookup = null
+        return undefined
+      })
   }
   return sharedLookup
 }
