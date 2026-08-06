@@ -6,6 +6,8 @@ import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.fabricEnable
 import com.facebook.react.defaults.DefaultReactActivityDelegate
 
 import android.os.Bundle
+import android.view.MotionEvent
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.zoontek.rnbootsplash.RNBootSplash
 
 class MainActivity : ReactActivity() {
@@ -26,4 +28,11 @@ class MainActivity : ReactActivity() {
     RNBootSplash.init(this, R.style.BootTheme) // ⬅️ initialize the splash screen
     super.onCreate(null)
   }
+
+  override fun dispatchTouchEvent(ev: MotionEvent): Boolean =
+      SafeTouchDispatch.dispatch(
+          onFrameworkBug = { FirebaseCrashlytics.getInstance().recordException(it) },
+      ) {
+        super.dispatchTouchEvent(ev)
+      }
 }

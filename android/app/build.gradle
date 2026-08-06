@@ -170,6 +170,11 @@ dependencies {
     androidTestImplementation('com.wix:detox:+')
     implementation 'androidx.appcompat:appcompat:1.1.0'
 
+    // Keep the BoM in sync with @react-native-firebase/app's pinned version
+    // (node_modules/@react-native-firebase/app/package.json -> sdkVersions.android.firebase)
+    implementation platform('com.google.firebase:firebase-bom:34.2.0')
+    implementation 'com.google.firebase:firebase-crashlytics'
+
     testImplementation("junit:junit:4.13.2")
     testImplementation("androidx.test:core:1.6.0")
     testImplementation("org.robolectric:robolectric:4.16")
