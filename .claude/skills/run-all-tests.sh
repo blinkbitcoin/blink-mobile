@@ -55,30 +55,27 @@ for dir in "$HERE"/*/; do
   fi
 done
 
-# --- Makefile shortcuts -------------------------------------------------------
-# The Makefile is the human quickstart; every target must delegate to the
-# tested scripts (checked with `make -n`, which expands recipes without
-# running anything).
+# --- Makefile (discovery and trust only) --------------------------------------
+# Doing lives in the SKILL.mds; the Makefile exists so `make help` orients a
+# human and `make test` is the one-keystroke trust command (also what CI would
+# call). Checked with `make -n`/output greps.
 printf '\n\033[1m=== Makefile ===\033[0m\n'
-mk() { # mk <assertion-name> <expected-script> <make args...>
-  local name="$1" want="$2"; shift 2
-  if make -s -n -C "$HERE" "$@" 2>/dev/null | grep -q "$want"; then
-    TOTAL_PASS=$((TOTAL_PASS + 1)); printf '  \033[32mPASS\033[0m %s\n' "$name"
-  else
-    TOTAL_FAIL=$((TOTAL_FAIL + 1)); printf '  \033[31mFAIL\033[0m %s\n' "$name"
-  fi
-}
-mk "make test delegates to run-all-tests"      "run-all-tests.sh" test
-mk "make claim delegates to claim-session"     "claim-session.sh" claim PR=12
-mk "make shot delegates to capture"            "capture.sh"       shot PR=12
-mk "make record delegates to record-flow"      "record-flow.sh"   record PR=12 FLOW=x.yaml
-mk "make publish delegates to push-assets"     "push-assets-branch.sh" publish PR=12 PURPOSE=screenshots FILES=x.png
-mk "make reset delegates to reset-app"         "reset-app.sh"     reset PR=12
-mk "make release delegates to release-session" "release-session.sh" release PR=12
-if make -s -n -C "$HERE" claim 2>/dev/null | grep -q "claim-session.sh"; then
-  TOTAL_FAIL=$((TOTAL_FAIL + 1)); printf '  \033[31mFAIL\033[0m make claim without PR= must refuse\n'
+MK_TEST=$(make -s -n -C "$HERE" test 2>/dev/null)
+if echo "$MK_TEST" | grep -q "run-all-tests.sh"; then
+  TOTAL_PASS=$((TOTAL_PASS + 1)); printf '  \033[32mPASS\033[0m make test delegates to run-all-tests\n'
 else
-  TOTAL_PASS=$((TOTAL_PASS + 1)); printf '  \033[32mPASS\033[0m make claim without PR= refuses\n'
+  TOTAL_FAIL=$((TOTAL_FAIL + 1)); printf '  \033[31mFAIL\033[0m make test delegates to run-all-tests\n'
+fi
+MK_HELP=$(make -s -C "$HERE" help 2>/dev/null)
+if echo "$MK_HELP" | grep -q "SKILL.md"; then
+  TOTAL_PASS=$((TOTAL_PASS + 1)); printf '  \033[32mPASS\033[0m make help points at the SKILL.md doing-interface\n'
+else
+  TOTAL_FAIL=$((TOTAL_FAIL + 1)); printf '  \033[31mFAIL\033[0m make help points at the SKILL.md doing-interface\n'
+fi
+if make -s -n -C "$HERE" claim PR=12 >/dev/null 2>&1; then
+  TOTAL_FAIL=$((TOTAL_FAIL + 1)); printf '  \033[31mFAIL\033[0m pipeline targets must not exist (SKILL.md is the one doing-interface)\n'
+else
+  TOTAL_PASS=$((TOTAL_PASS + 1)); printf '  \033[32mPASS\033[0m no pipeline targets: SKILL.md is the one doing-interface\n'
 fi
 
 echo
