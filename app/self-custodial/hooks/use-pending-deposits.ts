@@ -6,7 +6,12 @@ import { usePayments } from "@app/hooks/use-payments"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { type PendingDeposit } from "@app/types/payment"
 
-/** id (txid:vout) pins the deposit; status is its only field that changes. */
+/**
+ * Deposits are pinned by id (txid:vout) and compared on status, the only field
+ * the current consumers render. Fee and error details can therefore change
+ * without committing: the guard trades their freshness for a stable array
+ * identity, so widen it before rendering requiredFeeSats off this hook.
+ */
 const sameDeposits = (a: PendingDeposit[], b: PendingDeposit[]) =>
   a.length === b.length &&
   a.every((deposit, i) => deposit.id === b[i].id && deposit.status === b[i].status)
