@@ -93,10 +93,11 @@ export const usePendingReceiveAmount = ({
       )
     }
 
+    // An empty list needs no guard: the display sum resolves to null and the
+    // conversion fallback to a zero total, both of which render nothing.
     const pendingReceives = (pendingIncomingTransactions ?? []).filter(
       (tx) => tx.direction === TxDirection.Receive && tx.settlementAmount > 0,
     )
-    if (pendingReceives.length === 0) return null
 
     const displayTotal = sumSettlementDisplayAmounts(pendingReceives)
     if (displayTotal && displayTotal.amount > 0) {
