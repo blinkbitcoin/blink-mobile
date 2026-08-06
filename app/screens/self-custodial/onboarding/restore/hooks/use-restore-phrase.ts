@@ -12,10 +12,8 @@ import { splitWords } from "@app/utils/bip39-wordlist"
 import { reportError } from "@app/utils/error-logging"
 import { toastShow } from "@app/utils/toast"
 
+import { MNEMONIC_WORD_COUNT, WORDS_PER_STEP } from "../../utils"
 import { RestoreWalletStatus, useRestoreWallet } from "./use-restore-wallet"
-
-const WORD_COUNT = 12
-const WORDS_PER_STEP = 6
 
 type RestorePhraseParams = {
   step: PhraseStep
@@ -31,7 +29,7 @@ export const useRestorePhrase = ({ step, initialWords }: RestorePhraseParams) =>
   const isStep1 = step === PhraseStep.First
 
   const bip39 = useBip39Input({
-    wordCount: WORD_COUNT,
+    wordCount: MNEMONIC_WORD_COUNT,
     wordsPerStep: WORDS_PER_STEP,
     step,
     initialWords,
@@ -43,7 +41,7 @@ export const useRestorePhrase = ({ step, initialWords }: RestorePhraseParams) =>
       if (!accepted || !isStep1) return accepted
 
       const parsed = splitWords(text)
-      if (parsed.length === WORD_COUNT && validateMnemonic(parsed.join(" "))) {
+      if (parsed.length === MNEMONIC_WORD_COUNT && validateMnemonic(parsed.join(" "))) {
         navigation.navigate("selfCustodialRestorePhrase", {
           step: PhraseStep.Second,
           words: parsed,

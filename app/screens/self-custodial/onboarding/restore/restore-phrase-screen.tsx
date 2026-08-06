@@ -22,6 +22,7 @@ import {
   type MnemonicWordInputHandle,
 } from "@app/components/mnemonic-word-input"
 import { OnboardingScreenLayout } from "../layouts"
+import { isValidStepTwoWords } from "../utils"
 
 import { RestoreStatus, useRestorePhrase } from "./hooks/use-restore-phrase"
 
@@ -38,25 +39,25 @@ export const RestorePhraseScreen: React.FC = () => {
   /** Deep links and navigation-state rehydration can deliver missing or malformed params
    *  despite the route type; a bare destructure here threw into the app-wide ErrorBoundary,
    *  replacing the whole navigation tree (#4070). Fall back to step 1, where a restore
-   *  starts anyway. */
+   *  starts anyway. Step 2 is only valid together with the words entered on step 1 —
+   *  without them it renders inputs 7-12 over a phrase that can never validate. */
   const { params } = useRoute<RestorePhraseRouteProp>()
   const stepParam = params?.step
   const wordsParam = params?.words
-  const hasValidStep = isPhraseStep(stepParam)
-  const step = hasValidStep ? stepParam : PhraseStep.First
-  const initialWords =
-    Array.isArray(wordsParam) && wordsParam.every((word) => typeof word === "string")
-      ? wordsParam
-      : undefined
+  const wordsOk = isValidStepTwoWords(wordsParam)
+  const hasValidParams =
+    isPhraseStep(stepParam) && (stepParam === PhraseStep.First || wordsOk)
+  const step = hasValidParams ? stepParam : PhraseStep.First
+  const initialWords = hasValidParams && wordsOk ? wordsParam : undefined
 
   useEffect(() => {
-    if (hasValidStep) return
+    if (hasValidParams) return
     reportError(
       "Restore phrase route params missing",
-      new Error("Route delivered no valid step"),
+      new Error("Route delivered no valid step/words combination"),
       { dedupKey: "restore-phrase-params-missing", alwaysRecord: true },
     )
-  }, [hasValidStep])
+  }, [hasValidParams])
 
   const {
     stepWords,

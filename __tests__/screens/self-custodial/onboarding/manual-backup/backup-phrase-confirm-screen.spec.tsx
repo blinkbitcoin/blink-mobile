@@ -181,6 +181,70 @@ describe("BackupPhraseConfirmScreen", () => {
       expect(mockReplace).toHaveBeenCalledWith("selfCustodialBackupPhrase", { step: 1 })
     })
 
+    /** Shape-valid but semantically broken challenges render a prompt the user cannot
+     *  answer — "enter word 100" of a 12-word phrase — so they take the same
+     *  report-and-redirect path as missing params (#4088 review, I2). */
+    it("redirects when a challenge index falls outside the mnemonic", async () => {
+      mockRouteParams.mockReturnValue({ challenges: [{ index: 99, word: "abandon" }] })
+
+      render(
+        <ContextForScreen>
+          <BackupPhraseConfirmScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      expect(mockReplace).toHaveBeenCalledWith("selfCustodialBackupPhrase", { step: 1 })
+      expect(mockReportError).toHaveBeenCalledTimes(1)
+    })
+
+    it("redirects when challenge indexes repeat", async () => {
+      mockRouteParams.mockReturnValue({
+        challenges: [
+          { index: 4, word: "youth" },
+          { index: 4, word: "bundle" },
+        ],
+      })
+
+      render(
+        <ContextForScreen>
+          <BackupPhraseConfirmScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      expect(mockReplace).toHaveBeenCalledWith("selfCustodialBackupPhrase", { step: 1 })
+      expect(mockReportError).toHaveBeenCalledTimes(1)
+    })
+
+    it("redirects when a challenge word is blank", async () => {
+      mockRouteParams.mockReturnValue({ challenges: [{ index: 3, word: "  " }] })
+
+      render(
+        <ContextForScreen>
+          <BackupPhraseConfirmScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      expect(mockReplace).toHaveBeenCalledWith("selfCustodialBackupPhrase", { step: 1 })
+      expect(mockReportError).toHaveBeenCalledTimes(1)
+    })
+
+    it("redirects when a challenge index is not an integer", async () => {
+      mockRouteParams.mockReturnValue({ challenges: [{ index: 1.5, word: "youth" }] })
+
+      render(
+        <ContextForScreen>
+          <BackupPhraseConfirmScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      expect(mockReplace).toHaveBeenCalledWith("selfCustodialBackupPhrase", { step: 1 })
+      expect(mockReportError).toHaveBeenCalledTimes(1)
+    })
+
     it("neither redirects nor reports for valid challenges", async () => {
       render(
         <ContextForScreen>

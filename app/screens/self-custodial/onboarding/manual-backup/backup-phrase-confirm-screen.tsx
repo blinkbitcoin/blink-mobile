@@ -18,18 +18,9 @@ import { reportError } from "@app/utils/error-logging"
 import { testProps } from "@app/utils/testProps"
 
 import { useBackupConfirm, useCompleteBackup } from "../hooks"
+import { type Challenge, isValidChallenges } from "../utils"
 
 type ConfirmRouteProp = RouteProp<RootStackParamList, "selfCustodialBackupPhraseConfirm">
-
-type Challenge = { index: number; word: string }
-
-const isValidChallenges = (value: unknown): value is Challenge[] =>
-  Array.isArray(value) &&
-  value.length > 0 &&
-  value.every(
-    (challenge) =>
-      typeof challenge?.index === "number" && typeof challenge?.word === "string",
-  )
 
 /** A stable empty fallback, so the one frame rendered before the redirect does not feed
  *  useBackupConfirm a fresh array identity on every render. */

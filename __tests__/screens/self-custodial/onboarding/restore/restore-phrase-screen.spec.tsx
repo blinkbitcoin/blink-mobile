@@ -54,6 +54,13 @@ jest.mock("@app/components/mnemonic-word-input", () => {
 loadLocale("en")
 const LL = i18nObject("en")
 
+/** Step 2 is only usable when the first six words survived the hand-off from step 1;
+ *  the last six are what the user is about to type. */
+const validStep2Words = [
+  ...["abandon", "ability", "able", "about", "above", "absent"],
+  ...Array(6).fill(""),
+]
+
 const defaultHookReturn = {
   stepWords: Array(6).fill(""),
   offset: 6,
@@ -87,7 +94,7 @@ const renderScreen = () =>
 describe("RestorePhraseScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockRouteParams = { step: 2, words: Array(12).fill("") }
+    mockRouteParams = { step: 2, words: [...validStep2Words] }
     mockUseRestorePhrase.mockReturnValue(defaultHookReturn)
   })
 
@@ -117,16 +124,66 @@ describe("RestorePhraseScreen", () => {
       expect(getByText(LL.RestoreScreen.phraseSubtitleStep1())).toBeTruthy()
     })
 
-    it("drops malformed words instead of seeding the inputs with them", async () => {
+    /** Step 2 without usable words is a dead end — inputs 7-12 rendered over a phrase
+     *  whose first six words were never entered — so it is invalid params, not a
+     *  degraded-but-usable state (#4088 review, I1). */
+    it("falls back to step 1 and reports when step 2 arrives with malformed words", async () => {
       mockRouteParams = { step: 2, words: "not-an-array" }
+
+      const { getByText } = renderScreen()
+      await flushEffects()
+
+      expect(getByText(LL.RestoreScreen.phraseSubtitleStep1())).toBeTruthy()
+      expect(mockUseRestorePhrase).toHaveBeenCalledWith({
+        step: 1,
+        initialWords: undefined,
+      })
+      expect(mockReportError).toHaveBeenCalledTimes(1)
+      expect(mockReportError).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.any(Error),
+        expect.objectContaining({
+          dedupKey: "restore-phrase-params-missing",
+          alwaysRecord: true,
+        }),
+      )
+    })
+
+    it("falls back to step 1 and reports when step 2 arrives with a truncated words array", async () => {
+      mockRouteParams = { step: 2, words: ["abandon", "ability"] }
 
       renderScreen()
       await flushEffects()
 
       expect(mockUseRestorePhrase).toHaveBeenCalledWith({
-        step: 2,
+        step: 1,
         initialWords: undefined,
       })
+      expect(mockReportError).toHaveBeenCalledTimes(1)
+    })
+
+    it("falls back to step 1 and reports when step 2 arrives with its leading words empty", async () => {
+      mockRouteParams = { step: 2, words: Array(12).fill("") }
+
+      renderScreen()
+      await flushEffects()
+
+      expect(mockUseRestorePhrase).toHaveBeenCalledWith({
+        step: 1,
+        initialWords: undefined,
+      })
+      expect(mockReportError).toHaveBeenCalledTimes(1)
+    })
+
+    it("stays on step 2 and seeds the words when they are usable", async () => {
+      renderScreen()
+      await flushEffects()
+
+      expect(mockUseRestorePhrase).toHaveBeenCalledWith({
+        step: 2,
+        initialWords: validStep2Words,
+      })
+      expect(mockReportError).not.toHaveBeenCalled()
     })
 
     it("reports the malformed params once", async () => {
