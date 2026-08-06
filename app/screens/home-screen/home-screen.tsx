@@ -580,8 +580,12 @@ export const HomeScreen: React.FC = () => {
     setIsUpgradeModalVisible(true)
   }, [])
 
+  /** Also waits on the pending verdict: a late restricted result would otherwise
+   *  mount the full-screen block over an already-presented modal. Posponing costs
+   *  nothing, since this callback is a dependency of the focus effect below and
+   *  the effect re-arms its timer once the evaluation settles. */
   const triggerUpgradeModal = React.useCallback(() => {
-    if (isRestrictedRegion) return
+    if (isRestrictedRegion || isRestrictedRegionEvaluationPending) return
     if (!accountId || levelAccount !== AccountLevel.Zero) return
     if (!canShowUpgradeModal || satsBalance <= balanceLimitToTriggerUpgradeModal) return
 
@@ -589,6 +593,7 @@ export const HomeScreen: React.FC = () => {
     markShownUpgradeModal()
   }, [
     isRestrictedRegion,
+    isRestrictedRegionEvaluationPending,
     accountId,
     levelAccount,
     canShowUpgradeModal,
