@@ -14,6 +14,29 @@ Based on the PR's changed files, read relevant docs thoroughly:
 
 **Then read /docs/index.md** - it's the master index linking to additional docs (dev setup, E2E testing, i18n guide, etc.). Follow relevant references if they apply to the PR.
 
+## Skills
+
+Executable agent workflows live in `.claude/skills/` — isolated iOS simulator
+sessions (`react-native-ios-simulator`), PR demo capture
+(`react-native-demo-screenshots`, `react-native-demo-videos`), and embedding
+images in PR comments (`github-pr-image-attachments`). Use them instead of
+improvising `simctl`/Metro/capture commands. After editing any skill's
+scripts, run its `tests/run.sh` (or `.claude/skills/run-all-tests.sh` for all).
+
+The skills are app-agnostic; this repo's values for their required
+configuration are:
+
+```bash
+export DEMO_APP_ID_IOS=io.galoy.bitcoinbeach
+export DEMO_APP_ID_ANDROID=com.galoyapp
+export DEMO_SIM_PREFIX=blink-demo
+```
+
+Set them before claiming a simulator session or recording a flow — the
+scripts refuse to guess an app id. `DEMO_SIM_PREFIX` names this repo's
+simulators (`blink-demo-pr<N>`) and scopes their session state, so other
+repos using the same skills on one machine can never collide with ours.
+
 ## Critical Rules (Always Apply)
 - `app/graphql/generated.ts` is AUTO-GENERATED - never modify manually
 - Payment mutations must NOT have retry logic (handled specially in client.tsx)

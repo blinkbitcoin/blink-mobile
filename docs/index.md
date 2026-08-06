@@ -50,6 +50,7 @@ yarn ios             # iOS (terminal 2)
 | [Development Setup](./dev.md) | Development environment setup guide |
 | [PR Review Guide](./pr-review.md) | Review conventions, checklists, and enforced standards for pull requests |
 | [E2E Testing](./e2e-testing.md) | End-to-end testing with Detox/Appium |
+| [Agent Skills](../.claude/skills/README.md) | Tested agent workflows: isolated simulator sessions, PR demo capture, image attachments |
 | [Android env config & R8](./android-env-config-r8.md) | Verifying `react-native-config` values survive R8 in release builds |
 | [README](../README.md) | Project overview and basic instructions |
 | [Contributing](../CONTRIBUTING.MD) | Contribution guidelines |

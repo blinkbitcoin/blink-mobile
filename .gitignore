@@ -104,8 +104,9 @@ android-recordings
 !.yarn/sdks
 !.yarn/versions
 
-# As long asd we haven't agreed on an AI agent strategy, let's ignore any AI agent data
-.claude
+# AI agent data stays local, except the shared skills in .claude/skills
+.claude/*
+!.claude/skills
 .augment
 .bmad
 bmad-custom-src
