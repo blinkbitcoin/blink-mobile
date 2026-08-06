@@ -25,9 +25,6 @@ instructions (e.g. `AGENTS.md`).
 | [`react-native-demo-videos`](./react-native-demo-videos/SKILL.md) | Maestro-driven recordings with safe recorder stop paths, GIF/MP4/WebM encoding, and a guard against the `clearState` Metro-redirect trap |
 | [`github-pr-image-attachments`](./github-pr-image-attachments/SKILL.md) | Embed images in PR comments via an orphan `assets/pr-<N>-*` branch (`gh` has no attachment upload); repo derived from the origin remote |
 
-Some checkouts also carry `gh-stack` (a vendored personal workflow for stacked
-PRs) — it is not part of the demo pipeline.
-
 ## Quickstart (a before/after screenshot pair on a PR)
 
 ```bash
@@ -60,7 +57,8 @@ and release proves on exit that nothing else on the machine was disturbed.
 Runs every skill's suite — a couple hundred assertions against fake
 `xcrun`/`adb`/`maestro` binaries (real `ffmpeg`/ImageMagick/git where the
 guarantee needs the real tool). No simulators, no emulators, no network: safe
-on any machine, any time, including CI. The load-bearing guards are
+on any machine with ordinary dev tooling (bash, git, python3, make, ffmpeg,
+ImageMagick), any time, including CI. The load-bearing guards are
 mutation-checked, and the key `SKILL.md` claims are pinned by prose-contract
 assertions, so documentation drift fails the tests. This script also fails if
 a skill lacks a suite or this README stops mentioning it.
