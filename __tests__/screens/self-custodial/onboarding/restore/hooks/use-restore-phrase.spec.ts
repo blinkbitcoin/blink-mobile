@@ -1,6 +1,9 @@
 import { renderHook, act } from "@testing-library/react-native"
 
-import { useRestorePhrase } from "@app/screens/self-custodial/onboarding/restore/hooks/use-restore-phrase"
+import {
+  RestoreStatus,
+  useRestorePhrase,
+} from "@app/screens/self-custodial/onboarding/restore/hooks/use-restore-phrase"
 import { PhraseStep } from "@app/navigation/stack-param-lists"
 
 const mockNavigate = jest.fn()
@@ -95,6 +98,10 @@ describe("useRestorePhrase", () => {
       focusRequest: null as number | null,
       clearFocusRequest: jest.fn(),
     }
+  })
+
+  it("re-exports the restore wallet status for the screen", () => {
+    expect(RestoreStatus.Restoring).toBe("restoring")
   })
 
   it("returns initial state", () => {
@@ -259,6 +266,22 @@ describe("useRestorePhrase", () => {
 
     expect(mockRestore).toHaveBeenCalledWith("valid a b c d e f g h i j k")
     expect(result.current.validationError).toBeNull()
+  })
+
+  /** useRestoreWallet reports its own failures and drives its status state; the hook
+   *  only has to keep the rejection from escaping the button's onPress. */
+  it("swallows a rejecting restore instead of rethrowing", async () => {
+    mockBip39State.allFilled = true
+    mockBip39State.words = "valid a b c d e f g h i j k".split(" ")
+    mockRestore.mockRejectedValue(new Error("restore failed"))
+
+    const { result } = renderHook(() => useRestorePhrase({ step: PhraseStep.Second }))
+
+    await expect(
+      act(async () => {
+        await result.current.handleRestore()
+      }),
+    ).resolves.toBeUndefined()
   })
 
   it("clears validation error on word update", () => {

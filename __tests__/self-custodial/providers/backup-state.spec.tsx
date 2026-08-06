@@ -4,7 +4,9 @@ import { renderHook, act, waitFor } from "@testing-library/react-native"
 import {
   BackupStateProvider,
   useBackupState,
+  BackupMethod,
   BackupStatus,
+  markBackupCompletedFor,
   removeBackupStateFor,
 } from "@app/self-custodial/providers/backup-state"
 import { AccountType, AccountStatus } from "@app/types/wallet"
@@ -76,6 +78,18 @@ describe("BackupStateProvider", () => {
     mockActiveAccount = makeAccount(TEST_SC_ACCOUNT_ID)
   })
 
+  it("is a safe no-op when used outside the provider", () => {
+    const { result } = renderHook(() => useBackupState())
+
+    act(() => {
+      result.current.setBackupCompleted("manual")
+      result.current.resetBackupState()
+    })
+
+    expect(result.current.backupState.status).toBe(BackupStatus.None)
+    expect(mockSetItem).not.toHaveBeenCalled()
+  })
+
   it("provides default state when no persisted data", async () => {
     const { result } = renderHook(() => useBackupState(), { wrapper })
 
@@ -127,6 +141,86 @@ describe("BackupStateProvider", () => {
 
     expect(result.current.backupState.status).toBe(BackupStatus.None)
     expect(mockReportError).toHaveBeenCalledWith("Backup state read", expect.any(Error))
+  })
+
+  /** The recovery half of the fallback: after a failed read settles the provider to the
+   *  default state, a later completion must still persist (#4088 review, G4). */
+  it("persists a later completion after a failed read settled to defaults", async () => {
+    mockGetItem.mockRejectedValue(new Error("storage unavailable"))
+
+    const { result } = renderHook(() => useBackupState(), { wrapper })
+
+    await act(async () => {})
+
+    await act(async () => {
+      result.current.setBackupCompleted("manual")
+    })
+
+    expect(result.current.backupState.status).toBe(BackupStatus.Completed)
+    expect(mockSetItem).toHaveBeenCalledWith(
+      BACKUP_KEY,
+      JSON.stringify({ status: "completed", method: "manual" }),
+    )
+  })
+
+  it("reports a failing persist without losing the in-memory state", async () => {
+    mockSetItem.mockRejectedValue(new Error("disk full"))
+
+    const { result } = renderHook(() => useBackupState(), { wrapper })
+
+    await act(async () => {})
+
+    await act(async () => {
+      result.current.setBackupCompleted("manual")
+    })
+
+    expect(result.current.backupState.status).toBe(BackupStatus.Completed)
+    expect(mockReportError).toHaveBeenCalledWith(
+      "Backup state persist",
+      expect.any(Error),
+    )
+  })
+
+  it("drops a read that resolves after unmount", async () => {
+    let resolveRead: (value: string | null) => void = () => {}
+    mockGetItem.mockReturnValue(
+      new Promise<string | null>((resolve) => {
+        resolveRead = resolve
+      }),
+    )
+
+    const { unmount } = renderHook(() => useBackupState(), { wrapper })
+    unmount()
+
+    await act(async () => {
+      resolveRead(JSON.stringify({ status: "completed", method: "cloud" }))
+    })
+
+    expect(mockGetItem).toHaveBeenCalledWith(BACKUP_KEY)
+    expect(mockReportError).not.toHaveBeenCalled()
+  })
+
+  it("does not persist a completion without an active self-custodial account", async () => {
+    mockActiveAccount = null
+
+    const { result } = renderHook(() => useBackupState(), { wrapper })
+
+    await act(async () => {})
+
+    await act(async () => {
+      result.current.setBackupCompleted("manual")
+    })
+
+    expect(mockSetItem).not.toHaveBeenCalled()
+  })
+
+  it("markBackupCompletedFor writes the completed state under the given accountId", async () => {
+    await markBackupCompletedFor(OTHER_SC_ACCOUNT_ID, BackupMethod.Manual)
+
+    expect(mockSetItem).toHaveBeenCalledWith(
+      OTHER_BACKUP_KEY,
+      JSON.stringify({ status: "completed", method: "manual" }),
+    )
   })
 
   it("ignores corrupted persisted data", async () => {

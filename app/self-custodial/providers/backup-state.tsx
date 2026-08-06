@@ -112,6 +112,9 @@ export const BackupStateProvider: React.FC<React.PropsWithChildren> = ({ childre
       if (!mounted) return
       setBackupState(fresh ?? defaultState)
     }
+    /* istanbul ignore next -- readBackupState catches everything today, so this net is
+     * unreachable; it stays because the provider mounts above the app ErrorBoundary and
+     * a future refactor that lets load() reject must not become an unhandled rejection */
     load().catch((err) => {
       reportError("Backup state load", err)
     })

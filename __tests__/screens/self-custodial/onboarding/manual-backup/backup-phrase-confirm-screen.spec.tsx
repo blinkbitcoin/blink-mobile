@@ -306,6 +306,28 @@ describe("BackupPhraseConfirmScreen", () => {
     expect(getByText("youth")).toBeTruthy()
   })
 
+  it("moves the suggestion target when another input takes focus", async () => {
+    const { getByPlaceholderText, getByText, queryByText } = render(
+      <ContextForScreen>
+        <BackupPhraseConfirmScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    fireEvent.changeText(
+      getByPlaceholderText(`${LL.BackupScreen.ManualBackup.Confirm.enterWord()} 1`),
+      "you",
+    )
+    expect(getByText("youth")).toBeTruthy()
+
+    fireEvent(
+      getByPlaceholderText(`${LL.BackupScreen.ManualBackup.Confirm.enterWord()} 5`),
+      "focus",
+    )
+
+    expect(queryByText("youth")).toBeNull()
+  })
+
   it("fills input when suggestion is selected", async () => {
     const { getByPlaceholderText, getByText } = render(
       <ContextForScreen>

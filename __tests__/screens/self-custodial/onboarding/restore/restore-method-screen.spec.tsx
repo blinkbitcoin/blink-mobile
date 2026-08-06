@@ -183,6 +183,32 @@ describe("RestoreMethodScreen", () => {
       expect(mockToastShow).not.toHaveBeenCalled()
     })
 
+    /** useRestoreWallet reports its own failures and drives its status state; the screen
+     *  must swallow the rejection rather than double-report it via the read catch. */
+    it("swallows a rejecting restore after a successful read", async () => {
+      mockRead.mockResolvedValue({
+        success: true,
+        walletIdentifier: "pubkey-1",
+        mnemonic: "word1 word2 word3",
+      })
+      mockRestore.mockRejectedValue(new Error("restore failed"))
+
+      const { getByTestId } = render(
+        <ContextForScreen>
+          <RestoreMethodScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      await act(async () => {
+        fireEvent.press(getByTestId(passwordManagerTestId()))
+      })
+
+      expect(mockRestore).toHaveBeenCalledWith("word1 word2 word3")
+      expect(mockReportError).not.toHaveBeenCalled()
+      expect(mockToastShow).not.toHaveBeenCalled()
+    })
+
     it("stays silent when the user cancels", async () => {
       mockRead.mockResolvedValue({ success: false, error: "user-cancelled" })
 
