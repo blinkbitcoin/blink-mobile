@@ -50,6 +50,7 @@ yarn ios             # iOS (terminal 2)
 | [Development Setup](./dev.md) | Development environment setup guide |
 | [PR Review Guide](./pr-review.md) | Review conventions, checklists, and enforced standards for pull requests |
 | [E2E Testing](./e2e-testing.md) | End-to-end testing with Detox/Appium |
+| [Staging Login](./staging-login.md) | Getting a custodial staging session in a local build (SMS test flow, whitelist probe) |
 | [Android env config & R8](./android-env-config-r8.md) | Verifying `react-native-config` values survive R8 in release builds |
 | [README](../README.md) | Project overview and basic instructions |
 | [Contributing](../CONTRIBUTING.MD) | Contribution guidelines |
