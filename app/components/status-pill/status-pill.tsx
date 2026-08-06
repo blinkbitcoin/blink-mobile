@@ -1,5 +1,5 @@
 import React from "react"
-import { StyleProp, View, ViewStyle } from "react-native"
+import { Pressable, StyleProp, View, ViewStyle } from "react-native"
 
 import { makeStyles, Text } from "@rn-vui/themed"
 
@@ -7,19 +7,36 @@ import { testProps } from "@app/utils/testProps"
 
 export type StatusPillVariant = "warning" | "error" | "success" | "primary"
 
+/** The pill can sit in width-capped rows (balance header), so its label must
+ *  not outgrow the cap under iOS Dynamic Type — same ceiling as the header. */
+const MAX_LABEL_FONT_SIZE_MULTIPLIER = 1.4
+
 type Props = {
   label: string
   status: StatusPillVariant
   ghost?: boolean
   testID?: string
   style?: StyleProp<ViewStyle>
+  onPress?: () => void
 }
 
-export const StatusPill: React.FC<Props> = ({ label, status, ghost, testID, style }) => {
+export const StatusPill: React.FC<Props> = ({
+  label,
+  status,
+  ghost,
+  testID,
+  style,
+  onPress,
+}) => {
   const styles = useStyles({ status })
 
   const body = (
-    <Text style={styles.label} numberOfLines={1} ellipsizeMode="tail">
+    <Text
+      style={styles.label}
+      numberOfLines={1}
+      ellipsizeMode="tail"
+      maxFontSizeMultiplier={MAX_LABEL_FONT_SIZE_MULTIPLIER}
+    >
       {label}
     </Text>
   )
@@ -34,6 +51,19 @@ export const StatusPill: React.FC<Props> = ({ label, status, ghost, testID, styl
       >
         {body}
       </View>
+    )
+  }
+
+  if (onPress) {
+    return (
+      <Pressable
+        onPress={onPress}
+        accessibilityRole="button"
+        style={[styles.pill, style]}
+        {...(testID ? testProps(testID) : { accessibilityLabel: label })}
+      >
+        {body}
+      </Pressable>
     )
   }
 

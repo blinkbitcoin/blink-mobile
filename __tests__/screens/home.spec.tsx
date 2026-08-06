@@ -2044,6 +2044,25 @@ describe("HomeScreen pending receive badge", () => {
       expect(queryByTestId("balance-status-badge")).toBeNull()
     })
 
+    it("opens the unclaimed-deposits screen when the immature-deposit pill is tapped", async () => {
+      // The banner no longer counts immature deposits, so the pill carries
+      // their inspection path (txid / mempool link) to that screen.
+      mockActiveWalletOverride = selfCustodialWallet
+      mockPendingDepositsOverride = { deposits: [sparkDeposit("immature")] }
+
+      const { findByTestId } = render(
+        <ContextForScreen>
+          <HomeScreen />
+        </ContextForScreen>,
+      )
+
+      fireEvent.press(await findByTestId("balance-status-badge"))
+
+      expect(mockNavigate).toHaveBeenCalledWith("unclaimedDepositsScreen")
+
+      await flushEffects()
+    })
+
     it("leaves the badge to the unclaimed-deposit banner for claimable deposits", async () => {
       mockActiveWalletOverride = selfCustodialWallet
       mockPendingDepositsOverride = { deposits: [sparkDeposit("claimable")] }

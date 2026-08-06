@@ -39,6 +39,7 @@ const Loader = () => {
 export type StatusBadge = {
   label: string
   status: StatusPillVariant
+  onPress?: () => void
 }
 
 type Props = {
@@ -110,6 +111,7 @@ export const BalanceHeader: React.FC<Props> = ({
               <StatusPill
                 label={statusBadge.label}
                 status={statusBadge.status}
+                onPress={statusBadge.onPress}
                 testID="balance-status-badge"
                 style={styles.statusPill}
               />

@@ -166,6 +166,18 @@ describe("BalanceHeader", () => {
     expect(ghostStyle.maxWidth).toBe(realStyle.maxWidth)
   })
 
+  it("forwards the badge onPress so the pill can carry an action", () => {
+    const onPress = jest.fn()
+    const { getByTestId } = renderHeader({
+      statusBadge: { label: "+$1.00 pending", status: "warning", onPress },
+    })
+
+    fireEvent.press(getByTestId("balance-status-badge"))
+
+    expect(onPress).toHaveBeenCalledTimes(1)
+    expect(mockSwitchMemoryHideAmount).not.toHaveBeenCalled()
+  })
+
   it("does not render the status badge while amounts are hidden", () => {
     mockHideAmount = true
 

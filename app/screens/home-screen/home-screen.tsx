@@ -69,7 +69,7 @@ import {
   usePendingDeposits,
 } from "@app/self-custodial/hooks"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
-import { ConvertDirection } from "@app/types/payment"
+import { ConvertDirection, DepositStatus } from "@app/types/payment"
 import { useBackupNudgeState } from "@app/hooks/use-backup-nudge-state"
 import { useSelfCustodialInfoBulletinState } from "@app/hooks/use-self-custodial-info-bulletin-state"
 import { getErrorMessages } from "@app/graphql/utils"
@@ -368,10 +368,20 @@ export const HomeScreen: React.FC = () => {
     pendingIncomingTransactions,
     deposits,
   })
+  /** The banner below only counts actionable deposits, so the pill carries the
+   *  immature deposits' inspection path (txid / mempool link) to the
+   *  unclaimed-deposits screen. Custodial pending receives have no such
+   *  screen — their pill stays inert. */
+  const hasImmatureDeposits = deposits.some(
+    ({ status }) => status === DepositStatus.Immature,
+  )
   const pendingStatusBadge = pendingReceiveAmountText
     ? {
         label: LL.HomeScreen.pendingReceiveBadge({ amount: pendingReceiveAmountText }),
         status: "warning" as const,
+        onPress: hasImmatureDeposits
+          ? () => navigation.navigate("unclaimedDepositsScreen")
+          : undefined,
       }
     : undefined
 

@@ -1,5 +1,5 @@
 import React from "react"
-import { render } from "@testing-library/react-native"
+import { fireEvent, render } from "@testing-library/react-native"
 import { ThemeProvider } from "@rn-vui/themed"
 
 import theme from "@app/rne-theme/theme"
@@ -48,6 +48,26 @@ describe("StatusPill", () => {
     const label = getByText("PENDING +$1,234,567.89")
     expect(label.props.numberOfLines).toBe(1)
     expect(label.props.ellipsizeMode).toBe("tail")
+  })
+
+  it("caps font scaling on the label so the fixed-width pill cannot clip scaled amounts", () => {
+    const { getByText } = renderPill({ label: "STALE", status: "warning" })
+
+    expect(getByText("STALE").props.maxFontSizeMultiplier).toBeLessThanOrEqual(1.5)
+  })
+
+  it("invokes onPress when tapped", () => {
+    const onPress = jest.fn()
+    const { getByTestId } = renderPill({
+      label: "STALE",
+      status: "warning",
+      testID: "pill",
+      onPress,
+    })
+
+    fireEvent.press(getByTestId("pill"))
+
+    expect(onPress).toHaveBeenCalledTimes(1)
   })
 
   it("hides itself from accessibility and ignores the testID when ghost", () => {
