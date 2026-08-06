@@ -228,6 +228,20 @@ describe("usePendingDeposits", () => {
     expect(result.current.deposits).toEqual([deposit()])
   })
 
+  it("keeps the empty list's identity across an account change (no redundant commit)", async () => {
+    mockListPendingDeposits.mockResolvedValue({ deposits: [] })
+
+    const { result, rerender } = renderHook(() => usePendingDeposits())
+    await flush()
+    const empty = result.current.deposits
+
+    mockActiveAccount = { id: "acct-2" }
+    rerender({})
+    await flush()
+
+    expect(result.current.deposits).toBe(empty)
+  })
+
   it("refetch converges on a superseding listing before resolving", async () => {
     mockListPendingDeposits.mockResolvedValue({ deposits: [] })
 

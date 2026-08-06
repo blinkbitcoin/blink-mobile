@@ -70,6 +70,15 @@ describe("StatusPill", () => {
     expect(onPress).toHaveBeenCalledTimes(1)
   })
 
+  it("stays reachable by its label when pressable without a testID", () => {
+    const onPress = jest.fn()
+    const { getByLabelText } = renderPill({ label: "STALE", status: "warning", onPress })
+
+    fireEvent.press(getByLabelText("STALE"))
+
+    expect(onPress).toHaveBeenCalledTimes(1)
+  })
+
   it("hides itself from accessibility and ignores the testID when ghost", () => {
     const { queryByTestId } = renderPill({
       label: "STALE",
