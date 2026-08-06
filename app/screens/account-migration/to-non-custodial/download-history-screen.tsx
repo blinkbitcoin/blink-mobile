@@ -5,7 +5,7 @@ import { useTheme } from "@rn-vui/themed"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { IconHero } from "@app/components/icon-hero"
-import { useExportTransactionsCsv } from "@app/hooks/use-export-transactions-csv"
+import { useExportTransactionsCsv } from "@app/custodial/hooks/use-export-transactions-csv"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import {
   useCustodialWalletBalances,

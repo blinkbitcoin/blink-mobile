@@ -39,7 +39,7 @@ jest.mock("@app/screens/account-migration/hooks", () => ({
   useMigrationCheckpoint: () => mockUseMigrationCheckpoint(),
 }))
 
-jest.mock("@app/hooks/use-export-transactions-csv", () => ({
+jest.mock("@app/custodial/hooks/use-export-transactions-csv", () => ({
   useExportTransactionsCsv: () => ({ exportCsv: mockExportCsv, loading: false }),
 }))
 
