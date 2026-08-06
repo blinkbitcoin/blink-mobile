@@ -2110,6 +2110,7 @@
     "error": "Valami hiba történt a helyzeted lekérdezése közben"
   },
   "HomeScreen": {
+    "pendingReceiveBadge": "+{amount: string} Függőben",
     "receive": "Fogadás",
     "send": "Küldés",
     "title": "Kezdőlap",

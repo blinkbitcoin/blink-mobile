@@ -2110,6 +2110,7 @@
         "error": "Oops. Qualcosa è andato storto durante il recupero della tua posizione"
     },
     "HomeScreen": {
+        "pendingReceiveBadge": "+{amount: string} in attesa",
         "receive": "Ricevi",
         "send": "Invia",
         "title": "Home",

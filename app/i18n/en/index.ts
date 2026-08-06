@@ -2113,6 +2113,7 @@ const en: BaseTranslation = {
     error: "Oops. Something went wrong while getting your location",
   },
   HomeScreen: {
+    pendingReceiveBadge: "+{amount: string} pending",
     receive: "Receive",
     send: "Send",
     title: "Home",

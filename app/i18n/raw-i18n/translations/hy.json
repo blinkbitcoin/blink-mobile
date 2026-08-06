@@ -2110,6 +2110,7 @@
     "error": "Վայ։ Ինչ-որ բան այնպես չգնաց ձեր տեղադրությունը ստանալիս"
   },
   "HomeScreen": {
+    "pendingReceiveBadge": "+{amount: string} ընթացքի մեջ",
     "receive": "Ստանալ",
     "send": "Ուղարկել",
     "title": "Ընդհանուր",

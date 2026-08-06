@@ -2110,6 +2110,7 @@
     "error": "Oeps. Iets het verkeerd gegaan terwyl jou ligging bepaal is"
   },
   "HomeScreen": {
+    "pendingReceiveBadge": "+{amount: string} hangend",
     "receive": "Ontvang",
     "send": "Stuur",
     "title": "Tuis",

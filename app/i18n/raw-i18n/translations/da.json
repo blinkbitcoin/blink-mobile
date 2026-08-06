@@ -2110,6 +2110,7 @@
     "error": "Oops. Something went wrong while getting your location"
   },
   "HomeScreen": {
+    "pendingReceiveBadge": "+{amount: string} afventende",
     "receive": "Modtag",
     "send": "Send",
     "title": "Hjem",

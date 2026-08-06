@@ -2110,6 +2110,7 @@
     "error": "Owu. Kukho into engahambanga kakuhle ngelixa sifumana indawo yakho"
   },
   "HomeScreen": {
+    "pendingReceiveBadge": "+{amount: string} pending",
     "receive": "Yamkela",
     "send": "Thumela",
     "title": "Ekhaya",

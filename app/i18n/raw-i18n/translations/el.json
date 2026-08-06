@@ -2110,6 +2110,7 @@
     "error": "Ωπ! Κάτι πήγε στραβά κατά τη λήψη της τοποθεσίας σας"
   },
   "HomeScreen": {
+    "pendingReceiveBadge": "+{amount: string} σε αναμονή",
     "receive": "Λήψη",
     "send": "Αποστολή",
     "title": "Αρχική σελίδα ",

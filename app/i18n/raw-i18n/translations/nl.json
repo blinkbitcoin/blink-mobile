@@ -2110,6 +2110,7 @@
     "error": "Oeps. Er is iets misgegaan bij het ophalen van je locatie"
   },
   "HomeScreen": {
+    "pendingReceiveBadge": "+{amount: string} In behandeling",
     "receive": "Ontvang",
     "send": "Verzend",
     "title": "Thuisscherm",

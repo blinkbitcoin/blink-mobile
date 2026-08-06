@@ -2110,6 +2110,7 @@
     "error": "Hopa! A apărut o eroare la obținerea locației dvs"
   },
   "HomeScreen": {
+    "pendingReceiveBadge": "+{amount: string} în aşteptare",
     "receive": "Primește",
     "send": "Trimite",
     "title": "Acasă",

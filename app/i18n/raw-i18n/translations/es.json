@@ -2110,6 +2110,7 @@
         "error": "Ups. Algo salió mal al obtener tu ubicación"
     },
     "HomeScreen": {
+        "pendingReceiveBadge": "+{amount: string} pendiente",
         "receive": "Recibir",
         "send": "Enviar",
         "title": "Inicio",

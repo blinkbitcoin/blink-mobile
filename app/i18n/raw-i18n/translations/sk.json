@@ -2110,6 +2110,7 @@
     "error": "Ojoj. Pri získavaní vašej polohy sa vyskytla chyba"
   },
   "HomeScreen": {
+    "pendingReceiveBadge": "+{amount: string} čakajúce",
     "receive": "Prijať",
     "send": "Odoslať",
     "title": "Domov",

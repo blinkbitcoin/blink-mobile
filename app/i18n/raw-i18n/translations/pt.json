@@ -2110,6 +2110,7 @@
         "error": "Oops. Algo deu errado ao obter sua localização."
     },
     "HomeScreen": {
+        "pendingReceiveBadge": "+{amount: string} pendente",
         "receive": "Receber",
         "send": "Enviar",
         "title": "Página Inicial",
