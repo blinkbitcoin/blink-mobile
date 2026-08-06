@@ -94,10 +94,16 @@ export const MigrationGate: React.FC = () => {
   const {
     navigateToCheckpoint,
     loading: checkpointLoading,
+    hasError: checkpointError,
+    refetch: refetchCheckpoint,
     hasResumableCheckpoint,
   } = useMigrationCheckpoint()
-  const { reusablePendingAccountId, loading: pendingWalletLoading } =
-    useReusablePendingWallet()
+  const {
+    reusablePendingAccountId,
+    loading: pendingWalletLoading,
+    hasError: pendingWalletError,
+    refetch: refetchPendingWallet,
+  } = useReusablePendingWallet()
 
   const acknowledgeApiWarning = useCallback(() => setIsApiWarningAcknowledged(true), [])
 
@@ -119,13 +125,25 @@ export const MigrationGate: React.FC = () => {
   const retryGateData = useCallback(async () => {
     setIsRetrying(true)
     try {
-      await Promise.all([refetchApiKeys(), refetchBalances(), refetchLock()])
+      await Promise.all([
+        refetchApiKeys(),
+        refetchBalances(),
+        refetchLock(),
+        refetchCheckpoint(),
+        refetchPendingWallet(),
+      ])
     } catch (err) {
       reportError("Migration gate retry", err)
     } finally {
       setIsRetrying(false)
     }
-  }, [refetchApiKeys, refetchBalances, refetchLock])
+  }, [
+    refetchApiKeys,
+    refetchBalances,
+    refetchLock,
+    refetchCheckpoint,
+    refetchPendingWallet,
+  ])
 
   /** Returning from the dollar-transfer conversion, refetch so the balance reflects the
    *  now-empty dollars instead of the cached pre-transfer figure. */
@@ -147,8 +165,15 @@ export const MigrationGate: React.FC = () => {
 
   /** A failed query read as its empty default would wave a user with API keys or a live
    *  dollar balance straight in, or re-pitch the intro to a user a failed lock read makes
-   *  look unlocked, so a settled error blocks with a retry instead. */
-  const hasGateDataError = apiKeysError || balancesError || lockError
+   *  look unlocked, so a settled error blocks with a retry instead. The local reads join
+   *  only when locked — that is the only decision they feed, and an unreadable store there
+   *  would impersonate a wiped device and hand a resumable user to terminal support. */
+  const hasResumeDataError = checkpointError || pendingWalletError
+  const hasGateDataError =
+    apiKeysError ||
+    balancesError ||
+    lockError ||
+    (isMigrationLocked && hasResumeDataError)
 
   /** The API-key warning outranks the Dollar-Balance precondition in the entry order
    *  (entry, API-key check, Dollar Balance check, intro). */
@@ -181,10 +206,15 @@ export const MigrationGate: React.FC = () => {
   const hasResumedRef = useRef(false)
 
   useEffect(() => {
+    /** The error guard runs here, not only in render: the retry screen committing does
+     *  not stop this effect, and a read failure read as "nothing on device" would claim
+     *  the once-per-mount ref and navigate a resumable user to terminal support over it.
+     *  Unclaimed, a retry that succeeds re-runs this with real data. */
     if (
       !shouldResumeLockedMigration ||
       checkpointLoading ||
       pendingWalletLoading ||
+      hasResumeDataError ||
       hasResumedRef.current
     )
       return
@@ -214,6 +244,7 @@ export const MigrationGate: React.FC = () => {
     shouldResumeLockedMigration,
     checkpointLoading,
     pendingWalletLoading,
+    hasResumeDataError,
     hasResumableCheckpoint,
     reusablePendingAccountId,
     navigateToCheckpoint,

@@ -1,3 +1,5 @@
+import { useCallback } from "react"
+
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 
 import { usePendingMigrationAccounts } from "./use-pending-migration-accounts"
@@ -12,10 +14,20 @@ import { usePendingMigrationAccounts } from "./use-pending-migration-accounts"
 export const useReusablePendingWallet = (): {
   reusablePendingAccountId: string | null
   loading: boolean
+  hasError: boolean
+  refetch: () => Promise<unknown>
 } => {
-  const { pendingForActiveAccount, loading: pendingLoading } =
-    usePendingMigrationAccounts()
-  const { accounts, loading: registryLoading } = useAccountRegistry()
+  const {
+    pendingForActiveAccount,
+    loading: pendingLoading,
+    hasError,
+    refetch: refetchPending,
+  } = usePendingMigrationAccounts()
+  const {
+    accounts,
+    loading: registryLoading,
+    reloadSelfCustodialAccounts,
+  } = useAccountRegistry()
 
   const reusablePendingAccountId =
     pendingForActiveAccount &&
@@ -23,5 +35,17 @@ export const useReusablePendingWallet = (): {
       ? pendingForActiveAccount
       : null
 
-  return { reusablePendingAccountId, loading: pendingLoading || registryLoading }
+  /** Both halves of the predicate reload together; the registry read never errors
+   *  (a failed read keeps its prior entries), so hasError is the pending record's alone. */
+  const refetch = useCallback(
+    () => Promise.all([refetchPending(), reloadSelfCustodialAccounts()]),
+    [refetchPending, reloadSelfCustodialAccounts],
+  )
+
+  return {
+    reusablePendingAccountId,
+    loading: pendingLoading || registryLoading,
+    hasError,
+    refetch,
+  }
 }

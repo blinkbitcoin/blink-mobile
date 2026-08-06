@@ -4,13 +4,18 @@ import { useReusablePendingWallet } from "@app/screens/account-migration/hooks/u
 
 let mockPendingForActiveAccount: string | null = null
 let mockPendingLoading = false
+let mockPendingHasError = false
+const mockRefetchPending = jest.fn()
 let mockRegistryAccounts: { id: string }[] = []
 let mockRegistryLoading = false
+const mockReloadSelfCustodialAccounts = jest.fn()
 
 jest.mock("@app/screens/account-migration/hooks/use-pending-migration-accounts", () => ({
   usePendingMigrationAccounts: () => ({
     pendingForActiveAccount: mockPendingForActiveAccount,
     loading: mockPendingLoading,
+    hasError: mockPendingHasError,
+    refetch: mockRefetchPending,
   }),
 }))
 
@@ -18,15 +23,20 @@ jest.mock("@app/hooks/use-account-registry", () => ({
   useAccountRegistry: () => ({
     accounts: mockRegistryAccounts,
     loading: mockRegistryLoading,
+    reloadSelfCustodialAccounts: mockReloadSelfCustodialAccounts,
   }),
 }))
 
 describe("useReusablePendingWallet", () => {
   beforeEach(() => {
+    jest.clearAllMocks()
     mockPendingForActiveAccount = null
     mockPendingLoading = false
+    mockPendingHasError = false
     mockRegistryAccounts = []
     mockRegistryLoading = false
+    mockRefetchPending.mockResolvedValue(undefined)
+    mockReloadSelfCustodialAccounts.mockResolvedValue(undefined)
   })
 
   it("returns the pending wallet when it still exists on the device", () => {
@@ -75,5 +85,24 @@ describe("useReusablePendingWallet", () => {
     const { result } = renderHook(() => useReusablePendingWallet())
 
     expect(result.current.loading).toBe(false)
+  })
+
+  /** The gate must not read a failed record read as "no wallet to reuse" — that is the
+   *  wiped-device signature, and it ends at terminal support. */
+  it("surfaces the pending record's read error", () => {
+    mockPendingHasError = true
+
+    const { result } = renderHook(() => useReusablePendingWallet())
+
+    expect(result.current.hasError).toBe(true)
+  })
+
+  it("reloads both halves of the predicate on refetch", async () => {
+    const { result } = renderHook(() => useReusablePendingWallet())
+
+    await result.current.refetch()
+
+    expect(mockRefetchPending).toHaveBeenCalledTimes(1)
+    expect(mockReloadSelfCustodialAccounts).toHaveBeenCalledTimes(1)
   })
 })

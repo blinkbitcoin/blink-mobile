@@ -211,6 +211,20 @@ describe("MigrationContactSupportScreen", () => {
     expect(options?.headerBackVisible).toBe(false)
   })
 
+  /** The gate handover's ticket is identified by its code alone (support greps for it),
+   *  so the screen has to show `locked-without-checkpoint` verbatim for the cohort a
+   *  screenshot is the only diagnostic from. */
+  it("shows the gate handover's reason code verbatim", async () => {
+    mockReason = MigrationSupportReason.LockedWithoutCheckpoint
+    mockOrigin = MigrationSupportOrigin.Gate
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.getByText(LLSupport.reasonLabel())).toBeTruthy()
+    expect(screen.getByText("locked-without-checkpoint")).toBeTruthy()
+    expect(mockUseMigrationSupportEmail).toHaveBeenCalledWith("locked-without-checkpoint")
+  })
+
   it("renders the hero, every diagnostics row and the contact action", async () => {
     renderScreen()
     await flushEffects()
