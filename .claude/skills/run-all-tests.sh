@@ -55,6 +55,32 @@ for dir in "$HERE"/*/; do
   fi
 done
 
+# --- Makefile shortcuts -------------------------------------------------------
+# The Makefile is the human quickstart; every target must delegate to the
+# tested scripts (checked with `make -n`, which expands recipes without
+# running anything).
+printf '\n\033[1m=== Makefile ===\033[0m\n'
+mk() { # mk <assertion-name> <expected-script> <make args...>
+  local name="$1" want="$2"; shift 2
+  if make -s -n -C "$HERE" "$@" 2>/dev/null | grep -q "$want"; then
+    TOTAL_PASS=$((TOTAL_PASS + 1)); printf '  \033[32mPASS\033[0m %s\n' "$name"
+  else
+    TOTAL_FAIL=$((TOTAL_FAIL + 1)); printf '  \033[31mFAIL\033[0m %s\n' "$name"
+  fi
+}
+mk "make test delegates to run-all-tests"      "run-all-tests.sh" test
+mk "make claim delegates to claim-session"     "claim-session.sh" claim PR=12
+mk "make shot delegates to capture"            "capture.sh"       shot PR=12
+mk "make record delegates to record-flow"      "record-flow.sh"   record PR=12 FLOW=x.yaml
+mk "make publish delegates to push-assets"     "push-assets-branch.sh" publish PR=12 PURPOSE=screenshots FILES=x.png
+mk "make reset delegates to reset-app"         "reset-app.sh"     reset PR=12
+mk "make release delegates to release-session" "release-session.sh" release PR=12
+if make -s -n -C "$HERE" claim 2>/dev/null | grep -q "claim-session.sh"; then
+  TOTAL_FAIL=$((TOTAL_FAIL + 1)); printf '  \033[31mFAIL\033[0m make claim without PR= must refuse\n'
+else
+  TOTAL_PASS=$((TOTAL_PASS + 1)); printf '  \033[32mPASS\033[0m make claim without PR= refuses\n'
+fi
+
 echo
 echo "====================================="
 printf '%d suites, %d assertions passed, %d failed\n' "$SUITES" "$TOTAL_PASS" "$TOTAL_FAIL"
