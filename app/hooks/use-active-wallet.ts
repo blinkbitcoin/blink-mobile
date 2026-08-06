@@ -48,6 +48,11 @@ export const useActiveWallet = (): ActiveWalletResult => {
       isReady:
         base.status === ActiveWalletStatus.Ready ||
         base.status === ActiveWalletStatus.Degraded,
+      // Encodes SDK readiness, not just account type: false while the Spark
+      // SDK is still connecting (status Unavailable). To ask "is the active
+      // account self-custodial?", branch on
+      // `useAccountRegistry().activeAccount?.type === AccountType.SelfCustodial`
+      // instead (see use-price-conversion / use-pending-receive-amount).
       isSelfCustodial:
         base.accountType === AccountType.SelfCustodial &&
         base.status !== ActiveWalletStatus.Unavailable,

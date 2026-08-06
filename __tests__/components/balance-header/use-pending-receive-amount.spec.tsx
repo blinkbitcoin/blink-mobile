@@ -4,13 +4,26 @@ import { usePendingReceiveAmount } from "@app/components/balance-header/use-pend
 import { TransactionFragment, TxDirection, WalletCurrency } from "@app/graphql/generated"
 import { DisplayCurrency } from "@app/types/amounts"
 import { DepositStatus, PendingDeposit } from "@app/types/payment"
+import { AccountType } from "@app/types/wallet"
 
 const mockConvertMoneyAmount = jest.fn()
 const mockFormatMoneyAmount = jest.fn(
   ({ moneyAmount }: { moneyAmount: { amount: number } }) =>
     `$${(moneyAmount.amount / 100).toFixed(2)}`,
 )
-const mockUseActiveWallet = jest.fn()
+/** Mirrors formatCurrencyHelper: Number()s string majors, 2 fraction digits. */
+const mockFormatCurrency = jest.fn(
+  ({
+    amountInMajorUnits,
+    currency,
+  }: {
+    amountInMajorUnits: number | string
+    currency: string
+  }) => `${currency} ${Number(amountInMajorUnits).toFixed(2)}`,
+)
+let mockDisplayCurrency = "USD"
+let mockLoadedCurrencyCode = "USD"
+const mockUseAccountRegistry = jest.fn()
 
 jest.mock("@app/hooks", () => ({
   ...jest.requireActual("@app/hooks"),
@@ -18,11 +31,16 @@ jest.mock("@app/hooks", () => ({
 }))
 
 jest.mock("@app/hooks/use-display-currency", () => ({
-  useDisplayCurrency: () => ({ formatMoneyAmount: mockFormatMoneyAmount }),
+  useDisplayCurrency: () => ({
+    formatMoneyAmount: mockFormatMoneyAmount,
+    formatCurrency: mockFormatCurrency,
+    displayCurrency: mockDisplayCurrency,
+    currencyInfo: { DisplayCurrency: { currencyCode: mockLoadedCurrencyCode } },
+  }),
 }))
 
-jest.mock("@app/hooks/use-active-wallet", () => ({
-  useActiveWallet: () => mockUseActiveWallet(),
+jest.mock("@app/hooks/use-account-registry", () => ({
+  useAccountRegistry: () => mockUseAccountRegistry(),
 }))
 
 /**
@@ -65,8 +83,12 @@ const deposit = (overrides: Partial<PendingDeposit> = {}): PendingDeposit => ({
 describe("usePendingReceiveAmount", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockDisplayCurrency = "USD"
+    mockLoadedCurrencyCode = "USD"
     mockConvertMoneyAmount.mockReturnValue(mockConverter)
-    mockUseActiveWallet.mockReturnValue({ isSelfCustodial: false })
+    mockUseAccountRegistry.mockReturnValue({
+      activeAccount: { type: AccountType.Custodial },
+    })
   })
 
   describe("custodial", () => {
@@ -164,11 +186,184 @@ describe("usePendingReceiveAmount", () => {
 
       expect(result.current.pendingReceiveAmountText).toBeNull()
     })
+
+    it("sums server-locked settlementDisplayAmounts — the same source the unseen-tx badge formats", () => {
+      const { result } = renderHook(() =>
+        usePendingReceiveAmount({
+          pendingIncomingTransactions: [
+            pendingReceiveTx({
+              id: "a",
+              settlementDisplayAmount: "500.00",
+              settlementDisplayCurrency: "USD",
+            }),
+            pendingReceiveTx({
+              id: "b",
+              settlementDisplayAmount: "0.50",
+              settlementDisplayCurrency: "USD",
+            }),
+          ],
+        }),
+      )
+
+      expect(mockFormatCurrency).toHaveBeenCalledWith({
+        amountInMajorUnits: 500.5,
+        currency: "USD",
+      })
+      expect(result.current.pendingReceiveAmountText).toBe("USD 500.50")
+      expect(mockConverter).not.toHaveBeenCalled()
+    })
+
+    it("matches the unseen-tx badge amount for a single pending receive", () => {
+      const tx = pendingReceiveTx({
+        settlementDisplayAmount: "500.00",
+        settlementDisplayCurrency: "USD",
+      })
+
+      const { result } = renderHook(() =>
+        usePendingReceiveAmount({ pendingIncomingTransactions: [tx] }),
+      )
+
+      // Exactly what use-unseen-tx-amount-badge feeds formatCurrency.
+      const badgeText = mockFormatCurrency({
+        amountInMajorUnits: tx.settlementDisplayAmount as string,
+        currency: tx.settlementDisplayCurrency as string,
+      })
+      expect(result.current.pendingReceiveAmountText).toBe(badgeText)
+    })
+
+    it("renders from display amounts even while price conversion is bootstrapping", () => {
+      mockConvertMoneyAmount.mockReturnValue(undefined)
+
+      const { result } = renderHook(() =>
+        usePendingReceiveAmount({
+          pendingIncomingTransactions: [
+            pendingReceiveTx({
+              settlementDisplayAmount: "12.34",
+              settlementDisplayCurrency: "EUR",
+            }),
+          ],
+        }),
+      )
+
+      expect(result.current.pendingReceiveAmountText).toBe("EUR 12.34")
+    })
+
+    it("falls back to live-rate conversion when a display amount is missing", () => {
+      const { result } = renderHook(() =>
+        usePendingReceiveAmount({
+          pendingIncomingTransactions: [
+            pendingReceiveTx({
+              id: "with-display",
+              settlementAmount: 10_000,
+              settlementDisplayAmount: "100.00",
+              settlementDisplayCurrency: "USD",
+            }),
+            pendingReceiveTx({ id: "without-display", settlementAmount: 2_345 }),
+          ],
+        }),
+      )
+
+      expect(result.current.pendingReceiveAmountText).toBe("$123.45")
+      expect(mockFormatCurrency).not.toHaveBeenCalled()
+    })
+
+    it("falls back to live-rate conversion when display currencies disagree", () => {
+      const { result } = renderHook(() =>
+        usePendingReceiveAmount({
+          pendingIncomingTransactions: [
+            pendingReceiveTx({
+              id: "usd",
+              settlementAmount: 10_000,
+              settlementDisplayAmount: "100.00",
+              settlementDisplayCurrency: "USD",
+            }),
+            pendingReceiveTx({
+              id: "eur",
+              settlementAmount: 2_345,
+              settlementDisplayAmount: "90.00",
+              settlementDisplayCurrency: "EUR",
+            }),
+          ],
+        }),
+      )
+
+      expect(result.current.pendingReceiveAmountText).toBe("$123.45")
+    })
+
+    it("falls back to live-rate conversion when a display amount is not numeric", () => {
+      const { result } = renderHook(() =>
+        usePendingReceiveAmount({
+          pendingIncomingTransactions: [
+            pendingReceiveTx({
+              settlementAmount: 10_000,
+              settlementDisplayAmount: "not-a-number",
+              settlementDisplayCurrency: "USD",
+            }),
+          ],
+        }),
+      )
+
+      expect(result.current.pendingReceiveAmountText).toBe("$100.00")
+      expect(mockFormatCurrency).not.toHaveBeenCalled()
+    })
+
+    it("falls through to conversion when the locked display total is zero (dust)", () => {
+      const { result } = renderHook(() =>
+        usePendingReceiveAmount({
+          pendingIncomingTransactions: [
+            pendingReceiveTx({
+              settlementAmount: 300,
+              settlementDisplayAmount: "0.00",
+              settlementDisplayCurrency: "USD",
+            }),
+          ],
+        }),
+      )
+
+      expect(result.current.pendingReceiveAmountText).toBe("$3.00")
+      expect(mockFormatCurrency).not.toHaveBeenCalled()
+    })
+
+    it("sums before converting so several sub-display-unit receives keep the pill nonzero", () => {
+      // 0.001 display-minor-units per sat with per-call rounding: each 400-sat
+      // receive alone rounds to 0; only a pre-conversion sum survives.
+      mockConvertMoneyAmount.mockReturnValue(({ amount }: { amount: number }) => ({
+        amount: Math.round(amount * 0.001),
+        currency: "DisplayCurrency",
+        currencyCode: "USD",
+      }))
+
+      const { result } = renderHook(() =>
+        usePendingReceiveAmount({
+          pendingIncomingTransactions: [
+            pendingReceiveTx({ id: "a", settlementAmount: 400 }),
+            pendingReceiveTx({ id: "b", settlementAmount: 400 }),
+            pendingReceiveTx({ id: "c", settlementAmount: 400 }),
+          ],
+        }),
+      )
+
+      expect(result.current.pendingReceiveAmountText).toBe("$0.01")
+    })
+
+    it("suppresses the conversion-fallback pill until the display currency has loaded", () => {
+      mockDisplayCurrency = "EUR"
+      mockLoadedCurrencyCode = "USD" // currency list not loaded yet
+
+      const { result } = renderHook(() =>
+        usePendingReceiveAmount({ pendingIncomingTransactions: [pendingReceiveTx()] }),
+      )
+
+      expect(result.current.pendingReceiveAmountText).toBeNull()
+      expect(mockFormatMoneyAmount).not.toHaveBeenCalled()
+    })
   })
 
   describe("self-custodial", () => {
     beforeEach(() => {
-      mockUseActiveWallet.mockReturnValue({ isSelfCustodial: true })
+      mockUseAccountRegistry.mockReturnValue({
+        activeAccount: { type: AccountType.SelfCustodial },
+      })
     })
 
     it("sums immature (unconfirmed) deposits", () => {
@@ -234,12 +429,35 @@ describe("usePendingReceiveAmount", () => {
       expect(result.current.pendingReceiveAmountText).toBeNull()
     })
 
-    it("ignores custodial pending transactions in self-custodial mode", () => {
+    it("ignores custodial pending transactions even while the SDK is still connecting", () => {
+      // The account registry says self-custodial; wallet status is irrelevant —
+      // the old `useActiveWallet().isSelfCustodial` predicate flipped false
+      // while the Spark SDK connected and leaked custodial data in here.
       const { result } = renderHook(() =>
-        usePendingReceiveAmount({ pendingIncomingTransactions: [pendingReceiveTx()] }),
+        usePendingReceiveAmount({
+          pendingIncomingTransactions: [
+            pendingReceiveTx({
+              settlementDisplayAmount: "500.00",
+              settlementDisplayCurrency: "USD",
+            }),
+          ],
+        }),
       )
 
       expect(result.current.pendingReceiveAmountText).toBeNull()
+      expect(mockFormatCurrency).not.toHaveBeenCalled()
+    })
+
+    it("suppresses the pill until the display currency has loaded (no degraded string)", () => {
+      mockDisplayCurrency = "EUR"
+      mockLoadedCurrencyCode = "USD"
+
+      const { result } = renderHook(() =>
+        usePendingReceiveAmount({ deposits: [deposit()] }),
+      )
+
+      expect(result.current.pendingReceiveAmountText).toBeNull()
+      expect(mockFormatMoneyAmount).not.toHaveBeenCalled()
     })
   })
 })

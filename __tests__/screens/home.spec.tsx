@@ -96,6 +96,22 @@ jest.mock("@app/hooks/use-active-wallet", () => ({
     },
 }))
 
+// eslint-disable-next-line prefer-const
+let mockActiveAccountOverride: Record<string, unknown> | null = null
+
+jest.mock("@app/hooks/use-account-registry", () => {
+  const actual = jest.requireActual("@app/hooks/use-account-registry")
+  return {
+    ...actual,
+    useAccountRegistry: () => {
+      const registry = actual.useAccountRegistry()
+      return mockActiveAccountOverride
+        ? { ...registry, activeAccount: mockActiveAccountOverride }
+        : registry
+    },
+  }
+})
+
 jest.mock("@app/config/feature-flags-context", () => {
   const actual = jest.requireActual<typeof import("@app/config/feature-flags-context")>(
     "@app/config/feature-flags-context",
@@ -789,6 +805,7 @@ const runRestrictionInvariantCase = async ({
 const resetHomeScreenMocks = () => {
   currentMocks = []
   mockActiveWalletOverride = null
+  mockActiveAccountOverride = null
   mockDollarBalanceRestrictedOverride = false
   mockMigratePromptVisible = false
   mockCanReopen = false
@@ -1962,9 +1979,21 @@ describe("HomeScreen pending receive badge", () => {
       status,
       errorReason: null,
     })
+    const selfCustodialActiveAccount = {
+      id: "self-custodial-default",
+      type: "self-custodial",
+      label: "Self-custodial",
+      selected: true,
+      status: "available",
+    }
+
+    beforeEach(() => {
+      mockActiveAccountOverride = selfCustodialActiveAccount
+    })
 
     afterEach(() => {
       mockActiveWalletOverride = null
+      mockActiveAccountOverride = null
       mockPendingDepositsOverride = null
     })
 
@@ -1981,6 +2010,32 @@ describe("HomeScreen pending receive badge", () => {
       expect(await findByTestId("balance-status-badge")).toBeTruthy()
 
       await flushEffects()
+    })
+
+    it("ignores custodial pending receives while the Spark SDK is still connecting", async () => {
+      // Account registry: self-custodial. Wallet: still Unavailable, so the
+      // useActiveWallet predicate reports isSelfCustodial=false and the home
+      // query is NOT skipped — its pendingIncomingTransactions must not
+      // produce a pill beside the self-custodial balance.
+      mockActiveWalletOverride = {
+        wallets: [],
+        status: "unavailable",
+        accountType: "self-custodial",
+        isReady: false,
+        isSelfCustodial: false,
+        needsBackendAuth: false,
+      }
+      currentMocks = mocksWithPendingDeposit()
+
+      const { queryByTestId } = render(
+        <ContextForScreen>
+          <HomeScreen />
+        </ContextForScreen>,
+      )
+
+      await flushEffects()
+
+      expect(queryByTestId("balance-status-badge")).toBeNull()
     })
 
     it("leaves the badge to the unclaimed-deposit banner for claimable deposits", async () => {
