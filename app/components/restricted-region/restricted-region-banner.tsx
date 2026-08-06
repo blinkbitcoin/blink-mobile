@@ -5,6 +5,8 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
 import { makeStyles, Text } from "@rn-vui/themed"
 
+import { RestrictedRegionBody } from "./restricted-region-body"
+
 export const RestrictedRegionBanner: React.FC = () => {
   const { LL } = useI18nContext()
   const styles = useStyles()
@@ -14,11 +16,7 @@ export const RestrictedRegionBanner: React.FC = () => {
       <Text bold style={styles.title}>
         {LL.RestrictedRegion.title()}
       </Text>
-      <Text type="p3" style={styles.body}>
-        {LL.RestrictedRegion.body()}
-        {"\n\n"}
-        {LL.RestrictedRegion.bodyReturn()}
-      </Text>
+      <RestrictedRegionBody type="p3" style={styles.body} />
     </View>
   )
 }

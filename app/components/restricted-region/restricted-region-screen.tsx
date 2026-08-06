@@ -16,6 +16,8 @@ import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { testProps } from "@app/utils/testProps"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { RestrictedRegionBody } from "./restricted-region-body"
+
 /** The custodial variant: every custodial function is Blink-served, so the block covers
  *  the whole session and offers no way back into the app while it holds. */
 export const RestrictedRegionScreen: React.FC = () => {
@@ -66,11 +68,7 @@ export const RestrictedRegionScreen: React.FC = () => {
               <Text type="h2" bold style={styles.title}>
                 {LL.RestrictedRegion.title()}
               </Text>
-              <Text type="p2" style={styles.body}>
-                {LL.RestrictedRegion.body()}
-                {"\n\n"}
-                {LL.RestrictedRegion.bodyReturn()}
-              </Text>
+              <RestrictedRegionBody type="p2" style={styles.body} />
             </View>
           </View>
 
