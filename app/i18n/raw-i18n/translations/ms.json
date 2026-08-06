@@ -2234,6 +2234,22 @@
     "imageLibraryPermissionsNotGranted": "Kami tidak ada kebenaran untuk mengakses galeri imej anda. Sila periksa tetapan pada aplikasi pada peranti anda."
   },
   "SecurityScreen": {
+    "securityScore": {
+      "title": "Skor keselamatan {done: number}/{total: number}",
+      "levelLow": "rendah",
+      "levelMedium": "sederhana",
+      "levelHigh": "tinggi",
+      "set": "Tetapkan",
+      "enabled": "Diaktifkan",
+      "signals": {
+        "cloudBackup": "Sandaran awan",
+        "manualBackup": "Sandaran manual",
+        "appLock": "Kunci aplikasi (biometrik atau PIN)",
+        "hideBalance": "Sembunyikan baki",
+        "twoFactor": "Pengesahan dua faktor (2FA)",
+        "emailVerified": "E-mel disahkan"
+      }
+    },
     "title": "Keselamatan dan Privasi",
     "biometricDescription": "Buka dengan cap jari atau pengesahan wajah.",
     "biometricTitle": "Biometrik",

@@ -5,6 +5,8 @@ import {
   BackupStateProvider,
   useBackupState,
   BackupStatus,
+  completedMethodsOf,
+  markBackupCompletedFor,
   removeBackupStateFor,
 } from "@app/self-custodial/providers/backup-state"
 import { AccountType, AccountStatus } from "@app/types/wallet"
@@ -57,6 +59,12 @@ jest.mock("@react-native-firebase/crashlytics", () => () => ({
   log: jest.fn(),
 }))
 
+const mockReportError = jest.fn()
+
+jest.mock("@app/utils/error-logging", () => ({
+  reportError: (...args: unknown[]) => mockReportError(...args),
+}))
+
 const wrapper: React.FC<React.PropsWithChildren> = ({ children }) => (
   <BackupStateProvider>{children}</BackupStateProvider>
 )
@@ -106,8 +114,87 @@ describe("BackupStateProvider", () => {
     expect(result.current.backupState.method).toBe("manual")
     expect(mockSetItem).toHaveBeenCalledWith(
       BACKUP_KEY,
-      JSON.stringify({ status: "completed", method: "manual" }),
+      expect.stringContaining('"status":"completed"'),
     )
+    expect(JSON.parse(mockSetItem.mock.calls[0][1])).toMatchObject({
+      status: "completed",
+      method: "manual",
+      completedMethods: ["manual"],
+    })
+  })
+
+  describe("per-method completion history", () => {
+    it("accumulates completedMethods across different methods, method stays last-wins", async () => {
+      const { result } = renderHook(() => useBackupState(), { wrapper })
+
+      await act(async () => {})
+
+      await act(async () => {
+        result.current.setBackupCompleted("cloud")
+      })
+      await act(async () => {
+        result.current.setBackupCompleted("manual")
+      })
+
+      expect(result.current.backupState.method).toBe("manual")
+      expect(result.current.backupState.completedMethods).toEqual(["cloud", "manual"])
+    })
+
+    it("does not duplicate a method completed twice", async () => {
+      const { result } = renderHook(() => useBackupState(), { wrapper })
+
+      await act(async () => {})
+
+      await act(async () => {
+        result.current.setBackupCompleted("cloud")
+      })
+      await act(async () => {
+        result.current.setBackupCompleted("cloud")
+      })
+
+      expect(result.current.backupState.completedMethods).toEqual(["cloud"])
+    })
+
+    it("extends legacy persisted state (no completedMethods) instead of forgetting it", async () => {
+      mockGetItem.mockResolvedValue(
+        JSON.stringify({ status: "completed", method: "cloud" }),
+      )
+
+      const { result } = renderHook(() => useBackupState(), { wrapper })
+
+      await waitFor(() =>
+        expect(result.current.backupState.status).toBe(BackupStatus.Completed),
+      )
+
+      await act(async () => {
+        result.current.setBackupCompleted("manual")
+      })
+
+      expect(result.current.backupState.completedMethods).toEqual(["cloud", "manual"])
+    })
+  })
+
+  describe("completedMethodsOf", () => {
+    it("derives the list from legacy stored state without completedMethods", () => {
+      expect(completedMethodsOf({ status: "completed", method: "cloud" })).toEqual([
+        "cloud",
+      ])
+    })
+
+    it("prefers an explicit completedMethods list", () => {
+      expect(
+        completedMethodsOf({
+          status: "completed",
+          method: "manual",
+          completedMethods: ["cloud", "manual"],
+        }),
+      ).toEqual(["cloud", "manual"])
+    })
+
+    it("returns empty for non-completed or null state", () => {
+      expect(completedMethodsOf({ status: "none", method: null })).toEqual([])
+      expect(completedMethodsOf(null)).toEqual([])
+    })
   })
 
   it("ignores corrupted persisted data", async () => {
@@ -145,6 +232,48 @@ describe("BackupStateProvider", () => {
 
     expect(result.current.backupState.status).toBe(BackupStatus.None)
     expect(result.current.backupState.method).toBeNull()
+    expect(result.current.backupState.completedMethods).toBeUndefined()
+  })
+
+  it("never writes when the active account is not self-custodial", async () => {
+    mockActiveAccount = {
+      id: "custodial-default",
+      type: AccountType.Custodial,
+      label: "Custodial",
+      selected: true,
+      status: AccountStatus.RequiresRestore,
+    }
+
+    const { result } = renderHook(() => useBackupState(), { wrapper })
+
+    await act(async () => {})
+
+    await act(async () => {
+      result.current.setBackupCompleted("manual")
+    })
+
+    expect(mockSetItem).not.toHaveBeenCalled()
+    expect(result.current.backupState.status).toBe(BackupStatus.None)
+  })
+
+  it("keeps the in-memory state and reports when the persist write fails", async () => {
+    mockSetItem.mockRejectedValue(new Error("disk full"))
+
+    const { result } = renderHook(() => useBackupState(), { wrapper })
+
+    await act(async () => {})
+
+    await act(async () => {
+      result.current.setBackupCompleted("manual")
+    })
+
+    expect(result.current.backupState.status).toBe(BackupStatus.Completed)
+    await waitFor(() =>
+      expect(mockReportError).toHaveBeenCalledWith(
+        "Backup state persist",
+        expect.any(Error),
+      ),
+    )
   })
 
   describe("account-switch transition", () => {
@@ -201,6 +330,34 @@ describe("BackupStateProvider", () => {
       expect(result.current.backupState.method).toBeNull()
     })
 
+    it("ignores a stale read that resolves after the account has switched", async () => {
+      let resolveStaleRead: (raw: string) => void = () => {}
+      mockGetItem.mockImplementation((key: string) => {
+        if (key === BACKUP_KEY) {
+          return new Promise((resolve) => {
+            resolveStaleRead = resolve
+          })
+        }
+        if (key === OTHER_BACKUP_KEY) {
+          return Promise.resolve(JSON.stringify({ status: "completed", method: "cloud" }))
+        }
+        return Promise.resolve(null)
+      })
+
+      const { result, rerender } = renderHook(() => useBackupState(), { wrapper })
+
+      mockActiveAccount = makeAccount(OTHER_SC_ACCOUNT_ID)
+      rerender(undefined)
+
+      await waitFor(() => expect(result.current.backupState.method).toBe("cloud"))
+
+      await act(async () => {
+        resolveStaleRead(JSON.stringify({ status: "completed", method: "manual" }))
+      })
+
+      expect(result.current.backupState.method).toBe("cloud")
+    })
+
     it("clears the backup state when the active account becomes a non-self-custodial account", async () => {
       mockGetItem.mockResolvedValue(
         JSON.stringify({ status: "completed", method: "manual" }),
@@ -241,11 +398,56 @@ describe("BackupStateProvider", () => {
         result.current.setBackupCompleted("cloud")
       })
 
-      expect(mockSetItem).toHaveBeenCalledWith(
-        OTHER_BACKUP_KEY,
+      expect(mockSetItem).toHaveBeenCalledWith(OTHER_BACKUP_KEY, expect.any(String))
+      expect(JSON.parse(mockSetItem.mock.calls[0][1])).toMatchObject({
+        status: "completed",
+        method: "cloud",
+      })
+      expect(mockSetItem).not.toHaveBeenCalledWith(BACKUP_KEY, expect.any(String))
+    })
+  })
+
+  describe("markBackupCompletedFor", () => {
+    it("merges into existing persisted state instead of blind-overwriting", async () => {
+      mockGetItem.mockResolvedValue(
         JSON.stringify({ status: "completed", method: "cloud" }),
       )
-      expect(mockSetItem).not.toHaveBeenCalledWith(BACKUP_KEY, expect.any(String))
+
+      await markBackupCompletedFor(TEST_SC_ACCOUNT_ID, "manual")
+
+      expect(mockSetItem).toHaveBeenCalledWith(BACKUP_KEY, expect.any(String))
+      expect(JSON.parse(mockSetItem.mock.calls[0][1])).toMatchObject({
+        status: "completed",
+        method: "manual",
+        completedMethods: ["cloud", "manual"],
+      })
+    })
+
+    it("preserves unknown persisted fields (forward-compat with in-flight backup options)", async () => {
+      mockGetItem.mockResolvedValue(
+        JSON.stringify({
+          status: "completed",
+          method: "cloud",
+          cloudPasswordProtected: true,
+        }),
+      )
+
+      await markBackupCompletedFor(TEST_SC_ACCOUNT_ID, "manual")
+
+      expect(JSON.parse(mockSetItem.mock.calls[0][1])).toMatchObject({
+        cloudPasswordProtected: true,
+        completedMethods: ["cloud", "manual"],
+      })
+    })
+
+    it("writes a fresh record when nothing is persisted yet", async () => {
+      await markBackupCompletedFor(TEST_SC_ACCOUNT_ID, "manual")
+
+      expect(JSON.parse(mockSetItem.mock.calls[0][1])).toMatchObject({
+        status: "completed",
+        method: "manual",
+        completedMethods: ["manual"],
+      })
     })
   })
 

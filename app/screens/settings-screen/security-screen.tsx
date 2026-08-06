@@ -10,6 +10,9 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, ListItem } from "@rn-vui/themed"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
+import { SecurityScoreCard } from "@app/components/security-score-card"
+import { useSecurityScore } from "@app/hooks/use-security-score"
+import type { SecuritySignalKey } from "@app/types/security-score"
 import { Screen } from "../../components/screen"
 import {
   saveHiddenBalanceToolTip,
@@ -36,7 +39,6 @@ export const SecurityScreen: React.FC<Props> = ({ route, navigation }) => {
   const { LL } = useI18nContext()
   const [isBiometricsEnabled, setIsBiometricsEnabled] = useState(mIsBiometricsEnabled)
   const [isPinEnabled, setIsPinEnabled] = useState(mIsPinEnabled)
-  const [isHideBalanceEnabled, setIsHideBalanceEnabled] = useState(hideBalance)
 
   useFocusEffect(() => {
     getIsBiometricsEnabled()
@@ -97,13 +99,8 @@ export const SecurityScreen: React.FC<Props> = ({ route, navigation }) => {
   }
 
   const onHideBalanceValueChanged = (value: boolean) => {
-    if (value) {
-      setIsHideBalanceEnabled(saveHideBalance(client, true))
-      saveHiddenBalanceToolTip(client, true)
-    } else {
-      setIsHideBalanceEnabled(saveHideBalance(client, false))
-      saveHiddenBalanceToolTip(client, false)
-    }
+    saveHideBalance(client, value)
+    saveHiddenBalanceToolTip(client, value)
   }
 
   const removePin = async () => {
@@ -113,8 +110,28 @@ export const SecurityScreen: React.FC<Props> = ({ route, navigation }) => {
     }
   }
 
+  const securityScore = useSecurityScore({ isBiometricsEnabled, isPinEnabled })
+
+  // The card stays dumb; the screen owns what each "Set" does. Backup rows
+  // remain tappable after completion so the flow is always re-runnable (#3828).
+  // A Record (not a switch) so adding a signal without an action fails to compile.
+  const signalActions: Record<SecuritySignalKey, () => void> = {
+    cloudBackup: () => navigation.navigate("selfCustodialCloudBackup"),
+    manualBackup: () => navigation.navigate("selfCustodialBackupSecurityChecks"),
+    appLock: () => onBiometricsValueChanged(true),
+    hideBalance: () => onHideBalanceValueChanged(true),
+    twoFactor: () => navigation.navigate("totpRegistrationInitiate"),
+    emailVerified: () => navigation.navigate("emailRegistrationInitiate"),
+  }
+
   return (
     <Screen style={styles.container} preset="scroll">
+      {securityScore && (
+        <SecurityScoreCard
+          score={securityScore}
+          onSignalPress={(key) => signalActions[key]()}
+        />
+      )}
       <View style={styles.settingContainer}>
         <ListItem containerStyle={styles.listItemContainer}>
           <GaloyIcon name="fingerprint" size={24} />
@@ -147,10 +164,7 @@ export const SecurityScreen: React.FC<Props> = ({ route, navigation }) => {
           <ListItem.Content>
             <ListItem.Title>{LL.SecurityScreen.hideBalanceTitle()}</ListItem.Title>
           </ListItem.Content>
-          <Switch
-            value={isHideBalanceEnabled}
-            onValueChange={onHideBalanceValueChanged}
-          />
+          <Switch value={hideBalance} onValueChange={onHideBalanceValueChanged} />
         </ListItem>
       </View>
     </Screen>

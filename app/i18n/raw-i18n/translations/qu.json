@@ -2234,6 +2234,22 @@
     "imageLibraryPermissionsNotGranted": "We don't have permissions to access the image library.  Please check app settings for your platform."
   },
   "SecurityScreen": {
+    "securityScore": {
+      "title": "Seguridadpa puntajen {done: number}/{total: number}",
+      "levelLow": "pisi",
+      "levelMedium": "chawpi",
+      "levelHigh": "hatun",
+      "set": "Churay",
+      "enabled": "Aktivasqa",
+      "signals": {
+        "cloudBackup": "Phuyupi copia de seguridad",
+        "manualBackup": "Makiwan copia de seguridad",
+        "appLock": "App wichqay (biometria otaq PIN)",
+        "hideBalance": "Saldota pakay",
+        "twoFactor": "Iskay factorwan riqsichikuy (2FA)",
+        "emailVerified": "Correo electronico chiqaqchasqa"
+      }
+    },
     "title": "Chiqapkay Pakasqa kaypas",
     "biometricDescription": "Ñuqaqa biometric kaniyta yachanakuyta sutichaq",
     "biometricTitle": "Biometric",
