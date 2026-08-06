@@ -2,14 +2,16 @@ import { useCallback } from "react"
 
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 
+import { resolveReusablePendingAccount } from "../utils/migration-pending-account"
+
 import { usePendingMigrationAccounts } from "./use-pending-migration-accounts"
 
 /**
  * Whether a wallet provisioned by an earlier abandoned migration run is still usable on
- * this device — the same predicate ensureAccount applies before reusing instead of
- * provisioning (see use-migration-account). The gate reads it to tell a resumable restart
- * (record and wallet both survived) from a wiped device (e.g. a reinstall), where a
- * restart could only provision another orphan (#4070).
+ * this device — the shared reuse rule (see migration-pending-account) ensureAccount also
+ * applies before reusing instead of provisioning. The gate reads it to tell a resumable
+ * restart (record and wallet both survived) from a wiped device (e.g. a reinstall),
+ * where a restart could only provision another orphan (#4070).
  */
 export const useReusablePendingWallet = (): {
   reusablePendingAccountId: string | null
@@ -29,11 +31,10 @@ export const useReusablePendingWallet = (): {
     reloadSelfCustodialAccounts,
   } = useAccountRegistry()
 
-  const reusablePendingAccountId =
-    pendingForActiveAccount &&
-    accounts.some((account) => account.id === pendingForActiveAccount)
-      ? pendingForActiveAccount
-      : null
+  const reusablePendingAccountId = resolveReusablePendingAccount(
+    pendingForActiveAccount,
+    accounts,
+  )
 
   /** Both halves of the predicate reload together; the registry read never errors
    *  (a failed read keeps its prior entries), so hasError is the pending record's alone. */
