@@ -3,7 +3,7 @@ name: react-native-demo-videos
 description: Use when a PR needs a moving demo rather than screenshots — recording a user session flow on an iOS simulator or Android emulator to show a bugfix or feature behaving, before/after interaction videos, animated GIF, MP4 or WebM of app navigation, "demo expected behavior". Covers simctl recordVideo and adb screenrecord. Takes gif, mp4 or webm, and optionally ios or android, as arguments.
 ---
 
-# Demo Videos for blink-mobile PRs
+# Demo Videos for React Native PRs
 
 ## Overview
 
@@ -18,13 +18,18 @@ puts it on the PR.
 Session isolation is **not** handled here.
 
 - **iOS** — claim a simulator with the `react-native-ios-simulator` skill
-  first; everything below assumes `$BLINK_UDID` is set and the app is installed.
+  first; everything below assumes `$DEMO_UDID` is set and the app is installed.
 - **Android** — no claim skill exists yet. Pin the serial of an emulator *you
-  started* (`adb devices`) in `$BLINK_ANDROID_SERIAL`, with the app installed;
+  started* (`adb devices`) in `$DEMO_ANDROID_SERIAL`, with the app installed;
   never record an emulator you didn't start.
 
-With both variables set, the host OS decides: macOS records the iOS simulator
-(only macOS has one), any other host records Android. Override with
+The app under test is configuration: set `DEMO_APP_ID_IOS` /
+`DEMO_APP_ID_ANDROID` to your app's identifiers. `record-flow.sh` refuses to
+run without the one for the target platform — a silent default would record
+some other app and report success.
+
+With both device variables set, the host OS decides: macOS records the iOS
+simulator (only macOS has one), any other host records Android. Override with
 `--platform ios|android` on the scripts, or by invoking the skill with an
 `ios`/`android` argument.
 
@@ -79,8 +84,10 @@ silent loop has been misled about what is on their PR.
 
 ```bash
 SIM="$(git rev-parse --show-toplevel)"/.claude/skills/react-native-ios-simulator
+export DEMO_APP_ID_IOS=<your app's iOS bundle id>
 eval "$("$SIM/scripts/claim-session.sh" 3712)"          # iOS (other skill)
-# export BLINK_ANDROID_SERIAL=emulator-5554             # Android instead
+# export DEMO_ANDROID_SERIAL=emulator-5554              # Android instead
+# export DEMO_APP_ID_ANDROID=<your app's application id>
 ```
 
 ### 2. Write the flow
@@ -88,29 +95,42 @@ eval "$("$SIM/scripts/claim-session.sh" 3712)"          # iOS (other skill)
 Maestro flows live next to the worktree and are checked in nowhere — they're
 scaffolding. `flows/example-receipt-dismiss.yaml` in this skill is a worked
 example; copy its shape. Maestro drives both platforms with the same YAML —
-`--udid` takes an emulator serial too — but the `appId` differs:
-`io.galoy.bitcoinbeach` on iOS, `com.galoyapp` on Android. For a flow that
-must run on both, use `appId: ${APP_ID}` and pass `-e APP_ID=...`.
+`--udid` takes an emulator serial too. `record-flow.sh` injects your app id and
+Metro port, so flows stay app-agnostic:
 
 ```yaml
-appId: io.galoy.bitcoinbeach   # com.galoyapp on Android
+appId: ${APP_ID}               # injected via -e APP_ID=...
 ---
-- clearState          # a re-run must start where the last one started
-- launchApp
+- launchApp:
+    clearState: true           # a re-run must start where the last one started
+    arguments:
+      RCT_jsLocation: "localhost:${DEMO_PORT}"   # injected via -e DEMO_PORT=...
 - waitForAnimationToEnd:
     timeout: 10000    # never record a half-finished transition
 - tapOn: "Send"
 ```
 
-Two rules that come from things going wrong before:
+Three rules that come from things going wrong before:
 
+- **`clearState` must re-pass the Metro redirect as launch `arguments:`, on
+  every `launchApp` in the flow.** clearState wipes the app container including
+  the persisted `RCT_jsLocation` default, and launch arguments are per-launch;
+  without them the next launch silently loads the user's 8081 bundler and the
+  recording is a stuck splash. `record-flow.sh` refuses such a flow
+  (`--allow-clear-state` waives it). To simulate a reinstall outside Maestro,
+  use the simulator skill's `reset-app.sh` instead.
 - **`waitForAnimationToEnd` between steps.** Without it the recording catches
-  screens mid-transition and looks broken rather than fast.
+  screens mid-transition and looks broken rather than fast. On a *static*
+  screen it returns immediately — it is not a sleep; wait for content with
+  `extendedWaitUntil: visible:` instead.
 - **`tapOn: point: "50%,56%"` when text matching is flaky.** `tapOn: "Receive"`
-  fails while the wallet is still connecting; a point tap does not.
+  fails while the app is still connecting; a point tap does not. If
+  `maestro hierarchy` shows only container elements, text/testID matching is
+  blind app-wide — see the simulator skill's element-blindness section.
 
-Reaching a screen without an account (TEMP `initialRouteName`, stubbed hooks,
-locale launch args) is covered by the simulator skill — the same tricks apply.
+Reaching a screen or state without an account (TEMP `initialRouteName`,
+stubbed hooks, locale launch args, `reset-app.sh`) is covered by the simulator
+skill — the same tricks apply.
 
 ### 3. Record
 
@@ -122,13 +142,25 @@ SKILL="$(git rev-parse --show-toplevel)"/.claude/skills/react-native-demo-videos
 Runs an unrecorded warm-up first (Maestro installs a driver on first contact
 with a device — ~20s with an installer on screen), starts the recorder, pads
 lead-in and lead-out so the clip doesn't start or stop on a hard cut, runs the
-flow, then interrupts the recorder and verifies with `ffprobe` that what came
-out is playable. Produces `after.mov` on iOS; on Android, `after.mp4` — pulled
-off the device and cleaned up there automatically. Either feeds straight into
-`encode-demo.sh`.
+flow (forwarding `-e APP_ID` and `-e DEMO_PORT`), then interrupts the recorder
+and verifies with `ffprobe` that what came out is playable. Produces
+`after.mov` on iOS; on Android, `after.mp4` — pulled off the device and cleaned
+up there automatically. Either feeds straight into `encode-demo.sh`.
 
 A failing flow fails the script but keeps the partial recording, which is
 usually the fastest way to see what went wrong.
+
+A *passing* flow is not proof the recording shows the behavior either: the
+assertion can pass on a screen that appears after the clip's useful window, or
+before a late pop-back. Extract and look at frames before publishing —
+
+```bash
+ffmpeg -y -ss 15 -i demo/after.mov -frames:v 1 /tmp/mid.png     # mid-clip
+ffmpeg -y -sseof -2 -i demo/after.mov -frames:v 1 /tmp/last.png # end state
+```
+
+— a demo that ends on a spinner has happened here before, with every flow step
+green.
 
 **Android:** `screenrecord` hard-caps a recording at 3 minutes. The script
 warns and keeps what was captured when the cap is hit, but flows longer than
@@ -152,13 +184,15 @@ will be rejected at upload. The input is whatever the recorder produced —
 **GIF:**
 
 ```bash
-cd /path/to/blink-mobile
+cd /path/to/your-app
 "$SKILL/scripts/publish-demo.sh" 3712 before.gif after.gif --dry-run   # inspect
 "$SKILL/scripts/publish-demo.sh" 3712 before.gif after.gif             # push + print embed
 ```
 
 Pushes an orphan `assets/pr-<N>-demo` branch by plumbing (no checkout, no branch
-switch) and prints the markdown. Ask before the first push — it's an org repo.
+switch) and prints the markdown. The target repo is derived from the current
+repo's `origin` remote (override: `--repo owner/name`). Ask before the first
+push to any org — it's outward-facing.
 
 **MP4 / WebM:** GitHub's upload endpoint needs a browser session, so this part
 is driven through the Chrome extension:
@@ -182,13 +216,15 @@ The `after` side is cheap; the `before` side is where the time goes.
 record-flow.sh after flows/receipt.yaml ./demo
 
 # before: revert just the changed file, re-run THE SAME flow
-git checkout <main-sha> -- app/screens/send-bitcoin-screen/send-bitcoin-completed-screen.tsx
+git checkout <main-sha> -- path/to/changed-screen.tsx
 record-flow.sh before flows/receipt.yaml ./demo
-git checkout HEAD -- app/screens/send-bitcoin-screen/send-bitcoin-completed-screen.tsx
+git checkout HEAD -- path/to/changed-screen.tsx
 ```
 
-**Same flow on both sides, always.** Two differently-driven recordings prove
-nothing — the difference has to come from the code, not from how you tapped.
+**Same interactions on both sides, always.** Two differently-driven recordings
+prove nothing — the difference has to come from the code, not from how you
+tapped. (A content *wait* may target per-side text when the two sides land on
+different screens by design; the taps stay identical.)
 
 For a JS-only change, a file checkout plus fast refresh (~12s) is enough. A
 branch detach is only needed when native code differs.
@@ -207,12 +243,14 @@ threshold with a TEMP constant and say so in the PR comment.
 
 | Gotcha | What happens |
 |---|---|
+| `- clearState` without launch `arguments:` re-passing `RCT_jsLocation` | The persisted Metro redirect dies with the app data; the next launch silently loads the user's 8081 bundler and you record a stuck splash. record-flow.sh refuses the flow; every `launchApp` needs the arguments |
 | Stopping the recorder with anything but SIGINT | Right-sized file, no moov atom, plays nowhere |
 | Stopping an Android recording by killing the adb client | Same corrupt file — the on-device `screenrecord` must get the SIGINT (`adb shell kill -2`), which record-flow.sh does |
 | A flow longer than 3 minutes on Android | `screenrecord` stops at its cap; the tail of the flow is silently missing (record-flow.sh warns) |
-| Recording a ScreenGuard screen on Android (backup phrase) | Black frames — `FLAG_SECURE` blocks capture; TEMP-disable `useScreenSecurity` and caption it |
+| Recording a FLAG_SECURE screen on Android (recovery phrases etc.) | Black frames — TEMP-disable the screen-security hook and caption it |
 | Launching the recorder from a background script without the SIG_DFL shim | SIGINT is inherited as *ignored*; the recorder can never be stopped cleanly and every recording is corrupt |
 | Recording before the Maestro warm-up | Every demo opens on a driver installer |
+| `waitForAnimationToEnd` as a sleep | On a static screen it returns instantly; the flow races ahead of the app. Wait for content with `extendedWaitUntil: visible:` |
 | No explicit `fps` filter when encoding | `recordVideo` output is variable-frame-rate; GIF timing drifts |
 | Single-pass GIF palette | Anything appearing after the opening frames bands badly |
 | `maestro record` | No `--udid` (hijacks a device) and uploads to Maestro's cloud without `--local` — never use it; drive with `maestro test --udid` instead |
@@ -222,12 +260,12 @@ threshold with a TEMP constant and say so in the PR comment.
 ## After Editing the Scripts
 
 ```bash
-"$SKILL/tests/run.sh"     # 70 assertions, ~30s, exits non-zero on failure
+"$SKILL/tests/run.sh"     # 87 assertions, ~30s, exits non-zero on failure
 ```
 
 Fakes `xcrun`, `adb` (the full screenrecord start/kill -2/pull lifecycle) and
 `maestro`; uses real ffmpeg against a synthesized clip, so the encoding
 guarantees are checked by a real encoder. No simulator, no emulator, no
 network, safe to run while other agents work. Mutation-checked — the suite
-goes red when the SIGINT rule (either platform's), the disposition shim, or
-the palette pass is broken.
+goes red when the SIGINT rule (either platform's), the disposition shim, the
+clearState guard, or the palette pass is broken.

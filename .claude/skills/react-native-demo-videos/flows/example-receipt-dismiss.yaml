@@ -1,14 +1,21 @@
-> Worked example: the PR #3712 behaviour — a payment receipt that should
-> disappear after a long trip away from the app.
->
-> Read this for the shape, not the taps. Two things generalise:
->   - clearState + launchApp at the top, so a re-run starts where the last one did
->   - waitForAnimationToEnd between steps, so the recording never catches a
->     half-finished transition
-appId: io.galoy.bitcoinbeach
+# Worked example: a payment receipt that should disappear after a long trip
+# away from the app.
+#
+# Read this for the shape, not the taps. Three things generalise:
+#   - launchApp with clearState + arguments at the top, so a re-run starts
+#     where the last one did. clearState wipes the app container INCLUDING the
+#     persisted RCT_jsLocation Metro redirect, so the redirect must travel as a
+#     launch argument — on EVERY launchApp in the flow, because launch
+#     arguments are per-launch (record-flow.sh injects ${DEMO_PORT} via -e)
+#   - appId comes from ${APP_ID} (injected by record-flow.sh), never hardcoded
+#   - waitForAnimationToEnd between steps, so the recording never catches a
+#     half-finished transition
+appId: ${APP_ID}
 ---
-- clearState
-- launchApp
+- launchApp:
+    clearState: true
+    arguments:
+      RCT_jsLocation: "localhost:${DEMO_PORT}"
 - waitForAnimationToEnd:
     timeout: 10000
 
@@ -29,7 +36,9 @@ appId: io.galoy.bitcoinbeach
     notVisible: "Success Text"
     timeout: 35000
 
-- launchApp
+- launchApp:
+    arguments:
+      RCT_jsLocation: "localhost:${DEMO_PORT}"
 - waitForAnimationToEnd:
     timeout: 5000
 

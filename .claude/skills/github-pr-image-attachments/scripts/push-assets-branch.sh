@@ -10,6 +10,8 @@
 # that touches the working tree of whatever worktree you are standing in.
 #
 # Usage: push-assets-branch.sh <pr> <purpose> <file...> [--dry-run] [--repo owner/name] [--remote R]
+#   The target repo defaults to the origin remote's owner/name (ssh or https
+#   GitHub URL); pass --repo for anything the remote URL cannot express.
 #
 #   push-assets-branch.sh 3712 screenshots before.png after.png
 #     -> pushes assets/pr-3712-screenshots
