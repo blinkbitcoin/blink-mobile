@@ -29,10 +29,13 @@ configuration are:
 ```bash
 export DEMO_APP_ID_IOS=io.galoy.bitcoinbeach
 export DEMO_APP_ID_ANDROID=com.galoyapp
+export DEMO_SIM_PREFIX=blink-demo
 ```
 
 Set them before claiming a simulator session or recording a flow — the
-scripts refuse to guess an app id.
+scripts refuse to guess an app id. `DEMO_SIM_PREFIX` names this repo's
+simulators (`blink-demo-pr<N>`) and scopes their session state, so other
+repos using the same skills on one machine can never collide with ours.
 
 ## Critical Rules (Always Apply)
 - `app/graphql/generated.ts` is AUTO-GENERATED - never modify manually

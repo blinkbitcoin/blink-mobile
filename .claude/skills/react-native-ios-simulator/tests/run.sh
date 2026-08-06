@@ -203,7 +203,7 @@ reset_world
 eval "$("$SCRIPTS/claim-session.sh" 3712)" >/dev/null 2>&1
 EXPIRED_UDID="$DEMO_UDID"
 "$SCRIPTS/release-session.sh" 3712 >/dev/null 2>&1
-echo 1 > "$DEMO_SIM_REGISTRY/pr3712/released-at"
+echo 1 > "$DEMO_SIM_REGISTRY/rn-demo-pr3712/released-at"
 eval "$("$SCRIPTS/claim-session.sh" 4113)" >/dev/null 2>&1
 check "claim sweeps expired sessions from other PRs" "" "$(device_state "$EXPIRED_UDID")"
 
@@ -212,7 +212,7 @@ reset_world
 eval "$("$SCRIPTS/claim-session.sh" 3712)" >/dev/null 2>&1
 "$SCRIPTS/release-session.sh" 3712 --delete >/dev/null 2>&1
 check "--delete removes the session dir too" "absent" \
-  "$([ -d "$DEMO_SIM_REGISTRY/pr3712" ] && echo present || echo absent)"
+  "$([ -d "$DEMO_SIM_REGISTRY/rn-demo-pr3712" ] && echo present || echo absent)"
 
 echo
 echo "configurable naming and app identity"
@@ -227,9 +227,27 @@ check "release with the same prefix succeeds" "0" "$?"
 reset_world
 eval "$(DEMO_SIM_PREFIX=acme "$SCRIPTS/claim-session.sh" 501)" >/dev/null 2>&1
 "$SCRIPTS/release-session.sh" 501 --delete >/dev/null 2>&1
-check "release under the wrong prefix refuses (guard keys on the configured name)" "1" "$?"
+check "release under the wrong prefix refuses (session is keyed by prefix)" "1" "$?"
 check "the wrong-prefix device survives the refused release" "Booted" "$(device_state "$DEMO_UDID")"
 DEMO_SIM_PREFIX=acme "$SCRIPTS/release-session.sh" 501 --delete >/dev/null 2>&1
+
+# --- two repos, same PR number: sessions never collide ------------------------
+# The registry is shared machine-wide; the prefix is the only thing separating
+# repo A's PR #700 from repo B's PR #700.
+reset_world
+eval "$(DEMO_SIM_PREFIX=repoa "$SCRIPTS/claim-session.sh" 700)" >/dev/null 2>&1
+A_UDID="$DEMO_UDID"; A_DIR="$DEMO_SESSION_DIR"; A_PORT="$DEMO_PORT"
+eval "$(DEMO_SIM_PREFIX=repob "$SCRIPTS/claim-session.sh" 700)" >/dev/null 2>&1
+check "same PR in two repos gets distinct simulators" "different" \
+  "$([ "$DEMO_UDID" != "$A_UDID" ] && echo different || echo "same ($DEMO_UDID)")"
+check "same PR in two repos gets distinct session dirs" "different" \
+  "$([ "$DEMO_SESSION_DIR" != "$A_DIR" ] && echo different || echo "same ($DEMO_SESSION_DIR)")"
+check "same PR in two repos gets distinct ports" "different" \
+  "$([ "$DEMO_PORT" != "$A_PORT" ] && echo different || echo "same ($DEMO_PORT)")"
+DEMO_SIM_PREFIX=repob "$SCRIPTS/release-session.sh" 700 --delete >/dev/null 2>&1
+check "releasing repo B's session leaves repo A's simulator alone" "Booted" \
+  "$(device_state "$A_UDID")"
+DEMO_SIM_PREFIX=repoa "$SCRIPTS/release-session.sh" 700 --delete >/dev/null 2>&1
 
 # --- the reaper honors the configured prefix ----------------------------------
 reset_world
