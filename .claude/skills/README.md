@@ -31,21 +31,21 @@ PRs) — it is not part of the demo pipeline.
 ## Quickstart (a before/after screenshot pair on a PR)
 
 ```bash
+SKILLS="$(git rev-parse --show-toplevel)"/.claude/skills   # or this directory
 export DEMO_APP_ID_IOS=<bundle id>
-cd .claude/skills            # or: make -C .claude/skills <target> from anywhere
 
-make claim PR=1234           # isolated simulator + Metro port
-# install a build, start Metro on the claimed port — simulator SKILL.md, steps 3–4
-make shot PR=1234 LABEL=after
-# ...flip the code to the before state, make shot LABEL=before, then:
-make publish PR=1234 FILES="shots/before.png shots/after.png"
-make release PR=1234
+eval "$("$SKILLS/react-native-ios-simulator/scripts/claim-session.sh" <PR#>)"
+# install a build, start Metro on $DEMO_PORT — see the simulator SKILL.md
+"$SKILLS/react-native-demo-screenshots/scripts/capture.sh" after ./shots
+# ...flip the code to the before state, capture again, then:
+"$SKILLS/github-pr-image-attachments/scripts/push-assets-branch.sh" <PR#> screenshots shots/*.png
+"$SKILLS/react-native-ios-simulator/scripts/release-session.sh" <PR#>
 ```
 
-`make help` lists everything (`record` for videos, `reset` for fresh-install
-simulation, `test` for the suites). Each target is a thin delegation to the
-scripts below — after `make claim`, the session's udid/port are re-derived
-from the registry, so `PR=` is the only state you carry between commands.
+The scripts and their session contract are the one doing-interface, for humans
+and agents alike (`make help` orients you; pipeline make-wrappers were tried
+and removed — they added a second way to hold session state without covering
+the flow's hard middle).
 
 Every step is safer than it looks: sessions own a **named** simulator and an
 **atomically reserved** port, every destructive verb is guarded by that name,
