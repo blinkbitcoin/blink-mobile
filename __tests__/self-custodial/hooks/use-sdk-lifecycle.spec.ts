@@ -554,7 +554,69 @@ describe("useSdkLifecycle", () => {
       expect(result.current.status).toBe(ActiveWalletStatus.Ready)
     })
 
-    it("hands overlapping callers the in-flight run's completion (pull-to-refresh must not retract early)", async () => {
+    it("resolves each caller after its own iteration even while others keep re-arming the loop", async () => {
+      mockInitSdk.mockResolvedValue(buildSdk("sdk-1"))
+      captureListener()
+      mockGetSnapshot.mockResolvedValue({
+        wallets: [],
+        hasMore: false,
+        rawTransactionCount: 0,
+      })
+
+      const { result } = renderHook(() => useSdkLifecycle("acct-1", 0))
+      await waitFor(() => {
+        expect(result.current.status).toBe(ActiveWalletStatus.Ready)
+      })
+
+      const emptySnapshot = {
+        wallets: [],
+        hasMore: false,
+        rawTransactionCount: 0,
+      }
+      const pendingSnapshots: ((value: typeof emptySnapshot) => void)[] = []
+      mockGetSnapshot.mockImplementation(
+        () =>
+          new Promise((resolve) => {
+            pendingSnapshots.push(resolve)
+          }),
+      )
+      const finishIteration = async () => {
+        await act(async () => {
+          pendingSnapshots.shift()?.(emptySnapshot)
+          await new Promise<void>((r) => {
+            setImmediate(r)
+          })
+        })
+      }
+
+      let pullSettled = false
+      act(() => {
+        // Iteration 1: the background poll's refresh is in flight.
+        result.current.refreshWallets()
+        // The user's pull arrives mid-iteration → served by iteration 2.
+        result.current.refreshWallets().then(() => {
+          pullSettled = true
+        })
+      })
+
+      await finishIteration() // iteration 1 completes; iteration 2 starts
+      expect(pullSettled).toBe(false)
+
+      act(() => {
+        // Another poll tick re-arms the loop mid-iteration-2 — offline, this
+        // repeats forever; the pull must not inherit that lifetime.
+        result.current.refreshWallets()
+      })
+
+      await finishIteration() // iteration 2 completes → the pull settles
+      expect(pullSettled).toBe(true)
+      // The loop is still draining the third caller.
+      expect(pendingSnapshots.length + mockGetSnapshot.mock.calls.length).toBeGreaterThan(0)
+
+      await finishIteration() // let iteration 3 finish cleanly
+    })
+
+    it("hands overlapping callers the completion of the iteration serving them (pull-to-refresh must not retract early)", async () => {
       mockInitSdk.mockResolvedValue(buildSdk("sdk-1"))
       captureListener()
       mockGetSnapshot.mockResolvedValue({
