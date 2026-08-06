@@ -1,6 +1,6 @@
 ---
 name: github-pr-image-attachments
-description: Use when embedding screenshots, GIFs, or any image into a GitHub pull request comment or review from the command line — including "attach the screenshots to the PR", "add before/after images", or when a gh attachment upload or gist has been blocked. Covers blinkbitcoin repos.
+description: Use when embedding screenshots, GIFs, or any image into a GitHub pull request comment or review from the command line — including "attach the screenshots to the PR", "add before/after images", or when a gh attachment upload or gist has been blocked. Works against whatever GitHub repo the current checkout's origin remote points at.
 ---
 
 # Attaching Images to a GitHub PR
@@ -24,10 +24,10 @@ them out.
 
 ## Ask First
 
-Pushing a branch to an org repo is outward-facing. Ask before the first push.
-The `assets/pr-<N>-*` pattern is established convention on
-`blinkbitcoin/blink-mobile`; for any other repo or org, get explicit approval
-first.
+Pushing a branch to an org repo is outward-facing. Ask before the first push
+to any org, and record the approval here as a dated fact — approval for one
+org never extends to another. Recorded approvals: blinkbitcoin repos,
+2026-07-24.
 
 ## Procedure
 
@@ -50,7 +50,8 @@ git push origin "$COMMIT:refs/heads/assets/pr-$PR-screenshots"
 Then embed, two-up in a table:
 
 ```bash
-RAW=https://raw.githubusercontent.com/blinkbitcoin/blink-mobile/assets/pr-$PR-screenshots
+REPO=$(git remote get-url origin | sed -E 's#^(git@github\.com:|https://github\.com/)##; s#\.git$##')
+RAW=https://raw.githubusercontent.com/$REPO/assets/pr-$PR-screenshots
 gh pr comment "$PR" --body "| Before | After |
 |---|---|
 | <img src=\"$RAW/before.png\" width=\"300\"> | <img src=\"$RAW/after.png\" width=\"300\"> |
@@ -61,11 +62,10 @@ gh pr comment "$PR" --body "| Before | After |
 ## Naming
 
 `assets/pr-<N>-<purpose>` — e.g. `assets/pr-3712-screenshots`,
-`assets/pr-3712-demo`. This is what the repo actually uses; every asset branch
-on `blinkbitcoin/blink-mobile` follows it (`assets/pr-3973`,
-`assets/pr-3977-screenshots`, `assets/pr-3993-screenshots`,
-`assets/pr-3995-screenshots`, `assets/pr-4024-screenshots`). The `assets/`
-prefix keeps them grouped and out of the way of real branches.
+`assets/pr-3712-demo`. The `assets/` prefix keeps them grouped and out of the
+way of real branches; `scripts/push-assets-branch.sh` enforces the shape and
+derives the target repo from the checkout's `origin` remote (`--repo
+owner/name` overrides, e.g. for a non-GitHub remote).
 
 ## Video
 

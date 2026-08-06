@@ -23,6 +23,17 @@ images in PR comments (`github-pr-image-attachments`). Use them instead of
 improvising `simctl`/Metro/capture commands. After editing any skill's
 scripts, run its `tests/run.sh` (or `.claude/skills/run-all-tests.sh` for all).
 
+The skills are app-agnostic; this repo's values for their required
+configuration are:
+
+```bash
+export DEMO_APP_ID_IOS=io.galoy.bitcoinbeach
+export DEMO_APP_ID_ANDROID=com.galoyapp
+```
+
+Set them before claiming a simulator session or recording a flow — the
+scripts refuse to guess an app id.
+
 ## Critical Rules (Always Apply)
 - `app/graphql/generated.ts` is AUTO-GENERATED - never modify manually
 - Payment mutations must NOT have retry logic (handled specially in client.tsx)

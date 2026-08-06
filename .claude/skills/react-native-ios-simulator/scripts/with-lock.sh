@@ -9,7 +9,7 @@
 # yarn installs (shared global cache), pod install.
 #
 # Usage: with-lock.sh <lock-name> <timeout-seconds> <command> [args...]
-#   e.g. with-lock.sh native-build 1800 node node_modules/react-native/cli.js run-ios --udid "$BLINK_UDID"
+#   e.g. with-lock.sh native-build 1800 node node_modules/react-native/cli.js run-ios --udid "$DEMO_UDID"
 
 set -euo pipefail
 
@@ -18,7 +18,7 @@ TIMEOUT="${2:?missing timeout-seconds}"
 shift 2
 [ "$#" -gt 0 ] || { echo "FATAL: no command given" >&2; exit 1; }
 
-REGISTRY="${BLINK_SIM_REGISTRY:-$HOME/.claude/blink-sim-sessions}"
+REGISTRY="${DEMO_SIM_REGISTRY:-$HOME/.claude/rn-sim-sessions}"
 LOCK_DIR="$REGISTRY/locks/$LOCK_NAME"
 mkdir -p "$REGISTRY/locks"
 

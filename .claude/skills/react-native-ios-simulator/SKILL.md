@@ -1,23 +1,27 @@
 ---
 name: react-native-ios-simulator
-description: Use when running a React Native app (blink-mobile) on an iOS simulator on macOS — claiming an isolated simulator and Metro port, installing or building the app, reaching a particular screen, or any task involving xcrun simctl, Metro bundler ports, or a demo simulator. Required before capturing screenshots or video, and whenever other agents may share the same Mac.
+description: Use when running a React Native app on an iOS simulator on macOS — claiming an isolated simulator and Metro port, installing or building the app, reaching a particular screen or state, or any task involving xcrun simctl, Metro bundler ports, or a demo simulator. Required before capturing screenshots or video, and whenever other agents may share the same Mac.
 ---
 
 # React Native on an Isolated iOS Simulator (macOS)
 
 ## Overview
 
-Run blink-mobile on a simulator **you created**, fed by a Metro bundler on a
-port **you reserved**, from a worktree **you own** — then prove on exit that
+Run the app on a simulator **you created**, fed by a Metro bundler on a port
+**you reserved**, from a worktree **you own** — then prove on exit that
 nothing else on the machine was disturbed.
 
 Several agents run this concurrently on one Mac, alongside the user's own booted
 simulator and their Metro on port 8081. Isolation here is mechanical, not a
 convention to remember: the scripts reserve the port atomically and refuse to
-shut down a device that is not named after your PR.
+shut down a device that is not named for your session.
 
-**Core principle:** every simctl call is scoped to `$BLINK_UDID`. A simctl
+**Core principle:** every simctl call is scoped to `$DEMO_UDID`. A simctl
 command without a udid is a bug.
+
+The app under test is configuration, not code: set `DEMO_APP_ID_IOS` to your
+app's bundle id once per session. Nothing in these scripts assumes a
+particular app.
 
 ## Never Do These
 
@@ -28,7 +32,7 @@ this workflow that needs any of them:
 |---|---|
 | `simctl shutdown all` / `erase all` / `delete all` | Kills every agent's sim and the user's |
 | `pkill -f metro`, `pkill node`, `killall node` | Kills the user's bundler on 8081 |
-| Any `simctl` verb without `--udid`/`$BLINK_UDID` | Silently targets the *booted* device — usually the user's |
+| Any `simctl` verb without `--udid`/`$DEMO_UDID` | Silently targets the *booted* device — usually the user's |
 | `run-ios` with no `--udid` | Boots and hijacks a default simulator |
 | Metro on 8081, or `--port` you picked by eye | 8081 is the user's; eyeballed ports collide with other agents |
 | Booting/shutting a sim you did not create | Other agents' demo sims may be booted and mid-run |
@@ -40,16 +44,20 @@ this workflow that needs any of them:
 
 ```bash
 SKILL="$(git rev-parse --show-toplevel)"/.claude/skills/react-native-ios-simulator
+export DEMO_APP_ID_IOS=<your app's iOS bundle id>
 eval "$("$SKILL/scripts/claim-session.sh" 3712)"
 ```
 
-Exports `BLINK_PR`, `BLINK_UDID`, `BLINK_PORT`, `BLINK_SIM_NAME`,
-`BLINK_SESSION_DIR`. It creates `blink-pr<N>-demo` if absent, boots it,
-reserves a port in 8100–8499 by atomic mkdir in `~/.claude/blink-sim-sessions`,
-persists the Metro redirect onto that device only, and snapshots which devices
-were booted beforehand.
+Exports `DEMO_PR`, `DEMO_UDID`, `DEMO_PORT`, `DEMO_SIM_NAME`,
+`DEMO_SESSION_DIR`. It creates `${DEMO_SIM_PREFIX:-rn-demo}-pr<N>` if absent,
+boots it, reserves a port in 8100–8499 by atomic mkdir in
+`~/.claude/rn-sim-sessions` (override: `DEMO_SIM_REGISTRY`), persists the Metro
+redirect onto that device only (needs `DEMO_APP_ID_IOS`; skipped with a note
+otherwise), and snapshots which devices were booted beforehand.
 
-Re-running is idempotent — same sim, same port.
+Re-running is idempotent — same sim, same port. Sessions created before the
+2026-08 rename keep their old device prefix; release them by setting
+`DEMO_SIM_PREFIX=<old prefix>` for that one call.
 
 ### 2. Work in a scratchpad worktree
 
@@ -57,7 +65,7 @@ Never the shared checkout: the user keeps their own branch checked out and
 Metro pointed at it.
 
 ```bash
-git -C /path/to/blink-mobile worktree add /private/tmp/.../wt-3712 <branch>
+git -C /path/to/your-app worktree add /private/tmp/.../wt-3712 <branch>
 ```
 
 `node_modules`: a real copy, never a symlink — Metro dies on symlinked modules
@@ -78,22 +86,22 @@ Prefer **reusing** a recent build over making one — a native build writes to
 shared DerivedData that other agents are reading from:
 
 ```bash
-ls -dt ~/Library/Developer/Xcode/DerivedData/GaloyApp-*/Build/Products/Debug-iphonesimulator/Blink.app
-xcrun simctl install "$BLINK_UDID" <path>/Blink.app
+ls -dt ~/Library/Developer/Xcode/DerivedData/<YourApp>-*/Build/Products/Debug-iphonesimulator/*.app
+xcrun simctl install "$DEMO_UDID" <path>/<YourApp>.app
 ```
 
 Reuse is safe for pure-JS diffs and even dep removals (a native superset is
-harmless). Confirm nothing added a native module since the build:
+harmless). Confirm nothing added or updated a native module since the build:
 
 ```bash
-git -C .../blink-mobile log origin/main --since=<build-date> -- ios/ package.json yarn.lock
+git -C /path/to/your-app log origin/main --since=<build-date> -- ios/ package.json yarn.lock
 ```
 
 If you genuinely must build (~14 min cold), take the lock and pin the device:
 
 ```bash
 "$SKILL/scripts/with-lock.sh" native-build 1800 \
-  node node_modules/react-native/cli.js run-ios --udid "$BLINK_UDID"
+  node node_modules/react-native/cli.js run-ios --udid "$DEMO_UDID"
 ```
 
 `npx react-native` misresolves inside a worktree — always `node node_modules/react-native/cli.js`.
@@ -103,8 +111,8 @@ If you genuinely must build (~14 min cold), take the lock and pin the device:
 The PID is what lets release-session stop *your* Metro without a `pkill`.
 
 ```bash
-node node_modules/react-native/cli.js start --port "$BLINK_PORT" &
-echo $! > "$BLINK_SESSION_DIR/metro.pid"
+node node_modules/react-native/cli.js start --port "$DEMO_PORT" &
+echo $! > "$DEMO_SESSION_DIR/metro.pid"
 ```
 
 First bundle on a cold worktree is ~90s–2.5 min. Poll with screenshots rather
@@ -113,34 +121,47 @@ than assuming failure at 40s.
 ### 5. Launch and shoot
 
 ```bash
-xcrun simctl launch "$BLINK_UDID" io.galoy.bitcoinbeach -RCT_jsLocation "localhost:$BLINK_PORT"
-xcrun simctl io "$BLINK_UDID" screenshot /tmp/liveness.png   # poll only
+xcrun simctl launch "$DEMO_UDID" "$DEMO_APP_ID_IOS" -RCT_jsLocation "localhost:$DEMO_PORT"
+xcrun simctl io "$DEMO_UDID" screenshot /tmp/liveness.png   # poll only
 ```
 
 Cold start takes ~40s to clear the splash; poll with throwaway screenshots.
 For shots that will end up on a PR, use `react-native-demo-screenshots` — it
 waits for the screen to settle first.
 
-### 6. Release and verify
+### 6. Reset to a fresh install when the demo needs it
+
+```bash
+"$SKILL/scripts/reset-app.sh"       # uses $DEMO_UDID / $DEMO_APP_ID_IOS / $DEMO_PORT
+```
+
+True uninstall/reinstall (bundle cached in the session dir first), then the
+Metro redirect is re-persisted. This — not Maestro's `clearState` — is how to
+simulate "the user reinstalled the app": `clearState` wipes the persisted
+`RCT_jsLocation` redirect along with the app data, and the next plain launch
+silently loads the user's 8081 bundler (see the `react-native-demo-videos`
+gotcha table).
+
+### 7. Release and verify
 
 ```bash
 "$SKILL/scripts/release-session.sh" 3712            # shut down, keep for 24h (default)
 "$SKILL/scripts/release-session.sh" 3712 --delete   # remove immediately
 ```
 
-Refuses to touch a device not named `blink-pr<N>-demo`, kills only the recorded
-Metro PID, frees the port, then asserts every device booted at claim time is
-still booted. **A non-zero exit here means you damaged someone else's session —
-report it, don't ignore it.**
+Refuses to touch a device not named `${DEMO_SIM_PREFIX:-rn-demo}-pr<N>`, kills
+only the recorded Metro PID, frees the port, then asserts every device booted
+at claim time is still booted. **A non-zero exit here means you damaged someone
+else's session — report it, don't ignore it.**
 
 The default release keeps the simulator (with its app install and account) for
-`BLINK_SIM_TTL_HOURS` (24h) so retakes cost ~3 min instead of a full rebuild;
+`DEMO_SIM_TTL_HOURS` (24h) so retakes cost ~3 min instead of a full rebuild;
 `reap-stale.sh` — run automatically by every claim and release — deletes it
 once the stamp expires, so kept sims cannot accumulate the way they did before
 this skill existed (eight piled up once, one still booted from a session a week
 dead). Use `--delete` only when you know no more shots are coming and want the
 disk back now. A re-claim inside the window un-stamps the session, and the
-reaper never touches a booted device or one named for another PR.
+reaper never touches a booted device or one named for another session prefix.
 
 ## After Editing the Scripts
 
@@ -148,7 +169,7 @@ The isolation guarantees are load-bearing for every other agent on this Mac, so
 they are tested rather than asserted:
 
 ```bash
-"$SKILL/tests/run.sh"     # 36 assertions, ~20s, exits non-zero on failure
+"$SKILL/tests/run.sh"     # 69 assertions, ~30s, exits non-zero on failure
 ```
 
 It creates **no real simulators** — a fake `xcrun` goes first on PATH and the
@@ -159,29 +180,49 @@ Run it after touching anything in `scripts/`. If you add a guarantee, add the
 assertion that fails without it — the suite has been mutation-checked, so a new
 rule with no failing test is a rule nobody is holding you to.
 
-## Reaching a Screen Without an Account
+## Reaching a Screen or State Without an Account
 
 Most shots need no auth at all.
 
 | Goal | How |
 |---|---|
-| Boot straight into any screen | TEMP `initialRouteName={"sendBitcoinCompleted"}` + `initialParams` in `root-navigator.tsx` |
-| A component in isolation | TEMP-mount it in `GetStartedScreen` (logged-out initial route) inside `<View style={{paddingHorizontal:20,paddingTop:80,rowGap:20}}>`, and neutralise `styles.logoWrapper` with `{display:"none"}` — it is `position:absolute` full-bleed and will overlay your cards |
-| A specific locale | `simctl launch "$BLINK_UDID" io.galoy.bitcoinbeach -AppleLanguages "(es)" -AppleLocale es_ES` — the app follows launch-arg locale when logged out; launch args don't persist, so this is safe on a shared sim |
-| Username-gated rows | TEMP stub `use-pay-links.ts` → `return { username: "demouser", loading: false }` |
-| Dark mode | `xcrun simctl ui "$BLINK_UDID" appearance dark`, then relaunch. This works while the theme preference is still `system` — `GaloyThemeProvider` calls `Appearance.getColorScheme()` in that case — which is true on a fresh install, so it covers most screenshot runs. **Once a preference is set** the app themes from its own value and ignores the simulator: then edit AsyncStorage `manifest.json` in the app container (`persistentState` is a JSON *string*; parse it, set `themeByAccountId[activeAccountId]="dark"`) and terminate + launch |
-| Dynamic Type | `simctl ui "$BLINK_UDID" content_size accessibility-extra-large`, re-lays out in ~8s, then back to `medium` |
-| Scrolling | simctl cannot scroll — `maestro --udid "$BLINK_UDID" test flow.yaml` with `- swipe: start: 50%,80% end: 50%,20%` |
+| Boot straight into any screen | TEMP `initialRouteName={"someScreen"}` + `initialParams` in the root navigator |
+| A component in isolation | TEMP-mount it in the logged-out initial screen inside a padded `<View>`; neutralise any absolute-position full-bleed decoration with `{display:"none"}` so it cannot overlay your component |
+| A state only the server can set (a lock, a flag, a migration phase) | TEMP-stub the single hook that *reads* it to return the target state, plus settled-state stubs for sibling data hooks the screen gates on. Stub inputs, never the logic under test — and caption in the PR exactly what was forced |
+| A fresh-reinstall state | `scripts/reset-app.sh` — never Maestro `clearState`, which wipes the persisted Metro redirect along with the data |
+| Seeing a value the UI doesn't show (Metro not forwarding console.log) | TEMP `<Text>DBG:{JSON.stringify(x)}</Text>` in the screen + a screenshot — one frame settles what logs can't |
+| A specific locale | `simctl launch "$DEMO_UDID" "$DEMO_APP_ID_IOS" -AppleLanguages "(es)" -AppleLocale es_ES` — launch-arg locale applies when the app follows the device locale; args don't persist, so this is safe on a shared sim |
+| Data-gated rows (username, profile fields) | TEMP-stub the hook that feeds the row → `return { username: "demouser", loading: false }` |
+| Dark mode | `simctl ui appearance dark` does **not** work for apps that theme from their own persisted preference — edit that preference in the app's storage (AsyncStorage manifest or equivalent), then terminate + launch |
+| Dynamic Type | `simctl ui "$DEMO_UDID" content_size accessibility-extra-large`, re-lays out in ~8s, then back to `medium` |
+| Scrolling | simctl cannot scroll — `maestro --udid "$DEMO_UDID" test flow.yaml` with `- swipe: start: 50%,80% end: 50%,20%` |
 | Behind a native `Alert` | Alerts can't be tapped via simctl and refire on relaunch — TEMP-set the modal's `useState(true)`, TEMP-suppress the alert trigger, then terminate + launch |
 
-A **real self-custodial account** is creatable with no OTP and no backend
-(getStarted → Create new account → Accept). But `BREEZ_API_KEY` is absent from
-any local build, so the wallet lands on "Wallet is offline" — self-custodial
-Receive/Transfer cannot be shot live. Mount the component over the real
-non-custodial home instead and caption the limitation honestly.
+A flow that needs a backend credential absent from local builds (a payments
+key, a wallet SDK key) dead-ends no matter what the UI promises. Mount the
+component over a reachable real screen instead and caption the limitation
+honestly.
 
 Revert every TEMP edit with `git checkout` before finishing. They live in the
 worktree only.
+
+## Driving the UI: Element Blindness
+
+Maestro's element targeting can fail silently: a ScrollView that is itself an
+accessibility element collapses its children, so `maestro hierarchy` shows only
+the scroll container and **testID / text matching fail app-wide** while taps
+report success on nothing. Diagnose before writing taps:
+
+```bash
+maestro --udid "$DEMO_UDID" hierarchy        # if this shows only containers, element matching is blind
+```
+
+When the tree is collapsed, drive by geometry: take a fresh screenshot, then
+`tapOn: point: "X%,Y%"` — percentages are resolution-independent, so the same
+flow works across device sizes. Two more traps on iOS: dismiss the one-time
+keyboard-intro overlay before the first `inputText`, and never assume
+Appium/WebdriverIO selectors from a repo's e2e specs will transfer — Appium
+sees a deeper tree than Maestro does.
 
 ## Capturing the Result
 
@@ -210,6 +251,9 @@ upload attachments, so it takes a specific orphan-branch route.
 | Skipping the release script | Sims accumulate booted for weeks; collateral damage goes unnoticed |
 | Symlinked `node_modules` | Metro: `_lruCache is not a constructor` |
 | Assuming failure at 40s | First cold bundle is ~2.5 min |
+| Maestro `clearState` to fake a reinstall | Persisted Metro redirect dies with the data; next launch loads the user's 8081 bundler — use `reset-app.sh` |
+| `tapOn: "SomeText"` without checking the hierarchy | Collapsed accessibility tree: the tap never lands and nothing says so |
+| Reusing Appium selectors in Maestro flows | Appium sees a deeper tree; the selectors match nothing |
 
 ## Red Flags — Stop
 
@@ -217,4 +261,4 @@ upload attachments, so it takes a specific orphan-branch route.
 - About to `pkill` anything
 - Reaching for a sim you did not create because it's "already booted"
 - Release script exited non-zero and you moved on
-- Editing files in `blink-mobile/` rather than your worktree
+- Editing files in the shared checkout rather than your worktree

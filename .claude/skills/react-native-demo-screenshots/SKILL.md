@@ -1,9 +1,9 @@
 ---
 name: react-native-demo-screenshots
-description: Use when capturing still screenshots of a React Native app (blink-mobile) on an iOS simulator or Android emulator for a PR — before/after image pairs, showing a UI change or copy fix, cropping a pair honestly, or comparing a render against a design mock numerically. Covers simctl and adb screencap.
+description: Use when capturing still screenshots of a React Native app on an iOS simulator or Android emulator for a PR — before/after image pairs, showing a UI change or copy fix, cropping a pair honestly, or comparing a render against a design mock numerically. Covers simctl and adb screencap.
 ---
 
-# Demo Screenshots for blink-mobile PRs
+# Demo Screenshots for React Native PRs
 
 ## Overview
 
@@ -14,9 +14,9 @@ use the `react-native-demo-videos` skill instead.
 Session isolation is **not** handled here.
 
 - **iOS** — claim a simulator with the `react-native-ios-simulator` skill
-  first; everything below assumes `$BLINK_UDID` is set and the app is installed.
+  first; everything below assumes `$DEMO_UDID` is set and the app is installed.
 - **Android** — no claim skill exists yet. Pin the serial of an emulator *you
-  started* (`adb devices`) in `$BLINK_ANDROID_SERIAL`, with the app installed;
+  started* (`adb devices`) in `$DEMO_ANDROID_SERIAL`, with the app installed;
   never shoot an emulator you didn't start.
 
 With both variables set, the host OS decides: macOS shoots the iOS simulator
@@ -34,7 +34,7 @@ before and after, other than the code, is a way for the comparison to lie.
 SIM="$(git rev-parse --show-toplevel)"/.claude/skills/react-native-ios-simulator
 SHOT="$(git rev-parse --show-toplevel)"/.claude/skills/react-native-demo-screenshots
 eval "$("$SIM/scripts/claim-session.sh" 3712)"          # iOS
-# export BLINK_ANDROID_SERIAL=emulator-5554             # Android instead
+# export DEMO_ANDROID_SERIAL=emulator-5554             # Android instead
 
 "$SHOT/scripts/capture.sh" after ./shots
 ```
@@ -65,21 +65,6 @@ Then crop both sides with one box:
 
 It refuses to run when the inputs differ in size, or when the box doesn't fit —
 both of which silently produce a comparison that flatters one side.
-
-## Shooting Both Themes
-
-Designs frequently arrive dark-mode only while the app defaults to light. Shoot
-both and put them side by side rather than asserting the other one works:
-
-```bash
-xcrun simctl ui "$BLINK_UDID" appearance dark
-xcrun simctl terminate "$BLINK_UDID" io.galoy.bitcoinbeach
-xcrun simctl launch "$BLINK_UDID" io.galoy.bitcoinbeach -RCT_jsLocation "localhost:$BLINK_PORT"
-```
-
-A screen built from theme tokens works in both by construction, but "by
-construction" is a claim; a pair of screenshots is evidence. Reviewers of a
-dark-only mock have no other way to see that light mode survived.
 
 ## Comparing Against a Design Mock
 
@@ -123,7 +108,7 @@ Out of scope here. **Use the `github-pr-image-attachments` skill**, which owns
 the orphan-branch route and its gotchas:
 
 ```bash
-cd /path/to/blink-mobile
+cd /path/to/your-app
 ATT="$(git rev-parse --show-toplevel)"/.claude/skills/github-pr-image-attachments
 "$ATT/scripts/push-assets-branch.sh" 3712 screenshots before.png after.png
 ```
@@ -138,7 +123,7 @@ simulated. Caption honestly what was forced.
 | Shooting without waiting for the screen to settle | Splash screen or mid-transition on the PR |
 | Different crop boxes per side | The comparison flatters whichever side was cropped tighter |
 | Shooting the pair on different devices, or one side per platform | Different sizes and chrome; no honest comparison possible |
-| Assuming `simctl ui appearance dark` never works | It does while the theme preference is `system` (fresh install). It only fails once a preference is set — see the simulator skill |
+| `simctl ui appearance dark` | Doesn't work for apps that theme from their own persisted preference |
 | `adb shell screencap -p > file` | Old adb mangles the PNG's line endings — `exec-out` (what capture.sh uses) is the binary-safe channel |
 | Shooting a ScreenGuard screen on Android | A black frame, not the screen |
 | Judging a mock comparison by eye | Misses 15–40% size errors that look fine |
@@ -146,7 +131,7 @@ simulated. Caption honestly what was forced.
 ## After Editing the Scripts
 
 ```bash
-"$SHOT/tests/run.sh"     # 44 assertions, ~5s, exits non-zero on failure
+"$SHOT/tests/run.sh"     # 45 assertions, ~5s, exits non-zero on failure
 ```
 
 Fakes `xcrun` and `adb` (writing real PNGs) and uses real ImageMagick, so the

@@ -1,7 +1,7 @@
 #!/bin/bash
 # Release one PR's screenshot session and prove nothing else was disturbed.
 #
-# Only ever touches: the simulator named blink-pr<N>-demo, the Metro process
+# Only ever touches: the simulator named <prefix>-pr<N> for this PR, the Metro process
 # whose PID this session recorded, and this session's port reservation. Then it
 # diffs the booted-device list against the pre-flight snapshot and fails loudly
 # if anything that was booted before is not booted now.
@@ -9,7 +9,7 @@
 # Usage: release-session.sh <pr-number> [--delete]
 #   default leaves the simulator shut down but present (cheap to re-use for
 #           retakes); reap-stale.sh removes it automatically once it has sat
-#           released for BLINK_SIM_TTL_HOURS (default 24h)
+#           released for DEMO_SIM_TTL_HOURS (default 24h)
 #   --delete removes it immediately
 
 set -euo pipefail
@@ -21,9 +21,9 @@ case "$PR" in
   ''|*[!0-9]*) echo "FATAL: pr-number must be numeric, got '$PR'" >&2; exit 1 ;;
 esac
 
-REGISTRY="${BLINK_SIM_REGISTRY:-$HOME/.claude/blink-sim-sessions}"
+REGISTRY="${DEMO_SIM_REGISTRY:-$HOME/.claude/rn-sim-sessions}"
 SESSION_DIR="$REGISTRY/pr${PR}"
-EXPECTED_NAME="blink-pr${PR}-demo"
+EXPECTED_NAME="${DEMO_SIM_PREFIX:-rn-demo}-pr${PR}"
 
 [ -d "$SESSION_DIR" ] || { echo "FATAL: no claimed session for PR #$PR" >&2; exit 1; }
 
@@ -71,10 +71,10 @@ if [ -n "$UDID" ]; then
     xcrun simctl delete "$UDID"
     echo "deleted $EXPECTED_NAME ($UDID)"
   else
-    # Stamp for the reaper: kept for BLINK_SIM_TTL_HOURS (default 24h) so
+    # Stamp for the reaper: kept for DEMO_SIM_TTL_HOURS (default 24h) so
     # retakes are cheap, then reap-stale.sh removes it on a later claim/release.
     date +%s > "$SESSION_DIR/released-at"
-    echo "shut down $EXPECTED_NAME ($UDID), kept for ${BLINK_SIM_TTL_HOURS:-24}h"
+    echo "shut down $EXPECTED_NAME ($UDID), kept for ${DEMO_SIM_TTL_HOURS:-24}h"
   fi
 fi
 

@@ -15,8 +15,8 @@
 #
 # Usage: record-flow.sh <label> <flow.yaml> [output-dir] [--platform ios|android]
 #                       [--udid U | --serial S]
-#   iOS:     BLINK_UDID (from claim-session.sh) or --udid    -> <label>.mov
-#   Android: BLINK_ANDROID_SERIAL (e.g. emulator-5554) or --serial -> <label>.mp4
+#   iOS:     DEMO_UDID (from claim-session.sh) or --udid    -> <label>.mov
+#   Android: DEMO_ANDROID_SERIAL (e.g. emulator-5554) or --serial -> <label>.mp4
 #   With both env vars set, the host OS decides (macOS -> iOS, else Android);
 #   --platform (or --udid/--serial) overrides.
 #
@@ -26,10 +26,11 @@
 set -uo pipefail
 
 LABEL=""; FLOW=""; OUTDIR="."
-UDID="${BLINK_UDID:-}"; SERIAL="${BLINK_ANDROID_SERIAL:-}"; FORCE=""
+UDID="${DEMO_UDID:-}"; SERIAL="${DEMO_ANDROID_SERIAL:-}"; FORCE=""
 LEAD_IN="${DEMO_LEAD_IN:-1.5}"     # a beat of the start state before the first tap
 LEAD_OUT="${DEMO_LEAD_OUT:-2.0}"   # let the end state settle; a hard cut reads as truncated
 SKIP_WARMUP="${DEMO_SKIP_WARMUP:-}"
+ALLOW_CLEAR_STATE=""
 
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -39,6 +40,7 @@ while [ $# -gt 0 ]; do
     --lead-in) LEAD_IN="${2:?}"; shift 2 ;;
     --lead-out) LEAD_OUT="${2:?}"; shift 2 ;;
     --skip-warmup) SKIP_WARMUP=1; shift ;;
+    --allow-clear-state) ALLOW_CLEAR_STATE=1; shift ;;
     -*) echo "FATAL: unknown option '$1'" >&2; exit 64 ;;
     *)
       if   [ -z "$LABEL" ]; then LABEL="$1"
@@ -61,20 +63,20 @@ case "$FORCE" in ""|ios|android) : ;; *) die "--platform must be 'ios' or 'andro
 PLATFORM="$FORCE"
 if [ -z "$PLATFORM" ]; then
   if [ -n "$UDID" ] && [ -n "$SERIAL" ]; then
-    case "${BLINK_HOST_OS:-$(uname -s)}" in   # BLINK_HOST_OS is a test seam
+    case "${DEMO_HOST_OS:-$(uname -s)}" in   # DEMO_HOST_OS is a test seam
       Darwin) PLATFORM=ios ;;
       *)      PLATFORM=android ;;
     esac
   elif [ -n "$SERIAL" ]; then PLATFORM=android
   elif [ -n "$UDID" ];   then PLATFORM=ios
   else
-    die "no device: set BLINK_UDID (claim-session.sh) or BLINK_ANDROID_SERIAL, or pass --udid/--serial.
+    die "no device: set DEMO_UDID (claim-session.sh) or DEMO_ANDROID_SERIAL, or pass --udid/--serial.
        Recording without a pinned device would target whichever one is booted,
        which is usually the user's."
   fi
 fi
-[ "$PLATFORM" = ios     ] && [ -z "$UDID" ]   && die "--udid needs a value (or BLINK_UDID)"
-[ "$PLATFORM" = android ] && [ -z "$SERIAL" ] && die "--serial needs a value (or BLINK_ANDROID_SERIAL)"
+[ "$PLATFORM" = ios     ] && [ -z "$UDID" ]   && die "--udid needs a value (or DEMO_UDID)"
+[ "$PLATFORM" = android ] && [ -z "$SERIAL" ] && die "--serial needs a value (or DEMO_ANDROID_SERIAL)"
 
 case "$LABEL" in
   *[!a-zA-Z0-9._-]*) die "label '$LABEL' must be filename-safe" ;;
@@ -83,17 +85,43 @@ esac
 command -v maestro >/dev/null 2>&1 || die "maestro is not installed"
 mkdir -p "$OUTDIR"
 
+# The app under test is configuration, never a baked-in default: a wrong silent
+# default records some other app's splash screen and reports success.
 if [ "$PLATFORM" = android ]; then
   DEVICE="$SERIAL"
-  APP_ID="com.galoyapp"
+  APP_ID="${DEMO_APP_ID_ANDROID:-}"
+  [ -n "$APP_ID" ] || die "no app id: set DEMO_APP_ID_ANDROID to your app's Android application id"
   OUT="$OUTDIR/$LABEL.mp4"            # screenrecord emits MP4 natively
-  DEV_PATH="/sdcard/blink-demo-$LABEL.mp4"
+  DEV_PATH="/sdcard/demo-$LABEL.mp4"
 else
   DEVICE="$UDID"
-  APP_ID="io.galoy.bitcoinbeach"
+  APP_ID="${DEMO_APP_ID_IOS:-}"
+  [ -n "$APP_ID" ] || die "no app id: set DEMO_APP_ID_IOS to your app's iOS bundle id"
   OUT="$OUTDIR/$LABEL.mov"
 fi
 rm -f "$OUT"
+
+# --- The clearState guard (iOS only) -----------------------------------------
+# clearState wipes the app data container, which is where the persisted
+# RCT_jsLocation Metro redirect lives; the next launchApp then silently loads
+# the user's 8081 bundler and the recording shows a stuck splash. Launch
+# arguments are immune (they live in the process argument domain, per launch),
+# so a clearState flow must re-pass the redirect on EVERY launchApp:
+#
+#   - launchApp:
+#       clearState: true
+#       arguments:
+#         RCT_jsLocation: "localhost:${DEMO_PORT}"
+#
+# Android is exempt: Metro reaches an emulator over adb reverse, not app data.
+if [ "$PLATFORM" = ios ] && [ -z "$ALLOW_CLEAR_STATE" ]; then
+  if grep -q "clearState" "$FLOW" && ! grep -q "RCT_jsLocation" "$FLOW"; then
+    die "flow clears app state without re-passing the Metro redirect.
+       clearState wipes the persisted RCT_jsLocation default, so every launchApp
+       in this flow must carry: arguments: { RCT_jsLocation: \"localhost:\${DEMO_PORT}\" }
+       (or use reset-app.sh from the simulator skill instead; --allow-clear-state waives this check)"
+  fi
+fi
 
 # --- Warm-up ----------------------------------------------------------------
 # Maestro installs its driver onto a device the first time it drives it (~20s,
@@ -210,7 +238,10 @@ fi
 sleep "$LEAD_IN"
 
 # --- The flow ---------------------------------------------------------------
-maestro test --udid "$DEVICE" "$FLOW"
+# APP_ID and DEMO_PORT are forwarded so flows can stay app-agnostic
+# (`appId: ${APP_ID}`) and clearState flows can re-pass the Metro redirect as a
+# launch argument. Unused variables are harmless.
+maestro test --udid "$DEVICE" -e APP_ID="$APP_ID" ${DEMO_PORT:+-e DEMO_PORT="$DEMO_PORT"} "$FLOW"
 FLOW_RC=$?
 
 sleep "$LEAD_OUT"

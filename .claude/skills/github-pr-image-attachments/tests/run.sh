@@ -39,7 +39,7 @@ printf 'not a video really' > "$REPO/clip.mp4"
 echo
 echo "pushing assets"
 
-out=$(cd "$REPO" && "$PUSH" 3712 screenshots before.png after.png --repo blinkbitcoin/blink-mobile 2>&1)
+out=$(cd "$REPO" && "$PUSH" 3712 screenshots before.png after.png --repo acme/sample-app 2>&1)
 check "push exits zero" "0" "$?"
 
 REF=$(git -C "$WORK/origin.git" for-each-ref --format='%(refname)' | head -1)
@@ -53,7 +53,7 @@ PUSHED_SHA=$(git -C "$WORK/origin.git" rev-parse "refs/heads/assets/pr-3712-scre
 LOCAL_SHA=$(git -C "$REPO" hash-object after.png)
 check "pushed blob matches the local file" "$LOCAL_SHA" "$PUSHED_SHA"
 
-check "reports a usable RAW_BASE" "https://raw.githubusercontent.com/blinkbitcoin/blink-mobile/assets/pr-3712-screenshots" \
+check "reports a usable RAW_BASE" "https://raw.githubusercontent.com/acme/sample-app/assets/pr-3712-screenshots" \
   "$(echo "$out" | grep '^RAW_BASE=' | cut -d= -f2-)"
 check "reports one RAW_FILE per input" "2" "$(echo "$out" | grep -c '^RAW_FILE=')"
 check "RAW_FILE points at a path that exists in the tree" "yes" \
@@ -63,6 +63,22 @@ check "RAW_FILE points at a path that exists in the tree" "yes" \
 check "left the working tree clean" "" "$(cd "$REPO" && git status --porcelain=v1 --untracked-files=no)"
 check "did not switch branches" "yes" \
   "$(cd "$REPO" && git symbolic-ref -q HEAD >/dev/null && echo yes || echo no)"
+
+echo
+echo "repo derivation from the remote"
+
+# Without --repo, owner/name comes from the origin remote URL — both shapes.
+DREPO="$WORK/derive-repo"
+mkdir -p "$DREPO" && git -C "$DREPO" init -q
+cp "$REPO/before.png" "$DREPO/before.png"
+git -C "$DREPO" remote add origin git@github.com:acme/derived-ssh.git
+out=$(cd "$DREPO" && "$PUSH" 77 screenshots before.png --dry-run 2>&1)
+check "derives owner/name from an ssh remote" "yes" \
+  "$(echo "$out" | grep -q "raw.githubusercontent.com/acme/derived-ssh/assets/pr-77-screenshots" && echo yes || echo no)"
+git -C "$DREPO" remote set-url origin https://github.com/acme/derived-https.git
+out=$(cd "$DREPO" && "$PUSH" 77 screenshots before.png --dry-run 2>&1)
+check "derives owner/name from an https remote" "yes" \
+  "$(echo "$out" | grep -q "raw.githubusercontent.com/acme/derived-https/assets/pr-77-screenshots" && echo yes || echo no)"
 
 echo
 echo "purpose and naming"
@@ -107,6 +123,10 @@ echo "documented commands match the scripts"
 # disagree, the prose wins in practice and produces broken branches.
 check "SKILL.md documents the assets/ prefix" "yes" \
   "$(grep -q 'assets/pr-<N>-<purpose>' "$TESTS_DIR/../SKILL.md" && echo yes || echo no)"
+check "SKILL.md documents deriving the repo from the origin remote" "yes" \
+  "$(grep -qi "remote" "$TESTS_DIR/../SKILL.md" && echo yes || echo no)"
+check "SKILL.md keeps the per-org consent rule" "yes" \
+  "$(grep -qi "ask before the first push" "$TESTS_DIR/../SKILL.md" && echo yes || echo no)"
 check "SKILL.md warns that raw MP4 will not play" "yes" \
   "$(grep -qi 'octet-stream' "$TESTS_DIR/../SKILL.md" && echo yes || echo no)"
 

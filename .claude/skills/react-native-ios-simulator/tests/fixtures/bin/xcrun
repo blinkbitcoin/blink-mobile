@@ -14,6 +14,9 @@ shift
 DB="${FAKE_DEVICES:?FAKE_DEVICES not set}"
 touch "$DB"
 
+# Every invocation is recorded so tests can assert on call ordering and args.
+[ -n "${FAKE_ARGS_LOG:-}" ] && echo "simctl $*" >> "$FAKE_ARGS_LOG"
+
 case "${1:-}" in
   list)
     case "${2:-}" in
@@ -102,7 +105,34 @@ with open(db, "w") as f:
 ' "$DB" "$udid"
     ;;
 
-  spawn) exit 0 ;;  # `defaults write` on the device — nothing to model
+  spawn) exit 0 ;;  # `defaults write` on the device — recorded in the args log above
+
+  terminate) exit 0 ;;  # app process kill — nothing to model beyond the log entry
+
+  # Installed apps are modelled as directories under $FAKE_APP_ROOT/<udid>/<bundle>.app
+  get_app_container)
+    udid="${2:?}"; bundle="${3:?}"
+    APPROOT="${FAKE_APP_ROOT:?FAKE_APP_ROOT not set}"
+    path="$APPROOT/$udid/$bundle.app"
+    [ -d "$path" ] || { echo "fake xcrun: no app container for $bundle" >&2; exit 1; }
+    echo "$path"
+    ;;
+
+  install)
+    udid="${2:?}"; app_path="${3:?}"
+    APPROOT="${FAKE_APP_ROOT:?FAKE_APP_ROOT not set}"
+    [ -d "$app_path" ] || { echo "fake xcrun: install source missing: $app_path" >&2; exit 1; }
+    bundle=$(cat "$app_path/fake-bundle-id" 2>/dev/null || basename "$app_path" .app)
+    mkdir -p "$APPROOT/$udid"
+    rm -rf "$APPROOT/$udid/$bundle.app"
+    cp -R "$app_path" "$APPROOT/$udid/$bundle.app"
+    ;;
+
+  uninstall)
+    udid="${2:?}"; bundle="${3:?}"
+    APPROOT="${FAKE_APP_ROOT:?FAKE_APP_ROOT not set}"
+    rm -rf "$APPROOT/$udid/$bundle.app"
+    ;;
 
   *) echo "fake xcrun: unsupported verb '${1:-}'" >&2; exit 64 ;;
 esac

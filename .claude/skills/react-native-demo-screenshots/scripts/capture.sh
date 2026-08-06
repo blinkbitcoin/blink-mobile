@@ -10,8 +10,8 @@
 #
 # Usage: capture.sh <label> [output-dir] [--platform ios|android] [--udid U | --serial S]
 #                   [--settle N] [--timeout N]
-#   iOS:     BLINK_UDID (from the react-native-ios-simulator skill) or --udid
-#   Android: BLINK_ANDROID_SERIAL (e.g. emulator-5554) or --serial
+#   iOS:     DEMO_UDID (from the react-native-ios-simulator skill) or --udid
+#   Android: DEMO_ANDROID_SERIAL (e.g. emulator-5554) or --serial
 #   With both env vars set, the host OS decides (macOS -> iOS, else Android);
 #   --platform (or --udid/--serial) overrides.
 #
@@ -20,7 +20,7 @@
 set -uo pipefail
 
 LABEL=""; OUTDIR="."
-UDID="${BLINK_UDID:-}"; SERIAL="${BLINK_ANDROID_SERIAL:-}"; FORCE=""
+UDID="${DEMO_UDID:-}"; SERIAL="${DEMO_ANDROID_SERIAL:-}"; FORCE=""
 SETTLE="${SHOT_SETTLE:-0.6}"     # gap between comparison frames
 TIMEOUT="${SHOT_TIMEOUT:-30}"    # give up waiting for stability after this
 NO_WAIT=""
@@ -49,20 +49,20 @@ case "$FORCE" in ""|ios|android) : ;; *) die "--platform must be 'ios' or 'andro
 PLATFORM="$FORCE"
 if [ -z "$PLATFORM" ]; then
   if [ -n "$UDID" ] && [ -n "$SERIAL" ]; then
-    case "${BLINK_HOST_OS:-$(uname -s)}" in   # BLINK_HOST_OS is a test seam
+    case "${DEMO_HOST_OS:-$(uname -s)}" in   # DEMO_HOST_OS is a test seam
       Darwin) PLATFORM=ios ;;
       *)      PLATFORM=android ;;
     esac
   elif [ -n "$SERIAL" ]; then PLATFORM=android
   elif [ -n "$UDID" ];   then PLATFORM=ios
   else
-    die "no device: set BLINK_UDID (claim-session.sh) or BLINK_ANDROID_SERIAL, or pass --udid/--serial.
+    die "no device: set DEMO_UDID (claim-session.sh) or DEMO_ANDROID_SERIAL, or pass --udid/--serial.
        Capturing without a pinned device targets whichever one is booted,
        which is usually the user's."
   fi
 fi
-[ "$PLATFORM" = ios     ] && [ -z "$UDID" ]   && die "--udid needs a value (or BLINK_UDID)"
-[ "$PLATFORM" = android ] && [ -z "$SERIAL" ] && die "--serial needs a value (or BLINK_ANDROID_SERIAL)"
+[ "$PLATFORM" = ios     ] && [ -z "$UDID" ]   && die "--udid needs a value (or DEMO_UDID)"
+[ "$PLATFORM" = android ] && [ -z "$SERIAL" ] && die "--serial needs a value (or DEMO_ANDROID_SERIAL)"
 
 case "$LABEL" in
   *[!a-zA-Z0-9._-]*) die "label '$LABEL' must be filename-safe" ;;

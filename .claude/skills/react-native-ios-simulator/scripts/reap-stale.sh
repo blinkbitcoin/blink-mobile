@@ -8,16 +8,17 @@
 #
 # Safety mirrors release-session.sh: a device is only deleted when the live
 # device list says its udid still carries the session's expected
-# blink-pr<N>-demo name, and never while it is booted (someone is using it).
+# <prefix>-pr<N> name, and never while it is booted (someone is using it).
 #
 # Usage: reap-stale.sh
-#   BLINK_SIM_TTL_HOURS  retention window, default 24
-#   BLINK_SIM_REGISTRY   session registry, default ~/.claude/blink-sim-sessions
+#   DEMO_SIM_TTL_HOURS  retention window, default 24
+#   DEMO_SIM_REGISTRY   session registry, default ~/.claude/rn-sim-sessions
+#   DEMO_SIM_PREFIX     device-name prefix, default rn-demo
 
 set -uo pipefail
 
-REGISTRY="${BLINK_SIM_REGISTRY:-$HOME/.claude/blink-sim-sessions}"
-TTL_HOURS="${BLINK_SIM_TTL_HOURS:-24}"
+REGISTRY="${DEMO_SIM_REGISTRY:-$HOME/.claude/rn-sim-sessions}"
+TTL_HOURS="${DEMO_SIM_TTL_HOURS:-24}"
 NOW=$(date +%s)
 TTL_SECONDS=$((TTL_HOURS * 3600))
 
@@ -35,7 +36,7 @@ for SESSION_DIR in "$REGISTRY"/pr*/; do
   [ $((NOW - RELEASED_AT)) -ge "$TTL_SECONDS" ] || continue
 
   PR=$(basename "$SESSION_DIR" | sed 's/^pr//')
-  EXPECTED_NAME="blink-pr${PR}-demo"
+  EXPECTED_NAME="${DEMO_SIM_PREFIX:-rn-demo}-pr${PR}"
   UDID=$(cat "$SESSION_DIR/udid" 2>/dev/null || echo "")
 
   if [ -n "$UDID" ]; then

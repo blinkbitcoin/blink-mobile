@@ -20,8 +20,8 @@ case "$PR" in
   ''|*[!0-9]*) echo "FATAL: pr-number must be numeric, got '$PR'" >&2; exit 1 ;;
 esac
 
-REGISTRY="${BLINK_SIM_REGISTRY:-$HOME/.claude/blink-sim-sessions}"
-SIM_NAME="blink-pr${PR}-demo"
+REGISTRY="${DEMO_SIM_REGISTRY:-$HOME/.claude/rn-sim-sessions}"
+SIM_NAME="${DEMO_SIM_PREFIX:-rn-demo}-pr${PR}"
 SESSION_DIR="$REGISTRY/pr${PR}"
 
 # Sweep simulators from sessions released more than the TTL ago (default 24h),
@@ -118,15 +118,19 @@ ln -sfn "$SESSION_DIR" "$REGISTRY/ports/$PORT/session" 2>/dev/null || true
 xcrun simctl bootstatus "$UDID" -b >/dev/null 2>&1 || xcrun simctl boot "$UDID"
 
 # Persist the Metro redirect on THIS device only, so later plain `simctl launch`
-# calls keep using our bundler and never fall back to the user's 8081.
-xcrun simctl spawn "$UDID" defaults write io.galoy.bitcoinbeach RCT_jsLocation "localhost:$PORT" || true
+# calls keep using our bundler and never fall back to the user's 8081. Needs the
+# app's bundle id; without one the persisted redirect is skipped (flows that pass
+# RCT_jsLocation as a launch argument are unaffected).
+if [ -n "${DEMO_APP_ID_IOS:-}" ]; then
+  xcrun simctl spawn "$UDID" defaults write "$DEMO_APP_ID_IOS" RCT_jsLocation "localhost:$PORT" || true
+fi
 
 cat <<EOF
 # Claimed session for PR #$PR
-export BLINK_PR=$PR
-export BLINK_SIM_NAME="$SIM_NAME"
-export BLINK_UDID=$UDID
-export BLINK_PORT=$PORT
-export BLINK_SESSION_DIR="$SESSION_DIR"
+export DEMO_PR=$PR
+export DEMO_SIM_NAME="$SIM_NAME"
+export DEMO_UDID=$UDID
+export DEMO_PORT=$PORT
+export DEMO_SESSION_DIR="$SESSION_DIR"
 # Devices booted before this session: $PREFLIGHT_COUNT (recorded for the release check)
 EOF

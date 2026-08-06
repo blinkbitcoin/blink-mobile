@@ -20,8 +20,8 @@ export FAKE_ARGS_LOG="$WORK/args.log"
 export FAKE_FRAME_COUNTER="$WORK/frames.n"
 export SHOT_SETTLE=0.05
 
-printf 'DEMO-UDID|blink-pr3712-demo|Booted\n' > "$FAKE_DEVICES"
-printf 'emulator-5554|blink-pr3712-avd|device\n' > "$FAKE_ADB_DEVICES"
+printf 'DEMO-UDID|rn-demo-pr3712|Booted\n' > "$FAKE_DEVICES"
+printf 'emulator-5554|rn-demo-pr3712-avd|device\n' > "$FAKE_ADB_DEVICES"
 
 PASS=0; FAIL=0
 trap 'rm -rf "$WORK"' EXIT
@@ -35,7 +35,7 @@ echo
 echo "capture"
 
 reset
-BLINK_UDID=DEMO-UDID "$SCRIPTS/capture.sh" after "$WORK/shots" >/dev/null 2>&1
+DEMO_UDID=DEMO-UDID "$SCRIPTS/capture.sh" after "$WORK/shots" >/dev/null 2>&1
 check "capture exits zero" "0" "$?"
 check "wrote the labelled png" "yes" "$([ -s "$WORK/shots/after.png" ] && echo yes || echo no)"
 check "output is a real PNG" "PNG" "$(magick identify -format '%m' "$WORK/shots/after.png" 2>/dev/null)"
@@ -45,7 +45,7 @@ check "pinned the udid" "yes" "$(grep -q "screenshot udid=DEMO-UDID" "$FAKE_ARGS
 # Three distinct frames then a repeat: capture must keep shooting until two
 # consecutive frames match, so it never publishes a mid-animation screen.
 reset
-FAKE_FRAMES="red green blue blue" BLINK_UDID=DEMO-UDID \
+FAKE_FRAMES="red green blue blue" DEMO_UDID=DEMO-UDID \
   "$SCRIPTS/capture.sh" settled "$WORK/shots" >/dev/null 2>&1
 SHOTS=$(grep -c "screenshot udid=" "$FAKE_ARGS_LOG")
 check "waits for the screen to settle before keeping a frame" "yes" \
@@ -55,13 +55,13 @@ check "kept the settled frame, not an animating one" "blue" \
 
 # --- stability can be waived ------------------------------------------------
 reset
-FAKE_FRAMES="red green blue" BLINK_UDID=DEMO-UDID \
+FAKE_FRAMES="red green blue" DEMO_UDID=DEMO-UDID \
   "$SCRIPTS/capture.sh" nowait "$WORK/shots" --no-wait >/dev/null 2>&1
 check "--no-wait shoots exactly once" "1" "$(grep -c "screenshot udid=" "$FAKE_ARGS_LOG")"
 
 # --- a screen that never settles still yields a file ------------------------
 reset
-out=$(FAKE_NEVER_SETTLE=1 SHOT_TIMEOUT=1 BLINK_UDID=DEMO-UDID \
+out=$(FAKE_NEVER_SETTLE=1 SHOT_TIMEOUT=1 DEMO_UDID=DEMO-UDID \
   "$SCRIPTS/capture.sh" busy "$WORK/shots" 2>&1)
 check "an unsettled screen still produces a file" "yes" "$([ -s "$WORK/shots/busy.png" ] && echo yes || echo no)"
 check "and says so rather than pretending" "yes" \
@@ -69,17 +69,17 @@ check "and says so rather than pretending" "yes" \
 
 # --- guards -----------------------------------------------------------------
 reset
-env -u BLINK_UDID "$SCRIPTS/capture.sh" x "$WORK/shots" >/dev/null 2>&1
+env -u DEMO_UDID "$SCRIPTS/capture.sh" x "$WORK/shots" >/dev/null 2>&1
 check "refuses to capture without a pinned udid" "1" "$?"
 check "did not shoot anything without a udid" "0" "$(grep -c "screenshot udid=" "$FAKE_ARGS_LOG")"
 
-BLINK_UDID=DEMO-UDID "$SCRIPTS/capture.sh" "bad/label" "$WORK/shots" >/dev/null 2>&1
+DEMO_UDID=DEMO-UDID "$SCRIPTS/capture.sh" "bad/label" "$WORK/shots" >/dev/null 2>&1
 check "rejects a label that is not filename-safe" "1" "$?"
 
-BLINK_UDID=NO-SUCH-DEVICE "$SCRIPTS/capture.sh" x "$WORK/shots" >/dev/null 2>&1
+DEMO_UDID=NO-SUCH-DEVICE "$SCRIPTS/capture.sh" x "$WORK/shots" >/dev/null 2>&1
 check "fails when the device does not exist" "1" "$?"
 
-FAKE_SHOT_BROKEN=1 BLINK_UDID=DEMO-UDID "$SCRIPTS/capture.sh" broken "$WORK/shots" --no-wait >/dev/null 2>&1
+FAKE_SHOT_BROKEN=1 DEMO_UDID=DEMO-UDID "$SCRIPTS/capture.sh" broken "$WORK/shots" --no-wait >/dev/null 2>&1
 check "detects a file that is not really a PNG" "1" "$?"
 
 echo
@@ -87,7 +87,7 @@ echo "capture (android)"
 
 # --- android happy path -----------------------------------------------------
 reset
-BLINK_ANDROID_SERIAL=emulator-5554 "$SCRIPTS/capture.sh" droid "$WORK/shots" >/dev/null 2>&1
+DEMO_ANDROID_SERIAL=emulator-5554 "$SCRIPTS/capture.sh" droid "$WORK/shots" >/dev/null 2>&1
 check "android capture exits zero" "0" "$?"
 check "wrote the labelled png" "yes" "$([ -s "$WORK/shots/droid.png" ] && echo yes || echo no)"
 check "output is a real PNG" "PNG" "$(magick identify -format '%m' "$WORK/shots/droid.png" 2>/dev/null)"
@@ -96,7 +96,7 @@ check "did not touch simctl for an android shot" "0" "$(grep -c "screenshot udid
 
 # --- stability polling works on the adb path too ----------------------------
 reset
-FAKE_FRAMES="red green blue blue" BLINK_ANDROID_SERIAL=emulator-5554 \
+FAKE_FRAMES="red green blue blue" DEMO_ANDROID_SERIAL=emulator-5554 \
   "$SCRIPTS/capture.sh" droid-settled "$WORK/shots" >/dev/null 2>&1
 SHOTS=$(grep -c "screencap serial=" "$FAKE_ARGS_LOG")
 check "waits for the screen to settle on android" "yes" \
@@ -106,21 +106,21 @@ check "kept the settled frame on android" "blue" \
 
 # --- host-OS default when both platforms are claimed ------------------------
 reset
-BLINK_UDID=DEMO-UDID BLINK_ANDROID_SERIAL=emulator-5554 BLINK_HOST_OS=Darwin \
+DEMO_UDID=DEMO-UDID DEMO_ANDROID_SERIAL=emulator-5554 DEMO_HOST_OS=Darwin \
   "$SCRIPTS/capture.sh" both-mac "$WORK/shots" >/dev/null 2>&1
 check "with both claimed, macOS defaults to the ios simulator" "0" "$?"
 check "and shot via simctl" "yes" "$(grep -q "screenshot udid=DEMO-UDID" "$FAKE_ARGS_LOG" && echo yes || echo no)"
 check "and not via adb" "0" "$(grep -c "screencap serial=" "$FAKE_ARGS_LOG")"
 
 reset
-BLINK_UDID=DEMO-UDID BLINK_ANDROID_SERIAL=emulator-5554 BLINK_HOST_OS=Linux \
+DEMO_UDID=DEMO-UDID DEMO_ANDROID_SERIAL=emulator-5554 DEMO_HOST_OS=Linux \
   "$SCRIPTS/capture.sh" both-linux "$WORK/shots" >/dev/null 2>&1
 check "with both claimed, a non-mac host defaults to android" "0" "$?"
 check "and shot via adb" "yes" "$(grep -q "screencap serial=emulator-5554" "$FAKE_ARGS_LOG" && echo yes || echo no)"
 
 # --- the override argument --------------------------------------------------
 reset
-BLINK_UDID=DEMO-UDID BLINK_ANDROID_SERIAL=emulator-5554 BLINK_HOST_OS=Darwin \
+DEMO_UDID=DEMO-UDID DEMO_ANDROID_SERIAL=emulator-5554 DEMO_HOST_OS=Darwin \
   "$SCRIPTS/capture.sh" override "$WORK/shots" --platform android >/dev/null 2>&1
 check "--platform overrides the host default" "0" "$?"
 check "and it used adb" "yes" "$(grep -q "screencap serial=emulator-5554" "$FAKE_ARGS_LOG" && echo yes || echo no)"
@@ -128,26 +128,26 @@ check "and it used adb" "yes" "$(grep -q "screencap serial=emulator-5554" "$FAKE
 "$SCRIPTS/capture.sh" x "$WORK/shots" --platform tvos >/dev/null 2>&1
 check "rejects an unknown --platform" "1" "$?"
 
-BLINK_UDID=DEMO-UDID "$SCRIPTS/capture.sh" x "$WORK/shots" --platform android >/dev/null 2>&1
+DEMO_UDID=DEMO-UDID "$SCRIPTS/capture.sh" x "$WORK/shots" --platform android >/dev/null 2>&1
 check "--platform android without a serial fails" "1" "$?"
 
 reset
-BLINK_UDID=DEMO-UDID BLINK_ANDROID_SERIAL=emulator-5554 \
+DEMO_UDID=DEMO-UDID DEMO_ANDROID_SERIAL=emulator-5554 \
   "$SCRIPTS/capture.sh" pick-droid "$WORK/shots" --serial emulator-5554 >/dev/null 2>&1
 check "--serial disambiguates to android" "0" "$?"
 check "and it used adb" "yes" "$(grep -q "screencap serial=emulator-5554" "$FAKE_ARGS_LOG" && echo yes || echo no)"
 
 reset
-BLINK_UDID=DEMO-UDID BLINK_ANDROID_SERIAL=emulator-5554 \
+DEMO_UDID=DEMO-UDID DEMO_ANDROID_SERIAL=emulator-5554 \
   "$SCRIPTS/capture.sh" pick-ios "$WORK/shots" --udid DEMO-UDID >/dev/null 2>&1
 check "--udid disambiguates to ios" "0" "$?"
 check "and it used simctl" "yes" "$(grep -q "screenshot udid=DEMO-UDID" "$FAKE_ARGS_LOG" && echo yes || echo no)"
 
 reset
-BLINK_ANDROID_SERIAL=no-such-emulator "$SCRIPTS/capture.sh" x "$WORK/shots" >/dev/null 2>&1
+DEMO_ANDROID_SERIAL=no-such-emulator "$SCRIPTS/capture.sh" x "$WORK/shots" >/dev/null 2>&1
 check "fails when the emulator does not exist" "1" "$?"
 
-FAKE_SHOT_BROKEN=1 BLINK_ANDROID_SERIAL=emulator-5554 \
+FAKE_SHOT_BROKEN=1 DEMO_ANDROID_SERIAL=emulator-5554 \
   "$SCRIPTS/capture.sh" droid-broken "$WORK/shots" --no-wait >/dev/null 2>&1
 check "detects adb output that is not really a PNG" "1" "$?"
 
@@ -176,6 +176,13 @@ check "rejects a malformed crop box" "1" "$?"
 
 "$SCRIPTS/crop-pair.sh" "$WORK/before.png" "$WORK/after.png" >/dev/null 2>&1
 check "requires --crop" "1" "$?"
+
+echo
+echo "documented behavior matches the scripts"
+
+SKILL_MD="$TESTS_DIR/../SKILL.md"
+check "SKILL.md carries no BLINK_ residue" "no" \
+  "$(grep -q "BLINK_" "$SKILL_MD" && echo yes || echo no)"
 
 echo
 echo "-------------------------------------"
