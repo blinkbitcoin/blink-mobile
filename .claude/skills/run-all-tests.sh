@@ -40,6 +40,21 @@ for dir in "$HERE"/*/; do
   TOTAL_FAIL=$((TOTAL_FAIL + ${f:-0}))
 done
 
+# --- README freshness -------------------------------------------------------
+# The README is the human landing page; a skill it does not mention is a skill
+# nobody onboards into. Counted as one assertion per skill dir.
+printf '\n\033[1m=== README ===\033[0m\n'
+for dir in "$HERE"/*/; do
+  name=$(basename "$dir")
+  if [ -f "$HERE/README.md" ] && grep -q "$name" "$HERE/README.md"; then
+    TOTAL_PASS=$((TOTAL_PASS + 1))
+    printf '  \033[32mPASS\033[0m README mentions %s\n' "$name"
+  else
+    TOTAL_FAIL=$((TOTAL_FAIL + 1))
+    printf '  \033[31mFAIL\033[0m README.md is missing or does not mention %s\n' "$name"
+  fi
+done
+
 echo
 echo "====================================="
 printf '%d suites, %d assertions passed, %d failed\n' "$SUITES" "$TOTAL_PASS" "$TOTAL_FAIL"
