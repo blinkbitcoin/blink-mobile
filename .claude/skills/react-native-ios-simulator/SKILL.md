@@ -65,6 +65,12 @@ Re-running is idempotent — same sim, same port. Sessions created before the
 2026-08 rename keep their old device prefix; release them by setting
 `DEMO_SIM_PREFIX=<old prefix>` for that one call.
 
+When a **golden simulator** exists (see below), claiming clones it instead of
+creating a blank device — app already installed, account already logged in —
+and prints the golden's stamp as `# golden` comment lines. Anything that makes
+the clone dishonest (golden booted, different device type, explicit runtime
+mismatch) falls back to a blank create with a note on stderr, never silently.
+
 ### 2. Work in a scratchpad worktree
 
 Never the shared checkout: the user keeps their own branch checked out and
@@ -201,13 +207,55 @@ dead). Use `--delete` only when you know no more shots are coming and want the
 disk back now. A re-claim inside the window un-stamps the session, and the
 reaper never touches a booted device or one named for another session prefix.
 
+## The Golden Simulator: Skip Install + Login
+
+A video session used to pay a fresh staging login (OTP, coordinate taps,
+keyboard overlays) on every new simulator, and every session paid the app
+install. The golden simulator pays both **once**: a blessed, shutdown device
+with the app installed and an account logged in, which `claim-session.sh`
+clones in seconds for each session. Clones are immutable copies — sessions can
+never contaminate the golden or each other, which is what the rejected
+warm-sim-reuse idea could not guarantee.
+
+Create or refresh it by promoting a session you set up once:
+
+```bash
+eval "$("$SKILL/scripts/claim-session.sh" 3712)"
+# install the app, log in to staging once (Maestro or by hand), verify the
+# home screen, then promote - bless REPLACES release for this session:
+"$SKILL/scripts/bless-golden.sh" 3712 --sha "$(git rev-parse HEAD)"
+```
+
+`bless-golden.sh` verifies the device is this session's (same ownership gate as
+release), stops the session's Metro, shuts the device down, renames it to
+`${DEMO_SIM_PREFIX:-rn-demo}-golden` (swapping out and deleting any previous
+golden — exactly one device ever carries the name), writes a stamp
+(`sha`/`date`/`device-type`/`runtime`), and adopts the session: port freed,
+manifest gone, nothing left to release. Both the swap and claim's clone run
+under a shared lock, so a clone can never race a re-bless.
+
+**Staleness is judged, not guessed.** The clone carries the app build the
+golden was blessed with; before trusting it, diff native paths against the
+stamp's SHA (same rule as reusing a DerivedData build):
+
+```bash
+git -C /path/to/your-app log <stamp-sha>..origin/main -- ios/ package.json yarn.lock
+```
+
+Anything listed → the golden's native build is stale: set up a fresh session
+and re-bless. A clone that comes up logged out (staging sessions do expire)
+means the same thing — re-bless with a fresh login. Opt out of cloning with
+`DEMO_SIM_GOLDEN=none`, or point at a differently named golden with
+`DEMO_SIM_GOLDEN=<device name>`. The reaper never touches the golden: it has
+no session, and the name gate refuses it like any foreign device.
+
 ## After Editing the Scripts
 
 The isolation guarantees are load-bearing for every other agent on this Mac, so
 they are tested rather than asserted:
 
 ```bash
-"$SKILL/tests/run.sh"     # 99 assertions, ~45s, exits non-zero on failure
+"$SKILL/tests/run.sh"     # 130 assertions, ~60s, exits non-zero on failure
 ```
 
 It creates **no real simulators** — a fake `xcrun` goes first on PATH and the
