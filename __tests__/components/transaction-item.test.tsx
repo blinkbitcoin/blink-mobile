@@ -225,18 +225,48 @@ describe("MemoizedTransactionItem", () => {
     })
   })
 
-  describe("pressing the amount area", () => {
-    it("calls switchMemoryHideAmount", () => {
+  describe("pressing the row", () => {
+    it("pressing the amount area triggers the row's onPress, not the hide toggle", () => {
       const mockSwitch = jest.fn()
+      const mockOnPress = jest.fn()
       mockUseHideAmount.mockReturnValue({
         hideAmount: false,
         switchMemoryHideAmount: mockSwitch,
       })
 
-      const { getByText } = render(<MemoizedTransactionItem txid="tx-1" />)
+      const { getByText } = render(
+        <MemoizedTransactionItem txid="tx-1" onPress={mockOnPress} />,
+      )
       fireEvent.press(getByText("$10.00"))
 
-      expect(mockSwitch).toHaveBeenCalledTimes(1)
+      expect(mockOnPress).toHaveBeenCalledTimes(1)
+      expect(mockSwitch).not.toHaveBeenCalled()
+    })
+
+    it("pressing the row navigates", () => {
+      const mockOnPress = jest.fn()
+
+      const { getByTestId } = render(
+        <MemoizedTransactionItem txid="tx-1" onPress={mockOnPress} />,
+      )
+      fireEvent.press(getByTestId("transaction-item"))
+
+      expect(mockOnPress).toHaveBeenCalledTimes(1)
+    })
+
+    it("pressing the hidden placeholder does not toggle hide state", () => {
+      const mockSwitch = jest.fn()
+      mockUseHideAmount.mockReturnValue({
+        hideAmount: true,
+        switchMemoryHideAmount: mockSwitch,
+      })
+
+      const { getByTestId } = render(
+        <MemoizedTransactionItem txid="tx-1" onPress={jest.fn()} />,
+      )
+      fireEvent.press(getByTestId("hidden-balance-placeholder"))
+
+      expect(mockSwitch).not.toHaveBeenCalled()
     })
   })
 

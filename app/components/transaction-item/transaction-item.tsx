@@ -1,5 +1,5 @@
 import React from "react"
-import { Pressable, View } from "react-native"
+import { View } from "react-native"
 import Animated, { useSharedValue, useAnimatedStyle } from "react-native-reanimated"
 import { useIsFocused } from "@react-navigation/native"
 import { Text, makeStyles, ListItem } from "@rn-vui/themed"
@@ -100,7 +100,7 @@ const TransactionItem: React.FC<Props> = ({
   } = useAppConfig()
   const { formatMoneyAmount, formatCurrency } = useDisplayCurrency()
 
-  const { hideAmount, switchMemoryHideAmount } = useHideAmount()
+  const { hideAmount } = useHideAmount()
 
   const description = useDescriptionDisplay({
     tx,
@@ -197,20 +197,18 @@ const TransactionItem: React.FC<Props> = ({
           </ListItem.Subtitle>
         </ListItem.Content>
 
-        <Pressable hitSlop={10} onPress={switchMemoryHideAmount}>
-          <View style={styles.amountWrapper}>
-            {hideAmount ? (
-              <HiddenBalancePlaceholder size="small" />
-            ) : (
-              <>
-                <Text style={amountStyle}>{formattedDisplayAmount}</Text>
-                {formattedSecondaryAmount && (
-                  <Text style={amountStyle}>{formattedSecondaryAmount}</Text>
-                )}
-              </>
-            )}
-          </View>
-        </Pressable>
+        <View style={styles.amountWrapper}>
+          {hideAmount ? (
+            <HiddenBalancePlaceholder size="small" />
+          ) : (
+            <>
+              <Text style={amountStyle}>{formattedDisplayAmount}</Text>
+              {formattedSecondaryAmount && (
+                <Text style={amountStyle}>{formattedSecondaryAmount}</Text>
+              )}
+            </>
+          )}
+        </View>
       </ListItem>
     </Animated.View>
   )
