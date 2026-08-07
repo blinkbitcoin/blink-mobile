@@ -8,10 +8,7 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloyTertiaryButton } from "@app/components/atomic/galoy-tertiary-button"
-import {
-  headerRightNoGlass,
-  noHeaderRight,
-} from "@app/components/header-no-glass"
+import { headerRightNoGlass, noHeaderRight } from "@app/components/header-no-glass"
 import { WarningCard } from "@app/components/warning-card"
 import { SuggestionBar } from "@app/components/suggestion-bar"
 import { useI18nContext } from "@app/i18n/i18n-react"
