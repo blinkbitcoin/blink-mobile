@@ -9,6 +9,7 @@ import { logError } from "@app/utils/log-error"
 import {
   getRemoteConfigNumericObject,
   getRemoteConfigObject,
+  getRemoteConfigPositiveNumber,
   getRemoteConfigStringList,
   serializeRemoteConfigDefault,
 } from "@app/utils/remote-config"
@@ -476,9 +477,10 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           .getValue(SelfCustodialDepositClaimLeewayVbyteKey)
           .asNumber()
 
-        const migrationReceiveDelayedNoticeMs = remoteConfigInstance()
-          .getValue(MigrationReceiveDelayedNoticeMsKey)
-          .asNumber()
+        const migrationReceiveDelayedNoticeMs = getRemoteConfigPositiveNumber(
+          MigrationReceiveDelayedNoticeMsKey,
+          defaultRemoteConfig.migrationReceiveDelayedNoticeMs,
+        )
 
         const migrationDelayedRedirectEnabled = remoteConfigInstance()
           .getValue(MigrationDelayedRedirectEnabledKey)

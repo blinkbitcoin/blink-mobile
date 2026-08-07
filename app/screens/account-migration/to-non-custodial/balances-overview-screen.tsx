@@ -103,15 +103,11 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
    *  background instance (this screen stays mounted under the completion screen) never
    *  re-saves the checkpoint the migration just cleared, and on ready figures so it is
    *  never recorded before the commit point exists. */
-  const expectedReceiveSats = preview.receiveSats
+  const expectedReceiveSats = preview.expectedReceiveSats
   useEffect(() => {
-    if (!isFocused || checkpointLoading || !preview.isReady) return
-    saveCheckpoint(
-      MigrationCheckpoint.BalancesOverview,
-      undefined,
-      expectedReceiveSats ?? undefined,
-    )
-  }, [isFocused, checkpointLoading, preview.isReady, expectedReceiveSats, saveCheckpoint])
+    if (!isFocused || checkpointLoading || expectedReceiveSats === null) return
+    saveCheckpoint(MigrationCheckpoint.BalancesOverview, { expectedReceiveSats })
+  }, [isFocused, checkpointLoading, expectedReceiveSats, saveCheckpoint])
 
   /**
    * The ways this screen ends without an Approve to offer, as one value: the preview

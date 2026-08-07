@@ -13,6 +13,11 @@ import { reportError } from "@app/utils/error-logging"
  *  per-directory serialization for nothing. */
 const RECEIVE_CHECK_RETRY_MS = 5000
 
+/** Past the notice window the wait is no longer a matter of seconds, and the gate never
+ *  gives up, so the checks back off rather than opening an SDK connection every 5s for the
+ *  rest of the session. */
+const DELAYED_RECEIVE_CHECK_RETRY_MS = 30_000
+
 type UseMigrationReceiveConfirmationArgs = {
   selfCustodialAccountId: string | null
   /**
@@ -76,6 +81,10 @@ export const useMigrationReceiveConfirmation = ({
    *  file the same story. */
   const hasReportedFailureRef = useRef(false)
 
+  /** Mirrors the state for the polling effect, which outlives the flip and must read the
+   *  current cadence without re-arming (a re-armed effect fires an extra check at once). */
+  const isReceiveDelayedRef = useRef(false)
+
   useEffect(() => {
     if (!isWatching || selfCustodialAccountId === null) return
 
@@ -84,7 +93,10 @@ export const useMigrationReceiveConfirmation = ({
     const accountId = selfCustodialAccountId
 
     const scheduleNextCheck = () => {
-      timer = setTimeout(runCheck, RECEIVE_CHECK_RETRY_MS)
+      const retryMs = isReceiveDelayedRef.current
+        ? DELAYED_RECEIVE_CHECK_RETRY_MS
+        : RECEIVE_CHECK_RETRY_MS
+      timer = setTimeout(runCheck, retryMs)
     }
 
     const reportOnce = (err: unknown) => {
@@ -139,16 +151,33 @@ export const useMigrationReceiveConfirmation = ({
     }
   }, [isWatching, selfCustodialAccountId, network, selfCustodialDepositClaimLeewayVbyte])
 
-  /** The notice measures the wait for the receive, not the whole transfer: it starts when
-   *  the watching starts (server COMPLETED, nothing landed) and is withdrawn if a check
-   *  confirms before it fires. */
+  /** The notice measures the wait for the receive, not the whole transfer: it runs from a
+   *  timestamp rather than the effect's own lifetime because both callers recompute `skip`
+   *  from inputs that flap, and a window re-armed on each flap would never elapse. */
+  const watchStartedAtRef = useRef(0)
+  const watchedAccountIdRef = useRef<string | null>(null)
+
   useEffect(() => {
     if (!isWatching) return
+
+    /** Only a different wallet starts a fresh window: the wait belongs to one migration's
+     *  receive. A caller merely re-skipping deliberately does not reset it. */
+    if (watchedAccountIdRef.current !== selfCustodialAccountId) {
+      watchedAccountIdRef.current = selfCustodialAccountId
+      watchStartedAtRef.current = Date.now()
+      isReceiveDelayedRef.current = false
+      setIsReceiveDelayed(false)
+    }
+
+    const elapsed = Date.now() - watchStartedAtRef.current
+    const remaining = Math.max(migrationReceiveDelayedNoticeMs - elapsed, 0)
+
     const timer = setTimeout(() => {
+      isReceiveDelayedRef.current = true
       setIsReceiveDelayed(true)
-    }, migrationReceiveDelayedNoticeMs)
+    }, remaining)
     return () => clearTimeout(timer)
-  }, [isWatching, migrationReceiveDelayedNoticeMs])
+  }, [isWatching, selfCustodialAccountId, migrationReceiveDelayedNoticeMs])
 
   /** A skipped gate is inert, whatever it remembers: a caller that re-skips after a
    *  late failure must not keep receiving a notice (or a confirmation) minted for a

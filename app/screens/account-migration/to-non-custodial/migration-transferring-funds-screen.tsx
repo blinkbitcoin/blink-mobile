@@ -118,15 +118,17 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
    *  Each keeps its own message; only a real failure leaves this screen for support. */
   const isRecoverable = isClockOutOfSync || hasConnectionIssue
 
+  /** The delayed notice yields to a recoverable issue: a lost connection explains the
+   *  wait better than the wait itself, and its retry is the more useful footer. */
+  const isDelayedNoticeShown = isReceiveDelayed && !isRecoverable
+
   const recoverableMessage = isClockOutOfSync
     ? LLMigration.clockOutOfSync.body()
     : LL.errors.network.connection()
-  /** The delayed notice yields to a recoverable issue: a lost connection explains the
-   *  wait better than the wait itself, and its retry is the more useful footer. */
-  const delayedMessage = isReceiveDelayed ? LLMigration.transferDelayed.body() : null
-  const message =
-    (isRecoverable ? recoverableMessage : delayedMessage) ??
-    LLMigration.transferringFunds()
+  const waitingMessage = isDelayedNoticeShown
+    ? LLMigration.transferDelayed.body()
+    : LLMigration.transferringFunds()
+  const message = isRecoverable ? recoverableMessage : waitingMessage
 
   const retryTitle = isClockOutOfSync
     ? LLMigration.clockOutOfSync.retryCta()
@@ -134,6 +136,10 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
   const retryTestId = isClockOutOfSync
     ? "migration-clock-out-of-sync-retry"
     : "migration-connection-issue-retry"
+
+  const recoverableFooter = (
+    <GaloyPrimaryButton title={retryTitle} onPress={retry} {...testProps(retryTestId)} />
+  )
 
   /** Secondary, not primary: waiting stays the recommended path — the swap still fires
    *  the moment the receive lands, including while the support screen sits on top (this
@@ -146,11 +152,8 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
     />
   )
 
-  const retryFooter = isRecoverable ? (
-    <GaloyPrimaryButton title={retryTitle} onPress={retry} {...testProps(retryTestId)} />
-  ) : isReceiveDelayed ? (
-    delayedFooter
-  ) : undefined
+  const waitingFooter = isDelayedNoticeShown ? delayedFooter : undefined
+  const screenFooter = isRecoverable ? recoverableFooter : waitingFooter
 
   return (
     <Screen preset="fixed">
@@ -158,7 +161,7 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
         icon="clock"
         iconColor={colors.warning}
         iconBackgroundColor={colors._warningLight}
-        footer={retryFooter}
+        footer={screenFooter}
       >
         <Text style={styles.message}>{message}</Text>
       </StatusScreenLayout>

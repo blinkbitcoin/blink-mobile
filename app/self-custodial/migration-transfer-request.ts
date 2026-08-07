@@ -22,13 +22,13 @@ export const MigrationSdkStatus = {
 export type MigrationSdkStatus =
   (typeof MigrationSdkStatus)[keyof typeof MigrationSdkStatus]
 
-export type MigrationSdkResult<T> =
+type MigrationSdkResult<T> =
   | { status: typeof MigrationSdkStatus.Ok; value: T }
   | { status: typeof MigrationSdkStatus.NoMnemonic }
   | { status: typeof MigrationSdkStatus.ConnectionError; error: Error }
   | { status: typeof MigrationSdkStatus.Failed; error: Error }
 
-export type MigrationSdkConnectionArgs = {
+type MigrationSdkConnectionArgs = {
   accountId: string
   network: Network
   leewaySatPerVbyte: number
@@ -193,7 +193,7 @@ export const buildMigrationTransferRequest = (
     return { sparkInvoice: invoice, sparkPubkey: identityPubkey, proofSignature }
   })
 
-export type MigrationReceiveCheck = {
+type MigrationReceiveCheck = {
   hasReceived: boolean
   balanceSats: number
 }

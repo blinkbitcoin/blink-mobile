@@ -47,11 +47,24 @@ export const useResumeCompletedMigration = (): void => {
    *  into a wallet whose funds are still in transit either (#4102). Unconfirmed simply
    *  means no swap this session — the custodial session stays intact and the next launch
    *  (or this one, once a check lands) picks the swap back up. */
-  const { isReceiveConfirmed } = useMigrationReceiveConfirmation({
+  const { isReceiveConfirmed, isReceiveDelayed } = useMigrationReceiveConfirmation({
     selfCustodialAccountId: migrationAccountId,
     expectedReceiveSats: migrationExpectedReceiveSats,
     skip: !isServerCompleted,
   })
+
+  /** This path has no screen of its own to say the wait is unusual, so the crossing is at
+   *  least reported: a receive that never lands would otherwise be invisible, the user
+   *  sitting on a normal home with nothing pending anywhere. */
+  const hasReportedDelayRef = useRef(false)
+  useEffect(() => {
+    if (!isReceiveDelayed || hasReportedDelayRef.current) return
+    hasReportedDelayRef.current = true
+    reportError(
+      "Migration resume receive delayed",
+      new Error("Receive has not landed within the notice window"),
+    )
+  }, [isReceiveDelayed])
 
   /** A swap that resolves false is terminal, not transient: the destination account is
    *  gone from the device, so no retry brings it back. Blocks the effect from re-entering

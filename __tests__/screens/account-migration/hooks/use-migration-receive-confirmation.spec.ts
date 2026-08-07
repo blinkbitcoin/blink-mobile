@@ -16,6 +16,8 @@ jest.mock("@app/self-custodial/hooks/use-spark-network", () => ({
 }))
 
 const DELAYED_NOTICE_MS = 60_000
+const RECEIVE_CHECK_RETRY_MS = 5000
+const DELAYED_RETRY_MS = 30_000
 
 const defaultRemoteConfig = {
   selfCustodialDepositClaimLeewayVbyte: 1,
@@ -125,7 +127,7 @@ describe("useMigrationReceiveConfirmation", () => {
     expect(result.current.isReceiveDelayed).toBe(true)
 
     mockCheckReceiveLanded.mockResolvedValue(ok(landed))
-    await advance(5000)
+    await advance(DELAYED_RETRY_MS)
 
     expect(result.current).toEqual({
       isReceiveConfirmed: true,
@@ -150,6 +152,56 @@ describe("useMigrationReceiveConfirmation", () => {
       isReceiveDelayed: false,
     })
     expect(mockCheckReceiveLanded.mock.calls).toHaveLength(checksSoFar)
+  })
+
+  /** Both callers recompute `skip` from inputs that hydrate and flap; a window re-armed
+   *  from zero on each flap would never elapse and the notice would never appear. */
+  it("reaches the notice across a caller whose skip flaps", async () => {
+    const { result, rerender } = renderGate()
+    await flushCheck()
+
+    await advance(DELAYED_NOTICE_MS / 2)
+    expect(result.current.isReceiveDelayed).toBe(false)
+
+    rerender({ skip: true })
+    rerender({ skip: false })
+    await flushCheck()
+
+    await advance(DELAYED_NOTICE_MS / 2)
+    expect(result.current.isReceiveDelayed).toBe(true)
+  })
+
+  /** The gate never gives up, so past the notice window the checks back off rather than
+   *  opening an SDK connection every 5s for the rest of the session. */
+  it("backs the checks off once the wait passes the notice window", async () => {
+    const { result } = renderGate()
+    await flushCheck()
+
+    await advance(DELAYED_NOTICE_MS)
+    expect(result.current.isReceiveDelayed).toBe(true)
+    const checksAtNotice = mockCheckReceiveLanded.mock.calls.length
+
+    await advance(RECEIVE_CHECK_RETRY_MS)
+    expect(mockCheckReceiveLanded).toHaveBeenCalledTimes(checksAtNotice)
+
+    await advance(DELAYED_RETRY_MS - RECEIVE_CHECK_RETRY_MS)
+    expect(mockCheckReceiveLanded).toHaveBeenCalledTimes(checksAtNotice + 1)
+  })
+
+  /** The wait belongs to one migration's receive: a gate re-pointed at another wallet must
+   *  not inherit a notice minted for a payment it never waited on. */
+  it("measures a fresh window when the gate is pointed at another wallet", async () => {
+    const { result, rerender } = renderGate()
+    await flushCheck()
+    await advance(DELAYED_NOTICE_MS)
+    expect(result.current.isReceiveDelayed).toBe(true)
+
+    rerender({ selfCustodialAccountId: "sc-account-2" })
+    await flushCheck()
+    expect(result.current.isReceiveDelayed).toBe(false)
+
+    await advance(DELAYED_NOTICE_MS)
+    expect(result.current.isReceiveDelayed).toBe(true)
   })
 
   /** Nothing will ever arrive for a zero-receive migration, so waiting on the wallet
@@ -282,7 +334,7 @@ describe("useMigrationReceiveConfirmation", () => {
     expect(result.current.isReceiveConfirmed).toBe(false)
 
     const checksSoFar = mockCheckReceiveLanded.mock.calls.length
-    await advance(5000)
+    await advance(DELAYED_RETRY_MS)
     expect(mockCheckReceiveLanded.mock.calls.length).toBeGreaterThan(checksSoFar)
   })
 

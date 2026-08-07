@@ -668,8 +668,9 @@ describe("MigrationBalancesOverviewScreen", () => {
 
     expect(mockSaveCheckpoint).toHaveBeenCalledWith(
       MigrationCheckpoint.BalancesOverview,
-      undefined,
-      990,
+      {
+        expectedReceiveSats: 990,
+      },
     )
   })
 
@@ -689,8 +690,9 @@ describe("MigrationBalancesOverviewScreen", () => {
 
     expect(mockSaveCheckpoint).toHaveBeenCalledWith(
       MigrationCheckpoint.BalancesOverview,
-      undefined,
-      0,
+      {
+        expectedReceiveSats: 0,
+      },
     )
   })
 

@@ -17,6 +17,13 @@ import {
 
 import { useCustodialOwnerId } from "./use-custodial-owner-id"
 
+/** Named rather than positional so a caller setting only one field does not pass a
+ *  placeholder for the other. */
+type SaveCheckpointOptions = {
+  provisionedAccountId?: string
+  expectedReceiveSats?: number
+}
+
 /**
  * The persisted migration checkpoint's state and writes, free of any navigation
  * coupling so pure-logic consumers (backup routing, the session swap) can read the
@@ -86,13 +93,16 @@ export const useMigrationCheckpointState = () => {
     : null
 
   /** Resolves false when the write fails, so callers can stop the flow instead of
-   *  advancing on a checkpoint that only exists in memory. Re-sending the known
-   *  accountId lets a later successful save heal a write that failed. */
+   *  advancing on a checkpoint that only exists in memory. Re-sending what this hook
+   *  already knows heals a failed write: mergeCheckpoint preserves what reached storage,
+   *  this covers what never did. */
   const saveCheckpoint = useCallback(
     async (
       step: MigrationCheckpoint,
-      provisionedAccountId?: string,
-      expectedReceiveSatsUpdate?: number,
+      {
+        provisionedAccountId,
+        expectedReceiveSats: expectedReceiveSatsUpdate,
+      }: SaveCheckpointOptions = {},
     ): Promise<boolean> => {
       /** Without a resolved owner the checkpoint cannot be keyed, and saving would erase the
        *  stored owner + account id via mergeCheckpoint; refuse so a null-owner window (an

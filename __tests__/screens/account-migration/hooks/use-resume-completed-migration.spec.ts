@@ -163,6 +163,38 @@ describe("useResumeCompletedMigration", () => {
     expect(mockCompleteMigration).not.toHaveBeenCalled()
   })
 
+  /** This path has no screen of its own to say the wait is unusual, so the crossing is at
+   *  least reported rather than leaving a stuck receive invisible. */
+  it("reports a receive that has not landed within the notice window", async () => {
+    mockReceiveConfirmation = { isReceiveConfirmed: false, isReceiveDelayed: true }
+    renderHook(() => useResumeCompletedMigration())
+    await flushEffects()
+
+    expect(mockReportError).toHaveBeenCalledWith(
+      "Migration resume receive delayed",
+      expect.any(Error),
+    )
+  })
+
+  it("reports the delayed receive once, however often it re-renders", async () => {
+    mockReceiveConfirmation = { isReceiveConfirmed: false, isReceiveDelayed: true }
+    const { rerender } = renderHook(() => useResumeCompletedMigration())
+    await flushEffects()
+    rerender({})
+    rerender({})
+    await flushEffects()
+
+    expect(mockReportError).toHaveBeenCalledTimes(1)
+  })
+
+  it("stays quiet while the wait is still inside the notice window", async () => {
+    mockReceiveConfirmation = { isReceiveConfirmed: false, isReceiveDelayed: false }
+    renderHook(() => useResumeCompletedMigration())
+    await flushEffects()
+
+    expect(mockReportError).not.toHaveBeenCalled()
+  })
+
   /** Nobody who cannot act on the answer should be asking for it on every launch. */
   it("does not ask the server when no checkpoint says a migration is unfinished", async () => {
     mockMigrationAccountId = null

@@ -122,7 +122,9 @@ describe("useMigrationCheckpoint", () => {
     await waitFor(() => expect(result.current.loading).toBe(false))
 
     act(() => {
-      result.current.saveCheckpoint(MigrationCheckpoint.BackupMethod, "sc-account-1")
+      result.current.saveCheckpoint(MigrationCheckpoint.BackupMethod, {
+        provisionedAccountId: "sc-account-1",
+      })
     })
 
     expect(result.current.accountId).toBe("sc-account-1")
@@ -153,7 +155,10 @@ describe("useMigrationCheckpoint", () => {
     await waitFor(() => expect(result.current.loading).toBe(false))
 
     act(() => {
-      result.current.saveCheckpoint(MigrationCheckpoint.BalancesOverview, "sc-1", 21000)
+      result.current.saveCheckpoint(MigrationCheckpoint.BalancesOverview, {
+        provisionedAccountId: "sc-1",
+        expectedReceiveSats: 21000,
+      })
     })
 
     expect(result.current.expectedReceiveSats).toBe(21000)

@@ -73,11 +73,18 @@ export const validateStoredCheckpoint = (raw: unknown): StoredCheckpoint | null 
   if (custodialAccountId !== undefined && typeof custodialAccountId !== "string") {
     return null
   }
-  if (expectedReceiveSats !== undefined && typeof expectedReceiveSats !== "number") {
-    return null
-  }
+  /** Advisory, unlike the fields above: dropping a malformed one on its own keeps the step
+   *  and ids a locked account resumes from, which discarding the record would strip. */
+  const hasUsableExpectedReceiveSats =
+    typeof expectedReceiveSats === "number" && Number.isFinite(expectedReceiveSats)
 
-  return { step, savedAt, accountId, custodialAccountId, expectedReceiveSats }
+  return {
+    step,
+    savedAt,
+    accountId,
+    custodialAccountId,
+    expectedReceiveSats: hasUsableExpectedReceiveSats ? expectedReceiveSats : undefined,
+  }
 }
 
 export const resolveCheckpointRoute = (
@@ -129,14 +136,20 @@ export const mergeCheckpoint = (
   const hasSameOwner =
     existing?.custodialAccountId === undefined ||
     existing.custodialAccountId === update.custodialAccountId
+
+  /** Write-once for one owner's flow: the figure is only knowable before the drain, so a
+   *  re-entered commit screen would carry the post-drain zero the gate reads as "nothing
+   *  will ever arrive" and swap while the funds are still in transit (#4102). */
+  const inheritedExpectedReceiveSats = hasSameOwner
+    ? existing?.expectedReceiveSats
+    : undefined
+
   return {
     step: update.step,
     savedAt: Date.now(),
     accountId: update.accountId ?? (hasSameOwner ? existing?.accountId : undefined),
     custodialAccountId: update.custodialAccountId,
-    expectedReceiveSats:
-      update.expectedReceiveSats ??
-      (hasSameOwner ? existing?.expectedReceiveSats : undefined),
+    expectedReceiveSats: inheritedExpectedReceiveSats ?? update.expectedReceiveSats,
   }
 }
 

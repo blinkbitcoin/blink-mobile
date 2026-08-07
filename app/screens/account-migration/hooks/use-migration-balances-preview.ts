@@ -135,10 +135,10 @@ export const useMigrationBalancesPreview = () => {
 
   return {
     isReady,
-    /** The raw figure for persisting into the checkpoint, unlike the formatted strings
-     *  below; null until the preview is ready so a placeholder zero is never mistaken
-     *  for a real zero-receive migration. */
-    receiveSats: isReady ? receiveSats : null,
+    /** The raw figure for the checkpoint, named for what the checkpoint calls it rather
+     *  than shadowing the preview field whose type it does not share. Null until ready, so
+     *  a placeholder zero is never mistaken for a real zero-receive migration. */
+    expectedReceiveSats: isReady ? receiveSats : null,
     isRetryable,
     isUnavailable,
     unavailableReason,
