@@ -17,7 +17,8 @@ export type MigrationDiagnostic = {
  *
  * `custodialAccountId` covers the handover raised after the session was already discarded:
  * the `me` query is skipped for a signed-out custodial account, so without it the ticket
- * would name nothing that identifies the account support has to act on.
+ * would name nothing that identifies the account support has to act on. It wins over the
+ * query, which can still answer for another live session and name the wrong account.
  */
 export const useMigrationDiagnostics = (
   custodialAccountId?: string,
@@ -25,7 +26,7 @@ export const useMigrationDiagnostics = (
   const { LL } = useI18nContext()
   const LLSupport = LL.AccountMigration.contactSupport
   const { accountId, pubKey, username, email, phone } = useMigrationSupportDetails()
-  const effectiveAccountId = accountId || custodialAccountId || ""
+  const effectiveAccountId = custodialAccountId || accountId || ""
 
   return useMemo(
     () =>
