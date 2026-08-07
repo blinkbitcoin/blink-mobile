@@ -3896,7 +3896,7 @@ export type OnChainUsdPaymentSendAsBtcDenominatedMutation = { readonly __typenam
 export type AccountDeleteMutationVariables = Exact<{ [key: string]: never; }>;
 
 
-export type AccountDeleteMutation = { readonly __typename: 'Mutation', readonly accountDelete: { readonly __typename: 'AccountDeletePayload', readonly success: boolean, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }> } };
+export type AccountDeleteMutation = { readonly __typename: 'Mutation', readonly accountDelete: { readonly __typename: 'AccountDeletePayload', readonly success: boolean, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string, readonly code?: string | null }> } };
 
 export type UserEmailDeleteMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -8866,6 +8866,7 @@ export const AccountDeleteDocument = gql`
   accountDelete {
     errors {
       message
+      code
     }
     success
   }

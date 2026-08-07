@@ -24,11 +24,15 @@ import { useSwitchToNextProfile } from "@app/hooks/use-switch-to-next-profile"
 import { SettingsButton } from "../../button"
 import { useAccountDeleteContext } from "../account-delete-context"
 
+/** The migration flow closes the emptied custodial account with this same mutation, and
+ *  codegen allows one document per operation name, so this one is shared: `code` is what
+ *  lets that caller tell a transient refusal from a terminal one. */
 gql`
   mutation accountDelete {
     accountDelete {
       errors {
         message
+        code
       }
       success
     }
