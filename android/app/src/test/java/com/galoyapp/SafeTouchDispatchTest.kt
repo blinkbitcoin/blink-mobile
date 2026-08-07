@@ -46,6 +46,32 @@ class SafeTouchDispatchTest {
   }
 
   @Test
+  fun `swallows the out-of-range pointerIndex variant and reports it`() {
+    val frameworkBug = IllegalArgumentException("pointerIndex out of range")
+    var reported: Throwable? = null
+
+    val handled = safeTouchDispatch.dispatch(onFrameworkBug = { reported = it }) {
+      throw frameworkBug
+    }
+
+    assertFalse(handled)
+    assertSame(frameworkBug, reported)
+  }
+
+  @Test
+  fun `propagates IllegalArgumentException without a message without reporting`() {
+    val messageless = IllegalArgumentException()
+    var reported: Throwable? = null
+
+    val thrown = assertThrows(IllegalArgumentException::class.java) {
+      safeTouchDispatch.dispatch(onFrameworkBug = { reported = it }) { throw messageless }
+    }
+
+    assertSame(messageless, thrown)
+    assertNull(reported)
+  }
+
+  @Test
   fun `propagates IllegalArgumentException with an unrelated message without reporting`() {
     val realBug = IllegalArgumentException("span index out of bounds")
     var reported: Throwable? = null
