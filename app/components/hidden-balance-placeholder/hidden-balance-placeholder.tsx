@@ -3,6 +3,8 @@ import { View } from "react-native"
 
 import { makeStyles } from "@rn-vui/themed"
 
+import { testProps } from "@app/utils/testProps"
+
 // Archive: Previously, hidden balances were displayed as <Text>****</Text>
 // (four asterisk characters). This was replaced with four solid filled circles
 // to match the updated design spec.
@@ -22,7 +24,7 @@ export const HiddenBalancePlaceholder: React.FC<Props> = ({ size }) => {
   const styles = useStyles(CIRCLE_SIZES[size])
 
   return (
-    <View style={styles.container}>
+    <View {...testProps("hidden-balance-placeholder")} style={styles.container}>
       {CIRCLES.map((i) => (
         <View key={i} style={styles.circle} />
       ))}
