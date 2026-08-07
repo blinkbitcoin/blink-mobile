@@ -64,16 +64,14 @@ const mockBuildDiagnostics = () =>
     {
       label: LLSupport.accountIdLabel(),
       value: mockDetails.accountId,
-      isIdentifier: true,
     },
-    { label: LLSupport.pubKeyLabel(), value: mockDetails.pubKey, isIdentifier: true },
+    { label: LLSupport.pubKeyLabel(), value: mockDetails.pubKey },
     {
       label: LLSupport.usernameLabel(),
       value: mockDetails.username,
-      isIdentifier: false,
     },
-    { label: LLSupport.emailLabel(), value: mockDetails.email, isIdentifier: false },
-    { label: LLSupport.phoneLabel(), value: mockDetails.phone, isIdentifier: false },
+    { label: LLSupport.emailLabel(), value: mockDetails.email },
+    { label: LLSupport.phoneLabel(), value: mockDetails.phone },
   ].filter((diagnostic) => Boolean(diagnostic.value))
 
 jest.mock("@app/screens/account-migration/hooks/use-migration-support-email", () => ({
@@ -84,7 +82,7 @@ const MOCK_SUPPORT_DETAILS_TEXT = "reason and identity and environment block"
 
 const mockUseMigrationSupportEmail = jest.fn((reason: string) => ({
   cardDetails: [
-    { label: LLSupport.reasonLabel(), value: reason, isIdentifier: false },
+    { label: LLSupport.reasonLabel(), value: reason },
     ...mockBuildDiagnostics(),
   ],
   supportDetailsText: MOCK_SUPPORT_DETAILS_TEXT,
@@ -267,6 +265,12 @@ describe("MigrationContactSupportScreen", () => {
     expect(screen.queryByText(LLSupport.contactUsCta())).toBeNull()
     expect(screen.getByText(LLSupport.reasonLabel())).toBeTruthy()
     expect(screen.getByText("start-refused")).toBeTruthy()
+    // The diagnostics card and its copy control survive the variant switch: the users
+    // still stuck after a restart are exactly the ones support needs the identity from.
+    expect(screen.getByText(LLSupport.accountIdLabel())).toBeTruthy()
+    expect(screen.getByText("18A4242")).toBeTruthy()
+    expect(screen.getByText(LLSupport.pubKeyLabel())).toBeTruthy()
+    expect(screen.getByText(LLSupport.copy())).toBeTruthy()
   })
 
   /** The self-help variant relabels the primary CTA, but it must still reach the same
@@ -349,6 +353,10 @@ describe("MigrationContactSupportScreen", () => {
     await flushEffects()
 
     expect(mockUseMigrationSupportEmail).toHaveBeenCalledWith("unknown")
+    // The fallback must never read as self-help: a restart is not a known remedy for a
+    // reason we could not identify, so the stranded user gets the support-first framing.
+    expect(screen.getByTestId("icon-headset")).toBeTruthy()
+    expect(screen.queryByText(LLSupport.selfHelp.title())).toBeNull()
   })
 
   it("sends the support email from the contact action", async () => {

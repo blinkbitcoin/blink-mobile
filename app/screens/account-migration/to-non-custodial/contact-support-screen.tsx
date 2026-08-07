@@ -3,6 +3,7 @@ import { ScrollView, View } from "react-native"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { IconNamesType } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { HeaderBackButton } from "@react-navigation/elements"
@@ -22,6 +23,12 @@ import { useMigrationSupportEmail } from "@app/screens/account-migration/hooks/u
 import { MigrationSupportOrigin, MigrationSupportReason } from "@app/types/migration"
 import { testProps } from "@app/utils/testProps"
 
+/** Reasons a user can clear themselves by restarting the app: the start latch is in-memory
+ *  only, and the gate resumes (or completes) the migration on relaunch. */
+const SELF_HELP_REASONS: ReadonlySet<MigrationSupportReason> = new Set([
+  MigrationSupportReason.StartRefused,
+])
+
 /**
  * The migration failure and help screen: funds are safe, but the transfer needs support
  * assistance. It shows what failed and the account identity (custodial id plus the
@@ -38,13 +45,6 @@ import { testProps } from "@app/utils/testProps"
  * CTA as the still-stuck fallback. The diagnostics card and email stay identical so
  * support still gets the full block either way.
  */
-
-/** Reasons a user can clear themselves by restarting the app: the start latch is in-memory
- *  only, and the gate resumes (or completes) the migration on relaunch. */
-const SELF_HELP_REASONS: ReadonlySet<MigrationSupportReason> = new Set([
-  MigrationSupportReason.StartRefused,
-])
-
 export const MigrationContactSupportScreen: React.FC = () => {
   const { LL } = useI18nContext()
   const LLSupport = LL.AccountMigration.contactSupport
@@ -64,6 +64,22 @@ export const MigrationContactSupportScreen: React.FC = () => {
   const isSelfHelp = SELF_HELP_REASONS.has(reason)
   const { cardDetails, supportDetailsText, sendSupportEmail } =
     useMigrationSupportEmail(reason)
+
+  /** The two variants are complete alternatives — hero and CTA always switch together,
+   *  so the choice is made once here rather than per-prop in the JSX. */
+  const copy = isSelfHelp
+    ? {
+        icon: "refresh" as IconNamesType,
+        title: LLSupport.selfHelp.title(),
+        body: LLSupport.selfHelp.body(),
+        cta: LLSupport.selfHelp.contactSupportCta(),
+      }
+    : {
+        icon: "headset" as IconNamesType,
+        title: LLSupport.title(),
+        body: LLSupport.body(),
+        cta: LLSupport.contactUsCta(),
+      }
 
   /**
    * Back depends on where support was opened from. Mid-migration the commit point (Step 8)
@@ -127,17 +143,15 @@ export const MigrationContactSupportScreen: React.FC = () => {
     <Screen preset="fixed">
       <View style={styles.container}>
         <IconHero
-          icon={isSelfHelp ? "refresh" : "headset"}
+          icon={copy.icon}
           iconColor={colors.primary}
-          title={isSelfHelp ? LLSupport.selfHelp.title() : LLSupport.title()}
-          subtitle={isSelfHelp ? LLSupport.selfHelp.body() : LLSupport.body()}
+          title={copy.title}
+          subtitle={copy.body}
         />
 
         <ScrollView style={styles.scroll} contentContainerStyle={styles.body}>
           <View style={styles.card}>
             {cardDetails.map((diagnostic) => (
-              /** Every value renders complete, wrapping as needed, because support needs
-               *  the whole string, never a truncated one. */
               <View key={diagnostic.label} style={styles.row}>
                 <Text style={styles.label}>{diagnostic.label}</Text>
                 <Text style={styles.value}>{diagnostic.value}</Text>
@@ -154,11 +168,7 @@ export const MigrationContactSupportScreen: React.FC = () => {
 
         <View style={styles.buttonsContainer}>
           <GaloyPrimaryButton
-            title={
-              isSelfHelp
-                ? LLSupport.selfHelp.contactSupportCta()
-                : LLSupport.contactUsCta()
-            }
+            title={copy.cta}
             onPress={sendSupportEmail}
             {...testProps("migration-contact-support-cta")}
           />
@@ -206,6 +216,8 @@ const useStyles = makeStyles(({ colors }) => ({
     fontWeight: "400",
     lineHeight: 22,
   },
+  /** No numberOfLines: every value renders complete, wrapping as needed, because support
+   *  needs the whole string (account id, pubkey), never a truncated one. */
   value: {
     color: colors.black,
     fontSize: 14,
