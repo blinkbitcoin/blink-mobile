@@ -20,7 +20,8 @@ jest.mock("@app/graphql/generated", () => ({
 
 jest.mock("@app/utils/error-logging", () => ({
   ...jest.requireActual("@app/utils/error-logging"),
-  reportError: (operation: string, err: unknown) => mockReportError(operation, err),
+  reportError: (operation: string, err: unknown, options?: unknown) =>
+    mockReportError(operation, err, options),
 }))
 
 type Rejection = { message: string; code?: string | null }
@@ -119,6 +120,31 @@ describe("useCloseCustodialAccount", () => {
         message:
           "Migration account close capped: reach out to our support team (accountId: custodial-1)",
       }),
+      { alwaysRecord: true },
+    )
+  })
+
+  /** The label and the message have to describe the same rejection: a report named "capped"
+   *  carrying an unrelated validation error sends on-call after the wrong thing. */
+  it("quotes the cap's own message when it arrives behind another error", async () => {
+    mockDeleteAccount.mockResolvedValue(
+      payload({
+        success: false,
+        errors: [
+          { message: "invalid input", code: "VALIDATION_ERROR" },
+          { message: "reach out to our support team", code: "OPERATION_RESTRICTED" },
+        ],
+      }),
+    )
+
+    expect(await close()).toBe(AccountCloseOutcome.Refused)
+    expect(mockReportError).toHaveBeenCalledWith(
+      "Migration account close capped",
+      expect.objectContaining({
+        message:
+          "Migration account close capped: reach out to our support team (accountId: custodial-1)",
+      }),
+      { alwaysRecord: true },
     )
   })
 
@@ -137,6 +163,7 @@ describe("useCloseCustodialAccount", () => {
         message:
           "Migration account close rejected: account is inactive (accountId: custodial-1)",
       }),
+      { alwaysRecord: true },
     )
   })
 
@@ -156,6 +183,7 @@ describe("useCloseCustodialAccount", () => {
       expect.objectContaining({
         message: "Migration account close capped: capped (accountId: unknown)",
       }),
+      { alwaysRecord: true },
     )
   })
 
@@ -171,6 +199,7 @@ describe("useCloseCustodialAccount", () => {
         message:
           "Migration account close rejected: something broke (accountId: custodial-1)",
       }),
+      { alwaysRecord: true },
     )
   })
 
@@ -183,6 +212,7 @@ describe("useCloseCustodialAccount", () => {
     expect(mockReportError).toHaveBeenCalledWith(
       "Migration account close empty payload",
       expect.any(Error),
+      { alwaysRecord: true, dedupKey: "migration-close-empty-payload" },
     )
   })
 
@@ -193,6 +223,7 @@ describe("useCloseCustodialAccount", () => {
     expect(mockReportError).toHaveBeenCalledWith(
       "Migration account close empty payload",
       expect.any(Error),
+      { alwaysRecord: true, dedupKey: "migration-close-empty-payload" },
     )
   })
 
@@ -220,6 +251,7 @@ describe("useCloseCustodialAccount", () => {
       expect.objectContaining({
         message: "Migration account close unauthenticated: 401 (accountId: custodial-1)",
       }),
+      { alwaysRecord: true },
     )
   })
 
@@ -235,6 +267,7 @@ describe("useCloseCustodialAccount", () => {
         message:
           "Migration account close unauthenticated: Unauthorized (accountId: custodial-1)",
       }),
+      { alwaysRecord: true },
     )
   })
 
@@ -290,6 +323,7 @@ describe("useCloseCustodialAccount", () => {
           "Migration account close failed: apollo blew up (accountId: custodial-1)",
         stack: thrown.stack,
       }),
+      { alwaysRecord: true },
     )
   })
 })
