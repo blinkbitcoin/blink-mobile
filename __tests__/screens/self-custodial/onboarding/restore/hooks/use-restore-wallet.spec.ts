@@ -1,4 +1,7 @@
-import { Network as mockSparkNetwork } from "@breeztech/breez-sdk-spark-react-native"
+import {
+  Network as mockSparkNetwork,
+  SdkError_Tags as SdkErrorTags,
+} from "@breeztech/breez-sdk-spark-react-native"
 import { renderHook, act } from "@testing-library/react-native"
 
 import {
@@ -284,6 +287,100 @@ describe("useRestoreWallet", () => {
 
     await act(async () => {
       resolveRestore!()
+    })
+  })
+
+  describe("when the operators are unreachable", () => {
+    // The classifier decides on the SDK error's tag, so the shape has to carry
+    // a real one; anything else is classified Generic and takes the old path.
+    const networkError = () => ({
+      tag: SdkErrorTags.NetworkError,
+      inner: ["connection refused"],
+    })
+
+    it("says so instead of blaming the backup phrase", async () => {
+      // An outage and a typo'd phrase are indistinguishable inside the catch;
+      // the generic toast sends an outage victim hunting for their own mistake.
+      mockRestore.mockRejectedValue(networkError())
+      const { result } = renderHook(() => useRestoreWallet())
+
+      await act(async () => {
+        await result.current.restore("word1 word2 word3").catch(() => {})
+      })
+
+      expect(mockNavigate).toHaveBeenCalledWith("selfCustodialOperatorUnreachable", {
+        mnemonic: "word1 word2 word3",
+      })
+      expect(mockToastShow).not.toHaveBeenCalled()
+    })
+
+    it("carries the phrase forward, so emergency recovery can use it", async () => {
+      mockRestore.mockRejectedValue(networkError())
+      const { result } = renderHook(() => useRestoreWallet())
+
+      await act(async () => {
+        await result.current.restore("  word1 word2 word3  ").catch(() => {})
+      })
+
+      // Normalized, since that is the form everything downstream derives from.
+      expect(mockNavigate).toHaveBeenCalledWith("selfCustodialOperatorUnreachable", {
+        mnemonic: "word1 word2 word3",
+      })
+    })
+
+    it("still records the failure", async () => {
+      mockRestore.mockRejectedValue(networkError())
+      const { result } = renderHook(() => useRestoreWallet())
+
+      await act(async () => {
+        await result.current.restore("word1 word2 word3").catch(() => {})
+      })
+
+      expect(mockRecordError).toHaveBeenCalled()
+      expect(result.current.status).toBe(RestoreWalletStatus.Error)
+    })
+
+    it("keeps the generic toast for every other failure", async () => {
+      mockRestore.mockRejectedValue(new Error("storage full"))
+      const { result } = renderHook(() => useRestoreWallet())
+
+      await act(async () => {
+        await result.current.restore("word1 word2 word3").catch(() => {})
+      })
+
+      expect(mockNavigate).not.toHaveBeenCalled()
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({ message: "Failed" }),
+      )
+    })
+  })
+
+  describe("activating the restored account", () => {
+    const runRestore = async () => {
+      const { result } = renderHook(() => useRestoreWallet())
+      await act(async () => {
+        await result.current.restore("word1 word2 word3")
+      })
+      return mockUpdateState.mock.calls[0][0] as (
+        prev: { activeAccountId?: string } | undefined,
+      ) => { activeAccountId?: string } | undefined
+    }
+
+    it("points the app at the restored account", async () => {
+      const update = await runRestore()
+
+      expect(update({ activeAccountId: "old" })).toEqual({
+        activeAccountId: TEST_ACCOUNT_ID,
+      })
+    })
+
+    it("leaves an unloaded store alone", async () => {
+      // Restore can finish before the persistent store has hydrated; writing
+      // an account id into `undefined` would create a state with nothing else
+      // in it.
+      const update = await runRestore()
+
+      expect(update(undefined)).toBeUndefined()
     })
   })
 })

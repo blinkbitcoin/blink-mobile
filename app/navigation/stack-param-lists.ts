@@ -233,6 +233,8 @@ export type RootStackParamList = {
   selfCustodialRestorePhrase: { step: PhraseStep; words?: string[] }
   selfCustodialRestoreMethod: undefined
   selfCustodialCloudRestore: undefined
+  selfCustodialOperatorUnreachable: { mnemonic: string }
+  selfCustodialEmergencyRecovery: { mnemonic: string }
   selfCustodialRecoveryBackup: undefined
   stableBalanceSettings: undefined
 }

@@ -13,6 +13,7 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { logSelfCustodialRestoreCompleted } from "@app/self-custodial/analytics"
 import { selfCustodialRestoreWallet } from "@app/self-custodial/bridge"
 import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
+import { classifySdkError, SelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
 import {
   BackupMethod,
   markBackupCompletedFor,
@@ -97,6 +98,18 @@ export const useRestoreWallet = () => {
         } catch (err) {
           reportError("Wallet restore", err)
           setStatus(RestoreWalletStatus.Error)
+          // An outage and a wrong phrase are indistinguishable inside this
+          // catch, and the generic "check your phrase" toast sends an outage
+          // victim looking for a mistake they did not make. Only the operators
+          // being unreachable gets its own screen - which is also the only
+          // failure where emergency recovery is worth offering, since verifying
+          // a bundle against the phrase needs no network.
+          if (classifySdkError(err) === SelfCustodialErrorCode.NetworkError) {
+            navigation.navigate("selfCustodialOperatorUnreachable", {
+              mnemonic: normalized,
+            })
+            return
+          }
           toastShow({ message: LL.RestoreScreen.restoreFailed(), LL })
           throw err
         }
