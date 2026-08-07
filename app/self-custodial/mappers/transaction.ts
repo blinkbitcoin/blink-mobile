@@ -20,6 +20,9 @@ import {
 import { AccountType } from "@app/types/wallet"
 import { toNumber } from "@app/utils/helper"
 
+import { requireSparkTokenIdentifier } from "../config"
+import { recordErrorOnce } from "../logging"
+
 const reportUnhandledEnum = <T>(scope: string, unhandled: unknown, fallback: T): T => {
   recordAppError(
     new Error(`transaction-mapper.${scope}: unhandled SDK value ${String(unhandled)}`),
@@ -107,7 +110,7 @@ const toDisplayAmount = (
     ? rawAmount
     : tokenBaseUnitsToCents(rawAmount, tokenDecimals)
 
-const extractMemo = (payment: Payment): string | undefined => {
+export const extractMemo = (payment: Payment): string | undefined => {
   if (!payment.details) return undefined
 
   if (PaymentDetails.Lightning.instanceOf(payment.details)) {
@@ -157,8 +160,28 @@ const conversionInfoOf = (payment: Payment) => {
   return undefined
 }
 
-const hasConversion = (payment: Payment): boolean =>
+export const hasConversion = (payment: Payment): boolean =>
   Boolean(payment.conversionDetails) || Boolean(conversionInfoOf(payment))
+
+/**
+ * A token payment for anything other than the configured USDB token has no wallet in
+ * this app; every surface (history, balances, CSV export) drops it rather than guessing
+ * at units, with a deduped breadcrumb so the gap is visible in crash reporting.
+ */
+export const isKnownPayment = (payment: Payment): boolean => {
+  if (payment.method !== PaymentMethod.Token) return true
+  if (!payment.details || !PaymentDetails.Token.instanceOf(payment.details)) return false
+  const expectedIdentifier = requireSparkTokenIdentifier()
+  const observedIdentifier = payment.details.inner.metadata.identifier
+  if (observedIdentifier === expectedIdentifier) return true
+  recordErrorOnce(
+    `spark-unknown-token-payment:${observedIdentifier}`,
+    new Error(
+      `Unknown token payment dropped: id=${observedIdentifier} expected=${expectedIdentifier}`,
+    ),
+  )
+  return false
+}
 
 export const mapSelfCustodialTransaction = (payment: Payment): NormalizedTransaction => {
   const currency = mapCurrency(payment.details)

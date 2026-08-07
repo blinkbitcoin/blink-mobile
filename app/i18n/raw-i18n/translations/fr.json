@@ -2110,6 +2110,7 @@
         "error": "Oups. Un problème est survenu lors de la récupération de votre position"
     },
     "HomeScreen": {
+        "pendingReceiveBadge": "+{amount: string} en attente",
         "receive": "Recevoir",
         "send": "Envoyer",
         "title": "Accueil",
@@ -3816,6 +3817,7 @@
         "phraseSubtitleStep2": "Entrez le reste de votre phrase de sauvegarde",
         "nextWords": "6 mots suivants",
         "paste": "Coller",
+        "pasteFailed": "Impossible de lire le presse-papier. Veuillez saisir votre phrase de sauvegarde manuellement.",
         "enterWord": "Mot",
         "invalidMnemonic": "Phrase de sauvegarde invalide. Veuillez vérifier si l'ordre des mots est correct.",
         "restoring": "Restauration de votre portefeuille...",

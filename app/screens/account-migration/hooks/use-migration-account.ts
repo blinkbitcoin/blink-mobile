@@ -8,6 +8,7 @@ import { reportError } from "@app/utils/error-logging"
 import { toastShow } from "@app/utils/toast"
 
 import { MigrationCheckpoint } from "../utils/migration-checkpoint-storage"
+import { resolveReusablePendingAccount } from "../utils/migration-pending-account"
 
 import { useMigrationCheckpointState } from "./use-migration-checkpoint-state"
 import { usePendingMigrationAccounts } from "./use-pending-migration-accounts"
@@ -35,11 +36,10 @@ export const useMigrationAccount = () => {
   /** A wallet provisioned by an earlier abandoned run survives without expiry: reuse it
    *  so a phrase the user may have written down stays valid and no zombies pile up. It
    *  must still exist on the device, otherwise a fresh wallet replaces it. */
-  const reusableAccountId =
-    pendingForActiveAccount &&
-    accounts.some((account) => account.id === pendingForActiveAccount)
-      ? pendingForActiveAccount
-      : null
+  const reusableAccountId = resolveReusablePendingAccount(
+    pendingForActiveAccount,
+    accounts,
+  )
 
   const ensureAccount = useCallback(async (): Promise<string | null> => {
     if (accountId) return accountId

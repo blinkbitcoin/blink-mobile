@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect } from "react"
 import { ScrollView, View } from "react-native"
 
 import { makeStyles, Text } from "@rn-vui/themed"
@@ -10,8 +10,13 @@ import { InfoBanner } from "@app/components/info-banner"
 import { Screen } from "@app/components/screen"
 import { useScreenSecurity } from "@app/hooks/use-screen-security"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { reportError } from "@app/utils/error-logging"
 import { testProps } from "@app/utils/testProps"
-import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import {
+  isPhraseStep,
+  PhraseStep,
+  RootStackParamList,
+} from "@app/navigation/stack-param-lists"
 import { SettingsGroup } from "@app/screens/settings-screen/group"
 
 import { useBackupPhrase } from "../hooks"
@@ -23,7 +28,21 @@ type PhraseRouteProp = RouteProp<RootStackParamList, "selfCustodialBackupPhrase"
 export const BackupPhraseScreen: React.FC = () => {
   const { LL } = useI18nContext()
   const styles = useStyles()
-  const { step } = useRoute<PhraseRouteProp>().params
+  /** Deep links and navigation-state rehydration can deliver missing or malformed params
+   *  despite the route type; a bare destructure here threw into the app-wide ErrorBoundary,
+   *  replacing the whole navigation tree (#4070). Fall back to the first six words. */
+  const stepParam = useRoute<PhraseRouteProp>().params?.step
+  const hasValidStep = isPhraseStep(stepParam)
+  const step = hasValidStep ? stepParam : PhraseStep.First
+
+  useEffect(() => {
+    if (hasValidStep) return
+    reportError(
+      "Backup phrase route params missing",
+      new Error("Route delivered no valid step"),
+      { dedupKey: "backup-phrase-params-missing", alwaysRecord: true },
+    )
+  }, [hasValidStep])
 
   useScreenSecurity()
 

@@ -2110,6 +2110,7 @@
     "error": "Hopa! A apărut o eroare la obținerea locației dvs"
   },
   "HomeScreen": {
+    "pendingReceiveBadge": "+{amount: string} în aşteptare",
     "receive": "Primește",
     "send": "Trimite",
     "title": "Acasă",
@@ -3816,6 +3817,7 @@
     "phraseSubtitleStep2": "Introduceți restul frazei de backup",
     "nextWords": "Următoarele 6 cuvinte",
     "paste": "Lipește",
+    "pasteFailed": "Nu s-a putut citi din clipboard. Vă rugăm să introduceți fraza de backup manual.",
     "enterWord": "Cuvânt",
     "invalidMnemonic": "Frază de backup invalidă. Verificați dacă ordinea cuvintelor este corectă.",
     "restoring": "Se restaurează portofelul...",

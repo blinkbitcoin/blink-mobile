@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react"
-import { View, ScrollView } from "react-native"
+import { AppState, View, ScrollView } from "react-native"
 import ViewShot, { type ViewShotRef } from "react-native-view-shot"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
@@ -81,6 +81,37 @@ const useSuccessMessage = (
   }, [successAction, preimage])()
 }
 
+const STALE_BACKGROUND_MS = 30_000
+
+/** Quick trips away (opening a link, locking the phone) keep the receipt on return. */
+const useOnStaleBackgroundReturn = (onStaleReturn: () => void) => {
+  const backgroundedAt = useRef<number | null>(null)
+  const onStaleReturnRef = useRef(onStaleReturn)
+
+  useEffect(() => {
+    onStaleReturnRef.current = onStaleReturn
+  }, [onStaleReturn])
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener("change", (nextAppState) => {
+      if (nextAppState === "background") {
+        backgroundedAt.current = Date.now()
+        return
+      }
+      const tripStartedAt = backgroundedAt.current
+      const isReturningToForeground = nextAppState === "active" && tripStartedAt !== null
+      if (!isReturningToForeground) return
+
+      backgroundedAt.current = null
+      const isStale = Date.now() - tripStartedAt >= STALE_BACKGROUND_MS
+      if (isStale) {
+        onStaleReturnRef.current()
+      }
+    })
+    return () => subscription.remove()
+  }, [])
+}
+
 const SuccessIconComponent: React.FC<{
   status: StatusProcessed
   arrivalAtMempoolEstimate: number | undefined
@@ -151,6 +182,10 @@ const PaymentDetailsSection: React.FC<{
 }) => {
   const styles = useStyles()
 
+  const formattedTime = createdAt
+    ? formatUnixTimestampYMDHM({ timestampSeconds: createdAt })
+    : ""
+
   return (
     <>
       <View style={styles.successActionFieldContainer}>
@@ -185,7 +220,7 @@ const PaymentDetailsSection: React.FC<{
       <View style={styles.successActionFieldContainer}>
         <SuccessActionComponent
           title={LL.SendBitcoinScreen.time()}
-          text={createdAt ? formatUnixTimestampYMDHM(createdAt) : ""}
+          text={formattedTime}
           key="time"
           visible={Boolean(createdAt)}
         />
@@ -282,7 +317,41 @@ const SendBitcoinCompletedScreen: React.FC<Props> = ({ route }) => {
     return () => clearTimeout(timer)
   }, [successIconDuration])
 
-  const handleNavigateHome = () => navigation.navigate("Primary")
+  const handleNavigateHome = useCallback(() => navigation.popToTop(), [navigation])
+
+  /** Carries a stale return that arrived while the receipt was covered, until the focus
+   *  listener below can spend it. Dropping it instead would strand the receipt for the rest
+   *  of the session, which is the very thing this screen dismisses itself to avoid. */
+  const isDismissalDeferred = useRef(false)
+
+  /** A covered receipt must not steal navigation: on a second background trip taken from
+   *  the app-lock screen, popping would tear the lock off the stack and expose Home while
+   *  the app is still locked. The first trip is never covered, because AppStateWrapper
+   *  raises the lock only after awaiting the keystore, so this synchronous listener always
+   *  runs first. That relock has to stay asynchronous: were it to push the lock before this
+   *  runs, the receipt would survive underneath and the isResume goBack would land the user
+   *  right back on it. */
+  const handleStaleReturn = useCallback(() => {
+    if (!navigation.isFocused()) {
+      isDismissalDeferred.current = true
+      return
+    }
+    handleNavigateHome()
+  }, [navigation, handleNavigateHome])
+
+  useOnStaleBackgroundReturn(handleStaleReturn)
+
+  /** Whatever covered the receipt is gone and the stale one is on screen again, so the
+   *  dismissal held back above is safe to run now. */
+  useEffect(
+    () =>
+      navigation.addListener("focus", () => {
+        if (!isDismissalDeferred.current) return
+        isDismissalDeferred.current = false
+        handleNavigateHome()
+      }),
+    [navigation, handleNavigateHome],
+  )
 
   if (showSuccessIcon) {
     return (

@@ -1,6 +1,9 @@
 import { renderHook, act } from "@testing-library/react-native"
 
-import { useRestorePhrase } from "@app/screens/self-custodial/onboarding/restore/hooks/use-restore-phrase"
+import {
+  RestoreStatus,
+  useRestorePhrase,
+} from "@app/screens/self-custodial/onboarding/restore/hooks/use-restore-phrase"
 import { PhraseStep } from "@app/navigation/stack-param-lists"
 
 const mockNavigate = jest.fn()
@@ -60,9 +63,21 @@ jest.mock("@app/i18n/i18n-react", () => ({
     LL: {
       RestoreScreen: {
         invalidMnemonic: () => "Invalid mnemonic",
+        pasteFailed: () => "Paste failed",
       },
     },
   }),
+}))
+
+const mockToastShow = jest.fn()
+jest.mock("@app/utils/toast", () => ({
+  toastShow: (...args: readonly unknown[]) => mockToastShow(...args),
+}))
+
+const mockReportError = jest.fn()
+jest.mock("@app/utils/error-logging", () => ({
+  ...jest.requireActual("@app/utils/error-logging"),
+  reportError: (...args: readonly unknown[]) => mockReportError(...args),
 }))
 
 describe("useRestorePhrase", () => {
@@ -83,6 +98,10 @@ describe("useRestorePhrase", () => {
       focusRequest: null as number | null,
       clearFocusRequest: jest.fn(),
     }
+  })
+
+  it("re-exports the restore wallet status for the screen", () => {
+    expect(RestoreStatus.Restoring).toBe("restoring")
   })
 
   it("returns initial state", () => {
@@ -161,6 +180,27 @@ describe("useRestorePhrase", () => {
     expect(mockNavigate).not.toHaveBeenCalled()
   })
 
+  /** The paste control lives on a header onPress, so a clipboard rejection would surface
+   *  as an unhandled promise rejection; it is reported and toasted instead. */
+  it("reports and toasts a clipboard read failure instead of rejecting", async () => {
+    mockGetString.mockRejectedValue(new Error("clipboard unavailable"))
+
+    const { result } = renderHook(() => useRestorePhrase({ step: PhraseStep.First }))
+
+    await act(async () => {
+      await expect(result.current.handlePasteFromClipboard()).resolves.toBeUndefined()
+    })
+
+    expect(mockHandlePaste).not.toHaveBeenCalled()
+    expect(mockReportError).toHaveBeenCalledWith(
+      "Restore phrase clipboard read",
+      expect.any(Error),
+    )
+    expect(mockToastShow).toHaveBeenCalledWith(
+      expect.objectContaining({ message: "Paste failed" }),
+    )
+  })
+
   it("does not paste when clipboard is empty", async () => {
     mockGetString.mockResolvedValue("")
 
@@ -226,6 +266,22 @@ describe("useRestorePhrase", () => {
 
     expect(mockRestore).toHaveBeenCalledWith("valid a b c d e f g h i j k")
     expect(result.current.validationError).toBeNull()
+  })
+
+  /** useRestoreWallet reports its own failures and drives its status state; the hook
+   *  only has to keep the rejection from escaping the button's onPress. */
+  it("swallows a rejecting restore instead of rethrowing", async () => {
+    mockBip39State.allFilled = true
+    mockBip39State.words = "valid a b c d e f g h i j k".split(" ")
+    mockRestore.mockRejectedValue(new Error("restore failed"))
+
+    const { result } = renderHook(() => useRestorePhrase({ step: PhraseStep.Second }))
+
+    await expect(
+      act(async () => {
+        await result.current.handleRestore()
+      }),
+    ).resolves.toBeUndefined()
   })
 
   it("clears validation error on word update", () => {

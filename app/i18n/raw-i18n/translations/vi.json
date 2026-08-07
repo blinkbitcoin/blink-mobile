@@ -2110,6 +2110,7 @@
     "error": "Rất tiếc. Đã xảy ra lỗi khi lấy vị trí của bạn"
   },
   "HomeScreen": {
+    "pendingReceiveBadge": "+{amount: string} đang chờ",
     "receive": "Nhận",
     "send": "Gửi",
     "title": "Nhà",
@@ -3816,6 +3817,7 @@
     "phraseSubtitleStep2": "Nhập phần còn lại của cụm từ sao lưu",
     "nextWords": "6 từ tiếp theo",
     "paste": "Dán",
+    "pasteFailed": "Không thể đọc từ bộ nhớ tạm. Vui lòng nhập cụm từ sao lưu của bạn theo cách thủ công.",
     "enterWord": "Từ",
     "invalidMnemonic": "Cụm từ sao lưu không hợp lệ. Vui lòng kiểm tra xem thứ tự các từ có chính xác không.",
     "restoring": "Đang khôi phục ví...",

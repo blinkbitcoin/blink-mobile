@@ -2110,6 +2110,7 @@
         "error": "Oops. Qualcosa è andato storto durante il recupero della tua posizione"
     },
     "HomeScreen": {
+        "pendingReceiveBadge": "+{amount: string} in attesa",
         "receive": "Ricevi",
         "send": "Invia",
         "title": "Home",
@@ -3816,6 +3817,7 @@
         "phraseSubtitleStep2": "Inserisci il resto della tua frase di backup",
         "nextWords": "Prossime 6 parole",
         "paste": "Incolla",
+        "pasteFailed": "Impossibile leggere dagli appunti. Inserisci manualmente la tua frase di backup.",
         "enterWord": "Parola",
         "invalidMnemonic": "Frase di backup non valida. Verifica che l'ordine delle parole sia corretto.",
         "restoring": "Ripristino del portafoglio...",

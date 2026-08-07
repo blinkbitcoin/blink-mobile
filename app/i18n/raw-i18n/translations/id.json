@@ -2110,6 +2110,7 @@
     "error": "Ups. Terjadi kesalahan saat mendapatkan lokasi Anda."
   },
   "HomeScreen": {
+    "pendingReceiveBadge": "+{amount: string} tertunda",
     "receive": "Terima",
     "send": "Kirim",
     "title": "Beranda",
@@ -3816,6 +3817,7 @@
     "phraseSubtitleStep2": "Masukkan sisa frasa cadangan Anda",
     "nextWords": "6 kata berikutnya",
     "paste": "Tempel",
+    "pasteFailed": "Tidak dapat membaca dari papan klip. Silakan masukkan frasa cadangan Anda secara manual.",
     "enterWord": "Kata",
     "invalidMnemonic": "Frasa cadangan tidak valid. Harap periksa apakah urutan kata sudah benar.",
     "restoring": "Memulihkan dompet Anda...",

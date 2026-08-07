@@ -2110,6 +2110,7 @@
     "error": "Oops. Something went wrong while getting your location"
   },
   "HomeScreen": {
+    "pendingReceiveBadge": "+{amount: string} afventende",
     "receive": "Modtag",
     "send": "Send",
     "title": "Hjem",
@@ -3816,6 +3817,7 @@
     "phraseSubtitleStep2": "Indtast resten af din sikkerhedsfrase",
     "nextWords": "Næste 6 ord",
     "paste": "Indsæt",
+    "pasteFailed": "Kunne ikke læse fra udklipsholderen. Indtast venligst din sikkerhedsfrase manuelt.",
     "enterWord": "Ord",
     "invalidMnemonic": "Ugyldig backup-frase. Kontroller venligst om ordrækkefølgen er korrekt.",
     "restoring": "Gendanner din tegnebog...",

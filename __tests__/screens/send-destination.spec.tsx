@@ -725,6 +725,90 @@ describe("SendBitcoinDestinationScreen", () => {
     await flushEffects()
   })
 
+  it("trims pasted clipboard content before validating", async () => {
+    // distinct from the module mock's default "clipboard" so a missing Once
+    // override cannot satisfy the assertions below
+    jest.mocked(Clipboard.getString).mockResolvedValueOnce("\t paddedclip \n")
+    parseDestinationMock.mockResolvedValue({
+      valid: true,
+      destinationDirection: DestinationDirection.Send,
+      validDestination: {
+        valid: true,
+        paymentType: PaymentType.Intraledger,
+        handle: "paddedclip",
+        walletId: "wallet-id",
+      },
+      createPaymentDetail: jest.fn(),
+    })
+
+    render(
+      <ContextForScreen>
+        <SendBitcoinDestinationScreen route={sendBitcoinDestination} />
+      </ContextForScreen>,
+    )
+
+    const searchResponder = getResponderByLabel(LL.SendBitcoinScreen.placeholder())
+    const pasteButton = within(searchResponder).getByText(LL.common.paste())
+    fireEvent.press(pasteButton)
+
+    await flushAsync()
+    await flushAsync()
+
+    expect(parseDestinationMock).toHaveBeenCalledWith(
+      expect.objectContaining({ rawInput: "paddedclip" }),
+    )
+    // the input box shows the cleaned value, not the raw clipboard content
+    expect(screen.getByLabelText(LL.SendBitcoinScreen.placeholder()).props.value).toBe(
+      "paddedclip",
+    )
+
+    await flushEffects()
+    await settleModalAnimations()
+  })
+
+  it("trims a typed destination with surrounding whitespace when pressing next", async () => {
+    parseDestinationMock.mockResolvedValue({
+      valid: true,
+      destinationDirection: DestinationDirection.Send,
+      validDestination: {
+        valid: true,
+        paymentType: PaymentType.Intraledger,
+        handle: "alice",
+        walletId: "wallet-id",
+      },
+      createPaymentDetail: jest.fn(),
+    })
+
+    render(
+      <ContextForScreen>
+        <SendBitcoinDestinationScreen route={sendBitcoinDestination} />
+      </ContextForScreen>,
+    )
+
+    fireEvent.changeText(
+      screen.getByLabelText(LL.SendBitcoinScreen.placeholder()),
+      "  alice  ",
+    )
+    fireEvent.press(screen.getByLabelText(LL.common.next()))
+
+    await flushAsync()
+    await flushAsync()
+
+    expect(parseDestinationMock).toHaveBeenCalledWith(
+      expect.objectContaining({ rawInput: "alice" }),
+    )
+    // the valid result must survive the reducer's unparsedDestination echo
+    // check even though state still holds the untrimmed typed value — the
+    // confirm-username modal appearing proves it was not silently dropped
+    expect(
+      await screen.findByText(
+        LL.SendBitcoinDestinationScreen.confirmUsernameModal.title(),
+      ),
+    ).toBeTruthy()
+
+    await settleModalAnimations()
+  })
+
   it("navigates merchant choices to the merchant selection screen", async () => {
     const merchants = [
       {

@@ -155,6 +155,73 @@ describe("useMigrationCheckpoint", () => {
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(mockReportError).toHaveBeenCalledWith("Checkpoint load", expect.any(Error))
     expect(result.current.checkpoint).toBeNull()
+    /** Surfaced, not swallowed: an unreadable store must stay distinguishable from an
+     *  empty one, or the gate reads a transient failure as a wiped device. */
+    expect(result.current.hasError).toBe(true)
+  })
+
+  it("recovers through refetch after a failed load", async () => {
+    mockLoadCheckpoint.mockRejectedValueOnce(new Error("corrupt"))
+    mockLoadCheckpoint.mockResolvedValue({
+      step: MigrationCheckpoint.BackupAlerts,
+      savedAt: Date.now(),
+      accountId: "sc-account-2",
+    })
+
+    const { result } = renderHook(() => useMigrationCheckpoint())
+    await waitFor(() => expect(result.current.hasError).toBe(true))
+
+    await act(async () => {
+      await result.current.refetch()
+    })
+
+    expect(result.current.hasError).toBe(false)
+    expect(result.current.checkpoint).toBe(MigrationCheckpoint.BackupAlerts)
+    expect(result.current.hasResumableCheckpoint).toBe(true)
+  })
+
+  /** The error may only clear once the retry has SUCCEEDED: clearing it when the retry
+   *  starts would present the still-empty state as settled data for the length of the
+   *  read, and the gate would hand the user to support on it. */
+  it("keeps hasError raised while a refetch is still in flight", async () => {
+    mockLoadCheckpoint.mockRejectedValueOnce(new Error("corrupt"))
+
+    const { result } = renderHook(() => useMigrationCheckpoint())
+    await waitFor(() => expect(result.current.hasError).toBe(true))
+
+    let resolveReload: (stored: unknown) => void = () => {}
+    mockLoadCheckpoint.mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          resolveReload = resolve
+        }),
+    )
+
+    let refetchDone: Promise<void> | undefined
+    act(() => {
+      refetchDone = result.current.refetch()
+    })
+    expect(result.current.hasError).toBe(true)
+
+    await act(async () => {
+      resolveReload(null)
+      await refetchDone
+    })
+    expect(result.current.hasError).toBe(false)
+  })
+
+  it("resolves instead of rejecting when the refetched load fails again", async () => {
+    mockLoadCheckpoint.mockRejectedValue(new Error("corrupt"))
+
+    const { result } = renderHook(() => useMigrationCheckpoint())
+    await waitFor(() => expect(result.current.hasError).toBe(true))
+
+    /** The gate's retry Promise.alls every refetch; a rejection there would double-report
+     *  a failure that already traveled through reportError and hasError. */
+    await act(async () => {
+      await expect(result.current.refetch()).resolves.toBeUndefined()
+    })
+    expect(result.current.hasError).toBe(true)
   })
 
   it("resolves true when the storage write succeeds", async () => {

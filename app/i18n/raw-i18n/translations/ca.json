@@ -2110,6 +2110,7 @@
     "error": "Oops. Alguna cosa ha anat malament mentre s'obtenia la teva ubicació."
   },
   "HomeScreen": {
+    "pendingReceiveBadge": "+{amount: string} pendent",
     "receive": "Rebre",
     "send": "Enviar",
     "title": "Inici",
@@ -3816,6 +3817,7 @@
     "phraseSubtitleStep2": "Introdueix la resta de la teva frase de recuperació",
     "nextWords": "Següents 6 paraules",
     "paste": "Enganxar",
+    "pasteFailed": "No s'ha pogut llegir del porta-retalls. Introdueix la teva frase de recuperació manualment.",
     "enterWord": "Paraula",
     "invalidMnemonic": "Frase de còpia de seguretat no vàlida. Comprova si l'ordre de les paraules és correcte.",
     "restoring": "Restaurant la teva cartera...",

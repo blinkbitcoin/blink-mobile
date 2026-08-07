@@ -6538,6 +6538,11 @@ type RootTranslation = {
 	}
 	HomeScreen: {
 		/**
+		 * +​{​a​m​o​u​n​t​}​ ​p​e​n​d​i​n​g
+		 * @param {string} amount
+		 */
+		pendingReceiveBadge: RequiredParams<'amount'>
+		/**
 		 * R​e​c​e​i​v​e
 		 */
 		receive: string
@@ -12705,6 +12710,10 @@ type RootTranslation = {
 		 * P​a​s​t​e
 		 */
 		paste: string
+		/**
+		 * C​o​u​l​d​n​'​t​ ​r​e​a​d​ ​f​r​o​m​ ​c​l​i​p​b​o​a​r​d​.​ ​P​l​e​a​s​e​ ​e​n​t​e​r​ ​y​o​u​r​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​ ​m​a​n​u​a​l​l​y​.
+		 */
+		pasteFailed: string
 		/**
 		 * W​o​r​d
 		 */
@@ -19683,6 +19692,10 @@ export type TranslationFunctions = {
 	}
 	HomeScreen: {
 		/**
+		 * +{amount} pending
+		 */
+		pendingReceiveBadge: (arg: { amount: string }) => LocalizedString
+		/**
 		 * Receive
 		 */
 		receive: () => LocalizedString
@@ -25707,6 +25720,10 @@ export type TranslationFunctions = {
 		 * Paste
 		 */
 		paste: () => LocalizedString
+		/**
+		 * Couldn't read from clipboard. Please enter your backup phrase manually.
+		 */
+		pasteFailed: () => LocalizedString
 		/**
 		 * Word
 		 */

@@ -1,8 +1,5 @@
 import {
-  PaymentDetails,
-  PaymentMethod,
   type BreezSdkInterface,
-  type Payment,
   type TokenBalance,
 } from "@breeztech/breez-sdk-spark-react-native"
 
@@ -13,9 +10,8 @@ import { type NormalizedTransaction } from "@app/types/transaction"
 import { toWalletId, type WalletState } from "@app/types/wallet"
 
 import { findUsdbToken, getWalletInfo, listPayments } from "../bridge"
-import { requireSparkTokenIdentifier } from "../config"
 import { recordErrorOnce } from "../logging"
-import { mapSelfCustodialTransactions } from "../mappers/transaction"
+import { isKnownPayment, mapSelfCustodialTransactions } from "../mappers/transaction"
 
 const TRANSACTIONS_PER_PAGE = 20
 
@@ -23,21 +19,6 @@ const getStableBalance = (token: TokenBalance | undefined): number => {
   if (!token) return 0
   const decimals = token.tokenMetadata?.decimals ?? 0
   return tokenBaseUnitsToCents(Number(token.balance), decimals)
-}
-
-const isKnownPayment = (payment: Payment): boolean => {
-  if (payment.method !== PaymentMethod.Token) return true
-  if (!payment.details || !PaymentDetails.Token.instanceOf(payment.details)) return false
-  const expectedIdentifier = requireSparkTokenIdentifier()
-  const observedIdentifier = payment.details.inner.metadata.identifier
-  if (observedIdentifier === expectedIdentifier) return true
-  recordErrorOnce(
-    `spark-unknown-token-payment:${observedIdentifier}`,
-    new Error(
-      `Unknown token payment dropped: id=${observedIdentifier} expected=${expectedIdentifier}`,
-    ),
-  )
-  return false
 }
 
 type PaymentsPage = {

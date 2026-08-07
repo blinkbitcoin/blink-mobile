@@ -2113,6 +2113,7 @@ const en: BaseTranslation = {
     error: "Oops. Something went wrong while getting your location",
   },
   HomeScreen: {
+    pendingReceiveBadge: "+{amount: string} pending",
     receive: "Receive",
     send: "Send",
     title: "Home",
@@ -4000,6 +4001,7 @@ const en: BaseTranslation = {
     phraseSubtitleStep2: "Enter rest of your backup phrase",
     nextWords: "Next 6 words",
     paste: "Paste",
+    pasteFailed: "Couldn't read from clipboard. Please enter your backup phrase manually.",
     enterWord: "Word",
     invalidMnemonic: "Invalid backup phrase. Please check if the word order is correct.",
     restoring: "Restoring your wallet...",

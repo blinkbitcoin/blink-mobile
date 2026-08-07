@@ -2110,6 +2110,7 @@
         "error": "位置情報の取得中にエラーが発生しました"
     },
     "HomeScreen": {
+        "pendingReceiveBadge": "+{amount: string} 保留中",
         "receive": "受金",
         "send": "送金",
         "title": "ホーム",
@@ -3816,6 +3817,7 @@
         "phraseSubtitleStep2": "バックアップフレーズの残りを入力してください",
         "nextWords": "次の6語",
         "paste": "貼り付け",
+        "pasteFailed": "クリップボードから読み取れませんでした。バックアップフレーズを手動で入力してください。",
         "enterWord": "単語",
         "invalidMnemonic": "無効なバックアップフレーズです。単語の順序が正しいか確認してください。",
         "restoring": "ウォレットを復元中...",

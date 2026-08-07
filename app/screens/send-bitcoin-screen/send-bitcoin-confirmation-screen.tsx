@@ -30,6 +30,7 @@ import {
   ZeroUsdMoneyAmount,
 } from "@app/types/amounts"
 import { useSendDustWarning, useTranslateSdkError } from "@app/self-custodial/hooks"
+import { isSelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
 import { logPaymentAttempt, logPaymentResult } from "@app/utils/analytics"
 import { reportError } from "@app/utils/error-logging"
 import { CommonActions, RouteProp, useNavigation } from "@react-navigation/native"
@@ -153,7 +154,13 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     hasAttemptedSend,
   } = useSendPayment(sendPaymentMutation)
 
-  const feeErrorText = String(LL.SendBitcoinConfirmationScreen.feeError())
+  // Self-custodial fee failures carry a classified SDK code; custodial ones carry raw
+  // GraphQL text that is not fit to show, so only the former replaces the generic string.
+  const feeErrorCode = fee.status === "error" ? fee.errors?.[0]?.message : undefined
+  const feeErrorText =
+    (isSelfCustodialErrorCode(feeErrorCode)
+      ? translateSdkError(feeErrorCode)
+      : undefined) ?? String(LL.SendBitcoinConfirmationScreen.feeError())
   let feeDisplayText = feeErrorText
   currencyFeeAmount = feeErrorText
   satFeeAmount = feeErrorText
@@ -563,7 +570,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
               <Text type="p2">{feeDisplayText} *</Text>
             )}
             {fee.status === "error" && !fee.amount && (
-              <Text type="p2">{LL.SendBitcoinConfirmationScreen.feeError()}</Text>
+              <Text type="p2">{feeErrorText}</Text>
             )}
           </View>
           {fee.status === "error" && Boolean(fee.amount) && (

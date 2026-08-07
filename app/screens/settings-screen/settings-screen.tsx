@@ -49,6 +49,7 @@ import { MoveToNonCustodialSetting } from "./settings/account-move-to-noncustodi
 import { SwitchAccountSetting } from "./settings/multi-account"
 import { StableBalanceSetting } from "./settings/stable-balance"
 import { ViewBackupPhraseSetting } from "./settings/view-backup-phrase"
+import { BackupWalletSetting } from "./settings/backup-wallet"
 
 // All queries in settings have to be set here so that the server is not hit with
 // multiple requests for each query
@@ -129,7 +130,12 @@ export const SettingsScreen: React.FC = () => {
       ThemeSetting,
       StableBalanceSetting,
     ],
-    securityAndPrivacy: [TotpSetting, OnDeviceSecuritySetting, ViewBackupPhraseSetting],
+    securityAndPrivacy: [
+      TotpSetting,
+      OnDeviceSecuritySetting,
+      ViewBackupPhraseSetting,
+      BackupWalletSetting,
+    ],
     advanced: [ExportCsvSetting, ApiAccessSetting],
     community: [NeedHelpSetting, JoinCommunitySetting],
   }
@@ -185,9 +191,9 @@ export const SettingsScreen: React.FC = () => {
           name={LL.common.securityAndPrivacy()}
           items={items.securityAndPrivacy}
         />
-        {!isSelfCustodialMode && (
-          <SettingsGroup name={LL.common.advanced()} items={items.advanced} />
-        )}
+        {/* Rows gate themselves by account mode (CSV export branches, API access is
+            custodial-only) and SettingsGroup collapses when every row returns null. */}
+        <SettingsGroup name={LL.common.advanced()} items={items.advanced} />
         <SettingsGroup name={LL.common.support()} items={items.community} />
         <VersionComponent />
       </ScrollView>
