@@ -44,7 +44,11 @@ import { IsAuthedContextProvider, useIsAuthed } from "./is-authed-context"
 import { LevelContainer } from "./level-component"
 import { MessagingContainer } from "./messaging"
 import { NetworkErrorContextProvider } from "./network-error-context"
-import { hasIdempotencyKey, shouldRetryOperation } from "./retry-policy"
+import {
+  hasIdempotencyKey,
+  shouldRetryOperation,
+  shouldRetryUnauthorized,
+} from "./retry-policy"
 
 const getAuthorizationHeader = (token: string): string => {
   return `Bearer ${token}`
@@ -172,7 +176,8 @@ const GaloyClient: React.FC<PropsWithChildren> = ({ children }) => {
           max: 2,
           retryIf: (error, operation) => {
             return (
-              Boolean(error) && error.statusCode === 401 && !hasIdempotencyKey(operation)
+              !hasIdempotencyKey(operation) &&
+              shouldRetryUnauthorized(error, operation.operationName)
             )
           },
         },

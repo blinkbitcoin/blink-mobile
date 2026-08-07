@@ -41,11 +41,18 @@ const noRetryOperations = [
   "migrationStart",
   "migrationCommit",
   "migrationLnAddressTransfer",
+
+  // Irreversible, and it kills the token that authenticated it: a resend can neither undo
+  // the first attempt nor authenticate itself.
+  "accountDelete",
 ]
 
 const UNAUTHORIZED_STATUS = 401
 
 const IDEMPOTENCY_KEY_HEADER = "x-idempotency-key"
+
+const statusCodeOf = (error: NetworkError): number | undefined =>
+  (error as { statusCode?: number } | null)?.statusCode
 
 /**
  * Whether the operation's context carries an X-Idempotency-Key header. Such an operation
@@ -75,7 +82,18 @@ export const shouldRetryOperation = (
 ): boolean => {
   const hasError = Boolean(error)
   const isRetryableOperation = !noRetryOperations.includes(operationName)
-  const isUnauthorized =
-    (error as { statusCode?: number } | null)?.statusCode === UNAUTHORIZED_STATUS
+  const isUnauthorized = statusCodeOf(error) === UNAUTHORIZED_STATUS
   return hasError && isRetryableOperation && !isUnauthorized
 }
+
+/**
+ * Whether the dedicated 401 link should resend. It replays the identical request with the
+ * identical token, since nothing between the two links refreshes it, so the operations
+ * above gain nothing from it and risk a second, irreversible landing.
+ */
+export const shouldRetryUnauthorized = (
+  error: NetworkError,
+  operationName: string,
+): boolean =>
+  statusCodeOf(error) === UNAUTHORIZED_STATUS &&
+  !noRetryOperations.includes(operationName)
