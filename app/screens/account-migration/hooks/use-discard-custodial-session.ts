@@ -16,8 +16,10 @@ type DiscardCustodialSessionArgs = {
  * the migrated account leaves the registry, without touching other sessions or self-custodial ones.
  * When the session is still alive the logout also revokes it server-side and detaches the push
  * device token; a failed revocation never blocks the migration (the mutation is raced against a
- * short timeout and errors are only recorded). A closed account needs neither: it is left
- * `Closed` server-side, so it has nothing left to notify this device about.
+ * short timeout and errors are only recorded). A closed account can neither be revoked nor
+ * detach its token: `accountDelete` deletes the Kratos identity, so nothing is left to
+ * authenticate the logout with. The token it leaves behind is inert for payments, which a
+ * `Closed` account cannot receive, and is the backend's to clear on deletion (blink#758).
  */
 export const useDiscardCustodialSession = () => {
   const {

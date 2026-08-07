@@ -615,6 +615,39 @@ describe("useMigrationCheckpoint", () => {
     expect(result.current.hasResumableCheckpoint).toBe(true)
   })
 
+  /** The ownership flag above hides another profile's checkpoint, but claims an owner-less
+   *  one for whoever is active. Consumers that spend something irreversible read the stored
+   *  owner itself, so it has to be surfaced unfiltered. */
+  it("surfaces the owner the checkpoint was actually saved under", async () => {
+    mockLoadCheckpoint.mockResolvedValue({
+      step: MigrationCheckpoint.BackupMethod,
+      savedAt: Date.now(),
+      accountId: "sc-account-1",
+      custodialAccountId: "custodial-2",
+    })
+
+    const { result } = renderHook(() => useMigrationCheckpoint())
+
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    expect(result.current.checkpointOwnerId).toBe("custodial-2")
+  })
+
+  it("reports no owner for a checkpoint saved before owners existed", async () => {
+    mockLoadCheckpoint.mockResolvedValue({
+      step: MigrationCheckpoint.BackupMethod,
+      savedAt: Date.now(),
+      accountId: "sc-account-1",
+    })
+
+    const { result } = renderHook(() => useMigrationCheckpoint())
+
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    expect(result.current.accountId).toBe("sc-account-1")
+    expect(result.current.checkpointOwnerId).toBeNull()
+  })
+
   it("keeps resuming a checkpoint saved before owners existed", async () => {
     mockLoadCheckpoint.mockResolvedValue({
       step: MigrationCheckpoint.BackupMethod,
