@@ -3,6 +3,7 @@ import { ScrollView, View } from "react-native"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { IconNamesType } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { HeaderBackButton } from "@react-navigation/elements"
@@ -22,6 +23,12 @@ import { useMigrationSupportEmail } from "@app/screens/account-migration/hooks/u
 import { MigrationSupportOrigin, MigrationSupportReason } from "@app/types/migration"
 import { testProps } from "@app/utils/testProps"
 
+/** Reasons a user can clear themselves by restarting the app: the start latch is in-memory
+ *  only, and the gate resumes (or completes) the migration on relaunch. */
+const SELF_HELP_REASONS: ReadonlySet<MigrationSupportReason> = new Set([
+  MigrationSupportReason.StartRefused,
+])
+
 /**
  * The migration failure and help screen: funds are safe, but the transfer needs support
  * assistance. It shows what failed and the account identity (custodial id plus the
@@ -32,6 +39,11 @@ import { testProps } from "@app/utils/testProps"
  * control and the hardware back return to the commit point (Step 8) when support was opened
  * mid-migration, or dismiss the screen when it was opened by the completed-migration resume
  * handover; the visible control covers iOS, which has no hardware back.
+ *
+ * Restart-resolvable refusals (#4098) get a self-help variant instead of the support-first
+ * copy: the hero leads with restart instructions and frames the primary Contact support
+ * CTA as the still-stuck fallback. The diagnostics card and email stay identical so
+ * support still gets the full block either way.
  */
 export const MigrationContactSupportScreen: React.FC = () => {
   const { LL } = useI18nContext()
@@ -49,8 +61,25 @@ export const MigrationContactSupportScreen: React.FC = () => {
   /** Callers must pass a reason, but a navigation-state restore can land here with none;
    *  a named fallback keeps the ticket meaningful instead of crashing on a missing param. */
   const reason = params?.reason ?? MigrationSupportReason.Unknown
+  const isSelfHelp = SELF_HELP_REASONS.has(reason)
   const { cardDetails, supportDetailsText, sendSupportEmail } =
     useMigrationSupportEmail(reason)
+
+  /** The two variants are complete alternatives — hero and CTA always switch together,
+   *  so the choice is made once here rather than per-prop in the JSX. */
+  const copy = isSelfHelp
+    ? {
+        icon: "refresh" as IconNamesType,
+        title: LLSupport.selfHelp.title(),
+        body: LLSupport.selfHelp.body(),
+        cta: LLSupport.selfHelp.contactSupportCta(),
+      }
+    : {
+        icon: "headset" as IconNamesType,
+        title: LLSupport.title(),
+        body: LLSupport.body(),
+        cta: LLSupport.contactUsCta(),
+      }
 
   /**
    * Back depends on where support was opened from. Mid-migration the commit point (Step 8)
@@ -114,28 +143,20 @@ export const MigrationContactSupportScreen: React.FC = () => {
     <Screen preset="fixed">
       <View style={styles.container}>
         <IconHero
-          icon="headset"
+          icon={copy.icon}
           iconColor={colors.primary}
-          title={LLSupport.title()}
-          subtitle={LLSupport.body()}
+          title={copy.title}
+          subtitle={copy.body}
         />
 
         <ScrollView style={styles.scroll} contentContainerStyle={styles.body}>
           <View style={styles.card}>
-            {cardDetails.map((diagnostic) => {
-              /** Identifiers (account id, pubkey) keep the larger value font; the rest use
-               *  the smaller one. Every value renders complete, wrapping as needed, because
-               *  support needs the whole string, never a truncated one. */
-              const valueStyle = diagnostic.isIdentifier
-                ? styles.value
-                : [styles.value, styles.smallValue]
-              return (
-                <View key={diagnostic.label} style={styles.row}>
-                  <Text style={styles.label}>{diagnostic.label}</Text>
-                  <Text style={valueStyle}>{diagnostic.value}</Text>
-                </View>
-              )
-            })}
+            {cardDetails.map((diagnostic) => (
+              <View key={diagnostic.label} style={styles.row}>
+                <Text style={styles.label}>{diagnostic.label}</Text>
+                <Text style={styles.value}>{diagnostic.value}</Text>
+              </View>
+            ))}
           </View>
 
           <IconTextButton
@@ -147,7 +168,7 @@ export const MigrationContactSupportScreen: React.FC = () => {
 
         <View style={styles.buttonsContainer}>
           <GaloyPrimaryButton
-            title={LLSupport.contactUsCta()}
+            title={copy.cta}
             onPress={sendSupportEmail}
             {...testProps("migration-contact-support-cta")}
           />
@@ -195,18 +216,16 @@ const useStyles = makeStyles(({ colors }) => ({
     fontWeight: "400",
     lineHeight: 22,
   },
+  /** No numberOfLines: every value renders complete, wrapping as needed, because support
+   *  needs the whole string (account id, pubkey), never a truncated one. */
   value: {
     color: colors.black,
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: "Source Sans Pro",
     fontWeight: "700",
-    lineHeight: 22,
+    lineHeight: 20,
     textAlign: "right",
     maxWidth: 200,
-  },
-  smallValue: {
-    fontSize: 14,
-    lineHeight: 20,
   },
   buttonsContainer: {
     gap: 10,
