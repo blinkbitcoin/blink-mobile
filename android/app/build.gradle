@@ -170,9 +170,14 @@ dependencies {
     androidTestImplementation('com.wix:detox:+')
     implementation 'androidx.appcompat:appcompat:1.1.0'
 
-    // Keep the BoM in sync with @react-native-firebase/app's pinned version
-    // (node_modules/@react-native-firebase/app/package.json -> sdkVersions.android.firebase)
-    implementation platform('com.google.firebase:firebase-bom:34.2.0')
+    // BoM version read from the same source @react-native-firebase's own gradle
+    // scripts resolve it from, so an RNFB upgrade moves both in lockstep. The
+    // explicit crashlytics artifact is needed because RNFB declares its Firebase
+    // deps as `implementation`, keeping them off the app's compile classpath.
+    def rnfbSdkVersions = new groovy.json.JsonSlurper().parseText(
+        file("$rootDir/../node_modules/@react-native-firebase/app/package.json").text
+    ).sdkVersions
+    implementation platform("com.google.firebase:firebase-bom:${rnfbSdkVersions.android.firebase}")
     implementation 'com.google.firebase:firebase-crashlytics'
 
     testImplementation("junit:junit:4.13.2")
