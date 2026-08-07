@@ -183,8 +183,15 @@ relaunch. The script broadcasts on Metro's `/message` websocket and then
 **waits for Metro to report the re-served bundle** on `/events`: a broadcast
 with no app connected succeeds silently, and an unconfirmed flip produces a
 before/after pair whose sides are quietly identical. Non-zero exit means no
-bundle request followed — fall back to `simctl terminate` + launch. Native
-diffs still need a rebuild, not a reload.
+bundle request followed — fall back to `simctl terminate` + launch. That
+fallback is not hypothetical: an app's dev-server connection dies after a few
+reload cycles, and from then on every broadcast lands nowhere until the next
+cold launch. Native diffs still need a rebuild, not a reload.
+
+Exit 0 confirms the bundle was *served*, not that JS finished re-rendering —
+the app takes a few more seconds to execute it, and capture's settle-wait will
+happily lock onto the stable white teardown screen. Poll with throwaway
+screenshots until content is visible before shooting the real frame.
 
 ### 8. Release and verify
 
