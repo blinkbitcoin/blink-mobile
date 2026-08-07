@@ -45,9 +45,10 @@ jest.mock("@app/screens/self-custodial/onboarding/hooks", () => ({
 }))
 
 const mockNavigate = jest.fn()
+const mockParams = jest.fn<{ successMessage?: string } | undefined, []>()
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
-  useRoute: () => ({ params: { successMessage: "done" } }),
+  useRoute: () => ({ params: mockParams() }),
   useNavigation: () => ({ navigate: mockNavigate }),
 }))
 
@@ -66,6 +67,7 @@ describe("BundleExportScreen", () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
+    mockParams.mockReturnValue({ successMessage: "done" })
     mockActions.bundleState = undefined
     mockActions.sharing = false
     mockActions.copying = false
@@ -228,5 +230,25 @@ describe("BundleExportScreen", () => {
 
     fireEvent.press(screen.getByTestId("bundle-continue-button"))
     expect(mockCompleteBackup).not.toHaveBeenCalled()
+  })
+
+  it("finishes without a message when the route carries no params", () => {
+    mockParams.mockReturnValue(undefined)
+    mockActions.bundleState = null
+    renderScreen()
+
+    fireEvent.press(screen.getByTestId("bundle-continue-button"))
+    expect(mockCompleteBackup).toHaveBeenCalledWith({
+      method: BackupMethod.Manual,
+      message: undefined,
+    })
+  })
+
+  it("survives a failing initial read", () => {
+    // The screen has its own empty state; an unhandled rejection here would
+    // take the whole onboarding stack down instead of showing it.
+    mockActions.reloadState = jest.fn().mockRejectedValue(new Error("nope"))
+
+    expect(() => renderScreen()).not.toThrow()
   })
 })

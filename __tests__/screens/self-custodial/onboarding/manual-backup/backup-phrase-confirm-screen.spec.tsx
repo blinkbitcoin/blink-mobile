@@ -613,4 +613,29 @@ describe("BackupPhraseConfirmScreen", () => {
       expect(mockDisableScreenSecurity).toHaveBeenCalledTimes(1)
     })
   })
+
+  it("moves the suggestions to whichever field the user tapped into", async () => {
+    // Suggestions follow focus, not typing order: tapping back into an earlier
+    // field must not leave the previous field's suggestions on screen.
+    const { getByPlaceholderText, getAllByPlaceholderText, getByText, queryByText } =
+      render(
+        <ContextForScreen>
+          <BackupPhraseConfirmScreen />
+        </ContextForScreen>,
+      )
+    await flushEffects()
+
+    const first = getByPlaceholderText(
+      `${LL.BackupScreen.ManualBackup.Confirm.enterWord()} 1`,
+    )
+    const [, second] = getAllByPlaceholderText(
+      new RegExp(LL.BackupScreen.ManualBackup.Confirm.enterWord()),
+    )
+
+    fireEvent.changeText(first, "you")
+    expect(getByText("youth")).toBeTruthy()
+
+    fireEvent(second, "focus")
+    expect(queryByText("youth")).toBeNull()
+  })
 })
