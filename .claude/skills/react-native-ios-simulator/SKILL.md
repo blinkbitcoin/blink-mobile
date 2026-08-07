@@ -157,7 +157,30 @@ simulate "the user reinstalled the app": `clearState` wipes the persisted
 silently loads the user's 8081 bundler (see the `react-native-demo-videos`
 gotcha table).
 
-### 7. Release and verify
+### 7. Flip JS with a reload, not a relaunch
+
+Before/after pairs flip a file and shoot again. When the diff is JS-only,
+reload the running app instead of terminate + launch + splash (~35s → ~5s per
+flip, several flips per PR):
+
+```bash
+git checkout <main-sha> -- path/to/changed-screen.tsx
+"$SKILL/scripts/reload-app.sh"      # uses $DEMO_PORT; same as pressing r in Metro
+# shoot the "before", then restore and reload again
+git checkout HEAD -- path/to/changed-screen.tsx
+"$SKILL/scripts/reload-app.sh"
+```
+
+A full reload re-runs the JS entry point, so TEMP `initialRouteName` edits take
+effect — the case Fast Refresh cannot cover and the reason flips used to need a
+relaunch. The script broadcasts on Metro's `/message` websocket and then
+**waits for Metro to report the re-served bundle** on `/events`: a broadcast
+with no app connected succeeds silently, and an unconfirmed flip produces a
+before/after pair whose sides are quietly identical. Non-zero exit means no
+bundle request followed — fall back to `simctl terminate` + launch. Native
+diffs still need a rebuild, not a reload.
+
+### 8. Release and verify
 
 ```bash
 "$SKILL/scripts/release-session.sh" 3712            # shut down, keep for 24h (default)
@@ -184,7 +207,7 @@ The isolation guarantees are load-bearing for every other agent on this Mac, so
 they are tested rather than asserted:
 
 ```bash
-"$SKILL/tests/run.sh"     # 84 assertions, ~30s, exits non-zero on failure
+"$SKILL/tests/run.sh"     # 99 assertions, ~45s, exits non-zero on failure
 ```
 
 It creates **no real simulators** — a fake `xcrun` goes first on PATH and the
