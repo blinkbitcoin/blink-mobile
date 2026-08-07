@@ -291,6 +291,24 @@ describe("BackupPhraseScreen", () => {
       )
     })
 
+    it("announces the Copy button by its visible label, not the test id", async () => {
+      render(
+        <ContextForScreen>
+          <BackupPhraseScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      const { getByTestId } = renderHeaderRight()
+      const button = getByTestId("backup-phrase-copy")
+      // `testProps` sets accessibilityLabel to the test id; the explicit
+      // accessibilityLabel after the spread must win.
+      expect(button.props.accessibilityLabel).toBe(
+        LL.BackupScreen.ManualBackup.Phrase.copy(),
+      )
+      expect(button.props.hitSlop).toEqual({ top: 12, bottom: 12, left: 12, right: 12 })
+    })
+
     it("renders spark compatible link", async () => {
       const { getByText } = render(
         <ContextForScreen>

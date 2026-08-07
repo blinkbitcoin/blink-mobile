@@ -109,6 +109,25 @@ describe("ViewBackupPhraseScreen", () => {
     expect(getHeaderText(LL.BackupScreen.ManualBackup.Phrase.copy())).toBeTruthy()
   })
 
+  it("announces the Copy button by its visible label, not the test id", async () => {
+    const { getByText } = render(
+      <ContextForScreen>
+        <ViewBackupPhraseScreen />
+      </ContextForScreen>,
+    )
+
+    await waitFor(() => expect(getByText("youth")).toBeTruthy())
+
+    const { getByTestId } = renderHeaderRight()
+    const button = getByTestId("backup-phrase-copy")
+    // `testProps` sets accessibilityLabel to the test id; the explicit
+    // accessibilityLabel after the spread must win.
+    expect(button.props.accessibilityLabel).toBe(
+      LL.BackupScreen.ManualBackup.Phrase.copy(),
+    )
+    expect(button.props.hitSlop).toEqual({ top: 12, bottom: 12, left: 12, right: 12 })
+  })
+
   it("renders the do-not-share warning card", async () => {
     const { getByText } = render(
       <ContextForScreen>
