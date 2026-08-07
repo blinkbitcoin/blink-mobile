@@ -317,4 +317,40 @@ describe("GetStartedScreen", () => {
 
     expect(mockNavigate).toHaveBeenCalledWith("login", { type: "Login" })
   })
+
+  describe("developer screen secret trigger", () => {
+    const originalDev = __DEV__
+    const setDev = (value: boolean) => {
+      ;(global as unknown as { __DEV__: boolean }).__DEV__ = value
+    }
+
+    afterEach(() => {
+      setDev(originalDev)
+    })
+
+    const tapLogo = (times: number) => {
+      const { getByTestId } = render(<GetStartedScreen />)
+      const logo = getByTestId("logo-button")
+      for (let i = 0; i < times; i += 1) {
+        fireEvent.press(logo)
+      }
+    }
+
+    it("navigates to the developer screen after three logo taps in development builds", () => {
+      setDev(true)
+
+      tapLogo(3)
+
+      expect(mockNavigate).toHaveBeenCalledTimes(1)
+      expect(mockNavigate).toHaveBeenCalledWith("developerScreen")
+    })
+
+    it("does not navigate after three logo taps in release builds", () => {
+      setDev(false)
+
+      tapLogo(3)
+
+      expect(mockNavigate).not.toHaveBeenCalled()
+    })
+  })
 })
