@@ -17,12 +17,16 @@ jest.mock("@app/self-custodial/hooks/use-spark-network", () => ({
 
 const DELAYED_NOTICE_MS = 60_000
 
+const defaultRemoteConfig = {
+  selfCustodialDepositClaimLeewayVbyte: 1,
+  migrationReceiveDelayedNoticeMs: DELAYED_NOTICE_MS,
+  migrationDelayedRedirectEnabled: false,
+}
+let mockRemoteConfig = { ...defaultRemoteConfig }
+
 jest.mock("@app/config/feature-flags-context", () => ({
   ...jest.requireActual("@app/config/feature-flags-context"),
-  useRemoteConfig: () => ({
-    selfCustodialDepositClaimLeewayVbyte: 1,
-    migrationReceiveDelayedNoticeMs: 60_000,
-  }),
+  useRemoteConfig: () => mockRemoteConfig,
 }))
 
 jest.mock("@app/utils/error-logging", () => ({
@@ -64,6 +68,7 @@ describe("useMigrationReceiveConfirmation", () => {
   beforeEach(() => {
     jest.useFakeTimers()
     jest.clearAllMocks()
+    mockRemoteConfig = { ...defaultRemoteConfig }
     mockCheckReceiveLanded.mockResolvedValue(ok(stillEmpty))
   })
 
@@ -217,10 +222,50 @@ describe("useMigrationReceiveConfirmation", () => {
 
     await advance(DELAYED_NOTICE_MS)
     expect(result.current.isReceiveDelayed).toBe(true)
+    expect(result.current.isReceiveConfirmed).toBe(false)
 
     const checksSoFar = mockCheckReceiveLanded.mock.calls.length
     await advance(5000)
     expect(mockCheckReceiveLanded.mock.calls.length).toBeGreaterThan(checksSoFar)
+  })
+
+  /** The escape hatch, off by default: with the flag on, the elapsed window opens the
+   *  gate — no notice, straight to the swap, as the flow behaved before the gate. */
+  it("releases the redirect after the window when the delayed-redirect flag is on", async () => {
+    mockRemoteConfig.migrationDelayedRedirectEnabled = true
+
+    const { result } = renderGate()
+    await flushCheck()
+    expect(result.current.isReceiveConfirmed).toBe(false)
+
+    await advance(DELAYED_NOTICE_MS)
+
+    expect(result.current.isReceiveConfirmed).toBe(true)
+    expect(result.current.isReceiveDelayed).toBe(false)
+  })
+
+  it("stops checking once the timeout releases the gate", async () => {
+    mockRemoteConfig.migrationDelayedRedirectEnabled = true
+
+    renderGate()
+    await flushCheck()
+    await advance(DELAYED_NOTICE_MS)
+    const checksSoFar = mockCheckReceiveLanded.mock.calls.length
+
+    await advance(60_000)
+
+    expect(mockCheckReceiveLanded.mock.calls).toHaveLength(checksSoFar)
+  })
+
+  it("still confirms through a landed receive before the window with the flag on", async () => {
+    mockRemoteConfig.migrationDelayedRedirectEnabled = true
+    mockCheckReceiveLanded.mockResolvedValue(ok(landed))
+
+    const { result } = renderGate()
+    await flushCheck()
+
+    expect(result.current.isReceiveConfirmed).toBe(true)
+    expect(mockCheckReceiveLanded).toHaveBeenCalledTimes(1)
   })
 
   it("keeps the delayed notice down when the receive confirms in time", async () => {

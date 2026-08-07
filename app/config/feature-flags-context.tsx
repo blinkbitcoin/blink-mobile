@@ -55,6 +55,7 @@ const SelfCustodialCreationBlockedCountriesKey = "selfCustodialCreationBlockedCo
 const OffboardOnlyCountriesKey = "offboardOnlyCountries"
 const SelfCustodialDepositClaimLeewayVbyteKey = "selfCustodialDepositClaimLeewayVbyte"
 const MigrationReceiveDelayedNoticeMsKey = "migrationReceiveDelayedNoticeMs"
+const MigrationDelayedRedirectEnabledKey = "migrationDelayedRedirectEnabled"
 const FeeRatesConfigKey = "feeRatesConfig"
 
 type DeliveryOptionConfig = {
@@ -123,6 +124,7 @@ type RemoteConfig = {
   [OffboardOnlyCountriesKey]: string[]
   [SelfCustodialDepositClaimLeewayVbyteKey]: number
   [MigrationReceiveDelayedNoticeMsKey]: number
+  [MigrationDelayedRedirectEnabledKey]: boolean
   [FeeRatesConfigKey]: FeeRatesConfig
 }
 
@@ -229,6 +231,10 @@ export const defaultRemoteConfig: RemoteConfig = {
    *  payment is taking longer than usual and offering support. Product call on #4102:
    *  a minute after the confirmed send is more than enough for a healthy receive. */
   migrationReceiveDelayedNoticeMs: 60 * 1000,
+  /** Escape hatch should requirements change: when on, the migration's receive gate
+   *  releases the redirect once the notice window elapses instead of holding the swap
+   *  until the receive confirms. Off by default — waiting is the product decision. */
+  migrationDelayedRedirectEnabled: false,
   feeRatesConfig: defaultFeeRatesConfig,
 }
 
@@ -474,6 +480,10 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           .getValue(MigrationReceiveDelayedNoticeMsKey)
           .asNumber()
 
+        const migrationDelayedRedirectEnabled = remoteConfigInstance()
+          .getValue(MigrationDelayedRedirectEnabledKey)
+          .asBoolean()
+
         const feeRatesConfig = getRemoteConfigNumericObject(
           FeeRatesConfigKey,
           defaultFeeRatesConfig,
@@ -521,6 +531,7 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           offboardOnlyCountries,
           selfCustodialDepositClaimLeewayVbyte,
           migrationReceiveDelayedNoticeMs,
+          migrationDelayedRedirectEnabled,
           feeRatesConfig,
         })
       } catch (err) {

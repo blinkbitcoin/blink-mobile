@@ -39,7 +39,9 @@ type UseMigrationReceiveConfirmation = {
  * claims a payment Spark held for the offline wallet — and never gives up: an unconfirmed
  * receive keeps the user on the working custodial session, which is strictly better than
  * an empty new one. After the remote-configured notice window it raises `isReceiveDelayed`
- * so the screen can say the wait is unusual and offer support, while still polling.
+ * so the screen can say the wait is unusual and offer support, while still polling —
+ * unless the delayed-redirect flag is on, in which case the elapsed window releases the
+ * gate instead (the pre-#4102 behavior, kept reachable without an app release).
  */
 export const useMigrationReceiveConfirmation = ({
   selfCustodialAccountId,
@@ -47,17 +49,26 @@ export const useMigrationReceiveConfirmation = ({
   skip,
 }: UseMigrationReceiveConfirmationArgs): UseMigrationReceiveConfirmation => {
   const network = useSparkNetwork()
-  const { selfCustodialDepositClaimLeewayVbyte, migrationReceiveDelayedNoticeMs } =
-    useRemoteConfig()
+  const {
+    selfCustodialDepositClaimLeewayVbyte,
+    migrationReceiveDelayedNoticeMs,
+    migrationDelayedRedirectEnabled,
+  } = useRemoteConfig()
   const [isReceiveConfirmed, setIsReceiveConfirmed] = useState(false)
   const [isReceiveDelayed, setIsReceiveDelayed] = useState(false)
 
   /** A zero-receive migration (balance at or under an uncovered fee) gets no payment, so
    *  the gate opens without ever touching the SDK; waiting would strand the user forever. */
   const isConfirmedWithoutWaiting = !skip && expectedReceiveSats === 0
+
+  /** The escape hatch: with the flag on, the elapsed notice window opens the gate rather
+   *  than raising the notice, so the swap proceeds as it did before the gate existed. */
+  const isReleasedByTimeout = isReceiveDelayed && migrationDelayedRedirectEnabled
+
   const isWatching =
     !skip &&
     !isConfirmedWithoutWaiting &&
+    !isReleasedByTimeout &&
     !isReceiveConfirmed &&
     selfCustodialAccountId !== null
 
@@ -140,8 +151,14 @@ export const useMigrationReceiveConfirmation = ({
   }, [isWatching, migrationReceiveDelayedNoticeMs])
 
   return {
-    isReceiveConfirmed: isReceiveConfirmed || isConfirmedWithoutWaiting,
+    isReceiveConfirmed:
+      isReceiveConfirmed || isConfirmedWithoutWaiting || isReleasedByTimeout,
+    /** Masked once anything confirms — including the timeout release, which must swap
+     *  at once rather than flash the "taking longer" copy it just made moot. */
     isReceiveDelayed:
-      isReceiveDelayed && !isReceiveConfirmed && !isConfirmedWithoutWaiting,
+      isReceiveDelayed &&
+      !isReceiveConfirmed &&
+      !isConfirmedWithoutWaiting &&
+      !isReleasedByTimeout,
   }
 }
