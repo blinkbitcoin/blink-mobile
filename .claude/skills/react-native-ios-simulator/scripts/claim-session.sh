@@ -20,6 +20,18 @@ case "$PR" in
   ''|*[!0-9]*) echo "FATAL: pr-number must be numeric, got '$PR'" >&2; exit 1 ;;
 esac
 
+# DEMO_REQUIRED_ENV lists the names (space-separated) of credentials this
+# repo's real-account flows need; each one that is unset gets reported in the
+# claim output. The skill stays app-agnostic - it checks presence, nothing more.
+MISSING_CREDS=""
+for CRED_NAME in ${DEMO_REQUIRED_ENV:-}; do
+  [ -n "$CRED_NAME" ] || continue
+  if [ -z "${!CRED_NAME:-}" ]; then
+    MISSING_CREDS="$MISSING_CREDS $CRED_NAME"
+  fi
+done
+MISSING_CREDS="${MISSING_CREDS# }"
+
 REGISTRY="${DEMO_SIM_REGISTRY:-$HOME/.claude/rn-sim-sessions}"
 SIM_NAME="${DEMO_SIM_PREFIX:-rn-demo}-pr${PR}"
 # Keyed by the full device name, not the bare PR number: the registry is shared
@@ -212,4 +224,14 @@ if [ -f "$SESSION_DIR/golden-stamp" ]; then
       echo "# golden verdict: NATIVE BUILD STALE - ios/Podfile.lock changed since the bless; install a fresh build onto this clone, or re-bless the golden"
     fi
   fi
+fi
+
+# Fail-fast credential report: flows that need a real account (a staging login
+# for the golden, an OTP) dead-end mid-session when a credential is absent.
+# Naming the gap at claim time lets the agent plan the stub-harness route up
+# front instead of discovering the wall forty minutes in. Repo-specific names
+# come from DEMO_REQUIRED_ENV (see AGENTS.md); this never blocks the claim -
+# plenty of demos need no account at all.
+if [ -n "$MISSING_CREDS" ]; then
+  echo "# note: missing credentials: $MISSING_CREDS - real-account flows are unavailable this session; plan the stub-harness route now, not mid-flow"
 fi

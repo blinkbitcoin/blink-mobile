@@ -542,6 +542,28 @@ check "bless with a lockfile exits zero" "0" "$?"
 check "the blessed stamp carries the lockfile hash" "yes" \
   "$(grep -q '^podfile-lock-hash=' "$GOLDEN_STAMP" && echo yes || echo no)"
 
+echo
+echo "credential precheck"
+
+# The wall this removes: an agent discovering forty minutes into a session
+# that the staging OTP was never set on this machine. Claim reports the gap
+# up front - and never blocks, because most demos need no account at all.
+reset_world
+export FAKE_CRED_PRESENT=some-value
+out=$(DEMO_REQUIRED_ENV="FAKE_CRED_PRESENT FAKE_CRED_ABSENT" "$SCRIPTS/claim-session.sh" 720); rc=$?
+check "a claim with missing credentials still succeeds" "0" "$rc"
+check "claim names each missing credential up front" "yes" \
+  "$(echo "$out" | grep "missing credentials" | grep -q "FAKE_CRED_ABSENT" && echo yes || echo no)"
+check "a present credential is not reported missing" "no" \
+  "$(echo "$out" | grep "missing credentials" | grep -q "FAKE_CRED_PRESENT" && echo yes || echo no)"
+"$SCRIPTS/release-session.sh" 720 --delete >/dev/null 2>&1
+
+out=$(DEMO_REQUIRED_ENV="FAKE_CRED_PRESENT" "$SCRIPTS/claim-session.sh" 721)
+check "no note when every required credential is present" "no" \
+  "$(echo "$out" | grep -q "missing credentials" && echo yes || echo no)"
+"$SCRIPTS/release-session.sh" 721 --delete >/dev/null 2>&1
+unset FAKE_CRED_PRESENT
+
 # --- bless safety gates ------------------------------------------------------
 reset_world
 eval "$("$SCRIPTS/claim-session.sh" 710)" >/dev/null 2>&1
@@ -721,6 +743,8 @@ check "SKILL.md ties golden staleness to the stamp sha" "yes" \
   "$(grep -qi "stamp" "$SKILL_MD" && grep -q "origin/main -- ios/" "$SKILL_MD" && echo yes || echo no)"
 check "SKILL.md documents the native-stamp verdict" "yes" \
   "$(grep -q "native-stamp.sh" "$SKILL_MD" && echo yes || echo no)"
+check "SKILL.md documents the credential precheck" "yes" \
+  "$(grep -q "DEMO_REQUIRED_ENV" "$SKILL_MD" && echo yes || echo no)"
 check "SKILL.md documents the 72h retention default" "yes" \
   "$(grep -q "72h" "$SKILL_MD" && echo yes || echo no)"
 check "SKILL.md carries no stale 24h default" "no" \

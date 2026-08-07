@@ -73,6 +73,13 @@ native build still matches `ios/Podfile.lock`. Anything that makes the clone
 dishonest (golden booted, different device type, explicit runtime mismatch)
 falls back to a blank create with a note on stderr, never silently.
 
+Claim also reports missing credentials up front: set `DEMO_REQUIRED_ENV` to
+the names of env vars real-account flows need (this repo lists it in
+`AGENTS.md`), and any that are unset appear as a `# note: missing credentials`
+line — the signal to plan the stub-harness route immediately instead of
+hitting the wall mid-session. The claim itself never blocks on it; most demos
+need no account at all.
+
 ### 2. Work in a scratchpad worktree
 
 Never the shared checkout: the user keeps their own branch checked out and
@@ -280,7 +287,7 @@ The isolation guarantees are load-bearing for every other agent on this Mac, so
 they are tested rather than asserted:
 
 ```bash
-"$SKILL/tests/run.sh"     # 150 assertions, ~60s, exits non-zero on failure
+"$SKILL/tests/run.sh"     # 155 assertions, ~60s, exits non-zero on failure
 ```
 
 It creates **no real simulators** — a fake `xcrun` goes first on PATH and the
