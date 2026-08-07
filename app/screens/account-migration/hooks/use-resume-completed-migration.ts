@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react"
+import { AppState } from "react-native"
 
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
@@ -77,8 +78,26 @@ export const useResumeCompletedMigration = (): void => {
 
   /** An unsettled close is a dropped connection, and the attempt budget exists for a briefly
    *  locked keystore: spending it here would fire three calls against the same dead network
-   *  within milliseconds. One per launch, and the next launch tries again. */
+   *  within milliseconds. One per foreground instead, so the retry rides the moment the user
+   *  comes back rather than waiting for the OS to kill the process. */
   const hasDeferredCloseRef = useRef(false)
+  const [closeRetryCount, setCloseRetryCount] = useState(0)
+
+  /** Foregrounding is the cheapest signal that the connection may be back, and the only one
+   *  this hook can watch without a screen: it is mounted under the tab navigator with no UI
+   *  of its own, so nothing else here ever tells it to look again. */
+  useEffect(() => {
+    const subscription = AppState.addEventListener("change", (nextAppState) => {
+      const isDeferredCloseWaiting =
+        nextAppState === "active" && hasDeferredCloseRef.current
+      if (!isDeferredCloseWaiting) return
+      hasDeferredCloseRef.current = false
+      setCloseRetryCount((previous) => previous + 1)
+    })
+
+    return () => subscription.remove()
+  }, [])
+
   const isSwapPending = isServerCompleted && isReceiveConfirmed
 
   const handOverToSupport = useCallback(
@@ -104,29 +123,43 @@ export const useResumeCompletedMigration = (): void => {
     isSwapInFlightRef.current = true
     completeMigration()
       .then((completion) => {
-        if (completion === MigrationCompletion.Completed) return
+        /** Exhaustive on purpose: the fallthrough of an if-chain here is a support handover
+         *  under a reason that would be a lie, so a new outcome has to be a type error
+         *  rather than a ticket nobody can act on. */
+        switch (completion) {
+          case MigrationCompletion.Completed:
+            return
 
-        /** The close never settled, so the custodial token is still alive and the next
-         *  launch can still spend it. Nothing is lost meanwhile: the custodial session keeps
-         *  working and the provisioned account is already in the switcher. */
-        if (completion === MigrationCompletion.CloseUnavailable) {
-          hasDeferredCloseRef.current = true
-          return
+          /** The close never settled, so the custodial token is still alive and a later
+           *  attempt can still spend it. Nothing is lost meanwhile: the custodial session
+           *  keeps working and the provisioned account is already in the switcher. */
+          case MigrationCompletion.CloseUnavailable:
+            hasDeferredCloseRef.current = true
+            return
+
+          case MigrationCompletion.CloseRefused:
+            handOverToSupport(MigrationSupportReason.CustodialAccountCloseRefused)
+            return
+
+          /** The funds landed server-side but the destination self-custodial account is no
+           *  longer on this device (a reinstall wiped its key), so no retry finishes the
+           *  swap: name exactly that, and report it once. */
+          case MigrationCompletion.AccountMissing:
+            reportError(
+              "Migration resume without destination account",
+              new Error("Provisioned self-custodial account is not on this device"),
+            )
+            handOverToSupport(MigrationSupportReason.SelfCustodialAccountNotOnDevice)
+            return
+
+          default: {
+            const unhandledCompletion: never = completion
+            reportError(
+              "Migration resume unhandled completion",
+              new Error(`Unhandled completion: ${String(unhandledCompletion)}`),
+            )
+          }
         }
-
-        if (completion === MigrationCompletion.CloseRefused) {
-          handOverToSupport(MigrationSupportReason.CustodialAccountCloseRefused)
-          return
-        }
-
-        /** The funds landed server-side but the destination self-custodial account is no
-         *  longer on this device (a reinstall wiped its key), so no retry finishes the
-         *  swap: name exactly that, and report it once. */
-        reportError(
-          "Migration resume without destination account",
-          new Error("Provisioned self-custodial account is not on this device"),
-        )
-        handOverToSupport(MigrationSupportReason.SelfCustodialAccountNotOnDevice)
       })
       .catch((err) => {
         reportError("Migration resume swap", err)
@@ -135,5 +168,5 @@ export const useResumeCompletedMigration = (): void => {
       .finally(() => {
         isSwapInFlightRef.current = false
       })
-  }, [isSwapPending, attempts, completeMigration, handOverToSupport])
+  }, [isSwapPending, attempts, closeRetryCount, completeMigration, handOverToSupport])
 }

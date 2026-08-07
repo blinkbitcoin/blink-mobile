@@ -1,4 +1,5 @@
 import { act, renderHook } from "@testing-library/react-native"
+import type { AppStateStatus } from "react-native"
 
 import { MigrationStatus } from "@app/graphql/generated"
 import { useResumeCompletedMigration } from "@app/screens/account-migration/hooks/use-resume-completed-migration"
@@ -68,9 +69,38 @@ jest.mock("@app/utils/error-logging", () => ({
   reportError: (operation: string, err: unknown) => mockReportError(operation, err),
 }))
 
+const mockAppStateListeners: Array<(state: AppStateStatus) => void> = []
+
+jest.mock("react-native/Libraries/AppState/AppState", () => ({
+  __esModule: true,
+  default: {
+    addEventListener: (event: string, handler: (state: AppStateStatus) => void) => {
+      if (event !== "change") {
+        throw new Error(`Trying to subscribe to unknown event: ${event}`)
+      }
+      mockAppStateListeners.push(handler)
+      return {
+        remove: () => {
+          const index = mockAppStateListeners.indexOf(handler)
+          if (index !== -1) {
+            mockAppStateListeners.splice(index, 1)
+          }
+        },
+      }
+    },
+  },
+}))
+
+const foregroundApp = async () => {
+  await act(async () => {
+    mockAppStateListeners.forEach((listener) => listener("active"))
+  })
+}
+
 describe("useResumeCompletedMigration", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockAppStateListeners.length = 0
     mockStatus = MigrationStatus.Completed
     mockMigrationAccountId = "sc-account-1"
     mockMigrationLoading = false
@@ -331,6 +361,48 @@ describe("useResumeCompletedMigration", () => {
     expect(secondSwap).not.toHaveBeenCalled()
   })
 
+  /** The close failed on a dropped connection, and coming back to the app is the moment that
+   *  most often means the connection is back. Waiting for the OS to kill the process instead
+   *  would leave the user on the emptied custodial account with no retry and no message. */
+  it("retries a deferred close when the app returns to the foreground", async () => {
+    mockCompleteMigration.mockResolvedValue(MigrationCompletion.CloseUnavailable)
+    renderHook(() => useResumeCompletedMigration())
+    await flushEffects()
+    expect(mockCompleteMigration).toHaveBeenCalledTimes(1)
+
+    mockCompleteMigration.mockResolvedValue(MigrationCompletion.Completed)
+    await foregroundApp()
+    await flushEffects()
+
+    expect(mockCompleteMigration).toHaveBeenCalledTimes(2)
+  })
+
+  /** The retry is armed by a deferral, not by every trip through the app switcher. */
+  it("does not re-run a completed swap on the next foreground", async () => {
+    renderHook(() => useResumeCompletedMigration())
+    await flushEffects()
+
+    await foregroundApp()
+    await flushEffects()
+
+    expect(mockCompleteMigration).toHaveBeenCalledTimes(1)
+  })
+
+  /** Foregrounding cannot undo a handover: the outcome was terminal, and a second ticket
+   *  for the same migration is noise support has to sort through. */
+  it("does not reopen a handover on the next foreground", async () => {
+    mockCompleteMigration.mockResolvedValue(MigrationCompletion.CloseRefused)
+    renderHook(() => useResumeCompletedMigration())
+    await flushEffects()
+    expect(mockNavigate).toHaveBeenCalledTimes(1)
+
+    await foregroundApp()
+    await flushEffects()
+
+    expect(mockNavigate).toHaveBeenCalledTimes(1)
+    expect(mockCompleteMigration).toHaveBeenCalledTimes(1)
+  })
+
   /** The deletion cap: the migration finished, but the emptied custodial account stays open
    *  until support removes it, and no retry changes that. */
   it("hands over to support when the close is refused for good", async () => {
@@ -368,6 +440,23 @@ describe("useResumeCompletedMigration", () => {
     await flushEffects()
 
     expect(mockReportError).not.toHaveBeenCalled()
+  })
+
+  /** The switch is exhaustive at compile time, so this only happens to a build running
+   *  against a completion it does not know about. Reporting it beats the silence of an
+   *  if-chain's fallthrough, which would hand the user a ticket under the wrong reason. */
+  it("reports an outcome it does not recognise instead of handing over", async () => {
+    mockCompleteMigration.mockResolvedValue("newly-added-outcome" as MigrationCompletion)
+    renderHook(() => useResumeCompletedMigration())
+    await flushEffects()
+
+    expect(mockReportError).toHaveBeenCalledWith(
+      "Migration resume unhandled completion",
+      expect.objectContaining({
+        message: "Unhandled completion: newly-added-outcome",
+      }),
+    )
+    expect(mockNavigate).not.toHaveBeenCalled()
   })
 
   /** The effect can re-run while a swap is still in flight (a wallet-registry refresh
