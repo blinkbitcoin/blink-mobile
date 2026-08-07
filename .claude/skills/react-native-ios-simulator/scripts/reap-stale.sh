@@ -11,7 +11,7 @@
 # <prefix>-pr<N> name, and never while it is booted (someone is using it).
 #
 # Usage: reap-stale.sh
-#   DEMO_SIM_TTL_HOURS  retention window, default 24
+#   DEMO_SIM_TTL_HOURS  retention window, default 72
 #   DEMO_SIM_REGISTRY   session registry, default ~/.claude/rn-sim-sessions
 #   DEMO_SIM_PREFIX     device-name prefix, default rn-demo
 
@@ -19,7 +19,7 @@ set -uo pipefail
 
 REGISTRY="${DEMO_SIM_REGISTRY:-$HOME/.claude/rn-sim-sessions}"
 PREFIX="${DEMO_SIM_PREFIX:-rn-demo}"
-TTL_HOURS="${DEMO_SIM_TTL_HOURS:-24}"
+TTL_HOURS="${DEMO_SIM_TTL_HOURS:-72}"
 NOW=$(date +%s)
 TTL_SECONDS=$((TTL_HOURS * 3600))
 

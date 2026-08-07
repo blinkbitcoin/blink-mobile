@@ -27,7 +27,7 @@ SIM_NAME="${DEMO_SIM_PREFIX:-rn-demo}-pr${PR}"
 # once. The prefix is what keeps their sessions apart.
 SESSION_DIR="$REGISTRY/${SIM_NAME}"
 
-# Sweep simulators from sessions released more than the TTL ago (default 24h),
+# Sweep simulators from sessions released more than the TTL ago (default 72h),
 # then un-mark our own session: an active claim is never reaped.
 "$(dirname "${BASH_SOURCE[0]}")/reap-stale.sh" >/dev/null 2>&1 || true
 mkdir -p "$REGISTRY/ports" "$SESSION_DIR"
