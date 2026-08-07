@@ -3902,6 +3902,8 @@ const en: BaseTranslation = {
       body: "Your device's date and time are out of sync. Set them to automatic to continue.",
       retryCta: "Try again",
     },
+    closeUnavailable:
+      "Your funds are safe in your new wallet. We are still closing your old account, please try again in a moment.",
     migrationRequiredTitle: "Time to upgrade",
     migrationRequiredBody:
       "It's time to migrate your custodial account to a non-custodial account.",

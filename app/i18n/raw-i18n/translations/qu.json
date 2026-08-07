@@ -3813,7 +3813,8 @@
     "clockOutOfSync": {
       "body": "Dispositivoykipa p'unchawnin hinaspa horan mana huñusqachu. Automáticoman churay qatinaykipaq.",
       "retryCta": "Kutiy yapamuy"
-    }
+    },
+    "closeUnavailable": "Qullqiykiqa musuq qipiykipi allinmi kachkan. Ñawpaq cuentaykitaraq wichqachkaniku, ama hina kaspa huk ratumanta yapamanta ruway."
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Waqaychasqa",

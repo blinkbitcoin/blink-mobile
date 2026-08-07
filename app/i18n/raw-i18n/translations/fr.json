@@ -3813,7 +3813,8 @@
         "clockOutOfSync": {
             "body": "La date et l'heure de votre appareil sont désynchronisées. Réglez-les sur automatique pour continuer.",
             "retryCta": "Réessayer"
-        }
+        },
+        "closeUnavailable": "Vos fonds sont en sécurité dans votre nouveau portefeuille. Nous fermons encore votre ancien compte, veuillez réessayer dans un instant."
     },
     "AccountTypeSelectionScreen": {
         "custodialLabel": "Sous garde",

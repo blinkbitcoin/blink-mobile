@@ -3813,7 +3813,8 @@
     "clockOutOfSync": {
       "body": "Die datum en tyd van jou toestel is nie in sinkronisasie nie. Stel dit op outomaties om voort te gaan.",
       "retryCta": "Probeer weer"
-    }
+    },
+    "closeUnavailable": "Jou fondse is veilig in jou nuwe beursie. Ons is nog besig om jou ou rekening te sluit, probeer asseblief oor 'n oomblik weer."
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Bewaard",

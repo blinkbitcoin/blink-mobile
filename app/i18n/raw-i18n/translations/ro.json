@@ -3813,7 +3813,8 @@
     "clockOutOfSync": {
       "body": "Data și ora dispozitivului tău nu sunt sincronizate. Setează-le pe automat pentru a continua.",
       "retryCta": "Încearcă din nou"
-    }
+    },
+    "closeUnavailable": "Fondurile tale sunt în siguranță în noul portofel. Încă închidem contul tău vechi, te rugăm să încerci din nou într-un moment."
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Custodial",

@@ -3813,7 +3813,8 @@
     "clockOutOfSync": {
       "body": "Cihazının tarih ve saati eşitlenmemiş. Devam etmek için otomatik olarak ayarla.",
       "retryCta": "Tekrar dene"
-    }
+    },
+    "closeUnavailable": "Paranız yeni cüzdanınızda güvende. Eski hesabınızı hâlâ kapatıyoruz, lütfen birazdan tekrar deneyin."
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Emanetli",

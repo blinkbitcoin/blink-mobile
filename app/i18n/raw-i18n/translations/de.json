@@ -3813,7 +3813,8 @@
         "clockOutOfSync": {
             "body": "Datum und Uhrzeit deines Geräts sind nicht synchron. Stelle sie auf automatisch, um fortzufahren.",
             "retryCta": "Erneut versuchen"
-        }
+        },
+        "closeUnavailable": "Deine Gelder sind sicher in deiner neuen Wallet. Wir schließen dein altes Konto noch, bitte versuche es gleich noch einmal."
     },
     "AccountTypeSelectionScreen": {
         "custodialLabel": "Verwahrt",

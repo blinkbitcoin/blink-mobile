@@ -3813,7 +3813,8 @@
     "clockOutOfSync": {
       "body": "De datum en tijd van je apparaat lopen niet gelijk. Zet ze op automatisch om door te gaan.",
       "retryCta": "Opnieuw proberen"
-    }
+    },
+    "closeUnavailable": "Je geld staat veilig in je nieuwe wallet. We zijn je oude account nog aan het sluiten, probeer het zo meteen opnieuw."
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Bewaard",

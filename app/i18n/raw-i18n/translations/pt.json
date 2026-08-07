@@ -3813,7 +3813,8 @@
         "clockOutOfSync": {
             "body": "A data e a hora do teu dispositivo estão dessincronizadas. Define-as como automáticas para continuar.",
             "retryCta": "Tentar novamente"
-        }
+        },
+        "closeUnavailable": "Seus fundos estão seguros na sua nova carteira. Ainda estamos fechando sua conta antiga, tente novamente em instantes."
     },
     "AccountTypeSelectionScreen": {
         "custodialLabel": "Custodiada",

@@ -3813,7 +3813,8 @@
     "clockOutOfSync": {
       "body": "Az eszközöd dátuma és ideje nincs szinkronban. Állítsd automatikusra a folytatáshoz.",
       "retryCta": "Próbáld újra"
-    }
+    },
+    "closeUnavailable": "A pénzed biztonságban van az új tárcádban. Még zárjuk a régi fiókodat, kérjük, próbáld újra egy pillanat múlva."
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Letéti",

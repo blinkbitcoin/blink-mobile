@@ -3813,7 +3813,8 @@
     "clockOutOfSync": {
       "body": "Umhla nexesha lesixhobo sakho azihambelani. Zimisele ukuba zizenzekele ukuze uqhubeke.",
       "retryCta": "Zama kwakhona"
-    }
+    },
+    "closeUnavailable": "Imali yakho ikhuselekile kwisipaji sakho esitsha. Sisavala iakhawunti yakho endala, nceda uzame kwakhona emzuzwaneni."
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Igciniwe",

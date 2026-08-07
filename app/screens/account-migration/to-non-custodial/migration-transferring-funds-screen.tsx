@@ -37,7 +37,6 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
   const {
     migrationAccountId,
     migrationExpectedReceiveSats,
-    custodialAccountId,
     migrationLoading,
     completeMigration,
   } = useCompleteMigration()
@@ -46,15 +45,18 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
   useHardwareBackGuard()
 
   /** Every failure handover leaves this screen for good, so Back belongs on the commit
-   *  screen: the transfer is over and this one has nothing left to offer. */
+   *  screen: the transfer is over and this one has nothing left to offer. The id travels
+   *  with every handover, including the ones raised after the session was discarded, where
+   *  the support screen has nothing left to query it from. */
   const goToContactSupport = useCallback(
     (reason: MigrationSupportReason) => {
       navigation.navigate("accountMigrationContactSupport", {
         reason,
         origin: MigrationSupportOrigin.Commit,
+        custodialAccountId: ownerId ?? undefined,
       })
     },
-    [navigation],
+    [navigation, ownerId],
   )
 
   /** The delayed handover is the one the user comes back from: the receive is still being
@@ -134,12 +136,12 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
           params: {
             reason: MigrationSupportReason.CustodialAccountCloseRefused,
             origin: MigrationSupportOrigin.Resume,
-            custodialAccountId: custodialAccountId ?? undefined,
+            custodialAccountId: ownerId ?? undefined,
           },
         },
       ],
     })
-  }, [navigation, custodialAccountId])
+  }, [navigation, ownerId])
 
   /** The close is the only step bound to this moment, because the discard that follows
    *  destroys the token it needs; the swap after it is local, so a failure there leaves a
@@ -194,28 +196,36 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
   }, [isCloseUnavailable, retry])
 
   /** A skewed clock, a lost connection and a close that never settled share the retry
-   *  footer. The clock keeps its own message; the other two are network failures and read
-   *  as one. Only a real failure leaves this screen for support. */
+   *  footer. The close runs last, so it owns the footer whenever more than one step is
+   *  unsettled, and the retry above resolves in the same order: the button cannot name one
+   *  step and press another. Only a real failure leaves this screen for support. */
   const isRecoverable = isClockOutOfSync || hasConnectionIssue || isCloseUnavailable
+  const isClockRetry = isClockOutOfSync && !isCloseUnavailable
 
   /** The delayed notice yields to a recoverable issue: a lost connection explains the
    *  wait better than the wait itself, and its retry is the more useful footer. */
   const isDelayedNoticeShown = isReceiveDelayed && !isRecoverable
 
-  const recoverableMessage = isClockOutOfSync
+  const clockOrConnectionMessage = isClockRetry
     ? LLMigration.clockOutOfSync.body()
     : LL.errors.network.connection()
+  const recoverableMessage = isCloseUnavailable
+    ? LLMigration.closeUnavailable()
+    : clockOrConnectionMessage
   const waitingMessage = isDelayedNoticeShown
     ? LLMigration.transferDelayed.body()
     : LLMigration.transferringFunds()
   const message = isRecoverable ? recoverableMessage : waitingMessage
 
-  const retryTitle = isClockOutOfSync
+  const retryTitle = isClockRetry
     ? LLMigration.clockOutOfSync.retryCta()
     : LL.common.tryAgain()
-  const retryTestId = isClockOutOfSync
+  const clockOrConnectionTestId = isClockRetry
     ? "migration-clock-out-of-sync-retry"
     : "migration-connection-issue-retry"
+  const retryTestId = isCloseUnavailable
+    ? "migration-close-unavailable-retry"
+    : clockOrConnectionTestId
 
   const recoverableFooter = (
     <GaloyPrimaryButton

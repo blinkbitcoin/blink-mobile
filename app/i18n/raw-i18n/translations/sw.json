@@ -3813,7 +3813,8 @@
     "clockOutOfSync": {
       "body": "Tarehe na saa za kifaa chako hazijaoanishwa. Ziweke kwa kiotomatiki ili kuendelea.",
       "retryCta": "Jaribu tena"
-    }
+    },
+    "closeUnavailable": "Fedha zako ziko salama katika pochi yako mpya. Bado tunafunga akaunti yako ya zamani, tafadhali jaribu tena baada ya muda mfupi."
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Iliyohifadhiwa",

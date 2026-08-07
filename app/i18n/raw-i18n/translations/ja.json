@@ -3813,7 +3813,8 @@
         "clockOutOfSync": {
             "body": "デバイスの日付と時刻がずれています。続けるには自動設定にしてください。",
             "retryCta": "再試行"
-        }
+        },
+        "closeUnavailable": "資金は新しいウォレットで安全に保管されています。以前のアカウントをまだ閉鎖しています。少し経ってからもう一度お試しください。"
     },
     "AccountTypeSelectionScreen": {
         "custodialLabel": "カストディアル",

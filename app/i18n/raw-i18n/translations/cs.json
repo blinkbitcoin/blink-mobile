@@ -3813,7 +3813,8 @@
     "clockOutOfSync": {
       "body": "Datum a čas vašeho zařízení nejsou synchronizované. Nastavte je na automatické, abyste mohli pokračovat.",
       "retryCta": "Zkusit znovu"
-    }
+    },
+    "closeUnavailable": "Vaše prostředky jsou v bezpečí v nové peněžence. Váš starý účet stále zavíráme, zkuste to prosím za chvíli znovu."
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Spravovaný",

@@ -3813,7 +3813,8 @@
     "clockOutOfSync": {
       "body": "Tanggal dan waktu perangkat Anda tidak sinkron. Atur ke otomatis untuk melanjutkan.",
       "retryCta": "Coba lagi"
-    }
+    },
+    "closeUnavailable": "Dana Anda aman di dompet baru Anda. Kami masih menutup akun lama Anda, silakan coba lagi sebentar."
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Kustodian",
