@@ -1,5 +1,5 @@
 import * as React from "react"
-import { ActivityIndicator, Linking, View } from "react-native"
+import { ActivityIndicator, Linking, Pressable, View } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { ScrollView } from "react-native-gesture-handler"
 import { useFragment } from "@apollo/client"
@@ -7,6 +7,7 @@ import { IconNamesType } from "@app/components/atomic/galoy-icon"
 import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloyInfo } from "@app/components/atomic/galoy-info"
+import { HiddenBalancePlaceholder } from "@app/components/hidden-balance-placeholder/hidden-balance-placeholder"
 import { TransactionDate } from "@app/components/transaction-date"
 import { useDescriptionDisplay } from "@app/components/transaction-item"
 import { DeepPartialObject } from "@app/components/transaction-item/index.types"
@@ -21,6 +22,7 @@ import {
   useHomeAuthedQuery,
   WalletCurrency,
 } from "@app/graphql/generated"
+import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { useAppConfig, useClipboard, useTransactionSeenState } from "@app/hooks"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -119,6 +121,7 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
   const insets = useSafeAreaInsets()
 
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+  const { hideAmount, switchMemoryHideAmount } = useHideAmount()
   const { formatMoneyAmount } = useDisplayCurrency()
   const {
     appConfig: { galoyInstance },
@@ -411,7 +414,15 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
             <Text type="h2" numberOfLines={1} adjustsFontSizeToFit>
               {spendOrReceiveText}
             </Text>
-            <Text type="h1">{displayAmount}</Text>
+            <Pressable hitSlop={10} onPress={switchMemoryHideAmount}>
+              <View style={styles.amountWrapper}>
+                {hideAmount ? (
+                  <HiddenBalancePlaceholder size="small" />
+                ) : (
+                  <Text type="h1">{displayAmount}</Text>
+                )}
+              </View>
+            </Pressable>
           </View>
         </View>
 
@@ -613,6 +624,12 @@ const useStyles = makeStyles(({ colors }) => ({
     alignItems: "center",
     justifyContent: "center",
     transform: [{ translateY: -12 }],
+  },
+
+  amountWrapper: {
+    minHeight: 36,
+    justifyContent: "center",
+    alignItems: "center",
   },
 
   description: {

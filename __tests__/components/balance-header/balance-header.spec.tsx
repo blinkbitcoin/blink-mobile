@@ -1,6 +1,6 @@
 import React from "react"
 import { StyleSheet } from "react-native"
-import { fireEvent, render } from "@testing-library/react-native"
+import { fireEvent, render, within } from "@testing-library/react-native"
 import { ThemeProvider } from "@rn-vui/themed"
 
 import theme from "@app/rne-theme/theme"
@@ -110,18 +110,19 @@ describe("BalanceHeader", () => {
   it("renders the hidden placeholder instead of the balance when the amount is hidden", () => {
     mockHideAmount = true
 
-    const { getByText, queryByTestId } = renderHeader({ formattedBalance: "$42.00" })
+    const { getByTestId, queryByTestId } = renderHeader({ formattedBalance: "$42.00" })
 
-    expect(getByText("****")).toBeTruthy()
+    expect(getByTestId("hidden-balance-placeholder")).toBeTruthy()
     expect(queryByTestId("balance-value")).toBeNull()
   })
 
-  it("caps font scaling on the hidden placeholder (blink-wip#931)", () => {
+  it("renders no scalable text in the hidden placeholder (blink-wip#931)", () => {
     mockHideAmount = true
 
-    const { getByText } = renderHeader()
+    const { getByTestId } = renderHeader()
 
-    expect(getByText("****").props.maxFontSizeMultiplier).toBeLessThanOrEqual(1.5)
+    const placeholder = getByTestId("hidden-balance-placeholder")
+    expect(within(placeholder).queryByText(/./)).toBeNull()
   })
 
   it("does not render the status badge by default", () => {
