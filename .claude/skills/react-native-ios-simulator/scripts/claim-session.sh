@@ -20,6 +20,18 @@ case "$PR" in
   ''|*[!0-9]*) echo "FATAL: pr-number must be numeric, got '$PR'" >&2; exit 1 ;;
 esac
 
+# DEMO_REQUIRED_ENV lists the names (space-separated) of credentials this
+# repo's real-account flows need; each one that is unset gets reported in the
+# claim output. The skill stays app-agnostic - it checks presence, nothing more.
+MISSING_CREDS=""
+for CRED_NAME in ${DEMO_REQUIRED_ENV:-}; do
+  [ -n "$CRED_NAME" ] || continue
+  if [ -z "${!CRED_NAME:-}" ]; then
+    MISSING_CREDS="$MISSING_CREDS $CRED_NAME"
+  fi
+done
+MISSING_CREDS="${MISSING_CREDS# }"
+
 REGISTRY="${DEMO_SIM_REGISTRY:-$HOME/.claude/rn-sim-sessions}"
 SIM_NAME="${DEMO_SIM_PREFIX:-rn-demo}-pr${PR}"
 # Keyed by the full device name, not the bare PR number: the registry is shared
@@ -27,7 +39,7 @@ SIM_NAME="${DEMO_SIM_PREFIX:-rn-demo}-pr${PR}"
 # once. The prefix is what keeps their sessions apart.
 SESSION_DIR="$REGISTRY/${SIM_NAME}"
 
-# Sweep simulators from sessions released more than the TTL ago (default 24h),
+# Sweep simulators from sessions released more than the TTL ago (default 72h),
 # then un-mark our own session: an active claim is never reaped.
 "$(dirname "${BASH_SOURCE[0]}")/reap-stale.sh" >/dev/null 2>&1 || true
 mkdir -p "$REGISTRY/ports" "$SESSION_DIR"
@@ -91,6 +103,59 @@ for runtime, devices in json.load(sys.stdin)['devices'].items():
             print(d['udid']); sys.exit(0)
 " "$SIM_NAME" || true)
 
+# --- Golden clone fast path --------------------------------------------------
+# A blessed "golden" simulator (app installed, account logged in - see
+# bless-golden.sh) turns device setup from install + login minutes into a
+# seconds-long clone. The clone never mutates the golden, and the new device is
+# named for this PR like any other, so every ownership guard works unchanged.
+# Any ineligibility falls through to a blank create with a note - a demo on the
+# wrong device type or a booted golden must never be silent.
+if [ -z "$UDID" ]; then
+  GOLDEN_NAME="${DEMO_SIM_GOLDEN:-${DEMO_SIM_PREFIX:-rn-demo}-golden}"
+  GOLDEN_DIR="$REGISTRY/golden/$GOLDEN_NAME"
+  if [ "$GOLDEN_NAME" != "none" ]; then
+    GOLDEN=$(xcrun simctl list devices -j \
+      | python3 -c "
+import json,sys
+name=sys.argv[1]
+for _, devices in json.load(sys.stdin)['devices'].items():
+    for d in devices:
+        if d['name'] == name and d.get('isAvailable', True):
+            print('%s|%s' % (d['udid'], d.get('state', ''))); sys.exit(0)
+" "$GOLDEN_NAME" || true)
+    if [ -n "$GOLDEN" ]; then
+      GOLDEN_UDID="${GOLDEN%|*}"; GOLDEN_STATE="${GOLDEN#*|}"
+      STAMP_TYPE=$(grep '^device-type=' "$GOLDEN_DIR/stamp" 2>/dev/null | cut -d= -f2- || true)
+      STAMP_RUNTIME=$(grep '^runtime=' "$GOLDEN_DIR/stamp" 2>/dev/null | cut -d= -f2- || true)
+      if [ ! -f "$GOLDEN_DIR/stamp" ]; then
+        echo "note: golden $GOLDEN_NAME has no stamp (not blessed by bless-golden.sh); creating a blank device" >&2
+      elif [ "$GOLDEN_STATE" != "Shutdown" ]; then
+        echo "note: golden $GOLDEN_NAME is $GOLDEN_STATE, clone needs Shutdown; creating a blank device" >&2
+      elif [ "$DEVICE_TYPE" != "$STAMP_TYPE" ]; then
+        # A clone inherits the golden's hardware; shipping a pair shot on a
+        # silently different device type would make the demo dishonest.
+        echo "note: golden $GOLDEN_NAME is a '$STAMP_TYPE', requested '$DEVICE_TYPE'; creating a blank device" >&2
+      elif [ -n "$RUNTIME" ] && [ "$RUNTIME" != "$STAMP_RUNTIME" ]; then
+        echo "note: golden $GOLDEN_NAME runs '$STAMP_RUNTIME', requested '$RUNTIME'; creating a blank device" >&2
+      else
+        # Under the golden lock: a concurrent re-bless swaps the golden device
+        # mid-flight. If the clone still fails, fall through to a blank create.
+        UDID=$("$(dirname "${BASH_SOURCE[0]}")/with-lock.sh" golden 300 \
+          xcrun simctl clone "$GOLDEN_UDID" "$SIM_NAME" 2>/dev/null || true)
+        if [ -n "$UDID" ]; then
+          echo "cloned-from-golden" > "$SESSION_DIR/origin"
+          echo "$GOLDEN_NAME" > "$SESSION_DIR/golden-source"
+          cp "$GOLDEN_DIR/stamp" "$SESSION_DIR/golden-stamp" 2>/dev/null || true
+          echo "$STAMP_TYPE" > "$SESSION_DIR/device-type"
+          echo "${STAMP_RUNTIME:-default}" > "$SESSION_DIR/runtime"
+        else
+          echo "note: cloning golden $GOLDEN_NAME failed; creating a blank device" >&2
+        fi
+      fi
+    fi
+  fi
+fi
+
 if [ -z "$UDID" ]; then
   if [ -z "$RUNTIME" ]; then
     RUNTIME_ID=$(xcrun simctl list runtimes -j \
@@ -112,6 +177,10 @@ sys.exit('runtime not available: ' + name)
   fi
   UDID=$(xcrun simctl create "$SIM_NAME" "$DEVICE_TYPE" "$RUNTIME_ID")
   echo "created" > "$SESSION_DIR/origin"
+  # Recorded so bless-golden.sh can stamp what hardware the golden actually is,
+  # which is what lets a later claim refuse a device-type-mismatched clone.
+  echo "$DEVICE_TYPE" > "$SESSION_DIR/device-type"
+  echo "${RUNTIME:-default}" > "$SESSION_DIR/runtime"
 fi
 
 echo "$UDID" > "$SESSION_DIR/udid"
@@ -137,3 +206,32 @@ export DEMO_PORT=$PORT
 export DEMO_SESSION_DIR="$SESSION_DIR"
 # Devices booted before this session: $PREFLIGHT_COUNT (recorded for the release check)
 EOF
+
+# Stamp comments (sha/date/device-type) let the agent judge whether the golden's
+# native build is stale before trusting the cloned install - see SKILL.md.
+if [ -f "$SESSION_DIR/golden-stamp" ]; then
+  echo "# golden: this device is a clone of $(cat "$SESSION_DIR/golden-source" 2>/dev/null || echo "the golden sim")"
+  sed 's/^/# golden /' "$SESSION_DIR/golden-stamp"
+  # Instant staleness verdict when the cwd is an app worktree: hash comparison
+  # against the blessed Podfile.lock instead of git archaeology. A wrong guess
+  # here used to cost a ~14 min rebuild discovered as a crash at launch.
+  RECORDED_LOCK=$(grep '^podfile-lock-hash=' "$SESSION_DIR/golden-stamp" 2>/dev/null | cut -d= -f2- || true)
+  if [ -n "$RECORDED_LOCK" ] && [ -f "ios/Podfile.lock" ]; then
+    CURRENT_LOCK=$(shasum -a 256 ios/Podfile.lock | cut -d' ' -f1)
+    if [ "$CURRENT_LOCK" = "$RECORDED_LOCK" ]; then
+      echo "# golden verdict: native build matches this worktree's ios/Podfile.lock"
+    else
+      echo "# golden verdict: NATIVE BUILD STALE - ios/Podfile.lock changed since the bless; install a fresh build onto this clone, or re-bless the golden"
+    fi
+  fi
+fi
+
+# Fail-fast credential report: flows that need a real account (a staging login
+# for the golden, an OTP) dead-end mid-session when a credential is absent.
+# Naming the gap at claim time lets the agent plan the stub-harness route up
+# front instead of discovering the wall forty minutes in. Repo-specific names
+# come from DEMO_REQUIRED_ENV (see AGENTS.md); this never blocks the claim -
+# plenty of demos need no account at all.
+if [ -n "$MISSING_CREDS" ]; then
+  echo "# note: missing credentials: $MISSING_CREDS - real-account flows are unavailable this session; plan the stub-harness route now, not mid-flow"
+fi
