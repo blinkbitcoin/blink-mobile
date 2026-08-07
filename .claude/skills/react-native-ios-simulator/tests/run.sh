@@ -363,6 +363,124 @@ check "reset without a port writes no defaults" "no" \
 "$SCRIPTS/release-session.sh" 622 --delete >/dev/null 2>&1
 
 echo
+echo "golden simulator (bless + clone)"
+
+# One world for the whole section: a golden is long-lived state by design.
+reset_world
+eval "$("$SCRIPTS/claim-session.sh" 700)" >/dev/null 2>&1
+BLESS_UDID="$DEMO_UDID"; BLESS_PORT="$DEMO_PORT"
+mkdir -p "$FAKE_APP_ROOT/$BLESS_UDID"
+cp -R "$APP_SRC" "$FAKE_APP_ROOT/$BLESS_UDID/com.example.demoapp.app"
+"$SCRIPTS/bless-golden.sh" 700 --sha abc123 >/dev/null 2>&1
+check "bless exits zero" "0" "$?"
+check "the blessed device carries the golden name" "rn-demo-golden" \
+  "$(awk -F'|' -v u="$BLESS_UDID" '$1==u {print $2}' "$FAKE_DEVICES")"
+check "the golden is left shutdown (clone requires it)" "Shutdown" \
+  "$(device_state "$BLESS_UDID")"
+GOLDEN_STAMP="$DEMO_SIM_REGISTRY/golden/rn-demo-golden/stamp"
+check "the stamp records the build sha" "yes" \
+  "$(grep -q '^sha=abc123' "$GOLDEN_STAMP" && echo yes || echo no)"
+check "the stamp records the device type" "yes" \
+  "$(grep -q '^device-type=iPhone 16 Pro' "$GOLDEN_STAMP" && echo yes || echo no)"
+check "bless adopts the session - a later release finds nothing" "1" \
+  "$("$SCRIPTS/release-session.sh" 700 >/dev/null 2>&1; echo $?)"
+check "bless freed the session's port" "absent" \
+  "$([ -d "$DEMO_SIM_REGISTRY/ports/$BLESS_PORT" ] && echo present || echo absent)"
+
+# --- claim clones the golden instead of creating blank -----------------------
+out=$("$SCRIPTS/claim-session.sh" 701) && eval "$out"
+check "claim clones the golden's udid" "yes" \
+  "$(grep -q "clone $BLESS_UDID rn-demo-pr701" "$FAKE_ARGS_LOG" && echo yes || echo no)"
+check "the clone is named for the PR like any other session device" "Booted" \
+  "$(device_state "$DEMO_UDID")"
+check "the clone carries the golden's app container" "present" \
+  "$([ -d "$FAKE_APP_ROOT/$DEMO_UDID/com.example.demoapp.app" ] && echo present || echo absent)"
+check "claim output surfaces the golden stamp for staleness judgment" "yes" \
+  "$(echo "$out" | grep -q "sha=abc123" && echo yes || echo no)"
+"$SCRIPTS/release-session.sh" 701 --delete >/dev/null 2>&1
+check "a cloned session releases cleanly" "0" "$?"
+check "releasing the clone leaves the golden alone" "Shutdown" \
+  "$(device_state "$BLESS_UDID")"
+
+# --- the Metro redirect is persisted on clones too ---------------------------
+: > "$FAKE_ARGS_LOG"
+eval "$(DEMO_APP_ID_IOS=com.example.demoapp "$SCRIPTS/claim-session.sh" 702)" >/dev/null 2>&1
+check "a cloned claim still persists the Metro redirect" "yes" \
+  "$(grep -q "spawn $DEMO_UDID defaults write com.example.demoapp RCT_jsLocation localhost:$DEMO_PORT" "$FAKE_ARGS_LOG" && echo yes || echo no)"
+"$SCRIPTS/release-session.sh" 702 --delete >/dev/null 2>&1
+
+# --- every ineligibility falls back to a blank create ------------------------
+# The fake's clone verb errors on a booted source, so this cannot pass against
+# a clone that "succeeded" anyway.
+xcrun simctl boot "$BLESS_UDID"
+eval "$("$SCRIPTS/claim-session.sh" 703)" >/dev/null 2>&1
+check "a booted golden falls back to create" "created" \
+  "$(cat "$DEMO_SIM_REGISTRY/rn-demo-pr703/origin")"
+"$SCRIPTS/release-session.sh" 703 --delete >/dev/null 2>&1
+xcrun simctl shutdown "$BLESS_UDID"
+
+eval "$("$SCRIPTS/claim-session.sh" 704 "iPhone SE (3rd generation)")" >/dev/null 2>&1
+check "a device-type mismatch falls back to create (a clone would lie about hardware)" "created" \
+  "$(cat "$DEMO_SIM_REGISTRY/rn-demo-pr704/origin")"
+"$SCRIPTS/release-session.sh" 704 --delete >/dev/null 2>&1
+
+eval "$("$SCRIPTS/claim-session.sh" 705 "iPhone 16 Pro" "iOS 18.6")" >/dev/null 2>&1
+check "an explicit runtime mismatch falls back to create" "created" \
+  "$(cat "$DEMO_SIM_REGISTRY/rn-demo-pr705/origin")"
+"$SCRIPTS/release-session.sh" 705 --delete >/dev/null 2>&1
+
+eval "$(DEMO_SIM_GOLDEN=none "$SCRIPTS/claim-session.sh" 706)" >/dev/null 2>&1
+check "DEMO_SIM_GOLDEN=none disables cloning" "created" \
+  "$(cat "$DEMO_SIM_REGISTRY/rn-demo-pr706/origin")"
+"$SCRIPTS/release-session.sh" 706 --delete >/dev/null 2>&1
+
+# --- the reaper never touches the golden -------------------------------------
+# Including via a hostile session manifest pointing at the golden's udid: the
+# reaper's name gate must hold for the golden exactly as for the user's sim.
+eval "$("$SCRIPTS/claim-session.sh" 707)" >/dev/null 2>&1
+"$SCRIPTS/release-session.sh" 707 >/dev/null 2>&1
+echo 1 > "$DEMO_SIM_REGISTRY/rn-demo-pr707/released-at"
+echo "$BLESS_UDID" > "$DEMO_SIM_REGISTRY/rn-demo-pr707/udid"
+"$SCRIPTS/reap-stale.sh" >/dev/null 2>&1
+check "the reaper refuses a manifest pointing at the golden" "Shutdown" \
+  "$(device_state "$BLESS_UDID")"
+rm -rf "$DEMO_SIM_REGISTRY/rn-demo-pr707"
+
+# --- re-bless swaps atomically: exactly one golden survives ------------------
+out=$("$SCRIPTS/claim-session.sh" 708) && eval "$out"
+NEW_UDID="$DEMO_UDID"
+"$SCRIPTS/bless-golden.sh" 708 --sha def456 >/dev/null 2>&1
+check "re-bless exits zero" "0" "$?"
+check "exactly one device carries the golden name after a re-bless" "1" \
+  "$(awk -F'|' '$2=="rn-demo-golden"' "$FAKE_DEVICES" | wc -l | tr -d ' ')"
+check "the new device is the golden now" "rn-demo-golden" \
+  "$(awk -F'|' -v u="$NEW_UDID" '$1==u {print $2}' "$FAKE_DEVICES")"
+check "the retired golden is deleted, not orphaned" "" \
+  "$(device_state "$BLESS_UDID")"
+check "the stamp now describes the new golden" "yes" \
+  "$(grep -q '^sha=def456' "$GOLDEN_STAMP" && echo yes || echo no)"
+
+# --- bless safety gates ------------------------------------------------------
+reset_world
+eval "$("$SCRIPTS/claim-session.sh" 710)" >/dev/null 2>&1
+echo "OTHER-AGENT" > "$DEMO_SESSION_DIR/udid"      # manifest points at someone else
+"$SCRIPTS/bless-golden.sh" 710 >/dev/null 2>&1
+check "bless refuses a device not named for the session" "1" "$?"
+check "the foreign device survives the refused bless" "Booted" \
+  "$(device_state OTHER-AGENT)"
+rm -rf "$DEMO_SIM_REGISTRY/rn-demo-pr710"
+
+"$SCRIPTS/bless-golden.sh" 9999 >/dev/null 2>&1
+check "bless without a claimed session fails loudly" "1" "$?"
+
+# The golden race window (a clone of a golden being swapped mid-bless) is
+# closed by the shared lock; these go red if either side sheds it.
+check "claim's clone step runs under the golden lock" "yes" \
+  "$(grep -q 'with-lock.sh" golden' "$SCRIPTS/claim-session.sh" && echo yes || echo no)"
+check "bless's swap runs under the golden lock" "yes" \
+  "$(grep -q 'with-lock.sh" golden' "$SCRIPTS/bless-golden.sh" && echo yes || echo no)"
+
+echo
 echo "shared metro transform cache (metro-demo.config.js)"
 
 DEMO_CFG="$SCRIPTS/metro-demo.config.js"
@@ -499,6 +617,10 @@ echo "documented behavior matches the scripts"
 SKILL_MD="$TESTS_DIR/../SKILL.md"
 check "SKILL.md documents the reload flip" "yes" \
   "$(grep -q "reload-app.sh" "$SKILL_MD" && echo yes || echo no)"
+check "SKILL.md documents the golden bless workflow" "yes" \
+  "$(grep -q "bless-golden.sh" "$SKILL_MD" && echo yes || echo no)"
+check "SKILL.md ties golden staleness to the stamp sha" "yes" \
+  "$(grep -qi "stamp" "$SKILL_MD" && grep -q "origin/main -- ios/" "$SKILL_MD" && echo yes || echo no)"
 check "SKILL.md step 4 starts Metro with the demo cache config" "yes" \
   "$(grep -q "metro-demo.config.js" "$SKILL_MD" && echo yes || echo no)"
 check "SKILL.md forbids --reset-cache against the shared store" "yes" \

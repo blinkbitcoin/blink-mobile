@@ -91,6 +91,59 @@ for runtime, devices in json.load(sys.stdin)['devices'].items():
             print(d['udid']); sys.exit(0)
 " "$SIM_NAME" || true)
 
+# --- Golden clone fast path --------------------------------------------------
+# A blessed "golden" simulator (app installed, account logged in - see
+# bless-golden.sh) turns device setup from install + login minutes into a
+# seconds-long clone. The clone never mutates the golden, and the new device is
+# named for this PR like any other, so every ownership guard works unchanged.
+# Any ineligibility falls through to a blank create with a note - a demo on the
+# wrong device type or a booted golden must never be silent.
+if [ -z "$UDID" ]; then
+  GOLDEN_NAME="${DEMO_SIM_GOLDEN:-${DEMO_SIM_PREFIX:-rn-demo}-golden}"
+  GOLDEN_DIR="$REGISTRY/golden/$GOLDEN_NAME"
+  if [ "$GOLDEN_NAME" != "none" ]; then
+    GOLDEN=$(xcrun simctl list devices -j \
+      | python3 -c "
+import json,sys
+name=sys.argv[1]
+for _, devices in json.load(sys.stdin)['devices'].items():
+    for d in devices:
+        if d['name'] == name and d.get('isAvailable', True):
+            print('%s|%s' % (d['udid'], d.get('state', ''))); sys.exit(0)
+" "$GOLDEN_NAME" || true)
+    if [ -n "$GOLDEN" ]; then
+      GOLDEN_UDID="${GOLDEN%|*}"; GOLDEN_STATE="${GOLDEN#*|}"
+      STAMP_TYPE=$(grep '^device-type=' "$GOLDEN_DIR/stamp" 2>/dev/null | cut -d= -f2- || true)
+      STAMP_RUNTIME=$(grep '^runtime=' "$GOLDEN_DIR/stamp" 2>/dev/null | cut -d= -f2- || true)
+      if [ ! -f "$GOLDEN_DIR/stamp" ]; then
+        echo "note: golden $GOLDEN_NAME has no stamp (not blessed by bless-golden.sh); creating a blank device" >&2
+      elif [ "$GOLDEN_STATE" != "Shutdown" ]; then
+        echo "note: golden $GOLDEN_NAME is $GOLDEN_STATE, clone needs Shutdown; creating a blank device" >&2
+      elif [ "$DEVICE_TYPE" != "$STAMP_TYPE" ]; then
+        # A clone inherits the golden's hardware; shipping a pair shot on a
+        # silently different device type would make the demo dishonest.
+        echo "note: golden $GOLDEN_NAME is a '$STAMP_TYPE', requested '$DEVICE_TYPE'; creating a blank device" >&2
+      elif [ -n "$RUNTIME" ] && [ "$RUNTIME" != "$STAMP_RUNTIME" ]; then
+        echo "note: golden $GOLDEN_NAME runs '$STAMP_RUNTIME', requested '$RUNTIME'; creating a blank device" >&2
+      else
+        # Under the golden lock: a concurrent re-bless swaps the golden device
+        # mid-flight. If the clone still fails, fall through to a blank create.
+        UDID=$("$(dirname "${BASH_SOURCE[0]}")/with-lock.sh" golden 300 \
+          xcrun simctl clone "$GOLDEN_UDID" "$SIM_NAME" 2>/dev/null || true)
+        if [ -n "$UDID" ]; then
+          echo "cloned-from-golden" > "$SESSION_DIR/origin"
+          echo "$GOLDEN_NAME" > "$SESSION_DIR/golden-source"
+          cp "$GOLDEN_DIR/stamp" "$SESSION_DIR/golden-stamp" 2>/dev/null || true
+          echo "$STAMP_TYPE" > "$SESSION_DIR/device-type"
+          echo "${STAMP_RUNTIME:-default}" > "$SESSION_DIR/runtime"
+        else
+          echo "note: cloning golden $GOLDEN_NAME failed; creating a blank device" >&2
+        fi
+      fi
+    fi
+  fi
+fi
+
 if [ -z "$UDID" ]; then
   if [ -z "$RUNTIME" ]; then
     RUNTIME_ID=$(xcrun simctl list runtimes -j \
@@ -112,6 +165,10 @@ sys.exit('runtime not available: ' + name)
   fi
   UDID=$(xcrun simctl create "$SIM_NAME" "$DEVICE_TYPE" "$RUNTIME_ID")
   echo "created" > "$SESSION_DIR/origin"
+  # Recorded so bless-golden.sh can stamp what hardware the golden actually is,
+  # which is what lets a later claim refuse a device-type-mismatched clone.
+  echo "$DEVICE_TYPE" > "$SESSION_DIR/device-type"
+  echo "${RUNTIME:-default}" > "$SESSION_DIR/runtime"
 fi
 
 echo "$UDID" > "$SESSION_DIR/udid"
@@ -137,3 +194,10 @@ export DEMO_PORT=$PORT
 export DEMO_SESSION_DIR="$SESSION_DIR"
 # Devices booted before this session: $PREFLIGHT_COUNT (recorded for the release check)
 EOF
+
+# Stamp comments (sha/date/device-type) let the agent judge whether the golden's
+# native build is stale before trusting the cloned install - see SKILL.md.
+if [ -f "$SESSION_DIR/golden-stamp" ]; then
+  echo "# golden: this device is a clone of $(cat "$SESSION_DIR/golden-source" 2>/dev/null || echo "the golden sim")"
+  sed 's/^/# golden /' "$SESSION_DIR/golden-stamp"
+fi
