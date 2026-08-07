@@ -45,5 +45,8 @@ jobs:
           path: node_modules
           key: node-modules-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
       - run: yarn install --frozen-lockfile
-      - run: cd android && ./gradlew :app:testDebugUnitTest
+      # Caches ~/.gradle/caches and the wrapper between runs.
+      - uses: gradle/actions/setup-gradle@v4
+      - run: ./gradlew :app:testDebugUnitTest
+        working-directory: android
         timeout-minutes: 30
