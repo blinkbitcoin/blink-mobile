@@ -32,7 +32,7 @@ export const VersionComponent = () => {
   const detectedCountry = useIpCountryCode(true) ?? LL.common.unknown()
   const [secretMenuCounter, setSecretMenuCounter] = React.useState(0)
   React.useEffect(() => {
-    if (secretMenuCounter > 2) {
+    if (__DEV__ && secretMenuCounter > 2) {
       navigate("developerScreen")
       setSecretMenuCounter(0)
     }
