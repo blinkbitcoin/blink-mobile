@@ -192,13 +192,6 @@ export const useRecoveryBundleActions = (): RecoveryBundleActions => {
       // (ShareIntent.java) but missing from the lib's ShareOptions type.
       // Android writes data: URLs to a file before sharing; keep the
       // unencrypted bundle out of world-readable external cache storage.
-      const markExported = async () => {
-        if (!accountId) return
-        /** Recorded only after the sheet resolves, so a cancelled share does
-         *  not count as the user having a copy. */
-        await persistSettings({ ...settings, exportedAt: Date.now() }).catch(() => {})
-      }
-
       const options: ShareOptions & { useInternalStorage: boolean } = {
         title: "blink-recovery-bundle",
         filename: `blink-recovery-bundle-${networkLabelFor(network)}.json`,
@@ -207,7 +200,9 @@ export const useRecoveryBundleActions = (): RecoveryBundleActions => {
         useInternalStorage: true,
       }
       await Share.open(options)
-      await markExported()
+      // Recorded only after the sheet resolves, so a cancelled share does not
+      // count as the user having a copy.
+      await persistSettings({ ...settings, exportedAt: Date.now() }).catch(() => {})
       return true
     } catch (err) {
       /** Dismissing the sheet is a choice, not a failure, so it stays silent -

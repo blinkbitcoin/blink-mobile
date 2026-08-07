@@ -1,9 +1,9 @@
-import { renderHook, waitFor } from "@testing-library/react-native"
+import { renderHook, waitFor, act } from "@testing-library/react-native"
 
 import {
   RecoveryBackupNudgeVariant,
   useRecoveryBackupNudge,
-} from "@app/hooks/use-recovery-backup-nudge"
+} from "@app/self-custodial/hooks/use-recovery-backup-nudge"
 import { RecoveryBundleStatus } from "@app/self-custodial/hooks/use-recovery-bundle-status"
 
 // Matches the convention in use-backup-nudge-state.spec: a bare functional
@@ -204,6 +204,92 @@ describe("useRecoveryBackupNudge", () => {
       })
       const { result } = renderNudge(true)
       await waitFor(() => expect(result.current.variant).toBeNull())
+    })
+  })
+
+  it("still decides when the dismissal record cannot be read", async () => {
+    // An unreadable dismissal must not strand the banner in limbo: treat it as
+    // never dismissed and show the warning.
+    mockGetItem.mockRejectedValue(new Error("storage unavailable"))
+    mockStatus.mockReturnValue({
+      status: RecoveryBundleStatus.Stale,
+      savedAt: SAVED_AT,
+      leafCount: 3,
+      isOnlyOnThisDevice: false,
+    })
+    const { result } = renderNudge(true)
+    await waitFor(() =>
+      expect(result.current.variant).toBe(RecoveryBackupNudgeVariant.Stale),
+    )
+  })
+
+  it("ignores a corrupt dismissal value", async () => {
+    mockGetItem.mockResolvedValue("not-a-timestamp")
+    mockStatus.mockReturnValue({
+      status: RecoveryBundleStatus.Stale,
+      savedAt: SAVED_AT,
+      leafCount: 3,
+      isOnlyOnThisDevice: false,
+    })
+    const { result } = renderNudge(true)
+    await waitFor(() =>
+      expect(result.current.variant).toBe(RecoveryBackupNudgeVariant.Stale),
+    )
+  })
+
+  describe("reading and writing the dismissal", () => {
+    it("does not set state after the screen is gone", async () => {
+      // The read outlives a quick navigation away; writing into an unmounted
+      // hook is a warning at best and a leak at worst.
+      let releaseRead: (value: string | null) => void = () => {}
+      mockGetItem.mockReturnValue(
+        new Promise((resolve) => {
+          releaseRead = resolve
+        }),
+      )
+      const { unmount } = renderNudge(true)
+
+      unmount()
+      await act(async () => {
+        releaseRead(String(SAVED_AT))
+      })
+      // No act() warning and no throw is the assertion; reaching here means the
+      // late resolution was ignored.
+      expect(mockGetItem).toHaveBeenCalledTimes(1)
+    })
+
+    it("still hides the banner when the dismissal cannot be written", async () => {
+      // Storage failing is not a reason to keep showing a banner the user just
+      // dismissed; it only means it comes back next launch.
+      mockSetItem.mockRejectedValue(new Error("disk full"))
+      mockStatus.mockReturnValue({
+        status: RecoveryBundleStatus.Stale,
+        savedAt: SAVED_AT,
+        leafCount: 3,
+        isOnlyOnThisDevice: false,
+      })
+      const { result } = renderNudge(true)
+      await waitFor(() =>
+        expect(result.current.variant).toBe(RecoveryBackupNudgeVariant.Stale),
+      )
+
+      await act(async () => {
+        result.current.dismiss()
+      })
+
+      expect(result.current.variant).toBeNull()
+    })
+
+    it("ignores dismissal without an account", async () => {
+      mockAccount.mockReturnValue(null)
+      const { result } = renderNudge(true)
+      await waitFor(() => expect(result.current.variant).toBeNull())
+
+      await act(async () => {
+        result.current.dismiss()
+      })
+
+      expect(mockSetItem).not.toHaveBeenCalled()
     })
   })
 })
