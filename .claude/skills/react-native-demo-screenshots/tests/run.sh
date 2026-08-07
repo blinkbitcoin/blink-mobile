@@ -247,6 +247,54 @@ check "SKILL.md rejects a simulator per side, with the honesty rationale" "yes" 
   "$(grep -qi "simulator per side" "$SKILL_MD" && echo yes || echo no)"
 
 echo
+echo "bench (hermetic: counts first, loose clocks second)"
+
+# Policy: counted assertions catch loop-shaped regressions deterministically;
+# lower bounds prove waits exist and cannot flake on a slow machine; upper
+# bounds sit at >=5x locally measured (2s floor) and only catch runaway
+# sleeps. python3 is warmed once so no timed section pays interpreter start.
+python3 -c 'pass' 2>/dev/null
+py_now() { python3 -c 'import time; print("%.3f" % time.time())'; }
+
+# --- counted -----------------------------------------------------------------
+reset
+FAKE_FRAMES="red red" DEMO_UDID=DEMO-UDID \
+  "$SCRIPTS/capture.sh" bench2 "$WORK/shots" >/dev/null 2>&1
+check "a two-frame settle shoots exactly 2 frames" "2" \
+  "$(grep -c "screenshot udid=" "$FAKE_ARGS_LOG")"
+
+# --- lower bound: the settle sleep exists ------------------------------------
+reset
+SHOT_SETTLE=0.5 FAKE_FRAMES="red red" DEMO_UDID=DEMO-UDID \
+  "$SCRIPTS/capture.sh" bench-gap "$WORK/shots" >/dev/null 2>&1
+GAP=$(grep "screenshot udid=" "$FAKE_ARGS_LOG" | sed 's/.*t=//' | python3 -c '
+import sys
+ts = [float(l) for l in sys.stdin if l.strip()]
+print("%.3f" % (ts[1] - ts[0]) if len(ts) >= 2 else "nan")')
+check "the inter-shot gap honors the settle time (>=0.4s)" "yes" \
+  "$(python3 -c "print('yes' if float('$GAP') >= 0.4 else 'no ($GAP s)')" 2>/dev/null)"
+
+# --- upper bound: measured ~0.9s with fakes; 5s only catches runaway sleeps --
+reset
+T0=$(py_now)
+FAKE_FRAMES="red red" DEMO_UDID=DEMO-UDID \
+  "$SCRIPTS/capture.sh" bench-fast "$WORK/shots" >/dev/null 2>&1
+DUR=$(python3 -c "print('%.1f' % (float('$(py_now)') - float('$T0')))")
+check "a two-frame capture stays under the runaway budget (5s)" "yes" \
+  "$(python3 -c "print('yes' if float('$DUR') < 5 else 'no (${DUR}s)')")"
+
+# --- the bench's own mutation check: it must detect a planted regression -----
+# Two 3s-delayed shots put the same measurement well over the 5s budget; if
+# this stays under, the budget assertion above is measuring nothing.
+reset
+T0=$(py_now)
+FAKE_SHOT_DELAY=3 FAKE_FRAMES="red red" DEMO_UDID=DEMO-UDID \
+  "$SCRIPTS/capture.sh" bench-slow "$WORK/shots" >/dev/null 2>&1
+DUR=$(python3 -c "print('%.1f' % (float('$(py_now)') - float('$T0')))")
+check "a planted 3s shot delay is visible to the bench clock" "yes" \
+  "$(python3 -c "print('yes' if float('$DUR') >= 5 else 'no (${DUR}s)')")"
+
+echo
 echo "-------------------------------------"
 printf '%d passed, %d failed\n' "$PASS" "$FAIL"
 [ "$FAIL" -eq 0 ] || exit 1

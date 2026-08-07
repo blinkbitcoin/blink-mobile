@@ -141,7 +141,7 @@ simulated. Caption honestly what was forced.
 ## After Editing the Scripts
 
 ```bash
-"$SHOT/tests/run.sh"     # 52 assertions, ~10s, exits non-zero on failure
+"$SHOT/tests/run.sh"     # 56 assertions, ~15s, exits non-zero on failure
 ```
 
 Fakes `xcrun` and `adb` (writing real PNGs) and uses real ImageMagick, so the
