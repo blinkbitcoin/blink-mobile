@@ -3788,8 +3788,8 @@
     "explainerCta": "Разумем",
     "transferringFunds": "Пребацујемо ваша средства. Требало би да буде готово за неколико секунди.",
     "transferDelayed": {
-      "body": "Your funds are on their way to your new account. This is taking longer than usual — keep the app open and we'll finish up automatically.",
-      "contactSupportCta": "Contact support"
+      "body": "Ваша средства су на путу ка вашем новом налогу. Траје дуже него обично — држите апликацију отвореном и аутоматски ћемо завршити.",
+      "contactSupportCta": "Контактирајте подршку"
     },
     "clockOutOfSync": {
       "body": "Датум и време вашег уређаја нису усклађени. Подесите их на аутоматски да бисте наставили.",

@@ -3788,8 +3788,8 @@
     "explainerCta": "Rozumiem",
     "transferringFunds": "Prevádzame vaše prostriedky. Malo by to byť hotové za niekoľko sekúnd.",
     "transferDelayed": {
-      "body": "Your funds are on their way to your new account. This is taking longer than usual — keep the app open and we'll finish up automatically.",
-      "contactSupportCta": "Contact support"
+      "body": "Vaše prostriedky sú na ceste do vášho nového účtu. Trvá to dlhšie než zvyčajne — nechajte aplikáciu otvorenú a dokončíme to automaticky.",
+      "contactSupportCta": "Kontaktovať podporu"
     },
     "clockOutOfSync": {
       "body": "Dátum a čas vášho zariadenia nie sú synchronizované. Nastavte ich na automatické, aby ste mohli pokračovať.",

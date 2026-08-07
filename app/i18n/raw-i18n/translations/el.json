@@ -3788,8 +3788,8 @@
     "explainerCta": "Καταλαβαίνω",
     "transferringFunds": "Μεταφορά των κεφαλαίων σας. Θα ολοκληρωθεί σε λίγα δευτερόλεπτα.",
     "transferDelayed": {
-      "body": "Your funds are on their way to your new account. This is taking longer than usual — keep the app open and we'll finish up automatically.",
-      "contactSupportCta": "Contact support"
+      "body": "Τα κεφάλαιά σας βρίσκονται καθ' οδόν προς τον νέο σας λογαριασμό. Διαρκεί περισσότερο από το συνηθισμένο — κρατήστε την εφαρμογή ανοιχτή και θα ολοκληρώσουμε αυτόματα.",
+      "contactSupportCta": "Επικοινωνία με την υποστήριξη"
     },
     "clockOutOfSync": {
       "body": "Η ημερομηνία και η ώρα της συσκευής σου δεν είναι συγχρονισμένες. Ρύθμισέ τες σε αυτόματες για να συνεχίσεις.",

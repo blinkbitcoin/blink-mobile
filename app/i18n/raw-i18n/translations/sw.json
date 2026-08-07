@@ -3788,8 +3788,8 @@
     "explainerCta": "Naelewa",
     "transferringFunds": "Tunahamisha fedha zako. Inapaswa kukamilika ndani ya sekunde chache.",
     "transferDelayed": {
-      "body": "Your funds are on their way to your new account. This is taking longer than usual — keep the app open and we'll finish up automatically.",
-      "contactSupportCta": "Contact support"
+      "body": "Fedha zako ziko njiani kuelekea kwenye akaunti yako mpya. Inachukua muda mrefu kuliko kawaida — acha programu ikiwa wazi na tutakamilisha kiotomatiki.",
+      "contactSupportCta": "Wasiliana na usaidizi"
     },
     "clockOutOfSync": {
       "body": "Tarehe na saa za kifaa chako hazijaoanishwa. Ziweke kwa kiotomatiki ili kuendelea.",

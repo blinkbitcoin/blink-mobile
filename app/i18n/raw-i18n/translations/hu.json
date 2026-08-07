@@ -3788,8 +3788,8 @@
     "explainerCta": "Megértettem",
     "transferringFunds": "Átutalás folyamatban. Néhány másodperc alatt befejeződik.",
     "transferDelayed": {
-      "body": "Your funds are on their way to your new account. This is taking longer than usual — keep the app open and we'll finish up automatically.",
-      "contactSupportCta": "Contact support"
+      "body": "A pénzed úton van az új számládra. A szokásosnál tovább tart — hagyd nyitva az alkalmazást, és automatikusan befejezzük.",
+      "contactSupportCta": "Kapcsolatfelvétel az ügyfélszolgálattal"
     },
     "clockOutOfSync": {
       "body": "Az eszközöd dátuma és ideje nincs szinkronban. Állítsd automatikusra a folytatáshoz.",

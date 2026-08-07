@@ -3788,8 +3788,8 @@
     "explainerCta": "Ndiyaqonda",
     "transferringFunds": "Sidlulisela imali yakho. Kufanele kugqitywe ngomzuzwana nje.",
     "transferDelayed": {
-      "body": "Your funds are on their way to your new account. This is taking longer than usual — keep the app open and we'll finish up automatically.",
-      "contactSupportCta": "Contact support"
+      "body": "Imali yakho isendleleni eya kwiakhawunti yakho entsha. Kuthatha ixesha elide kunesiqhelo — gcina i-app ivulekile, siza kugqibezela ngokuzenzekelayo.",
+      "contactSupportCta": "Qhagamshelana nenkxaso"
     },
     "clockOutOfSync": {
       "body": "Umhla nexesha lesixhobo sakho azihambelani. Zimisele ukuba zizenzekele ukuze uqhubeke.",

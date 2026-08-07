@@ -3788,8 +3788,8 @@
     "explainerCta": "فهمت",
     "transferringFunds": "جارٍ تحويل أموالك. سيتم الانتهاء في غضون ثوانٍ قليلة.",
     "transferDelayed": {
-      "body": "Your funds are on their way to your new account. This is taking longer than usual — keep the app open and we'll finish up automatically.",
-      "contactSupportCta": "Contact support"
+      "body": "أموالك في طريقها إلى حسابك الجديد. يستغرق الأمر وقتًا أطول من المعتاد — أبقِ التطبيق مفتوحًا وسننهي العملية تلقائيًا.",
+      "contactSupportCta": "التواصل مع الدعم"
     },
     "clockOutOfSync": {
       "body": "تاريخ ووقت جهازك غير متزامنين. اضبطهما على الوضع التلقائي للمتابعة.",

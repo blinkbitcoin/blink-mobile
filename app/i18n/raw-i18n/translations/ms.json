@@ -3788,8 +3788,8 @@
     "explainerCta": "Saya faham",
     "transferringFunds": "Memindahkan dana anda. Ia sepatutnya siap dalam beberapa saat.",
     "transferDelayed": {
-      "body": "Your funds are on their way to your new account. This is taking longer than usual — keep the app open and we'll finish up automatically.",
-      "contactSupportCta": "Contact support"
+      "body": "Dana anda sedang dalam perjalanan ke akaun baharu anda. Ia mengambil masa lebih lama daripada biasa — biarkan aplikasi terbuka dan kami akan menyelesaikannya secara automatik.",
+      "contactSupportCta": "Hubungi sokongan"
     },
     "clockOutOfSync": {
       "body": "Tarikh dan masa peranti anda tidak segerak. Tetapkan kepada automatik untuk meneruskan.",

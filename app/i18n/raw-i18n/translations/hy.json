@@ -3788,8 +3788,8 @@
     "explainerCta": "Հասկանում եմ",
     "transferringFunds": "Ձեր միջոցները փոխանցվում են։ Դա պետք է ավարտվի մի քանի վայրկյանի ընթացքում։",
     "transferDelayed": {
-      "body": "Your funds are on their way to your new account. This is taking longer than usual — keep the app open and we'll finish up automatically.",
-      "contactSupportCta": "Contact support"
+      "body": "Ձեր միջոցները ձեր նոր հաշվի ճանապարհին են։ Դա տևում է սովորականից երկար — պահեք հավելվածը բաց, և մենք ավտոմատ կավարտենք։",
+      "contactSupportCta": "Կապվել աջակցության հետ"
     },
     "clockOutOfSync": {
       "body": "Ձեր սարքի ամսաթիվն ու ժամը համաժամացված չեն։ Դրանք ավտոմատ դարձրեք՝ շարունակելու համար։",

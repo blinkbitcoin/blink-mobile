@@ -3788,8 +3788,8 @@
     "explainerCta": "Jeg forstår",
     "transferringFunds": "Overfører dine midler. Det skulle være færdigt om få sekunder.",
     "transferDelayed": {
-      "body": "Your funds are on their way to your new account. This is taking longer than usual — keep the app open and we'll finish up automatically.",
-      "contactSupportCta": "Contact support"
+      "body": "Dine midler er på vej til din nye konto. Det tager længere tid end normalt — hold appen åben, så afslutter vi automatisk.",
+      "contactSupportCta": "Kontakt support"
     },
     "clockOutOfSync": {
       "body": "Din enheds dato og klokkeslæt er ude af synkronisering. Indstil dem til automatisk for at fortsætte.",
