@@ -10,6 +10,18 @@ export type AccountMigrationPreview = {
   receiveSats: number
 }
 
+/** The backend rejection codes the migration reads off a mutation payload: a server
+ *  contract rather than one hook's detail, so a rename lands in a single place. */
+export const MigrationRejectionCode = {
+  /** Refused while a transfer is still draining. Transient by contract. */
+  StateConflict: "MIGRATION_STATE_CONFLICT",
+  /** The phone-deletion cap, carrying the server's own contact-support copy. */
+  OperationRestricted: "OPERATION_RESTRICTED",
+} as const
+
+export type MigrationRejectionCode =
+  (typeof MigrationRejectionCode)[keyof typeof MigrationRejectionCode]
+
 /**
  * Why the migration handed the user to support. Deliberately NOT translated: the value is
  * copied out of an email by a human, so it has to stay greppable whatever locale produced

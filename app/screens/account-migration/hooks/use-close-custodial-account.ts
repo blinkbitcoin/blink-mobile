@@ -1,31 +1,43 @@
 import { useCallback } from "react"
 
-import { ApolloError } from "@apollo/client"
-
 import { useAccountDeleteMutation } from "@app/graphql/generated"
 import { isNetworkFailure } from "@app/graphql/is-network-failure"
+import { MigrationRejectionCode } from "@app/types/migration"
 import { reportError } from "@app/utils/error-logging"
-
-/** Refused while a transfer is still draining. Transient by contract. */
-const MIGRATION_STATE_CONFLICT_CODE = "MIGRATION_STATE_CONFLICT"
-
-/** The phone-deletion cap, carrying the server's own contact-support copy. */
-const OPERATION_RESTRICTED_CODE = "OPERATION_RESTRICTED"
+import { toError } from "@app/utils/error-reporting"
 
 const UNAUTHENTICATED_STATUS = 401
 
-const statusCodeOf = (candidate: unknown): number | undefined =>
-  candidate && typeof candidate === "object" && "statusCode" in candidate
-    ? (candidate as { statusCode?: number }).statusCode
+const UNKNOWN_ACCOUNT_ID = "unknown"
+
+const propertyOf = (candidate: unknown, property: string): unknown =>
+  candidate && typeof candidate === "object" && property in candidate
+    ? (candidate as Record<string, unknown>)[property]
     : undefined
 
-/** A 401 on the very call that deletes the account: the token it authenticated with is
- *  already dead, so the deletion landed and only its answer was lost. No later call can
- *  authenticate either, so treating this as retryable would 401 forever. */
-const isTokenDead = (err: unknown): boolean =>
+const statusCodeOf = (candidate: unknown): unknown => propertyOf(candidate, "statusCode")
+
+/** Duck-typed like `isNetworkFailure`, not gated on `instanceof ApolloError`: a second copy
+ *  of @apollo/client makes the instance check false for a real one, and the 401 would then
+ *  fall through to the network branch and earn a retry that can only 401 again. */
+const isUnauthenticated = (err: unknown): boolean =>
   statusCodeOf(err) === UNAUTHENTICATED_STATUS ||
-  (err instanceof ApolloError &&
-    statusCodeOf(err.networkError) === UNAUTHENTICATED_STATUS)
+  statusCodeOf(propertyOf(err, "networkError")) === UNAUTHENTICATED_STATUS
+
+/** `reportError` forwards nothing but the Error's message to Crashlytics, so the label and
+ *  the account id have to travel inside it. The original stack is kept. */
+const reportClose = (
+  label: string,
+  detail: unknown,
+  custodialAccountId: string | null,
+): void => {
+  const error = toError(detail)
+  const report = new Error(
+    `${label}: ${error.message} (accountId: ${custodialAccountId ?? UNKNOWN_ACCOUNT_ID})`,
+  )
+  report.stack = error.stack
+  reportError(label, report)
+}
 
 /** retryable = nothing settled server-side, so the token is still alive and a later attempt
  *  can land; refused = the server settled on no, and replaying only repeats the answer. */
@@ -46,6 +58,9 @@ export type AccountCloseOutcome =
  * classifies the answer and nothing else: what a non-closed outcome costs is the caller's
  * to decide.
  *
+ * Only a successful payload counts as closed: being wrong in that direction leaves a live
+ * custodial account behind an app that reported success, with nobody looking for it.
+ *
  * A refusal is reported with the account id, because that report is the only trace of an
  * account the migration left open and support has to remove by hand.
  */
@@ -65,7 +80,7 @@ export const useCloseCustodialAccount = () => {
         /** Every code is read, not just the first: a conflict behind another error is still
          *  a conflict, and misreading it as terminal would spend the close's one window. */
         const isTransferInFlight = rejections.some(
-          (rejection) => rejection.code === MIGRATION_STATE_CONFLICT_CODE,
+          (rejection) => rejection.code === MigrationRejectionCode.StateConflict,
         )
         if (isTransferInFlight) return AccountCloseOutcome.Retryable
 
@@ -74,38 +89,37 @@ export const useCloseCustodialAccount = () => {
         /** A settled response with no payload is not a refusal: the answer never arrived,
          *  so it earns a retry rather than burning the window on the strength of no answer. */
         if (!rejection) {
-          reportError(
+          reportClose(
             "Migration account close empty payload",
             new Error("accountDelete returned neither success nor an error"),
+            custodialAccountId,
           )
           return AccountCloseOutcome.Retryable
         }
 
         const isDeletionCapped = rejections.some(
-          (candidate) => candidate.code === OPERATION_RESTRICTED_CODE,
+          (candidate) => candidate.code === MigrationRejectionCode.OperationRestricted,
         )
-        const rejectionName = isDeletionCapped
+        const rejectionLabel = isDeletionCapped
           ? "Migration account close capped"
           : "Migration account close rejected"
-        reportError(
-          rejectionName,
-          new Error(
-            `${rejection.message} (accountId: ${custodialAccountId ?? "unknown"})`,
-          ),
-        )
+        reportClose(rejectionLabel, rejection.message, custodialAccountId)
 
         return AccountCloseOutcome.Refused
       } catch (err) {
-        if (isTokenDead(err)) {
-          reportError("Migration account close unacknowledged", err)
-          return AccountCloseOutcome.Closed
+        /** The token was rejected before the mutation ran, so nothing was deleted and no
+         *  later call can authenticate either. Refused, not closed: the transport no longer
+         *  resends this mutation, so a 401 is never the echo of an attempt that landed. */
+        if (isUnauthenticated(err)) {
+          reportClose("Migration account close unauthenticated", err, custodialAccountId)
+          return AccountCloseOutcome.Refused
         }
 
         /** A mutation the network never delivered can still land, so support never hears
          *  about it and the caller keeps its retry. */
         if (isNetworkFailure(err)) return AccountCloseOutcome.Retryable
 
-        reportError("Migration account close failed", err)
+        reportClose("Migration account close failed", err, custodialAccountId)
         return AccountCloseOutcome.Refused
       }
     },

@@ -116,7 +116,8 @@ describe("useCloseCustodialAccount", () => {
     expect(mockReportError).toHaveBeenCalledWith(
       "Migration account close capped",
       expect.objectContaining({
-        message: "reach out to our support team (accountId: custodial-1)",
+        message:
+          "Migration account close capped: reach out to our support team (accountId: custodial-1)",
       }),
     )
   })
@@ -133,7 +134,8 @@ describe("useCloseCustodialAccount", () => {
     expect(mockReportError).toHaveBeenCalledWith(
       "Migration account close rejected",
       expect.objectContaining({
-        message: "account is inactive (accountId: custodial-1)",
+        message:
+          "Migration account close rejected: account is inactive (accountId: custodial-1)",
       }),
     )
   })
@@ -151,7 +153,9 @@ describe("useCloseCustodialAccount", () => {
 
     expect(mockReportError).toHaveBeenCalledWith(
       "Migration account close capped",
-      expect.objectContaining({ message: "capped (accountId: unknown)" }),
+      expect.objectContaining({
+        message: "Migration account close capped: capped (accountId: unknown)",
+      }),
     )
   })
 
@@ -163,7 +167,10 @@ describe("useCloseCustodialAccount", () => {
     expect(await close()).toBe(AccountCloseOutcome.Refused)
     expect(mockReportError).toHaveBeenCalledWith(
       "Migration account close rejected",
-      expect.objectContaining({ message: "something broke (accountId: custodial-1)" }),
+      expect.objectContaining({
+        message:
+          "Migration account close rejected: something broke (accountId: custodial-1)",
+      }),
     )
   })
 
@@ -197,28 +204,50 @@ describe("useCloseCustodialAccount", () => {
     expect(mockReportError).not.toHaveBeenCalled()
   })
 
-  /** The deletion landed and only its answer was lost. No later call can authenticate
-   *  either, so calling this retryable would 401 forever and strand the migration. */
-  it("counts a 401 as closed, because the token it used is already dead", async () => {
+  /** The token was rejected before the mutation ran, so nothing was deleted, and no later
+   *  call can authenticate either. Nothing but a successful payload is proof of a deletion:
+   *  reporting one that never happened leaves a live account nobody is looking for. */
+  it("refuses on a 401 rather than claiming a deletion it has no proof of", async () => {
     mockDeleteAccount.mockRejectedValue(
       new ApolloError({
         networkError: Object.assign(new Error("401"), { statusCode: 401 }),
       }),
     )
 
-    expect(await close()).toBe(AccountCloseOutcome.Closed)
+    expect(await close()).toBe(AccountCloseOutcome.Refused)
     expect(mockReportError).toHaveBeenCalledWith(
-      "Migration account close unacknowledged",
-      expect.any(Error),
+      "Migration account close unauthenticated",
+      expect.objectContaining({
+        message: "Migration account close unauthenticated: 401 (accountId: custodial-1)",
+      }),
     )
   })
 
-  it("counts a bare 401 server error as closed too", async () => {
+  it("names the account on the 401 report, so support can find it", async () => {
     mockDeleteAccount.mockRejectedValue(
       Object.assign(new Error("Unauthorized"), { statusCode: 401 }),
     )
 
-    expect(await close()).toBe(AccountCloseOutcome.Closed)
+    expect(await close()).toBe(AccountCloseOutcome.Refused)
+    expect(mockReportError).toHaveBeenCalledWith(
+      "Migration account close unauthenticated",
+      expect.objectContaining({
+        message:
+          "Migration account close unauthenticated: Unauthorized (accountId: custodial-1)",
+      }),
+    )
+  })
+
+  /** A second @apollo/client copy in the bundle makes `instanceof ApolloError` false for a
+   *  real one; the 401 must not slip into the network branch and earn a doomed retry. */
+  it("reads a 401 off an Apollo-shaped error that fails the instance check", async () => {
+    mockDeleteAccount.mockRejectedValue(
+      Object.assign(new Error("Response not successful"), {
+        networkError: Object.assign(new Error("401"), { statusCode: 401 }),
+      }),
+    )
+
+    expect(await close()).toBe(AccountCloseOutcome.Refused)
   })
 
   /** Only a dead token is conclusive: another status is still a plain network failure. */
@@ -254,6 +283,13 @@ describe("useCloseCustodialAccount", () => {
     mockDeleteAccount.mockRejectedValue(thrown)
 
     expect(await close()).toBe(AccountCloseOutcome.Refused)
-    expect(mockReportError).toHaveBeenCalledWith("Migration account close failed", thrown)
+    expect(mockReportError).toHaveBeenCalledWith(
+      "Migration account close failed",
+      expect.objectContaining({
+        message:
+          "Migration account close failed: apollo blew up (accountId: custodial-1)",
+        stack: thrown.stack,
+      }),
+    )
   })
 })
