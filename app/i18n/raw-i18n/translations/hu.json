@@ -3817,6 +3817,7 @@
     "phraseSubtitleStep2": "Add meg a biztonsági kifejezésed többi szavát",
     "nextWords": "Következő 6 szó",
     "paste": "Beillesztés",
+    "pasteFailed": "Nem sikerült olvasni a vágólapról. Kérjük, add meg a biztonsági kifejezésed kézzel.",
     "enterWord": "Szó",
     "invalidMnemonic": "Érvénytelen biztonsági mentési kifejezés. Kérlek ellenőrizd, hogy a szavak sorrendje helyes-e.",
     "restoring": "Tárca visszaállítása...",

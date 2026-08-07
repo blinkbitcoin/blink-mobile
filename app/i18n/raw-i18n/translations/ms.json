@@ -3817,6 +3817,7 @@
     "phraseSubtitleStep2": "Masukkan baki frasa sandaran anda",
     "nextWords": "6 perkataan seterusnya",
     "paste": "Tampal",
+    "pasteFailed": "Tidak dapat membaca daripada clipboard. Sila masukkan frasa sandaran anda secara manual.",
     "enterWord": "Perkataan",
     "invalidMnemonic": "Frasa sandaran tidak sah. Sila semak sama ada susunan perkataan adalah betul.",
     "restoring": "Memulihkan dompet anda...",

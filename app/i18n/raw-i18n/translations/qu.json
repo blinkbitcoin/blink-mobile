@@ -3817,6 +3817,7 @@
     "phraseSubtitleStep2": "Puchun simikuna qillqay backup frase nisqamanta",
     "nextWords": "Hamuq 6 simikuna",
     "paste": "Taqay",
+    "pasteFailed": "Mana atikunchu clipboard nisqamanta ñawiriyta. Backup frase nisqaykita makiwan qillqay.",
     "enterWord": "Simi",
     "invalidMnemonic": "Mana allin waqaychana rimay. Simikunaq ñiqinta kawariy.",
     "restoring": "Walletniykita kutichichkani...",

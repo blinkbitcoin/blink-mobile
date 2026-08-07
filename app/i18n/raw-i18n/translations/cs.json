@@ -3817,6 +3817,7 @@
     "phraseSubtitleStep2": "Zadejte zbytek vaší zálohovací fráze",
     "nextWords": "Dalších 6 slov",
     "paste": "Vložit",
+    "pasteFailed": "Nepodařilo se číst ze schránky. Zadejte prosím zálohovací frázi ručně.",
     "enterWord": "Slovo",
     "invalidMnemonic": "Neplatná záložní fráze. Zkontrolujte prosím, zda je pořadí slov správné.",
     "restoring": "Obnovování vaší peněženky...",

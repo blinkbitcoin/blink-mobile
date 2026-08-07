@@ -9,7 +9,12 @@ import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { SuggestionBar } from "@app/components/suggestion-bar"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { PhraseStep, RootStackParamList } from "@app/navigation/stack-param-lists"
+import {
+  isPhraseStep,
+  PhraseStep,
+  RootStackParamList,
+} from "@app/navigation/stack-param-lists"
+import { reportError } from "@app/utils/error-logging"
 import { testProps } from "@app/utils/testProps"
 
 import {
@@ -17,6 +22,7 @@ import {
   type MnemonicWordInputHandle,
 } from "@app/components/mnemonic-word-input"
 import { OnboardingScreenLayout } from "../layouts"
+import { isValidStepTwoWords } from "../utils"
 
 import { RestoreStatus, useRestorePhrase } from "./hooks/use-restore-phrase"
 
@@ -29,7 +35,29 @@ export const RestorePhraseScreen: React.FC = () => {
     theme: { colors },
   } = useTheme()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-  const { step, words: initialWords } = useRoute<RestorePhraseRouteProp>().params
+
+  /** Deep links and navigation-state rehydration can deliver missing or malformed params
+   *  despite the route type; a bare destructure here threw into the app-wide ErrorBoundary,
+   *  replacing the whole navigation tree (#4070). Fall back to step 1, where a restore
+   *  starts anyway. Step 2 is only valid together with the words entered on step 1 —
+   *  without them it renders inputs 7-12 over a phrase that can never validate. */
+  const { params } = useRoute<RestorePhraseRouteProp>()
+  const stepParam = params?.step
+  const wordsParam = params?.words
+  const wordsOk = isValidStepTwoWords(wordsParam)
+  const hasValidParams =
+    isPhraseStep(stepParam) && (stepParam === PhraseStep.First || wordsOk)
+  const step = hasValidParams ? stepParam : PhraseStep.First
+  const initialWords = hasValidParams && wordsOk ? wordsParam : undefined
+
+  useEffect(() => {
+    if (hasValidParams) return
+    reportError(
+      "Restore phrase route params missing",
+      new Error("Route delivered no valid step/words combination"),
+      { dedupKey: "restore-phrase-params-missing", alwaysRecord: true },
+    )
+  }, [hasValidParams])
 
   const {
     stepWords,

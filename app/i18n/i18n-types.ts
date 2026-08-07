@@ -12711,6 +12711,10 @@ type RootTranslation = {
 		 */
 		paste: string
 		/**
+		 * C​o​u​l​d​n​'​t​ ​r​e​a​d​ ​f​r​o​m​ ​c​l​i​p​b​o​a​r​d​.​ ​P​l​e​a​s​e​ ​e​n​t​e​r​ ​y​o​u​r​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​ ​m​a​n​u​a​l​l​y​.
+		 */
+		pasteFailed: string
+		/**
 		 * W​o​r​d
 		 */
 		enterWord: string
@@ -25716,6 +25720,10 @@ export type TranslationFunctions = {
 		 * Paste
 		 */
 		paste: () => LocalizedString
+		/**
+		 * Couldn't read from clipboard. Please enter your backup phrase manually.
+		 */
+		pasteFailed: () => LocalizedString
 		/**
 		 * Word
 		 */

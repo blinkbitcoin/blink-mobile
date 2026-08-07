@@ -1,4 +1,6 @@
 import React from "react"
+import { StyleSheet } from "react-native"
+
 import { render, fireEvent, act } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
@@ -76,13 +78,8 @@ jest.mock("@app/graphql/generated", () => ({
 }))
 
 const mockNavigate = jest.fn()
-const mockRouteParams = jest.fn<
-  {
-    challenges: Array<{ index: number; word: string }>
-    successMessage?: string
-  },
-  []
->(() => ({
+const mockReplace = jest.fn()
+const mockRouteParams = jest.fn<unknown, []>(() => ({
   challenges: [
     { index: 0, word: "youth" },
     { index: 4, word: "bundle" },
@@ -91,8 +88,14 @@ const mockRouteParams = jest.fn<
 }))
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
-  useNavigation: () => ({ navigate: mockNavigate }),
+  useNavigation: () => ({ navigate: mockNavigate, replace: mockReplace }),
   useRoute: () => ({ params: mockRouteParams() }),
+}))
+
+const mockReportError = jest.fn()
+jest.mock("@app/utils/error-logging", () => ({
+  ...jest.requireActual("@app/utils/error-logging"),
+  reportError: (...args: readonly unknown[]) => mockReportError(...args),
 }))
 
 loadLocale("en")
@@ -125,6 +128,136 @@ describe("BackupPhraseConfirmScreen", () => {
 
   afterEach(() => {
     jest.useRealTimers()
+  })
+
+  /** A confirm screen without its challenges is dead — there is nothing to type — so
+   *  missing or malformed params redirect back to the first backup step with `replace`,
+   *  keeping the broken route out of the back stack, instead of throwing into the
+   *  app-wide ErrorBoundary (#4070). */
+  describe("route param guards", () => {
+    it("redirects to the first backup step when the route delivers no params", async () => {
+      mockRouteParams.mockReturnValue(undefined)
+
+      render(
+        <ContextForScreen>
+          <BackupPhraseConfirmScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      expect(mockReplace).toHaveBeenCalledWith("selfCustodialBackupPhrase", { step: 1 })
+      expect(mockReportError).toHaveBeenCalledTimes(1)
+      expect(mockReportError).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.any(Error),
+        expect.objectContaining({
+          dedupKey: "backup-confirm-params-missing",
+          alwaysRecord: true,
+        }),
+      )
+    })
+
+    it("redirects when the route delivers an empty challenge list", async () => {
+      mockRouteParams.mockReturnValue({ challenges: [] })
+
+      render(
+        <ContextForScreen>
+          <BackupPhraseConfirmScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      expect(mockReplace).toHaveBeenCalledWith("selfCustodialBackupPhrase", { step: 1 })
+    })
+
+    it("redirects when the route delivers malformed challenge entries", async () => {
+      mockRouteParams.mockReturnValue({ challenges: [{ index: "zero" }] })
+
+      render(
+        <ContextForScreen>
+          <BackupPhraseConfirmScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      expect(mockReplace).toHaveBeenCalledWith("selfCustodialBackupPhrase", { step: 1 })
+    })
+
+    /** Shape-valid but semantically broken challenges render a prompt the user cannot
+     *  answer — "enter word 100" of a 12-word phrase — so they take the same
+     *  report-and-redirect path as missing params (#4088 review, I2). */
+    it("redirects when a challenge index falls outside the mnemonic", async () => {
+      mockRouteParams.mockReturnValue({ challenges: [{ index: 99, word: "abandon" }] })
+
+      render(
+        <ContextForScreen>
+          <BackupPhraseConfirmScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      expect(mockReplace).toHaveBeenCalledWith("selfCustodialBackupPhrase", { step: 1 })
+      expect(mockReportError).toHaveBeenCalledTimes(1)
+    })
+
+    it("redirects when challenge indexes repeat", async () => {
+      mockRouteParams.mockReturnValue({
+        challenges: [
+          { index: 4, word: "youth" },
+          { index: 4, word: "bundle" },
+        ],
+      })
+
+      render(
+        <ContextForScreen>
+          <BackupPhraseConfirmScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      expect(mockReplace).toHaveBeenCalledWith("selfCustodialBackupPhrase", { step: 1 })
+      expect(mockReportError).toHaveBeenCalledTimes(1)
+    })
+
+    it("redirects when a challenge word is blank", async () => {
+      mockRouteParams.mockReturnValue({ challenges: [{ index: 3, word: "  " }] })
+
+      render(
+        <ContextForScreen>
+          <BackupPhraseConfirmScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      expect(mockReplace).toHaveBeenCalledWith("selfCustodialBackupPhrase", { step: 1 })
+      expect(mockReportError).toHaveBeenCalledTimes(1)
+    })
+
+    it("redirects when a challenge index is not an integer", async () => {
+      mockRouteParams.mockReturnValue({ challenges: [{ index: 1.5, word: "youth" }] })
+
+      render(
+        <ContextForScreen>
+          <BackupPhraseConfirmScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      expect(mockReplace).toHaveBeenCalledWith("selfCustodialBackupPhrase", { step: 1 })
+      expect(mockReportError).toHaveBeenCalledTimes(1)
+    })
+
+    it("neither redirects nor reports for valid challenges", async () => {
+      render(
+        <ContextForScreen>
+          <BackupPhraseConfirmScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      expect(mockReplace).not.toHaveBeenCalled()
+      expect(mockReportError).not.toHaveBeenCalled()
+    })
   })
 
   it("renders subtitle and input fields", async () => {
@@ -175,6 +308,28 @@ describe("BackupPhraseConfirmScreen", () => {
     expect(getByText("youth")).toBeTruthy()
   })
 
+  it("moves the suggestion target when another input takes focus", async () => {
+    const { getByPlaceholderText, getByText, queryByText } = render(
+      <ContextForScreen>
+        <BackupPhraseConfirmScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    fireEvent.changeText(
+      getByPlaceholderText(`${LL.BackupScreen.ManualBackup.Confirm.enterWord()} 1`),
+      "you",
+    )
+    expect(getByText("youth")).toBeTruthy()
+
+    fireEvent(
+      getByPlaceholderText(`${LL.BackupScreen.ManualBackup.Confirm.enterWord()} 5`),
+      "focus",
+    )
+
+    expect(queryByText("youth")).toBeNull()
+  })
+
   it("fills input when suggestion is selected", async () => {
     const { getByPlaceholderText, getByText } = render(
       <ContextForScreen>
@@ -192,7 +347,9 @@ describe("BackupPhraseConfirmScreen", () => {
     expect(input.props.value).toBe("youth")
   })
 
-  it("shows word number when input has content", async () => {
+  /** The number slot stays mounted with a fixed width so the row cannot reflow on the
+   *  first keystroke; empty inputs hide it with opacity only. */
+  it("reveals the word number when the input gains content", async () => {
     const { getByPlaceholderText, getByText } = render(
       <ContextForScreen>
         <BackupPhraseConfirmScreen />
@@ -200,13 +357,15 @@ describe("BackupPhraseConfirmScreen", () => {
     )
     await flushEffects()
 
+    expect(StyleSheet.flatten(getByText("1.").props.style).opacity).toBe(0)
+
     fireEvent.changeText(
       getByPlaceholderText(`${LL.BackupScreen.ManualBackup.Confirm.enterWord()} 1`),
       "you",
     )
     fireEvent.press(getByText("youth"))
 
-    expect(getByText("1.")).toBeTruthy()
+    expect(StyleSheet.flatten(getByText("1.").props.style).opacity).toBeUndefined()
   })
 
   const fillAllChallenges = (getByPlaceholderText: (p: string) => unknown) => {

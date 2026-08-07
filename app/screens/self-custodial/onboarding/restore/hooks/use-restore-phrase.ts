@@ -9,11 +9,11 @@ import { useBip39Input } from "@app/hooks/use-bip39-input"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { PhraseStep, RootStackParamList } from "@app/navigation/stack-param-lists"
 import { splitWords } from "@app/utils/bip39-wordlist"
+import { reportError } from "@app/utils/error-logging"
+import { toastShow } from "@app/utils/toast"
 
+import { MNEMONIC_WORD_COUNT, WORDS_PER_STEP } from "../../utils"
 import { RestoreWalletStatus, useRestoreWallet } from "./use-restore-wallet"
-
-const WORD_COUNT = 12
-const WORDS_PER_STEP = 6
 
 type RestorePhraseParams = {
   step: PhraseStep
@@ -29,7 +29,7 @@ export const useRestorePhrase = ({ step, initialWords }: RestorePhraseParams) =>
   const isStep1 = step === PhraseStep.First
 
   const bip39 = useBip39Input({
-    wordCount: WORD_COUNT,
+    wordCount: MNEMONIC_WORD_COUNT,
     wordsPerStep: WORDS_PER_STEP,
     step,
     initialWords,
@@ -41,7 +41,7 @@ export const useRestorePhrase = ({ step, initialWords }: RestorePhraseParams) =>
       if (!accepted || !isStep1) return accepted
 
       const parsed = splitWords(text)
-      if (parsed.length === WORD_COUNT && validateMnemonic(parsed.join(" "))) {
+      if (parsed.length === MNEMONIC_WORD_COUNT && validateMnemonic(parsed.join(" "))) {
         navigation.navigate("selfCustodialRestorePhrase", {
           step: PhraseStep.Second,
           words: parsed,
@@ -52,10 +52,17 @@ export const useRestorePhrase = ({ step, initialWords }: RestorePhraseParams) =>
     [bip39, isStep1, navigation],
   )
 
+  /** Wired to a header onPress, so a clipboard rejection would surface as an unhandled
+   *  promise rejection; report and toast it instead, and let the user type manually. */
   const handlePasteFromClipboard = useCallback(async () => {
-    const text = await Clipboard.getString()
-    if (text) handlePaste(text)
-  }, [handlePaste])
+    try {
+      const text = await Clipboard.getString()
+      if (text) handlePaste(text)
+    } catch (err) {
+      reportError("Restore phrase clipboard read", err)
+      toastShow({ message: LL.RestoreScreen.pasteFailed(), LL })
+    }
+  }, [handlePaste, LL])
 
   const isValid = useMemo(() => {
     if (!bip39.allFilled) return false

@@ -3817,6 +3817,7 @@
     "phraseSubtitleStep2": "Yedekleme ifadenizin geri kalanını girin",
     "nextWords": "Sonraki 6 kelime",
     "paste": "Yapıştır",
+    "pasteFailed": "Panodan okunamadı. Lütfen yedekleme ifadenizi elle girin.",
     "enterWord": "Kelime",
     "invalidMnemonic": "Geçersiz yedekleme ifadesi. Lütfen kelime sırasının doğru olup olmadığını kontrol edin.",
     "restoring": "Cüzdanınız geri yükleniyor...",

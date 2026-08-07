@@ -3817,6 +3817,7 @@
         "phraseSubtitleStep2": "Digite o restante da sua frase de backup",
         "nextWords": "Próximas 6 palavras",
         "paste": "Colar",
+        "pasteFailed": "Não foi possível ler da área de transferência. Digite sua frase de backup manualmente.",
         "enterWord": "Palavra",
         "invalidMnemonic": "Frase de backup inválida. Verifique se a ordem das palavras está correta.",
         "restoring": "Restaurando sua carteira...",

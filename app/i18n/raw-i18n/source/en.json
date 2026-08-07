@@ -3830,6 +3830,7 @@
         "phraseSubtitleStep2": "Enter rest of your backup phrase",
         "nextWords": "Next 6 words",
         "paste": "Paste",
+        "pasteFailed": "Couldn't read from clipboard. Please enter your backup phrase manually.",
         "enterWord": "Word",
         "invalidMnemonic": "Invalid backup phrase. Please check if the word order is correct.",
         "restoring": "Restoring your wallet...",

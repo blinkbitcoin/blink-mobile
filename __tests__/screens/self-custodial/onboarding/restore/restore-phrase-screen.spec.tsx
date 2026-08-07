@@ -12,17 +12,24 @@ const mockUseRestorePhrase = jest.fn()
 jest.mock(
   "@app/screens/self-custodial/onboarding/restore/hooks/use-restore-phrase",
   () => ({
-    useRestorePhrase: () => mockUseRestorePhrase(),
+    useRestorePhrase: (args: unknown) => mockUseRestorePhrase(args),
     RestoreStatus: { Idle: "idle", Restoring: "restoring", Error: "error" },
   }),
 )
 
 const mockNavigate = jest.fn()
 const mockSetOptions = jest.fn()
+let mockRouteParams: unknown
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
   useNavigation: () => ({ navigate: mockNavigate, setOptions: mockSetOptions }),
-  useRoute: () => ({ params: { step: 2, words: Array(12).fill("") } }),
+  useRoute: () => ({ params: mockRouteParams }),
+}))
+
+const mockReportError = jest.fn()
+jest.mock("@app/utils/error-logging", () => ({
+  ...jest.requireActual("@app/utils/error-logging"),
+  reportError: (...args: readonly unknown[]) => mockReportError(...args),
 }))
 
 type MnemonicWordInputProps = {
@@ -32,13 +39,20 @@ type MnemonicWordInputProps = {
   correct?: boolean
   wrong?: boolean
   testID?: string
+  onChangeText?: (text: string) => void
+  onFocus?: () => void
 }
 const mockMnemonicWordInput = jest.fn<null, [MnemonicWordInputProps]>(() => null)
+const mockInputFocus = jest.fn()
 jest.mock("@app/components/mnemonic-word-input", () => {
   const ReactImpl = jest.requireActual("react")
   const Mock = ReactImpl.forwardRef(
-    (props: MnemonicWordInputProps, _ref: React.Ref<unknown>) =>
-      mockMnemonicWordInput(props),
+    (props: MnemonicWordInputProps, ref: React.Ref<unknown>) => {
+      ReactImpl.useImperativeHandle(ref, () => ({
+        focus: () => mockInputFocus(props.index),
+      }))
+      return mockMnemonicWordInput(props)
+    },
   )
   Mock.displayName = "MockMnemonicWordInput"
   return { MnemonicWordInput: Mock }
@@ -46,6 +60,13 @@ jest.mock("@app/components/mnemonic-word-input", () => {
 
 loadLocale("en")
 const LL = i18nObject("en")
+
+/** Step 2 is only usable when the first six words survived the hand-off from step 1;
+ *  the last six are what the user is about to type. */
+const validStep2Words = [
+  ...["abandon", "ability", "able", "about", "above", "absent"],
+  ...Array(6).fill(""),
+]
 
 const defaultHookReturn = {
   stepWords: Array(6).fill(""),
@@ -80,7 +101,121 @@ const renderScreen = () =>
 describe("RestorePhraseScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockRouteParams = { step: 2, words: [...validStep2Words] }
     mockUseRestorePhrase.mockReturnValue(defaultHookReturn)
+  })
+
+  /** Deep links and navigation-state rehydration can deliver missing or malformed params;
+   *  the screen falls back to step 1 (where a restore starts) instead of throwing into the
+   *  app-wide ErrorBoundary, which replaces the whole navigation tree (#4070). */
+  describe("route param guards", () => {
+    it("falls back to step 1 when the route delivers no params", async () => {
+      mockRouteParams = undefined
+
+      const { getByText } = renderScreen()
+      await flushEffects()
+
+      expect(getByText(LL.RestoreScreen.phraseSubtitleStep1())).toBeTruthy()
+      expect(mockUseRestorePhrase).toHaveBeenCalledWith({
+        step: 1,
+        initialWords: undefined,
+      })
+    })
+
+    it("falls back to step 1 when the route delivers an out-of-range step", async () => {
+      mockRouteParams = { step: 5 }
+
+      const { getByText } = renderScreen()
+      await flushEffects()
+
+      expect(getByText(LL.RestoreScreen.phraseSubtitleStep1())).toBeTruthy()
+    })
+
+    /** Step 2 without usable words is a dead end — inputs 7-12 rendered over a phrase
+     *  whose first six words were never entered — so it is invalid params, not a
+     *  degraded-but-usable state (#4088 review, I1). */
+    it("falls back to step 1 and reports when step 2 arrives with malformed words", async () => {
+      mockRouteParams = { step: 2, words: "not-an-array" }
+
+      const { getByText } = renderScreen()
+      await flushEffects()
+
+      expect(getByText(LL.RestoreScreen.phraseSubtitleStep1())).toBeTruthy()
+      expect(mockUseRestorePhrase).toHaveBeenCalledWith({
+        step: 1,
+        initialWords: undefined,
+      })
+      expect(mockReportError).toHaveBeenCalledTimes(1)
+      expect(mockReportError).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.any(Error),
+        expect.objectContaining({
+          dedupKey: "restore-phrase-params-missing",
+          alwaysRecord: true,
+        }),
+      )
+    })
+
+    it("falls back to step 1 and reports when step 2 arrives with a truncated words array", async () => {
+      mockRouteParams = { step: 2, words: ["abandon", "ability"] }
+
+      renderScreen()
+      await flushEffects()
+
+      expect(mockUseRestorePhrase).toHaveBeenCalledWith({
+        step: 1,
+        initialWords: undefined,
+      })
+      expect(mockReportError).toHaveBeenCalledTimes(1)
+    })
+
+    it("falls back to step 1 and reports when step 2 arrives with its leading words empty", async () => {
+      mockRouteParams = { step: 2, words: Array(12).fill("") }
+
+      renderScreen()
+      await flushEffects()
+
+      expect(mockUseRestorePhrase).toHaveBeenCalledWith({
+        step: 1,
+        initialWords: undefined,
+      })
+      expect(mockReportError).toHaveBeenCalledTimes(1)
+    })
+
+    it("stays on step 2 and seeds the words when they are usable", async () => {
+      renderScreen()
+      await flushEffects()
+
+      expect(mockUseRestorePhrase).toHaveBeenCalledWith({
+        step: 2,
+        initialWords: validStep2Words,
+      })
+      expect(mockReportError).not.toHaveBeenCalled()
+    })
+
+    it("reports the malformed params once", async () => {
+      mockRouteParams = undefined
+
+      renderScreen()
+      await flushEffects()
+
+      expect(mockReportError).toHaveBeenCalledTimes(1)
+      expect(mockReportError).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.any(Error),
+        expect.objectContaining({
+          dedupKey: "restore-phrase-params-missing",
+          alwaysRecord: true,
+        }),
+      )
+    })
+
+    it("does not report valid params", async () => {
+      renderScreen()
+      await flushEffects()
+
+      expect(mockReportError).not.toHaveBeenCalled()
+    })
   })
 
   it("renders the inline invalidMnemonic message when step 2 is fully filled but invalid", async () => {
@@ -176,5 +311,111 @@ describe("RestorePhraseScreen", () => {
     await flushEffects()
 
     expect(getByText("Custom validation error")).toBeTruthy()
+  })
+
+  it("focuses the requested input and clears the request", async () => {
+    const clearFocusRequest = jest.fn()
+    mockUseRestorePhrase.mockReturnValue({
+      ...defaultHookReturn,
+      focusRequest: 7,
+      clearFocusRequest,
+    })
+
+    renderScreen()
+    await flushEffects()
+
+    expect(mockInputFocus).toHaveBeenCalledWith(7)
+    expect(clearFocusRequest).toHaveBeenCalledTimes(1)
+  })
+
+  it("wires the header paste button to the clipboard handler on step 1", async () => {
+    mockRouteParams = { step: 1 }
+    const handlePasteFromClipboard = jest.fn()
+    mockUseRestorePhrase.mockReturnValue({
+      ...defaultHookReturn,
+      isStep1: true,
+      offset: 0,
+      handlePasteFromClipboard,
+    })
+
+    renderScreen()
+    await flushEffects()
+
+    const { headerRight } = mockSetOptions.mock.calls[0][0]
+    const pasteButton = headerRight()
+    pasteButton.props.onPress()
+
+    expect(handlePasteFromClipboard).toHaveBeenCalledTimes(1)
+  })
+
+  it("marks the active input on focus", async () => {
+    const setActiveIndex = jest.fn()
+    mockUseRestorePhrase.mockReturnValue({
+      ...defaultHookReturn,
+      setActiveIndex,
+    })
+
+    renderScreen()
+    await flushEffects()
+
+    mockMnemonicWordInput.mock.calls[0][0].onFocus?.()
+
+    expect(setActiveIndex).toHaveBeenCalledWith(6)
+  })
+
+  it("routes typed text to updateWord on non-first inputs", async () => {
+    const updateWord = jest.fn()
+    mockUseRestorePhrase.mockReturnValue({
+      ...defaultHookReturn,
+      updateWord,
+    })
+
+    renderScreen()
+    await flushEffects()
+
+    mockMnemonicWordInput.mock.calls[0][0].onChangeText?.("apple")
+
+    expect(updateWord).toHaveBeenCalledWith(6, "apple")
+  })
+
+  it("lets an accepted paste on the first input swallow the change", async () => {
+    mockRouteParams = { step: 1 }
+    const handlePaste = jest.fn(() => true)
+    const updateWord = jest.fn()
+    mockUseRestorePhrase.mockReturnValue({
+      ...defaultHookReturn,
+      isStep1: true,
+      offset: 0,
+      handlePaste,
+      updateWord,
+    })
+
+    renderScreen()
+    await flushEffects()
+
+    mockMnemonicWordInput.mock.calls[0][0].onChangeText?.("abandon ability able")
+
+    expect(handlePaste).toHaveBeenCalledWith("abandon ability able")
+    expect(updateWord).not.toHaveBeenCalled()
+  })
+
+  it("falls through to updateWord when the first input's text is not a paste", async () => {
+    mockRouteParams = { step: 1 }
+    const handlePaste = jest.fn(() => false)
+    const updateWord = jest.fn()
+    mockUseRestorePhrase.mockReturnValue({
+      ...defaultHookReturn,
+      isStep1: true,
+      offset: 0,
+      handlePaste,
+      updateWord,
+    })
+
+    renderScreen()
+    await flushEffects()
+
+    mockMnemonicWordInput.mock.calls[0][0].onChangeText?.("aba")
+
+    expect(updateWord).toHaveBeenCalledWith(0, "aba")
   })
 })

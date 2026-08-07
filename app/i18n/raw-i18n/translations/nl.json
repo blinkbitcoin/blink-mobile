@@ -3817,6 +3817,7 @@
     "phraseSubtitleStep2": "Voer de rest van je back-upfrase in",
     "nextWords": "Volgende 6 woorden",
     "paste": "Plakken",
+    "pasteFailed": "Kan niet lezen van het klembord. Voer je back-upfrase handmatig in.",
     "enterWord": "Woord",
     "invalidMnemonic": "Ongeldige back-upzin. Controleer of de woordvolgorde correct is.",
     "restoring": "Je portemonnee wordt hersteld...",

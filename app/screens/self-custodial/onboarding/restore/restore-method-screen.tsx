@@ -11,6 +11,7 @@ import { IconHero } from "@app/components/icon-hero"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { TranslationFunctions } from "@app/i18n/i18n-types"
 import { PhraseStep, RootStackParamList } from "@app/navigation/stack-param-lists"
+import { reportError } from "@app/utils/error-logging"
 import { testProps } from "@app/utils/testProps"
 import { toastShow } from "@app/utils/toast"
 
@@ -35,8 +36,16 @@ const showRestoreErrorToast = (
       toastShow({ message: LL.RestoreScreen.restoreFailed(), LL })
       return
     default: {
+      /** Compile-time exhaustiveness stays, but the native module can return an error
+       *  string no CredentialError models; a runtime throw here reached the un-awaited
+       *  onPress as an unhandled promise rejection, so report and toast instead. */
       const _exhaustive: never = error
-      throw new Error(`Unknown credential error: ${_exhaustive}`)
+      reportError(
+        "Restore credential error unhandled",
+        new Error(`Unknown credential error: ${_exhaustive}`),
+        { alwaysRecord: true },
+      )
+      toastShow({ message: LL.RestoreScreen.restoreFailed(), LL })
     }
   }
 }
@@ -51,13 +60,20 @@ export const RestoreMethodScreen: React.FC = () => {
   const { restore } = useRestoreWallet()
   const cloudProvider = getCloudProviderName(LL)
 
+  /** read() itself can reject (native module failure); this handler is wired straight to
+   *  onPress, so a rejection here would be unhandled — catch, report, and toast. */
   const handleCredentialRestore = useCallback(async () => {
-    const result = await read()
-    if (!result.success) {
-      showRestoreErrorToast(result.error, LL)
-      return
+    try {
+      const result = await read()
+      if (!result.success) {
+        showRestoreErrorToast(result.error, LL)
+        return
+      }
+      await restore(result.mnemonic).catch(() => {})
+    } catch (err) {
+      reportError("Restore credential read", err)
+      toastShow({ message: LL.RestoreScreen.restoreFailed(), LL })
     }
-    await restore(result.mnemonic).catch(() => {})
   }, [read, restore, LL])
 
   return (
