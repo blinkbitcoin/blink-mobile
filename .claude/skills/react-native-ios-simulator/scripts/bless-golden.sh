@@ -36,6 +36,12 @@
 
 set -euo pipefail
 
+# Telemetry is best-effort - a broken lib must never block a bless.
+TEL_LIB="$(dirname "${BASH_SOURCE[0]}")/../lib/telemetry.sh"
+{ [ -f "$TEL_LIB" ] && . "$TEL_LIB"; } 2>/dev/null || true
+type tel_emit >/dev/null 2>&1 || { tel_now() { echo 0; }; tel_emit() { :; }; tel_span() { while [ $# -gt 0 ] && [ "$1" != "--" ]; do shift; done; [ $# -gt 0 ] && shift; "$@"; }; }
+T_BLESS=$(tel_now)
+
 die() { echo "FATAL: $*" >&2; exit 1; }
 
 PR="${1:?usage: bless-golden.sh <pr-number> [--sha <sha>]}"
@@ -212,6 +218,8 @@ if [ -n "${MISSING:-}" ]; then
   echo "$MISSING" >&2
   exit 1
 fi
+
+DEMO_SIM_NAME="$SIM_NAME" tel_emit sim.bless.total "$T_BLESS" golden="$GOLDEN_NAME" udid="$UDID"
 
 echo "blessed $GOLDEN_NAME ($UDID) - stamp: $GOLDEN_DIR/stamp"
 sed 's/^/  /' "$GOLDEN_DIR/stamp"

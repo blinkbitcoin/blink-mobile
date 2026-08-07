@@ -85,7 +85,14 @@ if [ -n "$NO_WAIT" ]; then
 else
   # Two identical frames in a row means nothing is animating. Comparing file
   # digests is enough and avoids depending on an image differ.
-  DEADLINE=$(python3 -c "import time; print(time.time() + $TIMEOUT)")
+  #
+  # The deadline uses `date +%s`: 1s resolution is plenty for a 30s budget,
+  # and the two python3 spawns per frame this replaced cost 40-100ms each
+  # iteration - drift injected into the very loop whose latency the telemetry
+  # is supposed to report honestly.
+  START_S=$(date +%s)
+  TIMEOUT_S=${TIMEOUT%.*}
+  [ -n "$TIMEOUT_S" ] && [ "$TIMEOUT_S" -ge 1 ] 2>/dev/null || TIMEOUT_S=1
   PREV=""
   STABLE=""
   while :; do
@@ -94,9 +101,7 @@ else
     CUR=$(shasum -a 256 "$TMP/frame.png" | cut -d' ' -f1)
     if [ -n "$PREV" ] && [ "$CUR" = "$PREV" ]; then STABLE=1; break; fi
     PREV="$CUR"
-    NOW=$(python3 -c "import time; print(time.time())")
-    OVER=$(python3 -c "print(1 if $NOW >= $DEADLINE else 0)")
-    [ "$OVER" = "1" ] && break
+    [ $(( $(date +%s) - START_S )) -ge "$TIMEOUT_S" ] && break
     sleep "$SETTLE"
   done
   cp "$TMP/frame.png" "$OUT"

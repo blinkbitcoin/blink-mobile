@@ -32,6 +32,11 @@
 
 set -euo pipefail
 
+# Telemetry is best-effort - a broken lib must never block a reload.
+TEL_LIB="$(dirname "${BASH_SOURCE[0]}")/../lib/telemetry.sh"
+{ [ -f "$TEL_LIB" ] && . "$TEL_LIB"; } 2>/dev/null || true
+type tel_emit >/dev/null 2>&1 || { tel_now() { echo 0; }; tel_emit() { :; }; tel_span() { while [ $# -gt 0 ] && [ "$1" != "--" ]; do shift; done; [ $# -gt 0 ] && shift; "$@"; }; }
+
 die() { echo "FATAL: $*" >&2; exit 1; }
 
 PORT="${DEMO_PORT:-}"
@@ -54,7 +59,9 @@ case "$PORT" in
   ''|*[!0-9]*) die "port must be numeric, got '$PORT'" ;;
 esac
 
-python3 - "$PORT" "$TIMEOUT" "${NO_WAIT:-0}" <<'PYEOF'
+T_RELOAD=$(tel_now)
+RELOAD_RC=0
+python3 - "$PORT" "$TIMEOUT" "${NO_WAIT:-0}" <<'PYEOF' || RELOAD_RC=$?
 import base64, hashlib, json, os, socket, struct, sys, time
 
 port, timeout, no_wait = int(sys.argv[1]), float(sys.argv[2]), sys.argv[3] == "1"
@@ -204,3 +211,11 @@ sys.stderr.write(
 send_close(ev_sock)
 sys.exit(1)
 PYEOF
+
+# confirmed means the /events wait saw the bundle served; a --no-wait exit 0
+# is fire-and-forget, so the no_wait flag keeps the two apart in reports.
+tel_emit sim.reload.total "$T_RELOAD" port="$PORT" \
+  confirmed="$([ "$RELOAD_RC" -eq 0 ] && echo 1 || echo 0)" \
+  no_wait="$([ -n "$NO_WAIT" ] && echo 1 || echo 0)" \
+  ok="$([ "$RELOAD_RC" -eq 0 ] && echo 1 || echo 0)"
+exit "$RELOAD_RC"
