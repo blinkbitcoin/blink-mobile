@@ -121,19 +121,29 @@ describe("seedMigratedAccountSettings", () => {
     expect(next).toBe(state)
   })
 
+  /** The retry of an abandoned run reuses the pending wallet and re-seeds it, so whatever
+   *  the user changed in between has to replace the stale entries rather than sit behind
+   *  them. All three maps in one test because the snapshot is seeded in a single call. */
   it("overwrites a previous seed for the same account", () => {
     const state: PersistentState = {
       ...baseState,
       selfCustodialDisplayCurrencyByAccountId: { [migratedId]: "GBP" },
+      selfCustodialLanguageByAccountId: { [migratedId]: "en" },
+      themeByAccountId: { [migratedId]: "light", [DefaultAccountId.Custodial]: "dark" },
     }
 
     const next = seedMigratedAccountSettings(state, migratedId, {
       displayCurrency: "EUR",
-      language: null,
+      language: "es",
     })
 
     expect(next.selfCustodialDisplayCurrencyByAccountId).toEqual({
       [migratedId]: "EUR",
+    })
+    expect(next.selfCustodialLanguageByAccountId).toEqual({ [migratedId]: "es" })
+    expect(next.themeByAccountId).toEqual({
+      [migratedId]: "dark",
+      [DefaultAccountId.Custodial]: "dark",
     })
   })
 })
