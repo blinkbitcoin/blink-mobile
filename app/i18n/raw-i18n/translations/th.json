@@ -3787,6 +3787,10 @@
     "explainerCheck5": "บัญชีของคุณจะถูกหักค่าธรรมเนียมเครือข่าย Spark",
     "explainerCta": "เข้าใจแล้ว",
     "transferringFunds": "กำลังโอนเงินของคุณ จะเสร็จสิ้นภายในไม่กี่วินาที",
+    "transferDelayed": {
+      "body": "Your funds are on their way to your new account. This is taking longer than usual — keep the app open and we'll finish up automatically.",
+      "contactSupportCta": "Contact support"
+    },
     "clockOutOfSync": {
       "body": "วันที่และเวลาของอุปกรณ์ของคุณไม่ตรงกัน ตั้งค่าเป็นอัตโนมัติเพื่อดำเนินการต่อ",
       "retryCta": "ลองอีกครั้ง"

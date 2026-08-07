@@ -3787,6 +3787,10 @@
         "explainerCheck5": "Uma taxa de rede Spark será descontada da sua conta",
         "explainerCta": "Entendi",
         "transferringFunds": "Transferindo seus fundos. Deve ser concluído em poucos segundos.",
+        "transferDelayed": {
+            "body": "Your funds are on their way to your new account. This is taking longer than usual — keep the app open and we'll finish up automatically.",
+            "contactSupportCta": "Contact support"
+        },
         "clockOutOfSync": {
             "body": "A data e a hora do teu dispositivo estão dessincronizadas. Define-as como automáticas para continuar.",
             "retryCta": "Tentar novamente"

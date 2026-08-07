@@ -3787,6 +3787,10 @@
     "explainerCheck5": "Θα χρεωθεί στον λογαριασμό σας ένα τέλος δικτύου Spark",
     "explainerCta": "Καταλαβαίνω",
     "transferringFunds": "Μεταφορά των κεφαλαίων σας. Θα ολοκληρωθεί σε λίγα δευτερόλεπτα.",
+    "transferDelayed": {
+      "body": "Your funds are on their way to your new account. This is taking longer than usual — keep the app open and we'll finish up automatically.",
+      "contactSupportCta": "Contact support"
+    },
     "clockOutOfSync": {
       "body": "Η ημερομηνία και η ώρα της συσκευής σου δεν είναι συγχρονισμένες. Ρύθμισέ τες σε αυτόματες για να συνεχίσεις.",
       "retryCta": "Δοκίμασε ξανά"

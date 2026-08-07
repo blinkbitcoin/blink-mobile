@@ -3787,6 +3787,10 @@
     "explainerCheck5": "Er worden Spark-netwerkkosten van je account afgeschreven",
     "explainerCta": "Ik begrijp het",
     "transferringFunds": "Je saldo wordt overgedragen. Het zou binnen enkele seconden klaar moeten zijn.",
+    "transferDelayed": {
+      "body": "Your funds are on their way to your new account. This is taking longer than usual — keep the app open and we'll finish up automatically.",
+      "contactSupportCta": "Contact support"
+    },
     "clockOutOfSync": {
       "body": "De datum en tijd van je apparaat lopen niet gelijk. Zet ze op automatisch om door te gaan.",
       "retryCta": "Opnieuw proberen"

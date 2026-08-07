@@ -39,16 +39,20 @@ const stillEmpty = { hasReceived: false, balanceSats: 0 }
 
 const ok = (value: typeof landed) => ({ status: MigrationSdkStatus.Ok, value })
 
-const renderGate = (
-  overrides: Partial<Parameters<typeof useMigrationReceiveConfirmation>[0]> = {},
-) =>
-  renderHook(() =>
-    useMigrationReceiveConfirmation({
-      selfCustodialAccountId: "sc-account-1",
-      expectedReceiveSats: 21000,
-      skip: false,
-      ...overrides,
-    }),
+type GateOverrides = Partial<Parameters<typeof useMigrationReceiveConfirmation>[0]>
+
+/** Prop-driven so a test can rerender through the transitions production actually
+ *  takes: mounted skipped, armed later, possibly re-skipped after a failure. */
+const renderGate = (overrides: GateOverrides = {}) =>
+  renderHook(
+    (props: GateOverrides) =>
+      useMigrationReceiveConfirmation({
+        selfCustodialAccountId: "sc-account-1",
+        expectedReceiveSats: 21000,
+        skip: false,
+        ...props,
+      }),
+    { initialProps: overrides },
   )
 
 /** Lets the pending check's promise chain settle without moving the fake clock. */
@@ -93,6 +97,59 @@ describe("useMigrationReceiveConfirmation", () => {
 
     expect(mockCheckReceiveLanded).not.toHaveBeenCalled()
     expect(result.current.isReceiveConfirmed).toBe(false)
+  })
+
+  /** The sequence production always takes: the gate mounts skipped (server still
+   *  TRANSFERRING) and arms only when COMPLETED arrives. The first check and the notice
+   *  window must both start from that moment, not from mount. */
+  it("starts checking and arms the notice once the caller stops skipping", async () => {
+    const { result, rerender } = renderGate({ skip: true })
+    await flushCheck()
+    expect(mockCheckReceiveLanded).not.toHaveBeenCalled()
+
+    rerender({ skip: false })
+    await flushCheck()
+    expect(mockCheckReceiveLanded).toHaveBeenCalledTimes(1)
+    expect(result.current.isReceiveConfirmed).toBe(false)
+
+    await advance(DELAYED_NOTICE_MS)
+    expect(result.current.isReceiveDelayed).toBe(true)
+  })
+
+  /** The reverse ordering of "confirms in time": the notice has already fired when the
+   *  funds land. The screen must swap at once, not keep the "taking longer" copy up. */
+  it("withdraws the delayed notice when the receive lands after it fired", async () => {
+    const { result } = renderGate()
+    await flushCheck()
+    await advance(DELAYED_NOTICE_MS)
+    expect(result.current.isReceiveDelayed).toBe(true)
+
+    mockCheckReceiveLanded.mockResolvedValue(ok(landed))
+    await advance(5000)
+
+    expect(result.current).toEqual({
+      isReceiveConfirmed: true,
+      isReceiveDelayed: false,
+    })
+  })
+
+  /** A caller that re-skips (a late failure handed the user to support) must get an
+   *  inert gate, not a notice minted for a swap that is no longer allowed. */
+  it("goes inert when the caller re-skips after the notice fired", async () => {
+    const { result, rerender } = renderGate()
+    await flushCheck()
+    await advance(DELAYED_NOTICE_MS)
+    expect(result.current.isReceiveDelayed).toBe(true)
+    const checksSoFar = mockCheckReceiveLanded.mock.calls.length
+
+    rerender({ skip: true })
+    await advance(60_000)
+
+    expect(result.current).toEqual({
+      isReceiveConfirmed: false,
+      isReceiveDelayed: false,
+    })
+    expect(mockCheckReceiveLanded.mock.calls).toHaveLength(checksSoFar)
   })
 
   /** Nothing will ever arrive for a zero-receive migration, so waiting on the wallet
@@ -299,6 +356,45 @@ describe("useMigrationReceiveConfirmation", () => {
     await advance(60_000)
 
     expect(mockCheckReceiveLanded).toHaveBeenCalledTimes(1)
+  })
+
+  /** A check in flight at unmount settles into a torn-down hook: its result must be
+   *  dropped, not turned into a state update or another scheduled check. */
+  it("drops a check that settles after unmount", async () => {
+    let settle: (value: unknown) => void = () => {}
+    mockCheckReceiveLanded.mockReturnValue(
+      new Promise((resolve) => {
+        settle = resolve
+      }),
+    )
+
+    const { unmount } = renderGate()
+    await flushCheck()
+    unmount()
+
+    settle(ok(stillEmpty))
+    await advance(60_000)
+
+    expect(mockCheckReceiveLanded).toHaveBeenCalledTimes(1)
+  })
+
+  it("drops a check that rejects after unmount, without reporting", async () => {
+    let fail: (err: unknown) => void = () => {}
+    mockCheckReceiveLanded.mockReturnValue(
+      new Promise((_resolve, reject) => {
+        fail = reject
+      }),
+    )
+
+    const { unmount } = renderGate()
+    await flushCheck()
+    unmount()
+
+    fail(new Error("keystore locked"))
+    await advance(60_000)
+
+    expect(mockCheckReceiveLanded).toHaveBeenCalledTimes(1)
+    expect(mockReportError).not.toHaveBeenCalled()
   })
 
   /** The keystore read sits before the SDK result shape exists, so it can reject rather

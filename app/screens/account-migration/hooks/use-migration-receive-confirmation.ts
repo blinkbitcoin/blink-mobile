@@ -59,7 +59,7 @@ export const useMigrationReceiveConfirmation = ({
 
   /** A zero-receive migration (balance at or under an uncovered fee) gets no payment, so
    *  the gate opens without ever touching the SDK; waiting would strand the user forever. */
-  const isConfirmedWithoutWaiting = !skip && expectedReceiveSats === 0
+  const isConfirmedWithoutWaiting = expectedReceiveSats === 0
 
   /** The escape hatch: with the flag on, the elapsed notice window opens the gate rather
    *  than raising the notice, so the swap proceeds as it did before the gate existed. */
@@ -150,12 +150,16 @@ export const useMigrationReceiveConfirmation = ({
     return () => clearTimeout(timer)
   }, [isWatching, migrationReceiveDelayedNoticeMs])
 
+  /** A skipped gate is inert, whatever it remembers: a caller that re-skips after a
+   *  late failure must not keep receiving a notice (or a confirmation) minted for a
+   *  swap that is no longer allowed to happen. */
   return {
     isReceiveConfirmed:
-      isReceiveConfirmed || isConfirmedWithoutWaiting || isReleasedByTimeout,
-    /** Masked once anything confirms — including the timeout release, which must swap
-     *  at once rather than flash the "taking longer" copy it just made moot. */
+      !skip && (isReceiveConfirmed || isConfirmedWithoutWaiting || isReleasedByTimeout),
+    /** Also masked once anything confirms — including the timeout release, which must
+     *  swap at once rather than flash the "taking longer" copy it just made moot. */
     isReceiveDelayed:
+      !skip &&
       isReceiveDelayed &&
       !isReceiveConfirmed &&
       !isConfirmedWithoutWaiting &&

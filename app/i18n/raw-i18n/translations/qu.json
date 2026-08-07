@@ -3787,6 +3787,10 @@
     "explainerCheck5": "Akawuntiykimanta Spark red pagota qichunqaku",
     "explainerCta": "Entiendini",
     "transferringFunds": "Qullqiykita apachkaniku. Iskay kinsa sikundullapi tukurunqa.",
+    "transferDelayed": {
+      "body": "Your funds are on their way to your new account. This is taking longer than usual — keep the app open and we'll finish up automatically.",
+      "contactSupportCta": "Contact support"
+    },
     "clockOutOfSync": {
       "body": "Dispositivoykipa p'unchawnin hinaspa horan mana huñusqachu. Automáticoman churay qatinaykipaq.",
       "retryCta": "Kutiy yapamuy"

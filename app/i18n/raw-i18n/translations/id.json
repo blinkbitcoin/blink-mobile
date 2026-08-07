@@ -3787,6 +3787,10 @@
     "explainerCheck5": "Akun Anda akan dikenakan biaya jaringan Spark",
     "explainerCta": "Saya mengerti",
     "transferringFunds": "Mentransfer dana Anda. Seharusnya selesai dalam beberapa detik.",
+    "transferDelayed": {
+      "body": "Your funds are on their way to your new account. This is taking longer than usual — keep the app open and we'll finish up automatically.",
+      "contactSupportCta": "Contact support"
+    },
     "clockOutOfSync": {
       "body": "Tanggal dan waktu perangkat Anda tidak sinkron. Atur ke otomatis untuk melanjutkan.",
       "retryCta": "Coba lagi"
