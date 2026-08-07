@@ -1,18 +1,16 @@
 import React from "react"
-import { render } from "@testing-library/react-native"
+import { act, render } from "@testing-library/react-native"
 import { Text } from "react-native"
 
 import { HideAmountContainer } from "@app/graphql/hide-amount-component"
 import { useHideAmount } from "@app/graphql/hide-amount-context"
 
-jest.mock("@apollo/client", () => ({
-  useApolloClient: () => ({ writeQuery: jest.fn() }),
-}))
-
 jest.mock("@app/graphql/generated", () => ({
   useHideBalanceQuery: jest.fn(),
 }))
 
+// Mocked only to assert the container never persists — a peek must not write
+// the hideBalance setting (that is the Security screen's job).
 jest.mock("@app/graphql/client-only-query", () => ({
   saveHideBalance: jest.fn(),
   saveHiddenBalanceToolTip: jest.fn(),
@@ -77,7 +75,7 @@ describe("HideAmountContainer", () => {
   })
 
   describe("switchMemoryHideAmount", () => {
-    it("calls saveHideBalance with toggled value when hideAmount is false", () => {
+    it("flips hideAmount in memory without persisting", () => {
       mockUseHideBalanceQuery.mockReturnValue({ data: { hideBalance: false } })
 
       render(
@@ -86,12 +84,14 @@ describe("HideAmountContainer", () => {
         </HideAmountContainer>,
       )
 
-      capturedContext?.switchMemoryHideAmount()
+      act(() => capturedContext?.switchMemoryHideAmount())
 
-      expect(mockSaveHideBalance).toHaveBeenCalledWith(expect.anything(), true)
+      expect(capturedContext?.hideAmount).toBe(true)
+      expect(mockSaveHideBalance).not.toHaveBeenCalled()
+      expect(mockSaveHiddenBalanceToolTip).not.toHaveBeenCalled()
     })
 
-    it("calls saveHideBalance with toggled value when hideAmount is true", () => {
+    it("peeking while the persisted setting is enabled leaves it untouched", () => {
       mockUseHideBalanceQuery.mockReturnValue({ data: { hideBalance: true } })
 
       render(
@@ -100,37 +100,67 @@ describe("HideAmountContainer", () => {
         </HideAmountContainer>,
       )
 
-      capturedContext?.switchMemoryHideAmount()
+      act(() => capturedContext?.switchMemoryHideAmount())
 
-      expect(mockSaveHideBalance).toHaveBeenCalledWith(expect.anything(), false)
+      expect(capturedContext?.hideAmount).toBe(false)
+      expect(mockSaveHideBalance).not.toHaveBeenCalled()
+      expect(mockSaveHiddenBalanceToolTip).not.toHaveBeenCalled()
+
+      act(() => capturedContext?.switchMemoryHideAmount())
+
+      expect(capturedContext?.hideAmount).toBe(true)
     })
+  })
 
-    it("calls saveHiddenBalanceToolTip with toggled value when hideAmount is false", () => {
+  describe("re-sync with the persisted hideBalance setting", () => {
+    it("follows a mid-session change of the persisted value", () => {
       mockUseHideBalanceQuery.mockReturnValue({ data: { hideBalance: false } })
 
-      render(
+      const { rerender } = render(
         <HideAmountContainer>
           <ContextCapture />
         </HideAmountContainer>,
       )
 
-      capturedContext?.switchMemoryHideAmount()
+      expect(capturedContext?.hideAmount).toBe(false)
 
-      expect(mockSaveHiddenBalanceToolTip).toHaveBeenCalledWith(expect.anything(), true)
+      mockUseHideBalanceQuery.mockReturnValue({ data: { hideBalance: true } })
+      rerender(
+        <HideAmountContainer>
+          <ContextCapture />
+        </HideAmountContainer>,
+      )
+
+      expect(capturedContext?.hideAmount).toBe(true)
     })
 
-    it("calls saveHiddenBalanceToolTip with toggled value when hideAmount is true", () => {
+    it("a persisted change overrides an earlier session peek", () => {
       mockUseHideBalanceQuery.mockReturnValue({ data: { hideBalance: true } })
 
-      render(
+      const { rerender } = render(
         <HideAmountContainer>
           <ContextCapture />
         </HideAmountContainer>,
       )
 
-      capturedContext?.switchMemoryHideAmount()
+      act(() => capturedContext?.switchMemoryHideAmount())
+      expect(capturedContext?.hideAmount).toBe(false)
 
-      expect(mockSaveHiddenBalanceToolTip).toHaveBeenCalledWith(expect.anything(), false)
+      mockUseHideBalanceQuery.mockReturnValue({ data: { hideBalance: false } })
+      rerender(
+        <HideAmountContainer>
+          <ContextCapture />
+        </HideAmountContainer>,
+      )
+      expect(capturedContext?.hideAmount).toBe(false)
+
+      mockUseHideBalanceQuery.mockReturnValue({ data: { hideBalance: true } })
+      rerender(
+        <HideAmountContainer>
+          <ContextCapture />
+        </HideAmountContainer>,
+      )
+      expect(capturedContext?.hideAmount).toBe(true)
     })
   })
 })

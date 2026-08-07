@@ -1,22 +1,24 @@
 import * as React from "react"
-import { PropsWithChildren, useCallback, useMemo } from "react"
+import { PropsWithChildren, useCallback, useEffect, useMemo, useState } from "react"
 
-import { useApolloClient } from "@apollo/client"
 import { useHideBalanceQuery } from "@app/graphql/generated"
 
-import { saveHiddenBalanceToolTip, saveHideBalance } from "./client-only-query"
 import { HideAmountContextProvider } from "./hide-amount-context"
 
 export const HideAmountContainer: React.FC<PropsWithChildren> = ({ children }) => {
-  const client = useApolloClient()
-  const { data: { hideBalance: hideAmount } = { hideBalance: false } } =
-    useHideBalanceQuery()
+  const { data: { hideBalance } = { hideBalance: false } } = useHideBalanceQuery()
+
+  // Session-scoped: peeking never writes the persisted hideBalance setting,
+  // so "always hide balance" re-hides the amount on the next app start.
+  const [hideAmount, setHideAmount] = useState(hideBalance)
+
+  useEffect(() => {
+    setHideAmount(hideBalance)
+  }, [hideBalance])
 
   const switchMemoryHideAmount = useCallback(() => {
-    const shouldHideBalance = !hideAmount
-    saveHideBalance(client, shouldHideBalance)
-    saveHiddenBalanceToolTip(client, shouldHideBalance)
-  }, [client, hideAmount])
+    setHideAmount((prev) => !prev)
+  }, [])
 
   const contextValue = useMemo(
     () => ({ hideAmount, switchMemoryHideAmount }),
