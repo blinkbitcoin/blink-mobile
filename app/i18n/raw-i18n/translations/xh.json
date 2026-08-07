@@ -3711,6 +3711,7 @@
     "contactSupport": {
       "title": "Qhagamshelana nenkxaso",
       "body": "Kukho into engahambanga kakuhle, kodwa ungakhathazeki, imali yakho ikhuselekile. Nceda uqhagamshelane nenkxaso ukuze ufumane uncedo.\n\nUsenokufuna olu lwazi ukunceda inkxaso isombulule ityala lakho:",
+      "closeRefusedBody": "Ukufuduka kwakho kugqityiwe kwaye imali yakho ikwisipaji sakho esitsha. Asikwazanga ukuvala iakhawunti yakho endala ngokuzenzekelayo, ngoko inkxaso kufuneka iyigqibezele egameni lakho.\n\nUsenokufuna olu lwazi ukunceda inkxaso isombulule ityala lakho:",
       "reasonLabel": "Isizathu",
       "accountIdLabel": "I-ID yeakhawunti",
       "pubKeyLabel": "pubKey",

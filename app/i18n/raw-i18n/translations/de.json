@@ -3711,6 +3711,7 @@
         "contactSupport": {
             "title": "Support kontaktieren",
             "body": "Etwas ist schiefgelaufen, aber keine Sorge, dein Guthaben ist sicher. Bitte kontaktiere den Support für Hilfe.\n\nDiese Informationen können dem Support helfen, deinen Fall zu lösen:",
+            "closeRefusedBody": "Deine Migration ist abgeschlossen und dein Guthaben befindet sich in deiner neuen Wallet. Wir konnten dein altes Konto nicht automatisch schließen, daher muss der Support das für dich erledigen.\n\nDiese Informationen können dem Support helfen, deinen Fall zu lösen:",
             "reasonLabel": "Grund",
             "accountIdLabel": "Konto-ID",
             "pubKeyLabel": "pubKey",

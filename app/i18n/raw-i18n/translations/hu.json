@@ -3711,6 +3711,7 @@
     "contactSupport": {
       "title": "Kapcsolatfelvétel az ügyfélszolgálattal",
       "body": "Valami hiba történt, de ne aggódjon, a pénze biztonságban van. Kérjük, forduljon az ügyfélszolgálathoz segítségért.\n\nEzekre az adatokra szüksége lehet, hogy az ügyfélszolgálat megoldja az esetét:",
+      "closeRefusedBody": "A migrációja befejeződött, és az egyenlege az új tárcájában van. A régi fiókját nem tudtuk automatikusan lezárni, ezért az ügyfélszolgálatnak kell befejeznie Ön helyett.\n\nEzekre az adatokra szüksége lehet, hogy az ügyfélszolgálat megoldja az esetét:",
       "reasonLabel": "Ok",
       "accountIdLabel": "Fiókazonosító",
       "pubKeyLabel": "pubKey",

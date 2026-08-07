@@ -3711,6 +3711,7 @@
     "contactSupport": {
       "title": "Yanapakuyta maskay",
       "body": "Imapas mana allinchu karqan, ichaqa ama llakikuychu, qullqiykikuna waqaychasqam kachkan. Ama hina kaspa yanapakuyta maskay.\n\nKay willakuykunata munawaq yanapakuqkuna hawkachinankupaq:",
+      "closeRefusedBody": "Astakuyniyki tukusqañam, qullqiykipas musuq qhipiykipiñam. Mawk'a cuentaykita mana kikinmanta wichq'ayta atirqanikuchu, chayrayku yanapaqkuna qammanta tukuchinanku.\n\nKay willakuykunata munawaq yanapakuqkuna hawkachinankupaq:",
       "reasonLabel": "Imarayku",
       "accountIdLabel": "Kuenta ID",
       "pubKeyLabel": "pubKey",

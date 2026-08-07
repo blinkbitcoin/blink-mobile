@@ -3711,6 +3711,7 @@
     "contactSupport": {
       "title": "Contact opnemen met support",
       "body": "Er is iets misgegaan, maar maak je geen zorgen, je geld is veilig. Neem contact op met support voor hulp.\n\nMogelijk heb je deze informatie nodig zodat support je zaak kan oplossen:",
+      "closeRefusedBody": "Je migratie is voltooid en je tegoed staat in je nieuwe wallet. We konden je oude account niet automatisch sluiten, dus support moet dit voor je afronden.\n\nMogelijk heb je deze informatie nodig zodat support je zaak kan oplossen:",
       "reasonLabel": "Reden",
       "accountIdLabel": "Account-ID",
       "pubKeyLabel": "pubKey",

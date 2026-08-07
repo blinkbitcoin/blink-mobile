@@ -3711,6 +3711,7 @@
     "contactSupport": {
       "title": "Kontaktovať podporu",
       "body": "Niečo sa pokazilo, ale nebojte sa, vaše prostriedky sú v bezpečí. Obráťte sa prosím na podporu.\n\nTieto informácie môžu podpore pomôcť vyriešiť váš prípad:",
+      "closeRefusedBody": "Vaša migrácia je dokončená a vaše prostriedky sú v novej peňaženke. Váš starý účet sa nám nepodarilo zatvoriť automaticky, takže to musí dokončiť podpora za vás.\n\nTieto informácie môžu podpore pomôcť vyriešiť váš prípad:",
       "reasonLabel": "Dôvod",
       "accountIdLabel": "ID účtu",
       "pubKeyLabel": "pubKey",

@@ -3711,6 +3711,7 @@
     "contactSupport": {
       "title": "Kontaktirajte podršku",
       "body": "Nešto je pošlo po zlu, ali ne brinite, vaša su sredstva sigurna. Obratite se podršci za pomoć.\n\nOve informacije mogu pomoći podršci da riješi vaš slučaj:",
+      "closeRefusedBody": "Vaša migracija je dovršena i vaša sredstva su u novom novčaniku. Vaš stari račun nismo mogli zatvoriti automatski, pa to podrška mora dovršiti umjesto vas.\n\nOve informacije mogu pomoći podršci da riješi vaš slučaj:",
       "reasonLabel": "Razlog",
       "accountIdLabel": "ID računa",
       "pubKeyLabel": "pubKey",
