@@ -1,5 +1,5 @@
 import React, { useEffect, useLayoutEffect, useRef } from "react"
-import { ActivityIndicator, Pressable, View } from "react-native"
+import { ActivityIndicator, View } from "react-native"
 
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
@@ -7,6 +7,12 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { GaloyTertiaryButton } from "@app/components/atomic/galoy-tertiary-button"
+import {
+  headerRightNoGlass,
+  noHeaderRight,
+} from "@app/components/header-no-glass/header-no-glass"
+import { WarningCard } from "@app/components/warning-card"
 import { SuggestionBar } from "@app/components/suggestion-bar"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import {
@@ -27,6 +33,9 @@ import { isValidStepTwoWords } from "../utils"
 import { RestoreStatus, useRestorePhrase } from "./hooks/use-restore-phrase"
 
 type RestorePhraseRouteProp = RouteProp<RootStackParamList, "selfCustodialRestorePhrase">
+
+// The clear tertiary button has no padding, so its hit area is the text bounds.
+const HEADER_BUTTON_HIT_SLOP = { top: 12, bottom: 12, left: 12, right: 12 }
 
 export const RestorePhraseScreen: React.FC = () => {
   const { LL } = useI18nContext()
@@ -94,19 +103,26 @@ export const RestorePhraseScreen: React.FC = () => {
 
   const pasteLabel = LL.RestoreScreen.paste()
 
+  // Step 1 -> step 2 updates params on this same mounted screen, so the Paste
+  // button installed during step 1 has to be cleared explicitly here.
   useLayoutEffect(() => {
-    if (!isStep1) return
-    navigation.setOptions({
-      headerRight: () => (
-        <Pressable
+    if (!isStep1) {
+      navigation.setOptions(noHeaderRight)
+      return
+    }
+    navigation.setOptions(
+      headerRightNoGlass(() => (
+        <GaloyTertiaryButton
+          clear
+          title={pasteLabel}
           onPress={handlePasteFromClipboard}
-          style={styles.headerPaste}
+          containerStyle={styles.headerButton}
+          hitSlop={HEADER_BUTTON_HIT_SLOP}
           {...testProps("restore-paste-button")}
-        >
-          <Text style={styles.headerPasteText}>{pasteLabel}</Text>
-        </Pressable>
-      ),
-    })
+          accessibilityLabel={pasteLabel}
+        />
+      )),
+    )
   }, [navigation, isStep1, handlePasteFromClipboard, pasteLabel, styles])
 
   if (status === RestoreStatus.Restoring) {
@@ -172,6 +188,14 @@ export const RestorePhraseScreen: React.FC = () => {
     >
       <Text style={styles.subtitle}>{subtitle}</Text>
 
+      {isStep1 && (
+        <View style={styles.warningCard}>
+          <WarningCard title={LL.RestoreScreen.recognizePhraseTitle()}>
+            {LL.RestoreScreen.recognizePhraseBody()}
+          </WarningCard>
+        </View>
+      )}
+
       <View style={styles.inputList}>
         {stepWords.map((word, i) => {
           const globalIndex = offset + i
@@ -218,16 +242,14 @@ const useStyles = makeStyles(({ colors }) => ({
     color: colors.grey2,
     marginBottom: 20,
   },
+  warningCard: {
+    marginBottom: 20,
+  },
   inputList: {
     gap: 10,
   },
-  headerPaste: {
+  headerButton: {
     marginRight: 16,
-  },
-  headerPasteText: {
-    color: colors.primary,
-    fontSize: 16,
-    fontWeight: "700",
   },
   errorContainer: {
     flexDirection: "row",

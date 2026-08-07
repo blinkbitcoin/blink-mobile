@@ -3663,7 +3663,8 @@
         "savedConfirm": "لقد حفظتها",
         "copy": "نسخ",
         "continueButton": "متابعة",
-        "testBackup": "اختبر نسختك الاحتياطية"
+        "testBackup": "اختبر نسختك الاحتياطية",
+        "doNotShareWarning": "لا تُظهر هذا لأي شخص بما في ذلك الدعم"
       },
       "Confirm": {
         "headerTitle": "تأكيد عبارة النسخ الاحتياطي",
@@ -3829,7 +3830,9 @@
     "enterPassword": "أدخل كلمة مرور التشفير",
     "wrongPassword": "كلمة مرور غير صحيحة. يرجى المحاولة مرة أخرى.",
     "pickBackupTitle": "اختر محفظة",
-    "pickBackupDescription": "اختر نسخة احتياطية للاستعادة"
+    "pickBackupDescription": "اختر نسخة احتياطية للاستعادة",
+    "recognizePhraseTitle": "هل تتعرّف على عبارة النسخ الاحتياطي هذه؟",
+    "recognizePhraseBody": "لا تُدخل أبدًا كلمات أرسلها لك شخص آخر."
   },
   "BackupNudge": {
     "title": "أموالك في خطر",

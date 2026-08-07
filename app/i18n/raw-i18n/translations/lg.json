@@ -3663,7 +3663,8 @@
         "savedConfirm": "Nkitereka",
         "copy": "Koppa",
         "continueButton": "Weyongerawo",
-        "testBackup": "Gezza okukuumako"
+        "testBackup": "Gezza okukuumako",
+        "doNotShareWarning": "Tokiraga muntu yenna, n'abawagizi ba support"
       },
       "Confirm": {
         "headerTitle": "Kakasa ekigambo eky'okukoppa",
@@ -3829,7 +3830,9 @@
     "enterPassword": "Yingiza password yo ey'okusiba",
     "wrongPassword": "Password si ntuufu. Gezaako nate.",
     "pickBackupTitle": "Londa wallet",
-    "pickBackupDescription": "Londa kopiyo y'okuzzaawo"
+    "pickBackupDescription": "Londa kopiyo y'okuzzaawo",
+    "recognizePhraseTitle": "Omanyi ebigambo bino eby'okukuuma?",
+    "recognizePhraseBody": "Toteekangamu bigambo omuntu omulala by'akuweereza."
   },
   "BackupNudge": {
     "title": "Ssente zo ziri mu bulabe",

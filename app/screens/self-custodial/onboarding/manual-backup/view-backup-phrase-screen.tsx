@@ -1,15 +1,20 @@
-import React, { useCallback } from "react"
+import React, { useCallback, useLayoutEffect } from "react"
 import { ActivityIndicator, ScrollView, View } from "react-native"
 
-import { makeStyles, Text, useTheme } from "@rn-vui/themed"
+import { makeStyles, useTheme } from "@rn-vui/themed"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
-import { IconTextButton } from "@app/components/icon-text-button"
-import { InfoBanner } from "@app/components/info-banner"
+import { GaloyTertiaryButton } from "@app/components/atomic/galoy-tertiary-button"
+import {
+  headerRightNoGlass,
+  noHeaderRight,
+} from "@app/components/header-no-glass/header-no-glass"
+import { WarningCard } from "@app/components/warning-card"
 import { MnemonicWordsGrid } from "@app/components/mnemonic-words-grid"
 import { Screen } from "@app/components/screen"
+import { SparkCompatibleInfo } from "@app/components/spark-compatible-info"
 import { useScreenSecurity } from "@app/hooks/use-screen-security"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -17,6 +22,9 @@ import { useBiometricGate } from "@app/screens/card-screen/hooks/use-biometric-g
 import { testProps } from "@app/utils/testProps"
 
 import { useViewBackupPhrase } from "../hooks"
+
+// The clear tertiary button has no padding, so its hit area is the text bounds.
+const HEADER_BUTTON_HIT_SLOP = { top: 12, bottom: 12, left: 12, right: 12 }
 
 export const ViewBackupPhraseScreen: React.FC = () => {
   const { LL } = useI18nContext()
@@ -36,14 +44,33 @@ export const ViewBackupPhraseScreen: React.FC = () => {
     onlyIfBiometricsEnabled: true,
   })
 
-  const { words, handleCopy, handleOpenSparkLink, handleTestBackup } =
-    useViewBackupPhrase()
+  const { words, handleCopy, handleTestBackup } = useViewBackupPhrase()
 
-  const sparkLink = LL.BackupScreen.ManualBackup.Phrase.sparkCompatibleLink()
-  const infoText = LL.BackupScreen.ManualBackup.Phrase.sparkCompatible({
-    sparkCompatibleLink: sparkLink,
-  })
-  const [infoBefore, infoAfter] = infoText.split(sparkLink)
+  const copyLabel = LL.BackupScreen.ManualBackup.Phrase.copy()
+
+  // The header sits outside the `!authenticated` early return below, so it has to
+  // gate itself: without this the Copy button is mounted — and copies the full
+  // mnemonic — while the biometric prompt is still pending.
+  useLayoutEffect(() => {
+    if (!authenticated) {
+      navigation.setOptions(noHeaderRight)
+      return
+    }
+
+    navigation.setOptions(
+      headerRightNoGlass(() => (
+        <GaloyTertiaryButton
+          clear
+          title={copyLabel}
+          onPress={handleCopy}
+          containerStyle={styles.headerButton}
+          hitSlop={HEADER_BUTTON_HIT_SLOP}
+          {...testProps("backup-phrase-copy")}
+          accessibilityLabel={copyLabel}
+        />
+      )),
+    )
+  }, [navigation, authenticated, copyLabel, handleCopy, styles])
 
   if (!authenticated) {
     return (
@@ -56,28 +83,11 @@ export const ViewBackupPhraseScreen: React.FC = () => {
   return (
     <Screen preset="fixed">
       <ScrollView contentContainerStyle={styles.content}>
+        <WarningCard title={LL.BackupScreen.ManualBackup.Phrase.doNotShareWarning()} />
+
         <MnemonicWordsGrid words={words} />
 
-        <IconTextButton
-          icon="copy-paste"
-          label={LL.BackupScreen.ManualBackup.Phrase.copy()}
-          onPress={handleCopy}
-          {...testProps("backup-phrase-copy")}
-        />
-
-        <InfoBanner>
-          <Text style={styles.infoText}>
-            {infoBefore}
-            <Text
-              style={styles.linkText}
-              accessibilityRole="link"
-              onPress={handleOpenSparkLink}
-            >
-              {sparkLink}
-            </Text>
-            {infoAfter}
-          </Text>
-        </InfoBanner>
+        <SparkCompatibleInfo />
       </ScrollView>
 
       <View style={styles.buttonsContainer}>
@@ -104,14 +114,8 @@ const useStyles = makeStyles(() => ({
     paddingBottom: 20,
     gap: 20,
   },
-  infoText: {
-    fontSize: 12,
-    lineHeight: 18,
-  },
-  linkText: {
-    fontSize: 12,
-    lineHeight: 18,
-    textDecorationLine: "underline",
+  headerButton: {
+    marginRight: 16,
   },
   buttonsContainer: {
     gap: 10,

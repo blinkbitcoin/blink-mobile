@@ -8,11 +8,12 @@ import { ContextForScreen } from "../../../helper"
 import { flushEffects } from "../../../../helpers/flush-effects"
 
 const mockNavigate = jest.fn()
+const mockSetOptions = jest.fn()
 let mockStep: unknown = 1
 let mockHasParams = true
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
-  useNavigation: () => ({ navigate: mockNavigate }),
+  useNavigation: () => ({ navigate: mockNavigate, setOptions: mockSetOptions }),
   useRoute: () => ({ params: mockHasParams ? { step: mockStep } : undefined }),
 }))
 
@@ -21,6 +22,13 @@ jest.mock("@app/utils/error-logging", () => ({
   ...jest.requireActual("@app/utils/error-logging"),
   reportError: (...args: readonly unknown[]) => mockReportError(...args),
 }))
+
+const renderHeaderRight = () => {
+  const calls = mockSetOptions.mock.calls
+  const lastOptions = calls[calls.length - 1]?.[0]
+  if (!lastOptions?.headerRight) throw new Error("headerRight was not set")
+  return render(<ContextForScreen>{lastOptions.headerRight()}</ContextForScreen>)
+}
 
 const mockCopyToClipboard = jest.fn()
 let mockCountdown = { remainingSeconds: 0, isExpired: true }
@@ -43,6 +51,12 @@ jest.mock("@app/screens/self-custodial/onboarding/hooks/use-wallet-mnemonic", ()
 jest.mock("react-native-inappbrowser-reborn", () => ({
   __esModule: true,
   default: { open: jest.fn(() => Promise.resolve()) },
+}))
+
+const mockOpenExternalUrl = jest.fn()
+jest.mock("@app/utils/external", () => ({
+  ...jest.requireActual("@app/utils/external"),
+  openExternalUrl: (...args: unknown[]) => mockOpenExternalUrl(...args),
 }))
 
 jest.mock("@app/screens/settings-screen/group", () => {
@@ -246,14 +260,15 @@ describe("BackupPhraseScreen", () => {
   })
 
   describe("shared", () => {
-    it("renders copy button", async () => {
-      const { getByText } = render(
+    it("renders copy button in the header", async () => {
+      render(
         <ContextForScreen>
           <BackupPhraseScreen />
         </ContextForScreen>,
       )
       await flushEffects()
 
+      const { getByText } = renderHeaderRight()
       expect(getByText(LL.BackupScreen.ManualBackup.Phrase.copy())).toBeTruthy()
     })
 
@@ -266,13 +281,32 @@ describe("BackupPhraseScreen", () => {
       await flushEffects()
 
       await waitFor(() => expect(getByText("youth")).toBeTruthy())
-      fireEvent.press(getByText(LL.BackupScreen.ManualBackup.Phrase.copy()))
+      const { getByText: getHeaderText } = renderHeaderRight()
+      fireEvent.press(getHeaderText(LL.BackupScreen.ManualBackup.Phrase.copy()))
       expect(mockCopyToClipboard).toHaveBeenCalledWith(
         expect.objectContaining({
           content: expect.stringContaining("youth"),
           message: LL.BackupScreen.ManualBackup.Phrase.copiedToast(),
         }),
       )
+    })
+
+    it("announces the Copy button by its visible label, not the test id", async () => {
+      render(
+        <ContextForScreen>
+          <BackupPhraseScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      const { getByTestId } = renderHeaderRight()
+      const button = getByTestId("backup-phrase-copy")
+      // `testProps` sets accessibilityLabel to the test id; the explicit
+      // accessibilityLabel after the spread must win.
+      expect(button.props.accessibilityLabel).toBe(
+        LL.BackupScreen.ManualBackup.Phrase.copy(),
+      )
+      expect(button.props.hitSlop).toEqual({ top: 12, bottom: 12, left: 12, right: 12 })
     })
 
     it("renders spark compatible link", async () => {
@@ -285,6 +319,32 @@ describe("BackupPhraseScreen", () => {
 
       expect(
         getByText(LL.BackupScreen.ManualBackup.Phrase.sparkCompatibleLink()),
+      ).toBeTruthy()
+    })
+
+    it("opens the spark-compatible link from the info banner", () => {
+      const { getByText } = render(
+        <ContextForScreen>
+          <BackupPhraseScreen />
+        </ContextForScreen>,
+      )
+
+      fireEvent.press(
+        getByText(LL.BackupScreen.ManualBackup.Phrase.sparkCompatibleLink()),
+      )
+
+      expect(mockOpenExternalUrl).toHaveBeenCalledWith("https://example.com")
+    })
+
+    it("renders the do-not-share warning card", () => {
+      const { getByText } = render(
+        <ContextForScreen>
+          <BackupPhraseScreen />
+        </ContextForScreen>,
+      )
+
+      expect(
+        getByText(LL.BackupScreen.ManualBackup.Phrase.doNotShareWarning()),
       ).toBeTruthy()
     })
   })
