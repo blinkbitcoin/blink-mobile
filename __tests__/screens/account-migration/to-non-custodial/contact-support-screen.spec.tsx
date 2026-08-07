@@ -249,6 +249,53 @@ describe("MigrationContactSupportScreen", () => {
     expect(screen.getByText(mockSupportEmail)).toBeTruthy()
   })
 
+  /** A refused start clears itself on relaunch (the start latch is in-memory, and the gate
+   *  resumes or completes the migration), so the screen leads with restart instructions
+   *  instead of the support-first copy (#4098). The diagnostics stay: support still needs
+   *  the reason code and identity if the restart does not help. */
+  it("shows the self-help copy for a refused start", async () => {
+    mockReason = MigrationSupportReason.StartRefused
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.getByTestId("icon-refresh")).toBeTruthy()
+    expect(screen.getByText(LLSupport.selfHelp.title())).toBeTruthy()
+    expect(screen.getByText(LLSupport.selfHelp.body())).toBeTruthy()
+    // No queryByText(LLSupport.title()) here: "Contact support" is also the demoted
+    // CTA's label, so the generic hero's absence is asserted through its body instead.
+    expect(screen.queryByText(LLSupport.body())).toBeNull()
+    expect(screen.queryByText(LLSupport.contactUsCta())).toBeNull()
+    expect(screen.getByText(LLSupport.reasonLabel())).toBeTruthy()
+    expect(screen.getByText("start-refused")).toBeTruthy()
+  })
+
+  /** Contact support demotes to a fallback in the self-help variant, but it must still
+   *  reach the same pre-filled email, and the address-copy control must survive. */
+  it("reaches support from the demoted self-help contact action", async () => {
+    mockReason = MigrationSupportReason.StartRefused
+    renderScreen()
+    await flushEffects()
+
+    fireEvent.press(screen.getByText(LLSupport.selfHelp.contactSupportCta()))
+
+    expect(mockSendSupportEmail).toHaveBeenCalledTimes(1)
+    expect(screen.getByText(mockSupportEmail)).toBeTruthy()
+  })
+
+  /** Terminal reasons cannot be restarted away, so they keep the support-first copy;
+   *  the self-help variant is scoped to the restart-resolvable set alone. */
+  it("keeps the support-first copy for a terminal reason", async () => {
+    mockReason = MigrationSupportReason.LockedWithoutCheckpoint
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.getByTestId("icon-headset")).toBeTruthy()
+    expect(screen.getByText(LLSupport.title())).toBeTruthy()
+    expect(screen.getByText(LLSupport.body())).toBeTruthy()
+    expect(screen.getByText(LLSupport.contactUsCta())).toBeTruthy()
+    expect(screen.queryByText(LLSupport.selfHelp.title())).toBeNull()
+  })
+
   /** Sensitive identifiers are shown complete for support to copy: the account id and the
    *  pubKey are never middle-ellipsized to fit one line. */
   it("renders the account id and the pubKey complete, never truncated", async () => {

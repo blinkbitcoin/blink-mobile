@@ -32,7 +32,18 @@ import { testProps } from "@app/utils/testProps"
  * control and the hardware back return to the commit point (Step 8) when support was opened
  * mid-migration, or dismiss the screen when it was opened by the completed-migration resume
  * handover; the visible control covers iOS, which has no hardware back.
+ *
+ * Restart-resolvable refusals (#4098) get a self-help variant instead of the support-first
+ * copy: restart instructions lead, and Contact support demotes to a fallback. The
+ * diagnostics card and email stay identical so support still gets the full block either way.
  */
+
+/** Reasons a user can clear themselves by restarting the app: the start latch is in-memory
+ *  only, and the gate resumes (or completes) the migration on relaunch. */
+const SELF_HELP_REASONS: ReadonlySet<MigrationSupportReason> = new Set([
+  MigrationSupportReason.StartRefused,
+])
+
 export const MigrationContactSupportScreen: React.FC = () => {
   const { LL } = useI18nContext()
   const LLSupport = LL.AccountMigration.contactSupport
@@ -49,6 +60,7 @@ export const MigrationContactSupportScreen: React.FC = () => {
   /** Callers must pass a reason, but a navigation-state restore can land here with none;
    *  a named fallback keeps the ticket meaningful instead of crashing on a missing param. */
   const reason = params?.reason ?? MigrationSupportReason.Unknown
+  const isSelfHelp = SELF_HELP_REASONS.has(reason)
   const { cardDetails, supportDetailsText, sendSupportEmail } =
     useMigrationSupportEmail(reason)
 
@@ -114,10 +126,10 @@ export const MigrationContactSupportScreen: React.FC = () => {
     <Screen preset="fixed">
       <View style={styles.container}>
         <IconHero
-          icon="headset"
+          icon={isSelfHelp ? "refresh" : "headset"}
           iconColor={colors.primary}
-          title={LLSupport.title()}
-          subtitle={LLSupport.body()}
+          title={isSelfHelp ? LLSupport.selfHelp.title() : LLSupport.title()}
+          subtitle={isSelfHelp ? LLSupport.selfHelp.body() : LLSupport.body()}
         />
 
         <ScrollView style={styles.scroll} contentContainerStyle={styles.body}>
@@ -146,11 +158,21 @@ export const MigrationContactSupportScreen: React.FC = () => {
         </ScrollView>
 
         <View style={styles.buttonsContainer}>
-          <GaloyPrimaryButton
-            title={LLSupport.contactUsCta()}
-            onPress={sendSupportEmail}
-            {...testProps("migration-contact-support-cta")}
-          />
+          {/* Self-help keeps no primary action: restarting cannot be a button, so the
+              instructions lead and Contact support demotes to a fallback. */}
+          {isSelfHelp ? (
+            <GaloySecondaryButton
+              title={LLSupport.selfHelp.contactSupportCta()}
+              onPress={sendSupportEmail}
+              {...testProps("migration-contact-support-cta")}
+            />
+          ) : (
+            <GaloyPrimaryButton
+              title={LLSupport.contactUsCta()}
+              onPress={sendSupportEmail}
+              {...testProps("migration-contact-support-cta")}
+            />
+          )}
           <GaloySecondaryButton
             title={supportEmailAddress}
             onPress={copySupportEmail}
