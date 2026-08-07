@@ -29,8 +29,10 @@ class MainActivity : ReactActivity() {
     super.onCreate(null)
   }
 
+  private val safeTouchDispatch = SafeTouchDispatch()
+
   override fun dispatchTouchEvent(ev: MotionEvent): Boolean =
-      SafeTouchDispatch.dispatch(
+      safeTouchDispatch.dispatch(
           onFrameworkBug = { FirebaseCrashlytics.getInstance().recordException(it) },
       ) {
         super.dispatchTouchEvent(ev)
