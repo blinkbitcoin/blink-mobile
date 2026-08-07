@@ -39,11 +39,12 @@ const throwError = () => {
 // Manual mocks for LnUrlPayServiceResponse and LNURLResponse
 const manualMockLnUrlPayServiceResponse = (
   identifier: string,
+  amounts?: { min: Satoshis; max: Satoshis },
 ): LnUrlPayServiceResponse => ({
   callback: "mocked_callback",
-  fixed: true,
-  min: 0 as Satoshis,
-  max: 2000 as Satoshis,
+  fixed: amounts ? amounts.min === amounts.max : true,
+  min: amounts ? amounts.min : (0 as Satoshis),
+  max: amounts ? amounts.max : (2000 as Satoshis),
   domain: "example.com",
   metadata: [
     ["text/plain", "description"],
@@ -289,6 +290,178 @@ describe("resolve lnurl destination", () => {
           }),
         )
       }
+    })
+  })
+
+  describe("with fixed-amount lnurl for username on our domain", () => {
+    const lnurlPaymentDestinationParams = {
+      parsedLnurlDestination: {
+        paymentType: PaymentType.Lnurl,
+        valid: true,
+        lnurl: "alice@ourdomain.com",
+        isMerchant: false,
+      } as const,
+      lnurlDomains: ["ourdomain.com"],
+      accountDefaultWalletQuery: jest.fn().mockResolvedValue({
+        data: {
+          accountDefaultWallet: {
+            __typename: "BtcWallet",
+            id: "recipientwalletid",
+            walletCurrency: "BTC",
+          },
+        },
+      }),
+      myWalletIds: ["testwalletid"],
+    }
+
+    it("creates lnurl pay destination to preserve the fixed amount", async () => {
+      const lnurlPayParams = manualMockLnUrlPayServiceResponse("alice@ourdomain.com", {
+        min: 100 as Satoshis,
+        max: 100 as Satoshis,
+      })
+      mockRequestPayServiceParams.mockResolvedValue(lnurlPayParams)
+      mockGetParams.mockResolvedValue(manualMockLNURLResponse())
+
+      const destination = await resolveLnurlDestination(lnurlPaymentDestinationParams)
+
+      expect(destination).toEqual(
+        expect.objectContaining({
+          valid: true,
+          destinationDirection: DestinationDirection.Send,
+          validDestination: expect.objectContaining({
+            paymentType: PaymentType.Lnurl,
+            lnurlParams: lnurlPayParams,
+          }),
+        }),
+      )
+      expect(
+        lnurlPaymentDestinationParams.accountDefaultWalletQuery,
+      ).not.toHaveBeenCalled()
+    })
+  })
+
+  describe("with zero-amount lnurl for username on our domain", () => {
+    const lnurlPaymentDestinationParams = {
+      parsedLnurlDestination: {
+        paymentType: PaymentType.Lnurl,
+        valid: true,
+        lnurl: "alice@ourdomain.com",
+        isMerchant: false,
+      } as const,
+      lnurlDomains: ["ourdomain.com"],
+      accountDefaultWalletQuery: jest.fn().mockResolvedValue({
+        data: {
+          accountDefaultWallet: {
+            __typename: "BtcWallet",
+            id: "recipientwalletid",
+            walletCurrency: "BTC",
+          },
+        },
+      }),
+      myWalletIds: ["testwalletid"],
+    }
+
+    it("resolves as intraledger destination instead of unpayable fixed zero amount", async () => {
+      const lnurlPayParams = manualMockLnUrlPayServiceResponse("alice@ourdomain.com", {
+        min: 0 as Satoshis,
+        max: 0 as Satoshis,
+      })
+      mockRequestPayServiceParams.mockResolvedValue(lnurlPayParams)
+      mockGetParams.mockResolvedValue(manualMockLNURLResponse())
+
+      const destination = await resolveLnurlDestination(lnurlPaymentDestinationParams)
+
+      expect(destination).toEqual(
+        expect.objectContaining({
+          valid: true,
+          destinationDirection: DestinationDirection.Send,
+        }),
+      )
+      if (destination.valid) {
+        expect(destination.validDestination).toEqual(
+          expect.objectContaining({
+            paymentType: PaymentType.Intraledger,
+            handle: "alice",
+          }),
+        )
+      }
+    })
+  })
+
+  describe("with variable-amount lnurl resolving to own wallet", () => {
+    const lnurlPaymentDestinationParams = {
+      parsedLnurlDestination: {
+        paymentType: PaymentType.Lnurl,
+        valid: true,
+        lnurl: "myself@ourdomain.com",
+        isMerchant: false,
+      } as const,
+      lnurlDomains: ["ourdomain.com"],
+      accountDefaultWalletQuery: jest.fn().mockResolvedValue({
+        data: {
+          accountDefaultWallet: {
+            __typename: "BtcWallet",
+            id: "testwalletid",
+            walletCurrency: "BTC",
+          },
+        },
+      }),
+      myWalletIds: ["testwalletid"],
+    }
+
+    it("falls back to lnurl pay destination when intraledger resolution is invalid", async () => {
+      const lnurlPayParams = manualMockLnUrlPayServiceResponse("myself@ourdomain.com")
+      mockRequestPayServiceParams.mockResolvedValue(lnurlPayParams)
+      mockGetParams.mockResolvedValue(manualMockLNURLResponse())
+
+      const destination = await resolveLnurlDestination(lnurlPaymentDestinationParams)
+
+      expect(destination).toEqual(
+        expect.objectContaining({
+          valid: true,
+          destinationDirection: DestinationDirection.Send,
+          validDestination: expect.objectContaining({
+            paymentType: PaymentType.Lnurl,
+            lnurlParams: lnurlPayParams,
+          }),
+        }),
+      )
+    })
+  })
+
+  describe("with fixed-amount lnurl on external domain", () => {
+    const lnurlPaymentDestinationParams = {
+      parsedLnurlDestination: {
+        paymentType: PaymentType.Lnurl,
+        valid: true,
+        lnurl: "bob@external.com",
+        isMerchant: false,
+      } as const,
+      lnurlDomains: ["ourdomain.com"],
+      accountDefaultWalletQuery: jest.fn(),
+      myWalletIds: ["testwalletid"],
+    }
+
+    it("creates lnurl pay destination with the fixed-amount params", async () => {
+      const lnurlPayParams = manualMockLnUrlPayServiceResponse("bob@external.com", {
+        min: 65 as Satoshis,
+        max: 65 as Satoshis,
+      })
+      mockRequestPayServiceParams.mockResolvedValue(lnurlPayParams)
+      mockGetParams.mockResolvedValue(manualMockLNURLResponse())
+
+      const destination = await resolveLnurlDestination(lnurlPaymentDestinationParams)
+
+      expect(destination).toEqual(
+        expect.objectContaining({
+          valid: true,
+          destinationDirection: DestinationDirection.Send,
+          validDestination: expect.objectContaining({
+            paymentType: PaymentType.Lnurl,
+            lnurlParams: lnurlPayParams,
+          }),
+        }),
+      )
     })
   })
 
