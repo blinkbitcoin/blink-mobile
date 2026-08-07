@@ -26,11 +26,16 @@ let mockMigrationAccountId: string | null = "sc-account-1"
 let mockMigrationLoading = false
 const mockUseHardwareBackGuard = jest.fn()
 
+/** The completion hook owns the custodial id now, so the screen reads it from there rather
+ *  than opening a second owner query of its own. */
+let mockOwnerId: string | null = "custodial-1"
+
 jest.mock("@app/screens/account-migration/hooks", () => ({
   ...jest.requireActual("@app/screens/account-migration/hooks"),
   useCompleteMigration: () => ({
     migrationAccountId: mockMigrationAccountId,
     migrationExpectedReceiveSats: 21000,
+    custodialAccountId: mockOwnerId,
     migrationLoading: mockMigrationLoading,
     completeMigration: mockCompleteMigration,
   }),
@@ -57,12 +62,6 @@ jest.mock("@app/screens/account-migration/hooks/use-migration-transfer", () => (
       retry: mockRetry,
     }
   },
-}))
-
-let mockOwnerId: string | null = "custodial-1"
-
-jest.mock("@app/screens/account-migration/hooks/use-custodial-owner-id", () => ({
-  useCustodialOwnerId: () => ({ ownerId: mockOwnerId, loading: false }),
 }))
 
 jest.mock("@app/utils/error-logging", () => ({
@@ -414,6 +413,25 @@ describe("MigrationTransferringFundsScreen", () => {
       index: 0,
       routes: [{ name: "selfCustodialBackupSuccess", params: { reBackup: false } }],
     })
+  })
+
+  /** The switch is exhaustive at compile time, so this only happens to a build running
+   *  against a completion it does not know about. The if-chain it replaced fell through to
+   *  the success screen, which would have told the user the migration finished. */
+  it("reports an outcome it does not recognise instead of claiming success", async () => {
+    mockIsTransferred = true
+    mockCompleteMigration.mockResolvedValue(
+      "newly-added-outcome" as unknown as MigrationCompletion,
+    )
+    renderScreen()
+    await flushEffects()
+
+    expect(reportError).toHaveBeenCalledWith(
+      "Migration completion unhandled",
+      expect.objectContaining({ message: "Unhandled completion: newly-added-outcome" }),
+    )
+    expect(mockReset).not.toHaveBeenCalled()
+    expect(mockNavigate).not.toHaveBeenCalled()
   })
 
   describe("when the account close does not settle", () => {

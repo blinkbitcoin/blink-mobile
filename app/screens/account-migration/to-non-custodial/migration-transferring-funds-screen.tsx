@@ -9,7 +9,6 @@ import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { Screen } from "@app/components/screen"
 import { StatusScreenLayout } from "@app/components/status-screen-layout"
-import { useCustodialOwnerId } from "@app/screens/account-migration/hooks/use-custodial-owner-id"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import {
@@ -33,10 +32,15 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
     theme: { colors },
   } = useTheme()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-  const { ownerId } = useCustodialOwnerId()
+
+  /** The custodial id comes from the completion hook rather than a second owner query of
+   *  this screen's own: two no-cache reads of the same id can disagree for a render after
+   *  an account switch, and the close and the handover that names it must never be stamped
+   *  with different accounts. */
   const {
     migrationAccountId,
     migrationExpectedReceiveSats,
+    custodialAccountId,
     migrationLoading,
     completeMigration,
   } = useCompleteMigration()
@@ -53,10 +57,10 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
       navigation.navigate("accountMigrationContactSupport", {
         reason,
         origin: MigrationSupportOrigin.Commit,
-        custodialAccountId: ownerId ?? undefined,
+        custodialAccountId: custodialAccountId ?? undefined,
       })
     },
-    [navigation, ownerId],
+    [navigation, custodialAccountId],
   )
 
   /** The delayed handover is the one the user comes back from: the receive is still being
@@ -92,7 +96,7 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
     hasConnectionIssue,
     retry,
   } = useMigrationTransfer({
-    custodialAccountId: ownerId,
+    custodialAccountId,
     selfCustodialAccountId: migrationAccountId,
     expectedReceiveSats: migrationExpectedReceiveSats,
     skip: isTransferSkipped,
@@ -136,48 +140,62 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
           params: {
             reason: MigrationSupportReason.CustodialAccountCloseRefused,
             origin: MigrationSupportOrigin.Resume,
-            custodialAccountId: ownerId ?? undefined,
+            custodialAccountId: custodialAccountId ?? undefined,
           },
         },
       ],
     })
-  }, [navigation, ownerId])
+  }, [navigation, custodialAccountId])
 
   /** The close is the only step bound to this moment, because the discard that follows
    *  destroys the token it needs; the swap after it is local, so a failure there leaves a
    *  completed migration the next launch can still finish. */
-  const hasFiredThisAttempt = firedAttemptRef.current === completionAttempt
-  const isCompletionSkipped = !isTransferred || hasFiredThisAttempt
-
   useEffect(() => {
-    if (isCompletionSkipped) return
+    if (!isTransferred) return
+
+    /** Read and claimed inside the effect, not at render: a closure re-run without a render
+     *  in between (React's development remount) would otherwise carry a stale "not fired
+     *  yet" and send a second completion after the first. */
+    if (firedAttemptRef.current === completionAttempt) return
     firedAttemptRef.current = completionAttempt
 
     completeMigration()
       .then((completion) => {
-        if (completion === MigrationCompletion.AccountMissing) {
-          goToContactSupport(MigrationSupportReason.SelfCustodialAccountMissing)
-          return
-        }
+        /** Exhaustive on purpose: the fallthrough of an if-chain here resets the stack to
+         *  the success screen, so a new outcome would silently tell the user the migration
+         *  finished. A type error is the cheaper way to find out. */
+        switch (completion) {
+          case MigrationCompletion.Completed:
+            resetToSuccess()
+            return
 
-        if (completion === MigrationCompletion.CloseUnavailable) {
-          setIsCloseUnavailable(true)
-          return
-        }
+          case MigrationCompletion.AccountMissing:
+            goToContactSupport(MigrationSupportReason.SelfCustodialAccountMissing)
+            return
 
-        if (completion === MigrationCompletion.CloseRefused) {
-          resetToCloseRefusedSupport()
-          return
-        }
+          case MigrationCompletion.CloseUnavailable:
+            setIsCloseUnavailable(true)
+            return
 
-        resetToSuccess()
+          case MigrationCompletion.CloseRefused:
+            resetToCloseRefusedSupport()
+            return
+
+          default: {
+            const unhandledCompletion: never = completion
+            reportError(
+              "Migration completion unhandled",
+              new Error(`Unhandled completion: ${String(unhandledCompletion)}`),
+            )
+          }
+        }
       })
       .catch((err) => {
         reportError("Migration session swap", err)
         goToContactSupport(MigrationSupportReason.TransferFailed)
       })
   }, [
-    isCompletionSkipped,
+    isTransferred,
     completionAttempt,
     completeMigration,
     resetToSuccess,
