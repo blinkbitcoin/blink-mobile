@@ -1,157 +1,225 @@
-import { renderHook, waitFor } from "@testing-library/react-native"
+import { Network as mockSparkNetwork } from "@breeztech/breez-sdk-spark-react-native"
+import { renderHook, act, waitFor } from "@testing-library/react-native"
 
+import { WalletCurrency } from "@app/graphql/generated"
 import {
   RecoveryBundleStatus,
   useRecoveryBundleStatus,
 } from "@app/self-custodial/hooks/use-recovery-bundle-status"
+import { AccountStatus, AccountType } from "@app/types/wallet"
 
-const mockReadState = jest.fn()
-jest.mock("@app/self-custodial/recovery-bundle/storage", () => ({
-  readRecoveryBundleState: (...args: unknown[]) => mockReadState(...args),
-}))
+const ACCOUNT_ID = "test-self-custodial-uuid"
 
-const mockReadSettings = jest.fn()
-jest.mock("@app/self-custodial/recovery-bundle/settings", () => ({
-  readRecoveryBundleSettings: (...args: unknown[]) => mockReadSettings(...args),
-}))
+const mockUseAccountRegistry = jest.fn()
+const mockUseActiveWallet = jest.fn()
+const mockReadRecoveryBundleState = jest.fn()
+const mockReadRecoveryBundleSettings = jest.fn()
 
-const mockAccount = jest.fn()
 jest.mock("@app/hooks/use-account-registry", () => ({
-  useAccountRegistry: () => ({ activeAccount: mockAccount() }),
+  useAccountRegistry: () => mockUseAccountRegistry(),
 }))
 
-const mockWallets = jest.fn()
 jest.mock("@app/hooks/use-active-wallet", () => ({
-  useActiveWallet: () => ({ wallets: mockWallets() }),
+  useActiveWallet: () => mockUseActiveWallet(),
 }))
 
 jest.mock("@app/self-custodial/hooks/use-spark-network", () => ({
-  useSparkNetwork: () => "mainnet",
+  useSparkNetwork: () => mockSparkNetwork.Regtest,
 }))
 
+jest.mock("@app/self-custodial/recovery-bundle/storage", () => ({
+  readRecoveryBundleState: (...args: readonly unknown[]) =>
+    mockReadRecoveryBundleState(...args),
+}))
+
+jest.mock("@app/self-custodial/recovery-bundle/settings", () => ({
+  readRecoveryBundleSettings: (...args: readonly unknown[]) =>
+    mockReadRecoveryBundleSettings(...args),
+}))
+
+// The production hook re-reads on focus; running the callback as a plain effect
+// keeps that path exercised without a navigation container.
 jest.mock("@react-navigation/native", () => ({
-  useFocusEffect: () => undefined,
+  useFocusEffect: (callback: () => void | (() => void)) =>
+    jest.requireActual<typeof import("react")>("react").useEffect(callback, [callback]),
 }))
 
-const SAVED_AT = Date.now() - 60_000
-const btc = (amount: number) => [{ walletCurrency: "BTC", balance: { amount } }]
+const selfCustodialAccount = {
+  id: ACCOUNT_ID,
+  type: AccountType.SelfCustodial,
+  label: "Spark",
+  selected: true,
+  status: AccountStatus.Available,
+}
+
+const withBalance = (sats: number) =>
+  mockUseActiveWallet.mockReturnValue({
+    wallets: [
+      {
+        walletCurrency: WalletCurrency.Btc,
+        balance: { amount: sats, currency: WalletCurrency.Btc },
+      },
+    ],
+  })
+
+const renderStatus = async () => {
+  const rendered = renderHook(() => useRecoveryBundleStatus())
+  await waitFor(() =>
+    expect(rendered.result.current.status).not.toBe(RecoveryBundleStatus.Unknown),
+  )
+  return rendered
+}
 
 describe("useRecoveryBundleStatus", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockAccount.mockReturnValue({ id: "account-1", type: "self-custodial" })
-    mockWallets.mockReturnValue(btc(21000))
-    mockReadState.mockResolvedValue({
-      savedAt: SAVED_AT,
-      totalSats: "21000",
+    mockUseAccountRegistry.mockReturnValue({ activeAccount: selfCustodialAccount })
+    withBalance(21000)
+    mockReadRecoveryBundleState.mockResolvedValue({
+      savedAt: Date.now() - 60_000,
+      bundleCreatedAt: "2026-08-05T00:00:00Z",
       leafCount: 3,
-      bundleCreatedAt: "2026-08-04T00:00:00Z",
+      totalSats: "21000",
       cloudSyncedAt: null,
     })
-    mockReadSettings.mockResolvedValue({
+    mockReadRecoveryBundleSettings.mockResolvedValue({
       autoRefresh: true,
       cloudSync: false,
-      exportedAt: Date.now(),
+      exportedAt: null,
     })
   })
 
-  it("says nothing on a custodial account", async () => {
-    mockAccount.mockReturnValue({ id: "c", type: "custodial" })
-    const { result } = renderHook(() => useRecoveryBundleStatus())
-    await waitFor(() => expect(result.current.status).toBe(RecoveryBundleStatus.Unknown))
-    expect(mockReadState).not.toHaveBeenCalled()
-  })
+  it("reports a bundle that matches the wallet as current", async () => {
+    const { result } = await renderStatus()
 
-  it("reports fresh while the wallet still matches the backup", async () => {
-    const { result } = renderHook(() => useRecoveryBundleStatus())
-    await waitFor(() => expect(result.current.status).toBe(RecoveryBundleStatus.Fresh))
+    expect(result.current.status).toBe(RecoveryBundleStatus.Fresh)
     expect(result.current.leafCount).toBe(3)
   })
 
-  it("reports stale once the balance has moved", async () => {
-    // Money arrived after the snapshot: recovering from it now would leave the
-    // new funds behind.
-    mockWallets.mockReturnValue(btc(31000))
-    const { result } = renderHook(() => useRecoveryBundleStatus())
-    await waitFor(() => expect(result.current.status).toBe(RecoveryBundleStatus.Stale))
+  it("reports a bundle the wallet has moved past as out of date", async () => {
+    withBalance(30000)
+    const { result } = await renderStatus()
+
+    expect(result.current.status).toBe(RecoveryBundleStatus.Stale)
   })
 
-  it("reports missing when no backup has been saved", async () => {
-    mockReadState.mockResolvedValue(null)
-    const { result } = renderHook(() => useRecoveryBundleStatus())
-    await waitFor(() => expect(result.current.status).toBe(RecoveryBundleStatus.Missing))
+  it("reports no bundle as missing", async () => {
+    mockReadRecoveryBundleState.mockResolvedValue(null)
+    const { result } = await renderStatus()
+
+    expect(result.current.status).toBe(RecoveryBundleStatus.Missing)
+    expect(result.current.savedAt).toBeNull()
   })
 
-  it("reports missing when the stored state cannot be read", async () => {
-    // "We cannot confirm you have one" reads as missing, not as fine.
-    mockReadState.mockRejectedValue(new Error("corrupt"))
+  it("reports an unreadable state file as missing", async () => {
+    // "We cannot confirm you have a backup" and "you have no backup" call for
+    // the same response from the user; claiming Fresh would not.
+    mockReadRecoveryBundleState.mockRejectedValue(new Error("corrupt"))
+    const { result } = await renderStatus()
+
+    expect(result.current.status).toBe(RecoveryBundleStatus.Missing)
+  })
+
+  it("stays Unknown on a custodial account and reads nothing", async () => {
+    mockUseAccountRegistry.mockReturnValue({
+      activeAccount: { ...selfCustodialAccount, type: AccountType.Custodial },
+    })
     const { result } = renderHook(() => useRecoveryBundleStatus())
-    await waitFor(() => expect(result.current.status).toBe(RecoveryBundleStatus.Missing))
+
+    await act(async () => {})
+
+    expect(result.current.status).toBe(RecoveryBundleStatus.Unknown)
+    expect(mockReadRecoveryBundleState).not.toHaveBeenCalled()
+  })
+
+  it("stays Unknown with no account at all", async () => {
+    mockUseAccountRegistry.mockReturnValue({ activeAccount: null })
+    const { result } = renderHook(() => useRecoveryBundleStatus())
+
+    await act(async () => {})
+
+    expect(result.current.status).toBe(RecoveryBundleStatus.Unknown)
   })
 
   it("ignores a Dollar wallet when comparing balances", async () => {
     // Only Bitcoin is covered by on-chain recovery (R3), so a Dollar balance
     // must not make the Bitcoin backup look out of date.
-    mockWallets.mockReturnValue([
-      { walletCurrency: "USD", balance: { amount: 500 } },
-      { walletCurrency: "BTC", balance: { amount: 21000 } },
-    ])
-    const { result } = renderHook(() => useRecoveryBundleStatus())
-    await waitFor(() => expect(result.current.status).toBe(RecoveryBundleStatus.Fresh))
+    mockUseActiveWallet.mockReturnValue({
+      wallets: [
+        {
+          walletCurrency: WalletCurrency.Usd,
+          balance: { amount: 500, currency: WalletCurrency.Usd },
+        },
+        {
+          walletCurrency: WalletCurrency.Btc,
+          balance: { amount: 21000, currency: WalletCurrency.Btc },
+        },
+      ],
+    })
+    const { result } = await renderStatus()
+
+    expect(result.current.status).toBe(RecoveryBundleStatus.Fresh)
   })
 
-  describe("only on this device", () => {
-    it("flags a bundle that was never exported and never synced", async () => {
-      mockReadSettings.mockResolvedValue({
-        autoRefresh: true,
-        cloudSync: false,
-        exportedAt: null,
-      })
-      const { result } = renderHook(() => useRecoveryBundleStatus())
-      await waitFor(() => expect(result.current.isOnlyOnThisDevice).toBe(true))
+  it("treats a wallet that has not loaded yet as having no balance to compare", async () => {
+    mockUseActiveWallet.mockReturnValue({ wallets: [] })
+    const { result } = await renderStatus()
+
+    expect(result.current.status).toBe(RecoveryBundleStatus.Fresh)
+  })
+
+  describe("has the bundle left this device", () => {
+    it("says no when it was never exported or synced", async () => {
+      const { result } = await renderStatus()
+
+      expect(result.current.isOnlyOnThisDevice).toBe(true)
     })
 
-    it("clears once the user has exported it", async () => {
-      mockReadSettings.mockResolvedValue({
+    it("says yes once the user exported it", async () => {
+      mockReadRecoveryBundleSettings.mockResolvedValue({
         autoRefresh: true,
         cloudSync: false,
-        exportedAt: SAVED_AT,
+        exportedAt: Date.now(),
       })
-      const { result } = renderHook(() => useRecoveryBundleStatus())
-      await waitFor(() => expect(result.current.isOnlyOnThisDevice).toBe(false))
-    })
+      const { result } = await renderStatus()
 
-    it("clears once it has reached the cloud, even unexported", async () => {
-      mockReadState.mockResolvedValue({
-        savedAt: SAVED_AT,
-        totalSats: "21000",
-        leafCount: 3,
-        bundleCreatedAt: "2026-08-04T00:00:00Z",
-        cloudSyncedAt: SAVED_AT,
-      })
-      mockReadSettings.mockResolvedValue({
-        autoRefresh: true,
-        cloudSync: true,
-        exportedAt: null,
-      })
-      const { result } = renderHook(() => useRecoveryBundleStatus())
-      await waitFor(() => expect(result.current.isOnlyOnThisDevice).toBe(false))
-    })
-
-    it("is not claimed when there is no bundle at all", async () => {
-      // Nothing exists, so "only on this device" would be a false statement;
-      // that case is Missing.
-      mockReadState.mockResolvedValue(null)
-      mockReadSettings.mockResolvedValue({
-        autoRefresh: true,
-        cloudSync: false,
-        exportedAt: null,
-      })
-      const { result } = renderHook(() => useRecoveryBundleStatus())
-      await waitFor(() =>
-        expect(result.current.status).toBe(RecoveryBundleStatus.Missing),
-      )
       expect(result.current.isOnlyOnThisDevice).toBe(false)
     })
+
+    it("says yes once it reached the cloud", async () => {
+      mockReadRecoveryBundleState.mockResolvedValue({
+        savedAt: Date.now() - 60_000,
+        bundleCreatedAt: "2026-08-05T00:00:00Z",
+        leafCount: 3,
+        totalSats: "21000",
+        cloudSyncedAt: Date.now(),
+      })
+      const { result } = await renderStatus()
+
+      expect(result.current.isOnlyOnThisDevice).toBe(false)
+    })
+
+    it("does not ask the question when there is no bundle", async () => {
+      // Missing already says everything; a second warning about where the
+      // non-existent bundle lives would just be noise.
+      mockReadRecoveryBundleState.mockResolvedValue(null)
+      const { result } = await renderStatus()
+
+      expect(result.current.isOnlyOnThisDevice).toBe(false)
+    })
+  })
+
+  it("re-reads on demand", async () => {
+    const { result } = await renderStatus()
+    mockReadRecoveryBundleState.mockClear()
+
+    await act(async () => {
+      await result.current.reload()
+    })
+
+    expect(mockReadRecoveryBundleState).toHaveBeenCalledWith(
+      ACCOUNT_ID,
+      mockSparkNetwork.Regtest,
+    )
   })
 })
