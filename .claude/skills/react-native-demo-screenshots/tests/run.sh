@@ -185,6 +185,8 @@ check "SKILL.md carries no BLINK_ residue" "no" \
   "$(grep -q "BLINK_" "$SKILL_MD" && echo yes || echo no)"
 check "SKILL.md pairs section uses the reload flip, not a blind fast refresh" "yes" \
   "$(grep -q "reload-app.sh" "$SKILL_MD" && echo yes || echo no)"
+check "SKILL.md rejects a simulator per side, with the honesty rationale" "yes" \
+  "$(grep -qi "simulator per side" "$SKILL_MD" && echo yes || echo no)"
 
 echo
 echo "-------------------------------------"
