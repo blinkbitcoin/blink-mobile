@@ -226,8 +226,9 @@ export const defaultRemoteConfig: RemoteConfig = {
   offboardOnlyCountries: offboardOnlyDefault,
   selfCustodialDepositClaimLeewayVbyte: 1,
   /** How long the migration's receive gate waits before telling the user the incoming
-   *  payment is taking longer than usual. Generous until real transit times are known. */
-  migrationReceiveDelayedNoticeMs: 10 * 60 * 1000,
+   *  payment is taking longer than usual and offering support. Product call on #4102:
+   *  a minute after the confirmed send is more than enough for a healthy receive. */
+  migrationReceiveDelayedNoticeMs: 60 * 1000,
   feeRatesConfig: defaultFeeRatesConfig,
 }
 
