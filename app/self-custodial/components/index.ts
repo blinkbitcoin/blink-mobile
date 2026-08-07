@@ -1,4 +1,5 @@
 export { AutoConvertListenerMount } from "./auto-convert-listener-mount"
 export { RecoveryBundleListenerMount } from "./recovery-bundle-listener-mount"
+export { RecoveryBackupNudgeBanner } from "./recovery-backup-nudge-banner"
 export { OfflineGate } from "./offline-gate"
 export { PaymentOfflineNotice } from "./payment-offline-notice"

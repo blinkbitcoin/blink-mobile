@@ -38,14 +38,14 @@ import {
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useFeatureFlags, useRemoteConfig } from "@app/config/feature-flags-context"
 import { BackupNudgeBanner } from "@app/components/backup-nudge-banner"
-import { RecoveryBackupNudgeBanner } from "@app/components/recovery-backup-nudge-banner"
+import { RecoveryBackupNudgeBanner } from "@app/self-custodial/components"
 import { SelfCustodialInfoBulletin } from "@app/components/self-custodial-info-bulletin"
 import { BackupNudgeModal } from "@app/components/backup-nudge-modal"
 import { NetworkStatusBanner } from "@app/components/network-status-banner"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
-import { useRecoveryBackupNudge } from "@app/hooks/use-recovery-backup-nudge"
+import { useRecoveryBackupNudge } from "@app/self-custodial/hooks/use-recovery-backup-nudge"
 import { useDefaultAccountModalShown } from "@app/hooks/use-default-account-modal-shown"
 import {
   useDollarBalanceRestricted,

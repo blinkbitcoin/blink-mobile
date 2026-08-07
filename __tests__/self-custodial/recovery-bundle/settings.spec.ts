@@ -99,4 +99,36 @@ describe("recovery bundle settings", () => {
       defaultRecoveryBundleSettings,
     )
   })
+
+  it("degrades a non-numeric exportedAt to never-exported", async () => {
+    // A corrupt value must not read as "already exported", which would silence
+    // the only-on-this-device warning.
+    await AsyncStorage.setItem(
+      `recoveryBundleSettings:${ACCOUNT_ID}`,
+      JSON.stringify({ autoRefresh: true, cloudSync: false, exportedAt: "yesterday" }),
+    )
+
+    expect(await readRecoveryBundleSettings(ACCOUNT_ID)).toEqual({
+      autoRefresh: true,
+      cloudSync: false,
+      exportedAt: null,
+    })
+  })
+
+  it("keeps a stored export timestamp", async () => {
+    await AsyncStorage.setItem(
+      `recoveryBundleSettings:${ACCOUNT_ID}`,
+      JSON.stringify({
+        autoRefresh: false,
+        cloudSync: true,
+        exportedAt: 1_700_000_000_000,
+      }),
+    )
+
+    await expect(readRecoveryBundleSettings(ACCOUNT_ID)).resolves.toEqual({
+      autoRefresh: false,
+      cloudSync: true,
+      exportedAt: 1_700_000_000_000,
+    })
+  })
 })
