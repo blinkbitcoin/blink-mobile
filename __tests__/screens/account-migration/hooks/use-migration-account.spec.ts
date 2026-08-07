@@ -42,6 +42,17 @@ jest.mock("@app/self-custodial/hooks/use-provision-self-custodial-account", () =
   useProvisionSelfCustodialAccount: () => ({ provision: mockProvision }),
 }))
 
+const mockSeedMigratedSettings = jest.fn()
+
+jest.mock(
+  "@app/screens/account-migration/hooks/use-seed-migrated-account-settings",
+  () => ({
+    useSeedMigratedAccountSettings: () => ({
+      seedMigratedSettings: mockSeedMigratedSettings,
+    }),
+  }),
+)
+
 let mockGuardBlocked = false
 
 jest.mock("@app/hooks/use-in-flight-guard", () => ({
@@ -194,6 +205,51 @@ describe("useMigrationAccount", () => {
       MigrationCheckpoint.TermsAndConditions,
       "sc-pending-1",
     )
+  })
+
+  it("seeds the custodial settings onto the freshly provisioned account", async () => {
+    const { result } = renderHook(() => useMigrationAccount())
+
+    await act(async () => {
+      await result.current.ensureAccount()
+    })
+
+    expect(mockSeedMigratedSettings).toHaveBeenCalledWith("sc-account-1")
+  })
+
+  it("seeds the custodial settings onto a reused pending account", async () => {
+    mockPendingForActiveAccount = "sc-pending-1"
+    mockRegistryAccounts = [{ id: "sc-pending-1" }]
+
+    const { result } = renderHook(() => useMigrationAccount())
+
+    await act(async () => {
+      await result.current.ensureAccount()
+    })
+
+    expect(mockSeedMigratedSettings).toHaveBeenCalledWith("sc-pending-1")
+  })
+
+  it("does not re-seed an already checkpointed account", async () => {
+    mockAccountId = "sc-account-1"
+    const { result } = renderHook(() => useMigrationAccount())
+
+    await act(async () => {
+      await result.current.ensureAccount()
+    })
+
+    expect(mockSeedMigratedSettings).not.toHaveBeenCalled()
+  })
+
+  it("does not seed when another provisioning run is in flight", async () => {
+    mockGuardBlocked = true
+    const { result } = renderHook(() => useMigrationAccount())
+
+    await act(async () => {
+      await result.current.ensureAccount()
+    })
+
+    expect(mockSeedMigratedSettings).not.toHaveBeenCalled()
   })
 
   it("provisions fresh when the pending wallet no longer exists on the device", async () => {
