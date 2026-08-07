@@ -18,11 +18,16 @@
 # the claim-side clone) run under the shared `golden` lock, because a clone of
 # a golden that is being swapped mid-flight is a real race.
 #
-# Usage: bless-golden.sh <pr-number> [--sha <sha>]
+# Usage: bless-golden.sh <pr-number> [--sha <sha>] [--lockfile <path>]
 #   <pr-number>  the claimed session whose simulator becomes the golden
 #   --sha        build SHA recorded in the stamp (default: HEAD of the cwd's
 #                git repo, or "unknown") - the agent compares it against
 #                native-path changes before trusting a clone's app install
+#   --lockfile   Podfile.lock of the build the golden carries (default:
+#                ios/Podfile.lock in the cwd). Its hash goes into the stamp so
+#                claim-session.sh can give an instant stale/fresh verdict
+#                instead of git archaeology; without a lockfile the stamp
+#                carries no hash and native-stamp.sh check demands a re-bless
 #
 # Workflow: claim a session, install the app, log in once, then bless.
 # If a later clone comes up logged out, the fix is to re-bless a fresh login.
@@ -39,10 +44,12 @@ case "$PR" in
 esac
 
 SHA=""
+LOCKFILE="ios/Podfile.lock"
 while [ $# -gt 0 ]; do
   case "$1" in
     --sha) SHA="${2:?--sha needs a value}"; shift 2 ;;
-    *) die "unknown argument '$1' (usage: bless-golden.sh <pr-number> [--sha <sha>])" ;;
+    --lockfile) LOCKFILE="${2:?--lockfile needs a value}"; shift 2 ;;
+    *) die "unknown argument '$1' (usage: bless-golden.sh <pr-number> [--sha <sha>] [--lockfile <path>])" ;;
   esac
 done
 [ -n "$SHA" ] || SHA=$(git rev-parse HEAD 2>/dev/null || echo "unknown")
@@ -129,6 +136,13 @@ date=$(date +%Y-%m-%dT%H:%M:%S)
 device-type=$DEVICE_TYPE
 runtime=$RUNTIME
 EOF
+# The lockfile hash is what turns "is this golden's native build stale?" from
+# git archaeology into an instant claim-time comparison.
+if [ -f "$LOCKFILE" ]; then
+  "$(dirname "${BASH_SOURCE[0]}")/native-stamp.sh" write "$GOLDEN_DIR/stamp" --lockfile "$LOCKFILE" >/dev/null
+else
+  echo "note: no Podfile.lock at $LOCKFILE - the stamp carries no native hash, so staleness checks will demand a re-bless; pass --lockfile to fix" >&2
+fi
 
 # --- Collateral-damage assertion ---------------------------------------------
 # Same exit guarantee as release-session.sh: every device booted before this
