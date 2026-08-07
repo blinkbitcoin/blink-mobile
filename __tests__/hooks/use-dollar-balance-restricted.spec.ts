@@ -1,17 +1,11 @@
 import { renderHook } from "@testing-library/react-native"
 
-import { getStableTokenRestricted } from "@app/store/persistent-state/stable-token-restriction"
-import { getStablesatsRestricted } from "@app/store/persistent-state/stablesats-restriction"
-import { PersistentState } from "@app/store/persistent-state/state-migrations"
 import { AccountType } from "@app/types/wallet"
 
 const mockUseDeviceLocation = jest.fn()
 const mockUseRemoteConfig = jest.fn()
 const mockUseActiveWallet = jest.fn()
-const mockUpdateState = jest.fn()
-const mockUseIpCountryCode = jest.fn()
-
-let mockPersistentState: PersistentState
+const mockUseIpCountryLookup = jest.fn()
 
 /** Mocked wholesale: the real module warns at load time when no API key is configured. */
 jest.mock("@app/utils/ip-country-lookup", () => ({
@@ -24,7 +18,7 @@ jest.mock("@app/hooks/use-device-location", () => ({
   __esModule: true,
   ...jest.requireActual("@app/hooks/use-device-location"),
   default: () => mockUseDeviceLocation(),
-  useIpCountryCode: (enabled: boolean) => mockUseIpCountryCode(enabled),
+  useIpCountryLookup: (enabled: boolean) => mockUseIpCountryLookup(enabled),
 }))
 
 jest.mock("@app/config/feature-flags-context", () => ({
@@ -35,28 +29,19 @@ jest.mock("@app/hooks/use-active-wallet", () => ({
   useActiveWallet: () => mockUseActiveWallet(),
 }))
 
-jest.mock("@app/store/persistent-state", () => ({
-  usePersistentStateContext: () => ({
-    persistentState: mockPersistentState,
-    updateState: mockUpdateState,
-  }),
-}))
-
 import {
   useDollarBalanceRestricted,
-  useDollarBalanceRestrictionSync,
+  useDollarBalanceRestriction,
 } from "@app/hooks/use-dollar-balance-restricted"
-
-const baseState: PersistentState = {
-  schemaVersion: 15,
-  galoyInstance: { id: "Main" },
-  galoyAuthToken: "",
-}
 
 const remoteConfig = {
   custodialDollarBalanceBlockedCountries: ["HK"],
   selfCustodialDollarBalanceBlockedCountries: ["FR"],
-  dollarRestrictionCacheEnabled: true,
+}
+
+/** A disabled lookup reports settled, so only the tests that hold on it pass false. */
+const setIpLookup = (countryCode: string | undefined, isSettled = true): void => {
+  mockUseIpCountryLookup.mockReturnValue({ countryCode, isSettled })
 }
 
 const setup = (accountType: AccountType): void => {
@@ -64,11 +49,13 @@ const setup = (accountType: AccountType): void => {
   mockUseDeviceLocation.mockReturnValue({ countryCode: undefined, source: undefined })
   mockUseRemoteConfig.mockReturnValue(remoteConfig)
   mockUseActiveWallet.mockReturnValue({ accountType })
-  mockUseIpCountryCode.mockReturnValue(undefined)
-  mockPersistentState = baseState
+  setIpLookup(undefined)
 }
 
 const read = () => renderHook(() => useDollarBalanceRestricted()).result.current
+
+const readRestriction = (accountTypeOverride?: AccountType) =>
+  renderHook(() => useDollarBalanceRestriction(accountTypeOverride)).result.current
 
 describe("useDollarBalanceRestricted", () => {
   describe("custodial", () => {
@@ -89,15 +76,8 @@ describe("useDollarBalanceRestricted", () => {
       expect(read()).toBe(false)
     })
 
-    it("stays restricted from the persisted custodial flag without a country", () => {
-      mockPersistentState = { ...baseState, stablesatsRestrictedCustodial: true }
+    it("is not restricted without a resolved country", () => {
       mockUseDeviceLocation.mockReturnValue({ countryCode: undefined })
-      expect(read()).toBe(true)
-    })
-
-    it("ignores the self-custodial persisted flag", () => {
-      mockPersistentState = { ...baseState, stableTokenRestricted: true }
-      mockUseDeviceLocation.mockReturnValue({ countryCode: "FR" })
       expect(read()).toBe(false)
     })
   })
@@ -114,18 +94,6 @@ describe("useDollarBalanceRestricted", () => {
       mockUseDeviceLocation.mockReturnValue({ countryCode: "HK" })
       expect(read()).toBe(false)
     })
-
-    it("stays restricted from the persisted stable-token flag", () => {
-      mockPersistentState = { ...baseState, stableTokenRestricted: true }
-      mockUseDeviceLocation.mockReturnValue({ countryCode: undefined })
-      expect(read()).toBe(true)
-    })
-
-    it("ignores the custodial persisted flag", () => {
-      mockPersistentState = { ...baseState, stablesatsRestrictedCustodial: true }
-      mockUseDeviceLocation.mockReturnValue({ countryCode: "HK" })
-      expect(read()).toBe(false)
-    })
   })
 
   describe("with an account-type override", () => {
@@ -137,185 +105,116 @@ describe("useDollarBalanceRestricted", () => {
 
     it("predicts the self-custodial restriction from the IP, not the session phone", () => {
       mockUseDeviceLocation.mockReturnValue({ countryCode: "HK" })
-      mockUseIpCountryCode.mockReturnValue("FR")
+      setIpLookup("FR")
       expect(readOverride(AccountType.SelfCustodial)).toBe(true)
     })
 
     it("falls back to the session country when the IP does not resolve", () => {
       mockUseDeviceLocation.mockReturnValue({ countryCode: "FR" })
-      mockUseIpCountryCode.mockReturnValue(undefined)
+      setIpLookup(undefined)
       expect(readOverride(AccountType.SelfCustodial)).toBe(true)
     })
 
     it("prefers the IP over the session country when both resolve", () => {
       mockUseDeviceLocation.mockReturnValue({ countryCode: "FR" })
-      mockUseIpCountryCode.mockReturnValue("HK")
+      setIpLookup("HK")
       expect(readOverride(AccountType.SelfCustodial)).toBe(false)
     })
 
     it("uses the self-custodial blocked list, not the custodial one", () => {
-      mockUseIpCountryCode.mockReturnValue("HK")
+      setIpLookup("HK")
       expect(readOverride(AccountType.SelfCustodial)).toBe(false)
-    })
-
-    it("honours the persisted self-custodial flag without any country", () => {
-      mockPersistentState = { ...baseState, stableTokenRestricted: true }
-      mockUseIpCountryCode.mockReturnValue(undefined)
-      expect(readOverride(AccountType.SelfCustodial)).toBe(true)
     })
 
     it("consults IP for the self-custodial prediction", () => {
       readOverride(AccountType.SelfCustodial)
-      expect(mockUseIpCountryCode).toHaveBeenCalledWith(true)
+      expect(mockUseIpCountryLookup).toHaveBeenCalledWith(true)
     })
 
     it("never consults IP for the custodial or default evaluations", () => {
       readOverride(AccountType.Custodial)
       read()
-      expect(mockUseIpCountryCode).not.toHaveBeenCalledWith(true)
-      expect(mockUseIpCountryCode).toHaveBeenCalledWith(false)
+      expect(mockUseIpCountryLookup).not.toHaveBeenCalledWith(true)
+      expect(mockUseIpCountryLookup).toHaveBeenCalledWith(false)
     })
   })
 
-  describe("with the restriction cache disabled remotely", () => {
-    beforeEach(() => {
-      setup(AccountType.Custodial)
-      mockUseRemoteConfig.mockReturnValue({
-        ...remoteConfig,
-        dollarRestrictionCacheEnabled: false,
-      })
-    })
-
-    it("ignores the persisted flag so a stale restriction can be lifted", () => {
-      mockPersistentState = { ...baseState, stablesatsRestrictedCustodial: true }
-      mockUseDeviceLocation.mockReturnValue({ countryCode: undefined })
-      expect(read()).toBe(false)
-    })
-
-    it("still restricts from the live device country", () => {
-      mockUseDeviceLocation.mockReturnValue({ countryCode: "HK" })
-      expect(read()).toBe(true)
-    })
-  })
-})
-
-describe("useDollarBalanceRestrictionSync", () => {
-  describe("custodial", () => {
+  describe("while the region is still resolving", () => {
     beforeEach(() => setup(AccountType.Custodial))
 
-    it("persists the custodial flag when the phone country is blocked", () => {
-      mockUseDeviceLocation.mockReturnValue({ countryCode: "HK", source: "phone" })
+    it("reports the region as pending without claiming a restriction", () => {
+      mockUseDeviceLocation.mockReturnValue({ countryCode: undefined, loading: true })
 
-      renderHook(() => useDollarBalanceRestrictionSync())
-
-      expect(mockUpdateState).toHaveBeenCalledTimes(1)
-      const updater = mockUpdateState.mock.calls[0][0]
-      expect(getStablesatsRestricted(updater(baseState))).toBe(true)
-      expect(updater(undefined)).toBeUndefined()
+      expect(readRestriction()).toEqual({ isRestricted: false, isRegionPending: true })
     })
 
-    it("does not consult IP when the phone country already blocks", () => {
-      mockUseDeviceLocation.mockReturnValue({ countryCode: "HK", source: "phone" })
-      renderHook(() => useDollarBalanceRestrictionSync())
-      expect(mockUseIpCountryCode).toHaveBeenCalledWith(false)
+    it("restricts once the region resolves to a blocked country", () => {
+      mockUseDeviceLocation.mockReturnValue({ countryCode: "HK", loading: false })
+
+      expect(readRestriction()).toEqual({ isRestricted: true, isRegionPending: false })
     })
 
-    it("falls back to IP and persists when the phone country does not block", () => {
-      mockUseDeviceLocation.mockReturnValue({ countryCode: "SV", source: "phone" })
-      mockUseIpCountryCode.mockReturnValue("HK")
-      renderHook(() => useDollarBalanceRestrictionSync())
-      expect(mockUseIpCountryCode).toHaveBeenCalledWith(true)
-      expect(mockUpdateState).toHaveBeenCalledTimes(1)
+    it("settles unrestricted once the region resolves to an allowed country", () => {
+      mockUseDeviceLocation.mockReturnValue({ countryCode: "US", loading: false })
+
+      expect(readRestriction()).toEqual({ isRestricted: false, isRegionPending: false })
     })
 
-    it("does not persist when neither phone nor IP blocks", () => {
-      mockUseDeviceLocation.mockReturnValue({ countryCode: "SV", source: "phone" })
-      mockUseIpCountryCode.mockReturnValue("AR")
-      renderHook(() => useDollarBalanceRestrictionSync())
-      expect(mockUpdateState).not.toHaveBeenCalled()
+    it("settles on a finished lookup that produced no country", () => {
+      mockUseDeviceLocation.mockReturnValue({ countryCode: undefined, loading: false })
+
+      expect(readRestriction()).toEqual({ isRestricted: false, isRegionPending: false })
     })
 
-    it("does not persist again once already flagged", () => {
-      mockPersistentState = { ...baseState, stablesatsRestrictedCustodial: true }
-      mockUseDeviceLocation.mockReturnValue({ countryCode: "HK", source: "phone" })
-      renderHook(() => useDollarBalanceRestrictionSync())
-      expect(mockUseIpCountryCode).toHaveBeenCalledWith(false)
-      expect(mockUpdateState).not.toHaveBeenCalled()
+    it("settles the self-custodial prediction on the IP even while the device keeps loading", () => {
+      mockUseDeviceLocation.mockReturnValue({ countryCode: undefined, loading: true })
+      setIpLookup("FR")
+
+      expect(readRestriction(AccountType.SelfCustodial)).toEqual({
+        isRestricted: true,
+        isRegionPending: false,
+      })
     })
   })
 
-  describe("self-custodial", () => {
-    beforeEach(() => setup(AccountType.SelfCustodial))
+  describe("while the prediction's IP lookup is in flight", () => {
+    beforeEach(() => setup(AccountType.Custodial))
 
-    it("persists the stable-token flag when the phone country is blocked", () => {
-      mockUseDeviceLocation.mockReturnValue({ countryCode: "FR", source: "phone" })
+    it("holds the prediction pending even though the device country already resolved", () => {
+      mockUseDeviceLocation.mockReturnValue({ countryCode: "US", loading: false })
+      setIpLookup(undefined, false)
 
-      renderHook(() => useDollarBalanceRestrictionSync())
-
-      expect(mockUpdateState).toHaveBeenCalledTimes(1)
-      const updater = mockUpdateState.mock.calls[0][0]
-      expect(getStableTokenRestricted(updater(baseState))).toBe(true)
-      expect(updater(undefined)).toBeUndefined()
-    })
-
-    it("falls back to IP and persists the stable-token flag", () => {
-      mockUseDeviceLocation.mockReturnValue({ countryCode: "SV", source: "phone" })
-      mockUseIpCountryCode.mockReturnValue("FR")
-      renderHook(() => useDollarBalanceRestrictionSync())
-      expect(mockUseIpCountryCode).toHaveBeenCalledWith(true)
-      expect(mockUpdateState).toHaveBeenCalledTimes(1)
-    })
-  })
-
-  it("does not consult IP when the source is not the phone", () => {
-    setup(AccountType.Custodial)
-    mockUseDeviceLocation.mockReturnValue({ countryCode: "AR", source: "ip" })
-    renderHook(() => useDollarBalanceRestrictionSync())
-    expect(mockUseIpCountryCode).toHaveBeenCalledWith(false)
-    expect(mockUpdateState).not.toHaveBeenCalled()
-  })
-
-  describe("with the restriction cache disabled remotely", () => {
-    beforeEach(() => {
-      setup(AccountType.Custodial)
-      mockUseRemoteConfig.mockReturnValue({
-        ...remoteConfig,
-        dollarRestrictionCacheEnabled: false,
+      expect(readRestriction(AccountType.SelfCustodial)).toEqual({
+        isRestricted: false,
+        isRegionPending: true,
       })
     })
 
-    it("does not persist even in a blocked country", () => {
-      mockUseDeviceLocation.mockReturnValue({ countryCode: "HK", source: "phone" })
-      renderHook(() => useDollarBalanceRestrictionSync())
-      expect(mockUpdateState).not.toHaveBeenCalled()
+    it("settles restricted once the in-flight IP lands on a blocked country", () => {
+      mockUseDeviceLocation.mockReturnValue({ countryCode: "US", loading: false })
+      setIpLookup("FR", true)
+
+      expect(readRestriction(AccountType.SelfCustodial)).toEqual({
+        isRestricted: true,
+        isRegionPending: false,
+      })
     })
 
-    it("does not consult IP", () => {
-      mockUseDeviceLocation.mockReturnValue({ countryCode: "SV", source: "phone" })
-      renderHook(() => useDollarBalanceRestrictionSync())
-      expect(mockUseIpCountryCode).toHaveBeenCalledWith(false)
-    })
-  })
+    it("settles on the session country once the lookup finishes without one", () => {
+      mockUseDeviceLocation.mockReturnValue({ countryCode: "FR", loading: false })
+      setIpLookup(undefined, true)
 
-  it("writes the self-custodial flag too when a blocked-country user switches from custodial to self-custodial", () => {
-    setup(AccountType.Custodial)
-    mockUseDeviceLocation.mockReturnValue({ countryCode: "HK", source: "phone" })
-    mockUseRemoteConfig.mockReturnValue({
-      custodialDollarBalanceBlockedCountries: ["HK"],
-      selfCustodialDollarBalanceBlockedCountries: ["HK"],
-      dollarRestrictionCacheEnabled: true,
+      expect(readRestriction(AccountType.SelfCustodial)).toEqual({
+        isRestricted: true,
+        isRegionPending: false,
+      })
     })
 
-    const { rerender } = renderHook(() => useDollarBalanceRestrictionSync())
+    it("leaves the custodial evaluation settled, since it never waits on the IP", () => {
+      mockUseDeviceLocation.mockReturnValue({ countryCode: "US", loading: false })
+      setIpLookup(undefined, false)
 
-    const custodialUpdater = mockUpdateState.mock.calls[0][0]
-    expect(getStablesatsRestricted(custodialUpdater(baseState))).toBe(true)
-
-    mockUseActiveWallet.mockReturnValue({ accountType: AccountType.SelfCustodial })
-    rerender({})
-
-    expect(mockUpdateState).toHaveBeenCalledTimes(2)
-    const selfCustodialUpdater = mockUpdateState.mock.calls[1][0]
-    expect(getStableTokenRestricted(selfCustodialUpdater(baseState))).toBe(true)
+      expect(readRestriction()).toEqual({ isRestricted: false, isRegionPending: false })
+    })
   })
 })

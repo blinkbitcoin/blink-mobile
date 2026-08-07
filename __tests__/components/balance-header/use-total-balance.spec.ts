@@ -9,6 +9,7 @@ const mockFormatMoneyAmount = jest.fn(
     `$${(moneyAmount.amount / 100).toFixed(2)}`,
 )
 const mockUseDollarBalanceRestricted = jest.fn()
+const mockIsRegionPending = jest.fn()
 
 jest.mock("@app/hooks", () => ({
   usePriceConversion: () => ({ convertMoneyAmount: mockConvertMoneyAmount() }),
@@ -20,6 +21,10 @@ jest.mock("@app/hooks/use-display-currency", () => ({
 
 jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
   useDollarBalanceRestricted: () => mockUseDollarBalanceRestricted(),
+  useDollarBalanceRestriction: () => ({
+    isRestricted: mockUseDollarBalanceRestricted(),
+    isRegionPending: mockIsRegionPending(),
+  }),
 }))
 
 const wallets = [
@@ -31,6 +36,48 @@ describe("useTotalBalance", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockUseDollarBalanceRestricted.mockReturnValue(false)
+    mockIsRegionPending.mockReturnValue(false)
+  })
+
+  it("holds the header on its loader while the region is pending", () => {
+    mockConvertMoneyAmount.mockReturnValue(({ amount }: { amount: number }) => ({
+      amount,
+      currency: "DisplayCurrency",
+      currencyCode: "USD",
+    }))
+    mockIsRegionPending.mockReturnValue(true)
+
+    const { result } = renderHook(() => useTotalBalance(wallets))
+
+    expect(result.current.isLoading).toBe(true)
+  })
+
+  it("keeps the dollars out of satsBalance while the region is pending", () => {
+    mockConvertMoneyAmount.mockReturnValue(({ amount }: { amount: number }) => ({
+      amount,
+      currency: "DisplayCurrency",
+      currencyCode: "USD",
+    }))
+    mockIsRegionPending.mockReturnValue(true)
+
+    const { result } = renderHook(() => useTotalBalance(wallets))
+
+    /** Read without consulting isLoading by the backup nudge, so a pending region must
+     *  not inflate it with dollars that vanish once the verdict lands. */
+    expect(result.current.satsBalance).toBe(1_000_000)
+  })
+
+  it("counts the dollars back into satsBalance once the region settles unrestricted", () => {
+    mockConvertMoneyAmount.mockReturnValue(({ amount }: { amount: number }) => ({
+      amount,
+      currency: "DisplayCurrency",
+      currencyCode: "USD",
+    }))
+    mockIsRegionPending.mockReturnValue(false)
+
+    const { result } = renderHook(() => useTotalBalance(wallets))
+
+    expect(result.current.satsBalance).toBe(1_050_000)
   })
 
   it("flags isLoading=true while price conversion is bootstrapping (account-switch window)", () => {

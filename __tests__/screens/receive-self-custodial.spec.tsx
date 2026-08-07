@@ -86,6 +86,7 @@ jest.mock("@app/hooks/use-active-wallet", () => ({
 
 jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
   useDollarBalanceRestricted: () => false,
+  useDollarBalanceRestriction: () => ({ isRestricted: false, isRegionPending: false }),
 }))
 
 jest.mock("@app/graphql/generated", () => {

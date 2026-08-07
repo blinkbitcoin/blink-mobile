@@ -21,10 +21,14 @@ jest.mock("@react-navigation/native", () => {
   }
 })
 
-const mockIsRestricted = jest.fn()
+const mockUseDollarBalanceRestriction = jest.fn()
 jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
-  useDollarBalanceRestricted: () => mockIsRestricted(),
+  useDollarBalanceRestriction: () => mockUseDollarBalanceRestriction(),
 }))
+
+const UNRESTRICTED = { isRestricted: false, isRegionPending: false }
+const REGION_PENDING = { isRestricted: false, isRegionPending: true }
+const RESTRICTED = { isRestricted: true, isRegionPending: false }
 
 const mockDisplayCurrency = jest.fn()
 jest.mock("@app/hooks/use-display-currency", () => ({
@@ -54,7 +58,7 @@ type RenderOptions = {
   cardLastFour?: string | null
 }
 
-const renderOverview = ({
+const overviewTree = ({
   loading = false,
   wallets = walletsFixture,
   hideAmount = false,
@@ -63,29 +67,30 @@ const renderOverview = ({
   onRestrictedTap,
   hasCard = false,
   cardLastFour,
-}: RenderOptions = {}) =>
-  render(
-    <ContextForScreen>
-      <IsAuthedContextProvider value={isAuthed}>
-        <HideAmountContextProvider value={{ hideAmount, switchMemoryHideAmount }}>
-          <WalletOverview
-            loading={loading}
-            wallets={wallets}
-            setIsStablesatModalVisible={mockSetStablesatModalVisible}
-            onRestrictedTap={onRestrictedTap}
-            hasCard={hasCard}
-            cardLastFour={cardLastFour}
-          />
-        </HideAmountContextProvider>
-      </IsAuthedContextProvider>
-    </ContextForScreen>,
-  )
+}: RenderOptions = {}) => (
+  <ContextForScreen>
+    <IsAuthedContextProvider value={isAuthed}>
+      <HideAmountContextProvider value={{ hideAmount, switchMemoryHideAmount }}>
+        <WalletOverview
+          loading={loading}
+          wallets={wallets}
+          setIsStablesatModalVisible={mockSetStablesatModalVisible}
+          onRestrictedTap={onRestrictedTap}
+          hasCard={hasCard}
+          cardLastFour={cardLastFour}
+        />
+      </HideAmountContextProvider>
+    </IsAuthedContextProvider>
+  </ContextForScreen>
+)
+
+const renderOverview = (options: RenderOptions = {}) => render(overviewTree(options))
 
 describe("WalletOverview", () => {
   beforeEach(() => {
     loadLocale("en")
     jest.clearAllMocks()
-    mockIsRestricted.mockReturnValue(false)
+    mockUseDollarBalanceRestriction.mockReturnValue(UNRESTRICTED)
     mockDisplayCurrency.mockReturnValue("USD")
   })
 
@@ -166,16 +171,71 @@ describe("WalletOverview", () => {
     })
 
     it("shows the restriction label when the dollar balance is restricted", async () => {
-      mockIsRestricted.mockReturnValue(true)
+      mockUseDollarBalanceRestriction.mockReturnValue(RESTRICTED)
 
       const { getByText } = renderOverview({ onRestrictedTap: jest.fn() })
       await flushEffects()
 
       expect(getByText("not available in your region")).toBeTruthy()
     })
+
+    it("shows neither the dollar amount nor the restriction label while the region is still resolving", async () => {
+      mockDisplayCurrency.mockReturnValue("EUR")
+      mockUseDollarBalanceRestriction.mockReturnValue(REGION_PENDING)
+
+      const { getByText, queryByText } = renderOverview({ onRestrictedTap: jest.fn() })
+      await flushEffects()
+
+      expect(queryByText("usd-underlying")).toBeNull()
+      expect(queryByText("not available in your region")).toBeNull()
+      expect(getByText("btc-underlying")).toBeTruthy()
+    })
+
+    it("shows the dollar amount once the pending region resolves to no restriction", async () => {
+      mockDisplayCurrency.mockReturnValue("EUR")
+      mockUseDollarBalanceRestriction.mockReturnValue(REGION_PENDING)
+
+      const { getByText, queryByText, rerender } = renderOverview({
+        onRestrictedTap: jest.fn(),
+      })
+      await flushEffects()
+
+      expect(queryByText("usd-underlying")).toBeNull()
+
+      mockUseDollarBalanceRestriction.mockReturnValue(UNRESTRICTED)
+      rerender(overviewTree({ onRestrictedTap: jest.fn() }))
+      await flushEffects()
+
+      expect(getByText("usd-underlying")).toBeTruthy()
+    })
   })
 
   describe("interactions", () => {
+    it("opens the restriction explanation when the restricted dollar row is pressed", async () => {
+      mockUseDollarBalanceRestriction.mockReturnValue(RESTRICTED)
+      const onRestrictedTap = jest.fn()
+
+      const { getByText } = renderOverview({ onRestrictedTap })
+      await flushEffects()
+
+      fireEvent.press(getByText("not available in your region"))
+
+      expect(onRestrictedTap).toHaveBeenCalled()
+    })
+
+    it("does not open the restriction explanation while the region is still resolving", async () => {
+      mockUseDollarBalanceRestriction.mockReturnValue(REGION_PENDING)
+      const onRestrictedTap = jest.fn()
+
+      const { getByText } = renderOverview({ onRestrictedTap })
+      await flushEffects()
+
+      fireEvent.press(getByText("Dollar"))
+
+      expect(onRestrictedTap).not.toHaveBeenCalled()
+      expect(mockNavigate).not.toHaveBeenCalled()
+    })
+
     it("opens the bitcoin transaction history when the bitcoin row is pressed", async () => {
       const { getByText } = renderOverview()
       await flushEffects()
