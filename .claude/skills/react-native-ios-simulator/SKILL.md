@@ -281,13 +281,32 @@ thing — re-bless with a fresh login. Opt out of cloning with
 `DEMO_SIM_GOLDEN=<device name>`. The reaper never touches the golden: it has
 no session, and the name gate refuses it like any foreign device.
 
+## Telemetry: Where the Time Goes
+
+Every script emits one JSON line per phase (claim/boot/reload/capture/
+warmup/flow/encode/push) into a local spans file under the session registry —
+local only, nothing leaves the machine; `DEMO_TELEMETRY=0` disables. Rank the
+bottlenecks, or verify an optimization actually optimized:
+
+```bash
+"$SKILL/scripts/spans-report.sh"                      # ranked by total time, last 7d
+"$SKILL/scripts/spans-report.sh" --compare <rev> <rev>  # before/after a change
+```
+
+Failure samples (a timed-out capture) sit in their own FAILED rows and never
+inflate a latency percentile; claims are split by origin because reclaim,
+clone and create are three different distributions. When you add a new phase
+worth measuring, emit through `lib/telemetry.sh` (`tel_now`/`tel_emit`/
+`tel_span`) and never from inside a hot loop — time the loop once and put the
+count in meta.
+
 ## After Editing the Scripts
 
 The isolation guarantees are load-bearing for every other agent on this Mac, so
 they are tested rather than asserted:
 
 ```bash
-"$SKILL/tests/run.sh"     # 173 assertions, ~75s, exits non-zero on failure
+"$SKILL/tests/run.sh"     # 186 assertions, ~80s, exits non-zero on failure
 ```
 
 It creates **no real simulators** — a fake `xcrun` goes first on PATH and the

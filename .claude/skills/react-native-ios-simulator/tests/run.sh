@@ -504,6 +504,62 @@ check "cloned claim emits origin=cloned-from-golden, matching the session file" 
 "$SCRIPTS/release-session.sh" 734 --delete >/dev/null 2>&1
 
 echo
+echo "spans report (spans-report.sh)"
+
+REPORT="$SCRIPTS/spans-report.sh"
+RPT_DIR="$WORK/report-telemetry"
+rm -rf "$RPT_DIR"; mkdir -p "$RPT_DIR"
+mkspan() { # mkspan <span> <dur_ms> <ok 1|0> <origin> <rev> [ts]
+  python3 -c '
+import json, sys, time
+span, dur, ok, origin, rev = sys.argv[1:6]
+ts = float(sys.argv[6]) if len(sys.argv) > 6 else time.time()
+meta = {"origin": origin} if origin else {}
+print(json.dumps({"v": 1, "ts": ts, "dur_ms": int(dur), "span": span,
+  "skill": span.split(".")[0], "session": "s", "run_id": "r", "rev": rev,
+  "ok": ok == "1", "meta": meta}))' "$@" >> "$RPT_DIR/spans-000000.jsonl"
+}
+
+for d in 100 200 300 400 500 600 700 800 900 1000; do mkspan a.big "$d" 1 "" rev1; done
+mkspan a.big 99999 0 "" rev1     # a failure sample with a huge duration
+mkspan b.small 50 1 "" rev1
+mkspan c.claim 10 1 created rev1
+mkspan c.claim 20 1 cloned rev1
+
+out=$("$REPORT" --dir "$RPT_DIR")
+BIG_ROW=$(echo "$out" | grep "^a\.big  ")
+check "p50 is nearest-rank exact" "500" "$(echo "$BIG_ROW" | awk '{print $3}')"
+check "p95 is nearest-rank exact" "1000" "$(echo "$BIG_ROW" | awk '{print $4}')"
+check "total sums the group" "5500" "$(echo "$BIG_ROW" | awk '{print $6}')"
+check "ranking puts the biggest total first" "yes" \
+  "$(echo "$out" | sed -n 3p | grep -q "^a\.big" && echo yes || echo no)"
+check "failure samples form their own FAILED row" "yes" \
+  "$(echo "$out" | grep -q "^a\.big FAILED" && echo yes || echo no)"
+check "and never inflate the success percentiles" "1000" "$(echo "$BIG_ROW" | awk '{print $5}')"
+check "groups split by origin" "yes" \
+  "$(echo "$out" | grep -q "^c\.claim created" && echo "$out" | grep -q "^c\.claim cloned" && echo yes || echo no)"
+
+mkspan d.ancient 5000 1 "" rev1 1000000    # emitted decades ago
+out=$("$REPORT" --dir "$RPT_DIR" --since 1d)
+check "--since excludes stale history from the ranking" "0" \
+  "$(echo "$out" | grep -c "^d\.ancient")"
+
+for d in 400 400; do mkspan e.opt "$d" 1 "" revA; done
+for d in 100 100; do mkspan e.opt "$d" 1 "" revB; done
+out=$("$REPORT" --dir "$RPT_DIR" --compare revA revB)
+OPT_ROW=$(echo "$out" | grep "^e\.opt")
+check "--compare shows both revisions' numbers" "yes" \
+  "$(echo "$OPT_ROW" | grep -q "400/2" && echo "$OPT_ROW" | grep -q "100/2" && echo yes || echo no)"
+check "--compare computes the delta" "yes" \
+  "$(echo "$OPT_ROW" | grep -q -- "-75%" && echo yes || echo no)"
+
+printf '{"v":1,"ts":12345,"dur' >> "$RPT_DIR/spans-000000.jsonl"   # a torn write
+out=$("$REPORT" --dir "$RPT_DIR" 2>&1); rc=$?
+check "a torn line never crashes the report" "0" "$rc"
+check "and is counted, not hidden" "yes" \
+  "$(echo "$out" | grep -q "1 unparseable line" && echo yes || echo no)"
+
+echo
 echo "native-build staleness stamp (native-stamp.sh)"
 
 NS="$SCRIPTS/native-stamp.sh"
@@ -860,6 +916,8 @@ check "SKILL.md ties golden staleness to the stamp sha" "yes" \
   "$(grep -qi "stamp" "$SKILL_MD" && grep -q "origin/main -- ios/" "$SKILL_MD" && echo yes || echo no)"
 check "SKILL.md documents the native-stamp verdict" "yes" \
   "$(grep -q "native-stamp.sh" "$SKILL_MD" && echo yes || echo no)"
+check "SKILL.md documents telemetry and the spans report" "yes" \
+  "$(grep -q "spans-report.sh" "$SKILL_MD" && grep -q "DEMO_TELEMETRY=0" "$SKILL_MD" && echo yes || echo no)"
 check "SKILL.md documents the credential precheck" "yes" \
   "$(grep -q "DEMO_REQUIRED_ENV" "$SKILL_MD" && echo yes || echo no)"
 check "SKILL.md documents the 72h retention default" "yes" \
