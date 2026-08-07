@@ -20,12 +20,15 @@ const EMAIL_DIVIDER = "-".repeat(40)
  * only its label is localized. The email frames the block so the write-here prompt lands
  * last, where mail clients drop the cursor at the end of a mailto body.
  */
-export const useMigrationSupportEmail = (reason: MigrationSupportReason) => {
+export const useMigrationSupportEmail = (
+  reason: MigrationSupportReason,
+  custodialAccountId?: string,
+) => {
   const { LL } = useI18nContext()
   const LLSupport = LL.AccountMigration.contactSupport
   const { composeSupport } = useContactSupport()
   const { countryCode } = useDeviceLocation()
-  const diagnostics = useMigrationDiagnostics()
+  const diagnostics = useMigrationDiagnostics(custodialAccountId)
   const platform = isIos ? "iOS" : "Android"
 
   const cardDetails: MigrationDiagnostic[] = [

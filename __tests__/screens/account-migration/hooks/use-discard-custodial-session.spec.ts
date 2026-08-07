@@ -22,10 +22,10 @@ jest.mock("@app/store/persistent-state", () => ({
 
 import { useDiscardCustodialSession } from "@app/screens/account-migration/hooks/use-discard-custodial-session"
 
-const discard = async (): Promise<void> => {
+const discard = async (isSessionAlive = true): Promise<void> => {
   const { result } = renderHook(() => useDiscardCustodialSession())
   await act(async () => {
-    await result.current.discardCustodialSession()
+    await result.current.discardCustodialSession({ isSessionAlive })
   })
 }
 
@@ -43,7 +43,26 @@ describe("useDiscardCustodialSession", () => {
     expect(mockLogout).toHaveBeenCalledWith({
       stateToDefault: false,
       token: "custodial-token",
+      isValidToken: true,
     })
+    expect(mockSaveToken).toHaveBeenCalledWith("")
+  })
+
+  /** Closing the account already deleted the Kratos identity and every session with it, so
+   *  asking to revoke would fire a doomed mutation and report a failure on every migration. */
+  it("skips the server-side revocation once the account has been closed", async () => {
+    await discard(false)
+
+    expect(mockLogout).toHaveBeenCalledWith({
+      stateToDefault: false,
+      token: "custodial-token",
+      isValidToken: false,
+    })
+  })
+
+  it("still clears the local token when the account has been closed", async () => {
+    await discard(false)
+
     expect(mockSaveToken).toHaveBeenCalledWith("")
   })
 

@@ -14,21 +14,32 @@ export type MigrationDiagnostic = {
  * email: the custodial identity plus the provisioned wallet's pubkey, with the empty
  * values already filtered out. Identity only, no failure reason: the screen exists so the
  * user can copy who they are, and the reason is a code for support that the email carries.
+ *
+ * `custodialAccountId` covers the handover raised after the session was already discarded:
+ * the `me` query is skipped for a signed-out custodial account, so without it the ticket
+ * would name nothing that identifies the account support has to act on.
  */
-export const useMigrationDiagnostics = (): readonly MigrationDiagnostic[] => {
+export const useMigrationDiagnostics = (
+  custodialAccountId?: string,
+): readonly MigrationDiagnostic[] => {
   const { LL } = useI18nContext()
   const LLSupport = LL.AccountMigration.contactSupport
   const { accountId, pubKey, username, email, phone } = useMigrationSupportDetails()
+  const effectiveAccountId = accountId || custodialAccountId || ""
 
   return useMemo(
     () =>
       [
-        { label: LLSupport.accountIdLabel(), value: accountId },
-        { label: LLSupport.pubKeyLabel(), value: pubKey },
-        { label: LLSupport.usernameLabel(), value: username },
-        { label: LLSupport.emailLabel(), value: email },
-        { label: LLSupport.phoneLabel(), value: phone },
+        {
+          label: LLSupport.accountIdLabel(),
+          value: effectiveAccountId,
+          isIdentifier: true,
+        },
+        { label: LLSupport.pubKeyLabel(), value: pubKey, isIdentifier: true },
+        { label: LLSupport.usernameLabel(), value: username, isIdentifier: false },
+        { label: LLSupport.emailLabel(), value: email, isIdentifier: false },
+        { label: LLSupport.phoneLabel(), value: phone, isIdentifier: false },
       ].filter((diagnostic) => Boolean(diagnostic.value)),
-    [LLSupport, accountId, pubKey, username, email, phone],
+    [LLSupport, effectiveAccountId, pubKey, username, email, phone],
   )
 }

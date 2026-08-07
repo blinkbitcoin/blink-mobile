@@ -1,11 +1,15 @@
-import { useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { MigrationStatus } from "@app/graphql/generated"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { MigrationSupportOrigin, MigrationSupportReason } from "@app/types/migration"
+import {
+  MigrationCompletion,
+  MigrationSupportOrigin,
+  MigrationSupportReason,
+} from "@app/types/migration"
 import { reportError } from "@app/utils/error-logging"
 
 import { useCompleteMigration } from "./use-complete-migration"
@@ -30,6 +34,7 @@ export const useResumeCompletedMigration = (): void => {
   const {
     migrationAccountId,
     migrationExpectedReceiveSats,
+    custodialAccountId,
     migrationLoading,
     completeMigration,
   } = useCompleteMigration()
@@ -43,10 +48,10 @@ export const useResumeCompletedMigration = (): void => {
   const isServerCompleted =
     status === MigrationStatus.Completed && hasUnfinishedMigration && !migrationLoading
 
-  /** The same receive gate as the transfer screen: a relaunch mid-transfer must not swap
-   *  into a wallet whose funds are still in transit either (#4102). Unconfirmed simply
-   *  means no swap this session — the custodial session stays intact and the next launch
-   *  (or this one, once a check lands) picks the swap back up. */
+  /** The same receive gate as the transfer screen: a relaunch mid-transfer must not close
+   *  the custodial account, nor swap into a wallet whose funds are still in transit
+   *  (#4102). Unconfirmed simply means no swap this session — the custodial session stays
+   *  intact and the next launch (or this one, once a check lands) picks the swap back up. */
   const { isReceiveConfirmed, isReceiveDelayed } = useMigrationReceiveConfirmation({
     selfCustodialAccountId: migrationAccountId,
     expectedReceiveSats: migrationExpectedReceiveSats,
@@ -66,38 +71,62 @@ export const useResumeCompletedMigration = (): void => {
     )
   }, [isReceiveDelayed])
 
-  /** A swap that resolves false is terminal, not transient: the destination account is
-   *  gone from the device, so no retry brings it back. Blocks the effect from re-entering
-   *  once the user has been handed to support, so the handover happens exactly once. */
+  /** Blocks the effect from re-entering once the user has been handed to support, so a
+   *  terminal outcome hands over exactly once. */
   const hasHandedOverRef = useRef(false)
+
+  /** An unsettled close is a dropped connection, and the attempt budget exists for a briefly
+   *  locked keystore: spending it here would fire three calls against the same dead network
+   *  within milliseconds. One per launch, and the next launch tries again. */
+  const hasDeferredCloseRef = useRef(false)
   const isSwapPending = isServerCompleted && isReceiveConfirmed
 
+  const handOverToSupport = useCallback(
+    (reason: MigrationSupportReason) => {
+      hasHandedOverRef.current = true
+      navigation.navigate("accountMigrationContactSupport", {
+        reason,
+        origin: MigrationSupportOrigin.Resume,
+        custodialAccountId: custodialAccountId ?? undefined,
+      })
+    },
+    [navigation, custodialAccountId],
+  )
+
   useEffect(() => {
-    const canAttempt =
-      isSwapPending && attempts < MAX_SWAP_ATTEMPTS && !hasHandedOverRef.current
+    const isSettled = hasHandedOverRef.current || hasDeferredCloseRef.current
+    const canAttempt = isSwapPending && attempts < MAX_SWAP_ATTEMPTS && !isSettled
     if (!canAttempt || isSwapInFlightRef.current) return
 
-    /** One swap in flight at a time: it discards a session and cannot be half-run. A
-     *  throw bumps the count, which both re-runs this effect for the retry and stops it
-     *  once the attempts are spent. */
+    /** One swap in flight at a time: it closes an account and discards a session, and
+     *  cannot be half-run. A spent attempt bumps the count, which both re-runs this effect
+     *  for the retry and stops it once the attempts are gone. */
     isSwapInFlightRef.current = true
     completeMigration()
-      .then((hasSwapped) => {
-        if (hasSwapped) return
+      .then((completion) => {
+        if (completion === MigrationCompletion.Completed) return
+
+        /** The close never settled, so the custodial token is still alive and the next
+         *  launch can still spend it. Nothing is lost meanwhile: the custodial session keeps
+         *  working and the provisioned account is already in the switcher. */
+        if (completion === MigrationCompletion.CloseUnavailable) {
+          hasDeferredCloseRef.current = true
+          return
+        }
+
+        if (completion === MigrationCompletion.CloseRefused) {
+          handOverToSupport(MigrationSupportReason.CustodialAccountCloseRefused)
+          return
+        }
 
         /** The funds landed server-side but the destination self-custodial account is no
-         *  longer on this device (a reinstall wiped its key), so there is no retry that
-         *  finishes the swap: hand the user to support with a reason that names exactly
-         *  that, and report it once. */
-        hasHandedOverRef.current = true
+         *  longer on this device (a reinstall wiped its key), so no retry finishes the
+         *  swap: name exactly that, and report it once. */
         reportError(
           "Migration resume without destination account",
           new Error("Provisioned self-custodial account is not on this device"),
         )
-        navigation.navigate("accountMigrationContactSupport", {
-          reason: MigrationSupportReason.SelfCustodialAccountNotOnDevice,
-          origin: MigrationSupportOrigin.Resume,
-        })
+        handOverToSupport(MigrationSupportReason.SelfCustodialAccountNotOnDevice)
       })
       .catch((err) => {
         reportError("Migration resume swap", err)
@@ -106,5 +135,5 @@ export const useResumeCompletedMigration = (): void => {
       .finally(() => {
         isSwapInFlightRef.current = false
       })
-  }, [isSwapPending, attempts, completeMigration, navigation])
+  }, [isSwapPending, attempts, completeMigration, handOverToSupport])
 }
