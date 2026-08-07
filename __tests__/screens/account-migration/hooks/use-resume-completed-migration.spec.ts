@@ -2,6 +2,7 @@ import { act, renderHook } from "@testing-library/react-native"
 
 import { MigrationStatus } from "@app/graphql/generated"
 import { useResumeCompletedMigration } from "@app/screens/account-migration/hooks/use-resume-completed-migration"
+import { MigrationCompletion } from "@app/types/migration"
 
 import { flushEffects } from "../../../helpers/flush-effects"
 
@@ -23,15 +24,17 @@ jest.mock("@react-navigation/native", () => ({
 let mockStatus: MigrationStatus | null = MigrationStatus.Completed
 let mockMigrationAccountId: string | null = "sc-account-1"
 let mockMigrationLoading = false
+let mockCustodialAccountId: string | null = "custodial-1"
 
 /** The swap function the hook receives. Its identity can change between renders in
  *  production (a wallet-registry refresh rebuilds it); a test can point it elsewhere to
  *  force the effect to re-run while the first swap is still in flight. */
-let mockCompleteMigrationRef: () => Promise<boolean> = mockCompleteMigration
+let mockCompleteMigrationRef: () => Promise<MigrationCompletion> = mockCompleteMigration
 
 jest.mock("@app/screens/account-migration/hooks/use-complete-migration", () => ({
   useCompleteMigration: () => ({
     migrationAccountId: mockMigrationAccountId,
+    custodialAccountId: mockCustodialAccountId,
     migrationLoading: mockMigrationLoading,
     completeMigration: mockCompleteMigrationRef,
   }),
@@ -55,8 +58,9 @@ describe("useResumeCompletedMigration", () => {
     mockStatus = MigrationStatus.Completed
     mockMigrationAccountId = "sc-account-1"
     mockMigrationLoading = false
+    mockCustodialAccountId = "custodial-1"
     mockCompleteMigrationRef = mockCompleteMigration
-    mockCompleteMigration.mockResolvedValue(true)
+    mockCompleteMigration.mockResolvedValue(MigrationCompletion.Completed)
   })
 
   /**
@@ -128,7 +132,7 @@ describe("useResumeCompletedMigration", () => {
     )
   })
 
-  /** A resolved-true swap is the funds landing on this device: the checkpoint clears and
+  /** A completed swap is the funds landing on this device: the checkpoint clears and
    *  nobody is sent anywhere. */
   it("does not hand over when the swap succeeds", async () => {
     renderHook(() => useResumeCompletedMigration())
@@ -139,12 +143,12 @@ describe("useResumeCompletedMigration", () => {
   })
 
   /**
-   * A swap that resolves false is the reinstall case: the migration finished server-side,
+   * An account-missing swap is the reinstall case: the migration finished server-side,
    * but the destination self-custodial account is no longer on this device, so no retry
    * can finish it and the user is handed to support with a reason that names exactly that.
    */
   it("hands over to support when the destination account is not on the device", async () => {
-    mockCompleteMigration.mockResolvedValue(false)
+    mockCompleteMigration.mockResolvedValue(MigrationCompletion.AccountMissing)
     renderHook(() => useResumeCompletedMigration())
     await flushEffects()
 
@@ -155,6 +159,7 @@ describe("useResumeCompletedMigration", () => {
     expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
       reason: "self-custodial-account-not-on-device",
       origin: "resume",
+      custodialAccountId: mockCustodialAccountId,
     })
   })
 
@@ -162,8 +167,8 @@ describe("useResumeCompletedMigration", () => {
    *  wallet-registry refresh rebuilds completeMigration); the handover is one event, so it
    *  fires once however often the effect re-runs. */
   it("hands over to support only once", async () => {
-    mockCompleteMigration.mockResolvedValue(false)
-    const secondSwap = jest.fn().mockResolvedValue(false)
+    mockCompleteMigration.mockResolvedValue(MigrationCompletion.AccountMissing)
+    const secondSwap = jest.fn().mockResolvedValue(MigrationCompletion.AccountMissing)
 
     const { rerender } = renderHook(() => useResumeCompletedMigration())
     await flushEffects()
@@ -184,7 +189,7 @@ describe("useResumeCompletedMigration", () => {
       .mockRejectedValueOnce(new Error("keystore locked"))
       .mockImplementationOnce(async () => {
         mockMigrationAccountId = null
-        return true
+        return MigrationCompletion.Completed
       })
     renderHook(() => useResumeCompletedMigration())
     await flushEffects()
@@ -192,17 +197,92 @@ describe("useResumeCompletedMigration", () => {
     expect(mockCompleteMigration).toHaveBeenCalledTimes(2)
   })
 
+  /** An unsettled close is a dropped connection, and the attempt budget exists for a briefly
+   *  locked keystore: three calls against the same dead network would land within
+   *  milliseconds of each other and spend the launch for nothing. */
+  it("tries an unsettled close once per launch instead of burning the attempts", async () => {
+    mockCompleteMigration.mockResolvedValue(MigrationCompletion.CloseUnavailable)
+    renderHook(() => useResumeCompletedMigration())
+    await flushEffects()
+
+    expect(mockCompleteMigration).toHaveBeenCalledTimes(1)
+  })
+
+  /** Nothing is lost: the custodial session keeps working, the provisioned account is
+   *  already in the switcher, and the next launch tries the close again. */
+  it("neither hands over nor reports when the close is deferred", async () => {
+    mockCompleteMigration.mockResolvedValue(MigrationCompletion.CloseUnavailable)
+    renderHook(() => useResumeCompletedMigration())
+    await flushEffects()
+
+    expect(mockNavigate).not.toHaveBeenCalled()
+    expect(mockReportError).not.toHaveBeenCalled()
+  })
+
+  it("does not retry a deferred close when the effect re-runs", async () => {
+    mockCompleteMigration.mockResolvedValue(MigrationCompletion.CloseUnavailable)
+    const secondSwap = jest.fn().mockResolvedValue(MigrationCompletion.Completed)
+
+    const { rerender } = renderHook(() => useResumeCompletedMigration())
+    await flushEffects()
+
+    mockCompleteMigrationRef = secondSwap
+    rerender({})
+    await flushEffects()
+
+    expect(secondSwap).not.toHaveBeenCalled()
+  })
+
+  /** The deletion cap: the migration finished, but the emptied custodial account stays open
+   *  until support removes it, and no retry changes that. */
+  it("hands over to support when the close is refused for good", async () => {
+    mockCompleteMigration.mockResolvedValue(MigrationCompletion.CloseRefused)
+    renderHook(() => useResumeCompletedMigration())
+    await flushEffects()
+
+    expect(mockCompleteMigration).toHaveBeenCalledTimes(1)
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
+      reason: "custodial-account-close-refused",
+      origin: "resume",
+      custodialAccountId: mockCustodialAccountId,
+    })
+  })
+
+  /** The owner query can still be unresolved on a resume launch; the handover goes out
+   *  regardless, just without an id to name. */
+  it("hands over without an id when the custodial owner is unknown", async () => {
+    mockCustodialAccountId = null
+    mockCompleteMigration.mockResolvedValue(MigrationCompletion.CloseRefused)
+    renderHook(() => useResumeCompletedMigration())
+    await flushEffects()
+
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
+      reason: "custodial-account-close-refused",
+      origin: "resume",
+      custodialAccountId: undefined,
+    })
+  })
+
+  /** The refusal is the server's settled answer, not a defect worth a crash report. */
+  it("does not report a refused close", async () => {
+    mockCompleteMigration.mockResolvedValue(MigrationCompletion.CloseRefused)
+    renderHook(() => useResumeCompletedMigration())
+    await flushEffects()
+
+    expect(mockReportError).not.toHaveBeenCalled()
+  })
+
   /** The effect can re-run while a swap is still in flight (a wallet-registry refresh
    *  changes completeMigration's identity); the in-flight ref makes that second run a
    *  no-op, so the session is never discarded twice. */
   it("does not start a second swap while one is still in flight", async () => {
-    let settle: (value: boolean) => void = () => undefined
+    let settle: (value: MigrationCompletion) => void = () => undefined
     mockCompleteMigration.mockReturnValue(
-      new Promise<boolean>((resolve) => {
+      new Promise<MigrationCompletion>((resolve) => {
         settle = resolve
       }),
     )
-    const secondSwap = jest.fn().mockResolvedValue(true)
+    const secondSwap = jest.fn().mockResolvedValue(MigrationCompletion.Completed)
 
     const { rerender } = renderHook(() => useResumeCompletedMigration())
     await flushEffects()
@@ -215,7 +295,7 @@ describe("useResumeCompletedMigration", () => {
     expect(secondSwap).not.toHaveBeenCalled()
 
     await act(async () => {
-      settle(true)
+      settle(MigrationCompletion.Completed)
     })
   })
 })

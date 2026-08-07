@@ -36,6 +36,9 @@ export const MigrationSupportReason = {
   TransferFailed: "transfer-failed",
   /** The lightning-address re-point onto the migrated account failed. */
   LnAddressTransferFailed: "ln-address-transfer-failed",
+  /** The server refused to close the emptied custodial account for good (the phone-deletion
+   *  cap). The migration itself finished; the account stays open until support removes it. */
+  CustodialAccountCloseRefused: "custodial-account-close-refused",
   /** The support screen was reached without a reason, e.g. after a navigation-state
    *  restore; a named fallback so the ticket is never blank and never a bare string. */
   Unknown: "unknown",
@@ -61,3 +64,21 @@ export const MigrationSupportOrigin = {
 
 export type MigrationSupportOrigin =
   (typeof MigrationSupportOrigin)[keyof typeof MigrationSupportOrigin]
+
+/**
+ * How an attempt to finish a migration ended. Closing the emptied custodial account has
+ * exactly one window: the session discard that follows destroys the only token that can
+ * authenticate the deletion. So an unsettled close finishes nothing and keeps the session
+ * and the checkpoint for a retry, while a settled refusal finishes everything and leaves
+ * the account itself to support.
+ */
+export const MigrationCompletion = {
+  Completed: "completed",
+  /** No provisioned self-custodial account on this device, so there is nothing to swap to. */
+  AccountMissing: "account-missing",
+  CloseUnavailable: "close-unavailable",
+  CloseRefused: "close-refused",
+} as const
+
+export type MigrationCompletion =
+  (typeof MigrationCompletion)[keyof typeof MigrationCompletion]

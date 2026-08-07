@@ -3,7 +3,7 @@ import { fireEvent, render, screen } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
 import { MigrationTransferringFundsScreen } from "@app/screens/account-migration/to-non-custodial/migration-transferring-funds-screen"
-import { MigrationSupportReason } from "@app/types/migration"
+import { MigrationCompletion, MigrationSupportReason } from "@app/types/migration"
 import { reportError } from "@app/utils/error-logging"
 
 import { ContextForScreen } from "../../helper"
@@ -21,12 +21,14 @@ jest.mock("@react-navigation/native", () => ({
 const mockCompleteMigration = jest.fn()
 let mockMigrationAccountId: string | null = "sc-account-1"
 let mockMigrationLoading = false
+let mockCustodialAccountId: string | null = "custodial-1"
 const mockUseHardwareBackGuard = jest.fn()
 
 jest.mock("@app/screens/account-migration/hooks", () => ({
   ...jest.requireActual("@app/screens/account-migration/hooks"),
   useCompleteMigration: () => ({
     migrationAccountId: mockMigrationAccountId,
+    custodialAccountId: mockCustodialAccountId,
     migrationLoading: mockMigrationLoading,
     completeMigration: mockCompleteMigration,
   }),
@@ -100,12 +102,13 @@ describe("MigrationTransferringFundsScreen", () => {
     jest.clearAllMocks()
     mockOwnerId = "custodial-1"
     mockMigrationAccountId = "sc-account-1"
+    mockCustodialAccountId = "custodial-1"
     mockMigrationLoading = false
     mockIsTransferred = false
     mockFailureReason = null
     mockIsClockOutOfSync = false
     mockHasConnectionIssue = false
-    mockCompleteMigration.mockResolvedValue(true)
+    mockCompleteMigration.mockResolvedValue(MigrationCompletion.Completed)
     loadLocale("en")
   })
 
@@ -133,7 +136,7 @@ describe("MigrationTransferringFundsScreen", () => {
     await flushEffects()
 
     expect(mockUseMigrationTransfer).toHaveBeenCalledWith({
-      custodialAccountId: "custodial-1",
+      custodialAccountId: mockCustodialAccountId,
       selfCustodialAccountId: "sc-account-1",
       skip: false,
     })
@@ -194,7 +197,7 @@ describe("MigrationTransferringFundsScreen", () => {
     mockIsTransferred = true
     mockCompleteMigration.mockImplementation(async () => {
       mockMigrationAccountId = null
-      return true
+      return MigrationCompletion.Completed
     })
 
     const { rerender } = renderScreen()
@@ -243,7 +246,7 @@ describe("MigrationTransferringFundsScreen", () => {
 
   it("routes to support when the swap does not happen", async () => {
     mockIsTransferred = true
-    mockCompleteMigration.mockResolvedValue(false)
+    mockCompleteMigration.mockResolvedValue(MigrationCompletion.AccountMissing)
     renderScreen()
     await flushEffects()
 
@@ -327,5 +330,151 @@ describe("MigrationTransferringFundsScreen", () => {
     fireEvent.press(screen.getByTestId("migration-connection-issue-retry"))
 
     expect(mockRetry).toHaveBeenCalledTimes(1)
+  })
+
+  describe("when the account close does not settle", () => {
+    beforeEach(() => {
+      mockIsTransferred = true
+      mockCompleteMigration.mockResolvedValue(MigrationCompletion.CloseUnavailable)
+    })
+
+    /** Nothing was discarded and the funds are safe, so the screen offers another attempt
+     *  instead of handing a transient blip to support. */
+    it("offers a retry rather than routing anywhere", async () => {
+      renderScreen()
+      await flushEffects()
+
+      expect(
+        screen.getByText("Connection issue.\nVerify your internet connection"),
+      ).toBeTruthy()
+      expect(screen.getByTestId("migration-connection-issue-retry")).toBeTruthy()
+      expect(mockNavigate).not.toHaveBeenCalled()
+      expect(mockReset).not.toHaveBeenCalled()
+    })
+
+    /** The transfer already landed, so the press must retry the close, not the transfer. */
+    it("retries the completion, not the transfer, when the button is pressed", async () => {
+      renderScreen()
+      await flushEffects()
+
+      mockCompleteMigration.mockResolvedValue(MigrationCompletion.Completed)
+      fireEvent.press(screen.getByTestId("migration-connection-issue-retry"))
+      await flushEffects()
+
+      expect(mockCompleteMigration).toHaveBeenCalledTimes(2)
+      expect(mockRetry).not.toHaveBeenCalled()
+    })
+
+    it("resets to success once a retried close settles", async () => {
+      renderScreen()
+      await flushEffects()
+
+      mockCompleteMigration.mockResolvedValue(MigrationCompletion.Completed)
+      fireEvent.press(screen.getByTestId("migration-connection-issue-retry"))
+      await flushEffects()
+
+      expect(mockReset).toHaveBeenCalledWith({
+        index: 0,
+        routes: [{ name: "selfCustodialBackupSuccess", params: { reBackup: false } }],
+      })
+    })
+
+    it("does not fire a second completion while the first is still unsettled", async () => {
+      const { rerender } = renderScreen()
+      await flushEffects()
+      rerenderScreen(rerender)
+      await flushEffects()
+
+      expect(mockCompleteMigration).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe("when the server refuses the account close for good", () => {
+    beforeEach(() => {
+      mockIsTransferred = true
+      mockCompleteMigration.mockResolvedValue(MigrationCompletion.CloseRefused)
+    })
+
+    /** Home sits under the handover, never the success screen: success auto-navigates home
+     *  a couple of seconds after its animation, from wherever it is mounted, and would take
+     *  the handover with it. */
+    it("puts home under the handover instead of the auto-navigating success screen", async () => {
+      renderScreen()
+      await flushEffects()
+
+      expect(mockReset).toHaveBeenCalledWith({
+        index: 1,
+        routes: [
+          { name: "Primary" },
+          {
+            name: "accountMigrationContactSupport",
+            params: {
+              reason: "custodial-account-close-refused",
+              origin: "resume",
+              custodialAccountId: mockCustodialAccountId,
+            },
+          },
+        ],
+      })
+    })
+
+    /** The session is discarded by the time support opens, so the live account query can no
+     *  longer name the custodial account the ticket is about. */
+    it("names the custodial account the ticket is about", async () => {
+      renderScreen()
+      await flushEffects()
+
+      expect(mockReset).toHaveBeenCalledWith(
+        expect.objectContaining({
+          routes: expect.arrayContaining([
+            expect.objectContaining({
+              params: expect.objectContaining({ custodialAccountId: "custodial-1" }),
+            }),
+          ]),
+        }),
+      )
+    })
+
+    it("never lands on the success screen, whose timer would clear the handover", async () => {
+      renderScreen()
+      await flushEffects()
+
+      expect(mockReset).not.toHaveBeenCalledWith(
+        expect.objectContaining({
+          routes: [{ name: "selfCustodialBackupSuccess", params: { reBackup: false } }],
+        }),
+      )
+    })
+
+    it("hands over without an id when the custodial owner is unknown", async () => {
+      mockCustodialAccountId = null
+      renderScreen()
+      await flushEffects()
+
+      expect(mockReset).toHaveBeenCalledWith(
+        expect.objectContaining({
+          routes: expect.arrayContaining([
+            expect.objectContaining({
+              params: expect.objectContaining({ custodialAccountId: undefined }),
+            }),
+          ]),
+        }),
+      )
+    })
+
+    /** The refusal is the server's settled answer, not a defect worth a crash report. */
+    it("does not report the refusal", async () => {
+      renderScreen()
+      await flushEffects()
+
+      expect(jest.mocked(reportError)).not.toHaveBeenCalled()
+    })
+
+    it("offers no retry, because no retry ever clears the refusal", async () => {
+      renderScreen()
+      await flushEffects()
+
+      expect(screen.queryByTestId("migration-connection-issue-retry")).toBeNull()
+    })
   })
 })

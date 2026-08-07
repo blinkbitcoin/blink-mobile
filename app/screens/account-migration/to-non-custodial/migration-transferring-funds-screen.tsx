@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from "react"
+import React, { useCallback, useEffect, useRef, useState } from "react"
 import { Text } from "react-native"
 
 import { makeStyles, useTheme } from "@rn-vui/themed"
@@ -16,7 +16,11 @@ import {
   useHardwareBackGuard,
 } from "@app/screens/account-migration/hooks"
 import { useMigrationTransfer } from "@app/screens/account-migration/hooks/use-migration-transfer"
-import { MigrationSupportOrigin, MigrationSupportReason } from "@app/types/migration"
+import {
+  MigrationCompletion,
+  MigrationSupportOrigin,
+  MigrationSupportReason,
+} from "@app/types/migration"
 import { reportError } from "@app/utils/error-logging"
 import { testProps } from "@app/utils/testProps"
 
@@ -29,7 +33,7 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
   } = useTheme()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { ownerId } = useCustodialOwnerId()
-  const { migrationAccountId, migrationLoading, completeMigration } =
+  const { migrationAccountId, custodialAccountId, migrationLoading, completeMigration } =
     useCompleteMigration()
 
   /** No navigation at all while the funds move. */
@@ -45,13 +49,19 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
     [navigation],
   )
 
-  /** Completing the transfer clears the checkpoint and swaps the session, so once it
-   *  succeeds a missing provisioned account is the expected outcome, not the fault this
-   *  screen watches for. Without this, the success itself would trip that guard. */
-  const hasSwappedRef = useRef(false)
+  const [isCloseUnavailable, setIsCloseUnavailable] = useState(false)
+  const [completionAttempt, setCompletionAttempt] = useState(0)
+
+  /** Which completion attempt already went out, claimed before the call rather than after it
+   *  answers, so neither an extra render nor an unstable identity fires a second one. */
+  const firedAttemptRef = useRef(-1)
+
+  /** A successful completion clears the checkpoint, so once one has run a missing
+   *  provisioned account is the expected outcome, not the fault this screen watches for. */
+  const hasAttemptedCompletion = firedAttemptRef.current >= 0
   const hasProvisionedAccount = Boolean(migrationAccountId)
   const isAccountMissing =
-    !migrationLoading && !hasProvisionedAccount && !hasSwappedRef.current
+    !migrationLoading && !hasProvisionedAccount && !hasAttemptedCompletion
 
   const isTransferSkipped = migrationLoading || isAccountMissing
   const { isTransferred, failureReason, isClockOutOfSync, hasConnectionIssue, retry } =
@@ -75,36 +85,93 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
     goToContactSupport(failureReason)
   }, [failureReason, goToContactSupport])
 
-  /** The session swap is the last step and it is local: the funds have already landed,
-   *  so a failure here leaves a completed migration the next launch can still finish. */
+  /** Point of no return: reset so the finished transfer screen (whose work is done and which
+   *  swallows back) is gone from the stack, not left mounted under success where a back press
+   *  before success auto-navigates home would land on it. */
+  const resetToSuccess = useCallback(() => {
+    navigation.reset({
+      index: 0,
+      routes: [{ name: "selfCustodialBackupSuccess", params: { reBackup: false } }],
+    })
+  }, [navigation])
+
+  /** Home sits underneath, never the success screen: success auto-navigates home a couple of
+   *  seconds after its animation, from wherever it is mounted, and would take this handover
+   *  with it. Back then leaves support for the funded wallet, which is where the user
+   *  belongs once they have read the ticket. */
+  const resetToCloseRefusedSupport = useCallback(() => {
+    navigation.reset({
+      index: 1,
+      routes: [
+        { name: "Primary" },
+        {
+          name: "accountMigrationContactSupport",
+          params: {
+            reason: MigrationSupportReason.CustodialAccountCloseRefused,
+            origin: MigrationSupportOrigin.Resume,
+            custodialAccountId: custodialAccountId ?? undefined,
+          },
+        },
+      ],
+    })
+  }, [navigation, custodialAccountId])
+
+  /** The close is the only step bound to this moment, because the discard that follows
+   *  destroys the token it needs; the swap after it is local, so a failure there leaves a
+   *  completed migration the next launch can still finish. */
+  const hasFiredThisAttempt = firedAttemptRef.current === completionAttempt
+  const isCompletionSkipped = !isTransferred || hasFiredThisAttempt
+
   useEffect(() => {
-    if (!isTransferred || hasSwappedRef.current) return
-    hasSwappedRef.current = true
+    if (isCompletionSkipped) return
+    firedAttemptRef.current = completionAttempt
 
     completeMigration()
-      .then((hasSwapped) => {
-        if (!hasSwapped) {
+      .then((completion) => {
+        if (completion === MigrationCompletion.AccountMissing) {
           goToContactSupport(MigrationSupportReason.SelfCustodialAccountMissing)
           return
         }
 
-        /** Point of no return: reset so the finished transfer screen (whose work is done
-         *  and which swallows back) is gone from the stack, not left mounted under success
-         *  where a back press before success auto-navigates home would land on it. */
-        navigation.reset({
-          index: 0,
-          routes: [{ name: "selfCustodialBackupSuccess", params: { reBackup: false } }],
-        })
+        if (completion === MigrationCompletion.CloseUnavailable) {
+          setIsCloseUnavailable(true)
+          return
+        }
+
+        if (completion === MigrationCompletion.CloseRefused) {
+          resetToCloseRefusedSupport()
+          return
+        }
+
+        resetToSuccess()
       })
       .catch((err) => {
         reportError("Migration session swap", err)
         goToContactSupport(MigrationSupportReason.TransferFailed)
       })
-  }, [isTransferred, completeMigration, navigation, goToContactSupport])
+  }, [
+    isCompletionSkipped,
+    completionAttempt,
+    completeMigration,
+    resetToSuccess,
+    resetToCloseRefusedSupport,
+    goToContactSupport,
+  ])
 
-  /** Two recoverable states share the retry footer: a skewed clock and a lost connection.
-   *  Each keeps its own message; only a real failure leaves this screen for support. */
-  const isRecoverable = isClockOutOfSync || hasConnectionIssue
+  /** Whichever step is unsettled is the one the press retries. */
+  const retryRecoverable = useCallback(() => {
+    if (isCloseUnavailable) {
+      setIsCloseUnavailable(false)
+      setCompletionAttempt((previous) => previous + 1)
+      return
+    }
+    retry()
+  }, [isCloseUnavailable, retry])
+
+  /** A skewed clock, a lost connection and a close that never settled share the retry
+   *  footer. The clock keeps its own message; the other two are network failures and read
+   *  as one. Only a real failure leaves this screen for support. */
+  const isRecoverable = isClockOutOfSync || hasConnectionIssue || isCloseUnavailable
 
   const recoverableMessage = isClockOutOfSync
     ? LLMigration.clockOutOfSync.body()
@@ -119,7 +186,11 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
     : "migration-connection-issue-retry"
 
   const retryFooter = isRecoverable ? (
-    <GaloyPrimaryButton title={retryTitle} onPress={retry} {...testProps(retryTestId)} />
+    <GaloyPrimaryButton
+      title={retryTitle}
+      onPress={retryRecoverable}
+      {...testProps(retryTestId)}
+    />
   ) : undefined
 
   return (
