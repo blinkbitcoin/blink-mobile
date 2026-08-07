@@ -74,4 +74,63 @@ describe("GaloyIcon", () => {
       ).not.toBeNull()
     })
   })
+
+  describe("prop fallbacks", () => {
+    // The size and colour props overlap deliberately; each fallback below is a
+    // combination real call sites use.
+    it("falls back to the theme colour when none is given", () => {
+      const { getByTestId } = renderWithTheme(<GaloyIcon name="info" size={24} />)
+
+      expect(getByTestId("icon-info").props.color).toBe(theme.lightColors?.black)
+    })
+
+    it("takes its size from width and height when size is absent", () => {
+      expect(
+        renderWithTheme(<GaloyIcon name="info" width={30} height={18} />).toJSON(),
+      ).not.toBeNull()
+    })
+
+    it("accepts a non-default phosphor weight", () => {
+      expect(
+        renderWithTheme(<GaloyIcon name="info" size={24} weight="bold" />).toJSON(),
+      ).not.toBeNull()
+    })
+
+    it("gives a custom svg its width and height separately", () => {
+      const { getByTestId } = renderWithTheme(
+        <GaloyIcon name="emergency-kit" width={30} height={18} />,
+      )
+
+      expect(getByTestId("icon-emergency-kit").props.width).toBe(30)
+      expect(getByTestId("icon-emergency-kit").props.height).toBe(18)
+    })
+
+    it("renders a custom svg inside a background container with a fixed container size", () => {
+      expect(
+        renderWithTheme(
+          <GaloyIcon
+            name="emergency-kit"
+            size={24}
+            backgroundColor="red"
+            containerSize={60}
+            opacity={0.4}
+          />,
+        ).toJSON(),
+      ).not.toBeNull()
+    })
+
+    it("renders a phosphor icon inside a background container with a fixed container size", () => {
+      expect(
+        renderWithTheme(
+          <GaloyIcon
+            name="info"
+            size={24}
+            backgroundColor="red"
+            containerSize={60}
+            opacity={0.4}
+          />,
+        ).toJSON(),
+      ).not.toBeNull()
+    })
+  })
 })
