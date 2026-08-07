@@ -3,12 +3,10 @@ import { Pressable } from "react-native"
 import DeviceInfo from "react-native-device-info"
 
 import { useIpCountryCode, usePhoneCountryCode } from "@app/hooks/use-device-location"
+import { useSecretMenuTrigger } from "@app/hooks/use-secret-menu-trigger"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { useNavigation } from "@react-navigation/native"
-import type { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { Text, makeStyles } from "@rn-vui/themed"
 
-import type { RootStackParamList } from "../../navigation/stack-param-lists"
 import { testProps } from "../../utils/testProps"
 
 const useStyles = makeStyles(({ colors }) => ({
@@ -19,29 +17,17 @@ const useStyles = makeStyles(({ colors }) => ({
   },
 }))
 
-type VersionComponentNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  "getStarted" | "settings"
->
-
 export const VersionComponent = () => {
   const styles = useStyles()
-  const { navigate } = useNavigation<VersionComponentNavigationProp>()
   const { LL } = useI18nContext()
   const registeredCountry = usePhoneCountryCode() ?? LL.common.unknown()
   const detectedCountry = useIpCountryCode(true) ?? LL.common.unknown()
-  const [secretMenuCounter, setSecretMenuCounter] = React.useState(0)
-  React.useEffect(() => {
-    if (secretMenuCounter > 2) {
-      navigate("developerScreen")
-      setSecretMenuCounter(0)
-    }
-  }, [navigate, secretMenuCounter])
+  const handleSecretMenuTap = useSecretMenuTrigger()
 
   const readableVersion = DeviceInfo.getReadableVersion()
 
   return (
-    <Pressable onPress={() => setSecretMenuCounter(secretMenuCounter + 1)}>
+    <Pressable onPress={handleSecretMenuTap}>
       <Text {...testProps("Version Build Text")} style={styles.version}>
         {readableVersion}
         {"\n"}

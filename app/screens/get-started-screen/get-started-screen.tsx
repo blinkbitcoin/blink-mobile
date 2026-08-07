@@ -10,6 +10,7 @@ import {
   ACCOUNT_OPTION_TO_FLOW,
 } from "@app/hooks/use-account-type-options"
 import { useCreationBlock } from "@app/hooks/use-creation-block"
+import { useSecretMenuTrigger } from "@app/hooks/use-secret-menu-trigger"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import theme from "@app/rne-theme/theme"
 import { AccountTypeMode } from "@app/types/account"
@@ -41,13 +42,7 @@ export const GetStartedScreen: React.FC = () => {
     navigation.setOptions({ headerShown: canGoBack })
   }, [navigation, canGoBack])
 
-  const [secretMenuCounter, setSecretMenuCounter] = React.useState(0)
-  React.useEffect(() => {
-    if (secretMenuCounter > 2) {
-      navigation.navigate("developerScreen")
-      setSecretMenuCounter(0)
-    }
-  }, [navigation, secretMenuCounter])
+  const handleSecretMenuTap = useSecretMenuTrigger()
 
   const {
     theme: { mode },
@@ -124,7 +119,7 @@ export const GetStartedScreen: React.FC = () => {
         {NonProdInstanceHint}
         <View style={styles.logoWrapper} pointerEvents="box-none">
           <Pressable
-            onPress={() => setSecretMenuCounter(secretMenuCounter + 1)}
+            onPress={handleSecretMenuTap}
             style={styles.logoContainer}
             {...testProps("logo-button")}
           >
