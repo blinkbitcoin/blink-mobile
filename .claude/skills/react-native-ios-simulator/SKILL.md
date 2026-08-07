@@ -67,9 +67,11 @@ Re-running is idempotent — same sim, same port. Sessions created before the
 
 When a **golden simulator** exists (see below), claiming clones it instead of
 creating a blank device — app already installed, account already logged in —
-and prints the golden's stamp as `# golden` comment lines. Anything that makes
-the clone dishonest (golden booted, different device type, explicit runtime
-mismatch) falls back to a blank create with a note on stderr, never silently.
+and prints the golden's stamp as `# golden` comment lines, plus (when run from
+an app worktree root) an instant `# golden verdict:` on whether the golden's
+native build still matches `ios/Podfile.lock`. Anything that makes the clone
+dishonest (golden booted, different device type, explicit runtime mismatch)
+falls back to a blank create with a note on stderr, never silently.
 
 ### 2. Work in a scratchpad worktree
 
@@ -103,7 +105,18 @@ xcrun simctl install "$DEMO_UDID" <path>/<YourApp>.app
 ```
 
 Reuse is safe for pure-JS diffs and even dep removals (a native superset is
-harmless). Confirm nothing added or updated a native module since the build:
+harmless) — while the native closure is unchanged. `Podfile.lock` is that
+closure's fingerprint, so the verdict is a hash comparison, not git
+archaeology (a wrong guess costs a ~14 min locked rebuild discovered as a
+crash at launch):
+
+```bash
+"$SKILL/scripts/native-stamp.sh" check <dir-of-the-.app>/demo-native-stamp   # instant verdict
+```
+
+After any native build you make, stamp it so the next agent gets that verdict
+too: `native-stamp.sh write <dir-of-the-.app>/demo-native-stamp`. For an
+unstamped build (made outside this workflow), fall back to git:
 
 ```bash
 git -C /path/to/your-app log origin/main --since=<build-date> -- ios/ package.json yarn.lock
@@ -241,17 +254,22 @@ golden — exactly one device ever carries the name), writes a stamp
 manifest gone, nothing left to release. Both the swap and claim's clone run
 under a shared lock, so a clone can never race a re-bless.
 
-**Staleness is judged, not guessed.** The clone carries the app build the
-golden was blessed with; before trusting it, diff native paths against the
-stamp's SHA (same rule as reusing a DerivedData build):
+**Staleness is judged, not guessed — and mechanically.** Bless hashes the
+build's `ios/Podfile.lock` into the stamp (`--lockfile` overrides the default
+cwd-relative path), and every claim run from an app worktree root prints the
+verdict as a `# golden verdict:` line: `native build matches` or
+`NATIVE BUILD STALE`. Stale means a native module changed since the bless (a
+`Podfile.lock` change, like the geetest module rename) — install a fresh build
+onto the clone or re-bless; do not trust the cloned install. For a stamp
+without a hash (blessed before lockfile stamping, or blessed without a
+lockfile), fall back to diffing native paths against the stamp's SHA:
 
 ```bash
 git -C /path/to/your-app log <stamp-sha>..origin/main -- ios/ package.json yarn.lock
 ```
 
-Anything listed → the golden's native build is stale: set up a fresh session
-and re-bless. A clone that comes up logged out (staging sessions do expire)
-means the same thing — re-bless with a fresh login. Opt out of cloning with
+A clone that comes up logged out (staging sessions do expire) means the same
+thing — re-bless with a fresh login. Opt out of cloning with
 `DEMO_SIM_GOLDEN=none`, or point at a differently named golden with
 `DEMO_SIM_GOLDEN=<device name>`. The reaper never touches the golden: it has
 no session, and the name gate refuses it like any foreign device.
@@ -262,7 +280,7 @@ The isolation guarantees are load-bearing for every other agent on this Mac, so
 they are tested rather than asserted:
 
 ```bash
-"$SKILL/tests/run.sh"     # 137 assertions, ~60s, exits non-zero on failure
+"$SKILL/tests/run.sh"     # 150 assertions, ~60s, exits non-zero on failure
 ```
 
 It creates **no real simulators** — a fake `xcrun` goes first on PATH and the

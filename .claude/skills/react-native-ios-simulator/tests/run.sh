@@ -387,6 +387,42 @@ check "reset without a port writes no defaults" "no" \
 "$SCRIPTS/release-session.sh" 622 --delete >/dev/null 2>&1
 
 echo
+echo "native-build staleness stamp (native-stamp.sh)"
+
+NS="$SCRIPTS/native-stamp.sh"
+NS_APP="$WORK/lock-app"; mkdir -p "$NS_APP/ios"
+echo "PODS v1" > "$NS_APP/ios/Podfile.lock"
+NS_STAMP="$WORK/native-stamp"
+echo "sha=abc" > "$NS_STAMP"
+
+(cd "$NS_APP" && "$NS" write "$NS_STAMP") >/dev/null 2>&1
+check "write records a podfile-lock-hash" "yes" \
+  "$(grep -q '^podfile-lock-hash=' "$NS_STAMP" && echo yes || echo no)"
+check "write preserves the stamp's other keys" "yes" \
+  "$(grep -q '^sha=abc' "$NS_STAMP" && echo yes || echo no)"
+
+(cd "$NS_APP" && "$NS" check "$NS_STAMP") >/dev/null 2>&1
+check "check passes while the lockfile is unchanged" "0" "$?"
+
+echo "PODS v2 - a native module renamed" > "$NS_APP/ios/Podfile.lock"
+out=$(cd "$NS_APP" && "$NS" check "$NS_STAMP" 2>&1); rc=$?
+check "check fails once the lockfile changed" "1" "$rc"
+check "the failure says STALE and names Podfile.lock" "yes" \
+  "$(echo "$out" | grep -q "STALE" && echo "$out" | grep -q "Podfile.lock" && echo yes || echo no)"
+
+(cd "$NS_APP" && "$NS" write "$NS_STAMP") >/dev/null 2>&1
+check "re-write replaces the hash line instead of stacking a second one" "1" \
+  "$(grep -c '^podfile-lock-hash=' "$NS_STAMP" | tr -d ' ')"
+
+# A stamp that cannot vouch for its build must fail, never pass vacuously.
+echo "sha=abc" > "$NS_STAMP"
+(cd "$NS_APP" && "$NS" check "$NS_STAMP") >/dev/null 2>&1
+check "a stamp without a hash demands a re-stamp" "1" "$?"
+
+"$NS" check "$NS_STAMP" --lockfile "$WORK/does-not-exist.lock" >/dev/null 2>&1
+check "a missing lockfile is a loud failure, not a pass" "1" "$?"
+
+echo
 echo "golden simulator (bless + clone)"
 
 # One world for the whole section: a golden is long-lived state by design.
@@ -483,6 +519,28 @@ check "the retired golden is deleted, not orphaned" "" \
   "$(device_state "$BLESS_UDID")"
 check "the stamp now describes the new golden" "yes" \
   "$(grep -q '^sha=def456' "$GOLDEN_STAMP" && echo yes || echo no)"
+
+# --- the stamp's lockfile hash gives claim an instant staleness verdict ------
+VERDICT_APP="$WORK/verdict-app"; mkdir -p "$VERDICT_APP/ios"
+echo "PODS blessed" > "$VERDICT_APP/ios/Podfile.lock"
+"$NS" write "$GOLDEN_STAMP" --lockfile "$VERDICT_APP/ios/Podfile.lock" >/dev/null 2>&1
+out=$(cd "$VERDICT_APP" && "$SCRIPTS/claim-session.sh" 709)
+check "claim reports a matching native build from the worktree root" "yes" \
+  "$(echo "$out" | grep -q "native build matches" && echo yes || echo no)"
+(cd "$VERDICT_APP" && "$SCRIPTS/release-session.sh" 709 --delete) >/dev/null 2>&1
+
+echo "PODS newer - native module changed" > "$VERDICT_APP/ios/Podfile.lock"
+out=$(cd "$VERDICT_APP" && "$SCRIPTS/claim-session.sh" 712)
+check "claim warns NATIVE BUILD STALE when the lockfile moved on" "yes" \
+  "$(echo "$out" | grep -q "NATIVE BUILD STALE" && echo yes || echo no)"
+(cd "$VERDICT_APP" && "$SCRIPTS/release-session.sh" 712 --delete) >/dev/null 2>&1
+
+# --- bless records the lockfile hash in the stamp ----------------------------
+out=$("$SCRIPTS/claim-session.sh" 713) && eval "$out"
+"$SCRIPTS/bless-golden.sh" 713 --sha bbb222 --lockfile "$VERDICT_APP/ios/Podfile.lock" >/dev/null 2>&1
+check "bless with a lockfile exits zero" "0" "$?"
+check "the blessed stamp carries the lockfile hash" "yes" \
+  "$(grep -q '^podfile-lock-hash=' "$GOLDEN_STAMP" && echo yes || echo no)"
 
 # --- bless safety gates ------------------------------------------------------
 reset_world
@@ -661,6 +719,8 @@ check "SKILL.md documents the golden bless workflow" "yes" \
   "$(grep -q "bless-golden.sh" "$SKILL_MD" && echo yes || echo no)"
 check "SKILL.md ties golden staleness to the stamp sha" "yes" \
   "$(grep -qi "stamp" "$SKILL_MD" && grep -q "origin/main -- ios/" "$SKILL_MD" && echo yes || echo no)"
+check "SKILL.md documents the native-stamp verdict" "yes" \
+  "$(grep -q "native-stamp.sh" "$SKILL_MD" && echo yes || echo no)"
 check "SKILL.md documents the 72h retention default" "yes" \
   "$(grep -q "72h" "$SKILL_MD" && echo yes || echo no)"
 check "SKILL.md carries no stale 24h default" "no" \

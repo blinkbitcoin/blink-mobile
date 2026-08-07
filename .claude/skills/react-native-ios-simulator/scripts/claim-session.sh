@@ -200,4 +200,16 @@ EOF
 if [ -f "$SESSION_DIR/golden-stamp" ]; then
   echo "# golden: this device is a clone of $(cat "$SESSION_DIR/golden-source" 2>/dev/null || echo "the golden sim")"
   sed 's/^/# golden /' "$SESSION_DIR/golden-stamp"
+  # Instant staleness verdict when the cwd is an app worktree: hash comparison
+  # against the blessed Podfile.lock instead of git archaeology. A wrong guess
+  # here used to cost a ~14 min rebuild discovered as a crash at launch.
+  RECORDED_LOCK=$(grep '^podfile-lock-hash=' "$SESSION_DIR/golden-stamp" 2>/dev/null | cut -d= -f2- || true)
+  if [ -n "$RECORDED_LOCK" ] && [ -f "ios/Podfile.lock" ]; then
+    CURRENT_LOCK=$(shasum -a 256 ios/Podfile.lock | cut -d' ' -f1)
+    if [ "$CURRENT_LOCK" = "$RECORDED_LOCK" ]; then
+      echo "# golden verdict: native build matches this worktree's ios/Podfile.lock"
+    else
+      echo "# golden verdict: NATIVE BUILD STALE - ios/Podfile.lock changed since the bless; install a fresh build onto this clone, or re-bless the golden"
+    fi
+  fi
 fi
