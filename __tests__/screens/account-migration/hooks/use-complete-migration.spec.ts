@@ -59,7 +59,8 @@ const mockReportError = jest.fn()
 
 jest.mock("@app/utils/error-logging", () => ({
   ...jest.requireActual("@app/utils/error-logging"),
-  reportError: (operation: string, err: unknown) => mockReportError(operation, err),
+  reportError: (operation: string, err: unknown, options?: unknown) =>
+    mockReportError(operation, err, options),
 }))
 
 const mockClearPendingAccount = jest.fn()
@@ -300,41 +301,65 @@ describe("useCompleteMigration", () => {
     })
   })
 
-  /** The deletion lands on whatever account the active token authenticates, so an unproven
-   *  owner would aim an irreversible call at a stranger's account. */
-  describe("when the active session does not own the checkpoint", () => {
-    it("refuses to delete an account the checkpoint was not saved by", async () => {
-      mockCheckpointOwnerId = "custodial-2"
-
-      expect(await complete()).toBe(MigrationCompletion.CloseUnavailable)
-      expect(mockCloseCustodialAccount).not.toHaveBeenCalled()
-    })
-
-    /** A record written before owners existed is claimed by whoever is active, so it can
-     *  serve another profile's account id. */
-    it("refuses to delete on an owner-less checkpoint", async () => {
-      mockCheckpointOwnerId = null
-
-      expect(await complete()).toBe(MigrationCompletion.CloseUnavailable)
-      expect(mockCloseCustodialAccount).not.toHaveBeenCalled()
-    })
-
-    it("refuses to delete while the session owner is unresolved", async () => {
+  /** The owner query answers on its own schedule, and a launch with no connection has it
+   *  answering nothing at all. Nothing is spent and nothing is claimed until it does. */
+  describe("when the session owner has not resolved", () => {
+    beforeEach(() => {
       mockOwnerId = null
-      mockCheckpointOwnerId = null
+    })
 
+    it("waits rather than aiming an irreversible call at an unproven account", async () => {
       expect(await complete()).toBe(MigrationCompletion.CloseUnavailable)
       expect(mockCloseCustodialAccount).not.toHaveBeenCalled()
     })
 
-    it("keeps the session and the checkpoint intact", async () => {
-      mockCheckpointOwnerId = "custodial-2"
+    it("keeps the session and the checkpoint intact for the retry", async () => {
       await complete()
 
       expect(mockDiscardCustodialSession).not.toHaveBeenCalled()
       expect(mockSetActiveAccountId).not.toHaveBeenCalled()
       expect(mockClearCheckpoint).not.toHaveBeenCalled()
       expect(mockClearPendingAccount).not.toHaveBeenCalled()
+    })
+
+    /** A pending query is a waiting state, not a fault: reporting it would raise a non-fatal
+     *  on every offline launch and every retry press. */
+    it("does not report a state the next attempt can still resolve", async () => {
+      await complete()
+
+      expect(mockReportError).not.toHaveBeenCalled()
+    })
+  })
+
+  /** The deletion lands on whatever account the active token authenticates, so a checkpoint
+   *  that does not name its owner can never prove which account it would hit. */
+  describe("when the checkpoint's owner cannot be matched to the session", () => {
+    it("never deletes an account the checkpoint was not proven to own", async () => {
+      mockCheckpointOwnerId = "custodial-2"
+
+      expect(await complete()).toBe(MigrationCompletion.CloseRefused)
+      expect(mockCloseCustodialAccount).not.toHaveBeenCalled()
+    })
+
+    /** A record written before owners existed is claimed by whoever is active, so it can
+     *  serve another profile's account id, and no later attempt makes it provable. */
+    it("treats an owner-less checkpoint the same way", async () => {
+      mockCheckpointOwnerId = null
+
+      expect(await complete()).toBe(MigrationCompletion.CloseRefused)
+      expect(mockCloseCustodialAccount).not.toHaveBeenCalled()
+    })
+
+    /** The funds are already self-custodial and no retry can ever prove the owner, so the
+     *  migration finishes here: the alternative is a user holding their wallet behind a
+     *  button that will never work. The account itself goes to support. */
+    it("finishes the migration instead of holding the user behind a doomed retry", async () => {
+      mockCheckpointOwnerId = null
+      await complete()
+
+      expect(mockDiscardCustodialSession).toHaveBeenCalledWith({ isSessionAlive: true })
+      expect(mockSetActiveAccountId).toHaveBeenCalledWith("sc-account-1")
+      expect(mockClearCheckpoint).toHaveBeenCalledTimes(1)
     })
 
     it("reports the mismatch with both ids", async () => {
@@ -347,6 +372,7 @@ describe("useCompleteMigration", () => {
           message:
             "Migration completion owner mismatch: checkpoint custodial-2, session custodial-1",
         }),
+        { dedupKey: "migration-completion-owner-mismatch" },
       )
     })
   })
@@ -354,7 +380,7 @@ describe("useCompleteMigration", () => {
   /** The resume hook stays mounted under the migration stack, so it and the transfer screen
    *  can both decide to finish at the same moment. */
   describe("when two callers complete at the same time", () => {
-    it("deletes the account once and defers the loser", async () => {
+    it("deletes the account once and gives both callers the same answer", async () => {
       let releaseClose: (outcome: AccountCloseOutcome) => void = () => {}
       mockCloseCustodialAccount.mockImplementation(
         () =>
@@ -373,9 +399,12 @@ describe("useCompleteMigration", () => {
       })
 
       expect(mockCloseCustodialAccount).toHaveBeenCalledTimes(1)
+      /** The loser waits on the winner rather than being told "unavailable": both watch the
+       *  same migration, and a retry footer over a migration that just finished is a lie the
+       *  user cannot resolve. */
       expect(outcomes).toEqual([
         MigrationCompletion.Completed,
-        MigrationCompletion.CloseUnavailable,
+        MigrationCompletion.Completed,
       ])
       expect(mockDiscardCustodialSession).toHaveBeenCalledTimes(1)
     })
