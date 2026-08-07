@@ -42,6 +42,7 @@ describe("useRecoveryBackupNudge", () => {
       status: RecoveryBundleStatus.Fresh,
       savedAt: SAVED_AT,
       leafCount: 3,
+      isOnlyOnThisDevice: false,
     })
   })
 
@@ -50,6 +51,7 @@ describe("useRecoveryBackupNudge", () => {
       status: RecoveryBundleStatus.Unknown,
       savedAt: null,
       leafCount: null,
+      isOnlyOnThisDevice: false,
     })
     const { result } = renderNudge(true)
     await waitFor(() => expect(result.current.variant).toBeNull())
@@ -61,6 +63,7 @@ describe("useRecoveryBackupNudge", () => {
       status: RecoveryBundleStatus.Missing,
       savedAt: null,
       leafCount: null,
+      isOnlyOnThisDevice: false,
     })
     const { result } = renderNudge(true)
     await waitFor(() => expect(result.current.variant).toBeNull())
@@ -72,6 +75,7 @@ describe("useRecoveryBackupNudge", () => {
         status: RecoveryBundleStatus.Missing,
         savedAt: null,
         leafCount: null,
+        isOnlyOnThisDevice: false,
       })
     })
 
@@ -110,6 +114,7 @@ describe("useRecoveryBackupNudge", () => {
         status: RecoveryBundleStatus.Stale,
         savedAt: SAVED_AT,
         leafCount: 3,
+        isOnlyOnThisDevice: false,
       })
     })
 
@@ -139,5 +144,66 @@ describe("useRecoveryBackupNudge", () => {
   it("stays quiet while the backup is current", async () => {
     const { result } = renderNudge(true)
     await waitFor(() => expect(result.current.variant).toBeNull())
+  })
+
+  describe("a bundle that never left the device", () => {
+    const onlyHere = (status: RecoveryBundleStatus) => {
+      mockStatus.mockReturnValue({
+        status,
+        savedAt: SAVED_AT,
+        leafCount: 3,
+        isOnlyOnThisDevice: true,
+      })
+    }
+
+    it("warns even though the backup is current", async () => {
+      // This is the state a user reaches by skipping the export: the bundle is
+      // fresh, so neither the missing nor the stale check would fire, yet the
+      // only copy dies with the phone.
+      onlyHere(RecoveryBundleStatus.Fresh)
+      const { result } = renderNudge(true)
+      await waitFor(() =>
+        expect(result.current.variant).toBe(RecoveryBackupNudgeVariant.OnlyOnThisDevice),
+      )
+    })
+
+    it("takes precedence over staleness", async () => {
+      // Both are true; saying both at once says neither well, and having no
+      // copy off the device is the bigger problem.
+      onlyHere(RecoveryBundleStatus.Stale)
+      const { result } = renderNudge(true)
+      await waitFor(() =>
+        expect(result.current.variant).toBe(RecoveryBackupNudgeVariant.OnlyOnThisDevice),
+      )
+    })
+
+    it("can be dismissed for the bundle the user saw", async () => {
+      onlyHere(RecoveryBundleStatus.Fresh)
+      mockGetItem.mockResolvedValue(String(SAVED_AT + 1000))
+      const { result } = renderNudge(true)
+      await waitFor(() => expect(result.current.variant).toBeNull())
+    })
+
+    it("returns once the bundle is refreshed and still unexported", async () => {
+      onlyHere(RecoveryBundleStatus.Fresh)
+      mockGetItem.mockResolvedValue(String(SAVED_AT - 1000))
+      const { result } = renderNudge(true)
+      await waitFor(() =>
+        expect(result.current.variant).toBe(RecoveryBackupNudgeVariant.OnlyOnThisDevice),
+      )
+    })
+
+    it("stays quiet once a copy exists off the device", async () => {
+      // Exported by the user, or synced to their cloud - either way there is a
+      // second copy and nothing to warn about.
+      mockStatus.mockReturnValue({
+        status: RecoveryBundleStatus.Fresh,
+        savedAt: SAVED_AT,
+        leafCount: 3,
+        isOnlyOnThisDevice: false,
+      })
+      const { result } = renderNudge(true)
+      await waitFor(() => expect(result.current.variant).toBeNull())
+    })
   })
 })

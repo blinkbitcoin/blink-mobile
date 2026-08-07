@@ -190,7 +190,11 @@ describe("useCloudBackup", () => {
     // Restored per test: jest.clearAllMocks() clears calls, not implementations,
     // so a case that makes one of these reject would otherwise leak into every
     // test after it.
-    mockReadSettings.mockResolvedValue({ autoRefresh: true, cloudSync: false })
+    mockReadSettings.mockResolvedValue({
+      autoRefresh: true,
+      cloudSync: false,
+      exportedAt: null,
+    })
     mockWriteSettings.mockResolvedValue(undefined)
     // Restored here rather than at the end of a test body, so an assertion
     // failing mid-test cannot leak a custodial account into every case after.

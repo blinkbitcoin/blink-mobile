@@ -42,10 +42,11 @@ describe("recovery bundle settings", () => {
 
     // These defaults are product rules (PRD 4.1): refresh is opt-out, cloud
     // sync is opt-in. Flipping either default is a product decision.
-    expect(settings).toEqual({ autoRefresh: true, cloudSync: false })
+    expect(settings).toEqual({ autoRefresh: true, cloudSync: false, exportedAt: null })
     expect(defaultRecoveryBundleSettings).toEqual({
       autoRefresh: true,
       cloudSync: false,
+      exportedAt: null,
     })
   })
 
@@ -53,11 +54,13 @@ describe("recovery bundle settings", () => {
     await writeRecoveryBundleSettings(ACCOUNT_ID, {
       autoRefresh: false,
       cloudSync: true,
+      exportedAt: null,
     })
 
     expect(await readRecoveryBundleSettings(ACCOUNT_ID)).toEqual({
       autoRefresh: false,
       cloudSync: true,
+      exportedAt: null,
     })
     // Another account keeps the defaults.
     expect(await readRecoveryBundleSettings(OTHER_ACCOUNT_ID)).toEqual(
@@ -88,6 +91,7 @@ describe("recovery bundle settings", () => {
     await writeRecoveryBundleSettings(ACCOUNT_ID, {
       autoRefresh: false,
       cloudSync: true,
+      exportedAt: null,
     })
     await removeRecoveryBundleSettings(ACCOUNT_ID)
 

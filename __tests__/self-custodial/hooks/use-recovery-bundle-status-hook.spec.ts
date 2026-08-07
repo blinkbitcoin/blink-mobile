@@ -10,6 +10,11 @@ jest.mock("@app/self-custodial/recovery-bundle/storage", () => ({
   readRecoveryBundleState: (...args: unknown[]) => mockReadState(...args),
 }))
 
+const mockReadSettings = jest.fn()
+jest.mock("@app/self-custodial/recovery-bundle/settings", () => ({
+  readRecoveryBundleSettings: (...args: unknown[]) => mockReadSettings(...args),
+}))
+
 const mockAccount = jest.fn()
 jest.mock("@app/hooks/use-account-registry", () => ({
   useAccountRegistry: () => ({ activeAccount: mockAccount() }),
@@ -42,6 +47,11 @@ describe("useRecoveryBundleStatus", () => {
       leafCount: 3,
       bundleCreatedAt: "2026-08-04T00:00:00Z",
       cloudSyncedAt: null,
+    })
+    mockReadSettings.mockResolvedValue({
+      autoRefresh: true,
+      cloudSync: false,
+      exportedAt: Date.now(),
     })
   })
 
@@ -88,5 +98,60 @@ describe("useRecoveryBundleStatus", () => {
     ])
     const { result } = renderHook(() => useRecoveryBundleStatus())
     await waitFor(() => expect(result.current.status).toBe(RecoveryBundleStatus.Fresh))
+  })
+
+  describe("only on this device", () => {
+    it("flags a bundle that was never exported and never synced", async () => {
+      mockReadSettings.mockResolvedValue({
+        autoRefresh: true,
+        cloudSync: false,
+        exportedAt: null,
+      })
+      const { result } = renderHook(() => useRecoveryBundleStatus())
+      await waitFor(() => expect(result.current.isOnlyOnThisDevice).toBe(true))
+    })
+
+    it("clears once the user has exported it", async () => {
+      mockReadSettings.mockResolvedValue({
+        autoRefresh: true,
+        cloudSync: false,
+        exportedAt: SAVED_AT,
+      })
+      const { result } = renderHook(() => useRecoveryBundleStatus())
+      await waitFor(() => expect(result.current.isOnlyOnThisDevice).toBe(false))
+    })
+
+    it("clears once it has reached the cloud, even unexported", async () => {
+      mockReadState.mockResolvedValue({
+        savedAt: SAVED_AT,
+        totalSats: "21000",
+        leafCount: 3,
+        bundleCreatedAt: "2026-08-04T00:00:00Z",
+        cloudSyncedAt: SAVED_AT,
+      })
+      mockReadSettings.mockResolvedValue({
+        autoRefresh: true,
+        cloudSync: true,
+        exportedAt: null,
+      })
+      const { result } = renderHook(() => useRecoveryBundleStatus())
+      await waitFor(() => expect(result.current.isOnlyOnThisDevice).toBe(false))
+    })
+
+    it("is not claimed when there is no bundle at all", async () => {
+      // Nothing exists, so "only on this device" would be a false statement;
+      // that case is Missing.
+      mockReadState.mockResolvedValue(null)
+      mockReadSettings.mockResolvedValue({
+        autoRefresh: true,
+        cloudSync: false,
+        exportedAt: null,
+      })
+      const { result } = renderHook(() => useRecoveryBundleStatus())
+      await waitFor(() =>
+        expect(result.current.status).toBe(RecoveryBundleStatus.Missing),
+      )
+      expect(result.current.isOnlyOnThisDevice).toBe(false)
+    })
   })
 })
