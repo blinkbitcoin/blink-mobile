@@ -1,12 +1,21 @@
 import { it } from "@jest/globals"
 
+const mockReportError = jest.fn()
+jest.mock("@app/utils/error-logging", () => ({
+  reportError: (...args: readonly unknown[]) => mockReportError(...args),
+}))
+
+import { MASK_CHAR } from "@app/config/appinfo"
 import {
   formatCardValidThruDisplay,
   formatDateFromNow,
+  formatDayAndMonth,
   formatDuration,
   formatMonth,
   formatShortDate,
+  formatUnixTimestampYMDHM,
   getLastDayOfMonth,
+  getTimeLeft,
   isSameDay,
   isToday,
   isYesterday,
@@ -198,6 +207,98 @@ describe("date utils", () => {
     })
   })
 
+  describe("getTimeLeft", () => {
+    const NOW = Date.parse("2024-06-10T12:00:00Z")
+    const SECOND = 1000
+    const MINUTE = 60 * SECOND
+    const HOUR = 60 * MINUTE
+    const DAY = 24 * HOUR
+
+    beforeEach(() => {
+      jest.useFakeTimers()
+      jest.setSystemTime(NOW)
+    })
+
+    afterEach(() => {
+      jest.useRealTimers()
+    })
+
+    it.each([
+      {
+        name: "counts down days, hours, minutes and seconds",
+        until: NOW + 2 * DAY + 3 * HOUR + 4 * MINUTE + 5 * SECOND,
+        expected: "02:03:04:05",
+      },
+      {
+        name: "pads every segment to two digits",
+        until: NOW + MINUTE + SECOND,
+        expected: "00:00:01:01",
+      },
+      {
+        name: "returns all zeros the instant the window closes",
+        until: NOW,
+        expected: "00:00:00:00",
+      },
+    ])("returns $expected when it $name", ({ until, expected }) => {
+      expect(getTimeLeft({ after: NOW - DAY, until })).toBe(expected)
+    })
+
+    it("returns an empty string once the window has passed", () => {
+      expect(getTimeLeft({ after: NOW - 2 * DAY, until: NOW - DAY })).toBe("")
+    })
+
+    it("returns an empty string before the window opens", () => {
+      expect(getTimeLeft({ after: NOW + DAY, until: NOW + 2 * DAY })).toBe("")
+    })
+  })
+
+  describe("formatUnixTimestampYMDHM", () => {
+    it.each([
+      {
+        name: "keeps the UTC wall clock when the zone is UTC",
+        timestampSeconds: Math.floor(Date.parse("2026-08-03T19:04:00Z") / 1000),
+        timezone: "UTC",
+        expected: "2026-08-03 19:04",
+      },
+      {
+        name: "shifts back for a negative offset zone",
+        timestampSeconds: Math.floor(Date.parse("2026-08-03T19:04:00Z") / 1000),
+        timezone: "America/El_Salvador",
+        expected: "2026-08-03 13:04",
+      },
+      {
+        name: "rolls to the next day for a positive offset zone",
+        timestampSeconds: Math.floor(Date.parse("2026-08-03T19:04:00Z") / 1000),
+        timezone: "Asia/Tokyo",
+        expected: "2026-08-04 04:04",
+      },
+      {
+        name: "rolls back a day for a negative offset zone",
+        timestampSeconds: Math.floor(Date.parse("2024-01-01T00:30:00Z") / 1000),
+        timezone: "America/Los_Angeles",
+        expected: "2023-12-31 16:30",
+      },
+      {
+        name: "renders midnight as 00 and not 24",
+        timestampSeconds: Math.floor(Date.parse("2024-01-01T00:00:00Z") / 1000),
+        timezone: "UTC",
+        expected: "2024-01-01 00:00",
+      },
+      {
+        name: "pads single digit month, day, hour and minute",
+        timestampSeconds: Math.floor(Date.parse("2024-03-05T04:07:00Z") / 1000),
+        timezone: "UTC",
+        expected: "2024-03-05 04:07",
+      },
+    ])("returns $expected when it $name", ({ timestampSeconds, timezone, expected }) => {
+      expect(formatUnixTimestampYMDHM({ timestampSeconds, timezone })).toBe(expected)
+    })
+
+    /** The device-zone default cannot be asserted here, where the process zone is UTC on
+     *  CI and any expectation built from it would compare UTC against UTC; that case lives
+     *  in `date-device-timezone.spec.ts`, which pins a non-UTC zone. */
+  })
+
   describe("parseCardValidThru", () => {
     it("parses a valid Date instance", () => {
       expect(parseCardValidThru(new Date("2024-05-01T12:00:00Z"))).toEqual({
@@ -247,6 +348,12 @@ describe("date utils", () => {
       expect(
         formatCardValidThruDisplay(new Date("2031-01-15T12:00:00Z"), true, "*"),
       ).toBe("01/ 31")
+    })
+
+    it("masks with the default mask character when none is given", () => {
+      expect(formatCardValidThruDisplay("2024-12-05", false)).toBe(
+        `${MASK_CHAR}${MASK_CHAR} / ${MASK_CHAR}${MASK_CHAR}`,
+      )
     })
   })
 
@@ -314,6 +421,22 @@ describe("date utils", () => {
     it("returns ISO format", () => {
       expect(formatDateFromNow({ years: 5, format: "iso" })).toBe("2031-03-12")
     })
+
+    it("advances by months without truncating to whole years", () => {
+      expect(formatDateFromNow({ months: 6, locale: "en-US" })).toBe("Sep 12, 2026")
+    })
+
+    it("treats 12 months the same as one year", () => {
+      expect(formatDateFromNow({ months: 12, locale: "en-US" })).toBe("Mar 12, 2027")
+    })
+
+    it("rolls months over into the following year", () => {
+      expect(formatDateFromNow({ months: 18, locale: "en-US" })).toBe("Sep 12, 2027")
+    })
+
+    it("falls back to en-US when no locale is given", () => {
+      expect(formatDateFromNow({ years: 1 })).toBe("Mar 12, 2027")
+    })
   })
 
   describe("formatDuration", () => {
@@ -343,6 +466,54 @@ describe("date utils", () => {
 
     it("formats days with narrow display", () => {
       expect(formatDuration(3, { unit: "day", locale: "en-US" })).toBe("3d")
+    })
+  })
+
+  describe("formatDayAndMonth", () => {
+    const AUG_31_2026_NOON_UTC = Date.UTC(2026, 7, 31, 12) / 1000
+
+    it("formats the day and long month for the given locale", () => {
+      expect(
+        formatDayAndMonth({
+          timestampSeconds: AUG_31_2026_NOON_UTC,
+          locale: "es",
+          timezone: "UTC",
+        }),
+      ).toBe("31 de agosto")
+    })
+
+    it("defaults to en-US when no locale is provided", () => {
+      expect(
+        formatDayAndMonth({ timestampSeconds: AUG_31_2026_NOON_UTC, timezone: "UTC" }),
+      ).toBe("August 31")
+    })
+
+    it("renders the date in the backend-defined timezone", () => {
+      const shortlyPastMidnightUtc = Date.UTC(2026, 8, 1, 0, 30) / 1000
+
+      expect(
+        formatDayAndMonth({
+          timestampSeconds: shortlyPastMidnightUtc,
+          locale: "en-US",
+          timezone: "America/El_Salvador",
+        }),
+      ).toBe("August 31")
+    })
+
+    it("falls back to the device timezone and reports when the timezone is malformed", () => {
+      mockReportError.mockClear()
+
+      const formatted = formatDayAndMonth({
+        timestampSeconds: AUG_31_2026_NOON_UTC,
+        locale: "en-US",
+        timezone: "Not/A_Timezone",
+      })
+
+      expect(formatted).toContain("August")
+      expect(mockReportError).toHaveBeenCalledWith(
+        "formatDayAndMonth timezone",
+        expect.any(Error),
+      )
     })
   })
 })

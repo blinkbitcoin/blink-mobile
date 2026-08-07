@@ -1,5 +1,6 @@
 import React from "react"
 import { render, fireEvent, act } from "@testing-library/react-native"
+import InAppBrowser from "react-native-inappbrowser-reborn"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
 import { CardSubscriptionScreen } from "@app/screens/card-screen/onboarding/card-flow/card-subscription-screen"
@@ -13,31 +14,9 @@ jest.mock("react-native-linear-gradient", () => ({
   LinearGradient: "LinearGradient",
 }))
 
-jest.mock("@rn-vui/themed", () => {
-  const actual = jest.requireActual("@rn-vui/themed")
-  const { TouchableOpacity } = jest.requireActual("react-native")
-  return {
-    ...actual,
-    CheckBox: ({
-      checked,
-      onPress,
-      containerStyle,
-    }: {
-      checked: boolean
-      onPress: () => void
-      containerStyle: Record<string, number>
-      iconType: string
-      checkedIcon: string
-      uncheckedIcon: string
-    }) => (
-      <TouchableOpacity
-        testID={`checkbox-${checked ? "checked" : "unchecked"}`}
-        onPress={onPress}
-        style={containerStyle}
-      />
-    ),
-  }
-})
+jest.mock("@rn-vui/themed", () =>
+  jest.requireActual("../../../../helpers/card-flow-mocks").mockThemedWithCheckbox(),
+)
 
 const mockNavigate = jest.fn()
 const mockUseRoute = jest.fn()
@@ -96,6 +75,9 @@ afterEach(() => {
   consoleLogSpy.mockRestore()
 })
 
+const RENEW_CHECKBOX_INDEX = 0
+const FEE_SCHEDULE_CHECKBOX_INDEX = 1
+
 describe("CardSubscriptionScreen - subscribe variant", () => {
   beforeEach(() => {
     loadLocale("en")
@@ -127,6 +109,18 @@ describe("CardSubscriptionScreen - subscribe variant", () => {
     expect(getByText("First year free")).toBeTruthy()
   })
 
+  it("displays the special offer label", async () => {
+    const { getByText } = render(
+      <ContextForScreen>
+        <CardSubscriptionScreen />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {})
+
+    expect(getByText("Special offer")).toBeTruthy()
+  })
+
   it("displays renew checkbox text", async () => {
     const { getByText } = render(
       <ContextForScreen>
@@ -137,8 +131,59 @@ describe("CardSubscriptionScreen - subscribe variant", () => {
     await act(async () => {})
 
     expect(
-      getByText("I understand that my subscription will automatically renew in 1 year"),
+      getByText("I understand my subscription will automatically renew in 12 months"),
     ).toBeTruthy()
+  })
+
+  it("displays the fee schedule checkbox text and link", async () => {
+    const { getByText } = render(
+      <ContextForScreen>
+        <CardSubscriptionScreen />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {})
+
+    expect(getByText(/I have reviewed and agree to the/)).toBeTruthy()
+    expect(getByText("Blink Card Fee Schedule")).toBeTruthy()
+  })
+
+  it("navigates to the fee schedule screen when the link is pressed", async () => {
+    const { getByText } = render(
+      <ContextForScreen>
+        <CardSubscriptionScreen />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {})
+
+    await act(async () => {
+      fireEvent.press(getByText("Blink Card Fee Schedule"))
+    })
+
+    expect(mockNavigate).toHaveBeenCalledWith("cardFeeScheduleScreen")
+  })
+
+  it("keeps the button disabled when only the renew checkbox is checked", async () => {
+    const { getByText, getAllByTestId } = render(
+      <ContextForScreen>
+        <CardSubscriptionScreen />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {})
+
+    const uncheckedBoxes = getAllByTestId("checkbox-unchecked")
+    await act(async () => {
+      fireEvent.press(uncheckedBoxes[0])
+    })
+
+    const button = getByText("Accept")
+    await act(async () => {
+      fireEvent.press(button)
+    })
+
+    expect(mockStartKyc).not.toHaveBeenCalled()
   })
 
   it("displays accept button", async () => {
@@ -153,7 +198,7 @@ describe("CardSubscriptionScreen - subscribe variant", () => {
     expect(getByText("Accept")).toBeTruthy()
   })
 
-  it("button is disabled when agreement is not checked", async () => {
+  it("button is disabled when no checkbox is checked", async () => {
     const { getByText } = render(
       <ContextForScreen>
         <CardSubscriptionScreen />
@@ -170,7 +215,7 @@ describe("CardSubscriptionScreen - subscribe variant", () => {
     expect(mockStartKyc).not.toHaveBeenCalled()
   })
 
-  it("button is enabled when both checkboxes are checked", async () => {
+  it("keeps the button disabled when only the fee schedule checkbox is checked", async () => {
     const { getByText, getAllByTestId } = render(
       <ContextForScreen>
         <CardSubscriptionScreen />
@@ -179,20 +224,18 @@ describe("CardSubscriptionScreen - subscribe variant", () => {
 
     await act(async () => {})
 
-    const uncheckedBoxes = getAllByTestId("checkbox-unchecked")
-
     await act(async () => {
-      fireEvent.press(uncheckedBoxes[0])
+      fireEvent.press(getAllByTestId("checkbox-unchecked")[FEE_SCHEDULE_CHECKBOX_INDEX])
     })
 
     await act(async () => {
-      fireEvent.press(uncheckedBoxes[1])
+      fireEvent.press(getByText("Accept"))
     })
 
-    expect(getByText("Accept")).toBeTruthy()
+    expect(mockStartKyc).not.toHaveBeenCalled()
   })
 
-  it("calls startKyc when accept pressed with both checkboxes checked", async () => {
+  it("keeps the button disabled when the terms are not accepted", async () => {
     const { getByText, getAllByTestId } = render(
       <ContextForScreen>
         <CardSubscriptionScreen />
@@ -202,18 +245,34 @@ describe("CardSubscriptionScreen - subscribe variant", () => {
     await act(async () => {})
 
     const uncheckedBoxes = getAllByTestId("checkbox-unchecked")
-
     await act(async () => {
-      fireEvent.press(uncheckedBoxes[0])
+      fireEvent.press(uncheckedBoxes[RENEW_CHECKBOX_INDEX])
+      fireEvent.press(uncheckedBoxes[FEE_SCHEDULE_CHECKBOX_INDEX])
     })
 
     await act(async () => {
-      fireEvent.press(uncheckedBoxes[1])
+      fireEvent.press(getByText("Accept"))
     })
 
-    const button = getByText("Accept")
+    expect(mockStartKyc).not.toHaveBeenCalled()
+  })
+
+  it("calls startKyc when renew, fee schedule, and terms are all accepted", async () => {
+    const { getByText, getAllByTestId } = render(
+      <ContextForScreen>
+        <CardSubscriptionScreen />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {})
+
+    const uncheckedBoxes = getAllByTestId("checkbox-unchecked")
     await act(async () => {
-      fireEvent.press(button)
+      uncheckedBoxes.forEach((checkbox) => fireEvent.press(checkbox))
+    })
+
+    await act(async () => {
+      fireEvent.press(getByText("Accept"))
     })
 
     expect(mockStartKyc).toHaveBeenCalled()
@@ -251,6 +310,18 @@ describe("CardSubscriptionScreen - payment variant", () => {
     expect(getByText("Payment Pending")).toBeTruthy()
   })
 
+  it("displays the status label", async () => {
+    const { getByText } = render(
+      <ContextForScreen>
+        <CardSubscriptionScreen />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {})
+
+    expect(getByText("Status")).toBeTruthy()
+  })
+
   it("does not display renew checkbox", async () => {
     const { queryByText } = render(
       <ContextForScreen>
@@ -261,7 +332,7 @@ describe("CardSubscriptionScreen - payment variant", () => {
     await act(async () => {})
 
     expect(
-      queryByText("I understand that my subscription will automatically renew in 1 year"),
+      queryByText("I understand my subscription will automatically renew in 12 months"),
     ).toBeNull()
   })
 
@@ -298,5 +369,23 @@ describe("CardSubscriptionScreen - payment variant", () => {
     })
 
     expect(mockStartKyc).not.toHaveBeenCalled()
+  })
+
+  it("opens the agreement links when pressed", async () => {
+    const { getByText } = render(
+      <ContextForScreen>
+        <CardSubscriptionScreen />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {})
+
+    await act(async () => {
+      fireEvent.press(getByText("Terms of Service"))
+      fireEvent.press(getByText("Privacy Policy"))
+      fireEvent.press(getByText("Cardholder Agreement"))
+    })
+
+    expect(InAppBrowser.open).toHaveBeenCalledTimes(3)
   })
 })

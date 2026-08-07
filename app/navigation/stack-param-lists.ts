@@ -1,7 +1,4 @@
 import { NavigatorScreenParams } from "@react-navigation/native"
-
-export const PhraseStep = { First: 1, Second: 2 } as const
-export type PhraseStep = (typeof PhraseStep)[keyof typeof PhraseStep]
 import { LNURLPaySuccessAction } from "lnurl-pay"
 
 import { IconNamesType } from "@app/components/atomic/galoy-icon"
@@ -10,6 +7,7 @@ import { EarnSectionType } from "@app/screens/earns-screen/sections"
 import { PhoneLoginInitiateType } from "@app/screens/phone-auth-screen"
 import {
   PaymentDestination,
+  MerchantChoice,
   ReceiveDestination,
 } from "@app/screens/send-bitcoin-screen/payment-destination/index.types"
 import { PaymentDetail } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
@@ -17,8 +15,17 @@ import { PaymentSendCompletedStatus } from "@app/screens/send-bitcoin-screen/use
 import { AccountTypeMode } from "@app/types/account"
 import { DisplayCurrency, MoneyAmount, WalletOrDisplayCurrency } from "@app/types/amounts"
 import { WalletDescriptor } from "@app/types/wallets"
+import { MigrationSupportOrigin, MigrationSupportReason } from "@app/types/migration"
 
 import { AuthenticationScreenPurpose, PinScreenPurpose } from "../utils/enum"
+
+export const PhraseStep = { First: 1, Second: 2 } as const
+export type PhraseStep = (typeof PhraseStep)[keyof typeof PhraseStep]
+
+/** Deep links and navigation-state rehydration can deliver params the route type says are
+ *  impossible; the phrase screens use this to fall back instead of throwing. */
+export const isPhraseStep = (value: unknown): value is PhraseStep =>
+  value === PhraseStep.First || value === PhraseStep.Second
 
 export type RootStackParamList = {
   getStarted: undefined
@@ -34,12 +41,15 @@ export type RootStackParamList = {
     title?: string
     onboarding?: boolean
   }
-  authenticationCheck: undefined
+  /** `isResume` marks the lock raised on returning from background: unlocking pops back to
+   *  the screen the user was on, instead of resetting to Primary the way a cold start does. */
+  authenticationCheck: { isResume?: boolean } | undefined
   authentication: {
     screenPurpose: AuthenticationScreenPurpose
     isPinEnabled: boolean
+    isResume?: boolean
   }
-  pin: { screenPurpose: PinScreenPurpose }
+  pin: { screenPurpose: PinScreenPurpose; isResume?: boolean }
   Primary: undefined
   earnsSection: { section: EarnSectionType; isAvailable: boolean }
   earnsQuiz: { id: string; isAvailable: boolean }
@@ -56,6 +66,9 @@ export type RootStackParamList = {
   sendBitcoinDetails: {
     paymentDestination: PaymentDestination
   }
+  merchantSelection: {
+    merchants: MerchantChoice[]
+  }
   sendBitcoinConfirmation: {
     paymentDetail: PaymentDetail<WalletCurrency>
   }
@@ -63,8 +76,17 @@ export type RootStackParamList = {
   conversionConfirmation: {
     fromWalletCurrency: WalletCurrency
     moneyAmount: MoneyAmount<WalletOrDisplayCurrency>
+    /** Where a completed migration convert lands (back in the flow, not Home). Navigation-only,
+     *  never a privilege: the region waiver comes from the armed flag, not this forgeable param. */
+    isMigrationConversion?: boolean
   }
-  conversionSuccess: undefined
+  conversionSuccess:
+    | {
+        /** Set when the conversion was a migration step, so the success screen returns to the
+         *  migration flow instead of Home. */
+        returnToMigration?: boolean
+      }
+    | undefined
   sendBitcoinCompleted: {
     arrivalAtMempoolEstimate?: number
     status: PaymentSendCompletedStatus
@@ -108,7 +130,7 @@ export type RootStackParamList = {
   phoneFlow: NavigatorScreenParams<PhoneValidationStackParamList>
   phoneRegistrationInitiate: undefined
   phoneRegistrationValidate: { phone: string; channel: PhoneCodeChannelType }
-  transactionDetail: { txid: string }
+  transactionDetail: { txid: string; recipientUserId?: string }
   unclaimedDepositsScreen: undefined
   transactionHistory?: {
     wallets?: ReadonlyArray<{
@@ -123,7 +145,9 @@ export type RootStackParamList = {
   profileScreen: undefined
   notificationSettingsScreen: undefined
   apiScreen: undefined
+  apiKeyCreateScreen: undefined
   transactionLimitsScreen: undefined
+  feeRatesScreen: undefined
   acceptTermsAndConditions: NewAccountFlowParamsList
   emailRegistrationInitiate?: { onboarding?: boolean; hasUsername?: boolean }
   emailRegistrationValidate: {
@@ -142,6 +166,7 @@ export type RootStackParamList = {
   notificationHistory: undefined
   onboarding: NavigatorScreenParams<OnboardingStackParamList>
   cardDashboardScreen: undefined
+  cardFeeScheduleScreen: undefined
   cardAddToMobileWalletScreen: {
     lastFour: string
     holderName: string
@@ -182,6 +207,7 @@ export type RootStackParamList = {
   cardOnboardingPaymentScreen: undefined
   cardOnboardingLoadingScreen: undefined
   cardOnboardingPersonalInfoScreen: undefined
+  cardOnboardingAcknowledgementScreen: undefined
   cardOnboardingPreapprovedScreen: undefined
   cardOnboardingProcessingScreen: undefined
   cardOnboardingApprovedScreen: undefined
@@ -196,8 +222,17 @@ export type RootStackParamList = {
     successMessage?: string
   }
   selfCustodialBackupSuccess: { reBackup?: boolean; message?: string } | undefined
+  accountMigrationEntry: undefined
+  accountMigrationStart: undefined
   accountMigrationExplainer: undefined
+  accountMigrationKeepReceiving: undefined
+  accountMigrationDownloadHistory: undefined
+  accountMigrationBalancesOverview: undefined
   accountMigrationTransferringFunds: undefined
+  accountMigrationContactSupport: {
+    reason: MigrationSupportReason
+    origin?: MigrationSupportOrigin
+  }
   selfCustodialRestorePhrase: { step: PhraseStep; words?: string[] }
   selfCustodialRestoreMethod: undefined
   selfCustodialCloudRestore: undefined
@@ -252,4 +287,6 @@ export type PrimaryStackParamList = {
   Web: undefined
 }
 
-export type NewAccountFlowParamsList = { flow: "phone" | "trial" | "selfCustodial" }
+export type NewAccountFlowParamsList = {
+  flow: "phone" | "trial" | "selfCustodial" | "migration"
+}

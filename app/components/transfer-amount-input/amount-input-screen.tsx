@@ -43,6 +43,7 @@ export type AmountInputScreenProps = {
   onTypingChange?: (typing: boolean, focusedId: InputField["id"] | null) => void
   onAfterRecalc?: () => void
   lockFormattingUntilBlur?: boolean
+  disabled?: boolean
 }
 
 export enum ConvertInputType {
@@ -142,6 +143,7 @@ export const AmountInputScreen: React.FC<AmountInputScreenProps> = ({
   onTypingChange,
   onAfterRecalc,
   lockFormattingUntilBlur = false,
+  disabled = false,
 }) => {
   const { currencyInfo, formatMoneyAmount, zeroDisplayAmount } = useDisplayCurrency()
   const { LL } = useI18nContext()
@@ -551,6 +553,7 @@ export const AmountInputScreen: React.FC<AmountInputScreenProps> = ({
       errorMessage={errorMessage || ""}
       onKeyPress={handleKeyPress}
       disabledKeys={disabledKeys}
+      disabled={disabled}
     />
   )
 }

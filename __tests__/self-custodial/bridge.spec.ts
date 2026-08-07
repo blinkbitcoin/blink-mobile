@@ -46,6 +46,12 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
   StableBalanceActiveLabel: {
     Set: jest.fn().mockImplementation((args) => ({ tag: "Set", inner: args })),
   },
+  MaxFee: {
+    NetworkRecommended: jest
+      .fn()
+      .mockImplementation((inner) => ({ tag: "NetworkRecommended", inner })),
+    Fixed: jest.fn().mockImplementation((inner) => ({ tag: "Fixed", inner })),
+  },
   connect: (...args: readonly unknown[]) => mockConnect(...args),
   defaultConfig: jest.fn().mockReturnValue({}),
   initLogging: jest.fn(),
@@ -146,11 +152,12 @@ describe("selfCustodialRestoreWallet", () => {
   })
 
   it("stores provided mnemonic and network", async () => {
-    await selfCustodialRestoreWallet(
-      "test-account-id",
-      "restore word1 word2 word3",
-      Network.Regtest,
-    )
+    await selfCustodialRestoreWallet({
+      accountId: "test-account-id",
+      mnemonic: "restore word1 word2 word3",
+      network: Network.Regtest,
+      leewaySatPerVbyte: 1,
+    })
 
     expect(mockSetMnemonicForAccount).toHaveBeenCalledWith(
       "test-account-id",
@@ -166,7 +173,12 @@ describe("selfCustodialRestoreWallet", () => {
     mockSetMnemonicForAccount.mockResolvedValue(false)
 
     await expect(
-      selfCustodialRestoreWallet("test-account-id", "mnemonic", Network.Regtest),
+      selfCustodialRestoreWallet({
+        accountId: "test-account-id",
+        mnemonic: "mnemonic",
+        network: Network.Regtest,
+        leewaySatPerVbyte: 1,
+      }),
     ).rejects.toThrow("Failed to store mnemonic")
   })
 })

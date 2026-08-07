@@ -14,6 +14,7 @@ let capturedHandleCalloutPress:
       mapInfo: { coordinates: { latitude: number; longitude: number }; title: string }
     }) => void)
   | undefined
+let capturedScreenProps: Record<string, unknown> | undefined
 
 jest.mock("@react-navigation/native", () => ({
   useFocusEffect: jest.fn(),
@@ -90,8 +91,10 @@ jest.mock("@app/components/screen", () => {
   const ReactActual = jest.requireActual("react")
   const RN = jest.requireActual("react-native")
   return {
-    Screen: ({ children }: { children?: React.ReactNode }) =>
-      ReactActual.createElement(RN.View, null, children),
+    Screen: ({ children, ...props }: { children?: React.ReactNode }) => {
+      capturedScreenProps = props
+      return ReactActual.createElement(RN.View, null, children)
+    },
   }
 })
 
@@ -140,6 +143,17 @@ describe("MapScreen.handleCalloutPress", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     capturedHandleCalloutPress = undefined
+    capturedScreenProps = undefined
+  })
+
+  it("excludes the bottom safe-area edge the tab bar already reserves", async () => {
+    mockUseIsAuthed.mockReturnValue(true)
+    mockUseActiveWallet.mockReturnValue({ isSelfCustodial: false })
+
+    renderMapScreen()
+    await waitForCalloutHandler()
+
+    expect(capturedScreenProps?.edges).toEqual(["left", "right"])
   })
 
   it("navigates to sendBitcoinDestination for a custodial authed user", async () => {

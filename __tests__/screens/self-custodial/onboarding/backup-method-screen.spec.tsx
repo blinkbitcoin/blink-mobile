@@ -10,6 +10,7 @@ import { IconHero } from "@app/components/icon-hero"
 import { BackupMethodScreen } from "@app/screens/self-custodial/onboarding/backup-method-screen"
 import theme from "@app/rne-theme/theme"
 import { ContextForScreen } from "../../helper"
+import { flushEffects } from "../../../helpers/flush-effects"
 
 const mockHandleKeychainBackup = jest.fn()
 const mockHandleCloudBackup = jest.fn()
@@ -29,13 +30,11 @@ jest.mock("@app/screens/self-custodial/onboarding/hooks", () => ({
   }),
 }))
 
-const mockSaveCheckpoint = jest.fn()
+const mockUseMigrationBackupCheckpoint = jest.fn()
 
 jest.mock("@app/screens/account-migration/hooks", () => ({
-  useMigrationCheckpoint: () => ({
-    saveCheckpoint: mockSaveCheckpoint,
-  }),
-  MigrationCheckpoint: { BackupMethod: "backupMethod" },
+  ...jest.requireActual("@app/screens/account-migration/hooks"),
+  useMigrationBackupCheckpoint: (step: string) => mockUseMigrationBackupCheckpoint(step),
 }))
 
 jest.mock("@app/components/atomic/galoy-primary-button", () => ({
@@ -94,12 +93,13 @@ describe("BackupMethodScreen", () => {
     Object.defineProperty(Platform, "OS", { configurable: true, value: originalPlatform })
   })
 
-  it("renders title and subtitle", () => {
+  it("renders title and subtitle", async () => {
     const { getByText } = render(
       <ContextForScreen>
         <BackupMethodScreen />
       </ContextForScreen>,
     )
+    await flushEffects()
 
     expect(getByText(LL.BackupScreen.BackupMethod.title())).toBeTruthy()
     expect(
@@ -111,7 +111,7 @@ describe("BackupMethodScreen", () => {
     ).toBeTruthy()
   })
 
-  it("renders all three backup method buttons on Android", () => {
+  it("renders all three backup method buttons on Android", async () => {
     Object.defineProperty(Platform, "OS", { configurable: true, value: "android" })
 
     const { getByText } = render(
@@ -119,29 +119,32 @@ describe("BackupMethodScreen", () => {
         <BackupMethodScreen />
       </ContextForScreen>,
     )
+    await flushEffects()
 
     expect(getByText(LL.BackupScreen.BackupMethod.googleDrive())).toBeTruthy()
     expect(getByText(LL.BackupScreen.BackupMethod.passwordManager())).toBeTruthy()
     expect(getByText(LL.BackupScreen.BackupMethod.manualBackup())).toBeTruthy()
   })
 
-  it("calls handleCloudBackup on cloud provider press", () => {
+  it("calls handleCloudBackup on cloud provider press", async () => {
     const { getByText } = render(
       <ContextForScreen>
         <BackupMethodScreen />
       </ContextForScreen>,
     )
+    await flushEffects()
 
     fireEvent.press(getByText(LL.BackupScreen.BackupMethod.appleICloud()))
     expect(mockHandleCloudBackup).toHaveBeenCalled()
   })
 
-  it("calls handleManualBackup on manual backup press", () => {
+  it("calls handleManualBackup on manual backup press", async () => {
     const { getByText } = render(
       <ContextForScreen>
         <BackupMethodScreen />
       </ContextForScreen>,
     )
+    await flushEffects()
 
     fireEvent.press(getByText(LL.BackupScreen.BackupMethod.manualBackup()))
     expect(mockHandleManualBackup).toHaveBeenCalled()
@@ -155,6 +158,7 @@ describe("BackupMethodScreen", () => {
         <BackupMethodScreen />
       </ContextForScreen>,
     )
+    await flushEffects()
 
     await act(async () => {
       fireEvent.press(getByText(LL.BackupScreen.BackupMethod.passwordManager()))
@@ -163,7 +167,7 @@ describe("BackupMethodScreen", () => {
     expect(mockHandleKeychainBackup).toHaveBeenCalled()
   })
 
-  it("hides the password manager button when credential backup is unavailable (Android multi-account)", () => {
+  it("hides the password manager button when credential backup is unavailable (Android multi-account)", async () => {
     Object.defineProperty(Platform, "OS", { configurable: true, value: "android" })
     mockIsCredentialBackupAvailable = false
 
@@ -172,12 +176,13 @@ describe("BackupMethodScreen", () => {
         <BackupMethodScreen />
       </ContextForScreen>,
     )
+    await flushEffects()
 
     expect(queryByText(LL.BackupScreen.BackupMethod.passwordManager())).toBeNull()
     expect(queryByText(LL.BackupScreen.BackupMethod.manualBackup())).toBeTruthy()
   })
 
-  it("hides the password manager button on iOS even when credential backup is available", () => {
+  it("hides the password manager button on iOS even when credential backup is available", async () => {
     Object.defineProperty(Platform, "OS", { configurable: true, value: "ios" })
     mockIsCredentialBackupAvailable = true
 
@@ -186,32 +191,35 @@ describe("BackupMethodScreen", () => {
         <BackupMethodScreen />
       </ContextForScreen>,
     )
+    await flushEffects()
 
     expect(queryByText(LL.BackupScreen.BackupMethod.passwordManager())).toBeNull()
     expect(queryByText(LL.BackupScreen.BackupMethod.manualBackup())).toBeTruthy()
   })
 
-  it("saves BackupMethod checkpoint on mount", () => {
+  it("delegates the BackupMethod checkpoint to the migration backup hook", async () => {
     render(
       <ContextForScreen>
         <BackupMethodScreen />
       </ContextForScreen>,
     )
+    await flushEffects()
 
-    expect(mockSaveCheckpoint).toHaveBeenCalledWith("backupMethod")
+    expect(mockUseMigrationBackupCheckpoint).toHaveBeenCalledWith("backupMethod")
   })
 
-  it("renders the hero icon with the success color", () => {
+  it("renders the hero icon with the green color", async () => {
     render(
       <ContextForScreen>
         <BackupMethodScreen />
       </ContextForScreen>,
     )
+    await flushEffects()
 
     const iconHeroMock = IconHero as unknown as jest.Mock
     const props = iconHeroMock.mock.calls[0][0]
 
-    expect(props.iconColor).toBe(theme.lightColors?.success)
+    expect(props.iconColor).toBe(theme.lightColors?._green)
     expect(props.icon).toBe("cloud")
   })
 })

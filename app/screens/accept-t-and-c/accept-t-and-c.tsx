@@ -11,6 +11,11 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 
+import {
+  MigrationCheckpoint,
+  useMigrationCheckpoint,
+} from "@app/screens/account-migration/hooks"
+
 import { Screen } from "../../components/screen"
 import { PhoneLoginInitiateType } from "../phone-auth-screen"
 import useAppCheckToken from "../get-started-screen/use-device-token"
@@ -26,6 +31,7 @@ export const AcceptTermsAndConditionsScreen: React.FC = () => {
 
   const route = useRoute<RouteProp<RootStackParamList, "acceptTermsAndConditions">>()
   const { flow } = route.params || { flow: "phone" }
+  const { saveCheckpoint } = useMigrationCheckpoint()
 
   const { deviceAccountEnabled } = useFeatureFlags()
   const appCheckToken = useAppCheckToken({ skip: !deviceAccountEnabled })
@@ -38,6 +44,16 @@ export const AcceptTermsAndConditionsScreen: React.FC = () => {
   }
 
   const action = async () => {
+    if (flow === "migration") {
+      /** The acceptance is part of the migration's consent trail, so advance only once the
+       *  checkpoint write lands; otherwise a failed write would later re-prompt for terms the
+       *  user already accepted. */
+      const saved = await saveCheckpoint(MigrationCheckpoint.BackupMethod)
+      if (!saved) return
+      navigation.navigate("selfCustodialBackupMethod")
+      return
+    }
+
     if (flow === "selfCustodial") {
       navigation.navigate("selfCustodialWalletCreation")
       return

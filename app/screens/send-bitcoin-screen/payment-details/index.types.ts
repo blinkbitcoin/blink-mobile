@@ -192,6 +192,9 @@ type LnurlSpecificProperties<T extends WalletCurrency> =
   | {
       paymentType: typeof PaymentType.Lnurl
       lnurlParams: LnUrlPayServiceResponse
+      /** The bolt11 invoice fetched from the lnurl service; set once an invoice exists
+       *  (i.e. when the payment is sendable). The lnurl string itself is `destination`. */
+      paymentRequest?: string
       setInvoice: SetInvoice<T>
       setSuccessAction: SetSuccessAction<T>
       isMerchant: boolean

@@ -33,7 +33,7 @@ describe("useAccountTypeOptions", () => {
   })
 
   describe("create flow", () => {
-    it("returns both options when SC is enabled and custodial signup is allowed", () => {
+    it("returns both options when self-custodial is enabled and custodial signup is allowed", () => {
       setUp({ nonCustodialEnabled: true, signupAllowed: true })
 
       const { result } = renderHook(() => useAccountTypeOptions(AccountTypeMode.Create))
@@ -55,7 +55,7 @@ describe("useAccountTypeOptions", () => {
       expect(result.current.defaultSelected).toBe(AccountOption.SelfCustodial)
     })
 
-    it("returns only custodial when SC is disabled and signup is allowed", () => {
+    it("returns only custodial when self-custodial is disabled and signup is allowed", () => {
       setUp({ nonCustodialEnabled: false, signupAllowed: true })
 
       const { result } = renderHook(() => useAccountTypeOptions(AccountTypeMode.Create))
@@ -65,7 +65,7 @@ describe("useAccountTypeOptions", () => {
       expect(result.current.selfCustodialTemporarilyDisabled).toBe(true)
     })
 
-    it("returns no options when both SC is disabled and custodial signup is blocked", () => {
+    it("returns no options when both self-custodial is disabled and custodial signup is blocked", () => {
       setUp({ nonCustodialEnabled: false, signupAllowed: false })
 
       const { result } = renderHook(() => useAccountTypeOptions(AccountTypeMode.Create))
@@ -105,7 +105,7 @@ describe("useAccountTypeOptions", () => {
       expect(result.current.options).toContain(AccountOption.Custodial)
     })
 
-    it("keeps custodial as the only option when SC is disabled", () => {
+    it("keeps custodial as the only option when self-custodial is disabled", () => {
       setUp({ nonCustodialEnabled: false, signupAllowed: false })
 
       const { result } = renderHook(() => useAccountTypeOptions(AccountTypeMode.Restore))

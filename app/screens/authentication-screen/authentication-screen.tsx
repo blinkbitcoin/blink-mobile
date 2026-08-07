@@ -4,10 +4,11 @@ import { Alert, View } from "react-native"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { useAuthenticationContext } from "@app/navigation/navigation-container-wrapper"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, useTheme } from "@rn-vui/themed"
+
+import { useUnlockScreen } from "./unlock-screen"
 
 import AppLogoDarkMode from "../../assets/logo/app-logo-dark.svg"
 import AppLogoLightMode from "../../assets/logo/blink-logo-light.svg"
@@ -33,8 +34,8 @@ export const AuthenticationScreen: React.FC<Props> = ({ route }) => {
 
   const styles = useStyles()
   const { logout } = useLogout()
-  const { screenPurpose, isPinEnabled } = route.params
-  const { setAppUnlocked } = useAuthenticationContext()
+  const { screenPurpose, isPinEnabled, isResume = false } = route.params
+  const { completeUnlock } = useUnlockScreen({ isResume })
   const { LL } = useI18nContext()
 
   const handleAuthenticationSuccess = React.useCallback(async () => {
@@ -43,9 +44,8 @@ export const AuthenticationScreen: React.FC<Props> = ({ route }) => {
     } else if (screenPurpose === AuthenticationScreenPurpose.TurnOnAuthentication) {
       KeyStoreWrapper.setIsBiometricsEnabled()
     }
-    setAppUnlocked()
-    navigation.replace("Primary")
-  }, [navigation, screenPurpose, setAppUnlocked])
+    completeUnlock(() => navigation.replace("Primary"))
+  }, [navigation, screenPurpose, completeUnlock])
 
   const attemptAuthentication = React.useCallback(() => {
     let description = "attemptAuthentication. should not be displayed?"
@@ -70,7 +70,10 @@ export const AuthenticationScreen: React.FC<Props> = ({ route }) => {
       {
         text: LL.common.ok(),
         onPress: () => {
-          navigation.replace("getStarted")
+          /** Reset, not replace: a resume relock pushes this screen on top of the live
+           *  stack, and anything left beneath would still be reachable — and advertised,
+           *  now that the splash header follows `canGoBack()`. */
+          navigation.reset({ index: 0, routes: [{ name: "getStarted" }] })
         },
       },
     ])
@@ -96,7 +99,10 @@ export const AuthenticationScreen: React.FC<Props> = ({ route }) => {
       <GaloySecondaryButton
         title={LL.AuthenticationScreen.usePin()}
         onPress={() =>
-          navigation.navigate("pin", { screenPurpose: PinScreenPurpose.AuthenticatePin })
+          navigation.navigate("pin", {
+            screenPurpose: PinScreenPurpose.AuthenticatePin,
+            isResume,
+          })
         }
         containerStyle={styles.buttonContainer}
       />

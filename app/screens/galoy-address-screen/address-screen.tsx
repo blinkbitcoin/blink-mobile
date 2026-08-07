@@ -66,8 +66,8 @@ export const GaloyAddressScreen = () => {
     appConfig.galoyInstance.lnAddressHostname,
     username,
   )
-  const posUrl = getPosUrl(appConfig.galoyInstance.posUrl, username)
-  const payCodeUrl = getPrintableQrCodeUrl(appConfig.galoyInstance.posUrl, username)
+  const posUrl = getPosUrl(username)
+  const payCodeUrl = getPrintableQrCodeUrl(username)
 
   const togglePosExplainerModal = () => {
     setIsPosExplainerModalOpen(!isPosExplainerModalOpen)

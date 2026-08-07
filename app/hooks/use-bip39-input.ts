@@ -7,7 +7,14 @@ import {
   splitWords,
 } from "@app/utils/bip39-wordlist"
 
-const BIP39_WORD_SET = new Set(BIP39_WORDLIST_EN)
+/** Built on first use instead of at module evaluation: with inline requires this module
+ *  evaluates at the phrase screen's first render, and eagerly materializing the 2048-word
+ *  Set there put wordlist work (and any failure) on the render path (#4070). */
+let bip39WordSet: Set<string> | undefined
+const getBip39WordSet = (): Set<string> => {
+  bip39WordSet ??= new Set(BIP39_WORDLIST_EN)
+  return bip39WordSet
+}
 
 const MIN_CHARS = 3
 const MAX_SUGGESTIONS = 3
@@ -55,7 +62,7 @@ export const useBip39Input = ({
         return next
       })
       const lastIndexInStep = offset + wordsPerStep - 1
-      if (!BIP39_WORD_SET.has(normalized)) return
+      if (!getBip39WordSet().has(normalized)) return
       if (index >= lastIndexInStep) return
       const matches = BIP39_WORDLIST_EN.filter((w) => w.startsWith(normalized))
       if (matches.length !== 1) return

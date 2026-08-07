@@ -1,6 +1,8 @@
 import React from "react"
-import { Keyboard } from "react-native"
+import { StyleSheet } from "react-native"
+
 import { render, fireEvent } from "@testing-library/react-native"
+import type { ReactTestRendererJSON } from "react-test-renderer"
 
 import { SuggestionBar } from "@app/components/suggestion-bar"
 import { ContextForScreen } from "../screens/helper"
@@ -48,18 +50,18 @@ describe("SuggestionBar", () => {
     expect(mockOnSelect).toHaveBeenCalledWith("help")
   })
 
-  it("listens to keyboard events", () => {
-    const addListenerSpy = jest.spyOn(Keyboard, "addListener")
-
-    render(
+  /** The bar's parents are keyboard-avoiding, so it must render in flow — an absolute
+   *  bottom offset here stacked on the parent's own keyboard avoidance and floated the
+   *  chips over the input rows (#4088 review follow-up). */
+  it("renders in flow without absolute positioning or a keyboard offset", () => {
+    const tree = render(
       <ContextForScreen>
         <SuggestionBar suggestions={["hello"]} onSelect={mockOnSelect} />
       </ContextForScreen>,
-    )
+    ).toJSON() as ReactTestRendererJSON
 
-    expect(addListenerSpy).toHaveBeenCalledWith("keyboardDidShow", expect.any(Function))
-    expect(addListenerSpy).toHaveBeenCalledWith("keyboardDidHide", expect.any(Function))
-
-    addListenerSpy.mockRestore()
+    const style = StyleSheet.flatten(tree.props.style)
+    expect(style.position).toBeUndefined()
+    expect(style.bottom).toBeUndefined()
   })
 })

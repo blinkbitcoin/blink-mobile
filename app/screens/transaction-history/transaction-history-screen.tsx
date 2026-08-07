@@ -1,6 +1,5 @@
 import * as React from "react"
 import { InteractionManager, SectionList, Text, View } from "react-native"
-import crashlytics from "@react-native-firebase/crashlytics"
 import { makeStyles } from "@rn-vui/themed"
 import { gql, useApolloClient } from "@apollo/client"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
@@ -38,6 +37,7 @@ import {
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useHasTransitioned, useTransactionSeenState } from "@app/hooks"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
+import { reportError } from "@app/utils/error-logging"
 
 import { MemoizedTransactionItem } from "@app/components/transaction-item"
 import { toastShow } from "../../utils/toast"
@@ -437,7 +437,7 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
 
   if (error) {
     console.error(error)
-    crashlytics().recordError(error)
+    reportError("transaction-history", error)
     toastShow({
       message: (translations) => translations.common.transactionsError(),
       LL,

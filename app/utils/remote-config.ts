@@ -93,3 +93,39 @@ export const getRemoteConfigObject = <T extends object>(key: string, fallback: T
   }
   return fallback
 }
+
+/**
+ * Reads a JSON object of numeric values, merging it over `defaults`. Only keys
+ * present in `defaults` whose remote value is a finite number are applied;
+ * invalid values are dropped (and logged) so a config typo can never leak a
+ * non-number into the UI. Unknown keys are ignored silently — newer configs
+ * may carry keys this app version does not know yet.
+ */
+export const getRemoteConfigNumericObject = <T extends Record<string, number>>(
+  key: string,
+  defaults: T,
+): T => {
+  const parsed = getRemoteConfigObject<Record<string, unknown>>(key, defaults)
+  if (parsed === (defaults as Record<string, unknown>)) return defaults
+
+  const merged: Record<string, number> = { ...defaults }
+  const droppedKeys: string[] = []
+  for (const entryKey of Object.keys(defaults)) {
+    if (entryKey in parsed) {
+      const entryValue = parsed[entryKey]
+      if (typeof entryValue === "number" && Number.isFinite(entryValue)) {
+        merged[entryKey] = entryValue
+      } else {
+        droppedKeys.push(entryKey)
+      }
+    }
+  }
+  if (droppedKeys.length > 0) {
+    logError({
+      scope: SCOPE,
+      error: new Error(`Dropped ${droppedKeys.length} non-numeric entries from "${key}"`),
+      context: { key, droppedKeys },
+    })
+  }
+  return merged as T
+}

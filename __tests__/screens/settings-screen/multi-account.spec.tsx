@@ -2,10 +2,21 @@ import React from "react"
 import { render, waitFor, screen } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
-import { SwitchAccountComponent } from "@app/screens/settings-screen/account/multi-account/switch-account.stories"
+import { MockedProvider } from "@apollo/client/testing"
+import { createCache } from "@app/graphql/cache"
+import { IsAuthedContextProvider } from "@app/graphql/is-authed-context"
+import { SwitchAccount } from "@app/screens/settings-screen/account/multi-account/switch-account"
 import { fetchProfiles } from "@app/screens/settings-screen/account/multi-account/utils"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 import { ContextForScreen } from "../helper"
+
+const SwitchAccountComponent = () => (
+  <MockedProvider cache={createCache()}>
+    <IsAuthedContextProvider value={true}>
+      <SwitchAccount />
+    </IsAuthedContextProvider>
+  </MockedProvider>
+)
 
 const expectedProfiles = [
   {
@@ -32,6 +43,39 @@ jest.mock("@app/utils/storage/secureStorage", () => ({
 const mockSaveProfile = jest.fn()
 let mockAppConfigToken = "mock-token-1"
 
+let mockSelfCustodialEntries: { id: string; createdAt: number }[] = []
+let mockPendingAccountIds = new Set<string>()
+
+jest.mock("@app/hooks/use-account-registry", () => ({
+  ...jest.requireActual("@app/hooks/use-account-registry"),
+  useAccountRegistry: () => ({
+    selfCustodialEntries: mockSelfCustodialEntries,
+    activeAccount: { id: "custodial-active", type: "custodial" },
+    accounts: [],
+    setActiveAccountId: jest.fn(),
+    reloadSelfCustodialAccounts: jest.fn(),
+  }),
+}))
+
+jest.mock("@app/screens/account-migration/hooks", () => ({
+  ...jest.requireActual("@app/screens/account-migration/hooks"),
+  usePendingMigrationAccounts: () => ({
+    pendingAccountIds: mockPendingAccountIds,
+    pendingForActiveAccount: null,
+    savePendingAccount: jest.fn(),
+    clearPendingAccount: jest.fn(),
+    loading: false,
+  }),
+}))
+
+jest.mock("@app/screens/settings-screen/self-custodial/profile-row", () => ({
+  ProfileRow: ({ entry }: { entry: { id: string } }) => {
+    const ReactActual = jest.requireActual("react")
+    const { Text } = jest.requireActual("react-native")
+    return ReactActual.createElement(Text, { testID: `sc-entry-${entry.id}` }, entry.id)
+  },
+}))
+
 jest.mock("@app/hooks", () => ({
   useAppConfig: () => ({
     appConfig: {
@@ -54,6 +98,8 @@ describe("Settings", () => {
     LL = i18nObject("en")
     mockAppConfigToken = "mock-token-1"
     mockSaveProfile.mockClear()
+    mockSelfCustodialEntries = []
+    mockPendingAccountIds = new Set()
   })
 
   it("Switch account shows user profiles", async () => {
@@ -106,6 +152,42 @@ describe("Settings", () => {
 
     await waitFor(() => {
       expect(mockSaveProfile).toHaveBeenCalledWith("mock-token-1")
+    })
+  })
+
+  it("hides wallets provisioned mid-migration from the switcher until activated", async () => {
+    ;(KeyStoreWrapper.getSessionProfiles as jest.Mock).mockResolvedValue(expectedProfiles)
+    mockSelfCustodialEntries = [
+      { id: "sc-pending-1", createdAt: 1 },
+      { id: "sc-normal-1", createdAt: 2 },
+    ]
+    mockPendingAccountIds = new Set(["sc-pending-1"])
+
+    render(
+      <ContextForScreen>
+        <SwitchAccountComponent />
+      </ContextForScreen>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId("sc-entry-sc-normal-1")).toBeTruthy()
+    })
+    expect(screen.queryByTestId("sc-entry-sc-pending-1")).toBeNull()
+  })
+
+  it("keeps a pending wallet visible once it became the active account", async () => {
+    ;(KeyStoreWrapper.getSessionProfiles as jest.Mock).mockResolvedValue(expectedProfiles)
+    mockSelfCustodialEntries = [{ id: "custodial-active", createdAt: 1 }]
+    mockPendingAccountIds = new Set(["custodial-active"])
+
+    render(
+      <ContextForScreen>
+        <SwitchAccountComponent />
+      </ContextForScreen>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId("sc-entry-custodial-active")).toBeTruthy()
     })
   })
 })

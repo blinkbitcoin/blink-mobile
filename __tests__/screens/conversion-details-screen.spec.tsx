@@ -5,7 +5,7 @@ import {
   type StyleProp,
   type ViewStyle,
 } from "react-native"
-import { it } from "@jest/globals"
+import { describe, it } from "@jest/globals"
 import { fireEvent, render, waitFor, act } from "@testing-library/react-native"
 import { MockedProvider, MockedResponse } from "@apollo/client/testing"
 import { NavigationContainer } from "@react-navigation/native"
@@ -13,6 +13,10 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import { ThemeProvider } from "@rn-vui/themed"
 
 import { ConversionDetailsScreen } from "@app/screens/conversion-flow/conversion-details-screen"
+import {
+  armMigrationConversion,
+  resetMigrationConversionArmed,
+} from "@app/screens/account-migration/hooks/use-migration-conversion"
 import {
   WalletCurrency,
   ConversionScreenDocument,
@@ -28,6 +32,16 @@ import { loadLocale } from "@app/i18n/i18n-util.sync"
 import theme from "@app/rne-theme/theme"
 import { createCache } from "@app/graphql/cache"
 import { DisplayCurrency as DisplayCurrencyType } from "@app/types/amounts"
+import { withDeviceLocale } from "../helpers/device-locale"
+
+/**
+ * The amount being typed is grouped by the device's locale (the bare
+ * toLocaleString() in formatNumberPadNumber), so every "100,000 SAT" in this
+ * file is really an en-US expectation. State it, or the file asserts whatever
+ * locale the machine running it is set to. The device-locale suite at the
+ * bottom of the file nests its own locales on top of this one.
+ */
+withDeviceLocale("en-US")
 
 jest.mock("@app/store/persistent-state", () => ({
   ...jest.requireActual("@app/store/persistent-state"),
@@ -150,6 +164,12 @@ const calculateExpectedSatsFromUsd = (usdCents: number): number => {
   return sats
 }
 
+/**
+ * Converted amounts are formatted by formatCurrencyHelper
+ * (@app/hooks/use-display-currency), which pins "en-US" whatever the device is
+ * set to, so this stays "en-US" even in the device-locale suite at the bottom
+ * of the file, which is the point of that suite.
+ */
 const formatNumber = (amount: number, fractionDigits: number) =>
   Intl.NumberFormat("en-US", {
     minimumFractionDigits: fractionDigits,
@@ -1212,6 +1232,177 @@ describe("Percentage selector functionality", () => {
       { timeout: 3000 },
     )
   })
+
+  const pressChipAndSettle = async (
+    getByTestId: ReturnType<typeof render>["getByTestId"],
+    percent: number,
+  ) => {
+    await act(async () => {
+      fireEvent.press(getByTestId(`convert-${percent}%`))
+    })
+    act(() => {
+      jest.advanceTimersByTime(1500)
+    })
+    await waitFor(() => {
+      expect(getByTestId(`convert-${percent}%`).props.accessibilityState?.selected).toBe(
+        true,
+      )
+    })
+  }
+
+  it("draws the pressed chip and leaves the others unpressed", async () => {
+    const Wrapper = createTestWrapper(buildMocks())
+
+    const { getByTestId } = render(
+      <Wrapper>
+        <ConversionDetailsScreen />
+      </Wrapper>,
+    )
+
+    await waitFor(() => {
+      expect(getByTestId("convert-50%")).toBeTruthy()
+    })
+
+    await pressChipAndSettle(getByTestId, 50)
+
+    expect(getByTestId("convert-100%").props.accessibilityState?.selected).toBe(false)
+  })
+
+  it("clears the pressed chip when a wallet toggle recalculates the amount", async () => {
+    const Wrapper = createTestWrapper(buildMocks())
+
+    const { getByTestId } = render(
+      <Wrapper>
+        <ConversionDetailsScreen />
+      </Wrapper>,
+    )
+
+    await waitFor(() => {
+      expect(getByTestId("convert-100%")).toBeTruthy()
+    })
+
+    await pressChipAndSettle(getByTestId, 100)
+
+    await act(async () => {
+      fireEvent.press(getByTestId("wallet-toggle-button"))
+    })
+
+    await waitFor(() => {
+      expect(getByTestId("convert-100%").props.accessibilityState?.selected).toBe(false)
+    })
+  })
+
+  it("clears the pressed chip when the amount is typed by hand", async () => {
+    const Wrapper = createTestWrapper(buildMocks())
+
+    const { getByTestId } = render(
+      <Wrapper>
+        <ConversionDetailsScreen />
+      </Wrapper>,
+    )
+
+    await waitFor(() => {
+      expect(getByTestId("convert-100%")).toBeTruthy()
+    })
+
+    await pressChipAndSettle(getByTestId, 100)
+
+    await act(async () => {
+      pressKeys(getByTestId, ["5"])
+    })
+
+    await waitFor(() => {
+      expect(getByTestId("convert-100%").props.accessibilityState?.selected).toBe(false)
+    })
+  })
+})
+
+describe("Migration conversion prefill", () => {
+  const buildMocks = () =>
+    createGraphQLMocks({
+      btcBalance: 100000,
+      usdBalance: 50000,
+    })
+
+  beforeEach(() => {
+    jest.useFakeTimers()
+  })
+
+  afterEach(() => {
+    jest.useRealTimers()
+    resetMigrationConversionArmed()
+  })
+
+  /**
+   * Reaching the convert from the migration arms a flag; the screen then opens USD to BTC
+   * and drives the full-balance chip automatically, so the whole dollar balance is ready to
+   * confirm without the user touching anything. A plain convert with both balances leaves
+   * the amount empty and Next disabled (see the initial-render suite), so an enabled Next
+   * here is the prefill having fired.
+   */
+  it("prefills the whole dollar balance when armed by the migration", async () => {
+    armMigrationConversion()
+    const Wrapper = createTestWrapper(buildMocks())
+
+    const { getByTestId } = render(
+      <Wrapper>
+        <ConversionDetailsScreen />
+      </Wrapper>,
+    )
+
+    await waitFor(() => {
+      expect(getByTestId("next-button")).toBeTruthy()
+    })
+
+    act(() => {
+      jest.advanceTimersByTime(1500)
+    })
+
+    await waitFor(
+      () => {
+        expect(getByTestId("next-button").props.accessibilityState?.disabled).toBe(false)
+      },
+      { timeout: 3000 },
+    )
+
+    /** The 100% chip stays visibly pressed once the amount settles, so the migration user
+     *  sees the whole balance is the active selection. */
+    expect(getByTestId("convert-100%").props.accessibilityState?.selected).toBe(true)
+  })
+
+  it("locks the amount controls to the full balance during a migration conversion", async () => {
+    armMigrationConversion()
+    const Wrapper = createTestWrapper(buildMocks())
+
+    const { getByTestId } = render(
+      <Wrapper>
+        <ConversionDetailsScreen />
+      </Wrapper>,
+    )
+
+    await waitFor(() => {
+      expect(getByTestId("next-button")).toBeTruthy()
+    })
+
+    act(() => {
+      jest.advanceTimersByTime(1500)
+    })
+
+    await waitFor(
+      () => {
+        expect(getByTestId("convert-100%").props.accessibilityState?.disabled).toBe(false)
+      },
+      { timeout: 3000 },
+    )
+
+    expect(getByTestId("wallet-toggle-button").props.accessibilityState?.disabled).toBe(
+      true,
+    )
+    expect(getByTestId("convert-25%").props.accessibilityState?.disabled).toBe(true)
+    expect(getByTestId("convert-50%").props.accessibilityState?.disabled).toBe(true)
+    expect(getByTestId("convert-75%").props.accessibilityState?.disabled).toBe(true)
+    expect(getByTestId("Key 5").props.accessibilityState?.disabled).toBe(true)
+  })
 })
 
 describe("Navigation", () => {
@@ -2205,4 +2396,79 @@ describe("Self-custodial percentage chip happy-path", () => {
       }),
     )
   })
+})
+
+/**
+ * The screen formats its two kinds of value differently, and the split is only
+ * visible on a device that is not en-US:
+ *
+ *  - the field being typed in shows the number pad's own string
+ *    (formatNumberPadNumber -> bare toLocaleString), grouped the way the user's
+ *    device groups digits
+ *  - every other field shows the converted amount (formatMoneyAmount ->
+ *    formatCurrencyHelper), which pins "en-US"
+ *
+ * Running the same interaction under several device locales is what holds that
+ * split in place — on an en-US machine the two are indistinguishable.
+ */
+describe("Device locale", () => {
+  const deviceLocaleCases = [
+    { deviceLocale: "de-DE", typedSats: "100.000" },
+    { deviceLocale: "hi-IN", typedSats: "1,00,000" },
+  ]
+
+  describe.each(deviceLocaleCases)(
+    "on a device set to $deviceLocale",
+    ({ deviceLocale, typedSats }) => {
+      withDeviceLocale(deviceLocale)
+
+      beforeEach(() => {
+        jest.useFakeTimers()
+      })
+
+      afterEach(() => {
+        jest.useRealTimers()
+      })
+
+      it("groups the typed sats the device's way, leaving the conversion en-US", async () => {
+        const Wrapper = createTestWrapper(
+          createGraphQLMocks({ btcBalance: 100000, usdBalance: 50000 }),
+        )
+
+        const { getByTestId, getByPlaceholderText } = render(
+          <Wrapper>
+            <ConversionDetailsScreen />
+          </Wrapper>,
+        )
+
+        await waitFor(() => {
+          expect(getByTestId("Key 1")).toBeTruthy()
+        })
+
+        const btcInput = getByPlaceholderText("0 SAT")
+        const usdInput = getByPlaceholderText("$0")
+
+        act(() => {
+          fireEvent(btcInput, "focus")
+        })
+
+        await act(async () => {
+          pressKeys(getByTestId, ["1", "0", "0", "0", "0", "0"])
+        })
+
+        act(() => {
+          jest.advanceTimersByTime(1500)
+        })
+
+        const expectedUsdCents = calculateExpectedUsdFromSats(100000)
+
+        await waitFor(() => {
+          expect(btcInput.props.value).toBe(`${typedSats} SAT`)
+          expect(usdInput.props.value).toBe(
+            withApprox(formatUsdCents(expectedUsdCents), true),
+          )
+        })
+      })
+    },
+  )
 })

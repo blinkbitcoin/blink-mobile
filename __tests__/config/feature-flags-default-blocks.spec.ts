@@ -94,4 +94,18 @@ describe("defaultRemoteConfig: compliance country lists", () => {
     expect(defaultRemoteConfig.custodialCreationBlockedCountries).toEqual(expected)
     expect(defaultRemoteConfig.selfCustodialCreationBlockedCountries).toEqual(expected)
   })
+
+  it("offboardOnlyCountries contains only uppercase ISO-3166 alpha-2 codes with no duplicates", () => {
+    assertCanonical(defaultRemoteConfig.offboardOnlyCountries)
+  })
+
+  it("offboardOnlyCountries defaults to the UAE, Nepal, Algeria, China and Myanmar", () => {
+    expect(defaultRemoteConfig.offboardOnlyCountries).toEqual([
+      "AE",
+      "NP",
+      "DZ",
+      "CN",
+      "MM",
+    ])
+  })
 })

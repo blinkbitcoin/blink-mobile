@@ -18,6 +18,12 @@ jest.mock("@app/graphql/generated", () => ({
   useLanguageQuery: (opts: unknown) => mockUseLanguageQuery(opts),
   useUserUpdateLanguageMutation: () => [jest.fn(), { loading: false }],
   useExportCsvSettingLazyQuery: () => [jest.fn(), { loading: false }],
+  // AccountPOS reads the display currency to build its terminal link. That query is
+  // the one exception to the skip rule this suite guards: use-effective-display-currency
+  // keeps it unauthed-safe with fetchPolicy "cache-only" instead of skip, so it never
+  // reaches the network for a logged-out user either.
+  useDisplayCurrencyQuery: () => ({ data: undefined, loading: false }),
+  useAccountUpdateDisplayCurrencyMutation: () => [jest.fn(), { loading: false }],
 }))
 
 jest.mock("@react-navigation/native", () => ({
@@ -41,9 +47,12 @@ jest.mock("@app/i18n/i18n-react", () => ({
       },
       SettingsScreen: {
         setByOs: () => "Default",
-        setYourLightningAddress: () => "Set address",
+        createAddress: () => "Create address",
         pos: () => "POS",
         staticQr: () => "Static QR",
+        donationButton: () => "Donate Button",
+        btcpayServer: () => "BTCPay Server",
+        woocommerce: () => "Woocommerce",
         logInOrCreateAccount: () => "Login",
       },
       DefaultWalletScreen: { title: () => "Default wallet" },
@@ -113,6 +122,7 @@ jest.mock("@app/components/set-lightning-address-modal", () => ({
 
 jest.mock("@react-native-firebase/crashlytics", () => () => ({
   recordError: jest.fn(),
+  log: jest.fn(),
 }))
 
 jest.mock("react-native-share", () => ({
@@ -126,6 +136,9 @@ import { DefaultWallet } from "@app/screens/settings-screen/settings/account-def
 import { AccountLNAddress } from "@app/screens/settings-screen/settings/account-ln-address"
 import { AccountPOS } from "@app/screens/settings-screen/settings/account-pos"
 import { AccountStaticQR } from "@app/screens/settings-screen/settings/account-static-qr"
+import { AccountDonationButton } from "@app/screens/settings-screen/settings/account-donation-button"
+import { AccountBtcpay } from "@app/screens/settings-screen/settings/account-btcpay"
+import { AccountWoocommerce } from "@app/screens/settings-screen/settings/account-woocommerce"
 import { ExportCsvSetting } from "@app/screens/settings-screen/settings/advanced-export-csv"
 import { LanguageSetting } from "@app/screens/settings-screen/settings/preferences-language"
 
@@ -149,6 +162,9 @@ describe("settings skips graphql queries when unauthenticated", () => {
       { name: "DefaultWallet", make: () => <DefaultWallet /> },
       { name: "AccountPOS", make: () => <AccountPOS /> },
       { name: "AccountStaticQR", make: () => <AccountStaticQR /> },
+      { name: "AccountDonationButton", make: () => <AccountDonationButton /> },
+      { name: "AccountBtcpay", make: () => <AccountBtcpay /> },
+      { name: "AccountWoocommerce", make: () => <AccountWoocommerce /> },
       { name: "AccountLNAddress", make: () => <AccountLNAddress /> },
       { name: "ExportCsvSetting", make: () => <ExportCsvSetting /> },
     ]

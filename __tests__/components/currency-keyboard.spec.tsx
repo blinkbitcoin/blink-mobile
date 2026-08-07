@@ -126,6 +126,18 @@ describe("CurrencyKeyboard", () => {
 
     expect(mockOnPress).toHaveBeenCalledWith("5")
   })
+
+  it("does not call onPress for any key when the whole keyboard is disabled", () => {
+    const { getByText, getByTestId } = render(
+      <CurrencyKeyboard onPress={mockOnPress} disabled />,
+    )
+
+    fireEvent.press(getByText("5"))
+    fireEvent.press(getByText("."))
+    fireEvent.press(getByTestId("Key ⌫"))
+
+    expect(mockOnPress).not.toHaveBeenCalled()
+  })
 })
 
 describe("getDisabledKeys", () => {

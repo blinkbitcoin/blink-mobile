@@ -171,6 +171,10 @@ jest.mock("@app/self-custodial/probe-account-wallets", () => ({
   },
 }))
 
+jest.mock("@app/config/feature-flags-context", () => ({
+  useRemoteConfig: () => ({ selfCustodialDepositClaimLeewayVbyte: 5 }),
+}))
+
 jest.mock("@app/utils/error-logging", () => ({
   reportError: jest.fn(),
 }))
@@ -294,7 +298,11 @@ describe("ProfileRow", () => {
     fireEvent.press(getByTestId(`delete-button-${TEST_ENTRY_ID}`))
 
     expect(await findByTestId("delete-modal")).toBeTruthy()
-    expect(mockProbeWallets).toHaveBeenCalledWith(TEST_ENTRY_ID, mockSparkNetwork.Mainnet)
+    expect(mockProbeWallets).toHaveBeenCalledWith(
+      TEST_ENTRY_ID,
+      mockSparkNetwork.Mainnet,
+      5,
+    )
     expect(mockDeleteWallet).not.toHaveBeenCalled()
   })
 

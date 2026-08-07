@@ -50,6 +50,8 @@ export type SendPaymentParams = {
 export type ReceiveLightningParams = {
   amount?: MoneyAmount<WalletCurrency>
   memo?: string
+  /** Invoice lifetime in seconds. Omitted, the SDK applies its own default. */
+  expirySecs?: number
 }
 
 export const FeeQuoteType = {

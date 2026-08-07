@@ -6,6 +6,7 @@ import {
   IpLookupAdapter,
   DEFAULT_ADAPTERS,
   resolveIpCountryCode,
+  resolveIpCountryCodeCached,
 } from "@app/utils/ip-country-lookup"
 
 jest.mock("axios")
@@ -78,6 +79,37 @@ describe("resolveIpCountryCode", () => {
   })
 })
 
+describe("resolveIpCountryCodeCached", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mutableConfig.GEO_IPIFY_API_KEY = ""
+    mutableConfig.IPINFO_API_KEY = ""
+    mutableConfig.PROXYCHECK_API_KEY = ""
+    mutableConfig.IPAPI_API_KEY = ""
+  })
+
+  /** One sequential test: the cache is module state, so the phases (failure
+   *  retries, concurrent dedupe, cached reuse) must run in a known order. */
+  it("shares one lookup per session, retrying failures and caching successes", async () => {
+    mockedAxios.get.mockRejectedValue(new Error("offline"))
+    await expect(resolveIpCountryCodeCached()).resolves.toBeUndefined()
+
+    mockedAxios.get.mockReset()
+    mockedAxios.get.mockResolvedValue({ data: { country: "DE" } })
+    const [first, second] = await Promise.all([
+      resolveIpCountryCodeCached(),
+      resolveIpCountryCodeCached(),
+    ])
+    expect(first).toBe("DE")
+    expect(second).toBe("DE")
+    expect(mockedAxios.get).toHaveBeenCalledTimes(1)
+
+    mockedAxios.get.mockClear()
+    await expect(resolveIpCountryCodeCached()).resolves.toBe("DE")
+    expect(mockedAxios.get).not.toHaveBeenCalled()
+  })
+})
+
 describe("DEFAULT_ADAPTERS key-gated behaviour", () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -100,7 +132,7 @@ describe("DEFAULT_ADAPTERS key-gated behaviour", () => {
     )
   })
 
-  it("uses api.ipinfo.io/lite with Bearer header when IPINFO_API_KEY is set", async () => {
+  it("calls the api.ipinfo.io/lite/me endpoint with the Bearer header when IPINFO_API_KEY is set", async () => {
     mutableConfig.IPINFO_API_KEY = "test-ipinfo-key"
     // eslint-disable-next-line camelcase
     mockedAxios.get.mockResolvedValue({ data: { country_code: "DE" } })
@@ -109,10 +141,23 @@ describe("DEFAULT_ADAPTERS key-gated behaviour", () => {
 
     expect(result).toBe("DE")
     expect(mockedAxios.get).toHaveBeenCalledWith(
-      expect.stringContaining("api.ipinfo.io/lite"),
+      "https://api.ipinfo.io/lite/me",
       expect.objectContaining({
         headers: expect.objectContaining({ Authorization: "Bearer test-ipinfo-key" }),
       }),
+    )
+  })
+
+  it("never calls the /lite/ endpoint without the /me segment, which 404s and defaults the country", async () => {
+    mutableConfig.IPINFO_API_KEY = "test-ipinfo-key"
+    // eslint-disable-next-line camelcase
+    mockedAxios.get.mockResolvedValue({ data: { country_code: "DE" } })
+
+    await resolveIpCountryCode(DEFAULT_ADAPTERS)
+
+    expect(mockedAxios.get).not.toHaveBeenCalledWith(
+      "https://api.ipinfo.io/lite/",
+      expect.anything(),
     )
   })
 

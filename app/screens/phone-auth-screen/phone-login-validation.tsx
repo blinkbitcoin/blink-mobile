@@ -19,10 +19,10 @@ import {
   logUpgradeLoginSuccess,
   logValidateAuthCodeFailure,
 } from "@app/utils/analytics"
+import { reportError } from "@app/utils/error-logging"
 import { testProps } from "@app/utils/testProps"
 import { useAppConfig, useSaveSessionProfile } from "@app/hooks"
 import analytics from "@react-native-firebase/analytics"
-import crashlytics from "@react-native-firebase/crashlytics"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { Text, makeStyles, useTheme, Input } from "@rn-vui/themed"
@@ -285,7 +285,7 @@ export const PhoneLoginValidationScreen: React.FC<PhoneLoginValidationScreenProp
         setStatus(ValidatePhoneCodeStatus.ReadyToRegenerate)
       } catch (err) {
         if (err instanceof Error) {
-          crashlytics().recordError(err)
+          reportError("phone-login-validation", err)
           console.debug({ err })
         }
         setError({

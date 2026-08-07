@@ -1,4 +1,5 @@
 import React, { PropsWithChildren } from "react"
+import type { ReactTestInstance } from "react-test-renderer"
 
 import { MockedProvider } from "@apollo/client/testing"
 import mocks from "@app/graphql/mocks"
@@ -10,10 +11,41 @@ import { NavigationContainer } from "@react-navigation/native"
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import { createTheme, ThemeProvider } from "@rn-vui/themed"
 
-import { StoryScreen } from "../../.storybook/views"
 import { createCache } from "../../app/graphql/cache"
 import { IsAuthedContextProvider } from "../../app/graphql/is-authed-context"
 import { AccountRegistryProvider } from "../../app/hooks/use-account-registry"
+import { PersistentStateContext } from "../../app/store/persistent-state"
+
+const PersistentStateWrapper: React.FC<PropsWithChildren> = ({ children }) => (
+  <PersistentStateContext.Provider
+    value={{
+      persistentState: {
+        schemaVersion: 15,
+        galoyInstance: {
+          id: "Main",
+        },
+        galoyAuthToken: "",
+      },
+      updateState: () => {},
+      resetState: () => {},
+    }}
+  >
+    <>{children}</>
+  </PersistentStateContext.Provider>
+)
+
+export const findPressableParent = (
+  node: ReactTestInstance | null,
+): ReactTestInstance => {
+  let current: ReactTestInstance | null = node
+  while (current && !current.props?.onPress) {
+    current = current.parent
+  }
+  if (!current) {
+    throw new Error("Pressable parent not found")
+  }
+  return current
+}
 
 const Stack = createNativeStackNavigator()
 
@@ -36,13 +68,13 @@ export const ContextForScreen: React.FC<PropsWithChildren<{ headerShown?: boolea
         <Stack.Screen name="Home">
           {() => (
             <MockedProvider mocks={mocks} cache={createCache()}>
-              <StoryScreen>
+              <PersistentStateWrapper>
                 <TypesafeI18n locale={detectDefaultLocale()}>
                   <IsAuthedContextProvider value={true}>
                     <AccountRegistryProvider>{children}</AccountRegistryProvider>
                   </IsAuthedContextProvider>
                 </TypesafeI18n>
-              </StoryScreen>
+              </PersistentStateWrapper>
             </MockedProvider>
           )}
         </Stack.Screen>
@@ -60,13 +92,13 @@ export const ContextForScreenWithTheme: React.FC<
         <Stack.Screen name="Home">
           {() => (
             <MockedProvider mocks={mocks} cache={createCache()}>
-              <StoryScreen>
+              <PersistentStateWrapper>
                 <TypesafeI18n locale={detectDefaultLocale()}>
                   <IsAuthedContextProvider value={true}>
                     <AccountRegistryProvider>{children}</AccountRegistryProvider>
                   </IsAuthedContextProvider>
                 </TypesafeI18n>
-              </StoryScreen>
+              </PersistentStateWrapper>
             </MockedProvider>
           )}
         </Stack.Screen>

@@ -3,6 +3,7 @@ import { requestPayServiceParams } from "lnurl-pay"
 import { Network as mockSparkNetwork } from "@breeztech/breez-sdk-spark-react-native"
 
 import { Network } from "@app/graphql/generated"
+import { parseDestination } from "@app/screens/send-bitcoin-screen/payment-destination"
 import { resolveDestination } from "@app/screens/send-bitcoin-screen/payment-destination/resolve-destination"
 import { PaymentType } from "@blinkbitcoin/blink-client"
 
@@ -111,6 +112,33 @@ describe("resolveDestination (integration: real parser)", () => {
     expect(result.valid && result.validDestination.paymentType).toBe(PaymentType.Lnurl)
   })
 
+  it("resolves a lightning address with surrounding whitespace", async () => {
+    const accountDefaultWalletQuery = jest.fn().mockResolvedValue({
+      data: { accountDefaultWallet: null },
+    })
+
+    const result = await resolveDestination(
+      {
+        rawInput: "\t esaudeveloper@blink.sv \n",
+        myWalletIds: ["my-wallet-id"],
+        bitcoinNetwork: Network.Mainnet,
+        lnurlDomains: [lnAddressHostname],
+        accountDefaultWalletQuery: accountDefaultWalletQuery as never,
+      },
+      { sdk: null, network: mockSparkNetwork.Regtest },
+      lnAddressHostname,
+    )
+
+    expect(result.valid).toBe(true)
+    expect(result.valid && result.validDestination.paymentType).toBe(PaymentType.Lnurl)
+    // no whitespace may leak into the resolved destination
+    const identifier =
+      result.valid && "lnurlParams" in result.validDestination
+        ? result.validDestination.lnurlParams.identifier
+        : undefined
+    expect(identifier).toBe("esaudeveloper@blink.sv")
+  })
+
   it("resolves a matching-network Spark address to a valid Spark destination", async () => {
     mockParseSparkAddress.mockResolvedValue({
       address: "sparkrt1qabcdefghijklmn",
@@ -155,5 +183,30 @@ describe("resolveDestination (integration: real parser)", () => {
 
     expect(result.valid).toBe(false)
     expect(!result.valid && result.invalidReason).toBe("WrongNetwork")
+  })
+})
+
+describe("parseDestination (integration: real parser)", () => {
+  // parseDestination is also called directly, bypassing resolveDestination
+  // (e.g. modal-nfc.tsx), so its own trim is pinned here.
+  it("trims surrounding whitespace before parsing", async () => {
+    const accountDefaultWalletQuery = jest.fn().mockResolvedValue({
+      data: { accountDefaultWallet: { id: "recipient-wallet-id" } },
+    })
+
+    const result = await parseDestination({
+      rawInput: "  esaudeveloper@blink.sv  ",
+      myWalletIds: ["my-wallet-id"],
+      bitcoinNetwork: Network.Mainnet,
+      lnurlDomains: ["blink.sv"],
+      accountDefaultWalletQuery: accountDefaultWalletQuery as never,
+    })
+
+    expect(result.valid).toBe(true)
+    expect(
+      result.valid &&
+        result.validDestination.paymentType === PaymentType.Intraledger &&
+        result.validDestination.handle,
+    ).toBe("esaudeveloper")
   })
 })

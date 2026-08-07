@@ -48,6 +48,13 @@ export const useActiveWallet = (): ActiveWalletResult => {
       isReady:
         base.status === ActiveWalletStatus.Ready ||
         base.status === ActiveWalletStatus.Degraded,
+      // Encodes SDK availability, not just account type: false whenever the
+      // status is Unavailable — the initial renders at cold start or right
+      // after an account switch (before the SDK lifecycle effect commits
+      // Loading), and when no mnemonic exists. To ask "is the active account
+      // self-custodial?", branch on
+      // `useAccountRegistry().activeAccount?.type === AccountType.SelfCustodial`
+      // instead (see use-price-conversion / use-pending-receive-amount).
       isSelfCustodial:
         base.accountType === AccountType.SelfCustodial &&
         base.status !== ActiveWalletStatus.Unavailable,

@@ -133,6 +133,17 @@ android {
             ndk {
                 abiFilters "armeabi-v7a", "arm64-v8a"
             }
+            // Release strips the native libs, so without uploading the symbol files every
+            // NDK crash reaches Crashlytics as raw addresses and cannot be root-caused.
+            firebaseCrashlytics {
+                nativeSymbolUploadEnabled true
+            }
+        }
+    }
+
+    testOptions {
+        unitTests {
+            includeAndroidResources true
         }
     }
 }
@@ -158,6 +169,12 @@ dependencies {
 
     androidTestImplementation('com.wix:detox:+')
     implementation 'androidx.appcompat:appcompat:1.1.0'
+
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("androidx.test:core:1.6.0")
+    testImplementation("org.robolectric:robolectric:4.16")
+    testImplementation("androidx.work:work-testing:2.9.0")
+
 }
 
 

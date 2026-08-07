@@ -4,7 +4,7 @@
     "react-native/react-native": true,
     "jest/globals": true
   },
-  "ignorePatterns": [".storybook/storybook.requires.js", "./patches", "**/GT3Captcha.bundle/resource.js"],
+  "ignorePatterns": ["./patches", "**/GT3Captcha.bundle/resource.js"],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaFeatures": {

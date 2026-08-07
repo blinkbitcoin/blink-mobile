@@ -11,7 +11,8 @@ export type NotificationCardUIProps = {
   title: string
   text: string
   icon?: IconNamesType
-  action: () => Promise<void>
+  /** Omitting the action renders an inert card: no press feedback, no button role. */
+  action?: () => Promise<void>
   loading?: boolean
   dismissAction?: () => void
   buttonLabel?: string
@@ -39,8 +40,8 @@ export const NotificationCardUI: React.FC<NotificationCardUIProps> = ({
     )
   }
 
-  return (
-    <TouchableOpacity style={styles.buttonContainer} onPress={action}>
+  const content = (
+    <>
       <View style={styles.contentSection}>
         <View style={styles.contentRow}>
           {icon && (
@@ -49,8 +50,12 @@ export const NotificationCardUI: React.FC<NotificationCardUIProps> = ({
             </View>
           )}
           <View style={styles.textColumn}>
-            <Text style={styles.titleStyle}>{title}</Text>
-            <Text style={styles.bodyText}>{text}</Text>
+            <Text type="p3" bold>
+              {title}
+            </Text>
+            <Text type="p3" style={styles.bodyText}>
+              {text}
+            </Text>
           </View>
           {dismissAction && (
             <GaloyIconButton
@@ -62,7 +67,7 @@ export const NotificationCardUI: React.FC<NotificationCardUIProps> = ({
           )}
         </View>
       </View>
-      {buttonLabel && (
+      {action && buttonLabel && (
         <View style={[styles.buttonActionContainer, icon && styles.buttonWithIcon]}>
           <GaloyPrimaryButton
             title={buttonLabel}
@@ -73,6 +78,18 @@ export const NotificationCardUI: React.FC<NotificationCardUIProps> = ({
           />
         </View>
       )}
+    </>
+  )
+
+  /** No action means a text-only card: a plain View, so it never gives press feedback
+   *  or announces as a button to screen readers. */
+  if (!action) {
+    return <View style={styles.buttonContainer}>{content}</View>
+  }
+
+  return (
+    <TouchableOpacity style={styles.buttonContainer} onPress={action}>
+      {content}
     </TouchableOpacity>
   )
 }
@@ -99,14 +116,8 @@ const useStyles = makeStyles(({ colors }) => ({
   textColumn: {
     flex: 1,
     flexDirection: "column",
-    alignItems: "flex-start",
+    alignItems: "stretch",
     justifyContent: "center",
-  },
-  titleStyle: {
-    fontSize: 14,
-    lineHeight: 20,
-    fontWeight: "400",
-    color: colors.black,
   },
   leftIconContainer: {
     justifyContent: "flex-start",
@@ -122,9 +133,6 @@ const useStyles = makeStyles(({ colors }) => ({
     alignItems: "center",
   },
   bodyText: {
-    fontSize: 14,
-    lineHeight: 20,
-    fontWeight: "400",
     color: colors.grey2,
   },
   buttonActionContainer: {

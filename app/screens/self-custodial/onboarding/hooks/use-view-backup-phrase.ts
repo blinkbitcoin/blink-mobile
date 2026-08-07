@@ -3,12 +3,10 @@ import { useCallback, useMemo } from "react"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
-import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useClipboard } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { splitWords } from "@app/utils/bip39-wordlist"
-import { openExternalUrl } from "@app/utils/external"
 
 import { useWalletMnemonic } from "./use-wallet-mnemonic"
 
@@ -21,7 +19,6 @@ export const useViewBackupPhrase = () => {
   const { LL } = useI18nContext()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { copyToClipboard } = useClipboard(CLIPBOARD_CLEAR_MS)
-  const { sparkCompatibleWalletsUrl } = useRemoteConfig()
   const mnemonic = useWalletMnemonic()
   const words = useMemo(() => (mnemonic ? splitWords(mnemonic) : []), [mnemonic])
 
@@ -31,11 +28,6 @@ export const useViewBackupPhrase = () => {
       message: LL.BackupScreen.ManualBackup.Phrase.copiedToast(),
     })
   }, [copyToClipboard, LL, words])
-
-  const handleOpenSparkLink = useCallback(
-    () => openExternalUrl(sparkCompatibleWalletsUrl),
-    [sparkCompatibleWalletsUrl],
-  )
 
   const handleTestBackup = useCallback(() => {
     const challenges = buildConfirmChallenges(words, CHALLENGE_COUNT)
@@ -48,7 +40,6 @@ export const useViewBackupPhrase = () => {
   return {
     words,
     handleCopy,
-    handleOpenSparkLink,
     handleTestBackup,
   }
 }

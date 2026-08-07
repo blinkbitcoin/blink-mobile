@@ -6,8 +6,17 @@ import { loadLocale } from "@app/i18n/i18n-util.sync"
 
 import { WalletCurrency } from "@app/graphql/generated"
 import { HideAmountContextProvider } from "@app/graphql/hide-amount-context"
+import SendBitcoinDetailsScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-details-screen"
+import {
+  CreatePaymentDetailParams,
+  DestinationDirection,
+  PaymentDestination,
+  ResolvedIntraledgerPaymentDestination,
+} from "@app/screens/send-bitcoin-screen/payment-destination/index.types"
+import { createIntraledgerPaymentDetails } from "@app/screens/send-bitcoin-screen/payment-details"
+import { ZeroBtcMoneyAmount } from "@app/types/amounts"
+import { PaymentType } from "@blinkbitcoin/blink-client"
 
-import { Intraledger } from "../../app/screens/send-bitcoin-screen/send-bitcoin-details-screen.stories"
 import { ContextForScreen } from "./helper"
 
 jest.mock("@react-navigation/native", () => ({
@@ -112,6 +121,47 @@ const flushAsync = () =>
 beforeEach(() => {
   loadLocale("en")
 })
+
+// Inline intraledger destination, mirroring send-details.spec.tsx (the
+// storybook stories this previously rendered were removed with storybook).
+const intraledgerWalletId = "f79792e3-282b-45d4-85d5-7486d020def5"
+const intraledgerHandle = "test"
+
+const intraledgerValidDestination: ResolvedIntraledgerPaymentDestination = {
+  valid: true,
+  walletId: intraledgerWalletId,
+  paymentType: PaymentType.Intraledger,
+  handle: intraledgerHandle,
+}
+
+const createIntraledgerPaymentDetail = <T extends WalletCurrency>({
+  convertMoneyAmount,
+  sendingWalletDescriptor,
+}: CreatePaymentDetailParams<T>) =>
+  createIntraledgerPaymentDetails({
+    handle: intraledgerHandle,
+    recipientWalletId: intraledgerWalletId,
+    sendingWalletDescriptor,
+    convertMoneyAmount,
+    unitOfAccountAmount: ZeroBtcMoneyAmount,
+  })
+
+const intraledgerPaymentDestination: PaymentDestination = {
+  valid: true,
+  validDestination: intraledgerValidDestination,
+  destinationDirection: DestinationDirection.Send,
+  createPaymentDetail: createIntraledgerPaymentDetail,
+}
+
+const intraledgerRoute = {
+  key: "sendBitcoinDetailsScreen",
+  name: "sendBitcoinDetails",
+  params: {
+    paymentDestination: intraledgerPaymentDestination,
+  },
+} as const
+
+const Intraledger = () => <SendBitcoinDetailsScreen route={intraledgerRoute} />
 
 describe("choose-wallet modal respects hide-balance", () => {
   const renderScreen = (hideAmount: boolean) =>

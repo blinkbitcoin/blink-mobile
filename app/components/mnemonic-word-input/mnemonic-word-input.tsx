@@ -38,7 +38,13 @@ export const MnemonicWordInput = forwardRef<
 
   return (
     <View style={[styles.container, correct && styles.correct, wrong && styles.error]}>
-      {value.trim().length > 0 && <Text style={styles.wordNumber}>{index + 1}.</Text>}
+      {/* Always mounted, fixed width: the row's layout must not depend on the input's
+       *  content, or the first keystroke reflows the field under the user's finger. */}
+      <Text
+        style={[styles.wordNumber, value.trim().length === 0 && styles.wordNumberHidden]}
+      >
+        {index + 1}.
+      </Text>
       <TextInput
         ref={inputRef}
         style={styles.input}
@@ -71,10 +77,16 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingHorizontal: 14,
     gap: 12,
   },
+  /** The number and the input share one typeface and no lineHeight override, so both
+   *  center on the same baseline; lineHeight on an iOS TextInput anchors glyphs
+   *  differently than on a Text and the two drift apart. */
   wordNumber: {
+    width: 24,
     fontSize: 14,
-    lineHeight: 20,
     color: colors.grey2,
+  },
+  wordNumberHidden: {
+    opacity: 0,
   },
   correct: {
     borderColor: colors._green,
@@ -85,7 +97,7 @@ const useStyles = makeStyles(({ colors }) => ({
   input: {
     flex: 1,
     fontSize: 14,
-    lineHeight: 20,
+    fontFamily: "SourceSansPro-Regular",
     color: colors.black,
   },
 }))

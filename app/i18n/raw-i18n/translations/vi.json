@@ -1,4 +1,38 @@
 {
+  "ApiScreen": {
+    "keysGroupTitle": "Khóa API",
+    "noKeys": "Chưa có khóa API nào",
+    "createKey": "Tạo khóa API",
+    "createTitle": "Khóa API mới",
+    "keyCreatedTitle": "Đã tạo khóa API",
+    "keyName": "Tên khóa",
+    "keyNamePlaceholder": "ví dụ: BTCPay Server",
+    "scopeRead": "Đọc",
+    "scopeReadDescription": "Xem số dư và lịch sử giao dịch",
+    "scopeReceive": "Nhận",
+    "scopeReceiveDescription": "Tạo hóa đơn và nhận thanh toán",
+    "scopeWrite": "Ghi",
+    "writeScopeDashboardOnly": "Các khóa có thể gửi thanh toán chỉ có thể được tạo trên dashboard.blink.sv",
+    "expiry": "Hết hạn",
+    "expiry30Days": "30 ngày",
+    "expiry90Days": "90 ngày",
+    "expiryNever": "Không bao giờ",
+    "expiresOn": "Hết hạn vào {date: string}",
+    "neverExpires": "Không bao giờ hết hạn",
+    "revoked": "Đã thu hồi",
+    "expired": "Đã hết hạn vào {date: string}",
+    "expiredNoDate": "Đã hết hạn",
+    "secretWarning": "Đây là lần duy nhất khóa được hiển thị. Hãy sao chép hoặc chia sẻ ngay bây giờ và lưu trữ an toàn.",
+    "secretCopied": "Đã sao chép khóa API. Bảng nhớ tạm sẽ được xóa sau 1 phút",
+    "revokeTitle": "Thu hồi khóa API?",
+    "revokeBody": "\"{name: string}\" sẽ ngừng hoạt động ngay lập tức. Không thể hoàn tác thao tác này.",
+    "revoke": "Thu hồi",
+    "revokeSuccess": "Đã thu hồi khóa API",
+    "createError": "Không thể tạo khóa API. Vui lòng thử lại.",
+    "revokeError": "Không thể thu hồi khóa API. Vui lòng thử lại.",
+    "loadError": "Không thể tải các khóa API của bạn. Vui lòng thử lại sau.",
+    "done": "Xong"
+  },
   "GaloyAddressScreen": {
     "title": "Receive payment by using:",
     "buttonTitle": "Set your address",
@@ -2003,7 +2037,7 @@
     "satAccumulated": "Sats đã tích lũy",
     "satsEarned": "{formattedNumber | sats} kiếm được",
     "sectionsCompleted": "Bạn vừa hoàn thành",
-    "title": "Kiếm được",
+    "title": "Học",
     "unlockQuestion": "Để mở khóa, hãy trả lời câu hỏi:",
     "youEarned": "Bạn đã kiếm được",
     "registerTitle": "Need to upgrade your account",
@@ -2011,6 +2045,7 @@
     "oneSectionADay": "Mỗi ngày một phần!",
     "availableTomorrow": "Hãy quay lại vào ngày mai để tiếp tục kiếm sats trong khi học.\n\nHoặc nhấn tiếp tục để tiếp tục học mà không có phần thưởng.",
     "motivatingBadger": "Đào qua các bài học này và kiếm tiền trong khi học",
+    "motivatingBadgerNoRewards": "Đào qua các bài học này và tìm hiểu về Bitcoin",
     "continueNoRewards": "Tiếp tục (Không có Phần thưởng)",
     "somethingNotRight": "Có gì đó không đúng...",
     "defaultErrorMessage": "{errorMessage: string} Vui lòng thử lại sau.\nHoặc nhấn tiếp tục để tiếp tục học mà không có phần thưởng.",
@@ -2049,7 +2084,7 @@
     "login": "Đăng nhập",
     "loginOrRestore": "Đăng nhập / Khôi phục",
     "logBackInWith": "Log back in with",
-    "headline": "Ví được cung cấp bởi Galoy",
+    "headline": "Ví được cung cấp bởi Blink",
     "startTrialAccount": "Start with a trial account",
     "startWithTrialAccount": "Start with trial account",
     "registerPhoneAccount": "Register phone account",
@@ -2075,6 +2110,7 @@
     "error": "Rất tiếc. Đã xảy ra lỗi khi lấy vị trí của bạn"
   },
   "HomeScreen": {
+    "pendingReceiveBadge": "+{amount: string} đang chờ",
     "receive": "Nhận",
     "send": "Gửi",
     "title": "Nhà",
@@ -2163,6 +2199,9 @@
     "lightningInvoice": "Hóa đơn lightning",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Phí nạp tiền: {fee} SAT cho số tiền dưới {threshold} SAT hoặc {overFee} SAT cho các khoản nạp trên {threshold} SAT",
+    "depositFeeTiers": "Deposit fees: {tiers: string}",
+    "depositFeeTierUpTo": "{fee: string} SAT up to {max: string} SAT",
+    "depositFeeTierAbove": "{fee: string} SAT above {min: string} SAT",
     "autoConvertMinAmount": "Số tiền dưới {minSats: number} sats / {minFiat: string} không thể chuyển đổi tự động sang Đô la. Bạn sẽ nhận Bitcoin thay thế.",
     "autoConvertFailed": "Đã nhận thanh toán nhưng chuyển đổi thất bại.",
     "pleaseWaitForConversion": "Vui lòng đợi cho đến khi quá trình chuyển đổi hoàn tất"
@@ -2261,6 +2300,10 @@
     "invalidPhoneNumber": "Nhập số điện thoại di động hợp lệ",
     "phoneNotAllowed": "Trường này không chấp nhận số điện thoại"
   },
+  "MerchantSelectionScreen": {
+    "title": "Chọn tùy chọn thanh toán",
+    "empty": "Không có tùy chọn thanh toán nào."
+  },
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Giao dịch sẽ được gửi vào mempool",
     "amount": "Số tiền",
@@ -2279,7 +2322,6 @@
     "notConfirmed": "Thanh toán đã được gửi\nnhưng vẫn chưa được xác nhận\n\nBạn có thể kiểm tra trạng thái\nthanh toán trong Các giao dịch",
     "note": "Chú thích hay nhãn mác",
     "success": "Thanh toán đã được gửi thành công",
-    "suggestionInput": "Enter your suggestion",
     "max": "Max",
     "maxAmount": "Max Amount",
     "title": "Gửi Bitcoin",
@@ -2319,6 +2361,10 @@
     "sdkGenericError": "Không thể ước tính phí. Vui lòng thử số tiền khác."
   },
   "SettingsScreen": {
+    "createAddress": "Tạo địa chỉ",
+    "donationButton": "Nút quyên góp",
+    "btcpayServer": "BTCPay Server",
+    "woocommerce": "WooCommerce",
     "staticQr": "QR tĩnh có thể in",
     "staticQrCopied": "Liên kết mã QR tĩnh của bạn đã được sao chép",
     "setByOs": "Đặt bởi hệ điều hành",
@@ -2327,7 +2373,6 @@
     "apiDashboard": "Truy cập và bảng điều khiển API",
     "pos": "Điểm bán hàng",
     "posCopied": "Liên kết điểm bán hàng của bạn đã được sao chép",
-    "setYourLightningAddress": "Đặt địa chỉ Lightning của bạn",
     "activated": "Đã kích hoạt",
     "addressScreen": "Ways to get paid",
     "nonCustodialAccount": "Tài khoản không lưu ký",
@@ -2525,7 +2570,32 @@
     "receivingAccount": "Số dư nhận",
     "sendingAccount": "Số dư gửi",
     "txNotBroadcast": "Your transaction is currently pending and will be broadcasted to the Bitcoin network in a moment.",
-    "momentarily": "trong giây lát"
+    "momentarily": "trong giây lát",
+    "findingAccount": "Đang tìm tài khoản cho khoản thanh toán này...",
+    "txNotFoundInAccounts": "Không tìm thấy khoản thanh toán này trong bất kỳ tài khoản nào trên thiết bị này. Nó có thể thuộc về một tài khoản đã đăng xuất.",
+    "txLoadFailed": "Không thể tải khoản thanh toán này. Kiểm tra kết nối của bạn và thử lại.",
+    "switchedForPayment": "Đã chuyển sang {identifier: string} để hiển thị khoản thanh toán này"
+  },
+  "FeeRatesScreen": {
+    "title": "Biểu phí",
+    "send": "Gửi",
+    "receive": "Nhận",
+    "transfer": "Chuyển khoản",
+    "lightning": "Lightning",
+    "intraledger": "Intraledger",
+    "onchainPriority": "Onchain ưu tiên (sớm nhất)",
+    "onchainStandard": "Onchain tiêu chuẩn (~4 giờ)",
+    "onchainEconomy": "Onchain tiết kiệm",
+    "lightningTransactions": "Giao dịch Lightning",
+    "onchainBelowThreshold": "Onchain dưới {threshold: string} SAT",
+    "onchainAboveThreshold": "Onchain trên {threshold: string} SAT",
+    "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
+    "transferFee": "Phí chuyển khoản",
+    "noFee": "miễn phí",
+    "lightningSendFee": "{fee: string} + ~{routingFee: string} phí định tuyến",
+    "fromApprox": "từ ~{fee: string}",
+    "satAmount": "{amount: string} SAT",
+    "error": "Không thể lấy thông tin phí tại thời điểm này"
   },
   "TransactionLimitsScreen": {
     "receive": "Nhận",
@@ -2570,7 +2640,8 @@
       "tooLong": "Address must be at most 50 characters long",
       "invalidCharacter": "Address can only contain letters, numbers, and underscores",
       "addressUnavailable": "Sorry, this address is already taken",
-      "unknownError": "An unknown error occurred, please try again later"
+      "unknownError": "An unknown error occurred, please try again later",
+      "backupRequired": "Back up your wallet before creating a Lightning address"
     },
     "receiveMoney": "Receive money from other lightning wallets and {bankName: string} users with this address.",
     "itCannotBeChanged": "It can't be changed later."
@@ -2700,6 +2771,8 @@
   },
   "common": {
     "country": "Quốc gia",
+    "registered": "Đã đăng ký",
+    "detected": "Đã phát hiện",
     "unknown": "Không xác định",
     "enabled": "Đã bật",
     "switch": "Công tắc",
@@ -2719,6 +2792,7 @@
     "anonymousUser": "Người dùng ẩn danh",
     "blinkToBlink": "Blink tới Blink",
     "transactionLimits": "Giới hạn giao dịch",
+    "feeRates": "Biểu phí",
     "activateWallet": "Kích hoạt ví",
     "amountRequired": "Yêu cầu là bắt buộc",
     "back": "Quay lại",
@@ -2732,6 +2806,7 @@
     "bitcoinPrice": "Giá Bitcoin",
     "btcAccount": "Số dư Bitcoin",
     "cancel": "Hủy",
+    "card": "Thẻ",
     "close": "Đóng",
     "confirm": "Xác nhận",
     "convert": "Chuyển đổi",
@@ -2799,6 +2874,7 @@
     "total": "Tổng cộng",
     "transactions": "Các giao dịch",
     "transactionsError": "Lỗi tải các giao dịch",
+    "transfer": "Chuyển khoản",
     "tryAgain": "Vui lòng thử lại",
     "type": "Loại",
     "usdAccount": "Số dư Đô la",
@@ -2815,6 +2891,7 @@
     "problemMaybeReauth": "There was a problem with your request. Please retry in one minute. If the problem persist, we recommend that you log out and log back in. You can log out by going into Settings > Account > Log out",
     "warning": "Warning",
     "continue": "Tiếp tục",
+    "skip": "Bỏ qua",
     "correct": "Đúng",
     "recommended": "Được khuyên dùng",
     "expirationTime": "Thời gian hết hạn",
@@ -2870,11 +2947,9 @@
     "email": "Email",
     "sms": "SMS",
     "faq": "FAQ",
-    "enjoyingApp": "Enjoying the app?",
     "statusPage": "Status Page",
     "telegram": "Telegram",
     "mattermost": "Mattermost",
-    "thankYouText": "Thank you for the feedback, would you like to suggest an improvement?",
     "defaultEmailSubject": "{bankName: string} - Support",
     "defaultSupportMessage": "Hey there! I need some help with {bankName: string}, I'm using the version {version: string} on {os: string}.",
     "emailCopied": "email {email: string} đã sao chép vào bộ nhớ tạm",
@@ -3044,6 +3119,66 @@
       "limitUpdateSuccess": "Cập nhật giới hạn thành công",
       "limitUpdateError": "Không thể cập nhật giới hạn",
       "limitMustBePositive": "Giới hạn phải lớn hơn không"
+    },
+    "CardFeeSchedule": {
+      "title": "Biểu phí Thẻ Blink",
+      "effectiveDate": "Có hiệu lực từ ngày 1 tháng 7 năm 2026",
+      "sections": {
+        "cardFees": "Phí thẻ",
+        "transactionFees": "Phí giao dịch",
+        "overdraft": "Thấu chi (chế độ được cấp vốn)"
+      },
+      "fees": {
+        "annualFee": {
+          "title": "Phí thường niên",
+          "subtitle": "Được miễn trong năm đầu tiên kể từ ngày phát hành Thẻ",
+          "value": "{amount: string} / năm"
+        },
+        "cardReplacement": {
+          "title": "Thay thế thẻ"
+        },
+        "usdTransactionFee": {
+          "title": "Phí giao dịch USD",
+          "subtitle": "Áp dụng cho mỗi giao dịch bằng đô la Mỹ"
+        },
+        "foreignTransactionFee": {
+          "title": "Phí giao dịch nước ngoài",
+          "subtitle": "Áp dụng cho mỗi giao dịch bằng loại tiền tệ khác đô la Mỹ"
+        },
+        "maximumOverdraft": {
+          "title": "Thấu chi tối đa",
+          "subtitle": "Phải được hoàn trả trong vòng 7 ngày"
+        },
+        "lateRepaymentFee": {
+          "title": "Phí hoàn trả trễ hạn",
+          "subtitle": "Được tính nếu khoản thấu chi không được hoàn trả trong vòng 7 ngày"
+        }
+      },
+      "btcConversion": {
+        "title": "Chuyển đổi BTC",
+        "body": "Khi một giao dịch yêu cầu chuyển đổi BTC sang USD, việc chuyển đổi được thực hiện theo tỷ giá hối đoái hiện hành, có thể bao gồm khoản chênh lệch phản ánh chi phí chuyển đổi."
+      },
+      "feesUpdateNotice": {
+        "text": "Phí có thể được cập nhật theo thời gian. Blink sẽ thông báo trước ít nhất 30 ngày trước khi bất kỳ thay đổi phí nào có hiệu lực, theo",
+        "linkText": "Thỏa thuận Chủ thẻ"
+      },
+      "creditModeNotice": "Chế độ Tín dụng hiện không hoạt động. Nếu Chế độ Tín dụng được kích hoạt, lãi suất, phí và các công bố về quyền lập hóa đơn hiện hành sẽ được cung cấp trước khi kích hoạt.",
+      "additionalDetails": {
+        "title": "Chi tiết phí bổ sung",
+        "overdraft": {
+          "label": "Thấu chi",
+          "text": ". Trong một số trường hợp nhất định, một giao dịch có thể được chấp thuận khiến Số dư Thẻ của bạn giảm xuống dưới 0. Thấu chi tối đa là {maxOverdraft: string}. Bạn phải hoàn trả khoản thấu chi trong vòng 7 ngày bằng cách chuyển thêm tiền vào Số dư Thẻ của bạn."
+        },
+        "foreignCurrency": {
+          "label": "Ngoại tệ",
+          "text": ". Nếu bạn thực hiện giao dịch bằng ngoại tệ, mạng lưới thẻ sẽ chuyển đổi sang USD bằng quy trình chuyển đổi riêng của mình. Tỷ giá vào ngày xử lý có thể khác với ngày giao dịch."
+        },
+        "noHiddenFees": {
+          "label": "Không có phí ẩn",
+          "text": ". Không có phí cho việc thiết lập tài khoản, không hoạt động, truy vấn số dư hoặc đóng thẻ của bạn."
+        }
+      },
+      "backButton": "Quay lại"
     },
     "CardDetails": {
       "title": "Chi tiết thẻ",
@@ -3390,6 +3525,7 @@
         "perYear": "mỗi năm",
         "status": {
           "label": "Trạng thái",
+          "specialOfferLabel": "Ưu đãi đặc biệt",
           "paymentPending": "Đang Chờ Thanh toán",
           "firstYearFree": "Năm đầu tiên miễn phí"
         },
@@ -3403,7 +3539,11 @@
           "cardholderAgreement": "Thỏa thuận Chủ thẻ",
           "and": "và"
         },
-        "renew": "Tôi hiểu rằng đăng ký của tôi sẽ tự động gia hạn sau 1 năm"
+        "feeSchedule": {
+          "text": "Tôi đã xem xét và đồng ý với",
+          "linkText": "Biểu Phí Blink Card"
+        },
+        "renew": "Tôi hiểu rằng gói đăng ký của tôi sẽ tự động gia hạn sau {months: number} tháng"
       },
       "CardIntroducing": {
         "title": "Giới thiệu",
@@ -3465,13 +3605,29 @@
         "buttonText": "Gửi đơn đăng ký",
         "select": "chọn"
       },
+      "Acknowledgement": {
+        "title": "Điều khoản và điều kiện",
+        "acceptButton": "Chấp nhận",
+        "eSignConsent": {
+          "text": "Tôi chấp nhận",
+          "linkText": "Đồng ý Chữ ký Điện tử"
+        },
+        "privacyAndTerms": {
+          "text": "Tôi chấp nhận",
+          "privacyPolicyLinkText": "Chính sách Bảo mật của nhà phát hành",
+          "and": ", và",
+          "cardTermsLinkText": "Điều khoản Thẻ Blink"
+        },
+        "certifyAccuracy": "Tôi xác nhận rằng thông tin tôi đã cung cấp là chính xác và tôi sẽ tuân thủ mọi quy tắc và yêu cầu liên quan đến Thẻ Blink Visa của tôi",
+        "acknowledgeSolicitation": "Tôi thừa nhận rằng việc đăng ký Thẻ Blink Visa không cấu thành hành vi chào mời trái phép"
+      },
       "CardPreapproved": {
         "title": "Bạn đã được phê duyệt trước cho thẻ Blink Visa!",
         "buttonText": "Đóng"
       },
       "CardProcessing": {
         "title": "Đang xử lý đơn đăng ký của bạn",
-        "subtitle": "Thời gian chờ ước tính: {waitTime: string}",
+        "subtitle": "Chúng tôi sẽ thông báo cho bạn ngay khi chúng tôi sẵn sàng",
         "buttonText": "Đóng"
       }
     }
@@ -3499,6 +3655,7 @@
       },
       "Phrase": {
         "headerTitle": "Cụm từ sao lưu",
+        "authDescription": "Xác thực để xem cụm từ sao lưu của bạn",
         "sparkCompatible": "Cụm từ sao lưu này hoạt động trong bất kỳ {sparkCompatibleLink} nào",
         "sparkCompatibleLink": "ví tương thích Spark",
         "copiedToast": "Đã sao chép cụm từ sao lưu vào bộ nhớ tạm",
@@ -3506,7 +3663,8 @@
         "savedConfirm": "Tôi đã lưu",
         "copy": "Sao chép",
         "continueButton": "Tiếp tục",
-        "testBackup": "Kiểm tra bản sao lưu của bạn"
+        "testBackup": "Kiểm tra bản sao lưu của bạn",
+        "doNotShareWarning": "Không cho bất kỳ ai xem điều này, kể cả bộ phận hỗ trợ"
       },
       "Confirm": {
         "headerTitle": "Xác nhận cụm từ sao lưu",
@@ -3538,6 +3696,7 @@
       "uploadSuccess": "Bản sao lưu đã được lưu vào {provider}",
       "uploadFailed": "Không thể tải lên bản sao lưu",
       "signInFailed": "Không thể đăng nhập vào {provider}",
+      "storageAccessRequired": "Cho phép {provider: string} truy cập bản sao lưu ví của bạn, rồi thử lại.",
       "cloudNotAvailable": "iCloud Drive không khả dụng. Vui lòng đăng nhập iCloud trong Cài đặt và bật iCloud Drive.",
       "networkError": "Lỗi mạng. Vui lòng kiểm tra kết nối và thử lại.",
       "existingBackupTitle": "Đã tìm thấy bản sao lưu",
@@ -3549,13 +3708,89 @@
     }
   },
   "AccountMigration": {
+    "contactSupport": {
+      "title": "Liên hệ hỗ trợ",
+      "body": "Đã xảy ra sự cố, nhưng đừng lo lắng, tiền của bạn vẫn an toàn. Vui lòng liên hệ bộ phận hỗ trợ để được trợ giúp.\n\nBạn có thể cần thông tin này để giúp bộ phận hỗ trợ giải quyết trường hợp của bạn:",
+      "reasonLabel": "Lý do",
+      "accountIdLabel": "ID tài khoản",
+      "pubKeyLabel": "pubKey",
+      "usernameLabel": "Tên người dùng",
+      "emailLabel": "Email",
+      "phoneLabel": "Số điện thoại",
+      "appVersionLabel": "Phiên bản ứng dụng",
+      "platformLabel": "Nền tảng",
+      "countryLabel": "Quốc gia",
+      "emailSubject": "Yêu cầu hỗ trợ di chuyển tài khoản",
+      "emailDescribeProblem": "Mô tả vấn đề:",
+      "emailAccountInfo": "Thông tin tài khoản cho bộ phận hỗ trợ:",
+      "contactUsCta": "Liên hệ chúng tôi",
+      "copy": "Sao chép"
+    },
+    "migrateNowModal": {
+      "title": "Hãy chuyển ngay sang tài khoản không lưu ký",
+      "body": "Bạn không còn có thể nhận tiền vào tài khoản lưu ký của mình. Blink đã ngừng dịch vụ lưu ký tại khu vực của bạn và tài khoản này sẽ bị vô hiệu hóa vào cuối ngày {date}.\n\nHãy chuyển ngay sang tài khoản không lưu ký.",
+      "migrateCta": "Chuyển ngay"
+    },
+    "reminderBulletin": {
+      "title": "Quan trọng",
+      "body": "Hãy chuyển sang tài khoản không lưu ký qua quy trình di chuyển có hướng dẫn, hoặc rút tiền, trước {date}. Việc nhận sẽ dừng vào {receiveStopsDate}.",
+      "migrateCta": "Chuyển"
+    },
+    "offboardBulletin": {
+      "title": "Quan trọng",
+      "body": "Tài khoản của bạn được đăng ký ở khu vực mà chúng tôi không thể cung cấp tài khoản. Hãy rút tiền của bạn trước ngày 31 tháng 8. Việc nhận tiền sẽ dừng vào ngày 10 tháng 8."
+    },
+    "dollarBalanceModal": {
+      "title": "Chúng tôi không thể di chuyển số dư đô la của bạn",
+      "body": "Trước tiên hãy rút hết số dư đô la của bạn. Bạn có thể chuyển nó sang số dư Bitcoin trong Blink hoặc nơi khác."
+    },
+    "balancesOverview": {
+      "title": "Chuyển số dư của bạn",
+      "body": "Chuyển tiền của bạn một cách an toàn sang tài khoản mới.",
+      "currentBitcoinBalance": "Số dư Bitcoin hiện tại",
+      "currentDollarBalance": "Số dư Đô la hiện tại",
+      "newBitcoinBalance": "Số dư Bitcoin mới",
+      "newDollarBalance": "Số dư Đô la mới",
+      "dollarBalanceNotAvailable": "không khả dụng",
+      "networkFee": "Phí mạng: <bold>{fee: string}</bold>",
+      "networkFeeCoveredByBlink": "Phí mạng: <bold>{fee: string}</bold> (do Blink chi trả)",
+      "retryCta": "Thử lại",
+      "approveCta": "Phê duyệt",
+      "contactSupportCta": "Liên hệ hỗ trợ"
+    },
+    "migrationRequiredTitle": "Đã đến lúc nâng cấp",
+    "keepReceivingTitle": "Tiếp tục nhận như bình thường",
+    "keepReceivingBody": "Địa chỉ Lightning của bạn sẽ được chuyển sang tài khoản non-custodial mới của bạn.",
+    "keepReceivingLnAddressLabel": "Địa chỉ LN của bạn",
+    "keepReceivingCta": "Tuyệt",
+    "receivingDisabledToast": "Việc nhận hiện đang bị vô hiệu hóa.",
+    "downloadHistoryTitle": "Tải xuống lịch sử giao dịch của bạn",
+    "downloadHistoryBody": "Tài khoản mới của bạn sẽ bắt đầu lại từ đầu. Nếu bạn muốn lưu lại hồ sơ giao dịch, hãy tải xuống dưới dạng CSV ngay bây giờ.",
+    "downloadHistoryDownloadCta": "Tải xuống",
+    "apiServiceTitle": "Dịch vụ API không khả dụng",
+    "apiServiceBody": "Chúng tôi nhận thấy bạn có khóa API đang hoạt động. Blink không thể cung cấp API ở chế độ non-custodial.\n\nNếu bạn phụ thuộc vào API của Blink, hãy liên hệ với chúng tôi sớm và chúng tôi sẽ cố gắng hết sức để hỗ trợ quá trình chuyển đổi suôn sẻ.",
+    "apiServiceContactCta": "Liên hệ với chúng tôi",
+    "apiServiceContinueCta": "Vẫn tiếp tục",
+    "resumeFailed": "Đã xảy ra lỗi khi tiếp tục quá trình chuyển của bạn. Vui lòng bắt đầu lại.",
+    "migrationRequiredBody": "Đã đến lúc chuyển tài khoản lưu ký của bạn sang tài khoản không lưu ký.",
+    "migrationRequiredForcedBody": "Đã đến lúc chuyển tài khoản lưu ký của bạn sang tài khoản không lưu ký. Điều này là bắt buộc vì lý do quy định.\n\nĐừng lo lắng, non-custodial sẽ tốt hơn cho bạn về lâu dài.",
+    "migrationGateTitle": "Không thể truy cập tài khoản",
+    "migrationGateBody": "Vì lý do quy định, chúng tôi không thể cung cấp tài khoản custodial ở khu vực của bạn. Hãy chuyển tiền của bạn sang tài khoản non-custodial với Blink bằng cách làm theo các bước tiếp theo hoặc liên hệ với chúng tôi tại <link>{email}</link>",
+    "bitcoinBalance": "Số dư Bitcoin",
+    "dollarBalance": "Số dư đô la",
     "moveToNonCustodial": "Chuyển sang non-custodial",
     "explainerTitle": "Chuyển sang non-custodial nghĩa là gì?",
-    "explainerStep1": "Bạn sẽ tạo một tài khoản non-custodial trên giao thức Spark, <link>tìm hiểu thêm tại đây</link>",
-    "explainerStep2": "Chúng tôi chuyển tiền của bạn vào tài khoản non-custodial mới và tài khoản hiện tại của bạn sẽ bị xóa",
-    "explainerStep3": "Tiếp tục sử dụng Blink như bình thường",
-    "letsMove": "Bắt đầu nào",
-    "transferringFunds": "Đang chuyển tiền của bạn. Sẽ hoàn tất trong vài giây."
+    "explainerCheck1": "Bạn sẽ tạo một tài khoản non-custodial trên giao thức Spark",
+    "explainerCheck2": "Chúng tôi chuyển tiền của bạn sang tài khoản non-custodial mới của bạn",
+    "explainerCheck3": "Tài khoản hiện tại của bạn và tất cả dữ liệu của nó bao gồm lịch sử giao dịch sẽ bị đóng",
+    "explainerCheck4": "API của Blink sẽ không khả dụng",
+    "explainerCheck5": "Tài khoản của bạn sẽ bị trừ phí mạng Spark",
+    "explainerCta": "Tôi hiểu",
+    "transferringFunds": "Đang chuyển tiền của bạn. Sẽ hoàn tất trong vài giây.",
+    "clockOutOfSync": {
+      "body": "Ngày và giờ trên thiết bị của bạn không đồng bộ. Đặt về tự động để tiếp tục.",
+      "retryCta": "Thử lại"
+    }
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Lưu ký",
@@ -3583,6 +3818,7 @@
     "phraseSubtitleStep2": "Nhập phần còn lại của cụm từ sao lưu",
     "nextWords": "6 từ tiếp theo",
     "paste": "Dán",
+    "pasteFailed": "Không thể đọc từ bộ nhớ tạm. Vui lòng nhập cụm từ sao lưu của bạn theo cách thủ công.",
     "enterWord": "Từ",
     "invalidMnemonic": "Cụm từ sao lưu không hợp lệ. Vui lòng kiểm tra xem thứ tự các từ có chính xác không.",
     "restoring": "Đang khôi phục ví...",
@@ -3594,7 +3830,9 @@
     "enterPassword": "Nhập mật khẩu mã hóa của bạn",
     "wrongPassword": "Mật khẩu không đúng. Vui lòng thử lại.",
     "pickBackupTitle": "Chọn một ví",
-    "pickBackupDescription": "Chọn bản sao lưu để khôi phục"
+    "pickBackupDescription": "Chọn bản sao lưu để khôi phục",
+    "recognizePhraseTitle": "Bạn có nhận ra cụm từ sao lưu này không?",
+    "recognizePhraseBody": "Không bao giờ nhập các từ mà người khác gửi cho bạn."
   },
   "BackupNudge": {
     "title": "Tiền của bạn đang gặp rủi ro",
@@ -3604,6 +3842,16 @@
     "modalTitle": "Bảo mật tiền của bạn",
     "modalDescription": "Chúng tôi khuyến nghị bạn sao lưu ví để ngăn chặn mất hoàn toàn tiền trong trường hợp bạn mất thiết bị này.",
     "secureMe": "Bảo mật ví"
+  },
+  "BackupRequired": {
+    "modalTitle": "Back up your wallet first",
+    "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
+    "backupNow": "Back up wallet"
+  },
+  "NonCustodialInfoBulletin": {
+    "title": "Đây là tài khoản không lưu ký",
+    "body": "Để tìm hiểu thêm, hãy đọc bài viết trên blog của chúng tôi",
+    "cta": "Đọc"
   },
   "StableBalance": {
     "title": "Số dư ổn định",
@@ -3638,7 +3886,7 @@
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
     "featureCircles": "Circles",
-    "featureEarn": "Earn",
+    "featureEarn": "Học",
     "featureCard": "Card"
   },
   "WalletCreationScreen": {
@@ -3652,10 +3900,10 @@
     "lightningPayment": "Thanh toán Lightning",
     "onchainDeposit": "Nạp On-chain",
     "onchainWithdrawal": "Rút On-chain",
-    "conversionFromBitcoin": "Chuyển đổi từ Bitcoin",
-    "conversionToBitcoin": "Chuyển đổi sang Bitcoin",
-    "conversionFromToken": "Chuyển đổi từ {token}",
-    "conversionToToken": "Chuyển đổi sang {token}",
+    "transferFromBitcoinBalance": "Chuyển từ số dư Bitcoin",
+    "transferToBitcoinBalance": "Chuyển đến số dư Bitcoin",
+    "transferFromTokenBalance": "Chuyển từ số dư {token}",
+    "transferToTokenBalance": "Chuyển đến số dư {token}",
     "tokenTransfer": "Chuyển {token}",
     "payTo": "Thanh toán cho {address}",
     "payment": "Thanh toán"

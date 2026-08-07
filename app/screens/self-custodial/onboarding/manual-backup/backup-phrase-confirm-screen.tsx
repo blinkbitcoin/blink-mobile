@@ -2,25 +2,29 @@ import React, { useCallback, useEffect, useRef } from "react"
 import { TextInput, View } from "react-native"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
-import { useRoute, useNavigation, RouteProp } from "@react-navigation/native"
+import { useNavigation, useRoute, RouteProp } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { Screen } from "@app/components/screen"
 import { SuggestionBar } from "@app/components/suggestion-bar"
-import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { PhraseStep, RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useMigrationCheckpoint } from "@app/screens/account-migration/hooks"
 import { logSelfCustodialBackupCompleted } from "@app/self-custodial/analytics"
-import { BackupStatus, useBackupState } from "@app/self-custodial/providers/backup-state"
-import { hasFunds } from "@app/utils/has-funds"
+import { BackupMethod } from "@app/self-custodial/providers/backup-state"
+import { reportError } from "@app/utils/error-logging"
 import { testProps } from "@app/utils/testProps"
 
-import { useBackupConfirm } from "../hooks"
+import { useBackupConfirm, useCompleteBackup } from "../hooks"
+import { type Challenge, isValidChallenges } from "../utils"
 
 type ConfirmRouteProp = RouteProp<RootStackParamList, "selfCustodialBackupPhraseConfirm">
+
+/** A stable empty fallback, so the one frame rendered before the redirect does not feed
+ *  useBackupConfirm a fresh array identity on every render. */
+const EMPTY_CHALLENGES: Challenge[] = []
 
 export const BackupPhraseConfirmScreen: React.FC = () => {
   const { LL } = useI18nContext()
@@ -29,35 +33,37 @@ export const BackupPhraseConfirmScreen: React.FC = () => {
     theme: { colors },
   } = useTheme()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-  const { challenges, successMessage } = useRoute<ConfirmRouteProp>().params
 
-  const { wallets, isSelfCustodial } = useActiveWallet()
-  const { backupState, setBackupCompleted } = useBackupState()
-  const { checkpoint, loading: checkpointLoading } = useMigrationCheckpoint()
-  const alreadyBackedUp = backupState.status === BackupStatus.Completed
-  // Migration only applies on a custodial account; self-custodial backups are standalone.
-  const isMigrating = !isSelfCustodial && checkpoint !== null && !alreadyBackedUp
-  const walletsHaveFunds = hasFunds(wallets)
+  /** Deep links and navigation-state rehydration can deliver missing or malformed params
+   *  despite the route type; a bare destructure here threw into the app-wide ErrorBoundary,
+   *  replacing the whole navigation tree (#4070). A confirm screen without its challenges
+   *  is dead — nothing to type — so it redirects to the first backup step with `replace`,
+   *  keeping the broken route out of the back stack. */
+  const { params } = useRoute<ConfirmRouteProp>()
+  const challengesParam = params?.challenges
+  const challenges = isValidChallenges(challengesParam)
+    ? challengesParam
+    : EMPTY_CHALLENGES
+  const successMessage = params?.successMessage
+  const hasValidChallenges = challenges.length > 0
+
+  useEffect(() => {
+    if (hasValidChallenges) return
+    reportError(
+      "Backup confirm route params missing",
+      new Error("Route delivered no valid challenges"),
+      { dedupKey: "backup-confirm-params-missing", alwaysRecord: true },
+    )
+    navigation.replace("selfCustodialBackupPhrase", { step: PhraseStep.First })
+  }, [hasValidChallenges, navigation])
+
+  const { loading: checkpointLoading } = useMigrationCheckpoint()
+  const completeBackup = useCompleteBackup()
 
   const onComplete = useCallback(() => {
-    setBackupCompleted("manual")
     logSelfCustodialBackupCompleted({ backupMethod: "manual" })
-    if (isMigrating && walletsHaveFunds) {
-      navigation.navigate("accountMigrationTransferringFunds")
-      return
-    }
-    navigation.navigate("selfCustodialBackupSuccess", {
-      reBackup: alreadyBackedUp,
-      message: successMessage,
-    })
-  }, [
-    navigation,
-    isMigrating,
-    walletsHaveFunds,
-    alreadyBackedUp,
-    setBackupCompleted,
-    successMessage,
-  ])
+    completeBackup({ method: BackupMethod.Manual, message: successMessage })
+  }, [completeBackup, successMessage])
 
   const {
     inputs,
@@ -75,6 +81,7 @@ export const BackupPhraseConfirmScreen: React.FC = () => {
   } = useBackupConfirm({ challenges, onComplete, disabled: checkpointLoading })
 
   const anyWrong = challenges.some((_, i) => isWordWrong(i))
+  const isConfirmDisabled = !allCorrect || checkpointLoading
 
   const inputRefs = useRef<Array<TextInput | null>>([])
 
@@ -105,9 +112,17 @@ export const BackupPhraseConfirmScreen: React.FC = () => {
                       wrong && styles.inputError,
                     ]}
                   >
-                    {inputs[i].trim().length > 0 && (
-                      <Text style={styles.wordNumber}>{challenge.index + 1}.</Text>
-                    )}
+                    {/* Always mounted, fixed width: the row's layout must not depend on
+                     *  the input's content, or the first keystroke reflows the field
+                     *  under the user's finger. */}
+                    <Text
+                      style={[
+                        styles.wordNumber,
+                        inputs[i].trim().length === 0 && styles.wordNumberHidden,
+                      ]}
+                    >
+                      {challenge.index + 1}.
+                    </Text>
                     <TextInput
                       ref={(ref) => {
                         inputRefs.current[i] = ref
@@ -159,7 +174,7 @@ export const BackupPhraseConfirmScreen: React.FC = () => {
                 ? LL.BackupScreen.ManualBackup.Confirm.confirm()
                 : LL.BackupScreen.ManualBackup.Confirm.enterWords()
             }
-            disabled={!allCorrect || checkpointLoading}
+            disabled={isConfirmDisabled}
             onPress={onComplete}
             {...testProps("backup-confirm-button")}
           />
@@ -197,10 +212,15 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingHorizontal: 14,
     gap: 12,
   },
+  /** Same typeface and no lineHeight override on number and input, so both center on
+   *  one baseline (see MnemonicWordInput). */
   wordNumber: {
+    width: 24,
     fontSize: 14,
-    lineHeight: 20,
     color: colors.grey2,
+  },
+  wordNumberHidden: {
+    opacity: 0,
   },
   inputCorrect: {
     borderColor: colors._green,
@@ -211,9 +231,8 @@ const useStyles = makeStyles(({ colors }) => ({
   input: {
     flex: 1,
     fontSize: 14,
-    lineHeight: 20,
     color: colors.black,
-    fontFamily: "Source Sans Pro",
+    fontFamily: "SourceSansPro-Regular",
   },
   errorContainer: {
     flexDirection: "row",

@@ -8,8 +8,6 @@ import {
   BetaQuery,
   CountryCodeDocument,
   CountryCodeQuery,
-  FeedbackModalShownDocument,
-  FeedbackModalShownQuery,
   HiddenBalanceToolTipDocument,
   HiddenBalanceToolTipQuery,
   HideBalanceDocument,
@@ -55,10 +53,6 @@ export default gql`
       latitudeDelta
       longitudeDelta
     }
-  }
-
-  query feedbackModalShown {
-    feedbackModalShown @client
   }
 
   query introducingCirclesModalShown {
@@ -171,20 +165,6 @@ export const updateMapLastCoords = (client: ApolloClient<unknown>, region: Regio
     })
   } catch {
     console.warn("impossible to update map last coords")
-  }
-}
-
-export const setFeedbackModalShown = (client: ApolloClient<unknown>, shown: boolean) => {
-  try {
-    client.writeQuery<FeedbackModalShownQuery>({
-      query: FeedbackModalShownDocument,
-      data: {
-        __typename: "Query",
-        feedbackModalShown: shown,
-      },
-    })
-  } catch {
-    console.warn("unable to update feedbackModalShown")
   }
 }
 

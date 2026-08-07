@@ -60,14 +60,16 @@
 
 ## Bitcoin/Lightning
 
-| Package | Purpose |
-|---------|---------|
-| bitcoinjs-lib | Bitcoin primitives |
-| js-lnurl | LNURL protocol |
-| lnurl-pay | LNURL payment |
-| @blinkbitcoin/blink-client | Blink API client |
-| bip21 | Bitcoin URI parsing |
-| bip39 | Mnemonic phrases |
+| Package | Version | Purpose |
+|---------|---------|---------|
+| @blinkbitcoin/blink-client | 1.1.0 | Blink payment destination parser and API client |
+| bitcoinjs-lib | ^6.1.5 | Bitcoin primitives |
+| bolt11 | ~1.4.1 | Lightning invoice parsing |
+| js-lnurl | 0.6.0 | LNURL protocol |
+| lnurl-pay | ^5.0.2 | LNURL payment requests |
+| @noble/hashes | ^1.8.0 | Cryptographic hash utilities used by payment parsing |
+| @scure/base | ^1.1.9 | Base encoding utilities used by payment parsing |
+| bip39 | ^3.1.0 | Mnemonic phrases |
 
 ## Native Capabilities
 
@@ -133,7 +135,6 @@ af, ar, ca, cs, da, de, el, en, es, fr, hr, hu, hy, it, ja, ko, ms, nl, no, pl, 
 | detox | E2E testing |
 | @wdio/cli | WebDriverIO |
 | appium | Mobile automation |
-| @storybook/react-native | Component documentation |
 
 ## Build & Development
 
@@ -182,8 +183,6 @@ yarn tsc            # TypeScript check
 yarn dev:codegen    # Generate GraphQL types
 yarn update-translations  # Update i18n
 
-# Storybook
-yarn storybook      # Component docs
 ```
 
 ## Environment Configuration

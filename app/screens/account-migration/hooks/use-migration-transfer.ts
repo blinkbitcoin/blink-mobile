@@ -1,0 +1,310 @@
+import { useCallback, useEffect, useRef, useState } from "react"
+
+import { gql } from "@apollo/client"
+
+import { useRemoteConfig } from "@app/config/feature-flags-context"
+import { MigrationStatus, useMigrationCommitMutation } from "@app/graphql/generated"
+import { isNetworkFailure } from "@app/graphql/is-network-failure"
+import { isDeviceClockSkewed } from "@app/graphql/server-time"
+import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
+import {
+  buildMigrationTransferRequest,
+  MigrationSdkStatus,
+} from "@app/self-custodial/migration-transfer-request"
+import { MigrationSupportReason } from "@app/types/migration"
+import { reportError } from "@app/utils/error-logging"
+
+import {
+  buildMigrationProofChallenge,
+  currentProofTimestamp,
+} from "../utils/migration-proof"
+
+import { useMigrationStatus } from "./use-migration-status"
+
+gql`
+  mutation migrationCommit($input: MigrationCommitInput!) {
+    migrationCommit(input: $input) {
+      errors {
+        message
+        code
+      }
+    }
+  }
+`
+
+/**
+ * Which disclosure the user accepted before committing. Bump it whenever the migration's
+ * explainer or terms copy changes materially: the backend stores it verbatim, and it is
+ * the only record of what was agreed to.
+ */
+const DISCLOSURE_VERSION = "v1"
+
+/** The server settles a drain in seconds, so the phase is re-read often enough to feel
+ *  immediate without turning a slow settle into a burst of reads. */
+const STATUS_POLL_INTERVAL_MS = 2000
+
+/** The backend gives a stale proof and a bad destination the same code; the clock skew
+ *  tells them apart, and any other code falls through to support (fail-safe). */
+const STALE_PROOF_REJECTION_CODE = "MIGRATION_INVALID_DESTINATION"
+
+/**
+ * Custodial accounts whose commit has already fired this session. Unlike a per-mount ref
+ * this survives a remount, so a screen that re-mounts while the first commit is still in
+ * flight cannot fire a second one with a fresh invoice, which the backend refuses as a
+ * state conflict. A genuine relaunch starts empty but reads TRANSFERRING, which already
+ * blocks a re-commit.
+ */
+const accountsWithCommitStarted = new Set<string>()
+
+/**
+ * The terminal commit failure remembered for each custodial account, keyed by id. The
+ * guard above outlives a remount but the per-mount failure state does not, so a screen
+ * re-entered after a failure would block the re-commit yet show no outcome and spin.
+ * Recording the settled reason here lets a remount restore it and route to support exactly
+ * as the first mount did.
+ */
+const settledCommitFailures = new Map<string, MigrationSupportReason>()
+
+/** Clears the module-level commit guard and remembered failures; for test isolation,
+ *  never called in production. */
+export const resetMigrationCommitGuard = (): void => {
+  accountsWithCommitStarted.clear()
+  settledCommitFailures.clear()
+}
+
+type UseMigrationTransferArgs = {
+  custodialAccountId: string | null
+  selfCustodialAccountId: string | null
+  skip: boolean
+}
+
+type UseMigrationTransfer = {
+  isTransferred: boolean
+  failureReason: MigrationSupportReason | null
+  isClockOutOfSync: boolean
+  hasConnectionIssue: boolean
+  retry: () => Promise<void>
+}
+
+/**
+ * Runs the transfer to its end: it commits when the server is still waiting for a
+ * destination, then watches the phase until it settles. Committing is driven by the
+ * server's own phase rather than by anything remembered locally, which is what makes a
+ * relaunch mid-transfer safe: a flow already TRANSFERRING is only watched, never
+ * re-committed with a second invoice the backend would refuse.
+ */
+export const useMigrationTransfer = ({
+  custodialAccountId,
+  selfCustodialAccountId,
+  skip,
+}: UseMigrationTransferArgs): UseMigrationTransfer => {
+  const network = useSparkNetwork()
+  const { selfCustodialDepositClaimLeewayVbyte } = useRemoteConfig()
+  const [commitMigration] = useMigrationCommitMutation()
+  /** Seeded from the remembered outcome so a screen re-entered after a settled failure
+   *  shows it at once, rather than blocking the re-commit and spinning with nothing shown. */
+  const [failureReason, setFailureReason] = useState<MigrationSupportReason | null>(() =>
+    custodialAccountId ? settledCommitFailures.get(custodialAccountId) ?? null : null,
+  )
+  const [isClockOutOfSync, setIsClockOutOfSync] = useState(false)
+  const [hasConnectionIssue, setHasConnectionIssue] = useState(false)
+
+  /**
+   * Polling stops for good once there is nothing left to watch: a terminal phase, a
+   * client-side failure, or a caller that is skipping. Reading `migration` runs the
+   * server's resume routine every time and this screen stays mounted under the one it
+   * hands over to, so an unstopped poll would hammer the server forever. `pollInterval: 0`
+   * rather than `undefined` because Apollo drops an undefined option in its options merge,
+   * leaving the previous interval in place, where 0 actually clears the timer.
+   */
+  const [hasStopped, setHasStopped] = useState(false)
+
+  /** Also paused while out of sync: nothing advances until the retry fires a fresh commit,
+   *  so polling would only re-run the server's resume routine for nothing. */
+  const shouldStopPolling = hasStopped || isClockOutOfSync
+  const { status, refetch: refetchStatus } = useMigrationStatus({
+    skip,
+    pollInterval: shouldStopPolling ? 0 : STATUS_POLL_INTERVAL_MS,
+  })
+
+  const hasServerFailed = status === MigrationStatus.Failed
+
+  /** A failure already handed the user to support, so a later COMPLETED from a stray poll
+   *  must not also swap the session out from under that screen. */
+  const isTransferred = status === MigrationStatus.Completed && failureReason === null
+
+  useEffect(() => {
+    if (isTransferred || hasServerFailed || failureReason !== null) setHasStopped(true)
+  }, [isTransferred, hasServerFailed, failureReason])
+
+  /** A phase past IN_PROGRESS means the commit did land (the drop hit the response, not the
+   *  request): the transfer is under way, so the notice clears and the screen watches it. */
+  useEffect(() => {
+    const hasAdvancedPastCommit = status !== null && status !== MigrationStatus.InProgress
+    if (hasAdvancedPastCommit) setHasConnectionIssue(false)
+  }, [status])
+
+  const fail = useCallback(
+    (reason: MigrationSupportReason, err: unknown) => {
+      reportError("Migration transfer", err)
+      /** Remember the settled failure so a re-entered screen restores it instead of
+       *  blocking the re-commit and spinning with nothing to show. */
+      if (custodialAccountId) settledCommitFailures.set(custodialAccountId, reason)
+      setFailureReason(reason)
+    },
+    [custodialAccountId],
+  )
+
+  /** The owner id can resolve a tick after mount; once it does, restore any failure the
+   *  guard already remembers so a re-entered screen routes to support rather than spinning. */
+  useEffect(() => {
+    if (!custodialAccountId || failureReason !== null) return
+    const rememberedFailure = settledCommitFailures.get(custodialAccountId)
+    if (rememberedFailure) setFailureReason(rememberedFailure)
+  }, [custodialAccountId, failureReason])
+
+  const commit = useCallback(
+    async (custodialId: string, selfCustodialId: string) => {
+      const proofTimestamp = currentProofTimestamp()
+      const result = await buildMigrationTransferRequest({
+        accountId: selfCustodialId,
+        network,
+        leewaySatPerVbyte: selfCustodialDepositClaimLeewayVbyte,
+        signChallenge: (sparkPubkey) =>
+          buildMigrationProofChallenge({
+            custodialAccountId: custodialId,
+            sparkPubkey,
+            timestamp: proofTimestamp,
+          }),
+      })
+
+      if (result.status === MigrationSdkStatus.NoMnemonic) {
+        fail(
+          MigrationSupportReason.SelfCustodialAccountMissing,
+          new Error("No mnemonic for the provisioned account"),
+        )
+        return
+      }
+
+      /** A dropped connection during the connect or the sign can be sent again, so it
+       *  pauses on the shared retry rather than handing the user to support. */
+      if (result.status === MigrationSdkStatus.ConnectionError) {
+        setHasConnectionIssue(true)
+        return
+      }
+
+      if (result.status === MigrationSdkStatus.Failed) {
+        fail(MigrationSupportReason.TransferFailed, result.error)
+        return
+      }
+
+      const { data } = await commitMigration({
+        variables: {
+          input: {
+            ...result.value,
+            proofTimestamp,
+            backupAttested: true,
+            disclosureVersion: DISCLOSURE_VERSION,
+          },
+        },
+      })
+
+      const [rejection] = data?.migrationCommit?.errors ?? []
+      if (!rejection) return
+
+      /** A skewed clock makes the proof stale, which the backend rejects under the
+       *  bad-destination code; that code plus a real skew is what earns a retry rather
+       *  than a handover to support. */
+      const isStaleProofRejection =
+        rejection.code === STALE_PROOF_REJECTION_CODE && isDeviceClockSkewed()
+      if (isStaleProofRejection) {
+        setIsClockOutOfSync(true)
+        return
+      }
+      fail(MigrationSupportReason.TransferFailed, new Error(rejection.message))
+    },
+    [network, selfCustodialDepositClaimLeewayVbyte, commitMigration, fail],
+  )
+
+  /** The server is waiting for a destination only while IN_PROGRESS: TRANSFERRING already
+   *  has one, and committing a second invoice is refused as a state conflict. */
+  const isAwaitingDestination = status === MigrationStatus.InProgress
+  const hasFailed = failureReason !== null
+  /** A recoverable issue (skewed clock or lost connection) pauses the commit; clearing the
+   *  flag on retry flips canCommit back to true and re-fires the effect. */
+  const hasRecoverableIssue = isClockOutOfSync || hasConnectionIssue
+  const canCommit = isAwaitingDestination && !skip && !hasFailed && !hasRecoverableIssue
+
+  useEffect(() => {
+    if (!canCommit) return
+
+    /** Both ids checked before the guard is claimed, so a transient null never latches
+     *  out a commit that could still fire once the id arrives. */
+    if (!custodialAccountId || !selfCustodialAccountId) return
+    if (accountsWithCommitStarted.has(custodialAccountId)) return
+
+    accountsWithCommitStarted.add(custodialAccountId)
+    commit(custodialAccountId, selfCustodialAccountId).catch((err) => {
+      /** A commit lost to the network can still have landed: it earns the shared retry, not
+       *  a handover, and the guard stays claimed until the user's retry clears it. */
+      if (isNetworkFailure(err)) {
+        setHasConnectionIssue(true)
+        return
+      }
+      fail(MigrationSupportReason.TransferFailed, err)
+    })
+  }, [canCommit, custodialAccountId, selfCustodialAccountId, commit, fail])
+
+  /** FAILED has no client-side way back: the phase machine only leaves it when a late
+   *  payment settles server-side, so offering a retry would loop on a refusal. */
+  const serverFailure = hasServerFailed ? MigrationSupportReason.TransferFailed : null
+
+  /** Clears the recoverable flag so the commit effect fires again. A commit lost to the
+   *  network may have landed, so after a connection issue the phase is re-read first: if it
+   *  advanced past IN_PROGRESS, watch rather than send a second invoice refused as a state
+   *  conflict. */
+  const runRetry = useCallback(async () => {
+    setIsClockOutOfSync(false)
+
+    if (hasConnectionIssue) {
+      let freshStatus: MigrationStatus | null
+      try {
+        freshStatus = await refetchStatus()
+      } catch {
+        /** Phase read failed too (still offline): keep the retry, do not recommit blind. */
+        return
+      }
+      const hasAdvancedPastCommit =
+        freshStatus !== null && freshStatus !== MigrationStatus.InProgress
+      if (hasAdvancedPastCommit) {
+        setHasConnectionIssue(false)
+        return
+      }
+    }
+
+    if (custodialAccountId) accountsWithCommitStarted.delete(custodialAccountId)
+    setHasConnectionIssue(false)
+  }, [custodialAccountId, hasConnectionIssue, refetchStatus])
+
+  /** One retry at a time so a double-tap cannot clear the commit guard mid-flight. */
+  const isRetryingRef = useRef(false)
+  const retry = useCallback(async () => {
+    if (isRetryingRef.current) return
+    isRetryingRef.current = true
+    await runRetry().finally(() => {
+      isRetryingRef.current = false
+    })
+  }, [runRetry])
+
+  /** A recoverable issue and support are mutually exclusive: while the user has a retry, a
+   *  server failure on the same render must not also route to support. */
+  const activeFailureReason = hasRecoverableIssue ? null : failureReason ?? serverFailure
+
+  return {
+    isTransferred,
+    failureReason: activeFailureReason,
+    isClockOutOfSync,
+    hasConnectionIssue,
+    retry,
+  }
+}

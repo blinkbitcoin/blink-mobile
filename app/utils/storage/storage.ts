@@ -29,13 +29,13 @@ export const saveString = async (key: string, value: string): Promise<boolean> =
   }
 }
 
-export const saveJson = async (key: string, value: unknown): Promise<boolean> => {
-  try {
-    await AsyncStorage.setItem(key, JSON.stringify(value))
-    return true
-  } catch {
-    return false
-  }
+/**
+ * Saves an object to storage, propagating the underlying write error instead of
+ * swallowing it, so a caller whose flow must stop on a failed write can catch it.
+ * Best-effort callers should catch and ignore.
+ */
+export const saveJson = async (key: string, value: unknown): Promise<void> => {
+  await AsyncStorage.setItem(key, JSON.stringify(value))
 }
 
 /**

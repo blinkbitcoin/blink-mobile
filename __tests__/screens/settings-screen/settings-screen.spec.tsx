@@ -13,6 +13,35 @@ jest.mock("@app/graphql/is-authed-context", () => ({
   useIsAuthed: () => mockUseIsAuthed(),
 }))
 
+/** Overrides only activeAccount so the self-custodial gating cases can flip the mode
+ *  while every other registry consumer keeps the real provider behavior. */
+const mockAccountRegistryOverride: { activeAccount: unknown } = {
+  activeAccount: undefined,
+}
+jest.mock("@app/hooks/use-account-registry", () => {
+  const actual = jest.requireActual("@app/hooks/use-account-registry")
+  return {
+    ...actual,
+    useAccountRegistry: () => ({
+      ...actual.useAccountRegistry(),
+      ...(mockAccountRegistryOverride.activeAccount
+        ? { activeAccount: mockAccountRegistryOverride.activeAccount }
+        : {}),
+    }),
+  }
+})
+
+/** The self-custodial rows read the wallet context; a connected stub keeps them out of
+ *  their loading-skeleton states so the gating assertions can find row titles. */
+jest.mock("@app/self-custodial/providers/wallet", () => ({
+  useSelfCustodialWallet: () => ({
+    sdk: {},
+    lightningAddress: null,
+    wallets: [],
+    allTransactions: [],
+  }),
+}))
+
 import React from "react"
 import { TouchableOpacity, View } from "react-native"
 import {
@@ -23,16 +52,27 @@ import {
   waitFor,
   within,
 } from "@testing-library/react-native"
+import { MockedProvider, MockedResponse } from "@apollo/client/testing"
+import { createCache } from "@app/graphql/cache"
 import { SettingsScreenDocument } from "@app/graphql/generated"
+import { IsAuthedContextProvider } from "@app/graphql/is-authed-context"
 import { NotificationHistoryScreen } from "@app/screens/notification-history-screen/notification-history-screen"
 import { SettingsScreen } from "@app/screens/settings-screen/settings-screen"
 import { SettingsRow } from "@app/screens/settings-screen/row"
 import { LevelContextProvider, AccountLevel } from "@app/graphql/level-context"
-import { LoggedInWithUsername } from "@app/screens/settings-screen/settings-screen.stories"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import mocks from "@app/graphql/mocks"
+import { AccountType } from "@app/types/wallet"
 import { ContextForScreen } from "../helper"
 import { flushEffects } from "../../helpers/flush-effects"
+
+const LoggedInWithUsername = ({ mock }: { mock: MockedResponse[] }) => (
+  <MockedProvider mocks={mock} cache={createCache()}>
+    <IsAuthedContextProvider value={true}>
+      <SettingsScreen />
+    </IsAuthedContextProvider>
+  </MockedProvider>
+)
 
 const notificationTitle = "Test notification"
 const notificationBody = "Test body"
@@ -156,6 +196,19 @@ jest.mock("@apollo/client", () => {
   }
 })
 
+/** Mocked wholesale: the real module warns at load time when no API key is configured. */
+jest.mock("@app/utils/ip-country-lookup", () => ({
+  DEFAULT_ADAPTERS: [],
+  resolveIpCountryCode: jest.fn(async () => undefined),
+  resolveIpCountryCodeCached: jest.fn(async () => undefined),
+}))
+
+/** The fake Apollo client above has no writeQuery, so the real updateCountryCode would throw and warn on every device-location render. */
+jest.mock("@app/graphql/client-only-query", () => ({
+  ...jest.requireActual("@app/graphql/client-only-query"),
+  updateCountryCode: jest.fn(),
+}))
+
 jest.mock("@app/graphql/generated", () => {
   const actual = jest.requireActual("@app/graphql/generated")
   return {
@@ -265,6 +318,7 @@ describe("Settings Screen", () => {
     jest.clearAllMocks()
     // clearAllMocks does not reset return values, so re-arm the default explicitly
     mockUseIsAuthed.mockReturnValue(true)
+    mockAccountRegistryOverride.activeAccount = undefined
     loadLocale("en")
     testState = createTestState()
   })
@@ -466,7 +520,7 @@ describe("Settings Screen", () => {
     await flushEffects()
   })
 
-  it("truncates long settings row titles", () => {
+  it("truncates long settings row titles", async () => {
     const longTitle = "This is a very long settings row title that should truncate"
 
     render(
@@ -474,13 +528,14 @@ describe("Settings Screen", () => {
         <SettingsRow action={null} title={longTitle} />
       </ContextForScreen>,
     )
+    await flushEffects()
 
     const titleNode = screen.getByText(longTitle)
     expect(titleNode.props.numberOfLines).toBe(1)
     expect(titleNode.props.ellipsizeMode).toBe("tail")
   })
 
-  it("truncates long settings row subtitles", () => {
+  it("truncates long settings row subtitles", async () => {
     const longTitle = "Short title"
     const longSubtitle = "This is a very long subtitle that should truncate"
 
@@ -489,13 +544,14 @@ describe("Settings Screen", () => {
         <SettingsRow action={null} title={longTitle} subtitle={longSubtitle} />
       </ContextForScreen>,
     )
+    await flushEffects()
 
     const subtitleNode = screen.getByText(longSubtitle)
     expect(subtitleNode.props.numberOfLines).toBe(1)
     expect(subtitleNode.props.ellipsizeMode).toBe("tail")
   })
 
-  it("truncates long title and subtitle together", () => {
+  it("truncates long title and subtitle together", async () => {
     const longTitle = "Another very long settings row title that should truncate"
     const longSubtitle = "Another very long subtitle that should truncate"
 
@@ -504,6 +560,7 @@ describe("Settings Screen", () => {
         <SettingsRow action={null} title={longTitle} subtitle={longSubtitle} />
       </ContextForScreen>,
     )
+    await flushEffects()
 
     const titleNode = screen.getByText(longTitle)
     const subtitleNode = screen.getByText(longSubtitle)
@@ -513,20 +570,29 @@ describe("Settings Screen", () => {
     expect(subtitleNode.props.ellipsizeMode).toBe("tail")
   })
 
-  it("does not render Move to non-custodial option until migration is complete", async () => {
+  it("renders the Move to non-custodial option for a custodial account", async () => {
     render(
       <ContextForScreen>
         <LoggedInWithUsername mock={mocksWithUsername} />
       </ContextForScreen>,
     )
 
-    // flush pending effects/microtasks, then assert on the settled output
-    await act(async () => {})
+    // let the migration-checkpoint load settle so the row leaves its skeleton state
+    await flushEffects()
 
-    // TODO: re-enable once the custodial → non-custodial migration is complete
-    expect(screen.queryByText("Move to non-custodial")).toBeNull()
+    expect(screen.getByText("Move to non-custodial")).toBeTruthy()
+  })
+
+  it("renders the Fee rates option", async () => {
+    render(
+      <ContextForScreen>
+        <LoggedInWithUsername mock={mocksWithUsername} />
+      </ContextForScreen>,
+    )
 
     await flushEffects()
+
+    expect(screen.getByText("Fee rates")).toBeTruthy()
   })
 
   it("does not render a standalone Recovery method group", async () => {
@@ -542,6 +608,39 @@ describe("Settings Screen", () => {
     expect(screen.queryByTestId("Recovery method-group")).toBeNull()
 
     await flushEffects()
+  })
+
+  it("shows the Advanced group with CSV export and API access for a custodial account", async () => {
+    render(
+      <ContextForScreen>
+        <LoggedInWithUsername mock={mocksWithUsername} />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    expect(screen.getByTestId("Advanced-group")).toBeTruthy()
+    expect(screen.getByText("Export all transactions")).toBeTruthy()
+    expect(screen.getByText("API integration")).toBeTruthy()
+  })
+
+  it("shows CSV export without API access for a self-custodial account", async () => {
+    mockAccountRegistryOverride.activeAccount = {
+      id: "sc-1",
+      type: AccountType.SelfCustodial,
+    }
+
+    render(
+      <ContextForScreen>
+        <LoggedInWithUsername mock={mocksWithUsername} />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    expect(screen.getByTestId("Advanced-group")).toBeTruthy()
+    expect(screen.getByText("Export all transactions")).toBeTruthy()
+    expect(screen.queryByText("API integration")).toBeNull()
   })
 
   it("skips the unread-notifications query when not authenticated", async () => {

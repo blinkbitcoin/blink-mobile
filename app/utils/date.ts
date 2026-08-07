@@ -1,4 +1,5 @@
 import { MASK_CHAR } from "@app/config/appinfo"
+import { reportError } from "@app/utils/error-logging"
 /* eslint-disable no-param-reassign */
 
 export const DEC_1_12_AM_UTC_MINUS_6 = new Date(Date.UTC(2023, 11, 1, 6, 0, 0)).getTime()
@@ -32,8 +33,6 @@ export const JULY_1_2024_12_AM_UTC_MINUS_6 = new Date(
 ).getTime()
 
 const secondsToDDMMSS = (totalSeconds: number) => {
-  if (totalSeconds < 0) return ""
-
   const days = Math.floor(totalSeconds / 86400) // There are 86400 seconds in a day
   const hours = Math.floor((totalSeconds - days * 86400) / 3600) // 3600 seconds in an hour
   const minutes = Math.floor((totalSeconds - days * 86400 - hours * 3600) / 60)
@@ -53,11 +52,6 @@ export const getTimeLeft = ({ after, until }: { after: number; until: number }) 
 
   const sLeft = (until - dateNow) / 1000
   return secondsToDDMMSS(sLeft)
-}
-
-// e.g. 1747691078 -> "2025-05-19 15:44"
-export function formatUnixTimestampYMDHM(timestampInSeconds: number) {
-  return new Date(timestampInSeconds * 1000).toISOString().slice(0, 16).replace("T", " ")
 }
 
 export const isSameDay = (a: Date, b: Date) =>
@@ -88,6 +82,62 @@ export const formatShortDate = ({
   return new Date(createdAt * 1000).toLocaleDateString("en-CA", options)
 }
 
+/**
+ * e.g. 1747691078 at UTC-6 -> "2025-05-19 15:44". Renders in the device timezone,
+ * matching the transaction list and detail screens; `timezone` is only injected so tests
+ * can pin a zone, so no production caller passes one and a malformed string never reaches
+ * `toLocaleTimeString`, which would throw a RangeError: give this the guard
+ * `formatDayAndMonth` carries if a backend zone ever arrives here. Each half borrows the
+ * locale whose shape it needs, `en-CA` for the `YYYY-MM-DD` order and `en-GB` for the 24
+ * hour clock, and joining them here keeps the result stable whatever separator a locale
+ * would pick; `en-GB` already defaults to `h23`, so `hourCycle` is not load-bearing and
+ * only guards a device ICU that would resolve it otherwise and render midnight as `24`.
+ */
+export const formatUnixTimestampYMDHM = ({
+  timestampSeconds,
+  timezone,
+}: {
+  timestampSeconds: number
+  timezone?: string
+}): string => {
+  const time = new Date(timestampSeconds * 1000).toLocaleTimeString("en-GB", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+    timeZone: timezone,
+  })
+
+  return `${formatShortDate({ createdAt: timestampSeconds, timezone })} ${time}`
+}
+
+export const formatDayAndMonth = ({
+  timestampSeconds,
+  locale,
+  timezone,
+}: {
+  timestampSeconds: number
+  locale?: string
+  timezone?: string
+}): string => {
+  const date = new Date(timestampSeconds * 1000)
+  const resolvedLocale = locale ?? "en-US"
+  try {
+    return date.toLocaleDateString(resolvedLocale, {
+      day: "numeric",
+      month: "long",
+      timeZone: timezone,
+    })
+  } catch (err) {
+    /** A malformed backend timezone makes toLocaleDateString throw a RangeError; fall back
+     *  to the device timezone so one bad string never crashes the home for every user. */
+    reportError("formatDayAndMonth timezone", err)
+    return date.toLocaleDateString(resolvedLocale, {
+      day: "numeric",
+      month: "long",
+    })
+  }
+}
+
 export const parseCardValidThru = (
   value: string | Date,
 ): { month: string; year: string } | null => {
@@ -110,16 +160,19 @@ export const parseCardValidThru = (
 }
 
 export const formatDateFromNow = ({
-  years,
+  years = 0,
+  months = 0,
   locale,
   format = "display",
 }: {
-  years: number
+  years?: number
+  months?: number
   locale?: string
   format?: "display" | "iso"
 }): string => {
   const date = new Date()
-  date.setFullYear(date.getFullYear() + years)
+  if (years) date.setFullYear(date.getFullYear() + years)
+  if (months) date.setMonth(date.getMonth() + months)
   if (format === "iso") return date.toISOString().split("T")[0]
 
   return date.toLocaleDateString(locale ?? "en-US", {

@@ -4,6 +4,7 @@ import { AppState } from "react-native"
 import { type BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
 import crashlytics from "@react-native-firebase/crashlytics"
 
+import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { type NormalizedTransaction } from "@app/types/transaction"
 import { ActiveWalletStatus, type WalletState } from "@app/types/wallet"
 import { reportError } from "@app/utils/error-logging"
@@ -77,6 +78,7 @@ export const useSdkLifecycle = (
   retryCount: number,
 ): SdkLifecycleState => {
   const network = useSparkNetwork()
+  const { selfCustodialDepositClaimLeewayVbyte } = useRemoteConfig()
   const [wallets, setWallets] = useState<WalletState[]>([])
   const [allTransactions, setAllTransactions] = useState<NormalizedTransaction[]>([])
   const [status, setStatus] = useState<ActiveWalletStatus>(ActiveWalletStatus.Unavailable)
@@ -91,20 +93,40 @@ export const useSdkLifecycle = (
   const abortRef = useRef(false)
   const refreshingRef = useRef(false)
   const pendingRefreshRef = useRef(false)
+  /** Callers waiting for the first refresh iteration that starts at or after
+   *  their call, resolved iteration by iteration — no caller adopts the whole
+   *  drain loop's lifetime (offline, the 10s poll can re-arm it indefinitely). */
+  const refreshWaitersRef = useRef<(() => void)[]>([])
   const rawTxOffsetRef = useRef(0)
+  /**
+   * The leeway only feeds the SDK config at connect time, so hold it in a ref:
+   * a remote-config change must not tear down and reconnect the live wallet.
+   */
+  const depositClaimLeewayRef = useRef(selfCustodialDepositClaimLeewayVbyte)
+  depositClaimLeewayRef.current = selfCustodialDepositClaimLeewayVbyte
   const { schedule: scheduleBackoffRetry, reset: resetBackoff } =
     useBackoffRetry(RECONNECT_BACKOFF_MS)
 
   // `refreshingRef` linearizes concurrent refreshes (10s poll, AppState change,
   // SDK events): only one runOnce executes at a time, and any overlapping call
-  // sets `pendingRefreshRef` so the in-flight loop reruns once it returns. The
-  // two require-atomic-updates disables below (post-await ref writes) are safe
-  // under that invariant.
+  // sets `pendingRefreshRef` so the in-flight loop reruns once it returns.
+  // Every caller awaits only the iteration that serves it (refreshWaitersRef):
+  // fresh data before pull-to-refresh retracts, without waiting on the whole
+  // drain loop. The require-atomic-updates disables below (post-await ref
+  // writes) are safe under that invariant.
   const refreshWallets = useCallback(async () => {
     const sdk = sdkRef.current
     if (!sdk) return
+    const settled = new Promise<void>((resolve) => {
+      refreshWaitersRef.current.push(resolve)
+    })
     if (refreshingRef.current) {
+      // The in-flight do/while below reruns while pendingRefreshRef is set;
+      // this caller's waiter resolves when the rerun serving it completes —
+      // not before any data landed (the spinner would retract on stale
+      // values), and not after the loop's open-ended lifetime either.
       pendingRefreshRef.current = true
+      await settled
       return
     }
     refreshingRef.current = true
@@ -156,14 +178,29 @@ export const useSdkLifecycle = (
       }
     }
 
-    try {
-      do {
-        pendingRefreshRef.current = false
-        await runOnce()
-      } while (pendingRefreshRef.current)
-    } finally {
-      refreshingRef.current = false // eslint-disable-line require-atomic-updates
-    }
+    // The drain loop runs detached (runOnce never rejects — its catch handles
+    // everything); each iteration serves the waiters registered before it
+    // started, and anyone arriving mid-iteration re-arms pendingRefreshRef to
+    // be served by the next.
+    ;(async () => {
+      try {
+        do {
+          const waiters = refreshWaitersRef.current
+          refreshWaitersRef.current = []
+          pendingRefreshRef.current = false
+          await runOnce()
+          for (const resolve of waiters) resolve()
+        } while (pendingRefreshRef.current)
+      } finally {
+        refreshingRef.current = false // eslint-disable-line require-atomic-updates
+        // Belt and braces: a waiter can only be left behind if the loop exits
+        // abnormally; never strand its caller.
+        const leftover = refreshWaitersRef.current
+        refreshWaitersRef.current = [] // eslint-disable-line require-atomic-updates
+        for (const resolve of leftover) resolve()
+      }
+    })()
+    await settled
   }, [resetBackoff, scheduleBackoffRetry])
 
   useEffect(() => {
@@ -183,11 +220,12 @@ export const useSdkLifecycle = (
     const accountId = activeSelfCustodialAccountId
 
     const connectAndListen = async (mnemonic: string) => {
-      const connectedSdk = await initSdk(
+      const connectedSdk = await initSdk({
         mnemonic,
-        storageDirFor(accountId, network),
+        storageDir: storageDirFor(accountId, network),
         network,
-      )
+        leewaySatPerVbyte: depositClaimLeewayRef.current,
+      })
       if (abortRef.current || !mounted) {
         await teardownSdk(connectedSdk, null)
         return
@@ -223,7 +261,6 @@ export const useSdkLifecycle = (
         })
         .catch((err) => {
           logSdkEvent(SdkLogLevel.Error, `getUserSettings failed: ${err}`)
-          crashlytics().recordError(new Error(`getUserSettings failed: ${err}`))
         })
     }
 

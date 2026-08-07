@@ -1,4 +1,38 @@
 {
+    "ApiScreen": {
+        "keysGroupTitle": "APIキー",
+        "noKeys": "APIキーはまだありません",
+        "createKey": "APIキーを作成",
+        "createTitle": "新しいAPIキー",
+        "keyCreatedTitle": "APIキーを作成しました",
+        "keyName": "キー名",
+        "keyNamePlaceholder": "例: BTCPay Server",
+        "scopeRead": "読み取り",
+        "scopeReadDescription": "残高と取引履歴を表示",
+        "scopeReceive": "受け取り",
+        "scopeReceiveDescription": "請求書を作成し支払いを受け取る",
+        "scopeWrite": "書き込み",
+        "writeScopeDashboardOnly": "支払いを送信できるキーは dashboard.blink.sv でのみ作成できます",
+        "expiry": "有効期限",
+        "expiry30Days": "30日",
+        "expiry90Days": "90日",
+        "expiryNever": "なし",
+        "expiresOn": "{date: string} に期限切れ",
+        "neverExpires": "有効期限なし",
+        "revoked": "取り消し済み",
+        "expired": "{date: string} に期限切れ",
+        "expiredNoDate": "期限切れ",
+        "secretWarning": "キーが表示されるのはこの一度だけです。今すぐコピーまたは共有し、安全に保管してください。",
+        "secretCopied": "APIキーをコピーしました。クリップボードは1分後に消去されます",
+        "revokeTitle": "APIキーを取り消しますか？",
+        "revokeBody": "「{name: string}」は直ちに機能しなくなります。この操作は元に戻せません。",
+        "revoke": "取り消す",
+        "revokeSuccess": "APIキーを取り消しました",
+        "createError": "APIキーを作成できませんでした。もう一度お試しください。",
+        "revokeError": "APIキーを取り消せませんでした。もう一度お試しください。",
+        "loadError": "APIキーを読み込めませんでした。後でもう一度お試しください。",
+        "done": "完了"
+    },
     "GaloyAddressScreen": {
         "title": "以下の方法で受金できます：",
         "buttonTitle": "アドレスを設定",
@@ -2003,7 +2037,7 @@
         "satAccumulated": "累計 sats",
         "satsEarned": "{formattedNumber | sats}を獲得しました",
         "sectionsCompleted": "完了しました",
-        "title": "獲得する",
+        "title": "学ぶ",
         "unlockQuestion": "アンロックするには、質問に答えてください：",
         "youEarned": "獲得額",
         "registerTitle": "ウォレットのアップグレードが必要です",
@@ -2011,6 +2045,7 @@
         "oneSectionADay": "1日1セクション！",
         "availableTomorrow": "明日また戻ってきて、学びながらsatsを獲得しましょう。\n\nまたは、「続ける」をタップして報酬なしで学習を続けることもできます。",
         "motivatingBadger": "レッスンを掘り進めて、学びながら稼ごう",
+        "motivatingBadgerNoRewards": "レッスンを掘り進めて、ビットコインについて学ぼう",
         "continueNoRewards": "続ける（報酬なし）",
         "somethingNotRight": "問題が発生しました...",
         "defaultErrorMessage": "{errorMessage: string} 後でもう一度お試しください。\nまたは、タップして報酬なしで学習を続けることもできます。",
@@ -2049,7 +2084,7 @@
         "login": "ログイン",
         "loginOrRestore": "ログイン / 復元",
         "logBackInWith": "再ログイン：",
-        "headline": "Galoyが提供するウォレット",
+        "headline": "Blinkが提供するウォレット",
         "startTrialAccount": "トライアルウォレットで始める",
         "startWithTrialAccount": "トライアルウォレットで始める",
         "registerPhoneAccount": "電話番号でウォレット登録する",
@@ -2075,6 +2110,7 @@
         "error": "位置情報の取得中にエラーが発生しました"
     },
     "HomeScreen": {
+        "pendingReceiveBadge": "+{amount: string} 保留中",
         "receive": "受金",
         "send": "送金",
         "title": "ホーム",
@@ -2163,6 +2199,9 @@
         "lightningInvoice": "Lightningインボイス",
         "bitcoinOnchain": "Bitcoin onchain",
         "depositFee": "入金手数料：{threshold} SAT未満は{fee} SAT、{threshold} SAT以上の入金は{overFee} SAT",
+        "depositFeeTiers": "Deposit fees: {tiers: string}",
+        "depositFeeTierUpTo": "{fee: string} SAT up to {max: string} SAT",
+        "depositFeeTierAbove": "{fee: string} SAT above {min: string} SAT",
         "autoConvertMinAmount": "{minSats: number} sats / {minFiat: string}未満の金額はドルに自動変換できません。代わりにビットコインを受け取ります。",
         "autoConvertFailed": "支払いは受け取りましたが、変換に失敗しました。",
         "pleaseWaitForConversion": "変換が完了するまでお待ちください"
@@ -2261,6 +2300,10 @@
         "invalidPhoneNumber": "有効な携帯電話番号を入力してください",
         "phoneNotAllowed": "このフィールドでは電話番号を使用できません"
     },
+    "MerchantSelectionScreen": {
+        "title": "支払いオプションを選択",
+        "empty": "利用できる支払いオプションはありません。"
+    },
     "SendBitcoinScreen": {
         "willBeSentToMempoolBy": "トランザクションはメモリプールに送信されます",
         "amount": "金額",
@@ -2279,7 +2322,6 @@
         "notConfirmed": "支払いが送金されました\nただし、まだ承認されていません\n\n支払い状況については\nトランザクションで確認できます",
         "note": "メモとラベル",
         "success": "支払いは正常に送金されました",
-        "suggestionInput": "提案を入力してください",
         "max": "最大",
         "maxAmount": "最大限度額",
         "title": "ビットコインを送金する",
@@ -2319,6 +2361,10 @@
         "sdkGenericError": "手数料を見積もれません。別の金額をお試しください。"
     },
     "SettingsScreen": {
+        "createAddress": "アドレスを作成",
+        "donationButton": "寄付ボタン",
+        "btcpayServer": "BTCPay Server",
+        "woocommerce": "WooCommerce",
         "staticQr": "印刷用静的QR",
         "staticQrCopied": "静的QRコードのリンクをコピーしました",
         "setByOs": "OSの設定に準拠",
@@ -2327,7 +2373,6 @@
         "apiDashboard": "APIアクセスとダッシュボード",
         "pos": "ポイント・オブ・セール",
         "posCopied": "ポイント・オブ・セールのリンクをコピーしました",
-        "setYourLightningAddress": "Lightningアドレスを設定",
         "activated": "アクティベーション",
         "addressScreen": "さまざまな受金方法を見る",
         "nonCustodialAccount": "非カストディアルアカウント",
@@ -2525,7 +2570,32 @@
         "receivingAccount": "受金ウォレット",
         "sendingAccount": "送金ウォレット",
         "txNotBroadcast": "あなたのトランザクションは現在保留中ですが、すぐにビットコインネットワークに反映されます。",
-        "momentarily": "まもなく"
+        "momentarily": "まもなく",
+        "findingAccount": "この支払いのアカウントを探しています...",
+        "txNotFoundInAccounts": "この支払いはこのデバイスのどのアカウントにも見つかりませんでした。ログアウトしたアカウントのものである可能性があります。",
+        "txLoadFailed": "この支払いを読み込めませんでした。接続を確認して、もう一度お試しください。",
+        "switchedForPayment": "この支払いを表示するため {identifier: string} に切り替えました"
+    },
+    "FeeRatesScreen": {
+        "title": "手数料率",
+        "send": "送金",
+        "receive": "受金",
+        "transfer": "振替",
+        "lightning": "ライトニング",
+        "intraledger": "イントラレジャー",
+        "onchainPriority": "オンチェーン優先 (最速)",
+        "onchainStandard": "オンチェーン標準 (~4時間)",
+        "onchainEconomy": "オンチェーン節約",
+        "lightningTransactions": "ライトニング取引",
+        "onchainBelowThreshold": "オンチェーン {threshold: string} SAT未満",
+        "onchainAboveThreshold": "オンチェーン {threshold: string} SAT超",
+        "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
+        "transferFee": "振替手数料",
+        "noFee": "手数料なし",
+        "lightningSendFee": "{fee: string} + ~{routingFee: string} ルーティング手数料",
+        "fromApprox": "~{fee: string} から",
+        "satAmount": "{amount: string} SAT",
+        "error": "現時点では手数料を取得できません"
     },
     "TransactionLimitsScreen": {
         "receive": "受金",
@@ -2570,7 +2640,8 @@
             "tooLong": "アドレスは50文字以上でなければなりません",
             "invalidCharacter": "アドレスにはアルファベット、数字、アンダースコアのみ使用できます",
             "addressUnavailable": "申し訳ありませんが、このアドレスは既に使われています",
-            "unknownError": "不明なエラーが発生しました。時間をあけてもう一度トライしてみてください"
+            "unknownError": "不明なエラーが発生しました。時間をあけてもう一度トライしてみてください",
+            "backupRequired": "Back up your wallet before creating a Lightning address"
         },
         "receiveMoney": "このアドレスで他のライトニング・ウォレットや{bankName: string}ユーザーからお金を受け取ります。",
         "itCannotBeChanged": "あとから変更することはできません"
@@ -2700,6 +2771,8 @@
     },
     "common": {
         "country": "国",
+        "registered": "登録済み",
+        "detected": "検出",
         "unknown": "不明",
         "enabled": "有効",
         "switch": "スイッチ",
@@ -2719,6 +2792,7 @@
         "anonymousUser": "匿名ユーザー",
         "blinkToBlink": "Blink から Blink へ",
         "transactionLimits": "トランザクション限度額",
+        "feeRates": "手数料率",
         "activateWallet": "ウォレットを有効化する",
         "amountRequired": "金額の入力は必要です",
         "back": "戻る",
@@ -2732,6 +2806,7 @@
         "bitcoinPrice": "ビットコイン価格",
         "btcAccount": "ビットコインウォレット",
         "cancel": "キャンセル",
+        "card": "カード",
         "close": "閉じる",
         "confirm": "承認する",
         "convert": "両替",
@@ -2800,6 +2875,7 @@
         "total": "合計",
         "transactions": "トランザクション",
         "transactionsError": "トランザクションの読み込みエラー",
+        "transfer": "振替",
         "tryAgain": "再トライする",
         "type": "入力する",
         "usdAccount": "ドルウォレット",
@@ -2816,6 +2892,7 @@
         "problemMaybeReauth": "リクエストに失敗しました。1分後に再トライしてください。問題が解決しない場合は、一旦ログアウトし、再ログインすることをお勧めします。設定 ＞ウォレット ＞ログアウトで、ログアウトできます。",
         "warning": "警告",
         "continue": "続ける",
+        "skip": "スキップ",
         "correct": "正解",
         "recommended": "おすすめ",
         "expirationTime": "有効期限",
@@ -2870,11 +2947,9 @@
         "email": "メールアドレス",
         "sms": "SMS",
         "faq": "よくある質問",
-        "enjoyingApp": "このアプリが気に入りましたか？",
         "statusPage": "ステータス",
         "telegram": "Telegram",
         "mattermost": "Mattermost",
-        "thankYouText": "フィードバックをありがとうございます。改善策をご提案いただけますか？",
         "defaultEmailSubject": "{bankName: string} - サポート",
         "defaultSupportMessage": "Hey there! I need some help with {bankName: string}, I'm using the version {version: string} on {os: string}.",
         "emailCopied": "メールアドレス{email: string}がクリップボードにコピーされました",
@@ -3016,6 +3091,66 @@
         "networkVisa": "Visa",
         "cardFrozenTitle": "カードが凍結されました",
         "cardFrozenSubtitle": "カードは一時的に無効になっています",
+        "CardFeeSchedule": {
+            "title": "Blink カード手数料スケジュール",
+            "effectiveDate": "2026年7月1日より有効",
+            "sections": {
+                "cardFees": "カード手数料",
+                "transactionFees": "取引手数料",
+                "overdraft": "当座貸越（資金供給モード）"
+            },
+            "fees": {
+                "annualFee": {
+                    "title": "年会費",
+                    "subtitle": "カード発行日から最初の1年間は免除",
+                    "value": "{amount: string} / 年"
+                },
+                "cardReplacement": {
+                    "title": "カード再発行"
+                },
+                "usdTransactionFee": {
+                    "title": "USD取引手数料",
+                    "subtitle": "米ドルでの各取引に適用されます"
+                },
+                "foreignTransactionFee": {
+                    "title": "外貨取引手数料",
+                    "subtitle": "米ドル以外の通貨での各取引に適用されます"
+                },
+                "maximumOverdraft": {
+                    "title": "最大当座貸越額",
+                    "subtitle": "7日以内に返済する必要があります"
+                },
+                "lateRepaymentFee": {
+                    "title": "延滞返済手数料",
+                    "subtitle": "当座貸越が7日以内に返済されない場合に請求されます"
+                }
+            },
+            "btcConversion": {
+                "title": "BTC変換",
+                "body": "取引にBTCからUSDへの変換が必要な場合、変換は実勢為替レートで実行され、変換コストを反映したスプレッドが含まれる場合があります。"
+            },
+            "feesUpdateNotice": {
+                "text": "手数料は随時更新される場合があります。Blinkは、手数料の変更が有効になる少なくとも30日前に、次に従って通知します：",
+                "linkText": "カード会員規約"
+            },
+            "creditModeNotice": "クレジットモードは現在有効ではありません。クレジットモードが有効化された場合、適用される金利、手数料、および請求権に関する開示は、有効化の前に提供されます。",
+            "additionalDetails": {
+                "title": "手数料の追加詳細",
+                "overdraft": {
+                    "label": "当座貸越",
+                    "text": "。特定の状況では、カード残高がゼロを下回る取引が承認される場合があります。最大当座貸越額は {maxOverdraft: string} です。7日以内に追加資金をカード残高に送金して当座貸越を返済する必要があります。"
+                },
+                "foreignCurrency": {
+                    "label": "外貨",
+                    "text": "。外貨で取引を行う場合、カードネットワークが独自の変換手順を使用してUSDに変換します。処理日のレートは取引日と異なる場合があります。"
+                },
+                "noHiddenFees": {
+                    "label": "隠れた手数料なし",
+                    "text": "。口座開設、非アクティブ、残高照会、カードの解約に手数料はかかりません。"
+                }
+            },
+            "backButton": "戻る"
+        },
         "CardDetails": {
             "title": "カード詳細",
             "cardNumber": "カード番号",
@@ -3390,6 +3525,7 @@
                 "perYear": "年額",
                 "status": {
                     "label": "ステータス",
+                    "specialOfferLabel": "特別オファー",
                     "paymentPending": "支払い保留中",
                     "firstYearFree": "初年度無料"
                 },
@@ -3403,7 +3539,11 @@
                     "cardholderAgreement": "カード会員契約",
                     "and": "および"
                 },
-                "renew": "サブスクリプションが1年後に自動更新されることを理解しています"
+                "feeSchedule": {
+                    "text": "以下を確認し、同意します：",
+                    "linkText": "Blink Card 手数料表"
+                },
+                "renew": "サブスクリプションが{months: number}か月後に自動的に更新されることを理解しています"
             },
             "CardIntroducing": {
                 "title": "ご紹介",
@@ -3465,13 +3605,29 @@
                 "buttonText": "申請を提出",
                 "select": "選択"
             },
+            "Acknowledgement": {
+                "title": "利用規約",
+                "acceptButton": "同意する",
+                "eSignConsent": {
+                    "text": "次に同意します：",
+                    "linkText": "電子署名への同意"
+                },
+                "privacyAndTerms": {
+                    "text": "次に同意します：",
+                    "privacyPolicyLinkText": "発行者のプライバシーポリシー",
+                    "and": "、および",
+                    "cardTermsLinkText": "Blink カードの規約"
+                },
+                "certifyAccuracy": "提供した情報が正確であること、および Blink Visa カードに関するすべての規則と要件を遵守することを証明します",
+                "acknowledgeSolicitation": "Blink Visa カードの申し込みが不正な勧誘に該当しないことを認めます"
+            },
             "CardPreapproved": {
                 "title": "Blink Visaカードの事前承認が完了しました！",
                 "buttonText": "閉じる"
             },
             "CardProcessing": {
                 "title": "申請を処理中",
-                "subtitle": "推定待ち時間: {waitTime: string}",
+                "subtitle": "準備ができ次第、お知らせします",
                 "buttonText": "閉じる"
             }
         }
@@ -3499,6 +3655,7 @@
             },
             "Phrase": {
                 "headerTitle": "リカバリーフレーズ",
+                "authDescription": "認証してリカバリーフレーズを表示",
                 "sparkCompatible": "このバックアップフレーズは{sparkCompatibleLink}で使用できます",
                 "sparkCompatibleLink": "Spark対応ウォレット",
                 "copiedToast": "バックアップフレーズをクリップボードにコピーしました",
@@ -3506,7 +3663,8 @@
                 "savedConfirm": "保存しました",
                 "copy": "コピー",
                 "continueButton": "続行",
-                "testBackup": "バックアップをテスト"
+                "testBackup": "バックアップをテスト",
+                "doNotShareWarning": "サポートを含め、誰にも見せないでください"
             },
             "Confirm": {
                 "headerTitle": "バックアップフレーズの確認",
@@ -3538,6 +3696,7 @@
             "uploadSuccess": "{provider}にバックアップを保存しました",
             "uploadFailed": "バックアップのアップロードに失敗しました",
             "signInFailed": "{provider}へのサインインに失敗しました",
+            "storageAccessRequired": "ウォレットのバックアップのために {provider: string} へのアクセスを許可してから、もう一度お試しください。",
             "cloudNotAvailable": "iCloud Driveが利用できません。設定からiCloudにサインインし、iCloud Driveを有効にしてください。",
             "networkError": "ネットワークエラーが発生しました。接続を確認して、もう一度お試しください。",
             "existingBackupTitle": "バックアップが見つかりました",
@@ -3549,13 +3708,89 @@
         }
     },
     "AccountMigration": {
+        "contactSupport": {
+            "title": "サポートに連絡",
+            "body": "問題が発生しましたが、ご安心ください。資金は安全です。サポートにお問い合わせください。\n\nサポートが問題を解決するために、次の情報が必要になる場合があります：",
+            "reasonLabel": "理由",
+            "accountIdLabel": "アカウントID",
+            "pubKeyLabel": "pubKey",
+            "usernameLabel": "ユーザー名",
+            "emailLabel": "メールアドレス",
+            "phoneLabel": "電話番号",
+            "appVersionLabel": "アプリのバージョン",
+            "platformLabel": "プラットフォーム",
+            "countryLabel": "国",
+            "emailSubject": "移行サポートのリクエスト",
+            "emailDescribeProblem": "問題の内容をご記入ください：",
+            "emailAccountInfo": "サポート用アカウント情報：",
+            "contactUsCta": "お問い合わせ",
+            "copy": "コピー"
+        },
+        "migrateNowModal": {
+            "title": "今すぐ非カストディアルアカウントに移行してください",
+            "body": "カストディアルアカウントでは資金を受け取れなくなりました。Blinkはお住まいの地域でカストディアルサービスを終了し、このアカウントは{date}の終わりまでに無効化されます。\n\n今すぐ非カストディアルアカウントに移行してください。",
+            "migrateCta": "今すぐ移行"
+        },
+        "reminderBulletin": {
+            "title": "重要",
+            "body": "{date}までに、ガイド付き移行で非カストディアルアカウントに移行するか、資金を引き出してください。{receiveStopsDate}に受け取りが停止します。",
+            "migrateCta": "移行"
+        },
+        "offboardBulletin": {
+            "title": "重要",
+            "body": "お客様のアカウントは、当社がアカウントを提供できない地域で登録されています。8月31日までに資金を引き出してください。受け取りは8月10日に停止します。"
+        },
+        "dollarBalanceModal": {
+            "title": "ドル残高は移行できません",
+            "body": "まずドル残高を空にしてください。Blinkのビットコイン残高、または他の場所へ移すことができます。"
+        },
+        "balancesOverview": {
+            "title": "残高を移動する",
+            "body": "資金を安全に新しいアカウントに移動します。",
+            "currentBitcoinBalance": "現在のビットコイン残高",
+            "currentDollarBalance": "現在のドル残高",
+            "newBitcoinBalance": "新しいビットコイン残高",
+            "newDollarBalance": "新しいドル残高",
+            "dollarBalanceNotAvailable": "利用不可",
+            "networkFee": "ネットワーク手数料: <bold>{fee: string}</bold>",
+            "networkFeeCoveredByBlink": "ネットワーク手数料: <bold>{fee: string}</bold>（Blinkが負担）",
+            "retryCta": "再試行",
+            "approveCta": "承認",
+            "contactSupportCta": "サポートに連絡"
+        },
+        "migrationRequiredTitle": "アップグレードの時間です",
+        "keepReceivingTitle": "これまで通り受け取りを続けられます",
+        "keepReceivingBody": "あなたのLightningアドレスは、新しいノンカストディアルアカウントに引き継がれます。",
+        "keepReceivingLnAddressLabel": "あなたのLNアドレス",
+        "keepReceivingCta": "いいね",
+        "receivingDisabledToast": "現在、受け取りは無効になっています。",
+        "downloadHistoryTitle": "取引履歴をダウンロード",
+        "downloadHistoryBody": "新しいアカウントはゼロから始まります。取引の記録を残したい場合は、今すぐCSVとしてダウンロードしてください。",
+        "downloadHistoryDownloadCta": "ダウンロード",
+        "apiServiceTitle": "APIサービスは利用できません",
+        "apiServiceBody": "有効なAPIキーをお持ちのようです。BlinkはノンカストディアルモードではAPIを提供できません。\n\nBlinkのAPIに依存している場合は、早めにお問い合わせください。スムーズな移行をできる限りサポートします。",
+        "apiServiceContactCta": "お問い合わせ",
+        "apiServiceContinueCta": "このまま続行",
+        "resumeFailed": "移行の再開中に問題が発生しました。もう一度最初からやり直してください。",
+        "migrationRequiredBody": "カストディアルアカウントを非カストディアルアカウントに移行する時です。",
+        "migrationRequiredForcedBody": "カストディアルアカウントを非カストディアルアカウントに移行する時です。これは規制上の理由により必須です。\n\nご心配なく。長期的にはノンカストディアルの方があなたにとって良い選択です。",
+        "migrationGateTitle": "アカウントにアクセスできません",
+        "migrationGateBody": "規制上の理由により、お住まいの地域ではカストディアルアカウントを提供できません。次の手順に従って資金をBlinkのノンカストディアルアカウントに移すか、<link>{email}</link>までお問い合わせください。",
+        "bitcoinBalance": "ビットコイン残高",
+        "dollarBalance": "ドル残高",
         "moveToNonCustodial": "ノンカストディアルに移行",
         "explainerTitle": "ノンカストディアルへの移行とは？",
-        "explainerStep1": "Sparkプロトコル上にノンカストディアルアカウントを作成します、<link>詳細はこちら</link>",
-        "explainerStep2": "お客様の資金を新しいノンカストディアルアカウントに転送し、現在のアカウントは削除されます",
-        "explainerStep3": "これまで通りBlinkをご利用ください",
-        "letsMove": "移行する",
-        "transferringFunds": "資金を転送中です。数秒で完了するはずです。"
+        "explainerCheck1": "Sparkプロトコル上にノンカストディアルアカウントを作成します",
+        "explainerCheck2": "資金を新しいノンカストディアルアカウントに移します",
+        "explainerCheck3": "現在のアカウントと、取引履歴を含むすべてのデータは閉鎖されます",
+        "explainerCheck4": "Blink APIは利用できなくなります",
+        "explainerCheck5": "アカウントからSparkネットワーク手数料が差し引かれます",
+        "explainerCta": "理解しました",
+        "transferringFunds": "資金を転送中です。数秒で完了するはずです。",
+        "clockOutOfSync": {
+            "body": "デバイスの日付と時刻がずれています。続けるには自動設定にしてください。",
+            "retryCta": "再試行"
+        }
     },
     "AccountTypeSelectionScreen": {
         "custodialLabel": "カストディアル",
@@ -3583,6 +3818,7 @@
         "phraseSubtitleStep2": "バックアップフレーズの残りを入力してください",
         "nextWords": "次の6語",
         "paste": "貼り付け",
+        "pasteFailed": "クリップボードから読み取れませんでした。バックアップフレーズを手動で入力してください。",
         "enterWord": "単語",
         "invalidMnemonic": "無効なバックアップフレーズです。単語の順序が正しいか確認してください。",
         "restoring": "ウォレットを復元中...",
@@ -3594,7 +3830,9 @@
         "enterPassword": "暗号化パスワードを入力してください",
         "wrongPassword": "パスワードが正しくありません。再試行してください.",
         "pickBackupTitle": "ウォレットを選択",
-        "pickBackupDescription": "復元するバックアップを選択"
+        "pickBackupDescription": "復元するバックアップを選択",
+        "recognizePhraseTitle": "このバックアップフレーズに見覚えがありますか？",
+        "recognizePhraseBody": "他人から送られた単語は絶対に入力しないでください。"
     },
     "BackupNudge": {
         "title": "あなたの資金が危険にさらされています",
@@ -3604,6 +3842,16 @@
         "modalTitle": "資金を保護してください",
         "modalDescription": "このデバイスを紛失した場合の資金の完全な喪失を防ぐために、ウォレットのバックアップを強くお勧めします。",
         "secureMe": "ウォレットを保護"
+    },
+    "BackupRequired": {
+        "modalTitle": "Back up your wallet first",
+        "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
+        "backupNow": "Back up wallet"
+    },
+    "NonCustodialInfoBulletin": {
+        "title": "これは非カストディアルアカウントです",
+        "body": "詳しくはブログ記事をご覧ください",
+        "cta": "読む"
     },
     "StableBalance": {
         "title": "ステーブルバランス",
@@ -3638,7 +3886,7 @@
         "noAccountTitle": "Custodial account required",
         "noAccountDescription": "{featureName} requires a Blink custodial account.",
         "featureCircles": "Circles",
-        "featureEarn": "Earn",
+        "featureEarn": "学ぶ",
         "featureCard": "Card"
     },
     "WalletCreationScreen": {
@@ -3652,10 +3900,10 @@
         "lightningPayment": "Lightning支払い",
         "onchainDeposit": "On-chain入金",
         "onchainWithdrawal": "On-chain出金",
-        "conversionFromBitcoin": "Bitcoinからの変換",
-        "conversionToBitcoin": "Bitcoinへの変換",
-        "conversionFromToken": "{token}からの変換",
-        "conversionToToken": "{token}への変換",
+        "transferFromBitcoinBalance": "ビットコイン残高から振替",
+        "transferToBitcoinBalance": "ビットコイン残高へ振替",
+        "transferFromTokenBalance": "{token}残高から振替",
+        "transferToTokenBalance": "{token}残高へ振替",
         "tokenTransfer": "{token}送金",
         "payTo": "{address}に支払い",
         "payment": "支払い"

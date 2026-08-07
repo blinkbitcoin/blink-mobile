@@ -12,6 +12,15 @@ import { testProps } from "@app/utils/testProps"
 
 import { StatusPill, type StatusPillVariant } from "../status-pill"
 
+/** The 32pt balance sits directly under the fixed-size home header chrome;
+ *  uncapped Dynamic Type makes it overrun the username row above. */
+const MAX_BALANCE_FONT_SIZE_MULTIPLIER = 1.4
+
+/** Long pending amounts must not push the balance off-center: the real pill and
+ *  the centering ghost cap at the same width and shrink together, otherwise the
+ *  double-width centering trick breaks asymmetrically. */
+const MAX_STATUS_PILL_WIDTH = 120
+
 const Loader = () => {
   const styles = useStyles()
   return (
@@ -31,6 +40,7 @@ const Loader = () => {
 export type StatusBadge = {
   label: string
   status: StatusPillVariant
+  onPress?: () => void
 }
 
 type Props = {
@@ -87,6 +97,7 @@ export const BalanceHeader: React.FC<Props> = ({
                 {...testProps("balance-value")}
                 style={styles.primaryBalanceText}
                 allowFontScaling
+                maxFontSizeMultiplier={MAX_BALANCE_FONT_SIZE_MULTIPLIER}
                 adjustsFontSizeToFit
               >
                 {formattedBalance}
@@ -96,6 +107,7 @@ export const BalanceHeader: React.FC<Props> = ({
               <StatusPill
                 label={statusBadge.label}
                 status={statusBadge.status}
+                onPress={statusBadge.onPress}
                 testID="balance-status-badge"
                 style={styles.statusPill}
               />
@@ -158,9 +170,13 @@ const useStyles = makeStyles(({ colors }) => ({
   statusPill: {
     marginLeft: 6,
     marginTop: 2,
+    flexShrink: 1,
+    maxWidth: MAX_STATUS_PILL_WIDTH,
   },
   statusPillGhost: {
     marginRight: 6,
     marginTop: 2,
+    flexShrink: 1,
+    maxWidth: MAX_STATUS_PILL_WIDTH,
   },
 }))
