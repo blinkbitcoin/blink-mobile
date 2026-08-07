@@ -3711,6 +3711,7 @@
     "contactSupport": {
       "title": "Tuukirire ab'obuyambi",
       "body": "Waliwo ekitagenze bulungi, naye tofaayo, ssente zo nnywevu. Tuukirira ab'obuyambi bakuyambe.\n\nOyinza okwetaaga ebikwata ku bino okuyamba ab'obuyambi okugonjoola ensonga yo:",
+      "closeRefusedBody": "Okusengula kwo kuwedde era ssente zo ziri mu wallet yo empya. Tetusobodde kuggalawo akawunti yo enkadde mu ngeri ey'obwannamaddala, n'olwekyo abayamba be balina okukimaliriza ku lulwo.\n\nOyinza okwetaaga ebikwata ku bino okuyamba ab'obuyambi okugonjoola ensonga yo:",
       "reasonLabel": "Ensonga",
       "accountIdLabel": "ID ya akawunti",
       "pubKeyLabel": "pubKey",
@@ -3790,7 +3791,8 @@
     "clockOutOfSync": {
       "body": "Ennaku n'obudde bw'ekyuma kyo tebituukagana. Bisseeko ku otomatiki osobole okweyongerayo.",
       "retryCta": "Ddamu ogezaako"
-    }
+    },
+    "closeUnavailable": "Ssente zo ziri bulungi mu walletiyo empya. Tukyaggalawo akawunti yo eyedda, ddamu ogezaako mu kaseera katono."
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Eterekeddwa",

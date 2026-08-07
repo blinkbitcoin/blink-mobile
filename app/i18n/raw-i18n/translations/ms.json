@@ -3711,6 +3711,7 @@
     "contactSupport": {
       "title": "Hubungi sokongan",
       "body": "Sesuatu telah berlaku, tetapi jangan risau, dana anda selamat. Sila hubungi sokongan untuk mendapatkan bantuan.\n\nAnda mungkin memerlukan maklumat ini untuk membantu sokongan menyelesaikan kes anda:",
+      "closeRefusedBody": "Migrasi anda telah selesai dan dana anda berada dalam dompet baharu anda. Kami tidak dapat menutup akaun lama anda secara automatik, jadi sokongan perlu menyelesaikannya untuk anda.\n\nAnda mungkin memerlukan maklumat ini untuk membantu sokongan menyelesaikan kes anda:",
       "reasonLabel": "Sebab",
       "accountIdLabel": "ID akaun",
       "pubKeyLabel": "pubKey",
@@ -3790,7 +3791,8 @@
     "clockOutOfSync": {
       "body": "Tarikh dan masa peranti anda tidak segerak. Tetapkan kepada automatik untuk meneruskan.",
       "retryCta": "Cuba lagi"
-    }
+    },
+    "closeUnavailable": "Dana anda selamat dalam dompet baharu anda. Kami masih menutup akaun lama anda, sila cuba lagi sebentar."
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Kustodian",

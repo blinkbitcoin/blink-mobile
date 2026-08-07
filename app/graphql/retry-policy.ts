@@ -1,6 +1,8 @@
 import type { Operation } from "@apollo/client"
 import type { NetworkError } from "@apollo/client/errors"
 
+import { isUnauthorizedError } from "./transport-error"
+
 /**
  * GraphQL operations the global RetryLink must never auto-resend. These are
  * non-idempotent: money-moving payments and the state-committing migration mutations. A
@@ -41,9 +43,11 @@ const noRetryOperations = [
   "migrationStart",
   "migrationCommit",
   "migrationLnAddressTransfer",
-]
 
-const UNAUTHORIZED_STATUS = 401
+  // Irreversible, and it kills the token that authenticated it: a resend can neither undo
+  // the first attempt nor authenticate itself.
+  "accountDelete",
+]
 
 const IDEMPOTENCY_KEY_HEADER = "x-idempotency-key"
 
@@ -75,7 +79,16 @@ export const shouldRetryOperation = (
 ): boolean => {
   const hasError = Boolean(error)
   const isRetryableOperation = !noRetryOperations.includes(operationName)
-  const isUnauthorized =
-    (error as { statusCode?: number } | null)?.statusCode === UNAUTHORIZED_STATUS
+  const isUnauthorized = isUnauthorizedError(error)
   return hasError && isRetryableOperation && !isUnauthorized
 }
+
+/**
+ * Whether the dedicated 401 link should resend. It replays the identical request with the
+ * identical token, since nothing between the two links refreshes it, so the operations
+ * above gain nothing from it and risk a second, irreversible landing.
+ */
+export const shouldRetryUnauthorized = (
+  error: NetworkError,
+  operationName: string,
+): boolean => isUnauthorizedError(error) && !noRetryOperations.includes(operationName)

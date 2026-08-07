@@ -31,6 +31,7 @@ const mockNavigate = jest.fn()
 const mockGoBack = jest.fn()
 const mockSetOptions = jest.fn()
 let mockOrigin: MigrationSupportOrigin | undefined
+let mockCustodialAccountId: string | undefined
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
   useNavigation: () => ({
@@ -39,7 +40,13 @@ jest.mock("@react-navigation/native", () => ({
     setOptions: mockSetOptions,
   }),
   useRoute: () => ({
-    params: mockHasParams ? { reason: mockReason, origin: mockOrigin } : undefined,
+    params: mockHasParams
+      ? {
+          reason: mockReason,
+          origin: mockOrigin,
+          custodialAccountId: mockCustodialAccountId,
+        }
+      : undefined,
   }),
   useFocusEffect: (callback: () => void | (() => void)) =>
     jest.requireActual<typeof import("react")>("react").useEffect(callback, [callback]),
@@ -77,12 +84,13 @@ const mockBuildDiagnostics = () =>
   ].filter((diagnostic) => Boolean(diagnostic.value))
 
 jest.mock("@app/screens/account-migration/hooks/use-migration-support-email", () => ({
-  useMigrationSupportEmail: (reason: string) => mockUseMigrationSupportEmail(reason),
+  useMigrationSupportEmail: (reason: string, custodialAccountId?: string) =>
+    mockUseMigrationSupportEmail(reason, custodialAccountId),
 }))
 
 const MOCK_SUPPORT_DETAILS_TEXT = "reason and identity and environment block"
 
-const mockUseMigrationSupportEmail = jest.fn((reason: string) => ({
+const mockUseMigrationSupportEmail = jest.fn((reason: string, _id?: string) => ({
   cardDetails: [
     { label: LLSupport.reasonLabel(), value: reason, isIdentifier: false },
     ...mockBuildDiagnostics(),
@@ -105,6 +113,7 @@ describe("MigrationContactSupportScreen", () => {
     mockReason = MigrationSupportReason.PreviewUnavailable
     mockHasParams = true
     mockOrigin = undefined
+    mockCustodialAccountId = undefined
     mockDetails = {
       accountId: "18A4242",
       pubKey: "spbc1pdjsovJFPej9i2vuK",
@@ -112,6 +121,45 @@ describe("MigrationContactSupportScreen", () => {
       email: "email@email.com",
       phone: "+1 374 9383 993",
     }
+  })
+
+  /** The migration succeeded here, so the generic "something went wrong" would contradict
+   *  the success the user was just shown: only the old account is left to close. */
+  it("tells a refused close that the migration worked and only the old account is left", async () => {
+    mockReason = MigrationSupportReason.CustodialAccountCloseRefused
+    renderScreen()
+    await flushEffects()
+
+    expect(
+      screen.getByText(
+        "Your migration is complete and your funds are in your new wallet. We could not close your old account automatically, so support needs to finish it for you.\n\nYou may need this information to help support resolve your case:",
+      ),
+    ).toBeTruthy()
+  })
+
+  it("keeps the generic body for every other reason", async () => {
+    renderScreen()
+    await flushEffects()
+
+    expect(
+      screen.getByText(
+        "Something went wrong but don't worry your funds are safe, please contact support for assistance.\n\nYou may need this information to help support resolve your case:",
+      ),
+    ).toBeTruthy()
+  })
+
+  /** The session is already discarded by the time this handover opens, so the live account
+   *  query is skipped and the id has to arrive as a param or the ticket names nobody. */
+  it("passes the custodial account id through to the ticket details", async () => {
+    mockReason = MigrationSupportReason.CustodialAccountCloseRefused
+    mockCustodialAccountId = "custodial-1"
+    renderScreen()
+    await flushEffects()
+
+    expect(mockUseMigrationSupportEmail).toHaveBeenCalledWith(
+      "custodial-account-close-refused",
+      "custodial-1",
+    )
   })
 
   it("redirects the hardware back to the commit point instead of exiting", async () => {
@@ -222,7 +270,10 @@ describe("MigrationContactSupportScreen", () => {
 
     expect(screen.getByText(LLSupport.reasonLabel())).toBeTruthy()
     expect(screen.getByText("locked-without-checkpoint")).toBeTruthy()
-    expect(mockUseMigrationSupportEmail).toHaveBeenCalledWith("locked-without-checkpoint")
+    expect(mockUseMigrationSupportEmail).toHaveBeenCalledWith(
+      "locked-without-checkpoint",
+      undefined,
+    )
   })
 
   it("renders the hero, every diagnostics row and the contact action", async () => {
@@ -280,7 +331,7 @@ describe("MigrationContactSupportScreen", () => {
     renderScreen()
     await flushEffects()
 
-    expect(mockUseMigrationSupportEmail).toHaveBeenCalledWith("start-refused")
+    expect(mockUseMigrationSupportEmail).toHaveBeenCalledWith("start-refused", undefined)
   })
 
   /** The error screen is the support channel, so what failed is on the screen,
@@ -301,7 +352,7 @@ describe("MigrationContactSupportScreen", () => {
     renderScreen()
     await flushEffects()
 
-    expect(mockUseMigrationSupportEmail).toHaveBeenCalledWith("unknown")
+    expect(mockUseMigrationSupportEmail).toHaveBeenCalledWith("unknown", undefined)
   })
 
   it("sends the support email from the contact action", async () => {

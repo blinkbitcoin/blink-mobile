@@ -3711,6 +3711,7 @@
     "contactSupport": {
       "title": "Kontaktirajte podršku",
       "body": "Nešto je pošlo po zlu, ali ne brinite, vaša su sredstva sigurna. Obratite se podršci za pomoć.\n\nOve informacije mogu pomoći podršci da riješi vaš slučaj:",
+      "closeRefusedBody": "Vaša migracija je dovršena i vaša sredstva su u novom novčaniku. Vaš stari račun nismo mogli zatvoriti automatski, pa to podrška mora dovršiti umjesto vas.\n\nOve informacije mogu pomoći podršci da riješi vaš slučaj:",
       "reasonLabel": "Razlog",
       "accountIdLabel": "ID računa",
       "pubKeyLabel": "pubKey",
@@ -3790,7 +3791,8 @@
     "clockOutOfSync": {
       "body": "Datum i vrijeme vašeg uređaja nisu usklađeni. Postavite ih na automatski način rada za nastavak.",
       "retryCta": "Pokušaj ponovno"
-    }
+    },
+    "closeUnavailable": "Vaša su sredstva sigurna u vašem novom novčaniku. Još zatvaramo vaš stari račun, pokušajte ponovno za trenutak."
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Pod skrbništvom",

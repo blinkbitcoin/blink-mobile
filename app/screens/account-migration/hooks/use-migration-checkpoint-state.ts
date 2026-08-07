@@ -124,6 +124,10 @@ export const useMigrationCheckpointState = () => {
   return {
     checkpoint,
     accountId,
+    /** The owner the record was actually saved under, null on one written before owners
+     *  existed. Read by consumers that spend something irreversible, since the ownership
+     *  flag above claims an owner-less record for whoever is active. */
+    checkpointOwnerId: stored?.custodialAccountId ?? null,
     loading: loading || ownerLoading,
     /** A read failure surfaced, not swallowed: without it an unreadable store is
      *  indistinguishable from a wiped device, and the gate would hand a resumable user

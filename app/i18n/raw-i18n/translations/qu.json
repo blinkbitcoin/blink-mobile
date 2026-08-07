@@ -3711,6 +3711,7 @@
     "contactSupport": {
       "title": "Yanapakuyta maskay",
       "body": "Imapas mana allinchu karqan, ichaqa ama llakikuychu, qullqiykikuna waqaychasqam kachkan. Ama hina kaspa yanapakuyta maskay.\n\nKay willakuykunata munawaq yanapakuqkuna hawkachinankupaq:",
+      "closeRefusedBody": "Astakuyniyki tukusqañam, qullqiykipas musuq qhipiykipiñam. Mawk'a cuentaykita mana kikinmanta wichq'ayta atirqanikuchu, chayrayku yanapaqkuna qammanta tukuchinanku.\n\nKay willakuykunata munawaq yanapakuqkuna hawkachinankupaq:",
       "reasonLabel": "Imarayku",
       "accountIdLabel": "Kuenta ID",
       "pubKeyLabel": "pubKey",
@@ -3790,7 +3791,8 @@
     "clockOutOfSync": {
       "body": "Dispositivoykipa p'unchawnin hinaspa horan mana huñusqachu. Automáticoman churay qatinaykipaq.",
       "retryCta": "Kutiy yapamuy"
-    }
+    },
+    "closeUnavailable": "Qullqiykiqa musuq qipiykipi allinmi kachkan. Ñawpaq cuentaykitaraq wichqachkaniku, ama hina kaspa huk ratumanta yapamanta ruway."
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Waqaychasqa",

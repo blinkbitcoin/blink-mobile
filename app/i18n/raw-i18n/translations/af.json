@@ -3711,6 +3711,7 @@
     "contactSupport": {
       "title": "Kontak ondersteuning",
       "body": "Iets het verkeerd geloop, maar moenie bekommerd wees nie, jou fondse is veilig. Kontak asseblief ondersteuning vir hulp.\n\nJy mag dalk hierdie inligting nodig hê om ondersteuning te help om jou saak op te los:",
+      "closeRefusedBody": "Jou migrasie is voltooi en jou fondse is in jou nuwe beursie. Ons kon nie jou ou rekening outomaties sluit nie, so ondersteuning moet dit vir jou afhandel.\n\nJy mag dalk hierdie inligting nodig hê om ondersteuning te help om jou saak op te los:",
       "reasonLabel": "Rede",
       "accountIdLabel": "Rekening-ID",
       "pubKeyLabel": "pubKey",
@@ -3790,7 +3791,8 @@
     "clockOutOfSync": {
       "body": "Die datum en tyd van jou toestel is nie in sinkronisasie nie. Stel dit op outomaties om voort te gaan.",
       "retryCta": "Probeer weer"
-    }
+    },
+    "closeUnavailable": "Jou fondse is veilig in jou nuwe beursie. Ons is nog besig om jou ou rekening te sluit, probeer asseblief oor 'n oomblik weer."
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Bewaard",

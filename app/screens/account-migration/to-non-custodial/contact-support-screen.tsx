@@ -49,8 +49,15 @@ export const MigrationContactSupportScreen: React.FC = () => {
   /** Callers must pass a reason, but a navigation-state restore can land here with none;
    *  a named fallback keeps the ticket meaningful instead of crashing on a missing param. */
   const reason = params?.reason ?? MigrationSupportReason.Unknown
-  const { cardDetails, supportDetailsText, sendSupportEmail } =
-    useMigrationSupportEmail(reason)
+  const { cardDetails, supportDetailsText, sendSupportEmail } = useMigrationSupportEmail(
+    reason,
+    params?.custodialAccountId,
+  )
+
+  /** The migration succeeded here, so the generic "something went wrong" would contradict
+   *  the success the user was just shown: only the old account is left to close. */
+  const isCloseRefused = reason === MigrationSupportReason.CustodialAccountCloseRefused
+  const body = isCloseRefused ? LLSupport.closeRefusedBody() : LLSupport.body()
 
   /**
    * Back depends on where support was opened from. Mid-migration the commit point (Step 8)
@@ -117,7 +124,7 @@ export const MigrationContactSupportScreen: React.FC = () => {
           icon="headset"
           iconColor={colors.primary}
           title={LLSupport.title()}
-          subtitle={LLSupport.body()}
+          subtitle={body}
         />
 
         <ScrollView style={styles.scroll} contentContainerStyle={styles.body}>

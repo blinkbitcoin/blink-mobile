@@ -3711,6 +3711,7 @@
     "contactSupport": {
       "title": "Contacta amb suport",
       "body": "Alguna cosa ha anat malament, però no et preocupis, els teus fons estan segurs. Contacta amb suport per obtenir ajuda.\n\nPotser necessitaràs aquesta informació per ajudar el suport a resoldre el teu cas:",
+      "closeRefusedBody": "La teva migració s'ha completat i els teus fons són a la teva cartera nova. No hem pogut tancar el teu compte antic automàticament, així que el suport ho ha d'acabar per tu.\n\nPotser necessitaràs aquesta informació per ajudar el suport a resoldre el teu cas:",
       "reasonLabel": "Motiu",
       "accountIdLabel": "ID del compte",
       "pubKeyLabel": "pubKey",
@@ -3790,7 +3791,8 @@
     "clockOutOfSync": {
       "body": "La data i l'hora del teu dispositiu no estan sincronitzades. Configura-les en automàtic per continuar.",
       "retryCta": "Torna-ho a provar"
-    }
+    },
+    "closeUnavailable": "Els teus fons són segurs a la teva nova cartera. Encara estem tancant el teu compte antic, torna-ho a provar d'aquí a un moment."
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Custodiat",

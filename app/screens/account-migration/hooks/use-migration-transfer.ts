@@ -4,14 +4,14 @@ import { gql } from "@apollo/client"
 
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { MigrationStatus, useMigrationCommitMutation } from "@app/graphql/generated"
-import { isNetworkFailure } from "@app/graphql/is-network-failure"
+import { isNetworkFailure } from "@app/graphql/transport-error"
 import { isDeviceClockSkewed } from "@app/graphql/server-time"
 import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
 import {
   buildMigrationTransferRequest,
   MigrationSdkStatus,
 } from "@app/self-custodial/migration-transfer-request"
-import { MigrationSupportReason } from "@app/types/migration"
+import { MigrationRejectionCode, MigrationSupportReason } from "@app/types/migration"
 import { reportError } from "@app/utils/error-logging"
 
 import {
@@ -42,10 +42,6 @@ const DISCLOSURE_VERSION = "v1"
 /** The server settles a drain in seconds, so the phase is re-read often enough to feel
  *  immediate without turning a slow settle into a burst of reads. */
 const STATUS_POLL_INTERVAL_MS = 2000
-
-/** The backend gives a stale proof and a bad destination the same code; the clock skew
- *  tells them apart, and any other code falls through to support (fail-safe). */
-const STALE_PROOF_REJECTION_CODE = "MIGRATION_INVALID_DESTINATION"
 
 /**
  * Custodial accounts whose commit has already fired this session. Unlike a per-mount ref
@@ -214,9 +210,10 @@ export const useMigrationTransfer = ({
 
       /** A skewed clock makes the proof stale, which the backend rejects under the
        *  bad-destination code; that code plus a real skew is what earns a retry rather
-       *  than a handover to support. */
+       *  than a handover to support. Any other code falls through to support (fail-safe). */
       const isStaleProofRejection =
-        rejection.code === STALE_PROOF_REJECTION_CODE && isDeviceClockSkewed()
+        rejection.code === MigrationRejectionCode.InvalidDestination &&
+        isDeviceClockSkewed()
       if (isStaleProofRejection) {
         setIsClockOutOfSync(true)
         return

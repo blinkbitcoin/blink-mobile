@@ -3898,6 +3898,8 @@ const en: BaseTranslation = {
       body: "Your device's date and time are out of sync. Set them to automatic to continue.",
       retryCta: "Try again",
     },
+    closeUnavailable:
+      "Your funds are safe in your new wallet. We are still closing your old account, please try again in a moment.",
     migrationRequiredTitle: "Time to upgrade",
     migrationRequiredBody:
       "It's time to migrate your custodial account to a non-custodial account.",
@@ -3959,6 +3961,8 @@ const en: BaseTranslation = {
     contactSupport: {
       title: "Contact support",
       body: "Something went wrong but don't worry your funds are safe, please contact support for assistance.\n\nYou may need this information to help support resolve your case:",
+      closeRefusedBody:
+        "Your migration is complete and your funds are in your new wallet. We could not close your old account automatically, so support needs to finish it for you.\n\nYou may need this information to help support resolve your case:",
       reasonLabel: "Reason",
       accountIdLabel: "Account ID",
       pubKeyLabel: "pubKey",
