@@ -12367,6 +12367,10 @@ type RootTranslation = {
 			retryCta: string
 		}
 		/**
+		 * Y​o​u​r​ ​f​u​n​d​s​ ​a​r​e​ ​s​a​f​e​ ​i​n​ ​y​o​u​r​ ​n​e​w​ ​w​a​l​l​e​t​.​ ​W​e​ ​a​r​e​ ​s​t​i​l​l​ ​c​l​o​s​i​n​g​ ​y​o​u​r​ ​o​l​d​ ​a​c​c​o​u​n​t​,​ ​p​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​ ​i​n​ ​a​ ​m​o​m​e​n​t​.
+		 */
+		closeUnavailable: string
+		/**
 		 * T​i​m​e​ ​t​o​ ​u​p​g​r​a​d​e
 		 */
 		migrationRequiredTitle: string
@@ -25400,6 +25404,10 @@ export type TranslationFunctions = {
 			 */
 			retryCta: () => LocalizedString
 		}
+		/**
+		 * Your funds are safe in your new wallet. We are still closing your old account, please try again in a moment.
+		 */
+		closeUnavailable: () => LocalizedString
 		/**
 		 * Time to upgrade
 		 */

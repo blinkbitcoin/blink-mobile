@@ -3791,7 +3791,8 @@
         "clockOutOfSync": {
             "body": "La fecha y la hora de tu dispositivo están desincronizadas. Ponlas en automático para continuar.",
             "retryCta": "Reintentar"
-        }
+        },
+        "closeUnavailable": "Tus fondos están seguros en tu nueva billetera. Todavía estamos cerrando tu cuenta anterior, inténtalo de nuevo en un momento."
     },
     "AccountTypeSelectionScreen": {
         "custodialLabel": "Custodiada",

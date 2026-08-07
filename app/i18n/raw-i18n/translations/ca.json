@@ -3791,7 +3791,8 @@
     "clockOutOfSync": {
       "body": "La data i l'hora del teu dispositiu no estan sincronitzades. Configura-les en automàtic per continuar.",
       "retryCta": "Torna-ho a provar"
-    }
+    },
+    "closeUnavailable": "Els teus fons són segurs a la teva nova cartera. Encara estem tancant el teu compte antic, torna-ho a provar d'aquí a un moment."
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Custodiat",

@@ -3791,7 +3791,8 @@
     "clockOutOfSync": {
       "body": "Tarikh dan masa peranti anda tidak segerak. Tetapkan kepada automatik untuk meneruskan.",
       "retryCta": "Cuba lagi"
-    }
+    },
+    "closeUnavailable": "Dana anda selamat dalam dompet baharu anda. Kami masih menutup akaun lama anda, sila cuba lagi sebentar."
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Kustodian",

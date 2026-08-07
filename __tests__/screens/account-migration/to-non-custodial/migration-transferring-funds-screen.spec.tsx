@@ -11,6 +11,9 @@ import { flushEffects } from "../../../helpers/flush-effects"
 
 loadLocale("en")
 
+const CLOSE_UNAVAILABLE_MESSAGE =
+  "Your funds are safe in your new wallet. We are still closing your old account, please try again in a moment."
+
 const mockNavigate = jest.fn()
 const mockReset = jest.fn()
 jest.mock("@react-navigation/native", () => ({
@@ -21,14 +24,12 @@ jest.mock("@react-navigation/native", () => ({
 const mockCompleteMigration = jest.fn()
 let mockMigrationAccountId: string | null = "sc-account-1"
 let mockMigrationLoading = false
-let mockCustodialAccountId: string | null = "custodial-1"
 const mockUseHardwareBackGuard = jest.fn()
 
 jest.mock("@app/screens/account-migration/hooks", () => ({
   ...jest.requireActual("@app/screens/account-migration/hooks"),
   useCompleteMigration: () => ({
     migrationAccountId: mockMigrationAccountId,
-    custodialAccountId: mockCustodialAccountId,
     migrationLoading: mockMigrationLoading,
     completeMigration: mockCompleteMigration,
   }),
@@ -102,7 +103,6 @@ describe("MigrationTransferringFundsScreen", () => {
     jest.clearAllMocks()
     mockOwnerId = "custodial-1"
     mockMigrationAccountId = "sc-account-1"
-    mockCustodialAccountId = "custodial-1"
     mockMigrationLoading = false
     mockIsTransferred = false
     mockFailureReason = null
@@ -136,7 +136,7 @@ describe("MigrationTransferringFundsScreen", () => {
     await flushEffects()
 
     expect(mockUseMigrationTransfer).toHaveBeenCalledWith({
-      custodialAccountId: mockCustodialAccountId,
+      custodialAccountId: "custodial-1",
       selfCustodialAccountId: "sc-account-1",
       skip: false,
     })
@@ -224,6 +224,7 @@ describe("MigrationTransferringFundsScreen", () => {
     expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
       reason: "self-custodial-account-missing",
       origin: "commit",
+      custodialAccountId: "custodial-1",
     })
     expect(jest.mocked(reportError)).toHaveBeenCalledWith(
       "Migration transfer without provisioned account",
@@ -241,6 +242,20 @@ describe("MigrationTransferringFundsScreen", () => {
     expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
       reason: "transfer-failed",
       origin: "commit",
+      custodialAccountId: "custodial-1",
+    })
+  })
+
+  it("routes to support without an id when the owner query has not resolved", async () => {
+    mockOwnerId = null
+    mockFailureReason = MigrationSupportReason.TransferFailed
+    renderScreen()
+    await flushEffects()
+
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
+      reason: "transfer-failed",
+      origin: "commit",
+      custodialAccountId: undefined,
     })
   })
 
@@ -253,6 +268,7 @@ describe("MigrationTransferringFundsScreen", () => {
     expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
       reason: "self-custodial-account-missing",
       origin: "commit",
+      custodialAccountId: "custodial-1",
     })
     expect(mockNavigate).not.toHaveBeenCalledWith(
       "selfCustodialBackupSuccess",
@@ -273,6 +289,7 @@ describe("MigrationTransferringFundsScreen", () => {
     expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
       reason: "transfer-failed",
       origin: "commit",
+      custodialAccountId: "custodial-1",
     })
   })
 
@@ -344,12 +361,22 @@ describe("MigrationTransferringFundsScreen", () => {
       renderScreen()
       await flushEffects()
 
-      expect(
-        screen.getByText("Connection issue.\nVerify your internet connection"),
-      ).toBeTruthy()
-      expect(screen.getByTestId("migration-connection-issue-retry")).toBeTruthy()
+      expect(screen.getByText(CLOSE_UNAVAILABLE_MESSAGE)).toBeTruthy()
+      expect(screen.getByTestId("migration-close-unavailable-retry")).toBeTruthy()
       expect(mockNavigate).not.toHaveBeenCalled()
       expect(mockReset).not.toHaveBeenCalled()
+    })
+
+    /** The commonest cause is the server still draining the transfer, where the connection
+     *  is fine and the copy would send the user to check a healthy network. */
+    it("names the close instead of blaming the connection", async () => {
+      renderScreen()
+      await flushEffects()
+
+      expect(
+        screen.queryByText("Connection issue.\nVerify your internet connection"),
+      ).toBeNull()
+      expect(screen.queryByTestId("migration-connection-issue-retry")).toBeNull()
     })
 
     /** The transfer already landed, so the press must retry the close, not the transfer. */
@@ -358,7 +385,25 @@ describe("MigrationTransferringFundsScreen", () => {
       await flushEffects()
 
       mockCompleteMigration.mockResolvedValue(MigrationCompletion.Completed)
-      fireEvent.press(screen.getByTestId("migration-connection-issue-retry"))
+      fireEvent.press(screen.getByTestId("migration-close-unavailable-retry"))
+      await flushEffects()
+
+      expect(mockCompleteMigration).toHaveBeenCalledTimes(2)
+      expect(mockRetry).not.toHaveBeenCalled()
+    })
+
+    /** The footer named the clock but the press retried the close, so the button did
+     *  something other than what it said. */
+    it("names the close, not the clock, when both are unsettled", async () => {
+      mockIsClockOutOfSync = true
+      renderScreen()
+      await flushEffects()
+
+      expect(screen.getByText(CLOSE_UNAVAILABLE_MESSAGE)).toBeTruthy()
+      expect(screen.queryByTestId("migration-clock-out-of-sync-retry")).toBeNull()
+
+      mockCompleteMigration.mockResolvedValue(MigrationCompletion.Completed)
+      fireEvent.press(screen.getByTestId("migration-close-unavailable-retry"))
       await flushEffects()
 
       expect(mockCompleteMigration).toHaveBeenCalledTimes(2)
@@ -370,7 +415,7 @@ describe("MigrationTransferringFundsScreen", () => {
       await flushEffects()
 
       mockCompleteMigration.mockResolvedValue(MigrationCompletion.Completed)
-      fireEvent.press(screen.getByTestId("migration-connection-issue-retry"))
+      fireEvent.press(screen.getByTestId("migration-close-unavailable-retry"))
       await flushEffects()
 
       expect(mockReset).toHaveBeenCalledWith({
@@ -411,7 +456,7 @@ describe("MigrationTransferringFundsScreen", () => {
             params: {
               reason: "custodial-account-close-refused",
               origin: "resume",
-              custodialAccountId: mockCustodialAccountId,
+              custodialAccountId: "custodial-1",
             },
           },
         ],
@@ -447,7 +492,7 @@ describe("MigrationTransferringFundsScreen", () => {
     })
 
     it("hands over without an id when the custodial owner is unknown", async () => {
-      mockCustodialAccountId = null
+      mockOwnerId = null
       renderScreen()
       await flushEffects()
 
@@ -475,6 +520,7 @@ describe("MigrationTransferringFundsScreen", () => {
       await flushEffects()
 
       expect(screen.queryByTestId("migration-connection-issue-retry")).toBeNull()
+      expect(screen.queryByTestId("migration-close-unavailable-retry")).toBeNull()
     })
   })
 })

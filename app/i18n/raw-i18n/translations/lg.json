@@ -3791,7 +3791,8 @@
     "clockOutOfSync": {
       "body": "Ennaku n'obudde bw'ekyuma kyo tebituukagana. Bisseeko ku otomatiki osobole okweyongerayo.",
       "retryCta": "Ddamu ogezaako"
-    }
+    },
+    "closeUnavailable": "Ssente zo ziri bulungi mu walletiyo empya. Tukyaggalawo akawunti yo eyedda, ddamu ogezaako mu kaseera katono."
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Eterekeddwa",

@@ -3791,7 +3791,8 @@
         "clockOutOfSync": {
             "body": "La data e l'ora del tuo dispositivo non sono sincronizzate. Impostale su automatico per continuare.",
             "retryCta": "Riprova"
-        }
+        },
+        "closeUnavailable": "I tuoi fondi sono al sicuro nel tuo nuovo portafoglio. Stiamo ancora chiudendo il tuo vecchio account, riprova tra un momento."
     },
     "AccountTypeSelectionScreen": {
         "custodialLabel": "Custodito",

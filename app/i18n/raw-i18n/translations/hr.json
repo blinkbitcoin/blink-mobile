@@ -3791,7 +3791,8 @@
     "clockOutOfSync": {
       "body": "Datum i vrijeme vašeg uređaja nisu usklađeni. Postavite ih na automatski način rada za nastavak.",
       "retryCta": "Pokušaj ponovno"
-    }
+    },
+    "closeUnavailable": "Vaša su sredstva sigurna u vašem novom novčaniku. Još zatvaramo vaš stari račun, pokušajte ponovno za trenutak."
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Pod skrbništvom",

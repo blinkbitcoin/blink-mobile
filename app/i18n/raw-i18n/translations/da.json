@@ -3791,7 +3791,8 @@
     "clockOutOfSync": {
       "body": "Din enheds dato og klokkeslæt er ude af synkronisering. Indstil dem til automatisk for at fortsætte.",
       "retryCta": "Prøv igen"
-    }
+    },
+    "closeUnavailable": "Dine midler er sikre i din nye tegnebog. Vi er stadig ved at lukke din gamle konto, prøv venligst igen om et øjeblik."
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Forvaltet",
