@@ -56,6 +56,16 @@ Fastest first:
 - **Copy/i18n swaps:** `git checkout origin/main -- app/i18n` → `reload-app.sh` (still JS-only), shoot, restore
 - **Whole branch:** build native once from the pre-change tree, then `git checkout --detach <branch>` for the JS side. Needs `git checkout -- ios/Podfile.lock` first, since pod install dirties it
 
+**Never a simulator per side.** Running "before" on one device and "after" on
+another halves wall-clock on paper and was explicitly rejected (issue #4092):
+two simulators are two devices — different app data, account state,
+remote-config fetches, timing — and anything that differs between the sides
+other than the code is a way for the comparison to lie. A worktree per side
+against one simulator is honest but slower than it sounds: each worktree pays
+its own `node_modules` install and every side-switch is a Metro swap, while
+the in-place flip above is a file checkout plus a ~5s reload. One worktree,
+one device, flip the code.
+
 Then crop both sides with one box:
 
 ```bash
@@ -131,7 +141,7 @@ simulated. Caption honestly what was forced.
 ## After Editing the Scripts
 
 ```bash
-"$SHOT/tests/run.sh"     # 46 assertions, ~5s, exits non-zero on failure
+"$SHOT/tests/run.sh"     # 47 assertions, ~5s, exits non-zero on failure
 ```
 
 Fakes `xcrun` and `adb` (writing real PNGs) and uses real ImageMagick, so the
