@@ -71,7 +71,6 @@ import {
 } from "../screens/authentication-screen"
 import { PinScreen } from "../screens/authentication-screen/pin-screen"
 import { unlockScreenOptions } from "../screens/authentication-screen/unlock-screen"
-import { DeveloperScreen } from "../screens/developer-screen"
 import { EarnMapScreen } from "../screens/earns-map-screen"
 import { EarnQuiz, EarnSection } from "../screens/earns-screen"
 import { SectionCompleted } from "../screens/earns-screen/section-completed"
@@ -175,6 +174,15 @@ import { TouchableOpacity } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import { ApiScreen } from "@app/screens/settings-screen/api-screen"
 import { ApiKeyCreateScreen } from "@app/screens/settings-screen/api/api-key-create-screen"
+
+// Required lazily (not statically imported) so the developer screen module —
+// its debugScreen query, token copy/share UI and instance override controls —
+// is never evaluated in release bundles: with __DEV__ inlined to false the
+// require is dead code and the module body never runs.
+const DeveloperScreen: React.ComponentType | null = __DEV__
+  ? // eslint-disable-next-line @typescript-eslint/no-var-requires
+    require("../screens/developer-screen").DeveloperScreen
+  : null
 
 const RootNavigator = createNativeStackNavigator<RootStackParamList>()
 
@@ -449,7 +457,7 @@ export const RootStack = () => {
         component={SecurityScreen}
         options={{ title: LL.SecurityScreen.title() }}
       />
-      {__DEV__ && (
+      {DeveloperScreen && (
         <RootNavigator.Screen
           name="developerScreen"
           component={DeveloperScreen}
