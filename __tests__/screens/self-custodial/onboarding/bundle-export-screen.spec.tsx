@@ -16,7 +16,7 @@ let LL: TranslationFunctions
 
 const mockActions: RecoveryBundleActions = {
   bundleState: undefined,
-  settings: { autoRefresh: true, cloudSync: false },
+  settings: { autoRefresh: true, cloudSync: false, exportedAt: null },
   settingsLoaded: true,
   refreshing: false,
   uploading: false,

@@ -22,6 +22,12 @@ export const RecoveryBackupNudgeVariant = {
   /** A backup exists but has fallen behind the wallet. A reminder, so it can
    *  be dismissed; it returns when the bundle goes stale again. */
   Stale: "stale",
+  /** A bundle exists but has never left this device - not exported by the user,
+   *  not uploaded to their cloud. It is "backed up" only in name: the automatic
+   *  on-device copy is lost with the phone. This is the state a user reaches by
+   *  skipping the export during onboarding, and the reason skipping is safe to
+   *  offer at all. */
+  OnlyOnThisDevice: "only-on-this-device",
 } as const
 
 export type RecoveryBackupNudgeVariant =
@@ -42,7 +48,7 @@ type RecoveryBackupNudge = {
  */
 export const useRecoveryBackupNudge = (hasBalance: boolean): RecoveryBackupNudge => {
   const { activeAccount } = useAccountRegistry()
-  const { status, savedAt } = useRecoveryBundleStatus()
+  const { status, savedAt, isOnlyOnThisDevice } = useRecoveryBundleStatus()
   const [dismissedAt, setDismissedAt] = useState<number | null>(null)
   const [dismissalLoaded, setDismissalLoaded] = useState(false)
 
@@ -86,13 +92,19 @@ export const useRecoveryBackupNudge = (hasBalance: boolean): RecoveryBackupNudge
       return hasBalance ? RecoveryBackupNudgeVariant.Missing : null
     }
 
-    if (status !== RecoveryBundleStatus.Stale) return null
-
-    /** A dismissal covers the staleness the user saw, not every future one:
-     *  once the bundle is refreshed and goes stale again, the reminder returns. */
-    const dismissalCoversThisStaleness =
+    /** A dismissal covers the state the user actually saw, not every future
+     *  one: once the bundle is refreshed, the reminder returns. */
+    const dismissalCoversThisBundle =
       dismissedAt !== null && savedAt !== null && dismissedAt > savedAt
-    return dismissalCoversThisStaleness ? null : RecoveryBackupNudgeVariant.Stale
+    if (dismissalCoversThisBundle) return null
+
+    /** Checked before staleness: a bundle that never left the device is a
+     *  bigger problem than one that is merely out of date, and saying both at
+     *  once would say neither well. */
+    if (isOnlyOnThisDevice) return RecoveryBackupNudgeVariant.OnlyOnThisDevice
+
+    if (status !== RecoveryBundleStatus.Stale) return null
+    return RecoveryBackupNudgeVariant.Stale
   })()
 
   return { variant, dismiss }
