@@ -3716,6 +3716,7 @@
         "body": "Ne aggódjon — a pénze biztonságban van. Az átköltözés eltarthat néhány percig, és néha egy lépésnek csak új kezdésre van szüksége.\n\nIndítsa el az átköltözést elölről — csak egy pillanatig tart.\n\nTovábbra is ezt a képernyőt látja? Forduljon az ügyfélszolgálathoz, és ossza meg az alábbi adatokat:",
         "contactSupportCta": "Kapcsolatfelvétel az ügyfélszolgálattal"
       },
+      "closeRefusedBody": "A migrációja befejeződött, és az egyenlege az új tárcájában van. A régi fiókját nem tudtuk automatikusan lezárni, ezért az ügyfélszolgálatnak kell befejeznie Ön helyett.\n\nEzekre az adatokra szüksége lehet, hogy az ügyfélszolgálat megoldja az esetét:",
       "reasonLabel": "Ok",
       "accountIdLabel": "Fiókazonosító",
       "pubKeyLabel": "pubKey",

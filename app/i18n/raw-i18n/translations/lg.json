@@ -3716,6 +3716,7 @@
         "body": "Tofaayo — ssente zo nnywevu. Okukyusa kuyinza okutwala eddakiika ntono, era oluusi omutendera gwetaaga butaaga kuddamu kutandika.\n\nTandika okukyusa okuva ku ntandikwa — kutwala akaseera katono.\n\nOkyalaba oluggya luno? Tuukirira ab'obuyambi obawe ebikwata wammanga:",
         "contactSupportCta": "Tuukirire ab'obuyambi"
       },
+      "closeRefusedBody": "Okusengula kwo kuwedde era ssente zo ziri mu wallet yo empya. Tetusobodde kuggalawo akawunti yo enkadde mu ngeri ey'obwannamaddala, n'olwekyo abayamba be balina okukimaliriza ku lulwo.\n\nOyinza okwetaaga ebikwata ku bino okuyamba ab'obuyambi okugonjoola ensonga yo:",
       "reasonLabel": "Ensonga",
       "accountIdLabel": "ID ya akawunti",
       "pubKeyLabel": "pubKey",

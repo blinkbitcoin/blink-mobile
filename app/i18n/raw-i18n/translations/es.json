@@ -3716,6 +3716,7 @@
                 "body": "No te preocupes — tus fondos están seguros. La migración puede tardar unos minutos, y a veces un paso solo necesita empezar de nuevo.\n\nComienza la migración de nuevo — solo tomará un momento.\n\n¿Sigues viendo esta pantalla? Contacta a soporte y comparte los datos de abajo:",
                 "contactSupportCta": "Contacta a soporte"
             },
+            "closeRefusedBody": "Tu migración se completó y tus fondos están en tu nueva billetera. No pudimos cerrar tu cuenta anterior automáticamente, así que soporte debe terminarlo por ti.\n\nPuede que necesites esta información para ayudar a soporte a resolver tu caso:",
             "reasonLabel": "Motivo",
             "accountIdLabel": "ID de cuenta",
             "pubKeyLabel": "pubKey",

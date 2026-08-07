@@ -3716,6 +3716,7 @@
         "body": "Bare rolig — dine midler er sikre. Migreringen kan tage et par minutter, og nogle gange skal et trin bare starte forfra.\n\nStart migreringen forfra — det tager kun et øjeblik.\n\nSer du stadig denne skærm? Kontakt support, og del oplysningerne nedenfor:",
         "contactSupportCta": "Kontakt support"
       },
+      "closeRefusedBody": "Din migrering er fuldført, og dine midler er i din nye tegnebog. Vi kunne ikke lukke din gamle konto automatisk, så supporten skal afslutte det for dig.\n\nDu kan få brug for disse oplysninger, så support kan løse din sag:",
       "reasonLabel": "Årsag",
       "accountIdLabel": "Konto-ID",
       "pubKeyLabel": "pubKey",

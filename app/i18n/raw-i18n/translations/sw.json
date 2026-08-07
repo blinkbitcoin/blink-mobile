@@ -3716,6 +3716,7 @@
         "body": "Usiwe na wasiwasi — fedha zako ziko salama. Uhamishaji unaweza kuchukua dakika chache, na wakati mwingine hatua moja inahitaji tu kuanza upya.\n\nAnza uhamishaji upya — inachukua muda mfupi tu.\n\nBado unaona skrini hii? Wasiliana na usaidizi na ushiriki maelezo yaliyo hapa chini:",
         "contactSupportCta": "Wasiliana na usaidizi"
       },
+      "closeRefusedBody": "Uhamishaji wako umekamilika na fedha zako ziko katika pochi yako mpya. Hatukuweza kufunga akaunti yako ya zamani kiotomatiki, kwa hivyo timu ya usaidizi inahitaji kuikamilisha kwa niaba yako.\n\nUnaweza kuhitaji taarifa hizi ili kusaidia usaidizi kutatua kesi yako:",
       "reasonLabel": "Sababu",
       "accountIdLabel": "Kitambulisho cha akaunti",
       "pubKeyLabel": "pubKey",

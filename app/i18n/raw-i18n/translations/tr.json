@@ -3716,6 +3716,7 @@
         "body": "Endişelenmeyin — paranız güvende. Taşıma birkaç dakika sürebilir ve bazen bir adımın yalnızca yeniden başlaması yeterlidir.\n\nTaşımayı baştan başlatın — yalnızca birkaç saniye sürer.\n\nBu ekranı hâlâ görüyor musunuz? Destek ile iletişime geçin ve aşağıdaki bilgileri paylaşın:",
         "contactSupportCta": "Destek ile iletişime geçin"
       },
+      "closeRefusedBody": "Taşıma işleminiz tamamlandı ve bakiyeniz yeni cüzdanınızda. Eski hesabınızı otomatik olarak kapatamadık, bu yüzden destek ekibinin bunu sizin için tamamlaması gerekiyor.\n\nDesteğin durumunuzu çözmesine yardımcı olmak için bu bilgilere ihtiyacınız olabilir:",
       "reasonLabel": "Neden",
       "accountIdLabel": "Hesap kimliği",
       "pubKeyLabel": "pubKey",

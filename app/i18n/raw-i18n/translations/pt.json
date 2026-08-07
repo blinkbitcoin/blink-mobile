@@ -3716,6 +3716,7 @@
                 "body": "Não se preocupe — seus fundos estão seguros. A migração pode levar alguns minutos, e às vezes uma etapa só precisa recomeçar.\n\nComece a migração de novo — leva só um instante.\n\nAinda está vendo esta tela? Entre em contato com o suporte e compartilhe os dados abaixo:",
                 "contactSupportCta": "Contate o suporte"
             },
+            "closeRefusedBody": "A sua migração foi concluída e os seus fundos estão na sua nova carteira. Não conseguimos fechar a sua conta antiga automaticamente, por isso o suporte precisa concluir isso para você.\n\nVocê pode precisar destas informações para ajudar o suporte a resolver o seu caso:",
             "reasonLabel": "Motivo",
             "accountIdLabel": "ID da conta",
             "pubKeyLabel": "pubKey",

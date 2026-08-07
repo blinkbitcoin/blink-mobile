@@ -3716,6 +3716,7 @@
         "body": "Ne brinite — vaša su sredstva sigurna. Migracija može potrajati nekoliko minuta, a ponekad je koraku dovoljan novi početak.\n\nZapočnite migraciju iznova — potrajat će samo trenutak.\n\nVidite li i dalje ovaj zaslon? Obratite se podršci i podijelite podatke u nastavku:",
         "contactSupportCta": "Kontaktirajte podršku"
       },
+      "closeRefusedBody": "Vaša migracija je dovršena i vaša sredstva su u novom novčaniku. Vaš stari račun nismo mogli zatvoriti automatski, pa to podrška mora dovršiti umjesto vas.\n\nOve informacije mogu pomoći podršci da riješi vaš slučaj:",
       "reasonLabel": "Razlog",
       "accountIdLabel": "ID računa",
       "pubKeyLabel": "pubKey",
