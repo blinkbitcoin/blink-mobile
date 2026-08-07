@@ -81,6 +81,9 @@ export const useMigrationCheckpointState = () => {
     !stored?.custodialAccountId || stored.custodialAccountId === ownerId
   const checkpoint = isOwnedByActiveAccount ? stored?.step ?? null : null
   const accountId = isOwnedByActiveAccount ? stored?.accountId ?? null : null
+  const expectedReceiveSats = isOwnedByActiveAccount
+    ? stored?.expectedReceiveSats ?? null
+    : null
 
   /** Resolves false when the write fails, so callers can stop the flow instead of
    *  advancing on a checkpoint that only exists in memory. Re-sending the known
@@ -89,6 +92,7 @@ export const useMigrationCheckpointState = () => {
     async (
       step: MigrationCheckpoint,
       provisionedAccountId?: string,
+      expectedReceiveSatsUpdate?: number,
     ): Promise<boolean> => {
       /** Without a resolved owner the checkpoint cannot be keyed, and saving would erase the
        *  stored owner + account id via mergeCheckpoint; refuse so a null-owner window (an
@@ -98,6 +102,8 @@ export const useMigrationCheckpointState = () => {
         step,
         accountId: provisionedAccountId ?? accountId ?? undefined,
         custodialAccountId: ownerId,
+        expectedReceiveSats:
+          expectedReceiveSatsUpdate ?? expectedReceiveSats ?? undefined,
       }
       setStored((existing) => mergeCheckpoint(existing, update))
       try {
@@ -108,7 +114,7 @@ export const useMigrationCheckpointState = () => {
         return false
       }
     },
-    [storageKey, ownerId, accountId],
+    [storageKey, ownerId, accountId, expectedReceiveSats],
   )
 
   const clearCheckpoint = useCallback(() => {
@@ -124,6 +130,7 @@ export const useMigrationCheckpointState = () => {
   return {
     checkpoint,
     accountId,
+    expectedReceiveSats,
     loading: loading || ownerLoading,
     /** A read failure surfaced, not swallowed: without it an unreadable store is
      *  indistinguishable from a wiped device, and the gate would hand a resumable user

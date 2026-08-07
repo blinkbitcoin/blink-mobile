@@ -14,6 +14,10 @@ export type StoredCheckpoint = {
   savedAt: number
   accountId?: string
   custodialAccountId?: string
+  /** What the server's preview said the new wallet will receive, captured at the commit
+   *  point — the only moment it is knowable (after the drain the preview reads an already
+   *  emptied balance). Absent on records saved by app versions before the field existed. */
+  expectedReceiveSats?: number
 }
 
 /**
@@ -60,7 +64,8 @@ export const isExpired = (
 export const validateStoredCheckpoint = (raw: unknown): StoredCheckpoint | null => {
   if (!raw || typeof raw !== "object") return null
 
-  const { step, savedAt, accountId, custodialAccountId } = raw as StoredCheckpoint
+  const { step, savedAt, accountId, custodialAccountId, expectedReceiveSats } =
+    raw as StoredCheckpoint
 
   if (!Object.values(MigrationCheckpoint).includes(step)) return null
   if (typeof savedAt !== "number") return null
@@ -68,8 +73,11 @@ export const validateStoredCheckpoint = (raw: unknown): StoredCheckpoint | null 
   if (custodialAccountId !== undefined && typeof custodialAccountId !== "string") {
     return null
   }
+  if (expectedReceiveSats !== undefined && typeof expectedReceiveSats !== "number") {
+    return null
+  }
 
-  return { step, savedAt, accountId, custodialAccountId }
+  return { step, savedAt, accountId, custodialAccountId, expectedReceiveSats }
 }
 
 export const resolveCheckpointRoute = (
@@ -105,6 +113,7 @@ export type CheckpointUpdate = {
   step: MigrationCheckpoint
   accountId?: string
   custodialAccountId?: string
+  expectedReceiveSats?: number
 }
 
 /**
@@ -125,6 +134,9 @@ export const mergeCheckpoint = (
     savedAt: Date.now(),
     accountId: update.accountId ?? (hasSameOwner ? existing?.accountId : undefined),
     custodialAccountId: update.custodialAccountId,
+    expectedReceiveSats:
+      update.expectedReceiveSats ??
+      (hasSameOwner ? existing?.expectedReceiveSats : undefined),
   }
 }
 

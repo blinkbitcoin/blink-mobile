@@ -124,6 +124,42 @@ describe("migration-checkpoint-storage", () => {
     })
   })
 
+  describe("validateStoredCheckpoint expectedReceiveSats", () => {
+    it("keeps a stored number", () => {
+      const result = validateStoredCheckpoint({
+        step: MigrationCheckpoint.BalancesOverview,
+        savedAt: 1000,
+        expectedReceiveSats: 21000,
+      })
+      expect(result?.expectedReceiveSats).toBe(21000)
+    })
+
+    it("rejects a non-number value", () => {
+      expect(
+        validateStoredCheckpoint({
+          step: MigrationCheckpoint.BalancesOverview,
+          savedAt: 1000,
+          expectedReceiveSats: "21000",
+        }),
+      ).toBeNull()
+    })
+
+    /** Checkpoints saved by app versions before the field existed must stay valid: their
+     *  absence is what the receive gate reads as "expectation unknown". */
+    it("accepts a legacy record without the field", () => {
+      const result = validateStoredCheckpoint({
+        step: MigrationCheckpoint.BalancesOverview,
+        savedAt: 1000,
+        accountId: "sc-1",
+      })
+      expect(result).toEqual({
+        step: MigrationCheckpoint.BalancesOverview,
+        savedAt: 1000,
+        accountId: "sc-1",
+      })
+    })
+  })
+
   describe("resolveCheckpointRoute", () => {
     it("returns the default destination for a null checkpoint", () => {
       expect(resolveCheckpointRoute(null)).toEqual({
@@ -317,6 +353,70 @@ describe("migration-checkpoint-storage", () => {
         savedAt: expect.any(Number),
         accountId: "sc-1",
         custodialAccountId: "cust-2",
+      })
+    })
+
+    it("stores the expected receive amount alongside the step", async () => {
+      mockLoadJson.mockResolvedValue(null)
+      await saveCheckpointToStorage("test-key", {
+        step: MigrationCheckpoint.BalancesOverview,
+        accountId: "sc-1",
+        custodialAccountId: "cust-1",
+        expectedReceiveSats: 21000,
+      })
+
+      expect(mockSaveJson).toHaveBeenCalledWith("test-key", {
+        step: MigrationCheckpoint.BalancesOverview,
+        savedAt: expect.any(Number),
+        accountId: "sc-1",
+        custodialAccountId: "cust-1",
+        expectedReceiveSats: 21000,
+      })
+    })
+
+    it("preserves the expected receive amount across step updates by the same owner", async () => {
+      mockLoadJson.mockResolvedValue({
+        step: MigrationCheckpoint.BalancesOverview,
+        savedAt: Date.now(),
+        accountId: "sc-1",
+        custodialAccountId: "cust-1",
+        expectedReceiveSats: 21000,
+      })
+
+      await saveCheckpointToStorage("test-key", {
+        step: MigrationCheckpoint.BalancesOverview,
+        custodialAccountId: "cust-1",
+      })
+
+      expect(mockSaveJson).toHaveBeenCalledWith("test-key", {
+        step: MigrationCheckpoint.BalancesOverview,
+        savedAt: expect.any(Number),
+        accountId: "sc-1",
+        custodialAccountId: "cust-1",
+        expectedReceiveSats: 21000,
+      })
+    })
+
+    it("drops the previous owner's expected amount when another account starts a flow", async () => {
+      mockLoadJson.mockResolvedValue({
+        step: MigrationCheckpoint.BalancesOverview,
+        savedAt: Date.now(),
+        accountId: "sc-1",
+        custodialAccountId: "cust-1",
+        expectedReceiveSats: 21000,
+      })
+
+      await saveCheckpointToStorage("test-key", {
+        step: MigrationCheckpoint.TermsAndConditions,
+        custodialAccountId: "cust-2",
+      })
+
+      expect(mockSaveJson).toHaveBeenCalledWith("test-key", {
+        step: MigrationCheckpoint.TermsAndConditions,
+        savedAt: expect.any(Number),
+        accountId: undefined,
+        custodialAccountId: "cust-2",
+        expectedReceiveSats: undefined,
       })
     })
 

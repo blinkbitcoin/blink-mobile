@@ -54,6 +54,7 @@ const CustodialCreationBlockedCountriesKey = "custodialCreationBlockedCountries"
 const SelfCustodialCreationBlockedCountriesKey = "selfCustodialCreationBlockedCountries"
 const OffboardOnlyCountriesKey = "offboardOnlyCountries"
 const SelfCustodialDepositClaimLeewayVbyteKey = "selfCustodialDepositClaimLeewayVbyte"
+const MigrationReceiveDelayedNoticeMsKey = "migrationReceiveDelayedNoticeMs"
 const FeeRatesConfigKey = "feeRatesConfig"
 
 type DeliveryOptionConfig = {
@@ -121,6 +122,7 @@ type RemoteConfig = {
   [SelfCustodialCreationBlockedCountriesKey]: string[]
   [OffboardOnlyCountriesKey]: string[]
   [SelfCustodialDepositClaimLeewayVbyteKey]: number
+  [MigrationReceiveDelayedNoticeMsKey]: number
   [FeeRatesConfigKey]: FeeRatesConfig
 }
 
@@ -223,6 +225,9 @@ export const defaultRemoteConfig: RemoteConfig = {
   selfCustodialCreationBlockedCountries: creationBlockedDefault,
   offboardOnlyCountries: offboardOnlyDefault,
   selfCustodialDepositClaimLeewayVbyte: 1,
+  /** How long the migration's receive gate waits before telling the user the incoming
+   *  payment is taking longer than usual. Generous until real transit times are known. */
+  migrationReceiveDelayedNoticeMs: 10 * 60 * 1000,
   feeRatesConfig: defaultFeeRatesConfig,
 }
 
@@ -464,6 +469,10 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           .getValue(SelfCustodialDepositClaimLeewayVbyteKey)
           .asNumber()
 
+        const migrationReceiveDelayedNoticeMs = remoteConfigInstance()
+          .getValue(MigrationReceiveDelayedNoticeMsKey)
+          .asNumber()
+
         const feeRatesConfig = getRemoteConfigNumericObject(
           FeeRatesConfigKey,
           defaultFeeRatesConfig,
@@ -510,6 +519,7 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           selfCustodialCreationBlockedCountries,
           offboardOnlyCountries,
           selfCustodialDepositClaimLeewayVbyte,
+          migrationReceiveDelayedNoticeMs,
           feeRatesConfig,
         })
       } catch (err) {

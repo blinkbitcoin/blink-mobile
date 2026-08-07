@@ -19,6 +19,7 @@ import {
   currentProofTimestamp,
 } from "../utils/migration-proof"
 
+import { useMigrationReceiveConfirmation } from "./use-migration-receive-confirmation"
 import { useMigrationStatus } from "./use-migration-status"
 
 gql`
@@ -75,11 +76,14 @@ export const resetMigrationCommitGuard = (): void => {
 type UseMigrationTransferArgs = {
   custodialAccountId: string | null
   selfCustodialAccountId: string | null
+  /** From the checkpoint; null on records saved before the field existed. */
+  expectedReceiveSats: number | null
   skip: boolean
 }
 
 type UseMigrationTransfer = {
   isTransferred: boolean
+  isReceiveDelayed: boolean
   failureReason: MigrationSupportReason | null
   isClockOutOfSync: boolean
   hasConnectionIssue: boolean
@@ -96,6 +100,7 @@ type UseMigrationTransfer = {
 export const useMigrationTransfer = ({
   custodialAccountId,
   selfCustodialAccountId,
+  expectedReceiveSats,
   skip,
 }: UseMigrationTransferArgs): UseMigrationTransfer => {
   const network = useSparkNetwork()
@@ -129,13 +134,26 @@ export const useMigrationTransfer = ({
 
   const hasServerFailed = status === MigrationStatus.Failed
 
+  /** COMPLETED is the sender's word only; the swap must also wait for the receiver's,
+   *  or the user lands in a wallet whose funds are still in transit (#4102). */
+  const { isReceiveConfirmed, isReceiveDelayed } = useMigrationReceiveConfirmation({
+    selfCustodialAccountId,
+    expectedReceiveSats,
+    skip: skip || status !== MigrationStatus.Completed || failureReason !== null,
+  })
+
   /** A failure already handed the user to support, so a later COMPLETED from a stray poll
    *  must not also swap the session out from under that screen. */
-  const isTransferred = status === MigrationStatus.Completed && failureReason === null
+  const isTransferred =
+    status === MigrationStatus.Completed && failureReason === null && isReceiveConfirmed
 
+  /** Stops on the server's terminal phase, not on isTransferred: the phase can no longer
+   *  change while the receive gate waits, so polling on would only re-run the server's
+   *  resume routine for the length of the wait. */
   useEffect(() => {
-    if (isTransferred || hasServerFailed || failureReason !== null) setHasStopped(true)
-  }, [isTransferred, hasServerFailed, failureReason])
+    const hasServerSettled = status === MigrationStatus.Completed || hasServerFailed
+    if (hasServerSettled || failureReason !== null) setHasStopped(true)
+  }, [status, hasServerFailed, failureReason])
 
   /** A phase past IN_PROGRESS means the commit did land (the drop hit the response, not the
    *  request): the transfer is under way, so the notice clears and the screen watches it. */
@@ -302,6 +320,7 @@ export const useMigrationTransfer = ({
 
   return {
     isTransferred,
+    isReceiveDelayed,
     failureReason: activeFailureReason,
     isClockOutOfSync,
     hasConnectionIssue,

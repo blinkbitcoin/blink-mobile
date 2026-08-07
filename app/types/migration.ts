@@ -34,6 +34,9 @@ export const MigrationSupportReason = {
   LockedWithoutCheckpoint: "locked-without-checkpoint",
   /** The transfer itself failed or threw. */
   TransferFailed: "transfer-failed",
+  /** The server paid the migration out, but the receive into the new self-custodial
+   *  wallet stayed unconfirmed past the notice window — the funds look stuck in transit. */
+  ReceiveDelayed: "receive-delayed",
   /** The lightning-address re-point onto the migrated account failed. */
   LnAddressTransferFailed: "ln-address-transfer-failed",
   /** The support screen was reached without a reason, e.g. after a navigation-state

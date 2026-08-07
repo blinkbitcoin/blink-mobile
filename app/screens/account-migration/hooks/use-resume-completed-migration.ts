@@ -9,6 +9,7 @@ import { MigrationSupportOrigin, MigrationSupportReason } from "@app/types/migra
 import { reportError } from "@app/utils/error-logging"
 
 import { useCompleteMigration } from "./use-complete-migration"
+import { useMigrationReceiveConfirmation } from "./use-migration-receive-confirmation"
 import { useMigrationStatus } from "./use-migration-status"
 
 /** A transient swap failure (a briefly locked keystore) can clear on a retry, so a few
@@ -26,8 +27,12 @@ const MAX_SWAP_ATTEMPTS = 3
  */
 export const useResumeCompletedMigration = (): void => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-  const { migrationAccountId, migrationLoading, completeMigration } =
-    useCompleteMigration()
+  const {
+    migrationAccountId,
+    migrationExpectedReceiveSats,
+    migrationLoading,
+    completeMigration,
+  } = useCompleteMigration()
 
   const hasUnfinishedMigration = Boolean(migrationAccountId)
   const { status } = useMigrationStatus({ skip: !hasUnfinishedMigration })
@@ -35,12 +40,24 @@ export const useResumeCompletedMigration = (): void => {
   const [attempts, setAttempts] = useState(0)
   const isSwapInFlightRef = useRef(false)
 
+  const isServerCompleted =
+    status === MigrationStatus.Completed && hasUnfinishedMigration && !migrationLoading
+
+  /** The same receive gate as the transfer screen: a relaunch mid-transfer must not swap
+   *  into a wallet whose funds are still in transit either (#4102). Unconfirmed simply
+   *  means no swap this session — the custodial session stays intact and the next launch
+   *  (or this one, once a check lands) picks the swap back up. */
+  const { isReceiveConfirmed } = useMigrationReceiveConfirmation({
+    selfCustodialAccountId: migrationAccountId,
+    expectedReceiveSats: migrationExpectedReceiveSats,
+    skip: !isServerCompleted,
+  })
+
   /** A swap that resolves false is terminal, not transient: the destination account is
    *  gone from the device, so no retry brings it back. Blocks the effect from re-entering
    *  once the user has been handed to support, so the handover happens exactly once. */
   const hasHandedOverRef = useRef(false)
-  const isSwapPending =
-    status === MigrationStatus.Completed && hasUnfinishedMigration && !migrationLoading
+  const isSwapPending = isServerCompleted && isReceiveConfirmed
 
   useEffect(() => {
     const canAttempt =
