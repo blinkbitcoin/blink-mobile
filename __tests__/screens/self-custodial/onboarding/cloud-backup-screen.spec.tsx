@@ -16,6 +16,9 @@ const mockHandleBackup = jest.fn()
 let mockLoading = false
 let mockIsValid = true
 let mockIsEncrypted = false
+let mockCanSyncBundle = false
+let mockAutoBundleSync = false
+const mockToggleAutoBundleSync = jest.fn()
 const mockToggleEncryption = jest.fn()
 const mockSetPassword = jest.fn()
 const mockSetConfirmPassword = jest.fn()
@@ -23,6 +26,9 @@ const mockSetConfirmPassword = jest.fn()
 jest.mock("@app/screens/self-custodial/onboarding/hooks", () => ({
   useCloudBackupForm: () => ({
     isEncrypted: mockIsEncrypted,
+    autoBundleSync: mockAutoBundleSync,
+    canSyncBundle: mockCanSyncBundle,
+    toggleAutoBundleSync: mockToggleAutoBundleSync,
     password: "",
     confirmPassword: "",
     toggleEncryption: mockToggleEncryption,
@@ -74,12 +80,21 @@ jest.mock("@app/components/info-banner", () => {
 loadLocale("en")
 const LL = i18nObject("en")
 
+const renderScreen = () =>
+  render(
+    <ContextForScreen>
+      <CloudBackupScreen />
+    </ContextForScreen>,
+  )
+
 describe("CloudBackupScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockLoading = false
     mockIsValid = true
     mockIsEncrypted = false
+    mockCanSyncBundle = false
+    mockAutoBundleSync = false
   })
 
   it("renders title and subtitle", async () => {
@@ -203,5 +218,31 @@ describe("CloudBackupScreen", () => {
     expect(mockUseMigrationBackupCheckpoint).toHaveBeenCalledWith(
       MigrationCheckpoint.CloudBackup,
     )
+  })
+
+  describe("automatic bundle backups", () => {
+    it("explains that a password is needed before it can be turned on", () => {
+      mockCanSyncBundle = false
+      const { getByText } = renderScreen()
+
+      expect(
+        getByText(LL.BackupScreen.CloudBackup.autoBundleNeedsPassword()),
+      ).toBeTruthy()
+    })
+
+    it("explains what it does once a password is in place", () => {
+      mockCanSyncBundle = true
+      const { getByText } = renderScreen()
+
+      expect(getByText(LL.BackupScreen.CloudBackup.autoBundleHint())).toBeTruthy()
+    })
+
+    it("can be toggled once a password is in place", () => {
+      mockCanSyncBundle = true
+      const { getByTestId } = renderScreen()
+
+      fireEvent.press(getByTestId("auto-bundle-checkbox"))
+      expect(mockToggleAutoBundleSync).toHaveBeenCalled()
+    })
   })
 })
