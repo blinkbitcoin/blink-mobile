@@ -306,7 +306,7 @@ The isolation guarantees are load-bearing for every other agent on this Mac, so
 they are tested rather than asserted:
 
 ```bash
-"$SKILL/tests/run.sh"     # 186 assertions, ~80s, exits non-zero on failure
+"$SKILL/tests/run.sh"     # 189 assertions, ~90s, exits non-zero on failure
 ```
 
 It creates **no real simulators** — a fake `xcrun` goes first on PATH and the

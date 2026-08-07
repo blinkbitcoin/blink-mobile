@@ -401,6 +401,20 @@ check "SKILL.md requires eyeballing extracted frames before publishing" "yes" \
   "$(grep -qi "extract" "$SKILL_MD" && grep -qi "frame" "$SKILL_MD" && echo yes || echo no)"
 
 echo
+echo "bench (hermetic: loose clock, runaway sleeps only)"
+
+# Real ffmpeg against the synthesized 2s clip; measured ~1-2s locally, so the
+# 15s budget only catches an order-of-magnitude regression (a dropped
+# hardware path, an accidental second decode of a full-res input).
+python3 -c 'pass' 2>/dev/null
+py_now() { python3 -c 'import time; print("%.3f" % time.time())'; }
+T0=$(py_now)
+"$SCRIPTS/encode-demo.sh" "$WORK/src.mov" "$WORK/bench.gif" --format gif --width 200 >/dev/null 2>&1
+DUR=$(python3 -c "print('%.1f' % (float('$(py_now)') - float('$T0')))")
+check "gif encode of the 2s clip stays under the runaway budget (15s)" "yes" \
+  "$(python3 -c "print('yes' if float('$DUR') < 15 else 'no (${DUR}s)')")"
+
+echo
 echo "-------------------------------------"
 printf '%d passed, %d failed\n' "$PASS" "$FAIL"
 [ "$FAIL" -eq 0 ] || exit 1

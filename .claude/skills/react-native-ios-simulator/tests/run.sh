@@ -973,6 +973,33 @@ check "releases the lock when the command fails" "absent" \
   "$([ -d "$DEMO_SIM_REGISTRY/locks/native-build" ] && echo present || echo absent)"
 
 echo
+echo "bench (hermetic: counts first, loose clocks second)"
+
+# Upper bounds sit at >=5x locally measured (claim+release cycle ~2.4s with
+# fakes, reload roundtrip ~0.9s) and only catch runaway sleeps; the counted
+# assertion is the deterministic net. python3 warmed before timing.
+python3 -c 'pass' 2>/dev/null
+py_now() { python3 -c 'import time; print("%.3f" % time.time())'; }
+
+reset_world
+T0=$(py_now)
+eval "$("$SCRIPTS/claim-session.sh" 900)" >/dev/null 2>&1
+"$SCRIPTS/release-session.sh" 900 --delete >/dev/null 2>&1
+DUR=$(python3 -c "print('%.1f' % (float('$(py_now)') - float('$T0')))")
+check "a claim+release cycle stays under the runaway budget (12s)" "yes" \
+  "$(python3 -c "print('yes' if float('$DUR') < 12 else 'no (${DUR}s)')")"
+
+start_ws_fake bundle-done
+T0=$(py_now)
+"$SCRIPTS/reload-app.sh" --port "$WS_PORT" --timeout 10 >/dev/null 2>&1
+DUR=$(python3 -c "print('%.1f' % (float('$(py_now)') - float('$T0')))")
+check "a confirmed reload roundtrip stays under the runaway budget (5s)" "yes" \
+  "$(python3 -c "print('yes' if float('$DUR') < 5 else 'no (${DUR}s)')")"
+check "a reload opens exactly two websocket connections" "2" \
+  "$(grep -c "^connect " "$WS_LOG")"
+kill "$WS_PID" 2>/dev/null
+
+echo
 echo "-------------------------------------"
 printf '%d passed, %d failed\n' "$PASS" "$FAIL"
 [ "$FAIL" -eq 0 ] || exit 1
