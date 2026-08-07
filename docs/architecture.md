@@ -2,8 +2,11 @@
 
 ## Project: blink-mobile (GaloyApp)
 
-**Generated:** 2025-12-12
 **Type:** React Native Mobile Application
+
+This is a hand-curated document. It intentionally avoids counts and version numbers —
+those live in the source files referenced throughout. When a change alters something
+described here, update this document in the same PR.
 
 ## High-Level Architecture
 
@@ -29,7 +32,6 @@
 │  │                    Data Layer                               ││
 │  │  ┌───────────────────┐  ┌────────────────────┐             ││
 │  │  │  GraphQL Queries  │  │  GraphQL Mutations │             ││
-│  │  │  (192 hooks)      │  │  (50 hooks)        │             ││
 │  │  └─────────┬─────────┘  └──────────┬─────────┘             ││
 │  └────────────┼─────────────────────────────────┬──────────────┘│
 │               │                                 │ WebSocket     │
@@ -53,78 +55,105 @@
 
 ### Provider Tree (app/app.tsx)
 
+Source of truth: `app/app.tsx`.
+
 ```
 GestureHandlerRootView
-└── PersistentStateProvider          # Local persistent state
-    └── TypesafeI18n                  # Internationalization
-        └── GaloyClient               # Apollo GraphQL client
-            └── GaloyThemeProvider    # UI theming
+└── PersistentStateProvider              # Local persistent state
+    └── TypesafeI18n                     # Internationalization
+        └── GaloyClient                  # Apollo GraphQL client
+            └── GaloyThemeProvider       # UI theming
                 └── FeatureFlagContextProvider
-                    └── ActionsProvider
-                        └── NavigationContainerWrapper
-                            └── ErrorBoundary
-                                └── RootSiblingParent
-                                    └── NotificationsProvider
-                                        ├── AppStateWrapper
-                                        ├── PushNotificationComponent
-                                        ├── RootStack (Navigation)
-                                        ├── NetworkErrorComponent
-                                        └── ActionModals
+                    └── CustodialWalletProvider          # Custodial wallet state
+                        └── SelfCustodialWalletProvider  # Self-custodial (Spark) wallet state
+                            └── BackupStateProvider      # Recovery-phrase backup state
+                                └── AutoConvertStatusProvider
+                                    └── ActionsProvider
+                                        └── MigrationBlockerProvider  # Account-migration gating
+                                            └── NavigationContainerWrapper
+                                                └── ErrorBoundary
+                                                    └── RootSiblingParent
+                                                        ├── NotificationsProvider
+                                                        │   ├── AppStateWrapper
+                                                        │   ├── PushNotificationComponent
+                                                        │   ├── AutoConvertListenerMount
+                                                        │   ├── RootStack (Navigation)
+                                                        │   ├── NetworkErrorComponent
+                                                        │   └── ActionModals
+                                                        └── GaloyToast
 ```
 
 ### Navigation Structure
 
+Source of truth: `app/navigation/root-navigator.tsx` and
+`app/navigation/stack-param-lists.ts`. Routes are listed here as product-area groups,
+not exhaustively — read the navigator for the full registry.
+
 ```
-RootStack (Stack Navigator)
-├── getStarted          # Initial screen (unauthenticated)
-├── authenticationCheck # Auth check screen
-├── authentication      # Login/PIN screen
-├── login               # Login method selection
-├── pin                 # PIN entry
-├── Primary             # Main app (Tab Navigator)
+RootStack (native stack navigator)
+├── Auth & entry: getStarted, accountTypeSelection, unsupportedRegion,
+│   authenticationCheck, authentication, login, pin, acceptTermsAndConditions
+├── Primary (bottom-tab navigator)
 │   ├── Home            # Dashboard with balances
-│   ├── People          # Contacts (Stack Navigator)
-│   │   ├── peopleHome
-│   │   ├── contactDetail
-│   │   ├── allContacts
-│   │   └── circlesDashboard
+│   ├── People          # Contacts (nested stack: peopleHome, contactDetail,
+│   │                   #   allContacts, circlesDashboard)
 │   ├── Map             # Merchant map
 │   └── Earn            # Educational content
-├── scanningQRCode      # QR scanner
-├── sendBitcoin*        # Send flow (5 screens)
-├── receiveBitcoin      # Receive flow
-├── conversion*         # Currency conversion (3 screens)
-├── settings            # Settings screen
-├── transaction*        # Transaction screens
-├── phone*/email*/totp* # Auth method screens
-├── onboarding          # Onboarding flow (Stack Navigator)
-│   ├── welcomeLevel1
-│   ├── emailBenefits
-│   ├── lightningBenefits
-│   └── supportScreen
-└── [other screens]
+├── Payments: scanningQRCode, sendBitcoin* (destination → details → confirmation
+│   → completed), merchantSelection, receiveBitcoin, setLightningAddress,
+│   redeemBitcoin*, conversion* (details → confirmation → success)
+├── Transactions: transactionDetail, transactionHistory, transactionLimitsScreen,
+│   unclaimedDepositsScreen, priceHistory, feeRatesScreen
+├── Settings & account: settings, accountScreen, profileScreen, addressScreen,
+│   defaultWallet, theme, language, currency, security, notificationSettingsScreen,
+│   notificationHistory, apiScreen, apiKeyCreateScreen, developerScreen
+├── Auth methods: phoneFlow / phoneRegistration* (nested stack incl.
+│   telegramLoginValidate), emailRegistration*, emailLogin*, totp*
+├── Card: cardDashboardScreen, card* (details, limits, PIN, statements, shipping,
+│   status, …), orderCardScreen, replaceCardScreen, cardOnboarding* (intro →
+│   details → subscribe → payment → approval flow)
+├── Self-custodial: selfCustodialWalletCreation, selfCustodialBackup* (method,
+│   cloud, phrase, security checks, confirm, success), selfCustodialRestore*,
+│   stableBalanceSettings
+├── Account migration: accountMigration* (start, entry, explainer, keepReceiving,
+│   downloadHistory, balancesOverview, transferringFunds, contactSupport)
+└── Misc: earnsSection, earnsQuiz, sectionCompleted, onboarding (nested stack),
+    fullOnboardingFlow, webView, selectionScreen
 ```
 
 ## Data Flow
 
 ### GraphQL Operations
 
-**Queries (192 hooks)** - Data fetching:
+All queries, mutations, and subscription hooks are generated into
+`app/graphql/generated.ts` (auto-generated — never edit manually; regenerate with
+`yarn dev:codegen`). Representative examples:
+
+**Queries** - Data fetching:
 - `useWalletOverviewScreenQuery` - Main dashboard data
 - `useRealtimePriceQuery` - Bitcoin price updates
-- `useTransactionsQuery` - Transaction history
+- `useTransactionListForDefaultAccountQuery` - Transaction history
 - `useContactsQuery` - Contact list
-- `useAnalyticsQuery` - Analytics data
 
-**Mutations (50 hooks)** - Data modifications:
+**Mutations** - Data modifications:
 - `useIntraLedgerPaymentSendMutation` - Internal transfers
 - `useLnInvoicePaymentSendMutation` - Lightning payments
 - `useOnChainPaymentSendMutation` - On-chain transactions
 - `useUserUpdateUsernameMutation` - Profile updates
-- `useDeviceNotificationTokenCreateMutation` - Push notifications
 
-**Subscriptions (1 hook)** - Real-time updates:
+**Subscriptions** - Real-time updates:
 - Price updates via WebSocket
+
+### Apollo Client Configuration
+
+Key features configured in `app/graphql/client.tsx`:
+
+1. **Persisted Queries**: SHA-256 hashed queries for bandwidth optimization
+2. **Cache Persistence**: Apollo cache stored in AsyncStorage
+3. **Retry Logic**: Auto-retry with backoff (excludes payment operations)
+4. **WebSocket**: Real-time subscriptions for price updates
+5. **App Check**: Firebase device attestation header
+6. **Auth**: Bearer token in Authorization header
 
 ### State Management Layers
 
@@ -135,6 +164,7 @@ RootStack (Stack Navigator)
 | Persistent State | Settings, preferences | PersistentStateContext + AsyncStorage |
 | UI State | Loading, errors, modals | React Context + local state |
 | Feature Flags | Feature toggles | FeatureFlagContext |
+| Wallet State | Custodial / self-custodial wallet context | CustodialWalletProvider, SelfCustodialWalletProvider |
 
 ## Authentication Flow
 
@@ -160,7 +190,20 @@ RootStack (Stack Navigator)
 
 ## Bitcoin/Lightning Architecture
 
-### Wallet Types
+### Account Modes: Custodial vs Self-Custodial
+
+The app supports two account modes, plus a migration path between them:
+
+- **Custodial** (`app/custodial/`): balances held by the Blink backend — the classic
+  BTC + Stablesats USD wallets below.
+- **Self-custodial** (`app/self-custodial/`): on-device Spark wallet with
+  recovery-phrase backup and restore flows (see the self-custodial route group above).
+- **Account migration** (`app/screens/account-migration/`): guided flow moving a
+  custodial account's funds to the self-custodial wallet.
+
+See also `docs/self-custodial-rollout.md`.
+
+### Wallet Types (custodial)
 
 | Wallet | Currency | Use Case |
 |--------|----------|----------|
@@ -218,6 +261,30 @@ RootStack (Stack Navigator)
 
 1. **Apollo Cache**: Persistent cache with AsyncStorage
 2. **Query Batching**: Persisted queries with SHA-256 hashes
-3. **Lazy Loading**: Screen-based code splitting
+3. **Lazy Loading**: Single-locale i18n loading at startup (`app/i18n/lazy-locale-loader.ts`)
 4. **Image Optimization**: SVG icons, optimized assets
-5. **Retry Logic**: Automatic retry with backoff
+5. **Retry Logic**: Automatic retry with backoff (never for payment mutations)
+
+## Where Things Live
+
+Source of truth: the directory tree itself (`git ls-tree HEAD app/`).
+
+| Path | Purpose |
+|------|---------|
+| `app/screens/` | One directory per screen |
+| `app/components/` | Reusable UI components |
+| `app/navigation/` | Navigators, param lists, navigation container |
+| `app/graphql/` | Apollo client, generated types/hooks, cache config |
+| `app/custodial/` | Custodial account logic |
+| `app/self-custodial/` | Self-custodial (Spark) wallet, backup/restore |
+| `app/screens/account-migration/` | Custodial → self-custodial migration flow |
+| `app/hooks/` | Shared React hooks |
+| `app/utils/` | Pure utilities |
+| `app/store/` | Persistent state |
+| `app/config/` | Environment/instance configuration |
+| `app/i18n/` | Translations (typesafe-i18n; edit `en/index.ts` only) |
+| `app/assets/`, `app/rne-theme/`, `app/types/` | Assets, theme, shared types |
+| `ios/`, `android/` | Native projects |
+| `__tests__/` | Jest unit/component tests |
+| `e2e/` | End-to-end tests |
+| `docs/` | Documentation (see `docs/index.md`) |

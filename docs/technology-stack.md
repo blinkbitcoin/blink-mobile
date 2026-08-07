@@ -2,28 +2,31 @@
 
 ## Project: blink-mobile (GaloyApp)
 
-**Generated:** 2025-12-12
+Versions live in `package.json`, `ios/Podfile.lock`, `android/build.gradle`, and
+`flake.nix` — this document explains what each technology is for, not which version is
+pinned. When adding or removing a dependency, update the relevant table here in the
+same PR.
 
 ## Core Technologies
 
-| Category | Technology | Version | Purpose |
-|----------|-----------|---------|---------|
-| Framework | React Native | 0.76.9 | Cross-platform mobile development |
-| Language | TypeScript | 5.4.5 | Type-safe JavaScript |
-| Runtime | Node.js | >=20 | Build tooling and development |
-| Package Manager | Yarn | - | Dependency management |
+| Category | Technology | Purpose |
+|----------|-----------|---------|
+| Framework | React Native | Cross-platform mobile development |
+| Language | TypeScript | Type-safe JavaScript |
+| Runtime | Node.js | Build tooling and development (engine range in `package.json`) |
+| Package Manager | Yarn | Dependency management |
 
 ## Frontend Stack
 
 ### UI Framework
-| Package | Version | Purpose |
-|---------|---------|---------|
-| @rn-vui/themed | - | Component library (RN Elements fork) |
-| react-native-reanimated | - | Performant animations |
-| react-native-gesture-handler | - | Touch gestures |
-| react-native-svg | - | Vector graphics |
-| react-native-safe-area-context | - | Safe area handling |
-| victory-native | - | Charts and data visualization |
+| Package | Purpose |
+|---------|---------|
+| @rn-vui/themed | Component library (RN Elements fork) |
+| react-native-reanimated | Performant animations |
+| react-native-gesture-handler | Touch gestures |
+| react-native-svg | Vector graphics |
+| react-native-safe-area-context | Safe area handling |
+| victory-native | Charts and data visualization |
 
 ### Navigation
 | Package | Purpose |
@@ -48,7 +51,6 @@
 | @apollo/client | GraphQL client |
 | graphql | GraphQL language |
 | graphql-ws | WebSocket subscriptions |
-| graphql-tag | GraphQL template tags |
 
 ### Code Generation
 | Package | Purpose |
@@ -60,16 +62,17 @@
 
 ## Bitcoin/Lightning
 
-| Package | Version | Purpose |
-|---------|---------|---------|
-| @blinkbitcoin/blink-client | 1.1.0 | Blink payment destination parser and API client |
-| bitcoinjs-lib | ^6.1.5 | Bitcoin primitives |
-| bolt11 | ~1.4.1 | Lightning invoice parsing |
-| js-lnurl | 0.6.0 | LNURL protocol |
-| lnurl-pay | ^5.0.2 | LNURL payment requests |
-| @noble/hashes | ^1.8.0 | Cryptographic hash utilities used by payment parsing |
-| @scure/base | ^1.1.9 | Base encoding utilities used by payment parsing |
-| bip39 | ^3.1.0 | Mnemonic phrases |
+| Package | Purpose |
+|---------|---------|
+| @blinkbitcoin/blink-client | Blink payment destination parser and API client |
+| @breeztech/breez-sdk-spark-react-native | Self-custodial Spark wallet SDK |
+| bitcoinjs-lib | Bitcoin primitives |
+| bolt11 | Lightning invoice parsing |
+| js-lnurl | LNURL protocol |
+| lnurl-pay | LNURL payment requests |
+| @noble/hashes | Cryptographic hash utilities used by payment parsing |
+| @scure/base | Base encoding utilities used by payment parsing |
+| bip39 | Mnemonic phrases |
 
 ## Native Capabilities
 
@@ -77,7 +80,7 @@
 | Package | Purpose |
 |---------|---------|
 | react-native-camera-kit | Camera access |
-| @nickadamson/react-native-qrcode-svg | QR code generation |
+| react-native-qrcode-svg | QR code generation |
 
 ### Hardware
 | Package | Purpose |
@@ -100,9 +103,9 @@
 | react-native-permissions | Permission management |
 
 ### UI Effects
-| Package | Version | Purpose |
-|---------|---------|---------|
-| @react-native-community/blur | 4.4.1 | Native blur effects for iOS and Android |
+| Package | Purpose |
+|---------|---------|
+| @react-native-community/blur | Native blur effects for iOS and Android |
 
 ## Firebase Services
 
@@ -123,8 +126,9 @@
 | @formatjs/intl-relativetimeformat | Date formatting |
 | intl-pluralrules | Pluralization rules |
 
-**Supported Languages (28):**
-af, ar, ca, cs, da, de, el, en, es, fr, hr, hu, hy, it, ja, ko, ms, nl, no, pl, pt, ro, ru, sv, th, tr, uk, zh
+**Supported languages:** one directory per locale under `app/i18n/` (source of truth).
+Only `app/i18n/en/index.ts` is edited by hand; other locales are managed by the
+translation pipeline (see `app/i18n/README.md`).
 
 ## Testing
 
@@ -141,23 +145,23 @@ af, ar, ca, cs, da, de, el, en, es, fr, hr, hu, hy, it, ja, ko, ms, nl, no, pl, 
 ### Development Environment
 | Tool | Purpose |
 |------|---------|
-| Nix Flake | Reproducible dev environment |
+| Nix Flake | Reproducible dev environment (toolchain versions pinned in `flake.nix`) |
 | Direnv | Environment management |
 | Metro | JavaScript bundler |
 
 ### CI/CD
 | Tool | Purpose |
 |------|---------|
-| GitHub Actions | CI/CD workflows |
+| GitHub Actions | CI/CD workflows (see `docs/index.md` for the workflow list) |
 | Fastlane | iOS/Android deployment |
 | Tilt | Local development orchestration |
 
 ### Build Tools
 | Tool | Purpose |
 |------|---------|
-| Xcode 26.5 | iOS builds |
-| Android SDK 35 | Android builds |
-| JDK 17 | Android compilation |
+| Xcode | iOS builds (version pinned in `flake.nix`) |
+| Android SDK | Android builds (versions in `android/build.gradle` / `flake.nix`) |
+| JDK | Android compilation (pinned in `flake.nix`) |
 | CocoaPods | iOS dependency management |
 | Gradle | Android build system |
 
@@ -175,14 +179,13 @@ yarn e2e:build      # Build for E2E
 yarn e2e:test       # Run E2E tests
 
 # Code quality
-yarn check-code     # Lint + type check
-yarn lint           # ESLint
-yarn tsc            # TypeScript check
+yarn check-code     # Type check + lint + translations + codegen checks
+yarn eslint:check   # ESLint
+yarn tsc:check      # TypeScript check
 
 # Code generation
 yarn dev:codegen    # Generate GraphQL types
 yarn update-translations  # Update i18n
-
 ```
 
 ## Environment Configuration

@@ -1,16 +1,19 @@
 # Blink Mobile Documentation
 
+> These docs are hand-curated. They deliberately contain no version numbers or counts —
+> those live in the source files each doc points at. The BMAD document-project scan that
+> originally generated some of them was retired (see blink-wip#1041); do **not**
+> regenerate — a re-scan would recreate deleted docs and overwrite curation. When a code
+> change alters something a doc describes, update the doc in the same PR.
+
 ## Project Overview
 
 | Property | Value |
 |----------|-------|
 | **Name** | blink-mobile (GaloyApp) |
-| **Type** | React Native Mobile Application |
+| **Type** | React Native Mobile Application (React Native + TypeScript) |
 | **Platforms** | iOS, Android |
-| **Language** | TypeScript |
-| **Framework** | React Native 0.76.9 |
 | **Repository** | blink-mobile |
-| **Documentation Generated** | 2025-12-12 |
 
 ## Quick Start
 
@@ -18,7 +21,7 @@
 # Prerequisites: Nix with flakes, Direnv
 
 # 1. Clone and enter directory
-git clone git@github.com:GaloyMoney/blink-mobile.git
+git clone git@github.com:blinkbitcoin/blink-mobile.git
 cd blink-mobile
 direnv allow
 
@@ -38,10 +41,8 @@ yarn ios             # iOS (terminal 2)
 
 | Document | Description |
 |----------|-------------|
-| [Architecture](./architecture.md) | System architecture, component hierarchy, data flow |
-| [Technology Stack](./technology-stack.md) | Complete list of technologies and dependencies |
-| [Source Tree Analysis](./source-tree-analysis.md) | Directory structure and code organization |
-| [API Reference](./api-reference.md) | GraphQL API types, queries, and mutations |
+| [Architecture](./architecture.md) | System architecture, providers, navigation, data flow, directory layout |
+| [Technology Stack](./technology-stack.md) | What each technology and dependency is for |
 
 ### Existing Documentation
 
@@ -51,6 +52,8 @@ yarn ios             # iOS (terminal 2)
 | [PR Review Guide](./pr-review.md) | Review conventions, checklists, and enforced standards for pull requests |
 | [E2E Testing](./e2e-testing.md) | End-to-end testing with Detox/Appium |
 | [Android env config & R8](./android-env-config-r8.md) | Verifying `react-native-config` values survive R8 in release builds |
+| [Self-Custodial Rollout](./self-custodial-rollout.md) | Self-custodial wallet rollout plan and status |
+| [Dollar vs Stablesats Naming](./dollar-vs-stablesats-naming-analysis.md) | Naming analysis for the USD wallet |
 | [README](../README.md) | Project overview and basic instructions |
 | [Contributing](../CONTRIBUTING.MD) | Contribution guidelines |
 
@@ -60,18 +63,6 @@ yarn ios             # iOS (terminal 2)
 |-------|----------|
 | i18n Guide | [app/i18n/README.md](../app/i18n/README.md) |
 | Android Fastlane | [android/fastlane/README.md](../android/fastlane/README.md) |
-
-## Project Statistics
-
-| Metric | Count |
-|--------|-------|
-| Components | 55 directories |
-| Screens | 30 directories |
-| GraphQL Queries | 192 hooks |
-| GraphQL Mutations | 50 hooks |
-| Supported Languages | 28 |
-| Unit Test Files | 48 |
-| Icon Assets | 44 SVG files |
 
 ## Key Entry Points
 
@@ -93,7 +84,7 @@ yarn ios             # iOS (terminal 2)
 ├────────────────────────────────────────────────┤
 │  State: Apollo Client + React Context          │
 ├────────────────────────────────────────────────┤
-│  Data: GraphQL (192 queries, 50 mutations)     │
+│  Data: GraphQL (generated queries/mutations)   │
 ├────────────────────────────────────────────────┤
 │  Native: iOS (Swift/ObjC) + Android (Kotlin)   │
 └────────────────────────────────────────────────┘
@@ -144,11 +135,14 @@ yarn e2e:test ios.sim.debug
 
 | Workflow | Trigger | Purpose |
 |----------|---------|---------|
-| `check-code.yml` | PR | Lint, type check |
+| `check-code.yml` | PR | Lint, type check, translations + codegen checks |
 | `test.yml` | PR | Unit tests |
 | `e2e.yml` | PR | E2E tests (iOS + Android) |
-| `audit.yml` | Schedule | Security audit |
-| `codeql.yml` | PR | Code analysis |
+| `audit.yml` | PR | Dependency security audit |
+| `codeql.yml` | PR + push to main | Code analysis |
+| `conventional.yaml` | PR | Conventional-commit title check |
+| `spelling.yml` | PR | Spell check (`typos`) |
+| `update_pods.yml` | Dependabot branches | Refresh `Podfile.lock` for dependency bumps |
 
 ## Backend Environments
 
@@ -166,12 +160,12 @@ yarn e2e:test ios.sim.debug
 - **Contacts**: Username-based payments
 - **Merchant Map**: Find Bitcoin-accepting businesses
 - **Educational Content**: Learn about Bitcoin (Earn section)
-- **Multi-Language**: 28 supported languages
+- **Multi-Language**: localized UI (one locale directory per language under `app/i18n/`)
 - **Push Notifications**: Transaction alerts
 
 ## External Resources
 
 - [Blink Website](https://blink.sv)
 - [Blink API Docs](https://dev.blink.sv)
-- [Galoy GitHub](https://github.com/GaloyMoney)
+- [Blink GitHub](https://github.com/blinkbitcoin)
 - [Community Chat](https://chat.blink.sv)
