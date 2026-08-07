@@ -4207,6 +4207,9 @@ const en: BaseTranslation = {
     nudgeMissingTitle: "Your funds have no recovery backup",
     nudgeMissingBody:
       "Set up your recovery backup so you can move your funds onchain if Spark becomes unavailable.",
+    nudgeOnlyOnThisDeviceTitle: "Your emergency bundle is only on this phone",
+    nudgeOnlyOnThisDeviceBody:
+      "Save a copy somewhere else. If you lose this phone, the copy stored on it goes with it and your funds cannot be recovered onchain.",
     nudgeStaleTitle: "Your recovery backup is out of date",
     nudgeStaleBody:
       "It no longer matches your balance. Refresh it so a recovery would return everything you hold.",

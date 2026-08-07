@@ -4017,6 +4017,8 @@
     "dollarNotCovered": "Je dollarsaldo valt niet onder on-chain herstel. Alleen bitcoin kan zo worden hersteld.",
     "nudgeMissingTitle": "Je geld heeft geen herstelback-up",
     "nudgeMissingBody": "Stel je herstelback-up in zodat je je geld on-chain kunt verplaatsen als Spark niet meer beschikbaar is.",
+    "nudgeOnlyOnThisDeviceTitle": "Je noodbundel staat alleen op deze telefoon",
+    "nudgeOnlyOnThisDeviceBody": "Bewaar ergens anders een kopie. Raak je deze telefoon kwijt, dan gaat de kopie erop mee en kan je geld niet on-chain worden hersteld.",
     "nudgeStaleTitle": "Je herstelback-up is verouderd",
     "nudgeStaleBody": "Hij komt niet meer overeen met je saldo. Ververs hem zodat herstel alles teruggeeft wat je hebt.",
     "nudgeCta": "Herstelback-up openen",

@@ -4017,6 +4017,8 @@
     "dollarNotCovered": "Tvoj dolárový zostatok nie je zahrnutý v on-chain obnove. Takto možno obnoviť iba bitcoin.",
     "nudgeMissingTitle": "Tvoje prostriedky nemajú zálohu na obnovu",
     "nudgeMissingBody": "Nastav zálohu na obnovu, aby si mohol presunúť prostriedky on-chain, ak Spark prestane byť dostupný.",
+    "nudgeOnlyOnThisDeviceTitle": "Tvoj núdzový balík je len v tomto telefóne",
+    "nudgeOnlyOnThisDeviceBody": "Ulož si kópiu inam. Ak telefón stratíš, kópia v ňom zmizne s ním a tvoje prostriedky nepôjde obnoviť on-chain.",
     "nudgeStaleTitle": "Tvoja záloha na obnovu je zastaraná",
     "nudgeStaleBody": "Už nezodpovedá tvojmu zostatku. Obnov ju, aby obnova vrátila všetko, čo máš.",
     "nudgeCta": "Otvoriť zálohu na obnovu",

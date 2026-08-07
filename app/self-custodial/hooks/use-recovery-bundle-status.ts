@@ -7,6 +7,7 @@ import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { AccountType } from "@app/types/wallet"
 
+import { readRecoveryBundleSettings } from "../recovery-bundle/settings"
 import { readRecoveryBundleState } from "../recovery-bundle/storage"
 import { useSparkNetwork } from "./use-spark-network"
 
@@ -77,6 +78,10 @@ type RecoveryBundleStatusResult = {
   status: RecoveryBundleStatus
   savedAt: number | null
   leafCount: number | null
+  /** True when a bundle exists but has never left this device - neither
+   *  exported by the user nor uploaded to their cloud. The automatic on-device
+   *  copy dies with the device, so this is "backed up" only in name. */
+  isOnlyOnThisDevice: boolean
   reload: () => Promise<void>
 }
 
@@ -96,7 +101,16 @@ export const useRecoveryBundleStatus = (): RecoveryBundleStatusResult => {
     savedAt: number | null
     savedTotalSats: string | null
     leafCount: number | null
-  }>({ loaded: false, savedAt: null, savedTotalSats: null, leafCount: null })
+    cloudSyncedAt: number | null
+    exportedAt: number | null
+  }>({
+    loaded: false,
+    savedAt: null,
+    savedTotalSats: null,
+    leafCount: null,
+    cloudSyncedAt: null,
+    exportedAt: null,
+  })
 
   const accountId =
     activeAccount?.type === AccountType.SelfCustodial ? activeAccount.id : null
@@ -107,21 +121,40 @@ export const useRecoveryBundleStatus = (): RecoveryBundleStatusResult => {
 
   const reload = useCallback(async () => {
     if (!accountId) {
-      setSaved({ loaded: false, savedAt: null, savedTotalSats: null, leafCount: null })
+      setSaved({
+        loaded: false,
+        savedAt: null,
+        savedTotalSats: null,
+        leafCount: null,
+        cloudSyncedAt: null,
+        exportedAt: null,
+      })
       return
     }
     try {
-      const state = await readRecoveryBundleState(accountId, network)
+      const [state, settings] = await Promise.all([
+        readRecoveryBundleState(accountId, network),
+        readRecoveryBundleSettings(accountId),
+      ])
       setSaved({
         loaded: true,
         savedAt: state?.savedAt ?? null,
         savedTotalSats: state?.totalSats ?? null,
         leafCount: state?.leafCount ?? null,
+        cloudSyncedAt: state?.cloudSyncedAt ?? null,
+        exportedAt: settings.exportedAt,
       })
     } catch {
       /** An unreadable state file is indistinguishable from no backup, and the
        *  honest reading of "we cannot confirm you have one" is Missing. */
-      setSaved({ loaded: true, savedAt: null, savedTotalSats: null, leafCount: null })
+      setSaved({
+        loaded: true,
+        savedAt: null,
+        savedTotalSats: null,
+        leafCount: null,
+        cloudSyncedAt: null,
+        exportedAt: null,
+      })
     }
   }, [accountId, network])
 
@@ -147,5 +180,17 @@ export const useRecoveryBundleStatus = (): RecoveryBundleStatusResult => {
           now: Date.now(),
         })
 
-  return { status, savedAt: saved.savedAt, leafCount: saved.leafCount, reload }
+  const isOnlyOnThisDevice =
+    status !== RecoveryBundleStatus.Unknown &&
+    status !== RecoveryBundleStatus.Missing &&
+    saved.exportedAt === null &&
+    saved.cloudSyncedAt === null
+
+  return {
+    status,
+    savedAt: saved.savedAt,
+    leafCount: saved.leafCount,
+    isOnlyOnThisDevice,
+    reload,
+  }
 }

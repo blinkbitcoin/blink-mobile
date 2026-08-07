@@ -23,13 +23,27 @@ export const RecoveryBackupNudgeBanner: React.FC<Props> = ({ variant, onDismiss 
     navigation.navigate("selfCustodialRecoveryBackup")
   }, [navigation])
 
-  const isMissing = variant === RecoveryBackupNudgeVariant.Missing
   const t = LL.RecoveryBundleScreen
+  const isMissing = variant === RecoveryBackupNudgeVariant.Missing
+  const copy = {
+    [RecoveryBackupNudgeVariant.Missing]: {
+      title: t.nudgeMissingTitle(),
+      body: t.nudgeMissingBody(),
+    },
+    [RecoveryBackupNudgeVariant.Stale]: {
+      title: t.nudgeStaleTitle(),
+      body: t.nudgeStaleBody(),
+    },
+    [RecoveryBackupNudgeVariant.OnlyOnThisDevice]: {
+      title: t.nudgeOnlyOnThisDeviceTitle(),
+      body: t.nudgeOnlyOnThisDeviceBody(),
+    },
+  }[variant]
 
   return (
     <NotificationCardUI
-      title={isMissing ? t.nudgeMissingTitle() : t.nudgeStaleTitle()}
-      text={isMissing ? t.nudgeMissingBody() : t.nudgeStaleBody()}
+      title={copy.title}
+      text={copy.body}
       action={openRecoveryBackup}
       /** Missing means funds exist with no recovery path at all, which is not a
        *  reminder to be snoozed; only the staleness variant can be dismissed. */

@@ -13384,6 +13384,14 @@ type RootTranslation = {
 		 */
 		nudgeMissingBody: string
 		/**
+		 * Y​o​u​r​ ​e​m​e​r​g​e​n​c​y​ ​b​u​n​d​l​e​ ​i​s​ ​o​n​l​y​ ​o​n​ ​t​h​i​s​ ​p​h​o​n​e
+		 */
+		nudgeOnlyOnThisDeviceTitle: string
+		/**
+		 * S​a​v​e​ ​a​ ​c​o​p​y​ ​s​o​m​e​w​h​e​r​e​ ​e​l​s​e​.​ ​I​f​ ​y​o​u​ ​l​o​s​e​ ​t​h​i​s​ ​p​h​o​n​e​,​ ​t​h​e​ ​c​o​p​y​ ​s​t​o​r​e​d​ ​o​n​ ​i​t​ ​g​o​e​s​ ​w​i​t​h​ ​i​t​ ​a​n​d​ ​y​o​u​r​ ​f​u​n​d​s​ ​c​a​n​n​o​t​ ​b​e​ ​r​e​c​o​v​e​r​e​d​ ​o​n​c​h​a​i​n​.
+		 */
+		nudgeOnlyOnThisDeviceBody: string
+		/**
 		 * Y​o​u​r​ ​r​e​c​o​v​e​r​y​ ​b​a​c​k​u​p​ ​i​s​ ​o​u​t​ ​o​f​ ​d​a​t​e
 		 */
 		nudgeStaleTitle: string
@@ -27083,6 +27091,14 @@ export type TranslationFunctions = {
 		 * Set up your recovery backup so you can move your funds onchain if Spark becomes unavailable.
 		 */
 		nudgeMissingBody: () => LocalizedString
+		/**
+		 * Your emergency bundle is only on this phone
+		 */
+		nudgeOnlyOnThisDeviceTitle: () => LocalizedString
+		/**
+		 * Save a copy somewhere else. If you lose this phone, the copy stored on it goes with it and your funds cannot be recovered onchain.
+		 */
+		nudgeOnlyOnThisDeviceBody: () => LocalizedString
 		/**
 		 * Your recovery backup is out of date
 		 */

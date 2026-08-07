@@ -4017,6 +4017,8 @@
     "dollarNotCovered": "A dolláregyenleged nem tartozik az on-chain helyreállítás alá. Így csak bitcoin állítható helyre.",
     "nudgeMissingTitle": "A pénzedhez nincs helyreállítási mentés",
     "nudgeMissingBody": "Állítsd be a helyreállítási mentést, hogy on-chain mozgathasd a pénzed, ha a Spark elérhetetlenné válik.",
+    "nudgeOnlyOnThisDeviceTitle": "A vészhelyzeti csomagod csak ezen a telefonon van",
+    "nudgeOnlyOnThisDeviceBody": "Ments egy másolatot máshová. Ha elveszíted a telefont, a rajta tárolt másolat is vele vész, és a pénzed nem lesz on-chain helyreállítható.",
     "nudgeStaleTitle": "A helyreállítási mentés elavult",
     "nudgeStaleBody": "Már nem egyezik az egyenlegeddel. Frissítsd, hogy a helyreállítás mindent visszaadjon.",
     "nudgeCta": "Helyreállítási mentés megnyitása",

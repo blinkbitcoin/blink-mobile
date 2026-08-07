@@ -4017,6 +4017,8 @@
     "dollarNotCovered": "Baki Dolar anda tidak dilindungi oleh pemulihan on-chain. Hanya Bitcoin boleh dipulihkan dengan cara ini.",
     "nudgeMissingTitle": "Dana anda tiada sandaran pemulihan",
     "nudgeMissingBody": "Sediakan sandaran pemulihan supaya anda boleh memindahkan dana secara on-chain jika Spark tidak tersedia.",
+    "nudgeOnlyOnThisDeviceTitle": "Bundel kecemasan anda hanya ada pada telefon ini",
+    "nudgeOnlyOnThisDeviceBody": "Simpan satu salinan di tempat lain. Jika anda kehilangan telefon ini, salinan di dalamnya turut hilang dan dana anda tidak boleh dipulihkan on-chain.",
     "nudgeStaleTitle": "Sandaran pemulihan anda sudah lapuk",
     "nudgeStaleBody": "Ia tidak lagi sepadan dengan baki anda. Segarkan semula supaya pemulihan mengembalikan semua yang anda miliki.",
     "nudgeCta": "Buka sandaran pemulihan",

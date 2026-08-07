@@ -4017,6 +4017,8 @@
     "dollarNotCovered": "Ibhalansi yakho yeDollar ayigqunyelwanga kukubuyisela kwi-chain. YiBitcoin kuphela enokubuyiselwa ngale ndlela.",
     "nudgeMissingTitle": "Imali yakho ayinalo ugcino lokubuyisela",
     "nudgeMissingBody": "Seta ugcino lwakho lokubuyisela ukuze ukwazi ukuhambisa imali kwi-chain ukuba iSpark ayifumaneki.",
+    "nudgeOnlyOnThisDeviceTitle": "Ingqokelela yakho yongxamiseko ikwifowuni le kuphela",
+    "nudgeOnlyOnThisDeviceBody": "Gcina ikopi kwenye indawo. Ukuba ulahlekelwa yile fowuni, ikopi ekuyo ihamba nayo kwaye imali yakho ayinakubuyiselwa kwi-chain.",
     "nudgeStaleTitle": "Ugcino lwakho lokubuyisela ludala",
     "nudgeStaleBody": "Alusahambelani nebhalansi yakho. Luhlaziye ukuze ukubuyisela kukubuyisele yonke into onayo.",
     "nudgeCta": "Vula ugcino lokubuyisela",

@@ -4017,6 +4017,8 @@
     "dollarNotCovered": "Ssente zo eza Doola tezirimu mu kuzza obuggya kwa chain. Bitcoin yokka y'esobola okuzzibwa mu ngeri eno.",
     "nudgeMissingTitle": "Ssente zo tezirina bakaapu ya kuzza buggya",
     "nudgeMissingBody": "Teekawo bakaapu yo ey'okuzza obuggya osobole okutwala ssente ku chain singa Spark egaana okukola.",
+    "nudgeOnlyOnThisDeviceTitle": "Ekipakiti kyo eky'obwangu kiri ku ssimu eno yokka",
+    "nudgeOnlyOnThisDeviceBody": "Tereeka kkopi ahalala. Bw'oba ofiiriddwa essimu eno, kkopi eri ku yo egenda nayo era ssente zo tezijja kuzzibwa ku chain.",
     "nudgeStaleTitle": "Bakaapu yo ey'okuzza obuggya nkadde",
     "nudgeStaleBody": "Tekyatuukagana na ssente zo. Gitereeze osobole okuzza byonna by'olina.",
     "nudgeCta": "Bikkula bakaapu ey'okuzza obuggya",
