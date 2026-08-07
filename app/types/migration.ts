@@ -60,6 +60,10 @@ export const MigrationSupportOrigin = {
   Commit: "commit",
   Resume: "resume",
   Gate: "gate",
+  /** The only handover the transfer is expected to survive: the receive is still being
+   *  watched underneath, so backing out returns to the screen watching it rather than
+   *  popping to the commit screen, which would unmount the gate with it. */
+  ReceiveDelayed: "receive-delayed",
 } as const
 
 export type MigrationSupportOrigin =

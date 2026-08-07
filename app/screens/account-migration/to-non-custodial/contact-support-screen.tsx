@@ -66,14 +66,19 @@ export const MigrationContactSupportScreen: React.FC = () => {
    */
   const isResumeOrigin = params?.origin === MigrationSupportOrigin.Resume
   const isGateOrigin = params?.origin === MigrationSupportOrigin.Gate
+  /** The delayed handover shares the resume path's Back: the transfer screen is still
+   *  mounted underneath watching for the receive, and navigating to the commit screen
+   *  would pop it off the stack, taking the gate the user is waiting on with it. */
+  const isReceiveDelayedOrigin = params?.origin === MigrationSupportOrigin.ReceiveDelayed
+  const isBackToScreenBeneath = isResumeOrigin || isReceiveDelayedOrigin
   const handleBack = useCallback(() => {
     if (isGateOrigin) return
-    if (isResumeOrigin) {
+    if (isBackToScreenBeneath) {
       navigation.goBack()
       return
     }
     navigation.navigate("accountMigrationBalancesOverview")
-  }, [isGateOrigin, isResumeOrigin, navigation])
+  }, [isGateOrigin, isBackToScreenBeneath, navigation])
   useHardwareBackGuard(handleBack)
 
   /** The back control lives in the navigator header, but its target is set from here so it

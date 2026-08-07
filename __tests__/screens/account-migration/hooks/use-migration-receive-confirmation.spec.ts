@@ -301,15 +301,47 @@ describe("useMigrationReceiveConfirmation", () => {
     )
   })
 
-  /** The swap path already reads a missing wallet key and routes it to support; a gate
-   *  that held the swap back would only hide that handover. */
-  it("passes a missing mnemonic through as confirmed", async () => {
+  /**
+   * The swap this would release checks the account index, not the keystore, so it would
+   * discard the working custodial session for a wallet whose key is unrecoverable and
+   * leave the user with neither. Not confirming keeps the working session, and the
+   * delayed notice is what routes the user to support.
+   */
+  it("does not confirm when the wallet's key is gone from the device", async () => {
     mockCheckReceiveLanded.mockResolvedValue({ status: MigrationSdkStatus.NoMnemonic })
 
     const { result } = renderGate()
     await flushCheck()
 
+    expect(result.current.isReceiveConfirmed).toBe(false)
+    expect(mockReportError).toHaveBeenCalledWith(
+      "Migration receive check",
+      expect.objectContaining({ message: "No mnemonic for the provisioned account" }),
+    )
+  })
+
+  it("keeps checking after a missing mnemonic, in case the keystore reads again", async () => {
+    mockCheckReceiveLanded
+      .mockResolvedValueOnce({ status: MigrationSdkStatus.NoMnemonic })
+      .mockResolvedValue(ok(landed))
+
+    const { result } = renderGate()
+    await flushCheck()
+    expect(result.current.isReceiveConfirmed).toBe(false)
+
+    await advance(RECEIVE_CHECK_RETRY_MS)
     expect(result.current.isReceiveConfirmed).toBe(true)
+  })
+
+  it("reports a missing mnemonic once, however many checks find it", async () => {
+    mockCheckReceiveLanded.mockResolvedValue({ status: MigrationSdkStatus.NoMnemonic })
+
+    renderGate()
+    await flushCheck()
+    await advance(RECEIVE_CHECK_RETRY_MS)
+    await advance(RECEIVE_CHECK_RETRY_MS)
+
+    expect(mockReportError).toHaveBeenCalledTimes(1)
   })
 
   /** The retry waits for the previous check to settle: checks serialize on the wallet's

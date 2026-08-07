@@ -169,6 +169,36 @@ describe("MigrationContactSupportScreen", () => {
     expect(mockNavigate).not.toHaveBeenCalledWith("accountMigrationBalancesOverview")
   })
 
+  /** The delayed handover is opened over a transfer that is still running: navigating to
+   *  the commit screen would pop the transfer screen off the stack and unmount the receive
+   *  gate the user is waiting on, so this Back dismisses instead. */
+  it("dismisses the hardware back when opened from the delayed-receive handover", async () => {
+    mockOrigin = MigrationSupportOrigin.ReceiveDelayed
+    const { BackHandler } =
+      jest.requireActual<typeof import("react-native")>("react-native")
+    const addListenerSpy = jest.spyOn(BackHandler, "addEventListener")
+    renderScreen()
+    await flushEffects()
+
+    const handler = addListenerSpy.mock.calls[0][1] as () => boolean
+
+    expect(handler()).toBe(true)
+    expect(mockGoBack).toHaveBeenCalledTimes(1)
+    expect(mockNavigate).not.toHaveBeenCalledWith("accountMigrationBalancesOverview")
+  })
+
+  it("dismisses the header back when opened from the delayed-receive handover", async () => {
+    mockOrigin = MigrationSupportOrigin.ReceiveDelayed
+    renderScreen()
+    await flushEffects()
+
+    const options = mockSetOptions.mock.calls.at(-1)?.[0]
+    options?.headerLeft?.().props.onPress()
+
+    expect(mockGoBack).toHaveBeenCalledTimes(1)
+    expect(mockNavigate).not.toHaveBeenCalledWith("accountMigrationBalancesOverview")
+  })
+
   /** From the gate handover (a lock with nothing to resume, #4070) there is nothing behind
    *  this screen: the gate underneath would only replay the handover, and the commit path
    *  would fabricate a commit screen for an account with no provisioned wallet. Support is

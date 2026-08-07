@@ -123,11 +123,17 @@ export const useMigrationReceiveConfirmation = ({
       }
       if (!isActive) return
 
-      /** The wallet's key is gone from the device. The gate must not invent its own
-       *  handover: it opens, and the swap it releases already reads the same absence and
-       *  routes to support (SelfCustodialAccountMissing / NotOnDevice). */
+      /**
+       * The wallet's key is gone from the device, and the gate must not answer that with a
+       * confirmation: the swap it would release checks the account index rather than the
+       * keystore, so it would discard the working custodial session for a wallet whose key
+       * is unrecoverable, leaving the user with neither. Treated as not-landed instead,
+       * which keeps the working session and lets the delayed notice route to support. The
+       * re-read is cheap — it settles before any SDK connection is opened.
+       */
       if (result.status === MigrationSdkStatus.NoMnemonic) {
-        setIsReceiveConfirmed(true)
+        reportOnce(new Error("No mnemonic for the provisioned account"))
+        scheduleNextCheck()
         return
       }
 

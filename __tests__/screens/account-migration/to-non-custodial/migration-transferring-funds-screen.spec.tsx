@@ -353,7 +353,9 @@ describe("MigrationTransferringFundsScreen", () => {
     expect(mockReset).not.toHaveBeenCalled()
   })
 
-  it("navigates to support with the delayed-receive reason when asked", async () => {
+  /** Its own origin, not the failure handovers': the receive is still being watched here,
+   *  and the commit-screen Back would pop this screen off the stack along with the gate. */
+  it("navigates to support with the delayed-receive reason and its own origin", async () => {
     mockIsReceiveDelayed = true
     renderScreen()
     await flushEffects()
@@ -362,7 +364,7 @@ describe("MigrationTransferringFundsScreen", () => {
 
     expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
       reason: MigrationSupportReason.ReceiveDelayed,
-      origin: "commit",
+      origin: "receive-delayed",
     })
   })
 

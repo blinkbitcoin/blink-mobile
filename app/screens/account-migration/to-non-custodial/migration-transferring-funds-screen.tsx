@@ -40,6 +40,8 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
   /** No navigation at all while the funds move. */
   useHardwareBackGuard()
 
+  /** Every failure handover leaves this screen for good, so Back belongs on the commit
+   *  screen: the transfer is over and this one has nothing left to offer. */
   const goToContactSupport = useCallback(
     (reason: MigrationSupportReason) => {
       navigation.navigate("accountMigrationContactSupport", {
@@ -49,6 +51,16 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
     },
     [navigation],
   )
+
+  /** The delayed handover is the one the user comes back from: the receive is still being
+   *  watched here, so its Back returns to this screen rather than popping it off the stack
+   *  along with the gate that is still waiting. */
+  const goToDelayedSupport = useCallback(() => {
+    navigation.navigate("accountMigrationContactSupport", {
+      reason: MigrationSupportReason.ReceiveDelayed,
+      origin: MigrationSupportOrigin.ReceiveDelayed,
+    })
+  }, [navigation])
 
   /** Completing the transfer clears the checkpoint and swaps the session, so once it
    *  succeeds a missing provisioned account is the expected outcome, not the fault this
@@ -147,7 +159,7 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
   const delayedFooter = (
     <GaloySecondaryButton
       title={LLMigration.transferDelayed.contactSupportCta()}
-      onPress={() => goToContactSupport(MigrationSupportReason.ReceiveDelayed)}
+      onPress={goToDelayedSupport}
       {...testProps("migration-receive-delayed-contact-support")}
     />
   )
