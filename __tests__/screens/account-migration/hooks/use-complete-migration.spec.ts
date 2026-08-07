@@ -10,11 +10,13 @@ const mockCloseCustodialAccount = jest.fn()
 
 let mockAccountId: string | undefined
 let mockCheckpoint: string | null
+let mockCheckpointOwnerId: string | null
 
 jest.mock("@app/screens/account-migration/hooks/use-migration-checkpoint-state", () => ({
   useMigrationCheckpointState: () => ({
     checkpoint: mockCheckpoint,
     accountId: mockAccountId,
+    checkpointOwnerId: mockCheckpointOwnerId,
     clearCheckpoint: mockClearCheckpoint,
   }),
 }))
@@ -45,8 +47,17 @@ jest.mock("@app/hooks/use-account-registry", () => ({
   }),
 }))
 
+let mockOwnerId: string | null = "custodial-1"
+
 jest.mock("@app/screens/account-migration/hooks/use-custodial-owner-id", () => ({
-  useCustodialOwnerId: () => ({ ownerId: "custodial-1", loading: false }),
+  useCustodialOwnerId: () => ({ ownerId: mockOwnerId, loading: false }),
+}))
+
+const mockReportError = jest.fn()
+
+jest.mock("@app/utils/error-logging", () => ({
+  ...jest.requireActual("@app/utils/error-logging"),
+  reportError: (operation: string, err: unknown) => mockReportError(operation, err),
 }))
 
 const mockClearPendingAccount = jest.fn()
@@ -72,6 +83,8 @@ describe("useCompleteMigration", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockAccountId = "sc-account-1"
+    mockOwnerId = "custodial-1"
+    mockCheckpointOwnerId = "custodial-1"
     mockAccounts = [{ id: "sc-account-1" }]
     mockRegistryLoading = false
     mockCheckpoint = "backupAlerts"
@@ -228,6 +241,94 @@ describe("useCompleteMigration", () => {
       await complete()
 
       expect(mockDiscardCustodialSession).toHaveBeenCalledWith({ isSessionAlive: true })
+    })
+  })
+
+  /** The deletion lands on whatever account the active token authenticates, so an unproven
+   *  owner would aim an irreversible call at a stranger's account. */
+  describe("when the active session does not own the checkpoint", () => {
+    it("refuses to delete an account the checkpoint was not saved by", async () => {
+      mockCheckpointOwnerId = "custodial-2"
+
+      expect(await complete()).toBe(MigrationCompletion.CloseUnavailable)
+      expect(mockCloseCustodialAccount).not.toHaveBeenCalled()
+    })
+
+    /** A record written before owners existed is claimed by whoever is active, so it can
+     *  serve another profile's account id. */
+    it("refuses to delete on an owner-less checkpoint", async () => {
+      mockCheckpointOwnerId = null
+
+      expect(await complete()).toBe(MigrationCompletion.CloseUnavailable)
+      expect(mockCloseCustodialAccount).not.toHaveBeenCalled()
+    })
+
+    it("refuses to delete while the session owner is unresolved", async () => {
+      mockOwnerId = null
+      mockCheckpointOwnerId = null
+
+      expect(await complete()).toBe(MigrationCompletion.CloseUnavailable)
+      expect(mockCloseCustodialAccount).not.toHaveBeenCalled()
+    })
+
+    it("keeps the session and the checkpoint intact", async () => {
+      mockCheckpointOwnerId = "custodial-2"
+      await complete()
+
+      expect(mockDiscardCustodialSession).not.toHaveBeenCalled()
+      expect(mockSetActiveAccountId).not.toHaveBeenCalled()
+      expect(mockClearCheckpoint).not.toHaveBeenCalled()
+      expect(mockClearPendingAccount).not.toHaveBeenCalled()
+    })
+
+    it("reports the mismatch with both ids", async () => {
+      mockCheckpointOwnerId = "custodial-2"
+      await complete()
+
+      expect(mockReportError).toHaveBeenCalledWith(
+        "Migration completion owner mismatch",
+        expect.objectContaining({
+          message:
+            "Migration completion owner mismatch: checkpoint custodial-2, session custodial-1",
+        }),
+      )
+    })
+  })
+
+  /** The resume hook stays mounted under the migration stack, so it and the transfer screen
+   *  can both decide to finish at the same moment. */
+  describe("when two callers complete at the same time", () => {
+    it("deletes the account once and defers the loser", async () => {
+      let releaseClose: (outcome: AccountCloseOutcome) => void = () => {}
+      mockCloseCustodialAccount.mockImplementation(
+        () =>
+          new Promise<AccountCloseOutcome>((resolve) => {
+            releaseClose = resolve
+          }),
+      )
+
+      const { result } = renderHook(() => useCompleteMigration())
+      let outcomes: MigrationCompletion[] = []
+      await act(async () => {
+        const first = result.current.completeMigration()
+        const second = result.current.completeMigration()
+        releaseClose(AccountCloseOutcome.Closed)
+        outcomes = await Promise.all([first, second])
+      })
+
+      expect(mockCloseCustodialAccount).toHaveBeenCalledTimes(1)
+      expect(outcomes).toEqual([
+        MigrationCompletion.Completed,
+        MigrationCompletion.CloseUnavailable,
+      ])
+      expect(mockDiscardCustodialSession).toHaveBeenCalledTimes(1)
+    })
+
+    it("frees the guard once the completion settles", async () => {
+      await complete()
+
+      expect(await complete()).toBe(MigrationCompletion.Completed)
+      expect(mockCloseCustodialAccount).toHaveBeenCalledTimes(2)
     })
   })
 })

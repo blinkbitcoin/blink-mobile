@@ -2,6 +2,7 @@ import { useCallback } from "react"
 
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { MigrationCompletion } from "@app/types/migration"
+import { reportError } from "@app/utils/error-logging"
 
 import {
   AccountCloseOutcome,
@@ -12,12 +13,21 @@ import { useDiscardCustodialSession } from "./use-discard-custodial-session"
 import { useMigrationCheckpointState } from "./use-migration-checkpoint-state"
 import { usePendingMigrationAccounts } from "./use-pending-migration-accounts"
 
+/** Module-level, because the callers are separate hook instances with no view of each
+ *  other's refs: the resume hook stays mounted in the tab navigator underneath the pushed
+ *  migration stack, so it and the transfer screen can both decide to finish at the same
+ *  moment, and two runs mean two account deletions and two competing navigation resets. */
+let isCompletionInFlight = false
+
+/** Repeated inside the Error because `reportError` forwards only the message. */
+const OWNER_MISMATCH_REPORT = "Migration completion owner mismatch"
+
 /** Closes the emptied custodial account, discards its session, then switches to the
  *  provisioned self-custodial account and clears the checkpoint plus the pending-wallet
  *  record. The order is forced, not preferred: the close authenticates with the custodial
  *  token that the discard destroys, so it is the one step no later launch can retry. */
 export const useCompleteMigration = () => {
-  const { checkpoint, accountId, loading, clearCheckpoint } =
+  const { checkpoint, accountId, checkpointOwnerId, loading, clearCheckpoint } =
     useMigrationCheckpointState()
   const { clearPendingAccount } = usePendingMigrationAccounts()
   const { setActiveAccountId, accounts, loading: accountsLoading } = useAccountRegistry()
@@ -32,28 +42,54 @@ export const useCompleteMigration = () => {
     const accountExists = accounts.some((account) => account.id === accountId)
     if (!accountExists) return MigrationCompletion.AccountMissing
 
-    /** Nothing settled, so nothing is spent: leave the session and the checkpoint exactly
-     *  as they are and let the caller offer another attempt. */
-    const closeOutcome = await closeCustodialAccount(custodialOwnerId)
-    if (closeOutcome === AccountCloseOutcome.Retryable)
+    /** The close deletes whatever account the active token authenticates, so it may only run
+     *  once this session is proven to be the one that saved the checkpoint. An owner-less
+     *  record is claimed by whoever is active, which would aim the deletion at a stranger. */
+    const isOwnedByActiveSession =
+      Boolean(custodialOwnerId) && checkpointOwnerId === custodialOwnerId
+    if (!isOwnedByActiveSession) {
+      reportError(
+        OWNER_MISMATCH_REPORT,
+        new Error(
+          `${OWNER_MISMATCH_REPORT}: checkpoint ${checkpointOwnerId ?? "unknown"}, session ${
+            custodialOwnerId ?? "unknown"
+          }`,
+        ),
+      )
       return MigrationCompletion.CloseUnavailable
+    }
 
-    const isAccountClosed = closeOutcome === AccountCloseOutcome.Closed
-    await discardCustodialSession({ isSessionAlive: !isAccountClosed })
-    setActiveAccountId(accountId)
-    await clearCheckpoint()
-    if (custodialOwnerId) await clearPendingAccount(custodialOwnerId)
+    if (isCompletionInFlight) return MigrationCompletion.CloseUnavailable
+    isCompletionInFlight = true
 
-    /** A refused close still finishes the migration: the funds are already self-custodial,
-     *  and holding the user on a dead custodial session would cost them their wallet over
-     *  an account only support can now remove. */
-    return isAccountClosed
-      ? MigrationCompletion.Completed
-      : MigrationCompletion.CloseRefused
+    try {
+      /** Nothing settled, so nothing is spent: leave the session and the checkpoint exactly
+       *  as they are and let the caller offer another attempt. */
+      const closeOutcome = await closeCustodialAccount(custodialOwnerId)
+      if (closeOutcome === AccountCloseOutcome.Retryable)
+        return MigrationCompletion.CloseUnavailable
+
+      const isAccountClosed = closeOutcome === AccountCloseOutcome.Closed
+      await discardCustodialSession({ isSessionAlive: !isAccountClosed })
+      setActiveAccountId(accountId)
+      await clearCheckpoint()
+      if (custodialOwnerId) await clearPendingAccount(custodialOwnerId)
+
+      /** A refused close still finishes the migration: the funds are already self-custodial,
+       *  and holding the user on a dead custodial session would cost them their wallet over
+       *  an account only support can now remove. */
+      return isAccountClosed
+        ? MigrationCompletion.Completed
+        : MigrationCompletion.CloseRefused
+    } finally {
+      // eslint-disable-next-line require-atomic-updates -- releasing after the await is the point
+      isCompletionInFlight = false
+    }
   }, [
     accountId,
     accounts,
     custodialOwnerId,
+    checkpointOwnerId,
     setActiveAccountId,
     closeCustodialAccount,
     discardCustodialSession,
