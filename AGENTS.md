@@ -30,12 +30,19 @@ configuration are:
 export DEMO_APP_ID_IOS=io.galoy.bitcoinbeach
 export DEMO_APP_ID_ANDROID=com.galoyapp
 export DEMO_SIM_PREFIX=blink-demo
+export DEMO_REQUIRED_ENV="GALOY_STAGING_GLOBAL_OTP"
 ```
 
 Set them before claiming a simulator session or recording a flow — the
 scripts refuse to guess an app id. `DEMO_SIM_PREFIX` names this repo's
 simulators (`blink-demo-pr<N>`) and scopes their session state, so other
 repos using the same skills on one machine can never collide with ours.
+
+`DEMO_REQUIRED_ENV` lists the credentials this repo's real-account demo flows
+need; claim-session.sh reports any that are unset at claim time, so a session
+knows from the start whether staging login is possible or the stub-harness
+route is the plan. The OTP value itself belongs in the machine's `.env.local`
+(loaded by `.envrc` via direnv), never in the repo.
 
 ## Critical Rules (Always Apply)
 - `app/graphql/generated.ts` is AUTO-GENERATED - never modify manually
