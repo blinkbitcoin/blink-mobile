@@ -1,7 +1,4 @@
 import { NavigatorScreenParams } from "@react-navigation/native"
-
-export const PhraseStep = { First: 1, Second: 2 } as const
-export type PhraseStep = (typeof PhraseStep)[keyof typeof PhraseStep]
 import { LNURLPaySuccessAction } from "lnurl-pay"
 
 import { IconNamesType } from "@app/components/atomic/galoy-icon"
@@ -21,6 +18,14 @@ import { WalletDescriptor } from "@app/types/wallets"
 import { MigrationSupportOrigin, MigrationSupportReason } from "@app/types/migration"
 
 import { AuthenticationScreenPurpose, PinScreenPurpose } from "../utils/enum"
+
+export const PhraseStep = { First: 1, Second: 2 } as const
+export type PhraseStep = (typeof PhraseStep)[keyof typeof PhraseStep]
+
+/** Deep links and navigation-state rehydration can deliver params the route type says are
+ *  impossible; the phrase screens use this to fall back instead of throwing. */
+export const isPhraseStep = (value: unknown): value is PhraseStep =>
+  value === PhraseStep.First || value === PhraseStep.Second
 
 export type RootStackParamList = {
   getStarted: undefined

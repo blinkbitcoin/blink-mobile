@@ -3663,7 +3663,8 @@
                 "savedConfirm": "Ich habe sie gespeichert",
                 "copy": "Kopieren",
                 "continueButton": "Weiter",
-                "testBackup": "Sicherung testen"
+                "testBackup": "Sicherung testen",
+                "doNotShareWarning": "Zeige dies niemandem, auch nicht dem Support"
             },
             "Confirm": {
                 "headerTitle": "Sicherungswörter bestätigen",
@@ -3817,6 +3818,7 @@
         "phraseSubtitleStep2": "Gib den Rest deiner Sicherungsphrase ein",
         "nextWords": "Nächste 6 Wörter",
         "paste": "Einfügen",
+        "pasteFailed": "Zwischenablage konnte nicht gelesen werden. Bitte gib deine Sicherungsphrase manuell ein.",
         "enterWord": "Wort",
         "invalidMnemonic": "Ungültige Backup-Phrase. Bitte überprüfe, ob die Wortreihenfolge korrekt ist.",
         "restoring": "Wallet wird wiederhergestellt...",
@@ -3828,7 +3830,9 @@
         "enterPassword": "Gib dein Verschlüsselungspasswort ein",
         "wrongPassword": "Falsches Passwort. Bitte versuche es erneut.",
         "pickBackupTitle": "Wallet auswählen",
-        "pickBackupDescription": "Wähle ein Backup zum Wiederherstellen"
+        "pickBackupDescription": "Wähle ein Backup zum Wiederherstellen",
+        "recognizePhraseTitle": "Erkennst du diese Backup-Phrase?",
+        "recognizePhraseBody": "Gib niemals Wörter ein, die dir jemand anderes geschickt hat."
     },
     "BackupNudge": {
         "title": "Ihre Mittel sind gefährdet",

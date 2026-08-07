@@ -1,3 +1,5 @@
+import { Keyboard } from "react-native"
+
 import { renderHook, act } from "@testing-library/react-native"
 
 import { useBip39Input } from "@app/hooks/use-bip39-input"
@@ -252,5 +254,99 @@ describe("useBip39Input", () => {
     })
 
     expect(result.current.focusRequest).toBeNull()
+  })
+
+  /** Suggestions only render while the keyboard is up, so these drive the keyboard
+   *  listeners directly instead of leaving the whole memo untested. */
+  describe("with the keyboard visible", () => {
+    const keyboardListeners: Record<string, () => void> = {}
+
+    beforeEach(() => {
+      jest.spyOn(Keyboard, "addListener").mockImplementation((event, listener) => {
+        keyboardListeners[event] = listener as () => void
+        return { remove: jest.fn() } as unknown as ReturnType<typeof Keyboard.addListener>
+      })
+    })
+
+    afterEach(() => {
+      jest.restoreAllMocks()
+    })
+
+    const showKeyboard = () => act(() => keyboardListeners.keyboardDidShow())
+
+    it("suggests matches for a 3+ character prefix", () => {
+      const { result } = renderHook(() => useBip39Input({ wordCount: 12 }))
+      showKeyboard()
+
+      act(() => {
+        result.current.setActiveIndex(0)
+        result.current.updateWord(0, "abo")
+      })
+
+      expect(result.current.suggestions).toEqual(["about", "above"])
+    })
+
+    it("suggests nothing below the character threshold", () => {
+      const { result } = renderHook(() => useBip39Input({ wordCount: 12 }))
+      showKeyboard()
+
+      act(() => {
+        result.current.setActiveIndex(0)
+        result.current.updateWord(0, "ab")
+      })
+
+      expect(result.current.suggestions).toEqual([])
+    })
+
+    it("suggests nothing for an empty active word", () => {
+      const { result } = renderHook(() => useBip39Input({ wordCount: 12 }))
+      showKeyboard()
+
+      act(() => {
+        result.current.setActiveIndex(0)
+      })
+
+      expect(result.current.suggestions).toEqual([])
+    })
+
+    it("suggests nothing once the word is complete and unique", () => {
+      const { result } = renderHook(() => useBip39Input({ wordCount: 12 }))
+      showKeyboard()
+
+      act(() => {
+        result.current.setActiveIndex(2)
+        result.current.updateWord(2, "runway")
+      })
+
+      expect(result.current.suggestions).toEqual([])
+    })
+
+    it("keeps suggesting when the typed word is a prefix of other words", () => {
+      const { result } = renderHook(() => useBip39Input({ wordCount: 12 }))
+      showKeyboard()
+
+      act(() => {
+        result.current.setActiveIndex(0)
+        result.current.updateWord(0, "run")
+      })
+
+      expect(result.current.suggestions).toEqual(["run", "runway"])
+    })
+
+    it("hides suggestions and deselects when the keyboard closes", () => {
+      const { result } = renderHook(() => useBip39Input({ wordCount: 12 }))
+      showKeyboard()
+
+      act(() => {
+        result.current.setActiveIndex(0)
+        result.current.updateWord(0, "abo")
+      })
+      expect(result.current.suggestions).toEqual(["about", "above"])
+
+      act(() => keyboardListeners.keyboardDidHide())
+
+      expect(result.current.suggestions).toEqual([])
+      expect(result.current.activeIndex).toBe(-1)
+    })
   })
 })

@@ -3663,7 +3663,8 @@
         "savedConfirm": "Saya telah menyimpannya",
         "copy": "Salin",
         "continueButton": "Teruskan",
-        "testBackup": "Uji sandaran anda"
+        "testBackup": "Uji sandaran anda",
+        "doNotShareWarning": "Jangan tunjukkan ini kepada sesiapa termasuk sokongan"
       },
       "Confirm": {
         "headerTitle": "Sahkan frasa sandaran",
@@ -3817,6 +3818,7 @@
     "phraseSubtitleStep2": "Masukkan baki frasa sandaran anda",
     "nextWords": "6 perkataan seterusnya",
     "paste": "Tampal",
+    "pasteFailed": "Tidak dapat membaca daripada clipboard. Sila masukkan frasa sandaran anda secara manual.",
     "enterWord": "Perkataan",
     "invalidMnemonic": "Frasa sandaran tidak sah. Sila semak sama ada susunan perkataan adalah betul.",
     "restoring": "Memulihkan dompet anda...",
@@ -3828,7 +3830,9 @@
     "enterPassword": "Masukkan kata laluan penyulitan anda",
     "wrongPassword": "Kata laluan salah. Sila cuba lagi.",
     "pickBackupTitle": "Pilih dompet",
-    "pickBackupDescription": "Pilih sandaran untuk dipulihkan"
+    "pickBackupDescription": "Pilih sandaran untuk dipulihkan",
+    "recognizePhraseTitle": "Adakah anda mengenali frasa sandaran ini?",
+    "recognizePhraseBody": "Jangan sekali-kali masukkan perkataan yang dihantar oleh orang lain."
   },
   "BackupNudge": {
     "title": "Dana anda dalam bahaya",

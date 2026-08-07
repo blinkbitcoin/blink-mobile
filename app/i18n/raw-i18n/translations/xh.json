@@ -3663,7 +3663,8 @@
         "savedConfirm": "Ndigcinile",
         "copy": "Kopa",
         "continueButton": "Qhubeka",
-        "testBackup": "Vavanya ugcino lwakho"
+        "testBackup": "Vavanya ugcino lwakho",
+        "doNotShareWarning": "Musa ukuyibonisa nakubani na, kuquka nenkxaso"
       },
       "Confirm": {
         "headerTitle": "Qinisekisa ibinzana lokugcina",
@@ -3817,6 +3818,7 @@
     "phraseSubtitleStep2": "Faka amanye amagama omgca wakho wokugcina",
     "nextWords": "Amagama a-6 alandelayo",
     "paste": "Ncamathisela",
+    "pasteFailed": "Ayikwazanga ukufunda kwibhodi eqhotyoshwayo. Nceda ufake umgca wakho wokugcina ngesandla.",
     "enterWord": "Igama",
     "invalidMnemonic": "Ibinzana lokugcina elingachananga. Nceda ujonge ukuba ulandelelwano lwamagama lulungile.",
     "restoring": "Kubuyiselwa isipaji sakho...",
@@ -3828,7 +3830,9 @@
     "enterPassword": "Faka iphasiwedi yakho yokufihla",
     "wrongPassword": "Iphasiwedi engalunganga. Nceda uzame kwakhona.",
     "pickBackupTitle": "Khetha isipaji",
-    "pickBackupDescription": "Khetha ugcino lokubuyisela"
+    "pickBackupDescription": "Khetha ugcino lokubuyisela",
+    "recognizePhraseTitle": "Ngaba uyayazi le binzana yokhuselo?",
+    "recognizePhraseBody": "Ungaze ufake amagama akuthunyelwe ngomnye umntu."
   },
   "BackupNudge": {
     "title": "Imali yakho isengozini",

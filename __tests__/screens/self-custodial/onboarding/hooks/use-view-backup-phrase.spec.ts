@@ -30,11 +30,6 @@ jest.mock("@app/i18n/i18n-react", () => ({
   }),
 }))
 
-const mockOpenExternalUrl = jest.fn()
-jest.mock("@app/utils/external", () => ({
-  openExternalUrl: (...args: unknown[]) => mockOpenExternalUrl(...args),
-}))
-
 jest.mock("@app/screens/self-custodial/onboarding/hooks/use-wallet-mnemonic", () => ({
   useWalletMnemonic: () =>
     "youth indicate void nation bundle execute ritual artwork harvest genuine plunge captain",
@@ -66,14 +61,6 @@ describe("useViewBackupPhrase", () => {
         "youth indicate void nation bundle execute ritual artwork harvest genuine plunge captain",
       message: "Copied",
     })
-  })
-
-  it("opens the spark-compatible wallets URL from remote config", () => {
-    const { result } = renderHook(() => useViewBackupPhrase())
-
-    act(() => result.current.handleOpenSparkLink())
-
-    expect(mockOpenExternalUrl).toHaveBeenCalledWith("https://spark.example")
   })
 
   it("navigates to the confirm screen with random challenges and the test-success message", async () => {

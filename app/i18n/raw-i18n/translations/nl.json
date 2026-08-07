@@ -3663,7 +3663,8 @@
         "savedConfirm": "Ik heb het opgeslagen",
         "copy": "Kopiëren",
         "continueButton": "Doorgaan",
-        "testBackup": "Test je back-up"
+        "testBackup": "Test je back-up",
+        "doNotShareWarning": "Laat dit aan niemand zien, ook niet aan support"
       },
       "Confirm": {
         "headerTitle": "Bevestig back-upzin",
@@ -3817,6 +3818,7 @@
     "phraseSubtitleStep2": "Voer de rest van je back-upfrase in",
     "nextWords": "Volgende 6 woorden",
     "paste": "Plakken",
+    "pasteFailed": "Kan niet lezen van het klembord. Voer je back-upfrase handmatig in.",
     "enterWord": "Woord",
     "invalidMnemonic": "Ongeldige back-upzin. Controleer of de woordvolgorde correct is.",
     "restoring": "Je portemonnee wordt hersteld...",
@@ -3828,7 +3830,9 @@
     "enterPassword": "Voer je versleutelingswachtwoord in",
     "wrongPassword": "Onjuist wachtwoord. Probeer opnieuw.",
     "pickBackupTitle": "Kies een wallet",
-    "pickBackupDescription": "Kies een back-up om te herstellen"
+    "pickBackupDescription": "Kies een back-up om te herstellen",
+    "recognizePhraseTitle": "Herken je deze back-upzin?",
+    "recognizePhraseBody": "Voer nooit woorden in die iemand anders je heeft gestuurd."
   },
   "BackupNudge": {
     "title": "Uw fondsen lopen gevaar",

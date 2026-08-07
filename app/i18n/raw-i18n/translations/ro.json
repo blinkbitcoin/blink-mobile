@@ -3663,7 +3663,8 @@
         "savedConfirm": "Am salvat-o",
         "copy": "Copiază",
         "continueButton": "Continuă",
-        "testBackup": "Testează-ți copia de rezervă"
+        "testBackup": "Testează-ți copia de rezervă",
+        "doNotShareWarning": "Nu arăta acest lucru nimănui, inclusiv asistenței"
       },
       "Confirm": {
         "headerTitle": "Confirmă fraza de backup",
@@ -3817,6 +3818,7 @@
     "phraseSubtitleStep2": "Introduceți restul frazei de backup",
     "nextWords": "Următoarele 6 cuvinte",
     "paste": "Lipește",
+    "pasteFailed": "Nu s-a putut citi din clipboard. Vă rugăm să introduceți fraza de backup manual.",
     "enterWord": "Cuvânt",
     "invalidMnemonic": "Frază de backup invalidă. Verificați dacă ordinea cuvintelor este corectă.",
     "restoring": "Se restaurează portofelul...",
@@ -3828,7 +3830,9 @@
     "enterPassword": "Introduceți parola de criptare",
     "wrongPassword": "Parolă incorectă. Încercați din nou.",
     "pickBackupTitle": "Alege un portofel",
-    "pickBackupDescription": "Selectează o copie de rezervă pentru restaurare"
+    "pickBackupDescription": "Selectează o copie de rezervă pentru restaurare",
+    "recognizePhraseTitle": "Recunoști această frază de backup?",
+    "recognizePhraseBody": "Nu introduce niciodată cuvinte trimise de altcineva."
   },
   "BackupNudge": {
     "title": "Fondurile dumneavoastră sunt în pericol",

@@ -3663,7 +3663,8 @@
         "savedConfirm": "Ek het dit gestoor",
         "copy": "Kopieer",
         "continueButton": "Gaan voort",
-        "testBackup": "Toets jou rugsteun"
+        "testBackup": "Toets jou rugsteun",
+        "doNotShareWarning": "Moenie dit vir enigiemand wys nie, ook nie ondersteuning nie"
       },
       "Confirm": {
         "headerTitle": "Bevestig rugsteunfrase",
@@ -3817,6 +3818,7 @@
     "phraseSubtitleStep2": "Voer die res van jou rugsteunfrase in",
     "nextWords": "Volgende 6 woorde",
     "paste": "Plak",
+    "pasteFailed": "Kon nie van die knipbord lees nie. Voer asseblief jou rugsteunfrase met die hand in.",
     "enterWord": "Woord",
     "invalidMnemonic": "Ongeldige rugsteunfrase. Kontroleer asseblief of die woordvolgorde reg is.",
     "restoring": "Jou beursie word herstel...",
@@ -3828,7 +3830,9 @@
     "enterPassword": "Voer jou enkripsierwagwoord in",
     "wrongPassword": "Verkeerde wagwoord. Probeer asseblief weer.",
     "pickBackupTitle": "Kies 'n beursie",
-    "pickBackupDescription": "Kies 'n rugsteun om te herstel"
+    "pickBackupDescription": "Kies 'n rugsteun om te herstel",
+    "recognizePhraseTitle": "Herken jy hierdie rugsteunfrase?",
+    "recognizePhraseBody": "Moet nooit woorde invoer wat iemand anders aan jou gestuur het nie."
   },
   "BackupNudge": {
     "title": "Jou fondse is in gevaar",

@@ -3663,7 +3663,8 @@
         "savedConfirm": "Saya sudah menyimpannya",
         "copy": "Salin",
         "continueButton": "Lanjutkan",
-        "testBackup": "Uji cadanganmu"
+        "testBackup": "Uji cadanganmu",
+        "doNotShareWarning": "Jangan tunjukkan ini kepada siapa pun, termasuk tim dukungan"
       },
       "Confirm": {
         "headerTitle": "Konfirmasi frasa cadangan",
@@ -3817,6 +3818,7 @@
     "phraseSubtitleStep2": "Masukkan sisa frasa cadangan Anda",
     "nextWords": "6 kata berikutnya",
     "paste": "Tempel",
+    "pasteFailed": "Tidak dapat membaca dari papan klip. Silakan masukkan frasa cadangan Anda secara manual.",
     "enterWord": "Kata",
     "invalidMnemonic": "Frasa cadangan tidak valid. Harap periksa apakah urutan kata sudah benar.",
     "restoring": "Memulihkan dompet Anda...",
@@ -3828,7 +3830,9 @@
     "enterPassword": "Masukkan kata sandi enkripsi Anda",
     "wrongPassword": "Kata sandi salah. Silakan coba lagi.",
     "pickBackupTitle": "Pilih dompet",
-    "pickBackupDescription": "Pilih cadangan untuk dipulihkan"
+    "pickBackupDescription": "Pilih cadangan untuk dipulihkan",
+    "recognizePhraseTitle": "Apakah Anda mengenali frasa cadangan ini?",
+    "recognizePhraseBody": "Jangan pernah memasukkan kata-kata yang dikirim orang lain kepada Anda."
   },
   "BackupNudge": {
     "title": "Dana Anda dalam bahaya",

@@ -3663,7 +3663,8 @@
         "savedConfirm": "Už jsem ji uložil",
         "copy": "Kopírovat",
         "continueButton": "Pokračovat",
-        "testBackup": "Otestujte zálohu"
+        "testBackup": "Otestujte zálohu",
+        "doNotShareWarning": "Neukazujte to nikomu, ani podpoře"
       },
       "Confirm": {
         "headerTitle": "Potvrďte záložní frázi",
@@ -3817,6 +3818,7 @@
     "phraseSubtitleStep2": "Zadejte zbytek vaší zálohovací fráze",
     "nextWords": "Dalších 6 slov",
     "paste": "Vložit",
+    "pasteFailed": "Nepodařilo se číst ze schránky. Zadejte prosím zálohovací frázi ručně.",
     "enterWord": "Slovo",
     "invalidMnemonic": "Neplatná záložní fráze. Zkontrolujte prosím, zda je pořadí slov správné.",
     "restoring": "Obnovování vaší peněženky...",
@@ -3828,7 +3830,9 @@
     "enterPassword": "Zadejte heslo šifrování",
     "wrongPassword": "Nesprávné heslo. Zkuste to prosím znovu.",
     "pickBackupTitle": "Vyberte peněženku",
-    "pickBackupDescription": "Vyberte zálohu k obnovení"
+    "pickBackupDescription": "Vyberte zálohu k obnovení",
+    "recognizePhraseTitle": "Poznáváte tuto zálohovací frázi?",
+    "recognizePhraseBody": "Nikdy nezadávejte slova, která vám poslal někdo jiný."
   },
   "BackupNudge": {
     "title": "Vaše prostředky jsou v ohrožení",

@@ -3663,7 +3663,8 @@
                 "savedConfirm": "Je l'ai sauvegardée",
                 "copy": "Copier",
                 "continueButton": "Continuer",
-                "testBackup": "Tester votre sauvegarde"
+                "testBackup": "Tester votre sauvegarde",
+                "doNotShareWarning": "Ne montrez ceci à personne, y compris au support"
             },
             "Confirm": {
                 "headerTitle": "Confirmer la phrase de sauvegarde",
@@ -3817,6 +3818,7 @@
         "phraseSubtitleStep2": "Entrez le reste de votre phrase de sauvegarde",
         "nextWords": "6 mots suivants",
         "paste": "Coller",
+        "pasteFailed": "Impossible de lire le presse-papier. Veuillez saisir votre phrase de sauvegarde manuellement.",
         "enterWord": "Mot",
         "invalidMnemonic": "Phrase de sauvegarde invalide. Veuillez vérifier si l'ordre des mots est correct.",
         "restoring": "Restauration de votre portefeuille...",
@@ -3828,7 +3830,9 @@
         "enterPassword": "Entrez votre mot de passe de chiffrement",
         "wrongPassword": "Mot de passe incorrect. Veuillez réessayer.",
         "pickBackupTitle": "Choisissez un portefeuille",
-        "pickBackupDescription": "Sélectionnez une sauvegarde à restaurer"
+        "pickBackupDescription": "Sélectionnez une sauvegarde à restaurer",
+        "recognizePhraseTitle": "Reconnaissez-vous cette phrase de sauvegarde ?",
+        "recognizePhraseBody": "N'entrez jamais des mots qu'une autre personne vous a envoyés."
     },
     "BackupNudge": {
         "title": "Vos fonds sont en danger",

@@ -11,9 +11,14 @@ import { ContextForScreen } from "../../../helper"
 
 const mockNavigate = jest.fn()
 const mockGoBack = jest.fn()
+const mockSetOptions = jest.fn()
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
-  useNavigation: () => ({ navigate: mockNavigate, goBack: mockGoBack }),
+  useNavigation: () => ({
+    navigate: mockNavigate,
+    goBack: mockGoBack,
+    setOptions: mockSetOptions,
+  }),
 }))
 
 const mockIsSensorAvailable = jest.fn()
@@ -25,6 +30,21 @@ jest.mock("@app/utils/biometricAuthentication", () => ({
     authenticate: (...args: unknown[]) => mockAuthenticate(...args),
   },
 }))
+
+const renderHeaderRight = () => {
+  const calls = mockSetOptions.mock.calls
+  const lastOptions = calls[calls.length - 1]?.[0]
+  if (!lastOptions?.headerRight) throw new Error("headerRight was not set")
+  return render(<ContextForScreen>{lastOptions.headerRight()}</ContextForScreen>)
+}
+
+// `headerRightNoGlass` writes `headerRight` for Android and
+// `unstable_headerRightItems` for iOS, so a header is only truly absent when
+// neither key was ever handed a renderer.
+const headerRightWasInstalled = () =>
+  mockSetOptions.mock.calls.some(
+    ([options]) => options?.headerRight || options?.unstable_headerRightItems,
+  )
 
 const mockCopyToClipboard = jest.fn()
 jest.mock("@app/hooks", () => ({
@@ -73,7 +93,7 @@ describe("ViewBackupPhraseScreen", () => {
     expect(getByText("genuine")).toBeTruthy()
   })
 
-  it("shows the Copy button and the spark-compatible wallet link", async () => {
+  it("shows the Copy button in the header and the spark-compatible wallet link", async () => {
     const { getByText } = render(
       <ContextForScreen>
         <ViewBackupPhraseScreen />
@@ -81,9 +101,43 @@ describe("ViewBackupPhraseScreen", () => {
     )
 
     await waitFor(() => expect(getByText("youth")).toBeTruthy())
-    expect(getByText(LL.BackupScreen.ManualBackup.Phrase.copy())).toBeTruthy()
     expect(
       getByText(LL.BackupScreen.ManualBackup.Phrase.sparkCompatibleLink()),
+    ).toBeTruthy()
+
+    const { getByText: getHeaderText } = renderHeaderRight()
+    expect(getHeaderText(LL.BackupScreen.ManualBackup.Phrase.copy())).toBeTruthy()
+  })
+
+  it("announces the Copy button by its visible label, not the test id", async () => {
+    const { getByText } = render(
+      <ContextForScreen>
+        <ViewBackupPhraseScreen />
+      </ContextForScreen>,
+    )
+
+    await waitFor(() => expect(getByText("youth")).toBeTruthy())
+
+    const { getByTestId } = renderHeaderRight()
+    const button = getByTestId("backup-phrase-copy")
+    // `testProps` sets accessibilityLabel to the test id; the explicit
+    // accessibilityLabel after the spread must win.
+    expect(button.props.accessibilityLabel).toBe(
+      LL.BackupScreen.ManualBackup.Phrase.copy(),
+    )
+    expect(button.props.hitSlop).toEqual({ top: 12, bottom: 12, left: 12, right: 12 })
+  })
+
+  it("renders the do-not-share warning card", async () => {
+    const { getByText } = render(
+      <ContextForScreen>
+        <ViewBackupPhraseScreen />
+      </ContextForScreen>,
+    )
+
+    await waitFor(() => expect(getByText("youth")).toBeTruthy())
+    expect(
+      getByText(LL.BackupScreen.ManualBackup.Phrase.doNotShareWarning()),
     ).toBeTruthy()
   })
 
@@ -95,7 +149,8 @@ describe("ViewBackupPhraseScreen", () => {
     )
 
     await waitFor(() => expect(getByText("youth")).toBeTruthy())
-    fireEvent.press(getByText(LL.BackupScreen.ManualBackup.Phrase.copy()))
+    const { getByText: getHeaderText } = renderHeaderRight()
+    fireEvent.press(getHeaderText(LL.BackupScreen.ManualBackup.Phrase.copy()))
 
     expect(mockCopyToClipboard).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -216,5 +271,68 @@ describe("ViewBackupPhraseScreen", () => {
 
     await waitFor(() => expect(mockAuthenticate).toHaveBeenCalledTimes(1))
     expect(queryByText("youth")).toBeNull()
+  })
+
+  it("does not install the header Copy button while biometric auth is pending", async () => {
+    mockGetIsBiometricsEnabled.mockResolvedValue(true)
+    mockAuthenticate.mockImplementation(() => {
+      // user has not responded to the prompt yet
+    })
+
+    render(
+      <ContextForScreen>
+        <ViewBackupPhraseScreen />
+      </ContextForScreen>,
+    )
+
+    await waitFor(() => expect(mockAuthenticate).toHaveBeenCalledTimes(1))
+
+    // The header is installed from a useLayoutEffect that sits above the
+    // `!authenticated` early return, so an ungated version would mount a Copy
+    // button that hands out the whole mnemonic before the prompt is answered.
+    expect(headerRightWasInstalled()).toBe(false)
+    expect(mockCopyToClipboard).not.toHaveBeenCalled()
+  })
+
+  it("does not install the header Copy button when biometric auth fails", async () => {
+    mockGetIsBiometricsEnabled.mockResolvedValue(true)
+    mockAuthenticate.mockImplementation(
+      (_desc: string, _onSuccess: () => void, onFail: () => void) => {
+        onFail()
+      },
+    )
+
+    render(
+      <ContextForScreen>
+        <ViewBackupPhraseScreen />
+      </ContextForScreen>,
+    )
+
+    await waitFor(() => expect(mockGoBack).toHaveBeenCalledTimes(1))
+    expect(headerRightWasInstalled()).toBe(false)
+  })
+
+  it("installs the header Copy button once biometric auth succeeds", async () => {
+    mockGetIsBiometricsEnabled.mockResolvedValue(true)
+    mockAuthenticate.mockImplementation((_desc: string, onSuccess: () => void) => {
+      onSuccess()
+    })
+
+    const { getByText } = render(
+      <ContextForScreen>
+        <ViewBackupPhraseScreen />
+      </ContextForScreen>,
+    )
+
+    await waitFor(() => expect(getByText("youth")).toBeTruthy())
+
+    const { getByText: getHeaderText } = renderHeaderRight()
+    fireEvent.press(getHeaderText(LL.BackupScreen.ManualBackup.Phrase.copy()))
+
+    expect(mockCopyToClipboard).toHaveBeenCalledWith(
+      expect.objectContaining({
+        content: expect.stringContaining("captain"),
+      }),
+    )
   })
 })

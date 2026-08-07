@@ -3663,7 +3663,8 @@
         "savedConfirm": "Tôi đã lưu",
         "copy": "Sao chép",
         "continueButton": "Tiếp tục",
-        "testBackup": "Kiểm tra bản sao lưu của bạn"
+        "testBackup": "Kiểm tra bản sao lưu của bạn",
+        "doNotShareWarning": "Không cho bất kỳ ai xem điều này, kể cả bộ phận hỗ trợ"
       },
       "Confirm": {
         "headerTitle": "Xác nhận cụm từ sao lưu",
@@ -3817,6 +3818,7 @@
     "phraseSubtitleStep2": "Nhập phần còn lại của cụm từ sao lưu",
     "nextWords": "6 từ tiếp theo",
     "paste": "Dán",
+    "pasteFailed": "Không thể đọc từ bộ nhớ tạm. Vui lòng nhập cụm từ sao lưu của bạn theo cách thủ công.",
     "enterWord": "Từ",
     "invalidMnemonic": "Cụm từ sao lưu không hợp lệ. Vui lòng kiểm tra xem thứ tự các từ có chính xác không.",
     "restoring": "Đang khôi phục ví...",
@@ -3828,7 +3830,9 @@
     "enterPassword": "Nhập mật khẩu mã hóa của bạn",
     "wrongPassword": "Mật khẩu không đúng. Vui lòng thử lại.",
     "pickBackupTitle": "Chọn một ví",
-    "pickBackupDescription": "Chọn bản sao lưu để khôi phục"
+    "pickBackupDescription": "Chọn bản sao lưu để khôi phục",
+    "recognizePhraseTitle": "Bạn có nhận ra cụm từ sao lưu này không?",
+    "recognizePhraseBody": "Không bao giờ nhập các từ mà người khác gửi cho bạn."
   },
   "BackupNudge": {
     "title": "Tiền của bạn đang gặp rủi ro",

@@ -3663,7 +3663,8 @@
         "savedConfirm": "Ja l'he desat",
         "copy": "Copiar",
         "continueButton": "Continua",
-        "testBackup": "Prova la teva còpia de seguretat"
+        "testBackup": "Prova la teva còpia de seguretat",
+        "doNotShareWarning": "No ho mostris a ningú, ni tan sols a l'assistència"
       },
       "Confirm": {
         "headerTitle": "Confirma la frase de còpia de seguretat",
@@ -3817,6 +3818,7 @@
     "phraseSubtitleStep2": "Introdueix la resta de la teva frase de recuperació",
     "nextWords": "Següents 6 paraules",
     "paste": "Enganxar",
+    "pasteFailed": "No s'ha pogut llegir del porta-retalls. Introdueix la teva frase de recuperació manualment.",
     "enterWord": "Paraula",
     "invalidMnemonic": "Frase de còpia de seguretat no vàlida. Comprova si l'ordre de les paraules és correcte.",
     "restoring": "Restaurant la teva cartera...",
@@ -3828,7 +3830,9 @@
     "enterPassword": "Introdueix la teva contrasenya de xifratge",
     "wrongPassword": "Contrasenya incorrecta. Si us plau, torna-ho a provar.",
     "pickBackupTitle": "Tria una cartera",
-    "pickBackupDescription": "Selecciona una còpia de seguretat per restaurar"
+    "pickBackupDescription": "Selecciona una còpia de seguretat per restaurar",
+    "recognizePhraseTitle": "Reconeixes aquesta frase de còpia de seguretat?",
+    "recognizePhraseBody": "No introdueixis mai paraules que t'hagi enviat algú altre."
   },
   "BackupNudge": {
     "title": "Els teus fons estan en risc",

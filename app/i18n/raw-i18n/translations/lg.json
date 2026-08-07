@@ -3663,7 +3663,8 @@
         "savedConfirm": "Nkitereka",
         "copy": "Koppa",
         "continueButton": "Weyongerawo",
-        "testBackup": "Gezza okukuumako"
+        "testBackup": "Gezza okukuumako",
+        "doNotShareWarning": "Tokiraga muntu yenna, n'abawagizi ba support"
       },
       "Confirm": {
         "headerTitle": "Kakasa ekigambo eky'okukoppa",
@@ -3817,6 +3818,7 @@
     "phraseSubtitleStep2": "Yingiza ebigambo ebikyasigaddewo",
     "nextWords": "Ebigambo 6 ebiddako",
     "paste": "Teeka",
+    "pasteFailed": "Tetusobodde kusoma ku lutimbe. Bambi yingiza ekigambo kyo eky'okukuuma ggwe kennyini.",
     "enterWord": "Ekigambo",
     "invalidMnemonic": "Ebigambo by'enkalakkalira tebituufu. Kakasa nti omulongo gw'ebigambo gwa kituufu.",
     "restoring": "Ezzaawo wallet yo...",
@@ -3828,7 +3830,9 @@
     "enterPassword": "Yingiza password yo ey'okusiba",
     "wrongPassword": "Password si ntuufu. Gezaako nate.",
     "pickBackupTitle": "Londa wallet",
-    "pickBackupDescription": "Londa kopiyo y'okuzzaawo"
+    "pickBackupDescription": "Londa kopiyo y'okuzzaawo",
+    "recognizePhraseTitle": "Omanyi ebigambo bino eby'okukuuma?",
+    "recognizePhraseBody": "Toteekangamu bigambo omuntu omulala by'akuweereza."
   },
   "BackupNudge": {
     "title": "Ssente zo ziri mu bulabe",

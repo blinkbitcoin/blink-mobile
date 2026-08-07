@@ -3663,7 +3663,8 @@
         "savedConfirm": "Kaydettim",
         "copy": "Kopyala",
         "continueButton": "Devam et",
-        "testBackup": "Yedeğini test et"
+        "testBackup": "Yedeğini test et",
+        "doNotShareWarning": "Bunu destek dahil hiç kimseye gösterme"
       },
       "Confirm": {
         "headerTitle": "Yedekleme ifadesini onayla",
@@ -3817,6 +3818,7 @@
     "phraseSubtitleStep2": "Yedekleme ifadenizin geri kalanını girin",
     "nextWords": "Sonraki 6 kelime",
     "paste": "Yapıştır",
+    "pasteFailed": "Panodan okunamadı. Lütfen yedekleme ifadenizi elle girin.",
     "enterWord": "Kelime",
     "invalidMnemonic": "Geçersiz yedekleme ifadesi. Lütfen kelime sırasının doğru olup olmadığını kontrol edin.",
     "restoring": "Cüzdanınız geri yükleniyor...",
@@ -3828,7 +3830,9 @@
     "enterPassword": "Şifreleme parolanızı girin",
     "wrongPassword": "Yanlış parola. Lütfen tekrar deneyin.",
     "pickBackupTitle": "Bir cüzdan seçin",
-    "pickBackupDescription": "Geri yüklemek için bir yedek seçin"
+    "pickBackupDescription": "Geri yüklemek için bir yedek seçin",
+    "recognizePhraseTitle": "Bu yedekleme ifadesini tanıyor musun?",
+    "recognizePhraseBody": "Başka birinin sana gönderdiği kelimeleri asla girme."
   },
   "BackupNudge": {
     "title": "Fonlarınız risk altında",

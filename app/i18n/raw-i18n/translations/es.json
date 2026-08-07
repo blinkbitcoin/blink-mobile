@@ -3663,7 +3663,8 @@
                 "savedConfirm": "Ya la guardé",
                 "copy": "Copiar",
                 "continueButton": "Continuar",
-                "testBackup": "Prueba tu respaldo"
+                "testBackup": "Prueba tu respaldo",
+                "doNotShareWarning": "No se lo muestre a nadie, ni siquiera al soporte"
             },
             "Confirm": {
                 "headerTitle": "Confirmar frase de respaldo",
@@ -3817,6 +3818,7 @@
         "phraseSubtitleStep2": "Ingresa el resto de tu frase de respaldo",
         "nextWords": "Siguientes 6 palabras",
         "paste": "Pegar",
+        "pasteFailed": "No se pudo leer del portapapeles. Por favor ingresa tu frase de respaldo manualmente.",
         "enterWord": "Palabra",
         "invalidMnemonic": "Frase de respaldo no válida. Por favor verifica si el orden de las palabras es correcto.",
         "restoring": "Restaurando tu billetera...",
@@ -3828,7 +3830,9 @@
         "enterPassword": "Ingresa tu contraseña de cifrado",
         "wrongPassword": "Contraseña incorrecta. Por favor intenta de nuevo.",
         "pickBackupTitle": "Elige una cartera",
-        "pickBackupDescription": "Selecciona una copia de seguridad para restaurar"
+        "pickBackupDescription": "Selecciona una copia de seguridad para restaurar",
+        "recognizePhraseTitle": "¿Reconoce esta frase de respaldo?",
+        "recognizePhraseBody": "Nunca introduzca palabras que otra persona le haya enviado."
     },
     "BackupNudge": {
         "title": "Tus fondos están en riesgo",

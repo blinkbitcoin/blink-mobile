@@ -3663,7 +3663,8 @@
         "savedConfirm": "Elmentettem",
         "copy": "Másolás",
         "continueButton": "Tovább",
-        "testBackup": "Teszteld a biztonsági mentést"
+        "testBackup": "Teszteld a biztonsági mentést",
+        "doNotShareWarning": "Ne mutasd meg senkinek, az ügyfélszolgálatnak sem"
       },
       "Confirm": {
         "headerTitle": "Biztonsági mentés megerősítése",
@@ -3817,6 +3818,7 @@
     "phraseSubtitleStep2": "Add meg a biztonsági kifejezésed többi szavát",
     "nextWords": "Következő 6 szó",
     "paste": "Beillesztés",
+    "pasteFailed": "Nem sikerült olvasni a vágólapról. Kérjük, add meg a biztonsági kifejezésed kézzel.",
     "enterWord": "Szó",
     "invalidMnemonic": "Érvénytelen biztonsági mentési kifejezés. Kérlek ellenőrizd, hogy a szavak sorrendje helyes-e.",
     "restoring": "Tárca visszaállítása...",
@@ -3828,7 +3830,9 @@
     "enterPassword": "Add meg a titkosítási jelszavadat",
     "wrongPassword": "Helytelen jelszó. Kérjük, próbáld újra.",
     "pickBackupTitle": "Válassz tárcát",
-    "pickBackupDescription": "Válassz egy biztonsági mentést a visszaállításhoz"
+    "pickBackupDescription": "Válassz egy biztonsági mentést a visszaállításhoz",
+    "recognizePhraseTitle": "Felismered ezt a biztonsági mentési kifejezést?",
+    "recognizePhraseBody": "Soha ne írj be olyan szavakat, amelyeket valaki más küldött neked."
   },
   "BackupNudge": {
     "title": "Pénzeszközeid veszélyben vannak",
