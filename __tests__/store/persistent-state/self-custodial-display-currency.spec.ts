@@ -1,6 +1,7 @@
 import {
   getSelfCustodialDisplayCurrency,
   withSelfCustodialDisplayCurrency,
+  withSelfCustodialDisplayCurrencyForAccount,
 } from "@app/store/persistent-state/self-custodial-display-currency"
 import { PersistentState } from "@app/store/persistent-state/state-migrations"
 import { DefaultAccountId } from "@app/types/wallet"
@@ -130,5 +131,34 @@ describe("withSelfCustodialDisplayCurrency", () => {
 
   it("returns the same state when no active account is set", () => {
     expect(withSelfCustodialDisplayCurrency(baseState, "EUR")).toBe(baseState)
+  })
+})
+
+describe("withSelfCustodialDisplayCurrencyForAccount", () => {
+  it("writes for an explicit id while the active account is custodial", () => {
+    const state: PersistentState = {
+      ...baseState,
+      activeAccountId: DefaultAccountId.Custodial,
+    }
+
+    const next = withSelfCustodialDisplayCurrencyForAccount(
+      state,
+      "self-custodial-new",
+      "EUR",
+    )
+
+    expect(next.selfCustodialDisplayCurrencyByAccountId).toEqual({
+      "self-custodial-new": "EUR",
+    })
+  })
+
+  it("refuses the custodial sentinel as target id", () => {
+    expect(
+      withSelfCustodialDisplayCurrencyForAccount(
+        baseState,
+        DefaultAccountId.Custodial,
+        "EUR",
+      ),
+    ).toBe(baseState)
   })
 })

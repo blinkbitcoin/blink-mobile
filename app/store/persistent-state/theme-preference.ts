@@ -11,13 +11,23 @@ export const getThemePreference = (state: PersistentState): ThemePreference => {
 export const withThemePreference = (
   state: PersistentState,
   theme: ThemePreference,
+): PersistentState =>
+  withThemePreferenceForAccount(state, resolveAccountKey(state), theme)
+
+/** Writes for an explicit account key so a not-yet-active account (e.g. one provisioned
+ *  mid-migration) can be seeded. Unlike the self-custodial maps, the custodial sentinel
+ *  is a legitimate key here — resolveAccountKey produces it for the custodial account. */
+export const withThemePreferenceForAccount = (
+  state: PersistentState,
+  accountKey: string,
+  theme: ThemePreference,
 ): PersistentState => {
-  const key = resolveAccountKey(state)
+  if (!accountKey) return state
   return {
     ...state,
     themeByAccountId: {
       ...state.themeByAccountId,
-      [key]: theme,
+      [accountKey]: theme,
     },
   }
 }
