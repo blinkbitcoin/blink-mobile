@@ -12,6 +12,13 @@
 
 set -euo pipefail
 
+# Telemetry is best-effort: a broken, unreadable or absent lib must never
+# break a claim - the fallbacks below turn every tel_* call into a no-op.
+TEL_LIB="$(dirname "${BASH_SOURCE[0]}")/../lib/telemetry.sh"
+{ [ -f "$TEL_LIB" ] && . "$TEL_LIB"; } 2>/dev/null || true
+type tel_emit >/dev/null 2>&1 || { tel_now() { echo 0; }; tel_emit() { :; }; tel_span() { while [ $# -gt 0 ] && [ "$1" != "--" ]; do shift; done; [ $# -gt 0 ] && shift; "$@"; }; }
+T_CLAIM=$(tel_now)
+
 PR="${1:?usage: claim-session.sh <pr-number> [device-type] [runtime]}"
 DEVICE_TYPE="${2:-iPhone 16 Pro}"
 RUNTIME="${3:-}"
@@ -39,9 +46,13 @@ SIM_NAME="${DEMO_SIM_PREFIX:-rn-demo}-pr${PR}"
 # once. The prefix is what keeps their sessions apart.
 SESSION_DIR="$REGISTRY/${SIM_NAME}"
 
+DEMO_SIM_NAME="$SIM_NAME"   # session label for telemetry spans
+
 # Sweep simulators from sessions released more than the TTL ago (default 72h),
 # then un-mark our own session: an active claim is never reaped.
+T_REAP=$(tel_now)
 "$(dirname "${BASH_SOURCE[0]}")/reap-stale.sh" >/dev/null 2>&1 || true
+tel_emit sim.claim.reap "$T_REAP"
 mkdir -p "$REGISTRY/ports" "$SESSION_DIR"
 rm -f "$SESSION_DIR/released-at"
 
@@ -93,6 +104,10 @@ fi
 # --- Simulator ---------------------------------------------------------------
 # Reuse our own named sim if a previous run left it; never adopt one we did not
 # name, because the name is the only ownership marker release-session trusts.
+# CLAIM_ORIGIN labels the telemetry span: reclaim (~1s), clone (~seconds) and
+# create (~a minute) are three different distributions, and aggregating them
+# under one name would make every percentile a lie.
+CLAIM_ORIGIN="reclaim"
 UDID=$(xcrun simctl list devices -j \
   | python3 -c "
 import json,sys
@@ -143,6 +158,7 @@ for _, devices in json.load(sys.stdin)['devices'].items():
         UDID=$("$(dirname "${BASH_SOURCE[0]}")/with-lock.sh" golden 300 \
           xcrun simctl clone "$GOLDEN_UDID" "$SIM_NAME" 2>/dev/null || true)
         if [ -n "$UDID" ]; then
+          CLAIM_ORIGIN="cloned-from-golden"
           echo "cloned-from-golden" > "$SESSION_DIR/origin"
           echo "$GOLDEN_NAME" > "$SESSION_DIR/golden-source"
           cp "$GOLDEN_DIR/stamp" "$SESSION_DIR/golden-stamp" 2>/dev/null || true
@@ -176,6 +192,7 @@ sys.exit('runtime not available: ' + name)
 " "$RUNTIME")
   fi
   UDID=$(xcrun simctl create "$SIM_NAME" "$DEVICE_TYPE" "$RUNTIME_ID")
+  CLAIM_ORIGIN="created"
   echo "created" > "$SESSION_DIR/origin"
   # Recorded so bless-golden.sh can stamp what hardware the golden actually is,
   # which is what lets a later claim refuse a device-type-mismatched clone.
@@ -187,7 +204,9 @@ echo "$UDID" > "$SESSION_DIR/udid"
 echo "$SIM_NAME" > "$SESSION_DIR/name"
 ln -sfn "$SESSION_DIR" "$REGISTRY/ports/$PORT/session" 2>/dev/null || true
 
+T_BOOT=$(tel_now)
 xcrun simctl bootstatus "$UDID" -b >/dev/null 2>&1 || xcrun simctl boot "$UDID"
+tel_emit sim.claim.boot "$T_BOOT" origin="$CLAIM_ORIGIN"
 
 # Persist the Metro redirect on THIS device only, so later plain `simctl launch`
 # calls keep using our bundler and never fall back to the user's 8081. Needs the
@@ -196,6 +215,9 @@ xcrun simctl bootstatus "$UDID" -b >/dev/null 2>&1 || xcrun simctl boot "$UDID"
 if [ -n "${DEMO_APP_ID_IOS:-}" ]; then
   xcrun simctl spawn "$UDID" defaults write "$DEMO_APP_ID_IOS" RCT_jsLocation "localhost:$PORT" || true
 fi
+
+tel_emit sim.claim.total "$T_CLAIM" origin="$CLAIM_ORIGIN" udid="$UDID" port="$PORT" \
+  device_type="$(cat "$SESSION_DIR/device-type" 2>/dev/null || echo "")"
 
 cat <<EOF
 # Claimed session for PR #$PR

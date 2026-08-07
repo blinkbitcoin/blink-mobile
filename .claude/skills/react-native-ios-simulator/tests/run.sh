@@ -387,6 +387,123 @@ check "reset without a port writes no defaults" "no" \
 "$SCRIPTS/release-session.sh" 622 --delete >/dev/null 2>&1
 
 echo
+echo "telemetry (lib/telemetry.sh)"
+
+TEL="$TESTS_DIR/../lib/telemetry.sh"
+TEL_TEST_DIR="$WORK/telemetry"
+spans_file() { ls "$1"/spans-*.jsonl 2>/dev/null | head -1; }
+span_lines() { cat "$(spans_file "$1")" 2>/dev/null; }
+
+# --- tel_span is transparent -------------------------------------------------
+rm -rf "$TEL_TEST_DIR"
+out=$(DEMO_TELEMETRY_DIR="$TEL_TEST_DIR" bash -c '
+  . "'"$TEL"'"
+  tel_span test.span k=v -- bash -c "echo real-out; echo real-err >&2; exit 3"
+' 2>"$WORK/tel-err.txt"); rc=$?
+check "tel_span preserves the exit code" "3" "$rc"
+check "tel_span preserves stdout" "real-out" "$out"
+check "tel_span preserves stderr" "real-err" "$(cat "$WORK/tel-err.txt")"
+check "one span, one line" "1" "$(span_lines "$TEL_TEST_DIR" | wc -l | tr -d ' ')"
+check "the line is valid v1 JSON with every schema key" "yes" \
+  "$(span_lines "$TEL_TEST_DIR" | python3 -c '
+import json, sys
+r = json.loads(sys.stdin.readline())
+need = {"v","ts","dur_ms","span","skill","session","run_id","rev","ok","meta"}
+ok = r["v"] == 1 and need <= set(r) and r["skill"] == "test" and r["ok"] is False and r["meta"]["rc"] == 3
+print("yes" if ok else "no")' 2>/dev/null)"
+
+# --- the unit trap: seconds-vs-ms is the classic telemetry bug ---------------
+rm -rf "$TEL_TEST_DIR"
+DEMO_TELEMETRY_DIR="$TEL_TEST_DIR" bash -c '. "'"$TEL"'"; tel_span test.sleep -- sleep 0.5' >/dev/null 2>&1
+DUR=$(span_lines "$TEL_TEST_DIR" | python3 -c 'import json,sys; print(json.loads(sys.stdin.readline())["dur_ms"])' 2>/dev/null)
+check "a 0.5s span records dur_ms in [400,5000]" "yes" \
+  "$([ -n "$DUR" ] && [ "$DUR" -ge 400 ] && [ "$DUR" -le 5000 ] && echo yes || echo "no ($DUR)")"
+
+# --- concurrent writers never tear each other's lines ------------------------
+rm -rf "$TEL_TEST_DIR"
+for i in $(seq 20); do
+  DEMO_TELEMETRY_DIR="$TEL_TEST_DIR" bash -c '
+    . "'"$TEL"'"
+    for j in 1 2 3 4 5 6 7 8 9 10; do t0=$(tel_now); tel_emit test.par "$t0" writer='"$i"' seq=$j; done
+  ' &
+done
+wait
+check "20 writers x 10 spans -> exactly 200 lines" "200" \
+  "$(span_lines "$TEL_TEST_DIR" | wc -l | tr -d ' ')"
+check "every concurrent line parses" "200" \
+  "$(span_lines "$TEL_TEST_DIR" | python3 -c '
+import json, sys
+print(sum(1 for l in sys.stdin if l.strip() and json.loads(l)))' 2>/dev/null)"
+
+# --- kill switch -------------------------------------------------------------
+rm -rf "$TEL_TEST_DIR"
+DEMO_TELEMETRY=0 DEMO_TELEMETRY_DIR="$TEL_TEST_DIR" bash -c '. "'"$TEL"'"; tel_span test.off -- true' >/dev/null 2>&1
+check "DEMO_TELEMETRY=0 runs the command" "0" "$?"
+check "DEMO_TELEMETRY=0 writes nothing" "absent" \
+  "$([ -d "$TEL_TEST_DIR" ] && echo present || echo absent)"
+
+# --- failure isolation: telemetry may never fail the caller ------------------
+# The instrumented scripts run set -euo pipefail; an unwritable telemetry dir
+# has to degrade to silence, not abort a claim.
+rm -rf "$TEL_TEST_DIR"; mkdir -p "$TEL_TEST_DIR"; chmod 0500 "$TEL_TEST_DIR"
+DEMO_TELEMETRY_DIR="$TEL_TEST_DIR" bash -c '
+  set -euo pipefail
+  . "'"$TEL"'"
+  t0=$(tel_now); tel_emit test.blocked "$t0"; tel_span test.blocked2 -- true
+  echo survived
+' > "$WORK/tel-iso.txt" 2>&1
+check "an unwritable telemetry dir cannot fail a set -e caller" "0" "$?"
+check "the caller actually ran to completion" "survived" "$(cat "$WORK/tel-iso.txt")"
+chmod 0700 "$TEL_TEST_DIR"
+
+# --- claims survive a broken lib and work without one ------------------------
+reset_world
+SAVED_LIB="$WORK/telemetry.sh.saved"
+cp "$TEL" "$SAVED_LIB"
+echo "this is not bash {{{" > "$TESTS_DIR/../lib/telemetry.sh"
+eval "$("$SCRIPTS/claim-session.sh" 730)" >/dev/null 2>&1
+check "a syntactically broken lib does not break a claim" "0" "$?"
+"$SCRIPTS/release-session.sh" 730 --delete >/dev/null 2>&1
+rm "$TESTS_DIR/../lib/telemetry.sh"
+eval "$("$SCRIPTS/claim-session.sh" 731)" >/dev/null 2>&1
+check "an absent lib does not break a claim" "0" "$?"
+"$SCRIPTS/release-session.sh" 731 --delete >/dev/null 2>&1
+cp "$SAVED_LIB" "$TESTS_DIR/../lib/telemetry.sh"
+
+# --- instrumented claims label origin from independent evidence --------------
+reset_world
+rm -rf "$DEMO_SIM_REGISTRY/telemetry"
+eval "$("$SCRIPTS/claim-session.sh" 732)" >/dev/null 2>&1
+ORIGIN_META=$(span_lines "$DEMO_SIM_REGISTRY/telemetry" | python3 -c '
+import json, sys
+for l in sys.stdin:
+    r = json.loads(l)
+    if r["span"] == "sim.claim.total":
+        print(r["meta"].get("origin", "")); break' 2>/dev/null)
+check "created claim emits origin=created, matching the session file" "yes" \
+  "$([ "$ORIGIN_META" = "$(cat "$DEMO_SIM_REGISTRY/rn-demo-pr732/origin")" ] && [ "$ORIGIN_META" = "created" ] && echo yes || echo "no ($ORIGIN_META)")"
+check "claim emits its sub-spans too" "yes" \
+  "$(span_lines "$DEMO_SIM_REGISTRY/telemetry" | grep -q '"span":"sim.claim.boot"' && span_lines "$DEMO_SIM_REGISTRY/telemetry" | grep -q '"span":"sim.claim.reap"' && echo yes || echo no)"
+"$SCRIPTS/release-session.sh" 732 >/dev/null 2>&1
+check "a clean release emits its span" "yes" \
+  "$(span_lines "$DEMO_SIM_REGISTRY/telemetry" | grep -q '"span":"sim.release.total"' && echo yes || echo no)"
+
+mkdir -p "$FAKE_APP_ROOT"   # bless needs the app-root scaffolding from earlier sections
+eval "$("$SCRIPTS/claim-session.sh" 733)" >/dev/null 2>&1
+"$SCRIPTS/bless-golden.sh" 733 --sha tel111 --lockfile /dev/null 2>/dev/null >/dev/null
+rm -rf "$DEMO_SIM_REGISTRY/telemetry"
+eval "$("$SCRIPTS/claim-session.sh" 734)" >/dev/null 2>&1
+ORIGIN_META=$(span_lines "$DEMO_SIM_REGISTRY/telemetry" | python3 -c '
+import json, sys
+for l in sys.stdin:
+    r = json.loads(l)
+    if r["span"] == "sim.claim.total":
+        print(r["meta"].get("origin", "")); break' 2>/dev/null)
+check "cloned claim emits origin=cloned-from-golden, matching the session file" "yes" \
+  "$([ "$ORIGIN_META" = "$(cat "$DEMO_SIM_REGISTRY/rn-demo-pr734/origin")" ] && [ "$ORIGIN_META" = "cloned-from-golden" ] && echo yes || echo "no ($ORIGIN_META)")"
+"$SCRIPTS/release-session.sh" 734 --delete >/dev/null 2>&1
+
+echo
 echo "native-build staleness stamp (native-stamp.sh)"
 
 NS="$SCRIPTS/native-stamp.sh"
