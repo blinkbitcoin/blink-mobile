@@ -4,7 +4,7 @@ import { injectJs, onMessageHandler } from "react-native-webln"
 import { WebView, WebViewNavigation } from "react-native-webview"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
-import { headerLeftNoGlass } from "@app/components/header-no-glass/header-no-glass"
+import { headerLeftNoGlass } from "@app/components/header-no-glass"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"

@@ -7,7 +7,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloyTertiaryButton } from "@app/components/atomic/galoy-tertiary-button"
-import { headerRightNoGlass } from "@app/components/header-no-glass/header-no-glass"
+import { headerRightNoGlass } from "@app/components/header-no-glass"
 import { WarningCard } from "@app/components/warning-card"
 import { Screen } from "@app/components/screen"
 import { SparkCompatibleInfo } from "@app/components/spark-compatible-info"

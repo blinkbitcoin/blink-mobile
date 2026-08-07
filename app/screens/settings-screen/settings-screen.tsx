@@ -8,7 +8,7 @@ import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
-import { headerRightNoGlass } from "@app/components/header-no-glass/header-no-glass"
+import { headerRightNoGlass } from "@app/components/header-no-glass"
 import { BackupStatus, useBackupState } from "@app/self-custodial/providers/backup-state"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { Screen } from "@app/components/screen"
