@@ -34,8 +34,9 @@ import { testProps } from "@app/utils/testProps"
  * handover; the visible control covers iOS, which has no hardware back.
  *
  * Restart-resolvable refusals (#4098) get a self-help variant instead of the support-first
- * copy: restart instructions lead, and Contact support demotes to a fallback. The
- * diagnostics card and email stay identical so support still gets the full block either way.
+ * copy: the hero leads with restart instructions and frames the primary Contact support
+ * CTA as the still-stuck fallback. The diagnostics card and email stay identical so
+ * support still gets the full block either way.
  */
 
 /** Reasons a user can clear themselves by restarting the app: the start latch is in-memory
@@ -134,20 +135,14 @@ export const MigrationContactSupportScreen: React.FC = () => {
 
         <ScrollView style={styles.scroll} contentContainerStyle={styles.body}>
           <View style={styles.card}>
-            {cardDetails.map((diagnostic) => {
-              /** Identifiers (account id, pubkey) keep the larger value font; the rest use
-               *  the smaller one. Every value renders complete, wrapping as needed, because
-               *  support needs the whole string, never a truncated one. */
-              const valueStyle = diagnostic.isIdentifier
-                ? styles.value
-                : [styles.value, styles.smallValue]
-              return (
-                <View key={diagnostic.label} style={styles.row}>
-                  <Text style={styles.label}>{diagnostic.label}</Text>
-                  <Text style={valueStyle}>{diagnostic.value}</Text>
-                </View>
-              )
-            })}
+            {cardDetails.map((diagnostic) => (
+              /** Every value renders complete, wrapping as needed, because support needs
+               *  the whole string, never a truncated one. */
+              <View key={diagnostic.label} style={styles.row}>
+                <Text style={styles.label}>{diagnostic.label}</Text>
+                <Text style={styles.value}>{diagnostic.value}</Text>
+              </View>
+            ))}
           </View>
 
           <IconTextButton
@@ -158,21 +153,15 @@ export const MigrationContactSupportScreen: React.FC = () => {
         </ScrollView>
 
         <View style={styles.buttonsContainer}>
-          {/* Self-help keeps no primary action: restarting cannot be a button, so the
-              instructions lead and Contact support demotes to a fallback. */}
-          {isSelfHelp ? (
-            <GaloySecondaryButton
-              title={LLSupport.selfHelp.contactSupportCta()}
-              onPress={sendSupportEmail}
-              {...testProps("migration-contact-support-cta")}
-            />
-          ) : (
-            <GaloyPrimaryButton
-              title={LLSupport.contactUsCta()}
-              onPress={sendSupportEmail}
-              {...testProps("migration-contact-support-cta")}
-            />
-          )}
+          <GaloyPrimaryButton
+            title={
+              isSelfHelp
+                ? LLSupport.selfHelp.contactSupportCta()
+                : LLSupport.contactUsCta()
+            }
+            onPress={sendSupportEmail}
+            {...testProps("migration-contact-support-cta")}
+          />
           <GaloySecondaryButton
             title={supportEmailAddress}
             onPress={copySupportEmail}
@@ -219,16 +208,12 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   value: {
     color: colors.black,
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: "Source Sans Pro",
     fontWeight: "700",
-    lineHeight: 22,
+    lineHeight: 20,
     textAlign: "right",
     maxWidth: 200,
-  },
-  smallValue: {
-    fontSize: 14,
-    lineHeight: 20,
   },
   buttonsContainer: {
     gap: 10,

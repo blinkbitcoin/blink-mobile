@@ -269,9 +269,9 @@ describe("MigrationContactSupportScreen", () => {
     expect(screen.getByText("start-refused")).toBeTruthy()
   })
 
-  /** Contact support demotes to a fallback in the self-help variant, but it must still
-   *  reach the same pre-filled email, and the address-copy control must survive. */
-  it("reaches support from the demoted self-help contact action", async () => {
+  /** The self-help variant relabels the primary CTA, but it must still reach the same
+   *  pre-filled email, and the address-copy control must survive. */
+  it("reaches support from the self-help contact action", async () => {
     mockReason = MigrationSupportReason.StartRefused
     renderScreen()
     await flushEffects()
