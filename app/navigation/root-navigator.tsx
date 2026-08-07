@@ -100,7 +100,7 @@ import { CardDashboardScreen } from "@app/screens/card-screen/card-dashboard-scr
 import { CardFeeScheduleScreen } from "@app/screens/card-screen/card-fee-schedule-screen"
 import { headerBackControl } from "@app/components/header-back-control/header-back-control"
 import { headerCloseControlOptions } from "@app/components/header-close-control"
-import { headerRightNoGlass } from "@app/components/header-no-glass/header-no-glass"
+import { headerRightNoGlass } from "@app/components/header-no-glass"
 import { NotificationHistoryScreen } from "@app/screens/notification-history-screen/notification-history-screen"
 import {
   CardAddToMobileWalletScreen,
@@ -779,7 +779,9 @@ export const RootStack = () => {
         component={CardPersonalInformationScreen}
         options={{
           title: LL.CardFlow.Onboarding.PersonalInformation.title(),
-          headerLeft: () => <></>,
+          // Suppresses the back button natively — an empty custom headerLeft item
+          // would still get the iOS 26 Liquid Glass capsule drawn around it.
+          headerBackVisible: false,
           ...headerCloseControlOptions(),
         }}
       />
@@ -796,7 +798,7 @@ export const RootStack = () => {
         component={CardProcessingScreen}
         options={{
           title: "",
-          headerLeft: () => <></>,
+          headerBackVisible: false,
           ...headerCloseControlOptions(),
         }}
       />
@@ -805,7 +807,7 @@ export const RootStack = () => {
         component={CardPreapprovedScreen}
         options={{
           title: "",
-          headerLeft: () => <></>,
+          headerBackVisible: false,
           ...headerCloseControlOptions(),
         }}
       />
