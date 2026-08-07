@@ -1,5 +1,5 @@
 import React from "react"
-import { render } from "@testing-library/react-native"
+import { fireEvent, render } from "@testing-library/react-native"
 
 import { RestorePhraseScreen } from "@app/screens/self-custodial/onboarding/restore/restore-phrase-screen"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
@@ -57,6 +57,26 @@ jest.mock("@app/components/mnemonic-word-input", () => {
   Mock.displayName = "MockMnemonicWordInput"
   return { MnemonicWordInput: Mock }
 })
+
+const renderHeaderRight = () => {
+  const calls = mockSetOptions.mock.calls
+  const lastOptions = calls[calls.length - 1]?.[0]
+  if (!lastOptions?.headerRight) throw new Error("headerRight was not set")
+  return render(<ContextForScreen>{lastOptions.headerRight()}</ContextForScreen>)
+}
+
+// `headerRightNoGlass` writes `headerRight` for Android and
+// `unstable_headerRightItems` for iOS, so a header is only truly absent when
+// neither key was ever handed a renderer.
+const headerRightWasInstalled = () =>
+  mockSetOptions.mock.calls.some(
+    ([options]) => options?.headerRight || options?.unstable_headerRightItems,
+  )
+
+const lastSetOptions = () => {
+  const calls = mockSetOptions.mock.calls
+  return calls[calls.length - 1]?.[0]
+}
 
 loadLocale("en")
 const LL = i18nObject("en")
@@ -440,5 +460,79 @@ describe("RestorePhraseScreen", () => {
     const { queryByText } = renderScreen()
 
     expect(queryByText(LL.RestoreScreen.recognizePhraseTitle())).toBeNull()
+  })
+
+  it("installs the header Paste button on step 1 and wires it to the clipboard", () => {
+    const handlePasteFromClipboard = jest.fn()
+    mockUseRestorePhrase.mockReturnValue({
+      ...defaultHookReturn,
+      isStep1: true,
+      handlePasteFromClipboard,
+    })
+
+    renderScreen()
+
+    const { getByText } = renderHeaderRight()
+    fireEvent.press(getByText(LL.RestoreScreen.paste()))
+
+    expect(handlePasteFromClipboard).toHaveBeenCalledTimes(1)
+  })
+
+  it("announces the Paste button by its visible label, not the test id", () => {
+    mockUseRestorePhrase.mockReturnValue({
+      ...defaultHookReturn,
+      isStep1: true,
+    })
+
+    renderScreen()
+
+    const { getByTestId } = renderHeaderRight()
+    const button = getByTestId("restore-paste-button")
+    expect(button.props.accessibilityLabel).toBe(LL.RestoreScreen.paste())
+    expect(button.props.hitSlop).toEqual({ top: 12, bottom: 12, left: 12, right: 12 })
+  })
+
+  it("clears the header Paste button when step 1 advances to step 2", () => {
+    mockUseRestorePhrase.mockReturnValue({
+      ...defaultHookReturn,
+      isStep1: true,
+    })
+
+    const { rerender } = renderScreen()
+    expect(headerRightWasInstalled()).toBe(true)
+
+    // Step 1 -> step 2 updates params on the same mounted screen, so the header
+    // must be cleared by the effect re-run rather than by an unmount.
+    mockUseRestorePhrase.mockReturnValue({
+      ...defaultHookReturn,
+      isStep1: false,
+    })
+    rerender(
+      <ContextForScreen>
+        <RestorePhraseScreen />
+      </ContextForScreen>,
+    )
+
+    expect(lastSetOptions()).toEqual({
+      headerRight: undefined,
+      // eslint-disable-next-line camelcase -- name dictated by @react-navigation/native-stack
+      unstable_headerRightItems: undefined,
+    })
+  })
+
+  it("never installs the header Paste button when rendered on step 2", () => {
+    mockUseRestorePhrase.mockReturnValue({
+      ...defaultHookReturn,
+      isStep1: false,
+    })
+
+    renderScreen()
+
+    expect(headerRightWasInstalled()).toBe(false)
+    expect(lastSetOptions()).toEqual({
+      headerRight: undefined,
+      // eslint-disable-next-line camelcase -- name dictated by @react-navigation/native-stack
+      unstable_headerRightItems: undefined,
+    })
   })
 })

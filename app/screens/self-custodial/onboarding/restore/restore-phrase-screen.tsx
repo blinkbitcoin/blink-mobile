@@ -8,7 +8,10 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloyTertiaryButton } from "@app/components/atomic/galoy-tertiary-button"
-import { headerRightNoGlass } from "@app/components/header-no-glass/header-no-glass"
+import {
+  headerRightNoGlass,
+  noHeaderRight,
+} from "@app/components/header-no-glass/header-no-glass"
 import { WarningCard } from "@app/components/warning-card"
 import { SuggestionBar } from "@app/components/suggestion-bar"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -100,8 +103,13 @@ export const RestorePhraseScreen: React.FC = () => {
 
   const pasteLabel = LL.RestoreScreen.paste()
 
+  // Step 1 -> step 2 updates params on this same mounted screen, so the Paste
+  // button installed during step 1 has to be cleared explicitly here.
   useLayoutEffect(() => {
-    if (!isStep1) return
+    if (!isStep1) {
+      navigation.setOptions(noHeaderRight)
+      return
+    }
     navigation.setOptions(
       headerRightNoGlass(() => (
         <GaloyTertiaryButton
