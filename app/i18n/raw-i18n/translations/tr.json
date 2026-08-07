@@ -3888,6 +3888,8 @@
     "dollarNotCovered": "Dolar bakiyen zincir üstü kurtarma kapsamında değildir. Bu yolla yalnızca Bitcoin kurtarılabilir.",
     "nudgeMissingTitle": "Paranın kurtarma yedeği yok",
     "nudgeMissingBody": "Spark kullanılamaz hale gelirse paranı zincir üzerine taşıyabilmek için kurtarma yedeğini ayarla.",
+    "nudgeOnlyOnThisDeviceTitle": "Acil durum paketin yalnızca bu telefonda",
+    "nudgeOnlyOnThisDeviceBody": "Bir kopyasını başka bir yere kaydet. Bu telefonu kaybedersen içindeki kopya da gider ve paran zincir üzerinden kurtarılamaz.",
     "nudgeStaleTitle": "Kurtarma yedeğin güncel değil",
     "nudgeStaleBody": "Artık bakiyenle eşleşmiyor. Yenile ki bir kurtarma sahip olduğun her şeyi geri getirsin.",
     "nudgeCta": "Kurtarma yedeğini aç",

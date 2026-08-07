@@ -79,7 +79,7 @@ jest.mock("@app/self-custodial/recovery-bundle/settings", () => ({
   ...jest.requireActual("@app/self-custodial/recovery-bundle/settings"),
   readRecoveryBundleSettings: jest
     .fn()
-    .mockResolvedValue({ autoRefresh: true, cloudSync: false }),
+    .mockResolvedValue({ autoRefresh: true, cloudSync: false, exportedAt: null }),
   writeRecoveryBundleSettings: (...args: readonly unknown[]) =>
     mockWriteSettings(...args),
 }))

@@ -3888,6 +3888,8 @@
     "dollarNotCovered": "Jou Dollar-saldo word nie deur kettingherstel gedek nie. Slegs Bitcoin kan so herstel word.",
     "nudgeMissingTitle": "Jou fondse het geen herstel-rugsteun nie",
     "nudgeMissingBody": "Stel jou herstel-rugsteun op sodat jy jou fondse na die ketting kan skuif indien Spark onbeskikbaar raak.",
+    "nudgeOnlyOnThisDeviceTitle": "Jou noodbundel is net op hierdie foon",
+    "nudgeOnlyOnThisDeviceBody": "Stoor 'n kopie elders. As jy hierdie foon verloor, gaan die kopie daarop saam en jou fondse kan nie op die ketting herstel word nie.",
     "nudgeStaleTitle": "Jou herstel-rugsteun is verouderd",
     "nudgeStaleBody": "Dit stem nie meer met jou saldo ooreen nie. Verfris dit sodat 'n herstel alles teruggee wat jy besit.",
     "nudgeCta": "Open herstel-rugsteun",

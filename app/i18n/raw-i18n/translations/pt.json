@@ -3888,6 +3888,8 @@
         "dollarNotCovered": "Seu saldo em dólares não é coberto pela recuperação on-chain. Apenas Bitcoin pode ser recuperado assim.",
         "nudgeMissingTitle": "Seus fundos não têm backup de recuperação",
         "nudgeMissingBody": "Configure seu backup de recuperação para poder mover os fundos on-chain caso o Spark fique indisponível.",
+        "nudgeOnlyOnThisDeviceTitle": "Seu pacote de emergência está apenas neste telefone",
+        "nudgeOnlyOnThisDeviceBody": "Salve uma cópia em outro lugar. Se você perder este telefone, a cópia guardada nele vai junto e seus fundos não poderão ser recuperados on-chain.",
         "nudgeStaleTitle": "Seu backup de recuperação está desatualizado",
         "nudgeStaleBody": "Ele não corresponde mais ao seu saldo. Atualize-o para que uma recuperação devolva tudo o que você tem.",
         "nudgeCta": "Abrir backup de recuperação",

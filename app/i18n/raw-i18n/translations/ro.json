@@ -3888,6 +3888,8 @@
     "dollarNotCovered": "Soldul tău în dolari nu este acoperit de recuperarea on-chain. Doar Bitcoin poate fi recuperat astfel.",
     "nudgeMissingTitle": "Fondurile tale nu au copie de recuperare",
     "nudgeMissingBody": "Configurează copia de recuperare ca să îți poți muta fondurile on-chain dacă Spark devine indisponibil.",
+    "nudgeOnlyOnThisDeviceTitle": "Pachetul tău de urgență este doar pe acest telefon",
+    "nudgeOnlyOnThisDeviceBody": "Salvează o copie în altă parte. Dacă pierzi acest telefon, copia de pe el dispare odată cu el și fondurile tale nu vor putea fi recuperate on-chain.",
     "nudgeStaleTitle": "Copia ta de recuperare este învechită",
     "nudgeStaleBody": "Nu mai corespunde soldului tău. Actualizeaz-o pentru ca o recuperare să îți returneze tot ce deții.",
     "nudgeCta": "Deschide copia de recuperare",

@@ -3888,6 +3888,8 @@
         "dollarNotCovered": "Votre solde en dollars n'est pas couvert par la récupération on-chain. Seul le Bitcoin peut être récupéré ainsi.",
         "nudgeMissingTitle": "Vos fonds n'ont aucune sauvegarde de récupération",
         "nudgeMissingBody": "Configurez votre sauvegarde de récupération afin de pouvoir déplacer vos fonds on-chain si Spark devient indisponible.",
+        "nudgeOnlyOnThisDeviceTitle": "Votre paquet d'urgence n'existe que sur ce téléphone",
+        "nudgeOnlyOnThisDeviceBody": "Enregistrez une copie ailleurs. Si vous perdez ce téléphone, la copie qui s'y trouve disparaît avec lui et vos fonds ne pourront pas être récupérés on-chain.",
         "nudgeStaleTitle": "Votre sauvegarde de récupération est obsolète",
         "nudgeStaleBody": "Elle ne correspond plus à votre solde. Actualisez-la pour qu'une récupération restitue tout ce que vous détenez.",
         "nudgeCta": "Ouvrir la sauvegarde de récupération",

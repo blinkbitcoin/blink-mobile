@@ -3888,6 +3888,8 @@
     "dollarNotCovered": "Salio lako la Dola halijafunikwa na urejeshaji wa on-chain. Bitcoin pekee ndiyo inaweza kurejeshwa hivi.",
     "nudgeMissingTitle": "Fedha zako hazina nakala ya urejeshaji",
     "nudgeMissingBody": "Weka nakala yako ya urejeshaji ili uweze kuhamisha fedha on-chain iwapo Spark haitapatikana.",
+    "nudgeOnlyOnThisDeviceTitle": "Kifurushi chako cha dharura kiko kwenye simu hii pekee",
+    "nudgeOnlyOnThisDeviceBody": "Hifadhi nakala mahali pengine. Ukipoteza simu hii, nakala iliyo ndani yake huenda nayo na fedha zako haziwezi kurejeshwa on-chain.",
     "nudgeStaleTitle": "Nakala yako ya urejeshaji imepitwa na wakati",
     "nudgeStaleBody": "Hailingani tena na salio lako. Isasishe ili urejeshaji urudishe kila kitu ulicho nacho.",
     "nudgeCta": "Fungua nakala ya urejeshaji",

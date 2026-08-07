@@ -3888,6 +3888,8 @@
     "dollarNotCovered": "Số dư Đô la của bạn không được khôi phục on-chain. Chỉ Bitcoin mới khôi phục được theo cách này.",
     "nudgeMissingTitle": "Tiền của bạn chưa có bản sao lưu khôi phục",
     "nudgeMissingBody": "Thiết lập bản sao lưu khôi phục để có thể chuyển tiền on-chain nếu Spark ngừng hoạt động.",
+    "nudgeOnlyOnThisDeviceTitle": "Gói khẩn cấp của bạn chỉ có trên điện thoại này",
+    "nudgeOnlyOnThisDeviceBody": "Hãy lưu một bản sao ở nơi khác. Nếu mất điện thoại này, bản sao trong máy cũng mất theo và tiền của bạn không thể khôi phục on-chain.",
     "nudgeStaleTitle": "Bản sao lưu khôi phục của bạn đã cũ",
     "nudgeStaleBody": "Nó không còn khớp với số dư của bạn. Hãy làm mới để việc khôi phục trả lại toàn bộ số tiền bạn có.",
     "nudgeCta": "Mở bản sao lưu khôi phục",

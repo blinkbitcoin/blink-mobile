@@ -3888,6 +3888,8 @@
     "dollarNotCovered": "Tvoj saldo u dolarima nije pokriven on-chain oporavkom. Samo se Bitcoin može tako oporaviti.",
     "nudgeMissingTitle": "Tvoja sredstva nemaju kopiju za oporavak",
     "nudgeMissingBody": "Postavi kopiju za oporavak kako bi mogao premjestiti sredstva on-chain ako Spark postane nedostupan.",
+    "nudgeOnlyOnThisDeviceTitle": "Tvoj paket za hitne slučajeve je samo na ovom telefonu",
+    "nudgeOnlyOnThisDeviceBody": "Spremi kopiju negdje drugdje. Ako izgubiš ovaj telefon, kopija na njemu nestaje s njim i tvoja sredstva neće se moći oporaviti on-chain.",
     "nudgeStaleTitle": "Kopija za oporavak je zastarjela",
     "nudgeStaleBody": "Više ne odgovara tvom saldu. Osvježi je kako bi oporavak vratio sve što imaš.",
     "nudgeCta": "Otvori kopiju za oporavak",

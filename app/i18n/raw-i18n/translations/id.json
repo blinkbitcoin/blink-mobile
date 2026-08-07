@@ -3888,6 +3888,8 @@
     "dollarNotCovered": "Saldo Dolarmu tidak tercakup dalam pemulihan on-chain. Hanya Bitcoin yang bisa dipulihkan dengan cara ini.",
     "nudgeMissingTitle": "Danamu tidak punya cadangan pemulihan",
     "nudgeMissingBody": "Siapkan cadangan pemulihanmu agar kamu bisa memindahkan dana secara on-chain jika Spark tidak tersedia.",
+    "nudgeOnlyOnThisDeviceTitle": "Paket daruratmu hanya ada di ponsel ini",
+    "nudgeOnlyOnThisDeviceBody": "Simpan salinannya di tempat lain. Jika kamu kehilangan ponsel ini, salinan di dalamnya ikut hilang dan danamu tidak bisa dipulihkan on-chain.",
     "nudgeStaleTitle": "Cadangan pemulihanmu sudah usang",
     "nudgeStaleBody": "Sudah tidak cocok dengan saldomu. Perbarui agar pemulihan mengembalikan semua yang kamu miliki.",
     "nudgeCta": "Buka cadangan pemulihan",

@@ -3888,6 +3888,8 @@
         "dollarNotCovered": "Dein Dollar-Guthaben ist von der On-Chain-Wiederherstellung nicht abgedeckt. Nur Bitcoin lässt sich so wiederherstellen.",
         "nudgeMissingTitle": "Deine Mittel haben kein Wiederherstellungs-Backup",
         "nudgeMissingBody": "Richte dein Wiederherstellungs-Backup ein, damit du deine Mittel On-Chain bewegen kannst, falls Spark nicht mehr verfügbar ist.",
+        "nudgeOnlyOnThisDeviceTitle": "Dein Notfall-Bundle liegt nur auf diesem Telefon",
+        "nudgeOnlyOnThisDeviceBody": "Speichere eine Kopie woanders. Verlierst du dieses Telefon, geht die dort gespeicherte Kopie mit, und dein Guthaben lässt sich nicht On-Chain wiederherstellen.",
         "nudgeStaleTitle": "Dein Wiederherstellungs-Backup ist veraltet",
         "nudgeStaleBody": "Es passt nicht mehr zu deinem Guthaben. Aktualisiere es, damit eine Wiederherstellung alles zurückgibt.",
         "nudgeCta": "Wiederherstellungs-Backup öffnen",

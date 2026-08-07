@@ -3888,6 +3888,8 @@
     "dollarNotCovered": "Din dollarsaldo er ikke dækket af on-chain-gendannelse. Kun bitcoin kan gendannes på denne måde.",
     "nudgeMissingTitle": "Dine midler har ingen gendannelsessikkerhedskopi",
     "nudgeMissingBody": "Opret din gendannelsessikkerhedskopi, så du kan flytte midlerne on-chain, hvis Spark bliver utilgængelig.",
+    "nudgeOnlyOnThisDeviceTitle": "Dit nødbundt findes kun på denne telefon",
+    "nudgeOnlyOnThisDeviceBody": "Gem en kopi et andet sted. Mister du telefonen, ryger kopien med, og dine midler kan ikke gendannes on-chain.",
     "nudgeStaleTitle": "Din gendannelsessikkerhedskopi er forældet",
     "nudgeStaleBody": "Den passer ikke længere til din saldo. Opdater den, så en gendannelse giver alt, hvad du har.",
     "nudgeCta": "Åbn gendannelsessikkerhedskopi",

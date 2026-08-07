@@ -3888,6 +3888,8 @@
     "dollarNotCovered": "El teu saldo en dòlars no està cobert per la recuperació a la cadena. Només es pot recuperar Bitcoin d'aquesta manera.",
     "nudgeMissingTitle": "Els teus fons no tenen còpia de recuperació",
     "nudgeMissingBody": "Configura la còpia de recuperació per poder moure els fons a la cadena si Spark deixa d'estar disponible.",
+    "nudgeOnlyOnThisDeviceTitle": "El teu paquet d'emergència només és en aquest telèfon",
+    "nudgeOnlyOnThisDeviceBody": "Desa'n una còpia en un altre lloc. Si perds aquest telèfon, la còpia que hi ha desada se'n va amb ell i els teus fons no es podran recuperar a la cadena.",
     "nudgeStaleTitle": "La teva còpia de recuperació està desactualitzada",
     "nudgeStaleBody": "Ja no coincideix amb el teu saldo. Actualitza-la perquè una recuperació retorni tot el que tens.",
     "nudgeCta": "Obre la còpia de recuperació",
