@@ -1,6 +1,8 @@
 import type { Operation } from "@apollo/client"
 import type { NetworkError } from "@apollo/client/errors"
 
+import { isUnauthorizedError } from "./transport-error"
+
 /**
  * GraphQL operations the global RetryLink must never auto-resend. These are
  * non-idempotent: money-moving payments and the state-committing migration mutations. A
@@ -47,12 +49,7 @@ const noRetryOperations = [
   "accountDelete",
 ]
 
-const UNAUTHORIZED_STATUS = 401
-
 const IDEMPOTENCY_KEY_HEADER = "x-idempotency-key"
-
-const statusCodeOf = (error: NetworkError): number | undefined =>
-  (error as { statusCode?: number } | null)?.statusCode
 
 /**
  * Whether the operation's context carries an X-Idempotency-Key header. Such an operation
@@ -82,7 +79,7 @@ export const shouldRetryOperation = (
 ): boolean => {
   const hasError = Boolean(error)
   const isRetryableOperation = !noRetryOperations.includes(operationName)
-  const isUnauthorized = statusCodeOf(error) === UNAUTHORIZED_STATUS
+  const isUnauthorized = isUnauthorizedError(error)
   return hasError && isRetryableOperation && !isUnauthorized
 }
 
@@ -94,6 +91,4 @@ export const shouldRetryOperation = (
 export const shouldRetryUnauthorized = (
   error: NetworkError,
   operationName: string,
-): boolean =>
-  statusCodeOf(error) === UNAUTHORIZED_STATUS &&
-  !noRetryOperations.includes(operationName)
+): boolean => isUnauthorizedError(error) && !noRetryOperations.includes(operationName)
