@@ -8,7 +8,10 @@ import { flushEffects } from "../../helpers/flush-effects"
 import theme from "@app/rne-theme/theme"
 import { UnclaimedDepositsScreen } from "@app/screens/unclaimed-deposits/unclaimed-deposits-screen"
 import { SdkFeeError } from "@app/screens/send-bitcoin-screen/hooks/use-onchain-fee-tiers"
-import { FeeTierOption } from "@app/screens/send-bitcoin-screen/hooks/fee-tiers.types"
+import {
+  FeeTierOption,
+  FeeUnit,
+} from "@app/screens/send-bitcoin-screen/hooks/fee-tiers.types"
 import { DepositStatus, type PendingDeposit } from "@app/types/payment"
 import { WalletCurrency } from "@app/graphql/generated"
 
@@ -19,9 +22,9 @@ let mockDeposits: PendingDeposit[] = []
 let mockIsBusy = false
 let mockIsProcessing: (id: string, action: string) => boolean = () => false
 let mockFeeTiers = {
-  [FeeTierOption.Fast]: { feeSats: 30, etaMinutes: 10 },
-  [FeeTierOption.Medium]: { feeSats: 20, etaMinutes: 30 },
-  [FeeTierOption.Slow]: { feeSats: 10, etaMinutes: 60 },
+  [FeeTierOption.Fast]: { feeAmount: 30, feeUnit: FeeUnit.SatPerVbyte, etaMinutes: 10 },
+  [FeeTierOption.Medium]: { feeAmount: 20, feeUnit: FeeUnit.SatPerVbyte, etaMinutes: 30 },
+  [FeeTierOption.Slow]: { feeAmount: 10, feeUnit: FeeUnit.SatPerVbyte, etaMinutes: 60 },
 }
 let mockFeeTiersError: SdkFeeError | null = null
 
@@ -125,9 +128,21 @@ describe("UnclaimedDepositsScreen — refund fee gating", () => {
     mockIsBusy = false
     mockIsProcessing = () => false
     mockFeeTiers = {
-      [FeeTierOption.Fast]: { feeSats: 30, etaMinutes: 10 },
-      [FeeTierOption.Medium]: { feeSats: 20, etaMinutes: 30 },
-      [FeeTierOption.Slow]: { feeSats: 10, etaMinutes: 60 },
+      [FeeTierOption.Fast]: {
+        feeAmount: 30,
+        feeUnit: FeeUnit.SatPerVbyte,
+        etaMinutes: 10,
+      },
+      [FeeTierOption.Medium]: {
+        feeAmount: 20,
+        feeUnit: FeeUnit.SatPerVbyte,
+        etaMinutes: 30,
+      },
+      [FeeTierOption.Slow]: {
+        feeAmount: 10,
+        feeUnit: FeeUnit.SatPerVbyte,
+        etaMinutes: 60,
+      },
     }
     mockFeeTiersError = null
   })
@@ -168,9 +183,21 @@ describe("UnclaimedDepositsScreen — refund fee gating", () => {
 
   it("disables Refund now when selected tier rate is 0 (regression)", () => {
     mockFeeTiers = {
-      [FeeTierOption.Fast]: { feeSats: 0, etaMinutes: 10 },
-      [FeeTierOption.Medium]: { feeSats: 0, etaMinutes: 30 },
-      [FeeTierOption.Slow]: { feeSats: 0, etaMinutes: 60 },
+      [FeeTierOption.Fast]: {
+        feeAmount: 0,
+        feeUnit: FeeUnit.SatPerVbyte,
+        etaMinutes: 10,
+      },
+      [FeeTierOption.Medium]: {
+        feeAmount: 0,
+        feeUnit: FeeUnit.SatPerVbyte,
+        etaMinutes: 30,
+      },
+      [FeeTierOption.Slow]: {
+        feeAmount: 0,
+        feeUnit: FeeUnit.SatPerVbyte,
+        etaMinutes: 60,
+      },
     }
     const utils = renderScreen()
     enterRefundMode(utils)
@@ -199,7 +226,25 @@ describe("UnclaimedDepositsScreen — refund fee gating", () => {
     expect(mockHandleRefund).toHaveBeenCalledWith(
       expect.objectContaining({ id: "deposit-1" }),
       "bc1qaddr",
-      20, // medium tier feeSats
+      20, // medium tier feeAmount
+    )
+
+    await flushEffects()
+  })
+
+  it("forwards the fee rate of the tier the user picks", async () => {
+    mockHandleRefund.mockResolvedValue(true)
+    const utils = renderScreen()
+    enterRefundMode(utils)
+    setAddress(utils, "bc1qaddr")
+
+    fireEvent.press(utils.getByText(/^Fast/))
+    fireEvent.press(utils.getByTestId("refund-now-button"))
+
+    expect(mockHandleRefund).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "deposit-1" }),
+      "bc1qaddr",
+      30, // fast tier feeAmount
     )
 
     await flushEffects()
@@ -213,9 +258,21 @@ describe("UnclaimedDepositsScreen — broader flows", () => {
     mockIsBusy = false
     mockIsProcessing = () => false
     mockFeeTiers = {
-      [FeeTierOption.Fast]: { feeSats: 30, etaMinutes: 10 },
-      [FeeTierOption.Medium]: { feeSats: 20, etaMinutes: 30 },
-      [FeeTierOption.Slow]: { feeSats: 10, etaMinutes: 60 },
+      [FeeTierOption.Fast]: {
+        feeAmount: 30,
+        feeUnit: FeeUnit.SatPerVbyte,
+        etaMinutes: 10,
+      },
+      [FeeTierOption.Medium]: {
+        feeAmount: 20,
+        feeUnit: FeeUnit.SatPerVbyte,
+        etaMinutes: 30,
+      },
+      [FeeTierOption.Slow]: {
+        feeAmount: 10,
+        feeUnit: FeeUnit.SatPerVbyte,
+        etaMinutes: 60,
+      },
     }
     mockFeeTiersError = null
   })

@@ -9,15 +9,16 @@ import {
 import { extractOnchainFees, prepareSend } from "@app/self-custodial/bridge"
 import { FEE_TIER_ETA_MINUTES } from "@app/types/payment"
 
-import { FeeTierOption, type FeeTierInfo } from "./fee-tiers.types"
+import {
+  buildZeroTiers,
+  FeeTierOption,
+  FeeUnit,
+  type FeeTierInfo,
+} from "./fee-tiers.types"
 
 export const ETA_MINUTES: Record<FeeTierOption, number> = FEE_TIER_ETA_MINUTES
 
-const DEFAULT_TIERS: Record<FeeTierOption, FeeTierInfo> = {
-  [FeeTierOption.Fast]: { feeSats: 0, etaMinutes: ETA_MINUTES[FeeTierOption.Fast] },
-  [FeeTierOption.Medium]: { feeSats: 0, etaMinutes: ETA_MINUTES[FeeTierOption.Medium] },
-  [FeeTierOption.Slow]: { feeSats: 0, etaMinutes: ETA_MINUTES[FeeTierOption.Slow] },
-}
+const DEFAULT_TIERS = buildZeroTiers(ETA_MINUTES, FeeUnit.Sats)
 
 export const SdkFeeError = {
   InsufficientFunds: "insufficient_funds",
@@ -31,6 +32,7 @@ export type SdkFeeError = (typeof SdkFeeError)[keyof typeof SdkFeeError]
 type OnchainFeeTiersResult = {
   tiers: Record<FeeTierOption, FeeTierInfo>
   error: SdkFeeError | null
+  isQuoting: boolean
 }
 
 const SDK_ERROR_TAG_MAP: Partial<Record<SdkErrorTags, SdkFeeError>> = {
@@ -53,6 +55,8 @@ export const useOnchainFeeTiers = (
 ): OnchainFeeTiersResult => {
   const [tiers, setTiers] = useState(DEFAULT_TIERS)
   const [error, setError] = useState<SdkFeeError | null>(null)
+  /** True from the first render when a quote is already due, so no frame claims a zero fee. */
+  const [isQuoting, setIsQuoting] = useState(() => Boolean(sdk && address && amountSats))
   // Discards stale prepareSend resolutions when deps change mid-flight.
   const requestTokenRef = useRef(0)
 
@@ -62,8 +66,11 @@ export const useOnchainFeeTiers = (
 
     if (!sdk || !address || !amountSats) {
       setError(null)
+      setIsQuoting(false)
       return
     }
+
+    setIsQuoting(true)
 
     try {
       const prepared = await prepareSend(sdk, {
@@ -80,15 +87,18 @@ export const useOnchainFeeTiers = (
 
       setTiers({
         [FeeTierOption.Fast]: {
-          feeSats: fees.fast,
+          feeAmount: fees.fast,
+          feeUnit: FeeUnit.Sats,
           etaMinutes: ETA_MINUTES[FeeTierOption.Fast],
         },
         [FeeTierOption.Medium]: {
-          feeSats: fees.medium,
+          feeAmount: fees.medium,
+          feeUnit: FeeUnit.Sats,
           etaMinutes: ETA_MINUTES[FeeTierOption.Medium],
         },
         [FeeTierOption.Slow]: {
-          feeSats: fees.slow,
+          feeAmount: fees.slow,
+          feeUnit: FeeUnit.Sats,
           etaMinutes: ETA_MINUTES[FeeTierOption.Slow],
         },
       })
@@ -96,6 +106,8 @@ export const useOnchainFeeTiers = (
     } catch (err) {
       if (token !== requestTokenRef.current) return
       setError(classifySdkFeeError(err))
+    } finally {
+      if (token === requestTokenRef.current) setIsQuoting(false)
     }
   }, [sdk, address, amountSats])
 
@@ -103,5 +115,5 @@ export const useOnchainFeeTiers = (
     fetchFees()
   }, [fetchFees])
 
-  return { tiers, error }
+  return { tiers, error, isQuoting }
 }

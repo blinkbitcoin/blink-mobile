@@ -21,8 +21,52 @@ describe("useRecommendedFeeTiers", () => {
     const { result } = renderHook(() => useRecommendedFeeTiers(mockSdk, false))
 
     await waitFor(() => expect(result.current.error).toBeNull())
-    expect(result.current.tiers[FeeTierOption.Fast].feeSats).toBe(0)
+    expect(result.current.tiers[FeeTierOption.Fast].feeAmount).toBe(0)
     expect(mockGetRecommendedFees).not.toHaveBeenCalled()
+  })
+
+  it("quotes from the very first render once refund mode is entered", () => {
+    mockGetRecommendedFees.mockImplementation(
+      () =>
+        new Promise(() => {
+          // deliberately never resolves
+        }),
+    )
+
+    const { result } = renderHook(() => useRecommendedFeeTiers(mockSdk, true))
+
+    // Read before any effect flush: false here would label the tiers with a zero rate.
+    expect(result.current.isQuoting).toBe(true)
+  })
+
+  it("is not quoting while disabled", () => {
+    const { result } = renderHook(() => useRecommendedFeeTiers(mockSdk, false))
+
+    expect(result.current.isQuoting).toBe(false)
+  })
+
+  it("stops quoting once the rates land", async () => {
+    mockGetRecommendedFees.mockResolvedValue({
+      fastest: 30,
+      halfHour: 20,
+      hour: 15,
+      economy: 10,
+      minimum: 5,
+    })
+
+    const { result } = renderHook(() => useRecommendedFeeTiers(mockSdk, true))
+
+    await waitFor(() => expect(result.current.isQuoting).toBe(false))
+    expect(result.current.tiers[FeeTierOption.Fast].feeAmount).toBe(30)
+  })
+
+  it("stops quoting when the sdk throws", async () => {
+    mockGetRecommendedFees.mockRejectedValue(new Error("network down"))
+
+    const { result } = renderHook(() => useRecommendedFeeTiers(mockSdk, true))
+
+    await waitFor(() => expect(result.current.error).not.toBeNull())
+    expect(result.current.isQuoting).toBe(false)
   })
 
   it("populates tiers when fetch succeeds", async () => {
@@ -36,9 +80,11 @@ describe("useRecommendedFeeTiers", () => {
 
     const { result } = renderHook(() => useRecommendedFeeTiers(mockSdk, true))
 
-    await waitFor(() => expect(result.current.tiers[FeeTierOption.Fast].feeSats).toBe(30))
-    expect(result.current.tiers[FeeTierOption.Medium].feeSats).toBe(20)
-    expect(result.current.tiers[FeeTierOption.Slow].feeSats).toBe(10)
+    await waitFor(() =>
+      expect(result.current.tiers[FeeTierOption.Fast].feeAmount).toBe(30),
+    )
+    expect(result.current.tiers[FeeTierOption.Medium].feeAmount).toBe(20)
+    expect(result.current.tiers[FeeTierOption.Slow].feeAmount).toBe(10)
     expect(result.current.error).toBeNull()
   })
 
@@ -57,9 +103,9 @@ describe("useRecommendedFeeTiers", () => {
     const { result } = renderHook(() => useRecommendedFeeTiers(mockSdk, true))
 
     await waitFor(() => expect(result.current.error).not.toBeNull())
-    expect(result.current.tiers[FeeTierOption.Fast].feeSats).toBe(0)
-    expect(result.current.tiers[FeeTierOption.Medium].feeSats).toBe(0)
-    expect(result.current.tiers[FeeTierOption.Slow].feeSats).toBe(0)
+    expect(result.current.tiers[FeeTierOption.Fast].feeAmount).toBe(0)
+    expect(result.current.tiers[FeeTierOption.Medium].feeAmount).toBe(0)
+    expect(result.current.tiers[FeeTierOption.Slow].feeAmount).toBe(0)
   })
 
   it("clears error on successful retry after a previous failure", async () => {
@@ -83,7 +129,9 @@ describe("useRecommendedFeeTiers", () => {
     rerender({ enabled: false })
     rerender({ enabled: true })
 
-    await waitFor(() => expect(result.current.tiers[FeeTierOption.Fast].feeSats).toBe(25))
+    await waitFor(() =>
+      expect(result.current.tiers[FeeTierOption.Fast].feeAmount).toBe(25),
+    )
     expect(result.current.error).toBeNull()
   })
 })

@@ -7486,7 +7486,7 @@ type RootTranslation = {
 		 */
 		type: string
 		/**
-		 * F​e​e​ ​s​p​e​e​d
+		 * C​o​n​f​i​r​m​a​t​i​o​n​ ​s​p​e​e​d
 		 */
 		feeTier: string
 		/**
@@ -7501,6 +7501,10 @@ type RootTranslation = {
 		 * S​l​o​w
 		 */
 		slow: string
+		/**
+		 * U​n​a​b​l​e​ ​t​o​ ​e​s​t​i​m​a​t​e​ ​f​e​e​s​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		feeEstimateError: string
 		/**
 		 * R​e​c​o​m​m​e​n​d​e​d
 		 */
@@ -20589,7 +20593,7 @@ export type TranslationFunctions = {
 		 */
 		type: () => LocalizedString
 		/**
-		 * Fee speed
+		 * Confirmation speed
 		 */
 		feeTier: () => LocalizedString
 		/**
@@ -20604,6 +20608,10 @@ export type TranslationFunctions = {
 		 * Slow
 		 */
 		slow: () => LocalizedString
+		/**
+		 * Unable to estimate fees. Please try again.
+		 */
+		feeEstimateError: () => LocalizedString
 		/**
 		 * Recommended
 		 */
