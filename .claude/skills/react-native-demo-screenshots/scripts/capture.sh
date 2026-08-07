@@ -19,6 +19,12 @@
 
 set -uo pipefail
 
+# Telemetry is best-effort and optional: this skill still works when the
+# simulator skill's lib is absent (skills get copied around individually).
+TEL_LIB="$(dirname "${BASH_SOURCE[0]}")/../../react-native-ios-simulator/lib/telemetry.sh"
+{ [ -f "$TEL_LIB" ] && . "$TEL_LIB"; } 2>/dev/null || true
+type tel_emit >/dev/null 2>&1 || { tel_now() { echo 0; }; tel_emit() { :; }; tel_span() { while [ $# -gt 0 ] && [ "$1" != "--" ]; do shift; done; [ $# -gt 0 ] && shift; "$@"; }; }
+
 LABEL=""; OUTDIR="."
 UDID="${DEMO_UDID:-}"; SERIAL="${DEMO_ANDROID_SERIAL:-}"; FORCE=""
 SETTLE="${SHOT_SETTLE:-0.6}"     # gap between comparison frames
@@ -80,8 +86,16 @@ else
   shoot() { xcrun simctl io "$UDID" screenshot "$1" >/dev/null 2>&1; }
 fi
 
+# One span for the whole capture - never per frame: a python3 spawn inside the
+# settle loop would distort the very latency being measured. Frame count and
+# stability land in meta; `ok` mirrors stability so the report can keep
+# timed-out captures out of the latency percentiles (they are failure samples).
+T_CAPTURE=$(tel_now)
+FRAMES=0
+
 if [ -n "$NO_WAIT" ]; then
   shoot "$OUT" || die "screenshot failed"
+  FRAMES=1
 else
   # Two identical frames in a row means nothing is animating. Comparing file
   # digests is enough and avoids depending on an image differ.
@@ -97,6 +111,7 @@ else
   STABLE=""
   while :; do
     shoot "$TMP/frame.png" || die "screenshot failed - is ${UDID:-$SERIAL} booted?"
+    FRAMES=$((FRAMES + 1))
     [ -s "$TMP/frame.png" ] || die "screenshot produced an empty file"
     CUR=$(shasum -a 256 "$TMP/frame.png" | cut -d' ' -f1)
     if [ -n "$PREV" ] && [ "$CUR" = "$PREV" ]; then STABLE=1; break; fi
@@ -109,6 +124,14 @@ else
 fi
 
 [ -s "$OUT" ] || die "no screenshot was written to $OUT"
+
+if [ -n "$NO_WAIT" ]; then
+  tel_emit shot.capture.total "$T_CAPTURE" platform="$PLATFORM" frames=1 no_wait=1
+else
+  STABLE_FLAG="$([ -n "$STABLE" ] && echo 1 || echo 0)"
+  tel_emit shot.capture.total "$T_CAPTURE" platform="$PLATFORM" frames="$FRAMES" \
+    settle="$SETTLE" stable="$STABLE_FLAG" ok="$STABLE_FLAG"
+fi
 
 # A PNG that is not a PNG means simctl wrote an error into the file.
 if command -v magick >/dev/null 2>&1; then

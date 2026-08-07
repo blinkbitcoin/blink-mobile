@@ -19,6 +19,10 @@ export FAKE_ADB_DEVICES="$WORK/adb-devices.txt"
 export FAKE_ARGS_LOG="$WORK/args.log"
 export FAKE_FRAME_COUNTER="$WORK/frames.n"
 export SHOT_SETTLE=0.05
+# Telemetry derives its store from the registry, so redirecting the registry
+# keeps every test span inside $WORK - the same isolation trick the simulator
+# suite uses for session state.
+export DEMO_SIM_REGISTRY="$WORK/registry"
 
 printf 'DEMO-UDID|rn-demo-pr3712|Booted\n' > "$FAKE_DEVICES"
 printf 'emulator-5554|rn-demo-pr3712-avd|device\n' > "$FAKE_ADB_DEVICES"
@@ -176,6 +180,60 @@ check "rejects a malformed crop box" "1" "$?"
 
 "$SCRIPTS/crop-pair.sh" "$WORK/before.png" "$WORK/after.png" >/dev/null 2>&1
 check "requires --crop" "1" "$?"
+
+echo
+echo "telemetry"
+
+TELEMETRY_DIR="$WORK/registry/telemetry"
+tel_spans() { cat "$TELEMETRY_DIR"/spans-*.jsonl 2>/dev/null; }
+span_meta() { # span_meta <span> <key>
+  tel_spans | python3 -c '
+import json, sys
+span, key = sys.argv[1], sys.argv[2]
+for l in sys.stdin:
+    r = json.loads(l)
+    if r["span"] == span:
+        print(r["meta"].get(key, "")); break' "$1" "$2" 2>/dev/null
+}
+
+# --- frames meta cross-checked against the fake's own shot log ---------------
+# Two different sequences on purpose: a hardcoded frames value survives one
+# of these runs, never both.
+reset; rm -rf "$TELEMETRY_DIR"
+FAKE_FRAMES="red blue blue" DEMO_UDID=DEMO-UDID \
+  "$SCRIPTS/capture.sh" tele3 "$WORK/shots" >/dev/null 2>&1
+check "capture span frames == the fake's shot count (3-frame run)" \
+  "$(grep -c "screenshot udid=" "$FAKE_ARGS_LOG")" "$(span_meta shot.capture.total frames)"
+check "one capture emits exactly one capture span (no per-frame spans)" "1" \
+  "$(tel_spans | grep -c '"span":"shot.capture.total"')"
+
+reset; rm -rf "$TELEMETRY_DIR"
+FAKE_FRAMES="red green blue blue" DEMO_UDID=DEMO-UDID \
+  "$SCRIPTS/capture.sh" tele4 "$WORK/shots" >/dev/null 2>&1
+check "capture span frames == the fake's shot count (4-frame run)" \
+  "$(grep -c "screenshot udid=" "$FAKE_ARGS_LOG")" "$(span_meta shot.capture.total frames)"
+
+# --- a timed-out capture is a failure sample, not a slow success -------------
+reset; rm -rf "$TELEMETRY_DIR"
+FAKE_NEVER_SETTLE=1 SHOT_TIMEOUT=1 DEMO_UDID=DEMO-UDID \
+  "$SCRIPTS/capture.sh" tele-busy "$WORK/shots" >/dev/null 2>&1
+check "a never-settled capture's span carries ok=false" "yes" \
+  "$(tel_spans | python3 -c '
+import json, sys
+for l in sys.stdin:
+    r = json.loads(l)
+    if r["span"] == "shot.capture.total":
+        print("yes" if r["ok"] is False and r["meta"].get("stable") == 0 else "no"); break' 2>/dev/null)"
+
+# --- telemetry never escapes to the real HOME --------------------------------
+# With the registry override dropped, the default chain must land inside the
+# redirected HOME - proving nothing in this suite can write outside $WORK.
+reset
+env -u DEMO_SIM_REGISTRY -u DEMO_TELEMETRY_DIR HOME="$WORK/fake-home" \
+  FAKE_FRAMES="red red" DEMO_UDID=DEMO-UDID \
+  "$SCRIPTS/capture.sh" homebound "$WORK/shots" >/dev/null 2>&1
+check "the default telemetry store derives from HOME" "yes" \
+  "$(ls "$WORK/fake-home/.claude/rn-sim-sessions/telemetry"/spans-*.jsonl >/dev/null 2>&1 && echo yes || echo no)"
 
 echo
 echo "documented behavior matches the scripts"

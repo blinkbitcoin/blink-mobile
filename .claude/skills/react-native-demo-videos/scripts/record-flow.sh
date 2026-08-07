@@ -25,6 +25,12 @@
 
 set -uo pipefail
 
+# Telemetry is best-effort and optional: this skill still works when the
+# simulator skill's lib is absent (skills get copied around individually).
+TEL_LIB="$(dirname "${BASH_SOURCE[0]}")/../../react-native-ios-simulator/lib/telemetry.sh"
+{ [ -f "$TEL_LIB" ] && . "$TEL_LIB"; } 2>/dev/null || true
+type tel_emit >/dev/null 2>&1 || { tel_now() { echo 0; }; tel_emit() { :; }; tel_span() { while [ $# -gt 0 ] && [ "$1" != "--" ]; do shift; done; [ $# -gt 0 ] && shift; "$@"; }; }
+
 LABEL=""; FLOW=""; OUTDIR="."
 UDID="${DEMO_UDID:-}"; SERIAL="${DEMO_ANDROID_SERIAL:-}"; FORCE=""
 LEAD_IN="${DEMO_LEAD_IN:-1.5}"     # a beat of the start state before the first tap
@@ -128,12 +134,16 @@ fi
 # with an installer visible on screen). Recording that would put a black screen
 # and a progress bar at the head of every demo, so it happens before the
 # recorder starts. Failure here is not fatal: the real flow will report it.
+T_WARMUP=$(tel_now)
 if [ -z "$SKIP_WARMUP" ]; then
   WARMUP="$(dirname "${BASH_SOURCE[0]}")/../flows/_warmup.yaml"
   if [ -f "$WARMUP" ]; then
     echo "warming up the maestro driver..."
     maestro test --udid "$DEVICE" -e APP_ID="$APP_ID" "$WARMUP" >/dev/null 2>&1
   fi
+  tel_emit vid.record.warmup "$T_WARMUP" platform="$PLATFORM" skipped=0
+else
+  tel_emit vid.record.warmup "$T_WARMUP" platform="$PLATFORM" skipped=1
 fi
 
 # --- Recorder ---------------------------------------------------------------
@@ -184,6 +194,7 @@ stop_recorder() {
 trap 'stop_recorder' EXIT INT TERM
 
 echo "recording $DEVICE -> $OUT"
+T_REC_START=$(tel_now)
 # The recorder is launched through a shim that resets SIGINT to its default
 # disposition before exec'ing.
 #
@@ -234,6 +245,7 @@ else
   done
   [ -n "$STARTED" ] || die "recorder never started writing $OUT (recorder process died)"
 fi
+tel_emit vid.record.start_wait "$T_REC_START" platform="$PLATFORM"
 
 sleep "$LEAD_IN"
 
@@ -241,11 +253,16 @@ sleep "$LEAD_IN"
 # APP_ID and DEMO_PORT are forwarded so flows can stay app-agnostic
 # (`appId: ${APP_ID}`) and clearState flows can re-pass the Metro redirect as a
 # launch argument. Unused variables are harmless.
+T_FLOW=$(tel_now)
 maestro test --udid "$DEVICE" -e APP_ID="$APP_ID" ${DEMO_PORT:+-e DEMO_PORT="$DEMO_PORT"} "$FLOW"
 FLOW_RC=$?
+tel_emit vid.record.flow "$T_FLOW" platform="$PLATFORM" rc="$FLOW_RC" \
+  ok="$([ "$FLOW_RC" -eq 0 ] && echo 1 || echo 0)"
 
 sleep "$LEAD_OUT"
+T_STOP=$(tel_now)
 stop_recorder
+tel_emit vid.record.stop "$T_STOP" platform="$PLATFORM"
 trap - EXIT INT TERM
 
 # --- Validate ---------------------------------------------------------------

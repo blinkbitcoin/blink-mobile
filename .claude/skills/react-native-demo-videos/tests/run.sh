@@ -25,6 +25,9 @@ export FAKE_ARGS_LOG="$WORK/args.log"
 export DEMO_LEAD_IN=0.2 DEMO_LEAD_OUT=0.2
 export DEMO_APP_ID_IOS=com.example.demoapp
 export DEMO_APP_ID_ANDROID=com.example.androidapp
+# Redirecting the registry keeps every test span inside $WORK (telemetry
+# derives its store from it).
+export DEMO_SIM_REGISTRY="$WORK/registry"
 unset DEMO_PORT 2>/dev/null || true
 
 printf 'DEMO-UDID|rn-demo-pr3712|Booted\n' > "$FAKE_DEVICES"
@@ -348,6 +351,39 @@ sys.exit(1 if ('clearState' in raw and 'RCT_jsLocation' not in raw) else 0)
 " "$f"
   check "$name never clears state without re-passing the Metro redirect" "0" "$?"
 done
+
+echo
+echo "telemetry"
+
+TELEMETRY_DIR="$WORK/registry/telemetry"
+tel_spans() { cat "$TELEMETRY_DIR"/spans-*.jsonl 2>/dev/null; }
+
+# --- a recording emits its phase spans ---------------------------------------
+reset_logs; rm -rf "$TELEMETRY_DIR"
+DEMO_UDID=DEMO-UDID "$SCRIPTS/record-flow.sh" tele "$WORK/flow.yaml" "$WORK/out" >/dev/null 2>&1
+check "record run exits zero with telemetry on" "0" "$?"
+for span in vid.record.warmup vid.record.start_wait vid.record.flow vid.record.stop; do
+  check "recording emits $span" "1" "$(tel_spans | grep -c "\"span\":\"$span\"")"
+done
+check "the warmup span says it was not skipped" "yes" \
+  "$(tel_spans | grep '"span":"vid.record.warmup"' | grep -q '"skipped":0' && echo yes || echo no)"
+
+reset_logs; rm -rf "$TELEMETRY_DIR"
+DEMO_SKIP_WARMUP=1 DEMO_UDID=DEMO-UDID "$SCRIPTS/record-flow.sh" tele2 "$WORK/flow.yaml" "$WORK/out" >/dev/null 2>&1
+check "a skipped warmup is labelled skipped, not silently absent" "yes" \
+  "$(tel_spans | grep '"span":"vid.record.warmup"' | grep -q '"skipped":1' && echo yes || echo no)"
+
+# --- encode span carries the fields that make it a throughput number ---------
+rm -rf "$TELEMETRY_DIR"
+"$SCRIPTS/encode-demo.sh" "$WORK/out/tele2.mov" "$WORK/tele.gif" --format gif --width 200 >/dev/null 2>&1
+check "encode emits vid.encode.total with format and size" "yes" \
+  "$(tel_spans | python3 -c '
+import json, sys
+for l in sys.stdin:
+    r = json.loads(l)
+    if r["span"] == "vid.encode.total":
+        m = r["meta"]
+        print("yes" if m.get("fmt") == "gif" and isinstance(m.get("out_bytes"), int) and m["out_bytes"] > 0 and m.get("in_dur_s") not in ("", None) else "no"); break' 2>/dev/null)"
 
 echo
 echo "documented behavior matches the scripts"
