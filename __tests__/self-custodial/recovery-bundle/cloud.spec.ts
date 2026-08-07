@@ -9,6 +9,9 @@ const mockDriveFindAppDataFile = jest.fn()
 const mockDriveUploadAppDataFile = jest.fn()
 const mockAssertICloudAvailable = jest.fn()
 const mockICloudUploadAppDataFile = jest.fn()
+const mockDriveDownloadAppDataFile = jest.fn()
+const mockICloudFindAppDataFile = jest.fn()
+const mockICloudDownloadAppDataFile = jest.fn()
 
 jest.mock("react-native", () => ({
   Platform: {
@@ -34,14 +37,18 @@ jest.mock("@app/utils/google-drive-client", () => ({
   DriveError: jest.requireActual("@app/utils/google-drive-client").DriveError,
   findAppDataFile: (...args: unknown[]) => mockDriveFindAppDataFile(...args),
   uploadAppDataFile: (...args: unknown[]) => mockDriveUploadAppDataFile(...args),
+  downloadAppDataFile: (...args: unknown[]) => mockDriveDownloadAppDataFile(...args),
 }))
 
 jest.mock("@app/utils/icloud-client", () => ({
   assertICloudAvailable: (...args: unknown[]) => mockAssertICloudAvailable(...args),
   uploadAppDataFile: (...args: unknown[]) => mockICloudUploadAppDataFile(...args),
+  findAppDataFile: (...args: unknown[]) => mockICloudFindAppDataFile(...args),
+  downloadAppDataFile: (...args: unknown[]) => mockICloudDownloadAppDataFile(...args),
 }))
 
 import {
+  attemptSilentCloudFetch,
   attemptSilentCloudUpload,
   getRecoveryBundleFilename,
   getRecoveryBundleFilenamePrefix,
@@ -197,5 +204,135 @@ describe("attemptSilentCloudUpload on Android", () => {
     expect(result).toEqual({ success: false, reason: "auth", error: forbidden })
     expect(mockClearCachedAccessToken).not.toHaveBeenCalled()
     expect(mockDriveFindAppDataFile).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe("attemptSilentCloudFetch on iOS", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockPlatformOS = "ios"
+    mockAssertICloudAvailable.mockResolvedValue(undefined)
+    mockICloudFindAppDataFile.mockResolvedValue(FILE_NAME)
+    mockICloudDownloadAppDataFile.mockResolvedValue(CONTENT)
+  })
+
+  it("returns the bundle stored under the expected name", async () => {
+    await expect(attemptSilentCloudFetch(FILE_NAME)).resolves.toEqual({
+      success: true,
+      content: CONTENT,
+    })
+    expect(mockICloudFindAppDataFile).toHaveBeenCalledWith(FILE_NAME)
+  })
+
+  it("reports a miss rather than downloading nothing", async () => {
+    mockICloudFindAppDataFile.mockResolvedValue(undefined)
+
+    await expect(attemptSilentCloudFetch(FILE_NAME)).resolves.toEqual({
+      success: false,
+      reason: CloudBackupErrorReason.NotFound,
+    })
+    expect(mockICloudDownloadAppDataFile).not.toHaveBeenCalled()
+  })
+
+  it("carries through the reason when iCloud is unavailable", async () => {
+    mockAssertICloudAvailable.mockRejectedValue({
+      reason: CloudBackupErrorReason.PermissionDenied,
+    })
+
+    await expect(attemptSilentCloudFetch(FILE_NAME)).resolves.toEqual({
+      success: false,
+      reason: CloudBackupErrorReason.PermissionDenied,
+    })
+  })
+
+  it("falls back to unknown for a failure carrying no reason", async () => {
+    mockICloudDownloadAppDataFile.mockRejectedValue(new Error("offline"))
+
+    await expect(attemptSilentCloudFetch(FILE_NAME)).resolves.toEqual({
+      success: false,
+      reason: CloudBackupErrorReason.Unknown,
+    })
+  })
+})
+
+describe("attemptSilentCloudFetch on Android", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockPlatformOS = "android"
+    mockGetCurrentUser.mockReturnValue({ user: { id: "1" } })
+    mockGetTokens.mockResolvedValue({ accessToken: "token" })
+    mockDriveFindAppDataFile.mockResolvedValue("file-1")
+    mockDriveDownloadAppDataFile.mockResolvedValue(CONTENT)
+  })
+
+  it("returns the bundle without prompting anyone to sign in", async () => {
+    await expect(attemptSilentCloudFetch(FILE_NAME)).resolves.toEqual({
+      success: true,
+      content: CONTENT,
+    })
+    // A sign-in sheet here would defeat the point of looking before asking.
+    expect(mockSignInSilently).not.toHaveBeenCalled()
+    expect(mockDriveDownloadAppDataFile).toHaveBeenCalledWith("file-1", "token")
+  })
+
+  it("signs in silently when no session is cached", async () => {
+    mockGetCurrentUser.mockReturnValue(null)
+    mockSignInSilently.mockResolvedValue({ type: "success" })
+
+    await expect(attemptSilentCloudFetch(FILE_NAME)).resolves.toEqual({
+      success: true,
+      content: CONTENT,
+    })
+  })
+
+  it("reports an unlinked Drive as an auth miss", async () => {
+    // Expected, not exceptional: most users reaching emergency recovery never
+    // linked cloud backup at all.
+    mockGetCurrentUser.mockReturnValue(null)
+    mockSignInSilently.mockResolvedValue({ type: "noSavedCredentialFound" })
+
+    await expect(attemptSilentCloudFetch(FILE_NAME)).resolves.toEqual({
+      success: false,
+      reason: CloudBackupErrorReason.Auth,
+    })
+    expect(mockDriveFindAppDataFile).not.toHaveBeenCalled()
+  })
+
+  it("reports a missing file rather than downloading nothing", async () => {
+    mockDriveFindAppDataFile.mockResolvedValue(undefined)
+
+    await expect(attemptSilentCloudFetch(FILE_NAME)).resolves.toEqual({
+      success: false,
+      reason: CloudBackupErrorReason.NotFound,
+    })
+    expect(mockDriveDownloadAppDataFile).not.toHaveBeenCalled()
+  })
+
+  it("retries once with a fresh token when the cached one is dead", async () => {
+    mockDriveFindAppDataFile
+      .mockRejectedValueOnce(
+        new DriveError(CloudBackupErrorReason.Auth, "Drive query failed (401)", 401),
+      )
+      .mockResolvedValueOnce("file-1")
+    mockGetTokens
+      .mockResolvedValueOnce({ accessToken: "stale" })
+      .mockResolvedValueOnce({ accessToken: "fresh" })
+
+    await expect(attemptSilentCloudFetch(FILE_NAME)).resolves.toEqual({
+      success: true,
+      content: CONTENT,
+    })
+    expect(mockClearCachedAccessToken).toHaveBeenCalled()
+  })
+
+  it("carries through the reason on a Drive failure", async () => {
+    mockDriveDownloadAppDataFile.mockRejectedValue({
+      reason: CloudBackupErrorReason.Transient,
+    })
+
+    await expect(attemptSilentCloudFetch(FILE_NAME)).resolves.toEqual({
+      success: false,
+      reason: CloudBackupErrorReason.Transient,
+    })
   })
 })

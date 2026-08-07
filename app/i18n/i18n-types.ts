@@ -12820,6 +12820,130 @@ type RootTranslation = {
 		 */
 		pickBackupDescription: string
 	}
+	EmergencyRecovery: {
+		/**
+		 * O​p​e​r​a​t​o​r​ ​u​n​r​e​a​c​h​a​b​l​e
+		 */
+		outageTitle: string
+		/**
+		 * S​p​a​r​k​ ​i​s​ ​e​x​p​e​r​i​e​n​c​i​n​g​ ​a​n​ ​o​u​t​a​g​e​.​ ​P​l​e​a​s​e​ ​w​a​i​t​ ​c​o​u​p​l​e​ ​m​i​n​u​t​e​s​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​ ​o​r​ ​c​o​n​t​a​c​t​ ​o​u​r​ ​{​s​u​p​p​o​r​t​}
+		 * @param {string} support
+		 */
+		outageBody: RequiredParams<'support'>
+		/**
+		 * S​u​p​p​o​r​t
+		 */
+		outageSupport: string
+		/**
+		 * E​m​e​r​g​e​n​c​y​ ​r​e​c​o​v​e​r​y
+		 */
+		outageCta: string
+		/**
+		 * T​r​y​ ​a​g​a​i​n​ ​l​a​t​e​r
+		 */
+		tryAgainLater: string
+		/**
+		 * V​e​r​i​f​y​i​n​g​ ​t​h​e​ ​e​m​e​r​g​e​n​c​y​ ​b​u​n​d​l​e
+		 */
+		verifying: string
+		/**
+		 * E​m​e​r​g​e​n​c​y​ ​b​u​n​d​l​e​ ​v​e​r​i​f​i​e​d
+		 */
+		verified: string
+		/**
+		 * U​p​l​o​a​d​ ​e​m​e​r​g​e​n​c​y​ ​b​u​n​d​l​e
+		 */
+		sourcesTitle: string
+		/**
+		 * I​f​ ​y​o​u​ ​h​a​v​e​ ​s​a​v​e​d​ ​t​h​e​ ​e​m​e​r​g​e​n​c​y​ ​b​u​n​d​l​e​,​ ​u​p​l​o​a​d​ ​i​t​ ​n​o​w​ ​t​o​ ​b​e​ ​a​b​l​e​ ​t​o​ ​e​x​i​t​ ​o​n​c​h​a​i​n​.
+		 */
+		sourcesBody: string
+		/**
+		 * N​e​e​d​ ​h​e​l​p​?
+		 */
+		needHelp: string
+		/**
+		 * {​p​r​o​v​i​d​e​r​}
+		 * @param {string} provider
+		 */
+		fromCloud: RequiredParams<'provider'>
+		/**
+		 * P​a​s​s​w​o​r​d​ ​m​a​n​a​g​e​r
+		 */
+		fromPasswordManager: string
+		/**
+		 * U​p​l​o​a​d​ ​b​u​n​d​l​e
+		 */
+		fromFile: string
+		/**
+		 * N​o​ ​e​m​e​r​g​e​n​c​y​ ​b​u​n​d​l​e​ ​f​o​r​ ​t​h​i​s​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​ ​i​n​ ​y​o​u​r​ ​c​l​o​u​d​.
+		 */
+		notInCloud: string
+		/**
+		 * N​o​t​h​i​n​g​ ​o​n​ ​t​h​e​ ​c​l​i​p​b​o​a​r​d​ ​t​o​ ​c​h​e​c​k​.
+		 */
+		clipboardEmpty: string
+		/**
+		 * T​h​a​t​ ​f​i​l​e​ ​c​o​u​l​d​ ​n​o​t​ ​b​e​ ​r​e​a​d​.
+		 */
+		fileUnreadable: string
+		/**
+		 * C​o​u​l​d​ ​n​o​t​ ​f​e​t​c​h​ ​t​h​e​ ​e​m​e​r​g​e​n​c​y​ ​b​u​n​d​l​e​.
+		 */
+		sourceFailed: string
+		/**
+		 * P​r​o​b​a​b​l​y​ ​a​ ​w​r​o​n​g​ ​f​i​l​e
+		 */
+		rejectedTitle: string
+		/**
+		 * B​a​c​k​u​p​ ​p​h​r​a​s​e​ ​d​o​e​s​ ​n​o​t​ ​m​a​t​c​h​ ​t​h​e​ ​e​m​e​r​g​e​n​c​y​ ​b​u​n​d​l​e​.​ ​A​r​e​ ​y​o​u​ ​s​u​r​e​,​ ​y​o​u​ ​h​a​v​e​ ​t​h​e​ ​c​o​r​r​e​c​t​ ​o​n​e​?
+		 */
+		rejectedWrongPhrase: string
+		/**
+		 * T​h​a​t​ ​f​i​l​e​ ​i​s​ ​n​o​t​ ​a​n​ ​e​m​e​r​g​e​n​c​y​ ​b​u​n​d​l​e​.​ ​A​r​e​ ​y​o​u​ ​s​u​r​e​ ​y​o​u​ ​p​i​c​k​e​d​ ​t​h​e​ ​r​i​g​h​t​ ​o​n​e​?
+		 */
+		rejectedNotABundle: string
+		/**
+		 * T​r​y​ ​a​g​a​i​n
+		 */
+		tryAgain: string
+		/**
+		 * R​e​s​t​o​r​e​ ​o​t​h​e​r
+		 */
+		restoreOther: string
+		/**
+		 * Y​o​u​r​ ​f​u​n​d​s​ ​c​a​n​ ​b​e​ ​r​e​c​o​v​e​r​e​d
+		 */
+		summaryTitle: string
+		/**
+		 * T​h​i​s​ ​b​u​n​d​l​e​ ​c​o​v​e​r​s​ ​t​h​e​ ​b​a​l​a​n​c​e​ ​b​e​l​o​w​.​ ​B​l​i​n​k​ ​c​a​n​n​o​t​ ​p​e​r​f​o​r​m​ ​t​h​e​ ​o​n​c​h​a​i​n​ ​e​x​i​t​ ​f​o​r​ ​y​o​u​ ​y​e​t​ ​-​ ​o​u​r​ ​s​u​p​p​o​r​t​ ​t​e​a​m​ ​w​i​l​l​ ​w​a​l​k​ ​y​o​u​ ​t​h​r​o​u​g​h​ ​i​t​ ​w​i​t​h​ ​t​h​e​ ​r​e​c​o​v​e​r​y​ ​t​o​o​l​i​n​g​.
+		 */
+		summaryBody: string
+		/**
+		 * C​o​v​e​r​e​d​ ​b​a​l​a​n​c​e
+		 */
+		summaryCovered: string
+		/**
+		 * O​u​t​p​u​t​s
+		 */
+		summaryOutputs: string
+		/**
+		 * B​u​n​d​l​e​ ​c​r​e​a​t​e​d
+		 */
+		summaryCreated: string
+		/**
+		 * C​o​n​t​a​c​t​ ​s​u​p​p​o​r​t
+		 */
+		summarySupport: string
+		/**
+		 * S​a​v​e​ ​b​u​n​d​l​e​ ​a​s​ ​a​ ​f​i​l​e
+		 */
+		summaryExport: string
+		/**
+		 * C​l​o​s​e
+		 */
+		summaryDone: string
+	}
 	BackupNudge: {
 		/**
 		 * Y​o​u​r​ ​f​u​n​d​s​ ​a​r​e​ ​a​t​ ​r​i​s​k
@@ -26060,6 +26184,128 @@ export type TranslationFunctions = {
 		 * Select a backup to restore
 		 */
 		pickBackupDescription: () => LocalizedString
+	}
+	EmergencyRecovery: {
+		/**
+		 * Operator unreachable
+		 */
+		outageTitle: () => LocalizedString
+		/**
+		 * Spark is experiencing an outage. Please wait couple minutes and try again or contact our {support}
+		 */
+		outageBody: (arg: { support: string }) => LocalizedString
+		/**
+		 * Support
+		 */
+		outageSupport: () => LocalizedString
+		/**
+		 * Emergency recovery
+		 */
+		outageCta: () => LocalizedString
+		/**
+		 * Try again later
+		 */
+		tryAgainLater: () => LocalizedString
+		/**
+		 * Verifying the emergency bundle
+		 */
+		verifying: () => LocalizedString
+		/**
+		 * Emergency bundle verified
+		 */
+		verified: () => LocalizedString
+		/**
+		 * Upload emergency bundle
+		 */
+		sourcesTitle: () => LocalizedString
+		/**
+		 * If you have saved the emergency bundle, upload it now to be able to exit onchain.
+		 */
+		sourcesBody: () => LocalizedString
+		/**
+		 * Need help?
+		 */
+		needHelp: () => LocalizedString
+		/**
+		 * {provider}
+		 */
+		fromCloud: (arg: { provider: string }) => LocalizedString
+		/**
+		 * Password manager
+		 */
+		fromPasswordManager: () => LocalizedString
+		/**
+		 * Upload bundle
+		 */
+		fromFile: () => LocalizedString
+		/**
+		 * No emergency bundle for this backup phrase in your cloud.
+		 */
+		notInCloud: () => LocalizedString
+		/**
+		 * Nothing on the clipboard to check.
+		 */
+		clipboardEmpty: () => LocalizedString
+		/**
+		 * That file could not be read.
+		 */
+		fileUnreadable: () => LocalizedString
+		/**
+		 * Could not fetch the emergency bundle.
+		 */
+		sourceFailed: () => LocalizedString
+		/**
+		 * Probably a wrong file
+		 */
+		rejectedTitle: () => LocalizedString
+		/**
+		 * Backup phrase does not match the emergency bundle. Are you sure, you have the correct one?
+		 */
+		rejectedWrongPhrase: () => LocalizedString
+		/**
+		 * That file is not an emergency bundle. Are you sure you picked the right one?
+		 */
+		rejectedNotABundle: () => LocalizedString
+		/**
+		 * Try again
+		 */
+		tryAgain: () => LocalizedString
+		/**
+		 * Restore other
+		 */
+		restoreOther: () => LocalizedString
+		/**
+		 * Your funds can be recovered
+		 */
+		summaryTitle: () => LocalizedString
+		/**
+		 * This bundle covers the balance below. Blink cannot perform the onchain exit for you yet - our support team will walk you through it with the recovery tooling.
+		 */
+		summaryBody: () => LocalizedString
+		/**
+		 * Covered balance
+		 */
+		summaryCovered: () => LocalizedString
+		/**
+		 * Outputs
+		 */
+		summaryOutputs: () => LocalizedString
+		/**
+		 * Bundle created
+		 */
+		summaryCreated: () => LocalizedString
+		/**
+		 * Contact support
+		 */
+		summarySupport: () => LocalizedString
+		/**
+		 * Save bundle as a file
+		 */
+		summaryExport: () => LocalizedString
+		/**
+		 * Close
+		 */
+		summaryDone: () => LocalizedString
 	}
 	BackupNudge: {
 		/**

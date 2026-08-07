@@ -4037,6 +4037,47 @@ const en: BaseTranslation = {
     pickBackupTitle: "Choose a wallet",
     pickBackupDescription: "Select a backup to restore",
   },
+  EmergencyRecovery: {
+    // Restore could not reach the Spark operators.
+    outageTitle: "Operator unreachable",
+    outageBody: "Spark is experiencing an outage. Please wait couple minutes and try again or contact our {support: string}",
+    outageSupport: "Support",
+    outageCta: "Emergency recovery",
+    tryAgainLater: "Try again later",
+
+    // Automatic attempt, and the verification of anything the user supplies.
+    verifying: "Verifying the emergency bundle",
+    verified: "Emergency bundle verified",
+
+    // Nothing found automatically: ask where the bundle is.
+    sourcesTitle: "Upload emergency bundle",
+    sourcesBody: "If you have saved the emergency bundle, upload it now to be able to exit onchain.",
+    needHelp: "Need help?",
+    fromCloud: "{provider: string}",
+    fromPasswordManager: "Password manager",
+    fromFile: "Upload bundle",
+    notInCloud: "No emergency bundle for this backup phrase in your cloud.",
+    clipboardEmpty: "Nothing on the clipboard to check.",
+    fileUnreadable: "That file could not be read.",
+    sourceFailed: "Could not fetch the emergency bundle.",
+
+    // The bundle did not belong to this phrase, or was not a bundle at all.
+    rejectedTitle: "Probably a wrong file",
+    rejectedWrongPhrase: "Backup phrase does not match the emergency bundle. Are you sure, you have the correct one?",
+    rejectedNotABundle: "That file is not an emergency bundle. Are you sure you picked the right one?",
+    tryAgain: "Try again",
+    restoreOther: "Restore other",
+
+    // What a verified bundle actually means, stated without overclaiming.
+    summaryTitle: "Your funds can be recovered",
+    summaryBody: "This bundle covers the balance below. Blink cannot perform the onchain exit for you yet - our support team will walk you through it with the recovery tooling.",
+    summaryCovered: "Covered balance",
+    summaryOutputs: "Outputs",
+    summaryCreated: "Bundle created",
+    summarySupport: "Contact support",
+    summaryExport: "Save bundle as a file",
+    summaryDone: "Close",
+  },
   BackupNudge: {
     title: "Your funds are at risk",
     description: "Secure your wallet now. It only takes a minute.",
