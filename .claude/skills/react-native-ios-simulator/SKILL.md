@@ -189,7 +189,7 @@ diffs still need a rebuild, not a reload.
 ### 8. Release and verify
 
 ```bash
-"$SKILL/scripts/release-session.sh" 3712            # shut down, keep for 24h (default)
+"$SKILL/scripts/release-session.sh" 3712            # shut down, keep for 72h (default)
 "$SKILL/scripts/release-session.sh" 3712 --delete   # remove immediately
 ```
 
@@ -199,7 +199,7 @@ at claim time is still booted. **A non-zero exit here means you damaged someone
 else's session — report it, don't ignore it.**
 
 The default release keeps the simulator (with its app install and account) for
-`DEMO_SIM_TTL_HOURS` (24h) so retakes cost ~3 min instead of a full rebuild;
+`DEMO_SIM_TTL_HOURS` (72h) so retakes cost ~3 min instead of a full rebuild;
 `reap-stale.sh` — run automatically by every claim and release — deletes it
 once the stamp expires, so kept sims cannot accumulate the way they did before
 this skill existed (eight piled up once, one still booted from a session a week
@@ -255,7 +255,7 @@ The isolation guarantees are load-bearing for every other agent on this Mac, so
 they are tested rather than asserted:
 
 ```bash
-"$SKILL/tests/run.sh"     # 130 assertions, ~60s, exits non-zero on failure
+"$SKILL/tests/run.sh"     # 135 assertions, ~60s, exits non-zero on failure
 ```
 
 It creates **no real simulators** — a fake `xcrun` goes first on PATH and the

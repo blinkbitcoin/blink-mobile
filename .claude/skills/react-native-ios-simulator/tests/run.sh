@@ -148,7 +148,7 @@ check "leaves another agent's process alone" "alive" \
 check "release without a claim fails loudly" "1" "$?"
 
 echo
-echo "24h retention"
+echo "72h retention"
 
 # --- default release keeps the device and stamps it for the reaper ----------
 reset_world
@@ -163,6 +163,30 @@ eval "$("$SCRIPTS/claim-session.sh" 3712)" >/dev/null 2>&1
 check "re-claim clears the released-at stamp" "absent" \
   "$([ -f "$DEMO_SESSION_DIR/released-at" ] && echo present || echo absent)"
 check "re-claim within the TTL reuses the kept device" "Booted" "$(device_state "$DEMO_UDID")"
+
+# --- the 72h default is real, not just documented ----------------------------
+# Every other retention test ages a stamp with `echo 1` (expired under ANY
+# ttl), so these two are the only assertions that notice the default silently
+# reverting to 24h (48h-old must survive) or drifting to forever (73h-old
+# must not).
+reset_world
+eval "$("$SCRIPTS/claim-session.sh" 3712)" >/dev/null 2>&1
+"$SCRIPTS/release-session.sh" 3712 >/dev/null 2>&1
+echo $(( $(date +%s) - 48 * 3600 )) > "$DEMO_SESSION_DIR/released-at"
+"$SCRIPTS/reap-stale.sh" >/dev/null 2>&1
+check "a session released 48h ago survives the default TTL" "Shutdown" \
+  "$(device_state "$DEMO_UDID")"
+echo $(( $(date +%s) - 73 * 3600 )) > "$DEMO_SESSION_DIR/released-at"
+"$SCRIPTS/reap-stale.sh" >/dev/null 2>&1
+check "a session released 73h ago is reaped" "" "$(device_state "$DEMO_UDID")"
+
+# --- DEMO_SIM_TTL_HOURS still overrides the default --------------------------
+reset_world
+eval "$("$SCRIPTS/claim-session.sh" 3712)" >/dev/null 2>&1
+"$SCRIPTS/release-session.sh" 3712 >/dev/null 2>&1
+echo $(( $(date +%s) - 2 * 3600 )) > "$DEMO_SESSION_DIR/released-at"
+DEMO_SIM_TTL_HOURS=1 "$SCRIPTS/reap-stale.sh" >/dev/null 2>&1
+check "DEMO_SIM_TTL_HOURS=1 reaps a 2h-old session" "" "$(device_state "$DEMO_UDID")"
 
 # --- reaper removes only expired sessions -----------------------------------
 reset_world
@@ -621,6 +645,10 @@ check "SKILL.md documents the golden bless workflow" "yes" \
   "$(grep -q "bless-golden.sh" "$SKILL_MD" && echo yes || echo no)"
 check "SKILL.md ties golden staleness to the stamp sha" "yes" \
   "$(grep -qi "stamp" "$SKILL_MD" && grep -q "origin/main -- ios/" "$SKILL_MD" && echo yes || echo no)"
+check "SKILL.md documents the 72h retention default" "yes" \
+  "$(grep -q "72h" "$SKILL_MD" && echo yes || echo no)"
+check "SKILL.md carries no stale 24h default" "no" \
+  "$(grep -q "24h" "$SKILL_MD" && echo yes || echo no)"
 check "SKILL.md step 4 starts Metro with the demo cache config" "yes" \
   "$(grep -q "metro-demo.config.js" "$SKILL_MD" && echo yes || echo no)"
 check "SKILL.md forbids --reset-cache against the shared store" "yes" \
