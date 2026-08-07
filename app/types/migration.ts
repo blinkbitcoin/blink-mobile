@@ -17,6 +17,8 @@ export const MigrationRejectionCode = {
   StateConflict: "MIGRATION_STATE_CONFLICT",
   /** The phone-deletion cap, carrying the server's own contact-support copy. */
   OperationRestricted: "OPERATION_RESTRICTED",
+  /** A stale proof and a bad destination share this code; the clock skew tells them apart. */
+  InvalidDestination: "MIGRATION_INVALID_DESTINATION",
 } as const
 
 export type MigrationRejectionCode =
