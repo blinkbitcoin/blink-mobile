@@ -22,11 +22,17 @@ export type RecoveryBundleSettings = {
   autoRefresh: boolean
   /** Upload the encrypted bundle to the seed backup's cloud provider. */
   cloudSync: boolean
+  /** Unix ms of the last successful export (share sheet or clipboard), or null
+   *  if the bundle has never left this device by the user's own hand. Drives
+   *  the "only on this phone" nudge: the automatic on-device copy dies with the
+   *  device, so a manual-path user who never exported has no recovery at all. */
+  exportedAt: number | null
 }
 
 export const defaultRecoveryBundleSettings: RecoveryBundleSettings = {
   autoRefresh: true,
   cloudSync: false,
+  exportedAt: null,
 }
 
 /** Missing or corrupted stored settings degrade to the defaults. */
@@ -46,6 +52,10 @@ export const readRecoveryBundleSettings = async (
         typeof parsed?.cloudSync === "boolean"
           ? parsed.cloudSync
           : defaultRecoveryBundleSettings.cloudSync,
+      exportedAt:
+        typeof parsed?.exportedAt === "number"
+          ? parsed.exportedAt
+          : defaultRecoveryBundleSettings.exportedAt,
     }
   } catch {
     return defaultRecoveryBundleSettings

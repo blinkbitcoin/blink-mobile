@@ -14,7 +14,7 @@ import { ContextForScreen } from "../../helper"
 const mockUseBackupState = jest.fn()
 const mockActions: RecoveryBundleActions = {
   bundleState: undefined,
-  settings: { autoRefresh: true, cloudSync: false },
+  settings: { autoRefresh: true, cloudSync: false, exportedAt: null },
   settingsLoaded: true,
   refreshing: false,
   uploading: false,
@@ -99,7 +99,7 @@ describe("RecoveryBackupScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockActions.bundleState = savedState
-    mockActions.settings = { autoRefresh: true, cloudSync: false }
+    mockActions.settings = { autoRefresh: true, cloudSync: false, exportedAt: null }
     mockActions.settingsLoaded = true
     mockActions.sharing = false
     mockActions.copying = false
@@ -157,7 +157,7 @@ describe("RecoveryBackupScreen", () => {
     expect(first.queryByTestId("recovery-bundle-cloud-upload")).toBeNull()
     first.unmount()
 
-    mockActions.settings = { autoRefresh: true, cloudSync: true }
+    mockActions.settings = { autoRefresh: true, cloudSync: true, exportedAt: null }
     const second = renderScreen()
     expect(second.getByTestId("recovery-bundle-cloud-upload")).toBeTruthy()
   })

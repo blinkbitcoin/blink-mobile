@@ -175,7 +175,7 @@ const otherState: RecoveryBundleState = {
   totalSats: "5000",
 }
 
-const otherSettings = { autoRefresh: false, cloudSync: true }
+const otherSettings = { autoRefresh: false, cloudSync: true, exportedAt: null }
 
 const deferred = <T>() => {
   let resolve: (value: T) => void = () => {}
@@ -209,6 +209,7 @@ const resetMocks = () => {
   mockReadRecoveryBundleSettings.mockResolvedValue({
     autoRefresh: true,
     cloudSync: false,
+    exportedAt: null,
   })
   mockWriteRecoveryBundleSettings.mockResolvedValue(undefined)
   mockMarkCloudSynced.mockResolvedValue(null)
@@ -519,13 +520,18 @@ describe("useRecoveryBundleActions", () => {
     it("exposes the defaults before the first load: auto refresh on, cloud sync off", () => {
       const { result } = renderHook(() => useRecoveryBundleActions())
 
-      expect(result.current.settings).toEqual({ autoRefresh: true, cloudSync: false })
+      expect(result.current.settings).toEqual({
+        autoRefresh: true,
+        cloudSync: false,
+        exportedAt: null,
+      })
     })
 
     it("reloadState loads the stored settings alongside the bundle state", async () => {
       mockReadRecoveryBundleSettings.mockResolvedValue({
         autoRefresh: false,
         cloudSync: true,
+        exportedAt: null,
       })
       const { result } = renderHook(() => useRecoveryBundleActions())
 
@@ -534,7 +540,11 @@ describe("useRecoveryBundleActions", () => {
       })
 
       expect(mockReadRecoveryBundleSettings).toHaveBeenCalledWith(ACCOUNT_ID)
-      expect(result.current.settings).toEqual({ autoRefresh: false, cloudSync: true })
+      expect(result.current.settings).toEqual({
+        autoRefresh: false,
+        cloudSync: true,
+        exportedAt: null,
+      })
     })
 
     it("handleSetAutoRefresh persists the flag for the account", async () => {
@@ -550,6 +560,7 @@ describe("useRecoveryBundleActions", () => {
       expect(mockWriteRecoveryBundleSettings).toHaveBeenCalledWith(ACCOUNT_ID, {
         autoRefresh: false,
         cloudSync: false,
+        exportedAt: null,
       })
       expect(result.current.settings.autoRefresh).toBe(false)
       expect(mockSyncExistingBundleToCloud).not.toHaveBeenCalled()
@@ -573,6 +584,7 @@ describe("useRecoveryBundleActions", () => {
       expect(mockWriteRecoveryBundleSettings).toHaveBeenCalledWith(ACCOUNT_ID, {
         autoRefresh: true,
         cloudSync: true,
+        exportedAt: null,
       })
       expect(mockSyncExistingBundleToCloud).toHaveBeenCalledWith(
         ACCOUNT_ID,
@@ -623,6 +635,7 @@ describe("useRecoveryBundleActions", () => {
       expect(mockWriteRecoveryBundleSettings).toHaveBeenCalledWith(ACCOUNT_ID, {
         autoRefresh: true,
         cloudSync: true,
+        exportedAt: null,
       })
       expect(mockSyncExistingBundleToCloud).not.toHaveBeenCalled()
       expect(mockStartSession).not.toHaveBeenCalled()
@@ -641,6 +654,7 @@ describe("useRecoveryBundleActions", () => {
       expect(mockWriteRecoveryBundleSettings).toHaveBeenCalledWith(ACCOUNT_ID, {
         autoRefresh: true,
         cloudSync: false,
+        exportedAt: null,
       })
       expect(mockSyncExistingBundleToCloud).not.toHaveBeenCalled()
     })
@@ -857,6 +871,47 @@ describe("useRecoveryBundleActions", () => {
       expect(mockCopyToClipboard).not.toHaveBeenCalled()
     })
   })
+
+  describe("recording that the bundle left the device", () => {
+    it("records an export after the share sheet resolves", async () => {
+      const { result } = renderHook(() => useRecoveryBundleActions())
+      await act(async () => {
+        await result.current.handleShare()
+      })
+
+      expect(mockWriteRecoveryBundleSettings).toHaveBeenCalledWith(
+        ACCOUNT_ID,
+        expect.objectContaining({ exportedAt: expect.any(Number) }),
+      )
+    })
+
+    it("records an export after a clipboard copy", async () => {
+      const { result } = renderHook(() => useRecoveryBundleActions())
+      await act(async () => {
+        await result.current.handleCopy()
+      })
+
+      expect(mockWriteRecoveryBundleSettings).toHaveBeenCalledWith(
+        ACCOUNT_ID,
+        expect.objectContaining({ exportedAt: expect.any(Number) }),
+      )
+    })
+
+    it("does not record an export the user cancelled", async () => {
+      // A dismissed share sheet is not a copy of anything; counting it would
+      // silence the "only on this phone" nudge on a lie.
+      mockShareOpen.mockRejectedValueOnce(new Error("User did not share"))
+      const { result } = renderHook(() => useRecoveryBundleActions())
+      await act(async () => {
+        await result.current.handleShare()
+      })
+
+      expect(mockWriteRecoveryBundleSettings).not.toHaveBeenCalledWith(
+        ACCOUNT_ID,
+        expect.objectContaining({ exportedAt: expect.any(Number) }),
+      )
+    })
+  })
 })
 
 describe("useRecoveryBundleActions account switch", () => {
@@ -868,7 +923,7 @@ describe("useRecoveryBundleActions account switch", () => {
       .mockReturnValueOnce(previousRead.promise)
       .mockResolvedValueOnce(otherState)
     mockReadRecoveryBundleSettings
-      .mockResolvedValueOnce({ autoRefresh: true, cloudSync: false })
+      .mockResolvedValueOnce({ autoRefresh: true, cloudSync: false, exportedAt: null })
       .mockResolvedValueOnce(otherSettings)
     const { result, rerender } = renderHook(() => useRecoveryBundleActions())
     let previousReload: Promise<void> = Promise.resolve()
@@ -901,7 +956,11 @@ describe("useRecoveryBundleActions account switch", () => {
     rerender({})
 
     expect(result.current.bundleState).toBeUndefined()
-    expect(result.current.settings).toEqual({ autoRefresh: true, cloudSync: false })
+    expect(result.current.settings).toEqual({
+      autoRefresh: true,
+      cloudSync: false,
+      exportedAt: null,
+    })
   })
 
   it("binds the read to the network too: a network switch reads as loading until it reloads", async () => {
@@ -1041,7 +1100,7 @@ describe("useRecoveryBundleActions account switch", () => {
     const write = deferred<undefined>()
     mockWriteRecoveryBundleSettings.mockReturnValue(write.promise)
     mockReadRecoveryBundleSettings
-      .mockResolvedValueOnce({ autoRefresh: true, cloudSync: false })
+      .mockResolvedValueOnce({ autoRefresh: true, cloudSync: false, exportedAt: null })
       .mockResolvedValueOnce(otherSettings)
     const { result, rerender } = renderHook(() => useRecoveryBundleActions())
     await act(async () => {
