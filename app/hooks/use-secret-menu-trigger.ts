@@ -13,19 +13,26 @@ const SECRET_MENU_TAP_THRESHOLD = 3
 
 /**
  * Returns an onPress handler that opens the developer screen after
- * SECRET_MENU_TAP_THRESHOLD presses. Gated to development builds: in release
- * builds the developer screen route is not registered, so the trigger is inert.
+ * SECRET_MENU_TAP_THRESHOLD presses. Two independent __DEV__ gates keep it
+ * inert in release builds: the handler itself no-ops (so taps never dispatch
+ * a navigate that react-navigation would drop with an unhandled-action
+ * error), and root-navigator only registers the route in dev builds.
+ *
+ * The count lives in a ref, not state — it is never rendered, and taps must
+ * not re-render the host screen.
  */
 export const useSecretMenuTrigger = () => {
   const { navigate } = useNavigation<SecretMenuNavigationProp>()
-  const [tapCount, setTapCount] = React.useState(0)
+  const tapCount = React.useRef(0)
 
-  React.useEffect(() => {
-    if (__DEV__ && tapCount >= SECRET_MENU_TAP_THRESHOLD) {
-      navigate("developerScreen")
-      setTapCount(0)
+  return React.useCallback(() => {
+    if (!__DEV__) {
+      return
     }
-  }, [navigate, tapCount])
-
-  return React.useCallback(() => setTapCount((count) => count + 1), [])
+    tapCount.current += 1
+    if (tapCount.current >= SECRET_MENU_TAP_THRESHOLD) {
+      tapCount.current = 0
+      navigate("developerScreen")
+    }
+  }, [navigate])
 }
