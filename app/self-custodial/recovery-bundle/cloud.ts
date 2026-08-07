@@ -14,6 +14,7 @@ import { CloudBackupErrorReason } from "@app/types/cloud-backup"
 import {
   deleteAppDataFile as driveDeleteAppDataFile,
   DriveError,
+  downloadAppDataFile as driveDownloadAppDataFile,
   findAppDataFile as driveFindAppDataFile,
   listAppDataFiles as driveListAppDataFiles,
   uploadAppDataFile as driveUploadAppDataFile,
@@ -22,6 +23,8 @@ import { callDrive, configureGoogleSignIn } from "@app/utils/google-drive-sessio
 import {
   assertICloudAvailable,
   deleteAppDataFile as iCloudDeleteAppDataFile,
+  downloadAppDataFile as iCloudDownloadAppDataFile,
+  findAppDataFile as iCloudFindAppDataFile,
   uploadAppDataFile as iCloudUploadAppDataFile,
 } from "@app/utils/icloud-client"
 
@@ -139,5 +142,47 @@ export const attemptSilentCloudDelete = async (
     return { success: true }
   } catch (err) {
     return silentFailure(err)
+  }
+}
+
+export type SilentCloudFetchResult =
+  | { success: true; content: string }
+  | { success: false; reason: CloudBackupErrorReason }
+
+/**
+ * Best-effort, non-interactive read of one known file.
+ *
+ * The emergency-recovery flow leads with this: the user has just typed a seed
+ * that names their bundle exactly, so the app can go and look before asking
+ * them to hunt for a file. A sign-in prompt here would defeat the point, so an
+ * unlinked Drive is reported as a reason like any other miss.
+ */
+export const attemptSilentCloudFetch = async (
+  fileName: string,
+): Promise<SilentCloudFetchResult> => {
+  try {
+    if (Platform.OS === "ios") {
+      await assertICloudAvailable()
+      const found = await iCloudFindAppDataFile(fileName)
+      if (!found) return { success: false, reason: CloudBackupErrorReason.NotFound }
+      return { success: true, content: await iCloudDownloadAppDataFile(found) }
+    }
+
+    const accessToken = await silentDriveAccessToken()
+    if (!accessToken) return { success: false, reason: CloudBackupErrorReason.Auth }
+    const { value: fileId, token: freshToken } = await callDrive(accessToken, (token) =>
+      driveFindAppDataFile(fileName, token),
+    )
+    if (!fileId) return { success: false, reason: CloudBackupErrorReason.NotFound }
+    const { value: content } = await callDrive(freshToken, (token) =>
+      driveDownloadAppDataFile(fileId, token),
+    )
+    return { success: true, content }
+  } catch (err) {
+    const reason =
+      err && typeof err === "object" && "reason" in err
+        ? (err.reason as CloudBackupErrorReason)
+        : CloudBackupErrorReason.Unknown
+    return { success: false, reason }
   }
 }
