@@ -363,9 +363,79 @@ check "reset without a port writes no defaults" "no" \
 "$SCRIPTS/release-session.sh" 622 --delete >/dev/null 2>&1
 
 echo
+echo "shared metro transform cache (metro-demo.config.js)"
+
+DEMO_CFG="$SCRIPTS/metro-demo.config.js"
+
+# The probe loads the wrapper the way Metro would and reports what came out.
+# The stub store classes stand in for metro-cache, which the wrapper must only
+# ever receive through the function-form cacheStores - never require itself.
+cat > "$WORK/metro-probe.js" <<'EOF'
+const cfg = require(process.argv[2])
+const Stub = class { constructor(o) { this.root = o.root } }
+const stores = typeof cfg.cacheStores === "function"
+  ? cfg.cacheStores({ AutoCleanFileStore: Stub, FileStore: Stub })
+  : []
+console.log(JSON.stringify({
+  sourceExts: (cfg.resolver || {}).sourceExts || [],
+  storeCount: stores.length,
+  root: stores.length ? stores[0].root : "",
+}))
+EOF
+
+FAKE_APP="$WORK/fake-app"
+mkdir -p "$FAKE_APP"
+cat > "$FAKE_APP/metro.config.js" <<'EOF'
+module.exports = {
+  resolver: { sourceExts: ["ts", "tsx", "svg-sentinel"] },
+}
+EOF
+
+out=$(cd "$FAKE_APP" && DEMO_METRO_CACHE_ROOT="$WORK/cache-root" node "$WORK/metro-probe.js" "$DEMO_CFG" 2>&1)
+check "app config fields survive the demo wrapper" "yes" \
+  "$(echo "$out" | grep -q "svg-sentinel" && echo yes || echo no)"
+check "wrapper installs exactly one shared cache store" "yes" \
+  "$(echo "$out" | grep -q '"storeCount":1' && echo yes || echo no)"
+check "cache root honors DEMO_METRO_CACHE_ROOT" "yes" \
+  "$(echo "$out" | grep -qF "\"root\":\"$WORK/cache-root\"" && echo yes || echo no)"
+
+# The fixture app deliberately has no node_modules: together with the loads
+# above this is what fails if anyone turns the function-form cacheStores into
+# a top-level require of metro-cache.
+check "fixture app carries no node_modules for the wrapper to lean on" "absent" \
+  "$([ -d "$FAKE_APP/node_modules" ] && echo present || echo absent)"
+
+out=$(cd "$FAKE_APP" && env -u DEMO_METRO_CACHE_ROOT node "$WORK/metro-probe.js" "$DEMO_CFG" 2>&1)
+check "default cache root expands to an absolute path under \$HOME" "yes" \
+  "$(echo "$out" | grep -qF "\"root\":\"$HOME/" && echo yes || echo no)"
+
+EMPTY_APP="$WORK/empty-app"
+mkdir -p "$EMPTY_APP"
+out=$(cd "$EMPTY_APP" && node "$WORK/metro-probe.js" "$DEMO_CFG" 2>&1); rc=$?
+check "wrapper fails loudly when cwd has no metro.config.js" "nonzero" \
+  "$([ "$rc" -ne 0 ] && echo nonzero || echo zero)"
+# Suffix match: node reports the symlink-resolved cwd (/private/var/...) while
+# bash's $WORK keeps the /var/... spelling on macOS.
+check "the failure names the missing config path" "yes" \
+  "$(echo "$out" | grep -qF "empty-app/metro.config.js" && echo yes || echo no)"
+
+FN_APP="$WORK/fn-app"
+mkdir -p "$FN_APP"
+echo "module.exports = () => ({})" > "$FN_APP/metro.config.js"
+out=$(cd "$FN_APP" && node "$WORK/metro-probe.js" "$DEMO_CFG" 2>&1); rc=$?
+check "wrapper refuses a function-form app config rather than dropping it" "nonzero" \
+  "$([ "$rc" -ne 0 ] && echo nonzero || echo zero)"
+check "the refusal says object-form only" "yes" \
+  "$(echo "$out" | grep -qi "object" && echo yes || echo no)"
+
+echo
 echo "documented behavior matches the scripts"
 
 SKILL_MD="$TESTS_DIR/../SKILL.md"
+check "SKILL.md step 4 starts Metro with the demo cache config" "yes" \
+  "$(grep -q "metro-demo.config.js" "$SKILL_MD" && echo yes || echo no)"
+check "SKILL.md forbids --reset-cache against the shared store" "yes" \
+  "$(grep -q -- "--reset-cache" "$SKILL_MD" && echo yes || echo no)"
 check "SKILL.md carries no BLINK_ residue" "no" \
   "$(grep -q "BLINK_" "$SKILL_MD" && echo yes || echo no)"
 check "SKILL.md documents reset-app.sh for reinstall state" "yes" \

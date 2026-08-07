@@ -37,6 +37,7 @@ this workflow that needs any of them:
 | Metro on 8081, or `--port` you picked by eye | 8081 is the user's; eyeballed ports collide with other agents |
 | Booting/shutting a sim you did not create | Other agents' demo sims may be booted and mid-run |
 | `simctl openurl` for deep links | Pops a SpringBoard confirm that simctl cannot dismiss and that survives relaunch — use TEMP `initialRouteName` |
+| `--reset-cache` with the demo Metro config | Clears the *shared* `~/.cache/metro-demo` store — every other agent's warm cache dies with yours. Point `DEMO_METRO_CACHE_ROOT` at a fresh dir instead |
 
 ## Workflow
 
@@ -114,14 +115,23 @@ If you genuinely must build (~14 min cold), take the lock and pin the device:
 ### 4. Start your bundler and record its PID
 
 The PID is what lets release-session stop *your* Metro without a `pkill`.
+Run from the worktree root — the demo config resolves the app's own
+`metro.config.js` from the working directory.
 
 ```bash
-node node_modules/react-native/cli.js start --port "$DEMO_PORT" &
+node node_modules/react-native/cli.js start --port "$DEMO_PORT" \
+  --config "$SKILL/scripts/metro-demo.config.js" &
 echo $! > "$DEMO_SESSION_DIR/metro.pid"
 ```
 
-First bundle on a cold worktree is ~90s–2.5 min. Poll with screenshots rather
-than assuming failure at 40s.
+`metro-demo.config.js` is the app's own config plus a transform cache shared
+across demo worktrees (`~/.cache/metro-demo`, override:
+`DEMO_METRO_CACHE_ROOT`). Metro's cache keys are content- and
+relative-path-based, so worktrees hit each other's entries: the first bundle
+after a dependency bump is cold (~90s–2.5 min — poll with screenshots rather
+than assuming failure at 40s), every later worktree's is warm (~15–30s, only
+the diff's files re-transform). Never `--reset-cache` here — the store is
+shared machine-wide.
 
 ### 5. Launch and shoot
 
@@ -174,7 +184,7 @@ The isolation guarantees are load-bearing for every other agent on this Mac, so
 they are tested rather than asserted:
 
 ```bash
-"$SKILL/tests/run.sh"     # 69 assertions, ~30s, exits non-zero on failure
+"$SKILL/tests/run.sh"     # 84 assertions, ~30s, exits non-zero on failure
 ```
 
 It creates **no real simulators** — a fake `xcrun` goes first on PATH and the
