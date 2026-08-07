@@ -18,6 +18,10 @@ WORK="$(mktemp -d "${TMPDIR:-/tmp}/pr-assets-tests.XXXXXX")"
 PASS=0; FAIL=0
 trap 'rm -rf "$WORK"' EXIT
 
+# Redirecting the registry keeps every test span inside $WORK (telemetry
+# derives its store from it).
+export DEMO_SIM_REGISTRY="$WORK/registry"
+
 ok()  { PASS=$((PASS+1)); printf '  \033[32mPASS\033[0m %s\n' "$1"; }
 bad() { FAIL=$((FAIL+1)); printf '  \033[31mFAIL\033[0m %s\n       %s\n' "$1" "$2"; }
 check(){ if [ "$2" = "$3" ]; then ok "$1"; else bad "$1" "expected '$2', got '$3'"; fi; }
@@ -56,6 +60,8 @@ check "pushed blob matches the local file" "$LOCAL_SHA" "$PUSHED_SHA"
 check "reports a usable RAW_BASE" "https://raw.githubusercontent.com/acme/sample-app/assets/pr-3712-screenshots" \
   "$(echo "$out" | grep '^RAW_BASE=' | cut -d= -f2-)"
 check "reports one RAW_FILE per input" "2" "$(echo "$out" | grep -c '^RAW_FILE=')"
+check "a successful push emits its telemetry span" "yes" \
+  "$(grep -l '"span":"pub.push.total"' "$WORK/registry/telemetry"/spans-*.jsonl >/dev/null 2>&1 && echo yes || echo no)"
 check "RAW_FILE points at a path that exists in the tree" "yes" \
   "$(f=$(echo "$out" | grep '^RAW_FILE=' | head -1 | sed 's#.*/##'); git -C "$WORK/origin.git" ls-tree -r --name-only refs/heads/assets/pr-3712-screenshots | grep -qx "$f" && echo yes || echo no)"
 
