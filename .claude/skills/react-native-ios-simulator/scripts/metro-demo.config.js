@@ -49,6 +49,18 @@ if (typeof appConfig !== "object" || appConfig === null || typeof appConfig.then
 
 module.exports = {
   ...appConfig,
+  transformer: {
+    ...appConfig.transformer,
+    // @react-native/metro-config require.resolve()s this to an ABSOLUTE path,
+    // and unlike babelTransformerPath (which metro-transform-worker excludes
+    // from its cache key) it is hashed into the global key - one per-worktree
+    // path in here and no worktree ever hits another's entries. Metro's own
+    // default is the bare specifier, resolved per-worktree at use time, so
+    // pinning it restores sharing without changing behavior. Verified live:
+    // this one field was the difference between 0% and full cross-worktree
+    // cache reuse.
+    asyncRequireModulePath: "metro-runtime/src/modules/asyncRequire",
+  },
   // AutoCleanFileStore, not FileStore: nothing ever purges ~/.cache the way
   // macOS purges $TMPDIR (where Metro's default cache lives), and this store
   // sweeps stale entries by mtime while a long-lived `start` process runs.

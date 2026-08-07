@@ -520,6 +520,8 @@ const stores = typeof cfg.cacheStores === "function"
   : []
 console.log(JSON.stringify({
   sourceExts: (cfg.resolver || {}).sourceExts || [],
+  transformerSentinel: (cfg.transformer || {}).sentinelField || "",
+  asyncRequireModulePath: (cfg.transformer || {}).asyncRequireModulePath || "",
   storeCount: stores.length,
   root: stores.length ? stores[0].root : "",
 }))
@@ -530,6 +532,13 @@ mkdir -p "$FAKE_APP"
 cat > "$FAKE_APP/metro.config.js" <<'EOF'
 module.exports = {
   resolver: { sourceExts: ["ts", "tsx", "svg-sentinel"] },
+  transformer: {
+    sentinelField: "transformer-sentinel",
+    // Models what @react-native/metro-config really does: a require.resolve()d
+    // per-worktree ABSOLUTE path. Hashed into the global transform-cache key,
+    // it silently reduces cross-worktree sharing to zero.
+    asyncRequireModulePath: "/private/tmp/some-worktree/node_modules/metro-runtime/src/modules/asyncRequire",
+  },
 }
 EOF
 
@@ -540,6 +549,13 @@ check "wrapper installs exactly one shared cache store" "yes" \
   "$(echo "$out" | grep -q '"storeCount":1' && echo yes || echo no)"
 check "cache root honors DEMO_METRO_CACHE_ROOT" "yes" \
   "$(echo "$out" | grep -qF "\"root\":\"$WORK/cache-root\"" && echo yes || echo no)"
+check "app transformer fields survive the wrapper" "yes" \
+  "$(echo "$out" | grep -q "transformer-sentinel" && echo yes || echo no)"
+# Verified live: with the app's absolute asyncRequireModulePath in the hashed
+# transformer config, cross-worktree sharing was exactly 0%; pinned to the bare
+# specifier, a second worktree's first bundle went from 39s to 4s.
+check "asyncRequireModulePath is pinned to the worktree-independent specifier" "yes" \
+  "$(echo "$out" | grep -q '"asyncRequireModulePath":"metro-runtime/src/modules/asyncRequire"' && echo yes || echo no)"
 
 # The fixture app deliberately has no node_modules: together with the loads
 # above this is what fails if anyone turns the function-form cacheStores into
