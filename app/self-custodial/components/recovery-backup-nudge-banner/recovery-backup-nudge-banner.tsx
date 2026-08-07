@@ -5,10 +5,10 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { RecoveryBackupNudgeVariant } from "@app/hooks/use-recovery-backup-nudge"
+import { RecoveryBackupNudgeVariant } from "@app/self-custodial/hooks/use-recovery-backup-nudge"
 import { testProps } from "@app/utils/testProps"
 
-import { NotificationCardUI } from "../notifications/notification-card-ui"
+import { NotificationCardUI } from "@app/components/notifications/notification-card-ui"
 
 type Props = {
   variant: RecoveryBackupNudgeVariant
