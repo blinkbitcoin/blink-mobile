@@ -10,7 +10,7 @@ import { GaloyTertiaryButton } from "@app/components/atomic/galoy-tertiary-butto
 import {
   headerRightNoGlass,
   noHeaderRight,
-} from "@app/components/header-no-glass/header-no-glass"
+} from "@app/components/header-no-glass"
 import { WarningCard } from "@app/components/warning-card"
 import { MnemonicWordsGrid } from "@app/components/mnemonic-words-grid"
 import { Screen } from "@app/components/screen"

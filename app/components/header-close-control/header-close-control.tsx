@@ -6,7 +6,7 @@ import { makeStyles, useTheme } from "@rn-vui/themed"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
 import { GaloyIconButton } from "../atomic/galoy-icon-button"
-import { headerRightNoGlass } from "../header-no-glass/header-no-glass"
+import { headerRightNoGlass } from "../header-no-glass"
 
 type HeaderCloseControlParams = {
   navigateTo?: keyof RootStackParamList
@@ -32,17 +32,9 @@ const HeaderCloseButton: React.FC<HeaderCloseControlParams> = ({
   )
 }
 
-export const headerCloseControl = ({
-  navigateTo = "Primary",
-}: HeaderCloseControlParams = {}) => {
-  const HeaderCloseControlComponent = () => <HeaderCloseButton navigateTo={navigateTo} />
-  HeaderCloseControlComponent.displayName = "HeaderCloseControl"
-
-  return HeaderCloseControlComponent
-}
-
 // Spread into a screen's `options` to render the close button without the iOS 26
-// Liquid Glass shared background. See header-no-glass.tsx.
+// Liquid Glass shared background. See header-no-glass.tsx. Intentionally the only
+// export: a bare `headerRight: <close button>` would get the glass capsule back.
 export const headerCloseControlOptions = ({
   navigateTo = "Primary",
 }: HeaderCloseControlParams = {}) =>

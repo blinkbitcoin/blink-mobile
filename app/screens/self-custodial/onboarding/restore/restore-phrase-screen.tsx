@@ -11,7 +11,7 @@ import { GaloyTertiaryButton } from "@app/components/atomic/galoy-tertiary-butto
 import {
   headerRightNoGlass,
   noHeaderRight,
-} from "@app/components/header-no-glass/header-no-glass"
+} from "@app/components/header-no-glass"
 import { WarningCard } from "@app/components/warning-card"
 import { SuggestionBar } from "@app/components/suggestion-bar"
 import { useI18nContext } from "@app/i18n/i18n-react"
