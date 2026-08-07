@@ -429,9 +429,76 @@ check "the refusal says object-form only" "yes" \
   "$(echo "$out" | grep -qi "object" && echo yes || echo no)"
 
 echo
+echo "js reload flip (reload-app.sh)"
+
+# One fake dev server per scenario: fresh port, fresh observation log.
+start_ws_fake() { # start_ws_fake <mode>; sets WS_PORT, WS_LOG, WS_PID
+  WS_LOG="$WORK/ws-$1.log"; : > "$WS_LOG"
+  rm -f "$WORK/ws-port"
+  FAKE_WS_MODE="$1" FAKE_WS_LOG="$WS_LOG" FAKE_WS_PORT_FILE="$WORK/ws-port" \
+    python3 "$TESTS_DIR/fixtures/ws-fake.py" &
+  WS_PID=$!; STRAYS+=($WS_PID); disown $WS_PID 2>/dev/null
+  for _ in $(seq 50); do [ -s "$WORK/ws-port" ] && break; sleep 0.1; done
+  WS_PORT=$(cat "$WORK/ws-port" 2>/dev/null || echo "")
+}
+
+# --- happy path: broadcast on /message, confirmation via /events -------------
+start_ws_fake bundle-done
+"$SCRIPTS/reload-app.sh" --port "$WS_PORT" --timeout 10 >/dev/null 2>&1
+check "reload exits zero once bundle activity is observed" "0" "$?"
+check "the broadcast lands on /message after a real handshake" "yes" \
+  "$(grep -q "^connect /message" "$WS_LOG" && echo yes || echo no)"
+check "the confirmation listener opens /events" "yes" \
+  "$(grep -q "^connect /events" "$WS_LOG" && echo yes || echo no)"
+FRAME=$(grep "^frame path=/message" "$WS_LOG" | head -1)
+check "payload is the version-2 reload method" "yes" \
+  "$(echo "$FRAME" | grep -q '"method": "reload"' && echo "$FRAME" | grep -q '"version": 2' && echo yes || echo no)"
+check "payload carries no id/target (broadcast, not a directed request)" "yes" \
+  "$(echo "$FRAME" | grep -qv '"id"' && echo "$FRAME" | grep -qv '"target"' && echo yes || echo no)"
+check "the client frame is masked as RFC 6455 requires" "yes" \
+  "$(echo "$FRAME" | grep -q "masked=1" && echo yes || echo no)"
+kill "$WS_PID" 2>/dev/null
+
+# --- no app connected: the silent-no-op broadcast must not report success ----
+# This is the assertion that dies if the /events wait is ever skipped: a
+# fire-and-forget mutant exits 0 here and ships identical before/after pairs.
+start_ws_fake silent
+out=$("$SCRIPTS/reload-app.sh" --port "$WS_PORT" --timeout 3 2>&1); rc=$?
+check "no bundle activity within the timeout fails the reload" "1" "$rc"
+check "the failure points at the terminate+launch fallback" "yes" \
+  "$(echo "$out" | grep -qi "terminate" && echo yes || echo no)"
+kill "$WS_PID" 2>/dev/null
+
+# --- a broken bundle is a failure, not a confirmed flip ----------------------
+start_ws_fake bundle-fail
+out=$("$SCRIPTS/reload-app.sh" --port "$WS_PORT" --timeout 10 2>&1); rc=$?
+check "a failed bundle build fails the reload" "1" "$rc"
+kill "$WS_PID" 2>/dev/null
+
+# --- --no-wait is explicit fire-and-forget -----------------------------------
+start_ws_fake silent
+"$SCRIPTS/reload-app.sh" --port "$WS_PORT" --no-wait >/dev/null 2>&1
+check "--no-wait fires the broadcast and exits zero unconfirmed" "0" "$?"
+check "--no-wait still delivered the reload frame" "yes" \
+  "$(for _ in $(seq 20); do grep -q "reload" "$WS_LOG" && break; sleep 0.1; done; grep -q "reload" "$WS_LOG" && echo yes || echo no)"
+kill "$WS_PID" 2>/dev/null
+
+# --- dead port and missing port fail fast, never hang ------------------------
+FREE_PORT=$(python3 -c 'import socket; s=socket.socket(); s.bind(("127.0.0.1",0)); print(s.getsockname()[1]); s.close()')
+"$SCRIPTS/reload-app.sh" --port "$FREE_PORT" --timeout 3 >/dev/null 2>&1
+check "nothing listening on the port is an immediate failure" "1" "$?"
+
+out=$(DEMO_PORT= "$SCRIPTS/reload-app.sh" 2>&1); rc=$?
+check "reload refuses to run without a port" "1" "$rc"
+check "the refusal names the 8081 hazard" "yes" \
+  "$(echo "$out" | grep -q "8081" && echo yes || echo no)"
+
+echo
 echo "documented behavior matches the scripts"
 
 SKILL_MD="$TESTS_DIR/../SKILL.md"
+check "SKILL.md documents the reload flip" "yes" \
+  "$(grep -q "reload-app.sh" "$SKILL_MD" && echo yes || echo no)"
 check "SKILL.md step 4 starts Metro with the demo cache config" "yes" \
   "$(grep -q "metro-demo.config.js" "$SKILL_MD" && echo yes || echo no)"
 check "SKILL.md forbids --reset-cache against the shared store" "yes" \

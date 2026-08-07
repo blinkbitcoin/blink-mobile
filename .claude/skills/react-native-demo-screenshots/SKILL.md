@@ -52,8 +52,8 @@ looping illustration).
 
 Fastest first:
 
-- **One file changed:** `git checkout <main-sha> -- <file>` → fast refresh (~12s, no relaunch) → shoot → `git checkout HEAD -- <file>`
-- **Copy/i18n swaps:** `git checkout origin/main -- app/i18n`, cold relaunch, shoot, restore
+- **One file changed:** `git checkout <main-sha> -- <file>` → `reload-app.sh` from the simulator skill (~5s, no relaunch; a full reload also applies TEMP `initialRouteName` edits, which fast refresh does not) → shoot → `git checkout HEAD -- <file>` → reload again
+- **Copy/i18n swaps:** `git checkout origin/main -- app/i18n` → `reload-app.sh` (still JS-only), shoot, restore
 - **Whole branch:** build native once from the pre-change tree, then `git checkout --detach <branch>` for the JS side. Needs `git checkout -- ios/Podfile.lock` first, since pod install dirties it
 
 Then crop both sides with one box:
@@ -131,7 +131,7 @@ simulated. Caption honestly what was forced.
 ## After Editing the Scripts
 
 ```bash
-"$SHOT/tests/run.sh"     # 45 assertions, ~5s, exits non-zero on failure
+"$SHOT/tests/run.sh"     # 46 assertions, ~5s, exits non-zero on failure
 ```
 
 Fakes `xcrun` and `adb` (writing real PNGs) and uses real ImageMagick, so the
