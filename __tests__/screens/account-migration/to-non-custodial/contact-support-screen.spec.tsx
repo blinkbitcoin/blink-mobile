@@ -30,6 +30,11 @@ let mockHasParams = true
 const mockNavigate = jest.fn()
 const mockGoBack = jest.fn()
 const mockSetOptions = jest.fn()
+const mockRemoveListener = jest.fn()
+type BeforeRemoveListener = (event: { preventDefault: () => void }) => void
+const mockAddListener = jest.fn(
+  (_event: string, _listener: BeforeRemoveListener) => mockRemoveListener,
+)
 let mockOrigin: MigrationSupportOrigin | undefined
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
@@ -37,6 +42,7 @@ jest.mock("@react-navigation/native", () => ({
     navigate: mockNavigate,
     goBack: mockGoBack,
     setOptions: mockSetOptions,
+    addListener: mockAddListener,
   }),
   useRoute: () => ({
     params: mockHasParams ? { reason: mockReason, origin: mockOrigin } : undefined,
@@ -127,16 +133,57 @@ describe("MigrationContactSupportScreen", () => {
     expect(mockNavigate).toHaveBeenCalledWith("accountMigrationBalancesOverview")
   })
 
-  /** The back control lives in the navigator header, set from this screen so it reuses the
-   *  return path to the commit point rather than a blind goBack. */
-  it("returns to the commit point from the header back control", async () => {
+  /** The navigator's back control pops, which from a commit-time failure would land on the
+   *  back-swallowing transfer screen, so the removal is intercepted and redirected. */
+  it("redirects a removal to the commit point when opened mid-migration", async () => {
+    renderScreen()
+    await flushEffects()
+
+    const [event, listener] = mockAddListener.mock.calls.at(-1) ?? []
+    const preventDefault = jest.fn()
+    listener?.({ preventDefault })
+
+    expect(event).toBe("beforeRemove")
+    expect(preventDefault).toHaveBeenCalledTimes(1)
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationBalancesOverview")
+  })
+
+  /** The redirect removes this screen too; intercepting that second pass as well would
+   *  loop on it instead of ending the handover. */
+  it("lets the redirect's own removal through instead of looping", async () => {
+    renderScreen()
+    await flushEffects()
+
+    const listener = mockAddListener.mock.calls.at(-1)?.[1]
+    listener?.({ preventDefault: jest.fn() })
+
+    const preventDefault = jest.fn()
+    listener?.({ preventDefault })
+
+    expect(preventDefault).not.toHaveBeenCalled()
+    expect(mockNavigate).toHaveBeenCalledTimes(1)
+  })
+
+  /** Replacing headerLeft through setOptions re-renders the native stack header with a
+   *  different hook count on Android and crashes the screen outright, so the control is
+   *  left to the navigator and only plain option values are set from here. */
+  it("never sets a headerLeft through setOptions", async () => {
+    renderScreen()
+    await flushEffects()
+
+    for (const [options] of mockSetOptions.mock.calls) {
+      expect(options).not.toHaveProperty("headerLeft")
+    }
+  })
+
+  it("hides the native back control so the navigator's own is not doubled", async () => {
     renderScreen()
     await flushEffects()
 
     const options = mockSetOptions.mock.calls.at(-1)?.[0]
-    options?.headerLeft?.().props.onPress()
 
-    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationBalancesOverview")
+    expect(options?.headerBackVisible).toBe(false)
+    expect(options?.headerShown).toBe(true)
   })
 
   /** From the resume handover there is no commit screen underneath, so the hardware back
@@ -157,16 +204,38 @@ describe("MigrationContactSupportScreen", () => {
     expect(mockNavigate).not.toHaveBeenCalledWith("accountMigrationBalancesOverview")
   })
 
-  it("dismisses the header back when opened from the resume handover", async () => {
+  it("leaves a removal alone when opened from the resume handover", async () => {
     mockOrigin = MigrationSupportOrigin.Resume
     renderScreen()
     await flushEffects()
 
-    const options = mockSetOptions.mock.calls.at(-1)?.[0]
-    options?.headerLeft?.().props.onPress()
+    expect(mockAddListener).not.toHaveBeenCalled()
+  })
 
+  /** The delayed handover is opened over a transfer that is still running: navigating to
+   *  the commit screen would pop the transfer screen off the stack and unmount the receive
+   *  gate the user is waiting on, so this Back dismisses instead. */
+  it("dismisses the hardware back when opened from the delayed-receive handover", async () => {
+    mockOrigin = MigrationSupportOrigin.ReceiveDelayed
+    const { BackHandler } =
+      jest.requireActual<typeof import("react-native")>("react-native")
+    const addListenerSpy = jest.spyOn(BackHandler, "addEventListener")
+    renderScreen()
+    await flushEffects()
+
+    const handler = addListenerSpy.mock.calls[0][1] as () => boolean
+
+    expect(handler()).toBe(true)
     expect(mockGoBack).toHaveBeenCalledTimes(1)
     expect(mockNavigate).not.toHaveBeenCalledWith("accountMigrationBalancesOverview")
+  })
+
+  it("leaves a removal alone when opened from the delayed-receive handover", async () => {
+    mockOrigin = MigrationSupportOrigin.ReceiveDelayed
+    renderScreen()
+    await flushEffects()
+
+    expect(mockAddListener).not.toHaveBeenCalled()
   })
 
   /** From the gate handover (a lock with nothing to resume, #4070) there is nothing behind
@@ -188,27 +257,25 @@ describe("MigrationContactSupportScreen", () => {
     expect(mockNavigate).not.toHaveBeenCalled()
   })
 
-  it("hides the header back control when opened from the gate handover", async () => {
+  /** The header holds nothing else on this screen, so hiding it is what leaves the gate
+   *  handover without any back control. */
+  it("hides the header entirely when opened from the gate handover", async () => {
     mockOrigin = MigrationSupportOrigin.Gate
     renderScreen()
     await flushEffects()
 
     const options = mockSetOptions.mock.calls.at(-1)?.[0]
 
-    expect(options?.headerLeft?.()).toBeNull()
+    expect(options?.headerShown).toBe(false)
+    expect(options?.headerBackVisible).toBe(false)
   })
 
-  /** A null headerLeft is not enough on native-stack: without headerBackVisible false the
-   *  navigator falls back to its native back button, which popped this cohort onto the
-   *  gate's spent spinner (caught on-device while demoing #4070). */
-  it("suppresses the native back button so null headerLeft cannot fall back to it", async () => {
+  it("leaves a removal alone when opened from the gate handover", async () => {
     mockOrigin = MigrationSupportOrigin.Gate
     renderScreen()
     await flushEffects()
 
-    const options = mockSetOptions.mock.calls.at(-1)?.[0]
-
-    expect(options?.headerBackVisible).toBe(false)
+    expect(mockAddListener).not.toHaveBeenCalled()
   })
 
   /** The gate handover's ticket is identified by its code alone (support greps for it),

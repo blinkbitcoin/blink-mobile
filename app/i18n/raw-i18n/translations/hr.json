@@ -3787,6 +3787,10 @@
     "explainerCheck5": "S tvog računa bit će naplaćena mrežna naknada Spark",
     "explainerCta": "Razumijem",
     "transferringFunds": "Prebacujemo vaša sredstva. Trebalo bi biti gotovo za nekoliko sekundi.",
+    "transferDelayed": {
+      "body": "Vaša sredstva su na putu prema vašem novom računu. Traje duže nego inače — držite aplikaciju otvorenom i automatski ćemo dovršiti.",
+      "contactSupportCta": "Kontaktirajte podršku"
+    },
     "clockOutOfSync": {
       "body": "Datum i vrijeme vašeg uređaja nisu usklađeni. Postavite ih na automatski način rada za nastavak.",
       "retryCta": "Pokušaj ponovno"

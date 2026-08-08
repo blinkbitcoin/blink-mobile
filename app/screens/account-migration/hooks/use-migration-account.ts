@@ -50,10 +50,9 @@ export const useMigrationAccount = () => {
         /** The step is the terms screen: resuming may never skip past an unaccepted T&C.
          *  A failed write stops the flow here; the provisioned id survives in the hook's
          *  local state, so retrying resumes it instead of provisioning a second account. */
-        const isSaved = await saveCheckpoint(
-          MigrationCheckpoint.TermsAndConditions,
-          newAccountId,
-        )
+        const isSaved = await saveCheckpoint(MigrationCheckpoint.TermsAndConditions, {
+          provisionedAccountId: newAccountId,
+        })
         if (!isSaved) throw new Error("Migration checkpoint save failed")
         return newAccountId
       })

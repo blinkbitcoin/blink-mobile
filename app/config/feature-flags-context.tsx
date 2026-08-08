@@ -9,6 +9,7 @@ import { logError } from "@app/utils/log-error"
 import {
   getRemoteConfigNumericObject,
   getRemoteConfigObject,
+  getRemoteConfigPositiveNumber,
   getRemoteConfigStringList,
   serializeRemoteConfigDefault,
 } from "@app/utils/remote-config"
@@ -54,6 +55,8 @@ const CustodialCreationBlockedCountriesKey = "custodialCreationBlockedCountries"
 const SelfCustodialCreationBlockedCountriesKey = "selfCustodialCreationBlockedCountries"
 const OffboardOnlyCountriesKey = "offboardOnlyCountries"
 const SelfCustodialDepositClaimLeewayVbyteKey = "selfCustodialDepositClaimLeewayVbyte"
+const MigrationReceiveDelayedNoticeMsKey = "migrationReceiveDelayedNoticeMs"
+const MigrationDelayedRedirectEnabledKey = "migrationDelayedRedirectEnabled"
 const FeeRatesConfigKey = "feeRatesConfig"
 
 type DeliveryOptionConfig = {
@@ -121,6 +124,8 @@ type RemoteConfig = {
   [SelfCustodialCreationBlockedCountriesKey]: string[]
   [OffboardOnlyCountriesKey]: string[]
   [SelfCustodialDepositClaimLeewayVbyteKey]: number
+  [MigrationReceiveDelayedNoticeMsKey]: number
+  [MigrationDelayedRedirectEnabledKey]: boolean
   [FeeRatesConfigKey]: FeeRatesConfig
 }
 
@@ -223,6 +228,14 @@ export const defaultRemoteConfig: RemoteConfig = {
   selfCustodialCreationBlockedCountries: creationBlockedDefault,
   offboardOnlyCountries: offboardOnlyDefault,
   selfCustodialDepositClaimLeewayVbyte: 1,
+  /** How long the migration's receive gate waits before telling the user the incoming
+   *  payment is taking longer than usual and offering support. Product call on #4102:
+   *  a minute after the confirmed send is more than enough for a healthy receive. */
+  migrationReceiveDelayedNoticeMs: 60 * 1000,
+  /** Escape hatch should requirements change: when on, the migration's receive gate
+   *  releases the redirect once the notice window elapses instead of holding the swap
+   *  until the receive confirms. Off by default — waiting is the product decision. */
+  migrationDelayedRedirectEnabled: false,
   feeRatesConfig: defaultFeeRatesConfig,
 }
 
@@ -464,6 +477,15 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           .getValue(SelfCustodialDepositClaimLeewayVbyteKey)
           .asNumber()
 
+        const migrationReceiveDelayedNoticeMs = getRemoteConfigPositiveNumber(
+          MigrationReceiveDelayedNoticeMsKey,
+          defaultRemoteConfig.migrationReceiveDelayedNoticeMs,
+        )
+
+        const migrationDelayedRedirectEnabled = remoteConfigInstance()
+          .getValue(MigrationDelayedRedirectEnabledKey)
+          .asBoolean()
+
         const feeRatesConfig = getRemoteConfigNumericObject(
           FeeRatesConfigKey,
           defaultFeeRatesConfig,
@@ -510,6 +532,8 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           selfCustodialCreationBlockedCountries,
           offboardOnlyCountries,
           selfCustodialDepositClaimLeewayVbyte,
+          migrationReceiveDelayedNoticeMs,
+          migrationDelayedRedirectEnabled,
           feeRatesConfig,
         })
       } catch (err) {

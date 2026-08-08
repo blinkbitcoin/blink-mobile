@@ -122,7 +122,9 @@ describe("useMigrationCheckpoint", () => {
     await waitFor(() => expect(result.current.loading).toBe(false))
 
     act(() => {
-      result.current.saveCheckpoint(MigrationCheckpoint.BackupMethod, "sc-account-1")
+      result.current.saveCheckpoint(MigrationCheckpoint.BackupMethod, {
+        provisionedAccountId: "sc-account-1",
+      })
     })
 
     expect(result.current.accountId).toBe("sc-account-1")
@@ -145,6 +147,69 @@ describe("useMigrationCheckpoint", () => {
     await waitFor(() => expect(result.current.loading).toBe(false))
 
     expect(result.current.accountId).toBe("sc-account-2")
+  })
+
+  it("persists and exposes the expected receive figure", async () => {
+    const { result } = renderHook(() => useMigrationCheckpoint())
+
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    act(() => {
+      result.current.saveCheckpoint(MigrationCheckpoint.BalancesOverview, {
+        provisionedAccountId: "sc-1",
+        expectedReceiveSats: 21000,
+      })
+    })
+
+    expect(result.current.expectedReceiveSats).toBe(21000)
+    expect(mockSaveCheckpointToStorage).toHaveBeenCalledWith("migrationCheckpoint_main", {
+      step: MigrationCheckpoint.BalancesOverview,
+      accountId: "sc-1",
+      custodialAccountId: "custodial-1",
+      expectedReceiveSats: 21000,
+    })
+  })
+
+  it("loads the expected receive figure from storage", async () => {
+    mockLoadCheckpoint.mockResolvedValue({
+      step: MigrationCheckpoint.BalancesOverview,
+      savedAt: Date.now(),
+      accountId: "sc-account-2",
+      expectedReceiveSats: 500,
+    })
+
+    const { result } = renderHook(() => useMigrationCheckpoint())
+
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    expect(result.current.expectedReceiveSats).toBe(500)
+  })
+
+  /** A zero must survive the save: the receive gate reads absent as "unknown" and would
+   *  wait on a receive that a zero-figure migration will never get. */
+  it("re-sends a known zero expected figure on step saves", async () => {
+    mockLoadCheckpoint.mockResolvedValue({
+      step: MigrationCheckpoint.BalancesOverview,
+      savedAt: Date.now(),
+      accountId: "sc-account-2",
+      custodialAccountId: "custodial-1",
+      expectedReceiveSats: 0,
+    })
+
+    const { result } = renderHook(() => useMigrationCheckpoint())
+
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    act(() => {
+      result.current.saveCheckpoint(MigrationCheckpoint.BalancesOverview)
+    })
+
+    expect(mockSaveCheckpointToStorage).toHaveBeenCalledWith("migrationCheckpoint_main", {
+      step: MigrationCheckpoint.BalancesOverview,
+      accountId: "sc-account-2",
+      custodialAccountId: "custodial-1",
+      expectedReceiveSats: 0,
+    })
   })
 
   it("reports the error and finishes loading when loadCheckpoint rejects", async () => {

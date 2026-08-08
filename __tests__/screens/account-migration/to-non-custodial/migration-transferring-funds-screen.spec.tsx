@@ -27,6 +27,7 @@ jest.mock("@app/screens/account-migration/hooks", () => ({
   ...jest.requireActual("@app/screens/account-migration/hooks"),
   useCompleteMigration: () => ({
     migrationAccountId: mockMigrationAccountId,
+    migrationExpectedReceiveSats: 21000,
     migrationLoading: mockMigrationLoading,
     completeMigration: mockCompleteMigration,
   }),
@@ -35,6 +36,7 @@ jest.mock("@app/screens/account-migration/hooks", () => ({
 
 const mockUseMigrationTransfer = jest.fn()
 let mockIsTransferred = false
+let mockIsReceiveDelayed = false
 let mockFailureReason: MigrationSupportReason | null = null
 let mockIsClockOutOfSync = false
 let mockHasConnectionIssue = false
@@ -45,6 +47,7 @@ jest.mock("@app/screens/account-migration/hooks/use-migration-transfer", () => (
     mockUseMigrationTransfer(args)
     return {
       isTransferred: mockIsTransferred,
+      isReceiveDelayed: mockIsReceiveDelayed,
       failureReason: mockFailureReason,
       isClockOutOfSync: mockIsClockOutOfSync,
       hasConnectionIssue: mockHasConnectionIssue,
@@ -102,6 +105,7 @@ describe("MigrationTransferringFundsScreen", () => {
     mockMigrationAccountId = "sc-account-1"
     mockMigrationLoading = false
     mockIsTransferred = false
+    mockIsReceiveDelayed = false
     mockFailureReason = null
     mockIsClockOutOfSync = false
     mockHasConnectionIssue = false
@@ -135,6 +139,7 @@ describe("MigrationTransferringFundsScreen", () => {
     expect(mockUseMigrationTransfer).toHaveBeenCalledWith({
       custodialAccountId: "custodial-1",
       selfCustodialAccountId: "sc-account-1",
+      expectedReceiveSats: 21000,
       skip: false,
     })
   })
@@ -327,5 +332,67 @@ describe("MigrationTransferringFundsScreen", () => {
     fireEvent.press(screen.getByTestId("migration-connection-issue-retry"))
 
     expect(mockRetry).toHaveBeenCalledTimes(1)
+  })
+
+  /** The receive gate held the swap past the notice window (#4102): the screen keeps
+   *  waiting — the swap still fires by itself — but says so and offers support. */
+  it("explains the wait and offers support once the receive is delayed", async () => {
+    mockIsReceiveDelayed = true
+    renderScreen()
+    await flushEffects()
+
+    expect(
+      screen.getByText(
+        "Your funds are on their way to your new account. This is taking longer than usual — keep the app open and we'll finish up automatically.",
+      ),
+    ).toBeTruthy()
+    expect(
+      screen.queryByText("Transferring your funds. It should be done in a few seconds."),
+    ).toBeNull()
+    expect(mockCompleteMigration).not.toHaveBeenCalled()
+    expect(mockReset).not.toHaveBeenCalled()
+  })
+
+  /** Its own origin, not the failure handovers': the receive is still being watched here,
+   *  and the commit-screen Back would pop this screen off the stack along with the gate. */
+  it("navigates to support with the delayed-receive reason and its own origin", async () => {
+    mockIsReceiveDelayed = true
+    renderScreen()
+    await flushEffects()
+
+    fireEvent.press(screen.getByTestId("migration-receive-delayed-contact-support"))
+
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
+      reason: MigrationSupportReason.ReceiveDelayed,
+      origin: "receive-delayed",
+    })
+  })
+
+  /** A lost connection explains the wait better than the wait itself, and its retry is
+   *  the more useful footer, so the recoverable state wins over the delayed notice. */
+  it("lets a recoverable issue take over from the delayed notice", async () => {
+    mockIsReceiveDelayed = true
+    mockHasConnectionIssue = true
+    renderScreen()
+    await flushEffects()
+
+    expect(
+      screen.getByText("Connection issue.\nVerify your internet connection"),
+    ).toBeTruthy()
+    expect(screen.queryByTestId("migration-receive-delayed-contact-support")).toBeNull()
+    expect(screen.getByTestId("migration-connection-issue-retry")).toBeTruthy()
+  })
+
+  it("still swaps and resets to success when the receive lands after the notice", async () => {
+    mockIsReceiveDelayed = true
+    mockIsTransferred = true
+    renderScreen()
+    await flushEffects()
+
+    expect(mockCompleteMigration).toHaveBeenCalledTimes(1)
+    expect(mockReset).toHaveBeenCalledWith({
+      index: 0,
+      routes: [{ name: "selfCustodialBackupSuccess", params: { reBackup: false } }],
+    })
   })
 })
