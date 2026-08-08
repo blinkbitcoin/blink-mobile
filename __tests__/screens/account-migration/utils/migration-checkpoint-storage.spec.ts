@@ -131,22 +131,21 @@ describe("migration-checkpoint-storage", () => {
       })
     })
 
-    it("resumes the terms screen with the migration flow param", () => {
+    it("restarts at the migration gate for a terms checkpoint", () => {
       expect(resolveCheckpointRoute(MigrationCheckpoint.TermsAndConditions)).toEqual({
-        name: "acceptTermsAndConditions",
-        params: { flow: "migration" },
+        name: "accountMigrationStart",
       })
     })
 
-    it("returns the backup-method destination for BackupMethod", () => {
+    it("restarts at the migration gate for BackupMethod", () => {
       expect(resolveCheckpointRoute(MigrationCheckpoint.BackupMethod)).toEqual({
-        name: "selfCustodialBackupMethod",
+        name: "accountMigrationStart",
       })
     })
 
-    it("returns the security-checks destination for BackupAlerts", () => {
+    it("restarts at the migration gate for BackupAlerts", () => {
       expect(resolveCheckpointRoute(MigrationCheckpoint.BackupAlerts)).toEqual({
-        name: "selfCustodialBackupSecurityChecks",
+        name: "accountMigrationStart",
       })
     })
 
@@ -156,13 +155,13 @@ describe("migration-checkpoint-storage", () => {
       })
     })
 
-    it("resumes forward to the cloud-backup destination on every platform", () => {
+    it("restarts at the migration gate for CloudBackup on every platform", () => {
       for (const os of ["android", "ios"] as const) {
         const original = Platform.OS
         Object.defineProperty(Platform, "OS", { value: os })
 
         expect(resolveCheckpointRoute(MigrationCheckpoint.CloudBackup)).toEqual({
-          name: "selfCustodialCloudBackup",
+          name: "accountMigrationStart",
         })
 
         Object.defineProperty(Platform, "OS", { value: original })

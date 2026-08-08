@@ -17,35 +17,16 @@ export type StoredCheckpoint = {
 }
 
 /**
- * Where a checkpoint resumes. Every destination is a param-less route except the
- * terms screen, which is shared across flows and needs the migration flow param.
+ * Where a checkpoint resumes. Every destination is a param-less route.
  */
-type CheckpointDestination =
-  | {
-      name:
-        | "accountMigrationExplainer"
-        | "selfCustodialBackupMethod"
-        | "selfCustodialCloudBackup"
-        | "selfCustodialBackupSecurityChecks"
-        | "accountMigrationBalancesOverview"
-      params?: undefined
-    }
-  | { name: "acceptTermsAndConditions"; params: { flow: "migration" } }
+type CheckpointDestination = {
+  name: "accountMigrationExplainer" | "accountMigrationStart" | "accountMigrationBalancesOverview"
+  params?: undefined
+}
 
 const STORAGE_KEY_PREFIX = "migrationCheckpoint"
 
 const CHECKPOINT_EXPIRATION_MS = 48 * 60 * 60 * 1000 // 48h
-
-const CHECKPOINT_DESTINATION_MAP: Record<MigrationCheckpoint, CheckpointDestination> = {
-  [MigrationCheckpoint.TermsAndConditions]: {
-    name: "acceptTermsAndConditions",
-    params: { flow: "migration" },
-  },
-  [MigrationCheckpoint.BackupMethod]: { name: "selfCustodialBackupMethod" },
-  [MigrationCheckpoint.CloudBackup]: { name: "selfCustodialCloudBackup" },
-  [MigrationCheckpoint.BackupAlerts]: { name: "selfCustodialBackupSecurityChecks" },
-  [MigrationCheckpoint.BalancesOverview]: { name: "accountMigrationBalancesOverview" },
-}
 
 const DEFAULT_DESTINATION: CheckpointDestination = { name: "accountMigrationExplainer" }
 
@@ -72,12 +53,19 @@ export const validateStoredCheckpoint = (raw: unknown): StoredCheckpoint | null 
   return { step, savedAt, accountId, custodialAccountId }
 }
 
+/** Only the commit point resumes mid-flow; every earlier step restarts at the
+ *  migration gate so the flow re-walks backup before offering the funds transfer
+ *  again. */
 export const resolveCheckpointRoute = (
   checkpoint: MigrationCheckpoint | null,
 ): CheckpointDestination => {
   if (!checkpoint) return DEFAULT_DESTINATION
 
-  return CHECKPOINT_DESTINATION_MAP[checkpoint]
+  if (checkpoint === MigrationCheckpoint.BalancesOverview) {
+    return { name: "accountMigrationBalancesOverview" }
+  }
+
+  return { name: "accountMigrationStart" }
 }
 
 export const loadCheckpoint = async (
