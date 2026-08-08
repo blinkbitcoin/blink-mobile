@@ -12356,6 +12356,16 @@ type RootTranslation = {
 		 * T​r​a​n​s​f​e​r​r​i​n​g​ ​y​o​u​r​ ​f​u​n​d​s​.​ ​I​t​ ​s​h​o​u​l​d​ ​b​e​ ​d​o​n​e​ ​i​n​ ​a​ ​f​e​w​ ​s​e​c​o​n​d​s​.
 		 */
 		transferringFunds: string
+		transferDelayed: {
+			/**
+			 * Y​o​u​r​ ​f​u​n​d​s​ ​a​r​e​ ​o​n​ ​t​h​e​i​r​ ​w​a​y​ ​t​o​ ​y​o​u​r​ ​n​e​w​ ​a​c​c​o​u​n​t​.​ ​T​h​i​s​ ​i​s​ ​t​a​k​i​n​g​ ​l​o​n​g​e​r​ ​t​h​a​n​ ​u​s​u​a​l​ ​—​ ​k​e​e​p​ ​t​h​e​ ​a​p​p​ ​o​p​e​n​ ​a​n​d​ ​w​e​'​l​l​ ​f​i​n​i​s​h​ ​u​p​ ​a​u​t​o​m​a​t​i​c​a​l​l​y​.
+			 */
+			body: string
+			/**
+			 * C​o​n​t​a​c​t​ ​s​u​p​p​o​r​t
+			 */
+			contactSupportCta: string
+		}
 		clockOutOfSync: {
 			/**
 			 * Y​o​u​r​ ​d​e​v​i​c​e​'​s​ ​d​a​t​e​ ​a​n​d​ ​t​i​m​e​ ​a​r​e​ ​o​u​t​ ​o​f​ ​s​y​n​c​.​ ​S​e​t​ ​t​h​e​m​ ​t​o​ ​a​u​t​o​m​a​t​i​c​ ​t​o​ ​c​o​n​t​i​n​u​e​.
@@ -25384,6 +25394,16 @@ export type TranslationFunctions = {
 		 * Transferring your funds. It should be done in a few seconds.
 		 */
 		transferringFunds: () => LocalizedString
+		transferDelayed: {
+			/**
+			 * Your funds are on their way to your new account. This is taking longer than usual — keep the app open and we'll finish up automatically.
+			 */
+			body: () => LocalizedString
+			/**
+			 * Contact support
+			 */
+			contactSupportCta: () => LocalizedString
+		}
 		clockOutOfSync: {
 			/**
 			 * Your device's date and time are out of sync. Set them to automatic to continue.

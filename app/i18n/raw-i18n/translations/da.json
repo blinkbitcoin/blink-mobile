@@ -3787,6 +3787,10 @@
     "explainerCheck5": "Din konto vil blive trukket et Spark-netværksgebyr",
     "explainerCta": "Jeg forstår",
     "transferringFunds": "Overfører dine midler. Det skulle være færdigt om få sekunder.",
+    "transferDelayed": {
+      "body": "Dine midler er på vej til din nye konto. Det tager længere tid end normalt — hold appen åben, så afslutter vi automatisk.",
+      "contactSupportCta": "Kontakt support"
+    },
     "clockOutOfSync": {
       "body": "Din enheds dato og klokkeslæt er ude af synkronisering. Indstil dem til automatisk for at fortsætte.",
       "retryCta": "Prøv igen"

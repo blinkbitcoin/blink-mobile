@@ -662,11 +662,38 @@ describe("MigrationBalancesOverviewScreen", () => {
     expect(mockNavigate).not.toHaveBeenCalled()
   })
 
-  it("persists the commit-point checkpoint on landing", async () => {
+  it("persists the commit-point checkpoint with the preview's receive figure", async () => {
     renderScreen()
     await flushEffects()
 
-    expect(mockSaveCheckpoint).toHaveBeenCalledWith(MigrationCheckpoint.BalancesOverview)
+    expect(mockSaveCheckpoint).toHaveBeenCalledWith(
+      MigrationCheckpoint.BalancesOverview,
+      {
+        expectedReceiveSats: 990,
+      },
+    )
+  })
+
+  /** A zero must be recorded as a zero: the receive gate reads an absent figure as
+   *  "expectation unknown" and would wait on funds that will never come. */
+  it("persists a zero receive figure rather than dropping it", async () => {
+    mockUseMigrationQuery.mockReturnValue(
+      migrationQueryResult({
+        balanceSats: 10,
+        feeSats: 10,
+        feeCoveredByBlink: false,
+        receiveSats: 0,
+      }),
+    )
+    renderScreen()
+    await flushEffects()
+
+    expect(mockSaveCheckpoint).toHaveBeenCalledWith(
+      MigrationCheckpoint.BalancesOverview,
+      {
+        expectedReceiveSats: 0,
+      },
+    )
   })
 
   it("waits for the checkpoint to load before persisting the commit point", async () => {

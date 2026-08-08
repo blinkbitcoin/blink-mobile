@@ -14,6 +14,10 @@ export type StoredCheckpoint = {
   savedAt: number
   accountId?: string
   custodialAccountId?: string
+  /** What the server's preview said the new wallet will receive, captured at the commit
+   *  point — the only moment it is knowable (after the drain the preview reads an already
+   *  emptied balance). Absent on records saved by app versions before the field existed. */
+  expectedReceiveSats?: number
 }
 
 /**
@@ -60,7 +64,8 @@ export const isExpired = (
 export const validateStoredCheckpoint = (raw: unknown): StoredCheckpoint | null => {
   if (!raw || typeof raw !== "object") return null
 
-  const { step, savedAt, accountId, custodialAccountId } = raw as StoredCheckpoint
+  const { step, savedAt, accountId, custodialAccountId, expectedReceiveSats } =
+    raw as StoredCheckpoint
 
   if (!Object.values(MigrationCheckpoint).includes(step)) return null
   if (typeof savedAt !== "number") return null
@@ -68,8 +73,18 @@ export const validateStoredCheckpoint = (raw: unknown): StoredCheckpoint | null 
   if (custodialAccountId !== undefined && typeof custodialAccountId !== "string") {
     return null
   }
+  /** Advisory, unlike the fields above: dropping a malformed one on its own keeps the step
+   *  and ids a locked account resumes from, which discarding the record would strip. */
+  const hasUsableExpectedReceiveSats =
+    typeof expectedReceiveSats === "number" && Number.isFinite(expectedReceiveSats)
 
-  return { step, savedAt, accountId, custodialAccountId }
+  return {
+    step,
+    savedAt,
+    accountId,
+    custodialAccountId,
+    expectedReceiveSats: hasUsableExpectedReceiveSats ? expectedReceiveSats : undefined,
+  }
 }
 
 export const resolveCheckpointRoute = (
@@ -105,6 +120,7 @@ export type CheckpointUpdate = {
   step: MigrationCheckpoint
   accountId?: string
   custodialAccountId?: string
+  expectedReceiveSats?: number
 }
 
 /**
@@ -120,11 +136,20 @@ export const mergeCheckpoint = (
   const hasSameOwner =
     existing?.custodialAccountId === undefined ||
     existing.custodialAccountId === update.custodialAccountId
+
+  /** Write-once for one owner's flow: the figure is only knowable before the drain, so a
+   *  re-entered commit screen would carry the post-drain zero the gate reads as "nothing
+   *  will ever arrive" and swap while the funds are still in transit (#4102). */
+  const inheritedExpectedReceiveSats = hasSameOwner
+    ? existing?.expectedReceiveSats
+    : undefined
+
   return {
     step: update.step,
     savedAt: Date.now(),
     accountId: update.accountId ?? (hasSameOwner ? existing?.accountId : undefined),
     custodialAccountId: update.custodialAccountId,
+    expectedReceiveSats: inheritedExpectedReceiveSats ?? update.expectedReceiveSats,
   }
 }
 

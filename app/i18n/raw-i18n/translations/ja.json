@@ -3787,6 +3787,10 @@
         "explainerCheck5": "アカウントからSparkネットワーク手数料が差し引かれます",
         "explainerCta": "理解しました",
         "transferringFunds": "資金を転送中です。数秒で完了するはずです。",
+        "transferDelayed": {
+            "body": "資金は新しいアカウントへ送金中です。通常より時間がかかっています。アプリを開いたままにしていただければ、自動的に完了します。",
+            "contactSupportCta": "サポートに問い合わせる"
+        },
         "clockOutOfSync": {
             "body": "デバイスの日付と時刻がずれています。続けるには自動設定にしてください。",
             "retryCta": "再試行"

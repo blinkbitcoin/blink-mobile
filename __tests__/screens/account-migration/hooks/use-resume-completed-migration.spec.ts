@@ -32,10 +32,26 @@ let mockCompleteMigrationRef: () => Promise<boolean> = mockCompleteMigration
 jest.mock("@app/screens/account-migration/hooks/use-complete-migration", () => ({
   useCompleteMigration: () => ({
     migrationAccountId: mockMigrationAccountId,
+    migrationExpectedReceiveSats: 21000,
     migrationLoading: mockMigrationLoading,
     completeMigration: mockCompleteMigrationRef,
   }),
 }))
+
+/** Confirmed by default so the server phase stays the deciding voice in the existing
+ *  cases; the receive-gate cases below flip it. */
+let mockReceiveConfirmation = { isReceiveConfirmed: true, isReceiveDelayed: false }
+const mockUseReceiveConfirmation = jest.fn()
+
+jest.mock(
+  "@app/screens/account-migration/hooks/use-migration-receive-confirmation",
+  () => ({
+    useMigrationReceiveConfirmation: (args: unknown) => {
+      mockUseReceiveConfirmation(args)
+      return mockReceiveConfirmation
+    },
+  }),
+)
 
 jest.mock("@app/screens/account-migration/hooks/use-migration-status", () => ({
   useMigrationStatus: (options: unknown) => {
@@ -57,6 +73,7 @@ describe("useResumeCompletedMigration", () => {
     mockMigrationLoading = false
     mockCompleteMigrationRef = mockCompleteMigration
     mockCompleteMigration.mockResolvedValue(true)
+    mockReceiveConfirmation = { isReceiveConfirmed: true, isReceiveDelayed: false }
   })
 
   /**
@@ -89,12 +106,93 @@ describe("useResumeCompletedMigration", () => {
     expect(mockCompleteMigration).not.toHaveBeenCalled()
   })
 
+  /** The fix for #4102 covers the relaunch path too: a COMPLETED found at launch must
+   *  not swap into a wallet whose funds are still in transit. No swap this session is
+   *  fine — the custodial session stays intact and the gate keeps checking. */
+  it("holds the swap while the receive is unconfirmed", async () => {
+    mockReceiveConfirmation = { isReceiveConfirmed: false, isReceiveDelayed: false }
+    renderHook(() => useResumeCompletedMigration())
+    await flushEffects()
+
+    expect(mockCompleteMigration).not.toHaveBeenCalled()
+  })
+
+  it("finishes the swap once the receive confirms", async () => {
+    mockReceiveConfirmation = { isReceiveConfirmed: false, isReceiveDelayed: false }
+    const { rerender } = renderHook(() => useResumeCompletedMigration())
+    await flushEffects()
+    expect(mockCompleteMigration).not.toHaveBeenCalled()
+
+    mockReceiveConfirmation = { isReceiveConfirmed: true, isReceiveDelayed: false }
+    rerender({})
+    await flushEffects()
+
+    expect(mockCompleteMigration).toHaveBeenCalledTimes(1)
+  })
+
+  /** Each look at the wallet opens a whole SDK connection, so the gate stays off until
+   *  the server reports the drain paid out. */
+  it("keeps the receive gate off until the server completes", async () => {
+    mockStatus = MigrationStatus.Transferring
+    renderHook(() => useResumeCompletedMigration())
+    await flushEffects()
+
+    expect(mockUseReceiveConfirmation).toHaveBeenLastCalledWith({
+      selfCustodialAccountId: "sc-account-1",
+      expectedReceiveSats: 21000,
+      skip: true,
+    })
+  })
+
+  it("arms the receive gate once the server has completed", async () => {
+    renderHook(() => useResumeCompletedMigration())
+    await flushEffects()
+
+    expect(mockUseReceiveConfirmation).toHaveBeenLastCalledWith({
+      selfCustodialAccountId: "sc-account-1",
+      expectedReceiveSats: 21000,
+      skip: false,
+    })
+  })
+
   it("waits for the checkpoint before deciding there is a swap to finish", async () => {
     mockMigrationLoading = true
     renderHook(() => useResumeCompletedMigration())
     await flushEffects()
 
     expect(mockCompleteMigration).not.toHaveBeenCalled()
+  })
+
+  /** This path has no screen of its own to say the wait is unusual, so the crossing is at
+   *  least reported rather than leaving a stuck receive invisible. */
+  it("reports a receive that has not landed within the notice window", async () => {
+    mockReceiveConfirmation = { isReceiveConfirmed: false, isReceiveDelayed: true }
+    renderHook(() => useResumeCompletedMigration())
+    await flushEffects()
+
+    expect(mockReportError).toHaveBeenCalledWith(
+      "Migration resume receive delayed",
+      expect.any(Error),
+    )
+  })
+
+  it("reports the delayed receive once, however often it re-renders", async () => {
+    mockReceiveConfirmation = { isReceiveConfirmed: false, isReceiveDelayed: true }
+    const { rerender } = renderHook(() => useResumeCompletedMigration())
+    await flushEffects()
+    rerender({})
+    rerender({})
+    await flushEffects()
+
+    expect(mockReportError).toHaveBeenCalledTimes(1)
+  })
+
+  it("stays quiet while the wait is still inside the notice window", async () => {
+    mockReceiveConfirmation = { isReceiveConfirmed: false, isReceiveDelayed: false }
+    renderHook(() => useResumeCompletedMigration())
+    await flushEffects()
+
+    expect(mockReportError).not.toHaveBeenCalled()
   })
 
   /** Nobody who cannot act on the answer should be asking for it on every launch. */

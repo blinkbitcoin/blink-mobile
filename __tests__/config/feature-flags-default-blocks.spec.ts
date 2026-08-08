@@ -108,4 +108,14 @@ describe("defaultRemoteConfig: compliance country lists", () => {
       "MM",
     ])
   })
+
+  /** The registered default is what runs before the first fetch lands and on every fetch
+   *  that fails; releasing the swap on the server's COMPLETED alone is the #4102 report. */
+  it("migrationDelayedRedirectEnabled defaults to holding the swap", () => {
+    expect(defaultRemoteConfig.migrationDelayedRedirectEnabled).toBe(false)
+  })
+
+  it("migrationReceiveDelayedNoticeMs defaults to the one minute product asked for", () => {
+    expect(defaultRemoteConfig.migrationReceiveDelayedNoticeMs).toBe(60_000)
+  })
 })

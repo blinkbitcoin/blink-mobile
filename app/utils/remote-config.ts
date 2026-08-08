@@ -77,6 +77,28 @@ export const getRemoteConfigStringList = (key: string, fallback: string[]): stri
   return strings
 }
 
+/**
+ * Reads a scalar number, keeping `fallback` when the remote value is not usable.
+ * `asNumber()` answers 0 for anything it cannot parse, and for a duration a real zero
+ * means "no wait at all". A key that was never set answers with its registered default,
+ * which is not a misconfiguration, so only a set-but-unusable value is reported.
+ */
+export const getRemoteConfigPositiveNumber = (key: string, fallback: number): number => {
+  const value = remoteConfigInstance().getValue(key)
+  const parsed = value.asNumber()
+  if (Number.isFinite(parsed) && parsed > 0) return parsed
+
+  const raw = value.asString()
+  if (raw) {
+    logError({
+      scope: SCOPE,
+      error: new Error(`Expected a positive number for "${key}"`),
+      context: { key, rawSnippet: raw.slice(0, 100) },
+    })
+  }
+  return fallback
+}
+
 export const getRemoteConfigObject = <T extends object>(key: string, fallback: T): T => {
   const parsed = tryParseJson<unknown>(
     remoteConfigInstance().getValue(key).asString(),

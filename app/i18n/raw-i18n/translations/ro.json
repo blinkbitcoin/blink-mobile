@@ -3787,6 +3787,10 @@
     "explainerCheck5": "Din contul tău se va deduce un comision de rețea Spark",
     "explainerCta": "Am înțeles",
     "transferringFunds": "Se transferă fondurile tale. Ar trebui să fie gata în câteva secunde.",
+    "transferDelayed": {
+      "body": "Fondurile tale sunt în drum spre noul tău cont. Durează mai mult decât de obicei — ține aplicația deschisă și vom finaliza automat.",
+      "contactSupportCta": "Contactează asistența"
+    },
     "clockOutOfSync": {
       "body": "Data și ora dispozitivului tău nu sunt sincronizate. Setează-le pe automat pentru a continua.",
       "retryCta": "Încearcă din nou"
