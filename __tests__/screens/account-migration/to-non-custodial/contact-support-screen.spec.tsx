@@ -247,10 +247,11 @@ describe("MigrationContactSupportScreen", () => {
     expect(screen.getByText(mockSupportEmail)).toBeTruthy()
   })
 
-  /** A refused start clears itself on relaunch (the start latch is in-memory, and the gate
-   *  resumes or completes the migration), so the screen leads with restart instructions
-   *  instead of the support-first copy (#4098). The diagnostics stay: support still needs
-   *  the reason code and identity if the restart does not help. */
+  /** A refused start can clear itself on relaunch: the start latch is in-memory, so a fresh
+   *  launch sends a new migrationStart and the user starts the migration again from the
+   *  intro. So the screen leads with restart instructions instead of the support-first copy
+   *  (#4098). The diagnostics stay: support still needs the reason code and identity if the
+   *  restart does not help. */
   it("shows the self-help copy for a refused start", async () => {
     mockReason = MigrationSupportReason.StartRefused
     renderScreen()
@@ -298,6 +299,60 @@ describe("MigrationContactSupportScreen", () => {
     expect(screen.getByText(LLSupport.body())).toBeTruthy()
     expect(screen.getByText(LLSupport.contactUsCta())).toBeTruthy()
     expect(screen.queryByText(LLSupport.selfHelp.title())).toBeNull()
+  })
+
+  /**
+   * Which reasons get the self-help variant IS the feature, so the whole taxonomy is
+   * enumerated rather than sampled: adding a reason to RESTART_RESOLVABLE_REASONS without
+   * deciding it belongs there fails here instead of shipping restart advice for a failure a
+   * restart cannot clear. Every reason present in the enum is covered by construction, so a
+   * new one has to be classified before this passes.
+   */
+  describe("variant membership across every support reason", () => {
+    const RESTART_RESOLVABLE: MigrationSupportReason[] = [
+      MigrationSupportReason.StartRefused,
+    ]
+    const allReasons: MigrationSupportReason[] = Object.values(MigrationSupportReason)
+
+    allReasons.forEach((reason) => {
+      const expectsSelfHelp = RESTART_RESOLVABLE.includes(reason)
+      const variant = expectsSelfHelp ? "self-help" : "support-first"
+
+      it(`gives ${reason} the ${variant} copy`, async () => {
+        mockReason = reason
+        renderScreen()
+        await flushEffects()
+
+        expect(
+          screen.getByTestId(expectsSelfHelp ? "icon-refresh" : "icon-headset"),
+        ).toBeTruthy()
+        expect(
+          screen.queryByText(
+            expectsSelfHelp ? LLSupport.selfHelp.body() : LLSupport.body(),
+          ),
+        ).toBeTruthy()
+        expect(
+          screen.queryByText(
+            expectsSelfHelp ? LLSupport.body() : LLSupport.selfHelp.body(),
+          ),
+        ).toBeNull()
+      })
+    })
+  })
+
+  /** The variant switch restructured the JSX around the copy control, so the self-help
+   *  variant asserts the press, not only the label: the still-stuck users are exactly the
+   *  ones who need the block on their clipboard. */
+  it("copies the full support block from the self-help variant", async () => {
+    mockReason = MigrationSupportReason.StartRefused
+    renderScreen()
+    await flushEffects()
+
+    fireEvent.press(screen.getByText(LLSupport.copy()))
+
+    expect(mockCopyToClipboard).toHaveBeenCalledWith({
+      content: MOCK_SUPPORT_DETAILS_TEXT,
+    })
   })
 
   /** Sensitive identifiers are shown complete for support to copy: the account id and the

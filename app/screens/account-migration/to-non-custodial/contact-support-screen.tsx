@@ -20,14 +20,20 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useHardwareBackGuard } from "@app/screens/account-migration/hooks"
 /** Deep import on purpose: its device-location chain stays out of the hooks barrel. */
 import { useMigrationSupportEmail } from "@app/screens/account-migration/hooks/use-migration-support-email"
-import { MigrationSupportOrigin, MigrationSupportReason } from "@app/types/migration"
+import {
+  MigrationSupportOrigin,
+  MigrationSupportReason,
+  RESTART_RESOLVABLE_REASONS,
+} from "@app/types/migration"
 import { testProps } from "@app/utils/testProps"
 
-/** Reasons a user can clear themselves by restarting the app: the start latch is in-memory
- *  only, and the gate resumes (or completes) the migration on relaunch. */
-const SELF_HELP_REASONS: ReadonlySet<MigrationSupportReason> = new Set([
-  MigrationSupportReason.StartRefused,
-])
+/** The hero and CTA of one variant, chosen together. */
+type SupportCopy = {
+  icon: IconNamesType
+  title: string
+  body: string
+  cta: string
+}
 
 /**
  * The migration failure and help screen: funds are safe, but the transfer needs support
@@ -41,8 +47,9 @@ const SELF_HELP_REASONS: ReadonlySet<MigrationSupportReason> = new Set([
  * handover; the visible control covers iOS, which has no hardware back.
  *
  * Restart-resolvable refusals (#4098) get a self-help variant instead of the support-first
- * copy: the hero leads with restart instructions and frames the primary Contact support
- * CTA as the still-stuck fallback. The diagnostics card and email stay identical so
+ * copy: the hero leads with restart instructions (relaunch, then start the migration again —
+ * nothing resumes on its own without a server-side lock) and frames the primary Contact
+ * support CTA as the still-stuck fallback. The diagnostics card and email stay identical so
  * support still gets the full block either way.
  */
 export const MigrationContactSupportScreen: React.FC = () => {
@@ -61,21 +68,21 @@ export const MigrationContactSupportScreen: React.FC = () => {
   /** Callers must pass a reason, but a navigation-state restore can land here with none;
    *  a named fallback keeps the ticket meaningful instead of crashing on a missing param. */
   const reason = params?.reason ?? MigrationSupportReason.Unknown
-  const isSelfHelp = SELF_HELP_REASONS.has(reason)
+  const isSelfHelp = RESTART_RESOLVABLE_REASONS.has(reason)
   const { cardDetails, supportDetailsText, sendSupportEmail } =
     useMigrationSupportEmail(reason)
 
   /** The two variants are complete alternatives — hero and CTA always switch together,
    *  so the choice is made once here rather than per-prop in the JSX. */
-  const copy = isSelfHelp
+  const copy: SupportCopy = isSelfHelp
     ? {
-        icon: "refresh" as IconNamesType,
+        icon: "refresh",
         title: LLSupport.selfHelp.title(),
         body: LLSupport.selfHelp.body(),
         cta: LLSupport.selfHelp.contactSupportCta(),
       }
     : {
-        icon: "headset" as IconNamesType,
+        icon: "headset",
         title: LLSupport.title(),
         body: LLSupport.body(),
         cta: LLSupport.contactUsCta(),
