@@ -11,9 +11,10 @@ import { useMigrationCheckpoint } from "./use-migration-checkpoint"
 /**
  * Routes to the migration flow's next step: a migration resumed at the commit point
  * jumps straight to its checkpoint, while every other run walks the flow and sees the
- * history-download step when there is history to download. replaceToCheckpoint comes
- * from the same checkpoint instance that decides the routing, so a guard that gates on
- * this hook's loading never replaces with a stale destination.
+ * history-download step when there is history to download. Both entry points share one
+ * destination, so a screen that skips itself lands where advancing through it would have.
+ * The checkpoint instance deciding the routing is the one this hook reports loading for,
+ * so a guard that gates on it never navigates with a stale destination.
  */
 export const useMigrationNextStep = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
@@ -26,19 +27,30 @@ export const useMigrationNextStep = () => {
   } = useMigrationCheckpoint()
 
   /** A restarted flow is offered the download again (#4109): it replays every step, and
-   *  only the commit point still skips ahead. */
+   *  only the commit point still skips ahead to its checkpoint. */
+  const shouldOfferHistoryDownload = hasTransactions && !isAtCommitPoint
+
   const goToNextStep = useCallback(() => {
-    const shouldOfferHistoryDownload = hasTransactions && !isAtCommitPoint
     if (shouldOfferHistoryDownload) {
       navigation.navigate("accountMigrationDownloadHistory")
       return
     }
     navigateToCheckpoint()
-  }, [navigation, hasTransactions, isAtCommitPoint, navigateToCheckpoint])
+  }, [navigation, shouldOfferHistoryDownload, navigateToCheckpoint])
+
+  /** Same destination as goToNextStep, replacing the current screen: for a guard that
+   *  skips its own screen, which must not leave it behind for the back gesture. */
+  const replaceToNextStep = useCallback(() => {
+    if (shouldOfferHistoryDownload) {
+      navigation.replace("accountMigrationDownloadHistory")
+      return
+    }
+    replaceToCheckpoint()
+  }, [navigation, shouldOfferHistoryDownload, replaceToCheckpoint])
 
   return {
     goToNextStep,
-    replaceToCheckpoint,
+    replaceToNextStep,
     loading: transactionsLoading || checkpointLoading,
   }
 }

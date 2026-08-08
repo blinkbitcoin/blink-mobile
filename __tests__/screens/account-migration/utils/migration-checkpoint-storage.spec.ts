@@ -1,9 +1,8 @@
-import { Platform } from "react-native"
-
 import {
   MigrationCheckpoint,
   clearCheckpointFromStorage,
   getStorageKey,
+  isCommitPointCheckpoint,
   isExpired,
   loadCheckpoint,
   resolveCheckpointRoute,
@@ -152,19 +151,6 @@ describe("migration-checkpoint-storage", () => {
       })
     })
 
-    it("restarts at the explainer for CloudBackup on every platform", () => {
-      for (const os of ["android", "ios"] as const) {
-        const original = Platform.OS
-        Object.defineProperty(Platform, "OS", { value: os })
-
-        expect(resolveCheckpointRoute(MigrationCheckpoint.CloudBackup)).toEqual({
-          name: "accountMigrationExplainer",
-        })
-
-        Object.defineProperty(Platform, "OS", { value: original })
-      }
-    })
-
     /** The gate reaches the rest of the flow through this resolver, so a checkpoint that
      *  resolves back to the gate leaves the user cycling between the two with no way
      *  forward. No stored step, present or future, may name it. */
@@ -174,6 +160,26 @@ describe("migration-checkpoint-storage", () => {
       )
 
       expect(everyDestination).not.toContain("accountMigrationStart")
+    })
+  })
+
+  describe("isCommitPointCheckpoint", () => {
+    it("holds only for the balances overview", () => {
+      const commitPointByCheckpoint = Object.values(MigrationCheckpoint).map(
+        (checkpoint) => [checkpoint, isCommitPointCheckpoint(checkpoint)] as const,
+      )
+
+      expect(commitPointByCheckpoint).toEqual([
+        [MigrationCheckpoint.TermsAndConditions, false],
+        [MigrationCheckpoint.BackupMethod, false],
+        [MigrationCheckpoint.CloudBackup, false],
+        [MigrationCheckpoint.BackupAlerts, false],
+        [MigrationCheckpoint.BalancesOverview, true],
+      ])
+    })
+
+    it("does not hold without a checkpoint", () => {
+      expect(isCommitPointCheckpoint(null)).toBe(false)
     })
   })
 

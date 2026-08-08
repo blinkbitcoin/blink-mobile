@@ -3,6 +3,7 @@ import { act, renderHook } from "@testing-library/react-native"
 import { useMigrationNextStep } from "@app/screens/account-migration/hooks/use-migration-next-step"
 
 const mockNavigate = jest.fn()
+const mockReplace = jest.fn()
 const mockNavigateToCheckpoint = jest.fn()
 const mockReplaceToCheckpoint = jest.fn()
 let mockIsAtCommitPoint = false
@@ -12,7 +13,7 @@ let mockTransactionsLoading = false
 
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
-  useNavigation: () => ({ navigate: mockNavigate }),
+  useNavigation: () => ({ navigate: mockNavigate, replace: mockReplace }),
 }))
 
 jest.mock("@app/screens/account-migration/hooks/use-migration-checkpoint", () => ({
@@ -90,10 +91,42 @@ describe("useMigrationNextStep", () => {
     expect(mockNavigateToCheckpoint).not.toHaveBeenCalled()
   })
 
-  it("exposes the same checkpoint instance's replace for skip guards", () => {
-    const { result } = renderHook(() => useMigrationNextStep())
+  /** A screen that skips itself must land where advancing through it would have, or the
+   *  history export is silently lost on that path (#4109). */
+  it("replaces onto the history download for a skip guard with history", () => {
+    mockHasTransactions = true
 
-    expect(result.current.replaceToCheckpoint).toBe(mockReplaceToCheckpoint)
+    const { result } = renderHook(() => useMigrationNextStep())
+    act(() => {
+      result.current.replaceToNextStep()
+    })
+
+    expect(mockReplace).toHaveBeenCalledWith("accountMigrationDownloadHistory")
+    expect(mockReplaceToCheckpoint).not.toHaveBeenCalled()
+    expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  it("replaces onto the checkpoint for a skip guard without history", () => {
+    const { result } = renderHook(() => useMigrationNextStep())
+    act(() => {
+      result.current.replaceToNextStep()
+    })
+
+    expect(mockReplaceToCheckpoint).toHaveBeenCalledTimes(1)
+    expect(mockReplace).not.toHaveBeenCalled()
+  })
+
+  it("replaces onto the checkpoint for a skip guard at the commit point", () => {
+    mockHasTransactions = true
+    mockIsAtCommitPoint = true
+
+    const { result } = renderHook(() => useMigrationNextStep())
+    act(() => {
+      result.current.replaceToNextStep()
+    })
+
+    expect(mockReplaceToCheckpoint).toHaveBeenCalledTimes(1)
+    expect(mockReplace).not.toHaveBeenCalled()
   })
 
   it("reports loading while the transaction check loads", () => {

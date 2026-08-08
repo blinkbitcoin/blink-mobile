@@ -359,24 +359,6 @@ describe("useMigrationCheckpoint", () => {
     expect(mockNavigate).toHaveBeenCalledWith("accountMigrationExplainer")
   })
 
-  it("restarts at the explainer when resuming from the terms checkpoint", async () => {
-    mockLoadCheckpoint.mockResolvedValue({
-      step: MigrationCheckpoint.TermsAndConditions,
-      savedAt: Date.now(),
-      accountId: "sc-account-1",
-    })
-
-    const { result } = renderHook(() => useMigrationCheckpoint())
-
-    await waitFor(() => expect(result.current.loading).toBe(false))
-
-    act(() => {
-      result.current.navigateToCheckpoint()
-    })
-
-    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationExplainer")
-  })
-
   it("resumes at the balances overview after reaching the commit point", async () => {
     mockLoadCheckpoint.mockResolvedValue({
       step: MigrationCheckpoint.BalancesOverview,

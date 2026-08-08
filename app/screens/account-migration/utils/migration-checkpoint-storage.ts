@@ -29,6 +29,24 @@ const CHECKPOINT_EXPIRATION_MS = 48 * 60 * 60 * 1000 // 48h
 
 const DEFAULT_DESTINATION: CheckpointDestination = { name: "accountMigrationExplainer" }
 
+/** Exhaustive on purpose: a step added to the enum has no entry here and fails to compile,
+ *  so a checkpoint past the commit point can never inherit the restart by omission. */
+const IS_COMMIT_POINT_BY_CHECKPOINT: Record<MigrationCheckpoint, boolean> = {
+  [MigrationCheckpoint.TermsAndConditions]: false,
+  [MigrationCheckpoint.BackupMethod]: false,
+  [MigrationCheckpoint.CloudBackup]: false,
+  [MigrationCheckpoint.BackupAlerts]: false,
+  [MigrationCheckpoint.BalancesOverview]: true,
+}
+
+/** The commit point is the only step a reopened flow jumps forward to: the balances screen
+ *  already claimed the account server-side, so re-walking backup ahead of it would offer a
+ *  transfer the user cannot decline. The route resolver and the entry screen both read this
+ *  one predicate, so the destination and the decision to resume can never disagree. */
+export const isCommitPointCheckpoint = (
+  checkpoint: MigrationCheckpoint | null,
+): boolean => checkpoint !== null && IS_COMMIT_POINT_BY_CHECKPOINT[checkpoint]
+
 export const getStorageKey = (environment: string): string =>
   `${STORAGE_KEY_PREFIX}_${environment.toLowerCase()}`
 
@@ -59,13 +77,10 @@ export const validateStoredCheckpoint = (raw: unknown): StoredCheckpoint | null 
  *  cycle the user cannot leave. */
 export const resolveCheckpointRoute = (
   checkpoint: MigrationCheckpoint | null,
-): CheckpointDestination => {
-  if (checkpoint === MigrationCheckpoint.BalancesOverview) {
-    return { name: "accountMigrationBalancesOverview" }
-  }
-
-  return DEFAULT_DESTINATION
-}
+): CheckpointDestination =>
+  isCommitPointCheckpoint(checkpoint)
+    ? { name: "accountMigrationBalancesOverview" }
+    : DEFAULT_DESTINATION
 
 export const loadCheckpoint = async (
   storageKey: string,
