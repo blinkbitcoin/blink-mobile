@@ -33,14 +33,14 @@ export const MigrationApiServiceScreen: React.FC<MigrationApiServiceScreenProps>
       footer={
         <>
           <GaloyPrimaryButton
-            title={LL.AccountMigration.apiServiceContactCta()}
-            onPress={openSupport}
-            {...testProps("migration-api-contact-cta")}
-          />
-          <GaloySecondaryButton
             title={LL.AccountMigration.apiServiceContinueCta()}
             onPress={onContinue}
             {...testProps("migration-api-continue-cta")}
+          />
+          <GaloySecondaryButton
+            title={LL.AccountMigration.apiServiceContactCta()}
+            onPress={openSupport}
+            {...testProps("migration-api-contact-cta")}
           />
         </>
       }

@@ -3918,11 +3918,11 @@ const en: BaseTranslation = {
     downloadHistoryBody:
       "Your new account will start fresh. If you want to keep record of your transactions, download them as CSV now.",
     downloadHistoryDownloadCta: "Download",
-    apiServiceTitle: "API service not available",
+    apiServiceTitle: "Apps replace the API",
     apiServiceBody:
-      "We note that you have active API keys. Blink can't provide the API in non-custodial mode.\n\nIf you are dependent on Blink's API, contact us promptly and we will do our best to assist a smooth transition.",
+      "Blink has non-custodial apps that replace most functions of the API, expcept sending. You find them through the Settings menu.\n\nIf you use the API to send, contact us.",
     apiServiceContactCta: "Contact us",
-    apiServiceContinueCta: "Continue anyways",
+    apiServiceContinueCta: "Continue",
     resumeFailed: "Something went wrong resuming your migration. Please start it again.",
     balancesOverview: {
       title: "Move your balance",
