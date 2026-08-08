@@ -29,7 +29,20 @@ import { useReusablePendingWallet } from "@app/screens/account-migration/hooks/u
 import { useSelfCustodialDisabled } from "@app/screens/account-migration/hooks/use-self-custodial-disabled"
 
 import { MigrationApiServiceScreen } from "./api-service-screen"
+import { MigrationMerchantToolsScreen } from "./merchant-tools-screen"
 import { MigrationMode, MigrationRequiredScreen } from "./migration-required-screen"
+
+/**
+ * The pre-flow an account with API keys walks before the rest of the entry checks: the
+ * warning that the API retires, then the tools that replace it, then out of the way.
+ */
+const ApiKeyPreFlowStep = {
+  Warning: "warning",
+  MerchantTools: "merchantTools",
+  Done: "done",
+} as const
+
+type ApiKeyPreFlowStep = (typeof ApiKeyPreFlowStep)[keyof typeof ApiKeyPreFlowStep]
 
 /**
  * The intro mode is the server wind-down phase, never a local guess: the closed account is
@@ -47,10 +60,11 @@ const resolveMigrationMode = (status: WindDownStatus | undefined): MigrationMode
 /**
  * Entry gate for the migration flow, the single choke point for the Settings entry
  * (tapping Migrate), the armed gate that replaces the app after closure, and a migration
- * the server has locked. Order of checks: accounts with API keys see the API-service
- * warning first, then any custodial Dollar Balance blocks entry because the user has to
- * empty it manually, and finally the "Time to upgrade" screen in the mode the wind-down
- * phase demands (voluntary, forced pre-deadline, or the armed gate).
+ * the server has locked. Order of checks: accounts with API keys walk the API-key
+ * pre-flow first (the warning, then the tools that replace the API), then any custodial
+ * Dollar Balance blocks entry because the user has to empty it manually, and finally the
+ * "Time to upgrade" screen in the mode the wind-down phase demands (voluntary, forced
+ * pre-deadline, or the armed gate).
  */
 export const MigrationGate: React.FC = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
@@ -79,7 +93,9 @@ export const MigrationGate: React.FC = () => {
     refetch: refetchLock,
   } = useMigrationLock()
   const isExitBlocked = isGated || isMigrationLocked
-  const [isApiWarningAcknowledged, setIsApiWarningAcknowledged] = useState(false)
+  const [apiKeyPreFlowStep, setApiKeyPreFlowStep] = useState<ApiKeyPreFlowStep>(
+    ApiKeyPreFlowStep.Warning,
+  )
 
   /** While a pushed screen (the dollar transfer) has focus the modal hides instead of
    *  floating over it; regaining focus shows it again with a fresh balance check. */
@@ -105,7 +121,18 @@ export const MigrationGate: React.FC = () => {
     refetch: refetchPendingWallet,
   } = useReusablePendingWallet()
 
-  const acknowledgeApiWarning = useCallback(() => setIsApiWarningAcknowledged(true), [])
+  const goToMerchantTools = useCallback(
+    () => setApiKeyPreFlowStep(ApiKeyPreFlowStep.MerchantTools),
+    [],
+  )
+  const goBackToApiWarning = useCallback(
+    () => setApiKeyPreFlowStep(ApiKeyPreFlowStep.Warning),
+    [],
+  )
+  const completeApiKeyPreFlow = useCallback(
+    () => setApiKeyPreFlowStep(ApiKeyPreFlowStep.Done),
+    [],
+  )
 
   const exitFlow = useCallback(() => {
     navigation.goBack()
@@ -175,9 +202,12 @@ export const MigrationGate: React.FC = () => {
     lockError ||
     (isMigrationLocked && hasResumeDataError)
 
-  /** The API-key warning outranks the Dollar-Balance precondition in the entry order
+  /** The API-key pre-flow outranks the Dollar-Balance precondition in the entry order
    *  (entry, API-key check, Dollar Balance check, intro). */
-  const shouldWarnAboutApiKeys = hasActiveApiKeys && !isApiWarningAcknowledged
+  const isAtApiWarning = apiKeyPreFlowStep === ApiKeyPreFlowStep.Warning
+  const isAtMerchantTools = apiKeyPreFlowStep === ApiKeyPreFlowStep.MerchantTools
+  const shouldWarnAboutApiKeys = hasActiveApiKeys && isAtApiWarning
+  const shouldShowMerchantTools = hasActiveApiKeys && isAtMerchantTools
 
   /**
    * Every phase blocks on a Dollar Balance, the armed gate included. The backend rejects
@@ -301,8 +331,17 @@ export const MigrationGate: React.FC = () => {
     const apiCloseAction = isExitBlocked ? undefined : exitFlow
     return (
       <MigrationApiServiceScreen
-        onContinue={acknowledgeApiWarning}
+        onContinue={goToMerchantTools}
         onClose={apiCloseAction}
+      />
+    )
+  }
+
+  if (shouldShowMerchantTools) {
+    return (
+      <MigrationMerchantToolsScreen
+        onContinue={completeApiKeyPreFlow}
+        onBack={goBackToApiWarning}
       />
     )
   }

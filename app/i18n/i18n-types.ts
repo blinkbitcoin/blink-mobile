@@ -12449,6 +12449,52 @@ type RootTranslation = {
 		 * C​o​n​t​i​n​u​e​ ​t​h​e​ ​M​i​g​r​a​t​i​o​n
 		 */
 		apiServiceContinueCta: string
+		merchantTools: {
+			/**
+			 * K​e​e​p​ ​g​e​t​t​i​n​g​ ​p​a​i​d​ ​a​s​ ​u​s​u​a​l
+			 */
+			title: string
+			/**
+			 * A​l​l​ ​t​o​o​l​s​ ​f​o​r​ ​i​n​c​o​m​i​n​g​ ​p​a​y​m​e​n​t​s​ ​k​e​e​p​ ​w​o​r​k​i​n​g​.​ ​J​u​s​t​ ​a​d​d​ ​y​o​u​r​ ​L​i​g​h​t​n​i​n​g​ ​a​d​d​r​e​s​s​.
+			 */
+			body: string
+			/**
+			 * G​o​t​ ​i​t
+			 */
+			cta: string
+			/**
+			 * B​l​i​n​k​ ​T​e​r​m​i​n​a​l
+			 */
+			terminalTitle: string
+			/**
+			 * A​ ​p​o​i​n​t​ ​o​f​ ​s​a​l​e​ ​i​n​ ​a​n​y​ ​b​r​o​w​s​e​r​.
+			 */
+			terminalBody: string
+			/**
+			 * D​o​n​a​t​e​ ​B​u​t​t​o​n
+			 */
+			donationTitle: string
+			/**
+			 * A​c​c​e​p​t​ ​d​o​n​a​t​i​o​n​s​ ​o​n​ ​a​n​y​ ​w​e​b​s​i​t​e​.
+			 */
+			donationBody: string
+			/**
+			 * B​T​C​P​a​y​ ​P​l​u​g​i​n
+			 */
+			btcpayTitle: string
+			/**
+			 * L​i​g​h​t​n​i​n​g​ ​p​a​y​m​e​n​t​s​ ​o​n​ ​y​o​u​r​ ​B​T​C​P​a​y​ ​S​e​r​v​e​r​.
+			 */
+			btcpayBody: string
+			/**
+			 * W​o​o​C​o​m​m​e​r​c​e​ ​P​l​u​g​i​n
+			 */
+			woocommerceTitle: string
+			/**
+			 * B​i​t​c​o​i​n​ ​c​h​e​c​k​o​u​t​ ​f​o​r​ ​y​o​u​r​ ​o​n​l​i​n​e​ ​s​t​o​r​e​.
+			 */
+			woocommerceBody: string
+		}
 		/**
 		 * S​o​m​e​t​h​i​n​g​ ​w​e​n​t​ ​w​r​o​n​g​ ​r​e​s​u​m​i​n​g​ ​y​o​u​r​ ​m​i​g​r​a​t​i​o​n​.​ ​P​l​e​a​s​e​ ​s​t​a​r​t​ ​i​t​ ​a​g​a​i​n​.
 		 */
@@ -25478,6 +25524,52 @@ export type TranslationFunctions = {
 		 * Continue the Migration
 		 */
 		apiServiceContinueCta: () => LocalizedString
+		merchantTools: {
+			/**
+			 * Keep getting paid as usual
+			 */
+			title: () => LocalizedString
+			/**
+			 * All tools for incoming payments keep working. Just add your Lightning address.
+			 */
+			body: () => LocalizedString
+			/**
+			 * Got it
+			 */
+			cta: () => LocalizedString
+			/**
+			 * Blink Terminal
+			 */
+			terminalTitle: () => LocalizedString
+			/**
+			 * A point of sale in any browser.
+			 */
+			terminalBody: () => LocalizedString
+			/**
+			 * Donate Button
+			 */
+			donationTitle: () => LocalizedString
+			/**
+			 * Accept donations on any website.
+			 */
+			donationBody: () => LocalizedString
+			/**
+			 * BTCPay Plugin
+			 */
+			btcpayTitle: () => LocalizedString
+			/**
+			 * Lightning payments on your BTCPay Server.
+			 */
+			btcpayBody: () => LocalizedString
+			/**
+			 * WooCommerce Plugin
+			 */
+			woocommerceTitle: () => LocalizedString
+			/**
+			 * Bitcoin checkout for your online store.
+			 */
+			woocommerceBody: () => LocalizedString
+		}
 		/**
 		 * Something went wrong resuming your migration. Please start it again.
 		 */
