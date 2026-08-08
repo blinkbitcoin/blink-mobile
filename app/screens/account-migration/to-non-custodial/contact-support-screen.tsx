@@ -1,4 +1,4 @@
-import React, { useCallback, useLayoutEffect } from "react"
+import React, { useCallback, useEffect, useLayoutEffect, useRef } from "react"
 import { ScrollView, View } from "react-native"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
@@ -71,6 +71,7 @@ export const MigrationContactSupportScreen: React.FC = () => {
    *  would pop it off the stack, taking the gate the user is waiting on with it. */
   const isReceiveDelayedOrigin = params?.origin === MigrationSupportOrigin.ReceiveDelayed
   const isBackToScreenBeneath = isResumeOrigin || isReceiveDelayedOrigin
+  const isBackToCommitScreen = !isGateOrigin && !isBackToScreenBeneath
   const handleBack = useCallback(() => {
     if (isGateOrigin) return
     if (isBackToScreenBeneath) {
@@ -81,24 +82,38 @@ export const MigrationContactSupportScreen: React.FC = () => {
   }, [isGateOrigin, isBackToScreenBeneath, navigation])
   useHardwareBackGuard(handleBack)
 
-  /** The back control lives in the navigator header, but its target is set from here so it
-   *  reuses this screen's origin-aware back path rather than a blind goBack, which from a
-   *  transfer-time failure would land on the swallowing transfer screen. */
+  /** The navigator already supplies the back control, so the native one stays hidden or the
+   *  header shows two. The gate handover is terminal and keeps no control at all: the header
+   *  holds nothing else here, so hiding it outright leaves the same screen without one. */
   useLayoutEffect(() => {
     navigation.setOptions({
+      headerShown: !isGateOrigin,
       headerBackVisible: false,
-      headerLeft: () =>
-        isGateOrigin ? null : (
-          <HeaderBackButton
-            tintColor={colors.black}
-            pressColor={colors.grey5}
-            pressOpacity={1}
-            onPress={handleBack}
-            {...testProps("migration-contact-support-back")}
-          />
-        ),
     })
-  }, [navigation, handleBack, isGateOrigin, colors.black, colors.grey5])
+  }, [navigation, isGateOrigin])
+
+  /**
+   * The commit-time handover is the only origin whose back must not simply pop: the screen
+   * beneath it swallows back, so the press is intercepted and redirected to the commit
+   * point instead. Every other origin pops, which is already what the header control does.
+   *
+   * Intercepting through the navigator rather than replacing `headerLeft` is deliberate: a
+   * `headerLeft` render function passed through `setOptions` makes the native stack header
+   * re-render with a different hook count on Android, which crashes the screen outright
+   * ("Rendered fewer hooks than expected") before any of this is reachable.
+   */
+  const isRedirectingBackRef = useRef(false)
+  useEffect(() => {
+    if (!isBackToCommitScreen) return
+    return navigation.addListener("beforeRemove", (event) => {
+      /** The redirect removes this screen too; letting that second pass through is what
+       *  ends the interception instead of looping on it. */
+      if (isRedirectingBackRef.current) return
+      event.preventDefault()
+      isRedirectingBackRef.current = true
+      navigation.navigate("accountMigrationBalancesOverview")
+    })
+  }, [navigation, isBackToCommitScreen])
 
   const { supportEmailAddress } = useContactSupport()
   const { copyToClipboard } = useClipboard()
