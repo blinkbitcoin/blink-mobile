@@ -19,16 +19,17 @@ import { AccountType } from "@app/types/wallet"
 export const MigrationEntryScreen: React.FC = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { activeAccount, loading: registryLoading } = useAccountRegistry()
-  const { loading, replaceToCheckpoint, hasResumableCheckpoint } =
-    useMigrationCheckpoint()
+  const { loading, replaceToCheckpoint, isAtCommitPoint } = useMigrationCheckpoint()
   const isSelfCustodialDisabled = useSelfCustodialDisabled()
   const { remoteConfigReady } = useFeatureFlags()
 
   const isSelfCustodialAccount = activeAccount?.type === AccountType.SelfCustodial
 
-  /** The kill-switch outranks resume: a disabled stack falls through to the gate (which shows
-   *  the temporarily-unavailable screen) instead of resuming a checkpoint straight past it. */
-  const shouldResume = !isSelfCustodialDisabled && hasResumableCheckpoint
+  /** Only the commit point resumes (#4109): a flow left before it restarts at the gate, so
+   *  reopening replays the whole thing from its first step instead of dropping the user
+   *  into a backup screen they have no context for. The kill-switch outranks even that: a
+   *  disabled stack falls through to the gate, which shows the unavailable screen. */
+  const shouldResume = !isSelfCustodialDisabled && isAtCommitPoint
 
   useEffect(() => {
     /** Wait for the account list and the flag too, not just the checkpoint: an unhydrated

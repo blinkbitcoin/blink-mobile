@@ -5,7 +5,7 @@ import { useMigrationNextStep } from "@app/screens/account-migration/hooks/use-m
 const mockNavigate = jest.fn()
 const mockNavigateToCheckpoint = jest.fn()
 const mockReplaceToCheckpoint = jest.fn()
-let mockHasResumableCheckpoint = false
+let mockIsAtCommitPoint = false
 let mockCheckpointLoading = false
 let mockHasTransactions = false
 let mockTransactionsLoading = false
@@ -19,7 +19,7 @@ jest.mock("@app/screens/account-migration/hooks/use-migration-checkpoint", () =>
   useMigrationCheckpoint: () => ({
     navigateToCheckpoint: mockNavigateToCheckpoint,
     replaceToCheckpoint: mockReplaceToCheckpoint,
-    hasResumableCheckpoint: mockHasResumableCheckpoint,
+    isAtCommitPoint: mockIsAtCommitPoint,
     loading: mockCheckpointLoading,
   }),
 }))
@@ -34,7 +34,7 @@ jest.mock("@app/screens/account-migration/hooks/use-has-transactions", () => ({
 describe("useMigrationNextStep", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockHasResumableCheckpoint = false
+    mockIsAtCommitPoint = false
     mockCheckpointLoading = false
     mockHasTransactions = false
     mockTransactionsLoading = false
@@ -62,9 +62,9 @@ describe("useMigrationNextStep", () => {
     expect(mockNavigate).not.toHaveBeenCalled()
   })
 
-  it("returns to the checkpoint when resuming even with history", () => {
+  it("returns to the checkpoint when resuming at the commit point even with history", () => {
     mockHasTransactions = true
-    mockHasResumableCheckpoint = true
+    mockIsAtCommitPoint = true
 
     const { result } = renderHook(() => useMigrationNextStep())
     act(() => {
@@ -73,6 +73,21 @@ describe("useMigrationNextStep", () => {
 
     expect(mockNavigateToCheckpoint).toHaveBeenCalledTimes(1)
     expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  /** A flow left before the commit point replays every step, so the download it already
+   *  skipped once is offered again rather than jumped over (#4109). */
+  it("offers the history download again to a restarted pre-commit migration", () => {
+    mockHasTransactions = true
+    mockIsAtCommitPoint = false
+
+    const { result } = renderHook(() => useMigrationNextStep())
+    act(() => {
+      result.current.goToNextStep()
+    })
+
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationDownloadHistory")
+    expect(mockNavigateToCheckpoint).not.toHaveBeenCalled()
   })
 
   it("exposes the same checkpoint instance's replace for skip guards", () => {

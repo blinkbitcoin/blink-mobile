@@ -341,7 +341,7 @@ describe("useMigrationCheckpoint", () => {
     expect(mockNavigate).toHaveBeenCalledWith("accountMigrationExplainer")
   })
 
-  it("restarts at the migration gate for a provisioned checkpoint before the commit point", async () => {
+  it("restarts at the explainer for a provisioned checkpoint before the commit point", async () => {
     mockLoadCheckpoint.mockResolvedValue({
       step: MigrationCheckpoint.BackupMethod,
       savedAt: Date.now(),
@@ -356,10 +356,10 @@ describe("useMigrationCheckpoint", () => {
       result.current.navigateToCheckpoint()
     })
 
-    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationStart")
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationExplainer")
   })
 
-  it("restarts at the migration gate when resuming from the terms checkpoint", async () => {
+  it("restarts at the explainer when resuming from the terms checkpoint", async () => {
     mockLoadCheckpoint.mockResolvedValue({
       step: MigrationCheckpoint.TermsAndConditions,
       savedAt: Date.now(),
@@ -374,7 +374,7 @@ describe("useMigrationCheckpoint", () => {
       result.current.navigateToCheckpoint()
     })
 
-    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationStart")
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationExplainer")
   })
 
   it("resumes at the balances overview after reaching the commit point", async () => {
@@ -414,7 +414,7 @@ describe("useMigrationCheckpoint", () => {
     expect(mockNavigate).not.toHaveBeenCalled()
   })
 
-  it("replaces to the migration gate when the checkpoint is before the commit point", async () => {
+  it("replaces to the explainer when the checkpoint is before the commit point", async () => {
     mockLoadCheckpoint.mockResolvedValue({
       step: MigrationCheckpoint.BackupMethod,
       savedAt: Date.now(),
@@ -429,7 +429,7 @@ describe("useMigrationCheckpoint", () => {
       result.current.replaceToCheckpoint()
     })
 
-    expect(mockReplace).toHaveBeenCalledWith("accountMigrationStart")
+    expect(mockReplace).toHaveBeenCalledWith("accountMigrationExplainer")
   })
 
   it("resumes from the explainer when the checkpoint has no provisioned account", async () => {
@@ -484,6 +484,50 @@ describe("useMigrationCheckpoint", () => {
     await waitFor(() => expect(result.current.loading).toBe(false))
 
     expect(result.current.hasResumableCheckpoint).toBe(false)
+  })
+
+  it("reports the commit point once the balances overview is stored", async () => {
+    mockLoadCheckpoint.mockResolvedValue({
+      step: MigrationCheckpoint.BalancesOverview,
+      savedAt: Date.now(),
+      accountId: "sc-account-1",
+    })
+
+    const { result } = renderHook(() => useMigrationCheckpoint())
+
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    expect(result.current.isAtCommitPoint).toBe(true)
+  })
+
+  /** The distinction the restart rests on: a resumable checkpoint is not a committed one,
+   *  so an abandoned backup step reopens the flow from scratch (#4109). */
+  it("is not at the commit point for a resumable checkpoint before it", async () => {
+    mockLoadCheckpoint.mockResolvedValue({
+      step: MigrationCheckpoint.BackupAlerts,
+      savedAt: Date.now(),
+      accountId: "sc-account-1",
+    })
+
+    const { result } = renderHook(() => useMigrationCheckpoint())
+
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    expect(result.current.hasResumableCheckpoint).toBe(true)
+    expect(result.current.isAtCommitPoint).toBe(false)
+  })
+
+  it("is not at the commit point when the balances step has no provisioned account", async () => {
+    mockLoadCheckpoint.mockResolvedValue({
+      step: MigrationCheckpoint.BalancesOverview,
+      savedAt: Date.now(),
+    })
+
+    const { result } = renderHook(() => useMigrationCheckpoint())
+
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    expect(result.current.isAtCommitPoint).toBe(false)
   })
 
   it("hides a checkpoint owned by a different custodial account", async () => {
@@ -617,7 +661,7 @@ describe("useMigrationCheckpoint", () => {
       result2.current.navigateToCheckpoint()
     })
 
-    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationStart")
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationExplainer")
   })
 
   it("does not update state when the load fails after unmount", async () => {

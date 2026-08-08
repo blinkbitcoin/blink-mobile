@@ -9,8 +9,8 @@ import { useHasTransactions } from "./use-has-transactions"
 import { useMigrationCheckpoint } from "./use-migration-checkpoint"
 
 /**
- * Routes to the migration flow's next step: a resumed migration already passed the
- * download step so it returns to its checkpoint, while a fresh one only sees the
+ * Routes to the migration flow's next step: a migration resumed at the commit point
+ * jumps straight to its checkpoint, while every other run walks the flow and sees the
  * history-download step when there is history to download. replaceToCheckpoint comes
  * from the same checkpoint instance that decides the routing, so a guard that gates on
  * this hook's loading never replaces with a stale destination.
@@ -21,18 +21,20 @@ export const useMigrationNextStep = () => {
   const {
     navigateToCheckpoint,
     replaceToCheckpoint,
-    hasResumableCheckpoint,
+    isAtCommitPoint,
     loading: checkpointLoading,
   } = useMigrationCheckpoint()
 
+  /** A restarted flow is offered the download again (#4109): it replays every step, and
+   *  only the commit point still skips ahead. */
   const goToNextStep = useCallback(() => {
-    const shouldOfferHistoryDownload = hasTransactions && !hasResumableCheckpoint
+    const shouldOfferHistoryDownload = hasTransactions && !isAtCommitPoint
     if (shouldOfferHistoryDownload) {
       navigation.navigate("accountMigrationDownloadHistory")
       return
     }
     navigateToCheckpoint()
-  }, [navigation, hasTransactions, hasResumableCheckpoint, navigateToCheckpoint])
+  }, [navigation, hasTransactions, isAtCommitPoint, navigateToCheckpoint])
 
   return {
     goToNextStep,

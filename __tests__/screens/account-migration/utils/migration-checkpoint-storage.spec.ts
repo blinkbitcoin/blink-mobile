@@ -125,28 +125,25 @@ describe("migration-checkpoint-storage", () => {
   })
 
   describe("resolveCheckpointRoute", () => {
+    const preCommitCheckpoints = [
+      MigrationCheckpoint.TermsAndConditions,
+      MigrationCheckpoint.BackupMethod,
+      MigrationCheckpoint.CloudBackup,
+      MigrationCheckpoint.BackupAlerts,
+    ]
+
     it("returns the default destination for a null checkpoint", () => {
       expect(resolveCheckpointRoute(null)).toEqual({
         name: "accountMigrationExplainer",
       })
     })
 
-    it("restarts at the migration gate for a terms checkpoint", () => {
-      expect(resolveCheckpointRoute(MigrationCheckpoint.TermsAndConditions)).toEqual({
-        name: "accountMigrationStart",
-      })
-    })
-
-    it("restarts at the migration gate for BackupMethod", () => {
-      expect(resolveCheckpointRoute(MigrationCheckpoint.BackupMethod)).toEqual({
-        name: "accountMigrationStart",
-      })
-    })
-
-    it("restarts at the migration gate for BackupAlerts", () => {
-      expect(resolveCheckpointRoute(MigrationCheckpoint.BackupAlerts)).toEqual({
-        name: "accountMigrationStart",
-      })
+    it("restarts at the explainer for every checkpoint before the commit point", () => {
+      for (const checkpoint of preCommitCheckpoints) {
+        expect(resolveCheckpointRoute(checkpoint)).toEqual({
+          name: "accountMigrationExplainer",
+        })
+      }
     })
 
     it("returns the balances-overview destination for the commit point", () => {
@@ -155,17 +152,28 @@ describe("migration-checkpoint-storage", () => {
       })
     })
 
-    it("restarts at the migration gate for CloudBackup on every platform", () => {
+    it("restarts at the explainer for CloudBackup on every platform", () => {
       for (const os of ["android", "ios"] as const) {
         const original = Platform.OS
         Object.defineProperty(Platform, "OS", { value: os })
 
         expect(resolveCheckpointRoute(MigrationCheckpoint.CloudBackup)).toEqual({
-          name: "accountMigrationStart",
+          name: "accountMigrationExplainer",
         })
 
         Object.defineProperty(Platform, "OS", { value: original })
       }
+    })
+
+    /** The gate reaches the rest of the flow through this resolver, so a checkpoint that
+     *  resolves back to the gate leaves the user cycling between the two with no way
+     *  forward. No stored step, present or future, may name it. */
+    it("never resolves to the migration gate", () => {
+      const everyDestination = [null, ...Object.values(MigrationCheckpoint)].map(
+        (checkpoint) => resolveCheckpointRoute(checkpoint).name,
+      )
+
+      expect(everyDestination).not.toContain("accountMigrationStart")
     })
   })
 

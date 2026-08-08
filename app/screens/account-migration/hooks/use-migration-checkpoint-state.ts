@@ -121,6 +121,12 @@ export const useMigrationCheckpointState = () => {
   /** A provisioned account is only stored alongside a checkpoint, so it gates resumability. */
   const hasResumableCheckpoint = Boolean(accountId)
 
+  /** The commit point is the only step a reopened flow jumps forward to: the balances
+   *  screen already claimed the account server-side, so re-walking backup ahead of it
+   *  would offer a transfer the user cannot decline. Every earlier step restarts. */
+  const isAtCommitPoint =
+    hasResumableCheckpoint && checkpoint === MigrationCheckpoint.BalancesOverview
+
   return {
     checkpoint,
     accountId,
@@ -135,5 +141,6 @@ export const useMigrationCheckpointState = () => {
     saveCheckpoint,
     clearCheckpoint,
     hasResumableCheckpoint,
+    isAtCommitPoint,
   }
 }

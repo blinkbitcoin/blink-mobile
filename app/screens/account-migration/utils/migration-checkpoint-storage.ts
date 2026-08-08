@@ -20,11 +20,7 @@ export type StoredCheckpoint = {
  * Where a checkpoint resumes. Every destination is a param-less route.
  */
 type CheckpointDestination = {
-  name:
-    | "accountMigrationExplainer"
-    | "accountMigrationStart"
-    | "accountMigrationBalancesOverview"
-  params?: undefined
+  name: "accountMigrationExplainer" | "accountMigrationBalancesOverview"
 }
 
 const STORAGE_KEY_PREFIX = "migrationCheckpoint"
@@ -56,19 +52,19 @@ export const validateStoredCheckpoint = (raw: unknown): StoredCheckpoint | null 
   return { step, savedAt, accountId, custodialAccountId }
 }
 
-/** Only the commit point resumes mid-flow; every earlier step restarts at the
- *  migration gate so the flow re-walks backup before offering the funds transfer
- *  again. */
+/** Only the commit point resumes mid-flow; every earlier step restarts at the explainer,
+ *  so the user re-walks terms and backup before the funds transfer is offered again. The
+ *  restart may not target the migration gate: the gate walks into the rest of the flow
+ *  through this same resolver, so pointing a pre-commit checkpoint back at it closes a
+ *  cycle the user cannot leave. */
 export const resolveCheckpointRoute = (
   checkpoint: MigrationCheckpoint | null,
 ): CheckpointDestination => {
-  if (!checkpoint) return DEFAULT_DESTINATION
-
   if (checkpoint === MigrationCheckpoint.BalancesOverview) {
     return { name: "accountMigrationBalancesOverview" }
   }
 
-  return { name: "accountMigrationStart" }
+  return DEFAULT_DESTINATION
 }
 
 export const loadCheckpoint = async (
