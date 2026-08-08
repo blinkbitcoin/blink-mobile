@@ -34,7 +34,7 @@ export const MigrationKeepReceivingScreen: React.FC = () => {
 
   const {
     goToNextStep,
-    replaceToCheckpoint,
+    replaceToNextStep,
     loading: nextStepLoading,
   } = useMigrationNextStep()
 
@@ -66,10 +66,12 @@ export const MigrationKeepReceivingScreen: React.FC = () => {
    *  background instance replace itself into the flow again. */
   const shouldSkipScreen = isFocused && isConfirmedWithoutAddress
 
-  /** Guard: this screen needs a lightning address; without one, skip into the flow. */
+  /** Guard: this screen needs a lightning address; without one, skip into the flow. Skipping
+   *  lands on the same step the CTA would have, so a user with history is still offered the
+   *  export they would otherwise never see on this path. */
   useEffect(() => {
-    if (shouldSkipScreen) replaceToCheckpoint()
-  }, [shouldSkipScreen, replaceToCheckpoint])
+    if (shouldSkipScreen) replaceToNextStep()
+  }, [shouldSkipScreen, replaceToNextStep])
 
   const [isRetrying, setIsRetrying] = useState(false)
   /** Retry re-runs the address query over the network; a still-failing refetch rejects, so

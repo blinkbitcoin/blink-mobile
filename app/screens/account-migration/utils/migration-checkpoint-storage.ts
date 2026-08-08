@@ -17,37 +17,35 @@ export type StoredCheckpoint = {
 }
 
 /**
- * Where a checkpoint resumes. Every destination is a param-less route except the
- * terms screen, which is shared across flows and needs the migration flow param.
+ * Where a checkpoint resumes. Every destination is a param-less route.
  */
-type CheckpointDestination =
-  | {
-      name:
-        | "accountMigrationExplainer"
-        | "selfCustodialBackupMethod"
-        | "selfCustodialCloudBackup"
-        | "selfCustodialBackupSecurityChecks"
-        | "accountMigrationBalancesOverview"
-      params?: undefined
-    }
-  | { name: "acceptTermsAndConditions"; params: { flow: "migration" } }
+type CheckpointDestination = {
+  name: "accountMigrationExplainer" | "accountMigrationBalancesOverview"
+}
 
 const STORAGE_KEY_PREFIX = "migrationCheckpoint"
 
 const CHECKPOINT_EXPIRATION_MS = 48 * 60 * 60 * 1000 // 48h
 
-const CHECKPOINT_DESTINATION_MAP: Record<MigrationCheckpoint, CheckpointDestination> = {
-  [MigrationCheckpoint.TermsAndConditions]: {
-    name: "acceptTermsAndConditions",
-    params: { flow: "migration" },
-  },
-  [MigrationCheckpoint.BackupMethod]: { name: "selfCustodialBackupMethod" },
-  [MigrationCheckpoint.CloudBackup]: { name: "selfCustodialCloudBackup" },
-  [MigrationCheckpoint.BackupAlerts]: { name: "selfCustodialBackupSecurityChecks" },
-  [MigrationCheckpoint.BalancesOverview]: { name: "accountMigrationBalancesOverview" },
+const DEFAULT_DESTINATION: CheckpointDestination = { name: "accountMigrationExplainer" }
+
+/** Exhaustive on purpose: a step added to the enum has no entry here and fails to compile,
+ *  so a checkpoint past the commit point can never inherit the restart by omission. */
+const IS_COMMIT_POINT_BY_CHECKPOINT: Record<MigrationCheckpoint, boolean> = {
+  [MigrationCheckpoint.TermsAndConditions]: false,
+  [MigrationCheckpoint.BackupMethod]: false,
+  [MigrationCheckpoint.CloudBackup]: false,
+  [MigrationCheckpoint.BackupAlerts]: false,
+  [MigrationCheckpoint.BalancesOverview]: true,
 }
 
-const DEFAULT_DESTINATION: CheckpointDestination = { name: "accountMigrationExplainer" }
+/** The commit point is the only step a reopened flow jumps forward to: the balances screen
+ *  already claimed the account server-side, so re-walking backup ahead of it would offer a
+ *  transfer the user cannot decline. The route resolver and the entry screen both read this
+ *  one predicate, so the destination and the decision to resume can never disagree. */
+export const isCommitPointCheckpoint = (
+  checkpoint: MigrationCheckpoint | null,
+): boolean => checkpoint !== null && IS_COMMIT_POINT_BY_CHECKPOINT[checkpoint]
 
 export const getStorageKey = (environment: string): string =>
   `${STORAGE_KEY_PREFIX}_${environment.toLowerCase()}`
@@ -72,13 +70,17 @@ export const validateStoredCheckpoint = (raw: unknown): StoredCheckpoint | null 
   return { step, savedAt, accountId, custodialAccountId }
 }
 
+/** Only the commit point resumes mid-flow; every earlier step restarts at the explainer,
+ *  so the user re-walks terms and backup before the funds transfer is offered again. The
+ *  restart may not target the migration gate: the gate walks into the rest of the flow
+ *  through this same resolver, so pointing a pre-commit checkpoint back at it closes a
+ *  cycle the user cannot leave. */
 export const resolveCheckpointRoute = (
   checkpoint: MigrationCheckpoint | null,
-): CheckpointDestination => {
-  if (!checkpoint) return DEFAULT_DESTINATION
-
-  return CHECKPOINT_DESTINATION_MAP[checkpoint]
-}
+): CheckpointDestination =>
+  isCommitPointCheckpoint(checkpoint)
+    ? { name: "accountMigrationBalancesOverview" }
+    : DEFAULT_DESTINATION
 
 export const loadCheckpoint = async (
   storageKey: string,
