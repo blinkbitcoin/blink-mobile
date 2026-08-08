@@ -973,6 +973,31 @@ check "releases the lock when the command fails" "absent" \
   "$([ -d "$DEMO_SIM_REGISTRY/locks/native-build" ] && echo present || echo absent)"
 
 echo
+echo "live bench smoke (bench/live.sh)"
+
+LIVE="$TESTS_DIR/../bench/live.sh"
+SHOT_FIXTURES="$TESTS_DIR/../../react-native-demo-screenshots/tests/fixtures/bin"
+
+env -u DEMO_UDID "$LIVE" --smoke >/dev/null 2>&1
+check "live bench refuses to run without a claimed session" "1" "$?"
+
+rm -f "$WORK/bench-smoke.json"
+printf 'DEMO-UDID|bench-sim|Booted\n' > "$WORK/bench-devices.txt"
+PATH="$SHOT_FIXTURES:$PATH" FAKE_DEVICES="$WORK/bench-devices.txt" \
+  FAKE_ARGS_LOG="$WORK/bench-args.log" FAKE_FRAME_COUNTER="$WORK/bench-frames.n" \
+  DEMO_UDID=DEMO-UDID DEMO_SESSION_DIR="$WORK" \
+  "$LIVE" --smoke --out "$WORK/bench-smoke.json" >/dev/null 2>&1
+check "smoke run exits zero against the fake simctl" "0" "$?"
+check "the bench artifact is schema-complete" "yes" \
+  "$(python3 -c '
+import json, sys
+r = json.load(open(sys.argv[1]))
+need = {"v","udid","smoke","context","shot_latency","compare_cost","settle_capture","recorder","encode"}
+sl = r["shot_latency"].get("png_xcrun") or {}
+print("yes" if need <= set(r) and sl.get("n") == 2 and isinstance(sl.get("p50"), float) else "no")
+' "$WORK/bench-smoke.json" 2>/dev/null)"
+
+echo
 echo "bench (hermetic: counts first, loose clocks second)"
 
 # Upper bounds sit at >=5x locally measured (claim+release cycle ~2.4s with
