@@ -14,7 +14,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { GateBalances } from "@app/screens/account-migration/gate-balances"
 import { useMigrationNextStep } from "@app/screens/account-migration/hooks"
-import { MigrationCloseHeader } from "@app/screens/account-migration/migration-close-header"
+import { MigrationStepHeader } from "@app/screens/account-migration/migration-step-header"
 import { MigrationStepLayout } from "@app/screens/account-migration/migration-step-layout"
 import { testProps } from "@app/utils/testProps"
 
@@ -138,7 +138,7 @@ export const MigrationRequiredScreen: React.FC<MigrationRequiredScreenProps> = (
   return (
     <MigrationStepLayout
       headerShown={false}
-      header={<MigrationCloseHeader onClose={closeAction} testID="migration-close" />}
+      header={<MigrationStepHeader onClose={closeAction} testIdPrefix="migration" />}
       contentStyle={styles.contentGap}
       footer={
         <GaloyPrimaryButton
