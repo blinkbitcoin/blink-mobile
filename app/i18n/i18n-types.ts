@@ -12575,7 +12575,7 @@ type RootTranslation = {
 				/**
 				 * D​o​n​'​t​ ​w​o​r​r​y​ ​—​ ​y​o​u​r​ ​f​u​n​d​s​ ​a​r​e​ ​s​a​f​e​.​ ​M​i​g​r​a​t​i​n​g​ ​c​a​n​ ​t​a​k​e​ ​a​ ​f​e​w​ ​m​i​n​u​t​e​s​,​ ​a​n​d​ ​s​o​m​e​t​i​m​e​s​ ​a​ ​s​t​e​p​ ​j​u​s​t​ ​n​e​e​d​s​ ​a​ ​f​r​e​s​h​ ​s​t​a​r​t​.​
 			​
-			​C​l​o​s​e​ ​t​h​e​ ​a​p​p​ ​c​o​m​p​l​e​t​e​l​y​,​ ​t​h​e​n​ ​o​p​e​n​ ​i​t​ ​a​g​a​i​n​.​ ​T​h​e​ ​m​i​g​r​a​t​i​o​n​ ​w​i​l​l​ ​p​i​c​k​ ​u​p​ ​w​h​e​r​e​ ​i​t​ ​l​e​f​t​ ​o​f​f​.​
+			​C​l​o​s​e​ ​t​h​e​ ​a​p​p​ ​c​o​m​p​l​e​t​e​l​y​,​ ​t​h​e​n​ ​o​p​e​n​ ​i​t​ ​a​g​a​i​n​ ​a​n​d​ ​s​t​a​r​t​ ​t​h​e​ ​m​i​g​r​a​t​i​o​n​ ​a​g​a​i​n​.​
 			​
 			​S​t​i​l​l​ ​s​e​e​i​n​g​ ​t​h​i​s​ ​s​c​r​e​e​n​ ​a​f​t​e​r​ ​r​e​s​t​a​r​t​i​n​g​?​ ​C​o​n​t​a​c​t​ ​s​u​p​p​o​r​t​ ​a​n​d​ ​s​h​a​r​e​ ​t​h​e​ ​d​e​t​a​i​l​s​ ​b​e​l​o​w​:
 				 */
@@ -25615,7 +25615,7 @@ export type TranslationFunctions = {
 				/**
 				 * Don't worry — your funds are safe. Migrating can take a few minutes, and sometimes a step just needs a fresh start.
 		
-			Close the app completely, then open it again. The migration will pick up where it left off.
+			Close the app completely, then open it again and start the migration again.
 		
 			Still seeing this screen after restarting? Contact support and share the details below:
 				 */
