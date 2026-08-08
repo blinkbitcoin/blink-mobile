@@ -20,7 +20,10 @@ export type StoredCheckpoint = {
  * Where a checkpoint resumes. Every destination is a param-less route.
  */
 type CheckpointDestination = {
-  name: "accountMigrationExplainer" | "accountMigrationStart" | "accountMigrationBalancesOverview"
+  name:
+    | "accountMigrationExplainer"
+    | "accountMigrationStart"
+    | "accountMigrationBalancesOverview"
   params?: undefined
 }
 
