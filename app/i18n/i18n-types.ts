@@ -12430,13 +12430,15 @@ type RootTranslation = {
 		 */
 		downloadHistoryDownloadCta: string
 		/**
-		 * A​P​I​ ​s​e​r​v​i​c​e​ ​n​o​t​ ​a​v​a​i​l​a​b​l​e
+		 * A​b​o​u​t​ ​y​o​u​r​ ​A​P​I​ ​k​e​y​s
 		 */
 		apiServiceTitle: string
 		/**
-		 * W​e​ ​n​o​t​e​ ​t​h​a​t​ ​y​o​u​ ​h​a​v​e​ ​a​c​t​i​v​e​ ​A​P​I​ ​k​e​y​s​.​ ​B​l​i​n​k​ ​c​a​n​'​t​ ​p​r​o​v​i​d​e​ ​t​h​e​ ​A​P​I​ ​i​n​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​m​o​d​e​.​
+		 * Y​o​u​r​ ​a​c​c​o​u​n​t​ ​h​a​s​ ​a​c​t​i​v​e​ ​A​P​I​ ​k​e​y​s​.​ ​T​h​e​ ​A​P​I​ ​w​o​n​'​t​ ​b​e​ ​a​v​a​i​l​a​b​l​e​ ​a​f​t​e​r​ ​y​o​u​ ​m​o​v​e​ ​t​o​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​.​
 	​
-	​I​f​ ​y​o​u​ ​a​r​e​ ​d​e​p​e​n​d​e​n​t​ ​o​n​ ​B​l​i​n​k​'​s​ ​A​P​I​,​ ​c​o​n​t​a​c​t​ ​u​s​ ​p​r​o​m​p​t​l​y​ ​a​n​d​ ​w​e​ ​w​i​l​l​ ​d​o​ ​o​u​r​ ​b​e​s​t​ ​t​o​ ​a​s​s​i​s​t​ ​a​ ​s​m​o​o​t​h​ ​t​r​a​n​s​i​t​i​o​n​.
+	​B​l​i​n​k​ ​h​a​s​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​p​p​s​ ​t​h​a​t​ ​r​e​p​l​a​c​e​ ​m​o​s​t​ ​f​u​n​c​t​i​o​n​s​ ​o​f​ ​t​h​e​ ​A​P​I​,​ ​e​x​c​e​p​t​ ​s​e​n​d​i​n​g​.​ ​Y​o​u​ ​w​i​l​l​ ​f​i​n​d​ ​t​h​e​m​ ​i​n​ ​t​h​e​ ​S​e​t​t​i​n​g​s​ ​m​e​n​u​.​
+	​
+	​I​f​ ​y​o​u​ ​u​s​e​ ​t​h​e​ ​A​P​I​ ​t​o​ ​s​e​n​d​,​ ​u​n​f​o​r​t​u​n​a​t​e​l​y​ ​i​t​ ​w​i​l​l​ ​n​o​ ​l​o​n​g​e​r​ ​b​e​ ​p​o​s​s​i​b​l​e​.
 		 */
 		apiServiceBody: string
 		/**
@@ -12444,7 +12446,7 @@ type RootTranslation = {
 		 */
 		apiServiceContactCta: string
 		/**
-		 * C​o​n​t​i​n​u​e​ ​a​n​y​w​a​y​s
+		 * C​o​n​t​i​n​u​e​ ​t​h​e​ ​M​i​g​r​a​t​i​o​n
 		 */
 		apiServiceContinueCta: string
 		/**
@@ -25457,13 +25459,15 @@ export type TranslationFunctions = {
 		 */
 		downloadHistoryDownloadCta: () => LocalizedString
 		/**
-		 * API service not available
+		 * About your API keys
 		 */
 		apiServiceTitle: () => LocalizedString
 		/**
-		 * We note that you have active API keys. Blink can't provide the API in non-custodial mode.
+		 * Your account has active API keys. The API won't be available after you move to non-custodial.
 
-	If you are dependent on Blink's API, contact us promptly and we will do our best to assist a smooth transition.
+	Blink has non-custodial apps that replace most functions of the API, except sending. You will find them in the Settings menu.
+
+	If you use the API to send, unfortunately it will no longer be possible.
 		 */
 		apiServiceBody: () => LocalizedString
 		/**
@@ -25471,7 +25475,7 @@ export type TranslationFunctions = {
 		 */
 		apiServiceContactCta: () => LocalizedString
 		/**
-		 * Continue anyways
+		 * Continue the Migration
 		 */
 		apiServiceContinueCta: () => LocalizedString
 		/**
