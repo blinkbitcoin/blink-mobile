@@ -3711,6 +3711,11 @@
     "contactSupport": {
       "title": "Kapcsolatfelvétel az ügyfélszolgálattal",
       "body": "Valami hiba történt, de ne aggódjon, a pénze biztonságban van. Kérjük, forduljon az ügyfélszolgálathoz segítségért.\n\nEzekre az adatokra szüksége lehet, hogy az ügyfélszolgálat megoldja az esetét:",
+      "selfHelp": {
+        "title": "Próbálja újraindítani az alkalmazást",
+        "body": "Ne aggódjon — a pénze biztonságban van. Az átköltözés eltarthat néhány percig, és néha egy lépésnek csak új kezdésre van szüksége.\n\nZárja be teljesen az alkalmazást, nyissa meg újra, és indítsa el az átköltözést elölről.\n\nAz újraindítás után is ezt a képernyőt látja? Forduljon az ügyfélszolgálathoz, és ossza meg az alábbi adatokat:",
+        "contactSupportCta": "Kapcsolatfelvétel az ügyfélszolgálattal"
+      },
       "reasonLabel": "Ok",
       "accountIdLabel": "Fiókazonosító",
       "pubKeyLabel": "pubKey",

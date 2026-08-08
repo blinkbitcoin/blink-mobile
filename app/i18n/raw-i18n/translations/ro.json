@@ -3711,6 +3711,11 @@
     "contactSupport": {
       "title": "Contactează suportul",
       "body": "Ceva nu a mers bine, dar nu-ți face griji, fondurile tale sunt în siguranță. Te rugăm să contactezi suportul pentru asistență.\n\nS-ar putea să ai nevoie de aceste informații pentru ca suportul să îți rezolve cazul:",
+      "selfHelp": {
+        "title": "Încearcă să repornești aplicația",
+        "body": "Nu-ți face griji — fondurile tale sunt în siguranță. Migrarea poate dura câteva minute, iar uneori un pas are nevoie doar de un nou început.\n\nÎnchide complet aplicația, deschide-o din nou și începe migrarea de la capăt.\n\nVezi în continuare acest ecran după repornire? Contactează suportul și trimite datele de mai jos:",
+        "contactSupportCta": "Contactează suportul"
+      },
       "reasonLabel": "Motiv",
       "accountIdLabel": "ID-ul contului",
       "pubKeyLabel": "pubKey",

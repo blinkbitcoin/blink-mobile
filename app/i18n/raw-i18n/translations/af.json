@@ -3711,6 +3711,11 @@
     "contactSupport": {
       "title": "Kontak ondersteuning",
       "body": "Iets het verkeerd geloop, maar moenie bekommerd wees nie, jou fondse is veilig. Kontak asseblief ondersteuning vir hulp.\n\nJy mag dalk hierdie inligting nodig hê om ondersteuning te help om jou saak op te los:",
+      "selfHelp": {
+        "title": "Probeer die app herbegin",
+        "body": "Moenie bekommerd wees nie — jou fondse is veilig. Migrasie kan 'n paar minute neem, en soms het 'n stap net 'n vars begin nodig.\n\nMaak die app heeltemal toe, open dit weer, en begin die migrasie weer.\n\nSien jy hierdie skerm steeds ná die herbegin? Kontak ondersteuning en deel die besonderhede hieronder:",
+        "contactSupportCta": "Kontak ondersteuning"
+      },
       "reasonLabel": "Rede",
       "accountIdLabel": "Rekening-ID",
       "pubKeyLabel": "pubKey",

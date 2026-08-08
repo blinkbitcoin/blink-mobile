@@ -3711,6 +3711,11 @@
     "contactSupport": {
       "title": "Kontakt support",
       "body": "Noget gik galt, men bare rolig, dine midler er sikre. Kontakt venligst support for at få hjælp.\n\nDu kan få brug for disse oplysninger, så support kan løse din sag:",
+      "selfHelp": {
+        "title": "Prøv at genstarte appen",
+        "body": "Bare rolig — dine midler er sikre. Migreringen kan tage et par minutter, og nogle gange skal et trin bare starte forfra.\n\nLuk appen helt, åbn den igen, og start migreringen forfra.\n\nSer du stadig denne skærm efter genstarten? Kontakt support, og del oplysningerne nedenfor:",
+        "contactSupportCta": "Kontakt support"
+      },
       "reasonLabel": "Årsag",
       "accountIdLabel": "Konto-ID",
       "pubKeyLabel": "pubKey",

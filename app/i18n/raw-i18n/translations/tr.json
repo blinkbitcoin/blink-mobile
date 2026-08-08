@@ -3711,6 +3711,11 @@
     "contactSupport": {
       "title": "Destek ile iletişime geçin",
       "body": "Bir şeyler ters gitti ama endişelenmeyin, paranız güvende. Yardım için lütfen destek ile iletişime geçin.\n\nDesteğin durumunuzu çözmesine yardımcı olmak için bu bilgilere ihtiyacınız olabilir:",
+      "selfHelp": {
+        "title": "Uygulamayı yeniden başlatmayı deneyin",
+        "body": "Endişelenmeyin — paranız güvende. Taşıma birkaç dakika sürebilir ve bazen bir adımın yalnızca yeniden başlaması yeterlidir.\n\nUygulamayı tamamen kapatın, yeniden açın ve taşımayı baştan başlatın.\n\nYeniden başlattıktan sonra bu ekranı hâlâ görüyor musunuz? Destek ile iletişime geçin ve aşağıdaki bilgileri paylaşın:",
+        "contactSupportCta": "Destek ile iletişime geçin"
+      },
       "reasonLabel": "Neden",
       "accountIdLabel": "Hesap kimliği",
       "pubKeyLabel": "pubKey",

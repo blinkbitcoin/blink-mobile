@@ -3711,6 +3711,11 @@
         "contactSupport": {
             "title": "Contatta il supporto",
             "body": "Qualcosa è andato storto, ma non preoccuparti, i tuoi fondi sono al sicuro. Contatta il supporto per ricevere assistenza.\n\nPotresti aver bisogno di queste informazioni per aiutare il supporto a risolvere il tuo caso:",
+            "selfHelp": {
+                "title": "Prova a riavviare l'app",
+                "body": "Non preoccuparti — i tuoi fondi sono al sicuro. La migrazione può richiedere qualche minuto e a volte a un passaggio serve solo ricominciare.\n\nChiudi completamente l'app, riaprila e ricomincia la migrazione da capo.\n\nVedi ancora questa schermata dopo il riavvio? Contatta il supporto e condividi i dati qui sotto:",
+                "contactSupportCta": "Contatta il supporto"
+            },
             "reasonLabel": "Motivo",
             "accountIdLabel": "ID account",
             "pubKeyLabel": "pubKey",

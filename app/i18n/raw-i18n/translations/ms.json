@@ -3711,6 +3711,11 @@
     "contactSupport": {
       "title": "Hubungi sokongan",
       "body": "Sesuatu telah berlaku, tetapi jangan risau, dana anda selamat. Sila hubungi sokongan untuk mendapatkan bantuan.\n\nAnda mungkin memerlukan maklumat ini untuk membantu sokongan menyelesaikan kes anda:",
+      "selfHelp": {
+        "title": "Cuba mulakan semula apl",
+        "body": "Jangan risau — dana anda selamat. Pemindahan mungkin mengambil masa beberapa minit, dan kadangkala satu langkah hanya perlu dimulakan semula.\n\nTutup apl sepenuhnya, buka semula, dan mulakan pemindahan sekali lagi.\n\nMasih melihat skrin ini selepas mula semula? Hubungi sokongan dan kongsikan maklumat di bawah:",
+        "contactSupportCta": "Hubungi sokongan"
+      },
       "reasonLabel": "Sebab",
       "accountIdLabel": "ID akaun",
       "pubKeyLabel": "pubKey",

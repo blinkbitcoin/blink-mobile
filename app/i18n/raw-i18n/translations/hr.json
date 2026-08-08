@@ -3711,6 +3711,11 @@
     "contactSupport": {
       "title": "Kontaktirajte podršku",
       "body": "Nešto je pošlo po zlu, ali ne brinite, vaša su sredstva sigurna. Obratite se podršci za pomoć.\n\nOve informacije mogu pomoći podršci da riješi vaš slučaj:",
+      "selfHelp": {
+        "title": "Pokušajte ponovno pokrenuti aplikaciju",
+        "body": "Ne brinite — vaša su sredstva sigurna. Migracija može potrajati nekoliko minuta, a ponekad je koraku dovoljan novi početak.\n\nPotpuno zatvorite aplikaciju, ponovno je otvorite i započnite migraciju iznova.\n\nVidite li i dalje ovaj zaslon nakon ponovnog pokretanja? Obratite se podršci i podijelite podatke u nastavku:",
+        "contactSupportCta": "Kontaktirajte podršku"
+      },
       "reasonLabel": "Razlog",
       "accountIdLabel": "ID računa",
       "pubKeyLabel": "pubKey",

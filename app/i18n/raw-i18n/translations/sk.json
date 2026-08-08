@@ -3711,6 +3711,11 @@
     "contactSupport": {
       "title": "Kontaktovať podporu",
       "body": "Niečo sa pokazilo, ale nebojte sa, vaše prostriedky sú v bezpečí. Obráťte sa prosím na podporu.\n\nTieto informácie môžu podpore pomôcť vyriešiť váš prípad:",
+      "selfHelp": {
+        "title": "Skúste aplikáciu reštartovať",
+        "body": "Nebojte sa — vaše prostriedky sú v bezpečí. Migrácia môže trvať niekoľko minút a niekedy stačí, aby sa jeden krok začal odznova.\n\nAplikáciu úplne zatvorte, znova ju otvorte a spustite migráciu odznova.\n\nVidíte túto obrazovku aj po reštarte? Obráťte sa na podporu a zdieľajte údaje nižšie:",
+        "contactSupportCta": "Kontaktovať podporu"
+      },
       "reasonLabel": "Dôvod",
       "accountIdLabel": "ID účtu",
       "pubKeyLabel": "pubKey",

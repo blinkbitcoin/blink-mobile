@@ -3711,6 +3711,11 @@
     "contactSupport": {
       "title": "Tuukirire ab'obuyambi",
       "body": "Waliwo ekitagenze bulungi, naye tofaayo, ssente zo nnywevu. Tuukirira ab'obuyambi bakuyambe.\n\nOyinza okwetaaga ebikwata ku bino okuyamba ab'obuyambi okugonjoola ensonga yo:",
+      "selfHelp": {
+        "title": "Gezaako okuzzaawo app",
+        "body": "Tofaayo — ssente zo nnywevu. Okukyusa kuyinza okutwala eddakiika ntono, era oluusi omutendera gwetaaga butaaga kuddamu kutandika.\n\nGgalawo app ddala, oddemu ogiggulewo, era otandike okukyusa okuva ku ntandikwa.\n\nOkyalaba oluggya luno ng'omaze okuzzaawo? Tuukirira ab'obuyambi obawe ebikwata wammanga:",
+        "contactSupportCta": "Tuukirire ab'obuyambi"
+      },
       "reasonLabel": "Ensonga",
       "accountIdLabel": "ID ya akawunti",
       "pubKeyLabel": "pubKey",
