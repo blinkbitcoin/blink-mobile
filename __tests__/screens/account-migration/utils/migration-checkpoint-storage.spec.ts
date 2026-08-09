@@ -1,9 +1,8 @@
-import { Platform } from "react-native"
-
 import {
   MigrationCheckpoint,
   clearCheckpointFromStorage,
   getStorageKey,
+  isCommitPointCheckpoint,
   isExpired,
   loadCheckpoint,
   resolveCheckpointRoute,
@@ -181,29 +180,25 @@ describe("migration-checkpoint-storage", () => {
   })
 
   describe("resolveCheckpointRoute", () => {
+    const preCommitCheckpoints = [
+      MigrationCheckpoint.TermsAndConditions,
+      MigrationCheckpoint.BackupMethod,
+      MigrationCheckpoint.CloudBackup,
+      MigrationCheckpoint.BackupAlerts,
+    ]
+
     it("returns the default destination for a null checkpoint", () => {
       expect(resolveCheckpointRoute(null)).toEqual({
         name: "accountMigrationExplainer",
       })
     })
 
-    it("resumes the terms screen with the migration flow param", () => {
-      expect(resolveCheckpointRoute(MigrationCheckpoint.TermsAndConditions)).toEqual({
-        name: "acceptTermsAndConditions",
-        params: { flow: "migration" },
-      })
-    })
-
-    it("returns the backup-method destination for BackupMethod", () => {
-      expect(resolveCheckpointRoute(MigrationCheckpoint.BackupMethod)).toEqual({
-        name: "selfCustodialBackupMethod",
-      })
-    })
-
-    it("returns the security-checks destination for BackupAlerts", () => {
-      expect(resolveCheckpointRoute(MigrationCheckpoint.BackupAlerts)).toEqual({
-        name: "selfCustodialBackupSecurityChecks",
-      })
+    it("restarts at the explainer for every checkpoint before the commit point", () => {
+      for (const checkpoint of preCommitCheckpoints) {
+        expect(resolveCheckpointRoute(checkpoint)).toEqual({
+          name: "accountMigrationExplainer",
+        })
+      }
     })
 
     it("returns the balances-overview destination for the commit point", () => {
@@ -212,17 +207,35 @@ describe("migration-checkpoint-storage", () => {
       })
     })
 
-    it("resumes forward to the cloud-backup destination on every platform", () => {
-      for (const os of ["android", "ios"] as const) {
-        const original = Platform.OS
-        Object.defineProperty(Platform, "OS", { value: os })
+    /** The gate reaches the rest of the flow through this resolver, so a checkpoint that
+     *  resolves back to the gate leaves the user cycling between the two with no way
+     *  forward. No stored step, present or future, may name it. */
+    it("never resolves to the migration gate", () => {
+      const everyDestination = [null, ...Object.values(MigrationCheckpoint)].map(
+        (checkpoint) => resolveCheckpointRoute(checkpoint).name,
+      )
 
-        expect(resolveCheckpointRoute(MigrationCheckpoint.CloudBackup)).toEqual({
-          name: "selfCustodialCloudBackup",
-        })
+      expect(everyDestination).not.toContain("accountMigrationStart")
+    })
+  })
 
-        Object.defineProperty(Platform, "OS", { value: original })
-      }
+  describe("isCommitPointCheckpoint", () => {
+    it("holds only for the balances overview", () => {
+      const commitPointByCheckpoint = Object.values(MigrationCheckpoint).map(
+        (checkpoint) => [checkpoint, isCommitPointCheckpoint(checkpoint)] as const,
+      )
+
+      expect(commitPointByCheckpoint).toEqual([
+        [MigrationCheckpoint.TermsAndConditions, false],
+        [MigrationCheckpoint.BackupMethod, false],
+        [MigrationCheckpoint.CloudBackup, false],
+        [MigrationCheckpoint.BackupAlerts, false],
+        [MigrationCheckpoint.BalancesOverview, true],
+      ])
+    })
+
+    it("does not hold without a checkpoint", () => {
+      expect(isCommitPointCheckpoint(null)).toBe(false)
     })
   })
 

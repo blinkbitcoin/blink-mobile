@@ -10,6 +10,7 @@ import {
   type StoredCheckpoint,
   clearCheckpointFromStorage,
   getStorageKey,
+  isCommitPointCheckpoint,
   loadCheckpoint,
   mergeCheckpoint,
   saveCheckpointToStorage,
@@ -137,6 +138,11 @@ export const useMigrationCheckpointState = () => {
   /** A provisioned account is only stored alongside a checkpoint, so it gates resumability. */
   const hasResumableCheckpoint = Boolean(accountId)
 
+  /** Reads the same predicate the route resolver does, so the decision to resume and the
+   *  screen resumed to stay one rule. Without a provisioned account there is nothing to
+   *  jump forward to, whatever the stored step says. */
+  const isAtCommitPoint = hasResumableCheckpoint && isCommitPointCheckpoint(checkpoint)
+
   return {
     checkpoint,
     accountId,
@@ -152,5 +158,6 @@ export const useMigrationCheckpointState = () => {
     saveCheckpoint,
     clearCheckpoint,
     hasResumableCheckpoint,
+    isAtCommitPoint,
   }
 }
