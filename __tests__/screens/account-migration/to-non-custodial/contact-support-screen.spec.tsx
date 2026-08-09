@@ -30,6 +30,7 @@ let mockHasParams = true
 const mockNavigate = jest.fn()
 const mockGoBack = jest.fn()
 const mockSetOptions = jest.fn()
+const mockReset = jest.fn()
 let mockOrigin: MigrationSupportOrigin | undefined
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
@@ -37,6 +38,7 @@ jest.mock("@react-navigation/native", () => ({
     navigate: mockNavigate,
     goBack: mockGoBack,
     setOptions: mockSetOptions,
+    reset: mockReset,
   }),
   useRoute: () => ({
     params: mockHasParams ? { reason: mockReason, origin: mockOrigin } : undefined,
@@ -247,11 +249,9 @@ describe("MigrationContactSupportScreen", () => {
     expect(screen.getByText(mockSupportEmail)).toBeTruthy()
   })
 
-  /** A refused start can clear itself on relaunch: the start latch is in-memory, so a fresh
-   *  launch sends a new migrationStart and the user starts the migration again from the
-   *  intro. So the screen leads with restart instructions instead of the support-first copy
-   *  (#4098). The diagnostics stay: support still needs the reason code and identity if the
-   *  restart does not help. */
+  /** A refused start can clear itself without support: the start latch is in-memory, so the
+   *  screen offers a retry instead of the support-first copy (#4098). The diagnostics stay:
+   *  support still needs the reason code and identity if the retry does not help. */
   it("shows the self-help copy for a refused start", async () => {
     mockReason = MigrationSupportReason.StartRefused
     renderScreen()
@@ -261,22 +261,42 @@ describe("MigrationContactSupportScreen", () => {
     expect(screen.getByText(LLSupport.selfHelp.title())).toBeTruthy()
     expect(screen.getByText(LLSupport.selfHelp.body())).toBeTruthy()
     // No queryByText(LLSupport.title()) here: "Contact support" is also the demoted
-    // CTA's label, so the generic hero's absence is asserted through its body instead.
+    // control's label, so the generic hero's absence is asserted through its body instead.
     expect(screen.queryByText(LLSupport.body())).toBeNull()
     expect(screen.queryByText(LLSupport.contactUsCta())).toBeNull()
     expect(screen.getByText(LLSupport.reasonLabel())).toBeTruthy()
     expect(screen.getByText("start-refused")).toBeTruthy()
     // The diagnostics card and its copy control survive the variant switch: the users
-    // still stuck after a restart are exactly the ones support needs the identity from.
+    // still stuck after a retry are exactly the ones support needs the identity from.
     expect(screen.getByText(LLSupport.accountIdLabel())).toBeTruthy()
     expect(screen.getByText("18A4242")).toBeTruthy()
     expect(screen.getByText(LLSupport.pubKeyLabel())).toBeTruthy()
     expect(screen.getByText(LLSupport.copy())).toBeTruthy()
   })
 
-  /** The self-help variant relabels the primary CTA, but it must still reach the same
-   *  pre-filled email, and the address-copy control must survive. */
-  it("reaches support from the self-help contact action", async () => {
+  /**
+   * The retry is the whole point of the variant: it has to unmount the commit screen holding
+   * the settled refusal, which a plain navigate would leave in place to re-route straight back
+   * here. It resets to the entry dispatcher rather than a migration screen so the
+   * resume-vs-fresh decision and the kill-switch still run, with Primary underneath so the
+   * user is not stranded.
+   */
+  it("restarts the migration from the entry dispatcher", async () => {
+    mockReason = MigrationSupportReason.StartRefused
+    renderScreen()
+    await flushEffects()
+
+    fireEvent.press(screen.getByTestId("migration-contact-support-retry"))
+
+    expect(mockReset).toHaveBeenCalledWith({
+      index: 1,
+      routes: [{ name: "Primary" }, { name: "accountMigrationEntry" }],
+    })
+    expect(mockSendSupportEmail).not.toHaveBeenCalled()
+  })
+
+  /** Support is demoted, not removed: the secondary still reaches the same pre-filled email. */
+  it("reaches support from the demoted self-help contact action", async () => {
     mockReason = MigrationSupportReason.StartRefused
     renderScreen()
     await flushEffects()
@@ -284,7 +304,31 @@ describe("MigrationContactSupportScreen", () => {
     fireEvent.press(screen.getByText(LLSupport.selfHelp.contactSupportCta()))
 
     expect(mockSendSupportEmail).toHaveBeenCalledTimes(1)
-    expect(screen.getByText(mockSupportEmail)).toBeTruthy()
+    expect(mockReset).not.toHaveBeenCalled()
+  })
+
+  /** The footer takes one primary and one secondary, so the self-help variant spends its
+   *  secondary on support and drops the address-as-copy-control the support-first variant
+   *  keeps. The full block is still copyable from the card's own control. */
+  it("drops the address copy control in the self-help variant", async () => {
+    mockReason = MigrationSupportReason.StartRefused
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.queryByTestId("migration-contact-support-copy")).toBeNull()
+    expect(screen.queryByText(mockSupportEmail)).toBeNull()
+    expect(screen.getByText(LLSupport.copy())).toBeTruthy()
+  })
+
+  /** The support-first footer is unchanged: contact primary, address secondary, no retry. */
+  it("keeps the established footer for a support-first reason", async () => {
+    mockReason = MigrationSupportReason.LockedWithoutCheckpoint
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.getByTestId("migration-contact-support-cta")).toBeTruthy()
+    expect(screen.getByTestId("migration-contact-support-copy")).toBeTruthy()
+    expect(screen.queryByTestId("migration-contact-support-retry")).toBeNull()
   })
 
   /** Terminal reasons cannot be restarted away, so they keep the support-first copy;

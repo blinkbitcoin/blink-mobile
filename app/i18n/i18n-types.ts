@@ -12569,15 +12569,15 @@ type RootTranslation = {
 			body: string
 			selfHelp: {
 				/**
-				 * T​r​y​ ​r​e​s​t​a​r​t​i​n​g​ ​t​h​e​ ​a​p​p
+				 * L​e​t​'​s​ ​t​r​y​ ​t​h​a​t​ ​a​g​a​i​n
 				 */
 				title: string
 				/**
 				 * D​o​n​'​t​ ​w​o​r​r​y​ ​—​ ​y​o​u​r​ ​f​u​n​d​s​ ​a​r​e​ ​s​a​f​e​.​ ​M​i​g​r​a​t​i​n​g​ ​c​a​n​ ​t​a​k​e​ ​a​ ​f​e​w​ ​m​i​n​u​t​e​s​,​ ​a​n​d​ ​s​o​m​e​t​i​m​e​s​ ​a​ ​s​t​e​p​ ​j​u​s​t​ ​n​e​e​d​s​ ​a​ ​f​r​e​s​h​ ​s​t​a​r​t​.​
 			​
-			​C​l​o​s​e​ ​t​h​e​ ​a​p​p​ ​c​o​m​p​l​e​t​e​l​y​,​ ​t​h​e​n​ ​o​p​e​n​ ​i​t​ ​a​g​a​i​n​ ​a​n​d​ ​s​t​a​r​t​ ​t​h​e​ ​m​i​g​r​a​t​i​o​n​ ​a​g​a​i​n​.​
+			​S​t​a​r​t​ ​t​h​e​ ​m​i​g​r​a​t​i​o​n​ ​o​v​e​r​ ​—​ ​i​t​ ​o​n​l​y​ ​t​a​k​e​s​ ​a​ ​m​o​m​e​n​t​.​
 			​
-			​S​t​i​l​l​ ​s​e​e​i​n​g​ ​t​h​i​s​ ​s​c​r​e​e​n​ ​a​f​t​e​r​ ​r​e​s​t​a​r​t​i​n​g​?​ ​C​o​n​t​a​c​t​ ​s​u​p​p​o​r​t​ ​a​n​d​ ​s​h​a​r​e​ ​t​h​e​ ​d​e​t​a​i​l​s​ ​b​e​l​o​w​:
+			​S​t​i​l​l​ ​s​e​e​i​n​g​ ​t​h​i​s​ ​s​c​r​e​e​n​?​ ​C​o​n​t​a​c​t​ ​s​u​p​p​o​r​t​ ​a​n​d​ ​s​h​a​r​e​ ​t​h​e​ ​d​e​t​a​i​l​s​ ​b​e​l​o​w​:
 				 */
 				body: string
 				/**
@@ -25609,15 +25609,15 @@ export type TranslationFunctions = {
 			body: () => LocalizedString
 			selfHelp: {
 				/**
-				 * Try restarting the app
+				 * Let's try that again
 				 */
 				title: () => LocalizedString
 				/**
 				 * Don't worry — your funds are safe. Migrating can take a few minutes, and sometimes a step just needs a fresh start.
 		
-			Close the app completely, then open it again and start the migration again.
+			Start the migration over — it only takes a moment.
 		
-			Still seeing this screen after restarting? Contact support and share the details below:
+			Still seeing this screen? Contact support and share the details below:
 				 */
 				body: () => LocalizedString
 				/**

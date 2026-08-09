@@ -3712,8 +3712,8 @@
       "title": "Kontaktovat podporu",
       "body": "Něco se pokazilo, ale nebojte se, vaše prostředky jsou v bezpečí. Obraťte se prosím na podporu.\n\nTyto informace mohou podpoře pomoci vyřešit váš případ:",
       "selfHelp": {
-        "title": "Zkuste aplikaci restartovat",
-        "body": "Nebojte se — vaše prostředky jsou v bezpečí. Migrace může trvat několik minut a někdy stačí, aby jeden krok začal znovu.\n\nAplikaci úplně zavřete, znovu ji otevřete a spusťte migraci od začátku.\n\nVidíte tuto obrazovku i po restartu? Obraťte se na podporu a sdílejte údaje níže:",
+        "title": "Zkusme to znovu",
+        "body": "Nebojte se — vaše prostředky jsou v bezpečí. Migrace může trvat několik minut a někdy stačí, aby jeden krok začal znovu.\n\nSpusťte migraci od začátku — zabere to jen chvíli.\n\nVidíte tuto obrazovku i nadále? Obraťte se na podporu a sdílejte údaje níže:",
         "contactSupportCta": "Kontaktovat podporu"
       },
       "reasonLabel": "Důvod",

@@ -27,12 +27,21 @@ import {
 } from "@app/types/migration"
 import { testProps } from "@app/utils/testProps"
 
-/** The hero and CTA of one variant, chosen together. */
-type SupportCopy = {
+/** One footer control. The house pattern is a primary with a single secondary underneath,
+ *  so each variant names exactly two. */
+type SupportAction = {
+  title: string
+  onPress: () => void
+  testID: string
+}
+
+/** The hero and both footer controls of one variant, chosen together. */
+type SupportVariant = {
   icon: IconNamesType
   title: string
   body: string
-  cta: string
+  primary: SupportAction
+  secondary: SupportAction
 }
 
 /**
@@ -47,10 +56,12 @@ type SupportCopy = {
  * handover; the visible control covers iOS, which has no hardware back.
  *
  * Restart-resolvable refusals (#4098) get a self-help variant instead of the support-first
- * copy: the hero leads with restart instructions (relaunch, then start the migration again —
- * nothing resumes on its own without a server-side lock) and frames the primary Contact
- * support CTA as the still-stuck fallback. The diagnostics card and email stay identical so
- * support still gets the full block either way.
+ * copy: the primary control retries the migration in place and Contact support drops to the
+ * secondary as the still-stuck fallback. The retry replaces the force-quit the copy used to
+ * ask for — an instruction many users cannot follow — and clears the same in-memory latch a
+ * relaunch would. The diagnostics card and its copy control stay identical across variants so
+ * support still gets the full block either way; only the address-as-copy-control is dropped
+ * in self-help, since the footer takes one primary and one secondary, not three.
  */
 export const MigrationContactSupportScreen: React.FC = () => {
   const { LL } = useI18nContext()
@@ -71,22 +82,6 @@ export const MigrationContactSupportScreen: React.FC = () => {
   const isSelfHelp = RESTART_RESOLVABLE_REASONS.has(reason)
   const { cardDetails, supportDetailsText, sendSupportEmail } =
     useMigrationSupportEmail(reason)
-
-  /** The two variants are complete alternatives — hero and CTA always switch together,
-   *  so the choice is made once here rather than per-prop in the JSX. */
-  const copy: SupportCopy = isSelfHelp
-    ? {
-        icon: "refresh",
-        title: LLSupport.selfHelp.title(),
-        body: LLSupport.selfHelp.body(),
-        cta: LLSupport.selfHelp.contactSupportCta(),
-      }
-    : {
-        icon: "headset",
-        title: LLSupport.title(),
-        body: LLSupport.body(),
-        cta: LLSupport.contactUsCta(),
-      }
 
   /**
    * Back depends on where support was opened from. Mid-migration the commit point (Step 8)
@@ -146,14 +141,69 @@ export const MigrationContactSupportScreen: React.FC = () => {
     copyToClipboard({ content: supportDetailsText })
   }, [copyToClipboard, supportDetailsText])
 
+  /**
+   * Retries a refused start without asking the user to force-quit. What blocks a second
+   * attempt is only in-memory: the commit screen holds the start latch and its settled
+   * refusal, and it stays mounted underneath, re-routing here on every focus. Resetting the
+   * stack unmounts it, so the entry dispatcher runs again and the screen it lands on fires a
+   * fresh migrationStart — the same effect a relaunch has, minus the force-quit. The
+   * dispatcher is the target rather than a migration screen because it owns the
+   * resume-vs-fresh decision and the self-custodial kill-switch; Primary stays underneath so
+   * the user is not stranded in a flow with nothing behind it.
+   */
+  const retryMigration = useCallback(() => {
+    navigation.reset({
+      index: 1,
+      routes: [{ name: "Primary" }, { name: "accountMigrationEntry" }],
+    })
+  }, [navigation])
+
+  /**
+   * The variants are complete alternatives — hero and both footer controls switch together,
+   * so the choice is made once here rather than per-prop in the JSX. Self-help leads with the
+   * retry and keeps support as the secondary; the support-first variant keeps its established
+   * footer, where the secondary is the address as a copy control.
+   */
+  const variant: SupportVariant = isSelfHelp
+    ? {
+        icon: "refresh",
+        title: LLSupport.selfHelp.title(),
+        body: LLSupport.selfHelp.body(),
+        primary: {
+          title: LL.common.tryAgain(),
+          onPress: retryMigration,
+          testID: "migration-contact-support-retry",
+        },
+        secondary: {
+          title: LLSupport.selfHelp.contactSupportCta(),
+          onPress: sendSupportEmail,
+          testID: "migration-contact-support-cta",
+        },
+      }
+    : {
+        icon: "headset",
+        title: LLSupport.title(),
+        body: LLSupport.body(),
+        primary: {
+          title: LLSupport.contactUsCta(),
+          onPress: sendSupportEmail,
+          testID: "migration-contact-support-cta",
+        },
+        secondary: {
+          title: supportEmailAddress,
+          onPress: copySupportEmail,
+          testID: "migration-contact-support-copy",
+        },
+      }
+
   return (
     <Screen preset="fixed">
       <View style={styles.container}>
         <IconHero
-          icon={copy.icon}
+          icon={variant.icon}
           iconColor={colors.primary}
-          title={copy.title}
-          subtitle={copy.body}
+          title={variant.title}
+          subtitle={variant.body}
         />
 
         <ScrollView style={styles.scroll} contentContainerStyle={styles.body}>
@@ -175,14 +225,14 @@ export const MigrationContactSupportScreen: React.FC = () => {
 
         <View style={styles.buttonsContainer}>
           <GaloyPrimaryButton
-            title={copy.cta}
-            onPress={sendSupportEmail}
-            {...testProps("migration-contact-support-cta")}
+            title={variant.primary.title}
+            onPress={variant.primary.onPress}
+            {...testProps(variant.primary.testID)}
           />
           <GaloySecondaryButton
-            title={supportEmailAddress}
-            onPress={copySupportEmail}
-            {...testProps("migration-contact-support-copy")}
+            title={variant.secondary.title}
+            onPress={variant.secondary.onPress}
+            {...testProps(variant.secondary.testID)}
           />
         </View>
       </View>
