@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { Pressable, StyleProp, TextStyle, View } from "react-native"
+import { Pressable, StyleProp, TextStyle, View, ViewStyle } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
@@ -16,6 +16,9 @@ type SettingItemRowProps = {
   subtitle?: string
   leftIcon?: IconNamesType
   leftIconColor?: string
+  leftIconSize?: number
+  /** Drops the standalone-card surface when the row sits inside a grouped list. */
+  containerStyle?: StyleProp<ViewStyle>
   titleStyle?: StyleProp<TextStyle>
   subtitleStyle?: StyleProp<TextStyle>
   rightIcon?: IconNamesType | null
@@ -28,6 +31,8 @@ export const SettingItemRow: React.FC<SettingItemRowProps> = ({
   subtitle,
   leftIcon,
   leftIconColor,
+  leftIconSize = ICON_SIZE,
+  containerStyle,
   titleStyle,
   subtitleStyle,
   rightIcon = "caret-right",
@@ -45,7 +50,7 @@ export const SettingItemRow: React.FC<SettingItemRowProps> = ({
 
   const renderLeftIcon = () => {
     if (leftIcon) {
-      return <GaloyIcon name={leftIcon} size={ICON_SIZE} color={iconColor} />
+      return <GaloyIcon name={leftIcon} size={leftIconSize} color={iconColor} />
     }
     return null
   }
@@ -70,7 +75,7 @@ export const SettingItemRow: React.FC<SettingItemRowProps> = ({
   if (onPress) {
     return (
       <Pressable
-        style={styles.container}
+        style={[styles.container, containerStyle]}
         onPress={onPress}
         onPressIn={() => setHovering(true)}
         onPressOut={() => setHovering(false)}
@@ -82,7 +87,7 @@ export const SettingItemRow: React.FC<SettingItemRowProps> = ({
     )
   }
 
-  return <View style={styles.container}>{content}</View>
+  return <View style={[styles.container, containerStyle]}>{content}</View>
 }
 
 const useStyles = makeStyles(({ colors }, { hovering, hasSubtitle }: StyleProps) => {
