@@ -69,6 +69,12 @@ jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () => mockSelfCustodialWallet(),
 }))
 
+// The receive hook consults unclaimed deposits before reusing an address; the listing
+// itself belongs to its own spec, so it stays empty here.
+jest.mock("@app/self-custodial/hooks/use-pending-deposits", () => ({
+  usePendingDeposits: () => ({ deposits: [], refetch: jest.fn() }),
+}))
+
 jest.mock("@app/store/persistent-state", () => {
   const actual = jest.requireActual("@app/store/persistent-state")
   return {

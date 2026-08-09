@@ -5,6 +5,7 @@ import {
   applyPaymentRequestDefaults,
   mockSdk,
   onchainReceipt,
+  pendingDeposit,
 } from "../../helpers/self-custodial-payment-request"
 import { usePaymentRequest } from "@app/self-custodial/hooks/use-payment-request"
 
@@ -23,6 +24,7 @@ const mockConvertMoneyAmount = jest.fn()
 const mockAddPendingAutoConvert = jest.fn()
 const mockFetchAutoConvertMinSats = jest.fn()
 const mockUseReceiveAssetMode = jest.fn()
+const mockPendingDeposits = jest.fn()
 const mockFormatMoneyAmount = jest.fn()
 const mockAccountRegistry = jest.fn()
 const mockRecordAppError = jest.fn()
@@ -47,6 +49,12 @@ jest.mock("@app/self-custodial/auto-convert", () => ({
 
 jest.mock("@app/self-custodial/hooks/use-receive-asset-mode", () => ({
   useReceiveAssetMode: () => mockUseReceiveAssetMode(),
+}))
+
+// The real hook subscribes to navigation focus, which a bare renderHook has no
+// container for; the receive screen it feeds is always inside one.
+jest.mock("@app/self-custodial/hooks/use-pending-deposits", () => ({
+  usePendingDeposits: () => mockPendingDeposits(),
 }))
 
 jest.mock("@app/self-custodial/providers/wallet", () => ({
@@ -95,6 +103,7 @@ beforeEach(() => {
     addPendingAutoConvert: mockAddPendingAutoConvert,
     fetchAutoConvertMinSats: mockFetchAutoConvertMinSats,
     useReceiveAssetMode: mockUseReceiveAssetMode,
+    pendingDeposits: mockPendingDeposits,
     formatMoneyAmount: mockFormatMoneyAmount,
   })
 })
@@ -145,7 +154,38 @@ describe("onchain address rotation", () => {
     expect(mockSaveIssuedOnchainAddress).toHaveBeenLastCalledWith("sc-account-1", {
       address: "bc1qrotated...",
       depositMarker: "deposit-1",
+      seenPendingDepositIds: [],
     })
+  })
+
+  it("waits for the wallet snapshot instead of reading an empty history as no deposits", async () => {
+    // Mounting during a cold start, a reconnect or a failed refresh: the snapshot has
+    // not landed, so `allTransactions` is empty. Rotating here would burn an address on
+    // every offline visit, and writing the empty marker back would make the deposit
+    // look new all over again once the snapshot arrives.
+    mockLoadIssuedOnchainAddress.mockResolvedValue({
+      address: "bc1qstored...",
+      depositMarker: "deposit-1",
+    })
+
+    const { result, rerender } = renderHook(() => usePaymentRequest())
+
+    await waitFor(() => {
+      expect(result.current?.onchainAddress).toBe("bc1qtest...")
+    })
+    expect(mockReceiveOnchain).toHaveBeenCalledWith({ newAddress: false })
+    expect(mockSaveIssuedOnchainAddress).toHaveBeenLastCalledWith("sc-account-1", {
+      address: "bc1qtest...",
+      depositMarker: "deposit-1",
+      seenPendingDepositIds: [],
+    })
+
+    // The snapshot lands and confirms the marker we already held: still nothing new.
+    mockSelfCustodialWallet.mockReturnValue(walletWith([onchainReceipt("deposit-1")]))
+    rerender({})
+    await flushEffects()
+
+    expect(mockReceiveOnchain).not.toHaveBeenCalledWith({ newAddress: true })
   })
 
   it("rotates on mount when the deposit landed while the app was closed", async () => {
@@ -186,9 +226,29 @@ describe("onchain address rotation", () => {
     expect(mockReceiveOnchain).not.toHaveBeenCalledWith({ newAddress: true })
   })
 
-  it("adopts the SDK's existing address for a wallet with no stored record", async () => {
+  it("rotates once for a wallet with receipts but no stored record", async () => {
+    // The first run after upgrading: nothing was ever recorded, yet the wallet has
+    // already been paid on-chain — so the address the SDK is holding may well be the
+    // one that was used. Rotating once costs an address; adopting it costs privacy.
     mockLoadIssuedOnchainAddress.mockResolvedValue(null)
     mockSelfCustodialWallet.mockReturnValue(walletWith([onchainReceipt("deposit-1")]))
+    mockReceiveOnchain.mockResolvedValue({ address: "bc1qrotated..." })
+
+    const { result } = renderHook(() => usePaymentRequest())
+
+    await waitFor(() => {
+      expect(result.current?.onchainAddress).toBe("bc1qrotated...")
+    })
+    expect(mockReceiveOnchain).toHaveBeenCalledWith({ newAddress: true })
+    expect(mockSaveIssuedOnchainAddress).toHaveBeenCalledWith("sc-account-1", {
+      address: "bc1qrotated...",
+      depositMarker: "deposit-1",
+      seenPendingDepositIds: [],
+    })
+  })
+
+  it("adopts the SDK's existing address for a wallet that has never been paid", async () => {
+    mockLoadIssuedOnchainAddress.mockResolvedValue(null)
 
     const { result } = renderHook(() => usePaymentRequest())
 
@@ -198,7 +258,8 @@ describe("onchain address rotation", () => {
     expect(mockReceiveOnchain).toHaveBeenCalledWith({ newAddress: false })
     expect(mockSaveIssuedOnchainAddress).toHaveBeenCalledWith("sc-account-1", {
       address: "bc1qtest...",
-      depositMarker: "deposit-1",
+      depositMarker: null,
+      seenPendingDepositIds: [],
     })
   })
 
@@ -221,11 +282,49 @@ describe("onchain address rotation", () => {
       expect(result.current?.onchainAddress).toBe("bc1qmanual...")
     })
     expect(mockReceiveOnchain).toHaveBeenLastCalledWith({ newAddress: true })
-    // A forced rotation never consults the stored record.
-    expect(mockLoadIssuedOnchainAddress).toHaveBeenCalledTimes(1)
+    // A forced rotation still reads the record — not to decide, but so the values it
+    // writes back cannot drop what was already there.
+    expect(mockLoadIssuedOnchainAddress).toHaveBeenCalledTimes(2)
   })
 
-  it("keeps the address when a rotation request returns nothing", async () => {
+  it("ignores repeat taps while a rotation is in flight", async () => {
+    // Every request costs an address, so a slow call must not hand out one per tap.
+    let resolveRotation: (value: { address: string }) => void = () => {}
+    mockReceiveOnchain
+      .mockResolvedValueOnce({ address: "bc1qfirst..." })
+      .mockImplementationOnce(
+        () =>
+          new Promise<{ address: string }>((resolve) => {
+            resolveRotation = resolve
+          }),
+      )
+
+    const { result } = renderHook(() => usePaymentRequest())
+    await waitFor(() => {
+      expect(result.current?.onchainAddress).toBe("bc1qfirst...")
+    })
+    mockReceiveOnchain.mockClear()
+
+    await act(async () => {
+      result.current?.rotateOnchainAddress?.()
+      result.current?.rotateOnchainAddress?.()
+      result.current?.rotateOnchainAddress?.()
+      await flushEffects()
+    })
+
+    expect(mockReceiveOnchain).toHaveBeenCalledTimes(1)
+
+    await act(async () => {
+      resolveRotation({ address: "bc1qmanual..." })
+      await flushEffects()
+    })
+
+    expect(result.current?.onchainAddress).toBe("bc1qmanual...")
+  })
+
+  it("keeps the address and reports the failure when a rotation returns nothing", async () => {
+    // The adapter reports failures as an error-only result rather than throwing, so
+    // without an explicit report the tap would fail in complete silence.
     mockReceiveOnchain
       .mockResolvedValueOnce({ address: "bc1qfirst..." })
       .mockResolvedValueOnce({ errors: [{ message: "sdk offline" }] })
@@ -241,6 +340,11 @@ describe("onchain address rotation", () => {
     })
 
     expect(result.current?.onchainAddress).toBe("bc1qfirst...")
+    expect(mockRecordAppError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: expect.stringContaining("sdk offline"),
+      }),
+    )
   })
 
   it("keeps the address and reports the failure when a rotation rejects", async () => {
@@ -341,6 +445,7 @@ describe("onchain address rotation", () => {
     expect(mockSaveIssuedOnchainAddress).toHaveBeenLastCalledWith("sc-account-1", {
       address: "bc1qsecond...",
       depositMarker: "deposit-2",
+      seenPendingDepositIds: [],
     })
   })
 
@@ -375,6 +480,86 @@ describe("onchain address rotation", () => {
       "sc-account-1",
       expect.objectContaining({ address: "bc1qstale..." }),
     )
+  })
+
+  describe("unclaimed deposits", () => {
+    /**
+     * A deposit too small to clear the claim fee waits in `listPendingDeposits` and
+     * never reaches the payment history, so the receipt marker alone would keep the
+     * address it paid in circulation.
+     */
+    it("rotates when an unclaimed deposit appears", async () => {
+      mockLoadIssuedOnchainAddress.mockResolvedValue({
+        address: "bc1qfirst...",
+        depositMarker: null,
+      })
+      mockReceiveOnchain
+        .mockResolvedValueOnce({ address: "bc1qfirst..." })
+        .mockResolvedValueOnce({ address: "bc1qrotated..." })
+
+      const { result, rerender } = renderHook(() => usePaymentRequest())
+      await waitFor(() => {
+        expect(result.current?.onchainAddress).toBe("bc1qfirst...")
+      })
+
+      mockPendingDeposits.mockReturnValue({
+        deposits: [pendingDeposit("txid-1")],
+        refetch: jest.fn(),
+      })
+      rerender({})
+
+      await waitFor(() => {
+        expect(result.current?.onchainAddress).toBe("bc1qrotated...")
+      })
+      expect(mockReceiveOnchain).toHaveBeenLastCalledWith({ newAddress: true })
+      expect(mockSaveIssuedOnchainAddress).toHaveBeenLastCalledWith("sc-account-1", {
+        address: "bc1qrotated...",
+        depositMarker: null,
+        seenPendingDepositIds: ["txid-1:0"],
+      })
+    })
+
+    it("leaves the address alone for a deposit it has already rotated for", async () => {
+      mockLoadIssuedOnchainAddress.mockResolvedValue({
+        address: "bc1qfirst...",
+        depositMarker: null,
+        seenPendingDepositIds: ["txid-1:0"],
+      })
+      mockPendingDeposits.mockReturnValue({
+        deposits: [pendingDeposit("txid-1")],
+        refetch: jest.fn(),
+      })
+
+      const { result } = renderHook(() => usePaymentRequest())
+
+      await waitFor(() => {
+        expect(result.current?.onchainAddress).toBe("bc1qtest...")
+      })
+      expect(mockReceiveOnchain).toHaveBeenCalledWith({ newAddress: false })
+    })
+
+    it("keeps recorded ids when the listing comes back empty", async () => {
+      // `usePendingDeposits` resolves to an empty array both when nothing is pending
+      // and when the listing failed or has not run yet — forgetting the ids on that
+      // would rotate again the moment the same deposits reappear.
+      mockLoadIssuedOnchainAddress.mockResolvedValue({
+        address: "bc1qfirst...",
+        depositMarker: null,
+        seenPendingDepositIds: ["txid-1:0"],
+      })
+
+      const { result } = renderHook(() => usePaymentRequest())
+
+      await waitFor(() => {
+        expect(result.current?.onchainAddress).toBe("bc1qtest...")
+      })
+      expect(mockReceiveOnchain).toHaveBeenCalledWith({ newAddress: false })
+      expect(mockSaveIssuedOnchainAddress).toHaveBeenLastCalledWith("sc-account-1", {
+        address: "bc1qtest...",
+        depositMarker: null,
+        seenPendingDepositIds: ["txid-1:0"],
+      })
+    })
   })
 
   describe("without a self-custodial account id", () => {

@@ -20,6 +20,7 @@ const mockRecordError = jest.fn()
 const mockAddPendingAutoConvert = jest.fn()
 const mockFetchAutoConvertMinSats = jest.fn()
 const mockUseReceiveAssetMode = jest.fn()
+const mockPendingDeposits = jest.fn()
 const mockFormatMoneyAmount = jest.fn()
 const mockLoadIssuedOnchainAddress = jest.fn()
 const mockSaveIssuedOnchainAddress = jest.fn()
@@ -42,6 +43,12 @@ jest.mock("@app/self-custodial/auto-convert", () => ({
 
 jest.mock("@app/self-custodial/hooks/use-receive-asset-mode", () => ({
   useReceiveAssetMode: () => mockUseReceiveAssetMode(),
+}))
+
+// The real hook subscribes to navigation focus, which a bare renderHook has no
+// container for; the receive screen it feeds is always inside one.
+jest.mock("@app/self-custodial/hooks/use-pending-deposits", () => ({
+  usePendingDeposits: () => mockPendingDeposits(),
 }))
 
 jest.mock("@app/self-custodial/providers/wallet", () => ({
@@ -86,6 +93,7 @@ describe("usePaymentRequest", () => {
       addPendingAutoConvert: mockAddPendingAutoConvert,
       fetchAutoConvertMinSats: mockFetchAutoConvertMinSats,
       useReceiveAssetMode: mockUseReceiveAssetMode,
+      pendingDeposits: mockPendingDeposits,
       formatMoneyAmount: mockFormatMoneyAmount,
     })
   })

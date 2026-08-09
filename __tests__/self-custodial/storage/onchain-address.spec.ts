@@ -2,6 +2,7 @@ import { WalletCurrency } from "@app/graphql/generated"
 import {
   latestOnchainReceiptId,
   loadIssuedOnchainAddress,
+  mergeSeenPendingDepositIds,
   saveIssuedOnchainAddress,
 } from "@app/self-custodial/storage/onchain-address"
 import {
@@ -83,6 +84,32 @@ describe("latestOnchainReceiptId", () => {
   })
 })
 
+describe("mergeSeenPendingDepositIds", () => {
+  it("starts from nothing when no ids were stored", () => {
+    expect(mergeSeenPendingDepositIds(undefined, ["a", "b"])).toEqual(["a", "b"])
+  })
+
+  it("adds only ids that are new", () => {
+    expect(mergeSeenPendingDepositIds(["a"], ["a", "b"])).toEqual(["a", "b"])
+  })
+
+  it("never forgets an id just because the listing came back empty", () => {
+    // The listing resolves empty on failure too, so shrinking to match it would let
+    // the same deposits trigger a rotation all over again.
+    expect(mergeSeenPendingDepositIds(["a", "b"], [])).toEqual(["a", "b"])
+  })
+
+  it("keeps the 50 most recent ids", () => {
+    const stored = Array.from({ length: 50 }, (_, i) => `stored-${i}`)
+
+    const merged = mergeSeenPendingDepositIds(stored, ["fresh"])
+
+    expect(merged).toHaveLength(50)
+    expect(merged[0]).toBe("stored-1")
+    expect(merged[49]).toBe("fresh")
+  })
+})
+
 describe("issued onchain address record", () => {
   beforeEach(() => {
     store.clear()
@@ -157,6 +184,52 @@ describe("issued onchain address record", () => {
       store.set(STORAGE_KEY, JSON.stringify(payload))
 
       expect(await loadIssuedOnchainAddress(ACCOUNT_ID)).toBeNull()
+    })
+  })
+
+  it("round-trips the unclaimed deposits it has rotated for", async () => {
+    await saveIssuedOnchainAddress(ACCOUNT_ID, {
+      address: "bc1qaddress",
+      depositMarker: null,
+      seenPendingDepositIds: ["txid-1:0", "txid-2:1"],
+    })
+
+    expect(await loadIssuedOnchainAddress(ACCOUNT_ID)).toEqual({
+      address: "bc1qaddress",
+      depositMarker: null,
+      seenPendingDepositIds: ["txid-1:0", "txid-2:1"],
+    })
+  })
+
+  it("still reads a record written before deposits were tracked", async () => {
+    store.set(STORAGE_KEY, JSON.stringify({ address: "bc1qold", depositMarker: "tx-1" }))
+
+    expect(await loadIssuedOnchainAddress(ACCOUNT_ID)).toEqual({
+      address: "bc1qold",
+      depositMarker: "tx-1",
+      seenPendingDepositIds: undefined,
+    })
+  })
+
+  const malformedIds: [string, unknown][] = [
+    ["not an array", "txid-1:0"],
+    ["an array of the wrong type", [7, { id: "txid-1:0" }]],
+  ]
+
+  malformedIds.forEach(([label, seenPendingDepositIds]) => {
+    // Rejecting the whole record here would read as "no address issued yet", which
+    // turns the reuse detection off entirely — a far worse outcome than losing a list.
+    it(`keeps the record when the deposit ids are ${label}`, async () => {
+      store.set(
+        STORAGE_KEY,
+        JSON.stringify({ address: "bc1q", depositMarker: "tx-1", seenPendingDepositIds }),
+      )
+
+      expect(await loadIssuedOnchainAddress(ACCOUNT_ID)).toEqual({
+        address: "bc1q",
+        depositMarker: "tx-1",
+        seenPendingDepositIds: undefined,
+      })
     })
   })
 

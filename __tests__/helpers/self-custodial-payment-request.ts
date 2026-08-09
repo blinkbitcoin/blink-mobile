@@ -40,6 +40,19 @@ export const onchainReceipt = (id: string) => ({
   paymentType: "onchain",
 })
 
+/**
+ * An unclaimed on-chain deposit. Only the id is read by the receive hook, but the
+ * shape mirrors `PendingDeposit` so a spec can widen its assertions later.
+ */
+export const pendingDeposit = (txid: string, vout = 0) => ({
+  id: `${txid}:${vout}`,
+  txid,
+  vout,
+  amount: btcAmount(1000),
+  status: "pending",
+  errorReason: null,
+})
+
 export type PaymentRequestMocks = {
   receiveLightning: jest.Mock
   receiveOnchain: jest.Mock
@@ -50,6 +63,8 @@ export type PaymentRequestMocks = {
   fetchAutoConvertMinSats: jest.Mock
   useReceiveAssetMode: jest.Mock
   formatMoneyAmount: jest.Mock
+  /** `usePendingDeposits`, which the hook consults before reusing an address. */
+  pendingDeposits?: jest.Mock
 }
 
 /** Puts every mock in the "self-custodial wallet is ready, BTC mode" baseline state. */
@@ -80,4 +95,5 @@ export const applyPaymentRequestDefaults = (mocks: PaymentRequestMocks): void =>
     isToggleDisabled: false,
     loading: false,
   })
+  mocks.pendingDeposits?.mockReturnValue({ deposits: [], refetch: jest.fn() })
 }
