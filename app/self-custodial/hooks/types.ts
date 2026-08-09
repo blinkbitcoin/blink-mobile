@@ -48,6 +48,8 @@ export type SelfCustodialPaymentRequestState = {
   feesInformation: { deposit: DepositFeesInformation } | undefined
   info?: { data?: InvoiceData }
   onchainAddress?: string
+  /** Requests a fresh on-chain deposit address; absent for custodial accounts. */
+  rotateOnchainAddress?: () => void
   getOnchainFullUriFn?: (params: UriParams) => string
   pr: {
     state?: PaymentRequestStateType

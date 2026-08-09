@@ -2161,6 +2161,8 @@
     "error": "Kon nie faktuur genereer nie. Kontak asseblief ondersteuning as hierdie probleem voortduur.",
     "copyInvoice": "Dra oor",
     "shareInvoice": "Deel",
+    "newAddress": "Nuwe adres",
+    "newAddressHint": "Skep 'n vars Bitcoin-adres vir hierdie deposito",
     "addAmount": "Vra spesifieke bedrag",
     "expired": "Hierdie faktuur het verval",
     "expiresIn": "Verval in",

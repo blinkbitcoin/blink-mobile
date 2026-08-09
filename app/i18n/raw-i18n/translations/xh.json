@@ -2161,6 +2161,8 @@
     "error": "Ayiphumelelanga ukwenza i-invoyisi. Nceda uqhakamishele abezoncedo ukuba le ngxaki iyaqhubeka.",
     "copyInvoice": "Khuphela i-invoyisi",
     "shareInvoice": "Yabelana nge-invoyisi",
+    "newAddress": "Idilesi entsha",
+    "newAddressHint": "Yenza idilesi entsha yeBitcoin yale dipozithi",
     "addAmount": "Cela Isixa esithile",
     "expired": "I-invoyisi iphelelwe lixesha",
     "expiresIn": "Iphelelwa",

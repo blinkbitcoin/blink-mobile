@@ -8,6 +8,7 @@ import { recordAppError } from "@app/utils/error-reporting"
 import { utils as lnurlUtils } from "lnurl-pay"
 
 import { WalletCurrency } from "@app/graphql/generated"
+import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { usePriceConversion } from "@app/hooks/use-price-conversion"
@@ -23,6 +24,7 @@ import {
   WalletOrDisplayCurrency,
   toBtcMoneyAmount,
 } from "@app/types/amounts"
+import { AccountType } from "@app/types/wallet"
 import { toSatsAmount } from "@app/utils/amounts"
 import { buildBitcoinUri } from "@app/utils/bitcoin-uri"
 
@@ -34,6 +36,11 @@ import {
 import { createReceiveLightning, createReceiveOnchain } from "../bridge"
 import { AutoConvertStatus, useAutoConvertStatus } from "../providers/auto-convert-status"
 import { useSelfCustodialWallet } from "../providers/wallet"
+import {
+  latestOnchainReceiptId,
+  loadIssuedOnchainAddress,
+  saveIssuedOnchainAddress,
+} from "../storage/onchain-address"
 
 import { useReceiveAssetMode } from "./use-receive-asset-mode"
 import type { InvoiceData, SelfCustodialPaymentRequestState } from "./types"
@@ -67,7 +74,11 @@ const isSameGeneration = (a: GenerationInputs | null, b: GenerationInputs): bool
   a !== null && a.sdk === b.sdk && a.key === b.key
 
 export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => {
-  const { sdk, lastReceivedPaymentId, lightningAddress } = useSelfCustodialWallet()
+  const { sdk, lastReceivedPaymentId, lightningAddress, allTransactions } =
+    useSelfCustodialWallet()
+  const { activeAccount } = useAccountRegistry()
+  const selfCustodialAccountId =
+    activeAccount?.type === AccountType.SelfCustodial ? activeAccount.id : null
   const { wallets, isReady } = useActiveWallet()
   const { convertMoneyAmount } = usePriceConversion()
   const { formatMoneyAmount } = useDisplayCurrency()
@@ -287,27 +298,78 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
     generateRequest(generation)
   }, [generation, generateRequest])
 
+  /**
+   * Marks how far the wallet's on-chain receive history had progressed when we last
+   * issued an address. The SDK never says which address a deposit paid, so a change
+   * here is our signal that the displayed address has been used.
+   */
+  const depositMarker = useMemo(
+    () => latestOnchainReceiptId(allTransactions),
+    [allTransactions],
+  )
+  const depositMarkerRef = useRef(depositMarker)
+  depositMarkerRef.current = depositMarker
+
+  // Only the newest request may publish its address: an automatic rotation and a
+  // manual tap can otherwise land out of order and show a superseded address.
+  const onchainRequestIdRef = useRef(0)
+
+  const issueOnchainAddress = useCallback(
+    async (forceRotate: boolean) => {
+      if (!sdk) return
+      const marker = depositMarkerRef.current
+      onchainRequestIdRef.current += 1
+      const requestId = onchainRequestIdRef.current
+
+      // Without an account id we cannot track reuse, so we fall back to the SDK's
+      // existing address rather than leaving the QR blank.
+      const issued =
+        forceRotate || !selfCustodialAccountId
+          ? null
+          : await loadIssuedOnchainAddress(selfCustodialAccountId)
+      // With no stored record we adopt whatever the SDK already holds: rotating here
+      // would burn an address for a wallet that has never received anything.
+      const shouldRotate =
+        forceRotate || (issued !== null && issued.depositMarker !== marker)
+
+      const result = await createReceiveOnchain(sdk)({ newAddress: shouldRotate })
+      if (!result.address) return
+      if (requestId !== onchainRequestIdRef.current) return
+
+      setOnchainAddress(result.address)
+      if (!selfCustodialAccountId) return
+      await saveIssuedOnchainAddress(selfCustodialAccountId, {
+        address: result.address,
+        depositMarker: marker,
+      })
+    },
+    [sdk, selfCustodialAccountId],
+  )
+
+  // Runs on mount and again whenever an on-chain receipt lands — covering both
+  // "the deposit arrived while the QR was on screen" and "it arrived while the app
+  // was closed". Re-saving the marker each time keeps this idempotent.
   useEffect(() => {
     if (!sdk) return
-    let cancelled = false
-    const adapter = createReceiveOnchain(sdk)
-    adapter()
-      .then((result: { address?: string }) => {
-        if (cancelled) return
-        if (result.address) setOnchainAddress(result.address)
-      })
-      .catch((err) => {
-        if (cancelled) return
-        recordAppError(
-          err instanceof Error
-            ? err
-            : new Error(`Self-custodial receive onchain adapter failed: ${err}`),
-        )
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [sdk])
+    issueOnchainAddress(false).catch((err) => {
+      recordAppError(
+        err instanceof Error
+          ? err
+          : new Error(`Self-custodial receive onchain adapter failed: ${err}`),
+      )
+    })
+  }, [sdk, issueOnchainAddress, depositMarker])
+
+  /** Manual "New address" action on the on-chain receive page. */
+  const rotateOnchainAddress = useCallback(() => {
+    issueOnchainAddress(true).catch((err) => {
+      recordAppError(
+        err instanceof Error
+          ? err
+          : new Error(`Self-custodial onchain address rotation failed: ${err}`),
+      )
+    })
+  }, [issueOnchainAddress])
 
   useEffect(() => {
     if (!sdk) return
@@ -452,6 +514,7 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
     feesInformation: undefined,
     info: invoiceData ? { data: invoiceData } : undefined,
     onchainAddress,
+    rotateOnchainAddress,
     getOnchainFullUriFn,
     pr: {
       state: requestState,

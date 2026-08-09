@@ -193,7 +193,15 @@ export type LnurlWithdrawAdapter = (
   params: LnurlWithdrawParams,
 ) => Promise<PaymentAdapterResult>
 
-export type ReceiveOnchainAdapter = () => Promise<{
+export type ReceiveOnchainParams = {
+  /**
+   * Rotate to a fresh deposit address instead of reusing the existing one.
+   * Previously issued addresses stay valid and monitored.
+   */
+  newAddress?: boolean
+}
+
+export type ReceiveOnchainAdapter = (params?: ReceiveOnchainParams) => Promise<{
   address?: string
   errors?: PaymentError[]
 }>

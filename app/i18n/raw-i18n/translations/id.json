@@ -2161,6 +2161,8 @@
     "error": "Gagal membuat faktur. Silakan hubungi dukungan jika masalah ini terus berlanjut.",
     "copyInvoice": "Salin",
     "shareInvoice": "Bagikan",
+    "newAddress": "Alamat Baru",
+    "newAddressHint": "Buat alamat Bitcoin baru untuk setoran ini",
     "addAmount": "Minta Jumlah Tertentu",
     "expired": "Faktur telah kedaluwarsa",
     "expiresIn": "Berakhir dalam",

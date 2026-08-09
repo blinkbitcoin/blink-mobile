@@ -2161,6 +2161,8 @@
     "error": "Không thể tạo hóa đơn. Vui lòng liên hệ với bộ phận hỗ trợ nếu sự cố này vẫn tiếp diễn.",
     "copyInvoice": "Copy",
     "shareInvoice": "Chia sẻ",
+    "newAddress": "Địa chỉ mới",
+    "newAddressHint": "Tạo địa chỉ Bitcoin mới cho khoản nạp này",
     "addAmount": "Yêu cầu số tiền cụ thể",
     "expired": "Hóa đơn đã hết hạn",
     "expiresIn": "Hết hạn trong",

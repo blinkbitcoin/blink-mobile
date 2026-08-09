@@ -30,6 +30,16 @@ export const btcAmount = (amount: number) => ({
   currencyCode: "BTC",
 })
 
+/** An incoming on-chain transaction — what marks a deposit address as used. */
+export const onchainReceipt = (id: string) => ({
+  id,
+  amount: btcAmount(1000),
+  direction: "receive",
+  status: "completed",
+  timestamp: 1_700_000_000,
+  paymentType: "onchain",
+})
+
 export type PaymentRequestMocks = {
   receiveLightning: jest.Mock
   receiveOnchain: jest.Mock
@@ -47,6 +57,7 @@ export const applyPaymentRequestDefaults = (mocks: PaymentRequestMocks): void =>
   mocks.selfCustodialWallet.mockReturnValue({
     sdk: mockSdk,
     lastReceivedPaymentId: null,
+    allTransactions: [],
   })
   mocks.activeWallet.mockReturnValue({ wallets: [btcWallet, usdWallet], isReady: true })
   mocks.receiveLightning.mockResolvedValue({ invoice: "lnbc1test..." })

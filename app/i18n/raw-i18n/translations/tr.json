@@ -2161,6 +2161,8 @@
     "error": "Fatura oluşturulamadı. Sorun devam ederse lütfen destekle iletişime geçin.",
     "copyInvoice": "Kopyala",
     "shareInvoice": "Paylaş",
+    "newAddress": "Yeni Adres",
+    "newAddressHint": "Bu yatırma için yeni bir Bitcoin adresi oluştur",
     "addAmount": "Belli Bir Miktar Talep Ey",
     "expired": "Faturanın süresi geçti",
     "expiresIn": "Süresi doluyor",

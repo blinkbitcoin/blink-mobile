@@ -2161,6 +2161,8 @@
     "error": "Kan factuur niet genereren. Neem contact op met klantenservice als dit probleem zich blijft voordoen.",
     "copyInvoice": "Kopiëren",
     "shareInvoice": "Deel",
+    "newAddress": "Nieuw Adres",
+    "newAddressHint": "Genereer een nieuw Bitcoin-adres voor deze storting",
     "addAmount": "Vraag Specifiek Bedrag Aan",
     "expired": "De factuur is verlopen",
     "expiresIn": "Verloopt in",

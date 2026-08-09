@@ -2161,6 +2161,8 @@
     "error": "No s'ha pogut generar la factura. Si us plau contacta amb el servei d'assistència si aquest problema persisteix.",
     "copyInvoice": "Copiar",
     "shareInvoice": "Comparteix",
+    "newAddress": "Adreça nova",
+    "newAddressHint": "Genera una adreça bitcoin nova per a aquest dipòsit",
     "addAmount": "Demana l'import específic",
     "expired": "La factura ha caducat",
     "expiresIn": "Caduca en",

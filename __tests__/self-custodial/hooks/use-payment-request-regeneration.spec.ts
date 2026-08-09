@@ -56,6 +56,18 @@ jest.mock("@app/hooks/use-display-currency", () => ({
   useDisplayCurrency: () => ({ formatMoneyAmount: mockFormatMoneyAmount }),
 }))
 
+jest.mock("@app/hooks/use-account-registry", () => ({
+  useAccountRegistry: () => ({
+    activeAccount: { id: "sc-account-1", type: "self-custodial" },
+  }),
+}))
+
+jest.mock("@app/self-custodial/storage/onchain-address", () => ({
+  ...jest.requireActual("@app/self-custodial/storage/onchain-address"),
+  loadIssuedOnchainAddress: async () => null,
+  saveIssuedOnchainAddress: async () => undefined,
+}))
+
 describe("usePaymentRequest invoice regeneration", () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -281,6 +293,7 @@ describe("usePaymentRequest invoice regeneration", () => {
     mockSelfCustodialWallet.mockReturnValue({
       sdk: { id: "reconnected-sdk" },
       lastReceivedPaymentId: null,
+      allTransactions: [],
     })
     mockReceiveLightning.mockResolvedValue({ invoice: "lnbc1newsession..." })
     rerender({})
@@ -310,6 +323,7 @@ describe("usePaymentRequest invoice regeneration", () => {
     mockSelfCustodialWallet.mockReturnValue({
       sdk: mockSdk,
       lastReceivedPaymentId: "payment-abc-123",
+      allTransactions: [],
     })
     rerender({})
     await waitFor(() => {
@@ -343,6 +357,7 @@ describe("usePaymentRequest invoice regeneration", () => {
     mockSelfCustodialWallet.mockReturnValue({
       sdk: mockSdk,
       lastReceivedPaymentId: "payment-abc-123",
+      allTransactions: [],
     })
     rerender({})
     await waitFor(() => {

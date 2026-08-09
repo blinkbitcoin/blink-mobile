@@ -2161,6 +2161,8 @@
     "error": "Fejl ved generering af faktura. Kontakt venligst support, hvis dette problem fortsætter.",
     "copyInvoice": "Kopier",
     "shareInvoice": "Del",
+    "newAddress": "Ny adresse",
+    "newAddressHint": "Generer en ny Bitcoin-adresse til dette indskud",
     "addAmount": "Anmod om et bestemt beløb",
     "expired": "Fakturaen er udløbet",
     "expiresIn": "Udløber om",

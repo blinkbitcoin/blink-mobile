@@ -24,6 +24,7 @@ type TestState = {
   memo?: string
   onchainAddress?: string
   getOnchainFullUriFn?: () => string
+  rotateOnchainAddress?: () => void
 }
 
 const buildState = (overrides: TestState = {}): TestState =>
@@ -106,6 +107,31 @@ describe("useOnchainResolver", () => {
     expect(result.current.address).toBe("bc1qself")
     expect(result.current.loading).toBe(false)
     expect(result.current.getFullUriFn?.({ prefix: true })).toBe("bitcoin:bc1qself")
+  })
+
+  it("exposes the self-custodial rotation action", () => {
+    const rotate = jest.fn()
+    const state = buildState({
+      onchainAddress: "bc1qself",
+      rotateOnchainAddress: rotate,
+    })
+
+    const { result } = renderHook(() =>
+      useOnchainResolver(true, state as never, WalletCurrency.Btc),
+    )
+
+    result.current.rotate?.()
+    expect(rotate).toHaveBeenCalledTimes(1)
+  })
+
+  it("offers no rotation action for custodial accounts", () => {
+    const state = buildState({ rotateOnchainAddress: jest.fn() })
+
+    const { result } = renderHook(() =>
+      useOnchainResolver(false, state as never, WalletCurrency.Btc),
+    )
+
+    expect(result.current.rotate).toBeUndefined()
   })
 
   it("reports loading=true while the self-custodial onchain address is still null", () => {

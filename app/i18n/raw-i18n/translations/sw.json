@@ -2161,6 +2161,8 @@
     "error": "Kushindwa kuzalisha bili. Tafadhali wasiliana na msaada ikiwa tatizo hili litadumu.",
     "copyInvoice": "Nakili",
     "shareInvoice": "Shiriki",
+    "newAddress": "Anwani mpya",
+    "newAddressHint": "Tengeneza anwani mpya ya Bitcoin kwa amana hii",
     "addAmount": "Omba Kiasi Maalum",
     "expired": "Bili imeisha muda wake",
     "expiresIn": "Inamalizika ndani ya",

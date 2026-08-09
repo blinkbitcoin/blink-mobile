@@ -2161,6 +2161,8 @@
         "error": "Falha ao gerar fatura. Entre em contato com o suporte se o problema persistir.",
         "copyInvoice": "Copiar",
         "shareInvoice": "Compartilhar",
+        "newAddress": "Novo endereço",
+        "newAddressHint": "Gerar um novo endereço Bitcoin para este depósito",
         "addAmount": "Solicitar valor específico",
         "expired": "A fatura expirou",
         "expiresIn": "Expira em",
