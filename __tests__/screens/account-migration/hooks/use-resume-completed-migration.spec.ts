@@ -1,6 +1,7 @@
 import { act, renderHook } from "@testing-library/react-native"
 
 import { MigrationStatus } from "@app/graphql/generated"
+import { MigrationCheckpoint } from "@app/screens/account-migration/utils/migration-checkpoint-storage"
 import { useResumeCompletedMigration } from "@app/screens/account-migration/hooks/use-resume-completed-migration"
 
 import { flushEffects } from "../../../helpers/flush-effects"
@@ -23,6 +24,9 @@ jest.mock("@react-navigation/native", () => ({
 let mockStatus: MigrationStatus | null = MigrationStatus.Completed
 let mockMigrationAccountId: string | null = "sc-account-1"
 let mockMigrationLoading = false
+let mockMigrationCheckpoint: MigrationCheckpoint | null =
+  MigrationCheckpoint.BalancesOverview
+const mockSaveCheckpoint = jest.fn()
 
 /** The swap function the hook receives. Its identity can change between renders in
  *  production (a wallet-registry refresh rebuilds it); a test can point it elsewhere to
@@ -31,16 +35,22 @@ let mockCompleteMigrationRef: () => Promise<boolean> = mockCompleteMigration
 
 jest.mock("@app/screens/account-migration/hooks/use-complete-migration", () => ({
   useCompleteMigration: () => ({
+    migrationCheckpoint: mockMigrationCheckpoint,
     migrationAccountId: mockMigrationAccountId,
     migrationExpectedReceiveSats: 21000,
     migrationLoading: mockMigrationLoading,
     completeMigration: mockCompleteMigrationRef,
+    saveCheckpoint: mockSaveCheckpoint,
   }),
 }))
 
 /** Confirmed by default so the server phase stays the deciding voice in the existing
  *  cases; the receive-gate cases below flip it. */
-let mockReceiveConfirmation = { isReceiveConfirmed: true, isReceiveDelayed: false }
+let mockReceiveConfirmation = {
+  isReceiveConfirmed: true,
+  isReceiveDelayed: false,
+  isReceiveUnrecoverable: false,
+}
 const mockUseReceiveConfirmation = jest.fn()
 
 jest.mock(
@@ -73,7 +83,13 @@ describe("useResumeCompletedMigration", () => {
     mockMigrationLoading = false
     mockCompleteMigrationRef = mockCompleteMigration
     mockCompleteMigration.mockResolvedValue(true)
-    mockReceiveConfirmation = { isReceiveConfirmed: true, isReceiveDelayed: false }
+    mockMigrationCheckpoint = MigrationCheckpoint.BalancesOverview
+    mockSaveCheckpoint.mockResolvedValue(true)
+    mockReceiveConfirmation = {
+      isReceiveConfirmed: true,
+      isReceiveDelayed: false,
+      isReceiveUnrecoverable: false,
+    }
   })
 
   /**
@@ -110,7 +126,11 @@ describe("useResumeCompletedMigration", () => {
    *  not swap into a wallet whose funds are still in transit. No swap this session is
    *  fine — the custodial session stays intact and the gate keeps checking. */
   it("holds the swap while the receive is unconfirmed", async () => {
-    mockReceiveConfirmation = { isReceiveConfirmed: false, isReceiveDelayed: false }
+    mockReceiveConfirmation = {
+      isReceiveConfirmed: false,
+      isReceiveDelayed: false,
+      isReceiveUnrecoverable: false,
+    }
     renderHook(() => useResumeCompletedMigration())
     await flushEffects()
 
@@ -118,12 +138,20 @@ describe("useResumeCompletedMigration", () => {
   })
 
   it("finishes the swap once the receive confirms", async () => {
-    mockReceiveConfirmation = { isReceiveConfirmed: false, isReceiveDelayed: false }
+    mockReceiveConfirmation = {
+      isReceiveConfirmed: false,
+      isReceiveDelayed: false,
+      isReceiveUnrecoverable: false,
+    }
     const { rerender } = renderHook(() => useResumeCompletedMigration())
     await flushEffects()
     expect(mockCompleteMigration).not.toHaveBeenCalled()
 
-    mockReceiveConfirmation = { isReceiveConfirmed: true, isReceiveDelayed: false }
+    mockReceiveConfirmation = {
+      isReceiveConfirmed: true,
+      isReceiveDelayed: false,
+      isReceiveUnrecoverable: false,
+    }
     rerender({})
     await flushEffects()
 
@@ -166,7 +194,11 @@ describe("useResumeCompletedMigration", () => {
   /** This path has no screen of its own to say the wait is unusual, so the crossing is at
    *  least reported rather than leaving a stuck receive invisible. */
   it("reports a receive that has not landed within the notice window", async () => {
-    mockReceiveConfirmation = { isReceiveConfirmed: false, isReceiveDelayed: true }
+    mockReceiveConfirmation = {
+      isReceiveConfirmed: false,
+      isReceiveDelayed: true,
+      isReceiveUnrecoverable: false,
+    }
     renderHook(() => useResumeCompletedMigration())
     await flushEffects()
 
@@ -177,7 +209,11 @@ describe("useResumeCompletedMigration", () => {
   })
 
   it("reports the delayed receive once, however often it re-renders", async () => {
-    mockReceiveConfirmation = { isReceiveConfirmed: false, isReceiveDelayed: true }
+    mockReceiveConfirmation = {
+      isReceiveConfirmed: false,
+      isReceiveDelayed: true,
+      isReceiveUnrecoverable: false,
+    }
     const { rerender } = renderHook(() => useResumeCompletedMigration())
     await flushEffects()
     rerender({})
@@ -188,7 +224,11 @@ describe("useResumeCompletedMigration", () => {
   })
 
   it("stays quiet while the wait is still inside the notice window", async () => {
-    mockReceiveConfirmation = { isReceiveConfirmed: false, isReceiveDelayed: false }
+    mockReceiveConfirmation = {
+      isReceiveConfirmed: false,
+      isReceiveDelayed: false,
+      isReceiveUnrecoverable: false,
+    }
     renderHook(() => useResumeCompletedMigration())
     await flushEffects()
 
@@ -314,6 +354,101 @@ describe("useResumeCompletedMigration", () => {
 
     await act(async () => {
       settle(true)
+    })
+  })
+
+  /**
+   * The gate refuses to confirm a receive whose key it cannot read, which is deliberate —
+   * confirming would swap away a working session for a wallet nobody can open. That also
+   * means the swap never runs and never resolves false, so this is the only path left to
+   * the handover that names the condition.
+   */
+  describe("when the provisioned wallet's key is gone from the device", () => {
+    beforeEach(() => {
+      mockReceiveConfirmation = {
+        isReceiveConfirmed: false,
+        isReceiveDelayed: false,
+        isReceiveUnrecoverable: true,
+      }
+    })
+
+    it("hands the user to support with the reason that names it", async () => {
+      renderHook(() => useResumeCompletedMigration())
+      await flushEffects()
+
+      expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
+        reason: "self-custodial-account-not-on-device",
+        origin: "resume",
+      })
+      expect(mockReportError).toHaveBeenCalledWith(
+        "Migration resume without destination account",
+        expect.objectContaining({
+          message: "Provisioned self-custodial account is not on this device",
+        }),
+      )
+    })
+
+    it("never swaps the session", async () => {
+      renderHook(() => useResumeCompletedMigration())
+      await flushEffects()
+
+      expect(mockCompleteMigration).not.toHaveBeenCalled()
+    })
+
+    it("hands over once however many times the effect re-runs", async () => {
+      const { rerender } = renderHook(() => useResumeCompletedMigration())
+      await flushEffects()
+      rerender({})
+      await flushEffects()
+
+      expect(mockNavigate).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  /**
+   * The checkpoint expires 48h after its last write while the receive gate has no bound, so
+   * without this a wait spanning two days would lose the record that says there is anything
+   * to finish — stranding a funded wallet the switcher also hides.
+   */
+  describe("keeping the checkpoint alive", () => {
+    it("rewrites the stored step once per launch", async () => {
+      const { rerender } = renderHook(() => useResumeCompletedMigration())
+      await flushEffects()
+      rerender({})
+      await flushEffects()
+
+      expect(mockSaveCheckpoint).toHaveBeenCalledTimes(1)
+      expect(mockSaveCheckpoint).toHaveBeenCalledWith(
+        MigrationCheckpoint.BalancesOverview,
+      )
+    })
+
+    /** No figure of its own, so `mergeCheckpoint` keeps the stored one: this write moves
+     *  `savedAt` and nothing else. */
+    it("sends no fresh receive figure with it", async () => {
+      renderHook(() => useResumeCompletedMigration())
+      await flushEffects()
+
+      expect(mockSaveCheckpoint).toHaveBeenCalledWith(expect.anything())
+      expect(mockSaveCheckpoint.mock.calls[0]).toHaveLength(1)
+    })
+
+    it("writes nothing when there is no migration to finish", async () => {
+      mockMigrationCheckpoint = null
+
+      renderHook(() => useResumeCompletedMigration())
+      await flushEffects()
+
+      expect(mockSaveCheckpoint).not.toHaveBeenCalled()
+    })
+
+    it("waits for the checkpoint to hydrate before rewriting it", async () => {
+      mockMigrationLoading = true
+
+      renderHook(() => useResumeCompletedMigration())
+      await flushEffects()
+
+      expect(mockSaveCheckpoint).not.toHaveBeenCalled()
     })
   })
 })

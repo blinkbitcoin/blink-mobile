@@ -13,6 +13,7 @@ import {
   savePendingProvisionedAccount,
   clearPendingProvisionedAccount,
   validateStoredCheckpoint,
+  mergeCheckpoint,
 } from "@app/screens/account-migration/utils/migration-checkpoint-storage"
 
 const mockLoadJson = jest.fn()
@@ -277,6 +278,100 @@ describe("migration-checkpoint-storage", () => {
 
       const result = await loadCheckpoint("test-key")
       expect(result).toBeNull()
+    })
+  })
+
+  /**
+   * The receive figure decides whether the gate waits at all, so which of the two records
+   * wins is the difference between a correct wait and the #4102 swap-before-funds-land.
+   */
+  describe("mergeCheckpoint", () => {
+    const stored = {
+      step: MigrationCheckpoint.BalancesOverview,
+      savedAt: 1,
+      custodialAccountId: "owner-1",
+      expectedReceiveSats: 21000,
+    }
+
+    /** The default, and the reason the rule exists: a figure read after the drain is a zero
+     *  meaning "the balance already moved", which the gate would read as "nothing is
+     *  coming" and swap on immediately. */
+    it("keeps the stored figure when the update does not claim to replace it", () => {
+      const merged = mergeCheckpoint(stored, {
+        step: MigrationCheckpoint.BalancesOverview,
+        custodialAccountId: "owner-1",
+        expectedReceiveSats: 0,
+      })
+
+      expect(merged.expectedReceiveSats).toBe(21000)
+    })
+
+    /** Only the commit screen sets the flag, and only while the server says nothing has
+     *  been drained — a zero captured while the balance was dust must not outlive a
+     *  later top-up. */
+    it("takes the fresh figure when the update claims to replace it", () => {
+      const merged = mergeCheckpoint(
+        { ...stored, expectedReceiveSats: 0 },
+        {
+          step: MigrationCheckpoint.BalancesOverview,
+          custodialAccountId: "owner-1",
+          expectedReceiveSats: 21000,
+          replaceExpectedReceiveSats: true,
+        },
+      )
+
+      expect(merged.expectedReceiveSats).toBe(21000)
+    })
+
+    it("records the figure when nothing was stored yet", () => {
+      const merged = mergeCheckpoint(null, {
+        step: MigrationCheckpoint.BalancesOverview,
+        custodialAccountId: "owner-1",
+        expectedReceiveSats: 21000,
+      })
+
+      expect(merged.expectedReceiveSats).toBe(21000)
+    })
+
+    /** Another profile's flow must inherit nothing, replacement flag or not. */
+    it("never carries a figure across a different owner", () => {
+      const merged = mergeCheckpoint(stored, {
+        step: MigrationCheckpoint.BalancesOverview,
+        custodialAccountId: "owner-2",
+        expectedReceiveSats: 500,
+      })
+
+      expect(merged.expectedReceiveSats).toBe(500)
+    })
+
+    it("keeps the provisioned account id across steps for one owner", () => {
+      const merged = mergeCheckpoint(
+        { ...stored, accountId: "sc-account-1" },
+        { step: MigrationCheckpoint.BackupMethod, custodialAccountId: "owner-1" },
+      )
+
+      expect(merged.accountId).toBe("sc-account-1")
+      expect(merged.step).toBe(MigrationCheckpoint.BackupMethod)
+    })
+
+    it("drops the provisioned account id for a different owner", () => {
+      const merged = mergeCheckpoint(
+        { ...stored, accountId: "sc-account-1" },
+        { step: MigrationCheckpoint.BackupMethod, custodialAccountId: "owner-2" },
+      )
+
+      expect(merged.accountId).toBeUndefined()
+    })
+
+    /** A record written before owners existed is claimed by whoever saves onto it. */
+    it("lets an ownerless record be claimed by the first owner to save", () => {
+      const merged = mergeCheckpoint(
+        { step: MigrationCheckpoint.BalancesOverview, savedAt: 1, accountId: "sc-1" },
+        { step: MigrationCheckpoint.BalancesOverview, custodialAccountId: "owner-1" },
+      )
+
+      expect(merged.accountId).toBe("sc-1")
+      expect(merged.custodialAccountId).toBe("owner-1")
     })
   })
 

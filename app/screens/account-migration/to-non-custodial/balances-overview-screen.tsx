@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from "react"
+import React, { useCallback, useEffect, useRef, useState } from "react"
 import { ActivityIndicator, ScrollView, View } from "react-native"
 import { useFocusEffect, useIsFocused, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
@@ -104,10 +104,33 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
    *  re-saves the checkpoint the migration just cleared, and on ready figures so it is
    *  never recorded before the commit point exists. */
   const expectedReceiveSats = preview.expectedReceiveSats
+
+  /** Nothing has left the custodial wallet in either of these phases, so the preview this
+   *  screen just read is the truth about a balance that may well have changed since an
+   *  earlier visit. Once the server is TRANSFERRING or past it, the same read would be a
+   *  post-drain zero, and replacing a good figure with it is precisely #4102. */
+  const isBeforeDrain =
+    migrationStatus === MigrationStatus.NotStarted ||
+    migrationStatus === MigrationStatus.InProgress
+
+  /** A checkpoint that never reached storage leaves the receive gate with no figure to wait
+   *  for, so Approve — the point of no return — stays off until the write is known to have
+   *  landed. Mirrors `accept-t-and-c`, which gates its own advance on the same boolean. */
+  const [hasSavedCheckpoint, setHasSavedCheckpoint] = useState(false)
+
   useEffect(() => {
     if (!isFocused || checkpointLoading || expectedReceiveSats === null) return
-    saveCheckpoint(MigrationCheckpoint.BalancesOverview, { expectedReceiveSats })
-  }, [isFocused, checkpointLoading, expectedReceiveSats, saveCheckpoint])
+    let isActive = true
+    saveCheckpoint(MigrationCheckpoint.BalancesOverview, {
+      expectedReceiveSats,
+      replaceExpectedReceiveSats: isBeforeDrain,
+    }).then((isSaved) => {
+      if (isActive) setHasSavedCheckpoint(isSaved)
+    })
+    return () => {
+      isActive = false
+    }
+  }, [isFocused, checkpointLoading, expectedReceiveSats, isBeforeDrain, saveCheckpoint])
 
   /**
    * The ways this screen ends without an Approve to offer, as one value: the preview
@@ -189,7 +212,10 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
    *  confirmed one exists and the lightning address has moved, not merely until the
    *  figures render. */
   const isApproveDisabled =
-    !preview.isReady || !migrationStart.isStarted || !lnAddressTransfer.isTransferred
+    !preview.isReady ||
+    !migrationStart.isStarted ||
+    !lnAddressTransfer.isTransferred ||
+    !hasSavedCheckpoint
 
   return (
     <Screen preset="fixed" headerShown={false}>

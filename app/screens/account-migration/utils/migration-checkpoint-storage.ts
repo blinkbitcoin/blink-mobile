@@ -121,6 +121,13 @@ export type CheckpointUpdate = {
   accountId?: string
   custodialAccountId?: string
   expectedReceiveSats?: number
+  /**
+   * Lets this update's figure replace a stored one. Set only by the commit screen, and only
+   * while the server says nothing has been drained yet — that is the whole safety condition,
+   * because a figure read after the drain is a zero that means "balance already moved", not
+   * "nothing is coming". Every other save leaves it unset and inherits.
+   */
+  replaceExpectedReceiveSats?: boolean
 }
 
 /**
@@ -137,12 +144,15 @@ export const mergeCheckpoint = (
     existing?.custodialAccountId === undefined ||
     existing.custodialAccountId === update.custodialAccountId
 
-  /** Write-once for one owner's flow: the figure is only knowable before the drain, so a
-   *  re-entered commit screen would carry the post-drain zero the gate reads as "nothing
-   *  will ever arrive" and swap while the funds are still in transit (#4102). */
-  const inheritedExpectedReceiveSats = hasSameOwner
-    ? existing?.expectedReceiveSats
-    : undefined
+  /** The stored figure wins by default, because a re-entered commit screen would otherwise
+   *  carry the post-drain zero the gate reads as "nothing will ever arrive" and swap while
+   *  the funds are still in transit (#4102). The exception is a caller that has established
+   *  the drain has not started, whose figure is the fresher reading of the same balance —
+   *  without it a zero captured while the balance was dust would outlive a later top-up. */
+  const inheritedExpectedReceiveSats =
+    hasSameOwner && !update.replaceExpectedReceiveSats
+      ? existing?.expectedReceiveSats
+      : undefined
 
   return {
     step: update.step,

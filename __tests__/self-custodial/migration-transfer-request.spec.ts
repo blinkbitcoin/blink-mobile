@@ -301,11 +301,12 @@ describe("buildMigrationTransferRequest", () => {
 describe("checkMigrationReceiveLanded", () => {
   const mockGetInfo = jest.fn()
 
-  const check = () =>
+  const check = (expectedReceiveSats: number | null = null) =>
     checkMigrationReceiveLanded({
       accountId: "sc-account-1",
       network: Network.Regtest,
       leewaySatPerVbyte: 1,
+      expectedReceiveSats,
     })
 
   beforeEach(() => {
@@ -339,6 +340,57 @@ describe("checkMigrationReceiveLanded", () => {
     expect(result).toEqual({
       status: MigrationSdkStatus.Ok,
       value: { hasReceived: false, balanceSats: 0 },
+    })
+  })
+
+  /** A wallet reused from an abandoned run can already hold sats, so a balance that has not
+   *  reached the previewed figure is not this migration's payment. */
+  it("does not confirm a balance short of the expected receive", async () => {
+    mockGetInfo.mockResolvedValue({ balanceSats: BigInt(500) })
+
+    const result = await check(21000)
+
+    expect(result).toEqual({
+      status: MigrationSdkStatus.Ok,
+      value: { hasReceived: false, balanceSats: 500 },
+    })
+  })
+
+  it("confirms once the balance reaches the expected receive", async () => {
+    mockGetInfo.mockResolvedValue({ balanceSats: BigInt(21000) })
+
+    const result = await check(21000)
+
+    expect(result).toEqual({
+      status: MigrationSdkStatus.Ok,
+      value: { hasReceived: true, balanceSats: 21000 },
+    })
+  })
+
+  /** The comparison is a floor, not an equality: a wallet holding more than the figure has
+   *  certainly received it. */
+  it("confirms a balance above the expected receive", async () => {
+    mockGetInfo.mockResolvedValue({ balanceSats: BigInt(30000) })
+
+    const result = await check(21000)
+
+    expect(result).toMatchObject({
+      status: MigrationSdkStatus.Ok,
+      value: { hasReceived: true },
+    })
+  })
+
+  /** Checkpoints written before the figure was persisted have nothing to measure against,
+   *  so they keep the original any-balance rule rather than waiting on a number they never
+   *  recorded. */
+  it("falls back to any positive balance when no figure was recorded", async () => {
+    mockGetInfo.mockResolvedValue({ balanceSats: BigInt(1) })
+
+    const result = await check(null)
+
+    expect(result).toEqual({
+      status: MigrationSdkStatus.Ok,
+      value: { hasReceived: true, balanceSats: 1 },
     })
   })
 

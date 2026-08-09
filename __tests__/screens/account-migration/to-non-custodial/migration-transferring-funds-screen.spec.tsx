@@ -395,4 +395,78 @@ describe("MigrationTransferringFundsScreen", () => {
       routes: [{ name: "selfCustodialBackupSuccess", params: { reBackup: false } }],
     })
   })
+
+  /**
+   * Past the notice window the handover happens on its own rather than waiting for the user
+   * to notice a secondary button — which on the resume-less path they may never do.
+   */
+  it("hands over to support by itself once the receive is delayed", async () => {
+    mockIsReceiveDelayed = true
+    renderScreen()
+    await flushEffects()
+
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
+      reason: MigrationSupportReason.ReceiveDelayed,
+      origin: "receive-delayed",
+    })
+  })
+
+  it("does not hand over while the wait is still inside the notice window", async () => {
+    renderScreen()
+    await flushEffects()
+
+    expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  /** A lost connection explains the wait better, and its retry is the more useful footer,
+   *  so the automatic handover yields to it exactly as the notice does. */
+  it("does not hand over while a recoverable issue owns the screen", async () => {
+    mockIsReceiveDelayed = true
+    mockHasConnectionIssue = true
+    renderScreen()
+    await flushEffects()
+
+    expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  /** Returning from support to watch the wait out must not be undone on the next render. */
+  it("hands over once however often it re-renders", async () => {
+    mockIsReceiveDelayed = true
+    const { rerender } = renderScreen()
+    await flushEffects()
+    rerender(
+      <ContextForScreen>
+        <MigrationTransferringFundsScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    expect(mockNavigate).toHaveBeenCalledTimes(1)
+  })
+
+  /**
+   * The whole argument for handing over automatically: this screen stays mounted underneath
+   * and the gate keeps polling, so a receive that lands afterwards still completes the swap.
+   * The handover explains the wait, it does not abandon it.
+   */
+  it("still completes the swap when the receive lands after the handover", async () => {
+    mockIsReceiveDelayed = true
+    const { rerender } = renderScreen()
+    await flushEffects()
+    expect(mockNavigate).toHaveBeenCalledTimes(1)
+
+    mockIsTransferred = true
+    rerender(
+      <ContextForScreen>
+        <MigrationTransferringFundsScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    expect(mockCompleteMigration).toHaveBeenCalledTimes(1)
+    expect(mockReset).toHaveBeenCalledWith({
+      index: 0,
+      routes: [{ name: "selfCustodialBackupSuccess", params: { reBackup: false } }],
+    })
+  })
 })

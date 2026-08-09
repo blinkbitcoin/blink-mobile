@@ -31,7 +31,18 @@ const mockNavigate = jest.fn()
 const mockGoBack = jest.fn()
 const mockSetOptions = jest.fn()
 const mockRemoveListener = jest.fn()
-type BeforeRemoveListener = (event: { preventDefault: () => void }) => void
+type BeforeRemoveEvent = {
+  preventDefault: () => void
+  data: { action: { type: string } }
+}
+type BeforeRemoveListener = (event: BeforeRemoveEvent) => void
+
+/** The listener only redirects a back press now, so every existing case has to say which
+ *  action is removing the screen. */
+const backEvent = (preventDefault = jest.fn()): BeforeRemoveEvent => ({
+  preventDefault,
+  data: { action: { type: "GO_BACK" } },
+})
 const mockAddListener = jest.fn(
   (_event: string, _listener: BeforeRemoveListener) => mockRemoveListener,
 )
@@ -141,9 +152,41 @@ describe("MigrationContactSupportScreen", () => {
 
     const [event, listener] = mockAddListener.mock.calls.at(-1) ?? []
     const preventDefault = jest.fn()
-    listener?.({ preventDefault })
+    listener?.(backEvent(preventDefault))
 
     expect(event).toBe("beforeRemove")
+    expect(preventDefault).toHaveBeenCalledTimes(1)
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationBalancesOverview")
+  })
+
+  /**
+   * `beforeRemove` fires for every action that drops this route, not only a back press, so
+   * without narrowing the guard a logout — or the 401 handler, or the migration blocker
+   * arming — would be cancelled and the user bounced back into the flow they were trying
+   * to leave.
+   */
+  it("lets a reset through instead of redirecting it", async () => {
+    renderScreen()
+    await flushEffects()
+
+    const listener = mockAddListener.mock.calls.at(-1)?.[1]
+    const preventDefault = jest.fn()
+    listener?.({ preventDefault, data: { action: { type: "RESET" } } })
+
+    expect(preventDefault).not.toHaveBeenCalled()
+    expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  /** The native stack header and the iOS swipe dispatch POP rather than GO_BACK depending
+   *  on the path, so both count as the back press this screen redirects. */
+  it("redirects a POP the same way as a GO_BACK", async () => {
+    renderScreen()
+    await flushEffects()
+
+    const listener = mockAddListener.mock.calls.at(-1)?.[1]
+    const preventDefault = jest.fn()
+    listener?.({ preventDefault, data: { action: { type: "POP" } } })
+
     expect(preventDefault).toHaveBeenCalledTimes(1)
     expect(mockNavigate).toHaveBeenCalledWith("accountMigrationBalancesOverview")
   })
@@ -155,10 +198,10 @@ describe("MigrationContactSupportScreen", () => {
     await flushEffects()
 
     const listener = mockAddListener.mock.calls.at(-1)?.[1]
-    listener?.({ preventDefault: jest.fn() })
+    listener?.(backEvent())
 
     const preventDefault = jest.fn()
-    listener?.({ preventDefault })
+    listener?.(backEvent(preventDefault))
 
     expect(preventDefault).not.toHaveBeenCalled()
     expect(mockNavigate).toHaveBeenCalledTimes(1)

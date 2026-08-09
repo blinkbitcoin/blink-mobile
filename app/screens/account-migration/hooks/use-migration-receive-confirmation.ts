@@ -18,6 +18,9 @@ const RECEIVE_CHECK_RETRY_MS = 5000
  *  rest of the session. */
 const DELAYED_RECEIVE_CHECK_RETRY_MS = 30_000
 
+/** Two settled readings, not one, before a missing key is treated as permanent. */
+const NO_MNEMONIC_READINGS_BEFORE_TERMINAL = 2
+
 type UseMigrationReceiveConfirmationArgs = {
   selfCustodialAccountId: string | null
   /**
@@ -34,6 +37,13 @@ type UseMigrationReceiveConfirmationArgs = {
 type UseMigrationReceiveConfirmation = {
   isReceiveConfirmed: boolean
   isReceiveDelayed: boolean
+  /**
+   * The wallet's key is gone from this device, so no amount of waiting produces a receive.
+   * Kept separate from a confirmation on purpose: confirming would release a swap that
+   * discards the working custodial session for a wallet nobody can open. The caller owns
+   * what to do with it — this gate only reports that waiting is pointless.
+   */
+  isReceiveUnrecoverable: boolean
 }
 
 /**
@@ -61,6 +71,7 @@ export const useMigrationReceiveConfirmation = ({
   } = useRemoteConfig()
   const [isReceiveConfirmed, setIsReceiveConfirmed] = useState(false)
   const [isReceiveDelayed, setIsReceiveDelayed] = useState(false)
+  const [isReceiveUnrecoverable, setIsReceiveUnrecoverable] = useState(false)
 
   /** A zero-receive migration (balance at or under an uncovered fee) gets no payment, so
    *  the gate opens without ever touching the SDK; waiting would strand the user forever. */
@@ -84,6 +95,12 @@ export const useMigrationReceiveConfirmation = ({
   /** Mirrors the state for the polling effect, which outlives the flip and must read the
    *  current cadence without re-arming (a re-armed effect fires an extra check at once). */
   const isReceiveDelayedRef = useRef(false)
+
+  /** A missing key is only called unrecoverable once it has settled that way twice running.
+   *  One reading is not enough: a keystore that is briefly unavailable (a locked device)
+   *  can answer the same way as one whose entry is truly gone, and the handover this
+   *  ultimately triggers is not something to raise on a blip. */
+  const consecutiveNoMnemonicRef = useRef(0)
 
   useEffect(() => {
     if (!isWatching || selfCustodialAccountId === null) return
@@ -112,6 +129,7 @@ export const useMigrationReceiveConfirmation = ({
           accountId,
           network,
           leewaySatPerVbyte: selfCustodialDepositClaimLeewayVbyte,
+          expectedReceiveSats,
         })
       } catch (err) {
         /** A keystore read that threw before the SDK result shape existed: transient as
@@ -128,14 +146,25 @@ export const useMigrationReceiveConfirmation = ({
        * confirmation: the swap it would release checks the account index rather than the
        * keystore, so it would discard the working custodial session for a wallet whose key
        * is unrecoverable, leaving the user with neither. Treated as not-landed instead,
-       * which keeps the working session and lets the delayed notice route to support. The
-       * re-read is cheap — it settles before any SDK connection is opened.
+       * which keeps the working session, and raised separately so the caller can hand the
+       * user over rather than leave them waiting on a receive that cannot arrive. Polling
+       * continues: if the reading was a blip, a later check clears it. The re-read is cheap
+       * — it settles before any SDK connection is opened.
        */
       if (result.status === MigrationSdkStatus.NoMnemonic) {
+        consecutiveNoMnemonicRef.current += 1
+        if (consecutiveNoMnemonicRef.current >= NO_MNEMONIC_READINGS_BEFORE_TERMINAL) {
+          setIsReceiveUnrecoverable(true)
+        }
         reportOnce(new Error("No mnemonic for the provisioned account"))
         scheduleNextCheck()
         return
       }
+
+      /** Any other settled answer means the keystore was readable, so a previous missing-key
+       *  reading was the blip and not this one. */
+      consecutiveNoMnemonicRef.current = 0
+      setIsReceiveUnrecoverable(false)
 
       if (result.status === MigrationSdkStatus.Ok && result.value.hasReceived) {
         setIsReceiveConfirmed(true)
@@ -155,7 +184,13 @@ export const useMigrationReceiveConfirmation = ({
       isActive = false
       if (timer) clearTimeout(timer)
     }
-  }, [isWatching, selfCustodialAccountId, network, selfCustodialDepositClaimLeewayVbyte])
+  }, [
+    isWatching,
+    selfCustodialAccountId,
+    network,
+    selfCustodialDepositClaimLeewayVbyte,
+    expectedReceiveSats,
+  ])
 
   /** The notice measures the wait for the receive, not the whole transfer: it runs from a
    *  timestamp rather than the effect's own lifetime because both callers recompute `skip`
@@ -196,6 +231,14 @@ export const useMigrationReceiveConfirmation = ({
     isReceiveDelayed:
       !skip &&
       isReceiveDelayed &&
+      !isReceiveConfirmed &&
+      !isConfirmedWithoutWaiting &&
+      !isReleasedByTimeout,
+    /** Masked by a confirmation for the same reason: a receive that landed settles the
+     *  question of whether the key was readable. */
+    isReceiveUnrecoverable:
+      !skip &&
+      isReceiveUnrecoverable &&
       !isReceiveConfirmed &&
       !isConfirmedWithoutWaiting &&
       !isReleasedByTimeout,
