@@ -380,7 +380,9 @@ export const MigrationGate: React.FC = () => {
 
     /** `React.FC` accepts undefined, so a missing arm would otherwise fall out of the
      *  switch and render nothing — a blank gate. Assigning to `never` is what turns that
-     *  into the compile error the comment above promises. */
+     *  into the compile error the comment above promises. Unreachable while the switch is
+     *  exhaustive, which is the point: tsc proves it, so no test can enter it. */
+    /* istanbul ignore next */
     default: {
       const unhandledStep: never = gateStep
       return unhandledStep
