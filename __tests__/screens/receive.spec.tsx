@@ -510,6 +510,24 @@ describe("ReceiveScreen", () => {
       })
     })
 
+    it("offers no New address action — custodial addresses rotate server-side", async () => {
+      render(
+        <ContextForScreen headerShown>
+          <ReceiveScreen />
+        </ContextForScreen>,
+      )
+
+      await flushAsync()
+      await flushAsync()
+
+      fireEvent.press(screen.getByTestId("carousel-page-1"))
+
+      await waitFor(() => {
+        expect(screen.getByText(LL.ReceiveScreen.copyInvoice())).toBeTruthy()
+      })
+      expect(screen.queryByText(LL.ReceiveScreen.newAddress())).toBeNull()
+    })
+
     it("copies onchain address when pressing copy on page 1", async () => {
       render(
         <ContextForScreen headerShown>
