@@ -3777,7 +3777,7 @@
         "apiServiceContactCta": "お問い合わせ",
         "apiServiceContinueCta": "移行を続ける",
         "merchantTools": {
-            "title": "これまでどおり支払いを受け取れます",
+            "title": "ご安心ください",
             "body": "受け取りのためのツールはすべて引き続き使えます。Lightningアドレスを追加するだけです。",
             "cta": "了解しました",
             "terminalTitle": "Blink Terminal",

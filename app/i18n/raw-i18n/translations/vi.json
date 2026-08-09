@@ -3777,7 +3777,7 @@
     "apiServiceContactCta": "Liên hệ với chúng tôi",
     "apiServiceContinueCta": "Tiếp tục chuyển đổi",
     "merchantTools": {
-      "title": "Tiếp tục nhận thanh toán như thường lệ",
+      "title": "Chúng tôi đã lo liệu tất cả",
       "body": "Tất cả công cụ nhận thanh toán vẫn hoạt động. Chỉ cần thêm địa chỉ Lightning của bạn.",
       "cta": "Đã hiểu",
       "terminalTitle": "Blink Terminal",

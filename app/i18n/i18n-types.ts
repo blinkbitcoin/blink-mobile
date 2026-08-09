@@ -12461,7 +12461,7 @@ type RootTranslation = {
 		apiServiceContinueCta: string
 		merchantTools: {
 			/**
-			 * K​e​e​p​ ​g​e​t​t​i​n​g​ ​p​a​i​d​ ​a​s​ ​u​s​u​a​l
+			 * W​e​ ​g​o​t​ ​y​o​u​ ​c​o​v​e​r​e​d
 			 */
 			title: string
 			/**
@@ -25564,7 +25564,7 @@ export type TranslationFunctions = {
 		apiServiceContinueCta: () => LocalizedString
 		merchantTools: {
 			/**
-			 * Keep getting paid as usual
+			 * We got you covered
 			 */
 			title: () => LocalizedString
 			/**
