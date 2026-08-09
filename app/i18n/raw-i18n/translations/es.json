@@ -3711,6 +3711,11 @@
         "contactSupport": {
             "title": "Contacta a soporte",
             "body": "Algo salió mal, pero no te preocupes, tus fondos están seguros. Por favor contacta a soporte para recibir asistencia.\n\nPuede que necesites esta información para ayudar a soporte a resolver tu caso:",
+            "selfHelp": {
+                "title": "Intentémoslo de nuevo",
+                "body": "No te preocupes — tus fondos están seguros. La migración puede tardar unos minutos, y a veces un paso solo necesita empezar de nuevo.\n\nComienza la migración de nuevo — solo tomará un momento.\n\n¿Sigues viendo esta pantalla? Contacta a soporte y comparte los datos de abajo:",
+                "contactSupportCta": "Contacta a soporte"
+            },
             "reasonLabel": "Motivo",
             "accountIdLabel": "ID de cuenta",
             "pubKeyLabel": "pubKey",

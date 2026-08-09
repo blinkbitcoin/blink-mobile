@@ -12625,6 +12625,24 @@ type RootTranslation = {
 		​Y​o​u​ ​m​a​y​ ​n​e​e​d​ ​t​h​i​s​ ​i​n​f​o​r​m​a​t​i​o​n​ ​t​o​ ​h​e​l​p​ ​s​u​p​p​o​r​t​ ​r​e​s​o​l​v​e​ ​y​o​u​r​ ​c​a​s​e​:
 			 */
 			body: string
+			selfHelp: {
+				/**
+				 * L​e​t​'​s​ ​t​r​y​ ​t​h​a​t​ ​a​g​a​i​n
+				 */
+				title: string
+				/**
+				 * D​o​n​'​t​ ​w​o​r​r​y​ ​—​ ​y​o​u​r​ ​f​u​n​d​s​ ​a​r​e​ ​s​a​f​e​.​ ​M​i​g​r​a​t​i​n​g​ ​c​a​n​ ​t​a​k​e​ ​a​ ​f​e​w​ ​m​i​n​u​t​e​s​,​ ​a​n​d​ ​s​o​m​e​t​i​m​e​s​ ​a​ ​s​t​e​p​ ​j​u​s​t​ ​n​e​e​d​s​ ​a​ ​f​r​e​s​h​ ​s​t​a​r​t​.​
+			​
+			​S​t​a​r​t​ ​t​h​e​ ​m​i​g​r​a​t​i​o​n​ ​o​v​e​r​ ​—​ ​i​t​ ​o​n​l​y​ ​t​a​k​e​s​ ​a​ ​m​o​m​e​n​t​.​
+			​
+			​S​t​i​l​l​ ​s​e​e​i​n​g​ ​t​h​i​s​ ​s​c​r​e​e​n​?​ ​C​o​n​t​a​c​t​ ​s​u​p​p​o​r​t​ ​a​n​d​ ​s​h​a​r​e​ ​t​h​e​ ​d​e​t​a​i​l​s​ ​b​e​l​o​w​:
+				 */
+				body: string
+				/**
+				 * C​o​n​t​a​c​t​ ​s​u​p​p​o​r​t
+				 */
+				contactSupportCta: string
+			}
 			/**
 			 * R​e​a​s​o​n
 			 */
@@ -25705,6 +25723,24 @@ export type TranslationFunctions = {
 		You may need this information to help support resolve your case:
 			 */
 			body: () => LocalizedString
+			selfHelp: {
+				/**
+				 * Let's try that again
+				 */
+				title: () => LocalizedString
+				/**
+				 * Don't worry — your funds are safe. Migrating can take a few minutes, and sometimes a step just needs a fresh start.
+		
+			Start the migration over — it only takes a moment.
+		
+			Still seeing this screen? Contact support and share the details below:
+				 */
+				body: () => LocalizedString
+				/**
+				 * Contact support
+				 */
+				contactSupportCta: () => LocalizedString
+			}
 			/**
 			 * Reason
 			 */

@@ -3976,6 +3976,11 @@ const en: BaseTranslation = {
     contactSupport: {
       title: "Contact support",
       body: "Something went wrong but don't worry your funds are safe, please contact support for assistance.\n\nYou may need this information to help support resolve your case:",
+      selfHelp: {
+        title: "Let's try that again",
+        body: "Don't worry — your funds are safe. Migrating can take a few minutes, and sometimes a step just needs a fresh start.\n\nStart the migration over — it only takes a moment.\n\nStill seeing this screen? Contact support and share the details below:",
+        contactSupportCta: "Contact support",
+      },
       reasonLabel: "Reason",
       accountIdLabel: "Account ID",
       pubKeyLabel: "pubKey",

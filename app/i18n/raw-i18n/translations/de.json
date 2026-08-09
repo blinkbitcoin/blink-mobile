@@ -3711,6 +3711,11 @@
         "contactSupport": {
             "title": "Support kontaktieren",
             "body": "Etwas ist schiefgelaufen, aber keine Sorge, dein Guthaben ist sicher. Bitte kontaktiere den Support für Hilfe.\n\nDiese Informationen können dem Support helfen, deinen Fall zu lösen:",
+            "selfHelp": {
+                "title": "Versuchen wir es noch einmal",
+                "body": "Keine Sorge — dein Guthaben ist sicher. Die Migration kann ein paar Minuten dauern, und manchmal braucht ein Schritt einfach einen Neustart.\n\nStarte die Migration noch einmal — das dauert nur einen Moment.\n\nSiehst du diesen Bildschirm immer noch? Kontaktiere den Support und teile die folgenden Daten:",
+                "contactSupportCta": "Support kontaktieren"
+            },
             "reasonLabel": "Grund",
             "accountIdLabel": "Konto-ID",
             "pubKeyLabel": "pubKey",

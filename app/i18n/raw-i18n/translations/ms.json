@@ -3711,6 +3711,11 @@
     "contactSupport": {
       "title": "Hubungi sokongan",
       "body": "Sesuatu telah berlaku, tetapi jangan risau, dana anda selamat. Sila hubungi sokongan untuk mendapatkan bantuan.\n\nAnda mungkin memerlukan maklumat ini untuk membantu sokongan menyelesaikan kes anda:",
+      "selfHelp": {
+        "title": "Mari cuba lagi",
+        "body": "Jangan risau — dana anda selamat. Pemindahan mungkin mengambil masa beberapa minit, dan kadangkala satu langkah hanya perlu dimulakan semula.\n\nMulakan pemindahan sekali lagi — ia hanya mengambil masa sebentar.\n\nMasih melihat skrin ini? Hubungi sokongan dan kongsikan maklumat di bawah:",
+        "contactSupportCta": "Hubungi sokongan"
+      },
       "reasonLabel": "Sebab",
       "accountIdLabel": "ID akaun",
       "pubKeyLabel": "pubKey",

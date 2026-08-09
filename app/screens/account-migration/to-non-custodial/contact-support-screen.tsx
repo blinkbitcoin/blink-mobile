@@ -3,6 +3,7 @@ import { ScrollView, View } from "react-native"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { IconNamesType } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
@@ -18,8 +19,29 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useHardwareBackGuard } from "@app/screens/account-migration/hooks"
 /** Deep import on purpose: its device-location chain stays out of the hooks barrel. */
 import { useMigrationSupportEmail } from "@app/screens/account-migration/hooks/use-migration-support-email"
-import { MigrationSupportOrigin, MigrationSupportReason } from "@app/types/migration"
+import {
+  MigrationSupportOrigin,
+  MigrationSupportReason,
+  RESTART_RESOLVABLE_REASONS,
+} from "@app/types/migration"
 import { testProps } from "@app/utils/testProps"
+
+/** One footer control. The house pattern is a primary with a single secondary underneath,
+ *  so each variant names exactly two. */
+type SupportAction = {
+  title: string
+  onPress: () => void
+  testID: string
+}
+
+/** The hero and both footer controls of one variant, chosen together. */
+type SupportVariant = {
+  icon: IconNamesType
+  title: string
+  body: string
+  primary: SupportAction
+  secondary: SupportAction
+}
 
 /**
  * The migration failure and help screen: funds are safe, but the transfer needs support
@@ -31,6 +53,14 @@ import { testProps } from "@app/utils/testProps"
  * control and the hardware back return to the commit point (Step 8) when support was opened
  * mid-migration, or dismiss the screen when it was opened by the completed-migration resume
  * handover; the visible control covers iOS, which has no hardware back.
+ *
+ * Restart-resolvable refusals (#4098) get a self-help variant instead of the support-first
+ * copy: the primary control retries the migration in place and Contact support drops to the
+ * secondary as the still-stuck fallback. The retry replaces the force-quit the copy used to
+ * ask for — an instruction many users cannot follow — and clears the same in-memory latch a
+ * relaunch would. The diagnostics card and its copy control stay identical across variants so
+ * support still gets the full block either way; only the address-as-copy-control is dropped
+ * in self-help, since the footer takes one primary and one secondary, not three.
  */
 export const MigrationContactSupportScreen: React.FC = () => {
   const { LL } = useI18nContext()
@@ -48,6 +78,7 @@ export const MigrationContactSupportScreen: React.FC = () => {
   /** Callers must pass a reason, but a navigation-state restore can land here with none;
    *  a named fallback keeps the ticket meaningful instead of crashing on a missing param. */
   const reason = params?.reason ?? MigrationSupportReason.Unknown
+  const isSelfHelp = RESTART_RESOLVABLE_REASONS.has(reason)
   const { cardDetails, supportDetailsText, sendSupportEmail } =
     useMigrationSupportEmail(reason)
 
@@ -105,8 +136,9 @@ export const MigrationContactSupportScreen: React.FC = () => {
   useEffect(() => {
     if (!isBackToCommitScreen) return
     return navigation.addListener("beforeRemove", (event) => {
-      /** The redirect removes this screen too; letting that second pass through is what
-       *  ends the interception instead of looping on it. */
+      /** The redirect removes this screen too, as does the self-help retry below; letting a
+       *  removal we asked for pass through is what ends the interception instead of looping
+       *  on it, or hijacking the retry into a navigate back to the refusal. */
       if (isRedirectingBackRef.current) return
       event.preventDefault()
       isRedirectingBackRef.current = true
@@ -129,32 +161,85 @@ export const MigrationContactSupportScreen: React.FC = () => {
     copyToClipboard({ content: supportDetailsText })
   }, [copyToClipboard, supportDetailsText])
 
+  /**
+   * Retries a refused start without asking the user to force-quit. What blocks a second
+   * attempt is only in-memory: the commit screen holds the start latch and its settled
+   * refusal, and it stays mounted underneath, re-routing here on every focus. Resetting the
+   * stack unmounts it, so the entry dispatcher runs again and the screen it lands on fires a
+   * fresh migrationStart — the same effect a relaunch has, minus the force-quit. The
+   * dispatcher is the target rather than a migration screen because it owns the
+   * resume-vs-fresh decision and the self-custodial kill-switch; Primary stays underneath so
+   * the user is not stranded in a flow with nothing behind it.
+   *
+   * The reset removes this screen, which the commit-origin back interception above would
+   * otherwise catch and turn into a navigate to the commit point — landing the user back on
+   * the screen still holding the refusal. Claiming the redirect ref first marks this removal
+   * as one we asked for, so it passes through.
+   */
+  const retryMigration = useCallback(() => {
+    isRedirectingBackRef.current = true
+    navigation.reset({
+      index: 1,
+      routes: [{ name: "Primary" }, { name: "accountMigrationEntry" }],
+    })
+  }, [navigation])
+
+  /**
+   * The variants are complete alternatives — hero and both footer controls switch together,
+   * so the choice is made once here rather than per-prop in the JSX. Self-help leads with the
+   * retry and keeps support as the secondary; the support-first variant keeps its established
+   * footer, where the secondary is the address as a copy control.
+   */
+  const variant: SupportVariant = isSelfHelp
+    ? {
+        icon: "refresh",
+        title: LLSupport.selfHelp.title(),
+        body: LLSupport.selfHelp.body(),
+        primary: {
+          title: LL.common.tryAgain(),
+          onPress: retryMigration,
+          testID: "migration-contact-support-retry",
+        },
+        secondary: {
+          title: LLSupport.selfHelp.contactSupportCta(),
+          onPress: sendSupportEmail,
+          testID: "migration-contact-support-cta",
+        },
+      }
+    : {
+        icon: "headset",
+        title: LLSupport.title(),
+        body: LLSupport.body(),
+        primary: {
+          title: LLSupport.contactUsCta(),
+          onPress: sendSupportEmail,
+          testID: "migration-contact-support-cta",
+        },
+        secondary: {
+          title: supportEmailAddress,
+          onPress: copySupportEmail,
+          testID: "migration-contact-support-copy",
+        },
+      }
+
   return (
     <Screen preset="fixed">
       <View style={styles.container}>
         <IconHero
-          icon="headset"
+          icon={variant.icon}
           iconColor={colors.primary}
-          title={LLSupport.title()}
-          subtitle={LLSupport.body()}
+          title={variant.title}
+          subtitle={variant.body}
         />
 
         <ScrollView style={styles.scroll} contentContainerStyle={styles.body}>
           <View style={styles.card}>
-            {cardDetails.map((diagnostic) => {
-              /** Identifiers (account id, pubkey) keep the larger value font; the rest use
-               *  the smaller one. Every value renders complete, wrapping as needed, because
-               *  support needs the whole string, never a truncated one. */
-              const valueStyle = diagnostic.isIdentifier
-                ? styles.value
-                : [styles.value, styles.smallValue]
-              return (
-                <View key={diagnostic.label} style={styles.row}>
-                  <Text style={styles.label}>{diagnostic.label}</Text>
-                  <Text style={valueStyle}>{diagnostic.value}</Text>
-                </View>
-              )
-            })}
+            {cardDetails.map((diagnostic) => (
+              <View key={diagnostic.label} style={styles.row}>
+                <Text style={styles.label}>{diagnostic.label}</Text>
+                <Text style={styles.value}>{diagnostic.value}</Text>
+              </View>
+            ))}
           </View>
 
           <IconTextButton
@@ -166,14 +251,14 @@ export const MigrationContactSupportScreen: React.FC = () => {
 
         <View style={styles.buttonsContainer}>
           <GaloyPrimaryButton
-            title={LLSupport.contactUsCta()}
-            onPress={sendSupportEmail}
-            {...testProps("migration-contact-support-cta")}
+            title={variant.primary.title}
+            onPress={variant.primary.onPress}
+            {...testProps(variant.primary.testID)}
           />
           <GaloySecondaryButton
-            title={supportEmailAddress}
-            onPress={copySupportEmail}
-            {...testProps("migration-contact-support-copy")}
+            title={variant.secondary.title}
+            onPress={variant.secondary.onPress}
+            {...testProps(variant.secondary.testID)}
           />
         </View>
       </View>
@@ -214,18 +299,16 @@ const useStyles = makeStyles(({ colors }) => ({
     fontWeight: "400",
     lineHeight: 22,
   },
+  /** No numberOfLines: every value renders complete, wrapping as needed, because support
+   *  needs the whole string (account id, pubkey), never a truncated one. */
   value: {
     color: colors.black,
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: "Source Sans Pro",
     fontWeight: "700",
-    lineHeight: 22,
+    lineHeight: 20,
     textAlign: "right",
     maxWidth: 200,
-  },
-  smallValue: {
-    fontSize: 14,
-    lineHeight: 20,
   },
   buttonsContainer: {
     gap: 10,

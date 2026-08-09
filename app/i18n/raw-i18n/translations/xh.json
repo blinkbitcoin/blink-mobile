@@ -3711,6 +3711,11 @@
     "contactSupport": {
       "title": "Qhagamshelana nenkxaso",
       "body": "Kukho into engahambanga kakuhle, kodwa ungakhathazeki, imali yakho ikhuselekile. Nceda uqhagamshelane nenkxaso ukuze ufumane uncedo.\n\nUsenokufuna olu lwazi ukunceda inkxaso isombulule ityala lakho:",
+      "selfHelp": {
+        "title": "Masizame kwakhona",
+        "body": "Ungakhathazeki — imali yakho ikhuselekile. Ufuduko lunokuthatha imizuzu embalwa, kwaye ngamanye amaxesha inyathelo lifuna nje ukuqala kwakhona.\n\nQala ufuduko kwakhona — kuthatha umzuzwana nje.\n\nUsayibona esi sikrini? Qhagamshelana nenkxaso wabelane ngeenkcukacha ezingezantsi:",
+        "contactSupportCta": "Qhagamshelana nenkxaso"
+      },
       "reasonLabel": "Isizathu",
       "accountIdLabel": "I-ID yeakhawunti",
       "pubKeyLabel": "pubKey",

@@ -48,6 +48,27 @@ export type MigrationSupportReason =
   (typeof MigrationSupportReason)[keyof typeof MigrationSupportReason]
 
 /**
+ * Reasons worth telling the user to restart the app for, rather than leading with support.
+ * The start latch is in-memory only, so a relaunch sends a fresh `migrationStart`: a refusal
+ * that was transient (a state conflict, a dollar balance the gate now asks them to empty)
+ * clears itself, and the user starts the migration again from the intro. Nothing resumes on
+ * its own — the gate's resume path needs a server-side lock, which a refused start never
+ * armed.
+ *
+ * Only a SUBSET of `start-refused` is actually restart-resolvable: the backend maps its
+ * permanent rejections (a cohort exclusion) onto the same MIGRATION_STATE_CONFLICT code as a
+ * transient conflict, so the client cannot tell them apart. Those users spend one restart
+ * before the copy's "still seeing this screen?" line sends them to support, which is the
+ * accepted trade-off for deflecting the transient majority. A distinct backend code for
+ * permanent refusals would let them keep the support-first copy.
+ *
+ * Lives next to the taxonomy so adding a reason above is decided in the same place.
+ */
+export const RESTART_RESOLVABLE_REASONS: ReadonlySet<MigrationSupportReason> = new Set([
+  MigrationSupportReason.StartRefused,
+])
+
+/**
  * Where the support screen was opened from, which decides its Back target. The commit flow
  * has the commit point (Step 8) underneath, so Back returns there, skipping the
  * back-swallowing transfer screen. The resume handover is pushed from the root navigator

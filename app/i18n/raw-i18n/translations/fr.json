@@ -3711,6 +3711,11 @@
         "contactSupport": {
             "title": "Contacter le support",
             "body": "Une erreur s'est produite, mais ne vous inquiétez pas, vos fonds sont en sécurité. Veuillez contacter le support pour obtenir de l'aide.\n\nCes informations peuvent aider le support à résoudre votre cas :",
+            "selfHelp": {
+                "title": "Réessayons",
+                "body": "Ne vous inquiétez pas — vos fonds sont en sécurité. La migration peut prendre quelques minutes, et parfois une étape a simplement besoin d'un nouveau départ.\n\nRecommencez la migration — cela ne prend qu'un instant.\n\nCet écran s'affiche toujours ? Contactez le support et partagez les informations ci-dessous :",
+                "contactSupportCta": "Contacter le support"
+            },
             "reasonLabel": "Motif",
             "accountIdLabel": "ID du compte",
             "pubKeyLabel": "pubKey",

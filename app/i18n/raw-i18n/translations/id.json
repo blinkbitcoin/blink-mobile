@@ -3711,6 +3711,11 @@
     "contactSupport": {
       "title": "Hubungi dukungan",
       "body": "Terjadi kesalahan, tetapi jangan khawatir, dana Anda aman. Silakan hubungi dukungan untuk mendapatkan bantuan.\n\nAnda mungkin memerlukan informasi ini untuk membantu dukungan menyelesaikan kasus Anda:",
+      "selfHelp": {
+        "title": "Mari coba lagi",
+        "body": "Jangan khawatir — dana Anda aman. Migrasi bisa memakan waktu beberapa menit, dan terkadang satu langkah hanya perlu dimulai ulang.\n\nMulai migrasi dari awal — hanya perlu sebentar.\n\nMasih melihat layar ini? Hubungi dukungan dan bagikan detail di bawah ini:",
+        "contactSupportCta": "Hubungi dukungan"
+      },
       "reasonLabel": "Alasan",
       "accountIdLabel": "ID akun",
       "pubKeyLabel": "pubKey",
