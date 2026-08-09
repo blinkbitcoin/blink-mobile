@@ -246,6 +246,16 @@ if [ -f "$SESSION_DIR/golden-stamp" ]; then
       echo "# golden verdict: NATIVE BUILD STALE - ios/Podfile.lock changed since the bless; install a fresh build onto this clone, or re-bless the golden"
     fi
   fi
+  # The baked Maestro driver is version-locked: after a CLI upgrade it
+  # silently re-installs mid-recording and the ~20s warmup tax returns with
+  # no explanation - so say so here, where the session starts.
+  STAMP_MAESTRO=$(grep '^maestro-version=' "$SESSION_DIR/golden-stamp" 2>/dev/null | cut -d= -f2- || true)
+  if [ -n "$STAMP_MAESTRO" ] && command -v maestro >/dev/null 2>&1; then
+    CURRENT_MAESTRO=$(maestro --version 2>/dev/null | head -1 || true)
+    if [ -n "$CURRENT_MAESTRO" ] && [ "$CURRENT_MAESTRO" != "$STAMP_MAESTRO" ]; then
+      echo "# golden note: maestro upgraded since the bless ($STAMP_MAESTRO -> $CURRENT_MAESTRO) - the baked driver will re-install on first recording; re-bless to restore the warmup skip"
+    fi
+  fi
 fi
 
 # Fail-fast credential report: flows that need a real account (a staging login

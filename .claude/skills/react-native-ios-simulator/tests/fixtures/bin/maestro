@@ -1,0 +1,15 @@
+#!/bin/bash
+# Fake `maestro` for the simulator-skill tests: bless-golden.sh bakes the
+# driver by running the warmup flow, and claim-session.sh compares stamped
+# vs current CLI versions. Logs to the shared args log; FAKE_MAESTRO_VERSION
+# lets the version-mismatch tests script an upgrade.
+
+set -uo pipefail
+
+echo "maestro $*" >> "${FAKE_ARGS_LOG:-/dev/null}"
+
+case "${1:-}" in
+  test) exit "${FAKE_MAESTRO_RC:-0}" ;;
+  --version) echo "${FAKE_MAESTRO_VERSION:-2.6.1}" ;;
+  *) echo "fake maestro: unsupported subcommand '${1:-}'" >&2; exit 64 ;;
+esac

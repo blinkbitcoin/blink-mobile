@@ -254,12 +254,16 @@ eval "$("$SKILL/scripts/claim-session.sh" 3712)"
 ```
 
 `bless-golden.sh` verifies the device is this session's (same ownership gate as
-release), stops the session's Metro, shuts the device down, renames it to
-`${DEMO_SIM_PREFIX:-rn-demo}-golden` (swapping out and deleting any previous
-golden — exactly one device ever carries the name), writes a stamp
-(`sha`/`date`/`device-type`/`runtime`), and adopts the session: port freed,
-manifest gone, nothing left to release. Both the swap and claim's clone run
-under a shared lock, so a clone can never race a re-bless.
+release), stops the session's Metro, **bakes the Maestro driver** (runs the
+videos skill's warm-up once, so every clone skips the ~20s per-recording
+warm-up; needs `DEMO_APP_ID_IOS` and maestro on PATH), shuts the device down,
+renames it to `${DEMO_SIM_PREFIX:-rn-demo}-golden` (swapping out and deleting
+any previous golden — exactly one device ever carries the name), writes a
+stamp (`sha`/`date`/`device-type`/`runtime`/`maestro-version`), and adopts the
+session: port freed, manifest gone, nothing left to release. Both the swap and
+claim's clone run under a shared lock, so a clone can never race a re-bless.
+The driver is version-locked — after a maestro upgrade, claim prints a
+re-bless note and recordings warm up again until someone re-blesses.
 
 **Staleness is judged, not guessed — and mechanically.** Bless hashes the
 build's `ios/Podfile.lock` into the stamp (`--lockfile` overrides the default
@@ -306,7 +310,7 @@ The isolation guarantees are load-bearing for every other agent on this Mac, so
 they are tested rather than asserted:
 
 ```bash
-"$SKILL/tests/run.sh"     # 189 assertions, ~90s, exits non-zero on failure
+"$SKILL/tests/run.sh"     # 197 assertions, ~100s, exits non-zero on failure
 ```
 
 It creates **no real simulators** — a fake `xcrun` goes first on PATH and the

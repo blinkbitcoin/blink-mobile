@@ -737,6 +737,33 @@ check "no note when every required credential is present" "no" \
 "$SCRIPTS/release-session.sh" 721 --delete >/dev/null 2>&1
 unset FAKE_CRED_PRESENT
 
+# --- bless bakes the maestro driver and stamps the CLI version ---------------
+out=$("$SCRIPTS/claim-session.sh" 714) && eval "$out"
+: > "$FAKE_ARGS_LOG"
+DEMO_APP_ID_IOS=com.example.demoapp "$SCRIPTS/bless-golden.sh" 714 --sha warm77 \
+  --lockfile /dev/null >/dev/null 2>&1
+check "bless with maestro available runs the warmup against its own device" "yes" \
+  "$(grep "maestro test" "$FAKE_ARGS_LOG" | grep -q "_warmup.yaml" && echo yes || echo no)"
+check "the stamp records the maestro version" "yes" \
+  "$(grep -q '^maestro-version=2.6.1' "$GOLDEN_STAMP" && echo yes || echo no)"
+
+out=$("$SCRIPTS/claim-session.sh" 715)
+check "a version-matched clone gets no upgrade note" "0" \
+  "$(echo "$out" | grep -c "maestro upgraded")"
+eval "$out"; "$SCRIPTS/release-session.sh" 715 --delete >/dev/null 2>&1
+
+out=$(FAKE_MAESTRO_VERSION=9.9.9 "$SCRIPTS/claim-session.sh" 716)
+check "a maestro upgrade since the bless is called out at claim time" "yes" \
+  "$(echo "$out" | grep -q "maestro upgraded" && echo yes || echo no)"
+eval "$out"; "$SCRIPTS/release-session.sh" 716 --delete >/dev/null 2>&1
+
+# Without an app id the warmup cannot run - the stamp must NOT pretend a
+# driver was baked (record-flow trusts the version line as "warm").
+out=$("$SCRIPTS/claim-session.sh" 717) && eval "$out"
+DEMO_APP_ID_IOS= "$SCRIPTS/bless-golden.sh" 717 --sha warm78 --lockfile /dev/null >/dev/null 2>&1
+check "a bless that could not bake writes no maestro-version line" "0" \
+  "$(grep -c '^maestro-version=' "$GOLDEN_STAMP")"
+
 # --- bless safety gates ------------------------------------------------------
 reset_world
 eval "$("$SCRIPTS/claim-session.sh" 710)" >/dev/null 2>&1

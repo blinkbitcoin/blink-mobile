@@ -28,7 +28,7 @@ export DEMO_APP_ID_ANDROID=com.example.androidapp
 # Redirecting the registry keeps every test span inside $WORK (telemetry
 # derives its store from it).
 export DEMO_SIM_REGISTRY="$WORK/registry"
-unset DEMO_PORT 2>/dev/null || true
+unset DEMO_PORT DEMO_SESSION_DIR DEMO_SKIP_WARMUP 2>/dev/null || true
 
 printf 'DEMO-UDID|rn-demo-pr3712|Booted\n' > "$FAKE_DEVICES"
 printf 'emulator-5554|rn-demo-pr3712-avd|device\n' > "$FAKE_ADB_DEVICES"
@@ -351,6 +351,47 @@ sys.exit(1 if ('clearState' in raw and 'RCT_jsLocation' not in raw) else 0)
 " "$f"
   check "$name never clears state without re-passing the Metro redirect" "0" "$?"
 done
+
+echo
+echo "warmup skip"
+
+# The warmup is a one-time driver install per device per maestro version;
+# these pin the three legitimate skip paths and the one that must NOT skip.
+WSESS="$WORK/warm-session"
+
+reset_logs; rm -rf "$WSESS"; mkdir -p "$WSESS"
+DEMO_SESSION_DIR="$WSESS" DEMO_UDID=DEMO-UDID \
+  "$SCRIPTS/record-flow.sh" warm1 "$WORK/flow.yaml" "$WORK/out" >/dev/null 2>&1
+check "the first recording of a session warms up" "1" \
+  "$(grep -c "_warmup.yaml" "$FAKE_ARGS_LOG")"
+reset_logs
+DEMO_SESSION_DIR="$WSESS" DEMO_UDID=DEMO-UDID \
+  "$SCRIPTS/record-flow.sh" warm2 "$WORK/flow.yaml" "$WORK/out" >/dev/null 2>&1
+check "the second recording in the same session skips it" "0" \
+  "$(grep -c "_warmup.yaml" "$FAKE_ARGS_LOG")"
+
+reset_logs; rm -rf "$WSESS"; mkdir -p "$WSESS"
+echo "maestro-version=2.6.1" > "$WSESS/golden-stamp"
+DEMO_SESSION_DIR="$WSESS" DEMO_UDID=DEMO-UDID \
+  "$SCRIPTS/record-flow.sh" warm3 "$WORK/flow.yaml" "$WORK/out" >/dev/null 2>&1
+check "a clone with a version-matched baked driver skips the warmup" "0" \
+  "$(grep -c "_warmup.yaml" "$FAKE_ARGS_LOG")"
+
+# The driver is version-locked: an upgraded CLI reinstalls it, so a stamped
+# version that no longer matches must warm up - the fake's clone would let a
+# stale skip pass silently otherwise.
+reset_logs; rm -rf "$WSESS"; mkdir -p "$WSESS"
+echo "maestro-version=1.0.0" > "$WSESS/golden-stamp"
+DEMO_SESSION_DIR="$WSESS" DEMO_UDID=DEMO-UDID \
+  "$SCRIPTS/record-flow.sh" warm4 "$WORK/flow.yaml" "$WORK/out" >/dev/null 2>&1
+check "a maestro upgrade voids the baked driver - warmup runs" "1" \
+  "$(grep -c "_warmup.yaml" "$FAKE_ARGS_LOG")"
+
+reset_logs; rm -rf "$WSESS"; mkdir -p "$WSESS"
+DEMO_SKIP_WARMUP=1 DEMO_SESSION_DIR="$WSESS" DEMO_UDID=DEMO-UDID \
+  "$SCRIPTS/record-flow.sh" warm5 "$WORK/flow.yaml" "$WORK/out" >/dev/null 2>&1
+check "the manual DEMO_SKIP_WARMUP override still works" "0" \
+  "$(grep -c "_warmup.yaml" "$FAKE_ARGS_LOG")"
 
 echo
 echo "telemetry"
