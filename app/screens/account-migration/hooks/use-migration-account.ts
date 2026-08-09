@@ -12,7 +12,6 @@ import { resolveReusablePendingAccount } from "../utils/migration-pending-accoun
 
 import { useMigrationCheckpointState } from "./use-migration-checkpoint-state"
 import { usePendingMigrationAccounts } from "./use-pending-migration-accounts"
-import { useSeedMigratedAccountSettings } from "./use-seed-migrated-account-settings"
 
 /** Provisions (without activating) the migration's self-custodial account so the shared
  *  backup screens show its phrase; the id is persisted in the checkpoint for resume.
@@ -30,7 +29,6 @@ export const useMigrationAccount = () => {
   } = usePendingMigrationAccounts()
   const { accounts, loading: registryLoading } = useAccountRegistry()
   const { provision } = useProvisionSelfCustodialAccount()
-  const { seedMigratedSettings } = useSeedMigratedAccountSettings()
   const { LL } = useI18nContext()
   const guard = useInFlightGuard()
   const [isProvisioning, setIsProvisioning] = useState(false)
@@ -49,11 +47,6 @@ export const useMigrationAccount = () => {
     try {
       const created = await guard.run(async () => {
         const newAccountId = reusableAccountId ?? (await provision(savePendingAccount))
-        /** Best-effort: copy the custodial display currency / language / theme onto the
-         *  new account now, while the custodial session and its Apollo cache are still
-         *  live — completion (and its resume path) runs after logout, when the server
-         *  values are unreachable (#4099). */
-        seedMigratedSettings(newAccountId)
         /** The step is the terms screen: resuming may never skip past an unaccepted T&C.
          *  A failed write stops the flow here; the provisioned id survives in the hook's
          *  local state, so retrying resumes it instead of provisioning a second account. */
@@ -79,7 +72,6 @@ export const useMigrationAccount = () => {
     reusableAccountId,
     savePendingAccount,
     saveCheckpoint,
-    seedMigratedSettings,
     LL,
   ])
 

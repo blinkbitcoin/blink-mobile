@@ -44,6 +44,23 @@ jest.mock("@app/screens/account-migration/hooks/use-pending-migration-accounts",
   }),
 }))
 
+const mockReportError = jest.fn()
+
+jest.mock("@app/utils/error-logging", () => ({
+  reportError: (...args: unknown[]) => mockReportError(...args),
+}))
+
+const mockSeedMigratedSettings = jest.fn()
+
+jest.mock(
+  "@app/screens/account-migration/hooks/use-seed-migrated-account-settings",
+  () => ({
+    useSeedMigratedAccountSettings: () => ({
+      seedMigratedSettings: mockSeedMigratedSettings,
+    }),
+  }),
+)
+
 import { useCompleteMigration } from "@app/screens/account-migration/hooks/use-complete-migration"
 
 const complete = async (): Promise<boolean | undefined> => {
@@ -63,6 +80,7 @@ describe("useCompleteMigration", () => {
     mockRegistryLoading = false
     mockCheckpoint = "backupAlerts"
     mockDiscardCustodialSession.mockResolvedValue(undefined)
+    mockSeedMigratedSettings.mockResolvedValue(undefined)
   })
 
   it("does nothing and returns false when no account has been provisioned", async () => {
@@ -109,6 +127,46 @@ describe("useCompleteMigration", () => {
 
     expect(mockSetActiveAccountId).not.toHaveBeenCalled()
     expect(mockClearCheckpoint).not.toHaveBeenCalled()
+  })
+
+  /** Completion is the only moment every path passes through — a resumed run never mounts
+   *  the migration screens — and the discard below it is what makes the custodial values
+   *  unreachable, so the copy has to happen here and in this order (#4099). */
+  it("copies the custodial settings while the session is still live", async () => {
+    await complete()
+
+    expect(mockSeedMigratedSettings).toHaveBeenCalledWith("sc-account-1")
+    expect(mockSeedMigratedSettings.mock.invocationCallOrder[0]).toBeLessThan(
+      mockDiscardCustodialSession.mock.invocationCallOrder[0],
+    )
+  })
+
+  it("completes the migration even when copying the settings fails", async () => {
+    mockSeedMigratedSettings.mockRejectedValue(new Error("settings fetch exploded"))
+
+    expect(await complete()).toBe(true)
+    expect(mockDiscardCustodialSession).toHaveBeenCalledTimes(1)
+    expect(mockSetActiveAccountId).toHaveBeenCalledWith("sc-account-1")
+    expect(mockReportError).toHaveBeenCalledWith(
+      "Migration settings carry-over",
+      expect.any(Error),
+    )
+  })
+
+  it("copies nothing when there is no account to copy onto", async () => {
+    mockAccountId = undefined
+
+    await complete()
+
+    expect(mockSeedMigratedSettings).not.toHaveBeenCalled()
+  })
+
+  it("copies nothing when the provisioned account is gone", async () => {
+    mockAccounts = []
+
+    await complete()
+
+    expect(mockSeedMigratedSettings).not.toHaveBeenCalled()
   })
 
   it("surfaces the migration checkpoint and provisioned account id", () => {
