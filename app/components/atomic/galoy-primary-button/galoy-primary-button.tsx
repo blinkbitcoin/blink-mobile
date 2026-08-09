@@ -29,14 +29,15 @@ const useStyles = makeStyles(({ colors }) => ({
     color: colors.white,
   },
   disabledTitleStyle: {
-    color: colors.grey5,
+    color: colors.grey2,
   },
   buttonStyle: {
     minHeight: 50,
     backgroundColor: colors.primary,
   },
+  // Opaque rather than a translucent primary: `opacity` blends the button with
+  // whatever sits behind it, so content could show through a disabled CTA.
   disabledStyle: {
-    opacity: 0.5,
-    backgroundColor: colors.primary,
+    backgroundColor: colors.grey4,
   },
 }))
