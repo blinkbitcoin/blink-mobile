@@ -199,19 +199,30 @@ type MigrationReceiveCheck = {
 }
 
 /**
- * Whether the migration payment has landed in the provisioned wallet. Any positive
- * balance is the receive: the wallet is provisioned by this flow and never used before
- * the session swap, so nothing else can have funded it. The forced sync is the point of
- * the call — Spark holds an incoming payment for an offline wallet and claims it on
- * sync, so this read is the detector and the actuator in one.
+ * Whether the migration payment has landed in the provisioned wallet. The balance is
+ * measured against what the server said it would send, because a positive balance alone
+ * is not proof: `resolveReusablePendingAccount` hands back a wallet left over from an
+ * earlier abandoned run, and that wallet may already hold sats from a prior partial
+ * receive or a deposit made against a phrase the user wrote down. The forced sync is the
+ * point of the call — Spark holds an incoming payment for an offline wallet and claims it
+ * on sync, so this read is the detector and the actuator in one.
  */
 export const checkMigrationReceiveLanded = (
-  args: MigrationSdkConnectionArgs,
+  args: MigrationSdkConnectionArgs & {
+    /** Null on a checkpoint written before the figure was persisted: there is nothing to
+     *  measure against, so those fall back to the original any-balance rule rather than
+     *  waiting forever on a number they never recorded. */
+    expectedReceiveSats: number | null
+  },
 ): Promise<MigrationSdkResult<MigrationReceiveCheck>> =>
   withMigrationSdk(args, async (sdk) => {
     const info = await sdk.getInfo({ ensureSynced: true })
     const balanceSats = Number(info.balanceSats)
-    return { hasReceived: balanceSats > 0, balanceSats }
+    const hasReceived =
+      args.expectedReceiveSats === null
+        ? balanceSats > 0
+        : balanceSats >= args.expectedReceiveSats
+    return { hasReceived, balanceSats }
   })
 
 /** The two proof fields `migrationLnAddressTransfer` takes; it re-points the lightning

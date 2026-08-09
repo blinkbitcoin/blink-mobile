@@ -188,6 +188,7 @@ const renderScreen = () =>
 
 const resetScreenMocks = () => {
   jest.clearAllMocks()
+  mockSaveCheckpoint.mockResolvedValue(true)
   loadLocale("en")
   mockDollarRestricted = false
   mockCurrentDollarRestricted = false
@@ -668,9 +669,7 @@ describe("MigrationBalancesOverviewScreen", () => {
 
     expect(mockSaveCheckpoint).toHaveBeenCalledWith(
       MigrationCheckpoint.BalancesOverview,
-      {
-        expectedReceiveSats: 990,
-      },
+      expect.objectContaining({ expectedReceiveSats: 990 }),
     )
   })
 
@@ -690,9 +689,7 @@ describe("MigrationBalancesOverviewScreen", () => {
 
     expect(mockSaveCheckpoint).toHaveBeenCalledWith(
       MigrationCheckpoint.BalancesOverview,
-      {
-        expectedReceiveSats: 0,
-      },
+      expect.objectContaining({ expectedReceiveSats: 0 }),
     )
   })
 
@@ -974,5 +971,78 @@ describe("MigrationBalancesOverviewScreen lightning-address re-point gating", ()
     expect(mockUseLnAddressTransfer).not.toHaveBeenCalledWith(
       expect.objectContaining({ skip: false }),
     )
+  })
+})
+
+/**
+ * The receive figure is what the gate waits for, and whether it may be refreshed depends on
+ * whether the server has drained anything yet. Kept in its own block so the main suite stays
+ * within the file's per-function line budget.
+ */
+describe("MigrationBalancesOverviewScreen commit-point checkpoint", () => {
+  beforeEach(resetScreenMocks)
+
+  /**
+   * Nothing has left the custodial wallet in these phases, so this reading is the truth
+   * about a balance that may have changed since an earlier visit — a zero captured while
+   * the balance was dust must not outlive a later top-up.
+   */
+  it("replaces a stale receive figure before the migration has started", async () => {
+    mockMigrationStatus = MigrationStatus.NotStarted
+
+    renderScreen()
+    await flushEffects()
+
+    expect(mockSaveCheckpoint).toHaveBeenCalledWith(
+      MigrationCheckpoint.BalancesOverview,
+      expect.objectContaining({ replaceExpectedReceiveSats: true }),
+    )
+  })
+
+  it("replaces a stale receive figure while the server awaits a destination", async () => {
+    mockMigrationStatus = MigrationStatus.InProgress
+
+    renderScreen()
+    await flushEffects()
+
+    expect(mockSaveCheckpoint).toHaveBeenCalledWith(
+      MigrationCheckpoint.BalancesOverview,
+      expect.objectContaining({ replaceExpectedReceiveSats: true }),
+    )
+  })
+
+  /** Past the drain the same read is a post-drain zero, and letting it overwrite a good
+   *  figure is exactly the swap-before-funds-land of #4102. */
+  it("leaves the stored figure alone once the drain is under way", async () => {
+    mockMigrationStatus = MigrationStatus.Transferring
+
+    renderScreen()
+    await flushEffects()
+
+    expect(mockSaveCheckpoint).toHaveBeenCalledWith(
+      MigrationCheckpoint.BalancesOverview,
+      expect.objectContaining({ replaceExpectedReceiveSats: false }),
+    )
+  })
+
+  /**
+   * The figure is what the receive gate waits for, so committing without it having reached
+   * storage leaves the next screen watching for an amount it never recorded. Approve is the
+   * point of no return, which makes it the right place to stop.
+   */
+  it("keeps Approve off when the checkpoint could not be written", async () => {
+    mockSaveCheckpoint.mockResolvedValue(false)
+
+    const { getByTestId } = renderScreen()
+    await flushEffects()
+
+    expect(getByTestId("migration-balances-overview-approve")).toBeDisabled()
+  })
+
+  it("enables Approve once the checkpoint write lands", async () => {
+    const { getByTestId } = renderScreen()
+    await flushEffects()
+
+    expect(getByTestId("migration-balances-overview-approve")).not.toBeDisabled()
   })
 })

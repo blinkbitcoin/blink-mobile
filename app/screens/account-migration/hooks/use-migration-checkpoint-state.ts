@@ -23,6 +23,9 @@ import { useCustodialOwnerId } from "./use-custodial-owner-id"
 type SaveCheckpointOptions = {
   provisionedAccountId?: string
   expectedReceiveSats?: number
+  /** Only the commit screen sets this, and only before the drain starts — see
+   *  `CheckpointUpdate`. Everything else carries the stored figure forward untouched. */
+  replaceExpectedReceiveSats?: boolean
 }
 
 /**
@@ -103,6 +106,7 @@ export const useMigrationCheckpointState = () => {
       {
         provisionedAccountId,
         expectedReceiveSats: expectedReceiveSatsUpdate,
+        replaceExpectedReceiveSats,
       }: SaveCheckpointOptions = {},
     ): Promise<boolean> => {
       /** Without a resolved owner the checkpoint cannot be keyed, and saving would erase the
@@ -115,6 +119,10 @@ export const useMigrationCheckpointState = () => {
         custodialAccountId: ownerId,
         expectedReceiveSats:
           expectedReceiveSatsUpdate ?? expectedReceiveSats ?? undefined,
+        /** Only meaningful alongside a figure of this call's own: a carry-forward save has
+         *  nothing fresher to offer, so it must never claim the right to replace. */
+        replaceExpectedReceiveSats:
+          replaceExpectedReceiveSats && expectedReceiveSatsUpdate !== undefined,
       }
       setStored((existing) => mergeCheckpoint(existing, update))
       try {

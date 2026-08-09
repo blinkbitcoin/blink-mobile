@@ -28,11 +28,31 @@ const MAX_SWAP_ATTEMPTS = 3
 export const useResumeCompletedMigration = (): void => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const {
+    migrationCheckpoint,
     migrationAccountId,
     migrationExpectedReceiveSats,
     migrationLoading,
     completeMigration,
+    saveCheckpoint,
   } = useCompleteMigration()
+
+  /**
+   * The checkpoint expires 48h after its last write, and the receive gate below has no
+   * bound at all, so a receive that stays unconfirmed for two days would have the record it
+   * depends on deleted underneath it — leaving the provisioned wallet funded, hidden from
+   * the switcher by a pending record that never expires, and no longer resumable. Rewriting
+   * it once per launch keeps the two lifetimes in step, and costs a single storage write on
+   * the launches where a migration is genuinely unfinished. The step is re-sent unchanged
+   * and carries no fresh figure, so nothing but `savedAt` moves.
+   */
+  const hasRefreshedCheckpointRef = useRef(false)
+  useEffect(() => {
+    if (!migrationCheckpoint || migrationLoading || hasRefreshedCheckpointRef.current) {
+      return
+    }
+    hasRefreshedCheckpointRef.current = true
+    saveCheckpoint(migrationCheckpoint)
+  }, [migrationCheckpoint, migrationLoading, saveCheckpoint])
 
   const hasUnfinishedMigration = Boolean(migrationAccountId)
   const { status } = useMigrationStatus({ skip: !hasUnfinishedMigration })
@@ -47,11 +67,12 @@ export const useResumeCompletedMigration = (): void => {
    *  into a wallet whose funds are still in transit either (#4102). Unconfirmed simply
    *  means no swap this session — the custodial session stays intact and the next launch
    *  (or this one, once a check lands) picks the swap back up. */
-  const { isReceiveConfirmed, isReceiveDelayed } = useMigrationReceiveConfirmation({
-    selfCustodialAccountId: migrationAccountId,
-    expectedReceiveSats: migrationExpectedReceiveSats,
-    skip: !isServerCompleted,
-  })
+  const { isReceiveConfirmed, isReceiveDelayed, isReceiveUnrecoverable } =
+    useMigrationReceiveConfirmation({
+      selfCustodialAccountId: migrationAccountId,
+      expectedReceiveSats: migrationExpectedReceiveSats,
+      skip: !isServerCompleted,
+    })
 
   /** This path has no screen of its own to say the wait is unusual, so the crossing is at
    *  least reported: a receive that never lands would otherwise be invisible, the user
@@ -71,6 +92,27 @@ export const useResumeCompletedMigration = (): void => {
    *  once the user has been handed to support, so the handover happens exactly once. */
   const hasHandedOverRef = useRef(false)
   const isSwapPending = isServerCompleted && isReceiveConfirmed
+
+  /**
+   * The same terminal condition reached from the other side. The gate refuses to confirm a
+   * receive it cannot read the key for, which is right — confirming would swap away a
+   * working session for an unopenable wallet — but it also means the swap below never runs
+   * and never resolves false, so without this the handover it owns would be unreachable and
+   * the user would wait on a receive that cannot arrive. Shares the one-shot latch with the
+   * swap's own handover so only one of the two ever fires.
+   */
+  useEffect(() => {
+    if (!isReceiveUnrecoverable || hasHandedOverRef.current) return
+    hasHandedOverRef.current = true
+    reportError(
+      "Migration resume without destination account",
+      new Error("Provisioned self-custodial account is not on this device"),
+    )
+    navigation.navigate("accountMigrationContactSupport", {
+      reason: MigrationSupportReason.SelfCustodialAccountNotOnDevice,
+      origin: MigrationSupportOrigin.Resume,
+    })
+  }, [isReceiveUnrecoverable, navigation])
 
   useEffect(() => {
     const canAttempt =

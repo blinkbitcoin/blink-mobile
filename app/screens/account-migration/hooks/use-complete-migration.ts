@@ -14,8 +14,14 @@ import { usePendingMigrationAccounts } from "./use-pending-migration-accounts"
  *  with the checkpoint intact, never stranded on an empty self-custodial account. Also
  *  surfaces the migration's checkpoint and account id from a single source of truth. */
 export const useCompleteMigration = () => {
-  const { checkpoint, accountId, expectedReceiveSats, loading, clearCheckpoint } =
-    useMigrationCheckpointState()
+  const {
+    checkpoint,
+    accountId,
+    expectedReceiveSats,
+    loading,
+    clearCheckpoint,
+    saveCheckpoint,
+  } = useMigrationCheckpointState()
   const { clearPendingAccount } = usePendingMigrationAccounts()
   const { setActiveAccountId, accounts, loading: accountsLoading } = useAccountRegistry()
   const { ownerId: custodialOwnerId } = useCustodialOwnerId()
@@ -59,5 +65,8 @@ export const useCompleteMigration = () => {
     migrationExpectedReceiveSats: expectedReceiveSats,
     migrationLoading: isMigrationDataLoading,
     completeMigration,
+    /** Exposed so a wait that outlives the checkpoint's 48h expiry can refresh it: the
+     *  record is what tells the next launch there is a migration to finish at all. */
+    saveCheckpoint,
   }
 }

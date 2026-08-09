@@ -134,6 +134,20 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
    *  wait better than the wait itself, and its retry is the more useful footer. */
   const isDelayedNoticeShown = isReceiveDelayed && !isRecoverable
 
+  /**
+   * Past the notice window the handover happens on its own rather than waiting for the user
+   * to find the button. It costs them nothing: this screen stays mounted underneath and the
+   * gate keeps polling, so a receive that lands afterwards still completes the swap — the
+   * handover explains the wait, it does not abandon it. Once only, so returning from support
+   * to watch the wait out is not immediately undone.
+   */
+  const hasHandedOverDelayRef = useRef(false)
+  useEffect(() => {
+    if (!isDelayedNoticeShown || hasHandedOverDelayRef.current) return
+    hasHandedOverDelayRef.current = true
+    goToDelayedSupport()
+  }, [isDelayedNoticeShown, goToDelayedSupport])
+
   const recoverableMessage = isClockOutOfSync
     ? LLMigration.clockOutOfSync.body()
     : LL.errors.network.connection()

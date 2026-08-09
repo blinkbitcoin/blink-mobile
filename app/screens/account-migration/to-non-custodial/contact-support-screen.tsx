@@ -105,6 +105,14 @@ export const MigrationContactSupportScreen: React.FC = () => {
   useEffect(() => {
     if (!isBackToCommitScreen) return
     return navigation.addListener("beforeRemove", (event) => {
+      /** Only a back press is redirected. `beforeRemove` fires for every action that drops
+       *  this route, so without the check a reset — logout, the 401 handler, the migration
+       *  blocker arming — would be cancelled too and the user could not leave. Both types
+       *  are listed because the native stack header and the iOS swipe dispatch either one
+       *  depending on the path. */
+      const actionType = event.data.action.type
+      if (actionType !== "POP" && actionType !== "GO_BACK") return
+
       /** The redirect removes this screen too; letting that second pass through is what
        *  ends the interception instead of looping on it. */
       if (isRedirectingBackRef.current) return
@@ -130,7 +138,10 @@ export const MigrationContactSupportScreen: React.FC = () => {
   }, [copyToClipboard, supportDetailsText])
 
   return (
-    <Screen preset="fixed">
+    /** The gate origin hides the navigator header, and Screen derives its top safe-area
+     *  edge from this prop rather than from the navigator, so without it the hero would
+     *  draw under the status bar on exactly that origin. */
+    <Screen preset="fixed" headerShown={isGateOrigin ? false : undefined}>
       <View style={styles.container}>
         <IconHero
           icon="headset"

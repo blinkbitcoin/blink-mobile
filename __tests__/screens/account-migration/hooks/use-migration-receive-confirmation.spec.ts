@@ -90,6 +90,7 @@ describe("useMigrationReceiveConfirmation", () => {
     expect(result.current).toEqual({
       isReceiveConfirmed: false,
       isReceiveDelayed: false,
+      isReceiveUnrecoverable: false,
     })
   })
 
@@ -132,6 +133,7 @@ describe("useMigrationReceiveConfirmation", () => {
     expect(result.current).toEqual({
       isReceiveConfirmed: true,
       isReceiveDelayed: false,
+      isReceiveUnrecoverable: false,
     })
   })
 
@@ -150,6 +152,7 @@ describe("useMigrationReceiveConfirmation", () => {
     expect(result.current).toEqual({
       isReceiveConfirmed: false,
       isReceiveDelayed: false,
+      isReceiveUnrecoverable: false,
     })
     expect(mockCheckReceiveLanded.mock.calls).toHaveLength(checksSoFar)
   })
@@ -224,6 +227,7 @@ describe("useMigrationReceiveConfirmation", () => {
       accountId: "sc-account-1",
       network: "regtest",
       leewaySatPerVbyte: 1,
+      expectedReceiveSats: 21000,
     })
     expect(result.current.isReceiveConfirmed).toBe(true)
   })
@@ -318,6 +322,70 @@ describe("useMigrationReceiveConfirmation", () => {
       "Migration receive check",
       expect.objectContaining({ message: "No mnemonic for the provisioned account" }),
     )
+  })
+
+  /** One reading is not enough to call it permanent: a briefly unavailable keystore (a
+   *  locked device) answers the same way as an entry that is genuinely gone, and the
+   *  handover this raises is not something to trigger on a blip. */
+  it("does not call a single missing-key reading unrecoverable", async () => {
+    mockCheckReceiveLanded.mockResolvedValue({ status: MigrationSdkStatus.NoMnemonic })
+
+    const { result } = renderGate()
+    await flushCheck()
+
+    expect(result.current.isReceiveUnrecoverable).toBe(false)
+  })
+
+  it("reports the wait as unrecoverable once the key is missing twice running", async () => {
+    mockCheckReceiveLanded.mockResolvedValue({ status: MigrationSdkStatus.NoMnemonic })
+
+    const { result } = renderGate()
+    await flushCheck()
+    await advance(RECEIVE_CHECK_RETRY_MS)
+
+    expect(result.current.isReceiveUnrecoverable).toBe(true)
+    expect(result.current.isReceiveConfirmed).toBe(false)
+  })
+
+  it("withdraws the unrecoverable verdict once the keystore reads again", async () => {
+    mockCheckReceiveLanded
+      .mockResolvedValueOnce({ status: MigrationSdkStatus.NoMnemonic })
+      .mockResolvedValueOnce({ status: MigrationSdkStatus.NoMnemonic })
+      .mockResolvedValue(ok(stillEmpty))
+
+    const { result } = renderGate()
+    await flushCheck()
+    await advance(RECEIVE_CHECK_RETRY_MS)
+    expect(result.current.isReceiveUnrecoverable).toBe(true)
+
+    await advance(RECEIVE_CHECK_RETRY_MS)
+
+    expect(result.current.isReceiveUnrecoverable).toBe(false)
+  })
+
+  it("keeps a skipped gate inert even after an unrecoverable verdict", async () => {
+    mockCheckReceiveLanded.mockResolvedValue({ status: MigrationSdkStatus.NoMnemonic })
+
+    const { result, rerender } = renderGate()
+    await flushCheck()
+    await advance(RECEIVE_CHECK_RETRY_MS)
+    expect(result.current.isReceiveUnrecoverable).toBe(true)
+
+    rerender({ skip: true })
+
+    expect(result.current.isReceiveUnrecoverable).toBe(false)
+  })
+
+  /** The zero-receive short-circuit never opens an SDK connection, so there is no keystore
+   *  reading to go wrong and nothing to hand over. */
+  it("raises nothing unrecoverable for a zero-receive migration", async () => {
+    mockCheckReceiveLanded.mockResolvedValue({ status: MigrationSdkStatus.NoMnemonic })
+
+    const { result } = renderGate({ expectedReceiveSats: 0 })
+    await flushCheck()
+
+    expect(result.current.isReceiveUnrecoverable).toBe(false)
+    expect(result.current.isReceiveConfirmed).toBe(true)
   })
 
   it("keeps checking after a missing mnemonic, in case the keystore reads again", async () => {
