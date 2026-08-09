@@ -27,7 +27,10 @@ export const MigrationMerchantToolsScreen: React.FC = () => {
   const {
     theme: { colors },
   } = useTheme()
-  const { goToNextStep } = useMigrationNextStep()
+  /** Gated on the hook's own loading, as its contract asks: the destination reads
+   *  hasResumableCheckpoint, which is false until the checkpoint query settles, so a tap
+   *  landing before then routes a resuming user to the re-provision entry instead. */
+  const { goToNextStep, loading: nextStepLoading } = useMigrationNextStep()
 
   const merchantToolsLL = LL.AccountMigration.merchantTools
 
@@ -60,6 +63,7 @@ export const MigrationMerchantToolsScreen: React.FC = () => {
         <GaloyPrimaryButton
           title={merchantToolsLL.cta()}
           onPress={goToNextStep}
+          loading={nextStepLoading}
           {...testProps("migration-merchant-tools-cta")}
         />
       }

@@ -23,13 +23,16 @@ const TOOL_ICON_TEST_IDS = [
 const TOOL_ICON_SIZE = 20
 
 const mockGoToNextStep = jest.fn()
+/** The destination depends on reads that are still in flight on mount, so tests drive the
+ *  hook's loading flag rather than assuming it has always settled. */
+let mockNextStepLoading = false
 
 jest.mock("@app/screens/account-migration/hooks", () => ({
   ...jest.requireActual("@app/screens/account-migration/hooks"),
   useMigrationNextStep: () => ({
     goToNextStep: mockGoToNextStep,
     replaceToCheckpoint: jest.fn(),
-    loading: false,
+    loading: mockNextStepLoading,
   }),
 }))
 
@@ -51,6 +54,7 @@ describe("MigrationMerchantToolsScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     loadLocale("en")
+    mockNextStepLoading = false
   })
 
   it("renders the receive hero with the title and subtitle", async () => {
@@ -173,6 +177,29 @@ describe("MigrationMerchantToolsScreen", () => {
     await flushEffects()
 
     fireEvent.press(screen.getByText(merchantToolsLL.cta()))
+
+    expect(mockGoToNextStep).toHaveBeenCalledTimes(1)
+  })
+
+  /** The destination is decided from hasResumableCheckpoint, which reads false until the
+   *  checkpoint query settles — so a tap accepted early sends a user who is mid-migration
+   *  to the re-provision entry rather than back to the step they left off at. */
+  it("refuses the tap until the next step is known", async () => {
+    mockNextStepLoading = true
+    renderScreen()
+    await flushEffects()
+
+    fireEvent.press(screen.getByTestId("migration-merchant-tools-cta"))
+
+    expect(mockGoToNextStep).not.toHaveBeenCalled()
+  })
+
+  it("accepts the tap once the next step has settled", async () => {
+    mockNextStepLoading = false
+    renderScreen()
+    await flushEffects()
+
+    fireEvent.press(screen.getByTestId("migration-merchant-tools-cta"))
 
     expect(mockGoToNextStep).toHaveBeenCalledTimes(1)
   })
