@@ -7,7 +7,7 @@ import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-but
 import { IconHero } from "@app/components/icon-hero"
 import { useContactSupport } from "@app/hooks/use-contact-support"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { MigrationStepHeader } from "@app/screens/account-migration/migration-step-header"
+import { MigrationCloseHeader } from "@app/screens/account-migration/migration-close-header"
 import { MigrationStepLayout } from "@app/screens/account-migration/migration-step-layout"
 import { testProps } from "@app/utils/testProps"
 
@@ -29,7 +29,7 @@ export const MigrationApiServiceScreen: React.FC<MigrationApiServiceScreenProps>
   return (
     <MigrationStepLayout
       headerShown={false}
-      header={<MigrationStepHeader onClose={onClose} testIdPrefix="migration-api" />}
+      header={<MigrationCloseHeader onClose={onClose} testID="migration-api-close" />}
       footer={
         <>
           <GaloyPrimaryButton
