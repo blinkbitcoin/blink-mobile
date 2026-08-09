@@ -135,15 +135,37 @@ fi
 # and a progress bar at the head of every demo, so it happens before the
 # recorder starts. Failure here is not fatal: the real flow will report it.
 T_WARMUP=$(tel_now)
-if [ -z "$SKIP_WARMUP" ]; then
+# The warmup is only needed once per device per Maestro version - the driver
+# it installs persists. Three ways to know it already happened, checked in
+# order of directness (iOS only: the session markers live in the iOS session
+# dir, and an Android emulator never shares a device with an iOS session):
+#   manual   DEMO_SKIP_WARMUP=1, the caller's own judgment
+#   session  an earlier maestro run in this session left the warmed marker
+#   golden   the clone carries a driver baked by bless-golden.sh, and the
+#            stamped maestro version still matches - after a CLI upgrade the
+#            driver silently re-installs, so a mismatch must warm up again
+WARM_REASON=""
+if [ -n "$SKIP_WARMUP" ]; then
+  WARM_REASON="manual"
+elif [ "$PLATFORM" = ios ] && [ -n "${DEMO_SESSION_DIR:-}" ] && [ -f "$DEMO_SESSION_DIR/maestro-warmed" ]; then
+  WARM_REASON="session"
+elif [ "$PLATFORM" = ios ] && [ -n "${DEMO_SESSION_DIR:-}" ] && [ -f "$DEMO_SESSION_DIR/golden-stamp" ]; then
+  STAMP_MV=$(grep '^maestro-version=' "$DEMO_SESSION_DIR/golden-stamp" 2>/dev/null | cut -d= -f2- || true)
+  CUR_MV=$(maestro --version 2>/dev/null | head -1 || true)
+  if [ -n "$STAMP_MV" ] && [ "$STAMP_MV" = "$CUR_MV" ]; then
+    WARM_REASON="golden"
+  fi
+fi
+if [ -z "$WARM_REASON" ]; then
   WARMUP="$(dirname "${BASH_SOURCE[0]}")/../flows/_warmup.yaml"
   if [ -f "$WARMUP" ]; then
     echo "warming up the maestro driver..."
     maestro test --udid "$DEVICE" -e APP_ID="$APP_ID" "$WARMUP" >/dev/null 2>&1
+    [ "$PLATFORM" = ios ] && [ -n "${DEMO_SESSION_DIR:-}" ] && touch "$DEMO_SESSION_DIR/maestro-warmed" 2>/dev/null
   fi
   tel_emit vid.record.warmup "$T_WARMUP" platform="$PLATFORM" skipped=0
 else
-  tel_emit vid.record.warmup "$T_WARMUP" platform="$PLATFORM" skipped=1
+  tel_emit vid.record.warmup "$T_WARMUP" platform="$PLATFORM" skipped=1 reason="$WARM_REASON"
 fi
 
 # --- Recorder ---------------------------------------------------------------
@@ -258,6 +280,11 @@ maestro test --udid "$DEVICE" -e APP_ID="$APP_ID" ${DEMO_PORT:+-e DEMO_PORT="$DE
 FLOW_RC=$?
 tel_emit vid.record.flow "$T_FLOW" platform="$PLATFORM" rc="$FLOW_RC" \
   ok="$([ "$FLOW_RC" -eq 0 ] && echo 1 || echo 0)"
+# A successful flow proves the driver works - later recordings in this
+# session need no warmup even if this one's was skipped manually.
+if [ "$FLOW_RC" -eq 0 ] && [ "$PLATFORM" = ios ] && [ -n "${DEMO_SESSION_DIR:-}" ]; then
+  touch "$DEMO_SESSION_DIR/maestro-warmed" 2>/dev/null || true
+fi
 
 sleep "$LEAD_OUT"
 T_STOP=$(tel_now)
