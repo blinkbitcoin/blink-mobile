@@ -906,4 +906,62 @@ describe("MigrationGate", () => {
 
     expect(mockRequiredScreen.mock.calls[0][0].mode).toBe("forcedPreDeadline")
   })
+
+  /**
+   * The entry order is one ranked list in `resolveGateStep`, so these cases turn on every
+   * lower-ranked condition at once and assert only the winner renders. Each pins one rung
+   * against the one below it; without them the order is free to drift silently, since a
+   * step that quietly loses its turn still renders a valid-looking screen.
+   */
+  describe("entry order", () => {
+    it("shows the retry rather than the spinner when a failed read is also an unready one", () => {
+      /** A settled error leaves `isReady` false, so error and loading are always true
+       *  together — the retry only ever appears because it outranks the spinner. */
+      mockUseActiveApiKeys.mockReturnValue(
+        apiKeysState({ hasError: true, isReady: false }),
+      )
+
+      const { getByTestId, queryByTestId } = render(<MigrationGate />)
+
+      expect(getByTestId("gate-retry-button")).toBeTruthy()
+      expect(queryByTestId("migration-gate-loading")).toBeNull()
+    })
+
+    it("waits for the reads to settle before warning about API keys", () => {
+      mockUseActiveApiKeys.mockReturnValue(apiKeysState({ hasActiveApiKeys: true }))
+      mockUseWalletOverviewScreenQuery.mockReturnValue({ loading: true, data: undefined })
+
+      const { getByTestId } = render(<MigrationGate />)
+
+      expect(getByTestId("migration-gate-loading")).toBeTruthy()
+      expect(mockApiServiceScreen).not.toHaveBeenCalled()
+    })
+
+    it("warns about the API keys before resuming a locked migration", () => {
+      mockIsMigrationLocked = true
+      mockUseActiveApiKeys.mockReturnValue(apiKeysState({ hasActiveApiKeys: true }))
+
+      render(<MigrationGate />)
+
+      expect(mockApiServiceScreen).toHaveBeenCalled()
+      expect(mockNavigateToCheckpoint).not.toHaveBeenCalled()
+    })
+
+    it("runs both preconditions before resuming when all three apply at once", () => {
+      /** Locked, with API keys, and holding dollars: the warning takes the screen, and
+       *  neither the dollar modal nor the resume may fire from behind it. */
+      mockIsMigrationLocked = true
+      mockUseActiveApiKeys.mockReturnValue(apiKeysState({ hasActiveApiKeys: true }))
+      mockUseWalletOverviewScreenQuery.mockReturnValue(
+        walletOverviewQueryResult({ usdBalance: 20 }),
+      )
+
+      render(<MigrationGate />)
+
+      expect(mockApiServiceScreen).toHaveBeenCalled()
+      expect(mockDollarBalanceModal).not.toHaveBeenCalled()
+      expect(mockNavigateToCheckpoint).not.toHaveBeenCalled()
+      expect(mockRequiredScreen).not.toHaveBeenCalled()
+    })
+  })
 })

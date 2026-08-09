@@ -45,12 +45,59 @@ const resolveMigrationMode = (status: WindDownStatus | undefined): MigrationMode
 }
 
 /**
+ * Every screen the gate can show. The ORDER of `resolveGateStep` below is the entry
+ * order — nothing else states it — so a step wins over everything declared after it.
+ */
+type GateStep =
+  | "selfCustodialDisabled"
+  | "gateDataError"
+  | "loading"
+  | "apiWarning"
+  | "dollarBalance"
+  | "resumeLockedMigration"
+  | "intro"
+
+type GateStepInput = {
+  isSelfCustodialDisabled: boolean
+  hasGateDataError: boolean
+  isGateDataLoading: boolean
+  shouldWarnAboutApiKeys: boolean
+  shouldBlockOnDollarBalance: boolean
+  isMigrationLocked: boolean
+}
+
+/**
+ * The single place the gate decides what a user sees, resolved highest priority first so
+ * that inserting a step here is the whole of adding one. A step therefore never states
+ * what outranks it: everything above has already claimed its cases by the time the check
+ * is reached, which is why the resume check below is a bare `isMigrationLocked` and not a
+ * list of the screens that come first.
+ *
+ * The emergency disable leads: every entry funnels through the gate, so refusing here
+ * pauses the whole flow the moment ops disables the stack, whatever path the user arrived
+ * by. A settled error comes next, because every check under it reads a query result and a
+ * failure read as an empty default would wave a user with API keys or a live dollar
+ * balance straight in. Then the preconditions in entry order (API-key warning, then the
+ * Dollar Balance the user has to empty by hand, since the backend refuses `migrationStart`
+ * and `migrationCommit` outright while the USD wallet holds anything). Resume sits below
+ * both: a dollar balance that arrived mid-flow still has to be emptied whatever the phase.
+ * The intro is last by definition — it is what is left when nothing else applies.
+ */
+const resolveGateStep = (input: GateStepInput): GateStep => {
+  if (input.isSelfCustodialDisabled) return "selfCustodialDisabled"
+  if (input.hasGateDataError) return "gateDataError"
+  if (input.isGateDataLoading) return "loading"
+  if (input.shouldWarnAboutApiKeys) return "apiWarning"
+  if (input.shouldBlockOnDollarBalance) return "dollarBalance"
+  if (input.isMigrationLocked) return "resumeLockedMigration"
+  return "intro"
+}
+
+/**
  * Entry gate for the migration flow, the single choke point for the Settings entry
  * (tapping Migrate), the armed gate that replaces the app after closure, and a migration
- * the server has locked. Order of checks: accounts with API keys see the API-service
- * warning first, then any custodial Dollar Balance blocks entry because the user has to
- * empty it manually, and finally the "Time to upgrade" screen in the mode the wind-down
- * phase demands (voluntary, forced pre-deadline, or the armed gate).
+ * the server has locked. Which of those the user lands on is `resolveGateStep` above and
+ * only there; this component reads the data that feeds it and draws the answer.
  */
 export const MigrationGate: React.FC = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
@@ -187,21 +234,23 @@ export const MigrationGate: React.FC = () => {
    */
   const shouldBlockOnDollarBalance = usdBalanceCents > 0
 
+  const gateStep = resolveGateStep({
+    isSelfCustodialDisabled,
+    hasGateDataError: Boolean(hasGateDataError),
+    isGateDataLoading,
+    shouldWarnAboutApiKeys,
+    shouldBlockOnDollarBalance,
+    isMigrationLocked,
+  })
+
   /**
    * A locked migration skips the intro and resumes where it left off. That screen exists
    * to convince someone who has not started; the server has already recorded this account
    * as migrating, so re-pitching it would be both wrong and an extra tap between the user
-   * and finishing. The preconditions still run first: a dollar balance that arrived
-   * mid-flow has to be emptied whatever the phase, or the commit is refused. The
-   * self-custodial disable outranks even this, since a disabled stack shows unavailable,
-   * never resumes.
+   * and finishing. Whether the preconditions let it get this far is `resolveGateStep`'s
+   * answer, not a second condition here.
    */
-  const shouldResumeLockedMigration =
-    isMigrationLocked &&
-    !isSelfCustodialDisabled &&
-    !isGateDataLoading &&
-    !shouldWarnAboutApiKeys &&
-    !shouldBlockOnDollarBalance
+  const shouldResumeLockedMigration = gateStep === "resumeLockedMigration"
 
   const hasResumedRef = useRef(false)
 
@@ -251,83 +300,92 @@ export const MigrationGate: React.FC = () => {
     navigation,
   ])
 
-  /** The emergency-disable net. Every entry funnels through the gate, so blocking here
-   *  pauses the whole flow the moment ops disables the stack, whatever path the user
-   *  arrived by. */
-  if (isSelfCustodialDisabled) {
-    return <TemporarilyUnavailableScreen />
-  }
+  /** One arm per step and no conditions of its own: which screen wins was settled by
+   *  `resolveGateStep`, so this only says what each one looks like. The exhaustive default
+   *  makes a step added to `GateStep` a compile error until it is drawn here. */
+  switch (gateStep) {
+    /** The emergency-disable net. Every entry funnels through the gate, so blocking here
+     *  pauses the whole flow the moment ops disables the stack, whatever path the user
+     *  arrived by. */
+    case "selfCustodialDisabled":
+      return <TemporarilyUnavailableScreen />
 
-  if (hasGateDataError) {
-    return (
-      <Screen preset="fixed">
-        <View style={styles.messageContainer}>
-          <GaloyIcon name="warning" size={64} color={colors.warning} />
-          <Text type="p1" style={styles.messageText}>
-            {LL.errors.generic()}
-          </Text>
-          <GaloyPrimaryButton
-            title={LL.common.tryAgain()}
-            onPress={retryGateData}
-            loading={isRetrying}
-            disabled={isRetrying}
-            {...testProps("migration-gate-retry")}
-          />
-        </View>
-      </Screen>
-    )
-  }
+    case "gateDataError":
+      return (
+        <Screen preset="fixed">
+          <View style={styles.messageContainer}>
+            <GaloyIcon name="warning" size={64} color={colors.warning} />
+            <Text type="p1" style={styles.messageText}>
+              {LL.errors.generic()}
+            </Text>
+            <GaloyPrimaryButton
+              title={LL.common.tryAgain()}
+              onPress={retryGateData}
+              loading={isRetrying}
+              disabled={isRetrying}
+              {...testProps("migration-gate-retry")}
+            />
+          </View>
+        </Screen>
+      )
 
-  /** In blocker mode the gate replaces the whole app, so returning null here would
-   *  leave a blank screen on every launch until the queries settle WITH data, and a locked
-   *  migration would flash the intro it is about to navigate away from. */
-  if (isGateDataLoading || shouldResumeLockedMigration) {
-    return (
-      <Screen preset="fixed">
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator
-            size="large"
-            color={colors.primary}
-            {...testProps("migration-gate-loading")}
-          />
-        </View>
-      </Screen>
-    )
-  }
+    /** In blocker mode the gate replaces the whole app, so returning null here would
+     *  leave a blank screen on every launch until the queries settle WITH data. A locked
+     *  migration shares the spinner rather than rendering nothing, or it would flash the
+     *  intro the resume effect is about to navigate away from. */
+    case "loading":
+    case "resumeLockedMigration":
+      return (
+        <Screen preset="fixed">
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator
+              size="large"
+              color={colors.primary}
+              {...testProps("migration-gate-loading")}
+            />
+          </View>
+        </Screen>
+      )
 
-  if (shouldWarnAboutApiKeys) {
     /** Same close rules as the "Time to upgrade" screen: closable until the way out is
      *  blocked by the armed gate or by a locked migration. */
-    const apiCloseAction = isExitBlocked ? undefined : exitFlow
-    return (
-      <MigrationApiServiceScreen
-        onContinue={acknowledgeApiWarning}
-        onClose={apiCloseAction}
-      />
-    )
-  }
+    case "apiWarning":
+      return (
+        <MigrationApiServiceScreen
+          onContinue={acknowledgeApiWarning}
+          onClose={isExitBlocked ? undefined : exitFlow}
+        />
+      )
 
-  if (shouldBlockOnDollarBalance) {
     /** Every affected user converts in-app from here, restricted regions included: the
      *  convert screen waives its usual region bounce when it is reached as a migration step
      *  (confirmed by the server wind-down, not the deep-linkable param alone), so the modal
      *  always offers the conversion. The close icon is hidden where the exit is blocked (the
      *  armed gate or a locked migration): no way back, so Transfer is the only action. */
-    const canCloseDollarModal = !isExitBlocked
-    return (
-      <>
-        <MigrationRequiredScreen mode={mode} isExitBlocked={isExitBlocked} />
-        <DollarBalanceMigrationModal
-          isVisible={isFocused}
-          toggleModal={exitFlow}
-          onTransfer={goToDollarTransfer}
-          showCloseIconButton={canCloseDollarModal}
-        />
-      </>
-    )
-  }
+    case "dollarBalance":
+      return (
+        <>
+          <MigrationRequiredScreen mode={mode} isExitBlocked={isExitBlocked} />
+          <DollarBalanceMigrationModal
+            isVisible={isFocused}
+            toggleModal={exitFlow}
+            onTransfer={goToDollarTransfer}
+            showCloseIconButton={!isExitBlocked}
+          />
+        </>
+      )
 
-  return <MigrationRequiredScreen mode={mode} isExitBlocked={isExitBlocked} />
+    case "intro":
+      return <MigrationRequiredScreen mode={mode} isExitBlocked={isExitBlocked} />
+
+    /** `React.FC` accepts undefined, so a missing arm would otherwise fall out of the
+     *  switch and render nothing — a blank gate. Assigning to `never` is what turns that
+     *  into the compile error the comment above promises. */
+    default: {
+      const unhandledStep: never = gateStep
+      return unhandledStep
+    }
+  }
 }
 
 const useStyles = makeStyles(() => ({
