@@ -3772,7 +3772,7 @@
         "apiServiceContactCta": "Kontaktiere uns",
         "apiServiceContinueCta": "Migration fortsetzen",
         "merchantTools": {
-            "title": "Weiterhin bezahlt werden wie gewohnt",
+            "title": "Wir haben an alles gedacht",
             "body": "Alle Tools für eingehende Zahlungen funktionieren weiter. Füge einfach deine Lightning-Adresse hinzu.",
             "cta": "Verstanden",
             "terminalTitle": "Blink Terminal",

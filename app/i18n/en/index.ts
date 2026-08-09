@@ -3928,7 +3928,7 @@ const en: BaseTranslation = {
     apiServiceContactCta: "Contact us",
     apiServiceContinueCta: "Continue the Migration",
     merchantTools: {
-      title: "Keep getting paid as usual",
+      title: "We got you covered",
       body: "All tools for incoming payments keep working. Just add your Lightning address.",
       cta: "Got it",
       terminalTitle: "Blink Terminal",
