@@ -1,8 +1,11 @@
 import { useEffect, useRef, useState } from "react"
 
+import { AMOUNT_BADGE_ANIMATION } from "@app/components/amount-badge"
 import { WalletCurrency } from "@app/graphql/generated"
 
-const EXIT_ANIMATION_MS = 180
+/** Shared with the badge itself and with the slot arbitration, so the three
+ *  cannot drift apart and cut each other's animations short. */
+const EXIT_ANIMATION_MS = AMOUNT_BADGE_ANIMATION.durationOut
 
 /**
  * Auto-marks an incoming transaction badge as seen after a delay,
