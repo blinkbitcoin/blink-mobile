@@ -3792,6 +3792,10 @@
         "explainerCheck5": "Des frais de réseau Spark seront déduits de votre compte",
         "explainerCta": "Je comprends",
         "transferringFunds": "Transfert de vos fonds en cours. Cela devrait être terminé en quelques secondes.",
+        "transferDelayed": {
+            "body": "Vos fonds sont en route vers votre nouveau compte. Cela prend plus de temps que d'habitude — gardez l'application ouverte et nous terminerons automatiquement.",
+            "contactSupportCta": "Contacter le support"
+        },
         "clockOutOfSync": {
             "body": "La date et l'heure de votre appareil sont désynchronisées. Réglez-les sur automatique pour continuer.",
             "retryCta": "Réessayer"

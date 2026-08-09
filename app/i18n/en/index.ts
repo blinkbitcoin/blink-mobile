@@ -3894,6 +3894,10 @@ const en: BaseTranslation = {
     explainerCta: "I understand",
     transferringFunds:
       "Transferring your funds. It should be done in a few seconds.",
+    transferDelayed: {
+      body: "Your funds are on their way to your new account. This is taking longer than usual — keep the app open and we'll finish up automatically.",
+      contactSupportCta: "Contact support",
+    },
     clockOutOfSync: {
       body: "Your device's date and time are out of sync. Set them to automatic to continue.",
       retryCta: "Try again",

@@ -28,6 +28,9 @@ jest.mock("@app/hooks/use-account-registry", () => ({
 }))
 
 const mockReplaceToCheckpoint = jest.fn()
+let mockIsAtCommitPoint = false
+/** Kept alongside isAtCommitPoint so a screen wired back to the looser flag fails here
+ *  instead of silently resuming a pre-commit checkpoint again (#4109). */
 let mockHasResumableCheckpoint = false
 let mockCheckpointLoading = false
 let mockSelfCustodialDisabled = false
@@ -36,6 +39,7 @@ jest.mock("@app/screens/account-migration/hooks", () => ({
   useMigrationCheckpoint: () => ({
     loading: mockCheckpointLoading,
     replaceToCheckpoint: mockReplaceToCheckpoint,
+    isAtCommitPoint: mockIsAtCommitPoint,
     hasResumableCheckpoint: mockHasResumableCheckpoint,
   }),
   useSelfCustodialDisabled: () => mockSelfCustodialDisabled,
@@ -56,6 +60,7 @@ describe("MigrationEntryScreen", () => {
     jest.clearAllMocks()
     mockCanGoBack = true
     mockActiveAccountType = AccountType.Custodial
+    mockIsAtCommitPoint = false
     mockHasResumableCheckpoint = false
     mockCheckpointLoading = false
     mockSelfCustodialDisabled = false
@@ -70,7 +75,8 @@ describe("MigrationEntryScreen", () => {
     expect(mockReplace).toHaveBeenCalledWith("accountMigrationStart")
   })
 
-  it("resumes at the stored checkpoint when one exists", () => {
+  it("resumes at the stored checkpoint once the flow reached the commit point", () => {
+    mockIsAtCommitPoint = true
     mockHasResumableCheckpoint = true
 
     render(<MigrationEntryScreen />)
@@ -79,9 +85,20 @@ describe("MigrationEntryScreen", () => {
     expect(mockReplace).not.toHaveBeenCalled()
   })
 
+  /** The flow reopens at its first step, not at the backup screen the user walked away
+   *  from, so a provisioned account alone no longer earns a resume (#4109). */
+  it("restarts at the gate when the flow was left before the commit point", () => {
+    mockHasResumableCheckpoint = true
+
+    render(<MigrationEntryScreen />)
+
+    expect(mockReplace).toHaveBeenCalledWith("accountMigrationStart")
+    expect(mockReplaceToCheckpoint).not.toHaveBeenCalled()
+  })
+
   it("routes to the gate instead of resuming when the kill-switch is off", () => {
     mockSelfCustodialDisabled = true
-    mockHasResumableCheckpoint = true
+    mockIsAtCommitPoint = true
 
     render(<MigrationEntryScreen />)
 
@@ -91,7 +108,7 @@ describe("MigrationEntryScreen", () => {
 
   it("waits for the remote config to resolve before dispatching", () => {
     mockRemoteConfigReady = false
-    mockHasResumableCheckpoint = true
+    mockIsAtCommitPoint = true
 
     render(<MigrationEntryScreen />)
 

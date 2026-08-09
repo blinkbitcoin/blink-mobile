@@ -3,6 +3,7 @@ import { Network } from "@breeztech/breez-sdk-spark-react-native"
 import {
   buildMigrationLnAddressProof,
   buildMigrationTransferRequest,
+  checkMigrationReceiveLanded,
   MigrationSdkStatus,
 } from "@app/self-custodial/migration-transfer-request"
 import { SelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
@@ -294,6 +295,117 @@ describe("buildMigrationTransferRequest", () => {
     await Promise.all([first, second])
 
     expect(mockInitSdk).toHaveBeenCalledTimes(2)
+  })
+})
+
+describe("checkMigrationReceiveLanded", () => {
+  const mockGetInfo = jest.fn()
+
+  const check = () =>
+    checkMigrationReceiveLanded({
+      accountId: "sc-account-1",
+      network: Network.Regtest,
+      leewaySatPerVbyte: 1,
+    })
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockGetMnemonic.mockResolvedValue("abandon abandon ability")
+    mockInitSdk.mockResolvedValue({ getInfo: mockGetInfo })
+    mockDisconnectSdk.mockResolvedValue(undefined)
+    mockGetInfo.mockResolvedValue({ balanceSats: 0 })
+    mockClassifySdkError.mockReturnValue(SelfCustodialErrorCode.Generic)
+  })
+
+  /** The forced sync is the point of the call: it is what claims a payment Spark held
+   *  for the offline wallet, so the read is detector and actuator in one. */
+  it("confirms the receive once the synced wallet shows a balance", async () => {
+    mockGetInfo.mockResolvedValue({ balanceSats: BigInt(21000) })
+
+    const result = await check()
+
+    expect(mockGetInfo).toHaveBeenCalledWith({ ensureSynced: true })
+    expect(result).toEqual({
+      status: MigrationSdkStatus.Ok,
+      value: { hasReceived: true, balanceSats: 21000 },
+    })
+  })
+
+  it("reports a still-empty wallet as not received", async () => {
+    mockGetInfo.mockResolvedValue({ balanceSats: BigInt(0) })
+
+    const result = await check()
+
+    expect(result).toEqual({
+      status: MigrationSdkStatus.Ok,
+      value: { hasReceived: false, balanceSats: 0 },
+    })
+  })
+
+  it("reports a device with no mnemonic for the provisioned account", async () => {
+    mockGetMnemonic.mockResolvedValue(null)
+
+    const result = await check()
+
+    expect(result).toEqual({ status: MigrationSdkStatus.NoMnemonic })
+    expect(mockInitSdk).not.toHaveBeenCalled()
+  })
+
+  it("keeps a network-tagged connect failure retryable", async () => {
+    mockClassifySdkError.mockReturnValue(SelfCustodialErrorCode.NetworkError)
+    mockInitSdk.mockRejectedValue(new Error("connection reset"))
+
+    const result = await check()
+
+    expect(result).toEqual({
+      status: MigrationSdkStatus.ConnectionError,
+      error: expect.objectContaining({ message: "connection reset" }),
+    })
+  })
+
+  it("disconnects even when the balance read fails", async () => {
+    mockGetInfo.mockRejectedValue(new Error("info unavailable"))
+
+    const result = await check()
+
+    expect(result).toEqual({
+      status: MigrationSdkStatus.Failed,
+      error: expect.objectContaining({ message: "info unavailable" }),
+    })
+    expect(mockDisconnectSdk).toHaveBeenCalledTimes(1)
+  })
+
+  /** The check and the invoice builder open SDKs on the same storage directory, so a
+   *  check fired while a commit retry is mid-connect must wait its turn. */
+  it("serializes behind a transfer request on the same storage directory", async () => {
+    let releaseFirstConnect: () => void = () => {}
+    const connectedSdk = sdkWith(jest.fn().mockResolvedValue({ signature: "deadbeef" }))
+    mockGetWalletInfo.mockResolvedValue({ identityPubkey: SPARK_PUBKEY })
+    mockReceivePayment.mockResolvedValue({ paymentRequest: "lnbcrt1invoice" })
+    mockInitSdk.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          releaseFirstConnect = () => resolve(connectedSdk)
+        }),
+    )
+    mockInitSdk.mockResolvedValue({ getInfo: mockGetInfo })
+
+    const request = buildMigrationTransferRequest({
+      accountId: "sc-account-1",
+      network: Network.Regtest,
+      leewaySatPerVbyte: 1,
+      signChallenge: () => "migrate:challenge",
+    })
+    const landed = check()
+    await flushMicrotasks()
+    expect(mockInitSdk).toHaveBeenCalledTimes(1)
+    expect(mockGetInfo).not.toHaveBeenCalled()
+
+    releaseFirstConnect()
+    await Promise.all([request, landed])
+
+    expect(mockInitSdk).toHaveBeenCalledTimes(2)
+    expect(mockGetInfo).toHaveBeenCalledTimes(1)
   })
 })
 

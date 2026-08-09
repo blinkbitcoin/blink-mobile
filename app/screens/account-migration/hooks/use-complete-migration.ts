@@ -14,7 +14,7 @@ import { usePendingMigrationAccounts } from "./use-pending-migration-accounts"
  *  with the checkpoint intact, never stranded on an empty self-custodial account. Also
  *  surfaces the migration's checkpoint and account id from a single source of truth. */
 export const useCompleteMigration = () => {
-  const { checkpoint, accountId, loading, clearCheckpoint } =
+  const { checkpoint, accountId, expectedReceiveSats, loading, clearCheckpoint } =
     useMigrationCheckpointState()
   const { clearPendingAccount } = usePendingMigrationAccounts()
   const { setActiveAccountId, accounts, loading: accountsLoading } = useAccountRegistry()
@@ -55,6 +55,8 @@ export const useCompleteMigration = () => {
   return {
     migrationCheckpoint: checkpoint,
     migrationAccountId: accountId,
+    /** What the receive gate waits for; null on checkpoints saved before the field existed. */
+    migrationExpectedReceiveSats: expectedReceiveSats,
     migrationLoading: isMigrationDataLoading,
     completeMigration,
   }

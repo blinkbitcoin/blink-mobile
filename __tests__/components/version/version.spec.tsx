@@ -1,6 +1,6 @@
 import * as React from "react"
 import { Text as ReactNativeText } from "react-native"
-import { render } from "@testing-library/react-native"
+import { fireEvent, render } from "@testing-library/react-native"
 
 import { VersionComponent } from "@app/components/version"
 
@@ -28,8 +28,10 @@ jest.mock("@app/i18n/i18n-react", () => ({
   }),
 }))
 
+const mockNavigate = jest.fn()
+
 jest.mock("@react-navigation/native", () => ({
-  useNavigation: () => ({ navigate: jest.fn() }),
+  useNavigation: () => ({ navigate: mockNavigate }),
 }))
 
 jest.mock("react-native-device-info", () => ({
@@ -48,6 +50,7 @@ describe("VersionComponent", () => {
   beforeEach(() => {
     mockUsePhoneCountryCode.mockReset()
     mockUseIpCountryCode.mockReset()
+    mockNavigate.mockClear()
   })
 
   it("shows the registered and detected countries below the version", () => {
@@ -84,5 +87,54 @@ describe("VersionComponent", () => {
     const { getByText } = render(<VersionComponent />)
 
     expect(getByText(/Registered: US · Detected: Unknown/)).toBeTruthy()
+  })
+
+  describe("developer screen secret trigger", () => {
+    const originalDev = __DEV__
+    const setDev = (value: boolean) => {
+      ;(global as unknown as { __DEV__: boolean }).__DEV__ = value
+    }
+
+    beforeEach(() => {
+      mockUsePhoneCountryCode.mockReturnValue("US")
+      mockUseIpCountryCode.mockReturnValue("SE")
+    })
+
+    afterEach(() => {
+      setDev(originalDev)
+    })
+
+    const tapVersion = (times: number) => {
+      const { getByTestId } = render(<VersionComponent />)
+      const versionText = getByTestId("Version Build Text")
+      for (let i = 0; i < times; i += 1) {
+        fireEvent.press(versionText)
+      }
+    }
+
+    it("navigates to the developer screen after three taps in development builds", () => {
+      setDev(true)
+
+      tapVersion(3)
+
+      expect(mockNavigate).toHaveBeenCalledTimes(1)
+      expect(mockNavigate).toHaveBeenCalledWith("developerScreen")
+    })
+
+    it("does not navigate before the third tap in development builds", () => {
+      setDev(true)
+
+      tapVersion(2)
+
+      expect(mockNavigate).not.toHaveBeenCalled()
+    })
+
+    it("does not navigate after three taps in release builds", () => {
+      setDev(false)
+
+      tapVersion(3)
+
+      expect(mockNavigate).not.toHaveBeenCalled()
+    })
   })
 })

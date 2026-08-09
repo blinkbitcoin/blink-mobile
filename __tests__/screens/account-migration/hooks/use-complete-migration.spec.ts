@@ -6,11 +6,13 @@ const mockDiscardCustodialSession = jest.fn()
 
 let mockAccountId: string | undefined
 let mockCheckpoint: string | null
+let mockExpectedReceiveSats: number | null
 
 jest.mock("@app/screens/account-migration/hooks/use-migration-checkpoint-state", () => ({
   useMigrationCheckpointState: () => ({
     checkpoint: mockCheckpoint,
     accountId: mockAccountId,
+    expectedReceiveSats: mockExpectedReceiveSats,
     clearCheckpoint: mockClearCheckpoint,
   }),
 }))
@@ -62,6 +64,7 @@ describe("useCompleteMigration", () => {
     mockAccounts = [{ id: "sc-account-1" }]
     mockRegistryLoading = false
     mockCheckpoint = "backupAlerts"
+    mockExpectedReceiveSats = 21000
     mockDiscardCustodialSession.mockResolvedValue(undefined)
   })
 
@@ -116,6 +119,7 @@ describe("useCompleteMigration", () => {
 
     expect(result.current.migrationCheckpoint).toBe("backupAlerts")
     expect(result.current.migrationAccountId).toBe("sc-account-1")
+    expect(result.current.migrationExpectedReceiveSats).toBe(21000)
   })
 
   /** The account check reads the registry's accounts, which start empty and fill after an

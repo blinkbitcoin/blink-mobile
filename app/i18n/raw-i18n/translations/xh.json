@@ -3792,6 +3792,10 @@
     "explainerCheck5": "I-akhawunti yakho iya kukhutshelwa intlawulo yothungelwano lwe-Spark",
     "explainerCta": "Ndiyaqonda",
     "transferringFunds": "Sidlulisela imali yakho. Kufanele kugqitywe ngomzuzwana nje.",
+    "transferDelayed": {
+      "body": "Imali yakho isendleleni eya kwiakhawunti yakho entsha. Kuthatha ixesha elide kunesiqhelo — gcina i-app ivulekile, siza kugqibezela ngokuzenzekelayo.",
+      "contactSupportCta": "Qhagamshelana nenkxaso"
+    },
     "clockOutOfSync": {
       "body": "Umhla nexesha lesixhobo sakho azihambelani. Zimisele ukuba zizenzekele ukuze uqhubeke.",
       "retryCta": "Zama kwakhona"

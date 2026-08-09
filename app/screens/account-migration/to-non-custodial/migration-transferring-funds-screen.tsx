@@ -6,6 +6,7 @@ import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { Screen } from "@app/components/screen"
 import { StatusScreenLayout } from "@app/components/status-screen-layout"
 import { useCustodialOwnerId } from "@app/screens/account-migration/hooks/use-custodial-owner-id"
@@ -29,12 +30,18 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
   } = useTheme()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { ownerId } = useCustodialOwnerId()
-  const { migrationAccountId, migrationLoading, completeMigration } =
-    useCompleteMigration()
+  const {
+    migrationAccountId,
+    migrationExpectedReceiveSats,
+    migrationLoading,
+    completeMigration,
+  } = useCompleteMigration()
 
   /** No navigation at all while the funds move. */
   useHardwareBackGuard()
 
+  /** Every failure handover leaves this screen for good, so Back belongs on the commit
+   *  screen: the transfer is over and this one has nothing left to offer. */
   const goToContactSupport = useCallback(
     (reason: MigrationSupportReason) => {
       navigation.navigate("accountMigrationContactSupport", {
@@ -45,6 +52,16 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
     [navigation],
   )
 
+  /** The delayed handover is the one the user comes back from: the receive is still being
+   *  watched here, so its Back returns to this screen rather than popping it off the stack
+   *  along with the gate that is still waiting. */
+  const goToDelayedSupport = useCallback(() => {
+    navigation.navigate("accountMigrationContactSupport", {
+      reason: MigrationSupportReason.ReceiveDelayed,
+      origin: MigrationSupportOrigin.ReceiveDelayed,
+    })
+  }, [navigation])
+
   /** Completing the transfer clears the checkpoint and swaps the session, so once it
    *  succeeds a missing provisioned account is the expected outcome, not the fault this
    *  screen watches for. Without this, the success itself would trip that guard. */
@@ -54,12 +71,19 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
     !migrationLoading && !hasProvisionedAccount && !hasSwappedRef.current
 
   const isTransferSkipped = migrationLoading || isAccountMissing
-  const { isTransferred, failureReason, isClockOutOfSync, hasConnectionIssue, retry } =
-    useMigrationTransfer({
-      custodialAccountId: ownerId,
-      selfCustodialAccountId: migrationAccountId,
-      skip: isTransferSkipped,
-    })
+  const {
+    isTransferred,
+    isReceiveDelayed,
+    failureReason,
+    isClockOutOfSync,
+    hasConnectionIssue,
+    retry,
+  } = useMigrationTransfer({
+    custodialAccountId: ownerId,
+    selfCustodialAccountId: migrationAccountId,
+    expectedReceiveSats: migrationExpectedReceiveSats,
+    skip: isTransferSkipped,
+  })
 
   useEffect(() => {
     if (!isAccountMissing) return
@@ -106,10 +130,17 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
    *  Each keeps its own message; only a real failure leaves this screen for support. */
   const isRecoverable = isClockOutOfSync || hasConnectionIssue
 
+  /** The delayed notice yields to a recoverable issue: a lost connection explains the
+   *  wait better than the wait itself, and its retry is the more useful footer. */
+  const isDelayedNoticeShown = isReceiveDelayed && !isRecoverable
+
   const recoverableMessage = isClockOutOfSync
     ? LLMigration.clockOutOfSync.body()
     : LL.errors.network.connection()
-  const message = isRecoverable ? recoverableMessage : LLMigration.transferringFunds()
+  const waitingMessage = isDelayedNoticeShown
+    ? LLMigration.transferDelayed.body()
+    : LLMigration.transferringFunds()
+  const message = isRecoverable ? recoverableMessage : waitingMessage
 
   const retryTitle = isClockOutOfSync
     ? LLMigration.clockOutOfSync.retryCta()
@@ -118,9 +149,23 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
     ? "migration-clock-out-of-sync-retry"
     : "migration-connection-issue-retry"
 
-  const retryFooter = isRecoverable ? (
+  const recoverableFooter = (
     <GaloyPrimaryButton title={retryTitle} onPress={retry} {...testProps(retryTestId)} />
-  ) : undefined
+  )
+
+  /** Secondary, not primary: waiting stays the recommended path — the swap still fires
+   *  the moment the receive lands, including while the support screen sits on top (this
+   *  screen stays mounted beneath it, exactly like the failure handover). */
+  const delayedFooter = (
+    <GaloySecondaryButton
+      title={LLMigration.transferDelayed.contactSupportCta()}
+      onPress={goToDelayedSupport}
+      {...testProps("migration-receive-delayed-contact-support")}
+    />
+  )
+
+  const waitingFooter = isDelayedNoticeShown ? delayedFooter : undefined
+  const screenFooter = isRecoverable ? recoverableFooter : waitingFooter
 
   return (
     <Screen preset="fixed">
@@ -128,7 +173,7 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
         icon="clock"
         iconColor={colors.warning}
         iconBackgroundColor={colors._warningLight}
-        footer={retryFooter}
+        footer={screenFooter}
       >
         <Text style={styles.message}>{message}</Text>
       </StatusScreenLayout>

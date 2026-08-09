@@ -29,3 +29,24 @@ jobs:
         env:
           NODE_OPTIONS: --max-old-space-size=4096
         timeout-minutes: 20
+  android-unit-test:
+    name: Android unit tests
+    # GH-hosted: ships the Android SDK and JDK toolchains the Gradle build
+    # auto-detects, unlike the self-hosted small runners.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version-file: .nvmrc
+      # Gradle needs node_modules for the RN gradle plugins and autolinking.
+      - uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: node-modules-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
+      - run: yarn install --frozen-lockfile
+      # Caches ~/.gradle/caches and the wrapper between runs.
+      - uses: gradle/actions/setup-gradle@v4
+      - run: ./gradlew :app:testDebugUnitTest
+        working-directory: android
+        timeout-minutes: 30

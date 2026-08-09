@@ -42,6 +42,21 @@ jest.mock("@app/self-custodial/migration-transfer-request", () => ({
   buildMigrationTransferRequest: (args: unknown) => mockBuildTransferRequest(args),
 }))
 
+/** Confirmed by default so the server phase stays the deciding voice in the existing
+ *  cases; the receive-gate cases below flip it. */
+let mockReceiveConfirmation = { isReceiveConfirmed: true, isReceiveDelayed: false }
+const mockUseReceiveConfirmation = jest.fn()
+
+jest.mock(
+  "@app/screens/account-migration/hooks/use-migration-receive-confirmation",
+  () => ({
+    useMigrationReceiveConfirmation: (args: unknown) => {
+      mockUseReceiveConfirmation(args)
+      return mockReceiveConfirmation
+    },
+  }),
+)
+
 jest.mock("@app/self-custodial/hooks/use-spark-network", () => ({
   useSparkNetwork: () => "regtest",
 }))
@@ -83,6 +98,7 @@ const renderTransfer = (
     useMigrationTransfer({
       custodialAccountId: "custodial-1",
       selfCustodialAccountId: "sc-account-1",
+      expectedReceiveSats: 21000,
       skip: false,
       ...overrides,
     }),
@@ -101,6 +117,7 @@ describe("useMigrationTransfer", () => {
     mockCommitMigration.mockResolvedValue({ data: { migrationCommit: { errors: [] } } })
     mockIsDeviceClockSkewed.mockReturnValue(false)
     mockCurrentProofTimestamp.mockReturnValue(1_700_000_000)
+    mockReceiveConfirmation = { isReceiveConfirmed: true, isReceiveDelayed: false }
   })
 
   it("commits the collected destination while the server awaits one", async () => {
@@ -205,6 +222,7 @@ describe("useMigrationTransfer", () => {
         useMigrationTransfer({
           custodialAccountId,
           selfCustodialAccountId: "sc-account-1",
+          expectedReceiveSats: 21000,
           skip: false,
         }),
       { initialProps: { custodialAccountId: null as string | null } },
@@ -242,6 +260,7 @@ describe("useMigrationTransfer", () => {
         useMigrationTransfer({
           custodialAccountId,
           selfCustodialAccountId: "sc-account-1",
+          expectedReceiveSats: 21000,
           skip: false,
         }),
       { initialProps: { custodialAccountId: null as string | null } },
@@ -344,6 +363,98 @@ describe("useMigrationTransfer", () => {
 
     expect(result.current.isTransferred).toBe(true)
     expect(result.current.failureReason).toBeNull()
+  })
+
+  /** The fix for #4102: COMPLETED is the sender's word only. Until the receive into the
+   *  new wallet is confirmed, the swap must not fire — the funds are still in transit. */
+  it("holds the swap while the receive is unconfirmed", async () => {
+    mockStatus = MigrationStatus.Completed
+    mockReceiveConfirmation = { isReceiveConfirmed: false, isReceiveDelayed: false }
+    const { result } = renderTransfer()
+    await flushEffects()
+
+    expect(result.current.isTransferred).toBe(false)
+    expect(result.current.failureReason).toBeNull()
+  })
+
+  it("reports done once the receive confirms after the server completed", async () => {
+    mockStatus = MigrationStatus.Completed
+    mockReceiveConfirmation = { isReceiveConfirmed: false, isReceiveDelayed: false }
+    const { result, rerender } = renderTransfer()
+    await flushEffects()
+    expect(result.current.isTransferred).toBe(false)
+
+    mockReceiveConfirmation = { isReceiveConfirmed: true, isReceiveDelayed: false }
+    rerender({})
+    await flushEffects()
+
+    expect(result.current.isTransferred).toBe(true)
+  })
+
+  /** The phase can no longer change once the server settled COMPLETED, so the status
+   *  poll stops even while the receive gate is still waiting on the wallet. */
+  it("stops watching the phase while the receive gate waits", async () => {
+    mockStatus = MigrationStatus.Completed
+    mockReceiveConfirmation = { isReceiveConfirmed: false, isReceiveDelayed: false }
+    renderTransfer()
+    await flushEffects()
+
+    expect(mockUseMigrationStatus).toHaveBeenLastCalledWith({
+      skip: false,
+      pollInterval: 0,
+    })
+  })
+
+  /** Each look at the wallet opens a whole SDK connection, so the gate stays off until
+   *  the server has actually paid the drain out. */
+  it("keeps the receive gate off until the server completes", async () => {
+    mockStatus = MigrationStatus.Transferring
+    renderTransfer({ expectedReceiveSats: 21000 })
+    await flushEffects()
+
+    expect(mockUseReceiveConfirmation).toHaveBeenLastCalledWith({
+      selfCustodialAccountId: "sc-account-1",
+      expectedReceiveSats: 21000,
+      skip: true,
+    })
+
+    mockStatus = MigrationStatus.Completed
+    renderTransfer({ expectedReceiveSats: 21000 })
+    await flushEffects()
+
+    expect(mockUseReceiveConfirmation).toHaveBeenLastCalledWith({
+      selfCustodialAccountId: "sc-account-1",
+      expectedReceiveSats: 21000,
+      skip: false,
+    })
+  })
+
+  /** A failure already handed the user to support; the gate must not keep polling the
+   *  wallet for a swap that is never allowed to happen. */
+  it("keeps the receive gate off once a failure has handed over", async () => {
+    mockStatus = MigrationStatus.InProgress
+    mockCommitMigration.mockResolvedValue({
+      data: { migrationCommit: { errors: [{ message: "refused" }] } },
+    })
+    const { rerender } = renderTransfer()
+    await flushEffects()
+
+    mockStatus = MigrationStatus.Completed
+    rerender({})
+    await flushEffects()
+
+    expect(mockUseReceiveConfirmation).toHaveBeenLastCalledWith(
+      expect.objectContaining({ skip: true }),
+    )
+  })
+
+  it("passes the delayed notice through for the screen to show", async () => {
+    mockStatus = MigrationStatus.Completed
+    mockReceiveConfirmation = { isReceiveConfirmed: false, isReceiveDelayed: true }
+    const { result } = renderTransfer()
+    await flushEffects()
+
+    expect(result.current.isReceiveDelayed).toBe(true)
   })
 
   /** FAILED has no client-side way back: the phase machine only leaves it when a late

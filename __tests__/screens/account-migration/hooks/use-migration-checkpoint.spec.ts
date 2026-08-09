@@ -122,7 +122,9 @@ describe("useMigrationCheckpoint", () => {
     await waitFor(() => expect(result.current.loading).toBe(false))
 
     act(() => {
-      result.current.saveCheckpoint(MigrationCheckpoint.BackupMethod, "sc-account-1")
+      result.current.saveCheckpoint(MigrationCheckpoint.BackupMethod, {
+        provisionedAccountId: "sc-account-1",
+      })
     })
 
     expect(result.current.accountId).toBe("sc-account-1")
@@ -145,6 +147,69 @@ describe("useMigrationCheckpoint", () => {
     await waitFor(() => expect(result.current.loading).toBe(false))
 
     expect(result.current.accountId).toBe("sc-account-2")
+  })
+
+  it("persists and exposes the expected receive figure", async () => {
+    const { result } = renderHook(() => useMigrationCheckpoint())
+
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    act(() => {
+      result.current.saveCheckpoint(MigrationCheckpoint.BalancesOverview, {
+        provisionedAccountId: "sc-1",
+        expectedReceiveSats: 21000,
+      })
+    })
+
+    expect(result.current.expectedReceiveSats).toBe(21000)
+    expect(mockSaveCheckpointToStorage).toHaveBeenCalledWith("migrationCheckpoint_main", {
+      step: MigrationCheckpoint.BalancesOverview,
+      accountId: "sc-1",
+      custodialAccountId: "custodial-1",
+      expectedReceiveSats: 21000,
+    })
+  })
+
+  it("loads the expected receive figure from storage", async () => {
+    mockLoadCheckpoint.mockResolvedValue({
+      step: MigrationCheckpoint.BalancesOverview,
+      savedAt: Date.now(),
+      accountId: "sc-account-2",
+      expectedReceiveSats: 500,
+    })
+
+    const { result } = renderHook(() => useMigrationCheckpoint())
+
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    expect(result.current.expectedReceiveSats).toBe(500)
+  })
+
+  /** A zero must survive the save: the receive gate reads absent as "unknown" and would
+   *  wait on a receive that a zero-figure migration will never get. */
+  it("re-sends a known zero expected figure on step saves", async () => {
+    mockLoadCheckpoint.mockResolvedValue({
+      step: MigrationCheckpoint.BalancesOverview,
+      savedAt: Date.now(),
+      accountId: "sc-account-2",
+      custodialAccountId: "custodial-1",
+      expectedReceiveSats: 0,
+    })
+
+    const { result } = renderHook(() => useMigrationCheckpoint())
+
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    act(() => {
+      result.current.saveCheckpoint(MigrationCheckpoint.BalancesOverview)
+    })
+
+    expect(mockSaveCheckpointToStorage).toHaveBeenCalledWith("migrationCheckpoint_main", {
+      step: MigrationCheckpoint.BalancesOverview,
+      accountId: "sc-account-2",
+      custodialAccountId: "custodial-1",
+      expectedReceiveSats: 0,
+    })
   })
 
   it("reports the error and finishes loading when loadCheckpoint rejects", async () => {
@@ -341,7 +406,7 @@ describe("useMigrationCheckpoint", () => {
     expect(mockNavigate).toHaveBeenCalledWith("accountMigrationExplainer")
   })
 
-  it("navigates to the checkpoint's screen for a provisioned checkpoint", async () => {
+  it("restarts at the explainer for a provisioned checkpoint before the commit point", async () => {
     mockLoadCheckpoint.mockResolvedValue({
       step: MigrationCheckpoint.BackupMethod,
       savedAt: Date.now(),
@@ -356,27 +421,7 @@ describe("useMigrationCheckpoint", () => {
       result.current.navigateToCheckpoint()
     })
 
-    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupMethod")
-  })
-
-  it("forwards the migration flow param when resuming at the terms screen", async () => {
-    mockLoadCheckpoint.mockResolvedValue({
-      step: MigrationCheckpoint.TermsAndConditions,
-      savedAt: Date.now(),
-      accountId: "sc-account-1",
-    })
-
-    const { result } = renderHook(() => useMigrationCheckpoint())
-
-    await waitFor(() => expect(result.current.loading).toBe(false))
-
-    act(() => {
-      result.current.navigateToCheckpoint()
-    })
-
-    expect(mockNavigate).toHaveBeenCalledWith("acceptTermsAndConditions", {
-      flow: "migration",
-    })
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationExplainer")
   })
 
   it("resumes at the balances overview after reaching the commit point", async () => {
@@ -399,7 +444,7 @@ describe("useMigrationCheckpoint", () => {
 
   it("replaces the current screen when resuming through replaceToCheckpoint", async () => {
     mockLoadCheckpoint.mockResolvedValue({
-      step: MigrationCheckpoint.TermsAndConditions,
+      step: MigrationCheckpoint.BalancesOverview,
       savedAt: Date.now(),
       accountId: "sc-account-1",
     })
@@ -412,13 +457,11 @@ describe("useMigrationCheckpoint", () => {
       result.current.replaceToCheckpoint()
     })
 
-    expect(mockReplace).toHaveBeenCalledWith("acceptTermsAndConditions", {
-      flow: "migration",
-    })
+    expect(mockReplace).toHaveBeenCalledWith("accountMigrationBalancesOverview")
     expect(mockNavigate).not.toHaveBeenCalled()
   })
 
-  it("replaces to a param-less destination when the checkpoint is past the terms", async () => {
+  it("replaces to the explainer when the checkpoint is before the commit point", async () => {
     mockLoadCheckpoint.mockResolvedValue({
       step: MigrationCheckpoint.BackupMethod,
       savedAt: Date.now(),
@@ -433,7 +476,7 @@ describe("useMigrationCheckpoint", () => {
       result.current.replaceToCheckpoint()
     })
 
-    expect(mockReplace).toHaveBeenCalledWith("selfCustodialBackupMethod")
+    expect(mockReplace).toHaveBeenCalledWith("accountMigrationExplainer")
   })
 
   it("resumes from the explainer when the checkpoint has no provisioned account", async () => {
@@ -488,6 +531,50 @@ describe("useMigrationCheckpoint", () => {
     await waitFor(() => expect(result.current.loading).toBe(false))
 
     expect(result.current.hasResumableCheckpoint).toBe(false)
+  })
+
+  it("reports the commit point once the balances overview is stored", async () => {
+    mockLoadCheckpoint.mockResolvedValue({
+      step: MigrationCheckpoint.BalancesOverview,
+      savedAt: Date.now(),
+      accountId: "sc-account-1",
+    })
+
+    const { result } = renderHook(() => useMigrationCheckpoint())
+
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    expect(result.current.isAtCommitPoint).toBe(true)
+  })
+
+  /** The distinction the restart rests on: a resumable checkpoint is not a committed one,
+   *  so an abandoned backup step reopens the flow from scratch (#4109). */
+  it("is not at the commit point for a resumable checkpoint before it", async () => {
+    mockLoadCheckpoint.mockResolvedValue({
+      step: MigrationCheckpoint.BackupAlerts,
+      savedAt: Date.now(),
+      accountId: "sc-account-1",
+    })
+
+    const { result } = renderHook(() => useMigrationCheckpoint())
+
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    expect(result.current.hasResumableCheckpoint).toBe(true)
+    expect(result.current.isAtCommitPoint).toBe(false)
+  })
+
+  it("is not at the commit point when the balances step has no provisioned account", async () => {
+    mockLoadCheckpoint.mockResolvedValue({
+      step: MigrationCheckpoint.BalancesOverview,
+      savedAt: Date.now(),
+    })
+
+    const { result } = renderHook(() => useMigrationCheckpoint())
+
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    expect(result.current.isAtCommitPoint).toBe(false)
   })
 
   it("hides a checkpoint owned by a different custodial account", async () => {
@@ -621,7 +708,7 @@ describe("useMigrationCheckpoint", () => {
       result2.current.navigateToCheckpoint()
     })
 
-    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSecurityChecks")
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationExplainer")
   })
 
   it("does not update state when the load fails after unmount", async () => {

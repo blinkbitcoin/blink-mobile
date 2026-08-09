@@ -3792,6 +3792,10 @@
     "explainerCheck5": "Es descomptarà una comissió de xarxa de Spark del teu compte",
     "explainerCta": "Ho entenc",
     "transferringFunds": "Transferint els teus fons. Hauria d'estar llest en uns segons.",
+    "transferDelayed": {
+      "body": "Els teus fons estan de camí al teu nou compte. Està trigant més de l'habitual — mantén l'aplicació oberta i ho acabarem automàticament.",
+      "contactSupportCta": "Contacta amb suport"
+    },
     "clockOutOfSync": {
       "body": "La data i l'hora del teu dispositiu no estan sincronitzades. Configura-les en automàtic per continuar.",
       "retryCta": "Torna-ho a provar"

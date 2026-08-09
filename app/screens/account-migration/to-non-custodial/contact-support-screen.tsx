@@ -1,4 +1,4 @@
-import React, { useCallback, useLayoutEffect } from "react"
+import React, { useCallback, useEffect, useLayoutEffect, useRef } from "react"
 import { ScrollView, View } from "react-native"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
@@ -6,7 +6,6 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { IconNamesType } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
-import { HeaderBackButton } from "@react-navigation/elements"
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
@@ -97,34 +96,55 @@ export const MigrationContactSupportScreen: React.FC = () => {
    */
   const isResumeOrigin = params?.origin === MigrationSupportOrigin.Resume
   const isGateOrigin = params?.origin === MigrationSupportOrigin.Gate
+  /** The delayed handover shares the resume path's Back: the transfer screen is still
+   *  mounted underneath watching for the receive, and navigating to the commit screen
+   *  would pop it off the stack, taking the gate the user is waiting on with it. */
+  const isReceiveDelayedOrigin = params?.origin === MigrationSupportOrigin.ReceiveDelayed
+  const isBackToScreenBeneath = isResumeOrigin || isReceiveDelayedOrigin
+  const isBackToCommitScreen = !isGateOrigin && !isBackToScreenBeneath
   const handleBack = useCallback(() => {
     if (isGateOrigin) return
-    if (isResumeOrigin) {
+    if (isBackToScreenBeneath) {
       navigation.goBack()
       return
     }
     navigation.navigate("accountMigrationBalancesOverview")
-  }, [isGateOrigin, isResumeOrigin, navigation])
+  }, [isGateOrigin, isBackToScreenBeneath, navigation])
   useHardwareBackGuard(handleBack)
 
-  /** The back control lives in the navigator header, but its target is set from here so it
-   *  reuses this screen's origin-aware back path rather than a blind goBack, which from a
-   *  transfer-time failure would land on the swallowing transfer screen. */
+  /** The navigator already supplies the back control, so the native one stays hidden or the
+   *  header shows two. The gate handover is terminal and keeps no control at all: the header
+   *  holds nothing else here, so hiding it outright leaves the same screen without one. */
   useLayoutEffect(() => {
     navigation.setOptions({
+      headerShown: !isGateOrigin,
       headerBackVisible: false,
-      headerLeft: () =>
-        isGateOrigin ? null : (
-          <HeaderBackButton
-            tintColor={colors.black}
-            pressColor={colors.grey5}
-            pressOpacity={1}
-            onPress={handleBack}
-            {...testProps("migration-contact-support-back")}
-          />
-        ),
     })
-  }, [navigation, handleBack, isGateOrigin, colors.black, colors.grey5])
+  }, [navigation, isGateOrigin])
+
+  /**
+   * The commit-time handover is the only origin whose back must not simply pop: the screen
+   * beneath it swallows back, so the press is intercepted and redirected to the commit
+   * point instead. Every other origin pops, which is already what the header control does.
+   *
+   * Intercepting through the navigator rather than replacing `headerLeft` is deliberate: a
+   * `headerLeft` render function passed through `setOptions` makes the native stack header
+   * re-render with a different hook count on Android, which crashes the screen outright
+   * ("Rendered fewer hooks than expected") before any of this is reachable.
+   */
+  const isRedirectingBackRef = useRef(false)
+  useEffect(() => {
+    if (!isBackToCommitScreen) return
+    return navigation.addListener("beforeRemove", (event) => {
+      /** The redirect removes this screen too, as does the self-help retry below; letting a
+       *  removal we asked for pass through is what ends the interception instead of looping
+       *  on it, or hijacking the retry into a navigate back to the refusal. */
+      if (isRedirectingBackRef.current) return
+      event.preventDefault()
+      isRedirectingBackRef.current = true
+      navigation.navigate("accountMigrationBalancesOverview")
+    })
+  }, [navigation, isBackToCommitScreen])
 
   const { supportEmailAddress } = useContactSupport()
   const { copyToClipboard } = useClipboard()
@@ -150,8 +170,14 @@ export const MigrationContactSupportScreen: React.FC = () => {
    * dispatcher is the target rather than a migration screen because it owns the
    * resume-vs-fresh decision and the self-custodial kill-switch; Primary stays underneath so
    * the user is not stranded in a flow with nothing behind it.
+   *
+   * The reset removes this screen, which the commit-origin back interception above would
+   * otherwise catch and turn into a navigate to the commit point — landing the user back on
+   * the screen still holding the refusal. Claiming the redirect ref first marks this removal
+   * as one we asked for, so it passes through.
    */
   const retryMigration = useCallback(() => {
+    isRedirectingBackRef.current = true
     navigation.reset({
       index: 1,
       routes: [{ name: "Primary" }, { name: "accountMigrationEntry" }],

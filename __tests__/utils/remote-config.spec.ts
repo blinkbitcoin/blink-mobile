@@ -2,13 +2,18 @@ import {
   getRemoteConfigList,
   getRemoteConfigNumericObject,
   getRemoteConfigObject,
+  getRemoteConfigPositiveNumber,
   getRemoteConfigStringList,
   serializeRemoteConfigDefault,
 } from "@app/utils/remote-config"
 
 const mockLogError = jest.fn()
 const mockAsString = jest.fn()
-const mockGetValue = jest.fn(() => ({ asString: mockAsString }))
+const mockAsNumber = jest.fn()
+const mockGetValue = jest.fn(() => ({
+  asString: mockAsString,
+  asNumber: mockAsNumber,
+}))
 
 jest.mock("@app/utils/log-error", () => ({
   logError: (...args: unknown[]) => mockLogError(...args),
@@ -297,5 +302,60 @@ describe("getRemoteConfigNumericObject", () => {
         context: expect.objectContaining({ actualShape: "array" }),
       }),
     )
+  })
+})
+
+describe("getRemoteConfigPositiveNumber", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it("returns a finite positive remote value", () => {
+    mockAsNumber.mockReturnValue(30_000)
+    mockAsString.mockReturnValue("30000")
+
+    expect(getRemoteConfigPositiveNumber("duration-key", 60_000)).toBe(30_000)
+    expect(mockGetValue).toHaveBeenCalledWith("duration-key")
+    expect(mockLogError).not.toHaveBeenCalled()
+  })
+
+  /** asNumber() answers 0 for anything it cannot parse, and for a duration a real zero
+   *  means "no wait at all" — the opposite of what a caller asking for one wants. */
+  it("keeps the fallback and reports a value that was set but does not parse", () => {
+    mockAsNumber.mockReturnValue(0)
+    mockAsString.mockReturnValue("60s")
+
+    expect(getRemoteConfigPositiveNumber("duration-key", 60_000)).toBe(60_000)
+    expect(mockLogError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        context: expect.objectContaining({ rawSnippet: "60s" }),
+      }),
+    )
+  })
+
+  it("keeps the fallback and reports a negative value", () => {
+    mockAsNumber.mockReturnValue(-1)
+    mockAsString.mockReturnValue("-1")
+
+    expect(getRemoteConfigPositiveNumber("duration-key", 60_000)).toBe(60_000)
+    expect(mockLogError).toHaveBeenCalled()
+  })
+
+  it("keeps the fallback and reports a non-finite value", () => {
+    mockAsNumber.mockReturnValue(Number.NaN)
+    mockAsString.mockReturnValue("not-a-number")
+
+    expect(getRemoteConfigPositiveNumber("duration-key", 60_000)).toBe(60_000)
+    expect(mockLogError).toHaveBeenCalled()
+  })
+
+  /** A key that was never set answers with its registered default; that is not an ops
+   *  mistake, so it must not file one on every launch. */
+  it("keeps the fallback silently when the key was never set", () => {
+    mockAsNumber.mockReturnValue(0)
+    mockAsString.mockReturnValue("")
+
+    expect(getRemoteConfigPositiveNumber("missing-key", 60_000)).toBe(60_000)
+    expect(mockLogError).not.toHaveBeenCalled()
   })
 })
