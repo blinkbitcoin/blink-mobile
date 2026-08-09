@@ -2,6 +2,7 @@ import React from "react"
 import {
   ActivityIndicator,
   StyleSheet,
+  Text,
   View,
   type TextStyle,
   type ViewStyle,
@@ -164,5 +165,22 @@ describe("GaloyPrimaryButton", () => {
     )
 
     expect(getSpinnerColor()).toBe("#123456")
+  })
+
+  it("takes its testID from a string title, and skips it for a rendered one", () => {
+    renderButton()
+    expect(screen.getByTestId("Continue")).toBeTruthy()
+    screen.unmount()
+
+    // A node title has no string to name the button by, so the automatic
+    // testProps are skipped rather than stringified into a useless id.
+    render(
+      <ContextForScreen>
+        <GaloyPrimaryButton title={<Text>Continue</Text>} onPress={() => {}} />
+      </ContextForScreen>,
+    )
+
+    expect(screen.getByText("Continue")).toBeTruthy()
+    expect(screen.queryByTestId("Continue")).toBeNull()
   })
 })
