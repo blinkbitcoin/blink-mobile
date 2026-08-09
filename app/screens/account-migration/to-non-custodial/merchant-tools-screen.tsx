@@ -1,7 +1,7 @@
 import React from "react"
-import { ScrollView } from "react-native"
+import { ScrollView, View } from "react-native"
 
-import { makeStyles, useTheme } from "@rn-vui/themed"
+import { Divider, makeStyles, useTheme } from "@rn-vui/themed"
 
 import { IconNamesType } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
@@ -17,6 +17,10 @@ type MigrationMerchantToolsScreenProps = {
   onContinue: () => void
   onBack: () => void
 }
+
+const TOOLS_DIVIDER_WIDTH = 1
+
+const TOOL_ICON_SIZE = 20
 
 /**
  * The companion to the API-key warning: the API retires, but every tool for incoming
@@ -34,12 +38,10 @@ export const MigrationMerchantToolsScreen: React.FC<
 
   const merchantToolsLL = LL.AccountMigration.merchantTools
 
-  /** The gate renders this step in place, so an unguarded Android back would pop the whole
-   *  flow while the arrow on screen only steps back one. Both go to the same place. */
+  /** The gate renders this step in place, so an unguarded system back pops the whole flow
+   *  where the arrow on screen only steps back one. */
   useHardwareBackGuard(onBack)
 
-  /** Each tool carries the icon its Settings row already uses, so the two lists read as
-   *  the same product rather than two takes on it. */
   const tools: { icon: IconNamesType; title: string; body: string }[] = [
     {
       icon: "calculator",
@@ -84,38 +86,54 @@ export const MigrationMerchantToolsScreen: React.FC<
         subtitle={merchantToolsLL.body()}
       />
 
-      {/** The list scrolls under a fixed hero: four cards plus a long translation
-       *  overflow the shortest screens, and the Got it button stays reachable. */}
-      <ScrollView style={styles.scroll} contentContainerStyle={styles.tools}>
-        {tools.map((tool) => (
-          <SettingItemRow
-            key={tool.icon}
-            leftIcon={tool.icon}
-            leftIconColor={colors._green}
-            title={tool.title}
-            subtitle={tool.body}
-            titleStyle={styles.toolTitle}
-            rightIcon={null}
-          />
-        ))}
+      {/** Scrolls under a fixed hero so a long translation never pushes Got it off screen. */}
+      <ScrollView style={styles.scroll} contentContainerStyle={styles.body}>
+        <View style={styles.toolsCard} {...testProps("migration-merchant-tools-card")}>
+          {tools.map((tool, index) => (
+            <React.Fragment key={tool.icon}>
+              {index > 0 && (
+                <Divider
+                  color={colors.grey4}
+                  width={TOOLS_DIVIDER_WIDTH}
+                  style={styles.toolsDivider}
+                />
+              )}
+              <SettingItemRow
+                leftIcon={tool.icon}
+                leftIconSize={TOOL_ICON_SIZE}
+                title={tool.title}
+                subtitle={tool.body}
+                rightIcon={null}
+                containerStyle={styles.toolRow}
+              />
+            </React.Fragment>
+          ))}
+        </View>
       </ScrollView>
     </MigrationStepLayout>
   )
 }
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles(({ colors }) => ({
   scroll: {
     flex: 1,
   },
-  tools: {
-    paddingTop: 24,
+  body: {
+    paddingTop: 30,
     paddingHorizontal: 20,
     paddingBottom: 20,
-    gap: 10,
   },
-  toolTitle: {
-    fontSize: 16,
-    fontWeight: "700",
-    lineHeight: 22,
+  toolsCard: {
+    backgroundColor: colors.grey5,
+    borderRadius: 8,
+    overflow: "hidden",
+  },
+  toolsDivider: {
+    marginHorizontal: 10,
+  },
+  toolRow: {
+    backgroundColor: colors.transparent,
+    borderRadius: 0,
+    paddingVertical: 4,
   },
 }))

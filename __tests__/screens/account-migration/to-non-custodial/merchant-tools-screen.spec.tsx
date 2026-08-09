@@ -1,16 +1,26 @@
 import React from "react"
+import { StyleSheet } from "react-native"
 import { render, screen, fireEvent } from "@testing-library/react-native"
 
 import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
+import { dark, light } from "@app/rne-theme/colors"
 
 import { MigrationMerchantToolsScreen } from "@app/screens/account-migration/to-non-custodial/merchant-tools-screen"
-import { ContextForScreen } from "../../helper"
+import { ContextForScreen, ContextForScreenWithTheme } from "../../helper"
 import { flushEffects } from "../../../helpers/flush-effects"
 
 loadLocale("en")
 const LL = i18nObject("en")
 const merchantToolsLL = LL.AccountMigration.merchantTools
+
+const TOOL_ICON_TEST_IDS = [
+  "icon-calculator",
+  "icon-donation-button",
+  "icon-btcpay",
+  "icon-woocommerce",
+]
+const TOOL_ICON_SIZE = 20
 
 const mockOnContinue = jest.fn()
 const mockOnBack = jest.fn()
@@ -20,6 +30,13 @@ const renderScreen = () =>
     <ContextForScreen>
       <MigrationMerchantToolsScreen onContinue={mockOnContinue} onBack={mockOnBack} />
     </ContextForScreen>,
+  )
+
+const renderScreenInTheme = (mode: "light" | "dark") =>
+  render(
+    <ContextForScreenWithTheme mode={mode}>
+      <MigrationMerchantToolsScreen onContinue={mockOnContinue} onBack={mockOnBack} />
+    </ContextForScreenWithTheme>,
   )
 
 describe("MigrationMerchantToolsScreen", () => {
@@ -62,6 +79,75 @@ describe("MigrationMerchantToolsScreen", () => {
     expect(screen.getByTestId("icon-donation-button")).toBeTruthy()
     expect(screen.getByTestId("icon-btcpay")).toBeTruthy()
     expect(screen.getByTestId("icon-woocommerce")).toBeTruthy()
+  })
+
+  it("groups the tools on the grouped-list surface in both themes", async () => {
+    renderScreenInTheme("light")
+    await flushEffects()
+
+    expect(screen.getByTestId("migration-merchant-tools-card")).toHaveStyle({
+      backgroundColor: light.grey5,
+    })
+
+    screen.unmount()
+    renderScreenInTheme("dark")
+    await flushEffects()
+
+    expect(screen.getByTestId("migration-merchant-tools-card")).toHaveStyle({
+      backgroundColor: dark.grey5,
+    })
+  })
+
+  it("separates the tools with a 1pt grey4 rule between each pair", async () => {
+    renderScreenInTheme("dark")
+    await flushEffects()
+
+    const dividers = screen.getAllByTestId("RNE__Divider")
+
+    expect(dividers).toHaveLength(3)
+    dividers.forEach((divider) => {
+      expect(StyleSheet.flatten(divider.props.style)).toMatchObject({
+        borderBottomColor: dark.grey4,
+        borderBottomWidth: 1,
+        marginHorizontal: 10,
+      })
+    })
+  })
+
+  it("sizes every tool icon alike", async () => {
+    renderScreen()
+    await flushEffects()
+
+    TOOL_ICON_TEST_IDS.forEach((testID) => {
+      expect(screen.getByTestId(testID).props.width).toBe(TOOL_ICON_SIZE)
+      expect(screen.getByTestId(testID).props.height).toBe(TOOL_ICON_SIZE)
+    })
+  })
+
+  it("draws the tool icons black in the light theme", async () => {
+    renderScreenInTheme("light")
+    await flushEffects()
+
+    TOOL_ICON_TEST_IDS.forEach((testID) => {
+      expect(screen.getByTestId(testID).props.color).toBe(light.black)
+    })
+  })
+
+  it("draws the tool icons white in the dark theme", async () => {
+    renderScreenInTheme("dark")
+    await flushEffects()
+
+    TOOL_ICON_TEST_IDS.forEach((testID) => {
+      expect(screen.getByTestId(testID).props.color).toBe(dark.black)
+    })
+  })
+
+  it("keeps the hero accent green while the rows follow the foreground", async () => {
+    renderScreenInTheme("dark")
+    await flushEffects()
+
+    expect(screen.getByTestId("icon-receive").props.color).toBe(dark._green)
+    expect(screen.getByTestId("icon-calculator").props.color).not.toBe(dark._green)
   })
 
   it("offers a single action, with no way to tap into a tool", async () => {
