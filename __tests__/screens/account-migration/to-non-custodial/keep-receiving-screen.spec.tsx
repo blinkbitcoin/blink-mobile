@@ -108,13 +108,14 @@ describe("MigrationKeepReceivingScreen", () => {
     expect(address.props.ellipsizeMode).toBe("middle")
   })
 
-  it("hands off to the flow's next step when the CTA is pressed", async () => {
+  it("hands off to the merchant tools when the CTA is pressed", async () => {
     renderScreen()
     await flushEffects()
 
     fireEvent.press(screen.getByText(LL.AccountMigration.keepReceivingCta()))
 
-    expect(mockGoToNextStep).toHaveBeenCalledTimes(1)
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationMerchantTools")
+    expect(mockGoToNextStep).not.toHaveBeenCalled()
   })
 
   it("renders nothing while the next-step checks are loading", async () => {

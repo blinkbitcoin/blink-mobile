@@ -158,6 +158,7 @@ import {
   MigrationExplainerScreen,
   MigrationGate,
   MigrationKeepReceivingScreen,
+  MigrationMerchantToolsScreen,
   MigrationTransferringFundsScreen,
 } from "@app/screens/account-migration"
 import {
@@ -903,6 +904,11 @@ export const RootStack = () => {
       <RootNavigator.Screen
         name="accountMigrationKeepReceiving"
         component={MigrationKeepReceivingScreen}
+        options={{ title: "" }}
+      />
+      <RootNavigator.Screen
+        name="accountMigrationMerchantTools"
+        component={MigrationMerchantToolsScreen}
         options={{ title: "" }}
       />
       <RootNavigator.Screen

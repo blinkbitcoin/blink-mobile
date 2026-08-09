@@ -12440,13 +12440,15 @@ type RootTranslation = {
 		 */
 		downloadHistoryDownloadCta: string
 		/**
-		 * A​P​I​ ​s​e​r​v​i​c​e​ ​n​o​t​ ​a​v​a​i​l​a​b​l​e
+		 * A​b​o​u​t​ ​y​o​u​r​ ​A​P​I​ ​k​e​y​s
 		 */
 		apiServiceTitle: string
 		/**
-		 * W​e​ ​n​o​t​e​ ​t​h​a​t​ ​y​o​u​ ​h​a​v​e​ ​a​c​t​i​v​e​ ​A​P​I​ ​k​e​y​s​.​ ​B​l​i​n​k​ ​c​a​n​'​t​ ​p​r​o​v​i​d​e​ ​t​h​e​ ​A​P​I​ ​i​n​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​m​o​d​e​.​
+		 * Y​o​u​r​ ​a​c​c​o​u​n​t​ ​h​a​s​ ​a​c​t​i​v​e​ ​A​P​I​ ​k​e​y​s​.​ ​T​h​e​ ​A​P​I​ ​w​o​n​'​t​ ​b​e​ ​a​v​a​i​l​a​b​l​e​ ​a​f​t​e​r​ ​y​o​u​ ​m​o​v​e​ ​t​o​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​.​
 	​
-	​I​f​ ​y​o​u​ ​a​r​e​ ​d​e​p​e​n​d​e​n​t​ ​o​n​ ​B​l​i​n​k​'​s​ ​A​P​I​,​ ​c​o​n​t​a​c​t​ ​u​s​ ​p​r​o​m​p​t​l​y​ ​a​n​d​ ​w​e​ ​w​i​l​l​ ​d​o​ ​o​u​r​ ​b​e​s​t​ ​t​o​ ​a​s​s​i​s​t​ ​a​ ​s​m​o​o​t​h​ ​t​r​a​n​s​i​t​i​o​n​.
+	​B​l​i​n​k​ ​h​a​s​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​p​p​s​ ​t​h​a​t​ ​r​e​p​l​a​c​e​ ​m​o​s​t​ ​f​u​n​c​t​i​o​n​s​ ​o​f​ ​t​h​e​ ​A​P​I​,​ ​e​x​c​e​p​t​ ​s​e​n​d​i​n​g​.​ ​Y​o​u​ ​w​i​l​l​ ​f​i​n​d​ ​t​h​e​m​ ​i​n​ ​t​h​e​ ​S​e​t​t​i​n​g​s​ ​m​e​n​u​.​
+	​
+	​I​f​ ​y​o​u​ ​u​s​e​ ​t​h​e​ ​A​P​I​ ​t​o​ ​s​e​n​d​,​ ​u​n​f​o​r​t​u​n​a​t​e​l​y​ ​i​t​ ​w​i​l​l​ ​n​o​ ​l​o​n​g​e​r​ ​b​e​ ​p​o​s​s​i​b​l​e​.
 		 */
 		apiServiceBody: string
 		/**
@@ -12454,9 +12456,55 @@ type RootTranslation = {
 		 */
 		apiServiceContactCta: string
 		/**
-		 * C​o​n​t​i​n​u​e​ ​a​n​y​w​a​y​s
+		 * C​o​n​t​i​n​u​e​ ​t​h​e​ ​M​i​g​r​a​t​i​o​n
 		 */
 		apiServiceContinueCta: string
+		merchantTools: {
+			/**
+			 * K​e​e​p​ ​g​e​t​t​i​n​g​ ​p​a​i​d​ ​a​s​ ​u​s​u​a​l
+			 */
+			title: string
+			/**
+			 * A​l​l​ ​t​o​o​l​s​ ​f​o​r​ ​i​n​c​o​m​i​n​g​ ​p​a​y​m​e​n​t​s​ ​k​e​e​p​ ​w​o​r​k​i​n​g​.​ ​J​u​s​t​ ​a​d​d​ ​y​o​u​r​ ​L​i​g​h​t​n​i​n​g​ ​a​d​d​r​e​s​s​.
+			 */
+			body: string
+			/**
+			 * G​o​t​ ​i​t
+			 */
+			cta: string
+			/**
+			 * B​l​i​n​k​ ​T​e​r​m​i​n​a​l
+			 */
+			terminalTitle: string
+			/**
+			 * A​ ​p​o​i​n​t​ ​o​f​ ​s​a​l​e​ ​i​n​ ​a​n​y​ ​b​r​o​w​s​e​r​.
+			 */
+			terminalBody: string
+			/**
+			 * D​o​n​a​t​e​ ​B​u​t​t​o​n
+			 */
+			donationTitle: string
+			/**
+			 * A​c​c​e​p​t​ ​d​o​n​a​t​i​o​n​s​ ​o​n​ ​a​n​y​ ​w​e​b​s​i​t​e​.
+			 */
+			donationBody: string
+			/**
+			 * B​T​C​P​a​y​ ​P​l​u​g​i​n
+			 */
+			btcpayTitle: string
+			/**
+			 * L​i​g​h​t​n​i​n​g​ ​p​a​y​m​e​n​t​s​ ​o​n​ ​y​o​u​r​ ​B​T​C​P​a​y​ ​S​e​r​v​e​r​.
+			 */
+			btcpayBody: string
+			/**
+			 * W​o​o​C​o​m​m​e​r​c​e​ ​P​l​u​g​i​n
+			 */
+			woocommerceTitle: string
+			/**
+			 * B​i​t​c​o​i​n​ ​c​h​e​c​k​o​u​t​ ​f​o​r​ ​y​o​u​r​ ​o​n​l​i​n​e​ ​s​t​o​r​e​.
+			 */
+			woocommerceBody: string
+		}
 		/**
 		 * S​o​m​e​t​h​i​n​g​ ​w​e​n​t​ ​w​r​o​n​g​ ​r​e​s​u​m​i​n​g​ ​y​o​u​r​ ​m​i​g​r​a​t​i​o​n​.​ ​P​l​e​a​s​e​ ​s​t​a​r​t​ ​i​t​ ​a​g​a​i​n​.
 		 */
@@ -25477,13 +25525,15 @@ export type TranslationFunctions = {
 		 */
 		downloadHistoryDownloadCta: () => LocalizedString
 		/**
-		 * API service not available
+		 * About your API keys
 		 */
 		apiServiceTitle: () => LocalizedString
 		/**
-		 * We note that you have active API keys. Blink can't provide the API in non-custodial mode.
+		 * Your account has active API keys. The API won't be available after you move to non-custodial.
 
-	If you are dependent on Blink's API, contact us promptly and we will do our best to assist a smooth transition.
+	Blink has non-custodial apps that replace most functions of the API, except sending. You will find them in the Settings menu.
+
+	If you use the API to send, unfortunately it will no longer be possible.
 		 */
 		apiServiceBody: () => LocalizedString
 		/**
@@ -25491,9 +25541,55 @@ export type TranslationFunctions = {
 		 */
 		apiServiceContactCta: () => LocalizedString
 		/**
-		 * Continue anyways
+		 * Continue the Migration
 		 */
 		apiServiceContinueCta: () => LocalizedString
+		merchantTools: {
+			/**
+			 * Keep getting paid as usual
+			 */
+			title: () => LocalizedString
+			/**
+			 * All tools for incoming payments keep working. Just add your Lightning address.
+			 */
+			body: () => LocalizedString
+			/**
+			 * Got it
+			 */
+			cta: () => LocalizedString
+			/**
+			 * Blink Terminal
+			 */
+			terminalTitle: () => LocalizedString
+			/**
+			 * A point of sale in any browser.
+			 */
+			terminalBody: () => LocalizedString
+			/**
+			 * Donate Button
+			 */
+			donationTitle: () => LocalizedString
+			/**
+			 * Accept donations on any website.
+			 */
+			donationBody: () => LocalizedString
+			/**
+			 * BTCPay Plugin
+			 */
+			btcpayTitle: () => LocalizedString
+			/**
+			 * Lightning payments on your BTCPay Server.
+			 */
+			btcpayBody: () => LocalizedString
+			/**
+			 * WooCommerce Plugin
+			 */
+			woocommerceTitle: () => LocalizedString
+			/**
+			 * Bitcoin checkout for your online store.
+			 */
+			woocommerceBody: () => LocalizedString
+		}
 		/**
 		 * Something went wrong resuming your migration. Please start it again.
 		 */

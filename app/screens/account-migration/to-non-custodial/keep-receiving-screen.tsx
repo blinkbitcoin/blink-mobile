@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react"
 import { ActivityIndicator, View } from "react-native"
-import { useIsFocused } from "@react-navigation/native"
+import { useIsFocused, useNavigation } from "@react-navigation/native"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
@@ -13,6 +14,7 @@ import { useAddressScreenQuery } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useAppConfig } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useMigrationNextStep } from "@app/screens/account-migration/hooks"
 import { MigrationStepLayout } from "@app/screens/account-migration/migration-step-layout"
 import { getLightningAddress } from "@app/utils/pay-links"
@@ -25,6 +27,7 @@ export const MigrationKeepReceivingScreen: React.FC = () => {
   const {
     theme: { colors },
   } = useTheme()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   const {
     appConfig: {
@@ -72,6 +75,13 @@ export const MigrationKeepReceivingScreen: React.FC = () => {
   useEffect(() => {
     if (shouldSkipScreen) replaceToNextStep()
   }, [shouldSkipScreen, replaceToNextStep])
+
+  /** The tools that connect to this address come next; the errored branch below skips
+   *  them, since it could not confirm there is an address to connect. */
+  const goToMerchantTools = useCallback(
+    () => navigation.navigate("accountMigrationMerchantTools"),
+    [navigation],
+  )
 
   const [isRetrying, setIsRetrying] = useState(false)
   /** Retry re-runs the address query over the network; a still-failing refetch rejects, so
@@ -137,7 +147,7 @@ export const MigrationKeepReceivingScreen: React.FC = () => {
       footer={
         <GaloyPrimaryButton
           title={LL.AccountMigration.keepReceivingCta()}
-          onPress={goToNextStep}
+          onPress={goToMerchantTools}
           {...testProps("migration-keep-receiving-cta")}
         />
       }
