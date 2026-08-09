@@ -83,7 +83,15 @@ if [ "$PLATFORM" = android ]; then
   # exec-out is binary-safe stdout; `shell screencap` would mangle line endings.
   shoot() { adb -s "$SERIAL" exec-out screencap -p > "$1" 2>/dev/null; }
 else
-  shoot() { xcrun simctl io "$UDID" screenshot "$1" >/dev/null 2>&1; }
+  # Resolve simctl once: xcrun dispatch costs ~80ms per shot on top of the
+  # ~0.27s screenshot itself (measured: p50 0.35s via xcrun vs 0.27s direct,
+  # bench-20260808-023805), and a settle capture pays it per frame.
+  SIMCTL="$(xcrun -f simctl 2>/dev/null || echo "")"
+  if [ -n "$SIMCTL" ]; then
+    shoot() { "$SIMCTL" io "$UDID" screenshot "$1" >/dev/null 2>&1; }
+  else
+    shoot() { xcrun simctl io "$UDID" screenshot "$1" >/dev/null 2>&1; }
+  fi
 fi
 
 # One span for the whole capture - never per frame: a python3 spawn inside the

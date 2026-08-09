@@ -44,6 +44,8 @@ check "capture exits zero" "0" "$?"
 check "wrote the labelled png" "yes" "$([ -s "$WORK/shots/after.png" ] && echo yes || echo no)"
 check "output is a real PNG" "PNG" "$(magick identify -format '%m' "$WORK/shots/after.png" 2>/dev/null)"
 check "pinned the udid" "yes" "$(grep -q "screenshot udid=DEMO-UDID" "$FAKE_ARGS_LOG" && echo yes || echo no)"
+check "shots go through the cached simctl path, not xcrun dispatch" "yes" \
+  "$(grep "screenshot udid=" "$FAKE_ARGS_LOG" | grep -qv "direct=1" && echo no || echo yes)"
 
 # --- stability polling ------------------------------------------------------
 # Three distinct frames then a repeat: capture must keep shooting until two
