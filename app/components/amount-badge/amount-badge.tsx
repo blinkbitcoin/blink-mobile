@@ -1,6 +1,8 @@
 import * as React from "react"
-import { Animated, Pressable } from "react-native"
-import { Text, makeStyles } from "@rn-vui/themed"
+// RN's Text, not the themed one: only the plain component honours
+// maxFontSizeMultiplier, and capping the scale is the point of this badge.
+import { Animated, Pressable, Text } from "react-native"
+import { makeStyles } from "@rn-vui/themed"
 
 import { useDropInOutAnimation } from "@app/components/animations"
 import { GaloyIcon, type IconNamesType } from "@app/components/atomic/galoy-icon"
