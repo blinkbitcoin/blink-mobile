@@ -22,20 +22,28 @@ const TOOL_ICON_TEST_IDS = [
 ]
 const TOOL_ICON_SIZE = 20
 
-const mockOnContinue = jest.fn()
-const mockOnBack = jest.fn()
+const mockGoToNextStep = jest.fn()
+
+jest.mock("@app/screens/account-migration/hooks", () => ({
+  ...jest.requireActual("@app/screens/account-migration/hooks"),
+  useMigrationNextStep: () => ({
+    goToNextStep: mockGoToNextStep,
+    replaceToCheckpoint: jest.fn(),
+    loading: false,
+  }),
+}))
 
 const renderScreen = () =>
   render(
     <ContextForScreen>
-      <MigrationMerchantToolsScreen onContinue={mockOnContinue} onBack={mockOnBack} />
+      <MigrationMerchantToolsScreen />
     </ContextForScreen>,
   )
 
 const renderScreenInTheme = (mode: "light" | "dark") =>
   render(
     <ContextForScreenWithTheme mode={mode}>
-      <MigrationMerchantToolsScreen onContinue={mockOnContinue} onBack={mockOnBack} />
+      <MigrationMerchantToolsScreen />
     </ContextForScreenWithTheme>,
   )
 
@@ -160,36 +168,12 @@ describe("MigrationMerchantToolsScreen", () => {
     expect(extraButtons).toHaveLength(0)
   })
 
-  it("continues the migration when Got it is pressed", async () => {
+  it("walks on to the next migration step when Got it is pressed", async () => {
     renderScreen()
     await flushEffects()
 
     fireEvent.press(screen.getByText(merchantToolsLL.cta()))
 
-    expect(mockOnContinue).toHaveBeenCalledTimes(1)
-    expect(mockOnBack).not.toHaveBeenCalled()
-  })
-
-  it("steps back on the hardware back instead of exiting the flow", async () => {
-    const { BackHandler } =
-      jest.requireActual<typeof import("react-native")>("react-native")
-    const addListenerSpy = jest.spyOn(BackHandler, "addEventListener")
-    renderScreen()
-    await flushEffects()
-
-    const handler = addListenerSpy.mock.calls[0][1] as () => boolean
-
-    expect(handler()).toBe(true)
-    expect(mockOnBack).toHaveBeenCalledTimes(1)
-  })
-
-  it("goes back through the header arrow", async () => {
-    renderScreen()
-    await flushEffects()
-
-    fireEvent.press(screen.getByTestId("migration-merchant-tools-back"))
-
-    expect(mockOnBack).toHaveBeenCalledTimes(1)
-    expect(mockOnContinue).not.toHaveBeenCalled()
+    expect(mockGoToNextStep).toHaveBeenCalledTimes(1)
   })
 })

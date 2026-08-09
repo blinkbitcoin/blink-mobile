@@ -44,17 +44,6 @@ const mockApiServiceScreen = jest.fn(
     )
   },
 )
-const mockMerchantToolsScreen = jest.fn(
-  (props: { onContinue: () => void; onBack: () => void }) => {
-    const { Pressable } = jest.requireActual("react-native")
-    return (
-      <>
-        <Pressable testID="gate-merchant-tools-continue" onPress={props.onContinue} />
-        <Pressable testID="gate-merchant-tools-back" onPress={props.onBack} />
-      </>
-    )
-  },
-)
 const mockRequiredScreen = jest.fn(
   (_props: { mode: string; onClose?: () => void; isExitBlocked?: boolean }) => null,
 )
@@ -198,16 +187,6 @@ jest.mock("@app/screens/account-migration/to-non-custodial/api-service-screen", 
   MigrationApiServiceScreen: (props: { onContinue: () => void; onClose?: () => void }) =>
     mockApiServiceScreen(props),
 }))
-
-jest.mock(
-  "@app/screens/account-migration/to-non-custodial/merchant-tools-screen",
-  () => ({
-    MigrationMerchantToolsScreen: (props: {
-      onContinue: () => void
-      onBack: () => void
-    }) => mockMerchantToolsScreen(props),
-  }),
-)
 
 jest.mock(
   "@app/screens/account-migration/to-non-custodial/migration-required-screen",
@@ -886,58 +865,14 @@ describe("MigrationGate", () => {
     expect(mockApiServiceScreen.mock.calls[0][0].onClose).toBeUndefined()
   })
 
-  it("lists the merchant tools once the API warning is continued", () => {
+  it("moves on to the required screen once the API warning is acknowledged", () => {
     mockUseActiveApiKeys.mockReturnValue(apiKeysState({ hasActiveApiKeys: true }))
 
     const { getByTestId } = render(<MigrationGate />)
 
     fireEvent.press(getByTestId("gate-api-continue"))
-
-    expect(mockMerchantToolsScreen).toHaveBeenCalled()
-    expect(mockRequiredScreen).not.toHaveBeenCalled()
-  })
-
-  it("returns to the API warning from the merchant tools", () => {
-    mockUseActiveApiKeys.mockReturnValue(apiKeysState({ hasActiveApiKeys: true }))
-
-    const { getByTestId } = render(<MigrationGate />)
-    fireEvent.press(getByTestId("gate-api-continue"))
-
-    fireEvent.press(getByTestId("gate-merchant-tools-back"))
-
-    expect(getByTestId("gate-api-continue")).toBeTruthy()
-    expect(mockRequiredScreen).not.toHaveBeenCalled()
-  })
-
-  it("moves on to the required screen once the merchant tools are acknowledged", () => {
-    mockUseActiveApiKeys.mockReturnValue(apiKeysState({ hasActiveApiKeys: true }))
-
-    const { getByTestId } = render(<MigrationGate />)
-    fireEvent.press(getByTestId("gate-api-continue"))
-
-    fireEvent.press(getByTestId("gate-merchant-tools-continue"))
 
     expect(mockRequiredScreen).toHaveBeenCalled()
-  })
-
-  it("never shows the merchant tools without API keys", () => {
-    render(<MigrationGate />)
-
-    expect(mockMerchantToolsScreen).not.toHaveBeenCalled()
-  })
-
-  it("lists the merchant tools before the dollar-balance check", () => {
-    mockUseWalletOverviewScreenQuery.mockReturnValue(
-      walletOverviewQueryResult({ usdBalance: 20 }),
-    )
-    mockUseActiveApiKeys.mockReturnValue(apiKeysState({ hasActiveApiKeys: true }))
-
-    const { getByTestId } = render(<MigrationGate />)
-
-    fireEvent.press(getByTestId("gate-api-continue"))
-
-    expect(mockMerchantToolsScreen).toHaveBeenCalled()
-    expect(mockDollarBalanceModal).not.toHaveBeenCalled()
   })
 
   it("uses the voluntary mode for an unaffected account with no wind-down", () => {

@@ -8,39 +8,28 @@ import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { SettingItemRow } from "@app/components/card-screen"
 import { IconHero } from "@app/components/icon-hero"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { useHardwareBackGuard } from "@app/screens/account-migration/hooks"
-import { MigrationStepHeader } from "@app/screens/account-migration/migration-step-header"
+import { useMigrationNextStep } from "@app/screens/account-migration/hooks"
 import { MigrationStepLayout } from "@app/screens/account-migration/migration-step-layout"
 import { testProps } from "@app/utils/testProps"
-
-type MigrationMerchantToolsScreenProps = {
-  onContinue: () => void
-  onBack: () => void
-}
 
 const TOOLS_DIVIDER_WIDTH = 1
 
 const TOOL_ICON_SIZE = 20
 
 /**
- * The companion to the API-key warning: the API retires, but every tool for incoming
- * payments keeps working non-custodially, so this lists them instead of leaving the
- * merchant with a dead end.
+ * Follows the lightning-address step: that address is what every tool for incoming
+ * payments connects to, so this names the ones that keep working non-custodially. Only
+ * accounts with an address get here, because only they walk through that step.
  */
-export const MigrationMerchantToolsScreen: React.FC<
-  MigrationMerchantToolsScreenProps
-> = ({ onContinue, onBack }) => {
+export const MigrationMerchantToolsScreen: React.FC = () => {
   const { LL } = useI18nContext()
   const styles = useStyles()
   const {
     theme: { colors },
   } = useTheme()
+  const { goToNextStep } = useMigrationNextStep()
 
   const merchantToolsLL = LL.AccountMigration.merchantTools
-
-  /** The gate renders this step in place, so an unguarded system back pops the whole flow
-   *  where the arrow on screen only steps back one. */
-  useHardwareBackGuard(onBack)
 
   const tools: { icon: IconNamesType; title: string; body: string }[] = [
     {
@@ -67,14 +56,10 @@ export const MigrationMerchantToolsScreen: React.FC<
 
   return (
     <MigrationStepLayout
-      headerShown={false}
-      header={
-        <MigrationStepHeader onBack={onBack} testIdPrefix="migration-merchant-tools" />
-      }
       footer={
         <GaloyPrimaryButton
           title={merchantToolsLL.cta()}
-          onPress={onContinue}
+          onPress={goToNextStep}
           {...testProps("migration-merchant-tools-cta")}
         />
       }

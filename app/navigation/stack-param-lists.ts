@@ -230,6 +230,7 @@ export type RootStackParamList = {
   accountMigrationStart: undefined
   accountMigrationExplainer: undefined
   accountMigrationKeepReceiving: undefined
+  accountMigrationMerchantTools: undefined
   accountMigrationDownloadHistory: undefined
   accountMigrationBalancesOverview: undefined
   accountMigrationTransferringFunds: undefined
