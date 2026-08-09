@@ -80,7 +80,7 @@ const WalletOverview: React.FC<Props> = ({
   showUsdNotification = false,
 }) => {
   const isDollarBalanceRestricted = useDollarBalanceRestricted()
-  const { hideAmount, switchMemoryHideAmount } = useHideAmount()
+  const { hideAmount, toggleHideAmount } = useHideAmount()
 
   const { LL } = useI18nContext()
   const isAuthed = useIsAuthed()
@@ -150,7 +150,7 @@ const WalletOverview: React.FC<Props> = ({
         <Text type="p1" bold {...testProps(LL.HomeScreen.myAccounts())}>
           {LL.HomeScreen.myAccounts()}
         </Text>
-        <Pressable onPress={switchMemoryHideAmount}>
+        <Pressable onPress={toggleHideAmount}>
           <GaloyIcon name={hideAmount ? "eye-slash" : "eye"} size={24} />
         </Pressable>
       </View>

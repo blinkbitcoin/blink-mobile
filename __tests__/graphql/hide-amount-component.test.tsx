@@ -4,24 +4,22 @@ import { Text } from "react-native"
 
 import { HideAmountContainer } from "@app/graphql/hide-amount-component"
 import { useHideAmount } from "@app/graphql/hide-amount-context"
+import { PersistentStateContext } from "@app/store/persistent-state"
+import { PersistentState } from "@app/store/persistent-state/state-migrations"
 
-jest.mock("@app/graphql/generated", () => ({
-  useHideBalanceQuery: jest.fn(),
+const mockReadQuery = jest.fn()
+
+// requireActual: generated.ts builds its documents with the real gql at import time.
+jest.mock("@apollo/client", () => ({
+  ...jest.requireActual("@apollo/client"),
+  useApolloClient: () => ({ readQuery: mockReadQuery }),
 }))
 
-// Mocked only to assert the container never persists — a peek must not write
-// the hideBalance setting (that is the Security screen's job).
-jest.mock("@app/graphql/client-only-query", () => ({
-  saveHideBalance: jest.fn(),
-  saveHiddenBalanceToolTip: jest.fn(),
-}))
-
-import { useHideBalanceQuery } from "@app/graphql/generated"
-import { saveHideBalance, saveHiddenBalanceToolTip } from "@app/graphql/client-only-query"
-
-const mockUseHideBalanceQuery = useHideBalanceQuery as jest.Mock
-const mockSaveHideBalance = saveHideBalance as jest.Mock
-const mockSaveHiddenBalanceToolTip = saveHiddenBalanceToolTip as jest.Mock
+const baseState: PersistentState = {
+  schemaVersion: 16,
+  galoyInstance: { id: "Main" },
+  galoyAuthToken: "",
+}
 
 let capturedContext: ReturnType<typeof useHideAmount> | null = null
 
@@ -30,137 +28,188 @@ const ContextCapture: React.FC = () => {
   return <Text testID="child">child</Text>
 }
 
+/**
+ * Real PersistentStateContext with live state, so a write is visible to the next
+ * render exactly as it is in the app. `updateState` doubles as the spy for the
+ * assertions about what does and does not get persisted.
+ */
+const updateState = jest.fn()
+let writeState: (update: (prev: PersistentState) => PersistentState) => void = () => {}
+
+const Harness: React.FC<{ initialState: PersistentState }> = ({ initialState }) => {
+  const [persistentState, setPersistentState] = React.useState(initialState)
+
+  const contextValue = React.useMemo(
+    () => ({
+      persistentState,
+      updateState: (update: (state?: PersistentState) => PersistentState | undefined) => {
+        updateState(update)
+        setPersistentState((prev) => update(prev) ?? prev)
+      },
+      resetState: jest.fn(),
+    }),
+    [persistentState],
+  )
+
+  writeState = (update) => setPersistentState((prev) => update(prev))
+
+  return (
+    <PersistentStateContext.Provider value={contextValue}>
+      <HideAmountContainer>
+        <ContextCapture />
+      </HideAmountContainer>
+    </PersistentStateContext.Provider>
+  )
+}
+
+const renderContainer = (initialState: PersistentState = baseState) =>
+  render(<Harness initialState={initialState} />)
+
+const settingChangedTo = (alwaysHideBalance: boolean) => (prev: PersistentState) => ({
+  ...prev,
+  alwaysHideBalance,
+})
+
+const tokenChanged = (prev: PersistentState) => ({ ...prev, galoyAuthToken: "new-token" })
+
+/** What the container actually persisted, in call order. */
+const persistedWrites = () =>
+  updateState.mock.calls.map(([update]) => update(baseState) as PersistentState)
+
 beforeEach(() => {
   jest.clearAllMocks()
   capturedContext = null
+  mockReadQuery.mockReturnValue({ hideBalance: false })
 })
 
 describe("HideAmountContainer", () => {
-  describe("context value from query", () => {
-    it("provides hideAmount: false when hideBalance is false", () => {
-      mockUseHideBalanceQuery.mockReturnValue({ data: { hideBalance: false } })
-
-      render(
-        <HideAmountContainer>
-          <ContextCapture />
-        </HideAmountContainer>,
-      )
+  describe("seeding at mount", () => {
+    it("starts visible when nothing is stored", () => {
+      renderContainer()
 
       expect(capturedContext?.hideAmount).toBe(false)
     })
 
-    it("provides hideAmount: true when hideBalance is true", () => {
-      mockUseHideBalanceQuery.mockReturnValue({ data: { hideBalance: true } })
-
-      render(
-        <HideAmountContainer>
-          <ContextCapture />
-        </HideAmountContainer>,
-      )
+    it("restores the last remembered visibility when always-hide is off", () => {
+      renderContainer({ ...baseState, alwaysHideBalance: false, balanceHidden: true })
 
       expect(capturedContext?.hideAmount).toBe(true)
     })
 
-    it("defaults hideAmount to false when data is undefined", () => {
-      mockUseHideBalanceQuery.mockReturnValue({ data: undefined })
+    it("starts hidden when always-hide is on, whatever was last remembered", () => {
+      renderContainer({ ...baseState, alwaysHideBalance: true, balanceHidden: false })
 
-      render(
-        <HideAmountContainer>
-          <ContextCapture />
-        </HideAmountContainer>,
-      )
+      expect(capturedContext?.hideAmount).toBe(true)
+    })
 
-      expect(capturedContext?.hideAmount).toBe(false)
+    it("writes nothing on mount", () => {
+      renderContainer({ ...baseState, alwaysHideBalance: false, balanceHidden: true })
+
+      expect(updateState).not.toHaveBeenCalled()
     })
   })
 
-  describe("switchMemoryHideAmount", () => {
-    it("flips hideAmount in memory without persisting", () => {
-      mockUseHideBalanceQuery.mockReturnValue({ data: { hideBalance: false } })
+  describe("toggleHideAmount", () => {
+    it("persists the new visibility while always-hide is off", () => {
+      renderContainer({ ...baseState, alwaysHideBalance: false })
 
-      render(
-        <HideAmountContainer>
-          <ContextCapture />
-        </HideAmountContainer>,
-      )
-
-      act(() => capturedContext?.switchMemoryHideAmount())
+      act(() => capturedContext?.toggleHideAmount())
 
       expect(capturedContext?.hideAmount).toBe(true)
-      expect(mockSaveHideBalance).not.toHaveBeenCalled()
-      expect(mockSaveHiddenBalanceToolTip).not.toHaveBeenCalled()
-    })
+      expect(persistedWrites()).toEqual([
+        expect.objectContaining({ balanceHidden: true }),
+      ])
 
-    it("peeking while the persisted setting is enabled leaves it untouched", () => {
-      mockUseHideBalanceQuery.mockReturnValue({ data: { hideBalance: true } })
-
-      render(
-        <HideAmountContainer>
-          <ContextCapture />
-        </HideAmountContainer>,
-      )
-
-      act(() => capturedContext?.switchMemoryHideAmount())
+      act(() => capturedContext?.toggleHideAmount())
 
       expect(capturedContext?.hideAmount).toBe(false)
-      expect(mockSaveHideBalance).not.toHaveBeenCalled()
-      expect(mockSaveHiddenBalanceToolTip).not.toHaveBeenCalled()
+      expect(persistedWrites()[1]).toEqual(
+        expect.objectContaining({ balanceHidden: false }),
+      )
+    })
 
-      act(() => capturedContext?.switchMemoryHideAmount())
+    it("keeps a peek session-only while always-hide is on", () => {
+      renderContainer({ ...baseState, alwaysHideBalance: true })
 
-      expect(capturedContext?.hideAmount).toBe(true)
+      act(() => capturedContext?.toggleHideAmount())
+
+      expect(capturedContext?.hideAmount).toBe(false)
+      expect(updateState).not.toHaveBeenCalled()
     })
   })
 
-  describe("re-sync with the persisted hideBalance setting", () => {
-    it("follows a mid-session change of the persisted value", () => {
-      mockUseHideBalanceQuery.mockReturnValue({ data: { hideBalance: false } })
+  describe("reacting to the always-hide setting", () => {
+    it("hides without remembering when the setting is turned on", () => {
+      renderContainer({ ...baseState, alwaysHideBalance: false })
 
-      const { rerender } = render(
-        <HideAmountContainer>
-          <ContextCapture />
-        </HideAmountContainer>,
-      )
-
-      expect(capturedContext?.hideAmount).toBe(false)
-
-      mockUseHideBalanceQuery.mockReturnValue({ data: { hideBalance: true } })
-      rerender(
-        <HideAmountContainer>
-          <ContextCapture />
-        </HideAmountContainer>,
-      )
+      act(() => writeState(settingChangedTo(true)))
 
       expect(capturedContext?.hideAmount).toBe(true)
+      expect(updateState).not.toHaveBeenCalled()
     })
 
-    it("a persisted change overrides an earlier session peek", () => {
-      mockUseHideBalanceQuery.mockReturnValue({ data: { hideBalance: true } })
+    it("reveals and remembers that choice when the setting is turned off", () => {
+      renderContainer({ ...baseState, alwaysHideBalance: true, balanceHidden: true })
 
-      const { rerender } = render(
-        <HideAmountContainer>
-          <ContextCapture />
-        </HideAmountContainer>,
-      )
+      act(() => writeState(settingChangedTo(false)))
 
-      act(() => capturedContext?.switchMemoryHideAmount())
       expect(capturedContext?.hideAmount).toBe(false)
+      expect(persistedWrites()).toEqual([
+        expect.objectContaining({ balanceHidden: false }),
+      ])
+    })
 
-      mockUseHideBalanceQuery.mockReturnValue({ data: { hideBalance: false } })
-      rerender(
-        <HideAmountContainer>
-          <ContextCapture />
-        </HideAmountContainer>,
-      )
-      expect(capturedContext?.hideAmount).toBe(false)
+    it("does not write when an unrelated part of the state changes", () => {
+      renderContainer({ ...baseState, alwaysHideBalance: false, balanceHidden: true })
 
-      mockUseHideBalanceQuery.mockReturnValue({ data: { hideBalance: true } })
-      rerender(
-        <HideAmountContainer>
-          <ContextCapture />
-        </HideAmountContainer>,
-      )
+      act(() => writeState(tokenChanged))
+
       expect(capturedContext?.hideAmount).toBe(true)
+      expect(updateState).not.toHaveBeenCalled()
+    })
+  })
+
+  describe("adopting the legacy Apollo setting", () => {
+    it("starts hidden and stores the setting once", () => {
+      mockReadQuery.mockReturnValue({ hideBalance: true })
+
+      renderContainer(baseState)
+
+      expect(capturedContext?.hideAmount).toBe(true)
+      expect(persistedWrites()).toEqual([
+        expect.objectContaining({ alwaysHideBalance: true }),
+      ])
+    })
+
+    it("treats the adopted value as the setting, so a peek is not remembered", () => {
+      mockReadQuery.mockReturnValue({ hideBalance: true })
+      renderContainer(baseState)
+      updateState.mockClear()
+
+      act(() => capturedContext?.toggleHideAmount())
+
+      expect(capturedContext?.hideAmount).toBe(false)
+      expect(updateState).not.toHaveBeenCalled()
+    })
+
+    it("ignores the legacy value once the setting has been stored", () => {
+      mockReadQuery.mockReturnValue({ hideBalance: true })
+
+      renderContainer({ ...baseState, alwaysHideBalance: false })
+
+      expect(capturedContext?.hideAmount).toBe(false)
+      expect(updateState).not.toHaveBeenCalled()
+    })
+
+    it("survives a cache that cannot answer the legacy query", () => {
+      mockReadQuery.mockImplementation(() => {
+        throw new Error("missing field")
+      })
+
+      renderContainer(baseState)
+
+      expect(capturedContext?.hideAmount).toBe(false)
+      expect(updateState).not.toHaveBeenCalled()
     })
   })
 })

@@ -180,7 +180,7 @@ beforeEach(() => {
 
   mockUseHideAmount.mockReturnValue({
     hideAmount: false,
-    switchMemoryHideAmount: jest.fn(),
+    toggleHideAmount: jest.fn(),
   })
 
   mockUseAppConfig.mockReturnValue({
@@ -210,7 +210,7 @@ describe("MemoizedTransactionItem", () => {
     beforeEach(() => {
       mockUseHideAmount.mockReturnValue({
         hideAmount: true,
-        switchMemoryHideAmount: jest.fn(),
+        toggleHideAmount: jest.fn(),
       })
     })
 
@@ -227,11 +227,11 @@ describe("MemoizedTransactionItem", () => {
 
   describe("pressing the row", () => {
     it("pressing the amount area triggers the row's onPress, not the hide toggle", () => {
-      const mockSwitch = jest.fn()
+      const mockToggle = jest.fn()
       const mockOnPress = jest.fn()
       mockUseHideAmount.mockReturnValue({
         hideAmount: false,
-        switchMemoryHideAmount: mockSwitch,
+        toggleHideAmount: mockToggle,
       })
 
       const { getByText } = render(
@@ -240,7 +240,7 @@ describe("MemoizedTransactionItem", () => {
       fireEvent.press(getByText("$10.00"))
 
       expect(mockOnPress).toHaveBeenCalledTimes(1)
-      expect(mockSwitch).not.toHaveBeenCalled()
+      expect(mockToggle).not.toHaveBeenCalled()
     })
 
     it("pressing the row navigates", () => {
@@ -255,10 +255,10 @@ describe("MemoizedTransactionItem", () => {
     })
 
     it("pressing the hidden placeholder does not toggle hide state", () => {
-      const mockSwitch = jest.fn()
+      const mockToggle = jest.fn()
       mockUseHideAmount.mockReturnValue({
         hideAmount: true,
-        switchMemoryHideAmount: mockSwitch,
+        toggleHideAmount: mockToggle,
       })
 
       const { getByTestId } = render(
@@ -266,7 +266,7 @@ describe("MemoizedTransactionItem", () => {
       )
       fireEvent.press(getByTestId("hidden-balance-placeholder"))
 
-      expect(mockSwitch).not.toHaveBeenCalled()
+      expect(mockToggle).not.toHaveBeenCalled()
     })
   })
 

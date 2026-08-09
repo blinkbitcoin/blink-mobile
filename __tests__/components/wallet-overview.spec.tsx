@@ -47,7 +47,7 @@ type RenderOptions = {
   loading?: boolean
   wallets?: readonly WalletBalance[]
   hideAmount?: boolean
-  switchMemoryHideAmount?: () => void
+  toggleHideAmount?: () => void
   isAuthed?: boolean
   onRestrictedTap?: () => void
   hasCard?: boolean
@@ -58,7 +58,7 @@ const renderOverview = ({
   loading = false,
   wallets = walletsFixture,
   hideAmount = false,
-  switchMemoryHideAmount = jest.fn(),
+  toggleHideAmount = jest.fn(),
   isAuthed = true,
   onRestrictedTap,
   hasCard = false,
@@ -67,7 +67,7 @@ const renderOverview = ({
   render(
     <ContextForScreen>
       <IsAuthedContextProvider value={isAuthed}>
-        <HideAmountContextProvider value={{ hideAmount, switchMemoryHideAmount }}>
+        <HideAmountContextProvider value={{ hideAmount, toggleHideAmount }}>
           <WalletOverview
             loading={loading}
             wallets={wallets}
@@ -214,14 +214,14 @@ describe("WalletOverview", () => {
     })
 
     it("toggles hide amount when the eye icon is pressed", async () => {
-      const switchMemoryHideAmount = jest.fn()
+      const toggleHideAmount = jest.fn()
 
-      const { getByTestId } = renderOverview({ switchMemoryHideAmount })
+      const { getByTestId } = renderOverview({ toggleHideAmount })
       await flushEffects()
 
       fireEvent.press(getByTestId("icon-eye"))
 
-      expect(switchMemoryHideAmount).toHaveBeenCalledTimes(1)
+      expect(toggleHideAmount).toHaveBeenCalledTimes(1)
     })
 
     it("opens the stablesats modal when the question icon is pressed", async () => {

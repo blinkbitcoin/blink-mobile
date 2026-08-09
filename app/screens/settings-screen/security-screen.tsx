@@ -2,8 +2,7 @@ import * as React from "react"
 import { useState } from "react"
 import { View } from "react-native"
 
-import { useApolloClient } from "@apollo/client"
-import { useHideBalanceQuery } from "@app/graphql/generated"
+import { useHideBalanceSetting } from "@app/hooks/use-hide-balance-setting"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RouteProp, useFocusEffect } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
@@ -11,10 +10,6 @@ import { makeStyles, ListItem } from "@rn-vui/themed"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { Screen } from "../../components/screen"
-import {
-  saveHiddenBalanceToolTip,
-  saveHideBalance,
-} from "../../graphql/client-only-query"
 import type { RootStackParamList } from "../../navigation/stack-param-lists"
 import BiometricWrapper from "../../utils/biometricAuthentication"
 import { PinScreenPurpose } from "../../utils/enum"
@@ -30,13 +25,11 @@ type Props = {
 export const SecurityScreen: React.FC<Props> = ({ route, navigation }) => {
   const styles = useStyles()
 
-  const client = useApolloClient()
   const { mIsBiometricsEnabled, mIsPinEnabled } = route.params
-  const { data: { hideBalance } = { hideBalance: false } } = useHideBalanceQuery()
+  const { alwaysHideBalance, setAlwaysHideBalance } = useHideBalanceSetting()
   const { LL } = useI18nContext()
   const [isBiometricsEnabled, setIsBiometricsEnabled] = useState(mIsBiometricsEnabled)
   const [isPinEnabled, setIsPinEnabled] = useState(mIsPinEnabled)
-  const [isHideBalanceEnabled, setIsHideBalanceEnabled] = useState(hideBalance)
 
   useFocusEffect(() => {
     getIsBiometricsEnabled()
@@ -96,16 +89,6 @@ export const SecurityScreen: React.FC<Props> = ({ route, navigation }) => {
     }
   }
 
-  const onHideBalanceValueChanged = (value: boolean) => {
-    if (value) {
-      setIsHideBalanceEnabled(saveHideBalance(client, true))
-      saveHiddenBalanceToolTip(client, true)
-    } else {
-      setIsHideBalanceEnabled(saveHideBalance(client, false))
-      saveHiddenBalanceToolTip(client, false)
-    }
-  }
-
   const removePin = async () => {
     if (await KeyStoreWrapper.removePin()) {
       KeyStoreWrapper.removePinAttempts()
@@ -148,8 +131,9 @@ export const SecurityScreen: React.FC<Props> = ({ route, navigation }) => {
             <ListItem.Title>{LL.SecurityScreen.hideBalanceTitle()}</ListItem.Title>
           </ListItem.Content>
           <Switch
-            value={isHideBalanceEnabled}
-            onValueChange={onHideBalanceValueChanged}
+            testID="always-hide-balance-switch"
+            value={alwaysHideBalance}
+            onValueChange={setAlwaysHideBalance}
           />
         </ListItem>
       </View>

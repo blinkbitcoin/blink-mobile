@@ -121,7 +121,7 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
   const insets = useSafeAreaInsets()
 
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-  const { hideAmount, switchMemoryHideAmount } = useHideAmount()
+  const { hideAmount, toggleHideAmount } = useHideAmount()
   const { formatMoneyAmount } = useDisplayCurrency()
   const {
     appConfig: { galoyInstance },
@@ -414,7 +414,7 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
             <Text type="h2" numberOfLines={1} adjustsFontSizeToFit>
               {spendOrReceiveText}
             </Text>
-            <Pressable hitSlop={10} onPress={switchMemoryHideAmount}>
+            <Pressable hitSlop={10} onPress={toggleHideAmount}>
               <View style={styles.amountWrapper}>
                 {hideAmount ? (
                   <HiddenBalancePlaceholder size="small" />
