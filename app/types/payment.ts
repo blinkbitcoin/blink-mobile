@@ -196,7 +196,11 @@ export type LnurlWithdrawAdapter = (
 export type ReceiveOnchainParams = {
   /**
    * Rotate to a fresh deposit address instead of reusing the existing one.
-   * Previously issued addresses stay valid and monitored.
+   *
+   * Rotating never strands funds: the Spark SDK keeps every address it has issued
+   * under watch, with no documented gap limit. "All previously generated addresses
+   * remain monitored" —
+   * https://sdk-doc-spark.breez.technology/guide/receive_payment.html
    */
   newAddress?: boolean
 }

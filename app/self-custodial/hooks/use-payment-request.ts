@@ -302,6 +302,10 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
    * Marks how far the wallet's on-chain receive history had progressed when we last
    * issued an address. The SDK never says which address a deposit paid, so a change
    * here is our signal that the displayed address has been used.
+   *
+   * Being wrong in the rotating direction is cheap — the SDK keeps every address it
+   * has issued under watch (see `ReceiveOnchainParams.newAddress`), so a needless
+   * rotation costs an address, never a payment.
    */
   const depositMarker = useMemo(
     () => latestOnchainReceiptId(allTransactions),
