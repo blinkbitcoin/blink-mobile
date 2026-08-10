@@ -99,6 +99,15 @@ jest.mock("@app/utils/error-logging", () => ({
   reportError: (...args: readonly unknown[]) => mockReportError(...args),
 }))
 
+const mockEnableScreenSecurity = jest.fn()
+const mockDisableScreenSecurity = jest.fn()
+jest.mock("@app/utils/screen-security", () => ({
+  enableScreenSecurity: (...args: readonly unknown[]) =>
+    mockEnableScreenSecurity(...args),
+  disableScreenSecurity: (...args: readonly unknown[]) =>
+    mockDisableScreenSecurity(...args),
+}))
+
 loadLocale("en")
 const LL = i18nObject("en")
 
@@ -565,6 +574,34 @@ describe("BackupPhraseConfirmScreen", () => {
         route: "accountMigrationBalancesOverview",
         accountId: "migration-uuid",
       },
+    })
+  })
+
+  /** The screen shows individual mnemonic words with their positions, so it must carry
+   *  the same screenshot/screen-recording protection as the backup-phrase screen. */
+  describe("screen security", () => {
+    it("enables screenshot protection on mount", async () => {
+      render(
+        <ContextForScreen>
+          <BackupPhraseConfirmScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      expect(mockEnableScreenSecurity).toHaveBeenCalledTimes(1)
+    })
+
+    it("disables screenshot protection on unmount", async () => {
+      const { unmount } = render(
+        <ContextForScreen>
+          <BackupPhraseConfirmScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      unmount()
+
+      expect(mockDisableScreenSecurity).toHaveBeenCalledTimes(1)
     })
   })
 })
