@@ -5,6 +5,19 @@ import { ThemeProvider } from "@rn-vui/themed"
 import theme from "@app/rne-theme/theme"
 import { FeeTierSelector } from "@app/screens/send-bitcoin-screen/fee-tier-selector"
 
+/** react-native-modal grabs an InteractionManager handle on open, which RN warns is deprecated. */
+jest.mock("react-native-modal", () => {
+  const MockModal = ({
+    children,
+    isVisible,
+  }: {
+    children: React.ReactNode
+    isVisible: boolean
+  }) => (isVisible ? React.createElement("View", { testID: "modal" }, children) : null)
+  MockModal.displayName = "MockModal"
+  return MockModal
+})
+
 const buildOptions = () => [
   { id: "fast", label: "Fast", detail: "30 sat/vB" },
   { id: "medium", label: "Medium", detail: "20 sat/vB" },
