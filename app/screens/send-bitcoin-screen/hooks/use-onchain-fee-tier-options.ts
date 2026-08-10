@@ -42,7 +42,7 @@ export const useOnchainFeeTierOptions = ({
   convertMoneyAmount,
 }: FeeTierOptionsParams) => {
   const { sdk } = useSelfCustodialWallet()
-  const { formatMoneyAmount } = useDisplayCurrency()
+  const { formatMoneyAmount, moneyAmountToDisplayCurrencyString } = useDisplayCurrency()
   const { LL, locale } = useI18nContext()
   /**
    * Held as "nothing picked yet" rather than seeded with a default, because isSelfCustodial
@@ -87,13 +87,21 @@ export const useOnchainFeeTierOptions = ({
       [FeeTierOption.Medium]: LL.SendBitcoinScreen.medium(),
       [FeeTierOption.Slow]: LL.SendBitcoinScreen.slow(),
     },
-    formatFee: ({ feeAmount, feeUnit }) =>
-      formatMoneyAmount({
-        moneyAmount: toWalletAmount({
-          amount: feeAmount,
-          currency: CURRENCY_BY_FEE_UNIT[feeUnit],
-        }),
-      }),
+    /**
+     * Display currency, like the confirmation screen; the wallet amount only stands in
+     * while the price is still loading.
+     */
+    formatFee: ({ feeAmount, feeUnit }) => {
+      const walletAmount = toWalletAmount({
+        amount: feeAmount,
+        currency: CURRENCY_BY_FEE_UNIT[feeUnit],
+      })
+
+      return (
+        moneyAmountToDisplayCurrencyString({ moneyAmount: walletAmount }) ??
+        formatMoneyAmount({ moneyAmount: walletAmount })
+      )
+    },
     locale,
   })
 

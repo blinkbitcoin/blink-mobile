@@ -36,10 +36,19 @@ jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () => ({ sdk: mockActiveSdk }),
 }))
 
+type MockMoneyAmount = { moneyAmount: { amount: number; currency: string } }
+
+let mockDisplayPriceReady = true
+
 jest.mock("@app/hooks/use-display-currency", () => ({
   useDisplayCurrency: () => ({
-    formatMoneyAmount: ({ moneyAmount }: { moneyAmount: { amount: number } }) =>
-      `${moneyAmount.amount} sats`,
+    formatMoneyAmount: ({ moneyAmount }: MockMoneyAmount) =>
+      `${moneyAmount.amount} ${moneyAmount.currency}`,
+    /** Tagged so a label built off the raw wallet amount instead shows up in the assert. */
+    moneyAmountToDisplayCurrencyString: ({ moneyAmount }: MockMoneyAmount) =>
+      mockDisplayPriceReady
+        ? `${moneyAmount.amount} ${moneyAmount.currency} display`
+        : undefined,
   }),
 }))
 
@@ -150,6 +159,7 @@ describe("useOnchainFeeTierOptions", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockActiveSdk = mockSdk
+    mockDisplayPriceReady = true
     mockFeeError = null
     mockHasSelfCustodialQuote = true
     mockHasCustodialQuote = true
@@ -303,6 +313,22 @@ describe("useOnchainFeeTierOptions", () => {
     }
   })
 
+  it("labels the tiers off the wallet amount while the display price is loading", () => {
+    mockDisplayPriceReady = false
+
+    const { result } = renderHook(() =>
+      useOnchainFeeTierOptions({
+        paymentDetail: buildOnchainDetailRaw() as never,
+        isSelfCustodial: true,
+        paymentDestination: undefined,
+        convertMoneyAmount: undefined,
+      }),
+    )
+
+    // No "display" tag: the price is not there yet, so the raw wallet amount stands in.
+    expect(result.current.feeTierOptions[0].label).toBe("Fast (30 BTC)")
+  })
+
   it("formats self-custodial fees in sats even when the usd wallet is sending", () => {
     const { result } = renderHook(() =>
       useOnchainFeeTierOptions({
@@ -317,7 +343,7 @@ describe("useOnchainFeeTierOptions", () => {
     )
 
     // The SDK quotes in sats regardless of wallet, so 30 must not be read as 30 cents.
-    expect(result.current.feeTierOptions[0].label).toBe("Fast (30 sats)")
+    expect(result.current.feeTierOptions[0].label).toBe("Fast (30 BTC display)")
   })
 
   it("blocks the send only when the self-custodial quote failed", () => {
@@ -766,9 +792,9 @@ describe("useOnchainFeeTierOptions", () => {
     )
 
     expect(result.current.feeTierOptions.map((o) => o.label)).toEqual([
-      "Fast (300 sats)",
-      "Medium (200 sats)",
-      "Slow (100 sats)",
+      "Fast (300 BTC display)",
+      "Medium (200 BTC display)",
+      "Slow (100 BTC display)",
     ])
   })
 })
