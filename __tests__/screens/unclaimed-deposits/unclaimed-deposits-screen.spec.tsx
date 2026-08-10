@@ -27,6 +27,7 @@ let mockFeeTiers = {
   [FeeTierOption.Slow]: { feeAmount: 10, feeUnit: FeeUnit.SatPerVbyte, etaMinutes: 60 },
 }
 let mockFeeTiersError: SdkFeeError | null = null
+let mockHasFeeRateQuote = true
 
 jest.mock("@app/screens/unclaimed-deposits/hooks/use-deposit-actions", () => ({
   useDepositActions: () => ({
@@ -53,6 +54,7 @@ jest.mock("@app/screens/unclaimed-deposits/hooks/use-recommended-fee-tiers", () 
     useRecommendedFeeTiers: () => ({
       tiers: mockFeeTiers,
       error: mockFeeTiersError,
+      hasQuote: mockHasFeeRateQuote,
     }),
   }
 })
@@ -145,6 +147,27 @@ describe("UnclaimedDepositsScreen — refund fee gating", () => {
       },
     }
     mockFeeTiersError = null
+    mockHasFeeRateQuote = true
+  })
+
+  it("carries the rate into each tier label once the rates are quoted", () => {
+    const utils = renderScreen()
+    enterRefundMode(utils)
+
+    // Each row reads "<label> <eta>", so the rate is matched at the head of the row.
+    expect(utils.getByText(/^Fast \(30 sat\/vB\) /)).toBeTruthy()
+    expect(utils.getByText(/^Medium \(20 sat\/vB\) /)).toBeTruthy()
+    expect(utils.getByText(/^Slow \(10 sat\/vB\) /)).toBeTruthy()
+  })
+
+  it("labels the tiers without a rate until the rates are quoted", () => {
+    mockHasFeeRateQuote = false
+    const utils = renderScreen()
+    enterRefundMode(utils)
+
+    // A zeroed placeholder must not read as a rate the SDK actually returned.
+    expect(utils.getByText(/^Medium ~/)).toBeTruthy()
+    expect(utils.queryByText(/sat\/vB/)).toBeNull()
   })
 
   it("enables Refund now when address is set, no error, tiers > 0", () => {

@@ -46,7 +46,7 @@ describe("useOnchainFeeTiers", () => {
     expect(result.current.tiers.fast.feeAmount).toBe(0)
   })
 
-  it("quotes from the very first render when the params are already in hand", () => {
+  it("holds no quote while the fees are still in flight", () => {
     mockPrepareSend.mockImplementation(
       () =>
         new Promise(() => {
@@ -56,31 +56,31 @@ describe("useOnchainFeeTiers", () => {
 
     const { result } = renderHook(() => useOnchainFeeTiers(mockSdk, "bc1qtest", 5000))
 
-    // Read before any effect flush: false here would label the tiers with a zero fee.
-    expect(result.current.isQuoting).toBe(true)
+    // True here would label the tiers with a zero fee nobody quoted.
+    expect(result.current.hasQuote).toBe(false)
   })
 
-  it("is not quoting when a param is missing", () => {
+  it("holds no quote when a param is missing", () => {
     const { result } = renderHook(() =>
       useOnchainFeeTiers(mockSdk, "bc1qtest", undefined),
     )
 
-    expect(result.current.isQuoting).toBe(false)
+    expect(result.current.hasQuote).toBe(false)
   })
 
-  it("stops quoting once the fees land", async () => {
+  it("holds a quote once the fees land", async () => {
     mockPrepareSend.mockResolvedValue({ id: "prepared" })
     mockExtractOnchainFees.mockReturnValue({ fast: 500, medium: 300, slow: 150 })
 
     const { result } = renderHook(() => useOnchainFeeTiers(mockSdk, "bc1qtest", 5000))
 
     await waitFor(() => {
-      expect(result.current.isQuoting).toBe(false)
+      expect(result.current.hasQuote).toBe(true)
     })
     expect(result.current.tiers.fast.feeAmount).toBe(500)
   })
 
-  it("stops quoting when the sdk throws", async () => {
+  it("holds no quote when the sdk throws", async () => {
     mockPrepareSend.mockRejectedValue(new Error("network down"))
 
     const { result } = renderHook(() => useOnchainFeeTiers(mockSdk, "bc1qtest", 5000))
@@ -88,7 +88,7 @@ describe("useOnchainFeeTiers", () => {
     await waitFor(() => {
       expect(result.current.error).not.toBeNull()
     })
-    expect(result.current.isQuoting).toBe(false)
+    expect(result.current.hasQuote).toBe(false)
   })
 
   it("fetches and sets fee tiers on success", async () => {
@@ -217,11 +217,13 @@ describe("useOnchainFeeTiers", () => {
 
     rerender({ amount: 5000 })
 
-    await waitFor(() => {
-      expect(result.current.error).toBeNull()
-    })
+    // The error belongs to the previous amount, so it is gone before the retry even lands.
+    expect(result.current.error).toBeNull()
 
-    expect(result.current.tiers.fast.feeAmount).toBe(500)
+    await waitFor(() => {
+      expect(result.current.tiers.fast.feeAmount).toBe(500)
+    })
+    expect(result.current.error).toBeNull()
   })
 
   it("clears error when amount becomes undefined", async () => {

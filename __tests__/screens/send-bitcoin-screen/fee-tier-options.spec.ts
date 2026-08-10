@@ -29,6 +29,7 @@ describe("buildFeeTierOptions", () => {
       labels,
       formatFee: ({ feeAmount }) => `${feeAmount} sats`,
       locale: "en",
+      hasQuote: true,
     })
 
     expect(result).toHaveLength(3)
@@ -55,6 +56,7 @@ describe("buildFeeTierOptions", () => {
       labels,
       formatFee: ({ feeAmount }) => `${feeAmount} sat/vB`,
       locale: "en",
+      hasQuote: true,
     })
 
     expect(result[0].label).toBe("Fast (500 sat/vB)")
@@ -69,6 +71,7 @@ describe("buildFeeTierOptions", () => {
       labels,
       formatFee: ({ feeAmount }) => `${feeAmount} sats`,
       locale: "en",
+      hasQuote: true,
     })
 
     expect(result[2].detail).toBe("~ 24h")
@@ -80,6 +83,7 @@ describe("buildFeeTierOptions", () => {
       labels,
       formatFee: ({ feeAmount }) => `${feeAmount} sats`,
       locale: "en",
+      hasQuote: true,
     })
 
     expect(result[2].detail).toBe("~ 60m")
@@ -94,12 +98,13 @@ describe("buildFeeTierOptions", () => {
       labels,
       formatFee: ({ feeAmount }) => `${feeAmount} sats`,
       locale: "en",
+      hasQuote: true,
     })
 
     expect(result[1].detail).toBe("~ 90m")
   })
 
-  it("omits the fee from the label while a quote is in flight", () => {
+  it("omits the fee from the label until a quote has landed", () => {
     const result = buildFeeTierOptions({
       tiers: {
         fast: { feeAmount: 0, feeUnit: FeeUnit.Sats, etaMinutes: 10 },
@@ -109,7 +114,7 @@ describe("buildFeeTierOptions", () => {
       labels,
       formatFee: ({ feeAmount }) => `${feeAmount} sats`,
       locale: "en",
-      isQuoting: true,
+      hasQuote: false,
     })
 
     expect(result.map((option) => option.label)).toEqual(["Fast", "Medium", "Slow"])
@@ -126,6 +131,7 @@ describe("buildFeeTierOptions", () => {
       labels,
       formatFee: ({ feeAmount }) => `${feeAmount} sats`,
       locale: "en",
+      hasQuote: true,
     })
 
     // An onchain address that resolves intraledger really is free; saying nothing reads

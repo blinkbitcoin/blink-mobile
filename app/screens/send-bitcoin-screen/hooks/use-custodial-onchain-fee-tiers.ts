@@ -22,6 +22,7 @@ import {
   FeeUnit,
   type FeeTierInfo,
 } from "./fee-tiers.types"
+import { useQuoteStatus } from "./use-quote-status"
 
 export const PAYOUT_SPEED_BY_FEE_TIER: Record<FeeTierOption, PayoutSpeed> = {
   [FeeTierOption.Fast]: PayoutSpeed.Fast,
@@ -191,6 +192,7 @@ type CustodialOnchainFeeTiersParams = {
 type CustodialOnchainFeeTiersResult = {
   tiers: Record<FeeTierOption, FeeTierInfo>
   hasError: boolean
+  hasQuote: boolean
   isQuoting: boolean
 }
 
@@ -201,14 +203,13 @@ export const useCustodialOnchainFeeTiers = ({
   quote,
 }: CustodialOnchainFeeTiersParams): CustodialOnchainFeeTiersResult => {
   const [tiers, setTiers] = useState(EMPTY_TIERS)
-  const [hasError, setHasError] = useState(false)
-  /**
-   * Starts true when the inputs are already in hand, because a fetch is then certain to
-   * follow. Starting false would paint one frame of bare tier names with no spinner.
-   */
-  const [isQuoting, setIsQuoting] = useState(() =>
-    Boolean(walletId && address && amount && quote),
-  )
+  /** Null until every input a quote needs is in hand, which is what gates the fetch below. */
+  const inputsKey =
+    walletId && address && amount && quote
+      ? `${walletId}|${address}|${amount}|${quote}`
+      : null
+  const { hasQuote, hasFailed, isQuoting, discardQuote, markQuoted, markFailed } =
+    useQuoteStatus(inputsKey)
   // Discards stale resolutions when the amount or destination changes mid-flight.
   const requestTokenRef = useRef(0)
 
@@ -221,12 +222,11 @@ export const useCustodialOnchainFeeTiers = ({
   const fetchFees = useCallback(async () => {
     requestTokenRef.current += 1
     const token = requestTokenRef.current
-    // Clear upfront so a failure from a previous amount does not outlive its own retry.
-    setHasError(false)
+    // Whatever was quoted stops applying the moment this runs, request or gate alike.
+    discardQuote()
 
     if (!walletId || !address || !amount || !quote) {
       setTiers(EMPTY_TIERS)
-      setIsQuoting(false)
       return
     }
 
@@ -237,12 +237,8 @@ export const useCustodialOnchainFeeTiers = ({
       [OnchainFeeQuote.UsdAsBtcDenominated]: fetchUsdAsBtcFees,
     }[quote]
 
-    /**
-     * Dropped alongside the flag so the selector never pairs the previous amount's fee with
-     * the amount now on screen; it shows the tier name and a spinner until this one lands.
-     */
+    // Dropped so a failure never leaves the previous amount's fee behind to be re-quoted onto.
     setTiers(EMPTY_TIERS)
-    setIsQuoting(true)
 
     try {
       const { data } = await fetchFeesForQuote({ variables })
@@ -250,20 +246,29 @@ export const useCustodialOnchainFeeTiers = ({
       if (!data) throw new Error("Missing on-chain fee data")
 
       setTiers(toTiers(data, FEE_UNIT_BY_QUOTE[quote]))
-      setHasError(false)
+      markQuoted()
     } catch (err) {
       if (token !== requestTokenRef.current) return
       reportError("use-custodial-onchain-fee-tiers", err)
       setTiers(EMPTY_TIERS)
-      setHasError(true)
-    } finally {
-      if (token === requestTokenRef.current) setIsQuoting(false)
+      markFailed()
     }
-  }, [walletId, address, amount, quote, fetchBtcFees, fetchUsdFees, fetchUsdAsBtcFees])
+  }, [
+    walletId,
+    address,
+    amount,
+    quote,
+    fetchBtcFees,
+    fetchUsdFees,
+    fetchUsdAsBtcFees,
+    discardQuote,
+    markQuoted,
+    markFailed,
+  ])
 
   useEffect(() => {
     fetchFees()
   }, [fetchFees])
 
-  return { tiers, hasError, isQuoting }
+  return { tiers, hasError: hasFailed, hasQuote, isQuoting }
 }

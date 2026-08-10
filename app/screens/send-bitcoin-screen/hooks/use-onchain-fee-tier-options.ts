@@ -95,7 +95,7 @@ export const useOnchainFeeTierOptions = ({
   const {
     tiers: selfCustodialTiers,
     error: selfCustodialError,
-    isQuoting: isQuotingSelfCustodialFees,
+    hasQuote: hasSelfCustodialQuote,
   } = useOnchainFeeTiers(sdk ?? null, selfCustodialAddress, selfCustodialAmountSats)
 
   /** Read from the payment detail so the tiers always quote the endpoint the send uses. */
@@ -115,6 +115,7 @@ export const useOnchainFeeTierOptions = ({
   const {
     tiers: custodialTiers,
     hasError: hasCustodialError,
+    hasQuote: hasCustodialQuote,
     isQuoting: isQuotingCustodialFees,
   } = useCustodialOnchainFeeTiers({
     walletId: custodialWalletId,
@@ -144,15 +145,14 @@ export const useOnchainFeeTierOptions = ({
   const isFeeTierErrorBlocking = isSelfCustodial && Boolean(selfCustodialErrorMessage)
 
   /**
-   * Label-level only: both rails hide the fee until it is quoted. The spinner stays
-   * custodial-only, because the SDK answers fast enough that one would merely flicker.
+   * Label-level only: both rails carry a fee only once one has been quoted for the amount
+   * on screen. The spinner stays custodial-only, because the SDK answers fast enough that
+   * one would merely flicker.
    */
-  const isQuotingFeeLabels = isSelfCustodial
-    ? isQuotingSelfCustodialFees
-    : isQuotingCustodialFees
+  const hasFeeQuote = isSelfCustodial ? hasSelfCustodialQuote : hasCustodialQuote
 
   const feeTierOptions = buildFeeTierOptions({
-    isQuoting: isQuotingFeeLabels,
+    hasQuote: hasFeeQuote,
     tiers: feeTiers,
     labels: {
       [FeeTierOption.Fast]: LL.SendBitcoinScreen.fast(),

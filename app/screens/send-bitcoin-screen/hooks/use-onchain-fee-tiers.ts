@@ -15,6 +15,7 @@ import {
   FeeUnit,
   type FeeTierInfo,
 } from "./fee-tiers.types"
+import { useQuoteStatus } from "./use-quote-status"
 
 export const ETA_MINUTES: Record<FeeTierOption, number> = FEE_TIER_ETA_MINUTES
 
@@ -32,7 +33,7 @@ export type SdkFeeError = (typeof SdkFeeError)[keyof typeof SdkFeeError]
 type OnchainFeeTiersResult = {
   tiers: Record<FeeTierOption, FeeTierInfo>
   error: SdkFeeError | null
-  isQuoting: boolean
+  hasQuote: boolean
 }
 
 const SDK_ERROR_TAG_MAP: Partial<Record<SdkErrorTags, SdkFeeError>> = {
@@ -54,23 +55,24 @@ export const useOnchainFeeTiers = (
   amountSats: number | undefined,
 ): OnchainFeeTiersResult => {
   const [tiers, setTiers] = useState(DEFAULT_TIERS)
-  const [error, setError] = useState<SdkFeeError | null>(null)
-  /** True from the first render when a quote is already due, so no frame claims a zero fee. */
-  const [isQuoting, setIsQuoting] = useState(() => Boolean(sdk && address && amountSats))
+  /** Holds only the reason; whether it still applies is decided by the keyed failure flag. */
+  const [failureReason, setFailureReason] = useState<SdkFeeError | null>(null)
+  /** The SDK instance cannot be keyed by value, so its absence gates the quote instead. */
+  const inputsKey = sdk && address && amountSats ? `${address}|${amountSats}` : null
+  const { hasQuote, hasFailed, discardQuote, markQuoted, markFailed } =
+    useQuoteStatus(inputsKey)
   // Discards stale prepareSend resolutions when deps change mid-flight.
   const requestTokenRef = useRef(0)
+
+  const error = hasFailed ? failureReason : null
 
   const fetchFees = useCallback(async () => {
     requestTokenRef.current += 1
     const token = requestTokenRef.current
+    // Whatever was quoted stops applying the moment this runs, request or gate alike.
+    discardQuote()
 
-    if (!sdk || !address || !amountSats) {
-      setError(null)
-      setIsQuoting(false)
-      return
-    }
-
-    setIsQuoting(true)
+    if (!sdk || !address || !amountSats) return
 
     try {
       const prepared = await prepareSend(sdk, {
@@ -81,7 +83,8 @@ export const useOnchainFeeTiers = (
 
       const fees = extractOnchainFees(prepared)
       if (!fees) {
-        setError(SdkFeeError.Generic)
+        setFailureReason(SdkFeeError.Generic)
+        markFailed()
         return
       }
 
@@ -102,18 +105,17 @@ export const useOnchainFeeTiers = (
           etaMinutes: ETA_MINUTES[FeeTierOption.Slow],
         },
       })
-      setError(null)
+      markQuoted()
     } catch (err) {
       if (token !== requestTokenRef.current) return
-      setError(classifySdkFeeError(err))
-    } finally {
-      if (token === requestTokenRef.current) setIsQuoting(false)
+      setFailureReason(classifySdkFeeError(err))
+      markFailed()
     }
-  }, [sdk, address, amountSats])
+  }, [sdk, address, amountSats, discardQuote, markQuoted, markFailed])
 
   useEffect(() => {
     fetchFees()
   }, [fetchFees])
 
-  return { tiers, error, isQuoting }
+  return { tiers, error, hasQuote }
 }

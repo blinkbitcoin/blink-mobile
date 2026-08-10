@@ -20,6 +20,7 @@ let mockFeeTiers = {
   [FeeTierOption.Slow]: { feeAmount: 10, feeUnit: FeeUnit.Sats, etaMinutes: 60 },
 }
 let mockFeeError: SdkFeeError | null = null
+let mockHasSelfCustodialQuote = true
 
 let mockCustodialTiers = {
   [FeeTierOption.Fast]: { feeAmount: 300, feeUnit: FeeUnit.Sats, etaMinutes: 10 },
@@ -28,6 +29,7 @@ let mockCustodialTiers = {
 }
 let mockCustodialHasError = false
 let mockCustodialIsQuoting = false
+let mockHasCustodialQuote = true
 const mockUseCustodialOnchainFeeTiers = jest.fn()
 
 jest.mock("@app/self-custodial/providers/wallet", () => ({
@@ -47,7 +49,11 @@ jest.mock("@app/screens/send-bitcoin-screen/hooks/use-onchain-fee-tiers", () => 
   )
   return {
     ...actual,
-    useOnchainFeeTiers: () => ({ tiers: mockFeeTiers, error: mockFeeError }),
+    useOnchainFeeTiers: () => ({
+      tiers: mockFeeTiers,
+      error: mockFeeError,
+      hasQuote: mockHasSelfCustodialQuote,
+    }),
   }
 })
 
@@ -64,6 +70,7 @@ jest.mock(
         return {
           tiers: mockCustodialTiers,
           hasError: mockCustodialHasError,
+          hasQuote: mockHasCustodialQuote,
           isQuoting: mockCustodialIsQuoting,
         }
       },
@@ -142,6 +149,8 @@ describe("useOnchainFeeTierOptions", () => {
     jest.clearAllMocks()
     mockActiveSdk = mockSdk
     mockFeeError = null
+    mockHasSelfCustodialQuote = true
+    mockHasCustodialQuote = true
     mockCustodialHasError = false
     mockCustodialIsQuoting = false
     mockFeeTiers = {

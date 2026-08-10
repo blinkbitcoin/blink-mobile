@@ -232,7 +232,7 @@ describe("useCustodialOnchainFeeTiers", () => {
     expect(result.current.isQuoting).toBe(false)
   })
 
-  it("quotes from the very first render when the params are already in hand", () => {
+  it("quotes on the very render the params arrive, not a render later", () => {
     mockFetchBtcFees.mockImplementation(
       () =>
         new Promise(() => {
@@ -240,9 +240,22 @@ describe("useCustodialOnchainFeeTiers", () => {
         }),
     )
 
-    const { result } = renderHook(() => useCustodialOnchainFeeTiers(btcParams))
+    /**
+     * Mounted without an amount because that is the only sequence the send screen performs:
+     * it builds the payment detail in an effect, so the hook never mounts with the params
+     * already in hand. Read before any effect flush, a flag set from an effect would still
+     * be false here and paint bare tier names with no spinner.
+     */
+    const { result, rerender } = renderHook(
+      (props: Parameters<typeof useCustodialOnchainFeeTiers>[0]) =>
+        useCustodialOnchainFeeTiers(props),
+      { initialProps: { ...btcParams, amount: undefined } },
+    )
 
-    // Read before any effect flush: false here would paint bare tier names with no spinner.
+    expect(result.current.isQuoting).toBe(false)
+
+    rerender(btcParams)
+
     expect(result.current.isQuoting).toBe(true)
   })
 
@@ -252,6 +265,63 @@ describe("useCustodialOnchainFeeTiers", () => {
     )
 
     expect(result.current.isQuoting).toBe(false)
+  })
+
+  it("has no quote before an amount is set", () => {
+    const { result } = renderHook(() =>
+      useCustodialOnchainFeeTiers({ ...btcParams, amount: undefined }),
+    )
+
+    // The zeroed placeholder must not read as a fee anyone quoted.
+    expect(result.current.hasQuote).toBe(false)
+  })
+
+  it("has a quote only once the response lands", async () => {
+    mockFetchBtcFees.mockResolvedValue(feeResponse(900, 600, 300))
+
+    const { result } = renderHook(() => useCustodialOnchainFeeTiers(btcParams))
+
+    expect(result.current.hasQuote).toBe(false)
+
+    await waitFor(() => {
+      expect(result.current.hasQuote).toBe(true)
+    })
+  })
+
+  it("has no quote when the request fails", async () => {
+    mockFetchBtcFees.mockRejectedValue(new Error("network down"))
+
+    const { result } = renderHook(() => useCustodialOnchainFeeTiers(btcParams))
+
+    await waitFor(() => {
+      expect(result.current.hasError).toBe(true)
+    })
+    expect(result.current.hasQuote).toBe(false)
+  })
+
+  it("drops the quote on the very render the amount changes", async () => {
+    mockFetchBtcFees.mockResolvedValueOnce(feeResponse(900, 600, 300))
+
+    const { result, rerender } = renderHook(
+      (props: Parameters<typeof useCustodialOnchainFeeTiers>[0]) =>
+        useCustodialOnchainFeeTiers(props),
+      { initialProps: btcParams },
+    )
+
+    await waitFor(() => {
+      expect(result.current.hasQuote).toBe(true)
+    })
+
+    mockFetchBtcFees.mockImplementationOnce(
+      () =>
+        new Promise(() => {
+          // deliberately never resolves
+        }),
+    )
+    rerender({ ...btcParams, amount: 99_000 })
+
+    // Read before the effect fires: the fee on hand was quoted for the previous amount.
+    expect(result.current.hasQuote).toBe(false)
   })
 
   it("never quotes without the params it needs", async () => {

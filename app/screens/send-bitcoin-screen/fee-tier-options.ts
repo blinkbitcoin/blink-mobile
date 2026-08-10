@@ -30,11 +30,12 @@ type BuildFeeTierOptionsParams = {
   formatFee: (tier: FeeTierInfo) => string
   locale: string
   /**
-   * Drops the fee from the label until a quote lands. Keyed on the request in flight rather
-   * than on a zero amount, so a fee that is genuinely zero still reads as zero instead of
-   * looking like one that was never quoted.
+   * Carries the fee into the label only once a quote has landed for the inputs on screen,
+   * which covers "no amount entered yet" and "quote in flight" with one predicate. Asking
+   * whether a quote exists rather than whether one is running is what keeps a fee that is
+   * genuinely zero reading as zero, while an unquoted tier shows no fee at all.
    */
-  isQuoting?: boolean
+  hasQuote: boolean
 }
 
 export const buildFeeTierOptions = ({
@@ -42,11 +43,11 @@ export const buildFeeTierOptions = ({
   labels,
   formatFee,
   locale,
-  isQuoting = false,
+  hasQuote,
 }: BuildFeeTierOptionsParams) =>
   [Tier.Fast, Tier.Medium, Tier.Slow].map((tier) => {
     const info = tiers[tier]
-    const label = isQuoting ? labels[tier] : `${labels[tier]} (${formatFee(info)})`
+    const label = hasQuote ? `${labels[tier]} (${formatFee(info)})` : labels[tier]
 
     return { id: tier, label, detail: `~ ${formatEta(info.etaMinutes, locale)}` }
   })

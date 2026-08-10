@@ -43,10 +43,10 @@ export const UnclaimedDepositsScreen: React.FC = () => {
   const {
     tiers: feeTiers,
     error: feeTiersError,
-    isQuoting: isQuotingFeeRates,
+    hasQuote: hasFeeRateQuote,
   } = useRecommendedFeeTiers(sdk ?? null, refundDepositId !== null)
   const feeTierOptions = buildFeeTierOptions({
-    isQuoting: isQuotingFeeRates,
+    hasQuote: hasFeeRateQuote,
     tiers: feeTiers,
     labels: {
       [FeeTierOption.Fast]: LL.SendBitcoinScreen.fast(),

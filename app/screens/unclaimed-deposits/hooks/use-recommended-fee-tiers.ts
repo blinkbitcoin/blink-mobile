@@ -16,32 +16,40 @@ import {
   FeeTierOption,
   FeeTierOption as Tier,
 } from "@app/screens/send-bitcoin-screen/hooks/fee-tiers.types"
+import { useQuoteStatus } from "@app/screens/send-bitcoin-screen/hooks/use-quote-status"
 
 const DEFAULT_TIERS = buildZeroTiers(ETA_MINUTES, FeeUnit.SatPerVbyte)
 
 type RecommendedFeeTiersResult = {
   tiers: Record<FeeTierOption, FeeTierInfo>
   error: SdkFeeError | null
-  isQuoting: boolean
+  hasQuote: boolean
 }
+
+/**
+ * The rates are network-wide rather than per payment, so being enabled is the whole of what
+ * a quote depends on and one constant stands in for the inputs the other rails key on.
+ */
+const RECOMMENDED_FEES_KEY = "recommended-fees"
 
 export const useRecommendedFeeTiers = (
   sdk: BreezSdkInterface | null,
   enabled: boolean,
 ): RecommendedFeeTiersResult => {
   const [tiers, setTiers] = useState(DEFAULT_TIERS)
-  const [error, setError] = useState<SdkFeeError | null>(null)
-  /** True from the first render when a quote is already due, so no frame claims a zero rate. */
-  const [isQuoting, setIsQuoting] = useState(() => Boolean(sdk && enabled))
+  /** Holds only the reason; whether it still applies is decided by the keyed failure flag. */
+  const [failureReason, setFailureReason] = useState<SdkFeeError | null>(null)
+  const inputsKey = sdk && enabled ? RECOMMENDED_FEES_KEY : null
+  const { hasQuote, hasFailed, discardQuote, markQuoted, markFailed } =
+    useQuoteStatus(inputsKey)
+
+  const error = hasFailed ? failureReason : null
 
   const fetchFees = useCallback(async () => {
-    if (!sdk || !enabled) {
-      setError(null)
-      setIsQuoting(false)
-      return
-    }
+    // Whatever was quoted stops applying the moment this runs, request or gate alike.
+    discardQuote()
 
-    setIsQuoting(true)
+    if (!sdk || !enabled) return
 
     try {
       const rates = await getRecommendedFees(sdk)
@@ -62,19 +70,18 @@ export const useRecommendedFeeTiers = (
           etaMinutes: ETA_MINUTES[Tier.Slow],
         },
       })
-      setError(null)
+      markQuoted()
     } catch (err) {
-      setError(classifySdkFeeError(err))
-    } finally {
-      setIsQuoting(false)
+      setFailureReason(classifySdkFeeError(err))
+      markFailed()
     }
-  }, [sdk, enabled])
+  }, [sdk, enabled, discardQuote, markQuoted, markFailed])
 
   useEffect(() => {
     fetchFees()
   }, [fetchFees])
 
-  return { tiers, error, isQuoting }
+  return { tiers, error, hasQuote }
 }
 
 export const getFeeRateSatPerVb = (
