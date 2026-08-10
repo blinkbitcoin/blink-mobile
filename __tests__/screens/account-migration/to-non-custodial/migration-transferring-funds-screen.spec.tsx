@@ -44,6 +44,9 @@ jest.mock("@app/screens/account-migration/hooks", () => ({
 
 const mockUseMigrationTransfer = jest.fn()
 let mockIsTransferred = false
+/** Proven unless a case is exercising the delayed-redirect release, which opens the gate
+ *  on the notice window without ever seeing the payment land. */
+let mockIsReceiveProven = true
 let mockIsReceiveDelayed = false
 let mockFailureReason: MigrationSupportReason | null = null
 let mockIsClockOutOfSync = false
@@ -55,6 +58,7 @@ jest.mock("@app/screens/account-migration/hooks/use-migration-transfer", () => (
     mockUseMigrationTransfer(args)
     return {
       isTransferred: mockIsTransferred,
+      isReceiveProven: mockIsReceiveProven,
       isReceiveDelayed: mockIsReceiveDelayed,
       failureReason: mockFailureReason,
       isClockOutOfSync: mockIsClockOutOfSync,
@@ -107,6 +111,7 @@ describe("MigrationTransferringFundsScreen", () => {
     mockMigrationAccountId = "sc-account-1"
     mockMigrationLoading = false
     mockIsTransferred = false
+    mockIsReceiveProven = true
     mockIsReceiveDelayed = false
     mockFailureReason = null
     mockIsClockOutOfSync = false
@@ -183,6 +188,16 @@ describe("MigrationTransferringFundsScreen", () => {
       routes: [{ name: "selfCustodialBackupSuccess", params: { reBackup: false } }],
     })
     expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  /** The completion spends this on the account deletion, the one step no retry undoes. */
+  it("tells the completion whether the receive was actually seen", async () => {
+    mockIsTransferred = true
+    mockIsReceiveProven = false
+    renderScreen()
+    await flushEffects()
+
+    expect(mockCompleteMigration).toHaveBeenCalledWith({ isReceiveProven: false })
   })
 
   it("swaps the session once, however often it re-renders", async () => {

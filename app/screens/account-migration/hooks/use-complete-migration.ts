@@ -31,6 +31,20 @@ const OWNER_MISMATCH_REPORT = "Migration completion owner mismatch"
  *  retry press would otherwise raise the same non-fatal again. */
 const OWNER_MISMATCH_DEDUP_KEY = "migration-completion-owner-mismatch"
 
+/** Repeated inside the Error because `reportError` forwards only the message. */
+const UNPROVEN_RECEIVE_REPORT = "Migration completion without a proven receive"
+
+/** One report per process: the release is an operator decision that holds for the whole
+ *  session, so every launch and every retry press would raise the same non-fatal again. */
+const UNPROVEN_RECEIVE_DEDUP_KEY = "migration-completion-unproven-receive"
+
+type CompleteMigrationArgs = {
+  /** Whether the receive gate saw the payment land, rather than releasing on the notice
+   *  window. False skips the close: the funds may still be in the custodial account, and
+   *  a deleted account takes them with it. */
+  isReceiveProven: boolean
+}
+
 type FinishOnDeviceArgs = {
   selfCustodialAccountId: string
   custodialAccountId: string
@@ -81,97 +95,122 @@ export const useCompleteMigration = () => {
     [discardCustodialSession, setActiveAccountId, clearCheckpoint, clearPendingAccount],
   )
 
-  const runCompletion = useCallback(async (): Promise<MigrationCompletion> => {
-    if (!accountId) return MigrationCompletion.AccountMissing
-    /** A keychain loss in the resume window would otherwise switch to an account that is
-     *  gone, stranding the user with neither. */
-    const accountExists = accounts.some((account) => account.id === accountId)
-    if (!accountExists) return MigrationCompletion.AccountMissing
+  const runCompletion = useCallback(
+    async ({ isReceiveProven }: CompleteMigrationArgs): Promise<MigrationCompletion> => {
+      if (!accountId) return MigrationCompletion.AccountMissing
+      /** A keychain loss in the resume window would otherwise switch to an account that is
+       *  gone, stranding the user with neither. */
+      const accountExists = accounts.some((account) => account.id === accountId)
+      if (!accountExists) return MigrationCompletion.AccountMissing
 
-    /** The close deletes whatever account the active token authenticates, so it may only run
-     *  once this session is proven to be the one that saved the checkpoint. The owner query
-     *  has not answered yet here (a launch with no connection), which the next attempt can
-     *  still resolve: nothing is spent and nothing is reported, since this is a waiting
-     *  state rather than a fault. */
-    if (!custodialOwnerId) return MigrationCompletion.CloseUnavailable
+      /** The close deletes whatever account the active token authenticates, so it may only
+       *  run once this session is proven to be the one that saved the checkpoint. The owner
+       *  query has not answered yet here (a launch with no connection), which the next
+       *  attempt can still resolve: nothing is spent and nothing is reported, since this is
+       *  a waiting state rather than a fault. */
+      if (!custodialOwnerId) return MigrationCompletion.CloseUnavailable
 
-    /** A record written before owners existed is claimed by whoever is active, so the
-     *  deletion could aim at a stranger's account and no later attempt makes it provable.
-     *  Terminal, therefore, and terminal in the direction that keeps the user moving: the
-     *  funds are already self-custodial, so the migration finishes here and the account
-     *  itself goes to support, exactly as a server-refused close does. */
-    const isCheckpointOwnedByActiveSession = checkpointOwnerId === custodialOwnerId
-    if (!isCheckpointOwnedByActiveSession) {
-      reportError(
-        OWNER_MISMATCH_REPORT,
-        new Error(
-          `${OWNER_MISMATCH_REPORT}: checkpoint ${
-            checkpointOwnerId ?? "unknown"
-          }, session ${custodialOwnerId}`,
-        ),
-        { dedupKey: OWNER_MISMATCH_DEDUP_KEY },
-      )
+      /** A record written before owners existed is claimed by whoever is active, so the
+       *  deletion could aim at a stranger's account and no later attempt makes it provable.
+       *  Terminal, therefore, and terminal in the direction that keeps the user moving: the
+       *  funds are already self-custodial, so the migration finishes here and the account
+       *  itself goes to support, exactly as a server-refused close does. */
+      const isCheckpointOwnedByActiveSession = checkpointOwnerId === custodialOwnerId
+      if (!isCheckpointOwnedByActiveSession) {
+        reportError(
+          OWNER_MISMATCH_REPORT,
+          new Error(
+            `${OWNER_MISMATCH_REPORT}: checkpoint ${
+              checkpointOwnerId ?? "unknown"
+            }, session ${custodialOwnerId}`,
+          ),
+          { dedupKey: OWNER_MISMATCH_DEDUP_KEY },
+        )
+        await finishOnDevice({
+          selfCustodialAccountId: accountId,
+          custodialAccountId: custodialOwnerId,
+          isSessionAlive: true,
+        })
+        return MigrationCompletion.CloseRefused
+      }
+
+      /** The caller released the swap on the notice window rather than a confirmed receive
+       *  (the delayed-redirect flag), so where the funds sit is unknown and the deletion
+       *  cannot run — an account deleted while they are still in it takes them with it.
+       *  Resolved as a refusal because it is terminal in the same way: the user moves on to
+       *  the self-custodial wallet and the custodial account, still open, goes to support. */
+      if (!isReceiveProven) {
+        reportError(
+          UNPROVEN_RECEIVE_REPORT,
+          new Error(`${UNPROVEN_RECEIVE_REPORT}: account ${custodialOwnerId}`),
+          { dedupKey: UNPROVEN_RECEIVE_DEDUP_KEY },
+        )
+        await finishOnDevice({
+          selfCustodialAccountId: accountId,
+          custodialAccountId: custodialOwnerId,
+          isSessionAlive: true,
+        })
+        return MigrationCompletion.CloseRefused
+      }
+
+      /** Copy the custodial display currency / language / theme onto the migrated account
+       *  while its session is still live — the close and the discard below are what make
+       *  the server values unreachable, so this runs before both. Placed after the refusal
+       *  checks so a migration that is about to be refused writes nothing, and on this path
+       *  rather than at provision time so resumed runs (which never mount the migration
+       *  screens) are covered too (#4099). Reported but never rethrown: losing a currency
+       *  preference must not strand a user mid-migration, and the account keeps today's
+       *  defaults if the copy fails. */
+      try {
+        await seedMigratedSettings(accountId)
+      } catch (err) {
+        reportError("Migration settings carry-over", err)
+      }
+
+      /** Nothing settled, so nothing is spent: leave the session and the checkpoint exactly
+       *  as they are and let the caller offer another attempt. */
+      const closeOutcome = await closeCustodialAccount(custodialOwnerId)
+      if (closeOutcome === AccountCloseOutcome.Retryable)
+        return MigrationCompletion.CloseUnavailable
+
+      const isAccountClosed = closeOutcome === AccountCloseOutcome.Closed
       await finishOnDevice({
         selfCustodialAccountId: accountId,
         custodialAccountId: custodialOwnerId,
-        isSessionAlive: true,
+        isSessionAlive: !isAccountClosed,
       })
-      return MigrationCompletion.CloseRefused
-    }
 
-    /** Copy the custodial display currency / language / theme onto the migrated account
-     *  while its session is still live — the close and the discard below are what make the
-     *  server values unreachable, so this runs before both. Placed after the refusal checks
-     *  so a migration that is about to be refused writes nothing, and on this path rather
-     *  than at provision time so resumed runs (which never mount the migration screens) are
-     *  covered too (#4099). Reported but never rethrown: losing a currency preference must
-     *  not strand a user mid-migration, and the account keeps today's defaults if the copy
-     *  fails. */
-    try {
-      await seedMigratedSettings(accountId)
-    } catch (err) {
-      reportError("Migration settings carry-over", err)
-    }
+      /** A refused close still finishes the migration: the funds are already self-custodial,
+       *  and holding the user on a dead custodial session would cost them their wallet over
+       *  an account only support can now remove. */
+      return isAccountClosed
+        ? MigrationCompletion.Completed
+        : MigrationCompletion.CloseRefused
+    },
+    [
+      accountId,
+      accounts,
+      custodialOwnerId,
+      checkpointOwnerId,
+      seedMigratedSettings,
+      closeCustodialAccount,
+      finishOnDevice,
+    ],
+  )
 
-    /** Nothing settled, so nothing is spent: leave the session and the checkpoint exactly
-     *  as they are and let the caller offer another attempt. */
-    const closeOutcome = await closeCustodialAccount(custodialOwnerId)
-    if (closeOutcome === AccountCloseOutcome.Retryable)
-      return MigrationCompletion.CloseUnavailable
+  const completeMigration = useCallback(
+    (args: CompleteMigrationArgs): Promise<MigrationCompletion> => {
+      if (completionInFlight) return completionInFlight
 
-    const isAccountClosed = closeOutcome === AccountCloseOutcome.Closed
-    await finishOnDevice({
-      selfCustodialAccountId: accountId,
-      custodialAccountId: custodialOwnerId,
-      isSessionAlive: !isAccountClosed,
-    })
+      const attempt = runCompletion(args).finally(() => {
+        completionInFlight = null
+      })
+      completionInFlight = attempt
 
-    /** A refused close still finishes the migration: the funds are already self-custodial,
-     *  and holding the user on a dead custodial session would cost them their wallet over
-     *  an account only support can now remove. */
-    return isAccountClosed
-      ? MigrationCompletion.Completed
-      : MigrationCompletion.CloseRefused
-  }, [
-    accountId,
-    accounts,
-    custodialOwnerId,
-    checkpointOwnerId,
-    seedMigratedSettings,
-    closeCustodialAccount,
-    finishOnDevice,
-  ])
-
-  const completeMigration = useCallback((): Promise<MigrationCompletion> => {
-    if (completionInFlight) return completionInFlight
-
-    const attempt = runCompletion().finally(() => {
-      completionInFlight = null
-    })
-    completionInFlight = attempt
-
-    return attempt
-  }, [runCompletion])
+      return attempt
+    },
+    [runCompletion],
+  )
 
   /** The account check is only trustworthy once both the checkpoint and the registry have
    *  hydrated: the registry's accounts start empty and fill after an async keystore read. */

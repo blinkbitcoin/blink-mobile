@@ -84,11 +84,15 @@ jest.mock(
 
 import { useCompleteMigration } from "@app/screens/account-migration/hooks/use-complete-migration"
 
-const complete = async (): Promise<MigrationCompletion | undefined> => {
+/** Proven by default: the unproven path is the delayed-redirect escape hatch, which its
+ *  own cases opt into. */
+const complete = async (
+  isReceiveProven = true,
+): Promise<MigrationCompletion | undefined> => {
   const { result } = renderHook(() => useCompleteMigration())
   let outcome: MigrationCompletion | undefined
   await act(async () => {
-    outcome = await result.current.completeMigration()
+    outcome = await result.current.completeMigration({ isReceiveProven })
   })
   return outcome
 }
@@ -168,7 +172,9 @@ describe("useCompleteMigration", () => {
 
     const { result } = renderHook(() => useCompleteMigration())
     await act(async () => {
-      await expect(result.current.completeMigration()).rejects.toThrow("keystore failure")
+      await expect(
+        result.current.completeMigration({ isReceiveProven: true }),
+      ).rejects.toThrow("keystore failure")
     })
 
     expect(mockSetActiveAccountId).not.toHaveBeenCalled()
@@ -377,6 +383,37 @@ describe("useCompleteMigration", () => {
     })
   })
 
+  /** The delayed-redirect flag releases the gate on the notice window rather than a
+   *  confirmed receive, so the funds may still be in the custodial account (#4102). */
+  describe("when the receive was never proven", () => {
+    it("never deletes an account the funds may still be sitting in", async () => {
+      expect(await complete(false)).toBe(MigrationCompletion.CloseRefused)
+      expect(mockCloseCustodialAccount).not.toHaveBeenCalled()
+    })
+
+    /** The release exists to move the user on, so the swap still happens: only the
+     *  irreversible half waits, and the open account goes to support. */
+    it("still swaps the session so the release does its job", async () => {
+      await complete(false)
+
+      expect(mockDiscardCustodialSession).toHaveBeenCalledWith({ isSessionAlive: true })
+      expect(mockSetActiveAccountId).toHaveBeenCalledWith("sc-account-1")
+      expect(mockClearCheckpoint).toHaveBeenCalledTimes(1)
+    })
+
+    it("reports the skipped close with the account it left open", async () => {
+      await complete(false)
+
+      expect(mockReportError).toHaveBeenCalledWith(
+        "Migration completion without a proven receive",
+        expect.objectContaining({
+          message: "Migration completion without a proven receive: account custodial-1",
+        }),
+        { dedupKey: "migration-completion-unproven-receive" },
+      )
+    })
+  })
+
   /** The resume hook stays mounted under the migration stack, so it and the transfer screen
    *  can both decide to finish at the same moment. */
   describe("when two callers complete at the same time", () => {
@@ -392,8 +429,8 @@ describe("useCompleteMigration", () => {
       const { result } = renderHook(() => useCompleteMigration())
       let outcomes: MigrationCompletion[] = []
       await act(async () => {
-        const first = result.current.completeMigration()
-        const second = result.current.completeMigration()
+        const first = result.current.completeMigration({ isReceiveProven: true })
+        const second = result.current.completeMigration({ isReceiveProven: true })
         releaseClose(AccountCloseOutcome.Closed)
         outcomes = await Promise.all([first, second])
       })

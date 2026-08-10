@@ -53,11 +53,12 @@ export const useResumeCompletedMigration = (): void => {
    *  the custodial account, nor swap into a wallet whose funds are still in transit
    *  (#4102). Unconfirmed simply means no swap this session — the custodial session stays
    *  intact and the next launch (or this one, once a check lands) picks the swap back up. */
-  const { isReceiveConfirmed, isReceiveDelayed } = useMigrationReceiveConfirmation({
-    selfCustodialAccountId: migrationAccountId,
-    expectedReceiveSats: migrationExpectedReceiveSats,
-    skip: !isServerCompleted,
-  })
+  const { isReceiveConfirmed, isReceiveProven, isReceiveDelayed } =
+    useMigrationReceiveConfirmation({
+      selfCustodialAccountId: migrationAccountId,
+      expectedReceiveSats: migrationExpectedReceiveSats,
+      skip: !isServerCompleted,
+    })
 
   /** This path has no screen of its own to say the wait is unusual, so the crossing is at
    *  least reported: a receive that never lands would otherwise be invisible, the user
@@ -121,7 +122,7 @@ export const useResumeCompletedMigration = (): void => {
      *  cannot be half-run. A spent attempt bumps the count, which both re-runs this effect
      *  for the retry and stops it once the attempts are gone. */
     isSwapInFlightRef.current = true
-    completeMigration()
+    completeMigration({ isReceiveProven })
       .then((completion) => {
         /** Exhaustive on purpose: the fallthrough of an if-chain here is a support handover
          *  under a reason that would be a lie, so a new outcome has to be a type error
@@ -168,5 +169,12 @@ export const useResumeCompletedMigration = (): void => {
       .finally(() => {
         isSwapInFlightRef.current = false
       })
-  }, [isSwapPending, attempts, closeRetryCount, completeMigration, handOverToSupport])
+  }, [
+    isSwapPending,
+    isReceiveProven,
+    attempts,
+    closeRetryCount,
+    completeMigration,
+    handOverToSupport,
+  ])
 }

@@ -79,6 +79,9 @@ type UseMigrationTransferArgs = {
 
 type UseMigrationTransfer = {
   isTransferred: boolean
+  /** Whether the receive was actually seen, as opposed to released by the notice window.
+   *  Only the irreversible half of the completion reads it. */
+  isReceiveProven: boolean
   isReceiveDelayed: boolean
   failureReason: MigrationSupportReason | null
   isClockOutOfSync: boolean
@@ -135,11 +138,12 @@ export const useMigrationTransfer = ({
   /** COMPLETED is the sender's word only; the swap must also wait for the receiver's,
    *  or the user lands in a wallet whose funds are still in transit (#4102). */
   const isReceiveGateSkipped = skip || !isServerCompleted || hasFailed
-  const { isReceiveConfirmed, isReceiveDelayed } = useMigrationReceiveConfirmation({
-    selfCustodialAccountId,
-    expectedReceiveSats,
-    skip: isReceiveGateSkipped,
-  })
+  const { isReceiveConfirmed, isReceiveProven, isReceiveDelayed } =
+    useMigrationReceiveConfirmation({
+      selfCustodialAccountId,
+      expectedReceiveSats,
+      skip: isReceiveGateSkipped,
+    })
 
   /** A failure already handed the user to support, so a later COMPLETED from a stray poll
    *  must not also swap the session out from under that screen. */
@@ -318,6 +322,7 @@ export const useMigrationTransfer = ({
 
   return {
     isTransferred,
+    isReceiveProven,
     isReceiveDelayed,
     failureReason: activeFailureReason,
     isClockOutOfSync,

@@ -44,7 +44,12 @@ jest.mock("@app/screens/account-migration/hooks/use-complete-migration", () => (
 
 /** Confirmed by default so the server phase stays the deciding voice in the existing
  *  cases; the receive-gate cases below flip it. */
-let mockReceiveConfirmation = { isReceiveConfirmed: true, isReceiveDelayed: false }
+let mockReceiveConfirmation: {
+  isReceiveConfirmed: boolean
+  isReceiveDelayed: boolean
+  /** Only the timeout-release case sets this apart from the confirmation. */
+  isReceiveProven?: boolean
+} = { isReceiveConfirmed: true, isReceiveDelayed: false }
 const mockUseReceiveConfirmation = jest.fn()
 
 jest.mock(
@@ -52,7 +57,10 @@ jest.mock(
   () => ({
     useMigrationReceiveConfirmation: (args: unknown) => {
       mockUseReceiveConfirmation(args)
-      return mockReceiveConfirmation
+      return {
+        isReceiveProven: mockReceiveConfirmation.isReceiveConfirmed,
+        ...mockReceiveConfirmation,
+      }
     },
   }),
 )
@@ -162,6 +170,20 @@ describe("useResumeCompletedMigration", () => {
     await flushEffects()
 
     expect(mockCompleteMigration).toHaveBeenCalledTimes(1)
+  })
+
+  /** The completion spends this on the account deletion: a gate opened by the notice
+   *  window rather than a landed payment must not delete the custodial account. */
+  it("tells the completion whether the receive was actually seen", async () => {
+    mockReceiveConfirmation = {
+      isReceiveConfirmed: true,
+      isReceiveProven: false,
+      isReceiveDelayed: false,
+    }
+    renderHook(() => useResumeCompletedMigration())
+    await flushEffects()
+
+    expect(mockCompleteMigration).toHaveBeenCalledWith({ isReceiveProven: false })
   })
 
   /** Each look at the wallet opens a whole SDK connection, so the gate stays off until

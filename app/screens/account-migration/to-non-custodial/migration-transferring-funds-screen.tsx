@@ -90,6 +90,7 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
   const isTransferSkipped = migrationLoading || isAccountMissing
   const {
     isTransferred,
+    isReceiveProven,
     isReceiveDelayed,
     failureReason,
     isClockOutOfSync,
@@ -159,7 +160,7 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
     if (firedAttemptRef.current === completionAttempt) return
     firedAttemptRef.current = completionAttempt
 
-    completeMigration()
+    completeMigration({ isReceiveProven })
       .then((completion) => {
         /** Exhaustive on purpose: the fallthrough of an if-chain here resets the stack to
          *  the success screen, so a new outcome would silently tell the user the migration
@@ -196,6 +197,7 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
       })
   }, [
     isTransferred,
+    isReceiveProven,
     completionAttempt,
     completeMigration,
     resetToSuccess,
