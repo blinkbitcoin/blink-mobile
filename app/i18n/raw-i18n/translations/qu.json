@@ -3716,6 +3716,7 @@
         "body": "Ama llakikuychu — qullqiykikuna waqaychasqam kachkan. Astakuyqa pisi minutokunatam apanman, wakinpitaq huk ruwayllam musuqmanta qallariyta munan.\n\nAstakuyta musuqmanta qallariy — pisi pachallatam apan.\n\n¿Kay pantallatachu rikuchkankiraq? Yanapakuyta maskay, kay willakuykunatapas willay:",
         "contactSupportCta": "Yanapakuyta maskay"
       },
+      "closeRefusedBody": "Astakuyniyki tukusqañam, qullqiykipas musuq qhipiykipiñam. Mawk'a cuentayki kicharisqaraq kanman. Yanapaqkuna qhawarinqaku, chaymanta wichq'anqaku chayna kaptin.\n\nKay willakuykunata munawaq yanapakuqkuna hawkachinankupaq:",
       "reasonLabel": "Imarayku",
       "accountIdLabel": "Kuenta ID",
       "pubKeyLabel": "pubKey",
@@ -3812,7 +3813,8 @@
     "clockOutOfSync": {
       "body": "Dispositivoykipa p'unchawnin hinaspa horan mana huñusqachu. Automáticoman churay qatinaykipaq.",
       "retryCta": "Kutiy yapamuy"
-    }
+    },
+    "closeUnavailable": "Qullqiykiqa musuq qipiykipi allinmi kachkan. Ñawpaq cuentaykitaraq wichqachkaniku, ama hina kaspa huk ratumanta yapamanta ruway."
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Waqaychasqa",

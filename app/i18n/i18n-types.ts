@@ -12377,6 +12377,10 @@ type RootTranslation = {
 			retryCta: string
 		}
 		/**
+		 * Y​o​u​r​ ​f​u​n​d​s​ ​a​r​e​ ​s​a​f​e​ ​i​n​ ​y​o​u​r​ ​n​e​w​ ​w​a​l​l​e​t​.​ ​W​e​ ​a​r​e​ ​s​t​i​l​l​ ​c​l​o​s​i​n​g​ ​y​o​u​r​ ​o​l​d​ ​a​c​c​o​u​n​t​,​ ​p​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​ ​i​n​ ​a​ ​m​o​m​e​n​t​.
+		 */
+		closeUnavailable: string
+		/**
 		 * T​i​m​e​ ​t​o​ ​u​p​g​r​a​d​e
 		 */
 		migrationRequiredTitle: string
@@ -12643,6 +12647,12 @@ type RootTranslation = {
 				 */
 				contactSupportCta: string
 			}
+			/**
+			 * Y​o​u​r​ ​m​i​g​r​a​t​i​o​n​ ​i​s​ ​c​o​m​p​l​e​t​e​ ​a​n​d​ ​y​o​u​r​ ​f​u​n​d​s​ ​a​r​e​ ​i​n​ ​y​o​u​r​ ​n​e​w​ ​w​a​l​l​e​t​.​ ​Y​o​u​r​ ​o​l​d​ ​a​c​c​o​u​n​t​ ​m​a​y​ ​s​t​i​l​l​ ​b​e​ ​o​p​e​n​.​ ​S​u​p​p​o​r​t​ ​w​i​l​l​ ​c​h​e​c​k​ ​a​n​d​ ​c​l​o​s​e​ ​i​t​ ​i​f​ ​i​t​ ​i​s​.​
+		​
+		​Y​o​u​ ​m​a​y​ ​n​e​e​d​ ​t​h​i​s​ ​i​n​f​o​r​m​a​t​i​o​n​ ​t​o​ ​h​e​l​p​ ​s​u​p​p​o​r​t​ ​r​e​s​o​l​v​e​ ​y​o​u​r​ ​c​a​s​e​:
+			 */
+			closeRefusedBody: string
 			/**
 			 * R​e​a​s​o​n
 			 */
@@ -25481,6 +25491,10 @@ export type TranslationFunctions = {
 			retryCta: () => LocalizedString
 		}
 		/**
+		 * Your funds are safe in your new wallet. We are still closing your old account, please try again in a moment.
+		 */
+		closeUnavailable: () => LocalizedString
+		/**
 		 * Time to upgrade
 		 */
 		migrationRequiredTitle: () => LocalizedString
@@ -25741,6 +25755,12 @@ export type TranslationFunctions = {
 				 */
 				contactSupportCta: () => LocalizedString
 			}
+			/**
+			 * Your migration is complete and your funds are in your new wallet. Your old account may still be open. Support will check and close it if it is.
+	
+		You may need this information to help support resolve your case:
+			 */
+			closeRefusedBody: () => LocalizedString
 			/**
 			 * Reason
 			 */

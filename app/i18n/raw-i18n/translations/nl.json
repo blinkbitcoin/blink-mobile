@@ -3716,6 +3716,7 @@
         "body": "Maak je geen zorgen — je geld is veilig. De migratie kan een paar minuten duren, en soms heeft een stap gewoon een nieuwe start nodig.\n\nStart de migratie opnieuw — het duurt maar even.\n\nZie je dit scherm nog steeds? Neem contact op met support en deel de gegevens hieronder:",
         "contactSupportCta": "Contact opnemen met support"
       },
+      "closeRefusedBody": "Je migratie is voltooid en je tegoed staat in je nieuwe wallet. Je oude account is mogelijk nog open. Support controleert dit en sluit het indien nodig.\n\nMogelijk heb je deze informatie nodig zodat support je zaak kan oplossen:",
       "reasonLabel": "Reden",
       "accountIdLabel": "Account-ID",
       "pubKeyLabel": "pubKey",
@@ -3812,7 +3813,8 @@
     "clockOutOfSync": {
       "body": "De datum en tijd van je apparaat lopen niet gelijk. Zet ze op automatisch om door te gaan.",
       "retryCta": "Opnieuw proberen"
-    }
+    },
+    "closeUnavailable": "Je geld staat veilig in je nieuwe wallet. We zijn je oude account nog aan het sluiten, probeer het zo meteen opnieuw."
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Bewaard",

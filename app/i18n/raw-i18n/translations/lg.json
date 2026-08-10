@@ -3716,6 +3716,7 @@
         "body": "Tofaayo — ssente zo nnywevu. Okukyusa kuyinza okutwala eddakiika ntono, era oluusi omutendera gwetaaga butaaga kuddamu kutandika.\n\nTandika okukyusa okuva ku ntandikwa — kutwala akaseera katono.\n\nOkyalaba oluggya luno? Tuukirira ab'obuyambi obawe ebikwata wammanga:",
         "contactSupportCta": "Tuukirire ab'obuyambi"
       },
+      "closeRefusedBody": "Okusengula kwo kuwedde era ssente zo ziri mu wallet yo empya. Akawunti yo enkadde eyinza okuba nga ekyali nnyanjuluze. Abayamba bajja kukebera era bagiggaleewo bwe kiba kyetaagisa.\n\nOyinza okwetaaga ebikwata ku bino okuyamba ab'obuyambi okugonjoola ensonga yo:",
       "reasonLabel": "Ensonga",
       "accountIdLabel": "ID ya akawunti",
       "pubKeyLabel": "pubKey",
@@ -3812,7 +3813,8 @@
     "clockOutOfSync": {
       "body": "Ennaku n'obudde bw'ekyuma kyo tebituukagana. Bisseeko ku otomatiki osobole okweyongerayo.",
       "retryCta": "Ddamu ogezaako"
-    }
+    },
+    "closeUnavailable": "Ssente zo ziri bulungi mu walletiyo empya. Tukyaggalawo akawunti yo eyedda, ddamu ogezaako mu kaseera katono."
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Eterekeddwa",

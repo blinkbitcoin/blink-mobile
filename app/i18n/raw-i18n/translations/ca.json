@@ -3716,6 +3716,7 @@
         "body": "No et preocupis — els teus fons estan segurs. La migració pot trigar uns minuts, i de vegades un pas només necessita començar de nou.\n\nComença la migració de nou — només trigarà un moment.\n\nEncara veus aquesta pantalla? Contacta amb suport i comparteix les dades següents:",
         "contactSupportCta": "Contacta amb suport"
       },
+      "closeRefusedBody": "La teva migració s'ha completat i els teus fons són a la teva cartera nova. És possible que el teu compte antic encara estigui obert. El suport ho comprovarà i el tancarà si cal.\n\nPotser necessitaràs aquesta informació per ajudar el suport a resoldre el teu cas:",
       "reasonLabel": "Motiu",
       "accountIdLabel": "ID del compte",
       "pubKeyLabel": "pubKey",
@@ -3812,7 +3813,8 @@
     "clockOutOfSync": {
       "body": "La data i l'hora del teu dispositiu no estan sincronitzades. Configura-les en automàtic per continuar.",
       "retryCta": "Torna-ho a provar"
-    }
+    },
+    "closeUnavailable": "Els teus fons són segurs a la teva nova cartera. Encara estem tancant el teu compte antic, torna-ho a provar d'aquí a un moment."
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Custodiat",

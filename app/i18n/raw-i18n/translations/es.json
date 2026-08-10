@@ -3716,6 +3716,7 @@
                 "body": "No te preocupes — tus fondos están seguros. La migración puede tardar unos minutos, y a veces un paso solo necesita empezar de nuevo.\n\nComienza la migración de nuevo — solo tomará un momento.\n\n¿Sigues viendo esta pantalla? Contacta a soporte y comparte los datos de abajo:",
                 "contactSupportCta": "Contacta a soporte"
             },
+            "closeRefusedBody": "Tu migración se completó y tus fondos están en tu nueva billetera. Puede que tu cuenta anterior siga abierta. Soporte lo verificará y la cerrará si es así.\n\nPuede que necesites esta información para ayudar a soporte a resolver tu caso:",
             "reasonLabel": "Motivo",
             "accountIdLabel": "ID de cuenta",
             "pubKeyLabel": "pubKey",
@@ -3812,7 +3813,8 @@
         "clockOutOfSync": {
             "body": "La fecha y la hora de tu dispositivo están desincronizadas. Ponlas en automático para continuar.",
             "retryCta": "Reintentar"
-        }
+        },
+        "closeUnavailable": "Tus fondos están seguros en tu nueva billetera. Todavía estamos cerrando tu cuenta anterior, inténtalo de nuevo en un momento."
     },
     "AccountTypeSelectionScreen": {
         "custodialLabel": "Custodiada",

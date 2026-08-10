@@ -3716,6 +3716,7 @@
         "body": "Nebojte sa — vaše prostriedky sú v bezpečí. Migrácia môže trvať niekoľko minút a niekedy stačí, aby sa jeden krok začal odznova.\n\nSpustite migráciu odznova — zaberie to len chvíľu.\n\nVidíte túto obrazovku aj naďalej? Obráťte sa na podporu a zdieľajte údaje nižšie:",
         "contactSupportCta": "Kontaktovať podporu"
       },
+      "closeRefusedBody": "Vaša migrácia je dokončená a vaše prostriedky sú v novej peňaženke. Váš starý účet môže byť stále otvorený. Podpora to overí a v prípade potreby ho zatvorí.\n\nTieto informácie môžu podpore pomôcť vyriešiť váš prípad:",
       "reasonLabel": "Dôvod",
       "accountIdLabel": "ID účtu",
       "pubKeyLabel": "pubKey",
@@ -3812,7 +3813,8 @@
     "clockOutOfSync": {
       "body": "Dátum a čas vášho zariadenia nie sú synchronizované. Nastavte ich na automatické, aby ste mohli pokračovať.",
       "retryCta": "Skúsiť znova"
-    }
+    },
+    "closeUnavailable": "Vaše prostriedky sú v bezpečí v novej peňaženke. Váš starý účet ešte zatvárame, skúste to prosím o chvíľu znova."
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Spravovaný",

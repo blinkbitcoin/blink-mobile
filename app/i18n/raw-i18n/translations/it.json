@@ -3716,6 +3716,7 @@
                 "body": "Non preoccuparti — i tuoi fondi sono al sicuro. La migrazione può richiedere qualche minuto e a volte a un passaggio serve solo ricominciare.\n\nRicomincia la migrazione da capo — ci vuole solo un attimo.\n\nVedi ancora questa schermata? Contatta il supporto e condividi i dati qui sotto:",
                 "contactSupportCta": "Contatta il supporto"
             },
+            "closeRefusedBody": "La tua migrazione è completata e i tuoi fondi sono nel tuo nuovo portafoglio. Il tuo vecchio account potrebbe essere ancora aperto. L'assistenza lo verificherà e lo chiuderà se necessario.\n\nPotresti aver bisogno di queste informazioni per aiutare il supporto a risolvere il tuo caso:",
             "reasonLabel": "Motivo",
             "accountIdLabel": "ID account",
             "pubKeyLabel": "pubKey",
@@ -3812,7 +3813,8 @@
         "clockOutOfSync": {
             "body": "La data e l'ora del tuo dispositivo non sono sincronizzate. Impostale su automatico per continuare.",
             "retryCta": "Riprova"
-        }
+        },
+        "closeUnavailable": "I tuoi fondi sono al sicuro nel tuo nuovo portafoglio. Stiamo ancora chiudendo il tuo vecchio account, riprova tra un momento."
     },
     "AccountTypeSelectionScreen": {
         "custodialLabel": "Custodito",

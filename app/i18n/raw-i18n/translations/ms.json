@@ -3716,6 +3716,7 @@
         "body": "Jangan risau — dana anda selamat. Pemindahan mungkin mengambil masa beberapa minit, dan kadangkala satu langkah hanya perlu dimulakan semula.\n\nMulakan pemindahan sekali lagi — ia hanya mengambil masa sebentar.\n\nMasih melihat skrin ini? Hubungi sokongan dan kongsikan maklumat di bawah:",
         "contactSupportCta": "Hubungi sokongan"
       },
+      "closeRefusedBody": "Migrasi anda telah selesai dan dana anda berada dalam dompet baharu anda. Akaun lama anda mungkin masih terbuka. Sokongan akan menyemaknya dan menutupnya jika perlu.\n\nAnda mungkin memerlukan maklumat ini untuk membantu sokongan menyelesaikan kes anda:",
       "reasonLabel": "Sebab",
       "accountIdLabel": "ID akaun",
       "pubKeyLabel": "pubKey",
@@ -3812,7 +3813,8 @@
     "clockOutOfSync": {
       "body": "Tarikh dan masa peranti anda tidak segerak. Tetapkan kepada automatik untuk meneruskan.",
       "retryCta": "Cuba lagi"
-    }
+    },
+    "closeUnavailable": "Dana anda selamat dalam dompet baharu anda. Kami masih menutup akaun lama anda, sila cuba lagi sebentar."
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Kustodian",

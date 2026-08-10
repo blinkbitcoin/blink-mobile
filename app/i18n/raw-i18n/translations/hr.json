@@ -3716,6 +3716,7 @@
         "body": "Ne brinite — vaša su sredstva sigurna. Migracija može potrajati nekoliko minuta, a ponekad je koraku dovoljan novi početak.\n\nZapočnite migraciju iznova — potrajat će samo trenutak.\n\nVidite li i dalje ovaj zaslon? Obratite se podršci i podijelite podatke u nastavku:",
         "contactSupportCta": "Kontaktirajte podršku"
       },
+      "closeRefusedBody": "Vaša migracija je dovršena i vaša sredstva su u novom novčaniku. Vaš stari račun možda je još uvijek otvoren. Podrška će to provjeriti i zatvoriti ga ako treba.\n\nOve informacije mogu pomoći podršci da riješi vaš slučaj:",
       "reasonLabel": "Razlog",
       "accountIdLabel": "ID računa",
       "pubKeyLabel": "pubKey",
@@ -3812,7 +3813,8 @@
     "clockOutOfSync": {
       "body": "Datum i vrijeme vašeg uređaja nisu usklađeni. Postavite ih na automatski način rada za nastavak.",
       "retryCta": "Pokušaj ponovno"
-    }
+    },
+    "closeUnavailable": "Vaša su sredstva sigurna u vašem novom novčaniku. Još zatvaramo vaš stari račun, pokušajte ponovno za trenutak."
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Pod skrbništvom",

@@ -20,24 +20,31 @@ const EMAIL_DIVIDER = "-".repeat(40)
  * only its label is localized. The email frames the block so the write-here prompt lands
  * last, where mail clients drop the cursor at the end of a mailto body.
  */
-export const useMigrationSupportEmail = (reason: MigrationSupportReason) => {
+export const useMigrationSupportEmail = (
+  reason: MigrationSupportReason,
+  custodialAccountId?: string,
+) => {
   const { LL } = useI18nContext()
   const LLSupport = LL.AccountMigration.contactSupport
   const { composeSupport } = useContactSupport()
   const { countryCode } = useDeviceLocation()
-  const diagnostics = useMigrationDiagnostics()
+  const diagnostics = useMigrationDiagnostics(custodialAccountId)
   const platform = isIos ? "iOS" : "Android"
 
   const cardDetails: MigrationDiagnostic[] = [
-    { label: LLSupport.reasonLabel(), value: reason },
+    { label: LLSupport.reasonLabel(), value: reason, isIdentifier: false },
     ...diagnostics,
   ].filter((line) => Boolean(line.value))
 
   const supportDetails: MigrationDiagnostic[] = [
     ...cardDetails,
-    { label: LLSupport.platformLabel(), value: platform },
-    { label: LLSupport.appVersionLabel(), value: getReadableVersion() },
-    { label: LLSupport.countryLabel(), value: countryCode ?? "" },
+    { label: LLSupport.platformLabel(), value: platform, isIdentifier: false },
+    {
+      label: LLSupport.appVersionLabel(),
+      value: getReadableVersion(),
+      isIdentifier: false,
+    },
+    { label: LLSupport.countryLabel(), value: countryCode ?? "", isIdentifier: false },
   ].filter((line) => Boolean(line.value))
 
   const supportDetailsText = supportDetails
