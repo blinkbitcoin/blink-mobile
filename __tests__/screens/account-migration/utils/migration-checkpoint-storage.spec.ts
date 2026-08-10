@@ -230,6 +230,7 @@ describe("migration-checkpoint-storage", () => {
         [MigrationCheckpoint.BackupMethod, false],
         [MigrationCheckpoint.CloudBackup, false],
         [MigrationCheckpoint.BackupAlerts, false],
+        [MigrationCheckpoint.ChooseExperience, false],
         [MigrationCheckpoint.BalancesOverview, true],
       ])
     })
@@ -238,21 +239,9 @@ describe("migration-checkpoint-storage", () => {
       expect(isCommitPointCheckpoint(null)).toBe(false)
     })
 
-    it("resumes onto the mode screen carrying the provisioned account", () => {
-      expect(
-        resolveCheckpointRoute(MigrationCheckpoint.ChooseExperience, "acc-1"),
-      ).toEqual({
-        name: "selfCustodialChooseExperience",
-        params: {
-          onContinue: {
-            route: "accountMigrationBalancesOverview",
-            accountId: "acc-1",
-          },
-        },
-      })
-    })
-
-    it("falls back to the explainer when the mode checkpoint has no account", () => {
+    /** The mode screen sits before the commit point, so it restarts at the explainer like
+     *  every other pre-commit step rather than resuming onto itself. */
+    it("restarts the mode checkpoint at the explainer", () => {
       expect(resolveCheckpointRoute(MigrationCheckpoint.ChooseExperience)).toEqual({
         name: "accountMigrationExplainer",
       })

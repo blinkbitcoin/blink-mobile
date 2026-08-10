@@ -37,11 +37,11 @@ const DEFAULT_DESTINATION: CheckpointDestination = { name: "accountMigrationExpl
 /** Exhaustive on purpose: a step added to the enum has no entry here and fails to compile,
  *  so a checkpoint past the commit point can never inherit the restart by omission. */
 const IS_COMMIT_POINT_BY_CHECKPOINT: Record<MigrationCheckpoint, boolean> = {
-  [MigrationCheckpoint.ChooseExperience]: false,
   [MigrationCheckpoint.TermsAndConditions]: false,
   [MigrationCheckpoint.BackupMethod]: false,
   [MigrationCheckpoint.CloudBackup]: false,
   [MigrationCheckpoint.BackupAlerts]: false,
+  [MigrationCheckpoint.ChooseExperience]: false,
   [MigrationCheckpoint.BalancesOverview]: true,
 }
 
