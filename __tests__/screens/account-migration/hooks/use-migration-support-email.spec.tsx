@@ -158,6 +158,7 @@ describe("useMigrationSupportEmail", () => {
     expect(result.current.cardDetails[0]).toEqual({
       label: LLSupport.reasonLabel(),
       value: "locked-without-checkpoint",
+      isIdentifier: false,
     })
     expect(result.current.supportDetailsText).toContain(
       `${LLSupport.reasonLabel()}: locked-without-checkpoint`,
@@ -221,12 +222,12 @@ describe("useMigrationSupportEmail", () => {
     )
 
     expect(result.current.cardDetails).toEqual([
-      { label: LLSupport.reasonLabel(), value: "transfer-failed" },
-      { label: LLSupport.accountIdLabel(), value: "18A4242" },
-      { label: LLSupport.pubKeyLabel(), value: "02abc123pubkey" },
-      { label: LLSupport.usernameLabel(), value: "satoshin21" },
-      { label: LLSupport.emailLabel(), value: "email@email.com" },
-      { label: LLSupport.phoneLabel(), value: "+1 374 9383 993" },
+      { label: LLSupport.reasonLabel(), value: "transfer-failed", isIdentifier: false },
+      { label: LLSupport.accountIdLabel(), value: "18A4242", isIdentifier: true },
+      { label: LLSupport.pubKeyLabel(), value: "02abc123pubkey", isIdentifier: true },
+      { label: LLSupport.usernameLabel(), value: "satoshin21", isIdentifier: false },
+      { label: LLSupport.emailLabel(), value: "email@email.com", isIdentifier: false },
+      { label: LLSupport.phoneLabel(), value: "+1 374 9383 993", isIdentifier: false },
     ])
   })
 

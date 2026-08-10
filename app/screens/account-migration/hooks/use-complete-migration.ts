@@ -103,6 +103,21 @@ export const useCompleteMigration = () => {
       const accountExists = accounts.some((account) => account.id === accountId)
       if (!accountExists) return MigrationCompletion.AccountMissing
 
+      /** Copy the custodial display currency / language / theme onto the migrated account
+       *  while its session is still live — the close and the discard below are what make
+       *  the server values unreachable. Ahead of the refusal checks, not after them: a
+       *  refusal still hands the user their self-custodial wallet, so it needs the
+       *  preferences just as much as a clean close does. On this path rather than at
+       *  provision time so resumed runs (which never mount the migration screens) are
+       *  covered too (#4099). Reported but never rethrown: losing a currency preference
+       *  must not strand a user mid-migration, and the account keeps today's defaults if
+       *  the copy fails. */
+      try {
+        await seedMigratedSettings(accountId)
+      } catch (err) {
+        reportError("Migration settings carry-over", err)
+      }
+
       /** The close deletes whatever account the active token authenticates, so it may only
        *  run once this session is proven to be the one that saved the checkpoint. The owner
        *  query has not answered yet here (a launch with no connection), which the next
@@ -151,20 +166,6 @@ export const useCompleteMigration = () => {
           isSessionAlive: true,
         })
         return MigrationCompletion.CloseRefused
-      }
-
-      /** Copy the custodial display currency / language / theme onto the migrated account
-       *  while its session is still live — the close and the discard below are what make
-       *  the server values unreachable, so this runs before both. Placed after the refusal
-       *  checks so a migration that is about to be refused writes nothing, and on this path
-       *  rather than at provision time so resumed runs (which never mount the migration
-       *  screens) are covered too (#4099). Reported but never rethrown: losing a currency
-       *  preference must not strand a user mid-migration, and the account keeps today's
-       *  defaults if the copy fails. */
-      try {
-        await seedMigratedSettings(accountId)
-      } catch (err) {
-        reportError("Migration settings carry-over", err)
       }
 
       /** Nothing settled, so nothing is spent: leave the session and the checkpoint exactly

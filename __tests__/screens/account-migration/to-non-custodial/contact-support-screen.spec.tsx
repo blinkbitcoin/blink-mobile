@@ -498,6 +498,15 @@ describe("MigrationContactSupportScreen", () => {
     ]
     const allReasons: MigrationSupportReason[] = Object.values(MigrationSupportReason)
 
+    /** The close refusal keeps the support-first hero but swaps the body: the migration
+     *  itself succeeded, so the generic "something went wrong" would contradict it. */
+    const expectedBody = (reason: MigrationSupportReason) => {
+      if (RESTART_RESOLVABLE.includes(reason)) return LLSupport.selfHelp.body()
+      return reason === MigrationSupportReason.CustodialAccountCloseRefused
+        ? LLSupport.closeRefusedBody()
+        : LLSupport.body()
+    }
+
     allReasons.forEach((reason) => {
       const expectsSelfHelp = RESTART_RESOLVABLE.includes(reason)
       const variant = expectsSelfHelp ? "self-help" : "support-first"
@@ -510,11 +519,7 @@ describe("MigrationContactSupportScreen", () => {
         expect(
           screen.getByTestId(expectsSelfHelp ? "icon-refresh" : "icon-headset"),
         ).toBeTruthy()
-        expect(
-          screen.queryByText(
-            expectsSelfHelp ? LLSupport.selfHelp.body() : LLSupport.body(),
-          ),
-        ).toBeTruthy()
+        expect(screen.queryByText(expectedBody(reason))).toBeTruthy()
         expect(
           screen.queryByText(
             expectsSelfHelp ? LLSupport.body() : LLSupport.selfHelp.body(),

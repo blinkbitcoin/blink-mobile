@@ -59,8 +59,7 @@ const mockReportError = jest.fn()
 
 jest.mock("@app/utils/error-logging", () => ({
   ...jest.requireActual("@app/utils/error-logging"),
-  reportError: (operation: string, err: unknown, options?: unknown) =>
-    mockReportError(operation, err, options),
+  reportError: (...args: unknown[]) => mockReportError(...args),
 }))
 
 const mockClearPendingAccount = jest.fn()
@@ -196,7 +195,7 @@ describe("useCompleteMigration", () => {
   it("completes the migration even when copying the settings fails", async () => {
     mockSeedMigratedSettings.mockRejectedValue(new Error("settings fetch exploded"))
 
-    expect(await complete()).toBe(true)
+    expect(await complete()).toBe(MigrationCompletion.Completed)
     expect(mockDiscardCustodialSession).toHaveBeenCalledTimes(1)
     expect(mockSetActiveAccountId).toHaveBeenCalledWith("sc-account-1")
     expect(mockReportError).toHaveBeenCalledWith(
@@ -431,6 +430,9 @@ describe("useCompleteMigration", () => {
       await act(async () => {
         const first = result.current.completeMigration({ isReceiveProven: true })
         const second = result.current.completeMigration({ isReceiveProven: true })
+        /** The settings carry-over awaits ahead of the close, so the close has not been
+         *  reached yet on this tick and `releaseClose` would still be the no-op stub. */
+        await Promise.resolve()
         releaseClose(AccountCloseOutcome.Closed)
         outcomes = await Promise.all([first, second])
       })

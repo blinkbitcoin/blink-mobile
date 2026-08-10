@@ -32,15 +32,19 @@ export const useMigrationSupportEmail = (
   const platform = isIos ? "iOS" : "Android"
 
   const cardDetails: MigrationDiagnostic[] = [
-    { label: LLSupport.reasonLabel(), value: reason },
+    { label: LLSupport.reasonLabel(), value: reason, isIdentifier: false },
     ...diagnostics,
   ].filter((line) => Boolean(line.value))
 
   const supportDetails: MigrationDiagnostic[] = [
     ...cardDetails,
-    { label: LLSupport.platformLabel(), value: platform },
-    { label: LLSupport.appVersionLabel(), value: getReadableVersion() },
-    { label: LLSupport.countryLabel(), value: countryCode ?? "" },
+    { label: LLSupport.platformLabel(), value: platform, isIdentifier: false },
+    {
+      label: LLSupport.appVersionLabel(),
+      value: getReadableVersion(),
+      isIdentifier: false,
+    },
+    { label: LLSupport.countryLabel(), value: countryCode ?? "", isIdentifier: false },
   ].filter((line) => Boolean(line.value))
 
   const supportDetailsText = supportDetails
