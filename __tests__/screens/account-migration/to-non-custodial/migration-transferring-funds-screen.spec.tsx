@@ -295,7 +295,8 @@ describe("MigrationTransferringFundsScreen", () => {
     )
   })
 
-  it("routes to support when the swap throws", async () => {
+  /** A throw here is a local step after the funds landed, never a transfer failure. */
+  it("routes to support as a completion failure when the swap throws", async () => {
     mockIsTransferred = true
     mockCompleteMigration.mockRejectedValue(new Error("keystore locked"))
     renderScreen()
@@ -306,7 +307,7 @@ describe("MigrationTransferringFundsScreen", () => {
       expect.any(Error),
     )
     expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
-      reason: "transfer-failed",
+      reason: "completion-failed",
       origin: "commit",
       custodialAccountId: "custodial-1",
     })

@@ -56,6 +56,10 @@ export const MigrationSupportReason = {
   /** The server refused to close the emptied custodial account for good (the phone-deletion
    *  cap). The migration itself finished; the account stays open until support removes it. */
   CustodialAccountCloseRefused: "custodial-account-close-refused",
+  /** The funds landed, but finishing on this device threw: the session discard, the
+   *  checkpoint clear or the pending-wallet write. Distinct from a transfer failure so
+   *  support does not go looking for money that never moved. */
+  CompletionFailed: "completion-failed",
   /** The support screen was reached without a reason, e.g. after a navigation-state
    *  restore; a named fallback so the ticket is never blank and never a bare string. */
   Unknown: "unknown",

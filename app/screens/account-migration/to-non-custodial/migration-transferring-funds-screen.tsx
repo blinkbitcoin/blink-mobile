@@ -193,7 +193,9 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
       })
       .catch((err) => {
         reportError("Migration session swap", err)
-        goToContactSupport(MigrationSupportReason.TransferFailed)
+        /** The close settles into an outcome rather than throwing, so what lands here is
+         *  a local step after the funds moved, not a transfer failure. */
+        goToContactSupport(MigrationSupportReason.CompletionFailed)
       })
   }, [
     isTransferred,
