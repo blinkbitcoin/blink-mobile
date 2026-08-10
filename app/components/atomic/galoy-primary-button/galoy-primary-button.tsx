@@ -15,10 +15,10 @@ export const GaloyPrimaryButton: FC<PropsWithChildren<ButtonProps>> = (props) =>
       {...(typeof props.title === "string" ? testProps(props.title) : {})}
       activeOpacity={0.85}
       TouchableComponent={TouchableHighlight}
-      // The library hardcodes a white spinner for solid buttons, which vanishes
-      // on the grey disabled surface (and on the light title colour in dark
-      // theme). Track whichever colour the title is wearing instead.
-      loadingProps={{ color: props.disabled ? colors.grey1 : colors.white }}
+      // The library hardcodes a white spinner for solid buttons. In dark theme
+      // the title on the orange fill is black, so the spinner drifted from the
+      // text it stands in for. Track the title's colour instead.
+      loadingProps={{ color: colors.white }}
       buttonStyle={styles.buttonStyle}
       titleStyle={styles.titleStyle}
       disabledStyle={styles.disabledStyle}
@@ -35,22 +35,17 @@ const useStyles = makeStyles(({ colors }) => ({
     fontWeight: "600",
     color: colors.white,
   },
-  // grey1 rather than a lighter grey: on the grey4 surface the muted greys land
-  // around 2.4:1, under the 3:1 floor WCAG AA sets even for large bold text.
   disabledTitleStyle: {
-    color: colors.grey1,
+    color: colors.grey5,
   },
   buttonStyle: {
     minHeight: 50,
     backgroundColor: colors.primary,
   },
-  // Opaque rather than a translucent primary: `opacity` blends the button with
-  // whatever sits behind it, so content could show through a disabled CTA. The
-  // outline keeps the button's shape readable on surfaces close to grey4 —
-  // modals paint grey5, which is barely a shade away from the fill.
+  // Translucent by design: the surface a sticky button sits on is responsible
+  // for painting itself, so nothing can show through the button.
   disabledStyle: {
-    backgroundColor: colors.grey4,
-    borderWidth: 1,
-    borderColor: colors.grey3,
+    opacity: 0.5,
+    backgroundColor: colors.primary,
   },
 }))
