@@ -14,8 +14,7 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
-    <application
-        android:usesCleartextTraffic="true"
-        tools:targetApi="28"
-        tools:ignore="GoogleAppIndexingWarning"/>
+    <!-- Cleartext for debug is granted via debug/res/xml/network_security_config.xml;
+         android:usesCleartextTraffic would be ignored while a networkSecurityConfig is set. -->
+    <application tools:ignore="GoogleAppIndexingWarning"/>
 </manifest>
