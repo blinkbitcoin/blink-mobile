@@ -2369,7 +2369,6 @@
     "fast": "Brzo",
     "medium": "Srednje",
     "slow": "Sporo",
-    "feeEstimateError": "Nije moguće procijeniti naknade. Pokušajte ponovno.",
     "recommended": "Preporučeno",
     "walletOffline": "Vaš novčanik je offline. Provjerite vezu i pokušajte ponovo.",
     "sdkInsufficientFunds": "Nedovoljno sredstava za ovu transakciju.",

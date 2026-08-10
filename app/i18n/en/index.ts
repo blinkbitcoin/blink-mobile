@@ -2409,7 +2409,6 @@ const en: BaseTranslation = {
     fast: "Fast",
     medium: "Medium",
     slow: "Slow",
-    feeEstimateError: "Unable to estimate fees. Please try again.",
     recommended: "Recommended",
     walletOffline: "Your wallet is offline. Please check your connection and try again.",
     sdkInsufficientFunds: "Not enough funds for this transaction.",

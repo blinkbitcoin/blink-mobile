@@ -2369,7 +2369,6 @@
     "fast": "Gyors",
     "medium": "Közepes",
     "slow": "Lassú",
-    "feeEstimateError": "Nem sikerült megbecsülni a díjakat. Kérjük, próbáld újra.",
     "recommended": "Ajánlott",
     "walletOffline": "A tárcád offline. Kérjük, ellenőrizd a kapcsolatot és próbáld újra.",
     "sdkInsufficientFunds": "Nincs elegendő egyenleg ehhez a tranzakcióhoz.",

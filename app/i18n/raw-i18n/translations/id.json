@@ -2369,7 +2369,6 @@
     "fast": "Cepat",
     "medium": "Sedang",
     "slow": "Lambat",
-    "feeEstimateError": "Tidak dapat memperkirakan biaya. Silakan coba lagi.",
     "recommended": "Direkomendasikan",
     "walletOffline": "Dompet Anda sedang offline. Silakan periksa koneksi Anda dan coba lagi.",
     "sdkInsufficientFunds": "Dana tidak cukup untuk transaksi ini.",

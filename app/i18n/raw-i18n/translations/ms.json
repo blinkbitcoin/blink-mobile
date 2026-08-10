@@ -2369,7 +2369,6 @@
     "fast": "Cepat",
     "medium": "Sederhana",
     "slow": "Perlahan",
-    "feeEstimateError": "Tidak dapat menganggarkan yuran. Sila cuba lagi.",
     "recommended": "Disyorkan",
     "walletOffline": "Dompet anda di luar talian. Sila semak sambungan anda dan cuba lagi.",
     "sdkInsufficientFunds": "Dana tidak mencukupi untuk transaksi ini.",

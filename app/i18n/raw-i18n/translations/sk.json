@@ -2369,7 +2369,6 @@
     "fast": "Rýchly",
     "medium": "Stredný",
     "slow": "Pomalý",
-    "feeEstimateError": "Poplatky sa nepodarilo odhadnúť. Skúste to znova.",
     "recommended": "Odporúčané",
     "walletOffline": "Vaša peňaženka je offline. Skontrolujte pripojenie a skúste to znova.",
     "sdkInsufficientFunds": "Nedostatok prostriedkov pre túto transakciu.",

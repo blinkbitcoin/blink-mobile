@@ -2369,7 +2369,6 @@
     "fast": "Hurtig",
     "medium": "Medium",
     "slow": "Langsom",
-    "feeEstimateError": "Gebyrerne kunne ikke beregnes. Prøv venligst igen.",
     "recommended": "Anbefalet",
     "walletOffline": "Din tegnebog er offline. Tjek venligst din forbindelse og prøv igen.",
     "sdkInsufficientFunds": "Ikke nok midler til denne transaktion.",

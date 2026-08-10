@@ -2369,7 +2369,6 @@
     "fast": "Snel",
     "medium": "Gemiddeld",
     "slow": "Langzaam",
-    "feeEstimateError": "Kan de kosten niet schatten. Probeer het opnieuw.",
     "recommended": "Aanbevolen",
     "walletOffline": "Je portemonnee is offline. Controleer je verbinding en probeer het opnieuw.",
     "sdkInsufficientFunds": "Onvoldoende saldo voor deze transactie.",

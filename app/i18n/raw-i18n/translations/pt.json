@@ -2369,7 +2369,6 @@
         "fast": "Rápido",
         "medium": "Médio",
         "slow": "Lento",
-        "feeEstimateError": "Não foi possível estimar as taxas. Tente novamente.",
         "recommended": "Recomendado",
         "walletOffline": "Sua carteira está offline. Verifique sua conexão e tente novamente.",
         "sdkInsufficientFunds": "Saldo insuficiente para esta transação.",

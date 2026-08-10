@@ -2369,7 +2369,6 @@
         "fast": "Rapide",
         "medium": "Moyen",
         "slow": "Lent",
-        "feeEstimateError": "Impossible d'estimer les frais. Veuillez réessayer.",
         "recommended": "Recommandé",
         "walletOffline": "Votre portefeuille est hors ligne. Veuillez vérifier votre connexion et réessayer.",
         "sdkInsufficientFunds": "Fonds insuffisants pour cette transaction.",

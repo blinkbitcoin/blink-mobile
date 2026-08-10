@@ -7556,10 +7556,6 @@ type RootTranslation = {
 		 */
 		slow: string
 		/**
-		 * U​n​a​b​l​e​ ​t​o​ ​e​s​t​i​m​a​t​e​ ​f​e​e​s​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
-		 */
-		feeEstimateError: string
-		/**
 		 * R​e​c​o​m​m​e​n​d​e​d
 		 */
 		recommended: string
@@ -20816,10 +20812,6 @@ export type TranslationFunctions = {
 		 * Slow
 		 */
 		slow: () => LocalizedString
-		/**
-		 * Unable to estimate fees. Please try again.
-		 */
-		feeEstimateError: () => LocalizedString
 		/**
 		 * Recommended
 		 */

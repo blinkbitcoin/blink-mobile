@@ -2369,7 +2369,6 @@
         "fast": "Veloce",
         "medium": "Medio",
         "slow": "Lento",
-        "feeEstimateError": "Impossibile stimare le commissioni. Riprova.",
         "recommended": "Consigliato",
         "walletOffline": "Il tuo portafoglio è offline. Controlla la connessione e riprova.",
         "sdkInsufficientFunds": "Fondi insufficienti per questa transazione.",

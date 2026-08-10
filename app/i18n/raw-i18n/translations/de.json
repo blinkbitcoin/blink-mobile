@@ -2369,7 +2369,6 @@
         "fast": "Schnell",
         "medium": "Mittel",
         "slow": "Langsam",
-        "feeEstimateError": "Gebühren konnten nicht geschätzt werden. Bitte versuche es erneut.",
         "recommended": "Empfohlen",
         "walletOffline": "Deine Wallet ist offline. Bitte überprüfe deine Verbindung und versuche es erneut.",
         "sdkInsufficientFunds": "Nicht genügend Guthaben für diese Transaktion.",

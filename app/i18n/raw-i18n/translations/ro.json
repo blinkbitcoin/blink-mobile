@@ -2369,7 +2369,6 @@
     "fast": "Rapid",
     "medium": "Mediu",
     "slow": "Lent",
-    "feeEstimateError": "Comisioanele nu au putut fi estimate. Încearcă din nou.",
     "recommended": "Recomandat",
     "walletOffline": "Portofelul tău este offline. Te rugăm să verifici conexiunea și să încerci din nou.",
     "sdkInsufficientFunds": "Fonduri insuficiente pentru această tranzacție.",

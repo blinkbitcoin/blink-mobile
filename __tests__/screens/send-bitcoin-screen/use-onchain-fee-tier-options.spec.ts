@@ -110,7 +110,9 @@ jest.mock("@app/i18n/i18n-react", () => ({
         sdkAmountTooLow: () => "Amount too low",
         sdkNetworkError: () => "Network error",
         sdkGenericError: () => "Generic error",
-        feeEstimateError: () => "Unable to estimate fees",
+      },
+      SendBitcoinConfirmationScreen: {
+        feeError: () => "Unable to calculate fee",
       },
     },
   }),
@@ -352,7 +354,7 @@ describe("useOnchainFeeTierOptions", () => {
       }),
     )
 
-    expect(result.current.feeTierErrorMessage).toBe("Unable to estimate fees")
+    expect(result.current.feeTierErrorMessage).toBe("Unable to calculate fee")
     expect(result.current.isFeeTierErrorBlocking).toBe(false)
   })
 

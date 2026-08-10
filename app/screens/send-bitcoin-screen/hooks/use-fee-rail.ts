@@ -14,19 +14,14 @@ import {
 
 type LL = ReturnType<typeof useI18nContext>["LL"]
 
-/**
- * What every rail owes the selector, so the caller picks one rail and reads it plainly
- * instead of pairing each field with a fresh isSelfCustodial ternary.
- */
 export type FeeRail = {
   tiers: Record<FeeTierOption, FeeTierInfo>
   errorMessage: string | undefined
   hasQuote: boolean
   /**
-   * Whether a failure here should stop the send. A self-custodial failure means the SDK
-   * could not build the transaction, so there is nothing to continue to. A custodial quote
-   * is only an estimate: the confirmation screen fetches its own and the mutation validates
-   * server-side, so a transient failure is worth showing but must not strand the user.
+   * A self-custodial failure means the SDK could not build the transaction, so there is
+   * nothing to continue to. A custodial quote is only an estimate that the confirmation
+   * screen fetches again, so a transient failure must not strand the user.
    */
   isErrorBlocking: boolean
 }
@@ -70,7 +65,6 @@ export const useCustodialFeeRail = ({
 }: FeeRailParams): FeeRail & { isQuoting: boolean } => {
   const { LL } = useI18nContext()
 
-  /** The destination's own amount wins, because that is what the send will settle. */
   const quotedAmount = paymentDetail?.destinationSpecifiedAmount
     ? paymentDetail.destinationSpecifiedAmount.amount
     : paymentDetail?.settlementAmount?.amount
@@ -85,7 +79,8 @@ export const useCustodialFeeRail = ({
 
   return {
     tiers,
-    errorMessage: hasError ? LL.SendBitcoinScreen.feeEstimateError() : undefined,
+    /** The confirmation screen's wording, so neither screen promises an impossible retry. */
+    errorMessage: hasError ? LL.SendBitcoinConfirmationScreen.feeError() : undefined,
     hasQuote,
     isErrorBlocking: false,
     isQuoting,
