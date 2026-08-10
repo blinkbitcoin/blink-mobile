@@ -894,6 +894,10 @@ describe("MigrationBalancesOverviewScreen", () => {
     expect(screen.getByText("BTC 1000")).toBeTruthy()
     expect(screen.getByText("BTC 990")).toBeTruthy()
   })
+})
+
+describe("MigrationBalancesOverviewScreen lightning-address re-point gating", () => {
+  beforeEach(resetScreenMocks)
 
   /** The re-point is a precondition of the commit, so a settled failure hands over exactly
    *  like a refused start. */
@@ -1074,10 +1078,6 @@ describe("MigrationBalancesOverviewScreen dollar-region gating", () => {
     expect(screen.getByText(LLOverview.dollarBalanceNotAvailable())).toBeTruthy()
     expect(screen.getAllByText("USD 0")).toHaveLength(1)
   })
-})
-
-describe("MigrationBalancesOverviewScreen lightning-address re-point gating", () => {
-  beforeEach(resetScreenMocks)
 
   /** A rejected start must never let the re-point move @blink.sv: it stays skipped until the
    *  server confirms the migration started. */

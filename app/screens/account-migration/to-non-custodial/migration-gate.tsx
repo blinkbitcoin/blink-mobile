@@ -113,7 +113,7 @@ export const MigrationGate: React.FC = () => {
 
   const goToDollarTransfer = useCallback(() => {
     /** Arm the flag before navigating so the convert screen waives its region restriction
-     *  for this migration step (see use-migration-conversion); the deep-linkable route is
+     *  for this migration step (see drain-conversion); the deep-linkable route is
      *  not trusted with that on its own. */
     armMigrationConversion()
     navigation.navigate("conversionDetails")
