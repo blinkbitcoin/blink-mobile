@@ -1,5 +1,7 @@
 import { renderHook, waitFor } from "@testing-library/react-native"
 
+import { flushEffects } from "../../helpers/flush-effects"
+
 import { SdkFeeError } from "@app/screens/send-bitcoin-screen/hooks/use-onchain-fee-tiers"
 import { useRecommendedFeeTiers } from "@app/screens/unclaimed-deposits/hooks/use-recommended-fee-tiers"
 import { FeeTierOption } from "@app/screens/send-bitcoin-screen/hooks/fee-tiers.types"
@@ -132,6 +134,73 @@ describe("useRecommendedFeeTiers", () => {
     await waitFor(() =>
       expect(result.current.tiers[FeeTierOption.Fast].feeAmount).toBe(25),
     )
+    expect(result.current.error).toBeNull()
+  })
+
+  it("discards a stale success when refund mode is toggled mid-flight", async () => {
+    let resolveStale: ((value: unknown) => void) | undefined
+    mockGetRecommendedFees.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          resolveStale = resolve
+        }),
+    )
+    mockGetRecommendedFees.mockResolvedValue({
+      fastest: 25,
+      halfHour: 15,
+      hour: 10,
+      economy: 8,
+      minimum: 4,
+    })
+
+    const { result, rerender } = renderHook(
+      ({ enabled }: { enabled: boolean }) => useRecommendedFeeTiers(mockSdk, enabled),
+      { initialProps: { enabled: true } },
+    )
+
+    rerender({ enabled: false })
+    rerender({ enabled: true })
+
+    await waitFor(() =>
+      expect(result.current.tiers[FeeTierOption.Fast].feeAmount).toBe(25),
+    )
+
+    resolveStale?.({ fastest: 999, halfHour: 999, hour: 999, economy: 999, minimum: 999 })
+    await flushEffects()
+
+    expect(result.current.tiers[FeeTierOption.Fast].feeAmount).toBe(25)
+  })
+
+  it("does not surface a stale failure once a newer quote already landed", async () => {
+    let rejectStale: ((reason: unknown) => void) | undefined
+    mockGetRecommendedFees.mockImplementationOnce(
+      () =>
+        new Promise((_resolve, reject) => {
+          rejectStale = reject
+        }),
+    )
+    mockGetRecommendedFees.mockResolvedValue({
+      fastest: 25,
+      halfHour: 15,
+      hour: 10,
+      economy: 8,
+      minimum: 4,
+    })
+
+    const { result, rerender } = renderHook(
+      ({ enabled }: { enabled: boolean }) => useRecommendedFeeTiers(mockSdk, enabled),
+      { initialProps: { enabled: true } },
+    )
+
+    rerender({ enabled: false })
+    rerender({ enabled: true })
+
+    await waitFor(() => expect(result.current.hasQuote).toBe(true))
+
+    rejectStale?.(new Error("stale request failed"))
+    await flushEffects()
+
+    expect(result.current.hasQuote).toBe(true)
     expect(result.current.error).toBeNull()
   })
 })

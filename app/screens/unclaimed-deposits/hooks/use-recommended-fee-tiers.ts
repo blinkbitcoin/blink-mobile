@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 
 import { type BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
 
@@ -42,17 +42,22 @@ export const useRecommendedFeeTiers = (
   const inputsKey = sdk && enabled ? RECOMMENDED_FEES_KEY : null
   const { hasQuote, hasFailed, discardQuote, markQuoted, markFailed } =
     useQuoteStatus(inputsKey)
+  // Discards stale resolutions when refund mode is toggled mid-flight.
+  const requestTokenRef = useRef(0)
 
   const error = hasFailed ? failureReason : null
 
   const fetchFees = useCallback(async () => {
-    // Whatever was quoted stops applying the moment this runs, request or gate alike.
+    requestTokenRef.current += 1
+    const token = requestTokenRef.current
     discardQuote()
 
     if (!sdk || !enabled) return
 
     try {
       const rates = await getRecommendedFees(sdk)
+      if (token !== requestTokenRef.current) return
+
       setTiers({
         [Tier.Fast]: {
           feeAmount: rates.fastest,
@@ -72,6 +77,7 @@ export const useRecommendedFeeTiers = (
       })
       markQuoted()
     } catch (err) {
+      if (token !== requestTokenRef.current) return
       setFailureReason(classifySdkFeeError(err))
       markFailed()
     }
