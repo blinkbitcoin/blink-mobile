@@ -3716,7 +3716,7 @@
                 "body": "Keine Sorge — dein Guthaben ist sicher. Die Migration kann ein paar Minuten dauern, und manchmal braucht ein Schritt einfach einen Neustart.\n\nStarte die Migration noch einmal — das dauert nur einen Moment.\n\nSiehst du diesen Bildschirm immer noch? Kontaktiere den Support und teile die folgenden Daten:",
                 "contactSupportCta": "Support kontaktieren"
             },
-            "closeRefusedBody": "Deine Migration ist abgeschlossen und dein Guthaben befindet sich in deiner neuen Wallet. Wir konnten dein altes Konto nicht automatisch schließen, daher muss der Support das für dich erledigen.\n\nDiese Informationen können dem Support helfen, deinen Fall zu lösen:",
+            "closeRefusedBody": "Deine Migration ist abgeschlossen und dein Guthaben befindet sich in deiner neuen Wallet. Dein altes Konto ist möglicherweise noch offen. Der Support prüft das und schließt es gegebenenfalls.\n\nDiese Informationen können dem Support helfen, deinen Fall zu lösen:",
             "reasonLabel": "Grund",
             "accountIdLabel": "Konto-ID",
             "pubKeyLabel": "pubKey",

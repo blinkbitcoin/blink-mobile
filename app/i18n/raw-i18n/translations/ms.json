@@ -3716,7 +3716,7 @@
         "body": "Jangan risau — dana anda selamat. Pemindahan mungkin mengambil masa beberapa minit, dan kadangkala satu langkah hanya perlu dimulakan semula.\n\nMulakan pemindahan sekali lagi — ia hanya mengambil masa sebentar.\n\nMasih melihat skrin ini? Hubungi sokongan dan kongsikan maklumat di bawah:",
         "contactSupportCta": "Hubungi sokongan"
       },
-      "closeRefusedBody": "Migrasi anda telah selesai dan dana anda berada dalam dompet baharu anda. Kami tidak dapat menutup akaun lama anda secara automatik, jadi sokongan perlu menyelesaikannya untuk anda.\n\nAnda mungkin memerlukan maklumat ini untuk membantu sokongan menyelesaikan kes anda:",
+      "closeRefusedBody": "Migrasi anda telah selesai dan dana anda berada dalam dompet baharu anda. Akaun lama anda mungkin masih terbuka. Sokongan akan menyemaknya dan menutupnya jika perlu.\n\nAnda mungkin memerlukan maklumat ini untuk membantu sokongan menyelesaikan kes anda:",
       "reasonLabel": "Sebab",
       "accountIdLabel": "ID akaun",
       "pubKeyLabel": "pubKey",

@@ -3716,7 +3716,7 @@
         "body": "Jangan khawatir — dana Anda aman. Migrasi bisa memakan waktu beberapa menit, dan terkadang satu langkah hanya perlu dimulai ulang.\n\nMulai migrasi dari awal — hanya perlu sebentar.\n\nMasih melihat layar ini? Hubungi dukungan dan bagikan detail di bawah ini:",
         "contactSupportCta": "Hubungi dukungan"
       },
-      "closeRefusedBody": "Migrasi Anda selesai dan dana Anda ada di dompet baru Anda. Kami tidak dapat menutup akun lama Anda secara otomatis, jadi tim dukungan perlu menyelesaikannya untuk Anda.\n\nAnda mungkin memerlukan informasi ini untuk membantu dukungan menyelesaikan kasus Anda:",
+      "closeRefusedBody": "Migrasi Anda selesai dan dana Anda ada di dompet baru Anda. Akun lama Anda mungkin masih terbuka. Tim dukungan akan memeriksanya dan menutupnya jika perlu.\n\nAnda mungkin memerlukan informasi ini untuk membantu dukungan menyelesaikan kasus Anda:",
       "reasonLabel": "Alasan",
       "accountIdLabel": "ID akun",
       "pubKeyLabel": "pubKey",

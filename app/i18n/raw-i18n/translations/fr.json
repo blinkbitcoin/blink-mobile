@@ -3716,7 +3716,7 @@
                 "body": "Ne vous inquiétez pas — vos fonds sont en sécurité. La migration peut prendre quelques minutes, et parfois une étape a simplement besoin d'un nouveau départ.\n\nRecommencez la migration — cela ne prend qu'un instant.\n\nCet écran s'affiche toujours ? Contactez le support et partagez les informations ci-dessous :",
                 "contactSupportCta": "Contacter le support"
             },
-            "closeRefusedBody": "Votre migration est terminée et vos fonds se trouvent dans votre nouveau portefeuille. Nous n'avons pas pu fermer votre ancien compte automatiquement, le support doit donc s'en charger pour vous.\n\nCes informations peuvent aider le support à résoudre votre cas :",
+            "closeRefusedBody": "Votre migration est terminée et vos fonds se trouvent dans votre nouveau portefeuille. Votre ancien compte est peut-être encore ouvert. Le support vérifiera et le fermera si c'est le cas.\n\nCes informations peuvent aider le support à résoudre votre cas :",
             "reasonLabel": "Motif",
             "accountIdLabel": "ID du compte",
             "pubKeyLabel": "pubKey",

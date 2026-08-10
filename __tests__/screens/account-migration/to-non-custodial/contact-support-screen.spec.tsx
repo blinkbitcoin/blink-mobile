@@ -130,17 +130,15 @@ describe("MigrationContactSupportScreen", () => {
   })
 
   /** The migration succeeded here, so the generic "something went wrong" would contradict
-   *  the success the user was just shown: only the old account is left to close. */
+   *  the success the user was just shown: only the old account is left, and the app cannot
+   *  prove it is still open, so the copy asks support to check rather than asserting. */
   it("tells a refused close that the migration worked and only the old account is left", async () => {
     mockReason = MigrationSupportReason.CustodialAccountCloseRefused
     renderScreen()
     await flushEffects()
 
-    expect(
-      screen.getByText(
-        "Your migration is complete and your funds are in your new wallet. We could not close your old account automatically, so support needs to finish it for you.\n\nYou may need this information to help support resolve your case:",
-      ),
-    ).toBeTruthy()
+    expect(screen.getByText(LLSupport.closeRefusedBody())).toBeTruthy()
+    expect(screen.queryByText(LLSupport.body())).toBeNull()
   })
 
   it("keeps the generic body for every other reason", async () => {

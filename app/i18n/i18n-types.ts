@@ -12648,7 +12648,7 @@ type RootTranslation = {
 				contactSupportCta: string
 			}
 			/**
-			 * Y​o​u​r​ ​m​i​g​r​a​t​i​o​n​ ​i​s​ ​c​o​m​p​l​e​t​e​ ​a​n​d​ ​y​o​u​r​ ​f​u​n​d​s​ ​a​r​e​ ​i​n​ ​y​o​u​r​ ​n​e​w​ ​w​a​l​l​e​t​.​ ​W​e​ ​c​o​u​l​d​ ​n​o​t​ ​c​l​o​s​e​ ​y​o​u​r​ ​o​l​d​ ​a​c​c​o​u​n​t​ ​a​u​t​o​m​a​t​i​c​a​l​l​y​,​ ​s​o​ ​s​u​p​p​o​r​t​ ​n​e​e​d​s​ ​t​o​ ​f​i​n​i​s​h​ ​i​t​ ​f​o​r​ ​y​o​u​.​
+			 * Y​o​u​r​ ​m​i​g​r​a​t​i​o​n​ ​i​s​ ​c​o​m​p​l​e​t​e​ ​a​n​d​ ​y​o​u​r​ ​f​u​n​d​s​ ​a​r​e​ ​i​n​ ​y​o​u​r​ ​n​e​w​ ​w​a​l​l​e​t​.​ ​Y​o​u​r​ ​o​l​d​ ​a​c​c​o​u​n​t​ ​m​a​y​ ​s​t​i​l​l​ ​b​e​ ​o​p​e​n​.​ ​S​u​p​p​o​r​t​ ​w​i​l​l​ ​c​h​e​c​k​ ​a​n​d​ ​c​l​o​s​e​ ​i​t​ ​i​f​ ​i​t​ ​i​s​.​
 		​
 		​Y​o​u​ ​m​a​y​ ​n​e​e​d​ ​t​h​i​s​ ​i​n​f​o​r​m​a​t​i​o​n​ ​t​o​ ​h​e​l​p​ ​s​u​p​p​o​r​t​ ​r​e​s​o​l​v​e​ ​y​o​u​r​ ​c​a​s​e​:
 			 */
@@ -25756,7 +25756,7 @@ export type TranslationFunctions = {
 				contactSupportCta: () => LocalizedString
 			}
 			/**
-			 * Your migration is complete and your funds are in your new wallet. We could not close your old account automatically, so support needs to finish it for you.
+			 * Your migration is complete and your funds are in your new wallet. Your old account may still be open. Support will check and close it if it is.
 	
 		You may need this information to help support resolve your case:
 			 */

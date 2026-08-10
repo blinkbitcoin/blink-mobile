@@ -12,6 +12,10 @@ const UNKNOWN_ACCOUNT_ID = "unknown"
  *  the transfer screen's retry as often as they like. */
 const EMPTY_PAYLOAD_DEDUP_KEY = "migration-close-empty-payload"
 
+/** Names the doubt rather than the 401: the account behind the ticket may already be gone. */
+const CLOSE_UNVERIFIABLE_REPORT =
+  "Migration account close unverifiable, account may already be deleted"
+
 type CloseReport = Pick<RecordAppErrorOptions, "dedupKey"> & {
   custodialAccountId: string | null
 }
@@ -107,13 +111,15 @@ export const useCloseCustodialAccount = () => {
 
         return AccountCloseOutcome.Refused
       } catch (err) {
-        /** The token was rejected before the mutation ran, so nothing was deleted and no
-         *  later call can authenticate either. Refused, not closed: the transport no longer
-         *  resends this mutation, so a 401 is never the echo of an attempt that landed. */
+        /** Two states answer the same way here, and the device cannot tell them apart: the
+         *  token was rejected before the mutation ran, or an earlier attempt already closed
+         *  the account and killed the identity this one authenticates with. That echo
+         *  survives the RetryLink change, since the retry the user presses is a fresh call.
+         *  Refused either way — a deletion nobody can prove must never read as done — but
+         *  reported as unverifiable, because on-call has to check the account still exists
+         *  before acting on the ticket. */
         if (isUnauthorizedError(err)) {
-          reportClose("Migration account close unauthenticated", err, {
-            custodialAccountId,
-          })
+          reportClose(CLOSE_UNVERIFIABLE_REPORT, err, { custodialAccountId })
           return AccountCloseOutcome.Refused
         }
 

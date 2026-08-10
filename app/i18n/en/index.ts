@@ -3984,7 +3984,7 @@ const en: BaseTranslation = {
         contactSupportCta: "Contact support",
       },
       closeRefusedBody:
-        "Your migration is complete and your funds are in your new wallet. We could not close your old account automatically, so support needs to finish it for you.\n\nYou may need this information to help support resolve your case:",
+        "Your migration is complete and your funds are in your new wallet. Your old account may still be open. Support will check and close it if it is.\n\nYou may need this information to help support resolve your case:",
       reasonLabel: "Reason",
       accountIdLabel: "Account ID",
       pubKeyLabel: "pubKey",

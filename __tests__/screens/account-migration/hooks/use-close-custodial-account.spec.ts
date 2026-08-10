@@ -235,9 +235,9 @@ describe("useCloseCustodialAccount", () => {
     expect(mockReportError).not.toHaveBeenCalled()
   })
 
-  /** The token was rejected before the mutation ran, so nothing was deleted, and no later
-   *  call can authenticate either. Nothing but a successful payload is proof of a deletion:
-   *  reporting one that never happened leaves a live account nobody is looking for. */
+  /** A 401 is either a token rejected before the mutation ran or the echo of an earlier
+   *  attempt that already deleted the account. Nothing but a successful payload is proof of
+   *  a deletion, so both refuse; the report names the doubt so on-call checks first. */
   it("refuses on a 401 rather than claiming a deletion it has no proof of", async () => {
     mockDeleteAccount.mockRejectedValue(
       new ApolloError({
@@ -247,25 +247,26 @@ describe("useCloseCustodialAccount", () => {
 
     expect(await close()).toBe(AccountCloseOutcome.Refused)
     expect(mockReportError).toHaveBeenCalledWith(
-      "Migration account close unauthenticated",
+      "Migration account close unverifiable, account may already be deleted",
       expect.objectContaining({
-        message: "Migration account close unauthenticated: 401 (accountId: custodial-1)",
+        message:
+          "Migration account close unverifiable, account may already be deleted: 401 (accountId: custodial-1)",
       }),
       { alwaysRecord: true },
     )
   })
 
-  it("names the account on the 401 report, so support can find it", async () => {
+  it("names the account on the unverifiable report, so support can find it", async () => {
     mockDeleteAccount.mockRejectedValue(
       Object.assign(new Error("Unauthorized"), { statusCode: 401 }),
     )
 
     expect(await close()).toBe(AccountCloseOutcome.Refused)
     expect(mockReportError).toHaveBeenCalledWith(
-      "Migration account close unauthenticated",
+      "Migration account close unverifiable, account may already be deleted",
       expect.objectContaining({
         message:
-          "Migration account close unauthenticated: Unauthorized (accountId: custodial-1)",
+          "Migration account close unverifiable, account may already be deleted: Unauthorized (accountId: custodial-1)",
       }),
       { alwaysRecord: true },
     )

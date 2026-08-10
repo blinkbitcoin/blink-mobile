@@ -3716,7 +3716,7 @@
         "body": "Nu-ți face griji — fondurile tale sunt în siguranță. Migrarea poate dura câteva minute, iar uneori un pas are nevoie doar de un nou început.\n\nÎncepe migrarea de la capăt — durează doar o clipă.\n\nVezi în continuare acest ecran? Contactează suportul și trimite datele de mai jos:",
         "contactSupportCta": "Contactează suportul"
       },
-      "closeRefusedBody": "Migrarea ta este finalizată și fondurile tale sunt în noul tău portofel. Nu am putut închide automat contul tău vechi, așa că asistența trebuie să finalizeze acest lucru pentru tine.\n\nS-ar putea să ai nevoie de aceste informații pentru ca suportul să îți rezolve cazul:",
+      "closeRefusedBody": "Migrarea ta este finalizată și fondurile tale sunt în noul tău portofel. Contul tău vechi ar putea fi încă deschis. Asistența va verifica și îl va închide dacă este cazul.\n\nS-ar putea să ai nevoie de aceste informații pentru ca suportul să îți rezolve cazul:",
       "reasonLabel": "Motiv",
       "accountIdLabel": "ID-ul contului",
       "pubKeyLabel": "pubKey",
