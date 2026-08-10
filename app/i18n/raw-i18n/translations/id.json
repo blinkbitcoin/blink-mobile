@@ -2365,7 +2365,7 @@
     "recipient": "Penerima",
     "time": "Waktu",
     "type": "Jenis",
-    "feeTier": "Kecepatan konfirmasi",
+    "feeTier": "Prioritas transaksi",
     "fast": "Cepat",
     "medium": "Sedang",
     "slow": "Lambat",

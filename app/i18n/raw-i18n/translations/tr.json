@@ -2365,7 +2365,7 @@
     "recipient": "Alıcı",
     "time": "Zaman",
     "type": "Tür",
-    "feeTier": "Onay hızı",
+    "feeTier": "İşlem önceliği",
     "fast": "Hızlı",
     "medium": "Orta",
     "slow": "Yavaş",

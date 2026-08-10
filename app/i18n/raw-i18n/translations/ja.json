@@ -2365,7 +2365,7 @@
         "recipient": "受取人",
         "time": "時間",
         "type": "種類",
-        "feeTier": "承認スピード",
+        "feeTier": "取引の優先度",
         "fast": "高速",
         "medium": "中速",
         "slow": "低速",

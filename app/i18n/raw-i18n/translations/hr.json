@@ -2365,7 +2365,7 @@
     "recipient": "Primatelj",
     "time": "Vrijeme",
     "type": "Vrsta",
-    "feeTier": "Brzina potvrde",
+    "feeTier": "Prioritet transakcije",
     "fast": "Brzo",
     "medium": "Srednje",
     "slow": "Sporo",

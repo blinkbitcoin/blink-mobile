@@ -2365,7 +2365,7 @@
     "recipient": "Ontvanger",
     "time": "Tijd",
     "type": "Type",
-    "feeTier": "Bevestigingssnelheid",
+    "feeTier": "Transactieprioriteit",
     "fast": "Snel",
     "medium": "Gemiddeld",
     "slow": "Langzaam",

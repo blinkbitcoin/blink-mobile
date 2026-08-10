@@ -2365,7 +2365,7 @@
     "recipient": "Modtager",
     "time": "Tidspunkt",
     "type": "Type",
-    "feeTier": "Bekræftelseshastighed",
+    "feeTier": "Transaktionsprioritet",
     "fast": "Hurtig",
     "medium": "Medium",
     "slow": "Langsom",

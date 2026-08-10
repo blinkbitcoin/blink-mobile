@@ -2365,7 +2365,7 @@
     "recipient": "Címzett",
     "time": "Időpont",
     "type": "Típus",
-    "feeTier": "Megerősítési sebesség",
+    "feeTier": "Tranzakció prioritása",
     "fast": "Gyors",
     "medium": "Közepes",
     "slow": "Lassú",

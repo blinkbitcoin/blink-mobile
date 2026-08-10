@@ -2405,7 +2405,7 @@ const en: BaseTranslation = {
     recipient: "Recipient",
     time: "Time",
     type: "Type",
-    feeTier: "Confirmation speed",
+    feeTier: "Transaction priority",
     fast: "Fast",
     medium: "Medium",
     slow: "Slow",
