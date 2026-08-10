@@ -138,10 +138,14 @@ describe("WalletOverview", () => {
     })
 
     it("masks the balances when hide amount is enabled", async () => {
-      const { getAllByText } = renderOverview({ hideAmount: true })
+      const { getAllByTestId, queryByText } = renderOverview({ hideAmount: true })
       await flushEffects()
 
-      expect(getAllByText("****").length).toBeGreaterThanOrEqual(2)
+      expect(getAllByTestId("hidden-balance-placeholder").length).toBeGreaterThanOrEqual(
+        2,
+      )
+      expect(queryByText("btc-underlying")).toBeNull()
+      expect(queryByText("usd-underlying")).toBeNull()
     })
 
     it("shows the underlying dollar amount when the display currency is not USD", async () => {

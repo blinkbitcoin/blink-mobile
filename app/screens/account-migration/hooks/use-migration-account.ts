@@ -8,6 +8,7 @@ import { reportError } from "@app/utils/error-logging"
 import { toastShow } from "@app/utils/toast"
 
 import { MigrationCheckpoint } from "../utils/migration-checkpoint-storage"
+import { resolveReusablePendingAccount } from "../utils/migration-pending-account"
 
 import { useMigrationCheckpointState } from "./use-migration-checkpoint-state"
 import { usePendingMigrationAccounts } from "./use-pending-migration-accounts"
@@ -35,11 +36,10 @@ export const useMigrationAccount = () => {
   /** A wallet provisioned by an earlier abandoned run survives without expiry: reuse it
    *  so a phrase the user may have written down stays valid and no zombies pile up. It
    *  must still exist on the device, otherwise a fresh wallet replaces it. */
-  const reusableAccountId =
-    pendingForActiveAccount &&
-    accounts.some((account) => account.id === pendingForActiveAccount)
-      ? pendingForActiveAccount
-      : null
+  const reusableAccountId = resolveReusablePendingAccount(
+    pendingForActiveAccount,
+    accounts,
+  )
 
   const ensureAccount = useCallback(async (): Promise<string | null> => {
     if (accountId) return accountId
@@ -50,10 +50,9 @@ export const useMigrationAccount = () => {
         /** The step is the terms screen: resuming may never skip past an unaccepted T&C.
          *  A failed write stops the flow here; the provisioned id survives in the hook's
          *  local state, so retrying resumes it instead of provisioning a second account. */
-        const isSaved = await saveCheckpoint(
-          MigrationCheckpoint.TermsAndConditions,
-          newAccountId,
-        )
+        const isSaved = await saveCheckpoint(MigrationCheckpoint.TermsAndConditions, {
+          provisionedAccountId: newAccountId,
+        })
         if (!isSaved) throw new Error("Migration checkpoint save failed")
         return newAccountId
       })

@@ -2110,6 +2110,7 @@
     "error": "Oops. Something went wrong while getting your location"
   },
   "HomeScreen": {
+    "pendingReceiveBadge": "+{amount: string} afventende",
     "receive": "Modtag",
     "send": "Send",
     "title": "Hjem",
@@ -3662,7 +3663,8 @@
         "savedConfirm": "Jeg har gemt den",
         "copy": "Kopiér",
         "continueButton": "Fortsæt",
-        "testBackup": "Test din backup"
+        "testBackup": "Test din backup",
+        "doNotShareWarning": "Vis ikke dette til nogen, heller ikke support"
       },
       "Confirm": {
         "headerTitle": "Bekræft backup-sætning",
@@ -3709,6 +3711,11 @@
     "contactSupport": {
       "title": "Kontakt support",
       "body": "Noget gik galt, men bare rolig, dine midler er sikre. Kontakt venligst support for at få hjælp.\n\nDu kan få brug for disse oplysninger, så support kan løse din sag:",
+      "selfHelp": {
+        "title": "Lad os prøve igen",
+        "body": "Bare rolig — dine midler er sikre. Migreringen kan tage et par minutter, og nogle gange skal et trin bare starte forfra.\n\nStart migreringen forfra — det tager kun et øjeblik.\n\nSer du stadig denne skærm? Kontakt support, og del oplysningerne nedenfor:",
+        "contactSupportCta": "Kontakt support"
+      },
       "reasonLabel": "Årsag",
       "accountIdLabel": "Konto-ID",
       "pubKeyLabel": "pubKey",
@@ -3765,10 +3772,23 @@
     "downloadHistoryTitle": "Download din transaktionshistorik",
     "downloadHistoryBody": "Din nye konto starter på en frisk. Hvis du vil bevare en oversigt over dine transaktioner, skal du downloade dem som CSV nu.",
     "downloadHistoryDownloadCta": "Download",
-    "apiServiceTitle": "API-tjeneste ikke tilgængelig",
-    "apiServiceBody": "Vi bemærker, at du har aktive API-nøgler. Blink kan ikke levere API'en i non-custodial tilstand.\n\nHvis du er afhængig af Blinks API, så kontakt os hurtigt, og vi vil gøre vores bedste for at hjælpe med en glidende overgang.",
+    "apiServiceTitle": "Om dine API-nøgler",
+    "apiServiceBody": "Din konto har aktive API-nøgler. API'en vil ikke være tilgængelig, efter du skifter til non-custodial.\n\nBlink har non-custodial apps, der erstatter de fleste af API'ens funktioner, undtagen afsendelse. Du finder dem i menuen Indstillinger.\n\nHvis du bruger API'en til at sende, vil det desværre ikke længere være muligt.",
     "apiServiceContactCta": "Kontakt os",
-    "apiServiceContinueCta": "Fortsæt alligevel",
+    "apiServiceContinueCta": "Fortsæt migreringen",
+    "merchantTools": {
+      "title": "Vi har styr på det",
+      "body": "Alle værktøjer til indgående betalinger virker fortsat. Tilføj blot din Lightning-adresse.",
+      "cta": "Forstået",
+      "terminalTitle": "Blink Terminal",
+      "terminalBody": "En kasseterminal i enhver browser.",
+      "donationTitle": "Donér-knap",
+      "donationBody": "Modtag donationer på enhver hjemmeside.",
+      "btcpayTitle": "BTCPay-plugin",
+      "btcpayBody": "Lightning-betalinger på din BTCPay Server.",
+      "woocommerceTitle": "WooCommerce-plugin",
+      "woocommerceBody": "Bitcoin-betaling til din netbutik."
+    },
     "resumeFailed": "Noget gik galt under genoptagelsen af din migrering. Start den venligst igen.",
     "migrationRequiredBody": "Det er tid til at migrere din depotkonto til en ikke-depotkonto.",
     "migrationRequiredForcedBody": "Det er tid til at migrere din depotkonto til en ikke-depotkonto. Det er påkrævet af regulatoriske årsager.\n\nIngen grund til bekymring, non-custodial vil være bedre for dig i det lange løb.",
@@ -3785,6 +3805,10 @@
     "explainerCheck5": "Din konto vil blive trukket et Spark-netværksgebyr",
     "explainerCta": "Jeg forstår",
     "transferringFunds": "Overfører dine midler. Det skulle være færdigt om få sekunder.",
+    "transferDelayed": {
+      "body": "Dine midler er på vej til din nye konto. Det tager længere tid end normalt — hold appen åben, så afslutter vi automatisk.",
+      "contactSupportCta": "Kontakt support"
+    },
     "clockOutOfSync": {
       "body": "Din enheds dato og klokkeslæt er ude af synkronisering. Indstil dem til automatisk for at fortsætte.",
       "retryCta": "Prøv igen"
@@ -3816,6 +3840,7 @@
     "phraseSubtitleStep2": "Indtast resten af din sikkerhedsfrase",
     "nextWords": "Næste 6 ord",
     "paste": "Indsæt",
+    "pasteFailed": "Kunne ikke læse fra udklipsholderen. Indtast venligst din sikkerhedsfrase manuelt.",
     "enterWord": "Ord",
     "invalidMnemonic": "Ugyldig backup-frase. Kontroller venligst om ordrækkefølgen er korrekt.",
     "restoring": "Gendanner din tegnebog...",
@@ -3827,7 +3852,9 @@
     "enterPassword": "Indtast din krypteringsadgangskode",
     "wrongPassword": "Forkert adgangskode. Prøv venligst igen.",
     "pickBackupTitle": "Vælg en tegnebog",
-    "pickBackupDescription": "Vælg en sikkerhedskopi at gendanne"
+    "pickBackupDescription": "Vælg en sikkerhedskopi at gendanne",
+    "recognizePhraseTitle": "Genkender du denne backup-sætning?",
+    "recognizePhraseBody": "Indtast aldrig ord, som en anden har sendt dig."
   },
   "BackupNudge": {
     "title": "Dine midler er i fare",

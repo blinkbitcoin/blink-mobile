@@ -2110,6 +2110,7 @@
     "error": "Hay aksi. Konum bilgini alırken bir şeyler yanlış gitti."
   },
   "HomeScreen": {
+    "pendingReceiveBadge": "+{amount: string} beklemede",
     "receive": "Al",
     "send": "Gönder",
     "title": "Ev",
@@ -3662,7 +3663,8 @@
         "savedConfirm": "Kaydettim",
         "copy": "Kopyala",
         "continueButton": "Devam et",
-        "testBackup": "Yedeğini test et"
+        "testBackup": "Yedeğini test et",
+        "doNotShareWarning": "Bunu destek dahil hiç kimseye gösterme"
       },
       "Confirm": {
         "headerTitle": "Yedekleme ifadesini onayla",
@@ -3709,6 +3711,11 @@
     "contactSupport": {
       "title": "Destek ile iletişime geçin",
       "body": "Bir şeyler ters gitti ama endişelenmeyin, paranız güvende. Yardım için lütfen destek ile iletişime geçin.\n\nDesteğin durumunuzu çözmesine yardımcı olmak için bu bilgilere ihtiyacınız olabilir:",
+      "selfHelp": {
+        "title": "Tekrar deneyelim",
+        "body": "Endişelenmeyin — paranız güvende. Taşıma birkaç dakika sürebilir ve bazen bir adımın yalnızca yeniden başlaması yeterlidir.\n\nTaşımayı baştan başlatın — yalnızca birkaç saniye sürer.\n\nBu ekranı hâlâ görüyor musunuz? Destek ile iletişime geçin ve aşağıdaki bilgileri paylaşın:",
+        "contactSupportCta": "Destek ile iletişime geçin"
+      },
       "reasonLabel": "Neden",
       "accountIdLabel": "Hesap kimliği",
       "pubKeyLabel": "pubKey",
@@ -3765,10 +3772,23 @@
     "downloadHistoryTitle": "İşlem geçmişini indir",
     "downloadHistoryBody": "Yeni hesabın sıfırdan başlayacak. İşlemlerinin bir kaydını tutmak istersen, şimdi CSV olarak indir.",
     "downloadHistoryDownloadCta": "İndir",
-    "apiServiceTitle": "API hizmeti kullanılamıyor",
-    "apiServiceBody": "Etkin API anahtarlarınız olduğunu fark ettik. Blink, non-custodial modda API sağlayamaz.\n\nBlink'in API'sine bağımlıysanız, lütfen bizimle en kısa sürede iletişime geçin; sorunsuz bir geçiş için elimizden geleni yapacağız.",
+    "apiServiceTitle": "API anahtarlarınız hakkında",
+    "apiServiceBody": "Hesabınızda etkin API anahtarları var. Non-custodial moda geçtikten sonra API kullanılamayacak.\n\nBlink'in, gönderme dışında API'nin çoğu işlevinin yerini alan non-custodial uygulamaları var. Bunları Ayarlar menüsünde bulabilirsiniz.\n\nAPI'yi göndermek için kullanıyorsanız, maalesef bu artık mümkün olmayacak.",
     "apiServiceContactCta": "Bize ulaşın",
-    "apiServiceContinueCta": "Yine de devam et",
+    "apiServiceContinueCta": "Geçişe devam et",
+    "merchantTools": {
+      "title": "Her şeyi düşündük",
+      "body": "Gelen ödemeler için tüm araçlar çalışmaya devam ediyor. Sadece Lightning adresini ekle.",
+      "cta": "Anladım",
+      "terminalTitle": "Blink Terminal",
+      "terminalBody": "Herhangi bir tarayıcıda satış noktası.",
+      "donationTitle": "Bağış düğmesi",
+      "donationBody": "Herhangi bir web sitesinde bağış kabul et.",
+      "btcpayTitle": "BTCPay eklentisi",
+      "btcpayBody": "BTCPay Server'ında Lightning ödemeleri.",
+      "woocommerceTitle": "WooCommerce eklentisi",
+      "woocommerceBody": "Çevrimiçi mağazan için Bitcoin ödemesi."
+    },
     "resumeFailed": "Taşıma işleminiz devam ettirilirken bir sorun oluştu. Lütfen yeniden başlatın.",
     "migrationRequiredBody": "Saklamalı hesabınızı saklamasız bir hesaba taşımanın zamanı geldi.",
     "migrationRequiredForcedBody": "Saklamalı hesabınızı saklamasız bir hesaba taşımanın zamanı geldi. Bu, düzenleyici nedenlerle zorunludur.\n\nEndişelenme, non-custodial uzun vadede senin için daha iyi olacak.",
@@ -3785,6 +3805,10 @@
     "explainerCheck5": "Hesabından bir Spark ağ ücreti düşülecek",
     "explainerCta": "Anladım",
     "transferringFunds": "Bakiyeniz aktarılıyor. Birkaç saniye içinde tamamlanacaktır.",
+    "transferDelayed": {
+      "body": "Bakiyeniz yeni hesabınıza aktarılıyor. Bu, normalden uzun sürüyor — uygulamayı açık tutun, işlemi otomatik olarak tamamlayacağız.",
+      "contactSupportCta": "Destek ile iletişime geçin"
+    },
     "clockOutOfSync": {
       "body": "Cihazının tarih ve saati eşitlenmemiş. Devam etmek için otomatik olarak ayarla.",
       "retryCta": "Tekrar dene"
@@ -3816,6 +3840,7 @@
     "phraseSubtitleStep2": "Yedekleme ifadenizin geri kalanını girin",
     "nextWords": "Sonraki 6 kelime",
     "paste": "Yapıştır",
+    "pasteFailed": "Panodan okunamadı. Lütfen yedekleme ifadenizi elle girin.",
     "enterWord": "Kelime",
     "invalidMnemonic": "Geçersiz yedekleme ifadesi. Lütfen kelime sırasının doğru olup olmadığını kontrol edin.",
     "restoring": "Cüzdanınız geri yükleniyor...",
@@ -3827,7 +3852,9 @@
     "enterPassword": "Şifreleme parolanızı girin",
     "wrongPassword": "Yanlış parola. Lütfen tekrar deneyin.",
     "pickBackupTitle": "Bir cüzdan seçin",
-    "pickBackupDescription": "Geri yüklemek için bir yedek seçin"
+    "pickBackupDescription": "Geri yüklemek için bir yedek seçin",
+    "recognizePhraseTitle": "Bu yedekleme ifadesini tanıyor musun?",
+    "recognizePhraseBody": "Başka birinin sana gönderdiği kelimeleri asla girme."
   },
   "BackupNudge": {
     "title": "Fonlarınız risk altında",

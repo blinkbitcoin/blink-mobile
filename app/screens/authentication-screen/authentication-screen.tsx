@@ -70,7 +70,10 @@ export const AuthenticationScreen: React.FC<Props> = ({ route }) => {
       {
         text: LL.common.ok(),
         onPress: () => {
-          navigation.replace("getStarted")
+          /** Reset, not replace: a resume relock pushes this screen on top of the live
+           *  stack, and anything left beneath would still be reachable — and advertised,
+           *  now that the splash header follows `canGoBack()`. */
+          navigation.reset({ index: 0, routes: [{ name: "getStarted" }] })
         },
       },
     ])

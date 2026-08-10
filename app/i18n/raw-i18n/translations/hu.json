@@ -2110,6 +2110,7 @@
     "error": "Valami hiba történt a helyzeted lekérdezése közben"
   },
   "HomeScreen": {
+    "pendingReceiveBadge": "+{amount: string} Függőben",
     "receive": "Fogadás",
     "send": "Küldés",
     "title": "Kezdőlap",
@@ -3662,7 +3663,8 @@
         "savedConfirm": "Elmentettem",
         "copy": "Másolás",
         "continueButton": "Tovább",
-        "testBackup": "Teszteld a biztonsági mentést"
+        "testBackup": "Teszteld a biztonsági mentést",
+        "doNotShareWarning": "Ne mutasd meg senkinek, az ügyfélszolgálatnak sem"
       },
       "Confirm": {
         "headerTitle": "Biztonsági mentés megerősítése",
@@ -3709,6 +3711,11 @@
     "contactSupport": {
       "title": "Kapcsolatfelvétel az ügyfélszolgálattal",
       "body": "Valami hiba történt, de ne aggódjon, a pénze biztonságban van. Kérjük, forduljon az ügyfélszolgálathoz segítségért.\n\nEzekre az adatokra szüksége lehet, hogy az ügyfélszolgálat megoldja az esetét:",
+      "selfHelp": {
+        "title": "Próbáljuk meg újra",
+        "body": "Ne aggódjon — a pénze biztonságban van. Az átköltözés eltarthat néhány percig, és néha egy lépésnek csak új kezdésre van szüksége.\n\nIndítsa el az átköltözést elölről — csak egy pillanatig tart.\n\nTovábbra is ezt a képernyőt látja? Forduljon az ügyfélszolgálathoz, és ossza meg az alábbi adatokat:",
+        "contactSupportCta": "Kapcsolatfelvétel az ügyfélszolgálattal"
+      },
       "reasonLabel": "Ok",
       "accountIdLabel": "Fiókazonosító",
       "pubKeyLabel": "pubKey",
@@ -3765,10 +3772,23 @@
     "downloadHistoryTitle": "Töltsd le a tranzakciós előzményeidet",
     "downloadHistoryBody": "Az új fiókod tiszta lappal indul. Ha meg szeretnéd őrizni a tranzakcióid nyilvántartását, töltsd le őket most CSV formátumban.",
     "downloadHistoryDownloadCta": "Letöltés",
-    "apiServiceTitle": "Az API szolgáltatás nem elérhető",
-    "apiServiceBody": "Észrevettük, hogy aktív API-kulcsaid vannak. A Blink nem tudja biztosítani az API-t önrendelkező módban.\n\nHa a Blink API-jától függsz, vedd fel velünk mielőbb a kapcsolatot, és mindent megteszünk a zökkenőmentes átállásért.",
+    "apiServiceTitle": "Az API-kulcsaidról",
+    "apiServiceBody": "A fiókodban aktív API-kulcsok vannak. Az API nem lesz elérhető, miután átállsz önrendelkező módra.\n\nA Blinknek vannak önrendelkező alkalmazásai, amelyek az API legtöbb funkcióját helyettesítik, a küldés kivételével. A Beállítások menüben találod őket.\n\nHa az API-t küldésre használod, sajnos ez már nem lesz lehetséges.",
     "apiServiceContactCta": "Lépj kapcsolatba velünk",
-    "apiServiceContinueCta": "Folytatás mindenképp",
+    "apiServiceContinueCta": "Migráció folytatása",
+    "merchantTools": {
+      "title": "Mindenre gondoltunk",
+      "body": "A bejövő fizetésekhez használt összes eszköz továbbra is működik. Csak add meg a Lightning címedet.",
+      "cta": "Értem",
+      "terminalTitle": "Blink Terminal",
+      "terminalBody": "Értékesítési pont bármelyik böngészőben.",
+      "donationTitle": "Adományozás gomb",
+      "donationBody": "Fogadj adományokat bármelyik weboldalon.",
+      "btcpayTitle": "BTCPay bővítmény",
+      "btcpayBody": "Lightning fizetések a BTCPay Servereden.",
+      "woocommerceTitle": "WooCommerce bővítmény",
+      "woocommerceBody": "Bitcoinos fizetés a webáruházadhoz."
+    },
     "resumeFailed": "Hiba történt az átköltözés folytatása közben. Kérjük, kezdje újra.",
     "migrationRequiredBody": "Itt az ideje átköltöztetni letétkezelt fiókját egy nem letétkezelt fiókba.",
     "migrationRequiredForcedBody": "Itt az ideje átköltöztetni letétkezelt fiókját egy nem letétkezelt fiókba. Ez szabályozási okokból kötelező.\n\nNe aggódj, a nem letéti mód hosszú távon jobb lesz neked.",
@@ -3785,6 +3805,10 @@
     "explainerCheck5": "A fiókodból levonásra kerül egy Spark hálózati díj",
     "explainerCta": "Megértettem",
     "transferringFunds": "Átutalás folyamatban. Néhány másodperc alatt befejeződik.",
+    "transferDelayed": {
+      "body": "A pénzed úton van az új számládra. A szokásosnál tovább tart — hagyd nyitva az alkalmazást, és automatikusan befejezzük.",
+      "contactSupportCta": "Kapcsolatfelvétel az ügyfélszolgálattal"
+    },
     "clockOutOfSync": {
       "body": "Az eszközöd dátuma és ideje nincs szinkronban. Állítsd automatikusra a folytatáshoz.",
       "retryCta": "Próbáld újra"
@@ -3816,6 +3840,7 @@
     "phraseSubtitleStep2": "Add meg a biztonsági kifejezésed többi szavát",
     "nextWords": "Következő 6 szó",
     "paste": "Beillesztés",
+    "pasteFailed": "Nem sikerült olvasni a vágólapról. Kérjük, add meg a biztonsági kifejezésed kézzel.",
     "enterWord": "Szó",
     "invalidMnemonic": "Érvénytelen biztonsági mentési kifejezés. Kérlek ellenőrizd, hogy a szavak sorrendje helyes-e.",
     "restoring": "Tárca visszaállítása...",
@@ -3827,7 +3852,9 @@
     "enterPassword": "Add meg a titkosítási jelszavadat",
     "wrongPassword": "Helytelen jelszó. Kérjük, próbáld újra.",
     "pickBackupTitle": "Válassz tárcát",
-    "pickBackupDescription": "Válassz egy biztonsági mentést a visszaállításhoz"
+    "pickBackupDescription": "Válassz egy biztonsági mentést a visszaállításhoz",
+    "recognizePhraseTitle": "Felismered ezt a biztonsági mentési kifejezést?",
+    "recognizePhraseBody": "Soha ne írj be olyan szavakat, amelyeket valaki más küldött neked."
   },
   "BackupNudge": {
     "title": "Pénzeszközeid veszélyben vannak",

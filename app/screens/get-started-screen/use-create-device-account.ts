@@ -88,7 +88,7 @@ export const useCreateDeviceAccount = () => {
 
         logCreatedDeviceAccount()
         analytics().logLogin({ method: "device" })
-        saveProfile(authToken)
+        await saveProfile(authToken)
         navigation.replace("Primary")
         onClose?.()
       } catch (err) {

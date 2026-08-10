@@ -24,12 +24,14 @@ export type SparkSession = {
  * parseDestination with account-aware resolution: a custodial sender re-tries a Blink
  * username that is not a custodial account as a lightning address over LNURL; a
  * self-custodial sender resolves and wraps through the connected SDK.
+ * Surrounding whitespace is trimmed off the raw input before any parsing.
  */
 export const resolveDestination = async (
-  params: ParseDestinationParams,
+  rawParams: ParseDestinationParams,
   session: SparkSession,
   lnAddressHostname: string,
 ): Promise<ParseDestinationResult> => {
+  const params = { ...rawParams, rawInput: rawParams.rawInput.trim() }
   const { sdk, network } = session
   if (!sdk) {
     const parsed = await parseDestination(params)

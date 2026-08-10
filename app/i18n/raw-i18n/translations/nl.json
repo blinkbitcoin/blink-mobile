@@ -2110,6 +2110,7 @@
     "error": "Oeps. Er is iets misgegaan bij het ophalen van je locatie"
   },
   "HomeScreen": {
+    "pendingReceiveBadge": "+{amount: string} In behandeling",
     "receive": "Ontvang",
     "send": "Verzend",
     "title": "Thuisscherm",
@@ -3662,7 +3663,8 @@
         "savedConfirm": "Ik heb het opgeslagen",
         "copy": "Kopiëren",
         "continueButton": "Doorgaan",
-        "testBackup": "Test je back-up"
+        "testBackup": "Test je back-up",
+        "doNotShareWarning": "Laat dit aan niemand zien, ook niet aan support"
       },
       "Confirm": {
         "headerTitle": "Bevestig back-upzin",
@@ -3709,6 +3711,11 @@
     "contactSupport": {
       "title": "Contact opnemen met support",
       "body": "Er is iets misgegaan, maar maak je geen zorgen, je geld is veilig. Neem contact op met support voor hulp.\n\nMogelijk heb je deze informatie nodig zodat support je zaak kan oplossen:",
+      "selfHelp": {
+        "title": "Laten we het opnieuw proberen",
+        "body": "Maak je geen zorgen — je geld is veilig. De migratie kan een paar minuten duren, en soms heeft een stap gewoon een nieuwe start nodig.\n\nStart de migratie opnieuw — het duurt maar even.\n\nZie je dit scherm nog steeds? Neem contact op met support en deel de gegevens hieronder:",
+        "contactSupportCta": "Contact opnemen met support"
+      },
       "reasonLabel": "Reden",
       "accountIdLabel": "Account-ID",
       "pubKeyLabel": "pubKey",
@@ -3765,10 +3772,23 @@
     "downloadHistoryTitle": "Download je transactiegeschiedenis",
     "downloadHistoryBody": "Je nieuwe account begint opnieuw. Als je een overzicht van je transacties wilt bewaren, download ze dan nu als CSV.",
     "downloadHistoryDownloadCta": "Downloaden",
-    "apiServiceTitle": "API-service niet beschikbaar",
-    "apiServiceBody": "We zien dat je actieve API-sleutels hebt. Blink kan de API niet aanbieden in non-custodial modus.\n\nAls je afhankelijk bent van de API van Blink, neem dan snel contact met ons op en we doen ons best om een soepele overgang te helpen.",
+    "apiServiceTitle": "Over je API-sleutels",
+    "apiServiceBody": "Je account heeft actieve API-sleutels. De API is niet meer beschikbaar nadat je overstapt naar non-custodial.\n\nBlink heeft non-custodial apps die de meeste functies van de API vervangen, behalve verzenden. Je vindt ze in het menu Instellingen.\n\nAls je de API gebruikt om te verzenden, is dat helaas niet langer mogelijk.",
     "apiServiceContactCta": "Neem contact op",
-    "apiServiceContinueCta": "Toch doorgaan",
+    "apiServiceContinueCta": "Doorgaan met de migratie",
+    "merchantTools": {
+      "title": "We hebben aan alles gedacht",
+      "body": "Alle tools voor inkomende betalingen blijven werken. Voeg gewoon je Lightning-adres toe.",
+      "cta": "Begrepen",
+      "terminalTitle": "Blink Terminal",
+      "terminalBody": "Een kassasysteem in elke browser.",
+      "donationTitle": "Doneerknop",
+      "donationBody": "Accepteer donaties op elke website.",
+      "btcpayTitle": "BTCPay-plug-in",
+      "btcpayBody": "Lightning-betalingen op je BTCPay Server.",
+      "woocommerceTitle": "WooCommerce-plug-in",
+      "woocommerceBody": "Bitcoin-afrekenen voor je webshop."
+    },
     "resumeFailed": "Er is iets misgegaan bij het hervatten van je migratie. Begin deze opnieuw.",
     "migrationRequiredBody": "Het is tijd om je bewaarde rekening te migreren naar een niet-bewaarde rekening.",
     "migrationRequiredForcedBody": "Het is tijd om je bewaarde rekening te migreren naar een niet-bewaarde rekening. Dit is vereist om regelgevende redenen.\n\nGeen zorgen, non-custodial is op de lange termijn beter voor je.",
@@ -3785,6 +3805,10 @@
     "explainerCheck5": "Er worden Spark-netwerkkosten van je account afgeschreven",
     "explainerCta": "Ik begrijp het",
     "transferringFunds": "Je saldo wordt overgedragen. Het zou binnen enkele seconden klaar moeten zijn.",
+    "transferDelayed": {
+      "body": "Je saldo is onderweg naar je nieuwe account. Het duurt langer dan gebruikelijk — houd de app open, dan ronden we het automatisch af.",
+      "contactSupportCta": "Contact opnemen met support"
+    },
     "clockOutOfSync": {
       "body": "De datum en tijd van je apparaat lopen niet gelijk. Zet ze op automatisch om door te gaan.",
       "retryCta": "Opnieuw proberen"
@@ -3816,6 +3840,7 @@
     "phraseSubtitleStep2": "Voer de rest van je back-upfrase in",
     "nextWords": "Volgende 6 woorden",
     "paste": "Plakken",
+    "pasteFailed": "Kan niet lezen van het klembord. Voer je back-upfrase handmatig in.",
     "enterWord": "Woord",
     "invalidMnemonic": "Ongeldige back-upzin. Controleer of de woordvolgorde correct is.",
     "restoring": "Je portemonnee wordt hersteld...",
@@ -3827,7 +3852,9 @@
     "enterPassword": "Voer je versleutelingswachtwoord in",
     "wrongPassword": "Onjuist wachtwoord. Probeer opnieuw.",
     "pickBackupTitle": "Kies een wallet",
-    "pickBackupDescription": "Kies een back-up om te herstellen"
+    "pickBackupDescription": "Kies een back-up om te herstellen",
+    "recognizePhraseTitle": "Herken je deze back-upzin?",
+    "recognizePhraseBody": "Voer nooit woorden in die iemand anders je heeft gestuurd."
   },
   "BackupNudge": {
     "title": "Uw fondsen lopen gevaar",

@@ -2110,6 +2110,7 @@
     "error": "Oops. Alguna cosa ha anat malament mentre s'obtenia la teva ubicació."
   },
   "HomeScreen": {
+    "pendingReceiveBadge": "+{amount: string} pendent",
     "receive": "Rebre",
     "send": "Enviar",
     "title": "Inici",
@@ -3662,7 +3663,8 @@
         "savedConfirm": "Ja l'he desat",
         "copy": "Copiar",
         "continueButton": "Continua",
-        "testBackup": "Prova la teva còpia de seguretat"
+        "testBackup": "Prova la teva còpia de seguretat",
+        "doNotShareWarning": "No ho mostris a ningú, ni tan sols a l'assistència"
       },
       "Confirm": {
         "headerTitle": "Confirma la frase de còpia de seguretat",
@@ -3709,6 +3711,11 @@
     "contactSupport": {
       "title": "Contacta amb suport",
       "body": "Alguna cosa ha anat malament, però no et preocupis, els teus fons estan segurs. Contacta amb suport per obtenir ajuda.\n\nPotser necessitaràs aquesta informació per ajudar el suport a resoldre el teu cas:",
+      "selfHelp": {
+        "title": "Tornem-ho a provar",
+        "body": "No et preocupis — els teus fons estan segurs. La migració pot trigar uns minuts, i de vegades un pas només necessita començar de nou.\n\nComença la migració de nou — només trigarà un moment.\n\nEncara veus aquesta pantalla? Contacta amb suport i comparteix les dades següents:",
+        "contactSupportCta": "Contacta amb suport"
+      },
       "reasonLabel": "Motiu",
       "accountIdLabel": "ID del compte",
       "pubKeyLabel": "pubKey",
@@ -3765,10 +3772,23 @@
     "downloadHistoryTitle": "Baixa el teu historial de transaccions",
     "downloadHistoryBody": "El teu compte nou començarà de zero. Si vols conservar un registre de les teves transaccions, baixa-les ara com a CSV.",
     "downloadHistoryDownloadCta": "Baixa",
-    "apiServiceTitle": "Servei d'API no disponible",
-    "apiServiceBody": "Observem que tens claus API actives. Blink no pot oferir l'API en mode no custodial.\n\nSi depens de l'API de Blink, contacta'ns aviat i farem tot el possible per ajudar-te en una transició fluida.",
+    "apiServiceTitle": "Sobre les teves claus API",
+    "apiServiceBody": "El teu compte té claus API actives. L'API no estarà disponible després de passar al mode no custodial.\n\nBlink té aplicacions no custodials que substitueixen la majoria de funcions de l'API, excepte enviar. Les trobaràs al menú de Configuració.\n\nSi utilitzes l'API per enviar, malauradament ja no serà possible.",
     "apiServiceContactCta": "Contacta'ns",
-    "apiServiceContinueCta": "Continua igualment",
+    "apiServiceContinueCta": "Continua la migració",
+    "merchantTools": {
+      "title": "Hem pensat en tot",
+      "body": "Totes les eines per a pagaments entrants segueixen funcionant. Només has d'afegir la teva adreça Lightning.",
+      "cta": "Entesos",
+      "terminalTitle": "Blink Terminal",
+      "terminalBody": "Un punt de venda en qualsevol navegador.",
+      "donationTitle": "Botó Donar",
+      "donationBody": "Accepta donacions a qualsevol lloc web.",
+      "btcpayTitle": "Connector BTCPay",
+      "btcpayBody": "Pagaments Lightning al teu BTCPay Server.",
+      "woocommerceTitle": "Connector WooCommerce",
+      "woocommerceBody": "Pagament amb Bitcoin per a la teva botiga en línia."
+    },
     "resumeFailed": "Alguna cosa ha fallat en reprendre la migració. Si us plau, torna-la a començar.",
     "migrationRequiredBody": "És hora de migrar el teu compte custodial a un compte no custodi.",
     "migrationRequiredForcedBody": "És hora de migrar el teu compte custodial a un compte no custodi. És obligatori per motius reguladors.\n\nNo et preocupis, la modalitat no custodial serà millor per a tu a llarg termini.",
@@ -3785,6 +3805,10 @@
     "explainerCheck5": "Es descomptarà una comissió de xarxa de Spark del teu compte",
     "explainerCta": "Ho entenc",
     "transferringFunds": "Transferint els teus fons. Hauria d'estar llest en uns segons.",
+    "transferDelayed": {
+      "body": "Els teus fons estan de camí al teu nou compte. Està trigant més de l'habitual — mantén l'aplicació oberta i ho acabarem automàticament.",
+      "contactSupportCta": "Contacta amb suport"
+    },
     "clockOutOfSync": {
       "body": "La data i l'hora del teu dispositiu no estan sincronitzades. Configura-les en automàtic per continuar.",
       "retryCta": "Torna-ho a provar"
@@ -3816,6 +3840,7 @@
     "phraseSubtitleStep2": "Introdueix la resta de la teva frase de recuperació",
     "nextWords": "Següents 6 paraules",
     "paste": "Enganxar",
+    "pasteFailed": "No s'ha pogut llegir del porta-retalls. Introdueix la teva frase de recuperació manualment.",
     "enterWord": "Paraula",
     "invalidMnemonic": "Frase de còpia de seguretat no vàlida. Comprova si l'ordre de les paraules és correcte.",
     "restoring": "Restaurant la teva cartera...",
@@ -3827,7 +3852,9 @@
     "enterPassword": "Introdueix la teva contrasenya de xifratge",
     "wrongPassword": "Contrasenya incorrecta. Si us plau, torna-ho a provar.",
     "pickBackupTitle": "Tria una cartera",
-    "pickBackupDescription": "Selecciona una còpia de seguretat per restaurar"
+    "pickBackupDescription": "Selecciona una còpia de seguretat per restaurar",
+    "recognizePhraseTitle": "Reconeixes aquesta frase de còpia de seguretat?",
+    "recognizePhraseBody": "No introdueixis mai paraules que t'hagi enviat algú altre."
   },
   "BackupNudge": {
     "title": "Els teus fons estan en risc",

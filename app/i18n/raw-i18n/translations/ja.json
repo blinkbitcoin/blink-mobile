@@ -2110,6 +2110,7 @@
         "error": "位置情報の取得中にエラーが発生しました"
     },
     "HomeScreen": {
+        "pendingReceiveBadge": "+{amount: string} 保留中",
         "receive": "受金",
         "send": "送金",
         "title": "ホーム",
@@ -3662,7 +3663,8 @@
                 "savedConfirm": "保存しました",
                 "copy": "コピー",
                 "continueButton": "続行",
-                "testBackup": "バックアップをテスト"
+                "testBackup": "バックアップをテスト",
+                "doNotShareWarning": "サポートを含め、誰にも見せないでください"
             },
             "Confirm": {
                 "headerTitle": "バックアップフレーズの確認",
@@ -3709,6 +3711,11 @@
         "contactSupport": {
             "title": "サポートに連絡",
             "body": "問題が発生しましたが、ご安心ください。資金は安全です。サポートにお問い合わせください。\n\nサポートが問題を解決するために、次の情報が必要になる場合があります：",
+            "selfHelp": {
+                "title": "もう一度お試しください",
+                "body": "ご安心ください — 資金は安全です。移行には数分かかることがあり、ステップをやり直すだけで解決する場合もあります。\n\n移行を最初からやり直してください。すぐに終わります。\n\nまだこの画面が表示されますか？サポートにお問い合わせのうえ、以下の情報をお伝えください：",
+                "contactSupportCta": "サポートに連絡"
+            },
             "reasonLabel": "理由",
             "accountIdLabel": "アカウントID",
             "pubKeyLabel": "pubKey",
@@ -3765,10 +3772,23 @@
         "downloadHistoryTitle": "取引履歴をダウンロード",
         "downloadHistoryBody": "新しいアカウントはゼロから始まります。取引の記録を残したい場合は、今すぐCSVとしてダウンロードしてください。",
         "downloadHistoryDownloadCta": "ダウンロード",
-        "apiServiceTitle": "APIサービスは利用できません",
-        "apiServiceBody": "有効なAPIキーをお持ちのようです。BlinkはノンカストディアルモードではAPIを提供できません。\n\nBlinkのAPIに依存している場合は、早めにお問い合わせください。スムーズな移行をできる限りサポートします。",
+        "apiServiceTitle": "APIキーについて",
+        "apiServiceBody": "お客様のアカウントには有効なAPIキーがあります。ノンカストディアルに移行すると、APIは利用できなくなります。\n\nBlinkには、送金を除くAPIのほとんどの機能を代替するノンカストディアルアプリがあります。設定メニューからご利用いただけます。\n\nAPIを送金に使用している場合、申し訳ありませんが今後はご利用いただけません。",
         "apiServiceContactCta": "お問い合わせ",
-        "apiServiceContinueCta": "このまま続行",
+        "apiServiceContinueCta": "移行を続ける",
+        "merchantTools": {
+            "title": "ご安心ください",
+            "body": "受け取りのためのツールはすべて引き続き使えます。Lightningアドレスを追加するだけです。",
+            "cta": "了解しました",
+            "terminalTitle": "Blink Terminal",
+            "terminalBody": "どのブラウザでも使えるPOS。",
+            "donationTitle": "寄付ボタン",
+            "donationBody": "どのウェブサイトでも寄付を受け付けられます。",
+            "btcpayTitle": "BTCPayプラグイン",
+            "btcpayBody": "お使いのBTCPay ServerでのLightning決済。",
+            "woocommerceTitle": "WooCommerceプラグイン",
+            "woocommerceBody": "オンラインストア向けのビットコイン決済。"
+        },
         "resumeFailed": "移行の再開中に問題が発生しました。もう一度最初からやり直してください。",
         "migrationRequiredBody": "カストディアルアカウントを非カストディアルアカウントに移行する時です。",
         "migrationRequiredForcedBody": "カストディアルアカウントを非カストディアルアカウントに移行する時です。これは規制上の理由により必須です。\n\nご心配なく。長期的にはノンカストディアルの方があなたにとって良い選択です。",
@@ -3785,6 +3805,10 @@
         "explainerCheck5": "アカウントからSparkネットワーク手数料が差し引かれます",
         "explainerCta": "理解しました",
         "transferringFunds": "資金を転送中です。数秒で完了するはずです。",
+        "transferDelayed": {
+            "body": "資金は新しいアカウントへ送金中です。通常より時間がかかっています。アプリを開いたままにしていただければ、自動的に完了します。",
+            "contactSupportCta": "サポートに問い合わせる"
+        },
         "clockOutOfSync": {
             "body": "デバイスの日付と時刻がずれています。続けるには自動設定にしてください。",
             "retryCta": "再試行"
@@ -3816,6 +3840,7 @@
         "phraseSubtitleStep2": "バックアップフレーズの残りを入力してください",
         "nextWords": "次の6語",
         "paste": "貼り付け",
+        "pasteFailed": "クリップボードから読み取れませんでした。バックアップフレーズを手動で入力してください。",
         "enterWord": "単語",
         "invalidMnemonic": "無効なバックアップフレーズです。単語の順序が正しいか確認してください。",
         "restoring": "ウォレットを復元中...",
@@ -3827,7 +3852,9 @@
         "enterPassword": "暗号化パスワードを入力してください",
         "wrongPassword": "パスワードが正しくありません。再試行してください.",
         "pickBackupTitle": "ウォレットを選択",
-        "pickBackupDescription": "復元するバックアップを選択"
+        "pickBackupDescription": "復元するバックアップを選択",
+        "recognizePhraseTitle": "このバックアップフレーズに見覚えがありますか？",
+        "recognizePhraseBody": "他人から送られた単語は絶対に入力しないでください。"
     },
     "BackupNudge": {
         "title": "あなたの資金が危険にさらされています",

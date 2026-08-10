@@ -2,6 +2,7 @@ import { PersistentState } from "@app/store/persistent-state/state-migrations"
 import {
   getThemePreference,
   withThemePreference,
+  withThemePreferenceForAccount,
 } from "@app/store/persistent-state/theme-preference"
 import { DefaultAccountId } from "@app/types/wallet"
 
@@ -176,5 +177,28 @@ describe("withThemePreference", () => {
       [DefaultAccountId.Custodial]: "dark",
       "self-custodial-1": "light",
     })
+  })
+})
+
+describe("withThemePreferenceForAccount", () => {
+  it("writes for an explicit key that is not the active account", () => {
+    const state: PersistentState = {
+      ...baseState,
+      activeAccountId: DefaultAccountId.Custodial,
+    }
+
+    const next = withThemePreferenceForAccount(state, "self-custodial-new", "dark")
+
+    expect(next.themeByAccountId).toEqual({ "self-custodial-new": "dark" })
+  })
+
+  it("accepts the custodial sentinel as a legitimate key", () => {
+    const next = withThemePreferenceForAccount(
+      baseState,
+      DefaultAccountId.Custodial,
+      "dark",
+    )
+
+    expect(next.themeByAccountId).toEqual({ [DefaultAccountId.Custodial]: "dark" })
   })
 })

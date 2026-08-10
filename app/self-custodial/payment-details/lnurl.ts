@@ -42,6 +42,8 @@ import {
 } from "../bridge"
 import { classifySdkError } from "../sdk-error"
 
+import { feeFailure } from "./send-helpers"
+
 const SAT_TO_MILLISAT = BigInt(1000)
 
 const extractMetadataStr = (lnurlParams: LnUrlPayServiceResponse): string => {
@@ -202,8 +204,8 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
             const prepared = await prepareLnurl(sdk, prepareOptions)
             const feeSats = extractLnurlFee(prepared)
             return { amount: asBtcSettlementAmount<T>(feeSats) }
-          } catch {
-            return { amount: undefined }
+          } catch (err) {
+            return feeFailure<T>("Self-custodial LNURL fee", err)
           }
         },
         sendPaymentMutation: async () => {

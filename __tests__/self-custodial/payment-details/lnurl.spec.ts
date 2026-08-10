@@ -57,6 +57,9 @@ jest.mock("@app/self-custodial/sdk-error", () => {
 jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
   AesSuccessActionDataResult_Tags: { Decrypted: "Decrypted", ErrorStatus: "ErrorStatus" },
   FeePolicy: { FeesExcluded: 0, FeesIncluded: 1 },
+  // The shared fee-failure helper lives in send-helpers, which builds its tier→speed map
+  // at module scope.
+  OnchainConfirmationSpeed: { Fast: 0, Medium: 1, Slow: 2 },
   SuccessActionProcessed_Tags: { Aes: "Aes", Message: "Message", Url: "Url" },
   PaymentDetails: {
     Lightning: {
@@ -400,6 +403,38 @@ describe("createSelfCustodialLnurlPaymentDetails", () => {
       if (!detail.canGetFee) throw new Error("expected canGetFee")
       const result = await detail.getFee({} as never)
       expect(result.amount).toBeUndefined()
+    })
+
+    // Without the classified code the confirmation screen can only show its generic
+    // "unable to calculate fee", which names no cause and leaves the slider disabled.
+    it("carries the classified code in errors when prepareLnurl throws", async () => {
+      mockPrepareLnurl.mockRejectedValue({ tag: "LnurlError", inner: ["bad callback"] })
+      const detail = createSelfCustodialLnurlPaymentDetails(createParams())
+      if (!detail.canGetFee) throw new Error("expected canGetFee")
+      const result = await detail.getFee({} as never)
+      expect(result.errors).toEqual([
+        {
+          __typename: "GraphQLApplicationError",
+          message: SelfCustodialErrorCode.InvalidInput,
+        },
+      ])
+    })
+
+    it("falls back to the Generic code for an unclassified throw", async () => {
+      mockPrepareLnurl.mockRejectedValue(new Error("boom"))
+      const detail = createSelfCustodialLnurlPaymentDetails(createParams())
+      if (!detail.canGetFee) throw new Error("expected canGetFee")
+      const result = await detail.getFee({} as never)
+      expect(result.errors?.[0]?.message).toBe(SelfCustodialErrorCode.Generic)
+    })
+
+    it("leaves errors unset on a successful quote", async () => {
+      mockPrepareLnurl.mockResolvedValue({})
+      mockExtractLnurlFee.mockReturnValue(5)
+      const detail = createSelfCustodialLnurlPaymentDetails(createParams())
+      if (!detail.canGetFee) throw new Error("expected canGetFee")
+      const result = await detail.getFee({} as never)
+      expect(result.errors).toBeUndefined()
     })
   })
 

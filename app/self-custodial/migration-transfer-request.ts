@@ -28,10 +28,13 @@ type MigrationSdkResult<T> =
   | { status: typeof MigrationSdkStatus.ConnectionError; error: Error }
   | { status: typeof MigrationSdkStatus.Failed; error: Error }
 
-type WithMigrationSdkArgs = {
+type MigrationSdkConnectionArgs = {
   accountId: string
   network: Network
   leewaySatPerVbyte: number
+}
+
+type WithMigrationSdkArgs = MigrationSdkConnectionArgs & {
   /** Built by the caller, which owns the backend's challenge format, from the pubkey the
    *  wallet hands back. */
   signChallenge: (sparkPubkey: string) => string
@@ -92,7 +95,7 @@ const runExclusivePerStorageDir = <T>(
  * route; a network-tagged failure is a retryable ConnectionError; any other failure is Failed.
  */
 const withMigrationSdk = async <T>(
-  { accountId, network, leewaySatPerVbyte }: WithMigrationSdkArgs,
+  { accountId, network, leewaySatPerVbyte }: MigrationSdkConnectionArgs,
   use: (sdk: BreezSdkInterface) => Promise<T>,
 ): Promise<MigrationSdkResult<T>> => {
   const mnemonic = await KeyStoreWrapper.getMnemonicForAccount(accountId)
@@ -188,6 +191,27 @@ export const buildMigrationTransferRequest = (
       args.signChallenge,
     )
     return { sparkInvoice: invoice, sparkPubkey: identityPubkey, proofSignature }
+  })
+
+type MigrationReceiveCheck = {
+  hasReceived: boolean
+  balanceSats: number
+}
+
+/**
+ * Whether the migration payment has landed in the provisioned wallet. Any positive
+ * balance is the receive: the wallet is provisioned by this flow and never used before
+ * the session swap, so nothing else can have funded it. The forced sync is the point of
+ * the call — Spark holds an incoming payment for an offline wallet and claims it on
+ * sync, so this read is the detector and the actuator in one.
+ */
+export const checkMigrationReceiveLanded = (
+  args: MigrationSdkConnectionArgs,
+): Promise<MigrationSdkResult<MigrationReceiveCheck>> =>
+  withMigrationSdk(args, async (sdk) => {
+    const info = await sdk.getInfo({ ensureSynced: true })
+    const balanceSats = Number(info.balanceSats)
+    return { hasReceived: balanceSats > 0, balanceSats }
   })
 
 /** The two proof fields `migrationLnAddressTransfer` takes; it re-points the lightning

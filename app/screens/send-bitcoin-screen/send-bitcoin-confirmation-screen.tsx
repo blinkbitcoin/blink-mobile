@@ -7,6 +7,7 @@ import { gql } from "@apollo/client"
 import { CurrencyPill, useEqualPillWidth } from "@app/components/atomic/currency-pill"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import GaloySliderButton from "@app/components/atomic/galoy-slider-button/galoy-slider-button"
+import { HiddenBalancePlaceholder } from "@app/components/hidden-balance-placeholder/hidden-balance-placeholder"
 import { PaymentDestinationDisplay } from "@app/components/payment-destination-display"
 import { Screen } from "@app/components/screen"
 import { WarningBanner } from "@app/components/warning-banner"
@@ -30,6 +31,7 @@ import {
   ZeroUsdMoneyAmount,
 } from "@app/types/amounts"
 import { useSendDustWarning, useTranslateSdkError } from "@app/self-custodial/hooks"
+import { isSelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
 import { logPaymentAttempt, logPaymentResult } from "@app/utils/analytics"
 import { reportError } from "@app/utils/error-logging"
 import { CommonActions, RouteProp, useNavigation } from "@react-navigation/native"
@@ -153,7 +155,13 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     hasAttemptedSend,
   } = useSendPayment(sendPaymentMutation)
 
-  const feeErrorText = String(LL.SendBitcoinConfirmationScreen.feeError())
+  // Self-custodial fee failures carry a classified SDK code; custodial ones carry raw
+  // GraphQL text that is not fit to show, so only the former replaces the generic string.
+  const feeErrorCode = fee.status === "error" ? fee.errors?.[0]?.message : undefined
+  const feeErrorText =
+    (isSelfCustodialErrorCode(feeErrorCode)
+      ? translateSdkError(feeErrorCode)
+      : undefined) ?? String(LL.SendBitcoinConfirmationScreen.feeError())
   let feeDisplayText = feeErrorText
   currencyFeeAmount = feeErrorText
   satFeeAmount = feeErrorText
@@ -497,23 +505,23 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
             </View>
             <View style={styles.walletSelectorInfoContainer}>
               <View style={styles.walletSelectorTypeTextContainer}>
-                {sendingWalletDescriptor.currency === WalletCurrency.Btc ? (
-                  <Text style={styles.walletCurrencyText}>
-                    {hideAmount ? HIDDEN_AMOUNT_PLACEHOLDER : btcPrimaryText}
-                  </Text>
+                {hideAmount ? (
+                  <HiddenBalancePlaceholder size="small" />
+                ) : sendingWalletDescriptor.currency === WalletCurrency.Btc ? (
+                  <Text style={styles.walletCurrencyText}>{btcPrimaryText}</Text>
                 ) : (
-                  <Text style={styles.walletCurrencyText}>
-                    {hideAmount ? HIDDEN_AMOUNT_PLACEHOLDER : usdPrimaryText}
-                  </Text>
+                  <Text style={styles.walletCurrencyText}>{usdPrimaryText}</Text>
                 )}
               </View>
-              <View style={styles.walletSelectorBalanceContainer}>
-                {sendingWalletDescriptor.currency === WalletCurrency.Btc ? (
-                  <Text>{hideAmount ? HIDDEN_AMOUNT_PLACEHOLDER : btcSecondaryText}</Text>
-                ) : (
-                  <Text>{hideAmount ? HIDDEN_AMOUNT_PLACEHOLDER : usdSecondaryText}</Text>
-                )}
-              </View>
+              {!hideAmount && (
+                <View style={styles.walletSelectorBalanceContainer}>
+                  {sendingWalletDescriptor.currency === WalletCurrency.Btc ? (
+                    <Text>{btcSecondaryText}</Text>
+                  ) : (
+                    <Text>{usdSecondaryText}</Text>
+                  )}
+                </View>
+              )}
               <View />
             </View>
           </View>
@@ -563,7 +571,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
               <Text type="p2">{feeDisplayText} *</Text>
             )}
             {fee.status === "error" && !fee.amount && (
-              <Text type="p2">{LL.SendBitcoinConfirmationScreen.feeError()}</Text>
+              <Text type="p2">{feeErrorText}</Text>
             )}
           </View>
           {fee.status === "error" && Boolean(fee.amount) && (

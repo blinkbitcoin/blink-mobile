@@ -2110,6 +2110,7 @@
     "error": "Ups. Terjadi kesalahan saat mendapatkan lokasi Anda."
   },
   "HomeScreen": {
+    "pendingReceiveBadge": "+{amount: string} tertunda",
     "receive": "Terima",
     "send": "Kirim",
     "title": "Beranda",
@@ -3662,7 +3663,8 @@
         "savedConfirm": "Saya sudah menyimpannya",
         "copy": "Salin",
         "continueButton": "Lanjutkan",
-        "testBackup": "Uji cadanganmu"
+        "testBackup": "Uji cadanganmu",
+        "doNotShareWarning": "Jangan tunjukkan ini kepada siapa pun, termasuk tim dukungan"
       },
       "Confirm": {
         "headerTitle": "Konfirmasi frasa cadangan",
@@ -3709,6 +3711,11 @@
     "contactSupport": {
       "title": "Hubungi dukungan",
       "body": "Terjadi kesalahan, tetapi jangan khawatir, dana Anda aman. Silakan hubungi dukungan untuk mendapatkan bantuan.\n\nAnda mungkin memerlukan informasi ini untuk membantu dukungan menyelesaikan kasus Anda:",
+      "selfHelp": {
+        "title": "Mari coba lagi",
+        "body": "Jangan khawatir — dana Anda aman. Migrasi bisa memakan waktu beberapa menit, dan terkadang satu langkah hanya perlu dimulai ulang.\n\nMulai migrasi dari awal — hanya perlu sebentar.\n\nMasih melihat layar ini? Hubungi dukungan dan bagikan detail di bawah ini:",
+        "contactSupportCta": "Hubungi dukungan"
+      },
       "reasonLabel": "Alasan",
       "accountIdLabel": "ID akun",
       "pubKeyLabel": "pubKey",
@@ -3765,10 +3772,23 @@
     "downloadHistoryTitle": "Unduh riwayat transaksi Anda",
     "downloadHistoryBody": "Akun baru Anda akan dimulai dari awal. Jika Anda ingin menyimpan catatan transaksi Anda, unduh sekarang sebagai CSV.",
     "downloadHistoryDownloadCta": "Unduh",
-    "apiServiceTitle": "Layanan API tidak tersedia",
-    "apiServiceBody": "Kami melihat bahwa Anda memiliki kunci API aktif. Blink tidak dapat menyediakan API dalam mode non-custodial.\n\nJika Anda bergantung pada API Blink, hubungi kami segera dan kami akan berusaha sebaik mungkin untuk membantu transisi yang mulus.",
+    "apiServiceTitle": "Tentang kunci API Anda",
+    "apiServiceBody": "Akun Anda memiliki kunci API aktif. API tidak akan tersedia setelah Anda beralih ke non-custodial.\n\nBlink memiliki aplikasi non-custodial yang menggantikan sebagian besar fungsi API, kecuali pengiriman. Anda akan menemukannya di menu Pengaturan.\n\nJika Anda menggunakan API untuk mengirim, sayangnya hal itu tidak akan mungkin lagi.",
     "apiServiceContactCta": "Hubungi kami",
-    "apiServiceContinueCta": "Tetap lanjutkan",
+    "apiServiceContinueCta": "Lanjutkan migrasi",
+    "merchantTools": {
+      "title": "Semua sudah kami siapkan",
+      "body": "Semua alat untuk pembayaran masuk tetap berfungsi. Cukup tambahkan alamat Lightning Anda.",
+      "cta": "Mengerti",
+      "terminalTitle": "Blink Terminal",
+      "terminalBody": "Tempat penjualan di peramban mana pun.",
+      "donationTitle": "Tombol donasi",
+      "donationBody": "Terima donasi di situs web mana pun.",
+      "btcpayTitle": "Plugin BTCPay",
+      "btcpayBody": "Pembayaran Lightning di BTCPay Server Anda.",
+      "woocommerceTitle": "Plugin WooCommerce",
+      "woocommerceBody": "Pembayaran Bitcoin untuk toko online Anda."
+    },
     "resumeFailed": "Terjadi kesalahan saat melanjutkan migrasi Anda. Silakan mulai lagi dari awal.",
     "migrationRequiredBody": "Saatnya memigrasikan akun kustodial Anda ke akun non-kustodial.",
     "migrationRequiredForcedBody": "Saatnya memigrasikan akun kustodial Anda ke akun non-kustodial. Ini diperlukan karena alasan regulasi.\n\nTidak perlu khawatir, non-custodial akan lebih baik untukmu dalam jangka panjang.",
@@ -3785,6 +3805,10 @@
     "explainerCheck5": "Akun Anda akan dikenakan biaya jaringan Spark",
     "explainerCta": "Saya mengerti",
     "transferringFunds": "Mentransfer dana Anda. Seharusnya selesai dalam beberapa detik.",
+    "transferDelayed": {
+      "body": "Dana Anda sedang dalam perjalanan ke akun baru Anda. Ini memakan waktu lebih lama dari biasanya — biarkan aplikasi tetap terbuka dan kami akan menyelesaikannya secara otomatis.",
+      "contactSupportCta": "Hubungi dukungan"
+    },
     "clockOutOfSync": {
       "body": "Tanggal dan waktu perangkat Anda tidak sinkron. Atur ke otomatis untuk melanjutkan.",
       "retryCta": "Coba lagi"
@@ -3816,6 +3840,7 @@
     "phraseSubtitleStep2": "Masukkan sisa frasa cadangan Anda",
     "nextWords": "6 kata berikutnya",
     "paste": "Tempel",
+    "pasteFailed": "Tidak dapat membaca dari papan klip. Silakan masukkan frasa cadangan Anda secara manual.",
     "enterWord": "Kata",
     "invalidMnemonic": "Frasa cadangan tidak valid. Harap periksa apakah urutan kata sudah benar.",
     "restoring": "Memulihkan dompet Anda...",
@@ -3827,7 +3852,9 @@
     "enterPassword": "Masukkan kata sandi enkripsi Anda",
     "wrongPassword": "Kata sandi salah. Silakan coba lagi.",
     "pickBackupTitle": "Pilih dompet",
-    "pickBackupDescription": "Pilih cadangan untuk dipulihkan"
+    "pickBackupDescription": "Pilih cadangan untuk dipulihkan",
+    "recognizePhraseTitle": "Apakah Anda mengenali frasa cadangan ini?",
+    "recognizePhraseBody": "Jangan pernah memasukkan kata-kata yang dikirim orang lain kepada Anda."
   },
   "BackupNudge": {
     "title": "Dana Anda dalam bahaya",

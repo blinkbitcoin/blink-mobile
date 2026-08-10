@@ -107,7 +107,7 @@ describe("useMigrationAccount", () => {
     expect(ensured).toBe("sc-account-1")
     expect(mockSaveCheckpoint).toHaveBeenCalledWith(
       MigrationCheckpoint.TermsAndConditions,
-      "sc-account-1",
+      { provisionedAccountId: "sc-account-1" },
     )
   })
 
@@ -192,7 +192,7 @@ describe("useMigrationAccount", () => {
     expect(mockSavePendingAccount).not.toHaveBeenCalled()
     expect(mockSaveCheckpoint).toHaveBeenCalledWith(
       MigrationCheckpoint.TermsAndConditions,
-      "sc-pending-1",
+      { provisionedAccountId: "sc-pending-1" },
     )
   })
 

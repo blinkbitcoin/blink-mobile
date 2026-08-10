@@ -2110,6 +2110,7 @@
         "error": "Oops. Qualcosa è andato storto durante il recupero della tua posizione"
     },
     "HomeScreen": {
+        "pendingReceiveBadge": "+{amount: string} in attesa",
         "receive": "Ricevi",
         "send": "Invia",
         "title": "Home",
@@ -3662,7 +3663,8 @@
                 "savedConfirm": "L'ho salvata",
                 "copy": "Copia",
                 "continueButton": "Continua",
-                "testBackup": "Verifica il tuo backup"
+                "testBackup": "Verifica il tuo backup",
+                "doNotShareWarning": "Non mostrarlo a nessuno, nemmeno all'assistenza"
             },
             "Confirm": {
                 "headerTitle": "Conferma frase di backup",
@@ -3709,6 +3711,11 @@
         "contactSupport": {
             "title": "Contatta il supporto",
             "body": "Qualcosa è andato storto, ma non preoccuparti, i tuoi fondi sono al sicuro. Contatta il supporto per ricevere assistenza.\n\nPotresti aver bisogno di queste informazioni per aiutare il supporto a risolvere il tuo caso:",
+            "selfHelp": {
+                "title": "Riproviamo",
+                "body": "Non preoccuparti — i tuoi fondi sono al sicuro. La migrazione può richiedere qualche minuto e a volte a un passaggio serve solo ricominciare.\n\nRicomincia la migrazione da capo — ci vuole solo un attimo.\n\nVedi ancora questa schermata? Contatta il supporto e condividi i dati qui sotto:",
+                "contactSupportCta": "Contatta il supporto"
+            },
             "reasonLabel": "Motivo",
             "accountIdLabel": "ID account",
             "pubKeyLabel": "pubKey",
@@ -3765,10 +3772,23 @@
         "downloadHistoryTitle": "Scarica la cronologia delle transazioni",
         "downloadHistoryBody": "Il tuo nuovo account partirà da zero. Se vuoi conservare un registro delle tue transazioni, scaricale ora come CSV.",
         "downloadHistoryDownloadCta": "Scarica",
-        "apiServiceTitle": "Servizio API non disponibile",
-        "apiServiceBody": "Notiamo che hai chiavi API attive. Blink non può fornire l'API in modalità non-custodial.\n\nSe dipendi dall'API di Blink, contattaci subito e faremo del nostro meglio per aiutarti con una transizione fluida.",
+        "apiServiceTitle": "Informazioni sulle tue chiavi API",
+        "apiServiceBody": "Il tuo account ha chiavi API attive. L'API non sarà disponibile dopo il passaggio al non-custodial.\n\nBlink offre app non-custodial che sostituiscono la maggior parte delle funzioni dell'API, tranne l'invio. Le trovi nel menu Impostazioni.\n\nSe usi l'API per inviare, purtroppo non sarà più possibile.",
         "apiServiceContactCta": "Contattaci",
-        "apiServiceContinueCta": "Continua comunque",
+        "apiServiceContinueCta": "Continua la migrazione",
+        "merchantTools": {
+            "title": "Abbiamo pensato a tutto",
+            "body": "Tutti gli strumenti per i pagamenti in entrata continuano a funzionare. Aggiungi solo il tuo indirizzo Lightning.",
+            "cta": "Ho capito",
+            "terminalTitle": "Blink Terminal",
+            "terminalBody": "Un punto di vendita in qualsiasi browser.",
+            "donationTitle": "Pulsante Dona",
+            "donationBody": "Accetta donazioni su qualsiasi sito web.",
+            "btcpayTitle": "Plugin BTCPay",
+            "btcpayBody": "Pagamenti Lightning sul tuo BTCPay Server.",
+            "woocommerceTitle": "Plugin WooCommerce",
+            "woocommerceBody": "Pagamento in Bitcoin per il tuo negozio online."
+        },
         "resumeFailed": "Qualcosa è andato storto durante la ripresa della migrazione. Ricominciala da capo.",
         "migrationRequiredBody": "È ora di migrare il tuo account custodiale verso un account non custodiale.",
         "migrationRequiredForcedBody": "È ora di migrare il tuo account custodiale verso un account non custodiale. È obbligatorio per motivi normativi.\n\nNon preoccuparti, il non-custodial sarà migliore per te nel lungo periodo.",
@@ -3785,6 +3805,10 @@
         "explainerCheck5": "Verrà addebitata una commissione di rete Spark sul tuo account",
         "explainerCta": "Ho capito",
         "transferringFunds": "Trasferimento dei tuoi fondi in corso. Dovrebbe completarsi in pochi secondi.",
+        "transferDelayed": {
+            "body": "I tuoi fondi sono in viaggio verso il tuo nuovo conto. Sta richiedendo più tempo del solito — tieni l'app aperta e completeremo automaticamente.",
+            "contactSupportCta": "Contatta l'assistenza"
+        },
         "clockOutOfSync": {
             "body": "La data e l'ora del tuo dispositivo non sono sincronizzate. Impostale su automatico per continuare.",
             "retryCta": "Riprova"
@@ -3816,6 +3840,7 @@
         "phraseSubtitleStep2": "Inserisci il resto della tua frase di backup",
         "nextWords": "Prossime 6 parole",
         "paste": "Incolla",
+        "pasteFailed": "Impossibile leggere dagli appunti. Inserisci manualmente la tua frase di backup.",
         "enterWord": "Parola",
         "invalidMnemonic": "Frase di backup non valida. Verifica che l'ordine delle parole sia corretto.",
         "restoring": "Ripristino del portafoglio...",
@@ -3827,7 +3852,9 @@
         "enterPassword": "Inserisci la password di crittografia",
         "wrongPassword": "Password errata. Riprova.",
         "pickBackupTitle": "Scegli un portafoglio",
-        "pickBackupDescription": "Seleziona un backup da ripristinare"
+        "pickBackupDescription": "Seleziona un backup da ripristinare",
+        "recognizePhraseTitle": "Riconosci questa frase di backup?",
+        "recognizePhraseBody": "Non inserire mai parole che ti ha inviato qualcun altro."
     },
     "BackupNudge": {
         "title": "I tuoi fondi sono a rischio",

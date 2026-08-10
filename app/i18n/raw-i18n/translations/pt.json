@@ -2110,6 +2110,7 @@
         "error": "Oops. Algo deu errado ao obter sua localização."
     },
     "HomeScreen": {
+        "pendingReceiveBadge": "+{amount: string} pendente",
         "receive": "Receber",
         "send": "Enviar",
         "title": "Página Inicial",
@@ -3662,7 +3663,8 @@
                 "savedConfirm": "Já salvei",
                 "copy": "Copiar",
                 "continueButton": "Continuar",
-                "testBackup": "Teste seu backup"
+                "testBackup": "Teste seu backup",
+                "doNotShareWarning": "Não mostre isto a ninguém, incluindo o suporte"
             },
             "Confirm": {
                 "headerTitle": "Confirmar frase de backup",
@@ -3709,6 +3711,11 @@
         "contactSupport": {
             "title": "Contate o suporte",
             "body": "Algo deu errado, mas não se preocupe, seus fundos estão seguros. Entre em contato com o suporte para obter assistência.\n\nVocê pode precisar destas informações para ajudar o suporte a resolver o seu caso:",
+            "selfHelp": {
+                "title": "Vamos tentar de novo",
+                "body": "Não se preocupe — seus fundos estão seguros. A migração pode levar alguns minutos, e às vezes uma etapa só precisa recomeçar.\n\nComece a migração de novo — leva só um instante.\n\nAinda está vendo esta tela? Entre em contato com o suporte e compartilhe os dados abaixo:",
+                "contactSupportCta": "Contate o suporte"
+            },
             "reasonLabel": "Motivo",
             "accountIdLabel": "ID da conta",
             "pubKeyLabel": "pubKey",
@@ -3765,10 +3772,23 @@
         "downloadHistoryTitle": "Baixe seu histórico de transações",
         "downloadHistoryBody": "Sua nova conta começará do zero. Se você quiser manter um registro das suas transações, baixe-as agora como CSV.",
         "downloadHistoryDownloadCta": "Baixar",
-        "apiServiceTitle": "Serviço de API indisponível",
-        "apiServiceBody": "Notamos que você tem chaves de API ativas. A Blink não pode fornecer a API no modo não custodial.\n\nSe você depende da API da Blink, entre em contato conosco o quanto antes e faremos o possível para ajudar em uma transição tranquila.",
+        "apiServiceTitle": "Sobre suas chaves de API",
+        "apiServiceBody": "Sua conta tem chaves de API ativas. A API não estará disponível depois que você migrar para o modo não custodial.\n\nA Blink tem aplicativos não custodiais que substituem a maioria das funções da API, exceto o envio. Você os encontra no menu Configurações.\n\nSe você usa a API para enviar, infelizmente isso não será mais possível.",
         "apiServiceContactCta": "Fale conosco",
-        "apiServiceContinueCta": "Continuar mesmo assim",
+        "apiServiceContinueCta": "Continuar a migração",
+        "merchantTools": {
+            "title": "Pensamos em tudo",
+            "body": "Todas as ferramentas para pagamentos recebidos continuam funcionando. Basta adicionar seu endereço Lightning.",
+            "cta": "Entendi",
+            "terminalTitle": "Blink Terminal",
+            "terminalBody": "Um ponto de venda em qualquer navegador.",
+            "donationTitle": "Botão Doar",
+            "donationBody": "Aceite doações em qualquer site.",
+            "btcpayTitle": "Plugin BTCPay",
+            "btcpayBody": "Pagamentos Lightning no seu BTCPay Server.",
+            "woocommerceTitle": "Plugin WooCommerce",
+            "woocommerceBody": "Checkout em Bitcoin para sua loja online."
+        },
         "resumeFailed": "Algo deu errado ao retomar a sua migração. Por favor, comece novamente.",
         "migrationRequiredBody": "É hora de migrar a sua conta custodial para uma conta não custodial.",
         "migrationRequiredForcedBody": "É hora de migrar a sua conta custodial para uma conta não custodial. É obrigatório por motivos regulatórios.\n\nNão se preocupe, a modalidade não custodial será melhor para você a longo prazo.",
@@ -3785,6 +3805,10 @@
         "explainerCheck5": "Uma taxa de rede Spark será descontada da sua conta",
         "explainerCta": "Entendi",
         "transferringFunds": "Transferindo seus fundos. Deve ser concluído em poucos segundos.",
+        "transferDelayed": {
+            "body": "Seus fundos estão a caminho da sua nova conta. Está demorando mais que o normal — mantenha o aplicativo aberto e concluiremos automaticamente.",
+            "contactSupportCta": "Falar com o suporte"
+        },
         "clockOutOfSync": {
             "body": "A data e a hora do teu dispositivo estão dessincronizadas. Define-as como automáticas para continuar.",
             "retryCta": "Tentar novamente"
@@ -3816,6 +3840,7 @@
         "phraseSubtitleStep2": "Digite o restante da sua frase de backup",
         "nextWords": "Próximas 6 palavras",
         "paste": "Colar",
+        "pasteFailed": "Não foi possível ler da área de transferência. Digite sua frase de backup manualmente.",
         "enterWord": "Palavra",
         "invalidMnemonic": "Frase de backup inválida. Verifique se a ordem das palavras está correta.",
         "restoring": "Restaurando sua carteira...",
@@ -3827,7 +3852,9 @@
         "enterPassword": "Digite sua senha de criptografia",
         "wrongPassword": "Senha incorreta. Tente novamente.",
         "pickBackupTitle": "Escolha uma carteira",
-        "pickBackupDescription": "Selecione um backup para restaurar"
+        "pickBackupDescription": "Selecione um backup para restaurar",
+        "recognizePhraseTitle": "Você reconhece esta frase de backup?",
+        "recognizePhraseBody": "Nunca insira palavras que outra pessoa lhe enviou."
     },
     "BackupNudge": {
         "title": "Seus fundos estão em risco",

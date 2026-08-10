@@ -1,5 +1,5 @@
 import React, { createRef } from "react"
-import { TextInput } from "react-native"
+import { StyleSheet, TextInput } from "react-native"
 import { render, fireEvent } from "@testing-library/react-native"
 
 import {
@@ -55,13 +55,15 @@ describe("MnemonicWordInput", () => {
       <MnemonicWordInput {...defaultProps} index={2} value="alpha" />,
     )
 
-    expect(getByText("3.")).toBeTruthy()
+    const wordNumber = getByText("3.")
+    expect(StyleSheet.flatten(wordNumber.props.style).opacity).toBeUndefined()
   })
 
-  it("does not show word number when value is empty", () => {
-    const { queryByText } = render(<MnemonicWordInput {...defaultProps} index={0} />)
+  it("keeps word number mounted but hidden when value is empty", () => {
+    const { getByText } = render(<MnemonicWordInput {...defaultProps} index={0} />)
 
-    expect(queryByText("1.")).toBeNull()
+    const wordNumber = getByText("1.")
+    expect(StyleSheet.flatten(wordNumber.props.style).opacity).toBe(0)
   })
 
   it("calls onChangeText when text changes", () => {

@@ -29,7 +29,10 @@ import com.galoyapp.R
 
 @RunWith(RobolectricTestRunner::class)
 @Config(
-    application = TestApplication::class
+    application = TestApplication::class,
+    // Robolectric needs Java 21 to emulate SDK 36 (the default from targetSdk),
+    // but the RN Gradle plugin pins the test toolchain to Java 17.
+    sdk = [35]
 )
 class BitcoinPriceWidgetTest {
     private var context: Context? = null

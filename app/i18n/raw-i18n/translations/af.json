@@ -2110,6 +2110,7 @@
     "error": "Oeps. Iets het verkeerd gegaan terwyl jou ligging bepaal is"
   },
   "HomeScreen": {
+    "pendingReceiveBadge": "+{amount: string} hangend",
     "receive": "Ontvang",
     "send": "Stuur",
     "title": "Tuis",
@@ -3662,7 +3663,8 @@
         "savedConfirm": "Ek het dit gestoor",
         "copy": "Kopieer",
         "continueButton": "Gaan voort",
-        "testBackup": "Toets jou rugsteun"
+        "testBackup": "Toets jou rugsteun",
+        "doNotShareWarning": "Moenie dit vir enigiemand wys nie, ook nie ondersteuning nie"
       },
       "Confirm": {
         "headerTitle": "Bevestig rugsteunfrase",
@@ -3709,6 +3711,11 @@
     "contactSupport": {
       "title": "Kontak ondersteuning",
       "body": "Iets het verkeerd geloop, maar moenie bekommerd wees nie, jou fondse is veilig. Kontak asseblief ondersteuning vir hulp.\n\nJy mag dalk hierdie inligting nodig hê om ondersteuning te help om jou saak op te los:",
+      "selfHelp": {
+        "title": "Kom ons probeer weer",
+        "body": "Moenie bekommerd wees nie — jou fondse is veilig. Migrasie kan 'n paar minute neem, en soms het 'n stap net 'n vars begin nodig.\n\nBegin die migrasie oor — dit neem net 'n oomblik.\n\nSien jy hierdie skerm steeds? Kontak ondersteuning en deel die besonderhede hieronder:",
+        "contactSupportCta": "Kontak ondersteuning"
+      },
       "reasonLabel": "Rede",
       "accountIdLabel": "Rekening-ID",
       "pubKeyLabel": "pubKey",
@@ -3765,10 +3772,23 @@
     "downloadHistoryTitle": "Laai jou transaksiegeskiedenis af",
     "downloadHistoryBody": "Jou nuwe rekening begin vars. As jy 'n rekord van jou transaksies wil hou, laai dit nou as CSV af.",
     "downloadHistoryDownloadCta": "Laai af",
-    "apiServiceTitle": "API-diens nie beskikbaar nie",
-    "apiServiceBody": "Ons let op dat jy aktiewe API-sleutels het. Blink kan nie die API in nie-bewaarende modus verskaf nie.\n\nAs jy van Blink se API afhanklik is, kontak ons gou en ons sal ons bes doen om 'n gladde oorgang te help.",
+    "apiServiceTitle": "Oor jou API-sleutels",
+    "apiServiceBody": "Jou rekening het aktiewe API-sleutels. Die API sal nie beskikbaar wees nadat jy na nie-bewaarend oorskakel nie.\n\nBlink het nie-bewaarende programme wat die meeste funksies van die API vervang, behalwe stuur. Jy sal hulle in die Verstellings-kieslys vind.\n\nAs jy die API gebruik om te stuur, sal dit ongelukkig nie meer moontlik wees nie.",
     "apiServiceContactCta": "Kontak ons",
-    "apiServiceContinueCta": "Gaan tog voort",
+    "apiServiceContinueCta": "Gaan voort met die migrasie",
+    "merchantTools": {
+      "title": "Ons het aan alles gedink",
+      "body": "Alle gereedskap vir inkomende betalings werk steeds. Voeg net jou Lightning-adres by.",
+      "cta": "Ek het dit",
+      "terminalTitle": "Blink Terminal",
+      "terminalBody": "'n Verkooppunt in enige blaaier.",
+      "donationTitle": "Skenk-knoppie",
+      "donationBody": "Aanvaar skenkings op enige webwerf.",
+      "btcpayTitle": "BTCPay-inprop",
+      "btcpayBody": "Lightning-betalings op jou BTCPay Server.",
+      "woocommerceTitle": "WooCommerce-inprop",
+      "woocommerceBody": "Bitcoin-afhandeling vir jou aanlynwinkel."
+    },
     "resumeFailed": "Iets het verkeerd geloop met die hervatting van jou migrasie. Begin dit asseblief weer.",
     "migrationRequiredBody": "Dit is tyd om jou bewaarrekening na 'n nie-bewaarrekening te migreer.",
     "migrationRequiredForcedBody": "Dit is tyd om jou bewaarrekening na 'n nie-bewaarrekening te migreer. Dit word om regulatoriese redes vereis.\n\nGeen rede tot kommer nie, nie-bewaring sal op die lange duur beter vir jou wees.",
@@ -3785,6 +3805,10 @@
     "explainerCheck5": "Jou rekening sal met 'n Spark-netwerkfooi belas word",
     "explainerCta": "Ek verstaan",
     "transferringFunds": "Jou fondse word oorgedra. Dit behoort binne 'n paar sekondes klaar te wees.",
+    "transferDelayed": {
+      "body": "Jou fondse is op pad na jou nuwe rekening. Dit neem langer as gewoonlik — hou die app oop en ons handel dit outomaties af.",
+      "contactSupportCta": "Kontak ondersteuning"
+    },
     "clockOutOfSync": {
       "body": "Die datum en tyd van jou toestel is nie in sinkronisasie nie. Stel dit op outomaties om voort te gaan.",
       "retryCta": "Probeer weer"
@@ -3816,6 +3840,7 @@
     "phraseSubtitleStep2": "Voer die res van jou rugsteunfrase in",
     "nextWords": "Volgende 6 woorde",
     "paste": "Plak",
+    "pasteFailed": "Kon nie van die knipbord lees nie. Voer asseblief jou rugsteunfrase met die hand in.",
     "enterWord": "Woord",
     "invalidMnemonic": "Ongeldige rugsteunfrase. Kontroleer asseblief of die woordvolgorde reg is.",
     "restoring": "Jou beursie word herstel...",
@@ -3827,7 +3852,9 @@
     "enterPassword": "Voer jou enkripsierwagwoord in",
     "wrongPassword": "Verkeerde wagwoord. Probeer asseblief weer.",
     "pickBackupTitle": "Kies 'n beursie",
-    "pickBackupDescription": "Kies 'n rugsteun om te herstel"
+    "pickBackupDescription": "Kies 'n rugsteun om te herstel",
+    "recognizePhraseTitle": "Herken jy hierdie rugsteunfrase?",
+    "recognizePhraseBody": "Moet nooit woorde invoer wat iemand anders aan jou gestuur het nie."
   },
   "BackupNudge": {
     "title": "Jou fondse is in gevaar",

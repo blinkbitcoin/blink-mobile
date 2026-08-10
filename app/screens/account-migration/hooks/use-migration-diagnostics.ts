@@ -7,9 +7,6 @@ import { useMigrationSupportDetails } from "./use-migration-support-details"
 export type MigrationDiagnostic = {
   label: string
   value: string
-  /** Identifiers are long hashes shown in the larger value font; the support screen renders
-   *  them complete, never truncated, so support gets the whole string. */
-  isIdentifier: boolean
 }
 
 /**
@@ -26,11 +23,11 @@ export const useMigrationDiagnostics = (): readonly MigrationDiagnostic[] => {
   return useMemo(
     () =>
       [
-        { label: LLSupport.accountIdLabel(), value: accountId, isIdentifier: true },
-        { label: LLSupport.pubKeyLabel(), value: pubKey, isIdentifier: true },
-        { label: LLSupport.usernameLabel(), value: username, isIdentifier: false },
-        { label: LLSupport.emailLabel(), value: email, isIdentifier: false },
-        { label: LLSupport.phoneLabel(), value: phone, isIdentifier: false },
+        { label: LLSupport.accountIdLabel(), value: accountId },
+        { label: LLSupport.pubKeyLabel(), value: pubKey },
+        { label: LLSupport.usernameLabel(), value: username },
+        { label: LLSupport.emailLabel(), value: email },
+        { label: LLSupport.phoneLabel(), value: phone },
       ].filter((diagnostic) => Boolean(diagnostic.value)),
     [LLSupport, accountId, pubKey, username, email, phone],
   )

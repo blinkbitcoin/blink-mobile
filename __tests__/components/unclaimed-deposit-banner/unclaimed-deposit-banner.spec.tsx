@@ -1,5 +1,5 @@
 import React from "react"
-import { fireEvent, render, waitFor } from "@testing-library/react-native"
+import { fireEvent, render } from "@testing-library/react-native"
 import { ThemeProvider } from "@rn-vui/themed"
 
 import theme from "@app/rne-theme/theme"
@@ -8,24 +8,9 @@ import { DepositStatus, type PendingDeposit } from "@app/types/payment"
 import { WalletCurrency } from "@app/graphql/generated"
 
 const mockNavigate = jest.fn()
-const mockListPendingDeposits = jest.fn()
-let mockWallets: unknown[] = []
-let mockListPendingDepositsImpl: typeof mockListPendingDeposits | undefined =
-  mockListPendingDeposits
 
 jest.mock("@react-navigation/native", () => ({
   useNavigation: () => ({ navigate: mockNavigate }),
-  useFocusEffect: (cb: () => void) => {
-    cb()
-  },
-}))
-
-jest.mock("@app/hooks/use-payments", () => ({
-  usePayments: () => ({ listPendingDeposits: mockListPendingDepositsImpl }),
-}))
-
-jest.mock("@app/self-custodial/providers/wallet", () => ({
-  useSelfCustodialWallet: () => ({ wallets: mockWallets }),
 }))
 
 jest.mock("@app/i18n/i18n-react", () => ({
@@ -49,86 +34,98 @@ const buildDeposit = (overrides: Partial<PendingDeposit> = {}): PendingDeposit =
   ...overrides,
 })
 
-const renderBanner = () =>
+const renderBanner = (deposits: PendingDeposit[] = []) =>
   render(
     <ThemeProvider theme={theme}>
-      <UnclaimedDepositBanner />
+      <UnclaimedDepositBanner deposits={deposits} />
     </ThemeProvider>,
   )
 
 describe("UnclaimedDepositBanner", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockWallets = []
-    mockListPendingDepositsImpl = mockListPendingDeposits
-    mockListPendingDeposits.mockResolvedValue({ deposits: [] })
   })
 
-  it("renders nothing when there are no pending deposits", async () => {
+  it("renders nothing when there are no pending deposits", () => {
     const { queryByTestId } = renderBanner()
-
-    await waitFor(() => expect(mockListPendingDeposits).toHaveBeenCalled())
 
     expect(queryByTestId("unclaimed-deposit-banner")).toBeNull()
   })
 
-  it("renders count and total sats when deposits are pending", async () => {
-    mockListPendingDeposits.mockResolvedValue({
-      deposits: [
-        buildDeposit({
-          id: "1",
-          amount: { amount: 1000, currency: WalletCurrency.Btc, currencyCode: "BTC" },
-        }),
-        buildDeposit({
-          id: "2",
-          amount: { amount: 2500, currency: WalletCurrency.Btc, currencyCode: "BTC" },
-        }),
-      ],
-    })
+  it("renders count and total sats when deposits are pending", () => {
+    const { getByText } = renderBanner([
+      buildDeposit({
+        id: "1",
+        amount: { amount: 1000, currency: WalletCurrency.Btc, currencyCode: "BTC" },
+      }),
+      buildDeposit({
+        id: "2",
+        amount: { amount: 2500, currency: WalletCurrency.Btc, currencyCode: "BTC" },
+      }),
+    ])
 
-    const { findByText } = renderBanner()
-
-    expect(await findByText("2 pending")).toBeTruthy()
-    expect(await findByText("3500 sats")).toBeTruthy()
+    expect(getByText("2 pending")).toBeTruthy()
+    expect(getByText("3500 sats")).toBeTruthy()
   })
 
-  it("filters out refunded deposits from the count and total", async () => {
-    mockListPendingDeposits.mockResolvedValue({
-      deposits: [
-        buildDeposit({ id: "1", status: DepositStatus.Claimable }),
-        buildDeposit({
-          id: "2",
-          status: DepositStatus.Refunded,
-          amount: { amount: 9999, currency: WalletCurrency.Btc, currencyCode: "BTC" },
-        }),
-      ],
-    })
+  it("filters out refunded deposits from the count and total", () => {
+    const { getByText } = renderBanner([
+      buildDeposit({ id: "1", status: DepositStatus.Claimable }),
+      buildDeposit({
+        id: "2",
+        status: DepositStatus.Refunded,
+        amount: { amount: 9999, currency: WalletCurrency.Btc, currencyCode: "BTC" },
+      }),
+    ])
 
-    const { findByText } = renderBanner()
-
-    expect(await findByText("1 pending")).toBeTruthy()
-    expect(await findByText("1000 sats")).toBeTruthy()
+    expect(getByText("1 pending")).toBeTruthy()
+    expect(getByText("1000 sats")).toBeTruthy()
   })
 
-  it("navigates to the unclaimed-deposits screen on press", async () => {
-    mockListPendingDeposits.mockResolvedValue({
-      deposits: [buildDeposit()],
-    })
+  it("renders nothing when every deposit is refunded", () => {
+    const { queryByTestId } = renderBanner([
+      buildDeposit({ id: "1", status: DepositStatus.Refunded }),
+    ])
 
-    const { findByTestId } = renderBanner()
-    const banner = await findByTestId("unclaimed-deposit-banner")
+    expect(queryByTestId("unclaimed-deposit-banner")).toBeNull()
+  })
 
-    fireEvent.press(banner)
+  it("excludes immature deposits — the balance pill owns them until they confirm", () => {
+    const { getByText } = renderBanner([
+      buildDeposit({ id: "1", status: DepositStatus.Claimable }),
+      buildDeposit({
+        id: "2",
+        status: DepositStatus.Immature,
+        amount: { amount: 7777, currency: WalletCurrency.Btc, currencyCode: "BTC" },
+      }),
+    ])
+
+    expect(getByText("1 pending")).toBeTruthy()
+    expect(getByText("1000 sats")).toBeTruthy()
+  })
+
+  it("renders nothing when every deposit is immature", () => {
+    const { queryByTestId } = renderBanner([
+      buildDeposit({ id: "1", status: DepositStatus.Immature }),
+    ])
+
+    expect(queryByTestId("unclaimed-deposit-banner")).toBeNull()
+  })
+
+  it("still counts fee-exceeded and errored deposits", () => {
+    const { getByText } = renderBanner([
+      buildDeposit({ id: "1", status: DepositStatus.FeeExceeded }),
+      buildDeposit({ id: "2", status: DepositStatus.Error }),
+    ])
+
+    expect(getByText("2 pending")).toBeTruthy()
+  })
+
+  it("navigates to the unclaimed-deposits screen on press", () => {
+    const { getByTestId } = renderBanner([buildDeposit()])
+
+    fireEvent.press(getByTestId("unclaimed-deposit-banner"))
 
     expect(mockNavigate).toHaveBeenCalledWith("unclaimedDepositsScreen")
-  })
-
-  it("does nothing when listPendingDeposits is undefined (custodial / loading)", () => {
-    mockListPendingDepositsImpl = undefined
-
-    const { queryByTestId } = renderBanner()
-
-    expect(queryByTestId("unclaimed-deposit-banner")).toBeNull()
-    expect(mockListPendingDeposits).not.toHaveBeenCalled()
   })
 })

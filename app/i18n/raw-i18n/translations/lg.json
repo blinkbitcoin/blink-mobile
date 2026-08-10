@@ -2110,6 +2110,7 @@
     "error": "Oops. Waliwo ekyatambude bulungi kukufuna ekifo kyo"
   },
   "HomeScreen": {
+    "pendingReceiveBadge": "+{amount: string} tekinagwa",
     "receive": "Funa",
     "send": "Sindika",
     "title": "Ewaka",
@@ -3662,7 +3663,8 @@
         "savedConfirm": "Nkitereka",
         "copy": "Koppa",
         "continueButton": "Weyongerawo",
-        "testBackup": "Gezza okukuumako"
+        "testBackup": "Gezza okukuumako",
+        "doNotShareWarning": "Tokiraga muntu yenna, n'abawagizi ba support"
       },
       "Confirm": {
         "headerTitle": "Kakasa ekigambo eky'okukoppa",
@@ -3709,6 +3711,11 @@
     "contactSupport": {
       "title": "Tuukirire ab'obuyambi",
       "body": "Waliwo ekitagenze bulungi, naye tofaayo, ssente zo nnywevu. Tuukirira ab'obuyambi bakuyambe.\n\nOyinza okwetaaga ebikwata ku bino okuyamba ab'obuyambi okugonjoola ensonga yo:",
+      "selfHelp": {
+        "title": "Ka tuddemu tugezeeko",
+        "body": "Tofaayo — ssente zo nnywevu. Okukyusa kuyinza okutwala eddakiika ntono, era oluusi omutendera gwetaaga butaaga kuddamu kutandika.\n\nTandika okukyusa okuva ku ntandikwa — kutwala akaseera katono.\n\nOkyalaba oluggya luno? Tuukirira ab'obuyambi obawe ebikwata wammanga:",
+        "contactSupportCta": "Tuukirire ab'obuyambi"
+      },
       "reasonLabel": "Ensonga",
       "accountIdLabel": "ID ya akawunti",
       "pubKeyLabel": "pubKey",
@@ -3765,10 +3772,23 @@
     "downloadHistoryTitle": "Sika ebyafaayo by'ensimbi zo",
     "downloadHistoryBody": "Akaawunti yo empya ejja kutandika bupya. Bw'oba oyagala okukuuma ebiwandiiko by'ensimbi zo, bisike kati nga CSV.",
     "downloadHistoryDownloadCta": "Sika",
-    "apiServiceTitle": "Empeereza ya API tekolawo",
-    "apiServiceBody": "Tulaba nti olina ebisumuluzo bya API ebikola. Blink tesobola kuwa API mu ngeri ya non-custodial.\n\nBw'oba weesigamye ku API ya Blink, tukwatagane naffe amangu era tujja kukola kyonna ekisoboka okuyamba mu nkyukakyuka enteefu.",
+    "apiServiceTitle": "Ku bisumuluzo byo ebya API",
+    "apiServiceBody": "Akawunti yo erina ebisumuluzo bya API ebikola. API tejja kubeerawo ng'omaze okudda mu non-custodial.\n\nBlink erina puloguramu za non-custodial eziddira mu kifo kya bingi ku bikolwa bya API, okuggyako okusindika. Ojja kuzisanga mu menu ya Ensengeka.\n\nBw'oba okozesa API okusindika, eky'ennaku kino tekijja kuddamu kusoboka.",
     "apiServiceContactCta": "Tukwatagane naffe",
-    "apiServiceContinueCta": "Weeyongereyo wadde kiri kityo",
+    "apiServiceContinueCta": "Weeyongere n'enkyukakyuka",
+    "merchantTools": {
+      "title": "Twalowooza ku byonna",
+      "body": "Ebikozesebwa byonna eby'okufuna ssente bikyakola. Yongerako bukyakala endagiriro yo eya Lightning.",
+      "cta": "Ntegedde",
+      "terminalTitle": "Blink Terminal",
+      "terminalBody": "Ekifo we batunda mu buli bbulawuza.",
+      "donationTitle": "Bbatani y'okuwaayo",
+      "donationBody": "Kkiriza ebiweebwayo ku buli mukutu.",
+      "btcpayTitle": "Puragini ya BTCPay",
+      "btcpayBody": "Okusasula kwa Lightning ku BTCPay Server yo.",
+      "woocommerceTitle": "Puragini ya WooCommerce",
+      "woocommerceBody": "Okusasula na Bitcoin mu dduuka lyo erya ku mukutu."
+    },
     "resumeFailed": "Waliwo ekitagenze bulungi nga tuddamu okukyusa kwo. Bambi ddamu okitandike.",
     "migrationRequiredBody": "Kiseera ky'okujja akawunti yo ekuumibwa ogigirre mu akawunti etakuumibwa.",
     "migrationRequiredForcedBody": "Kiseera ky'okujja akawunti yo ekuumibwa ogigirre mu akawunti etakuumibwa. Kyetaagisa olw'ensonga z'amateeka.\n\nTeweeraliikirira, non-custodial ejja kuba nnungi gy'oli mu kiseera ekiwanvu.",
@@ -3785,6 +3805,10 @@
     "explainerCheck5": "Ku kawunti yo kujja kusalibwako ssente z'omukutu gwa Spark",
     "explainerCta": "Ntegedde",
     "transferringFunds": "Tutwala ssente zo. Kijja kuggwa mu sikonda ntono.",
+    "transferDelayed": {
+      "body": "Ssente zo ziri mu kkubo okutuuka ku akaawunti yo empya. Kino kitwala ebbanga okusinga bulijjo — leka app ng'eggule, tujja kukimaliriza kyokka.",
+      "contactSupportCta": "Tuukirira abayambi"
+    },
     "clockOutOfSync": {
       "body": "Ennaku n'obudde bw'ekyuma kyo tebituukagana. Bisseeko ku otomatiki osobole okweyongerayo.",
       "retryCta": "Ddamu ogezaako"
@@ -3816,6 +3840,7 @@
     "phraseSubtitleStep2": "Yingiza ebigambo ebikyasigaddewo",
     "nextWords": "Ebigambo 6 ebiddako",
     "paste": "Teeka",
+    "pasteFailed": "Tetusobodde kusoma ku lutimbe. Bambi yingiza ekigambo kyo eky'okukuuma ggwe kennyini.",
     "enterWord": "Ekigambo",
     "invalidMnemonic": "Ebigambo by'enkalakkalira tebituufu. Kakasa nti omulongo gw'ebigambo gwa kituufu.",
     "restoring": "Ezzaawo wallet yo...",
@@ -3827,7 +3852,9 @@
     "enterPassword": "Yingiza password yo ey'okusiba",
     "wrongPassword": "Password si ntuufu. Gezaako nate.",
     "pickBackupTitle": "Londa wallet",
-    "pickBackupDescription": "Londa kopiyo y'okuzzaawo"
+    "pickBackupDescription": "Londa kopiyo y'okuzzaawo",
+    "recognizePhraseTitle": "Omanyi ebigambo bino eby'okukuuma?",
+    "recognizePhraseBody": "Toteekangamu bigambo omuntu omulala by'akuweereza."
   },
   "BackupNudge": {
     "title": "Ssente zo ziri mu bulabe",

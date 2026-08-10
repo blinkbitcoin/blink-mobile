@@ -2110,6 +2110,7 @@
     "error": "Owu. Kukho into engahambanga kakuhle ngelixa sifumana indawo yakho"
   },
   "HomeScreen": {
+    "pendingReceiveBadge": "+{amount: string} pending",
     "receive": "Yamkela",
     "send": "Thumela",
     "title": "Ekhaya",
@@ -3662,7 +3663,8 @@
         "savedConfirm": "Ndigcinile",
         "copy": "Kopa",
         "continueButton": "Qhubeka",
-        "testBackup": "Vavanya ugcino lwakho"
+        "testBackup": "Vavanya ugcino lwakho",
+        "doNotShareWarning": "Musa ukuyibonisa nakubani na, kuquka nenkxaso"
       },
       "Confirm": {
         "headerTitle": "Qinisekisa ibinzana lokugcina",
@@ -3709,6 +3711,11 @@
     "contactSupport": {
       "title": "Qhagamshelana nenkxaso",
       "body": "Kukho into engahambanga kakuhle, kodwa ungakhathazeki, imali yakho ikhuselekile. Nceda uqhagamshelane nenkxaso ukuze ufumane uncedo.\n\nUsenokufuna olu lwazi ukunceda inkxaso isombulule ityala lakho:",
+      "selfHelp": {
+        "title": "Masizame kwakhona",
+        "body": "Ungakhathazeki — imali yakho ikhuselekile. Ufuduko lunokuthatha imizuzu embalwa, kwaye ngamanye amaxesha inyathelo lifuna nje ukuqala kwakhona.\n\nQala ufuduko kwakhona — kuthatha umzuzwana nje.\n\nUsayibona esi sikrini? Qhagamshelana nenkxaso wabelane ngeenkcukacha ezingezantsi:",
+        "contactSupportCta": "Qhagamshelana nenkxaso"
+      },
       "reasonLabel": "Isizathu",
       "accountIdLabel": "I-ID yeakhawunti",
       "pubKeyLabel": "pubKey",
@@ -3765,10 +3772,23 @@
     "downloadHistoryTitle": "Khuphela imbali yezenzo zakho zemali",
     "downloadHistoryBody": "I-akhawunti yakho entsha iza kuqala kwakhona. Ukuba ufuna ukugcina irekhodi lezenzo zakho zemali, zikhuphele ngoku njenge-CSV.",
     "downloadHistoryDownloadCta": "Khuphela",
-    "apiServiceTitle": "Inkonzo ye-API ayifumaneki",
-    "apiServiceBody": "Siyaqaphela ukuba unezitshixo ze-API ezisebenzayo. I-Blink ayikwazi ukubonelela nge-API kwimo ye-non-custodial.\n\nUkuba uxhomekeke kwi-API ye-Blink, qhagamshelana nathi ngokukhawuleza kwaye siya kwenza konke okusemandleni ukunceda utshintsho olugudileyo.",
+    "apiServiceTitle": "Malunga nezitshixo zakho ze-API",
+    "apiServiceBody": "Iakhawunti yakho inezitshixo ze-API ezisebenzayo. I-API ayisayi kufumaneka emva kokuba utshintshele kwi-non-custodial.\n\nI-Blink ineeaplikeshini ze-non-custodial ezithatha indawo yezona zinto zininzi ze-API, ngaphandle kokuthumela. Uya kuzifumana kwimenyu yeeSetingi.\n\nUkuba usebenzisa i-API ukuthumela, ngelishwa oko akusayi kuphinda kwenzeke.",
     "apiServiceContactCta": "Qhagamshelana nathi",
-    "apiServiceContinueCta": "Qhubeka nokuba kunjalo",
+    "apiServiceContinueCta": "Qhubeka nokufuduka",
+    "merchantTools": {
+      "title": "Sikulungiselele konke",
+      "body": "Zonke izixhobo zeentlawulo ezingenayo ziyaqhubeka zisebenza. Yongeza nje idilesi yakho ye-Lightning.",
+      "cta": "Ndiyaqonda",
+      "terminalTitle": "Blink Terminal",
+      "terminalBody": "Indawo yokuthengisa kuyo nayiphi na ibhrawuza.",
+      "donationTitle": "Iqhosha lomnikelo",
+      "donationBody": "Yamkela iminikelo kuyo nayiphi na iwebhusayithi.",
+      "btcpayTitle": "Isongezo se-BTCPay",
+      "btcpayBody": "Iintlawulo ze-Lightning kwi-BTCPay Server yakho.",
+      "woocommerceTitle": "Isongezo se-WooCommerce",
+      "woocommerceBody": "Ukuhlawula ngeBitcoin kwivenkile yakho ye-intanethi."
+    },
     "resumeFailed": "Kukho into engahambanga kakuhle ekuqhubekeni nofuduko lwakho. Nceda uqale kwakhona.",
     "migrationRequiredBody": "Lixesha lokufudusela iakhawunti yakho egcinwayo kwiakhawunti engagcinwanga.",
     "migrationRequiredForcedBody": "Lixesha lokufudusela iakhawunti yakho egcinwayo kwiakhawunti engagcinwanga. Iyafuneka ngenxa yezizathu zolawulo.\n\nSukukhathazeka, i-non-custodial iya kuba ngcono kuwe kwixesha elide.",
@@ -3785,6 +3805,10 @@
     "explainerCheck5": "I-akhawunti yakho iya kukhutshelwa intlawulo yothungelwano lwe-Spark",
     "explainerCta": "Ndiyaqonda",
     "transferringFunds": "Sidlulisela imali yakho. Kufanele kugqitywe ngomzuzwana nje.",
+    "transferDelayed": {
+      "body": "Imali yakho isendleleni eya kwiakhawunti yakho entsha. Kuthatha ixesha elide kunesiqhelo — gcina i-app ivulekile, siza kugqibezela ngokuzenzekelayo.",
+      "contactSupportCta": "Qhagamshelana nenkxaso"
+    },
     "clockOutOfSync": {
       "body": "Umhla nexesha lesixhobo sakho azihambelani. Zimisele ukuba zizenzekele ukuze uqhubeke.",
       "retryCta": "Zama kwakhona"
@@ -3816,6 +3840,7 @@
     "phraseSubtitleStep2": "Faka amanye amagama omgca wakho wokugcina",
     "nextWords": "Amagama a-6 alandelayo",
     "paste": "Ncamathisela",
+    "pasteFailed": "Ayikwazanga ukufunda kwibhodi eqhotyoshwayo. Nceda ufake umgca wakho wokugcina ngesandla.",
     "enterWord": "Igama",
     "invalidMnemonic": "Ibinzana lokugcina elingachananga. Nceda ujonge ukuba ulandelelwano lwamagama lulungile.",
     "restoring": "Kubuyiselwa isipaji sakho...",
@@ -3827,7 +3852,9 @@
     "enterPassword": "Faka iphasiwedi yakho yokufihla",
     "wrongPassword": "Iphasiwedi engalunganga. Nceda uzame kwakhona.",
     "pickBackupTitle": "Khetha isipaji",
-    "pickBackupDescription": "Khetha ugcino lokubuyisela"
+    "pickBackupDescription": "Khetha ugcino lokubuyisela",
+    "recognizePhraseTitle": "Ngaba uyayazi le binzana yokhuselo?",
+    "recognizePhraseBody": "Ungaze ufake amagama akuthunyelwe ngomnye umntu."
   },
   "BackupNudge": {
     "title": "Imali yakho isengozini",

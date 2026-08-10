@@ -2110,6 +2110,7 @@
         "error": "Ups. Bei der Ermittlung Ihres Standorts ist etwas schief gelaufen"
     },
     "HomeScreen": {
+        "pendingReceiveBadge": "+{amount: string} Ausstehend",
         "receive": "Erhalten",
         "send": "Senden",
         "title": "Home",
@@ -3662,7 +3663,8 @@
                 "savedConfirm": "Ich habe sie gespeichert",
                 "copy": "Kopieren",
                 "continueButton": "Weiter",
-                "testBackup": "Sicherung testen"
+                "testBackup": "Sicherung testen",
+                "doNotShareWarning": "Zeige dies niemandem, auch nicht dem Support"
             },
             "Confirm": {
                 "headerTitle": "Sicherungswörter bestätigen",
@@ -3709,6 +3711,11 @@
         "contactSupport": {
             "title": "Support kontaktieren",
             "body": "Etwas ist schiefgelaufen, aber keine Sorge, dein Guthaben ist sicher. Bitte kontaktiere den Support für Hilfe.\n\nDiese Informationen können dem Support helfen, deinen Fall zu lösen:",
+            "selfHelp": {
+                "title": "Versuchen wir es noch einmal",
+                "body": "Keine Sorge — dein Guthaben ist sicher. Die Migration kann ein paar Minuten dauern, und manchmal braucht ein Schritt einfach einen Neustart.\n\nStarte die Migration noch einmal — das dauert nur einen Moment.\n\nSiehst du diesen Bildschirm immer noch? Kontaktiere den Support und teile die folgenden Daten:",
+                "contactSupportCta": "Support kontaktieren"
+            },
             "reasonLabel": "Grund",
             "accountIdLabel": "Konto-ID",
             "pubKeyLabel": "pubKey",
@@ -3765,10 +3772,23 @@
         "downloadHistoryTitle": "Lade deinen Transaktionsverlauf herunter",
         "downloadHistoryBody": "Dein neues Konto startet neu. Wenn du eine Aufzeichnung deiner Transaktionen behalten möchtest, lade sie jetzt als CSV herunter.",
         "downloadHistoryDownloadCta": "Herunterladen",
-        "apiServiceTitle": "API-Dienst nicht verfügbar",
-        "apiServiceBody": "Uns ist aufgefallen, dass du aktive API-Schlüssel hast. Blink kann die API im Non-Custodial-Modus nicht bereitstellen.\n\nWenn du auf die API von Blink angewiesen bist, kontaktiere uns bitte umgehend, und wir werden unser Bestes für einen reibungslosen Übergang tun.",
+        "apiServiceTitle": "Über deine API-Schlüssel",
+        "apiServiceBody": "Dein Konto hat aktive API-Schlüssel. Nach dem Wechsel zu Non-Custodial ist die API nicht mehr verfügbar.\n\nBlink hat Non-Custodial-Apps, die die meisten Funktionen der API ersetzen, außer dem Senden. Du findest sie im Menü Einstellungen.\n\nWenn du die API zum Senden nutzt, wird das leider nicht mehr möglich sein.",
         "apiServiceContactCta": "Kontaktiere uns",
-        "apiServiceContinueCta": "Trotzdem fortfahren",
+        "apiServiceContinueCta": "Migration fortsetzen",
+        "merchantTools": {
+            "title": "Wir haben an alles gedacht",
+            "body": "Alle Tools für eingehende Zahlungen funktionieren weiter. Füge einfach deine Lightning-Adresse hinzu.",
+            "cta": "Verstanden",
+            "terminalTitle": "Blink Terminal",
+            "terminalBody": "Ein Kassensystem in jedem Browser.",
+            "donationTitle": "Spenden-Button",
+            "donationBody": "Nimm Spenden auf jeder Website an.",
+            "btcpayTitle": "BTCPay-Plugin",
+            "btcpayBody": "Lightning-Zahlungen auf deinem BTCPay Server.",
+            "woocommerceTitle": "WooCommerce-Plugin",
+            "woocommerceBody": "Bitcoin-Checkout für deinen Onlineshop."
+        },
         "resumeFailed": "Beim Fortsetzen deiner Migration ist etwas schiefgelaufen. Bitte starte sie erneut.",
         "migrationRequiredBody": "Es ist Zeit, dein verwahrtes Konto auf ein nicht-verwahrtes Konto zu migrieren.",
         "migrationRequiredForcedBody": "Es ist Zeit, dein verwahrtes Konto auf ein nicht-verwahrtes Konto zu migrieren. Dies ist aus regulatorischen Gründen erforderlich.\n\nKeine Sorge, Non-Custodial wird auf lange Sicht besser für dich sein.",
@@ -3785,6 +3805,10 @@
         "explainerCheck5": "Deinem Konto wird eine Spark-Netzwerkgebühr abgezogen",
         "explainerCta": "Ich verstehe",
         "transferringFunds": "Deine Guthaben werden übertragen. Es sollte in wenigen Sekunden abgeschlossen sein.",
+        "transferDelayed": {
+            "body": "Deine Guthaben sind auf dem Weg zu deinem neuen Konto. Es dauert länger als üblich — lass die App geöffnet, wir schließen es automatisch ab.",
+            "contactSupportCta": "Support kontaktieren"
+        },
         "clockOutOfSync": {
             "body": "Datum und Uhrzeit deines Geräts sind nicht synchron. Stelle sie auf automatisch, um fortzufahren.",
             "retryCta": "Erneut versuchen"
@@ -3816,6 +3840,7 @@
         "phraseSubtitleStep2": "Gib den Rest deiner Sicherungsphrase ein",
         "nextWords": "Nächste 6 Wörter",
         "paste": "Einfügen",
+        "pasteFailed": "Zwischenablage konnte nicht gelesen werden. Bitte gib deine Sicherungsphrase manuell ein.",
         "enterWord": "Wort",
         "invalidMnemonic": "Ungültige Backup-Phrase. Bitte überprüfe, ob die Wortreihenfolge korrekt ist.",
         "restoring": "Wallet wird wiederhergestellt...",
@@ -3827,7 +3852,9 @@
         "enterPassword": "Gib dein Verschlüsselungspasswort ein",
         "wrongPassword": "Falsches Passwort. Bitte versuche es erneut.",
         "pickBackupTitle": "Wallet auswählen",
-        "pickBackupDescription": "Wähle ein Backup zum Wiederherstellen"
+        "pickBackupDescription": "Wähle ein Backup zum Wiederherstellen",
+        "recognizePhraseTitle": "Erkennst du diese Backup-Phrase?",
+        "recognizePhraseBody": "Gib niemals Wörter ein, die dir jemand anderes geschickt hat."
     },
     "BackupNudge": {
         "title": "Ihre Mittel sind gefährdet",

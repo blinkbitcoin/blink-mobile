@@ -146,6 +146,34 @@ describe("useMigrationSupportEmail", () => {
     expect(Linking.openURL).toHaveBeenCalledWith(expectedMailto(expectedBody))
   })
 
+  /** The gate handover's reason is what tells support this is the locked-without-state
+   *  cohort (#4070) — only the code string in the ticket identifies it, so it has to land
+   *  verbatim in both the on-screen details and the email body. */
+  it("carries the gate handover's locked-without-checkpoint reason verbatim", async () => {
+    const { result } = renderHook(
+      () => useMigrationSupportEmail(MigrationSupportReason.LockedWithoutCheckpoint),
+      { wrapper },
+    )
+
+    expect(result.current.cardDetails[0]).toEqual({
+      label: LLSupport.reasonLabel(),
+      value: "locked-without-checkpoint",
+    })
+    expect(result.current.supportDetailsText).toContain(
+      `${LLSupport.reasonLabel()}: locked-without-checkpoint`,
+    )
+
+    await act(async () => {
+      result.current.sendSupportEmail()
+    })
+
+    expect(Linking.openURL).toHaveBeenCalledWith(
+      expect.stringContaining(
+        encodeURIComponent(`${LLSupport.reasonLabel()}: locked-without-checkpoint`),
+      ),
+    )
+  })
+
   /** The reason no longer travels with the account diagnostics, so it has to survive a
    *  device that can supply none of them. */
   it("carries the reason even when every account detail is missing", () => {
@@ -193,12 +221,12 @@ describe("useMigrationSupportEmail", () => {
     )
 
     expect(result.current.cardDetails).toEqual([
-      { label: LLSupport.reasonLabel(), value: "transfer-failed", isIdentifier: false },
-      { label: LLSupport.accountIdLabel(), value: "18A4242", isIdentifier: true },
-      { label: LLSupport.pubKeyLabel(), value: "02abc123pubkey", isIdentifier: true },
-      { label: LLSupport.usernameLabel(), value: "satoshin21", isIdentifier: false },
-      { label: LLSupport.emailLabel(), value: "email@email.com", isIdentifier: false },
-      { label: LLSupport.phoneLabel(), value: "+1 374 9383 993", isIdentifier: false },
+      { label: LLSupport.reasonLabel(), value: "transfer-failed" },
+      { label: LLSupport.accountIdLabel(), value: "18A4242" },
+      { label: LLSupport.pubKeyLabel(), value: "02abc123pubkey" },
+      { label: LLSupport.usernameLabel(), value: "satoshin21" },
+      { label: LLSupport.emailLabel(), value: "email@email.com" },
+      { label: LLSupport.phoneLabel(), value: "+1 374 9383 993" },
     ])
   })
 

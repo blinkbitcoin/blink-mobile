@@ -6538,6 +6538,11 @@ type RootTranslation = {
 	}
 	HomeScreen: {
 		/**
+		 * +​{​a​m​o​u​n​t​}​ ​p​e​n​d​i​n​g
+		 * @param {string} amount
+		 */
+		pendingReceiveBadge: RequiredParams<'amount'>
+		/**
 		 * R​e​c​e​i​v​e
 		 */
 		receive: string
@@ -12271,6 +12276,10 @@ type RootTranslation = {
 				 * T​e​s​t​ ​y​o​u​r​ ​b​a​c​k​u​p
 				 */
 				testBackup: string
+				/**
+				 * D​o​ ​n​o​t​ ​s​h​o​w​ ​t​h​i​s​ ​t​o​ ​a​n​y​o​n​e​,​ ​i​n​c​l​u​d​i​n​g​ ​s​u​p​p​o​r​t
+				 */
+				doNotShareWarning: string
 			}
 			Confirm: {
 				/**
@@ -12347,6 +12356,16 @@ type RootTranslation = {
 		 * T​r​a​n​s​f​e​r​r​i​n​g​ ​y​o​u​r​ ​f​u​n​d​s​.​ ​I​t​ ​s​h​o​u​l​d​ ​b​e​ ​d​o​n​e​ ​i​n​ ​a​ ​f​e​w​ ​s​e​c​o​n​d​s​.
 		 */
 		transferringFunds: string
+		transferDelayed: {
+			/**
+			 * Y​o​u​r​ ​f​u​n​d​s​ ​a​r​e​ ​o​n​ ​t​h​e​i​r​ ​w​a​y​ ​t​o​ ​y​o​u​r​ ​n​e​w​ ​a​c​c​o​u​n​t​.​ ​T​h​i​s​ ​i​s​ ​t​a​k​i​n​g​ ​l​o​n​g​e​r​ ​t​h​a​n​ ​u​s​u​a​l​ ​—​ ​k​e​e​p​ ​t​h​e​ ​a​p​p​ ​o​p​e​n​ ​a​n​d​ ​w​e​'​l​l​ ​f​i​n​i​s​h​ ​u​p​ ​a​u​t​o​m​a​t​i​c​a​l​l​y​.
+			 */
+			body: string
+			/**
+			 * C​o​n​t​a​c​t​ ​s​u​p​p​o​r​t
+			 */
+			contactSupportCta: string
+		}
 		clockOutOfSync: {
 			/**
 			 * Y​o​u​r​ ​d​e​v​i​c​e​'​s​ ​d​a​t​e​ ​a​n​d​ ​t​i​m​e​ ​a​r​e​ ​o​u​t​ ​o​f​ ​s​y​n​c​.​ ​S​e​t​ ​t​h​e​m​ ​t​o​ ​a​u​t​o​m​a​t​i​c​ ​t​o​ ​c​o​n​t​i​n​u​e​.
@@ -12421,13 +12440,15 @@ type RootTranslation = {
 		 */
 		downloadHistoryDownloadCta: string
 		/**
-		 * A​P​I​ ​s​e​r​v​i​c​e​ ​n​o​t​ ​a​v​a​i​l​a​b​l​e
+		 * A​b​o​u​t​ ​y​o​u​r​ ​A​P​I​ ​k​e​y​s
 		 */
 		apiServiceTitle: string
 		/**
-		 * W​e​ ​n​o​t​e​ ​t​h​a​t​ ​y​o​u​ ​h​a​v​e​ ​a​c​t​i​v​e​ ​A​P​I​ ​k​e​y​s​.​ ​B​l​i​n​k​ ​c​a​n​'​t​ ​p​r​o​v​i​d​e​ ​t​h​e​ ​A​P​I​ ​i​n​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​m​o​d​e​.​
+		 * Y​o​u​r​ ​a​c​c​o​u​n​t​ ​h​a​s​ ​a​c​t​i​v​e​ ​A​P​I​ ​k​e​y​s​.​ ​T​h​e​ ​A​P​I​ ​w​o​n​'​t​ ​b​e​ ​a​v​a​i​l​a​b​l​e​ ​a​f​t​e​r​ ​y​o​u​ ​m​o​v​e​ ​t​o​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​.​
 	​
-	​I​f​ ​y​o​u​ ​a​r​e​ ​d​e​p​e​n​d​e​n​t​ ​o​n​ ​B​l​i​n​k​'​s​ ​A​P​I​,​ ​c​o​n​t​a​c​t​ ​u​s​ ​p​r​o​m​p​t​l​y​ ​a​n​d​ ​w​e​ ​w​i​l​l​ ​d​o​ ​o​u​r​ ​b​e​s​t​ ​t​o​ ​a​s​s​i​s​t​ ​a​ ​s​m​o​o​t​h​ ​t​r​a​n​s​i​t​i​o​n​.
+	​B​l​i​n​k​ ​h​a​s​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​p​p​s​ ​t​h​a​t​ ​r​e​p​l​a​c​e​ ​m​o​s​t​ ​f​u​n​c​t​i​o​n​s​ ​o​f​ ​t​h​e​ ​A​P​I​,​ ​e​x​c​e​p​t​ ​s​e​n​d​i​n​g​.​ ​Y​o​u​ ​w​i​l​l​ ​f​i​n​d​ ​t​h​e​m​ ​i​n​ ​t​h​e​ ​S​e​t​t​i​n​g​s​ ​m​e​n​u​.​
+	​
+	​I​f​ ​y​o​u​ ​u​s​e​ ​t​h​e​ ​A​P​I​ ​t​o​ ​s​e​n​d​,​ ​u​n​f​o​r​t​u​n​a​t​e​l​y​ ​i​t​ ​w​i​l​l​ ​n​o​ ​l​o​n​g​e​r​ ​b​e​ ​p​o​s​s​i​b​l​e​.
 		 */
 		apiServiceBody: string
 		/**
@@ -12435,9 +12456,55 @@ type RootTranslation = {
 		 */
 		apiServiceContactCta: string
 		/**
-		 * C​o​n​t​i​n​u​e​ ​a​n​y​w​a​y​s
+		 * C​o​n​t​i​n​u​e​ ​t​h​e​ ​M​i​g​r​a​t​i​o​n
 		 */
 		apiServiceContinueCta: string
+		merchantTools: {
+			/**
+			 * W​e​ ​g​o​t​ ​y​o​u​ ​c​o​v​e​r​e​d
+			 */
+			title: string
+			/**
+			 * A​l​l​ ​t​o​o​l​s​ ​f​o​r​ ​i​n​c​o​m​i​n​g​ ​p​a​y​m​e​n​t​s​ ​k​e​e​p​ ​w​o​r​k​i​n​g​.​ ​J​u​s​t​ ​a​d​d​ ​y​o​u​r​ ​L​i​g​h​t​n​i​n​g​ ​a​d​d​r​e​s​s​.
+			 */
+			body: string
+			/**
+			 * G​o​t​ ​i​t
+			 */
+			cta: string
+			/**
+			 * B​l​i​n​k​ ​T​e​r​m​i​n​a​l
+			 */
+			terminalTitle: string
+			/**
+			 * A​ ​p​o​i​n​t​ ​o​f​ ​s​a​l​e​ ​i​n​ ​a​n​y​ ​b​r​o​w​s​e​r​.
+			 */
+			terminalBody: string
+			/**
+			 * D​o​n​a​t​e​ ​B​u​t​t​o​n
+			 */
+			donationTitle: string
+			/**
+			 * A​c​c​e​p​t​ ​d​o​n​a​t​i​o​n​s​ ​o​n​ ​a​n​y​ ​w​e​b​s​i​t​e​.
+			 */
+			donationBody: string
+			/**
+			 * B​T​C​P​a​y​ ​P​l​u​g​i​n
+			 */
+			btcpayTitle: string
+			/**
+			 * L​i​g​h​t​n​i​n​g​ ​p​a​y​m​e​n​t​s​ ​o​n​ ​y​o​u​r​ ​B​T​C​P​a​y​ ​S​e​r​v​e​r​.
+			 */
+			btcpayBody: string
+			/**
+			 * W​o​o​C​o​m​m​e​r​c​e​ ​P​l​u​g​i​n
+			 */
+			woocommerceTitle: string
+			/**
+			 * B​i​t​c​o​i​n​ ​c​h​e​c​k​o​u​t​ ​f​o​r​ ​y​o​u​r​ ​o​n​l​i​n​e​ ​s​t​o​r​e​.
+			 */
+			woocommerceBody: string
+		}
 		/**
 		 * S​o​m​e​t​h​i​n​g​ ​w​e​n​t​ ​w​r​o​n​g​ ​r​e​s​u​m​i​n​g​ ​y​o​u​r​ ​m​i​g​r​a​t​i​o​n​.​ ​P​l​e​a​s​e​ ​s​t​a​r​t​ ​i​t​ ​a​g​a​i​n​.
 		 */
@@ -12558,6 +12625,24 @@ type RootTranslation = {
 		​Y​o​u​ ​m​a​y​ ​n​e​e​d​ ​t​h​i​s​ ​i​n​f​o​r​m​a​t​i​o​n​ ​t​o​ ​h​e​l​p​ ​s​u​p​p​o​r​t​ ​r​e​s​o​l​v​e​ ​y​o​u​r​ ​c​a​s​e​:
 			 */
 			body: string
+			selfHelp: {
+				/**
+				 * L​e​t​'​s​ ​t​r​y​ ​t​h​a​t​ ​a​g​a​i​n
+				 */
+				title: string
+				/**
+				 * D​o​n​'​t​ ​w​o​r​r​y​ ​—​ ​y​o​u​r​ ​f​u​n​d​s​ ​a​r​e​ ​s​a​f​e​.​ ​M​i​g​r​a​t​i​n​g​ ​c​a​n​ ​t​a​k​e​ ​a​ ​f​e​w​ ​m​i​n​u​t​e​s​,​ ​a​n​d​ ​s​o​m​e​t​i​m​e​s​ ​a​ ​s​t​e​p​ ​j​u​s​t​ ​n​e​e​d​s​ ​a​ ​f​r​e​s​h​ ​s​t​a​r​t​.​
+			​
+			​S​t​a​r​t​ ​t​h​e​ ​m​i​g​r​a​t​i​o​n​ ​o​v​e​r​ ​—​ ​i​t​ ​o​n​l​y​ ​t​a​k​e​s​ ​a​ ​m​o​m​e​n​t​.​
+			​
+			​S​t​i​l​l​ ​s​e​e​i​n​g​ ​t​h​i​s​ ​s​c​r​e​e​n​?​ ​C​o​n​t​a​c​t​ ​s​u​p​p​o​r​t​ ​a​n​d​ ​s​h​a​r​e​ ​t​h​e​ ​d​e​t​a​i​l​s​ ​b​e​l​o​w​:
+				 */
+				body: string
+				/**
+				 * C​o​n​t​a​c​t​ ​s​u​p​p​o​r​t
+				 */
+				contactSupportCta: string
+			}
 			/**
 			 * R​e​a​s​o​n
 			 */
@@ -12706,6 +12791,10 @@ type RootTranslation = {
 		 */
 		paste: string
 		/**
+		 * C​o​u​l​d​n​'​t​ ​r​e​a​d​ ​f​r​o​m​ ​c​l​i​p​b​o​a​r​d​.​ ​P​l​e​a​s​e​ ​e​n​t​e​r​ ​y​o​u​r​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​ ​m​a​n​u​a​l​l​y​.
+		 */
+		pasteFailed: string
+		/**
 		 * W​o​r​d
 		 */
 		enterWord: string
@@ -12753,6 +12842,14 @@ type RootTranslation = {
 		 * S​e​l​e​c​t​ ​a​ ​b​a​c​k​u​p​ ​t​o​ ​r​e​s​t​o​r​e
 		 */
 		pickBackupDescription: string
+		/**
+		 * D​o​ ​y​o​u​ ​r​e​c​o​g​n​i​z​e​ ​t​h​i​s​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​?
+		 */
+		recognizePhraseTitle: string
+		/**
+		 * N​e​v​e​r​ ​e​n​t​e​r​ ​w​o​r​d​s​ ​s​o​m​e​o​n​e​ ​e​l​s​e​ ​s​e​n​t​ ​y​o​u​.
+		 */
+		recognizePhraseBody: string
 	}
 	BackupNudge: {
 		/**
@@ -19683,6 +19780,10 @@ export type TranslationFunctions = {
 	}
 	HomeScreen: {
 		/**
+		 * +{amount} pending
+		 */
+		pendingReceiveBadge: (arg: { amount: string }) => LocalizedString
+		/**
 		 * Receive
 		 */
 		receive: () => LocalizedString
@@ -25279,6 +25380,10 @@ export type TranslationFunctions = {
 				 * Test your backup
 				 */
 				testBackup: () => LocalizedString
+				/**
+				 * Do not show this to anyone, including support
+				 */
+				doNotShareWarning: () => LocalizedString
 			}
 			Confirm: {
 				/**
@@ -25355,6 +25460,16 @@ export type TranslationFunctions = {
 		 * Transferring your funds. It should be done in a few seconds.
 		 */
 		transferringFunds: () => LocalizedString
+		transferDelayed: {
+			/**
+			 * Your funds are on their way to your new account. This is taking longer than usual — keep the app open and we'll finish up automatically.
+			 */
+			body: () => LocalizedString
+			/**
+			 * Contact support
+			 */
+			contactSupportCta: () => LocalizedString
+		}
 		clockOutOfSync: {
 			/**
 			 * Your device's date and time are out of sync. Set them to automatic to continue.
@@ -25428,13 +25543,15 @@ export type TranslationFunctions = {
 		 */
 		downloadHistoryDownloadCta: () => LocalizedString
 		/**
-		 * API service not available
+		 * About your API keys
 		 */
 		apiServiceTitle: () => LocalizedString
 		/**
-		 * We note that you have active API keys. Blink can't provide the API in non-custodial mode.
+		 * Your account has active API keys. The API won't be available after you move to non-custodial.
 
-	If you are dependent on Blink's API, contact us promptly and we will do our best to assist a smooth transition.
+	Blink has non-custodial apps that replace most functions of the API, except sending. You will find them in the Settings menu.
+
+	If you use the API to send, unfortunately it will no longer be possible.
 		 */
 		apiServiceBody: () => LocalizedString
 		/**
@@ -25442,9 +25559,55 @@ export type TranslationFunctions = {
 		 */
 		apiServiceContactCta: () => LocalizedString
 		/**
-		 * Continue anyways
+		 * Continue the Migration
 		 */
 		apiServiceContinueCta: () => LocalizedString
+		merchantTools: {
+			/**
+			 * We got you covered
+			 */
+			title: () => LocalizedString
+			/**
+			 * All tools for incoming payments keep working. Just add your Lightning address.
+			 */
+			body: () => LocalizedString
+			/**
+			 * Got it
+			 */
+			cta: () => LocalizedString
+			/**
+			 * Blink Terminal
+			 */
+			terminalTitle: () => LocalizedString
+			/**
+			 * A point of sale in any browser.
+			 */
+			terminalBody: () => LocalizedString
+			/**
+			 * Donate Button
+			 */
+			donationTitle: () => LocalizedString
+			/**
+			 * Accept donations on any website.
+			 */
+			donationBody: () => LocalizedString
+			/**
+			 * BTCPay Plugin
+			 */
+			btcpayTitle: () => LocalizedString
+			/**
+			 * Lightning payments on your BTCPay Server.
+			 */
+			btcpayBody: () => LocalizedString
+			/**
+			 * WooCommerce Plugin
+			 */
+			woocommerceTitle: () => LocalizedString
+			/**
+			 * Bitcoin checkout for your online store.
+			 */
+			woocommerceBody: () => LocalizedString
+		}
 		/**
 		 * Something went wrong resuming your migration. Please start it again.
 		 */
@@ -25560,6 +25723,24 @@ export type TranslationFunctions = {
 		You may need this information to help support resolve your case:
 			 */
 			body: () => LocalizedString
+			selfHelp: {
+				/**
+				 * Let's try that again
+				 */
+				title: () => LocalizedString
+				/**
+				 * Don't worry — your funds are safe. Migrating can take a few minutes, and sometimes a step just needs a fresh start.
+		
+			Start the migration over — it only takes a moment.
+		
+			Still seeing this screen? Contact support and share the details below:
+				 */
+				body: () => LocalizedString
+				/**
+				 * Contact support
+				 */
+				contactSupportCta: () => LocalizedString
+			}
 			/**
 			 * Reason
 			 */
@@ -25708,6 +25889,10 @@ export type TranslationFunctions = {
 		 */
 		paste: () => LocalizedString
 		/**
+		 * Couldn't read from clipboard. Please enter your backup phrase manually.
+		 */
+		pasteFailed: () => LocalizedString
+		/**
 		 * Word
 		 */
 		enterWord: () => LocalizedString
@@ -25755,6 +25940,14 @@ export type TranslationFunctions = {
 		 * Select a backup to restore
 		 */
 		pickBackupDescription: () => LocalizedString
+		/**
+		 * Do you recognize this backup phrase?
+		 */
+		recognizePhraseTitle: () => LocalizedString
+		/**
+		 * Never enter words someone else sent you.
+		 */
+		recognizePhraseBody: () => LocalizedString
 	}
 	BackupNudge: {
 		/**

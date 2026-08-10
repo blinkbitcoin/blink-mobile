@@ -28,8 +28,15 @@ export const MigrationSupportReason = {
    *  longer on this device (its key is gone, e.g. after a reinstall), so the resume swap
    *  cannot run and no retry brings it back. */
   SelfCustodialAccountNotOnDevice: "self-custodial-account-not-on-device",
+  /** The server has this account locked mid-migration, but the device holds neither a
+   *  resumable checkpoint nor a reusable pending wallet (e.g. after a reinstall), so a
+   *  restart would only provision another orphan; support is the only way forward. */
+  LockedWithoutCheckpoint: "locked-without-checkpoint",
   /** The transfer itself failed or threw. */
   TransferFailed: "transfer-failed",
+  /** The server paid the migration out, but the receive into the new self-custodial
+   *  wallet stayed unconfirmed past the notice window — the funds look stuck in transit. */
+  ReceiveDelayed: "receive-delayed",
   /** The lightning-address re-point onto the migrated account failed. */
   LnAddressTransferFailed: "ln-address-transfer-failed",
   /** The support screen was reached without a reason, e.g. after a navigation-state
@@ -41,15 +48,43 @@ export type MigrationSupportReason =
   (typeof MigrationSupportReason)[keyof typeof MigrationSupportReason]
 
 /**
+ * Reasons worth telling the user to restart the app for, rather than leading with support.
+ * The start latch is in-memory only, so a relaunch sends a fresh `migrationStart`: a refusal
+ * that was transient (a state conflict, a dollar balance the gate now asks them to empty)
+ * clears itself, and the user starts the migration again from the intro. Nothing resumes on
+ * its own — the gate's resume path needs a server-side lock, which a refused start never
+ * armed.
+ *
+ * Only a SUBSET of `start-refused` is actually restart-resolvable: the backend maps its
+ * permanent rejections (a cohort exclusion) onto the same MIGRATION_STATE_CONFLICT code as a
+ * transient conflict, so the client cannot tell them apart. Those users spend one restart
+ * before the copy's "still seeing this screen?" line sends them to support, which is the
+ * accepted trade-off for deflecting the transient majority. A distinct backend code for
+ * permanent refusals would let them keep the support-first copy.
+ *
+ * Lives next to the taxonomy so adding a reason above is decided in the same place.
+ */
+export const RESTART_RESOLVABLE_REASONS: ReadonlySet<MigrationSupportReason> = new Set([
+  MigrationSupportReason.StartRefused,
+])
+
+/**
  * Where the support screen was opened from, which decides its Back target. The commit flow
  * has the commit point (Step 8) underneath, so Back returns there, skipping the
  * back-swallowing transfer screen. The resume handover is pushed from the root navigator
  * with no migration screens beneath it, so Back dismisses to where it came from rather than
- * fabricating a fresh commit screen over an already-completed migration.
+ * fabricating a fresh commit screen over an already-completed migration. The gate handover
+ * has nothing behind it at all — the gate underneath would only replay the handover — so
+ * support becomes the terminal screen with no Back.
  */
 export const MigrationSupportOrigin = {
   Commit: "commit",
   Resume: "resume",
+  Gate: "gate",
+  /** The only handover the transfer is expected to survive: the receive is still being
+   *  watched underneath, so backing out returns to the screen watching it rather than
+   *  popping to the commit screen, which would unmount the gate with it. */
+  ReceiveDelayed: "receive-delayed",
 } as const
 
 export type MigrationSupportOrigin =

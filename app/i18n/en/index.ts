@@ -2113,6 +2113,7 @@ const en: BaseTranslation = {
     error: "Oops. Something went wrong while getting your location",
   },
   HomeScreen: {
+    pendingReceiveBadge: "+{amount: string} pending",
     receive: "Receive",
     send: "Send",
     title: "Home",
@@ -3865,6 +3866,7 @@ const en: BaseTranslation = {
         savedConfirm: "I have saved it",
         copy: "Copy",
         testBackup: "Test your backup",
+        doNotShareWarning: "Do not show this to anyone, including support",
       },
       Confirm: {
         headerTitle: "Confirm backup phrase",
@@ -3892,6 +3894,10 @@ const en: BaseTranslation = {
     explainerCta: "I understand",
     transferringFunds:
       "Transferring your funds. It should be done in a few seconds.",
+    transferDelayed: {
+      body: "Your funds are on their way to your new account. This is taking longer than usual — keep the app open and we'll finish up automatically.",
+      contactSupportCta: "Contact support",
+    },
     clockOutOfSync: {
       body: "Your device's date and time are out of sync. Set them to automatic to continue.",
       retryCta: "Try again",
@@ -3916,11 +3922,24 @@ const en: BaseTranslation = {
     downloadHistoryBody:
       "Your new account will start fresh. If you want to keep record of your transactions, download them as CSV now.",
     downloadHistoryDownloadCta: "Download",
-    apiServiceTitle: "API service not available",
+    apiServiceTitle: "About your API keys",
     apiServiceBody:
-      "We note that you have active API keys. Blink can't provide the API in non-custodial mode.\n\nIf you are dependent on Blink's API, contact us promptly and we will do our best to assist a smooth transition.",
+      "Your account has active API keys. The API won't be available after you move to non-custodial.\n\nBlink has non-custodial apps that replace most functions of the API, except sending. You will find them in the Settings menu.\n\nIf you use the API to send, unfortunately it will no longer be possible.",
     apiServiceContactCta: "Contact us",
-    apiServiceContinueCta: "Continue anyways",
+    apiServiceContinueCta: "Continue the Migration",
+    merchantTools: {
+      title: "We got you covered",
+      body: "All tools for incoming payments keep working. Just add your Lightning address.",
+      cta: "Got it",
+      terminalTitle: "Blink Terminal",
+      terminalBody: "A point of sale in any browser.",
+      donationTitle: "Donate Button",
+      donationBody: "Accept donations on any website.",
+      btcpayTitle: "BTCPay Plugin",
+      btcpayBody: "Lightning payments on your BTCPay Server.",
+      woocommerceTitle: "WooCommerce Plugin",
+      woocommerceBody: "Bitcoin checkout for your online store.",
+    },
     resumeFailed: "Something went wrong resuming your migration. Please start it again.",
     balancesOverview: {
       title: "Move your balance",
@@ -3957,6 +3976,11 @@ const en: BaseTranslation = {
     contactSupport: {
       title: "Contact support",
       body: "Something went wrong but don't worry your funds are safe, please contact support for assistance.\n\nYou may need this information to help support resolve your case:",
+      selfHelp: {
+        title: "Let's try that again",
+        body: "Don't worry — your funds are safe. Migrating can take a few minutes, and sometimes a step just needs a fresh start.\n\nStart the migration over — it only takes a moment.\n\nStill seeing this screen? Contact support and share the details below:",
+        contactSupportCta: "Contact support",
+      },
       reasonLabel: "Reason",
       accountIdLabel: "Account ID",
       pubKeyLabel: "pubKey",
@@ -4000,6 +4024,7 @@ const en: BaseTranslation = {
     phraseSubtitleStep2: "Enter rest of your backup phrase",
     nextWords: "Next 6 words",
     paste: "Paste",
+    pasteFailed: "Couldn't read from clipboard. Please enter your backup phrase manually.",
     enterWord: "Word",
     invalidMnemonic: "Invalid backup phrase. Please check if the word order is correct.",
     restoring: "Restoring your wallet...",
@@ -4013,6 +4038,8 @@ const en: BaseTranslation = {
     wrongPassword: "Incorrect password. Please try again.",
     pickBackupTitle: "Choose a wallet",
     pickBackupDescription: "Select a backup to restore",
+    recognizePhraseTitle: "Do you recognize this backup phrase?",
+    recognizePhraseBody: "Never enter words someone else sent you.",
   },
   BackupNudge: {
     title: "Your funds are at risk",

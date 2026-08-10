@@ -1,7 +1,4 @@
 import { NavigatorScreenParams } from "@react-navigation/native"
-
-export const PhraseStep = { First: 1, Second: 2 } as const
-export type PhraseStep = (typeof PhraseStep)[keyof typeof PhraseStep]
 import { LNURLPaySuccessAction } from "lnurl-pay"
 
 import { IconNamesType } from "@app/components/atomic/galoy-icon"
@@ -22,6 +19,14 @@ import { MigrationSupportOrigin, MigrationSupportReason } from "@app/types/migra
 
 import { AuthenticationScreenPurpose, PinScreenPurpose } from "../utils/enum"
 
+export const PhraseStep = { First: 1, Second: 2 } as const
+export type PhraseStep = (typeof PhraseStep)[keyof typeof PhraseStep]
+
+/** Deep links and navigation-state rehydration can deliver params the route type says are
+ *  impossible; the phrase screens use this to fall back instead of throwing. */
+export const isPhraseStep = (value: unknown): value is PhraseStep =>
+  value === PhraseStep.First || value === PhraseStep.Second
+
 export type RootStackParamList = {
   getStarted: undefined
   accountTypeSelection: { mode: AccountTypeMode }
@@ -30,6 +35,10 @@ export type RootStackParamList = {
   liteDeviceAccount: {
     appCheckToken: string
   }
+  // Dev-only route: root-navigator registers it only when __DEV__ (lazy
+  // require there). navigate("developerScreen") still type-checks in release
+  // builds but is dropped as an unhandled action — gate any new call site
+  // with __DEV__, or reuse useSecretMenuTrigger.
   developerScreen: undefined
   login: {
     type: PhoneLoginInitiateType
@@ -221,6 +230,7 @@ export type RootStackParamList = {
   accountMigrationStart: undefined
   accountMigrationExplainer: undefined
   accountMigrationKeepReceiving: undefined
+  accountMigrationMerchantTools: undefined
   accountMigrationDownloadHistory: undefined
   accountMigrationBalancesOverview: undefined
   accountMigrationTransferringFunds: undefined

@@ -2110,6 +2110,7 @@
     "error": "Ups. Při zjišťování vaší polohy se něco pokazilo"
   },
   "HomeScreen": {
+    "pendingReceiveBadge": "+{amount: string} čekající",
     "receive": "Přijmout",
     "send": "Odeslat",
     "title": "Domů",
@@ -3662,7 +3663,8 @@
         "savedConfirm": "Už jsem ji uložil",
         "copy": "Kopírovat",
         "continueButton": "Pokračovat",
-        "testBackup": "Otestujte zálohu"
+        "testBackup": "Otestujte zálohu",
+        "doNotShareWarning": "Neukazujte to nikomu, ani podpoře"
       },
       "Confirm": {
         "headerTitle": "Potvrďte záložní frázi",
@@ -3709,6 +3711,11 @@
     "contactSupport": {
       "title": "Kontaktovat podporu",
       "body": "Něco se pokazilo, ale nebojte se, vaše prostředky jsou v bezpečí. Obraťte se prosím na podporu.\n\nTyto informace mohou podpoře pomoci vyřešit váš případ:",
+      "selfHelp": {
+        "title": "Zkusme to znovu",
+        "body": "Nebojte se — vaše prostředky jsou v bezpečí. Migrace může trvat několik minut a někdy stačí, aby jeden krok začal znovu.\n\nSpusťte migraci od začátku — zabere to jen chvíli.\n\nVidíte tuto obrazovku i nadále? Obraťte se na podporu a sdílejte údaje níže:",
+        "contactSupportCta": "Kontaktovat podporu"
+      },
       "reasonLabel": "Důvod",
       "accountIdLabel": "ID účtu",
       "pubKeyLabel": "pubKey",
@@ -3765,10 +3772,23 @@
     "downloadHistoryTitle": "Stáhněte si historii transakcí",
     "downloadHistoryBody": "Váš nový účet začne od začátku. Pokud si chcete uchovat záznam o svých transakcích, stáhněte si je nyní jako CSV.",
     "downloadHistoryDownloadCta": "Stáhnout",
-    "apiServiceTitle": "Služba API není dostupná",
-    "apiServiceBody": "Všimli jsme si, že máte aktivní API klíče. Blink nemůže poskytovat API v non-custodial režimu.\n\nPokud jste na API Blinku závislí, kontaktujte nás co nejdříve a uděláme maximum pro hladký přechod.",
+    "apiServiceTitle": "O vašich API klíčích",
+    "apiServiceBody": "Váš účet má aktivní API klíče. Po přechodu na non-custodial nebude API dostupné.\n\nBlink má non-custodial aplikace, které nahrazují většinu funkcí API, kromě odesílání. Najdete je v nabídce Nastavení.\n\nPokud používáte API k odesílání, bohužel to už nebude možné.",
     "apiServiceContactCta": "Kontaktujte nás",
-    "apiServiceContinueCta": "Přesto pokračovat",
+    "apiServiceContinueCta": "Pokračovat v migraci",
+    "merchantTools": {
+      "title": "Mysleli jsme na všechno",
+      "body": "Všechny nástroje pro příchozí platby fungují dál. Stačí přidat vaši Lightning adresu.",
+      "cta": "Rozumím",
+      "terminalTitle": "Blink Terminal",
+      "terminalBody": "Pokladna v jakémkoli prohlížeči.",
+      "donationTitle": "Darovací tlačítko",
+      "donationBody": "Přijímejte dary na jakémkoli webu.",
+      "btcpayTitle": "BTCPay plugin",
+      "btcpayBody": "Lightning platby na vašem BTCPay Serveru.",
+      "woocommerceTitle": "WooCommerce plugin",
+      "woocommerceBody": "Platba Bitcoinem pro váš e-shop."
+    },
     "resumeFailed": "Při pokračování migrace se něco pokazilo. Začněte ji prosím znovu.",
     "migrationRequiredBody": "Je čas migrovat váš svěřenský účet na nesvěřenský účet.",
     "migrationRequiredForcedBody": "Je čas migrovat váš svěřenský účet na nesvěřenský účet. Je to vyžadováno z regulatorních důvodů.\n\nNení třeba se obávat, non-custodial pro tebe bude z dlouhodobého hlediska lepší.",
@@ -3785,6 +3805,10 @@
     "explainerCheck5": "Z tvého účtu bude stržen síťový poplatek Spark",
     "explainerCta": "Rozumím",
     "transferringFunds": "Převádíme vaše prostředky. Mělo by to být hotové za několik sekund.",
+    "transferDelayed": {
+      "body": "Vaše prostředky jsou na cestě do vašeho nového účtu. Trvá to déle než obvykle — nechte aplikaci otevřenou a dokončíme to automaticky.",
+      "contactSupportCta": "Kontaktovat podporu"
+    },
     "clockOutOfSync": {
       "body": "Datum a čas vašeho zařízení nejsou synchronizované. Nastavte je na automatické, abyste mohli pokračovat.",
       "retryCta": "Zkusit znovu"
@@ -3816,6 +3840,7 @@
     "phraseSubtitleStep2": "Zadejte zbytek vaší zálohovací fráze",
     "nextWords": "Dalších 6 slov",
     "paste": "Vložit",
+    "pasteFailed": "Nepodařilo se číst ze schránky. Zadejte prosím zálohovací frázi ručně.",
     "enterWord": "Slovo",
     "invalidMnemonic": "Neplatná záložní fráze. Zkontrolujte prosím, zda je pořadí slov správné.",
     "restoring": "Obnovování vaší peněženky...",
@@ -3827,7 +3852,9 @@
     "enterPassword": "Zadejte heslo šifrování",
     "wrongPassword": "Nesprávné heslo. Zkuste to prosím znovu.",
     "pickBackupTitle": "Vyberte peněženku",
-    "pickBackupDescription": "Vyberte zálohu k obnovení"
+    "pickBackupDescription": "Vyberte zálohu k obnovení",
+    "recognizePhraseTitle": "Poznáváte tuto zálohovací frázi?",
+    "recognizePhraseBody": "Nikdy nezadávejte slova, která vám poslal někdo jiný."
   },
   "BackupNudge": {
     "title": "Vaše prostředky jsou v ohrožení",

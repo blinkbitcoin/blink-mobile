@@ -12,6 +12,7 @@ import * as PaymentDetailsLightning from "@app/screens/send-bitcoin-screen/payme
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 import SendBitcoinConfirmationScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-confirmation-screen"
+import { SelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { RouteProp } from "@react-navigation/native"
 
@@ -990,6 +991,85 @@ describe("SendBitcoinConfirmationScreen — skipBalanceCheck matrix", () => {
     await flushEffects()
 
     expect(screen.getByTestId("slider").props.accessibilityState.disabled).toBe(false)
+  })
+})
+
+// A failed self-custodial quote used to render only the generic "Unable to calculate fee"
+// with the slider disabled, naming no cause. The classified SDK code now picks the message.
+describe("SendBitcoinConfirmationScreen — fee error messages", () => {
+  const genericFeeError = /Unable to calculate fee/i
+  const insufficientFunds = /Not enough funds to cover the amount and network fees/i
+
+  const renderWithFee = async (fee: Record<string, unknown>) => {
+    mockUseFee.mockReturnValue(fee)
+    render(
+      <ContextForScreen>
+        <Intraledger route={buildUsdSettlementRoute(200)} />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+  }
+
+  it("names the cause when the quote carries a classified self-custodial code", async () => {
+    await renderWithFee({
+      status: "error",
+      errors: [
+        {
+          __typename: "GraphQLApplicationError",
+          message: SelfCustodialErrorCode.InsufficientFunds,
+        },
+      ],
+    })
+
+    expect(screen.getByText(insufficientFunds)).toBeTruthy()
+    expect(screen.queryByText(genericFeeError)).toBeNull()
+  })
+
+  it("translates the network-error code too", async () => {
+    await renderWithFee({
+      status: "error",
+      errors: [
+        {
+          __typename: "GraphQLApplicationError",
+          message: SelfCustodialErrorCode.NetworkError,
+        },
+      ],
+    })
+
+    expect(screen.getByText(/Network connection problem/i)).toBeTruthy()
+  })
+
+  it("falls back to the generic string when the quote carries no code", async () => {
+    await renderWithFee({ status: "error" })
+
+    expect(screen.getByText(genericFeeError)).toBeTruthy()
+  })
+
+  // Custodial errors are raw GraphQL text, not something to put in front of a user, and
+  // useTranslateSdkError passes unknown input straight through — hence the code guard.
+  it("keeps the generic string for a custodial GraphQL error message", async () => {
+    await renderWithFee({
+      status: "error",
+      errors: [
+        {
+          __typename: "GraphQLApplicationError",
+          message: "Unbalanced transaction: ledger entry rejected",
+        },
+      ],
+    })
+
+    expect(screen.getByText(genericFeeError)).toBeTruthy()
+    expect(screen.queryByText(/Unbalanced transaction/i)).toBeNull()
+  })
+
+  it("shows no fee error at all once the quote succeeds", async () => {
+    await renderWithFee({
+      status: "set",
+      amount: { amount: 0, currency: WalletCurrency.Usd, currencyCode: "USD" },
+    })
+
+    expect(screen.queryByText(genericFeeError)).toBeNull()
+    expect(screen.queryByText(insufficientFunds)).toBeNull()
   })
 })
 

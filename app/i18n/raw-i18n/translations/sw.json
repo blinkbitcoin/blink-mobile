@@ -2110,6 +2110,7 @@
     "error": "Lo! Hitilafu fulani imetokea wakati wa kupata eneo lako"
   },
   "HomeScreen": {
+    "pendingReceiveBadge": "+{amount: string} inasubiri",
     "receive": "Pokea",
     "send": "Tuma",
     "title": "Nyumbani",
@@ -3662,7 +3663,8 @@
         "savedConfirm": "Nimehifadhi",
         "copy": "Nakili",
         "continueButton": "Endelea",
-        "testBackup": "Jaribu hifadhi yako"
+        "testBackup": "Jaribu hifadhi yako",
+        "doNotShareWarning": "Usimwonyeshe mtu yeyote ikiwa ni pamoja na timu ya usaidizi"
       },
       "Confirm": {
         "headerTitle": "Thibitisha maneno ya nakala",
@@ -3709,6 +3711,11 @@
     "contactSupport": {
       "title": "Wasiliana na usaidizi",
       "body": "Kuna kitu kimeenda vibaya, lakini usiwe na wasiwasi, fedha zako ziko salama. Tafadhali wasiliana na usaidizi kwa msaada.\n\nUnaweza kuhitaji taarifa hizi ili kusaidia usaidizi kutatua kesi yako:",
+      "selfHelp": {
+        "title": "Hebu tujaribu tena",
+        "body": "Usiwe na wasiwasi — fedha zako ziko salama. Uhamishaji unaweza kuchukua dakika chache, na wakati mwingine hatua moja inahitaji tu kuanza upya.\n\nAnza uhamishaji upya — inachukua muda mfupi tu.\n\nBado unaona skrini hii? Wasiliana na usaidizi na ushiriki maelezo yaliyo hapa chini:",
+        "contactSupportCta": "Wasiliana na usaidizi"
+      },
       "reasonLabel": "Sababu",
       "accountIdLabel": "Kitambulisho cha akaunti",
       "pubKeyLabel": "pubKey",
@@ -3765,10 +3772,23 @@
     "downloadHistoryTitle": "Pakua historia ya miamala yako",
     "downloadHistoryBody": "Akaunti yako mpya itaanza upya. Ikiwa unataka kuweka kumbukumbu ya miamala yako, ipakue sasa kama CSV.",
     "downloadHistoryDownloadCta": "Pakua",
-    "apiServiceTitle": "Huduma ya API haipatikani",
-    "apiServiceBody": "Tunaona kuwa una funguo za API zinazotumika. Blink haiwezi kutoa API katika hali ya non-custodial.\n\nIkiwa unategemea API ya Blink, wasiliana nasi haraka na tutafanya tuwezalo kusaidia mpito laini.",
+    "apiServiceTitle": "Kuhusu funguo zako za API",
+    "apiServiceBody": "Akaunti yako ina funguo za API zinazotumika. API haitapatikana baada ya kuhamia non-custodial.\n\nBlink ina programu za non-custodial zinazochukua nafasi ya kazi nyingi za API, isipokuwa kutuma. Utazipata katika menyu ya Mipangilio.\n\nIkiwa unatumia API kutuma, kwa bahati mbaya haitawezekana tena.",
     "apiServiceContactCta": "Wasiliana nasi",
-    "apiServiceContinueCta": "Endelea hata hivyo",
+    "apiServiceContinueCta": "Endelea na uhamishaji",
+    "merchantTools": {
+      "title": "Tumeshughulikia kila kitu",
+      "body": "Zana zote za malipo yanayoingia zinaendelea kufanya kazi. Ongeza tu anwani yako ya Lightning.",
+      "cta": "Nimeelewa",
+      "terminalTitle": "Blink Terminal",
+      "terminalBody": "Sehemu ya uuzaji katika kivinjari chochote.",
+      "donationTitle": "Kitufe cha kuchangia",
+      "donationBody": "Pokea michango kwenye tovuti yoyote.",
+      "btcpayTitle": "Programu-jalizi ya BTCPay",
+      "btcpayBody": "Malipo ya Lightning kwenye BTCPay Server yako.",
+      "woocommerceTitle": "Programu-jalizi ya WooCommerce",
+      "woocommerceBody": "Malipo ya Bitcoin kwa duka lako la mtandaoni."
+    },
     "resumeFailed": "Hitilafu imetokea wakati wa kuendelea na uhamishaji wako. Tafadhali anza tena.",
     "migrationRequiredBody": "Ni wakati wa kuhamisha akaunti yako ya udhamini kwenda akaunti isiyo ya udhamini.",
     "migrationRequiredForcedBody": "Ni wakati wa kuhamisha akaunti yako ya udhamini kwenda akaunti isiyo ya udhamini. Inahitajika kwa sababu za udhibiti.\n\nUsiwe na wasiwasi, non-custodial itakuwa bora kwako kwa muda mrefu.",
@@ -3785,6 +3805,10 @@
     "explainerCheck5": "Akaunti yako itakatwa ada ya mtandao wa Spark",
     "explainerCta": "Naelewa",
     "transferringFunds": "Tunahamisha fedha zako. Inapaswa kukamilika ndani ya sekunde chache.",
+    "transferDelayed": {
+      "body": "Fedha zako ziko njiani kuelekea kwenye akaunti yako mpya. Inachukua muda mrefu kuliko kawaida — acha programu ikiwa wazi na tutakamilisha kiotomatiki.",
+      "contactSupportCta": "Wasiliana na usaidizi"
+    },
     "clockOutOfSync": {
       "body": "Tarehe na saa za kifaa chako hazijaoanishwa. Ziweke kwa kiotomatiki ili kuendelea.",
       "retryCta": "Jaribu tena"
@@ -3816,6 +3840,7 @@
     "phraseSubtitleStep2": "Ingiza maneno yaliyobaki ya msemo wako wa hifadhi",
     "nextWords": "Maneno 6 yanayofuata",
     "paste": "Bandika",
+    "pasteFailed": "Imeshindwa kusoma kutoka kwenye ubao wa kunakili. Tafadhali ingiza msemo wako wa hifadhi mwenyewe.",
     "enterWord": "Neno",
     "invalidMnemonic": "Kifungu cha akiba si sahihi. Tafadhali angalia kama mpangilio wa maneno ni sahihi.",
     "restoring": "Kurudisha mkoba wako...",
@@ -3827,7 +3852,9 @@
     "enterPassword": "Ingiza nenosiri lako la usimbaji",
     "wrongPassword": "Nenosiri si sahihi. Tafadhali jaribu tena.",
     "pickBackupTitle": "Chagua pochi",
-    "pickBackupDescription": "Chagua nakala rudufu ya kurejesha"
+    "pickBackupDescription": "Chagua nakala rudufu ya kurejesha",
+    "recognizePhraseTitle": "Je, unaitambua kaulisiri hii ya nakala rudufu?",
+    "recognizePhraseBody": "Kamwe usiweke maneno uliyotumiwa na mtu mwingine."
   },
   "BackupNudge": {
     "title": "Fedha zako ziko hatarini",

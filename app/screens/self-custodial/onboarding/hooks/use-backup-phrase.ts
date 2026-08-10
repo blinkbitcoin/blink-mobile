@@ -3,13 +3,11 @@ import { useCallback, useMemo, useRef } from "react"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
-import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useClipboard, useCountdown } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { PhraseStep, RootStackParamList } from "@app/navigation/stack-param-lists"
 import { splitWords } from "@app/utils/bip39-wordlist"
 import { formatDuration } from "@app/utils/date"
-import { openExternalUrl } from "@app/utils/external"
 
 import { buildConfirmChallenges } from "../utils"
 
@@ -24,7 +22,6 @@ export const useBackupPhrase = (step: PhraseStep) => {
   const { LL, locale } = useI18nContext()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { copyToClipboard } = useClipboard(CLIPBOARD_CLEAR_MS)
-  const { sparkCompatibleWalletsUrl } = useRemoteConfig()
   const mnemonic = useWalletMnemonic()
   const words = useMemo(() => (mnemonic ? splitWords(mnemonic) : []), [mnemonic])
 
@@ -49,11 +46,6 @@ export const useBackupPhrase = (step: PhraseStep) => {
       message: LL.BackupScreen.ManualBackup.Phrase.copiedToast(),
     })
   }, [copyToClipboard, LL, words])
-
-  const handleOpenLink = useCallback(
-    () => openExternalUrl(sparkCompatibleWalletsUrl),
-    [sparkCompatibleWalletsUrl],
-  )
 
   const handleContinue = useCallback(() => {
     if (isStep1) {
@@ -80,7 +72,6 @@ export const useBackupPhrase = (step: PhraseStep) => {
     secondCard,
     offset,
     handleCopy,
-    handleOpenLink,
     handleContinue,
     buttonTitle,
     isButtonDisabled,

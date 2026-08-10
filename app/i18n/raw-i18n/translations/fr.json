@@ -2110,6 +2110,7 @@
         "error": "Oups. Un problème est survenu lors de la récupération de votre position"
     },
     "HomeScreen": {
+        "pendingReceiveBadge": "+{amount: string} en attente",
         "receive": "Recevoir",
         "send": "Envoyer",
         "title": "Accueil",
@@ -3662,7 +3663,8 @@
                 "savedConfirm": "Je l'ai sauvegardée",
                 "copy": "Copier",
                 "continueButton": "Continuer",
-                "testBackup": "Tester votre sauvegarde"
+                "testBackup": "Tester votre sauvegarde",
+                "doNotShareWarning": "Ne montrez ceci à personne, y compris au support"
             },
             "Confirm": {
                 "headerTitle": "Confirmer la phrase de sauvegarde",
@@ -3709,6 +3711,11 @@
         "contactSupport": {
             "title": "Contacter le support",
             "body": "Une erreur s'est produite, mais ne vous inquiétez pas, vos fonds sont en sécurité. Veuillez contacter le support pour obtenir de l'aide.\n\nCes informations peuvent aider le support à résoudre votre cas :",
+            "selfHelp": {
+                "title": "Réessayons",
+                "body": "Ne vous inquiétez pas — vos fonds sont en sécurité. La migration peut prendre quelques minutes, et parfois une étape a simplement besoin d'un nouveau départ.\n\nRecommencez la migration — cela ne prend qu'un instant.\n\nCet écran s'affiche toujours ? Contactez le support et partagez les informations ci-dessous :",
+                "contactSupportCta": "Contacter le support"
+            },
             "reasonLabel": "Motif",
             "accountIdLabel": "ID du compte",
             "pubKeyLabel": "pubKey",
@@ -3765,10 +3772,23 @@
         "downloadHistoryTitle": "Téléchargez votre historique de transactions",
         "downloadHistoryBody": "Votre nouveau compte démarrera à zéro. Si vous souhaitez conserver une trace de vos transactions, téléchargez-les maintenant au format CSV.",
         "downloadHistoryDownloadCta": "Télécharger",
-        "apiServiceTitle": "Service API non disponible",
-        "apiServiceBody": "Nous remarquons que vous avez des clés API actives. Blink ne peut pas fournir l'API en mode non-custodial.\n\nSi vous dépendez de l'API de Blink, contactez-nous rapidement et nous ferons de notre mieux pour faciliter une transition en douceur.",
+        "apiServiceTitle": "À propos de vos clés API",
+        "apiServiceBody": "Votre compte possède des clés API actives. L'API ne sera plus disponible après votre passage en non-custodial.\n\nBlink propose des applications non-custodial qui remplacent la plupart des fonctions de l'API, sauf l'envoi. Vous les trouverez dans le menu Réglages.\n\nSi vous utilisez l'API pour envoyer, cela ne sera malheureusement plus possible.",
         "apiServiceContactCta": "Contactez-nous",
-        "apiServiceContinueCta": "Continuer quand même",
+        "apiServiceContinueCta": "Continuer la migration",
+        "merchantTools": {
+            "title": "Nous avons pensé à tout",
+            "body": "Tous les outils de paiements entrants continuent de fonctionner. Ajoutez simplement votre adresse Lightning.",
+            "cta": "J'ai compris",
+            "terminalTitle": "Blink Terminal",
+            "terminalBody": "Un point de vente dans n'importe quel navigateur.",
+            "donationTitle": "Bouton de don",
+            "donationBody": "Acceptez les dons sur n'importe quel site web.",
+            "btcpayTitle": "Extension BTCPay",
+            "btcpayBody": "Paiements Lightning sur votre BTCPay Server.",
+            "woocommerceTitle": "Extension WooCommerce",
+            "woocommerceBody": "Paiement en Bitcoin pour votre boutique en ligne."
+        },
         "resumeFailed": "Une erreur s'est produite lors de la reprise de votre migration. Veuillez la recommencer.",
         "migrationRequiredBody": "Il est temps de migrer votre compte custodial vers un compte non-custodial.",
         "migrationRequiredForcedBody": "Il est temps de migrer votre compte custodial vers un compte non-custodial. C'est requis pour des raisons réglementaires.\n\nPas d'inquiétude, le non-custodial sera meilleur pour vous à long terme.",
@@ -3785,6 +3805,10 @@
         "explainerCheck5": "Des frais de réseau Spark seront déduits de votre compte",
         "explainerCta": "Je comprends",
         "transferringFunds": "Transfert de vos fonds en cours. Cela devrait être terminé en quelques secondes.",
+        "transferDelayed": {
+            "body": "Vos fonds sont en route vers votre nouveau compte. Cela prend plus de temps que d'habitude — gardez l'application ouverte et nous terminerons automatiquement.",
+            "contactSupportCta": "Contacter le support"
+        },
         "clockOutOfSync": {
             "body": "La date et l'heure de votre appareil sont désynchronisées. Réglez-les sur automatique pour continuer.",
             "retryCta": "Réessayer"
@@ -3816,6 +3840,7 @@
         "phraseSubtitleStep2": "Entrez le reste de votre phrase de sauvegarde",
         "nextWords": "6 mots suivants",
         "paste": "Coller",
+        "pasteFailed": "Impossible de lire le presse-papier. Veuillez saisir votre phrase de sauvegarde manuellement.",
         "enterWord": "Mot",
         "invalidMnemonic": "Phrase de sauvegarde invalide. Veuillez vérifier si l'ordre des mots est correct.",
         "restoring": "Restauration de votre portefeuille...",
@@ -3827,7 +3852,9 @@
         "enterPassword": "Entrez votre mot de passe de chiffrement",
         "wrongPassword": "Mot de passe incorrect. Veuillez réessayer.",
         "pickBackupTitle": "Choisissez un portefeuille",
-        "pickBackupDescription": "Sélectionnez une sauvegarde à restaurer"
+        "pickBackupDescription": "Sélectionnez une sauvegarde à restaurer",
+        "recognizePhraseTitle": "Reconnaissez-vous cette phrase de sauvegarde ?",
+        "recognizePhraseBody": "N'entrez jamais des mots qu'une autre personne vous a envoyés."
     },
     "BackupNudge": {
         "title": "Vos fonds sont en danger",

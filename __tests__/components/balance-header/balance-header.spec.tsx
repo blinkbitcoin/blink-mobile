@@ -1,9 +1,11 @@
 import React from "react"
-import { fireEvent, render } from "@testing-library/react-native"
+import { StyleSheet } from "react-native"
+import { fireEvent, render, within } from "@testing-library/react-native"
 import { ThemeProvider } from "@rn-vui/themed"
 
 import theme from "@app/rne-theme/theme"
 import { BalanceMode } from "@app/hooks/use-balance-mode"
+import { StatusPill } from "@app/components/status-pill"
 
 import { BalanceHeader } from "@app/components/balance-header/balance-header"
 
@@ -108,18 +110,19 @@ describe("BalanceHeader", () => {
   it("renders the hidden placeholder instead of the balance when the amount is hidden", () => {
     mockHideAmount = true
 
-    const { getByText, queryByTestId } = renderHeader({ formattedBalance: "$42.00" })
+    const { getByTestId, queryByTestId } = renderHeader({ formattedBalance: "$42.00" })
 
-    expect(getByText("****")).toBeTruthy()
+    expect(getByTestId("hidden-balance-placeholder")).toBeTruthy()
     expect(queryByTestId("balance-value")).toBeNull()
   })
 
-  it("caps font scaling on the hidden placeholder (blink-wip#931)", () => {
+  it("renders no scalable text in the hidden placeholder (blink-wip#931)", () => {
     mockHideAmount = true
 
-    const { getByText } = renderHeader()
+    const { getByTestId } = renderHeader()
 
-    expect(getByText("****").props.maxFontSizeMultiplier).toBeLessThanOrEqual(1.5)
+    const placeholder = getByTestId("hidden-balance-placeholder")
+    expect(within(placeholder).queryByText(/./)).toBeNull()
   })
 
   it("does not render the status badge by default", () => {
@@ -141,6 +144,46 @@ describe("BalanceHeader", () => {
     const { queryByTestId } = renderHeader({
       statusBadge: { label: "STALE", status: "warning" },
       loading: true,
+    })
+
+    expect(queryByTestId("balance-status-badge")).toBeNull()
+  })
+
+  it("caps and shrinks the real pill and the centering ghost identically", () => {
+    // eslint-disable-next-line camelcase -- testing-library exposes this API verbatim
+    const { UNSAFE_getAllByType } = renderHeader({
+      statusBadge: { label: "+$1,234,567.89 pending", status: "warning" },
+    })
+
+    const pills = UNSAFE_getAllByType(StatusPill)
+    expect(pills).toHaveLength(2)
+
+    const [ghostStyle, realStyle] = pills.map((pill) =>
+      StyleSheet.flatten(pill.props.style),
+    )
+    expect(ghostStyle.flexShrink).toBe(1)
+    expect(realStyle.flexShrink).toBe(1)
+    expect(ghostStyle.maxWidth).toBeDefined()
+    expect(ghostStyle.maxWidth).toBe(realStyle.maxWidth)
+  })
+
+  it("forwards the badge onPress so the pill can carry an action", () => {
+    const onPress = jest.fn()
+    const { getByTestId } = renderHeader({
+      statusBadge: { label: "+$1.00 pending", status: "warning", onPress },
+    })
+
+    fireEvent.press(getByTestId("balance-status-badge"))
+
+    expect(onPress).toHaveBeenCalledTimes(1)
+    expect(mockSwitchMemoryHideAmount).not.toHaveBeenCalled()
+  })
+
+  it("does not render the status badge while amounts are hidden", () => {
+    mockHideAmount = true
+
+    const { queryByTestId } = renderHeader({
+      statusBadge: { label: "+$1.00 pending", status: "warning" },
     })
 
     expect(queryByTestId("balance-status-badge")).toBeNull()

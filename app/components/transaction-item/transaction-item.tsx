@@ -10,6 +10,7 @@ import {
   TransactionFragmentDoc,
   WalletCurrency,
 } from "@app/graphql/generated"
+import { HiddenBalancePlaceholder } from "@app/components/hidden-balance-placeholder/hidden-balance-placeholder"
 import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { useAppConfig } from "@app/hooks"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
@@ -196,16 +197,18 @@ const TransactionItem: React.FC<Props> = ({
           </ListItem.Subtitle>
         </ListItem.Content>
 
-        {hideAmount ? (
-          <Text>****</Text>
-        ) : (
-          <View>
-            <Text style={amountStyle}>{formattedDisplayAmount}</Text>
-            {formattedSecondaryAmount && (
-              <Text style={amountStyle}>{formattedSecondaryAmount}</Text>
-            )}
-          </View>
-        )}
+        <View style={styles.amountWrapper}>
+          {hideAmount ? (
+            <HiddenBalancePlaceholder size="small" />
+          ) : (
+            <>
+              <Text style={amountStyle}>{formattedDisplayAmount}</Text>
+              {formattedSecondaryAmount && (
+                <Text style={amountStyle}>{formattedSecondaryAmount}</Text>
+              )}
+            </>
+          )}
+        </View>
       </ListItem>
     </Animated.View>
   )
@@ -258,5 +261,10 @@ const useStyles = makeStyles(({ colors }, props: UseStyleProps) => ({
     fontSize: 14,
     lineHeight: 20,
     fontWeight: "400",
+  },
+  amountWrapper: {
+    alignItems: "flex-end",
+    justifyContent: "center",
+    minHeight: 40,
   },
 }))
