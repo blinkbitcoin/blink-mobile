@@ -284,6 +284,23 @@ describe("MigrationContactSupportScreen", () => {
     expect(mockAddListener).not.toHaveBeenCalled()
   })
 
+  /** The commit path resets Home underneath before handing over, so Back returns there
+   *  rather than to a commit screen the finished migration has already left. */
+  it("dismisses the hardware back when opened from the close-refused handover", async () => {
+    mockOrigin = MigrationSupportOrigin.CloseRefused
+    const { BackHandler } =
+      jest.requireActual<typeof import("react-native")>("react-native")
+    const addListenerSpy = jest.spyOn(BackHandler, "addEventListener")
+    renderScreen()
+    await flushEffects()
+
+    const handler = addListenerSpy.mock.calls[0][1] as () => boolean
+
+    expect(handler()).toBe(true)
+    expect(mockGoBack).toHaveBeenCalledTimes(1)
+    expect(mockNavigate).not.toHaveBeenCalledWith("accountMigrationBalancesOverview")
+  })
+
   /** From the gate handover (a lock with nothing to resume, #4070) there is nothing behind
    *  this screen: the gate underneath would only replay the handover, and the commit path
    *  would fabricate a commit screen for an account with no provisioned wallet. Support is

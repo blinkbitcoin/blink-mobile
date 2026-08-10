@@ -140,7 +140,7 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
           name: "accountMigrationContactSupport",
           params: {
             reason: MigrationSupportReason.CustodialAccountCloseRefused,
-            origin: MigrationSupportOrigin.Resume,
+            origin: MigrationSupportOrigin.CloseRefused,
             custodialAccountId: custodialAccountId ?? undefined,
           },
         },

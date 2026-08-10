@@ -109,7 +109,11 @@ export const MigrationContactSupportScreen: React.FC = () => {
    *  mounted underneath watching for the receive, and navigating to the commit screen
    *  would pop it off the stack, taking the gate the user is waiting on with it. */
   const isReceiveDelayedOrigin = params?.origin === MigrationSupportOrigin.ReceiveDelayed
-  const isBackToScreenBeneath = isResumeOrigin || isReceiveDelayedOrigin
+  /** The commit path resets Home underneath before handing over, so it backs out the same
+   *  way rather than to a commit screen the migration has already left behind. */
+  const isCloseRefusedOrigin = params?.origin === MigrationSupportOrigin.CloseRefused
+  const isBackToScreenBeneath =
+    isResumeOrigin || isReceiveDelayedOrigin || isCloseRefusedOrigin
   const isBackToCommitScreen = !isGateOrigin && !isBackToScreenBeneath
   const handleBack = useCallback(() => {
     if (isGateOrigin) return

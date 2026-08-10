@@ -106,6 +106,9 @@ export const MigrationSupportOrigin = {
    *  watched underneath, so backing out returns to the screen watching it rather than
    *  popping to the commit screen, which would unmount the gate with it. */
   ReceiveDelayed: "receive-delayed",
+  /** Raised by the commit path after it resets the stack with Home underneath, so Back
+   *  returns there rather than fabricating a commit screen for a finished migration. */
+  CloseRefused: "close-refused",
 } as const
 
 export type MigrationSupportOrigin =

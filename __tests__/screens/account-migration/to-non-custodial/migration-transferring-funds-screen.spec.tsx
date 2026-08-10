@@ -556,7 +556,7 @@ describe("MigrationTransferringFundsScreen", () => {
             name: "accountMigrationContactSupport",
             params: {
               reason: "custodial-account-close-refused",
-              origin: "resume",
+              origin: "close-refused",
               custodialAccountId: "custodial-1",
             },
           },
