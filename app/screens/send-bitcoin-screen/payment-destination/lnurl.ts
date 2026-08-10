@@ -6,6 +6,7 @@ import {
   WalletCurrency,
 } from "@app/graphql/generated"
 import { toBtcMoneyAmount } from "@app/types/amounts"
+import { decodeBareLnurl, isHttpsUrl } from "@app/utils/lnurl"
 import { LnurlPaymentDestination, PaymentType } from "@blinkbitcoin/blink-client"
 
 import { createLnurlPaymentDetails } from "../payment-details"
@@ -37,10 +38,31 @@ export const resolveLnurlDestination = async ({
   // but lnurl withdraw is handled here
 
   if (parsedLnurlDestination.valid) {
+    // js-lnurl and lnurl-pay fetch the URL embedded in a bare bech32 LNURL
+    // without enforcing https. Reject any other scheme before any network call.
+    const decodedUrl = decodeBareLnurl(parsedLnurlDestination.lnurl)
+    if (decodedUrl !== null && !isHttpsUrl(decodedUrl)) {
+      return {
+        valid: false,
+        invalidReason: InvalidDestinationReason.LnurlError,
+        invalidPaymentDestination: parsedLnurlDestination,
+      } as const
+    }
+
     const lnurlParams = await getParams(parsedLnurlDestination.lnurl)
 
     // Check for lnurl withdraw request
     if ("tag" in lnurlParams && lnurlParams.tag === "withdrawRequest") {
+      // The withdraw callback is fetched directly by this app or the Breez SDK;
+      // require https so a malicious or downgraded service cannot redirect the
+      // redemption (which carries the invoice) over cleartext.
+      if (!isHttpsUrl(lnurlParams.callback)) {
+        return {
+          valid: false,
+          invalidReason: InvalidDestinationReason.LnurlUnsupported,
+          invalidPaymentDestination: parsedLnurlDestination,
+        } as const
+      }
       return createLnurlWithdrawDestination({
         lnurl: parsedLnurlDestination.lnurl,
         callback: lnurlParams.callback,
@@ -59,6 +81,16 @@ export const resolveLnurlDestination = async ({
       })
 
       if (lnurlPayParams) {
+        // Same https requirement for the pay callback: the Breez SDK fetches it
+        // on self-custodial sends, and the backend on custodial ones.
+        if (!isHttpsUrl(lnurlPayParams.callback)) {
+          return {
+            valid: false,
+            invalidReason: InvalidDestinationReason.LnurlUnsupported,
+            invalidPaymentDestination: parsedLnurlDestination,
+          } as const
+        }
+
         const maybeIntraledgerDestination = await tryGetIntraLedgerDestinationFromLnurl({
           lnurlDomains,
           lnurlPayParams,

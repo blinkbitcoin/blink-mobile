@@ -103,7 +103,7 @@ describe("merchant payment destinations", () => {
       termsUrl: "https://boltz.exchange/terms",
     }
     const lnurlParams = {
-      callback: "mocked_callback",
+      callback: "https://example.com/callback",
       fixed: true,
       min: 0 as Satoshis,
       max: 2000 as Satoshis,
@@ -164,7 +164,7 @@ describe("merchant payment destinations", () => {
     const sdk = { id: "spark-sdk" } as never
     const wrapped = { valid: true, wrapped: true }
     const lnurlParams = {
-      callback: "mocked_callback",
+      callback: "https://example.com/callback",
       fixed: true,
       min: 0 as Satoshis,
       max: 2000 as Satoshis,
