@@ -80,6 +80,53 @@ describe("useOnchainFeeTiers", () => {
     expect(result.current.tiers.fast.feeAmount).toBe(500)
   })
 
+  it("drops the previous amount's fees when the next quote fails", async () => {
+    mockPrepareSend.mockResolvedValue({ id: "prepared" })
+    mockExtractOnchainFees.mockReturnValue({ fast: 500, medium: 300, slow: 150 })
+
+    const { result, rerender } = renderHook(
+      ({ amount }: { amount: number | undefined }) =>
+        useOnchainFeeTiers(mockSdk, "bc1qtest", amount),
+      { initialProps: { amount: 5000 as number | undefined } },
+    )
+
+    await waitFor(() => {
+      expect(result.current.tiers.fast.feeAmount).toBe(500)
+    })
+
+    mockPrepareSend.mockRejectedValue(new Error("network down"))
+    rerender({ amount: 9000 })
+
+    await waitFor(() => {
+      expect(result.current.error).not.toBeNull()
+    })
+    // Leaving 500 behind would hand a caller reading tiers the old amount's fee.
+    expect(result.current.tiers.fast.feeAmount).toBe(0)
+    expect(result.current.tiers.medium.feeAmount).toBe(0)
+    expect(result.current.tiers.slow.feeAmount).toBe(0)
+  })
+
+  it("drops the previous amount's fees when the inputs fall away", async () => {
+    mockPrepareSend.mockResolvedValue({ id: "prepared" })
+    mockExtractOnchainFees.mockReturnValue({ fast: 500, medium: 300, slow: 150 })
+
+    const { result, rerender } = renderHook(
+      ({ amount }: { amount: number | undefined }) =>
+        useOnchainFeeTiers(mockSdk, "bc1qtest", amount),
+      { initialProps: { amount: 5000 as number | undefined } },
+    )
+
+    await waitFor(() => {
+      expect(result.current.tiers.fast.feeAmount).toBe(500)
+    })
+
+    rerender({ amount: undefined })
+
+    await waitFor(() => {
+      expect(result.current.tiers.fast.feeAmount).toBe(0)
+    })
+  })
+
   it("holds no quote when the sdk throws", async () => {
     mockPrepareSend.mockRejectedValue(new Error("network down"))
 

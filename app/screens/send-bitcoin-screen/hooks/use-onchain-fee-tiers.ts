@@ -69,8 +69,14 @@ export const useOnchainFeeTiers = (
   const fetchFees = useCallback(async () => {
     requestTokenRef.current += 1
     const token = requestTokenRef.current
-    // Whatever was quoted stops applying the moment this runs, request or gate alike.
+    /**
+     * Whatever was quoted stops applying the moment this runs, request or gate alike. The
+     * tiers go with it, so neither failure path below can leave the previous amount's fees
+     * on hand: only the success path puts numbers back, which is what the custodial rail
+     * already does and what keeps a caller reading tiers directly from reading stale ones.
+     */
     discardQuote()
+    setTiers(DEFAULT_TIERS)
 
     if (!sdk || !address || !amountSats) return
 
