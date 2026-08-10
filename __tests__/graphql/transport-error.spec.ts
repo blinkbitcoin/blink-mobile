@@ -48,6 +48,23 @@ describe("statusCodeOf", () => {
     expect(statusCodeOf(new Error("Network request failed"))).toBeUndefined()
     expect(statusCodeOf(null)).toBeUndefined()
   })
+
+  /** A transport that surfaces the status as a string is the same rejection; returning it
+   *  unparsed would fail every comparison in silence. */
+  it("coerces a status the transport surfaced as a string", () => {
+    expect(
+      statusCodeOf(Object.assign(new Error("Unauthorized"), { statusCode: "401" })),
+    ).toBe(401)
+  })
+
+  it("has nothing to report for a status that is not a number at all", () => {
+    expect(
+      statusCodeOf(Object.assign(new Error("Odd"), { statusCode: "not-a-status" })),
+    ).toBeUndefined()
+    expect(
+      statusCodeOf(Object.assign(new Error("Odd"), { statusCode: { code: 401 } })),
+    ).toBeUndefined()
+  })
 })
 
 describe("isUnauthorizedError", () => {

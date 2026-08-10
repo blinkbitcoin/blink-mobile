@@ -23,10 +23,20 @@ export const isNetworkFailure = (err: unknown): boolean =>
   Boolean(err instanceof Error && "networkError" in err && err.networkError)
 
 /** The transport's HTTP status, read off either the error itself (what a link hands the
- *  RetryLink) or its networkError (what Apollo hands a caller). */
-export const statusCodeOf = (err: unknown): unknown =>
-  propertyOf(err, "statusCode") ??
-  propertyOf(propertyOf(err, "networkError"), "statusCode")
+ *  RetryLink) or its networkError (what Apollo hands a caller). Numeric strings are
+ *  coerced: a transport surfacing "401" is the same rejection, and returning it unparsed
+ *  would fail every comparison below in silence. */
+export const statusCodeOf = (err: unknown): number | undefined => {
+  const status =
+    propertyOf(err, "statusCode") ??
+    propertyOf(propertyOf(err, "networkError"), "statusCode")
+
+  if (typeof status === "number") return status
+  if (typeof status !== "string") return undefined
+
+  const parsed = Number(status)
+  return Number.isInteger(parsed) ? parsed : undefined
+}
 
 /** Whether the transport rejected the token. A 401 that slipped into the network branch
  *  would earn a retry that can only 401 again. */
