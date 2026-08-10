@@ -217,14 +217,18 @@ export const useCompleteMigration = () => {
    *  hydrated: the registry's accounts start empty and fill after an async keystore read. */
   const isMigrationDataLoading = loading || accountsLoading
 
+  /** The account this migration emptied, which is the checkpoint's owner wherever the two
+   *  disagree; null only on checkpoints saved before owners existed. */
+  const emptiedCustodialAccountId = checkpointOwnerId ?? custodialOwnerId
+
   return {
     migrationCheckpoint: checkpoint,
     migrationAccountId: accountId,
     /** What the receive gate waits for; null on checkpoints saved before the field existed. */
     migrationExpectedReceiveSats: expectedReceiveSats,
-    /** Read before the discard clears it, so a handover raised after the swap can still name
-     *  the custodial account support has to close. */
-    custodialAccountId: custodialOwnerId,
+    /** Read before the discard clears it, so a handover raised after the swap can still
+     *  name the custodial account support has to close. */
+    custodialAccountId: emptiedCustodialAccountId,
     migrationLoading: isMigrationDataLoading,
     completeMigration,
   }

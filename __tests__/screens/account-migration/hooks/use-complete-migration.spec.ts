@@ -236,6 +236,25 @@ describe("useCompleteMigration", () => {
     expect(result.current.custodialAccountId).toBe("custodial-1")
   })
 
+  /** The emptied account is the checkpoint's, not whoever happens to be signed in: naming
+   *  the session's would send support to verify an account the migration never touched. */
+  it("names the checkpoint's owner when it disagrees with the session", () => {
+    mockCheckpointOwnerId = "custodial-emptied"
+    mockOwnerId = "custodial-signed-in"
+
+    const { result } = renderHook(() => useCompleteMigration())
+
+    expect(result.current.custodialAccountId).toBe("custodial-emptied")
+  })
+
+  it("falls back to the session for a checkpoint saved before owners existed", () => {
+    mockCheckpointOwnerId = null
+
+    const { result } = renderHook(() => useCompleteMigration())
+
+    expect(result.current.custodialAccountId).toBe("custodial-1")
+  })
+
   /** The account check reads the registry's accounts, which start empty and fill after an
    *  async keystore read on a resume launch; reporting loading until the registry hydrates
    *  stops a swap decided too early from reading a present destination as missing. */
