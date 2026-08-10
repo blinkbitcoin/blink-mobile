@@ -68,7 +68,7 @@ describe("useCustodialOnchainFeeTiers", () => {
     )
 
     expect(result.current.tiers[FeeTierOption.Fast].etaMinutes).toBe(10)
-    expect(result.current.tiers[FeeTierOption.Medium].etaMinutes).toBe(60)
+    expect(result.current.tiers[FeeTierOption.Medium].etaMinutes).toBe(240)
     expect(result.current.tiers[FeeTierOption.Slow].etaMinutes).toBe(1440)
   })
 
