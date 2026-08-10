@@ -1,5 +1,5 @@
 import React from "react"
-import { ScrollView, StyleSheet, Text } from "react-native"
+import { ScrollView, StyleSheet, Text, type ViewStyle } from "react-native"
 import { fireEvent, render, screen } from "@testing-library/react-native"
 import type { ReactTestInstance } from "react-test-renderer"
 
@@ -18,6 +18,15 @@ const renderLayout = (
   )
 
 const getScrollView = () => screen.UNSAFE_getByType(ScrollView)
+
+/** The nearest ancestor of `node` that paints a background colour. */
+const getPaintedAncestor = (node: ReactTestInstance): ReactTestInstance | undefined => {
+  for (let current = node.parent; current; current = current.parent) {
+    const style = StyleSheet.flatten(current.props.style) as ViewStyle | undefined
+    if (style?.backgroundColor) return current
+  }
+  return undefined
+}
 
 /** Whether `node` is rendered anywhere beneath `ancestor`. */
 const isInside = (node: ReactTestInstance, ancestor: ReactTestInstance): boolean => {
@@ -42,6 +51,19 @@ describe("MigrationStepLayout", () => {
     // The footer must stay a sibling below the scroll area, never an overlay,
     // so the scroll viewport is always the height the buttons leave behind.
     expect(isInside(screen.getByText("footer action"), getScrollView())).toBe(false)
+  })
+
+  it("paints the footer band itself, not just the screen behind it", () => {
+    renderLayout()
+
+    // A disabled primary button is a translucent fill, so the band beneath it
+    // has to own its pixels. Painting is only the band's if the nearest painted
+    // ancestor stops short of the scroll area — the screen paints too, and
+    // leaning on that would leave the button compositing whatever it overlaps.
+    const band = getPaintedAncestor(screen.getByText("footer action"))
+
+    expect(band).toBeDefined()
+    expect(band && isInside(getScrollView(), band)).toBe(false)
   })
 
   it("lets the content container grow so tall content can scroll", () => {

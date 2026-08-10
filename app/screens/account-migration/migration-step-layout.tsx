@@ -88,7 +88,7 @@ export const MigrationStepLayout: React.FC<MigrationStepLayoutProps> = ({
   )
 }
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles(({ colors }) => ({
   container: {
     flex: 1,
     justifyContent: "space-between",
@@ -107,5 +107,9 @@ const useStyles = makeStyles(() => ({
     paddingHorizontal: 20,
     paddingBottom: 20,
     paddingTop: 10,
+    // The band paints its own surface rather than leaning on the screen showing
+    // through: a disabled primary button is a translucent fill, so whatever is
+    // visible behind the band would be visible through the button.
+    backgroundColor: colors.white,
   },
 }))
