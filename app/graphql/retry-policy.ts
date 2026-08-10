@@ -1,5 +1,6 @@
 import type { Operation } from "@apollo/client"
 import type { NetworkError } from "@apollo/client/errors"
+import { RetryLink } from "@apollo/client/link/retry"
 
 import { isUnauthorizedError } from "./transport-error"
 
@@ -92,3 +93,22 @@ export const shouldRetryUnauthorized = (
   error: NetworkError,
   operationName: string,
 ): boolean => isUnauthorizedError(error) && !noRetryOperations.includes(operationName)
+
+const UNAUTHORIZED_RETRY_INITIAL_DELAY_MS = 5000
+
+/** Built here rather than inline in the client so the composition that actually protects
+ *  the irreversible operations is reachable from a test. */
+export const createUnauthorizedRetryLink = (): RetryLink =>
+  new RetryLink({
+    attempts: {
+      max: 2,
+      retryIf: (error, operation) =>
+        !hasIdempotencyKey(operation) &&
+        shouldRetryUnauthorized(error, operation.operationName),
+    },
+    delay: {
+      initial: UNAUTHORIZED_RETRY_INITIAL_DELAY_MS,
+      max: Infinity,
+      jitter: false,
+    },
+  })
