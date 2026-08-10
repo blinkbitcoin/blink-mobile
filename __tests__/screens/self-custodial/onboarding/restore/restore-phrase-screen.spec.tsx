@@ -32,6 +32,15 @@ jest.mock("@app/utils/error-logging", () => ({
   reportError: (...args: readonly unknown[]) => mockReportError(...args),
 }))
 
+const mockEnableScreenSecurity = jest.fn()
+const mockDisableScreenSecurity = jest.fn()
+jest.mock("@app/utils/screen-security", () => ({
+  enableScreenSecurity: (...args: readonly unknown[]) =>
+    mockEnableScreenSecurity(...args),
+  disableScreenSecurity: (...args: readonly unknown[]) =>
+    mockDisableScreenSecurity(...args),
+}))
+
 type MnemonicWordInputProps = {
   index: number
   value: string
@@ -533,6 +542,38 @@ describe("RestorePhraseScreen", () => {
       headerRight: undefined,
       // eslint-disable-next-line camelcase -- name dictated by @react-navigation/native-stack
       unstable_headerRightItems: undefined,
+    })
+  })
+
+  /** The screen shows a funded wallet's mnemonic, so it must carry the same
+   *  screenshot/screen-recording protection as the backup-creation screen. */
+  describe("screen security", () => {
+    it("enables screenshot protection on mount", async () => {
+      renderScreen()
+      await flushEffects()
+
+      expect(mockEnableScreenSecurity).toHaveBeenCalledTimes(1)
+    })
+
+    it("keeps screenshot protection active on the restoring and error states", async () => {
+      for (const status of ["restoring", "error"]) {
+        jest.clearAllMocks()
+        mockUseRestorePhrase.mockReturnValue({ ...defaultHookReturn, status })
+
+        renderScreen()
+        await flushEffects()
+
+        expect(mockEnableScreenSecurity).toHaveBeenCalledTimes(1)
+      }
+    })
+
+    it("disables screenshot protection on unmount", async () => {
+      const { unmount } = renderScreen()
+      await flushEffects()
+
+      unmount()
+
+      expect(mockDisableScreenSecurity).toHaveBeenCalledTimes(1)
     })
   })
 })
