@@ -17,7 +17,10 @@ import {
   PaymentDestination,
   ResolvedIntraledgerPaymentDestination,
 } from "@app/screens/send-bitcoin-screen/payment-destination/index.types"
-import { createIntraledgerPaymentDetails } from "@app/screens/send-bitcoin-screen/payment-details"
+import {
+  createIntraledgerPaymentDetails,
+  createNoAmountOnchainPaymentDetails,
+} from "@app/screens/send-bitcoin-screen/payment-details"
 import { ZeroBtcMoneyAmount } from "@app/types/amounts"
 import { PaymentType } from "@blinkbitcoin/blink-client"
 
@@ -133,6 +136,42 @@ const intraledgerRoute = {
 } as const
 
 const Intraledger = () => <SendBitcoinDetailsScreen route={intraledgerRoute} />
+
+const onchainAddress = "bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq"
+
+const onchainValidDestination = {
+  valid: true as const,
+  paymentType: PaymentType.Onchain,
+  address: onchainAddress,
+}
+
+const createOnchainPaymentDetail = <T extends WalletCurrency>({
+  convertMoneyAmount,
+  sendingWalletDescriptor,
+}: CreatePaymentDetailParams<T>) =>
+  createNoAmountOnchainPaymentDetails({
+    address: onchainAddress,
+    sendingWalletDescriptor,
+    convertMoneyAmount,
+    unitOfAccountAmount: ZeroBtcMoneyAmount,
+  })
+
+const onchainPaymentDestination: PaymentDestination = {
+  valid: true,
+  validDestination: onchainValidDestination as never,
+  destinationDirection: DestinationDirection.Send,
+  createPaymentDetail: createOnchainPaymentDetail,
+}
+
+const onchainRoute = {
+  key: "sendBitcoinDetailsScreen",
+  name: "sendBitcoinDetails",
+  params: {
+    paymentDestination: onchainPaymentDestination,
+  },
+} as const
+
+const Onchain = () => <SendBitcoinDetailsScreen route={onchainRoute} />
 
 it("SendScreen Details", async () => {
   render(
@@ -312,5 +351,96 @@ describe("SendBitcoinDetailsScreen — LNURL requestInvoice gate", () => {
     expect(mockRequestInvoice).toHaveBeenCalledWith(
       expect.objectContaining({ lnUrlOrAddress: "lnurl1abc" }),
     )
+  })
+})
+
+describe("onchain fee tier gating", () => {
+  it("renders the speed selector for a custodial onchain send", async () => {
+    render(
+      <ContextForScreen>
+        <Onchain />
+      </ContextForScreen>,
+    )
+
+    // The render condition widened from "self-custodial and onchain" to any onchain send.
+    expect(await screen.findByTestId("fee-tier-dropdown")).toBeTruthy()
+  })
+
+  it("keeps the speed selector off an intraledger send", async () => {
+    render(
+      <ContextForScreen>
+        <Intraledger />
+      </ContextForScreen>,
+    )
+    await flushAsync()
+
+    expect(screen.queryByTestId("fee-tier-dropdown")).toBeNull()
+  })
+
+  it("labels the tiers without a fee while none has been quoted", async () => {
+    loadLocale("en")
+    const LL = i18nObject("en")
+
+    render(
+      <ContextForScreen>
+        <Onchain />
+      </ContextForScreen>,
+    )
+    await screen.findByTestId("fee-tier-dropdown")
+    await flushAsync()
+
+    // A zeroed placeholder must never read as a fee somebody quoted.
+    expect(screen.getByText(LL.SendBitcoinScreen.fast())).toBeTruthy()
+    expect(screen.queryByText(`${LL.SendBitcoinScreen.fast()} (0 sats)`)).toBeNull()
+  })
+
+  it("adopts the tier the user picks", async () => {
+    loadLocale("en")
+    const LL = i18nObject("en")
+
+    render(
+      <ContextForScreen>
+        <Onchain />
+      </ContextForScreen>,
+    )
+    await screen.findByTestId("fee-tier-dropdown")
+    await flushAsync()
+
+    fireEvent.press(screen.getByTestId("fee-tier-dropdown"))
+    fireEvent.press(screen.getByTestId("fee-tier-slow"))
+    await flushAsync()
+
+    expect(screen.getAllByText(LL.SendBitcoinScreen.slow()).length).toBeGreaterThan(0)
+  })
+
+  it("leaves Next enabled when a custodial quote fails", async () => {
+    loadLocale("en")
+    const LL = i18nObject("en")
+
+    render(
+      <ContextForScreen>
+        <Onchain />
+      </ContextForScreen>,
+    )
+    await screen.findByTestId("fee-tier-dropdown")
+    await flushAsync()
+
+    fireEvent.press(screen.getByTestId("Amount Input Button"))
+    await flushAsync()
+    fireEvent.press(screen.getByTestId("Key 1"))
+    await flushAsync()
+    const setAmountButtons = screen.getAllByText(LL.AmountInputScreen.setAmount())
+    fireEvent.press(setAmountButtons[setAmountButtons.length - 1])
+    await flushAsync()
+
+    /**
+     * The custodial quote is only an estimate: the confirmation screen fetches its own and
+     * the mutation validates server-side, so a failure here must not strand the user.
+     */
+    await waitFor(() => {
+      expect(
+        screen.getByTestId(LL.common.next()).props.accessibilityState?.disabled,
+      ).toBe(false)
+    })
   })
 })
