@@ -10,10 +10,29 @@ jest.mock("react-native-modal", () => {
   const MockModal = ({
     children,
     isVisible,
+    onBackdropPress,
+    onBackButtonPress,
   }: {
     children: React.ReactNode
     isVisible: boolean
-  }) => (isVisible ? React.createElement("View", { testID: "modal" }, children) : null)
+    onBackdropPress: () => void
+    onBackButtonPress: () => void
+  }) =>
+    isVisible
+      ? React.createElement(
+          "View",
+          { testID: "modal" },
+          React.createElement("View", {
+            testID: "modal-backdrop",
+            onPress: onBackdropPress,
+          }),
+          React.createElement("View", {
+            testID: "modal-back-button",
+            onPress: onBackButtonPress,
+          }),
+          children,
+        )
+      : null
   MockModal.displayName = "MockModal"
   return MockModal
 })
@@ -101,6 +120,26 @@ describe("FeeTierSelector", () => {
     const { getByTestId } = renderSelector({ selected: "nonexistent" as never })
 
     expect(getByTestId("fee-tier-dropdown")).toBeTruthy()
+  })
+
+  it("closes the tier list when the backdrop is pressed", () => {
+    const { getByTestId, queryByTestId } = renderSelector()
+
+    fireEvent.press(getByTestId("fee-tier-dropdown"))
+    expect(getByTestId("fee-tier-slow")).toBeTruthy()
+
+    fireEvent.press(getByTestId("modal-backdrop"))
+
+    expect(queryByTestId("fee-tier-slow")).toBeNull()
+  })
+
+  it("closes the tier list on the hardware back button", () => {
+    const { getByTestId, queryByTestId } = renderSelector()
+
+    fireEvent.press(getByTestId("fee-tier-dropdown"))
+    fireEvent.press(getByTestId("modal-back-button"))
+
+    expect(queryByTestId("fee-tier-slow")).toBeNull()
   })
 
   it("hides detail when an option's detail is empty", () => {

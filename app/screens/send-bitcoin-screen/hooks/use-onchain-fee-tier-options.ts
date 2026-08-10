@@ -14,17 +14,8 @@ import { type ParseDestinationResult } from "../payment-destination/index.types"
 import { ConvertMoneyAmount, type PaymentDetail } from "../payment-details/index.types"
 
 import { FeeTierOption, FeeUnit } from "./fee-tiers.types"
-import {
-  PAYOUT_SPEED_BY_FEE_TIER,
-  useCustodialOnchainFeeTiers,
-} from "./use-custodial-onchain-fee-tiers"
-import {
-  type SdkFeeError,
-  SdkFeeError as FeeError,
-  useOnchainFeeTiers,
-} from "./use-onchain-fee-tiers"
-
-type LL = ReturnType<typeof useI18nContext>["LL"]
+import { useCustodialFeeRail, useSelfCustodialFeeRail } from "./use-fee-rail"
+import { PAYOUT_SPEED_BY_FEE_TIER } from "./use-custodial-onchain-fee-tiers"
 
 /**
  * Read off the tier rather than guessed from the rail, so a cents fee can never be handed
@@ -35,16 +26,6 @@ const CURRENCY_BY_FEE_UNIT: Record<FeeUnit, WalletCurrency> = {
   [FeeUnit.Sats]: WalletCurrency.Btc,
   [FeeUnit.Cents]: WalletCurrency.Usd,
   [FeeUnit.SatPerVbyte]: WalletCurrency.Btc,
-}
-
-const resolveFeeErrorMessage = (error: SdkFeeError, LL: LL): string => {
-  if (error === FeeError.InsufficientFunds) {
-    return LL.SendBitcoinScreen.sdkInsufficientFunds()
-  }
-  if (error === FeeError.InvalidInput) return LL.SendBitcoinScreen.sdkAmountTooLow()
-  if (error === FeeError.NetworkError) return LL.SendBitcoinScreen.sdkNetworkError()
-
-  return LL.SendBitcoinScreen.sdkGenericError()
 }
 
 type FeeTierOptionsParams = {
@@ -79,81 +60,28 @@ export const useOnchainFeeTierOptions = ({
   const feeTier = pickedFeeTier ?? defaultFeeTier
 
   const isOnchain = paymentDetail?.paymentType === PaymentType.Onchain
-  const isSelfCustodialOnchain = isSelfCustodial && isOnchain
-  const isCustodialOnchain = !isSelfCustodial && isOnchain
 
-  const address = isOnchain ? paymentDetail?.destination : undefined
-  const settlementAmount = paymentDetail?.settlementAmount
-
-  const selfCustodialAmountSats =
-    isSelfCustodialOnchain && settlementAmount?.amount
-      ? settlementAmount.amount
-      : undefined
-
-  const selfCustodialAddress = isSelfCustodialOnchain ? address : undefined
-
-  const {
-    tiers: selfCustodialTiers,
-    error: selfCustodialError,
-    hasQuote: hasSelfCustodialQuote,
-  } = useOnchainFeeTiers(sdk ?? null, selfCustodialAddress, selfCustodialAmountSats)
-
-  /** Read from the payment detail so the tiers always quote the endpoint the send uses. */
-  const custodialQuote = isCustodialOnchain ? paymentDetail?.feeQuote : undefined
-
-  const quotedAmount = paymentDetail?.destinationSpecifiedAmount
-    ? paymentDetail.destinationSpecifiedAmount.amount
-    : settlementAmount?.amount
-
-  /** All four gates move together: off the custodial on-chain rail nothing is quoted. */
-  const custodialWalletId = isCustodialOnchain
-    ? paymentDetail?.sendingWalletDescriptor.id
-    : undefined
-  const custodialAddress = isCustodialOnchain ? address : undefined
-  const custodialAmount = isCustodialOnchain ? quotedAmount : undefined
-
-  const {
-    tiers: custodialTiers,
-    hasError: hasCustodialError,
-    hasQuote: hasCustodialQuote,
-    isQuoting: isQuotingCustodialFees,
-  } = useCustodialOnchainFeeTiers({
-    walletId: custodialWalletId,
-    address: custodialAddress,
-    amount: custodialAmount,
-    quote: custodialQuote,
+  const selfCustodialRail = useSelfCustodialFeeRail({
+    paymentDetail,
+    isActive: isSelfCustodial && isOnchain,
+  })
+  const custodialRail = useCustodialFeeRail({
+    paymentDetail,
+    isActive: !isSelfCustodial && isOnchain,
   })
 
-  const feeTiers = isSelfCustodial ? selfCustodialTiers : custodialTiers
-
-  const selfCustodialErrorMessage = selfCustodialError
-    ? resolveFeeErrorMessage(selfCustodialError, LL)
-    : undefined
-  const custodialErrorMessage = hasCustodialError
-    ? LL.SendBitcoinScreen.feeEstimateError()
-    : undefined
-  const feeTierErrorMessage = isSelfCustodial
-    ? selfCustodialErrorMessage
-    : custodialErrorMessage
+  /** The one place the rail is chosen; everything below reads the winner plainly. */
+  const feeRail = isSelfCustodial ? selfCustodialRail : custodialRail
 
   /**
-   * A self-custodial failure means the SDK could not build the transaction, so there is
-   * nothing to continue to. A custodial quote is only an estimate: the confirmation screen
-   * fetches its own and the mutation validates server-side, so a transient failure is worth
-   * showing but must not strand the user on this screen with no way to retry.
+   * The spinner stays custodial-only, because the SDK answers fast enough that one would
+   * merely flicker. It is the single field the rails do not answer alike.
    */
-  const isFeeTierErrorBlocking = isSelfCustodial && Boolean(selfCustodialErrorMessage)
-
-  /**
-   * Label-level only: both rails carry a fee only once one has been quoted for the amount
-   * on screen. The spinner stays custodial-only, because the SDK answers fast enough that
-   * one would merely flicker.
-   */
-  const hasFeeQuote = isSelfCustodial ? hasSelfCustodialQuote : hasCustodialQuote
+  const isQuotingFees = !isSelfCustodial && custodialRail.isQuoting
 
   const feeTierOptions = buildFeeTierOptions({
-    hasQuote: hasFeeQuote,
-    tiers: feeTiers,
+    hasQuote: feeRail.hasQuote,
+    tiers: feeRail.tiers,
     labels: {
       [FeeTierOption.Fast]: LL.SendBitcoinScreen.fast(),
       [FeeTierOption.Medium]: LL.SendBitcoinScreen.medium(),
@@ -229,9 +157,8 @@ export const useOnchainFeeTierOptions = ({
     setFeeTier,
     feeTierOptions,
     isOnchain,
-    feeTierErrorMessage,
-    isFeeTierErrorBlocking,
-    /** Only the custodial rail quotes over the network; the SDK answers near-instantly. */
-    isQuotingFees: !isSelfCustodial && isQuotingCustodialFees,
+    feeTierErrorMessage: feeRail.errorMessage,
+    isFeeTierErrorBlocking: feeRail.isErrorBlocking,
+    isQuotingFees,
   }
 }
