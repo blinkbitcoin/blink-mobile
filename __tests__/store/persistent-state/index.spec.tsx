@@ -24,6 +24,30 @@ jest.mock("@react-native-firebase/crashlytics", () => () => ({
   log: jest.fn(),
 }))
 
+// In-memory stand-in for the secure key store, where the session token now lives.
+const mockSecureStore = new Map<string, string>()
+jest.mock("react-native-secure-key-store", () => ({
+  __esModule: true,
+  default: {
+    get: (key: string) =>
+      mockSecureStore.has(key)
+        ? Promise.resolve(mockSecureStore.get(key))
+        : Promise.reject(new Error(`key not found: ${key}`)),
+    set: (key: string, value: string) => {
+      mockSecureStore.set(key, value)
+      return Promise.resolve(true)
+    },
+    remove: (key: string) => {
+      mockSecureStore.delete(key)
+      return Promise.resolve(true)
+    },
+  },
+  ACCESSIBLE: {
+    ALWAYS_THIS_DEVICE_ONLY: "ALWAYS_THIS_DEVICE_ONLY",
+    WHEN_UNLOCKED_THIS_DEVICE_ONLY: "WHEN_UNLOCKED_THIS_DEVICE_ONLY",
+  },
+}))
+
 const TestConsumer: React.FC = () => {
   const ctx = React.useContext(PersistentStateContext)
   if (!ctx) return <Text testID="loading">Loading</Text>
@@ -48,6 +72,7 @@ const TestConsumer: React.FC = () => {
 describe("PersistentStateProvider", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockSecureStore.clear()
     mockSaveJson.mockResolvedValue(undefined)
     mockSaveString.mockResolvedValue(true)
   })
@@ -160,7 +185,9 @@ describe("PersistentStateProvider", () => {
 
     expect(mockSaveJson).toHaveBeenCalledWith(
       "persistentState",
-      expect.objectContaining({ galoyAuthToken: "new-token" }),
+      // The token is stripped from the AsyncStorage blob — the in-memory value
+      // ("new-token", asserted above) never reaches disk in plaintext.
+      expect.objectContaining({ galoyAuthToken: "" }),
     )
   })
 
@@ -350,6 +377,67 @@ describe("PersistentStateProvider", () => {
 
       expect(mockRecordError).not.toHaveBeenCalled()
       expect(mockSaveString).not.toHaveBeenCalled()
+    })
+  })
+
+  describe("session token storage", () => {
+    it("hydrates the token from the secure key store, ignoring the blank on-disk copy", async () => {
+      mockSecureStore.set("activeAuthToken", "secure-token")
+      mockLoadJson.mockResolvedValue({
+        schemaVersion: 6,
+        galoyInstance: { id: "Main" },
+        galoyAuthToken: "",
+      })
+
+      render(
+        <PersistentStateProvider>
+          <TestConsumer />
+        </PersistentStateProvider>,
+      )
+
+      await waitFor(() => {
+        expect(screen.getByTestId("token").props.children).toBe("secure-token")
+      })
+    })
+
+    it("moves a legacy plaintext token from the AsyncStorage blob into the key store on load", async () => {
+      mockLoadJson.mockResolvedValue({
+        schemaVersion: 6,
+        galoyInstance: { id: "Main" },
+        galoyAuthToken: "legacy-token",
+      })
+
+      render(
+        <PersistentStateProvider>
+          <TestConsumer />
+        </PersistentStateProvider>,
+      )
+
+      await waitFor(() => {
+        expect(screen.getByTestId("token").props.children).toBe("legacy-token")
+      })
+      expect(mockSecureStore.get("activeAuthToken")).toBe("legacy-token")
+    })
+
+    it("prefers the key store token over a stale blob copy", async () => {
+      mockSecureStore.set("activeAuthToken", "secure-token")
+      mockLoadJson.mockResolvedValue({
+        schemaVersion: 6,
+        galoyInstance: { id: "Main" },
+        galoyAuthToken: "stale-blob-token",
+      })
+
+      render(
+        <PersistentStateProvider>
+          <TestConsumer />
+        </PersistentStateProvider>,
+      )
+
+      await waitFor(() => {
+        expect(screen.getByTestId("token").props.children).toBe("secure-token")
+      })
+      // No legacy move happened: the blob token is discarded, not promoted.
+      expect(mockSecureStore.get("activeAuthToken")).toBe("secure-token")
     })
   })
 })

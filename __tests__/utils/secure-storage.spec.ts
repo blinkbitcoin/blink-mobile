@@ -536,4 +536,59 @@ describe("KeyStoreWrapper session-profile methods", () => {
       expect(result).toBe(false)
     })
   })
+
+  describe("active auth token", () => {
+    it("getActiveAuthToken reads the activeAuthToken key", async () => {
+      mockGet.mockResolvedValue("session-token")
+
+      const result = await KeyStoreWrapper.getActiveAuthToken()
+
+      expect(result).toBe("session-token")
+      expect(mockGet).toHaveBeenCalledWith("activeAuthToken")
+    })
+
+    it("getActiveAuthToken returns null on keystore error", async () => {
+      mockGet.mockRejectedValue(new Error("keychain unavailable"))
+
+      const result = await KeyStoreWrapper.getActiveAuthToken()
+
+      expect(result).toBeNull()
+    })
+
+    it("setActiveAuthToken writes device-only and returns true", async () => {
+      mockSet.mockResolvedValue(undefined)
+
+      const result = await KeyStoreWrapper.setActiveAuthToken("session-token")
+
+      expect(result).toBe(true)
+      expect(mockSet).toHaveBeenCalledWith("activeAuthToken", "session-token", {
+        accessible: "ALWAYS_THIS_DEVICE_ONLY",
+      })
+    })
+
+    it("setActiveAuthToken returns false when the write fails", async () => {
+      mockSet.mockRejectedValue(new Error("write locked"))
+
+      const result = await KeyStoreWrapper.setActiveAuthToken("session-token")
+
+      expect(result).toBe(false)
+    })
+
+    it("removeActiveAuthToken removes the key and returns true", async () => {
+      mockRemove.mockResolvedValue(undefined)
+
+      const result = await KeyStoreWrapper.removeActiveAuthToken()
+
+      expect(result).toBe(true)
+      expect(mockRemove).toHaveBeenCalledWith("activeAuthToken")
+    })
+
+    it("removeActiveAuthToken returns false on keystore error", async () => {
+      mockRemove.mockRejectedValue(new Error("not found"))
+
+      const result = await KeyStoreWrapper.removeActiveAuthToken()
+
+      expect(result).toBe(false)
+    })
+  })
 })

@@ -43,6 +43,12 @@ const useLogout = () => {
 
         if (token) {
           await KeyStoreWrapper.removeSessionProfileByToken(token)
+          // Removing the profile that backs the active session must also drop
+          // the active token, or it would be hydrated back on next launch.
+          const activeToken = await KeyStoreWrapper.getActiveAuthToken()
+          if (activeToken === token) {
+            await KeyStoreWrapper.removeActiveAuthToken()
+          }
           context = { headers: { authorization: `Bearer ${token}` } }
         } else {
           await AsyncStorage.multiRemove([SCHEMA_VERSION_KEY])
@@ -50,6 +56,7 @@ const useLogout = () => {
           await KeyStoreWrapper.removePin()
           await KeyStoreWrapper.removePinAttempts()
           await KeyStoreWrapper.removeSessionProfiles()
+          await KeyStoreWrapper.removeActiveAuthToken()
         }
 
         logLogout()

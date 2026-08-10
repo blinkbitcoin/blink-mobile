@@ -5,6 +5,7 @@ import { recordAppError } from "@app/utils/error-reporting"
 
 import { reportError } from "@app/utils/error-logging"
 import { loadJson, saveJson, saveString } from "@app/utils/storage"
+import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
 import {
   defaultPersistentState,
@@ -26,25 +27,44 @@ const quarantineRawState = async (rawData: unknown): Promise<void> => {
   }
 }
 
+/**
+ * The session token is never persisted in this AsyncStorage blob: it lives in
+ * the secure key store (KeyStoreWrapper) and is hydrated into memory on load.
+ * A token still present in a blob written before this split is moved to the
+ * key store here, then stripped from disk on the next save.
+ */
+const hydrateAuthToken = async (state: PersistentState): Promise<PersistentState> => {
+  const secureToken = await KeyStoreWrapper.getActiveAuthToken()
+  if (secureToken) {
+    return { ...state, galoyAuthToken: secureToken }
+  }
+  if (state.galoyAuthToken) {
+    await KeyStoreWrapper.setActiveAuthToken(state.galoyAuthToken)
+  }
+  return state
+}
+
 export const loadPersistentState = async (): Promise<PersistentState> => {
   const data = await loadJson(PERSISTENT_STATE_KEY)
   const result = await migratePersistentState(data)
 
   switch (result.status) {
     case MigrationStatus.Ok:
-      return result.state
+      return hydrateAuthToken(result.state)
     case MigrationStatus.NoData:
-      return defaultPersistentState
+      return hydrateAuthToken(defaultPersistentState)
     case MigrationStatus.Failed:
       recordAppError(result.error, { alwaysRecord: true })
       await quarantineRawState(result.rawData)
-      return defaultPersistentState
+      return hydrateAuthToken(defaultPersistentState)
   }
 }
 
 const savePersistentState = async (state: PersistentState): Promise<void> => {
   try {
-    await saveJson(PERSISTENT_STATE_KEY, state)
+    // galoyAuthToken stays in memory only — the plaintext copy on disk is
+    // always blank; the real token is in the secure key store.
+    await saveJson(PERSISTENT_STATE_KEY, { ...state, galoyAuthToken: "" })
   } catch (err) {
     // Storage failures are crash-adjacent: never downgrade on message wording.
     reportError("Persistent state save", err, { alwaysRecord: true })

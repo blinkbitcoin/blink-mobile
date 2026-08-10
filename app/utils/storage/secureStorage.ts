@@ -5,6 +5,7 @@ export default class KeyStoreWrapper {
   private static readonly PIN = "PIN"
   private static readonly PIN_ATTEMPTS = "pinAttempts"
   private static readonly SESSION_PROFILES = "sessionProfiles"
+  private static readonly ACTIVE_AUTH_TOKEN = "activeAuthToken"
   private static readonly MNEMONIC = "mnemonic"
   private static readonly MNEMONIC_NETWORK = "mnemonic_network"
 
@@ -133,6 +134,38 @@ export default class KeyStoreWrapper {
       await RNSecureKeyStore.remove(KeyStoreWrapper.SESSION_PROFILES)
       return true
     } catch (err) {
+      return false
+    }
+  }
+
+  /**
+   * The active session token. Stored only here (secure key store) and kept in
+   * memory at runtime — it must never be written to AsyncStorage.
+   */
+  public static async getActiveAuthToken(): Promise<string | null> {
+    try {
+      return await RNSecureKeyStore.get(KeyStoreWrapper.ACTIVE_AUTH_TOKEN)
+    } catch {
+      return null
+    }
+  }
+
+  public static async setActiveAuthToken(token: string): Promise<boolean> {
+    try {
+      await RNSecureKeyStore.set(KeyStoreWrapper.ACTIVE_AUTH_TOKEN, token, {
+        accessible: ACCESSIBLE.ALWAYS_THIS_DEVICE_ONLY,
+      })
+      return true
+    } catch {
+      return false
+    }
+  }
+
+  public static async removeActiveAuthToken(): Promise<boolean> {
+    try {
+      await RNSecureKeyStore.remove(KeyStoreWrapper.ACTIVE_AUTH_TOKEN)
+      return true
+    } catch {
       return false
     }
   }
