@@ -105,6 +105,20 @@ const foregroundApp = async () => {
   })
 }
 
+/** Mirrored, not imported: reading them from the source would let a removal pass. */
+const DEFERRED_CLOSE_RETRY_DELAY_MS = 5 * 60 * 1000
+const MAX_DEFERRED_CLOSE_TIMER_RETRIES = 3
+
+/** `flushEffects` settles through `setImmediate`, which a faked clock would swallow. */
+const withFakeTimers = () => jest.useFakeTimers({ doNotFake: ["setImmediate"] })
+
+const advanceToNextCloseRetry = async () => {
+  await act(async () => {
+    jest.advanceTimersByTime(DEFERRED_CLOSE_RETRY_DELAY_MS)
+  })
+  await flushEffects()
+}
+
 describe("useResumeCompletedMigration", () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -116,6 +130,10 @@ describe("useResumeCompletedMigration", () => {
     mockCompleteMigrationRef = mockCompleteMigration
     mockCompleteMigration.mockResolvedValue(MigrationCompletion.Completed)
     mockReceiveConfirmation = { isReceiveConfirmed: true, isReceiveDelayed: false }
+  })
+
+  afterEach(() => {
+    jest.useRealTimers()
   })
 
   /**
@@ -397,6 +415,35 @@ describe("useResumeCompletedMigration", () => {
     await flushEffects()
 
     expect(mockCompleteMigration).toHaveBeenCalledTimes(2)
+  })
+
+  it("retries a deferred close on a timer while the app stays foregrounded", async () => {
+    withFakeTimers()
+    mockCompleteMigration.mockResolvedValue(MigrationCompletion.CloseUnavailable)
+    renderHook(() => useResumeCompletedMigration())
+    await flushEffects()
+    expect(mockCompleteMigration).toHaveBeenCalledTimes(1)
+
+    mockCompleteMigration.mockResolvedValue(MigrationCompletion.Completed)
+    await advanceToNextCloseRetry()
+
+    expect(mockCompleteMigration).toHaveBeenCalledTimes(2)
+  })
+
+  it("stops the timed retries once the budget is spent", async () => {
+    withFakeTimers()
+    mockCompleteMigration.mockResolvedValue(MigrationCompletion.CloseUnavailable)
+    renderHook(() => useResumeCompletedMigration())
+    await flushEffects()
+
+    const beyondTheBudget = MAX_DEFERRED_CLOSE_TIMER_RETRIES + 2
+    for (let round = 0; round < beyondTheBudget; round += 1) {
+      await advanceToNextCloseRetry()
+    }
+
+    expect(mockCompleteMigration).toHaveBeenCalledTimes(
+      1 + MAX_DEFERRED_CLOSE_TIMER_RETRIES,
+    )
   })
 
   /** The retry is armed by a deferral, not by every trip through the app switcher. */

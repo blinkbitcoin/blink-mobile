@@ -21,6 +21,11 @@ import { useMigrationStatus } from "./use-migration-status"
  *  are attempted before leaving the rest to the next launch, which starts the count over. */
 const MAX_SWAP_ATTEMPTS = 3
 
+/** Foregrounding may never come, so a deferred close is also retried on a timer, bounded
+ *  so a dead network cannot be dialled all session. */
+const DEFERRED_CLOSE_RETRY_DELAY_MS = 5 * 60 * 1000
+const MAX_DEFERRED_CLOSE_TIMER_RETRIES = 3
+
 /**
  * Finishes a migration the server completed but this device never swapped away from. The
  * transfer ends in two steps, the server moving the funds and the app switching sessions,
@@ -83,6 +88,10 @@ export const useResumeCompletedMigration = (): void => {
    *  comes back rather than waiting for the OS to kill the process. */
   const hasDeferredCloseRef = useRef(false)
   const [closeRetryCount, setCloseRetryCount] = useState(0)
+  const deferredCloseTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
+  )
+  const timedCloseRetriesRef = useRef(0)
 
   /** Foregrounding is the cheapest signal that the connection may be back, and the only one
    *  this hook can watch without a screen: it is mounted under the tab navigator with no UI
@@ -93,11 +102,23 @@ export const useResumeCompletedMigration = (): void => {
         nextAppState === "active" && hasDeferredCloseRef.current
       if (!isDeferredCloseWaiting) return
       hasDeferredCloseRef.current = false
+      clearTimeout(deferredCloseTimerRef.current)
       setCloseRetryCount((previous) => previous + 1)
     })
 
     return () => subscription.remove()
   }, [])
+
+  const scheduleDeferredCloseRetry = useCallback(() => {
+    if (timedCloseRetriesRef.current >= MAX_DEFERRED_CLOSE_TIMER_RETRIES) return
+    timedCloseRetriesRef.current += 1
+    deferredCloseTimerRef.current = setTimeout(() => {
+      hasDeferredCloseRef.current = false
+      setCloseRetryCount((previous) => previous + 1)
+    }, DEFERRED_CLOSE_RETRY_DELAY_MS)
+  }, [])
+
+  useEffect(() => () => clearTimeout(deferredCloseTimerRef.current), [])
 
   const isSwapPending = isServerCompleted && isReceiveConfirmed
 
@@ -136,6 +157,7 @@ export const useResumeCompletedMigration = (): void => {
            *  keeps working and the provisioned account is already in the switcher. */
           case MigrationCompletion.CloseUnavailable:
             hasDeferredCloseRef.current = true
+            scheduleDeferredCloseRetry()
             return
 
           case MigrationCompletion.CloseRefused:
@@ -176,5 +198,6 @@ export const useResumeCompletedMigration = (): void => {
     closeRetryCount,
     completeMigration,
     handOverToSupport,
+    scheduleDeferredCloseRetry,
   ])
 }
