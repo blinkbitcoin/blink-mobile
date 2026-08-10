@@ -26,6 +26,7 @@ jest.mock("@react-native-firebase/crashlytics", () => () => ({
 
 // In-memory stand-in for the secure key store, where the session token now lives.
 const mockSecureStore = new Map<string, string>()
+const failSetFor = new Set<string>()
 jest.mock("react-native-secure-key-store", () => ({
   __esModule: true,
   default: {
@@ -34,6 +35,7 @@ jest.mock("react-native-secure-key-store", () => ({
         ? Promise.resolve(mockSecureStore.get(key))
         : Promise.reject(new Error(`key not found: ${key}`)),
     set: (key: string, value: string) => {
+      if (failSetFor.has(key)) return Promise.reject(new Error("keystore locked"))
       mockSecureStore.set(key, value)
       return Promise.resolve(true)
     },
@@ -73,6 +75,7 @@ describe("PersistentStateProvider", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockSecureStore.clear()
+    failSetFor.clear()
     mockSaveJson.mockResolvedValue(undefined)
     mockSaveString.mockResolvedValue(true)
   })
@@ -308,7 +311,9 @@ describe("PersistentStateProvider", () => {
       const timestamp = Number(key.split(".").pop())
       expect(timestamp).toBeGreaterThanOrEqual(before)
       expect(timestamp).toBeLessThanOrEqual(after)
-      expect(JSON.parse(payload)).toEqual(corruptedState3)
+      // The quarantine keeps the raw blob for forensics but never the token:
+      // it is stripped before the payload hits AsyncStorage.
+      expect(JSON.parse(payload)).toEqual({ ...corruptedState3, galoyAuthToken: "" })
 
       // Provider must still mount with defaults so the app can launch.
       expect(screen.getByTestId("token").props.children).toBe(
@@ -438,6 +443,77 @@ describe("PersistentStateProvider", () => {
       })
       // No legacy move happened: the blob token is discarded, not promoted.
       expect(mockSecureStore.get("activeAuthToken")).toBe("secure-token")
+    })
+
+    it("does NOT hydrate on a fresh install, even when the key store still holds a token", async () => {
+      // iOS: the keychain outlives app deletion. No persisted blob must mean
+      // logged out — not "resume the previous install's session".
+      mockSecureStore.set("activeAuthToken", "previous-install-token")
+      mockLoadJson.mockResolvedValue(null)
+
+      render(
+        <PersistentStateProvider>
+          <TestConsumer />
+        </PersistentStateProvider>,
+      )
+
+      await waitFor(() => {
+        expect(screen.getByTestId("token")).toBeTruthy()
+      })
+      expect(screen.getByTestId("token").props.children).toBe(
+        defaultPersistentState.galoyAuthToken,
+      )
+    })
+
+    it("does NOT hydrate after a failed migration — the clean slate stays logged out", async () => {
+      // The quarantine-and-reset path must not pair the live token with the
+      // default instance's backend.
+      mockSecureStore.set("activeAuthToken", "secure-token")
+      mockLoadJson.mockResolvedValue({
+        schemaVersion: 3,
+        hasShownStableSatsWelcome: false,
+        isUsdDisabled: false,
+        galoyInstance: { id: "Main", name: "DefinitelyNotARealInstance" },
+        galoyAuthToken: "token-v3",
+        isAnalyticsEnabled: true,
+      })
+
+      render(
+        <PersistentStateProvider>
+          <TestConsumer />
+        </PersistentStateProvider>,
+      )
+
+      await waitFor(() => {
+        expect(screen.getByTestId("token")).toBeTruthy()
+      })
+      expect(screen.getByTestId("token").props.children).toBe(
+        defaultPersistentState.galoyAuthToken,
+      )
+    })
+
+    it("reports a failed key-store write during the legacy token move, keeping the token in memory", async () => {
+      failSetFor.add("activeAuthToken")
+      mockLoadJson.mockResolvedValue({
+        schemaVersion: 6,
+        galoyInstance: { id: "Main" },
+        galoyAuthToken: "legacy-token",
+      })
+
+      render(
+        <PersistentStateProvider>
+          <TestConsumer />
+        </PersistentStateProvider>,
+      )
+
+      await waitFor(() => {
+        expect(screen.getByTestId("token").props.children).toBe("legacy-token")
+      })
+      expect(mockSecureStore.has("activeAuthToken")).toBe(false)
+      expect(mockRecordError).toHaveBeenCalledTimes(1)
+      expect(mockRecordError.mock.calls[0][0].message).toContain(
+        "Failed to move legacy auth token",
+      )
     })
   })
 })

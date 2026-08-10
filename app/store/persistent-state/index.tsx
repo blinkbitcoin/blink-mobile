@@ -17,9 +17,16 @@ import {
 const PERSISTENT_STATE_KEY = "persistentState"
 const PERSISTENT_STATE_QUARANTINE_PREFIX = "persistentStateQuarantine"
 
+// The raw blob can predate the token/keystore split and still carry a
+// plaintext galoyAuthToken — never write that copy back to disk.
+const sanitizeForQuarantine = (rawData: unknown): unknown =>
+  rawData && typeof rawData === "object" && "galoyAuthToken" in rawData
+    ? { ...rawData, galoyAuthToken: "" }
+    : rawData
+
 const quarantineRawState = async (rawData: unknown): Promise<void> => {
   const key = `${PERSISTENT_STATE_QUARANTINE_PREFIX}.${Date.now()}`
-  const ok = await saveString(key, JSON.stringify(rawData))
+  const ok = await saveString(key, JSON.stringify(sanitizeForQuarantine(rawData)))
   if (!ok) {
     recordAppError(new Error(`Quarantine write failed for key ${key}`), {
       alwaysRecord: true,
@@ -28,18 +35,28 @@ const quarantineRawState = async (rawData: unknown): Promise<void> => {
 }
 
 /**
- * The session token is never persisted in this AsyncStorage blob: it lives in
- * the secure key store (KeyStoreWrapper) and is hydrated into memory on load.
- * A token still present in a blob written before this split is moved to the
- * key store here, then stripped from disk on the next save.
+ * The session token is never persisted in the AsyncStorage blob: it lives in
+ * the secure key store (KeyStoreWrapper) and is attached to the in-memory
+ * state here, on the Ok path only. NoData is a fresh install (the iOS
+ * keychain can outlive the app, so "no blob" must not mean "resume the old
+ * session"), and Failed is a deliberate clean slate — neither should come up
+ * authenticated. A token still present in a pre-split blob is moved to the
+ * key store, then stripped from disk on the next save.
  */
-const hydrateAuthToken = async (state: PersistentState): Promise<PersistentState> => {
+const resolveAuthToken = async (state: PersistentState): Promise<PersistentState> => {
   const secureToken = await KeyStoreWrapper.getActiveAuthToken()
   if (secureToken) {
     return { ...state, galoyAuthToken: secureToken }
   }
   if (state.galoyAuthToken) {
-    await KeyStoreWrapper.setActiveAuthToken(state.galoyAuthToken)
+    const moved = await KeyStoreWrapper.setActiveAuthToken(state.galoyAuthToken)
+    if (!moved) {
+      // The token now exists only in memory; the next save strips the blob
+      // copy, so the session ends at next launch. Make that visible.
+      recordAppError(new Error("Failed to move legacy auth token to the key store"), {
+        alwaysRecord: true,
+      })
+    }
   }
   return state
 }
@@ -50,13 +67,13 @@ export const loadPersistentState = async (): Promise<PersistentState> => {
 
   switch (result.status) {
     case MigrationStatus.Ok:
-      return hydrateAuthToken(result.state)
+      return resolveAuthToken(result.state)
     case MigrationStatus.NoData:
-      return hydrateAuthToken(defaultPersistentState)
+      return defaultPersistentState
     case MigrationStatus.Failed:
       recordAppError(result.error, { alwaysRecord: true })
       await quarantineRawState(result.rawData)
-      return hydrateAuthToken(defaultPersistentState)
+      return defaultPersistentState
   }
 }
 

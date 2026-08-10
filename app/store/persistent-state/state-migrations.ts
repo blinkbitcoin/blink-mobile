@@ -120,6 +120,9 @@ type PersistentState_14 = {
 type PersistentState_15 = {
   schemaVersion: 15
   galoyInstance: GaloyInstanceInput
+  // In-memory only: always written to disk as "" (see savePersistentState) and
+  // hydrated from the secure key store on load. Migrations must keep passing it
+  // through so a token in a pre-split blob can still be moved to the key store.
   galoyAuthToken: string
   activeAccountId?: string
   selfCustodialDefaultWalletCurrency?: "BTC" | "USD"

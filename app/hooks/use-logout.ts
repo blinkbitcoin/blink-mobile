@@ -38,9 +38,18 @@ const useLogout = () => {
       isValidToken = true,
     }: LogoutOptions = {}): Promise<void> => {
       try {
-        let context
-        const deviceToken = await messaging().getToken()
+        // Isolated: a failed push-token fetch must never skip the local
+        // key-store cleanup below — that would leave the session token behind
+        // to be hydrated back on next launch. The server-side revocation is
+        // best-effort and simply skipped without a device token.
+        let deviceToken: string | undefined
+        try {
+          deviceToken = await messaging().getToken()
+        } catch (err) {
+          reportError("logout device token fetch", err)
+        }
 
+        let context
         if (token) {
           await KeyStoreWrapper.removeSessionProfileByToken(token)
           // Removing the profile that backs the active session must also drop
@@ -61,7 +70,7 @@ const useLogout = () => {
 
         logLogout()
 
-        if (token && isValidToken) {
+        if (token && isValidToken && deviceToken) {
           await Promise.race([
             userLogoutMutation({
               context,

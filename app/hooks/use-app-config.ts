@@ -2,15 +2,23 @@ import { useCallback, useMemo } from "react"
 
 import { GaloyInstance, resolveGaloyInstanceOrDefault } from "@app/config"
 import { usePersistentStateContext } from "@app/store/persistent-state"
+import { reportError } from "@app/utils/error-logging"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
 // The session token is persisted only in the secure key store; the persistent
 // state copy is in-memory (its on-disk blob is written with the token stripped).
+// A rejected key-store write leaves the token memory-only — the session
+// evaporates at next launch — so surface it instead of resolving silently.
 const persistToken = async (token: string): Promise<void> => {
-  if (token) {
-    await KeyStoreWrapper.setActiveAuthToken(token)
-  } else {
-    await KeyStoreWrapper.removeActiveAuthToken()
+  const persisted = token
+    ? await KeyStoreWrapper.setActiveAuthToken(token)
+    : await KeyStoreWrapper.removeActiveAuthToken()
+  if (!persisted) {
+    reportError(
+      "persist auth token",
+      new Error("secure key store rejected the auth token update"),
+      { alwaysRecord: true },
+    )
   }
 }
 

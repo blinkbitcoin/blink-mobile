@@ -232,7 +232,9 @@ describe("useLogout", () => {
     expect(mockResetState).toHaveBeenCalled()
   })
 
-  it("resets state even when fetching the push device token fails", async () => {
+  it("a failed push-token fetch still runs the full key-store cleanup", async () => {
+    mockSecureStore.set("activeAuthToken", "tok-a")
+    seedProfiles([profileA])
     mockGetDeviceToken.mockRejectedValue(new Error("fcm unavailable"))
 
     const { result } = renderHook(() => useLogout())
@@ -240,7 +242,28 @@ describe("useLogout", () => {
       await result.current.logout()
     })
 
+    // Regression: the fetch used to throw ahead of every removal, so the
+    // token survived in the key store and was hydrated back on next launch.
+    expect(mockSecureStore.has("activeAuthToken")).toBe(false)
+    expect(mockSecureStore.has("sessionProfiles")).toBe(false)
     expect(mockReportError).toHaveBeenCalled()
     expect(mockResetState).toHaveBeenCalled()
+  })
+
+  it("skips the server revocation when the push-token fetch fails, but still removes the session locally", async () => {
+    mockSecureStore.set("activeAuthToken", "tok-a")
+    seedProfiles([profileA, profileB])
+    mockGetDeviceToken.mockRejectedValue(new Error("fcm unavailable"))
+
+    const { result } = renderHook(() => useLogout())
+    await act(async () => {
+      await result.current.logout({ stateToDefault: false, token: "tok-a" })
+    })
+
+    // No device token means no revocation attempt — but the local cleanup
+    // must not depend on it.
+    expect(mockUserLogoutMutation).not.toHaveBeenCalled()
+    expect(mockSecureStore.has("activeAuthToken")).toBe(false)
+    expect(storedProfiles().map((p) => p.token)).toEqual(["tok-b"])
   })
 })
