@@ -48,9 +48,9 @@ type CompleteMigrationArgs = {
 type FinishOnDeviceArgs = {
   selfCustodialAccountId: string
   custodialAccountId: string
-  /** False once the account was closed: its Kratos identity is gone, so the revocation the
-   *  discard would fire has nothing left to authenticate with. */
-  isSessionAlive: boolean
+  /** The outcome rather than a boolean derived from it: a caller cannot invert what it does
+   *  not compute. Absent where the close never ran, which leaves the session alive. */
+  closeOutcome?: AccountCloseOutcome
 }
 
 /** Closes the emptied custodial account, discards its session, then switches to the
@@ -85,8 +85,11 @@ export const useCompleteMigration = () => {
     async ({
       selfCustodialAccountId,
       custodialAccountId,
-      isSessionAlive,
+      closeOutcome,
     }: FinishOnDeviceArgs): Promise<void> => {
+      /** A closed account took its Kratos identity with it, so the revocation the discard
+       *  would fire has nothing left to authenticate with. */
+      const isSessionAlive = closeOutcome !== AccountCloseOutcome.Closed
       await discardCustodialSession({ isSessionAlive })
       setActiveAccountId(selfCustodialAccountId)
       await clearCheckpoint()
@@ -144,7 +147,6 @@ export const useCompleteMigration = () => {
         await finishOnDevice({
           selfCustodialAccountId: accountId,
           custodialAccountId: custodialOwnerId,
-          isSessionAlive: true,
         })
         return MigrationCompletion.CloseRefused
       }
@@ -163,7 +165,6 @@ export const useCompleteMigration = () => {
         await finishOnDevice({
           selfCustodialAccountId: accountId,
           custodialAccountId: custodialOwnerId,
-          isSessionAlive: true,
         })
         return MigrationCompletion.CloseRefused
       }
@@ -178,7 +179,7 @@ export const useCompleteMigration = () => {
       await finishOnDevice({
         selfCustodialAccountId: accountId,
         custodialAccountId: custodialOwnerId,
-        isSessionAlive: !isAccountClosed,
+        closeOutcome,
       })
 
       /** A refused close still finishes the migration: the funds are already self-custodial,
