@@ -13,7 +13,7 @@ import { buildFeeTierOptions } from "../fee-tier-options"
 import { type ParseDestinationResult } from "../payment-destination/index.types"
 import { ConvertMoneyAmount, type PaymentDetail } from "../payment-details/index.types"
 
-import { FeeTierOption, FeeUnit } from "./fee-tiers.types"
+import { type FeeTierInfo, FeeTierOption, FeeUnit } from "./fee-tiers.types"
 import { useCustodialFeeRail, useSelfCustodialFeeRail } from "./use-fee-rail"
 import { PAYOUT_SPEED_BY_FEE_TIER } from "./use-custodial-onchain-fee-tiers"
 
@@ -27,6 +27,10 @@ const CURRENCY_BY_FEE_UNIT: Record<FeeUnit, WalletCurrency> = {
   [FeeUnit.Cents]: WalletCurrency.Usd,
   [FeeUnit.SatPerVbyte]: WalletCurrency.Btc,
 }
+
+/** One conversion for the label and the high-fee warning, so they cannot disagree. */
+const toTierWalletAmount = ({ feeAmount, feeUnit }: FeeTierInfo) =>
+  toWalletAmount({ amount: feeAmount, currency: CURRENCY_BY_FEE_UNIT[feeUnit] })
 
 type FeeTierOptionsParams = {
   paymentDetail: PaymentDetail<WalletCurrency> | null
@@ -91,11 +95,8 @@ export const useOnchainFeeTierOptions = ({
      * Display currency, like the confirmation screen; the wallet amount only stands in
      * while the price is still loading.
      */
-    formatFee: ({ feeAmount, feeUnit }) => {
-      const walletAmount = toWalletAmount({
-        amount: feeAmount,
-        currency: CURRENCY_BY_FEE_UNIT[feeUnit],
-      })
+    formatFee: (tier) => {
+      const walletAmount = toTierWalletAmount(tier)
 
       return (
         moneyAmountToDisplayCurrencyString({ moneyAmount: walletAmount }) ??
@@ -104,6 +105,12 @@ export const useOnchainFeeTierOptions = ({
     },
     locale,
   })
+
+  /**
+   * The fee the picked tier was quoted for. The high-fee warning reads it instead of
+   * probing a second time, so it judges the payment by its own quote.
+   */
+  const selectedTierFee = toTierWalletAmount(feeRail.tiers[feeTier])
 
   const rebuildForTier = useCallback(
     (
@@ -165,6 +172,8 @@ export const useOnchainFeeTierOptions = ({
     setFeeTier,
     feeTierOptions,
     isOnchain,
+    selectedTierFee,
+    hasFeeQuote: feeRail.hasQuote,
     feeTierErrorMessage: feeRail.errorMessage,
     isFeeTierErrorBlocking: feeRail.isErrorBlocking,
     isQuotingFees,

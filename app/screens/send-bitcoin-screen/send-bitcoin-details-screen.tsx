@@ -43,7 +43,7 @@ import {
 import { reportError } from "@app/utils/error-logging"
 
 import { FeeTierSelector } from "./fee-tier-selector"
-import { useOnchainFeeAlert } from "./hooks/use-onchain-fee-alert"
+import { shouldWarnAboutHighFee } from "./hooks/onchain-fee-alert"
 import { useOnchainFeeTierOptions } from "./hooks/use-onchain-fee-tier-options"
 import { useSendWallets } from "./hooks/use-send-wallets"
 
@@ -145,6 +145,8 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     isFeeTierErrorBlocking,
     isQuotingFees,
     isOnchain,
+    selectedTierFee,
+    hasFeeQuote,
   } = useOnchainFeeTierOptions({
     paymentDetail,
     isSelfCustodial,
@@ -222,11 +224,11 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     zeroDisplayAmount,
   ])
 
-  const alertHighFees = useOnchainFeeAlert({
+  const alertHighFees = shouldWarnAboutHighFee({
     paymentDetail,
-    walletId: btcWallet?.id as string,
-    network,
     isSelfCustodial,
+    selectedTierFee,
+    hasFeeQuote,
   })
 
   if (!paymentDetail) {
