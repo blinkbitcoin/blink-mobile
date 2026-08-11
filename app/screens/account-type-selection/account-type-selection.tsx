@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { View } from "react-native"
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
@@ -13,6 +13,7 @@ import {
   useAccountTypeOptions,
 } from "@app/hooks/use-account-type-options"
 import { useCreationBlock } from "@app/hooks/use-creation-block"
+import { useIsMounted } from "@app/hooks/use-is-mounted"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import {
   ChooseExperienceContinueRoute,
@@ -23,6 +24,9 @@ import { testProps } from "@app/utils/testProps"
 
 import { PhoneLoginInitiateType } from "../phone-auth-screen"
 
+/** Ordered here rather than by the options list, so the cards keep a stable place. */
+const CARD_ORDER = [AccountOption.Custodial, AccountOption.SelfCustodial]
+
 export const AccountTypeSelectionScreen: React.FC = () => {
   const styles = useStyles()
   const { LL } = useI18nContext()
@@ -32,15 +36,8 @@ export const AccountTypeSelectionScreen: React.FC = () => {
   const isCreateMode = mode === AccountTypeMode.Create
   const { options, defaultSelected, selfCustodialTemporarilyDisabled } =
     useAccountTypeOptions()
-  const { checkBlockReason, isChecking } = useCreationBlock()
-  /** The check outlives a back-press, so a late answer must not push a screen onto it. */
-  const isMountedRef = useRef(true)
-  useEffect(
-    () => () => {
-      isMountedRef.current = false
-    },
-    [],
-  )
+  const { checkBlockReason, isChecking, isFirstSignupRuleReady } = useCreationBlock()
+  const isMounted = useIsMounted()
   const [selected, setSelected] = useState<AccountOption | null>(defaultSelected)
 
   useEffect(() => {
@@ -51,16 +48,18 @@ export const AccountTypeSelectionScreen: React.FC = () => {
     if (!selected) return
 
     if (isCreateMode) {
-      const blockReason = await checkBlockReason(selected)
-      if (!isMountedRef.current) return
-      if (blockReason) {
-        navigation.navigate("unsupportedRegion", { reason: blockReason })
-        return
-      }
+      /** Self-custodial is answered after the mode screen instead: Anon reads no location
+       *  at all, and the mode is not chosen yet. */
       if (selected === AccountOption.SelfCustodial) {
         navigation.navigate("selfCustodialChooseExperience", {
           onContinue: { route: ChooseExperienceContinueRoute.AcceptTerms },
         })
+        return
+      }
+      const blockReason = await checkBlockReason(selected)
+      if (!isMounted()) return
+      if (blockReason) {
+        navigation.navigate("unsupportedRegion", { reason: blockReason })
         return
       }
       navigation.navigate("acceptTermsAndConditions", {
@@ -79,7 +78,14 @@ export const AccountTypeSelectionScreen: React.FC = () => {
     navigation.navigate("selfCustodialRestoreMethod")
   }
 
-  const isContinueDisabled = !selected || isChecking
+  const isContinueDisabled = !selected || isChecking || !isFirstSignupRuleReady
+
+  /** A selection changed mid-check would leave the answer describing the option the user
+   *  moved away from, so the cards hold still until it lands. */
+  const handleSelect = (option: AccountOption) => {
+    if (isChecking) return
+    setSelected(option)
+  }
 
   const cardsByOption: Record<AccountOption, OptionCard<AccountOption>> = {
     [AccountOption.Custodial]: {
@@ -98,8 +104,6 @@ export const AccountTypeSelectionScreen: React.FC = () => {
     },
   }
 
-  /** Ordered here rather than by the options list, so the cards keep a stable place. */
-  const CARD_ORDER = [AccountOption.Custodial, AccountOption.SelfCustodial]
   const cardOptions = CARD_ORDER.filter((option) => options.includes(option)).map(
     (option) => cardsByOption[option],
   )
@@ -125,7 +129,7 @@ export const AccountTypeSelectionScreen: React.FC = () => {
           <OptionCardGroup
             options={cardOptions}
             selectedKey={selected}
-            onSelect={setSelected}
+            onSelect={handleSelect}
           />
         </View>
 

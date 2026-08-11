@@ -8,7 +8,10 @@ import { AnonModeConvertModal } from "@app/self-custodial/components/anon-mode-c
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { IconHero } from "@app/components/icon-hero"
 import { OptionCard, OptionCardGroup } from "@app/components/option-card-group"
+import { AccountOption } from "@app/hooks/use-account-type-options"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
+import { useCreationBlock } from "@app/hooks/use-creation-block"
+import { useIsMounted } from "@app/hooks/use-is-mounted"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { WalletCurrency } from "@app/graphql/generated"
 import {
@@ -19,7 +22,7 @@ import {
 import { armModeSelectionConversion } from "@app/screens/conversion-flow/drain-conversion"
 import { useSelfCustodialAccountMode } from "@app/self-custodial/hooks/use-self-custodial-account-mode"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
-import { AccountMode } from "@app/types/account"
+import { AccountMode, CreationBlockReason } from "@app/types/account"
 import { ActiveWalletStatus } from "@app/types/wallet"
 import { toastShow } from "@app/utils/toast"
 import { testProps } from "@app/utils/testProps"
@@ -50,6 +53,10 @@ export const ChooseExperienceScreen: React.FC = () => {
     useSelfCustodialAccountMode()
   const { wallets, isReady: isWalletReady, status: walletStatus } = useActiveWallet()
   const { refreshWallets } = useSelfCustodialWallet()
+  /** No first-signup gate here: this screen only ever submits self-custodial, which the
+   *  device's account count does not govern. */
+  const { checkBlockReason, isChecking } = useCreationBlock()
+  const isMounted = useIsMounted()
   const [isConvertModalVisible, setIsConvertModalVisible] = useState(false)
 
   /** Null on the settings entry; the onboarding entries carry their onward step. */
@@ -107,8 +114,9 @@ export const ChooseExperienceScreen: React.FC = () => {
 
   /** The settings entry gates the Anon switch on the live balance, which is unknown
    *  until the wallet syncs: wait rather than let a cold start skip the gate. */
-  const isContinueWaiting =
+  const isSettingsBalanceUnknown =
     isBalanceRequired && !isWalletUnreachable && (!isWalletReady || isRefreshingWallets)
+  const isContinueWaiting = isChecking || isSettingsBalanceUnknown
 
   /**
    * Restore and migration arrive with the account already activated and only the screen
@@ -148,13 +156,30 @@ export const ChooseExperienceScreen: React.FC = () => {
     },
   ]
 
+  /** A mode changed mid-check would leave the answer describing the mode the user moved
+   *  away from, so the cards hold still until it lands. */
+  const handleSelect = (mode: AccountMode) => {
+    if (isChecking) return
+    setSelected(mode)
+  }
+
   const goToDollarTransfer = () => {
     setIsConvertModalVisible(false)
     armModeSelectionConversion()
     navigation.navigate("conversionDetails")
   }
 
-  const handleContinue = () => {
+  /**
+   * Creation is the only entry that may still be refused a region, and only once the mode
+   * is known: Anon exists so that nothing about the user is read, the connection included.
+   * Every other entry already has its account.
+   */
+  const resolveCreationRefusal = async (): Promise<CreationBlockReason | null> => {
+    if (selected === AccountMode.Anon) return null
+    return checkBlockReason(AccountOption.SelfCustodial)
+  }
+
+  const handleContinue = async () => {
     if (!onContinue) {
       /** The gate cannot be honoured without the balance, and no amount of waiting will
        *  produce it, so the refusal is said out loud rather than left as a dead button. */
@@ -183,12 +208,19 @@ export const ChooseExperienceScreen: React.FC = () => {
 
     switch (onContinue.route) {
       /** Creation has no account yet, so the mode rides through terms to wallet creation. */
-      case ChooseExperienceContinueRoute.AcceptTerms:
+      case ChooseExperienceContinueRoute.AcceptTerms: {
+        const blockReason = await resolveCreationRefusal()
+        if (!isMounted()) return
+        if (blockReason) {
+          navigation.navigate("unsupportedRegion", { reason: blockReason })
+          return
+        }
         navigation.navigate("acceptTermsAndConditions", {
           flow: "selfCustodial",
           mode: selected,
         })
         return
+      }
       case ChooseExperienceContinueRoute.BackupSuccess:
         setAccountMode(onContinue.accountId, selected)
         navigation.navigate("selfCustodialBackupSuccess")
@@ -227,7 +259,7 @@ export const ChooseExperienceScreen: React.FC = () => {
         <OptionCardGroup
           options={options}
           selectedKey={selected}
-          onSelect={setSelected}
+          onSelect={handleSelect}
         />
       </View>
 

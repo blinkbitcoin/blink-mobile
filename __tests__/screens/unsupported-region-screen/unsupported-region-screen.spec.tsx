@@ -8,11 +8,10 @@ import { ThemeProvider } from "@rn-vui/themed"
 const mockGoBack = jest.fn()
 
 let mockRouteParams: { reason?: string } | undefined
-let mockOptions: string[] = ["selfCustodial", "custodial"]
+let mockNonCustodialEnabled = true
 
-jest.mock("@app/hooks/use-account-type-options", () => ({
-  AccountOption: { Custodial: "custodial", SelfCustodial: "selfCustodial" },
-  useAccountTypeOptions: () => ({ options: mockOptions }),
+jest.mock("@app/config/feature-flags-context", () => ({
+  useFeatureFlags: () => ({ nonCustodialEnabled: mockNonCustodialEnabled }),
 }))
 
 jest.mock("@react-navigation/native", () => ({
@@ -43,7 +42,7 @@ describe("UnsupportedRegionScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockRouteParams = undefined
-    mockOptions = ["selfCustodial", "custodial"]
+    mockNonCustodialEnabled = true
   })
 
   it("renders the title and description", () => {
@@ -64,6 +63,36 @@ describe("UnsupportedRegionScreen", () => {
     ).toBeTruthy()
   })
 
+  it("titles the unreadable location rather than calling the region unsupported", () => {
+    mockRouteParams = { reason: "unknownRegion" }
+    const { getByText, queryByText } = render(wrap(<UnsupportedRegionScreen />))
+
+    expect(getByText("Region not determined")).toBeTruthy()
+    expect(queryByText("Unsupported region")).toBeNull()
+  })
+
+  it("ignores a reason that only exists on Object's prototype", () => {
+    // `in` would accept these and call them as if they described a refusal.
+    mockRouteParams = { reason: "valueOf" }
+    const { getByText } = render(wrap(<UnsupportedRegionScreen />))
+
+    expect(getByText("Unsupported region")).toBeTruthy()
+    expect(
+      getByText("Unfortunately we can not serve users from your current region."),
+    ).toBeTruthy()
+  })
+
+  it("falls back to the regional wording for a reason it does not know", () => {
+    // A deep link from an older build could still name a refusal this one dropped.
+    mockRouteParams = { reason: "somethingThisBuildDroppedLongAgo" }
+    const { getByText } = render(wrap(<UnsupportedRegionScreen />))
+
+    expect(getByText("Unsupported region")).toBeTruthy()
+    expect(
+      getByText("Unfortunately we can not serve users from your current region."),
+    ).toBeTruthy()
+  })
+
   it("offers self-custodial when only the first Blink account was refused", () => {
     mockRouteParams = { reason: "firstCustodialSignup" }
     const { getByText } = render(wrap(<UnsupportedRegionScreen />))
@@ -78,7 +107,7 @@ describe("UnsupportedRegionScreen", () => {
 
   it("withholds the self-custodial offer when that option is turned off", () => {
     mockRouteParams = { reason: "firstCustodialSignup" }
-    mockOptions = ["custodial"]
+    mockNonCustodialEnabled = false
     const { getByText } = render(wrap(<UnsupportedRegionScreen />))
 
     // Pointing at an option this build does not offer would be a dead end.
