@@ -5,18 +5,13 @@ import { useCreationBlock } from "@app/hooks/use-creation-block"
 import { CreationBlockReason } from "@app/types/account"
 
 const mockUseRemoteConfig = jest.fn()
-const mockUsePhoneCountryCode = jest.fn()
 const mockUseAccountRegistry = jest.fn()
 const mockResolveIpCountryCodeCached = jest.fn()
 const mockUpdateCountryCode = jest.fn()
-const mockUseCountryCodeQuery = jest.fn()
 
 jest.mock("@apollo/client", () => ({
+  ...jest.requireActual("@apollo/client"),
   useApolloClient: () => ({}),
-}))
-
-jest.mock("@app/graphql/generated", () => ({
-  useCountryCodeQuery: () => mockUseCountryCodeQuery(),
 }))
 
 jest.mock("@app/graphql/client-only-query", () => ({
@@ -35,38 +30,26 @@ jest.mock("@app/hooks/use-account-registry", () => ({
   useAccountRegistry: () => mockUseAccountRegistry(),
 }))
 
-jest.mock("@app/hooks/use-device-location", () => ({
-  __esModule: true,
-  ...jest.requireActual("@app/hooks/use-device-location"),
-  usePhoneCountryCode: (options?: unknown) => mockUsePhoneCountryCode(options),
-}))
-
 jest.mock("@app/utils/ip-country-lookup", () => ({
   resolveIpCountryCodeCached: () => mockResolveIpCountryCodeCached(),
 }))
 
 const setUp = ({
   ipCountryCode,
-  phoneCountryCode = undefined,
   accountCount = 1,
   isRegistryHydrating = false,
-  cachedCountryCode = undefined,
   custodialCreationBlockedCountries = ["CU", "IR"],
   selfCustodialCreationBlockedCountries = ["KP", "SY"],
   custodialFirstSignupBlockedCountries = [],
 }: {
   ipCountryCode?: string
-  phoneCountryCode?: string
   accountCount?: number
   isRegistryHydrating?: boolean
-  cachedCountryCode?: string
   custodialCreationBlockedCountries?: string[]
   selfCustodialCreationBlockedCountries?: string[]
   custodialFirstSignupBlockedCountries?: string[]
 }) => {
-  mockUsePhoneCountryCode.mockReturnValue(phoneCountryCode)
   mockResolveIpCountryCodeCached.mockResolvedValue(ipCountryCode)
-  mockUseCountryCodeQuery.mockReturnValue({ data: { countryCode: cachedCountryCode } })
   mockUseAccountRegistry.mockReturnValue({
     accounts: new Array(accountCount).fill({}),
     loading: isRegistryHydrating,
@@ -200,19 +183,6 @@ describe("useCreationBlock", () => {
   })
 
   describe("the country it reads", () => {
-    it("prefers a phone already in hand over reading the connection", async () => {
-      const { result } = setUp({
-        ipCountryCode: "SV",
-        phoneCountryCode: "CU",
-        custodialCreationBlockedCountries: ["CU"],
-      })
-
-      expect(await check(result, AccountOption.Custodial)).toBe(
-        CreationBlockReason.Region,
-      )
-      expect(mockResolveIpCountryCodeCached).not.toHaveBeenCalled()
-    })
-
     it("uppercases what the provider returned before matching any list", async () => {
       const { result } = setUp({
         ipCountryCode: "pk",
@@ -226,18 +196,7 @@ describe("useCreationBlock", () => {
       )
     })
 
-    it("keeps a country read earlier when the lookup is down", async () => {
-      const { result } = setUp({
-        ipCountryCode: undefined,
-        cachedCountryCode: "CU",
-      })
-
-      expect(await check(result, AccountOption.Custodial)).toBe(
-        CreationBlockReason.Region,
-      )
-    })
-
-    it("records a fresh answer so a later check can fall back to it", async () => {
+    it("records the answer, so the rest of the app shares the country it read", async () => {
       const { result } = setUp({ ipCountryCode: "SV" })
 
       await check(result, AccountOption.Custodial)
@@ -257,25 +216,24 @@ describe("useCreationBlock", () => {
       )
     })
 
-    it("falls back to the connection when no phone is registered", async () => {
+    it("reads the connection and never an account's registered phone", async () => {
       const { result } = setUp({ ipCountryCode: "CU" })
 
+      // Which account happens to be open must not decide who may create a new one.
       await check(result, AccountOption.Custodial)
 
       expect(mockResolveIpCountryCodeCached).toHaveBeenCalled()
     })
   })
 
-  describe("isChecking", () => {
+  describe("the flags a submit button waits on", () => {
     const setUpPending = () => {
       let resolveLookup: (code: string) => void = () => undefined
-      mockUsePhoneCountryCode.mockReturnValue(undefined)
       mockResolveIpCountryCodeCached.mockReturnValue(
         new Promise<string>((resolve) => {
           resolveLookup = resolve
         }),
       )
-      mockUseCountryCodeQuery.mockReturnValue({ data: { countryCode: undefined } })
       mockUseAccountRegistry.mockReturnValue({ accounts: [], loading: false })
       mockUseRemoteConfig.mockReturnValue({
         custodialCreationBlockedCountries: [],
@@ -307,35 +265,19 @@ describe("useCreationBlock", () => {
       expect(result.current.isChecking).toBe(false)
     })
 
-    it("stays held until the last of several checks settles", async () => {
-      const { render: rendered, resolve } = setUpPending()
-      const { result } = rendered
+    it("reports the first-signup rule unready while the account registry hydrates", () => {
+      const { result } = setUp({ ipCountryCode: "SV", isRegistryHydrating: true })
 
-      let first: Promise<CreationBlockReason | null> = Promise.resolve(null)
-      let second: Promise<CreationBlockReason | null> = Promise.resolve(null)
-      act(() => {
-        first = result.current.checkBlockReason(AccountOption.SelfCustodial)
-        second = result.current.checkBlockReason(AccountOption.Custodial)
-      })
-      await waitFor(() => expect(result.current.isChecking).toBe(true))
-
-      await act(async () => {
-        resolve()
-        await first
-      })
-
-      // A screen submits every option at once, so one finishing cannot free the button.
-      await act(async () => {
-        await second
-      })
+      // An empty registry mid-hydration would refuse a device that already holds accounts.
+      expect(result.current.isFirstSignupRuleReady).toBe(false)
+      // Nobody asked for a check, so nothing is in flight either.
       expect(result.current.isChecking).toBe(false)
     })
 
-    it("holds while the account registry is still hydrating", () => {
-      const { result } = setUp({ ipCountryCode: "SV", isRegistryHydrating: true })
+    it("reports the rule ready once the registry has settled", () => {
+      const { result } = setUp({ ipCountryCode: "SV" })
 
-      // The account count decides the first-signup rule, so it cannot answer yet.
-      expect(result.current.isChecking).toBe(true)
+      expect(result.current.isFirstSignupRuleReady).toBe(true)
     })
   })
 })

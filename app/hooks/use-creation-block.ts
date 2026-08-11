@@ -1,23 +1,23 @@
-import { useCallback, useRef, useState } from "react"
+import { useCallback, useState } from "react"
 
 import { useApolloClient } from "@apollo/client"
-import { CountryCode } from "libphonenumber-js/mobile"
-
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { updateCountryCode } from "@app/graphql/client-only-query"
-import { useCountryCodeQuery } from "@app/graphql/generated"
 import { CreationBlockReason } from "@app/types/account"
 import { decideCustodialEligibility } from "@app/utils/custodial-eligibility"
 import { resolveIpCountryCodeCached } from "@app/utils/ip-country-lookup"
 
 import { AccountOption } from "./use-account-type-options"
 import { useAccountRegistry } from "./use-account-registry"
-import { isBlockedCountry, usePhoneCountryCode } from "./use-device-location"
+import { isBlockedCountry } from "./use-device-location"
 
 type CreationBlock = {
   checkBlockReason: (option: AccountOption) => Promise<CreationBlockReason | null>
-  /** True while an answer cannot be trusted yet, which is what holds the submit button. */
+  /** A check is in flight, so the button that asked for it waits on its own answer. */
   isChecking: boolean
+  /** The device's account count has settled. Only the custodial first-signup rule reads
+   *  it, so a caller submitting self-custodial alone has nothing to wait for. */
+  isFirstSignupRuleReady: boolean
 }
 
 /**
@@ -32,30 +32,26 @@ export const useCreationBlock = (): CreationBlock => {
     selfCustodialCreationBlockedCountries,
     custodialFirstSignupBlockedCountries,
   } = useRemoteConfig()
-  /** A phone already in hand is the registered country, so no connection need be read. */
-  const phoneCountryCode = usePhoneCountryCode({ isCustodialFlow: true })
   const client = useApolloClient()
-  const { data } = useCountryCodeQuery()
-  const cachedCountryCode = data?.countryCode as CountryCode | undefined
-  /** Counted rather than flagged: a screen may submit every option at once. */
-  const checksInFlight = useRef(0)
   const [isResolving, setIsResolving] = useState(false)
 
+  /**
+   * The connection alone, matching the `regionCheck` query this will hand over to: an
+   * account being created has no phone of its own, and borrowing another account's would
+   * make the verdict depend on which one happens to be open. There is no local fallback
+   * either, since the country-code cache answers "SV" for an unset value and would turn
+   * "could not resolve" into a country nobody read.
+   */
   const resolveCountry = useCallback(async (): Promise<string | undefined> => {
-    if (phoneCountryCode) return phoneCountryCode.toUpperCase()
-
     const resolved = await resolveIpCountryCodeCached()
-    if (resolved) {
-      updateCountryCode(client, resolved)
-      return resolved.toUpperCase()
-    }
-    /** A country read earlier this install beats none at all when the lookup is down. */
-    return cachedCountryCode?.toUpperCase()
-  }, [phoneCountryCode, cachedCountryCode, client])
+    if (!resolved) return undefined
+
+    updateCountryCode(client, resolved)
+    return resolved.toUpperCase()
+  }, [client])
 
   const checkBlockReason = useCallback(
     async (option: AccountOption): Promise<CreationBlockReason | null> => {
-      checksInFlight.current += 1
       setIsResolving(true)
       try {
         const country = await resolveCountry()
@@ -80,8 +76,7 @@ export const useCreationBlock = (): CreationBlock => {
 
         return isSignupAllowed ? null : CreationBlockReason.FirstCustodialSignup
       } finally {
-        checksInFlight.current -= 1
-        if (checksInFlight.current === 0) setIsResolving(false)
+        setIsResolving(false)
       }
     },
     [
@@ -93,6 +88,11 @@ export const useCreationBlock = (): CreationBlock => {
     ],
   )
 
-  /** Account count decides the first-signup rule, so an unsettled registry cannot answer. */
-  return { checkBlockReason, isChecking: isResolving || isRegistryHydrating }
+  return {
+    checkBlockReason,
+    isChecking: isResolving,
+    /** A registry still hydrating reads as a device holding no account, which would refuse
+     *  the first-signup rule to someone who already has one. */
+    isFirstSignupRuleReady: !isRegistryHydrating,
+  }
 }
