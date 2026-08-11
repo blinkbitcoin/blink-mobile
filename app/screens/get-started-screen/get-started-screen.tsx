@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect, useRef } from "react"
 import { Pressable, View } from "react-native"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
@@ -14,7 +14,7 @@ import { useCreationBlock } from "@app/hooks/use-creation-block"
 import { useSecretMenuTrigger } from "@app/hooks/use-secret-menu-trigger"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import theme from "@app/rne-theme/theme"
-import { AccountTypeMode } from "@app/types/account"
+import { AccountTypeMode, CreationBlockReason } from "@app/types/account"
 import { logGetStartedAction } from "@app/utils/analytics"
 import { testProps } from "@app/utils/testProps"
 
@@ -56,18 +56,33 @@ export const GetStartedScreen: React.FC = () => {
   const { LL } = useI18nContext()
 
   const { deviceAccountEnabled, nonCustodialEnabled } = useFeatureFlags()
-  const { options, defaultSelected, loading: detectingCountry } = useAccountTypeOptions()
-  const { isCreationBlocked, loading: detectingRegion } = useCreationBlock()
-  const canCreateAccount = options.length > 0
-  const isCreateAccountDisabled = !canCreateAccount || detectingCountry || detectingRegion
+  const { options, defaultSelected } = useAccountTypeOptions()
+  const { checkBlockReason, isChecking } = useCreationBlock()
+  /** The check outlives a back-press, so a late answer must not push a screen onto it. */
+  const isMountedRef = useRef(true)
+  useEffect(
+    () => () => {
+      isMountedRef.current = false
+    },
+    [],
+  )
 
   const appCheckToken = useAppCheckToken({ skip: !deviceAccountEnabled })
 
-  const handleCreateAccount = () => {
-    if (!canCreateAccount) return
+  const handleCreateAccount = async () => {
+    /**
+     * Every option refused leaves nothing to create, so the screen opens on why. With one
+     * option its own reason is the honest one; with several, only the regional wording is
+     * true of them all.
+     */
+    const refusals = await Promise.all(options.map((option) => checkBlockReason(option)))
+    if (!isMountedRef.current) return
 
-    if (options.every((option) => isCreationBlocked(option))) {
-      navigation.navigate("unsupportedRegion")
+    const isEveryOptionRefused = refusals.every((reason) => reason !== null)
+    if (isEveryOptionRefused) {
+      const isSingleOptionOffered = refusals.length === 1
+      const reason = isSingleOptionOffered ? refusals[0] : CreationBlockReason.Region
+      navigation.navigate("unsupportedRegion", { reason: reason ?? undefined })
       return
     }
 
@@ -143,7 +158,8 @@ export const GetStartedScreen: React.FC = () => {
           <GaloyPrimaryButton
             title={LL.GetStartedScreen.createAccount()}
             onPress={handleCreateAccount}
-            disabled={isCreateAccountDisabled}
+            disabled={isChecking}
+            loading={isChecking}
           />
           <GaloySecondaryButton
             title={

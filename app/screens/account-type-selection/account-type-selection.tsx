@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react"
-import { ActivityIndicator, View } from "react-native"
+import React, { useEffect, useRef, useState } from "react"
+import { View } from "react-native"
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
-import { makeStyles, Text, useTheme } from "@rn-vui/themed"
+import { makeStyles, Text } from "@rn-vui/themed"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { OptionCard, OptionCardGroup } from "@app/components/option-card-group"
@@ -25,33 +25,36 @@ import { PhoneLoginInitiateType } from "../phone-auth-screen"
 
 export const AccountTypeSelectionScreen: React.FC = () => {
   const styles = useStyles()
-  const {
-    theme: { colors },
-  } = useTheme()
   const { LL } = useI18nContext()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const route = useRoute<RouteProp<RootStackParamList, "accountTypeSelection">>()
   const { mode } = route.params
   const isCreateMode = mode === AccountTypeMode.Create
-  const {
-    options,
-    defaultSelected,
-    selfCustodialTemporarilyDisabled,
-    loading: detectingCountry,
-  } = useAccountTypeOptions(mode)
-  const { isCreationBlocked, loading: detectingRegion } = useCreationBlock()
+  const { options, defaultSelected, selfCustodialTemporarilyDisabled } =
+    useAccountTypeOptions()
+  const { checkBlockReason, isChecking } = useCreationBlock()
+  /** The check outlives a back-press, so a late answer must not push a screen onto it. */
+  const isMountedRef = useRef(true)
+  useEffect(
+    () => () => {
+      isMountedRef.current = false
+    },
+    [],
+  )
   const [selected, setSelected] = useState<AccountOption | null>(defaultSelected)
 
   useEffect(() => {
     if (defaultSelected && !selected) setSelected(defaultSelected)
   }, [defaultSelected, selected])
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     if (!selected) return
 
     if (isCreateMode) {
-      if (isCreationBlocked(selected)) {
-        navigation.navigate("unsupportedRegion")
+      const blockReason = await checkBlockReason(selected)
+      if (!isMountedRef.current) return
+      if (blockReason) {
+        navigation.navigate("unsupportedRegion", { reason: blockReason })
         return
       }
       if (selected === AccountOption.SelfCustodial) {
@@ -76,30 +79,30 @@ export const AccountTypeSelectionScreen: React.FC = () => {
     navigation.navigate("selfCustodialRestoreMethod")
   }
 
-  const showSelfCustodial = options.includes(AccountOption.SelfCustodial)
-  const showCustodial = options.includes(AccountOption.Custodial)
-  const isContinueDisabled =
-    !selected || detectingCountry || (isCreateMode && detectingRegion)
+  const isContinueDisabled = !selected || isChecking
 
-  const cardOptions: OptionCard<AccountOption>[] = []
-  if (showCustodial) {
-    cardOptions.push({
+  const cardsByOption: Record<AccountOption, OptionCard<AccountOption>> = {
+    [AccountOption.Custodial]: {
       key: AccountOption.Custodial,
       icon: "cloud",
       title: LL.AccountTypeSelectionScreen.custodialLabel(),
       description: LL.AccountTypeSelectionScreen.custodialDescription(),
       testID: "custodial-option",
-    })
-  }
-  if (showSelfCustodial) {
-    cardOptions.push({
+    },
+    [AccountOption.SelfCustodial]: {
       key: AccountOption.SelfCustodial,
       icon: "key-outline",
       title: LL.AccountTypeSelectionScreen.selfCustodialLabel(),
       description: LL.AccountTypeSelectionScreen.selfCustodialDescription(),
       testID: "self-custodial-option",
-    })
+    },
   }
+
+  /** Ordered here rather than by the options list, so the cards keep a stable place. */
+  const CARD_ORDER = [AccountOption.Custodial, AccountOption.SelfCustodial]
+  const cardOptions = CARD_ORDER.filter((option) => options.includes(option)).map(
+    (option) => cardsByOption[option],
+  )
 
   return (
     <Screen>
@@ -119,17 +122,11 @@ export const AccountTypeSelectionScreen: React.FC = () => {
             </View>
           )}
 
-          {detectingCountry ? (
-            <View style={styles.loaderContainer}>
-              <ActivityIndicator color={colors.primary} />
-            </View>
-          ) : (
-            <OptionCardGroup
-              options={cardOptions}
-              selectedKey={selected}
-              onSelect={setSelected}
-            />
-          )}
+          <OptionCardGroup
+            options={cardOptions}
+            selectedKey={selected}
+            onSelect={setSelected}
+          />
         </View>
 
         <View style={styles.ctaContainer}>
@@ -140,6 +137,7 @@ export const AccountTypeSelectionScreen: React.FC = () => {
                 : LL.AccountTypeSelectionScreen.chooseMethod()
             }
             onPress={handleContinue}
+            loading={isChecking}
             disabled={isContinueDisabled}
             {...testProps("continue-button")}
           />
@@ -176,10 +174,6 @@ const useStyles = makeStyles(({ colors }) => ({
     lineHeight: 18,
     color: colors.grey1,
     textAlign: "center",
-  },
-  loaderContainer: {
-    paddingVertical: 40,
-    alignItems: "center",
   },
   ctaContainer: {
     paddingHorizontal: 20,

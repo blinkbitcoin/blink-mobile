@@ -156,13 +156,22 @@ const useDeviceLocation = ({
   }
 }
 
-export const usePhoneCountryCode = (): CountryCode | undefined => {
+/**
+ * The registered country, parsed from the account's own phone number. Anon Mode withholds
+ * it like every other location, except for a custodial flow: the account being created has
+ * no mode of its own yet, and a custodial one never will, so neither may inherit another
+ * account's Anon.
+ */
+export const usePhoneCountryCode = ({
+  isCustodialFlow = false,
+}: DeviceLocationOptions = {}): CountryCode | undefined => {
   const { isAnonMode } = useSelfCustodialAccountMode()
+  const isPhoneWithheld = isAnonMode && !isCustodialFlow
   const { data } = useSettingsScreenQuery({
-    skip: isAnonMode,
+    skip: isPhoneWithheld,
     fetchPolicy: "cache-first",
   })
-  const phone = isAnonMode ? undefined : data?.me?.phone
+  const phone = isPhoneWithheld ? undefined : data?.me?.phone
 
   return useMemo(() => {
     if (!phone) return undefined
