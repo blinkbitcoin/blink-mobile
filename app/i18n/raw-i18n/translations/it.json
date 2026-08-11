@@ -3926,6 +3926,7 @@
         "description": "Purtroppo non possiamo servire gli utenti dalla tua regione attuale.",
         "custodialSignupDescription": "Purtroppo non possiamo creare nuovi account in custodia nella tua regione attuale. Puoi invece usare un account in autocustodia.",
         "custodialSignupOnlyDescription": "Purtroppo non possiamo creare nuovi account in custodia nella tua regione attuale.",
+        "unknownRegionTitle": "Regione non determinata",
         "unknownRegionDescription": "Non siamo riusciti a determinare la tua regione. Controlla la connessione e riprova."
     },
     "RestoreScreen": {

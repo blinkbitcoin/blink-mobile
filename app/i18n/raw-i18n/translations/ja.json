@@ -3926,6 +3926,7 @@
         "description": "申し訳ございませんが、現在の地域のユーザーにはサービスをご提供できません。",
         "custodialSignupDescription": "申し訳ありませんが、現在のお住まいの地域では新しいカストディアルアカウントを作成できません。代わりにセルフカストディアルアカウントをご利用いただけます。",
         "custodialSignupOnlyDescription": "申し訳ありませんが、現在のお住まいの地域では新しいカストディアルアカウントを作成できません。",
+        "unknownRegionTitle": "地域を特定できません",
         "unknownRegionDescription": "お住まいの地域を特定できませんでした。接続を確認して、もう一度お試しください。"
     },
     "RestoreScreen": {

@@ -3926,6 +3926,7 @@
     "description": "Sajnos nem tudjuk kiszolgálni a jelenlegi régiódból érkező felhasználókat.",
     "custodialSignupDescription": "Sajnos nem tudunk új letéti fiókokat létrehozni a jelenlegi régiódban. Helyette használhatsz saját letétkezelésű fiókot.",
     "custodialSignupOnlyDescription": "Sajnos nem tudunk új letéti fiókokat létrehozni a jelenlegi régiódban.",
+    "unknownRegionTitle": "A régió nem állapítható meg",
     "unknownRegionDescription": "Nem tudtuk meghatározni a régiódat. Ellenőrizd a kapcsolatot, és próbáld újra."
   },
   "RestoreScreen": {

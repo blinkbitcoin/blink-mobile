@@ -3926,6 +3926,7 @@
     "description": "Malangnya kami tidak dapat melayani pengguna dari wilayah semasa anda.",
     "custodialSignupDescription": "Malangnya kami tidak dapat membuka akaun kustodi baharu di wilayah anda sekarang. Anda boleh menggunakan akaun swajagaan sebagai gantinya.",
     "custodialSignupOnlyDescription": "Malangnya kami tidak dapat membuka akaun kustodi baharu di wilayah anda sekarang.",
+    "unknownRegionTitle": "Wilayah tidak dapat ditentukan",
     "unknownRegionDescription": "Kami tidak dapat menentukan wilayah anda. Sila semak sambungan anda dan cuba lagi."
   },
   "RestoreScreen": {

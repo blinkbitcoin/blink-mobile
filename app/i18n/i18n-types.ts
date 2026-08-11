@@ -13108,6 +13108,10 @@ type RootTranslation = {
 		 */
 		custodialSignupOnlyDescription: string
 		/**
+		 * R​e​g​i​o​n​ ​n​o​t​ ​d​e​t​e​r​m​i​n​e​d
+		 */
+		unknownRegionTitle: string
+		/**
 		 * W​e​ ​c​o​u​l​d​ ​n​o​t​ ​d​e​t​e​r​m​i​n​e​ ​y​o​u​r​ ​r​e​g​i​o​n​.​ ​P​l​e​a​s​e​ ​c​h​e​c​k​ ​y​o​u​r​ ​c​o​n​n​e​c​t​i​o​n​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​.
 		 */
 		unknownRegionDescription: string
@@ -26547,6 +26551,10 @@ export type TranslationFunctions = {
 		 * Unfortunately we can not create new custodial accounts in your current region.
 		 */
 		custodialSignupOnlyDescription: () => LocalizedString
+		/**
+		 * Region not determined
+		 */
+		unknownRegionTitle: () => LocalizedString
 		/**
 		 * We could not determine your region. Please check your connection and try again.
 		 */

@@ -3926,6 +3926,7 @@
     "description": "Ongelukkig kan ons nie gebruikers uit jou huidige streek bedien nie.",
     "custodialSignupDescription": "Ons kan ongelukkig nie nuwe bewaarnemingsrekeninge in jou huidige streek skep nie. Jy kan eerder 'n selfbewaarnemingsrekening gebruik.",
     "custodialSignupOnlyDescription": "Ons kan ongelukkig nie nuwe bewaarnemingsrekeninge in jou huidige streek skep nie.",
+    "unknownRegionTitle": "Streek nie bepaal nie",
     "unknownRegionDescription": "Ons kon nie jou streek bepaal nie. Kontroleer asseblief jou verbinding en probeer weer."
   },
   "RestoreScreen": {

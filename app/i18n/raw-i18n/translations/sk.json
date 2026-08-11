@@ -3926,6 +3926,7 @@
     "description": "Bohužiaľ nemôžeme obsluhovať používateľov z vášho aktuálneho regiónu.",
     "custodialSignupDescription": "Bohužiaľ nemôžeme vo vašom regióne vytvárať nové zverenecké účty. Namiesto toho môžete použiť účet vo vlastnej správe.",
     "custodialSignupOnlyDescription": "Bohužiaľ nemôžeme vo vašom regióne vytvárať nové zverenecké účty.",
+    "unknownRegionTitle": "Región nezistený",
     "unknownRegionDescription": "Nepodarilo sa nám určiť váš región. Skontrolujte pripojenie a skúste to znova."
   },
   "RestoreScreen": {

@@ -3926,6 +3926,7 @@
     "description": "Llakikuypaq, kunan suyuykimanta ruraqkunata mana yanapayta atiykuchu.",
     "custodialSignupDescription": "Llakiypaq, kunan suyuykipi musuq waqaychaq cuentakunata mana kamayta atinikuchu. Kikin waqaychaq cuentata llamk'achiwaqmi.",
     "custodialSignupOnlyDescription": "Llakiypaq, kunan suyuykipi musuq waqaychaq cuentakunata mana kamayta atinikuchu.",
+    "unknownRegionTitle": "Suyu mana riqsisqa",
     "unknownRegionDescription": "Suyuykita mana riqsiyta atinikuchu. Tinkiyniykita qhaway, hinaspa yapamanta ruway."
   },
   "RestoreScreen": {

@@ -3926,6 +3926,7 @@
     "description": "Ngelishwa asikwazi ukunceda abasebenzisi abavela kummandla wakho wangoku.",
     "custodialSignupDescription": "Ngelishwa asikwazi ukuvula iiakhawunti ezintsha ezigcinwa ngathi kummandla wakho wangoku. Ungasebenzisa iakhawunti ozigcinela yona endaweni yoko.",
     "custodialSignupOnlyDescription": "Ngelishwa asikwazi ukuvula iiakhawunti ezintsha ezigcinwa ngathi kummandla wakho wangoku.",
+    "unknownRegionTitle": "Ummandla awufunyanwanga",
     "unknownRegionDescription": "Asikwazanga ukufumanisa ummandla wakho. Nceda ujonge uqhagamshelwano lwakho uzame kwakhona."
   },
   "RestoreScreen": {

@@ -3926,6 +3926,7 @@
     "description": "Rất tiếc, chúng tôi không thể phục vụ người dùng từ khu vực hiện tại của bạn.",
     "custodialSignupDescription": "Rất tiếc, chúng tôi không thể tạo tài khoản lưu ký mới ở khu vực hiện tại của bạn. Bạn có thể dùng tài khoản tự lưu ký thay thế.",
     "custodialSignupOnlyDescription": "Rất tiếc, chúng tôi không thể tạo tài khoản lưu ký mới ở khu vực hiện tại của bạn.",
+    "unknownRegionTitle": "Chưa xác định được khu vực",
     "unknownRegionDescription": "Chúng tôi không thể xác định khu vực của bạn. Vui lòng kiểm tra kết nối và thử lại."
   },
   "RestoreScreen": {

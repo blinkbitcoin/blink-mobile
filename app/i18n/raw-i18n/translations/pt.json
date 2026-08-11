@@ -3926,6 +3926,7 @@
         "description": "Infelizmente não podemos atender utilizadores da sua região atual.",
         "custodialSignupDescription": "Infelizmente não podemos criar novas contas custodiais na sua região atual. Pode usar uma conta de autocustódia.",
         "custodialSignupOnlyDescription": "Infelizmente não podemos criar novas contas custodiais na sua região atual.",
+        "unknownRegionTitle": "Região não determinada",
         "unknownRegionDescription": "Não conseguimos determinar a sua região. Verifique a ligação e tente novamente."
     },
     "RestoreScreen": {

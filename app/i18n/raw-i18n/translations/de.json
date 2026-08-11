@@ -3926,6 +3926,7 @@
         "description": "Leider können wir keine Nutzer aus deiner aktuellen Region bedienen.",
         "custodialSignupDescription": "Leider können wir in deiner aktuellen Region keine neuen verwahrten Konten erstellen. Du kannst stattdessen ein selbstverwahrtes Konto nutzen.",
         "custodialSignupOnlyDescription": "Leider können wir in deiner aktuellen Region keine neuen verwahrten Konten erstellen.",
+        "unknownRegionTitle": "Region nicht ermittelt",
         "unknownRegionDescription": "Wir konnten deine Region nicht ermitteln. Bitte prüfe deine Verbindung und versuche es erneut."
     },
     "RestoreScreen": {

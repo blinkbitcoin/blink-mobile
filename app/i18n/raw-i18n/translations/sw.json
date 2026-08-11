@@ -3926,6 +3926,7 @@
     "description": "Kwa bahati mbaya hatuwezi kuhudumia watumiaji kutoka eneo lako la sasa.",
     "custodialSignupDescription": "Kwa bahati mbaya hatuwezi kufungua akaunti mpya za uhifadhi katika eneo lako la sasa. Unaweza kutumia akaunti ya kujihifadhi badala yake.",
     "custodialSignupOnlyDescription": "Kwa bahati mbaya hatuwezi kufungua akaunti mpya za uhifadhi katika eneo lako la sasa.",
+    "unknownRegionTitle": "Eneo halijabainika",
     "unknownRegionDescription": "Hatukuweza kubaini eneo lako. Tafadhali angalia muunganisho wako na ujaribu tena."
   },
   "RestoreScreen": {

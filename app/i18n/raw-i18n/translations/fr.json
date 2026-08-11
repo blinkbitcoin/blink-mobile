@@ -3926,6 +3926,7 @@
         "description": "Malheureusement, nous ne pouvons pas servir les utilisateurs de votre région actuelle.",
         "custodialSignupDescription": "Malheureusement, nous ne pouvons pas créer de nouveaux comptes en dépôt dans votre région actuelle. Vous pouvez utiliser un compte en auto-conservation.",
         "custodialSignupOnlyDescription": "Malheureusement, nous ne pouvons pas créer de nouveaux comptes en dépôt dans votre région actuelle.",
+        "unknownRegionTitle": "Région non déterminée",
         "unknownRegionDescription": "Nous n'avons pas pu déterminer votre région. Vérifiez votre connexion et réessayez."
     },
     "RestoreScreen": {
