@@ -1,6 +1,9 @@
 import { renderHook, waitFor } from "@testing-library/react-native"
 
-import { FeeTierOption } from "@app/screens/send-bitcoin-screen/hooks/fee-tiers.types"
+import {
+  FeeTierOption,
+  FeeUnit,
+} from "@app/screens/send-bitcoin-screen/hooks/fee-tiers.types"
 import { OnchainFeeQuote } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
 import { useCustodialOnchainFeeTiers } from "@app/screens/send-bitcoin-screen/hooks/use-custodial-onchain-fee-tiers"
 
@@ -133,6 +136,54 @@ describe("useCustodialOnchainFeeTiers", () => {
       variables: { walletId: "usd-wallet", address: "bc1qtest", amount: 50_000 },
     })
     expect(mockFetchUsdFees).not.toHaveBeenCalled()
+  })
+
+  it("marks a cents quote as cents and a sats quote as sats", async () => {
+    mockFetchUsdFees.mockResolvedValue(feeResponse(50, 30, 20))
+
+    const { result: usd } = renderHook(() =>
+      useCustodialOnchainFeeTiers({
+        walletId: "usd-wallet",
+        address: "bc1qtest",
+        amount: 250,
+        quote: OnchainFeeQuote.Usd,
+      }),
+    )
+
+    await waitFor(() => {
+      expect(usd.current.tiers[FeeTierOption.Fast].feeAmount).toBe(50)
+    })
+    // The unit is what keeps a cents fee out of the sats formatter one layer up.
+    expect(usd.current.tiers[FeeTierOption.Fast].feeUnit).toBe(FeeUnit.Cents)
+    expect(usd.current.tiers[FeeTierOption.Slow].feeUnit).toBe(FeeUnit.Cents)
+
+    mockFetchBtcFees.mockResolvedValue(feeResponse(900, 600, 300))
+
+    const { result: btc } = renderHook(() => useCustodialOnchainFeeTiers(btcParams))
+
+    await waitFor(() => {
+      expect(btc.current.tiers[FeeTierOption.Fast].feeAmount).toBe(900)
+    })
+    expect(btc.current.tiers[FeeTierOption.Fast].feeUnit).toBe(FeeUnit.Sats)
+  })
+
+  it("marks a usd wallet quoting a fixed btc amount as cents", async () => {
+    mockFetchUsdAsBtcFees.mockResolvedValue(feeResponse(70, 40, 25))
+
+    const { result } = renderHook(() =>
+      useCustodialOnchainFeeTiers({
+        walletId: "usd-wallet",
+        address: "bc1qtest",
+        amount: 50_000,
+        quote: OnchainFeeQuote.UsdAsBtcDenominated,
+      }),
+    )
+
+    await waitFor(() => {
+      expect(result.current.tiers[FeeTierOption.Fast].feeAmount).toBe(70)
+    })
+    // Only the amount sent to this endpoint is sats; OnChainUsdTxFee answers in cents.
+    expect(result.current.tiers[FeeTierOption.Fast].feeUnit).toBe(FeeUnit.Cents)
   })
 
   it("flags an error and zeroes the tiers when the quote rejects", async () => {

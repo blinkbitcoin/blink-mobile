@@ -142,11 +142,15 @@ gql`
   }
 `
 
-/** Only a USD wallet quoting in cents departs from sats, and only for the cents endpoint. */
+/**
+ * Read off the endpoint's return type, not its input. Both USD endpoints resolve to
+ * `OnChainUsdTxFee`, whose `amount` is a `CentAmount`; only the amount handed to
+ * `onChainUsdTxFeeAsBtcDenominated` is sat-denominated.
+ */
 const FEE_UNIT_BY_QUOTE: Record<OnchainFeeQuote, FeeUnit> = {
   [OnchainFeeQuote.Btc]: FeeUnit.Sats,
   [OnchainFeeQuote.Usd]: FeeUnit.Cents,
-  [OnchainFeeQuote.UsdAsBtcDenominated]: FeeUnit.Sats,
+  [OnchainFeeQuote.UsdAsBtcDenominated]: FeeUnit.Cents,
 }
 
 const EMPTY_TIERS = Object.freeze(
