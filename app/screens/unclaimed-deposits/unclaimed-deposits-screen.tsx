@@ -60,7 +60,16 @@ export const UnclaimedDepositsScreen: React.FC = () => {
   const isRefundMode = refundDepositId !== null
   const hasAddress = refundAddress.trim().length > 0
   const selectedFeeRate = feeTiers[feeTier].feeAmount
-  const canSubmitRefund = hasAddress && feeTiersError === null && selectedFeeRate > 0
+  const hasFeeRateError = feeTiersError !== null
+  const isFeeRateBroadcastable = selectedFeeRate > 0
+  /**
+   * The quote gate stops a rate the labels never showed from being submitted; the rate
+   * itself still has to be one the network would accept.
+   */
+  const canSubmitRefund =
+    hasAddress && !hasFeeRateError && hasFeeRateQuote && isFeeRateBroadcastable
+  const isRefundSubmitDisabled = !canSubmitRefund || isBusy
+  const isClaimDisabled = isBusy || isRefundMode
 
   const resetRefund = () => {
     setRefundDepositId(null)
@@ -117,7 +126,7 @@ export const UnclaimedDepositsScreen: React.FC = () => {
                     <GaloyTertiaryButton
                       title={LL.UnclaimedDeposit.claim()}
                       onPress={() => handleClaim(deposit)}
-                      disabled={isBusy || isRefundMode}
+                      disabled={isClaimDisabled}
                       {...testProps(`claim-${deposit.id}`)}
                     />
                   )}
@@ -163,7 +172,7 @@ export const UnclaimedDepositsScreen: React.FC = () => {
                         />
                       ))}
                     </View>
-                    {feeTiersError !== null && (
+                    {hasFeeRateError && (
                       <Text style={styles.errorText}>
                         {LL.UnclaimedDeposit.feeRateUnavailable()}
                       </Text>
@@ -184,7 +193,7 @@ export const UnclaimedDepositsScreen: React.FC = () => {
                       <GaloyTertiaryButton
                         title={LL.UnclaimedDeposit.refundNow()}
                         onPress={() => onRefund(deposit.id)}
-                        disabled={!canSubmitRefund || isBusy}
+                        disabled={isRefundSubmitDisabled}
                         {...testProps("refund-now-button")}
                       />
                     )}

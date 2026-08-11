@@ -50,7 +50,9 @@ export const useRecommendedFeeTiers = (
   const fetchFees = useCallback(async () => {
     requestTokenRef.current += 1
     const token = requestTokenRef.current
+    // The rates go with the quote, so a caller reading tiers cannot see a discarded rate.
     discardQuote()
+    setTiers(DEFAULT_TIERS)
 
     if (!sdk || !enabled) return
 

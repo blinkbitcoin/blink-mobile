@@ -110,6 +110,40 @@ describe("useRecommendedFeeTiers", () => {
     expect(result.current.tiers[FeeTierOption.Slow].feeAmount).toBe(0)
   })
 
+  it("zeroes the rates while a re-entered panel is quoting again", async () => {
+    mockGetRecommendedFees.mockResolvedValueOnce({
+      fastest: 100,
+      halfHour: 60,
+      hour: 40,
+      economy: 20,
+      minimum: 5,
+    })
+
+    const { result, rerender } = renderHook(
+      ({ enabled }: { enabled: boolean }) => useRecommendedFeeTiers(mockSdk, enabled),
+      { initialProps: { enabled: true } },
+    )
+
+    await waitFor(() =>
+      expect(result.current.tiers[FeeTierOption.Fast].feeAmount).toBe(100),
+    )
+
+    // The re-entry quote never settles, so only the first visit's rates could linger.
+    mockGetRecommendedFees.mockImplementationOnce(
+      () =>
+        new Promise(() => {
+          // deliberately never resolves
+        }),
+    )
+    rerender({ enabled: false })
+    rerender({ enabled: true })
+    await flushEffects()
+
+    // Leaving 100 here lets the screen submit a refund at a rate it stopped showing.
+    expect(result.current.tiers[FeeTierOption.Fast].feeAmount).toBe(0)
+    expect(result.current.hasQuote).toBe(false)
+  })
+
   it("clears error on successful retry after a previous failure", async () => {
     mockGetRecommendedFees.mockRejectedValueOnce(new Error("transient"))
     mockGetRecommendedFees.mockResolvedValueOnce({

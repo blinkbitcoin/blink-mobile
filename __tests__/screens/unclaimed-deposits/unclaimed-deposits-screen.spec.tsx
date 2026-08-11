@@ -204,6 +204,18 @@ describe("UnclaimedDepositsScreen — refund fee gating", () => {
     expect(utils.queryByText("Couldn't load network fees")).toBeNull()
   })
 
+  it("keeps Refund now disabled while no quote answers for the rates on hand", () => {
+    // The hook-level re-entry path is pinned in use-recommended-fee-tiers.spec.ts.
+    mockHasFeeRateQuote = false
+    const utils = renderScreen()
+    enterRefundMode(utils)
+    setAddress(utils, "bc1qaddr")
+
+    // Submitting here would broadcast at a rate the labels are not showing.
+    const button = utils.getByTestId("refund-now-button")
+    expect(button.props.accessibilityState?.disabled).toBe(true)
+  })
+
   it("disables Refund now when selected tier rate is 0 (regression)", () => {
     mockFeeTiers = {
       [FeeTierOption.Fast]: {
@@ -298,6 +310,7 @@ describe("UnclaimedDepositsScreen — broader flows", () => {
       },
     }
     mockFeeTiersError = null
+    mockHasFeeRateQuote = true
   })
 
   it("renders empty-state copy when there are no deposits", () => {
