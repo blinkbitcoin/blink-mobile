@@ -3923,7 +3923,10 @@
   },
   "UnsupportedRegionScreen": {
     "title": "Ikke-understøttet region",
-    "description": "Desværre kan vi ikke betjene brugere fra din nuværende region."
+    "description": "Desværre kan vi ikke betjene brugere fra din nuværende region.",
+    "custodialSignupDescription": "Desværre kan vi ikke oprette nye depotkonti i din nuværende region. Du kan i stedet bruge en selvforvaltet konto.",
+    "custodialSignupOnlyDescription": "Desværre kan vi ikke oprette nye depotkonti i din nuværende region.",
+    "unknownRegionDescription": "Vi kunne ikke fastslå din region. Tjek din forbindelse, og prøv igen."
   },
   "RestoreScreen": {
     "title": "Gendan tegnebog",

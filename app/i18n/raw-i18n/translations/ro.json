@@ -3923,7 +3923,10 @@
   },
   "UnsupportedRegionScreen": {
     "title": "Regiune neacceptată",
-    "description": "Din păcate nu putem deservi utilizatorii din regiunea ta actuală."
+    "description": "Din păcate nu putem deservi utilizatorii din regiunea ta actuală.",
+    "custodialSignupDescription": "Din păcate nu putem crea conturi custodiale noi în regiunea ta actuală. Poți folosi în schimb un cont în auto-custodie.",
+    "custodialSignupOnlyDescription": "Din păcate nu putem crea conturi custodiale noi în regiunea ta actuală.",
+    "unknownRegionDescription": "Nu am putut determina regiunea ta. Verifică conexiunea și încearcă din nou."
   },
   "RestoreScreen": {
     "title": "Restaurare portofel",

@@ -3923,7 +3923,10 @@
   },
   "UnsupportedRegionScreen": {
     "title": "Ekitundu ekitawagirwa",
-    "description": "Eky'embi, tetusobola kuweereza bakozesa abava mu kitundu kyo eky'okaakano."
+    "description": "Eky'embi, tetusobola kuweereza bakozesa abava mu kitundu kyo eky'okaakano.",
+    "custodialSignupDescription": "Tetusobola kutondawo akkawunti empya eza kkampuni mu kitundu kyo. Osobola okukozesa akkawunti eyeefuga.",
+    "custodialSignupOnlyDescription": "Tetusobola kutondawo akkawunti empya eza kkampuni mu kitundu kyo.",
+    "unknownRegionDescription": "Tetusobodde kumanya kitundu kyo. Kebera enkolagana yo ogezeeko nate."
   },
   "RestoreScreen": {
     "title": "Zzaawo wallet",

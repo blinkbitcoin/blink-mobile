@@ -3923,7 +3923,10 @@
   },
   "UnsupportedRegionScreen": {
     "title": "Nem támogatott régió",
-    "description": "Sajnos nem tudjuk kiszolgálni a jelenlegi régiódból érkező felhasználókat."
+    "description": "Sajnos nem tudjuk kiszolgálni a jelenlegi régiódból érkező felhasználókat.",
+    "custodialSignupDescription": "Sajnos nem tudunk új letéti fiókokat létrehozni a jelenlegi régiódban. Helyette használhatsz saját letétkezelésű fiókot.",
+    "custodialSignupOnlyDescription": "Sajnos nem tudunk új letéti fiókokat létrehozni a jelenlegi régiódban.",
+    "unknownRegionDescription": "Nem tudtuk meghatározni a régiódat. Ellenőrizd a kapcsolatot, és próbáld újra."
   },
   "RestoreScreen": {
     "title": "Tárca visszaállítása",

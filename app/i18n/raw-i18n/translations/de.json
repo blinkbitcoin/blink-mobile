@@ -3923,7 +3923,10 @@
     },
     "UnsupportedRegionScreen": {
         "title": "Nicht unterstützte Region",
-        "description": "Leider können wir keine Nutzer aus deiner aktuellen Region bedienen."
+        "description": "Leider können wir keine Nutzer aus deiner aktuellen Region bedienen.",
+        "custodialSignupDescription": "Leider können wir in deiner aktuellen Region keine neuen verwahrten Konten erstellen. Du kannst stattdessen ein selbstverwahrtes Konto nutzen.",
+        "custodialSignupOnlyDescription": "Leider können wir in deiner aktuellen Region keine neuen verwahrten Konten erstellen.",
+        "unknownRegionDescription": "Wir konnten deine Region nicht ermitteln. Bitte prüfe deine Verbindung und versuche es erneut."
     },
     "RestoreScreen": {
         "title": "Wallet wiederherstellen",

@@ -3923,7 +3923,10 @@
   },
   "UnsupportedRegionScreen": {
     "title": "Nepodržana regija",
-    "description": "Nažalost ne možemo pružati uslugu korisnicima iz vaše trenutne regije."
+    "description": "Nažalost ne možemo pružati uslugu korisnicima iz vaše trenutne regije.",
+    "custodialSignupDescription": "Nažalost ne možemo otvoriti nove skrbničke račune u tvojoj trenutnoj regiji. Umjesto toga možeš koristiti račun u vlastitom skrbništvu.",
+    "custodialSignupOnlyDescription": "Nažalost ne možemo otvoriti nove skrbničke račune u tvojoj trenutnoj regiji.",
+    "unknownRegionDescription": "Nismo mogli utvrditi tvoju regiju. Provjeri vezu i pokušaj ponovno."
   },
   "RestoreScreen": {
     "title": "Vraćanje novčanika",

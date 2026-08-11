@@ -3923,7 +3923,10 @@
   },
   "UnsupportedRegionScreen": {
     "title": "Niet-ondersteunde regio",
-    "description": "Helaas kunnen we geen gebruikers uit je huidige regio bedienen."
+    "description": "Helaas kunnen we geen gebruikers uit je huidige regio bedienen.",
+    "custodialSignupDescription": "Helaas kunnen we in jouw huidige regio geen nieuwe beheerde accounts aanmaken. Je kunt in plaats daarvan een zelfbeheerd account gebruiken.",
+    "custodialSignupOnlyDescription": "Helaas kunnen we in jouw huidige regio geen nieuwe beheerde accounts aanmaken.",
+    "unknownRegionDescription": "We konden je regio niet bepalen. Controleer je verbinding en probeer het opnieuw."
   },
   "RestoreScreen": {
     "title": "Portemonnee herstellen",

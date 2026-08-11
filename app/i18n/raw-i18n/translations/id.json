@@ -3923,7 +3923,10 @@
   },
   "UnsupportedRegionScreen": {
     "title": "Wilayah tidak didukung",
-    "description": "Sayangnya kami tidak dapat melayani pengguna dari wilayah Anda saat ini."
+    "description": "Sayangnya kami tidak dapat melayani pengguna dari wilayah Anda saat ini.",
+    "custodialSignupDescription": "Sayangnya kami tidak dapat membuat akun kustodian baru di wilayah Anda saat ini. Anda dapat menggunakan akun swakelola sebagai gantinya.",
+    "custodialSignupOnlyDescription": "Sayangnya kami tidak dapat membuat akun kustodian baru di wilayah Anda saat ini.",
+    "unknownRegionDescription": "Kami tidak dapat menentukan wilayah Anda. Periksa koneksi Anda dan coba lagi."
   },
   "RestoreScreen": {
     "title": "Pulihkan dompet",
