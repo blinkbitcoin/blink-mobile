@@ -31,6 +31,7 @@ let mockCustodialHasError = false
 let mockCustodialIsQuoting = false
 let mockHasCustodialQuote = true
 const mockUseCustodialOnchainFeeTiers = jest.fn()
+const mockUseOnchainFeeTiers = jest.fn()
 
 jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () => ({ sdk: mockActiveSdk }),
@@ -58,11 +59,14 @@ jest.mock("@app/screens/send-bitcoin-screen/hooks/use-onchain-fee-tiers", () => 
   )
   return {
     ...actual,
-    useOnchainFeeTiers: () => ({
-      tiers: mockFeeTiers,
-      error: mockFeeError,
-      hasQuote: mockHasSelfCustodialQuote,
-    }),
+    useOnchainFeeTiers: (...args: unknown[]) => {
+      mockUseOnchainFeeTiers(...args)
+      return {
+        tiers: mockFeeTiers,
+        error: mockFeeError,
+        hasQuote: mockHasSelfCustodialQuote,
+      }
+    },
   }
 })
 
@@ -311,6 +315,41 @@ describe("useOnchainFeeTierOptions", () => {
       )
       expect(result.current.feeTierErrorMessage).toBe(expected)
     }
+  })
+
+  it("hands the self-custodial rail nothing to quote on a custodial payment", () => {
+    renderHook(() =>
+      useOnchainFeeTierOptions({
+        paymentDetail: buildOnchainDetailRaw() as never,
+        isSelfCustodial: false,
+        paymentDestination: undefined,
+        convertMoneyAmount: undefined,
+      }),
+    )
+
+    // Address and amount gated off, so the SDK never quotes a payment the backend owns.
+    expect(mockUseOnchainFeeTiers).toHaveBeenLastCalledWith(
+      expect.anything(),
+      undefined,
+      undefined,
+    )
+  })
+
+  it("hands the self-custodial rail the payment once the rail is its own", () => {
+    renderHook(() =>
+      useOnchainFeeTierOptions({
+        paymentDetail: buildOnchainDetailRaw() as never,
+        isSelfCustodial: true,
+        paymentDestination: undefined,
+        convertMoneyAmount: undefined,
+      }),
+    )
+
+    expect(mockUseOnchainFeeTiers).toHaveBeenLastCalledWith(
+      expect.anything(),
+      "bc1qaddr",
+      5000,
+    )
   })
 
   it("labels the tiers off the wallet amount while the display price is loading", () => {

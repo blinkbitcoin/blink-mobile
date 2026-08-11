@@ -214,6 +214,8 @@ describe("no amount lightning payment details", () => {
     const paymentDetails = createNoAmountOnchainPaymentDetails(params)
     expectCannotGetFee(paymentDetails)
     expectCannotSendPayment(paymentDetails)
+    // An absent feeQuote is what keeps the tier selector from quoting an unsendable payment.
+    expect(paymentDetails.feeQuote).toBeUndefined()
   })
 
   it("cannot set memo if memo is provided", () => {

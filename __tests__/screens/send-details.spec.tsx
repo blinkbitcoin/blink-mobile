@@ -434,13 +434,15 @@ describe("onchain fee tier gating", () => {
     await flushAsync()
 
     /**
-     * The custodial quote is only an estimate: the confirmation screen fetches its own and
-     * the mutation validates server-side, so a failure here must not strand the user.
+     * The pairing is the point: the failure is surfaced and the sender can still continue.
+     * A custodial quote is only an estimate, since the confirmation screen fetches its own
+     * and the mutation validates server-side.
      */
     await waitFor(() => {
-      expect(
-        screen.getByTestId(LL.common.next()).props.accessibilityState?.disabled,
-      ).toBe(false)
+      expect(screen.getByText(LL.SendBitcoinConfirmationScreen.feeError())).toBeTruthy()
     })
+    expect(screen.getByTestId(LL.common.next()).props.accessibilityState?.disabled).toBe(
+      false,
+    )
   })
 })
