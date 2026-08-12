@@ -32,6 +32,19 @@ jest.mock("@react-navigation/native", () =>
   jest.requireActual("../helpers/transaction-detail-mocks").mockNavigation(),
 )
 
+/** The screen reads the wallet history to tell whether the transaction being shown is the
+ *  newest one. Mocked away here because this spec only renders the heading, and loading
+ *  the real mapper would pull the generated enums that the graphql mock above leaves out. */
+const mockNoFragments: unknown[] = []
+jest.mock("@app/self-custodial/hooks/use-self-custodial-transaction-fragments", () => ({
+  useSelfCustodialTransactionFragments: () => mockNoFragments,
+}))
+
+const mockNoTransactions: unknown[] = []
+jest.mock("@app/self-custodial/providers/wallet", () => ({
+  useSelfCustodialWallet: () => ({ allTransactions: mockNoTransactions }),
+}))
+
 jest.mock("@app/components/icon-transactions", () => ({ IconTransaction: () => null }))
 jest.mock("@app/components/wallet-summary", () => ({ WalletSummary: () => null }))
 jest.mock("@app/components/transaction-date", () => ({ TransactionDate: () => null }))
