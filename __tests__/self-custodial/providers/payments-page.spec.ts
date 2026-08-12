@@ -29,7 +29,10 @@ jest.mock("@app/self-custodial/logging", () => ({
   recordErrorOnce: (...args: unknown[]) => mockRecordErrorOnce(...args),
 }))
 
+/** Only the mapping is stubbed. `isKnownPayment` comes from the module itself so the
+ *  token filtering below exercises the real predicate against the mocked config. */
 jest.mock("@app/self-custodial/mappers/transaction", () => ({
+  ...jest.requireActual("@app/self-custodial/mappers/transaction"),
   mapSelfCustodialTransactions: (...args: unknown[]) => mockMapTransactions(...args),
 }))
 
