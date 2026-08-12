@@ -4,6 +4,7 @@ import { AccountType } from "@app/types/wallet"
 
 const mockUseDeviceLocation = jest.fn()
 const mockUseRemoteConfig = jest.fn()
+let mockRemoteConfigReady = true
 const mockUseActiveWallet = jest.fn()
 const mockUseIpCountryLookup = jest.fn()
 
@@ -23,6 +24,7 @@ jest.mock("@app/self-custodial/hooks/use-self-custodial-account-mode", () => ({
 
 jest.mock("@app/config/feature-flags-context", () => ({
   useRemoteConfig: () => mockUseRemoteConfig(),
+  useFeatureFlags: () => ({ remoteConfigReady: mockRemoteConfigReady }),
 }))
 
 jest.mock("@app/hooks/use-active-wallet", () => ({
@@ -37,7 +39,9 @@ import {
 } from "@app/hooks/use-dollar-balance-restricted"
 
 const remoteConfig = {
+  custodialTransferBlockedCountries: [],
   custodialDollarBalanceBlockedCountries: ["HK"],
+  selfCustodialTransferBlockedCountries: [],
   selfCustodialDollarBalanceBlockedCountries: ["FR"],
 }
 
@@ -48,6 +52,7 @@ const setIpLookup = (countryCode: string | undefined, isSettled = true): void =>
 
 const setup = (accountType: AccountType): void => {
   jest.clearAllMocks()
+  mockRemoteConfigReady = true
   mockIsAnonMode = false
   mockUseDeviceLocation.mockReturnValue({ countryCode: undefined, source: undefined })
   mockUseRemoteConfig.mockReturnValue(remoteConfig)
@@ -250,6 +255,20 @@ describe("useDollarBalanceRestricted", () => {
       setIpLookup(undefined, false)
 
       expect(readRestriction()).toEqual({ isRestricted: false, isRegionPending: false })
+    })
+  })
+
+  describe("before the block-lists have arrived", () => {
+    it("reports the region pending rather than a verdict off the compiled defaults", () => {
+      mockRemoteConfigReady = false
+
+      const { isRegionPending, isGated } = renderHook(() => useDollarBalanceGate()).result
+        .current
+
+      // A list still being fetched would read as a country nothing restricts, and the
+      // surface would settle on it and then flip once the real list lands.
+      expect(isRegionPending).toBe(true)
+      expect(isGated).toBe(false)
     })
   })
 })

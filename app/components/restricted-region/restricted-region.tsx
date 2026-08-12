@@ -8,10 +8,11 @@ import React, {
   useState,
 } from "react"
 
-import { useFeatureFlags, useRemoteConfig } from "@app/config/feature-flags-context"
+import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
-import { isBlockedCountry, useIpCountryLookup } from "@app/hooks/use-device-location"
 import { RestrictedRegionScreen } from "@app/custodial/components/restricted-region-screen"
+import { isBlockedCountry } from "@app/hooks/use-device-location"
+import { useRegionCheck } from "@app/hooks/use-region-check"
 import { bootSplashGate } from "@app/navigation/boot-splash-gate"
 import { RestrictedRegionModal } from "@app/self-custodial/components/restricted-region-modal"
 import { AccountType } from "@app/types/wallet"
@@ -55,14 +56,18 @@ type RestrictedRegionEvaluation = {
 const useEvaluateRestrictedRegion = (): RestrictedRegionEvaluation => {
   const { activeAccount, loading: isRegistryHydrating } = useAccountRegistry()
   const accountType = activeAccount?.type
-  const { custodialCreationBlockedCountries, selfCustodialCreationBlockedCountries } =
-    useRemoteConfig()
-  const { remoteConfigReady } = useFeatureFlags()
-  const { countryCode: ipCountryCode, isSettled } = useIpCountryLookup(
-    accountType !== undefined,
-  )
+  const { selfCustodialCreationBlockedCountries } = useRemoteConfig()
+  /** Custodial answers through the hook the server will serve; a self-custodial wallet has
+   *  no Blink account behind it and keeps its own list. `isSettled` already spans the
+   *  remote-config fetch, so both branches wait on it. */
+  const hasAccountToEvaluate = accountType !== undefined
+  const {
+    countryCode,
+    restricted: isCustodialRestricted,
+    isSettled,
+  } = useRegionCheck(hasAccountToEvaluate)
 
-  if (accountType === undefined) {
+  if (!hasAccountToEvaluate) {
     return {
       isRestrictedRegion: false,
       isEvaluationPending: isRegistryHydrating,
@@ -70,18 +75,17 @@ const useEvaluateRestrictedRegion = (): RestrictedRegionEvaluation => {
     }
   }
 
-  const blockedCountries =
-    accountType === AccountType.SelfCustodial
-      ? selfCustodialCreationBlockedCountries
-      : custodialCreationBlockedCountries
+  const isSelfCustodial = accountType === AccountType.SelfCustodial
+  const isSelfCustodialRestricted = isBlockedCountry(
+    countryCode,
+    selfCustodialCreationBlockedCountries,
+  )
+  const isRestrictedRegion = isSelfCustodial
+    ? isSelfCustodialRestricted
+    : isCustodialRestricted
+  const isEvaluationPending = isRegistryHydrating || !isSettled
 
-  const isEvaluationPending = isRegistryHydrating || !isSettled || !remoteConfigReady
-
-  return {
-    isRestrictedRegion: isBlockedCountry(ipCountryCode, blockedCountries),
-    isEvaluationPending,
-    accountType,
-  }
+  return { isRestrictedRegion, isEvaluationPending, accountType }
 }
 
 /** Hosts the sanctions surfaces: the custodial one blocks the whole session, since

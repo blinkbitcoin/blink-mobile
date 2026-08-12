@@ -4,6 +4,7 @@ import { AccountType } from "@app/types/wallet"
 
 const mockUseDeviceLocation = jest.fn()
 const mockUseRemoteConfig = jest.fn()
+let mockRemoteConfigReady = true
 const mockUseActiveWallet = jest.fn()
 
 jest.mock("@app/utils/ip-country-lookup")
@@ -21,6 +22,7 @@ jest.mock("@app/self-custodial/hooks/use-self-custodial-account-mode", () => ({
 
 jest.mock("@app/config/feature-flags-context", () => ({
   useRemoteConfig: () => mockUseRemoteConfig(),
+  useFeatureFlags: () => ({ remoteConfigReady: mockRemoteConfigReady }),
 }))
 
 jest.mock("@app/hooks/use-active-wallet", () => ({
@@ -31,10 +33,13 @@ import { useTransferGate, useTransferGated } from "@app/hooks/use-transfer-block
 
 const setup = (): void => {
   jest.clearAllMocks()
+  mockRemoteConfigReady = true
   mockIsAnonMode = false
   mockUseDeviceLocation.mockReturnValue({ countryCode: undefined, source: undefined })
   mockUseRemoteConfig.mockReturnValue({
+    custodialDollarBalanceBlockedCountries: [],
     custodialTransferBlockedCountries: ["DE"],
+    selfCustodialDollarBalanceBlockedCountries: [],
     selfCustodialTransferBlockedCountries: ["FR"],
   })
   mockUseActiveWallet.mockReturnValue({ accountType: AccountType.SelfCustodial })
@@ -128,6 +133,20 @@ describe("useTransferGated — region policy", () => {
       mockUseDeviceLocation.mockReturnValue({ countryCode: undefined, loading: false })
 
       expect(readGate()).toEqual({ isGated: true, isRegionPending: false })
+    })
+  })
+
+  describe("before the block-lists have arrived", () => {
+    it("reports the region pending rather than a verdict off the compiled defaults", () => {
+      mockRemoteConfigReady = false
+
+      const { isRegionPending, isGated } = renderHook(() => useTransferGate()).result
+        .current
+
+      // A list still being fetched would read as a country nothing restricts, and the
+      // surface would settle on it and then flip once the real list lands.
+      expect(isRegionPending).toBe(true)
+      expect(isGated).toBe(false)
     })
   })
 })
