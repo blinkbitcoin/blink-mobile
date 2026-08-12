@@ -3080,7 +3080,7 @@ const en: BaseTranslation = {
     mattermost: "Mattermost",
     defaultEmailSubject: "{bankName: string} - Support",
     defaultSupportMessage:
-      "Hey there! I need some help with {bankName: string}, I'm using the version {version: string} on {os: string}.",
+      "Hey there! I need some help with {bankName: string}, I'm using the version {version: string} on {os: string}. My Account ID is: {accountId: string}",
     emailCopied: "email {email: string} copied to clipboard",
     deleteAccount: "Delete account",
     delete: "delete",
