@@ -2539,6 +2539,7 @@ describe("HomeScreen pull-to-refresh", () => {
     mockSelfCustodialWalletOverride = {
       sdk: null,
       wallets: [],
+      allTransactions: [],
       status: "ready",
       isStableBalanceActive: false,
       lastReceivedPaymentId: null,
