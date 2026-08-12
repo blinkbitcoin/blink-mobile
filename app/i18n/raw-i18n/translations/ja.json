@@ -2245,7 +2245,7 @@
             "signals": {
                 "cloudBackup": "クラウドバックアップ",
                 "manualBackup": "手動バックアップ",
-                "appLock": "アプリロック（生体認証またはPIN）",
+                "appLock": "生体認証/PIN",
                 "hideBalance": "残高を非表示",
                 "twoFactor": "二要素認証（2FA）",
                 "emailVerified": "確認済みメールアドレス"

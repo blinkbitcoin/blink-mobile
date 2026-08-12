@@ -126,12 +126,6 @@ export const SecurityScreen: React.FC<Props> = ({ route, navigation }) => {
 
   return (
     <Screen style={styles.container} preset="scroll">
-      {securityScore && (
-        <SecurityScoreCard
-          score={securityScore}
-          onSignalPress={(key) => signalActions[key]()}
-        />
-      )}
       <View style={styles.settingContainer}>
         <ListItem containerStyle={styles.listItemContainer}>
           <GaloyIcon name="fingerprint" size={24} />
@@ -142,6 +136,16 @@ export const SecurityScreen: React.FC<Props> = ({ route, navigation }) => {
             </ListItem.Subtitle>
           </ListItem.Content>
           <Switch value={isBiometricsEnabled} onValueChange={onBiometricsValueChanged} />
+        </ListItem>
+      </View>
+
+      <View style={styles.settingContainer}>
+        <ListItem containerStyle={styles.listItemContainer}>
+          <GaloyIcon name="eye-slash" size={24} />
+          <ListItem.Content>
+            <ListItem.Title>{LL.SecurityScreen.hideBalanceTitle()}</ListItem.Title>
+          </ListItem.Content>
+          <Switch value={hideBalance} onValueChange={onHideBalanceValueChanged} />
         </ListItem>
       </View>
 
@@ -158,15 +162,12 @@ export const SecurityScreen: React.FC<Props> = ({ route, navigation }) => {
         </ListItem>
       </View>
 
-      <View style={styles.settingContainer}>
-        <ListItem containerStyle={styles.listItemContainer}>
-          <GaloyIcon name="eye-slash" size={24} />
-          <ListItem.Content>
-            <ListItem.Title>{LL.SecurityScreen.hideBalanceTitle()}</ListItem.Title>
-          </ListItem.Content>
-          <Switch value={hideBalance} onValueChange={onHideBalanceValueChanged} />
-        </ListItem>
-      </View>
+      {securityScore && (
+        <SecurityScoreCard
+          score={securityScore}
+          onSignalPress={(key) => signalActions[key]()}
+        />
+      )}
     </Screen>
   )
 }

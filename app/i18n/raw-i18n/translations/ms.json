@@ -2245,7 +2245,7 @@
       "signals": {
         "cloudBackup": "Sandaran awan",
         "manualBackup": "Sandaran manual",
-        "appLock": "Kunci aplikasi (biometrik atau PIN)",
+        "appLock": "Biometrik/PIN",
         "hideBalance": "Sembunyikan baki",
         "twoFactor": "Pengesahan dua faktor (2FA)",
         "emailVerified": "E-mel disahkan"

@@ -22,7 +22,7 @@ describe("selfCustodialSecuritySignals", () => {
   it("orders backup signals first and keeps them retriggerable", () => {
     const signals = selfCustodialSecuritySignals([])
 
-    expect(signals.map((s) => s.key)).toEqual(["cloudBackup", "manualBackup"])
+    expect(signals.map((s) => s.key)).toEqual(["manualBackup", "cloudBackup"])
     expect(signals.every((s) => s.retriggerable)).toBe(true)
     expect(signals.every((s) => !s.done)).toBe(true)
   })

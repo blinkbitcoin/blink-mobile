@@ -2245,7 +2245,7 @@
       "signals": {
         "cloudBackup": "Cadangan cloud",
         "manualBackup": "Cadangan manual",
-        "appLock": "Kunci aplikasi (biometrik atau PIN)",
+        "appLock": "Biometrik/PIN",
         "hideBalance": "Sembunyikan saldo",
         "twoFactor": "Autentikasi dua faktor (2FA)",
         "emailVerified": "Email terverifikasi"

@@ -2245,7 +2245,7 @@
       "signals": {
         "cloudBackup": "Sao lưu đám mây",
         "manualBackup": "Sao lưu thủ công",
-        "appLock": "Khóa ứng dụng (sinh trắc học hoặc PIN)",
+        "appLock": "Sinh trắc học/PIN",
         "hideBalance": "Ẩn số dư",
         "twoFactor": "Xác thực hai yếu tố (2FA)",
         "emailVerified": "Email đã xác minh"

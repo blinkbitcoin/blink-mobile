@@ -96,7 +96,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
           signals: {
             cloudBackup: () => "Cloud backup",
             manualBackup: () => "Manual backup",
-            appLock: () => "App lock (biometrics or PIN)",
+            appLock: () => "Biometrics/PIN",
             hideBalance: () => "Hide balance",
             twoFactor: () => "Two-factor authentication (2FA)",
             emailVerified: () => "Verified email",
@@ -134,6 +134,23 @@ describe("SecurityScreen security score card", () => {
     const { getByTestId } = renderScreen()
 
     expect(getByTestId("security-score-card")).toBeTruthy()
+  })
+
+  /** Queries return matches in tree order, so this pins both the toggle order
+   *  and the card sitting below all of them. */
+  it("renders the card under the device toggles", () => {
+    const { getAllByText } = renderScreen()
+
+    const sectionTitles = getAllByText(
+      /^(Biometric|Always hide balance|PIN code|Security score .+)$/,
+    )
+
+    expect(sectionTitles.map((node) => node.props.children)).toEqual([
+      "Biometric",
+      "Always hide balance",
+      "PIN code",
+      "Security score 0/4",
+    ])
   })
 
   it("shows account signals for a custodial account instead of backup rows", () => {

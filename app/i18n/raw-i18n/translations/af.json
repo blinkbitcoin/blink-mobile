@@ -2245,7 +2245,7 @@
       "signals": {
         "cloudBackup": "Wolk-rugsteun",
         "manualBackup": "Handmatige rugsteun",
-        "appLock": "Appslot (biometrie of PIN)",
+        "appLock": "Biometrie/PIN",
         "hideBalance": "Versteek balans",
         "twoFactor": "Twee-faktor-verifikasie (2FA)",
         "emailVerified": "Geverifieerde e-pos"

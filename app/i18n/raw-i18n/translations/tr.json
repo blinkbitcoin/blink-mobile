@@ -2245,7 +2245,7 @@
       "signals": {
         "cloudBackup": "Bulut yedekleme",
         "manualBackup": "Manuel yedekleme",
-        "appLock": "Uygulama kilidi (biyometri veya PIN)",
+        "appLock": "Biyometri/PIN",
         "hideBalance": "Bakiyeyi gizle",
         "twoFactor": "İki faktörlü kimlik doğrulama (2FA)",
         "emailVerified": "Doğrulanmış e-posta"

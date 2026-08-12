@@ -2245,7 +2245,7 @@
       "signals": {
         "cloudBackup": "Ukugcina kwilifu",
         "manualBackup": "Ukugcina ngesandla",
-        "appLock": "Ukutshixa i-app (ibhayometriki okanye i-PIN)",
+        "appLock": "Ibhayometriki/i-PIN",
         "hideBalance": "Fihla ibhalansi",
         "twoFactor": "Ungqinisiso lwezinto ezimbini (2FA)",
         "emailVerified": "I-imeyile eqinisekisiweyo"

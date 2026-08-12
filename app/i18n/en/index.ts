@@ -2273,7 +2273,7 @@ const en: BaseTranslation = {
       signals: {
         cloudBackup: "Cloud backup",
         manualBackup: "Manual backup",
-        appLock: "App lock (biometrics or PIN)",
+        appLock: "Biometrics/PIN",
         hideBalance: "Hide balance",
         twoFactor: "Two-factor authentication (2FA)",
         emailVerified: "Verified email",

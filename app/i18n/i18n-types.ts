@@ -7106,7 +7106,7 @@ type RootTranslation = {
 				 */
 				manualBackup: string
 				/**
-				 * A​p​p​ ​l​o​c​k​ ​(​b​i​o​m​e​t​r​i​c​s​ ​o​r​ ​P​I​N​)
+				 * B​i​o​m​e​t​r​i​c​s​/​P​I​N
 				 */
 				appLock: string
 				/**
@@ -20385,7 +20385,7 @@ export type TranslationFunctions = {
 				 */
 				manualBackup: () => LocalizedString
 				/**
-				 * App lock (biometrics or PIN)
+				 * Biometrics/PIN
 				 */
 				appLock: () => LocalizedString
 				/**

@@ -2245,7 +2245,7 @@
             "signals": {
                 "cloudBackup": "Sauvegarde cloud",
                 "manualBackup": "Sauvegarde manuelle",
-                "appLock": "Verrouillage de l'application (biométrie ou PIN)",
+                "appLock": "Biométrie/PIN",
                 "hideBalance": "Masquer le solde",
                 "twoFactor": "Authentification à deux facteurs (2FA)",
                 "emailVerified": "E-mail vérifié"

@@ -2245,7 +2245,7 @@
       "signals": {
         "cloudBackup": "Copie de rezervă în cloud",
         "manualBackup": "Copie de rezervă manuală",
-        "appLock": "Blocarea aplicației (biometrie sau PIN)",
+        "appLock": "Biometrie/PIN",
         "hideBalance": "Ascunde soldul",
         "twoFactor": "Autentificare cu doi factori (2FA)",
         "emailVerified": "E-mail verificat"

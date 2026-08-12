@@ -2245,7 +2245,7 @@
       "signals": {
         "cloudBackup": "Phuyupi copia de seguridad",
         "manualBackup": "Makiwan copia de seguridad",
-        "appLock": "App wichqay (biometria otaq PIN)",
+        "appLock": "Biometria/PIN",
         "hideBalance": "Saldota pakay",
         "twoFactor": "Iskay factorwan riqsichikuy (2FA)",
         "emailVerified": "Correo electronico chiqaqchasqa"

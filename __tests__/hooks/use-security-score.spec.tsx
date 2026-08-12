@@ -70,15 +70,15 @@ describe("useSecurityScore", () => {
 
   it("puts self-custodial signals before the shared device signals", () => {
     mockSelfCustodialSignals.mockReturnValue([
-      { key: "cloudBackup", done: false, retriggerable: true },
       { key: "manualBackup", done: true, retriggerable: true },
+      { key: "cloudBackup", done: false, retriggerable: true },
     ])
 
     const { result } = renderHook(() => useSecurityScore(NO_LOCK))
 
     expect(result.current?.signals.map((s) => s.key)).toEqual([
-      "cloudBackup",
       "manualBackup",
+      "cloudBackup",
       "appLock",
       "hideBalance",
     ])

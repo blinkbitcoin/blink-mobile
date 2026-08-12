@@ -2245,7 +2245,7 @@
       "signals": {
         "cloudBackup": "Hifadhi rudufu ya wingu",
         "manualBackup": "Hifadhi rudufu ya mkono",
-        "appLock": "Kufuli ya programu (bayometriki au PIN)",
+        "appLock": "Bayometriki/PIN",
         "hideBalance": "Ficha salio",
         "twoFactor": "Uthibitishaji wa hatua mbili (2FA)",
         "emailVerified": "Barua pepe iliyothibitishwa"

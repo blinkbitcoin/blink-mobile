@@ -2245,7 +2245,7 @@
       "signals": {
         "cloudBackup": "نسخ احتياطي سحابي",
         "manualBackup": "نسخ احتياطي يدوي",
-        "appLock": "قفل التطبيق (البصمة أو رمز PIN)",
+        "appLock": "البصمة/PIN",
         "hideBalance": "إخفاء الرصيد",
         "twoFactor": "المصادقة الثنائية (2FA)",
         "emailVerified": "بريد إلكتروني موثّق"

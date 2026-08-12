@@ -2245,7 +2245,7 @@
       "signals": {
         "cloudBackup": "Felhőalapú biztonsági mentés",
         "manualBackup": "Kézi biztonsági mentés",
-        "appLock": "Alkalmazászár (biometria vagy PIN)",
+        "appLock": "Biometria/PIN",
         "hideBalance": "Egyenleg elrejtése",
         "twoFactor": "Kétfaktoros hitelesítés (2FA)",
         "emailVerified": "Megerősített e-mail"

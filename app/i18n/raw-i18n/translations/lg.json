@@ -2245,7 +2245,7 @@
       "signals": {
         "cloudBackup": "Koppi y'okukuuma ku cloud",
         "manualBackup": "Koppi y'okukuuma ey'omu ngalo",
-        "appLock": "Okusiba app (biometrics oba PIN)",
+        "appLock": "Biometrics/PIN",
         "hideBalance": "Kweka omuwendo",
         "twoFactor": "Okukakasa okubiri (2FA)",
         "emailVerified": "Email ekakasiddwa"

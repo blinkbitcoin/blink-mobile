@@ -2245,7 +2245,7 @@
       "signals": {
         "cloudBackup": "Cloudová záloha",
         "manualBackup": "Manuálna záloha",
-        "appLock": "Zámok aplikácie (biometria alebo PIN)",
+        "appLock": "Biometria/PIN",
         "hideBalance": "Skryť zostatok",
         "twoFactor": "Dvojfaktorové overenie (2FA)",
         "emailVerified": "Overený e-mail"
