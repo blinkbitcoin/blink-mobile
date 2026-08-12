@@ -96,6 +96,8 @@ describe("SecurityScoreCard", () => {
     expect(mockOnSignalPress).toHaveBeenCalledWith("manualBackup")
   })
 
+  /** Inert, but not announced as dimmed: a satisfied signal is not a control
+   *  the user is barred from. */
   it("renders a done toggle-backed signal as Enabled and inert", () => {
     const { getByTestId, getByText } = renderWithTheme(
       <SecurityScoreCard
@@ -108,6 +110,9 @@ describe("SecurityScoreCard", () => {
     fireEvent.press(getByTestId("security-score-appLock"))
 
     expect(mockOnSignalPress).not.toHaveBeenCalled()
+    expect(
+      getByTestId("security-score-appLock").props.accessibilityState?.disabled,
+    ).toBeFalsy()
   })
 
   it("switches the header to the high state at full score", () => {
