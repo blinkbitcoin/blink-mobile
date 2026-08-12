@@ -333,14 +333,6 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
                   : LL.common.shareLightning()
               }
             />
-            {carousel.isOnChainPage && onchain.rotate && (
-              <ActionButton
-                label={LL.ReceiveScreen.newAddress()}
-                icon="refresh"
-                onPress={onchain.rotate}
-                accessibilityHint={LL.ReceiveScreen.newAddressHint()}
-              />
-            )}
           </View>
         )}
 

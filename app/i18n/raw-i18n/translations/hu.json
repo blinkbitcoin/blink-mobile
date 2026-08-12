@@ -2161,8 +2161,6 @@
     "error": "Számla létrehozása sikertelen. Kérjük, vedd fel a kapcsolatot az ügyfélszolgálattal, ha a probléma továbbra is fennáll.",
     "copyInvoice": "Másolás",
     "shareInvoice": "Megosztás",
-    "newAddress": "Új cím",
-    "newAddressHint": "Új Bitcoin cím létrehozása ehhez a befizetéshez",
     "addAmount": "Konkrét összeg igénylése",
     "expired": "A számla lejárt",
     "expiresIn": "Lejár",

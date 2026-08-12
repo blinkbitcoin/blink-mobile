@@ -2166,8 +2166,6 @@ const en: BaseTranslation = {
     error: "Failed to generate invoice. Please contact support if this problem persists.",
     copyInvoice: "Copy",
     shareInvoice: "Share",
-    newAddress: "New address",
-    newAddressHint: "Generate a fresh Bitcoin address for this deposit",
     addAmount: "Request Specific Amount",
     expired: "The invoice has expired",
     expiresIn: "Expires in",

@@ -6721,14 +6721,6 @@ type RootTranslation = {
 		 */
 		shareInvoice: string
 		/**
-		 * N​e​w​ ​a​d​d​r​e​s​s
-		 */
-		newAddress: string
-		/**
-		 * G​e​n​e​r​a​t​e​ ​a​ ​f​r​e​s​h​ ​B​i​t​c​o​i​n​ ​a​d​d​r​e​s​s​ ​f​o​r​ ​t​h​i​s​ ​d​e​p​o​s​i​t
-		 */
-		newAddressHint: string
-		/**
 		 * R​e​q​u​e​s​t​ ​S​p​e​c​i​f​i​c​ ​A​m​o​u​n​t
 		 */
 		addAmount: string
@@ -19950,14 +19942,6 @@ export type TranslationFunctions = {
 		 * Share
 		 */
 		shareInvoice: () => LocalizedString
-		/**
-		 * New address
-		 */
-		newAddress: () => LocalizedString
-		/**
-		 * Generate a fresh Bitcoin address for this deposit
-		 */
-		newAddressHint: () => LocalizedString
 		/**
 		 * Request Specific Amount
 		 */

@@ -2161,8 +2161,6 @@
         "error": "Impossibile generare un'invoice. Contattare l'assistenza se il problema persiste.",
         "copyInvoice": "Copia",
         "shareInvoice": "Condividi",
-        "newAddress": "Nuovo indirizzo",
-        "newAddressHint": "Genera un nuovo indirizzo Bitcoin per questo deposito",
         "addAmount": "Richiedi un importo specifico",
         "expired": "L'invoice è scaduta",
         "expiresIn": "Scade in",

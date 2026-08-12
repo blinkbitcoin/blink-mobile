@@ -2161,8 +2161,6 @@
     "error": "Generiranje fakture nije uspjelo. Obratite se podršci ako se ovaj problem nastavi pojavljivati.",
     "copyInvoice": "Kopiraj",
     "shareInvoice": "Podijeli",
-    "newAddress": "Nova adresa",
-    "newAddressHint": "Generiraj novu Bitcoin adresu za ovu uplatu",
     "addAmount": "Zatraži određeni iznos",
     "expired": "Faktura je istekla",
     "expiresIn": "Istječe za",

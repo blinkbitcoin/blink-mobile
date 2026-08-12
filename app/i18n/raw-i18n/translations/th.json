@@ -2161,8 +2161,6 @@
     "error": "การสร้าง invoice ผิดพลาด หากปัญหายังคงอยู่ กรุณาติดต่อฝ่ายซัพพอร์ท",
     "copyInvoice": "Copy",
     "shareInvoice": "แชร์",
-    "newAddress": "Address ใหม่",
-    "newAddressHint": "สร้าง Bitcoin address ใหม่สำหรับการฝากครั้งนี้",
     "addAmount": "ขอจำนวนเงินที่แน่นอน",
     "expired": "Invoiceนี้ หมดอายุแล้ว",
     "expiresIn": "หมดอายุใน",

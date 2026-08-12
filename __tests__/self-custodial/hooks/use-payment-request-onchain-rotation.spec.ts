@@ -263,82 +263,28 @@ describe("onchain address rotation", () => {
     })
   })
 
-  it("rotates on demand when the manual action is invoked", async () => {
-    mockReceiveOnchain
-      .mockResolvedValueOnce({ address: "bc1qfirst..." })
-      .mockResolvedValueOnce({ address: "bc1qmanual..." })
-
-    const { result } = renderHook(() => usePaymentRequest())
-    await waitFor(() => {
-      expect(result.current?.onchainAddress).toBe("bc1qfirst...")
-    })
-
-    await act(async () => {
-      result.current?.rotateOnchainAddress?.()
-      await flushEffects()
-    })
-
-    await waitFor(() => {
-      expect(result.current?.onchainAddress).toBe("bc1qmanual...")
-    })
-    expect(mockReceiveOnchain).toHaveBeenLastCalledWith({ newAddress: true })
-    // A forced rotation still reads the record — not to decide, but so the values it
-    // writes back cannot drop what was already there.
-    expect(mockLoadIssuedOnchainAddress).toHaveBeenCalledTimes(2)
-  })
-
-  it("ignores repeat taps while a rotation is in flight", async () => {
-    // Every request costs an address, so a slow call must not hand out one per tap.
-    let resolveRotation: (value: { address: string }) => void = () => {}
-    mockReceiveOnchain
-      .mockResolvedValueOnce({ address: "bc1qfirst..." })
-      .mockImplementationOnce(
-        () =>
-          new Promise<{ address: string }>((resolve) => {
-            resolveRotation = resolve
-          }),
-      )
-
-    const { result } = renderHook(() => usePaymentRequest())
-    await waitFor(() => {
-      expect(result.current?.onchainAddress).toBe("bc1qfirst...")
-    })
-    mockReceiveOnchain.mockClear()
-
-    await act(async () => {
-      result.current?.rotateOnchainAddress?.()
-      result.current?.rotateOnchainAddress?.()
-      result.current?.rotateOnchainAddress?.()
-      await flushEffects()
-    })
-
-    expect(mockReceiveOnchain).toHaveBeenCalledTimes(1)
-
-    await act(async () => {
-      resolveRotation({ address: "bc1qmanual..." })
-      await flushEffects()
-    })
-
-    expect(result.current?.onchainAddress).toBe("bc1qmanual...")
-  })
-
   it("keeps the address and reports the failure when a rotation returns nothing", async () => {
     // The adapter reports failures as an error-only result rather than throwing, so
-    // without an explicit report the tap would fail in complete silence.
+    // without an explicit report the rotation would fail in complete silence — and
+    // the address already on screen has to survive it.
+    mockLoadIssuedOnchainAddress.mockResolvedValue({
+      address: "bc1qfirst...",
+      depositMarker: null,
+    })
     mockReceiveOnchain
       .mockResolvedValueOnce({ address: "bc1qfirst..." })
       .mockResolvedValueOnce({ errors: [{ message: "sdk offline" }] })
 
-    const { result } = renderHook(() => usePaymentRequest())
+    const { result, rerender } = renderHook(() => usePaymentRequest())
     await waitFor(() => {
       expect(result.current?.onchainAddress).toBe("bc1qfirst...")
     })
 
-    await act(async () => {
-      result.current?.rotateOnchainAddress?.()
-      await flushEffects()
-    })
+    mockSelfCustodialWallet.mockReturnValue(walletWith([onchainReceipt("deposit-1")]))
+    rerender({})
+    await flushEffects()
 
+    expect(mockReceiveOnchain).toHaveBeenLastCalledWith({ newAddress: true })
     expect(result.current?.onchainAddress).toBe("bc1qfirst...")
     expect(mockRecordAppError).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -348,19 +294,22 @@ describe("onchain address rotation", () => {
   })
 
   it("keeps the address and reports the failure when a rotation rejects", async () => {
+    mockLoadIssuedOnchainAddress.mockResolvedValue({
+      address: "bc1qfirst...",
+      depositMarker: null,
+    })
     mockReceiveOnchain
       .mockResolvedValueOnce({ address: "bc1qfirst..." })
       .mockRejectedValueOnce(new Error("rotation boom"))
 
-    const { result } = renderHook(() => usePaymentRequest())
+    const { result, rerender } = renderHook(() => usePaymentRequest())
     await waitFor(() => {
       expect(result.current?.onchainAddress).toBe("bc1qfirst...")
     })
 
-    await act(async () => {
-      result.current?.rotateOnchainAddress?.()
-      await flushEffects()
-    })
+    mockSelfCustodialWallet.mockReturnValue(walletWith([onchainReceipt("deposit-1")]))
+    rerender({})
+    await flushEffects()
 
     expect(result.current?.onchainAddress).toBe("bc1qfirst...")
     expect(mockRecordAppError).toHaveBeenCalledWith(
@@ -379,28 +328,6 @@ describe("onchain address rotation", () => {
       )
     })
     expect(result.current?.onchainAddress).toBeUndefined()
-  })
-
-  it("describes a non-Error rotation rejection", async () => {
-    mockReceiveOnchain
-      .mockResolvedValueOnce({ address: "bc1qfirst..." })
-      .mockRejectedValueOnce("string blowup")
-
-    const { result } = renderHook(() => usePaymentRequest())
-    await waitFor(() => {
-      expect(result.current?.onchainAddress).toBe("bc1qfirst...")
-    })
-
-    await act(async () => {
-      result.current?.rotateOnchainAddress?.()
-      await flushEffects()
-    })
-
-    expect(mockRecordAppError).toHaveBeenCalledWith(
-      expect.objectContaining({
-        message: "Self-custodial onchain address rotation failed: string blowup",
-      }),
-    )
   })
 
   it("describes a non-Error rejection from the automatic fetch", async () => {
@@ -449,8 +376,9 @@ describe("onchain address rotation", () => {
     })
   })
 
-  it("ignores a slow initial fetch that resolves after a manual rotation", async () => {
-    // Without the request-sequence guard the stale response would overwrite the
+  it("ignores a slow initial fetch that resolves after the deposit rotation", async () => {
+    // A deposit landing while the first request is still in flight starts a second
+    // one. Without the request-sequence guard the stale response would overwrite the
     // freshly rotated address, silently putting the used address back on screen.
     let resolveInitial: (value: { address: string }) => void = () => {}
     mockReceiveOnchain
@@ -459,23 +387,23 @@ describe("onchain address rotation", () => {
           resolveInitial = resolve
         }),
       )
-      .mockResolvedValueOnce({ address: "bc1qmanual..." })
+      .mockResolvedValueOnce({ address: "bc1qrotated..." })
 
-    const { result } = renderHook(() => usePaymentRequest())
+    const { result, rerender } = renderHook(() => usePaymentRequest())
     await flushEffects()
+    expect(result.current?.onchainAddress).toBeUndefined()
 
-    await act(async () => {
-      result.current?.rotateOnchainAddress?.()
-      await flushEffects()
-    })
-    expect(result.current?.onchainAddress).toBe("bc1qmanual...")
+    mockSelfCustodialWallet.mockReturnValue(walletWith([onchainReceipt("deposit-1")]))
+    rerender({})
+    await flushEffects()
+    expect(result.current?.onchainAddress).toBe("bc1qrotated...")
 
     await act(async () => {
       resolveInitial({ address: "bc1qstale..." })
       await flushEffects()
     })
 
-    expect(result.current?.onchainAddress).toBe("bc1qmanual...")
+    expect(result.current?.onchainAddress).toBe("bc1qrotated...")
     expect(mockSaveIssuedOnchainAddress).not.toHaveBeenCalledWith(
       "sc-account-1",
       expect.objectContaining({ address: "bc1qstale..." }),
@@ -590,23 +518,24 @@ describe("onchain address rotation", () => {
       expect(mockSaveIssuedOnchainAddress).not.toHaveBeenCalled()
     })
 
-    it("can still rotate on demand", async () => {
+    it("can still rotate when a deposit lands", async () => {
       mockAccountRegistry.mockReturnValue({ activeAccount: undefined })
       mockReceiveOnchain
         .mockResolvedValueOnce({ address: "bc1qfirst..." })
-        .mockResolvedValueOnce({ address: "bc1qmanual..." })
+        .mockResolvedValueOnce({ address: "bc1qrotated..." })
 
-      const { result } = renderHook(() => usePaymentRequest())
+      const { result, rerender } = renderHook(() => usePaymentRequest())
       await waitFor(() => {
         expect(result.current?.onchainAddress).toBe("bc1qfirst...")
       })
 
-      await act(async () => {
-        result.current?.rotateOnchainAddress?.()
-        await flushEffects()
-      })
+      mockSelfCustodialWallet.mockReturnValue(walletWith([onchainReceipt("deposit-1")]))
+      rerender({})
 
-      expect(result.current?.onchainAddress).toBe("bc1qmanual...")
+      await waitFor(() => {
+        expect(result.current?.onchainAddress).toBe("bc1qrotated...")
+      })
+      expect(mockReceiveOnchain).toHaveBeenLastCalledWith({ newAddress: true })
       expect(mockSaveIssuedOnchainAddress).not.toHaveBeenCalled()
     })
   })

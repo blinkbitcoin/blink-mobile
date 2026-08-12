@@ -2161,8 +2161,6 @@
     "error": "Invoice kawsayniyta qillqata sutichinaqinmi. Chaskisqa kaniyta yachanakuyta sutichaqta munanpi ch'usaq kayniyta rikuy munanpi kawsayniyta qillqata sutichinaqinmi.",
     "copyInvoice": "Copy",
     "shareInvoice": "Ch'usaq k'iru",
-    "newAddress": "Musuq kaniy",
-    "newAddressHint": "Musuq Bitcoin kaniyta ruray kay churaypaq",
     "addAmount": "Ch'usaq kayniyta sutichaq",
     "expired": "Qillqa chhikan",
     "expiresIn": "Munanpi chhikan",

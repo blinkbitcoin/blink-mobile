@@ -2161,8 +2161,6 @@
     "error": "Nepodarilo sa vygenerovať faktúru. Ak tento problém pretrváva, kontaktujte prosím podporu.",
     "copyInvoice": "Kopírovať",
     "shareInvoice": "Zdieľať",
-    "newAddress": "Nová adresa",
-    "newAddressHint": "Vygenerovať novú bitcoinovú adresu pre tento vklad",
     "addAmount": "Požiadať o konkrétnu sumu",
     "expired": "Platnosť faktúry vypršala",
     "expiresIn": "Platnosť končí za",

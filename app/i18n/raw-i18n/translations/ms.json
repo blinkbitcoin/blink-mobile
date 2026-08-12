@@ -2161,8 +2161,6 @@
     "error": "Gagal untuk menjana invois. Sila berhubung dengan tim sokongan\njika masalah ini tetap berlaku",
     "copyInvoice": "Salin",
     "shareInvoice": "Kongsi",
-    "newAddress": "Alamat baharu",
-    "newAddressHint": "Jana alamat Bitcoin baharu untuk deposit ini",
     "addAmount": "Mohon amaun yang spesifik",
     "expired": "Invois ni telah tamat tempoh",
     "expiresIn": "Tamat tempoh dalam",

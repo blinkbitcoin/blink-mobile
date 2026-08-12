@@ -2161,8 +2161,6 @@
         "error": "Invoice konnte nicht erstellt werden. Bitte kontaktiere den Support, wenn dieses Problem weiterhin besteht.",
         "copyInvoice": "Kopieren",
         "shareInvoice": "Teilen",
-        "newAddress": "Neue Adresse",
-        "newAddressHint": "Eine neue Bitcoin Adresse für diese Einzahlung erzeugen",
         "addAmount": "Betrag spezifizieren",
         "expired": "Die Invoice ist abgelaufen",
         "expiresIn": "Läuft ab in",

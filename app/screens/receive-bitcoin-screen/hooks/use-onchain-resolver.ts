@@ -28,7 +28,6 @@ export const useOnchainResolver = (
       address: requestState.onchainAddress ?? null,
       loading: !requestState.onchainAddress,
       getFullUriFn: requestState.getOnchainFullUriFn,
-      rotate: requestState.rotateOnchainAddress,
     }
   }
 
@@ -36,8 +35,5 @@ export const useOnchainResolver = (
     address: custodialOnchain.address,
     loading: custodialOnchain.loading,
     getFullUriFn: custodialOnchain.getFullUriFn,
-    // Custodial addresses come from the server's `onChainAddressCurrent`; rotation
-    // is not the client's to drive.
-    rotate: undefined,
   }
 }

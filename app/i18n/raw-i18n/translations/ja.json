@@ -2161,8 +2161,6 @@
         "error": "インボイスの作成に失敗しました。この問題が解決しない場合は、サポートにお問い合わせください。",
         "copyInvoice": "コピー",
         "shareInvoice": "共有",
-        "newAddress": "新しいアドレス",
-        "newAddressHint": "この入金用に新しいビットコイン・アドレスを生成する",
         "addAmount": "金額を設定する",
         "expired": "有効期限切れのインボイスです",
         "expiresIn": "有効期限",

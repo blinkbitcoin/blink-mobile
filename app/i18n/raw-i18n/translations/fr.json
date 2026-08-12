@@ -2161,8 +2161,6 @@
         "error": "Impossible de générer la facture. Merci de contacter le support si le problème persiste.",
         "copyInvoice": "Copier",
         "shareInvoice": "Partager",
-        "newAddress": "Nouvelle adresse",
-        "newAddressHint": "Générer une nouvelle adresse Bitcoin pour ce dépôt",
         "addAmount": "Demander un montant spécifique",
         "expired": "La facture a expiré",
         "expiresIn": "Expire dans",

@@ -2161,8 +2161,6 @@
     "error": "Nu s-a reușit generarea facturii. Vă rugăm să contactați asistența dacă această problemă persistă.",
     "copyInvoice": "Copiați",
     "shareInvoice": "Partajare",
-    "newAddress": "Adresă nouă",
-    "newAddressHint": "Generați o adresă Bitcoin nouă pentru acest depozit",
     "addAmount": "Specificați suma solicitată",
     "expired": "Factura a expirat",
     "expiresIn": "Expiră în",
