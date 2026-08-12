@@ -217,7 +217,7 @@ describe("useUnseenTxAmountBadge", () => {
     expect(sendResult.current.unseenAmountText).toBe("BTC 10")
   })
 
-  it("navigates to transactionDetail using latest tx id", () => {
+  it("navigates to transactionDetail for the transaction it is given", () => {
     const { result } = renderHook(() =>
       useUnseenTxAmountBadge({
         transactions: [tx({ id: "navigate-me", createdAt: 10 })],
@@ -226,10 +226,24 @@ describe("useUnseenTxAmountBadge", () => {
       }),
     )
 
-    result.current.handleUnseenBadgePress()
+    result.current.navigateToTransaction("navigate-me")
 
     expect(mockNavigate).toHaveBeenCalledWith("transactionDetail", {
       txid: "navigate-me",
     })
+  })
+
+  it("does not navigate without a transaction to open", () => {
+    const { result } = renderHook(() =>
+      useUnseenTxAmountBadge({
+        transactions: [],
+        hasUnseenBtcTx: false,
+        hasUnseenUsdTx: false,
+      }),
+    )
+
+    result.current.navigateToTransaction("")
+
+    expect(mockNavigate).not.toHaveBeenCalled()
   })
 })

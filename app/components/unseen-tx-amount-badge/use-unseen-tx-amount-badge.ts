@@ -87,16 +87,22 @@ export const useUnseenTxAmountBadge = ({
     return direction === TxDirection.Receive ? `+${formatted}` : formatted
   }, [latestUnseenTx, formatCurrency, formatMoneyAmount])
 
-  const handleUnseenBadgePress = useCallback(() => {
-    if (!latestUnseenTx?.id) return
+  /** Takes the transaction to open rather than reading the newest unseen one: once a badge
+   *  is announced its transaction is already marked seen, so by the time it can be pressed
+   *  there is no unseen transaction left to derive the target from. */
+  const navigateToTransaction = useCallback(
+    (txid: string) => {
+      if (!txid) return
 
-    navigation.navigate("transactionDetail", { txid: latestUnseenTx.id })
-  }, [navigation, latestUnseenTx?.id])
+      navigation.navigate("transactionDetail", { txid })
+    },
+    [navigation],
+  )
 
   return {
     latestUnseenTx,
     unseenAmountText,
-    handleUnseenBadgePress,
+    navigateToTransaction,
     isOutgoing: latestUnseenTx?.direction === TxDirection.Send,
   }
 }

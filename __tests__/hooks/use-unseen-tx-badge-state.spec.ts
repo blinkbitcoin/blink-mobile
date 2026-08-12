@@ -19,6 +19,7 @@ const mockAmountBadge = jest.fn()
 const mockFragments = jest.fn()
 const mockOutgoingVisibility = jest.fn()
 const mockIncomingAutoSeen = jest.fn()
+const mockNavigateToTransaction = jest.fn()
 const mockMarkTxSeen = jest.fn()
 
 jest.mock("@app/hooks/use-transaction-seen-state", () => ({
@@ -112,11 +113,11 @@ describe("useUnseenTxBadgeState", () => {
     mockAmountBadge.mockReturnValue({
       latestUnseenTx: undefined,
       unseenAmountText: null,
-      handleUnseenBadgePress: jest.fn(),
+      navigateToTransaction: mockNavigateToTransaction,
       isOutgoing: false,
     })
     mockOutgoingVisibility.mockReturnValue(false)
-    mockIncomingAutoSeen.mockReturnValue(true)
+    mockIncomingAutoSeen.mockReturnValue({ visible: true, announcement: null })
   })
 
   describe("custodial account", () => {
@@ -220,7 +221,7 @@ describe("useUnseenTxBadgeState", () => {
     mockAmountBadge.mockReturnValue({
       latestUnseenTx: { id: "tx-1", settlementCurrency: WalletCurrency.Usd },
       unseenAmountText: "+$1.00",
-      handleUnseenBadgePress: jest.fn(),
+      navigateToTransaction: mockNavigateToTransaction,
       isOutgoing: true,
     })
 
@@ -242,11 +243,10 @@ describe("useUnseenTxBadgeState", () => {
   })
 
   it("exposes what the home screen renders", () => {
-    const handleUnseenBadgePress = jest.fn()
     mockAmountBadge.mockReturnValue({
       latestUnseenTx: { id: "tx-1", settlementCurrency: WalletCurrency.Btc },
       unseenAmountText: "+1,000 sats",
-      handleUnseenBadgePress,
+      navigateToTransaction: mockNavigateToTransaction,
       isOutgoing: false,
     })
     mockSeenState.mockReturnValue({
@@ -262,12 +262,122 @@ describe("useUnseenTxBadgeState", () => {
       hasUnseenBtcTx: true,
       hasUnseenUsdTx: false,
       unseenAmountText: "+1,000 sats",
-      handleUnseenBadgePress,
       showIncomingBadge: true,
       showOutgoingBadge: false,
       isOutgoing: false,
       latestUnseenTxId: "tx-1",
       transactionCount: 1,
+    })
+  })
+
+  describe("an announced incoming badge", () => {
+    const ANNOUNCEMENT = {
+      txId: "announced-tx",
+      currency: WalletCurrency.Btc,
+      amountText: "+2,000 sats",
+    }
+
+    /** Marking seen on announcement empties the unseen state while the badge is still up,
+     *  which is the state the home screen has to keep rendering from. */
+    const renderAnnouncedBadge = () => {
+      mockAmountBadge.mockReturnValue({
+        latestUnseenTx: undefined,
+        unseenAmountText: null,
+        navigateToTransaction: mockNavigateToTransaction,
+        isOutgoing: false,
+      })
+      mockIncomingAutoSeen.mockReturnValue({
+        visible: true,
+        announcement: ANNOUNCEMENT,
+      })
+
+      return renderBadgeState({ isSelfCustodial: true })
+    }
+
+    it("keeps showing the announced amount after its transaction is marked seen", () => {
+      const { result } = renderAnnouncedBadge()
+
+      expect(result.current.unseenAmountText).toBe("+2,000 sats")
+      expect(result.current.latestUnseenTxId).toBe("announced-tx")
+      expect(result.current.showIncomingBadge).toBe(true)
+    })
+
+    it("opens the announced transaction when the badge is pressed", () => {
+      const { result } = renderAnnouncedBadge()
+
+      result.current.handleUnseenBadgePress()
+
+      expect(mockNavigateToTransaction).toHaveBeenCalledWith("announced-tx")
+    })
+
+    it("stays on the incoming branch even if an outgoing transaction becomes the newest unseen one", () => {
+      mockAmountBadge.mockReturnValue({
+        latestUnseenTx: { id: "outgoing-tx", settlementCurrency: WalletCurrency.Btc },
+        unseenAmountText: "-500 sats",
+        navigateToTransaction: mockNavigateToTransaction,
+        isOutgoing: true,
+      })
+      mockIncomingAutoSeen.mockReturnValue({
+        visible: true,
+        announcement: ANNOUNCEMENT,
+      })
+
+      const { result } = renderBadgeState({ isSelfCustodial: true })
+
+      expect(result.current.isOutgoing).toBe(false)
+      expect(result.current.unseenAmountText).toBe("+2,000 sats")
+    })
+
+    it("parks the outgoing badge instead of letting it mark its transaction seen unpainted", () => {
+      mockAmountBadge.mockReturnValue({
+        latestUnseenTx: { id: "outgoing-tx", settlementCurrency: WalletCurrency.Btc },
+        unseenAmountText: "-500 sats",
+        navigateToTransaction: mockNavigateToTransaction,
+        isOutgoing: true,
+      })
+      mockIncomingAutoSeen.mockReturnValue({
+        visible: true,
+        announcement: ANNOUNCEMENT,
+      })
+
+      renderBadgeState({ isSelfCustodial: true })
+
+      const [outgoingParams] = mockOutgoingVisibility.mock.calls[0]
+      expect(outgoingParams.isOutgoing).toBe(false)
+      expect(outgoingParams.amountText).toBeNull()
+      expect(outgoingParams.txId).toBeUndefined()
+    })
+
+    it("keeps the announced currency reading unseen so its wallet row stays marked", () => {
+      mockSeenState.mockReturnValue({
+        hasUnseenBtcTx: false,
+        hasUnseenUsdTx: false,
+        markTxSeen: mockMarkTxSeen,
+      })
+      mockIncomingAutoSeen.mockReturnValue({
+        visible: true,
+        announcement: ANNOUNCEMENT,
+      })
+
+      const { result } = renderBadgeState({ isSelfCustodial: true })
+
+      expect(result.current.hasUnseenBtcTx).toBe(true)
+      expect(result.current.hasUnseenUsdTx).toBe(false)
+    })
+
+    it("does not navigate once the announcement is released and nothing is unseen", () => {
+      mockAmountBadge.mockReturnValue({
+        latestUnseenTx: undefined,
+        unseenAmountText: null,
+        navigateToTransaction: mockNavigateToTransaction,
+        isOutgoing: false,
+      })
+      mockIncomingAutoSeen.mockReturnValue({ visible: false, announcement: null })
+
+      const { result } = renderBadgeState({ isSelfCustodial: true })
+      result.current.handleUnseenBadgePress()
+
+      expect(mockNavigateToTransaction).not.toHaveBeenCalled()
     })
   })
 })
