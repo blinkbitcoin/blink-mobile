@@ -1,5 +1,5 @@
 import * as React from "react"
-import { useState } from "react"
+import { useCallback, useState } from "react"
 import { View } from "react-native"
 
 import { useApolloClient } from "@apollo/client"
@@ -40,17 +40,21 @@ export const SecurityScreen: React.FC<Props> = ({ route, navigation }) => {
   const [isBiometricsEnabled, setIsBiometricsEnabled] = useState(mIsBiometricsEnabled)
   const [isPinEnabled, setIsPinEnabled] = useState(mIsPinEnabled)
 
-  useFocusEffect(() => {
-    getIsBiometricsEnabled()
-    getIsPinEnabled()
-  })
-  const getIsBiometricsEnabled = async () => {
-    setIsBiometricsEnabled(await KeyStoreWrapper.getIsBiometricsEnabled())
-  }
+  /**
+   * `useFocusEffect` lists its callback in its own effect deps, so a fresh
+   * closure each render tears down the focus listeners and re-reads the
+   * keystore every time the score card's data moves underneath it.
+   */
+  const readDeviceLockState = useCallback(() => {
+    const readBiometrics = async () =>
+      setIsBiometricsEnabled(await KeyStoreWrapper.getIsBiometricsEnabled())
+    const readPin = async () => setIsPinEnabled(await KeyStoreWrapper.getIsPinEnabled())
 
-  const getIsPinEnabled = async () => {
-    setIsPinEnabled(await KeyStoreWrapper.getIsPinEnabled())
-  }
+    readBiometrics()
+    readPin()
+  }, [])
+
+  useFocusEffect(readDeviceLockState)
 
   const onBiometricsValueChanged = async (value: boolean) => {
     if (value) {
