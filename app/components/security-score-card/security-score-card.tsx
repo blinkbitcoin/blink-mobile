@@ -77,7 +77,6 @@ export const SecurityScoreCard: React.FC<SecurityScoreCardProps> = ({
               key={signal.key}
               style={styles.row}
               onPress={handlePress}
-              disabled={!isPressable}
               accessibilityRole={rowAccessibilityRole}
               testID={`security-score-${signal.key}`}
             >

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react"
+import React, { useEffect, useMemo, useRef } from "react"
 import { Animated, View } from "react-native"
 
 import { makeStyles } from "@rn-vui/themed"
@@ -13,8 +13,19 @@ type SegmentProps = {
 const Segment: React.FC<SegmentProps> = ({ isFilled, fillColor }) => {
   const styles = useStyles()
   const fillTarget = isFilled ? 1 : 0
-  const fillAnimation = useRef(new Animated.Value(fillTarget)).current
+  const fillAnimationRef = useRef<Animated.Value | null>(null)
+  if (!fillAnimationRef.current) fillAnimationRef.current = new Animated.Value(fillTarget)
+  const fillAnimation = fillAnimationRef.current
   const drivenTo = useRef(fillTarget)
+
+  const fillWidth = useMemo(
+    () =>
+      fillAnimation.interpolate({
+        inputRange: [0, 1],
+        outputRange: ["0%", "100%"],
+      }),
+    [fillAnimation],
+  )
 
   useEffect(() => {
     /** The segment mounts already at its final width, and re-renders that leave
@@ -32,16 +43,7 @@ const Segment: React.FC<SegmentProps> = ({ isFilled, fillColor }) => {
   return (
     <View style={styles.segment}>
       <Animated.View
-        style={[
-          styles.segmentFill,
-          {
-            backgroundColor: fillColor,
-            width: fillAnimation.interpolate({
-              inputRange: [0, 1],
-              outputRange: ["0%", "100%"],
-            }),
-          },
-        ]}
+        style={[styles.segmentFill, { backgroundColor: fillColor, width: fillWidth }]}
       />
     </View>
   )

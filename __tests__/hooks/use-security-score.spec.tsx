@@ -62,7 +62,7 @@ describe("useSecurityScore", () => {
     mockHideBalanceQuery.mockReturnValue({ data: { hideBalance: false } })
   })
 
-  it("returns null when neither mode contributes — no active account", () => {
+  it("returns null when neither mode contributes: no active account", () => {
     const { result } = renderHook(() => useSecurityScore(NO_LOCK))
 
     expect(result.current).toBeNull()

@@ -36,21 +36,21 @@ type BackupMethod = (typeof BackupMethod)[keyof typeof BackupMethod]
 
 type BackupState = {
   status: BackupStatus
-  // Most recent completed method (last-wins); use completedMethods to know
-  // everything the user has done.
+  /** Most recent completed method (last-wins); use completedMethods to know
+   *  everything the user has done. */
   method: BackupMethod | null
   completedMethods?: BackupMethod[]
 }
 
-// The fallback branch doubles as the migration for records persisted before
-// completedMethods existed.
+/** The fallback branch doubles as the migration for records persisted before
+ *  completedMethods existed. */
 export const completedMethodsOf = (state: BackupState | null): BackupMethod[] =>
   state?.completedMethods ??
   (state?.status === BackupStatus.Completed && state.method ? [state.method] : [])
 
-// Spreads prev so fields this module doesn't know about survive the write.
-// Note the two writers hand it different prevs: markBackupCompletedFor re-reads
-// storage, while the provider merges against its in-memory state.
+/** Spreads prev so fields this module doesn't know about survive the write. Note
+ *  the two writers hand it different prevs: markBackupCompletedFor re-reads
+ *  storage, while the provider merges against its in-memory state. */
 const withCompletedMethod = (
   prev: BackupState | null,
   method: BackupMethod,

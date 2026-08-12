@@ -1,7 +1,7 @@
 import { useCustodialSecuritySignals } from "@app/custodial/hooks"
 import { useHideBalanceQuery } from "@app/graphql/generated"
-// Deep import on purpose: the self-custodial barrel pulls the payment-request
-// module graph into every consumer, which the score hook doesn't need.
+/** Deep import on purpose: the self-custodial barrel pulls the payment-request
+ *  module graph into every consumer, which the score hook doesn't need. */
 import { useSelfCustodialSecuritySignals } from "@app/self-custodial/hooks/use-security-signals"
 import type {
   SecurityScore,
@@ -14,7 +14,9 @@ type DeviceLockState = {
   isPinEnabled: boolean
 }
 
-// Shared by both account modes: these protect the device surface, not the account.
+const MEDIUM_LEVEL_COVERAGE = 0.5
+
+/** Shared by both account modes: these protect the device surface, not the account. */
 export const deviceSecuritySignals = (
   deviceLock: DeviceLockState,
   isHideBalanceEnabled: boolean,
@@ -27,21 +29,29 @@ export const deviceSecuritySignals = (
   { key: "hideBalance", done: isHideBalanceEnabled, retriggerable: false },
 ]
 
+/** An empty list scores low, not high: unreachable through useSecurityScore
+ *  (device signals always contribute), but computeSecurityScore is exported. */
+const levelOf = (done: number, total: number): SecurityScoreLevel => {
+  if (total === 0) return "low"
+  if (done === total) return "high"
+  if (done / total < MEDIUM_LEVEL_COVERAGE) return "low"
+  return "medium"
+}
+
 export const computeSecurityScore = (
   signals: SecuritySignalDescriptor[],
 ): SecurityScore => {
+  const total = signals.length
   const done = signals.filter((signal) => signal.done).length
-  // Guard the empty list: 0/0 must not score as NaN-medium. Unreachable via
-  // useSecurityScore (device signals always contribute), but this is exported.
-  const ratio = signals.length === 0 ? 0 : done / signals.length
-  const level: SecurityScoreLevel = ratio === 1 ? "high" : ratio < 0.5 ? "low" : "medium"
 
-  return { signals, done, total: signals.length, level }
+  return { signals, done, total, level: levelOf(done, total) }
 }
 
-// Mode-agnostic aggregator: each mode hook returns its contribution or null for
-// "not my mode". Device lock comes in as a parameter because the security screen
-// owns that async keystore state and updates it synchronously on toggle.
+/**
+ * Mode-agnostic aggregator: each mode hook returns its contribution or null for
+ * "not my mode". Device lock comes in as a parameter because the security screen
+ * owns that async keystore state and updates it synchronously on toggle.
+ */
 export const useSecurityScore = (deviceLock: DeviceLockState): SecurityScore | null => {
   const selfCustodial = useSelfCustodialSecuritySignals()
   const custodial = useCustodialSecuritySignals()

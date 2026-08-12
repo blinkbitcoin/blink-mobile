@@ -1,5 +1,5 @@
 import * as React from "react"
-import { useCallback, useState } from "react"
+import { useCallback, useMemo, useState } from "react"
 import { View } from "react-native"
 
 import { useApolloClient } from "@apollo/client"
@@ -56,43 +56,47 @@ export const SecurityScreen: React.FC<Props> = ({ route, navigation }) => {
 
   useFocusEffect(readDeviceLockState)
 
-  const onBiometricsValueChanged = async (value: boolean) => {
-    if (value) {
-      try {
-        if (await BiometricWrapper.isSensorAvailable()) {
-          // Presents the OS specific authentication prompt
-          BiometricWrapper.authenticate(
-            LL.AuthenticationScreen.setUpAuthenticationDescription(),
-            handleAuthenticationSuccess,
-            handleAuthenticationFailure,
-          )
-        } else {
-          toastShow({
-            message: (translations) => translations.SecurityScreen.biometryNotAvailable(),
-            LL,
-          })
-        }
-      } catch {
-        toastShow({
-          message: (translations) => translations.SecurityScreen.biometryNotEnrolled(),
-          LL,
-        })
-      }
-    } else if (await KeyStoreWrapper.removeIsBiometricsEnabled()) {
-      setIsBiometricsEnabled(false)
-    }
-  }
-
-  const handleAuthenticationSuccess = async () => {
+  const handleAuthenticationSuccess = useCallback(async () => {
     if (await KeyStoreWrapper.setIsBiometricsEnabled()) {
       setIsBiometricsEnabled(true)
     }
-  }
+  }, [])
 
-  const handleAuthenticationFailure = () => {
+  const handleAuthenticationFailure = useCallback(() => {
     // This is called when a user cancels or taps out of the authentication prompt,
     // so no action is necessary.
-  }
+  }, [])
+
+  const onBiometricsValueChanged = useCallback(
+    async (value: boolean) => {
+      if (value) {
+        try {
+          if (await BiometricWrapper.isSensorAvailable()) {
+            // Presents the OS specific authentication prompt
+            BiometricWrapper.authenticate(
+              LL.AuthenticationScreen.setUpAuthenticationDescription(),
+              handleAuthenticationSuccess,
+              handleAuthenticationFailure,
+            )
+          } else {
+            toastShow({
+              message: (translations) =>
+                translations.SecurityScreen.biometryNotAvailable(),
+              LL,
+            })
+          }
+        } catch {
+          toastShow({
+            message: (translations) => translations.SecurityScreen.biometryNotEnrolled(),
+            LL,
+          })
+        }
+      } else if (await KeyStoreWrapper.removeIsBiometricsEnabled()) {
+        setIsBiometricsEnabled(false)
+      }
+    },
+    [LL, handleAuthenticationSuccess, handleAuthenticationFailure],
+  )
 
   const onPinValueChanged = async (value: boolean) => {
     if (value) {
@@ -102,10 +106,13 @@ export const SecurityScreen: React.FC<Props> = ({ route, navigation }) => {
     }
   }
 
-  const onHideBalanceValueChanged = (value: boolean) => {
-    saveHideBalance(client, value)
-    saveHiddenBalanceToolTip(client, value)
-  }
+  const onHideBalanceValueChanged = useCallback(
+    (value: boolean) => {
+      saveHideBalance(client, value)
+      saveHiddenBalanceToolTip(client, value)
+    },
+    [client],
+  )
 
   const removePin = async () => {
     if (await KeyStoreWrapper.removePin()) {
@@ -116,17 +123,25 @@ export const SecurityScreen: React.FC<Props> = ({ route, navigation }) => {
 
   const securityScore = useSecurityScore({ isBiometricsEnabled, isPinEnabled })
 
-  // The card stays dumb; the screen owns what each "Set" does. Backup rows
-  // remain tappable after completion so the flow is always re-runnable (#3828).
-  // A Record (not a switch) so adding a signal without an action fails to compile.
-  const signalActions: Record<SecuritySignalKey, () => void> = {
-    cloudBackup: () => navigation.navigate("selfCustodialCloudBackup"),
-    manualBackup: () => navigation.navigate("selfCustodialBackupSecurityChecks"),
-    appLock: () => onBiometricsValueChanged(true),
-    hideBalance: () => onHideBalanceValueChanged(true),
-    twoFactor: () => navigation.navigate("totpRegistrationInitiate"),
-    emailVerified: () => navigation.navigate("emailRegistrationInitiate"),
-  }
+  /** The card stays dumb; the screen owns what each "Set" does. Backup rows
+   *  remain tappable after completion so the flow is always re-runnable (#3828).
+   *  A Record (not a switch) so adding a signal without an action fails to compile. */
+  const signalActions: Record<SecuritySignalKey, () => void> = useMemo(
+    () => ({
+      cloudBackup: () => navigation.navigate("selfCustodialCloudBackup"),
+      manualBackup: () => navigation.navigate("selfCustodialBackupSecurityChecks"),
+      appLock: () => onBiometricsValueChanged(true),
+      hideBalance: () => onHideBalanceValueChanged(true),
+      twoFactor: () => navigation.navigate("totpRegistrationInitiate"),
+      emailVerified: () => navigation.navigate("emailRegistrationInitiate"),
+    }),
+    [navigation, onBiometricsValueChanged, onHideBalanceValueChanged],
+  )
+
+  const onSignalPress = useCallback(
+    (key: SecuritySignalKey) => signalActions[key](),
+    [signalActions],
+  )
 
   return (
     <Screen style={styles.container} preset="scroll">
@@ -167,10 +182,7 @@ export const SecurityScreen: React.FC<Props> = ({ route, navigation }) => {
       </View>
 
       {securityScore && (
-        <SecurityScoreCard
-          score={securityScore}
-          onSignalPress={(key) => signalActions[key]()}
-        />
+        <SecurityScoreCard score={securityScore} onSignalPress={onSignalPress} />
       )}
     </Screen>
   )

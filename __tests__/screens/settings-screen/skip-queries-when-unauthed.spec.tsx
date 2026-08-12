@@ -262,21 +262,21 @@ describe("settings skips graphql queries when unauthenticated", () => {
       return Wrapper
     }
 
-    it("applies skip: !isAuthed while preserving fetchPolicy: cache-first", () => {
+    it("applies skip: !isAuthed while preserving fetchPolicy: cache-and-network", () => {
       renderHook(() => useCustodialSecuritySignals(), { wrapper: wrap(false) })
 
       expect(mockUseSettingsScreenQuery).toHaveBeenCalledWith({
         skip: true,
-        fetchPolicy: "cache-first",
+        fetchPolicy: "cache-and-network",
       })
     })
 
-    it("does not skip when authed and keeps fetchPolicy: cache-first", () => {
+    it("does not skip when authed and keeps fetchPolicy: cache-and-network", () => {
       renderHook(() => useCustodialSecuritySignals(), { wrapper: wrap(true) })
 
       expect(mockUseSettingsScreenQuery).toHaveBeenCalledWith({
         skip: false,
-        fetchPolicy: "cache-first",
+        fetchPolicy: "cache-and-network",
       })
     })
   })

@@ -29,7 +29,7 @@ export const useCustodialSecuritySignals = (): SecuritySignalDescriptor[] | null
   const { isAtLeastLevelOne } = useLevel()
   const { data } = useSettingsScreenQuery({
     skip: !isAuthed,
-    fetchPolicy: "cache-first",
+    fetchPolicy: "cache-and-network",
   })
 
   if (activeAccount?.type !== AccountType.Custodial) return null

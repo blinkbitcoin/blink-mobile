@@ -69,7 +69,7 @@ describe("useCustodialSecuritySignals", () => {
     expect(result.current).toBeNull()
   })
 
-  it("returns an empty list at level 0 — device signals only, no dead Set rows", () => {
+  it("returns an empty list at level 0: device signals only, no dead Set rows", () => {
     mockIsAtLeastLevelOne.mockReturnValue(false)
 
     const { result } = renderHook(() => useCustodialSecuritySignals())

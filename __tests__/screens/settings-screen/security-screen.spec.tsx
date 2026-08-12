@@ -1,5 +1,5 @@
 import React from "react"
-import { fireEvent, render, waitFor } from "@testing-library/react-native"
+import { act, fireEvent, render, waitFor } from "@testing-library/react-native"
 import { ThemeProvider } from "@rn-vui/themed"
 
 import { SecurityScreen } from "@app/screens/settings-screen/security-screen"
@@ -11,6 +11,9 @@ const mockBackupState = jest.fn()
 const mockNavigate = jest.fn()
 const mockIsAtLeastLevelOne = jest.fn()
 const mockSettingsData = jest.fn()
+const mockUseFocusEffect = jest.fn()
+const mockGetIsBiometricsEnabled = jest.fn()
+const mockGetIsPinEnabled = jest.fn()
 
 jest.mock("@app/hooks/use-account-registry", () => ({
   useAccountRegistry: () => ({ activeAccount: mockActiveAccount() }),
@@ -58,14 +61,14 @@ jest.mock("@app/utils/biometricAuthentication", () => ({
 jest.mock("@app/utils/storage/secureStorage", () => ({
   __esModule: true,
   default: {
-    getIsBiometricsEnabled: jest.fn().mockResolvedValue(false),
-    getIsPinEnabled: jest.fn().mockResolvedValue(false),
+    getIsBiometricsEnabled: () => mockGetIsBiometricsEnabled(),
+    getIsPinEnabled: () => mockGetIsPinEnabled(),
   },
 }))
 
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
-  useFocusEffect: jest.fn(),
+  useFocusEffect: (callback: () => void) => mockUseFocusEffect(callback),
 }))
 
 jest.mock("@app/components/screen", () => ({
@@ -108,16 +111,20 @@ jest.mock("@app/i18n/i18n-react", () => ({
 }))
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-const renderScreen = () =>
-  render(
-    <ThemeProvider theme={theme}>
-      <SecurityScreen
-        navigation={{ navigate: mockNavigate } as any}
-        route={{ params: { mIsBiometricsEnabled: false, mIsPinEnabled: false } } as any}
-      />
-    </ThemeProvider>,
-  )
+const screenElement = () => (
+  <ThemeProvider theme={theme}>
+    <SecurityScreen
+      navigation={{ navigate: mockNavigate } as any}
+      route={{ params: { mIsBiometricsEnabled: false, mIsPinEnabled: false } } as any}
+    />
+  </ThemeProvider>
+)
 /* eslint-enable @typescript-eslint/no-explicit-any */
+
+const renderScreen = () => render(screenElement())
+
+const focusCallbacks = (): (() => void)[] =>
+  mockUseFocusEffect.mock.calls.map(([callback]) => callback)
 
 describe("SecurityScreen security score card", () => {
   beforeEach(() => {
@@ -128,6 +135,8 @@ describe("SecurityScreen security score card", () => {
     mockSettingsData.mockReturnValue({
       me: { totpEnabled: false, email: { address: null, verified: false } },
     })
+    mockGetIsBiometricsEnabled.mockResolvedValue(false)
+    mockGetIsPinEnabled.mockResolvedValue(false)
   })
 
   it("shows the card for a self-custodial account", () => {
@@ -232,6 +241,30 @@ describe("SecurityScreen security score card", () => {
 
     expect(saveHideBalance).toHaveBeenCalledWith(expect.anything(), true)
     expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  /** useFocusEffect lists its callback in its own deps, so a fresh closure per
+   *  render re-subscribes the listener and re-reads the keystore every time. */
+  it("hands useFocusEffect one callback across renders", () => {
+    const { rerender } = renderScreen()
+    rerender(screenElement())
+
+    const [first, ...rest] = focusCallbacks()
+
+    expect(rest.length).toBeGreaterThan(0)
+    expect(rest.every((callback) => callback === first)).toBe(true)
+  })
+
+  it("scores app lock from the keystore state the focus effect reads", async () => {
+    mockGetIsBiometricsEnabled.mockResolvedValueOnce(true)
+
+    const { getByText } = renderScreen()
+
+    await act(async () => {
+      focusCallbacks()[0]()
+    })
+
+    expect(getByText("Security score 1/4")).toBeTruthy()
   })
 
   it("keeps a completed backup signal tappable so the flow can be re-run (#3828)", () => {
