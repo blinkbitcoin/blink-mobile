@@ -4,30 +4,24 @@ excludeAgent: "coding-agent"
 ---
 # Documentation Freshness Review
 
-When reviewing PRs, check if code changes require documentation updates.
+The docs under `docs/` are hand-curated and deliberately contain no version numbers or
+counts, so most PRs need no doc updates. Only flag a PR when it matches one of the
+triggers below. See [docs/index.md](../../docs/index.md) for the complete catalog.
 
-## Documentation Index
+## Triggers
 
-See [docs/index.md](../../docs/index.md) for the complete documentation catalog. Key docs:
-
-| Document | Update When |
-|----------|-------------|
-| [architecture.md](../../docs/architecture.md) | Component hierarchy, data flow, navigation structure changes |
-| [technology-stack.md](../../docs/technology-stack.md) | Dependencies added/removed/upgraded, new libraries |
-| [source-tree-analysis.md](../../docs/source-tree-analysis.md) | New directories, major refactors, file reorganization |
-| [api-reference.md](../../docs/api-reference.md) | GraphQL queries/mutations added/changed, new hooks |
-
-## Review Checklist
-
-Flag if PR includes:
-- New dependencies without `technology-stack.md` update
-- New directories/modules without `source-tree-analysis.md` update
-- Architecture changes without `architecture.md` update
-- New GraphQL operations without `api-reference.md` update
-- Changes that invalidate existing documentation
+| PR touches | Required doc update |
+|------------|---------------------|
+| Provider stack in `app/app.tsx` | [architecture.md](../../docs/architecture.md) provider tree |
+| `app/navigation/root-navigator.tsx` or `app/navigation/stack-param-lists.ts` (screens/navigators added or removed) | [architecture.md](../../docs/architecture.md) navigation section |
+| `package.json` dependencies added or removed (not version bumps) | [technology-stack.md](../../docs/technology-stack.md) |
+| `app/graphql/client.tsx` link chain, retry behavior, or endpoints | [architecture.md](../../docs/architecture.md) Apollo config / endpoints |
+| New top-level directory under `app/` | [architecture.md](../../docs/architecture.md) "Where Things Live" |
+| New file in `docs/` | [index.md](../../docs/index.md) catalog |
 
 ## Guidance
 
+- Version-only dependency bumps require NO doc updates (the docs contain no versions by design)
 - Don't block PRs for minor doc gaps, but comment suggesting updates
-- For significant changes, request doc updates before merge
-- Reference specific doc sections that may need attention
+- For significant structural changes, request doc updates before merge
+- Reference the specific doc section that needs attention
