@@ -41,10 +41,21 @@ import {
   DestinationDirection,
   isMerchantChoiceDestination,
 } from "./payment-destination/index.types"
+import { testProps } from "@app/utils/testProps"
+
 import { resolveDestination } from "./payment-destination/resolve-destination"
 
 const { width: screenWidth } = Dimensions.get("window")
 const { height: screenHeight } = Dimensions.get("window")
+
+/**
+ * Longest side the picker is allowed to hand back. The QR decoder allocates one integer
+ * per pixel of what it receives, at full resolution: a 12000x12000 photo asks for 576MB
+ * against a heap that caps out around 200MB, and the app dies before reading anything.
+ * The bound sits above what a camera produces, so an ordinary photo is passed through
+ * untouched and only the extremes are subsampled, which keeps dense codes readable.
+ */
+const QR_IMAGE_MAX_DIMENSION = 4096
 
 gql`
   query scanningQRCodeScreen {
@@ -313,13 +324,33 @@ export const ScanningQRCodeScreen: React.FC = () => {
 
   const showImagePicker = async () => {
     try {
-      const result = await launchImageLibrary({ mediaType: "photo" })
+      const result = await launchImageLibrary({
+        mediaType: "photo",
+        maxWidth: QR_IMAGE_MAX_DIMENSION,
+        maxHeight: QR_IMAGE_MAX_DIMENSION,
+      })
       if (result.errorCode === "permission") {
         toastShow({
           message: (translations) =>
             translations.ScanningQRCodeScreen.imageLibraryPermissionsNotGranted(),
           LL,
         })
+        return
+      }
+      /** Every other code arrives with no assets, so without this the button reads as
+       *  dead: nothing opens, nothing is said, and nothing reaches error reporting. The
+       *  message stays generic because the picker failed before it could hand over a
+       *  photo, and saying the image holds no QR would be a claim about something the app
+       *  never got to look at. */
+      if (result.errorCode) {
+        reportError(
+          "scanning-qrcode",
+          new Error(
+            `Image library failed: ${result.errorCode} ${result.errorMessage ?? ""}`,
+          ),
+        )
+        Alert.alert(LL.errors.unexpectedError())
+        return
       }
       if (result.assets && result.assets.length > 0) {
         const { uri } = result.assets[0]
@@ -405,7 +436,7 @@ export const ScanningQRCodeScreen: React.FC = () => {
           </View>
         </Pressable>
         <View style={styles.openGallery}>
-          <Pressable onPress={showImagePicker}>
+          <Pressable {...testProps("open-gallery")} onPress={showImagePicker}>
             <GaloyIcon
               name="image"
               size={64}
