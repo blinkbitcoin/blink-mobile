@@ -239,7 +239,11 @@ describe("BackupStateProvider", () => {
     expect(result.current.backupState.status).toBe(BackupStatus.Completed)
     expect(mockSetItem).toHaveBeenCalledWith(
       BACKUP_KEY,
-      JSON.stringify({ status: "completed", method: "manual" }),
+      JSON.stringify({
+        status: "completed",
+        method: "manual",
+        completedMethods: ["manual"],
+      }),
     )
   })
 
@@ -299,7 +303,11 @@ describe("BackupStateProvider", () => {
 
     expect(mockSetItem).toHaveBeenCalledWith(
       OTHER_BACKUP_KEY,
-      JSON.stringify({ status: "completed", method: "manual" }),
+      JSON.stringify({
+        status: "completed",
+        method: "manual",
+        completedMethods: ["manual"],
+      }),
     )
   })
 
