@@ -19,6 +19,14 @@ export FAKE_ADB_DEVICES="$WORK/adb-devices.txt"
 export FAKE_ARGS_LOG="$WORK/args.log"
 export FAKE_FRAME_COUNTER="$WORK/frames.n"
 export SHOT_SETTLE=0.05
+# Telemetry derives its store from the registry, so redirecting the registry
+# keeps every test span inside $WORK - the same isolation trick the simulator
+# suite uses for session state.
+export DEMO_SIM_REGISTRY="$WORK/registry"
+# A shell with a live claimed session exports DEMO_UDID etc.; inherited, they
+# flip the host-OS platform default under the android tests. Trust only what
+# each test sets explicitly.
+unset DEMO_UDID DEMO_ANDROID_SERIAL DEMO_HOST_OS DEMO_SESSION_DIR DEMO_PORT 2>/dev/null || true
 
 printf 'DEMO-UDID|rn-demo-pr3712|Booted\n' > "$FAKE_DEVICES"
 printf 'emulator-5554|rn-demo-pr3712-avd|device\n' > "$FAKE_ADB_DEVICES"
@@ -40,6 +48,8 @@ check "capture exits zero" "0" "$?"
 check "wrote the labelled png" "yes" "$([ -s "$WORK/shots/after.png" ] && echo yes || echo no)"
 check "output is a real PNG" "PNG" "$(magick identify -format '%m' "$WORK/shots/after.png" 2>/dev/null)"
 check "pinned the udid" "yes" "$(grep -q "screenshot udid=DEMO-UDID" "$FAKE_ARGS_LOG" && echo yes || echo no)"
+check "shots go through the cached simctl path, not xcrun dispatch" "yes" \
+  "$(grep "screenshot udid=" "$FAKE_ARGS_LOG" | grep -qv "direct=1" && echo no || echo yes)"
 
 # --- stability polling ------------------------------------------------------
 # Three distinct frames then a repeat: capture must keep shooting until two
@@ -178,6 +188,60 @@ check "rejects a malformed crop box" "1" "$?"
 check "requires --crop" "1" "$?"
 
 echo
+echo "telemetry"
+
+TELEMETRY_DIR="$WORK/registry/telemetry"
+tel_spans() { cat "$TELEMETRY_DIR"/spans-*.jsonl 2>/dev/null; }
+span_meta() { # span_meta <span> <key>
+  tel_spans | python3 -c '
+import json, sys
+span, key = sys.argv[1], sys.argv[2]
+for l in sys.stdin:
+    r = json.loads(l)
+    if r["span"] == span:
+        print(r["meta"].get(key, "")); break' "$1" "$2" 2>/dev/null
+}
+
+# --- frames meta cross-checked against the fake's own shot log ---------------
+# Two different sequences on purpose: a hardcoded frames value survives one
+# of these runs, never both.
+reset; rm -rf "$TELEMETRY_DIR"
+FAKE_FRAMES="red blue blue" DEMO_UDID=DEMO-UDID \
+  "$SCRIPTS/capture.sh" tele3 "$WORK/shots" >/dev/null 2>&1
+check "capture span frames == the fake's shot count (3-frame run)" \
+  "$(grep -c "screenshot udid=" "$FAKE_ARGS_LOG")" "$(span_meta shot.capture.total frames)"
+check "one capture emits exactly one capture span (no per-frame spans)" "1" \
+  "$(tel_spans | grep -c '"span":"shot.capture.total"')"
+
+reset; rm -rf "$TELEMETRY_DIR"
+FAKE_FRAMES="red green blue blue" DEMO_UDID=DEMO-UDID \
+  "$SCRIPTS/capture.sh" tele4 "$WORK/shots" >/dev/null 2>&1
+check "capture span frames == the fake's shot count (4-frame run)" \
+  "$(grep -c "screenshot udid=" "$FAKE_ARGS_LOG")" "$(span_meta shot.capture.total frames)"
+
+# --- a timed-out capture is a failure sample, not a slow success -------------
+reset; rm -rf "$TELEMETRY_DIR"
+FAKE_NEVER_SETTLE=1 SHOT_TIMEOUT=1 DEMO_UDID=DEMO-UDID \
+  "$SCRIPTS/capture.sh" tele-busy "$WORK/shots" >/dev/null 2>&1
+check "a never-settled capture's span carries ok=false" "yes" \
+  "$(tel_spans | python3 -c '
+import json, sys
+for l in sys.stdin:
+    r = json.loads(l)
+    if r["span"] == "shot.capture.total":
+        print("yes" if r["ok"] is False and r["meta"].get("stable") == 0 else "no"); break' 2>/dev/null)"
+
+# --- telemetry never escapes to the real HOME --------------------------------
+# With the registry override dropped, the default chain must land inside the
+# redirected HOME - proving nothing in this suite can write outside $WORK.
+reset
+env -u DEMO_SIM_REGISTRY -u DEMO_TELEMETRY_DIR HOME="$WORK/fake-home" \
+  FAKE_FRAMES="red red" DEMO_UDID=DEMO-UDID \
+  "$SCRIPTS/capture.sh" homebound "$WORK/shots" >/dev/null 2>&1
+check "the default telemetry store derives from HOME" "yes" \
+  "$(ls "$WORK/fake-home/.claude/rn-sim-sessions/telemetry"/spans-*.jsonl >/dev/null 2>&1 && echo yes || echo no)"
+
+echo
 echo "documented behavior matches the scripts"
 
 SKILL_MD="$TESTS_DIR/../SKILL.md"
@@ -187,6 +251,54 @@ check "SKILL.md pairs section uses the reload flip, not a blind fast refresh" "y
   "$(grep -q "reload-app.sh" "$SKILL_MD" && echo yes || echo no)"
 check "SKILL.md rejects a simulator per side, with the honesty rationale" "yes" \
   "$(grep -qi "simulator per side" "$SKILL_MD" && echo yes || echo no)"
+
+echo
+echo "bench (hermetic: counts first, loose clocks second)"
+
+# Policy: counted assertions catch loop-shaped regressions deterministically;
+# lower bounds prove waits exist and cannot flake on a slow machine; upper
+# bounds sit at >=5x locally measured (2s floor) and only catch runaway
+# sleeps. python3 is warmed once so no timed section pays interpreter start.
+python3 -c 'pass' 2>/dev/null
+py_now() { python3 -c 'import time; print("%.3f" % time.time())'; }
+
+# --- counted -----------------------------------------------------------------
+reset
+FAKE_FRAMES="red red" DEMO_UDID=DEMO-UDID \
+  "$SCRIPTS/capture.sh" bench2 "$WORK/shots" >/dev/null 2>&1
+check "a two-frame settle shoots exactly 2 frames" "2" \
+  "$(grep -c "screenshot udid=" "$FAKE_ARGS_LOG")"
+
+# --- lower bound: the settle sleep exists ------------------------------------
+reset
+SHOT_SETTLE=0.5 FAKE_FRAMES="red red" DEMO_UDID=DEMO-UDID \
+  "$SCRIPTS/capture.sh" bench-gap "$WORK/shots" >/dev/null 2>&1
+GAP=$(grep "screenshot udid=" "$FAKE_ARGS_LOG" | sed 's/.*t=//' | python3 -c '
+import sys
+ts = [float(l) for l in sys.stdin if l.strip()]
+print("%.3f" % (ts[1] - ts[0]) if len(ts) >= 2 else "nan")')
+check "the inter-shot gap honors the settle time (>=0.4s)" "yes" \
+  "$(python3 -c "print('yes' if float('$GAP') >= 0.4 else 'no ($GAP s)')" 2>/dev/null)"
+
+# --- upper bound: measured ~0.9s with fakes; 5s only catches runaway sleeps --
+reset
+T0=$(py_now)
+FAKE_FRAMES="red red" DEMO_UDID=DEMO-UDID \
+  "$SCRIPTS/capture.sh" bench-fast "$WORK/shots" >/dev/null 2>&1
+DUR=$(python3 -c "print('%.1f' % (float('$(py_now)') - float('$T0')))")
+check "a two-frame capture stays under the runaway budget (5s)" "yes" \
+  "$(python3 -c "print('yes' if float('$DUR') < 5 else 'no (${DUR}s)')")"
+
+# --- the bench's own mutation check: it must detect a planted regression -----
+# Two 3s-delayed shots put the same measurement well over the 5s budget; if
+# this stays under, the budget assertion above is measuring nothing.
+reset
+T0=$(py_now)
+FAKE_SHOT_DELAY=3 FAKE_FRAMES="red red" DEMO_UDID=DEMO-UDID \
+  "$SCRIPTS/capture.sh" bench-slow "$WORK/shots" >/dev/null 2>&1
+DUR=$(python3 -c "print('%.1f' % (float('$(py_now)') - float('$T0')))")
+check "a planted 3s shot delay is visible to the bench clock" "yes" \
+  "$(python3 -c "print('yes' if float('$DUR') >= 5 else 'no (${DUR}s)')")"
 
 echo
 echo "-------------------------------------"

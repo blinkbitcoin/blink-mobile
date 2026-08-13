@@ -19,6 +19,13 @@
 
 set -uo pipefail
 
+# Telemetry is best-effort and optional: this skill still works when the
+# simulator skill's lib is absent (skills get copied around individually).
+TEL_LIB="$(dirname "${BASH_SOURCE[0]}")/../../react-native-ios-simulator/lib/telemetry.sh"
+{ [ -f "$TEL_LIB" ] && . "$TEL_LIB"; } 2>/dev/null || true
+type tel_emit >/dev/null 2>&1 || { tel_now() { echo 0; }; tel_emit() { :; }; tel_span() { while [ $# -gt 0 ] && [ "$1" != "--" ]; do shift; done; [ $# -gt 0 ] && shift; "$@"; }; }
+T_PUSH=$(tel_now)
+
 PR=""; PURPOSE=""; FILES=(); DRY=""; REPO=""; REMOTE="origin"
 
 while [ $# -gt 0 ]; do
@@ -102,6 +109,8 @@ else
 fi
 
 # Machine-readable first, so callers can build their own markdown.
+tel_emit pub.push.total "$T_PUSH" pr="$PR" purpose="$PURPOSE" \
+  files="${#FILES[@]}" dry_run="$([ -n "$DRY" ] && echo 1 || echo 0)"
 echo "RAW_BASE=$RAW"
 for f in "${FILES[@]}"; do
   echo "RAW_FILE=$RAW/$(basename "$f")"

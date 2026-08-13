@@ -140,7 +140,11 @@ SKILL="$(git rev-parse --show-toplevel)"/.claude/skills/react-native-demo-videos
 ```
 
 Runs an unrecorded warm-up first (Maestro installs a driver on first contact
-with a device — ~20s with an installer on screen), starts the recorder, pads
+with a device — ~20s with an installer on screen) — unless it provably already
+happened: an earlier recording in this session, or a golden-sim clone whose
+baked driver still matches `maestro --version` (bless-golden.sh stamps the
+version; an upgraded CLI voids the bake and the warm-up runs again). Then it
+starts the recorder, pads
 lead-in and lead-out so the clip doesn't start or stop on a hard cut, runs the
 flow (forwarding `-e APP_ID` and `-e DEMO_PORT`), then interrupts the recorder
 and verifies with `ffprobe` that what came out is playable. Produces
@@ -263,7 +267,7 @@ threshold with a TEMP constant and say so in the PR comment.
 ## After Editing the Scripts
 
 ```bash
-"$SKILL/tests/run.sh"     # 88 assertions, ~30s, exits non-zero on failure
+"$SKILL/tests/run.sh"     # 104 assertions, ~50s, exits non-zero on failure
 ```
 
 Fakes `xcrun`, `adb` (the full screenrecord start/kill -2/pull lifecycle) and

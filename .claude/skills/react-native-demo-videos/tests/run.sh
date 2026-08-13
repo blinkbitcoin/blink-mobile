@@ -25,7 +25,13 @@ export FAKE_ARGS_LOG="$WORK/args.log"
 export DEMO_LEAD_IN=0.2 DEMO_LEAD_OUT=0.2
 export DEMO_APP_ID_IOS=com.example.demoapp
 export DEMO_APP_ID_ANDROID=com.example.androidapp
-unset DEMO_PORT 2>/dev/null || true
+# Redirecting the registry keeps every test span inside $WORK (telemetry
+# derives its store from it).
+export DEMO_SIM_REGISTRY="$WORK/registry"
+# A shell with a live claimed session exports DEMO_UDID etc.; inherited, they
+# flip the host-OS platform default and every android test silently records
+# via simctl. The suite trusts only what each test sets explicitly.
+unset DEMO_PORT DEMO_SESSION_DIR DEMO_SKIP_WARMUP DEMO_UDID DEMO_ANDROID_SERIAL DEMO_HOST_OS 2>/dev/null || true
 
 printf 'DEMO-UDID|rn-demo-pr3712|Booted\n' > "$FAKE_DEVICES"
 printf 'emulator-5554|rn-demo-pr3712-avd|device\n' > "$FAKE_ADB_DEVICES"
@@ -350,6 +356,90 @@ sys.exit(1 if ('clearState' in raw and 'RCT_jsLocation' not in raw) else 0)
 done
 
 echo
+echo "warmup skip"
+
+# The warmup is a one-time driver install per device per maestro version;
+# these pin the three legitimate skip paths and the one that must NOT skip.
+WSESS="$WORK/warm-session"
+
+reset_logs; rm -rf "$WSESS"; mkdir -p "$WSESS"
+DEMO_SESSION_DIR="$WSESS" DEMO_UDID=DEMO-UDID \
+  "$SCRIPTS/record-flow.sh" warm1 "$WORK/flow.yaml" "$WORK/out" >/dev/null 2>&1
+check "the first recording of a session warms up" "1" \
+  "$(grep -c "_warmup.yaml" "$FAKE_ARGS_LOG")"
+reset_logs
+DEMO_SESSION_DIR="$WSESS" DEMO_UDID=DEMO-UDID \
+  "$SCRIPTS/record-flow.sh" warm2 "$WORK/flow.yaml" "$WORK/out" >/dev/null 2>&1
+check "the second recording in the same session skips it" "0" \
+  "$(grep -c "_warmup.yaml" "$FAKE_ARGS_LOG")"
+
+reset_logs; rm -rf "$WSESS"; mkdir -p "$WSESS"
+echo "maestro-version=2.6.1" > "$WSESS/golden-stamp"
+DEMO_SESSION_DIR="$WSESS" DEMO_UDID=DEMO-UDID \
+  "$SCRIPTS/record-flow.sh" warm3 "$WORK/flow.yaml" "$WORK/out" >/dev/null 2>&1
+check "a clone with a version-matched baked driver skips the warmup" "0" \
+  "$(grep -c "_warmup.yaml" "$FAKE_ARGS_LOG")"
+
+# The driver is version-locked: an upgraded CLI reinstalls it, so a stamped
+# version that no longer matches must warm up - the fake's clone would let a
+# stale skip pass silently otherwise.
+reset_logs; rm -rf "$WSESS"; mkdir -p "$WSESS"
+echo "maestro-version=1.0.0" > "$WSESS/golden-stamp"
+DEMO_SESSION_DIR="$WSESS" DEMO_UDID=DEMO-UDID \
+  "$SCRIPTS/record-flow.sh" warm4 "$WORK/flow.yaml" "$WORK/out" >/dev/null 2>&1
+check "a maestro upgrade voids the baked driver - warmup runs" "1" \
+  "$(grep -c "_warmup.yaml" "$FAKE_ARGS_LOG")"
+
+# The version gate itself costs a ~3s JVM start, so it is cached per session.
+reset_logs; rm -rf "$WSESS"; mkdir -p "$WSESS"
+echo "maestro-version=2.6.1" > "$WSESS/golden-stamp"
+DEMO_SESSION_DIR="$WSESS" DEMO_UDID=DEMO-UDID \
+  "$SCRIPTS/record-flow.sh" warm6 "$WORK/flow.yaml" "$WORK/out" >/dev/null 2>&1
+DEMO_SESSION_DIR="$WSESS" DEMO_UDID=DEMO-UDID \
+  "$SCRIPTS/record-flow.sh" warm7 "$WORK/flow.yaml" "$WORK/out" >/dev/null 2>&1
+check "the maestro version probe runs once per session, not per recording" "1" \
+  "$(grep -c "maestro --version" "$FAKE_ARGS_LOG")"
+
+reset_logs; rm -rf "$WSESS"; mkdir -p "$WSESS"
+DEMO_SKIP_WARMUP=1 DEMO_SESSION_DIR="$WSESS" DEMO_UDID=DEMO-UDID \
+  "$SCRIPTS/record-flow.sh" warm5 "$WORK/flow.yaml" "$WORK/out" >/dev/null 2>&1
+check "the manual DEMO_SKIP_WARMUP override still works" "0" \
+  "$(grep -c "_warmup.yaml" "$FAKE_ARGS_LOG")"
+
+echo
+echo "telemetry"
+
+TELEMETRY_DIR="$WORK/registry/telemetry"
+tel_spans() { cat "$TELEMETRY_DIR"/spans-*.jsonl 2>/dev/null; }
+
+# --- a recording emits its phase spans ---------------------------------------
+reset_logs; rm -rf "$TELEMETRY_DIR"
+DEMO_UDID=DEMO-UDID "$SCRIPTS/record-flow.sh" tele "$WORK/flow.yaml" "$WORK/out" >/dev/null 2>&1
+check "record run exits zero with telemetry on" "0" "$?"
+for span in vid.record.warmup vid.record.start_wait vid.record.flow vid.record.stop; do
+  check "recording emits $span" "1" "$(tel_spans | grep -c "\"span\":\"$span\"")"
+done
+check "the warmup span says it was not skipped" "yes" \
+  "$(tel_spans | grep '"span":"vid.record.warmup"' | grep -q '"skipped":0' && echo yes || echo no)"
+
+reset_logs; rm -rf "$TELEMETRY_DIR"
+DEMO_SKIP_WARMUP=1 DEMO_UDID=DEMO-UDID "$SCRIPTS/record-flow.sh" tele2 "$WORK/flow.yaml" "$WORK/out" >/dev/null 2>&1
+check "a skipped warmup is labelled skipped, not silently absent" "yes" \
+  "$(tel_spans | grep '"span":"vid.record.warmup"' | grep -q '"skipped":1' && echo yes || echo no)"
+
+# --- encode span carries the fields that make it a throughput number ---------
+rm -rf "$TELEMETRY_DIR"
+"$SCRIPTS/encode-demo.sh" "$WORK/out/tele2.mov" "$WORK/tele.gif" --format gif --width 200 >/dev/null 2>&1
+check "encode emits vid.encode.total with format and size" "yes" \
+  "$(tel_spans | python3 -c '
+import json, sys
+for l in sys.stdin:
+    r = json.loads(l)
+    if r["span"] == "vid.encode.total":
+        m = r["meta"]
+        print("yes" if m.get("fmt") == "gif" and isinstance(m.get("out_bytes"), int) and m["out_bytes"] > 0 and m.get("in_dur_s") not in ("", None) else "no"); break' 2>/dev/null)"
+
+echo
 echo "documented behavior matches the scripts"
 
 SKILL_MD="$TESTS_DIR/../SKILL.md"
@@ -359,10 +449,29 @@ check "SKILL.md warns clearState wipes the persisted redirect" "yes" \
   "$(grep -i "clearState" "$SKILL_MD" | grep -qi "redirect\|RCT_jsLocation\|8081" && echo yes || echo no)"
 check "SKILL.md before/after section uses the reload flip for JS-only changes" "yes" \
   "$(grep -q "reload-app.sh" "$SKILL_MD" && echo yes || echo no)"
+# Real maestro (2.6.1) fails an entire flow at parse time if anything but
+# YAML precedes the header - and warmup output is discarded, so the failure
+# is silent. The fake maestro never parses YAML, hence this static gate.
+check "the warmup flow starts with YAML, not prose (maestro parse-fails on >)" "yes" \
+  "$(head -1 "$TESTS_DIR/../flows/_warmup.yaml" | grep -qE '^(#|appId:)' && echo yes || echo no)"
 check "SKILL.md teaches the launchApp arguments form" "yes" \
   "$(grep -q "RCT_jsLocation" "$SKILL_MD" && echo yes || echo no)"
 check "SKILL.md requires eyeballing extracted frames before publishing" "yes" \
   "$(grep -qi "extract" "$SKILL_MD" && grep -qi "frame" "$SKILL_MD" && echo yes || echo no)"
+
+echo
+echo "bench (hermetic: loose clock, runaway sleeps only)"
+
+# Real ffmpeg against the synthesized 2s clip; measured ~1-2s locally, so the
+# 15s budget only catches an order-of-magnitude regression (a dropped
+# hardware path, an accidental second decode of a full-res input).
+python3 -c 'pass' 2>/dev/null
+py_now() { python3 -c 'import time; print("%.3f" % time.time())'; }
+T0=$(py_now)
+"$SCRIPTS/encode-demo.sh" "$WORK/src.mov" "$WORK/bench.gif" --format gif --width 200 >/dev/null 2>&1
+DUR=$(python3 -c "print('%.1f' % (float('$(py_now)') - float('$T0')))")
+check "gif encode of the 2s clip stays under the runaway budget (15s)" "yes" \
+  "$(python3 -c "print('yes' if float('$DUR') < 15 else 'no (${DUR}s)')")"
 
 echo
 echo "-------------------------------------"

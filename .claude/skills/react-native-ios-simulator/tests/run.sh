@@ -387,6 +387,179 @@ check "reset without a port writes no defaults" "no" \
 "$SCRIPTS/release-session.sh" 622 --delete >/dev/null 2>&1
 
 echo
+echo "telemetry (lib/telemetry.sh)"
+
+TEL="$TESTS_DIR/../lib/telemetry.sh"
+TEL_TEST_DIR="$WORK/telemetry"
+spans_file() { ls "$1"/spans-*.jsonl 2>/dev/null | head -1; }
+span_lines() { cat "$(spans_file "$1")" 2>/dev/null; }
+
+# --- tel_span is transparent -------------------------------------------------
+rm -rf "$TEL_TEST_DIR"
+out=$(DEMO_TELEMETRY_DIR="$TEL_TEST_DIR" bash -c '
+  . "'"$TEL"'"
+  tel_span test.span k=v -- bash -c "echo real-out; echo real-err >&2; exit 3"
+' 2>"$WORK/tel-err.txt"); rc=$?
+check "tel_span preserves the exit code" "3" "$rc"
+check "tel_span preserves stdout" "real-out" "$out"
+check "tel_span preserves stderr" "real-err" "$(cat "$WORK/tel-err.txt")"
+check "one span, one line" "1" "$(span_lines "$TEL_TEST_DIR" | wc -l | tr -d ' ')"
+check "the line is valid v1 JSON with every schema key" "yes" \
+  "$(span_lines "$TEL_TEST_DIR" | python3 -c '
+import json, sys
+r = json.loads(sys.stdin.readline())
+need = {"v","ts","dur_ms","span","skill","session","run_id","rev","ok","meta"}
+ok = r["v"] == 1 and need <= set(r) and r["skill"] == "test" and r["ok"] is False and r["meta"]["rc"] == 3
+print("yes" if ok else "no")' 2>/dev/null)"
+
+# --- the unit trap: seconds-vs-ms is the classic telemetry bug ---------------
+rm -rf "$TEL_TEST_DIR"
+DEMO_TELEMETRY_DIR="$TEL_TEST_DIR" bash -c '. "'"$TEL"'"; tel_span test.sleep -- sleep 0.5' >/dev/null 2>&1
+DUR=$(span_lines "$TEL_TEST_DIR" | python3 -c 'import json,sys; print(json.loads(sys.stdin.readline())["dur_ms"])' 2>/dev/null)
+check "a 0.5s span records dur_ms in [400,5000]" "yes" \
+  "$([ -n "$DUR" ] && [ "$DUR" -ge 400 ] && [ "$DUR" -le 5000 ] && echo yes || echo "no ($DUR)")"
+
+# --- concurrent writers never tear each other's lines ------------------------
+rm -rf "$TEL_TEST_DIR"
+for i in $(seq 20); do
+  DEMO_TELEMETRY_DIR="$TEL_TEST_DIR" bash -c '
+    . "'"$TEL"'"
+    for j in 1 2 3 4 5 6 7 8 9 10; do t0=$(tel_now); tel_emit test.par "$t0" writer='"$i"' seq=$j; done
+  ' &
+done
+wait
+check "20 writers x 10 spans -> exactly 200 lines" "200" \
+  "$(span_lines "$TEL_TEST_DIR" | wc -l | tr -d ' ')"
+check "every concurrent line parses" "200" \
+  "$(span_lines "$TEL_TEST_DIR" | python3 -c '
+import json, sys
+print(sum(1 for l in sys.stdin if l.strip() and json.loads(l)))' 2>/dev/null)"
+
+# --- kill switch -------------------------------------------------------------
+rm -rf "$TEL_TEST_DIR"
+DEMO_TELEMETRY=0 DEMO_TELEMETRY_DIR="$TEL_TEST_DIR" bash -c '. "'"$TEL"'"; tel_span test.off -- true' >/dev/null 2>&1
+check "DEMO_TELEMETRY=0 runs the command" "0" "$?"
+check "DEMO_TELEMETRY=0 writes nothing" "absent" \
+  "$([ -d "$TEL_TEST_DIR" ] && echo present || echo absent)"
+
+# --- failure isolation: telemetry may never fail the caller ------------------
+# The instrumented scripts run set -euo pipefail; an unwritable telemetry dir
+# has to degrade to silence, not abort a claim.
+rm -rf "$TEL_TEST_DIR"; mkdir -p "$TEL_TEST_DIR"; chmod 0500 "$TEL_TEST_DIR"
+DEMO_TELEMETRY_DIR="$TEL_TEST_DIR" bash -c '
+  set -euo pipefail
+  . "'"$TEL"'"
+  t0=$(tel_now); tel_emit test.blocked "$t0"; tel_span test.blocked2 -- true
+  echo survived
+' > "$WORK/tel-iso.txt" 2>&1
+check "an unwritable telemetry dir cannot fail a set -e caller" "0" "$?"
+check "the caller actually ran to completion" "survived" "$(cat "$WORK/tel-iso.txt")"
+chmod 0700 "$TEL_TEST_DIR"
+
+# --- claims survive a broken lib and work without one ------------------------
+reset_world
+SAVED_LIB="$WORK/telemetry.sh.saved"
+cp "$TEL" "$SAVED_LIB"
+echo "this is not bash {{{" > "$TESTS_DIR/../lib/telemetry.sh"
+eval "$("$SCRIPTS/claim-session.sh" 730)" >/dev/null 2>&1
+check "a syntactically broken lib does not break a claim" "0" "$?"
+"$SCRIPTS/release-session.sh" 730 --delete >/dev/null 2>&1
+rm "$TESTS_DIR/../lib/telemetry.sh"
+eval "$("$SCRIPTS/claim-session.sh" 731)" >/dev/null 2>&1
+check "an absent lib does not break a claim" "0" "$?"
+"$SCRIPTS/release-session.sh" 731 --delete >/dev/null 2>&1
+cp "$SAVED_LIB" "$TESTS_DIR/../lib/telemetry.sh"
+
+# --- instrumented claims label origin from independent evidence --------------
+reset_world
+rm -rf "$DEMO_SIM_REGISTRY/telemetry"
+eval "$("$SCRIPTS/claim-session.sh" 732)" >/dev/null 2>&1
+ORIGIN_META=$(span_lines "$DEMO_SIM_REGISTRY/telemetry" | python3 -c '
+import json, sys
+for l in sys.stdin:
+    r = json.loads(l)
+    if r["span"] == "sim.claim.total":
+        print(r["meta"].get("origin", "")); break' 2>/dev/null)
+check "created claim emits origin=created, matching the session file" "yes" \
+  "$([ "$ORIGIN_META" = "$(cat "$DEMO_SIM_REGISTRY/rn-demo-pr732/origin")" ] && [ "$ORIGIN_META" = "created" ] && echo yes || echo "no ($ORIGIN_META)")"
+check "claim emits its sub-spans too" "yes" \
+  "$(span_lines "$DEMO_SIM_REGISTRY/telemetry" | grep -q '"span":"sim.claim.boot"' && span_lines "$DEMO_SIM_REGISTRY/telemetry" | grep -q '"span":"sim.claim.reap"' && echo yes || echo no)"
+"$SCRIPTS/release-session.sh" 732 >/dev/null 2>&1
+check "a clean release emits its span" "yes" \
+  "$(span_lines "$DEMO_SIM_REGISTRY/telemetry" | grep -q '"span":"sim.release.total"' && echo yes || echo no)"
+
+mkdir -p "$FAKE_APP_ROOT"   # bless needs the app-root scaffolding from earlier sections
+eval "$("$SCRIPTS/claim-session.sh" 733)" >/dev/null 2>&1
+"$SCRIPTS/bless-golden.sh" 733 --sha tel111 --lockfile /dev/null 2>/dev/null >/dev/null
+rm -rf "$DEMO_SIM_REGISTRY/telemetry"
+eval "$("$SCRIPTS/claim-session.sh" 734)" >/dev/null 2>&1
+ORIGIN_META=$(span_lines "$DEMO_SIM_REGISTRY/telemetry" | python3 -c '
+import json, sys
+for l in sys.stdin:
+    r = json.loads(l)
+    if r["span"] == "sim.claim.total":
+        print(r["meta"].get("origin", "")); break' 2>/dev/null)
+check "cloned claim emits origin=cloned-from-golden, matching the session file" "yes" \
+  "$([ "$ORIGIN_META" = "$(cat "$DEMO_SIM_REGISTRY/rn-demo-pr734/origin")" ] && [ "$ORIGIN_META" = "cloned-from-golden" ] && echo yes || echo "no ($ORIGIN_META)")"
+"$SCRIPTS/release-session.sh" 734 --delete >/dev/null 2>&1
+
+echo
+echo "spans report (spans-report.sh)"
+
+REPORT="$SCRIPTS/spans-report.sh"
+RPT_DIR="$WORK/report-telemetry"
+rm -rf "$RPT_DIR"; mkdir -p "$RPT_DIR"
+mkspan() { # mkspan <span> <dur_ms> <ok 1|0> <origin> <rev> [ts]
+  python3 -c '
+import json, sys, time
+span, dur, ok, origin, rev = sys.argv[1:6]
+ts = float(sys.argv[6]) if len(sys.argv) > 6 else time.time()
+meta = {"origin": origin} if origin else {}
+print(json.dumps({"v": 1, "ts": ts, "dur_ms": int(dur), "span": span,
+  "skill": span.split(".")[0], "session": "s", "run_id": "r", "rev": rev,
+  "ok": ok == "1", "meta": meta}))' "$@" >> "$RPT_DIR/spans-000000.jsonl"
+}
+
+for d in 100 200 300 400 500 600 700 800 900 1000; do mkspan a.big "$d" 1 "" rev1; done
+mkspan a.big 99999 0 "" rev1     # a failure sample with a huge duration
+mkspan b.small 50 1 "" rev1
+mkspan c.claim 10 1 created rev1
+mkspan c.claim 20 1 cloned rev1
+
+out=$("$REPORT" --dir "$RPT_DIR")
+BIG_ROW=$(echo "$out" | grep "^a\.big  ")
+check "p50 is nearest-rank exact" "500" "$(echo "$BIG_ROW" | awk '{print $3}')"
+check "p95 is nearest-rank exact" "1000" "$(echo "$BIG_ROW" | awk '{print $4}')"
+check "total sums the group" "5500" "$(echo "$BIG_ROW" | awk '{print $6}')"
+check "ranking puts the biggest total first" "yes" \
+  "$(echo "$out" | sed -n 3p | grep -q "^a\.big" && echo yes || echo no)"
+check "failure samples form their own FAILED row" "yes" \
+  "$(echo "$out" | grep -q "^a\.big FAILED" && echo yes || echo no)"
+check "and never inflate the success percentiles" "1000" "$(echo "$BIG_ROW" | awk '{print $5}')"
+check "groups split by origin" "yes" \
+  "$(echo "$out" | grep -q "^c\.claim created" && echo "$out" | grep -q "^c\.claim cloned" && echo yes || echo no)"
+
+mkspan d.ancient 5000 1 "" rev1 1000000    # emitted decades ago
+out=$("$REPORT" --dir "$RPT_DIR" --since 1d)
+check "--since excludes stale history from the ranking" "0" \
+  "$(echo "$out" | grep -c "^d\.ancient")"
+
+for d in 400 400; do mkspan e.opt "$d" 1 "" revA; done
+for d in 100 100; do mkspan e.opt "$d" 1 "" revB; done
+out=$("$REPORT" --dir "$RPT_DIR" --compare revA revB)
+OPT_ROW=$(echo "$out" | grep "^e\.opt")
+check "--compare shows both revisions' numbers" "yes" \
+  "$(echo "$OPT_ROW" | grep -q "400/2" && echo "$OPT_ROW" | grep -q "100/2" && echo yes || echo no)"
+check "--compare computes the delta" "yes" \
+  "$(echo "$OPT_ROW" | grep -q -- "-75%" && echo yes || echo no)"
+
+printf '{"v":1,"ts":12345,"dur' >> "$RPT_DIR/spans-000000.jsonl"   # a torn write
+out=$("$REPORT" --dir "$RPT_DIR" 2>&1); rc=$?
+check "a torn line never crashes the report" "0" "$rc"
+check "and is counted, not hidden" "yes" \
+  "$(echo "$out" | grep -q "1 unparseable line" && echo yes || echo no)"
+
+echo
 echo "native-build staleness stamp (native-stamp.sh)"
 
 NS="$SCRIPTS/native-stamp.sh"
@@ -563,6 +736,33 @@ check "no note when every required credential is present" "no" \
   "$(echo "$out" | grep -q "missing credentials" && echo yes || echo no)"
 "$SCRIPTS/release-session.sh" 721 --delete >/dev/null 2>&1
 unset FAKE_CRED_PRESENT
+
+# --- bless bakes the maestro driver and stamps the CLI version ---------------
+out=$("$SCRIPTS/claim-session.sh" 714) && eval "$out"
+: > "$FAKE_ARGS_LOG"
+DEMO_APP_ID_IOS=com.example.demoapp "$SCRIPTS/bless-golden.sh" 714 --sha warm77 \
+  --lockfile /dev/null >/dev/null 2>&1
+check "bless with maestro available runs the warmup against its own device" "yes" \
+  "$(grep "maestro test" "$FAKE_ARGS_LOG" | grep -q "_warmup.yaml" && echo yes || echo no)"
+check "the stamp records the maestro version" "yes" \
+  "$(grep -q '^maestro-version=2.6.1' "$GOLDEN_STAMP" && echo yes || echo no)"
+
+out=$("$SCRIPTS/claim-session.sh" 715)
+check "a version-matched clone gets no upgrade note" "0" \
+  "$(echo "$out" | grep -c "maestro upgraded")"
+eval "$out"; "$SCRIPTS/release-session.sh" 715 --delete >/dev/null 2>&1
+
+out=$(FAKE_MAESTRO_VERSION=9.9.9 "$SCRIPTS/claim-session.sh" 716)
+check "a maestro upgrade since the bless is called out at claim time" "yes" \
+  "$(echo "$out" | grep -q "maestro upgraded" && echo yes || echo no)"
+eval "$out"; "$SCRIPTS/release-session.sh" 716 --delete >/dev/null 2>&1
+
+# Without an app id the warmup cannot run - the stamp must NOT pretend a
+# driver was baked (record-flow trusts the version line as "warm").
+out=$("$SCRIPTS/claim-session.sh" 717) && eval "$out"
+DEMO_APP_ID_IOS= "$SCRIPTS/bless-golden.sh" 717 --sha warm78 --lockfile /dev/null >/dev/null 2>&1
+check "a bless that could not bake writes no maestro-version line" "0" \
+  "$(grep -c '^maestro-version=' "$GOLDEN_STAMP")"
 
 # --- bless safety gates ------------------------------------------------------
 reset_world
@@ -743,6 +943,8 @@ check "SKILL.md ties golden staleness to the stamp sha" "yes" \
   "$(grep -qi "stamp" "$SKILL_MD" && grep -q "origin/main -- ios/" "$SKILL_MD" && echo yes || echo no)"
 check "SKILL.md documents the native-stamp verdict" "yes" \
   "$(grep -q "native-stamp.sh" "$SKILL_MD" && echo yes || echo no)"
+check "SKILL.md documents telemetry and the spans report" "yes" \
+  "$(grep -q "spans-report.sh" "$SKILL_MD" && grep -q "DEMO_TELEMETRY=0" "$SKILL_MD" && echo yes || echo no)"
 check "SKILL.md documents the credential precheck" "yes" \
   "$(grep -q "DEMO_REQUIRED_ENV" "$SKILL_MD" && echo yes || echo no)"
 check "SKILL.md documents the 72h retention default" "yes" \
@@ -796,6 +998,58 @@ rm -rf "$DEMO_SIM_REGISTRY/locks"
 "$SCRIPTS/with-lock.sh" native-build 10 false >/dev/null 2>&1
 check "releases the lock when the command fails" "absent" \
   "$([ -d "$DEMO_SIM_REGISTRY/locks/native-build" ] && echo present || echo absent)"
+
+echo
+echo "live bench smoke (bench/live.sh)"
+
+LIVE="$TESTS_DIR/../bench/live.sh"
+SHOT_FIXTURES="$TESTS_DIR/../../react-native-demo-screenshots/tests/fixtures/bin"
+
+env -u DEMO_UDID "$LIVE" --smoke >/dev/null 2>&1
+check "live bench refuses to run without a claimed session" "1" "$?"
+
+rm -f "$WORK/bench-smoke.json"
+printf 'DEMO-UDID|bench-sim|Booted\n' > "$WORK/bench-devices.txt"
+PATH="$SHOT_FIXTURES:$PATH" FAKE_DEVICES="$WORK/bench-devices.txt" \
+  FAKE_ARGS_LOG="$WORK/bench-args.log" FAKE_FRAME_COUNTER="$WORK/bench-frames.n" \
+  DEMO_UDID=DEMO-UDID DEMO_SESSION_DIR="$WORK" \
+  "$LIVE" --smoke --out "$WORK/bench-smoke.json" >/dev/null 2>&1
+check "smoke run exits zero against the fake simctl" "0" "$?"
+check "the bench artifact is schema-complete" "yes" \
+  "$(python3 -c '
+import json, sys
+r = json.load(open(sys.argv[1]))
+need = {"v","udid","smoke","context","shot_latency","compare_cost","settle_capture","recorder","encode"}
+sl = r["shot_latency"].get("png_xcrun") or {}
+print("yes" if need <= set(r) and sl.get("n") == 2 and isinstance(sl.get("p50"), float) else "no")
+' "$WORK/bench-smoke.json" 2>/dev/null)"
+
+echo
+echo "bench (hermetic: counts first, loose clocks second)"
+
+# Upper bounds sit at >=5x locally measured (claim+release cycle ~2.4s with
+# fakes, reload roundtrip ~0.9s) and only catch runaway sleeps; the counted
+# assertion is the deterministic net. python3 warmed before timing.
+python3 -c 'pass' 2>/dev/null
+py_now() { python3 -c 'import time; print("%.3f" % time.time())'; }
+
+reset_world
+T0=$(py_now)
+eval "$("$SCRIPTS/claim-session.sh" 900)" >/dev/null 2>&1
+"$SCRIPTS/release-session.sh" 900 --delete >/dev/null 2>&1
+DUR=$(python3 -c "print('%.1f' % (float('$(py_now)') - float('$T0')))")
+check "a claim+release cycle stays under the runaway budget (12s)" "yes" \
+  "$(python3 -c "print('yes' if float('$DUR') < 12 else 'no (${DUR}s)')")"
+
+start_ws_fake bundle-done
+T0=$(py_now)
+"$SCRIPTS/reload-app.sh" --port "$WS_PORT" --timeout 10 >/dev/null 2>&1
+DUR=$(python3 -c "print('%.1f' % (float('$(py_now)') - float('$T0')))")
+check "a confirmed reload roundtrip stays under the runaway budget (5s)" "yes" \
+  "$(python3 -c "print('yes' if float('$DUR') < 5 else 'no (${DUR}s)')")"
+check "a reload opens exactly two websocket connections" "2" \
+  "$(grep -c "^connect " "$WS_LOG")"
+kill "$WS_PID" 2>/dev/null
 
 echo
 echo "-------------------------------------"

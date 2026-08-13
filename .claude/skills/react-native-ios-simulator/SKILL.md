@@ -254,12 +254,16 @@ eval "$("$SKILL/scripts/claim-session.sh" 3712)"
 ```
 
 `bless-golden.sh` verifies the device is this session's (same ownership gate as
-release), stops the session's Metro, shuts the device down, renames it to
-`${DEMO_SIM_PREFIX:-rn-demo}-golden` (swapping out and deleting any previous
-golden — exactly one device ever carries the name), writes a stamp
-(`sha`/`date`/`device-type`/`runtime`), and adopts the session: port freed,
-manifest gone, nothing left to release. Both the swap and claim's clone run
-under a shared lock, so a clone can never race a re-bless.
+release), stops the session's Metro, **bakes the Maestro driver** (runs the
+videos skill's warm-up once, so every clone skips the ~20s per-recording
+warm-up; needs `DEMO_APP_ID_IOS` and maestro on PATH), shuts the device down,
+renames it to `${DEMO_SIM_PREFIX:-rn-demo}-golden` (swapping out and deleting
+any previous golden — exactly one device ever carries the name), writes a
+stamp (`sha`/`date`/`device-type`/`runtime`/`maestro-version`), and adopts the
+session: port freed, manifest gone, nothing left to release. Both the swap and
+claim's clone run under a shared lock, so a clone can never race a re-bless.
+The driver is version-locked — after a maestro upgrade, claim prints a
+re-bless note and recordings warm up again until someone re-blesses.
 
 **Staleness is judged, not guessed — and mechanically.** Bless hashes the
 build's `ios/Podfile.lock` into the stamp (`--lockfile` overrides the default
@@ -275,11 +279,37 @@ lockfile), fall back to diffing native paths against the stamp's SHA:
 git -C /path/to/your-app log <stamp-sha>..origin/main -- ios/ package.json yarn.lock
 ```
 
+**A fresh clone can refuse to launch the app** — `simctl launch` fails with
+`FBSOpenApplicationServiceErrorDomain ... denied by service delegate
+(SBMainWorkspace)` because the cloned SpringBoard's app registration is
+stale. The fix is a plain `simctl install` of the same build over it (an
+upgrade install: re-registers the app, **keeps the data container and the
+login**), then launch again. A shutdown/boot cycle alone does not clear it.
+
 A clone that comes up logged out (staging sessions do expire) means the same
 thing — re-bless with a fresh login. Opt out of cloning with
 `DEMO_SIM_GOLDEN=none`, or point at a differently named golden with
 `DEMO_SIM_GOLDEN=<device name>`. The reaper never touches the golden: it has
 no session, and the name gate refuses it like any foreign device.
+
+## Telemetry: Where the Time Goes
+
+Every script emits one JSON line per phase (claim/boot/reload/capture/
+warmup/flow/encode/push) into a local spans file under the session registry —
+local only, nothing leaves the machine; `DEMO_TELEMETRY=0` disables. Rank the
+bottlenecks, or verify an optimization actually optimized:
+
+```bash
+"$SKILL/scripts/spans-report.sh"                      # ranked by total time, last 7d
+"$SKILL/scripts/spans-report.sh" --compare <rev> <rev>  # before/after a change
+```
+
+Failure samples (a timed-out capture) sit in their own FAILED rows and never
+inflate a latency percentile; claims are split by origin because reclaim,
+clone and create are three different distributions. When you add a new phase
+worth measuring, emit through `lib/telemetry.sh` (`tel_now`/`tel_emit`/
+`tel_span`) and never from inside a hot loop — time the loop once and put the
+count in meta.
 
 ## After Editing the Scripts
 
@@ -287,7 +317,7 @@ The isolation guarantees are load-bearing for every other agent on this Mac, so
 they are tested rather than asserted:
 
 ```bash
-"$SKILL/tests/run.sh"     # 155 assertions, ~60s, exits non-zero on failure
+"$SKILL/tests/run.sh"     # 197 assertions, ~100s, exits non-zero on failure
 ```
 
 It creates **no real simulators** — a fake `xcrun` goes first on PATH and the

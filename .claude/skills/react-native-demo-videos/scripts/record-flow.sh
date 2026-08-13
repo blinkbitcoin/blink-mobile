@@ -25,6 +25,12 @@
 
 set -uo pipefail
 
+# Telemetry is best-effort and optional: this skill still works when the
+# simulator skill's lib is absent (skills get copied around individually).
+TEL_LIB="$(dirname "${BASH_SOURCE[0]}")/../../react-native-ios-simulator/lib/telemetry.sh"
+{ [ -f "$TEL_LIB" ] && . "$TEL_LIB"; } 2>/dev/null || true
+type tel_emit >/dev/null 2>&1 || { tel_now() { echo 0; }; tel_emit() { :; }; tel_span() { while [ $# -gt 0 ] && [ "$1" != "--" ]; do shift; done; [ $# -gt 0 ] && shift; "$@"; }; }
+
 LABEL=""; FLOW=""; OUTDIR="."
 UDID="${DEMO_UDID:-}"; SERIAL="${DEMO_ANDROID_SERIAL:-}"; FORCE=""
 LEAD_IN="${DEMO_LEAD_IN:-1.5}"     # a beat of the start state before the first tap
@@ -128,12 +134,44 @@ fi
 # with an installer visible on screen). Recording that would put a black screen
 # and a progress bar at the head of every demo, so it happens before the
 # recorder starts. Failure here is not fatal: the real flow will report it.
-if [ -z "$SKIP_WARMUP" ]; then
+T_WARMUP=$(tel_now)
+# The warmup is only needed once per device per Maestro version - the driver
+# it installs persists. Three ways to know it already happened, checked in
+# order of directness (iOS only: the session markers live in the iOS session
+# dir, and an Android emulator never shares a device with an iOS session):
+#   manual   DEMO_SKIP_WARMUP=1, the caller's own judgment
+#   session  an earlier maestro run in this session left the warmed marker
+#   golden   the clone carries a driver baked by bless-golden.sh, and the
+#            stamped maestro version still matches - after a CLI upgrade the
+#            driver silently re-installs, so a mismatch must warm up again
+WARM_REASON=""
+if [ -n "$SKIP_WARMUP" ]; then
+  WARM_REASON="manual"
+elif [ "$PLATFORM" = ios ] && [ -n "${DEMO_SESSION_DIR:-}" ] && [ -f "$DEMO_SESSION_DIR/maestro-warmed" ]; then
+  WARM_REASON="session"
+elif [ "$PLATFORM" = ios ] && [ -n "${DEMO_SESSION_DIR:-}" ] && [ -f "$DEMO_SESSION_DIR/golden-stamp" ]; then
+  STAMP_MV=$(grep '^maestro-version=' "$DEMO_SESSION_DIR/golden-stamp" 2>/dev/null | cut -d= -f2- || true)
+  # `maestro --version` boots a JVM (~3s, measured in the vid.record.warmup
+  # span) - cache it per session so only the first recording pays it.
+  CUR_MV=$(cat "$DEMO_SESSION_DIR/maestro-cli-version" 2>/dev/null || true)
+  if [ -z "$CUR_MV" ]; then
+    CUR_MV=$(maestro --version 2>/dev/null | head -1 || true)
+    [ -n "$CUR_MV" ] && echo "$CUR_MV" > "$DEMO_SESSION_DIR/maestro-cli-version" 2>/dev/null
+  fi
+  if [ -n "$STAMP_MV" ] && [ "$STAMP_MV" = "$CUR_MV" ]; then
+    WARM_REASON="golden"
+  fi
+fi
+if [ -z "$WARM_REASON" ]; then
   WARMUP="$(dirname "${BASH_SOURCE[0]}")/../flows/_warmup.yaml"
   if [ -f "$WARMUP" ]; then
     echo "warming up the maestro driver..."
     maestro test --udid "$DEVICE" -e APP_ID="$APP_ID" "$WARMUP" >/dev/null 2>&1
+    [ "$PLATFORM" = ios ] && [ -n "${DEMO_SESSION_DIR:-}" ] && touch "$DEMO_SESSION_DIR/maestro-warmed" 2>/dev/null
   fi
+  tel_emit vid.record.warmup "$T_WARMUP" platform="$PLATFORM" skipped=0
+else
+  tel_emit vid.record.warmup "$T_WARMUP" platform="$PLATFORM" skipped=1 reason="$WARM_REASON"
 fi
 
 # --- Recorder ---------------------------------------------------------------
@@ -184,6 +222,7 @@ stop_recorder() {
 trap 'stop_recorder' EXIT INT TERM
 
 echo "recording $DEVICE -> $OUT"
+T_REC_START=$(tel_now)
 # The recorder is launched through a shim that resets SIGINT to its default
 # disposition before exec'ing.
 #
@@ -234,6 +273,7 @@ else
   done
   [ -n "$STARTED" ] || die "recorder never started writing $OUT (recorder process died)"
 fi
+tel_emit vid.record.start_wait "$T_REC_START" platform="$PLATFORM"
 
 sleep "$LEAD_IN"
 
@@ -241,11 +281,21 @@ sleep "$LEAD_IN"
 # APP_ID and DEMO_PORT are forwarded so flows can stay app-agnostic
 # (`appId: ${APP_ID}`) and clearState flows can re-pass the Metro redirect as a
 # launch argument. Unused variables are harmless.
+T_FLOW=$(tel_now)
 maestro test --udid "$DEVICE" -e APP_ID="$APP_ID" ${DEMO_PORT:+-e DEMO_PORT="$DEMO_PORT"} "$FLOW"
 FLOW_RC=$?
+tel_emit vid.record.flow "$T_FLOW" platform="$PLATFORM" rc="$FLOW_RC" \
+  ok="$([ "$FLOW_RC" -eq 0 ] && echo 1 || echo 0)"
+# A successful flow proves the driver works - later recordings in this
+# session need no warmup even if this one's was skipped manually.
+if [ "$FLOW_RC" -eq 0 ] && [ "$PLATFORM" = ios ] && [ -n "${DEMO_SESSION_DIR:-}" ]; then
+  touch "$DEMO_SESSION_DIR/maestro-warmed" 2>/dev/null || true
+fi
 
 sleep "$LEAD_OUT"
+T_STOP=$(tel_now)
 stop_recorder
+tel_emit vid.record.stop "$T_STOP" platform="$PLATFORM"
 trap - EXIT INT TERM
 
 # --- Validate ---------------------------------------------------------------

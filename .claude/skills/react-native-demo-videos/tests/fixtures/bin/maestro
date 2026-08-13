@@ -31,6 +31,6 @@ case "${1:-}" in
       *) sleep "${FAKE_FLOW_SECONDS:-0.3}"; exit "${FAKE_MAESTRO_RC:-0}" ;;
     esac
     ;;
-  --version) echo "2.6.1" ;;
+  --version) echo "${FAKE_MAESTRO_VERSION:-2.6.1}" ;;
   *) echo "fake maestro: unsupported subcommand '${1:-}'" >&2; exit 64 ;;
 esac

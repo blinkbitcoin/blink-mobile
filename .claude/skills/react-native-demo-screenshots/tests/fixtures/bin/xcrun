@@ -8,8 +8,17 @@
 
 set -uo pipefail
 
-[ "${1:-}" = "simctl" ] || { echo "fake xcrun: only simctl is supported" >&2; exit 64; }
-shift
+# capture.sh resolves simctl once via `xcrun -f simctl`; handing back this
+# fake keeps the resolved-binary path testable - later calls arrive without
+# the `simctl` prefix and are logged direct=1, which is what the assertion
+# that the caching actually happened keys on.
+if [ "${1:-}" = "-f" ]; then
+  echo "$0"
+  exit 0
+fi
+
+DIRECT=1
+[ "${1:-}" = "simctl" ] && { DIRECT=0; shift; }
 
 ARGS_LOG="${FAKE_ARGS_LOG:-/dev/null}"
 
@@ -20,7 +29,11 @@ case "${1:-}" in
     OUT="${4:?fake xcrun: screenshot needs an output path}"
     [ "$OP" = "screenshot" ] || { echo "fake xcrun: unsupported io op '$OP'" >&2; exit 64; }
 
-    echo "screenshot udid=$UDID out=$OUT" >> "$ARGS_LOG"
+    # The t= stamp lets the bench assert on inter-shot gaps (a settle sleep
+    # that silently disappears shows up as gap ~ 0); FAKE_SHOT_DELAY plants a
+    # slow shot so the bench can prove it detects planted regressions.
+    echo "screenshot udid=$UDID out=$OUT direct=$DIRECT t=$(python3 -c 'import time; print("%.3f" % time.time())')" >> "$ARGS_LOG"
+    [ -n "${FAKE_SHOT_DELAY:-}" ] && sleep "$FAKE_SHOT_DELAY"
 
     if [ -n "${FAKE_DEVICES:-}" ] && [ -f "${FAKE_DEVICES}" ]; then
       grep -q "^${UDID}|" "$FAKE_DEVICES" || { echo "fake xcrun: no device $UDID" >&2; exit 1; }
