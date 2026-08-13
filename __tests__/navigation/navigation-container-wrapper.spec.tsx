@@ -36,9 +36,9 @@ let mockOnStateChange: ((state: unknown) => void) | undefined
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
   createNavigationContainerRef: () => ({
-    reset: (state: { routes: { name: string }[] }) => {
+    reset: (state: { index: number; routes: { name: string; params?: object }[] }) => {
       mockReset(state)
-      mockRootState = { index: 0, routes: state.routes }
+      mockRootState = { index: state.index, routes: state.routes }
     },
     isReady: () => mockIsReady,
     getRootState: () => mockRootState,
@@ -92,6 +92,7 @@ import {
   processLinkForAction,
   useAuthenticationContext,
 } from "@app/navigation/navigation-container-wrapper"
+import { MigrationSupportOrigin, MigrationSupportReason } from "@app/types/migration"
 import { AuthenticationScreenPurpose, PinScreenPurpose } from "@app/utils/enum"
 
 describe("processLinkForAction", () => {
@@ -241,6 +242,31 @@ const STACK_AT_BIOMETRIC_PIN_FALLBACK = {
   ],
 }
 
+/** Where the gate sends a locked migration it has no checkpoint to resume, and one of the
+ *  checkpoint steps it resumes to. Neither is the deeplink entry: the gate never navigates
+ *  there, so an allowance naming only the entry misses everything it does open. */
+const GATE_CONTACT_SUPPORT_ROUTE = {
+  name: "accountMigrationContactSupport",
+  params: {
+    reason: MigrationSupportReason.LockedWithoutCheckpoint,
+    origin: MigrationSupportOrigin.Gate,
+  },
+}
+const GATE_CHECKPOINT_ROUTE = { name: "accountMigrationTransferringFunds" }
+
+/** The gate is mounted under the unlock screen, so it resumes and navigates there while the
+ *  user has not typed anything into the PIN pad yet. */
+const STACK_WITH_GATE_SCREEN_OVER_UNLOCK = {
+  index: 3,
+  routes: [...STACK_AT_RESUME_UNLOCK.routes, GATE_CONTACT_SUPPORT_ROUTE],
+}
+
+/** The same screen once the unlock has stepped back off the stack. */
+const STACK_WITH_GATE_SCREEN_ABOVE = {
+  index: 2,
+  routes: [{ name: "Primary" }, { name: "scanningQRCode" }, GATE_CONTACT_SUPPORT_ROUTE],
+}
+
 /** Settings reuses the pin route to SET a PIN, with the app already unlocked. */
 const STACK_AT_SETTINGS_PIN = {
   index: 2,
@@ -386,17 +412,68 @@ describe("NavigationContainerWrapper armed-gate reset", () => {
     expect(mockReset).not.toHaveBeenCalled()
   })
 
-  it("lands a retry on the blocker itself, never back on the unlock", async () => {
-    /** Only arming owes a still-locked session a trip through the unlock. A retry that
-     *  routed there would bounce the user off the screen it was only meant to pop. */
+  it("lands a retry on the blocker once the unlock it waited for has run", async () => {
     mockBlockerVisible = true
     mockRootState = STACK_AT_RESUME_UNLOCK
 
-    renderWrapper(<Text testID="child">child</Text>)
+    renderWrapper(<UnlockProbe />)
 
+    await waitFor(() => expect(screen.getByTestId("lock-state")).toBeTruthy())
+
+    unlock()
     navigateTo(STACK_WITH_SCREEN_ABOVE)
 
     expect(mockReset).toHaveBeenCalledWith(RESET_TO_PRIMARY)
+  })
+
+  it("routes a retry through the unlock when the lock is still up", async () => {
+    /** Where a reset lands is the lock's call, not the trigger's. Deriving it from the
+     *  trigger let a retry land on Primary with the lock raised, and the user reached the
+     *  app without ever entering a PIN. */
+    mockBlockerVisible = true
+    mockRootState = STACK_AT_RESUME_UNLOCK
+
+    renderWrapper(<UnlockProbe />)
+
+    await waitFor(() => expect(screen.getByTestId("lock-state")).toBeTruthy())
+
+    navigateTo(STACK_WITH_SCREEN_ABOVE)
+
+    expect(mockReset).toHaveBeenCalledWith(RESET_TO_UNLOCK)
+  })
+
+  it("routes a retry the armed gate itself set off through the unlock", async () => {
+    /** The gate is mounted under the unlock screen, so a locked migration resumes and
+     *  navigates while the PIN pad is still up and empty. That navigation is what runs the
+     *  pending retry, which used to tear the unlock down and land on Primary. */
+    mockBlockerVisible = true
+    mockRootState = STACK_AT_RESUME_UNLOCK
+
+    renderWrapper(<UnlockProbe />)
+
+    await waitFor(() => expect(screen.getByTestId("lock-state")).toBeTruthy())
+    expect(mockReset).not.toHaveBeenCalled()
+
+    navigateTo(STACK_WITH_GATE_SCREEN_OVER_UNLOCK)
+
+    expect(mockReset).toHaveBeenCalledWith(RESET_TO_UNLOCK)
+    expect(screen.getByTestId("lock-state").props.children).toBe("locked")
+  })
+
+  it("does not preserve a gate screen above the unlock, which would skip the PIN", async () => {
+    /** The unlock outranks the allowance: anything stacked over it is reachable without a
+     *  PIN. The gate opens the screen again from the mount the unlock returns to. */
+    mockBlockerVisible = true
+    mockRootState = STACK_AT_RESUME_UNLOCK
+
+    renderWrapper(<UnlockProbe />)
+
+    await waitFor(() => expect(screen.getByTestId("lock-state")).toBeTruthy())
+
+    navigateTo(STACK_WITH_GATE_SCREEN_OVER_UNLOCK)
+
+    expect(mockReset).toHaveBeenCalledTimes(1)
+    expect(mockReset.mock.calls[0][0].routes).toHaveLength(1)
   })
 
   it("does not come back for a reset the arming had already declined", async () => {
@@ -448,9 +525,11 @@ describe("NavigationContainerWrapper armed-gate reset", () => {
     expect(mockReset).not.toHaveBeenCalled()
   })
 
-  it("never pops the migration entry the armed gate lets through", async () => {
+  it("keeps the migration entry the armed gate lets through, and pops what is under it", async () => {
     /** The one deeplink the gate allows can only land after the gate armed, so a retry
-     *  finishing an older job must leave it alone. */
+     *  finishing an older job must leave it alone. Returning early instead abandoned the
+     *  pop, and the pre-arming screen underneath stayed reachable by back-navigation over
+     *  a closed account. */
     mockBlockerVisible = true
     mockRootState = STACK_AT_RESUME_UNLOCK
 
@@ -468,7 +547,116 @@ describe("NavigationContainerWrapper armed-gate reset", () => {
       ],
     })
 
+    expect(mockReset).toHaveBeenCalledWith({
+      index: 1,
+      routes: [{ name: "Primary" }, { name: "accountMigrationEntry" }],
+    })
+  })
+
+  it("keeps a screen the armed gate opened itself, not just the deeplink entry", async () => {
+    /** The gate navigates to contact support and to the checkpoint steps, never to the
+     *  entry, so an allowance naming the entry alone popped the gate's own choice back off
+     *  and left it to navigate there again from a fresh mount. */
+    mockBlockerVisible = true
+    mockRootState = STACK_AT_RESUME_UNLOCK
+
+    renderWrapper(<UnlockProbe />)
+
+    await waitFor(() => expect(screen.getByTestId("lock-state")).toBeTruthy())
+
+    unlock()
+    navigateTo(STACK_WITH_GATE_SCREEN_ABOVE)
+
+    expect(mockReset).toHaveBeenCalledWith({
+      index: 1,
+      routes: [{ name: "Primary" }, GATE_CONTACT_SUPPORT_ROUTE],
+    })
+  })
+
+  it("carries the preserved screen's params, so it reopens on the same case", async () => {
+    /** The support screen reads its reason and origin from the params; dropping them would
+     *  land the user on a blank ticket. */
+    mockBlockerVisible = true
+    mockRootState = STACK_AT_RESUME_UNLOCK
+
+    renderWrapper(<UnlockProbe />)
+
+    await waitFor(() => expect(screen.getByTestId("lock-state")).toBeTruthy())
+
+    unlock()
+    navigateTo(STACK_WITH_GATE_SCREEN_ABOVE)
+
+    expect(mockReset.mock.calls[0][0].routes[1].params).toEqual(
+      GATE_CONTACT_SUPPORT_ROUTE.params,
+    )
+  })
+
+  it("pops everything above the blocker when the gate arms, migration screens included", async () => {
+    /** Arming has no allowance to make: whatever is on the stack was opened before the gate
+     *  existed, a migration screen reached from Settings included. */
+    mockRootState = {
+      index: 1,
+      routes: [{ name: "Primary" }, GATE_CHECKPOINT_ROUTE],
+    }
+
+    const { rerender } = renderWrapper(<UnlockProbe />)
+
+    unlock()
+    await waitFor(() =>
+      expect(screen.getByTestId("lock-state").props.children).toBe("unlocked"),
+    )
+
+    mockBlockerVisible = true
+    rerender(
+      <NavigationContainerWrapper>
+        <UnlockProbe />
+      </NavigationContainerWrapper>,
+    )
+
+    await waitFor(() => expect(mockReset).toHaveBeenCalledWith(RESET_TO_PRIMARY))
+  })
+
+  it("does not remount a gate screen that already sits on the blocker", async () => {
+    /** Preserving it would lay down the stack that is already there. Dispatching that
+     *  anyway remounts the screen and restarts whatever it had in flight, and the transfer
+     *  step is the worst place for that. */
+    mockBlockerVisible = true
+    mockRootState = STACK_AT_RESUME_UNLOCK
+
+    renderWrapper(<UnlockProbe />)
+
+    await waitFor(() => expect(screen.getByTestId("lock-state")).toBeTruthy())
+
+    unlock()
+    navigateTo({ index: 1, routes: [{ name: "Primary" }, GATE_CHECKPOINT_ROUTE] })
+
     expect(mockReset).not.toHaveBeenCalled()
+  })
+
+  it("spends the deferral on the gate screen, rather than saving it for what comes next", async () => {
+    /** The dollar transfer the gate opens is not a migration route, so a deferral still
+     *  armed when the user taps Transfer would reset the conversion away mid-flow. */
+    mockBlockerVisible = true
+    mockRootState = STACK_AT_RESUME_UNLOCK
+
+    renderWrapper(<UnlockProbe />)
+
+    await waitFor(() => expect(screen.getByTestId("lock-state")).toBeTruthy())
+
+    unlock()
+    navigateTo(STACK_WITH_GATE_SCREEN_ABOVE)
+    expect(mockReset).toHaveBeenCalledTimes(1)
+
+    navigateTo({
+      index: 2,
+      routes: [
+        { name: "Primary" },
+        GATE_CONTACT_SUPPORT_ROUTE,
+        { name: "conversionDetails" },
+      ],
+    })
+
+    expect(mockReset).toHaveBeenCalledTimes(1)
   })
 
   it("stops retrying once the kill-switch hides the blocker", async () => {

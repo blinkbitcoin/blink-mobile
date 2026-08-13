@@ -1,5 +1,7 @@
 import { readFileSync } from "fs"
 
+import { isMigrationRoute } from "@app/navigation/migration-routes"
+
 // The flow's screens navigate to each other by route name, and every screen spec mocks
 // navigation, so a route that was never registered still passes everywhere else and only
 // fails on device. Pinned with source-level assertions for the same reason the developer
@@ -19,6 +21,21 @@ describe("migration flow registration in root-navigator", () => {
   it("registers every step of the flow", () => {
     FLOW_ROUTES.forEach((route) => {
       expect(navigatorSource).toContain(`name="${route}"`)
+    })
+  })
+
+  it("keeps every registered migration screen inside the armed gate's allowance", () => {
+    /** The armed-gate reset pops whatever it does not recognise as the gate's own, and an
+     *  enumerated allowance is exactly what went wrong there: it named the deeplink entry
+     *  and missed the screens the gate opens itself. Read off the navigator so a screen
+     *  registered later is covered without anyone remembering to add it. */
+    const registeredRoutes = [
+      ...navigatorSource.matchAll(/name="(accountMigration\w+)"/g),
+    ].map(([, routeName]) => routeName)
+
+    expect(registeredRoutes.length).toBeGreaterThan(FLOW_ROUTES.length)
+    registeredRoutes.forEach((routeName) => {
+      expect(isMigrationRoute(routeName)).toBe(true)
     })
   })
 
