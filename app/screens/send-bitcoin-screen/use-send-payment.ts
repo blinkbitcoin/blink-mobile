@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react"
-import { v4 as uuidv4 } from "uuid"
+import Crypto from "react-native-quick-crypto"
 
 import { gql } from "@apollo/client"
 import {
@@ -162,10 +162,8 @@ gql`
 `
 
 const useGetUuid = () => {
-  const randomUuid = useMemo(() => {
-    const randomBytes = Array.from({ length: 16 }, () => Math.floor(Math.random() * 256))
-    return uuidv4({ random: randomBytes })
-  }, [])
+  // Idempotency keys must be unpredictable: Math.random is not a CSPRNG.
+  const randomUuid = useMemo(() => Crypto.randomUUID(), [])
   return randomUuid
 }
 
