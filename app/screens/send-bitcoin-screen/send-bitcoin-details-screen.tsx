@@ -1,4 +1,9 @@
-import { requestInvoice, utils, Satoshis } from "lnurl-pay"
+import {
+  requestInvoiceWithServiceParams,
+  utils,
+  Satoshis,
+  LnUrlPayServiceResponse,
+} from "lnurl-pay"
 import React, { useEffect, useState } from "react"
 import { TouchableOpacity, TouchableWithoutFeedback, View } from "react-native"
 import ReactNativeModal from "react-native-modal"
@@ -378,12 +383,23 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
             "BTC",
           )
 
+          // Pay with the service params resolveLnurlDestination already vetted.
+          // requestInvoice(lnUrlOrAddress) would resolve the destination a second
+          // time and fetch whatever callback that response carries, which lnurl-pay
+          // does not require to be https — so the callback the app checked would
+          // not be the callback it pays.
+          if (!lnurlParams) {
+            setIsLoadingLnurl(false)
+            setAsyncErrorMessage(LL.SendBitcoinScreen.failedToFetchLnurlInvoice())
+            return
+          }
+
           const requestInvoiceParams: {
-            lnUrlOrAddress: string
+            params: LnUrlPayServiceResponse
             tokens: Satoshis
             comment?: string
           } = {
-            lnUrlOrAddress: paymentDetail.destination,
+            params: lnurlParams,
             tokens: utils.toSats(btcAmount.amount),
           }
 
@@ -391,7 +407,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
             requestInvoiceParams.comment = paymentDetail.memo
           }
 
-          const result = await requestInvoice(requestInvoiceParams)
+          const result = await requestInvoiceWithServiceParams(requestInvoiceParams)
 
           setPaymentDetail(paymentDetail.setSuccessAction(result.successAction))
 
