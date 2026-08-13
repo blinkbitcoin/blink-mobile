@@ -400,6 +400,59 @@ describe("PersistentStateProvider", () => {
       expect(screen.getByTestId("token").props.children).toBe("legacy-token")
     })
 
+    it("retries the keychain write on the first save after a failed boot adoption", async () => {
+      mockLoadJson.mockResolvedValue(legacyBlob)
+      mockSetActiveToken.mockResolvedValue(false)
+
+      render(
+        <PersistentStateProvider>
+          <TestConsumer />
+        </PersistentStateProvider>,
+      )
+
+      await waitFor(() => {
+        expect(screen.getByTestId("token")).toBeTruthy()
+      })
+      expect(screen.getByTestId("token").props.children).toBe("legacy-token")
+
+      // Keystore recovers; the user changes an unrelated setting.
+      mockSetActiveToken.mockResolvedValue(true)
+      mockSetActiveToken.mockClear()
+      await act(async () => {
+        fireEvent.press(screen.getByTestId("update-other-btn"))
+      })
+
+      // The save must retry the keychain write (the ref was seeded "" on the
+      // failed adoption, so the token no longer matches it)…
+      await waitFor(() => {
+        expect(mockSetActiveToken).toHaveBeenCalledWith("legacy-token")
+      })
+      // …while the blob it writes stays token-free.
+      const lastBlob = mockSaveJson.mock.calls[mockSaveJson.mock.calls.length - 1][1]
+      expect(lastBlob).not.toHaveProperty("galoyAuthToken")
+    })
+
+    it("reports but survives a saveJson failure during the boot-time blob scrub", async () => {
+      mockLoadJson.mockResolvedValue(legacyBlob)
+      mockSaveJson.mockRejectedValueOnce(new Error("disk full"))
+
+      render(
+        <PersistentStateProvider>
+          <TestConsumer />
+        </PersistentStateProvider>,
+      )
+
+      await waitFor(() => {
+        expect(screen.getByTestId("token")).toBeTruthy()
+      })
+
+      // The adoption itself succeeded, so the session is live…
+      expect(screen.getByTestId("token").props.children).toBe("legacy-token")
+      // …and the failed scrub write was surfaced, not swallowed.
+      expect(mockRecordError).toHaveBeenCalledTimes(1)
+      expect(mockRecordError.mock.calls[0][0].message).toBe("disk full")
+    })
+
     it("prefers the keychain token over a stale blob token and still scrubs the blob", async () => {
       mockLoadJson.mockResolvedValue(legacyBlob)
       mockGetActiveToken.mockResolvedValue("keychain-token")

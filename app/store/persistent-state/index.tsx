@@ -71,7 +71,15 @@ const scrubQuarantinedTokens = async (): Promise<void> => {
   }
 }
 
-export const loadPersistentState = async (): Promise<PersistentState> => {
+type LoadedPersistentState = {
+  state: PersistentState
+  // What the keychain durably holds after load. The provider seeds its
+  // dirty-check ref from this, so a failed adoption ("") makes the first
+  // save retry the keychain write instead of skipping it.
+  persistedToken: string
+}
+
+export const loadPersistentState = async (): Promise<LoadedPersistentState> => {
   // Fire-and-forget: quarantine hygiene must never delay app boot.
   scrubQuarantinedTokens().catch(() => {})
   const data = await loadJson(PERSISTENT_STATE_KEY)
@@ -83,12 +91,13 @@ export const loadPersistentState = async (): Promise<PersistentState> => {
       // Blobs written before the token moved to the keychain still carry it;
       // post-scrub blobs don't, and migrations just spread the field through.
       const blobToken = result.state.galoyAuthToken ?? ""
+      // The keychain is the source of truth once populated; the blob copy is
+      // only adopted while the keychain slot is empty.
+      let adopted = Boolean(keychainToken)
       if (blobToken) {
-        // The keychain is the source of truth once populated; the blob copy is
-        // only adopted while the keychain slot is empty.
-        const adopted = keychainToken
-          ? true
-          : await KeyStoreWrapper.setActiveToken(blobToken)
+        if (!adopted) {
+          adopted = await KeyStoreWrapper.setActiveToken(blobToken)
+        }
         if (adopted) {
           const { galoyAuthToken: _, ...scrubbed } = result.state
           try {
@@ -103,17 +112,20 @@ export const loadPersistentState = async (): Promise<PersistentState> => {
           })
         }
       }
-      return { ...result.state, galoyAuthToken: keychainToken || blobToken }
+      return {
+        state: { ...result.state, galoyAuthToken: keychainToken || blobToken },
+        persistedToken: keychainToken || (adopted ? blobToken : ""),
+      }
     }
     case MigrationStatus.NoData:
       // The iOS keychain survives uninstall; without this, a reinstall would
       // silently resurrect the previous session.
       await KeyStoreWrapper.removeActiveToken()
-      return defaultPersistentState
+      return { state: defaultPersistentState, persistedToken: "" }
     case MigrationStatus.Failed:
       recordAppError(result.error, { alwaysRecord: true })
       await quarantineRawState(result.rawData)
-      return defaultPersistentState
+      return { state: defaultPersistentState, persistedToken: "" }
   }
 }
 
@@ -173,8 +185,8 @@ export const PersistentStateProvider: React.FC<PropsWithChildren> = ({ children 
 
   React.useEffect(() => {
     ;(async () => {
-      const loadedState = await loadPersistentState()
-      lastPersistedTokenRef.current = loadedState.galoyAuthToken
+      const { state: loadedState, persistedToken } = await loadPersistentState()
+      lastPersistedTokenRef.current = persistedToken
       setPersistentState(loadedState)
     })()
   }, [])
