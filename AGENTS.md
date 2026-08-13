@@ -44,6 +44,17 @@ knows from the start whether staging login is possible or the stub-harness
 route is the plan. The OTP value itself belongs in the machine's `.env.local`
 (loaded by `.envrc` via direnv), never in the repo.
 
+The Blink-specific *procedures* — logging in against staging with the global
+OTP, switching a fresh install off the Main (production) instance, and the
+golden-simulator provisioning recipe — live in the `blink-staging-session`
+skill, not in the app-agnostic ones. One repo-specific gotcha worth repeating
+here because it bites native builds in demo worktrees:
+`yarn install --ignore-scripts` (the fast path for Metro-only work) skips two
+postinstalls a native build needs — run `npx install-skia` and
+`node_modules/@breeztech/breez-sdk-spark-react-native/scripts/postinstall.sh`
+before `pod install`, or the build fails at link on missing Skia/Breez
+binaries.
+
 ## Critical Rules (Always Apply)
 - `app/graphql/generated.ts` is AUTO-GENERATED - never modify manually
 - Payment mutations must NOT have retry logic (handled specially in client.tsx)

@@ -1,0 +1,42 @@
+# SMS login against Staging with the global OTP.
+# Route: GetStarted -> Log in / Restore -> Custodial -> Choose method ->
+# Use SMS -> phone digits -> Send via SMS -> OTP.
+#
+# PHONE and OTP arrive as Maestro env vars from staging-login.sh - the OTP
+# value must never appear literally in this file (the repo is public).
+# Coordinate taps: collapsed accessibility tree; portrait 16-Pro-class.
+appId: ${APP_ID}
+---
+- launchApp
+- waitForAnimationToEnd:
+    timeout: 10000
+- tapOn:
+    point: "50%,92%"
+- waitForAnimationToEnd:
+    timeout: 4000
+- tapOn:
+    point: "25%,29%"
+- waitForAnimationToEnd:
+    timeout: 2000
+- tapOn:
+    point: "50%,91%"
+- waitForAnimationToEnd:
+    timeout: 4000
+- tapOn:
+    point: "50%,89%"
+- waitForAnimationToEnd:
+    timeout: 4000
+- tapOn:
+    point: "50%,26%"
+- inputText: ${PHONE}
+- waitForAnimationToEnd:
+    timeout: 2000
+- tapOn:
+    point: "50%,56%"
+- waitForAnimationToEnd:
+    timeout: 8000
+- tapOn:
+    point: "50%,29%"
+- inputText: ${OTP}
+- waitForAnimationToEnd:
+    timeout: 15000
