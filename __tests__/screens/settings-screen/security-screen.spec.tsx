@@ -1,4 +1,5 @@
 import React from "react"
+import { Alert, AlertButton } from "react-native"
 import { act, fireEvent, render, waitFor } from "@testing-library/react-native"
 import { ThemeProvider } from "@rn-vui/themed"
 
@@ -14,6 +15,8 @@ const mockSettingsData = jest.fn()
 const mockUseFocusEffect = jest.fn()
 const mockGetIsBiometricsEnabled = jest.fn()
 const mockGetIsPinEnabled = jest.fn()
+const mockEmailDelete = jest.fn()
+const mockRegistrationInitiate = jest.fn()
 
 jest.mock("@app/hooks/use-account-registry", () => ({
   useAccountRegistry: () => ({ activeAccount: mockActiveAccount() }),
@@ -27,6 +30,11 @@ jest.mock("@app/self-custodial/providers/backup-state", () => ({
 jest.mock("@app/graphql/generated", () => ({
   useHideBalanceQuery: () => ({ data: { hideBalance: false } }),
   useSettingsScreenQuery: () => ({ data: mockSettingsData() }),
+  useUserEmailDeleteMutation: () => [mockEmailDelete, { loading: false }],
+  useUserEmailRegistrationInitiateMutation: () => [
+    mockRegistrationInitiate,
+    { loading: false },
+  ],
 }))
 
 jest.mock("@app/graphql/is-authed-context", () => ({
@@ -39,6 +47,7 @@ jest.mock("@app/graphql/level-context", () => ({
 
 jest.mock("@apollo/client", () => ({
   useApolloClient: () => ({}),
+  gql: () => undefined,
 }))
 
 jest.mock("@app/graphql/client-only-query", () => ({
@@ -69,6 +78,7 @@ jest.mock("@app/utils/storage/secureStorage", () => ({
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
   useFocusEffect: (callback: () => void) => mockUseFocusEffect(callback),
+  useNavigation: () => ({ navigate: mockNavigate }),
 }))
 
 jest.mock("@app/components/screen", () => ({
@@ -81,6 +91,14 @@ jest.mock("@app/i18n/i18n-react", () => ({
     LL: {
       AuthenticationScreen: {
         setUpAuthenticationDescription: () => "Set up authentication",
+      },
+      AccountScreen: {
+        emailUnverified: () => "Email not verified",
+        emailUnverifiedContent: () => "Send the code again?",
+      },
+      common: {
+        cancel: () => "Cancel",
+        ok: () => "OK",
       },
       SecurityScreen: {
         biometricTitle: () => "Biometric",
@@ -126,6 +144,13 @@ const renderScreen = () => render(screenElement())
 const focusCallbacks = (): (() => void)[] =>
   mockUseFocusEffect.mock.calls.map(([callback]) => callback)
 
+const pressAlertButton = async (label: string) => {
+  const [, , buttons] = jest.mocked(Alert.alert).mock.calls[0]
+  const button = (buttons as AlertButton[]).find(({ text }) => text === label)
+
+  await button?.onPress?.()
+}
+
 describe("SecurityScreen security score card", () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -137,6 +162,16 @@ describe("SecurityScreen security score card", () => {
     })
     mockGetIsBiometricsEnabled.mockResolvedValue(false)
     mockGetIsPinEnabled.mockResolvedValue(false)
+    mockEmailDelete.mockResolvedValue({ data: {} })
+    mockRegistrationInitiate.mockResolvedValue({
+      data: {
+        userEmailRegistrationInitiate: {
+          errors: [],
+          emailRegistrationId: "registration-id",
+        },
+      },
+    })
+    jest.spyOn(Alert, "alert").mockImplementation(() => {})
   })
 
   it("shows the card for a self-custodial account", () => {
@@ -200,6 +235,50 @@ describe("SecurityScreen security score card", () => {
     fireEvent.press(getByTestId("security-score-emailVerified"))
 
     expect(mockNavigate).toHaveBeenCalledWith("emailRegistrationInitiate")
+  })
+
+  /** Registration is refused while the account already holds an address, so the
+   *  card can't send this user through the sign-up screen (#4076 review). */
+  it("re-verifies instead of registering when the address is already on the account", () => {
+    mockActiveAccount.mockReturnValue({ type: AccountType.Custodial })
+    mockSettingsData.mockReturnValue({
+      me: {
+        totpEnabled: false,
+        email: { address: "someone@example.com", verified: false },
+      },
+    })
+
+    const { getByTestId } = renderScreen()
+    fireEvent.press(getByTestId("security-score-emailVerified"))
+
+    expect(Alert.alert).toHaveBeenCalledWith(
+      "Email not verified",
+      "Send the code again?",
+      expect.any(Array),
+    )
+    expect(mockNavigate).not.toHaveBeenCalledWith("emailRegistrationInitiate")
+  })
+
+  it("takes the confirmed re-verification to the code screen", async () => {
+    mockActiveAccount.mockReturnValue({ type: AccountType.Custodial })
+    mockSettingsData.mockReturnValue({
+      me: {
+        totpEnabled: false,
+        email: { address: "someone@example.com", verified: false },
+      },
+    })
+
+    const { getByTestId } = renderScreen()
+    fireEvent.press(getByTestId("security-score-emailVerified"))
+    await act(async () => {
+      await pressAlertButton("OK")
+    })
+
+    expect(mockEmailDelete).toHaveBeenCalledWith({ fetchPolicy: "no-cache" })
+    expect(mockNavigate).toHaveBeenCalledWith("emailRegistrationValidate", {
+      email: "someone@example.com",
+      emailRegistrationId: "registration-id",
+    })
   })
 
   it("routes the cloud-backup signal straight to the cloud backup screen", () => {

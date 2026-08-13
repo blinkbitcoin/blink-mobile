@@ -11,9 +11,11 @@ import { makeStyles, ListItem } from "@rn-vui/themed"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { SecurityScoreCard } from "@app/components/security-score-card"
+import { useEmailReverification } from "@app/hooks/use-email-reverification"
 import { useSecurityScore } from "@app/hooks/use-security-score"
 import type { SecuritySignalKey } from "@app/types/security-score"
 import { Screen } from "../../components/screen"
+import { useLoginMethods } from "./account/login-methods-hook"
 import {
   saveHiddenBalanceToolTip,
   saveHideBalance,
@@ -123,6 +125,20 @@ export const SecurityScreen: React.FC<Props> = ({ route, navigation }) => {
 
   const securityScore = useSecurityScore({ isBiometricsEnabled, isPinEnabled })
 
+  const { email, emailVerified } = useLoginMethods()
+  const { promptReverification } = useEmailReverification()
+
+  /** Registration can't be initiated while the account already holds an address,
+   *  so an unverified one goes through delete-and-set-again instead — the same
+   *  route the account settings row takes for this state. */
+  const onEmailSignalPress = useCallback(() => {
+    if (email && !emailVerified) {
+      promptReverification(email)
+      return
+    }
+    navigation.navigate("emailRegistrationInitiate")
+  }, [email, emailVerified, promptReverification, navigation])
+
   /** The card stays dumb; the screen owns what each "Set" does. Backup rows
    *  remain tappable after completion so the flow is always re-runnable (#3828).
    *  A Record (not a switch) so adding a signal without an action fails to compile. */
@@ -133,9 +149,9 @@ export const SecurityScreen: React.FC<Props> = ({ route, navigation }) => {
       appLock: () => onBiometricsValueChanged(true),
       hideBalance: () => onHideBalanceValueChanged(true),
       twoFactor: () => navigation.navigate("totpRegistrationInitiate"),
-      emailVerified: () => navigation.navigate("emailRegistrationInitiate"),
+      emailVerified: onEmailSignalPress,
     }),
-    [navigation, onBiometricsValueChanged, onHideBalanceValueChanged],
+    [navigation, onBiometricsValueChanged, onHideBalanceValueChanged, onEmailSignalPress],
   )
 
   const onSignalPress = useCallback(
