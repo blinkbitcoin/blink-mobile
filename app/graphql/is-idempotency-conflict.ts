@@ -1,4 +1,4 @@
-import { ApolloError } from "@apollo/client"
+import { statusCodeOf } from "./transport-error"
 
 const CONFLICT_STATUS = 409
 
@@ -9,11 +9,6 @@ const CONFLICT_STATUS = 409
  * text like "409 sats" can never match.
  */
 const CONFLICT_MESSAGE_PATTERN = /409:?\s*conflict|idempotency key already exist/i
-
-const statusCodeOf = (candidate: unknown): number | undefined =>
-  candidate && typeof candidate === "object" && "statusCode" in candidate
-    ? (candidate as { statusCode?: number }).statusCode
-    : undefined
 
 /**
  * Whether an error thrown by a payment mutation is the server rejecting a replay of an
@@ -26,9 +21,6 @@ const statusCodeOf = (candidate: unknown): number | undefined =>
 export const isIdempotencyConflict = (err: unknown): boolean => {
   if (!(err instanceof Error)) {
     return false
-  }
-  if (err instanceof ApolloError && statusCodeOf(err.networkError) === CONFLICT_STATUS) {
-    return true
   }
   if (statusCodeOf(err) === CONFLICT_STATUS) {
     return true

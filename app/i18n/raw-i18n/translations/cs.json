@@ -2235,6 +2235,22 @@
     "imageLibraryPermissionsNotGranted": "We don't have permissions to access the image library.  Please check app settings for your platform."
   },
   "SecurityScreen": {
+    "securityScore": {
+      "title": "Skóre zabezpečení {done: number}/{total: number}",
+      "levelLow": "nízké",
+      "levelMedium": "střední",
+      "levelHigh": "vysoké",
+      "set": "Nastavit",
+      "enabled": "Zapnuto",
+      "signals": {
+        "cloudBackup": "Cloudová záloha",
+        "manualBackup": "Ruční záloha",
+        "appLock": "Biometrie/PIN",
+        "hideBalance": "Skrýt zůstatek",
+        "twoFactor": "Dvoufaktorové ověření (2FA)",
+        "emailVerified": "Ověřený e-mail"
+      }
+    },
     "title": "Zabezpečení a soukromí",
     "biometricDescription": "Odemykání pomocí otisku prstu nebo rozpoznání obličeje.",
     "biometricTitle": "Biometrické údaje",
@@ -3716,6 +3732,7 @@
         "body": "Nebojte se — vaše prostředky jsou v bezpečí. Migrace může trvat několik minut a někdy stačí, aby jeden krok začal znovu.\n\nSpusťte migraci od začátku — zabere to jen chvíli.\n\nVidíte tuto obrazovku i nadále? Obraťte se na podporu a sdílejte údaje níže:",
         "contactSupportCta": "Kontaktovat podporu"
       },
+      "closeRefusedBody": "Vaše migrace je dokončena a vaše prostředky jsou v nové peněžence. Váš starý účet může být stále otevřený. Podpora to ověří a v případě potřeby jej zavře.\n\nTyto informace mohou podpoře pomoci vyřešit váš případ:",
       "reasonLabel": "Důvod",
       "accountIdLabel": "ID účtu",
       "pubKeyLabel": "pubKey",
@@ -3812,7 +3829,8 @@
     "clockOutOfSync": {
       "body": "Datum a čas vašeho zařízení nejsou synchronizované. Nastavte je na automatické, abyste mohli pokračovat.",
       "retryCta": "Zkusit znovu"
-    }
+    },
+    "closeUnavailable": "Vaše prostředky jsou v bezpečí v nové peněžence. Váš starý účet stále zavíráme, zkuste to prosím za chvíli znovu."
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Spravovaný",

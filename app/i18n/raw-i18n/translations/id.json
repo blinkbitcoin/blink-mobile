@@ -2235,6 +2235,22 @@
     "imageLibraryPermissionsNotGranted": "Kami tidak memiliki izin untuk mengakses pustaka gambar. Silakan periksa pengaturan aplikasi untuk platform Anda."
   },
   "SecurityScreen": {
+    "securityScore": {
+      "title": "Skor keamanan {done: number}/{total: number}",
+      "levelLow": "rendah",
+      "levelMedium": "sedang",
+      "levelHigh": "tinggi",
+      "set": "Atur",
+      "enabled": "Aktif",
+      "signals": {
+        "cloudBackup": "Cadangan cloud",
+        "manualBackup": "Cadangan manual",
+        "appLock": "Biometrik/PIN",
+        "hideBalance": "Sembunyikan saldo",
+        "twoFactor": "Autentikasi dua faktor (2FA)",
+        "emailVerified": "Email terverifikasi"
+      }
+    },
     "title": "Keamanan dan Privasi",
     "biometricDescription": "Buka dengan sidik jari atau pengenalan wajah.",
     "biometricTitle": "Biometrik",
@@ -3716,6 +3732,7 @@
         "body": "Jangan khawatir — dana Anda aman. Migrasi bisa memakan waktu beberapa menit, dan terkadang satu langkah hanya perlu dimulai ulang.\n\nMulai migrasi dari awal — hanya perlu sebentar.\n\nMasih melihat layar ini? Hubungi dukungan dan bagikan detail di bawah ini:",
         "contactSupportCta": "Hubungi dukungan"
       },
+      "closeRefusedBody": "Migrasi Anda selesai dan dana Anda ada di dompet baru Anda. Akun lama Anda mungkin masih terbuka. Tim dukungan akan memeriksanya dan menutupnya jika perlu.\n\nAnda mungkin memerlukan informasi ini untuk membantu dukungan menyelesaikan kasus Anda:",
       "reasonLabel": "Alasan",
       "accountIdLabel": "ID akun",
       "pubKeyLabel": "pubKey",
@@ -3812,7 +3829,8 @@
     "clockOutOfSync": {
       "body": "Tanggal dan waktu perangkat Anda tidak sinkron. Atur ke otomatis untuk melanjutkan.",
       "retryCta": "Coba lagi"
-    }
+    },
+    "closeUnavailable": "Dana Anda aman di dompet baru Anda. Kami masih menutup akun lama Anda, silakan coba lagi sebentar."
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Kustodian",

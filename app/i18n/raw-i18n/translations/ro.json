@@ -2235,6 +2235,22 @@
     "imageLibraryPermissionsNotGranted": "Nu avem permisiuni pentru a accesa biblioteca de imagini. Vă rugăm să verificați setările aplicației pentru platforma dvs."
   },
   "SecurityScreen": {
+    "securityScore": {
+      "title": "Scor de securitate {done: number}/{total: number}",
+      "levelLow": "scăzut",
+      "levelMedium": "mediu",
+      "levelHigh": "ridicat",
+      "set": "Configurează",
+      "enabled": "Activat",
+      "signals": {
+        "cloudBackup": "Copie de rezervă în cloud",
+        "manualBackup": "Copie de rezervă manuală",
+        "appLock": "Biometrie/PIN",
+        "hideBalance": "Ascunde soldul",
+        "twoFactor": "Autentificare cu doi factori (2FA)",
+        "emailVerified": "E-mail verificat"
+      }
+    },
     "title": "Securitate și Confidențialitate",
     "biometricDescription": "Deblocați cu amprentă sau recunoaștere facială.",
     "biometricTitle": "Biometric",
@@ -3716,6 +3732,7 @@
         "body": "Nu-ți face griji — fondurile tale sunt în siguranță. Migrarea poate dura câteva minute, iar uneori un pas are nevoie doar de un nou început.\n\nÎncepe migrarea de la capăt — durează doar o clipă.\n\nVezi în continuare acest ecran? Contactează suportul și trimite datele de mai jos:",
         "contactSupportCta": "Contactează suportul"
       },
+      "closeRefusedBody": "Migrarea ta este finalizată și fondurile tale sunt în noul tău portofel. Contul tău vechi ar putea fi încă deschis. Asistența va verifica și îl va închide dacă este cazul.\n\nS-ar putea să ai nevoie de aceste informații pentru ca suportul să îți rezolve cazul:",
       "reasonLabel": "Motiv",
       "accountIdLabel": "ID-ul contului",
       "pubKeyLabel": "pubKey",
@@ -3812,7 +3829,8 @@
     "clockOutOfSync": {
       "body": "Data și ora dispozitivului tău nu sunt sincronizate. Setează-le pe automat pentru a continua.",
       "retryCta": "Încearcă din nou"
-    }
+    },
+    "closeUnavailable": "Fondurile tale sunt în siguranță în noul portofel. Încă închidem contul tău vechi, te rugăm să încerci din nou într-un moment."
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Custodial",

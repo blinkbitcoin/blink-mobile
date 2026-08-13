@@ -2235,6 +2235,22 @@
     "imageLibraryPermissionsNotGranted": "We don't have permissions to access the image library.  Please check app settings for your platform."
   },
   "SecurityScreen": {
+    "securityScore": {
+      "title": "Оцена безбедности {done: number}/{total: number}",
+      "levelLow": "ниска",
+      "levelMedium": "средња",
+      "levelHigh": "висока",
+      "set": "Подеси",
+      "enabled": "Укључено",
+      "signals": {
+        "cloudBackup": "Резервна копија у облаку",
+        "manualBackup": "Ручна резервна копија",
+        "appLock": "Биометрија/PIN",
+        "hideBalance": "Сакриј стање",
+        "twoFactor": "Двофакторска аутентификација (2FA)",
+        "emailVerified": "Потврђена имејл адреса"
+      }
+    },
     "title": "Безбедност и приватност",
     "biometricDescription": "Откључајте отиском прста или препознавањем лица.",
     "biometricTitle": "Биометријски",
@@ -3716,6 +3732,7 @@
         "body": "Не брините — ваша средства су безбедна. Миграција може да потраје неколико минута, а понекад је кораку довољан нов почетак.\n\nЗапочните миграцију изнова — потрајаће само тренутак.\n\nДа ли и даље видите овај екран? Обратите се подршци и поделите податке испод:",
         "contactSupportCta": "Контактирајте подршку"
       },
+      "closeRefusedBody": "Ваша миграција је завршена и ваша средства су у новом новчанику. Ваш стари налог можда је још увек отворен. Подршка ће то проверити и затворити га ако јесте.\n\nОве информације могу помоћи подршци да реши ваш случај:",
       "reasonLabel": "Разлог",
       "accountIdLabel": "ID налога",
       "pubKeyLabel": "pubKey",
@@ -3812,7 +3829,8 @@
     "clockOutOfSync": {
       "body": "Датум и време вашег уређаја нису усклађени. Подесите их на аутоматски да бисте наставили.",
       "retryCta": "Покушај поново"
-    }
+    },
+    "closeUnavailable": "Ваша средства су безбедна у вашем новом новчанику. Још увек затварамо ваш стари налог, покушајте поново за тренутак."
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Под старатељством",

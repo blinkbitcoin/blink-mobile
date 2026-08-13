@@ -2235,6 +2235,22 @@
     "imageLibraryPermissionsNotGranted": "Resim arşivinize erişimimiz yok. Lütfen uygulama ayarlarını kontrol edin."
   },
   "SecurityScreen": {
+    "securityScore": {
+      "title": "Güvenlik puanı {done: number}/{total: number}",
+      "levelLow": "düşük",
+      "levelMedium": "orta",
+      "levelHigh": "yüksek",
+      "set": "Ayarla",
+      "enabled": "Etkin",
+      "signals": {
+        "cloudBackup": "Bulut yedekleme",
+        "manualBackup": "Manuel yedekleme",
+        "appLock": "Biyometri/PIN",
+        "hideBalance": "Bakiyeyi gizle",
+        "twoFactor": "İki faktörlü kimlik doğrulama (2FA)",
+        "emailVerified": "Doğrulanmış e-posta"
+      }
+    },
     "title": "Güvenlik ve Gizlilik",
     "biometricDescription": "Parmak izi veya yüz tanıma kullanarak kilidi aç. ",
     "biometricTitle": "Biyometrik",
@@ -3716,6 +3732,7 @@
         "body": "Endişelenmeyin — paranız güvende. Taşıma birkaç dakika sürebilir ve bazen bir adımın yalnızca yeniden başlaması yeterlidir.\n\nTaşımayı baştan başlatın — yalnızca birkaç saniye sürer.\n\nBu ekranı hâlâ görüyor musunuz? Destek ile iletişime geçin ve aşağıdaki bilgileri paylaşın:",
         "contactSupportCta": "Destek ile iletişime geçin"
       },
+      "closeRefusedBody": "Taşıma işleminiz tamamlandı ve bakiyeniz yeni cüzdanınızda. Eski hesabınız hâlâ açık olabilir. Destek ekibi kontrol edip gerekirse kapatacak.\n\nDesteğin durumunuzu çözmesine yardımcı olmak için bu bilgilere ihtiyacınız olabilir:",
       "reasonLabel": "Neden",
       "accountIdLabel": "Hesap kimliği",
       "pubKeyLabel": "pubKey",
@@ -3812,7 +3829,8 @@
     "clockOutOfSync": {
       "body": "Cihazının tarih ve saati eşitlenmemiş. Devam etmek için otomatik olarak ayarla.",
       "retryCta": "Tekrar dene"
-    }
+    },
+    "closeUnavailable": "Paranız yeni cüzdanınızda güvende. Eski hesabınızı hâlâ kapatıyoruz, lütfen birazdan tekrar deneyin."
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Emanetli",

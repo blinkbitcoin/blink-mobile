@@ -237,6 +237,9 @@ export type RootStackParamList = {
   accountMigrationContactSupport: {
     reason: MigrationSupportReason
     origin?: MigrationSupportOrigin
+    /** Named by a handover raised after the session was discarded, when the live `me` query
+     *  can no longer answer for the custodial account the ticket is about. */
+    custodialAccountId?: string
   }
   selfCustodialRestorePhrase: { step: PhraseStep; words?: string[] }
   selfCustodialRestoreMethod: undefined

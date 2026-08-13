@@ -2235,6 +2235,22 @@
     "imageLibraryPermissionsNotGranted": "Nincs engedélyünk a képek könyvtár eléréséhez. Kérjük, ellenőrizd az alkalmazás-beállításokat a készülékeden."
   },
   "SecurityScreen": {
+    "securityScore": {
+      "title": "Biztonsági pontszám {done: number}/{total: number}",
+      "levelLow": "alacsony",
+      "levelMedium": "közepes",
+      "levelHigh": "magas",
+      "set": "Beállítás",
+      "enabled": "Bekapcsolva",
+      "signals": {
+        "cloudBackup": "Felhőalapú biztonsági mentés",
+        "manualBackup": "Kézi biztonsági mentés",
+        "appLock": "Biometria/PIN",
+        "hideBalance": "Egyenleg elrejtése",
+        "twoFactor": "Kétfaktoros hitelesítés (2FA)",
+        "emailVerified": "Megerősített e-mail"
+      }
+    },
     "title": "Biztonság és adatvédelem",
     "biometricDescription": "Feloldás ujjlenyomat vagy arcfelismerés segítségével.",
     "biometricTitle": "Biometrikus",
@@ -3716,6 +3732,7 @@
         "body": "Ne aggódjon — a pénze biztonságban van. Az átköltözés eltarthat néhány percig, és néha egy lépésnek csak új kezdésre van szüksége.\n\nIndítsa el az átköltözést elölről — csak egy pillanatig tart.\n\nTovábbra is ezt a képernyőt látja? Forduljon az ügyfélszolgálathoz, és ossza meg az alábbi adatokat:",
         "contactSupportCta": "Kapcsolatfelvétel az ügyfélszolgálattal"
       },
+      "closeRefusedBody": "A migrációja befejeződött, és az egyenlege az új tárcájában van. Lehet, hogy a régi fiókja még nyitva van. Az ügyfélszolgálat ellenőrzi, és szükség esetén lezárja.\n\nEzekre az adatokra szüksége lehet, hogy az ügyfélszolgálat megoldja az esetét:",
       "reasonLabel": "Ok",
       "accountIdLabel": "Fiókazonosító",
       "pubKeyLabel": "pubKey",
@@ -3812,7 +3829,8 @@
     "clockOutOfSync": {
       "body": "Az eszközöd dátuma és ideje nincs szinkronban. Állítsd automatikusra a folytatáshoz.",
       "retryCta": "Próbáld újra"
-    }
+    },
+    "closeUnavailable": "A pénzed biztonságban van az új tárcádban. Még zárjuk a régi fiókodat, kérjük, próbáld újra egy pillanat múlva."
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Letéti",

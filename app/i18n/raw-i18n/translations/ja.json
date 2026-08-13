@@ -2235,6 +2235,22 @@
         "imageLibraryPermissionsNotGranted": "画像ライブラリにアクセスする権限がありません。 アプリの設定を確認してください。"
     },
     "SecurityScreen": {
+        "securityScore": {
+            "title": "セキュリティスコア {done: number}/{total: number}",
+            "levelLow": "低",
+            "levelMedium": "中",
+            "levelHigh": "高",
+            "set": "設定",
+            "enabled": "有効",
+            "signals": {
+                "cloudBackup": "クラウドバックアップ",
+                "manualBackup": "手動バックアップ",
+                "appLock": "生体認証/PIN",
+                "hideBalance": "残高を非表示",
+                "twoFactor": "二要素認証（2FA）",
+                "emailVerified": "確認済みメールアドレス"
+            }
+        },
         "title": "セキュリティとプライバシー",
         "biometricDescription": "指紋認証または顔認証でロックを解除する。",
         "biometricTitle": "生体認証",
@@ -3716,6 +3732,7 @@
                 "body": "ご安心ください — 資金は安全です。移行には数分かかることがあり、ステップをやり直すだけで解決する場合もあります。\n\n移行を最初からやり直してください。すぐに終わります。\n\nまだこの画面が表示されますか？サポートにお問い合わせのうえ、以下の情報をお伝えください：",
                 "contactSupportCta": "サポートに連絡"
             },
+            "closeRefusedBody": "移行が完了し、資金は新しいウォレットに入っています。古いアカウントはまだ開いている可能性があります。サポートが確認し、必要であれば閉鎖します。\n\nサポートが問題を解決するために、次の情報が必要になる場合があります：",
             "reasonLabel": "理由",
             "accountIdLabel": "アカウントID",
             "pubKeyLabel": "pubKey",
@@ -3812,7 +3829,8 @@
         "clockOutOfSync": {
             "body": "デバイスの日付と時刻がずれています。続けるには自動設定にしてください。",
             "retryCta": "再試行"
-        }
+        },
+        "closeUnavailable": "資金は新しいウォレットで安全に保管されています。以前のアカウントをまだ閉鎖しています。少し経ってからもう一度お試しください。"
     },
     "AccountTypeSelectionScreen": {
         "custodialLabel": "カストディアル",

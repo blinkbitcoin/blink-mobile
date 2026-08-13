@@ -1,12 +1,9 @@
 import React from "react"
 import { Alert } from "react-native"
 
-import { gql } from "@apollo/client"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
-import {
-  useUserEmailDeleteMutation,
-  useUserEmailRegistrationInitiateMutation,
-} from "@app/graphql/generated"
+import { useUserEmailDeleteMutation } from "@app/graphql/generated"
+import { useEmailReverification } from "@app/hooks/use-email-reverification"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { TranslationFunctions } from "@app/i18n/i18n-types"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -18,41 +15,6 @@ import { useTheme } from "@rn-vui/themed"
 import { SettingsRow } from "../../row"
 import { useLoginMethods } from "../login-methods-hook"
 import { useSaveSessionProfile } from "@app/hooks/use-save-session-profile"
-
-gql`
-  mutation userEmailDelete {
-    userEmailDelete {
-      errors {
-        message
-      }
-      me {
-        id
-        phone
-        totpEnabled
-        email {
-          address
-          verified
-        }
-      }
-    }
-  }
-
-  mutation userEmailRegistrationInitiate($input: UserEmailRegistrationInitiateInput!) {
-    userEmailRegistrationInitiate(input: $input) {
-      errors {
-        message
-      }
-      emailRegistrationId
-      me {
-        id
-        email {
-          address
-          verified
-        }
-      }
-    }
-  }
-`
 
 const title = (
   email: string | undefined,
@@ -78,8 +40,7 @@ export const EmailSetting: React.FC = () => {
   const { updateCurrentProfile } = useSaveSessionProfile()
 
   const [emailDeleteMutation, { loading: emDelLoading }] = useUserEmailDeleteMutation()
-  const [setEmailMutation, { loading: emRegLoading }] =
-    useUserEmailRegistrationInitiateMutation()
+  const { promptReverification, spinner: reverifying } = useEmailReverification()
 
   const deleteEmail = async () => {
     try {
@@ -111,53 +72,6 @@ export const EmailSetting: React.FC = () => {
     )
   }
 
-  const tryConfirmEmailAgain = async (email: string) => {
-    try {
-      await emailDeleteMutation({
-        // to avoid flacky behavior
-        // this could lead to inconsistent state if delete works but set fails
-        fetchPolicy: "no-cache",
-      })
-
-      const { data } = await setEmailMutation({
-        variables: { input: { email } },
-      })
-
-      const errors = data?.userEmailRegistrationInitiate.errors
-      if (errors && errors.length > 0) {
-        Alert.alert(errors[0].message)
-      }
-
-      const emailRegistrationId = data?.userEmailRegistrationInitiate.emailRegistrationId
-
-      if (emailRegistrationId) {
-        navigate("emailRegistrationValidate", {
-          emailRegistrationId,
-          email,
-        })
-      } else {
-        console.warn("no flow returned")
-      }
-    } catch (err) {
-      console.error(err, "error in setEmailMutation")
-    }
-  }
-
-  const reVerifyEmailPrompt = () => {
-    if (!email) return
-    Alert.alert(
-      LL.AccountScreen.emailUnverified(),
-      LL.AccountScreen.emailUnverifiedContent(),
-      [
-        { text: LL.common.cancel(), onPress: () => {} },
-        {
-          text: LL.common.ok(),
-          onPress: () => tryConfirmEmailAgain(email),
-        },
-      ],
-    )
-  }
-
   const rightIconAction = email
     ? () => {
         if (emailVerified) {
@@ -166,7 +80,7 @@ export const EmailSetting: React.FC = () => {
           }
           return
         }
-        reVerifyEmailPrompt()
+        promptReverification(email)
       }
     : undefined
 
@@ -183,7 +97,7 @@ export const EmailSetting: React.FC = () => {
   return (
     <SettingsRow
       loading={loading}
-      spinner={emDelLoading || emRegLoading}
+      spinner={emDelLoading || reverifying}
       title={title(email, emailVerified, LL)}
       leftGaloyIcon="email-add"
       action={email ? null : () => navigate("emailRegistrationInitiate")}

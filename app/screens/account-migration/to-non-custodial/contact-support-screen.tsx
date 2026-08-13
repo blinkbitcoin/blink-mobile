@@ -79,8 +79,17 @@ export const MigrationContactSupportScreen: React.FC = () => {
    *  a named fallback keeps the ticket meaningful instead of crashing on a missing param. */
   const reason = params?.reason ?? MigrationSupportReason.Unknown
   const isSelfHelp = RESTART_RESOLVABLE_REASONS.has(reason)
-  const { cardDetails, supportDetailsText, sendSupportEmail } =
-    useMigrationSupportEmail(reason)
+  const { cardDetails, supportDetailsText, sendSupportEmail } = useMigrationSupportEmail(
+    reason,
+    params?.custodialAccountId,
+  )
+
+  /** The migration succeeded here, so the generic "something went wrong" would contradict
+   *  the success the user was just shown: only the old account is left to close. */
+  const isCloseRefused = reason === MigrationSupportReason.CustodialAccountCloseRefused
+  const supportFirstBody = isCloseRefused
+    ? LLSupport.closeRefusedBody()
+    : LLSupport.body()
 
   /**
    * Back depends on where support was opened from. Mid-migration the commit point (Step 8)
@@ -100,7 +109,11 @@ export const MigrationContactSupportScreen: React.FC = () => {
    *  mounted underneath watching for the receive, and navigating to the commit screen
    *  would pop it off the stack, taking the gate the user is waiting on with it. */
   const isReceiveDelayedOrigin = params?.origin === MigrationSupportOrigin.ReceiveDelayed
-  const isBackToScreenBeneath = isResumeOrigin || isReceiveDelayedOrigin
+  /** The commit path resets Home underneath before handing over, so it backs out the same
+   *  way rather than to a commit screen the migration has already left behind. */
+  const isCloseRefusedOrigin = params?.origin === MigrationSupportOrigin.CloseRefused
+  const isBackToScreenBeneath =
+    isResumeOrigin || isReceiveDelayedOrigin || isCloseRefusedOrigin
   const isBackToCommitScreen = !isGateOrigin && !isBackToScreenBeneath
   const handleBack = useCallback(() => {
     if (isGateOrigin) return
@@ -209,7 +222,7 @@ export const MigrationContactSupportScreen: React.FC = () => {
     : {
         icon: "headset",
         title: LLSupport.title(),
-        body: LLSupport.body(),
+        body: supportFirstBody,
         primary: {
           title: LLSupport.contactUsCta(),
           onPress: sendSupportEmail,
