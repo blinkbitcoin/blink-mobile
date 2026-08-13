@@ -440,8 +440,16 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
       }
     })
 
+  /**
+   * Held while the quote is out, because the high-fee warning is judged by the fee the
+   * selector quoted: leaving before it lands is leaving without the warning. The fee this
+   * screen probed on mount used to stand in for it, which the picked tier's own fee replaced.
+   */
   const isNextDisabled =
-    !goToNextScreen || !amountStatus.validAmount || isFeeTierErrorBlocking
+    !goToNextScreen ||
+    !amountStatus.validAmount ||
+    isFeeTierErrorBlocking ||
+    isQuotingFees
 
   /**
    * The extra-info box shows one message, and an invalid amount is the one the sender can
