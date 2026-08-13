@@ -28,7 +28,10 @@ export DEMO_APP_ID_ANDROID=com.example.androidapp
 # Redirecting the registry keeps every test span inside $WORK (telemetry
 # derives its store from it).
 export DEMO_SIM_REGISTRY="$WORK/registry"
-unset DEMO_PORT DEMO_SESSION_DIR DEMO_SKIP_WARMUP 2>/dev/null || true
+# A shell with a live claimed session exports DEMO_UDID etc.; inherited, they
+# flip the host-OS platform default and every android test silently records
+# via simctl. The suite trusts only what each test sets explicitly.
+unset DEMO_PORT DEMO_SESSION_DIR DEMO_SKIP_WARMUP DEMO_UDID DEMO_ANDROID_SERIAL DEMO_HOST_OS 2>/dev/null || true
 
 printf 'DEMO-UDID|rn-demo-pr3712|Booted\n' > "$FAKE_DEVICES"
 printf 'emulator-5554|rn-demo-pr3712-avd|device\n' > "$FAKE_ADB_DEVICES"
@@ -387,6 +390,16 @@ DEMO_SESSION_DIR="$WSESS" DEMO_UDID=DEMO-UDID \
 check "a maestro upgrade voids the baked driver - warmup runs" "1" \
   "$(grep -c "_warmup.yaml" "$FAKE_ARGS_LOG")"
 
+# The version gate itself costs a ~3s JVM start, so it is cached per session.
+reset_logs; rm -rf "$WSESS"; mkdir -p "$WSESS"
+echo "maestro-version=2.6.1" > "$WSESS/golden-stamp"
+DEMO_SESSION_DIR="$WSESS" DEMO_UDID=DEMO-UDID \
+  "$SCRIPTS/record-flow.sh" warm6 "$WORK/flow.yaml" "$WORK/out" >/dev/null 2>&1
+DEMO_SESSION_DIR="$WSESS" DEMO_UDID=DEMO-UDID \
+  "$SCRIPTS/record-flow.sh" warm7 "$WORK/flow.yaml" "$WORK/out" >/dev/null 2>&1
+check "the maestro version probe runs once per session, not per recording" "1" \
+  "$(grep -c "maestro --version" "$FAKE_ARGS_LOG")"
+
 reset_logs; rm -rf "$WSESS"; mkdir -p "$WSESS"
 DEMO_SKIP_WARMUP=1 DEMO_SESSION_DIR="$WSESS" DEMO_UDID=DEMO-UDID \
   "$SCRIPTS/record-flow.sh" warm5 "$WORK/flow.yaml" "$WORK/out" >/dev/null 2>&1
@@ -436,6 +449,11 @@ check "SKILL.md warns clearState wipes the persisted redirect" "yes" \
   "$(grep -i "clearState" "$SKILL_MD" | grep -qi "redirect\|RCT_jsLocation\|8081" && echo yes || echo no)"
 check "SKILL.md before/after section uses the reload flip for JS-only changes" "yes" \
   "$(grep -q "reload-app.sh" "$SKILL_MD" && echo yes || echo no)"
+# Real maestro (2.6.1) fails an entire flow at parse time if anything but
+# YAML precedes the header - and warmup output is discarded, so the failure
+# is silent. The fake maestro never parses YAML, hence this static gate.
+check "the warmup flow starts with YAML, not prose (maestro parse-fails on >)" "yes" \
+  "$(head -1 "$TESTS_DIR/../flows/_warmup.yaml" | grep -qE '^(#|appId:)' && echo yes || echo no)"
 check "SKILL.md teaches the launchApp arguments form" "yes" \
   "$(grep -q "RCT_jsLocation" "$SKILL_MD" && echo yes || echo no)"
 check "SKILL.md requires eyeballing extracted frames before publishing" "yes" \

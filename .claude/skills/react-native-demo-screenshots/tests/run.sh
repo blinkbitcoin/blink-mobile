@@ -23,6 +23,10 @@ export SHOT_SETTLE=0.05
 # keeps every test span inside $WORK - the same isolation trick the simulator
 # suite uses for session state.
 export DEMO_SIM_REGISTRY="$WORK/registry"
+# A shell with a live claimed session exports DEMO_UDID etc.; inherited, they
+# flip the host-OS platform default under the android tests. Trust only what
+# each test sets explicitly.
+unset DEMO_UDID DEMO_ANDROID_SERIAL DEMO_HOST_OS DEMO_SESSION_DIR DEMO_PORT 2>/dev/null || true
 
 printf 'DEMO-UDID|rn-demo-pr3712|Booted\n' > "$FAKE_DEVICES"
 printf 'emulator-5554|rn-demo-pr3712-avd|device\n' > "$FAKE_ADB_DEVICES"
