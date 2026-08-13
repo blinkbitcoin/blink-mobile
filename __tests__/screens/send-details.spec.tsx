@@ -573,4 +573,48 @@ describe("onchain fee tier gating", () => {
     )
   })
 
+  /**
+   * The extra-info box shows one message, and an amount the account cannot send is the one
+   * the sender can act on. The same amount also fails to quote, so without an order between
+   * them the fee error takes the box and hides both the limit and the way past it.
+   */
+  it("keeps the limit error in the box when the quote fails for the same amount", async () => {
+    loadLocale("en")
+    const LL = i18nObject("en")
+    mockWithdrawalAllowance.remaining = 500
+    mockQuoteFees.mockResolvedValue(failedQuote)
+
+    render(
+      <ContextForScreen>
+        <Onchain />
+      </ContextForScreen>,
+    )
+    await screen.findByTestId("fee-tier-dropdown")
+    await flushAsync()
+
+    fireEvent.press(screen.getByTestId("Amount Input Button"))
+    await flushAsync()
+    // Against the mocked price 9,999 NGN is $99.99, well past the $5 left on the limit.
+    fireEvent.press(screen.getByTestId("Key 9"))
+    fireEvent.press(screen.getByTestId("Key 9"))
+    fireEvent.press(screen.getByTestId("Key 9"))
+    fireEvent.press(screen.getByTestId("Key 9"))
+    await flushAsync()
+    const setAmountButtons = screen.getAllByText(LL.AmountInputScreen.setAmount())
+    fireEvent.press(setAmountButtons[setAmountButtons.length - 1])
+    await flushAsync()
+
+    // Matched by its opening words, since the allowance is formatted into the rest of it.
+    const amountExceedsLimitOpening = LL.SendBitcoinScreen.amountExceedsLimit({
+      limit: "",
+    }).trim()
+
+    await waitFor(() => {
+      expect(screen.getByText(new RegExp(`^${amountExceedsLimitOpening}`))).toBeTruthy()
+    })
+    expect(screen.queryByText(LL.common.feeError())).toBeNull()
+    expect(screen.getByTestId(LL.common.next()).props.accessibilityState?.disabled).toBe(
+      true,
+    )
+  })
 })

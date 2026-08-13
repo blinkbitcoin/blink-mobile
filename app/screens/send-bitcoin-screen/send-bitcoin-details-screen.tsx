@@ -443,6 +443,15 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
   const isNextDisabled =
     !goToNextScreen || !amountStatus.validAmount || isFeeTierErrorBlocking
 
+  /**
+   * The extra-info box shows one message, and an invalid amount is the one the sender can
+   * act on. A fee error only takes the box once the amount is valid, or when it blocks the
+   * send outright, since then there is nothing to continue to whatever the amount reads.
+   */
+  const shouldShowFeeTierError = amountStatus.validAmount || isFeeTierErrorBlocking
+  const extraInfoErrorMessage =
+    asyncErrorMessage || (shouldShowFeeTierError ? feeTierErrorMessage : undefined)
+
   const setAmount = (moneyAmount: MoneyAmount<WalletOrDisplayCurrency>) => {
     setPaymentDetail((paymentDetail) =>
       paymentDetail?.setAmount ? paymentDetail.setAmount(moneyAmount) : paymentDetail,
@@ -618,7 +627,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
           />
         </View>
         <SendBitcoinDetailsExtraInfo
-          errorMessage={asyncErrorMessage || feeTierErrorMessage}
+          errorMessage={extraInfoErrorMessage}
           amountStatus={amountStatus}
           currentLevel={currentLevel}
         />
