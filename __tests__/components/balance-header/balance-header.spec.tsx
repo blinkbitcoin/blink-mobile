@@ -9,13 +9,13 @@ import { StatusPill } from "@app/components/status-pill"
 
 import { BalanceHeader } from "@app/components/balance-header/balance-header"
 
-const mockSwitchMemoryHideAmount = jest.fn()
+const mockToggleHideAmount = jest.fn()
 let mockHideAmount = false
 
 jest.mock("@app/graphql/hide-amount-context", () => ({
   useHideAmount: () => ({
     hideAmount: mockHideAmount,
-    switchMemoryHideAmount: mockSwitchMemoryHideAmount,
+    toggleHideAmount: mockToggleHideAmount,
   }),
 }))
 
@@ -176,7 +176,7 @@ describe("BalanceHeader", () => {
     fireEvent.press(getByTestId("balance-status-badge"))
 
     expect(onPress).toHaveBeenCalledTimes(1)
-    expect(mockSwitchMemoryHideAmount).not.toHaveBeenCalled()
+    expect(mockToggleHideAmount).not.toHaveBeenCalled()
   })
 
   it("does not render the status badge while amounts are hidden", () => {

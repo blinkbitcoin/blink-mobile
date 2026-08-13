@@ -2,8 +2,7 @@ import * as React from "react"
 import { useCallback, useMemo, useState } from "react"
 import { View } from "react-native"
 
-import { useApolloClient } from "@apollo/client"
-import { useHideBalanceQuery } from "@app/graphql/generated"
+import { useHideBalanceSetting } from "@app/hooks/use-hide-balance-setting"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RouteProp, useFocusEffect } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
@@ -16,10 +15,6 @@ import { useSecurityScore } from "@app/hooks/use-security-score"
 import type { SecuritySignalKey } from "@app/types/security-score"
 import { Screen } from "../../components/screen"
 import { useLoginMethods } from "./account/login-methods-hook"
-import {
-  saveHiddenBalanceToolTip,
-  saveHideBalance,
-} from "../../graphql/client-only-query"
 import type { RootStackParamList } from "../../navigation/stack-param-lists"
 import BiometricWrapper from "../../utils/biometricAuthentication"
 import { PinScreenPurpose } from "../../utils/enum"
@@ -35,9 +30,8 @@ type Props = {
 export const SecurityScreen: React.FC<Props> = ({ route, navigation }) => {
   const styles = useStyles()
 
-  const client = useApolloClient()
   const { mIsBiometricsEnabled, mIsPinEnabled } = route.params
-  const { data: { hideBalance } = { hideBalance: false } } = useHideBalanceQuery()
+  const { alwaysHideBalance, setAlwaysHideBalance } = useHideBalanceSetting()
   const { LL } = useI18nContext()
   const [isBiometricsEnabled, setIsBiometricsEnabled] = useState(mIsBiometricsEnabled)
   const [isPinEnabled, setIsPinEnabled] = useState(mIsPinEnabled)
@@ -108,14 +102,6 @@ export const SecurityScreen: React.FC<Props> = ({ route, navigation }) => {
     }
   }
 
-  const onHideBalanceValueChanged = useCallback(
-    (value: boolean) => {
-      saveHideBalance(client, value)
-      saveHiddenBalanceToolTip(client, value)
-    },
-    [client],
-  )
-
   const removePin = async () => {
     if (await KeyStoreWrapper.removePin()) {
       KeyStoreWrapper.removePinAttempts()
@@ -147,11 +133,11 @@ export const SecurityScreen: React.FC<Props> = ({ route, navigation }) => {
       cloudBackup: () => navigation.navigate("selfCustodialCloudBackup"),
       manualBackup: () => navigation.navigate("selfCustodialBackupSecurityChecks"),
       appLock: () => onBiometricsValueChanged(true),
-      hideBalance: () => onHideBalanceValueChanged(true),
+      hideBalance: () => setAlwaysHideBalance(true),
       twoFactor: () => navigation.navigate("totpRegistrationInitiate"),
       emailVerified: onEmailSignalPress,
     }),
-    [navigation, onBiometricsValueChanged, onHideBalanceValueChanged, onEmailSignalPress],
+    [navigation, onBiometricsValueChanged, setAlwaysHideBalance, onEmailSignalPress],
   )
 
   const onSignalPress = useCallback(
@@ -180,7 +166,11 @@ export const SecurityScreen: React.FC<Props> = ({ route, navigation }) => {
           <ListItem.Content>
             <ListItem.Title>{LL.SecurityScreen.hideBalanceTitle()}</ListItem.Title>
           </ListItem.Content>
-          <Switch value={hideBalance} onValueChange={onHideBalanceValueChanged} />
+          <Switch
+            testID="always-hide-balance-switch"
+            value={alwaysHideBalance}
+            onValueChange={setAlwaysHideBalance}
+          />
         </ListItem>
       </View>
 

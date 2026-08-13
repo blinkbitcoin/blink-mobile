@@ -1,10 +1,13 @@
 import React from "react"
 import { Alert, AlertButton } from "react-native"
 import { act, fireEvent, render, waitFor } from "@testing-library/react-native"
+import type { ReactTestInstance } from "react-test-renderer"
 import { ThemeProvider } from "@rn-vui/themed"
 
 import { SecurityScreen } from "@app/screens/settings-screen/security-screen"
 import theme from "@app/rne-theme/theme"
+import { PersistentStateContext } from "@app/store/persistent-state"
+import { PersistentState } from "@app/store/persistent-state/state-migrations"
 import { AccountType } from "@app/types/wallet"
 
 const mockActiveAccount = jest.fn()
@@ -17,6 +20,8 @@ const mockGetIsBiometricsEnabled = jest.fn()
 const mockGetIsPinEnabled = jest.fn()
 const mockEmailDelete = jest.fn()
 const mockRegistrationInitiate = jest.fn()
+const mockUpdateState = jest.fn()
+const mockResetState = jest.fn()
 
 jest.mock("@app/hooks/use-account-registry", () => ({
   useAccountRegistry: () => ({ activeAccount: mockActiveAccount() }),
@@ -28,7 +33,6 @@ jest.mock("@app/self-custodial/providers/backup-state", () => ({
 }))
 
 jest.mock("@app/graphql/generated", () => ({
-  useHideBalanceQuery: () => ({ data: { hideBalance: false } }),
   useSettingsScreenQuery: () => ({ data: mockSettingsData() }),
   useUserEmailDeleteMutation: () => [mockEmailDelete, { loading: false }],
   useUserEmailRegistrationInitiateMutation: () => [
@@ -50,14 +54,22 @@ jest.mock("@apollo/client", () => ({
   gql: () => undefined,
 }))
 
-jest.mock("@app/graphql/client-only-query", () => ({
-  saveHideBalance: jest.fn(),
-  saveHiddenBalanceToolTip: jest.fn(),
-}))
-
-jest.mock("@app/components/atomic/switch", () => ({
-  Switch: () => null,
-}))
+/** The real Switch renders, so the hide-balance row can be driven by testID. */
+jest.mock("react-native-reanimated", () => {
+  const RNView = jest.requireActual<typeof import("react-native")>("react-native").View
+  return {
+    __esModule: true,
+    default: {
+      View: RNView,
+      createAnimatedComponent: (component: React.ComponentType) => component,
+    },
+    useSharedValue: (initial: number) => ({ value: initial }),
+    useAnimatedStyle: () => ({}),
+    withTiming: (value: number) => value,
+    interpolateColor: () => "transparent",
+    View: RNView,
+  }
+})
 
 jest.mock("@app/utils/biometricAuthentication", () => ({
   __esModule: true,
@@ -99,6 +111,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
       common: {
         cancel: () => "Cancel",
         ok: () => "OK",
+        switch: () => "switch",
       },
       SecurityScreen: {
         biometricTitle: () => "Biometric",
@@ -128,18 +141,49 @@ jest.mock("@app/i18n/i18n-react", () => ({
   }),
 }))
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-const screenElement = () => (
-  <ThemeProvider theme={theme}>
-    <SecurityScreen
-      navigation={{ navigate: mockNavigate } as any}
-      route={{ params: { mIsBiometricsEnabled: false, mIsPinEnabled: false } } as any}
-    />
-  </ThemeProvider>
-)
-/* eslint-enable @typescript-eslint/no-explicit-any */
+const baseState: PersistentState = {
+  schemaVersion: 16,
+  galoyInstance: { id: "Main" },
+  galoyAuthToken: "",
+}
 
-const renderScreen = () => render(screenElement())
+/** Declared at module scope so `rerender(screenElement())` re-renders the same
+ *  component type and keeps the state the screen has already written. */
+const Harness: React.FC<{ initialState: PersistentState }> = ({ initialState }) => {
+  const [persistentState, setPersistentState] = React.useState(initialState)
+
+  return (
+    <PersistentStateContext.Provider
+      value={{
+        persistentState,
+        updateState: (update) => {
+          mockUpdateState(update)
+          setPersistentState((prev) => update(prev) ?? prev)
+        },
+        resetState: mockResetState,
+      }}
+    >
+      {/* eslint-disable @typescript-eslint/no-explicit-any */}
+      <ThemeProvider theme={theme}>
+        <SecurityScreen
+          navigation={{ navigate: mockNavigate } as any}
+          route={{ params: { mIsBiometricsEnabled: false, mIsPinEnabled: false } } as any}
+        />
+      </ThemeProvider>
+      {/* eslint-enable @typescript-eslint/no-explicit-any */}
+    </PersistentStateContext.Provider>
+  )
+}
+
+const screenElement = (initialState: PersistentState = baseState) => (
+  <Harness initialState={initialState} />
+)
+
+const renderScreen = (initialState?: PersistentState) =>
+  render(screenElement(initialState))
+
+const hideBalanceChecked = (element: ReactTestInstance): boolean =>
+  element.props.accessibilityState.checked
 
 const focusCallbacks = (): (() => void)[] =>
   mockUseFocusEffect.mock.calls.map(([callback]) => callback)
@@ -151,28 +195,30 @@ const pressAlertButton = async (label: string) => {
   await button?.onPress?.()
 }
 
-describe("SecurityScreen security score card", () => {
-  beforeEach(() => {
-    jest.clearAllMocks()
-    mockActiveAccount.mockReturnValue({ type: AccountType.SelfCustodial })
-    mockBackupState.mockReturnValue({ status: "none", method: null })
-    mockIsAtLeastLevelOne.mockReturnValue(true)
-    mockSettingsData.mockReturnValue({
-      me: { totpEnabled: false, email: { address: null, verified: false } },
-    })
-    mockGetIsBiometricsEnabled.mockResolvedValue(false)
-    mockGetIsPinEnabled.mockResolvedValue(false)
-    mockEmailDelete.mockResolvedValue({ data: {} })
-    mockRegistrationInitiate.mockResolvedValue({
-      data: {
-        userEmailRegistrationInitiate: {
-          errors: [],
-          emailRegistrationId: "registration-id",
-        },
-      },
-    })
-    jest.spyOn(Alert, "alert").mockImplementation(() => {})
+const applyDefaultMocks = () => {
+  jest.clearAllMocks()
+  mockActiveAccount.mockReturnValue({ type: AccountType.SelfCustodial })
+  mockBackupState.mockReturnValue({ status: "none", method: null })
+  mockIsAtLeastLevelOne.mockReturnValue(true)
+  mockSettingsData.mockReturnValue({
+    me: { totpEnabled: false, email: { address: null, verified: false } },
   })
+  mockGetIsBiometricsEnabled.mockResolvedValue(false)
+  mockGetIsPinEnabled.mockResolvedValue(false)
+  mockEmailDelete.mockResolvedValue({ data: {} })
+  mockRegistrationInitiate.mockResolvedValue({
+    data: {
+      userEmailRegistrationInitiate: {
+        errors: [],
+        emailRegistrationId: "registration-id",
+      },
+    },
+  })
+  jest.spyOn(Alert, "alert").mockImplementation(() => {})
+}
+
+describe("SecurityScreen security score card", () => {
+  beforeEach(applyDefaultMocks)
 
   it("shows the card for a self-custodial account", () => {
     const { getByTestId } = renderScreen()
@@ -312,14 +358,23 @@ describe("SecurityScreen security score card", () => {
   })
 
   it("turns hide balance on in place from its Set row", () => {
-    const { saveHideBalance } = jest.requireMock("@app/graphql/client-only-query")
-
     const { getByTestId } = renderScreen()
 
     fireEvent.press(getByTestId("security-score-hideBalance"))
 
-    expect(saveHideBalance).toHaveBeenCalledWith(expect.anything(), true)
+    expect(mockUpdateState).toHaveBeenCalledTimes(1)
+    expect(mockUpdateState.mock.calls[0][0](baseState)).toEqual(
+      expect.objectContaining({ alwaysHideBalance: true }),
+    )
     expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  /** The signal reads the persisted setting, not the Apollo cache the screen
+   *  stopped writing when the setting moved into PersistentState (#4124). */
+  it("scores hide balance from the persisted setting", () => {
+    const { getByText } = renderScreen({ ...baseState, alwaysHideBalance: true })
+
+    expect(getByText("Security score 1/4")).toBeTruthy()
   })
 
   /** useFocusEffect lists its callback in its own deps, so a fresh closure per
@@ -358,5 +413,44 @@ describe("SecurityScreen security score card", () => {
     fireEvent.press(getByTestId("security-score-cloudBackup"))
 
     expect(mockNavigate).toHaveBeenCalledWith("selfCustodialCloudBackup")
+  })
+})
+
+describe("SecurityScreen — always hide balance", () => {
+  beforeEach(applyDefaultMocks)
+
+  it("reflects the stored setting", () => {
+    const { getByTestId } = renderScreen({ ...baseState, alwaysHideBalance: true })
+
+    expect(hideBalanceChecked(getByTestId("always-hide-balance-switch"))).toBe(true)
+  })
+
+  it("is off when nothing is stored", () => {
+    const { getByTestId } = renderScreen()
+
+    expect(hideBalanceChecked(getByTestId("always-hide-balance-switch"))).toBe(false)
+  })
+
+  it("persists the setting and follows the stored value, not a local copy", () => {
+    const { getByTestId } = renderScreen()
+
+    fireEvent(getByTestId("always-hide-balance-switch"), "pressIn")
+
+    expect(mockUpdateState).toHaveBeenCalledTimes(1)
+    expect(mockUpdateState.mock.calls[0][0](baseState)).toEqual(
+      expect.objectContaining({ alwaysHideBalance: true }),
+    )
+    expect(hideBalanceChecked(getByTestId("always-hide-balance-switch"))).toBe(true)
+  })
+
+  it("turns the setting back off", () => {
+    const { getByTestId } = renderScreen({ ...baseState, alwaysHideBalance: true })
+
+    fireEvent(getByTestId("always-hide-balance-switch"), "pressIn")
+
+    expect(mockUpdateState.mock.calls[0][0](baseState)).toEqual(
+      expect.objectContaining({ alwaysHideBalance: false }),
+    )
+    expect(hideBalanceChecked(getByTestId("always-hide-balance-switch"))).toBe(false)
   })
 })

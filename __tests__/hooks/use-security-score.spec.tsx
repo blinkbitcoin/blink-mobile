@@ -5,7 +5,7 @@ import type { SecuritySignalDescriptor } from "@app/types/security-score"
 
 const mockSelfCustodialSignals = jest.fn()
 const mockCustodialSignals = jest.fn()
-const mockHideBalanceQuery = jest.fn()
+const mockAlwaysHideBalance = jest.fn()
 
 jest.mock("@app/self-custodial/hooks/use-security-signals", () => ({
   useSelfCustodialSecuritySignals: () => mockSelfCustodialSignals(),
@@ -15,8 +15,11 @@ jest.mock("@app/custodial/hooks/use-security-signals", () => ({
   useCustodialSecuritySignals: () => mockCustodialSignals(),
 }))
 
-jest.mock("@app/graphql/generated", () => ({
-  useHideBalanceQuery: () => mockHideBalanceQuery(),
+jest.mock("@app/hooks/use-hide-balance-setting", () => ({
+  useHideBalanceSetting: () => ({
+    alwaysHideBalance: mockAlwaysHideBalance(),
+    setAlwaysHideBalance: jest.fn(),
+  }),
 }))
 
 const NO_LOCK = { isBiometricsEnabled: false, isPinEnabled: false }
@@ -59,7 +62,7 @@ describe("useSecurityScore", () => {
     jest.clearAllMocks()
     mockSelfCustodialSignals.mockReturnValue(null)
     mockCustodialSignals.mockReturnValue(null)
-    mockHideBalanceQuery.mockReturnValue({ data: { hideBalance: false } })
+    mockAlwaysHideBalance.mockReturnValue(false)
   })
 
   it("returns null when neither mode contributes: no active account", () => {
@@ -114,7 +117,7 @@ describe("useSecurityScore", () => {
 
   it("reaches high on a level-0 custodial account with both device signals", () => {
     mockCustodialSignals.mockReturnValue([])
-    mockHideBalanceQuery.mockReturnValue({ data: { hideBalance: true } })
+    mockAlwaysHideBalance.mockReturnValue(true)
 
     const { result } = renderHook(() =>
       useSecurityScore({ isBiometricsEnabled: false, isPinEnabled: true }),
@@ -137,12 +140,16 @@ describe("useSecurityScore", () => {
     expect(pin.current?.signals.find((s) => s.key === "appLock")?.done).toBe(true)
   })
 
-  it("treats a not-yet-loaded hide-balance query as not hidden", () => {
+  /** The setting moved out of the Apollo cache and into PersistentState (#4124),
+   *  so the signal follows the persisted value rather than a query result. */
+  it("scores hide balance from the persisted setting", () => {
     mockCustodialSignals.mockReturnValue([])
-    mockHideBalanceQuery.mockReturnValue({})
 
-    const { result } = renderHook(() => useSecurityScore(NO_LOCK))
+    const { result: off } = renderHook(() => useSecurityScore(NO_LOCK))
+    mockAlwaysHideBalance.mockReturnValue(true)
+    const { result: on } = renderHook(() => useSecurityScore(NO_LOCK))
 
-    expect(result.current?.signals.find((s) => s.key === "hideBalance")?.done).toBe(false)
+    expect(off.current?.signals.find((s) => s.key === "hideBalance")?.done).toBe(false)
+    expect(on.current?.signals.find((s) => s.key === "hideBalance")?.done).toBe(true)
   })
 })

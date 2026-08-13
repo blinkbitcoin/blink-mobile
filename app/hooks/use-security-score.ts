@@ -1,5 +1,5 @@
 import { useCustodialSecuritySignals } from "@app/custodial/hooks"
-import { useHideBalanceQuery } from "@app/graphql/generated"
+import { useHideBalanceSetting } from "@app/hooks/use-hide-balance-setting"
 /** Deep import on purpose: the self-custodial barrel pulls the payment-request
  *  module graph into every consumer, which the score hook doesn't need. */
 import { useSelfCustodialSecuritySignals } from "@app/self-custodial/hooks/use-security-signals"
@@ -55,13 +55,13 @@ export const computeSecurityScore = (
 export const useSecurityScore = (deviceLock: DeviceLockState): SecurityScore | null => {
   const selfCustodial = useSelfCustodialSecuritySignals()
   const custodial = useCustodialSecuritySignals()
-  const { data: { hideBalance } = { hideBalance: false } } = useHideBalanceQuery()
+  const { alwaysHideBalance } = useHideBalanceSetting()
 
   const modeSignals = selfCustodial ?? custodial
   if (!modeSignals) return null
 
   return computeSecurityScore([
     ...modeSignals,
-    ...deviceSecuritySignals(deviceLock, hideBalance),
+    ...deviceSecuritySignals(deviceLock, alwaysHideBalance),
   ])
 }

@@ -2308,7 +2308,6 @@ export type Query = {
   readonly custodialRestrictions: CustodialRestrictions;
   readonly deviceSessionCount: Scalars['Int']['output'];
   readonly globals?: Maybe<Globals>;
-  readonly hiddenBalanceToolTip: Scalars['Boolean']['output'];
   readonly hideBalance: Scalars['Boolean']['output'];
   readonly innerCircleValue: Scalars['Int']['output'];
   readonly introducingCirclesModalShown: Scalars['Boolean']['output'];
@@ -3300,11 +3299,6 @@ export type HideBalanceQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type HideBalanceQuery = { readonly __typename: 'Query', readonly hideBalance: boolean };
-
-export type HiddenBalanceToolTipQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type HiddenBalanceToolTipQuery = { readonly __typename: 'Query', readonly hiddenBalanceToolTip: boolean };
 
 export type BetaQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -4684,43 +4678,6 @@ export type HideBalanceQueryHookResult = ReturnType<typeof useHideBalanceQuery>;
 export type HideBalanceLazyQueryHookResult = ReturnType<typeof useHideBalanceLazyQuery>;
 export type HideBalanceSuspenseQueryHookResult = ReturnType<typeof useHideBalanceSuspenseQuery>;
 export type HideBalanceQueryResult = Apollo.QueryResult<HideBalanceQuery, HideBalanceQueryVariables>;
-export const HiddenBalanceToolTipDocument = gql`
-    query hiddenBalanceToolTip {
-  hiddenBalanceToolTip @client
-}
-    `;
-
-/**
- * __useHiddenBalanceToolTipQuery__
- *
- * To run a query within a React component, call `useHiddenBalanceToolTipQuery` and pass it any options that fit your needs.
- * When your component renders, `useHiddenBalanceToolTipQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useHiddenBalanceToolTipQuery({
- *   variables: {
- *   },
- * });
- */
-export function useHiddenBalanceToolTipQuery(baseOptions?: Apollo.QueryHookOptions<HiddenBalanceToolTipQuery, HiddenBalanceToolTipQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<HiddenBalanceToolTipQuery, HiddenBalanceToolTipQueryVariables>(HiddenBalanceToolTipDocument, options);
-      }
-export function useHiddenBalanceToolTipLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<HiddenBalanceToolTipQuery, HiddenBalanceToolTipQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<HiddenBalanceToolTipQuery, HiddenBalanceToolTipQueryVariables>(HiddenBalanceToolTipDocument, options);
-        }
-export function useHiddenBalanceToolTipSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<HiddenBalanceToolTipQuery, HiddenBalanceToolTipQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<HiddenBalanceToolTipQuery, HiddenBalanceToolTipQueryVariables>(HiddenBalanceToolTipDocument, options);
-        }
-export type HiddenBalanceToolTipQueryHookResult = ReturnType<typeof useHiddenBalanceToolTipQuery>;
-export type HiddenBalanceToolTipLazyQueryHookResult = ReturnType<typeof useHiddenBalanceToolTipLazyQuery>;
-export type HiddenBalanceToolTipSuspenseQueryHookResult = ReturnType<typeof useHiddenBalanceToolTipSuspenseQuery>;
-export type HiddenBalanceToolTipQueryResult = Apollo.QueryResult<HiddenBalanceToolTipQuery, HiddenBalanceToolTipQueryVariables>;
 export const BetaDocument = gql`
     query beta {
   beta @client
@@ -11850,7 +11807,6 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   custodialRestrictions?: Resolver<ResolversTypes['CustodialRestrictions'], ParentType, ContextType>;
   deviceSessionCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   globals?: Resolver<Maybe<ResolversTypes['Globals']>, ParentType, ContextType>;
-  hiddenBalanceToolTip?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   hideBalance?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   innerCircleValue?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   introducingCirclesModalShown?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;

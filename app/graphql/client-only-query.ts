@@ -8,10 +8,6 @@ import {
   BetaQuery,
   CountryCodeDocument,
   CountryCodeQuery,
-  HiddenBalanceToolTipDocument,
-  HiddenBalanceToolTipQuery,
-  HideBalanceDocument,
-  HideBalanceQuery,
   InnerCircleValueDocument,
   InnerCircleValueQuery,
   IntroducingCirclesModalShownDocument,
@@ -30,12 +26,11 @@ import {
 } from "./generated"
 
 export default gql`
+  # Legacy read-only source for the "always hide balance" setting, which now lives in
+  # PersistentState. Kept so HideAmountContainer can adopt the value one last time for
+  # users upgrading from an older build; removable after a couple of releases.
   query hideBalance {
     hideBalance @client
-  }
-
-  query hiddenBalanceToolTip {
-    hiddenBalanceToolTip @client
   }
 
   query beta {
@@ -83,42 +78,6 @@ export default gql`
     }
   }
 `
-
-export const saveHideBalance = (
-  client: ApolloClient<unknown>,
-  status: boolean,
-): boolean => {
-  try {
-    client.writeQuery<HideBalanceQuery>({
-      query: HideBalanceDocument,
-      data: {
-        __typename: "Query",
-        hideBalance: status,
-      },
-    })
-    return status
-  } catch {
-    return false
-  }
-}
-
-export const saveHiddenBalanceToolTip = (
-  client: ApolloClient<unknown>,
-  status: boolean,
-): boolean => {
-  try {
-    client.writeQuery<HiddenBalanceToolTipQuery>({
-      query: HiddenBalanceToolTipDocument,
-      data: {
-        __typename: "Query",
-        hiddenBalanceToolTip: status,
-      },
-    })
-    return status
-  } catch {
-    return false
-  }
-}
 
 export const activateBeta = (client: ApolloClient<unknown>, status: boolean) => {
   try {
