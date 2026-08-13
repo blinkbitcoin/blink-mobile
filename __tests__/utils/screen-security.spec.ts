@@ -20,11 +20,6 @@ const loadModule = (): typeof import("@app/utils/screen-security") => {
   return mod
 }
 
-const flushQueue = () =>
-  new Promise<void>((resolve) => {
-    setImmediate(resolve)
-  })
-
 describe("screen-security", () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -102,14 +97,68 @@ describe("screen-security", () => {
     expect(mockUnregister).not.toHaveBeenCalled()
   })
 
-  it("keeps processing the queue after a native call rejects", async () => {
+  /** Registration state is tracked separately from the screen count: a rejected
+   *  register must not leave the module claiming protection that was never
+   *  installed. */
+  it("does not unregister after a rejected register, since no guard was installed", async () => {
     const { enableScreenSecurity, disableScreenSecurity } = loadModule()
     mockRegister.mockRejectedValueOnce(new Error("native failure"))
 
     await expect(enableScreenSecurity("#000000")).rejects.toThrow("native failure")
     await disableScreenSecurity()
-    await flushQueue()
 
+    expect(mockUnregister).not.toHaveBeenCalled()
+  })
+
+  it("retries registration on the next enable after a rejected register", async () => {
+    const { enableScreenSecurity, disableScreenSecurity } = loadModule()
+    mockRegister.mockRejectedValueOnce(new Error("native failure"))
+
+    await expect(enableScreenSecurity("#000000")).rejects.toThrow("native failure")
+    await disableScreenSecurity()
+
+    await enableScreenSecurity("#000000")
+    expect(mockRegister).toHaveBeenCalledTimes(2)
+  })
+
+  /** Finding: the phrase screen's register rejects, the confirm screen is pushed on
+   *  top, and its enable must retry the registration rather than early-returning on a
+   *  count that claims protection which was never installed. */
+  it("registers for a screen pushed after another screen's registration failed", async () => {
+    const { enableScreenSecurity } = loadModule()
+    mockRegister.mockRejectedValueOnce(new Error("native failure"))
+
+    await expect(enableScreenSecurity("#000000")).rejects.toThrow("native failure")
+    await enableScreenSecurity("#000000")
+
+    expect(mockRegister).toHaveBeenCalledTimes(2)
+  })
+
+  /** The replace path unmounts one protected screen as another mounts; the queued
+   *  disable sees the arriving screen and skips the unregister/register churn. */
+  it("does not churn the guard when one protected screen replaces another", async () => {
+    const { enableScreenSecurity, disableScreenSecurity } = loadModule()
+
+    const first = enableScreenSecurity("#000000")
+    const leaving = disableScreenSecurity()
+    const arriving = enableScreenSecurity("#000000")
+    await Promise.all([first, leaving, arriving])
+
+    expect(mockRegister).toHaveBeenCalledTimes(1)
+    expect(mockUnregister).not.toHaveBeenCalled()
+  })
+
+  it("keeps processing the queue after a native call rejects", async () => {
+    const { enableScreenSecurity, disableScreenSecurity } = loadModule()
+    mockRegister.mockRejectedValueOnce(new Error("native failure"))
+
+    await expect(enableScreenSecurity("#000000")).rejects.toThrow("native failure")
+
+    await enableScreenSecurity("#000000")
+    await disableScreenSecurity()
+    await disableScreenSecurity()
+
+    expect(mockRegister).toHaveBeenCalledTimes(2)
     expect(mockUnregister).toHaveBeenCalledTimes(1)
   })
 })
