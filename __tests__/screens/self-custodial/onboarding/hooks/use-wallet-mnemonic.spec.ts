@@ -127,34 +127,76 @@ describe("useWalletMnemonic", () => {
 describe("useWalletIdentity", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockDeriveWalletIdentityPubkey.mockReturnValue("derived-pubkey")
+    mockDeriveWalletIdentityPubkey.mockResolvedValue("derived-pubkey")
   })
 
-  it("derives the identity pubkey from the mnemonic", () => {
+  it("derives the identity pubkey from the mnemonic, reporting loading until it settles", async () => {
     const { result } = renderHook(() => useWalletIdentity("youth indicate void"))
 
-    expect(result.current).toBe("derived-pubkey")
+    expect(result.current).toEqual({ pubkey: "", loading: true })
+
+    await waitFor(() =>
+      expect(result.current).toEqual({ pubkey: "derived-pubkey", loading: false }),
+    )
     expect(mockDeriveWalletIdentityPubkey).toHaveBeenCalledWith(
       "youth indicate void",
       mockNetwork,
     )
   })
 
-  it("returns an empty string and skips derivation while the mnemonic is empty", () => {
+  it("returns an empty pubkey and skips derivation while the mnemonic is empty", () => {
     const { result } = renderHook(() => useWalletIdentity(""))
 
-    expect(result.current).toBe("")
+    expect(result.current).toEqual({ pubkey: "", loading: false })
     expect(mockDeriveWalletIdentityPubkey).not.toHaveBeenCalled()
   })
 
-  it("memoizes the derivation across renders with the same mnemonic", () => {
+  it("settles to an empty pubkey when derivation rejects", async () => {
+    mockDeriveWalletIdentityPubkey.mockRejectedValue(new Error("signer failed"))
+
+    const { result } = renderHook(() => useWalletIdentity("youth indicate void"))
+
+    await waitFor(() => expect(result.current).toEqual({ pubkey: "", loading: false }))
+  })
+
+  it("derives once per mnemonic and re-derives when it changes", async () => {
     const { result, rerender } = renderHook(
       ({ m }: { m: string }) => useWalletIdentity(m),
       { initialProps: { m: "youth indicate void" } },
     )
+    await waitFor(() => expect(result.current.pubkey).toBe("derived-pubkey"))
     rerender({ m: "youth indicate void" })
 
-    expect(result.current).toBe("derived-pubkey")
     expect(mockDeriveWalletIdentityPubkey).toHaveBeenCalledTimes(1)
+
+    mockDeriveWalletIdentityPubkey.mockResolvedValue("other-pubkey")
+    rerender({ m: "other mnemonic words" })
+
+    await waitFor(() => expect(result.current.pubkey).toBe("other-pubkey"))
+    expect(mockDeriveWalletIdentityPubkey).toHaveBeenCalledTimes(2)
+  })
+
+  it("does not set state when unmounted before the derivation resolves", async () => {
+    let resolveDerivation: (pubkey: string) => void = () => {}
+    mockDeriveWalletIdentityPubkey.mockReturnValue(
+      new Promise((resolve) => {
+        resolveDerivation = resolve
+      }),
+    )
+    const consoleError = jest.spyOn(console, "error").mockImplementation(() => {})
+
+    try {
+      const { unmount } = renderHook(() => useWalletIdentity("youth indicate void"))
+      unmount()
+      resolveDerivation("derived-pubkey")
+
+      /** Flush the microtask queue; a state write after unmount would surface as a
+       *  React act()/update warning through console.error. */
+      await new Promise(process.nextTick)
+
+      expect(consoleError).not.toHaveBeenCalled()
+    } finally {
+      consoleError.mockRestore()
+    }
   })
 })

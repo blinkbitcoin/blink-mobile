@@ -179,7 +179,7 @@ describe("executeAutoConvert", () => {
         {
           conversionDetails: {
             status: "Completed",
-            from: { amount: 5000n },
+            conversions: [{ from: { amount: 5000n } }],
           },
           timestamp: 2000n, // seconds; paymentMs = 2_000_000
         },
@@ -199,7 +199,7 @@ describe("executeAutoConvert", () => {
         {
           conversionDetails: {
             status: "Completed",
-            from: { amount: 5000n },
+            conversions: [{ from: { amount: 5000n } }],
           },
           timestamp: 500n, // paymentMs = 500_000 < recordCreatedAtMs (1_000_000)
         },
@@ -217,7 +217,7 @@ describe("executeAutoConvert", () => {
         {
           conversionDetails: {
             status: "Completed",
-            from: { amount: 5200n }, // 4% off of 5000
+            conversions: [{ from: { amount: 5200n } }], // 4% off of 5000
           },
           timestamp: 2000n,
         },
@@ -236,7 +236,7 @@ describe("executeAutoConvert", () => {
         {
           conversionDetails: {
             status: "Completed",
-            from: { amount: 10_000n }, // 100% off
+            conversions: [{ from: { amount: 10_000n } }], // 100% off
           },
           timestamp: 2000n,
         },
@@ -244,6 +244,23 @@ describe("executeAutoConvert", () => {
       baseParams,
     )
 
+    expect(mockGetConversionQuote).toHaveBeenCalled()
+  })
+
+  it("does NOT match a conversion whose legs array is empty (0.22 shape)", async () => {
+    mockGetConversionQuote.mockResolvedValue(successQuote())
+
+    const outcome = await executeAutoConvert(
+      sdkWith([
+        {
+          conversionDetails: { status: "Completed", conversions: [] },
+          timestamp: 2000n,
+        },
+      ]),
+      baseParams,
+    )
+
+    expect(outcome).toEqual({ status: "converted" })
     expect(mockGetConversionQuote).toHaveBeenCalled()
   })
 
@@ -315,7 +332,10 @@ describe("executeAutoConvert", () => {
       sdkWith([
         {
           id: "conv-paired-elsewhere",
-          conversionDetails: { status: "Completed", from: { amount: 5000n } },
+          conversionDetails: {
+            status: "Completed",
+            conversions: [{ from: { amount: 5000n } }],
+          },
           timestamp: 2000n,
         },
       ]),
@@ -331,12 +351,18 @@ describe("executeAutoConvert", () => {
       sdkWith([
         {
           id: "conv-paired-elsewhere",
-          conversionDetails: { status: "Completed", from: { amount: 5000n } },
+          conversionDetails: {
+            status: "Completed",
+            conversions: [{ from: { amount: 5000n } }],
+          },
           timestamp: 2000n,
         },
         {
           id: "conv-unclaimed",
-          conversionDetails: { status: "Completed", from: { amount: 5000n } },
+          conversionDetails: {
+            status: "Completed",
+            conversions: [{ from: { amount: 5000n } }],
+          },
           timestamp: 2000n,
         },
       ]),
@@ -363,7 +389,10 @@ describe("findRecentConversionId", () => {
       sdkWith([
         {
           id: "conv-1",
-          conversionDetails: { status: "Completed", from: { amount: 5000n } },
+          conversionDetails: {
+            status: "Completed",
+            conversions: [{ from: { amount: 5000n } }],
+          },
         },
       ]),
       { satsAmount: 5000, toleranceBps: 500, claimedConversionIds: new Set() },
@@ -377,11 +406,17 @@ describe("findRecentConversionId", () => {
       sdkWith([
         {
           id: "conv-claimed",
-          conversionDetails: { status: "Completed", from: { amount: 5000n } },
+          conversionDetails: {
+            status: "Completed",
+            conversions: [{ from: { amount: 5000n } }],
+          },
         },
         {
           id: "conv-fresh",
-          conversionDetails: { status: "Completed", from: { amount: 5000n } },
+          conversionDetails: {
+            status: "Completed",
+            conversions: [{ from: { amount: 5000n } }],
+          },
         },
       ]),
       {
@@ -400,11 +435,17 @@ describe("findRecentConversionId", () => {
         { id: "p-no-conversion", conversionDetails: undefined },
         {
           id: "p-pending",
-          conversionDetails: { status: "Pending", from: { amount: 5000n } },
+          conversionDetails: {
+            status: "Pending",
+            conversions: [{ from: { amount: 5000n } }],
+          },
         },
         {
           id: "conv-real",
-          conversionDetails: { status: "Completed", from: { amount: 5000n } },
+          conversionDetails: {
+            status: "Completed",
+            conversions: [{ from: { amount: 5000n } }],
+          },
         },
       ]),
       { satsAmount: 5000, toleranceBps: 500, claimedConversionIds: new Set() },
@@ -418,7 +459,10 @@ describe("findRecentConversionId", () => {
       sdkWith([
         {
           id: "conv-far",
-          conversionDetails: { status: "Completed", from: { amount: 10_000n } },
+          conversionDetails: {
+            status: "Completed",
+            conversions: [{ from: { amount: 10_000n } }],
+          },
         },
       ]),
       { satsAmount: 5000, toleranceBps: 500, claimedConversionIds: new Set() },

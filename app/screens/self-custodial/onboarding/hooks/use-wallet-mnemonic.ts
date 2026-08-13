@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
@@ -43,10 +43,37 @@ export const useWalletMnemonic = (): string => {
   return mnemonic
 }
 
-export const useWalletIdentity = (mnemonic: string): string => {
+type WalletIdentity = {
+  pubkey: string
+  /** True while derivation is in flight; consumers must not treat the transient empty
+   *  pubkey as a failure until this settles. */
+  loading: boolean
+}
+
+export const useWalletIdentity = (mnemonic: string): WalletIdentity => {
   const network = useSparkNetwork()
-  return useMemo(
-    () => (mnemonic ? deriveWalletIdentityPubkey(mnemonic, network) : ""),
-    [mnemonic, network],
-  )
+  const [pubkey, setPubkey] = useState("")
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    if (!mnemonic) {
+      setPubkey("")
+      setLoading(false)
+      return
+    }
+    let mounted = true
+    setLoading(true)
+    deriveWalletIdentityPubkey(mnemonic, network)
+      .catch(() => "")
+      .then((derived) => {
+        if (!mounted) return
+        setPubkey(derived)
+        setLoading(false)
+      })
+    return () => {
+      mounted = false
+    }
+  }, [mnemonic, network])
+
+  return { pubkey, loading }
 }

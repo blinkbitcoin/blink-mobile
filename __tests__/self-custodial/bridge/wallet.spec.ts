@@ -1,4 +1,4 @@
-import { Network, defaultExternalSigner } from "@breeztech/breez-sdk-spark-react-native"
+import { Network, defaultExternalSigners } from "@breeztech/breez-sdk-spark-react-native"
 
 import {
   checkLightningAddressAvailable,
@@ -11,40 +11,47 @@ import {
 } from "@app/self-custodial/bridge/wallet"
 
 describe("deriveWalletIdentityPubkey", () => {
-  it("derives the identity pubkey offline from the mnemonic and frees the signer", () => {
-    const uniffiDestroy = jest.fn()
-    const identityPublicKey = jest
-      .fn()
-      .mockReturnValue({ bytes: Uint8Array.from([0x02, 0xab, 0xff]).buffer })
-    ;(defaultExternalSigner as jest.Mock).mockReturnValue({
-      identityPublicKey,
-      uniffiDestroy,
+  const mockSigners = (getIdentityPublicKey: jest.Mock) => {
+    const breezDestroy = jest.fn()
+    const sparkDestroy = jest.fn()
+    ;(defaultExternalSigners as jest.Mock).mockReturnValue({
+      breezSigner: { uniffiDestroy: breezDestroy },
+      sparkSigner: { getIdentityPublicKey, uniffiDestroy: sparkDestroy },
     })
+    return { breezDestroy, sparkDestroy }
+  }
 
-    const pubkey = deriveWalletIdentityPubkey("youth indicate void", Network.Regtest)
+  it("derives the identity pubkey offline from the mnemonic and frees both signers", async () => {
+    const { breezDestroy, sparkDestroy } = mockSigners(
+      jest.fn().mockResolvedValue({ bytes: Uint8Array.from([0x02, 0xab, 0xff]).buffer }),
+    )
+
+    const pubkey = await deriveWalletIdentityPubkey(
+      "youth indicate void",
+      Network.Regtest,
+    )
 
     expect(pubkey).toBe("02abff")
-    expect(defaultExternalSigner).toHaveBeenCalledWith(
+    expect(defaultExternalSigners).toHaveBeenCalledWith(
       "youth indicate void",
       undefined,
       Network.Regtest,
       undefined,
     )
-    expect(uniffiDestroy).toHaveBeenCalledTimes(1)
+    expect(breezDestroy).toHaveBeenCalledTimes(1)
+    expect(sparkDestroy).toHaveBeenCalledTimes(1)
   })
 
-  it("frees the signer even when reading the pubkey throws", () => {
-    const uniffiDestroy = jest.fn()
-    const identityPublicKey = jest.fn(() => {
-      throw new Error("read failed")
-    })
-    ;(defaultExternalSigner as jest.Mock).mockReturnValue({
-      identityPublicKey,
-      uniffiDestroy,
-    })
+  it("frees both signers even when reading the pubkey rejects, and propagates the error", async () => {
+    const { breezDestroy, sparkDestroy } = mockSigners(
+      jest.fn().mockRejectedValue(new Error("read failed")),
+    )
 
-    expect(() => deriveWalletIdentityPubkey("m", Network.Regtest)).toThrow("read failed")
-    expect(uniffiDestroy).toHaveBeenCalledTimes(1)
+    await expect(deriveWalletIdentityPubkey("m", Network.Regtest)).rejects.toThrow(
+      "read failed",
+    )
+    expect(breezDestroy).toHaveBeenCalledTimes(1)
+    expect(sparkDestroy).toHaveBeenCalledTimes(1)
   })
 })
 

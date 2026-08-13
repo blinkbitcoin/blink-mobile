@@ -46,7 +46,7 @@ jest.mock("@app/self-custodial/hooks/use-spark-network", () => ({
 }))
 
 jest.mock("@app/self-custodial/bridge", () => ({
-  deriveWalletIdentityPubkey: () => mockIdentityPubkey,
+  deriveWalletIdentityPubkey: () => Promise.resolve(mockIdentityPubkey),
 }))
 
 const mockCompleteBackup = jest.fn()

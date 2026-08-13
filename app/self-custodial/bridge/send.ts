@@ -2,6 +2,7 @@ import {
   FeePolicy,
   LnurlPayRequest,
   OnchainConfirmationSpeed,
+  PaymentRequest,
   PrepareLnurlPayRequest,
   PrepareSendPaymentRequest,
   SendPaymentMethod_Tags as MethodTag,
@@ -64,7 +65,9 @@ export type PrepareSendOptions = {
 export const prepareSend = (sdk: BreezSdkInterface, options: PrepareSendOptions) =>
   sdk.prepareSendPayment(
     PrepareSendPaymentRequest.create({
-      paymentRequest: options.paymentRequest,
+      /** Input is the parse-me variant of the 0.22 PaymentRequest enum; the CrossChain
+       *  variant is deliberately unused (cross-chain sends stay disabled). */
+      paymentRequest: new PaymentRequest.Input({ input: options.paymentRequest }),
       amount: options.amount,
       tokenIdentifier: options.tokenIdentifier,
       conversionOptions: options.conversionOptions,

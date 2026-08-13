@@ -59,7 +59,7 @@ export const useCloudBackup = ({
   const { startSession, upload, downloadById, resolveErrorMessage, loading } =
     usePlatformCloudBackup()
   const mnemonic = useWalletMnemonic()
-  const identityPubkey = useWalletIdentity(mnemonic)
+  const { pubkey: identityPubkey, loading: identityLoading } = useWalletIdentity(mnemonic)
   const { lightningAddress } = useSelfCustodialAccountInfo()
 
   const handleBackup = useCallback(async () => {
@@ -72,6 +72,10 @@ export const useCloudBackup = ({
       if (reason === CloudBackupErrorReason.Cancelled) return
       toastShow({ message: resolveErrorMessage(reason, LL), LL })
     }
+
+    /** The CTA is disabled while the pubkey derives, so reaching this mid-derivation is a
+     *  race, not a failure; stay silent instead of flashing a spurious failure toast. */
+    if (identityLoading) return
 
     if (!identityPubkey) {
       /** The pubkey is derived locally from the phrase, with no cloud involved, so a missing
@@ -155,8 +159,9 @@ export const useCloudBackup = ({
     appConfig.galoyInstance.name,
     mnemonic,
     identityPubkey,
+    identityLoading,
     lightningAddress,
   ])
 
-  return { handleBackup, loading }
+  return { handleBackup, loading: loading || identityLoading }
 }

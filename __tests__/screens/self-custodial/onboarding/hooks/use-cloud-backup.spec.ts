@@ -58,9 +58,13 @@ jest.mock("@app/utils/crypto", () => ({
 }))
 
 let mockIdentityPubkey: string | null = "test-pubkey-1234"
+let mockIdentityLoading = false
 jest.mock("@app/screens/self-custodial/onboarding/hooks/use-wallet-mnemonic", () => ({
   useWalletMnemonic: () => "youth indicate void",
-  useWalletIdentity: () => mockIdentityPubkey,
+  useWalletIdentity: () => ({
+    pubkey: mockIdentityPubkey ?? "",
+    loading: mockIdentityLoading,
+  }),
 }))
 
 let mockLightningAddress: string | null = null
@@ -148,6 +152,7 @@ describe("useCloudBackup", () => {
     jest.clearAllMocks()
     mockLoading = false
     mockIdentityPubkey = "test-pubkey-1234"
+    mockIdentityLoading = false
     mockLightningAddress = null
     mockStartSession.mockResolvedValue(sessionOk(noExistingFile))
     mockDownloadById.mockResolvedValue({ success: false, reason: "not-found" })
@@ -513,6 +518,26 @@ describe("useCloudBackup", () => {
     expect(mockToastShow).toHaveBeenCalledWith(
       expect.objectContaining({ message: "Upload failed" }),
     )
+  })
+
+  it("reports loading and stays silent while the identity pubkey is still deriving", async () => {
+    mockIdentityPubkey = null
+    mockIdentityLoading = true
+
+    const { result } = renderHook(() =>
+      useCloudBackup({ isEncrypted: false, password: "" }),
+    )
+
+    expect(result.current.loading).toBe(true)
+
+    await act(async () => {
+      await result.current.handleBackup()
+    })
+
+    /** Mid-derivation is a race with the disabled CTA, not a failure: no toast. */
+    expect(mockStartSession).not.toHaveBeenCalled()
+    expect(mockUpload).not.toHaveBeenCalled()
+    expect(mockToastShow).not.toHaveBeenCalled()
   })
 
   it("includes walletIdentifier and lightningAddress in payload when set", async () => {

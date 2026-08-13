@@ -17,6 +17,9 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
   FeePolicy: { FeesExcluded: 0, FeesIncluded: 1 },
   LnurlPayRequest: { create: (p: Record<string, unknown>) => p },
   OnchainConfirmationSpeed: { Fast: 0, Medium: 1, Slow: 2 },
+  PaymentRequest: {
+    Input: jest.fn().mockImplementation((inner: unknown) => ({ tag: "Input", inner })),
+  },
   PrepareLnurlPayRequest: { create: (p: Record<string, unknown>) => p },
   PrepareSendPaymentRequest: { create: (p: Record<string, unknown>) => p },
   SendPaymentMethod_Tags: {
@@ -219,7 +222,7 @@ describe("prepareSend", () => {
     })
 
     expect(prepareSendPayment).toHaveBeenCalledWith({
-      paymentRequest: "lnbc1abc",
+      paymentRequest: { tag: "Input", inner: { input: "lnbc1abc" } },
       amount: BigInt(1000),
       tokenIdentifier: "usdb-token-id",
     })
@@ -232,7 +235,7 @@ describe("prepareSend", () => {
     await prepareSend(sdk, { paymentRequest: "lnbc1abc", amount: BigInt(1000) })
 
     expect(prepareSendPayment).toHaveBeenCalledWith({
-      paymentRequest: "lnbc1abc",
+      paymentRequest: { tag: "Input", inner: { input: "lnbc1abc" } },
       amount: BigInt(1000),
       tokenIdentifier: undefined,
       conversionOptions: undefined,

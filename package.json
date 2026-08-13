@@ -63,7 +63,7 @@
     "@bitcoinerlab/secp256k1": "^1.1.1",
     "@blinkbitcoin/blink-client": "1.1.0",
     "@blinkbitcoin/react-native-geetest-module": "0.1.2",
-    "@breeztech/breez-sdk-spark-react-native": "0.15.0",
+    "@breeztech/breez-sdk-spark-react-native": "0.22.0",
     "@expo/react-native-action-sheet": "^4.0.1",
     "@formatjs/intl-getcanonicallocales": "^2.3.0",
     "@formatjs/intl-locale": "^3.4.5",

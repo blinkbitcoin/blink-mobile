@@ -14,7 +14,7 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
     ClaimedDeposits: "ClaimedDeposits",
     UnclaimedDeposits: "UnclaimedDeposits",
     PaymentFailed: "PaymentFailed",
-    Optimization: "Optimization",
+    AutoOptimization: "AutoOptimization",
   },
 }))
 
@@ -367,7 +367,7 @@ describe("useSdkLifecycle", () => {
       const snapshotCallsBefore = mockGetSnapshot.mock.calls.length
 
       await act(async () => {
-        await listener.current?.({ tag: "Optimization" })
+        await listener.current?.({ tag: "AutoOptimization" })
       })
 
       expect(mockGetSnapshot.mock.calls).toHaveLength(snapshotCallsBefore)

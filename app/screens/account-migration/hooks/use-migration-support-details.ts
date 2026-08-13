@@ -52,10 +52,12 @@ export const useMigrationSupportDetails = (): MigrationSupportDetails => {
    *  resident: this screen shows only the pubkey, never the words. */
   useEffect(() => {
     let mounted = true
-    loadMnemonic().then((mnemonic) => {
-      if (!mounted) return
-      setPubKey(mnemonic ? deriveWalletIdentityPubkey(mnemonic, network) : "")
-    })
+    loadMnemonic()
+      .then((mnemonic) => (mnemonic ? deriveWalletIdentityPubkey(mnemonic, network) : ""))
+      .catch(() => "")
+      .then((pubkey) => {
+        if (mounted) setPubKey(pubkey)
+      })
     return () => {
       mounted = false
     }

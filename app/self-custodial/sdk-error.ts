@@ -24,6 +24,7 @@ export const isSelfCustodialErrorCode = (
 const TAG_TO_CODE: Record<SdkErrorTags, SelfCustodialErrorCode> = {
   [SdkErrorTags.InsufficientFunds]: SelfCustodialErrorCode.InsufficientFunds,
   [SdkErrorTags.MaxDepositClaimFeeExceeded]: SelfCustodialErrorCode.InsufficientFunds,
+  [SdkErrorTags.InsufficientCpfpFunds]: SelfCustodialErrorCode.InsufficientFunds,
   [SdkErrorTags.NetworkError]: SelfCustodialErrorCode.NetworkError,
   [SdkErrorTags.ChainServiceError]: SelfCustodialErrorCode.NetworkError,
   [SdkErrorTags.InvalidInput]: SelfCustodialErrorCode.InvalidInput,
@@ -33,6 +34,11 @@ const TAG_TO_CODE: Record<SdkErrorTags, SelfCustodialErrorCode> = {
   [SdkErrorTags.StorageError]: SelfCustodialErrorCode.Generic,
   [SdkErrorTags.Signer]: SelfCustodialErrorCode.Generic,
   [SdkErrorTags.SparkError]: SelfCustodialErrorCode.Generic,
+  /** Optimization / unilateral-exit state conflicts (0.22): flows the app never starts,
+   *  so no user-facing refinement exists for them. */
+  [SdkErrorTags.OptimizationAlreadyRunning]: SelfCustodialErrorCode.Generic,
+  [SdkErrorTags.OptimizationCancelled]: SelfCustodialErrorCode.Generic,
+  [SdkErrorTags.FundingUtxoConflict]: SelfCustodialErrorCode.Generic,
   [SdkErrorTags.Generic]: SelfCustodialErrorCode.Generic,
 }
 

@@ -25,7 +25,8 @@ jest.mock("@app/self-custodial/hooks/use-spark-network", () => ({
 }))
 
 jest.mock("@app/self-custodial/bridge", () => ({
-  deriveWalletIdentityPubkey: (mnemonic: string) => (mnemonic ? "02abc123pubkey" : ""),
+  deriveWalletIdentityPubkey: (mnemonic: string) =>
+    Promise.resolve(mnemonic ? "02abc123pubkey" : ""),
 }))
 
 describe("useMigrationSupportDetails", () => {

@@ -36,6 +36,9 @@ describe("activateStableBalance", () => {
     const arg = updateUserSettings.mock.calls[0][0]
     expect(arg.sparkPrivateModeEnabled).toBeUndefined()
     expect(arg.stableBalanceActiveLabel).toBeInstanceOf(Object)
+    /** 0.22 requires the key; leaving it unset must not overwrite the user's setting. */
+    expect("sparkMasterIdentityPublicKey" in arg).toBe(true)
+    expect(arg.sparkMasterIdentityPublicKey).toBeUndefined()
   })
 
   it("propagates errors from the SDK", async () => {
@@ -59,6 +62,12 @@ describe("deactivateStableBalance", () => {
 
     expect(mockUnset).toHaveBeenCalledTimes(1)
     expect(updateUserSettings).toHaveBeenCalledTimes(1)
+    expect("sparkMasterIdentityPublicKey" in updateUserSettings.mock.calls[0][0]).toBe(
+      true,
+    )
+    expect(
+      updateUserSettings.mock.calls[0][0].sparkMasterIdentityPublicKey,
+    ).toBeUndefined()
   })
 
   it("propagates errors from the SDK", async () => {

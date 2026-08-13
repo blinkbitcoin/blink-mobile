@@ -18,6 +18,10 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => {
     MissingUtxo: "MissingUtxo",
     LnurlError: "LnurlError",
     Signer: "Signer",
+    OptimizationAlreadyRunning: "OptimizationAlreadyRunning",
+    OptimizationCancelled: "OptimizationCancelled",
+    InsufficientCpfpFunds: "InsufficientCpfpFunds",
+    FundingUtxoConflict: "FundingUtxoConflict",
     Generic: "Generic",
   }
   return {
@@ -50,6 +54,22 @@ describe("classifySdkError", () => {
     expect(classifySdkError(sdkError("MaxDepositClaimFeeExceeded"))).toBe(
       SelfCustodialErrorCode.InsufficientFunds,
     )
+  })
+
+  it("maps InsufficientCpfpFunds (0.22) as InsufficientFunds", () => {
+    expect(classifySdkError(sdkError("InsufficientCpfpFunds"))).toBe(
+      SelfCustodialErrorCode.InsufficientFunds,
+    )
+  })
+
+  it("maps the 0.22 optimization/exit state conflicts to Generic", () => {
+    for (const tag of [
+      "OptimizationAlreadyRunning",
+      "OptimizationCancelled",
+      "FundingUtxoConflict",
+    ]) {
+      expect(classifySdkError(sdkError(tag))).toBe(SelfCustodialErrorCode.Generic)
+    }
   })
 
   it("maps NetworkError and ChainServiceError to NetworkError", () => {

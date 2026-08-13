@@ -62,7 +62,9 @@ export const useBackupMethods = () => {
    *  on mount: cloud and manual leave this screen and load it themselves. */
   const handleCredentialBackup = useCallback(async () => {
     const mnemonic = await loadMnemonic()
-    const identityPubkey = mnemonic ? deriveWalletIdentityPubkey(mnemonic, network) : ""
+    const identityPubkey = mnemonic
+      ? await deriveWalletIdentityPubkey(mnemonic, network).catch(() => "")
+      : ""
     if (!identityPubkey) {
       toastShow({
         message: LL.BackupScreen.BackupMethod.passwordManagerBackupFailed(),

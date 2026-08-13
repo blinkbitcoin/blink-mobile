@@ -10,10 +10,12 @@ export const activateStableBalance = (
   sdk.updateUserSettings({
     sparkPrivateModeEnabled: undefined,
     stableBalanceActiveLabel: new StableBalanceActiveLabel.Set({ label }),
+    sparkMasterIdentityPublicKey: undefined,
   })
 
 export const deactivateStableBalance = (sdk: BreezSdkInterface): Promise<void> =>
   sdk.updateUserSettings({
     sparkPrivateModeEnabled: undefined,
     stableBalanceActiveLabel: new StableBalanceActiveLabel.Unset(),
+    sparkMasterIdentityPublicKey: undefined,
   })

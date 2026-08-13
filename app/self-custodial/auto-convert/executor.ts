@@ -99,7 +99,10 @@ const matchesConversionAmount = (
   satsAmount: number,
   toleranceBps: number,
 ): boolean => {
-  const from = payment.conversionDetails?.from
+  /** 0.22 models a conversion as an array of legs. The AMM BTC→USDB path this matcher
+   *  serves is single-leg, so the sats we sent are the first leg's source; a future
+   *  multi-hop route would need to pick its entry leg here deliberately. */
+  const from = payment.conversionDetails?.conversions[0]?.from
   if (!from) return false
   const fromAmount = toNumber(from.amount)
   const tolerance = Math.max(
