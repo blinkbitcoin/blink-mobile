@@ -151,7 +151,13 @@ elif [ "$PLATFORM" = ios ] && [ -n "${DEMO_SESSION_DIR:-}" ] && [ -f "$DEMO_SESS
   WARM_REASON="session"
 elif [ "$PLATFORM" = ios ] && [ -n "${DEMO_SESSION_DIR:-}" ] && [ -f "$DEMO_SESSION_DIR/golden-stamp" ]; then
   STAMP_MV=$(grep '^maestro-version=' "$DEMO_SESSION_DIR/golden-stamp" 2>/dev/null | cut -d= -f2- || true)
-  CUR_MV=$(maestro --version 2>/dev/null | head -1 || true)
+  # `maestro --version` boots a JVM (~3s, measured in the vid.record.warmup
+  # span) - cache it per session so only the first recording pays it.
+  CUR_MV=$(cat "$DEMO_SESSION_DIR/maestro-cli-version" 2>/dev/null || true)
+  if [ -z "$CUR_MV" ]; then
+    CUR_MV=$(maestro --version 2>/dev/null | head -1 || true)
+    [ -n "$CUR_MV" ] && echo "$CUR_MV" > "$DEMO_SESSION_DIR/maestro-cli-version" 2>/dev/null
+  fi
   if [ -n "$STAMP_MV" ] && [ "$STAMP_MV" = "$CUR_MV" ]; then
     WARM_REASON="golden"
   fi

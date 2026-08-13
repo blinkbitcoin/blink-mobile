@@ -279,6 +279,13 @@ lockfile), fall back to diffing native paths against the stamp's SHA:
 git -C /path/to/your-app log <stamp-sha>..origin/main -- ios/ package.json yarn.lock
 ```
 
+**A fresh clone can refuse to launch the app** — `simctl launch` fails with
+`FBSOpenApplicationServiceErrorDomain ... denied by service delegate
+(SBMainWorkspace)` because the cloned SpringBoard's app registration is
+stale. The fix is a plain `simctl install` of the same build over it (an
+upgrade install: re-registers the app, **keeps the data container and the
+login**), then launch again. A shutdown/boot cycle alone does not clear it.
+
 A clone that comes up logged out (staging sessions do expire) means the same
 thing — re-bless with a fresh login. Opt out of cloning with
 `DEMO_SIM_GOLDEN=none`, or point at a differently named golden with
