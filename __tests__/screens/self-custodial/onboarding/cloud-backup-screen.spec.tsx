@@ -14,17 +14,13 @@ import { flushEffects } from "../../../helpers/flush-effects"
 const mockHandleBackup = jest.fn()
 let mockLoading = false
 let mockIsValid = true
-let mockIsEncrypted = false
-const mockToggleEncryption = jest.fn()
 const mockSetPassword = jest.fn()
 const mockSetConfirmPassword = jest.fn()
 
 jest.mock("@app/screens/self-custodial/onboarding/hooks", () => ({
   useCloudBackupForm: () => ({
-    isEncrypted: mockIsEncrypted,
     password: "",
     confirmPassword: "",
-    toggleEncryption: mockToggleEncryption,
     setPassword: mockSetPassword,
     setConfirmPassword: mockSetConfirmPassword,
     passwordError: undefined,
@@ -78,7 +74,6 @@ describe("CloudBackupScreen", () => {
     jest.clearAllMocks()
     mockLoading = false
     mockIsValid = true
-    mockIsEncrypted = false
   })
 
   it("renders title and subtitle", async () => {
@@ -92,32 +87,7 @@ describe("CloudBackupScreen", () => {
     expect(getByText(LL.BackupScreen.CloudBackup.title())).toBeTruthy()
   })
 
-  it("renders checkbox and continue button", async () => {
-    const { getByText } = render(
-      <ContextForScreen>
-        <CloudBackupScreen />
-      </ContextForScreen>,
-    )
-    await flushEffects()
-
-    expect(getByText(LL.BackupScreen.CloudBackup.encryptCheckbox())).toBeTruthy()
-    expect(getByText(LL.BackupScreen.CloudBackup.continueButton())).toBeTruthy()
-  })
-
-  it("does not show password fields when encryption is off", async () => {
-    const { queryByText } = render(
-      <ContextForScreen>
-        <CloudBackupScreen />
-      </ContextForScreen>,
-    )
-    await flushEffects()
-
-    expect(queryByText(LL.BackupScreen.CloudBackup.password())).toBeNull()
-  })
-
-  it("shows password fields and warning when encryption is on", async () => {
-    mockIsEncrypted = true
-
+  it("always shows the password fields, the warning, and the continue button", async () => {
     const { getByText } = render(
       <ContextForScreen>
         <CloudBackupScreen />
@@ -128,6 +98,7 @@ describe("CloudBackupScreen", () => {
     expect(getByText(LL.BackupScreen.CloudBackup.password())).toBeTruthy()
     expect(getByText(LL.BackupScreen.CloudBackup.confirmPassword())).toBeTruthy()
     expect(getByText(LL.BackupScreen.CloudBackup.importantTitle())).toBeTruthy()
+    expect(getByText(LL.BackupScreen.CloudBackup.continueButton())).toBeTruthy()
   })
 
   it("calls handleBackup on continue press", async () => {
@@ -143,8 +114,6 @@ describe("CloudBackupScreen", () => {
   })
 
   it("renders the Important InfoBanner with warning icon color", async () => {
-    mockIsEncrypted = true
-
     render(
       <ContextForScreen>
         <CloudBackupScreen />

@@ -3697,8 +3697,7 @@
     },
     "CloudBackup": {
       "title": "Masigcine isipaji sakho",
-      "description": "Siza kugcina ikopi yesivakalisi sakho sokugcina kwi-{provider} yakho.",
-      "encryptCheckbox": "Bethelela ngegama lokugqitha elongezelelweyo",
+      "description": "Siza kugcina ikopi yokhuselo yebinzana lakho lokubuyisela efihlwe ngokhowudi kwaye ikhuselwe ngephasiwedi kwi-{provider} yakho.",
       "password": "Igama lokugqitha",
       "passwordPlaceholder": "(ubuncinane oonobumba abayi-12)",
       "confirmPassword": "Qinisekisa igama lokugqitha",

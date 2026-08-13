@@ -4,7 +4,6 @@ import { View } from "react-native"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
-import { CheckboxRow } from "@app/components/checkbox-row"
 import { IconHero } from "@app/components/icon-hero"
 import { InfoBanner } from "@app/components/info-banner"
 import { PasswordInput } from "@app/components/password-input"
@@ -30,10 +29,8 @@ export const CloudBackupScreen: React.FC = () => {
   const cloudProvider = getCloudProviderName(LL)
 
   const {
-    isEncrypted,
     password,
     confirmPassword,
-    toggleEncryption,
     setPassword,
     setConfirmPassword,
     markPasswordTouched,
@@ -43,7 +40,7 @@ export const CloudBackupScreen: React.FC = () => {
     isValid,
   } = useCloudBackupForm()
 
-  const { handleBackup, loading } = useCloudBackup({ isEncrypted, password })
+  const { handleBackup, loading } = useCloudBackup({ password })
 
   useMigrationBackupCheckpoint(MigrationCheckpoint.CloudBackup)
 
@@ -63,48 +60,38 @@ export const CloudBackupScreen: React.FC = () => {
           </View>
 
           <View style={styles.formContainer}>
-            <CheckboxRow
-              label={LL.BackupScreen.CloudBackup.encryptCheckbox()}
-              isChecked={isEncrypted}
-              onPress={toggleEncryption}
-              centered
-              {...testProps("encrypt-checkbox")}
-            />
+            <View style={styles.passwordFields}>
+              <PasswordInput
+                label={LL.BackupScreen.CloudBackup.password()}
+                value={password}
+                onChangeText={setPassword}
+                onBlur={markPasswordTouched}
+                placeholder={LL.BackupScreen.CloudBackup.passwordPlaceholder()}
+                error={passwordError}
+                {...testProps("cloud-password-input")}
+              />
+              <PasswordInput
+                label={LL.BackupScreen.CloudBackup.confirmPassword()}
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
+                onBlur={markConfirmPasswordTouched}
+                placeholder={LL.BackupScreen.CloudBackup.confirmPasswordPlaceholder()}
+                error={confirmPasswordError}
+                {...testProps("cloud-confirm-password-input")}
+              />
 
-            {isEncrypted && (
-              <View style={styles.encryptionFields}>
-                <PasswordInput
-                  label={LL.BackupScreen.CloudBackup.password()}
-                  value={password}
-                  onChangeText={setPassword}
-                  onBlur={markPasswordTouched}
-                  placeholder={LL.BackupScreen.CloudBackup.passwordPlaceholder()}
-                  error={passwordError}
-                  {...testProps("cloud-password-input")}
+              <InfoBanner
+                title={LL.BackupScreen.CloudBackup.importantTitle()}
+                icon="warning"
+                iconColor="warning"
+              >
+                <RichText
+                  text={LL.BackupScreen.CloudBackup.importantMessage({
+                    bold: `<bold>${LL.BackupScreen.CloudBackup.importantMessageBold()}</bold>`,
+                  })}
                 />
-                <PasswordInput
-                  label={LL.BackupScreen.CloudBackup.confirmPassword()}
-                  value={confirmPassword}
-                  onChangeText={setConfirmPassword}
-                  onBlur={markConfirmPasswordTouched}
-                  placeholder={LL.BackupScreen.CloudBackup.confirmPasswordPlaceholder()}
-                  error={confirmPasswordError}
-                  {...testProps("cloud-confirm-password-input")}
-                />
-
-                <InfoBanner
-                  title={LL.BackupScreen.CloudBackup.importantTitle()}
-                  icon="warning"
-                  iconColor="warning"
-                >
-                  <RichText
-                    text={LL.BackupScreen.CloudBackup.importantMessage({
-                      bold: `<bold>${LL.BackupScreen.CloudBackup.importantMessageBold()}</bold>`,
-                    })}
-                  />
-                </InfoBanner>
-              </View>
-            )}
+              </InfoBanner>
+            </View>
           </View>
         </View>
 
@@ -136,7 +123,7 @@ const useStyles = makeStyles(() => ({
     gap: 14,
     alignItems: "center",
   },
-  encryptionFields: {
+  passwordFields: {
     gap: 0,
     alignSelf: "stretch",
   },

@@ -3697,8 +3697,7 @@
     },
     "CloudBackup": {
       "title": "Mari sandarkan dompet anda",
-      "description": "Kami akan menyimpan sandaran frasa pemulihan anda ke {provider} anda.",
-      "encryptCheckbox": "Sulitkan dengan kata laluan tambahan",
+      "description": "Kami akan menyimpan sandaran frasa sandaran anda yang disulitkan dan dilindungi kata laluan dalam {provider} anda.",
       "password": "Kata laluan",
       "passwordPlaceholder": "(minimum 12 aksara)",
       "confirmPassword": "Sahkan kata laluan",

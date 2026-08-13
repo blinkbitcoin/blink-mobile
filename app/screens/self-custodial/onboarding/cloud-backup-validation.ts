@@ -1,7 +1,6 @@
 import { validatePassword } from "@app/utils/validators/password"
 
 type CloudBackupFormInput = {
-  isEncrypted: boolean
   password: string
   confirmPassword: string
   passwordTouched: boolean
@@ -15,7 +14,6 @@ export type CloudBackupFormValidation = {
 }
 
 export const validateCloudBackupForm = ({
-  isEncrypted,
   password,
   confirmPassword,
   passwordTouched,
@@ -27,10 +25,9 @@ export const validateCloudBackupForm = ({
   const doPasswordsMatch = password === confirmPassword
 
   return {
-    shouldShowPasswordError:
-      isEncrypted && passwordTouched && hasPassword && !isPasswordValid,
+    shouldShowPasswordError: passwordTouched && hasPassword && !isPasswordValid,
     shouldShowConfirmPasswordError:
-      isEncrypted && confirmPasswordTouched && hasConfirmPassword && !doPasswordsMatch,
-    isValid: !isEncrypted || (isPasswordValid && doPasswordsMatch),
+      confirmPasswordTouched && hasConfirmPassword && !doPasswordsMatch,
+    isValid: isPasswordValid && doPasswordsMatch,
   }
 }

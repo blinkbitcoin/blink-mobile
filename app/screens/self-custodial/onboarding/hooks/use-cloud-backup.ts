@@ -43,13 +43,11 @@ const buildExistingBackupMessage = (
 }
 
 type UseCloudBackupParams = {
-  isEncrypted: boolean
   password: string
   version?: number
 }
 
 export const useCloudBackup = ({
-  isEncrypted,
   password,
   version = DEFAULT_BACKUP_VERSION,
 }: UseCloudBackupParams) => {
@@ -123,7 +121,7 @@ export const useCloudBackup = ({
     const payload = buildBackupPayload(mnemonic, {
       walletIdentifier: identityPubkey,
       lightningAddress: lightningAddress ?? undefined,
-      password: isEncrypted ? password : undefined,
+      password,
       version,
     })
 
@@ -143,7 +141,6 @@ export const useCloudBackup = ({
     })
     completeBackup({ method: BackupMethod.Cloud })
   }, [
-    isEncrypted,
     password,
     version,
     startSession,
