@@ -96,6 +96,14 @@ const mockCreatePaymentDetail = jest.fn()
 const mockSetAmount = jest
   .fn()
   .mockImplementation((amt) => ({ ...mockRebuilt, amount: amt }))
+/** Answers with a detail that can still take an amount, as the real one does. */
+const mockSetMemo = jest.fn().mockImplementation((memo) => ({
+  paymentType: "onchain",
+  memo,
+  canSetAmount: true,
+  setAmount: (amt: unknown) => mockSetAmount(amt),
+}))
+
 jest.mock("@app/self-custodial/payment-details/wrap-destination", () => ({
   wrapDestination: jest.fn(() => ({
     valid: true,
@@ -105,6 +113,8 @@ jest.mock("@app/self-custodial/payment-details/wrap-destination", () => ({
         paymentType: "onchain",
         canSetAmount: true,
         setAmount: (amt: unknown) => mockSetAmount(amt),
+        canSetMemo: true,
+        setMemo: (memo: unknown) => mockSetMemo(memo),
       }
     },
   })),
@@ -486,6 +496,44 @@ describe("useOnchainFeeTierOptions", () => {
     expect(mockCreatePaymentDetail).toHaveBeenCalled()
     expect(mockSetAmount).toHaveBeenCalled()
     expect(result.current.feeTier).toBe(FeeTierOption.Slow)
+  })
+
+  /** Rebuilding starts from the destination, which carries no note of its own. */
+  it("carries the sender's note onto the rebuilt detail", () => {
+    const noted = { ...buildOnchainDetailRaw(), memo: "rent" } as never
+
+    const { result } = renderHook(() =>
+      useOnchainFeeTierOptions({
+        paymentDetail: noted,
+        isSelfCustodial: true,
+        paymentDestination: { isValid: true } as never,
+        convertMoneyAmount: jest.fn() as never,
+      }),
+    )
+
+    act(() => {
+      result.current.setFeeTier(FeeTierOption.Slow, noted)
+    })
+
+    expect(mockSetMemo).toHaveBeenCalledWith("rent")
+    expect(mockSetAmount).toHaveBeenCalled()
+  })
+
+  it("leaves the rebuilt detail alone when the sender wrote no note", () => {
+    const { result } = renderHook(() =>
+      useOnchainFeeTierOptions({
+        paymentDetail: buildOnchainDetail(),
+        isSelfCustodial: true,
+        paymentDestination: { isValid: true } as never,
+        convertMoneyAmount: jest.fn() as never,
+      }),
+    )
+
+    act(() => {
+      result.current.setFeeTier(FeeTierOption.Slow, buildOnchainDetail())
+    })
+
+    expect(mockSetMemo).not.toHaveBeenCalled()
   })
 
   it("returns the rebuilt detail without an amount when none has been entered yet", () => {

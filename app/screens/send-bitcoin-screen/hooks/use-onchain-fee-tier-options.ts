@@ -134,10 +134,19 @@ export const useOnchainFeeTierOptions = ({
         sendingWalletDescriptor: currentDetail.sendingWalletDescriptor,
       })
 
-      if (!currentDetail.unitOfAccountAmount.amount || !rebuilt.canSetAmount) {
-        return rebuilt
+      /**
+       * Rebuilding starts from the destination, which carries no note, so anything typed is
+       * carried over by hand. The custodial rail rebuilds from its own params and keeps the
+       * note on its own, and the same action must not cost the sender their note on one rail.
+       */
+      const currentMemo = currentDetail.memo
+      const restored =
+        currentMemo && rebuilt.canSetMemo ? rebuilt.setMemo(currentMemo) : rebuilt
+
+      if (!currentDetail.unitOfAccountAmount.amount || !restored.canSetAmount) {
+        return restored
       }
-      return rebuilt.setAmount(currentDetail.unitOfAccountAmount)
+      return restored.setAmount(currentDetail.unitOfAccountAmount)
     },
     [isSelfCustodial, sdk, paymentDestination, convertMoneyAmount],
   )
