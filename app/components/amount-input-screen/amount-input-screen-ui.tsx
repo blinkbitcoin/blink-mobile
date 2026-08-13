@@ -64,7 +64,7 @@ export const AmountInputScreenUI: React.FC<AmountInputScreenUIProps> = ({
           <CurrencyPill label={primaryCurrencyCode} variant="outlined" />
           <View style={styles.amountContainer}>
             <Text style={styles.amountText}>
-              {primaryCurrencySymbol || ""}
+              {primaryCurrencyCode !== "HUF" && (primaryCurrencySymbol || "")}
               {primaryCurrencyFormattedAmount || "0"}
             </Text>
             <TextInput
@@ -91,7 +91,7 @@ export const AmountInputScreenUI: React.FC<AmountInputScreenUIProps> = ({
               <CurrencyPill label={secondaryCurrencyCode} variant="outlined" />
               <View style={styles.amountContainer}>
                 <Text style={styles.amountText}>
-                  {secondaryCurrencySymbol}
+                  {secondaryCurrencyCode !== "HUF" && secondaryCurrencySymbol}
                   {secondaryCurrencyFormattedAmount}
                 </Text>
               </View>
