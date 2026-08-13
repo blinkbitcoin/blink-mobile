@@ -9,6 +9,7 @@ import {
 
 import { useAuthenticationContext } from "@app/navigation/navigation-container-wrapper"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { UnlockRouteName } from "@app/navigation/unlock-routes"
 
 type UseUnlockScreenParams = {
   isResume: boolean
@@ -23,7 +24,7 @@ type UseUnlockScreenParams = {
 export const unlockScreenOptions = ({
   route,
 }: {
-  route: RouteProp<RootStackParamList, "authenticationCheck" | "authentication" | "pin">
+  route: RouteProp<RootStackParamList, UnlockRouteName>
 }): NativeStackNavigationOptions => ({
   headerShown: false,
   gestureEnabled: !route.params?.isResume,

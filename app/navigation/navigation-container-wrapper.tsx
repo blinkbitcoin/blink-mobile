@@ -21,6 +21,7 @@ import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useMigrationBlocker } from "@app/screens/account-migration/hooks/use-migration-blocker"
 
 import { RootStackParamList } from "./stack-param-lists"
+import { isUnlockInProgress } from "./unlock-routes"
 
 const navigationRef = createNavigationContainerRef<RootStackParamList>()
 
@@ -40,36 +41,55 @@ export const isMigrationDeeplink = (url: string): boolean => {
   }
 }
 
-/** The root route the blocker renders under: PrimaryNavigator swaps its tabs for the gate. */
-const BLOCKER_ROUTE = "Primary" as const
+/** Where the blocker lives: PrimaryNavigator swaps its tabs for the gate. */
+const BLOCKER_ROUTE = "Primary" satisfies keyof RootStackParamList
 
-/** The unlock flow's own screens. Resetting the stack while one of them is in front tears
- *  down an unlock the user is halfway through and serves them an identical empty one, which
- *  is the PIN screen that kept reappearing on every launch (#4150). */
-const UNLOCK_ROUTES = new Set<string>([
-  "authenticationCheck",
-  "authentication",
-  "pin",
-] satisfies (keyof RootStackParamList)[])
+/** Where a still-locked session has to pass through first. */
+const UNLOCK_ENTRY_ROUTE = "authenticationCheck" satisfies keyof RootStackParamList
 
-type RootRoutes = NavigationState["routes"]
+/** What the migration deeplink above opens. The armed gate lets that one link through, so
+ *  it is the one thing that can legitimately appear above the blocker after the gate armed,
+ *  and a retry finishing an older job must not pop the screen it just opened. */
+const MIGRATION_ENTRY_ROUTE = "accountMigrationEntry" satisfies keyof RootStackParamList
 
-/** Whether the root stack holds anything for the blocker to pop. The blocker renders inside
- *  its own route, so a stack that is already just that route needs nothing, and resetting it
- *  anyway would remount the gate for no reason. A stack with no routes to read is judged the
- *  same way an unreadable one is: nothing proven, nothing thrown away. */
-const hasRoutesAboveBlocker = (routes: RootRoutes): boolean => {
-  if (routes.length === 0) return false
-  const hasStackedRoutes = routes.length > 1
-  const isBlockerAtRoot = routes[0].name === BLOCKER_ROUTE
-  return hasStackedRoutes || !isBlockerAtRoot
+/** The armed-gate reset is lock-aware: while the app is still locked it must land on
+ *  authenticationCheck so the PIN/biometric unlock is never skipped. Jumping straight to
+ *  Primary would strand isAppLocked at true, hiding the gate behind an app that never
+ *  unlocked and freezing the queued migration deeplink (which waits on !isAppLocked). Once
+ *  unlocked, Primary is correct: the blocker renders the gate with no jarring re-prompt. */
+export const blockerEntryRoute = (mustRouteThroughUnlock: boolean) =>
+  mustRouteThroughUnlock ? UNLOCK_ENTRY_ROUTE : BLOCKER_ROUTE
+
+/** The route the user is looking at, which is the only one an unlock can be blocking from,
+ *  read off the state's own index rather than the tail of the list. */
+const focusedRoute = (state: NavigationState | undefined) =>
+  state ? state.routes[state.index] : undefined
+
+/**
+ * Whether resetting this stack would achieve anything. Two separate jobs qualify: popping
+ * whatever is stacked on top of the blocker, and routing a session that is still locked
+ * through the unlock entry, which is the only thing that lowers the lock and so the only
+ * thing that drains the queued deeplink. A stack the blocker is not part of at all belongs
+ * to another flow — signing in, unlocking, the landing screen a logout returns to — which
+ * runs nothing over the closed account and reaches the blocker on its own.
+ */
+const isResetWarranted = (
+  state: NavigationState | undefined,
+  mustRouteThroughUnlock: boolean,
+): boolean => {
+  const routes = state?.routes ?? []
+  const blockerIndex = routes.findIndex((route) => route.name === BLOCKER_ROUTE)
+  if (blockerIndex === -1) return false
+
+  const hasRoutesAboveBlocker = blockerIndex < routes.length - 1
+  return hasRoutesAboveBlocker || mustRouteThroughUnlock
 }
 
-/** Whether an unlock stands in front of the pop, which only the topmost route can. */
-const isUnlockInProgress = (routes: RootRoutes): boolean => {
-  const topRoute = routes[routes.length - 1]
-  return topRoute !== undefined && UNLOCK_ROUTES.has(topRoute.name)
-}
+/** Why the stack is being judged. The two triggers do not carry the same authority: arming
+ *  owns both of the jobs above, while a retry exists only to finish the pop an unlock stood
+ *  in front of, and must not bounce a session elsewhere on the strength of a lock its own
+ *  flow never lowered (the three-strikes logout resets the stack without unlocking). */
+type ResetTrigger = "gate-armed" | "unlock-cleared"
 
 export type AuthenticationContextType = {
   isAppLocked: boolean
@@ -124,41 +144,69 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
     isBlockerVisibleRef.current = isBlockerVisible
   }, [isBlockerVisible])
 
-  /** Set when a pop found an unlock in front of it, so the pop runs the moment that unlock
-   *  finishes instead of being lost. Only that case waits: keying the pop on the lock state
-   *  itself would re-run it on every resume unlock, throwing away whatever the gate had
-   *  opened, and would never run at all in a session that signed in without ever unlocking. */
-  const isPopDeferredRef = useRef(false)
+  /** Mirrors the lock for the readers that run outside a render: the state is a commit
+   *  behind, and the retry below runs during a navigation dispatch, before that commit
+   *  lands. Written by the two setters so it is never the stale one. */
+  const isAppLockedRef = useRef(isAppLocked)
+
+  /** Set when the reset found an unlock in front of it, so it retries instead of being
+   *  lost. Cleared by the next attempt that finds the way clear. */
+  const isResetDeferredRef = useRef(false)
 
   /** Pop anything a deeplink opened above the blocker so nothing keeps working over the
-   *  closed account. */
-  const popRoutesAboveBlocker = useCallback(() => {
+   *  closed account, landing on the lock-aware entry so arming never skips the unlock.
+   *  An unlock already on screen is the one thing it will not do that to: resetting there
+   *  tore the screen down mid-PIN and served an identical empty one (#4150). */
+  const resetToBlocker = useCallback((trigger: ResetTrigger) => {
+    /** Guarded here rather than at each caller: the retry below fires on navigations the
+     *  kill-switch may have made harmless in the meantime. A deferral does not outlive the
+     *  blocker it was waiting for, or a re-arming would inherit a verdict about a stack
+     *  that has since moved on. Readiness is different: it is transient, and onReady runs
+     *  the arming again, so a deferral survives it. */
+    if (!isBlockerVisibleRef.current) {
+      isResetDeferredRef.current = false
+      return
+    }
     if (!navigationRef.isReady()) return
 
-    const routes = navigationRef.getRootState()?.routes ?? []
-    const isUnlockInTheWay = isUnlockInProgress(routes)
-    isPopDeferredRef.current = isUnlockInTheWay
+    const rootState = navigationRef.getRootState()
+    const routeInFront = focusedRoute(rootState)
+    if (!routeInFront) return
 
-    if (isUnlockInTheWay) return
-    if (!hasRoutesAboveBlocker(routes)) return
-    navigationRef.reset({ index: 0, routes: [{ name: BLOCKER_ROUTE }] })
+    const isArming = trigger === "gate-armed"
+
+    /** Only a retry has to make this allowance. Arming pops everything above the blocker,
+     *  as it always has: those screens were opened before the gate existed. */
+    const isOnSanctionedEntry = routeInFront.name === MIGRATION_ENTRY_ROUTE
+    if (!isArming && isOnSanctionedEntry) {
+      isResetDeferredRef.current = false
+      return
+    }
+
+    const mustRouteThroughUnlock = isAppLockedRef.current && isArming
+
+    /** Judged before the unlock is: a reset that would achieve nothing has nothing to come
+     *  back for either, so it must not leave a retry armed behind it. */
+    if (!isResetWarranted(rootState, mustRouteThroughUnlock)) {
+      isResetDeferredRef.current = false
+      return
+    }
+
+    isResetDeferredRef.current = isUnlockInProgress(routeInFront)
+    if (isResetDeferredRef.current) return
+
+    navigationRef.reset({
+      index: 0,
+      routes: [{ name: blockerEntryRoute(mustRouteThroughUnlock) }],
+    })
   }, [])
 
   /** Covers arming mid-session. The container-not-ready-yet case (armed at cold start) is
    *  handled from onReady below, since this effect can fire before isReady() is true. */
   useEffect(() => {
     if (!isBlockerVisible) return
-    popRoutesAboveBlocker()
-  }, [isBlockerVisible, popRoutesAboveBlocker])
-
-  /** The waiting half: the unlock that stood in front of a pop has finished. */
-  const hasUnlockFinished = isBlockerVisible && !isAppLocked
-
-  useEffect(() => {
-    if (!hasUnlockFinished) return
-    if (!isPopDeferredRef.current) return
-    popRoutesAboveBlocker()
-  }, [hasUnlockFinished, popRoutesAboveBlocker])
+    resetToBlocker("gate-armed")
+  }, [isBlockerVisible, resetToBlocker])
 
   useEffect(() => {
     if (canHandlePayments && !isAppLocked && urlAfterUnlockAndAuth) {
@@ -169,12 +217,19 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
 
   const setAppUnlocked = React.useMemo(
     () => async () => {
+      isAppLockedRef.current = false
       setIsAppLocked(false)
     },
     [],
   )
 
-  const setAppLocked = React.useMemo(() => () => setIsAppLocked(true), [])
+  const setAppLocked = React.useMemo(
+    () => () => {
+      isAppLockedRef.current = true
+      setIsAppLocked(true)
+    },
+    [],
+  )
 
   const routeName = useRef("Initial")
 
@@ -305,9 +360,9 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
         onReady={() => {
           RNBootSplash.hide({ fade: true })
           console.log("NavigationContainer onReady")
-          /** Cold-started already gated: pop now that the container is ready, since the
+          /** Cold-started already gated: reset now that the container is ready, since the
            *  effect above may have run before isReady() turned true. */
-          if (isBlockerVisibleRef.current) popRoutesAboveBlocker()
+          if (isBlockerVisibleRef.current) resetToBlocker("gate-armed")
         }}
         onStateChange={(state) => {
           const currentRouteName = getActiveRouteName(state)
@@ -321,6 +376,14 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
             })
             routeName.current = currentRouteName
           }
+
+          /** A reset an unlock held back retries on every navigation until the way is
+           *  clear. The visibility comes from this render rather than the ref, which a
+           *  passive effect may not have caught up to yet. Releasing the lock is not the same event as leaving the unlock: the
+           *  biometric prompt falls back to the PIN pad and steps back onto itself with the
+           *  lock already down, so keying the retry on the lock would spend it too early. */
+          const isRetryPending = isBlockerVisible && isResetDeferredRef.current
+          if (isRetryPending) resetToBlocker("unlock-cleared")
         }}
       >
         {children}
