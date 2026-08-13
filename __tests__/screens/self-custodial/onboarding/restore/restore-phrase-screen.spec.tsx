@@ -130,6 +130,8 @@ const renderScreen = () =>
 describe("RestorePhraseScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockEnableScreenSecurity.mockResolvedValue(undefined)
+    mockDisableScreenSecurity.mockResolvedValue(undefined)
     mockRouteParams = { step: 2, words: [...validStep2Words] }
     mockUseRestorePhrase.mockReturnValue(defaultHookReturn)
   })
