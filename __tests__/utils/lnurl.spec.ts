@@ -92,6 +92,19 @@ describe("lud17Url", () => {
       "http://hiddenservice.onion/withdraw",
     )
   })
+
+  // js-lnurl's /\.onion($|\W)/ does not match ".onion" followed by a word
+  // character, but lnurl-pay's includes(".onion") does and downgrades anyway.
+  // The wider rule has to win, or the payload passes the gate and is still
+  // fetched over cleartext.
+  it("maps a payload where .onion is followed by a word character to plain http", () => {
+    expect(lud17Url("lnurlp://attacker.com/x.onionz")).toBe(
+      "http://attacker.com/x.onionz",
+    )
+    expect(lud17Url("lnurlw://attacker.com/x.onion1")).toBe(
+      "http://attacker.com/x.onion1",
+    )
+  })
 })
 
 describe("isHttpsUrl", () => {

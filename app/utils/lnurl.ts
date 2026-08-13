@@ -33,17 +33,19 @@ export const decodeBareLnurl = (lnurl: string): BareLnurlDecodeResult => {
   }
 }
 
-// LUD-17 URI schemes are converted by js-lnurl to https URLs, or to plain http
-// whenever ".onion" appears anywhere in the payload (it matches /\.onion($|\W)/;
-// lnurl-pay likewise checks parsedUrl.includes(".onion")). Mirror that
-// derivation so the scheme can be vetted before any network call.
+// LUD-17 URI schemes are converted to https URLs by the two libraries that fetch
+// them, or to plain http when the payload looks like an onion service. The two
+// disagree on what that means: js-lnurl matches /\.onion($|\W)/ while lnurl-pay
+// checks parsedUrl.includes(".onion"), so a payload like "host/x.onionz" is https
+// to one and http to the other. Take the wider rule, otherwise a payload can pass
+// this gate and still be fetched over cleartext by lnurl-pay.
 const LUD17_SCHEME_PATTERN = /^(?:lnurlw|lnurlp|lnurlc|keyauth):\/\//i
 
 export const lud17Url = (lnurl: string): string | null => {
   const trimmed = lnurl.trim()
   if (!LUD17_SCHEME_PATTERN.test(trimmed)) return null
   const payload = trimmed.split("://")[1]
-  const scheme = payload.match(/\.onion($|\W)/) ? "http" : "https"
+  const scheme = payload.includes(".onion") ? "http" : "https"
   return `${scheme}://${payload}`
 }
 

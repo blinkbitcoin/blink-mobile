@@ -563,6 +563,27 @@ describe("lnurl https enforcement", () => {
     expect(mockRequestPayServiceParams).not.toHaveBeenCalled()
   })
 
+  it("rejects a LUD-17 lnurlp URI whose .onion is followed by a word character", async () => {
+    const destination = await resolveLnurlDestination({
+      parsedLnurlDestination: {
+        paymentType: PaymentType.Lnurl,
+        valid: true,
+        lnurl: "lnurlp://attacker.com/x.onionz",
+        isMerchant: false,
+      },
+      ...baseParams,
+    })
+
+    expect(destination).toEqual(
+      expect.objectContaining({
+        valid: false,
+        invalidReason: InvalidDestinationReason.LnurlError,
+      }),
+    )
+    expect(mockGetParams).not.toHaveBeenCalled()
+    expect(mockRequestPayServiceParams).not.toHaveBeenCalled()
+  })
+
   it("accepts a LUD-17 lnurlw URI over a clearnet host (derived URL is https)", async () => {
     const lnurl = "lnurlw://example.com/withdraw"
     mockGetParams.mockResolvedValue(manualMockLNURLWithdrawParams())
