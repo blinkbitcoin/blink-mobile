@@ -116,6 +116,8 @@ describe("BackupPhraseConfirmScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     jest.useFakeTimers({ doNotFake: ["setImmediate"] })
+    mockEnableScreenSecurity.mockResolvedValue(undefined)
+    mockDisableScreenSecurity.mockResolvedValue(undefined)
     mockCheckpoint.mockReturnValue(null)
     mockMigrationAccountId.mockReturnValue("migration-uuid")
     mockCheckpointLoading.mockReturnValue(false)
