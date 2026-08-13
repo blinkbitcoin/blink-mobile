@@ -96,7 +96,6 @@ const mockCreatePaymentDetail = jest.fn()
 const mockSetAmount = jest
   .fn()
   .mockImplementation((amt) => ({ ...mockRebuilt, amount: amt }))
-
 jest.mock("@app/self-custodial/payment-details/wrap-destination", () => ({
   wrapDestination: jest.fn(() => ({
     valid: true,
@@ -124,7 +123,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
         sdkNetworkError: () => "Network error",
         sdkGenericError: () => "Generic error",
       },
-      SendBitcoinConfirmationScreen: {
+      common: {
         feeError: () => "Unable to calculate fee",
       },
     },

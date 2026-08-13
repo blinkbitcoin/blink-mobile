@@ -79,8 +79,8 @@ export const useCustodialFeeRail = ({
 
   return {
     tiers,
-    /** The confirmation screen's wording, so neither screen promises an impossible retry. */
-    errorMessage: hasError ? LL.SendBitcoinConfirmationScreen.feeError() : undefined,
+    /** Shared with the confirmation screen, so neither promises an impossible retry. */
+    errorMessage: hasError ? LL.common.feeError() : undefined,
     hasQuote,
     isErrorBlocking: false,
     isQuoting,

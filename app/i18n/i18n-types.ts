@@ -7176,10 +7176,6 @@ type RootTranslation = {
 		 */
 		maxFeeSelected: string
 		/**
-		 * U​n​a​b​l​e​ ​t​o​ ​c​a​l​c​u​l​a​t​e​ ​f​e​e
-		 */
-		feeError: string
-		/**
 		 * T​h​i​s​ ​i​n​v​o​i​c​e​ ​h​a​s​ ​a​l​r​e​a​d​y​ ​b​e​e​n​ ​p​a​i​d
 		 */
 		invoiceAlreadyPaid: string
@@ -9392,6 +9388,10 @@ type RootTranslation = {
 		 * F​e​e​s
 		 */
 		fees: string
+		/**
+		 * U​n​a​b​l​e​ ​t​o​ ​c​a​l​c​u​l​a​t​e​ ​f​e​e
+		 */
+		feeError: string
 		/**
 		 * F​i​r​s​t​ ​N​a​m​e
 		 */
@@ -20453,10 +20453,6 @@ export type TranslationFunctions = {
 		 */
 		maxFeeSelected: () => LocalizedString
 		/**
-		 * Unable to calculate fee
-		 */
-		feeError: () => LocalizedString
-		/**
 		 * This invoice has already been paid
 		 */
 		invoiceAlreadyPaid: () => LocalizedString
@@ -22606,6 +22602,10 @@ export type TranslationFunctions = {
 		 * Fees
 		 */
 		fees: () => LocalizedString
+		/**
+		 * Unable to calculate fee
+		 */
+		feeError: () => LocalizedString
 		/**
 		 * First Name
 		 */
