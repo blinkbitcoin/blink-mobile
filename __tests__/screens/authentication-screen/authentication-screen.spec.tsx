@@ -52,6 +52,7 @@ jest.mock("@app/utils/storage/secureStorage", () => ({
   __esModule: true,
   default: {
     resetPinAttempts: jest.fn(),
+    removePinLockedUntil: jest.fn(),
     setIsBiometricsEnabled: jest.fn(),
     /** Read by the account registry the screen renders under. */
     getSessionProfiles: jest.fn().mockResolvedValue([]),

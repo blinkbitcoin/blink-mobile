@@ -6762,6 +6762,11 @@ type RootTranslation = {
 		 */
 		tooManyAttempts: string
 		/**
+		 * T​o​o​ ​m​a​n​y​ ​f​a​i​l​e​d​ ​a​t​t​e​m​p​t​s​.​ ​T​r​y​ ​a​g​a​i​n​ ​i​n​ ​{​s​e​c​o​n​d​s​}​s​.
+		 * @param {number} seconds
+		 */
+		tryAgainIn: RequiredParams<'seconds'>
+		/**
 		 * V​e​r​i​f​y​ ​y​o​u​r​ ​P​I​N​ ​c​o​d​e
 		 */
 		verifyPin: string
@@ -20220,6 +20225,10 @@ export type TranslationFunctions = {
 		 * Too many failed attempts. Logging out.
 		 */
 		tooManyAttempts: () => LocalizedString
+		/**
+		 * Too many failed attempts. Try again in {seconds}s.
+		 */
+		tryAgainIn: (arg: { seconds: number }) => LocalizedString
 		/**
 		 * Verify your PIN code
 		 */

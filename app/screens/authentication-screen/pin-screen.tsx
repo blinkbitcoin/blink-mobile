@@ -9,6 +9,12 @@ import { makeStyles } from "@rn-vui/themed"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 
+import {
+  clampLockedUntil,
+  lockoutMsForFailures,
+  MAX_PIN_ATTEMPTS,
+  remainingLockoutMs,
+} from "./pin-lockout"
 import { useUnlockScreen } from "./unlock-screen"
 
 import { Screen } from "../../components/screen"
@@ -37,18 +43,38 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
   )
   const [previousPIN, setPreviousPIN] = useState("")
   const [pinAttempts, setPinAttempts] = useState(0)
+  const [lockedUntil, setLockedUntil] = useState(0)
+  const [now, setNow] = useState(Date.now())
 
-  const MAX_PIN_ATTEMPTS = 3
+  const remainingMs = remainingLockoutMs(lockedUntil, now)
+  const isLocked = remainingMs > 0 && screenPurpose === PinScreenPurpose.AuthenticatePin
 
   useEffect(() => {
     ;(async () => {
-      setPinAttempts(await KeyStoreWrapper.getPinAttemptsOrZero())
+      // A persisted future lock keeps the screen locked across app restarts.
+      const [attempts, storedLockedUntil] = await Promise.all([
+        KeyStoreWrapper.getPinAttemptsOrZero(),
+        KeyStoreWrapper.getPinLockedUntilOrZero(),
+      ])
+      setPinAttempts(attempts)
+      setLockedUntil(clampLockedUntil(storedLockedUntil, Date.now()))
+      setNow(Date.now())
     })()
   }, [])
 
+  useEffect(() => {
+    if (!isLocked) return
+    const interval = setInterval(() => setNow(Date.now()), 1000)
+    return () => clearInterval(interval)
+  }, [isLocked])
+
   const handleCompletedPinForAuthenticatePin = async (newEnteredPIN: string) => {
     if (newEnteredPIN === (await KeyStoreWrapper.getPinOrEmptyString())) {
-      KeyStoreWrapper.resetPinAttempts()
+      // Awaited so a kill right after unlock can't leave a stale future lock.
+      await Promise.all([
+        KeyStoreWrapper.resetPinAttempts(),
+        KeyStoreWrapper.removePinLockedUntil(),
+      ])
       completeUnlock(() =>
         navigation.reset({
           index: 0,
@@ -57,8 +83,16 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
       )
     } else if (pinAttempts < MAX_PIN_ATTEMPTS - 1) {
       const newPinAttempts = pinAttempts + 1
-      KeyStoreWrapper.setPinAttempts(newPinAttempts.toString())
+      const newLockedUntil = Date.now() + lockoutMsForFailures(newPinAttempts)
+      // Persist before showing the result so killing the app mid-write can't
+      // erase the failed attempt.
+      await Promise.all([
+        KeyStoreWrapper.setPinAttempts(newPinAttempts.toString()),
+        KeyStoreWrapper.setPinLockedUntil(newLockedUntil.toString()),
+      ])
       setPinAttempts(newPinAttempts)
+      setLockedUntil(newLockedUntil)
+      setNow(Date.now())
       setEnteredPIN("")
       if (newPinAttempts === MAX_PIN_ATTEMPTS - 1) {
         setHelperText(LL.PinScreen.oneAttemptRemaining())
@@ -88,6 +122,9 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
   }
 
   const addDigit = (digit: string) => {
+    if (isLocked) {
+      return
+    }
     if (enteredPIN.length < 4) {
       const newEnteredPIN = enteredPIN + digit
       setEnteredPIN(newEnteredPIN)
@@ -105,7 +142,10 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
   const verifyPINCodeMatches = async (newEnteredPIN: string) => {
     if (previousPIN === newEnteredPIN) {
       if (await KeyStoreWrapper.setPin(previousPIN)) {
-        KeyStoreWrapper.resetPinAttempts()
+        await Promise.all([
+          KeyStoreWrapper.resetPinAttempts(),
+          KeyStoreWrapper.removePinLockedUntil(),
+        ])
         navigation.goBack()
       } else {
         returnToSetPin()
@@ -138,6 +178,9 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
         <Button
           buttonStyle={styles.pinPadButton}
           titleStyle={styles.pinPadButtonTitle}
+          disabled={isLocked}
+          disabledStyle={styles.pinPadButton}
+          disabledTitleStyle={styles.pinPadButtonTitleDisabled}
           title={digit}
           onPress={() => addDigit(digit)}
         />
@@ -155,7 +198,11 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
         {circleComponentForDigit(3)}
       </View>
       <View style={styles.helperTextContainer}>
-        <Text style={styles.helperText}>{helperText}</Text>
+        <Text style={styles.helperText}>
+          {isLocked
+            ? LL.PinScreen.tryAgainIn({ seconds: Math.ceil(remainingMs / 1000) })
+            : helperText}
+        </Text>
       </View>
       <View style={styles.pinPad}>
         <View style={styles.pinPadRow}>
@@ -179,6 +226,8 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
           <View style={styles.pinPadButtonContainer}>
             <Button
               buttonStyle={styles.pinPadButton}
+              disabled={isLocked}
+              disabledStyle={styles.pinPadButton}
               icon={<GaloyIcon name="arrow-left" size={32} color="white" />}
               onPress={() => setEnteredPIN(enteredPIN.slice(0, -1))}
             />
@@ -264,6 +313,13 @@ const useStyles = makeStyles(({ colors }) => ({
     color: colors.white,
     fontSize: 26,
     fontWeight: "500",
+  },
+
+  pinPadButtonTitleDisabled: {
+    color: colors.white,
+    fontSize: 26,
+    fontWeight: "500",
+    opacity: 0.4,
   },
 
   pinPadRow: {

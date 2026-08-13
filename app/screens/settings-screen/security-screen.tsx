@@ -105,6 +105,7 @@ export const SecurityScreen: React.FC<Props> = ({ route, navigation }) => {
   const removePin = async () => {
     if (await KeyStoreWrapper.removePin()) {
       KeyStoreWrapper.removePinAttempts()
+      KeyStoreWrapper.removePinLockedUntil()
       setIsPinEnabled(false)
     }
   }

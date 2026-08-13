@@ -32,6 +32,7 @@ export default class KeyStoreWrapper {
   private static readonly IS_BIOMETRICS_ENABLED = "isBiometricsEnabled"
   private static readonly PIN = "PIN"
   private static readonly PIN_ATTEMPTS = "pinAttempts"
+  private static readonly PIN_LOCKED_UNTIL = "pinLockedUntil"
   private static readonly SESSION_PROFILES = "sessionProfiles"
   private static readonly ACTIVE_TOKEN = GALOY_AUTH_TOKEN_KEY
   private static readonly MNEMONIC = "mnemonic"
@@ -129,6 +130,37 @@ export default class KeyStoreWrapper {
   public static async removePinAttempts(): Promise<boolean> {
     try {
       await RNSecureKeyStore.remove(KeyStoreWrapper.PIN_ATTEMPTS)
+      return true
+    } catch {
+      return false
+    }
+  }
+
+  public static async getPinLockedUntilOrZero(): Promise<number> {
+    try {
+      const lockedUntil = Number(
+        await RNSecureKeyStore.get(KeyStoreWrapper.PIN_LOCKED_UNTIL),
+      )
+      return Number.isFinite(lockedUntil) ? lockedUntil : 0
+    } catch {
+      return 0
+    }
+  }
+
+  public static async setPinLockedUntil(epochMs: string): Promise<boolean> {
+    try {
+      await RNSecureKeyStore.set(KeyStoreWrapper.PIN_LOCKED_UNTIL, epochMs, {
+        accessible: ACCESSIBLE.ALWAYS_THIS_DEVICE_ONLY,
+      })
+      return true
+    } catch {
+      return false
+    }
+  }
+
+  public static async removePinLockedUntil(): Promise<boolean> {
+    try {
+      await RNSecureKeyStore.remove(KeyStoreWrapper.PIN_LOCKED_UNTIL)
       return true
     } catch {
       return false

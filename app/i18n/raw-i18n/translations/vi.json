@@ -2167,6 +2167,7 @@
     "setPinFailedMatch": "Mã PIN không khớp - Đặt mã PIN của bạn",
     "storePinFailed": "Không thể lưu mã pin của bạn.",
     "tooManyAttempts": "Quá nhiều lần thử không thành công. Đang đăng xuất.",
+    "tryAgainIn": "Quá nhiều lần thử không thành công. Thử lại sau {seconds: number} giây.",
     "verifyPin": "Xác minh mã PIN của bạn"
   },
   "PriceHistoryScreen": {

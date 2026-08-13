@@ -2171,6 +2171,7 @@ const en: BaseTranslation = {
     setPinFailedMatch: "Pins didn't match - Set your PIN code",
     storePinFailed: "Unable to store your pin.",
     tooManyAttempts: "Too many failed attempts. Logging out.",
+    tryAgainIn: "Too many failed attempts. Try again in {seconds: number}s.",
     verifyPin: "Verify your PIN code",
   },
   PriceHistoryScreen: {

@@ -2167,6 +2167,7 @@
         "setPinFailedMatch": "I PIN non corrispondono - Imposta il tuo PIN",
         "storePinFailed": "Non è possibile salvare il tuo PIN.",
         "tooManyAttempts": "Troppi tentativi falliti. Eseguo log out.",
+        "tryAgainIn": "Troppi tentativi falliti. Riprova tra {seconds: number} s.",
         "verifyPin": "Verifica il tuo PIN"
     },
     "PriceHistoryScreen": {
