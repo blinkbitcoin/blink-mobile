@@ -117,11 +117,24 @@ export const loadPersistentState = async (): Promise<LoadedPersistentState> => {
         persistedToken: keychainToken || (adopted ? blobToken : ""),
       }
     }
-    case MigrationStatus.NoData:
-      // The iOS keychain survives uninstall; without this, a reinstall would
-      // silently resurrect the previous session.
-      await KeyStoreWrapper.removeActiveToken()
+    case MigrationStatus.NoData: {
+      // Genuinely a fresh install (unrecognized schemas are Failed): the iOS
+      // keychain survives uninstall, so clear every session credential the UI
+      // can reach — the active token AND the switcher's session profiles.
+      // This branch re-runs on every boot until the first blob write, so a
+      // failed wipe also retries across boots.
+      const removeWithRetry = async (remove: () => Promise<boolean>, what: string) => {
+        const ok = (await remove()) || (await remove())
+        if (!ok) {
+          recordAppError(new Error(`Reinstall keychain cleanup failed: ${what}`), {
+            alwaysRecord: true,
+          })
+        }
+      }
+      await removeWithRetry(KeyStoreWrapper.removeActiveToken, "active token")
+      await removeWithRetry(KeyStoreWrapper.removeSessionProfiles, "session profiles")
       return { state: defaultPersistentState, persistedToken: "" }
+    }
     case MigrationStatus.Failed: {
       recordAppError(result.error, { alwaysRecord: true })
       await quarantineRawState(result.rawData)

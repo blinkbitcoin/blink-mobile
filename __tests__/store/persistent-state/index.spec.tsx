@@ -25,6 +25,7 @@ jest.mock("@app/utils/storage", () => ({
 const mockGetActiveToken = jest.fn()
 const mockSetActiveToken = jest.fn()
 const mockRemoveActiveToken = jest.fn()
+const mockRemoveSessionProfiles = jest.fn()
 
 jest.mock("@app/utils/storage/secureStorage", () => ({
   __esModule: true,
@@ -32,6 +33,7 @@ jest.mock("@app/utils/storage/secureStorage", () => ({
     getActiveToken: (...args: unknown[]) => mockGetActiveToken(...args),
     setActiveToken: (...args: unknown[]) => mockSetActiveToken(...args),
     removeActiveToken: (...args: unknown[]) => mockRemoveActiveToken(...args),
+    removeSessionProfiles: (...args: unknown[]) => mockRemoveSessionProfiles(...args),
   },
 }))
 
@@ -87,6 +89,7 @@ describe("PersistentStateProvider", () => {
     mockGetActiveToken.mockResolvedValue("")
     mockSetActiveToken.mockResolvedValue(true)
     mockRemoveActiveToken.mockResolvedValue(true)
+    mockRemoveSessionProfiles.mockResolvedValue(true)
   })
 
   it("renders nothing (null) while state is loading", async () => {
@@ -162,6 +165,69 @@ describe("PersistentStateProvider", () => {
 
     expect(mockRemoveActiveToken).toHaveBeenCalledTimes(1)
     expect(screen.getByTestId("token").props.children).toBe("")
+  })
+
+  it("wipes session profiles as well as the active token on a fresh install", async () => {
+    // sessionProfiles survive uninstall in the same keychain and are reachable
+    // through the account switcher — wiping only the active token would let a
+    // new device owner restore the previous owner's session with one tap.
+    mockLoadJson.mockResolvedValue(null)
+
+    render(
+      <PersistentStateProvider>
+        <TestConsumer />
+      </PersistentStateProvider>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId("token")).toBeTruthy()
+    })
+
+    expect(mockRemoveActiveToken).toHaveBeenCalled()
+    expect(mockRemoveSessionProfiles).toHaveBeenCalled()
+  })
+
+  it("retries a failed reinstall wipe once and reports if it still fails", async () => {
+    mockLoadJson.mockResolvedValue(null)
+    mockRemoveActiveToken.mockResolvedValue(false)
+
+    render(
+      <PersistentStateProvider>
+        <TestConsumer />
+      </PersistentStateProvider>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId("token")).toBeTruthy()
+    })
+
+    expect(mockRemoveActiveToken).toHaveBeenCalledTimes(2)
+    expect(mockRecordError).toHaveBeenCalledTimes(1)
+    expect(mockRecordError.mock.calls[0][0].message).toContain(
+      "Reinstall keychain cleanup failed",
+    )
+  })
+
+  it("does not wipe the keychain for an unrecognized schema version", async () => {
+    // A downgrade from a future build is not a reinstall: the blob exists but
+    // can't be read. The session must survive the round trip.
+    mockLoadJson.mockResolvedValue({ schemaVersion: 99, galoyInstance: { id: "Main" } })
+    mockGetActiveToken.mockResolvedValue("kc-token")
+
+    render(
+      <PersistentStateProvider>
+        <TestConsumer />
+      </PersistentStateProvider>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId("token")).toBeTruthy()
+    })
+
+    expect(mockRemoveActiveToken).not.toHaveBeenCalled()
+    expect(mockRemoveSessionProfiles).not.toHaveBeenCalled()
+    // Downgrade boots keep the session (Failed → keychain recovery).
+    expect(screen.getByTestId("token").props.children).toBe("kc-token")
   })
 
   it("does NOT save state on initial load (no-op write guard)", async () => {
