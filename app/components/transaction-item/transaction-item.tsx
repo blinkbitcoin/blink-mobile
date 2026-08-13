@@ -60,13 +60,16 @@ export const useDescriptionDisplay = ({
 
 // Owns the navigation focus subscription so that only the highlighted row
 // re-renders when focus changes, instead of every mounted row in the list.
-const BouncingRow: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const BouncingRow: React.FC<{ visible: boolean; children: React.ReactNode }> = ({
+  visible,
+  children,
+}) => {
   const isFocused = useIsFocused()
   const scale = useSharedValue(1)
 
   useBounceInAnimation({
     isFocused,
-    visible: true,
+    visible,
     scale,
     delay: 300,
     duration: 120,
@@ -108,6 +111,13 @@ const TransactionItem: React.FC<Props> = ({
     [isFirst, isLast, isOnHomeScreen, highlight],
   )
   const styles = useStyles(styleProps)
+
+  // Once a row has been highlighted, keep the wrapper mounted for the life of
+  // the row: dropping it when the highlight clears would swap the element type
+  // at that position and remount the whole row subtree. Rows that are never
+  // highlighted never mount it, so they never subscribe to navigation focus.
+  const everHighlighted = React.useRef(highlight)
+  if (highlight) everHighlighted.current = true
 
   const { data: tx } = useFragment<TransactionFragment>({
     fragment: TransactionFragmentDoc,
@@ -224,7 +234,11 @@ const TransactionItem: React.FC<Props> = ({
     </ListItem>
   )
 
-  return highlight ? <BouncingRow>{row}</BouncingRow> : row
+  return everHighlighted.current ? (
+    <BouncingRow visible={highlight}>{row}</BouncingRow>
+  ) : (
+    row
+  )
 }
 
 export const MemoizedTransactionItem = React.memo(TransactionItem)

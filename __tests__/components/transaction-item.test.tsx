@@ -76,8 +76,17 @@ jest.mock(
 )
 
 // --- child components that would otherwise require native modules ---
+// The mount counter is what makes a remount of the row subtree assertable:
+// re-rendering leaves it alone, unmounting and rebuilding bumps it.
+let mockIconMounts = 0
 jest.mock("@app/components/icon-transactions", () => ({
-  IconTransaction: () => null,
+  IconTransaction: () => {
+    const react = jest.requireActual("react")
+    react.useEffect(() => {
+      mockIconMounts += 1
+    }, [])
+    return null
+  },
 }))
 
 jest.mock("@app/components/transaction-date", () => ({
@@ -151,8 +160,10 @@ import { useIsFocused } from "@react-navigation/native"
 import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { useAppConfig } from "@app/hooks"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
+import { useBounceInAnimation } from "@app/components/animations"
 
 const mockUseFragment = useFragment as jest.Mock
+const mockUseBounceInAnimation = useBounceInAnimation as jest.Mock
 const mockUseIsFocused = useIsFocused as jest.Mock
 const mockUseHideAmount = useHideAmount as jest.Mock
 const mockUseAppConfig = useAppConfig as jest.Mock
@@ -179,6 +190,7 @@ const makeTx = (overrides = {}) => ({
 
 beforeEach(() => {
   jest.clearAllMocks()
+  mockIconMounts = 0
 
   mockUseFragment.mockReturnValue({ data: makeTx() })
 
@@ -296,6 +308,31 @@ describe("MemoizedTransactionItem", () => {
       render(<MemoizedTransactionItem txid="tx-1" highlight />)
 
       expect(mockUseIsFocused).toHaveBeenCalled()
+    })
+
+    it("does not remount the row when the highlight clears", () => {
+      // Tapping an unseen transaction marks it seen, which flips highlight
+      // true -> false. Swapping the element type at that position would throw
+      // the whole row subtree away and rebuild it.
+      const { rerender } = render(<MemoizedTransactionItem txid="tx-1" highlight />)
+      expect(mockIconMounts).toBe(1)
+
+      rerender(<MemoizedTransactionItem txid="tx-1" highlight={false} />)
+
+      expect(mockIconMounts).toBe(1)
+    })
+
+    it("stops the bounce when the highlight clears, without dropping the wrapper", () => {
+      const { rerender } = render(<MemoizedTransactionItem txid="tx-1" highlight />)
+      expect(mockUseBounceInAnimation).toHaveBeenLastCalledWith(
+        expect.objectContaining({ visible: true }),
+      )
+
+      rerender(<MemoizedTransactionItem txid="tx-1" highlight={false} />)
+
+      expect(mockUseBounceInAnimation).toHaveBeenLastCalledWith(
+        expect.objectContaining({ visible: false }),
+      )
     })
   })
 

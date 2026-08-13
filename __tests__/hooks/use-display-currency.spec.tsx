@@ -57,7 +57,17 @@ const setPriceConversion = ({
   })
 }
 
+// Restored unconditionally: jest is configured with neither restoreMocks nor
+// resetMocks, so a spy left in place by a failing assertion would break every
+// later formatting test and bury the real failure.
+let numberFormatSpy: jest.SpyInstance | undefined
+
 describe("useDisplayCurrency", () => {
+  afterEach(() => {
+    numberFormatSpy?.mockRestore()
+    numberFormatSpy = undefined
+  })
+
   beforeEach(() => {
     jest.clearAllMocks()
     mockUseIsAuthed.mockReturnValue(true)
@@ -337,7 +347,7 @@ describe("useDisplayCurrency", () => {
         { id: "USD", symbol: "$", fractionDigits: 2 },
         { id: "XTS", symbol: "¤", fractionDigits: 7 },
       ])
-      const numberFormatSpy = jest.spyOn(Intl, "NumberFormat")
+      numberFormatSpy = jest.spyOn(Intl, "NumberFormat")
 
       const { result } = renderHook(() => useDisplayCurrency())
 
@@ -351,8 +361,6 @@ describe("useDisplayCurrency", () => {
       expect(numberFormatSpy.mock.calls.length).toBeLessThanOrEqual(1)
       expect(formatted[0]).toBe("¤0.0000000")
       expect(formatted[24]).toBe("¤24.0000000")
-
-      numberFormatSpy.mockRestore()
     })
   })
 

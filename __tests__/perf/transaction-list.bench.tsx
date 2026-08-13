@@ -11,6 +11,11 @@
  * only so it can count how many times each row renders.
  *
  * Run against origin/main for "before" and this branch for "after".
+ *
+ * This is a manual A/B harness, not a test: it lives under __tests__/ but
+ * testRegex in jest.config.js only matches .(test|spec).(ts|tsx|js), so
+ * .bench.tsx never runs in CI. Nothing will tell you when it rots — re-run it
+ * by name whenever the row or the list changes.
  */
 import React from "react"
 import { StyleSheet } from "react-native"
@@ -222,7 +227,11 @@ describe(`transaction list — ${ROW_COUNT} rows`, () => {
           mount: {
             rowRenders: median(mountRowRenders),
             styleSheetCreates: median(mountStyleSheets),
-            intlNumberFormats: median(mountFormatters),
+            // The formatter cache is module-level, so it survives the whole
+            // REPEATS loop: only the first run measures a cold cache, and runs
+            // 2+ reporting 0 is the expected shape of the fix rather than a
+            // per-mount number. A median across runs would describe the loop.
+            intlNumberFormatsFirstRun: mountFormatters[0],
             intlNumberFormatsEachRun: mountFormatters,
           },
           // Wall-clock is deliberately not reported: in this environment it is
