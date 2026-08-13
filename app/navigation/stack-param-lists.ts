@@ -165,7 +165,17 @@ export type RootStackParamList = {
   totpRegistrationInitiate: undefined
   totpRegistrationValidate: { totpRegistrationId: string }
   totpLoginValidate: { authToken: string }
-  webView: { url: string; initialTitle?: string; headerTitle?: string }
+  webView: {
+    url: string
+    initialTitle?: string
+    headerTitle?: string
+    /**
+     * DEV ONLY — bypasses the instance-origin allowlist of the WebView screen.
+     * Must only be set from the developer screen; the webView route is not
+     * deep-linkable, so the param cannot arrive from outside the app.
+     */
+    allowArbitraryUrl?: boolean
+  }
   fullOnboardingFlow: undefined
   notificationHistory: undefined
   onboarding: NavigatorScreenParams<OnboardingStackParamList>
