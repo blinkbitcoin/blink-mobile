@@ -68,6 +68,9 @@ gql`
 const INITIAL_ITEMS_TO_RENDER = 14
 const RENDER_BATCH_SIZE = 14
 const QUERY_BATCH_SIZE = INITIAL_ITEMS_TO_RENDER * 1.5
+// RN's default of 21 keeps roughly ten screens of rows mounted on either side of
+// the viewport; 7 still leaves three screens of headroom for fast scrolling.
+const WINDOW_SIZE = 7
 
 type TransactionHistoryScreenProps = {
   route: RouteProp<RootStackParamList, "transactionHistory">
@@ -429,11 +432,22 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
           memo: item.memo,
           direction: item.direction,
         })}
-        onPress={() => handleItemPress(item.id)}
+        onPress={handleItemPress}
       />
     ),
     [shouldHighlightTransactionId, handleItemPress],
   )
+
+  const renderSectionHeader = React.useCallback(
+    ({ section: { title } }: { section: { title: string } }) => (
+      <View style={styles.sectionHeaderContainer}>
+        <Text style={styles.sectionHeaderText}>{title}</Text>
+      </View>
+    ),
+    [styles.sectionHeaderContainer, styles.sectionHeaderText],
+  )
+
+  const keyExtractor = React.useCallback((item: TransactionFragment) => item.id, [])
 
   if (error) {
     console.error(error)
@@ -511,12 +525,9 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
         showsVerticalScrollIndicator={false}
         maxToRenderPerBatch={RENDER_BATCH_SIZE}
         initialNumToRender={INITIAL_ITEMS_TO_RENDER}
+        windowSize={WINDOW_SIZE}
         renderItem={renderItem}
-        renderSectionHeader={({ section: { title } }) => (
-          <View style={styles.sectionHeaderContainer}>
-            <Text style={styles.sectionHeaderText}>{title}</Text>
-          </View>
-        )}
+        renderSectionHeader={renderSectionHeader}
         ListEmptyComponent={
           <View style={styles.noTransactionView}>
             <Text style={styles.noTransactionText}>
@@ -525,7 +536,7 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
           </View>
         }
         sections={sections}
-        keyExtractor={(item) => item.id}
+        keyExtractor={keyExtractor}
         onEndReached={fetchNextTransactionsPage}
         onEndReachedThreshold={0.5}
         onRefresh={handleRefresh}

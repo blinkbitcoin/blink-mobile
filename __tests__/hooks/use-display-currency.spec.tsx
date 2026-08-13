@@ -329,6 +329,31 @@ describe("useDisplayCurrency", () => {
 
       expect(formatted).toBe("$100.00 USD")
     })
+
+    it("constructs at most one Intl.NumberFormat per fraction-digit count", () => {
+      // 7 fraction digits is used by no other test in this file, so the
+      // module-level formatter cache is cold on the first run and warm after.
+      setCurrencyList([
+        { id: "USD", symbol: "$", fractionDigits: 2 },
+        { id: "XTS", symbol: "¤", fractionDigits: 7 },
+      ])
+      const numberFormatSpy = jest.spyOn(Intl, "NumberFormat")
+
+      const { result } = renderHook(() => useDisplayCurrency())
+
+      const formatted = Array.from({ length: 25 }, (_, index) =>
+        result.current.formatCurrency({
+          amountInMajorUnits: index,
+          currency: "XTS",
+        }),
+      )
+
+      expect(numberFormatSpy.mock.calls.length).toBeLessThanOrEqual(1)
+      expect(formatted[0]).toBe("¤0.0000000")
+      expect(formatted[24]).toBe("¤24.0000000")
+
+      numberFormatSpy.mockRestore()
+    })
   })
 
   describe("getCurrencySymbol", () => {

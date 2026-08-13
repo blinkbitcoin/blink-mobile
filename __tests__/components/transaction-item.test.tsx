@@ -51,8 +51,10 @@ jest.mock("@app/i18n/i18n-react", () => ({
 }))
 
 // --- @react-navigation/native ---
+// jest.fn so the focus subscription itself is assertable: only highlighted rows
+// should subscribe, otherwise opening a transaction re-renders every mounted row.
 jest.mock("@react-navigation/native", () => ({
-  useIsFocused: () => true,
+  useIsFocused: jest.fn(() => true),
 }))
 
 // --- @app/components/animations ---
@@ -145,11 +147,13 @@ jest.mock("@app/types/amounts", () => ({
 
 // ─── imports needed for mocking ───────────────────────────────────────────────
 import { useFragment } from "@apollo/client"
+import { useIsFocused } from "@react-navigation/native"
 import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { useAppConfig } from "@app/hooks"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 
 const mockUseFragment = useFragment as jest.Mock
+const mockUseIsFocused = useIsFocused as jest.Mock
 const mockUseHideAmount = useHideAmount as jest.Mock
 const mockUseAppConfig = useAppConfig as jest.Mock
 const mockUseDisplayCurrency = useDisplayCurrency as jest.Mock
@@ -254,6 +258,17 @@ describe("MemoizedTransactionItem", () => {
       expect(mockOnPress).toHaveBeenCalledTimes(1)
     })
 
+    it("passes its own txid to onPress, so the list can share one callback", () => {
+      const mockOnPress = jest.fn()
+
+      const { getByTestId } = render(
+        <MemoizedTransactionItem txid="tx-1" onPress={mockOnPress} />,
+      )
+      fireEvent.press(getByTestId("transaction-item"))
+
+      expect(mockOnPress).toHaveBeenCalledWith("tx-1")
+    })
+
     it("pressing the hidden placeholder does not toggle hide state", () => {
       const mockSwitch = jest.fn()
       mockUseHideAmount.mockReturnValue({
@@ -267,6 +282,20 @@ describe("MemoizedTransactionItem", () => {
       fireEvent.press(getByTestId("hidden-balance-placeholder"))
 
       expect(mockSwitch).not.toHaveBeenCalled()
+    })
+  })
+
+  describe("re-render cost", () => {
+    it("does not subscribe to navigation focus when not highlighted", () => {
+      render(<MemoizedTransactionItem txid="tx-1" />)
+
+      expect(mockUseIsFocused).not.toHaveBeenCalled()
+    })
+
+    it("subscribes to navigation focus when highlighted", () => {
+      render(<MemoizedTransactionItem txid="tx-1" highlight />)
+
+      expect(mockUseIsFocused).toHaveBeenCalled()
     })
   })
 

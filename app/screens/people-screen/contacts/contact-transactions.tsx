@@ -30,6 +30,10 @@ gql`
   }
 `
 
+// RN's default of 21 keeps roughly ten screens of rows mounted on either side of
+// the viewport; 7 still leaves three screens of headroom for fast scrolling.
+const WINDOW_SIZE = 7
+
 type Props = {
   contactUsername: string
 }
@@ -55,6 +59,23 @@ export const ContactTransactions = ({ contactUsername }: Props) => {
       }),
     [transactions, LL, locale],
   )
+
+  // Declared above the early returns below to keep hook order stable.
+  const renderItem = React.useCallback(
+    ({ item }: { item: { id: string } }) => <MemoizedTransactionItem txid={item.id} />,
+    [],
+  )
+
+  const renderSectionHeader = React.useCallback(
+    ({ section: { title } }: { section: { title: string } }) => (
+      <View style={styles.sectionHeaderContainer}>
+        <Text style={styles.sectionHeaderText}>{title}</Text>
+      </View>
+    ),
+    [styles.sectionHeaderContainer, styles.sectionHeaderText],
+  )
+
+  const keyExtractor = React.useCallback((item: { id: string }) => item.id, [])
 
   if (error) {
     toastShow({
@@ -84,15 +105,10 @@ export const ContactTransactions = ({ contactUsername }: Props) => {
   return (
     <View style={styles.screen}>
       <SectionList
-        renderItem={({ item }) => (
-          <MemoizedTransactionItem key={`txn-${item.id}`} txid={item.id} />
-        )}
+        renderItem={renderItem}
         initialNumToRender={20}
-        renderSectionHeader={({ section: { title } }) => (
-          <View style={styles.sectionHeaderContainer}>
-            <Text style={styles.sectionHeaderText}>{title}</Text>
-          </View>
-        )}
+        windowSize={WINDOW_SIZE}
+        renderSectionHeader={renderSectionHeader}
         ListEmptyComponent={
           <View style={styles.noTransactionView}>
             <Text style={styles.noTransactionText}>
@@ -101,7 +117,7 @@ export const ContactTransactions = ({ contactUsername }: Props) => {
           </View>
         }
         sections={sections}
-        keyExtractor={(item) => item.id}
+        keyExtractor={keyExtractor}
         onEndReached={fetchNextTransactionsPage}
         onEndReachedThreshold={0.5}
       />
