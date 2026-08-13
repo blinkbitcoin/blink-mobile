@@ -40,14 +40,36 @@ export const isMigrationDeeplink = (url: string): boolean => {
   }
 }
 
-/** The armed-gate reset is lock-aware: while the app is still locked it must land on
- *  authenticationCheck so the PIN/biometric unlock is never skipped. Jumping straight to
- *  Primary would strand isAppLocked at true, hiding the gate behind an app that never
- *  unlocked and freezing the queued migration deeplink (which waits on !isAppLocked). Once
- *  unlocked, Primary is correct: the blocker renders the gate with no jarring re-prompt. */
-export const blockerEntryRoute = (
-  isAppLocked: boolean,
-): "authenticationCheck" | "Primary" => (isAppLocked ? "authenticationCheck" : "Primary")
+/** The root route the blocker renders under: PrimaryNavigator swaps its tabs for the gate. */
+const BLOCKER_ROUTE = "Primary" as const
+
+/** The unlock flow's own screens. Resetting the stack while one of them is in front tears
+ *  down an unlock the user is halfway through and serves them an identical empty one, which
+ *  is the PIN screen that kept reappearing on every launch (#4150). */
+const UNLOCK_ROUTES = new Set<string>([
+  "authenticationCheck",
+  "authentication",
+  "pin",
+] satisfies (keyof RootStackParamList)[])
+
+type RootRoutes = NavigationState["routes"]
+
+/** Whether the root stack holds anything for the blocker to pop. The blocker renders inside
+ *  its own route, so a stack that is already just that route needs nothing, and resetting it
+ *  anyway would remount the gate for no reason. A stack with no routes to read is judged the
+ *  same way an unreadable one is: nothing proven, nothing thrown away. */
+const hasRoutesAboveBlocker = (routes: RootRoutes): boolean => {
+  if (routes.length === 0) return false
+  const hasStackedRoutes = routes.length > 1
+  const isBlockerAtRoot = routes[0].name === BLOCKER_ROUTE
+  return hasStackedRoutes || !isBlockerAtRoot
+}
+
+/** Whether an unlock stands in front of the pop, which only the topmost route can. */
+const isUnlockInProgress = (routes: RootRoutes): boolean => {
+  const topRoute = routes[routes.length - 1]
+  return topRoute !== undefined && UNLOCK_ROUTES.has(topRoute.name)
+}
 
 export type AuthenticationContextType = {
   isAppLocked: boolean
@@ -102,27 +124,41 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
     isBlockerVisibleRef.current = isBlockerVisible
   }, [isBlockerVisible])
 
-  /** Kept current for resetToBlocker, which reads the lock state from a stable callback
-   *  and from onReady, both of which would otherwise close over a stale value. */
-  const isAppLockedRef = useRef(isAppLocked)
-  useEffect(() => {
-    isAppLockedRef.current = isAppLocked
-  }, [isAppLocked])
+  /** Set when a pop found an unlock in front of it, so the pop runs the moment that unlock
+   *  finishes instead of being lost. Only that case waits: keying the pop on the lock state
+   *  itself would re-run it on every resume unlock, throwing away whatever the gate had
+   *  opened, and would never run at all in a session that signed in without ever unlocking. */
+  const isPopDeferredRef = useRef(false)
 
   /** Pop anything a deeplink opened above the blocker so nothing keeps working over the
-   *  closed account, landing on the lock-aware entry so arming never skips the unlock. */
-  const resetToBlocker = useCallback(() => {
-    navigationRef.reset({
-      index: 0,
-      routes: [{ name: blockerEntryRoute(isAppLockedRef.current) }],
-    })
+   *  closed account. */
+  const popRoutesAboveBlocker = useCallback(() => {
+    if (!navigationRef.isReady()) return
+
+    const routes = navigationRef.getRootState()?.routes ?? []
+    const isUnlockInTheWay = isUnlockInProgress(routes)
+    isPopDeferredRef.current = isUnlockInTheWay
+
+    if (isUnlockInTheWay) return
+    if (!hasRoutesAboveBlocker(routes)) return
+    navigationRef.reset({ index: 0, routes: [{ name: BLOCKER_ROUTE }] })
   }, [])
 
   /** Covers arming mid-session. The container-not-ready-yet case (armed at cold start) is
    *  handled from onReady below, since this effect can fire before isReady() is true. */
   useEffect(() => {
-    if (isBlockerVisible && navigationRef.isReady()) resetToBlocker()
-  }, [isBlockerVisible, resetToBlocker])
+    if (!isBlockerVisible) return
+    popRoutesAboveBlocker()
+  }, [isBlockerVisible, popRoutesAboveBlocker])
+
+  /** The waiting half: the unlock that stood in front of a pop has finished. */
+  const hasUnlockFinished = isBlockerVisible && !isAppLocked
+
+  useEffect(() => {
+    if (!hasUnlockFinished) return
+    if (!isPopDeferredRef.current) return
+    popRoutesAboveBlocker()
+  }, [hasUnlockFinished, popRoutesAboveBlocker])
 
   useEffect(() => {
     if (canHandlePayments && !isAppLocked && urlAfterUnlockAndAuth) {
@@ -269,9 +305,9 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
         onReady={() => {
           RNBootSplash.hide({ fade: true })
           console.log("NavigationContainer onReady")
-          /** Cold-started already gated: reset now that the container is ready, since the
+          /** Cold-started already gated: pop now that the container is ready, since the
            *  effect above may have run before isReady() turned true. */
-          if (isBlockerVisibleRef.current) resetToBlocker()
+          if (isBlockerVisibleRef.current) popRoutesAboveBlocker()
         }}
         onStateChange={(state) => {
           const currentRouteName = getActiveRouteName(state)
