@@ -6,7 +6,7 @@ const mockBackupState = jest.fn()
 const mockActiveWallet = jest.fn()
 const mockRemoteConfig = jest.fn()
 const mockAccountRegistry = jest.fn()
-const mockGetItem = jest.fn()
+const mockMultiGet = jest.fn()
 const mockSetItem = jest.fn()
 
 jest.mock("@app/self-custodial/providers/backup-state", () => ({
@@ -39,9 +39,15 @@ jest.mock("@app/components/balance-header/use-total-balance", () => ({
 }))
 
 jest.mock("@react-native-async-storage/async-storage", () => ({
-  getItem: (...args: string[]) => mockGetItem(...args),
+  multiGet: (keys: string[]) => mockMultiGet(keys),
   setItem: (...args: string[]) => mockSetItem(...args),
 }))
+
+const ACCOUNT_ID = "test-self-custodial-uuid"
+const BANNER_KEY = `backupNudgeDismissedAt:${ACCOUNT_ID}`
+const MODAL_KEY = `backupNudgeModalDismissedAt:${ACCOUNT_ID}`
+
+let storage: Record<string, string> = {}
 
 const defaultBackupState = { backupState: { status: "none", method: null } }
 const completedBackupState = { backupState: { status: "completed", method: "manual" } }
@@ -55,26 +61,35 @@ const custodialWallet = {
   isReady: true,
   wallets: [{ id: "btc-1", walletCurrency: "BTC", balance: { amount: 50000 } }],
 }
+const aboveModalThresholdWallet = {
+  accountType: "self-custodial",
+  isReady: true,
+  wallets: [{ id: "btc-1", walletCurrency: "BTC", balance: { amount: 22000 } }],
+}
 const defaultConfig = {
   backupNudgeBannerThreshold: 2100,
   backupNudgeModalThreshold: 21000,
+  backupNudgeModalCooldownMs: 24 * 60 * 60 * 1000,
 }
 
-const selfCustodialAccount = { type: "self-custodial", id: "test-self-custodial-uuid" }
+const selfCustodialAccount = { type: "self-custodial", id: ACCOUNT_ID }
 
 describe("useBackupNudgeState", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    storage = {}
     mockBackupState.mockReturnValue(defaultBackupState)
     mockActiveWallet.mockReturnValue(selfCustodialWallet)
     mockAccountRegistry.mockReturnValue({ activeAccount: selfCustodialAccount })
     mockRemoteConfig.mockReturnValue(defaultConfig)
-    mockGetItem.mockResolvedValue(null)
+    mockMultiGet.mockImplementation((keys: string[]) =>
+      Promise.resolve(keys.map((key) => [key, storage[key] ?? null])),
+    )
     mockSetItem.mockResolvedValue(undefined)
   })
 
   it("hides banner and modal while dismissal-load is pending", () => {
-    mockGetItem.mockReturnValue(new Promise(() => {}))
+    mockMultiGet.mockReturnValue(new Promise(() => {}))
 
     const { result } = renderHook(() => useBackupNudgeState())
 
@@ -83,7 +98,7 @@ describe("useBackupNudgeState", () => {
   })
 
   it("shows settings banner without waiting for dismissal-load", () => {
-    mockGetItem.mockReturnValue(new Promise(() => {}))
+    mockMultiGet.mockReturnValue(new Promise(() => {}))
 
     const { result } = renderHook(() => useBackupNudgeState())
 
@@ -100,11 +115,7 @@ describe("useBackupNudgeState", () => {
   })
 
   it("shows modal when balance >= modal threshold", async () => {
-    mockActiveWallet.mockReturnValue({
-      accountType: "self-custodial",
-      isReady: true,
-      wallets: [{ id: "btc-1", walletCurrency: "BTC", balance: { amount: 22000 } }],
-    })
+    mockActiveWallet.mockReturnValue(aboveModalThresholdWallet)
 
     const { result } = renderHook(() => useBackupNudgeState())
 
@@ -155,14 +166,11 @@ describe("useBackupNudgeState", () => {
     })
 
     expect(result.current.shouldShowBanner).toBe(false)
-    expect(mockSetItem).toHaveBeenCalledWith(
-      "backupNudgeDismissedAt:test-self-custodial-uuid",
-      expect.any(String),
-    )
+    expect(mockSetItem).toHaveBeenCalledWith(BANNER_KEY, expect.any(String))
   })
 
   it("loads dismissed state from AsyncStorage", async () => {
-    mockGetItem.mockResolvedValue(String(Date.now()))
+    storage[BANNER_KEY] = String(Date.now())
 
     const { result } = renderHook(() => useBackupNudgeState())
 
@@ -172,13 +180,102 @@ describe("useBackupNudgeState", () => {
   })
 
   it("shows banner again after 24h cooldown", async () => {
-    mockGetItem.mockResolvedValue(String(Date.now() - 25 * 60 * 60 * 1000))
+    storage[BANNER_KEY] = String(Date.now() - 25 * 60 * 60 * 1000)
 
     const { result } = renderHook(() => useBackupNudgeState())
 
     await act(async () => {})
 
     expect(result.current.shouldShowBanner).toBe(true)
+  })
+
+  it("dismisses the modal and persists it under its own key", async () => {
+    mockActiveWallet.mockReturnValue(aboveModalThresholdWallet)
+
+    const { result } = renderHook(() => useBackupNudgeState())
+
+    await act(async () => {})
+    expect(result.current.shouldShowModal).toBe(true)
+
+    act(() => {
+      result.current.dismissModal()
+    })
+
+    expect(result.current.shouldShowModal).toBe(false)
+    expect(mockSetItem).toHaveBeenCalledWith(MODAL_KEY, expect.any(String))
+  })
+
+  it("falls back to the banner once the modal is dismissed", async () => {
+    mockActiveWallet.mockReturnValue(aboveModalThresholdWallet)
+
+    const { result } = renderHook(() => useBackupNudgeState())
+
+    await act(async () => {})
+    expect(result.current.shouldShowBanner).toBe(false)
+
+    act(() => {
+      result.current.dismissModal()
+    })
+
+    expect(result.current.shouldShowBanner).toBe(true)
+  })
+
+  it("keeps the modal dismissed across a remount within the cooldown", async () => {
+    mockActiveWallet.mockReturnValue(aboveModalThresholdWallet)
+    storage[MODAL_KEY] = String(Date.now())
+
+    const { result } = renderHook(() => useBackupNudgeState())
+
+    await act(async () => {})
+
+    expect(result.current.shouldShowModal).toBe(false)
+    expect(result.current.shouldShowBanner).toBe(true)
+  })
+
+  it("shows the modal again once its cooldown elapsed", async () => {
+    mockActiveWallet.mockReturnValue(aboveModalThresholdWallet)
+    storage[MODAL_KEY] = String(Date.now() - 25 * 60 * 60 * 1000)
+
+    const { result } = renderHook(() => useBackupNudgeState())
+
+    await act(async () => {})
+
+    expect(result.current.shouldShowModal).toBe(true)
+  })
+
+  it("honours the remote-config modal cooldown", async () => {
+    mockActiveWallet.mockReturnValue(aboveModalThresholdWallet)
+    mockRemoteConfig.mockReturnValue({
+      ...defaultConfig,
+      backupNudgeModalCooldownMs: 7 * 24 * 60 * 60 * 1000,
+    })
+    storage[MODAL_KEY] = String(Date.now() - 25 * 60 * 60 * 1000)
+
+    const { result } = renderHook(() => useBackupNudgeState())
+
+    await act(async () => {})
+
+    expect(result.current.shouldShowModal).toBe(false)
+  })
+
+  it("keeps the two dismissals independent", async () => {
+    mockActiveWallet.mockReturnValue(aboveModalThresholdWallet)
+    storage[BANNER_KEY] = String(Date.now())
+
+    const { result } = renderHook(() => useBackupNudgeState())
+
+    await act(async () => {})
+
+    // A dismissed banner must not silence the blocking modal...
+    expect(result.current.shouldShowModal).toBe(true)
+
+    act(() => {
+      result.current.dismissModal()
+    })
+
+    // ...and dismissing the modal must not resurrect the dismissed banner.
+    expect(result.current.shouldShowModal).toBe(false)
+    expect(result.current.shouldShowBanner).toBe(false)
   })
 
   it("triggers banner when USD weight pushes combined balance over the threshold", async () => {

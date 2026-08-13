@@ -4,6 +4,7 @@ jest.mock("@app/hooks/use-backup-nudge-state", () => ({
     shouldShowModal: false,
     shouldShowSettingsBanner: false,
     dismissBanner: jest.fn(),
+    dismissModal: jest.fn(),
   }),
 }))
 

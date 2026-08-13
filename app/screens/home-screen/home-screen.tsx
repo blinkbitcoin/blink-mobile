@@ -231,7 +231,8 @@ export const HomeScreen: React.FC = () => {
   const hasMultipleAccounts = accounts.length > 1
   const { stableBalanceEnabled } = useFeatureFlags()
   const { mode: balanceMode, toggleMode: toggleBalanceMode } = useBalanceMode()
-  const { shouldShowBanner, shouldShowModal, dismissBanner } = useBackupNudgeState()
+  const { shouldShowBanner, shouldShowModal, dismissBanner, dismissModal } =
+    useBackupNudgeState()
   const {
     shouldShow: shouldShowSelfCustodialInfoBulletin,
     dismiss: dismissSelfCustodialInfoBulletin,
@@ -915,10 +916,7 @@ export const HomeScreen: React.FC = () => {
         bottomOffset={15}
         onAction={() => navigation.navigate("transactionHistory")}
       />
-      <BackupNudgeModal
-        isVisible={shouldShowModal && isFocused}
-        onClose={dismissBanner}
-      />
+      <BackupNudgeModal isVisible={shouldShowModal && isFocused} onClose={dismissModal} />
     </Screen>
   )
 }

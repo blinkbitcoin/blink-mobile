@@ -42,6 +42,7 @@ const mockBackupNudgeState = {
   shouldShowModal: false,
   shouldShowSettingsBanner: false,
   dismissBanner: jest.fn(),
+  dismissModal: jest.fn(),
 }
 jest.mock("@app/hooks/use-backup-nudge-state", () => ({
   useBackupNudgeState: () => mockBackupNudgeState,
@@ -1418,6 +1419,8 @@ describe("HomeScreen", () => {
 
     beforeEach(() => {
       mockBackupNudgeModal.mockClear()
+      mockBackupNudgeState.dismissModal.mockClear()
+      mockBackupNudgeState.dismissBanner.mockClear()
       mockBackupNudgeState.shouldShowModal = false
       mockIsFocused = true
     })
@@ -1481,6 +1484,26 @@ describe("HomeScreen", () => {
       await flushEffects()
 
       expect(lastIsVisible()).toBe(false)
+    })
+
+    // #4156: closing the modal used to write the banner's dismissal key, which the
+    // modal never reads — so the prompt reopened on the same render and trapped users.
+    it("closes through the modal's own dismissal, not the banner's", async () => {
+      mockBackupNudgeState.shouldShowModal = true
+      mockIsFocused = true
+
+      render(
+        <ContextForScreen>
+          <HomeScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      const calls = mockBackupNudgeModal.mock.calls
+      calls[calls.length - 1][0].onClose()
+
+      expect(mockBackupNudgeState.dismissModal).toHaveBeenCalled()
+      expect(mockBackupNudgeState.dismissBanner).not.toHaveBeenCalled()
     })
   })
 })
