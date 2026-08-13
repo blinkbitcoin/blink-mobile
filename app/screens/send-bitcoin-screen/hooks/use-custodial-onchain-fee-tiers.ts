@@ -245,18 +245,36 @@ export const useCustodialOnchainFeeTiers = ({
     // Dropped so a failure never leaves the previous amount's fee behind to be re-quoted onto.
     setTiers(EMPTY_TIERS)
 
+    /** Every failure lands the same way on screen; only what is reported differs. */
+    const failQuote = (err: unknown, isExpected: boolean) => {
+      reportError("use-custodial-onchain-fee-tiers", err, { expected: isExpected })
+      setTiers(EMPTY_TIERS)
+      markFailed()
+    }
+
     try {
-      const { data } = await fetchFeesForQuote({ variables })
+      const { data, error } = await fetchFeesForQuote({ variables })
       if (token !== requestTokenRef.current) return
-      if (!data) throw new Error("Missing on-chain fee data")
+
+      if (!data) {
+        /**
+         * A failed lazy query resolves rather than rejects, so the cause only ever arrives
+         * here. A GraphQL error is the backend turning down the amount or address the sender
+         * typed, an outcome rather than a defect, and the one that would otherwise file a
+         * fresh non-fatal on every keystroke. A missing cause is left to be recorded, since
+         * an empty response with nothing to explain it is a defect of its own.
+         */
+        const isInputRejection = Boolean(error?.graphQLErrors.length)
+        failQuote(error ?? new Error("Missing on-chain fee data"), isInputRejection)
+        return
+      }
 
       setTiers(toTiers(data, FEE_UNIT_BY_QUOTE[quote]))
       markQuoted()
     } catch (err) {
       if (token !== requestTokenRef.current) return
-      reportError("use-custodial-onchain-fee-tiers", err)
-      setTiers(EMPTY_TIERS)
-      markFailed()
+      /** Nothing above rejects of its own accord, so arriving here is unexpected in itself. */
+      failQuote(err, false)
     }
   }, [
     walletId,

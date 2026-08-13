@@ -1,5 +1,8 @@
 import { renderHook, waitFor } from "@testing-library/react-native"
 
+import { ApolloError } from "@apollo/client"
+import { GraphQLError } from "graphql"
+
 import {
   FeeTierOption,
   FeeUnit,
@@ -10,6 +13,13 @@ import { useCustodialOnchainFeeTiers } from "@app/screens/send-bitcoin-screen/ho
 const mockFetchBtcFees = jest.fn()
 const mockFetchUsdFees = jest.fn()
 const mockFetchUsdAsBtcFees = jest.fn()
+const mockReportError = jest.fn()
+
+jest.mock("@app/utils/error-logging", () => ({
+  ...jest.requireActual("@app/utils/error-logging"),
+  reportError: (operation: string, err: unknown, options?: unknown) =>
+    mockReportError(operation, err, options),
+}))
 
 /**
  * Apollo hands back a stable execute function across renders. These stand-ins must be
@@ -207,6 +217,90 @@ describe("useCustodialOnchainFeeTiers", () => {
     await waitFor(() => {
       expect(result.current.hasError).toBe(true)
     })
+  })
+
+  it("leaves a quoted fee unreported", async () => {
+    mockFetchBtcFees.mockResolvedValue(feeResponse(900, 600, 300))
+
+    const { result } = renderHook(() => useCustodialOnchainFeeTiers(btcParams))
+
+    await waitFor(() => {
+      expect(result.current.hasError).toBe(false)
+    })
+    expect(mockReportError).not.toHaveBeenCalled()
+  })
+
+  /**
+   * The backend turning down an amount or an address is the sender still typing, not a
+   * defect. Reported as expected so it stays a breadcrumb instead of filing a fresh
+   * non-fatal on every keystroke.
+   */
+  it("reports a backend rejection as expected rather than as a defect", async () => {
+    const rejection = new ApolloError({
+      graphQLErrors: [new GraphQLError("Amount is too small to send onchain")],
+    })
+    mockFetchBtcFees.mockResolvedValue({ data: undefined, error: rejection })
+
+    const { result } = renderHook(() => useCustodialOnchainFeeTiers(btcParams))
+
+    await waitFor(() => {
+      expect(result.current.hasError).toBe(true)
+    })
+    expect(mockReportError).toHaveBeenCalledWith(
+      "use-custodial-onchain-fee-tiers",
+      rejection,
+      { expected: true },
+    )
+  })
+
+  /** The transport failing is what the connectivity classifier downgrades, so it must
+   *  arrive carrying the cause rather than a stand-in that reads like a defect. */
+  it("reports a transport failure with the cause the classifier reads", async () => {
+    const outage = new ApolloError({ networkError: new Error("Network request failed") })
+    mockFetchBtcFees.mockResolvedValue({ data: undefined, error: outage })
+
+    const { result } = renderHook(() => useCustodialOnchainFeeTiers(btcParams))
+
+    await waitFor(() => {
+      expect(result.current.hasError).toBe(true)
+    })
+    expect(mockReportError).toHaveBeenCalledWith(
+      "use-custodial-onchain-fee-tiers",
+      outage,
+      { expected: false },
+    )
+  })
+
+  it("records an empty response that carries no cause", async () => {
+    mockFetchBtcFees.mockResolvedValue({ data: undefined })
+
+    const { result } = renderHook(() => useCustodialOnchainFeeTiers(btcParams))
+
+    await waitFor(() => {
+      expect(result.current.hasError).toBe(true)
+    })
+    expect(mockReportError).toHaveBeenCalledWith(
+      "use-custodial-onchain-fee-tiers",
+      expect.objectContaining({ message: "Missing on-chain fee data" }),
+      { expected: false },
+    )
+  })
+
+  /** Apollo resolves a failed query rather than rejecting it, so a rejection is a defect. */
+  it("records a rejected quote as a defect", async () => {
+    const thrown = new Error("execute threw")
+    mockFetchBtcFees.mockRejectedValue(thrown)
+
+    const { result } = renderHook(() => useCustodialOnchainFeeTiers(btcParams))
+
+    await waitFor(() => {
+      expect(result.current.hasError).toBe(true)
+    })
+    expect(mockReportError).toHaveBeenCalledWith(
+      "use-custodial-onchain-fee-tiers",
+      thrown,
+      { expected: false },
+    )
   })
 
   it("clears a previous error once a later quote succeeds", async () => {
