@@ -30,6 +30,17 @@ export const saveString = async (key: string, value: string): Promise<boolean> =
 }
 
 /**
+ * Lists every key currently in storage.
+ */
+export const getAllKeys = async (): Promise<readonly string[]> => {
+  try {
+    return await AsyncStorage.getAllKeys()
+  } catch {
+    return []
+  }
+}
+
+/**
  * Saves an object to storage, propagating the underlying write error instead of
  * swallowing it, so a caller whose flow must stop on a failed write can catch it.
  * Best-effort callers should catch and ignore.

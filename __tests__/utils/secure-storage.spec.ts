@@ -537,3 +537,68 @@ describe("KeyStoreWrapper session-profile methods", () => {
     })
   })
 })
+
+describe("KeyStoreWrapper active-token methods", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  describe("getActiveToken", () => {
+    it("returns the stored token from the 'galoyAuthToken' key", async () => {
+      mockGet.mockResolvedValue("ory_st_secret")
+
+      const result = await KeyStoreWrapper.getActiveToken()
+
+      expect(result).toBe("ory_st_secret")
+      expect(mockGet).toHaveBeenCalledWith("galoyAuthToken")
+    })
+
+    it("returns an empty string when the key is missing or the keystore fails", async () => {
+      mockGet.mockRejectedValue(new Error("not found"))
+
+      const result = await KeyStoreWrapper.getActiveToken()
+
+      expect(result).toBe("")
+    })
+  })
+
+  describe("setActiveToken", () => {
+    it("writes the token with ALWAYS_THIS_DEVICE_ONLY accessibility", async () => {
+      mockSet.mockResolvedValue(undefined)
+
+      const result = await KeyStoreWrapper.setActiveToken("ory_st_secret")
+
+      expect(result).toBe(true)
+      expect(mockSet).toHaveBeenCalledWith("galoyAuthToken", "ory_st_secret", {
+        accessible: "ALWAYS_THIS_DEVICE_ONLY",
+      })
+    })
+
+    it("returns false on storage error", async () => {
+      mockSet.mockRejectedValue(new Error("write locked"))
+
+      const result = await KeyStoreWrapper.setActiveToken("ory_st_secret")
+
+      expect(result).toBe(false)
+    })
+  })
+
+  describe("removeActiveToken", () => {
+    it("removes the key and returns true", async () => {
+      mockRemove.mockResolvedValue(undefined)
+
+      const result = await KeyStoreWrapper.removeActiveToken()
+
+      expect(result).toBe(true)
+      expect(mockRemove).toHaveBeenCalledWith("galoyAuthToken")
+    })
+
+    it("returns false when the keystore rejects", async () => {
+      mockRemove.mockRejectedValue(new Error("keystore unavailable"))
+
+      const result = await KeyStoreWrapper.removeActiveToken()
+
+      expect(result).toBe(false)
+    })
+  })
+})

@@ -5,6 +5,7 @@ export default class KeyStoreWrapper {
   private static readonly PIN = "PIN"
   private static readonly PIN_ATTEMPTS = "pinAttempts"
   private static readonly SESSION_PROFILES = "sessionProfiles"
+  private static readonly ACTIVE_TOKEN = "galoyAuthToken"
   private static readonly MNEMONIC = "mnemonic"
   private static readonly MNEMONIC_NETWORK = "mnemonic_network"
 
@@ -133,6 +134,37 @@ export default class KeyStoreWrapper {
       await RNSecureKeyStore.remove(KeyStoreWrapper.SESSION_PROFILES)
       return true
     } catch (err) {
+      return false
+    }
+  }
+
+  public static async getActiveToken(): Promise<string> {
+    try {
+      return await RNSecureKeyStore.get(KeyStoreWrapper.ACTIVE_TOKEN)
+    } catch {
+      return ""
+    }
+  }
+
+  public static async setActiveToken(token: string): Promise<boolean> {
+    try {
+      // ALWAYS_THIS_DEVICE_ONLY over WHEN_UNLOCKED: iOS can cold-start the app in the
+      // background while locked (UIBackgroundModes remote-notification), and a failed
+      // read here degrades to a silent logged-out session.
+      await RNSecureKeyStore.set(KeyStoreWrapper.ACTIVE_TOKEN, token, {
+        accessible: ACCESSIBLE.ALWAYS_THIS_DEVICE_ONLY,
+      })
+      return true
+    } catch {
+      return false
+    }
+  }
+
+  public static async removeActiveToken(): Promise<boolean> {
+    try {
+      await RNSecureKeyStore.remove(KeyStoreWrapper.ACTIVE_TOKEN)
+      return true
+    } catch {
       return false
     }
   }

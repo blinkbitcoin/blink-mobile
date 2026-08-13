@@ -50,6 +50,7 @@ const useLogout = () => {
           await KeyStoreWrapper.removePin()
           await KeyStoreWrapper.removePinAttempts()
           await KeyStoreWrapper.removeSessionProfiles()
+          await KeyStoreWrapper.removeActiveToken()
         }
 
         logLogout()
