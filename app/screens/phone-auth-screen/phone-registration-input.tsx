@@ -1,17 +1,9 @@
-import {
-  CountryCode as PhoneNumberCountryCode,
-  getCountryCallingCode,
-} from "libphonenumber-js/mobile"
+import { CountryCode as PhoneNumberCountryCode } from "libphonenumber-js/mobile"
 import * as React from "react"
 import { ActivityIndicator, View } from "react-native"
-import CountryPicker, {
-  CountryCode,
-  DARK_THEME,
-  DEFAULT_THEME,
-  Flag,
-} from "react-native-country-picker-modal"
-import { TouchableOpacity } from "react-native-gesture-handler"
+import { CountryCode } from "react-native-country-picker-modal"
 
+import { CountryCodePicker } from "@app/components/phone-input/country-code-picker"
 import { GaloyErrorBox } from "@app/components/atomic/galoy-error-box"
 import { GaloyInfo } from "@app/components/atomic/galoy-info"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
@@ -35,7 +27,7 @@ export const PhoneRegistrationInitiateScreen: React.FC = () => {
   const styles = useStyles()
 
   const {
-    theme: { colors, mode: themeMode },
+    theme: { colors },
   } = useTheme()
 
   const {
@@ -154,34 +146,15 @@ export const PhoneRegistrationInitiateScreen: React.FC = () => {
         </View>
 
         <View style={styles.inputContainer}>
-          <CountryPicker
-            theme={themeMode === "dark" ? DARK_THEME : DEFAULT_THEME}
+          <CountryCodePicker
             countryCode={
               (phoneInputInfo?.countryCode || DEFAULT_COUNTRY_CODE) as CountryCode
             }
             countryCodes={supportedCountries as CountryCode[]}
-            onSelect={(country) => setCountryCode(country.cca2 as PhoneNumberCountryCode)}
-            renderFlagButton={({ countryCode, onOpen }) => {
-              return (
-                countryCode && (
-                  <TouchableOpacity
-                    style={styles.countryPickerButtonStyle}
-                    onPress={onOpen}
-                  >
-                    <Flag countryCode={countryCode} flagSize={24} />
-                    <Text type="p1">
-                      +{getCountryCallingCode(countryCode as PhoneNumberCountryCode)}
-                    </Text>
-                  </TouchableOpacity>
-                )
-              )
-            }}
-            withCallingCodeButton={true}
-            withFilter={true}
-            filterProps={{
-              autoFocus: true,
-            }}
-            withCallingCode={true}
+            onSelect={(country: { cca2: string }) =>
+              setCountryCode(country.cca2 as PhoneNumberCountryCode)
+            }
+            buttonStyle={styles.countryPickerButtonStyle}
           />
           <Input
             placeholder={PLACEHOLDER_PHONE_NUMBER}
