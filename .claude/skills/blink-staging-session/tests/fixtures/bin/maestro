@@ -1,0 +1,12 @@
+#!/bin/bash
+# Fake `maestro` for the staging-login tests: records every invocation so
+# ordering, --udid pinning and env injection are assertable; FAKE_MAESTRO_RC
+# simulates a failing flow.
+set -uo pipefail
+echo "maestro $*" >> "${FAKE_ARGS_LOG:-/dev/null}"
+[ "${1:-}" = "--udid" ] && shift 2
+case "${1:-}" in
+  test) exit "${FAKE_MAESTRO_RC:-0}" ;;
+  --version) echo "2.6.1" ;;
+  *) echo "fake maestro: unsupported subcommand '${1:-}'" >&2; exit 64 ;;
+esac

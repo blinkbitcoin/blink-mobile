@@ -24,6 +24,7 @@ instructions (e.g. `AGENTS.md`).
 | [`react-native-demo-screenshots`](./react-native-demo-screenshots/SKILL.md) | Settle-aware capture, honest before/after crop pairs, numeric comparison against design mocks |
 | [`react-native-demo-videos`](./react-native-demo-videos/SKILL.md) | Maestro-driven recordings with safe recorder stop paths, GIF/MP4/WebM encoding, and a guard against the `clearState` Metro-redirect trap |
 | [`github-pr-image-attachments`](./github-pr-image-attachments/SKILL.md) | Embed images in PR comments via an orphan `assets/pr-<N>-*` branch (`gh` has no attachment upload); repo derived from the origin remote |
+| [`blink-staging-session`](./blink-staging-session/SKILL.md) | **Blink-specific** (the one exception to app-agnosticism, kept separate on purpose): staging login with the global OTP, the Main→Staging instance switch, golden-sim provisioning recipe |
 
 ## Quickstart (a before/after screenshot pair on a PR)
 
