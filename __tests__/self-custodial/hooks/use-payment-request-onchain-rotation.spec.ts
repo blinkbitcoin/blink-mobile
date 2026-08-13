@@ -30,6 +30,7 @@ const mockAccountRegistry = jest.fn()
 const mockRecordAppError = jest.fn()
 const mockLoadIssuedOnchainAddress = jest.fn()
 const mockSaveIssuedOnchainAddress = jest.fn()
+const mockFindLatestOnchainReceiptId = jest.fn()
 
 jest.mock("@app/self-custodial/bridge", () => ({
   createReceiveLightning: () => mockReceiveLightning,
@@ -59,6 +60,13 @@ jest.mock("@app/self-custodial/hooks/use-pending-deposits", () => ({
 
 jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () => mockSelfCustodialWallet(),
+}))
+
+// The lookback the hook falls through to when the loaded history holds no on-chain
+// receipt; its own paging is covered in the wallet-snapshot spec.
+jest.mock("@app/self-custodial/providers/wallet-snapshot", () => ({
+  findLatestOnchainReceiptId: (...args: unknown[]) =>
+    mockFindLatestOnchainReceiptId(...args),
 }))
 
 jest.mock("@app/hooks/use-active-wallet", () => ({
@@ -94,6 +102,7 @@ beforeEach(() => {
   })
   mockLoadIssuedOnchainAddress.mockResolvedValue(null)
   mockSaveIssuedOnchainAddress.mockResolvedValue(undefined)
+  mockFindLatestOnchainReceiptId.mockResolvedValue(null)
   applyPaymentRequestDefaults({
     receiveLightning: mockReceiveLightning,
     receiveOnchain: mockReceiveOnchain,
@@ -518,25 +527,176 @@ describe("onchain address rotation", () => {
       expect(mockSaveIssuedOnchainAddress).not.toHaveBeenCalled()
     })
 
-    it("can still rotate when a deposit lands", async () => {
+    it("does not rotate on a deposit it would have no way to record", async () => {
+      // Rotating here writes nothing, so the next run has the same evidence and rotates
+      // again: a fresh address every render, and still no reuse tracking to show for it.
       mockAccountRegistry.mockReturnValue({ activeAccount: undefined })
-      mockReceiveOnchain
-        .mockResolvedValueOnce({ address: "bc1qfirst..." })
-        .mockResolvedValueOnce({ address: "bc1qrotated..." })
 
       const { result, rerender } = renderHook(() => usePaymentRequest())
       await waitFor(() => {
-        expect(result.current?.onchainAddress).toBe("bc1qfirst...")
+        expect(result.current?.onchainAddress).toBe("bc1qtest...")
       })
 
       mockSelfCustodialWallet.mockReturnValue(walletWith([onchainReceipt("deposit-1")]))
+      rerender({})
+      await flushEffects()
+
+      expect(mockReceiveOnchain).not.toHaveBeenCalledWith({ newAddress: true })
+      expect(mockSaveIssuedOnchainAddress).not.toHaveBeenCalled()
+    })
+
+    it("rotates as soon as the account id is back", async () => {
+      // The state above is transient — an account switch mid-render — so the pause on
+      // rotation must not outlive it.
+      mockAccountRegistry.mockReturnValue({ activeAccount: undefined })
+      mockSelfCustodialWallet.mockReturnValue(walletWith([onchainReceipt("deposit-1")]))
+
+      const { result, rerender } = renderHook(() => usePaymentRequest())
+      await waitFor(() => {
+        expect(result.current?.onchainAddress).toBe("bc1qtest...")
+      })
+      expect(mockReceiveOnchain).toHaveBeenLastCalledWith({ newAddress: false })
+
+      mockAccountRegistry.mockReturnValue({
+        activeAccount: { id: "sc-account-1", type: "self-custodial" },
+      })
+      mockReceiveOnchain.mockResolvedValue({ address: "bc1qrotated..." })
       rerender({})
 
       await waitFor(() => {
         expect(result.current?.onchainAddress).toBe("bc1qrotated...")
       })
       expect(mockReceiveOnchain).toHaveBeenLastCalledWith({ newAddress: true })
-      expect(mockSaveIssuedOnchainAddress).not.toHaveBeenCalled()
+      expect(mockSaveIssuedOnchainAddress).toHaveBeenLastCalledWith("sc-account-1", {
+        address: "bc1qrotated...",
+        depositMarker: "deposit-1",
+        seenPendingDepositIds: [],
+      })
+    })
+  })
+
+  describe("when the deposit has scrolled off the loaded history", () => {
+    /**
+     * `allTransactions` only holds the newest page. A wallet that keeps paying over
+     * Lightning pushes its on-chain receipt off that page, and the marker read from it
+     * goes null — the same value a wallet that has never been paid produces. Falling
+     * through to the SDK is what keeps those two apart. Reported as M1 on #4119.
+     */
+    it("rotates on a receipt only the SDK lookback can still see", async () => {
+      mockLoadIssuedOnchainAddress.mockResolvedValue({
+        address: "bc1qused...",
+        depositMarker: "deposit-0",
+      })
+      mockSelfCustodialWallet.mockReturnValue(
+        walletWith([{ ...onchainReceipt("ln-1"), paymentType: "lightning" }]),
+      )
+      mockFindLatestOnchainReceiptId.mockResolvedValue("deposit-1")
+      mockReceiveOnchain.mockResolvedValue({ address: "bc1qrotated..." })
+
+      const { result } = renderHook(() => usePaymentRequest())
+
+      await waitFor(() => {
+        expect(result.current?.onchainAddress).toBe("bc1qrotated...")
+      })
+      expect(mockReceiveOnchain).toHaveBeenCalledWith({ newAddress: true })
+      expect(mockSaveIssuedOnchainAddress).toHaveBeenLastCalledWith("sc-account-1", {
+        address: "bc1qrotated...",
+        depositMarker: "deposit-1",
+        seenPendingDepositIds: [],
+      })
+    })
+
+    it("rotates only once for that receipt", async () => {
+      // The recorded marker is what stops the lookback from reading the same deposit as
+      // new on every visit for as long as it stays off the loaded page.
+      mockLoadIssuedOnchainAddress.mockResolvedValue({
+        address: "bc1qrotated...",
+        depositMarker: "deposit-1",
+      })
+      mockFindLatestOnchainReceiptId.mockResolvedValue("deposit-1")
+
+      const { result } = renderHook(() => usePaymentRequest())
+
+      await waitFor(() => {
+        expect(result.current?.onchainAddress).toBe("bc1qtest...")
+      })
+      expect(mockReceiveOnchain).toHaveBeenCalledWith({ newAddress: false })
+    })
+
+    it("skips the lookback when the loaded history already shows a receipt", async () => {
+      // Anything newer would be on the page too, so the loaded marker is the answer.
+      mockLoadIssuedOnchainAddress.mockResolvedValue({
+        address: "bc1qfirst...",
+        depositMarker: "deposit-1",
+      })
+      mockSelfCustodialWallet.mockReturnValue(walletWith([onchainReceipt("deposit-1")]))
+
+      const { result } = renderHook(() => usePaymentRequest())
+
+      await waitFor(() => {
+        expect(result.current?.onchainAddress).toBe("bc1qtest...")
+      })
+      expect(mockFindLatestOnchainReceiptId).not.toHaveBeenCalled()
+    })
+
+    it("holds the address when the lookback finds nothing", async () => {
+      mockLoadIssuedOnchainAddress.mockResolvedValue({
+        address: "bc1qstored...",
+        depositMarker: "deposit-1",
+      })
+      mockFindLatestOnchainReceiptId.mockResolvedValue(null)
+
+      const { result } = renderHook(() => usePaymentRequest())
+
+      await waitFor(() => {
+        expect(result.current?.onchainAddress).toBe("bc1qtest...")
+      })
+      expect(mockReceiveOnchain).toHaveBeenCalledWith({ newAddress: false })
+      expect(mockSaveIssuedOnchainAddress).toHaveBeenLastCalledWith("sc-account-1", {
+        address: "bc1qtest...",
+        depositMarker: "deposit-1",
+        seenPendingDepositIds: [],
+      })
+    })
+
+    it("still shows an address, keeps the marker and reports it when the lookback fails", async () => {
+      // Offline is the common case: a failed lookback is "we do not know", so it must
+      // neither rotate, nor erase the marker, nor leave the QR blank.
+      mockLoadIssuedOnchainAddress.mockResolvedValue({
+        address: "bc1qstored...",
+        depositMarker: "deposit-1",
+      })
+      mockFindLatestOnchainReceiptId.mockRejectedValue(new Error("sdk offline"))
+
+      const { result } = renderHook(() => usePaymentRequest())
+
+      await waitFor(() => {
+        expect(result.current?.onchainAddress).toBe("bc1qtest...")
+      })
+      expect(mockReceiveOnchain).toHaveBeenCalledWith({ newAddress: false })
+      expect(mockSaveIssuedOnchainAddress).toHaveBeenLastCalledWith("sc-account-1", {
+        address: "bc1qtest...",
+        depositMarker: "deposit-1",
+        seenPendingDepositIds: [],
+      })
+      expect(mockRecordAppError).toHaveBeenCalledWith(
+        expect.objectContaining({ message: "sdk offline" }),
+      )
+    })
+
+    it("describes a non-Error lookback rejection", async () => {
+      mockFindLatestOnchainReceiptId.mockRejectedValue("string blowup")
+
+      const { result } = renderHook(() => usePaymentRequest())
+
+      await waitFor(() => {
+        expect(result.current?.onchainAddress).toBe("bc1qtest...")
+      })
+      expect(mockRecordAppError).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: "Self-custodial onchain deposit marker lookup failed: string blowup",
+        }),
+      )
     })
   })
 })

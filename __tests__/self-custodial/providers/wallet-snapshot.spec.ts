@@ -5,6 +5,7 @@ import { AccountType, toWalletId, type WalletState } from "@app/types/wallet"
 
 import {
   appendTransactions,
+  findLatestOnchainReceiptId,
   getSelfCustodialWalletSnapshot,
   loadMoreTransactions,
   mergeOrderedTransactions,
@@ -573,5 +574,113 @@ describe("mergeOrderedTransactions", () => {
     const result = mergeOrderedTransactions(existing, olderPage)
 
     expect(result.map((t) => t.id)).toEqual(["new", "old"])
+  })
+})
+
+/**
+ * The receive screen decides whether the on-chain address it is about to show has
+ * already been paid, and the page of history the UI holds is too short to answer that
+ * for a wallet that keeps transacting. These pin the bounded walk that answers it.
+ */
+describe("findLatestOnchainReceiptId", () => {
+  const LOOKBACK_PAGE_SIZE = 100
+  const LOOKBACK_MAX_PAGES = 3
+
+  const onchainReceipt = (id: string) => ({
+    id,
+    paymentType: 1, // SdkPaymentType.Receive
+    amount: BigInt(1000),
+    fees: BigInt(10),
+    timestamp: BigInt(1700000000),
+    status: 0,
+    method: 3, // PaymentMethod.Deposit
+    details: { tag: "Deposit", inner: { txId: `${id}-tx` } },
+  })
+
+  const lightningReceipt = (id: string) => ({
+    ...buildKnownPayment(id),
+    paymentType: 1,
+  })
+
+  /** A wallet whose history is exactly `pages`, page by page, honouring the offset. */
+  const sdkServing = (pages: unknown[][]) => {
+    const listPayments = jest.fn(({ offset }: { offset: number }) =>
+      Promise.resolve({ payments: pages[offset / LOOKBACK_PAGE_SIZE] ?? [] }),
+    )
+    return { sdk: { listPayments } as never, listPayments }
+  }
+
+  const fullPageOf = (prefix: string) =>
+    Array.from({ length: LOOKBACK_PAGE_SIZE }, (_, i) =>
+      lightningReceipt(`${prefix}-${i}`),
+    )
+
+  it("returns the newest on-chain receipt from the first page", async () => {
+    const { sdk, listPayments } = sdkServing([
+      [
+        lightningReceipt("ln-1"),
+        onchainReceipt("deposit-2"),
+        onchainReceipt("deposit-1"),
+      ],
+    ])
+
+    await expect(findLatestOnchainReceiptId(sdk)).resolves.toBe("deposit-2")
+    expect(listPayments).toHaveBeenCalledTimes(1)
+  })
+
+  it("reads past a full page of other payments to find the receipt", async () => {
+    // The reported gap: the deposit is real but sits behind enough later payments that
+    // the history the screen has loaded no longer shows it.
+    const { sdk, listPayments } = sdkServing([
+      fullPageOf("ln"),
+      [onchainReceipt("deposit-1")],
+    ])
+
+    await expect(findLatestOnchainReceiptId(sdk)).resolves.toBe("deposit-1")
+    expect(listPayments).toHaveBeenCalledTimes(2)
+    expect(listPayments).toHaveBeenLastCalledWith(
+      expect.objectContaining({ offset: LOOKBACK_PAGE_SIZE, limit: LOOKBACK_PAGE_SIZE }),
+    )
+  })
+
+  it("stops at the end of the history rather than paging into nothing", async () => {
+    const { sdk, listPayments } = sdkServing([[lightningReceipt("ln-1")]])
+
+    await expect(findLatestOnchainReceiptId(sdk)).resolves.toBeNull()
+    expect(listPayments).toHaveBeenCalledTimes(1)
+  })
+
+  it("returns null for a wallet with no payments at all", async () => {
+    const { sdk, listPayments } = sdkServing([])
+
+    await expect(findLatestOnchainReceiptId(sdk)).resolves.toBeNull()
+    expect(listPayments).toHaveBeenCalledTimes(1)
+  })
+
+  it("gives up after the bounded lookback instead of walking the whole history", async () => {
+    // Reporting "not found" here reads as "we do not know", which never rotates — so a
+    // wallet deeper than the bound is left as it was, not handed a fresh address a visit.
+    const pages = Array.from({ length: LOOKBACK_MAX_PAGES + 2 }, (_, i) =>
+      fullPageOf(`p${i}`),
+    )
+    const { sdk, listPayments } = sdkServing(pages)
+
+    await expect(findLatestOnchainReceiptId(sdk)).resolves.toBeNull()
+    expect(listPayments).toHaveBeenCalledTimes(LOOKBACK_MAX_PAGES)
+  })
+
+  it("ignores outgoing on-chain payments", async () => {
+    const withdrawal = { ...onchainReceipt("withdraw-1"), paymentType: 0, method: 4 }
+    const { sdk } = sdkServing([[withdrawal]])
+
+    await expect(findLatestOnchainReceiptId(sdk)).resolves.toBeNull()
+  })
+
+  it("propagates a listing failure for the caller to decide on", async () => {
+    const sdk = {
+      listPayments: jest.fn().mockRejectedValue(new Error("sdk offline")),
+    } as never
+
+    await expect(findLatestOnchainReceiptId(sdk)).rejects.toThrow("sdk offline")
   })
 })
