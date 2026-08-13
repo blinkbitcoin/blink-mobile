@@ -5,6 +5,7 @@ import { fireEvent, render } from "@testing-library/react-native"
 import { CountryCodePicker } from "@app/components/phone-input/country-code-picker"
 
 const mockPicker = jest.fn()
+const mockPickerMount = jest.fn()
 const mockFlag = jest.fn()
 const mockOnOpen = jest.fn()
 
@@ -18,19 +19,27 @@ const mockOnOpen = jest.fn()
  */
 jest.mock("react-native-country-picker-modal", () => {
   const ReactActual = jest.requireActual("react")
+
+  const CountryPickerMock = (props: Record<string, unknown>) => {
+    mockPicker(props)
+    /** Counts mounts rather than renders: an effect with no dependencies runs again only
+     *  when this subtree is a new instance, which is exactly what the key has to force. */
+    ReactActual.useEffect(() => {
+      mockPickerMount()
+    }, [])
+    const renderFlagButton = props.renderFlagButton as (args: {
+      countryCode?: string
+      onOpen: () => void
+    }) => React.ReactNode
+    return renderFlagButton({
+      countryCode: props.countryCode as string | undefined,
+      onOpen: mockOnOpen,
+    })
+  }
+
   return {
     __esModule: true,
-    default: (props: Record<string, unknown>) => {
-      mockPicker(props)
-      const renderFlagButton = props.renderFlagButton as (args: {
-        countryCode?: string
-        onOpen: () => void
-      }) => React.ReactNode
-      return renderFlagButton({
-        countryCode: props.countryCode as string | undefined,
-        onOpen: mockOnOpen,
-      })
-    },
+    default: CountryPickerMock,
     Flag: (props: Record<string, unknown>) => {
       mockFlag(props)
       return ReactActual.createElement("Flag")
@@ -46,17 +55,20 @@ jest.mock("@rn-vui/themed", () => ({
   useTheme: () => ({ theme: { mode: mockThemeMode() } }),
 }))
 
+const pickerElement = (
+  overrides: Partial<React.ComponentProps<typeof CountryCodePicker>> = {},
+) => (
+  <CountryCodePicker
+    countryCode={"SV" as never}
+    countryCodes={["SV", "US"] as never}
+    onSelect={jest.fn()}
+    {...overrides}
+  />
+)
+
 const renderPicker = (
   overrides: Partial<React.ComponentProps<typeof CountryCodePicker>> = {},
-) =>
-  render(
-    <CountryCodePicker
-      countryCode={"SV" as never}
-      countryCodes={["SV", "US"] as never}
-      onSelect={jest.fn()}
-      {...overrides}
-    />,
-  )
+) => render(pickerElement(overrides))
 
 describe("CountryCodePicker", () => {
   beforeEach(() => {
@@ -140,20 +152,26 @@ describe("CountryCodePicker", () => {
 
   it("rebuilds the picker when the supported countries finally arrive", () => {
     const { rerender } = renderPicker({ countryCodes: [] as never })
-    const keyWhileEmpty = mockPicker.mock.calls.length
+    expect(mockPickerMount).toHaveBeenCalledTimes(1)
 
-    rerender(
-      <CountryCodePicker
-        countryCode={"SV" as never}
-        countryCodes={["SV", "US"] as never}
-        onSelect={jest.fn()}
-      />,
-    )
+    rerender(pickerElement())
 
     /** A fresh mount is the point: the library reads its country list once, so reusing the
      *  instance would keep offering every country instead of the supported ones. */
-    expect(mockPicker.mock.calls.length).toBeGreaterThan(keyWhileEmpty)
+    expect(mockPickerMount).toHaveBeenCalledTimes(2)
     expect(mockPicker.mock.calls.at(-1)?.[0].countryCodes).toEqual(["SV", "US"])
+  })
+
+  it("keeps the picker it already built when only the selected country changes", () => {
+    const { rerender } = renderPicker()
+    expect(mockPickerMount).toHaveBeenCalledTimes(1)
+
+    rerender(pickerElement({ countryCode: "US" as never }))
+
+    /** The list is what the key answers to. Remounting on anything else would throw away
+     *  the modal's own state, including the filter text, while it is open. */
+    expect(mockPickerMount).toHaveBeenCalledTimes(1)
+    expect(mockPicker.mock.calls.at(-1)?.[0].countryCode).toBe("US")
   })
 
   it("follows the app theme into the picker", () => {

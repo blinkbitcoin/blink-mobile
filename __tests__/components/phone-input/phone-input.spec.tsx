@@ -1,6 +1,6 @@
 import React from "react"
-import { TextInput } from "react-native"
-import { ThemeProvider, createTheme } from "@rn-vui/themed"
+import { StyleProp, TextInput, ViewStyle } from "react-native"
+import { Input, ThemeProvider, createTheme } from "@rn-vui/themed"
 import { act, fireEvent, render } from "@testing-library/react-native"
 
 import { PhoneInput } from "@app/components/phone-input/phone-input"
@@ -29,6 +29,15 @@ jest.mock("@app/graphql/generated", () => ({
  *  full screen context would spin up providers that log act warnings for no gain here. */
 const renderInput = (node: React.ReactElement) =>
   render(<ThemeProvider theme={createTheme({})}>{node}</ThemeProvider>)
+
+/** What `disabledInput` amounts to in the stylesheet, which is all a caller can observe. */
+const DIMMED_STYLE = { opacity: 0.6 }
+
+/** The query needs a plain component type, and rn-vui types `Input`'s ref as the bare
+ *  TextInput underneath it, which does not fit one. Only the style prop is read here. */
+const ThemedInput = Input as unknown as React.ComponentType<{
+  inputContainerStyle: StyleProp<ViewStyle>
+}>
 
 describe("PhoneInput", () => {
   beforeEach(() => {
@@ -63,6 +72,19 @@ describe("PhoneInput", () => {
     renderInput(<PhoneInput value="" onChangeText={jest.fn()} />)
 
     expect(mockCountryCodePicker).not.toHaveBeenCalled()
+  })
+
+  it("dims both halves of the field when the caller disables it", () => {
+    // eslint-disable-next-line camelcase -- testing-library exposes this API verbatim
+    const { UNSAFE_getByType } = renderInput(
+      <PhoneInput value="" isDisabled={true} onChangeText={jest.fn()} />,
+    )
+
+    const [props] = mockCountryCodePicker.mock.calls.at(-1) ?? []
+    expect(props.buttonStyle).toContainEqual(DIMMED_STYLE)
+    expect(UNSAFE_getByType(ThemedInput).props.inputContainerStyle).toContainEqual(
+      DIMMED_STYLE,
+    )
   })
 
   it("reports the country and the formatted number to its caller", () => {
@@ -152,6 +174,41 @@ describe("PhoneInput", () => {
     expect(onChangeText).toHaveBeenCalledWith("+14155552671")
     expect(onChangeInfo).toHaveBeenLastCalledWith(
       expect.objectContaining({ countryCode: "US" }),
+    )
+  })
+
+  it("adopts the country of a number it is handed already written", () => {
+    const onChangeInfo = jest.fn()
+
+    renderInput(
+      <PhoneInput
+        value="+14155552671"
+        onChangeText={jest.fn()}
+        onChangeInfo={onChangeInfo}
+      />,
+    )
+
+    /** The number outranks the location here: a US number reached the field while the
+     *  device says SV, and the country has to follow the number. */
+    expect(onChangeInfo).toHaveBeenLastCalledWith(
+      expect.objectContaining({ countryCode: "US", countryCallingCode: "1" }),
+    )
+  })
+
+  it("leaves a handed-in number's country alone when the caller pins the country", () => {
+    const onChangeInfo = jest.fn()
+
+    renderInput(
+      <PhoneInput
+        value="+14155552671"
+        keepCountryCode={true}
+        onChangeText={jest.fn()}
+        onChangeInfo={onChangeInfo}
+      />,
+    )
+
+    expect(onChangeInfo).toHaveBeenLastCalledWith(
+      expect.objectContaining({ countryCode: "SV" }),
     )
   })
 
