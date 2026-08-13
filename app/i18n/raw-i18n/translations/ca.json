@@ -2122,6 +2122,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "PIN incorrecte. Queden {attemptsRemaining: string} intents.",
+    "enterPin": "Introdueix el teu codi PIN",
     "oneAttemptRemaining": "PIN incorrecte. Queda 1 intent.",
     "setPin": "Configura el teu codi PIN",
     "setPinFailedMatch": "Els Pins no coincideixen - Estableix el teu codi PIN",

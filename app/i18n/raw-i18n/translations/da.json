@@ -2122,6 +2122,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "Forkert PIN-kode. {attemptsRemaining: number} forsøg tilbage.",
+    "enterPin": "Indtast din PIN-kode",
     "oneAttemptRemaining": "Forkert PIN-kode. 1 forsøg tilbage.",
     "setPin": "Vælg din PIN-kode.",
     "setPinFailedMatch": "PIN-koderne matcher ikke - Vælg din PIN-kode.",

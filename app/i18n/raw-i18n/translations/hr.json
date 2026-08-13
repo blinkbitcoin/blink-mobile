@@ -2122,6 +2122,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "Netočan PIN. {attemptsRemaining: number} preostalih pokušaja.",
+    "enterPin": "Unesite svoj PIN kod",
     "oneAttemptRemaining": "Netočan PIN. Preostao je 1 pokušaj.",
     "setPin": "Postavite svoj PIN kod",
     "setPinFailedMatch": "Pinovi se ne podudaraju - postavite svoj PIN kod",

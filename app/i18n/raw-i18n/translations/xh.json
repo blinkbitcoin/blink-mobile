@@ -2122,6 +2122,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "I-PIN engalunganga. {attemptsRemaining: number} imizamo eseleyo.",
+    "enterPin": "Faka ikhowudi yakho ye-PIN",
     "oneAttemptRemaining": "PIN engalunganga. Kushiyeke umzamo “1”.",
     "setPin": "Seta ikhowudi yakho ye-PIN",
     "setPinFailedMatch": "Pin azihambelani  - Seta ikhowudi yakho ye-PIN",

@@ -2122,6 +2122,7 @@
     },
     "PinScreen": {
         "attemptsRemaining": "PINコードが間違っています。残り{attemptsRemaining: number}回トライできます。",
+        "enterPin": "PINコードを入力してください",
         "oneAttemptRemaining": "PINコードが間違っています。残り1回トライできます。",
         "setPin": "PINコードを設定してください",
         "setPinFailedMatch": "PINコードが一致しませんでした。PINコードを設定してください",

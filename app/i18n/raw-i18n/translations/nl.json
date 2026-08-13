@@ -2122,6 +2122,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "Onjuiste pincode. {attemptsRemaining: number} resterende pogingen.",
+    "enterPin": "Voer uw pincode in",
     "oneAttemptRemaining": "Onjuiste pincode. 1 poging over.",
     "setPin": "Stel uw PIN code in",
     "setPinFailedMatch": "Pincodes komen niet overeen - Stel uw pincode in",

@@ -2122,6 +2122,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "PIN incorect. {attemptsRemaining: number} încercări rămase.",
+    "enterPin": "Introduceți codul PIN",
     "oneAttemptRemaining": "PIN incorect. 1 încercare rămasă.",
     "setPin": "Setează codul PIN",
     "setPinFailedMatch": "Pinurile nu se potrivesc - Setează codul PIN",

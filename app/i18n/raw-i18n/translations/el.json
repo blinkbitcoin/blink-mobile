@@ -2122,6 +2122,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "Λανθασμένο PIN. {attemptsRemaining: number} προσπάθειες που απομένουν.",
+    "enterPin": "Εισαγάγετε τον κωδικό σας PIN",
     "oneAttemptRemaining": "Λανθασμένο PIN. Απομένει 1 προσπάθεια.",
     "setPin": "Ορίστε τον κωδικό σας PIN ",
     "setPinFailedMatch": "Οι κωδικοί PIN δεν ταιριάζουν - Ορίστε τον κωδικό PIN σας",

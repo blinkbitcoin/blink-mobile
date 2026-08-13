@@ -6583,6 +6583,10 @@ type RootTranslation = {
 		 */
 		attemptsRemaining: RequiredParams<'attemptsRemaining'>
 		/**
+		 * E​n​t​e​r​ ​y​o​u​r​ ​P​I​N​ ​c​o​d​e
+		 */
+		enterPin: string
+		/**
 		 * I​n​c​o​r​r​e​c​t​ ​P​I​N​.​ ​1​ ​a​t​t​e​m​p​t​ ​r​e​m​a​i​n​i​n​g​.
 		 */
 		oneAttemptRemaining: string
@@ -19886,6 +19890,10 @@ export type TranslationFunctions = {
 		 * Incorrect PIN. {attemptsRemaining} attempts remaining.
 		 */
 		attemptsRemaining: (arg: { attemptsRemaining: number }) => LocalizedString
+		/**
+		 * Enter your PIN code
+		 */
+		enterPin: () => LocalizedString
 		/**
 		 * Incorrect PIN. 1 attempt remaining.
 		 */

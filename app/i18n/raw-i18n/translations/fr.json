@@ -2122,6 +2122,7 @@
     },
     "PinScreen": {
         "attemptsRemaining": "NIP incorrect. {attemptsRemaining: number} tentatives restantes.",
+        "enterPin": "Saisissez votre code NIP",
         "oneAttemptRemaining": "NIP incorrect. 1 tentative restante.",
         "setPin": "Définissez votre code NIP",
         "setPinFailedMatch": "Les NIP ne correspondent pas - Corrigez votre code NIP",

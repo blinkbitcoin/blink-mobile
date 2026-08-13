@@ -2122,6 +2122,7 @@
     },
     "PinScreen": {
         "attemptsRemaining": "PIN incorreto. {attemptsRemaining: string} tentativas restantes.",
+        "enterPin": "Insira seu código PIN",
         "oneAttemptRemaining": "PIN incorreto. 1 tentativa restante.",
         "setPin": "Defina seu código PIN",
         "setPinFailedMatch": "Os PINs não correspondem - Defina seu código PIN",

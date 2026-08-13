@@ -2122,6 +2122,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "Սխալ PIN: {attemptsRemaining: number} փորձեր են մնացել։ ",
+    "enterPin": "Մուտքագրեք Ձեր PIN ծածկագիրը",
     "oneAttemptRemaining": "Սխալ PIN: 1 փորձ է մնացել։ ",
     "setPin": "Սահմանել PIN ծածկագիր",
     "setPinFailedMatch": "Pin ծածկագրերը չեն համընկնում - Կարգավորել PIN ծածկագիրը",

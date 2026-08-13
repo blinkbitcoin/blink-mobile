@@ -2122,6 +2122,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "Pini sahihi. {attemptsRemaining: number} yamesalia.",
+    "enterPin": "Ingiza pini yako",
     "oneAttemptRemaining": "Pini si sahihi. Jaribio 1 limesalia.",
     "setPin": "Andikisha pini yako",
     "setPinFailedMatch": "Pini hazikulingana - Andikisha Pini yako.",

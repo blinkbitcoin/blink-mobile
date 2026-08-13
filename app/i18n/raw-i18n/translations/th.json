@@ -2122,6 +2122,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "พินนี้ผิด มีโอกาสใส่พินอีก {attemptsRemaining: number} ครั้ง",
+    "enterPin": "ป้อนพินโค้ด",
     "oneAttemptRemaining": "พินนี้ผิด โอกาสสุดท้าย",
     "setPin": "ตั้งค่าพินโค้ด",
     "setPinFailedMatch": "พินไม่ตรงกัน - ตั้งค่าพินโค้ดอีกครั้ง",

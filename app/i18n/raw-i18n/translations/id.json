@@ -2122,6 +2122,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "PIN salah. {attemptsRemaining: number} percobaan tersisa.",
+    "enterPin": "Masukkan kode PIN Anda",
     "oneAttemptRemaining": "PIN salah. 1 percobaan tersisa.",
     "setPin": "Atur kode PIN Anda",
     "setPinFailedMatch": "PIN tidak cocok - Atur kode PIN Anda",

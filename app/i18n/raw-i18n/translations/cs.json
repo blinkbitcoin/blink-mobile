@@ -2122,6 +2122,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "Nesprávný kód PIN. {attemptsRemaining: string} zbývající pokusy.",
+    "enterPin": "Zadejte svůj PIN kód",
     "oneAttemptRemaining": "Nesprávný kód PIN. Zbývá 1 pokus.",
     "setPin": "Nastavení PIN kódu",
     "setPinFailedMatch": "Piny se neshodují - nastavte svůj PIN kód",

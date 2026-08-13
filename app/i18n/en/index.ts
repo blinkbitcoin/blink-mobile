@@ -2126,6 +2126,7 @@ const en: BaseTranslation = {
   },
   PinScreen: {
     attemptsRemaining: "Incorrect PIN. {attemptsRemaining: number} attempts remaining.",
+    enterPin: "Enter your PIN code",
     oneAttemptRemaining: "Incorrect PIN. 1 attempt remaining.",
     setPin: "Set your PIN code",
     setPinFailedMatch: "Pins didn't match - Set your PIN code",

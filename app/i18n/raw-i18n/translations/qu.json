@@ -2122,6 +2122,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "Mana kani PIN. {attemptsRemaining: number} rantiq kani.",
+    "enterPin": "PIN kodiykita yaykuchiy",
     "oneAttemptRemaining": "Mana kani PIN. 1 rantiq kani.",
     "setPin": "PIN kodiyan kani",
     "setPinFailedMatch": "PIN kodiyan mana kani - PIN kodiyan kani.",

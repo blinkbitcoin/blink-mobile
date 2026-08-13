@@ -2122,6 +2122,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "Неисправан ПИН. Преостало је {attemptsRemaining: number} покушаја.",
+    "enterPin": "Унесите свој ПИН код",
     "oneAttemptRemaining": "Неисправан ПИН. Преостао је 1 покушај.",
     "setPin": "Поставите свој ПИН код",
     "setPinFailedMatch": "ПИН-ови се не подударају - Поставите свој ПИН код",
