@@ -122,10 +122,17 @@ export const loadPersistentState = async (): Promise<LoadedPersistentState> => {
       // silently resurrect the previous session.
       await KeyStoreWrapper.removeActiveToken()
       return { state: defaultPersistentState, persistedToken: "" }
-    case MigrationStatus.Failed:
+    case MigrationStatus.Failed: {
       recordAppError(result.error, { alwaysRecord: true })
       await quarantineRawState(result.rawData)
-      return { state: defaultPersistentState, persistedToken: "" }
+      // The credential lives in the keychain and is unaffected by blob
+      // corruption: losing settings must not cost the session.
+      const keychainToken = await KeyStoreWrapper.getActiveToken()
+      return {
+        state: { ...defaultPersistentState, galoyAuthToken: keychainToken },
+        persistedToken: keychainToken,
+      }
+    }
   }
 }
 

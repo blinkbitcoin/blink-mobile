@@ -534,6 +534,30 @@ describe("PersistentStateProvider", () => {
       isAnalyticsEnabled: true,
     }
 
+    it("recovers the session from the keychain when migration fails", async () => {
+      mockLoadJson.mockResolvedValue(corruptedState3)
+      mockGetActiveToken.mockResolvedValue("kc-token")
+
+      render(
+        <PersistentStateProvider>
+          <TestConsumer />
+        </PersistentStateProvider>,
+      )
+
+      await waitFor(() => {
+        expect(screen.getByTestId("token")).toBeTruthy()
+      })
+
+      // Settings fall back to defaults, but the session survives…
+      expect(screen.getByTestId("token").props.children).toBe("kc-token")
+      expect(screen.getByTestId("schema").props.children).toBe(
+        defaultPersistentState.schemaVersion,
+      )
+      // …and the credential is neither removed nor re-written.
+      expect(mockRemoveActiveToken).not.toHaveBeenCalled()
+      expect(mockSetActiveToken).not.toHaveBeenCalled()
+    })
+
     it("reports the migration error to crashlytics instead of silently logging to console", async () => {
       mockLoadJson.mockResolvedValue(corruptedState3)
 
