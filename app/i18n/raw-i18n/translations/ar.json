@@ -2235,6 +2235,22 @@
     "imageLibraryPermissionsNotGranted": "We don't have permissions to access the image library.  Please check app settings for your platform."
   },
   "SecurityScreen": {
+    "securityScore": {
+      "title": "درجة الأمان {done: number}/{total: number}",
+      "levelLow": "منخفضة",
+      "levelMedium": "متوسطة",
+      "levelHigh": "مرتفعة",
+      "set": "تعيين",
+      "enabled": "مفعّل",
+      "signals": {
+        "cloudBackup": "نسخ احتياطي سحابي",
+        "manualBackup": "نسخ احتياطي يدوي",
+        "appLock": "البصمة/PIN",
+        "hideBalance": "إخفاء الرصيد",
+        "twoFactor": "المصادقة الثنائية (2FA)",
+        "emailVerified": "بريد إلكتروني موثّق"
+      }
+    },
     "title": "الأمان والخصوصية",
     "biometricDescription": "افتح بالبصمة أو التعرّف بالوجه",
     "biometricTitle": "بيومتري",

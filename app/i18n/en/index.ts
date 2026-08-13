@@ -2263,6 +2263,22 @@ const en: BaseTranslation = {
       "Set a 4-digit numerical PIN to unlock",
     pinTitle: "PIN code",
     setPin: "Set PIN",
+    securityScore: {
+      title: "Security score {done: number}/{total: number}",
+      levelLow: "low",
+      levelMedium: "medium",
+      levelHigh: "high",
+      set: "Set",
+      enabled: "Enabled",
+      signals: {
+        cloudBackup: "Cloud backup",
+        manualBackup: "Manual backup",
+        appLock: "Biometrics/PIN",
+        hideBalance: "Hide balance",
+        twoFactor: "Two-factor authentication (2FA)",
+        emailVerified: "Verified email",
+      },
+    },
   },
   SendBitcoinConfirmationScreen: {
     amountLabel: "Amount:",

@@ -2235,6 +2235,22 @@
     "imageLibraryPermissionsNotGranted": "Nemáme povolenie na prístup k galérii obrázkov. Skontrolujte nastavenia aplikácie na vašej platforme."
   },
   "SecurityScreen": {
+    "securityScore": {
+      "title": "Skóre zabezpečenia {done: number}/{total: number}",
+      "levelLow": "nízke",
+      "levelMedium": "stredné",
+      "levelHigh": "vysoké",
+      "set": "Nastaviť",
+      "enabled": "Zapnuté",
+      "signals": {
+        "cloudBackup": "Cloudová záloha",
+        "manualBackup": "Manuálna záloha",
+        "appLock": "Biometria/PIN",
+        "hideBalance": "Skryť zostatok",
+        "twoFactor": "Dvojfaktorové overenie (2FA)",
+        "emailVerified": "Overený e-mail"
+      }
+    },
     "title": "Bezpečnosť a súkromie",
     "biometricDescription": "Odomykanie pomocou odtlačku prsta alebo rozpoznania tváre.",
     "biometricTitle": "Biometrické údaje",

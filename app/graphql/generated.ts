@@ -3362,6 +3362,18 @@ export type CurrencyListQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type CurrencyListQuery = { readonly __typename: 'Query', readonly currencyList: ReadonlyArray<{ readonly __typename: 'Currency', readonly id: string, readonly flag: string, readonly name: string, readonly symbol: string, readonly fractionDigits: number }> };
 
+export type UserEmailDeleteMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type UserEmailDeleteMutation = { readonly __typename: 'Mutation', readonly userEmailDelete: { readonly __typename: 'UserEmailDeletePayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly me?: { readonly __typename: 'User', readonly id: string, readonly phone?: string | null, readonly totpEnabled: boolean, readonly email?: { readonly __typename: 'Email', readonly address?: string | null, readonly verified?: boolean | null } | null } | null } };
+
+export type UserEmailRegistrationInitiateMutationVariables = Exact<{
+  input: UserEmailRegistrationInitiateInput;
+}>;
+
+
+export type UserEmailRegistrationInitiateMutation = { readonly __typename: 'Mutation', readonly userEmailRegistrationInitiate: { readonly __typename: 'UserEmailRegistrationInitiatePayload', readonly emailRegistrationId?: string | null, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly me?: { readonly __typename: 'User', readonly id: string, readonly email?: { readonly __typename: 'Email', readonly address?: string | null, readonly verified?: boolean | null } | null } | null } };
+
 export type CaptchaCreateChallengeMutationVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -3544,13 +3556,6 @@ export type QuizClaimMutationVariables = Exact<{
 
 
 export type QuizClaimMutation = { readonly __typename: 'Mutation', readonly quizClaim: { readonly __typename: 'QuizClaimPayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string, readonly code?: string | null }>, readonly quizzes: ReadonlyArray<{ readonly __typename: 'Quiz', readonly id: string, readonly amount: number, readonly completed: boolean, readonly notBefore?: number | null }> } };
-
-export type UserEmailRegistrationInitiateMutationVariables = Exact<{
-  input: UserEmailRegistrationInitiateInput;
-}>;
-
-
-export type UserEmailRegistrationInitiateMutation = { readonly __typename: 'Mutation', readonly userEmailRegistrationInitiate: { readonly __typename: 'UserEmailRegistrationInitiatePayload', readonly emailRegistrationId?: string | null, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly me?: { readonly __typename: 'User', readonly id: string, readonly email?: { readonly __typename: 'Email', readonly address?: string | null, readonly verified?: boolean | null } | null } | null } };
 
 export type UserEmailRegistrationValidateMutationVariables = Exact<{
   input: UserEmailRegistrationValidateInput;
@@ -3897,11 +3902,6 @@ export type AccountDeleteMutationVariables = Exact<{ [key: string]: never; }>;
 
 
 export type AccountDeleteMutation = { readonly __typename: 'Mutation', readonly accountDelete: { readonly __typename: 'AccountDeletePayload', readonly success: boolean, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string, readonly code?: string | null }> } };
-
-export type UserEmailDeleteMutationVariables = Exact<{ [key: string]: never; }>;
-
-
-export type UserEmailDeleteMutation = { readonly __typename: 'Mutation', readonly userEmailDelete: { readonly __typename: 'UserEmailDeletePayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly me?: { readonly __typename: 'User', readonly id: string, readonly phone?: string | null, readonly totpEnabled: boolean, readonly email?: { readonly __typename: 'Email', readonly address?: string | null, readonly verified?: boolean | null } | null } | null } };
 
 export type UserPhoneDeleteMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -5218,6 +5218,92 @@ export type CurrencyListQueryHookResult = ReturnType<typeof useCurrencyListQuery
 export type CurrencyListLazyQueryHookResult = ReturnType<typeof useCurrencyListLazyQuery>;
 export type CurrencyListSuspenseQueryHookResult = ReturnType<typeof useCurrencyListSuspenseQuery>;
 export type CurrencyListQueryResult = Apollo.QueryResult<CurrencyListQuery, CurrencyListQueryVariables>;
+export const UserEmailDeleteDocument = gql`
+    mutation userEmailDelete {
+  userEmailDelete {
+    errors {
+      message
+    }
+    me {
+      id
+      phone
+      totpEnabled
+      email {
+        address
+        verified
+      }
+    }
+  }
+}
+    `;
+export type UserEmailDeleteMutationFn = Apollo.MutationFunction<UserEmailDeleteMutation, UserEmailDeleteMutationVariables>;
+
+/**
+ * __useUserEmailDeleteMutation__
+ *
+ * To run a mutation, you first call `useUserEmailDeleteMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUserEmailDeleteMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [userEmailDeleteMutation, { data, loading, error }] = useUserEmailDeleteMutation({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useUserEmailDeleteMutation(baseOptions?: Apollo.MutationHookOptions<UserEmailDeleteMutation, UserEmailDeleteMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UserEmailDeleteMutation, UserEmailDeleteMutationVariables>(UserEmailDeleteDocument, options);
+      }
+export type UserEmailDeleteMutationHookResult = ReturnType<typeof useUserEmailDeleteMutation>;
+export type UserEmailDeleteMutationResult = Apollo.MutationResult<UserEmailDeleteMutation>;
+export type UserEmailDeleteMutationOptions = Apollo.BaseMutationOptions<UserEmailDeleteMutation, UserEmailDeleteMutationVariables>;
+export const UserEmailRegistrationInitiateDocument = gql`
+    mutation userEmailRegistrationInitiate($input: UserEmailRegistrationInitiateInput!) {
+  userEmailRegistrationInitiate(input: $input) {
+    errors {
+      message
+    }
+    emailRegistrationId
+    me {
+      id
+      email {
+        address
+        verified
+      }
+    }
+  }
+}
+    `;
+export type UserEmailRegistrationInitiateMutationFn = Apollo.MutationFunction<UserEmailRegistrationInitiateMutation, UserEmailRegistrationInitiateMutationVariables>;
+
+/**
+ * __useUserEmailRegistrationInitiateMutation__
+ *
+ * To run a mutation, you first call `useUserEmailRegistrationInitiateMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUserEmailRegistrationInitiateMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [userEmailRegistrationInitiateMutation, { data, loading, error }] = useUserEmailRegistrationInitiateMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUserEmailRegistrationInitiateMutation(baseOptions?: Apollo.MutationHookOptions<UserEmailRegistrationInitiateMutation, UserEmailRegistrationInitiateMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UserEmailRegistrationInitiateMutation, UserEmailRegistrationInitiateMutationVariables>(UserEmailRegistrationInitiateDocument, options);
+      }
+export type UserEmailRegistrationInitiateMutationHookResult = ReturnType<typeof useUserEmailRegistrationInitiateMutation>;
+export type UserEmailRegistrationInitiateMutationResult = Apollo.MutationResult<UserEmailRegistrationInitiateMutation>;
+export type UserEmailRegistrationInitiateMutationOptions = Apollo.BaseMutationOptions<UserEmailRegistrationInitiateMutation, UserEmailRegistrationInitiateMutationVariables>;
 export const CaptchaCreateChallengeDocument = gql`
     mutation captchaCreateChallenge {
   captchaCreateChallenge {
@@ -6512,49 +6598,6 @@ export function useQuizClaimMutation(baseOptions?: Apollo.MutationHookOptions<Qu
 export type QuizClaimMutationHookResult = ReturnType<typeof useQuizClaimMutation>;
 export type QuizClaimMutationResult = Apollo.MutationResult<QuizClaimMutation>;
 export type QuizClaimMutationOptions = Apollo.BaseMutationOptions<QuizClaimMutation, QuizClaimMutationVariables>;
-export const UserEmailRegistrationInitiateDocument = gql`
-    mutation userEmailRegistrationInitiate($input: UserEmailRegistrationInitiateInput!) {
-  userEmailRegistrationInitiate(input: $input) {
-    errors {
-      message
-    }
-    emailRegistrationId
-    me {
-      id
-      email {
-        address
-        verified
-      }
-    }
-  }
-}
-    `;
-export type UserEmailRegistrationInitiateMutationFn = Apollo.MutationFunction<UserEmailRegistrationInitiateMutation, UserEmailRegistrationInitiateMutationVariables>;
-
-/**
- * __useUserEmailRegistrationInitiateMutation__
- *
- * To run a mutation, you first call `useUserEmailRegistrationInitiateMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useUserEmailRegistrationInitiateMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [userEmailRegistrationInitiateMutation, { data, loading, error }] = useUserEmailRegistrationInitiateMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useUserEmailRegistrationInitiateMutation(baseOptions?: Apollo.MutationHookOptions<UserEmailRegistrationInitiateMutation, UserEmailRegistrationInitiateMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<UserEmailRegistrationInitiateMutation, UserEmailRegistrationInitiateMutationVariables>(UserEmailRegistrationInitiateDocument, options);
-      }
-export type UserEmailRegistrationInitiateMutationHookResult = ReturnType<typeof useUserEmailRegistrationInitiateMutation>;
-export type UserEmailRegistrationInitiateMutationResult = Apollo.MutationResult<UserEmailRegistrationInitiateMutation>;
-export type UserEmailRegistrationInitiateMutationOptions = Apollo.BaseMutationOptions<UserEmailRegistrationInitiateMutation, UserEmailRegistrationInitiateMutationVariables>;
 export const UserEmailRegistrationValidateDocument = gql`
     mutation userEmailRegistrationValidate($input: UserEmailRegistrationValidateInput!) {
   userEmailRegistrationValidate(input: $input) {
@@ -8897,49 +8940,6 @@ export function useAccountDeleteMutation(baseOptions?: Apollo.MutationHookOption
 export type AccountDeleteMutationHookResult = ReturnType<typeof useAccountDeleteMutation>;
 export type AccountDeleteMutationResult = Apollo.MutationResult<AccountDeleteMutation>;
 export type AccountDeleteMutationOptions = Apollo.BaseMutationOptions<AccountDeleteMutation, AccountDeleteMutationVariables>;
-export const UserEmailDeleteDocument = gql`
-    mutation userEmailDelete {
-  userEmailDelete {
-    errors {
-      message
-    }
-    me {
-      id
-      phone
-      totpEnabled
-      email {
-        address
-        verified
-      }
-    }
-  }
-}
-    `;
-export type UserEmailDeleteMutationFn = Apollo.MutationFunction<UserEmailDeleteMutation, UserEmailDeleteMutationVariables>;
-
-/**
- * __useUserEmailDeleteMutation__
- *
- * To run a mutation, you first call `useUserEmailDeleteMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useUserEmailDeleteMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [userEmailDeleteMutation, { data, loading, error }] = useUserEmailDeleteMutation({
- *   variables: {
- *   },
- * });
- */
-export function useUserEmailDeleteMutation(baseOptions?: Apollo.MutationHookOptions<UserEmailDeleteMutation, UserEmailDeleteMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<UserEmailDeleteMutation, UserEmailDeleteMutationVariables>(UserEmailDeleteDocument, options);
-      }
-export type UserEmailDeleteMutationHookResult = ReturnType<typeof useUserEmailDeleteMutation>;
-export type UserEmailDeleteMutationResult = Apollo.MutationResult<UserEmailDeleteMutation>;
-export type UserEmailDeleteMutationOptions = Apollo.BaseMutationOptions<UserEmailDeleteMutation, UserEmailDeleteMutationVariables>;
 export const UserPhoneDeleteDocument = gql`
     mutation userPhoneDelete {
   userPhoneDelete {

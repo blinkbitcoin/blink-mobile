@@ -1,29 +1,18 @@
 import React from "react"
-import { Text as RNText } from "react-native"
-import { render, act } from "@testing-library/react-native"
+import { render as rtlRender, act } from "@testing-library/react-native"
+
+import { ThemeProvider } from "@rn-vui/themed"
 
 import { StepsProgressBar } from "@app/components/steps-progress-bar"
+import theme from "@app/rne-theme/theme"
 
-jest.mock("@rn-vui/themed", () => ({
-  Text: (props: React.ComponentProps<typeof RNText>) => <RNText {...props} />,
-  useTheme: () => ({
-    theme: {
-      colors: {
-        primary: "#F7931A",
-        grey2: "#666666",
-        grey4: "#CCCCCC",
-      },
-    },
-  }),
-  makeStyles: () => () => ({
-    container: {},
-    barsContainer: {},
-    bar: {},
-    barFill: {},
-    labelsContainer: {},
-    label: {},
-  }),
-}))
+const Themed: React.FC<React.PropsWithChildren> = ({ children }) => (
+  <ThemeProvider theme={theme}>{children}</ThemeProvider>
+)
+
+/** The real theme, so the component's own style factory runs as it ships. As a
+ *  wrapper rather than a hand-wrapped element, so `rerender` keeps it too. */
+const render = (element: React.ReactElement) => rtlRender(element, { wrapper: Themed })
 
 // The animated bar fill runs an Animated.timing whose updates land across several
 // frames after the synchronous test body returns. Drive those frames to

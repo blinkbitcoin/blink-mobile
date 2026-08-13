@@ -2235,6 +2235,22 @@
     "imageLibraryPermissionsNotGranted": "Vi har ikke tilladelser til at få adgang til billedbiblioteket. Tjek venligst appindstillingerne for din platform."
   },
   "SecurityScreen": {
+    "securityScore": {
+      "title": "Sikkerhedsscore {done: number}/{total: number}",
+      "levelLow": "lav",
+      "levelMedium": "mellem",
+      "levelHigh": "høj",
+      "set": "Indstil",
+      "enabled": "Aktiveret",
+      "signals": {
+        "cloudBackup": "Cloud-backup",
+        "manualBackup": "Manuel backup",
+        "appLock": "Biometri/PIN",
+        "hideBalance": "Skjul saldo",
+        "twoFactor": "Tofaktorgodkendelse (2FA)",
+        "emailVerified": "Verificeret e-mail"
+      }
+    },
     "title": "Sikkerhed og privatliv",
     "biometricDescription": "Lås op med fingeraftryk eller ansigtsgenkendelse.",
     "biometricTitle": "Biometrisk",

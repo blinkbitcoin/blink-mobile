@@ -7069,6 +7069,60 @@ type RootTranslation = {
 		 * S​e​t​ ​P​I​N
 		 */
 		setPin: string
+		securityScore: {
+			/**
+			 * S​e​c​u​r​i​t​y​ ​s​c​o​r​e​ ​{​d​o​n​e​}​/​{​t​o​t​a​l​}
+			 * @param {number} done
+			 * @param {number} total
+			 */
+			title: RequiredParams<'done' | 'total'>
+			/**
+			 * l​o​w
+			 */
+			levelLow: string
+			/**
+			 * m​e​d​i​u​m
+			 */
+			levelMedium: string
+			/**
+			 * h​i​g​h
+			 */
+			levelHigh: string
+			/**
+			 * S​e​t
+			 */
+			set: string
+			/**
+			 * E​n​a​b​l​e​d
+			 */
+			enabled: string
+			signals: {
+				/**
+				 * C​l​o​u​d​ ​b​a​c​k​u​p
+				 */
+				cloudBackup: string
+				/**
+				 * M​a​n​u​a​l​ ​b​a​c​k​u​p
+				 */
+				manualBackup: string
+				/**
+				 * B​i​o​m​e​t​r​i​c​s​/​P​I​N
+				 */
+				appLock: string
+				/**
+				 * H​i​d​e​ ​b​a​l​a​n​c​e
+				 */
+				hideBalance: string
+				/**
+				 * T​w​o​-​f​a​c​t​o​r​ ​a​u​t​h​e​n​t​i​c​a​t​i​o​n​ ​(​2​F​A​)
+				 */
+				twoFactor: string
+				/**
+				 * V​e​r​i​f​i​e​d​ ​e​m​a​i​l
+				 */
+				emailVerified: string
+			}
+		}
 	}
 	SendBitcoinConfirmationScreen: {
 		/**
@@ -20296,6 +20350,58 @@ export type TranslationFunctions = {
 		 * Set PIN
 		 */
 		setPin: () => LocalizedString
+		securityScore: {
+			/**
+			 * Security score {done}/{total}
+			 */
+			title: (arg: { done: number, total: number }) => LocalizedString
+			/**
+			 * low
+			 */
+			levelLow: () => LocalizedString
+			/**
+			 * medium
+			 */
+			levelMedium: () => LocalizedString
+			/**
+			 * high
+			 */
+			levelHigh: () => LocalizedString
+			/**
+			 * Set
+			 */
+			set: () => LocalizedString
+			/**
+			 * Enabled
+			 */
+			enabled: () => LocalizedString
+			signals: {
+				/**
+				 * Cloud backup
+				 */
+				cloudBackup: () => LocalizedString
+				/**
+				 * Manual backup
+				 */
+				manualBackup: () => LocalizedString
+				/**
+				 * Biometrics/PIN
+				 */
+				appLock: () => LocalizedString
+				/**
+				 * Hide balance
+				 */
+				hideBalance: () => LocalizedString
+				/**
+				 * Two-factor authentication (2FA)
+				 */
+				twoFactor: () => LocalizedString
+				/**
+				 * Verified email
+				 */
+				emailVerified: () => LocalizedString
+			}
+		}
 	}
 	SendBitcoinConfirmationScreen: {
 		/**

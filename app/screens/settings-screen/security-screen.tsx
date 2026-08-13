@@ -1,5 +1,5 @@
 import * as React from "react"
-import { useState } from "react"
+import { useCallback, useMemo, useState } from "react"
 import { View } from "react-native"
 
 import { useApolloClient } from "@apollo/client"
@@ -10,7 +10,12 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, ListItem } from "@rn-vui/themed"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
+import { SecurityScoreCard } from "@app/components/security-score-card"
+import { useEmailReverification } from "@app/hooks/use-email-reverification"
+import { useSecurityScore } from "@app/hooks/use-security-score"
+import type { SecuritySignalKey } from "@app/types/security-score"
 import { Screen } from "../../components/screen"
+import { useLoginMethods } from "./account/login-methods-hook"
 import {
   saveHiddenBalanceToolTip,
   saveHideBalance,
@@ -36,57 +41,64 @@ export const SecurityScreen: React.FC<Props> = ({ route, navigation }) => {
   const { LL } = useI18nContext()
   const [isBiometricsEnabled, setIsBiometricsEnabled] = useState(mIsBiometricsEnabled)
   const [isPinEnabled, setIsPinEnabled] = useState(mIsPinEnabled)
-  const [isHideBalanceEnabled, setIsHideBalanceEnabled] = useState(hideBalance)
 
-  useFocusEffect(() => {
-    getIsBiometricsEnabled()
-    getIsPinEnabled()
-  })
-  const getIsBiometricsEnabled = async () => {
-    setIsBiometricsEnabled(await KeyStoreWrapper.getIsBiometricsEnabled())
-  }
+  /**
+   * `useFocusEffect` lists its callback in its own effect deps, so a fresh
+   * closure each render tears down the focus listeners and re-reads the
+   * keystore every time the score card's data moves underneath it.
+   */
+  const readDeviceLockState = useCallback(() => {
+    const readBiometrics = async () =>
+      setIsBiometricsEnabled(await KeyStoreWrapper.getIsBiometricsEnabled())
+    const readPin = async () => setIsPinEnabled(await KeyStoreWrapper.getIsPinEnabled())
 
-  const getIsPinEnabled = async () => {
-    setIsPinEnabled(await KeyStoreWrapper.getIsPinEnabled())
-  }
+    readBiometrics()
+    readPin()
+  }, [])
 
-  const onBiometricsValueChanged = async (value: boolean) => {
-    if (value) {
-      try {
-        if (await BiometricWrapper.isSensorAvailable()) {
-          // Presents the OS specific authentication prompt
-          BiometricWrapper.authenticate(
-            LL.AuthenticationScreen.setUpAuthenticationDescription(),
-            handleAuthenticationSuccess,
-            handleAuthenticationFailure,
-          )
-        } else {
-          toastShow({
-            message: (translations) => translations.SecurityScreen.biometryNotAvailable(),
-            LL,
-          })
-        }
-      } catch {
-        toastShow({
-          message: (translations) => translations.SecurityScreen.biometryNotEnrolled(),
-          LL,
-        })
-      }
-    } else if (await KeyStoreWrapper.removeIsBiometricsEnabled()) {
-      setIsBiometricsEnabled(false)
-    }
-  }
+  useFocusEffect(readDeviceLockState)
 
-  const handleAuthenticationSuccess = async () => {
+  const handleAuthenticationSuccess = useCallback(async () => {
     if (await KeyStoreWrapper.setIsBiometricsEnabled()) {
       setIsBiometricsEnabled(true)
     }
-  }
+  }, [])
 
-  const handleAuthenticationFailure = () => {
+  const handleAuthenticationFailure = useCallback(() => {
     // This is called when a user cancels or taps out of the authentication prompt,
     // so no action is necessary.
-  }
+  }, [])
+
+  const onBiometricsValueChanged = useCallback(
+    async (value: boolean) => {
+      if (value) {
+        try {
+          if (await BiometricWrapper.isSensorAvailable()) {
+            // Presents the OS specific authentication prompt
+            BiometricWrapper.authenticate(
+              LL.AuthenticationScreen.setUpAuthenticationDescription(),
+              handleAuthenticationSuccess,
+              handleAuthenticationFailure,
+            )
+          } else {
+            toastShow({
+              message: (translations) =>
+                translations.SecurityScreen.biometryNotAvailable(),
+              LL,
+            })
+          }
+        } catch {
+          toastShow({
+            message: (translations) => translations.SecurityScreen.biometryNotEnrolled(),
+            LL,
+          })
+        }
+      } else if (await KeyStoreWrapper.removeIsBiometricsEnabled()) {
+        setIsBiometricsEnabled(false)
+      }
+    },
+    [LL, handleAuthenticationSuccess, handleAuthenticationFailure],
+  )
 
   const onPinValueChanged = async (value: boolean) => {
     if (value) {
@@ -96,15 +108,13 @@ export const SecurityScreen: React.FC<Props> = ({ route, navigation }) => {
     }
   }
 
-  const onHideBalanceValueChanged = (value: boolean) => {
-    if (value) {
-      setIsHideBalanceEnabled(saveHideBalance(client, true))
-      saveHiddenBalanceToolTip(client, true)
-    } else {
-      setIsHideBalanceEnabled(saveHideBalance(client, false))
-      saveHiddenBalanceToolTip(client, false)
-    }
-  }
+  const onHideBalanceValueChanged = useCallback(
+    (value: boolean) => {
+      saveHideBalance(client, value)
+      saveHiddenBalanceToolTip(client, value)
+    },
+    [client],
+  )
 
   const removePin = async () => {
     if (await KeyStoreWrapper.removePin()) {
@@ -112,6 +122,42 @@ export const SecurityScreen: React.FC<Props> = ({ route, navigation }) => {
       setIsPinEnabled(false)
     }
   }
+
+  const securityScore = useSecurityScore({ isBiometricsEnabled, isPinEnabled })
+
+  const { email, emailVerified } = useLoginMethods()
+  const { promptReverification } = useEmailReverification()
+
+  /** Registration can't be initiated while the account already holds an address,
+   *  so an unverified one goes through delete-and-set-again instead — the same
+   *  route the account settings row takes for this state. */
+  const onEmailSignalPress = useCallback(() => {
+    if (email && !emailVerified) {
+      promptReverification(email)
+      return
+    }
+    navigation.navigate("emailRegistrationInitiate")
+  }, [email, emailVerified, promptReverification, navigation])
+
+  /** The card stays dumb; the screen owns what each "Set" does. Backup rows
+   *  remain tappable after completion so the flow is always re-runnable (#3828).
+   *  A Record (not a switch) so adding a signal without an action fails to compile. */
+  const signalActions: Record<SecuritySignalKey, () => void> = useMemo(
+    () => ({
+      cloudBackup: () => navigation.navigate("selfCustodialCloudBackup"),
+      manualBackup: () => navigation.navigate("selfCustodialBackupSecurityChecks"),
+      appLock: () => onBiometricsValueChanged(true),
+      hideBalance: () => onHideBalanceValueChanged(true),
+      twoFactor: () => navigation.navigate("totpRegistrationInitiate"),
+      emailVerified: onEmailSignalPress,
+    }),
+    [navigation, onBiometricsValueChanged, onHideBalanceValueChanged, onEmailSignalPress],
+  )
+
+  const onSignalPress = useCallback(
+    (key: SecuritySignalKey) => signalActions[key](),
+    [signalActions],
+  )
 
   return (
     <Screen style={styles.container} preset="scroll">
@@ -130,6 +176,16 @@ export const SecurityScreen: React.FC<Props> = ({ route, navigation }) => {
 
       <View style={styles.settingContainer}>
         <ListItem containerStyle={styles.listItemContainer}>
+          <GaloyIcon name="eye-slash" size={24} />
+          <ListItem.Content>
+            <ListItem.Title>{LL.SecurityScreen.hideBalanceTitle()}</ListItem.Title>
+          </ListItem.Content>
+          <Switch value={hideBalance} onValueChange={onHideBalanceValueChanged} />
+        </ListItem>
+      </View>
+
+      <View style={styles.settingContainer}>
+        <ListItem containerStyle={styles.listItemContainer}>
           <GaloyIcon name="lock-closed" size={24} />
           <ListItem.Content>
             <ListItem.Title>{LL.SecurityScreen.pinTitle()}</ListItem.Title>
@@ -141,18 +197,9 @@ export const SecurityScreen: React.FC<Props> = ({ route, navigation }) => {
         </ListItem>
       </View>
 
-      <View style={styles.settingContainer}>
-        <ListItem containerStyle={styles.listItemContainer}>
-          <GaloyIcon name="eye-slash" size={24} />
-          <ListItem.Content>
-            <ListItem.Title>{LL.SecurityScreen.hideBalanceTitle()}</ListItem.Title>
-          </ListItem.Content>
-          <Switch
-            value={isHideBalanceEnabled}
-            onValueChange={onHideBalanceValueChanged}
-          />
-        </ListItem>
-      </View>
+      {securityScore && (
+        <SecurityScoreCard score={securityScore} onSignalPress={onSignalPress} />
+      )}
     </Screen>
   )
 }

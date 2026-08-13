@@ -2235,6 +2235,22 @@
     "imageLibraryPermissionsNotGranted": "We don't have permissions to access the image library.  Please check app settings for your platform."
   },
   "SecurityScreen": {
+    "securityScore": {
+      "title": "คะแนนความปลอดภัย {done: number}/{total: number}",
+      "levelLow": "ต่ำ",
+      "levelMedium": "ปานกลาง",
+      "levelHigh": "สูง",
+      "set": "ตั้งค่า",
+      "enabled": "เปิดใช้งาน",
+      "signals": {
+        "cloudBackup": "สำรองข้อมูลบนคลาวด์",
+        "manualBackup": "สำรองข้อมูลด้วยตนเอง",
+        "appLock": "ไบโอเมตริก/PIN",
+        "hideBalance": "ซ่อนยอดคงเหลือ",
+        "twoFactor": "การยืนยันตัวตนสองชั้น (2FA)",
+        "emailVerified": "อีเมลที่ยืนยันแล้ว"
+      }
+    },
     "title": "ความปลอดภัยและความเป็นส่วนตัว",
     "biometricDescription": "ปลดล็อกด้วยลายนิ้วมือหรือการจดจำใบหน้า",
     "biometricTitle": "ไบโอเมทริกซ์",

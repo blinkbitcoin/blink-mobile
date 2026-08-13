@@ -2235,6 +2235,22 @@
     "imageLibraryPermissionsNotGranted": "Resim arşivinize erişimimiz yok. Lütfen uygulama ayarlarını kontrol edin."
   },
   "SecurityScreen": {
+    "securityScore": {
+      "title": "Güvenlik puanı {done: number}/{total: number}",
+      "levelLow": "düşük",
+      "levelMedium": "orta",
+      "levelHigh": "yüksek",
+      "set": "Ayarla",
+      "enabled": "Etkin",
+      "signals": {
+        "cloudBackup": "Bulut yedekleme",
+        "manualBackup": "Manuel yedekleme",
+        "appLock": "Biyometri/PIN",
+        "hideBalance": "Bakiyeyi gizle",
+        "twoFactor": "İki faktörlü kimlik doğrulama (2FA)",
+        "emailVerified": "Doğrulanmış e-posta"
+      }
+    },
     "title": "Güvenlik ve Gizlilik",
     "biometricDescription": "Parmak izi veya yüz tanıma kullanarak kilidi aç. ",
     "biometricTitle": "Biyometrik",

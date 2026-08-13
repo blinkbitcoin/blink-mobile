@@ -2235,6 +2235,22 @@
     "imageLibraryPermissionsNotGranted": "Nincs engedélyünk a képek könyvtár eléréséhez. Kérjük, ellenőrizd az alkalmazás-beállításokat a készülékeden."
   },
   "SecurityScreen": {
+    "securityScore": {
+      "title": "Biztonsági pontszám {done: number}/{total: number}",
+      "levelLow": "alacsony",
+      "levelMedium": "közepes",
+      "levelHigh": "magas",
+      "set": "Beállítás",
+      "enabled": "Bekapcsolva",
+      "signals": {
+        "cloudBackup": "Felhőalapú biztonsági mentés",
+        "manualBackup": "Kézi biztonsági mentés",
+        "appLock": "Biometria/PIN",
+        "hideBalance": "Egyenleg elrejtése",
+        "twoFactor": "Kétfaktoros hitelesítés (2FA)",
+        "emailVerified": "Megerősített e-mail"
+      }
+    },
     "title": "Biztonság és adatvédelem",
     "biometricDescription": "Feloldás ujjlenyomat vagy arcfelismerés segítségével.",
     "biometricTitle": "Biometrikus",
