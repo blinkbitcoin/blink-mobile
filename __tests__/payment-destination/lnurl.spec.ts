@@ -491,7 +491,7 @@ describe("lnurl https enforcement", () => {
     expect(destination).toEqual(
       expect.objectContaining({
         valid: false,
-        invalidReason: InvalidDestinationReason.LnurlUnsupported,
+        invalidReason: InvalidDestinationReason.LnurlError,
       }),
     )
   })
@@ -516,7 +516,72 @@ describe("lnurl https enforcement", () => {
     expect(destination).toEqual(
       expect.objectContaining({
         valid: false,
-        invalidReason: InvalidDestinationReason.LnurlUnsupported,
+        invalidReason: InvalidDestinationReason.LnurlError,
+      }),
+    )
+  })
+
+  it("rejects a lnurl1 string it cannot decode instead of passing it through unchecked", async () => {
+    const destination = await resolveLnurlDestination({
+      parsedLnurlDestination: {
+        paymentType: PaymentType.Lnurl,
+        valid: true,
+        lnurl: "lnurl1qqqqqq",
+        isMerchant: false,
+      },
+      ...baseParams,
+    })
+
+    expect(destination).toEqual(
+      expect.objectContaining({
+        valid: false,
+        invalidReason: InvalidDestinationReason.LnurlError,
+      }),
+    )
+    expect(mockGetParams).not.toHaveBeenCalled()
+    expect(mockRequestPayServiceParams).not.toHaveBeenCalled()
+  })
+
+  it("rejects a LUD-17 lnurlw URI whose payload contains .onion (cleartext http downgrade)", async () => {
+    const destination = await resolveLnurlDestination({
+      parsedLnurlDestination: {
+        paymentType: PaymentType.Lnurl,
+        valid: true,
+        lnurl: "lnurlw://attacker.com/w/.onion/x",
+        isMerchant: false,
+      },
+      ...baseParams,
+    })
+
+    expect(destination).toEqual(
+      expect.objectContaining({
+        valid: false,
+        invalidReason: InvalidDestinationReason.LnurlError,
+      }),
+    )
+    expect(mockGetParams).not.toHaveBeenCalled()
+    expect(mockRequestPayServiceParams).not.toHaveBeenCalled()
+  })
+
+  it("accepts a LUD-17 lnurlw URI over a clearnet host (derived URL is https)", async () => {
+    const lnurl = "lnurlw://example.com/withdraw"
+    mockGetParams.mockResolvedValue(manualMockLNURLWithdrawParams())
+
+    const destination = await resolveLnurlDestination({
+      parsedLnurlDestination: {
+        paymentType: PaymentType.Lnurl,
+        valid: true,
+        lnurl,
+        isMerchant: false,
+      },
+      ...baseParams,
+    })
+
+    expect(mockGetParams).toHaveBeenCalledWith(lnurl)
+    expect(destination).toEqual(
+      expect.objectContaining({
+        valid: true,
+        destinationDirection: DestinationDirection.Receive,
       }),
     )
   })

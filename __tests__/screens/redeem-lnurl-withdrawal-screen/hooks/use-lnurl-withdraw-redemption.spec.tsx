@@ -370,6 +370,30 @@ describe("useLnurlWithdrawRedemption — custodial branch", () => {
     expect(fetchedUrl).toContain("pr=lnbc-bolt11-string")
   })
 
+  it("refuses a non-https callback and never fetches it", async () => {
+    const invoice = {
+      paymentRequest: "lnbc-bolt11-string",
+      paymentHash: "hash-A",
+    }
+    mockLnInvoiceCreate.mockResolvedValueOnce({
+      data: { lnInvoiceCreate: { invoice, errors: [] } },
+    })
+
+    const { result } = renderHook(() =>
+      useLnurlWithdrawRedemption({
+        ...defaultParams,
+        callback: "http://example.com/lnurl/withdraw",
+      }),
+    )
+
+    await flushEffects()
+    await flushEffects()
+
+    expect(mockFetch).not.toHaveBeenCalled()
+    expect(result.current.errorMessage).toBe("fallback-redeeming-error")
+    expect(result.current.paid).toBe(false)
+  })
+
   it("flips paid=true when the LN update hash matches the generated invoice paymentHash, and refetches the Home query", async () => {
     const invoice = { paymentRequest: "lnbc-bolt11-string", paymentHash: "hash-A" }
     mockLnInvoiceCreate.mockResolvedValueOnce({
