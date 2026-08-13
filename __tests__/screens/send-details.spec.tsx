@@ -26,6 +26,19 @@ import { PaymentType } from "@blinkbitcoin/blink-client"
 
 import { ContextForScreen } from "./helper"
 
+/** react-native-modal grabs an InteractionManager handle on open, which RN warns is deprecated. */
+jest.mock("react-native-modal", () => {
+  const MockModal = ({
+    children,
+    isVisible,
+  }: {
+    children: React.ReactNode
+    isVisible: boolean
+  }) => (isVisible ? React.createElement("View", { testID: "modal" }, children) : null)
+  MockModal.displayName = "MockModal"
+  return MockModal
+})
+
 const mockRequestInvoice = jest.fn()
 jest.mock("lnurl-pay", () => ({
   ...jest.requireActual("lnurl-pay"),
@@ -72,6 +85,87 @@ jest.mock("@app/hooks/use-effective-display-currency", () => ({
     loading: false,
   }),
 }))
+
+/**
+ * The account query behind this screen answers without a balance, which leaves the amount
+ * rules unreachable. Balances are stood up here instead, far enough above anything typed
+ * that the amount input never clamps and only the daily limit can turn an amount down.
+ */
+jest.mock("@app/screens/send-bitcoin-screen/hooks/use-send-wallets", () => {
+  const btcWallet = {
+    id: "f79792e3-282b-45d4-85d5-7486d020def5",
+    balance: 100_000_000,
+    walletCurrency: "BTC",
+  }
+  const usdWallet = {
+    id: "f091c102-6277-4cc6-8d81-87ebf6aaad1b",
+    balance: 1_000_000,
+    walletCurrency: "USD",
+  }
+
+  return {
+    ...jest.requireActual("@app/screens/send-bitcoin-screen/hooks/use-send-wallets"),
+    useSendWallets: () => ({
+      wallets: [btcWallet, usdWallet],
+      defaultWallet: btcWallet,
+      btcWallet,
+      usdWallet,
+      network: "mainnet",
+      loading: false,
+      isSelfCustodial: false,
+    }),
+  }
+})
+
+/**
+ * The withdrawal allowance, in cents. It starts where the shared account mock leaves it, so
+ * only a test that lowers it on purpose has an amount turned down for being over the limit.
+ */
+const mockWithdrawalAllowance = { remaining: 100_000_000 }
+
+/**
+ * The tier quote, answered per test rather than left to fall off the end of the mocked
+ * responses. Held as one stable function because Apollo hands back a stable execute across
+ * renders, and a fresh identity per render would re-arm the hook's effect forever.
+ */
+const mockQuoteFees = jest.fn()
+
+jest.mock("@app/graphql/generated", () => ({
+  ...jest.requireActual("@app/graphql/generated"),
+  useSendBitcoinWithdrawalLimitsQuery: () => ({
+    data: {
+      me: {
+        defaultAccount: {
+          limits: {
+            withdrawal: [
+              {
+                totalLimit: 100_000_000,
+                remainingLimit: mockWithdrawalAllowance.remaining,
+                interval: 86_400,
+              },
+            ],
+          },
+        },
+      },
+    },
+  }),
+  useOnChainTxFeeBySpeedLazyQuery: () => [mockQuoteFees],
+  useOnChainUsdTxFeeBySpeedLazyQuery: () => [mockQuoteFees],
+  useOnChainUsdTxFeeAsBtcDenominatedBySpeedLazyQuery: () => [mockQuoteFees],
+}))
+
+const quotedFees = {
+  data: { fast: { amount: 900 }, medium: { amount: 600 }, slow: { amount: 300 } },
+}
+const failedQuote = { data: undefined }
+
+beforeEach(() => {
+  mockQuoteFees.mockResolvedValue(quotedFees)
+})
+
+afterEach(() => {
+  mockWithdrawalAllowance.remaining = 100_000_000
+})
 
 jest.mock("@react-native-firebase/app-check", () => {
   return () => ({
@@ -413,9 +507,42 @@ describe("onchain fee tier gating", () => {
     expect(screen.getAllByText(LL.SendBitcoinScreen.slow()).length).toBeGreaterThan(0)
   })
 
+  it("carries the quoted fee into the tier label", async () => {
+    loadLocale("en")
+    const LL = i18nObject("en")
+
+    render(
+      <ContextForScreen>
+        <Onchain />
+      </ContextForScreen>,
+    )
+    await screen.findByTestId("fee-tier-dropdown")
+    await flushAsync()
+
+    fireEvent.press(screen.getByTestId("Amount Input Button"))
+    await flushAsync()
+    fireEvent.press(screen.getByTestId("Key 1"))
+    await flushAsync()
+    const setAmountButtons = screen.getAllByText(LL.AmountInputScreen.setAmount())
+    fireEvent.press(setAmountButtons[setAmountButtons.length - 1])
+    await flushAsync()
+
+    // The fee itself is formatted in the display currency, so only its presence is asserted.
+    await waitFor(() => {
+      expect(
+        screen.getByText(new RegExp(`^${LL.SendBitcoinScreen.fast()} \\(`)),
+      ).toBeTruthy()
+    })
+    expect(screen.queryByText(LL.common.feeError())).toBeNull()
+    expect(screen.getByTestId(LL.common.next()).props.accessibilityState?.disabled).toBe(
+      false,
+    )
+  })
+
   it("leaves Next enabled when a custodial quote fails", async () => {
     loadLocale("en")
     const LL = i18nObject("en")
+    mockQuoteFees.mockResolvedValue(failedQuote)
 
     render(
       <ContextForScreen>
@@ -439,10 +566,11 @@ describe("onchain fee tier gating", () => {
      * and the mutation validates server-side.
      */
     await waitFor(() => {
-      expect(screen.getByText(LL.SendBitcoinConfirmationScreen.feeError())).toBeTruthy()
+      expect(screen.getByText(LL.common.feeError())).toBeTruthy()
     })
     expect(screen.getByTestId(LL.common.next()).props.accessibilityState?.disabled).toBe(
       false,
     )
   })
+
 })
