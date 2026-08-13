@@ -3105,6 +3105,7 @@
       "cardUpdateError": "Kart durumu güncellenemedi"
     },
     "validThruLabel": "GEÇERLİLİK",
+    "authenticationRequired": "Kimlik doğrulama gerekli. Güvenlik ayarlarından PIN kodu veya biyometri ayarlayabilirsin.",
     "networkVisa": "Visa",
     "cardFrozenTitle": "Kart donduruldu",
     "cardFrozenSubtitle": "Kart geçici olarak devre dışı",

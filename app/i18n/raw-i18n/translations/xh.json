@@ -3105,6 +3105,7 @@
       "cardUpdateError": "Akukwazekanga ukuhlaziya isimo sekhadi"
     },
     "validThruLabel": "ISEBENZA DE KUPHELA",
+    "authenticationRequired": "Kufuneka uqinisekiso. Ungaseta ikhowudi ye-PIN okanye i-biometrics kusetingi zokhuseleko.",
     "networkVisa": "Visa",
     "cardFrozenTitle": "Ikhadi libandisiwe",
     "cardFrozenSubtitle": "Ikhadi limisiwe okwethutyana",

@@ -3105,6 +3105,7 @@
       "cardUpdateError": "Tidak dapat memperbarui status kartu"
     },
     "validThruLabel": "BERLAKU HINGGA",
+    "authenticationRequired": "Autentikasi diperlukan. Anda dapat mengatur kode PIN atau biometrik di pengaturan keamanan.",
     "networkVisa": "Visa",
     "cardFrozenTitle": "Kartu dibekukan",
     "cardFrozenSubtitle": "Kartu dinonaktifkan sementara",

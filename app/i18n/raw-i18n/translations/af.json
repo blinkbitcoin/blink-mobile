@@ -3105,6 +3105,7 @@
       "cardUpdateError": "Kon kaartstatus nie opdateer nie"
     },
     "validThruLabel": "GELDIG TOT",
+    "authenticationRequired": "Verifikasie word vereis. Jy kan 'n PIN of biometrie in Sekuriteit-instellings opstel.",
     "networkVisa": "Visa",
     "cardFrozenTitle": "Kaart gevries",
     "cardFrozenSubtitle": "Die kaart is tydelik gedeaktiveer",

@@ -3105,6 +3105,7 @@
             "cardUpdateError": "Impossibile aggiornare lo stato della carta"
         },
         "validThruLabel": "VALIDA FINO",
+        "authenticationRequired": "È richiesta l'autenticazione. Puoi impostare un codice PIN o la biometria nelle impostazioni di sicurezza.",
         "networkVisa": "Visa",
         "cardFrozenTitle": "Carta bloccata",
         "cardFrozenSubtitle": "La carta è temporaneamente disabilitata",

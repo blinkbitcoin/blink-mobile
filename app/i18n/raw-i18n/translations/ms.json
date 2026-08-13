@@ -3105,6 +3105,7 @@
       "cardUpdateError": "Tidak dapat mengemas kini status kad"
     },
     "validThruLabel": "SAH SEHINGGA",
+    "authenticationRequired": "Pengesahan diperlukan. Anda boleh menetapkan kod PIN atau biometrik dalam tetapan keselamatan.",
     "networkVisa": "Visa",
     "cardFrozenTitle": "Kad dibekukan",
     "cardFrozenSubtitle": "Kad dinyahaktifkan sementara",

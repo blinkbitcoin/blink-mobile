@@ -3105,6 +3105,7 @@
       "cardUpdateError": "Tekisobose kukyusa embeera ya kaadi"
     },
     "validThruLabel": "KIKWATA OKUTUUSA",
+    "authenticationRequired": "Okakasibwa kwetaagisa. Osobola okuteekawo PIN oba biometriks mu ntegeka z'obukuumi.",
     "networkVisa": "Visa",
     "cardFrozenTitle": "Kaadi ekkuziddwa",
     "cardFrozenSubtitle": "Kaadi eddiriddwa okukola okumala akaseera",

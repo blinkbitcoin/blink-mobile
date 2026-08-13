@@ -3105,6 +3105,7 @@
       "cardUpdateError": "Nem sikerült frissíteni a kártya állapotát"
     },
     "validThruLabel": "ÉRVÉNYES",
+    "authenticationRequired": "Hitelesítés szükséges. PIN kódot vagy biometriát a biztonsági beállításokban állíthatsz be.",
     "networkVisa": "Visa",
     "cardFrozenTitle": "Kártya befagyasztva",
     "cardFrozenSubtitle": "A kártya ideiglenesen letiltva",

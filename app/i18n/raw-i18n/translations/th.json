@@ -3105,6 +3105,7 @@
       "cardUpdateError": "ไม่สามารถอัปเดตสถานะบัตรได้"
     },
     "validThruLabel": "ใช้ได้ถึง",
+    "authenticationRequired": "จำเป็นต้องมีการยืนยันตัวตน คุณสามารถตั้งค่าพินโค้ดหรือไบโอเมตริกได้ในการตั้งค่าความปลอดภัย",
     "networkVisa": "Visa",
     "cardFrozenTitle": "บัตรถูกระงับ",
     "cardFrozenSubtitle": "บัตรถูกปิดใช้งานชั่วคราว",

@@ -3105,6 +3105,7 @@
             "cardUpdateError": "Não foi possível atualizar o status do cartão"
         },
         "validThruLabel": "VÁLIDO ATÉ",
+        "authenticationRequired": "É necessária autenticação. Você pode configurar um código PIN ou biometria nas configurações de segurança.",
         "networkVisa": "Visa",
         "cardFrozenTitle": "Cartão congelado",
         "cardFrozenSubtitle": "O cartão está temporariamente desativado",

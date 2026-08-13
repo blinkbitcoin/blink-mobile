@@ -3105,6 +3105,7 @@
       "cardUpdateError": "Imeshindwa kusasisha hali ya kadi"
     },
     "validThruLabel": "INATUMIKA HADI",
+    "authenticationRequired": "Uthibitishaji unahitajika. Unaweza kuweka pini au bayometriki katika mipangilio ya usalama.",
     "networkVisa": "Visa",
     "cardFrozenTitle": "Kadi imegandishwa",
     "cardFrozenSubtitle": "Kadi imezimwa kwa muda",

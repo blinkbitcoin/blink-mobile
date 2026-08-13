@@ -3105,6 +3105,7 @@
       "cardUpdateError": "Kon kaartstatus niet bijwerken"
     },
     "validThruLabel": "GELDIG TOT",
+    "authenticationRequired": "Verificatie is vereist. U kunt een pincode of biometrie instellen in de beveiligingsinstellingen.",
     "networkVisa": "Visa",
     "cardFrozenTitle": "Kaart bevroren",
     "cardFrozenSubtitle": "De kaart is tijdelijk uitgeschakeld",

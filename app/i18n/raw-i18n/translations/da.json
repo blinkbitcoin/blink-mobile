@@ -3105,6 +3105,7 @@
       "cardUpdateError": "Kunne ikke opdatere kortstatus"
     },
     "validThruLabel": "GYLDIG TIL",
+    "authenticationRequired": "Godkendelse er påkrævet. Du kan opsætte en PIN-kode eller biometri i sikkerhedsindstillingerne.",
     "networkVisa": "Visa",
     "cardFrozenTitle": "Kort spærret",
     "cardFrozenSubtitle": "Kortet er midlertidigt deaktiveret",

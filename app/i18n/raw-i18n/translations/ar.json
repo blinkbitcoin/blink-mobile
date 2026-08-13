@@ -3105,6 +3105,7 @@
       "cardUpdateError": "تعذر تحديث حالة البطاقة"
     },
     "validThruLabel": "صالح حتى",
+    "authenticationRequired": "المصادقة مطلوبة. يمكنك إعداد رمز PIN أو المصادقة الحيوية في إعدادات الأمان.",
     "networkVisa": "Visa",
     "cardFrozenTitle": "البطاقة مجمدة",
     "cardFrozenSubtitle": "البطاقة معطلة مؤقتًا",

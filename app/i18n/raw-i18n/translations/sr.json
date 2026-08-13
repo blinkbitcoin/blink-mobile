@@ -3105,6 +3105,7 @@
       "cardUpdateError": "Није могуће ажурирати статус картице"
     },
     "validThruLabel": "VAŽI DO",
+    "authenticationRequired": "Потребна је аутентификација. ПИН код или биометрију можете подесити у безбедносним подешавањима.",
     "networkVisa": "Visa",
     "cardFrozenTitle": "Kartica zamrznuta",
     "cardFrozenSubtitle": "Kartica je privremeno onemogućena",

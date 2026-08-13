@@ -3105,6 +3105,7 @@
       "cardUpdateError": "Nepodarilo sa aktualizovať stav karty"
     },
     "validThruLabel": "PLATNÉ DO",
+    "authenticationRequired": "Vyžaduje sa overenie. PIN kód alebo biometriu si môžete nastaviť v nastaveniach zabezpečenia.",
     "networkVisa": "Visa",
     "cardFrozenTitle": "Karta zmrazená",
     "cardFrozenSubtitle": "Karta je dočasne deaktivovaná",
