@@ -166,12 +166,10 @@ describe("useCloudBackup", () => {
     mockDownloadById.mockResolvedValue({ success: false, reason: "not-found" })
   })
 
-  it("uploads unencrypted backup and navigates to success", async () => {
+  it("uploads an encrypted backup and navigates to success", async () => {
     mockUpload.mockResolvedValue({ success: true })
 
-    const { result } = renderHook(() =>
-      useCloudBackup({ isEncrypted: false, password: "" }),
-    )
+    const { result } = renderHook(() => useCloudBackup({ password: "mypassword123" }))
 
     await act(async () => {
       await result.current.handleBackup()
@@ -181,7 +179,7 @@ describe("useCloudBackup", () => {
       "blink-spark-backup-blink-test-pubkey-1234.json",
     )
     expect(mockUpload).toHaveBeenCalledWith(
-      expect.stringContaining('"encrypted":false'),
+      expect.stringContaining('"encrypted":true'),
       "blink-spark-backup-blink-test-pubkey-1234.json",
       noExistingFile,
     )
@@ -195,9 +193,7 @@ describe("useCloudBackup", () => {
     mockUpload.mockResolvedValue({ success: true })
 
     try {
-      const { result } = renderHook(() =>
-        useCloudBackup({ isEncrypted: false, password: "" }),
-      )
+      const { result } = renderHook(() => useCloudBackup({ password: "mypassword123" }))
       await act(async () => {
         await result.current.handleBackup()
       })
@@ -208,31 +204,10 @@ describe("useCloudBackup", () => {
     expect(mockLogBackupCompleted).toHaveBeenCalledWith({ backupMethod: "google_drive" })
   })
 
-  it("uploads encrypted backup when encryption enabled", async () => {
-    mockUpload.mockResolvedValue({ success: true })
-
-    const { result } = renderHook(() =>
-      useCloudBackup({ isEncrypted: true, password: "mypassword123" }),
-    )
-
-    await act(async () => {
-      await result.current.handleBackup()
-    })
-
-    expect(mockUpload).toHaveBeenCalledWith(
-      expect.stringContaining('"encrypted":true'),
-      "blink-spark-backup-blink-test-pubkey-1234.json",
-      noExistingFile,
-    )
-    expect(mockCompleteBackup).toHaveBeenCalledWith({ method: "cloud" })
-  })
-
   it("shows the resolved failure message on upload failure", async () => {
     mockUpload.mockResolvedValue({ success: false, reason: "auth" })
 
-    const { result } = renderHook(() =>
-      useCloudBackup({ isEncrypted: false, password: "" }),
-    )
+    const { result } = renderHook(() => useCloudBackup({ password: "mypassword123" }))
 
     await act(async () => {
       await result.current.handleBackup()
@@ -247,9 +222,7 @@ describe("useCloudBackup", () => {
   it("does not double-report to crashlytics on upload failure — the inner hook owns Drive error telemetry", async () => {
     mockUpload.mockResolvedValue({ success: false, reason: "transient" })
 
-    const { result } = renderHook(() =>
-      useCloudBackup({ isEncrypted: false, password: "" }),
-    )
+    const { result } = renderHook(() => useCloudBackup({ password: "mypassword123" }))
 
     await act(async () => {
       await result.current.handleBackup()
@@ -261,9 +234,7 @@ describe("useCloudBackup", () => {
   it("delegates the sign-in error message to the provider's resolveErrorMessage", async () => {
     mockStartSession.mockResolvedValue({ success: false, reason: "unknown" })
 
-    const { result } = renderHook(() =>
-      useCloudBackup({ isEncrypted: false, password: "" }),
-    )
+    const { result } = renderHook(() => useCloudBackup({ password: "mypassword123" }))
 
     await act(async () => {
       await result.current.handleBackup()
@@ -278,9 +249,7 @@ describe("useCloudBackup", () => {
   it("stays silent when the user cancels the sign-in", async () => {
     mockStartSession.mockResolvedValue({ success: false, reason: "cancelled" })
 
-    const { result } = renderHook(() =>
-      useCloudBackup({ isEncrypted: false, password: "" }),
-    )
+    const { result } = renderHook(() => useCloudBackup({ password: "mypassword123" }))
 
     await act(async () => {
       await result.current.handleBackup()
@@ -296,9 +265,7 @@ describe("useCloudBackup", () => {
     mockUpload.mockResolvedValue({ success: true })
     mockConfirmDialog.mockResolvedValue(true)
 
-    const { result } = renderHook(() =>
-      useCloudBackup({ isEncrypted: false, password: "" }),
-    )
+    const { result } = renderHook(() => useCloudBackup({ password: "mypassword123" }))
 
     await act(async () => {
       await result.current.handleBackup()
@@ -311,7 +278,7 @@ describe("useCloudBackup", () => {
       }),
     )
     expect(mockUpload).toHaveBeenCalledWith(
-      expect.stringContaining('"encrypted":false'),
+      expect.stringContaining('"encrypted":true'),
       "blink-spark-backup-blink-test-pubkey-1234.json",
       withExistingFile,
     )
@@ -334,9 +301,7 @@ describe("useCloudBackup", () => {
     mockUpload.mockResolvedValue({ success: true })
     mockConfirmDialog.mockResolvedValue(true)
 
-    const { result } = renderHook(() =>
-      useCloudBackup({ isEncrypted: false, password: "" }),
-    )
+    const { result } = renderHook(() => useCloudBackup({ password: "mypassword123" }))
 
     await act(async () => {
       await result.current.handleBackup()
@@ -372,9 +337,7 @@ describe("useCloudBackup", () => {
     mockUpload.mockResolvedValue({ success: true })
     mockConfirmDialog.mockResolvedValue(true)
 
-    const { result } = renderHook(() =>
-      useCloudBackup({ isEncrypted: false, password: "" }),
-    )
+    const { result } = renderHook(() => useCloudBackup({ password: "mypassword123" }))
 
     await act(async () => {
       await result.current.handleBackup()
@@ -391,9 +354,7 @@ describe("useCloudBackup", () => {
     mockStartSession.mockResolvedValue(sessionOk(withExistingFile))
     mockDownloadById.mockResolvedValue({ success: false, reason: "transient" })
 
-    const { result } = renderHook(() =>
-      useCloudBackup({ isEncrypted: false, password: "" }),
-    )
+    const { result } = renderHook(() => useCloudBackup({ password: "mypassword123" }))
 
     await act(async () => {
       await result.current.handleBackup()
@@ -412,9 +373,7 @@ describe("useCloudBackup", () => {
     mockDownloadById.mockResolvedValue({ success: true, content: "not-json" })
     mockConfirmDialog.mockResolvedValue(false)
 
-    const { result } = renderHook(() =>
-      useCloudBackup({ isEncrypted: false, password: "" }),
-    )
+    const { result } = renderHook(() => useCloudBackup({ password: "mypassword123" }))
 
     await act(async () => {
       await result.current.handleBackup()
@@ -441,9 +400,7 @@ describe("useCloudBackup", () => {
     })
     mockConfirmDialog.mockResolvedValue(false)
 
-    const { result } = renderHook(() =>
-      useCloudBackup({ isEncrypted: false, password: "" }),
-    )
+    const { result } = renderHook(() => useCloudBackup({ password: "mypassword123" }))
 
     await act(async () => {
       await result.current.handleBackup()
@@ -464,9 +421,7 @@ describe("useCloudBackup", () => {
   it("does not fetch the existing backup when there is nothing to overwrite", async () => {
     mockUpload.mockResolvedValue({ success: true })
 
-    const { result } = renderHook(() =>
-      useCloudBackup({ isEncrypted: false, password: "" }),
-    )
+    const { result } = renderHook(() => useCloudBackup({ password: "mypassword123" }))
 
     await act(async () => {
       await result.current.handleBackup()
@@ -480,9 +435,7 @@ describe("useCloudBackup", () => {
     mockStartSession.mockResolvedValue(sessionOk(withExistingFile))
     mockConfirmDialog.mockResolvedValue(false)
 
-    const { result } = renderHook(() =>
-      useCloudBackup({ isEncrypted: false, password: "" }),
-    )
+    const { result } = renderHook(() => useCloudBackup({ password: "mypassword123" }))
 
     await act(async () => {
       await result.current.handleBackup()
@@ -495,9 +448,7 @@ describe("useCloudBackup", () => {
   it("includes version in backup payload", async () => {
     mockUpload.mockResolvedValue({ success: true })
 
-    const { result } = renderHook(() =>
-      useCloudBackup({ isEncrypted: false, password: "" }),
-    )
+    const { result } = renderHook(() => useCloudBackup({ password: "mypassword123" }))
 
     await act(async () => {
       await result.current.handleBackup()
@@ -513,9 +464,7 @@ describe("useCloudBackup", () => {
   it("aborts with a local backup error (not a sign-in error) when identityPubkey is missing", async () => {
     mockIdentityPubkey = null
 
-    const { result } = renderHook(() =>
-      useCloudBackup({ isEncrypted: false, password: "" }),
-    )
+    const { result } = renderHook(() => useCloudBackup({ password: "mypassword123" }))
 
     await act(async () => {
       await result.current.handleBackup()
@@ -596,9 +545,7 @@ describe("useCloudBackup", () => {
     mockLightningAddress = "alice@blink.sv"
     mockUpload.mockResolvedValue({ success: true })
 
-    const { result } = renderHook(() =>
-      useCloudBackup({ isEncrypted: false, password: "" }),
-    )
+    const { result } = renderHook(() => useCloudBackup({ password: "mypassword123" }))
 
     await act(async () => {
       await result.current.handleBackup()
@@ -619,9 +566,7 @@ describe("useCloudBackup", () => {
   it("omits lightningAddress in payload when null", async () => {
     mockUpload.mockResolvedValue({ success: true })
 
-    const { result } = renderHook(() =>
-      useCloudBackup({ isEncrypted: false, password: "" }),
-    )
+    const { result } = renderHook(() => useCloudBackup({ password: "mypassword123" }))
 
     await act(async () => {
       await result.current.handleBackup()

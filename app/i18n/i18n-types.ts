@@ -12402,14 +12402,10 @@ type RootTranslation = {
 			 */
 			title: string
 			/**
-			 * W​e​ ​w​i​l​l​ ​s​a​v​e​ ​a​ ​b​a​c​k​u​p​ ​o​f​ ​y​o​u​r​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​ ​t​o​ ​y​o​u​r​ ​{​p​r​o​v​i​d​e​r​}​.
+			 * W​e​ ​w​i​l​l​ ​s​a​v​e​ ​a​ ​p​a​s​s​w​o​r​d​-​p​r​o​t​e​c​t​e​d​,​ ​e​n​c​r​y​p​t​e​d​ ​b​a​c​k​u​p​ ​o​f​ ​y​o​u​r​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​ ​t​o​ ​y​o​u​r​ ​{​p​r​o​v​i​d​e​r​}​.
 			 * @param {string} provider
 			 */
 			description: RequiredParams<'provider'>
-			/**
-			 * E​n​c​r​y​p​t​ ​w​i​t​h​ ​a​d​d​i​t​i​o​n​a​l​ ​p​a​s​s​w​o​r​d
-			 */
-			encryptCheckbox: string
 			/**
 			 * P​a​s​s​w​o​r​d
 			 */
@@ -25867,13 +25863,9 @@ export type TranslationFunctions = {
 			 */
 			title: () => LocalizedString
 			/**
-			 * We will save a backup of your backup phrase to your {provider}.
+			 * We will save a password-protected, encrypted backup of your backup phrase to your {provider}.
 			 */
 			description: (arg: { provider: string }) => LocalizedString
-			/**
-			 * Encrypt with additional password
-			 */
-			encryptCheckbox: () => LocalizedString
 			/**
 			 * Password
 			 */

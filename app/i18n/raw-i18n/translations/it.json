@@ -3763,8 +3763,7 @@
         },
         "CloudBackup": {
             "title": "Eseguiamo il backup del portafoglio",
-            "description": "Salveremo una copia della tua frase di backup nel tuo {provider}.",
-            "encryptCheckbox": "Crittografa con password aggiuntiva",
+            "description": "Salveremo un backup crittografato e protetto da password della tua frase di backup nel tuo {provider}.",
             "password": "Password",
             "passwordPlaceholder": "(minimo 12 caratteri)",
             "confirmPassword": "Conferma password",

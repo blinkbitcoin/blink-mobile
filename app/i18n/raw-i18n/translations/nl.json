@@ -3763,8 +3763,7 @@
     },
     "CloudBackup": {
       "title": "Laten we een back-up maken van je portemonnee",
-      "description": "We slaan een back-up van je herstelzin op in je {provider}.",
-      "encryptCheckbox": "Versleutelen met extra wachtwoord",
+      "description": "We slaan een met een wachtwoord beveiligde, versleutelde back-up van je back-upzin op in je {provider}.",
       "password": "Wachtwoord",
       "passwordPlaceholder": "(minimaal 12 tekens)",
       "confirmPassword": "Bevestig wachtwoord",

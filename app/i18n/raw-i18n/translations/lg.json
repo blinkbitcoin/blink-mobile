@@ -3763,8 +3763,7 @@
     },
     "CloudBackup": {
       "title": "Ka tukoppe akawunti yo",
-      "description": "Tujja kutereka kopi y'ekigambo kyo eky'okukuuma mu {provider} yo.",
-      "encryptCheckbox": "Kiziyiza n'ekigambo eky'okustreyitinga ekirala",
+      "description": "Tujja kutereka kopi y'ebigambo byo eby'okuzzaawo ekuumibwa n'ekigambo ky'ekyama era nga esiriikiddwa mu {provider} yo.",
       "password": "Ekigambo eky'okuyingira",
       "passwordPlaceholder": "(obunene 12 ennukuta)",
       "confirmPassword": "Kakasa ekigambo eky'okuyingira",

@@ -3763,8 +3763,7 @@
     },
     "CloudBackup": {
       "title": "Qullqikuqniykita waqaychasun",
-      "description": "Waqaychay simiykipa huknin kaqta {provider} nisqaykiman waqaychasaqku.",
-      "encryptCheckbox": "Yapay contraseñawan pakay",
+      "description": "{provider}-niykipi backup rimayniykita password-wan amachasqa, chʼin cifrasqa waqaychasun.",
       "password": "Contraseña",
       "passwordPlaceholder": "(pisi kaptinpas 12 sanampakuna)",
       "confirmPassword": "Contraseñata takyachiy",

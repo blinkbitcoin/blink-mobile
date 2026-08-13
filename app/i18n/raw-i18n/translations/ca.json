@@ -3763,8 +3763,7 @@
     },
     "CloudBackup": {
       "title": "Fem una còpia de seguretat de la teva cartera",
-      "description": "Desarem una còpia de la teva frase de seguretat al teu {provider}.",
-      "encryptCheckbox": "Xifrar amb contrasenya addicional",
+      "description": "Desarem una còpia de seguretat xifrada i protegida amb contrasenya de la teva frase de recuperació al teu {provider}.",
       "password": "Contrasenya",
       "passwordPlaceholder": "(mínim 12 caràcters)",
       "confirmPassword": "Confirmar contrasenya",

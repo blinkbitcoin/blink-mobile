@@ -3763,8 +3763,7 @@
         },
         "CloudBackup": {
             "title": "Respaldemos tu billetera",
-            "description": "Guardaremos una copia de tu frase de respaldo en tu {provider}.",
-            "encryptCheckbox": "Encriptar con contraseña adicional",
+            "description": "Guardaremos una copia de seguridad cifrada y protegida con contraseña de tu frase de respaldo en tu {provider}.",
             "password": "Contraseña",
             "passwordPlaceholder": "(mínimo 12 caracteres)",
             "confirmPassword": "Confirmar contraseña",

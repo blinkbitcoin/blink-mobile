@@ -3763,8 +3763,7 @@
     },
     "CloudBackup": {
       "title": "Zálohujme vašu peňaženku",
-      "description": "Uložíme zálohu vašej záložnej frázy do vášho {provider}.",
-      "encryptCheckbox": "Šifrovať dodatočným heslom",
+      "description": "Do vášho {provider} uložíme zálohu vašej záložnej frázy zašifrovanú a chránenú heslom.",
       "password": "Heslo",
       "passwordPlaceholder": "(minimálne 12 znakov)",
       "confirmPassword": "Potvrdiť heslo",

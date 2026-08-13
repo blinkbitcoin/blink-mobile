@@ -3763,8 +3763,7 @@
     },
     "CloudBackup": {
       "title": "Készítsünk biztonsági mentést a tárcádról",
-      "description": "Elmentjük a biztonsági kifejezésed másolatát a {provider} tárhelyedre.",
-      "encryptCheckbox": "Titkosítás további jelszóval",
+      "description": "Jelszóval védett, titkosított biztonsági mentést készítünk a helyreállítási kifejezéséről a {provider} fiókjába.",
       "password": "Jelszó",
       "passwordPlaceholder": "(legalább 12 karakter)",
       "confirmPassword": "Jelszó megerősítése",

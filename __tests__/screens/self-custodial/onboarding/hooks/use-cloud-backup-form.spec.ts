@@ -25,34 +25,14 @@ jest.mock("@app/i18n/i18n-react", () => ({
 }))
 
 describe("useCloudBackupForm", () => {
-  it("starts with encryption disabled and valid", () => {
+  it("starts invalid: a password is always required", () => {
     const { result } = renderHook(() => useCloudBackupForm())
-    expect(result.current.isEncrypted).toBe(false)
-    expect(result.current.isValid).toBe(true)
-  })
-
-  it("toggles encryption and clears passwords", () => {
-    const { result } = renderHook(() => useCloudBackupForm())
-
-    act(() => result.current.setPassword("test"))
-    act(() => result.current.toggleEncryption())
-
-    expect(result.current.isEncrypted).toBe(true)
-    expect(result.current.password).toBe("")
-  })
-
-  it("is invalid when encryption enabled but no password", () => {
-    const { result } = renderHook(() => useCloudBackupForm())
-
-    act(() => result.current.toggleEncryption())
-
     expect(result.current.isValid).toBe(false)
   })
 
   it("shows password too short error after the field is marked touched", () => {
     const { result } = renderHook(() => useCloudBackupForm())
 
-    act(() => result.current.toggleEncryption())
     act(() => result.current.setPassword("short"))
     act(() => result.current.markPasswordTouched())
 
@@ -63,33 +43,15 @@ describe("useCloudBackupForm", () => {
   it("does not show password error while typing before the field is touched", () => {
     const { result } = renderHook(() => useCloudBackupForm())
 
-    act(() => result.current.toggleEncryption())
     act(() => result.current.setPassword("short"))
 
     expect(result.current.passwordError).toBeUndefined()
     expect(result.current.isValid).toBe(false)
   })
 
-  it("resets touched flag when encryption is toggled off", () => {
-    const { result } = renderHook(() => useCloudBackupForm())
-
-    act(() => result.current.toggleEncryption())
-    act(() => result.current.setPassword("short"))
-    act(() => result.current.markPasswordTouched())
-
-    expect(result.current.passwordError).toBe("Minimum 12 characters")
-
-    act(() => result.current.toggleEncryption())
-    act(() => result.current.toggleEncryption())
-    act(() => result.current.setPassword("shorty"))
-
-    expect(result.current.passwordError).toBeUndefined()
-  })
-
   it("clears password touched flag when the field is emptied", () => {
     const { result } = renderHook(() => useCloudBackupForm())
 
-    act(() => result.current.toggleEncryption())
     act(() => result.current.setPassword("short"))
     act(() => result.current.markPasswordTouched())
 
@@ -104,7 +66,6 @@ describe("useCloudBackupForm", () => {
   it("clears confirm-password touched flag when the field is emptied", () => {
     const { result } = renderHook(() => useCloudBackupForm())
 
-    act(() => result.current.toggleEncryption())
     act(() => result.current.setPassword("ValidPass1234!"))
     act(() => result.current.setConfirmPassword("wrong"))
     act(() => result.current.markConfirmPasswordTouched())
@@ -120,7 +81,6 @@ describe("useCloudBackupForm", () => {
   it("shows password mismatch error after confirm field is marked touched", () => {
     const { result } = renderHook(() => useCloudBackupForm())
 
-    act(() => result.current.toggleEncryption())
     act(() => result.current.setPassword("ValidPass1234!"))
     act(() => result.current.setConfirmPassword("different"))
     act(() => result.current.markConfirmPasswordTouched())
@@ -132,7 +92,6 @@ describe("useCloudBackupForm", () => {
   it("does not show confirm password error while typing before the field is touched", () => {
     const { result } = renderHook(() => useCloudBackupForm())
 
-    act(() => result.current.toggleEncryption())
     act(() => result.current.setPassword("ValidPass1234!"))
     act(() => result.current.setConfirmPassword("different"))
 
@@ -143,7 +102,6 @@ describe("useCloudBackupForm", () => {
   it("is valid when passwords match and meet minimum length", () => {
     const { result } = renderHook(() => useCloudBackupForm())
 
-    act(() => result.current.toggleEncryption())
     act(() => result.current.setPassword("ValidPass1234!"))
     act(() => result.current.setConfirmPassword("ValidPass1234!"))
 
@@ -155,7 +113,6 @@ describe("useCloudBackupForm", () => {
   it("treats a password of exactly 11 characters as too short", () => {
     const { result } = renderHook(() => useCloudBackupForm())
 
-    act(() => result.current.toggleEncryption())
     act(() => result.current.setPassword("12345678901"))
     act(() => result.current.markPasswordTouched())
 
@@ -166,7 +123,6 @@ describe("useCloudBackupForm", () => {
   it("accepts a password of exactly 12 characters", () => {
     const { result } = renderHook(() => useCloudBackupForm())
 
-    act(() => result.current.toggleEncryption())
     act(() => result.current.setPassword("123456789012"))
     act(() => result.current.setConfirmPassword("123456789012"))
     act(() => result.current.markPasswordTouched())
@@ -178,7 +134,6 @@ describe("useCloudBackupForm", () => {
   it("clears the confirm-password error once the fields match after being touched", () => {
     const { result } = renderHook(() => useCloudBackupForm())
 
-    act(() => result.current.toggleEncryption())
     act(() => result.current.setPassword("123456789012"))
     act(() => result.current.setConfirmPassword("different"))
     act(() => result.current.markConfirmPasswordTouched())
@@ -193,7 +148,6 @@ describe("useCloudBackupForm", () => {
   it("clears the fields and touched flags when the screen loses focus", () => {
     const { result } = renderHook(() => useCloudBackupForm())
 
-    act(() => result.current.toggleEncryption())
     act(() => result.current.setPassword("123456789012"))
     act(() => result.current.setConfirmPassword("123456789012"))
     act(() => result.current.markPasswordTouched())

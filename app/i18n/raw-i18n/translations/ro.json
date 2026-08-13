@@ -3763,8 +3763,7 @@
     },
     "CloudBackup": {
       "title": "Să facem o copie de siguranță a portofelului tău",
-      "description": "Vom salva o copie a frazei de recuperare în {provider} tău.",
-      "encryptCheckbox": "Criptează cu o parolă suplimentară",
+      "description": "Vom salva o copie de rezervă criptată și protejată cu parolă a frazei tale de rezervă în {provider}.",
       "password": "Parolă",
       "passwordPlaceholder": "(minim 12 caractere)",
       "confirmPassword": "Confirmă parola",
