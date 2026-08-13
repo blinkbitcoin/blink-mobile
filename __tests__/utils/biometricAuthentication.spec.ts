@@ -82,6 +82,16 @@ describe("BiometricWrapper", () => {
   })
 
   describe("authenticate", () => {
+    it("does not offer the OS fallback button, which could only ever fail", async () => {
+      mockAuthenticate.mockResolvedValue(undefined)
+
+      await BiometricWrapper.authenticate("auth", jest.fn(), jest.fn())
+
+      expect(mockAuthenticate).toHaveBeenCalledWith(
+        expect.objectContaining({ fallbackEnabled: false }),
+      )
+    })
+
     it("does not record user cancellations but still calls handleFailure", async () => {
       mockAuthenticate.mockRejectedValue(namedError("UserCancel", "user cancelled"))
       const handleSuccess = jest.fn()
