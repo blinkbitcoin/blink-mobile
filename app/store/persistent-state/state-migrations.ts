@@ -340,8 +340,20 @@ export const migratePersistentState = async (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: any,
 ): Promise<MigrationResult> => {
-  if (!data || !(data.schemaVersion in stateMigrations)) {
+  if (!data) {
     return { status: MigrationStatus.NoData }
+  }
+  if (!(data.schemaVersion in stateMigrations)) {
+    // A blob we can't read is not a fresh install — a downgrade from a future
+    // schema lands here. Failed keeps the keychain untouched and quarantines a
+    // redacted copy instead of destroying the session credential.
+    return {
+      status: MigrationStatus.Failed,
+      error: new Error(
+        `Unrecognized persistent state schemaVersion: ${String(data.schemaVersion)}`,
+      ),
+      rawData: data,
+    }
   }
   const schemaVersion: 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 =
     data.schemaVersion
