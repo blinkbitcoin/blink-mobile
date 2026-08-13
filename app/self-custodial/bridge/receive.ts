@@ -37,12 +37,12 @@ export const createReceiveLightning = (
 }
 
 export const createReceiveOnchain = (sdk: BreezSdkInterface): ReceiveOnchainAdapter => {
-  return async () => {
+  return async (params) => {
     try {
       const response = await sdk.receivePayment(
         ReceivePaymentRequest.create({
           paymentMethod: new ReceivePaymentMethod.BitcoinAddress({
-            newAddress: undefined,
+            newAddress: params?.newAddress,
           }),
         }),
       )

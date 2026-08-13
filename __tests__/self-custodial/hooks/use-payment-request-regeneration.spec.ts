@@ -18,6 +18,7 @@ const mockRecordError = jest.fn()
 const mockAddPendingAutoConvert = jest.fn()
 const mockFetchAutoConvertMinSats = jest.fn()
 const mockUseReceiveAssetMode = jest.fn()
+const mockPendingDeposits = jest.fn()
 const mockFormatMoneyAmount = jest.fn()
 
 jest.mock("@app/self-custodial/bridge", () => ({
@@ -40,6 +41,12 @@ jest.mock("@app/self-custodial/hooks/use-receive-asset-mode", () => ({
   useReceiveAssetMode: () => mockUseReceiveAssetMode(),
 }))
 
+// The real hook subscribes to navigation focus, which a bare renderHook has no
+// container for; the receive screen it feeds is always inside one.
+jest.mock("@app/self-custodial/hooks/use-pending-deposits", () => ({
+  usePendingDeposits: () => mockPendingDeposits(),
+}))
+
 jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () => mockSelfCustodialWallet(),
 }))
@@ -56,6 +63,18 @@ jest.mock("@app/hooks/use-display-currency", () => ({
   useDisplayCurrency: () => ({ formatMoneyAmount: mockFormatMoneyAmount }),
 }))
 
+jest.mock("@app/hooks/use-account-registry", () => ({
+  useAccountRegistry: () => ({
+    activeAccount: { id: "sc-account-1", type: "self-custodial" },
+  }),
+}))
+
+jest.mock("@app/self-custodial/storage/onchain-address", () => ({
+  ...jest.requireActual("@app/self-custodial/storage/onchain-address"),
+  loadIssuedOnchainAddress: async () => null,
+  saveIssuedOnchainAddress: async () => undefined,
+}))
+
 describe("usePaymentRequest invoice regeneration", () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -68,6 +87,7 @@ describe("usePaymentRequest invoice regeneration", () => {
       addPendingAutoConvert: mockAddPendingAutoConvert,
       fetchAutoConvertMinSats: mockFetchAutoConvertMinSats,
       useReceiveAssetMode: mockUseReceiveAssetMode,
+      pendingDeposits: mockPendingDeposits,
       formatMoneyAmount: mockFormatMoneyAmount,
     })
   })
@@ -281,6 +301,7 @@ describe("usePaymentRequest invoice regeneration", () => {
     mockSelfCustodialWallet.mockReturnValue({
       sdk: { id: "reconnected-sdk" },
       lastReceivedPaymentId: null,
+      allTransactions: [],
     })
     mockReceiveLightning.mockResolvedValue({ invoice: "lnbc1newsession..." })
     rerender({})
@@ -310,6 +331,7 @@ describe("usePaymentRequest invoice regeneration", () => {
     mockSelfCustodialWallet.mockReturnValue({
       sdk: mockSdk,
       lastReceivedPaymentId: "payment-abc-123",
+      allTransactions: [],
     })
     rerender({})
     await waitFor(() => {
@@ -343,6 +365,7 @@ describe("usePaymentRequest invoice regeneration", () => {
     mockSelfCustodialWallet.mockReturnValue({
       sdk: mockSdk,
       lastReceivedPaymentId: "payment-abc-123",
+      allTransactions: [],
     })
     rerender({})
     await waitFor(() => {
