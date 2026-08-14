@@ -8,6 +8,11 @@ jest.mock("react-native-screenguard", () => ({
   unregister: (...args: readonly unknown[]) => mockUnregister(...args),
 }))
 
+const mockReportError = jest.fn()
+jest.mock("@app/utils/error-logging", () => ({
+  reportError: (...args: readonly unknown[]) => mockReportError(...args),
+}))
+
 /** The util keeps its reference count and call queue in module state, so each test
  *  loads a fresh copy. */
 const loadModule = (): typeof import("@app/utils/screen-security") => {
@@ -23,9 +28,17 @@ const loadModule = (): typeof import("@app/utils/screen-security") => {
 describe("screen-security", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    // Fake timers keep a retry scheduled by a rejected enable inert unless the test
+    // advances the clock — otherwise a stray timer from one isolated module could
+    // fire mid-test in another and pollute the call counts.
+    jest.useFakeTimers()
     mockInitSettings.mockResolvedValue(undefined)
     mockRegister.mockResolvedValue(undefined)
     mockUnregister.mockResolvedValue(undefined)
+  })
+
+  afterEach(() => {
+    jest.useRealTimers()
   })
 
   it("initializes and registers with the given background color on first enable", async () => {
@@ -160,5 +173,93 @@ describe("screen-security", () => {
 
     expect(mockRegister).toHaveBeenCalledTimes(2)
     expect(mockUnregister).toHaveBeenCalledTimes(1)
+  })
+
+  /** A rejected register is not the only way initSettings/register can fail: if
+   *  initialization itself rejects, no guard was installed and the next enable must
+   *  start over from initSettings. */
+  it("starts over from initSettings on the next enable when initialization fails", async () => {
+    const { enableScreenSecurity } = loadModule()
+    mockInitSettings.mockRejectedValueOnce(new Error("native failure"))
+
+    await expect(enableScreenSecurity("#000000")).rejects.toThrow("native failure")
+    expect(mockRegister).not.toHaveBeenCalled()
+
+    await enableScreenSecurity("#000000")
+
+    expect(mockInitSettings).toHaveBeenCalledTimes(2)
+    expect(mockRegister).toHaveBeenCalledTimes(1)
+  })
+
+  /** A rejected unregister leaves the native state unknown, and the call-time
+   *  activeScreens gate means no later disable ever reaches the queue to retry it.
+   *  If `registered` stayed true, every later enable would skip the register and the
+   *  JS and native states would stay desynced for the rest of the process — so the
+   *  next enable must re-register. The rejection still propagates so the hook can
+   *  report it. */
+  it("re-registers on the next enable after a rejected unregister", async () => {
+    const { enableScreenSecurity, disableScreenSecurity } = loadModule()
+    mockUnregister.mockRejectedValueOnce(new Error("native failure"))
+
+    await enableScreenSecurity("#000000")
+    await expect(disableScreenSecurity()).rejects.toThrow("native failure")
+
+    await enableScreenSecurity("#000000")
+
+    expect(mockRegister).toHaveBeenCalledTimes(2)
+  })
+
+  // Must match ENABLE_RETRY_DELAY_MS in the util; a change there should fail here.
+  const RETRY_DELAY_MS = 10_000
+  // Must match ENABLE_RETRY_LIMIT in the util.
+  const RETRY_LIMIT = 3
+
+  describe("enable retry", () => {
+    it("retries a rejected registration while a protected screen is still mounted", async () => {
+      const { enableScreenSecurity } = loadModule()
+      mockRegister.mockRejectedValueOnce(new Error("native failure"))
+
+      await expect(enableScreenSecurity("#000000")).rejects.toThrow("native failure")
+      expect(mockRegister).toHaveBeenCalledTimes(1)
+
+      await jest.advanceTimersByTimeAsync(RETRY_DELAY_MS)
+
+      expect(mockRegister).toHaveBeenCalledTimes(2)
+    })
+
+    it("stops retrying once the guard is registered", async () => {
+      const { enableScreenSecurity } = loadModule()
+      mockRegister.mockRejectedValueOnce(new Error("native failure"))
+
+      await expect(enableScreenSecurity("#000000")).rejects.toThrow("native failure")
+      await jest.advanceTimersByTimeAsync(RETRY_DELAY_MS)
+      expect(mockRegister).toHaveBeenCalledTimes(2)
+
+      await jest.advanceTimersByTimeAsync(RETRY_DELAY_MS * (RETRY_LIMIT + 1))
+      expect(mockRegister).toHaveBeenCalledTimes(2)
+    })
+
+    it("reports each failed retry and gives up after a bounded number", async () => {
+      const { enableScreenSecurity } = loadModule()
+      mockRegister.mockRejectedValue(new Error("native failure"))
+
+      await expect(enableScreenSecurity("#000000")).rejects.toThrow("native failure")
+      await jest.advanceTimersByTimeAsync(RETRY_DELAY_MS * (RETRY_LIMIT + 2))
+
+      expect(mockRegister).toHaveBeenCalledTimes(1 + RETRY_LIMIT)
+      expect(mockReportError).toHaveBeenCalledTimes(RETRY_LIMIT)
+    })
+
+    it("does not retry once the last protected screen has unmounted", async () => {
+      const { enableScreenSecurity, disableScreenSecurity } = loadModule()
+      mockRegister.mockRejectedValueOnce(new Error("native failure"))
+
+      await expect(enableScreenSecurity("#000000")).rejects.toThrow("native failure")
+      await disableScreenSecurity()
+
+      await jest.advanceTimersByTimeAsync(RETRY_DELAY_MS * (RETRY_LIMIT + 2))
+
+      expect(mockRegister).toHaveBeenCalledTimes(1)
+    })
   })
 })
