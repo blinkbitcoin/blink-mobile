@@ -51,8 +51,10 @@ const headerRightWasInstalled = () =>
 const mockCopyToClipboard = jest.fn()
 jest.mock("@app/hooks", () => ({
   useClipboard: () => ({ copyToClipboard: mockCopyToClipboard }),
-  // The gate is the subject under test here: real hook, mocked native layers.
+  // The gate is the subject under test here: real hooks, mocked native layers.
   useLocalAuthGate: jest.requireActual("@app/hooks/use-local-auth-gate").useLocalAuthGate,
+  useAuthGateFailureHandler: jest.requireActual("@app/hooks/use-local-auth-gate")
+    .useAuthGateFailureHandler,
 }))
 
 jest.mock("@app/config/feature-flags-context", () => ({
@@ -419,8 +421,9 @@ describe("ViewBackupPhraseScreen", () => {
       await act(async () => challengeParams().onChallengeFailure())
 
       expect(mockGoBack).toHaveBeenCalledTimes(1)
-      /** The bounce must explain itself — a silent goBack reads as a broken screen. */
-      expect(mockToastShow).toHaveBeenCalledTimes(1)
+      /** A deliberate decline bounces silently — the user cancelled and knows
+       *  why; the settings-advice toast is for the can't-authenticate causes. */
+      expect(mockToastShow).not.toHaveBeenCalled()
       expect(queryByText("youth")).toBeNull()
     })
 

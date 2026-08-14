@@ -94,13 +94,14 @@ const pressBack = () => {
   return registration?.[1]() ?? false
 }
 
-/** Runs whatever the screen registered for beforeRemove — the navigator popping the screen,
- *  whether by gesture, hardware back, or the screen's own goBack. */
-const fireBeforeRemove = () => {
+/** Runs whatever the screen registered for beforeRemove with the removing action's
+ *  type — POP for gesture/header back and the screen's own goBack, GO_BACK for the
+ *  hardware button, RESET for stack-wide resets the screen doesn't own. */
+const fireBeforeRemove = (actionType = "POP") => {
   const registration = mockAddListener.mock.calls.find(
     ([eventName]) => eventName === "beforeRemove",
   )
-  registration?.[1]()
+  registration?.[1]({ data: { action: { type: actionType } } })
 }
 
 const enterPin = async (pin: string) => {
@@ -279,6 +280,40 @@ describe("PinScreen", () => {
 
       expect(onChallengeFailure).toHaveBeenCalledTimes(1)
       expect(onChallengeSuccess).not.toHaveBeenCalled()
+    })
+
+    it("treats the hardware back as a decline too", async () => {
+      const onChallengeFailure = jest.fn()
+      renderChallenge({ onChallengeSuccess: jest.fn(), onChallengeFailure })
+      await flushEffects()
+
+      fireBeforeRemove("GO_BACK")
+
+      expect(onChallengeFailure).toHaveBeenCalledTimes(1)
+    })
+
+    it("stays silent when a stack-wide reset removes the challenge", async () => {
+      /** A reset (migration blocker, resume relock, another screen's lockout)
+       *  unmounts the caller too — a decline callback would toast and goBack
+       *  into a screen that no longer exists. */
+      const onChallengeFailure = jest.fn()
+      renderChallenge({ onChallengeSuccess: jest.fn(), onChallengeFailure })
+      await flushEffects()
+
+      fireBeforeRemove("RESET")
+
+      expect(onChallengeFailure).not.toHaveBeenCalled()
+    })
+
+    it("a reset resolves the challenge: a pop arriving after it reports nothing", async () => {
+      const onChallengeFailure = jest.fn()
+      renderChallenge({ onChallengeSuccess: jest.fn(), onChallengeFailure })
+      await flushEffects()
+
+      fireBeforeRemove("RESET")
+      fireBeforeRemove("POP")
+
+      expect(onChallengeFailure).not.toHaveBeenCalled()
     })
 
     it("leaves the back press alone, so dismissal stays possible", async () => {

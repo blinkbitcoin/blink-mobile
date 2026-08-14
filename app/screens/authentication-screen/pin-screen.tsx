@@ -70,10 +70,21 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
    *  they navigate, so the pop they trigger stays silent here. */
   useEffect(() => {
     if (screenPurpose !== PinScreenPurpose.ChallengePin) return
-    return navigation.addListener("beforeRemove", () => {
+    return navigation.addListener("beforeRemove", (e) => {
       if (challengeResolvedRef.current) return
       challengeResolvedRef.current = true
-      onChallengeFailure?.()
+      /** Only a pop-family removal is the user declining (swipe and header back
+       *  dispatch POP, hardware back GO_BACK). A RESET/REPLACE is a removal the
+       *  challenge doesn't own — it unmounts the caller too, so a decline
+       *  callback would fire into a screen that no longer exists. */
+      const actionType = e.data.action.type
+      if (
+        actionType === "POP" ||
+        actionType === "POP_TO_TOP" ||
+        actionType === "GO_BACK"
+      ) {
+        onChallengeFailure?.()
+      }
     })
   }, [screenPurpose, navigation, onChallengeFailure])
 

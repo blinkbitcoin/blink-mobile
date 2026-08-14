@@ -208,6 +208,28 @@ describe("CardDetailsScreen", () => {
       expect(mockGoBack).toHaveBeenCalled()
     })
 
+    it("bounces silently when the pin challenge is declined", async () => {
+      mockGetIsPinEnabled.mockResolvedValue(true)
+      mockIsSensorAvailable.mockResolvedValue(false)
+
+      render(
+        <ContextForScreen>
+          <CardDetailsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      const challengeParams = mockPush.mock.calls.find(
+        ([routeName]) => routeName === "pin",
+      )?.[1]
+      await act(async () => challengeParams.onChallengeFailure())
+
+      /** The user cancelled and knows why; setup advice here would mislead. */
+      expect(toastShow).not.toHaveBeenCalled()
+      expect(mockGoBack).toHaveBeenCalledTimes(1)
+    })
+
     it("fails closed when no factor is configured at all", async () => {
       mockGetIsPinEnabled.mockResolvedValue(false)
       mockGetIsBiometricsEnabled.mockResolvedValue(false)

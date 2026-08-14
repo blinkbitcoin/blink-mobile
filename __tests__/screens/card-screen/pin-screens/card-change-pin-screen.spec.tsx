@@ -24,8 +24,10 @@ jest.mock("@app/utils/toast", () => ({
 }))
 
 const mockUseLocalAuthGate = jest.fn().mockReturnValue(true)
+const mockAuthFailureHandler = jest.fn()
 jest.mock("@app/hooks/use-local-auth-gate", () => ({
   useLocalAuthGate: (...args: unknown[]) => mockUseLocalAuthGate(...args),
+  useAuthGateFailureHandler: () => mockAuthFailureHandler,
 }))
 
 const mockUpdatePin = jest.fn().mockResolvedValue(true)
@@ -77,6 +79,20 @@ describe("CardChangePinScreen", () => {
 
       expect(mockUseLocalAuthGate).toHaveBeenCalledWith(
         expect.objectContaining({ required: true }),
+      )
+    })
+
+    it("wires the shared failure handler as the gate's onFailure", async () => {
+      render(
+        <ContextForScreen>
+          <CardChangePinScreen />
+        </ContextForScreen>,
+      )
+
+      await flushEffects()
+
+      expect(mockUseLocalAuthGate).toHaveBeenCalledWith(
+        expect.objectContaining({ onFailure: mockAuthFailureHandler }),
       )
     })
   })

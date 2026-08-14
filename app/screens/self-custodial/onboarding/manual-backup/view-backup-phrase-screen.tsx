@@ -1,4 +1,4 @@
-import React, { useCallback, useLayoutEffect } from "react"
+import React, { useLayoutEffect } from "react"
 import { ActivityIndicator, ScrollView, View } from "react-native"
 
 import { makeStyles, useTheme } from "@rn-vui/themed"
@@ -7,17 +7,16 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloyTertiaryButton } from "@app/components/atomic/galoy-tertiary-button"
-import { headerRightNoGlass, noHeaderRight } from "@app/components/header-no-glass"
+import { headerRightNoGlass } from "@app/components/header-no-glass"
 import { WarningCard } from "@app/components/warning-card"
 import { MnemonicWordsGrid } from "@app/components/mnemonic-words-grid"
 import { Screen } from "@app/components/screen"
 import { SparkCompatibleInfo } from "@app/components/spark-compatible-info"
-import { useLocalAuthGate } from "@app/hooks"
+import { useAuthGateFailureHandler, useLocalAuthGate } from "@app/hooks"
 import { useScreenSecurity } from "@app/hooks/use-screen-security"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { testProps } from "@app/utils/testProps"
-import { toastShow } from "@app/utils/toast"
 
 import { useViewBackupPhrase } from "../hooks"
 
@@ -30,19 +29,9 @@ export const ViewBackupPhraseScreen: React.FC = () => {
   const {
     theme: { colors },
   } = useTheme()
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-
   useScreenSecurity()
 
-  /** The gate fails closed, so the bounce needs an explanation — silently landing
-   *  the user back outside their own backup phrase reads as a broken screen. */
-  const handleAuthFailure = useCallback(() => {
-    toastShow({
-      message: (translations) => translations.AuthenticationScreen.authenticationRequired(),
-      LL,
-    })
-    navigation.goBack()
-  }, [navigation, LL])
+  const handleAuthFailure = useAuthGateFailureHandler()
 
   const authenticated = useLocalAuthGate({
     description: LL.BackupScreen.ManualBackup.Phrase.authDescription(),
@@ -52,15 +41,6 @@ export const ViewBackupPhraseScreen: React.FC = () => {
     // blocked behind lock setup. A factor they did configure is still enforced.
     required: false,
   })
-
-  // The header sits outside the `!authenticated` early return below, so it has to
-  // gate itself: without this the Copy button is mounted — and copies the full
-  // mnemonic — while the auth challenge is still pending.
-  useLayoutEffect(() => {
-    if (!authenticated) {
-      navigation.setOptions(noHeaderRight)
-    }
-  }, [navigation, authenticated])
 
   if (!authenticated) {
     return (

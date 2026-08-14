@@ -1,14 +1,28 @@
 import { renderHook, act } from "@testing-library/react-native"
 
-import { useLocalAuthGate } from "@app/hooks/use-local-auth-gate"
+import {
+  useAuthGateFailureHandler,
+  useLocalAuthGate,
+} from "@app/hooks/use-local-auth-gate"
 import BiometricWrapper from "@app/utils/biometricAuthentication"
 import { PinScreenPurpose } from "@app/utils/enum"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
+import { toastShow } from "@app/utils/toast"
 
 const mockPush = jest.fn()
+const mockGoBack = jest.fn()
 
 jest.mock("@react-navigation/native", () => ({
-  useNavigation: () => ({ push: mockPush }),
+  useNavigation: () => ({ push: mockPush, goBack: mockGoBack }),
+}))
+
+jest.mock("@app/utils/toast", () => ({
+  toastShow: jest.fn(),
+}))
+
+/** The failure handler only hands LL through to the (mocked) toast. */
+jest.mock("@app/i18n/i18n-react", () => ({
+  useI18nContext: () => ({ LL: {} }),
 }))
 
 jest.mock("@app/utils/biometricAuthentication", () => ({
@@ -75,6 +89,7 @@ describe("useLocalAuthGate", () => {
 
       expect(result.current).toBe(false)
       expect(onFailure).toHaveBeenCalledTimes(1)
+      expect(onFailure).toHaveBeenCalledWith("noFactor")
       expect(mockAuthenticate).not.toHaveBeenCalled()
       expect(mockPush).not.toHaveBeenCalled()
     })
@@ -130,6 +145,7 @@ describe("useLocalAuthGate", () => {
 
       expect(result.current).toBe(false)
       expect(onFailure).toHaveBeenCalledTimes(1)
+      expect(onFailure).toHaveBeenCalledWith("declined")
     })
 
     it("fails when the prompt fails and no pin exists", async () => {
@@ -141,6 +157,7 @@ describe("useLocalAuthGate", () => {
 
       expect(result.current).toBe(false)
       expect(onFailure).toHaveBeenCalledTimes(1)
+      expect(onFailure).toHaveBeenCalledWith("unavailable")
       expect(mockPush).not.toHaveBeenCalled()
     })
 
@@ -169,6 +186,7 @@ describe("useLocalAuthGate", () => {
 
       expect(result.current).toBe(false)
       expect(onFailure).toHaveBeenCalledTimes(1)
+      expect(onFailure).toHaveBeenCalledWith("unavailable")
     })
 
     it("treats a sensor probe error as a missing sensor", async () => {
@@ -304,5 +322,39 @@ describe("useLocalAuthGate", () => {
 
     expect(result.current).toBe(false)
     expect(onFailure).toHaveBeenCalledTimes(1)
+    expect(onFailure).toHaveBeenCalledWith("unavailable")
+  })
+})
+
+describe("useAuthGateFailureHandler", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it("explains and bounces when no factor is configured", () => {
+    const { result } = renderHook(() => useAuthGateFailureHandler())
+
+    act(() => result.current("noFactor"))
+
+    expect(toastShow).toHaveBeenCalledTimes(1)
+    expect(mockGoBack).toHaveBeenCalledTimes(1)
+  })
+
+  it("explains and bounces when a configured factor cannot be satisfied", () => {
+    const { result } = renderHook(() => useAuthGateFailureHandler())
+
+    act(() => result.current("unavailable"))
+
+    expect(toastShow).toHaveBeenCalledTimes(1)
+    expect(mockGoBack).toHaveBeenCalledTimes(1)
+  })
+
+  it("bounces silently on a deliberate decline", () => {
+    const { result } = renderHook(() => useAuthGateFailureHandler())
+
+    act(() => result.current("declined"))
+
+    expect(toastShow).not.toHaveBeenCalled()
+    expect(mockGoBack).toHaveBeenCalledTimes(1)
   })
 })

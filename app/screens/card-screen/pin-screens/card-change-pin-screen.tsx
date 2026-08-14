@@ -2,7 +2,7 @@ import React, { useCallback } from "react"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
-import { useLocalAuthGate } from "@app/hooks"
+import { useAuthGateFailureHandler, useLocalAuthGate } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { toastShow } from "@app/utils/toast"
@@ -22,13 +22,7 @@ export const CardChangePinScreen: React.FC = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { updatePin, loading } = useCardPinUpdate()
 
-  const handleAuthFailure = useCallback(() => {
-    toastShow({
-      message: (translations) => translations.AuthenticationScreen.authenticationRequired(),
-      LL,
-    })
-    navigation.goBack()
-  }, [navigation, LL])
+  const handleAuthFailure = useAuthGateFailureHandler()
 
   const authenticated = useLocalAuthGate({
     description: LL.CardFlow.PinScreens.ChangeFlow.biometricDescription(),

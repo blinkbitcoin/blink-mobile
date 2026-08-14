@@ -1,18 +1,32 @@
-import { useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
+import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import BiometricWrapper from "@app/utils/biometricAuthentication"
 import { PinScreenPurpose } from "@app/utils/enum"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
+import { toastShow } from "@app/utils/toast"
+
+/**
+ * Why the gate could not authenticate:
+ * - `noFactor`: nothing is configured to challenge with (only reported when
+ *   `required` fails closed).
+ * - `unavailable`: a configured factor could not be satisfied — sensor gone or
+ *   biometrics failed with no pin to fall back to, or the keystore errored.
+ *   (A biometric-prompt cancel with no pin lands here too: the library callback
+ *   cannot distinguish a cancel from a mismatch.)
+ * - `declined`: the user dismissed the pin challenge on purpose.
+ */
+export type AuthGateFailureReason = "noFactor" | "unavailable" | "declined"
 
 type UseLocalAuthGateParams = {
   /** Shown in the OS biometric prompt. */
   description: string
   /** Reports the gate's final failure — biometrics and pin both out of road. */
-  onFailure: () => void
+  onFailure: (reason: AuthGateFailureReason) => void
   /**
    * Governs exactly one case: what happens when NO factor is configured (no pin,
    * no biometrics). The default fails closed. Opting out is a product decision;
@@ -20,6 +34,31 @@ type UseLocalAuthGateParams = {
    * unaffected — a factor the user configured is always enforced.
    */
   required?: boolean
+}
+
+/**
+ * The failure behavior every gated screen shares: bounce back, and explain the
+ * bounce unless the user caused it themselves. Declines are silent — the user
+ * cancelled and knows why; the settings-advice toast is for the causes where
+ * they lack (or cannot use) a factor.
+ */
+export const useAuthGateFailureHandler = () => {
+  const { LL } = useI18nContext()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+
+  return useCallback(
+    (reason: AuthGateFailureReason) => {
+      if (reason !== "declined") {
+        toastShow({
+          message: (translations) =>
+            translations.AuthenticationScreen.authenticationRequired(),
+          LL,
+        })
+      }
+      navigation.goBack()
+    },
+    [navigation, LL],
+  )
 }
 
 /**
@@ -59,7 +98,7 @@ export const useLocalAuthGate = ({
       navigation.push("pin", {
         screenPurpose: PinScreenPurpose.ChallengePin,
         onChallengeSuccess: () => mounted && setAuthenticated(true),
-        onChallengeFailure: () => mounted && onFailureRef.current(),
+        onChallengeFailure: () => mounted && onFailureRef.current("declined"),
       })
 
     const gate = async () => {
@@ -77,7 +116,7 @@ export const useLocalAuthGate = ({
         if (!pinEnabled && !biometricsEnabled) {
           // The only branch `required` governs: there is nothing to challenge with.
           if (requiredRef.current) {
-            onFailureRef.current()
+            onFailureRef.current("noFactor")
             return
           }
           setAuthenticated(true)
@@ -85,7 +124,7 @@ export const useLocalAuthGate = ({
         }
 
         const fallThroughToPin = () =>
-          pinEnabled ? challengePin() : onFailureRef.current()
+          pinEnabled ? challengePin() : onFailureRef.current("unavailable")
 
         if (biometricsEnabled) {
           // A missing or erroring sensor never opens the gate — the user asked for
@@ -114,7 +153,7 @@ export const useLocalAuthGate = ({
         fallThroughToPin()
       } catch {
         if (mounted) {
-          onFailureRef.current()
+          onFailureRef.current("unavailable")
         }
       }
     }
