@@ -141,6 +141,18 @@ const hasAlreadyConverted = async (
       const paymentMs = Number(payment.timestamp) * 1000
       if (paymentMs < match.recordCreatedAtMs) return false
 
+      /** 0.22 persists the status but rebuilds the legs on retrieval, so a settled
+       *  conversion can surface with none while its child payment is still syncing.
+       *  Matching is the safe side: a false match skips one auto-convert, a false miss
+       *  converts the user's sats a second time. */
+      if (!details.conversions?.length) {
+        reportError(
+          "hasAlreadyConverted",
+          `completed conversion ${payment.id} has no legs; treating as already converted`,
+        )
+        return true
+      }
+
       return matchesConversionAmount(payment, match.satsAmount, match.toleranceBps)
     })
   } catch {

@@ -26,6 +26,12 @@ jest.mock("@app/self-custodial/bridge/token-balance", () => ({
   fetchUsdbDecimals: (...args: unknown[]) => mockFetchDecimals(...args),
 }))
 
+const mockReportError = jest.fn()
+
+jest.mock("@app/utils/error-logging", () => ({
+  reportError: (...args: unknown[]) => mockReportError(...args),
+}))
+
 jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
   ConversionStatus: { Completed: "Completed", Pending: "Pending" },
   PaymentStatus: { Completed: "Completed", Pending: "Pending" },
@@ -247,17 +253,60 @@ describe("executeAutoConvert", () => {
     expect(mockGetConversionQuote).toHaveBeenCalled()
   })
 
-  it("does NOT match a conversion whose legs array is empty (0.22 shape)", async () => {
+  /** 0.22 rebuilds the legs on retrieval, so a settled conversion can arrive with none.
+   *  Converting again spends the user's sats twice; skipping once costs nothing. */
+  it("treats a completed conversion with no legs as already converted, and reports it", async () => {
     mockGetConversionQuote.mockResolvedValue(successQuote())
 
     const outcome = await executeAutoConvert(
       sdkWith([
         {
+          id: "conv-legless",
           conversionDetails: { status: "Completed", conversions: [] },
           timestamp: 2000n,
         },
       ]),
       baseParams,
+    )
+
+    expect(outcome).toEqual({ status: "already-converted" })
+    expect(mockGetConversionQuote).not.toHaveBeenCalled()
+    expect(mockReportError).toHaveBeenCalledWith(
+      "hasAlreadyConverted",
+      expect.stringContaining("conv-legless"),
+    )
+  })
+
+  it("still converts when the legless conversion predates the record", async () => {
+    mockGetConversionQuote.mockResolvedValue(successQuote())
+
+    const outcome = await executeAutoConvert(
+      sdkWith([
+        {
+          id: "conv-old",
+          conversionDetails: { status: "Completed", conversions: [] },
+          timestamp: 900n, // 900_000ms, before recordCreatedAtMs
+        },
+      ]),
+      baseParams,
+    )
+
+    expect(outcome).toEqual({ status: "converted" })
+    expect(mockGetConversionQuote).toHaveBeenCalled()
+  })
+
+  it("still converts when the legless conversion is already claimed by another receive", async () => {
+    mockGetConversionQuote.mockResolvedValue(successQuote())
+
+    const outcome = await executeAutoConvert(
+      sdkWith([
+        {
+          id: "conv-claimed",
+          conversionDetails: { status: "Completed", conversions: [] },
+          timestamp: 2000n,
+        },
+      ]),
+      { ...baseParams, claimedConversionIds: new Set(["conv-claimed"]) },
     )
 
     expect(outcome).toEqual({ status: "converted" })
@@ -399,6 +448,22 @@ describe("findRecentConversionId", () => {
     )
 
     expect(id).toBe("conv-1")
+  })
+
+  /** Pairing needs a real source amount, so unlike the spend-side gate this stays strict:
+   *  a legless conversion is not a usable pairing candidate. */
+  it("skips a completed conversion with no legs", async () => {
+    const id = await findRecentConversionId(
+      sdkWith([
+        {
+          id: "conv-legless",
+          conversionDetails: { status: "Completed", conversions: [] },
+        },
+      ]),
+      { satsAmount: 5000, toleranceBps: 500, claimedConversionIds: new Set() },
+    )
+
+    expect(id).toBeUndefined()
   })
 
   it("skips conversions already claimed by another receive", async () => {
