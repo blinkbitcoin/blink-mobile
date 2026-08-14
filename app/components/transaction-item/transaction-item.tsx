@@ -1,6 +1,10 @@
 import React from "react"
 import { View } from "react-native"
-import Animated, { useSharedValue, useAnimatedStyle } from "react-native-reanimated"
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  type SharedValue,
+} from "react-native-reanimated"
 import { useIsFocused } from "@react-navigation/native"
 import { Text, makeStyles, ListItem } from "@rn-vui/themed"
 import { useFragment } from "@apollo/client"
@@ -58,29 +62,32 @@ export const useDescriptionDisplay = ({
   }
 }
 
-// Owns the navigation focus subscription so that only the highlighted row
-// re-renders when focus changes, instead of every mounted row in the list.
-const BouncingRow: React.FC<{ visible: boolean; children: React.ReactNode }> = ({
-  visible,
-  children,
-}) => {
+const BOUNCE_DELAY_MS = 300
+const BOUNCE_DURATION_MS = 120
+
+/**
+ * Owns the navigation focus subscription that drives a row's bounce-in.
+ *
+ * It renders nothing and is mounted as a sibling of the row, only once that row
+ * has been highlighted. `useIsFocused` re-renders every subscriber on each
+ * navigation focus change, so keeping it out of the rows that never bounce is
+ * what stops opening a transaction from re-rendering the whole mounted list.
+ */
+const BounceOnFocus: React.FC<{
+  visible: boolean
+  scale: SharedValue<number>
+}> = ({ visible, scale }) => {
   const isFocused = useIsFocused()
-  const scale = useSharedValue(1)
 
   useBounceInAnimation({
     isFocused,
     visible,
     scale,
-    delay: 300,
-    duration: 120,
+    delay: BOUNCE_DELAY_MS,
+    duration: BOUNCE_DURATION_MS,
   })
 
-  const animatedStyle = useAnimatedStyle(
-    () => ({ transform: [{ scale: scale.value }] }),
-    [scale],
-  )
-
-  return <Animated.View style={animatedStyle}>{children}</Animated.View>
+  return null
 }
 
 type Props = {
@@ -112,10 +119,18 @@ const TransactionItem: React.FC<Props> = ({
   )
   const styles = useStyles(styleProps)
 
-  // Once a row has been highlighted, keep the wrapper mounted for the life of
-  // the row: dropping it when the highlight clears would swap the element type
-  // at that position and remount the whole row subtree. Rows that are never
-  // highlighted never mount it, so they never subscribe to navigation focus.
+  const scale = useSharedValue(1)
+  const animatedStyle = useAnimatedStyle(
+    () => ({ transform: [{ scale: scale.value }] }),
+    [scale],
+  )
+
+  // Once a row has been highlighted, keep the subscriber mounted for the life of
+  // the row rather than dropping it when the highlight clears. useBounceInAnimation
+  // resets `scale` from its `visible: false` branch, not from its cleanup, so a
+  // highlight clearing mid-bounce would otherwise leave the row frozen at
+  // whatever scale the animation had reached. Rows that are never highlighted
+  // never mount it, so they never subscribe to navigation focus.
   const everHighlighted = React.useRef(highlight)
   if (highlight) everHighlighted.current = true
 
@@ -185,59 +200,65 @@ const TransactionItem: React.FC<Props> = ({
       ? undefined
       : formattedSettlementAmount
 
-  const row = (
-    <ListItem
-      {...testProps(testId)}
-      containerStyle={styles.container}
-      // handlePress is always defined, so it is only handed over when the caller
-      // actually passed an onPress — otherwise the row would become pressable.
-      onPress={onPress ? handlePress : undefined}
-    >
-      <IconTransaction
-        onChain={tx.settlementVia?.__typename === "SettlementViaOnChain"}
-        isReceive={isReceive}
-        pending={isPending}
-        walletCurrency={walletCurrency}
-      />
-      <ListItem.Content {...testProps("list-item-content")}>
-        <ListItem.Title
-          numberOfLines={1}
-          ellipsizeMode="tail"
-          style={styles.title}
-          {...testProps("tx-description")}
-        >
-          {description}
-        </ListItem.Title>
-        <ListItem.Subtitle style={styles.subtitle}>
-          {subtitle ? (
-            <TransactionDate
-              createdAt={tx.createdAt}
-              status={tx.status}
-              includeTime={false}
-            />
-          ) : undefined}
-        </ListItem.Subtitle>
-      </ListItem.Content>
+  return (
+    // Always wrapped, so the element type at this position never depends on
+    // `highlight`: React does not diff across a type change, and swapping the
+    // wrapper in or out would unmount and rebuild the whole row subtree at the
+    // exact moment the user is looking at that row. Only the focus subscriber
+    // below is conditional, and it sits in its own child slot so toggling it
+    // leaves the row beside it untouched.
+    <Animated.View style={animatedStyle}>
+      {everHighlighted.current ? (
+        <BounceOnFocus visible={highlight} scale={scale} />
+      ) : null}
+      <ListItem
+        {...testProps(testId)}
+        containerStyle={styles.container}
+        // handlePress is always defined, so it is only handed over when the
+        // caller actually passed an onPress — otherwise the row would become
+        // pressable.
+        onPress={onPress ? handlePress : undefined}
+      >
+        <IconTransaction
+          onChain={tx.settlementVia?.__typename === "SettlementViaOnChain"}
+          isReceive={isReceive}
+          pending={isPending}
+          walletCurrency={walletCurrency}
+        />
+        <ListItem.Content {...testProps("list-item-content")}>
+          <ListItem.Title
+            numberOfLines={1}
+            ellipsizeMode="tail"
+            style={styles.title}
+            {...testProps("tx-description")}
+          >
+            {description}
+          </ListItem.Title>
+          <ListItem.Subtitle style={styles.subtitle}>
+            {subtitle ? (
+              <TransactionDate
+                createdAt={tx.createdAt}
+                status={tx.status}
+                includeTime={false}
+              />
+            ) : undefined}
+          </ListItem.Subtitle>
+        </ListItem.Content>
 
-      <View style={styles.amountWrapper}>
-        {hideAmount ? (
-          <HiddenBalancePlaceholder size="small" />
-        ) : (
-          <>
-            <Text style={amountStyle}>{formattedDisplayAmount}</Text>
-            {formattedSecondaryAmount && (
-              <Text style={amountStyle}>{formattedSecondaryAmount}</Text>
-            )}
-          </>
-        )}
-      </View>
-    </ListItem>
-  )
-
-  return everHighlighted.current ? (
-    <BouncingRow visible={highlight}>{row}</BouncingRow>
-  ) : (
-    row
+        <View style={styles.amountWrapper}>
+          {hideAmount ? (
+            <HiddenBalancePlaceholder size="small" />
+          ) : (
+            <>
+              <Text style={amountStyle}>{formattedDisplayAmount}</Text>
+              {formattedSecondaryAmount && (
+                <Text style={amountStyle}>{formattedSecondaryAmount}</Text>
+              )}
+            </>
+          )}
+        </View>
+      </ListItem>
+    </Animated.View>
   )
 }
 
