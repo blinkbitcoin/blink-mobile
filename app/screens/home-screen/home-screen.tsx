@@ -70,7 +70,7 @@ import {
 } from "@app/self-custodial/hooks"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { ConvertDirection, DepositStatus } from "@app/types/payment"
-import { useBackupNudgeState } from "@app/hooks/use-backup-nudge-state"
+import { useBackupNudgeState } from "@app/self-custodial/hooks/use-backup-nudge-state"
 import { useSelfCustodialInfoBulletinState } from "@app/hooks/use-self-custodial-info-bulletin-state"
 import { getErrorMessages } from "@app/graphql/utils"
 import { getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"

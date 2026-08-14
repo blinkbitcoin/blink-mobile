@@ -4,13 +4,13 @@ import AsyncStorage from "@react-native-async-storage/async-storage"
 
 import { useTotalBalance } from "@app/components/balance-header/use-total-balance"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
-import { BackupStatus, useBackupState } from "@app/self-custodial/providers/backup-state"
+import { useAccountRegistry } from "@app/hooks/use-account-registry"
+import { useActiveWallet } from "@app/hooks/use-active-wallet"
+import { useIsSelfCustodialAccount } from "@app/hooks/use-is-self-custodial-account"
 import { AccountType } from "@app/types/wallet"
 import { reportError } from "@app/utils/error-logging"
 
-import { useAccountRegistry } from "./use-account-registry"
-import { useActiveWallet } from "./use-active-wallet"
-import { useIsSelfCustodialAccount } from "./use-is-self-custodial-account"
+import { BackupStatus, useBackupState } from "../providers/backup-state"
 
 const BANNER_DISMISSAL_COOLDOWN_MS = 24 * 60 * 60 * 1000
 const BANNER_DISMISSAL_KEY_PREFIX = "backupNudgeDismissedAt"

@@ -44,7 +44,7 @@ const mockBackupNudgeState = {
   dismissBanner: jest.fn(),
   dismissModal: jest.fn(),
 }
-jest.mock("@app/hooks/use-backup-nudge-state", () => ({
+jest.mock("@app/self-custodial/hooks/use-backup-nudge-state", () => ({
   useBackupNudgeState: () => mockBackupNudgeState,
 }))
 

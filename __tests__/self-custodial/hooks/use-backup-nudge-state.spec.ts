@@ -1,6 +1,6 @@
 import { renderHook, act } from "@testing-library/react-native"
 
-import { useBackupNudgeState } from "@app/hooks/use-backup-nudge-state"
+import { useBackupNudgeState } from "@app/self-custodial/hooks/use-backup-nudge-state"
 
 const mockBackupState = jest.fn()
 const mockActiveWallet = jest.fn()
