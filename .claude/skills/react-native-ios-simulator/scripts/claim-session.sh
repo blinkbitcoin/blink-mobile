@@ -63,41 +63,29 @@ rm -f "$SESSION_DIR/released-at"
 xcrun simctl list devices booted -j > "$SESSION_DIR/preflight-booted.json"
 PREFLIGHT_COUNT=$(grep -c '"udid"' "$SESSION_DIR/preflight-booted.json" || true)
 
+# --- Where the demo runs from ------------------------------------------------
+# Recorded so verify-session.sh can catch the trap that once manufactured a
+# phantom regression: the checkout moving to another branch mid-session, after
+# which Metro serves code that is not the code under test.
+if git rev-parse --show-toplevel >/dev/null 2>&1; then
+  git rev-parse --show-toplevel > "$SESSION_DIR/worktree"
+  git rev-parse HEAD > "$SESSION_DIR/head-sha"
+fi
+
 # --- Port reservation --------------------------------------------------------
-# Deterministic starting point per PR (so re-runs are stable), then walk upward.
-# mkdir is atomic on every filesystem we care about: whoever creates the
-# directory owns the port. 8081 is never in range - that is the user's Metro.
-reserve_port() {
-  local base=$((8100 + (PR % 400)))
-  local candidate stale_pid
-  for offset in $(seq 0 60); do
-    candidate=$((base + offset))
-    [ "$candidate" -eq 8081 ] && continue
-    if mkdir "$REGISTRY/ports/$candidate" 2>/dev/null; then
-      echo "$SIM_NAME" > "$REGISTRY/ports/$candidate/owner"
-      # Re-check after winning the reservation: another process outside this
-      # registry (a stray Metro, an unrelated dev server) may already hold it.
-      if lsof -nP -iTCP:"$candidate" -sTCP:LISTEN >/dev/null 2>&1; then
-        rm -rf "$REGISTRY/ports/$candidate"
-        continue
-      fi
-      echo "$candidate"; return 0
-    fi
-    # Reclaim a reservation whose owning session no longer exists.
-    stale_pid=$(cat "$REGISTRY/ports/$candidate/metro.pid" 2>/dev/null || echo "")
-    if [ -n "$stale_pid" ] && ! kill -0 "$stale_pid" 2>/dev/null; then
-      if [ "$(cat "$REGISTRY/ports/$candidate/owner" 2>/dev/null)" = "$SIM_NAME" ]; then
-        echo "$candidate"; return 0
-      fi
-    fi
-  done
-  echo "FATAL: no free port in $base..$((base + 60))" >&2; exit 1
-}
+# The reservation itself lives in lib/ports.sh because the registry is shared
+# with the Android skill: an iOS session and an Android session on one port is
+# the collision the registry exists to prevent, and a second implementation
+# would be a second chance to get the atomicity wrong. Load-bearing, so a
+# missing lib fails loudly rather than degrading.
+PORTS_LIB="$(dirname "${BASH_SOURCE[0]}")/../lib/ports.sh"
+[ -f "$PORTS_LIB" ] || { echo "FATAL: missing $PORTS_LIB - an unreserved port would silently steal another agent's bundler" >&2; exit 1; }
+. "$PORTS_LIB"
 
 if [ -f "$SESSION_DIR/port" ]; then
   PORT=$(cat "$SESSION_DIR/port")   # idempotent re-claim
 else
-  PORT=$(reserve_port)
+  PORT=$(reserve_metro_port "$REGISTRY" "$SIM_NAME" "$PR") || exit 1
   echo "$PORT" > "$SESSION_DIR/port"
 fi
 

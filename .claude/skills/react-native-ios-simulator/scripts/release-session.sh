@@ -87,9 +87,12 @@ if [ -n "$UDID" ]; then
 fi
 
 # --- Port release ------------------------------------------------------------
-if [ -n "$PORT" ] && [ "$(cat "$REGISTRY/ports/$PORT/owner" 2>/dev/null)" = "$EXPECTED_NAME" ]; then
-  rm -rf "$REGISTRY/ports/$PORT"
-fi
+# Same shared lib the claim reserves through - the owner check lives in one
+# place, so a session can never free a reservation it does not hold.
+PORTS_LIB="$(dirname "${BASH_SOURCE[0]}")/../lib/ports.sh"
+[ -f "$PORTS_LIB" ] || { echo "FATAL: missing $PORTS_LIB" >&2; exit 1; }
+. "$PORTS_LIB"
+release_metro_port "$REGISTRY" "$PORT" "$EXPECTED_NAME"
 
 # --- Collateral-damage assertion ---------------------------------------------
 # Every device booted at claim time must still be booted, minus our own.

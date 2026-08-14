@@ -108,6 +108,15 @@ check "SKILL.md carries the demo-worktree native build prerequisites" "yes" \
 check "SKILL.md never contains a 6-digit literal that could be the PIN" "0" \
   "$(grep -cE '(^|[^0-9.])[0-9]{6}([^0-9.]|$)' "$SKILL_MD")"
 
+# The count in SKILL.md is documentation that rots silently - it drifted to 105
+# against 97 actual once. Comparing it here makes the drift a red build instead
+# of a number nobody checks.
+DOC_COUNT=$(grep -o '# [0-9]\+ assertions' "$TESTS_DIR/../SKILL.md" 2>/dev/null | head -1 | grep -o '[0-9]\+' || echo "")
+ACTUAL_COUNT=$((PASS + FAIL))
+if [ -n "$DOC_COUNT" ] && [ "$DOC_COUNT" != "$ACTUAL_COUNT" ]; then
+  bad "SKILL.md documents the suite's own size" "$DOC_COUNT assertions" "$ACTUAL_COUNT"
+fi
+
 echo
 echo "-------------------------------------"
 printf '%d passed, %d failed\n' "$PASS" "$FAIL"

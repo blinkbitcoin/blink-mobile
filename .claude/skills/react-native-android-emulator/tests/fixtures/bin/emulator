@@ -1,0 +1,50 @@
+#!/bin/bash
+# Fake `emulator` for the Android session tests.
+#
+# `-list-avds` reports $FAKE_AVDS (newline-separated). Booting attaches a device
+# to the fake adb's device list as `emulator-<port>|<avd>|device`, which is the
+# whole point: it proves the claim's serial really is derived from the console
+# port it reserved, not from whatever happened to be attached.
+#
+# Refuses to boot an AVD that is already attached - a real emulator locks its
+# AVD, and a fake that allowed it would let the "one session per AVD" guarantee
+# pass vacuously.
+
+set -uo pipefail
+
+ARGS_LOG="${FAKE_ARGS_LOG:-/dev/null}"
+DEVICES="${FAKE_ADB_DEVICES:?FAKE_ADB_DEVICES not set}"
+echo "emulator $*" >> "$ARGS_LOG"
+
+if [ "${1:-}" = "-list-avds" ]; then
+  printf '%s\n' ${FAKE_AVDS:-Pixel_Test_A Pixel_Test_B}
+  exit 0
+fi
+
+AVD=""; PORT=""
+while [ $# -gt 0 ]; do
+  case "$1" in
+    -avd) AVD="${2:?}"; shift 2 ;;
+    -port) PORT="${2:?}"; shift 2 ;;
+    *) shift ;;
+  esac
+done
+
+[ -n "$AVD" ] || { echo "fake emulator: no -avd given" >&2; exit 64; }
+[ -n "$PORT" ] || { echo "fake emulator: no -port given (the serial must be ours by construction)" >&2; exit 64; }
+
+touch "$DEVICES"
+if awk -F'|' -v a="$AVD" '$2==a {found=1} END {exit !found}' "$DEVICES"; then
+  echo "emulator: ERROR: Running multiple emulators with the same AVD '$AVD' is not supported" >&2
+  exit 1
+fi
+
+[ -n "${FAKE_EMULATOR_BOOT_FAILS:-}" ] && { echo "emulator: boot failed" >&2; exit 1; }
+
+printf '%s|%s|device\n' "emulator-$PORT" "$AVD" >> "$DEVICES"
+
+# A real emulator stays in the foreground until killed; the claim backgrounds it
+# and records the PID, so the fake must stay alive to be killable.
+while [ -f "$DEVICES" ] && grep -q "^emulator-$PORT|" "$DEVICES"; do
+  sleep 0.2
+done

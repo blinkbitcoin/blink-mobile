@@ -1,0 +1,103 @@
+#!/bin/bash
+# Fake `adb` for the Android session tests.
+#
+# Models attached devices as lines in $FAKE_ADB_DEVICES (`serial|avd|state`) and
+# the device filesystem under $FAKE_ANDROID_ROOT, so the prefs push can be
+# asserted as real bytes landing in a real path rather than "a command ran".
+#
+# Every invocation is logged to $FAKE_ARGS_LOG. Like the capture skills' fakes,
+# `-s <serial>` is mandatory for device-scoped verbs: that is what makes "the
+# scripts always pin a device" a testable invariant rather than a convention.
+
+set -uo pipefail
+
+ARGS_LOG="${FAKE_ARGS_LOG:-/dev/null}"
+DEVICES="${FAKE_ADB_DEVICES:?FAKE_ADB_DEVICES not set}"
+ROOT="${FAKE_ANDROID_ROOT:?FAKE_ANDROID_ROOT not set}"
+echo "adb $*" >> "$ARGS_LOG"
+
+touch "$DEVICES"
+
+# Global (non device-scoped) verbs first.
+case "${1:-}" in
+  devices)
+    echo "List of devices attached"
+    awk -F'|' 'NF>=3 {print $1"\t"$3}' "$DEVICES"
+    exit 0
+    ;;
+  start-server|kill-server)
+    echo "fake adb: refusing '$1' - it disrupts every other agent's session" >&2
+    exit 70
+    ;;
+esac
+
+[ "${1:-}" = "-s" ] || { echo "fake adb: refusing to run without -s <serial>" >&2; exit 70; }
+SERIAL="${2:?}"
+shift 2
+
+grep -q "^${SERIAL}|" "$DEVICES" || { echo "adb: device '$SERIAL' not found" >&2; exit 1; }
+AVD_OF_SERIAL=$(awk -F'|' -v s="$SERIAL" '$1==s {print $2}' "$DEVICES")
+
+case "${1:-}" in
+  emu)
+    case "${2:-}" in
+      kill)
+        # Detach it, exactly like a real `emu kill`.
+        grep -v "^${SERIAL}|" "$DEVICES" > "$DEVICES.tmp" && mv "$DEVICES.tmp" "$DEVICES"
+        echo "OK"
+        ;;
+      avd)
+        [ "${3:-}" = "name" ] || { echo "fake adb: unsupported emu avd verb" >&2; exit 64; }
+        echo "$AVD_OF_SERIAL"
+        echo "OK"
+        ;;
+      *) echo "fake adb: unsupported emu verb '${2:-}'" >&2; exit 64 ;;
+    esac
+    ;;
+
+  wait-for-device) exit 0 ;;
+
+  shell)
+    shift
+    case "${1:-}" in
+      getprop)
+        case "${2:-}" in
+          sys.boot_completed) echo "${FAKE_BOOT_COMPLETED:-1}" ;;
+          *) echo "" ;;
+        esac
+        ;;
+      run-as)
+        APP="${2:?}"; shift 2
+        # A real run-as fails on a non-debuggable build; model that so the
+        # script's error path is reachable.
+        [ -n "${FAKE_RUN_AS_DENIED:-}" ] && { echo "run-as: package not debuggable: $APP" >&2; exit 1; }
+        case "${1:-}" in
+          mkdir) mkdir -p "$ROOT/data/data/$APP/shared_prefs" 2>/dev/null; exit 0 ;;
+          cp)
+            SRC="${2:?}"; DST="${3:?}"
+            mkdir -p "$ROOT$(dirname "$DST")"
+            cp "$ROOT$SRC" "$ROOT$DST" 2>/dev/null || { echo "cp: $SRC: No such file" >&2; exit 1; }
+            ;;
+          *) echo "fake adb: unsupported run-as verb '${1:-}'" >&2; exit 64 ;;
+        esac
+        ;;
+      am)
+        [ "${2:-}" = "force-stop" ] && { echo "force-stop ${3:-}" >> "$ARGS_LOG"; exit 0; }
+        exit 0
+        ;;
+      rm) shift; rm -f "$ROOT${*: -1}" 2>/dev/null; exit 0 ;;
+      pm) exit 0 ;;
+      *) echo "fake adb: unsupported shell verb '${1:-}'" >&2; exit 64 ;;
+    esac
+    ;;
+
+  push)
+    SRC="${2:?}"; DST="${3:?}"
+    mkdir -p "$ROOT$(dirname "$DST")"
+    cp "$SRC" "$ROOT$DST" || exit 1
+    ;;
+
+  install) exit 0 ;;
+
+  *) echo "fake adb: unsupported verb '${1:-}'" >&2; exit 64 ;;
+esac
