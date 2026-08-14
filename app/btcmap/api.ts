@@ -166,6 +166,9 @@ export type BtcMapDelta = {
   removedIds: number[]
   // Cursor to hand back on the next sync.
   syncedUpTo: string
+  // Set when paging cannot get past a timestamp without losing rows, so the
+  // only lossless way forward is to throw the cache away and start over.
+  needsReseed: boolean
 }
 
 /**
@@ -202,16 +205,27 @@ export const fetchPlacesDelta = async (since: string): Promise<BtcMapDelta> => {
 
     if (!data.length) break
 
+    const firstUpdatedAt = data[0]?.updated_at
+    const lastUpdatedAt = data[data.length - 1]?.updated_at
+
+    // A full page that begins and ends on the same timestamp may have more rows
+    // at that timestamp behind it, and no cursor can reach them.
+    if (
+      data.length >= BTCMAP_PAGE_SIZE &&
+      firstUpdatedAt &&
+      firstUpdatedAt === lastUpdatedAt
+    ) {
+      return { upserted: [], removedIds: [], syncedUpTo: since, needsReseed: true }
+    }
+
     for (const place of data) {
       changed.set(place.id, place)
     }
 
-    const lastUpdatedAt = data[data.length - 1]?.updated_at
     if (lastUpdatedAt) newestSeen = lastUpdatedAt
     const nextCursor = lastUpdatedAt ? rewind(lastUpdatedAt) : cursor
 
-    // A short page means we caught up. A cursor that refuses to move means a
-    // whole page shares one timestamp, and walking further would loop forever.
+    // A short page means we caught up.
     if (data.length < BTCMAP_PAGE_SIZE || nextCursor === cursor) break
     cursor = nextCursor
   }
@@ -234,7 +248,7 @@ export const fetchPlacesDelta = async (since: string): Promise<BtcMapDelta> => {
   const syncedUpTo =
     new Date(rewound).getTime() > new Date(since).getTime() ? rewound : since
 
-  return { upserted, removedIds, syncedUpTo }
+  return { upserted, removedIds, syncedUpTo, needsReseed: false }
 }
 
 export const fetchPlaceDetails = async (id: number): Promise<BtcMapPlaceDetails> => {

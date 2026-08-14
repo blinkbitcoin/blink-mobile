@@ -52,6 +52,7 @@ beforeEach(() => {
     upserted: [],
     removedIds: [],
     syncedUpTo: "2026-08-02T00:00:00.000Z",
+    needsReseed: false,
   })
 })
 
@@ -86,7 +87,8 @@ describe("useBtcMapPlaces", () => {
       upserted: [place(3)],
       removedIds: [1],
       syncedUpTo: "2026-08-02T00:00:00.000Z",
-      })
+      needsReseed: false,
+    })
 
     const { result } = renderHook(() => useBtcMapPlaces())
 
@@ -237,5 +239,29 @@ describe("useBtcMapPlaces kill switch", () => {
 
     await waitFor(() => expect(result.current.isLoading).toBe(false))
     expect(result.current.hasError).toBe(false)
+  })
+})
+
+describe("useBtcMapPlaces lossless sync", () => {
+  it("throws the cache away when the delta cannot page losslessly", async () => {
+    mockedRead.mockResolvedValue(cached(BTCMAP_SYNC_INTERVAL_MS + 1000))
+    mockedDelta.mockResolvedValue({
+      upserted: [],
+      removedIds: [],
+      syncedUpTo: "2026-08-01T00:00:00.000Z",
+      needsReseed: true,
+    })
+    mockedSnapshot.mockResolvedValue({
+      places: [place(7), place(8)],
+      syncedUpTo: "2026-08-05T00:00:00.000Z",
+    })
+
+    const { result } = renderHook(() => useBtcMapPlaces())
+
+    await waitFor(() =>
+      expect(result.current.places.map((entry) => entry.id)).toEqual([7, 8]),
+    )
+    expect(mockedSnapshot).toHaveBeenCalled()
+    expect(mockedWrite).toHaveBeenCalled()
   })
 })

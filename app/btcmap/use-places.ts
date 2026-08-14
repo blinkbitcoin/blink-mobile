@@ -19,6 +19,16 @@ const applyDelta = (
 }
 
 /**
+ * A clock that was ahead when the cache was written leaves a negative age;
+ * without the lower bound the sync would never run again.
+ */
+const isStale = (snapshot: BtcMapSnapshot | null): boolean => {
+  if (!snapshot) return true
+  const age = Date.now() - new Date(snapshot.lastSyncedAt).getTime()
+  return age >= BTCMAP_SYNC_INTERVAL_MS || age < 0
+}
+
+/**
  * The BTC Map place list, held offline.
  *
  * The cached copy is shown the moment it is read, then refreshed in the
@@ -40,6 +50,7 @@ export const useBtcMapPlaces = () => {
   const { btcMapPlacesEnabled } = useRemoteConfig()
 
   const isMountedRef = useRef(true)
+
   useEffect(() => {
     isMountedRef.current = true
     return () => {
@@ -53,6 +64,29 @@ export const useBtcMapPlaces = () => {
       setLoading(false)
       setHasError(false)
       return
+    }
+
+    const seed = async (): Promise<BtcMapSnapshot> => {
+      const { places: seeded, syncedUpTo } = await fetchPlacesSnapshot()
+      // Refuse to cache an empty seed — see the read path below.
+      if (!seeded.length) throw new Error("BTC Map returned no places")
+      if (isMountedRef.current) setPlaces(seeded)
+
+      const fresh = {
+        places: seeded,
+        syncedUpTo,
+        lastSyncedAt: new Date().toISOString(),
+      }
+
+      try {
+        await writeSnapshot(fresh)
+      } catch (error) {
+        // Already drawn: a full disk should cost the next launch a re-download,
+        // not this one its map.
+        recordAppError(toError(error), { dedupKey: "btcmap-cache-write" })
+      }
+
+      return fresh
     }
 
     const load = async () => {
@@ -78,12 +112,16 @@ export const useBtcMapPlaces = () => {
       }
 
       try {
-        if (snapshot) {
-          // A clock that was ahead when the cache was written leaves a negative
-          // age; without the lower bound the sync would never run again.
-          const age = Date.now() - new Date(snapshot.lastSyncedAt).getTime()
-          if (age >= BTCMAP_SYNC_INTERVAL_MS || age < 0) {
-            const delta = await fetchPlacesDelta(snapshot.syncedUpTo)
+        if (!snapshot) {
+          snapshot = await seed()
+        } else if (isStale(snapshot)) {
+          const delta = await fetchPlacesDelta(snapshot.syncedUpTo)
+
+          if (delta.needsReseed) {
+            // Paging cannot get past this timestamp without stranding rows, so
+            // the cache is thrown away rather than left quietly incomplete.
+            snapshot = await seed()
+          } else {
             const markers = {
               syncedUpTo: delta.syncedUpTo,
               lastSyncedAt: new Date().toISOString(),
@@ -101,24 +139,11 @@ export const useBtcMapPlaces = () => {
               }
               // Draw before persisting: a full disk should cost the next launch
               // a re-download, not this one its map.
-              if (!isMountedRef.current) return
-              setPlaces(merged.places)
+              if (isMountedRef.current) setPlaces(merged.places)
               snapshot = merged
               await writeSnapshot(merged)
             }
           }
-        } else {
-          const { places: seeded, syncedUpTo } = await fetchPlacesSnapshot()
-          // Refuse to cache an empty seed — see the read path above.
-          if (!seeded.length) throw new Error("BTC Map returned no places")
-          if (!isMountedRef.current) return
-          setPlaces(seeded)
-          snapshot = {
-            places: seeded,
-            syncedUpTo,
-            lastSyncedAt: new Date().toISOString(),
-          }
-          await writeSnapshot(snapshot)
         }
       } catch (error) {
         recordAppError(toError(error), { dedupKey: "btcmap-places-sync" })

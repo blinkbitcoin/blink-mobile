@@ -131,7 +131,10 @@ describe("fetchPlacesDelta", () => {
     expect(paramsOf(1).updated_since).toBe("2026-08-02T00:00:00.499Z")
   })
 
-  it("stops instead of looping when a whole page shares one timestamp", async () => {
+  it("asks for a reseed rather than stranding a timestamp group bigger than a page", async () => {
+    // Every rewound request returns the same first PAGE_SIZE rows, and there is
+    // no id cursor to reach the rest — so the only lossless move is to start
+    // over from the CDN snapshot.
     mockedGet.mockResolvedValue(
       page(
         Array.from({ length: BTCMAP_PAGE_SIZE }, (_, index) =>
@@ -140,13 +143,28 @@ describe("fetchPlacesDelta", () => {
       ),
     )
 
-    const delta = await fetchPlacesDelta("2026-08-01T00:00:00.000Z")
+    const delta = await fetchPlacesDelta("2026-07-01T00:00:00.000Z")
 
-    // One request to see the page, one more to notice the cursor did not move.
-    expect(mockedGet).toHaveBeenCalledTimes(2)
-    // The millisecond rewind must never take the stored cursor backwards: a
-    // cursor that regresses replays the same page on every launch forever.
-    expect(delta.syncedUpTo).toBe("2026-08-01T00:00:00.000Z")
+    expect(delta.needsReseed).toBe(true)
+    // No cursor is advanced past a group we could not finish reading.
+    expect(delta.syncedUpTo).toBe("2026-07-01T00:00:00.000Z")
+    expect(delta.upserted).toEqual([])
+    expect(mockedGet).toHaveBeenCalledTimes(1)
+  })
+
+  it("pages normally when a full page merely ends inside a tie group", async () => {
+    const rows = Array.from({ length: BTCMAP_PAGE_SIZE }, (_, index) =>
+      wirePlace(
+        index + 1,
+        `2026-08-01T00:00:00.${String(index % 900).padStart(3, "0")}Z`,
+      ),
+    )
+    mockedGet.mockResolvedValueOnce(page(rows)).mockResolvedValueOnce(page([]))
+
+    const delta = await fetchPlacesDelta("2026-07-01T00:00:00.000Z")
+
+    expect(delta.needsReseed).toBe(false)
+    expect(delta.upserted).toHaveLength(BTCMAP_PAGE_SIZE)
   })
 
   it("never hands back a cursor earlier than the one it was given", async () => {
