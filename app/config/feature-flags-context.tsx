@@ -9,6 +9,7 @@ import { logError } from "@app/utils/log-error"
 import {
   getRemoteConfigNumericObject,
   getRemoteConfigObject,
+  getRemoteConfigPositiveNumber,
   getRemoteConfigStringList,
   serializeRemoteConfigDefault,
 } from "@app/utils/remote-config"
@@ -25,8 +26,14 @@ const AppLockGracePeriodSecondsKey = "appLockGracePeriodSeconds"
 const CardTermsAndConditionsUrlKey = "cardTermsAndConditionsUrl"
 const CardPrivacyPolicyUrlKey = "cardPrivacyPolicyUrl"
 const CardCardholderAgreementUrlKey = "cardCardholderAgreementUrl"
+const CardESignConsentUrlKey = "cardESignConsentUrl"
+const CardIssuerPrivacyPolicyUrlKey = "cardIssuerPrivacyPolicyUrl"
 const CardSubscriptionPriceUsdKey = "cardSubscriptionPriceUsd"
-const CardProcessingWaitTimeHoursKey = "cardProcessingWaitTimeHours"
+const CardReplacementFeeUsdKey = "cardReplacementFeeUsd"
+const CardUsdTransactionFeePercentKey = "cardUsdTransactionFeePercent"
+const CardForeignTransactionFeePercentKey = "cardForeignTransactionFeePercent"
+const CardMaxOverdraftUsdKey = "cardMaxOverdraftUsd"
+const CardLateRepaymentFeeUsdKey = "cardLateRepaymentFeeUsd"
 const ReplaceCardDeliveryConfigKey = "replaceCardDeliveryConfig"
 const SparkCompatibleWalletsUrlKey = "sparkCompatibleWalletsUrl"
 const BackupNudgeBannerThresholdKey = "backupNudgeBannerThreshold"
@@ -46,7 +53,10 @@ const SelfCustodialTransferBlockedCountriesKey = "selfCustodialTransferBlockedCo
 const CustodialTransferBlockedCountriesKey = "custodialTransferBlockedCountries"
 const CustodialCreationBlockedCountriesKey = "custodialCreationBlockedCountries"
 const SelfCustodialCreationBlockedCountriesKey = "selfCustodialCreationBlockedCountries"
+const OffboardOnlyCountriesKey = "offboardOnlyCountries"
 const SelfCustodialDepositClaimLeewayVbyteKey = "selfCustodialDepositClaimLeewayVbyte"
+const MigrationReceiveDelayedNoticeMsKey = "migrationReceiveDelayedNoticeMs"
+const MigrationDelayedRedirectEnabledKey = "migrationDelayedRedirectEnabled"
 const FeeRatesConfigKey = "feeRatesConfig"
 
 type DeliveryOptionConfig = {
@@ -86,8 +96,14 @@ type RemoteConfig = {
   [CardTermsAndConditionsUrlKey]: string
   [CardPrivacyPolicyUrlKey]: string
   [CardCardholderAgreementUrlKey]: string
+  [CardESignConsentUrlKey]: string
+  [CardIssuerPrivacyPolicyUrlKey]: string
   [CardSubscriptionPriceUsdKey]: number
-  [CardProcessingWaitTimeHoursKey]: number
+  [CardReplacementFeeUsdKey]: number
+  [CardUsdTransactionFeePercentKey]: number
+  [CardForeignTransactionFeePercentKey]: number
+  [CardMaxOverdraftUsdKey]: number
+  [CardLateRepaymentFeeUsdKey]: number
   [ReplaceCardDeliveryConfigKey]: ReplaceCardDeliveryConfig
   [SparkCompatibleWalletsUrlKey]: string
   [BackupNudgeBannerThresholdKey]: number
@@ -106,7 +122,10 @@ type RemoteConfig = {
   [CustodialTransferBlockedCountriesKey]: string[]
   [CustodialCreationBlockedCountriesKey]: string[]
   [SelfCustodialCreationBlockedCountriesKey]: string[]
+  [OffboardOnlyCountriesKey]: string[]
   [SelfCustodialDepositClaimLeewayVbyteKey]: number
+  [MigrationReceiveDelayedNoticeMsKey]: number
+  [MigrationDelayedRedirectEnabledKey]: boolean
   [FeeRatesConfigKey]: FeeRatesConfig
 }
 
@@ -159,6 +178,14 @@ const creationBlockedDefault = [
   "CU", "IR", "KP", "SY", "RU", "BY",
 ]
 
+/**
+ * Offboard-only regions of the custodial sunset: accounts registered there cannot be
+ * offered any account, so the home shows the withdraw-your-funds bulletin instead of the
+ * migration nudges. Ops empties the remote list after the withdrawal deadline, which is
+ * what retires the bulletin — the client never compares dates.
+ */
+const offboardOnlyDefault = ["AE", "NP", "DZ", "CN", "MM"]
+
 export const defaultRemoteConfig: RemoteConfig = {
   deviceAccountEnabledRestAuth: false,
   balanceLimitToTriggerUpgradeModal: 2100,
@@ -171,9 +198,16 @@ export const defaultRemoteConfig: RemoteConfig = {
   appLockGracePeriodSeconds: 60,
   cardTermsAndConditionsUrl: "https://www.blink.sv/en/terms-conditions",
   cardPrivacyPolicyUrl: "https://www.blink.sv/en/privacy-policy",
-  cardCardholderAgreementUrl: "https://www.blink.sv",
+  cardCardholderAgreementUrl: "https://www.blink.sv/en/blink-card-cardholder-agreement",
+  cardESignConsentUrl:
+    "https://legal.raincards.xyz/legal/electronic-communications-notice",
+  cardIssuerPrivacyPolicyUrl: "https://www.third-national.com/privacypolicy",
   cardSubscriptionPriceUsd: 1000,
-  cardProcessingWaitTimeHours: 24,
+  cardReplacementFeeUsd: 10,
+  cardUsdTransactionFeePercent: 1.21,
+  cardForeignTransactionFeePercent: 2.21,
+  cardMaxOverdraftUsd: 200,
+  cardLateRepaymentFeeUsd: 25,
   replaceCardDeliveryConfig: defaultReplaceCardDeliveryConfig,
   sparkCompatibleWalletsUrl: "https://docs.spark.money/wallets/overview",
   backupNudgeBannerThreshold: 2100,
@@ -192,7 +226,16 @@ export const defaultRemoteConfig: RemoteConfig = {
   custodialTransferBlockedCountries: transferBlockedDefault,
   custodialCreationBlockedCountries: creationBlockedDefault,
   selfCustodialCreationBlockedCountries: creationBlockedDefault,
+  offboardOnlyCountries: offboardOnlyDefault,
   selfCustodialDepositClaimLeewayVbyte: 1,
+  /** How long the migration's receive gate waits before telling the user the incoming
+   *  payment is taking longer than usual and offering support. Product call on #4102:
+   *  a minute after the confirmed send is more than enough for a healthy receive. */
+  migrationReceiveDelayedNoticeMs: 60 * 1000,
+  /** Escape hatch should requirements change: when on, the migration's receive gate
+   *  releases the redirect once the notice window elapses instead of holding the swap
+   *  until the receive confirms. Off by default — waiting is the product decision. */
+  migrationDelayedRedirectEnabled: false,
   feeRatesConfig: defaultFeeRatesConfig,
 }
 
@@ -228,6 +271,9 @@ remoteConfigInstance().setDefaults({
   ),
   selfCustodialCreationBlockedCountries: serializeRemoteConfigDefault(
     defaultRemoteConfig.selfCustodialCreationBlockedCountries,
+  ),
+  offboardOnlyCountries: serializeRemoteConfigDefault(
+    defaultRemoteConfig.offboardOnlyCountries,
   ),
   feeRatesConfig: serializeRemoteConfigDefault(defaultFeeRatesConfig),
 })
@@ -305,12 +351,36 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           .getValue(CardCardholderAgreementUrlKey)
           .asString()
 
+        const cardESignConsentUrl = remoteConfigInstance()
+          .getValue(CardESignConsentUrlKey)
+          .asString()
+
+        const cardIssuerPrivacyPolicyUrl = remoteConfigInstance()
+          .getValue(CardIssuerPrivacyPolicyUrlKey)
+          .asString()
+
         const cardSubscriptionPriceUsd = remoteConfigInstance()
           .getValue(CardSubscriptionPriceUsdKey)
           .asNumber()
 
-        const cardProcessingWaitTimeHours = remoteConfigInstance()
-          .getValue(CardProcessingWaitTimeHoursKey)
+        const cardReplacementFeeUsd = remoteConfigInstance()
+          .getValue(CardReplacementFeeUsdKey)
+          .asNumber()
+
+        const cardUsdTransactionFeePercent = remoteConfigInstance()
+          .getValue(CardUsdTransactionFeePercentKey)
+          .asNumber()
+
+        const cardForeignTransactionFeePercent = remoteConfigInstance()
+          .getValue(CardForeignTransactionFeePercentKey)
+          .asNumber()
+
+        const cardMaxOverdraftUsd = remoteConfigInstance()
+          .getValue(CardMaxOverdraftUsdKey)
+          .asNumber()
+
+        const cardLateRepaymentFeeUsd = remoteConfigInstance()
+          .getValue(CardLateRepaymentFeeUsdKey)
           .asNumber()
 
         const sparkCompatibleWalletsUrl = remoteConfigInstance()
@@ -398,9 +468,23 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           defaultRemoteConfig.selfCustodialCreationBlockedCountries,
         )
 
+        const offboardOnlyCountries = getRemoteConfigStringList(
+          OffboardOnlyCountriesKey,
+          defaultRemoteConfig.offboardOnlyCountries,
+        )
+
         const selfCustodialDepositClaimLeewayVbyte = remoteConfigInstance()
           .getValue(SelfCustodialDepositClaimLeewayVbyteKey)
           .asNumber()
+
+        const migrationReceiveDelayedNoticeMs = getRemoteConfigPositiveNumber(
+          MigrationReceiveDelayedNoticeMsKey,
+          defaultRemoteConfig.migrationReceiveDelayedNoticeMs,
+        )
+
+        const migrationDelayedRedirectEnabled = remoteConfigInstance()
+          .getValue(MigrationDelayedRedirectEnabledKey)
+          .asBoolean()
 
         const feeRatesConfig = getRemoteConfigNumericObject(
           FeeRatesConfigKey,
@@ -420,8 +504,14 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           cardTermsAndConditionsUrl,
           cardPrivacyPolicyUrl,
           cardCardholderAgreementUrl,
+          cardESignConsentUrl,
+          cardIssuerPrivacyPolicyUrl,
           cardSubscriptionPriceUsd,
-          cardProcessingWaitTimeHours,
+          cardReplacementFeeUsd,
+          cardUsdTransactionFeePercent,
+          cardForeignTransactionFeePercent,
+          cardMaxOverdraftUsd,
+          cardLateRepaymentFeeUsd,
           replaceCardDeliveryConfig,
           sparkCompatibleWalletsUrl,
           backupNudgeBannerThreshold,
@@ -440,7 +530,10 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           custodialTransferBlockedCountries,
           custodialCreationBlockedCountries,
           selfCustodialCreationBlockedCountries,
+          offboardOnlyCountries,
           selfCustodialDepositClaimLeewayVbyte,
+          migrationReceiveDelayedNoticeMs,
+          migrationDelayedRedirectEnabled,
           feeRatesConfig,
         })
       } catch (err) {
@@ -448,6 +541,7 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           scope: "remote-config",
           error: err,
           context: { stage: "fetchAndActivate" },
+          dedupKey: "remote-config-fetch",
         })
       } finally {
         setRemoteConfigReady(true)

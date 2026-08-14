@@ -1,3 +1,4 @@
+import { bech32 } from "bech32"
 import { LNURLResponse, LNURLWithdrawParams, getParams } from "js-lnurl"
 import { requestPayServiceParams, LnUrlPayServiceResponse, Satoshis } from "lnurl-pay"
 
@@ -5,7 +6,10 @@ import {
   createLnurlPaymentDestination,
   resolveLnurlDestination,
 } from "@app/screens/send-bitcoin-screen/payment-destination"
-import { DestinationDirection } from "@app/screens/send-bitcoin-screen/payment-destination/index.types"
+import {
+  DestinationDirection,
+  InvalidDestinationReason,
+} from "@app/screens/send-bitcoin-screen/payment-destination/index.types"
 import { createLnurlPaymentDetails } from "@app/screens/send-bitcoin-screen/payment-details"
 import { ZeroBtcMoneyAmount } from "@app/types/amounts"
 import { PaymentType } from "@blinkbitcoin/blink-client"
@@ -40,7 +44,7 @@ const throwError = () => {
 const manualMockLnUrlPayServiceResponse = (
   identifier: string,
 ): LnUrlPayServiceResponse => ({
-  callback: "mocked_callback",
+  callback: "https://example.com/callback",
   fixed: true,
   min: 0 as Satoshis,
   max: 2000 as Satoshis,
@@ -68,7 +72,7 @@ const manualMockLNURLWithdrawParams = (): LNURLWithdrawParams => ({
   // Example structure. Adjust according to your actual LNURLWithdrawParams type
   tag: "withdrawRequest",
   k1: "some_random_string",
-  callback: "http://example.com/callback",
+  callback: "https://example.com/callback",
   domain: "example.com",
   maxWithdrawable: 2000,
   minWithdrawable: 0,
@@ -404,5 +408,202 @@ describe("create lnurl destination", () => {
       destinationSpecifiedMemo: lnurlPaymentDestinationParams.lnurlParams.description,
       isMerchant: false,
     })
+  })
+})
+
+describe("lnurl https enforcement", () => {
+  const encodeLnurl = (url: string): string =>
+    bech32.encode("lnurl", bech32.toWords(Buffer.from(url, "utf8")), 20000)
+
+  const baseParams = {
+    lnurlDomains: ["ourdomain.com"],
+    accountDefaultWalletQuery: jest.fn(),
+    myWalletIds: ["testwalletid"],
+  }
+
+  beforeEach(() => {
+    mockRequestPayServiceParams.mockClear()
+    mockGetParams.mockClear()
+  })
+
+  it("rejects a bare bech32 lnurl that decodes to an http URL before any fetch", async () => {
+    const destination = await resolveLnurlDestination({
+      parsedLnurlDestination: {
+        paymentType: PaymentType.Lnurl,
+        valid: true,
+        lnurl: encodeLnurl("http://example.com/lnurl"),
+        isMerchant: false,
+      },
+      ...baseParams,
+    })
+
+    expect(destination).toEqual(
+      expect.objectContaining({
+        valid: false,
+        invalidReason: InvalidDestinationReason.LnurlError,
+      }),
+    )
+    expect(mockGetParams).not.toHaveBeenCalled()
+    expect(mockRequestPayServiceParams).not.toHaveBeenCalled()
+  })
+
+  it("accepts a bare bech32 lnurl that decodes to an https URL", async () => {
+    const lnurl = encodeLnurl("https://example.com/lnurl")
+    const lnurlPayParams = manualMockLnUrlPayServiceResponse(lnurl)
+    mockRequestPayServiceParams.mockResolvedValue(lnurlPayParams)
+    mockGetParams.mockResolvedValue(manualMockLNURLResponse())
+
+    const destination = await resolveLnurlDestination({
+      parsedLnurlDestination: {
+        paymentType: PaymentType.Lnurl,
+        valid: true,
+        lnurl,
+        isMerchant: false,
+      },
+      ...baseParams,
+    })
+
+    expect(mockGetParams).toHaveBeenCalledWith(lnurl)
+    expect(destination).toEqual(
+      expect.objectContaining({
+        valid: true,
+        destinationDirection: DestinationDirection.Send,
+      }),
+    )
+  })
+
+  it("rejects a withdraw request whose callback is not https", async () => {
+    mockGetParams.mockResolvedValue({
+      ...manualMockLNURLWithdrawParams(),
+      callback: "http://example.com/callback",
+    })
+
+    const destination = await resolveLnurlDestination({
+      parsedLnurlDestination: {
+        paymentType: PaymentType.Lnurl,
+        valid: true,
+        lnurl: "lnurlrandomstring",
+        isMerchant: false,
+      },
+      ...baseParams,
+    })
+
+    expect(destination).toEqual(
+      expect.objectContaining({
+        valid: false,
+        invalidReason: InvalidDestinationReason.LnurlError,
+      }),
+    )
+  })
+
+  it("rejects a pay request whose callback is not https", async () => {
+    mockGetParams.mockResolvedValue(manualMockLNURLResponse())
+    mockRequestPayServiceParams.mockResolvedValue({
+      ...manualMockLnUrlPayServiceResponse("bob@external.com"),
+      callback: "http://example.com/callback",
+    })
+
+    const destination = await resolveLnurlDestination({
+      parsedLnurlDestination: {
+        paymentType: PaymentType.Lnurl,
+        valid: true,
+        lnurl: "bob@external.com",
+        isMerchant: false,
+      },
+      ...baseParams,
+    })
+
+    expect(destination).toEqual(
+      expect.objectContaining({
+        valid: false,
+        invalidReason: InvalidDestinationReason.LnurlError,
+      }),
+    )
+  })
+
+  it("rejects a lnurl1 string it cannot decode instead of passing it through unchecked", async () => {
+    const destination = await resolveLnurlDestination({
+      parsedLnurlDestination: {
+        paymentType: PaymentType.Lnurl,
+        valid: true,
+        lnurl: "lnurl1qqqqqq",
+        isMerchant: false,
+      },
+      ...baseParams,
+    })
+
+    expect(destination).toEqual(
+      expect.objectContaining({
+        valid: false,
+        invalidReason: InvalidDestinationReason.LnurlError,
+      }),
+    )
+    expect(mockGetParams).not.toHaveBeenCalled()
+    expect(mockRequestPayServiceParams).not.toHaveBeenCalled()
+  })
+
+  it("rejects a LUD-17 lnurlw URI whose payload contains .onion (cleartext http downgrade)", async () => {
+    const destination = await resolveLnurlDestination({
+      parsedLnurlDestination: {
+        paymentType: PaymentType.Lnurl,
+        valid: true,
+        lnurl: "lnurlw://attacker.com/w/.onion/x",
+        isMerchant: false,
+      },
+      ...baseParams,
+    })
+
+    expect(destination).toEqual(
+      expect.objectContaining({
+        valid: false,
+        invalidReason: InvalidDestinationReason.LnurlError,
+      }),
+    )
+    expect(mockGetParams).not.toHaveBeenCalled()
+    expect(mockRequestPayServiceParams).not.toHaveBeenCalled()
+  })
+
+  it("rejects a LUD-17 lnurlp URI whose .onion is followed by a word character", async () => {
+    const destination = await resolveLnurlDestination({
+      parsedLnurlDestination: {
+        paymentType: PaymentType.Lnurl,
+        valid: true,
+        lnurl: "lnurlp://attacker.com/x.onionz",
+        isMerchant: false,
+      },
+      ...baseParams,
+    })
+
+    expect(destination).toEqual(
+      expect.objectContaining({
+        valid: false,
+        invalidReason: InvalidDestinationReason.LnurlError,
+      }),
+    )
+    expect(mockGetParams).not.toHaveBeenCalled()
+    expect(mockRequestPayServiceParams).not.toHaveBeenCalled()
+  })
+
+  it("accepts a LUD-17 lnurlw URI over a clearnet host (derived URL is https)", async () => {
+    const lnurl = "lnurlw://example.com/withdraw"
+    mockGetParams.mockResolvedValue(manualMockLNURLWithdrawParams())
+
+    const destination = await resolveLnurlDestination({
+      parsedLnurlDestination: {
+        paymentType: PaymentType.Lnurl,
+        valid: true,
+        lnurl,
+        isMerchant: false,
+      },
+      ...baseParams,
+    })
+
+    expect(mockGetParams).toHaveBeenCalledWith(lnurl)
+    expect(destination).toEqual(
+      expect.objectContaining({
+        valid: true,
+        destinationDirection: DestinationDirection.Receive,
+      }),
+    )
   })
 })

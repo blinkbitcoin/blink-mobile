@@ -5,18 +5,21 @@ import { toastShow } from "@app/utils/toast"
 
 import { useMigrateNowPrompt } from "./use-migrate-now-prompt"
 import { useMigrationReminderBulletin } from "./use-migration-reminder-bulletin"
+import { useOffboardOnlyBulletin } from "./use-offboard-only-bulletin"
 import { useWindDownReceiveBlocked } from "./use-wind-down-receive-blocked"
 
 /**
  * The wind-down nudges the custodial home renders, bundled so the home reads them from one
- * call: the pre-cutoff reminder bulletin, the receive-disabled migrate-now prompt, and the
- * receive-blocked state that greys the home Receive action. The home stays decoupled from
- * the individual wind-down hooks by depending on this single entry point.
+ * call: the offboard-only withdraw bulletin, the pre-cutoff reminder bulletin, the
+ * receive-disabled migrate-now prompt, and the receive-blocked state that greys the home
+ * Receive action. The home stays decoupled from the individual wind-down hooks by
+ * depending on this single entry point.
  */
 export const useWindDownHomeNudges = () => {
   const { LL } = useI18nContext()
   const migrateNowPrompt = useMigrateNowPrompt()
   const reminderBulletin = useMigrationReminderBulletin()
+  const offboardBulletin = useOffboardOnlyBulletin()
   const isReceiveBlocked = useWindDownReceiveBlocked()
 
   /** Both blocked phases grey Receive. A tap reopens the migrate-now nudge when that nudge
@@ -38,7 +41,14 @@ export const useWindDownHomeNudges = () => {
 
   return {
     migrateNowPrompt,
-    reminderBulletin,
+    offboardBulletin,
+    /** The offboard bulletin replaces the migration reminder rather than stacking with
+     *  it: offboard-only regions cannot open any account, so the reminder's Migrate CTA
+     *  is a dead end, and two "Important" cards would give contradictory instructions. */
+    reminderBulletin: {
+      ...reminderBulletin,
+      isVisible: reminderBulletin.isVisible && !offboardBulletin.isVisible,
+    },
     receiveBlocked: {
       isBlocked: isReceiveBlocked,
       onDisabledPress: onReceiveBlockedPress,

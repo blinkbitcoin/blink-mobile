@@ -86,10 +86,9 @@ export const createCache = () =>
       Query: {
         fields: {
           // local only fields
+          // Legacy: the setting lives in PersistentState now, this is read once on
+          // upgrade so users who set it on an older build keep it.
           hideBalance: {
-            read: (value) => value ?? false,
-          },
-          hiddenBalanceToolTip: {
             read: (value) => value ?? false,
           },
           beta: {
@@ -100,9 +99,6 @@ export const createCache = () =>
           },
           region: {
             read: (value) => value ?? null,
-          },
-          feedbackModalShown: {
-            read: (value) => value ?? false,
           },
           introducingCirclesModalShown: {
             read: (value) => value ?? false,

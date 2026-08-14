@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- Debug only: permit cleartext so Metro and local backends work
+         on emulators (10.0.2.2, localhost) and physical devices (LAN IP). -->
+    <base-config cleartextTrafficPermitted="true" />
+</network-security-config>

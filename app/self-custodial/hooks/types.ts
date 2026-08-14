@@ -5,6 +5,7 @@ import {
   PaymentRequestStateType,
 } from "@app/screens/receive-bitcoin-screen/payment/index.types"
 import { MoneyAmount, WalletOrDisplayCurrency } from "@app/types/amounts"
+import { DepositFeesInformation } from "@app/utils/deposit-fees"
 
 type UriParams = { uppercase?: boolean; prefix?: boolean }
 
@@ -44,15 +45,7 @@ export type SelfCustodialPaymentRequestState = {
   btcWalletId?: string
   usdWalletId?: string
   lnAddressHostname: string
-  feesInformation:
-    | {
-        deposit: {
-          minBankFee: string
-          minBankFeeThreshold: string
-          ratio: string
-        }
-      }
-    | undefined
+  feesInformation: { deposit: DepositFeesInformation } | undefined
   info?: { data?: InvoiceData }
   onchainAddress?: string
   getOnchainFullUriFn?: (params: UriParams) => string

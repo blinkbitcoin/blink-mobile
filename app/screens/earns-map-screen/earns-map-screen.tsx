@@ -10,6 +10,7 @@ import { makeStyles, useTheme } from "@rn-vui/themed"
 
 import { BackendFeatureGate } from "@app/components/backend-feature-gate"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
+import { useIsSelfCustodialAccount } from "@app/hooks/use-is-self-custodial-account"
 import { MountainHeader } from "../../components/mountain-header"
 import { Screen } from "../../components/screen"
 import { RootStackParamList } from "../../navigation/stack-param-lists"
@@ -94,6 +95,12 @@ const EarnMapScreenContent: React.FC = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList, "Earn">>()
   const { LL } = useI18nContext()
+  const isSelfCustodial = useIsSelfCustodialAccount()
+  /**
+   * Rewards are paid out of the custodial backend, so self-custodial accounts get
+   * the lessons only.
+   */
+  const rewardsAvailable = !isSelfCustodial
   const quizQuestionsContent = getQuizQuestionsContent({ LL })
   const sections = Object.keys(earnSections) as EarnSectionType[]
 
@@ -210,7 +217,7 @@ const EarnMapScreenContent: React.FC = () => {
       }
       navigation.navigate("earnsSection", {
         section,
-        isAvailable: true,
+        isAvailable: rewardsAvailable,
       })
     }
 
@@ -269,7 +276,7 @@ const EarnMapScreenContent: React.FC = () => {
 
   if (loading) {
     return (
-      <Screen>
+      <Screen edges={["left", "right"]}>
         <View style={styles.loadingView}>
           <ActivityIndicator size="large" color={colors._blue} />
         </View>
@@ -304,7 +311,7 @@ const EarnMapScreenContent: React.FC = () => {
         <MountainHeader
           amount={earnedSats.toString()}
           color={backgroundColor}
-          isAvailable
+          isAvailable={rewardsAvailable}
         />
         <View style={styles.mainView}>
           <Finish currSection={currSection} length={sectionsData.length} />
@@ -316,7 +323,9 @@ const EarnMapScreenContent: React.FC = () => {
               </View>
               <View style={styles.bottomSectionInner}>
                 <Text style={styles.bottomSectionText}>
-                  {LL.EarnScreen.motivatingBadger()}
+                  {rewardsAvailable
+                    ? LL.EarnScreen.motivatingBadger()
+                    : LL.EarnScreen.motivatingBadgerNoRewards()}
                 </Text>
               </View>
             </View>
@@ -411,6 +420,14 @@ const useStyles = makeStyles(({ colors }) => ({
 
 export const EarnMapScreen: React.FC = () => {
   const { LL } = useI18nContext()
+  const isSelfCustodial = useIsSelfCustodialAccount()
+
+  /**
+   * The lessons and quizzes are bundled with the app, so a self-custodial account
+   * can work through them without a custodial backend behind it.
+   */
+  if (isSelfCustodial) return <EarnMapScreenContent />
+
   return (
     <BackendFeatureGate
       featureName={LL.BackendFeatureGate.featureEarn()}

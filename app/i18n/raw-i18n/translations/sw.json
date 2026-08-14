@@ -1,4 +1,38 @@
 {
+  "ApiScreen": {
+    "keysGroupTitle": "Funguo za API",
+    "noKeys": "Bado hakuna funguo za API",
+    "createKey": "Unda ufunguo wa API",
+    "createTitle": "Ufunguo mpya wa API",
+    "keyCreatedTitle": "Ufunguo wa API umeundwa",
+    "keyName": "Jina la ufunguo",
+    "keyNamePlaceholder": "k.m. BTCPay Server",
+    "scopeRead": "Soma",
+    "scopeReadDescription": "Angalia salio na historia ya miamala",
+    "scopeReceive": "Pokea",
+    "scopeReceiveDescription": "Unda ankara na upokee malipo",
+    "scopeWrite": "Andika",
+    "writeScopeDashboardOnly": "Funguo zinazoweza kutuma malipo zinaweza kuundwa tu kwenye dashboard.blink.sv",
+    "expiry": "Inaisha",
+    "expiry30Days": "Siku 30",
+    "expiry90Days": "Siku 90",
+    "expiryNever": "Kamwe",
+    "expiresOn": "Inaisha tarehe {date: string}",
+    "neverExpires": "Haiishi kamwe",
+    "revoked": "Imebatilishwa",
+    "expired": "Iliisha tarehe {date: string}",
+    "expiredNoDate": "Imeisha",
+    "secretWarning": "Hii ndiyo mara pekee ufunguo unaonyeshwa. Nakili au shiriki sasa na uhifadhi kwa usalama.",
+    "secretCopied": "Ufunguo wa API umenakiliwa. Ubao wa kunakili utafutwa baada ya dakika 1",
+    "revokeTitle": "Batilisha ufunguo wa API?",
+    "revokeBody": "\"{name: string}\" utaacha kufanya kazi mara moja. Kitendo hiki hakiwezi kutenduliwa.",
+    "revoke": "Batilisha",
+    "revokeSuccess": "Ufunguo wa API umebatilishwa",
+    "createError": "Imeshindwa kuunda ufunguo wa API. Tafadhali jaribu tena.",
+    "revokeError": "Imeshindwa kubatilisha ufunguo wa API. Tafadhali jaribu tena.",
+    "loadError": "Imeshindwa kupakia funguo zako za API. Tafadhali jaribu tena baadaye.",
+    "done": "Imekamilika"
+  },
   "GaloyAddressScreen": {
     "title": "Pokea malipo kwa kutumia:",
     "buttonTitle": "Weka anwani yako",
@@ -2003,7 +2037,7 @@
     "satAccumulated": "Sats kusanyiko",
     "satsEarned": "{formattedNumber | sats} earned",
     "sectionsCompleted": "Umekamilisha",
-    "title": "Pata",
+    "title": "Jifunze",
     "unlockQuestion": "Ili kufungua, jibu swali:",
     "youEarned": "Umechuma",
     "registerTitle": "Unahitaji kuboresha akaunti yako",
@@ -2011,6 +2045,7 @@
     "oneSectionADay": "Sehemu moja kwa siku!",
     "availableTomorrow": "Rudi kesho ili kuendelea kujifunza kuhusu Bitcoin!",
     "motivatingBadger": "Chunguza masomo haya na upate mapato kadri unavyojifunza",
+    "motivatingBadgerNoRewards": "Chunguza masomo haya na ujifunze kuhusu Bitcoin",
     "continueNoRewards": "Endelea (Bila Zawadi)",
     "somethingNotRight": "Kuna tatizo fulani...",
     "defaultErrorMessage": "{errorMessage: string} Tafadhali jaribu tena baadaye.\nAu, bofya kuendelea kujifunza bila zawadi.",
@@ -2049,7 +2084,7 @@
     "login": "Ingia",
     "loginOrRestore": "Ingia / Rejesha",
     "logBackInWith": "Ingia tena na",
-    "headline": "Pochi limewezeshwa na Galoy.",
+    "headline": "Pochi limewezeshwa na Blink",
     "startTrialAccount": "Anza na akaunti ya majaribio",
     "startWithTrialAccount": "Anza na akaunti ya majaribio",
     "registerPhoneAccount": "Jisajili akaunti ya simu",
@@ -2075,6 +2110,7 @@
     "error": "Lo! Hitilafu fulani imetokea wakati wa kupata eneo lako"
   },
   "HomeScreen": {
+    "pendingReceiveBadge": "+{amount: string} inasubiri",
     "receive": "Pokea",
     "send": "Tuma",
     "title": "Nyumbani",
@@ -2163,6 +2199,9 @@
     "lightningInvoice": "Ankara ya lightning",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Ada ya amana: {fee} SAT kwa kiasi chini ya {threshold} SAT au {overFee} SAT kwa amana zaidi ya {threshold} SAT",
+    "depositFeeTiers": "Deposit fees: {tiers: string}",
+    "depositFeeTierUpTo": "{fee: string} SAT up to {max: string} SAT",
+    "depositFeeTierAbove": "{fee: string} SAT above {min: string} SAT",
     "autoConvertMinAmount": "Viwango vilivyo chini ya sats {minSats: number} / {minFiat: string} haviwezi kubadilishwa kwa Dola kiotomatiki. Utapokea Bitcoin badala yake.",
     "autoConvertFailed": "Malipo yamepokelewa lakini ubadilishaji umeshindwa.",
     "pleaseWaitForConversion": "Tafadhali subiri hadi ubadilishaji ukamilike"
@@ -2196,6 +2235,22 @@
     "imageLibraryPermissionsNotGranted": "Hatuna ruhusa ya kupata maktaba ya picha. Tafadhali angalia vipimo vya programu kwenye jukwaa lako."
   },
   "SecurityScreen": {
+    "securityScore": {
+      "title": "Alama ya usalama {done: number}/{total: number}",
+      "levelLow": "chini",
+      "levelMedium": "wastani",
+      "levelHigh": "juu",
+      "set": "Weka",
+      "enabled": "Imewashwa",
+      "signals": {
+        "cloudBackup": "Hifadhi rudufu ya wingu",
+        "manualBackup": "Hifadhi rudufu ya mkono",
+        "appLock": "Bayometriki/PIN",
+        "hideBalance": "Ficha salio",
+        "twoFactor": "Uthibitishaji wa hatua mbili (2FA)",
+        "emailVerified": "Barua pepe iliyothibitishwa"
+      }
+    },
     "title": "Usalama na Faragha",
     "biometricDescription": "Fungua kutumia alama za vidole au utambuzi kwa uso.",
     "biometricTitle": "Biometriki",
@@ -2261,6 +2316,10 @@
     "invalidPhoneNumber": "Ingiza nambari sahihi ya simu ya mkononi",
     "phoneNotAllowed": "Sehemu hii haikubali nambari za simu"
   },
+  "MerchantSelectionScreen": {
+    "title": "Chagua chaguo la malipo",
+    "empty": "Hakuna chaguo za malipo zinazopatikana."
+  },
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Muamala unapaswa kuwasilishwa kwenye mempool",
     "amount": "Kiasi",
@@ -2279,7 +2338,6 @@
     "notConfirmed": "Malipo yametumwa lakini haijathibitishwa bado. Unaweza kuangalia hali ya malipo katika sehemu ya Malipo",
     "note": "Dokezo au lebo",
     "success": "Malipo imetumwa kwa ufanisi",
-    "suggestionInput": "Ingiza mapendekezo yako",
     "max": "Zaidi",
     "maxAmount": "Kiasi cha Juu",
     "title": "Tuma Bitcoin",
@@ -2320,7 +2378,7 @@
   },
   "SettingsScreen": {
     "createAddress": "Unda anwani",
-    "donationButton": "Kitufe cha mchango",
+    "donationButton": "Kitufe cha kuchangia",
     "btcpayServer": "BTCPay Server",
     "woocommerce": "WooCommerce",
     "staticQr": "Msimbo Tuli wa QR unaoweza kuchapishwa",
@@ -2528,7 +2586,11 @@
     "receivingAccount": "Akaunti ya Kupokelea",
     "sendingAccount": "Akaunti ya Kutuma",
     "txNotBroadcast": "Muamala wako umeorodheshwa. Unapaswa kuonekana kwenye mempool {countdown: string}.",
-    "momentarily": "muda mfupi"
+    "momentarily": "muda mfupi",
+    "findingAccount": "Inatafuta akaunti ya malipo haya...",
+    "txNotFoundInAccounts": "Malipo haya hayakupatikana katika akaunti yoyote kwenye kifaa hiki. Huenda ni ya akaunti iliyotoka.",
+    "txLoadFailed": "Imeshindwa kupakia malipo haya. Angalia muunganisho wako kisha ujaribu tena.",
+    "switchedForPayment": "Imebadilisha hadi {identifier: string} ili kuonyesha malipo haya"
   },
   "FeeRatesScreen": {
     "title": "Viwango vya ada",
@@ -2543,6 +2605,7 @@
     "lightningTransactions": "Miamala ya Lightning",
     "onchainBelowThreshold": "Onchain chini ya {threshold: string} SAT",
     "onchainAboveThreshold": "Onchain zaidi ya {threshold: string} SAT",
+    "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Ada ya uhamisho",
     "noFee": "hakuna ada",
     "lightningSendFee": "{fee: string} + ~{routingFee: string} ada ya uelekezaji",
@@ -2593,7 +2656,8 @@
       "tooLong": "Anwani lazima iwe na herufi si zaidi ya 50",
       "invalidCharacter": "Anwani inaweza kuwa na herufi, nambari, na alama ya chini pekee",
       "addressUnavailable": "Samahani, anwani hii tayari imetumika",
-      "unknownError": "Kuna hitilafu isiyofahamika, tafadhali jaribu tena baadaye"
+      "unknownError": "Kuna hitilafu isiyofahamika, tafadhali jaribu tena baadaye",
+      "backupRequired": "Back up your wallet before creating a Lightning address"
     },
     "receiveMoney": "Pokea pesa kutoka kwa mkoba mwingine wa umeme na watumiaji wa {bankName: string} na anwani hii.",
     "itCannotBeChanged": "Haitaweza kubadilishwa baadaye."
@@ -2758,6 +2822,7 @@
     "bitcoinPrice": "Bei ya Bitcoin",
     "btcAccount": "Akaunti ya Bitcoin",
     "cancel": "Futa",
+    "card": "Kadi",
     "close": "Funga",
     "confirm": "Thibitisha",
     "convert": "Badilisha",
@@ -2898,11 +2963,9 @@
     "email": "Barua pepe",
     "sms": "SMS",
     "faq": "Maswali yanayoulizwa mara kwa mara",
-    "enjoyingApp": "Unafurahia programu?",
     "statusPage": "Ukurasa wa Hali",
     "telegram": "Telegram",
     "mattermost": "Mattermost",
-    "thankYouText": "Asante kwa maoni, ungependa kupendekeza uboreshaji?",
     "defaultEmailSubject": "{bankName: string} - Usaidizi",
     "defaultSupportMessage": "Hujambo! Nahitaji usaidizi wa {bankName: string}, ninatumia toleo la {version: string} kwenye {os: string}.",
     "emailCopied": "Barua pepe {email: string} imenakiliwa kwenye ubao wa kunakili",
@@ -3072,6 +3135,66 @@
       "limitUpdateSuccess": "Kikomo kimesasishwa kwa mafanikio",
       "limitUpdateError": "Imeshindikana kusasisha kikomo",
       "limitMustBePositive": "Kikomo lazima kiwe kikubwa kuliko sifuri"
+    },
+    "CardFeeSchedule": {
+      "title": "Ratiba ya ada za Kadi ya Blink",
+      "effectiveDate": "Inatumika kuanzia tarehe 1 Julai 2026",
+      "sections": {
+        "cardFees": "Ada za kadi",
+        "transactionFees": "Ada za muamala",
+        "overdraft": "Utumiaji zaidi (hali ya kufadhiliwa)"
+      },
+      "fees": {
+        "annualFee": {
+          "title": "Ada ya mwaka",
+          "subtitle": "Imesamehewa mwaka wa kwanza kuanzia tarehe ya kutolewa kwa Kadi",
+          "value": "{amount: string} / mwaka"
+        },
+        "cardReplacement": {
+          "title": "Kubadilisha kadi"
+        },
+        "usdTransactionFee": {
+          "title": "Ada ya muamala wa USD",
+          "subtitle": "Inatozwa kwa kila muamala kwa dola za Marekani"
+        },
+        "foreignTransactionFee": {
+          "title": "Ada ya muamala wa kigeni",
+          "subtitle": "Inatozwa kwa kila muamala kwa sarafu isiyokuwa dola za Marekani"
+        },
+        "maximumOverdraft": {
+          "title": "Utumiaji zaidi wa juu",
+          "subtitle": "Lazima urejeshwe ndani ya siku 7"
+        },
+        "lateRepaymentFee": {
+          "title": "Ada ya kulipa kwa kuchelewa",
+          "subtitle": "Hutozwa iwapo utumiaji zaidi haujarejeshwa ndani ya siku 7"
+        }
+      },
+      "btcConversion": {
+        "title": "Ubadilishaji wa BTC",
+        "body": "Muamala unapohitaji ubadilishaji wa BTC kuwa USD, ubadilishaji hufanywa kwa kiwango cha ubadilishaji kinachotumika, ambacho kinaweza kujumuisha tofauti inayoakisi gharama ya ubadilishaji."
+      },
+      "feesUpdateNotice": {
+        "text": "Ada zinaweza kusasishwa mara kwa mara. Blink itatoa taarifa angalau siku 30 kabla ya mabadiliko yoyote ya ada kuanza kutumika, kulingana na",
+        "linkText": "Mkataba wa Mwenye Kadi"
+      },
+      "creditModeNotice": "Hali ya Mkopo haiko hai kwa sasa. Iwapo Hali ya Mkopo itawashwa, viwango vya riba, ada, na ufichuzi wa haki za bili vinavyotumika vitatolewa kabla ya kuwashwa.",
+      "additionalDetails": {
+        "title": "Maelezo ya ziada ya ada",
+        "overdraft": {
+          "label": "Utumiaji zaidi",
+          "text": ". Katika mazingira fulani, muamala unaweza kuidhinishwa unaosababisha Salio la Kadi yako kushuka chini ya sifuri. Utumiaji zaidi wa juu ni {maxOverdraft: string}. Lazima urejeshe utumiaji zaidi ndani ya siku 7 kwa kuhamisha fedha za ziada kwenye Salio la Kadi yako."
+        },
+        "foreignCurrency": {
+          "label": "Sarafu ya kigeni",
+          "text": ". Ukifanya muamala kwa sarafu ya kigeni, mtandao wa kadi huubadilisha kuwa USD kwa kutumia taratibu zake za ubadilishaji. Kiwango katika tarehe ya uchakataji kinaweza kutofautiana na tarehe ya muamala."
+        },
+        "noHiddenFees": {
+          "label": "Hakuna ada zilizofichwa",
+          "text": ". Hakuna ada za kuanzisha akaunti, kutotumika, maswali ya salio, au kufunga kadi yako."
+        }
+      },
+      "backButton": "Rudi"
     },
     "CardDetails": {
       "title": "Maelezo ya kadi",
@@ -3418,6 +3541,7 @@
         "perYear": "kwa mwaka",
         "status": {
           "label": "Hali",
+          "specialOfferLabel": "Ofa maalum",
           "paymentPending": "Malipo Yanasubiri",
           "firstYearFree": "Mwaka wa kwanza bure"
         },
@@ -3431,7 +3555,11 @@
           "cardholderAgreement": "Mkataba wa Mmiliki wa Kadi",
           "and": "na"
         },
-        "renew": "Ninaelewa kuwa usajili wangu utahuishwa moja kwa moja baada ya mwaka 1"
+        "feeSchedule": {
+          "text": "Nimekagua na ninakubali",
+          "linkText": "Ratiba ya Ada ya Blink Card"
+        },
+        "renew": "Ninaelewa kuwa usajili wangu utahuishwa kiotomatiki baada ya miezi {months: number}"
       },
       "CardIntroducing": {
         "title": "Kuanzisha",
@@ -3493,13 +3621,29 @@
         "buttonText": "Wasilisha maombi",
         "select": "chagua"
       },
+      "Acknowledgement": {
+        "title": "Sheria na masharti",
+        "acceptButton": "Kubali",
+        "eSignConsent": {
+          "text": "Ninakubali",
+          "linkText": "Idhini ya Sahihi ya Kielektroniki"
+        },
+        "privacyAndTerms": {
+          "text": "Ninakubali",
+          "privacyPolicyLinkText": "Sera ya Faragha ya mtoaji",
+          "and": ", na",
+          "cardTermsLinkText": "Masharti ya Kadi ya Blink"
+        },
+        "certifyAccuracy": "Ninathibitisha kwamba maelezo niliyotoa ni sahihi na kwamba nitazingatia sheria na mahitaji yote yanayohusiana na Kadi yangu ya Blink Visa",
+        "acknowledgeSolicitation": "Ninatambua kwamba kuomba Kadi ya Blink Visa si ombi lisiloidhinishwa"
+      },
       "CardPreapproved": {
         "title": "Umeidhinishwa mapema kwa kadi ya Blink Visa!",
         "buttonText": "Funga"
       },
       "CardProcessing": {
         "title": "Tunashughulikia maombi yako",
-        "subtitle": "Muda wa kusubiri unaokadiriwa: {waitTime: string}",
+        "subtitle": "Tutakujulisha mara tu tutakapokuwa tayari",
         "buttonText": "Funga"
       }
     }
@@ -3535,7 +3679,8 @@
         "savedConfirm": "Nimehifadhi",
         "copy": "Nakili",
         "continueButton": "Endelea",
-        "testBackup": "Jaribu hifadhi yako"
+        "testBackup": "Jaribu hifadhi yako",
+        "doNotShareWarning": "Usimwonyeshe mtu yeyote ikiwa ni pamoja na timu ya usaidizi"
       },
       "Confirm": {
         "headerTitle": "Thibitisha maneno ya nakala",
@@ -3567,6 +3712,7 @@
       "uploadSuccess": "Nakala imehifadhiwa kwenye {provider}",
       "uploadFailed": "Imeshindwa kupakia nakala",
       "signInFailed": "Imeshindwa kuingia katika {provider}",
+      "storageAccessRequired": "Ruhusu {provider: string} kufikia nakala rudufu ya pochi yako, kisha ujaribu tena.",
       "cloudNotAvailable": "iCloud Drive haipatikani. Tafadhali ingia katika iCloud kupitia Mipangilio na uwashe iCloud Drive.",
       "networkError": "Hitilafu ya mtandao. Tafadhali angalia muunganisho wako na ujaribu tena.",
       "existingBackupTitle": "Nakala imepatikana",
@@ -3581,6 +3727,12 @@
     "contactSupport": {
       "title": "Wasiliana na usaidizi",
       "body": "Kuna kitu kimeenda vibaya, lakini usiwe na wasiwasi, fedha zako ziko salama. Tafadhali wasiliana na usaidizi kwa msaada.\n\nUnaweza kuhitaji taarifa hizi ili kusaidia usaidizi kutatua kesi yako:",
+      "selfHelp": {
+        "title": "Hebu tujaribu tena",
+        "body": "Usiwe na wasiwasi — fedha zako ziko salama. Uhamishaji unaweza kuchukua dakika chache, na wakati mwingine hatua moja inahitaji tu kuanza upya.\n\nAnza uhamishaji upya — inachukua muda mfupi tu.\n\nBado unaona skrini hii? Wasiliana na usaidizi na ushiriki maelezo yaliyo hapa chini:",
+        "contactSupportCta": "Wasiliana na usaidizi"
+      },
+      "closeRefusedBody": "Uhamishaji wako umekamilika na fedha zako ziko katika pochi yako mpya. Akaunti yako ya zamani huenda bado iko wazi. Timu ya usaidizi itakagua na kuifunga ikiwa ndivyo.\n\nUnaweza kuhitaji taarifa hizi ili kusaidia usaidizi kutatua kesi yako:",
       "reasonLabel": "Sababu",
       "accountIdLabel": "Kitambulisho cha akaunti",
       "pubKeyLabel": "pubKey",
@@ -3605,6 +3757,10 @@
       "title": "Muhimu",
       "body": "Hamia kwenye akaunti isiyo ya udhamini kupitia uhamishaji unaoongozwa, au toa fedha zako, kabla ya {date}. Kupokea kutasimama {receiveStopsDate}.",
       "migrateCta": "Hamia"
+    },
+    "offboardBulletin": {
+      "title": "Muhimu",
+      "body": "Akaunti yako imesajiliwa katika eneo ambalo hatuwezi kutoa akaunti. Toa fedha zako kabla ya tarehe 31 Agosti. Kupokea kunasimama tarehe 10 Agosti."
     },
     "dollarBalanceModal": {
       "title": "Hatuwezi kuhamisha Salio lako la Dola",
@@ -3633,10 +3789,23 @@
     "downloadHistoryTitle": "Pakua historia ya miamala yako",
     "downloadHistoryBody": "Akaunti yako mpya itaanza upya. Ikiwa unataka kuweka kumbukumbu ya miamala yako, ipakue sasa kama CSV.",
     "downloadHistoryDownloadCta": "Pakua",
-    "apiServiceTitle": "Huduma ya API haipatikani",
-    "apiServiceBody": "Tunaona kuwa una funguo za API zinazotumika. Blink haiwezi kutoa API katika hali ya non-custodial.\n\nIkiwa unategemea API ya Blink, wasiliana nasi haraka na tutafanya tuwezalo kusaidia mpito laini.",
+    "apiServiceTitle": "Kuhusu funguo zako za API",
+    "apiServiceBody": "Akaunti yako ina funguo za API zinazotumika. API haitapatikana baada ya kuhamia non-custodial.\n\nBlink ina programu za non-custodial zinazochukua nafasi ya kazi nyingi za API, isipokuwa kutuma. Utazipata katika menyu ya Mipangilio.\n\nIkiwa unatumia API kutuma, kwa bahati mbaya haitawezekana tena.",
     "apiServiceContactCta": "Wasiliana nasi",
-    "apiServiceContinueCta": "Endelea hata hivyo",
+    "apiServiceContinueCta": "Endelea na uhamishaji",
+    "merchantTools": {
+      "title": "Tumeshughulikia kila kitu",
+      "body": "Zana zote za malipo yanayoingia zinaendelea kufanya kazi. Ongeza tu anwani yako ya Lightning.",
+      "cta": "Nimeelewa",
+      "terminalTitle": "Blink Terminal",
+      "terminalBody": "Sehemu ya uuzaji katika kivinjari chochote.",
+      "donationTitle": "Kitufe cha kuchangia",
+      "donationBody": "Pokea michango kwenye tovuti yoyote.",
+      "btcpayTitle": "Programu-jalizi ya BTCPay",
+      "btcpayBody": "Malipo ya Lightning kwenye BTCPay Server yako.",
+      "woocommerceTitle": "Programu-jalizi ya WooCommerce",
+      "woocommerceBody": "Malipo ya Bitcoin kwa duka lako la mtandaoni."
+    },
     "resumeFailed": "Hitilafu imetokea wakati wa kuendelea na uhamishaji wako. Tafadhali anza tena.",
     "migrationRequiredBody": "Ni wakati wa kuhamisha akaunti yako ya udhamini kwenda akaunti isiyo ya udhamini.",
     "migrationRequiredForcedBody": "Ni wakati wa kuhamisha akaunti yako ya udhamini kwenda akaunti isiyo ya udhamini. Inahitajika kwa sababu za udhibiti.\n\nUsiwe na wasiwasi, non-custodial itakuwa bora kwako kwa muda mrefu.",
@@ -3653,10 +3822,15 @@
     "explainerCheck5": "Akaunti yako itakatwa ada ya mtandao wa Spark",
     "explainerCta": "Naelewa",
     "transferringFunds": "Tunahamisha fedha zako. Inapaswa kukamilika ndani ya sekunde chache.",
+    "transferDelayed": {
+      "body": "Fedha zako ziko njiani kuelekea kwenye akaunti yako mpya. Inachukua muda mrefu kuliko kawaida — acha programu ikiwa wazi na tutakamilisha kiotomatiki.",
+      "contactSupportCta": "Wasiliana na usaidizi"
+    },
     "clockOutOfSync": {
       "body": "Tarehe na saa za kifaa chako hazijaoanishwa. Ziweke kwa kiotomatiki ili kuendelea.",
       "retryCta": "Jaribu tena"
-    }
+    },
+    "closeUnavailable": "Fedha zako ziko salama katika pochi yako mpya. Bado tunafunga akaunti yako ya zamani, tafadhali jaribu tena baada ya muda mfupi."
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Iliyohifadhiwa",
@@ -3684,6 +3858,7 @@
     "phraseSubtitleStep2": "Ingiza maneno yaliyobaki ya msemo wako wa hifadhi",
     "nextWords": "Maneno 6 yanayofuata",
     "paste": "Bandika",
+    "pasteFailed": "Imeshindwa kusoma kutoka kwenye ubao wa kunakili. Tafadhali ingiza msemo wako wa hifadhi mwenyewe.",
     "enterWord": "Neno",
     "invalidMnemonic": "Kifungu cha akiba si sahihi. Tafadhali angalia kama mpangilio wa maneno ni sahihi.",
     "restoring": "Kurudisha mkoba wako...",
@@ -3695,7 +3870,9 @@
     "enterPassword": "Ingiza nenosiri lako la usimbaji",
     "wrongPassword": "Nenosiri si sahihi. Tafadhali jaribu tena.",
     "pickBackupTitle": "Chagua pochi",
-    "pickBackupDescription": "Chagua nakala rudufu ya kurejesha"
+    "pickBackupDescription": "Chagua nakala rudufu ya kurejesha",
+    "recognizePhraseTitle": "Je, unaitambua kaulisiri hii ya nakala rudufu?",
+    "recognizePhraseBody": "Kamwe usiweke maneno uliyotumiwa na mtu mwingine."
   },
   "BackupNudge": {
     "title": "Fedha zako ziko hatarini",
@@ -3705,6 +3882,11 @@
     "modalTitle": "Linda fedha zako",
     "modalDescription": "Tunakushauri sana uhifadhi pochi yako ili kuzuia kupoteza fedha zako zote iwapo utapoteza kifaa hiki.",
     "secureMe": "Linda pochi"
+  },
+  "BackupRequired": {
+    "modalTitle": "Back up your wallet first",
+    "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
+    "backupNow": "Back up wallet"
   },
   "NonCustodialInfoBulletin": {
     "title": "Hii ni akaunti isiyo ya udhamini",
@@ -3744,7 +3926,7 @@
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
     "featureCircles": "Circles",
-    "featureEarn": "Earn",
+    "featureEarn": "Jifunze",
     "featureCard": "Card"
   },
   "WalletCreationScreen": {

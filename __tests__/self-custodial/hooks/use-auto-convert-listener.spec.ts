@@ -82,7 +82,7 @@ jest.mock("@app/utils/toast", () => ({
 
 jest.mock("@react-native-firebase/crashlytics", () => ({
   __esModule: true,
-  default: () => ({ recordError: jest.fn() }),
+  default: () => ({ recordError: jest.fn(), log: jest.fn() }),
 }))
 
 jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({

@@ -885,13 +885,31 @@ export type CurrencyConversionEstimation = {
   readonly usdCentAmount: Scalars['CentAmount']['output'];
 };
 
+export type CustodialRestrictions = {
+  readonly __typename: 'CustodialRestrictions';
+  readonly dollarBalance: Scalars['Boolean']['output'];
+  readonly transfer: Scalars['Boolean']['output'];
+};
+
+export type DepositFeeTier = {
+  readonly __typename: 'DepositFeeTier';
+  readonly amount: Scalars['String']['output'];
+  /** highest amount this tier applies to, null when unbounded */
+  readonly maxAmount?: Maybe<Scalars['String']['output']>;
+};
+
 export type DepositFeesInformation = {
   readonly __typename: 'DepositFeesInformation';
   readonly minBankFee: Scalars['String']['output'];
   /** below this amount minBankFee will be charged */
   readonly minBankFeeThreshold: Scalars['String']['output'];
-  /** ratio to charge as basis points above minBankFeeThreshold amount */
+  /**
+   * ratio to charge as basis points above minBankFeeThreshold amount
+   * @deprecated fees are a flat amount per tier, use tiers
+   */
   readonly ratio: Scalars['String']['output'];
+  /** amount charged per tier, in ascending order of maxAmount */
+  readonly tiers: ReadonlyArray<DepositFeeTier>;
 };
 
 export type DeviceNotificationTokenCreateInput = {
@@ -2287,10 +2305,9 @@ export type Query = {
   /** Returns an estimated conversion rate for the given amount and currency */
   readonly currencyConversionEstimation: CurrencyConversionEstimation;
   readonly currencyList: ReadonlyArray<Currency>;
+  readonly custodialRestrictions: CustodialRestrictions;
   readonly deviceSessionCount: Scalars['Int']['output'];
-  readonly feedbackModalShown: Scalars['Boolean']['output'];
   readonly globals?: Maybe<Globals>;
-  readonly hiddenBalanceToolTip: Scalars['Boolean']['output'];
   readonly hideBalance: Scalars['Boolean']['output'];
   readonly innerCircleValue: Scalars['Int']['output'];
   readonly introducingCirclesModalShown: Scalars['Boolean']['output'];
@@ -2311,6 +2328,7 @@ export type Query = {
   /** Returns 1 Sat and 1 Usd Cent price for the given currency in minor unit */
   readonly realtimePrice: RealtimePrice;
   readonly region?: Maybe<Region>;
+  readonly regionCheck: RegionCheck;
   readonly txLastSeen: TxLastSeen;
   readonly upgradeModalLastShownAt?: Maybe<Scalars['String']['output']>;
   /** @deprecated will be migrated to AccountDefaultWalletId */
@@ -2472,6 +2490,13 @@ export type Region = {
   readonly latitudeDelta: Scalars['Float']['output'];
   readonly longitude: Scalars['Float']['output'];
   readonly longitudeDelta: Scalars['Float']['output'];
+};
+
+export type RegionCheck = {
+  readonly __typename: 'RegionCheck';
+  readonly countryCode?: Maybe<Scalars['String']['output']>;
+  readonly custodialCreationAllowed: Scalars['Boolean']['output'];
+  readonly restricted: Scalars['Boolean']['output'];
 };
 
 export type SatAmountPayload = {
@@ -3246,6 +3271,13 @@ export type WalletOverviewScreenQueryVariables = Exact<{ [key: string]: never; }
 
 export type WalletOverviewScreenQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly wallets: ReadonlyArray<{ readonly __typename: 'BTCWallet', readonly id: string, readonly balance: number, readonly walletCurrency: WalletCurrency } | { readonly __typename: 'UsdWallet', readonly id: string, readonly balance: number, readonly walletCurrency: WalletCurrency }> } } | null };
 
+export type ExportCsvSettingQueryVariables = Exact<{
+  walletIds: ReadonlyArray<Scalars['WalletId']['input']> | Scalars['WalletId']['input'];
+}>;
+
+
+export type ExportCsvSettingQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly csvTransactions: string } } | null };
+
 export type AnalyticsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -3268,11 +3300,6 @@ export type HideBalanceQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type HideBalanceQuery = { readonly __typename: 'Query', readonly hideBalance: boolean };
 
-export type HiddenBalanceToolTipQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type HiddenBalanceToolTipQuery = { readonly __typename: 'Query', readonly hiddenBalanceToolTip: boolean };
-
 export type BetaQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -3287,11 +3314,6 @@ export type RegionQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type RegionQuery = { readonly __typename: 'Query', readonly region?: { readonly __typename: 'Region', readonly latitude: number, readonly longitude: number, readonly latitudeDelta: number, readonly longitudeDelta: number } | null };
-
-export type FeedbackModalShownQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type FeedbackModalShownQuery = { readonly __typename: 'Query', readonly feedbackModalShown: boolean };
 
 export type IntroducingCirclesModalShownQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -3349,12 +3371,17 @@ export type CurrencyListQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type CurrencyListQuery = { readonly __typename: 'Query', readonly currencyList: ReadonlyArray<{ readonly __typename: 'Currency', readonly id: string, readonly flag: string, readonly name: string, readonly symbol: string, readonly fractionDigits: number }> };
 
-export type ExportCsvSettingQueryVariables = Exact<{
-  walletIds: ReadonlyArray<Scalars['WalletId']['input']> | Scalars['WalletId']['input'];
+export type UserEmailDeleteMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type UserEmailDeleteMutation = { readonly __typename: 'Mutation', readonly userEmailDelete: { readonly __typename: 'UserEmailDeletePayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly me?: { readonly __typename: 'User', readonly id: string, readonly phone?: string | null, readonly totpEnabled: boolean, readonly email?: { readonly __typename: 'Email', readonly address?: string | null, readonly verified?: boolean | null } | null } | null } };
+
+export type UserEmailRegistrationInitiateMutationVariables = Exact<{
+  input: UserEmailRegistrationInitiateInput;
 }>;
 
 
-export type ExportCsvSettingQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly csvTransactions: string } } | null };
+export type UserEmailRegistrationInitiateMutation = { readonly __typename: 'Mutation', readonly userEmailRegistrationInitiate: { readonly __typename: 'UserEmailRegistrationInitiatePayload', readonly emailRegistrationId?: string | null, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly me?: { readonly __typename: 'User', readonly id: string, readonly email?: { readonly __typename: 'Email', readonly address?: string | null, readonly verified?: boolean | null } | null } | null } };
 
 export type CaptchaCreateChallengeMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -3374,6 +3401,21 @@ export type UserLogoutMutationVariables = Exact<{
 
 
 export type UserLogoutMutation = { readonly __typename: 'Mutation', readonly userLogout: { readonly __typename: 'SuccessPayload', readonly success?: boolean | null } };
+
+export type TransactionOwnershipProbeQueryVariables = Exact<{
+  first?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type TransactionOwnershipProbeQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly wallets: ReadonlyArray<{ readonly __typename: 'BTCWallet', readonly id: string } | { readonly __typename: 'UsdWallet', readonly id: string }>, readonly pendingIncomingTransactions: ReadonlyArray<{ readonly __typename: 'Transaction', readonly id: string }>, readonly transactions?: { readonly __typename: 'TransactionConnection', readonly edges?: ReadonlyArray<{ readonly __typename: 'TransactionEdge', readonly node: { readonly __typename: 'Transaction', readonly id: string } }> | null } | null } } | null };
+
+export type TransactionByIdForWalletQueryVariables = Exact<{
+  walletId: Scalars['WalletId']['input'];
+  txId: Scalars['ID']['input'];
+}>;
+
+
+export type TransactionByIdForWalletQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly walletById: { readonly __typename: 'BTCWallet', readonly id: string, readonly transactionById: { readonly __typename: 'Transaction', readonly id: string, readonly status: TxStatus, readonly direction: TxDirection, readonly memo?: string | null, readonly createdAt: number, readonly settlementAmount: number, readonly settlementFee: number, readonly settlementDisplayFee: string, readonly settlementCurrency: WalletCurrency, readonly settlementDisplayAmount: string, readonly settlementDisplayCurrency: string, readonly settlementPrice: { readonly __typename: 'PriceOfOneSettlementMinorUnitInDisplayMinorUnit', readonly base: number, readonly offset: number, readonly currencyUnit: string, readonly formattedAmount: string }, readonly initiationVia: { readonly __typename: 'InitiationViaIntraLedger', readonly counterPartyWalletId?: string | null, readonly counterPartyUsername?: string | null } | { readonly __typename: 'InitiationViaLn', readonly paymentHash: string, readonly paymentRequest: string } | { readonly __typename: 'InitiationViaOnChain', readonly address: string }, readonly settlementVia: { readonly __typename: 'SettlementViaIntraLedger', readonly counterPartyWalletId?: string | null, readonly counterPartyUsername?: string | null, readonly preImage?: string | null } | { readonly __typename: 'SettlementViaLn', readonly preImage?: string | null } | { readonly __typename: 'SettlementViaOnChain', readonly transactionHash?: string | null, readonly arrivalInMempoolEstimatedAt?: number | null } } } | { readonly __typename: 'UsdWallet', readonly id: string, readonly transactionById: { readonly __typename: 'Transaction', readonly id: string, readonly status: TxStatus, readonly direction: TxDirection, readonly memo?: string | null, readonly createdAt: number, readonly settlementAmount: number, readonly settlementFee: number, readonly settlementDisplayFee: string, readonly settlementCurrency: WalletCurrency, readonly settlementDisplayAmount: string, readonly settlementDisplayCurrency: string, readonly settlementPrice: { readonly __typename: 'PriceOfOneSettlementMinorUnitInDisplayMinorUnit', readonly base: number, readonly offset: number, readonly currencyUnit: string, readonly formattedAmount: string }, readonly initiationVia: { readonly __typename: 'InitiationViaIntraLedger', readonly counterPartyWalletId?: string | null, readonly counterPartyUsername?: string | null } | { readonly __typename: 'InitiationViaLn', readonly paymentHash: string, readonly paymentRequest: string } | { readonly __typename: 'InitiationViaOnChain', readonly address: string }, readonly settlementVia: { readonly __typename: 'SettlementViaIntraLedger', readonly counterPartyWalletId?: string | null, readonly counterPartyUsername?: string | null, readonly preImage?: string | null } | { readonly __typename: 'SettlementViaLn', readonly preImage?: string | null } | { readonly __typename: 'SettlementViaOnChain', readonly transactionHash?: string | null, readonly arrivalInMempoolEstimatedAt?: number | null } } } } } | null };
 
 export type GetUsernamesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -3523,13 +3565,6 @@ export type QuizClaimMutationVariables = Exact<{
 
 
 export type QuizClaimMutation = { readonly __typename: 'Mutation', readonly quizClaim: { readonly __typename: 'QuizClaimPayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string, readonly code?: string | null }>, readonly quizzes: ReadonlyArray<{ readonly __typename: 'Quiz', readonly id: string, readonly amount: number, readonly completed: boolean, readonly notBefore?: number | null }> } };
-
-export type UserEmailRegistrationInitiateMutationVariables = Exact<{
-  input: UserEmailRegistrationInitiateInput;
-}>;
-
-
-export type UserEmailRegistrationInitiateMutation = { readonly __typename: 'Mutation', readonly userEmailRegistrationInitiate: { readonly __typename: 'UserEmailRegistrationInitiatePayload', readonly emailRegistrationId?: string | null, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly me?: { readonly __typename: 'User', readonly id: string, readonly email?: { readonly __typename: 'Email', readonly address?: string | null, readonly verified?: boolean | null } | null } | null } };
 
 export type UserEmailRegistrationValidateMutationVariables = Exact<{
   input: UserEmailRegistrationValidateInput;
@@ -3694,12 +3729,20 @@ export type LnUsdInvoiceCreateMutation = { readonly __typename: 'Mutation', read
 export type PaymentRequestQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type PaymentRequestQuery = { readonly __typename: 'Query', readonly globals?: { readonly __typename: 'Globals', readonly network: Network, readonly feesInformation: { readonly __typename: 'FeesInformation', readonly deposit: { readonly __typename: 'DepositFeesInformation', readonly minBankFee: string, readonly minBankFeeThreshold: string, readonly ratio: string } } } | null, readonly me?: { readonly __typename: 'User', readonly id: string, readonly username?: string | null, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly defaultWalletId: string, readonly wallets: ReadonlyArray<{ readonly __typename: 'BTCWallet', readonly id: string, readonly balance: number, readonly walletCurrency: WalletCurrency } | { readonly __typename: 'UsdWallet', readonly id: string, readonly balance: number, readonly walletCurrency: WalletCurrency }> } } | null };
+export type PaymentRequestQuery = { readonly __typename: 'Query', readonly globals?: { readonly __typename: 'Globals', readonly network: Network, readonly feesInformation: { readonly __typename: 'FeesInformation', readonly deposit: { readonly __typename: 'DepositFeesInformation', readonly minBankFee: string, readonly minBankFeeThreshold: string, readonly tiers: ReadonlyArray<{ readonly __typename: 'DepositFeeTier', readonly maxAmount?: string | null, readonly amount: string }> } } } | null, readonly me?: { readonly __typename: 'User', readonly id: string, readonly username?: string | null, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly defaultWalletId: string, readonly wallets: ReadonlyArray<{ readonly __typename: 'BTCWallet', readonly id: string, readonly balance: number, readonly walletCurrency: WalletCurrency } | { readonly __typename: 'UsdWallet', readonly id: string, readonly balance: number, readonly walletCurrency: WalletCurrency }> } } | null };
 
 export type MyLnUpdatesSubscriptionVariables = Exact<{ [key: string]: never; }>;
 
 
 export type MyLnUpdatesSubscription = { readonly __typename: 'Subscription', readonly myUpdates: { readonly __typename: 'MyUpdatesPayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly update?: { readonly __typename: 'IntraLedgerUpdate' } | { readonly __typename: 'LnUpdate', readonly paymentHash: string, readonly status: InvoicePaymentStatus } | { readonly __typename: 'OnChainUpdate' } | { readonly __typename: 'Price' } | { readonly __typename: 'RealtimePrice' } | null } };
+
+export type TransactionsByPaymentHashQueryVariables = Exact<{
+  walletId: Scalars['WalletId']['input'];
+  paymentHash: Scalars['PaymentHash']['input'];
+}>;
+
+
+export type TransactionsByPaymentHashQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly walletById: { readonly __typename: 'BTCWallet', readonly id: string, readonly transactionsByPaymentHash: ReadonlyArray<{ readonly __typename: 'Transaction', readonly id: string, readonly status: TxStatus, readonly direction: TxDirection, readonly createdAt: number }> } | { readonly __typename: 'UsdWallet', readonly id: string, readonly transactionsByPaymentHash: ReadonlyArray<{ readonly __typename: 'Transaction', readonly id: string, readonly status: TxStatus, readonly direction: TxDirection, readonly createdAt: number }> } } } | null };
 
 export type ScanningQrCodeScreenQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -3738,13 +3781,6 @@ export type SendBitcoinInternalLimitsQueryVariables = Exact<{ [key: string]: nev
 
 
 export type SendBitcoinInternalLimitsQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly limits: { readonly __typename: 'AccountLimits', readonly internalSend: ReadonlyArray<{ readonly __typename: 'OneDayAccountLimit', readonly totalLimit: number, readonly remainingLimit?: number | null, readonly interval?: number | null }> } } } | null };
-
-export type FeedbackSubmitMutationVariables = Exact<{
-  input: FeedbackSubmitInput;
-}>;
-
-
-export type FeedbackSubmitMutation = { readonly __typename: 'Mutation', readonly feedbackSubmit: { readonly __typename: 'SuccessPayload', readonly success?: boolean | null, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }> } };
 
 export type LnNoAmountInvoiceFeeProbeMutationVariables = Exact<{
   input: LnNoAmountInvoiceFeeProbeInput;
@@ -3874,12 +3910,7 @@ export type OnChainUsdPaymentSendAsBtcDenominatedMutation = { readonly __typenam
 export type AccountDeleteMutationVariables = Exact<{ [key: string]: never; }>;
 
 
-export type AccountDeleteMutation = { readonly __typename: 'Mutation', readonly accountDelete: { readonly __typename: 'AccountDeletePayload', readonly success: boolean, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }> } };
-
-export type UserEmailDeleteMutationVariables = Exact<{ [key: string]: never; }>;
-
-
-export type UserEmailDeleteMutation = { readonly __typename: 'Mutation', readonly userEmailDelete: { readonly __typename: 'UserEmailDeletePayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly me?: { readonly __typename: 'User', readonly id: string, readonly phone?: string | null, readonly totpEnabled: boolean, readonly email?: { readonly __typename: 'Email', readonly address?: string | null, readonly verified?: boolean | null } | null } | null } };
+export type AccountDeleteMutation = { readonly __typename: 'Mutation', readonly accountDelete: { readonly __typename: 'AccountDeletePayload', readonly success: boolean, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string, readonly code?: string | null }> } };
 
 export type UserPhoneDeleteMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -3890,6 +3921,25 @@ export type WarningSecureAccountQueryVariables = Exact<{ [key: string]: never; }
 
 
 export type WarningSecureAccountQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly level: AccountLevel, readonly id: string, readonly wallets: ReadonlyArray<{ readonly __typename: 'BTCWallet', readonly id: string, readonly balance: number, readonly walletCurrency: WalletCurrency } | { readonly __typename: 'UsdWallet', readonly id: string, readonly balance: number, readonly walletCurrency: WalletCurrency }> } } | null };
+
+export type ApiKeysQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type ApiKeysQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly apiKeys: ReadonlyArray<{ readonly __typename: 'ApiKey', readonly id: string, readonly name: string, readonly createdAt: number, readonly revoked: boolean, readonly expired: boolean, readonly lastUsedAt?: number | null, readonly expiresAt?: number | null, readonly scopes: ReadonlyArray<Scope>, readonly readOnly: boolean }> } | null };
+
+export type ApiKeyCreateMutationVariables = Exact<{
+  input: ApiKeyCreateInput;
+}>;
+
+
+export type ApiKeyCreateMutation = { readonly __typename: 'Mutation', readonly apiKeyCreate: { readonly __typename: 'ApiKeyCreatePayload', readonly apiKeySecret: string, readonly apiKey: { readonly __typename: 'ApiKey', readonly id: string, readonly name: string, readonly createdAt: number, readonly revoked: boolean, readonly expired: boolean, readonly lastUsedAt?: number | null, readonly expiresAt?: number | null, readonly scopes: ReadonlyArray<Scope>, readonly readOnly: boolean } } };
+
+export type ApiKeyRevokeMutationVariables = Exact<{
+  input: ApiKeyRevokeInput;
+}>;
+
+
+export type ApiKeyRevokeMutation = { readonly __typename: 'Mutation', readonly apiKeyRevoke: { readonly __typename: 'ApiKeyRevokePayload', readonly apiKey: { readonly __typename: 'ApiKey', readonly id: string, readonly name: string, readonly createdAt: number, readonly revoked: boolean, readonly expired: boolean, readonly lastUsedAt?: number | null, readonly expiresAt?: number | null, readonly scopes: ReadonlyArray<Scope>, readonly readOnly: boolean } } };
 
 export type AccountUpdateDefaultWalletIdMutationVariables = Exact<{
   input: AccountUpdateDefaultWalletIdInput;
@@ -3913,7 +3963,7 @@ export type AccountUpdateDisplayCurrencyMutation = { readonly __typename: 'Mutat
 export type FeeRatesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type FeeRatesQuery = { readonly __typename: 'Query', readonly globals?: { readonly __typename: 'Globals', readonly feesInformation: { readonly __typename: 'FeesInformation', readonly deposit: { readonly __typename: 'DepositFeesInformation', readonly minBankFee: string, readonly minBankFeeThreshold: string, readonly ratio: string } } } | null };
+export type FeeRatesQuery = { readonly __typename: 'Query', readonly globals?: { readonly __typename: 'Globals', readonly feesInformation: { readonly __typename: 'FeesInformation', readonly deposit: { readonly __typename: 'DepositFeesInformation', readonly minBankFee: string, readonly minBankFeeThreshold: string, readonly tiers: ReadonlyArray<{ readonly __typename: 'DepositFeeTier', readonly maxAmount?: string | null, readonly amount: string }> } } } | null };
 
 export type LanguageQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -4399,6 +4449,50 @@ export type WalletOverviewScreenQueryHookResult = ReturnType<typeof useWalletOve
 export type WalletOverviewScreenLazyQueryHookResult = ReturnType<typeof useWalletOverviewScreenLazyQuery>;
 export type WalletOverviewScreenSuspenseQueryHookResult = ReturnType<typeof useWalletOverviewScreenSuspenseQuery>;
 export type WalletOverviewScreenQueryResult = Apollo.QueryResult<WalletOverviewScreenQuery, WalletOverviewScreenQueryVariables>;
+export const ExportCsvSettingDocument = gql`
+    query ExportCsvSetting($walletIds: [WalletId!]!) {
+  me {
+    id
+    defaultAccount {
+      id
+      csvTransactions(walletIds: $walletIds)
+    }
+  }
+}
+    `;
+
+/**
+ * __useExportCsvSettingQuery__
+ *
+ * To run a query within a React component, call `useExportCsvSettingQuery` and pass it any options that fit your needs.
+ * When your component renders, `useExportCsvSettingQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useExportCsvSettingQuery({
+ *   variables: {
+ *      walletIds: // value for 'walletIds'
+ *   },
+ * });
+ */
+export function useExportCsvSettingQuery(baseOptions: Apollo.QueryHookOptions<ExportCsvSettingQuery, ExportCsvSettingQueryVariables> & ({ variables: ExportCsvSettingQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<ExportCsvSettingQuery, ExportCsvSettingQueryVariables>(ExportCsvSettingDocument, options);
+      }
+export function useExportCsvSettingLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ExportCsvSettingQuery, ExportCsvSettingQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<ExportCsvSettingQuery, ExportCsvSettingQueryVariables>(ExportCsvSettingDocument, options);
+        }
+export function useExportCsvSettingSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<ExportCsvSettingQuery, ExportCsvSettingQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<ExportCsvSettingQuery, ExportCsvSettingQueryVariables>(ExportCsvSettingDocument, options);
+        }
+export type ExportCsvSettingQueryHookResult = ReturnType<typeof useExportCsvSettingQuery>;
+export type ExportCsvSettingLazyQueryHookResult = ReturnType<typeof useExportCsvSettingLazyQuery>;
+export type ExportCsvSettingSuspenseQueryHookResult = ReturnType<typeof useExportCsvSettingSuspenseQuery>;
+export type ExportCsvSettingQueryResult = Apollo.QueryResult<ExportCsvSettingQuery, ExportCsvSettingQueryVariables>;
 export const AnalyticsDocument = gql`
     query analytics {
   me {
@@ -4584,43 +4678,6 @@ export type HideBalanceQueryHookResult = ReturnType<typeof useHideBalanceQuery>;
 export type HideBalanceLazyQueryHookResult = ReturnType<typeof useHideBalanceLazyQuery>;
 export type HideBalanceSuspenseQueryHookResult = ReturnType<typeof useHideBalanceSuspenseQuery>;
 export type HideBalanceQueryResult = Apollo.QueryResult<HideBalanceQuery, HideBalanceQueryVariables>;
-export const HiddenBalanceToolTipDocument = gql`
-    query hiddenBalanceToolTip {
-  hiddenBalanceToolTip @client
-}
-    `;
-
-/**
- * __useHiddenBalanceToolTipQuery__
- *
- * To run a query within a React component, call `useHiddenBalanceToolTipQuery` and pass it any options that fit your needs.
- * When your component renders, `useHiddenBalanceToolTipQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useHiddenBalanceToolTipQuery({
- *   variables: {
- *   },
- * });
- */
-export function useHiddenBalanceToolTipQuery(baseOptions?: Apollo.QueryHookOptions<HiddenBalanceToolTipQuery, HiddenBalanceToolTipQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<HiddenBalanceToolTipQuery, HiddenBalanceToolTipQueryVariables>(HiddenBalanceToolTipDocument, options);
-      }
-export function useHiddenBalanceToolTipLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<HiddenBalanceToolTipQuery, HiddenBalanceToolTipQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<HiddenBalanceToolTipQuery, HiddenBalanceToolTipQueryVariables>(HiddenBalanceToolTipDocument, options);
-        }
-export function useHiddenBalanceToolTipSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<HiddenBalanceToolTipQuery, HiddenBalanceToolTipQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<HiddenBalanceToolTipQuery, HiddenBalanceToolTipQueryVariables>(HiddenBalanceToolTipDocument, options);
-        }
-export type HiddenBalanceToolTipQueryHookResult = ReturnType<typeof useHiddenBalanceToolTipQuery>;
-export type HiddenBalanceToolTipLazyQueryHookResult = ReturnType<typeof useHiddenBalanceToolTipLazyQuery>;
-export type HiddenBalanceToolTipSuspenseQueryHookResult = ReturnType<typeof useHiddenBalanceToolTipSuspenseQuery>;
-export type HiddenBalanceToolTipQueryResult = Apollo.QueryResult<HiddenBalanceToolTipQuery, HiddenBalanceToolTipQueryVariables>;
 export const BetaDocument = gql`
     query beta {
   beta @client
@@ -4737,43 +4794,6 @@ export type RegionQueryHookResult = ReturnType<typeof useRegionQuery>;
 export type RegionLazyQueryHookResult = ReturnType<typeof useRegionLazyQuery>;
 export type RegionSuspenseQueryHookResult = ReturnType<typeof useRegionSuspenseQuery>;
 export type RegionQueryResult = Apollo.QueryResult<RegionQuery, RegionQueryVariables>;
-export const FeedbackModalShownDocument = gql`
-    query feedbackModalShown {
-  feedbackModalShown @client
-}
-    `;
-
-/**
- * __useFeedbackModalShownQuery__
- *
- * To run a query within a React component, call `useFeedbackModalShownQuery` and pass it any options that fit your needs.
- * When your component renders, `useFeedbackModalShownQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useFeedbackModalShownQuery({
- *   variables: {
- *   },
- * });
- */
-export function useFeedbackModalShownQuery(baseOptions?: Apollo.QueryHookOptions<FeedbackModalShownQuery, FeedbackModalShownQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<FeedbackModalShownQuery, FeedbackModalShownQueryVariables>(FeedbackModalShownDocument, options);
-      }
-export function useFeedbackModalShownLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<FeedbackModalShownQuery, FeedbackModalShownQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<FeedbackModalShownQuery, FeedbackModalShownQueryVariables>(FeedbackModalShownDocument, options);
-        }
-export function useFeedbackModalShownSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<FeedbackModalShownQuery, FeedbackModalShownQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<FeedbackModalShownQuery, FeedbackModalShownQueryVariables>(FeedbackModalShownDocument, options);
-        }
-export type FeedbackModalShownQueryHookResult = ReturnType<typeof useFeedbackModalShownQuery>;
-export type FeedbackModalShownLazyQueryHookResult = ReturnType<typeof useFeedbackModalShownLazyQuery>;
-export type FeedbackModalShownSuspenseQueryHookResult = ReturnType<typeof useFeedbackModalShownSuspenseQuery>;
-export type FeedbackModalShownQueryResult = Apollo.QueryResult<FeedbackModalShownQuery, FeedbackModalShownQueryVariables>;
 export const IntroducingCirclesModalShownDocument = gql`
     query introducingCirclesModalShown {
   introducingCirclesModalShown @client
@@ -5170,50 +5190,92 @@ export type CurrencyListQueryHookResult = ReturnType<typeof useCurrencyListQuery
 export type CurrencyListLazyQueryHookResult = ReturnType<typeof useCurrencyListLazyQuery>;
 export type CurrencyListSuspenseQueryHookResult = ReturnType<typeof useCurrencyListSuspenseQuery>;
 export type CurrencyListQueryResult = Apollo.QueryResult<CurrencyListQuery, CurrencyListQueryVariables>;
-export const ExportCsvSettingDocument = gql`
-    query ExportCsvSetting($walletIds: [WalletId!]!) {
-  me {
-    id
-    defaultAccount {
+export const UserEmailDeleteDocument = gql`
+    mutation userEmailDelete {
+  userEmailDelete {
+    errors {
+      message
+    }
+    me {
       id
-      csvTransactions(walletIds: $walletIds)
+      phone
+      totpEnabled
+      email {
+        address
+        verified
+      }
     }
   }
 }
     `;
+export type UserEmailDeleteMutationFn = Apollo.MutationFunction<UserEmailDeleteMutation, UserEmailDeleteMutationVariables>;
 
 /**
- * __useExportCsvSettingQuery__
+ * __useUserEmailDeleteMutation__
  *
- * To run a query within a React component, call `useExportCsvSettingQuery` and pass it any options that fit your needs.
- * When your component renders, `useExportCsvSettingQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
+ * To run a mutation, you first call `useUserEmailDeleteMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUserEmailDeleteMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
  *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const { data, loading, error } = useExportCsvSettingQuery({
+ * const [userEmailDeleteMutation, { data, loading, error }] = useUserEmailDeleteMutation({
  *   variables: {
- *      walletIds: // value for 'walletIds'
  *   },
  * });
  */
-export function useExportCsvSettingQuery(baseOptions: Apollo.QueryHookOptions<ExportCsvSettingQuery, ExportCsvSettingQueryVariables> & ({ variables: ExportCsvSettingQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+export function useUserEmailDeleteMutation(baseOptions?: Apollo.MutationHookOptions<UserEmailDeleteMutation, UserEmailDeleteMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<ExportCsvSettingQuery, ExportCsvSettingQueryVariables>(ExportCsvSettingDocument, options);
+        return Apollo.useMutation<UserEmailDeleteMutation, UserEmailDeleteMutationVariables>(UserEmailDeleteDocument, options);
       }
-export function useExportCsvSettingLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ExportCsvSettingQuery, ExportCsvSettingQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<ExportCsvSettingQuery, ExportCsvSettingQueryVariables>(ExportCsvSettingDocument, options);
-        }
-export function useExportCsvSettingSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<ExportCsvSettingQuery, ExportCsvSettingQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<ExportCsvSettingQuery, ExportCsvSettingQueryVariables>(ExportCsvSettingDocument, options);
-        }
-export type ExportCsvSettingQueryHookResult = ReturnType<typeof useExportCsvSettingQuery>;
-export type ExportCsvSettingLazyQueryHookResult = ReturnType<typeof useExportCsvSettingLazyQuery>;
-export type ExportCsvSettingSuspenseQueryHookResult = ReturnType<typeof useExportCsvSettingSuspenseQuery>;
-export type ExportCsvSettingQueryResult = Apollo.QueryResult<ExportCsvSettingQuery, ExportCsvSettingQueryVariables>;
+export type UserEmailDeleteMutationHookResult = ReturnType<typeof useUserEmailDeleteMutation>;
+export type UserEmailDeleteMutationResult = Apollo.MutationResult<UserEmailDeleteMutation>;
+export type UserEmailDeleteMutationOptions = Apollo.BaseMutationOptions<UserEmailDeleteMutation, UserEmailDeleteMutationVariables>;
+export const UserEmailRegistrationInitiateDocument = gql`
+    mutation userEmailRegistrationInitiate($input: UserEmailRegistrationInitiateInput!) {
+  userEmailRegistrationInitiate(input: $input) {
+    errors {
+      message
+    }
+    emailRegistrationId
+    me {
+      id
+      email {
+        address
+        verified
+      }
+    }
+  }
+}
+    `;
+export type UserEmailRegistrationInitiateMutationFn = Apollo.MutationFunction<UserEmailRegistrationInitiateMutation, UserEmailRegistrationInitiateMutationVariables>;
+
+/**
+ * __useUserEmailRegistrationInitiateMutation__
+ *
+ * To run a mutation, you first call `useUserEmailRegistrationInitiateMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUserEmailRegistrationInitiateMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [userEmailRegistrationInitiateMutation, { data, loading, error }] = useUserEmailRegistrationInitiateMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUserEmailRegistrationInitiateMutation(baseOptions?: Apollo.MutationHookOptions<UserEmailRegistrationInitiateMutation, UserEmailRegistrationInitiateMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UserEmailRegistrationInitiateMutation, UserEmailRegistrationInitiateMutationVariables>(UserEmailRegistrationInitiateDocument, options);
+      }
+export type UserEmailRegistrationInitiateMutationHookResult = ReturnType<typeof useUserEmailRegistrationInitiateMutation>;
+export type UserEmailRegistrationInitiateMutationResult = Apollo.MutationResult<UserEmailRegistrationInitiateMutation>;
+export type UserEmailRegistrationInitiateMutationOptions = Apollo.BaseMutationOptions<UserEmailRegistrationInitiateMutation, UserEmailRegistrationInitiateMutationVariables>;
 export const CaptchaCreateChallengeDocument = gql`
     mutation captchaCreateChallenge {
   captchaCreateChallenge {
@@ -5321,6 +5383,112 @@ export function useUserLogoutMutation(baseOptions?: Apollo.MutationHookOptions<U
 export type UserLogoutMutationHookResult = ReturnType<typeof useUserLogoutMutation>;
 export type UserLogoutMutationResult = Apollo.MutationResult<UserLogoutMutation>;
 export type UserLogoutMutationOptions = Apollo.BaseMutationOptions<UserLogoutMutation, UserLogoutMutationVariables>;
+export const TransactionOwnershipProbeDocument = gql`
+    query transactionOwnershipProbe($first: Int) {
+  me {
+    id
+    defaultAccount {
+      id
+      wallets {
+        id
+      }
+      pendingIncomingTransactions {
+        id
+      }
+      transactions(first: $first) {
+        edges {
+          node {
+            id
+          }
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useTransactionOwnershipProbeQuery__
+ *
+ * To run a query within a React component, call `useTransactionOwnershipProbeQuery` and pass it any options that fit your needs.
+ * When your component renders, `useTransactionOwnershipProbeQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useTransactionOwnershipProbeQuery({
+ *   variables: {
+ *      first: // value for 'first'
+ *   },
+ * });
+ */
+export function useTransactionOwnershipProbeQuery(baseOptions?: Apollo.QueryHookOptions<TransactionOwnershipProbeQuery, TransactionOwnershipProbeQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<TransactionOwnershipProbeQuery, TransactionOwnershipProbeQueryVariables>(TransactionOwnershipProbeDocument, options);
+      }
+export function useTransactionOwnershipProbeLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<TransactionOwnershipProbeQuery, TransactionOwnershipProbeQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<TransactionOwnershipProbeQuery, TransactionOwnershipProbeQueryVariables>(TransactionOwnershipProbeDocument, options);
+        }
+export function useTransactionOwnershipProbeSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<TransactionOwnershipProbeQuery, TransactionOwnershipProbeQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<TransactionOwnershipProbeQuery, TransactionOwnershipProbeQueryVariables>(TransactionOwnershipProbeDocument, options);
+        }
+export type TransactionOwnershipProbeQueryHookResult = ReturnType<typeof useTransactionOwnershipProbeQuery>;
+export type TransactionOwnershipProbeLazyQueryHookResult = ReturnType<typeof useTransactionOwnershipProbeLazyQuery>;
+export type TransactionOwnershipProbeSuspenseQueryHookResult = ReturnType<typeof useTransactionOwnershipProbeSuspenseQuery>;
+export type TransactionOwnershipProbeQueryResult = Apollo.QueryResult<TransactionOwnershipProbeQuery, TransactionOwnershipProbeQueryVariables>;
+export const TransactionByIdForWalletDocument = gql`
+    query transactionByIdForWallet($walletId: WalletId!, $txId: ID!) {
+  me {
+    id
+    defaultAccount {
+      id
+      walletById(walletId: $walletId) {
+        id
+        transactionById(transactionId: $txId) {
+          ...Transaction
+        }
+      }
+    }
+  }
+}
+    ${TransactionFragmentDoc}`;
+
+/**
+ * __useTransactionByIdForWalletQuery__
+ *
+ * To run a query within a React component, call `useTransactionByIdForWalletQuery` and pass it any options that fit your needs.
+ * When your component renders, `useTransactionByIdForWalletQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useTransactionByIdForWalletQuery({
+ *   variables: {
+ *      walletId: // value for 'walletId'
+ *      txId: // value for 'txId'
+ *   },
+ * });
+ */
+export function useTransactionByIdForWalletQuery(baseOptions: Apollo.QueryHookOptions<TransactionByIdForWalletQuery, TransactionByIdForWalletQueryVariables> & ({ variables: TransactionByIdForWalletQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<TransactionByIdForWalletQuery, TransactionByIdForWalletQueryVariables>(TransactionByIdForWalletDocument, options);
+      }
+export function useTransactionByIdForWalletLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<TransactionByIdForWalletQuery, TransactionByIdForWalletQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<TransactionByIdForWalletQuery, TransactionByIdForWalletQueryVariables>(TransactionByIdForWalletDocument, options);
+        }
+export function useTransactionByIdForWalletSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<TransactionByIdForWalletQuery, TransactionByIdForWalletQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<TransactionByIdForWalletQuery, TransactionByIdForWalletQueryVariables>(TransactionByIdForWalletDocument, options);
+        }
+export type TransactionByIdForWalletQueryHookResult = ReturnType<typeof useTransactionByIdForWalletQuery>;
+export type TransactionByIdForWalletLazyQueryHookResult = ReturnType<typeof useTransactionByIdForWalletLazyQuery>;
+export type TransactionByIdForWalletSuspenseQueryHookResult = ReturnType<typeof useTransactionByIdForWalletSuspenseQuery>;
+export type TransactionByIdForWalletQueryResult = Apollo.QueryResult<TransactionByIdForWalletQuery, TransactionByIdForWalletQueryVariables>;
 export const GetUsernamesDocument = gql`
     query getUsernames {
   me {
@@ -6402,49 +6570,6 @@ export function useQuizClaimMutation(baseOptions?: Apollo.MutationHookOptions<Qu
 export type QuizClaimMutationHookResult = ReturnType<typeof useQuizClaimMutation>;
 export type QuizClaimMutationResult = Apollo.MutationResult<QuizClaimMutation>;
 export type QuizClaimMutationOptions = Apollo.BaseMutationOptions<QuizClaimMutation, QuizClaimMutationVariables>;
-export const UserEmailRegistrationInitiateDocument = gql`
-    mutation userEmailRegistrationInitiate($input: UserEmailRegistrationInitiateInput!) {
-  userEmailRegistrationInitiate(input: $input) {
-    errors {
-      message
-    }
-    emailRegistrationId
-    me {
-      id
-      email {
-        address
-        verified
-      }
-    }
-  }
-}
-    `;
-export type UserEmailRegistrationInitiateMutationFn = Apollo.MutationFunction<UserEmailRegistrationInitiateMutation, UserEmailRegistrationInitiateMutationVariables>;
-
-/**
- * __useUserEmailRegistrationInitiateMutation__
- *
- * To run a mutation, you first call `useUserEmailRegistrationInitiateMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useUserEmailRegistrationInitiateMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [userEmailRegistrationInitiateMutation, { data, loading, error }] = useUserEmailRegistrationInitiateMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useUserEmailRegistrationInitiateMutation(baseOptions?: Apollo.MutationHookOptions<UserEmailRegistrationInitiateMutation, UserEmailRegistrationInitiateMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<UserEmailRegistrationInitiateMutation, UserEmailRegistrationInitiateMutationVariables>(UserEmailRegistrationInitiateDocument, options);
-      }
-export type UserEmailRegistrationInitiateMutationHookResult = ReturnType<typeof useUserEmailRegistrationInitiateMutation>;
-export type UserEmailRegistrationInitiateMutationResult = Apollo.MutationResult<UserEmailRegistrationInitiateMutation>;
-export type UserEmailRegistrationInitiateMutationOptions = Apollo.BaseMutationOptions<UserEmailRegistrationInitiateMutation, UserEmailRegistrationInitiateMutationVariables>;
 export const UserEmailRegistrationValidateDocument = gql`
     mutation userEmailRegistrationValidate($input: UserEmailRegistrationValidateInput!) {
   userEmailRegistrationValidate(input: $input) {
@@ -7586,7 +7711,10 @@ export const PaymentRequestDocument = gql`
       deposit {
         minBankFee
         minBankFeeThreshold
-        ratio
+        tiers {
+          maxAmount
+          amount
+        }
       }
     }
   }
@@ -7674,6 +7802,59 @@ export function useMyLnUpdatesSubscription(baseOptions?: Apollo.SubscriptionHook
       }
 export type MyLnUpdatesSubscriptionHookResult = ReturnType<typeof useMyLnUpdatesSubscription>;
 export type MyLnUpdatesSubscriptionResult = Apollo.SubscriptionResult<MyLnUpdatesSubscription>;
+export const TransactionsByPaymentHashDocument = gql`
+    query transactionsByPaymentHash($walletId: WalletId!, $paymentHash: PaymentHash!) {
+  me {
+    id
+    defaultAccount {
+      id
+      walletById(walletId: $walletId) {
+        id
+        transactionsByPaymentHash(paymentHash: $paymentHash) {
+          id
+          status
+          direction
+          createdAt
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useTransactionsByPaymentHashQuery__
+ *
+ * To run a query within a React component, call `useTransactionsByPaymentHashQuery` and pass it any options that fit your needs.
+ * When your component renders, `useTransactionsByPaymentHashQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useTransactionsByPaymentHashQuery({
+ *   variables: {
+ *      walletId: // value for 'walletId'
+ *      paymentHash: // value for 'paymentHash'
+ *   },
+ * });
+ */
+export function useTransactionsByPaymentHashQuery(baseOptions: Apollo.QueryHookOptions<TransactionsByPaymentHashQuery, TransactionsByPaymentHashQueryVariables> & ({ variables: TransactionsByPaymentHashQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<TransactionsByPaymentHashQuery, TransactionsByPaymentHashQueryVariables>(TransactionsByPaymentHashDocument, options);
+      }
+export function useTransactionsByPaymentHashLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<TransactionsByPaymentHashQuery, TransactionsByPaymentHashQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<TransactionsByPaymentHashQuery, TransactionsByPaymentHashQueryVariables>(TransactionsByPaymentHashDocument, options);
+        }
+export function useTransactionsByPaymentHashSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<TransactionsByPaymentHashQuery, TransactionsByPaymentHashQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<TransactionsByPaymentHashQuery, TransactionsByPaymentHashQueryVariables>(TransactionsByPaymentHashDocument, options);
+        }
+export type TransactionsByPaymentHashQueryHookResult = ReturnType<typeof useTransactionsByPaymentHashQuery>;
+export type TransactionsByPaymentHashLazyQueryHookResult = ReturnType<typeof useTransactionsByPaymentHashLazyQuery>;
+export type TransactionsByPaymentHashSuspenseQueryHookResult = ReturnType<typeof useTransactionsByPaymentHashSuspenseQuery>;
+export type TransactionsByPaymentHashQueryResult = Apollo.QueryResult<TransactionsByPaymentHashQuery, TransactionsByPaymentHashQueryVariables>;
 export const ScanningQrCodeScreenDocument = gql`
     query scanningQRCodeScreen {
   globals {
@@ -8019,44 +8200,6 @@ export type SendBitcoinInternalLimitsQueryHookResult = ReturnType<typeof useSend
 export type SendBitcoinInternalLimitsLazyQueryHookResult = ReturnType<typeof useSendBitcoinInternalLimitsLazyQuery>;
 export type SendBitcoinInternalLimitsSuspenseQueryHookResult = ReturnType<typeof useSendBitcoinInternalLimitsSuspenseQuery>;
 export type SendBitcoinInternalLimitsQueryResult = Apollo.QueryResult<SendBitcoinInternalLimitsQuery, SendBitcoinInternalLimitsQueryVariables>;
-export const FeedbackSubmitDocument = gql`
-    mutation feedbackSubmit($input: FeedbackSubmitInput!) {
-  feedbackSubmit(input: $input) {
-    errors {
-      message
-      __typename
-    }
-    success
-    __typename
-  }
-}
-    `;
-export type FeedbackSubmitMutationFn = Apollo.MutationFunction<FeedbackSubmitMutation, FeedbackSubmitMutationVariables>;
-
-/**
- * __useFeedbackSubmitMutation__
- *
- * To run a mutation, you first call `useFeedbackSubmitMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useFeedbackSubmitMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [feedbackSubmitMutation, { data, loading, error }] = useFeedbackSubmitMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useFeedbackSubmitMutation(baseOptions?: Apollo.MutationHookOptions<FeedbackSubmitMutation, FeedbackSubmitMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<FeedbackSubmitMutation, FeedbackSubmitMutationVariables>(FeedbackSubmitDocument, options);
-      }
-export type FeedbackSubmitMutationHookResult = ReturnType<typeof useFeedbackSubmitMutation>;
-export type FeedbackSubmitMutationResult = Apollo.MutationResult<FeedbackSubmitMutation>;
-export type FeedbackSubmitMutationOptions = Apollo.BaseMutationOptions<FeedbackSubmitMutation, FeedbackSubmitMutationVariables>;
 export const LnNoAmountInvoiceFeeProbeDocument = gql`
     mutation lnNoAmountInvoiceFeeProbe($input: LnNoAmountInvoiceFeeProbeInput!) {
   lnNoAmountInvoiceFeeProbe(input: $input) {
@@ -8738,6 +8881,7 @@ export const AccountDeleteDocument = gql`
   accountDelete {
     errors {
       message
+      code
     }
     success
   }
@@ -8768,49 +8912,6 @@ export function useAccountDeleteMutation(baseOptions?: Apollo.MutationHookOption
 export type AccountDeleteMutationHookResult = ReturnType<typeof useAccountDeleteMutation>;
 export type AccountDeleteMutationResult = Apollo.MutationResult<AccountDeleteMutation>;
 export type AccountDeleteMutationOptions = Apollo.BaseMutationOptions<AccountDeleteMutation, AccountDeleteMutationVariables>;
-export const UserEmailDeleteDocument = gql`
-    mutation userEmailDelete {
-  userEmailDelete {
-    errors {
-      message
-    }
-    me {
-      id
-      phone
-      totpEnabled
-      email {
-        address
-        verified
-      }
-    }
-  }
-}
-    `;
-export type UserEmailDeleteMutationFn = Apollo.MutationFunction<UserEmailDeleteMutation, UserEmailDeleteMutationVariables>;
-
-/**
- * __useUserEmailDeleteMutation__
- *
- * To run a mutation, you first call `useUserEmailDeleteMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useUserEmailDeleteMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [userEmailDeleteMutation, { data, loading, error }] = useUserEmailDeleteMutation({
- *   variables: {
- *   },
- * });
- */
-export function useUserEmailDeleteMutation(baseOptions?: Apollo.MutationHookOptions<UserEmailDeleteMutation, UserEmailDeleteMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<UserEmailDeleteMutation, UserEmailDeleteMutationVariables>(UserEmailDeleteDocument, options);
-      }
-export type UserEmailDeleteMutationHookResult = ReturnType<typeof useUserEmailDeleteMutation>;
-export type UserEmailDeleteMutationResult = Apollo.MutationResult<UserEmailDeleteMutation>;
-export type UserEmailDeleteMutationOptions = Apollo.BaseMutationOptions<UserEmailDeleteMutation, UserEmailDeleteMutationVariables>;
 export const UserPhoneDeleteDocument = gql`
     mutation userPhoneDelete {
   userPhoneDelete {
@@ -8902,6 +9003,143 @@ export type WarningSecureAccountQueryHookResult = ReturnType<typeof useWarningSe
 export type WarningSecureAccountLazyQueryHookResult = ReturnType<typeof useWarningSecureAccountLazyQuery>;
 export type WarningSecureAccountSuspenseQueryHookResult = ReturnType<typeof useWarningSecureAccountSuspenseQuery>;
 export type WarningSecureAccountQueryResult = Apollo.QueryResult<WarningSecureAccountQuery, WarningSecureAccountQueryVariables>;
+export const ApiKeysDocument = gql`
+    query apiKeys {
+  me {
+    id
+    apiKeys {
+      id
+      name
+      createdAt
+      revoked
+      expired
+      lastUsedAt
+      expiresAt
+      scopes
+      readOnly
+    }
+  }
+}
+    `;
+
+/**
+ * __useApiKeysQuery__
+ *
+ * To run a query within a React component, call `useApiKeysQuery` and pass it any options that fit your needs.
+ * When your component renders, `useApiKeysQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useApiKeysQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useApiKeysQuery(baseOptions?: Apollo.QueryHookOptions<ApiKeysQuery, ApiKeysQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<ApiKeysQuery, ApiKeysQueryVariables>(ApiKeysDocument, options);
+      }
+export function useApiKeysLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ApiKeysQuery, ApiKeysQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<ApiKeysQuery, ApiKeysQueryVariables>(ApiKeysDocument, options);
+        }
+export function useApiKeysSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<ApiKeysQuery, ApiKeysQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<ApiKeysQuery, ApiKeysQueryVariables>(ApiKeysDocument, options);
+        }
+export type ApiKeysQueryHookResult = ReturnType<typeof useApiKeysQuery>;
+export type ApiKeysLazyQueryHookResult = ReturnType<typeof useApiKeysLazyQuery>;
+export type ApiKeysSuspenseQueryHookResult = ReturnType<typeof useApiKeysSuspenseQuery>;
+export type ApiKeysQueryResult = Apollo.QueryResult<ApiKeysQuery, ApiKeysQueryVariables>;
+export const ApiKeyCreateDocument = gql`
+    mutation apiKeyCreate($input: ApiKeyCreateInput!) {
+  apiKeyCreate(input: $input) {
+    apiKey {
+      id
+      name
+      createdAt
+      revoked
+      expired
+      lastUsedAt
+      expiresAt
+      scopes
+      readOnly
+    }
+    apiKeySecret
+  }
+}
+    `;
+export type ApiKeyCreateMutationFn = Apollo.MutationFunction<ApiKeyCreateMutation, ApiKeyCreateMutationVariables>;
+
+/**
+ * __useApiKeyCreateMutation__
+ *
+ * To run a mutation, you first call `useApiKeyCreateMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useApiKeyCreateMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [apiKeyCreateMutation, { data, loading, error }] = useApiKeyCreateMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useApiKeyCreateMutation(baseOptions?: Apollo.MutationHookOptions<ApiKeyCreateMutation, ApiKeyCreateMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<ApiKeyCreateMutation, ApiKeyCreateMutationVariables>(ApiKeyCreateDocument, options);
+      }
+export type ApiKeyCreateMutationHookResult = ReturnType<typeof useApiKeyCreateMutation>;
+export type ApiKeyCreateMutationResult = Apollo.MutationResult<ApiKeyCreateMutation>;
+export type ApiKeyCreateMutationOptions = Apollo.BaseMutationOptions<ApiKeyCreateMutation, ApiKeyCreateMutationVariables>;
+export const ApiKeyRevokeDocument = gql`
+    mutation apiKeyRevoke($input: ApiKeyRevokeInput!) {
+  apiKeyRevoke(input: $input) {
+    apiKey {
+      id
+      name
+      createdAt
+      revoked
+      expired
+      lastUsedAt
+      expiresAt
+      scopes
+      readOnly
+    }
+  }
+}
+    `;
+export type ApiKeyRevokeMutationFn = Apollo.MutationFunction<ApiKeyRevokeMutation, ApiKeyRevokeMutationVariables>;
+
+/**
+ * __useApiKeyRevokeMutation__
+ *
+ * To run a mutation, you first call `useApiKeyRevokeMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useApiKeyRevokeMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [apiKeyRevokeMutation, { data, loading, error }] = useApiKeyRevokeMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useApiKeyRevokeMutation(baseOptions?: Apollo.MutationHookOptions<ApiKeyRevokeMutation, ApiKeyRevokeMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<ApiKeyRevokeMutation, ApiKeyRevokeMutationVariables>(ApiKeyRevokeDocument, options);
+      }
+export type ApiKeyRevokeMutationHookResult = ReturnType<typeof useApiKeyRevokeMutation>;
+export type ApiKeyRevokeMutationResult = Apollo.MutationResult<ApiKeyRevokeMutation>;
+export type ApiKeyRevokeMutationOptions = Apollo.BaseMutationOptions<ApiKeyRevokeMutation, ApiKeyRevokeMutationVariables>;
 export const AccountUpdateDefaultWalletIdDocument = gql`
     mutation accountUpdateDefaultWalletId($input: AccountUpdateDefaultWalletIdInput!) {
   accountUpdateDefaultWalletId(input: $input) {
@@ -9035,7 +9273,10 @@ export const FeeRatesDocument = gql`
       deposit {
         minBankFee
         minBankFeeThreshold
-        ratio
+        tiers {
+          maxAmount
+          amount
+        }
       }
     }
   }
@@ -10042,7 +10283,9 @@ export type ResolversTypes = {
   CountryCode: ResolverTypeWrapper<Scalars['CountryCode']['output']>;
   Currency: ResolverTypeWrapper<Currency>;
   CurrencyConversionEstimation: ResolverTypeWrapper<CurrencyConversionEstimation>;
+  CustodialRestrictions: ResolverTypeWrapper<CustodialRestrictions>;
   DateTime: ResolverTypeWrapper<Scalars['DateTime']['output']>;
+  DepositFeeTier: ResolverTypeWrapper<DepositFeeTier>;
   DepositFeesInformation: ResolverTypeWrapper<DepositFeesInformation>;
   DeviceNotificationTokenCreateInput: DeviceNotificationTokenCreateInput;
   DisplayCurrency: ResolverTypeWrapper<Scalars['DisplayCurrency']['output']>;
@@ -10177,6 +10420,7 @@ export type ResolversTypes = {
   RealtimePriceInput: RealtimePriceInput;
   RealtimePricePayload: ResolverTypeWrapper<RealtimePricePayload>;
   Region: ResolverTypeWrapper<Region>;
+  RegionCheck: ResolverTypeWrapper<RegionCheck>;
   SafeInt: ResolverTypeWrapper<Scalars['SafeInt']['output']>;
   SatAmount: ResolverTypeWrapper<Scalars['SatAmount']['output']>;
   SatAmountPayload: ResolverTypeWrapper<SatAmountPayload>;
@@ -10345,7 +10589,9 @@ export type ResolversParentTypes = {
   CountryCode: Scalars['CountryCode']['output'];
   Currency: Currency;
   CurrencyConversionEstimation: CurrencyConversionEstimation;
+  CustodialRestrictions: CustodialRestrictions;
   DateTime: Scalars['DateTime']['output'];
+  DepositFeeTier: DepositFeeTier;
   DepositFeesInformation: DepositFeesInformation;
   DeviceNotificationTokenCreateInput: DeviceNotificationTokenCreateInput;
   DisplayCurrency: Scalars['DisplayCurrency']['output'];
@@ -10466,6 +10712,7 @@ export type ResolversParentTypes = {
   RealtimePriceInput: RealtimePriceInput;
   RealtimePricePayload: RealtimePricePayload;
   Region: Region;
+  RegionCheck: RegionCheck;
   SafeInt: Scalars['SafeInt']['output'];
   SatAmount: Scalars['SatAmount']['output'];
   SatAmountPayload: SatAmountPayload;
@@ -10980,14 +11227,27 @@ export type CurrencyConversionEstimationResolvers<ContextType = any, ParentType 
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type CustodialRestrictionsResolvers<ContextType = any, ParentType extends ResolversParentTypes['CustodialRestrictions'] = ResolversParentTypes['CustodialRestrictions']> = {
+  dollarBalance?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  transfer?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export interface DateTimeScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['DateTime'], any> {
   name: 'DateTime';
 }
+
+export type DepositFeeTierResolvers<ContextType = any, ParentType extends ResolversParentTypes['DepositFeeTier'] = ResolversParentTypes['DepositFeeTier']> = {
+  amount?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  maxAmount?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
 
 export type DepositFeesInformationResolvers<ContextType = any, ParentType extends ResolversParentTypes['DepositFeesInformation'] = ResolversParentTypes['DepositFeesInformation']> = {
   minBankFee?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   minBankFeeThreshold?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   ratio?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  tiers?: Resolver<ReadonlyArray<ResolversTypes['DepositFeeTier']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -11544,10 +11804,9 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   countryCode?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   currencyConversionEstimation?: Resolver<ResolversTypes['CurrencyConversionEstimation'], ParentType, ContextType, RequireFields<QueryCurrencyConversionEstimationArgs, 'amount' | 'currency'>>;
   currencyList?: Resolver<ReadonlyArray<ResolversTypes['Currency']>, ParentType, ContextType>;
+  custodialRestrictions?: Resolver<ResolversTypes['CustodialRestrictions'], ParentType, ContextType>;
   deviceSessionCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  feedbackModalShown?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   globals?: Resolver<Maybe<ResolversTypes['Globals']>, ParentType, ContextType>;
-  hiddenBalanceToolTip?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   hideBalance?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   innerCircleValue?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   introducingCirclesModalShown?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
@@ -11565,6 +11824,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   price?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   realtimePrice?: Resolver<ResolversTypes['RealtimePrice'], ParentType, ContextType, RequireFields<QueryRealtimePriceArgs, 'currency'>>;
   region?: Resolver<Maybe<ResolversTypes['Region']>, ParentType, ContextType>;
+  regionCheck?: Resolver<ResolversTypes['RegionCheck'], ParentType, ContextType>;
   txLastSeen?: Resolver<ResolversTypes['TxLastSeen'], ParentType, ContextType, RequireFields<QueryTxLastSeenArgs, 'accountId'>>;
   upgradeModalLastShownAt?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   userDefaultWalletId?: Resolver<ResolversTypes['WalletId'], ParentType, ContextType, RequireFields<QueryUserDefaultWalletIdArgs, 'username'>>;
@@ -11608,6 +11868,13 @@ export type RegionResolvers<ContextType = any, ParentType extends ResolversParen
   latitudeDelta?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   longitude?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   longitudeDelta?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type RegionCheckResolvers<ContextType = any, ParentType extends ResolversParentTypes['RegionCheck'] = ResolversParentTypes['RegionCheck']> = {
+  countryCode?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  custodialCreationAllowed?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  restricted?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -12040,7 +12307,9 @@ export type Resolvers<ContextType = any> = {
   CountryCode?: GraphQLScalarType;
   Currency?: CurrencyResolvers<ContextType>;
   CurrencyConversionEstimation?: CurrencyConversionEstimationResolvers<ContextType>;
+  CustodialRestrictions?: CustodialRestrictionsResolvers<ContextType>;
   DateTime?: GraphQLScalarType;
+  DepositFeeTier?: DepositFeeTierResolvers<ContextType>;
   DepositFeesInformation?: DepositFeesInformationResolvers<ContextType>;
   DisplayCurrency?: GraphQLScalarType;
   Email?: EmailResolvers<ContextType>;
@@ -12123,6 +12392,7 @@ export type Resolvers<ContextType = any> = {
   RealtimePrice?: RealtimePriceResolvers<ContextType>;
   RealtimePricePayload?: RealtimePricePayloadResolvers<ContextType>;
   Region?: RegionResolvers<ContextType>;
+  RegionCheck?: RegionCheckResolvers<ContextType>;
   SafeInt?: GraphQLScalarType;
   SatAmount?: GraphQLScalarType;
   SatAmountPayload?: SatAmountPayloadResolvers<ContextType>;

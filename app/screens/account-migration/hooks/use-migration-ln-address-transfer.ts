@@ -7,7 +7,7 @@ import {
   MigrationLnAddressTransferStatus,
   useMigrationLnAddressTransferMutation,
 } from "@app/graphql/generated"
-import { isNetworkFailure } from "@app/graphql/is-network-failure"
+import { isNetworkFailure } from "@app/graphql/transport-error"
 import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
 import {
   buildMigrationLnAddressProof,

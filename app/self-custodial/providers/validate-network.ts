@@ -1,5 +1,4 @@
 import { type Network } from "@breeztech/breez-sdk-spark-react-native"
-import crashlytics from "@react-native-firebase/crashlytics"
 
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
@@ -16,6 +15,5 @@ export const validateStoredNetwork = async (
 
   const message = `Network mismatch: wallet=${mismatch}, config=${networkLabelFor(network)}`
   logSdkEvent(SdkLogLevel.Error, message)
-  crashlytics().recordError(new Error(message))
   return false
 }

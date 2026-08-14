@@ -1,29 +1,56 @@
-import React from "react"
+import React, { useEffect, useLayoutEffect } from "react"
 import { ScrollView, View } from "react-native"
 
 import { makeStyles, Text } from "@rn-vui/themed"
-import { useRoute, RouteProp } from "@react-navigation/native"
+import { useNavigation, useRoute, RouteProp } from "@react-navigation/native"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
-import { IconTextButton } from "@app/components/icon-text-button"
-import { InfoBanner } from "@app/components/info-banner"
+import { GaloyTertiaryButton } from "@app/components/atomic/galoy-tertiary-button"
+import { headerRightNoGlass } from "@app/components/header-no-glass"
+import { WarningCard } from "@app/components/warning-card"
 import { Screen } from "@app/components/screen"
+import { SparkCompatibleInfo } from "@app/components/spark-compatible-info"
 import { useScreenSecurity } from "@app/hooks/use-screen-security"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { reportError } from "@app/utils/error-logging"
 import { testProps } from "@app/utils/testProps"
-import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import {
+  isPhraseStep,
+  PhraseStep,
+  RootStackParamList,
+} from "@app/navigation/stack-param-lists"
 import { SettingsGroup } from "@app/screens/settings-screen/group"
 
 import { useBackupPhrase } from "../hooks"
 
 const WORDS_PER_CARD = 3
 
+// The clear tertiary button has no padding, so its hit area is the text bounds.
+const HEADER_BUTTON_HIT_SLOP = { top: 12, bottom: 12, left: 12, right: 12 }
+
 type PhraseRouteProp = RouteProp<RootStackParamList, "selfCustodialBackupPhrase">
 
 export const BackupPhraseScreen: React.FC = () => {
   const { LL } = useI18nContext()
   const styles = useStyles()
-  const { step } = useRoute<PhraseRouteProp>().params
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+
+  /** Deep links and navigation-state rehydration can deliver missing or malformed params
+   *  despite the route type; a bare destructure here threw into the app-wide ErrorBoundary,
+   *  replacing the whole navigation tree (#4070). Fall back to the first six words. */
+  const stepParam = useRoute<PhraseRouteProp>().params?.step
+  const hasValidStep = isPhraseStep(stepParam)
+  const step = hasValidStep ? stepParam : PhraseStep.First
+
+  useEffect(() => {
+    if (hasValidStep) return
+    reportError(
+      "Backup phrase route params missing",
+      new Error("Route delivered no valid step"),
+      { dedupKey: "backup-phrase-params-missing", alwaysRecord: true },
+    )
+  }, [hasValidStep])
 
   useScreenSecurity()
 
@@ -32,17 +59,28 @@ export const BackupPhraseScreen: React.FC = () => {
     secondCard,
     offset,
     handleCopy,
-    handleOpenLink,
     handleContinue,
     buttonTitle,
     isButtonDisabled,
   } = useBackupPhrase(step)
 
-  const sparkLink = LL.BackupScreen.ManualBackup.Phrase.sparkCompatibleLink()
-  const infoText = LL.BackupScreen.ManualBackup.Phrase.sparkCompatible({
-    sparkCompatibleLink: sparkLink,
-  })
-  const [infoBefore, infoAfter] = infoText.split(sparkLink)
+  const copyLabel = LL.BackupScreen.ManualBackup.Phrase.copy()
+
+  useLayoutEffect(() => {
+    navigation.setOptions(
+      headerRightNoGlass(() => (
+        <GaloyTertiaryButton
+          clear
+          title={copyLabel}
+          onPress={handleCopy}
+          containerStyle={styles.headerButton}
+          hitSlop={HEADER_BUTTON_HIT_SLOP}
+          {...testProps("backup-phrase-copy")}
+          accessibilityLabel={copyLabel}
+        />
+      )),
+    )
+  }, [navigation, copyLabel, handleCopy, styles])
 
   const renderWord = (word: string, index: number) => (
     <View key={index} style={styles.wordRow}>
@@ -54,6 +92,8 @@ export const BackupPhraseScreen: React.FC = () => {
   return (
     <Screen preset="fixed">
       <ScrollView contentContainerStyle={styles.content}>
+        <WarningCard title={LL.BackupScreen.ManualBackup.Phrase.doNotShareWarning()} />
+
         <View style={styles.seedWords}>
           <SettingsGroup
             items={firstCard.map((word, i) => () => renderWord(word, i))}
@@ -69,26 +109,7 @@ export const BackupPhraseScreen: React.FC = () => {
           />
         </View>
 
-        <InfoBanner>
-          <Text style={styles.infoText}>
-            {infoBefore}
-            <Text
-              style={styles.linkText}
-              accessibilityRole="link"
-              onPress={handleOpenLink}
-            >
-              {sparkLink}
-            </Text>
-            {infoAfter}
-          </Text>
-        </InfoBanner>
-
-        <IconTextButton
-          icon="copy-paste"
-          label={LL.BackupScreen.ManualBackup.Phrase.copy()}
-          onPress={handleCopy}
-          {...testProps("backup-phrase-copy")}
-        />
+        <SparkCompatibleInfo />
       </ScrollView>
 
       <View style={styles.buttonsContainer}>
@@ -109,6 +130,9 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingTop: 10,
     paddingBottom: 20,
     gap: 20,
+  },
+  headerButton: {
+    marginRight: 16,
   },
   seedWords: {
     gap: 20,
@@ -134,15 +158,6 @@ const useStyles = makeStyles(({ colors }) => ({
   wordText: {
     fontSize: 14,
     lineHeight: 20,
-  },
-  infoText: {
-    fontSize: 12,
-    lineHeight: 18,
-  },
-  linkText: {
-    fontSize: 12,
-    lineHeight: 18,
-    textDecorationLine: "underline",
   },
   buttonsContainer: {
     gap: 10,

@@ -1,4 +1,9 @@
-import { requestInvoice, utils, Satoshis } from "lnurl-pay"
+import {
+  requestInvoiceWithServiceParams,
+  utils,
+  Satoshis,
+  LnUrlPayServiceResponse,
+} from "lnurl-pay"
 import React, { useEffect, useState } from "react"
 import { TouchableOpacity, TouchableWithoutFeedback, View } from "react-native"
 import ReactNativeModal from "react-native-modal"
@@ -10,8 +15,8 @@ import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloyTertiaryButton } from "@app/components/atomic/galoy-tertiary-button"
 import { NoteInput } from "@app/components/note-input"
 import { PaymentDestinationDisplay } from "@app/components/payment-destination-display"
+import { HiddenBalancePlaceholder } from "@app/components/hidden-balance-placeholder/hidden-balance-placeholder"
 import { Screen } from "@app/components/screen"
-import { HIDDEN_AMOUNT_PLACEHOLDER } from "@app/config"
 import {
   useSendBitcoinInternalLimitsQuery,
   useSendBitcoinWithdrawalLimitsQuery,
@@ -27,7 +32,6 @@ import {
   Network as NetworkLibGaloy,
   PaymentType,
 } from "@blinkbitcoin/blink-client"
-import crashlytics from "@react-native-firebase/crashlytics"
 import { NavigationProp, RouteProp, useNavigation } from "@react-navigation/native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
@@ -42,6 +46,7 @@ import {
   toUsdMoneyAmount,
   WalletOrDisplayCurrency,
 } from "@app/types/amounts"
+import { reportError } from "@app/utils/error-logging"
 
 import { FeeTierSelector } from "./fee-tier-selector"
 import { useOnchainFeeAlert } from "./hooks/use-onchain-fee-alert"
@@ -326,30 +331,34 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
                     onLayout={onPillLayout(wallet.walletCurrency)}
                   />
                 </View>
-                <View style={styles.walletSelectorInfoContainer}>
-                  <View style={styles.walletSelectorTypeTextContainer}>
-                    {wallet.walletCurrency === WalletCurrency.Btc ? (
-                      <Text style={styles.walletCurrencyText}>
-                        {hideAmount ? HIDDEN_AMOUNT_PLACEHOLDER : btcPrimaryText}
-                      </Text>
-                    ) : (
-                      <Text style={styles.walletCurrencyText}>
-                        {hideAmount ? HIDDEN_AMOUNT_PLACEHOLDER : usdPrimaryText}
-                      </Text>
-                    )}
-                  </View>
-                  <View style={styles.walletSelectorBalanceContainer}>
-                    {wallet.walletCurrency === WalletCurrency.Btc ? (
-                      <Text>
-                        {hideAmount ? HIDDEN_AMOUNT_PLACEHOLDER : btcSecondaryText}
-                      </Text>
-                    ) : (
-                      <Text>
-                        {hideAmount ? HIDDEN_AMOUNT_PLACEHOLDER : usdSecondaryText}
-                      </Text>
-                    )}
-                  </View>
-                  <View />
+                <View
+                  style={
+                    hideAmount
+                      ? styles.walletSelectorInfoContainerHidden
+                      : styles.walletSelectorInfoContainer
+                  }
+                >
+                  {hideAmount ? (
+                    <HiddenBalancePlaceholder size="small" />
+                  ) : (
+                    <>
+                      <View style={styles.walletSelectorTypeTextContainer}>
+                        {wallet.walletCurrency === WalletCurrency.Btc ? (
+                          <Text style={styles.walletCurrencyText}>{btcPrimaryText}</Text>
+                        ) : (
+                          <Text style={styles.walletCurrencyText}>{usdPrimaryText}</Text>
+                        )}
+                      </View>
+                      <View style={styles.walletSelectorBalanceContainer}>
+                        {wallet.walletCurrency === WalletCurrency.Btc ? (
+                          <Text>{btcSecondaryText}</Text>
+                        ) : (
+                          <Text>{usdSecondaryText}</Text>
+                        )}
+                      </View>
+                      <View />
+                    </>
+                  )}
                 </View>
               </View>
             </TouchableWithoutFeedback>
@@ -374,12 +383,23 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
             "BTC",
           )
 
+          // Pay with the service params resolveLnurlDestination already vetted.
+          // requestInvoice(lnUrlOrAddress) would resolve the destination a second
+          // time and fetch whatever callback that response carries, which lnurl-pay
+          // does not require to be https — so the callback the app checked would
+          // not be the callback it pays.
+          if (!lnurlParams) {
+            setIsLoadingLnurl(false)
+            setAsyncErrorMessage(LL.SendBitcoinScreen.failedToFetchLnurlInvoice())
+            return
+          }
+
           const requestInvoiceParams: {
-            lnUrlOrAddress: string
+            params: LnUrlPayServiceResponse
             tokens: Satoshis
             comment?: string
           } = {
-            lnUrlOrAddress: paymentDetail.destination,
+            params: lnurlParams,
             tokens: utils.toSats(btcAmount.amount),
           }
 
@@ -387,7 +407,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
             requestInvoiceParams.comment = paymentDetail.memo
           }
 
-          const result = await requestInvoice(requestInvoiceParams)
+          const result = await requestInvoiceWithServiceParams(requestInvoiceParams)
 
           setPaymentDetail(paymentDetail.setSuccessAction(result.successAction))
 
@@ -411,9 +431,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
           }
         } catch (error) {
           setIsLoadingLnurl(false)
-          if (error instanceof Error) {
-            crashlytics().recordError(error)
-          }
+          reportError("send-bitcoin-details", error)
           setAsyncErrorMessage(LL.SendBitcoinScreen.failedToFetchLnurlInvoice())
           return
         }
@@ -512,33 +530,37 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
                   onLayout={onPillLayout(sendingWalletDescriptor.currency)}
                 />
               </View>
-              <View style={styles.walletSelectorInfoContainer}>
-                <View style={styles.walletSelectorTypeTextContainer}>
-                  {sendingWalletDescriptor.currency === WalletCurrency.Btc ? (
-                    <>
-                      <Text style={styles.walletCurrencyText}>
-                        {hideAmount ? HIDDEN_AMOUNT_PLACEHOLDER : btcPrimaryText}
+              <View
+                style={
+                  hideAmount
+                    ? styles.walletSelectorInfoContainerHidden
+                    : styles.walletSelectorInfoContainer
+                }
+              >
+                {hideAmount ? (
+                  <HiddenBalancePlaceholder size="small" />
+                ) : (
+                  <>
+                    <View style={styles.walletSelectorTypeTextContainer}>
+                      {sendingWalletDescriptor.currency === WalletCurrency.Btc ? (
+                        <Text style={styles.walletCurrencyText}>{btcPrimaryText}</Text>
+                      ) : (
+                        <Text style={styles.walletCurrencyText}>{usdPrimaryText}</Text>
+                      )}
+                    </View>
+                    <View style={styles.walletSelectorBalanceContainer}>
+                      <Text
+                        {...testProps(
+                          `${sendingWalletDescriptor.currency} Wallet Balance`,
+                        )}
+                      >
+                        {sendingWalletDescriptor.currency === WalletCurrency.Btc
+                          ? btcSecondaryText
+                          : usdSecondaryText}
                       </Text>
-                    </>
-                  ) : (
-                    <>
-                      <Text style={styles.walletCurrencyText}>
-                        {hideAmount ? HIDDEN_AMOUNT_PLACEHOLDER : usdPrimaryText}
-                      </Text>
-                    </>
-                  )}
-                </View>
-                <View style={styles.walletSelectorBalanceContainer}>
-                  <Text
-                    {...testProps(`${sendingWalletDescriptor.currency} Wallet Balance`)}
-                  >
-                    {hideAmount
-                      ? HIDDEN_AMOUNT_PLACEHOLDER
-                      : sendingWalletDescriptor.currency === WalletCurrency.Btc
-                        ? btcSecondaryText
-                        : usdSecondaryText}
-                  </Text>
-                </View>
+                    </View>
+                  </>
+                )}
               </View>
 
               <View style={styles.pickWalletIcon}>
@@ -670,6 +692,10 @@ const useStyles = makeStyles(({ colors }) => ({
   walletSelectorInfoContainer: {
     flex: 1,
     flexDirection: "column",
+  },
+  walletSelectorInfoContainerHidden: {
+    flex: 1,
+    justifyContent: "center",
   },
   walletCurrencyText: {
     fontWeight: "bold",

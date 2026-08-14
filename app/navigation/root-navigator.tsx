@@ -39,6 +39,7 @@ import SendBitcoinCompletedScreen from "@app/screens/send-bitcoin-screen/send-bi
 import SendBitcoinConfirmationScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-confirmation-screen"
 import SendBitcoinDestinationScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-destination-screen"
 import SendBitcoinDetailsScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-details-screen"
+import MerchantSelectionScreen from "@app/screens/send-bitcoin-screen/merchant-selection-screen"
 import { SetLightningAddressScreen } from "@app/screens/lightning-address-screen/set-lightning-address-screen"
 import { AccountScreen, SwitchAccount } from "@app/screens/settings-screen/account"
 import { DefaultWalletScreen } from "@app/screens/settings-screen/default-wallet"
@@ -70,7 +71,6 @@ import {
 } from "../screens/authentication-screen"
 import { PinScreen } from "../screens/authentication-screen/pin-screen"
 import { unlockScreenOptions } from "../screens/authentication-screen/unlock-screen"
-import { DeveloperScreen } from "../screens/developer-screen"
 import { EarnMapScreen } from "../screens/earns-map-screen"
 import { EarnQuiz, EarnSection } from "../screens/earns-screen"
 import { SectionCompleted } from "../screens/earns-screen/section-completed"
@@ -96,8 +96,10 @@ import { OfflineGate } from "@app/self-custodial/components"
 import { useSelfCustodialUnavailable } from "@app/self-custodial/hooks/use-unavailable"
 import { usePersistentStateContext } from "@app/store/persistent-state"
 import { CardDashboardScreen } from "@app/screens/card-screen/card-dashboard-screen"
+import { CardFeeScheduleScreen } from "@app/screens/card-screen/card-fee-schedule-screen"
 import { headerBackControl } from "@app/components/header-back-control/header-back-control"
-import { headerCloseControl } from "@app/components/header-close-control"
+import { headerCloseControlOptions } from "@app/components/header-close-control"
+import { headerRightNoGlass } from "@app/components/header-no-glass"
 import { NotificationHistoryScreen } from "@app/screens/notification-history-screen/notification-history-screen"
 import {
   CardAddToMobileWalletScreen,
@@ -121,6 +123,7 @@ import {
   CardSubscriptionScreen,
   LoadingCardScreen,
   CardPersonalInformationScreen,
+  CardAcknowledgementScreen,
   CardPreapprovedScreen,
   CardProcessingScreen,
   CardApprovedScreen,
@@ -155,6 +158,7 @@ import {
   MigrationExplainerScreen,
   MigrationGate,
   MigrationKeepReceivingScreen,
+  MigrationMerchantToolsScreen,
   MigrationTransferringFundsScreen,
 } from "@app/screens/account-migration"
 import {
@@ -171,6 +175,16 @@ import { AcceptTermsAndConditionsScreen } from "@app/screens/accept-t-and-c"
 import { TouchableOpacity } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import { ApiScreen } from "@app/screens/settings-screen/api-screen"
+import { ApiKeyCreateScreen } from "@app/screens/settings-screen/api/api-key-create-screen"
+
+// Required lazily (not statically imported) so the developer screen module —
+// its debugScreen query, token copy/share UI and instance override controls —
+// is never evaluated in release bundles: with __DEV__ inlined to false the
+// require is dead code and the module body never runs.
+const DeveloperScreen: React.ComponentType | null = __DEV__
+  ? // eslint-disable-next-line @typescript-eslint/no-var-requires
+    require("../screens/developer-screen").DeveloperScreen
+  : null
 
 const RootNavigator = createNativeStackNavigator<RootStackParamList>()
 
@@ -188,6 +202,7 @@ const ScanningQRCodeGated = withOfflineGate(ScanningQRCodeScreen)
 const SendBitcoinDestinationGated = withOfflineGate(SendBitcoinDestinationScreen)
 const SendBitcoinDetailsGated = withOfflineGate(SendBitcoinDetailsScreen)
 const SendBitcoinConfirmationGated = withOfflineGate(SendBitcoinConfirmationScreen)
+const MerchantSelectionGated = withOfflineGate(MerchantSelectionScreen)
 const ReceiveOfflineGated = withOfflineGate(ReceiveScreen)
 const ReceiveGated: React.FC = () => (
   <WindDownReceiveGate>
@@ -241,7 +256,7 @@ export const RootStack = () => {
       <RootNavigator.Screen
         name="getStarted"
         component={GetStartedScreen}
-        options={{ headerShown: false }}
+        options={{ headerShown: false, title: "" }}
       />
       <RootNavigator.Screen
         name="accountTypeSelection"
@@ -301,20 +316,25 @@ export const RootStack = () => {
         component={SendBitcoinDestinationGated}
         options={{
           title: LL.SendBitcoinScreen.destinationScreenTitle(),
-          headerRight: () => (
+          ...headerRightNoGlass(() => (
             <TouchableOpacity
               onPress={() => navigation.setParams({ scanPressed: Date.now() })}
               style={styles.SendBitcoinScreenScanIcon}
             >
               <ScanIcon fill={colors.black} />
             </TouchableOpacity>
-          ),
+          )),
         }}
       />
       <RootNavigator.Screen
         name="sendBitcoinDetails"
         component={SendBitcoinDetailsGated}
         options={{ title: LL.SendBitcoinScreen.title() }}
+      />
+      <RootNavigator.Screen
+        name="merchantSelection"
+        component={MerchantSelectionGated}
+        options={{ title: LL.MerchantSelectionScreen.title() }}
       />
       <RootNavigator.Screen
         name="sendBitcoinConfirmation"
@@ -439,13 +459,15 @@ export const RootStack = () => {
         component={SecurityScreen}
         options={{ title: LL.SecurityScreen.title() }}
       />
-      <RootNavigator.Screen
-        name="developerScreen"
-        component={DeveloperScreen}
-        options={{
-          gestureEnabled: false,
-        }}
-      />
+      {DeveloperScreen && (
+        <RootNavigator.Screen
+          name="developerScreen"
+          component={DeveloperScreen}
+          options={{
+            gestureEnabled: false,
+          }}
+        />
+      )}
       <RootNavigator.Screen
         name="sectionCompleted"
         component={SectionCompleted}
@@ -528,6 +550,13 @@ export const RootStack = () => {
         component={ApiScreen}
         options={{
           title: LL.SettingsScreen.apiAcess(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="apiKeyCreateScreen"
+        component={ApiKeyCreateScreen}
+        options={{
+          title: LL.ApiScreen.createTitle(),
         }}
       />
       <RootNavigator.Screen
@@ -629,6 +658,13 @@ export const RootStack = () => {
         }}
       />
       <RootNavigator.Screen
+        name="cardFeeScheduleScreen"
+        component={CardFeeScheduleScreen}
+        options={{
+          title: LL.CardFlow.CardFeeSchedule.title(),
+        }}
+      />
+      <RootNavigator.Screen
         name="cardDetailsScreen"
         component={CardDetailsScreen}
         options={{ title: LL.CardFlow.CardDetails.title() }}
@@ -708,7 +744,7 @@ export const RootStack = () => {
         component={CardIntroducingScreen}
         options={{
           title: LL.CardFlow.Onboarding.CardIntroducing.title(),
-          headerRight: headerCloseControl(),
+          ...headerCloseControlOptions(),
         }}
       />
       <RootNavigator.Screen
@@ -716,7 +752,7 @@ export const RootStack = () => {
         component={OnboardingCardDetailsScreen}
         options={{
           title: LL.CardFlow.Onboarding.CardDetails.title(),
-          headerRight: headerCloseControl(),
+          ...headerCloseControlOptions(),
         }}
       />
       <RootNavigator.Screen
@@ -731,7 +767,7 @@ export const RootStack = () => {
         component={CardSubscriptionScreen}
         options={{
           title: LL.CardFlow.Onboarding.CardSubscription.subscribeTitle(),
-          headerRight: headerCloseControl(),
+          ...headerCloseControlOptions(),
         }}
       />
       <RootNavigator.Screen
@@ -746,7 +782,7 @@ export const RootStack = () => {
         component={LoadingCardScreen}
         options={{
           title: "",
-          headerRight: headerCloseControl(),
+          ...headerCloseControlOptions(),
         }}
       />
       <RootNavigator.Screen
@@ -754,8 +790,18 @@ export const RootStack = () => {
         component={CardPersonalInformationScreen}
         options={{
           title: LL.CardFlow.Onboarding.PersonalInformation.title(),
-          headerLeft: () => <></>,
-          headerRight: headerCloseControl(),
+          // Suppresses the back button natively — an empty custom headerLeft item
+          // would still get the iOS 26 Liquid Glass capsule drawn around it.
+          headerBackVisible: false,
+          ...headerCloseControlOptions(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="cardOnboardingAcknowledgementScreen"
+        component={CardAcknowledgementScreen}
+        options={{
+          title: "",
+          ...headerCloseControlOptions(),
         }}
       />
       <RootNavigator.Screen
@@ -763,8 +809,8 @@ export const RootStack = () => {
         component={CardProcessingScreen}
         options={{
           title: "",
-          headerLeft: () => <></>,
-          headerRight: headerCloseControl(),
+          headerBackVisible: false,
+          ...headerCloseControlOptions(),
         }}
       />
       <RootNavigator.Screen
@@ -772,8 +818,8 @@ export const RootStack = () => {
         component={CardPreapprovedScreen}
         options={{
           title: "",
-          headerLeft: () => <></>,
-          headerRight: headerCloseControl(),
+          headerBackVisible: false,
+          ...headerCloseControlOptions(),
         }}
       />
       <RootNavigator.Screen
@@ -781,7 +827,7 @@ export const RootStack = () => {
         component={CardApprovedScreen}
         options={{
           title: LL.CardFlow.CardStatus.title(),
-          headerRight: headerCloseControl(),
+          ...headerCloseControlOptions(),
         }}
       />
       <RootNavigator.Screen
@@ -858,6 +904,11 @@ export const RootStack = () => {
       <RootNavigator.Screen
         name="accountMigrationKeepReceiving"
         component={MigrationKeepReceivingScreen}
+        options={{ title: "" }}
+      />
+      <RootNavigator.Screen
+        name="accountMigrationMerchantTools"
+        component={MigrationMerchantToolsScreen}
         options={{ title: "" }}
       />
       <RootNavigator.Screen

@@ -2,7 +2,6 @@ import * as React from "react"
 import { Alert, DevSettings, Linking, View, Share } from "react-native"
 import DeviceInfo from "react-native-device-info"
 import { ScrollView } from "react-native-gesture-handler"
-import InAppReview from "react-native-in-app-review"
 import { InAppBrowser } from "react-native-inappbrowser-reborn"
 
 import { gql, useApolloClient } from "@apollo/client"
@@ -79,9 +78,6 @@ export const DeveloperScreen: React.FC = () => {
   }, [accountId, currentGaloyInstance.fiatUrl, currentGaloyInstance.kycUrl])
 
   const [newToken, setNewToken] = React.useState(token)
-  const [hasFlowFinishedSuccessfully, setHasFlowFinishedSuccessfully] = React.useState<
-    undefined | boolean
-  >(undefined)
 
   const [newGraphqlUri, setNewGraphqlUri] = React.useState(
     currentGaloyInstance.id === "Custom" ? currentGaloyInstance.graphqlUri : "",
@@ -298,16 +294,6 @@ export const DeveloperScreen: React.FC = () => {
               navigate("webView", {
                 url: urlWebView,
               })
-            }
-          />
-          <Text>InAppReview available: {String(InAppReview.isAvailable())}</Text>
-          <Text>result InAppReview: {String(hasFlowFinishedSuccessfully)}</Text>
-          <Button
-            title="Rate us"
-            containerStyle={styles.button}
-            {...testProps("Rate us")}
-            onPress={() =>
-              InAppReview.RequestInAppReview().then(setHasFlowFinishedSuccessfully)
             }
           />
           <Text style={styles.textHeader}>Trigger Bulletins</Text>

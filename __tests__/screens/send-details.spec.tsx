@@ -24,9 +24,12 @@ import { PaymentType } from "@blinkbitcoin/blink-client"
 import { ContextForScreen } from "./helper"
 
 const mockRequestInvoice = jest.fn()
+const mockRequestInvoiceWithServiceParams = jest.fn()
 jest.mock("lnurl-pay", () => ({
   ...jest.requireActual("lnurl-pay"),
   requestInvoice: (...args: unknown[]) => mockRequestInvoice(...args),
+  requestInvoiceWithServiceParams: (...args: unknown[]) =>
+    mockRequestInvoiceWithServiceParams(...args),
 }))
 
 const mockNavigate = jest.fn()
@@ -282,6 +285,7 @@ describe("SendBitcoinDetailsScreen — LNURL requestInvoice gate", () => {
     await flushAsync()
 
     expect(mockRequestInvoice).not.toHaveBeenCalled()
+    expect(mockRequestInvoiceWithServiceParams).not.toHaveBeenCalled()
     expect(mockNavigate).toHaveBeenCalledWith(
       "sendBitcoinConfirmation",
       expect.objectContaining({ paymentDetail: expect.any(Object) }),
@@ -291,7 +295,7 @@ describe("SendBitcoinDetailsScreen — LNURL requestInvoice gate", () => {
   it("calls lnurl-pay requestInvoice when paymentDetail.sendPaymentMutation is missing (custodial path)", async () => {
     const detail = buildLnurlPaymentDetail({ withSendMutation: false })
     const LL = i18nObject("en")
-    mockRequestInvoice.mockResolvedValue({
+    mockRequestInvoiceWithServiceParams.mockResolvedValue({
       invoice: "lnbc10n1pjxample",
       successAction: undefined,
     })
@@ -308,9 +312,38 @@ describe("SendBitcoinDetailsScreen — LNURL requestInvoice gate", () => {
     fireEvent.press(screen.getByText(LL.common.next()))
     await flushAsync()
 
-    expect(mockRequestInvoice).toHaveBeenCalledTimes(1)
-    expect(mockRequestInvoice).toHaveBeenCalledWith(
-      expect.objectContaining({ lnUrlOrAddress: "lnurl1abc" }),
+    expect(mockRequestInvoiceWithServiceParams).toHaveBeenCalledTimes(1)
+    expect(mockRequestInvoiceWithServiceParams).toHaveBeenCalledWith(
+      expect.objectContaining({ params: lnurlParams }),
     )
+  })
+
+  // requestInvoice(lnUrlOrAddress) would resolve the destination again and fetch
+  // whatever callback the second response carries, bypassing the https check
+  // resolveLnurlDestination performed on the params held here.
+  it("pays with the vetted service params and never re-resolves the destination", async () => {
+    const detail = buildLnurlPaymentDetail({ withSendMutation: false })
+    const LL = i18nObject("en")
+    mockRequestInvoiceWithServiceParams.mockResolvedValue({
+      invoice: "lnbc10n1pjxample",
+      successAction: undefined,
+    })
+
+    render(
+      <ContextForScreen>
+        <SendBitcoinDetailsScreen route={buildRoute(detail)} />
+      </ContextForScreen>,
+    )
+
+    await flushAsync()
+    await flushAsync()
+
+    fireEvent.press(screen.getByText(LL.common.next()))
+    await flushAsync()
+
+    const args = mockRequestInvoiceWithServiceParams.mock.calls[0][0]
+    expect(args.params.callback).toBe("https://example.com/cb")
+    expect(args).not.toHaveProperty("lnUrlOrAddress")
+    expect(mockRequestInvoice).not.toHaveBeenCalled()
   })
 })

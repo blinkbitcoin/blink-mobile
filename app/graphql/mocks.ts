@@ -437,7 +437,18 @@ const mocks = [
               __typename: "DepositFeesInformation",
               minBankFee: "2500",
               minBankFeeThreshold: "1000000",
-              ratio: "50",
+              tiers: [
+                {
+                  __typename: "DepositFeeTier",
+                  maxAmount: "1000000",
+                  amount: "2500",
+                },
+                {
+                  __typename: "DepositFeeTier",
+                  maxAmount: null,
+                  amount: "5000",
+                },
+              ],
             },
           },
         },
@@ -457,6 +468,10 @@ const mocks = [
             deposit: {
               minBankFee: "3000",
               minBankFeeThreshold: "1000000",
+              tiers: [
+                { maxAmount: "1000000", amount: "3000" },
+                { maxAmount: null, amount: "5000" },
+              ],
             },
           },
         },

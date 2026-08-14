@@ -1,8 +1,9 @@
 import React from "react"
 import { it } from "@jest/globals"
 import { MockedResponse } from "@apollo/client/testing"
-import { fireEvent, render, waitFor } from "@testing-library/react-native"
-import { StyleSheet } from "react-native"
+import { act, fireEvent, render, waitFor } from "@testing-library/react-native"
+import { RefreshControl, StyleSheet } from "react-native"
+import { SafeAreaView } from "react-native-safe-area-context"
 
 import { HomeScreen } from "../../app/screens/home-screen"
 import { ContextForScreen } from "./helper"
@@ -95,8 +96,36 @@ jest.mock("@app/hooks/use-active-wallet", () => ({
     },
 }))
 
+// eslint-disable-next-line prefer-const
+let mockActiveAccountOverride: Record<string, unknown> | null = null
+
+jest.mock("@app/hooks/use-account-registry", () => {
+  const actual = jest.requireActual("@app/hooks/use-account-registry")
+  return {
+    ...actual,
+    useAccountRegistry: () => {
+      const registry = actual.useAccountRegistry()
+      return mockActiveAccountOverride
+        ? { ...registry, activeAccount: mockActiveAccountOverride }
+        : registry
+    },
+  }
+})
+
 jest.mock("@app/config/feature-flags-context", () => {
-  const actual = jest.requireActual("@app/config/feature-flags-context")
+  const actual = jest.requireActual<typeof import("@app/config/feature-flags-context")>(
+    "@app/config/feature-flags-context",
+  )
+  /**
+   * Typed against the real hook and spread from the real defaults so tsc fails
+   * when the mock misses a new remote-config key or keeps a removed one — a
+   * stale partial mock crashed the whole suite when #3977 landed.
+   */
+  const remoteConfig: ReturnType<typeof actual.useRemoteConfig> = {
+    ...actual.defaultRemoteConfig,
+    custodialDollarBalanceBlockedCountries: [],
+    selfCustodialDollarBalanceBlockedCountries: [],
+  }
   return {
     ...actual,
     useFeatureFlags: () =>
@@ -104,17 +133,7 @@ jest.mock("@app/config/feature-flags-context", () => {
         nonCustodialEnabled: false,
         stableBalanceEnabled: false,
       },
-    useRemoteConfig: () => ({
-      loading: false,
-      remoteConfigReady: true,
-      feeReimbursementMemo: "fee reimbursement",
-      featureFlags: {
-        nonCustodialEnabled: false,
-        stableBalanceEnabled: false,
-      },
-      custodialDollarBalanceBlockedCountries: [],
-      selfCustodialDollarBalanceBlockedCountries: [],
-    }),
+    useRemoteConfig: () => remoteConfig,
   }
 })
 
@@ -213,12 +232,23 @@ jest.mock("@app/components/migration-reminder-bulletin", () => {
 })
 
 const mockUseNonCustodialConversionLimits = jest.fn()
+let mockPendingDepositsOverride: {
+  deposits: unknown[]
+  refetch?: () => Promise<void>
+} | null = null
 
-jest.mock("@app/self-custodial/hooks", () => ({
-  ...jest.requireActual("@app/self-custodial/hooks"),
-  useNonCustodialConversionLimits: (direction: string | undefined) =>
-    mockUseNonCustodialConversionLimits(direction),
-}))
+jest.mock("@app/self-custodial/hooks", () => {
+  const actual = jest.requireActual("@app/self-custodial/hooks")
+  return {
+    ...actual,
+    useNonCustodialConversionLimits: (direction: string | undefined) =>
+      mockUseNonCustodialConversionLimits(direction),
+    usePendingDeposits: () =>
+      mockPendingDepositsOverride
+        ? { refetch: async () => {}, ...mockPendingDepositsOverride }
+        : actual.usePendingDeposits(),
+  }
+})
 
 jest.mock("@app/components/dollar-balance-restriction-modal", () => {
   const ReactActual = jest.requireActual("react")
@@ -405,11 +435,15 @@ export const generateHomeMock = ({
   network,
   btcBalance,
   usdBalance,
+  pendingIncomingTransactions = [],
+  defaultAccountMissing = false,
 }: {
   level: AccountLevel
   network: Network
   btcBalance: number
   usdBalance: number
+  pendingIncomingTransactions?: Array<Record<string, unknown>>
+  defaultAccountMissing?: boolean
 }): MockedResponse[] => {
   return [
     {
@@ -444,43 +478,78 @@ export const generateHomeMock = ({
               address: null,
               verified: false,
             },
-            defaultAccount: {
-              __typename: "ConsumerAccount",
-              id: "account-id",
-              level,
-              defaultWalletId: "btc-wallet",
-              wallets: [
-                {
-                  __typename: "BTCWallet",
-                  id: "btc-wallet",
-                  balance: btcBalance,
-                  walletCurrency: "BTC",
+            defaultAccount: defaultAccountMissing
+              ? null
+              : {
+                  __typename: "ConsumerAccount",
+                  id: "account-id",
+                  level,
+                  defaultWalletId: "btc-wallet",
+                  wallets: [
+                    {
+                      __typename: "BTCWallet",
+                      id: "btc-wallet",
+                      balance: btcBalance,
+                      walletCurrency: "BTC",
+                    },
+                    {
+                      __typename: "UsdWallet",
+                      id: "usd-wallet",
+                      balance: usdBalance,
+                      walletCurrency: "USD",
+                    },
+                  ],
+                  transactions: {
+                    __typename: "TransactionConnection",
+                    edges: [],
+                    pageInfo: {
+                      __typename: "PageInfo",
+                      hasNextPage: false,
+                      hasPreviousPage: false,
+                      startCursor: null,
+                      endCursor: null,
+                    },
+                  },
+                  pendingIncomingTransactions,
                 },
-                {
-                  __typename: "UsdWallet",
-                  id: "usd-wallet",
-                  balance: usdBalance,
-                  walletCurrency: "USD",
-                },
-              ],
-              transactions: {
-                __typename: "TransactionConnection",
-                edges: [],
-                pageInfo: {
-                  __typename: "PageInfo",
-                  hasNextPage: false,
-                  hasPreviousPage: false,
-                  startCursor: null,
-                  endCursor: null,
-                },
-              },
-              pendingIncomingTransactions: [],
-            },
           },
         },
       },
     },
   ]
+}
+
+/** Unconfirmed onchain deposit, shaped to the full Transaction fragment so the
+ *  Apollo cache accepts it without data-loss warnings. */
+const pendingOnchainReceiveTx = {
+  __typename: "Transaction",
+  id: "pending-onchain-receive-1",
+  status: "PENDING",
+  direction: "RECEIVE",
+  memo: null,
+  createdAt: 1678093528,
+  settlementAmount: 50_000,
+  settlementFee: 0,
+  settlementDisplayFee: "0.00",
+  settlementCurrency: "BTC",
+  settlementDisplayAmount: "500.00",
+  settlementDisplayCurrency: "USD",
+  settlementPrice: {
+    base: 10320000000000,
+    offset: 12,
+    currencyUnit: "USDCENT",
+    formattedAmount: "10.32",
+    __typename: "Price",
+  },
+  initiationVia: {
+    __typename: "InitiationViaOnChain",
+    address: "bc1q-pending-deposit-address",
+  },
+  settlementVia: {
+    __typename: "SettlementViaOnChain",
+    transactionHash: "pending-tx-hash",
+    arrivalInMempoolEstimatedAt: null,
+  },
 }
 
 type ConvertButtonCase = {
@@ -629,25 +698,138 @@ const selfCustodialReadyWalletOverride = (usdBalance: number) => ({
   needsBackendAuth: false,
 })
 
-describe("HomeScreen", () => {
-  beforeEach(() => {
-    currentMocks = []
-    mockActiveWalletOverride = null
-    mockDollarBalanceRestrictedOverride = false
-    mockMigratePromptVisible = false
-    mockCanReopen = false
-    mockReceiveBlocked = false
-    mockReminderBulletinVisible = false
-    mockTransferBlockedOverride = false
-    mockDollarBalanceModalVisible = false
-    mockForcedConversionParams = null
-    jest.clearAllMocks()
-    mockUseNonCustodialConversionLimits.mockReturnValue({
-      limits: null,
-      loading: false,
-      error: null,
-    })
+type RestrictionInvariantCase = {
+  description: string
+  restricted: boolean
+  transferBlocked: boolean
+  level: AccountLevel
+  btcBalance: number
+  expectButton: "disabled" | "enabled" | "hidden"
+}
+
+// Invariant: a dollar-restricted account must always see the transfer button
+// (disabled, opening the restriction modal) so the greyed-out dollar row has
+// an explanation path. The only exception is the iOS zero-balance gate.
+const restrictionInvariantCases: RestrictionInvariantCase[] = [
+  {
+    description:
+      "dollar restricted + transfers blocked --> transfer button shown but disabled",
+    restricted: true,
+    transferBlocked: true,
+    level: AccountLevel.Two,
+    btcBalance: 1000,
+    expectButton: "disabled",
+  },
+  {
+    description:
+      "dollar restricted + transfers allowed --> transfer button shown but disabled",
+    restricted: true,
+    transferBlocked: false,
+    level: AccountLevel.Two,
+    btcBalance: 1000,
+    expectButton: "disabled",
+  },
+  {
+    description: "dollar restricted + iOS zero-balance gate --> transfer button hidden",
+    restricted: true,
+    transferBlocked: false,
+    level: AccountLevel.One,
+    btcBalance: 0,
+    expectButton: "hidden",
+  },
+  {
+    description:
+      "dollar restricted + transfers blocked + iOS zero-balance gate --> transfer button hidden",
+    restricted: true,
+    transferBlocked: true,
+    level: AccountLevel.One,
+    btcBalance: 0,
+    expectButton: "hidden",
+  },
+  {
+    description:
+      "dollar active + transfers blocked + iOS zero-balance gate --> transfer button hidden",
+    restricted: false,
+    transferBlocked: true,
+    level: AccountLevel.One,
+    btcBalance: 0,
+    expectButton: "hidden",
+  },
+  {
+    description: "dollar active + transfers allowed --> transfer button enabled",
+    restricted: false,
+    transferBlocked: false,
+    level: AccountLevel.Two,
+    btcBalance: 1000,
+    expectButton: "enabled",
+  },
+]
+
+const runRestrictionInvariantCase = async ({
+  restricted,
+  transferBlocked,
+  level,
+  btcBalance,
+  expectButton,
+}: RestrictionInvariantCase) => {
+  mockDollarBalanceRestrictedOverride = restricted
+  mockTransferBlockedOverride = transferBlocked
+  // usdBalance stays 0 so the forced-conversion modal never auto-opens
+  currentMocks = generateHomeMock({
+    level,
+    network: Network.Mainnet,
+    btcBalance,
+    usdBalance: 0,
   })
+
+  const { getByTestId } = render(
+    <ContextForScreen>
+      <HomeScreen />
+    </ContextForScreen>,
+  )
+
+  if (expectButton === "hidden") {
+    await waitFor(() => expect(() => getByTestId("transfer")).toThrow())
+    await flushEffects()
+    return
+  }
+
+  await waitFor(() => expect(getByTestId("transfer")).toBeTruthy())
+  await flushEffects()
+
+  fireEvent.press(getByTestId("transfer"))
+
+  if (expectButton === "disabled") {
+    expect(mockDollarBalanceModalVisible).toBe(true)
+    expect(mockNavigate).not.toHaveBeenCalledWith("conversionDetails")
+  } else {
+    expect(mockNavigate).toHaveBeenCalledWith("conversionDetails")
+    expect(mockDollarBalanceModalVisible).toBe(false)
+  }
+}
+
+const resetHomeScreenMocks = () => {
+  currentMocks = []
+  mockActiveWalletOverride = null
+  mockActiveAccountOverride = null
+  mockDollarBalanceRestrictedOverride = false
+  mockMigratePromptVisible = false
+  mockCanReopen = false
+  mockReceiveBlocked = false
+  mockReminderBulletinVisible = false
+  mockTransferBlockedOverride = false
+  mockDollarBalanceModalVisible = false
+  mockForcedConversionParams = null
+  jest.clearAllMocks()
+  mockUseNonCustodialConversionLimits.mockReturnValue({
+    limits: null,
+    loading: false,
+    error: null,
+  })
+}
+
+describe("HomeScreen", () => {
+  beforeEach(resetHomeScreenMocks)
 
   it("renders home screen for custodial user", async () => {
     const { getByTestId } = render(
@@ -658,6 +840,41 @@ describe("HomeScreen", () => {
     await flushEffects()
 
     expect(getByTestId("slide-up-handle")).toBeTruthy()
+  })
+
+  it("renders when the authed response is temporarily missing defaultAccount", async () => {
+    // Right after device-account creation, /me can resolve before defaultAccount
+    // does; a throw here left the app crashing on every reopen (#4082)
+    currentMocks = generateHomeMock({
+      level: AccountLevel.Zero,
+      network: Network.Mainnet,
+      btcBalance: 0,
+      usdBalance: 0,
+      defaultAccountMissing: true,
+    })
+
+    const { getByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    expect(getByTestId("slide-up-handle")).toBeTruthy()
+  })
+
+  it("excludes the bottom safe-area edge the tab bar already reserves", async () => {
+    // eslint-disable-next-line camelcase -- testing-library exposes this API verbatim
+    const { UNSAFE_getAllByType } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    const edges = UNSAFE_getAllByType(SafeAreaView).map((view) => view.props.edges)
+    expect(edges).toContainEqual(["top", "left", "right"])
+    expect(edges).not.toContainEqual(expect.arrayContaining(["bottom"]))
   })
 
   it.each([...iosCases, ...androidCases] satisfies ConvertButtonCase[])(
@@ -706,6 +923,8 @@ describe("HomeScreen", () => {
     await waitFor(() => expect(() => getByTestId("transfer")).toThrow())
     await flushEffects()
   })
+
+  it.each(restrictionInvariantCases)("$description", runRestrictionInvariantCase)
 
   it("auto-opens the convert modal when a restricted account holds a Dollar balance", async () => {
     mockDollarBalanceRestrictedOverride = true
@@ -1264,104 +1483,101 @@ describe("HomeScreen", () => {
       expect(lastIsVisible()).toBe(false)
     })
   })
+})
+describe("HomeScreen self-custodial balance loading (#3852)", () => {
+  beforeEach(resetHomeScreenMocks)
 
-  describe("self-custodial balance loading (#3852)", () => {
-    afterEach(() => {
-      mockActiveWalletOverride = null
-    })
+  it("shows the loading state instead of $0.00 when the self-custodial balance failed to load", async () => {
+    mockActiveWalletOverride = {
+      wallets: [],
+      status: "error",
+      accountType: "self-custodial",
+      isReady: false,
+      isSelfCustodial: true,
+      needsBackendAuth: false,
+    }
 
-    it("shows the loading state instead of $0.00 when the self-custodial balance failed to load", async () => {
-      mockActiveWalletOverride = {
-        wallets: [],
-        status: "error",
-        accountType: "self-custodial",
-        isReady: false,
-        isSelfCustodial: true,
-        needsBackendAuth: false,
-      }
+    const { queryByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
 
-      const { queryByTestId } = render(
-        <ContextForScreen>
-          <HomeScreen />
-        </ContextForScreen>,
-      )
-      await flushEffects()
+    expect(queryByTestId("balance-value")).toBeNull()
+  })
 
-      expect(queryByTestId("balance-value")).toBeNull()
-    })
+  it("keeps showing the balance when a later refresh goes offline and the wallets are retained", async () => {
+    mockActiveWalletOverride = {
+      wallets: [
+        {
+          id: "btc-1",
+          walletCurrency: "BTC",
+          balance: { amount: 5000, currency: "BTC", currencyCode: "BTC" },
+          transactions: [],
+        },
+        {
+          id: "usd-1",
+          walletCurrency: "USD",
+          balance: { amount: 0, currency: "USD", currencyCode: "USD" },
+          transactions: [],
+        },
+      ],
+      status: "offline",
+      accountType: "self-custodial",
+      isReady: false,
+      isSelfCustodial: true,
+      needsBackendAuth: false,
+    }
 
-    it("keeps showing the balance when a later refresh goes offline and the wallets are retained", async () => {
-      mockActiveWalletOverride = {
-        wallets: [
-          {
-            id: "btc-1",
-            walletCurrency: "BTC",
-            balance: { amount: 5000, currency: "BTC", currencyCode: "BTC" },
-            transactions: [],
-          },
-          {
-            id: "usd-1",
-            walletCurrency: "USD",
-            balance: { amount: 0, currency: "USD", currencyCode: "USD" },
-            transactions: [],
-          },
-        ],
-        status: "offline",
-        accountType: "self-custodial",
-        isReady: false,
-        isSelfCustodial: true,
-        needsBackendAuth: false,
-      }
+    const { getByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
 
-      const { getByTestId } = render(
-        <ContextForScreen>
-          <HomeScreen />
-        </ContextForScreen>,
-      )
-      await flushEffects()
+    expect(getByTestId("balance-value")).toBeTruthy()
+  })
 
-      expect(getByTestId("balance-value")).toBeTruthy()
-    })
+  it("shows the loading state during an account switch, before the new wallets load", async () => {
+    mockActiveWalletOverride = {
+      wallets: [],
+      status: "loading",
+      accountType: "self-custodial",
+      isReady: false,
+      isSelfCustodial: true,
+      needsBackendAuth: false,
+    }
 
-    it("shows the loading state during an account switch, before the new wallets load", async () => {
-      mockActiveWalletOverride = {
-        wallets: [],
-        status: "loading",
-        accountType: "self-custodial",
-        isReady: false,
-        isSelfCustodial: true,
-        needsBackendAuth: false,
-      }
+    const { queryByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
 
-      const { queryByTestId } = render(
-        <ContextForScreen>
-          <HomeScreen />
-        </ContextForScreen>,
-      )
-      await flushEffects()
+    expect(queryByTestId("balance-value")).toBeNull()
+  })
 
-      expect(queryByTestId("balance-value")).toBeNull()
-    })
+  it("shows a zero balance, not a skeleton, for a ready account with no wallets", async () => {
+    mockActiveWalletOverride = {
+      wallets: [],
+      status: "ready",
+      accountType: "self-custodial",
+      isReady: true,
+      isSelfCustodial: true,
+      needsBackendAuth: false,
+    }
 
-    it("shows a zero balance, not a skeleton, for a ready account with no wallets", async () => {
-      mockActiveWalletOverride = {
-        wallets: [],
-        status: "ready",
-        accountType: "self-custodial",
-        isReady: true,
-        isSelfCustodial: true,
-        needsBackendAuth: false,
-      }
+    const { getByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
 
-      const { getByTestId } = render(
-        <ContextForScreen>
-          <HomeScreen />
-        </ContextForScreen>,
-      )
-      await flushEffects()
-
-      expect(getByTestId("balance-value")).toBeTruthy()
-    })
+    expect(getByTestId("balance-value")).toBeTruthy()
   })
 })
 
@@ -1671,6 +1887,320 @@ describe("HomeScreen wind-down states", () => {
   })
 })
 
+describe("HomeScreen pending receive badge", () => {
+  beforeEach(resetHomeScreenMocks)
+
+  const mocksWithPendingDeposit = () =>
+    generateHomeMock({
+      level: AccountLevel.One,
+      network: Network.Mainnet,
+      btcBalance: 1000,
+      usdBalance: 0,
+      pendingIncomingTransactions: [pendingOnchainReceiveTx],
+    })
+
+  it("shows the pending amount beside the balance while a deposit is unconfirmed", async () => {
+    currentMocks = mocksWithPendingDeposit()
+
+    const { findByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    expect(await findByTestId("balance-status-badge")).toBeTruthy()
+
+    await flushEffects()
+  })
+
+  /** The regression in blink-wip#937: the only pending signal at the top was the
+   *  unseen-tx badge, which auto-dismisses after ~5s. The pending badge is
+   *  state-driven and must outlive that window. */
+  it("keeps the pending badge past the unseen-badge auto-dismiss window", async () => {
+    jest.useFakeTimers({ doNotFake: ["setImmediate"] })
+    try {
+      currentMocks = mocksWithPendingDeposit()
+
+      const { findByTestId, getByTestId } = render(
+        <ContextForScreen>
+          <HomeScreen />
+        </ContextForScreen>,
+      )
+
+      expect(await findByTestId("balance-status-badge")).toBeTruthy()
+
+      // 5s auto-seen delay + 180ms hide-to-mark gap + slack
+      act(() => {
+        jest.advanceTimersByTime(5_500)
+      })
+
+      expect(getByTestId("balance-status-badge")).toBeTruthy()
+
+      await flushEffects()
+    } finally {
+      jest.useRealTimers()
+    }
+  })
+
+  it("hides the badge while nothing is pending", async () => {
+    currentMocks = generateHomeMock({
+      level: AccountLevel.One,
+      network: Network.Mainnet,
+      btcBalance: 1000,
+      usdBalance: 0,
+    })
+
+    const { queryByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    expect(queryByTestId("balance-status-badge")).toBeNull()
+  })
+
+  describe("self-custodial", () => {
+    const selfCustodialWallet = {
+      wallets: [
+        {
+          id: "btc-1",
+          walletCurrency: "BTC",
+          balance: { amount: 0, currency: "BTC", currencyCode: "BTC" },
+          transactions: [],
+        },
+      ],
+      status: "ready",
+      accountType: "self-custodial",
+      isReady: true,
+      isSelfCustodial: true,
+      needsBackendAuth: false,
+    }
+    const sparkDeposit = (status: string) => ({
+      id: "abc:0",
+      txid: "abc",
+      vout: 0,
+      amount: { amount: 50_000, currency: "BTC", currencyCode: "BTC" },
+      status,
+      errorReason: null,
+    })
+    const selfCustodialActiveAccount = {
+      id: "self-custodial-default",
+      type: "self-custodial",
+      label: "Self-custodial",
+      selected: true,
+      status: "available",
+    }
+
+    beforeEach(() => {
+      mockActiveAccountOverride = selfCustodialActiveAccount
+    })
+
+    afterEach(() => {
+      mockActiveWalletOverride = null
+      mockActiveAccountOverride = null
+      mockPendingDepositsOverride = null
+    })
+
+    it("shows the badge for an immature (unconfirmed) Spark deposit", async () => {
+      mockActiveWalletOverride = selfCustodialWallet
+      mockPendingDepositsOverride = { deposits: [sparkDeposit("immature")] }
+
+      const { findByTestId } = render(
+        <ContextForScreen>
+          <HomeScreen />
+        </ContextForScreen>,
+      )
+
+      expect(await findByTestId("balance-status-badge")).toBeTruthy()
+
+      await flushEffects()
+    })
+
+    it("ignores custodial pending receives while the Spark SDK is still connecting", async () => {
+      // Account registry: self-custodial. Wallet: still Unavailable, so the
+      // useActiveWallet predicate reports isSelfCustodial=false and the home
+      // query is NOT skipped — its pendingIncomingTransactions must not
+      // produce a pill beside the self-custodial balance.
+      mockActiveWalletOverride = {
+        wallets: [],
+        status: "unavailable",
+        accountType: "self-custodial",
+        isReady: false,
+        isSelfCustodial: false,
+        needsBackendAuth: false,
+      }
+      currentMocks = mocksWithPendingDeposit()
+
+      const { queryByTestId } = render(
+        <ContextForScreen>
+          <HomeScreen />
+        </ContextForScreen>,
+      )
+
+      await flushEffects()
+
+      expect(queryByTestId("balance-status-badge")).toBeNull()
+    })
+
+    it("opens the unclaimed-deposits screen when the immature-deposit pill is tapped", async () => {
+      // The banner no longer counts immature deposits, so the pill carries
+      // their inspection path (txid / mempool link) to that screen.
+      mockActiveWalletOverride = selfCustodialWallet
+      mockPendingDepositsOverride = { deposits: [sparkDeposit("immature")] }
+
+      const { findByTestId } = render(
+        <ContextForScreen>
+          <HomeScreen />
+        </ContextForScreen>,
+      )
+
+      fireEvent.press(await findByTestId("balance-status-badge"))
+
+      expect(mockNavigate).toHaveBeenCalledWith("unclaimedDepositsScreen")
+
+      await flushEffects()
+    })
+
+    it("leaves the badge to the unclaimed-deposit banner for claimable deposits", async () => {
+      mockActiveWalletOverride = selfCustodialWallet
+      mockPendingDepositsOverride = { deposits: [sparkDeposit("claimable")] }
+
+      const { queryByTestId } = render(
+        <ContextForScreen>
+          <HomeScreen />
+        </ContextForScreen>,
+      )
+
+      await flushEffects()
+
+      expect(queryByTestId("balance-status-badge")).toBeNull()
+    })
+  })
+})
+
+describe("HomeScreen pull-to-refresh", () => {
+  beforeEach(resetHomeScreenMocks)
+
+  /** iOS renders a programmatically-pinned UIRefreshControl as a frozen,
+   *  non-spinning spinner. The control must reflect only user-initiated pulls
+   *  (which the gesture animates natively), never background query loading —
+   *  binding it to `loading` pinned a dead spinner on every mount and forever
+   *  while a self-custodial wallet connects. */
+  it("does not pin the refresh spinner while queries load in the background", async () => {
+    // eslint-disable-next-line camelcase -- testing-library exposes this API verbatim
+    const { UNSAFE_getByType } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    expect(UNSAFE_getByType(RefreshControl).props.refreshing).toBe(false)
+
+    await flushEffects()
+
+    expect(UNSAFE_getByType(RefreshControl).props.refreshing).toBe(false)
+  })
+
+  it("spins only for the duration of a user-initiated refresh", async () => {
+    // eslint-disable-next-line camelcase -- testing-library exposes this API verbatim
+    const { UNSAFE_getByType } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    act(() => {
+      UNSAFE_getByType(RefreshControl).props.onRefresh()
+    })
+
+    expect(UNSAFE_getByType(RefreshControl).props.refreshing).toBe(true)
+
+    await waitFor(() =>
+      expect(UNSAFE_getByType(RefreshControl).props.refreshing).toBe(false),
+    )
+  })
+
+  /** A failed pull (offline is routine) must unpin the spinner and must not
+   *  escape as an unhandled rejection — RefreshControl ignores the promise. */
+  it("recovers the spinner when the refresh fails", async () => {
+    mockActiveWalletOverride = {
+      wallets: [],
+      status: "ready",
+      accountType: "self-custodial",
+      isReady: true,
+      isSelfCustodial: true,
+      needsBackendAuth: false,
+    }
+    mockSelfCustodialWalletOverride = {
+      sdk: null,
+      wallets: [],
+      status: "ready",
+      isStableBalanceActive: false,
+      lastReceivedPaymentId: null,
+      hasMoreTransactions: false,
+      loadingMore: false,
+      loadMore: jest.fn(),
+      refreshWallets: jest.fn().mockRejectedValue(new Error("offline")),
+      refreshStableBalanceActive: jest.fn(),
+      retry: jest.fn(),
+    }
+    try {
+      // eslint-disable-next-line camelcase -- testing-library exposes this API verbatim
+      const { UNSAFE_getByType } = render(
+        <ContextForScreen>
+          <HomeScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      await act(async () => {
+        await expect(
+          UNSAFE_getByType(RefreshControl).props.onRefresh(),
+        ).resolves.toBeUndefined()
+      })
+
+      expect(UNSAFE_getByType(RefreshControl).props.refreshing).toBe(false)
+    } finally {
+      mockActiveWalletOverride = null
+      mockSelfCustodialWalletOverride = null
+    }
+  })
+
+  it("refreshes the pending deposits before a self-custodial pull retracts", async () => {
+    const refetchDeposits = jest.fn().mockResolvedValue(undefined)
+    mockActiveWalletOverride = {
+      wallets: [],
+      status: "ready",
+      accountType: "self-custodial",
+      isReady: true,
+      isSelfCustodial: true,
+      needsBackendAuth: false,
+    }
+    mockPendingDepositsOverride = { deposits: [], refetch: refetchDeposits }
+    try {
+      // eslint-disable-next-line camelcase -- testing-library exposes this API verbatim
+      const { UNSAFE_getByType } = render(
+        <ContextForScreen>
+          <HomeScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      await act(async () => {
+        await UNSAFE_getByType(RefreshControl).props.onRefresh()
+      })
+
+      expect(refetchDeposits).toHaveBeenCalledTimes(1)
+    } finally {
+      mockActiveWalletOverride = null
+      mockPendingDepositsOverride = null
+    }
+  })
+})
+
 describe("bulletins auth gating", () => {
   const mockUseBulletinsQuery = useBulletinsQuery as jest.Mock
 
@@ -1802,5 +2332,22 @@ describe("HomeScreen layout under font scaling (blink-wip#931)", () => {
     expect(getByTestId("home-username").props.maxFontSizeMultiplier).toBeLessThanOrEqual(
       1.5,
     )
+  })
+})
+
+describe("useRemoteConfig mock completeness", () => {
+  it("covers every real remote-config key so a new key cannot crash unrelated tests", () => {
+    const actual = jest.requireActual<typeof import("@app/config/feature-flags-context")>(
+      "@app/config/feature-flags-context",
+    )
+    const mocked = jest.requireMock<typeof import("@app/config/feature-flags-context")>(
+      "@app/config/feature-flags-context",
+    )
+
+    const missingKeys = Object.keys(actual.defaultRemoteConfig).filter(
+      (key) => !(key in mocked.useRemoteConfig()),
+    )
+
+    expect(missingKeys).toEqual([])
   })
 })

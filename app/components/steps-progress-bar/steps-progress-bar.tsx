@@ -1,16 +1,12 @@
-import React, { useEffect, useRef } from "react"
-import { Animated, TextStyle, View } from "react-native"
+import React from "react"
+import { TextStyle, View } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
+
+import { SegmentedProgressBar } from "@app/components/segmented-progress-bar"
 
 type StepsProgressBarProps = {
   steps: string[]
   currentStep: number
-}
-
-type AnimatedBarProps = {
-  isActive: boolean
-  activeColor: string
-  inactiveColor: string
 }
 
 const TextAlign = {
@@ -18,42 +14,6 @@ const TextAlign = {
   Center: "center",
   Right: "right",
 } as const
-
-const ANIMATION_DURATION = 120
-
-const AnimatedBar: React.FC<AnimatedBarProps> = ({
-  isActive,
-  activeColor,
-  inactiveColor,
-}) => {
-  const styles = useStyles()
-  const widthAnim = useRef(new Animated.Value(isActive ? 1 : 0)).current
-
-  useEffect(() => {
-    Animated.timing(widthAnim, {
-      toValue: isActive ? 1 : 0,
-      duration: ANIMATION_DURATION,
-      useNativeDriver: false,
-    }).start()
-  }, [isActive, widthAnim])
-
-  return (
-    <View style={[styles.bar, { backgroundColor: inactiveColor }]}>
-      <Animated.View
-        style={[
-          styles.barFill,
-          {
-            backgroundColor: activeColor,
-            width: widthAnim.interpolate({
-              inputRange: [0, 1],
-              outputRange: ["0%", "100%"],
-            }),
-          },
-        ]}
-      />
-    </View>
-  )
-}
 
 export const StepsProgressBar: React.FC<StepsProgressBarProps> = ({
   steps,
@@ -72,16 +32,11 @@ export const StepsProgressBar: React.FC<StepsProgressBarProps> = ({
 
   return (
     <View style={styles.container}>
-      <View style={styles.barsContainer}>
-        {steps.map((_, index) => (
-          <AnimatedBar
-            key={`bar-${index}`}
-            isActive={index < currentStep}
-            activeColor={colors.primary}
-            inactiveColor={colors.grey4}
-          />
-        ))}
-      </View>
+      <SegmentedProgressBar
+        total={steps.length}
+        filled={currentStep}
+        fillColor={colors.primary}
+      />
       <View style={styles.labelsContainer}>
         {steps.map((label, index) => (
           <Text
@@ -99,18 +54,6 @@ export const StepsProgressBar: React.FC<StepsProgressBarProps> = ({
 const useStyles = makeStyles(({ colors }) => ({
   container: {
     width: "100%",
-  },
-  barsContainer: {
-    flexDirection: "row",
-    width: "100%",
-  },
-  bar: {
-    flex: 1,
-    height: 2,
-    overflow: "hidden",
-  },
-  barFill: {
-    height: "100%",
   },
   labelsContainer: {
     flexDirection: "row",

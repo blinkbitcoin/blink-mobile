@@ -1,4 +1,38 @@
 {
+    "ApiScreen": {
+        "keysGroupTitle": "API-Schlüssel",
+        "noKeys": "Noch keine API-Schlüssel",
+        "createKey": "API-Schlüssel erstellen",
+        "createTitle": "Neuer API-Schlüssel",
+        "keyCreatedTitle": "API-Schlüssel erstellt",
+        "keyName": "Schlüsselname",
+        "keyNamePlaceholder": "z. B. BTCPay Server",
+        "scopeRead": "Lesen",
+        "scopeReadDescription": "Guthaben und Transaktionsverlauf ansehen",
+        "scopeReceive": "Empfangen",
+        "scopeReceiveDescription": "Invoices erstellen und Zahlungen empfangen",
+        "scopeWrite": "Schreiben",
+        "writeScopeDashboardOnly": "Schlüssel, die Zahlungen senden können, können nur auf dashboard.blink.sv erstellt werden",
+        "expiry": "Läuft ab",
+        "expiry30Days": "30 Tage",
+        "expiry90Days": "90 Tage",
+        "expiryNever": "Nie",
+        "expiresOn": "Läuft am {date: string} ab",
+        "neverExpires": "Läuft nie ab",
+        "revoked": "Widerrufen",
+        "expired": "Abgelaufen am {date: string}",
+        "expiredNoDate": "Abgelaufen",
+        "secretWarning": "Der Schlüssel wird nur dieses eine Mal angezeigt. Kopiere oder teile ihn jetzt und bewahre ihn sicher auf.",
+        "secretCopied": "API-Schlüssel kopiert. Die Zwischenablage wird in 1 Minute geleert",
+        "revokeTitle": "API-Schlüssel widerrufen?",
+        "revokeBody": "\"{name: string}\" funktioniert sofort nicht mehr. Dies kann nicht rückgängig gemacht werden.",
+        "revoke": "Widerrufen",
+        "revokeSuccess": "API-Schlüssel widerrufen",
+        "createError": "Der API-Schlüssel konnte nicht erstellt werden. Bitte versuche es erneut.",
+        "revokeError": "Der API-Schlüssel konnte nicht widerrufen werden. Bitte versuche es erneut.",
+        "loadError": "Deine API-Schlüssel konnten nicht geladen werden. Bitte versuche es später erneut.",
+        "done": "Fertig"
+    },
     "GaloyAddressScreen": {
         "title": "Erhalte Zahlungen durch:",
         "buttonTitle": "Wähle deine Adresse",
@@ -2003,7 +2037,7 @@
         "satAccumulated": "Sats gesammelt",
         "satsEarned": "{formattedNumber | sats} earned",
         "sectionsCompleted": "Du bist fertig",
-        "title": "Verdienen",
+        "title": "Lernen",
         "unlockQuestion": "Beantworte folgende Frage zum Entsperren:",
         "youEarned": "Du hast",
         "registerTitle": "Account Upgrade benötigt",
@@ -2011,6 +2045,7 @@
         "oneSectionADay": "Ein Abschnitt pro Tag",
         "availableTomorrow": "Kommen Sie morgen wieder, um mehr über Bitcoin zu erfahren!",
         "motivatingBadger": "Graben Sie sich durch diese Lektionen und verdienen Sie dabei",
+        "motivatingBadgerNoRewards": "Graben Sie sich durch diese Lektionen und lernen Sie Bitcoin kennen",
         "continueNoRewards": "Weiter (ohne Belohnungen)",
         "somethingNotRight": "Etwas stimmt nicht ...",
         "defaultErrorMessage": "{errorMessage: string} Bitte versuche es später erneut.\nOder klicke auf Weiter, um ohne Belohnungen weiterzulernen.",
@@ -2049,7 +2084,7 @@
         "login": "Anmelden",
         "loginOrRestore": "Anmelden / Wiederherstellen",
         "logBackInWith": "Wieder einloggen mit",
-        "headline": "Wallet zur Verfügung gestellt von Galoy",
+        "headline": "Wallet zur Verfügung gestellt von Blink",
         "startTrialAccount": "Mit einem Demo-Account beginnen",
         "startWithTrialAccount": "Mit Demo-Account starten",
         "registerPhoneAccount": "Telefon-Account registrieren",
@@ -2075,6 +2110,7 @@
         "error": "Ups. Bei der Ermittlung Ihres Standorts ist etwas schief gelaufen"
     },
     "HomeScreen": {
+        "pendingReceiveBadge": "+{amount: string} Ausstehend",
         "receive": "Erhalten",
         "send": "Senden",
         "title": "Home",
@@ -2163,6 +2199,9 @@
         "lightningInvoice": "Lightning-Rechnung",
         "bitcoinOnchain": "Bitcoin onchain",
         "depositFee": "Einzahlungsgebühr: {fee} SAT für Beträge unter {threshold} SAT oder {overFee} SAT für Einzahlungen über {threshold} SAT",
+        "depositFeeTiers": "Deposit fees: {tiers: string}",
+        "depositFeeTierUpTo": "{fee: string} SAT up to {max: string} SAT",
+        "depositFeeTierAbove": "{fee: string} SAT above {min: string} SAT",
         "autoConvertMinAmount": "Beträge unter {minSats: number} Sats / {minFiat: string} können nicht automatisch in Dollar umgewandelt werden. Du erhältst stattdessen Bitcoin.",
         "autoConvertFailed": "Zahlung empfangen, aber die Umwandlung ist fehlgeschlagen.",
         "pleaseWaitForConversion": "Bitte warte, bis die Umwandlung abgeschlossen ist"
@@ -2196,6 +2235,22 @@
         "imageLibraryPermissionsNotGranted": "Wir haben keine Berechtigung für den Zugriff auf die Bilderbibliothek. Bitte überprüfen Sie die App-Einstellungen für Ihre Plattform."
     },
     "SecurityScreen": {
+        "securityScore": {
+            "title": "Sicherheitsbewertung {done: number}/{total: number}",
+            "levelLow": "niedrig",
+            "levelMedium": "mittel",
+            "levelHigh": "hoch",
+            "set": "Einrichten",
+            "enabled": "Aktiviert",
+            "signals": {
+                "cloudBackup": "Cloud-Backup",
+                "manualBackup": "Manuelles Backup",
+                "appLock": "Biometrie/PIN",
+                "hideBalance": "Guthaben verbergen",
+                "twoFactor": "Zwei-Faktor-Authentifizierung (2FA)",
+                "emailVerified": "Verifizierte E-Mail-Adresse"
+            }
+        },
         "title": "Sicherheit und Datenschutz",
         "biometricDescription": "Mit Fingerabdruck oder Gesichtserkennung entsperren.",
         "biometricTitle": "Biometrie",
@@ -2261,6 +2316,10 @@
         "invalidPhoneNumber": "Gib eine gültige Mobilnummer ein",
         "phoneNotAllowed": "Dieses Feld akzeptiert keine Telefonnummern"
     },
+    "MerchantSelectionScreen": {
+        "title": "Zahlungsoption auswählen",
+        "empty": "Es sind keine Zahlungsoptionen verfügbar."
+    },
     "SendBitcoinScreen": {
         "willBeSentToMempoolBy": "Transaktion sollte an den Mempool übermittelt werden",
         "amount": "Betrag",
@@ -2279,7 +2338,6 @@
         "notConfirmed": "Die Zahlung wurde gesendet\naber sie ist noch nicht bestätigt\n\nDu kannst den Status der Zahlung\nim Bereich Transaktionen einsehen",
         "note": "Notiz",
         "success": "Zahlung erfolgreich gesendet",
-        "suggestionInput": "Gib deinen Vorschlag ein",
         "max": "Max",
         "maxAmount": "Maximaler Betrag",
         "title": "Sende Bitcoin",
@@ -2528,7 +2586,11 @@
         "receivingAccount": "Empfangendes Guthaben",
         "sendingAccount": "Sendendes Guthaben",
         "txNotBroadcast": "Ihre Transaktion befindet sich in der Warteschlange. Sie sollte im Mempool erscheinen: {countdown: string} ",
-        "momentarily": "momentan"
+        "momentarily": "momentan",
+        "findingAccount": "Konto für diese Zahlung wird gesucht...",
+        "txNotFoundInAccounts": "Diese Zahlung wurde in keinem Konto auf diesem Gerät gefunden. Möglicherweise gehört sie zu einem abgemeldeten Konto.",
+        "txLoadFailed": "Diese Zahlung konnte nicht geladen werden. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
+        "switchedForPayment": "Zu {identifier: string} gewechselt, um diese Zahlung anzuzeigen"
     },
     "FeeRatesScreen": {
         "title": "Gebührensätze",
@@ -2543,6 +2605,7 @@
         "lightningTransactions": "Lightning-Transaktionen",
         "onchainBelowThreshold": "Onchain unter {threshold: string} SAT",
         "onchainAboveThreshold": "Onchain über {threshold: string} SAT",
+        "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
         "transferFee": "Übertragungsgebühr",
         "noFee": "keine Gebühr",
         "lightningSendFee": "{fee: string} + ~{routingFee: string} Routing-Gebühr",
@@ -2593,7 +2656,8 @@
             "tooLong": "Die Adresse darf nicht länger als 50 Zeichen sein",
             "invalidCharacter": "Die Adresse darf nur Buchstaben, Zahlen und Unterstriche beinhalten",
             "addressUnavailable": "Entschuldigung, diese Adresse ist schon vergeben",
-            "unknownError": "Ein unbekannter Fehler ist aufgetreten, bitte versuche es später erneut"
+            "unknownError": "Ein unbekannter Fehler ist aufgetreten, bitte versuche es später erneut",
+            "backupRequired": "Back up your wallet before creating a Lightning address"
         },
         "receiveMoney": "Empfange Geld von anderen Lightning Wallets und {bankName: string} Usern mit dieser Adresse.",
         "itCannotBeChanged": "Kann später nicht mehr geändert werden."
@@ -2758,6 +2822,7 @@
         "bitcoinPrice": "Bitcoin Preis",
         "btcAccount": "Bitcoin-Guthaben",
         "cancel": "Abbrechen",
+        "card": "Karte",
         "close": "Schließen",
         "confirm": "Bestätigen",
         "convert": "Konvertieren",
@@ -2898,11 +2963,9 @@
         "email": "E-Mail",
         "sms": "SMS",
         "faq": "FAQ",
-        "enjoyingApp": "Gefällt Dir die App?",
         "statusPage": "Status-Seite",
         "telegram": "Telegram",
         "mattermost": "Mattermost",
-        "thankYouText": "Danke für Deine Rückmeldung. Möchtest du einen Verbesserungsvorschlag einreichen?",
         "defaultEmailSubject": "{bankName: string} - Support",
         "defaultSupportMessage": "Hey! Ich brauche Hilfe mit {bankName: string}, ich benutze Version {version: string} auf {os: string}.",
         "emailCopied": "E-Mail {email: string} in Zwischenablage kopiert",
@@ -3044,6 +3107,66 @@
         "networkVisa": "Visa",
         "cardFrozenTitle": "Karte eingefroren",
         "cardFrozenSubtitle": "Die Karte ist vorübergehend deaktiviert",
+        "CardFeeSchedule": {
+            "title": "Blink Card-Gebührenübersicht",
+            "effectiveDate": "Gültig ab 1. Juli 2026",
+            "sections": {
+                "cardFees": "Kartengebühren",
+                "transactionFees": "Transaktionsgebühren",
+                "overdraft": "Überziehung (finanzierter Modus)"
+            },
+            "fees": {
+                "annualFee": {
+                    "title": "Jahresgebühr",
+                    "subtitle": "Im ersten Jahr ab dem Ausstellungsdatum der Karte erlassen",
+                    "value": "{amount: string} / Jahr"
+                },
+                "cardReplacement": {
+                    "title": "Kartenersatz"
+                },
+                "usdTransactionFee": {
+                    "title": "USD-Transaktionsgebühr",
+                    "subtitle": "Gilt für jede Transaktion in US-Dollar"
+                },
+                "foreignTransactionFee": {
+                    "title": "Auslandstransaktionsgebühr",
+                    "subtitle": "Gilt für jede Transaktion in einer anderen Währung als US-Dollar"
+                },
+                "maximumOverdraft": {
+                    "title": "Maximale Überziehung",
+                    "subtitle": "Muss innerhalb von 7 Tagen zurückgezahlt werden"
+                },
+                "lateRepaymentFee": {
+                    "title": "Gebühr für verspätete Rückzahlung",
+                    "subtitle": "Wird erhoben, wenn die Überziehung nicht innerhalb von 7 Tagen zurückgezahlt wird"
+                }
+            },
+            "btcConversion": {
+                "title": "BTC-Umrechnung",
+                "body": "Wenn eine Transaktion die Umrechnung von BTC in USD erfordert, wird die Umrechnung zum aktuellen Wechselkurs durchgeführt, der einen Aufschlag enthalten kann, der die Umrechnungskosten widerspiegelt."
+            },
+            "feesUpdateNotice": {
+                "text": "Die Gebühren können von Zeit zu Zeit aktualisiert werden. Blink wird mindestens 30 Tage im Voraus benachrichtigen, bevor Gebührenänderungen in Kraft treten, gemäß der",
+                "linkText": "Karteninhabervereinbarung"
+            },
+            "creditModeNotice": "Der Kreditmodus ist derzeit nicht aktiv. Wenn der Kreditmodus aktiviert wird, werden die geltenden Zinssätze, Gebühren und Offenlegungen zu Abrechnungsrechten vor der Aktivierung bereitgestellt.",
+            "additionalDetails": {
+                "title": "Weitere Gebührendetails",
+                "overdraft": {
+                    "label": "Überziehung",
+                    "text": ". Unter bestimmten Umständen kann eine Transaktion genehmigt werden, die dazu führt, dass Ihr Kartenguthaben unter null fällt. Die maximale Überziehung beträgt {maxOverdraft: string}. Sie müssen die Überziehung innerhalb von 7 Tagen zurückzahlen, indem Sie zusätzliche Mittel auf Ihr Kartenguthaben überweisen."
+                },
+                "foreignCurrency": {
+                    "label": "Fremdwährung",
+                    "text": ". Wenn Sie eine Transaktion in einer Fremdwährung durchführen, rechnet das Kartennetzwerk sie mit seinen eigenen Umrechnungsverfahren in USD um. Der Kurs am Verarbeitungsdatum kann vom Transaktionsdatum abweichen."
+                },
+                "noHiddenFees": {
+                    "label": "Keine versteckten Gebühren",
+                    "text": ". Es fallen keine Gebühren für Kontoeinrichtung, Inaktivität, Saldoabfragen oder das Schließen Ihrer Karte an."
+                }
+            },
+            "backButton": "Zurück"
+        },
         "CardDetails": {
             "title": "Kartendetails",
             "cardNumber": "Kartennummer",
@@ -3418,6 +3541,7 @@
                 "perYear": "pro Jahr",
                 "status": {
                     "label": "Status",
+                    "specialOfferLabel": "Sonderangebot",
                     "paymentPending": "Zahlung Ausstehend",
                     "firstYearFree": "Erstes Jahr kostenlos"
                 },
@@ -3431,7 +3555,11 @@
                     "cardholderAgreement": "Karteninhabervereinbarung",
                     "and": "und"
                 },
-                "renew": "Ich verstehe, dass mein Abonnement automatisch in 1 Jahr verlängert wird"
+                "feeSchedule": {
+                    "text": "Ich habe geprüft und akzeptiere die",
+                    "linkText": "Blink Card-Gebührenübersicht"
+                },
+                "renew": "Ich verstehe, dass mein Abonnement automatisch in {months: number} Monaten verlängert wird"
             },
             "CardIntroducing": {
                 "title": "Vorstellung",
@@ -3493,13 +3621,29 @@
                 "buttonText": "Antrag einreichen",
                 "select": "auswählen"
             },
+            "Acknowledgement": {
+                "title": "Geschäftsbedingungen",
+                "acceptButton": "Akzeptieren",
+                "eSignConsent": {
+                    "text": "Ich akzeptiere die",
+                    "linkText": "E-Sign-Einwilligung"
+                },
+                "privacyAndTerms": {
+                    "text": "Ich akzeptiere die",
+                    "privacyPolicyLinkText": "Datenschutzrichtlinie des Ausstellers",
+                    "and": " und die",
+                    "cardTermsLinkText": "Blink Card-Bedingungen"
+                },
+                "certifyAccuracy": "Ich bestätige, dass die von mir angegebenen Informationen korrekt sind und dass ich alle Regeln und Anforderungen im Zusammenhang mit meiner Blink Visa Card einhalten werde",
+                "acknowledgeSolicitation": "Ich erkenne an, dass die Beantragung der Blink Visa Card keine unbefugte Aufforderung darstellt"
+            },
             "CardPreapproved": {
                 "title": "Sie wurden für die Blink Visa-Karte vorab genehmigt!",
                 "buttonText": "Schließen"
             },
             "CardProcessing": {
                 "title": "Dein Antrag wird bearbeitet",
-                "subtitle": "Geschätzte Wartezeit: {waitTime: string}",
+                "subtitle": "Wir benachrichtigen dich, sobald wir bereit sind",
                 "buttonText": "Schließen"
             }
         }
@@ -3535,7 +3679,8 @@
                 "savedConfirm": "Ich habe sie gespeichert",
                 "copy": "Kopieren",
                 "continueButton": "Weiter",
-                "testBackup": "Sicherung testen"
+                "testBackup": "Sicherung testen",
+                "doNotShareWarning": "Zeige dies niemandem, auch nicht dem Support"
             },
             "Confirm": {
                 "headerTitle": "Sicherungswörter bestätigen",
@@ -3567,6 +3712,7 @@
             "uploadSuccess": "Sicherung in {provider} gespeichert",
             "uploadFailed": "Fehler beim Hochladen der Sicherung",
             "signInFailed": "Anmeldung bei {provider} fehlgeschlagen",
+            "storageAccessRequired": "Erlaube {provider: string} den Zugriff auf deine Wallet-Sicherung und versuche es erneut.",
             "cloudNotAvailable": "iCloud Drive ist nicht verfügbar. Bitte melde dich in den Einstellungen bei iCloud an und aktiviere iCloud Drive.",
             "networkError": "Netzwerkfehler. Bitte überprüfe deine Verbindung und versuche es erneut.",
             "existingBackupTitle": "Sicherung gefunden",
@@ -3581,6 +3727,12 @@
         "contactSupport": {
             "title": "Support kontaktieren",
             "body": "Etwas ist schiefgelaufen, aber keine Sorge, dein Guthaben ist sicher. Bitte kontaktiere den Support für Hilfe.\n\nDiese Informationen können dem Support helfen, deinen Fall zu lösen:",
+            "selfHelp": {
+                "title": "Versuchen wir es noch einmal",
+                "body": "Keine Sorge — dein Guthaben ist sicher. Die Migration kann ein paar Minuten dauern, und manchmal braucht ein Schritt einfach einen Neustart.\n\nStarte die Migration noch einmal — das dauert nur einen Moment.\n\nSiehst du diesen Bildschirm immer noch? Kontaktiere den Support und teile die folgenden Daten:",
+                "contactSupportCta": "Support kontaktieren"
+            },
+            "closeRefusedBody": "Deine Migration ist abgeschlossen und dein Guthaben befindet sich in deiner neuen Wallet. Dein altes Konto ist möglicherweise noch offen. Der Support prüft das und schließt es gegebenenfalls.\n\nDiese Informationen können dem Support helfen, deinen Fall zu lösen:",
             "reasonLabel": "Grund",
             "accountIdLabel": "Konto-ID",
             "pubKeyLabel": "pubKey",
@@ -3605,6 +3757,10 @@
             "title": "Wichtig",
             "body": "Wechsle bis zum {date} über die geführte Migration zu einem nicht-verwahrten Konto oder zahle dein Guthaben aus. Der Empfang endet am {receiveStopsDate}.",
             "migrateCta": "Migrieren"
+        },
+        "offboardBulletin": {
+            "title": "Wichtig",
+            "body": "Dein Konto ist in einer Region registriert, in der wir keine Konten anbieten können. Hebe dein Guthaben vor dem 31. August ab. Der Empfang endet am 10. August."
         },
         "dollarBalanceModal": {
             "title": "Wir können dein Dollar-Guthaben nicht migrieren",
@@ -3633,10 +3789,23 @@
         "downloadHistoryTitle": "Lade deinen Transaktionsverlauf herunter",
         "downloadHistoryBody": "Dein neues Konto startet neu. Wenn du eine Aufzeichnung deiner Transaktionen behalten möchtest, lade sie jetzt als CSV herunter.",
         "downloadHistoryDownloadCta": "Herunterladen",
-        "apiServiceTitle": "API-Dienst nicht verfügbar",
-        "apiServiceBody": "Uns ist aufgefallen, dass du aktive API-Schlüssel hast. Blink kann die API im Non-Custodial-Modus nicht bereitstellen.\n\nWenn du auf die API von Blink angewiesen bist, kontaktiere uns bitte umgehend, und wir werden unser Bestes für einen reibungslosen Übergang tun.",
+        "apiServiceTitle": "Über deine API-Schlüssel",
+        "apiServiceBody": "Dein Konto hat aktive API-Schlüssel. Nach dem Wechsel zu Non-Custodial ist die API nicht mehr verfügbar.\n\nBlink hat Non-Custodial-Apps, die die meisten Funktionen der API ersetzen, außer dem Senden. Du findest sie im Menü Einstellungen.\n\nWenn du die API zum Senden nutzt, wird das leider nicht mehr möglich sein.",
         "apiServiceContactCta": "Kontaktiere uns",
-        "apiServiceContinueCta": "Trotzdem fortfahren",
+        "apiServiceContinueCta": "Migration fortsetzen",
+        "merchantTools": {
+            "title": "Wir haben an alles gedacht",
+            "body": "Alle Tools für eingehende Zahlungen funktionieren weiter. Füge einfach deine Lightning-Adresse hinzu.",
+            "cta": "Verstanden",
+            "terminalTitle": "Blink Terminal",
+            "terminalBody": "Ein Kassensystem in jedem Browser.",
+            "donationTitle": "Spenden-Button",
+            "donationBody": "Nimm Spenden auf jeder Website an.",
+            "btcpayTitle": "BTCPay-Plugin",
+            "btcpayBody": "Lightning-Zahlungen auf deinem BTCPay Server.",
+            "woocommerceTitle": "WooCommerce-Plugin",
+            "woocommerceBody": "Bitcoin-Checkout für deinen Onlineshop."
+        },
         "resumeFailed": "Beim Fortsetzen deiner Migration ist etwas schiefgelaufen. Bitte starte sie erneut.",
         "migrationRequiredBody": "Es ist Zeit, dein verwahrtes Konto auf ein nicht-verwahrtes Konto zu migrieren.",
         "migrationRequiredForcedBody": "Es ist Zeit, dein verwahrtes Konto auf ein nicht-verwahrtes Konto zu migrieren. Dies ist aus regulatorischen Gründen erforderlich.\n\nKeine Sorge, Non-Custodial wird auf lange Sicht besser für dich sein.",
@@ -3653,10 +3822,15 @@
         "explainerCheck5": "Deinem Konto wird eine Spark-Netzwerkgebühr abgezogen",
         "explainerCta": "Ich verstehe",
         "transferringFunds": "Deine Guthaben werden übertragen. Es sollte in wenigen Sekunden abgeschlossen sein.",
+        "transferDelayed": {
+            "body": "Deine Guthaben sind auf dem Weg zu deinem neuen Konto. Es dauert länger als üblich — lass die App geöffnet, wir schließen es automatisch ab.",
+            "contactSupportCta": "Support kontaktieren"
+        },
         "clockOutOfSync": {
             "body": "Datum und Uhrzeit deines Geräts sind nicht synchron. Stelle sie auf automatisch, um fortzufahren.",
             "retryCta": "Erneut versuchen"
-        }
+        },
+        "closeUnavailable": "Deine Gelder sind sicher in deiner neuen Wallet. Wir schließen dein altes Konto noch, bitte versuche es gleich noch einmal."
     },
     "AccountTypeSelectionScreen": {
         "custodialLabel": "Verwahrt",
@@ -3684,6 +3858,7 @@
         "phraseSubtitleStep2": "Gib den Rest deiner Sicherungsphrase ein",
         "nextWords": "Nächste 6 Wörter",
         "paste": "Einfügen",
+        "pasteFailed": "Zwischenablage konnte nicht gelesen werden. Bitte gib deine Sicherungsphrase manuell ein.",
         "enterWord": "Wort",
         "invalidMnemonic": "Ungültige Backup-Phrase. Bitte überprüfe, ob die Wortreihenfolge korrekt ist.",
         "restoring": "Wallet wird wiederhergestellt...",
@@ -3695,7 +3870,9 @@
         "enterPassword": "Gib dein Verschlüsselungspasswort ein",
         "wrongPassword": "Falsches Passwort. Bitte versuche es erneut.",
         "pickBackupTitle": "Wallet auswählen",
-        "pickBackupDescription": "Wähle ein Backup zum Wiederherstellen"
+        "pickBackupDescription": "Wähle ein Backup zum Wiederherstellen",
+        "recognizePhraseTitle": "Erkennst du diese Backup-Phrase?",
+        "recognizePhraseBody": "Gib niemals Wörter ein, die dir jemand anderes geschickt hat."
     },
     "BackupNudge": {
         "title": "Ihre Mittel sind gefährdet",
@@ -3705,6 +3882,11 @@
         "modalTitle": "Sichern Sie Ihre Mittel",
         "modalDescription": "Wir empfehlen dringend, Ihre Wallet zu sichern, um einen vollständigen Verlust Ihrer Mittel zu verhindern, falls Sie dieses Gerät verlieren.",
         "secureMe": "Wallet sichern"
+    },
+    "BackupRequired": {
+        "modalTitle": "Back up your wallet first",
+        "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
+        "backupNow": "Back up wallet"
     },
     "NonCustodialInfoBulletin": {
         "title": "Dies ist ein nicht-verwahrtes Konto",
@@ -3744,7 +3926,7 @@
         "noAccountTitle": "Custodial-Konto erforderlich",
         "noAccountDescription": "{featureName} benötigt ein Blink custodial-Konto.",
         "featureCircles": "Circles",
-        "featureEarn": "Verdienen",
+        "featureEarn": "Lernen",
         "featureCard": "Karte"
     },
     "WalletCreationScreen": {

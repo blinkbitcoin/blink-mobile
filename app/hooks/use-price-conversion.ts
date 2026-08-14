@@ -1,6 +1,6 @@
 import { useMemo } from "react"
 
-import crashlytics from "@react-native-firebase/crashlytics"
+import { recordAppError } from "@app/utils/error-reporting"
 
 import {
   useRealtimePriceQuery,
@@ -119,7 +119,7 @@ export const usePriceConversion = () => {
       ) {
         amount = NaN
 
-        crashlytics().recordError(
+        recordAppError(
           new Error(
             `Price conversion is out of sync with display currency. Money amount: ${moneyAmount.currencyCode}, display currency: ${displayCurrency}`,
           ),

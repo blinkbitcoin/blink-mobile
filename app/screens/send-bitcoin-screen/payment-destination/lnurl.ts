@@ -6,6 +6,12 @@ import {
   WalletCurrency,
 } from "@app/graphql/generated"
 import { toBtcMoneyAmount } from "@app/types/amounts"
+import {
+  BareLnurlDecodeStatus,
+  decodeBareLnurl,
+  isHttpsUrl,
+  lud17Url,
+} from "@app/utils/lnurl"
 import { LnurlPaymentDestination, PaymentType } from "@blinkbitcoin/blink-client"
 
 import { createLnurlPaymentDetails } from "../payment-details"
@@ -37,10 +43,47 @@ export const resolveLnurlDestination = async ({
   // but lnurl withdraw is handled here
 
   if (parsedLnurlDestination.valid) {
+    // js-lnurl and lnurl-pay fetch the URL embedded in a bare bech32 LNURL
+    // verbatim, and derive a plain http URL from LUD-17 URIs whenever ".onion"
+    // appears in the payload, without enforcing https in either case. Vet the
+    // scheme of whatever URL the input resolves to before any network call. An
+    // undecodable lnurl1 string is rejected rather than skipped: the app's
+    // bech32@2 and js-lnurl's bundled bech32@1 need not agree on every input,
+    // so a decode miss here must not wave the input through unchecked.
+    const bareLnurl = decodeBareLnurl(parsedLnurlDestination.lnurl)
+    const fetchUrl =
+      bareLnurl.status === BareLnurlDecodeStatus.Decoded
+        ? bareLnurl.url
+        : lud17Url(parsedLnurlDestination.lnurl)
+
+    if (
+      bareLnurl.status === BareLnurlDecodeStatus.DecodeError ||
+      (fetchUrl !== null && !isHttpsUrl(fetchUrl))
+    ) {
+      return {
+        valid: false,
+        invalidReason: InvalidDestinationReason.LnurlError,
+        invalidPaymentDestination: parsedLnurlDestination,
+      } as const
+    }
+
     const lnurlParams = await getParams(parsedLnurlDestination.lnurl)
 
     // Check for lnurl withdraw request
     if ("tag" in lnurlParams && lnurlParams.tag === "withdrawRequest") {
+      // The withdraw callback is fetched directly by this app or the Breez SDK;
+      // require https so a malicious or downgraded service cannot redirect the
+      // redemption (which carries the invoice) over cleartext. Routed through
+      // LnurlError rather than LnurlUnsupported because destination-information.tsx
+      // pattern-matches with `case LnurlError || LnurlUnsupported`, which leaves
+      // LnurlUnsupported on the generic destination error.
+      if (!isHttpsUrl(lnurlParams.callback)) {
+        return {
+          valid: false,
+          invalidReason: InvalidDestinationReason.LnurlError,
+          invalidPaymentDestination: parsedLnurlDestination,
+        } as const
+      }
       return createLnurlWithdrawDestination({
         lnurl: parsedLnurlDestination.lnurl,
         callback: lnurlParams.callback,
@@ -59,6 +102,17 @@ export const resolveLnurlDestination = async ({
       })
 
       if (lnurlPayParams) {
+        // Same https requirement for the pay callback: the Breez SDK fetches it
+        // on self-custodial sends, and the backend on custodial ones. LnurlError
+        // rather than LnurlUnsupported for the reason given above.
+        if (!isHttpsUrl(lnurlPayParams.callback)) {
+          return {
+            valid: false,
+            invalidReason: InvalidDestinationReason.LnurlError,
+            invalidPaymentDestination: parsedLnurlDestination,
+          } as const
+        }
+
         const maybeIntraledgerDestination = await tryGetIntraLedgerDestinationFromLnurl({
           lnurlDomains,
           lnurlPayParams,

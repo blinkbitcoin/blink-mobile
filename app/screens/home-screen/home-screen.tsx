@@ -20,7 +20,11 @@ import { StableSatsModal } from "@app/components/stablesats-modal"
 import { DollarBalanceRestrictionModal } from "@app/components/dollar-balance-restriction-modal"
 import { UsdConvertToBtcModal } from "@app/components/usd-convert-to-btc-modal"
 import WalletOverview from "@app/components/wallet-overview/wallet-overview"
-import { BalanceHeader, useTotalBalance } from "@app/components/balance-header"
+import {
+  BalanceHeader,
+  usePendingReceiveAmount,
+  useTotalBalance,
+} from "@app/components/balance-header"
 import { BalanceMode, useBalanceMode } from "@app/hooks/use-balance-mode"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
@@ -52,6 +56,7 @@ import {
 import { useDollarBalanceForcedConversion } from "@app/hooks/use-dollar-balance-forced-conversion"
 import { MigrateNowModal } from "@app/components/migrate-now-modal"
 import { MigrationReminderBulletin } from "@app/components/migration-reminder-bulletin"
+import { OffboardOnlyBulletin } from "@app/components/offboard-only-bulletin"
 /** Deep import on purpose: keeps the migration hooks barrel out of the home graph. */
 import { useWindDownHomeNudges } from "@app/screens/account-migration/hooks/use-wind-down-home-nudges"
 import {
@@ -59,13 +64,18 @@ import {
   useTransferBlockedSync,
 } from "@app/hooks/use-transfer-blocked"
 import { useSelfCustodialNetworkMismatchToast } from "@app/self-custodial/hooks/use-network-mismatch-toast"
-import { useNonCustodialConversionLimits } from "@app/self-custodial/hooks"
+import {
+  useNonCustodialConversionLimits,
+  usePendingDeposits,
+} from "@app/self-custodial/hooks"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
-import { ConvertDirection } from "@app/types/payment"
+import { ConvertDirection, DepositStatus } from "@app/types/payment"
 import { useBackupNudgeState } from "@app/hooks/use-backup-nudge-state"
 import { useSelfCustodialInfoBulletinState } from "@app/hooks/use-self-custodial-info-bulletin-state"
 import { getErrorMessages } from "@app/graphql/utils"
 import { getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
+import { useCardData } from "@app/screens/card-screen/hooks/use-card-data"
+import { isCardUsable } from "@app/screens/card-screen/utils/card-display"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { UnclaimedDepositBanner } from "@app/components/unclaimed-deposit-banner"
 import { testProps } from "@app/utils/testProps"
@@ -189,6 +199,7 @@ gql`
   }
 `
 
+// eslint-disable-next-line max-statements -- HomeScreen orchestrates the entire home; splitting solely to meet the 100-statement cap would fragment cohesive setup without improving readability
 export const HomeScreen: React.FC = () => {
   const styles = useStyles()
   const {
@@ -311,6 +322,18 @@ export const HomeScreen: React.FC = () => {
         walletCurrency: w.walletCurrency,
       }))
     : dataAuthed?.me?.defaultAccount?.wallets
+
+  /**
+   * TODO(card): `cards` on ConsumerAccount only exists on the staging backend
+   * today, so gate the home card row to staging until the card service ships to
+   * every instance; then drop `isCardBackendAvailable` and query unconditionally.
+   * Ref PR #3899.
+   */
+  const isCardBackendAvailable = galoyInstanceId === "Staging"
+  const { card: homeCard } = useCardData({ skip: !isCardBackendAvailable })
+  const hasCard = homeCard !== undefined && isCardUsable(homeCard.status)
+  const cardLastFour = homeCard?.lastFour
+
   const {
     formattedBalance: defaultFormattedBalance,
     satsBalance,
@@ -330,10 +353,37 @@ export const HomeScreen: React.FC = () => {
       : defaultFormattedBalance
 
   const accountId = dataAuthed?.me?.defaultAccount?.id
-  const levelAccount = dataAuthed?.me?.defaultAccount.level
+  const levelAccount = dataAuthed?.me?.defaultAccount?.level
   const pendingIncomingTransactions =
     dataAuthed?.me?.defaultAccount?.pendingIncomingTransactions
   const transactionsEdges = dataAuthed?.me?.defaultAccount?.transactions?.edges
+
+  /** Fetched once here and shared with the UnclaimedDepositBanner below, so the
+   *  pending pill and that banner can never disagree about the same deposits. */
+  const { deposits, refetch: refetchPendingDeposits } = usePendingDeposits()
+
+  /** Pending deposits stay visible beside the balance until confirmed —
+   *  unlike the unseen-tx badge below, which auto-dismisses (blink-wip#937). */
+  const { pendingReceiveAmountText } = usePendingReceiveAmount({
+    pendingIncomingTransactions,
+    deposits,
+  })
+  /** The banner below only counts actionable deposits, so the pill carries the
+   *  immature deposits' inspection path (txid / mempool link) to the
+   *  unclaimed-deposits screen. Custodial pending receives have no such
+   *  screen — their pill stays inert. */
+  const hasImmatureDeposits = deposits.some(
+    ({ status }) => status === DepositStatus.Immature,
+  )
+  const pendingStatusBadge = pendingReceiveAmountText
+    ? {
+        label: LL.HomeScreen.pendingReceiveBadge({ amount: pendingReceiveAmountText }),
+        status: "warning" as const,
+        onPress: hasImmatureDeposits
+          ? () => navigation.navigate("unclaimedDepositsScreen")
+          : undefined,
+      }
+    : undefined
 
   const transactions = useMemo(() => {
     const txs: TransactionFragment[] = []
@@ -456,7 +506,8 @@ export const HomeScreen: React.FC = () => {
       : null
   const shouldShowStableTokenConvertModal = isSelfCustodial && isConvertModalVisible
 
-  const { migrateNowPrompt, reminderBulletin, receiveBlocked } = useWindDownHomeNudges()
+  const { migrateNowPrompt, offboardBulletin, reminderBulletin, receiveBlocked } =
+    useWindDownHomeNudges()
   const { dismissForSession: dismissMigrateNowPrompt } = migrateNowPrompt
   /** Dismissing first keeps the modal from floating over the pushed migration flow. */
   const goToMigration = React.useCallback(() => {
@@ -496,33 +547,54 @@ export const HomeScreen: React.FC = () => {
     openUpgradeModal,
   ])
 
-  const refetch = React.useCallback(() => {
+  const refetch = React.useCallback(async () => {
     if (isSelfCustodial) {
-      refreshSelfCustodialWallets()
+      // Both must land before the pull-to-refresh spinner retracts: the wallet
+      // snapshot feeds the balance, the deposit listing feeds the pending pill
+      // and the unclaimed-deposit banner.
+      await Promise.all([refreshSelfCustodialWallets(), refetchPendingDeposits()])
       return
     }
 
     if (!isAuthed) return
 
-    Promise.all([
+    await Promise.all([
       refetchRealtimePrice(),
       refetchAuthed(),
       refetchUnauthed(),
       refetchBulletins(),
-    ]).then(() => {
-      // Triggers the upgrade trial account modal after refetch
-      triggerUpgradeModal()
-    })
+    ])
+    // Triggers the upgrade trial account modal after refetch
+    triggerUpgradeModal()
   }, [
     isAuthed,
     isSelfCustodial,
     refreshSelfCustodialWallets,
+    refetchPendingDeposits,
     refetchAuthed,
     refetchBulletins,
     refetchRealtimePrice,
     refetchUnauthed,
     triggerUpgradeModal,
   ])
+
+  /** The refresh control reflects only user-initiated pulls: iOS renders a
+   *  programmatically-pinned UIRefreshControl as a frozen spinner, so binding
+   *  it to background query loading pinned a dead spinner on every mount (and
+   *  indefinitely while a self-custodial wallet connects). */
+  const [isPullRefreshing, setIsPullRefreshing] = React.useState(false)
+  const handlePullToRefresh = React.useCallback(async () => {
+    setIsPullRefreshing(true)
+    try {
+      await refetch()
+    } catch {
+      // A failed pull (e.g. offline) already surfaces through each query's
+      // error state; RefreshControl ignores the promise, so don't let the
+      // rejection escape as unhandled.
+    } finally {
+      setIsPullRefreshing(false)
+    }
+  }, [refetch])
 
   const numberOfTxs = transactions.length
 
@@ -613,16 +685,20 @@ export const HomeScreen: React.FC = () => {
     },
   ]
 
-  const isIosWithBalance = isIos && satsBalance > 0
+  const passesIosGate =
+    isSelfCustodial ||
+    !isIos ||
+    dataUnauthed?.globals?.network !== "mainnet" ||
+    levelAccount === AccountLevel.Two ||
+    levelAccount === AccountLevel.Three ||
+    (isIos && satsBalance > 0)
 
+  /** A transfer-blocked country must not hide the button while the dollar
+   *  balance is restricted — the disabled button is the user's entry point to
+   *  the restriction explanation (WalletOverview greys the row from the same
+   *  hook). Only the iOS zero-balance gate may hide it in that state. */
   const shouldShowTransferButton =
-    !isTransferBlocked &&
-    (isSelfCustodial ||
-      !isIos ||
-      dataUnauthed?.globals?.network !== "mainnet" ||
-      levelAccount === AccountLevel.Two ||
-      levelAccount === AccountLevel.Three ||
-      isIosWithBalance)
+    passesIosGate && (!isTransferBlocked || isDollarBalanceRestricted)
 
   if (shouldShowTransferButton) {
     buttons.unshift({
@@ -667,7 +743,7 @@ export const HomeScreen: React.FC = () => {
   }
 
   return (
-    <Screen headerShown={false}>
+    <Screen headerShown={false} edges={["top", "left", "right"]}>
       {AccountCreationNeededModal}
       <StableSatsModal
         isVisible={isStablesatModalVisible}
@@ -751,6 +827,7 @@ export const HomeScreen: React.FC = () => {
         showStableBalanceToggle={showStableBalanceToggle}
         mode={balanceMode}
         onModeChange={toggleBalanceMode}
+        statusBadge={pendingStatusBadge}
       />
       <View style={styles.badgeSlot}>
         <UnseenTxAmountBadge
@@ -770,8 +847,8 @@ export const HomeScreen: React.FC = () => {
         contentContainerStyle={styles.scrollViewContainer}
         refreshControl={
           <RefreshControl
-            refreshing={loading && isFocused}
-            onRefresh={refetch}
+            refreshing={isPullRefreshing}
+            onRefresh={handlePullToRefresh}
             colors={[colors.primary]}
             tintColor={colors.primary}
           />
@@ -782,6 +859,8 @@ export const HomeScreen: React.FC = () => {
           setIsStablesatModalVisible={setIsStablesatModalVisible}
           onRestrictedTap={() => setIsRestrictionModalVisible(true)}
           wallets={wallets}
+          hasCard={hasCard}
+          cardLastFour={cardLastFour}
           showBtcNotification={isOutgoing ? false : hasUnseenBtcTx}
           showUsdNotification={isOutgoing ? false : hasUnseenUsdTx}
         />
@@ -807,9 +886,10 @@ export const HomeScreen: React.FC = () => {
             </React.Fragment>
           ))}
         </View>
-        {isSelfCustodial && <UnclaimedDepositBanner />}
+        {isSelfCustodial && <UnclaimedDepositBanner deposits={deposits} />}
         <NetworkStatusBanner />
         {shouldShowBanner && <BackupNudgeBanner onDismiss={dismissBanner} />}
+        {offboardBulletin.isVisible && <OffboardOnlyBulletin />}
         {reminderBulletin.isVisible && (
           <MigrationReminderBulletin
             onMigrate={goToMigration}

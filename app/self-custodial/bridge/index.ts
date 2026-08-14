@@ -9,6 +9,7 @@ export {
 export {
   getWalletInfo,
   deriveWalletIdentityPubkey,
+  listAllPayments,
   listPayments,
   getUserSettings,
   syncSelfCustodialWallet,

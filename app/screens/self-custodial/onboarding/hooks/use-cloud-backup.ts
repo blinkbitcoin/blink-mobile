@@ -65,6 +65,14 @@ export const useCloudBackup = ({
   const handleBackup = useCallback(async () => {
     const provider = getCloudProviderName(LL)
 
+    /** Every non-cancelled Drive failure carries its own remedy (e.g. storageAccessRequired for
+     *  a withheld scope), so it routes through the resolver instead of a generic toast;
+     *  cancellation is the user's own action and stays silent. */
+    const toastFailure = (reason: CloudBackupErrorReason) => {
+      if (reason === CloudBackupErrorReason.Cancelled) return
+      toastShow({ message: resolveErrorMessage(reason, LL), LL })
+    }
+
     if (!identityPubkey) {
       /** The pubkey is derived locally from the phrase, with no cloud involved, so a missing
        *  one is a local failure: signInFailed would misdirect the user to their cloud account. */
@@ -76,23 +84,25 @@ export const useCloudBackup = ({
 
     const sessionResult = await startSession(filename)
     if (!sessionResult.success) {
-      toastShow({ message: resolveErrorMessage(sessionResult.reason, LL), LL })
+      toastFailure(sessionResult.reason)
       return
     }
     const { session } = sessionResult
+    let { accessToken } = session
 
     if (session.existingFileId) {
-      const downloadResult = await downloadById(
-        session.existingFileId,
-        session.accessToken,
-      )
+      const downloadResult = await downloadById(session.existingFileId, accessToken)
 
       if (
         !downloadResult.success &&
         downloadResult.reason !== CloudBackupErrorReason.NotFound
       ) {
-        toastShow({ message: LL.BackupScreen.CloudBackup.uploadFailed(), LL })
+        toastFailure(downloadResult.reason)
         return
+      }
+
+      if (downloadResult.success && downloadResult.accessToken) {
+        accessToken = downloadResult.accessToken
       }
 
       const metadata = downloadResult.success
@@ -117,9 +127,9 @@ export const useCloudBackup = ({
       version,
     })
 
-    const result = await upload(payload, filename, session)
+    const result = await upload(payload, filename, { ...session, accessToken })
     if (!result.success) {
-      toastShow({ message: LL.BackupScreen.CloudBackup.uploadFailed(), LL })
+      toastFailure(result.reason)
       return
     }
 

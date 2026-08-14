@@ -12,11 +12,27 @@ type CopyToClipboardParams = {
 export const useClipboard = (clearAfterMs?: number) => {
   const { LL } = useI18nContext()
   const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  // Content awaiting a timed clear; null once cleared or superseded
+  const pendingContentRef = useRef<string | null>(null)
+
+  const clearPendingContent = useCallback(async (): Promise<void> => {
+    clearTimeout(timerRef.current)
+    const content = pendingContentRef.current
+    pendingContentRef.current = null
+    if (!content) return
+    // Only wipe if the clipboard still holds what we copied — the user may
+    // have copied something else since
+    const current = await Clipboard.getString()
+    if (current === content) Clipboard.setString("")
+  }, [])
 
   useEffect(() => {
-    if (!clearAfterMs) clearTimeout(timerRef.current)
-    return () => clearTimeout(timerRef.current)
-  }, [clearAfterMs])
+    return () => {
+      // Clear immediately rather than dropping the scheduled clear, so a
+      // copied secret never outlives the screen that promised to clear it
+      clearPendingContent().catch(() => {})
+    }
+  }, [clearPendingContent])
 
   const copyToClipboard = useCallback(
     ({ content, message }: CopyToClipboardParams): void => {
@@ -28,10 +44,15 @@ export const useClipboard = (clearAfterMs?: number) => {
         LL,
       })
       if (clearAfterMs) {
-        timerRef.current = setTimeout(() => Clipboard.setString(""), clearAfterMs)
+        pendingContentRef.current = content
+        timerRef.current = setTimeout(() => {
+          clearPendingContent().catch(() => {})
+        }, clearAfterMs)
+      } else {
+        pendingContentRef.current = null
       }
     },
-    [LL, clearAfterMs],
+    [LL, clearAfterMs, clearPendingContent],
   )
 
   return { copyToClipboard }

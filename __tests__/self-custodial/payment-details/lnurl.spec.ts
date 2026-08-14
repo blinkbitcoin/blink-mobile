@@ -57,6 +57,9 @@ jest.mock("@app/self-custodial/sdk-error", () => {
 jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
   AesSuccessActionDataResult_Tags: { Decrypted: "Decrypted", ErrorStatus: "ErrorStatus" },
   FeePolicy: { FeesExcluded: 0, FeesIncluded: 1 },
+  // The shared fee-failure helper lives in send-helpers, which builds its tier→speed map
+  // at module scope.
+  OnchainConfirmationSpeed: { Fast: 0, Medium: 1, Slow: 2 },
   SuccessActionProcessed_Tags: { Aes: "Aes", Message: "Message", Url: "Url" },
   PaymentDetails: {
     Lightning: {
@@ -198,6 +201,72 @@ describe("createSelfCustodialLnurlPaymentDetails", () => {
       const updated = detail.setMemo("new memo")
       expect(updated.memo).toBe("new memo")
     })
+
+    it("setMemo overrides a destination-specified memo", () => {
+      const detail = createSelfCustodialLnurlPaymentDetails(
+        createParams({ destinationSpecifiedMemo: "Payment to user@example.com" }),
+      )
+      if (!detail.canSetMemo) throw new Error("expected canSetMemo")
+
+      expect(detail.setMemo("dinner").memo).toBe("dinner")
+    })
+
+    it("keeps the typed memo across successive edits", () => {
+      const detail = createSelfCustodialLnurlPaymentDetails(
+        createParams({ destinationSpecifiedMemo: "Payment to user@example.com" }),
+      )
+      if (!detail.canSetMemo) throw new Error("expected canSetMemo")
+      const once = detail.setMemo("din")
+      if (!once.canSetMemo) throw new Error("expected canSetMemo")
+
+      expect(once.setMemo("dinner").memo).toBe("dinner")
+    })
+
+    it("clearing the memo does not fall back to the destination memo", () => {
+      const detail = createSelfCustodialLnurlPaymentDetails(
+        createParams({ destinationSpecifiedMemo: "Payment to user@example.com" }),
+      )
+      if (!detail.canSetMemo) throw new Error("expected canSetMemo")
+
+      expect(detail.setMemo("").memo).toBe("")
+    })
+
+    it("sends the typed memo as the comment instead of the destination description", async () => {
+      mockPrepareLnurl.mockResolvedValue({})
+      const detail = createSelfCustodialLnurlPaymentDetails(
+        createParams({
+          lnurlParams: baseLnurlParams({ commentAllowed: 200 }),
+          destinationSpecifiedMemo: "Payment to user@example.com",
+        }),
+      )
+      if (!detail.canSetMemo) throw new Error("expected canSetMemo")
+      const updated = detail.setMemo("dinner")
+      if (!updated.canGetFee) throw new Error("expected canGetFee")
+
+      await updated.getFee({} as never)
+
+      expect(mockPrepareLnurl).toHaveBeenCalledWith(
+        expect.any(Object),
+        expect.objectContaining({ comment: "dinner" }),
+      )
+    })
+
+    it("truncates the comment to the length the destination allows", async () => {
+      mockPrepareLnurl.mockResolvedValue({})
+      const detail = createSelfCustodialLnurlPaymentDetails(
+        createParams({ lnurlParams: baseLnurlParams({ commentAllowed: 10 }) }),
+      )
+      if (!detail.canSetMemo) throw new Error("expected canSetMemo")
+      const updated = detail.setMemo("a note far longer than the destination accepts")
+      if (!updated.canGetFee) throw new Error("expected canGetFee")
+
+      await updated.getFee({} as never)
+
+      expect(mockPrepareLnurl).toHaveBeenCalledWith(
+        expect.any(Object),
+        expect.objectContaining({ comment: "a note far" }),
+      )
+    })
   })
 
   describe("prepareLnurl options (currency-aware shape)", () => {
@@ -334,6 +403,38 @@ describe("createSelfCustodialLnurlPaymentDetails", () => {
       if (!detail.canGetFee) throw new Error("expected canGetFee")
       const result = await detail.getFee({} as never)
       expect(result.amount).toBeUndefined()
+    })
+
+    // Without the classified code the confirmation screen can only show its generic
+    // "unable to calculate fee", which names no cause and leaves the slider disabled.
+    it("carries the classified code in errors when prepareLnurl throws", async () => {
+      mockPrepareLnurl.mockRejectedValue({ tag: "LnurlError", inner: ["bad callback"] })
+      const detail = createSelfCustodialLnurlPaymentDetails(createParams())
+      if (!detail.canGetFee) throw new Error("expected canGetFee")
+      const result = await detail.getFee({} as never)
+      expect(result.errors).toEqual([
+        {
+          __typename: "GraphQLApplicationError",
+          message: SelfCustodialErrorCode.InvalidInput,
+        },
+      ])
+    })
+
+    it("falls back to the Generic code for an unclassified throw", async () => {
+      mockPrepareLnurl.mockRejectedValue(new Error("boom"))
+      const detail = createSelfCustodialLnurlPaymentDetails(createParams())
+      if (!detail.canGetFee) throw new Error("expected canGetFee")
+      const result = await detail.getFee({} as never)
+      expect(result.errors?.[0]?.message).toBe(SelfCustodialErrorCode.Generic)
+    })
+
+    it("leaves errors unset on a successful quote", async () => {
+      mockPrepareLnurl.mockResolvedValue({})
+      mockExtractLnurlFee.mockReturnValue(5)
+      const detail = createSelfCustodialLnurlPaymentDetails(createParams())
+      if (!detail.canGetFee) throw new Error("expected canGetFee")
+      const result = await detail.getFee({} as never)
+      expect(result.errors).toBeUndefined()
     })
   })
 
