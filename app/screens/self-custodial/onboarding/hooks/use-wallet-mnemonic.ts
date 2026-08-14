@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
@@ -26,22 +26,40 @@ export const useLoadWalletMnemonic = (): (() => Promise<string>) => {
   }, [targetAccountId])
 }
 
-export const useWalletMnemonic = (): string => {
+type WalletMnemonicState = {
+  mnemonic: string
+  /** True while the keychain read is in flight. The bare string cannot tell "not read
+   *  yet" from "no phrase stored", which is the difference between a silent wait and a
+   *  local failure for consumers that gate a CTA on it. */
+  loading: boolean
+}
+
+export const useWalletMnemonicState = (): WalletMnemonicState => {
+  /** Two primitives rather than one object, so re-reading the same account settles into
+   *  React's bail-out instead of re-rendering every consumer. */
   const [mnemonic, setMnemonic] = useState("")
+  const [loading, setLoading] = useState(true)
   const loadMnemonic = useLoadWalletMnemonic()
 
   useEffect(() => {
     let mounted = true
-    loadMnemonic().then((stored) => {
-      if (mounted) setMnemonic(stored)
-    })
+    setLoading(true)
+    loadMnemonic()
+      .catch(() => "")
+      .then((stored) => {
+        if (!mounted) return
+        setMnemonic(stored)
+        setLoading(false)
+      })
     return () => {
       mounted = false
     }
   }, [loadMnemonic])
 
-  return mnemonic
+  return useMemo(() => ({ mnemonic, loading }), [mnemonic, loading])
 }
+
+export const useWalletMnemonic = (): string => useWalletMnemonicState().mnemonic
 
 type WalletIdentity = {
   pubkey: string

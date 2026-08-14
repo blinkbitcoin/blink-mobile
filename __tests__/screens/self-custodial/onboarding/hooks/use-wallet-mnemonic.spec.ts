@@ -1,8 +1,9 @@
-import { renderHook, waitFor } from "@testing-library/react-native"
+import { act, renderHook, waitFor } from "@testing-library/react-native"
 
 import {
   useWalletIdentity,
   useWalletMnemonic,
+  useWalletMnemonicState,
 } from "@app/screens/self-custodial/onboarding/hooks/use-wallet-mnemonic"
 import { AccountType } from "@app/types/wallet"
 
@@ -63,12 +64,15 @@ describe("useWalletMnemonic", () => {
     mockUseMigrationCheckpoint.mockReturnValue({ accountId: null })
   })
 
-  it("returns empty string when no self-custodial account is active", () => {
+  it("returns empty string when no self-custodial account is active", async () => {
     setNoActiveAccount()
 
     const { result } = renderHook(() => useWalletMnemonic())
 
-    expect(result.current).toBe("")
+    await waitFor(() => {
+      expect(result.current).toBe("")
+    })
+    expect(mockGetMnemonicForAccount).not.toHaveBeenCalled()
   })
 
   it("loads mnemonic from keychain for the active account", async () => {
@@ -121,6 +125,73 @@ describe("useWalletMnemonic", () => {
     })
     expect(mockGetMnemonicForAccount).toHaveBeenCalledWith(ACCOUNT_ID)
     expect(mockGetMnemonicForAccount).not.toHaveBeenCalledWith(MIGRATION_ACCOUNT_ID)
+  })
+})
+
+describe("useWalletMnemonicState", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockUseMigrationCheckpoint.mockReturnValue({ accountId: null })
+  })
+
+  it("reports loading until the keychain read settles", async () => {
+    setActiveSelfCustodial()
+    let resolveRead: (value: string) => void = () => {}
+    mockGetMnemonicForAccount.mockReturnValue(
+      new Promise<string>((resolve) => {
+        resolveRead = resolve
+      }),
+    )
+
+    const { result } = renderHook(() => useWalletMnemonicState())
+
+    expect(result.current).toEqual({ mnemonic: "", loading: true })
+
+    await act(async () => {
+      resolveRead("word1 word2 word3")
+    })
+
+    await waitFor(() => {
+      expect(result.current).toEqual({
+        mnemonic: "word1 word2 word3",
+        loading: false,
+      })
+    })
+  })
+
+  /** A stored-but-empty phrase must settle to loading:false, or consumers can never tell
+   *  it apart from a read still in flight and the CTA stays disabled forever. */
+  it("settles with loading false when no phrase is stored", async () => {
+    setActiveSelfCustodial()
+    mockGetMnemonicForAccount.mockResolvedValue(null)
+
+    const { result } = renderHook(() => useWalletMnemonicState())
+
+    await waitFor(() => {
+      expect(result.current).toEqual({ mnemonic: "", loading: false })
+    })
+  })
+
+  it("settles with loading false when there is no account to read", async () => {
+    setNoActiveAccount()
+
+    const { result } = renderHook(() => useWalletMnemonicState())
+
+    await waitFor(() => {
+      expect(result.current).toEqual({ mnemonic: "", loading: false })
+    })
+    expect(mockGetMnemonicForAccount).not.toHaveBeenCalled()
+  })
+
+  it("settles with loading false when the keychain read rejects", async () => {
+    setActiveSelfCustodial()
+    mockGetMnemonicForAccount.mockRejectedValue(new Error("keychain locked"))
+
+    const { result } = renderHook(() => useWalletMnemonicState())
+
+    await waitFor(() => {
+      expect(result.current).toEqual({ mnemonic: "", loading: false })
+    })
   })
 })
 

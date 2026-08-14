@@ -21,7 +21,7 @@ import { getCloudProviderName } from "../utils"
 
 import { useCompleteBackup } from "./use-complete-backup"
 import { usePlatformCloudBackup } from "./use-platform-cloud-backup"
-import { useWalletIdentity, useWalletMnemonic } from "./use-wallet-mnemonic"
+import { useWalletIdentity, useWalletMnemonicState } from "./use-wallet-mnemonic"
 
 const DEFAULT_BACKUP_VERSION = 1
 
@@ -58,9 +58,13 @@ export const useCloudBackup = ({
   const { appConfig } = useAppConfig()
   const { startSession, upload, downloadById, resolveErrorMessage, loading } =
     usePlatformCloudBackup()
-  const mnemonic = useWalletMnemonic()
+  const { mnemonic, loading: mnemonicLoading } = useWalletMnemonicState()
   const { pubkey: identityPubkey, loading: identityLoading } = useWalletIdentity(mnemonic)
   const { lightningAddress } = useSelfCustodialAccountInfo()
+
+  /** The phrase is read from the keychain before the pubkey can derive from it; both
+   *  windows leave the pubkey empty without it being a failure. */
+  const identityPending = mnemonicLoading || identityLoading
 
   const handleBackup = useCallback(async () => {
     const provider = getCloudProviderName(LL)
@@ -73,9 +77,9 @@ export const useCloudBackup = ({
       toastShow({ message: resolveErrorMessage(reason, LL), LL })
     }
 
-    /** The CTA is disabled while the pubkey derives, so reaching this mid-derivation is a
-     *  race, not a failure; stay silent instead of flashing a spurious failure toast. */
-    if (identityLoading) return
+    /** The CTA is disabled while the phrase reads and the pubkey derives, so reaching this
+     *  mid-flight is a race, not a failure; stay silent instead of flashing a toast. */
+    if (identityPending) return
 
     if (!identityPubkey) {
       /** The pubkey is derived locally from the phrase, with no cloud involved, so a missing
@@ -159,9 +163,9 @@ export const useCloudBackup = ({
     appConfig.galoyInstance.name,
     mnemonic,
     identityPubkey,
-    identityLoading,
+    identityPending,
     lightningAddress,
   ])
 
-  return { handleBackup, loading: loading || identityLoading }
+  return { handleBackup, loading: loading || identityPending }
 }
