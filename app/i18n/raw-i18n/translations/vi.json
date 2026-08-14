@@ -2062,7 +2062,7 @@
       "sendingLimit": "Reduced daily sending limit",
       "noOnchain": "No receiving bitcoin onchain",
       "recoveryOption": "Khôi phục tiền qua SMS hoặc email",
-      "dailyLimit": "Giới hạn giao dịch USD 999 mỗi ngày",
+      "dailyLimit": "Giới hạn giao dịch USD {amount: number} mỗi ngày",
       "onchainReceive": "Nhận bitcoin trên chuỗi"
     }
   },
@@ -2636,7 +2636,7 @@
       "mainTitle": "Chào mừng đến Cấp 1",
       "title": "Các tính năng mới đã được mở khóa cho tài khoản của bạn:",
       "receiveBitcoinDescription": "Nhận Bitcoin bằng số điện thoại của bạn",
-      "dailyLimitDescription": "Gửi tối đa USD 999 mỗi ngày",
+      "dailyLimitDescription": "Gửi tối đa USD {amount: number} mỗi ngày",
       "onchainDescription": "Nhận thanh toán trên chuỗi"
     },
     "emailBenefits": {

@@ -2,6 +2,7 @@ import * as React from "react"
 import { RouteProp, useNavigation, useFocusEffect } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
+import { LEVEL_ONE_DAILY_LIMIT_USD } from "@app/config"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { useSettingsScreenQuery } from "@app/graphql/generated"
 import {
@@ -46,7 +47,9 @@ export const WelcomeLevel1Screen: React.FC<WelcomeLevel1ScreenProps> = ({ route 
       title={LL.OnboardingScreen.welcomeLevel1.title()}
       descriptions={[
         LL.OnboardingScreen.welcomeLevel1.receiveBitcoinDescription(),
-        LL.OnboardingScreen.welcomeLevel1.dailyLimitDescription(),
+        LL.OnboardingScreen.welcomeLevel1.dailyLimitDescription({
+          amount: LEVEL_ONE_DAILY_LIMIT_USD,
+        }),
         LL.OnboardingScreen.welcomeLevel1.onchainDescription(),
       ]}
       primaryLabel={LL.common.next()}

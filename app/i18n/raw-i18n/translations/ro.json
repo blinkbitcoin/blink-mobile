@@ -2062,7 +2062,7 @@
       "sendingLimit": "Limită de trimitere zilnică redusă",
       "noOnchain": "Nu primiți bitcoin onchain",
       "recoveryOption": "Recuperați fondurile prin SMS sau email",
-      "dailyLimit": "Limită zilnică de tranzacții de USD 999",
+      "dailyLimit": "Limită zilnică de tranzacții de USD {amount: number}",
       "onchainReceive": "Primiți bitcoin onchain"
     }
   },
@@ -2636,7 +2636,7 @@
       "mainTitle": "Bine ați venit la Nivelul 1",
       "title": "Funcții noi deblocate pentru contul dvs.:",
       "receiveBitcoinDescription": "Primiți Bitcoin folosind numărul dvs. de telefon",
-      "dailyLimitDescription": "Trimite până la USD 999 pe zi",
+      "dailyLimitDescription": "Trimite până la USD {amount: number} pe zi",
       "onchainDescription": "Primiți plăți on-chain"
     },
     "emailBenefits": {

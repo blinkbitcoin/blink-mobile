@@ -2062,7 +2062,7 @@
       "sendingLimit": "Verlaagde daaglikse spandeerbare limiet",
       "noOnchain": "Geen ontvang van Bitcoin-opketting",
       "recoveryOption": "Herwin fondse per SMS of e-pos",
-      "dailyLimit": "USD 999 daaglikse transaksielimiet",
+      "dailyLimit": "USD {amount: number} daaglikse transaksielimiet",
       "onchainReceive": "Ontvang bitcoin on-chain"
     }
   },
@@ -2636,7 +2636,7 @@
       "mainTitle": "Welkom by Vlak 1",
       "title": "Nuwe funksies ontsluit vir jou rekening:",
       "receiveBitcoinDescription": "Ontvang Bitcoin met jou telefoonnommer",
-      "dailyLimitDescription": "Stuur tot USD 999 per dag",
+      "dailyLimitDescription": "Stuur tot USD {amount: number} per dag",
       "onchainDescription": "Ontvang on-chain betalings"
     },
     "emailBenefits": {

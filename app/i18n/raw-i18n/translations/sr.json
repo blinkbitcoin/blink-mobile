@@ -2062,7 +2062,7 @@
       "sendingLimit": "Смањено дневно ограничење слања",
       "noOnchain": "Нема примања биткоина на ланцу",
       "recoveryOption": "Повратак средстава преко SMS-а или е-поште",
-      "dailyLimit": "USD 999 дневни лимит за трансакције",
+      "dailyLimit": "USD {amount: number} дневни лимит за трансакције",
       "onchainReceive": "Примајте Bitcoin на блокчејну"
     }
   },
@@ -2636,7 +2636,7 @@
       "mainTitle": "Добродошли на Ниво 1",
       "title": "Нове функције откључане за ваш налог:",
       "receiveBitcoinDescription": "Примајте Bitcoin користећи свој број телефона",
-      "dailyLimitDescription": "Пошаљите до USD 999 дневно",
+      "dailyLimitDescription": "Пошаљите до USD {amount: number} дневно",
       "onchainDescription": "Примајте уплате на блокчејну"
     },
     "emailBenefits": {

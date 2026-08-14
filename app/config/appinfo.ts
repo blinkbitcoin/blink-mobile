@@ -27,6 +27,14 @@ export const getCloudBackupFilenamePrefix = (network: string) =>
 export const getCloudBackupFilename = (network: string, walletIdentifier: string) =>
   `${getCloudBackupFilenamePrefix(network)}${walletIdentifier}.json`
 
+/**
+ * Daily limit advertised to level 1 accounts, corrected from 1,000 to 999 by the SSF
+ * audit (blink-wip#739). Single source for the two screens that display it, so the
+ * advertised amount cannot drift between them. Fed into the translated copy as the
+ * `amount` placeholder rather than written into each sentence.
+ */
+export const LEVEL_ONE_DAILY_LIMIT_USD = 999
+
 export const BLINK_DEEP_LINK_PREFIX = "blink:/"
 export const TELEGRAM_CALLBACK_PATH = "auth/passport-callback"
 export const HIDDEN_AMOUNT_PLACEHOLDER = "****"

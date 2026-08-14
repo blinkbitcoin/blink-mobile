@@ -3,6 +3,7 @@ import { useNavigation, RouteProp } from "@react-navigation/native"
 import { render, fireEvent } from "@testing-library/react-native"
 
 import { loadLocale } from "@app/i18n/i18n-util.sync"
+import { LEVEL_ONE_DAILY_LIMIT_USD } from "@app/config"
 import { i18nObject } from "@app/i18n/i18n-util"
 import { useSettingsScreenQuery } from "@app/graphql/generated"
 import { WelcomeLevel1Screen } from "@app/screens/onboarding-screen"
@@ -66,7 +67,11 @@ describe("WelcomeLevel1Screen", () => {
       getByText(LL.OnboardingScreen.welcomeLevel1.receiveBitcoinDescription()),
     ).toBeTruthy()
     expect(
-      getByText(LL.OnboardingScreen.welcomeLevel1.dailyLimitDescription()),
+      getByText(
+        LL.OnboardingScreen.welcomeLevel1.dailyLimitDescription({
+          amount: LEVEL_ONE_DAILY_LIMIT_USD,
+        }),
+      ),
     ).toBeTruthy()
     expect(getByText(LL.OnboardingScreen.welcomeLevel1.onchainDescription())).toBeTruthy()
   })

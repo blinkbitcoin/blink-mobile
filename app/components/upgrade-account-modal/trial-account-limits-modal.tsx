@@ -2,6 +2,7 @@ import * as React from "react"
 import { View } from "react-native"
 import { LocalizedString } from "typesafe-i18n"
 
+import { LEVEL_ONE_DAILY_LIMIT_USD } from "@app/config"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import CustomModal from "@app/components/custom-modal/custom-modal"
@@ -55,7 +56,11 @@ export const TrialAccountLimitsModal: React.FC<TrialAccountLimitsModalProps> = (
       body={
         <View style={styles.modalBody}>
           <LimitItem text={LL.GetStartedScreen.trialAccountLimits.recoveryOption()} />
-          <LimitItem text={LL.GetStartedScreen.trialAccountLimits.dailyLimit()} />
+          <LimitItem
+            text={LL.GetStartedScreen.trialAccountLimits.dailyLimit({
+              amount: LEVEL_ONE_DAILY_LIMIT_USD,
+            })}
+          />
           <LimitItem text={LL.GetStartedScreen.trialAccountLimits.onchainReceive()} />
         </View>
       }

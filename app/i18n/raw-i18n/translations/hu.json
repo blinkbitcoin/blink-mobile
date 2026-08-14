@@ -2062,7 +2062,7 @@
       "sendingLimit": "Csökkentett napi küldési korlát",
       "noOnchain": "Nincs onchain Bitcoin fogadás",
       "recoveryOption": "Pénz visszaszerzése SMS-sel vagy e-maillel",
-      "dailyLimit": "Napi USD 999 tranzakciós limit",
+      "dailyLimit": "Napi USD {amount: number} tranzakciós limit",
       "onchainReceive": "Bitcoin fogadása on-chain"
     }
   },
@@ -2636,7 +2636,7 @@
       "mainTitle": "Üdvözlünk az 1. szinten",
       "title": "Új funkciók a fiókodban:",
       "receiveBitcoinDescription": "Bitcoin fogadása telefonszámoddal",
-      "dailyLimitDescription": "Küldj naponta akár USD 999-et",
+      "dailyLimitDescription": "Küldj naponta akár USD {amount: number}-et",
       "onchainDescription": "On-chain fizetések fogadása"
     },
     "emailBenefits": {

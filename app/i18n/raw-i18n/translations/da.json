@@ -2062,7 +2062,7 @@
       "sendingLimit": "Nedsat daglig afsendelsesgrænse.",
       "noOnchain": "Ingen modtagelse af bitcoin onchain.",
       "recoveryOption": "Gendan midler via SMS eller e-mail",
-      "dailyLimit": "USD 999 daglig transaktionsgrænse",
+      "dailyLimit": "USD {amount: number} daglig transaktionsgrænse",
       "onchainReceive": "Modtag bitcoin onchain"
     }
   },
@@ -2636,7 +2636,7 @@
       "mainTitle": "Velkommen til niveau 1",
       "title": "Nye funktioner låst op for din konto:",
       "receiveBitcoinDescription": "Modtag Bitcoin med dit telefonnummer",
-      "dailyLimitDescription": "Send op til USD 999 om dagen",
+      "dailyLimitDescription": "Send op til USD {amount: number} om dagen",
       "onchainDescription": "Modtag on-chain betalinger"
     },
     "emailBenefits": {
