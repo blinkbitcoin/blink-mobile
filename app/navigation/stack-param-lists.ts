@@ -172,7 +172,10 @@ export type RootStackParamList = {
     /**
      * DEV ONLY — bypasses the instance-origin allowlist of the WebView screen.
      * Must only be set from the developer screen; the webView route is not
-     * deep-linkable, so the param cannot arrive from outside the app.
+     * deep-linkable, so the param cannot arrive from outside the app. That
+     * invariant is enforced by a test over DEEP_LINK_SCREENS in
+     * navigation-container-wrapper — adding a deep link for this route would
+     * make the bypass reachable from a crafted URL.
      */
     allowArbitraryUrl?: boolean
   }

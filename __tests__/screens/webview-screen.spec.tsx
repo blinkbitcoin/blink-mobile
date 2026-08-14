@@ -49,6 +49,15 @@ jest.mock("@app/utils/external", () => ({
   openExternalUrl: jest.fn(),
 }))
 
+jest.mock("@app/utils/log-error", () => ({
+  logError: jest.fn(),
+}))
+
+const getLogError = () => jest.requireMock("@app/utils/log-error").logError as jest.Mock
+
+const loggedMessages = () =>
+  getLogError().mock.calls.map((call) => String(call[0]?.error ?? ""))
+
 // The test context pins the Main galoy instance:
 // kycUrl = https://kyc.blink.sv, fiatUrl = https://fiat.blink.sv
 const FIAT_URL = "https://fiat.blink.sv?accountId=test"
@@ -199,6 +208,22 @@ describe("WebViewScreen", () => {
       expect(typeof buttons?.[0]?.onPress).toBe("function")
     })
 
+    it("records which origin was refused and what was allowed", async () => {
+      jest.spyOn(Alert, "alert").mockImplementation(() => {})
+
+      renderScreen({
+        ...mockRoute,
+        params: { url: "https://evil.example/phishing" },
+      })
+
+      // The user only ever sees a generic error, so a misconfigured instance and
+      // a genuine block are indistinguishable without this breadcrumb.
+      await waitFor(() => expect(getLogError()).toHaveBeenCalled())
+      const message = loggedMessages()[0]
+      expect(message).toContain("https://evil.example")
+      expect(message).toContain("https://fiat.blink.sv")
+    })
+
     it("refuses unparseable entry URLs", async () => {
       const alertSpy = jest.spyOn(Alert, "alert")
 
@@ -238,8 +263,66 @@ describe("WebViewScreen", () => {
       simulateLoad(webViewInstance, "https://fiat.blink.sv/checkout")
       expect(injectJs).toHaveBeenCalledTimes(1)
 
+      mockInjectJavaScript.mockClear()
       simulateLoad(webViewInstance, "https://payment-partner.example/redirect")
       expect(injectJs).toHaveBeenCalledTimes(1) // unchanged: theme only, no bridge
+      // The bridge count alone cannot tell a working origin gate from a stuck
+      // injection latch — both leave it at 1. Theme JS re-injection proves the
+      // second load was actually processed and only the bridge was withheld.
+      expect(mockInjectJavaScript).toHaveBeenCalledTimes(1)
+      expect(mockInjectJavaScript).toHaveBeenCalledWith(
+        expect.stringContaining("data-theme"),
+      )
+    })
+
+    it("injects each payload once when two progress events land in one load", async () => {
+      const webViewInstance = await getWebView(mockRoute)
+
+      // Native progress callbacks can both arrive before React re-renders. A
+      // state-based guard let both through, double-registering the WebLN
+      // listeners and pollers so one sendPayment navigated twice.
+      webViewInstance.props.onLoadStart()
+      webViewInstance.props.onLoadProgress({
+        nativeEvent: { progress: 0.8, url: "https://fiat.blink.sv/checkout" },
+      })
+      webViewInstance.props.onLoadProgress({
+        nativeEvent: { progress: 0.9, url: "https://fiat.blink.sv/checkout" },
+      })
+
+      expect(injectJs).toHaveBeenCalledTimes(1)
+      expect(mockInjectJavaScript).toHaveBeenCalledTimes(2) // theme + bridge, once each
+    })
+
+    it("ignores progress events below the injection threshold", async () => {
+      const webViewInstance = await getWebView(mockRoute)
+
+      webViewInstance.props.onLoadStart()
+      webViewInstance.props.onLoadProgress({
+        nativeEvent: { progress: 0.5, url: "https://fiat.blink.sv/checkout" },
+      })
+
+      expect(mockInjectJavaScript).not.toHaveBeenCalled()
+      expect(injectJs).not.toHaveBeenCalled()
+    })
+
+    it("records a breadcrumb when a fiat flow loses the bridge off-origin", async () => {
+      const webViewInstance = await getWebView(mockRoute)
+
+      simulateLoad(webViewInstance, "https://payment-partner.example/redirect")
+
+      // Withholding the bridge is invisible to the user: the page just never
+      // gets window.webln and the payment never starts.
+      expect(loggedMessages()).toContainEqual(
+        expect.stringContaining("https://payment-partner.example"),
+      )
+    })
+
+    it("does not record a bridge breadcrumb for KYC, which never has one", async () => {
+      const webViewInstance = await getWebView(mockRouteWithHeaderTitle)
+
+      simulateLoad(webViewInstance, "https://kyc.blink.sv/webflow?token=test")
+
+      expect(getLogError()).not.toHaveBeenCalled()
     })
 
     it("does not inject the bridge on the KYC origin", async () => {
@@ -285,12 +368,23 @@ describe("WebViewScreen", () => {
   })
 
   describe("hardening props", () => {
-    it("restricts navigation to https and disables multiple windows", async () => {
+    it("restricts navigation to https and routes popups through the handler", async () => {
       const webViewInstance = await getWebView(mockRoute)
 
       expect(webViewInstance.props.originWhitelist).toEqual(["https://*"])
-      expect(webViewInstance.props.setSupportMultipleWindows).toBe(false)
       expect(typeof webViewInstance.props.onOpenWindow).toBe("function")
+    })
+
+    it("keeps multiple-window support on so onOpenWindow fires on Android", async () => {
+      const webViewInstance = await getWebView(mockRoute)
+
+      // Android dispatches the open-window event only from
+      // RNCWebChromeClient.onCreateWindow, which the platform calls only while
+      // multiple windows are supported. Setting this false makes onOpenWindow
+      // dead code there and lets window.open navigate this trusted WebView in
+      // place — react-native-webview drops the popup itself once a handler is
+      // registered, so nothing opens in-app regardless.
+      expect(webViewInstance.props.setSupportMultipleWindows).toBe(true)
     })
 
     it("sends window.open targets to the external browser only when https", async () => {
@@ -306,6 +400,27 @@ describe("WebViewScreen", () => {
         nativeEvent: { targetUrl: "javascript:void(0)" }, // eslint-disable-line no-script-url
       })
       expect(openExternalUrl).toHaveBeenCalledTimes(1)
+
+      webViewInstance.props.onOpenWindow({
+        nativeEvent: { targetUrl: "http://insecure.example/page" },
+      })
+      expect(openExternalUrl).toHaveBeenCalledTimes(1)
+    })
+
+    it("records a breadcrumb for every dropped window.open target", async () => {
+      const webViewInstance = await getWebView(mockRoute)
+
+      // A partner flow that opens about:blank and writes into the handle gets a
+      // dead window and stalls with nothing surfaced to the user.
+      webViewInstance.props.onOpenWindow({
+        nativeEvent: { targetUrl: "about:blank" },
+      })
+      webViewInstance.props.onOpenWindow({
+        nativeEvent: { targetUrl: "http://insecure.example/page" },
+      })
+
+      expect(getLogError()).toHaveBeenCalledTimes(2)
+      expect(loggedMessages()[1]).toContain("http://insecure.example")
     })
   })
 })
