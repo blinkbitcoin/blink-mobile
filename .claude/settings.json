@@ -11,6 +11,8 @@
       "Bash(xcrun simctl ui *)",
       "Bash(xcrun simctl get_app_container *)",
       "Bash(xcrun simctl bootstatus *)",
+      "Bash(adb *)",
+      "Bash(emulator *)",
       "Bash(maestro *)",
       "Bash(ffmpeg *)",
       "Bash(ffprobe *)",

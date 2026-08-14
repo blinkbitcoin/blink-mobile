@@ -102,3 +102,13 @@ than the one you embedded.
 ```bash
 curl -sSI "$RAW/after.png" | head -1
 ```
+
+## After Editing the Scripts
+
+```bash
+"$ATT/tests/run.sh"     # 27 assertions, ~5s, exits non-zero on failure
+```
+
+Pushes for real, to a local bare repo standing in for origin: no network, but
+the plumbing that fails silently (tree, refspec) is exercised end to end. If you
+add a guarantee, add the assertion that fails without it.

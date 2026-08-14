@@ -63,82 +63,32 @@ rm -f "$SESSION_DIR/released-at"
 xcrun simctl list devices booted -j > "$SESSION_DIR/preflight-booted.json"
 PREFLIGHT_COUNT=$(grep -c '"udid"' "$SESSION_DIR/preflight-booted.json" || true)
 
-# --- Port reservation --------------------------------------------------------
-# Deterministic starting point per PR (so re-runs are stable), then walk upward.
-# mkdir is atomic on every filesystem we care about: whoever creates the
-# directory owns the port. 8081 is never in range - that is the user's Metro.
-# Something outside this session's Metro is listening there: an unrelated
-# server, or a stray bundler. The session's own Metro (metro.pid) does not count.
-port_listened() {
-  local pids own
-  pids=$(lsof -nP -t -iTCP:"$1" -sTCP:LISTEN 2>/dev/null || true)
-  [ -n "$pids" ] || return 1
-  # Ours only if the recorded Metro PID is itself one of the listeners - a
-  # merely alive metro.pid proves nothing (the PID may have been recycled).
-  own=$(cat "$SESSION_DIR/metro.pid" 2>/dev/null || echo "")
-  [ -n "$own" ] && printf '%s\n' "$pids" | grep -qx "$own" && return 1
-  return 0
-}
+# --- Where the demo runs from ------------------------------------------------
+# Recorded so verify-session.sh can catch the trap that once manufactured a
+# phantom regression: the checkout moving to another branch mid-session, after
+# which Metro serves code that is not the code under test.
+if git rev-parse --show-toplevel >/dev/null 2>&1; then
+  git rev-parse --show-toplevel > "$SESSION_DIR/worktree"
+  git rev-parse HEAD > "$SESSION_DIR/head-sha"
+fi
 
-reserve_port() {
-  local base=$((8100 + (PR % 400)))
-  local candidate stale_pid
-  for offset in $(seq 0 60); do
-    candidate=$((base + offset))
-    [ "$candidate" -eq 8081 ] && continue
-    if mkdir "$REGISTRY/ports/$candidate" 2>/dev/null; then
-      echo "$SIM_NAME" > "$REGISTRY/ports/$candidate/owner"
-      # Re-check after winning the reservation: another process outside this
-      # registry (a stray Metro, an unrelated dev server) may already hold it.
-      if lsof -nP -iTCP:"$candidate" -sTCP:LISTEN >/dev/null 2>&1; then
-        rm -rf "$REGISTRY/ports/$candidate"
-        continue
-      fi
-      echo "$candidate"; return 0
-    fi
-    # A reservation this session already owns is ours to reuse, whether or not
-    # Metro ever started on it - otherwise a claim that died before recording
-    # its port leaks the reservation forever. Another session's reservation is
-    # never ours to judge.
-    # Still re-checked for a listener: an orphaned reservation's port may
-    # have been taken by an unrelated server since.
-    if [ "$(cat "$REGISTRY/ports/$candidate/owner" 2>/dev/null)" = "$SIM_NAME" ]; then
-      if port_listened "$candidate"; then
-        rm -rf "$REGISTRY/ports/$candidate"   # ours, but unusable: free it, move on
-        continue
-      fi
-      echo "$candidate"; return 0
-    fi
-  done
-  echo "FATAL: no free port in $base..$((base + 60))" >&2; exit 1
-}
+# --- Port reservation --------------------------------------------------------
+# The reservation itself lives in lib/ports.sh because the registry is shared
+# with the Android skill: an iOS session and an Android session on one port is
+# the collision the registry exists to prevent, and a second implementation
+# would be a second chance to get the atomicity wrong. Load-bearing, so a
+# missing lib fails loudly rather than degrading.
+PORTS_LIB="$(dirname "${BASH_SOURCE[0]}")/../lib/ports.sh"
+[ -f "$PORTS_LIB" ] || { echo "FATAL: missing $PORTS_LIB - an unreserved port would silently steal another agent's bundler" >&2; exit 1; }
+. "$PORTS_LIB"
 
 # A recorded port is only reusable while the registry still says it is ours:
 # release frees the reservation but keeps the session dir for retakes, so a
-# re-claim must re-take the port (atomically) or reserve a fresh one - never
-# trust the file alone, or two sessions end up sharing one Metro.
-reclaim_port() {
-  local port="$1"
-  case "$port" in ''|*[!0-9]*) return 1 ;; esac
-  if [ "$(cat "$REGISTRY/ports/$port/owner" 2>/dev/null)" = "$SIM_NAME" ]; then
-    if port_listened "$port"; then
-      rm -rf "$REGISTRY/ports/$port"   # ours, but unusable: free it before moving on
-      return 1
-    fi
-    return 0
-  fi
-  mkdir "$REGISTRY/ports/$port" 2>/dev/null || return 1
-  echo "$SIM_NAME" > "$REGISTRY/ports/$port/owner"
-  if lsof -nP -iTCP:"$port" -sTCP:LISTEN >/dev/null 2>&1; then
-    rm -rf "$REGISTRY/ports/$port"
-    return 1
-  fi
-  return 0
-}
-
+# re-claim re-takes it atomically or reserves a fresh one - never trusting the
+# file alone, or two sessions end up sharing one Metro.
 PORT=$(cat "$SESSION_DIR/port" 2>/dev/null || echo "")
-if ! reclaim_port "$PORT"; then
-  PORT=$(reserve_port)
+if ! reclaim_metro_port "$REGISTRY" "$SIM_NAME" "$PORT"; then
+  PORT=$(reserve_metro_port "$REGISTRY" "$SIM_NAME" "$PR") || exit 1
   echo "$PORT" > "$SESSION_DIR/port"
 fi
 
