@@ -69,6 +69,18 @@ describe("WelcomeLevel1Screen", () => {
     expect(getByText(LL.OnboardingScreen.welcomeLevel1.onchainDescription())).toBeTruthy()
   })
 
+  it("Advertises the audited USD 999 daily limit", () => {
+    // SSF audit finding (blink-wip#739): the enforced level 1 limit is USD 999/day,
+    // so the advertised copy must not say 1,000.
+    const { getByText } = render(
+      <ContextForScreen>
+        <WelcomeLevel1Screen route={route} />
+      </ContextForScreen>,
+    )
+
+    expect(getByText("Send up to USD 999 per day", { exact: false })).toBeTruthy()
+  })
+
   it("Triggers primary action button with label", () => {
     const mockReplace = jest.fn()
     ;(useNavigation as jest.Mock).mockReturnValue({
