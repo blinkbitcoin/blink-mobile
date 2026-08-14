@@ -2,28 +2,18 @@ import { CountryCode } from "libphonenumber-js/mobile"
 import * as React from "react"
 // eslint-disable-next-line react-native/split-platform-components
 import { Alert, Dimensions } from "react-native"
-import { Region, MapMarker as MapMarkerType } from "react-native-maps"
+import { Region } from "react-native-maps"
 import { check, PermissionStatus, RESULTS } from "react-native-permissions"
 
-import { gql } from "@apollo/client"
+import { LatLng } from "@app/btcmap"
 import MapComponent from "@app/components/map-component"
-import {
-  MapMarker,
-  useBusinessMapMarkersQuery,
-  useRegionQuery,
-} from "@app/graphql/generated"
-import { useIsAuthed } from "@app/graphql/is-authed-context"
-import { useActiveWallet } from "@app/hooks/use-active-wallet"
+import { useRegionQuery } from "@app/graphql/generated"
 import useDeviceLocation from "@app/hooks/use-device-location"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import Geolocation from "@react-native-community/geolocation"
-import { useFocusEffect } from "@react-navigation/native"
-import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import countryCodes from "../../../utils/countryInfo.json"
 import { Screen } from "../../components/screen"
-import { RootStackParamList } from "../../navigation/stack-param-lists"
-import { toastShow } from "../../utils/toast"
 import { LOCATION_PERMISSION, getUserRegion } from "./functions"
 
 const EL_ZONTE_COORDS = {
@@ -38,10 +28,6 @@ const { height, width } = Dimensions.get("window")
 const LATITUDE_DELTA = 15 // <-- decrease for more zoom
 const LONGITUDE_DELTA = LATITUDE_DELTA * (width / height)
 
-type Props = {
-  navigation: NativeStackNavigationProp<RootStackParamList, "Primary">
-}
-
 Geolocation.setRNConfiguration({
   skipPermissionRequests: true,
   enableBackgroundLocationUpdates: false,
@@ -49,51 +35,20 @@ Geolocation.setRNConfiguration({
   locationProvider: "auto",
 })
 
-gql`
-  query businessMapMarkers {
-    businessMapMarkers {
-      username
-      mapInfo {
-        title
-        coordinates {
-          longitude
-          latitude
-        }
-      }
-    }
-  }
-`
-
-export const MapScreen: React.FC<Props> = ({ navigation }) => {
-  const isAuthed = useIsAuthed()
-  const { isSelfCustodial } = useActiveWallet()
+/**
+ * Merchants that take bitcoin, from BTC Map (https://btcmap.org) — the
+ * community-maintained OpenStreetMap overlay the wider bitcoin ecosystem
+ * already uses. We read it; nothing here writes back to it.
+ */
+export const MapScreen: React.FC = () => {
   const { countryCode, loading } = useDeviceLocation()
   const { data: lastRegion, error: lastRegionError } = useRegionQuery()
   const { LL } = useI18nContext()
 
-  const { data, error, refetch } = useBusinessMapMarkersQuery({
-    notifyOnNetworkStatusChange: true,
-    fetchPolicy: "cache-and-network",
-  })
-
-  const focusedMarkerRef = React.useRef<MapMarkerType | null>(null)
-
   const [initialLocation, setInitialLocation] = React.useState<Region>()
-  const [isRefreshed, setIsRefreshed] = React.useState(false)
-  const [focusedMarker, setFocusedMarker] = React.useState<MapMarker | null>(null)
+  const [userCoords, setUserCoords] = React.useState<LatLng>()
   const [isInitializing, setInitializing] = React.useState(true)
   const [permissionsStatus, setPermissionsStatus] = React.useState<PermissionStatus>()
-
-  useFocusEffect(() => {
-    if (!isRefreshed) {
-      setIsRefreshed(true)
-      refetch()
-    }
-  })
-
-  if (error) {
-    toastShow({ message: error.message, LL })
-  }
 
   // On screen load, check (NOT request) if location permissions are given
   React.useEffect(() => {
@@ -104,6 +59,7 @@ export const MapScreen: React.FC<Props> = ({ navigation }) => {
         getUserRegion(async (region) => {
           if (region) {
             setInitialLocation(region)
+            setUserCoords({ latitude: region.latitude, longitude: region.longitude })
           } else {
             setInitializing(false)
           }
@@ -163,39 +119,14 @@ export const MapScreen: React.FC<Props> = ({ navigation }) => {
     }
   }, [isInitializing, countryCode, lastRegion, loading, initialLocation])
 
-  const handleCalloutPress = (item: MapMarker) => {
-    if (isAuthed || isSelfCustodial) {
-      navigation.navigate("sendBitcoinDestination", { username: item.username })
-    } else {
-      navigation.navigate("acceptTermsAndConditions", { flow: "phone" })
-    }
-  }
-
-  const handleMarkerPress = (item: MapMarker, ref?: MapMarkerType) => {
-    setFocusedMarker(item)
-    if (ref) {
-      focusedMarkerRef.current = ref
-    }
-  }
-
-  const handleMapPress = () => {
-    setFocusedMarker(null)
-    focusedMarkerRef.current = null
-  }
-
   return (
     <Screen edges={["left", "right"]}>
       {initialLocation && (
         <MapComponent
-          data={data}
           userLocation={initialLocation}
+          userCoords={userCoords}
           permissionsStatus={permissionsStatus}
           setPermissionsStatus={setPermissionsStatus}
-          handleMapPress={handleMapPress}
-          handleMarkerPress={handleMarkerPress}
-          focusedMarker={focusedMarker}
-          focusedMarkerRef={focusedMarkerRef}
-          handleCalloutPress={handleCalloutPress}
           alertOnLocationError={alertOnLocationError}
         />
       )}

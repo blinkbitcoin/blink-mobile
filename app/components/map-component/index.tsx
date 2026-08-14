@@ -1,55 +1,66 @@
 import debounce from "lodash.debounce"
-import React, { useRef } from "react"
-import { View } from "react-native"
-import MapView, { MapMarker as MapMarkerType, Region } from "react-native-maps"
+import React from "react"
+import { ActivityIndicator, Pressable, View } from "react-native"
+import MapView, { Region } from "react-native-maps"
 import { PermissionStatus, RESULTS, request } from "react-native-permissions"
+import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 import { useApolloClient } from "@apollo/client"
+import { BtcMapPlace, LatLng, useBtcMapPlaces } from "@app/btcmap"
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { updateMapLastCoords } from "@app/graphql/client-only-query"
-import { BusinessMapMarkersQuery, MapMarker } from "@app/graphql/generated"
+import { useI18nContext } from "@app/i18n/i18n-react"
 import { LOCATION_PERMISSION, getUserRegion } from "@app/screens/map-screen/functions"
 import { isIOS } from "@rn-vui/base"
-import { makeStyles, useTheme } from "@rn-vui/themed"
+import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
-import MapMarkerComponent from "../map-marker-component"
+import { ClusterMarker, ClusterMarkerData } from "./cluster-marker"
 import LocationButtonCopy from "./location-button-copy"
 import MapStyles from "./map-styles.json"
 import { OpenSettingsElement, OpenSettingsModal } from "./open-settings-modal"
+import { PlaceMarker } from "./place-marker"
+import { PlaceSheet } from "./place-sheet"
+import { usePlaceClusters } from "./use-place-clusters"
+
+const SAVE_COORDS_DEBOUNCE_MS = 1000
+const FLY_TO_DURATION_MS = 350
 
 type Props = {
-  data?: BusinessMapMarkersQuery
-  userLocation?: Region
+  userLocation: Region
+  userCoords?: LatLng
   permissionsStatus?: PermissionStatus
   setPermissionsStatus: (_: PermissionStatus) => void
-  handleMapPress: () => void
-  handleMarkerPress: (_: MapMarker) => void
-  focusedMarker: MapMarker | null
-  focusedMarkerRef: React.MutableRefObject<MapMarkerType | null>
-  handleCalloutPress: (_: MapMarker) => void
   alertOnLocationError: () => void
 }
 
 export default function MapComponent({
-  data,
   userLocation,
+  userCoords,
   permissionsStatus,
   setPermissionsStatus,
-  handleMapPress,
-  handleMarkerPress,
-  focusedMarker,
-  focusedMarkerRef,
-  handleCalloutPress,
   alertOnLocationError,
 }: Props) {
   const {
     theme: { colors, mode: themeMode },
   } = useTheme()
-  const styles = useStyles()
+  const insets = useSafeAreaInsets()
+  const styles = useStyles({ topInset: insets.top })
   const client = useApolloClient()
+  const { LL } = useI18nContext()
 
-  const mapViewRef = useRef<MapView>(null)
+  const mapViewRef = React.useRef<MapView>(null)
   const openSettingsModalRef = React.useRef<OpenSettingsElement>(null)
   const isAndroidSecondPermissionRequest = React.useRef(false)
+
+  const [region, setRegion] = React.useState<Region>(userLocation)
+  // Seeded from the screen's mount-time fix, then kept current by every
+  // successful re-centre — granting permission from here has to start the
+  // opening-hours badge working without an app restart.
+  const [coords, setCoords] = React.useState<LatLng | undefined>(userCoords)
+  const [selectedPlace, setSelectedPlace] = React.useState<BtcMapPlace | null>(null)
+
+  const { places: allPlaces, isLoading, hasError, retry } = useBtcMapPlaces()
+  const { places, clusters, regionForCluster } = usePlaceClusters(allPlaces, region)
 
   // toggle modal from inside modal component instead of here in the parent
   const toggleModal = React.useCallback(
@@ -70,10 +81,16 @@ export default function MapComponent({
   }
 
   const centerOnUser = async () => {
-    getUserRegion(async (region) => {
-      if (region && mapViewRef.current) {
-        mapViewRef.current.animateToRegion(region)
-      } else {
+    getUserRegion(async (userRegion) => {
+      if (userRegion) {
+        setCoords({
+          latitude: userRegion.latitude,
+          longitude: userRegion.longitude,
+        })
+      }
+      if (userRegion && mapViewRef.current) {
+        mapViewRef.current.animateToRegion(userRegion)
+      } else if (!userRegion) {
         alertOnLocationError()
       }
     })
@@ -102,11 +119,46 @@ export default function MapComponent({
     }
   }
 
-  const debouncedHandleRegionChange = React.useRef(
-    debounce((region: Region) => updateMapLastCoords(client, region), 1000, {
-      trailing: true,
-    }),
-  ).current
+  const saveCoords = React.useMemo(
+    () =>
+      debounce(
+        (lastRegion: Region) => updateMapLastCoords(client, lastRegion),
+        SAVE_COORDS_DEBOUNCE_MS,
+        { trailing: true },
+      ),
+    [client],
+  )
+
+  React.useEffect(() => () => saveCoords.cancel(), [saveCoords])
+
+  // Read by the cluster handler, so that panning does not hand every cluster a
+  // fresh callback and re-render the lot of them.
+  const regionRef = React.useRef(region)
+
+  const handleRegionChangeComplete = React.useCallback(
+    (nextRegion: Region) => {
+      regionRef.current = nextRegion
+      setRegion(nextRegion)
+      saveCoords(nextRegion)
+    },
+    [saveCoords],
+  )
+
+  const handleClusterPress = React.useCallback(
+    (cluster: ClusterMarkerData) => {
+      mapViewRef.current?.animateToRegion(
+        regionForCluster(cluster, regionRef.current),
+        FLY_TO_DURATION_MS,
+      )
+    },
+    [regionForCluster],
+  )
+
+  const handlePlacePress = React.useCallback((place: BtcMapPlace) => {
+    setSelectedPlace(place)
+  }, [])
+
+  const closeSheet = React.useCallback(() => setSelectedPlace(null), [])
 
   return (
     <View style={styles.viewContainer}>
@@ -117,35 +169,39 @@ export default function MapComponent({
         showsMyLocationButton={false}
         initialRegion={userLocation}
         customMapStyle={themeMode === "dark" ? MapStyles.dark : MapStyles.light}
-        onPress={handleMapPress}
-        onRegionChange={debouncedHandleRegionChange}
-        onMarkerSelect={(e) => {
-          // react-native-maps has a very annoying error on iOS
-          // When two markers are almost on top of each other onSelect will get called for a nearby Marker
-          // This improvement (not an optimal fix) checks to see if that error happened, and quickly reopens the correct callout
-          const matchingLat =
-            e.nativeEvent.coordinate.latitude ===
-            focusedMarker?.mapInfo.coordinates.latitude
-          const matchingLng =
-            e.nativeEvent.coordinate.longitude ===
-            focusedMarker?.mapInfo.coordinates.longitude
-          if (!matchingLat || !matchingLng) {
-            if (focusedMarkerRef.current) {
-              focusedMarkerRef.current.showCallout()
-            }
-          }
-        }}
+        onRegionChangeComplete={handleRegionChangeComplete}
+        moveOnMarkerPress={false}
+        rotateEnabled={false}
+        pitchEnabled={false}
+        toolbarEnabled={false}
       >
-        {(data?.businessMapMarkers ?? []).map((item: MapMarker) => (
-          <MapMarkerComponent
-            key={item.username}
-            item={item}
-            color={colors._orange}
-            handleCalloutPress={handleCalloutPress}
-            handleMarkerPress={handleMarkerPress}
+        {clusters.map((cluster) => (
+          <ClusterMarker
+            key={`cluster-${cluster.id}`}
+            cluster={cluster}
+            onPress={handleClusterPress}
           />
         ))}
+        {places.map((place) => (
+          <PlaceMarker key={place.id} place={place} onPress={handlePlacePress} />
+        ))}
       </MapView>
+
+      {isLoading && !allPlaces.length && (
+        <View style={styles.statusPill}>
+          <ActivityIndicator size="small" color={colors.primary} />
+          <Text style={styles.statusText}>{LL.MapScreen.loadingPlaces()}</Text>
+        </View>
+      )}
+
+      {hasError && (
+        <Pressable style={styles.statusPill} onPress={retry}>
+          <GaloyIcon name="warning" size={16} color={colors.error} />
+          <Text style={styles.statusText}>{LL.MapScreen.placesError()}</Text>
+          <Text style={styles.retryText}>{LL.common.tryAgain()}</Text>
+        </Pressable>
+      )}
+
       {permissionsStatus !== RESULTS.UNAVAILABLE &&
         permissionsStatus !== RESULTS.LIMITED && (
           <LocationButtonCopy
@@ -154,16 +210,61 @@ export default function MapComponent({
             centerOnUser={centerOnUser}
           />
         )}
+
+      {/* The places are OpenStreetMap data under ODbL, which asks that anyone
+          looking at it can see where it came from. */}
+      <Text style={styles.attribution}>{LL.MapScreen.attribution()}</Text>
+
       <OpenSettingsModal ref={openSettingsModalRef} />
+
+      <PlaceSheet place={selectedPlace} userLocation={coords} onClose={closeSheet} />
     </View>
   )
 }
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles(({ colors }, { topInset }: { topInset: number }) => ({
   map: {
     height: "100%",
     width: "100%",
   },
 
   viewContainer: { flex: 1 },
+
+  statusPill: {
+    position: "absolute",
+    // The screen leaves the top edge to the map, so the pill reserves its own.
+    top: topInset + 12,
+    alignSelf: "center",
+    flexDirection: "row",
+    alignItems: "center",
+    columnGap: 8,
+    backgroundColor: colors.white,
+    borderRadius: 20,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    maxWidth: "90%",
+  },
+  statusText: {
+    fontSize: 13,
+    color: colors.black,
+    flexShrink: 1,
+  },
+  retryText: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: colors.primary,
+  },
+  attribution: {
+    position: "absolute",
+    right: 8,
+    bottom: 8,
+    fontSize: 11,
+    // This is the ODbL credit, so it has to stay readable over whatever the
+    // basemap happens to be — hence an opaque chip rather than a tint.
+    color: colors.grey1,
+    backgroundColor: colors.white,
+    borderRadius: 4,
+    paddingHorizontal: 5,
+    paddingVertical: 2,
+  },
 }))

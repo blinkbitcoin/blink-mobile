@@ -2,31 +2,11 @@ import React from "react"
 import { render, waitFor } from "@testing-library/react-native"
 
 import { MapScreen } from "@app/screens/map-screen/map-screen"
-import { PermissionStatus, RESULTS } from "react-native-permissions"
+import { getUserRegion } from "@app/screens/map-screen/functions"
+import { check, PermissionStatus, RESULTS } from "react-native-permissions"
 
-const mockNavigate = jest.fn()
-const mockUseIsAuthed = jest.fn()
-const mockUseActiveWallet = jest.fn()
-
-let capturedHandleCalloutPress:
-  | ((item: {
-      username: string
-      mapInfo: { coordinates: { latitude: number; longitude: number }; title: string }
-    }) => void)
-  | undefined
+let capturedMapProps: Record<string, unknown> | undefined
 let capturedScreenProps: Record<string, unknown> | undefined
-
-jest.mock("@react-navigation/native", () => ({
-  useFocusEffect: jest.fn(),
-}))
-
-jest.mock("@app/graphql/is-authed-context", () => ({
-  useIsAuthed: () => mockUseIsAuthed(),
-}))
-
-jest.mock("@app/hooks/use-active-wallet", () => ({
-  useActiveWallet: () => mockUseActiveWallet(),
-}))
 
 jest.mock("@app/hooks/use-device-location", () => ({
   __esModule: true,
@@ -43,11 +23,6 @@ jest.mock("@app/i18n/i18n-react", () => ({
 }))
 
 jest.mock("@app/graphql/generated", () => ({
-  useBusinessMapMarkersQuery: () => ({
-    data: undefined,
-    error: undefined,
-    refetch: jest.fn(),
-  }),
   useRegionQuery: () => ({
     data: {
       region: {
@@ -59,10 +34,6 @@ jest.mock("@app/graphql/generated", () => ({
     },
     error: undefined,
   }),
-}))
-
-jest.mock("@apollo/client", () => ({
-  gql: jest.fn(),
 }))
 
 jest.mock("@react-native-community/geolocation", () => ({
@@ -104,104 +75,71 @@ jest.mock("@app/components/map-component", () => {
   return {
     __esModule: true,
     default: (props: Record<string, unknown>) => {
-      capturedHandleCalloutPress =
-        props.handleCalloutPress as typeof capturedHandleCalloutPress
+      capturedMapProps = props
       return ReactActual.createElement(RN.View, { testID: "map-component" })
     },
   }
 })
 
-jest.mock("@app/utils/toast", () => ({
-  toastShow: jest.fn(),
-}))
+const mockedCheck = check as jest.MockedFunction<typeof check>
+const mockedGetUserRegion = getUserRegion as jest.MockedFunction<typeof getUserRegion>
 
-const baseItem = {
-  __typename: "MapMarker" as const,
-  username: "isacorlando",
-  mapInfo: {
-    __typename: "MapInfo" as const,
-    title: "Isac Orlando",
-    coordinates: {
-      __typename: "Coordinates" as const,
-      latitude: 13.5,
-      longitude: -89.4,
-    },
-  },
-}
-
-const renderMapScreen = () =>
-  render(<MapScreen navigation={{ navigate: mockNavigate } as never} />)
-
-const waitForCalloutHandler = () =>
+const waitForMap = () =>
   waitFor(() => {
-    if (!capturedHandleCalloutPress) {
-      throw new Error("MapComponent not yet mounted")
-    }
+    if (!capturedMapProps) throw new Error("MapComponent not yet mounted")
   })
 
-describe("MapScreen.handleCalloutPress", () => {
+describe("MapScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    capturedHandleCalloutPress = undefined
+    capturedMapProps = undefined
     capturedScreenProps = undefined
+    mockedCheck.mockResolvedValue(RESULTS.DENIED)
   })
 
   it("excludes the bottom safe-area edge the tab bar already reserves", async () => {
-    mockUseIsAuthed.mockReturnValue(true)
-    mockUseActiveWallet.mockReturnValue({ isSelfCustodial: false })
-
-    renderMapScreen()
-    await waitForCalloutHandler()
+    render(<MapScreen />)
+    await waitForMap()
 
     expect(capturedScreenProps?.edges).toEqual(["left", "right"])
   })
 
-  it("navigates to sendBitcoinDestination for a custodial authed user", async () => {
-    mockUseIsAuthed.mockReturnValue(true)
-    mockUseActiveWallet.mockReturnValue({ isSelfCustodial: false })
+  it("falls back to the last viewed region when location is denied", async () => {
+    render(<MapScreen />)
+    await waitForMap()
 
-    renderMapScreen()
-    await waitForCalloutHandler()
-    capturedHandleCalloutPress?.(baseItem)
-
-    expect(mockNavigate).toHaveBeenCalledWith("sendBitcoinDestination", {
-      username: "isacorlando",
+    expect(capturedMapProps?.userLocation).toEqual({
+      latitude: 13.5,
+      longitude: -89.4,
+      latitudeDelta: 0.05,
+      longitudeDelta: 0.05,
     })
   })
 
-  it("navigates to sendBitcoinDestination for a self-custodial user (no Galoy auth)", async () => {
-    mockUseIsAuthed.mockReturnValue(false)
-    mockUseActiveWallet.mockReturnValue({ isSelfCustodial: true })
+  it("withholds the user's coordinates when location was never granted", async () => {
+    // The place sheet only trusts the device clock for nearby places, so an
+    // absent fix has to stay absent rather than default to the map centre.
+    render(<MapScreen />)
+    await waitForMap()
 
-    renderMapScreen()
-    await waitForCalloutHandler()
-    capturedHandleCalloutPress?.(baseItem)
-
-    expect(mockNavigate).toHaveBeenCalledWith("sendBitcoinDestination", {
-      username: "isacorlando",
-    })
+    expect(capturedMapProps?.userCoords).toBeUndefined()
+    expect(capturedMapProps?.permissionsStatus).toBe(RESULTS.DENIED)
   })
 
-  it("navigates to acceptTermsAndConditions for a user with no wallet", async () => {
-    mockUseIsAuthed.mockReturnValue(false)
-    mockUseActiveWallet.mockReturnValue({ isSelfCustodial: false })
+  it("passes the real fix through once location is granted", async () => {
+    mockedCheck.mockResolvedValue(RESULTS.GRANTED)
+    mockedGetUserRegion.mockImplementation((callback) =>
+      callback({
+        latitude: 51.5,
+        longitude: -0.12,
+        latitudeDelta: 0.02,
+        longitudeDelta: 0.02,
+      }),
+    )
 
-    renderMapScreen()
-    await waitForCalloutHandler()
-    capturedHandleCalloutPress?.(baseItem)
+    render(<MapScreen />)
+    await waitForMap()
 
-    expect(mockNavigate).toHaveBeenCalledWith("acceptTermsAndConditions", {
-      flow: "phone",
-    })
-  })
-
-  it("does not call navigate before the callout is pressed", async () => {
-    mockUseIsAuthed.mockReturnValue(true)
-    mockUseActiveWallet.mockReturnValue({ isSelfCustodial: false })
-
-    renderMapScreen()
-    await waitForCalloutHandler()
-
-    expect(mockNavigate).not.toHaveBeenCalled()
+    expect(capturedMapProps?.userCoords).toEqual({ latitude: 51.5, longitude: -0.12 })
   })
 })

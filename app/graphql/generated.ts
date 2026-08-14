@@ -3622,11 +3622,6 @@ export type BulletinsQueryVariables = Exact<{
 
 export type BulletinsQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly unacknowledgedStatefulNotificationsWithBulletinEnabled: { readonly __typename: 'StatefulNotificationConnection', readonly pageInfo: { readonly __typename: 'PageInfo', readonly endCursor?: string | null, readonly hasNextPage: boolean, readonly hasPreviousPage: boolean, readonly startCursor?: string | null }, readonly edges: ReadonlyArray<{ readonly __typename: 'StatefulNotificationEdge', readonly cursor: string, readonly node: { readonly __typename: 'StatefulNotification', readonly id: string, readonly title: string, readonly body: string, readonly createdAt: number, readonly acknowledgedAt?: number | null, readonly bulletinEnabled: boolean, readonly icon?: Icon | null, readonly action?: { readonly __typename: 'OpenDeepLinkAction', readonly deepLink: string, readonly label?: string | null } | { readonly __typename: 'OpenExternalLinkAction', readonly url: string, readonly label?: string | null } | null } }> } } | null };
 
-export type BusinessMapMarkersQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type BusinessMapMarkersQuery = { readonly __typename: 'Query', readonly businessMapMarkers: ReadonlyArray<{ readonly __typename: 'MapMarker', readonly username: string, readonly mapInfo: { readonly __typename: 'MapInfo', readonly title: string, readonly coordinates: { readonly __typename: 'Coordinates', readonly longitude: number, readonly latitude: number } } }> };
-
 export type StatefulNotificationAcknowledgeMutationVariables = Exact<{
   input: StatefulNotificationAcknowledgeInput;
 }>;
@@ -6973,52 +6968,6 @@ export type BulletinsQueryHookResult = ReturnType<typeof useBulletinsQuery>;
 export type BulletinsLazyQueryHookResult = ReturnType<typeof useBulletinsLazyQuery>;
 export type BulletinsSuspenseQueryHookResult = ReturnType<typeof useBulletinsSuspenseQuery>;
 export type BulletinsQueryResult = Apollo.QueryResult<BulletinsQuery, BulletinsQueryVariables>;
-export const BusinessMapMarkersDocument = gql`
-    query businessMapMarkers {
-  businessMapMarkers {
-    username
-    mapInfo {
-      title
-      coordinates {
-        longitude
-        latitude
-      }
-    }
-  }
-}
-    `;
-
-/**
- * __useBusinessMapMarkersQuery__
- *
- * To run a query within a React component, call `useBusinessMapMarkersQuery` and pass it any options that fit your needs.
- * When your component renders, `useBusinessMapMarkersQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useBusinessMapMarkersQuery({
- *   variables: {
- *   },
- * });
- */
-export function useBusinessMapMarkersQuery(baseOptions?: Apollo.QueryHookOptions<BusinessMapMarkersQuery, BusinessMapMarkersQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<BusinessMapMarkersQuery, BusinessMapMarkersQueryVariables>(BusinessMapMarkersDocument, options);
-      }
-export function useBusinessMapMarkersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<BusinessMapMarkersQuery, BusinessMapMarkersQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<BusinessMapMarkersQuery, BusinessMapMarkersQueryVariables>(BusinessMapMarkersDocument, options);
-        }
-export function useBusinessMapMarkersSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<BusinessMapMarkersQuery, BusinessMapMarkersQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<BusinessMapMarkersQuery, BusinessMapMarkersQueryVariables>(BusinessMapMarkersDocument, options);
-        }
-export type BusinessMapMarkersQueryHookResult = ReturnType<typeof useBusinessMapMarkersQuery>;
-export type BusinessMapMarkersLazyQueryHookResult = ReturnType<typeof useBusinessMapMarkersLazyQuery>;
-export type BusinessMapMarkersSuspenseQueryHookResult = ReturnType<typeof useBusinessMapMarkersSuspenseQuery>;
-export type BusinessMapMarkersQueryResult = Apollo.QueryResult<BusinessMapMarkersQuery, BusinessMapMarkersQueryVariables>;
 export const StatefulNotificationAcknowledgeDocument = gql`
     mutation StatefulNotificationAcknowledge($input: StatefulNotificationAcknowledgeInput!) {
   statefulNotificationAcknowledge(input: $input) {
