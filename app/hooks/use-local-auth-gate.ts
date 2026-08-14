@@ -23,11 +23,14 @@ type UseLocalAuthGateParams = {
 }
 
 /**
- * Gates a screen behind whatever local factors the user has configured, the same
- * pin-OR-biometrics disjunction the app lock uses (app-state.tsx): biometrics
- * when available, the pin challenge as the fallback, failing closed whenever a
- * configured factor cannot be satisfied. Runs once per mount; `authenticated`
- * latches true for the caller's lifetime.
+ * Gates a screen behind whatever local factors the user has configured:
+ * biometrics when available, the pin challenge as the fallback, failing closed
+ * whenever a configured factor cannot be satisfied. Deliberately STRICTER than
+ * the app unlock (authentication-check-screen.tsx), which fails open for a
+ * biometrics-only user whose sensor is gone rather than brick them out of the
+ * whole app — behind an in-app gate the right price for a dead sensor is losing
+ * the one screen. Runs once per mount; `authenticated` latches true for the
+ * caller's lifetime.
  */
 export const useLocalAuthGate = ({
   description,
@@ -48,8 +51,12 @@ export const useLocalAuthGate = ({
      *  lockout resets the whole stack — so results landing late are dropped. */
     let mounted = true
 
+    /** push, never navigate: navigate onto an already-focused pin route replaces
+     *  its params, so a deferred challenge could rewrite the resume app-lock's
+     *  screen (dropping isResume and its dismissal guards) instead of stacking
+     *  a separate challenge on top of it. */
     const challengePin = () =>
-      navigation.navigate("pin", {
+      navigation.push("pin", {
         screenPurpose: PinScreenPurpose.ChallengePin,
         onChallengeSuccess: () => mounted && setAuthenticated(true),
         onChallengeFailure: () => mounted && onFailureRef.current(),
@@ -61,6 +68,11 @@ export const useLocalAuthGate = ({
           KeyStoreWrapper.getIsPinEnabled(),
           KeyStoreWrapper.getIsBiometricsEnabled(),
         ])
+        /** The awaits make initiation itself a late result: a caller popped while
+         *  the reads were in flight must not be challenged over its successor. */
+        if (!mounted) {
+          return
+        }
 
         if (!pinEnabled && !biometricsEnabled) {
           // The only branch `required` governs: there is nothing to challenge with.
@@ -81,6 +93,9 @@ export const useLocalAuthGate = ({
           const sensorAvailable = await BiometricWrapper.isSensorAvailable().catch(
             () => false,
           )
+          if (!mounted) {
+            return
+          }
           if (!sensorAvailable) {
             fallThroughToPin()
             return
@@ -98,7 +113,9 @@ export const useLocalAuthGate = ({
 
         fallThroughToPin()
       } catch {
-        onFailureRef.current()
+        if (mounted) {
+          onFailureRef.current()
+        }
       }
     }
 

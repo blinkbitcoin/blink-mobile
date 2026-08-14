@@ -10,12 +10,14 @@ import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 import { ContextForScreen } from "../../../helper"
 
 const mockNavigate = jest.fn()
+const mockPush = jest.fn()
 const mockGoBack = jest.fn()
 const mockSetOptions = jest.fn()
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
   useNavigation: () => ({
     navigate: mockNavigate,
+    push: mockPush,
     goBack: mockGoBack,
     setOptions: mockSetOptions,
   }),
@@ -81,7 +83,7 @@ describe("ViewBackupPhraseScreen", () => {
 
   /** The pin challenge resolves through callbacks handed to the pin route. */
   const challengeParams = () =>
-    mockNavigate.mock.calls.find(([routeName]) => routeName === "pin")?.[1]
+    mockPush.mock.calls.find(([routeName]) => routeName === "pin")?.[1]
 
   beforeEach(() => {
     jest.clearAllMocks()
@@ -368,7 +370,7 @@ describe("ViewBackupPhraseScreen", () => {
       )
 
       await waitFor(() =>
-        expect(mockNavigate).toHaveBeenCalledWith(
+        expect(mockPush).toHaveBeenCalledWith(
           "pin",
           expect.objectContaining({ screenPurpose: "ChallengePin" }),
         ),
@@ -400,7 +402,7 @@ describe("ViewBackupPhraseScreen", () => {
       )
 
       await waitFor(() =>
-        expect(mockNavigate).toHaveBeenCalledWith(
+        expect(mockPush).toHaveBeenCalledWith(
           "pin",
           expect.objectContaining({ screenPurpose: "ChallengePin" }),
         ),

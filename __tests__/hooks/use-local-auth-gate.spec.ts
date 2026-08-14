@@ -5,10 +5,10 @@ import BiometricWrapper from "@app/utils/biometricAuthentication"
 import { PinScreenPurpose } from "@app/utils/enum"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
-const mockNavigate = jest.fn()
+const mockPush = jest.fn()
 
 jest.mock("@react-navigation/native", () => ({
-  useNavigation: () => ({ navigate: mockNavigate }),
+  useNavigation: () => ({ push: mockPush }),
 }))
 
 jest.mock("@app/utils/biometricAuthentication", () => ({
@@ -46,7 +46,7 @@ const biometricPromptResolves = (outcome: "success" | "failure") =>
 
 /** The pin challenge resolves through callbacks handed to the pin route; grab them. */
 const capturedChallengeParams = () => {
-  const call = mockNavigate.mock.calls.find(([routeName]) => routeName === "pin")
+  const call = mockPush.mock.calls.find(([routeName]) => routeName === "pin")
   return call?.[1]
 }
 
@@ -76,7 +76,7 @@ describe("useLocalAuthGate", () => {
       expect(result.current).toBe(false)
       expect(onFailure).toHaveBeenCalledTimes(1)
       expect(mockAuthenticate).not.toHaveBeenCalled()
-      expect(mockNavigate).not.toHaveBeenCalled()
+      expect(mockPush).not.toHaveBeenCalled()
     })
 
     it("opens only on an explicit opt-out", async () => {
@@ -99,7 +99,7 @@ describe("useLocalAuthGate", () => {
       await settle()
 
       expect(result.current).toBe(true)
-      expect(mockNavigate).not.toHaveBeenCalled()
+      expect(mockPush).not.toHaveBeenCalled()
     })
 
     it("falls back to the pin challenge when the prompt fails and a pin exists", async () => {
@@ -109,7 +109,7 @@ describe("useLocalAuthGate", () => {
       const { result, onFailure } = renderGate()
       await settle()
 
-      expect(mockNavigate).toHaveBeenCalledWith(
+      expect(mockPush).toHaveBeenCalledWith(
         "pin",
         expect.objectContaining({ screenPurpose: PinScreenPurpose.ChallengePin }),
       )
@@ -141,7 +141,7 @@ describe("useLocalAuthGate", () => {
 
       expect(result.current).toBe(false)
       expect(onFailure).toHaveBeenCalledTimes(1)
-      expect(mockNavigate).not.toHaveBeenCalled()
+      expect(mockPush).not.toHaveBeenCalled()
     })
 
     it("skips straight to the pin challenge when the sensor is unavailable", async () => {
@@ -152,7 +152,7 @@ describe("useLocalAuthGate", () => {
       await settle()
 
       expect(mockAuthenticate).not.toHaveBeenCalled()
-      expect(mockNavigate).toHaveBeenCalledWith(
+      expect(mockPush).toHaveBeenCalledWith(
         "pin",
         expect.objectContaining({ screenPurpose: PinScreenPurpose.ChallengePin }),
       )
@@ -179,7 +179,7 @@ describe("useLocalAuthGate", () => {
       await settle()
 
       expect(mockAuthenticate).not.toHaveBeenCalled()
-      expect(mockNavigate).toHaveBeenCalledWith(
+      expect(mockPush).toHaveBeenCalledWith(
         "pin",
         expect.objectContaining({ screenPurpose: PinScreenPurpose.ChallengePin }),
       )
@@ -198,7 +198,7 @@ describe("useLocalAuthGate", () => {
 
       expect(mockIsSensorAvailable).not.toHaveBeenCalled()
       expect(mockAuthenticate).not.toHaveBeenCalled()
-      expect(mockNavigate).toHaveBeenCalledWith(
+      expect(mockPush).toHaveBeenCalledWith(
         "pin",
         expect.objectContaining({ screenPurpose: PinScreenPurpose.ChallengePin }),
       )
@@ -220,6 +220,63 @@ describe("useLocalAuthGate", () => {
     params.onChallengeFailure()
 
     expect(onFailure).not.toHaveBeenCalled()
+  })
+
+  describe("unmounted while the gate is still initiating", () => {
+    /** The mounted flag must gate initiation, not just result callbacks: a caller
+     *  popped mid-flight must not be challenged (or prompted) over its successor. */
+    it("does not challenge when the factor reads settle after unmount", async () => {
+      let resolvePin!: (value: boolean) => void
+      mockGetIsPinEnabled.mockReturnValue(
+        new Promise<boolean>((resolve) => {
+          resolvePin = resolve
+        }),
+      )
+      mockGetIsBiometricsEnabled.mockResolvedValue(false)
+
+      const { unmount, onFailure } = renderGate()
+      unmount()
+      await act(async () => resolvePin(true))
+
+      expect(mockPush).not.toHaveBeenCalled()
+      expect(mockAuthenticate).not.toHaveBeenCalled()
+      expect(onFailure).not.toHaveBeenCalled()
+    })
+
+    it("does not report a required gate's no-factor failure after unmount", async () => {
+      let resolvePin!: (value: boolean) => void
+      mockGetIsPinEnabled.mockReturnValue(
+        new Promise<boolean>((resolve) => {
+          resolvePin = resolve
+        }),
+      )
+      mockGetIsBiometricsEnabled.mockResolvedValue(false)
+
+      const { unmount, onFailure } = renderGate()
+      unmount()
+      await act(async () => resolvePin(false))
+
+      expect(onFailure).not.toHaveBeenCalled()
+    })
+
+    it("does not prompt when the sensor probe settles after unmount", async () => {
+      arrangeFactors({ pin: true, biometrics: true })
+      let resolveSensor!: (value: boolean) => void
+      mockIsSensorAvailable.mockReturnValue(
+        new Promise<boolean>((resolve) => {
+          resolveSensor = resolve
+        }),
+      )
+
+      const { unmount, onFailure } = renderGate()
+      await settle()
+      unmount()
+      await act(async () => resolveSensor(true))
+
+      expect(mockAuthenticate).not.toHaveBeenCalled()
+      expect(mockPush).not.toHaveBeenCalled()
+      expect(onFailure).not.toHaveBeenCalled()
+    })
   })
 
   it("fails closed when the keystore itself errors", async () => {

@@ -17,6 +17,7 @@ jest.mock("react-native-linear-gradient", () => ({
 const mockGoBack = jest.fn()
 const mockSetOptions = jest.fn()
 const mockNavigate = jest.fn()
+const mockPush = jest.fn()
 jest.mock("@react-navigation/native", () => {
   const actualNav = jest.requireActual("@react-navigation/native")
   return {
@@ -25,6 +26,7 @@ jest.mock("@react-navigation/native", () => {
       goBack: mockGoBack,
       setOptions: mockSetOptions,
       navigate: mockNavigate,
+      push: mockPush,
     }),
   }
 })
@@ -158,7 +160,7 @@ describe("CardDetailsScreen", () => {
 
       expect(queryByText("Card number")).toBeNull()
       expect(mockAuthenticate).not.toHaveBeenCalled()
-      expect(mockNavigate).toHaveBeenCalledWith(
+      expect(mockPush).toHaveBeenCalledWith(
         "pin",
         expect.objectContaining({ screenPurpose: "ChallengePin" }),
       )
@@ -180,7 +182,7 @@ describe("CardDetailsScreen", () => {
 
       await act(async () => {})
 
-      expect(mockNavigate).toHaveBeenCalledWith(
+      expect(mockPush).toHaveBeenCalledWith(
         "pin",
         expect.objectContaining({ screenPurpose: "ChallengePin" }),
       )
