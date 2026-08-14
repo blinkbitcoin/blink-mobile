@@ -43,6 +43,13 @@ import { withDeviceLocale } from "../helpers/device-locale"
  */
 withDeviceLocale("en-US")
 
+/** The dollar-balance guard now holds the screen until remote config lands, and the
+ *  context default outside a provider is never-ready, which would hide it for good. */
+jest.mock("@app/config/feature-flags-context", () => ({
+  ...jest.requireActual("@app/config/feature-flags-context"),
+  useFeatureFlags: () => ({ remoteConfigReady: true }),
+}))
+
 jest.mock("@app/store/persistent-state", () => ({
   ...jest.requireActual("@app/store/persistent-state"),
   usePersistentStateContext: () => ({
