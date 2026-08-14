@@ -11,7 +11,15 @@ import {
  *  uniffi lifecycle method, though the concrete objects always carry it. */
 type DisposableSigner = { uniffiDestroy: () => void }
 
-const destroySigner = (signer: unknown) => (signer as DisposableSigner).uniffiDestroy()
+/** Both destroys run from a finally, where a throw would strand the signer that has not
+ *  been freed yet and replace the pubkey (or the original error) on the way out. */
+const destroySigner = (signer: unknown) => {
+  try {
+    ;(signer as DisposableSigner).uniffiDestroy()
+  } catch {
+    // Already freed, or a binding without the uniffi lifecycle method.
+  }
+}
 
 export const getWalletInfo = (sdk: BreezSdkInterface) =>
   sdk.getInfo({ ensureSynced: false })

@@ -53,6 +53,32 @@ describe("deriveWalletIdentityPubkey", () => {
     expect(breezDestroy).toHaveBeenCalledTimes(1)
     expect(sparkDestroy).toHaveBeenCalledTimes(1)
   })
+
+  it("still frees the second signer and returns the pubkey when the first destroy throws", async () => {
+    const { breezDestroy, sparkDestroy } = mockSigners(
+      jest.fn().mockResolvedValue({ bytes: Uint8Array.from([0x02, 0xab, 0xff]).buffer }),
+    )
+    breezDestroy.mockImplementation(() => {
+      throw new Error("already freed")
+    })
+
+    await expect(deriveWalletIdentityPubkey("m", Network.Regtest)).resolves.toBe("02abff")
+    expect(sparkDestroy).toHaveBeenCalledTimes(1)
+  })
+
+  it("does not let a throwing destroy mask the original rejection", async () => {
+    const { breezDestroy, sparkDestroy } = mockSigners(
+      jest.fn().mockRejectedValue(new Error("read failed")),
+    )
+    breezDestroy.mockImplementation(() => {
+      throw new Error("already freed")
+    })
+
+    await expect(deriveWalletIdentityPubkey("m", Network.Regtest)).rejects.toThrow(
+      "read failed",
+    )
+    expect(sparkDestroy).toHaveBeenCalledTimes(1)
+  })
 })
 
 describe("getWalletInfo", () => {
