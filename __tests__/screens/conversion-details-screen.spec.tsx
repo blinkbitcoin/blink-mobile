@@ -50,6 +50,16 @@ jest.mock("@app/config/feature-flags-context", () => ({
   useFeatureFlags: () => ({ remoteConfigReady: true }),
 }))
 
+/** The custodial verdict is the server's, and an unanswered query gates every feature
+ *  that needs a region, so this screen needs one served to be reachable at all. */
+jest.mock("@app/graphql/generated", () => ({
+  ...jest.requireActual("@app/graphql/generated"),
+  useCustodialRestrictionsQuery: () => ({
+    data: { custodialRestrictions: { dollarBalance: false, transfer: false } },
+    loading: false,
+  }),
+}))
+
 jest.mock("@app/store/persistent-state", () => ({
   ...jest.requireActual("@app/store/persistent-state"),
   usePersistentStateContext: () => ({

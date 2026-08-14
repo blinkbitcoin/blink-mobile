@@ -1,18 +1,30 @@
 import { CountryCode } from "libphonenumber-js/mobile"
 
+import { gql } from "@apollo/client"
 import { useFeatureFlags, useRemoteConfig } from "@app/config/feature-flags-context"
+import { useCustodialRestrictionsQuery } from "@app/graphql/generated"
+import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { AccountType } from "@app/types/wallet"
 
 import useDeviceLocation, {
   isBlockedCountry,
   useIpCountryLookup,
 } from "./use-device-location"
+import { useAccountRegistry } from "./use-account-registry"
 import { useActiveWallet } from "./use-active-wallet"
 
+gql`
+  query custodialRestrictions {
+    custodialRestrictions {
+      dollarBalance
+      transfer
+    }
+  }
+`
+
 /**
- * What an account may not do where it is. The field names are the ones the
- * `custodialRestrictions` query answers, so adopting it later replaces one branch below
- * rather than any caller.
+ * What an account may not do where it is. The custodial half is the server's own answer;
+ * the field names are its.
  */
 export type Restrictions = {
   dollarBalance: boolean
@@ -28,6 +40,20 @@ type BlockedCountries = {
   dollarBalance: string[]
   transfer: string[]
 }
+
+/** What a session with no Blink account behind it answers to: there is nothing to gate. */
+const UNRESTRICTED: Restrictions = Object.freeze({
+  dollarBalance: false,
+  transfer: false,
+})
+
+/** A gated feature requires a determined region, and an unanswered query determined none.
+ *  `UnknownRegionPolicy = FAIL_CLOSED` per the PRD's P0 values: no region, no gated
+ *  feature, regardless of why there is no region. */
+const RESTRICTED_UNKNOWN_REGION: Restrictions = Object.freeze({
+  dollarBalance: true,
+  transfer: true,
+})
 
 /**
  * Pure so the policy can be read without a render, and so both custody types answer to the
@@ -90,12 +116,16 @@ export const useAccountRestrictions = (
 ): AccountRestrictions => {
   const { accountType: activeAccountType } = useActiveWallet()
   const {
-    custodialDollarBalanceBlockedCountries,
     selfCustodialDollarBalanceBlockedCountries,
-    custodialTransferBlockedCountries,
     selfCustodialTransferBlockedCountries,
   } = useRemoteConfig()
   const { remoteConfigReady } = useFeatureFlags()
+  const isAuthed = useIsAuthed()
+  /** `useActiveWallet` answers Custodial while the registry hydrates, so a self-custodial
+   *  device reads as an unauthed custodial one for those first renders. Reporting settled
+   *  there would offer the dollar balance and the transfer button, then withdraw both once
+   *  the real account lands. */
+  const { loading: isRegistryHydrating } = useAccountRegistry()
 
   const isSelfCustodial =
     (accountTypeOverride ?? activeAccountType) === AccountType.SelfCustodial
@@ -104,21 +134,49 @@ export const useAccountRestrictions = (
     isSelfCustodialPrediction,
   )
 
-  /** The custodial half is the server's to answer; a self-custodial wallet has no Blink
-   *  account behind it and keeps its own lists. */
-  const blockedCountries: BlockedCountries = isSelfCustodial
-    ? {
-        dollarBalance: selfCustodialDollarBalanceBlockedCountries,
-        transfer: selfCustodialTransferBlockedCountries,
-      }
-    : {
-        dollarBalance: custodialDollarBalanceBlockedCountries,
-        transfer: custodialTransferBlockedCountries,
-      }
+  /**
+   * The server picks the country this answers for by account level (verified phone for a
+   * level 1-2 account, request IP for level 0), so the client never chooses between
+   * sources. It speaks only for a Blink account, so a session without one asks nothing.
+   */
+  const isQueryEnabled = !isSelfCustodial && isAuthed
+  const { data, loading: isQueryLoading } = useCustodialRestrictionsQuery({
+    skip: !isQueryEnabled,
+    /** The verdict follows the account's current standing, and the app re-asks on
+     *  foreground, so a cached answer would outlive the session that earned it. */
+    fetchPolicy: "no-cache",
+  })
 
-  /** An empty list mid-fetch would read as a country nothing restricts, so the fetch is
-   *  part of the wait rather than a verdict of its own. */
-  const isSettled = !isRegionPending && remoteConfigReady
+  /** A self-custodial wallet has no Blink account behind it, so no server verdict covers
+   *  it and it keeps its own lists. */
+  const selfCustodialBlockedCountries: BlockedCountries = {
+    dollarBalance: selfCustodialDollarBalanceBlockedCountries,
+    transfer: selfCustodialTransferBlockedCountries,
+  }
 
-  return { ...toRestrictions(countryCode, blockedCountries), isSettled }
+  if (isSelfCustodial) {
+    /** An empty list mid-fetch would read as a country nothing restricts, so the fetch is
+     *  part of the wait rather than a verdict of its own. */
+    return {
+      ...toRestrictions(countryCode, selfCustodialBlockedCountries),
+      isSettled: !isRegionPending && remoteConfigReady,
+    }
+  }
+
+  /** A session with no Blink account has no custodial verdict to receive, so nothing is
+   *  gated. It only settles once the registry has named the account, since until then
+   *  this reads as custodial-unauthed whatever the account really is. */
+  if (!isQueryEnabled) return { ...UNRESTRICTED, isSettled: !isRegistryHydrating }
+
+  /** Held rather than judged while the answer is in flight: the surfaces read
+   *  `isRegionPending` and wait, so this value is never shown. */
+  if (isQueryLoading) return { ...UNRESTRICTED, isSettled: false }
+
+  const restrictions = data?.custodialRestrictions ?? RESTRICTED_UNKNOWN_REGION
+
+  return {
+    dollarBalance: restrictions.dollarBalance,
+    transfer: restrictions.transfer,
+    isSettled: true,
+  }
 }
