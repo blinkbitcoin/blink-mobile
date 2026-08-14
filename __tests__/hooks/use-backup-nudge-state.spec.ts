@@ -8,6 +8,7 @@ const mockRemoteConfig = jest.fn()
 const mockAccountRegistry = jest.fn()
 const mockMultiGet = jest.fn()
 const mockSetItem = jest.fn()
+const mockReportError = jest.fn()
 
 jest.mock("@app/self-custodial/providers/backup-state", () => ({
   BackupStatus: { None: "none", Completed: "completed" },
@@ -43,11 +44,28 @@ jest.mock("@react-native-async-storage/async-storage", () => ({
   setItem: (...args: string[]) => mockSetItem(...args),
 }))
 
+jest.mock("@app/utils/error-logging", () => ({
+  reportError: (...args: unknown[]) => mockReportError(...args),
+}))
+
 const ACCOUNT_ID = "test-self-custodial-uuid"
 const BANNER_KEY = `backupNudgeDismissedAt:${ACCOUNT_ID}`
 const MODAL_KEY = `backupNudgeModalDismissedAt:${ACCOUNT_ID}`
 
 let storage: Record<string, string> = {}
+
+// `multiGet` does NOT echo the requested key order on Android. The legacy module
+// runs `SELECT key,value ... WHERE key IN (...)` with no ORDER BY, pushes the
+// cursor rows first, then appends every key it did not find as [key, null].
+// Reproducing that here keeps the suite honest about the platform we ship on.
+const androidMultiGetOrder = (keys: string[]): [string, string | null][] => {
+  const found = keys.filter((key) => storage[key] !== undefined)
+  const missing = keys.filter((key) => storage[key] === undefined)
+  return [
+    ...found.map((key): [string, string | null] => [key, storage[key]]),
+    ...missing.map((key): [string, string | null] => [key, null]),
+  ]
+}
 
 const defaultBackupState = { backupState: { status: "none", method: null } }
 const completedBackupState = { backupState: { status: "completed", method: "manual" } }
@@ -83,7 +101,7 @@ describe("useBackupNudgeState", () => {
     mockAccountRegistry.mockReturnValue({ activeAccount: selfCustodialAccount })
     mockRemoteConfig.mockReturnValue(defaultConfig)
     mockMultiGet.mockImplementation((keys: string[]) =>
-      Promise.resolve(keys.map((key) => [key, storage[key] ?? null])),
+      Promise.resolve(androidMultiGetOrder(keys)),
     )
     mockSetItem.mockResolvedValue(undefined)
   })
@@ -232,6 +250,27 @@ describe("useBackupNudgeState", () => {
     expect(result.current.shouldShowBanner).toBe(true)
   })
 
+  it("keeps the modal dismissed when only the modal key exists (Android key order)", async () => {
+    // The reported scenario: dismissed the modal, never dismissed the banner.
+    // Android returns [[MODAL_KEY, ts], [BANNER_KEY, null]] - the reverse of the
+    // request - so reading the reply positionally swaps the two timestamps and
+    // brings the blocking modal back on every launch.
+    mockActiveWallet.mockReturnValue(aboveModalThresholdWallet)
+    storage[MODAL_KEY] = String(Date.now())
+
+    expect(await mockMultiGet([BANNER_KEY, MODAL_KEY])).toEqual([
+      [MODAL_KEY, expect.any(String)],
+      [BANNER_KEY, null],
+    ])
+
+    const { result } = renderHook(() => useBackupNudgeState())
+
+    await act(async () => {})
+
+    expect(result.current.shouldShowModal).toBe(false)
+    expect(result.current.shouldShowBanner).toBe(true)
+  })
+
   it("shows the modal again once its cooldown elapsed", async () => {
     mockActiveWallet.mockReturnValue(aboveModalThresholdWallet)
     storage[MODAL_KEY] = String(Date.now() - 25 * 60 * 60 * 1000)
@@ -276,6 +315,53 @@ describe("useBackupNudgeState", () => {
     // ...and dismissing the modal must not resurrect the dismissed banner.
     expect(result.current.shouldShowModal).toBe(false)
     expect(result.current.shouldShowBanner).toBe(false)
+  })
+
+  it("fails open and reports when the dismissal read rejects", async () => {
+    mockActiveWallet.mockReturnValue(aboveModalThresholdWallet)
+    mockMultiGet.mockRejectedValue(new Error("SQLiteDiskIOException"))
+
+    const { result } = renderHook(() => useBackupNudgeState())
+
+    await act(async () => {})
+
+    // A storage failure must not silently suppress a security nudge.
+    expect(result.current.shouldShowModal).toBe(true)
+    expect(mockReportError).toHaveBeenCalledWith("Nudge dismiss read", expect.any(Error))
+  })
+
+  it("ignores a stale read from the previously active account", async () => {
+    const OTHER_ACCOUNT_ID = "other-self-custodial-uuid"
+    mockActiveWallet.mockReturnValue(aboveModalThresholdWallet)
+
+    // Account A has a dismissed modal, account B has nothing dismissed.
+    storage[MODAL_KEY] = String(Date.now())
+
+    let resolveAccountA: (entries: [string, string | null][]) => void = () => {}
+    mockMultiGet.mockImplementationOnce(
+      (keys: string[]) =>
+        new Promise((resolve) => {
+          resolveAccountA = () => resolve(androidMultiGetOrder(keys))
+        }),
+    )
+
+    const { result, rerender } = renderHook(() => useBackupNudgeState())
+
+    // Switch to account B, whose read resolves immediately...
+    mockAccountRegistry.mockReturnValue({
+      activeAccount: { type: "self-custodial", id: OTHER_ACCOUNT_ID },
+    })
+    rerender({})
+    await act(async () => {})
+
+    expect(result.current.shouldShowModal).toBe(true)
+
+    // ...and only then does account A's read land. It must not apply.
+    await act(async () => {
+      resolveAccountA([])
+    })
+
+    expect(result.current.shouldShowModal).toBe(true)
   })
 
   it("triggers banner when USD weight pushes combined balance over the threshold", async () => {
