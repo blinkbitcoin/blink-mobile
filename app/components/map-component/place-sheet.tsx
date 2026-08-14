@@ -63,14 +63,17 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
   const { details, isLoading, hasError, retry } = useBtcMapPlaceDetails(shown?.id)
 
   // Re-read the clock while the sheet is open so a place that opens or closes
-  // under the user stops saying otherwise, as btcmap.org's pill does.
+  // under the user stops saying otherwise, as btcmap.org's pill does. Only two
+  // things on the sheet age — the open/closed badge and the boost — so a place
+  // with neither is not worth a re-render a minute.
+  const isTimeSensitive = Boolean(details?.openingHours ?? details?.boostedUntil)
   const [now, setNow] = React.useState(() => new Date())
   React.useEffect(() => {
-    if (!place) return undefined
+    if (!place || !isTimeSensitive) return undefined
     setNow(new Date())
     const timer = setInterval(() => setNow(new Date()), REFRESH_INTERVAL_MS)
     return () => clearInterval(timer)
-  }, [place])
+  }, [place, isTimeSensitive])
 
   const boosted = isBoosted(details?.boostedUntil ?? shown?.boostedUntil, now)
   const styles = useStyles({
