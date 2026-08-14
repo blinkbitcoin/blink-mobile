@@ -23,6 +23,25 @@ jest.mock("@app/utils/error-logging", () => ({
   reportError: (...args: readonly unknown[]) => mockReportError(...args),
 }))
 
+const mockReleaseScreenSecurity = jest.fn(() => Promise.resolve())
+let mockLeaseReady: Promise<void> = Promise.resolve()
+jest.mock("@app/utils/screen-security", () => ({
+  acquireScreenSecurity: () => ({
+    ready: mockLeaseReady,
+    release: mockReleaseScreenSecurity,
+  }),
+}))
+
+const deferred = <T,>() => {
+  let resolve: (value: T) => void = () => {}
+  let reject: (reason: Error) => void = () => {}
+  const promise = new Promise<T>((res, rej) => {
+    resolve = res
+    reject = rej
+  })
+  return { promise, resolve, reject }
+}
+
 const renderHeaderRight = () => {
   const calls = mockSetOptions.mock.calls
   const lastOptions = calls[calls.length - 1]?.[0]
@@ -81,6 +100,47 @@ describe("BackupPhraseScreen", () => {
     mockStep = 1
     mockHasParams = true
     mockCountdown = { remainingSeconds: 0, isExpired: true }
+    mockLeaseReady = Promise.resolve()
+  })
+
+  /** The screen shows the mnemonic and a header Copy action; until the screen
+   *  guard is actually on, none of that may exist — a pending or failed
+   *  registration must not paint the seed words. */
+  describe("screen security gate", () => {
+    it("shows no seed words while registration is pending, and the words once it resolves", async () => {
+      const registration = deferred<void>()
+      mockLeaseReady = registration.promise
+
+      const { queryByText, findByText } = render(
+        <ContextForScreen>
+          <BackupPhraseScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      expect(queryByText("youth")).toBeNull()
+      expect(mockSetOptions).not.toHaveBeenCalled()
+
+      registration.resolve(undefined)
+      expect(await findByText("youth")).toBeTruthy()
+    })
+
+    it("keeps the seed words unmounted when registration is exhausted", async () => {
+      const registration = deferred<void>()
+      mockLeaseReady = registration.promise
+
+      const { queryByText, findByTestId } = render(
+        <ContextForScreen>
+          <BackupPhraseScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+      registration.reject(new Error("native failure"))
+
+      expect(await findByTestId("screen-security-retry")).toBeTruthy()
+      expect(queryByText("youth")).toBeNull()
+      expect(mockSetOptions).not.toHaveBeenCalled()
+    })
   })
 
   /** Deep links and navigation-state rehydration can deliver missing or malformed params;
@@ -322,12 +382,13 @@ describe("BackupPhraseScreen", () => {
       ).toBeTruthy()
     })
 
-    it("opens the spark-compatible link from the info banner", () => {
+    it("opens the spark-compatible link from the info banner", async () => {
       const { getByText } = render(
         <ContextForScreen>
           <BackupPhraseScreen />
         </ContextForScreen>,
       )
+      await flushEffects()
 
       fireEvent.press(
         getByText(LL.BackupScreen.ManualBackup.Phrase.sparkCompatibleLink()),
@@ -336,12 +397,13 @@ describe("BackupPhraseScreen", () => {
       expect(mockOpenExternalUrl).toHaveBeenCalledWith("https://example.com")
     })
 
-    it("renders the do-not-share warning card", () => {
+    it("renders the do-not-share warning card", async () => {
       const { getByText } = render(
         <ContextForScreen>
           <BackupPhraseScreen />
         </ContextForScreen>,
       )
+      await flushEffects()
 
       expect(
         getByText(LL.BackupScreen.ManualBackup.Phrase.doNotShareWarning()),
