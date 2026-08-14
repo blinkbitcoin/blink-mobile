@@ -13,7 +13,6 @@ import CustomModal from "../custom-modal/custom-modal"
 
 type BackupNudgeModalProps = {
   isVisible: boolean
-  // Dismissal: X, backdrop tap and Android back. Starts the modal cooldown.
   onClose: () => void
 }
 
@@ -28,10 +27,8 @@ export const BackupNudgeModal: React.FC<BackupNudgeModalProps> = ({
   const { LL } = useI18nContext()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
-  // Deliberately no `onClose()` here: reaching the backup screen is not a
-  // backup. The caller hides the modal while this screen is unfocused, so a
-  // user who abandons the flow is nudged again instead of buying a quiet day.
   const handleSecure = () => {
+    onClose()
     navigation.navigate("selfCustodialBackupMethod")
   }
 
