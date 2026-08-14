@@ -107,7 +107,9 @@ const fireBeforeRemove = (actionType = "POP") => {
 /** The decline callback is deferred a tick past the removing pop's dispatch. */
 const flushDeferredDecline = () =>
   act(async () => {
-    await new Promise((resolve) => setTimeout(resolve, 0))
+    await new Promise((resolve) => {
+      setTimeout(resolve, 0)
+    })
   })
 
 const enterPin = async (pin: string) => {
