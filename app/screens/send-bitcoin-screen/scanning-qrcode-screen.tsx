@@ -420,6 +420,11 @@ export const ScanningQRCodeScreen: React.FC = () => {
     )
   }
 
+  /** A scan already in flight makes processInvoice drop whatever the picker hands back,
+   *  so opening it would read as a dead button. Dimming says the same thing the guard
+   *  does, before the user spends a trip through the gallery on it. */
+  const galleryIconStyle = pending ? styles.iconGaleryPending : styles.iconGalery
+
   return (
     <Screen unsafe>
       {isFocused && (
@@ -446,12 +451,16 @@ export const ScanningQRCodeScreen: React.FC = () => {
           </View>
         </Pressable>
         <View style={styles.openGallery}>
-          <Pressable {...testProps("open-gallery")} onPress={showImagePicker}>
+          <Pressable
+            {...testProps("open-gallery")}
+            disabled={pending}
+            onPress={showImagePicker}
+          >
             <GaloyIcon
               name="image"
               size={64}
               color={colors._lightGrey}
-              style={styles.iconGalery}
+              style={galleryIconStyle}
             />
           </Pressable>
           <Pressable onPress={handleInvoicePaste}>
@@ -506,6 +515,8 @@ const useStyles = makeStyles(({ colors }) => ({
   iconClose: { position: "absolute", top: -2, color: colors._black },
 
   iconGalery: { opacity: 0.8 },
+
+  iconGaleryPending: { opacity: 0.4 },
 
   iconClipboard: { opacity: 0.8, position: "absolute", bottom: "5%", right: "15%" },
 

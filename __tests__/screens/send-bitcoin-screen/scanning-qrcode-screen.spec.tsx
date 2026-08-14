@@ -455,6 +455,23 @@ describe("ScanningQRCodeScreen", () => {
       expect(mockResolveDestination).not.toHaveBeenCalled()
     })
 
+    /**
+     * processInvoice drops whatever it is handed while a scan is in flight, so a picker
+     * opened now would cost the user a trip through the gallery and end in silence.
+     */
+    it("stays shut while a scan is already in flight", async () => {
+      mockResolveDestination.mockReturnValue(new Promise(() => {}))
+
+      const screen = await renderScreen()
+      await act(async () => {
+        lastReadCode?.({ nativeEvent: { codeStringValue: "lnbc1inflight" } })
+      })
+
+      await openGallery(screen)
+
+      expect(mockLaunchImageLibrary).not.toHaveBeenCalled()
+    })
+
     it("surfaces a picker failure instead of dying on it", async () => {
       mockLaunchImageLibrary.mockRejectedValue(new Error("picker exploded"))
 
