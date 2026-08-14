@@ -353,6 +353,44 @@ describe("ScanningQRCodeScreen", () => {
     expect(mockResolveDestination).toHaveBeenCalledTimes(1)
   })
 
+  /**
+   * pending gates every scan and is only cleared from this alert, so a rejection that
+   * skipped the alert left the camera and the gallery button dead for the whole screen.
+   */
+  it("keeps scanning alive when resolving rejects with something that is not an Error", async () => {
+    mockResolveDestination.mockRejectedValue({ code: "E_RESOLVE" })
+
+    await renderScreen()
+    await fireScan("lnbc1first")
+
+    await waitFor(() =>
+      expect(alertSpy).toHaveBeenCalledWith(
+        "Unexpected error occurred",
+        "",
+        expect.anything(),
+      ),
+    )
+    expect(mockReportError).toHaveBeenCalledWith(
+      "scanning-qrcode",
+      new Error('{"code":"E_RESOLVE"}'),
+    )
+
+    const [, , buttons] = alertSpy.mock.calls[0]
+    await act(async () => {
+      buttons?.[0].onPress?.()
+    })
+
+    mockResolveDestination.mockResolvedValue({
+      valid: true,
+      destinationDirection: DestinationDirection.Send,
+      validDestination: { paymentType: "Lightning" },
+      createPaymentDetail: jest.fn(),
+    })
+    await fireScan("lnbc1second")
+
+    expect(mockResolveDestination).toHaveBeenCalledTimes(2)
+  })
+
   describe("picking a QR from the gallery", () => {
     const openGallery = async (screen: RenderAPI) => {
       await act(async () => {

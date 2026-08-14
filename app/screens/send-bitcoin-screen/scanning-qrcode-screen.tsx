@@ -276,20 +276,24 @@ export const ScanningQRCodeScreen: React.FC = () => {
             break
         }
       } catch (err: unknown) {
-        if (err instanceof Error) {
-          reportError("scanning-qrcode", err)
-          Alert.alert(err.toString(), "", [
-            {
-              text: LL.common.ok(),
-              onPress: () => setPending(false),
-            },
-          ])
-        }
+        /** Narrowing on instanceof here would drop a rejection that is not an Error
+         *  without ever reaching setPending(false), and pending gates every scan: the
+         *  camera and the gallery button would both stay dead for the rest of the screen.
+         *  What was rejected goes to error reporting rather than into the dialog, which
+         *  would otherwise show the user a serialized native payload. */
+        reportError("scanning-qrcode", toError(err))
+        Alert.alert(LL.errors.unexpectedError(), "", [
+          {
+            text: LL.common.ok(),
+            onPress: () => setPending(false),
+          },
+        ])
       }
     }
   }, [
     LL.ScanningQRCodeScreen,
     LL.common,
+    LL.errors,
     navigation,
     pending,
     bitcoinNetwork,
@@ -319,10 +323,8 @@ export const ScanningQRCodeScreen: React.FC = () => {
       const data = await Clipboard.getString()
       processInvoice(data)
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        reportError("scanning-qrcode", err)
-        Alert.alert(err.toString())
-      }
+      reportError("scanning-qrcode", toError(err))
+      Alert.alert(LL.errors.unexpectedError())
     }
   }
 
