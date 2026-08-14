@@ -8,8 +8,8 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { Screen } from "@app/components/screen"
+import { ScreenSecurityGate } from "@app/components/screen-security-gate"
 import { SuggestionBar } from "@app/components/suggestion-bar"
-import { useScreenSecurity } from "@app/hooks/use-screen-security"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { PhraseStep, RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useMigrationCheckpoint } from "@app/screens/account-migration/hooks"
@@ -27,7 +27,9 @@ type ConfirmRouteProp = RouteProp<RootStackParamList, "selfCustodialBackupPhrase
  *  useBackupConfirm a fresh array identity on every render. */
 const EMPTY_CHALLENGES: Challenge[] = []
 
-export const BackupPhraseConfirmScreen: React.FC = () => {
+/** The gate mounts this only once the screenshot guard is actually on — the typed
+ *  words must not exist while registration is pending. */
+const BackupPhraseConfirmContent: React.FC = () => {
   const { LL } = useI18nContext()
   const styles = useStyles()
   const {
@@ -60,8 +62,6 @@ export const BackupPhraseConfirmScreen: React.FC = () => {
 
   const { loading: checkpointLoading } = useMigrationCheckpoint()
   const completeBackup = useCompleteBackup()
-
-  useScreenSecurity()
 
   const onComplete = useCallback(() => {
     logSelfCustodialBackupCompleted({ backupMethod: "manual" })
@@ -186,6 +186,12 @@ export const BackupPhraseConfirmScreen: React.FC = () => {
     </Screen>
   )
 }
+
+export const BackupPhraseConfirmScreen: React.FC = () => (
+  <ScreenSecurityGate>
+    <BackupPhraseConfirmContent />
+  </ScreenSecurityGate>
+)
 
 const useStyles = makeStyles(({ colors }) => ({
   container: {

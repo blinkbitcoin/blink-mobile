@@ -10,8 +10,8 @@ import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloyTertiaryButton } from "@app/components/atomic/galoy-tertiary-button"
 import { headerRightNoGlass, noHeaderRight } from "@app/components/header-no-glass"
 import { WarningCard } from "@app/components/warning-card"
+import { ScreenSecurityGate } from "@app/components/screen-security-gate"
 import { SuggestionBar } from "@app/components/suggestion-bar"
-import { useScreenSecurity } from "@app/hooks/use-screen-security"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import {
   isPhraseStep,
@@ -35,7 +35,9 @@ type RestorePhraseRouteProp = RouteProp<RootStackParamList, "selfCustodialRestor
 // The clear tertiary button has no padding, so its hit area is the text bounds.
 const HEADER_BUTTON_HIT_SLOP = { top: 12, bottom: 12, left: 12, right: 12 }
 
-export const RestorePhraseScreen: React.FC = () => {
+/** The gate mounts this only once the screenshot guard is actually on — the typed
+ *  words and the header Paste action must not exist while registration is pending. */
+const RestorePhraseContent: React.FC = () => {
   const { LL } = useI18nContext()
   const styles = useStyles()
   const {
@@ -65,8 +67,6 @@ export const RestorePhraseScreen: React.FC = () => {
       { dedupKey: "restore-phrase-params-missing", alwaysRecord: true },
     )
   }, [hasValidParams])
-
-  useScreenSecurity()
 
   const {
     stepWords,
@@ -234,6 +234,12 @@ export const RestorePhraseScreen: React.FC = () => {
     </OnboardingScreenLayout>
   )
 }
+
+export const RestorePhraseScreen: React.FC = () => (
+  <ScreenSecurityGate>
+    <RestorePhraseContent />
+  </ScreenSecurityGate>
+)
 
 const useStyles = makeStyles(({ colors }) => ({
   subtitle: {
