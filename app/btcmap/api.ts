@@ -92,11 +92,13 @@ const paymentUrl = (wire: BtcMapPlaceDetailsWire): string | undefined => {
     return scheme && PAYMENT_URI_SCHEMES.includes(scheme) ? uri : undefined
   }
 
+  // The hosts are fixed, so this is not an open redirect — but an unencoded
+  // username containing "/" or "?" would silently change what the URL means.
   const pouch = osmTag(wire, PAYMENT_TAGS.pouch)
-  if (pouch) return `https://app.pouch.ph/${pouch}`
+  if (pouch) return `https://app.pouch.ph/${encodeURIComponent(pouch)}`
 
   const coinos = osmTag(wire, PAYMENT_TAGS.coinos)
-  if (coinos) return `https://coinos.io/${coinos}`
+  if (coinos) return `https://coinos.io/${encodeURIComponent(coinos)}`
 
   return undefined
 }

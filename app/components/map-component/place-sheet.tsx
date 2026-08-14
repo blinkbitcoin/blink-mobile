@@ -12,19 +12,22 @@ import { useSafeAreaInsets } from "react-native-safe-area-context"
 import MaterialIcon from "react-native-vector-icons/MaterialIcons"
 
 import {
-  BTCMAP_SITE_URL,
   BtcMapPlace,
-  BtcMapPlaceDetails,
   LatLng,
   OpeningState,
   VerificationState,
+  directionsUrl,
   formatSurveyDate,
+  hostOf,
   isBoosted,
   materialIconName,
+  merchantUrl,
   openingStateAt,
   sharesClockWith,
+  socialUrl,
   useBtcMapPlaceDetails,
   verificationStateAt,
+  withScheme,
 } from "@app/btcmap"
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -40,31 +43,6 @@ type Props = {
   place: BtcMapPlace | null
   userLocation?: LatLng
   onClose: () => void
-}
-
-const merchantUrl = (details: BtcMapPlaceDetails | null, place: BtcMapPlace) =>
-  `${BTCMAP_SITE_URL}/merchant/${details?.osmId ?? place.id}`
-
-/** btcmap.org shows the bare host, which is all anyone reads off a link anyway. */
-const hostOf = (url: string) =>
-  url
-    .replace(/^[a-z]+:\/\//i, "")
-    .replace(/^www\./i, "")
-    .split("/")[0]
-
-const withScheme = (url: string) => (/^[a-z]+:\/\//i.test(url) ? url : `https://${url}`)
-
-/**
- * OSM stores `contact:instagram` and friends as either a full URL or a bare
- * handle, and roughly half of BTC Map's are handles. Prefixing a handle with
- * `https://` yields `https://@someone`, which resolves to nothing — so a value
- * without a host is treated as a username on the platform's own domain.
- */
-const socialUrl = (host: string, value: string) => {
-  const trimmed = value.trim()
-  if (/^[a-z]+:\/\//i.test(trimmed)) return trimmed
-  if (trimmed.includes(".")) return `https://${trimmed}`
-  return `https://${host}/${trimmed.replace(/^@/, "")}`
 }
 
 export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) => {
@@ -114,25 +92,11 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
     )
   }
 
-  const navigate = () => {
-    const { latitude, longitude } = shown
-    // Without a name there is nothing to label the pin with, and an empty label
-    // turns both platforms' URLs into a text search that finds nothing — so the
-    // bare-coordinate form is used instead.
-    const label = name ? encodeURIComponent(name) : ""
-    const url = Platform.select({
-      ios: label
-        ? `maps:0,0?q=${label}@${latitude},${longitude}`
-        : `maps:0,0?ll=${latitude},${longitude}`,
-      android: label
-        ? `geo:${latitude},${longitude}?q=${latitude},${longitude}(${label})`
-        : `geo:${latitude},${longitude}?q=${latitude},${longitude}`,
-    })
-    if (url) openUrl(url)
-  }
+  const navigate = () =>
+    openUrl(directionsUrl(shown, name, Platform.OS === "ios" ? "ios" : "android"))
 
   const share = () => {
-    Share.share({ message: merchantUrl(details, shown) })
+    Share.share({ message: merchantUrl(details, shown.id) })
   }
 
   const renderRow = (icon: IconNamesType, text: string, onPress?: () => void) => (
@@ -355,7 +319,7 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
 
           <Pressable
             style={styles.profileLink}
-            onPress={() => openUrl(merchantUrl(details, shown))}
+            onPress={() => openUrl(merchantUrl(details, shown.id))}
           >
             <Text style={styles.profileLinkText}>{LL.MapScreen.seeOnBtcMap()}</Text>
             <GaloyIcon name="arrow-square-out" size={14} color={colors.primary} />
