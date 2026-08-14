@@ -24,15 +24,20 @@ jest.mock("@app/self-custodial/hooks/use-spark-network", () => ({
   useSparkNetwork: () => "Regtest",
 }))
 
+let mockDeriveRejects = false
+
 jest.mock("@app/self-custodial/bridge", () => ({
   deriveWalletIdentityPubkey: (mnemonic: string) =>
-    Promise.resolve(mnemonic ? "02abc123pubkey" : ""),
+    mockDeriveRejects
+      ? Promise.reject(new Error("signer unavailable"))
+      : Promise.resolve(mnemonic ? "02abc123pubkey" : ""),
 }))
 
 describe("useMigrationSupportDetails", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockMnemonic = "abandon ability able"
+    mockDeriveRejects = false
     mockLoadMnemonic = () => Promise.resolve(mockMnemonic)
     mockUseMigrationSupportDetailsQuery.mockReturnValue({
       loading: false,
@@ -60,6 +65,18 @@ describe("useMigrationSupportDetails", () => {
       email: "email@email.com",
       phone: "+1 374 9383 993",
     })
+  })
+
+  /** Derivation became async in SDK 0.22; a rejection must settle to an empty pubkey and
+   *  leave the rest of the support details intact, not surface as an unhandled promise. */
+  it("settles with an empty pubkey when the derivation rejects", async () => {
+    mockDeriveRejects = true
+
+    const { result } = renderHook(() => useMigrationSupportDetails())
+
+    await waitFor(() => expect(result.current.accountId).toBe("18A4242"))
+    expect(result.current.pubKey).toBe("")
+    expect(result.current.username).toBe("satoshin21")
   })
 
   /** Unmounting before the phrase resolves must not set state on a gone component. */
