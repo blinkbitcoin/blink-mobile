@@ -2097,7 +2097,7 @@
       "sendingLimit": "Verlaagde dagelijkse verzendlimiet",
       "noOnchain": "Geen ontvangen van bitcoin onchain",
       "recoveryOption": "Fondsen herstellen via SMS of e-mail",
-      "dailyLimit": "USD 999 dagelijkse transactielimiet",
+      "dailyLimit": "USD {limit: string} dagelijkse transactielimiet",
       "onchainReceive": "Bitcoin onchain ontvangen"
     }
   },
@@ -2700,7 +2700,7 @@
       "mainTitle": "Welkom bij niveau 1",
       "title": "Nieuwe functies ontgrendeld voor je account:",
       "receiveBitcoinDescription": "Bitcoin ontvangen met je telefoonnummer",
-      "dailyLimitDescription": "Verstuur tot USD 999 per dag",
+      "dailyLimitDescription": "Verstuur tot USD {limit: string} per dag",
       "onchainDescription": "Onchain betalingen ontvangen"
     },
     "emailBenefits": {

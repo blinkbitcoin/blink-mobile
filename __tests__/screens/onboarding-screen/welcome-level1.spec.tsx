@@ -63,8 +63,11 @@ describe("WelcomeLevel1Screen", () => {
     expect(
       getByText(LL.OnboardingScreen.welcomeLevel1.receiveBitcoinDescription()),
     ).toBeTruthy()
+    // "999" is both the shared-mock backend value and the audited fallback
     expect(
-      getByText(LL.OnboardingScreen.welcomeLevel1.dailyLimitDescription()),
+      getByText(
+        LL.OnboardingScreen.welcomeLevel1.dailyLimitDescription({ limit: "999" }),
+      ),
     ).toBeTruthy()
     expect(getByText(LL.OnboardingScreen.welcomeLevel1.onchainDescription())).toBeTruthy()
   })

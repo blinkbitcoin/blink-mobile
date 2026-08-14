@@ -2097,7 +2097,7 @@
             "sendingLimit": "1日あたりの送金上限を引き下げる",
             "noOnchain": "オンチェーンでのビットコイン受取禁止",
             "recoveryOption": "SMSまたはメールで資金を復元",
-            "dailyLimit": "1日USD 999の取引限度額",
+            "dailyLimit": "1日USD {limit: string}の取引限度額",
             "onchainReceive": "Bitcoinのオンチェーン受取"
         }
     },
@@ -2700,7 +2700,7 @@
             "mainTitle": "レベル1へようこそ",
             "title": "アカウントで新しい機能が利用可能になりました：",
             "receiveBitcoinDescription": "電話番号を使ってBitcoinを受取",
-            "dailyLimitDescription": "1日あたり最大USD 999を送金",
+            "dailyLimitDescription": "1日あたり最大USD {limit: string}を送金",
             "onchainDescription": "オンチェーンでの支払いを受取"
         },
         "emailBenefits": {

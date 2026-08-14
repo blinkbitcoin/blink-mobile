@@ -1,10 +1,13 @@
 import React from "react"
-import { render } from "@testing-library/react-native"
+import { render, waitFor } from "@testing-library/react-native"
 
+import { MockedProvider, MockedResponse } from "@apollo/client/testing"
 import { ThemeProvider } from "@rn-vui/themed"
 import TypesafeI18n from "@app/i18n/i18n-react"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
+import { AccountLimitsByLevelDocument } from "@app/graphql/generated"
+import { FALLBACK_LEVEL1_DAILY_LIMIT_CENTS } from "@app/hooks/use-level1-daily-limit"
 
 jest.mock("react-native-modal", () => {
   const ReactNs = jest.requireActual<typeof import("react")>("react")
@@ -34,16 +37,38 @@ import { TrialAccountLimitsModal } from "@app/components/upgrade-account-modal"
 loadLocale("en")
 const LL = i18nObject("en")
 
-const wrap = (ui: React.ReactElement) => (
-  <ThemeProvider>
-    <TypesafeI18n locale="en">{ui}</TypesafeI18n>
-  </ThemeProvider>
+const accountLimitsMock = (withdrawalCents: number) => ({
+  request: { query: AccountLimitsByLevelDocument },
+  result: {
+    data: {
+      globals: {
+        __typename: "Globals" as const,
+        accountLimitsByLevel: [
+          {
+            __typename: "AccountLevelLimits" as const,
+            level: "ONE",
+            withdrawal: withdrawalCents,
+          },
+        ],
+      },
+    },
+  },
+})
+
+const wrap = (ui: React.ReactElement, mocks: ReadonlyArray<MockedResponse> = []) => (
+  <MockedProvider mocks={mocks}>
+    <ThemeProvider>
+      <TypesafeI18n locale="en">{ui}</TypesafeI18n>
+    </ThemeProvider>
+  </MockedProvider>
 )
 
 describe("TrialAccountLimitsModal", () => {
-  it("renders the level 1 benefit items", () => {
+  it("renders the level 1 benefit items", async () => {
     const { getByText } = render(
-      wrap(<TrialAccountLimitsModal isVisible={true} closeModal={jest.fn()} />),
+      wrap(<TrialAccountLimitsModal isVisible={true} closeModal={jest.fn()} />, [
+        accountLimitsMock(99900),
+      ]),
     )
 
     expect(getByText(LL.GetStartedScreen.trialAccountLimits.modalTitle())).toBeTruthy()
@@ -53,19 +78,54 @@ describe("TrialAccountLimitsModal", () => {
       }),
     ).toBeTruthy()
     expect(
-      getByText(LL.GetStartedScreen.trialAccountLimits.dailyLimit(), { exact: false }),
-    ).toBeTruthy()
-    expect(
       getByText(LL.GetStartedScreen.trialAccountLimits.onchainReceive(), {
         exact: false,
       }),
     ).toBeTruthy()
+    await waitFor(() => expect(getByText("USD 999", { exact: false })).toBeTruthy())
   })
 
-  it("shows the audited USD 999 daily limit", () => {
-    // SSF audit finding (blink-wip#739): the enforced level 1 limit is $999/day,
-    // so the advertised copy must not say 1,000.
-    expect(LL.GetStartedScreen.trialAccountLimits.dailyLimit()).toContain("USD 999")
-    expect(LL.OnboardingScreen.welcomeLevel1.dailyLimitDescription()).toContain("USD 999")
+  it("shows the daily limit served by the backend, not a hardcoded value", async () => {
+    // blink#750 exposes the enforced limits on globals; the copy must follow it
+    const { getByText } = render(
+      wrap(<TrialAccountLimitsModal isVisible={true} closeModal={jest.fn()} />, [
+        accountLimitsMock(150000),
+      ]),
+    )
+
+    await waitFor(() =>
+      expect(
+        getByText("USD 1,500 daily transaction limit", { exact: false }),
+      ).toBeTruthy(),
+    )
+  })
+
+  it("falls back to the audited USD 999 limit when the backend has no limits field", async () => {
+    // SSF audit finding (blink-wip#739): the enforced level 1 limit is $999/day.
+    // Older production APIs reject the accountLimitsByLevel query entirely, so
+    // the fallback must still advertise the correct value.
+    const errorMock = {
+      request: { query: AccountLimitsByLevelDocument },
+      error: new Error("cannot query field 'accountLimitsByLevel' on type 'Globals'"),
+    }
+    const { getByText } = render(
+      wrap(<TrialAccountLimitsModal isVisible={true} closeModal={jest.fn()} />, [
+        errorMock,
+      ]),
+    )
+
+    await waitFor(() =>
+      expect(getByText("USD 999 daily transaction limit", { exact: false })).toBeTruthy(),
+    )
+  })
+
+  it("keeps the fallback pinned to the audited enforced limit", () => {
+    expect(FALLBACK_LEVEL1_DAILY_LIMIT_CENTS).toBe(99900)
+    expect(LL.GetStartedScreen.trialAccountLimits.dailyLimit({ limit: "999" })).toContain(
+      "USD 999",
+    )
+    expect(
+      LL.OnboardingScreen.welcomeLevel1.dailyLimitDescription({ limit: "999" }),
+    ).toContain("USD 999")
   })
 })

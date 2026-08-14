@@ -2097,7 +2097,7 @@
       "sendingLimit": "Snížený denní limit odesílání",
       "noOnchain": "Nelze přijímat bitcoin onchain",
       "recoveryOption": "Obnovení prostředků pomocí SMS nebo e-mailu",
-      "dailyLimit": "Denní transakční limit USD 999",
+      "dailyLimit": "Denní transakční limit USD {limit: string}",
       "onchainReceive": "Příjem Bitcoinu on-chain"
     }
   },
@@ -2700,7 +2700,7 @@
       "mainTitle": "Vítejte na úrovni 1",
       "title": "Nové funkce odemčeny pro váš účet:",
       "receiveBitcoinDescription": "Příjem Bitcoinu pomocí telefonního čísla",
-      "dailyLimitDescription": "Pošlete až USD 999 denně",
+      "dailyLimitDescription": "Pošlete až USD {limit: string} denně",
       "onchainDescription": "Příjem on-chain plateb"
     },
     "emailBenefits": {

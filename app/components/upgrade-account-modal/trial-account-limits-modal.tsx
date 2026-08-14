@@ -3,6 +3,7 @@ import { View } from "react-native"
 import { LocalizedString } from "typesafe-i18n"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { useLevel1DailyLimit } from "@app/hooks"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import CustomModal from "@app/components/custom-modal/custom-modal"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -26,6 +27,7 @@ export const TrialAccountLimitsModal: React.FC<TrialAccountLimitsModalProps> = (
   beforeSubmit,
 }) => {
   const { LL } = useI18nContext()
+  const { limit } = useLevel1DailyLimit()
   const styles = useStyles()
   const {
     theme: { colors },
@@ -55,7 +57,9 @@ export const TrialAccountLimitsModal: React.FC<TrialAccountLimitsModalProps> = (
       body={
         <View style={styles.modalBody}>
           <LimitItem text={LL.GetStartedScreen.trialAccountLimits.recoveryOption()} />
-          <LimitItem text={LL.GetStartedScreen.trialAccountLimits.dailyLimit()} />
+          <LimitItem
+            text={LL.GetStartedScreen.trialAccountLimits.dailyLimit({ limit })}
+          />
           <LimitItem text={LL.GetStartedScreen.trialAccountLimits.onchainReceive()} />
         </View>
       }

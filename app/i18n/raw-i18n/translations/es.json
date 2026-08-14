@@ -2097,7 +2097,7 @@
             "sendingLimit": "Límite de envíos diarios reducido",
             "noOnchain": "No recibir bitcoin onchain",
             "recoveryOption": "Recupera fondos por SMS o correo",
-            "dailyLimit": "Límite de transacciones diarias de USD 999",
+            "dailyLimit": "Límite de transacciones diarias de USD {limit: string}",
             "onchainReceive": "Recibir bitcoin en cadena"
         }
     },
@@ -2700,7 +2700,7 @@
             "mainTitle": "Bienvenido al Nivel 1",
             "title": "Nuevas funciones desbloqueadas para tu cuenta:",
             "receiveBitcoinDescription": "Recibe Bitcoin usando tu número de teléfono",
-            "dailyLimitDescription": "Envía hasta USD 999 por día",
+            "dailyLimitDescription": "Envía hasta USD {limit: string} por día",
             "onchainDescription": "Recibe pagos on-chain"
         },
         "emailBenefits": {

@@ -188,6 +188,20 @@ export const AccountLevel = {
 } as const;
 
 export type AccountLevel = typeof AccountLevel[keyof typeof AccountLevel];
+/** Daily transaction limits enforced for a given account level. */
+export type AccountLevelLimits = {
+  readonly __typename: 'AccountLevelLimits';
+  /** Max amount that can be converted between currencies among an account's own wallets. */
+  readonly convert: Scalars['CentAmount']['output'];
+  /** Max amount that can be sent to other internal accounts. */
+  readonly internalSend: Scalars['CentAmount']['output'];
+  /** The rolling time interval in seconds that the limits apply for. */
+  readonly interval: Scalars['Seconds']['output'];
+  readonly level: AccountLevel;
+  /** Max amount that can be withdrawn to external onchain or lightning destinations. */
+  readonly withdrawal: Scalars['CentAmount']['output'];
+};
+
 export type AccountLimit = {
   /** The rolling time interval in seconds that the limits would apply for. */
   readonly interval?: Maybe<Scalars['Seconds']['output']>;
@@ -3959,6 +3973,11 @@ export type AccountUpdateDisplayCurrencyMutationVariables = Exact<{
 
 
 export type AccountUpdateDisplayCurrencyMutation = { readonly __typename: 'Mutation', readonly accountUpdateDisplayCurrency: { readonly __typename: 'AccountUpdateDisplayCurrencyPayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly account?: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly displayCurrency: string } | null } };
+
+export type AccountLimitsByLevelQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type AccountLimitsByLevelQuery = { readonly __typename: 'Query', readonly globals?: { readonly __typename: 'Globals', readonly accountLimitsByLevel: ReadonlyArray<{ readonly __typename: 'AccountLevelLimits', readonly level: AccountLevel, readonly withdrawal: number }> } | null };
 
 export type FeeRatesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -9266,6 +9285,48 @@ export function useAccountUpdateDisplayCurrencyMutation(baseOptions?: Apollo.Mut
 export type AccountUpdateDisplayCurrencyMutationHookResult = ReturnType<typeof useAccountUpdateDisplayCurrencyMutation>;
 export type AccountUpdateDisplayCurrencyMutationResult = Apollo.MutationResult<AccountUpdateDisplayCurrencyMutation>;
 export type AccountUpdateDisplayCurrencyMutationOptions = Apollo.BaseMutationOptions<AccountUpdateDisplayCurrencyMutation, AccountUpdateDisplayCurrencyMutationVariables>;
+export const AccountLimitsByLevelDocument = gql`
+    query accountLimitsByLevel {
+  globals {
+    accountLimitsByLevel {
+      level
+      withdrawal
+    }
+  }
+}
+    `;
+
+/**
+ * __useAccountLimitsByLevelQuery__
+ *
+ * To run a query within a React component, call `useAccountLimitsByLevelQuery` and pass it any options that fit your needs.
+ * When your component renders, `useAccountLimitsByLevelQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useAccountLimitsByLevelQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useAccountLimitsByLevelQuery(baseOptions?: Apollo.QueryHookOptions<AccountLimitsByLevelQuery, AccountLimitsByLevelQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<AccountLimitsByLevelQuery, AccountLimitsByLevelQueryVariables>(AccountLimitsByLevelDocument, options);
+      }
+export function useAccountLimitsByLevelLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<AccountLimitsByLevelQuery, AccountLimitsByLevelQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<AccountLimitsByLevelQuery, AccountLimitsByLevelQueryVariables>(AccountLimitsByLevelDocument, options);
+        }
+export function useAccountLimitsByLevelSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<AccountLimitsByLevelQuery, AccountLimitsByLevelQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<AccountLimitsByLevelQuery, AccountLimitsByLevelQueryVariables>(AccountLimitsByLevelDocument, options);
+        }
+export type AccountLimitsByLevelQueryHookResult = ReturnType<typeof useAccountLimitsByLevelQuery>;
+export type AccountLimitsByLevelLazyQueryHookResult = ReturnType<typeof useAccountLimitsByLevelLazyQuery>;
+export type AccountLimitsByLevelSuspenseQueryHookResult = ReturnType<typeof useAccountLimitsByLevelSuspenseQuery>;
+export type AccountLimitsByLevelQueryResult = Apollo.QueryResult<AccountLimitsByLevelQuery, AccountLimitsByLevelQueryVariables>;
 export const FeeRatesDocument = gql`
     query feeRates {
   globals {
