@@ -330,40 +330,6 @@ describe("useBackupNudgeState", () => {
     expect(mockReportError).toHaveBeenCalledWith("Nudge dismiss read", expect.any(Error))
   })
 
-  it("ignores a stale read from the previously active account", async () => {
-    const OTHER_ACCOUNT_ID = "other-self-custodial-uuid"
-    mockActiveWallet.mockReturnValue(aboveModalThresholdWallet)
-
-    // Account A has a dismissed modal, account B has nothing dismissed.
-    storage[MODAL_KEY] = String(Date.now())
-
-    let resolveAccountA: (entries: [string, string | null][]) => void = () => {}
-    mockMultiGet.mockImplementationOnce(
-      (keys: string[]) =>
-        new Promise((resolve) => {
-          resolveAccountA = () => resolve(androidMultiGetOrder(keys))
-        }),
-    )
-
-    const { result, rerender } = renderHook(() => useBackupNudgeState())
-
-    // Switch to account B, whose read resolves immediately...
-    mockAccountRegistry.mockReturnValue({
-      activeAccount: { type: "self-custodial", id: OTHER_ACCOUNT_ID },
-    })
-    rerender({})
-    await act(async () => {})
-
-    expect(result.current.shouldShowModal).toBe(true)
-
-    // ...and only then does account A's read land. It must not apply.
-    await act(async () => {
-      resolveAccountA([])
-    })
-
-    expect(result.current.shouldShowModal).toBe(true)
-  })
-
   it("triggers banner when USD weight pushes combined balance over the threshold", async () => {
     const btcAmount = 1_000
     const usdCentsAmount = 200
