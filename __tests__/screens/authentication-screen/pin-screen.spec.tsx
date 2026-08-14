@@ -47,6 +47,7 @@ jest.mock("@app/utils/storage/secureStorage", () => ({
     getPinAttemptsOrZero: jest.fn().mockResolvedValue(0),
     resetPinAttempts: jest.fn(),
     setPinAttempts: jest.fn(),
+    setPin: jest.fn().mockResolvedValue(true),
     /** Read by the account registry the screen renders under. */
     getSessionProfiles: jest.fn().mockResolvedValue([]),
   },
@@ -108,6 +109,8 @@ const enterPin = async (pin: string) => {
   }
   await flushEffects()
 }
+
+const pressBackspace = () => fireEvent.press(screen.getByTestId("pin-backspace"))
 
 describe("PinScreen", () => {
   beforeAll(() => {
@@ -198,6 +201,32 @@ describe("PinScreen", () => {
     expect(mockSetAppUnlocked).not.toHaveBeenCalled()
     expect(mockGoBack).not.toHaveBeenCalled()
     expect(mockReset).not.toHaveBeenCalled()
+  })
+
+  it("re-arms the keypad after a wrong guess, so the next attempt can unlock", async () => {
+    /** The input lock engages when an attempt dispatches; a wrong (non-lockout)
+     *  guess must hand the keypad back or every retry would be dead. */
+    renderScreen(true)
+    await flushEffects()
+
+    await enterPin(WRONG_PIN)
+    await enterPin(CORRECT_PIN)
+
+    expect(KeyStoreWrapper.setPinAttempts).toHaveBeenCalledWith("1")
+    expect(mockSetAppUnlocked).toHaveBeenCalledTimes(1)
+    expect(mockGoBack).toHaveBeenCalledTimes(1)
+  })
+
+  it("backspace edits the entry between attempts", async () => {
+    renderScreen(true)
+    await flushEffects()
+
+    fireEvent.press(screen.getByText("9"))
+    pressBackspace()
+    await enterPin(CORRECT_PIN)
+
+    /** Had the backspace been dead, the attempt would have been "9123". */
+    expect(mockSetAppUnlocked).toHaveBeenCalledTimes(1)
   })
 
   describe("ChallengePin: verifying the pin for a caller without touching the app lock", () => {
@@ -314,6 +343,7 @@ describe("PinScreen", () => {
       await flushEffects()
 
       await enterPin(WRONG_PIN)
+      pressBackspace()
       await enterPin(CORRECT_PIN)
 
       expect(mockLogout).toHaveBeenCalledTimes(1)
@@ -329,6 +359,35 @@ describe("PinScreen", () => {
       expect(mockReset).toHaveBeenCalledTimes(1)
     })
 
+    it("re-arms the keypad after a wrong guess, so the next attempt can resolve", async () => {
+      const onChallengeSuccess = jest.fn()
+      renderChallenge({ onChallengeSuccess, onChallengeFailure: jest.fn() })
+      await flushEffects()
+
+      await enterPin(WRONG_PIN)
+      await enterPin(CORRECT_PIN)
+
+      expect(KeyStoreWrapper.setPinAttempts).toHaveBeenCalledWith("1")
+      expect(onChallengeSuccess).toHaveBeenCalledTimes(1)
+      expect(mockGoBack).toHaveBeenCalledTimes(1)
+    })
+
+    it("still resets the stack when the lockout's logout fails", async () => {
+      /** The reset is the lockout's terminal answer; a logout error must not
+       *  strand the caller behind a challenge that can no longer resolve. */
+      mockLogout.mockRejectedValueOnce(new Error("network down"))
+      ;(KeyStoreWrapper.getPinAttemptsOrZero as jest.Mock).mockResolvedValueOnce(2)
+      renderChallenge({ onChallengeSuccess: jest.fn(), onChallengeFailure: jest.fn() })
+      await flushEffects()
+
+      await enterPin(WRONG_PIN)
+
+      expect(mockReset).toHaveBeenCalledWith({
+        index: 0,
+        routes: [{ name: "Primary" }],
+      })
+    })
+
     it("reads the shared counter at attempt time, not from a mount snapshot", async () => {
       /** A counter snapshotted at mount can rewind strikes recorded elsewhere (unlock,
        *  another challenge) — every attempt must consult the keystore directly. */
@@ -342,6 +401,38 @@ describe("PinScreen", () => {
 
       expect(mockLogout).toHaveBeenCalledTimes(1)
       expect(mockReset).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe("SetPin: creating a pin from settings", () => {
+    it("stores the pin once both entries match", async () => {
+      /** The handoff from first entry to verification runs through the same
+       *  input lock as every attempt — it must re-arm or creation wedges. */
+      renderScreen(undefined, PinScreenPurpose.SetPin)
+      await flushEffects()
+
+      await enterPin("1111")
+      await enterPin("1111")
+
+      expect(KeyStoreWrapper.setPin).toHaveBeenCalledWith("1111")
+      expect(KeyStoreWrapper.resetPinAttempts).toHaveBeenCalledTimes(1)
+      expect(mockGoBack).toHaveBeenCalledTimes(1)
+    })
+
+    it("re-arms after a mismatch so the user can start over", async () => {
+      renderScreen(undefined, PinScreenPurpose.SetPin)
+      await flushEffects()
+
+      await enterPin("1111")
+      await enterPin("2222")
+
+      expect(KeyStoreWrapper.setPin).not.toHaveBeenCalled()
+
+      await enterPin("3333")
+      await enterPin("3333")
+
+      expect(KeyStoreWrapper.setPin).toHaveBeenCalledWith("3333")
+      expect(mockGoBack).toHaveBeenCalledTimes(1)
     })
   })
 

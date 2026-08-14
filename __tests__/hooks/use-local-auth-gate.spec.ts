@@ -259,6 +259,22 @@ describe("useLocalAuthGate", () => {
       expect(onFailure).not.toHaveBeenCalled()
     })
 
+    it("stays quiet when the keystore read rejects after unmount", async () => {
+      let rejectPin!: (error: Error) => void
+      mockGetIsPinEnabled.mockReturnValue(
+        new Promise<boolean>((_resolve, reject) => {
+          rejectPin = reject
+        }),
+      )
+      mockGetIsBiometricsEnabled.mockResolvedValue(false)
+
+      const { unmount, onFailure } = renderGate()
+      unmount()
+      await act(async () => rejectPin(new Error("keystore gone")))
+
+      expect(onFailure).not.toHaveBeenCalled()
+    })
+
     it("does not prompt when the sensor probe settles after unmount", async () => {
       arrangeFactors({ pin: true, biometrics: true })
       let resolveSensor!: (value: boolean) => void

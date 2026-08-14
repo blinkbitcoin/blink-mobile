@@ -17,6 +17,7 @@ import { RootStackParamList } from "../../navigation/stack-param-lists"
 import { PinScreenPurpose } from "../../utils/enum"
 import { sleep } from "../../utils/sleep"
 import KeyStoreWrapper from "../../utils/storage/secureStorage"
+import { testProps } from "../../utils/testProps"
 
 type Props = {
   route: RouteProp<RootStackParamList, "pin">
@@ -96,10 +97,12 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
       try {
         await logout()
         await sleep(1000)
+      } catch {
+        /** Logout is best-effort here: the lockout's terminal answer is the reset
+         *  below, and the challenge path marks challengeResolvedRef before calling
+         *  us — a thrown error without the reset would strand the caller waiting
+         *  on a callback that can no longer fire. */
       } finally {
-        /** The challenge path marks challengeResolvedRef before calling us, so a
-         *  logout error without the reset would strand the caller waiting on a
-         *  callback that can no longer fire — the reset must land either way. */
         navigation.reset({
           index: 0,
           routes: [{ name: "Primary" }],
@@ -246,6 +249,7 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
           {buttonComponentForDigit("0")}
           <View style={styles.pinPadButtonContainer}>
             <Button
+              {...testProps("pin-backspace")}
               buttonStyle={styles.pinPadButton}
               icon={<GaloyIcon name="arrow-left" size={32} color="white" />}
               onPress={() => {

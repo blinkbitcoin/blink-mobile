@@ -277,6 +277,7 @@ describe("ViewBackupPhraseScreen", () => {
     )
 
     await waitFor(() => expect(mockGoBack).toHaveBeenCalledTimes(1))
+    expect(mockToastShow).toHaveBeenCalledTimes(1)
     expect(queryByText("youth")).toBeNull()
     expect(mockUseWalletMnemonic).not.toHaveBeenCalled()
   })
