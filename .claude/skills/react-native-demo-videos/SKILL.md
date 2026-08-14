@@ -1,6 +1,7 @@
 ---
 name: react-native-demo-videos
 description: Use when a PR needs a moving demo rather than screenshots — recording a user session flow on an iOS simulator or Android emulator to show a bugfix or feature behaving, before/after interaction videos, animated GIF, MP4 or WebM of app navigation, "demo expected behavior". Covers simctl recordVideo and adb screenrecord. Takes gif, mp4 or webm, and optionally ios or android, as arguments.
+allowed-tools: Bash(xcrun simctl *) Bash(maestro *) Bash(ffmpeg *) Bash(ffprobe *) Bash(/*/.claude/skills/*/scripts/*.sh) Bash(/*/.claude/skills/*/scripts/*.sh *) Bash(/*/.claude/skills/*/tests/run.sh)
 ---
 
 # Demo Videos for React Native PRs
@@ -267,7 +268,7 @@ threshold with a TEMP constant and say so in the PR comment.
 ## After Editing the Scripts
 
 ```bash
-"$SKILL/tests/run.sh"     # 104 assertions, ~50s, exits non-zero on failure
+"$SKILL/tests/run.sh"     # 105 assertions, ~50s, exits non-zero on failure
 ```
 
 Fakes `xcrun`, `adb` (the full screenrecord start/kill -2/pull lifecycle) and

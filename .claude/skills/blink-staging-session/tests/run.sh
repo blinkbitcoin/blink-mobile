@@ -95,6 +95,8 @@ echo
 echo "documented behavior matches the scripts"
 
 SKILL_MD="$TESTS_DIR/../SKILL.md"
+check "SKILL.md pre-approves this skill's commands (allowed-tools)" "yes" \
+  "$(head -5 "$SKILL_MD" | grep "allowed-tools:" | grep -q -- "Bash(maestro \*)" && echo yes || echo no)"
 check "SKILL.md sources the OTP from .env.local via the env var" "yes" \
   "$(grep -q "GALOY_STAGING_GLOBAL_OTP" "$SKILL_MD" && grep -q ".env.local" "$SKILL_MD" && echo yes || echo no)"
 check "SKILL.md warns fresh installs point at Main (production)" "yes" \

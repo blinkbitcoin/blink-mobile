@@ -245,6 +245,8 @@ echo
 echo "documented behavior matches the scripts"
 
 SKILL_MD="$TESTS_DIR/../SKILL.md"
+check "SKILL.md pre-approves this skill's commands (allowed-tools)" "yes" \
+  "$(head -5 "$SKILL_MD" | grep "allowed-tools:" | grep -q -- "Bash(xcrun simctl \*)" && head -5 "$SKILL_MD" | grep "allowed-tools:" | grep -q -- "Bash(magick \*)" && echo yes || echo no)"
 check "SKILL.md carries no BLINK_ residue" "no" \
   "$(grep -q "BLINK_" "$SKILL_MD" && echo yes || echo no)"
 check "SKILL.md pairs section uses the reload flip, not a blind fast refresh" "yes" \

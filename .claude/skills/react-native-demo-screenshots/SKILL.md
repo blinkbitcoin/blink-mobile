@@ -1,6 +1,7 @@
 ---
 name: react-native-demo-screenshots
 description: Use when capturing still screenshots of a React Native app on an iOS simulator or Android emulator for a PR — before/after image pairs, showing a UI change or copy fix, cropping a pair honestly, or comparing a render against a design mock numerically. Covers simctl and adb screencap.
+allowed-tools: Bash(xcrun simctl *) Bash(magick *) Bash(/*/.claude/skills/*/scripts/*.sh) Bash(/*/.claude/skills/*/scripts/*.sh *) Bash(/*/.claude/skills/*/tests/run.sh)
 ---
 
 # Demo Screenshots for React Native PRs
@@ -141,7 +142,7 @@ simulated. Caption honestly what was forced.
 ## After Editing the Scripts
 
 ```bash
-"$SHOT/tests/run.sh"     # 57 assertions, ~15s, exits non-zero on failure
+"$SHOT/tests/run.sh"     # 58 assertions, ~15s, exits non-zero on failure
 ```
 
 Fakes `xcrun` and `adb` (writing real PNGs) and uses real ImageMagick, so the
