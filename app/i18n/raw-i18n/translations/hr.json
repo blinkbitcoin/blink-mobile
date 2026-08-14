@@ -2162,12 +2162,13 @@
   },
   "PinScreen": {
     "attemptsRemaining": "Netočan PIN. {attemptsRemaining: number} preostalih pokušaja.",
+    "lockoutUnavailable": "Neuspjeli pokušaj nije moguće sigurno zabilježiti. Odjava.",
     "oneAttemptRemaining": "Netočan PIN. Preostao je 1 pokušaj.",
     "setPin": "Postavite svoj PIN kod",
     "setPinFailedMatch": "Pinovi se ne podudaraju - postavite svoj PIN kod",
     "storePinFailed": "Nije moguće pohraniti vaš PIN.",
     "tooManyAttempts": "Previše neuspjelih pokušaja. Odjava.",
-    "tryAgainIn": "Previše neuspjelih pokušaja. Pokušajte ponovno za {seconds: number} s.",
+    "tryAgainIn": "Pokušajte ponovno za {seconds: number} s.",
     "verifyPin": "Potvrdite svoj PIN kod"
   },
   "PriceHistoryScreen": {

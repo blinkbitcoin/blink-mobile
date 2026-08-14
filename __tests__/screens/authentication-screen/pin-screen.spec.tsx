@@ -37,21 +37,53 @@ jest.mock("@app/hooks/use-logout", () => ({
 jest.mock("@app/utils/storage/secureStorage", () => ({
   __esModule: true,
   default: {
-    getPinOrEmptyString: jest.fn().mockResolvedValue("1234"),
-    getPinAttemptsOrZero: jest.fn().mockResolvedValue(0),
-    getPinLockedUntilOrZero: jest.fn().mockResolvedValue(0),
-    resetPinAttempts: jest.fn().mockResolvedValue(true),
-    setPinAttempts: jest.fn().mockResolvedValue(true),
-    setPin: jest.fn().mockResolvedValue(true),
-    setPinLockedUntil: jest.fn().mockResolvedValue(true),
-    removePinLockedUntil: jest.fn().mockResolvedValue(true),
+    getPinOrEmptyString: jest.fn(),
+    getPinFailureState: jest.fn(),
+    setPinFailureState: jest.fn(),
+    clearPinFailureState: jest.fn(),
+    repairPinLockedUntil: jest.fn(),
+    setPin: jest.fn(),
     /** Read by the account registry the screen renders under. */
-    getSessionProfiles: jest.fn().mockResolvedValue([]),
+    getSessionProfiles: jest.fn(),
   },
 }))
 
 const CORRECT_PIN = "1234"
 const WRONG_PIN = "9999"
+
+const mockedStore = jest.mocked(KeyStoreWrapper)
+
+/**
+ * A real keystore rather than per-call stubs, because the lockout now re-reads
+ * storage on every attempt. Keeping the values here lets a test unmount and
+ * re-render the screen to model a force-quit and relaunch.
+ */
+let stored: { pin: string; attempts: number; lockedUntil: number }
+
+const primeStore = () => {
+  stored = { pin: CORRECT_PIN, attempts: 0, lockedUntil: 0 }
+
+  mockedStore.getPinOrEmptyString.mockImplementation(async () => stored.pin)
+  mockedStore.getPinFailureState.mockImplementation(async () => ({
+    attempts: stored.attempts,
+    lockedUntil: stored.lockedUntil,
+  }))
+  mockedStore.setPinFailureState.mockImplementation(async ({ attempts, lockedUntil }) => {
+    stored.attempts = attempts
+    stored.lockedUntil = lockedUntil
+    return true
+  })
+  mockedStore.clearPinFailureState.mockImplementation(async () => {
+    stored.attempts = 0
+    stored.lockedUntil = 0
+  })
+  mockedStore.repairPinLockedUntil.mockImplementation(async (lockedUntil) => {
+    stored.lockedUntil = lockedUntil
+    return true
+  })
+  mockedStore.setPin.mockResolvedValue(true)
+  mockedStore.getSessionProfiles.mockResolvedValue([])
+}
 
 const buildRoute = (
   isResume?: boolean,
@@ -97,6 +129,7 @@ describe("PinScreen", () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
+    primeStore()
     backHandlerSpy = jest.spyOn(BackHandler, "addEventListener")
   })
 
@@ -181,8 +214,6 @@ describe("PinScreen", () => {
   })
 
   describe("brute-force lockout", () => {
-    const mockedStore = jest.mocked(KeyStoreWrapper)
-
     beforeEach(() => {
       // flushEffects relies on setImmediate; keep it real so effects settle.
       jest.useFakeTimers({ doNotFake: ["setImmediate"] })
@@ -206,10 +237,21 @@ describe("PinScreen", () => {
 
       await enterPin(WRONG_PIN)
 
-      expect(mockedStore.setPinAttempts).toHaveBeenCalledWith("1")
-      expect(mockedStore.setPinLockedUntil).toHaveBeenCalledTimes(1)
-      const persisted = Number(mockedStore.setPinLockedUntil.mock.calls[0][0])
-      expect(persisted).toBeGreaterThan(Date.now())
+      expect(mockedStore.setPinFailureState).toHaveBeenCalledTimes(1)
+      expect(stored.attempts).toBe(1)
+      expect(stored.lockedUntil).toBeGreaterThan(Date.now())
+    })
+
+    it("shows how many attempts are left alongside the countdown", async () => {
+      // The countdown used to replace this line, so a single typo read as
+      // "too many failed attempts" and hid the real count.
+      renderScreen(false)
+      await flushEffects()
+
+      await enterPin(WRONG_PIN)
+
+      expect(screen.getByText("Incorrect PIN. 2 attempts remaining.")).toBeTruthy()
+      expect(screen.getByText(/try again in/i)).toBeTruthy()
     })
 
     it("makes the keypad inert while locked, even for the correct pin", async () => {
@@ -233,12 +275,12 @@ describe("PinScreen", () => {
       await enterPin(CORRECT_PIN)
 
       expect(mockSetAppUnlocked).toHaveBeenCalledTimes(1)
-      expect(mockedStore.resetPinAttempts).toHaveBeenCalled()
-      expect(mockedStore.removePinLockedUntil).toHaveBeenCalled()
+      expect(mockedStore.clearPinFailureState).toHaveBeenCalled()
+      expect(stored).toMatchObject({ attempts: 0, lockedUntil: 0 })
     })
 
     it("starts locked when a future lockout is persisted (survives relaunch)", async () => {
-      mockedStore.getPinLockedUntilOrZero.mockResolvedValueOnce(Date.now() + 30_000)
+      stored.lockedUntil = Date.now() + 30_000
 
       renderScreen(false)
       await flushEffects()
@@ -249,23 +291,34 @@ describe("PinScreen", () => {
       expect(screen.getByText(/try again in/i)).toBeTruthy()
     })
 
-    it("clamps an absurd persisted lockout to the longest scheduled one", async () => {
-      // A wall clock rolled backward after the write must not lock forever.
-      mockedStore.getPinLockedUntilOrZero.mockResolvedValueOnce(
-        Date.now() + 100 * 24 * 60 * 60 * 1000,
-      )
+    it("warns about the last attempt after a relaunch, not just in session", async () => {
+      // The warning used to live in component state, so relaunching lost it and
+      // the next wrong entry wiped the pin and session without notice.
+      stored.attempts = 2
 
       renderScreen(false)
       await flushEffects()
-      await advance(MAX_LOCKOUT_MS + 1000)
 
+      expect(screen.getByText("Incorrect PIN. 1 attempt remaining.")).toBeTruthy()
+    })
+
+    it("clamps an absurd persisted lockout and repairs it in storage", async () => {
+      // A wall clock rolled backward after the write must not lock forever, and
+      // leaving the bad value stored would re-impose the lock on every launch.
+      stored.lockedUntil = Date.now() + 100 * 24 * 60 * 60 * 1000
+
+      renderScreen(false)
+      await flushEffects()
+      expect(mockedStore.repairPinLockedUntil).toHaveBeenCalled()
+
+      await advance(MAX_LOCKOUT_MS + 1000)
       await enterPin(CORRECT_PIN)
 
       expect(mockSetAppUnlocked).toHaveBeenCalledTimes(1)
     })
 
     it("still logs out on the third failure", async () => {
-      mockedStore.getPinAttemptsOrZero.mockResolvedValueOnce(2)
+      stored.attempts = 2
 
       renderScreen(false)
       await flushEffects()
@@ -280,8 +333,61 @@ describe("PinScreen", () => {
       })
     })
 
+    it("logs out rather than let an attempt go unrecorded", async () => {
+      // A lockout held only in memory dies with the process, so a failed write
+      // has to end the session instead of leaving the next guess free.
+      mockedStore.setPinFailureState.mockResolvedValue(false)
+
+      renderScreen(false)
+      await flushEffects()
+
+      await enterPin(WRONG_PIN)
+
+      expect(mockLogout).toHaveBeenCalledTimes(1)
+      expect(screen.queryByText(/try again in/i)).toBeNull()
+      expect(
+        screen.getByText("Couldn't record the failed attempt securely. Logging out."),
+      ).toBeTruthy()
+    })
+
+    it("refuses a guess made on a fresh mount while the stored lock still runs", async () => {
+      // The relaunch bypass: the screen's own state starts at zero attempts and
+      // no lock, so a guess entered before hydration used to skip the lock and
+      // write the attempt count back down to 1.
+      stored.attempts = 2
+      stored.lockedUntil = Date.now() + 60_000
+
+      renderScreen(false)
+      await enterPin(WRONG_PIN)
+
+      expect(stored.attempts).toBe(2)
+      expect(mockLogout).not.toHaveBeenCalled()
+    })
+
+    it("reaches the logout even when the app is killed between every guess", async () => {
+      // Each guess lands in a freshly mounted screen that has hydrated nothing,
+      // and the attacker has to sit out each lock. The budget still runs out.
+      for (const { attempt, lockMs } of [
+        { attempt: 1, lockMs: 31_000 },
+        { attempt: 2, lockMs: 61_000 },
+      ]) {
+        const { unmount } = renderScreen(false)
+        await flushEffects()
+        await enterPin(WRONG_PIN)
+        expect(stored.attempts).toBe(attempt)
+        unmount()
+        await advance(lockMs)
+      }
+
+      renderScreen(false)
+      await flushEffects()
+      await enterPin(WRONG_PIN)
+
+      expect(mockLogout).toHaveBeenCalledTimes(1)
+    })
+
     it("never locks the set-pin flow", async () => {
-      mockedStore.getPinLockedUntilOrZero.mockResolvedValueOnce(Date.now() + 30_000)
+      stored.lockedUntil = Date.now() + 30_000
 
       renderScreen(undefined, PinScreenPurpose.SetPin)
       await flushEffects()
@@ -291,6 +397,56 @@ describe("PinScreen", () => {
 
       expect(mockedStore.setPin).toHaveBeenCalledWith("1111")
       expect(mockGoBack).toHaveBeenCalled()
+    })
+  })
+
+  describe("input while a verification is in flight", () => {
+    /** Holds the verification open on its stored-pin read. */
+    const holdVerification = () => {
+      let release: (pin: string) => void = () => {}
+      mockedStore.getPinOrEmptyString.mockImplementation(
+        () =>
+          new Promise<string>((resolve) => {
+            release = resolve
+          }),
+      )
+      return async () => {
+        await act(async () => {
+          release(stored.pin)
+        })
+      }
+    }
+
+    it("ignores a backspace, so a second attempt can't be slipped in", async () => {
+      // Backspace used to be gated only by the `disabled` prop, which comes
+      // from a render that predates the verification. Backspace plus a digit
+      // re-entered the handler on a stale attempt count, and two wrong guesses
+      // were recorded as one.
+      renderScreen(false)
+      await flushEffects()
+
+      const release = holdVerification()
+      await enterPin(WRONG_PIN)
+
+      fireEvent.press(screen.getByTestId("pinPadBackspace"))
+      fireEvent.press(screen.getByText("1"))
+      await flushEffects()
+
+      expect(mockedStore.getPinOrEmptyString).toHaveBeenCalledTimes(1)
+      await release()
+    })
+
+    it("ignores further digits", async () => {
+      renderScreen(false)
+      await flushEffects()
+
+      const release = holdVerification()
+      await enterPin(WRONG_PIN)
+
+      await enterPin(WRONG_PIN)
+
+      expect(mockedStore.getPinOrEmptyString).toHaveBeenCalledTimes(1)
+      await release()
     })
   })
 })

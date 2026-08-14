@@ -2162,12 +2162,13 @@
   },
   "PinScreen": {
     "attemptsRemaining": "Nesprávný kód PIN. {attemptsRemaining: string} zbývající pokusy.",
+    "lockoutUnavailable": "Neúspěšný pokus se nepodařilo bezpečně zaznamenat. Odhlášení.",
     "oneAttemptRemaining": "Nesprávný kód PIN. Zbývá 1 pokus.",
     "setPin": "Nastavení PIN kódu",
     "setPinFailedMatch": "Piny se neshodují - nastavte svůj PIN kód",
     "storePinFailed": "Nelze uložit váš PIN.",
     "tooManyAttempts": "Příliš mnoho neúspěšných pokusů. Odhlášení.",
-    "tryAgainIn": "Příliš mnoho neúspěšných pokusů. Zkuste to znovu za {seconds: number} s.",
+    "tryAgainIn": "Zkuste to znovu za {seconds: number} s.",
     "verifyPin": "Ověřte svůj PIN kód"
   },
   "PriceHistoryScreen": {

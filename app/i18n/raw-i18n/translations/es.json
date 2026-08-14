@@ -2162,12 +2162,13 @@
     },
     "PinScreen": {
         "attemptsRemaining": "PIN incorrecto. Quedan {attemptsRemaining: string} intentos.",
+        "lockoutUnavailable": "No se ha podido registrar el intento fallido de forma segura. Cerrando sesión.",
         "oneAttemptRemaining": "PIN incorrecto. Queda 1 intento.",
         "setPin": "Establezca su PIN",
         "setPinFailedMatch": "El PIN no coincide. Establezca su PIN",
         "storePinFailed": "No se puede guardar su PIN.",
         "tooManyAttempts": "Ha superado el límite de intentos. Cerrando sesión.",
-        "tryAgainIn": "Demasiados intentos fallidos. Inténtelo de nuevo en {seconds: number} s.",
+        "tryAgainIn": "Inténtelo de nuevo en {seconds: number} s.",
         "verifyPin": "Verifique su PIN"
     },
     "PriceHistoryScreen": {

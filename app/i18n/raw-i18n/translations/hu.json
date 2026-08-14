@@ -2162,12 +2162,13 @@
   },
   "PinScreen": {
     "attemptsRemaining": "Helytelen PIN. {attemptsRemaining: number} próbálkozás maradt.",
+    "lockoutUnavailable": "A sikertelen próbálkozást nem sikerült biztonságosan rögzíteni. Kijelentkezés.",
     "oneAttemptRemaining": "Helytelen PIN. 1 próbálkozás maradt.",
     "setPin": "Állítsd be a PIN kódodat",
     "setPinFailedMatch": "A PIN kódok nem egyeznek - Állítsd be a PIN kódodat",
     "storePinFailed": "Nem sikerült tárolni a PIN kódodat.",
     "tooManyAttempts": "Túl sok sikertelen próbálkozás. Kijelentkezés.",
-    "tryAgainIn": "Túl sok sikertelen próbálkozás. Próbálja újra {seconds: number} mp múlva.",
+    "tryAgainIn": "Próbálja újra {seconds: number} mp múlva.",
     "verifyPin": "Ellenőrizd a PIN kódodat"
   },
   "PriceHistoryScreen": {

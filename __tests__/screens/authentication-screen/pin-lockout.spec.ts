@@ -2,8 +2,18 @@ import {
   clampLockedUntil,
   lockoutMsForFailures,
   MAX_LOCKOUT_MS,
+  MAX_PIN_ATTEMPTS,
   remainingLockoutMs,
 } from "@app/screens/authentication-screen/pin-lockout"
+
+describe("the attempt budget", () => {
+  it("grants exactly one attempt per scheduled lockout tier", () => {
+    // MAX_PIN_ATTEMPTS is derived from the schedule length. Adding a tier must
+    // widen the budget in step, never leave the two to drift apart.
+    expect(MAX_PIN_ATTEMPTS).toBe(3)
+    expect(lockoutMsForFailures(MAX_PIN_ATTEMPTS - 1)).toBe(MAX_LOCKOUT_MS)
+  })
+})
 
 describe("lockoutMsForFailures", () => {
   it("escalates with consecutive failures", () => {
@@ -31,6 +41,13 @@ describe("remainingLockoutMs", () => {
     expect(remainingLockoutMs(10_000, 10_000)).toBe(0)
     expect(remainingLockoutMs(10_000, 50_000)).toBe(0)
   })
+
+  it("caps at the longest scheduled lockout when the clock moves backward", () => {
+    // The screen stays mounted and the wall clock steps back an hour: the live
+    // countdown must not stretch past what the schedule can hand out.
+    const lockedUntil = 3_600_000
+    expect(remainingLockoutMs(lockedUntil, 0)).toBe(MAX_LOCKOUT_MS)
+  })
 })
 
 describe("clampLockedUntil", () => {
@@ -44,5 +61,9 @@ describe("clampLockedUntil", () => {
     const now = 1_000_000
     const farFuture = now + 100 * 24 * 60 * 60 * 1000
     expect(clampLockedUntil(farFuture, now)).toBe(now + MAX_LOCKOUT_MS)
+  })
+
+  it("floors a negative persisted lock at zero", () => {
+    expect(clampLockedUntil(-5_000, 1_000)).toBe(0)
   })
 })

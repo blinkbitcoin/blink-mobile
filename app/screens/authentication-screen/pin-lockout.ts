@@ -1,16 +1,15 @@
-export const MAX_PIN_ATTEMPTS = 3
-
-// Escalating lockout after N consecutive failures: none, 30s, 60s. The third
-// failure logs the user out (pin-screen.tsx), so the schedule needs no more
-// entries.
+// Escalating lockout after N consecutive failures: none, 30s, 60s. The failure
+// after the last entry has no lockout — it logs the user out (pin-verification.ts)
+// — so the number of attempts the schedule grants IS the schedule's length.
 const LOCKOUT_MS_BY_FAILURES = [0, 30_000, 60_000] as const
 
-export const MAX_LOCKOUT_MS = LOCKOUT_MS_BY_FAILURES[LOCKOUT_MS_BY_FAILURES.length - 1]
+/** Derived, so adding a tier can't silently widen the attempt budget. */
+export const MAX_PIN_ATTEMPTS = LOCKOUT_MS_BY_FAILURES.length
+
+export const MAX_LOCKOUT_MS = LOCKOUT_MS_BY_FAILURES[MAX_PIN_ATTEMPTS - 1]
 
 export const lockoutMsForFailures = (failures: number): number =>
-  LOCKOUT_MS_BY_FAILURES[
-    Math.min(Math.max(failures, 0), LOCKOUT_MS_BY_FAILURES.length - 1)
-  ]
+  LOCKOUT_MS_BY_FAILURES[Math.min(Math.max(failures, 0), MAX_PIN_ATTEMPTS - 1)]
 
 /**
  * Bounds a persisted lock when it is loaded: a stored timestamp further out
@@ -19,8 +18,13 @@ export const lockoutMsForFailures = (failures: number): number =>
  * expires on schedule instead of locking the user out indefinitely.
  */
 export const clampLockedUntil = (lockedUntil: number, now: number): number =>
-  Math.min(lockedUntil, now + MAX_LOCKOUT_MS)
+  Math.min(Math.max(lockedUntil, 0), now + MAX_LOCKOUT_MS)
 
-/** Milliseconds of lockout left at `now`, floored at zero. */
+/**
+ * Milliseconds of lockout left at `now`, floored at zero and capped at the
+ * longest scheduled lockout. The cap matters while the screen stays mounted:
+ * a clock that moves backward mid-lockout must not inflate a live countdown
+ * past what the schedule can hand out.
+ */
 export const remainingLockoutMs = (lockedUntil: number, now: number): number =>
-  Math.max(0, lockedUntil - now)
+  Math.min(Math.max(0, lockedUntil - now), MAX_LOCKOUT_MS)

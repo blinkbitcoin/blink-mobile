@@ -6742,6 +6742,10 @@ type RootTranslation = {
 		 */
 		attemptsRemaining: RequiredParams<'attemptsRemaining'>
 		/**
+		 * C​o​u​l​d​n​'​t​ ​r​e​c​o​r​d​ ​t​h​e​ ​f​a​i​l​e​d​ ​a​t​t​e​m​p​t​ ​s​e​c​u​r​e​l​y​.​ ​L​o​g​g​i​n​g​ ​o​u​t​.
+		 */
+		lockoutUnavailable: string
+		/**
 		 * I​n​c​o​r​r​e​c​t​ ​P​I​N​.​ ​1​ ​a​t​t​e​m​p​t​ ​r​e​m​a​i​n​i​n​g​.
 		 */
 		oneAttemptRemaining: string
@@ -6762,7 +6766,7 @@ type RootTranslation = {
 		 */
 		tooManyAttempts: string
 		/**
-		 * T​o​o​ ​m​a​n​y​ ​f​a​i​l​e​d​ ​a​t​t​e​m​p​t​s​.​ ​T​r​y​ ​a​g​a​i​n​ ​i​n​ ​{​s​e​c​o​n​d​s​}​s​.
+		 * T​r​y​ ​a​g​a​i​n​ ​i​n​ ​{​s​e​c​o​n​d​s​}​s​.
 		 * @param {number} seconds
 		 */
 		tryAgainIn: RequiredParams<'seconds'>
@@ -20206,6 +20210,10 @@ export type TranslationFunctions = {
 		 */
 		attemptsRemaining: (arg: { attemptsRemaining: number }) => LocalizedString
 		/**
+		 * Couldn't record the failed attempt securely. Logging out.
+		 */
+		lockoutUnavailable: () => LocalizedString
+		/**
 		 * Incorrect PIN. 1 attempt remaining.
 		 */
 		oneAttemptRemaining: () => LocalizedString
@@ -20226,7 +20234,7 @@ export type TranslationFunctions = {
 		 */
 		tooManyAttempts: () => LocalizedString
 		/**
-		 * Too many failed attempts. Try again in {seconds}s.
+		 * Try again in {seconds}s.
 		 */
 		tryAgainIn: (arg: { seconds: number }) => LocalizedString
 		/**

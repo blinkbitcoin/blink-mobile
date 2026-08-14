@@ -1,5 +1,5 @@
 import * as React from "react"
-import { useEffect, useState } from "react"
+import { useCallback, useState } from "react"
 import { Alert, Text, View } from "react-native"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RouteProp, useNavigation } from "@react-navigation/native"
@@ -9,13 +9,8 @@ import { makeStyles } from "@rn-vui/themed"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 
-import {
-  clampLockedUntil,
-  lockoutMsForFailures,
-  MAX_PIN_ATTEMPTS,
-  remainingLockoutMs,
-} from "./pin-lockout"
 import { useUnlockScreen } from "./unlock-screen"
+import { usePinLockout } from "./use-pin-lockout"
 
 import { Screen } from "../../components/screen"
 import useLogout from "../../hooks/use-logout"
@@ -37,79 +32,42 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
   const { screenPurpose, isResume = false } = route.params
   const { completeUnlock } = useUnlockScreen({ isResume })
   const { LL } = useI18nContext()
+  const isAuthenticate = screenPurpose === PinScreenPurpose.AuthenticatePin
   const [enteredPIN, setEnteredPIN] = useState("")
   const [helperText, setHelperText] = useState(
     screenPurpose === PinScreenPurpose.SetPin ? LL.PinScreen.setPin() : "",
   )
   const [previousPIN, setPreviousPIN] = useState("")
-  const [pinAttempts, setPinAttempts] = useState(0)
-  const [lockedUntil, setLockedUntil] = useState(0)
-  const [now, setNow] = useState(Date.now())
+  /** Set only on the terminal outcomes, where the screen is about to go away. */
+  const [farewellText, setFarewellText] = useState("")
 
-  const remainingMs = remainingLockoutMs(lockedUntil, now)
-  const isLocked = remainingMs > 0 && screenPurpose === PinScreenPurpose.AuthenticatePin
-
-  useEffect(() => {
-    ;(async () => {
-      // A persisted future lock keeps the screen locked across app restarts.
-      const [attempts, storedLockedUntil] = await Promise.all([
-        KeyStoreWrapper.getPinAttemptsOrZero(),
-        KeyStoreWrapper.getPinLockedUntilOrZero(),
-      ])
-      setPinAttempts(attempts)
-      setLockedUntil(clampLockedUntil(storedLockedUntil, Date.now()))
-      setNow(Date.now())
-    })()
-  }, [])
-
-  useEffect(() => {
-    if (!isLocked) return
-    const interval = setInterval(() => setNow(Date.now()), 1000)
-    return () => clearInterval(interval)
-  }, [isLocked])
-
-  const handleCompletedPinForAuthenticatePin = async (newEnteredPIN: string) => {
-    if (newEnteredPIN === (await KeyStoreWrapper.getPinOrEmptyString())) {
-      // Awaited so a kill right after unlock can't leave a stale future lock.
-      await Promise.all([
-        KeyStoreWrapper.resetPinAttempts(),
-        KeyStoreWrapper.removePinLockedUntil(),
-      ])
-      completeUnlock(() =>
-        navigation.reset({
-          index: 0,
-          routes: [{ name: "Primary" }],
-        }),
-      )
-    } else if (pinAttempts < MAX_PIN_ATTEMPTS - 1) {
-      const newPinAttempts = pinAttempts + 1
-      const newLockedUntil = Date.now() + lockoutMsForFailures(newPinAttempts)
-      // Persist before showing the result so killing the app mid-write can't
-      // erase the failed attempt.
-      await Promise.all([
-        KeyStoreWrapper.setPinAttempts(newPinAttempts.toString()),
-        KeyStoreWrapper.setPinLockedUntil(newLockedUntil.toString()),
-      ])
-      setPinAttempts(newPinAttempts)
-      setLockedUntil(newLockedUntil)
-      setNow(Date.now())
+  const endSession = useCallback(
+    async (message: string) => {
       setEnteredPIN("")
-      if (newPinAttempts === MAX_PIN_ATTEMPTS - 1) {
-        setHelperText(LL.PinScreen.oneAttemptRemaining())
-      } else {
-        const attemptsRemaining = MAX_PIN_ATTEMPTS - newPinAttempts
-        setHelperText(LL.PinScreen.attemptsRemaining({ attemptsRemaining }))
-      }
-    } else {
-      setHelperText(LL.PinScreen.tooManyAttempts())
+      setFarewellText(message)
       await logout()
       await sleep(1000)
       navigation.reset({
         index: 0,
         routes: [{ name: "Primary" }],
       })
-    }
-  }
+    },
+    [logout, navigation],
+  )
+
+  const lockout = usePinLockout({
+    enabled: isAuthenticate,
+    onUnlocked: () =>
+      completeUnlock(() =>
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "Primary" }],
+        }),
+      ),
+    onWrongPin: () => setEnteredPIN(""),
+    onExhausted: () => endSession(LL.PinScreen.tooManyAttempts()),
+    onUnrecorded: () => endSession(LL.PinScreen.lockoutUnavailable()),
+  })
 
   const handleCompletedPinForSetPin = (newEnteredPIN: string) => {
     if (previousPIN.length === 0) {
@@ -122,38 +80,43 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
   }
 
   const addDigit = (digit: string) => {
-    if (isLocked) {
-      return
-    }
-    if (enteredPIN.length < 4) {
-      const newEnteredPIN = enteredPIN + digit
-      setEnteredPIN(newEnteredPIN)
+    if (!lockout.canAcceptInput()) return
+    if (enteredPIN.length >= 4) return
 
-      if (newEnteredPIN.length === 4) {
-        if (screenPurpose === PinScreenPurpose.AuthenticatePin) {
-          handleCompletedPinForAuthenticatePin(newEnteredPIN)
-        } else if (screenPurpose === PinScreenPurpose.SetPin) {
-          handleCompletedPinForSetPin(newEnteredPIN)
-        }
-      }
+    const newEnteredPIN = enteredPIN + digit
+    setEnteredPIN(newEnteredPIN)
+    if (newEnteredPIN.length < 4) return
+
+    if (isAuthenticate) {
+      lockout.submit(newEnteredPIN)
+    } else if (screenPurpose === PinScreenPurpose.SetPin) {
+      handleCompletedPinForSetPin(newEnteredPIN)
     }
   }
 
+  // Asks the guard rather than relying on the button's `disabled` prop: that
+  // prop comes from a render that may predate the verification in flight,
+  // which is exactly how a backspace used to slip a second attempt through.
+  const removeDigit = () => {
+    if (!lockout.canAcceptInput()) return
+    setEnteredPIN((pin) => pin.slice(0, -1))
+  }
+
   const verifyPINCodeMatches = async (newEnteredPIN: string) => {
-    if (previousPIN === newEnteredPIN) {
+    if (previousPIN !== newEnteredPIN) {
+      returnToSetPin()
+      return
+    }
+
+    await lockout.runGuarded(async () => {
       if (await KeyStoreWrapper.setPin(previousPIN)) {
-        await Promise.all([
-          KeyStoreWrapper.resetPinAttempts(),
-          KeyStoreWrapper.removePinLockedUntil(),
-        ])
+        await KeyStoreWrapper.clearPinFailureState()
         navigation.goBack()
       } else {
         returnToSetPin()
         Alert.alert(LL.PinScreen.storePinFailed())
       }
-    } else {
-      returnToSetPin()
-    }
+    })
   }
 
   const returnToSetPin = () => {
@@ -178,7 +141,7 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
         <Button
           buttonStyle={styles.pinPadButton}
           titleStyle={styles.pinPadButtonTitle}
-          disabled={isLocked}
+          disabled={lockout.isInputDisabled}
           disabledStyle={styles.pinPadButton}
           disabledTitleStyle={styles.pinPadButtonTitleDisabled}
           title={digit}
@@ -186,6 +149,19 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
         />
       </View>
     )
+  }
+
+  // The attempt count is derived from what the lockout hook read back from
+  // storage, so it survives a relaunch instead of living in its own state.
+  const attemptsText = () => {
+    if (farewellText) return farewellText
+    if (!isAuthenticate) return helperText
+    if (lockout.attemptsRemaining === null) return helperText
+    return lockout.attemptsRemaining === 1
+      ? LL.PinScreen.oneAttemptRemaining()
+      : LL.PinScreen.attemptsRemaining({
+          attemptsRemaining: lockout.attemptsRemaining,
+        })
   }
 
   return (
@@ -198,11 +174,13 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
         {circleComponentForDigit(3)}
       </View>
       <View style={styles.helperTextContainer}>
-        <Text style={styles.helperText}>
-          {isLocked
-            ? LL.PinScreen.tryAgainIn({ seconds: Math.ceil(remainingMs / 1000) })
-            : helperText}
-        </Text>
+        {/* Both lines, so a countdown never hides how many tries are left. */}
+        <Text style={styles.helperText}>{attemptsText()}</Text>
+        {lockout.isLocked ? (
+          <Text style={styles.helperText}>
+            {LL.PinScreen.tryAgainIn({ seconds: lockout.remainingSeconds })}
+          </Text>
+        ) : null}
       </View>
       <View style={styles.pinPad}>
         <View style={styles.pinPadRow}>
@@ -225,11 +203,12 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
           {buttonComponentForDigit("0")}
           <View style={styles.pinPadButtonContainer}>
             <Button
+              testID="pinPadBackspace"
               buttonStyle={styles.pinPadButton}
-              disabled={isLocked}
+              disabled={lockout.isInputDisabled}
               disabledStyle={styles.pinPadButton}
               icon={<GaloyIcon name="arrow-left" size={32} color="white" />}
-              onPress={() => setEnteredPIN(enteredPIN.slice(0, -1))}
+              onPress={removeDigit}
             />
           </View>
         </View>

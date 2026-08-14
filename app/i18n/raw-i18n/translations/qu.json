@@ -2162,12 +2162,13 @@
   },
   "PinScreen": {
     "attemptsRemaining": "Mana kani PIN. {attemptsRemaining: number} rantiq kani.",
+    "lockoutUnavailable": "Manam allinta waqaychayta atirqanchu pantasqa kutita. Chiqanichu.",
     "oneAttemptRemaining": "Mana kani PIN. 1 rantiq kani.",
     "setPin": "PIN kodiyan kani",
     "setPinFailedMatch": "PIN kodiyan mana kani - PIN kodiyan kani.",
     "storePinFailed": "Ñuqa PIN kodiyan kawsayninkuqa mana kani.",
     "tooManyAttempts": "Rantiq kawsayninkuqa hukllaqmi. Chiqanichu.",
-    "tryAgainIn": "Ancha achka pantasqa kutikuna. Wakmanta ruwaykuy {seconds: number} s qhipata.",
+    "tryAgainIn": "Wakmanta ruwaykuy {seconds: number} s qhipata.",
     "verifyPin": "PIN qillqinmi qhipanichu"
   },
   "PriceHistoryScreen": {

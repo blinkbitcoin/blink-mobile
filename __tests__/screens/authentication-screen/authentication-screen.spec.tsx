@@ -51,8 +51,7 @@ jest.mock("@app/utils/biometricAuthentication", () => ({
 jest.mock("@app/utils/storage/secureStorage", () => ({
   __esModule: true,
   default: {
-    resetPinAttempts: jest.fn(),
-    removePinLockedUntil: jest.fn(),
+    clearPinFailureState: jest.fn().mockResolvedValue(undefined),
     setIsBiometricsEnabled: jest.fn(),
     /** Read by the account registry the screen renders under. */
     getSessionProfiles: jest.fn().mockResolvedValue([]),
@@ -126,6 +125,18 @@ describe("AuthenticationScreen", () => {
     expect(mockSetAppUnlocked).toHaveBeenCalledTimes(1)
     expect(mockReplace).toHaveBeenCalledWith("Primary")
     expect(mockGoBack).not.toHaveBeenCalled()
+  })
+
+  it("clears the pin lockout before leaving, so biometrics doesn't strand a lock", async () => {
+    // Proving identity biometrically has to release the pin lockout, and the
+    // write has to land before we navigate away: a kill in that gap would
+    // leave the user locked out, one wrong digit from a forced logout.
+    renderScreen(false)
+    await flushEffects()
+
+    const clearOrder =
+      jest.mocked(KeyStoreWrapper).clearPinFailureState.mock.invocationCallOrder[0]
+    expect(clearOrder).toBeLessThan(mockSetAppUnlocked.mock.invocationCallOrder[0])
   })
 
   it("treats a missing resume flag as a cold start", async () => {

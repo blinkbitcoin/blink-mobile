@@ -40,8 +40,9 @@ export const AuthenticationScreen: React.FC<Props> = ({ route }) => {
 
   const handleAuthenticationSuccess = React.useCallback(async () => {
     if (screenPurpose === AuthenticationScreenPurpose.Authenticate) {
-      KeyStoreWrapper.resetPinAttempts()
-      KeyStoreWrapper.removePinLockedUntil()
+      // Awaited so a kill right after unlock can't leave a stale lock behind
+      // for a user who has just proven who they are biometrically.
+      await KeyStoreWrapper.clearPinFailureState()
     } else if (screenPurpose === AuthenticationScreenPurpose.TurnOnAuthentication) {
       KeyStoreWrapper.setIsBiometricsEnabled()
     }

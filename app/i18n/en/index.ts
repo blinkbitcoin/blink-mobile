@@ -2166,12 +2166,13 @@ const en: BaseTranslation = {
   },
   PinScreen: {
     attemptsRemaining: "Incorrect PIN. {attemptsRemaining: number} attempts remaining.",
+    lockoutUnavailable: "Couldn't record the failed attempt securely. Logging out.",
     oneAttemptRemaining: "Incorrect PIN. 1 attempt remaining.",
     setPin: "Set your PIN code",
     setPinFailedMatch: "Pins didn't match - Set your PIN code",
     storePinFailed: "Unable to store your pin.",
     tooManyAttempts: "Too many failed attempts. Logging out.",
-    tryAgainIn: "Too many failed attempts. Try again in {seconds: number}s.",
+    tryAgainIn: "Try again in {seconds: number}s.",
     verifyPin: "Verify your PIN code",
   },
   PriceHistoryScreen: {

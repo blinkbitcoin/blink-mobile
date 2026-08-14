@@ -2162,12 +2162,13 @@
   },
   "PinScreen": {
     "attemptsRemaining": "Սխալ PIN: {attemptsRemaining: number} փորձեր են մնացել։ ",
+    "lockoutUnavailable": "Չհաջողվեց ապահով կերպով գրանցել ձախողված փորձը։ Ելք համակարգից։",
     "oneAttemptRemaining": "Սխալ PIN: 1 փորձ է մնացել։ ",
     "setPin": "Սահմանել PIN ծածկագիր",
     "setPinFailedMatch": "Pin ծածկագրերը չեն համընկնում - Կարգավորել PIN ծածկագիրը",
     "storePinFailed": "Չհաջողվեց պահպանել Ձեր pin-ը։ ",
     "tooManyAttempts": "Չափից շատ անհաջող փորձեր։ Ելք համակարգից։ ",
-    "tryAgainIn": "Չափազանց շատ ձախողված փորձեր: Կրկին փորձեք {seconds: number} վ-ից:",
+    "tryAgainIn": "Կրկին փորձեք {seconds: number} վ-ից:",
     "verifyPin": "Հաստատեք Ձեր PIN ծածկագիրը"
   },
   "PriceHistoryScreen": {

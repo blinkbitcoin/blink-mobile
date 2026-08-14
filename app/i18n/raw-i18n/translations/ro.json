@@ -2162,12 +2162,13 @@
   },
   "PinScreen": {
     "attemptsRemaining": "PIN incorect. {attemptsRemaining: number} încercări rămase.",
+    "lockoutUnavailable": "Încercarea eșuată nu a putut fi înregistrată în siguranță. Deconectare.",
     "oneAttemptRemaining": "PIN incorect. 1 încercare rămasă.",
     "setPin": "Setează codul PIN",
     "setPinFailedMatch": "Pinurile nu se potrivesc - Setează codul PIN",
     "storePinFailed": "Nu se poate stoca codul PIN.",
     "tooManyAttempts": "Prea multe încercări eșuate. Deconectare.",
-    "tryAgainIn": "Prea multe încercări eșuate. Încercați din nou în {seconds: number} s.",
+    "tryAgainIn": "Încercați din nou în {seconds: number} s.",
     "verifyPin": "Verificați codul PIN"
   },
   "PriceHistoryScreen": {

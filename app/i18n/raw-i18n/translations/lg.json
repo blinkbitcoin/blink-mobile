@@ -2162,12 +2162,13 @@
   },
   "PinScreen": {
     "attemptsRemaining": "PIN enkyamu. {attemptsRemaining: number} okugezaako okusigaddewo.",
+    "lockoutUnavailable": "Tetusobodde kuwandiika kugezaako okulemeredwa mu bukuumi. Logging out.",
     "oneAttemptRemaining": "PIN enkyamu. mulundi 1 ogw'okugezaako ogusigaddewo.",
     "setPin": "Kola PIN yo",
     "setPinFailedMatch": "Pins tezikwatagana - Kola PIN yo",
     "storePinFailed": "Tetusobodde kutereka pin yo",
     "tooManyAttempts": "Okugezaako okungi ennyo okulemeredwa. Logging out.",
-    "tryAgainIn": "Ogezezza emirundi mingi nnyo. Gezaako nate mu {seconds: number} s.",
+    "tryAgainIn": "Gezaako nate mu {seconds: number} s.",
     "verifyPin": "Kakasa pini koodi yo"
   },
   "PriceHistoryScreen": {
