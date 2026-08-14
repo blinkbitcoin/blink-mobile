@@ -47,8 +47,34 @@ if (typeof appConfig !== "object" || appConfig === null || typeof appConfig.then
   )
 }
 
+// Escape hatch for a worktree whose node_modules is shared with (or symlinked
+// to) another checkout: Metro resolves from the project root outward, so a
+// worktree without its own real node_modules fails with
+// `UnableToResolveError: <pkg> could not be found`. Pointing nodeModulesPaths
+// and watchFolders at the real directory fixes it.
+//
+// Opt-in on purpose - the skill's primary advice is still a real node_modules
+// copy, which is proven and avoids a second failure mode Metro has with
+// symlinked module trees (`_lruCache is not a constructor`).
+//
+// Note the resolver spread: this file's top-level spread is shallow, so a bare
+// `resolver: {...}` key would silently drop the app's own extraNodeModules,
+// sourceExts and resolverMainFields (svg transform, stream/zlib shims - the
+// app renders wrong rather than failing loudly).
+const sharedModules = process.env.DEMO_NODE_MODULES
+const resolverOverride = sharedModules
+  ? {
+      resolver: {
+        ...appConfig.resolver,
+        nodeModulesPaths: [...((appConfig.resolver || {}).nodeModulesPaths || []), sharedModules],
+      },
+      watchFolders: [...(appConfig.watchFolders || []), sharedModules],
+    }
+  : {}
+
 module.exports = {
   ...appConfig,
+  ...resolverOverride,
   transformer: {
     ...appConfig.transformer,
     // @react-native/metro-config require.resolve()s this to an ABSOLUTE path,

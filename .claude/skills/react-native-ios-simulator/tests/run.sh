@@ -1067,6 +1067,15 @@ check "a reload opens exactly two websocket connections" "2" \
   "$(grep -c "^connect " "$WS_LOG")"
 kill "$WS_PID" 2>/dev/null
 
+# The count in SKILL.md is documentation that rots silently - it drifted to 105
+# against 97 actual once. Comparing it here makes the drift a red build instead
+# of a number nobody checks.
+DOC_COUNT=$(grep -o '# [0-9]\+ assertions' "$TESTS_DIR/../SKILL.md" 2>/dev/null | head -1 | grep -o '[0-9]\+' || echo "")
+ACTUAL_COUNT=$((PASS + FAIL))
+if [ -n "$DOC_COUNT" ] && [ "$DOC_COUNT" != "$ACTUAL_COUNT" ]; then
+  bad "SKILL.md documents the suite's own size" "$DOC_COUNT assertions" "$ACTUAL_COUNT"
+fi
+
 echo
 echo "-------------------------------------"
 printf '%d passed, %d failed\n' "$PASS" "$FAIL"

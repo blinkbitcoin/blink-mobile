@@ -107,25 +107,45 @@ else
 fi
 rm -f "$OUT"
 
-# --- The clearState guard (iOS only) -----------------------------------------
-# clearState wipes the app data container, which is where the persisted
-# RCT_jsLocation Metro redirect lives; the next launchApp then silently loads
-# the user's 8081 bundler and the recording shows a stuck splash. Launch
-# arguments are immune (they live in the process argument domain, per launch),
-# so a clearState flow must re-pass the redirect on EVERY launchApp:
+# --- The clearState guard ----------------------------------------------------
+# clearState wipes the app data container - which on BOTH platforms is where
+# this session's Metro pointer lives:
 #
-#   - launchApp:
-#       clearState: true
-#       arguments:
-#         RCT_jsLocation: "localhost:${DEMO_PORT}"
+#   iOS      the persisted RCT_jsLocation default. Launch arguments are immune
+#            (process argument domain, per launch), so a clearState flow must
+#            re-pass the redirect on EVERY launchApp:
 #
-# Android is exempt: Metro reaches an emulator over adb reverse, not app data.
-if [ "$PLATFORM" = ios ] && [ -z "$ALLOW_CLEAR_STATE" ]; then
-  if grep -q "clearState" "$FLOW" && ! grep -q "RCT_jsLocation" "$FLOW"; then
+#              - launchApp:
+#                  clearState: true
+#                  arguments:
+#                    RCT_jsLocation: "localhost:${DEMO_PORT}"
+#
+#   Android  the debug_http_host SharedPreference written by
+#            point-app-at-metro.sh. There is no launch-argument equivalent, so
+#            the remedy is to re-run that script after the clearing launch.
+#
+# Either way the failure is silent and identical: the next launch dials the
+# default dev server - 8081, which on a shared Mac is another agent's Metro -
+# and the recording shows a stuck splash or, worse, somebody else's build.
+#
+# (This used to exempt Android on the belief that "Metro reaches an emulator
+# over adb reverse, not app data". Both halves were wrong: an emulator resolves
+# the dev server to 10.0.2.2:8081 and never consults a reverse tunnel, and once
+# the claimed port lives in debug_http_host the pointer IS app data.)
+if [ -z "$ALLOW_CLEAR_STATE" ] && grep -q "clearState" "$FLOW"; then
+  if [ "$PLATFORM" = ios ] && ! grep -q "RCT_jsLocation" "$FLOW"; then
     die "flow clears app state without re-passing the Metro redirect.
        clearState wipes the persisted RCT_jsLocation default, so every launchApp
        in this flow must carry: arguments: { RCT_jsLocation: \"localhost:\${DEMO_PORT}\" }
        (or use reset-app.sh from the simulator skill instead; --allow-clear-state waives this check)"
+  fi
+  if [ "$PLATFORM" = android ] && ! grep -q "point-app-at-metro" "$FLOW"; then
+    die "flow clears app state, which deletes the debug_http_host preference
+       pointing this emulator at Metro on port ${DEMO_PORT:-<claimed>}. The next launch would
+       dial 10.0.2.2:8081 - another agent's bundler - and record their build or a
+       stuck splash. Re-run point-app-at-metro.sh after the clearing launch, and
+       note that here (a '# point-app-at-metro' comment in the flow acknowledges it);
+       --allow-clear-state waives this check."
   fi
 fi
 
@@ -137,17 +157,21 @@ fi
 T_WARMUP=$(tel_now)
 # The warmup is only needed once per device per Maestro version - the driver
 # it installs persists. Three ways to know it already happened, checked in
-# order of directness (iOS only: the session markers live in the iOS session
-# dir, and an Android emulator never shares a device with an iOS session):
+# order of directness:
 #   manual   DEMO_SKIP_WARMUP=1, the caller's own judgment
-#   session  an earlier maestro run in this session left the warmed marker
+#   session  an earlier maestro run in this session left the warmed marker.
+#            Platform-neutral now that Android sessions have a session dir of
+#            their own - Android used to pay the full ~20s on EVERY recording
+#            purely because it had nowhere to keep the marker.
 #   golden   the clone carries a driver baked by bless-golden.sh, and the
 #            stamped maestro version still matches - after a CLI upgrade the
-#            driver silently re-installs, so a mismatch must warm up again
+#            driver silently re-installs, so a mismatch must warm up again.
+#            iOS-only: the golden is a simulator clone, and an AVD has no
+#            equivalent yet.
 WARM_REASON=""
 if [ -n "$SKIP_WARMUP" ]; then
   WARM_REASON="manual"
-elif [ "$PLATFORM" = ios ] && [ -n "${DEMO_SESSION_DIR:-}" ] && [ -f "$DEMO_SESSION_DIR/maestro-warmed" ]; then
+elif [ -n "${DEMO_SESSION_DIR:-}" ] && [ -f "$DEMO_SESSION_DIR/maestro-warmed" ]; then
   WARM_REASON="session"
 elif [ "$PLATFORM" = ios ] && [ -n "${DEMO_SESSION_DIR:-}" ] && [ -f "$DEMO_SESSION_DIR/golden-stamp" ]; then
   STAMP_MV=$(grep '^maestro-version=' "$DEMO_SESSION_DIR/golden-stamp" 2>/dev/null | cut -d= -f2- || true)
@@ -167,7 +191,7 @@ if [ -z "$WARM_REASON" ]; then
   if [ -f "$WARMUP" ]; then
     echo "warming up the maestro driver..."
     maestro test --udid "$DEVICE" -e APP_ID="$APP_ID" "$WARMUP" >/dev/null 2>&1
-    [ "$PLATFORM" = ios ] && [ -n "${DEMO_SESSION_DIR:-}" ] && touch "$DEMO_SESSION_DIR/maestro-warmed" 2>/dev/null
+    [ -n "${DEMO_SESSION_DIR:-}" ] && touch "$DEMO_SESSION_DIR/maestro-warmed" 2>/dev/null
   fi
   tel_emit vid.record.warmup "$T_WARMUP" platform="$PLATFORM" skipped=0
 else
@@ -288,7 +312,7 @@ tel_emit vid.record.flow "$T_FLOW" platform="$PLATFORM" rc="$FLOW_RC" \
   ok="$([ "$FLOW_RC" -eq 0 ] && echo 1 || echo 0)"
 # A successful flow proves the driver works - later recordings in this
 # session need no warmup even if this one's was skipped manually.
-if [ "$FLOW_RC" -eq 0 ] && [ "$PLATFORM" = ios ] && [ -n "${DEMO_SESSION_DIR:-}" ]; then
+if [ "$FLOW_RC" -eq 0 ] && [ -n "${DEMO_SESSION_DIR:-}" ]; then
   touch "$DEMO_SESSION_DIR/maestro-warmed" 2>/dev/null || true
 fi
 
