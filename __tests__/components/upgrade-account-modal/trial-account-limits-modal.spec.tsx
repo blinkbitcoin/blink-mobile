@@ -14,12 +14,14 @@ jest.mock("@react-navigation/native", () => ({
   useNavigation: () => ({ navigate: mockNavigate }),
 }))
 
-// avoid pulling the firebase app-check native module in via the phone-auth screen
-jest.mock("@app/screens/phone-auth-screen", () => ({
-  PhoneLoginInitiateType: { Login: "Login", CreateAccount: "CreateAccount" },
-}))
+// avoid pulling the firebase app-check native module in via the phone-auth screen,
+// but keep the real wire values so a rename of them breaks the navigation assertion
+jest.mock("@app/screens/phone-auth-screen", () =>
+  jest.requireActual("@app/screens/phone-auth-screen/phone-login-initiate-type"),
+)
 
 import { TrialAccountLimitsModal } from "@app/components/upgrade-account-modal"
+import { PhoneLoginInitiateType } from "@app/screens/phone-auth-screen/phone-login-initiate-type"
 
 loadLocale("en")
 
@@ -79,7 +81,7 @@ describe("TrialAccountLimitsModal", () => {
 
     expect(beforeSubmit).toHaveBeenCalledTimes(1)
     expect(mockNavigate).toHaveBeenCalledWith("login", {
-      type: "CreateAccount",
+      type: PhoneLoginInitiateType.CreateAccount,
       title: UPGRADE_CTA,
       onboarding: true,
     })
