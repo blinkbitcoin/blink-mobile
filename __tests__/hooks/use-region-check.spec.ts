@@ -2,185 +2,277 @@ import { renderHook } from "@testing-library/react-native"
 
 import { useRegionCheck, useRegionCheckLazy } from "@app/hooks/use-region-check"
 
-const mockUseRemoteConfig = jest.fn()
-const mockUseFeatureFlags = jest.fn()
-const mockUseIpCountryLookup = jest.fn()
-const mockResolveIpCountryCodeCached = jest.fn()
+const mockUseRegionCheckQuery = jest.fn()
+const mockClientQuery = jest.fn()
 const mockUpdateCountryCode = jest.fn()
+const mockUseSelfCustodialAccountMode = jest.fn()
 
-jest.mock("@app/config/feature-flags-context", () => ({
-  useRemoteConfig: () => mockUseRemoteConfig(),
-  useFeatureFlags: () => mockUseFeatureFlags(),
+jest.mock("@app/graphql/generated", () => ({
+  ...jest.requireActual("@app/graphql/generated"),
+  useRegionCheckQuery: (options: unknown) => mockUseRegionCheckQuery(options),
 }))
 
 jest.mock("@apollo/client", () => ({
   ...jest.requireActual("@apollo/client"),
-  useApolloClient: () => ({}),
+  useApolloClient: () => ({ query: (options: unknown) => mockClientQuery(options) }),
 }))
 
 jest.mock("@app/graphql/client-only-query", () => ({
   updateCountryCode: (...args: unknown[]) => mockUpdateCountryCode(...args),
 }))
 
-/** Reached through use-device-location, and it warns about API keys on import. */
-jest.mock("@app/utils/ip-country-lookup", () => ({
-  resolveIpCountryCodeCached: () => mockResolveIpCountryCodeCached(),
+jest.mock("@app/self-custodial/hooks/use-self-custodial-account-mode", () => ({
+  useSelfCustodialAccountMode: () => mockUseSelfCustodialAccountMode(),
 }))
 
-jest.mock("@app/hooks/use-device-location", () => ({
-  __esModule: true,
-  ...jest.requireActual("@app/hooks/use-device-location"),
-  useIpCountryLookup: (enabled: boolean) => mockUseIpCountryLookup(enabled),
-}))
+type ServerVerdict = {
+  countryCode?: string | null
+  custodialCreationAllowed: boolean
+  restricted: boolean
+}
 
+const ALLOWED: ServerVerdict = {
+  countryCode: "SV",
+  custodialCreationAllowed: true,
+  restricted: false,
+}
+
+/** null stands for "the query answered nothing", which `undefined` cannot: it would take
+ *  the parameter default instead. */
 const setUp = ({
   enabled = true,
-  countryCode,
-  isLookupSettled = true,
-  remoteConfigReady = true,
-  custodialCreationBlockedCountries = ["CU", "IR"],
+  isAnonMode = false,
+  regionCheck = ALLOWED,
+  loading = false,
 }: {
   enabled?: boolean
-  countryCode?: string
-  isLookupSettled?: boolean
-  remoteConfigReady?: boolean
-  custodialCreationBlockedCountries?: string[]
+  isAnonMode?: boolean
+  regionCheck?: ServerVerdict | null
+  loading?: boolean
 }) => {
-  mockUseIpCountryLookup.mockReturnValue({ countryCode, isSettled: isLookupSettled })
-  mockUseFeatureFlags.mockReturnValue({ remoteConfigReady })
-  mockUseRemoteConfig.mockReturnValue({ custodialCreationBlockedCountries })
+  mockUseSelfCustodialAccountMode.mockReturnValue({ isAnonMode })
+  mockUseRegionCheckQuery.mockReturnValue({
+    data: regionCheck ? { regionCheck } : undefined,
+    loading,
+  })
   return renderHook(() => useRegionCheck(enabled)).result.current
 }
+
+/** What the query hook was told, so the skip decision can be read directly. */
+const lastQueryOptions = () => mockUseRegionCheckQuery.mock.calls.at(-1)?.[0]
 
 describe("useRegionCheck", () => {
   beforeEach(() => jest.clearAllMocks())
 
   describe("the verdict", () => {
-    it("refuses creation and reports the session restricted in a listed country", () => {
-      const verdict = setUp({ countryCode: "CU" })
+    it("reports the refusal the server gave, rather than deriving one", () => {
+      const verdict = setUp({
+        regionCheck: {
+          countryCode: "CU",
+          custodialCreationAllowed: false,
+          restricted: true,
+        },
+      })
 
       expect(verdict.custodialCreationAllowed).toBe(false)
       expect(verdict.restricted).toBe(true)
     })
 
-    it("allows both where the list does not carry the country", () => {
-      const verdict = setUp({ countryCode: "SV" })
+    it("carries the two fields separately, since the server separates them", () => {
+      // A country closed to new accounts is not necessarily a sanctioned session.
+      const verdict = setUp({
+        regionCheck: {
+          countryCode: "PK",
+          custodialCreationAllowed: false,
+          restricted: false,
+        },
+      })
+
+      expect(verdict.custodialCreationAllowed).toBe(false)
+      expect(verdict.restricted).toBe(false)
+    })
+
+    it("allows both where the server restricts nothing", () => {
+      const verdict = setUp({ regionCheck: ALLOWED })
 
       expect(verdict.custodialCreationAllowed).toBe(true)
       expect(verdict.restricted).toBe(false)
     })
 
-    it("allows both while the country is unresolved", () => {
-      // Nothing was read, so nothing may be held against the user.
-      const verdict = setUp({ countryCode: undefined })
+    it("holds nothing against the user when the query answered nothing", () => {
+      const verdict = setUp({ regionCheck: null })
 
+      expect(verdict.countryCode).toBeUndefined()
       expect(verdict.custodialCreationAllowed).toBe(true)
       expect(verdict.restricted).toBe(false)
     })
 
-    it("matches case-insensitively, since the list is stored uppercase", () => {
-      expect(setUp({ countryCode: "cu" }).restricted).toBe(true)
+    it("reports the country the server resolved", () => {
+      expect(setUp({ regionCheck: ALLOWED }).countryCode).toBe("SV")
     })
 
-    it("reports the country it resolved", () => {
-      expect(setUp({ countryCode: "SV" }).countryCode).toBe("SV")
+    it("uppercases the country, so every caller reads one casing", () => {
+      expect(setUp({ regionCheck: { ...ALLOWED, countryCode: "sv" } }).countryCode).toBe(
+        "SV",
+      )
+    })
+
+    it("reports a verdict the server could not attach a country to", () => {
+      const verdict = setUp({
+        regionCheck: {
+          countryCode: null,
+          custodialCreationAllowed: true,
+          restricted: false,
+        },
+      })
+
+      expect(verdict.countryCode).toBeUndefined()
+      expect(verdict.restricted).toBe(false)
     })
   })
 
   describe("locating the user", () => {
-    it("resolves nothing for a caller that did not ask", () => {
-      // Reading the region is the act of locating someone. Anon is the standing case.
+    it("asks nothing for a caller that did not ask", () => {
+      // Reading the region is the act of locating someone.
       setUp({ enabled: false })
 
-      expect(mockUseIpCountryLookup).toHaveBeenCalledWith(false)
+      expect(lastQueryOptions()).toMatchObject({ skip: true })
     })
 
-    it("passes the caller's intent through to the lookup", () => {
+    it("asks nothing in Anon, which spoke for an account that declined to be located", () => {
+      setUp({ enabled: true, isAnonMode: true })
+
+      expect(lastQueryOptions()).toMatchObject({ skip: true })
+    })
+
+    it("asks once the caller has a reason to", () => {
       setUp({ enabled: true })
 
-      expect(mockUseIpCountryLookup).toHaveBeenCalledWith(true)
+      expect(lastQueryOptions()).toMatchObject({ skip: false })
+    })
+
+    it("never reads a cached verdict, which could speak for a network already left", () => {
+      setUp({ enabled: true })
+
+      expect(lastQueryOptions()).toMatchObject({ fetchPolicy: "no-cache" })
+    })
+
+    it("withholds a verdict left over from before Anon was entered", () => {
+      // The skip keeps Apollo's last data around; returning it would leak a country the
+      // account asked not to have read.
+      const verdict = setUp({ isAnonMode: true, regionCheck: ALLOWED })
+
+      expect(verdict.countryCode).toBeUndefined()
+      expect(verdict.restricted).toBe(false)
     })
   })
 
   describe("isSettled", () => {
     it("is settled at once for a caller that asks nothing", () => {
       // There is no answer coming, so waiting on one would never end.
-      expect(setUp({ enabled: false, isLookupSettled: false }).isSettled).toBe(true)
+      expect(setUp({ enabled: false, loading: true }).isSettled).toBe(true)
     })
 
-    it("is false while the lookup is still running", () => {
-      expect(setUp({ isLookupSettled: false }).isSettled).toBe(false)
+    it("is settled at once in Anon", () => {
+      expect(setUp({ isAnonMode: true, loading: true }).isSettled).toBe(true)
     })
 
-    it("is false until remote config has answered", () => {
-      // An empty list mid-fetch would read as a country nothing restricts.
-      expect(setUp({ countryCode: "CU", remoteConfigReady: false }).isSettled).toBe(false)
+    it("is false while the query is in flight", () => {
+      expect(setUp({ loading: true }).isSettled).toBe(false)
     })
 
-    it("is true once both have settled, resolved country or not", () => {
-      expect(setUp({ countryCode: "SV" }).isSettled).toBe(true)
-      expect(setUp({ countryCode: undefined }).isSettled).toBe(true)
+    it("settles on an answer, and on the absence of one", () => {
+      // An unreachable server is not a verdict, and holding the UI on it would strand a
+      // user the app has no service left to protect anyway.
+      expect(setUp({ regionCheck: ALLOWED }).isSettled).toBe(true)
+      expect(setUp({ regionCheck: null }).isSettled).toBe(true)
     })
   })
 })
 
 describe("useRegionCheckLazy", () => {
-  const setUpLazy = ({
-    ipCountryCode,
-    custodialCreationBlockedCountries = ["CU", "IR"],
-  }: {
-    ipCountryCode?: string
-    custodialCreationBlockedCountries?: string[]
-  }) => {
-    mockResolveIpCountryCodeCached.mockResolvedValue(ipCountryCode)
-    mockUseRemoteConfig.mockReturnValue({ custodialCreationBlockedCountries })
+  const setUpLazy = (result: { data?: { regionCheck: ServerVerdict } } | Error) => {
+    if (result instanceof Error) mockClientQuery.mockRejectedValue(result)
+    else mockClientQuery.mockResolvedValue(result)
     return renderHook(() => useRegionCheckLazy()).result.current
   }
 
   beforeEach(() => jest.clearAllMocks())
 
   it("locates nobody until it is called", () => {
-    setUpLazy({ ipCountryCode: "CU" })
+    setUpLazy({ data: { regionCheck: ALLOWED } })
 
     // The creation screens hold this hook while the user is still only browsing.
-    expect(mockResolveIpCountryCodeCached).not.toHaveBeenCalled()
+    expect(mockClientQuery).not.toHaveBeenCalled()
   })
 
-  it("refuses creation and reports restricted in a listed country", async () => {
-    const verdict = await setUpLazy({ ipCountryCode: "CU" })()
+  it("reports the refusal the server gave", async () => {
+    const verdict = await setUpLazy({
+      data: {
+        regionCheck: {
+          countryCode: "CU",
+          custodialCreationAllowed: false,
+          restricted: true,
+        },
+      },
+    })()
 
     expect(verdict.custodialCreationAllowed).toBe(false)
     expect(verdict.restricted).toBe(true)
     expect(verdict.countryCode).toBe("CU")
   })
 
-  it("allows both where the list does not carry the country", async () => {
-    const verdict = await setUpLazy({ ipCountryCode: "SV" })()
+  it("allows both where the server restricts nothing", async () => {
+    const verdict = await setUpLazy({ data: { regionCheck: ALLOWED } })()
 
     expect(verdict.custodialCreationAllowed).toBe(true)
     expect(verdict.restricted).toBe(false)
   })
 
-  it("uppercases what the provider returned before matching the list", async () => {
-    const verdict = await setUpLazy({ ipCountryCode: "cu" })()
+  it("uppercases what the server returned", async () => {
+    const verdict = await setUpLazy({
+      data: { regionCheck: { ...ALLOWED, countryCode: "sv" } },
+    })()
 
-    expect(verdict.countryCode).toBe("CU")
-    expect(verdict.restricted).toBe(true)
+    expect(verdict.countryCode).toBe("SV")
   })
 
-  it("answers an unresolved country as such, with nothing held against the user", async () => {
-    const verdict = await setUpLazy({ ipCountryCode: undefined })()
+  it("never reads a cached verdict", async () => {
+    await setUpLazy({ data: { regionCheck: ALLOWED } })()
 
-    // No local fallback: the country-code cache answers "SV" for an unset value, and
-    // reading it would turn "could not resolve" into a country nobody read.
+    expect(mockClientQuery).toHaveBeenCalledWith(
+      expect.objectContaining({ fetchPolicy: "no-cache" }),
+    )
+  })
+
+  it("answers an unreachable server as an unread region", async () => {
+    // Account creation refuses on this rather than guessing; it is the one caller that
+    // must not proceed without a region.
+    const verdict = await setUpLazy(new Error("network down"))()
+
     expect(verdict.countryCode).toBeUndefined()
     expect(verdict.custodialCreationAllowed).toBe(true)
     expect(verdict.restricted).toBe(false)
     expect(mockUpdateCountryCode).not.toHaveBeenCalled()
   })
 
+  it("answers a verdict with no country as an unread region", async () => {
+    const verdict = await setUpLazy({
+      data: {
+        regionCheck: {
+          countryCode: null,
+          custodialCreationAllowed: true,
+          restricted: false,
+        },
+      },
+    })()
+
+    expect(verdict.countryCode).toBeUndefined()
+    expect(mockUpdateCountryCode).not.toHaveBeenCalled()
+  })
+
   it("records the answer, so the rest of the app shares the country it read", async () => {
-    await setUpLazy({ ipCountryCode: "SV" })()
+    await setUpLazy({ data: { regionCheck: ALLOWED } })()
 
     expect(mockUpdateCountryCode).toHaveBeenCalledWith(expect.anything(), "SV")
   })

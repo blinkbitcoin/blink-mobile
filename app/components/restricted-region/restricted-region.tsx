@@ -8,7 +8,7 @@ import React, {
   useState,
 } from "react"
 
-import { useRemoteConfig } from "@app/config/feature-flags-context"
+import { useFeatureFlags, useRemoteConfig } from "@app/config/feature-flags-context"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { RestrictedRegionScreen } from "@app/custodial/components/restricted-region-screen"
 import { isBlockedCountry } from "@app/hooks/use-device-location"
@@ -57,9 +57,9 @@ const useEvaluateRestrictedRegion = (): RestrictedRegionEvaluation => {
   const { activeAccount, loading: isRegistryHydrating } = useAccountRegistry()
   const accountType = activeAccount?.type
   const { selfCustodialCreationBlockedCountries } = useRemoteConfig()
-  /** Custodial answers through the hook the server will serve; a self-custodial wallet has
-   *  no Blink account behind it and keeps its own list. `isSettled` already spans the
-   *  remote-config fetch, so both branches wait on it. */
+  const { remoteConfigReady } = useFeatureFlags()
+  /** Custodial answers through the server's own verdict; a self-custodial wallet has no
+   *  Blink account behind it and keeps its own list. */
   const hasAccountToEvaluate = accountType !== undefined
   const {
     countryCode,
@@ -83,7 +83,11 @@ const useEvaluateRestrictedRegion = (): RestrictedRegionEvaluation => {
   const isRestrictedRegion = isSelfCustodial
     ? isSelfCustodialRestricted
     : isCustodialRestricted
-  const isEvaluationPending = isRegistryHydrating || !isSettled
+  /** Only the self-custodial branch still reads a compiled-in list, so only it waits on
+   *  the fetch: an empty list mid-flight would read as a country nothing restricts. The
+   *  custodial verdict is the server's and needs no list at all. */
+  const isListPending = isSelfCustodial && !remoteConfigReady
+  const isEvaluationPending = isRegistryHydrating || !isSettled || isListPending
 
   return { isRestrictedRegion, isEvaluationPending, accountType }
 }

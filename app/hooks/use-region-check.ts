@@ -1,11 +1,25 @@
 import { useCallback } from "react"
 
-import { useApolloClient } from "@apollo/client"
-import { useFeatureFlags, useRemoteConfig } from "@app/config/feature-flags-context"
+import { gql, useApolloClient } from "@apollo/client"
 import { updateCountryCode } from "@app/graphql/client-only-query"
-import { resolveIpCountryCodeCached } from "@app/utils/ip-country-lookup"
+import {
+  RegionCheckDocument,
+  RegionCheckQuery,
+  useRegionCheckQuery,
+} from "@app/graphql/generated"
+import { CountryCode } from "libphonenumber-js/mobile"
 
-import { isBlockedCountry, useIpCountryLookup } from "./use-device-location"
+import { useSelfCustodialAccountMode } from "@app/self-custodial/hooks/use-self-custodial-account-mode"
+
+gql`
+  query regionCheck {
+    regionCheck {
+      countryCode
+      custodialCreationAllowed
+      restricted
+    }
+  }
+`
 
 /**
  * The session's region verdict, shaped after the `regionCheck` query that will serve it.
@@ -37,46 +51,48 @@ const UNRESOLVED_VERDICT: RegionCheckVerdict = Object.freeze({
 })
 
 /**
- * One list answers both today, so a country closed to new accounts is also read as
- * sanctioned. The server separates them, and this shape already carries the two fields
- * that will hold the difference.
+ * The server separates "closed to new accounts" from "sanctioned", so the two fields are
+ * read as given rather than derived from one another. A verdict with no country is one the
+ * server could not resolve, which restricts nothing.
  */
 const toVerdict = (
-  resolvedCountry: string,
-  custodialCreationBlockedCountries: string[],
-): RegionCheckVerdict => {
-  /** Uppercased once here, so both access modes answer the same casing and the lists,
-   *  which are stored uppercase, are matched the same way. */
-  const countryCode = resolvedCountry.toUpperCase()
-  const isCountryBlocked = isBlockedCountry(
-    countryCode,
-    custodialCreationBlockedCountries,
-  )
+  regionCheck: RegionCheckQuery["regionCheck"] | undefined,
+): RegionCheckVerdict | undefined => {
+  if (!regionCheck) return undefined
 
   return {
-    countryCode,
-    custodialCreationAllowed: !isCountryBlocked,
-    restricted: isCountryBlocked,
+    /** Uppercased once here, so both access modes answer the same casing. */
+    countryCode: regionCheck.countryCode?.toUpperCase(),
+    custodialCreationAllowed: regionCheck.custodialCreationAllowed,
+    restricted: regionCheck.restricted,
   }
 }
 
 /**
  * Reading the region is the act of locating the user, so a caller with no reason to ask
- * passes false and nothing is resolved. Anon is the standing case.
+ * passes false and nothing is resolved. Anon is the standing case: it speaks for an account
+ * that exists and asked not to be located, so the query is never issued there.
  */
 export const useRegionCheck = (enabled: boolean): RegionCheck => {
-  const { custodialCreationBlockedCountries } = useRemoteConfig()
-  const { remoteConfigReady } = useFeatureFlags()
-  const { countryCode, isSettled: isLookupSettled } = useIpCountryLookup(enabled)
+  const { isAnonMode } = useSelfCustodialAccountMode()
+  const isQueryEnabled = enabled && !isAnonMode
 
-  const verdict = countryCode
-    ? toVerdict(countryCode, custodialCreationBlockedCountries)
-    : UNRESOLVED_VERDICT
+  const { data, loading } = useRegionCheckQuery({
+    skip: !isQueryEnabled,
+    /** The verdict follows the connection the request went out on, so a cached answer
+     *  could speak for a network the user has since left. */
+    fetchPolicy: "no-cache",
+  })
 
-  /** An empty list mid-fetch would read as a country nothing restricts, so the fetch is
-   *  part of the wait. A caller that asks nothing has no answer coming, so it never waits. */
-  const isVerdictSettled = isLookupSettled && remoteConfigReady
-  const isSettled = !enabled || isVerdictSettled
+  /** Read only while the query is live: a skip keeps Apollo's last data around, and
+   *  returning it would leak a verdict from before the caller stopped asking. */
+  const servedVerdict = isQueryEnabled ? toVerdict(data?.regionCheck) : undefined
+  const verdict = servedVerdict ?? UNRESOLVED_VERDICT
+
+  /** An unreachable server is not a verdict, so nothing is held against the user and the
+   *  wait ends: `regionCheck` shares an API with every other custodial feature, so there is
+   *  no service left to protect. A caller that asks nothing never waits at all. */
+  const isSettled = !isQueryEnabled || !loading
 
   return { ...verdict, isSettled }
 }
@@ -93,16 +109,24 @@ export const useRegionCheck = (enabled: boolean): RegionCheck => {
  * account being created, which has no mode of its own yet and cannot inherit another's.
  */
 export const useRegionCheckLazy = (): (() => Promise<RegionCheckVerdict>) => {
-  const { custodialCreationBlockedCountries } = useRemoteConfig()
   const client = useApolloClient()
 
   return useCallback(async () => {
-    const resolved = await resolveIpCountryCodeCached()
-    if (!resolved) return UNRESOLVED_VERDICT
+    /** An unreachable server leaves the region unread, which account creation refuses on
+     *  rather than guesses at: it is the one caller that must not proceed without one. */
+    const verdict = await client
+      .query<RegionCheckQuery>({
+        query: RegionCheckDocument,
+        fetchPolicy: "no-cache",
+      })
+      .then(({ data }) => toVerdict(data?.regionCheck))
+      .catch(() => undefined)
+
+    if (!verdict?.countryCode) return UNRESOLVED_VERDICT
 
     /** Shared with every other consumer of the country, so one read serves them all. */
-    updateCountryCode(client, resolved)
+    updateCountryCode(client, verdict.countryCode as CountryCode)
 
-    return toVerdict(resolved, custodialCreationBlockedCountries)
-  }, [client, custodialCreationBlockedCountries])
+    return verdict
+  }, [client])
 }
