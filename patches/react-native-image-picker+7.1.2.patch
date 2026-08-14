@@ -1,5 +1,5 @@
 diff --git a/node_modules/react-native-image-picker/android/src/main/java/com/imagepicker/ImagePickerModuleImpl.java b/node_modules/react-native-image-picker/android/src/main/java/com/imagepicker/ImagePickerModuleImpl.java
-index afe4b3e..2aaeb71 100644
+index afe4b3e..b39b12d 100644
 --- a/node_modules/react-native-image-picker/android/src/main/java/com/imagepicker/ImagePickerModuleImpl.java
 +++ b/node_modules/react-native-image-picker/android/src/main/java/com/imagepicker/ImagePickerModuleImpl.java
 @@ -166,17 +166,47 @@ public class ImagePickerModuleImpl implements ActivityEventListener {
@@ -55,6 +55,45 @@ index afe4b3e..2aaeb71 100644
      }
  
      @Override
+@@ -191,14 +221,32 @@ public class ImagePickerModuleImpl implements ActivityEventListener {
+             if (requestCode == REQUEST_LAUNCH_IMAGE_CAPTURE) {
+                 deleteFile(fileUri);
+             }
+-            try {
+-                callback.invoke(getCancelMap());
++            /**
++             * Claimed under the same lock as onAssetsObtained, for the same reason: the
++             * callback is single-shot and React Native aborts the process the moment one
++             * is invoked twice. The old shape invoked it a second time from inside its own
++             * catch, so the handler for a failed hand-off was itself the crash. It also
++             * left the failure path falling through to the switch below, since its return
++             * sat inside the try. Settling the response first keeps this to one invoke on
++             * every route out.
++             */
++            final Callback cancelCallback;
++            synchronized (this) {
++                cancelCallback = this.callback;
++                this.callback = null;
++            }
++            if (cancelCallback == null) {
+                 return;
+-            } catch (RuntimeException exception) {
+-                callback.invoke(getErrorMap(errOthers, exception.getMessage()));
+-            } finally {
+-                callback = null;
+             }
++
++            ReadableMap response;
++            try {
++                response = getCancelMap();
++            } catch (Throwable throwable) {
++                response = getErrorMap(errOthers, throwable.getMessage());
++            }
++            cancelCallback.invoke(response);
++            return;
+         }
+ 
+         switch (requestCode) {
 diff --git a/node_modules/react-native-image-picker/android/src/main/java/com/imagepicker/Utils.java b/node_modules/react-native-image-picker/android/src/main/java/com/imagepicker/Utils.java
 index 1e9078d..87707ae 100644
 --- a/node_modules/react-native-image-picker/android/src/main/java/com/imagepicker/Utils.java
