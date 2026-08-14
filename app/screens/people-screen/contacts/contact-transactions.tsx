@@ -2,7 +2,10 @@ import * as React from "react"
 import { SectionList, Text, View } from "react-native"
 
 import { gql } from "@apollo/client"
-import { MemoizedTransactionItem } from "@app/components/transaction-item"
+import {
+  MemoizedTransactionItem,
+  TRANSACTION_LIST_WINDOW_SIZE,
+} from "@app/components/transaction-item"
 import { useTransactionListForContactQuery } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { groupTransactionsByDate } from "@app/graphql/transactions"
@@ -34,6 +37,14 @@ type Props = {
   contactUsername: string
 }
 
+const keyExtractor = (item: { id: string }) => item.id
+
+// Rows here are deliberately not pressable: this list only shows the history
+// with one contact, it does not navigate into a transaction.
+const renderItem = ({ item }: { item: { id: string } }) => (
+  <MemoizedTransactionItem txid={item.id} />
+)
+
 export const ContactTransactions = ({ contactUsername }: Props) => {
   const styles = useStyles()
   const { LL, locale } = useI18nContext()
@@ -54,6 +65,16 @@ export const ContactTransactions = ({ contactUsername }: Props) => {
         locale,
       }),
     [transactions, LL, locale],
+  )
+
+  // Declared above the early returns below to keep hook order stable.
+  const renderSectionHeader = React.useCallback(
+    ({ section: { title } }: { section: { title: string } }) => (
+      <View style={styles.sectionHeaderContainer}>
+        <Text style={styles.sectionHeaderText}>{title}</Text>
+      </View>
+    ),
+    [styles.sectionHeaderContainer, styles.sectionHeaderText],
   )
 
   if (error) {
@@ -84,15 +105,10 @@ export const ContactTransactions = ({ contactUsername }: Props) => {
   return (
     <View style={styles.screen}>
       <SectionList
-        renderItem={({ item }) => (
-          <MemoizedTransactionItem key={`txn-${item.id}`} txid={item.id} />
-        )}
+        renderItem={renderItem}
         initialNumToRender={20}
-        renderSectionHeader={({ section: { title } }) => (
-          <View style={styles.sectionHeaderContainer}>
-            <Text style={styles.sectionHeaderText}>{title}</Text>
-          </View>
-        )}
+        windowSize={TRANSACTION_LIST_WINDOW_SIZE}
+        renderSectionHeader={renderSectionHeader}
         ListEmptyComponent={
           <View style={styles.noTransactionView}>
             <Text style={styles.noTransactionText}>
@@ -101,7 +117,7 @@ export const ContactTransactions = ({ contactUsername }: Props) => {
           </View>
         }
         sections={sections}
-        keyExtractor={(item) => item.id}
+        keyExtractor={keyExtractor}
         onEndReached={fetchNextTransactionsPage}
         onEndReachedThreshold={0.5}
       />
