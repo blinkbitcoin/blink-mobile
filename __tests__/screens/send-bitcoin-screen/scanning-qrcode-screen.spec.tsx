@@ -104,6 +104,12 @@ jest.mock("@app/utils/toast", () => ({
   toastShow: (...args: unknown[]) => mockToastShow(...args),
 }))
 
+const mockReportError = jest.fn()
+jest.mock("@app/utils/error-logging", () => ({
+  ...jest.requireActual("@app/utils/error-logging"),
+  reportError: (...args: readonly unknown[]) => mockReportError(...args),
+}))
+
 const alertSpy = jest.spyOn(Alert, "alert").mockImplementation(() => {})
 
 beforeAll(() => {
@@ -355,7 +361,7 @@ describe("ScanningQRCodeScreen", () => {
     }
 
     /**
-     * The decoder allocates one integer per pixel of whatever it is handed, so an
+     * The decoder holds the decoded bitmap and one integer per pixel on top of it, so an
      * unbounded photo is an out-of-memory crash rather than a slow read.
      */
     it("bounds the picked image before the decoder ever sees it", async () => {
@@ -364,8 +370,8 @@ describe("ScanningQRCodeScreen", () => {
 
       expect(mockLaunchImageLibrary).toHaveBeenCalledWith({
         mediaType: "photo",
-        maxWidth: 4096,
-        maxHeight: 4096,
+        maxWidth: 2048,
+        maxHeight: 2048,
       })
     })
 
@@ -417,7 +423,33 @@ describe("ScanningQRCodeScreen", () => {
       const screen = await renderScreen()
       await openGallery(screen)
 
-      await waitFor(() => expect(alertSpy).toHaveBeenCalled())
+      await waitFor(() =>
+        expect(alertSpy).toHaveBeenCalledWith("Unexpected error occurred"),
+      )
+      expect(mockReportError).toHaveBeenCalledWith(
+        "scanning-qrcode",
+        new Error("picker exploded"),
+      )
+    })
+
+    /**
+     * A native module can reject with something that is not an Error, and narrowing the
+     * catch on instanceof would drop those rejections with no alert and nothing reported.
+     * What it rejected with belongs in error reporting, not in a dialog.
+     */
+    it("surfaces a picker rejection that is not an Error", async () => {
+      mockLaunchImageLibrary.mockRejectedValue({ code: "E_PICKER_UNAVAILABLE" })
+
+      const screen = await renderScreen()
+      await openGallery(screen)
+
+      await waitFor(() =>
+        expect(alertSpy).toHaveBeenCalledWith("Unexpected error occurred"),
+      )
+      expect(mockReportError).toHaveBeenCalledWith(
+        "scanning-qrcode",
+        new Error('{"code":"E_PICKER_UNAVAILABLE"}'),
+      )
     })
 
     it("tells the user when the image library permission was refused", async () => {
@@ -440,6 +472,10 @@ describe("ScanningQRCodeScreen", () => {
       await openGallery(screen)
 
       await waitFor(() => expect(alertSpy).toHaveBeenCalled())
+      expect(mockReportError).toHaveBeenCalledWith(
+        "scanning-qrcode",
+        new Error("Image library failed: others Unsupported file type"),
+      )
       expect(mockToastShow).not.toHaveBeenCalled()
       expect(mockDetect).not.toHaveBeenCalled()
     })

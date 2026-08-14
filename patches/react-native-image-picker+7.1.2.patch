@@ -1,8 +1,8 @@
 diff --git a/node_modules/react-native-image-picker/android/src/main/java/com/imagepicker/ImagePickerModuleImpl.java b/node_modules/react-native-image-picker/android/src/main/java/com/imagepicker/ImagePickerModuleImpl.java
-index afe4b3e..26f4972 100644
+index afe4b3e..2aaeb71 100644
 --- a/node_modules/react-native-image-picker/android/src/main/java/com/imagepicker/ImagePickerModuleImpl.java
 +++ b/node_modules/react-native-image-picker/android/src/main/java/com/imagepicker/ImagePickerModuleImpl.java
-@@ -166,15 +166,29 @@ public class ImagePickerModuleImpl implements ActivityEventListener {
+@@ -166,17 +166,47 @@ public class ImagePickerModuleImpl implements ActivityEventListener {
      }
  
      void onAssetsObtained(List<Uri> fileUris) {
@@ -25,17 +25,36 @@ index afe4b3e..26f4972 100644
          ExecutorService executor = Executors.newSingleThreadExecutor();
  
          executor.submit(() -> {
++            /**
++             * The response is settled before the single invoke, and every Throwable is
++             * caught rather than only RuntimeException. Decoding the picked image can
++             * raise an OutOfMemoryError, which is an Error: catching Exception alone
++             * lets it die inside a Future nobody reads, so the callback never fires and
++             * the promise on the JS side stays pending forever.
++             */
++            ReadableMap response;
              try {
 -                callback.invoke(getResponseMap(fileUris, options, reactContext));
-+                cb.invoke(getResponseMap(fileUris, options, reactContext));
-             } catch (RuntimeException exception) {
+-            } catch (RuntimeException exception) {
 -                callback.invoke(getErrorMap(errOthers, exception.getMessage()));
 -            } finally {
 -                callback = null;
-+                cb.invoke(getErrorMap(errOthers, exception.getMessage()));
++                response = getResponseMap(fileUris, options, reactContext);
++            } catch (Throwable throwable) {
++                response = getErrorMap(errOthers, throwable.getMessage());
              }
++            cb.invoke(response);
          });
++        /**
++         * The executor is created per pick and its worker thread outlives the task that
++         * ran on it, so without this one thread and its stack leak on every gallery open,
++         * against the same heap the bounded decode above is protecting. shutdown() lets
++         * the submitted task finish and then retires the thread.
++         */
++        executor.shutdown();
      }
+ 
+     @Override
 diff --git a/node_modules/react-native-image-picker/android/src/main/java/com/imagepicker/Utils.java b/node_modules/react-native-image-picker/android/src/main/java/com/imagepicker/Utils.java
 index 1e9078d..87707ae 100644
 --- a/node_modules/react-native-image-picker/android/src/main/java/com/imagepicker/Utils.java
@@ -100,3 +119,107 @@ index 1e9078d..87707ae 100644
      }
  
      // ExifInterface.saveAttributes is costly operation so don't set exif for unnecessary orientations
+diff --git a/node_modules/react-native-image-picker/ios/ImagePickerManager.mm b/node_modules/react-native-image-picker/ios/ImagePickerManager.mm
+index 93e99be..5157930 100644
+--- a/node_modules/react-native-image-picker/ios/ImagePickerManager.mm
++++ b/node_modules/react-native-image-picker/ios/ImagePickerManager.mm
+@@ -165,9 +165,20 @@ NSData* extractImageData(UIImage* image){
+ 
+     UIImage* newImage = image;
+     if (![fileType isEqualToString:@"gif"]) {
+-        newImage = [ImagePickerUtils resizeImage:image
+-                                     maxWidth:[self.options[@"maxWidth"] floatValue]
+-                                    maxHeight:[self.options[@"maxHeight"] floatValue]];
++        float maxWidth = [self.options[@"maxWidth"] floatValue];
++        float maxHeight = [self.options[@"maxHeight"] floatValue];
++        /**
++         * Bounded during the decode, before the resize. Handing the picked image straight
++         * to resizeImage makes its [image drawInRect:] materialise every pixel of the
++         * source, which is the allocation a caller setting a bound is asking to avoid.
++         */
++        UIImage* sourceImage = [ImagePickerUtils boundedImage:image
++                                                         data:data
++                                                     maxWidth:maxWidth
++                                                    maxHeight:maxHeight];
++        newImage = [ImagePickerUtils resizeImage:sourceImage
++                                     maxWidth:maxWidth
++                                    maxHeight:maxHeight];
+     }
+ 
+     float quality = [self.options[@"quality"] floatValue];
+diff --git a/node_modules/react-native-image-picker/ios/ImagePickerUtils.h b/node_modules/react-native-image-picker/ios/ImagePickerUtils.h
+index 3cd8bfc..90dea80 100644
+--- a/node_modules/react-native-image-picker/ios/ImagePickerUtils.h
++++ b/node_modules/react-native-image-picker/ios/ImagePickerUtils.h
+@@ -13,6 +13,8 @@
+ 
+ + (NSString*)getFileType:(NSData*)imageData;
+ 
+++ (UIImage*)boundedImage:(UIImage*)image data:(NSData*)data maxWidth:(float)maxWidth maxHeight:(float)maxHeight;
++
+ + (UIImage*)resizeImage:(UIImage*)image maxWidth:(float)maxWidth maxHeight:(float)maxHeight;
+ 
+ + (CGSize)getVideoDimensionsFromUrl:(NSURL *)url;
+diff --git a/node_modules/react-native-image-picker/ios/ImagePickerUtils.mm b/node_modules/react-native-image-picker/ios/ImagePickerUtils.mm
+index 443500d..20b213e 100644
+--- a/node_modules/react-native-image-picker/ios/ImagePickerUtils.mm
++++ b/node_modules/react-native-image-picker/ios/ImagePickerUtils.mm
+@@ -1,5 +1,6 @@
+ #import "ImagePickerUtils.h"
+ #import <CoreServices/CoreServices.h>
++#import <ImageIO/ImageIO.h>
+ #import <PhotosUI/PhotosUI.h>
+ 
+ @implementation ImagePickerUtils
+@@ -145,6 +146,51 @@
+     return CGSizeMake(0, 0);
+ }
+ 
++/**
++ * The source bitmap for a resize, read back from the data already bounded instead of
++ * decoded at full resolution first. resizeImage scales a UIImage that is in memory, and
++ * a picked image is lazy: [image drawInRect:] is what forces the source decode, so a
++ * 144MP pick allocates 576MB before the resize it was asked for can shrink anything.
++ * ImageIO reads the header, subsamples during the decode and only ever holds the bounded
++ * result. The original image is returned whenever no bound was asked for, the image is
++ * already inside it, or ImageIO cannot read the data, so those paths keep their behaviour.
++ */
+++ (UIImage*)boundedImage:(UIImage*)image data:(NSData*)data maxWidth:(float)maxWidth maxHeight:(float)maxHeight
++{
++    if ((maxWidth <= 0) || (maxHeight <= 0) || (data == nil)) {
++        return image;
++    }
++
++    if (image.size.width <= maxWidth && image.size.height <= maxHeight) {
++        return image;
++    }
++
++    CGImageSourceRef source = CGImageSourceCreateWithData((__bridge CFDataRef)data, (__bridge CFDictionaryRef)@{
++        (__bridge id)kCGImageSourceShouldCache: @NO
++    });
++    if (source == NULL) {
++        return image;
++    }
++
++    NSDictionary *thumbnailOptions = @{
++        (__bridge id)kCGImageSourceCreateThumbnailFromImageAlways: @YES,
++        (__bridge id)kCGImageSourceCreateThumbnailWithTransform: @YES,
++        (__bridge id)kCGImageSourceShouldCacheImmediately: @YES,
++        (__bridge id)kCGImageSourceThumbnailMaxPixelSize: @(MAX(maxWidth, maxHeight))
++    };
++    CGImageRef boundedRef = CGImageSourceCreateThumbnailAtIndex(source, 0, (__bridge CFDictionaryRef)thumbnailOptions);
++    CFRelease(source);
++
++    if (boundedRef == NULL) {
++        return image;
++    }
++
++    UIImage *result = [UIImage imageWithCGImage:boundedRef];
++    CGImageRelease(boundedRef);
++
++    return result;
++}
++
+ + (UIImage*)resizeImage:(UIImage*)image maxWidth:(float)maxWidth maxHeight:(float)maxHeight
+ {
+     if ((maxWidth == 0) || (maxHeight == 0)) {

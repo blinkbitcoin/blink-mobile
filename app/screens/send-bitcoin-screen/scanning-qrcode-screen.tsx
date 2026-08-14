@@ -28,6 +28,7 @@ import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { logParseDestinationResult } from "@app/utils/analytics"
 import { reportError } from "@app/utils/error-logging"
+import { toError } from "@app/utils/error-reporting"
 import { toastShow } from "@app/utils/toast"
 import Clipboard from "@react-native-clipboard/clipboard"
 import { useIsFocused, useNavigation } from "@react-navigation/native"
@@ -49,13 +50,16 @@ const { width: screenWidth } = Dimensions.get("window")
 const { height: screenHeight } = Dimensions.get("window")
 
 /**
- * Longest side the picker is allowed to hand back. The QR decoder allocates one integer
- * per pixel of what it receives, at full resolution: a 12000x12000 photo asks for 576MB
- * against a heap that caps out around 200MB, and the app dies before reading anything.
- * The bound sits above what a camera produces, so an ordinary photo is passed through
- * untouched and only the extremes are subsampled, which keeps dense codes readable.
+ * Longest side the picker is allowed to hand back. The QR decoder holds the decoded
+ * bitmap and one integer per pixel on top of it, so its peak is eight bytes per pixel of
+ * whatever it receives: a 12000x12000 photo asks for 576MB against a heap that caps out
+ * around 200MB, and the app dies before reading anything. At this bound the peak is 34MB,
+ * which the 96MB heap of a budget device survives. A code filling the frame stays well
+ * inside what the decoder needs, eight or more pixels per module even at version 40, the
+ * densest there is; a code occupying a small corner of a very large photo is the case
+ * this trades away.
  */
-const QR_IMAGE_MAX_DIMENSION = 4096
+const QR_IMAGE_MAX_DIMENSION = 2048
 
 gql`
   query scanningQRCodeScreen {
@@ -362,10 +366,14 @@ export const ScanningQRCodeScreen: React.FC = () => {
         Alert.alert(LL.ScanningQRCodeScreen.noQrCode())
       }
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        reportError("scanning-qrcode", err)
-        Alert.alert(err.toString())
-      }
+      /** A native module can reject with a plain object or a string rather than an Error,
+       *  and an Error crossing a realm boundary fails the instanceof check too. Narrowing
+       *  on that check here would leave those rejections with no alert and nothing in
+       *  error reporting, which is the dead button this change is closing. The detail goes
+       *  to error reporting rather than to the user, who would otherwise be shown whatever
+       *  the native module rejected with, serialized. */
+      reportError("scanning-qrcode", toError(err))
+      Alert.alert(LL.errors.unexpectedError())
     }
   }
 
