@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 
+import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { recordAppError, toError } from "@app/utils/error-reporting"
 
 import { fetchPlacesDelta, fetchPlacesSnapshot } from "./api"
@@ -24,12 +25,19 @@ const applyDelta = (
  * background — a stale map beats a spinner, and the map is only ever a few
  * edits behind. A cold start pulls the CDN snapshot; every start after that
  * asks the API for what changed, at most once an hour.
+ *
+ * All of it is behind a Remote Config kill switch, because the data is a third
+ * party's: turning `btcMapPlacesEnabled` off empties the map — quietly, since a
+ * deliberate shutdown is not an error the user can act on — without waiting for
+ * an app release.
  */
 export const useBtcMapPlaces = () => {
   const [places, setPlaces] = useState<BtcMapPlace[]>([])
   const [isLoading, setLoading] = useState(true)
   const [hasError, setHasError] = useState(false)
   const [attempt, setAttempt] = useState(0)
+
+  const { btcMapPlacesEnabled } = useRemoteConfig()
 
   const isMountedRef = useRef(true)
   useEffect(() => {
@@ -40,6 +48,13 @@ export const useBtcMapPlaces = () => {
   }, [])
 
   useEffect(() => {
+    if (!btcMapPlacesEnabled) {
+      setPlaces([])
+      setLoading(false)
+      setHasError(false)
+      return
+    }
+
     const load = async () => {
       setLoading(true)
       setHasError(false)
@@ -116,7 +131,7 @@ export const useBtcMapPlaces = () => {
     }
 
     load()
-  }, [attempt])
+  }, [attempt, btcMapPlacesEnabled])
 
   const retry = useCallback(() => setAttempt((previous) => previous + 1), [])
 

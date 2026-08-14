@@ -11,6 +11,11 @@ jest.mock("@app/btcmap/api", () => ({
   fetchPlacesDelta: jest.fn(),
 }))
 
+const mockRemoteConfig = { btcMapPlacesEnabled: true }
+jest.mock("@app/config/feature-flags-context", () => ({
+  useRemoteConfig: () => mockRemoteConfig,
+}))
+
 jest.mock("@app/btcmap/storage", () => ({
   readSnapshot: jest.fn(),
   writeSnapshot: jest.fn(),
@@ -40,6 +45,7 @@ const cached = (ageMs: number): BtcMapSnapshot => ({
 
 beforeEach(() => {
   jest.clearAllMocks()
+  mockRemoteConfig.btcMapPlacesEnabled = true
   mockedWrite.mockResolvedValue(undefined)
   mockedMarkers.mockResolvedValue(undefined)
   mockedDelta.mockResolvedValue({
@@ -80,7 +86,7 @@ describe("useBtcMapPlaces", () => {
       upserted: [place(3)],
       removedIds: [1],
       syncedUpTo: "2026-08-02T00:00:00.000Z",
-    })
+      })
 
     const { result } = renderHook(() => useBtcMapPlaces())
 
@@ -206,5 +212,30 @@ describe("useBtcMapPlaces recovery paths", () => {
     // 2.4 MB of chunks are not rewritten for zero changed rows.
     expect(result.current.places).toBe(first)
     expect(mockedWrite).not.toHaveBeenCalled()
+  })
+})
+
+describe("useBtcMapPlaces kill switch", () => {
+  it("touches neither cache nor network while the feed is switched off", async () => {
+    // The data is a third party's; turning it off has to work without a release.
+    mockRemoteConfig.btcMapPlacesEnabled = false
+    mockedRead.mockResolvedValue(cached(0))
+
+    const { result } = renderHook(() => useBtcMapPlaces())
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false))
+    expect(result.current.places).toEqual([])
+    expect(mockedRead).not.toHaveBeenCalled()
+    expect(mockedSnapshot).not.toHaveBeenCalled()
+    expect(mockedDelta).not.toHaveBeenCalled()
+  })
+
+  it("empties the map quietly rather than reporting an error", async () => {
+    mockRemoteConfig.btcMapPlacesEnabled = false
+
+    const { result } = renderHook(() => useBtcMapPlaces())
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false))
+    expect(result.current.hasError).toBe(false)
   })
 })

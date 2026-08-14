@@ -41,6 +41,7 @@ const BackupNudgeModalThresholdKey = "backupNudgeModalThreshold"
 const NonCustodialEnabledKey = "nonCustodialEnabled"
 const StableBalanceEnabledKey = "stableBalanceEnabled"
 const DollarRestrictionCacheEnabledKey = "dollarRestrictionCacheEnabled"
+const BtcMapPlacesEnabledKey = "btcMapPlacesEnabled"
 const AutoConvertMaxAttemptsKey = "autoConvertMaxAttempts"
 const AutoConvertPollMaxAttemptsKey = "autoConvertPollMaxAttempts"
 const AutoConvertPollIntervalMsKey = "autoConvertPollIntervalMs"
@@ -111,6 +112,7 @@ type RemoteConfig = {
   [NonCustodialEnabledKey]: boolean
   [StableBalanceEnabledKey]: boolean
   [DollarRestrictionCacheEnabledKey]: boolean
+  [BtcMapPlacesEnabledKey]: boolean
   [AutoConvertMaxAttemptsKey]: number
   [AutoConvertPollMaxAttemptsKey]: number
   [AutoConvertPollIntervalMsKey]: number
@@ -215,6 +217,10 @@ export const defaultRemoteConfig: RemoteConfig = {
   nonCustodialEnabled: false,
   stableBalanceEnabled: false,
   dollarRestrictionCacheEnabled: true,
+  /** Kill switch for the map's merchant data, which comes from BTC Map — a third
+   *  party we do not control. If the feed starts serving something harmful or
+   *  simply wrong, turning this off empties the map without an app release. */
+  btcMapPlacesEnabled: true,
   autoConvertMaxAttempts: 3,
   autoConvertPollMaxAttempts: 30,
   autoConvertPollIntervalMs: 500,
@@ -407,6 +413,10 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           .getValue(DollarRestrictionCacheEnabledKey)
           .asBoolean()
 
+        const btcMapPlacesEnabled = remoteConfigInstance()
+          .getValue(BtcMapPlacesEnabledKey)
+          .asBoolean()
+
         const autoConvertMaxAttempts = remoteConfigInstance()
           .getValue(AutoConvertMaxAttemptsKey)
           .asNumber()
@@ -519,6 +529,7 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           nonCustodialEnabled,
           stableBalanceEnabled,
           dollarRestrictionCacheEnabled,
+          btcMapPlacesEnabled,
           autoConvertMaxAttempts,
           autoConvertPollMaxAttempts,
           autoConvertPollIntervalMs,
