@@ -3,34 +3,35 @@ import { fireEvent, render } from "@testing-library/react-native"
 
 import { ThemeProvider } from "@rn-vui/themed"
 import TypesafeI18n from "@app/i18n/i18n-react"
+import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
 const mockNavigate = jest.fn()
 
-jest.mock("react-native-modal", () => require("../../helpers/react-native-modal-mock"))
+jest.mock("react-native-modal", () =>
+  jest.requireActual("../../helpers/react-native-modal-mock"),
+)
 
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
   useNavigation: () => ({ navigate: mockNavigate }),
 }))
 
-// avoid pulling the firebase app-check native module in via the phone-auth screen,
-// but keep the real wire values so a rename of them breaks the navigation assertion
-jest.mock("@app/screens/phone-auth-screen", () =>
-  jest.requireActual("@app/screens/phone-auth-screen/phone-login-initiate-type"),
-)
-
 import { TrialAccountLimitsModal } from "@app/components/upgrade-account-modal"
-import { PhoneLoginInitiateType } from "@app/screens/phone-auth-screen/phone-login-initiate-type"
 
 loadLocale("en")
+const LL = i18nObject("en")
 
-const MODAL_TITLE = "Upgrade for more benefits"
-// SSF audit finding (blink-wip#739): the enforced level 1 limit is USD 999/day,
-// so the advertised copy must not say 1,000.
+const UPGRADE_TO = 1
+
+/**
+ * SSF audit finding (blink-wip#739): the enforced level 1 limit is USD 999/day, so
+ * the advertised copy must not say 1,000. Pinned as a literal on purpose, since the
+ * point is to fail when the amount in the copy changes.
+ */
 const DAILY_LIMIT = "USD 999 daily transaction limit"
-const UPGRADE_CTA = "Upgrade to Level 1"
-const NOT_NOW = "Not now"
+
+const UPGRADE_CTA = LL.UpgradeAccountModal.upgradeToLevel({ level: UPGRADE_TO })
 
 const wrap = (ui: React.ReactElement) => (
   <ThemeProvider>
@@ -55,9 +56,17 @@ describe("TrialAccountLimitsModal", () => {
   it("renders the level 1 benefit items", () => {
     const { getByText } = renderModal()
 
-    expect(getByText(MODAL_TITLE)).toBeTruthy()
-    expect(getByText("Recover funds by SMS or email", { exact: false })).toBeTruthy()
-    expect(getByText("Receive bitcoin onchain", { exact: false })).toBeTruthy()
+    expect(getByText(LL.GetStartedScreen.trialAccountLimits.modalTitle())).toBeTruthy()
+    expect(
+      getByText(LL.GetStartedScreen.trialAccountLimits.recoveryOption(), {
+        exact: false,
+      }),
+    ).toBeTruthy()
+    expect(
+      getByText(LL.GetStartedScreen.trialAccountLimits.onchainReceive(), {
+        exact: false,
+      }),
+    ).toBeTruthy()
   })
 
   it("advertises the audited USD 999 daily limit", () => {
@@ -69,7 +78,7 @@ describe("TrialAccountLimitsModal", () => {
   it("renders nothing when isVisible is false", () => {
     const { queryByText } = renderModal({ isVisible: false })
 
-    expect(queryByText(MODAL_TITLE)).toBeNull()
+    expect(queryByText(LL.GetStartedScreen.trialAccountLimits.modalTitle())).toBeNull()
   })
 
   it("navigates to account creation and closes from the upgrade action", () => {
@@ -81,7 +90,7 @@ describe("TrialAccountLimitsModal", () => {
 
     expect(beforeSubmit).toHaveBeenCalledTimes(1)
     expect(mockNavigate).toHaveBeenCalledWith("login", {
-      type: PhoneLoginInitiateType.CreateAccount,
+      type: "CreateAccount",
       title: UPGRADE_CTA,
       onboarding: true,
     })
@@ -92,7 +101,7 @@ describe("TrialAccountLimitsModal", () => {
     const closeModal = jest.fn()
     const { getByText } = renderModal({ closeModal })
 
-    fireEvent.press(getByText(NOT_NOW))
+    fireEvent.press(getByText(LL.UpgradeAccountModal.notNow()))
 
     expect(closeModal).toHaveBeenCalledTimes(1)
     expect(mockNavigate).not.toHaveBeenCalled()
