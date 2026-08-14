@@ -42,26 +42,53 @@ const quarantineRawState = async (rawData: unknown): Promise<void> => {
   }
 }
 
+// Deliberately NOT under the `${PERSISTENT_STATE_QUARANTINE_PREFIX}.` prefix,
+// or the sweep would iterate its own marker.
+const QUARANTINE_SCRUB_DONE_KEY = "persistentStateQuarantineScrubDone"
+
 // Quarantine copies written before tokens moved to the keychain still hold the
 // raw credential; rewrite them redacted.
 const scrubQuarantinedTokens = async (): Promise<void> => {
   try {
+    // One clean sweep is permanent: quarantine copies written after the token
+    // moved to the keychain are already redacted at write time.
+    if (await loadString(QUARANTINE_SCRUB_DONE_KEY)) return
     const keys = await getAllKeys()
     const quarantineKeys = keys.filter((key) =>
       key.startsWith(`${PERSISTENT_STATE_QUARANTINE_PREFIX}.`),
     )
+    let allClean = true
     for (const key of quarantineKeys) {
-      const raw = await loadString(key)
-      const parsed = raw ? JSON.parse(raw) : null
-      if (
-        parsed &&
-        typeof parsed === "object" &&
-        "galoyAuthToken" in parsed &&
-        parsed.galoyAuthToken &&
-        parsed.galoyAuthToken !== TOKEN_REDACTED
-      ) {
-        await saveString(key, JSON.stringify(redactToken(parsed)))
+      // Per-entry isolation: one corrupt entry must not end the sweep early —
+      // later keys may still hold raw tokens.
+      try {
+        const raw = await loadString(key)
+        const parsed = raw ? JSON.parse(raw) : null
+        if (
+          parsed &&
+          typeof parsed === "object" &&
+          "galoyAuthToken" in parsed &&
+          parsed.galoyAuthToken &&
+          parsed.galoyAuthToken !== TOKEN_REDACTED
+        ) {
+          const ok = await saveString(key, JSON.stringify(redactToken(parsed)))
+          if (!ok) {
+            allClean = false
+            recordAppError(new Error(`Quarantine redaction write failed for ${key}`), {
+              alwaysRecord: true,
+            })
+          }
+        }
+      } catch (err) {
+        allClean = false
+        recordAppError(
+          err instanceof Error ? err : new Error(`Quarantine entry unreadable: ${key}`),
+          { alwaysRecord: true },
+        )
       }
+    }
+    if (allClean) {
+      await saveString(QUARANTINE_SCRUB_DONE_KEY, "1")
     }
   } catch (err) {
     recordAppError(

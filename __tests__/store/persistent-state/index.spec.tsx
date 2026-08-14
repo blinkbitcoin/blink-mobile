@@ -541,12 +541,25 @@ describe("PersistentStateProvider", () => {
   })
 
   describe("quarantine token hygiene", () => {
+    const SCRUB_DONE_KEY = "persistentStateQuarantineScrubDone"
+
+    // The sweep reads the done-marker first; answer per key so the marker
+    // lookup stays null while quarantine keys return their payloads.
+    const mockQuarantineEntries = (entries: Record<string, string>) => {
+      mockLoadString.mockImplementation((key: string) =>
+        Promise.resolve(entries[key] ?? null),
+      )
+    }
+
     it("redacts the token from pre-existing quarantine keys at load", async () => {
       mockLoadJson.mockResolvedValue(scrubbedBlob)
       mockGetAllKeys.mockResolvedValue(["persistentStateQuarantine.123", "unrelatedKey"])
-      mockLoadString.mockResolvedValue(
-        JSON.stringify({ schemaVersion: 5, galoyAuthToken: "old-secret" }),
-      )
+      mockQuarantineEntries({
+        "persistentStateQuarantine.123": JSON.stringify({
+          schemaVersion: 5,
+          galoyAuthToken: "old-secret",
+        }),
+      })
 
       render(
         <PersistentStateProvider>
@@ -560,16 +573,19 @@ describe("PersistentStateProvider", () => {
           JSON.stringify({ schemaVersion: 5, galoyAuthToken: "[REDACTED]" }),
         )
       })
-      expect(mockLoadString).toHaveBeenCalledTimes(1)
       expect(mockLoadString).toHaveBeenCalledWith("persistentStateQuarantine.123")
+      expect(mockLoadString).not.toHaveBeenCalledWith("unrelatedKey")
     })
 
-    it("leaves already-redacted quarantine keys alone", async () => {
+    it("leaves already-redacted quarantine keys alone and marks the sweep done", async () => {
       mockLoadJson.mockResolvedValue(scrubbedBlob)
       mockGetAllKeys.mockResolvedValue(["persistentStateQuarantine.123"])
-      mockLoadString.mockResolvedValue(
-        JSON.stringify({ schemaVersion: 5, galoyAuthToken: "[REDACTED]" }),
-      )
+      mockQuarantineEntries({
+        "persistentStateQuarantine.123": JSON.stringify({
+          schemaVersion: 5,
+          galoyAuthToken: "[REDACTED]",
+        }),
+      })
 
       render(
         <PersistentStateProvider>
@@ -586,7 +602,62 @@ describe("PersistentStateProvider", () => {
         })
       })
 
-      expect(mockSaveString).not.toHaveBeenCalled()
+      // No rewrite of the already-clean entry — only the done-marker write.
+      expect(mockSaveString).not.toHaveBeenCalledWith(
+        "persistentStateQuarantine.123",
+        expect.anything(),
+      )
+      expect(mockSaveString).toHaveBeenCalledWith(SCRUB_DONE_KEY, "1")
+    })
+
+    it("scrubs remaining quarantine entries even when one is corrupt", async () => {
+      mockLoadJson.mockResolvedValue(scrubbedBlob)
+      mockGetAllKeys.mockResolvedValue([
+        "persistentStateQuarantine.100", // corrupt — iterated first
+        "persistentStateQuarantine.200", // healthy, still holds a raw token
+      ])
+      mockQuarantineEntries({
+        "persistentStateQuarantine.100": "{truncated",
+        "persistentStateQuarantine.200": JSON.stringify({ galoyAuthToken: "raw-token" }),
+      })
+
+      render(
+        <PersistentStateProvider>
+          <TestConsumer />
+        </PersistentStateProvider>,
+      )
+
+      await waitFor(() => {
+        expect(mockSaveString).toHaveBeenCalledWith(
+          "persistentStateQuarantine.200",
+          JSON.stringify({ galoyAuthToken: "[REDACTED]" }),
+        )
+      })
+      // The corrupt entry was reported, and an unclean sweep is never marked done.
+      expect(mockRecordError).toHaveBeenCalledTimes(1)
+      expect(mockSaveString).not.toHaveBeenCalledWith(SCRUB_DONE_KEY, expect.anything())
+    })
+
+    it("skips the sweep entirely once the done-marker exists", async () => {
+      mockLoadJson.mockResolvedValue(scrubbedBlob)
+      mockQuarantineEntries({ [SCRUB_DONE_KEY]: "1" })
+
+      render(
+        <PersistentStateProvider>
+          <TestConsumer />
+        </PersistentStateProvider>,
+      )
+
+      await waitFor(() => {
+        expect(screen.getByTestId("token")).toBeTruthy()
+      })
+      await act(async () => {
+        await new Promise<void>((r) => {
+          setTimeout(r, 50)
+        })
+      })
+
+      expect(mockGetAllKeys).not.toHaveBeenCalled()
     })
   })
 
@@ -659,8 +730,12 @@ describe("PersistentStateProvider", () => {
       })
       const after = Date.now()
 
-      expect(mockSaveString).toHaveBeenCalledTimes(1)
-      const [key, payload] = mockSaveString.mock.calls[0]
+      // Ignore the scrub sweep's done-marker write; only quarantine writes count.
+      const quarantineCalls = mockSaveString.mock.calls.filter(([k]) =>
+        String(k).startsWith("persistentStateQuarantine."),
+      )
+      expect(quarantineCalls).toHaveLength(1)
+      const [key, payload] = quarantineCalls[0]
       expect(key).toMatch(/^persistentStateQuarantine\.\d+$/)
       const timestamp = Number(key.split(".").pop())
       expect(timestamp).toBeGreaterThanOrEqual(before)
@@ -679,7 +754,11 @@ describe("PersistentStateProvider", () => {
 
     it("records a second error when the quarantine write itself fails, but still mounts with defaults", async () => {
       mockLoadJson.mockResolvedValue(corruptedState3)
-      mockSaveString.mockResolvedValueOnce(false)
+      // Fail the quarantine write specifically — a blanket mockResolvedValueOnce
+      // could be consumed by the concurrent scrub sweep's done-marker write.
+      mockSaveString.mockImplementation((key: string) =>
+        Promise.resolve(!key.startsWith("persistentStateQuarantine.")),
+      )
 
       render(
         <PersistentStateProvider>
@@ -717,7 +796,11 @@ describe("PersistentStateProvider", () => {
       })
 
       expect(mockRecordError).not.toHaveBeenCalled()
-      expect(mockSaveString).not.toHaveBeenCalled()
+      expect(
+        mockSaveString.mock.calls.filter(([k]) =>
+          String(k).startsWith("persistentStateQuarantine."),
+        ),
+      ).toHaveLength(0)
     })
 
     it("does NOT touch crashlytics or the quarantine key for null persisted data", async () => {
@@ -734,7 +817,11 @@ describe("PersistentStateProvider", () => {
       })
 
       expect(mockRecordError).not.toHaveBeenCalled()
-      expect(mockSaveString).not.toHaveBeenCalled()
+      expect(
+        mockSaveString.mock.calls.filter(([k]) =>
+          String(k).startsWith("persistentStateQuarantine."),
+        ),
+      ).toHaveLength(0)
     })
   })
 })
