@@ -6,7 +6,7 @@ jest.mock("@react-native-async-storage/async-storage", () =>
 
 import AsyncStorage from "@react-native-async-storage/async-storage"
 
-import { readSnapshot, writeSnapshot } from "@app/btcmap/storage"
+import { readSnapshot, writeSnapshot, writeSyncMarkers } from "@app/btcmap/storage"
 import { BtcMapPlace } from "@app/btcmap/types"
 
 const place = (id: number): BtcMapPlace => ({
@@ -77,6 +77,42 @@ describe("btcmap snapshot storage", () => {
     )
 
     expect(await readSnapshot()).toBeNull()
+  })
+
+  it("records a no-op sync without disturbing the places", async () => {
+    // Most hourly syncs change nothing; dropping chunkCount here would read
+    // back as "no cache" and force a full re-download on every launch.
+    await writeSnapshot(snapshotOf(12_000))
+
+    await writeSyncMarkers({
+      syncedUpTo: "2026-09-01T00:00:00.000Z",
+      lastSyncedAt: "2026-09-02T00:00:00.000Z",
+    })
+
+    expect(await readSnapshot()).toEqual({
+      places: snapshotOf(12_000).places,
+      syncedUpTo: "2026-09-01T00:00:00.000Z",
+      lastSyncedAt: "2026-09-02T00:00:00.000Z",
+    })
+  })
+
+  it("does not invent a meta row when there is no snapshot to mark", async () => {
+    await writeSyncMarkers({
+      syncedUpTo: "2026-09-01T00:00:00.000Z",
+      lastSyncedAt: "2026-09-02T00:00:00.000Z",
+    })
+
+    expect(await readSnapshot()).toBeNull()
+  })
+
+  it("reclaims chunks orphaned by a write whose meta never landed", async () => {
+    await writeSnapshot(snapshotOf(12_000))
+    await AsyncStorage.removeItem("btcMapPlacesMeta")
+
+    await writeSnapshot(snapshotOf(10))
+
+    const keys = await AsyncStorage.getAllKeys()
+    expect(keys.filter((key) => key.startsWith("btcMapPlacesChunk"))).toHaveLength(1)
   })
 
   it("survives a corrupt meta row", async () => {

@@ -1,6 +1,6 @@
 import React from "react"
 import { Linking, Share } from "react-native"
-import { render, fireEvent, waitFor } from "@testing-library/react-native"
+import { act, render, fireEvent, waitFor } from "@testing-library/react-native"
 
 import { BtcMapPlace, BtcMapPlaceDetails } from "@app/btcmap"
 import { useBtcMapPlaceDetails } from "@app/btcmap/use-place-details"
@@ -233,5 +233,75 @@ describe("PlaceSheet fallbacks", () => {
     expect(url).toContain("51.5072")
     expect(url).not.toContain("()")
     expect(url).not.toContain("@51.5072")
+  })
+})
+
+describe("PlaceSheet contact and payment rows", () => {
+  it("dials, mails and pays through the OS rather than the in-app browser", async () => {
+    // InAppBrowser cannot open tel:, mailto: or lightning: — those have to
+    // reach the platform handler.
+    setDetails(details({ phone: "+44 20 7946 0100", email: "hi@satoshi.example" }))
+    const { getByText } = renderSheet()
+
+    await waitFor(() => expect(getByText("+44 20 7946 0100")).toBeTruthy())
+    fireEvent.press(getByText("+44 20 7946 0100"))
+    expect(Linking.openURL).toHaveBeenCalledWith("tel:+44 20 7946 0100")
+
+    fireEvent.press(getByText("hi@satoshi.example"))
+    expect(Linking.openURL).toHaveBeenCalledWith("mailto:hi@satoshi.example")
+  })
+
+  it("offers the pay row only when the place published a payment URI", async () => {
+    const without = renderSheet()
+    await waitFor(() => expect(without.getByText("Satoshi Coffee")).toBeTruthy())
+    expect(without.queryByText("Pay this merchant")).toBeNull()
+
+    setDetails(details({ paymentUrl: "lightning:lnurl1abc" }))
+    const { getByText } = renderSheet()
+
+    await waitFor(() => expect(getByText("Pay this merchant")).toBeTruthy())
+    fireEvent.press(getByText("Pay this merchant"))
+
+    // Handed to the OS verbatim — the allowlist in api.ts is what vets it.
+    expect(Linking.openURL).toHaveBeenCalledWith("lightning:lnurl1abc")
+  })
+
+  it("warns when paying needs a particular app", async () => {
+    setDetails(details({ requiredAppUrl: "example.com/wallet" }))
+    const { getByText } = renderSheet()
+
+    await waitFor(() => expect(getByText("Needs a specific app to pay")).toBeTruthy())
+  })
+
+  it("links to the btcmap.org page by numeric id before details arrive", async () => {
+    setDetails(null, { isLoading: true })
+    const { getByText } = renderSheet()
+
+    await waitFor(() => expect(getByText("See full profile on BTC Map")).toBeTruthy())
+    fireEvent.press(getByText("See full profile on BTC Map"))
+
+    expect(mockedOpenExternal).toHaveBeenCalledWith("https://btcmap.org/merchant/42")
+  })
+
+  it("re-reads the clock so a place closing under the user stops saying open", async () => {
+    jest.useFakeTimers()
+    try {
+      // Open until 18:00; start at 17:59 and cross the boundary.
+      jest.setSystemTime(new Date(2026, 7, 12, 17, 59))
+      setDetails(details({ openingHours: "Mo-Su 09:00-18:00" }))
+      const { getByText, queryByText } = renderSheet({ userLocation: NEARBY_USER })
+
+      await waitFor(() => expect(getByText("Open now")).toBeTruthy())
+
+      await act(async () => {
+        jest.setSystemTime(new Date(2026, 7, 12, 18, 1))
+        jest.advanceTimersByTime(60_000)
+      })
+
+      expect(queryByText("Open now")).toBeNull()
+      expect(getByText("Closed")).toBeTruthy()
+    } finally {
+      jest.useRealTimers()
+    }
   })
 })

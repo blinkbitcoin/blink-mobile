@@ -1,3 +1,4 @@
+import React from "react"
 import { TouchableOpacity, View } from "react-native"
 import { PermissionStatus, RESULTS } from "react-native-permissions"
 
@@ -21,6 +22,7 @@ export default function LocationButtonCopy({
   return (
     <View style={styles.button}>
       <TouchableOpacity
+        testID="location-button"
         style={styles.android}
         onPress={permissionStatus === RESULTS.GRANTED ? centerOnUser : requestPermissions}
       >
