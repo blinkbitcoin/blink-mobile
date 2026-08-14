@@ -46,15 +46,20 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
     return ""
   })
   const [previousPIN, setPreviousPIN] = useState("")
-  const [pinAttempts, setPinAttempts] = useState(0)
 
   const MAX_PIN_ATTEMPTS = 3
 
-  useEffect(() => {
-    ;(async () => {
-      setPinAttempts(await KeyStoreWrapper.getPinAttemptsOrZero())
-    })()
-  }, [])
+  /** Locked from the moment a 4th digit dispatches a completion handler until the
+   *  attempt resolves, so nothing typed mid-decision (or during the lockout's
+   *  logout window) can reach a handler that already made its call. */
+  const inputLockedRef = useRef(false)
+
+  /** Re-arms the keypad for another attempt; the lockout and success paths
+   *  deliberately never call it — the screen is departing. */
+  const resetPinInput = () => {
+    inputLockedRef.current = false
+    setEnteredPIN("")
+  }
 
   const challengeResolvedRef = useRef(false)
 
@@ -74,12 +79,11 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
   /** Shared by the unlock and the challenge: the keystore counter is one budget of three
    *  guesses across both, and exhausting it ends the session the way the app lock does —
    *  failing softly at the cap would hand out a fresh guess per re-entry. */
-  const handleWrongPin = async () => {
+  const handleWrongPin = async (pinAttempts: number) => {
     if (pinAttempts < MAX_PIN_ATTEMPTS - 1) {
       const newPinAttempts = pinAttempts + 1
-      KeyStoreWrapper.setPinAttempts(newPinAttempts.toString())
-      setPinAttempts(newPinAttempts)
-      setEnteredPIN("")
+      await KeyStoreWrapper.setPinAttempts(newPinAttempts.toString())
+      resetPinInput()
       if (newPinAttempts === MAX_PIN_ATTEMPTS - 1) {
         setHelperText(LL.PinScreen.oneAttemptRemaining())
       } else {
@@ -87,13 +91,20 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
         setHelperText(LL.PinScreen.attemptsRemaining({ attemptsRemaining }))
       }
     } else {
+      setEnteredPIN("")
       setHelperText(LL.PinScreen.tooManyAttempts())
-      await logout()
-      await sleep(1000)
-      navigation.reset({
-        index: 0,
-        routes: [{ name: "Primary" }],
-      })
+      try {
+        await logout()
+        await sleep(1000)
+      } finally {
+        /** The challenge path marks challengeResolvedRef before calling us, so a
+         *  logout error without the reset would strand the caller waiting on a
+         *  callback that can no longer fire — the reset must land either way. */
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "Primary" }],
+        })
+      }
     }
   }
 
@@ -107,7 +118,7 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
         }),
       )
     } else {
-      await handleWrongPin()
+      await handleWrongPin(await KeyStoreWrapper.getPinAttemptsOrZero())
     }
   }
 
@@ -119,30 +130,35 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
       navigation.goBack()
       return
     }
+    const pinAttempts = await KeyStoreWrapper.getPinAttemptsOrZero()
     if (pinAttempts >= MAX_PIN_ATTEMPTS - 1) {
       /** The lockout reset unmounts the caller — that is the outcome, so the failure
        *  callback (whose only job is dismissing the gated screen) must stay quiet. */
       challengeResolvedRef.current = true
     }
-    await handleWrongPin()
+    await handleWrongPin(pinAttempts)
   }
 
   const handleCompletedPinForSetPin = (newEnteredPIN: string) => {
     if (previousPIN.length === 0) {
       setPreviousPIN(newEnteredPIN)
       setHelperText(LL.PinScreen.verifyPin())
-      setEnteredPIN("")
+      resetPinInput()
     } else {
       verifyPINCodeMatches(newEnteredPIN)
     }
   }
 
   const addDigit = (digit: string) => {
+    if (inputLockedRef.current) {
+      return
+    }
     if (enteredPIN.length < 4) {
       const newEnteredPIN = enteredPIN + digit
       setEnteredPIN(newEnteredPIN)
 
       if (newEnteredPIN.length === 4) {
+        inputLockedRef.current = true
         if (screenPurpose === PinScreenPurpose.AuthenticatePin) {
           handleCompletedPinForAuthenticatePin(newEnteredPIN)
         } else if (screenPurpose === PinScreenPurpose.ChallengePin) {
@@ -171,7 +187,7 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
   const returnToSetPin = () => {
     setPreviousPIN("")
     setHelperText(LL.PinScreen.setPinFailedMatch())
-    setEnteredPIN("")
+    resetPinInput()
   }
 
   const circleComponentForDigit = (digit: number) => {
@@ -232,7 +248,11 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
             <Button
               buttonStyle={styles.pinPadButton}
               icon={<GaloyIcon name="arrow-left" size={32} color="white" />}
-              onPress={() => setEnteredPIN(enteredPIN.slice(0, -1))}
+              onPress={() => {
+                if (!inputLockedRef.current) {
+                  setEnteredPIN(enteredPIN.slice(0, -1))
+                }
+              }}
             />
           </View>
         </View>

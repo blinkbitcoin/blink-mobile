@@ -296,5 +296,81 @@ describe("PinScreen", () => {
       expect(onChallengeSuccess).not.toHaveBeenCalled()
       expect(onChallengeFailure).not.toHaveBeenCalled()
     })
+
+    it("ignores input typed during the lockout's logout window", async () => {
+      /** The lockout awaits logout + a grace sleep before resetting the stack. The keypad
+       *  must be dead in that window: a correct pin typed there would otherwise resolve
+       *  the challenge against a session that is being destroyed. */
+      const { sleep } = jest.requireMock("@app/utils/sleep")
+      let releaseSleep!: () => void
+      ;(sleep as jest.Mock).mockReturnValueOnce(
+        new Promise<void>((resolve) => {
+          releaseSleep = resolve
+        }),
+      )
+      ;(KeyStoreWrapper.getPinAttemptsOrZero as jest.Mock).mockResolvedValueOnce(2)
+      const onChallengeSuccess = jest.fn()
+      renderChallenge({ onChallengeSuccess, onChallengeFailure: jest.fn() })
+      await flushEffects()
+
+      await enterPin(WRONG_PIN)
+      await enterPin(CORRECT_PIN)
+
+      expect(mockLogout).toHaveBeenCalledTimes(1)
+      expect(onChallengeSuccess).not.toHaveBeenCalled()
+      expect(KeyStoreWrapper.resetPinAttempts).not.toHaveBeenCalled()
+      expect(mockGoBack).not.toHaveBeenCalled()
+      expect(mockReset).not.toHaveBeenCalled()
+
+      releaseSleep()
+      await flushEffects()
+
+      expect(mockLogout).toHaveBeenCalledTimes(1)
+      expect(mockReset).toHaveBeenCalledTimes(1)
+    })
+
+    it("reads the shared counter at attempt time, not from a mount snapshot", async () => {
+      /** A counter snapshotted at mount can rewind strikes recorded elsewhere (unlock,
+       *  another challenge) — every attempt must consult the keystore directly. */
+      renderChallenge({ onChallengeSuccess: jest.fn(), onChallengeFailure: jest.fn() })
+      await flushEffects()
+
+      expect(KeyStoreWrapper.getPinAttemptsOrZero).not.toHaveBeenCalled()
+      ;(KeyStoreWrapper.getPinAttemptsOrZero as jest.Mock).mockResolvedValueOnce(2)
+
+      await enterPin(WRONG_PIN)
+
+      expect(mockLogout).toHaveBeenCalledTimes(1)
+      expect(mockReset).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  it("ignores input typed during the app-lock lockout window", async () => {
+    /** Same window as the challenge, on the unlock path: a correct pin typed while the
+     *  lockout is logging out must not complete the unlock. */
+    const { sleep } = jest.requireMock("@app/utils/sleep")
+    let releaseSleep!: () => void
+    ;(sleep as jest.Mock).mockReturnValueOnce(
+      new Promise<void>((resolve) => {
+        releaseSleep = resolve
+      }),
+    )
+    ;(KeyStoreWrapper.getPinAttemptsOrZero as jest.Mock).mockResolvedValueOnce(2)
+    renderScreen(true)
+    await flushEffects()
+
+    await enterPin(WRONG_PIN)
+    await enterPin(CORRECT_PIN)
+
+    expect(mockLogout).toHaveBeenCalledTimes(1)
+    expect(mockSetAppUnlocked).not.toHaveBeenCalled()
+    expect(mockGoBack).not.toHaveBeenCalled()
+    expect(mockReset).not.toHaveBeenCalled()
+
+    releaseSleep()
+    await flushEffects()
+
+    expect(mockLogout).toHaveBeenCalledTimes(1)
+    expect(mockReset).toHaveBeenCalledTimes(1)
   })
 })
