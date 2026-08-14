@@ -19,6 +19,9 @@ jest.mock("libphonenumber-js/mobile", () => ({
 const mockResolveIpCountryCode = jest.fn()
 jest.mock("@app/utils/ip-country-lookup", () => ({
   resolveIpCountryCodeCached: (...args: unknown[]) => mockResolveIpCountryCode(...args),
+  /** The hook subscribes to the session-start reset; this spec never fires one. */
+  subscribeToIpCountryLookup: () => () => undefined,
+  getIpCountryLookupGeneration: () => 0,
 }))
 
 jest.mock("@app/utils/log-error", () => ({
