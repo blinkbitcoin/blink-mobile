@@ -5,6 +5,7 @@ import { render, fireEvent, waitFor } from "@testing-library/react-native"
 import { BtcMapPlace, BtcMapPlaceDetails } from "@app/btcmap"
 import { useBtcMapPlaceDetails } from "@app/btcmap/use-place-details"
 import { PlaceSheet } from "@app/components/map-component/place-sheet"
+import { openExternalUrl } from "@app/utils/external"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
 import { ContextForScreen } from "../../screens/helper"
@@ -12,6 +13,8 @@ import { ContextForScreen } from "../../screens/helper"
 jest.mock("@app/btcmap/use-place-details", () => ({
   useBtcMapPlaceDetails: jest.fn(),
 }))
+
+jest.mock("@app/utils/external", () => ({ openExternalUrl: jest.fn() }))
 
 jest.mock("react-native-safe-area-context", () => ({
   ...jest.requireActual("react-native-safe-area-context"),
@@ -21,6 +24,7 @@ jest.mock("react-native-safe-area-context", () => ({
 const mockedUseDetails = useBtcMapPlaceDetails as jest.MockedFunction<
   typeof useBtcMapPlaceDetails
 >
+const mockedOpenExternal = openExternalUrl as jest.MockedFunction<typeof openExternalUrl>
 
 const LONDON_PLACE: BtcMapPlace = {
   id: 42,
@@ -63,6 +67,7 @@ beforeEach(() => {
   jest.clearAllMocks()
   loadLocale("en")
   jest.spyOn(Linking, "openURL").mockResolvedValue(true)
+  mockedOpenExternal.mockResolvedValue(undefined)
   jest.spyOn(Share, "share").mockResolvedValue({ action: "sharedAction" })
   setDetails(details())
 })
@@ -160,7 +165,10 @@ describe("PlaceSheet", () => {
     await waitFor(() => expect(getByText("satoshicoffee.example")).toBeTruthy())
     fireEvent.press(getByText("satoshicoffee.example"))
 
-    expect(Linking.openURL).toHaveBeenCalledWith("https://www.satoshicoffee.example/menu")
+    // Web links use the in-app browser the rest of the app uses.
+    expect(mockedOpenExternal).toHaveBeenCalledWith(
+      "https://www.satoshicoffee.example/menu",
+    )
   })
 
   it("offers a retry when the details request failed", async () => {
@@ -196,10 +204,10 @@ describe("PlaceSheet fallbacks", () => {
 
     await waitFor(() => expect(getByText("Instagram")).toBeTruthy())
     fireEvent.press(getByText("Instagram"))
-    expect(Linking.openURL).toHaveBeenCalledWith("https://instagram.com/satoshicoffee")
+    expect(mockedOpenExternal).toHaveBeenCalledWith("https://instagram.com/satoshicoffee")
 
     fireEvent.press(getByText("Facebook"))
-    expect(Linking.openURL).toHaveBeenCalledWith("https://satoshi.coffee")
+    expect(mockedOpenExternal).toHaveBeenCalledWith("https://satoshi.coffee")
   })
 
   it("passes a social value that is already a URL through untouched", async () => {
@@ -209,7 +217,7 @@ describe("PlaceSheet fallbacks", () => {
     await waitFor(() => expect(getByText("X")).toBeTruthy())
     fireEvent.press(getByText("X"))
 
-    expect(Linking.openURL).toHaveBeenCalledWith("https://x.com/satoshicoffee")
+    expect(mockedOpenExternal).toHaveBeenCalledWith("https://x.com/satoshicoffee")
   })
 
   it("navigates by coordinate when the place has no name to label the pin with", async () => {
@@ -220,6 +228,7 @@ describe("PlaceSheet fallbacks", () => {
     await waitFor(() => expect(getByText("Navigate")).toBeTruthy())
     fireEvent.press(getByText("Navigate"))
 
+    // geo:/maps: must reach the OS — the in-app browser cannot open them.
     const url = (Linking.openURL as jest.Mock).mock.calls[0][0] as string
     expect(url).toContain("51.5072")
     expect(url).not.toContain("()")

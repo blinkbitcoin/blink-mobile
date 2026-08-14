@@ -20,6 +20,7 @@ import {
   formatSurveyDate,
   hostOf,
   isBoosted,
+  isWebUrl,
   materialIconName,
   merchantUrl,
   openingStateAt,
@@ -31,6 +32,7 @@ import {
 } from "@app/btcmap"
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { openExternalUrl } from "@app/utils/external"
 import { toastShow } from "@app/utils/toast"
 import { Skeleton, Text, makeStyles, useTheme } from "@rn-vui/themed"
 
@@ -86,10 +88,12 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
 
   const verification = verificationStateAt(details?.verifiedAt, now)
 
+  // Web destinations get the in-app browser the rest of the app uses, so a tap
+  // on a merchant's site does not strand the user in Safari. tel:, geo:/maps:
+  // and lightning: have to reach the OS instead — InAppBrowser cannot open them.
   const openUrl = (url: string) => {
-    Linking.openURL(url).catch(() =>
-      toastShow({ message: LL.MapScreen.cannotOpenLink(), LL }),
-    )
+    const open = isWebUrl(url) ? openExternalUrl(url) : Linking.openURL(url)
+    open.catch(() => toastShow({ message: LL.MapScreen.cannotOpenLink(), LL }))
   }
 
   const navigate = () =>
