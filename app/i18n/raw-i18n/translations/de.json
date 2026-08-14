@@ -72,6 +72,7 @@
     },
     "AuthenticationScreen": {
         "authenticationDescription": "Authentifizieren zum Fortfahren",
+        "authenticationRequired": "Authentifizierung erforderlich. Du kannst einen PIN Code oder Biometrie in den Sicherheitseinstellungen einrichten.",
         "setUp": "Biometrische Authentifizierung einrichten",
         "setUpAuthenticationDescription": "Biometrie zur Authentifizierung verwenden",
         "skip": "Überspringen",
@@ -3105,7 +3106,6 @@
             "cardUpdateError": "Kartenstatus konnte nicht aktualisiert werden"
         },
         "validThruLabel": "GÜLTIG BIS",
-        "authenticationRequired": "Authentifizierung erforderlich. Du kannst einen PIN Code oder Biometrie in den Sicherheitseinstellungen einrichten.",
         "networkVisa": "Visa",
         "cardFrozenTitle": "Karte eingefroren",
         "cardFrozenSubtitle": "Die Karte ist vorübergehend deaktiviert",

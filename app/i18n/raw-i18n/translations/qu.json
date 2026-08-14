@@ -72,6 +72,7 @@
   },
   "AuthenticationScreen": {
     "authenticationDescription": "Kaypi tukuyta munanki",
+    "authenticationRequired": "Riqsichiyqa necesitakun. PIN kodta utaq biometriata seguridad kamachinapi churayta atinki.",
     "setUp": "Biometric Authentication tukuyta munay",
     "setUpAuthenticationDescription": "Biometric tukuytaq munan",
     "skip": "Atipanichu",
@@ -3105,7 +3106,6 @@
       "cardUpdateError": "Tarjetap kaynin mana hukchayta atinchu"
     },
     "validThruLabel": "VÁLIDO HASTA",
-    "authenticationRequired": "Riqsichiyqa necesitakun. PIN kodta utaq biometriata seguridad kamachinapi churayta atinki.",
     "networkVisa": "Visa",
     "cardFrozenTitle": "Tarjeta congelada",
     "cardFrozenSubtitle": "La tarjeta está temporalmente deshabilitada",

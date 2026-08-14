@@ -72,6 +72,7 @@
   },
   "AuthenticationScreen": {
     "authenticationDescription": "Bevestig om voort te gaan",
+    "authenticationRequired": "Verifikasie word vereis. Jy kan 'n PIN of biometrie in Sekuriteit-instellings opstel.",
     "setUp": "Opstel van biometriese verifikasie",
     "setUpAuthenticationDescription": "Gebruik boimetriese verifikasie",
     "skip": "Gaan verby",
@@ -3105,7 +3106,6 @@
       "cardUpdateError": "Kon kaartstatus nie opdateer nie"
     },
     "validThruLabel": "GELDIG TOT",
-    "authenticationRequired": "Verifikasie word vereis. Jy kan 'n PIN of biometrie in Sekuriteit-instellings opstel.",
     "networkVisa": "Visa",
     "cardFrozenTitle": "Kaart gevries",
     "cardFrozenSubtitle": "Die kaart is tydelik gedeaktiveer",

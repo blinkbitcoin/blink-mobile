@@ -17,6 +17,7 @@ import { useScreenSecurity } from "@app/hooks/use-screen-security"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { testProps } from "@app/utils/testProps"
+import { toastShow } from "@app/utils/toast"
 
 import { useViewBackupPhrase } from "../hooks"
 
@@ -33,7 +34,15 @@ export const ViewBackupPhraseScreen: React.FC = () => {
 
   useScreenSecurity()
 
-  const handleAuthFailure = useCallback(() => navigation.goBack(), [navigation])
+  /** The gate fails closed, so the bounce needs an explanation — silently landing
+   *  the user back outside their own backup phrase reads as a broken screen. */
+  const handleAuthFailure = useCallback(() => {
+    toastShow({
+      message: (translations) => translations.AuthenticationScreen.authenticationRequired(),
+      LL,
+    })
+    navigation.goBack()
+  }, [navigation, LL])
 
   const authenticated = useLocalAuthGate({
     description: LL.BackupScreen.ManualBackup.Phrase.authDescription(),

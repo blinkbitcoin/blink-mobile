@@ -72,6 +72,7 @@
     },
     "AuthenticationScreen": {
         "authenticationDescription": "Authentifiez-vous pour continuer",
+        "authenticationRequired": "Une authentification est requise. Vous pouvez configurer un code NIP ou la biométrie dans les paramètres de sécurité.",
         "setUp": "Configurez l’authentification biométrique",
         "setUpAuthenticationDescription": "Utilisez l’authentification biométrique",
         "skip": "Passez cette étape",
@@ -3105,7 +3106,6 @@
             "cardUpdateError": "Impossible de mettre à jour le statut de la carte"
         },
         "validThruLabel": "VALIDE JUSQU’À",
-        "authenticationRequired": "Une authentification est requise. Vous pouvez configurer un code NIP ou la biométrie dans les paramètres de sécurité.",
         "networkVisa": "Visa",
         "cardFrozenTitle": "Carte gelée",
         "cardFrozenSubtitle": "La carte est temporairement désactivée",

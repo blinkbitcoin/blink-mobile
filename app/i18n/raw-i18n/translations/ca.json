@@ -72,6 +72,7 @@
   },
   "AuthenticationScreen": {
     "authenticationDescription": "Confirma la teva identitat per continuar",
+    "authenticationRequired": "Cal autenticació. Pots configurar un codi PIN o biometria a la configuració de seguretat.",
     "setUp": "Configura la identificació biomètrica",
     "setUpAuthenticationDescription": "Utilitza la identificació biomètrica",
     "skip": "Omet",
@@ -3105,7 +3106,6 @@
       "cardUpdateError": "No s'ha pogut actualitzar l'estat de la targeta"
     },
     "validThruLabel": "VÀLIDA FINS",
-    "authenticationRequired": "Cal autenticació. Pots configurar un codi PIN o biometria a la configuració de seguretat.",
     "networkVisa": "Visa",
     "cardFrozenTitle": "Targeta congelada",
     "cardFrozenSubtitle": "La targeta està temporalment desactivada",

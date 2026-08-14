@@ -35,7 +35,7 @@ export const CardDetailsScreen: React.FC = () => {
 
   const handleAuthFailure = useCallback(() => {
     toastShow({
-      message: LL.CardFlow.authenticationRequired(),
+      message: (translations) => translations.AuthenticationScreen.authenticationRequired(),
       LL,
     })
     navigation.goBack()

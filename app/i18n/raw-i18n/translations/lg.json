@@ -72,6 +72,7 @@
   },
   "AuthenticationScreen": {
     "authenticationDescription": "Kakasa okugenda mu maaso",
+    "authenticationRequired": "Okakasibwa kwetaagisa. Osobola okuteekawo PIN oba biometriks mu ntegeka z'obukuumi.",
     "setUp": "Teekateeka okukakasa kwa Biometric",
     "setUpAuthenticationDescription": "Kozesa biometric okukakasa",
     "skip": "Buuka",
@@ -3105,7 +3106,6 @@
       "cardUpdateError": "Tekisobose kukyusa embeera ya kaadi"
     },
     "validThruLabel": "KIKWATA OKUTUUSA",
-    "authenticationRequired": "Okakasibwa kwetaagisa. Osobola okuteekawo PIN oba biometriks mu ntegeka z'obukuumi.",
     "networkVisa": "Visa",
     "cardFrozenTitle": "Kaadi ekkuziddwa",
     "cardFrozenSubtitle": "Kaadi eddiriddwa okukola okumala akaseera",

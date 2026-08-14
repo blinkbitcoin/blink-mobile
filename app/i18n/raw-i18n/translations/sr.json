@@ -72,6 +72,7 @@
   },
   "AuthenticationScreen": {
     "authenticationDescription": "Аутентификујте се да би сте наставили",
+    "authenticationRequired": "Потребна је аутентификација. ПИН код или биометрију можете подесити у безбедносним подешавањима.",
     "setUp": "Подесите Биометријску Аутентификацију",
     "setUpAuthenticationDescription": "Користи биометрију за аутентификацију",
     "skip": "Прескочи",
@@ -3105,7 +3106,6 @@
       "cardUpdateError": "Није могуће ажурирати статус картице"
     },
     "validThruLabel": "VAŽI DO",
-    "authenticationRequired": "Потребна је аутентификација. ПИН код или биометрију можете подесити у безбедносним подешавањима.",
     "networkVisa": "Visa",
     "cardFrozenTitle": "Kartica zamrznuta",
     "cardFrozenSubtitle": "Kartica je privremeno onemogućena",

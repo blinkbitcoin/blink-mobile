@@ -72,6 +72,7 @@
   },
   "AuthenticationScreen": {
     "authenticationDescription": "Xác thực để tiếp tục",
+    "authenticationRequired": "Cần xác thực. Bạn có thể thiết lập mã PIN hoặc sinh trắc học trong cài đặt bảo mật.",
     "setUp": "Đặt xác thực vân tay",
     "setUpAuthenticationDescription": "Sử dụng vân tay để xác thực",
     "skip": "Bỏ qua",
@@ -3105,7 +3106,6 @@
       "cardUpdateError": "Không thể cập nhật trạng thái thẻ"
     },
     "validThruLabel": "CÓ HIỆU LỰC ĐẾN",
-    "authenticationRequired": "Cần xác thực. Bạn có thể thiết lập mã PIN hoặc sinh trắc học trong cài đặt bảo mật.",
     "networkVisa": "Visa",
     "cardFrozenTitle": "Thẻ bị khóa",
     "cardFrozenSubtitle": "Thẻ tạm thời bị vô hiệu hóa",

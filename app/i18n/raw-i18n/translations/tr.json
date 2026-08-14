@@ -72,6 +72,7 @@
   },
   "AuthenticationScreen": {
     "authenticationDescription": "Devam edebilmek için doğrula",
+    "authenticationRequired": "Kimlik doğrulama gerekli. Güvenlik ayarlarından PIN kodu veya biyometri ayarlayabilirsin.",
     "setUp": "Biyometrik doğrulamayı ayarlayın",
     "setUpAuthenticationDescription": "Doğrulama için biyometrik veri kullan",
     "skip": "Atla",
@@ -3105,7 +3106,6 @@
       "cardUpdateError": "Kart durumu güncellenemedi"
     },
     "validThruLabel": "GEÇERLİLİK",
-    "authenticationRequired": "Kimlik doğrulama gerekli. Güvenlik ayarlarından PIN kodu veya biyometri ayarlayabilirsin.",
     "networkVisa": "Visa",
     "cardFrozenTitle": "Kart donduruldu",
     "cardFrozenSubtitle": "Kart geçici olarak devre dışı",

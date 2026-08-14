@@ -72,6 +72,7 @@
   },
   "AuthenticationScreen": {
     "authenticationDescription": "Autentificați-vă pentru a continua",
+    "authenticationRequired": "Este necesară autentificarea. Puteți seta un cod PIN sau date biometrice în setările de securitate.",
     "setUp": "Configurați autentificarea biometrică",
     "setUpAuthenticationDescription": "Utilizați autentificarea biometrică",
     "skip": "Săriți peste",
@@ -3105,7 +3106,6 @@
       "cardUpdateError": "Nu s-a putut actualiza starea cardului"
     },
     "validThruLabel": "VALABIL PÂNĂ LA",
-    "authenticationRequired": "Este necesară autentificarea. Puteți seta un cod PIN sau date biometrice în setările de securitate.",
     "networkVisa": "Visa",
     "cardFrozenTitle": "Card blocat",
     "cardFrozenSubtitle": "Cardul este dezactivat temporar",

@@ -46,6 +46,8 @@ const en: BaseTranslation = {
   },
   AuthenticationScreen: {
     authenticationDescription: "Authenticate to continue",
+    authenticationRequired:
+      "Authentication is required. You can set up a PIN or biometrics in Security settings.",
     setUp: "Set up Biometric Authentication",
     setUpAuthenticationDescription: "Use biometric to authenticate",
     skip: "Skip",
@@ -3229,8 +3231,6 @@ const en: BaseTranslation = {
   },
   CardFlow: {
     validThruLabel: "VALID THRU",
-    authenticationRequired:
-      "Authentication is required. You can set up a PIN or biometrics in Security settings.",
     networkVisa: "Visa",
     cardFrozenTitle: "Card frozen",
     cardFrozenSubtitle: "Card is temporarily disabled",

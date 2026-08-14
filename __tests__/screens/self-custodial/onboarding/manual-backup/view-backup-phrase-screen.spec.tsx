@@ -74,6 +74,11 @@ jest.mock("@app/utils/external", () => ({
   openExternalUrl: (...args: unknown[]) => mockOpenExternalUrl(...args),
 }))
 
+const mockToastShow = jest.fn()
+jest.mock("@app/utils/toast", () => ({
+  toastShow: (...args: unknown[]) => mockToastShow(...args),
+}))
+
 loadLocale("en")
 const LL = i18nObject("en")
 
@@ -413,6 +418,8 @@ describe("ViewBackupPhraseScreen", () => {
       await act(async () => challengeParams().onChallengeFailure())
 
       expect(mockGoBack).toHaveBeenCalledTimes(1)
+      /** The bounce must explain itself — a silent goBack reads as a broken screen. */
+      expect(mockToastShow).toHaveBeenCalledTimes(1)
       expect(queryByText("youth")).toBeNull()
     })
 
@@ -430,6 +437,7 @@ describe("ViewBackupPhraseScreen", () => {
 
       await waitFor(() => expect(mockGoBack).toHaveBeenCalledTimes(1))
       expect(mockAuthenticate).not.toHaveBeenCalled()
+      expect(mockToastShow).toHaveBeenCalledTimes(1)
       expect(queryByText("youth")).toBeNull()
       expect(mockUseWalletMnemonic).not.toHaveBeenCalled()
     })

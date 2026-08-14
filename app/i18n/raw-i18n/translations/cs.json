@@ -72,6 +72,7 @@
   },
   "AuthenticationScreen": {
     "authenticationDescription": "Ověřte se, chcete-li pokračovat",
+    "authenticationRequired": "Je vyžadováno ověření. PIN kód nebo biometrii můžete nastavit v nastavení zabezpečení.",
     "setUp": "Nastavení biometrického ověřování",
     "setUpAuthenticationDescription": "Použití biometrických údajů k ověřování",
     "skip": "Přeskočit",
@@ -3105,7 +3106,6 @@
       "cardUpdateError": "Nepodařilo se aktualizovat stav karty"
     },
     "validThruLabel": "PLATNOST DO",
-    "authenticationRequired": "Je vyžadováno ověření. PIN kód nebo biometrii můžete nastavit v nastavení zabezpečení.",
     "networkVisa": "Visa",
     "cardFrozenTitle": "Karta zmrazena",
     "cardFrozenSubtitle": "Karta je dočasně deaktivována",

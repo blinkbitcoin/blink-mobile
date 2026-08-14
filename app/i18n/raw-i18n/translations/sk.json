@@ -72,6 +72,7 @@
   },
   "AuthenticationScreen": {
     "authenticationDescription": "Overte sa, aby ste mohli pokračovať",
+    "authenticationRequired": "Vyžaduje sa overenie. PIN kód alebo biometriu si môžete nastaviť v nastaveniach zabezpečenia.",
     "setUp": "Nastavenie biometrického overovania",
     "setUpAuthenticationDescription": "Použitie biometrických údajov na overovanie",
     "skip": "Preskočiť",
@@ -3105,7 +3106,6 @@
       "cardUpdateError": "Nepodarilo sa aktualizovať stav karty"
     },
     "validThruLabel": "PLATNÉ DO",
-    "authenticationRequired": "Vyžaduje sa overenie. PIN kód alebo biometriu si môžete nastaviť v nastaveniach zabezpečenia.",
     "networkVisa": "Visa",
     "cardFrozenTitle": "Karta zmrazená",
     "cardFrozenSubtitle": "Karta je dočasne deaktivovaná",
