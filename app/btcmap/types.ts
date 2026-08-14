@@ -11,11 +11,11 @@ export type BtcMapPlaceWire = {
   deleted_at?: string | null
 }
 
-// The index signature carries the raw OpenStreetMap tags BTC Map passes through
-// under an `osm:` prefix — "osm:payment:lightning" and friends. Those keys are
-// not identifiers, so they are read by index.
+// Only the promoted fields are named. BTC Map also passes raw OpenStreetMap
+// tags through under an `osm:` prefix — "osm:payment:lightning" and friends —
+// but those keys are not identifiers and an index signature here would make
+// every misspelled field name type-check, so they are read through `osmTag`.
 export type BtcMapPlaceDetailsWire = {
-  [tag: string]: string | number | undefined
   id: number
   name?: string
   address?: string

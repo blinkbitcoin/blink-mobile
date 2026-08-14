@@ -77,8 +77,10 @@ const toPlace = (place: BtcMapPlaceWire): BtcMapPlace => ({
   boostedUntil: place.boosted_until,
 })
 
+// The single place the wire object is read outside its declared fields, so the
+// cast is contained and a typo in a *named* field still fails to compile.
 const osmTag = (wire: BtcMapPlaceDetailsWire, tag: string): string | undefined => {
-  const value = wire[tag]
+  const value = (wire as Record<string, unknown>)[tag]
   return typeof value === "string" ? value : undefined
 }
 
