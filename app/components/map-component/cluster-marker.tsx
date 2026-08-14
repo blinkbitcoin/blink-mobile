@@ -5,6 +5,8 @@ import Svg, { Circle } from "react-native-svg"
 
 import { Text, makeStyles } from "@rn-vui/themed"
 
+import { useMarkerSettle } from "./use-marker-settle"
+
 // BTC Map's cluster discs: two translucent circles that step from green to
 // amber to orange as the count grows. Same values in both themes.
 const CLUSTER_SIZE = 40
@@ -35,6 +37,9 @@ type Props = {
 export const ClusterMarker: React.FC<Props> = React.memo(({ cluster, onPress }) => {
   const styles = useStyles()
   const tier = tierFor(cluster.count)
+  // Discs are react-native-svg like the pins are, so they need the same paint
+  // window before tracking can be turned off — see use-marker-settle.
+  const tracksViewChanges = useMarkerSettle(`${tier.inner}|${cluster.count}`)
 
   return (
     <Marker
@@ -42,7 +47,7 @@ export const ClusterMarker: React.FC<Props> = React.memo(({ cluster, onPress }) 
       testID={`btcmap-cluster-${cluster.id}`}
       coordinate={{ latitude: cluster.latitude, longitude: cluster.longitude }}
       anchor={{ x: 0.5, y: 0.5 }}
-      tracksViewChanges={false}
+      tracksViewChanges={tracksViewChanges}
       onPress={() => onPress(cluster)}
     >
       <View style={styles.cluster}>

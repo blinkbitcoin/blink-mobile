@@ -6,6 +6,7 @@ import MaterialIcon from "react-native-vector-icons/MaterialIcons"
 import { BtcMapPlace, isBoosted, materialIconName } from "@app/btcmap"
 import { makeStyles } from "@rn-vui/themed"
 
+import { useMarkerSettle } from "./use-marker-settle"
 import {
   PIN_COLOR,
   PIN_COLOR_BOOSTED,
@@ -18,11 +19,6 @@ import {
   PinShape,
 } from "./pin-shape"
 
-// react-native-maps re-rasterises a custom marker view on every frame while
-// `tracksViewChanges` is on, which is ruinous with hundreds of pins on screen.
-// It has to stay on long enough for the SVG and the glyph to paint once.
-const SETTLE_MS = 400
-
 type Props = {
   place: BtcMapPlace
   onPress: (place: BtcMapPlace) => void
@@ -33,16 +29,7 @@ export const PlaceMarker: React.FC<Props> = React.memo(({ place, onPress }) => {
   const color = isBoosted(place.boostedUntil, new Date()) ? PIN_COLOR_BOOSTED : PIN_COLOR
   const glyph = materialIconName(place.icon)
 
-  const [tracksViewChanges, setTracksViewChanges] = React.useState(true)
-
-  // Keyed on what is actually drawn: once tracking is off, Android keeps
-  // rendering the cached bitmap, so a place whose icon or boost changes under a
-  // sync has to be allowed to rasterise again.
-  React.useEffect(() => {
-    setTracksViewChanges(true)
-    const timer = setTimeout(() => setTracksViewChanges(false), SETTLE_MS)
-    return () => clearTimeout(timer)
-  }, [glyph, color])
+  const tracksViewChanges = useMarkerSettle(`${glyph}|${color}`)
 
   return (
     <Marker
