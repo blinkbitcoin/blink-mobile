@@ -15,6 +15,8 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
     UnclaimedDeposits: "UnclaimedDeposits",
     PaymentFailed: "PaymentFailed",
     AutoOptimization: "AutoOptimization",
+    LightningAddressChanged: "LightningAddressChanged",
+    NewDeposits: "NewDeposits",
   },
 }))
 
@@ -372,6 +374,27 @@ describe("useSdkLifecycle", () => {
 
       expect(mockGetSnapshot.mock.calls).toHaveLength(snapshotCallsBefore)
       expect(result.current.lastReceivedPaymentId).toBeNull()
+    })
+
+    /** NewDeposits only reached REFRESH_EVENTS in 0.22. If this mock ever drops the tag
+     *  again the set holds `undefined`, and this refresh silently stops happening. */
+    it("refreshes on a NewDeposits event", async () => {
+      mockInitSdk.mockResolvedValue(buildSdk("sdk-1"))
+      const listener = captureListener()
+
+      renderHook(() => useSdkLifecycle("acct-1", 0))
+
+      await waitFor(() => {
+        expect(listener.current).not.toBeNull()
+      })
+
+      const snapshotCallsBefore = mockGetSnapshot.mock.calls.length
+
+      await act(async () => {
+        await listener.current?.({ tag: "NewDeposits" })
+      })
+
+      expect(mockGetSnapshot.mock.calls.length).toBeGreaterThan(snapshotCallsBefore)
     })
 
     it("does not update lastReceivedPaymentId when the event lacks inner.payment", async () => {

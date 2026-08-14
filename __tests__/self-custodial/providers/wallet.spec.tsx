@@ -54,6 +54,8 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
     UnclaimedDeposits: "UnclaimedDeposits",
     PaymentFailed: "PaymentFailed",
     AutoOptimization: "AutoOptimization",
+    LightningAddressChanged: "LightningAddressChanged",
+    NewDeposits: "NewDeposits",
   },
   ServiceStatus: {
     Operational: 0,
