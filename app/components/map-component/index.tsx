@@ -11,6 +11,7 @@ import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { updateMapLastCoords } from "@app/graphql/client-only-query"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { LOCATION_PERMISSION, getUserRegion } from "@app/screens/map-screen/functions"
+import { useFocusEffect } from "@react-navigation/native"
 import { isIOS } from "@rn-vui/base"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
@@ -59,7 +60,12 @@ export default function MapComponent({
   const [coords, setCoords] = React.useState<LatLng | undefined>(userCoords)
   const [selectedPlace, setSelectedPlace] = React.useState<BtcMapPlace | null>(null)
 
-  const { places: allPlaces, isLoading, hasError, retry } = useBtcMapPlaces()
+  const { places: allPlaces, isLoading, hasError, refresh } = useBtcMapPlaces()
+
+  // The map tab is never unmounted, so returning to it days later would
+  // otherwise show whatever was cached when the process started. `refresh` is a
+  // no-op unless the cache has actually aged out.
+  useFocusEffect(refresh)
   const { places, clusters, regionForCluster } = usePlaceClusters(allPlaces, region)
 
   // toggle modal from inside modal component instead of here in the parent
@@ -195,7 +201,7 @@ export default function MapComponent({
       )}
 
       {hasError && (
-        <Pressable style={styles.statusPill} onPress={retry}>
+        <Pressable style={styles.statusPill} onPress={refresh}>
           <GaloyIcon name="warning" size={16} color={colors.error} />
           <Text style={styles.statusText}>{LL.MapScreen.placesError()}</Text>
           <Text style={styles.retryText}>{LL.common.tryAgain()}</Text>

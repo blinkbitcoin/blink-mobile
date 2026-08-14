@@ -1,3 +1,4 @@
+import { AppState, AppStateStatus } from "react-native"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
 
 import { fetchPlacesDelta, fetchPlacesSnapshot } from "@app/btcmap/api"
@@ -157,7 +158,7 @@ describe("useBtcMapPlaces", () => {
     const { result } = renderHook(() => useBtcMapPlaces())
     await waitFor(() => expect(result.current.hasError).toBe(true))
 
-    act(() => result.current.retry())
+    act(() => result.current.refresh())
 
     await waitFor(() => expect(result.current.places).toHaveLength(1))
     expect(result.current.hasError).toBe(false)
@@ -242,7 +243,73 @@ describe("useBtcMapPlaces kill switch", () => {
   })
 })
 
-describe("useBtcMapPlaces lossless sync", () => {
+describe("useBtcMapPlaces staying current while mounted", () => {
+  const emitAppState = (status: AppStateStatus) => {
+    const calls = (AppState.addEventListener as jest.Mock).mock.calls
+    const handler = calls[calls.length - 1][1] as (state: AppStateStatus) => void
+    act(() => handler(status))
+  }
+
+  beforeEach(() => {
+    jest
+      .spyOn(AppState, "addEventListener")
+      .mockReturnValue({ remove: jest.fn() } as never)
+  })
+
+  afterEach(() => jest.restoreAllMocks())
+
+  it("syncs on resume once the cache has aged out", async () => {
+    // The map tab never unmounts, so without this the age check runs once per
+    // process and a week-old cache stays on screen forever.
+    const openedAt = Date.now()
+    mockedRead.mockResolvedValue(cached(0))
+    const { result } = renderHook(() => useBtcMapPlaces())
+    await waitFor(() => expect(result.current.isLoading).toBe(false))
+    expect(mockedDelta).not.toHaveBeenCalled()
+
+    // Backgrounded for well over the sync interval, then reopened.
+    jest.spyOn(Date, "now").mockReturnValue(openedAt + BTCMAP_SYNC_INTERVAL_MS + 1000)
+    emitAppState("active")
+
+    await waitFor(() => expect(mockedDelta).toHaveBeenCalled())
+  })
+
+  it("does nothing on resume while the cache is still fresh", async () => {
+    mockedRead.mockResolvedValue(cached(0))
+    const { result } = renderHook(() => useBtcMapPlaces())
+    await waitFor(() => expect(result.current.isLoading).toBe(false))
+
+    emitAppState("active")
+    emitAppState("active")
+
+    expect(mockedRead).toHaveBeenCalledTimes(1)
+    expect(mockedDelta).not.toHaveBeenCalled()
+  })
+
+  it("refuses to stampede while a load is already running", async () => {
+    mockedRead.mockResolvedValue(null)
+    let releaseSeed: (value: {
+      places: BtcMapPlace[]
+      syncedUpTo: string
+    }) => void = () => {}
+    mockedSnapshot.mockReturnValue(
+      new Promise((resolve) => {
+        releaseSeed = resolve
+      }),
+    )
+
+    const { result } = renderHook(() => useBtcMapPlaces())
+    await waitFor(() => expect(mockedSnapshot).toHaveBeenCalledTimes(1))
+
+    act(() => result.current.refresh())
+    expect(mockedSnapshot).toHaveBeenCalledTimes(1)
+
+    await act(async () => {
+      releaseSeed({ places: [place(1)], syncedUpTo: "2026-08-01T00:00:00.000Z" })
+    })
+    await waitFor(() => expect(result.current.places).toHaveLength(1))
+  })
+
   it("throws the cache away when the delta cannot page losslessly", async () => {
     mockedRead.mockResolvedValue(cached(BTCMAP_SYNC_INTERVAL_MS + 1000))
     mockedDelta.mockResolvedValue({

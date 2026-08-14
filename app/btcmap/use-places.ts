@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react"
+import { AppState } from "react-native"
 
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { recordAppError, toError } from "@app/utils/error-reporting"
@@ -36,6 +37,11 @@ const isStale = (snapshot: BtcMapSnapshot | null): boolean => {
  * edits behind. A cold start pulls the CDN snapshot; every start after that
  * asks the API for what changed, at most once an hour.
  *
+ * The map tab stays mounted for the life of the process, so "once an hour"
+ * cannot rely on a remount. `refresh` re-runs the age check and is wired to app
+ * resume here and to screen focus by the map component; it is a no-op when the
+ * cache is fresh or a load is already in flight, so neither trigger can stampede.
+ *
  * All of it is behind a Remote Config kill switch, because the data is a third
  * party's: turning `btcMapPlacesEnabled` off empties the map — quietly, since a
  * deliberate shutdown is not an error the user can act on — without waiting for
@@ -50,6 +56,9 @@ export const useBtcMapPlaces = () => {
   const { btcMapPlacesEnabled } = useRemoteConfig()
 
   const isMountedRef = useRef(true)
+  // What `refresh` needs to decide without re-running on every state change.
+  const snapshotRef = useRef<BtcMapSnapshot | null>(null)
+  const isLoadingRef = useRef(false)
 
   useEffect(() => {
     isMountedRef.current = true
@@ -60,6 +69,7 @@ export const useBtcMapPlaces = () => {
 
   useEffect(() => {
     if (!btcMapPlacesEnabled) {
+      isLoadingRef.current = false
       setPlaces([])
       setLoading(false)
       setHasError(false)
@@ -90,6 +100,7 @@ export const useBtcMapPlaces = () => {
     }
 
     const load = async () => {
+      isLoadingRef.current = true
       setLoading(true)
       setHasError(false)
 
@@ -151,6 +162,8 @@ export const useBtcMapPlaces = () => {
         // cached map on screen, a failed refresh is not worth a toast.
         if (isMountedRef.current && !snapshot) setHasError(true)
       } finally {
+        snapshotRef.current = snapshot
+        isLoadingRef.current = false
         if (isMountedRef.current) setLoading(false)
       }
     }
@@ -158,7 +171,20 @@ export const useBtcMapPlaces = () => {
     load()
   }, [attempt, btcMapPlacesEnabled])
 
-  const retry = useCallback(() => setAttempt((previous) => previous + 1), [])
+  const refresh = useCallback(() => {
+    if (isLoadingRef.current) return
+    if (!isStale(snapshotRef.current)) return
+    setAttempt((previous) => previous + 1)
+  }, [])
 
-  return { places, isLoading, hasError, retry }
+  // Coming back from the background is the other way a long-lived map goes
+  // stale without ever remounting.
+  useEffect(() => {
+    const subscription = AppState.addEventListener("change", (state) => {
+      if (state === "active") refresh()
+    })
+    return () => subscription.remove()
+  }, [refresh])
+
+  return { places, isLoading, hasError, refresh }
 }

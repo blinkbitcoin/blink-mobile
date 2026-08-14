@@ -9,7 +9,7 @@ import { getUserRegion } from "@app/screens/map-screen/functions"
 
 import { ContextForScreen } from "../../screens/helper"
 
-const mockRetry = jest.fn()
+const mockRefresh = jest.fn()
 
 jest.mock("@app/btcmap/use-places", () => ({ useBtcMapPlaces: jest.fn() }))
 
@@ -80,7 +80,7 @@ const setPlaces = (overrides: Partial<ReturnType<typeof useBtcMapPlaces>> = {}) 
     places: [],
     isLoading: false,
     hasError: false,
-    retry: mockRetry,
+    refresh: mockRefresh,
     ...overrides,
   })
 
@@ -126,7 +126,7 @@ describe("MapComponent", () => {
     )
     fireEvent.press(getByText("Try Again"))
 
-    expect(mockRetry).toHaveBeenCalled()
+    expect(mockRefresh).toHaveBeenCalled()
   })
 
   it("credits OpenStreetMap, which the data's licence requires", async () => {
