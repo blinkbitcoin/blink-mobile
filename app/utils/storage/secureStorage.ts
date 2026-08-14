@@ -1,11 +1,19 @@
 import RNSecureKeyStore, { ACCESSIBLE } from "react-native-secure-key-store"
 
+// The keychain slot and the legacy persisted-blob field share this name.
+// Pinned forever: existing installs already store entries under it.
+export const GALOY_AUTH_TOKEN_KEY = "galoyAuthToken"
+// Type-level handle so other modules can pin their own copy of the literal to
+// this one at compile time without a runtime import (specs mock this module
+// wholesale, which would erase a runtime named export).
+export type GaloyAuthTokenKey = typeof GALOY_AUTH_TOKEN_KEY
+
 export default class KeyStoreWrapper {
   private static readonly IS_BIOMETRICS_ENABLED = "isBiometricsEnabled"
   private static readonly PIN = "PIN"
   private static readonly PIN_ATTEMPTS = "pinAttempts"
   private static readonly SESSION_PROFILES = "sessionProfiles"
-  private static readonly ACTIVE_TOKEN = "galoyAuthToken"
+  private static readonly ACTIVE_TOKEN = GALOY_AUTH_TOKEN_KEY
   private static readonly MNEMONIC = "mnemonic"
   private static readonly MNEMONIC_NETWORK = "mnemonic_network"
 

@@ -11,7 +11,7 @@ import {
   saveJson,
   saveString,
 } from "@app/utils/storage"
-import KeyStoreWrapper from "@app/utils/storage/secureStorage"
+import KeyStoreWrapper, { type GaloyAuthTokenKey } from "@app/utils/storage/secureStorage"
 
 import {
   defaultPersistentState,
@@ -25,9 +25,14 @@ const PERSISTENT_STATE_QUARANTINE_PREFIX = "persistentStateQuarantine"
 
 const TOKEN_REDACTED = "[REDACTED]"
 
+// One name, three roles: the blob field, the duck-type checks below, and the
+// keychain slot. The type annotation pins this literal to secureStorage's
+// GALOY_AUTH_TOKEN_KEY at compile time (a mismatch is a tsc error).
+const GALOY_AUTH_TOKEN_KEY: GaloyAuthTokenKey = "galoyAuthToken"
+
 const redactToken = (rawData: unknown): unknown => {
-  if (rawData && typeof rawData === "object" && "galoyAuthToken" in rawData) {
-    return { ...rawData, galoyAuthToken: TOKEN_REDACTED }
+  if (rawData && typeof rawData === "object" && GALOY_AUTH_TOKEN_KEY in rawData) {
+    return { ...rawData, [GALOY_AUTH_TOKEN_KEY]: TOKEN_REDACTED }
   }
   return rawData
 }
@@ -67,9 +72,9 @@ const scrubQuarantinedTokens = async (): Promise<void> => {
         if (
           parsed &&
           typeof parsed === "object" &&
-          "galoyAuthToken" in parsed &&
-          parsed.galoyAuthToken &&
-          parsed.galoyAuthToken !== TOKEN_REDACTED
+          GALOY_AUTH_TOKEN_KEY in parsed &&
+          parsed[GALOY_AUTH_TOKEN_KEY] &&
+          parsed[GALOY_AUTH_TOKEN_KEY] !== TOKEN_REDACTED
         ) {
           const ok = await saveString(key, JSON.stringify(redactToken(parsed)))
           if (!ok) {
@@ -97,6 +102,17 @@ const scrubQuarantinedTokens = async (): Promise<void> => {
     )
   }
 }
+
+type PersistentStateBlob = Omit<PersistentState, "galoyAuthToken"> & {
+  // Structural typing would let a full PersistentState satisfy a plain Omit;
+  // `never` turns passing the token into a compile error.
+  galoyAuthToken?: never
+}
+
+// The ONLY writer of the persisted blob: the token must never reach plaintext
+// storage again, and this signature makes that a compile-time guarantee.
+const savePersistentStateBlob = (blob: PersistentStateBlob): Promise<void> =>
+  saveJson(PERSISTENT_STATE_KEY, blob)
 
 type LoadedPersistentState = {
   state: PersistentState
@@ -128,7 +144,7 @@ export const loadPersistentState = async (): Promise<LoadedPersistentState> => {
         if (adopted) {
           const { galoyAuthToken: _, ...scrubbed } = result.state
           try {
-            await saveJson(PERSISTENT_STATE_KEY, scrubbed)
+            await savePersistentStateBlob(scrubbed)
           } catch (err) {
             reportError("Persistent state scrub", err, { alwaysRecord: true })
           }
@@ -182,7 +198,7 @@ const savePersistentState = async (
 ): Promise<void> => {
   const { galoyAuthToken, ...stateWithoutToken } = state
   try {
-    await saveJson(PERSISTENT_STATE_KEY, stateWithoutToken)
+    await savePersistentStateBlob(stateWithoutToken)
   } catch (err) {
     // Storage failures are crash-adjacent: never downgrade on message wording.
     reportError("Persistent state save", err, { alwaysRecord: true })
@@ -192,7 +208,7 @@ const savePersistentState = async (
       ? await KeyStoreWrapper.setActiveToken(galoyAuthToken)
       : await KeyStoreWrapper.removeActiveToken()
     if (ok) {
-      // eslint-disable-next-line require-atomic-updates -- single writer; saves are serialized per state change
+      // eslint-disable-next-line require-atomic-updates -- single writer; the provider's save queue serializes saves
       lastPersistedTokenRef.current = galoyAuthToken
     } else {
       // Ref stays stale so the next state change retries the keychain write.
@@ -223,10 +239,17 @@ export const PersistentStateProvider: React.FC<PropsWithChildren> = ({ children 
   )
   const hasModified = React.useRef(false)
   const lastPersistedTokenRef = React.useRef("")
+  const saveQueueRef = React.useRef<Promise<void>>(Promise.resolve())
 
   React.useEffect(() => {
     if (hasModified.current && persistentState) {
-      savePersistentState(persistentState, lastPersistedTokenRef)
+      // Serialize saves: the ref update inside savePersistentState is
+      // single-writer only because each save waits for the previous one.
+      // (savePersistentState catches all its own failures, so the chain
+      // cannot reject and wedge.)
+      saveQueueRef.current = saveQueueRef.current.then(() =>
+        savePersistentState(persistentState, lastPersistedTokenRef),
+      )
     }
   }, [persistentState])
 
