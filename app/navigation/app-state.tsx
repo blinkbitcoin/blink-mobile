@@ -6,11 +6,17 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { useApolloClient } from "@apollo/client"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
-import { HomeAuthedDocument } from "@app/graphql/generated"
+import {
+  CustodialRestrictionsDocument,
+  HomeAuthedDocument,
+  RegionCheckDocument,
+} from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
+import { useSelfCustodialAccountMode } from "@app/self-custodial/hooks/use-self-custodial-account-mode"
 import { useAuthenticationContext } from "@app/navigation/navigation-container-wrapper"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { logEnterBackground, logEnterForeground } from "@app/utils/analytics"
+import { resetIpCountryLookup } from "@app/utils/ip-country-lookup"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
 const MILLISECONDS_PER_SECOND = 1000
@@ -22,6 +28,7 @@ export const AppStateWrapper: React.FC = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { isAppLocked, setAppLocked } = useAuthenticationContext()
   const { appLockGracePeriodSeconds } = useRemoteConfig()
+  const { isAnonMode } = useSelfCustodialAccountMode()
 
   /** When the app left the foreground, or null while it has not. A ref rather than state
    *  because nothing renders from it, and losing it to a killed process is harmless: that
@@ -88,7 +95,24 @@ export const AppStateWrapper: React.FC = () => {
         nextAppState === "background"
 
       if (isEnteringForeground) {
-        isAuthed && client.refetchQueries({ include: [HomeAuthedDocument] })
+        /** Sanctions ride the live connection and are evaluated at every session start,
+         *  so the verdict is re-asked for on return rather than kept from wherever the
+         *  session was backgrounded. It carries no account, so it runs unauthed too.
+         *
+         *  Anon is excluded here rather than left to the query's own `skip`: Apollo parks
+         *  a skipped query in `standby` and would not refetch it, but the promise that an
+         *  Anon account is never located must not rest on that. */
+        isAnonMode || client.refetchQueries({ include: [RegionCheckDocument] })
+
+        /** The self-custodial half still resolves its own country, and its shared lookup
+         *  outlives a session unless dropped here: without this the region a user
+         *  launched on would govern until they killed the app, which is the latch this
+         *  work exists to remove. */
+        resetIpCountryLookup()
+        isAuthed &&
+          client.refetchQueries({
+            include: [HomeAuthedDocument, CustodialRestrictionsDocument],
+          })
 
         console.info("App has come to the foreground!")
         logEnterForeground()
@@ -101,7 +125,7 @@ export const AppStateWrapper: React.FC = () => {
         logEnterBackground()
       }
     },
-    [client, isAuthed, relockIfGracePeriodExpired],
+    [client, isAuthed, isAnonMode, relockIfGracePeriodExpired],
   )
 
   useEffect(() => {

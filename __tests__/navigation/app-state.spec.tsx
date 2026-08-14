@@ -13,6 +13,8 @@ const mockRefetchQueries = jest.fn()
 
 let mockGracePeriodSeconds = 60
 let mockIsAuthed = true
+let mockIsAnonMode = false
+const mockResetIpCountryLookup = jest.fn()
 let mockIsAppLocked = false
 
 jest.mock("@react-navigation/native", () => ({
@@ -33,6 +35,14 @@ jest.mock("@app/config/feature-flags-context", () => ({
 
 jest.mock("@app/graphql/is-authed-context", () => ({
   useIsAuthed: () => mockIsAuthed,
+}))
+
+jest.mock("@app/self-custodial/hooks/use-self-custodial-account-mode", () => ({
+  useSelfCustodialAccountMode: () => ({ isAnonMode: mockIsAnonMode }),
+}))
+
+jest.mock("@app/utils/ip-country-lookup", () => ({
+  resetIpCountryLookup: () => mockResetIpCountryLookup(),
 }))
 
 jest.mock("@apollo/client", () => ({
@@ -87,6 +97,7 @@ describe("AppStateWrapper", () => {
 
     mockGracePeriodSeconds = GRACE_PERIOD_SECONDS
     mockIsAuthed = true
+    mockIsAnonMode = false
     mockIsAppLocked = false
     setLock({ pin: true, biometrics: false })
 
@@ -276,23 +287,69 @@ describe("AppStateWrapper", () => {
   })
 
   describe("existing foreground behavior", () => {
+    /** The document a refetch call named, so the two batches can be told apart. */
+    const refetchedOperations = () =>
+      mockRefetchQueries.mock.calls.flatMap((call) =>
+        (call[0]?.include ?? []).map(
+          (document: { definitions: { name?: { value: string } }[] }) =>
+            document.definitions[0]?.name?.value,
+        ),
+      )
+
     it("refetches the home query when the app returns", async () => {
       renderWrapper()
       await flushEffects()
 
       await leaveAndReturn(1)
 
-      expect(mockRefetchQueries).toHaveBeenCalledTimes(1)
+      expect(refetchedOperations()).toContain("homeAuthed")
     })
 
-    it("does not refetch for a signed-out user", async () => {
+    /** Sanctions ride the live connection and are evaluated at every session start, so
+     *  the verdict is re-asked for on return regardless of who is signed in. */
+    it("re-asks for the region verdict when the app returns", async () => {
+      renderWrapper()
+      await flushEffects()
+
+      await leaveAndReturn(1)
+
+      expect(refetchedOperations()).toContain("regionCheck")
+    })
+
+    /** The self-custodial half resolves its own country through a lookup shared for the
+     *  whole JS process; keeping it across a session start is the latch this removes. */
+    it("drops the shared country lookup when the app returns", async () => {
+      renderWrapper()
+      await flushEffects()
+
+      await leaveAndReturn(1)
+
+      expect(mockResetIpCountryLookup).toHaveBeenCalled()
+    })
+
+    /** Anon exists so that nothing about the user is read, the connection included. The
+     *  guard is asserted here rather than left to the query's own skip. */
+    it("asks for no region verdict in Anon mode", async () => {
+      mockIsAnonMode = true
+      renderWrapper()
+      await flushEffects()
+
+      await leaveAndReturn(1)
+
+      expect(refetchedOperations()).not.toContain("regionCheck")
+    })
+
+    it("refetches nothing account-bound for a signed-out user", async () => {
       mockIsAuthed = false
       renderWrapper()
       await flushEffects()
 
       await leaveAndReturn(1)
 
-      expect(mockRefetchQueries).not.toHaveBeenCalled()
+      const operations = refetchedOperations()
+      expect(operations).toContain("regionCheck")
+      expect(operations).not.toContain("homeAuthed")
+      expect(operations).not.toContain("custodialRestrictions")
     })
   })
 })
