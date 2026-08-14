@@ -6,12 +6,14 @@ const mockUserLogoutMutation = jest.fn()
 const mockResetState = jest.fn()
 const mockLogLogout = jest.fn()
 const mockReportError = jest.fn()
+const mockGetDeviceToken = jest.fn()
 
 const mockRemoveIsBiometricsEnabled = jest.fn()
 const mockRemovePin = jest.fn()
 const mockRemovePinAttempts = jest.fn()
 const mockRemoveSessionProfiles = jest.fn()
 const mockRemoveSessionProfileByToken = jest.fn()
+const mockGetActiveToken = jest.fn()
 const mockRemoveActiveToken = jest.fn()
 
 jest.mock("@app/graphql/generated", () => ({
@@ -32,7 +34,7 @@ jest.mock("@app/utils/error-logging", () => ({
 }))
 
 jest.mock("@react-native-firebase/messaging", () => () => ({
-  getToken: () => Promise.resolve("device-token"),
+  getToken: () => mockGetDeviceToken(),
 }))
 
 const mockMultiRemove = jest.fn()
@@ -53,6 +55,7 @@ jest.mock("@app/utils/storage/secureStorage", () => ({
     removeSessionProfiles: (...args: unknown[]) => mockRemoveSessionProfiles(...args),
     removeSessionProfileByToken: (...args: unknown[]) =>
       mockRemoveSessionProfileByToken(...args),
+    getActiveToken: (...args: unknown[]) => mockGetActiveToken(...args),
     removeActiveToken: (...args: unknown[]) => mockRemoveActiveToken(...args),
   },
 }))
@@ -61,12 +64,14 @@ describe("useLogout", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockUserLogoutMutation.mockResolvedValue({ data: { userLogout: { success: true } } })
+    mockGetDeviceToken.mockResolvedValue("device-token")
     mockMultiRemove.mockResolvedValue(undefined)
     mockRemoveIsBiometricsEnabled.mockResolvedValue(true)
     mockRemovePin.mockResolvedValue(true)
     mockRemovePinAttempts.mockResolvedValue(true)
     mockRemoveSessionProfiles.mockResolvedValue(true)
     mockRemoveSessionProfileByToken.mockResolvedValue(true)
+    mockGetActiveToken.mockResolvedValue("")
     mockRemoveActiveToken.mockResolvedValue(true)
   })
 
@@ -86,6 +91,7 @@ describe("useLogout", () => {
   })
 
   it("profile logout (explicit token) removes only that profile, not the active keychain token", async () => {
+    mockGetActiveToken.mockResolvedValue("current-session-token")
     const { result } = renderHook(() => useLogout())
 
     await act(async () => {
@@ -99,5 +105,71 @@ describe("useLogout", () => {
     expect(mockRemoveSessionProfileByToken).toHaveBeenCalledWith("other-profile-token")
     expect(mockRemoveActiveToken).not.toHaveBeenCalled()
     expect(mockResetState).not.toHaveBeenCalled()
+  })
+
+  it("profile logout also drops the keychain token when the removed profile backs the active session", async () => {
+    // A crash after this logout but before the caller saves the next token
+    // must land on "logged out", never on a session whose profile is gone.
+    mockGetActiveToken.mockResolvedValue("active-token")
+    const { result } = renderHook(() => useLogout())
+
+    await act(async () => {
+      await result.current.logout({
+        token: "active-token",
+        isValidToken: false,
+        stateToDefault: false,
+      })
+    })
+
+    expect(mockRemoveSessionProfileByToken).toHaveBeenCalledWith("active-token")
+    expect(mockRemoveActiveToken).toHaveBeenCalledTimes(1)
+  })
+
+  it("revokes the session server-side when a valid token and device token are available", async () => {
+    const { result } = renderHook(() => useLogout())
+
+    await act(async () => {
+      await result.current.logout({ token: "session-token", stateToDefault: false })
+    })
+
+    expect(mockUserLogoutMutation).toHaveBeenCalledWith(
+      expect.objectContaining({
+        variables: { input: { deviceToken: "device-token" } },
+      }),
+    )
+  })
+
+  it("a failed device-token fetch never skips the local cleanup, only the server revocation", async () => {
+    mockGetDeviceToken.mockRejectedValue(new Error("firebase unavailable"))
+    const { result } = renderHook(() => useLogout())
+
+    await act(async () => {
+      await result.current.logout({ token: "session-token", stateToDefault: false })
+    })
+
+    expect(mockRemoveSessionProfileByToken).toHaveBeenCalledWith("session-token")
+    // UserLogoutInput.deviceToken is non-null: without one there is no valid
+    // revocation call to make.
+    expect(mockUserLogoutMutation).not.toHaveBeenCalled()
+    expect(mockReportError).toHaveBeenCalledWith(
+      "logout device token fetch",
+      expect.any(Error),
+    )
+  })
+
+  it("a failed device-token fetch on full logout still wipes every keychain secret", async () => {
+    mockGetDeviceToken.mockRejectedValue(new Error("firebase unavailable"))
+    const { result } = renderHook(() => useLogout())
+
+    await act(async () => {
+      await result.current.logout()
+    })
+
+    expect(mockRemoveIsBiometricsEnabled).toHaveBeenCalledTimes(1)
+    expect(mockRemovePin).toHaveBeenCalledTimes(1)
+    expect(mockRemovePinAttempts).toHaveBeenCalledTimes(1)
+    expect(mockRemoveSessionProfiles).toHaveBeenCalledTimes(1)
+    expect(mockRemoveActiveToken).toHaveBeenCalledTimes(1)
+    expect(mockResetState).toHaveBeenCalledTimes(1)
   })
 })
