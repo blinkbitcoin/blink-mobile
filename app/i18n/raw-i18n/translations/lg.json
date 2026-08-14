@@ -3415,8 +3415,7 @@
         "pinChangedTitle": "PIN ekyusiddwa",
         "pinChangedSubtitle": "PIN yo ekyusiddwa bulungi.",
         "pinChangedToast": "PIN ekyusiddwa obulungi",
-        "biometricDescription": "Kakasa obuntubulamu bwo okukyusa PIN",
-        "biometricRequired": "Okukakasa kw'ebiometrike kwetaagisa okukyusa PIN yo."
+        "biometricDescription": "Kakasa obuntubulamu bwo okukyusa PIN"
       }
     },
     "ReplaceCard": {

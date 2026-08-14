@@ -3415,8 +3415,7 @@
         "pinChangedTitle": "PIN verander",
         "pinChangedSubtitle": "Jou PIN is suksesvol verander.",
         "pinChangedToast": "PIN is suksesvol verander",
-        "biometricDescription": "Verifieer jou identiteit om PIN te verander",
-        "biometricRequired": "Biometriese verifikasie is nodig om jou PIN te verander."
+        "biometricDescription": "Verifieer jou identiteit om PIN te verander"
       }
     },
     "ReplaceCard": {

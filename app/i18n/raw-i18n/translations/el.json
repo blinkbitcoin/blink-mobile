@@ -3415,8 +3415,7 @@
         "pinChangedTitle": "Το PIN άλλαξε",
         "pinChangedSubtitle": "Το PIN σας άλλαξε επιτυχώς.",
         "pinChangedToast": "Ο κωδικός PIN άλλαξε επιτυχώς",
-        "biometricDescription": "Επαληθεύστε την ταυτότητά σας για αλλαγή PIN",
-        "biometricRequired": "Η βιομετρική ταυτοποίηση απαιτείται για την αλλαγή του PIN σας."
+        "biometricDescription": "Επαληθεύστε την ταυτότητά σας για αλλαγή PIN"
       }
     },
     "ReplaceCard": {

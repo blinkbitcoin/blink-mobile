@@ -3574,8 +3574,6 @@ const en: BaseTranslation = {
         enterNewPin: "Enter new PIN",
         enterNewPinSubtitle: "Please enter your new 4-digit PIN.",
         biometricDescription: "Verify your identity to change PIN",
-        biometricRequired:
-          "Biometric authentication is required to change your PIN.",
         pinChangedTitle: "PIN changed",
         pinChangedSubtitle: "Your PIN has been changed successfully.",
         pinChangedToast: "PIN has been changed successfully",

@@ -3415,8 +3415,7 @@
         "pinChangedTitle": "PIN canviat",
         "pinChangedSubtitle": "El vostre PIN s'ha canviat correctament.",
         "pinChangedToast": "El PIN s'ha canviat correctament",
-        "biometricDescription": "Verifiqueu la vostra identitat per canviar el PIN",
-        "biometricRequired": "L'autenticació biomètrica és necessària per canviar el vostre PIN."
+        "biometricDescription": "Verifiqueu la vostra identitat per canviar el PIN"
       }
     },
     "ReplaceCard": {

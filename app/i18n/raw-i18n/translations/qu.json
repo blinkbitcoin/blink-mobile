@@ -3415,8 +3415,7 @@
         "pinChangedTitle": "PIN tikrasqa",
         "pinChangedSubtitle": "PIN nisqayki allinta tikrasqa.",
         "pinChangedToast": "PIN allinta tikrasqa",
-        "biometricDescription": "Kikinykita qhaway PIN-ta tikranapaq",
-        "biometricRequired": "Biométrica takyachiy ruranayuqmi PIN-ta tikranapaq."
+        "biometricDescription": "Kikinykita qhaway PIN-ta tikranapaq"
       }
     },
     "ReplaceCard": {

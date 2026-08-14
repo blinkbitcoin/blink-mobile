@@ -3415,8 +3415,7 @@
         "pinChangedTitle": "PIN zmenený",
         "pinChangedSubtitle": "Váš PIN bol úspešne zmenený.",
         "pinChangedToast": "PIN bol úspešne zmenený",
-        "biometricDescription": "Overte svoju totožnosť na zmenu PINu",
-        "biometricRequired": "Na zmenu PINu je vyžadovaná biometrická autentifikácia."
+        "biometricDescription": "Overte svoju totožnosť na zmenu PINu"
       }
     },
     "ReplaceCard": {

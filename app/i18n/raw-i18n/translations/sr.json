@@ -3415,8 +3415,7 @@
         "pinChangedTitle": "ПИН промењен",
         "pinChangedSubtitle": "Ваш ПИН је успешно промењен.",
         "pinChangedToast": "ПИН је успешно промењен",
-        "biometricDescription": "Потврдите свој идентитет за промену PIN-а",
-        "biometricRequired": "Биометријска аутентификација је потребна за промену вашег PIN-а."
+        "biometricDescription": "Потврдите свој идентитет за промену PIN-а"
       }
     },
     "ReplaceCard": {

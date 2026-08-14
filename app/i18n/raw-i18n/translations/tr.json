@@ -3415,8 +3415,7 @@
         "pinChangedTitle": "PIN değiştirildi",
         "pinChangedSubtitle": "PIN'iniz başarıyla değiştirildi.",
         "pinChangedToast": "PIN başarıyla değiştirildi",
-        "biometricDescription": "PIN'inizi değiştirmek için kimliğinizi doğrulayın",
-        "biometricRequired": "PIN'inizi değiştirmek için biyometrik kimlik doğrulama gereklidir."
+        "biometricDescription": "PIN'inizi değiştirmek için kimliğinizi doğrulayın"
       }
     },
     "ReplaceCard": {

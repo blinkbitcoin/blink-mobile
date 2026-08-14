@@ -3415,8 +3415,7 @@
         "pinChangedTitle": "PIN imebadilishwa",
         "pinChangedSubtitle": "PIN yako imebadilishwa kwa mafanikio.",
         "pinChangedToast": "PIN imebadilishwa kwa mafanikio",
-        "biometricDescription": "Thibitisha utambulisho wako kubadilisha PIN",
-        "biometricRequired": "Uthibitishaji wa kibayometriki unahitajika kubadilisha PIN yako."
+        "biometricDescription": "Thibitisha utambulisho wako kubadilisha PIN"
       }
     },
     "ReplaceCard": {
