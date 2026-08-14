@@ -122,7 +122,6 @@ jest.mock("@app/config/feature-flags-context", () => {
    */
   const remoteConfig: ReturnType<typeof actual.useRemoteConfig> = {
     ...actual.defaultRemoteConfig,
-    custodialDollarBalanceBlockedCountries: [],
     selfCustodialDollarBalanceBlockedCountries: [],
   }
   return {

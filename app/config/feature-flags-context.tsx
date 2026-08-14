@@ -47,12 +47,9 @@ const AutoConvertPollMaxAttemptsKey = "autoConvertPollMaxAttempts"
 const AutoConvertPollIntervalMsKey = "autoConvertPollIntervalMs"
 const AutoConvertAmountMatchToleranceBpsKey = "autoConvertAmountMatchToleranceBps"
 const CustodialFirstSignupBlockedCountriesKey = "custodialFirstSignupBlockedCountries"
-const CustodialDollarBalanceBlockedCountriesKey = "custodialDollarBalanceBlockedCountries"
 const SelfCustodialDollarBalanceBlockedCountriesKey =
   "selfCustodialDollarBalanceBlockedCountries"
 const SelfCustodialTransferBlockedCountriesKey = "selfCustodialTransferBlockedCountries"
-const CustodialTransferBlockedCountriesKey = "custodialTransferBlockedCountries"
-const CustodialCreationBlockedCountriesKey = "custodialCreationBlockedCountries"
 const SelfCustodialCreationBlockedCountriesKey = "selfCustodialCreationBlockedCountries"
 const OffboardOnlyCountriesKey = "offboardOnlyCountries"
 const SelfCustodialDepositClaimLeewayVbyteKey = "selfCustodialDepositClaimLeewayVbyte"
@@ -118,11 +115,8 @@ type RemoteConfig = {
   [AutoConvertPollIntervalMsKey]: number
   [AutoConvertAmountMatchToleranceBpsKey]: number
   [CustodialFirstSignupBlockedCountriesKey]: string[]
-  [CustodialDollarBalanceBlockedCountriesKey]: string[]
   [SelfCustodialDollarBalanceBlockedCountriesKey]: string[]
   [SelfCustodialTransferBlockedCountriesKey]: string[]
-  [CustodialTransferBlockedCountriesKey]: string[]
-  [CustodialCreationBlockedCountriesKey]: string[]
   [SelfCustodialCreationBlockedCountriesKey]: string[]
   [OffboardOnlyCountriesKey]: string[]
   [SelfCustodialDepositClaimLeewayVbyteKey]: number
@@ -229,11 +223,8 @@ export const defaultRemoteConfig: RemoteConfig = {
   autoConvertPollIntervalMs: 500,
   autoConvertAmountMatchToleranceBps: 500,
   custodialFirstSignupBlockedCountries: custodialFirstSignupBlockedDefault,
-  custodialDollarBalanceBlockedCountries: ["HK"],
   selfCustodialDollarBalanceBlockedCountries: ["HK"],
   selfCustodialTransferBlockedCountries: transferBlockedDefault,
-  custodialTransferBlockedCountries: transferBlockedDefault,
-  custodialCreationBlockedCountries: creationBlockedDefault,
   selfCustodialCreationBlockedCountries: creationBlockedDefault,
   offboardOnlyCountries: offboardOnlyDefault,
   selfCustodialDepositClaimLeewayVbyte: 1,
@@ -263,20 +254,11 @@ remoteConfigInstance().setDefaults({
   custodialFirstSignupBlockedCountries: serializeRemoteConfigDefault(
     custodialFirstSignupBlockedDefault,
   ),
-  custodialDollarBalanceBlockedCountries: serializeRemoteConfigDefault(
-    defaultRemoteConfig.custodialDollarBalanceBlockedCountries,
-  ),
   selfCustodialDollarBalanceBlockedCountries: serializeRemoteConfigDefault(
     defaultRemoteConfig.selfCustodialDollarBalanceBlockedCountries,
   ),
   selfCustodialTransferBlockedCountries: serializeRemoteConfigDefault(
     defaultRemoteConfig.selfCustodialTransferBlockedCountries,
-  ),
-  custodialTransferBlockedCountries: serializeRemoteConfigDefault(
-    defaultRemoteConfig.custodialTransferBlockedCountries,
-  ),
-  custodialCreationBlockedCountries: serializeRemoteConfigDefault(
-    defaultRemoteConfig.custodialCreationBlockedCountries,
   ),
   selfCustodialCreationBlockedCountries: serializeRemoteConfigDefault(
     defaultRemoteConfig.selfCustodialCreationBlockedCountries,
@@ -457,11 +439,6 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           custodialFirstSignupBlockedDefault,
         )
 
-        const custodialDollarBalanceBlockedCountries = getRemoteConfigStringList(
-          CustodialDollarBalanceBlockedCountriesKey,
-          defaultRemoteConfig.custodialDollarBalanceBlockedCountries,
-        )
-
         const selfCustodialDollarBalanceBlockedCountries = getRemoteConfigStringList(
           SelfCustodialDollarBalanceBlockedCountriesKey,
           defaultRemoteConfig.selfCustodialDollarBalanceBlockedCountries,
@@ -470,16 +447,6 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
         const selfCustodialTransferBlockedCountries = getRemoteConfigStringList(
           SelfCustodialTransferBlockedCountriesKey,
           defaultRemoteConfig.selfCustodialTransferBlockedCountries,
-        )
-
-        const custodialTransferBlockedCountries = getRemoteConfigStringList(
-          CustodialTransferBlockedCountriesKey,
-          defaultRemoteConfig.custodialTransferBlockedCountries,
-        )
-
-        const custodialCreationBlockedCountries = getRemoteConfigStringList(
-          CustodialCreationBlockedCountriesKey,
-          defaultRemoteConfig.custodialCreationBlockedCountries,
         )
 
         const selfCustodialCreationBlockedCountries = getRemoteConfigStringList(
@@ -544,11 +511,8 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           autoConvertPollIntervalMs,
           autoConvertAmountMatchToleranceBps,
           custodialFirstSignupBlockedCountries,
-          custodialDollarBalanceBlockedCountries,
           selfCustodialDollarBalanceBlockedCountries,
           selfCustodialTransferBlockedCountries,
-          custodialTransferBlockedCountries,
-          custodialCreationBlockedCountries,
           selfCustodialCreationBlockedCountries,
           offboardOnlyCountries,
           selfCustodialDepositClaimLeewayVbyte,
