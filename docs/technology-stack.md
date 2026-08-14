@@ -98,6 +98,7 @@
 |---------|---------|
 | react-native-maps | Map display |
 | react-native-permissions | Permission management |
+| supercluster | Clusters the ~29k BTC Map merchant pins (pure JS, no native module) |
 
 ### UI Effects
 | Package | Version | Purpose |
