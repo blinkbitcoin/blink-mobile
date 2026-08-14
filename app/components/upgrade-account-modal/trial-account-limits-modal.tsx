@@ -6,7 +6,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import CustomModal from "@app/components/custom-modal/custom-modal"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { PhoneLoginInitiateType } from "@app/screens/phone-auth-screen"
+import { PhoneLoginInitiateType } from "@app/screens/phone-auth-screen/phone-login-initiate-type"
 
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
