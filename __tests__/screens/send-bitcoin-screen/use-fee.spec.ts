@@ -8,17 +8,26 @@ import { toBtcMoneyAmount } from "@app/types/amounts"
 // use-fee only calls these to hand them to getFee; the self-custodial quotes ignore them.
 // The tuple is built once and shared: it lands in the fee effect's dependency array, so a
 // fresh identity per render would re-fire the effect forever (Apollo's is stable for real).
+const mockOnchainQueryOptions: Record<string, unknown> = {}
+
 jest.mock("@app/graphql/generated", () => {
   const probe = [jest.fn(), {}]
+  /** Records the options each onchain query is armed with, for the fetch-policy assertion. */
+  const recordOptions = (name: string) => (options: unknown) => {
+    mockOnchainQueryOptions[name] = options
+    return probe
+  }
   return {
     WalletCurrency: { Btc: "BTC", Usd: "USD" },
     useLnInvoiceFeeProbeMutation: () => probe,
     useLnNoAmountInvoiceFeeProbeMutation: () => probe,
     useLnUsdInvoiceFeeProbeMutation: () => probe,
     useLnNoAmountUsdInvoiceFeeProbeMutation: () => probe,
-    useOnChainTxFeeLazyQuery: () => probe,
-    useOnChainUsdTxFeeLazyQuery: () => probe,
-    useOnChainUsdTxFeeAsBtcDenominatedLazyQuery: () => probe,
+    useOnChainTxFeeLazyQuery: recordOptions("onChainTxFee"),
+    useOnChainUsdTxFeeLazyQuery: recordOptions("onChainUsdTxFee"),
+    useOnChainUsdTxFeeAsBtcDenominatedLazyQuery: recordOptions(
+      "onChainUsdTxFeeAsBtcDenominated",
+    ),
   }
 })
 
@@ -43,6 +52,20 @@ const asErrored = (fee: ReturnType<typeof useFee>) => {
 describe("useFee", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+  })
+
+  it("arms every onchain fee query to skip the cache", () => {
+    renderHook(() => useFee(undefined))
+
+    /**
+     * On-chain fees move with the mempool, so a cached quote goes stale within minutes and
+     * would contradict the live estimate the details screen shows for the same amount.
+     */
+    expect(mockOnchainQueryOptions.onChainTxFee).toEqual({ fetchPolicy: "no-cache" })
+    expect(mockOnchainQueryOptions.onChainUsdTxFee).toEqual({ fetchPolicy: "no-cache" })
+    expect(mockOnchainQueryOptions.onChainUsdTxFeeAsBtcDenominated).toEqual({
+      fetchPolicy: "no-cache",
+    })
   })
 
   it("stays unset when there is no getFee function", () => {

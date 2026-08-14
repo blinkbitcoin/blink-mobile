@@ -1,5 +1,7 @@
 import { renderHook, waitFor } from "@testing-library/react-native"
 
+import { flushEffects } from "../../helpers/flush-effects"
+
 import { SdkFeeError } from "@app/screens/send-bitcoin-screen/hooks/use-onchain-fee-tiers"
 import { useRecommendedFeeTiers } from "@app/screens/unclaimed-deposits/hooks/use-recommended-fee-tiers"
 import { FeeTierOption } from "@app/screens/send-bitcoin-screen/hooks/fee-tiers.types"
@@ -21,8 +23,52 @@ describe("useRecommendedFeeTiers", () => {
     const { result } = renderHook(() => useRecommendedFeeTiers(mockSdk, false))
 
     await waitFor(() => expect(result.current.error).toBeNull())
-    expect(result.current.tiers[FeeTierOption.Fast].feeSats).toBe(0)
+    expect(result.current.tiers[FeeTierOption.Fast].feeAmount).toBe(0)
     expect(mockGetRecommendedFees).not.toHaveBeenCalled()
+  })
+
+  it("quotes from the very first render once refund mode is entered", () => {
+    mockGetRecommendedFees.mockImplementation(
+      () =>
+        new Promise(() => {
+          // deliberately never resolves
+        }),
+    )
+
+    const { result } = renderHook(() => useRecommendedFeeTiers(mockSdk, true))
+
+    // A quote that never lands: true here would label the tiers with a zero rate.
+    expect(result.current.hasQuote).toBe(false)
+  })
+
+  it("holds no quote while disabled", () => {
+    const { result } = renderHook(() => useRecommendedFeeTiers(mockSdk, false))
+
+    expect(result.current.hasQuote).toBe(false)
+  })
+
+  it("holds a quote once the rates land", async () => {
+    mockGetRecommendedFees.mockResolvedValue({
+      fastest: 30,
+      halfHour: 20,
+      hour: 15,
+      economy: 10,
+      minimum: 5,
+    })
+
+    const { result } = renderHook(() => useRecommendedFeeTiers(mockSdk, true))
+
+    await waitFor(() => expect(result.current.hasQuote).toBe(true))
+    expect(result.current.tiers[FeeTierOption.Fast].feeAmount).toBe(30)
+  })
+
+  it("holds no quote when the sdk throws", async () => {
+    mockGetRecommendedFees.mockRejectedValue(new Error("network down"))
+
+    const { result } = renderHook(() => useRecommendedFeeTiers(mockSdk, true))
+
+    await waitFor(() => expect(result.current.error).not.toBeNull())
+    expect(result.current.hasQuote).toBe(false)
   })
 
   it("populates tiers when fetch succeeds", async () => {
@@ -36,9 +82,11 @@ describe("useRecommendedFeeTiers", () => {
 
     const { result } = renderHook(() => useRecommendedFeeTiers(mockSdk, true))
 
-    await waitFor(() => expect(result.current.tiers[FeeTierOption.Fast].feeSats).toBe(30))
-    expect(result.current.tiers[FeeTierOption.Medium].feeSats).toBe(20)
-    expect(result.current.tiers[FeeTierOption.Slow].feeSats).toBe(10)
+    await waitFor(() =>
+      expect(result.current.tiers[FeeTierOption.Fast].feeAmount).toBe(30),
+    )
+    expect(result.current.tiers[FeeTierOption.Medium].feeAmount).toBe(20)
+    expect(result.current.tiers[FeeTierOption.Slow].feeAmount).toBe(10)
     expect(result.current.error).toBeNull()
   })
 
@@ -57,9 +105,43 @@ describe("useRecommendedFeeTiers", () => {
     const { result } = renderHook(() => useRecommendedFeeTiers(mockSdk, true))
 
     await waitFor(() => expect(result.current.error).not.toBeNull())
-    expect(result.current.tiers[FeeTierOption.Fast].feeSats).toBe(0)
-    expect(result.current.tiers[FeeTierOption.Medium].feeSats).toBe(0)
-    expect(result.current.tiers[FeeTierOption.Slow].feeSats).toBe(0)
+    expect(result.current.tiers[FeeTierOption.Fast].feeAmount).toBe(0)
+    expect(result.current.tiers[FeeTierOption.Medium].feeAmount).toBe(0)
+    expect(result.current.tiers[FeeTierOption.Slow].feeAmount).toBe(0)
+  })
+
+  it("zeroes the rates while a re-entered panel is quoting again", async () => {
+    mockGetRecommendedFees.mockResolvedValueOnce({
+      fastest: 100,
+      halfHour: 60,
+      hour: 40,
+      economy: 20,
+      minimum: 5,
+    })
+
+    const { result, rerender } = renderHook(
+      ({ enabled }: { enabled: boolean }) => useRecommendedFeeTiers(mockSdk, enabled),
+      { initialProps: { enabled: true } },
+    )
+
+    await waitFor(() =>
+      expect(result.current.tiers[FeeTierOption.Fast].feeAmount).toBe(100),
+    )
+
+    // The re-entry quote never settles, so only the first visit's rates could linger.
+    mockGetRecommendedFees.mockImplementationOnce(
+      () =>
+        new Promise(() => {
+          // deliberately never resolves
+        }),
+    )
+    rerender({ enabled: false })
+    rerender({ enabled: true })
+    await flushEffects()
+
+    // Leaving 100 here lets the screen submit a refund at a rate it stopped showing.
+    expect(result.current.tiers[FeeTierOption.Fast].feeAmount).toBe(0)
+    expect(result.current.hasQuote).toBe(false)
   })
 
   it("clears error on successful retry after a previous failure", async () => {
@@ -83,7 +165,76 @@ describe("useRecommendedFeeTiers", () => {
     rerender({ enabled: false })
     rerender({ enabled: true })
 
-    await waitFor(() => expect(result.current.tiers[FeeTierOption.Fast].feeSats).toBe(25))
+    await waitFor(() =>
+      expect(result.current.tiers[FeeTierOption.Fast].feeAmount).toBe(25),
+    )
+    expect(result.current.error).toBeNull()
+  })
+
+  it("discards a stale success when refund mode is toggled mid-flight", async () => {
+    let resolveStale: ((value: unknown) => void) | undefined
+    mockGetRecommendedFees.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          resolveStale = resolve
+        }),
+    )
+    mockGetRecommendedFees.mockResolvedValue({
+      fastest: 25,
+      halfHour: 15,
+      hour: 10,
+      economy: 8,
+      minimum: 4,
+    })
+
+    const { result, rerender } = renderHook(
+      ({ enabled }: { enabled: boolean }) => useRecommendedFeeTiers(mockSdk, enabled),
+      { initialProps: { enabled: true } },
+    )
+
+    rerender({ enabled: false })
+    rerender({ enabled: true })
+
+    await waitFor(() =>
+      expect(result.current.tiers[FeeTierOption.Fast].feeAmount).toBe(25),
+    )
+
+    resolveStale?.({ fastest: 999, halfHour: 999, hour: 999, economy: 999, minimum: 999 })
+    await flushEffects()
+
+    expect(result.current.tiers[FeeTierOption.Fast].feeAmount).toBe(25)
+  })
+
+  it("does not surface a stale failure once a newer quote already landed", async () => {
+    let rejectStale: ((reason: unknown) => void) | undefined
+    mockGetRecommendedFees.mockImplementationOnce(
+      () =>
+        new Promise((_resolve, reject) => {
+          rejectStale = reject
+        }),
+    )
+    mockGetRecommendedFees.mockResolvedValue({
+      fastest: 25,
+      halfHour: 15,
+      hour: 10,
+      economy: 8,
+      minimum: 4,
+    })
+
+    const { result, rerender } = renderHook(
+      ({ enabled }: { enabled: boolean }) => useRecommendedFeeTiers(mockSdk, enabled),
+      { initialProps: { enabled: true } },
+    )
+
+    rerender({ enabled: false })
+    rerender({ enabled: true })
+
+    await waitFor(() => expect(result.current.hasQuote).toBe(true))
+
+    rejectStale?.(new Error("stale request failed"))
+    await flushEffects()
+
+    expect(result.current.hasQuote).toBe(true)
     expect(result.current.error).toBeNull()
   })
 })
