@@ -130,6 +130,23 @@ describe("CloudBackupScreen", () => {
     expect(view.UNSAFE_queryByType(ActivityIndicator)).toBeTruthy()
   })
 
+  /** With the checkbox gone, this disabled gate is the only thing keeping an empty or
+   *  mismatched password out of `buildBackupPayload`, which now throws on one. */
+  it("disables continue and does not back up while the form is invalid", async () => {
+    mockIsValid = false
+
+    const { getByText } = render(
+      <ContextForScreen>
+        <CloudBackupScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    fireEvent.press(getByText(LL.BackupScreen.CloudBackup.continueButton()))
+
+    expect(mockHandleBackup).not.toHaveBeenCalled()
+  })
+
   it("renders the Important InfoBanner with warning icon color", async () => {
     render(
       <ContextForScreen>
