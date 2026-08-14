@@ -1334,6 +1334,14 @@ query currencyList {
   }
 }
 
+query custodialRestrictions {
+  custodialRestrictions {
+    dollarBalance
+    transfer
+    __typename
+  }
+}
+
 query debugScreen {
   me {
     id
@@ -1881,6 +1889,15 @@ query realtimePriceUnauthed($currency: DisplayCurrency) {
       offset
       __typename
     }
+    __typename
+  }
+}
+
+query regionCheck {
+  regionCheck {
+    countryCode
+    custodialCreationAllowed
+    restricted
     __typename
   }
 }
