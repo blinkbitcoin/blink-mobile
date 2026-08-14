@@ -1,5 +1,5 @@
 import React from "react"
-import { fireEvent, render, screen } from "@testing-library/react-native"
+import { act, fireEvent, render, screen } from "@testing-library/react-native"
 
 import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
@@ -41,10 +41,24 @@ jest.mock("@react-native-clipboard/clipboard", () => ({
   getString: jest.fn(() => Promise.resolve("")),
 }))
 
+const mockReleaseScreenSecurity = jest.fn(() => Promise.resolve())
+let mockLeaseReady: Promise<void> = Promise.resolve()
 jest.mock("@app/utils/screen-security", () => ({
-  enableScreenSecurity: jest.fn(() => Promise.resolve()),
-  disableScreenSecurity: jest.fn(() => Promise.resolve()),
+  acquireScreenSecurity: () => ({
+    ready: mockLeaseReady,
+    release: mockReleaseScreenSecurity,
+  }),
 }))
+
+const deferred = <T,>() => {
+  let resolve: (value: T) => void = () => {}
+  let reject: (reason: Error) => void = () => {}
+  const promise = new Promise<T>((res, rej) => {
+    resolve = res
+    reject = rej
+  })
+  return { promise, resolve, reject }
+}
 
 loadLocale("en")
 const LL = i18nObject("en")
@@ -66,31 +80,71 @@ describe("ApiKeySecretReveal", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     beforeRemoveListeners.length = 0
+    mockLeaseReady = Promise.resolve()
   })
 
-  it("hides the header back button and disables the swipe-back gesture", () => {
+  it("hides the header back button and disables the swipe-back gesture", async () => {
     renderReveal()
+    await screen.findByTestId("api-key-secret")
 
     expect(mockSetOptions).toHaveBeenCalledWith(
       expect.objectContaining({ headerBackVisible: false, gestureEnabled: false }),
     )
   })
 
-  it("blocks hardware and system back navigation", () => {
+  it("blocks hardware and system back navigation", async () => {
     renderReveal()
+    await screen.findByTestId("api-key-secret")
 
     expect(beforeRemoveListeners.length).toBeGreaterThan(0)
     const event = emitBeforeRemove()
     expect(event.preventDefault).toHaveBeenCalled()
   })
 
-  it("allows leaving via the Done button", () => {
+  it("allows leaving via the Done button", async () => {
     renderReveal()
+    await screen.findByTestId("api-key-secret")
 
     fireEvent.press(screen.getByTestId(LL.ApiScreen.done()))
 
     expect(mockGoBack).toHaveBeenCalled()
     const event = emitBeforeRemove()
     expect(event.preventDefault).not.toHaveBeenCalled()
+  })
+
+  /** The reveal shows a one-time API secret: until the screen guard is actually
+   *  on, none of the secret, its QR, or the Copy/Share actions may exist. */
+  describe("screen security gate", () => {
+    it("shows nothing sensitive while registration is pending, and the secret once it resolves", async () => {
+      const registration = deferred<void>()
+      mockLeaseReady = registration.promise
+
+      renderReveal()
+      await act(async () => {})
+
+      expect(screen.queryByTestId("api-key-secret")).toBeNull()
+      expect(screen.queryByText(LL.common.share())).toBeNull()
+      expect(mockSetOptions).not.toHaveBeenCalled()
+
+      registration.resolve(undefined)
+      await screen.findByTestId("api-key-secret")
+      expect(screen.getByText(LL.common.share())).toBeTruthy()
+    })
+
+    it("keeps the secret unmounted after registration fails, and Back still leaves", async () => {
+      const registration = deferred<void>()
+      mockLeaseReady = registration.promise
+
+      renderReveal()
+      await act(async () => {})
+      registration.reject(new Error("native failure"))
+
+      await screen.findByTestId("screen-security-retry")
+      expect(screen.queryByTestId("api-key-secret")).toBeNull()
+      expect(mockSetOptions).not.toHaveBeenCalled()
+
+      fireEvent.press(screen.getByTestId("screen-security-back"))
+      expect(mockGoBack).toHaveBeenCalledTimes(1)
+    })
   })
 })

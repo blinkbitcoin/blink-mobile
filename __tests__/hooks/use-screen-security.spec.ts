@@ -1,13 +1,12 @@
 import { renderHook, waitFor } from "@testing-library/react-native"
 
 import { useScreenSecurity } from "@app/hooks/use-screen-security"
+import { ScreenSecurityLease } from "@app/utils/screen-security"
 
-const mockEnableScreenSecurity = jest.fn()
-const mockDisableScreenSecurity = jest.fn()
-
+const mockAcquireScreenSecurity = jest.fn()
 jest.mock("@app/utils/screen-security", () => ({
-  enableScreenSecurity: (...args: string[]) => mockEnableScreenSecurity(...args),
-  disableScreenSecurity: () => mockDisableScreenSecurity(),
+  acquireScreenSecurity: (...args: readonly unknown[]) =>
+    mockAcquireScreenSecurity(...args),
 }))
 
 const mockReportError = jest.fn()
@@ -21,44 +20,88 @@ jest.mock("@rn-vui/themed", () => ({
   }),
 }))
 
+const deferred = <T>() => {
+  let resolve: (value: T) => void = () => {}
+  let reject: (reason: Error) => void = () => {}
+  const promise = new Promise<T>((res, rej) => {
+    resolve = res
+    reject = rej
+  })
+  return { promise, resolve, reject }
+}
+
+const leaseWith = (
+  ready: Promise<void>,
+): ScreenSecurityLease & { release: jest.Mock } => ({
+  ready,
+  release: jest.fn(() => Promise.resolve()),
+})
+
 describe("useScreenSecurity", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockEnableScreenSecurity.mockResolvedValue(undefined)
-    mockDisableScreenSecurity.mockResolvedValue(undefined)
   })
 
-  it("enables screen security on mount", () => {
-    renderHook(() => useScreenSecurity())
+  it("starts activating and acquires a lease with the theme's background color", () => {
+    mockAcquireScreenSecurity.mockReturnValue(leaseWith(new Promise(() => {})))
 
-    expect(mockEnableScreenSecurity).toHaveBeenCalledWith("#000000")
+    const { result } = renderHook(() => useScreenSecurity())
+
+    expect(result.current).toBe("activating")
+    expect(mockAcquireScreenSecurity).toHaveBeenCalledWith("#000000")
   })
 
-  it("disables screen security on unmount", () => {
+  it("becomes active once the guard is on", async () => {
+    const registration = deferred<void>()
+    mockAcquireScreenSecurity.mockReturnValue(leaseWith(registration.promise))
+
+    const { result } = renderHook(() => useScreenSecurity())
+
+    registration.resolve(undefined)
+    await waitFor(() => expect(result.current).toBe("active"))
+  })
+
+  it("becomes failed and reports when registration is exhausted", async () => {
+    const registration = deferred<void>()
+    const failure = new Error("native failure")
+    mockAcquireScreenSecurity.mockReturnValue(leaseWith(registration.promise))
+
+    const { result } = renderHook(() => useScreenSecurity())
+
+    registration.reject(failure)
+    await waitFor(() => expect(result.current).toBe("failed"))
+    expect(mockReportError).toHaveBeenCalledWith("Enable screen security", failure)
+  })
+
+  it("releases the lease exactly once on unmount", () => {
+    const lease = leaseWith(new Promise(() => {}))
+    mockAcquireScreenSecurity.mockReturnValue(lease)
+
     const { unmount } = renderHook(() => useScreenSecurity())
-
     unmount()
 
-    expect(mockDisableScreenSecurity).toHaveBeenCalled()
+    expect(lease.release).toHaveBeenCalledTimes(1)
   })
 
-  /** The enable is fire-and-forget; a native failure to install the guard must be
-   *  reported, not leaked as an unhandled rejection while the screen renders its seed
-   *  words unprotected. */
-  it("reports a rejected enable instead of leaking an unhandled rejection", async () => {
-    const failure = new Error("native failure")
-    mockEnableScreenSecurity.mockRejectedValueOnce(failure)
+  it("ignores a late settlement arriving after unmount", async () => {
+    const registration = deferred<void>()
+    mockAcquireScreenSecurity.mockReturnValue(leaseWith(registration.promise))
 
-    renderHook(() => useScreenSecurity())
+    const { result, unmount } = renderHook(() => useScreenSecurity())
+    unmount()
 
-    await waitFor(() =>
-      expect(mockReportError).toHaveBeenCalledWith("Enable screen security", failure),
-    )
+    registration.resolve(undefined)
+    await Promise.resolve()
+
+    expect(result.current).toBe("activating")
+    expect(mockReportError).not.toHaveBeenCalled()
   })
 
-  it("reports a rejected disable on unmount", async () => {
+  it("reports a rejected release on unmount", async () => {
     const failure = new Error("native failure")
-    mockDisableScreenSecurity.mockRejectedValueOnce(failure)
+    const lease = leaseWith(new Promise(() => {}))
+    lease.release.mockRejectedValue(failure)
+    mockAcquireScreenSecurity.mockReturnValue(lease)
 
     const { unmount } = renderHook(() => useScreenSecurity())
     unmount()

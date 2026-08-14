@@ -8,9 +8,9 @@ import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { Screen } from "@app/components/screen"
+import { ScreenSecurityGate } from "@app/components/screen-security-gate"
 import { QrCodeComponent } from "@app/components/totp-export"
 import { useClipboard } from "@app/hooks"
-import { useScreenSecurity } from "@app/hooks/use-screen-security"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { testProps } from "@app/utils/testProps"
@@ -23,9 +23,9 @@ type Props = {
   name: string
 }
 
-export const ApiKeySecretReveal: React.FC<Props> = ({ secret, name }) => {
-  useScreenSecurity()
-
+/** The gate mounts this only once the screenshot guard is actually on — the secret,
+ *  its QR and the Copy/Share actions must not exist while registration is pending. */
+const ApiKeySecretRevealContent: React.FC<Props> = ({ secret, name }) => {
   const { LL } = useI18nContext()
   const styles = useStyles()
   const {
@@ -123,6 +123,12 @@ export const ApiKeySecretReveal: React.FC<Props> = ({ secret, name }) => {
     </Screen>
   )
 }
+
+export const ApiKeySecretReveal: React.FC<Props> = (props) => (
+  <ScreenSecurityGate>
+    <ApiKeySecretRevealContent {...props} />
+  </ScreenSecurityGate>
+)
 
 const useStyles = makeStyles(({ colors }) => ({
   container: {
