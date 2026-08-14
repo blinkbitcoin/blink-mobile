@@ -39,7 +39,10 @@ import { useHasTransitioned, useTransactionSeenState } from "@app/hooks"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { reportError } from "@app/utils/error-logging"
 
-import { MemoizedTransactionItem } from "@app/components/transaction-item"
+import {
+  MemoizedTransactionItem,
+  TRANSACTION_LIST_WINDOW_SIZE,
+} from "@app/components/transaction-item"
 import { toastShow } from "../../utils/toast"
 
 import TransactionHistorySkeleton from "./transaction-history-skeleton"
@@ -68,9 +71,8 @@ gql`
 const INITIAL_ITEMS_TO_RENDER = 14
 const RENDER_BATCH_SIZE = 14
 const QUERY_BATCH_SIZE = INITIAL_ITEMS_TO_RENDER * 1.5
-// RN's default of 21 keeps roughly ten screens of rows mounted on either side of
-// the viewport; 7 still leaves three screens of headroom for fast scrolling.
-const WINDOW_SIZE = 7
+
+const keyExtractor = (item: TransactionFragment) => item.id
 
 type TransactionHistoryScreenProps = {
   route: RouteProp<RootStackParamList, "transactionHistory">
@@ -447,8 +449,6 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
     [styles.sectionHeaderContainer, styles.sectionHeaderText],
   )
 
-  const keyExtractor = React.useCallback((item: TransactionFragment) => item.id, [])
-
   if (error) {
     console.error(error)
     reportError("transaction-history", error)
@@ -525,7 +525,7 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
         showsVerticalScrollIndicator={false}
         maxToRenderPerBatch={RENDER_BATCH_SIZE}
         initialNumToRender={INITIAL_ITEMS_TO_RENDER}
-        windowSize={WINDOW_SIZE}
+        windowSize={TRANSACTION_LIST_WINDOW_SIZE}
         renderItem={renderItem}
         renderSectionHeader={renderSectionHeader}
         ListEmptyComponent={

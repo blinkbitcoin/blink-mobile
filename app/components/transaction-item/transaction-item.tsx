@@ -66,6 +66,16 @@ const BOUNCE_DELAY_MS = 300
 const BOUNCE_DURATION_MS = 120
 
 /**
+ * Window size for the lists that render these rows.
+ *
+ * RN's default of 21 keeps roughly ten screens of rows mounted on either side
+ * of the viewport; 7 still leaves three screens of headroom for fast scrolling.
+ * If a fast fling ever shows blank cells, raise this to 9 rather than reverting.
+ * Shared so the two transaction lists cannot drift apart.
+ */
+export const TRANSACTION_LIST_WINDOW_SIZE = 7
+
+/**
  * Owns the navigation focus subscription that drives a row's bounce-in.
  *
  * It renders nothing and is mounted as a sibling of the row, only once that row

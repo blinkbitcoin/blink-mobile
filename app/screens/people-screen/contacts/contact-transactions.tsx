@@ -2,7 +2,10 @@ import * as React from "react"
 import { SectionList, Text, View } from "react-native"
 
 import { gql } from "@apollo/client"
-import { MemoizedTransactionItem } from "@app/components/transaction-item"
+import {
+  MemoizedTransactionItem,
+  TRANSACTION_LIST_WINDOW_SIZE,
+} from "@app/components/transaction-item"
 import { useTransactionListForContactQuery } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { groupTransactionsByDate } from "@app/graphql/transactions"
@@ -30,13 +33,17 @@ gql`
   }
 `
 
-// RN's default of 21 keeps roughly ten screens of rows mounted on either side of
-// the viewport; 7 still leaves three screens of headroom for fast scrolling.
-const WINDOW_SIZE = 7
-
 type Props = {
   contactUsername: string
 }
+
+const keyExtractor = (item: { id: string }) => item.id
+
+// Rows here are deliberately not pressable: this list only shows the history
+// with one contact, it does not navigate into a transaction.
+const renderItem = ({ item }: { item: { id: string } }) => (
+  <MemoizedTransactionItem txid={item.id} />
+)
 
 export const ContactTransactions = ({ contactUsername }: Props) => {
   const styles = useStyles()
@@ -61,11 +68,6 @@ export const ContactTransactions = ({ contactUsername }: Props) => {
   )
 
   // Declared above the early returns below to keep hook order stable.
-  const renderItem = React.useCallback(
-    ({ item }: { item: { id: string } }) => <MemoizedTransactionItem txid={item.id} />,
-    [],
-  )
-
   const renderSectionHeader = React.useCallback(
     ({ section: { title } }: { section: { title: string } }) => (
       <View style={styles.sectionHeaderContainer}>
@@ -74,8 +76,6 @@ export const ContactTransactions = ({ contactUsername }: Props) => {
     ),
     [styles.sectionHeaderContainer, styles.sectionHeaderText],
   )
-
-  const keyExtractor = React.useCallback((item: { id: string }) => item.id, [])
 
   if (error) {
     toastShow({
@@ -107,7 +107,7 @@ export const ContactTransactions = ({ contactUsername }: Props) => {
       <SectionList
         renderItem={renderItem}
         initialNumToRender={20}
-        windowSize={WINDOW_SIZE}
+        windowSize={TRANSACTION_LIST_WINDOW_SIZE}
         renderSectionHeader={renderSectionHeader}
         ListEmptyComponent={
           <View style={styles.noTransactionView}>
