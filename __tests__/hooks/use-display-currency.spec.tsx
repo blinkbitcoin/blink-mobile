@@ -62,6 +62,15 @@ const setPriceConversion = ({
 // later formatting test and bury the real failure.
 let numberFormatSpy: jest.SpyInstance | undefined
 
+// Counts only the constructions for the fraction-digit count under test, so an
+// unrelated formatter built during the same render cannot move the number.
+const constructionsAt = (fractionDigits: number) =>
+  (numberFormatSpy?.mock.calls ?? []).filter(
+    ([, options]) =>
+      (options as Intl.NumberFormatOptions | undefined)?.maximumFractionDigits ===
+      fractionDigits,
+  ).length
+
 describe("useDisplayCurrency", () => {
   afterEach(() => {
     numberFormatSpy?.mockRestore()
@@ -358,9 +367,38 @@ describe("useDisplayCurrency", () => {
         }),
       )
 
-      expect(numberFormatSpy.mock.calls.length).toBeLessThanOrEqual(1)
+      expect(constructionsAt(7)).toBe(1)
       expect(formatted[0]).toBe("¤0.0000000")
       expect(formatted[24]).toBe("¤24.0000000")
+    })
+
+    it("keeps interleaved fraction-digit counts on their own formatter", () => {
+      // The cache is keyed on fraction digits alone. Two currencies formatted
+      // alternately is what catches a key that stops distinguishing them, since
+      // both would then read back through whichever formatter was built first.
+      setCurrencyList([
+        { id: "XTA", symbol: "¤", fractionDigits: 5 },
+        { id: "XTB", symbol: "¤", fractionDigits: 6 },
+      ])
+      numberFormatSpy = jest.spyOn(Intl, "NumberFormat")
+
+      const { result } = renderHook(() => useDisplayCurrency())
+
+      const formatted = Array.from({ length: 8 }, (_, index) =>
+        result.current.formatCurrency({
+          amountInMajorUnits: 1,
+          currency: index % 2 === 0 ? "XTA" : "XTB",
+        }),
+      )
+
+      expect(formatted.filter((_, index) => index % 2 === 0)).toEqual(
+        Array(4).fill("¤1.00000"),
+      )
+      expect(formatted.filter((_, index) => index % 2 === 1)).toEqual(
+        Array(4).fill("¤1.000000"),
+      )
+      expect(constructionsAt(5)).toBe(1)
+      expect(constructionsAt(6)).toBe(1)
     })
   })
 

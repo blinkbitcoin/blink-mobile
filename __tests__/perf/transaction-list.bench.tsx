@@ -32,6 +32,8 @@ import { detectDefaultLocale } from "@app/utils/locale-detector"
 import { TransactionFragmentDoc } from "@app/graphql/generated"
 import { MemoizedTransactionItem } from "@app/components/transaction-item"
 
+import { flushEffects } from "../helpers/flush-effects"
+
 import { createCache } from "../../app/graphql/cache"
 import { IsAuthedContextProvider } from "../../app/graphql/is-authed-context"
 import { PersistentStateContext } from "../../app/store/persistent-state"
@@ -84,9 +86,14 @@ const Stack = createNativeStackNavigator()
 
 const ListScreen: React.FC = () => {
   const navigation = useNavigation()
-  benchGlobal.__navigate = () =>
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (navigation as any).navigate("Detail")
+
+  // In an effect, not the render body: assigning during render is the pattern
+  // a double-rendering mode punishes, and it would silently skew the counts.
+  React.useEffect(() => {
+    benchGlobal.__navigate = () =>
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (navigation as any).navigate("Detail")
+  }, [navigation])
 
   return (
     <>
@@ -163,25 +170,28 @@ const median = (values: number[]) => {
 // and the measurement is worthless.
 const readRowRenders = () => rowRenders
 
+// One quiet pass is enough to call it settled; the cap only exists so a tree
+// that never stops rendering fails loudly instead of hanging until the timeout.
+const SETTLE_MAX_PASSES = 100
+
 const settle = async () => {
-  for (let attempt = 0; attempt < 100; attempt += 1) {
+  for (let pass = 0; pass < SETTLE_MAX_PASSES; pass += 1) {
     const before = readRowRenders()
     // eslint-disable-next-line no-await-in-loop
-    await act(async () => {
-      await new Promise((resolve) => {
-        setTimeout(resolve, 15)
-      })
-    })
+    await flushEffects()
     if (readRowRenders() === before) {
       return
     }
   }
-  throw new Error("tree never became quiescent")
+  throw new Error(
+    `tree never became quiescent after ${SETTLE_MAX_PASSES} passes, so the measurement would be meaningless`,
+  )
 }
 
-describe(`transaction list — ${ROW_COUNT} rows`, () => {
-  jest.setTimeout(300000)
+// Long enough for the largest BENCH_ROWS x BENCH_REPEATS combination in use.
+jest.setTimeout(300000)
 
+describe(`transaction list — ${ROW_COUNT} rows`, () => {
   it("measures the cost of opening a transaction", async () => {
     const mountRowRenders: number[] = []
     const mountStyleSheets: number[] = []
