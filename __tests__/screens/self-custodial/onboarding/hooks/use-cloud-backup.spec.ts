@@ -49,13 +49,22 @@ jest.mock("@app/self-custodial/analytics", () => ({
     mockLogBackupCompleted(...args),
 }))
 
+/** Only the crypto primitives are mocked — `buildBackupPayload` itself runs for real, so the
+ *  assertions below see the payload shape that actually reaches the user's cloud. */
+const mockEncryptAesGcm = jest.fn(() => ({ data: "ZW5jcnlwdGVk", iv: "aXY=" }))
 jest.mock("@app/utils/crypto", () => ({
+  PBKDF2_ITERATIONS: 600_000,
+  PBKDF2_KEY_LENGTH: 16,
+  PBKDF2_DIGEST: "SHA-256",
   deriveKeyFromPassword: () => ({
     key: "abcd1234abcd1234abcd1234abcd1234",
     salt: "c2FsdA==",
   }),
-  encryptAesGcm: () => ({ data: "ZW5jcnlwdGVk", iv: "aXY=" }),
+  encryptAesGcm: () => mockEncryptAesGcm(),
+  decryptAesGcm: jest.fn(),
 }))
+
+const MNEMONIC = "youth indicate void"
 
 let mockIdentityPubkey: string | null = "test-pubkey-1234"
 jest.mock("@app/screens/self-custodial/onboarding/hooks/use-wallet-mnemonic", () => ({
@@ -72,28 +81,6 @@ jest.mock("@app/self-custodial/hooks/use-self-custodial-account-info", () => ({
 
 jest.mock("@app/self-custodial/providers/backup-state", () => ({
   BackupMethod: { Cloud: "cloud", Keychain: "keychain", Manual: "manual" },
-}))
-
-jest.mock("@app/utils/backup-payload", () => ({
-  ...jest.requireActual("@app/utils/backup-payload"),
-  buildBackupPayload: jest.fn(
-    (
-      _mnemonic: string,
-      opts: {
-        walletIdentifier: string
-        lightningAddress?: string
-        password?: string
-        version?: number
-      },
-    ) =>
-      JSON.stringify({
-        version: opts.version ?? 1,
-        walletIdentifier: opts.walletIdentifier,
-        ...(opts.lightningAddress ? { lightningAddress: opts.lightningAddress } : {}),
-        encrypted: Boolean(opts.password),
-        mnemonic: opts.password ? "ZW5jcnlwdGVk" : "youth indicate void",
-      }),
-  ),
 }))
 
 const mockConfirmDialog = jest.fn()
@@ -170,7 +157,75 @@ describe("useCloudBackup", () => {
       "blink-spark-backup-blink-test-pubkey-1234.json",
       noExistingFile,
     )
+    /** The point of the mandatory password: the phrase must not leave the device in the
+     *  clear. `"encrypted":true` alone would still pass with a stray plaintext field. */
+    expect(mockUpload.mock.calls[0][0]).not.toContain(MNEMONIC)
+    expect(mockUpload.mock.calls[0][0]).not.toContain('"mnemonic"')
     expect(mockCompleteBackup).toHaveBeenCalledWith({ method: "cloud" })
+  })
+
+  it("does not upload the phrase in the clear when overwriting an existing backup", async () => {
+    mockStartSession.mockResolvedValue(sessionOk(withExistingFile))
+    mockDownloadById.mockResolvedValue({
+      success: true,
+      content: JSON.stringify({
+        version: 1,
+        walletIdentifier: "test-pubkey-1234",
+        encrypted: false,
+        mnemonic: MNEMONIC,
+      }),
+    })
+    mockUpload.mockResolvedValue({ success: true })
+    mockConfirmDialog.mockResolvedValue(true)
+
+    const { result } = renderHook(() => useCloudBackup({ password: "mypassword123" }))
+
+    await act(async () => {
+      await result.current.handleBackup()
+    })
+
+    /** The legacy plaintext backup being replaced carries the phrase; the replacement
+     *  must not carry it forward. */
+    expect(mockUpload.mock.calls[0][0]).not.toContain(MNEMONIC)
+    expect(mockUpload.mock.calls[0][0]).toContain('"encrypted":true')
+  })
+
+  it("toasts and reports instead of throwing when encryption fails", async () => {
+    mockEncryptAesGcm.mockImplementationOnce(() => {
+      throw new Error("native crypto unavailable")
+    })
+    mockUpload.mockResolvedValue({ success: true })
+
+    const { result } = renderHook(() => useCloudBackup({ password: "mypassword123" }))
+
+    await act(async () => {
+      await expect(result.current.handleBackup()).resolves.toBeUndefined()
+    })
+
+    expect(mockToastShow).toHaveBeenCalledWith(
+      expect.objectContaining({ message: "Upload failed" }),
+    )
+    expect(mockRecordError).toHaveBeenCalled()
+    expect(mockUpload).not.toHaveBeenCalled()
+    expect(mockCompleteBackup).not.toHaveBeenCalled()
+  })
+
+  /** The disabled Continue button is the only thing keeping an empty password out of here.
+   *  Should that gate ever regress, the backup must fail loudly rather than upload plaintext. */
+  it("aborts with a toast rather than uploading when the password is empty", async () => {
+    mockUpload.mockResolvedValue({ success: true })
+
+    const { result } = renderHook(() => useCloudBackup({ password: "" }))
+
+    await act(async () => {
+      await expect(result.current.handleBackup()).resolves.toBeUndefined()
+    })
+
+    expect(mockUpload).not.toHaveBeenCalled()
+    expect(mockToastShow).toHaveBeenCalledWith(
+      expect.objectContaining({ message: "Upload failed" }),
+    )
+    expect(mockCompleteBackup).not.toHaveBeenCalled()
   })
 
   /** The success path tags the analytics event by platform; on android that is google_drive. */
