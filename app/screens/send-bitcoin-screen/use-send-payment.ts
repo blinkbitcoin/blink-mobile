@@ -163,7 +163,10 @@ gql`
 
 const useGetUuid = () => {
   // Idempotency keys must be unpredictable: Math.random is not a CSPRNG.
-  const randomUuid = useMemo(() => Crypto.randomUUID(), [])
+  // useState's lazy initializer, not useMemo: React may discard a memo cache
+  // and re-run the factory on a mounted component, and a re-minted key would
+  // silently defeat backend dedupe on a same-session retry after a failure.
+  const [randomUuid] = useState(() => Crypto.randomUUID())
   return randomUuid
 }
 
