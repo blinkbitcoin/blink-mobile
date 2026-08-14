@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(xcrun simctl *)",
+      "Bash(maestro *)",
+      "Bash(ffmpeg *)",
+      "Bash(ffprobe *)",
+      "Bash(magick *)",
+      "Bash(node node_modules/react-native/cli.js *)",
+      "Bash(/*/.claude/skills/*/scripts/*.sh)",
+      "Bash(/*/.claude/skills/*/scripts/*.sh *)",
+      "Bash(/*/.claude/skills/*/tests/run.sh)",
+      "Bash(/*/.claude/skills/*/bench/live.sh)",
+      "Bash(/*/.claude/skills/*/bench/live.sh *)",
+      "Bash(/*/.claude/skills/run-all-tests.sh)"
+    ]
+  }
+}
