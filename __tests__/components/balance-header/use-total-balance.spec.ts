@@ -92,5 +92,22 @@ describe("useTotalBalance", () => {
         expect.objectContaining({ amount: 50_000, currencyCode: "USD" }),
       )
     })
+
+    // Hiding a restricted dollar balance is a display rule. Callers that measure
+    // how much is at risk on the device must see the funds that are really there.
+    it("keeps the USD balance when the caller opts out of the display restriction", () => {
+      mockUseDollarBalanceRestricted.mockReturnValue(true)
+      const convert = buildConvertSpy()
+      mockConvertMoneyAmount.mockReturnValue(convert)
+
+      renderHook(() => useTotalBalance(wallets, { applyDollarRestriction: false }))
+
+      const usdCalls = convert.mock.calls.filter(
+        (args) => (args[0] as unknown as { currencyCode: string }).currencyCode === "USD",
+      )
+      expect(usdCalls[0][0]).toEqual(
+        expect.objectContaining({ amount: 50_000, currencyCode: "USD" }),
+      )
+    })
   })
 })

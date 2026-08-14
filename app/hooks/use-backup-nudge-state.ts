@@ -10,6 +10,7 @@ import { reportError } from "@app/utils/error-logging"
 
 import { useAccountRegistry } from "./use-account-registry"
 import { useActiveWallet } from "./use-active-wallet"
+import { useIsSelfCustodialAccount } from "./use-is-self-custodial-account"
 
 const BANNER_DISMISSAL_COOLDOWN_MS = 24 * 60 * 60 * 1000
 const BANNER_DISMISSAL_KEY_PREFIX = "backupNudgeDismissedAt"
@@ -41,6 +42,7 @@ type BackupNudgeState = {
 export const useBackupNudgeState = (): BackupNudgeState => {
   const { backupState } = useBackupState()
   const activeWallet = useActiveWallet()
+  const isSelfCustodial = useIsSelfCustodialAccount()
   const { activeAccount } = useAccountRegistry()
   const {
     backupNudgeBannerThreshold,
@@ -99,7 +101,6 @@ export const useBackupNudgeState = (): BackupNudgeState => {
   }, [activeSelfCustodialAccountId])
 
   const isBackedUp = backupState.status === BackupStatus.Completed
-  const isSelfCustodial = activeWallet.accountType === AccountType.SelfCustodial
   const isWalletReady = activeWallet.isReady
 
   const walletsForTotal = useMemo(
@@ -112,7 +113,12 @@ export const useBackupNudgeState = (): BackupNudgeState => {
     [activeWallet.wallets],
   )
 
-  const { satsBalance } = useTotalBalance(walletsForTotal)
+  // Opt out of the dollar-balance restriction: it hides a balance, it does not
+  // remove it, and an unbacked stable-token holding is exactly as lost as an
+  // unbacked BTC one if the device goes.
+  const { satsBalance } = useTotalBalance(walletsForTotal, {
+    applyDollarRestriction: false,
+  })
 
   const isBannerDismissedRecently =
     bannerDismissedAt !== null &&

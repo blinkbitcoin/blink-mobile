@@ -9,6 +9,7 @@ const mockAccountRegistry = jest.fn()
 const mockMultiGet = jest.fn()
 const mockSetItem = jest.fn()
 const mockReportError = jest.fn()
+const mockUseTotalBalance = jest.fn()
 
 jest.mock("@app/self-custodial/providers/backup-state", () => ({
   BackupStatus: { None: "none", Completed: "completed" },
@@ -30,13 +31,19 @@ jest.mock("@app/config/feature-flags-context", () => ({
 const SATS_PER_USD_CENT = 10
 
 jest.mock("@app/components/balance-header/use-total-balance", () => ({
-  useTotalBalance: (wallets: Array<{ walletCurrency: string; balance: number }>) => ({
-    satsBalance: wallets.reduce((sum, w) => {
-      if (w.walletCurrency === "BTC") return sum + w.balance
-      if (w.walletCurrency === "USD") return sum + w.balance * 10
-      return sum
-    }, 0),
-  }),
+  useTotalBalance: (
+    wallets: Array<{ walletCurrency: string; balance: number }>,
+    options?: { applyDollarRestriction?: boolean },
+  ) => {
+    mockUseTotalBalance(wallets, options)
+    return {
+      satsBalance: wallets.reduce((sum, w) => {
+        if (w.walletCurrency === "BTC") return sum + w.balance
+        if (w.walletCurrency === "USD") return sum + w.balance * 10
+        return sum
+      }, 0),
+    }
+  },
 }))
 
 jest.mock("@react-native-async-storage/async-storage", () => ({
@@ -328,6 +335,69 @@ describe("useBackupNudgeState", () => {
     // A storage failure must not silently suppress a security nudge.
     expect(result.current.shouldShowModal).toBe(true)
     expect(mockReportError).toHaveBeenCalledWith("Nudge dismiss read", expect.any(Error))
+  })
+
+  // A dollar-restricted region hides the stable-token balance from the display,
+  // but the funds are still on the device and still unbacked.
+  it("measures the balance without the dollar-display restriction", async () => {
+    renderHook(() => useBackupNudgeState())
+
+    await act(async () => {})
+
+    expect(mockUseTotalBalance).toHaveBeenCalledWith(
+      expect.any(Array),
+      expect.objectContaining({ applyDollarRestriction: false }),
+    )
+  })
+
+  it("reports a failed dismissal write", async () => {
+    mockActiveWallet.mockReturnValue(aboveModalThresholdWallet)
+    mockSetItem.mockRejectedValue(new Error("SQLiteFullException"))
+
+    const { result } = renderHook(() => useBackupNudgeState())
+
+    await act(async () => {})
+    await act(async () => {
+      result.current.dismissModal()
+    })
+
+    expect(mockReportError).toHaveBeenCalledWith("Nudge dismiss write", expect.any(Error))
+  })
+
+  it("clears dismissal state and finishes loading for a custodial account", async () => {
+    mockAccountRegistry.mockReturnValue({
+      activeAccount: { type: "custodial", id: "custodial-uuid" },
+    })
+
+    const { result } = renderHook(() => useBackupNudgeState())
+
+    await act(async () => {})
+
+    // No account-scoped key to read, so storage is never touched...
+    expect(mockMultiGet).not.toHaveBeenCalled()
+    // ...but `loaded` must still flip, or every threshold-gated surface stays
+    // hidden forever. shouldShowBanner is the one that proves it: it is gated on
+    // `loaded`, unlike shouldShowSettingsBanner.
+    expect(result.current.shouldShowBanner).toBe(true)
+  })
+
+  // The keys are account-scoped, so with no self-custodial account there is no
+  // key to write. Persisting anything here would land under a wrong or partial
+  // key and silence a later account's nudge.
+  it("never persists a dismissal without a self-custodial account", async () => {
+    mockAccountRegistry.mockReturnValue({
+      activeAccount: { type: "custodial", id: "custodial-uuid" },
+    })
+
+    const { result } = renderHook(() => useBackupNudgeState())
+
+    await act(async () => {})
+    act(() => {
+      result.current.dismissBanner()
+      result.current.dismissModal()
+    })
+
+    expect(mockSetItem).not.toHaveBeenCalled()
   })
 
   it("triggers banner when USD weight pushes combined balance over the threshold", async () => {
