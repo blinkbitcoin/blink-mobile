@@ -1,0 +1,95 @@
+import React, { PropsWithChildren } from "react"
+import { act, renderHook, waitFor } from "@testing-library/react-native"
+
+import { MockedProvider, MockedResponse } from "@apollo/client/testing"
+import { AccountLimitsByLevelDocument } from "@app/graphql/generated"
+import {
+  FALLBACK_LEVEL1_DAILY_LIMIT_CENTS,
+  useLevel1DailyLimit,
+} from "@app/hooks/use-level1-daily-limit"
+
+type LevelRow = { level: string; withdrawal: number }
+
+const limitsMock = (rows: LevelRow[]): MockedResponse => ({
+  request: { query: AccountLimitsByLevelDocument },
+  result: {
+    data: {
+      globals: {
+        __typename: "Globals",
+        accountLimitsByLevel: rows.map((row) => ({
+          __typename: "AccountLevelLimits",
+          ...row,
+        })),
+      },
+    },
+  },
+})
+
+const wrapper = (mocks: ReadonlyArray<MockedResponse>) => {
+  const Wrapper: React.FC<PropsWithChildren> = ({ children }) => (
+    <MockedProvider mocks={mocks}>{children}</MockedProvider>
+  )
+  return Wrapper
+}
+
+describe("useLevel1DailyLimit", () => {
+  it("returns the level ONE withdrawal limit from a multi-level response", async () => {
+    const { result } = renderHook(() => useLevel1DailyLimit(), {
+      wrapper: wrapper([
+        limitsMock([
+          { level: "ZERO", withdrawal: 25000 },
+          { level: "ONE", withdrawal: 150000 },
+          { level: "TWO", withdrawal: 500000 },
+        ]),
+      ]),
+    })
+
+    await waitFor(() => expect(result.current.limit).toBe("1,500"))
+  })
+
+  it("falls back when the response has no level ONE entry", async () => {
+    const { result } = renderHook(() => useLevel1DailyLimit(), {
+      wrapper: wrapper([limitsMock([{ level: "ZERO", withdrawal: 25000 }])]),
+    })
+
+    // let the query resolve, then confirm the fallback is still shown
+    await act(
+      async () =>
+        new Promise((resolve) => {
+          setTimeout(resolve, 0)
+        }),
+    )
+    expect(result.current.limit).toBe("999")
+  })
+
+  it("falls back to the audited value while loading and after a query error", async () => {
+    const errorMock: MockedResponse = {
+      request: { query: AccountLimitsByLevelDocument },
+      error: new Error("cannot query field 'accountLimitsByLevel' on type 'Globals'"),
+    }
+    const { result } = renderHook(() => useLevel1DailyLimit(), {
+      wrapper: wrapper([errorMock]),
+    })
+
+    // first render: query in flight, fallback already correct
+    expect(result.current.limit).toBe("999")
+    expect(FALLBACK_LEVEL1_DAILY_LIMIT_CENTS).toBe(99900)
+
+    // after the error lands, the fallback must still be shown
+    await act(
+      async () =>
+        new Promise((resolve) => {
+          setTimeout(resolve, 0)
+        }),
+    )
+    expect(result.current.limit).toBe("999")
+  })
+
+  it("keeps fractional cents readable instead of truncating them", async () => {
+    const { result } = renderHook(() => useLevel1DailyLimit(), {
+      wrapper: wrapper([limitsMock([{ level: "ONE", withdrawal: 99950 }])]),
+    })
+
+    await waitFor(() => expect(result.current.limit).toBe("999.5"))
+  })
+})

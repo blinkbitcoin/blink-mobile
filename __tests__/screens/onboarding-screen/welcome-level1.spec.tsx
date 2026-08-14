@@ -5,6 +5,7 @@ import { render, fireEvent } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 import { useSettingsScreenQuery } from "@app/graphql/generated"
+import { useLevel1DailyLimit } from "@app/hooks"
 import { WelcomeLevel1Screen } from "@app/screens/onboarding-screen"
 import { OnboardingStackParamList } from "@app/navigation/stack-param-lists"
 
@@ -37,12 +38,18 @@ jest.mock("@react-navigation/native", () => ({
   useNavigation: jest.fn(),
 }))
 
+jest.mock("@app/hooks", () => ({
+  ...jest.requireActual("@app/hooks"),
+  useLevel1DailyLimit: jest.fn(),
+}))
+
 describe("WelcomeLevel1Screen", () => {
   let LL: ReturnType<typeof i18nObject>
   const mockAddListener = jest.fn(() => jest.fn())
 
   beforeEach(() => {
     ;(useSettingsScreenQuery as jest.Mock).mockReturnValue(usernameMock)
+    ;(useLevel1DailyLimit as jest.Mock).mockReturnValue({ limit: "999" })
     ;(useNavigation as jest.Mock).mockReturnValue({
       addListener: mockAddListener,
     })
@@ -70,6 +77,22 @@ describe("WelcomeLevel1Screen", () => {
       ),
     ).toBeTruthy()
     expect(getByText(LL.OnboardingScreen.welcomeLevel1.onchainDescription())).toBeTruthy()
+  })
+
+  it("Renders the daily limit provided by the backend hook", () => {
+    ;(useLevel1DailyLimit as jest.Mock).mockReturnValue({ limit: "1,500" })
+
+    const { getByText } = render(
+      <ContextForScreen>
+        <WelcomeLevel1Screen route={route} />
+      </ContextForScreen>,
+    )
+
+    expect(
+      getByText(
+        LL.OnboardingScreen.welcomeLevel1.dailyLimitDescription({ limit: "1,500" }),
+      ),
+    ).toBeTruthy()
   })
 
   it("Triggers primary action button with label", () => {
