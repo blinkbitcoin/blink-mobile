@@ -1,6 +1,7 @@
 ---
 name: react-native-ios-simulator
 description: Use when running a React Native app on an iOS simulator on macOS — claiming an isolated simulator and Metro port, installing or building the app, reaching a particular screen or state, or any task involving xcrun simctl, Metro bundler ports, or a demo simulator. Required before capturing screenshots or video, and whenever other agents may share the same Mac.
+allowed-tools: Bash(xcrun simctl *) Bash(maestro *) Bash(node node_modules/react-native/cli.js *) Bash(/*/.claude/skills/*/scripts/*.sh) Bash(/*/.claude/skills/*/scripts/*.sh *) Bash(/*/.claude/skills/*/tests/run.sh) Bash(/*/.claude/skills/*/bench/live.sh *)
 ---
 
 # React Native on an Isolated iOS Simulator (macOS)
@@ -317,7 +318,7 @@ The isolation guarantees are load-bearing for every other agent on this Mac, so
 they are tested rather than asserted:
 
 ```bash
-"$SKILL/tests/run.sh"     # 197 assertions, ~100s, exits non-zero on failure
+"$SKILL/tests/run.sh"     # 199 assertions, ~100s, exits non-zero on failure
 ```
 
 It creates **no real simulators** — a fake `xcrun` goes first on PATH and the
