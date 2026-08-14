@@ -177,6 +177,33 @@ export default class KeyStoreWrapper {
     }
   }
 
+  /**
+   * Reinstall guard: the iOS keychain outlives the app install, so a genuine
+   * fresh install must clear every session credential the UI can reach.
+   * Owning the list here means adding a new uninstall-surviving slot and
+   * adding it to this wipe are the same edit, in the same file.
+   *
+   * Mnemonics are deliberately excluded: wallet keys outliving uninstall is a
+   * recovery/product decision, not cleanup (and their account index does not
+   * survive uninstall, so they cannot be enumerated here anyway).
+   *
+   * Each removal is retried once; a persistent failure is reported through
+   * onFailure but never thrown, and never stops the remaining slots — boot
+   * must go on and every slot must get its attempt.
+   */
+  public static async clearUninstallSurvivingCredentials(
+    onFailure: (what: string) => void,
+  ): Promise<void> {
+    const removeWithRetry = async (remove: () => Promise<boolean>, what: string) => {
+      const ok = (await remove()) || (await remove())
+      if (!ok) {
+        onFailure(what)
+      }
+    }
+    await removeWithRetry(KeyStoreWrapper.removeActiveToken, "active token")
+    await removeWithRetry(KeyStoreWrapper.removeSessionProfiles, "session profiles")
+  }
+
   private static mnemonicKeyFor(accountId: string): string {
     return `${KeyStoreWrapper.MNEMONIC}:${accountId}`
   }

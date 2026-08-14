@@ -602,3 +602,75 @@ describe("KeyStoreWrapper active-token methods", () => {
     })
   })
 })
+
+describe("KeyStoreWrapper clearUninstallSurvivingCredentials", () => {
+  const onFailure = jest.fn()
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockRemove.mockResolvedValue(undefined)
+  })
+
+  it("removes the active token and the session profiles, and only those", async () => {
+    await KeyStoreWrapper.clearUninstallSurvivingCredentials(onFailure)
+
+    expect(mockRemove).toHaveBeenCalledWith("galoyAuthToken")
+    expect(mockRemove).toHaveBeenCalledWith("sessionProfiles")
+    // Mnemonics are deliberately NOT wiped (wallet keys outliving uninstall
+    // is a product decision, not cleanup) — nothing else may be touched.
+    expect(mockRemove).toHaveBeenCalledTimes(2)
+    expect(onFailure).not.toHaveBeenCalled()
+  })
+
+  it("retries a failed removal once and stays silent when the retry lands", async () => {
+    mockRemove
+      .mockRejectedValueOnce(new Error("keystore busy")) // token, attempt 1
+      .mockResolvedValue(undefined)
+
+    await KeyStoreWrapper.clearUninstallSurvivingCredentials(onFailure)
+
+    const tokenAttempts = mockRemove.mock.calls.filter(([k]) => k === "galoyAuthToken")
+    expect(tokenAttempts).toHaveLength(2)
+    expect(onFailure).not.toHaveBeenCalled()
+  })
+
+  it("reports a persistently failing token removal and still wipes the profiles", async () => {
+    mockRemove.mockImplementation((key: string) =>
+      key === "galoyAuthToken"
+        ? Promise.reject(new Error("keystore unavailable"))
+        : Promise.resolve(undefined),
+    )
+
+    await KeyStoreWrapper.clearUninstallSurvivingCredentials(onFailure)
+
+    expect(onFailure).toHaveBeenCalledTimes(1)
+    expect(onFailure).toHaveBeenCalledWith("active token")
+    // One slot failing must not stop the other from being cleared.
+    expect(mockRemove).toHaveBeenCalledWith("sessionProfiles")
+  })
+
+  it("reports a persistently failing profile removal by name", async () => {
+    mockRemove.mockImplementation((key: string) =>
+      key === "sessionProfiles"
+        ? Promise.reject(new Error("keystore unavailable"))
+        : Promise.resolve(undefined),
+    )
+
+    await KeyStoreWrapper.clearUninstallSurvivingCredentials(onFailure)
+
+    expect(onFailure).toHaveBeenCalledTimes(1)
+    expect(onFailure).toHaveBeenCalledWith("session profiles")
+  })
+
+  it("reports every slot when the keystore is fully unavailable, and never throws", async () => {
+    mockRemove.mockRejectedValue(new Error("keystore unavailable"))
+
+    await expect(
+      KeyStoreWrapper.clearUninstallSurvivingCredentials(onFailure),
+    ).resolves.toBeUndefined()
+
+    expect(onFailure).toHaveBeenCalledTimes(2)
+    expect(onFailure).toHaveBeenNthCalledWith(1, "active token")
+    expect(onFailure).toHaveBeenNthCalledWith(2, "session profiles")
+  })
+})

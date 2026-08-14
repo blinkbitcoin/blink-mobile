@@ -161,21 +161,16 @@ export const loadPersistentState = async (): Promise<LoadedPersistentState> => {
       }
     }
     case MigrationStatus.NoData: {
-      // Genuinely a fresh install (unrecognized schemas are Failed): the iOS
-      // keychain survives uninstall, so clear every session credential the UI
-      // can reach — the active token AND the switcher's session profiles.
-      // This branch re-runs on every boot until the first blob write, so a
+      // Genuinely a fresh install (unrecognized schemas are Failed). This
+      // branch owns only the trigger and the reporting — WHICH credentials
+      // survive uninstall and must be wiped is secureStorage's knowledge.
+      // The branch re-runs on every boot until the first blob write, so a
       // failed wipe also retries across boots.
-      const removeWithRetry = async (remove: () => Promise<boolean>, what: string) => {
-        const ok = (await remove()) || (await remove())
-        if (!ok) {
-          recordAppError(new Error(`Reinstall keychain cleanup failed: ${what}`), {
-            alwaysRecord: true,
-          })
-        }
-      }
-      await removeWithRetry(KeyStoreWrapper.removeActiveToken, "active token")
-      await removeWithRetry(KeyStoreWrapper.removeSessionProfiles, "session profiles")
+      await KeyStoreWrapper.clearUninstallSurvivingCredentials((what) => {
+        recordAppError(new Error(`Reinstall keychain cleanup failed: ${what}`), {
+          alwaysRecord: true,
+        })
+      })
       return { state: defaultPersistentState, persistedToken: "" }
     }
     case MigrationStatus.Failed: {

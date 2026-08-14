@@ -25,7 +25,7 @@ jest.mock("@app/utils/storage", () => ({
 const mockGetActiveToken = jest.fn()
 const mockSetActiveToken = jest.fn()
 const mockRemoveActiveToken = jest.fn()
-const mockRemoveSessionProfiles = jest.fn()
+const mockClearUninstallSurvivingCredentials = jest.fn()
 
 jest.mock("@app/utils/storage/secureStorage", () => ({
   __esModule: true,
@@ -33,7 +33,8 @@ jest.mock("@app/utils/storage/secureStorage", () => ({
     getActiveToken: (...args: unknown[]) => mockGetActiveToken(...args),
     setActiveToken: (...args: unknown[]) => mockSetActiveToken(...args),
     removeActiveToken: (...args: unknown[]) => mockRemoveActiveToken(...args),
-    removeSessionProfiles: (...args: unknown[]) => mockRemoveSessionProfiles(...args),
+    clearUninstallSurvivingCredentials: (...args: unknown[]) =>
+      mockClearUninstallSurvivingCredentials(...args),
   },
 }))
 
@@ -89,7 +90,7 @@ const setupStorageMockDefaults = () => {
   mockGetActiveToken.mockResolvedValue("")
   mockSetActiveToken.mockResolvedValue(true)
   mockRemoveActiveToken.mockResolvedValue(true)
-  mockRemoveSessionProfiles.mockResolvedValue(true)
+  mockClearUninstallSurvivingCredentials.mockResolvedValue(undefined)
 }
 
 describe("PersistentStateProvider", () => {
@@ -150,9 +151,10 @@ describe("PersistentStateProvider", () => {
     )
   })
 
-  it("removes a leftover keychain token when no persisted data exists (reinstall)", async () => {
+  it("clears uninstall-surviving credentials when no persisted data exists (reinstall)", async () => {
     // The iOS keychain survives uninstall; a fresh install must not resurrect
-    // the previous session.
+    // the previous session. Which credentials are wiped (and the retry
+    // behavior) is owned and tested by secureStorage — this locks the trigger.
     mockLoadJson.mockResolvedValue(null)
     mockGetActiveToken.mockResolvedValue("token-from-before-uninstall")
 
@@ -166,15 +168,19 @@ describe("PersistentStateProvider", () => {
       expect(screen.getByTestId("token")).toBeTruthy()
     })
 
-    expect(mockRemoveActiveToken).toHaveBeenCalledTimes(1)
+    expect(mockClearUninstallSurvivingCredentials).toHaveBeenCalledTimes(1)
     expect(screen.getByTestId("token").props.children).toBe("")
   })
 
-  it("wipes session profiles as well as the active token on a fresh install", async () => {
-    // sessionProfiles survive uninstall in the same keychain and are reachable
-    // through the account switcher — wiping only the active token would let a
-    // new device owner restore the previous owner's session with one tap.
+  it("reports each failed credential wipe to crashlytics by name", async () => {
     mockLoadJson.mockResolvedValue(null)
+    // The loader supplies the reporting callback; a wipe failure surfaces
+    // through it, named, and never throws into the boot path.
+    mockClearUninstallSurvivingCredentials.mockImplementation(
+      async (onFailure: (what: string) => void) => {
+        onFailure("active token")
+      },
+    )
 
     render(
       <PersistentStateProvider>
@@ -186,71 +192,13 @@ describe("PersistentStateProvider", () => {
       expect(screen.getByTestId("token")).toBeTruthy()
     })
 
-    expect(mockRemoveActiveToken).toHaveBeenCalled()
-    expect(mockRemoveSessionProfiles).toHaveBeenCalled()
-  })
-
-  it("retries a failed reinstall wipe once and reports if it still fails", async () => {
-    mockLoadJson.mockResolvedValue(null)
-    mockRemoveActiveToken.mockResolvedValue(false)
-
-    render(
-      <PersistentStateProvider>
-        <TestConsumer />
-      </PersistentStateProvider>,
-    )
-
-    await waitFor(() => {
-      expect(screen.getByTestId("token")).toBeTruthy()
-    })
-
-    expect(mockRemoveActiveToken).toHaveBeenCalledTimes(2)
     expect(mockRecordError).toHaveBeenCalledTimes(1)
-    expect(mockRecordError.mock.calls[0][0].message).toContain(
-      "Reinstall keychain cleanup failed",
+    expect(mockRecordError.mock.calls[0][0].message).toBe(
+      "Reinstall keychain cleanup failed: active token",
     )
   })
 
-  it("retries and reports a failed session-profile wipe independently", async () => {
-    // Each credential gets its own retry+report: a regression that unwrapped
-    // the second removeWithRetry call would otherwise pass the suite.
-    mockLoadJson.mockResolvedValue(null)
-    mockRemoveSessionProfiles.mockResolvedValue(false)
-
-    render(
-      <PersistentStateProvider>
-        <TestConsumer />
-      </PersistentStateProvider>,
-    )
-
-    await waitFor(() => {
-      expect(screen.getByTestId("token")).toBeTruthy()
-    })
-
-    expect(mockRemoveSessionProfiles).toHaveBeenCalledTimes(2)
-    expect(mockRecordError).toHaveBeenCalledTimes(1)
-    expect(mockRecordError.mock.calls[0][0].message).toContain("session profiles")
-  })
-
-  it("does not report when the reinstall wipe succeeds on the retry", async () => {
-    mockLoadJson.mockResolvedValue(null)
-    mockRemoveActiveToken.mockResolvedValueOnce(false)
-
-    render(
-      <PersistentStateProvider>
-        <TestConsumer />
-      </PersistentStateProvider>,
-    )
-
-    await waitFor(() => {
-      expect(screen.getByTestId("token")).toBeTruthy()
-    })
-
-    expect(mockRemoveActiveToken).toHaveBeenCalledTimes(2)
-    expect(mockRecordError).not.toHaveBeenCalled()
-  })
-
-  it("does not wipe the keychain for an unrecognized schema version", async () => {
+  it("does not clear credentials for an unrecognized schema version", async () => {
     // A downgrade from a future build is not a reinstall: the blob exists but
     // can't be read. The session must survive the round trip.
     mockLoadJson.mockResolvedValue({ schemaVersion: 99, galoyInstance: { id: "Main" } })
@@ -266,8 +214,7 @@ describe("PersistentStateProvider", () => {
       expect(screen.getByTestId("token")).toBeTruthy()
     })
 
-    expect(mockRemoveActiveToken).not.toHaveBeenCalled()
-    expect(mockRemoveSessionProfiles).not.toHaveBeenCalled()
+    expect(mockClearUninstallSurvivingCredentials).not.toHaveBeenCalled()
     // Downgrade boots keep the session (Failed → keychain recovery).
     expect(screen.getByTestId("token").props.children).toBe("kc-token")
   })
