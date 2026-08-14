@@ -322,6 +322,10 @@ describe("useBackupNudgeState", () => {
     // ...and dismissing the modal must not resurrect the dismissed banner.
     expect(result.current.shouldShowModal).toBe(false)
     expect(result.current.shouldShowBanner).toBe(false)
+    // With both home-screen surfaces quiet, the settings banner is the warning
+    // that has to remain - it is the only thing standing between this user and
+    // no backup reminder at all.
+    expect(result.current.shouldShowSettingsBanner).toBe(true)
   })
 
   it("fails open and reports when the dismissal read rejects", async () => {
@@ -379,6 +383,75 @@ describe("useBackupNudgeState", () => {
     // hidden forever. shouldShowBanner is the one that proves it: it is gated on
     // `loaded`, unlike shouldShowSettingsBanner.
     expect(result.current.shouldShowBanner).toBe(true)
+  })
+
+  it("ignores a stale read from the previously active account", async () => {
+    const OTHER_ACCOUNT_ID = "other-self-custodial-uuid"
+    mockActiveWallet.mockReturnValue(aboveModalThresholdWallet)
+
+    // Account A dismissed its modal; account B has dismissed nothing.
+    storage[MODAL_KEY] = String(Date.now())
+
+    let landAccountARead: () => void = () => {}
+    mockMultiGet.mockImplementationOnce(
+      (keys: string[]) =>
+        new Promise((resolve) => {
+          landAccountARead = () => resolve(androidMultiGetOrder(keys))
+        }),
+    )
+
+    const { result, rerender } = renderHook(() => useBackupNudgeState())
+
+    // Switch to account B, whose read resolves straight away...
+    mockAccountRegistry.mockReturnValue({
+      activeAccount: { type: "self-custodial", id: OTHER_ACCOUNT_ID },
+    })
+    rerender({})
+    await act(async () => {})
+
+    expect(result.current.shouldShowModal).toBe(true)
+
+    // ...and only now does account A's read land. Applying it would hide B's
+    // modal using A's dismissal.
+    await act(async () => {
+      landAccountARead()
+    })
+
+    expect(result.current.shouldShowModal).toBe(true)
+  })
+
+  // Same race on the failure path: fail-open clears the dismissal state, so a
+  // late rejection from the previous account would wipe the current account's
+  // freshly loaded timestamps and re-show a modal it had already dismissed.
+  it("ignores a stale failed read from the previously active account", async () => {
+    const OTHER_ACCOUNT_ID = "other-self-custodial-uuid"
+    mockActiveWallet.mockReturnValue(aboveModalThresholdWallet)
+
+    let failAccountARead: () => void = () => {}
+    mockMultiGet.mockImplementationOnce(
+      () =>
+        new Promise((_resolve, reject) => {
+          failAccountARead = () => reject(new Error("SQLiteDiskIOException"))
+        }),
+    )
+
+    const { result, rerender } = renderHook(() => useBackupNudgeState())
+
+    // Account B loads cleanly and has a dismissed modal.
+    storage[`backupNudgeModalDismissedAt:${OTHER_ACCOUNT_ID}`] = String(Date.now())
+    mockAccountRegistry.mockReturnValue({
+      activeAccount: { type: "self-custodial", id: OTHER_ACCOUNT_ID },
+    })
+    rerender({})
+    await act(async () => {})
+
+    expect(result.current.shouldShowModal).toBe(false)
+
+    await act(async () => {
+      failAccountARead()
+    })
+
+    expect(result.current.shouldShowModal).toBe(false)
   })
 
   // The keys are account-scoped, so with no self-custodial account there is no

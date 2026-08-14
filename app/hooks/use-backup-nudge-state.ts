@@ -64,12 +64,17 @@ export const useBackupNudgeState = (): BackupNudgeState => {
       return
     }
 
+    // The two reads race across an account switch: nothing orders the previous
+    // account's reply before the current one's, and applying a stale reply would
+    // decide this account's nudges from the other account's dismissals.
+    let cancelled = false
     const bannerKey = bannerDismissalKeyFor(activeSelfCustodialAccountId)
     const modalKey = modalDismissalKeyFor(activeSelfCustodialAccountId)
 
     setLoaded(false)
     AsyncStorage.multiGet([bannerKey, modalKey])
       .then((entries) => {
+        if (cancelled) return
         // Look the values up by key: Android returns them in SQLite row order
         // with the not-found keys appended, not in the order we asked for.
         const byKey = new Map(entries)
@@ -79,11 +84,16 @@ export const useBackupNudgeState = (): BackupNudgeState => {
       })
       .catch((err) => {
         reportError("Nudge dismiss read", err)
+        if (cancelled) return
         // Fail open: an unreadable storage must not silence a security nudge.
         setBannerDismissedAt(null)
         setModalDismissedAt(null)
         setLoaded(true)
       })
+
+    return () => {
+      cancelled = true
+    }
   }, [activeSelfCustodialAccountId])
 
   const dismissBanner = useCallback(() => {
@@ -136,8 +146,10 @@ export const useBackupNudgeState = (): BackupNudgeState => {
     satsBalance >= backupNudgeModalThreshold &&
     !isModalDismissedRecently
 
-  // Once the modal is dismissed the banner takes over: the user keeps a visible
-  // warning without a prompt that blocks the wallet.
+  // Once the modal is dismissed the banner takes over, so the user keeps a
+  // visible warning without a prompt that blocks the wallet - unless they also
+  // dismissed the banner inside its own cooldown, in which case both stay quiet
+  // and `shouldShowSettingsBanner` below is the warning that always remains.
   const shouldShowBanner =
     !isBackedUp &&
     isSelfCustodial &&
