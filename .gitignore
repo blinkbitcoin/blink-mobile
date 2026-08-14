@@ -104,9 +104,11 @@ android-recordings
 !.yarn/sdks
 !.yarn/versions
 
-# AI agent data stays local, except the shared skills in .claude/skills
+# AI agent data stays local, except the shared skills in .claude/skills and
+# the shared permission allowlist (settings.local.json remains per-machine)
 .claude/*
 !.claude/skills
+!.claude/settings.json
 .augment
 .bmad
 bmad-custom-src

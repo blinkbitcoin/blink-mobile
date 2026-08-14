@@ -127,6 +127,8 @@ echo
 echo "documented commands match the scripts"
 # The SKILL.md tells agents to use this convention; if the prose and the script
 # disagree, the prose wins in practice and produces broken branches.
+check "SKILL.md pre-approves this skill's commands (allowed-tools)" "yes" \
+  "$(head -5 "$TESTS_DIR/../SKILL.md" | grep "allowed-tools:" | grep -q -- "scripts/\*.sh" && echo yes || echo no)"
 check "SKILL.md documents the assets/ prefix" "yes" \
   "$(grep -q 'assets/pr-<N>-<purpose>' "$TESTS_DIR/../SKILL.md" && echo yes || echo no)"
 check "SKILL.md documents deriving the repo from the origin remote" "yes" \

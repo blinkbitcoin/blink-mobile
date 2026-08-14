@@ -24,6 +24,21 @@ instructions (e.g. `AGENTS.md`).
 | [`react-native-demo-screenshots`](./react-native-demo-screenshots/SKILL.md) | Settle-aware capture, honest before/after crop pairs, numeric comparison against design mocks |
 | [`react-native-demo-videos`](./react-native-demo-videos/SKILL.md) | Maestro-driven recordings with safe recorder stop paths, GIF/MP4/WebM encoding, and a guard against the `clearState` Metro-redirect trap |
 | [`github-pr-image-attachments`](./github-pr-image-attachments/SKILL.md) | Embed images in PR comments via an orphan `assets/pr-<N>-*` branch (`gh` has no attachment upload); repo derived from the origin remote |
+| [`blink-staging-session`](./blink-staging-session/SKILL.md) | **Blink-specific** (the one exception to app-agnosticism, kept separate on purpose): staging login with the global OTP, the Main→Staging instance switch, golden-sim provisioning recipe |
+
+## Permissions: allowed by default, guarded by the scripts
+
+Autonomous sessions die on permission prompts, so the repo pre-approves the
+skills' commands in two layers: `.claude/settings.json` allowlists
+`xcrun simctl`, `maestro`, `ffmpeg`/`ffprobe`/`magick`, the RN CLI, and the
+skill scripts for every session in a trusted checkout, and each `SKILL.md`
+carries the same grants as `allowed-tools` frontmatter (turn-scoped, works
+even where project settings don't apply). This is safe because the safety
+here was never the prompt: it is the tested scripts — udid scoping,
+ownership gates, the collateral-damage assertion — and the suites that
+mutation-check them. Note: non-interactive runs in an *untrusted* checkout
+ignore project settings by design; trust the workspace once and the
+allowlist applies.
 
 ## Quickstart (a before/after screenshot pair on a PR)
 

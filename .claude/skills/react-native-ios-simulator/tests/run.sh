@@ -935,6 +935,8 @@ echo
 echo "documented behavior matches the scripts"
 
 SKILL_MD="$TESTS_DIR/../SKILL.md"
+check "SKILL.md pre-approves this skill's commands (allowed-tools)" "yes" \
+  "$(head -5 "$SKILL_MD" | grep "allowed-tools:" | grep -q -- "Bash(xcrun simctl \*)" && head -5 "$SKILL_MD" | grep "allowed-tools:" | grep -q -- "Bash(maestro \*)" && echo yes || echo no)"
 check "SKILL.md documents the reload flip" "yes" \
   "$(grep -q "reload-app.sh" "$SKILL_MD" && echo yes || echo no)"
 check "SKILL.md documents the golden bless workflow" "yes" \
@@ -943,6 +945,20 @@ check "SKILL.md ties golden staleness to the stamp sha" "yes" \
   "$(grep -qi "stamp" "$SKILL_MD" && grep -q "origin/main -- ios/" "$SKILL_MD" && echo yes || echo no)"
 check "SKILL.md documents the native-stamp verdict" "yes" \
   "$(grep -q "native-stamp.sh" "$SKILL_MD" && echo yes || echo no)"
+
+# The harness permission prompts block autonomous sessions; the checked-in
+# allowlist is what lets the skills' commands run unprompted for everyone.
+SETTINGS="$TESTS_DIR/../../../settings.json"
+check "the repo ships the permission allowlist the skills need" "yes" \
+  "$(python3 -c '
+import json, sys
+try:
+    allow = json.load(open(sys.argv[1]))["permissions"]["allow"]
+except Exception:
+    print("no"); sys.exit()
+need = ["Bash(xcrun simctl *)", "Bash(maestro *)", "Bash(ffmpeg *)"]
+print("yes" if all(n in allow for n in need) and any(".claude/skills" in a for a in allow) else "no")
+' "$SETTINGS" 2>/dev/null)"
 check "SKILL.md documents telemetry and the spans report" "yes" \
   "$(grep -q "spans-report.sh" "$SKILL_MD" && grep -q "DEMO_TELEMETRY=0" "$SKILL_MD" && echo yes || echo no)"
 check "SKILL.md documents the credential precheck" "yes" \
