@@ -83,7 +83,11 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
         actionType === "POP_TO_TOP" ||
         actionType === "GO_BACK"
       ) {
-        onChallengeFailure?.()
+        /** Deferred: this listener runs inside the removing pop's dispatch, so a
+         *  goBack the caller issues in response would coalesce with the pop
+         *  already in flight and be swallowed — stranding the caller on its
+         *  pending screen. Next tick, the stack has settled and it pops cleanly. */
+        setTimeout(() => onChallengeFailure?.(), 0)
       }
     })
   }, [screenPurpose, navigation, onChallengeFailure])

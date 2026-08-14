@@ -1,6 +1,6 @@
 import React from "react"
 import { Alert, BackHandler } from "react-native"
-import { fireEvent, render, screen } from "@testing-library/react-native"
+import { act, fireEvent, render, screen } from "@testing-library/react-native"
 
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { PinScreen } from "@app/screens/authentication-screen/pin-screen"
@@ -103,6 +103,12 @@ const fireBeforeRemove = (actionType = "POP") => {
   )
   registration?.[1]({ data: { action: { type: actionType } } })
 }
+
+/** The decline callback is deferred a tick past the removing pop's dispatch. */
+const flushDeferredDecline = () =>
+  act(async () => {
+    await new Promise((resolve) => setTimeout(resolve, 0))
+  })
 
 const enterPin = async (pin: string) => {
   for (const digit of pin.split("")) {
@@ -277,6 +283,7 @@ describe("PinScreen", () => {
 
       await enterPin(CORRECT_PIN)
       fireBeforeRemove()
+      await flushDeferredDecline()
 
       expect(onChallengeFailure).not.toHaveBeenCalled()
     })
@@ -289,9 +296,28 @@ describe("PinScreen", () => {
 
       fireBeforeRemove()
       fireBeforeRemove()
+      await flushDeferredDecline()
 
       expect(onChallengeFailure).toHaveBeenCalledTimes(1)
       expect(onChallengeSuccess).not.toHaveBeenCalled()
+    })
+
+    it("defers the decline callback until the removing pop has settled", async () => {
+      /** The listener runs inside the pop's dispatch; a goBack the caller issues
+       *  synchronously in response coalesces with that pop and is swallowed,
+       *  stranding the caller on its pending screen (found live: the backup
+       *  screen sat on its spinner forever after a decline). */
+      const onChallengeFailure = jest.fn()
+      renderChallenge({ onChallengeSuccess: jest.fn(), onChallengeFailure })
+      await flushEffects()
+
+      fireBeforeRemove()
+
+      expect(onChallengeFailure).not.toHaveBeenCalled()
+
+      await flushDeferredDecline()
+
+      expect(onChallengeFailure).toHaveBeenCalledTimes(1)
     })
 
     it("treats the hardware back as a decline too", async () => {
@@ -300,6 +326,7 @@ describe("PinScreen", () => {
       await flushEffects()
 
       fireBeforeRemove("GO_BACK")
+      await flushDeferredDecline()
 
       expect(onChallengeFailure).toHaveBeenCalledTimes(1)
     })
@@ -313,6 +340,7 @@ describe("PinScreen", () => {
       await flushEffects()
 
       fireBeforeRemove("RESET")
+      await flushDeferredDecline()
 
       expect(onChallengeFailure).not.toHaveBeenCalled()
     })
@@ -324,6 +352,7 @@ describe("PinScreen", () => {
 
       fireBeforeRemove("RESET")
       fireBeforeRemove("POP")
+      await flushDeferredDecline()
 
       expect(onChallengeFailure).not.toHaveBeenCalled()
     })
@@ -362,6 +391,7 @@ describe("PinScreen", () => {
 
       await enterPin(WRONG_PIN)
       fireBeforeRemove()
+      await flushDeferredDecline()
 
       expect(mockLogout).toHaveBeenCalledTimes(1)
       expect(mockReset).toHaveBeenCalledWith({
