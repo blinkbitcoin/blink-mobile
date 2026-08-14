@@ -1,5 +1,5 @@
 import React from "react"
-import { BackHandler } from "react-native"
+import { Alert, BackHandler } from "react-native"
 import { fireEvent, render, screen } from "@testing-library/react-native"
 
 import { loadLocale } from "@app/i18n/i18n-util.sync"
@@ -202,6 +202,18 @@ describe("PinScreen", () => {
     expect(mockSetAppUnlocked).not.toHaveBeenCalled()
     expect(mockGoBack).not.toHaveBeenCalled()
     expect(mockReset).not.toHaveBeenCalled()
+  })
+
+  it("warns on the second wrong guess that one attempt remains", async () => {
+    ;(KeyStoreWrapper.getPinAttemptsOrZero as jest.Mock).mockResolvedValueOnce(1)
+    renderScreen(true)
+    await flushEffects()
+
+    await enterPin(WRONG_PIN)
+
+    expect(KeyStoreWrapper.setPinAttempts).toHaveBeenCalledWith("2")
+    expect(screen.getByText("Incorrect PIN. 1 attempt remaining.")).toBeTruthy()
+    expect(mockLogout).not.toHaveBeenCalled()
   })
 
   it("re-arms the keypad after a wrong guess, so the next attempt can unlock", async () => {
@@ -467,6 +479,27 @@ describe("PinScreen", () => {
       await enterPin("3333")
 
       expect(KeyStoreWrapper.setPin).toHaveBeenCalledWith("3333")
+      expect(mockGoBack).toHaveBeenCalledTimes(1)
+    })
+
+    it("explains a failed store and re-arms for another try", async () => {
+      ;(KeyStoreWrapper.setPin as jest.Mock).mockResolvedValueOnce(false)
+      const alertSpy = jest.spyOn(Alert, "alert").mockImplementation(() => {})
+      renderScreen(undefined, PinScreenPurpose.SetPin)
+      await flushEffects()
+
+      await enterPin("1111")
+      await enterPin("1111")
+
+      expect(alertSpy).toHaveBeenCalledWith("Unable to store your pin.")
+      expect(mockGoBack).not.toHaveBeenCalled()
+
+      /** The failure path runs through returnToSetPin — the keypad must be live
+       *  again or the user is stuck. */
+      await enterPin("2222")
+      await enterPin("2222")
+
+      expect(KeyStoreWrapper.setPin).toHaveBeenLastCalledWith("2222")
       expect(mockGoBack).toHaveBeenCalledTimes(1)
     })
   })

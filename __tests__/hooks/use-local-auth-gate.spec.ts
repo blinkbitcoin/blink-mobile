@@ -4,6 +4,8 @@ import {
   useAuthGateFailureHandler,
   useLocalAuthGate,
 } from "@app/hooks/use-local-auth-gate"
+import { i18nObject } from "@app/i18n/i18n-util"
+import { loadLocale } from "@app/i18n/i18n-util.sync"
 import BiometricWrapper from "@app/utils/biometricAuthentication"
 import { PinScreenPurpose } from "@app/utils/enum"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
@@ -338,6 +340,13 @@ describe("useAuthGateFailureHandler", () => {
 
     expect(toastShow).toHaveBeenCalledTimes(1)
     expect(mockGoBack).toHaveBeenCalledTimes(1)
+
+    /** The toast copy is wired to the shared (non-card) namespace. */
+    const { message } = (toastShow as jest.Mock).mock.calls[0][0]
+    loadLocale("en")
+    expect(message(i18nObject("en"))).toBe(
+      "Authentication is required. You can set up a PIN or biometrics in Security settings.",
+    )
   })
 
   it("explains and bounces when a configured factor cannot be satisfied", () => {
