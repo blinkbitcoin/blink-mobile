@@ -401,6 +401,23 @@ describe("PinScreen", () => {
   })
 
   describe("input while a verification is in flight", () => {
+    beforeEach(() => {
+      // flushEffects relies on setImmediate; keep it real so effects settle.
+      jest.useFakeTimers({ doNotFake: ["setImmediate"] })
+    })
+
+    afterEach(() => {
+      jest.useRealTimers()
+    })
+
+    const advance = async (ms: number) => {
+      await flushEffects()
+      await act(async () => {
+        jest.advanceTimersByTime(ms)
+      })
+      await flushEffects()
+    }
+
     /** Holds the verification open on its stored-pin read. */
     const holdVerification = () => {
       let release: (pin: string) => void = () => {}
@@ -417,11 +434,23 @@ describe("PinScreen", () => {
       }
     }
 
-    it("ignores a backspace, so a second attempt can't be slipped in", async () => {
-      // Backspace used to be gated only by the `disabled` prop, which comes
-      // from a render that predates the verification. Backspace plus a digit
-      // re-entered the handler on a stale attempt count, and two wrong guesses
-      // were recorded as one.
+    it("disables the whole keypad, backspace included", async () => {
+      // Backspace used to be gated only by the `disabled` prop, and that prop
+      // did not cover the verifying window at all — so the pad looked live
+      // while quietly swallowing presses.
+      renderScreen(false)
+      await flushEffects()
+
+      const release = holdVerification()
+      await enterPin(WRONG_PIN)
+
+      expect(screen.getByTestId("pinPadBackspace")).toBeDisabled()
+      expect(screen.getByText("1")).toBeDisabled()
+
+      await release()
+    })
+
+    it("runs exactly one verification however many keys are pressed", async () => {
       renderScreen(false)
       await flushEffects()
 
@@ -429,24 +458,22 @@ describe("PinScreen", () => {
       await enterPin(WRONG_PIN)
 
       fireEvent.press(screen.getByTestId("pinPadBackspace"))
-      fireEvent.press(screen.getByText("1"))
-      await flushEffects()
+      await enterPin(WRONG_PIN)
 
       expect(mockedStore.getPinOrEmptyString).toHaveBeenCalledTimes(1)
       await release()
     })
 
-    it("ignores further digits", async () => {
+    it("re-enables the keypad once the verification lands", async () => {
       renderScreen(false)
       await flushEffects()
 
       const release = holdVerification()
       await enterPin(WRONG_PIN)
-
-      await enterPin(WRONG_PIN)
-
-      expect(mockedStore.getPinOrEmptyString).toHaveBeenCalledTimes(1)
       await release()
+      await advance(31_000)
+
+      expect(screen.getByText("1")).not.toBeDisabled()
     })
   })
 })

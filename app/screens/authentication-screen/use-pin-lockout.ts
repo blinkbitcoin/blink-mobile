@@ -47,6 +47,7 @@ export const usePinLockout = ({
 }: UsePinLockoutParams): UsePinLockout => {
   const guard = useInFlightGuard()
   const [isHydrated, setIsHydrated] = useState(!enabled)
+  const [isVerifying, setIsVerifying] = useState(false)
   const [lockedUntil, setLockedUntil] = useState(0)
   const [attemptsRemaining, setAttemptsRemaining] = useState<number | null>(null)
 
@@ -74,30 +75,36 @@ export const usePinLockout = ({
     }
   }, [enabled])
 
-  const isInputDisabled = !isHydrated || isLocked
+  // Disabled while verifying too, so the keypad never looks live while it is
+  // silently dropping presses.
+  const isInputDisabled = !isHydrated || isLocked || isVerifying
 
   const submit = useCallback(
     (enteredPin: string) => {
       guard.run(async () => {
+        setIsVerifying(true)
         const result = await verifyPin(enteredPin)
 
         switch (result.outcome) {
           case "unlocked":
             setLockedUntil(0)
             setAttemptsRemaining(null)
+            setIsVerifying(false)
             onUnlocked()
             return
           case "locked":
             setLockedUntil(result.lockedUntil)
+            setIsVerifying(false)
             return
           case "wrong":
             setLockedUntil(result.lockedUntil)
             setAttemptsRemaining(result.attemptsRemaining)
+            setIsVerifying(false)
             onWrongPin()
             return
           case "exhausted":
-            // The guard stays held for the whole teardown, so no further input
-            // is accepted while the logout runs.
+            // Left verifying on purpose: the guard and the disabled keypad both
+            // stay put for the whole logout teardown.
             await onExhausted()
             return
           case "unrecorded":
