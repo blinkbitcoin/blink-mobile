@@ -40,6 +40,14 @@ export const lnurlDomainFor = (network: Network): string =>
   network === Network.Mainnet ? MAINNET_LNURL_DOMAIN : REGTEST_LNURL_DOMAIN
 
 /**
+ * Base URL of the LNURL server for a self-custodial account: the same host its address is
+ * spelled with, which is what serves the authenticated `/lnurlpay/{pubkey}` routes. Not
+ * the custodial `lnAddressHostname` — `pay.*` fronts the payment app and 404s them.
+ */
+export const lnurlServerUrlFor = (network: Network): string =>
+  `https://${lnurlDomainFor(network)}`
+
+/**
  * Returns the wallet's stored network label when it conflicts with the current
  * network, or null when there is no stored label or it matches. Single source
  * of the mismatch rule shared by the SDK connect gate and the mismatch toast.
