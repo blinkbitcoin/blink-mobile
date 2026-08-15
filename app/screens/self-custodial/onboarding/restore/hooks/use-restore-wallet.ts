@@ -26,6 +26,8 @@ import {
   StorageReadStatus,
 } from "@app/self-custodial/storage/account-index"
 import { usePersistentStateContext } from "@app/store/persistent-state"
+import { withSelfCustodialModeFromServer } from "@app/store/persistent-state/self-custodial-server-account-mode"
+import { AccountMode } from "@app/types/account"
 import { reportError } from "@app/utils/error-logging"
 import { normalizeMnemonic } from "@app/utils/mnemonic"
 import { toastShow } from "@app/utils/toast"
@@ -59,6 +61,17 @@ export const useRestoreWallet = () => {
     [updateState],
   )
 
+  /** A restored account takes its mode from the server, never from a fresh question: it
+   *  was chosen on a device this one may never have been. */
+  const adoptServerMode = useCallback(
+    (accountId: string, serverMode: AccountMode | null) => {
+      updateState(
+        (prev) => prev && withSelfCustodialModeFromServer(prev, accountId, serverMode),
+      )
+    },
+    [updateState],
+  )
+
   const restore = useCallback(
     async (mnemonic: string) => {
       await guard.run(async () => {
@@ -75,21 +88,18 @@ export const useRestoreWallet = () => {
           const lookup = await findSelfCustodialAccountByMnemonic(normalized)
           if (lookup.status === StorageReadStatus.ReadFailed) throw lookup.error
 
+          /** Already on this device, so its mode is already stored: re-entering the
+           *  phrase is not a new answer about how the account should behave. */
           if (lookup.id) {
             activateAccount(lookup.id)
             reinitSdk()
             logSelfCustodialRestoreCompleted()
-            navigation.navigate("selfCustodialChooseExperience", {
-              onContinue: {
-                route: ChooseExperienceContinueRoute.BackupSuccess,
-                accountId: lookup.id,
-              },
-            })
+            navigation.navigate("selfCustodialBackupSuccess")
             return
           }
 
           const accountId = Crypto.randomUUID()
-          await selfCustodialRestoreWallet({
+          const { serverMode, isServerModeKnown } = await selfCustodialRestoreWallet({
             accountId,
             mnemonic: normalized,
             network,
@@ -101,9 +111,21 @@ export const useRestoreWallet = () => {
           activateAccount(accountId)
           reinitSdk()
           logSelfCustodialRestoreCompleted()
-          navigation.navigate("selfCustodialChooseExperience", {
-            onContinue: { route: ChooseExperienceContinueRoute.BackupSuccess, accountId },
-          })
+
+          /** Only an unanswered server leaves the question open. Assuming a default here
+           *  would push it back and overwrite whatever the account really holds. */
+          if (!isServerModeKnown) {
+            navigation.navigate("selfCustodialChooseExperience", {
+              onContinue: {
+                route: ChooseExperienceContinueRoute.BackupSuccess,
+                accountId,
+              },
+            })
+            return
+          }
+
+          adoptServerMode(accountId, serverMode)
+          navigation.navigate("selfCustodialBackupSuccess")
         } catch (err) {
           reportError("Wallet restore", err)
           setStatus(RestoreWalletStatus.Error)
@@ -115,6 +137,7 @@ export const useRestoreWallet = () => {
     [
       guard,
       activateAccount,
+      adoptServerMode,
       reinitSdk,
       reloadSelfCustodialAccounts,
       navigation,

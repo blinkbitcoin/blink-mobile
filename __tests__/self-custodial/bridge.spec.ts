@@ -15,6 +15,11 @@ const mockDisconnect = jest.fn()
 const mockUpdateUserSettings = jest.fn()
 const mockRecordError = jest.fn()
 
+const mockRecoverLnurlServerMode = jest.fn()
+jest.mock("@app/self-custodial/lnurl-server-mode", () => ({
+  recoverLnurlServerMode: (...args: unknown[]) => mockRecoverLnurlServerMode(...args),
+}))
+
 jest.mock("bip39", () => ({
   generateMnemonic: (...args: unknown[]) => mockGenerateMnemonic(...args),
   validateMnemonic: jest.fn().mockReturnValue(true),
@@ -83,6 +88,7 @@ jest.mock("@app/self-custodial/storage/account-index", () => ({
 
 jest.mock("@react-native-firebase/crashlytics", () => () => ({
   recordError: (...args: Error[]) => mockRecordError(...args),
+  log: jest.fn(),
 }))
 
 jest.mock("@app/self-custodial/logging", () => ({
@@ -144,11 +150,20 @@ describe("selfCustodialCreateWallet", () => {
 })
 
 describe("selfCustodialRestoreWallet", () => {
+  const restoreWallet = () =>
+    selfCustodialRestoreWallet({
+      accountId: "test-account-id",
+      mnemonic: "restore word1 word2 word3",
+      network: Network.Regtest,
+      leewaySatPerVbyte: 1,
+    })
+
   beforeEach(() => {
     jest.clearAllMocks()
     mockSetMnemonicForAccount.mockResolvedValue(true)
     mockSetMnemonicNetworkForAccount.mockResolvedValue(true)
     mockConnect.mockResolvedValue({ disconnect: jest.fn().mockResolvedValue(undefined) })
+    mockRecoverLnurlServerMode.mockResolvedValue(null)
   })
 
   it("stores provided mnemonic and network", async () => {
@@ -167,6 +182,35 @@ describe("selfCustodialRestoreWallet", () => {
       "test-account-id",
       "regtest",
     )
+  })
+
+  /** Read while the wallet is connected and able to sign, the one moment the restore
+   *  has. */
+  it("hands back the mode the LNURL server already holds", async () => {
+    mockRecoverLnurlServerMode.mockResolvedValue("anon")
+
+    expect(await restoreWallet()).toEqual({ serverMode: "anon", isServerModeKnown: true })
+  })
+
+  it("hands back no mode when the server holds none", async () => {
+    expect(await restoreWallet()).toEqual({ serverMode: null, isServerModeKnown: true })
+  })
+
+  /** The wallet itself is whole; an unreachable server must not undo a restore that
+   *  otherwise succeeded. */
+  it("completes the restore when the mode cannot be recovered", async () => {
+    mockRecoverLnurlServerMode.mockRejectedValue(new Error("server down"))
+
+    expect(await restoreWallet()).toEqual({ serverMode: null, isServerModeKnown: false })
+    expect(mockDeleteMnemonicForAccount).not.toHaveBeenCalled()
+  })
+
+  /** An unanswered server is not the server answering "none": a stored Anon may be
+   *  sitting behind it, and reporting none would push it away. */
+  it("marks the mode as unknown rather than absent when the server never answered", async () => {
+    mockRecoverLnurlServerMode.mockRejectedValue(new Error("server down"))
+
+    expect((await restoreWallet()).isServerModeKnown).toBe(false)
   })
 
   it("throws if keychain storage fails", async () => {

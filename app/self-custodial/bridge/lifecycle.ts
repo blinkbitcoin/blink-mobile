@@ -11,12 +11,14 @@ import {
 import { generateMnemonic, validateMnemonic } from "bip39"
 import Crypto from "react-native-quick-crypto"
 
+import { AccountMode } from "@app/types/account"
 import { reportError } from "@app/utils/error-logging"
 import { normalizeMnemonic } from "@app/utils/mnemonic"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
 import {
   lnurlDomainFor,
+  lnurlServerUrlFor,
   MAX_SLIPPAGE_BPS,
   networkLabelFor,
   requireBreezApiKey,
@@ -24,6 +26,7 @@ import {
   SparkToken,
   storageDirFor,
 } from "../config"
+import { recoverLnurlServerMode } from "../lnurl-server-mode"
 import { createSdkLogListener } from "../logging"
 import { addSelfCustodialAccountId } from "../storage/account-index"
 
@@ -133,12 +136,22 @@ type RestoreWalletParams = {
   leewaySatPerVbyte: number
 }
 
+type RestoredWallet = {
+  /** The mode the LNURL server holds for this wallet, or null when it holds none. Read
+   *  here because this is the one moment the wallet is connected and able to sign. */
+  serverMode: AccountMode | null
+  /** False when the server could not be asked at all, which is not the same as it
+   *  answering "none": a stored Anon may be sitting behind an unanswered request, and
+   *  assuming Enhanced would push it away. */
+  isServerModeKnown: boolean
+}
+
 export const selfCustodialRestoreWallet = async ({
   accountId,
   mnemonic,
   network,
   leewaySatPerVbyte,
-}: RestoreWalletParams): Promise<void> => {
+}: RestoreWalletParams): Promise<RestoredWallet> => {
   const normalized = normalizeMnemonic(mnemonic)
   if (!validateMnemonic(normalized)) {
     throw new Error("Invalid BIP39 mnemonic")
@@ -159,8 +172,19 @@ export const selfCustodialRestoreWallet = async ({
       network,
       leewaySatPerVbyte,
     })
+    /** An unreachable server must not fail the restore: the wallet itself is whole. */
+    const recovered = await recoverLnurlServerMode({
+      sdk,
+      serverUrl: lnurlServerUrlFor(network),
+    })
+      .then((serverMode) => ({ serverMode, isServerModeKnown: true }))
+      .catch((err) => {
+        reportError("Wallet restore mode recovery", err)
+        return { serverMode: null, isServerModeKnown: false }
+      })
     await disconnectSdk(sdk)
     await addSelfCustodialAccountId(accountId)
+    return recovered
   } catch (err) {
     await KeyStoreWrapper.deleteMnemonicForAccount(accountId)
     reportError("Wallet restore", err)

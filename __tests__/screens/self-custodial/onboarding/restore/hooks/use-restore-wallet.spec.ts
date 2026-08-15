@@ -5,6 +5,10 @@ import {
   useRestoreWallet,
   RestoreWalletStatus,
 } from "@app/screens/self-custodial/onboarding/restore/hooks/use-restore-wallet"
+import { getSelfCustodialAccountMode } from "@app/store/persistent-state/self-custodial-account-mode"
+import { getSelfCustodialServerAccountMode } from "@app/store/persistent-state/self-custodial-server-account-mode"
+import { PersistentState } from "@app/store/persistent-state/state-migrations"
+import { AccountMode } from "@app/types/account"
 
 const TEST_ACCOUNT_ID = "test-account-id-123"
 
@@ -97,7 +101,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
 describe("useRestoreWallet", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockRestore.mockResolvedValue(undefined)
+    mockRestore.mockResolvedValue({ serverMode: null, isServerModeKnown: true })
     mockReloadSelfCustodialAccounts.mockResolvedValue(undefined)
     mockFindSelfCustodialAccountByMnemonic.mockResolvedValue({ status: "ok", id: null })
     mockValidateMnemonic.mockReturnValue(true)
@@ -123,12 +127,10 @@ describe("useRestoreWallet", () => {
       leewaySatPerVbyte: 5,
     })
     expect(mockReloadSelfCustodialAccounts).toHaveBeenCalledTimes(1)
-    expect(mockUpdateState).toHaveBeenCalledTimes(1)
+    expect(mockUpdateState).toHaveBeenCalledTimes(2)
     expect(mockReinitSdk).toHaveBeenCalledTimes(1)
     expect(mockMarkBackupCompletedFor).toHaveBeenCalledWith(TEST_ACCOUNT_ID, "manual")
-    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialChooseExperience", {
-      onContinue: { route: "selfCustodialBackupSuccess", accountId: TEST_ACCOUNT_ID },
-    })
+    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSuccess")
   })
 
   it("activates an existing account when the mnemonic is already imported", async () => {
@@ -146,8 +148,141 @@ describe("useRestoreWallet", () => {
     expect(mockRestore).not.toHaveBeenCalled()
     expect(mockUpdateState).toHaveBeenCalledTimes(1)
     expect(mockReinitSdk).toHaveBeenCalledTimes(1)
-    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialChooseExperience", {
-      onContinue: { route: "selfCustodialBackupSuccess", accountId: "existing-id" },
+    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSuccess")
+  })
+
+  /**
+   * A restored wallet gets its mode from the server, never from a fresh question: it was
+   * chosen on a device this one may never have been, so asking again could only overwrite
+   * a deliberate answer with a default.
+   */
+  describe("the mode a restored wallet comes back with", () => {
+    const baseState: PersistentState = {
+      schemaVersion: 20,
+      galoyInstance: { id: "Main" },
+      galoyAuthToken: "",
+      activeAccountId: TEST_ACCOUNT_ID,
+    }
+
+    const restoreAndReadState = async (serverMode: AccountMode | null) => {
+      mockRestore.mockResolvedValue({ serverMode, isServerModeKnown: true })
+      const { result } = renderHook(() => useRestoreWallet())
+
+      await act(async () => {
+        await result.current.restore("word1 word2 word3")
+      })
+
+      /** Applied in the order the hook queued them, which is what the store does. */
+      return mockUpdateState.mock.calls.reduce(
+        (state, [updater]) => updater(state) as PersistentState,
+        baseState,
+      )
+    }
+
+    it("adopts the Anon the server holds instead of asking", async () => {
+      const state = await restoreAndReadState(AccountMode.Anon)
+
+      expect(getSelfCustodialAccountMode(state)).toBe(AccountMode.Anon)
+      expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSuccess")
+    })
+
+    it("adopts the Enhanced the server holds", async () => {
+      const state = await restoreAndReadState(AccountMode.Enhanced)
+
+      expect(getSelfCustodialAccountMode(state)).toBe(AccountMode.Enhanced)
+    })
+
+    /** Already on the server, so re-pushing it would spend a paid country lookup to say
+     *  what it just told us. */
+    it("records a recovered mode as already confirmed", async () => {
+      const state = await restoreAndReadState(AccountMode.Anon)
+
+      expect(getSelfCustodialServerAccountMode(state, TEST_ACCOUNT_ID)).toBe(
+        AccountMode.Anon,
+      )
+    })
+
+    it("falls back to Enhanced when the server holds no mode", async () => {
+      const state = await restoreAndReadState(null)
+
+      expect(getSelfCustodialAccountMode(state)).toBe(AccountMode.Enhanced)
+    })
+
+    /** Left unconfirmed on purpose: the server never said Enhanced, so the sync still
+     *  owes it that push. */
+    it("leaves an assumed Enhanced unconfirmed so the sync pushes it", async () => {
+      const state = await restoreAndReadState(null)
+
+      expect(getSelfCustodialServerAccountMode(state, TEST_ACCOUNT_ID)).toBeNull()
+    })
+
+    /** The one case that still asks. Defaulting here would push Enhanced back and
+     *  overwrite an Anon the server holds but could not report. */
+    it("asks when the server could not be reached at all", async () => {
+      mockRestore.mockResolvedValue({ serverMode: null, isServerModeKnown: false })
+      const { result } = renderHook(() => useRestoreWallet())
+
+      await act(async () => {
+        await result.current.restore("word1 word2 word3")
+      })
+
+      expect(mockNavigate).toHaveBeenCalledWith("selfCustodialChooseExperience", {
+        onContinue: {
+          route: "selfCustodialBackupSuccess",
+          accountId: TEST_ACCOUNT_ID,
+        },
+      })
+    })
+
+    it("writes no mode at all when the server could not be reached", async () => {
+      mockRestore.mockResolvedValue({ serverMode: null, isServerModeKnown: false })
+      const { result } = renderHook(() => useRestoreWallet())
+
+      await act(async () => {
+        await result.current.restore("word1 word2 word3")
+      })
+
+      /** Only the activation write; nothing claims a mode the server never reported. */
+      expect(mockUpdateState).toHaveBeenCalledTimes(1)
+    })
+
+    it("never sends a restore to the mode picker", async () => {
+      await restoreAndReadState(AccountMode.Anon)
+
+      expect(mockNavigate).not.toHaveBeenCalledWith(
+        "selfCustodialChooseExperience",
+        expect.anything(),
+      )
+    })
+
+    it("makes the restored account the active one", async () => {
+      mockRestore.mockResolvedValue({ serverMode: null, isServerModeKnown: true })
+      const { result } = renderHook(() => useRestoreWallet())
+
+      await act(async () => {
+        await result.current.restore("word1 word2 word3")
+      })
+
+      const activate = mockUpdateState.mock.calls[0][0]
+      expect(
+        (activate({ ...baseState, activeAccountId: undefined }) as PersistentState)
+          .activeAccountId,
+      ).toBe(TEST_ACCOUNT_ID)
+      expect(activate(undefined)).toBeUndefined()
+    })
+
+    it("leaves the state alone when there is none to update", async () => {
+      mockRestore.mockResolvedValue({
+        serverMode: AccountMode.Anon,
+        isServerModeKnown: true,
+      })
+      const { result } = renderHook(() => useRestoreWallet())
+
+      await act(async () => {
+        await result.current.restore("word1 word2 word3")
+      })
+
+      expect(mockUpdateState.mock.calls[1][0](undefined)).toBeUndefined()
     })
   })
 
@@ -246,8 +381,8 @@ describe("useRestoreWallet", () => {
     let resolveFirst: () => void
     mockRestore.mockImplementationOnce(
       () =>
-        new Promise<void>((resolve) => {
-          resolveFirst = resolve
+        new Promise<{ serverMode: null; isServerModeKnown: boolean }>((resolve) => {
+          resolveFirst = () => resolve({ serverMode: null, isServerModeKnown: true })
         }),
     )
 
@@ -273,8 +408,8 @@ describe("useRestoreWallet", () => {
   it("sets restoring status during restore", async () => {
     let resolveRestore: () => void
     mockRestore.mockReturnValue(
-      new Promise<void>((resolve) => {
-        resolveRestore = resolve
+      new Promise<{ serverMode: null; isServerModeKnown: boolean }>((resolve) => {
+        resolveRestore = () => resolve({ serverMode: null, isServerModeKnown: true })
       }),
     )
 
