@@ -5,7 +5,7 @@ import {
 import { PersistentState } from "@app/store/persistent-state/state-migrations"
 
 const baseState: PersistentState = {
-  schemaVersion: 19,
+  schemaVersion: 20,
   galoyInstance: { id: "Main" },
   galoyAuthToken: "",
 }
