@@ -1,0 +1,18 @@
+diff --git a/node_modules/uniffi-bindgen-react-native/cpp/includes/RustBuffer.h b/node_modules/uniffi-bindgen-react-native/cpp/includes/RustBuffer.h
+index 68fb1d8..c433065 100644
+--- a/node_modules/uniffi-bindgen-react-native/cpp/includes/RustBuffer.h
++++ b/node_modules/uniffi-bindgen-react-native/cpp/includes/RustBuffer.h
+@@ -10,8 +10,11 @@
+ #include "UniffiCallInvoker.h"
+ #include <jsi/jsi.h>
+ 
++// Patched (patch-package): match uniffi-core 0.29's #[repr(C)] RustBuffer
++// layout (u64 capacity, u64 len, ptr data) on 32-bit targets, where size_t
++// is 4 bytes and would otherwise misalign the FFI struct.
+ struct RustBuffer {
+-  size_t capacity;
+-  size_t len;
++  uint64_t capacity;
++  uint64_t len;
+   uint8_t *data;
+ };
