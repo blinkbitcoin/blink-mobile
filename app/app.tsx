@@ -22,7 +22,10 @@ import { NotificationsProvider } from "./components/notifications/index"
 import { PushNotificationComponent } from "./components/push-notification"
 import { FeatureFlagContextProvider } from "./config/feature-flags-context"
 import { CustodialWalletProvider } from "./custodial/providers/wallet"
-import { AutoConvertListenerMount } from "./self-custodial/components"
+import {
+  AccountModeSyncMount,
+  AutoConvertListenerMount,
+} from "./self-custodial/components"
 import { AutoConvertStatusProvider } from "./self-custodial/providers/auto-convert-status"
 import { BackupStateProvider } from "./self-custodial/providers/backup-state"
 import { SelfCustodialWalletProvider } from "./self-custodial/providers/wallet"
@@ -76,6 +79,7 @@ export const App = () => (
                                       <AppStateWrapper />
                                       <PushNotificationComponent />
                                       <AutoConvertListenerMount />
+                                      <AccountModeSyncMount />
                                       <RootStack />
                                       <NetworkErrorComponent />
                                       <ActionModals />
