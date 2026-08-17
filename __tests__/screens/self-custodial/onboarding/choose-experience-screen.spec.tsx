@@ -79,13 +79,13 @@ describe("ChooseExperienceScreen", () => {
     mockOnContinue = { route: "selfCustodialBackupSuccess", accountId: "sc-account-1" }
   })
 
-  it("renders the hand-tap hero with the title", async () => {
+  it("renders the spinner hero with the title", async () => {
     await renderScreen()
 
     const iconHeroMock = IconHero as unknown as jest.Mock
     const props = iconHeroMock.mock.calls[0][0]
 
-    expect(props.icon).toBe("hand-tap")
+    expect(props.icon).toBe("spinner")
     expect(props.title).toBe(LL.ChooseExperienceScreen.title())
   })
 

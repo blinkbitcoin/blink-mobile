@@ -80,9 +80,9 @@ describe("GaloyIcon", () => {
       ).not.toBeNull()
     })
 
-    it("renders the hand-tap icon", () => {
+    it("renders the spinner icon", () => {
       expect(
-        renderWithTheme(<GaloyIcon name="hand-tap" size={24} />).toJSON(),
+        renderWithTheme(<GaloyIcon name="spinner" size={24} />).toJSON(),
       ).not.toBeNull()
     })
 

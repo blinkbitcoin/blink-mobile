@@ -93,7 +93,7 @@ export const ChooseExperienceScreen: React.FC = () => {
       }
     >
       <IconHero
-        icon="hand-tap"
+        icon="spinner"
         iconColor={colors.primary}
         title={LLScreen.title()}
         subtitle={LLScreen.subtitle()}

@@ -112,7 +112,7 @@ import CaretUpCircle from "@app/assets/icons-redesign/caret-up-circle.svg"
 import Limits from "@app/assets/icons-redesign/limits.svg"
 import Chain from "@app/assets/icons/chain.svg"
 import Location from "@app/assets/icons-redesign/location.svg"
-import HandTap from "@app/assets/icons-redesign/hand-tap.svg"
+import Spinner from "@app/assets/icons-redesign/spinner.svg"
 import MagicWand from "@app/assets/icons-redesign/magic-wand.svg"
 import Sunglasses from "@app/assets/icons-redesign/sunglasses.svg"
 
@@ -249,7 +249,7 @@ const customSvgMap = {
   "limits": Limits,
   "chain": Chain,
   "location": Location,
-  "hand-tap": HandTap,
+  "spinner": Spinner,
   "magic-wand": MagicWand,
   "sunglasses": Sunglasses,
 } as const
