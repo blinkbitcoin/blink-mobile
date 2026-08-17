@@ -2123,8 +2123,7 @@
     "boosted": "Istaknuto",
     "verifiedOn": "Provjereno {date: string}",
     "lastVerifiedOn": "Posljednja provjera {date: string}",
-    "needsSurvey": "Ovo mjesto treba provjeriti",
-    "seeOnBtcMap": "Pogledaj cijeli profil na BTC Map"
+    "needsSurvey": "Ovo mjesto treba provjeriti"
   },
   "HomeScreen": {
     "pendingReceiveBadge": "+{amount: string} u tijeku",

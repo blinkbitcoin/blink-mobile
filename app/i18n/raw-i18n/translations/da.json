@@ -2123,8 +2123,7 @@
     "boosted": "Fremhævet",
     "verifiedOn": "Verificeret {date: string}",
     "lastVerifiedOn": "Sidst verificeret {date: string}",
-    "needsSurvey": "Dette sted skal verificeres",
-    "seeOnBtcMap": "Se hele profilen på BTC Map"
+    "needsSurvey": "Dette sted skal verificeres"
   },
   "HomeScreen": {
     "pendingReceiveBadge": "+{amount: string} afventende",

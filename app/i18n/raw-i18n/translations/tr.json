@@ -2123,8 +2123,7 @@
     "boosted": "Öne çıkarılmış",
     "verifiedOn": "{date: string} tarihinde doğrulandı",
     "lastVerifiedOn": "Son doğrulama {date: string}",
-    "needsSurvey": "Bu yerin doğrulanması gerekiyor",
-    "seeOnBtcMap": "Tüm profili BTC Map'te gör"
+    "needsSurvey": "Bu yerin doğrulanması gerekiyor"
   },
   "HomeScreen": {
     "pendingReceiveBadge": "+{amount: string} beklemede",

@@ -406,14 +406,18 @@ describe("PlaceSheet contact and payment rows", () => {
     expect(mockedOpenExternal).toHaveBeenCalledWith("https://www.moneybadger.co.za/pay")
   })
 
-  it("links to the btcmap.org page by numeric id before details arrive", async () => {
+  it("shares by numeric id before the details have arrived", async () => {
+    // The OSM id comes with the details; sharing before then still has to
+    // produce a link that resolves, which the place's own id does.
     setDetails(null, { isLoading: true })
-    const { getByText } = renderSheet()
+    const { getByTestId } = renderSheet()
 
-    await waitFor(() => expect(getByText("See full profile on BTC Map")).toBeTruthy())
-    fireEvent.press(getByText("See full profile on BTC Map"))
+    await waitFor(() => expect(getByTestId("share-place")).toBeTruthy())
+    fireEvent.press(getByTestId("share-place"))
 
-    expect(mockedOpenExternal).toHaveBeenCalledWith("https://btcmap.org/merchant/42")
+    expect(Share.share).toHaveBeenCalledWith({
+      message: "https://btcmap.org/merchant/42",
+    })
   })
 
   it("re-reads the clock so a place closing under the user stops saying open", async () => {

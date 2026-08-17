@@ -2089,8 +2089,7 @@
         "boosted": "Boosted",
         "verifiedOn": "Verified {date: string}",
         "lastVerifiedOn": "Last verified {date: string}",
-        "needsSurvey": "This location needs to be surveyed",
-        "seeOnBtcMap": "See full profile on BTC Map"
+        "needsSurvey": "This location needs to be surveyed"
     },
     "HomeScreen": {
         "pendingReceiveBadge": "+{amount: string} pending",

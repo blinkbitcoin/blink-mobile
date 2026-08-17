@@ -2123,8 +2123,7 @@
     "boosted": "Առաջխաղացված",
     "verifiedOn": "Հաստատված է՝ {date: string}",
     "lastVerifiedOn": "Վերջին հաստատումը՝ {date: string}",
-    "needsSurvey": "Այս վայրը պետք է ստուգվի",
-    "seeOnBtcMap": "Տեսնել ամբողջ պրոֆիլը BTC Map-ում"
+    "needsSurvey": "Այս վայրը պետք է ստուգվի"
   },
   "HomeScreen": {
     "pendingReceiveBadge": "+{amount: string} ընթացքի մեջ",

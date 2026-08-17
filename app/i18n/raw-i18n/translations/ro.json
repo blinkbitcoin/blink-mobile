@@ -2123,8 +2123,7 @@
     "boosted": "Promovat",
     "verifiedOn": "Verificat pe {date: string}",
     "lastVerifiedOn": "Ultima verificare pe {date: string}",
-    "needsSurvey": "Acest loc trebuie verificat",
-    "seeOnBtcMap": "Vezi profilul complet pe BTC Map"
+    "needsSurvey": "Acest loc trebuie verificat"
   },
   "HomeScreen": {
     "pendingReceiveBadge": "+{amount: string} în aşteptare",

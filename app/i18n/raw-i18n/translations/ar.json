@@ -2123,8 +2123,7 @@
     "boosted": "مُروَّج",
     "verifiedOn": "تم التحقق في {date: string}",
     "lastVerifiedOn": "آخر تحقق في {date: string}",
-    "needsSurvey": "هذا المكان بحاجة إلى تحقق",
-    "seeOnBtcMap": "عرض الملف الكامل على BTC Map"
+    "needsSurvey": "هذا المكان بحاجة إلى تحقق"
   },
   "HomeScreen": {
     "pendingReceiveBadge": "+{amount: string} قيد الانتظار",

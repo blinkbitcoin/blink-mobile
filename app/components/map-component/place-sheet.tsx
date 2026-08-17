@@ -544,14 +544,6 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
                 </View>
               )}
 
-              <Pressable
-                style={styles.profileLink}
-                onPress={() => openUrl(merchantUrl(details, shown.id))}
-              >
-                <Text style={styles.profileLinkText}>{LL.MapScreen.seeOnBtcMap()}</Text>
-                <GaloyIcon name="arrow-square-out" size={14} color={colors.primary} />
-              </Pressable>
-
               {/* Dragging the sheet down closes it, but that is a gesture you
                   have to know about. This is the same thing, spelled out, and
                   it is the last thing you reach going down the detail. */}
@@ -814,18 +806,6 @@ const useStyles = makeStyles(({ colors }, { bottomInset, accent }: StyleProps) =
   skeletonRow: {
     height: 14,
     borderRadius: 4,
-  },
-  profileLink: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    columnGap: 6,
-    minHeight: 44,
-  },
-  profileLinkText: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: colors.primary,
   },
   close: {
     // Pushed to the foot of the scroll area by whatever space is left over.

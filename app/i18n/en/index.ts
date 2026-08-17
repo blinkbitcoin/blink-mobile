@@ -2127,7 +2127,6 @@ const en: BaseTranslation = {
     verifiedOn: "Verified {date: string}",
     lastVerifiedOn: "Last verified {date: string}",
     needsSurvey: "This location needs to be surveyed",
-    seeOnBtcMap: "See full profile on BTC Map",
   },
   HomeScreen: {
     pendingReceiveBadge: "+{amount: string} pending",

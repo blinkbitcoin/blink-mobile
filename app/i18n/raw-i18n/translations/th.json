@@ -2123,8 +2123,7 @@
     "boosted": "ไฮไลต์",
     "verifiedOn": "ยืนยันเมื่อ {date: string}",
     "lastVerifiedOn": "ยืนยันครั้งล่าสุดเมื่อ {date: string}",
-    "needsSurvey": "สถานที่นี้ต้องได้รับการยืนยัน",
-    "seeOnBtcMap": "ดูโปรไฟล์เต็มบน BTC Map"
+    "needsSurvey": "สถานที่นี้ต้องได้รับการยืนยัน"
   },
   "HomeScreen": {
     "pendingReceiveBadge": "+{amount: string} อยู่ระหว่างดำเนินการ",

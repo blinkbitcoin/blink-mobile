@@ -2123,8 +2123,7 @@
     "boosted": "Diketengahkan",
     "verifiedOn": "Disahkan pada {date: string}",
     "lastVerifiedOn": "Kali terakhir disahkan pada {date: string}",
-    "needsSurvey": "Tempat ini perlu disahkan",
-    "seeOnBtcMap": "Lihat profil penuh di BTC Map"
+    "needsSurvey": "Tempat ini perlu disahkan"
   },
   "HomeScreen": {
     "pendingReceiveBadge": "+{amount: string} tergendala",

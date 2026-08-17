@@ -2123,8 +2123,7 @@
     "boosted": "Imeangaziwa",
     "verifiedOn": "Ilithibitishwa {date: string}",
     "lastVerifiedOn": "Ilithibitishwa mara ya mwisho {date: string}",
-    "needsSurvey": "Eneo hili linahitaji kuthibitishwa",
-    "seeOnBtcMap": "Ona wasifu kamili kwenye BTC Map"
+    "needsSurvey": "Eneo hili linahitaji kuthibitishwa"
   },
   "HomeScreen": {
     "pendingReceiveBadge": "+{amount: string} inasubiri",

@@ -6602,10 +6602,6 @@ type RootTranslation = {
 		 * T​h​i​s​ ​l​o​c​a​t​i​o​n​ ​n​e​e​d​s​ ​t​o​ ​b​e​ ​s​u​r​v​e​y​e​d
 		 */
 		needsSurvey: string
-		/**
-		 * S​e​e​ ​f​u​l​l​ ​p​r​o​f​i​l​e​ ​o​n​ ​B​T​C​ ​M​a​p
-		 */
-		seeOnBtcMap: string
 	}
 	HomeScreen: {
 		/**
@@ -19977,10 +19973,6 @@ export type TranslationFunctions = {
 		 * This location needs to be surveyed
 		 */
 		needsSurvey: () => LocalizedString
-		/**
-		 * See full profile on BTC Map
-		 */
-		seeOnBtcMap: () => LocalizedString
 	}
 	HomeScreen: {
 		/**

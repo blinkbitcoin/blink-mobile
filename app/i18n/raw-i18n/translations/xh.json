@@ -2123,8 +2123,7 @@
     "boosted": "Igqanyisiwe",
     "verifiedOn": "Iqinisekisiwe nge-{date: string}",
     "lastVerifiedOn": "Iqinisekiswe okokugqibela nge-{date: string}",
-    "needsSurvey": "Le ndawo ifuna ukuqinisekiswa",
-    "seeOnBtcMap": "Jonga iprofayile epheleleyo kwiBTC Map"
+    "needsSurvey": "Le ndawo ifuna ukuqinisekiswa"
   },
   "HomeScreen": {
     "pendingReceiveBadge": "+{amount: string} pending",

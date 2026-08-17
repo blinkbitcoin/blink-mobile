@@ -2123,8 +2123,7 @@
     "boosted": "Disorot",
     "verifiedOn": "Diverifikasi {date: string}",
     "lastVerifiedOn": "Terakhir diverifikasi {date: string}",
-    "needsSurvey": "Tempat ini perlu diverifikasi",
-    "seeOnBtcMap": "Lihat profil lengkap di BTC Map"
+    "needsSurvey": "Tempat ini perlu diverifikasi"
   },
   "HomeScreen": {
     "pendingReceiveBadge": "+{amount: string} tertunda",

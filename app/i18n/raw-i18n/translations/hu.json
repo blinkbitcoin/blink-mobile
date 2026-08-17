@@ -2123,8 +2123,7 @@
     "boosted": "Kiemelt",
     "verifiedOn": "Ellenőrizve: {date: string}",
     "lastVerifiedOn": "Utoljára ellenőrizve: {date: string}",
-    "needsSurvey": "Ezt a helyet ellenőrizni kell",
-    "seeOnBtcMap": "Teljes profil megtekintése a BTC Map-on"
+    "needsSurvey": "Ezt a helyet ellenőrizni kell"
   },
   "HomeScreen": {
     "pendingReceiveBadge": "+{amount: string} Függőben",

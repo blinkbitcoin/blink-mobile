@@ -2123,8 +2123,7 @@
         "boosted": "注目",
         "verifiedOn": "{date: string} に確認済み",
         "lastVerifiedOn": "最終確認日 {date: string}",
-        "needsSurvey": "この場所は確認が必要です",
-        "seeOnBtcMap": "BTC Map で詳細を見る"
+        "needsSurvey": "この場所は確認が必要です"
     },
     "HomeScreen": {
         "pendingReceiveBadge": "+{amount: string} 保留中",

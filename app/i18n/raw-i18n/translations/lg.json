@@ -2123,8 +2123,7 @@
     "boosted": "Kinnyonnyoddwa",
     "verifiedOn": "Kikakasiddwa ku {date: string}",
     "lastVerifiedOn": "Kikakasiddwa okusembayo ku {date: string}",
-    "needsSurvey": "Ekifo kino kyetaaga okukakasibwa",
-    "seeOnBtcMap": "Laba ebikwata ku kifo kino ku BTC Map"
+    "needsSurvey": "Ekifo kino kyetaaga okukakasibwa"
   },
   "HomeScreen": {
     "pendingReceiveBadge": "+{amount: string} tekinagwa",

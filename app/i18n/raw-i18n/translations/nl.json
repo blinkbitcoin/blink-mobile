@@ -2123,8 +2123,7 @@
     "boosted": "Uitgelicht",
     "verifiedOn": "Geverifieerd op {date: string}",
     "lastVerifiedOn": "Laatst geverifieerd op {date: string}",
-    "needsSurvey": "Deze plaats moet geverifieerd worden",
-    "seeOnBtcMap": "Bekijk het volledige profiel op BTC Map"
+    "needsSurvey": "Deze plaats moet geverifieerd worden"
   },
   "HomeScreen": {
     "pendingReceiveBadge": "+{amount: string} In behandeling",

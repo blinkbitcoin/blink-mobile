@@ -2123,8 +2123,7 @@
     "boosted": "Riqsichisqa",
     "verifiedOn": "{date: string} p'unchawpi chiqanchasqa",
     "lastVerifiedOn": "Qhipa kaq chiqanchay {date: string}",
-    "needsSurvey": "Kay cheqaqa chiqanchana kanan",
-    "seeOnBtcMap": "BTC Map nisqapi hunt'asqa willakuyta qhaway"
+    "needsSurvey": "Kay cheqaqa chiqanchana kanan"
   },
   "HomeScreen": {
     "pendingReceiveBadge": "+{amount: string} Kanqaqmi",

@@ -2123,8 +2123,7 @@
     "boosted": "Zvýrazněno",
     "verifiedOn": "Ověřeno {date: string}",
     "lastVerifiedOn": "Naposledy ověřeno {date: string}",
-    "needsSurvey": "Toto místo je potřeba ověřit",
-    "seeOnBtcMap": "Zobrazit celý profil na BTC Map"
+    "needsSurvey": "Toto místo je potřeba ověřit"
   },
   "HomeScreen": {
     "pendingReceiveBadge": "+{amount: string} čekající",

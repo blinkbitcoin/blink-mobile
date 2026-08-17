@@ -2123,8 +2123,7 @@
     "boosted": "Zvýraznené",
     "verifiedOn": "Overené {date: string}",
     "lastVerifiedOn": "Naposledy overené {date: string}",
-    "needsSurvey": "Toto miesto je potrebné overiť",
-    "seeOnBtcMap": "Zobraziť celý profil na BTC Map"
+    "needsSurvey": "Toto miesto je potrebné overiť"
   },
   "HomeScreen": {
     "pendingReceiveBadge": "+{amount: string} čakajúce",

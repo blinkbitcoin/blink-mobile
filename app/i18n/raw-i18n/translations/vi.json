@@ -2123,8 +2123,7 @@
     "boosted": "Nổi bật",
     "verifiedOn": "Đã xác minh ngày {date: string}",
     "lastVerifiedOn": "Xác minh lần cuối ngày {date: string}",
-    "needsSurvey": "Địa điểm này cần được xác minh",
-    "seeOnBtcMap": "Xem hồ sơ đầy đủ trên BTC Map"
+    "needsSurvey": "Địa điểm này cần được xác minh"
   },
   "HomeScreen": {
     "pendingReceiveBadge": "+{amount: string} đang chờ",

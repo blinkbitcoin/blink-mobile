@@ -2123,8 +2123,7 @@
         "boosted": "Destacado",
         "verifiedOn": "Verificado el {date: string}",
         "lastVerifiedOn": "Verificado por última vez el {date: string}",
-        "needsSurvey": "Este lugar necesita ser verificado",
-        "seeOnBtcMap": "Ver el perfil completo en BTC Map"
+        "needsSurvey": "Este lugar necesita ser verificado"
     },
     "HomeScreen": {
         "pendingReceiveBadge": "+{amount: string} pendiente",
