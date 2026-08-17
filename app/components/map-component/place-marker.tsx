@@ -8,8 +8,6 @@ import { makeStyles } from "@rn-vui/themed"
 
 import { useMarkerSettle } from "./use-marker-settle"
 import {
-  PIN_COLOR,
-  PIN_COLOR_BOOSTED,
   PIN_GLYPH_COLOR,
   PIN_GLYPH_LEFT,
   PIN_GLYPH_SIZE,
@@ -17,6 +15,7 @@ import {
   PIN_HEIGHT,
   PIN_WIDTH,
   PinShape,
+  usePinColor,
 } from "./pin-shape"
 
 type Props = {
@@ -26,7 +25,7 @@ type Props = {
 
 export const PlaceMarker: React.FC<Props> = React.memo(({ place, onPress }) => {
   const styles = useStyles()
-  const color = isBoosted(place.boostedUntil, new Date()) ? PIN_COLOR_BOOSTED : PIN_COLOR
+  const color = usePinColor(isBoosted(place.boostedUntil, new Date()))
   const glyph = materialIconName(place.icon)
 
   const tracksViewChanges = useMarkerSettle(`${glyph}|${color}`)

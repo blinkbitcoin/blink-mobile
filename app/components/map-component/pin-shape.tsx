@@ -1,9 +1,12 @@
 import React from "react"
 import Svg, { Path } from "react-native-svg"
 
-// BTC Map's marker silhouette and colours, taken from the sprite generator its
-// web map uses, so a pin here reads as the same pin on btcmap.org. Both themes
-// share them — only the surrounding map restyles for dark mode.
+import { useTheme } from "@rn-vui/themed"
+
+// BTC Map's marker silhouette, taken from the sprite generator its web map uses,
+// so the pin reads as the same shape as the one on btcmap.org. The fill does not
+// follow btcmap.org: it follows the app's own palette, which restyles for dark
+// mode where btcmap.org's single teal does not.
 const PIN_PATH =
   "M0 16.0333C0 6.08 8.05161 0.131836 15.8361 0.131836C23.6205 0.131836 31.6721 6.08 " +
   "31.6721 16.0333C31.6721 26.461 16.9494 41.3035 16.3229 41.9301C16.1941 42.0595 " +
@@ -18,9 +21,19 @@ export const PIN_GLYPH_SIZE = 20
 export const PIN_GLYPH_LEFT = 6
 export const PIN_GLYPH_TOP = 5.75
 
-export const PIN_COLOR = "#0E95AF"
+// Dark mode cannot use the theme's primary — it lightens to amber there and
+// competes with the boosted pin — so it gets its own periwinkle.
+export const PIN_COLOR_DARK = "#8D9EDD"
 export const PIN_COLOR_BOOSTED = "#F7931A"
 export const PIN_GLYPH_COLOR = "#FFFFFF"
+
+/** The fill for a pin, which is the app's accent rather than btcmap.org's teal. */
+export const usePinColor = (isBoostedPlace: boolean): string => {
+  const { theme } = useTheme()
+
+  if (isBoostedPlace) return PIN_COLOR_BOOSTED
+  return theme.mode === "dark" ? PIN_COLOR_DARK : theme.colors.primary
+}
 
 export const PinShape: React.FC<{ color: string }> = ({ color }) => (
   <Svg width={PIN_WIDTH} height={PIN_HEIGHT} viewBox="0 0 32 43">

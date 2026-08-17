@@ -36,7 +36,7 @@ import { openExternalUrl } from "@app/utils/external"
 import { toastShow } from "@app/utils/toast"
 import { Skeleton, Text, makeStyles, useTheme } from "@rn-vui/themed"
 
-import { PIN_COLOR, PIN_COLOR_BOOSTED } from "./pin-shape"
+import { usePinColor } from "./pin-shape"
 
 const REFRESH_INTERVAL_MS = 60_000
 const SCRIM_COLOR = "rgba(0, 0, 0, 0.4)"
@@ -76,10 +76,7 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
   }, [place, isTimeSensitive])
 
   const boosted = isBoosted(details?.boostedUntil ?? shown?.boostedUntil, now)
-  const styles = useStyles({
-    bottomInset: insets.bottom,
-    accent: boosted ? PIN_COLOR_BOOSTED : PIN_COLOR,
-  })
+  const styles = useStyles({ bottomInset: insets.bottom, accent: usePinColor(boosted) })
 
   if (!shown) return null
 

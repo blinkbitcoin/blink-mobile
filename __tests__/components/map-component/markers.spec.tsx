@@ -1,12 +1,17 @@
 import React from "react"
 import { act, render, renderHook } from "@testing-library/react-native"
-import { Circle } from "react-native-svg"
-import { ThemeProvider } from "@rn-vui/themed"
+import { Circle, Path } from "react-native-svg"
+import { ThemeProvider, createTheme } from "@rn-vui/themed"
 
 import { BtcMapPlace } from "@app/btcmap"
 import theme from "@app/rne-theme/theme"
+import { dark, light } from "@app/rne-theme/colors"
 import { ClusterMarker } from "@app/components/map-component/cluster-marker"
 import { PlaceMarker } from "@app/components/map-component/place-marker"
+import {
+  PIN_COLOR_BOOSTED,
+  PIN_COLOR_DARK,
+} from "@app/components/map-component/pin-shape"
 import { useMarkerSettle } from "@app/components/map-component/use-marker-settle"
 
 jest.mock("react-native-maps", () => {
@@ -34,6 +39,16 @@ const place = (overrides: Partial<BtcMapPlace> = {}): BtcMapPlace => ({
 const withTheme = (node: React.ReactElement) => (
   <ThemeProvider theme={theme}>{node}</ThemeProvider>
 )
+
+const inMode = (mode: "light" | "dark", node: React.ReactElement) => (
+  <ThemeProvider theme={createTheme({ lightColors: light, darkColors: dark, mode })}>
+    {node}
+  </ThemeProvider>
+)
+
+const pinFill = (node: React.ReactElement) =>
+  // eslint-disable-next-line camelcase -- testing-library exposes this verbatim
+  render(node).UNSAFE_getAllByType(Path)[0].props.fill
 
 const trackingOf = (tree: ReturnType<typeof render>, testID: string) =>
   tree.getByTestId(testID).props.tracksViewChanges
@@ -76,6 +91,29 @@ describe("PlaceMarker", () => {
     expect(trackingOf(tree, "btcmap-place-1")).toBe(false)
   })
 
+  it("fills from the app's palette, not btcmap.org's teal", () => {
+    // Light takes the theme accent; dark cannot, because primary lightens to
+    // amber there and would collide with the boosted pin.
+    expect(
+      pinFill(inMode("light", <PlaceMarker place={place()} onPress={jest.fn()} />)),
+    ).toBe(light.primary)
+    expect(
+      pinFill(inMode("dark", <PlaceMarker place={place()} onPress={jest.fn()} />)),
+    ).toBe(PIN_COLOR_DARK)
+  })
+
+  it("marks a boosted place out in both themes", () => {
+    const boosted = place({
+      boostedUntil: new Date(Date.now() + 86_400_000).toISOString(),
+    })
+
+    for (const mode of ["light", "dark"] as const) {
+      expect(
+        pinFill(inMode(mode, <PlaceMarker place={boosted} onPress={jest.fn()} />)),
+      ).toBe(PIN_COLOR_BOOSTED)
+    }
+  })
+
   it("repaints when a sync flips the place's boost", () => {
     const future = new Date(Date.now() + 86_400_000).toISOString()
     const tree = render(withTheme(<PlaceMarker place={place()} onPress={jest.fn()} />))
@@ -110,7 +148,7 @@ describe("ClusterMarker", () => {
     expect(trackingOf(tree, "btcmap-cluster-7")).toBe(false)
   })
 
-  it("repaints when the count crosses a colour tier", () => {
+  it("repaints when the count changes", () => {
     const tree = render(
       withTheme(<ClusterMarker cluster={cluster(4)} onPress={jest.fn()} />),
     )
@@ -121,15 +159,40 @@ describe("ClusterMarker", () => {
     expect(trackingOf(tree, "btcmap-cluster-7")).toBe(true)
   })
 
-  it("steps disc colour at BTC Map's own count thresholds", () => {
-    const fillsFor = (count: number) =>
+  it("keeps one accent colour whatever the count, distinguished by opacity", () => {
+    // btcmap.org steps green to amber to orange with the count; here the disc's
+    // size already carries that, so the colour stays put and only the number
+    // moves. Both discs share the accent and differ only in opacity.
+    const discsFor = (count: number) =>
       render(withTheme(<ClusterMarker cluster={cluster(count)} onPress={jest.fn()} />))
         // eslint-disable-next-line camelcase -- testing-library exposes this verbatim
         .UNSAFE_getAllByType(Circle)
-        .map((circle) => circle.props.fill)
+        .map((circle) => ({
+          fill: circle.props.fill,
+          opacity: circle.props.fillOpacity,
+        }))
 
-    expect(fillsFor(9)).not.toEqual(fillsFor(10))
-    expect(fillsFor(10)).toEqual(fillsFor(99))
-    expect(fillsFor(99)).not.toEqual(fillsFor(100))
+    const small = discsFor(4)
+    expect(small.map((disc) => disc.fill)).toEqual([small[0].fill, small[0].fill])
+    expect(small[0].opacity).toBeLessThan(small[1].opacity)
+
+    for (const count of [10, 99, 100, 5000]) {
+      expect(discsFor(count).map((disc) => disc.fill)).toEqual(
+        small.map((disc) => disc.fill),
+      )
+    }
+  })
+
+  it("takes its colour from the theme rather than a hardcoded palette", () => {
+    const fill = render(
+      withTheme(<ClusterMarker cluster={cluster(4)} onPress={jest.fn()} />),
+    )
+      // eslint-disable-next-line camelcase -- testing-library exposes this verbatim
+      .UNSAFE_getAllByType(Circle)[0].props.fill
+
+    // Guards the assertion against passing vacuously if the key ever stops
+    // resolving: an undefined fill renders an invisible disc.
+    expect(fill).toMatch(/^#[0-9a-f]{6}$/i)
+    expect(fill).toBe(theme.lightColors?.success)
   })
 })

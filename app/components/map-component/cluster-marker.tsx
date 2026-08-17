@@ -3,24 +3,20 @@ import { View } from "react-native"
 import { Marker } from "react-native-maps"
 import Svg, { Circle } from "react-native-svg"
 
-import { Text, makeStyles } from "@rn-vui/themed"
+import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
 import { useMarkerSettle } from "./use-marker-settle"
 
-// BTC Map's cluster discs: two translucent circles that step from green to
-// amber to orange as the count grows. Same values in both themes.
-const CLUSTER_SIZE = 40
-const OUTER_RADIUS = 20
-const INNER_RADIUS = 15
-
-const CLUSTER_TIERS = [
-  { upTo: 9, outer: "rgba(181,226,140,0.6)", inner: "rgba(110,204,57,0.6)" },
-  { upTo: 99, outer: "rgba(241,211,87,0.6)", inner: "rgba(240,194,12,0.6)" },
-  { upTo: Infinity, outer: "rgba(253,156,115,0.6)", inner: "rgba(241,128,23,0.6)" },
-]
-
-const tierFor = (count: number) =>
-  CLUSTER_TIERS.find((tier) => count <= tier.upTo) ?? CLUSTER_TIERS[2]
+// Two concentric discs in one theme colour, the inner one more opaque. The size
+// a cluster covers is already the count's signal, so — unlike btcmap.org, which
+// steps green to amber to orange — the colour stays put and only the number
+// changes.
+const CLUSTER_SIZE = 50
+const VIEWBOX = 45
+const OUTER_RADIUS = 22.5
+const INNER_RADIUS = 16.5
+const OUTER_OPACITY = 0.3
+const INNER_OPACITY = 0.7
 
 export type ClusterMarkerData = {
   id: string
@@ -36,10 +32,12 @@ type Props = {
 
 export const ClusterMarker: React.FC<Props> = React.memo(({ cluster, onPress }) => {
   const styles = useStyles()
-  const tier = tierFor(cluster.count)
+  const {
+    theme: { colors },
+  } = useTheme()
   // Discs are react-native-svg like the pins are, so they need the same paint
   // window before tracking can be turned off — see use-marker-settle.
-  const tracksViewChanges = useMarkerSettle(`${tier.inner}|${cluster.count}`)
+  const tracksViewChanges = useMarkerSettle(`${colors.success}|${cluster.count}`)
 
   return (
     <Marker
@@ -51,18 +49,24 @@ export const ClusterMarker: React.FC<Props> = React.memo(({ cluster, onPress }) 
       onPress={() => onPress(cluster)}
     >
       <View style={styles.cluster}>
-        <Svg width={CLUSTER_SIZE} height={CLUSTER_SIZE}>
+        <Svg
+          width={CLUSTER_SIZE}
+          height={CLUSTER_SIZE}
+          viewBox={`0 0 ${VIEWBOX} ${VIEWBOX}`}
+        >
           <Circle
-            cx={CLUSTER_SIZE / 2}
-            cy={CLUSTER_SIZE / 2}
+            cx={VIEWBOX / 2}
+            cy={VIEWBOX / 2}
             r={OUTER_RADIUS}
-            fill={tier.outer}
+            fill={colors.success}
+            fillOpacity={OUTER_OPACITY}
           />
           <Circle
-            cx={CLUSTER_SIZE / 2}
-            cy={CLUSTER_SIZE / 2}
+            cx={VIEWBOX / 2}
+            cy={VIEWBOX / 2}
             r={INNER_RADIUS}
-            fill={tier.inner}
+            fill={colors.success}
+            fillOpacity={INNER_OPACITY}
           />
         </Svg>
         <View style={styles.countOverlay} pointerEvents="none">
@@ -90,10 +94,10 @@ const useStyles = makeStyles(({ colors }) => ({
     justifyContent: "center",
   },
   count: {
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: "bold",
-    // The discs are pale in every tier, so the count stays black in dark mode
-    // too rather than following the theme's inverted `black`.
-    color: colors._black,
+    // The inner disc carries the accent at 70% in both themes, so the count is
+    // pinned white rather than following the theme's inverted `black`.
+    color: colors._white,
   },
 }))
