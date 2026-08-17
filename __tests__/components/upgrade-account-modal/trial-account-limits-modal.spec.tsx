@@ -9,32 +9,19 @@ import { i18nObject } from "@app/i18n/i18n-util"
 import { AccountLimitsByLevelDocument } from "@app/graphql/generated"
 import { FALLBACK_LEVEL1_DAILY_LIMIT_CENTS } from "@app/hooks/use-level1-daily-limit"
 
-jest.mock("react-native-modal", () => {
-  const ReactNs = jest.requireActual<typeof import("react")>("react")
-  const RN = jest.requireActual<typeof import("react-native")>("react-native")
-  const MockModal = ({
-    children,
-    isVisible,
-  }: {
-    children: React.ReactNode
-    isVisible: boolean
-  }) => (isVisible ? ReactNs.createElement(RN.View, null, children) : null)
-  return { __esModule: true, default: MockModal }
-})
+jest.mock("react-native-modal", () =>
+  jest.requireActual("@mocks/react-native-modal-mock"),
+)
 
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
   useNavigation: () => ({ navigate: jest.fn() }),
 }))
 
-// avoid pulling the firebase app-check native module in via the phone-auth screen
-jest.mock("@app/screens/phone-auth-screen", () => ({
-  PhoneLoginInitiateType: { SignIn: "SignIn", CreateAccount: "CreateAccount" },
-}))
-
 import { TrialAccountLimitsModal } from "@app/components/upgrade-account-modal"
 
 loadLocale("en")
+loadLocale("es")
 const LL = i18nObject("en")
 
 const accountLimitsMock = (withdrawalCents: number) => ({
@@ -55,10 +42,14 @@ const accountLimitsMock = (withdrawalCents: number) => ({
   },
 })
 
-const wrap = (ui: React.ReactElement, mocks: ReadonlyArray<MockedResponse> = []) => (
+const wrap = (
+  ui: React.ReactElement,
+  mocks: ReadonlyArray<MockedResponse> = [],
+  locale: Parameters<typeof i18nObject>[0] = "en",
+) => (
   <MockedProvider mocks={mocks}>
     <ThemeProvider>
-      <TypesafeI18n locale="en">{ui}</TypesafeI18n>
+      <TypesafeI18n locale={locale}>{ui}</TypesafeI18n>
     </ThemeProvider>
   </MockedProvider>
 )
@@ -116,6 +107,25 @@ describe("TrialAccountLimitsModal", () => {
 
     await waitFor(() =>
       expect(getByText("USD 999 daily transaction limit", { exact: false })).toBeTruthy(),
+    )
+  })
+
+  it("interpolates the backend amount into a non-English locale", async () => {
+    // Every other assertion here runs in `en`, so a locale that drops the
+    // placeholder — or reverts to the pre-audit hardcoded string — renders
+    // untested. Spanish stands in for the other 29.
+    const { getByText } = render(
+      wrap(
+        <TrialAccountLimitsModal isVisible={true} closeModal={jest.fn()} />,
+        [accountLimitsMock(150000)],
+        "es",
+      ),
+    )
+
+    await waitFor(() =>
+      expect(
+        getByText("Límite de transacciones diarias de USD 1,500", { exact: false }),
+      ).toBeTruthy(),
     )
   })
 
