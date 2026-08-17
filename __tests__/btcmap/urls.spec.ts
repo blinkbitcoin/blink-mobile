@@ -2,9 +2,12 @@ import {
   directionsUrl,
   hostOf,
   isWebUrl,
+  mailtoUrl,
   merchantUrl,
+  paymentUri,
   socialUrl,
-  withScheme,
+  telUrl,
+  webUrl,
 } from "@app/btcmap/urls"
 import { BtcMapPlaceDetails } from "@app/btcmap/types"
 
@@ -23,17 +26,66 @@ describe("hostOf", () => {
   })
 })
 
-describe("withScheme", () => {
+describe("webUrl", () => {
   it("adds https to a bare domain", () => {
-    expect(withScheme("example.com/menu")).toBe("https://example.com/menu")
+    expect(webUrl("example.com/menu")).toBe("https://example.com/menu")
+    // "https://mailto:a@b.c" is what a `://`-only check produces, and it is junk.
+    expect(webUrl("https://example.com")).toBe("https://example.com")
+    expect(webUrl("http://example.com")).toBe("http://example.com")
   })
 
-  it("leaves an existing scheme alone, including ones with no authority", () => {
-    // "https://mailto:a@b.c" is what a `://`-only check produces, and it is junk.
-    expect(withScheme("mailto:a@b.c")).toBe("mailto:a@b.c")
-    expect(withScheme("lightning:lnurl1abc")).toBe("lightning:lnurl1abc")
-    expect(withScheme("bitcoin:bc1qxyz")).toBe("bitcoin:bc1qxyz")
-    expect(withScheme("https://example.com")).toBe("https://example.com")
+  // These fields are raw OSM tags: a volunteer can put a wallet scheme in a
+  // merchant's "website", and this app is the registered handler for several.
+  it("refuses a website that is not a web link", () => {
+    expect(webUrl("bitcoin:bc1qxyz?amount=1")).toBeUndefined()
+    expect(webUrl("lightning:lnurl1abc")).toBeUndefined()
+    expect(webUrl("lnurlp:pay@evil.example")).toBeUndefined()
+    expect(webUrl("blink:something")).toBeUndefined()
+    expect(webUrl("tel:*21*15550100%23")).toBeUndefined()
+    expect(webUrl("mailto:a@b.c")).toBeUndefined()
+    // eslint-disable-next-line no-script-url -- the point of the test
+    expect(webUrl("javascript:alert(1)")).toBeUndefined()
+    expect(webUrl("  ")).toBeUndefined()
+  })
+})
+
+describe("paymentUri", () => {
+  it("accepts the schemes a wallet can act on", () => {
+    expect(paymentUri("lightning:lnurl1abc")).toBe("lightning:lnurl1abc")
+    expect(paymentUri("bitcoin:bc1qxyz")).toBe("bitcoin:bc1qxyz")
+    expect(paymentUri("https://pay.example/x")).toBe("https://pay.example/x")
+    expect(paymentUri("mailto:pay@example.com")).toBe("mailto:pay@example.com")
+  })
+
+  it("refuses anything else, including a bare string with no scheme at all", () => {
+    // eslint-disable-next-line no-script-url -- the point of the test
+    expect(paymentUri("javascript:alert(1)")).toBeUndefined()
+    expect(paymentUri("blink:x")).toBeUndefined()
+    expect(paymentUri("pay.example/x")).toBeUndefined()
+  })
+})
+
+describe("telUrl", () => {
+  it("keeps a dialable number", () => {
+    expect(telUrl("+1 (555) 010-0")).toBe("tel:+1 (555) 010-0")
+  })
+
+  it("refuses what would leave an MMI sequence sitting in the dialer", () => {
+    // "*21*<number>#" is unconditional call forwarding.
+    expect(telUrl("*21*15550100#")).toBeUndefined()
+    expect(telUrl("#31#15550100")).toBeUndefined()
+    expect(telUrl("nonsense")).toBeUndefined()
+  })
+})
+
+describe("mailtoUrl", () => {
+  it("keeps a plain address", () => {
+    expect(mailtoUrl("hi@example.com")).toBe("mailto:hi@example.com")
+  })
+
+  it("refuses one carrying mail headers", () => {
+    // Everything after "?" becomes subject/body/bcc.
+    expect(mailtoUrl("hi@example.com?bcc=someone@example.net")).toBeUndefined()
   })
 })
 
@@ -50,6 +102,13 @@ describe("socialUrl", () => {
   it("passes through anything that already carries a host or scheme", () => {
     expect(socialUrl("x.com", "https://x.com/satoshi")).toBe("https://x.com/satoshi")
     expect(socialUrl("x.com", "x.com/satoshi")).toBe("https://x.com/satoshi")
+  })
+
+  it("refuses a social value carrying a non-web scheme", () => {
+    expect(socialUrl("x.com", "bitcoin:bc1qxyz")).toBeUndefined()
+    // eslint-disable-next-line no-script-url -- the point of the test
+    expect(socialUrl("x.com", "javascript:alert(1)")).toBeUndefined()
+    expect(socialUrl("x.com", "  ")).toBeUndefined()
   })
 })
 

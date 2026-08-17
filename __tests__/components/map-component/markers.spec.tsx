@@ -7,11 +7,8 @@ import { BtcMapPlace } from "@app/btcmap"
 import theme from "@app/rne-theme/theme"
 import { dark, light } from "@app/rne-theme/colors"
 import { ClusterMarker } from "@app/components/map-component/cluster-marker"
-import {
-  PlaceMarker,
-  markerAnchor,
-  markerHeight,
-} from "@app/components/map-component/place-marker"
+import { markerAnchor, markerHeight } from "@app/components/map-component/marker-layout"
+import { PlaceMarker } from "@app/components/map-component/place-marker"
 import {
   PIN_COLOR_BOOSTED,
   PIN_COLOR_DARK,

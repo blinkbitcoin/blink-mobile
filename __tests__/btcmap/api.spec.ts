@@ -1,7 +1,7 @@
 import axios from "axios"
 
 import { fetchPlaceDetails, fetchPlacesDelta, fetchPlacesSnapshot } from "@app/btcmap/api"
-import { BTCMAP_PAGE_SIZE } from "@app/btcmap/config"
+import { BTCMAP_MAX_PAGES, BTCMAP_PAGE_SIZE } from "@app/btcmap/config"
 
 jest.mock("axios")
 
@@ -183,6 +183,35 @@ describe("fetchPlacesDelta", () => {
     await fetchPlacesDelta("2026-07-01T00:00:00.000Z")
 
     expect(String(paramsOf(0).fields)).toContain("deleted_at")
+  })
+
+  it("stops at the page ceiling with a cursor the next sync can carry on from", async () => {
+    // A backlog that never runs out — a full resync is 6 pages, so reaching 40
+    // means either the dataset grew many times over or the cursor is not
+    // advancing. Either way the walk stops, and what it stops with has to be
+    // resumable: everything collected so far, and a cursor past it. Dropping
+    // the cursor here would replay the same 40 pages on every launch forever.
+    // Distinct timestamps within each page, so this is an endless backlog
+    // rather than the timestamp-tie case that asks for a reseed instead.
+    const start = Date.UTC(2026, 6, 1)
+    let tick = 0
+    mockedGet.mockImplementation(async () =>
+      page(
+        Array.from({ length: BTCMAP_PAGE_SIZE }, () => {
+          tick += 1
+          return wirePlace(tick, new Date(start + tick * 1000).toISOString())
+        }),
+      ),
+    )
+
+    const delta = await fetchPlacesDelta("2026-07-01T00:00:00.000Z")
+
+    expect(mockedGet).toHaveBeenCalledTimes(BTCMAP_MAX_PAGES)
+    expect(delta.needsReseed).toBe(false)
+    expect(delta.upserted.length).toBeGreaterThan(0)
+    expect(new Date(delta.syncedUpTo).getTime()).toBeGreaterThan(
+      new Date("2026-07-01T00:00:00.000Z").getTime(),
+    )
   })
 })
 

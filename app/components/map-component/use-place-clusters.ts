@@ -1,8 +1,9 @@
-import { useCallback, useMemo } from "react"
+import { useCallback, useEffect, useMemo } from "react"
 import { Region } from "react-native-maps"
 import Supercluster from "supercluster"
 
 import { BtcMapPlace } from "@app/btcmap"
+import { recordAppError } from "@app/utils/error-reporting"
 
 import { ClusterMarkerData } from "./cluster-marker"
 import { MAX_ZOOM, longitudeDeltaForZoom, zoomForRegion } from "./viewport"
@@ -28,7 +29,11 @@ type ClusterOrPlace =
   | Supercluster.ClusterFeature<Supercluster.AnyProps>
   | Supercluster.PointFeature<PlaceProperties>
 
-const EMPTY = { places: [] as BtcMapPlace[], clusters: [] as ClusterMarkerData[] }
+const EMPTY = {
+  places: [] as BtcMapPlace[],
+  clusters: [] as ClusterMarkerData[],
+  dropped: 0,
+}
 
 const boundsForRegion = (region: Region): [number, number, number, number] => [
   region.longitude - region.longitudeDelta / 2,
@@ -36,6 +41,21 @@ const boundsForRegion = (region: Region): [number, number, number, number] => [
   region.longitude + region.longitudeDelta / 2,
   region.latitude + region.latitudeDelta / 2,
 ]
+
+/**
+ * How far a place sits from the middle of the screen, for ranking only.
+ *
+ * Planar and squared — the real distance is never needed, just the order — with
+ * longitude scaled by latitude so the comparison stays sane away from the
+ * equator. Anything that would make this wrong (the antimeridian) is a viewport
+ * spanning half the globe, which is well inside clustering territory anyway.
+ */
+const offCentreRank = (place: BtcMapPlace, region: Region): number => {
+  const dLat = place.latitude - region.latitude
+  const dLng =
+    (place.longitude - region.longitude) * Math.cos((region.latitude * Math.PI) / 180)
+  return dLat * dLat + dLng * dLng
+}
 
 /**
  * Group ~30k places into what is worth drawing for the current viewport.
@@ -86,11 +106,32 @@ export const usePlaceClusters = (places: BtcMapPlace[], region: Region | undefin
       }
     }
 
+    // `getClusters` answers in the index's own spatial order, so slicing it raw
+    // would keep an arbitrary 400 and swap which 400 on the next pan — pins
+    // blinking in and out, including the one being reached for. Ranked by
+    // distance from the middle of the screen instead, the cap degrades where
+    // the user is not looking and a small pan changes the set gradually.
+    const dropped = Math.max(0, singles.length - MAX_RENDERED)
+    if (dropped)
+      singles.sort((a, b) => offCentreRank(a, region) - offCentreRank(b, region))
+
     return {
       places: singles.slice(0, MAX_RENDERED),
       clusters: clusters.slice(0, MAX_RENDERED),
+      dropped,
     }
   }, [index, region])
+
+  // Rendering 400 of N reads as a complete map to the user and to anyone
+  // chasing a "my shop is missing" report, so the cap says when it bites.
+  // Expected, not a defect: a breadcrumb on the next crash, never a non-fatal.
+  useEffect(() => {
+    if (!visible.dropped) return
+    recordAppError(new Error(`BTC Map render cap hit, ${visible.dropped} pins dropped`), {
+      expected: true,
+      dedupKey: "btcmap-render-cap",
+    })
+  }, [visible.dropped])
 
   /**
    * Where to fly when a cluster is tapped: the zoom at which supercluster would

@@ -13,7 +13,13 @@
 // btcmap.org itself uses the `opening_hours` npm package, which is LGPL and
 // ~107 KB gzipped on top of i18next. This subset was differentially tested
 // against it over every distinct BTC Map hours string at half-hour intervals
-// across a week — 5.9M comparisons, zero disagreements on the cases it answers.
+// across a week — 5.9M comparisons.
+//
+// That sweep did miss one class: a `;` rule for today used to cancel an
+// overnight span that had started the day before, so "Fr 18:00-02:00;
+// Sa 12:00-02:00" read as closed at Saturday 01:00. Rules therefore report
+// "open now" and "still open from yesterday" separately (see `Hit`), and the
+// corpus wants multi-rule overnight specs in it before the next such claim.
 
 export const OpeningState = {
   Open: "open",
@@ -193,43 +199,63 @@ const parseRules = (spec: string): Rule[] | null => {
   return rules
 }
 
-const ruleIsHit = (rule: Rule, day: number, minute: number): boolean => {
+// The two ways a rule can cover the moment being asked about. They are kept
+// apart because only the first belongs to today: a `;` rule replaces what
+// earlier rules said about the days it names, and it must not reach back and
+// cancel a span that started yesterday and is still running.
+type Hit = {
+  // The rule names today, and one of its spans is open now.
+  today: boolean
+  // The rule named yesterday, and an overnight span of it runs into today.
+  spill: boolean
+}
+
+const ruleHit = (rule: Rule, day: number, minute: number): Hit => {
   const applies = !rule.days || rule.days.has(day)
   const appliedYesterday = !rule.days || rule.days.has((day + 6) % 7)
 
-  if (rule.always) return applies
-  if (rule.off) return false
+  if (rule.off) return { today: false, spill: false }
+  // "24/7" fills its own days exactly and has nothing to spill into the next.
+  if (rule.always) return { today: applies, spill: false }
 
-  return rule.spans.some((span) => {
-    if (applies && !span.wraps) return minute >= span.start && minute < span.end
-    // An overnight span is open on its evening side today, and spills into the
-    // small hours of the day after.
-    if (applies && span.wraps && minute >= span.start) return true
-    return appliedYesterday && span.wraps && minute < span.end
-  })
+  return {
+    today:
+      applies &&
+      rule.spans.some((span) =>
+        // An overnight span is open on its evening side from its start on.
+        span.wraps ? minute >= span.start : minute >= span.start && minute < span.end,
+      ),
+    spill: appliedYesterday && rule.spans.some((span) => span.wraps && minute < span.end),
+  }
 }
 
 const evaluate = (rules: Rule[], day: number, minute: number): OpeningState => {
   let isOpen = false
+  // Tracked outside the override logic on purpose. "Fr 18:00-02:00; Sa 12:00-02:00"
+  // at Saturday 01:00 is open on Friday's session, and the Saturday rule saying
+  // nothing about 01:00 must not be read as closing it. An explicit "Sa off"
+  // does not cancel it either — a bar that shuts after midnight and does not
+  // reopen on Saturday is still serving at 01:00.
+  let spilledOpen = false
 
   for (const rule of rules) {
     const applies = !rule.days || rule.days.has(day)
-    const hit = ruleIsHit(rule, day, minute)
+    const { today, spill } = ruleHit(rule, day, minute)
+
+    if (spill) spilledOpen = true
 
     if (rule.additive) {
       // A comma unions with what came before — except "Sa closed", which still
       // shuts the day it names.
       if (rule.off && applies) isOpen = false
-      else if (hit) isOpen = true
+      else if (today) isOpen = true
     } else if (applies) {
       // A semicolon rule replaces earlier ones for the days it names.
-      isOpen = hit
-    } else if (hit) {
-      isOpen = true
+      isOpen = today
     }
   }
 
-  return isOpen ? OpeningState.Open : OpeningState.Closed
+  return isOpen || spilledOpen ? OpeningState.Open : OpeningState.Closed
 }
 
 /**

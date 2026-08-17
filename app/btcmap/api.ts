@@ -17,6 +17,7 @@ import {
   BtcMapPlaceDetailsWire,
   BtcMapPlaceWire,
 } from "./types"
+import { paymentUri } from "./urls"
 
 // Fields the map itself needs. Everything else is fetched per place, on tap.
 // `deleted_at` is load-bearing twice over: it is how we learn about removals,
@@ -64,9 +65,6 @@ const DETAIL_FIELDS = [
   ...Object.values(CONTACT_TAGS),
 ].join(",")
 
-// btcmap.org refuses to hand a user off to an arbitrary scheme, and neither do we.
-const PAYMENT_URI_SCHEMES = ["http:", "https:", "lightning:", "bitcoin:", "mailto:"]
-
 const isRenderablePlace = (place: BtcMapPlaceWire): boolean =>
   !place.deleted_at && typeof place.lat === "number" && typeof place.lon === "number"
 
@@ -89,11 +87,11 @@ const acceptsTag = (wire: BtcMapPlaceDetailsWire, tag: string): boolean =>
   osmTag(wire, tag) === "yes"
 
 const paymentUrl = (wire: BtcMapPlaceDetailsWire): string | undefined => {
+  // btcmap.org refuses to hand a user off to an arbitrary scheme, and neither
+  // do we — see the allowlists in `urls.ts`, which every OSM-sourced link on
+  // the sheet now goes through.
   const uri = osmTag(wire, PAYMENT_TAGS.uri)?.trim()
-  if (uri) {
-    const scheme = /^[a-z][a-z0-9+.-]*:/i.exec(uri)?.[0].toLowerCase()
-    return scheme && PAYMENT_URI_SCHEMES.includes(scheme) ? uri : undefined
-  }
+  if (uri) return paymentUri(uri)
 
   // The hosts are fixed, so this is not an open redirect — but an unencoded
   // username containing "/" or "?" would silently change what the URL means.

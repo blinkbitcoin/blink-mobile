@@ -6,6 +6,12 @@ import MaterialIcon from "react-native-vector-icons/MaterialIcons"
 import { BtcMapPlace, isBoosted, materialIconName } from "@app/btcmap"
 import { Text, makeStyles } from "@rn-vui/themed"
 
+import {
+  LABEL_GAP,
+  LABEL_LINE_HEIGHT,
+  LABEL_MAX_WIDTH,
+  markerAnchor,
+} from "./marker-layout"
 import { useMarkerSettle } from "./use-marker-settle"
 import {
   PIN_GLYPH_COLOR,
@@ -18,26 +24,6 @@ import {
   usePinColor,
 } from "./pin-shape"
 
-const LABEL_MAX_WIDTH = 132
-const LABEL_LINE_HEIGHT = 14
-const LABEL_GAP = 2
-
-/**
- * The marker view's height, which the anchor is derived from.
- *
- * The teardrop's tip has to land on the place's coordinate, so the anchor is the
- * tip's position as a fraction of the whole view — not a constant. Adding a
- * label below the pin makes the view taller, and an anchor left at 1 would push
- * every labelled pin north of where it actually is.
- */
-export const markerHeight = (hasLabel: boolean): number =>
-  hasLabel ? PIN_HEIGHT + LABEL_GAP + LABEL_LINE_HEIGHT : PIN_HEIGHT
-
-export const markerAnchor = (hasLabel: boolean) => ({
-  x: 0.5,
-  y: PIN_HEIGHT / markerHeight(hasLabel),
-})
-
 type Props = {
   place: BtcMapPlace
   name?: string
@@ -46,6 +32,11 @@ type Props = {
 
 export const PlaceMarker: React.FC<Props> = React.memo(({ place, name, onPress }) => {
   const styles = useStyles()
+  // Read at render time, and this component is memoised, so nothing schedules a
+  // repaint at the moment a boost lapses — a pin can stay orange until the next
+  // pan re-renders it. That is deliberate: boosts run for days, every region
+  // change re-renders the markers anyway, and a timer per pin to close a gap
+  // nobody can see would undo the point of `useMarkerSettle`.
   const color = usePinColor(isBoosted(place.boostedUntil, new Date()))
   const glyph = materialIconName(place.icon)
   const hasLabel = Boolean(name)

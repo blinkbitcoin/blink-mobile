@@ -45,7 +45,7 @@ describe("useBtcMapPlaceNames", () => {
 
     await settle()
 
-    expect(mockedFetch).toHaveBeenCalledWith({ latitude: 51.5, longitude: -0.12 }, 0.9)
+    expect(mockedFetch).toHaveBeenCalledWith({ latitude: 51.5, longitude: -0.12 }, 1.7)
     await waitFor(() => expect(result.current.get(1)).toBe("Satoshi Coffee"))
   })
 
@@ -62,7 +62,7 @@ describe("useBtcMapPlaceNames", () => {
     await settle()
 
     expect(mockedFetch).toHaveBeenCalledTimes(1)
-    expect(mockedFetch).toHaveBeenCalledWith({ latitude: 51.53, longitude: -0.12 }, 0.9)
+    expect(mockedFetch).toHaveBeenCalledWith({ latitude: 51.53, longitude: -0.12 }, 1.7)
   })
 
   it("keeps names from where the user has already been", async () => {
@@ -107,6 +107,65 @@ describe("useBtcMapPlaceNames", () => {
     })
 
     expect(result.current.get(99)).toBeUndefined()
+  })
+
+  it("asks about a grid cell rather than the exact spot the user is looking at", async () => {
+    // The centre is the one thing here that describes where the user is, and it
+    // goes to a third party. Neighbouring viewports must be indistinguishable.
+    const { rerender } = renderHook(
+      (props: Parameters<typeof useBtcMapPlaceNames>[0]) => useBtcMapPlaceNames(props),
+      { initialProps: viewport({ center: { latitude: 51.50312, longitude: -0.12417 } }) },
+    )
+    await settle()
+
+    expect(mockedFetch).toHaveBeenCalledWith({ latitude: 51.5, longitude: -0.12 }, 1.7)
+
+    // A pan within the same cell is the same question, so it is not re-asked.
+    rerender(viewport({ center: { latitude: 51.49866, longitude: -0.11983 } }))
+    await settle()
+
+    expect(mockedFetch).toHaveBeenCalledTimes(1)
+  })
+
+  it("widens the radius to cover wherever in the cell the user really is", async () => {
+    renderHook(() => useBtcMapPlaceNames(viewport({ radiusKm: 0.4 })))
+    await settle()
+
+    const [, radiusKm] = mockedFetch.mock.calls[0]
+    expect(radiusKm).toBeGreaterThan(0.4)
+    // Half the diagonal of a 0.01° cell, so the corners are inside it.
+    expect(radiusKm).toBeCloseTo(1.2, 5)
+  })
+
+  it("forgets the least recently seen names once the cache is full", async () => {
+    // 2000 is the cap. Seed past it in one response, then confirm a later
+    // response evicts from the front rather than growing without bound.
+    const bulk = new Map(
+      Array.from({ length: 2000 }, (_, index) => [index + 1, `Place ${index + 1}`]),
+    )
+    mockedFetch.mockResolvedValue(bulk)
+
+    const { result, rerender } = renderHook(
+      (props: Parameters<typeof useBtcMapPlaceNames>[0]) => useBtcMapPlaceNames(props),
+      { initialProps: viewport() },
+    )
+    await settle()
+    await waitFor(() => expect(result.current.size).toBe(2000))
+
+    // Re-seeing place 1 has to move it out of the firing line; a plain
+    // `Map.set` would leave it at the front and evict it next.
+    mockedFetch.mockResolvedValue(new Map([[1, "Satoshi Coffee"]]))
+    rerender(viewport({ center: { latitude: 51.6, longitude: -0.12 } }))
+    await settle()
+
+    mockedFetch.mockResolvedValue(new Map([[5001, "Bitcoin Bakery"]]))
+    rerender(viewport({ center: { latitude: 51.7, longitude: -0.12 } }))
+    await settle()
+
+    await waitFor(() => expect(result.current.get(5001)).toBe("Bitcoin Bakery"))
+    expect(result.current.size).toBe(2000)
+    expect(result.current.get(1)).toBe("Satoshi Coffee")
+    expect(result.current.get(2)).toBeUndefined()
   })
 
   it("stays quiet when the lookup fails", async () => {

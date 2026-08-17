@@ -61,6 +61,58 @@ describe("openingStateAt", () => {
     expect(openingStateAt(hours, at(4, 3))).toBe(OpeningState.Closed)
   })
 
+  // The shape a bar or restaurant actually publishes: hours listed per day, each
+  // running past midnight. The day's own rule says nothing about 01:00, and it
+  // must not be read as contradicting the previous day's session.
+  it("carries an overnight range across a later per-day rule", () => {
+    const hours = "Fr 18:00-02:00; Sa 12:00-02:00"
+    expect(openingStateAt(hours, at(5, 19))).toBe(OpeningState.Open)
+    expect(openingStateAt(hours, at(6, 1))).toBe(OpeningState.Open)
+    expect(openingStateAt(hours, at(6, 4))).toBe(OpeningState.Closed)
+    expect(openingStateAt(hours, at(6, 13))).toBe(OpeningState.Open)
+    expect(openingStateAt(hours, at(0, 1))).toBe(OpeningState.Open)
+    expect(openingStateAt(hours, at(0, 13))).toBe(OpeningState.Closed)
+  })
+
+  it("carries it across an explicit closure of the day it lands in", () => {
+    // Shutting after midnight and not reopening is still open at 01:00.
+    const hours = "Mo-Fr 18:00-02:00; Sa off"
+    expect(openingStateAt(hours, at(6, 1))).toBe(OpeningState.Open)
+    expect(openingStateAt(hours, at(6, 12))).toBe(OpeningState.Closed)
+  })
+
+  it("evaluates every day of a week of per-day overnight rules", () => {
+    const hours =
+      "Mo 20:00-01:00; Tu 20:00-01:00; We 20:00-01:00; " +
+      "Th 20:00-03:00; Fr 20:00-03:00; Sa 20:00-03:00; Su off"
+
+    // Each day: open on its own evening, and in the small hours it inherits
+    // from the night before rather than from its own rule.
+    for (const day of [1, 2, 3, 4, 5, 6]) {
+      expect(openingStateAt(hours, at(day, 21))).toBe(OpeningState.Open)
+    }
+    for (const day of [2, 3, 4]) {
+      expect(openingStateAt(hours, at(day, 0, 30))).toBe(OpeningState.Open)
+      expect(openingStateAt(hours, at(day, 2))).toBe(OpeningState.Closed)
+    }
+    for (const day of [5, 6, 0]) {
+      expect(openingStateAt(hours, at(day, 2))).toBe(OpeningState.Open)
+      expect(openingStateAt(hours, at(day, 4))).toBe(OpeningState.Closed)
+    }
+    // Sunday is off, and Saturday night does not run into Monday.
+    expect(openingStateAt(hours, at(0, 21))).toBe(OpeningState.Closed)
+    expect(openingStateAt(hours, at(1, 2))).toBe(OpeningState.Closed)
+  })
+
+  it("does not let a spill open a day that nothing reaches into", () => {
+    // Monday's evening span ends before midnight, so Tuesday 01:00 is closed.
+    expect(openingStateAt("Mo 18:00-23:00; Tu 12:00-18:00", at(2, 1))).toBe(
+      OpeningState.Closed,
+    )
+    // 24/7 fills its own days exactly; it has nothing to spill.
+    expect(openingStateAt("Mo 24/7; Tu 12:00-18:00", at(2, 1))).toBe(OpeningState.Closed)
+  })
+
   it("reads a range ending at midnight as closing at the end of the day", () => {
     const hours = "Mo-Su 10:00-00:00"
     expect(openingStateAt(hours, at(3, 23, 59))).toBe(OpeningState.Open)

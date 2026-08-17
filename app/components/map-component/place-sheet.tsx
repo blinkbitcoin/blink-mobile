@@ -21,17 +21,20 @@ import {
   hostOf,
   isBoosted,
   isWebUrl,
+  mailtoUrl,
   materialIconName,
   merchantUrl,
   openingStateAt,
   sharesClockWith,
   socialUrl,
+  telUrl,
   useBtcMapPlaceDetails,
   verificationStateAt,
-  withScheme,
+  webUrl,
 } from "@app/btcmap"
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { recordAppError, toError } from "@app/utils/error-reporting"
 import { openExternalUrl } from "@app/utils/external"
 import { toastShow } from "@app/utils/toast"
 import { Skeleton, Text, makeStyles, useTheme } from "@rn-vui/themed"
@@ -62,15 +65,30 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
 
   const { details, isLoading, hasError, retry } = useBtcMapPlaceDetails(shown?.id)
 
-  // Re-read the clock while the sheet is open so a place that opens or closes
-  // under the user stops saying otherwise, as btcmap.org's pill does. Only two
-  // things on the sheet age — the open/closed badge and the boost — so a place
-  // with neither is not worth a re-render a minute.
-  const isTimeSensitive = Boolean(details?.openingHours ?? details?.boostedUntil)
+  // `||` rather than `??`: an empty-string `opening_hours` is a value and not a
+  // blank, so `??` would stop there and never look at the boost behind it. The
+  // snapshot's own boost counts too — it is the only one there is until the
+  // details land.
+  const isTimeSensitive = Boolean(
+    details?.openingHours || details?.boostedUntil || shown?.boostedUntil,
+  )
+
   const [now, setNow] = React.useState(() => new Date())
+
+  // Opening the sheet re-reads the clock whatever is on it. `now` also dates the
+  // verification badge, and this component mounts with the map rather than with
+  // the sheet, so without this it would still hold the moment the map tab first
+  // appeared — days ago, on a process that has been alive that long.
+  React.useEffect(() => {
+    if (place) setNow(new Date())
+  }, [place])
+
+  // Then keep re-reading it while the sheet is open, so a place that opens or
+  // closes under the user stops saying otherwise, as btcmap.org's pill does.
+  // Only the open/closed badge and the boost age, so a place with neither is
+  // not worth a re-render a minute.
   React.useEffect(() => {
     if (!place || !isTimeSensitive) return undefined
-    setNow(new Date())
     const timer = setInterval(() => setNow(new Date()), REFRESH_INTERVAL_MS)
     return () => clearInterval(timer)
   }, [place, isTimeSensitive])
@@ -100,8 +118,21 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
     openUrl(directionsUrl(shown, name, Platform.OS === "ios" ? "ios" : "android"))
 
   const share = () => {
-    Share.share({ message: merchantUrl(details, shown.id) })
+    // A dismissed share sheet resolves; a rejection is the OS refusing, which
+    // the user cannot act on and a toast would only interrupt.
+    Share.share({ message: merchantUrl(details, shown.id) }).catch((error) =>
+      recordAppError(toError(error), { expected: true, dedupKey: "btcmap-share" }),
+    )
   }
+
+  // Every link below started life as a raw OpenStreetMap tag, so it is checked
+  // before it is offered — see the allowlists in `urls.ts`. A row whose value
+  // does not survive that check is not drawn at all, rather than drawn as a tap
+  // that goes somewhere other than what its icon and label promise.
+  const websiteUrl = details?.website ? webUrl(details.website) : undefined
+  const appUrl = details?.requiredAppUrl ? webUrl(details.requiredAppUrl) : undefined
+  const phoneUrl = details?.phone ? telUrl(details.phone) : undefined
+  const emailUrl = details?.email ? mailtoUrl(details.email) : undefined
 
   const renderRow = (icon: IconNamesType, text: string, onPress?: () => void) => (
     <Pressable
@@ -138,15 +169,16 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
   ].filter(Boolean)
 
   // Brand names, so they stay untranslated — the same three btcmap.org lists.
-  const socials: [string, string][] = (
+  const socials = (
     [
       ["Instagram", "instagram.com", details?.instagram],
       ["Facebook", "facebook.com", details?.facebook],
       ["X", "x.com", details?.twitter],
     ] as [string, string, string | undefined][]
-  )
-    .filter(([, , value]) => Boolean(value))
-    .map(([label, host, value]) => [label, socialUrl(host, value as string)])
+  ).flatMap(([label, host, value]) => {
+    const url = value ? socialUrl(host, value) : undefined
+    return url ? [[label, url] as [string, string]] : []
+  })
 
   const verificationLabel = {
     [VerificationState.Verified]: () =>
@@ -249,26 +281,31 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
           <View style={styles.rows}>
             {Boolean(details?.openingHours) &&
               renderRow("clock", details?.openingHours ?? "")}
+            {/* The number and address are worth reading even when they are not
+                in a shape we are willing to hand to the dialer or mail app, so
+                these two rows stay — they just stop being tappable. */}
             {Boolean(details?.phone) &&
-              renderRow("phone", details?.phone ?? "", () =>
-                openUrl(`tel:${details?.phone}`),
+              renderRow(
+                "phone",
+                details?.phone ?? "",
+                phoneUrl ? () => openUrl(phoneUrl) : undefined,
               )}
-            {Boolean(details?.website) &&
-              renderRow("globe", hostOf(details?.website ?? ""), () =>
-                openUrl(withScheme(details?.website ?? "")),
+            {Boolean(websiteUrl) &&
+              renderRow("globe", hostOf(websiteUrl ?? ""), () =>
+                openUrl(websiteUrl ?? ""),
               )}
             {Boolean(details?.email) &&
-              renderRow("email-add", details?.email ?? "", () =>
-                openUrl(`mailto:${details?.email}`),
+              renderRow(
+                "email-add",
+                details?.email ?? "",
+                emailUrl ? () => openUrl(emailUrl) : undefined,
               )}
             {Boolean(details?.paymentUrl) &&
               renderRow("lightning", LL.MapScreen.payMerchant(), () =>
                 openUrl(details?.paymentUrl ?? ""),
               )}
-            {Boolean(details?.requiredAppUrl) &&
-              renderRow("info", LL.MapScreen.requiresApp(), () =>
-                openUrl(withScheme(details?.requiredAppUrl ?? "")),
-              )}
+            {Boolean(appUrl) &&
+              renderRow("info", LL.MapScreen.requiresApp(), () => openUrl(appUrl ?? ""))}
           </View>
 
           {acceptsLabels.length > 0 && (
@@ -308,10 +345,8 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
 
           <View style={styles.actions}>
             {renderAction("map", LL.MapScreen.navigate(), navigate)}
-            {Boolean(details?.phone) &&
-              renderAction("phone", LL.common.phone(), () =>
-                openUrl(`tel:${details?.phone}`),
-              )}
+            {Boolean(phoneUrl) &&
+              renderAction("phone", LL.common.phone(), () => openUrl(phoneUrl ?? ""))}
             {renderAction("share", LL.common.share(), share)}
           </View>
 

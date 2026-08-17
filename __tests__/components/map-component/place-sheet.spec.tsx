@@ -251,6 +251,64 @@ describe("PlaceSheet contact and payment rows", () => {
     expect(Linking.openURL).toHaveBeenCalledWith("mailto:hi@satoshi.example")
   })
 
+  it("refuses to hand a merchant's own scheme to the OS from a link row", async () => {
+    // These fields are raw OSM tags any volunteer can edit, and this app is the
+    // registered handler for bitcoin:, lightning:, lnurlp: and blink:. A pin
+    // must not be able to reopen our own send flow from behind a globe icon.
+    setDetails(
+      details({
+        website: "bitcoin:bc1qattacker?amount=1",
+        requiredAppUrl: "lnurlp:pay@evil.example",
+        // eslint-disable-next-line no-script-url -- the point of the test
+        instagram: "javascript:alert(1)",
+      }),
+    )
+    const { getByText, queryByText } = renderSheet()
+
+    await waitFor(() => expect(getByText("Satoshi Coffee")).toBeTruthy())
+
+    // Not merely inert — never drawn, so there is no tap that goes somewhere
+    // other than what its icon and label promise.
+    expect(queryByText("bc1qattacker")).toBeNull()
+    expect(queryByText("Needs a specific app to pay")).toBeNull()
+    expect(queryByText("Instagram")).toBeNull()
+    expect(Linking.openURL).not.toHaveBeenCalled()
+    expect(mockedOpenExternal).not.toHaveBeenCalled()
+  })
+
+  it("still shows a number it will not dial, rather than hiding it", async () => {
+    // "*21*<number>#" forwards every call. The number is worth reading; putting
+    // it one tap from the dialer is not.
+    setDetails(details({ phone: "*21*15550100#" }))
+    const { getByText } = renderSheet()
+
+    await waitFor(() => expect(getByText("*21*15550100#")).toBeTruthy())
+    fireEvent.press(getByText("*21*15550100#"))
+
+    expect(Linking.openURL).not.toHaveBeenCalled()
+  })
+
+  it("opens the links that are what they claim to be", async () => {
+    setDetails(
+      details({
+        website: "satoshi.example/menu",
+        requiredAppUrl: "https://wallet.example",
+        instagram: "@satoshi",
+      }),
+    )
+    const { getByText } = renderSheet()
+
+    await waitFor(() => expect(getByText("satoshi.example")).toBeTruthy())
+    fireEvent.press(getByText("satoshi.example"))
+    expect(mockedOpenExternal).toHaveBeenCalledWith("https://satoshi.example/menu")
+
+    fireEvent.press(getByText("Needs a specific app to pay"))
+    expect(mockedOpenExternal).toHaveBeenCalledWith("https://wallet.example")
+
+    fireEvent.press(getByText("Instagram"))
+    expect(mockedOpenExternal).toHaveBeenCalledWith("https://instagram.com/satoshi")
+  })
+
   it("offers the pay row only when the place published a payment URI", async () => {
     const without = renderSheet()
     await waitFor(() => expect(without.getByText("Satoshi Coffee")).toBeTruthy())

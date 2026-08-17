@@ -241,6 +241,38 @@ describe("useBtcMapPlaces kill switch", () => {
     await waitFor(() => expect(result.current.isLoading).toBe(false))
     expect(result.current.hasError).toBe(false)
   })
+
+  it("empties a map that was already drawn when the switch is thrown", async () => {
+    mockedRead.mockResolvedValue(cached(0))
+
+    const { result, rerender } = renderHook(() => useBtcMapPlaces())
+    await waitFor(() => expect(result.current.places).toHaveLength(2))
+
+    mockRemoteConfig.btcMapPlacesEnabled = false
+    rerender({})
+
+    await waitFor(() => expect(result.current.places).toEqual([]))
+    expect(result.current.hasError).toBe(false)
+  })
+
+  it("puts the map back when the switch is thrown again", async () => {
+    // The snapshot held in memory is dropped along with the places it drew, so
+    // re-enabling has to go back to the cache rather than find a stale ref and
+    // leave the map blank.
+    mockedRead.mockResolvedValue(cached(0))
+
+    const { result, rerender } = renderHook(() => useBtcMapPlaces())
+    await waitFor(() => expect(result.current.places).toHaveLength(2))
+
+    mockRemoteConfig.btcMapPlacesEnabled = false
+    rerender({})
+    await waitFor(() => expect(result.current.places).toEqual([]))
+
+    mockRemoteConfig.btcMapPlacesEnabled = true
+    rerender({})
+
+    await waitFor(() => expect(result.current.places).toHaveLength(2))
+  })
 })
 
 describe("useBtcMapPlaces staying current while mounted", () => {
@@ -272,6 +304,27 @@ describe("useBtcMapPlaces staying current while mounted", () => {
     emitAppState("active")
 
     await waitFor(() => expect(mockedDelta).toHaveBeenCalled())
+  })
+
+  it("re-checks the age without going back to disk for what it already holds", async () => {
+    // A resume that does sync still must not re-read: that is a multiGet, a
+    // JSON.parse of ~2.4 MB on the JS thread and a new array identity that
+    // re-clusters all ~29k points, to arrive at the list already in memory.
+    const openedAt = Date.now()
+    mockedRead.mockResolvedValue(cached(0))
+
+    const { result } = renderHook(() => useBtcMapPlaces())
+    await waitFor(() => expect(result.current.places).toHaveLength(2))
+    const first = result.current.places
+    expect(mockedRead).toHaveBeenCalledTimes(1)
+
+    jest.spyOn(Date, "now").mockReturnValue(openedAt + BTCMAP_SYNC_INTERVAL_MS + 1000)
+    emitAppState("active")
+
+    await waitFor(() => expect(mockedDelta).toHaveBeenCalled())
+    expect(mockedRead).toHaveBeenCalledTimes(1)
+    // An empty delta leaves the very same array, so nothing re-clusters either.
+    expect(result.current.places).toBe(first)
   })
 
   it("does nothing on resume while the cache is still fresh", async () => {

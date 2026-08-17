@@ -13,6 +13,21 @@ const DEBOUNCE_MS = 350
 // old ground does not blank the labels, but not forever.
 const MAX_CACHED_NAMES = 2000
 
+// The viewport centre is the one thing on this screen that leaves the device
+// describing where the user is, and it would otherwise go to a third party once
+// per settled pan — a timestamped trail of home, work and the shop in between,
+// at a zoom precise enough to be a street address. Snapping it to a ~1.1 km grid
+// means every look around a neighbourhood asks the same question, so the trail
+// collapses to the cell rather than the path taken through it.
+const GRID_STEPS_PER_DEGREE = 100
+const snapToGrid = (value: number) =>
+  Math.round(value * GRID_STEPS_PER_DEGREE) / GRID_STEPS_PER_DEGREE
+
+// Half the diagonal of one grid cell, so the widened radius still reaches
+// wherever inside it the user actually is. Latitude dominates: a cell is at its
+// widest at the equator, where 0.005° is ~0.56 km each way.
+const GRID_SLACK_KM = 0.8
+
 type Viewport = {
   center: LatLng
   radiusKm: number
@@ -24,8 +39,8 @@ type Viewport = {
  * Merchant names for the places currently on screen.
  *
  * The offline snapshot deliberately carries no names, so labels are fetched for
- * the viewport instead — one small request per settled pan, and none at all
- * until the map is zoomed in far enough for labels to be drawn.
+ * the viewport instead — one small request per settled pan onto a new grid cell,
+ * and none at all until the map is zoomed in far enough for labels to be drawn.
  *
  * Failures are silent: a missing label is a pin without a name under it, which
  * is exactly what the map looked like before, and not something the user can
@@ -38,8 +53,14 @@ export const useBtcMapPlaceNames = (viewport: Viewport): ReadonlyMap<number, str
   // overwrite a newer one.
   const requestRef = useRef(0)
 
-  const { enabled, radiusKm } = viewport
-  const { latitude, longitude } = viewport.center
+  const { enabled } = viewport
+  // Quantised before it reaches the dependency array, so a pan that stays
+  // inside one cell does not even re-run the effect, let alone re-ask.
+  const latitude = snapToGrid(viewport.center.latitude)
+  const longitude = snapToGrid(viewport.center.longitude)
+  // Rounded for the same reason, and because a radius carried to fifteen
+  // decimal places is a fingerprint of the exact viewport it came from.
+  const radiusKm = Math.round((viewport.radiusKm + GRID_SLACK_KM) * 100) / 100
 
   useEffect(() => {
     if (!enabled) return undefined
@@ -54,9 +75,16 @@ export const useBtcMapPlaceNames = (viewport: Viewport): ReadonlyMap<number, str
 
         setNames((previous) => {
           const merged = new Map(previous)
-          for (const [id, name] of fetched) merged.set(id, name)
+          for (const [id, name] of fetched) {
+            // Deleted first so a name seen again moves to the back of the
+            // queue. `Map.set` on a key it already holds keeps the original
+            // position, which would evict the names the user keeps returning to
+            // ahead of ones glimpsed once and left behind.
+            merged.delete(id)
+            merged.set(id, name)
+          }
 
-          // Oldest first, since Map preserves insertion order.
+          // Least recently seen first, since Map preserves insertion order.
           if (merged.size > MAX_CACHED_NAMES) {
             const excess = merged.size - MAX_CACHED_NAMES
             const stale = Array.from(merged.keys()).slice(0, excess)
