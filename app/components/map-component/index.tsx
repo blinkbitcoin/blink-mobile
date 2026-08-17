@@ -6,7 +6,7 @@ import { PermissionStatus, RESULTS, request } from "react-native-permissions"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 import { useApolloClient } from "@apollo/client"
-import { BtcMapPlace, LatLng, useBtcMapPlaces } from "@app/btcmap"
+import { BtcMapPlace, LatLng, useBtcMapPlaceNames, useBtcMapPlaces } from "@app/btcmap"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { updateMapLastCoords } from "@app/graphql/client-only-query"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -22,6 +22,11 @@ import { OpenSettingsElement, OpenSettingsModal } from "./open-settings-modal"
 import { PlaceMarker } from "./place-marker"
 import { PlaceSheet } from "./place-sheet"
 import { usePlaceClusters } from "./use-place-clusters"
+import { radiusKmForRegion, zoomForRegion } from "./viewport"
+
+// btcmap.org starts labelling its pins here too. Below it the pins are packed
+// tightly enough that names would overlap into noise.
+const LABEL_MIN_ZOOM = 15
 
 const SAVE_COORDS_DEBOUNCE_MS = 1000
 const FLY_TO_DURATION_MS = 350
@@ -67,6 +72,14 @@ export default function MapComponent({
   // no-op unless the cache has actually aged out.
   useFocusEffect(refresh)
   const { places, clusters, regionForCluster } = usePlaceClusters(allPlaces, region)
+
+  // Names are not in the offline snapshot, so they are fetched for the viewport
+  // — and only once it is tight enough for labels to be legible.
+  const names = useBtcMapPlaceNames({
+    center: { latitude: region.latitude, longitude: region.longitude },
+    radiusKm: radiusKmForRegion(region),
+    enabled: zoomForRegion(region) >= LABEL_MIN_ZOOM,
+  })
 
   // toggle modal from inside modal component instead of here in the parent
   const toggleModal = React.useCallback(
@@ -195,7 +208,12 @@ export default function MapComponent({
           />
         ))}
         {places.map((place) => (
-          <PlaceMarker key={place.id} place={place} onPress={handlePlacePress} />
+          <PlaceMarker
+            key={place.id}
+            place={place}
+            name={names.get(place.id)}
+            onPress={handlePlacePress}
+          />
         ))}
       </MapView>
 

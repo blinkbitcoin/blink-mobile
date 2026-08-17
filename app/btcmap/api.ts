@@ -10,6 +10,7 @@ import {
   BTCMAP_REQUEST_TIMEOUT_MS,
   BTCMAP_SNAPSHOT_TIMEOUT_MS,
 } from "./config"
+import { LatLng } from "./geo"
 import {
   BtcMapPlace,
   BtcMapPlaceDetails,
@@ -249,6 +250,41 @@ export const fetchPlacesDelta = async (since: string): Promise<BtcMapDelta> => {
     new Date(rewound).getTime() > new Date(since).getTime() ? rewound : since
 
   return { upserted, removedIds, syncedUpTo, needsReseed: false }
+}
+
+/**
+ * Names for every place within `radiusKm` of a point, in one request.
+ *
+ * The offline snapshot has no names — the CDN dump does not carry them — so map
+ * labels come from here rather than from bloating that snapshot with all ~29k.
+ * At the zoom labels appear this is a sub-kilometre radius: a handful of places
+ * and a couple of KB, against 2.8 MB for the full uncompressed name list.
+ *
+ * The endpoint ignores `fields` and always returns its own rich shape, so the
+ * rest of each row is discarded here.
+ */
+export const fetchPlaceNamesNear = async (
+  center: LatLng,
+  radiusKm: number,
+): Promise<Map<number, string>> => {
+  const { data } = await axios.get<BtcMapPlaceDetailsWire[]>(
+    `${BTCMAP_API_BASE_URL}/places/search`,
+    {
+      params: {
+        lat: center.latitude,
+        lon: center.longitude,
+        // eslint-disable-next-line camelcase
+        radius_km: radiusKm,
+      },
+      timeout: BTCMAP_REQUEST_TIMEOUT_MS,
+    },
+  )
+
+  const names = new Map<number, string>()
+  for (const place of data) {
+    if (place.name) names.set(place.id, place.name)
+  }
+  return names
 }
 
 export const fetchPlaceDetails = async (id: number): Promise<BtcMapPlaceDetails> => {

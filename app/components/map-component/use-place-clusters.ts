@@ -1,16 +1,15 @@
 import { useCallback, useMemo } from "react"
-import { Dimensions } from "react-native"
 import { Region } from "react-native-maps"
 import Supercluster from "supercluster"
 
 import { BtcMapPlace } from "@app/btcmap"
 
 import { ClusterMarkerData } from "./cluster-marker"
+import { MAX_ZOOM, longitudeDeltaForZoom, zoomForRegion } from "./viewport"
 
 // BTC Map stops clustering at zoom 17 and draws every pin from there in;
 // supercluster's `maxZoom` is the last level it still clusters at.
 const CLUSTERING_DISABLED_ZOOM = 17
-const MAX_ZOOM = 20
 
 const CLUSTER_OPTIONS = {
   radius: 60,
@@ -30,20 +29,6 @@ type ClusterOrPlace =
   | Supercluster.PointFeature<PlaceProperties>
 
 const EMPTY = { places: [] as BtcMapPlace[], clusters: [] as ClusterMarkerData[] }
-
-// Tiles are 256dp wide, so a viewport of W dp at zoom z spans
-// 360 * W / (256 * 2^z) degrees. Dropping the width term costs about two thirds
-// of a zoom level on a phone, which is enough to keep clustering a whole level
-// past where btcmap.org stops.
-const TILE_SIZE = 256
-const viewportWidth = () => Dimensions.get("window").width
-
-/** The tile zoom at which the map is currently drawn. */
-const zoomForRegion = (region: Region): number => {
-  const span = Math.max(region.longitudeDelta, 1e-6)
-  const zoom = Math.log2((360 * viewportWidth()) / (TILE_SIZE * span))
-  return Math.max(0, Math.min(MAX_ZOOM, Math.round(zoom)))
-}
 
 const boundsForRegion = (region: Region): [number, number, number, number] => [
   region.longitude - region.longitudeDelta / 2,
@@ -118,7 +103,7 @@ export const usePlaceClusters = (places: BtcMapPlace[], region: Region | undefin
         : zoomForRegion(current) + 2
       const zoom = Math.min(expansionZoom, MAX_ZOOM)
 
-      const longitudeDelta = (360 * viewportWidth()) / (TILE_SIZE * 2 ** zoom)
+      const longitudeDelta = longitudeDeltaForZoom(zoom)
       const aspect = current.latitudeDelta / Math.max(current.longitudeDelta, 1e-6)
 
       return {

@@ -7,10 +7,15 @@ import { BtcMapPlace } from "@app/btcmap"
 import theme from "@app/rne-theme/theme"
 import { dark, light } from "@app/rne-theme/colors"
 import { ClusterMarker } from "@app/components/map-component/cluster-marker"
-import { PlaceMarker } from "@app/components/map-component/place-marker"
+import {
+  PlaceMarker,
+  markerAnchor,
+  markerHeight,
+} from "@app/components/map-component/place-marker"
 import {
   PIN_COLOR_BOOSTED,
   PIN_COLOR_DARK,
+  PIN_HEIGHT,
 } from "@app/components/map-component/pin-shape"
 import { useMarkerSettle } from "@app/components/map-component/use-marker-settle"
 
@@ -112,6 +117,55 @@ describe("PlaceMarker", () => {
         pinFill(inMode(mode, <PlaceMarker place={boosted} onPress={jest.fn()} />)),
       ).toBe(PIN_COLOR_BOOSTED)
     }
+  })
+
+  it("keeps the teardrop tip on the coordinate whether or not it is labelled", () => {
+    // The anchor is the tip's position as a fraction of the view. A label makes
+    // the view taller, so a constant anchor would push labelled pins north of
+    // where the merchant actually is.
+    expect(markerAnchor(false)).toEqual({ x: 0.5, y: 1 })
+
+    const labelled = markerAnchor(true)
+    expect(labelled.x).toBe(0.5)
+    expect(labelled.y).toBeCloseTo(PIN_HEIGHT / markerHeight(true), 5)
+    expect(labelled.y).toBeLessThan(1)
+
+    const anchorOf = (name?: string) =>
+      render(
+        withTheme(<PlaceMarker place={place()} name={name} onPress={jest.fn()} />),
+      ).getByTestId("btcmap-place-1").props.anchor
+
+    expect(anchorOf()).toEqual(markerAnchor(false))
+    expect(anchorOf("Satoshi Coffee")).toEqual(markerAnchor(true))
+  })
+
+  it("draws the merchant's name under the pin when one is known", () => {
+    const withName = render(
+      withTheme(
+        <PlaceMarker place={place()} name="Satoshi Coffee" onPress={jest.fn()} />,
+      ),
+    )
+    expect(withName.getByText("Satoshi Coffee")).toBeTruthy()
+
+    // No name yet means no label and no reserved space for one.
+    const without = render(withTheme(<PlaceMarker place={place()} onPress={jest.fn()} />))
+    expect(without.queryByText("Satoshi Coffee")).toBeNull()
+  })
+
+  it("repaints when a name arrives after the pin has already painted", () => {
+    // Tracking is off 400ms after mount, and Android then serves the cached
+    // bitmap — a label that never reopens the window never appears.
+    const tree = render(withTheme(<PlaceMarker place={place()} onPress={jest.fn()} />))
+    act(() => jest.advanceTimersByTime(500))
+    expect(trackingOf(tree, "btcmap-place-1")).toBe(false)
+
+    tree.rerender(
+      withTheme(
+        <PlaceMarker place={place()} name="Satoshi Coffee" onPress={jest.fn()} />,
+      ),
+    )
+
+    expect(trackingOf(tree, "btcmap-place-1")).toBe(true)
   })
 
   it("repaints when a sync flips the place's boost", () => {
