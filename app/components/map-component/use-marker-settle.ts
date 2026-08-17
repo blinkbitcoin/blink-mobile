@@ -1,9 +1,23 @@
 import { useEffect, useRef, useState } from "react"
 import { MapMarker } from "react-native-maps"
 
-// Long enough for react-native-svg and the label's text to paint the marker's
-// contents once.
+// How long the view is left tracking before it is frozen. Android gives up well
+// before this on its own (see below), so this is really just the point at which
+// we stop asking.
 const SETTLE_MS = 400
+
+// When to force the icon to refresh after the contents change.
+//
+// One delay cannot be right for every device. Short enough to get a label on
+// screen promptly on a fast phone is not long enough for react-native-svg and
+// the text to have painted on a loaded emulator — and a capture taken before
+// they have is exactly what freezes a half-drawn pin. Since each pass costs one
+// small bitmap, doing it more than once is cheaper than guessing: the first
+// usually lands, and the later ones are there for when layout ran long.
+//
+// If a device still shows a half-drawn pin, add another entry rather than
+// stretching the window — tracking is not what is doing the work here.
+const REDRAW_AT_MS = [SETTLE_MS, 1200]
 
 /**
  * When a custom `Marker` may stop tracking its view, and how it is made to
@@ -31,8 +45,16 @@ const SETTLE_MS = 400
  *    is inside `updateTracksViewChanges`, behind an early return that trips
  *    whenever the native side already deactivated itself. It never runs for us.
  *
- * `redraw()` posts a single unconditional `updateMarkerIcon()` to the main
- * looper, which is the only way back once the counter has run out.
+ * `redraw()` posts an unconditional `updateMarkerIcon()` to the main looper,
+ * which is the only way back once the counter has run out — hence the schedule
+ * above rather than a single delay chosen to be long enough for the slowest
+ * device we can imagine.
+ *
+ * None of this costs anything on iOS: the Apple Maps path renders marker views
+ * live and ignores `tracksViewChanges` entirely. It would matter under
+ * `PROVIDER_GOOGLE`, which honours the prop by re-rendering every frame — so if
+ * this map ever moves to Google Maps on iOS, check what the window costs there
+ * before lengthening it.
  */
 export const useMarkerSettle = (appearance: string) => {
   const markerRef = useRef<MapMarker>(null)
@@ -41,14 +63,17 @@ export const useMarkerSettle = (appearance: string) => {
   useEffect(() => {
     setTracksViewChanges(true)
 
-    const timer = setTimeout(() => {
-      setTracksViewChanges(false)
-      // By now the contents have painted, so this captures them whether or not
-      // the native tracker was still listening.
-      markerRef.current?.redraw()
-    }, SETTLE_MS)
+    const settle = setTimeout(() => setTracksViewChanges(false), SETTLE_MS)
+    // Each of these captures whatever has painted by then, whether or not the
+    // native tracker is still listening.
+    const redraws = REDRAW_AT_MS.map((delay) =>
+      setTimeout(() => markerRef.current?.redraw(), delay),
+    )
 
-    return () => clearTimeout(timer)
+    return () => {
+      clearTimeout(settle)
+      for (const redraw of redraws) clearTimeout(redraw)
+    }
   }, [appearance])
 
   return { markerRef, tracksViewChanges }

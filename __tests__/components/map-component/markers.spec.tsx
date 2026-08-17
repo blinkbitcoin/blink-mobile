@@ -103,11 +103,13 @@ describe("useMarkerSettle", () => {
     expect(result.current.tracksViewChanges).toBe(true)
   })
 
-  it("forces a last rasterisation as the window closes", () => {
+  it("forces the rasterisation more than once, well past the tracking window", () => {
     // Android's tracker stops re-capturing a couple of frames after the view
     // changed, whatever the prop says, and the library's own final-render
-    // fallback is behind an early return that trips once it has. Without this
-    // the marker keeps whatever half-painted bitmap it had at that moment.
+    // fallback is behind an early return that trips once it has. So the icon is
+    // refreshed by hand — and more than once, because a single delay that suits
+    // a fast phone is not enough on a loaded emulator, where a capture taken too
+    // early freezes a half-drawn pin for good.
     const redraw = jest.fn()
     const { rerender } = renderHook(
       ({ appearance }: { appearance: string }) => {
@@ -120,16 +122,25 @@ describe("useMarkerSettle", () => {
     )
 
     expect(redraw).not.toHaveBeenCalled()
+
+    // The first pass lands as the window closes...
     act(() => jest.advanceTimersByTime(500))
     expect(redraw).toHaveBeenCalledTimes(1)
 
-    // And again each time the window is reopened and closes.
+    // ...and at least one more follows it, long after tracking stopped.
+    act(() => jest.advanceTimersByTime(2000))
+    expect(redraw.mock.calls.length).toBeGreaterThan(1)
+
+    // The whole schedule runs again each time the window is reopened.
+    const beforeReopen = redraw.mock.calls.length
     rerender({ appearance: "b" })
-    act(() => jest.advanceTimersByTime(500))
-    expect(redraw).toHaveBeenCalledTimes(2)
+    act(() => jest.advanceTimersByTime(2500))
+    expect(redraw.mock.calls).toHaveLength(beforeReopen * 2)
   })
 
-  it("does not redraw a window that was reopened before it closed", () => {
+  it("drops the pending redraws when the window is reopened before they fire", () => {
+    // Capturing mid-change is the failure being avoided, so a superseded
+    // schedule must not leave a stray timer behind to do exactly that.
     const redraw = jest.fn()
     const { rerender } = renderHook(
       ({ appearance }: { appearance: string }) => {
@@ -145,7 +156,6 @@ describe("useMarkerSettle", () => {
     rerender({ appearance: "b" })
     act(() => jest.advanceTimersByTime(200))
 
-    // The first timer was cleared, so the pin is not captured mid-change.
     expect(redraw).not.toHaveBeenCalled()
 
     act(() => jest.advanceTimersByTime(300))
@@ -232,10 +242,15 @@ describe("PlaceMarker", () => {
     expect(trackingOf(tree, "btcmap-place-1")).toBe(true)
 
     // Reopening the window is not enough on its own — the native tracker gives
-    // up after a couple of frames — so the label's paint is forced home too.
+    // up after a couple of frames — so the label's paint is forced home too,
+    // and again later in case it had not finished by the first pass.
+    const beforeLabel = redrawsFor("btcmap-place-1")
     act(() => jest.advanceTimersByTime(500))
     expect(trackingOf(tree, "btcmap-place-1")).toBe(false)
-    expect(redrawsFor("btcmap-place-1")).toBe(2)
+    expect(redrawsFor("btcmap-place-1")).toBe(beforeLabel + 1)
+
+    act(() => jest.advanceTimersByTime(2000))
+    expect(redrawsFor("btcmap-place-1")).toBeGreaterThan(beforeLabel + 1)
   })
 
   it("repaints when a sync flips the place's boost", () => {
