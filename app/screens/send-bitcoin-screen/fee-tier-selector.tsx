@@ -1,5 +1,10 @@
 import React, { useState } from "react"
-import { TouchableOpacity, TouchableWithoutFeedback, View } from "react-native"
+import {
+  ActivityIndicator,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
+} from "react-native"
 import ReactNativeModal from "react-native-modal"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
@@ -18,6 +23,8 @@ type FeeTierSelectorProps<T extends string> = {
   options: OptionItem<T>[]
   selected: T
   onSelect: (id: T) => void
+  /** Shows a spinner in place of the caret while the fees are being quoted. */
+  loading?: boolean
 }
 
 export const FeeTierSelector = <T extends string>({
@@ -25,6 +32,7 @@ export const FeeTierSelector = <T extends string>({
   options,
   selected,
   onSelect,
+  loading = false,
 }: FeeTierSelectorProps<T>): React.ReactElement => {
   const styles = useStyles()
   const {
@@ -49,7 +57,15 @@ export const FeeTierSelector = <T extends string>({
             )}
           </View>
           <View style={styles.iconContainer}>
-            <GaloyIcon name="caret-down" size={24} color={colors.primary} />
+            {loading ? (
+              <ActivityIndicator
+                size="small"
+                color={colors.primary}
+                {...testProps("fee-tier-spinner")}
+              />
+            ) : (
+              <GaloyIcon name="caret-down" size={24} color={colors.primary} />
+            )}
           </View>
         </View>
       </TouchableWithoutFeedback>

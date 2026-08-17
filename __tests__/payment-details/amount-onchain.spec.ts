@@ -1,5 +1,9 @@
-import { WalletCurrency } from "@app/graphql/generated"
+import { PayoutSpeed, WalletCurrency } from "@app/graphql/generated"
 import * as PaymentDetails from "@app/screens/send-bitcoin-screen/payment-details/onchain"
+import {
+  type ConvertMoneyAmount,
+  OnchainFeeQuote,
+} from "@app/screens/send-bitcoin-screen/payment-details/index.types"
 
 import {
   btcSendingWalletDescriptor,
@@ -71,6 +75,7 @@ describe("no amount onchain payment details", () => {
           address: defaultParams.address,
           amount: settlementAmount.amount,
           walletId: btcSendingWalletParams.sendingWalletDescriptor.id,
+          speed: PayoutSpeed.Fast,
         },
       })
     })
@@ -93,6 +98,7 @@ describe("no amount onchain payment details", () => {
             address: defaultParams.address,
             amount: settlementAmount.amount,
             walletId: btcSendingWalletParams.sendingWalletDescriptor.id,
+            speed: PayoutSpeed.Fast,
           },
         },
       })
@@ -123,6 +129,7 @@ describe("no amount onchain payment details", () => {
           address: defaultParams.address,
           amount: usdSendingWalletParams.destinationSpecifiedAmount.amount,
           walletId: usdSendingWalletParams.sendingWalletDescriptor.id,
+          speed: PayoutSpeed.Fast,
         },
       })
     })
@@ -146,6 +153,7 @@ describe("no amount onchain payment details", () => {
               address: defaultParams.address,
               amount: usdSendingWalletParams.destinationSpecifiedAmount.amount,
               walletId: usdSendingWalletParams.sendingWalletDescriptor.id,
+              speed: PayoutSpeed.Fast,
             },
           },
         },
@@ -184,5 +192,164 @@ describe("no amount onchain payment details", () => {
       sendingWalletDescriptor,
     )
     expect(newPaymentDetails.sendingWalletDescriptor).toEqual(sendingWalletDescriptor)
+  })
+
+  it("can set convertMoneyAmount", () => {
+    const paymentDetails = createAmountOnchainPaymentDetails(defaultParams)
+    const newConvertMoneyAmount: ConvertMoneyAmount = (amount, currency) => ({
+      amount: amount.amount * 2,
+      currency,
+      currencyCode: currency,
+    })
+
+    const newPaymentDetails = paymentDetails.setConvertMoneyAmount(newConvertMoneyAmount)
+
+    expect(newPaymentDetails.convertMoneyAmount).toBe(newConvertMoneyAmount)
+    expect(newPaymentDetails.settlementAmount.amount).toEqual(testAmount.amount * 2)
+  })
+
+  describe("payout speed", () => {
+    it("defaults to the schema default so behaviour is unchanged until the user picks", () => {
+      const paymentDetails = createAmountOnchainPaymentDetails(defaultParams)
+      expect(paymentDetails.payoutSpeed).toEqual(PayoutSpeed.Fast)
+    })
+
+    it("carries the selected speed onto the rebuilt payment detail", () => {
+      const paymentDetails = createAmountOnchainPaymentDetails(defaultParams)
+      if (!paymentDetails.setPayoutSpeed) throw new Error("Payout speed cannot be set")
+
+      const slowDetails = paymentDetails.setPayoutSpeed(PayoutSpeed.Slow)
+      expect(slowDetails.payoutSpeed).toEqual(PayoutSpeed.Slow)
+    })
+
+    it("quotes the fee for the selected speed and maps it to the wallet currency", async () => {
+      const feeParamsMocks = createGetFeeMocks()
+      ;(feeParamsMocks.onChainTxFee as jest.Mock).mockResolvedValue({
+        data: { onChainTxFee: { amount: 450 } },
+      })
+      const paymentDetails = createAmountOnchainPaymentDetails(defaultParams)
+      if (!paymentDetails.setPayoutSpeed) throw new Error("Payout speed cannot be set")
+
+      const slowDetails = paymentDetails.setPayoutSpeed(PayoutSpeed.Slow)
+      if (!slowDetails.canGetFee) throw new Error("Cannot get fee")
+
+      const fee = await slowDetails.getFee(feeParamsMocks)
+
+      expect(feeParamsMocks.onChainTxFee).toHaveBeenCalledWith(
+        expect.objectContaining({
+          variables: expect.objectContaining({ speed: PayoutSpeed.Slow }),
+        }),
+      )
+      expect(fee.amount).toEqual(
+        expect.objectContaining({ amount: 450, currency: WalletCurrency.Btc }),
+      )
+    })
+
+    it("sends the payment with the selected speed", async () => {
+      const sendPaymentMocks = createSendPaymentMocks()
+      ;(sendPaymentMocks.onChainPaymentSend as jest.Mock).mockResolvedValue({
+        data: {
+          onChainPaymentSend: {
+            status: "SUCCESS",
+            errors: [],
+            transaction: {
+              settlementVia: {
+                __typename: "SettlementViaOnChain",
+                arrivalInMempoolEstimatedAt: 1234,
+              },
+            },
+          },
+        },
+      })
+      const paymentDetails = createAmountOnchainPaymentDetails(defaultParams)
+      if (!paymentDetails.setPayoutSpeed) throw new Error("Payout speed cannot be set")
+
+      const mediumDetails = paymentDetails.setPayoutSpeed(PayoutSpeed.Medium)
+      if (!mediumDetails.canSendPayment) throw new Error("Cannot send payment")
+
+      try {
+        await mediumDetails.sendPaymentMutation(sendPaymentMocks)
+      } catch {
+        // the send response is not mocked, only the call arguments matter here
+      }
+
+      expect(sendPaymentMocks.onChainPaymentSend).toHaveBeenCalledWith(
+        expect.objectContaining({
+          variables: expect.objectContaining({
+            input: expect.objectContaining({ speed: PayoutSpeed.Medium }),
+          }),
+        }),
+      )
+    })
+
+    it("quotes a usd wallet as-btc-denominated with the selected speed", async () => {
+      const feeParamsMocks = createGetFeeMocks()
+      ;(feeParamsMocks.onChainUsdTxFeeAsBtcDenominated as jest.Mock).mockResolvedValue({
+        data: { onChainUsdTxFeeAsBtcDenominated: { amount: 12 } },
+      })
+      const paymentDetails = createAmountOnchainPaymentDetails({
+        ...defaultParams,
+        sendingWalletDescriptor: usdSendingWalletDescriptor,
+      })
+      if (!paymentDetails.setPayoutSpeed) throw new Error("Payout speed cannot be set")
+
+      const slowDetails = paymentDetails.setPayoutSpeed(PayoutSpeed.Slow)
+      if (!slowDetails.canGetFee) throw new Error("Cannot get fee")
+
+      const fee = await slowDetails.getFee(feeParamsMocks)
+
+      expect(feeParamsMocks.onChainUsdTxFeeAsBtcDenominated).toHaveBeenCalledWith(
+        expect.objectContaining({
+          variables: expect.objectContaining({ speed: PayoutSpeed.Slow }),
+        }),
+      )
+      expect(fee.amount).toEqual(
+        expect.objectContaining({ amount: 12, currency: WalletCurrency.Usd }),
+      )
+    })
+
+    it("returns status and errors when a usd wallet sends as-btc-denominated", async () => {
+      const sendPaymentMocks = createSendPaymentMocks()
+      ;(
+        sendPaymentMocks.onChainUsdPaymentSendAsBtcDenominated as jest.Mock
+      ).mockResolvedValue({
+        data: {
+          onChainUsdPaymentSendAsBtcDenominated: { status: "SUCCESS", errors: [] },
+        },
+      })
+      const paymentDetails = createAmountOnchainPaymentDetails({
+        ...defaultParams,
+        sendingWalletDescriptor: usdSendingWalletDescriptor,
+      })
+      if (!paymentDetails.canSendPayment) throw new Error("Cannot send payment")
+
+      const result = await paymentDetails.sendPaymentMutation(sendPaymentMocks)
+
+      expect(result).toEqual({ status: "SUCCESS", errors: [] })
+    })
+  })
+
+  describe("fee quote", () => {
+    it("quotes a btc wallet in sats", () => {
+      const paymentDetails = createAmountOnchainPaymentDetails(defaultParams)
+      expect(paymentDetails.feeQuote).toBe(OnchainFeeQuote.Btc)
+    })
+
+    it("quotes a usd wallet as-btc when the destination fixed the amount", () => {
+      const paymentDetails = createAmountOnchainPaymentDetails({
+        ...defaultParams,
+        sendingWalletDescriptor: usdSendingWalletDescriptor,
+      })
+      expect(paymentDetails.feeQuote).toBe(OnchainFeeQuote.UsdAsBtcDenominated)
+    })
+
+    it("keeps the quote when the payout speed changes", () => {
+      const paymentDetails = createAmountOnchainPaymentDetails(defaultParams)
+      if (!paymentDetails.setPayoutSpeed) throw new Error("Payout speed cannot be set")
+
+      expect(paymentDetails.setPayoutSpeed(PayoutSpeed.Slow).feeQuote).toBe(
+        OnchainFeeQuote.Btc,
+      )
+    })
   })
 })

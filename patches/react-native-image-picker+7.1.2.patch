@@ -1,0 +1,264 @@
+diff --git a/node_modules/react-native-image-picker/android/src/main/java/com/imagepicker/ImagePickerModuleImpl.java b/node_modules/react-native-image-picker/android/src/main/java/com/imagepicker/ImagePickerModuleImpl.java
+index afe4b3e..b39b12d 100644
+--- a/node_modules/react-native-image-picker/android/src/main/java/com/imagepicker/ImagePickerModuleImpl.java
++++ b/node_modules/react-native-image-picker/android/src/main/java/com/imagepicker/ImagePickerModuleImpl.java
+@@ -166,17 +166,47 @@ public class ImagePickerModuleImpl implements ActivityEventListener {
+     }
+ 
+     void onAssetsObtained(List<Uri> fileUris) {
++        /**
++         * The callback is claimed under a lock before this method returns, so the hand-off
++         * is single-shot. Clearing the field inside the executor task instead leaves it set
++         * until that task runs, letting a duplicate onActivityResult pass the null check
++         * and schedule a second task holding the same callback; React Native aborts the
++         * process as soon as a callback is invoked more than once.
++         */
++        final Callback cb;
++        synchronized (this) {
++            cb = this.callback;
++            this.callback = null;
++        }
++        if (cb == null) {
++            return;
++        }
++
+         ExecutorService executor = Executors.newSingleThreadExecutor();
+ 
+         executor.submit(() -> {
++            /**
++             * The response is settled before the single invoke, and every Throwable is
++             * caught rather than only RuntimeException. Decoding the picked image can
++             * raise an OutOfMemoryError, which is an Error: catching Exception alone
++             * lets it die inside a Future nobody reads, so the callback never fires and
++             * the promise on the JS side stays pending forever.
++             */
++            ReadableMap response;
+             try {
+-                callback.invoke(getResponseMap(fileUris, options, reactContext));
+-            } catch (RuntimeException exception) {
+-                callback.invoke(getErrorMap(errOthers, exception.getMessage()));
+-            } finally {
+-                callback = null;
++                response = getResponseMap(fileUris, options, reactContext);
++            } catch (Throwable throwable) {
++                response = getErrorMap(errOthers, throwable.getMessage());
+             }
++            cb.invoke(response);
+         });
++        /**
++         * The executor is created per pick and its worker thread outlives the task that
++         * ran on it, so without this one thread and its stack leak on every gallery open,
++         * against the same heap the bounded decode above is protecting. shutdown() lets
++         * the submitted task finish and then retires the thread.
++         */
++        executor.shutdown();
+     }
+ 
+     @Override
+@@ -191,14 +221,32 @@ public class ImagePickerModuleImpl implements ActivityEventListener {
+             if (requestCode == REQUEST_LAUNCH_IMAGE_CAPTURE) {
+                 deleteFile(fileUri);
+             }
+-            try {
+-                callback.invoke(getCancelMap());
++            /**
++             * Claimed under the same lock as onAssetsObtained, for the same reason: the
++             * callback is single-shot and React Native aborts the process the moment one
++             * is invoked twice. The old shape invoked it a second time from inside its own
++             * catch, so the handler for a failed hand-off was itself the crash. It also
++             * left the failure path falling through to the switch below, since its return
++             * sat inside the try. Settling the response first keeps this to one invoke on
++             * every route out.
++             */
++            final Callback cancelCallback;
++            synchronized (this) {
++                cancelCallback = this.callback;
++                this.callback = null;
++            }
++            if (cancelCallback == null) {
+                 return;
+-            } catch (RuntimeException exception) {
+-                callback.invoke(getErrorMap(errOthers, exception.getMessage()));
+-            } finally {
+-                callback = null;
+             }
++
++            ReadableMap response;
++            try {
++                response = getCancelMap();
++            } catch (Throwable throwable) {
++                response = getErrorMap(errOthers, throwable.getMessage());
++            }
++            cancelCallback.invoke(response);
++            return;
+         }
+ 
+         switch (requestCode) {
+diff --git a/node_modules/react-native-image-picker/android/src/main/java/com/imagepicker/Utils.java b/node_modules/react-native-image-picker/android/src/main/java/com/imagepicker/Utils.java
+index 1e9078d..87707ae 100644
+--- a/node_modules/react-native-image-picker/android/src/main/java/com/imagepicker/Utils.java
++++ b/node_modules/react-native-image-picker/android/src/main/java/com/imagepicker/Utils.java
+@@ -202,6 +202,23 @@ public class Utils {
+                 || orientation.equals(String.valueOf(ExifInterface.ORIENTATION_ROTATE_270));
+     }
+ 
++    /**
++     * Largest power-of-two subsampling factor that still leaves the decoded bitmap at or
++     * above the requested size, so the scaling that follows only ever shrinks.
++     */
++    static int calculateInSampleSize(int origWidth, int origHeight, int reqWidth, int reqHeight) {
++        if (reqWidth <= 0 || reqHeight <= 0) {
++            return 1;
++        }
++
++        int inSampleSize = 1;
++        while (origWidth / (inSampleSize * 2) >= reqWidth
++                && origHeight / (inSampleSize * 2) >= reqHeight) {
++            inSampleSize *= 2;
++        }
++        return inSampleSize;
++    }
++
+     // Resize image
+     // When decoding a jpg to bitmap all exif meta data will be lost, so make sure to copy orientation exif to new file else image might have wrong orientations
+     public static Uri resizeImage(Uri uri, Context context, Options options) {
+@@ -216,7 +233,17 @@ public class Utils {
+ 
+             try (InputStream imageStream = context.getContentResolver().openInputStream(uri)) {
+                 String mimeType = getMimeType(uri, context);
+-                Bitmap b = BitmapFactory.decodeStream(imageStream);
++                /**
++                 * Decoded straight to a size near the requested one. Reading the stream at
++                 * full resolution first allocates the entire source bitmap, four bytes per
++                 * pixel, which for a high-megapixel photo exceeds the heap and raises an
++                 * OutOfMemoryError. That is an Error rather than an Exception, so nothing
++                 * here catches it and the caller is left without a response.
++                 */
++                BitmapFactory.Options decodeOptions = new BitmapFactory.Options();
++                decodeOptions.inSampleSize =
++                        calculateInSampleSize(origDimens[0], origDimens[1], newDimens[0], newDimens[1]);
++                Bitmap b = BitmapFactory.decodeStream(imageStream, null, decodeOptions);
+                 String originalOrientation = getOrientation(uri, context);
+ 
+                 if (needToSwapDimension(originalOrientation)) {
+@@ -246,7 +273,15 @@ public class Utils {
+ 
+     static String getOrientation(Uri uri, Context context) throws IOException {
+         ExifInterface exifInterface = new ExifInterface(context.getContentResolver().openInputStream(uri));
+-        return exifInterface.getAttribute(ExifInterface.TAG_ORIENTATION);
++        String orientation = exifInterface.getAttribute(ExifInterface.TAG_ORIENTATION);
++        /**
++         * An image with no orientation tag, a screenshot for instance, reports null here,
++         * and both callers dereference this value: reading dimensions and writing the
++         * resized file each raise a NullPointerException that resizeImage swallows, so the
++         * original full-resolution image is handed back as if no resize had been asked for.
++         * Undefined is the neutral value both callers already treat as "leave it alone".
++         */
++        return orientation != null ? orientation : String.valueOf(ExifInterface.ORIENTATION_UNDEFINED);
+     }
+ 
+     // ExifInterface.saveAttributes is costly operation so don't set exif for unnecessary orientations
+diff --git a/node_modules/react-native-image-picker/ios/ImagePickerManager.mm b/node_modules/react-native-image-picker/ios/ImagePickerManager.mm
+index 93e99be..5157930 100644
+--- a/node_modules/react-native-image-picker/ios/ImagePickerManager.mm
++++ b/node_modules/react-native-image-picker/ios/ImagePickerManager.mm
+@@ -165,9 +165,20 @@ NSData* extractImageData(UIImage* image){
+ 
+     UIImage* newImage = image;
+     if (![fileType isEqualToString:@"gif"]) {
+-        newImage = [ImagePickerUtils resizeImage:image
+-                                     maxWidth:[self.options[@"maxWidth"] floatValue]
+-                                    maxHeight:[self.options[@"maxHeight"] floatValue]];
++        float maxWidth = [self.options[@"maxWidth"] floatValue];
++        float maxHeight = [self.options[@"maxHeight"] floatValue];
++        /**
++         * Bounded during the decode, before the resize. Handing the picked image straight
++         * to resizeImage makes its [image drawInRect:] materialise every pixel of the
++         * source, which is the allocation a caller setting a bound is asking to avoid.
++         */
++        UIImage* sourceImage = [ImagePickerUtils boundedImage:image
++                                                         data:data
++                                                     maxWidth:maxWidth
++                                                    maxHeight:maxHeight];
++        newImage = [ImagePickerUtils resizeImage:sourceImage
++                                     maxWidth:maxWidth
++                                    maxHeight:maxHeight];
+     }
+ 
+     float quality = [self.options[@"quality"] floatValue];
+diff --git a/node_modules/react-native-image-picker/ios/ImagePickerUtils.h b/node_modules/react-native-image-picker/ios/ImagePickerUtils.h
+index 3cd8bfc..90dea80 100644
+--- a/node_modules/react-native-image-picker/ios/ImagePickerUtils.h
++++ b/node_modules/react-native-image-picker/ios/ImagePickerUtils.h
+@@ -13,6 +13,8 @@
+ 
+ + (NSString*)getFileType:(NSData*)imageData;
+ 
+++ (UIImage*)boundedImage:(UIImage*)image data:(NSData*)data maxWidth:(float)maxWidth maxHeight:(float)maxHeight;
++
+ + (UIImage*)resizeImage:(UIImage*)image maxWidth:(float)maxWidth maxHeight:(float)maxHeight;
+ 
+ + (CGSize)getVideoDimensionsFromUrl:(NSURL *)url;
+diff --git a/node_modules/react-native-image-picker/ios/ImagePickerUtils.mm b/node_modules/react-native-image-picker/ios/ImagePickerUtils.mm
+index 443500d..20b213e 100644
+--- a/node_modules/react-native-image-picker/ios/ImagePickerUtils.mm
++++ b/node_modules/react-native-image-picker/ios/ImagePickerUtils.mm
+@@ -1,5 +1,6 @@
+ #import "ImagePickerUtils.h"
+ #import <CoreServices/CoreServices.h>
++#import <ImageIO/ImageIO.h>
+ #import <PhotosUI/PhotosUI.h>
+ 
+ @implementation ImagePickerUtils
+@@ -145,6 +146,51 @@
+     return CGSizeMake(0, 0);
+ }
+ 
++/**
++ * The source bitmap for a resize, read back from the data already bounded instead of
++ * decoded at full resolution first. resizeImage scales a UIImage that is in memory, and
++ * a picked image is lazy: [image drawInRect:] is what forces the source decode, so a
++ * 144MP pick allocates 576MB before the resize it was asked for can shrink anything.
++ * ImageIO reads the header, subsamples during the decode and only ever holds the bounded
++ * result. The original image is returned whenever no bound was asked for, the image is
++ * already inside it, or ImageIO cannot read the data, so those paths keep their behaviour.
++ */
+++ (UIImage*)boundedImage:(UIImage*)image data:(NSData*)data maxWidth:(float)maxWidth maxHeight:(float)maxHeight
++{
++    if ((maxWidth <= 0) || (maxHeight <= 0) || (data == nil)) {
++        return image;
++    }
++
++    if (image.size.width <= maxWidth && image.size.height <= maxHeight) {
++        return image;
++    }
++
++    CGImageSourceRef source = CGImageSourceCreateWithData((__bridge CFDataRef)data, (__bridge CFDictionaryRef)@{
++        (__bridge id)kCGImageSourceShouldCache: @NO
++    });
++    if (source == NULL) {
++        return image;
++    }
++
++    NSDictionary *thumbnailOptions = @{
++        (__bridge id)kCGImageSourceCreateThumbnailFromImageAlways: @YES,
++        (__bridge id)kCGImageSourceCreateThumbnailWithTransform: @YES,
++        (__bridge id)kCGImageSourceShouldCacheImmediately: @YES,
++        (__bridge id)kCGImageSourceThumbnailMaxPixelSize: @(MAX(maxWidth, maxHeight))
++    };
++    CGImageRef boundedRef = CGImageSourceCreateThumbnailAtIndex(source, 0, (__bridge CFDictionaryRef)thumbnailOptions);
++    CFRelease(source);
++
++    if (boundedRef == NULL) {
++        return image;
++    }
++
++    UIImage *result = [UIImage imageWithCGImage:boundedRef];
++    CGImageRelease(boundedRef);
++
++    return result;
++}
++
+ + (UIImage*)resizeImage:(UIImage*)image maxWidth:(float)maxWidth maxHeight:(float)maxHeight
+ {
+     if ((maxWidth == 0) || (maxHeight == 0)) {

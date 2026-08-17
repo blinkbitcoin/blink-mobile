@@ -30,7 +30,6 @@ import { useLevel } from "@app/graphql/level-context"
 import {
   decodeInvoiceString,
   Network as NetworkLibGaloy,
-  PaymentType,
 } from "@blinkbitcoin/blink-client"
 import { NavigationProp, RouteProp, useNavigation } from "@react-navigation/native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
@@ -49,7 +48,7 @@ import {
 import { reportError } from "@app/utils/error-logging"
 
 import { FeeTierSelector } from "./fee-tier-selector"
-import { useOnchainFeeAlert } from "./hooks/use-onchain-fee-alert"
+import { shouldWarnAboutHighFee } from "./hooks/onchain-fee-alert"
 import { useOnchainFeeTierOptions } from "./hooks/use-onchain-fee-tier-options"
 import { useSendWallets } from "./hooks/use-send-wallets"
 
@@ -143,13 +142,22 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
 
   const [paymentDetail, setPaymentDetail] =
     useState<PaymentDetail<WalletCurrency> | null>(null)
-  const { feeTier, setFeeTier, feeTierOptions, feeTierErrorMessage } =
-    useOnchainFeeTierOptions({
-      paymentDetail,
-      isSelfCustodial,
-      paymentDestination,
-      convertMoneyAmount: _convertMoneyAmount,
-    })
+  const {
+    feeTier,
+    setFeeTier,
+    feeTierOptions,
+    feeTierErrorMessage,
+    isFeeTierErrorBlocking,
+    isQuotingFees,
+    isOnchain,
+    selectedTierFee,
+    hasFeeQuote,
+  } = useOnchainFeeTierOptions({
+    paymentDetail,
+    isSelfCustodial,
+    paymentDestination,
+    convertMoneyAmount: _convertMoneyAmount,
+  })
 
   const handleFeeTierChange = (tier: typeof feeTier) => {
     const rebuilt = setFeeTier(tier, paymentDetail)
@@ -221,11 +229,11 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     zeroDisplayAmount,
   ])
 
-  const alertHighFees = useOnchainFeeAlert({
+  const alertHighFees = shouldWarnAboutHighFee({
     paymentDetail,
-    walletId: btcWallet?.id as string,
-    network,
     isSelfCustodial,
+    selectedTierFee,
+    hasFeeQuote,
   })
 
   if (!paymentDetail) {
@@ -448,6 +456,26 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
       }
     })
 
+  /**
+   * Held while the quote is out, because the high-fee warning is judged by the fee the
+   * selector quoted: leaving before it lands is leaving without the warning. The fee this
+   * screen probed on mount used to stand in for it, which the picked tier's own fee replaced.
+   */
+  const isNextDisabled =
+    !goToNextScreen ||
+    !amountStatus.validAmount ||
+    isFeeTierErrorBlocking ||
+    isQuotingFees
+
+  /**
+   * The extra-info box shows one message, and an invalid amount is the one the sender can
+   * act on. A fee error only takes the box once the amount is valid, or when it blocks the
+   * send outright, since then there is nothing to continue to whatever the amount reads.
+   */
+  const shouldShowFeeTierError = amountStatus.validAmount || isFeeTierErrorBlocking
+  const extraInfoErrorMessage =
+    asyncErrorMessage || (shouldShowFeeTierError ? feeTierErrorMessage : undefined)
+
   const setAmount = (moneyAmount: MoneyAmount<WalletOrDisplayCurrency>) => {
     setPaymentDetail((paymentDetail) =>
       paymentDetail?.setAmount ? paymentDetail.setAmount(moneyAmount) : paymentDetail,
@@ -601,13 +629,14 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
             />
           </View>
         </View>
-        {isSelfCustodial && paymentDetail.paymentType === PaymentType.Onchain && (
+        {isOnchain && (
           <View style={styles.fieldContainer}>
             <FeeTierSelector
               title={LL.SendBitcoinScreen.feeTier()}
               options={feeTierOptions}
               selected={feeTier}
               onSelect={handleFeeTierChange}
+              loading={isQuotingFees}
             />
           </View>
         )}
@@ -622,7 +651,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
           />
         </View>
         <SendBitcoinDetailsExtraInfo
-          errorMessage={asyncErrorMessage || feeTierErrorMessage}
+          errorMessage={extraInfoErrorMessage}
           amountStatus={amountStatus}
           currentLevel={currentLevel}
         />
@@ -630,9 +659,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
           <GaloyPrimaryButton
             onPress={goToNextScreen || undefined}
             loading={isLoadingLnurl}
-            disabled={
-              !goToNextScreen || !amountStatus.validAmount || Boolean(feeTierErrorMessage)
-            }
+            disabled={isNextDisabled}
             title={LL.common.next()}
           />
         </View>
