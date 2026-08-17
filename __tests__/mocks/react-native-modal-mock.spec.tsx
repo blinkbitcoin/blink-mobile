@@ -1,6 +1,6 @@
 import React from "react"
 import { Text } from "react-native"
-import { render } from "@testing-library/react-native"
+import { fireEvent, render } from "@testing-library/react-native"
 
 import ModalMock from "@mocks/react-native-modal-mock"
 
@@ -26,6 +26,29 @@ describe("react-native-modal mock", () => {
     )
 
     expect(queryByText("inside")).toBeNull()
+  })
+
+  it("exposes both dismissal handlers the app wires up", () => {
+    // custom-modal.tsx routes onBackdropPress and onBackButtonPress to
+    // toggleModal; a stand-in that dropped them would delete that coverage from
+    // every spec that adopts it, silently and while staying green.
+    const onBackdropPress = jest.fn()
+    const onBackButtonPress = jest.fn()
+    const { getByTestId } = render(
+      <ModalMock
+        isVisible={true}
+        onBackdropPress={onBackdropPress}
+        onBackButtonPress={onBackButtonPress}
+      >
+        <Text>inside</Text>
+      </ModalMock>,
+    )
+
+    fireEvent.press(getByTestId("backdrop"))
+    fireEvent.press(getByTestId("back-button"))
+
+    expect(onBackdropPress).toHaveBeenCalledTimes(1)
+    expect(onBackButtonPress).toHaveBeenCalledTimes(1)
   })
 
   it("is importable the way jest.mock consumes it", () => {

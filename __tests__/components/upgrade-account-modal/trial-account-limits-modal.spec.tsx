@@ -1,5 +1,5 @@
 import React from "react"
-import { render, waitFor } from "@testing-library/react-native"
+import { fireEvent, render, waitFor } from "@testing-library/react-native"
 
 import { MockedProvider, MockedResponse } from "@apollo/client/testing"
 import { ThemeProvider } from "@rn-vui/themed"
@@ -13,9 +13,11 @@ jest.mock("react-native-modal", () =>
   jest.requireActual("@mocks/react-native-modal-mock"),
 )
 
+const mockNavigate = jest.fn()
+
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
-  useNavigation: () => ({ navigate: jest.fn() }),
+  useNavigation: () => ({ navigate: mockNavigate }),
 }))
 
 import { TrialAccountLimitsModal } from "@app/components/upgrade-account-modal"
@@ -55,6 +57,35 @@ const wrap = (
 )
 
 describe("TrialAccountLimitsModal", () => {
+  beforeEach(() => mockNavigate.mockClear())
+
+  it("sends the upgrade CTA to phone login as an account creation", () => {
+    // The route type is asserted as the literal wire value, not as
+    // PhoneLoginInitiateType.CreateAccount: reading the constant the component
+    // reads makes the assertion move with any change to its value, so only a
+    // rename would fail — and tsc already catches that.
+    const beforeSubmit = jest.fn()
+    const closeModal = jest.fn()
+    const { getByText } = render(
+      wrap(
+        <TrialAccountLimitsModal
+          isVisible={true}
+          closeModal={closeModal}
+          beforeSubmit={beforeSubmit}
+        />,
+      ),
+    )
+
+    fireEvent.press(getByText(LL.UpgradeAccountModal.upgradeToLevel({ level: 1 })))
+
+    expect(beforeSubmit).toHaveBeenCalledTimes(1)
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "login",
+      expect.objectContaining({ type: "CreateAccount", onboarding: true }),
+    )
+    expect(closeModal).toHaveBeenCalledTimes(1)
+  })
+
   it("renders the level 1 benefit items", async () => {
     const { getByText } = render(
       wrap(<TrialAccountLimitsModal isVisible={true} closeModal={jest.fn()} />, [
