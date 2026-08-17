@@ -9,7 +9,7 @@ import { makeStyles, useTheme } from "@rn-vui/themed"
 // HeaderBackButton was tuned for the old JS stack (no such inset), so it now sits
 // ~10px too far right. Pull it back on Android to restore the previous position.
 // (Migration to native-stack: PR #3840 / commit 4b6bff263.)
-const BACK_BUTTON_INSET_CORRECTION = Platform.OS === "android" ? -10 : 0
+const ANDROID_BACK_BUTTON_INSET_CORRECTION = -10
 
 export const InvisibleBackButton = (): React.ReactNode => {
   const styles = useStyles()
@@ -20,7 +20,7 @@ export const InvisibleBackButton = (): React.ReactNode => {
       importantForAccessibility="no-hide-descendants"
       style={styles.container}
     >
-      <HeaderBackButton onPress={() => {}} style={styles.backButton} />
+      <HeaderBackButton style={styles.backButton} />
     </View>
   )
 }
@@ -51,11 +51,16 @@ const HeaderBackButtonWithTheme = (
 export const headerBackControl = ({ canGoBack = true }: HeaderBackControlParams = {}) =>
   canGoBack ? HeaderBackButtonWithTheme : InvisibleBackButton
 
-const useStyles = makeStyles(() => ({
-  container: {
-    opacity: 0,
-  },
-  backButton: {
-    marginLeft: BACK_BUTTON_INSET_CORRECTION,
-  },
-}))
+const useStyles = makeStyles(() => {
+  const isAndroid = Platform.OS === "android"
+  const backButtonInsetCorrection = isAndroid ? ANDROID_BACK_BUTTON_INSET_CORRECTION : 0
+
+  return {
+    container: {
+      opacity: 0,
+    },
+    backButton: {
+      marginLeft: backButtonInsetCorrection,
+    },
+  }
+})
