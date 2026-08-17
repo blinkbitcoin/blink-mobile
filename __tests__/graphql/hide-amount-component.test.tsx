@@ -47,6 +47,7 @@ const Harness: React.FC<{ initialState: PersistentState }> = ({ initialState }) 
         setPersistentState((prev) => update(prev) ?? prev)
       },
       resetState: jest.fn(),
+      clearToken: jest.fn().mockResolvedValue(undefined),
     }),
     [persistentState],
   )

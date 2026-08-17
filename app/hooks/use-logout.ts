@@ -26,7 +26,7 @@ gql`
 `
 
 const useLogout = () => {
-  const { resetState } = usePersistentStateContext()
+  const { resetState, clearToken } = usePersistentStateContext()
   const [userLogoutMutation] = useUserLogoutMutation({
     fetchPolicy: "no-cache",
   })
@@ -48,15 +48,18 @@ const useLogout = () => {
           reportError("logout device token fetch", err)
         }
 
-        let context
+        let context: { headers: { authorization: string } } | undefined
         if (token) {
           await KeyStoreWrapper.removeSessionProfileByToken(token)
           // Removing the profile that backs the active session must also drop
           // the keychain token: a crash before the caller saves the next
           // token would otherwise resurrect a session whose profile is gone.
+          // Via the provider, so its dirty-check ref learns the slot is empty —
+          // a direct keystore removal would leave the ref stale and make every
+          // later save skip the write it thinks already happened.
           const activeToken = await KeyStoreWrapper.getActiveToken()
           if (activeToken === token) {
-            await KeyStoreWrapper.removeActiveToken()
+            await clearToken()
           }
           context = { headers: { authorization: `Bearer ${token}` } }
         } else {
@@ -65,7 +68,7 @@ const useLogout = () => {
           await KeyStoreWrapper.removePin()
           await KeyStoreWrapper.removePinAttempts()
           await KeyStoreWrapper.removeSessionProfiles()
-          await KeyStoreWrapper.removeActiveToken()
+          await clearToken()
         }
 
         logLogout()
@@ -96,7 +99,7 @@ const useLogout = () => {
         }
       }
     },
-    [resetState, userLogoutMutation],
+    [resetState, clearToken, userLogoutMutation],
   )
 
   return {

@@ -15,6 +15,7 @@ const mockRemoveSessionProfiles = jest.fn()
 const mockRemoveSessionProfileByToken = jest.fn()
 const mockGetActiveToken = jest.fn()
 const mockRemoveActiveToken = jest.fn()
+const mockClearToken = jest.fn()
 
 jest.mock("@app/graphql/generated", () => ({
   ...jest.requireActual("@app/graphql/generated"),
@@ -22,7 +23,10 @@ jest.mock("@app/graphql/generated", () => ({
 }))
 
 jest.mock("@app/store/persistent-state", () => ({
-  usePersistentStateContext: () => ({ resetState: mockResetState }),
+  usePersistentStateContext: () => ({
+    resetState: mockResetState,
+    clearToken: (...args: unknown[]) => mockClearToken(...args),
+  }),
 }))
 
 jest.mock("@app/utils/analytics", () => ({
@@ -73,6 +77,7 @@ describe("useLogout", () => {
     mockRemoveSessionProfileByToken.mockResolvedValue(true)
     mockGetActiveToken.mockResolvedValue("")
     mockRemoveActiveToken.mockResolvedValue(true)
+    mockClearToken.mockResolvedValue(undefined)
   })
 
   it("full logout removes the active token from the keychain alongside the other secrets", async () => {
@@ -86,7 +91,10 @@ describe("useLogout", () => {
     expect(mockRemovePin).toHaveBeenCalledTimes(1)
     expect(mockRemovePinAttempts).toHaveBeenCalledTimes(1)
     expect(mockRemoveSessionProfiles).toHaveBeenCalledTimes(1)
-    expect(mockRemoveActiveToken).toHaveBeenCalledTimes(1)
+    // Through the provider, never straight at the keystore: the provider owns
+    // the slot and the ref that tracks what it durably holds.
+    expect(mockClearToken).toHaveBeenCalledTimes(1)
+    expect(mockRemoveActiveToken).not.toHaveBeenCalled()
     expect(mockResetState).toHaveBeenCalledTimes(1)
   })
 
@@ -103,6 +111,7 @@ describe("useLogout", () => {
     })
 
     expect(mockRemoveSessionProfileByToken).toHaveBeenCalledWith("other-profile-token")
+    expect(mockClearToken).not.toHaveBeenCalled()
     expect(mockRemoveActiveToken).not.toHaveBeenCalled()
     expect(mockResetState).not.toHaveBeenCalled()
   })
@@ -122,7 +131,8 @@ describe("useLogout", () => {
     })
 
     expect(mockRemoveSessionProfileByToken).toHaveBeenCalledWith("active-token")
-    expect(mockRemoveActiveToken).toHaveBeenCalledTimes(1)
+    expect(mockClearToken).toHaveBeenCalledTimes(1)
+    expect(mockRemoveActiveToken).not.toHaveBeenCalled()
   })
 
   it("revokes the session server-side when a valid token and device token are available", async () => {
@@ -169,7 +179,10 @@ describe("useLogout", () => {
     expect(mockRemovePin).toHaveBeenCalledTimes(1)
     expect(mockRemovePinAttempts).toHaveBeenCalledTimes(1)
     expect(mockRemoveSessionProfiles).toHaveBeenCalledTimes(1)
-    expect(mockRemoveActiveToken).toHaveBeenCalledTimes(1)
+    // Through the provider, never straight at the keystore: the provider owns
+    // the slot and the ref that tracks what it durably holds.
+    expect(mockClearToken).toHaveBeenCalledTimes(1)
+    expect(mockRemoveActiveToken).not.toHaveBeenCalled()
     expect(mockResetState).toHaveBeenCalledTimes(1)
   })
 })

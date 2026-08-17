@@ -562,6 +562,55 @@ describe("KeyStoreWrapper active-token methods", () => {
     })
   })
 
+  describe("readActiveToken", () => {
+    // Both native modules reject a missing key rather than resolving empty, so
+    // "no token" and "the read went wrong" arrive as the same rejection and
+    // only the code separates them. Callers that would overwrite or delete a
+    // credential on an empty read depend on this distinction.
+    const keyNotFound = () =>
+      Object.assign(new Error("key does not present"), {
+        code: "404",
+      })
+
+    it("reports a stored token as found", async () => {
+      mockGet.mockResolvedValue("ory_st_secret")
+
+      expect(await KeyStoreWrapper.readActiveToken()).toEqual({
+        status: "found",
+        token: "ory_st_secret",
+      })
+    })
+
+    it("reports the 404 rejection as absent, not as a failure", async () => {
+      mockGet.mockRejectedValue(keyNotFound())
+
+      expect(await KeyStoreWrapper.readActiveToken()).toEqual({ status: "absent" })
+    })
+
+    it("reports any other rejection as a failed read", async () => {
+      const err = Object.assign(new Error("keystore locked"), { code: "9" })
+      mockGet.mockRejectedValue(err)
+
+      expect(await KeyStoreWrapper.readActiveToken()).toEqual({ status: "failed", err })
+    })
+
+    it("treats a codeless rejection as a failed read rather than assuming absence", async () => {
+      mockGet.mockRejectedValue(new Error("something unexpected"))
+
+      const result = await KeyStoreWrapper.readActiveToken()
+
+      expect(result.status).toBe("failed")
+    })
+
+    it("collapses to an empty string through getActiveToken either way", async () => {
+      mockGet.mockRejectedValue(keyNotFound())
+      expect(await KeyStoreWrapper.getActiveToken()).toBe("")
+
+      mockGet.mockRejectedValue(new Error("keystore locked"))
+      expect(await KeyStoreWrapper.getActiveToken()).toBe("")
+    })
+  })
+
   describe("setActiveToken", () => {
     it("writes the token with ALWAYS_THIS_DEVICE_ONLY accessibility", async () => {
       mockSet.mockResolvedValue(undefined)

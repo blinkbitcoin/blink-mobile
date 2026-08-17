@@ -8,14 +8,12 @@ import {
 } from "@app/store/persistent-state"
 import { defaultPersistentState } from "@app/store/persistent-state/state-migrations"
 
-const mockLoadJson = jest.fn()
 const mockSaveJson = jest.fn()
 const mockSaveString = jest.fn()
 const mockLoadString = jest.fn()
 const mockGetAllKeys = jest.fn()
 
 jest.mock("@app/utils/storage", () => ({
-  loadJson: (...args: unknown[]) => mockLoadJson(...args),
   saveJson: (...args: unknown[]) => mockSaveJson(...args),
   saveString: (...args: unknown[]) => mockSaveString(...args),
   loadString: (...args: unknown[]) => mockLoadString(...args),
@@ -23,6 +21,7 @@ jest.mock("@app/utils/storage", () => ({
 }))
 
 const mockGetActiveToken = jest.fn()
+const mockReadActiveToken = jest.fn()
 const mockSetActiveToken = jest.fn()
 const mockRemoveActiveToken = jest.fn()
 const mockClearUninstallSurvivingCredentials = jest.fn()
@@ -31,12 +30,29 @@ jest.mock("@app/utils/storage/secureStorage", () => ({
   __esModule: true,
   default: {
     getActiveToken: (...args: unknown[]) => mockGetActiveToken(...args),
+    readActiveToken: (...args: unknown[]) => mockReadActiveToken(...args),
     setActiveToken: (...args: unknown[]) => mockSetActiveToken(...args),
     removeActiveToken: (...args: unknown[]) => mockRemoveActiveToken(...args),
     clearUninstallSurvivingCredentials: (...args: unknown[]) =>
       mockClearUninstallSurvivingCredentials(...args),
   },
 }))
+
+const PERSISTENT_STATE_KEY = "persistentState"
+
+// Every string the fake storage holds, keyed the way production asks for it:
+// the blob under persistentState plus whatever quarantine entries a test seeds.
+// The provider reads the blob as text and parses it itself, so a fixture is a
+// JSON string, and a test can hand it bytes that do not parse.
+const storedStrings = new Map<string, string>()
+
+const setPersistedBlob = (value: unknown) => {
+  storedStrings.set(PERSISTENT_STATE_KEY, JSON.stringify(value))
+}
+
+const setRawPersistedBlob = (raw: string) => {
+  storedStrings.set(PERSISTENT_STATE_KEY, raw)
+}
 
 const mockRecordError = jest.fn()
 jest.mock("@react-native-firebase/crashlytics", () => () => ({
@@ -76,6 +92,7 @@ const TestConsumer: React.FC = () => {
         }
       />
       <TouchableOpacity testID="reset-btn" onPress={ctx.resetState} />
+      <TouchableOpacity testID="clear-token-btn" onPress={() => ctx.clearToken()} />
     </>
   )
 }
@@ -83,11 +100,18 @@ const TestConsumer: React.FC = () => {
 // Shared across the top-level describes (split to satisfy max-lines-per-function)
 const setupStorageMockDefaults = () => {
   jest.clearAllMocks()
+  storedStrings.clear()
   mockSaveJson.mockResolvedValue(undefined)
   mockSaveString.mockResolvedValue(true)
-  mockLoadString.mockResolvedValue(null)
+  mockLoadString.mockImplementation(async (key: string) => storedStrings.get(key) ?? null)
   mockGetAllKeys.mockResolvedValue([])
   mockGetActiveToken.mockResolvedValue("")
+  // Derived from getActiveToken so the plain fixtures keep working; tests that
+  // care about miss-vs-error override readActiveToken directly.
+  mockReadActiveToken.mockImplementation(async () => {
+    const token = await mockGetActiveToken()
+    return token ? { status: "found", token } : { status: "absent" }
+  })
   mockSetActiveToken.mockResolvedValue(true)
   mockRemoveActiveToken.mockResolvedValue(true)
   mockClearUninstallSurvivingCredentials.mockResolvedValue(undefined)
@@ -98,7 +122,7 @@ describe("PersistentStateProvider", () => {
 
   it("renders nothing (null) while state is loading", async () => {
     // Never resolve — keeps the provider in loading state
-    mockLoadJson.mockReturnValue(new Promise(() => {}))
+    mockLoadString.mockReturnValue(new Promise(() => {}))
 
     render(
       <PersistentStateProvider>
@@ -112,7 +136,7 @@ describe("PersistentStateProvider", () => {
   })
 
   it("loads persisted state and renders children", async () => {
-    mockLoadJson.mockResolvedValue(scrubbedBlob)
+    setPersistedBlob(scrubbedBlob)
     mockGetActiveToken.mockResolvedValue("saved-token")
 
     render(
@@ -134,7 +158,7 @@ describe("PersistentStateProvider", () => {
   })
 
   it("falls back to default state when no persisted data exists", async () => {
-    mockLoadJson.mockResolvedValue(null)
+    storedStrings.delete(PERSISTENT_STATE_KEY)
 
     render(
       <PersistentStateProvider>
@@ -155,7 +179,7 @@ describe("PersistentStateProvider", () => {
     // The iOS keychain survives uninstall; a fresh install must not resurrect
     // the previous session. Which credentials are wiped (and the retry
     // behavior) is owned and tested by secureStorage — this locks the trigger.
-    mockLoadJson.mockResolvedValue(null)
+    storedStrings.delete(PERSISTENT_STATE_KEY)
     mockGetActiveToken.mockResolvedValue("token-from-before-uninstall")
 
     render(
@@ -173,7 +197,7 @@ describe("PersistentStateProvider", () => {
   })
 
   it("reports each failed credential wipe to crashlytics by name", async () => {
-    mockLoadJson.mockResolvedValue(null)
+    storedStrings.delete(PERSISTENT_STATE_KEY)
     // The loader supplies the reporting callback; a wipe failure surfaces
     // through it, named, and never throws into the boot path.
     mockClearUninstallSurvivingCredentials.mockImplementation(
@@ -201,7 +225,7 @@ describe("PersistentStateProvider", () => {
   it("does not clear credentials for an unrecognized schema version", async () => {
     // A downgrade from a future build is not a reinstall: the blob exists but
     // can't be read. The session must survive the round trip.
-    mockLoadJson.mockResolvedValue({ schemaVersion: 99, galoyInstance: { id: "Main" } })
+    setPersistedBlob({ schemaVersion: 99, galoyInstance: { id: "Main" } })
     mockGetActiveToken.mockResolvedValue("kc-token")
 
     render(
@@ -220,7 +244,7 @@ describe("PersistentStateProvider", () => {
   })
 
   it("does NOT save state on initial load (no-op write guard)", async () => {
-    mockLoadJson.mockResolvedValue(scrubbedBlob)
+    setPersistedBlob(scrubbedBlob)
     mockGetActiveToken.mockResolvedValue("existing")
 
     render(
@@ -245,7 +269,7 @@ describe("PersistentStateProvider", () => {
   })
 
   it("saves state after updateState is called, splitting the token into the keychain", async () => {
-    mockLoadJson.mockResolvedValue(scrubbedBlob)
+    setPersistedBlob(scrubbedBlob)
     mockGetActiveToken.mockResolvedValue("old-token")
 
     render(
@@ -275,7 +299,7 @@ describe("PersistentStateProvider", () => {
   })
 
   it("does not touch the keychain when a state change leaves the token unchanged", async () => {
-    mockLoadJson.mockResolvedValue(scrubbedBlob)
+    setPersistedBlob(scrubbedBlob)
     mockGetActiveToken.mockResolvedValue("stable-token")
 
     render(
@@ -301,7 +325,7 @@ describe("PersistentStateProvider", () => {
   })
 
   it("saves state after resetState is called, removing the keychain token", async () => {
-    mockLoadJson.mockResolvedValue(scrubbedBlob)
+    setPersistedBlob(scrubbedBlob)
     mockGetActiveToken.mockResolvedValue("some-token")
 
     render(
@@ -335,7 +359,7 @@ describe("PersistentStateProvider", () => {
   })
 
   it("reports a failed save to crashlytics instead of crashing, keeping the update in memory", async () => {
-    mockLoadJson.mockResolvedValue(scrubbedBlob)
+    setPersistedBlob(scrubbedBlob)
     mockGetActiveToken.mockResolvedValue("old-token")
     mockSaveJson.mockRejectedValueOnce(new Error("saveJson timed out"))
 
@@ -365,7 +389,7 @@ describe("PersistentStateProvider", () => {
   })
 
   it("reports a failed keychain write and retries it on the next state change", async () => {
-    mockLoadJson.mockResolvedValue(scrubbedBlob)
+    setPersistedBlob(scrubbedBlob)
     mockGetActiveToken.mockResolvedValue("old-token")
     mockSetActiveToken.mockResolvedValueOnce(false)
 
@@ -401,7 +425,7 @@ describe("PersistentStateProvider", () => {
   })
 
   it("serializes saves: a queued save waits for the slow one before it", async () => {
-    mockLoadJson.mockResolvedValue(scrubbedBlob)
+    setPersistedBlob(scrubbedBlob)
     mockGetActiveToken.mockResolvedValue("old-token")
 
     render(
@@ -452,7 +476,7 @@ describe("PersistentStateProvider", () => {
     }
 
     it("adopts a legacy blob token into the keychain and re-saves the blob without it", async () => {
-      mockLoadJson.mockResolvedValue(legacyBlob)
+      setPersistedBlob(legacyBlob)
 
       render(
         <PersistentStateProvider>
@@ -475,7 +499,7 @@ describe("PersistentStateProvider", () => {
     })
 
     it("does not scrub the blob when keychain adoption fails", async () => {
-      mockLoadJson.mockResolvedValue(legacyBlob)
+      setPersistedBlob(legacyBlob)
       mockSetActiveToken.mockResolvedValue(false)
 
       render(
@@ -500,7 +524,7 @@ describe("PersistentStateProvider", () => {
     })
 
     it("retries the keychain write on the first save after a failed boot adoption", async () => {
-      mockLoadJson.mockResolvedValue(legacyBlob)
+      setPersistedBlob(legacyBlob)
       mockSetActiveToken.mockResolvedValue(false)
 
       render(
@@ -532,7 +556,7 @@ describe("PersistentStateProvider", () => {
     })
 
     it("reports but survives a saveJson failure during the boot-time blob scrub", async () => {
-      mockLoadJson.mockResolvedValue(legacyBlob)
+      setPersistedBlob(legacyBlob)
       mockSaveJson.mockRejectedValueOnce(new Error("disk full"))
 
       render(
@@ -553,7 +577,7 @@ describe("PersistentStateProvider", () => {
     })
 
     it("prefers the keychain token over a stale blob token and still scrubs the blob", async () => {
-      mockLoadJson.mockResolvedValue(legacyBlob)
+      setPersistedBlob(legacyBlob)
       mockGetActiveToken.mockResolvedValue("keychain-token")
 
       render(
@@ -582,13 +606,11 @@ describe("PersistentStateProvider quarantine token hygiene", () => {
   // The sweep reads the done-marker first; answer per key so the marker
   // lookup stays null while quarantine keys return their payloads.
   const mockQuarantineEntries = (entries: Record<string, string>) => {
-    mockLoadString.mockImplementation((key: string) =>
-      Promise.resolve(entries[key] ?? null),
-    )
+    Object.entries(entries).forEach(([key, value]) => storedStrings.set(key, value))
   }
 
   it("redacts the token from pre-existing quarantine keys at load", async () => {
-    mockLoadJson.mockResolvedValue(scrubbedBlob)
+    setPersistedBlob(scrubbedBlob)
     mockGetAllKeys.mockResolvedValue(["persistentStateQuarantine.123", "unrelatedKey"])
     mockQuarantineEntries({
       "persistentStateQuarantine.123": JSON.stringify({
@@ -614,7 +636,7 @@ describe("PersistentStateProvider quarantine token hygiene", () => {
   })
 
   it("leaves already-redacted quarantine keys alone and marks the sweep done", async () => {
-    mockLoadJson.mockResolvedValue(scrubbedBlob)
+    setPersistedBlob(scrubbedBlob)
     mockGetAllKeys.mockResolvedValue(["persistentStateQuarantine.123"])
     mockQuarantineEntries({
       "persistentStateQuarantine.123": JSON.stringify({
@@ -647,7 +669,7 @@ describe("PersistentStateProvider quarantine token hygiene", () => {
   })
 
   it("scrubs remaining quarantine entries even when one is corrupt", async () => {
-    mockLoadJson.mockResolvedValue(scrubbedBlob)
+    setPersistedBlob(scrubbedBlob)
     mockGetAllKeys.mockResolvedValue([
       "persistentStateQuarantine.100", // corrupt — iterated first
       "persistentStateQuarantine.200", // healthy, still holds a raw token
@@ -675,7 +697,7 @@ describe("PersistentStateProvider quarantine token hygiene", () => {
   })
 
   it("reports a failed redaction write and withholds the done-marker", async () => {
-    mockLoadJson.mockResolvedValue(scrubbedBlob)
+    setPersistedBlob(scrubbedBlob)
     mockGetAllKeys.mockResolvedValue(["persistentStateQuarantine.100"])
     mockQuarantineEntries({
       "persistentStateQuarantine.100": JSON.stringify({ galoyAuthToken: "raw-token" }),
@@ -700,7 +722,7 @@ describe("PersistentStateProvider quarantine token hygiene", () => {
   })
 
   it("skips the sweep entirely once the done-marker exists", async () => {
-    mockLoadJson.mockResolvedValue(scrubbedBlob)
+    setPersistedBlob(scrubbedBlob)
     mockQuarantineEntries({ [SCRUB_DONE_KEY]: "1" })
 
     render(
@@ -735,7 +757,7 @@ describe("PersistentStateProvider migration failure handling", () => {
   }
 
   it("recovers the session from the keychain when migration fails", async () => {
-    mockLoadJson.mockResolvedValue(corruptedState3)
+    setPersistedBlob(corruptedState3)
     mockGetActiveToken.mockResolvedValue("kc-token")
 
     render(
@@ -759,7 +781,7 @@ describe("PersistentStateProvider migration failure handling", () => {
   })
 
   it("reports the migration error to crashlytics instead of silently logging to console", async () => {
-    mockLoadJson.mockResolvedValue(corruptedState3)
+    setPersistedBlob(corruptedState3)
 
     render(
       <PersistentStateProvider>
@@ -777,7 +799,7 @@ describe("PersistentStateProvider migration failure handling", () => {
   })
 
   it("quarantines the raw input with the token redacted before falling back to defaults", async () => {
-    mockLoadJson.mockResolvedValue(corruptedState3)
+    setPersistedBlob(corruptedState3)
     const before = Date.now()
 
     render(
@@ -814,7 +836,7 @@ describe("PersistentStateProvider migration failure handling", () => {
   })
 
   it("records a second error when the quarantine write itself fails, but still mounts with defaults", async () => {
-    mockLoadJson.mockResolvedValue(corruptedState3)
+    setPersistedBlob(corruptedState3)
     // Fail the quarantine write specifically — a blanket mockResolvedValueOnce
     // could be consumed by the concurrent scrub sweep's done-marker write.
     mockSaveString.mockImplementation((key: string) =>
@@ -841,7 +863,7 @@ describe("PersistentStateProvider migration failure handling", () => {
   })
 
   it("does NOT touch crashlytics or the quarantine key on a successful migration", async () => {
-    mockLoadJson.mockResolvedValue(scrubbedBlob)
+    setPersistedBlob(scrubbedBlob)
     mockGetActiveToken.mockResolvedValue("saved")
 
     render(
@@ -863,7 +885,7 @@ describe("PersistentStateProvider migration failure handling", () => {
   })
 
   it("does NOT touch crashlytics or the quarantine key for null persisted data", async () => {
-    mockLoadJson.mockResolvedValue(null)
+    storedStrings.delete(PERSISTENT_STATE_KEY)
 
     render(
       <PersistentStateProvider>
@@ -881,5 +903,302 @@ describe("PersistentStateProvider migration failure handling", () => {
         String(k).startsWith("persistentStateQuarantine."),
       ),
     ).toHaveLength(0)
+  })
+})
+
+// An absent blob means a fresh install and wipes every credential that outlives
+// uninstall. A blob that is present but unreadable means damage — and the whole
+// point of moving the token into the keychain was that damage to the blob must
+// not cost the session.
+describe("PersistentStateProvider unreadable blob handling", () => {
+  beforeEach(setupStorageMockDefaults)
+
+  const truncatedBlob = '{"schemaVersion":16,"galoyInstance":{"id":"Main"},"galoyAu'
+
+  it("keeps the keychain session when the blob does not parse", async () => {
+    setRawPersistedBlob(truncatedBlob)
+    mockGetActiveToken.mockResolvedValue("live-session-token")
+
+    render(
+      <PersistentStateProvider>
+        <TestConsumer />
+      </PersistentStateProvider>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId("token")).toBeTruthy()
+    })
+
+    // Not a reinstall: the credentials that survive uninstall stay put.
+    expect(mockClearUninstallSurvivingCredentials).not.toHaveBeenCalled()
+    expect(screen.getByTestId("token").props.children).toBe("live-session-token")
+    expect(mockRecordError).toHaveBeenCalled()
+    expect(mockRecordError.mock.calls[0][0]).toBeInstanceOf(Error)
+  })
+
+  it("quarantines a description of an unparseable blob, never its bytes", async () => {
+    // The parsed path can redact a known field; here the bytes may be cut
+    // mid-token, so nothing can promise a redaction pass caught the credential.
+    setRawPersistedBlob(`{"galoyAuthToken":"super-secret-token`)
+
+    render(
+      <PersistentStateProvider>
+        <TestConsumer />
+      </PersistentStateProvider>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId("token")).toBeTruthy()
+    })
+
+    const [, payload] = mockSaveString.mock.calls.find(([k]) =>
+      String(k).startsWith("persistentStateQuarantine."),
+    )
+    expect(payload).not.toContain("super-secret-token")
+    const quarantined = JSON.parse(payload)
+    expect(quarantined.unparseable).toBe(true)
+    expect(quarantined.byteLength).toBe(`{"galoyAuthToken":"super-secret-token`.length)
+    expect(typeof quarantined.parseError).toBe("string")
+  })
+
+  it("treats an empty blob as damage rather than a fresh install", async () => {
+    // A zero-length value is not how an absent key reads, so it is a write that
+    // went wrong — and must not be answered by deleting the user's credentials.
+    setRawPersistedBlob("")
+    mockGetActiveToken.mockResolvedValue("live-session-token")
+
+    render(
+      <PersistentStateProvider>
+        <TestConsumer />
+      </PersistentStateProvider>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId("token")).toBeTruthy()
+    })
+
+    expect(mockClearUninstallSurvivingCredentials).not.toHaveBeenCalled()
+    expect(screen.getByTestId("token").props.children).toBe("live-session-token")
+  })
+
+  it("withholds the quarantine done-marker when the key listing fails", async () => {
+    // An empty listing and a failed listing are different facts: marking the
+    // sweep done on a failure would retire it while raw tokens are still there.
+    setPersistedBlob(scrubbedBlob)
+    mockGetAllKeys.mockResolvedValue(null)
+
+    render(
+      <PersistentStateProvider>
+        <TestConsumer />
+      </PersistentStateProvider>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId("token")).toBeTruthy()
+    })
+    await act(async () => {
+      await new Promise<void>((r) => {
+        setTimeout(r, 50)
+      })
+    })
+
+    expect(mockSaveString).not.toHaveBeenCalledWith(
+      "persistentStateQuarantineScrubDone",
+      "1",
+    )
+    expect(
+      mockRecordError.mock.calls.some(([err]) =>
+        String(err?.message).includes("could not list storage keys"),
+      ),
+    ).toBe(true)
+  })
+})
+
+describe("PersistentStateProvider keychain read and removal failures", () => {
+  beforeEach(setupStorageMockDefaults)
+
+  const legacyBlob = {
+    schemaVersion: 16,
+    galoyInstance: { id: "Main" },
+    galoyAuthToken: "legacy-blob-token",
+  }
+
+  it("skips adoption when the keychain read fails, leaving both copies intact", async () => {
+    // A failed read looks exactly like an empty slot. Adopting on it would
+    // overwrite a newer keychain token with the older blob copy and then scrub
+    // the blob, destroying the only record of the newer one.
+    setPersistedBlob(legacyBlob)
+    mockReadActiveToken.mockResolvedValue({
+      status: "failed",
+      err: new Error("keystore locked"),
+    })
+
+    render(
+      <PersistentStateProvider>
+        <TestConsumer />
+      </PersistentStateProvider>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId("token")).toBeTruthy()
+    })
+
+    expect(mockSetActiveToken).not.toHaveBeenCalled()
+    expect(mockSaveJson).not.toHaveBeenCalled()
+    expect(
+      mockRecordError.mock.calls.some(([err]) =>
+        String(err?.message).includes("keychain read failed"),
+      ),
+    ).toBe(true)
+    // The blob copy still backs the session in memory, so the user stays in.
+    expect(screen.getByTestId("token").props.children).toBe("legacy-blob-token")
+  })
+
+  it("retries the keychain write on the next save after a skipped adoption", async () => {
+    setPersistedBlob(legacyBlob)
+    mockReadActiveToken.mockResolvedValue({
+      status: "failed",
+      err: new Error("keystore locked"),
+    })
+
+    render(
+      <PersistentStateProvider>
+        <TestConsumer />
+      </PersistentStateProvider>,
+    )
+    await waitFor(() => {
+      expect(screen.getByTestId("token")).toBeTruthy()
+    })
+
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("update-other-btn"))
+    })
+
+    // Seeded from what the keychain durably holds (nothing), so the very next
+    // save carries the token across instead of assuming it is already there.
+    await waitFor(() => {
+      expect(mockSetActiveToken).toHaveBeenCalledWith("legacy-blob-token")
+    })
+  })
+
+  it("clearToken drops the keychain token and leaves the ref agreeing with it", async () => {
+    setPersistedBlob(scrubbedBlob)
+    mockGetActiveToken.mockResolvedValue("session-token")
+
+    render(
+      <PersistentStateProvider>
+        <TestConsumer />
+      </PersistentStateProvider>,
+    )
+    await waitFor(() => {
+      expect(screen.getByTestId("token")).toBeTruthy()
+    })
+
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("clear-token-btn"))
+    })
+
+    await waitFor(() => {
+      expect(mockRemoveActiveToken).toHaveBeenCalledTimes(1)
+    })
+    expect(screen.getByTestId("token").props.children).toBe("")
+
+    // The ref learned the slot is empty, so an unrelated change does not
+    // re-remove — and, more to the point, a later token WOULD be written
+    // rather than skipped as "already persisted".
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("update-other-btn"))
+    })
+    expect(mockRemoveActiveToken).toHaveBeenCalledTimes(1)
+
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("update-btn"))
+    })
+    await waitFor(() => {
+      expect(mockSetActiveToken).toHaveBeenCalledWith("new-token")
+    })
+  })
+
+  it("retries a refused removal once and reports it instead of swallowing it", async () => {
+    setPersistedBlob(scrubbedBlob)
+    mockGetActiveToken.mockResolvedValue("session-token")
+    mockRemoveActiveToken.mockResolvedValue(false)
+
+    render(
+      <PersistentStateProvider>
+        <TestConsumer />
+      </PersistentStateProvider>,
+    )
+    await waitFor(() => {
+      expect(screen.getByTestId("token")).toBeTruthy()
+    })
+
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("clear-token-btn"))
+    })
+
+    // Four attempts, and the shape matters: two from clearToken (the immediate
+    // retry) and two more from the save its state change queues, which tries
+    // again precisely because the ref was left stale. Without the retry this
+    // would be two.
+    await waitFor(() => {
+      expect(mockRemoveActiveToken).toHaveBeenCalledTimes(4)
+    })
+    expect(
+      mockRecordError.mock.calls.some(([err]) =>
+        String(err?.message).includes("keystore remove failed"),
+      ),
+    ).toBe(true)
+
+    // Ref left stale on purpose, so the next state change tries again…
+    const callsWhileFailing = mockRemoveActiveToken.mock.calls.length
+    mockRemoveActiveToken.mockResolvedValue(true)
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("update-other-btn"))
+    })
+    await waitFor(() => {
+      expect(mockRemoveActiveToken.mock.calls.length).toBeGreaterThan(callsWhileFailing)
+    })
+
+    // …and stops trying once the keystore finally accepts it.
+    const callsAfterSuccess = mockRemoveActiveToken.mock.calls.length
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("update-other-btn"))
+    })
+    expect(mockRemoveActiveToken).toHaveBeenCalledTimes(callsAfterSuccess)
+  })
+
+  it("writes the blob before the keychain within one save", async () => {
+    // Documented order, pinned: the crash window between the two writes leaves
+    // new settings beside the old token, and whoever changes this should have
+    // to change the test that says so.
+    setPersistedBlob(scrubbedBlob)
+    mockGetActiveToken.mockResolvedValue("old-token")
+
+    const order: string[] = []
+    mockSaveJson.mockImplementation(async () => {
+      order.push("blob")
+    })
+    mockSetActiveToken.mockImplementation(async () => {
+      order.push("keychain")
+      return true
+    })
+
+    render(
+      <PersistentStateProvider>
+        <TestConsumer />
+      </PersistentStateProvider>,
+    )
+    await waitFor(() => {
+      expect(screen.getByTestId("token")).toBeTruthy()
+    })
+
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("update-btn"))
+    })
+
+    await waitFor(() => {
+      expect(order).toEqual(["blob", "keychain"])
+    })
   })
 })
