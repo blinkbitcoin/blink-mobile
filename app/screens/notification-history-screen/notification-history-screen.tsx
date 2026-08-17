@@ -141,7 +141,7 @@ export const NotificationHistoryScreen = () => {
     return () => {
       cancelled = true
     }
-  }, [acknowledgeNotification, client, isFocused, unackIdsKey])
+  }, [acknowledgeNotification, client, isFocused, notifications?.nodes, unackIdsKey])
 
   const fetchNextNotificationsPage = () => {
     const pageInfo = notifications?.pageInfo

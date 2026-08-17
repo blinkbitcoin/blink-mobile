@@ -4,20 +4,16 @@ import parsePhoneNumber, {
   getCountryCallingCode,
 } from "libphonenumber-js/mobile"
 import React, { useEffect, useMemo, useRef, useState } from "react"
-import { View, TouchableOpacity, StyleProp, ViewStyle } from "react-native"
-import CountryPicker, {
-  CountryCode,
-  DARK_THEME,
-  DEFAULT_THEME,
-  Flag,
-} from "react-native-country-picker-modal"
-import { Input, makeStyles, Text, useTheme } from "@rn-vui/themed"
+import { View, StyleProp, ViewStyle } from "react-native"
+import { CountryCode } from "react-native-country-picker-modal"
+import { Input, makeStyles } from "@rn-vui/themed"
 import { testProps } from "@app/utils/testProps"
 import useDeviceLocation from "@app/hooks/use-device-location"
 import { useSupportedCountriesQuery } from "@app/graphql/generated"
 import { IconNode } from "@rn-vui/base"
 import type { InputRef } from "@app/types/themed-input"
 
+import { CountryCodePicker } from "./country-code-picker"
 import PhoneInputSkeleton from "./phone-input-skeleton"
 
 const PLACEHOLDER_PHONE_NUMBER = "123-456-7890"
@@ -58,9 +54,6 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
   countryPickerButtonStyle,
   bgColor,
 }) => {
-  const {
-    theme: { mode: themeMode },
-  } = useTheme()
   const styles = useStyles({ bgColor })
 
   const { data } = useSupportedCountriesQuery()
@@ -142,37 +135,16 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
 
   return (
     <View style={styles.inputContainer}>
-      <CountryPicker
-        theme={themeMode === "dark" ? DARK_THEME : DEFAULT_THEME}
+      <CountryCodePicker
         countryCode={phoneInputInfo?.countryCode as CountryCode}
         countryCodes={allSupportedCountries as CountryCode[]}
         onSelect={handleCountrySelect}
         onClose={handleCountryPickerClose}
-        renderFlagButton={({ countryCode, onOpen }) => {
-          return (
-            countryCode && (
-              <TouchableOpacity
-                style={[
-                  styles.countryPickerButtonStyle,
-                  isDisabled && styles.disabledInput,
-                  countryPickerButtonStyle,
-                ]}
-                onPress={onOpen}
-              >
-                <Flag countryCode={countryCode} flagSize={24} />
-                <Text type="p1">
-                  +{getCountryCallingCode(countryCode as PhoneNumberCountryCode)}
-                </Text>
-              </TouchableOpacity>
-            )
-          )
-        }}
-        withCallingCodeButton={true}
-        withFilter={true}
-        filterProps={{
-          autoFocus: true,
-        }}
-        withCallingCode={true}
+        buttonStyle={[
+          styles.countryPickerButtonStyle,
+          isDisabled && styles.disabledInput,
+          countryPickerButtonStyle,
+        ]}
       />
       <Input
         {...testProps("telephoneNumber")}

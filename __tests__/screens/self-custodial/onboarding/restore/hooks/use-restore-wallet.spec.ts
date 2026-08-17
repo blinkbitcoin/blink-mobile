@@ -66,6 +66,7 @@ jest.mock("@react-navigation/native", () => ({
 
 jest.mock("@react-native-firebase/crashlytics", () => () => ({
   recordError: (...args: Error[]) => mockRecordError(...args),
+  log: jest.fn(),
 }))
 
 jest.mock("@app/self-custodial/providers/wallet", () => ({

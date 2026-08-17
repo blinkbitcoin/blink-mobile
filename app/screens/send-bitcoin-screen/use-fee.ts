@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 
 import { gql } from "@apollo/client"
 import {
+  GraphQlApplicationError,
   WalletCurrency,
   useLnInvoiceFeeProbeMutation,
   useLnNoAmountInvoiceFeeProbeMutation,
@@ -14,13 +15,13 @@ import {
 import type { SelfCustodialFeeResult } from "@app/self-custodial/payment-details/send-helpers"
 import { WalletAmount } from "@app/types/amounts"
 import { ConvertAmountAdjustment } from "@app/types/payment"
-import crashlytics from "@react-native-firebase/crashlytics"
+import { reportError } from "@app/utils/error-logging"
 
 import { GetFee } from "./payment-details/index.types"
 
 type FeeType =
   | {
-      status: "loading" | "error" | "unset"
+      status: "loading" | "unset"
       amount?: undefined | null
     }
   | {
@@ -28,9 +29,12 @@ type FeeType =
       status: "set"
       amountAdjustment?: ConvertAmountAdjustment
     }
+  // The only arm that carries errors: a quote that failed, with the classified reason.
+  // `null` because GetFee may report a failure alongside an absent amount.
   | {
-      amount?: WalletAmount<WalletCurrency>
+      amount?: WalletAmount<WalletCurrency> | null
       status: "error"
+      errors?: readonly GraphQlApplicationError[]
     }
 
 gql`
@@ -74,8 +78,9 @@ gql`
     $walletId: WalletId!
     $address: OnChainAddress!
     $amount: SatAmount!
+    $speed: PayoutSpeed!
   ) {
-    onChainTxFee(walletId: $walletId, address: $address, amount: $amount) {
+    onChainTxFee(walletId: $walletId, address: $address, amount: $amount, speed: $speed) {
       amount
     }
   }
@@ -84,8 +89,14 @@ gql`
     $walletId: WalletId!
     $address: OnChainAddress!
     $amount: CentAmount!
+    $speed: PayoutSpeed!
   ) {
-    onChainUsdTxFee(walletId: $walletId, address: $address, amount: $amount) {
+    onChainUsdTxFee(
+      walletId: $walletId
+      address: $address
+      amount: $amount
+      speed: $speed
+    ) {
       amount
     }
   }
@@ -94,11 +105,13 @@ gql`
     $walletId: WalletId!
     $address: OnChainAddress!
     $amount: SatAmount!
+    $speed: PayoutSpeed!
   ) {
     onChainUsdTxFeeAsBtcDenominated(
       walletId: $walletId
       address: $address
       amount: $amount
+      speed: $speed
     ) {
       amount
     }
@@ -114,9 +127,16 @@ const useFee = <T extends WalletCurrency>(getFeeFn?: GetFee<T> | null): FeeType 
   const [lnNoAmountInvoiceFeeProbe] = useLnNoAmountInvoiceFeeProbeMutation()
   const [lnUsdInvoiceFeeProbe] = useLnUsdInvoiceFeeProbeMutation()
   const [lnNoAmountUsdInvoiceFeeProbe] = useLnNoAmountUsdInvoiceFeeProbeMutation()
-  const [onChainTxFee] = useOnChainTxFeeLazyQuery()
-  const [onChainUsdTxFee] = useOnChainUsdTxFeeLazyQuery()
-  const [onChainUsdTxFeeAsBtcDenominated] = useOnChainUsdTxFeeAsBtcDenominatedLazyQuery()
+  /**
+   * On-chain fees move with the mempool, so a cached quote goes stale within minutes.
+   * Apollo would otherwise serve one from an earlier visit under the default cache-first
+   * policy, contradicting the live estimate the details screen shows for the same amount.
+   */
+  const [onChainTxFee] = useOnChainTxFeeLazyQuery({ fetchPolicy: "no-cache" })
+  const [onChainUsdTxFee] = useOnChainUsdTxFeeLazyQuery({ fetchPolicy: "no-cache" })
+  const [onChainUsdTxFeeAsBtcDenominated] = useOnChainUsdTxFeeAsBtcDenominatedLazyQuery({
+    fetchPolicy: "no-cache",
+  })
 
   useEffect(() => {
     if (!getFeeFn) {
@@ -143,6 +163,7 @@ const useFee = <T extends WalletCurrency>(getFeeFn?: GetFee<T> | null): FeeType 
           return setFee({
             status: "error",
             amount: feeResponse.amount,
+            errors: feeResponse.errors,
           })
         }
 
@@ -153,9 +174,7 @@ const useFee = <T extends WalletCurrency>(getFeeFn?: GetFee<T> | null): FeeType 
           amountAdjustment,
         })
       } catch (err) {
-        if (err instanceof Error) {
-          crashlytics().recordError(err)
-        }
+        reportError("use-fee", err)
         return setFee({
           status: "error",
         })

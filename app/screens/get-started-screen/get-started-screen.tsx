@@ -10,6 +10,7 @@ import {
   ACCOUNT_OPTION_TO_FLOW,
 } from "@app/hooks/use-account-type-options"
 import { useCreationBlock } from "@app/hooks/use-creation-block"
+import { useSecretMenuTrigger } from "@app/hooks/use-secret-menu-trigger"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import theme from "@app/rne-theme/theme"
 import { AccountTypeMode } from "@app/types/account"
@@ -33,13 +34,15 @@ export const GetStartedScreen: React.FC = () => {
 
   const styles = useStyles()
 
-  const [secretMenuCounter, setSecretMenuCounter] = React.useState(0)
-  React.useEffect(() => {
-    if (secretMenuCounter > 2) {
-      navigation.navigate("developerScreen")
-      setSecretMenuCounter(0)
-    }
-  }, [navigation, secretMenuCounter])
+  /** Reached through "Add account" this screen sits on top of an existing session, so it
+   *  owes the user a way back. A first install — and every flow that resets the stack to
+   *  this screen, like logout or account deletion — has nothing to return to. */
+  const canGoBack = navigation.canGoBack()
+  React.useLayoutEffect(() => {
+    navigation.setOptions({ headerShown: canGoBack })
+  }, [navigation, canGoBack])
+
+  const handleSecretMenuTap = useSecretMenuTrigger()
 
   const {
     theme: { mode },
@@ -111,12 +114,12 @@ export const GetStartedScreen: React.FC = () => {
     )
 
   return (
-    <Screen headerShown={false}>
+    <Screen headerShown={canGoBack}>
       <View style={styles.container}>
         {NonProdInstanceHint}
         <View style={styles.logoWrapper} pointerEvents="box-none">
           <Pressable
-            onPress={() => setSecretMenuCounter(secretMenuCounter + 1)}
+            onPress={handleSecretMenuTap}
             style={styles.logoContainer}
             {...testProps("logo-button")}
           >

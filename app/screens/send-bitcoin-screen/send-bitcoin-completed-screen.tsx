@@ -1,9 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react"
-import { View, Alert, ScrollView } from "react-native"
-import InAppReview from "react-native-in-app-review"
+import { AppState, View, ScrollView } from "react-native"
 import ViewShot, { type ViewShotRef } from "react-native-view-shot"
 
-import { useApolloClient } from "@apollo/client"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { Screen } from "@app/components/screen"
 import {
@@ -11,21 +9,15 @@ import {
   SuccessIconAnimation,
 } from "@app/components/success-animation"
 import { SuccessActionComponent } from "@app/components/success-action"
-import { setFeedbackModalShown } from "@app/graphql/client-only-query"
-import {
-  useFeedbackModalShownQuery,
-  useSettingsScreenQuery,
-} from "@app/graphql/generated"
-import { useAppConfig, useScreenshot } from "@app/hooks"
+import { useSettingsScreenQuery } from "@app/graphql/generated"
+import { useScreenshot } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { logAppFeedback } from "@app/utils/analytics"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { testProps } from "../../utils/testProps"
-import { SuggestionModal } from "./suggestion-modal"
 import { PaymentSendCompletedStatus } from "./use-send-payment"
 import LogoLightMode from "@app/assets/logo/blink-logo-light.svg"
 import LogoDarkMode from "@app/assets/logo/app-logo-dark.svg"
@@ -38,7 +30,6 @@ import {
   timeToMempool,
 } from "../transaction-detail-screen/format-time"
 import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"
-import { GaloyInstance } from "@app/config/galoy-instances"
 import { TranslationFunctions } from "@app/i18n/i18n-types"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { PaymentType } from "@blinkbitcoin/blink-client"
@@ -48,8 +39,6 @@ type StatusProcessed = "SUCCESS" | "PENDING" | "QUEUED"
 interface Props {
   route: RouteProp<RootStackParamList, "sendBitcoinCompleted">
 }
-
-const FEEDBACK_DELAY = 3000
 
 const processStatus = ({
   status,
@@ -92,55 +81,35 @@ const useSuccessMessage = (
   }, [successAction, preimage])()
 }
 
-const useFeedbackHandler = () => {
-  const client = useApolloClient()
-  const { LL } = useI18nContext()
-  const { appConfig } = useAppConfig()
-  const [showSuggestionModal, setShowSuggestionModal] = useState(false)
+const STALE_BACKGROUND_MS = 30_000
 
-  const handleNegativeFeedback = useCallback(() => {
-    logAppFeedback({ isEnjoingApp: false })
-    setShowSuggestionModal(true)
+/** Quick trips away (opening a link, locking the phone) keep the receipt on return. */
+const useOnStaleBackgroundReturn = (onStaleReturn: () => void) => {
+  const backgroundedAt = useRef<number | null>(null)
+  const onStaleReturnRef = useRef(onStaleReturn)
+
+  useEffect(() => {
+    onStaleReturnRef.current = onStaleReturn
+  }, [onStaleReturn])
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener("change", (nextAppState) => {
+      if (nextAppState === "background") {
+        backgroundedAt.current = Date.now()
+        return
+      }
+      const tripStartedAt = backgroundedAt.current
+      const isReturningToForeground = nextAppState === "active" && tripStartedAt !== null
+      if (!isReturningToForeground) return
+
+      backgroundedAt.current = null
+      const isStale = Date.now() - tripStartedAt >= STALE_BACKGROUND_MS
+      if (isStale) {
+        onStaleReturnRef.current()
+      }
+    })
+    return () => subscription.remove()
   }, [])
-
-  const handlePositiveFeedback = useCallback(() => {
-    logAppFeedback({ isEnjoingApp: true })
-    InAppReview.RequestInAppReview()
-  }, [])
-
-  const requestFeedback = useCallback(() => {
-    if (!shouldShowFeedback(appConfig)) return
-
-    if (InAppReview.isAvailable()) {
-      showFeedbackAlert(LL, handleNegativeFeedback, handlePositiveFeedback)
-      setFeedbackModalShown(client, true)
-    }
-  }, [LL, client, appConfig, handleNegativeFeedback, handlePositiveFeedback])
-
-  return { requestFeedback, showSuggestionModal, setShowSuggestionModal }
-}
-
-const shouldShowFeedback = (appConfig: {
-  token: string
-  galoyInstance: GaloyInstance
-}): boolean => {
-  return appConfig && appConfig.galoyInstance.id !== "Local"
-}
-
-const showFeedbackAlert = (
-  LL: TranslationFunctions,
-  onNegative: () => void,
-  onPositive: () => void,
-) => {
-  Alert.alert(
-    "",
-    LL.support.enjoyingApp(),
-    [
-      { text: LL.common.No(), onPress: onNegative },
-      { text: LL.common.yes(), onPress: onPositive },
-    ],
-    { cancelable: true },
-  )
 }
 
 const SuccessIconComponent: React.FC<{
@@ -213,6 +182,10 @@ const PaymentDetailsSection: React.FC<{
 }) => {
   const styles = useStyles()
 
+  const formattedTime = createdAt
+    ? formatUnixTimestampYMDHM({ timestampSeconds: createdAt })
+    : ""
+
   return (
     <>
       <View style={styles.successActionFieldContainer}>
@@ -247,7 +220,7 @@ const PaymentDetailsSection: React.FC<{
       <View style={styles.successActionFieldContainer}>
         <SuccessActionComponent
           title={LL.SendBitcoinScreen.time()}
-          text={createdAt ? formatUnixTimestampYMDHM(createdAt) : ""}
+          text={formattedTime}
           key="time"
           visible={Boolean(createdAt)}
         />
@@ -327,7 +300,6 @@ const SendBitcoinCompletedScreen: React.FC<Props> = ({ route }) => {
     useNavigation<NativeStackNavigationProp<RootStackParamList, "sendBitcoinCompleted">>()
   const { LL } = useI18nContext()
 
-  const feedbackShownData = useFeedbackModalShownQuery()
   const { data } = useSettingsScreenQuery({ fetchPolicy: "cache-first" })
   const { successIconDuration } = useRemoteConfig()
 
@@ -338,8 +310,6 @@ const SendBitcoinCompletedScreen: React.FC<Props> = ({ route }) => {
   const noteMessage = successActionMessage || note?.trim() || ""
   const Logo = mode === "dark" ? LogoDarkMode : LogoLightMode
 
-  const { requestFeedback, showSuggestionModal, setShowSuggestionModal } =
-    useFeedbackHandler()
   const { isTakingScreenshot, captureAndShare } = useScreenshot(viewRef)
 
   useEffect(() => {
@@ -347,16 +317,41 @@ const SendBitcoinCompletedScreen: React.FC<Props> = ({ route }) => {
     return () => clearTimeout(timer)
   }, [successIconDuration])
 
-  useEffect(() => {
-    const feedbackModalShown = feedbackShownData?.data?.feedbackModalShown
+  const handleNavigateHome = useCallback(() => navigation.popToTop(), [navigation])
 
-    if (!feedbackModalShown) {
-      const feedbackTimeout = setTimeout(requestFeedback, FEEDBACK_DELAY)
-      return () => clearTimeout(feedbackTimeout)
+  /** Carries a stale return that arrived while the receipt was covered, until the focus
+   *  listener below can spend it. Dropping it instead would strand the receipt for the rest
+   *  of the session, which is the very thing this screen dismisses itself to avoid. */
+  const isDismissalDeferred = useRef(false)
+
+  /** A covered receipt must not steal navigation: on a second background trip taken from
+   *  the app-lock screen, popping would tear the lock off the stack and expose Home while
+   *  the app is still locked. The first trip is never covered, because AppStateWrapper
+   *  raises the lock only after awaiting the keystore, so this synchronous listener always
+   *  runs first. That relock has to stay asynchronous: were it to push the lock before this
+   *  runs, the receipt would survive underneath and the isResume goBack would land the user
+   *  right back on it. */
+  const handleStaleReturn = useCallback(() => {
+    if (!navigation.isFocused()) {
+      isDismissalDeferred.current = true
+      return
     }
-  }, [feedbackShownData?.data?.feedbackModalShown, requestFeedback])
+    handleNavigateHome()
+  }, [navigation, handleNavigateHome])
 
-  const handleNavigateHome = () => navigation.navigate("Primary")
+  useOnStaleBackgroundReturn(handleStaleReturn)
+
+  /** Whatever covered the receipt is gone and the stale one is on screen again, so the
+   *  dismissal held back above is safe to run now. */
+  useEffect(
+    () =>
+      navigation.addListener("focus", () => {
+        if (!isDismissalDeferred.current) return
+        isDismissalDeferred.current = false
+        handleNavigateHome()
+      }),
+    [navigation, handleNavigateHome],
+  )
 
   if (showSuccessIcon) {
     return (
@@ -408,12 +403,6 @@ const SendBitcoinCompletedScreen: React.FC<Props> = ({ route }) => {
           )}
         </View>
       </ViewShot>
-
-      <SuggestionModal
-        navigation={navigation}
-        showSuggestionModal={showSuggestionModal}
-        setShowSuggestionModal={setShowSuggestionModal}
-      />
     </Screen>
   )
 }

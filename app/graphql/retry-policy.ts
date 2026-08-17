@@ -1,4 +1,8 @@
+import type { Operation } from "@apollo/client"
 import type { NetworkError } from "@apollo/client/errors"
+import { RetryLink } from "@apollo/client/link/retry"
+
+import { isUnauthorizedError } from "./transport-error"
 
 /**
  * GraphQL operations the global RetryLink must never auto-resend. These are
@@ -22,11 +26,15 @@ const noRetryOperations = [
   "lnNoAmountUsdInvoicePaymentSend",
 
   "onChainPaymentSend",
+  "onChainPaymentSendAll",
   "onChainUsdPaymentSend",
   "onChainUsdPaymentSendAsBtcDenominated",
   "onChainTxFee",
   "onChainUsdTxFee",
   "onChainUsdTxFeeAsBtcDenominated",
+  "onChainTxFeeBySpeed",
+  "onChainUsdTxFeeBySpeed",
+  "onChainUsdTxFeeAsBtcDenominatedBySpeed",
 
   // no need to retry to upload the token
   // specially as it's running on app start
@@ -39,9 +47,30 @@ const noRetryOperations = [
   "migrationStart",
   "migrationCommit",
   "migrationLnAddressTransfer",
+
+  // Irreversible, and it kills the token that authenticated it: a resend can neither undo
+  // the first attempt nor authenticate itself.
+  "accountDelete",
 ]
 
-const UNAUTHORIZED_STATUS = 401
+const IDEMPOTENCY_KEY_HEADER = "x-idempotency-key"
+
+/**
+ * Whether the operation's context carries an X-Idempotency-Key header. Such an operation
+ * must never be transport-retried: the server may have already processed the first
+ * attempt, and a replay with the same key is rejected with 409 Conflict, masking a
+ * successful payment as a failure. The header lookup is case-insensitive so a future
+ * casing change cannot silently disable this gate.
+ */
+export const hasIdempotencyKey = (operation: Operation): boolean => {
+  const headers = operation.getContext().headers as Record<string, unknown> | undefined
+  if (!headers) {
+    return false
+  }
+  return Object.keys(headers).some(
+    (key) => key.toLowerCase() === IDEMPOTENCY_KEY_HEADER && Boolean(headers[key]),
+  )
+}
 
 /**
  * Whether the RetryLink should resend a failed operation. It resends only when there is a
@@ -54,7 +83,35 @@ export const shouldRetryOperation = (
 ): boolean => {
   const hasError = Boolean(error)
   const isRetryableOperation = !noRetryOperations.includes(operationName)
-  const isUnauthorized =
-    (error as { statusCode?: number } | null)?.statusCode === UNAUTHORIZED_STATUS
+  const isUnauthorized = isUnauthorizedError(error)
   return hasError && isRetryableOperation && !isUnauthorized
 }
+
+/**
+ * Whether the dedicated 401 link should resend. It replays the identical request with the
+ * identical token, since nothing between the two links refreshes it, so the operations
+ * above gain nothing from it and risk a second, irreversible landing.
+ */
+export const shouldRetryUnauthorized = (
+  error: NetworkError,
+  operationName: string,
+): boolean => isUnauthorizedError(error) && !noRetryOperations.includes(operationName)
+
+const UNAUTHORIZED_RETRY_INITIAL_DELAY_MS = 5000
+
+/** Built here rather than inline in the client so the composition that actually protects
+ *  the irreversible operations is reachable from a test. */
+export const createUnauthorizedRetryLink = (): RetryLink =>
+  new RetryLink({
+    attempts: {
+      max: 2,
+      retryIf: (error, operation) =>
+        !hasIdempotencyKey(operation) &&
+        shouldRetryUnauthorized(error, operation.operationName),
+    },
+    delay: {
+      initial: UNAUTHORIZED_RETRY_INITIAL_DELAY_MS,
+      max: Infinity,
+      jitter: false,
+    },
+  })

@@ -1,4 +1,38 @@
 {
+  "ApiScreen": {
+    "keysGroupTitle": "API-sleutels",
+    "noKeys": "Nog geen API-sleutels",
+    "createKey": "API-sleutel aanmaken",
+    "createTitle": "Nieuwe API-sleutel",
+    "keyCreatedTitle": "API-sleutel aangemaakt",
+    "keyName": "Sleutelnaam",
+    "keyNamePlaceholder": "bijv. BTCPay Server",
+    "scopeRead": "Lezen",
+    "scopeReadDescription": "Saldo en transactiegeschiedenis bekijken",
+    "scopeReceive": "Ontvangen",
+    "scopeReceiveDescription": "Facturen aanmaken en betalingen ontvangen",
+    "scopeWrite": "Schrijven",
+    "writeScopeDashboardOnly": "Sleutels die betalingen kunnen verzenden, kunnen alleen op dashboard.blink.sv worden aangemaakt",
+    "expiry": "Verloopt",
+    "expiry30Days": "30 dagen",
+    "expiry90Days": "90 dagen",
+    "expiryNever": "Nooit",
+    "expiresOn": "Verloopt op {date: string}",
+    "neverExpires": "Verloopt nooit",
+    "revoked": "Ingetrokken",
+    "expired": "Verlopen op {date: string}",
+    "expiredNoDate": "Verlopen",
+    "secretWarning": "Dit is de enige keer dat de sleutel wordt getoond. Kopieer of deel hem nu en bewaar hem veilig.",
+    "secretCopied": "API-sleutel gekopieerd. Klembord wordt over 1 minuut gewist",
+    "revokeTitle": "API-sleutel intrekken?",
+    "revokeBody": "\"{name: string}\" stopt onmiddellijk met werken. Dit kan niet ongedaan worden gemaakt.",
+    "revoke": "Intrekken",
+    "revokeSuccess": "API-sleutel ingetrokken",
+    "createError": "Kan de API-sleutel niet aanmaken. Probeer het opnieuw.",
+    "revokeError": "Kan de API-sleutel niet intrekken. Probeer het opnieuw.",
+    "loadError": "Kan je API-sleutels niet laden. Probeer het later opnieuw.",
+    "done": "Klaar"
+  },
   "GaloyAddressScreen": {
     "title": "Betaling ontvangen door gebruik te maken van:",
     "buttonTitle": "Stel je adres in",
@@ -2003,7 +2037,7 @@
     "satAccumulated": "Sats verzameld",
     "satsEarned": "{formattedNumber | sats} verdiend",
     "sectionsCompleted": "Je hebt voltooid",
-    "title": "Verdien",
+    "title": "Leren",
     "unlockQuestion": "Beantwoord de vraag om te ontgrendelen:",
     "youEarned": "Jij hebt verdiend",
     "registerTitle": "U moet uw account upgraden",
@@ -2011,6 +2045,7 @@
     "oneSectionADay": "Eén sectie per dag!",
     "availableTomorrow": "Kom morgen terug om verder te verdienen terwijl je leert.\n\nOf klik op doorgaan om te blijven leren zonder beloningen.",
     "motivatingBadger": "Graaf je een weg door deze lessen en verdien terwijl je leert",
+    "motivatingBadgerNoRewards": "Graaf je een weg door deze lessen en leer over Bitcoin",
     "continueNoRewards": "Doorgaan (Zonder beloningen)",
     "somethingNotRight": "Er klopt iets niet...",
     "defaultErrorMessage": "{errorMessage: string} Probeer het later opnieuw.\nOf klik op doorgaan om te blijven leren zonder beloningen.",
@@ -2049,7 +2084,7 @@
     "login": "Inloggen",
     "loginOrRestore": "Inloggen / Herstellen",
     "logBackInWith": "Log opnieuw in met",
-    "headline": "Wallet mogelijk gemaakt door Galoy",
+    "headline": "Wallet mogelijk gemaakt door Blink",
     "startTrialAccount": "Begin met een proefaccount",
     "startWithTrialAccount": "Begin met een proefaccount",
     "registerPhoneAccount": "Registreer telefoonaccount",
@@ -2075,6 +2110,7 @@
     "error": "Oeps. Er is iets misgegaan bij het ophalen van je locatie"
   },
   "HomeScreen": {
+    "pendingReceiveBadge": "+{amount: string} In behandeling",
     "receive": "Ontvang",
     "send": "Verzend",
     "title": "Thuisscherm",
@@ -2163,6 +2199,9 @@
     "lightningInvoice": "Lightning-factuur",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Stortingskosten: {fee} SAT voor bedragen onder {threshold} SAT of {overFee} SAT voor stortingen boven {threshold} SAT",
+    "depositFeeTiers": "Deposit fees: {tiers: string}",
+    "depositFeeTierUpTo": "{fee: string} SAT up to {max: string} SAT",
+    "depositFeeTierAbove": "{fee: string} SAT above {min: string} SAT",
     "autoConvertMinAmount": "Bedragen onder {minSats: number} sats / {minFiat: string} kunnen niet automatisch worden omgezet naar Dollar. Je ontvangt Bitcoin in plaats daarvan.",
     "autoConvertFailed": "Betaling ontvangen maar de conversie is mislukt.",
     "pleaseWaitForConversion": "Wacht tot de omzetting is voltooid"
@@ -2196,6 +2235,22 @@
     "imageLibraryPermissionsNotGranted": "We hebben geen toestemming om toegang te krijgen tot de beeldbibliotheek. Controleer de app-instellingen voor uw platform."
   },
   "SecurityScreen": {
+    "securityScore": {
+      "title": "Beveiligingsscore {done: number}/{total: number}",
+      "levelLow": "laag",
+      "levelMedium": "gemiddeld",
+      "levelHigh": "hoog",
+      "set": "Instellen",
+      "enabled": "Ingeschakeld",
+      "signals": {
+        "cloudBackup": "Cloudback-up",
+        "manualBackup": "Handmatige back-up",
+        "appLock": "Biometrie/pincode",
+        "hideBalance": "Saldo verbergen",
+        "twoFactor": "Tweefactorauthenticatie (2FA)",
+        "emailVerified": "Geverifieerd e-mailadres"
+      }
+    },
     "title": "Beveiliging en privacy",
     "biometricDescription": "Ontgrendel met vingerafdruk of gezichtsherkenning.",
     "biometricTitle": "Biometrisch",
@@ -2220,7 +2275,6 @@
     "totalLabel": "Totaal:",
     "totalExceed": "Totaal overschrijdt uw saldo van {balance: string}",
     "maxFeeSelected": "Dit zijn de maximale kosten die voor deze transactie in rekening worden gebracht. Het kan uiteindelijk minder zijn zodra de betaling is gedaan.",
-    "feeError": "Het berekenen van de kosten is mislukt",
     "invoiceAlreadyPaid": "Deze factuur is al betaald",
     "somethingWentWrong": "Er is iets misgegaan",
     "paymentAlreadyAttempted": "Betaling al geprobeerd.\n\nAls je deze betaling opnieuw wilt doen, begin dan opnieuw.",
@@ -2261,6 +2315,10 @@
     "invalidPhoneNumber": "Voer een geldig mobiel nummer in",
     "phoneNotAllowed": "Dit veld accepteert geen telefoonnummers"
   },
+  "MerchantSelectionScreen": {
+    "title": "Kies betaaloptie",
+    "empty": "Er zijn geen betaalopties beschikbaar."
+  },
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Transactie wordt naar de mempool verzonden",
     "amount": "Bedrag",
@@ -2279,7 +2337,6 @@
     "notConfirmed": "De betaling is verzonden\nmaar is nog niet bevestigd\n\nU kunt de status controleren\nvan de betaling in Transacties",
     "note": "Noot of label",
     "success": "De betaling is succesvol verzonden",
-    "suggestionInput": "Voer uw suggestie in",
     "max": "Max",
     "maxAmount": "Maximaal bedrag",
     "title": "Verzend Bitcoin",
@@ -2307,7 +2364,7 @@
     "recipient": "Ontvanger",
     "time": "Tijd",
     "type": "Type",
-    "feeTier": "Kosten snelheid",
+    "feeTier": "Transactieprioriteit",
     "fast": "Snel",
     "medium": "Gemiddeld",
     "slow": "Langzaam",
@@ -2320,7 +2377,7 @@
   },
   "SettingsScreen": {
     "createAddress": "Adres aanmaken",
-    "donationButton": "Donatieknop",
+    "donationButton": "Doneerknop",
     "btcpayServer": "BTCPay Server",
     "woocommerce": "WooCommerce",
     "staticQr": "Afdrukbare statische QR",
@@ -2528,7 +2585,11 @@
     "receivingAccount": "Ontvangend saldo",
     "sendingAccount": "Verzendend saldo",
     "txNotBroadcast": "Uw transactie is momenteel in behandeling en wordt binnen enkele ogenblikken naar het Bitcoin-netwerk verzonden.",
-    "momentarily": "binnenkort"
+    "momentarily": "binnenkort",
+    "findingAccount": "Account voor deze betaling zoeken...",
+    "txNotFoundInAccounts": "Deze betaling is in geen enkel account op dit apparaat gevonden. Mogelijk hoort deze bij een uitgelogd account.",
+    "txLoadFailed": "Kan deze betaling niet laden. Controleer uw verbinding en probeer het opnieuw.",
+    "switchedForPayment": "Overgeschakeld naar {identifier: string} om deze betaling te tonen"
   },
   "FeeRatesScreen": {
     "title": "Kostentarieven",
@@ -2543,6 +2604,7 @@
     "lightningTransactions": "Lightning-transacties",
     "onchainBelowThreshold": "Onchain onder {threshold: string} SAT",
     "onchainAboveThreshold": "Onchain boven {threshold: string} SAT",
+    "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Overschrijvingskosten",
     "noFee": "geen kosten",
     "lightningSendFee": "{fee: string} + ~{routingFee: string} routeringskosten",
@@ -2593,7 +2655,8 @@
       "tooLong": "Het adres mag maximaal 50 tekens lang zijn",
       "invalidCharacter": "Adres mag alleen letters, cijfers en onderstrepingstekens bevatten",
       "addressUnavailable": "Sorry, dit adres is al in gebruik",
-      "unknownError": "Er is een onbekende fout opgetreden. Probeer het later opnieuw"
+      "unknownError": "Er is een onbekende fout opgetreden. Probeer het later opnieuw",
+      "backupRequired": "Back up your wallet before creating a Lightning address"
     },
     "receiveMoney": "Ontvang geld van andere Lightning-wallets en {bankName: string}-gebruikers met dit adres.",
     "itCannotBeChanged": "Het kan later niet meer worden gewijzigd."
@@ -2758,6 +2821,7 @@
     "bitcoinPrice": "Bitcoin Prijs",
     "btcAccount": "Bitcoinsaldo",
     "cancel": "Annuleer",
+    "card": "Kaart",
     "close": "Sluit",
     "confirm": "Bevestig",
     "convert": "Omrekenen",
@@ -2776,6 +2840,7 @@
     "fee": "kosten",
     "Fee": "Kosten",
     "fees": "Kosten",
+    "feeError": "Het berekenen van de kosten is mislukt",
     "firstName": "Voornaam",
     "from": "Van",
     "hour": "uur",
@@ -2898,11 +2963,9 @@
     "email": "Email",
     "sms": "SMS",
     "faq": "FAQ",
-    "enjoyingApp": "Geniet je van de app?",
     "statusPage": "Status Pagina",
     "telegram": "Telegram",
     "mattermost": "Mattermost",
-    "thankYouText": "Bedankt voor de feedback. Wilt u een verbetering voorstellen?",
     "defaultEmailSubject": "{bankName: string} - Klantenservice",
     "defaultSupportMessage": "Hallo daar! Ik heb hulp nodig met {bankName: string}, ik gebruik de versie {version: string} op {os: string}.",
     "emailCopied": "email {email: string} gekopieerd naar klembord",
@@ -3072,6 +3135,66 @@
       "limitUpdateSuccess": "Limiet succesvol bijgewerkt",
       "limitUpdateError": "Limiet bijwerken mislukt",
       "limitMustBePositive": "Limiet moet groter zijn dan nul"
+    },
+    "CardFeeSchedule": {
+      "title": "Blink Card-tariefoverzicht",
+      "effectiveDate": "Van kracht vanaf 1 juli 2026",
+      "sections": {
+        "cardFees": "Kaartkosten",
+        "transactionFees": "Transactiekosten",
+        "overdraft": "Roodstand (gefinancierde modus)"
+      },
+      "fees": {
+        "annualFee": {
+          "title": "Jaarlijkse kosten",
+          "subtitle": "Kwijtgescholden voor het eerste jaar vanaf de uitgiftedatum van de kaart",
+          "value": "{amount: string} / jaar"
+        },
+        "cardReplacement": {
+          "title": "Kaartvervanging"
+        },
+        "usdTransactionFee": {
+          "title": "USD-transactiekosten",
+          "subtitle": "Van toepassing op elke transactie in Amerikaanse dollar"
+        },
+        "foreignTransactionFee": {
+          "title": "Buitenlandse transactiekosten",
+          "subtitle": "Van toepassing op elke transactie in een andere valuta dan de Amerikaanse dollar"
+        },
+        "maximumOverdraft": {
+          "title": "Maximale roodstand",
+          "subtitle": "Moet binnen 7 dagen worden terugbetaald"
+        },
+        "lateRepaymentFee": {
+          "title": "Kosten voor late terugbetaling",
+          "subtitle": "In rekening gebracht als de roodstand niet binnen 7 dagen wordt terugbetaald"
+        }
+      },
+      "btcConversion": {
+        "title": "BTC-conversie",
+        "body": "Wanneer een transactie conversie van BTC naar USD vereist, wordt de conversie uitgevoerd tegen de geldende wisselkoers, die een marge kan bevatten die de conversiekosten weerspiegelt."
+      },
+      "feesUpdateNotice": {
+        "text": "Kosten kunnen van tijd tot tijd worden bijgewerkt. Blink geeft ten minste 30 dagen van tevoren kennis voordat eventuele kostenwijzigingen van kracht worden, in overeenstemming met de",
+        "linkText": "Kaarthouderovereenkomst"
+      },
+      "creditModeNotice": "Kredietmodus is momenteel niet actief. Als Kredietmodus wordt geactiveerd, worden de toepasselijke rentetarieven, kosten en openbaarmakingen van factureringsrechten vóór activering verstrekt.",
+      "additionalDetails": {
+        "title": "Aanvullende kostendetails",
+        "overdraft": {
+          "label": "Roodstand",
+          "text": ". In bepaalde omstandigheden kan een transactie worden goedgekeurd waardoor uw kaartsaldo onder nul komt. De maximale roodstand is {maxOverdraft: string}. U moet de roodstand binnen 7 dagen terugbetalen door extra geld naar uw kaartsaldo over te maken."
+        },
+        "foreignCurrency": {
+          "label": "Vreemde valuta",
+          "text": ". Als u een transactie in een vreemde valuta uitvoert, converteert het kaartnetwerk deze naar USD met zijn eigen conversieprocedures. De koers op de verwerkingsdatum kan afwijken van de transactiedatum."
+        },
+        "noHiddenFees": {
+          "label": "Geen verborgen kosten",
+          "text": ". Er zijn geen kosten voor het openen van een account, inactiviteit, saldo-opvragingen of het sluiten van uw kaart."
+        }
+      },
+      "backButton": "Terug"
     },
     "CardDetails": {
       "title": "Kaartgegevens",
@@ -3418,6 +3541,7 @@
         "perYear": "per jaar",
         "status": {
           "label": "Status",
+          "specialOfferLabel": "Speciale aanbieding",
           "paymentPending": "Betaling in Afwachting",
           "firstYearFree": "Eerste jaar gratis"
         },
@@ -3431,7 +3555,11 @@
           "cardholderAgreement": "Kaarthouderovereenkomst",
           "and": "en"
         },
-        "renew": "Ik begrijp dat mijn abonnement automatisch wordt verlengd over 1 jaar"
+        "feeSchedule": {
+          "text": "Ik heb beoordeeld en ga akkoord met het",
+          "linkText": "Blink Card-tarievenoverzicht"
+        },
+        "renew": "Ik begrijp dat mijn abonnement automatisch over {months: number} maanden wordt verlengd"
       },
       "CardIntroducing": {
         "title": "Introductie",
@@ -3493,13 +3621,29 @@
         "buttonText": "Aanvraag indienen",
         "select": "selecteer"
       },
+      "Acknowledgement": {
+        "title": "Algemene voorwaarden",
+        "acceptButton": "Accepteren",
+        "eSignConsent": {
+          "text": "Ik accepteer de",
+          "linkText": "E-Sign-toestemming"
+        },
+        "privacyAndTerms": {
+          "text": "Ik accepteer de",
+          "privacyPolicyLinkText": "Privacybeleid van de uitgever",
+          "and": ", en de",
+          "cardTermsLinkText": "Blink Card-voorwaarden"
+        },
+        "certifyAccuracy": "Ik verklaar dat de door mij verstrekte informatie juist is en dat ik alle regels en vereisten met betrekking tot mijn Blink Visa-kaart zal naleven",
+        "acknowledgeSolicitation": "Ik erken dat het aanvragen van de Blink Visa-kaart geen ongeoorloofde werving vormt"
+      },
       "CardPreapproved": {
         "title": "U bent vooraf goedgekeurd voor de Blink Visa-kaart!",
         "buttonText": "Sluiten"
       },
       "CardProcessing": {
         "title": "Je aanvraag wordt verwerkt",
-        "subtitle": "Geschatte wachttijd: {waitTime: string}",
+        "subtitle": "We laten het je weten zodra we klaar zijn",
         "buttonText": "Sluiten"
       }
     }
@@ -3535,7 +3679,8 @@
         "savedConfirm": "Ik heb het opgeslagen",
         "copy": "Kopiëren",
         "continueButton": "Doorgaan",
-        "testBackup": "Test je back-up"
+        "testBackup": "Test je back-up",
+        "doNotShareWarning": "Laat dit aan niemand zien, ook niet aan support"
       },
       "Confirm": {
         "headerTitle": "Bevestig back-upzin",
@@ -3567,6 +3712,7 @@
       "uploadSuccess": "Back-up opgeslagen in {provider}",
       "uploadFailed": "Uploaden van back-up mislukt",
       "signInFailed": "Aanmelden bij {provider} mislukt",
+      "storageAccessRequired": "Geef {provider: string} toegang tot de back-up van je wallet en probeer het opnieuw.",
       "cloudNotAvailable": "iCloud Drive is niet beschikbaar. Meld je aan bij iCloud in Instellingen en schakel iCloud Drive in.",
       "networkError": "Netwerkfout. Controleer je verbinding en probeer het opnieuw.",
       "existingBackupTitle": "Back-up gevonden",
@@ -3581,6 +3727,12 @@
     "contactSupport": {
       "title": "Contact opnemen met support",
       "body": "Er is iets misgegaan, maar maak je geen zorgen, je geld is veilig. Neem contact op met support voor hulp.\n\nMogelijk heb je deze informatie nodig zodat support je zaak kan oplossen:",
+      "selfHelp": {
+        "title": "Laten we het opnieuw proberen",
+        "body": "Maak je geen zorgen — je geld is veilig. De migratie kan een paar minuten duren, en soms heeft een stap gewoon een nieuwe start nodig.\n\nStart de migratie opnieuw — het duurt maar even.\n\nZie je dit scherm nog steeds? Neem contact op met support en deel de gegevens hieronder:",
+        "contactSupportCta": "Contact opnemen met support"
+      },
+      "closeRefusedBody": "Je migratie is voltooid en je tegoed staat in je nieuwe wallet. Je oude account is mogelijk nog open. Support controleert dit en sluit het indien nodig.\n\nMogelijk heb je deze informatie nodig zodat support je zaak kan oplossen:",
       "reasonLabel": "Reden",
       "accountIdLabel": "Account-ID",
       "pubKeyLabel": "pubKey",
@@ -3605,6 +3757,10 @@
       "title": "Belangrijk",
       "body": "Stap vóór {date} over naar een niet-bewaarde rekening via begeleide migratie, of neem je tegoed op. Ontvangen stopt op {receiveStopsDate}.",
       "migrateCta": "Migreer"
+    },
+    "offboardBulletin": {
+      "title": "Belangrijk",
+      "body": "Je account is geregistreerd in een regio waar we geen accounts kunnen aanbieden. Neem je geld op vóór 31 augustus. Ontvangen stopt op 10 augustus."
     },
     "dollarBalanceModal": {
       "title": "We kunnen je dollarsaldo niet migreren",
@@ -3633,10 +3789,23 @@
     "downloadHistoryTitle": "Download je transactiegeschiedenis",
     "downloadHistoryBody": "Je nieuwe account begint opnieuw. Als je een overzicht van je transacties wilt bewaren, download ze dan nu als CSV.",
     "downloadHistoryDownloadCta": "Downloaden",
-    "apiServiceTitle": "API-service niet beschikbaar",
-    "apiServiceBody": "We zien dat je actieve API-sleutels hebt. Blink kan de API niet aanbieden in non-custodial modus.\n\nAls je afhankelijk bent van de API van Blink, neem dan snel contact met ons op en we doen ons best om een soepele overgang te helpen.",
+    "apiServiceTitle": "Over je API-sleutels",
+    "apiServiceBody": "Je account heeft actieve API-sleutels. De API is niet meer beschikbaar nadat je overstapt naar non-custodial.\n\nBlink heeft non-custodial apps die de meeste functies van de API vervangen, behalve verzenden. Je vindt ze in het menu Instellingen.\n\nAls je de API gebruikt om te verzenden, is dat helaas niet langer mogelijk.",
     "apiServiceContactCta": "Neem contact op",
-    "apiServiceContinueCta": "Toch doorgaan",
+    "apiServiceContinueCta": "Doorgaan met de migratie",
+    "merchantTools": {
+      "title": "We hebben aan alles gedacht",
+      "body": "Alle tools voor inkomende betalingen blijven werken. Voeg gewoon je Lightning-adres toe.",
+      "cta": "Begrepen",
+      "terminalTitle": "Blink Terminal",
+      "terminalBody": "Een kassasysteem in elke browser.",
+      "donationTitle": "Doneerknop",
+      "donationBody": "Accepteer donaties op elke website.",
+      "btcpayTitle": "BTCPay-plug-in",
+      "btcpayBody": "Lightning-betalingen op je BTCPay Server.",
+      "woocommerceTitle": "WooCommerce-plug-in",
+      "woocommerceBody": "Bitcoin-afrekenen voor je webshop."
+    },
     "resumeFailed": "Er is iets misgegaan bij het hervatten van je migratie. Begin deze opnieuw.",
     "migrationRequiredBody": "Het is tijd om je bewaarde rekening te migreren naar een niet-bewaarde rekening.",
     "migrationRequiredForcedBody": "Het is tijd om je bewaarde rekening te migreren naar een niet-bewaarde rekening. Dit is vereist om regelgevende redenen.\n\nGeen zorgen, non-custodial is op de lange termijn beter voor je.",
@@ -3653,10 +3822,15 @@
     "explainerCheck5": "Er worden Spark-netwerkkosten van je account afgeschreven",
     "explainerCta": "Ik begrijp het",
     "transferringFunds": "Je saldo wordt overgedragen. Het zou binnen enkele seconden klaar moeten zijn.",
+    "transferDelayed": {
+      "body": "Je saldo is onderweg naar je nieuwe account. Het duurt langer dan gebruikelijk — houd de app open, dan ronden we het automatisch af.",
+      "contactSupportCta": "Contact opnemen met support"
+    },
     "clockOutOfSync": {
       "body": "De datum en tijd van je apparaat lopen niet gelijk. Zet ze op automatisch om door te gaan.",
       "retryCta": "Opnieuw proberen"
-    }
+    },
+    "closeUnavailable": "Je geld staat veilig in je nieuwe wallet. We zijn je oude account nog aan het sluiten, probeer het zo meteen opnieuw."
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Bewaard",
@@ -3684,6 +3858,7 @@
     "phraseSubtitleStep2": "Voer de rest van je back-upfrase in",
     "nextWords": "Volgende 6 woorden",
     "paste": "Plakken",
+    "pasteFailed": "Kan niet lezen van het klembord. Voer je back-upfrase handmatig in.",
     "enterWord": "Woord",
     "invalidMnemonic": "Ongeldige back-upzin. Controleer of de woordvolgorde correct is.",
     "restoring": "Je portemonnee wordt hersteld...",
@@ -3695,7 +3870,9 @@
     "enterPassword": "Voer je versleutelingswachtwoord in",
     "wrongPassword": "Onjuist wachtwoord. Probeer opnieuw.",
     "pickBackupTitle": "Kies een wallet",
-    "pickBackupDescription": "Kies een back-up om te herstellen"
+    "pickBackupDescription": "Kies een back-up om te herstellen",
+    "recognizePhraseTitle": "Herken je deze back-upzin?",
+    "recognizePhraseBody": "Voer nooit woorden in die iemand anders je heeft gestuurd."
   },
   "BackupNudge": {
     "title": "Uw fondsen lopen gevaar",
@@ -3705,6 +3882,11 @@
     "modalTitle": "Beveilig uw fondsen",
     "modalDescription": "We raden u ten zeerste aan om een back-up van uw portemonnee te maken om volledig verlies van fondsen te voorkomen als u dit apparaat kwijtraakt.",
     "secureMe": "Portemonnee beveiligen"
+  },
+  "BackupRequired": {
+    "modalTitle": "Back up your wallet first",
+    "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
+    "backupNow": "Back up wallet"
   },
   "NonCustodialInfoBulletin": {
     "title": "Dit is een niet-bewaarde rekening",
@@ -3744,7 +3926,7 @@
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
     "featureCircles": "Circles",
-    "featureEarn": "Earn",
+    "featureEarn": "Leren",
     "featureCard": "Card"
   },
   "WalletCreationScreen": {

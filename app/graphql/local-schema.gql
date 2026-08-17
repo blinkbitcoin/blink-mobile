@@ -4,12 +4,10 @@ extend type Contact {
 
 extend type Query {
   hideBalance: Boolean!
-  hiddenBalanceToolTip: Boolean!
   price: String # FIXME test only?
   beta: Boolean!
   countryCode: String!
   region: Region
-  feedbackModalShown: Boolean!
   introducingCirclesModalShown: Boolean!
   innerCircleValue: Int!
   upgradeModalLastShownAt: String

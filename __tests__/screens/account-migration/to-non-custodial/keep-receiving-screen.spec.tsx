@@ -41,14 +41,14 @@ jest.mock("@app/utils/error-logging", () => ({
 }))
 
 const mockGoToNextStep = jest.fn()
-const mockReplaceToCheckpoint = jest.fn()
+const mockReplaceToNextStep = jest.fn()
 let mockNextStepLoading = false
 
 jest.mock("@app/screens/account-migration/hooks", () => ({
   ...jest.requireActual("@app/screens/account-migration/hooks"),
   useMigrationNextStep: () => ({
     goToNextStep: mockGoToNextStep,
-    replaceToCheckpoint: mockReplaceToCheckpoint,
+    replaceToNextStep: mockReplaceToNextStep,
     loading: mockNextStepLoading,
   }),
 }))
@@ -108,13 +108,14 @@ describe("MigrationKeepReceivingScreen", () => {
     expect(address.props.ellipsizeMode).toBe("middle")
   })
 
-  it("hands off to the flow's next step when the CTA is pressed", async () => {
+  it("hands off to the merchant tools when the CTA is pressed", async () => {
     renderScreen()
     await flushEffects()
 
     fireEvent.press(screen.getByText(LL.AccountMigration.keepReceivingCta()))
 
-    expect(mockGoToNextStep).toHaveBeenCalledTimes(1)
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationMerchantTools")
+    expect(mockGoToNextStep).not.toHaveBeenCalled()
   })
 
   it("renders nothing while the next-step checks are loading", async () => {
@@ -133,7 +134,7 @@ describe("MigrationKeepReceivingScreen", () => {
     renderScreen()
     await flushEffects()
 
-    expect(mockReplaceToCheckpoint).toHaveBeenCalledTimes(1)
+    expect(mockReplaceToNextStep).toHaveBeenCalledTimes(1)
     expect(screen.queryByText(LL.AccountMigration.keepReceivingTitle())).toBeNull()
   })
 
@@ -143,7 +144,7 @@ describe("MigrationKeepReceivingScreen", () => {
     renderScreen()
     await flushEffects()
 
-    expect(mockReplaceToCheckpoint).not.toHaveBeenCalled()
+    expect(mockReplaceToNextStep).not.toHaveBeenCalled()
   })
 
   it("shows a spinner (not a blank screen) while the address is still loading", async () => {
@@ -153,7 +154,7 @@ describe("MigrationKeepReceivingScreen", () => {
 
     expect(screen.getByTestId("migration-keep-receiving-loading")).toBeTruthy()
     expect(screen.queryByText(LL.AccountMigration.keepReceivingTitle())).toBeNull()
-    expect(mockReplaceToCheckpoint).not.toHaveBeenCalled()
+    expect(mockReplaceToNextStep).not.toHaveBeenCalled()
   })
 
   it("shows a retry state, not a spinner, and does not skip when the address query errors", async () => {
@@ -171,7 +172,7 @@ describe("MigrationKeepReceivingScreen", () => {
     /** The spinner-forever bug: an errored query must render a way forward, not a spinner. */
     expect(screen.queryByTestId("migration-keep-receiving-loading")).toBeNull()
     /** A failed query must not read as "no address" and skip the warning. */
-    expect(mockReplaceToCheckpoint).not.toHaveBeenCalled()
+    expect(mockReplaceToNextStep).not.toHaveBeenCalled()
   })
 
   it("refetches the address when Try Again is pressed on the error state", async () => {
@@ -225,6 +226,6 @@ describe("MigrationKeepReceivingScreen", () => {
     fireEvent.press(screen.getByText(LL.common.continue()))
 
     expect(mockGoToNextStep).toHaveBeenCalledTimes(1)
-    expect(mockReplaceToCheckpoint).not.toHaveBeenCalled()
+    expect(mockReplaceToNextStep).not.toHaveBeenCalled()
   })
 })

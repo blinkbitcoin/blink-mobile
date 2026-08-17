@@ -170,6 +170,90 @@ describe("usePendingMigrationAccounts", () => {
       "Pending migration accounts load",
       expect.any(Error),
     )
+    /** Surfaced, not swallowed: an unreadable record must stay distinguishable from
+     *  "no pending wallet", or the gate reads a transient failure as a wiped device. */
+    expect(result.current.hasError).toBe(true)
+  })
+
+  it("recovers through refetch after a failed load", async () => {
+    mockLoadPendingProvisionedAccounts.mockRejectedValueOnce(new Error("read failed"))
+    mockLoadPendingProvisionedAccounts.mockResolvedValue({
+      "custodial-1": "sc-pending-1",
+    })
+
+    const { result } = renderHook(() => usePendingMigrationAccounts())
+    await waitFor(() => expect(result.current.hasError).toBe(true))
+
+    await act(async () => {
+      await result.current.refetch()
+    })
+
+    expect(result.current.hasError).toBe(false)
+    expect(result.current.pendingForActiveAccount).toBe("sc-pending-1")
+  })
+
+  /** The error may only clear once the retry has SUCCEEDED: clearing it when the retry
+   *  starts would present the still-empty map as settled data for the length of the
+   *  read, and the gate would hand the user to support on it. */
+  it("keeps hasError raised while a refetch is still in flight", async () => {
+    mockLoadPendingProvisionedAccounts.mockRejectedValueOnce(new Error("read failed"))
+
+    const { result } = renderHook(() => usePendingMigrationAccounts())
+    await waitFor(() => expect(result.current.hasError).toBe(true))
+
+    let resolveReload: (pending: Record<string, string>) => void = () => {}
+    mockLoadPendingProvisionedAccounts.mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          resolveReload = resolve
+        }),
+    )
+
+    let refetchDone: Promise<void> | undefined
+    act(() => {
+      refetchDone = result.current.refetch()
+    })
+    expect(result.current.hasError).toBe(true)
+
+    await act(async () => {
+      resolveReload({})
+      await refetchDone
+    })
+    expect(result.current.hasError).toBe(false)
+  })
+
+  it("resolves instead of rejecting when the refetched load fails again", async () => {
+    mockLoadPendingProvisionedAccounts.mockRejectedValue(new Error("read failed"))
+
+    const { result } = renderHook(() => usePendingMigrationAccounts())
+    await waitFor(() => expect(result.current.hasError).toBe(true))
+
+    /** The gate's retry Promise.alls every refetch; a rejection there would double-report
+     *  a failure that already traveled through reportError and hasError. */
+    await act(async () => {
+      await expect(result.current.refetch()).resolves.toBeUndefined()
+    })
+    expect(result.current.hasError).toBe(true)
+  })
+
+  /** The record itself was read fine in the self-heal case, so it counts as a success
+   *  and clears a raised error rather than leaving the gate stuck on retry. */
+  it("clears hasError when a refetch lands on the self-heal path", async () => {
+    mockLoadPendingProvisionedAccounts.mockRejectedValueOnce(new Error("read failed"))
+    mockLoadPendingProvisionedAccounts.mockResolvedValue({
+      "custodial-1": "sc-wallet-1",
+    })
+    mockActiveAccount = { id: "sc-wallet-1", type: "selfCustodial" }
+
+    const { result } = renderHook(() => usePendingMigrationAccounts())
+    await waitFor(() => expect(result.current.hasError).toBe(true))
+
+    await act(async () => {
+      await result.current.refetch()
+    })
+
+    expect(result.current.hasError).toBe(false)
+    expect(result.current.pendingForActiveAccount).toBeNull()
   })
 
   it("reports when the self-heal cleanup write fails", async () => {

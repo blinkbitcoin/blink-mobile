@@ -55,7 +55,7 @@ describe("CardProcessingScreen", () => {
     expect(getByText("Processing your application")).toBeTruthy()
   })
 
-  it("displays subtitle with wait time", async () => {
+  it("displays subtitle", async () => {
     const { getByText } = render(
       <ContextForScreen>
         <CardProcessingScreen />
@@ -64,7 +64,7 @@ describe("CardProcessingScreen", () => {
 
     await act(async () => {})
 
-    expect(getByText("Estimated wait time: 24h")).toBeTruthy()
+    expect(getByText("We will notify you once we are ready")).toBeTruthy()
   })
 
   it("displays close button", async () => {

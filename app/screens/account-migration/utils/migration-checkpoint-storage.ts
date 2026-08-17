@@ -14,40 +14,42 @@ export type StoredCheckpoint = {
   savedAt: number
   accountId?: string
   custodialAccountId?: string
+  /** What the server's preview said the new wallet will receive, captured at the commit
+   *  point — the only moment it is knowable (after the drain the preview reads an already
+   *  emptied balance). Absent on records saved by app versions before the field existed. */
+  expectedReceiveSats?: number
 }
 
 /**
- * Where a checkpoint resumes. Every destination is a param-less route except the
- * terms screen, which is shared across flows and needs the migration flow param.
+ * Where a checkpoint resumes. Every destination is a param-less route.
  */
-type CheckpointDestination =
-  | {
-      name:
-        | "accountMigrationExplainer"
-        | "selfCustodialBackupMethod"
-        | "selfCustodialCloudBackup"
-        | "selfCustodialBackupSecurityChecks"
-        | "accountMigrationBalancesOverview"
-      params?: undefined
-    }
-  | { name: "acceptTermsAndConditions"; params: { flow: "migration" } }
+type CheckpointDestination = {
+  name: "accountMigrationExplainer" | "accountMigrationBalancesOverview"
+}
 
 const STORAGE_KEY_PREFIX = "migrationCheckpoint"
 
 const CHECKPOINT_EXPIRATION_MS = 48 * 60 * 60 * 1000 // 48h
 
-const CHECKPOINT_DESTINATION_MAP: Record<MigrationCheckpoint, CheckpointDestination> = {
-  [MigrationCheckpoint.TermsAndConditions]: {
-    name: "acceptTermsAndConditions",
-    params: { flow: "migration" },
-  },
-  [MigrationCheckpoint.BackupMethod]: { name: "selfCustodialBackupMethod" },
-  [MigrationCheckpoint.CloudBackup]: { name: "selfCustodialCloudBackup" },
-  [MigrationCheckpoint.BackupAlerts]: { name: "selfCustodialBackupSecurityChecks" },
-  [MigrationCheckpoint.BalancesOverview]: { name: "accountMigrationBalancesOverview" },
+const DEFAULT_DESTINATION: CheckpointDestination = { name: "accountMigrationExplainer" }
+
+/** Exhaustive on purpose: a step added to the enum has no entry here and fails to compile,
+ *  so a checkpoint past the commit point can never inherit the restart by omission. */
+const IS_COMMIT_POINT_BY_CHECKPOINT: Record<MigrationCheckpoint, boolean> = {
+  [MigrationCheckpoint.TermsAndConditions]: false,
+  [MigrationCheckpoint.BackupMethod]: false,
+  [MigrationCheckpoint.CloudBackup]: false,
+  [MigrationCheckpoint.BackupAlerts]: false,
+  [MigrationCheckpoint.BalancesOverview]: true,
 }
 
-const DEFAULT_DESTINATION: CheckpointDestination = { name: "accountMigrationExplainer" }
+/** The commit point is the only step a reopened flow jumps forward to: the balances screen
+ *  already claimed the account server-side, so re-walking backup ahead of it would offer a
+ *  transfer the user cannot decline. The route resolver and the entry screen both read this
+ *  one predicate, so the destination and the decision to resume can never disagree. */
+export const isCommitPointCheckpoint = (
+  checkpoint: MigrationCheckpoint | null,
+): boolean => checkpoint !== null && IS_COMMIT_POINT_BY_CHECKPOINT[checkpoint]
 
 export const getStorageKey = (environment: string): string =>
   `${STORAGE_KEY_PREFIX}_${environment.toLowerCase()}`
@@ -60,7 +62,8 @@ export const isExpired = (
 export const validateStoredCheckpoint = (raw: unknown): StoredCheckpoint | null => {
   if (!raw || typeof raw !== "object") return null
 
-  const { step, savedAt, accountId, custodialAccountId } = raw as StoredCheckpoint
+  const { step, savedAt, accountId, custodialAccountId, expectedReceiveSats } =
+    raw as StoredCheckpoint
 
   if (!Object.values(MigrationCheckpoint).includes(step)) return null
   if (typeof savedAt !== "number") return null
@@ -68,17 +71,31 @@ export const validateStoredCheckpoint = (raw: unknown): StoredCheckpoint | null 
   if (custodialAccountId !== undefined && typeof custodialAccountId !== "string") {
     return null
   }
+  /** Advisory, unlike the fields above: dropping a malformed one on its own keeps the step
+   *  and ids a locked account resumes from, which discarding the record would strip. */
+  const hasUsableExpectedReceiveSats =
+    typeof expectedReceiveSats === "number" && Number.isFinite(expectedReceiveSats)
 
-  return { step, savedAt, accountId, custodialAccountId }
+  return {
+    step,
+    savedAt,
+    accountId,
+    custodialAccountId,
+    expectedReceiveSats: hasUsableExpectedReceiveSats ? expectedReceiveSats : undefined,
+  }
 }
 
+/** Only the commit point resumes mid-flow; every earlier step restarts at the explainer,
+ *  so the user re-walks terms and backup before the funds transfer is offered again. The
+ *  restart may not target the migration gate: the gate walks into the rest of the flow
+ *  through this same resolver, so pointing a pre-commit checkpoint back at it closes a
+ *  cycle the user cannot leave. */
 export const resolveCheckpointRoute = (
   checkpoint: MigrationCheckpoint | null,
-): CheckpointDestination => {
-  if (!checkpoint) return DEFAULT_DESTINATION
-
-  return CHECKPOINT_DESTINATION_MAP[checkpoint]
-}
+): CheckpointDestination =>
+  isCommitPointCheckpoint(checkpoint)
+    ? { name: "accountMigrationBalancesOverview" }
+    : DEFAULT_DESTINATION
 
 export const loadCheckpoint = async (
   storageKey: string,
@@ -105,6 +122,7 @@ export type CheckpointUpdate = {
   step: MigrationCheckpoint
   accountId?: string
   custodialAccountId?: string
+  expectedReceiveSats?: number
 }
 
 /**
@@ -120,11 +138,20 @@ export const mergeCheckpoint = (
   const hasSameOwner =
     existing?.custodialAccountId === undefined ||
     existing.custodialAccountId === update.custodialAccountId
+
+  /** Write-once for one owner's flow: the figure is only knowable before the drain, so a
+   *  re-entered commit screen would carry the post-drain zero the gate reads as "nothing
+   *  will ever arrive" and swap while the funds are still in transit (#4102). */
+  const inheritedExpectedReceiveSats = hasSameOwner
+    ? existing?.expectedReceiveSats
+    : undefined
+
   return {
     step: update.step,
     savedAt: Date.now(),
     accountId: update.accountId ?? (hasSameOwner ? existing?.accountId : undefined),
     custodialAccountId: update.custodialAccountId,
+    expectedReceiveSats: inheritedExpectedReceiveSats ?? update.expectedReceiveSats,
   }
 }
 

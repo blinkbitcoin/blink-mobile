@@ -65,11 +65,6 @@ jest.mock("@app/components/screen", () => ({
     React.createElement("View", { testID: "screen" }, children),
 }))
 
-jest.mock("react-native-in-app-review", () => ({
-  isAvailable: () => false,
-  RequestInAppReview: jest.fn(),
-}))
-
 jest.mock("react-native-inappbrowser-reborn", () => ({
   InAppBrowser: { isAvailable: jest.fn(), open: jest.fn() },
 }))

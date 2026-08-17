@@ -44,7 +44,11 @@ import { IsAuthedContextProvider, useIsAuthed } from "./is-authed-context"
 import { LevelContainer } from "./level-component"
 import { MessagingContainer } from "./messaging"
 import { NetworkErrorContextProvider } from "./network-error-context"
-import { shouldRetryOperation } from "./retry-policy"
+import {
+  createUnauthorizedRetryLink,
+  hasIdempotencyKey,
+  shouldRetryOperation,
+} from "./retry-policy"
 
 const getAuthorizationHeader = (token: string): string => {
   return `Bearer ${token}`
@@ -159,24 +163,15 @@ const GaloyClient: React.FC<PropsWithChildren> = ({ children }) => {
           max: 5,
           retryIf: (error, operation) => {
             console.debug(JSON.stringify(error), "retry on error")
-            return shouldRetryOperation(error, operation.operationName)
+            return (
+              !hasIdempotencyKey(operation) &&
+              shouldRetryOperation(error, operation.operationName)
+            )
           },
         },
       })
 
-      const retry401ErrorLink = new RetryLink({
-        attempts: {
-          max: 2,
-          retryIf: (error) => {
-            return error && error.statusCode === 401
-          },
-        },
-        delay: {
-          initial: 5000, // Initial delay in milliseconds (20 seconds)
-          max: Infinity,
-          jitter: false,
-        },
-      })
+      const retry401ErrorLink = createUnauthorizedRetryLink()
 
       let authLink: ApolloLink
       if (token) {

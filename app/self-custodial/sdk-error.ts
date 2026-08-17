@@ -14,6 +14,13 @@ export const SelfCustodialErrorCode = {
 export type SelfCustodialErrorCode =
   (typeof SelfCustodialErrorCode)[keyof typeof SelfCustodialErrorCode]
 
+const ERROR_CODES: ReadonlySet<string> = new Set(Object.values(SelfCustodialErrorCode))
+
+/** Lets shared screens tell a classified self-custodial code apart from a custodial GraphQL message. */
+export const isSelfCustodialErrorCode = (
+  value: string | undefined,
+): value is SelfCustodialErrorCode => value !== undefined && ERROR_CODES.has(value)
+
 const TAG_TO_CODE: Record<SdkErrorTags, SelfCustodialErrorCode> = {
   [SdkErrorTags.InsufficientFunds]: SelfCustodialErrorCode.InsufficientFunds,
   [SdkErrorTags.MaxDepositClaimFeeExceeded]: SelfCustodialErrorCode.InsufficientFunds,

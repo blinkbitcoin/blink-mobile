@@ -48,7 +48,7 @@ import {
 } from "@app/hooks/use-dollar-balance-restricted"
 
 const baseState: PersistentState = {
-  schemaVersion: 14,
+  schemaVersion: 16,
   galoyInstance: { id: "Main" },
   galoyAuthToken: "",
 }

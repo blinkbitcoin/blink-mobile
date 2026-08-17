@@ -1,4 +1,38 @@
 {
+  "ApiScreen": {
+    "keysGroupTitle": "API բանալիներ",
+    "noKeys": "Դեռ API բանալիներ չկան",
+    "createKey": "Ստեղծել API բանալի",
+    "createTitle": "Նոր API բանալի",
+    "keyCreatedTitle": "API բանալին ստեղծվեց",
+    "keyName": "Բանալու անուն",
+    "keyNamePlaceholder": "օր. BTCPay Server",
+    "scopeRead": "Կարդալ",
+    "scopeReadDescription": "Դիտել մնացորդը և գործարքների պատմությունը",
+    "scopeReceive": "Ստանալ",
+    "scopeReceiveDescription": "Ստեղծել հաշիվներ և ստանալ վճարումներ",
+    "scopeWrite": "Գրել",
+    "writeScopeDashboardOnly": "Վճարումներ ուղարկելու հնարավորությամբ բանալիները կարելի է ստեղծել միայն dashboard.blink.sv-ում",
+    "expiry": "Ավարտվում է",
+    "expiry30Days": "30 օր",
+    "expiry90Days": "90 օր",
+    "expiryNever": "Երբեք",
+    "expiresOn": "Ավարտվում է {date: string}",
+    "neverExpires": "Երբեք չի ավարտվում",
+    "revoked": "Չեղարկված",
+    "expired": "Ավարտվել է {date: string}",
+    "expiredNoDate": "Ավարտված",
+    "secretWarning": "Սա միակ անգամն է, երբ բանալին ցուցադրվում է. Պատճենեք կամ կիսվեք այժմ և պահեք ապահով տեղում:",
+    "secretCopied": "API բանալին պատճենվեց: Սեղմատախտակը կմաքրվի 1 րոպեից",
+    "revokeTitle": "Չեղարկե՞լ API բանալին",
+    "revokeBody": "\"{name: string}\"-ը անմիջապես կդադարի աշխատել: Սա հնարավոր չէ հետարկել:",
+    "revoke": "Չեղարկել",
+    "revokeSuccess": "API բանալին չեղարկվեց",
+    "createError": "API բանալին չհաջողվեց ստեղծել: Փորձեք նորից:",
+    "revokeError": "API բանալին չհաջողվեց չեղարկել: Փորձեք նորից:",
+    "loadError": "Ձեր API բանալիները չհաջողվեց բեռնել: Փորձեք ավելի ուշ:",
+    "done": "Պատրաստ է"
+  },
   "GaloyAddressScreen": {
     "title": "Ստացեք վճարում՝ օգտագործելով",
     "buttonTitle": "Գրանցեք Ձեր հասցեն",
@@ -2003,7 +2037,7 @@
     "satAccumulated": "Սատերը կուտակվել են",
     "satsEarned": "{formattedNumber | sats} վաստակել եք",
     "sectionsCompleted": "Դուք ավարտել եք",
-    "title": "Վաստակել",
+    "title": "Սովորել",
     "unlockQuestion": "Բացելու համար՝ պատասխանեք հարցին",
     "youEarned": "Դուք վաստակեցիք",
     "registerTitle": "Հարկավոր է թարմացնել Ձեր հաշիվը։ ",
@@ -2011,6 +2045,7 @@
     "oneSectionADay": "Օրը մեկ բաժին։",
     "availableTomorrow": "Վերադարձեք վաղը։ Վերադարձեք վաղը, որպեսզի շարունակեք sats վաստակելը՝ սովորելով։\n\nԿամ սեղմեք «Շարունակել»՝ առանց պարգևատրման սովորելը շարունակելու համար։",
     "motivatingBadger": "Անցեք այս դասերով և վաստակեք՝ սովորելով",
+    "motivatingBadgerNoRewards": "Անցեք այս դասերով և սովորեք Բիթքոինի մասին",
     "continueNoRewards": "Շարունակել (Առանց պարգևատրման)",
     "somethingNotRight": "Ինչ-որ բան այնպես չէ...",
     "defaultErrorMessage": "{errorMessage: string} Խնդրում ենք փորձել ավելի ուշ։\nԿամ սեղմեք՝ առանց պարգևատրման սովորելը շարունակելու համար։",
@@ -2049,7 +2084,7 @@
     "login": "Մուտք գործել",
     "loginOrRestore": "Մուտք գործել / վերականգնել",
     "logBackInWith": "Մուտք գործել գործածելով",
-    "headline": "Դրամապանակն աջակցվում է Galoy-ի կողմից",
+    "headline": "Դրամապանակն աջակցվում է Blink-ի կողմից",
     "startTrialAccount": "Սկսել փորձնական հաշվով ",
     "startWithTrialAccount": "Սկսել փորձնական հաշվով ",
     "registerPhoneAccount": "Գրանցել հեռախոսահամարը ",
@@ -2075,6 +2110,7 @@
     "error": "Վայ։ Ինչ-որ բան այնպես չգնաց ձեր տեղադրությունը ստանալիս"
   },
   "HomeScreen": {
+    "pendingReceiveBadge": "+{amount: string} ընթացքի մեջ",
     "receive": "Ստանալ",
     "send": "Ուղարկել",
     "title": "Ընդհանուր",
@@ -2163,6 +2199,9 @@
     "lightningInvoice": "lightning վճարման հարցում",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Ավանդի վճար: {fee} SAT մինչև {threshold} SAT գումարների համար կամ {overFee} SAT {threshold} SAT-ից բարձր ավանդների համար",
+    "depositFeeTiers": "Deposit fees: {tiers: string}",
+    "depositFeeTierUpTo": "{fee: string} SAT up to {max: string} SAT",
+    "depositFeeTierAbove": "{fee: string} SAT above {min: string} SAT",
     "autoConvertMinAmount": "{minSats: number} սաթ / {minFiat: string}-ից պակաս գումարները չեն կարող ավտոմատ կերպով փոխարկվել Դոլարի։ Դուք կստանաք Bitcoin։",
     "autoConvertFailed": "Վճարումը ստացվեց, սակայն փոխարկումը չհաջողվեց։",
     "pleaseWaitForConversion": "Խնդրում ենք սպասել, մինչև փոխարկումն ավարտվի"
@@ -2196,6 +2235,22 @@
     "imageLibraryPermissionsNotGranted": "We don't have permissions to access the image library.  Please check app settings for your platform."
   },
   "SecurityScreen": {
+    "securityScore": {
+      "title": "Անվտանգության միավոր {done: number}/{total: number}",
+      "levelLow": "ցածր",
+      "levelMedium": "միջին",
+      "levelHigh": "բարձր",
+      "set": "Կարգավորել",
+      "enabled": "Միացված է",
+      "signals": {
+        "cloudBackup": "Ամպային կրկնօրինակում",
+        "manualBackup": "Ձեռքով կրկնօրինակում",
+        "appLock": "Կենսաչափություն/PIN",
+        "hideBalance": "Թաքցնել մնացորդը",
+        "twoFactor": "Երկգործոն նույնականացում (2FA)",
+        "emailVerified": "Հաստատված էլ. փոստ"
+      }
+    },
     "title": "Անվտանգություն և գաղտնիություն",
     "biometricDescription": "Բացել մատնահետքով կամ դիմային ճանաչման համակարգով։ ",
     "biometricTitle": "Բիոմետրիկ համակարգ",
@@ -2220,7 +2275,6 @@
     "totalLabel": "Ընդհանուր գումար․",
     "totalExceed": "Ընդհանուր գումարը գերազանցում է {balance: string}ի Ձեր հաշվեկշիռը",
     "maxFeeSelected": "Սա առավելագույն վճարն է, որը Ձեզանից կգանձվի այս գործառնության համար: Վճարումը կատարելուց հետո այն կարող է նվազել։ ",
-    "feeError": "Չհաջողվեց հաշվել վճարը",
     "invoiceAlreadyPaid": "Այս հաշիվ առաջնարդեն վճարված է",
     "somethingWentWrong": "Ինչ-որ բան այնպես չգնաց",
     "paymentAlreadyAttempted": "Վճարումը արդեն փորձվել է։\n\nԵթե ցանկանում եք կրկին ուղարկել այս վճարումը՝ սկսել ի սկբանե։",
@@ -2261,6 +2315,10 @@
     "invalidPhoneNumber": "Մուտքագրեք վավեր բջջային հեռախոսահամար",
     "phoneNotAllowed": "Այս դաշտը չի ընդունում հեռախոսահամարներ"
   },
+  "MerchantSelectionScreen": {
+    "title": "Ընտրեք վճարման տարբերակ",
+    "empty": "Վճարման տարբերակներ չկան։"
+  },
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Գործարքը պետք է ուղարկվի mempool",
     "amount": "Չափ",
@@ -2279,7 +2337,6 @@
     "notConfirmed": "Վճարումն ուղարկվել է\nսակայն դեռ չի հաստատվել\n\nԴու կարող եք ստուգել վճարման\n կարգավիճակը Գործառնություններում",
     "note": "Նշում կամ պիտակ",
     "success": "Վճարումը հաջողությամբ կատարվել է",
-    "suggestionInput": "Մուտքագրել առաջարկ",
     "max": "Առավելագույն",
     "maxAmount": "Գումարի առավելագույն չափը",
     "title": "Ուղարկել Բիթքոյն",
@@ -2307,7 +2364,7 @@
     "recipient": "Ստացող",
     "time": "Ժամանակ",
     "type": "Տեսակ",
-    "feeTier": "Հանձնավճարի արագություն",
+    "feeTier": "Գործարքի առաջնահերթություն",
     "fast": "Արագ",
     "medium": "Միջին",
     "slow": "Դանդաղ",
@@ -2528,7 +2585,11 @@
     "receivingAccount": "Ստացողի հաշիվ",
     "sendingAccount": "Ողւարկողի հաշիվ",
     "txNotBroadcast": "Ձեր գործառնությունն այս պահին ընթացքի մեջ է և հաջորդիվ կհհաղորդվի Բիթքոյնի ցանցին:",
-    "momentarily": "անհապաղ"
+    "momentarily": "անհապաղ",
+    "findingAccount": "Որոնվում է այս վճարման հաշիվը...",
+    "txNotFoundInAccounts": "Այս վճարումը չի գտնվել այս սարքի ոչ մի հաշվում։ Այն կարող է պատկանել դուրս գրված հաշվի։",
+    "txLoadFailed": "Չհաջողվեց բեռնել այս վճարումը։ Ստուգեք ձեր կապը և կրկին փորձեք։",
+    "switchedForPayment": "Անցում կատարվեց {identifier: string} հաշվին՝ այս վճարումը ցուցադրելու համար"
   },
   "FeeRatesScreen": {
     "title": "Վճարների սակագներ",
@@ -2543,6 +2604,7 @@
     "lightningTransactions": "Lightning գործարքներ",
     "onchainBelowThreshold": "Onchain {threshold: string} SAT-ից ցածր",
     "onchainAboveThreshold": "Onchain {threshold: string} SAT-ից բարձր",
+    "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Փոխանցման վճար",
     "noFee": "առանց վճարի",
     "lightningSendFee": "{fee: string} + ~{routingFee: string} երթուղավորման վճար",
@@ -2593,7 +2655,8 @@
       "tooLong": "Հասցեն պետք է ունենա առնվազն 50 նիշ",
       "invalidCharacter": "րՀասցեն կարող է ունենալ միայն նամակներ, թվեր, և ստորագծեր",
       "addressUnavailable": "Ներողություն, այս հասցեն արդեն կիրառվում է",
-      "unknownError": "Անհայտ սխալ։ Խնդրում ենք կրկին փորձել ավելի ուշ"
+      "unknownError": "Անհայտ սխալ։ Խնդրում ենք կրկին փորձել ավելի ուշ",
+      "backupRequired": "Back up your wallet before creating a Lightning address"
     },
     "receiveMoney": "Ստանալ գումար այլ lightning դրամապանակներից և {bankName: string} օգտատերերից այս հասցեով։ ",
     "itCannotBeChanged": "Այն չի կարող փոփոխվել ավելի ուշ։"
@@ -2758,6 +2821,7 @@
     "bitcoinPrice": "Բիթքոյնի գինը",
     "btcAccount": "Բիթքոյն հաշիվ",
     "cancel": "Չեղարկել ",
+    "card": "Քարտ",
     "close": "Փակել",
     "confirm": "Հաստատել",
     "convert": "Փոխակերպել",
@@ -2776,6 +2840,7 @@
     "fee": "վճար",
     "Fee": "Վճար",
     "fees": "Վճարներ",
+    "feeError": "Չհաջողվեց հաշվել վճարը",
     "firstName": "Անուն",
     "from": "ից",
     "hour": "ժամ",
@@ -2898,11 +2963,9 @@
     "email": "էլ․ հասցե",
     "sms": "SMS",
     "faq": "FAQ",
-    "enjoyingApp": "Հավանու՞մ եք հավելվածը։ ",
     "statusPage": "Status Page",
     "telegram": "Telegram",
     "mattermost": "Mattermost",
-    "thankYouText": "Շնորհակալություն Ձեր արձագանքի համար, կցանկանայի՞ք առաջարկել բարելավում։ ",
     "defaultEmailSubject": "{bankName: string} - Աջակցություն",
     "defaultSupportMessage": "Ողջու՛յն։ Օգնություն է հարկավոր {bankName: string}ի առիթով, ես պգտագործում եմ {version: string} տարբերակը {os: string}ով։ ",
     "emailCopied": "էլ․ հասցե {email: string} պատճենվեց ժամանակավոր շտեմարանում ",
@@ -3072,6 +3135,66 @@
       "limitUpdateSuccess": "Սահմանաչափը հաջողությամբ թարմացվեց",
       "limitUpdateError": "Չհաջողվեց թարմացնել սահմանաչափը",
       "limitMustBePositive": "Սահմանաչափը պետք է լինի զրոյից մեծ"
+    },
+    "CardFeeSchedule": {
+      "title": "Blink քարտի վճարների ցանկ",
+      "effectiveDate": "Ուժի մեջ է 2026 թ. հուլիսի 1-ից",
+      "sections": {
+        "cardFees": "Քարտի վճարներ",
+        "transactionFees": "Գործարքների վճարներ",
+        "overdraft": "Գերաշխարհում (ֆինանսավորվող ռեժիմ)"
+      },
+      "fees": {
+        "annualFee": {
+          "title": "Տարեկան վճար",
+          "subtitle": "Ազատված է առաջին տարվա համար քարտի թողարկման ամսաթվից",
+          "value": "{amount: string} / տարի"
+        },
+        "cardReplacement": {
+          "title": "Քարտի փոխարինում"
+        },
+        "usdTransactionFee": {
+          "title": "USD գործարքի վճար",
+          "subtitle": "Կիրառվում է ամերիկյան դոլարով յուրաքանչյուր գործարքի նկատմամբ"
+        },
+        "foreignTransactionFee": {
+          "title": "Արտարժութային գործարքի վճար",
+          "subtitle": "Կիրառվում է ամերիկյան դոլարից տարբեր արժույթով յուրաքանչյուր գործարքի նկատմամբ"
+        },
+        "maximumOverdraft": {
+          "title": "Առավելագույն գերաշխարհում",
+          "subtitle": "Պետք է մարվի 7 օրվա ընթացքում"
+        },
+        "lateRepaymentFee": {
+          "title": "Ուշ մարման վճար",
+          "subtitle": "Գանձվում է, եթե գերաշխարհումը չի մարվում 7 օրվա ընթացքում"
+        }
+      },
+      "btcConversion": {
+        "title": "BTC փոխարկում",
+        "body": "Երբ գործարքը պահանջում է BTC-ի փոխարկում USD, փոխարկումն իրականացվում է գործող փոխարժեքով, որը կարող է ներառել փոխարկման ծախսն արտացոլող մարժա։"
+      },
+      "feesUpdateNotice": {
+        "text": "Վճարները կարող են ժամանակ առ ժամանակ թարմացվել։ Blink-ը կծանուցի առնվազն 30 օր առաջ, նախքան որևէ վճարի փոփոխություն ուժի մեջ մտնելը, համաձայն",
+        "linkText": "Քարտապանի պայմանագրի"
+      },
+      "creditModeNotice": "Վարկային ռեժիմը ներկայումս ակտիվ չէ։ Եթե Վարկային ռեժիմն ակտիվացվի, կիրառելի տոկոսադրույքները, վճարները և հաշվարկային իրավունքների բացահայտումները կտրամադրվեն մինչև ակտիվացումը։",
+      "additionalDetails": {
+        "title": "Վճարների լրացուցիչ մանրամասներ",
+        "overdraft": {
+          "label": "Գերաշխարհում",
+          "text": ". Որոշ դեպքերում կարող է հաստատվել գործարք, որը ձեր քարտի մնացորդը կիջեցնի զրոյից ցածր։ Առավելագույն գերաշխարհումը {maxOverdraft: string} է։ Դուք պետք է մարեք գերաշխարհումը 7 օրվա ընթացքում՝ ձեր քարտի մնացորդին լրացուցիչ միջոցներ փոխանցելով։"
+        },
+        "foreignCurrency": {
+          "label": "Արտարժույթ",
+          "text": ". Եթե գործարք եք կատարում արտարժույթով, քարտի ցանցը այն փոխարկում է USD՝ օգտագործելով իր սեփական փոխարկման ընթացակարգերը։ Մշակման օրվա փոխարժեքը կարող է տարբերվել գործարքի ամսաթվից։"
+        },
+        "noHiddenFees": {
+          "label": "Առանց թաքնված վճարների",
+          "text": ". Հաշվի ստեղծման, անգործության, մնացորդի հարցումների կամ ձեր քարտը փակելու համար վճարներ չկան։"
+        }
+      },
+      "backButton": "Հետ"
     },
     "CardDetails": {
       "title": "Քարտի մանրամասներ",
@@ -3418,6 +3541,7 @@
         "perYear": "տարեկան",
         "status": {
           "label": "Կարգավիճակ",
+          "specialOfferLabel": "Հատուկ առաջարկ",
           "paymentPending": "Վճարումը սպասման մեջ է",
           "firstYearFree": "Առաջին տարին անվճար է"
         },
@@ -3431,7 +3555,11 @@
           "cardholderAgreement": "Քարտապանի համաձայնագրին",
           "and": "և"
         },
-        "renew": "Ես հասկանում եմ, որ իմ բաժանորդագրությունը ավտոմատ կերկարաձգվի 1 տարի հետո"
+        "feeSchedule": {
+          "text": "Ես ծանոթացել եմ և համաձայն եմ",
+          "linkText": "Blink Card-ի վճարների սանդղակին"
+        },
+        "renew": "Հասկանում եմ, որ իմ բաժանորդագրությունն ավտոմատ կերպով կթարմացվի {months: number} ամսից"
       },
       "CardIntroducing": {
         "title": "Ներկայացնում ենք",
@@ -3493,13 +3621,29 @@
         "buttonText": "Ուղարկել հայտը",
         "select": "ընտրել"
       },
+      "Acknowledgement": {
+        "title": "Դրույթներ և պայմաններ",
+        "acceptButton": "Ընդունել",
+        "eSignConsent": {
+          "text": "Ես ընդունում եմ",
+          "linkText": "էլեկտրոնային ստորագրության համաձայնությունը"
+        },
+        "privacyAndTerms": {
+          "text": "Ես ընդունում եմ",
+          "privacyPolicyLinkText": "թողարկողի գաղտնիության քաղաքականությունը",
+          "and": ", և",
+          "cardTermsLinkText": "Blink քարտի պայմանները"
+        },
+        "certifyAccuracy": "Ես հաստատում եմ, որ իմ տրամադրած տեղեկատվությունը ճշգրիտ է և որ ես կհետևեմ իմ Blink Visa քարտի հետ կապված բոլոր կանոններին ու պահանջներին",
+        "acknowledgeSolicitation": "Ես գիտակցում եմ, որ Blink Visa քարտի համար դիմելը չի համարվում չարտոնված դիմում"
+      },
       "CardPreapproved": {
         "title": "You have been pre-approved for the Blink Visa card!",
         "buttonText": "Close"
       },
       "CardProcessing": {
         "title": "Մշակվում է Ձեր հայտը",
-        "subtitle": "Սպասման գնահատված ժամանակը՝ {waitTime: string}",
+        "subtitle": "Մենք ձեզ կտեղեկացնենք, հենց որ պատրաստ լինենք",
         "buttonText": "Փակել"
       }
     }
@@ -3535,7 +3679,8 @@
         "savedConfirm": "Ես պահպանել եմ",
         "copy": "Պատճենել",
         "continueButton": "Շարունակել",
-        "testBackup": "Փորձարկեք ձեր պահեստավորումը"
+        "testBackup": "Փորձարկեք ձեր պահեստավորումը",
+        "doNotShareWarning": "Մի՛ ցույց տվեք սա որևէ մեկին, այդ թվում՝ աջակցման ծառայությանը"
       },
       "Confirm": {
         "headerTitle": "Հաստատեք պահուստային արտահայտությունը",
@@ -3567,6 +3712,7 @@
       "uploadSuccess": "Պահուստային պատճենը պահպանվել է {provider}-ում",
       "uploadFailed": "Պահուստային պատճենի վերբեռնումը ձախողվեց",
       "signInFailed": "{provider}-ին մուտքը ձախողվեց",
+      "storageAccessRequired": "Թույլատրեք {provider: string}-ի հասանելիությունը ձեր դրամապանակի պահուստային պատճենին, ապա փորձեք կրկին։",
       "cloudNotAvailable": "iCloud Drive հասանելի չէ։ Մուտք գործեք iCloud Կարգավորումներից և միացրեք iCloud Drive-ը։",
       "networkError": "Ցանցի սխալ։ Ստուգեք միացումը և կրկին փորձեք։",
       "existingBackupTitle": "Պահուստային պատճեն գտնվել է",
@@ -3581,6 +3727,12 @@
     "contactSupport": {
       "title": "Կապ աջակցության հետ",
       "body": "Ինչ-որ բան սխալ գնաց, բայց մի անհանգստացեք, ձեր միջոցներն ապահով են։ Խնդրում ենք կապվել աջակցության հետ օգնության համար։\n\nՁեզ կարող է անհրաժեշտ լինել այս տեղեկատվությունը, որպեսզի աջակցությունը լուծի ձեր հարցը․",
+      "selfHelp": {
+        "title": "Փորձենք նորից",
+        "body": "Մի անհանգստացեք — ձեր միջոցներն ապահով են։ Տեղափոխումը կարող է տևել մի քանի րոպե, և երբեմն քայլին ուղղակի նոր սկիզբ է պետք։\n\nՍկսեք տեղափոխումը սկզբից — դա կտևի ընդամենը մի պահ։\n\nԴեռ տեսնո՞ւմ եք այս էկրանը։ Կապվեք աջակցության հետ և կիսվեք ստորև բերված տվյալներով․",
+        "contactSupportCta": "Կապ աջակցության հետ"
+      },
+      "closeRefusedBody": "Ձեր տեղափոխումն ավարտված է, և ձեր միջոցները ձեր նոր դրամապանակում են։ Ձեր հին հաշիվը կարող է դեռ բաց լինել։ Աջակցման թիմը կստուգի և կփակի այն անհրաժեշտության դեպքում։\n\nՁեզ կարող է անհրաժեշտ լինել այս տեղեկատվությունը, որպեսզի աջակցությունը լուծի ձեր հարցը․",
       "reasonLabel": "Պատճառ",
       "accountIdLabel": "Հաշվի ID",
       "pubKeyLabel": "pubKey",
@@ -3605,6 +3757,10 @@
       "title": "Կարևոր",
       "body": "Անցեք ոչ պահպանող հաշվի ուղղորդված տեղափոխման միջոցով կամ կանխիկացրեք ձեր միջոցները մինչև {date}։ Ստացումը կդադարի {receiveStopsDate}-ին։",
       "migrateCta": "Տեղափոխվել"
+    },
+    "offboardBulletin": {
+      "title": "Կարևոր",
+      "body": "Ձեր հաշիվը գրանցված է տարածաշրջանում, որտեղ մենք չենք կարող հաշիվներ առաջարկել։ Հանեք ձեր միջոցները մինչև օգոստոսի 31-ը։ Ստացումը դադարում է օգոստոսի 10-ին։"
     },
     "dollarBalanceModal": {
       "title": "Մենք չենք կարող տեղափոխել ձեր դոլարային մնացորդը",
@@ -3633,10 +3789,23 @@
     "downloadHistoryTitle": "Ներբեռնեք ձեր գործարքների պատմությունը",
     "downloadHistoryBody": "Ձեր նոր հաշիվը կսկսվի զրոյից։ Եթե ցանկանում եք պահպանել ձեր գործարքների գրառումը, ներբեռնեք դրանք հիմա որպես CSV։",
     "downloadHistoryDownloadCta": "Ներբեռնել",
-    "apiServiceTitle": "API ծառայությունը հասանելի չէ",
-    "apiServiceBody": "Նկատում ենք, որ դուք ունեք ակտիվ API բանալիներ։ Blink-ը չի կարող տրամադրել API-ն ոչ պահառու ռեժիմում։\n\nԵթե կախված եք Blink-ի API-ից, շուտ կապվեք մեզ հետ, և մենք կանենք հնարավորը՝ սահուն անցմանն օգնելու համար։",
+    "apiServiceTitle": "Ձեր API բանալիների մասին",
+    "apiServiceBody": "Ձեր հաշիվն ունի ակտիվ API բանալիներ։ Ոչ պահառու ռեժիմին անցնելուց հետո API-ն հասանելի չի լինի։\n\nBlink-ն ունի ոչ պահառու հավելվածներ, որոնք փոխարինում են API-ի գործառույթների մեծ մասը՝ բացի ուղարկելուց։ Դրանք կգտնեք Կարգավորումներ ընտրացանկում։\n\nԵթե API-ն օգտագործում եք ուղարկելու համար, ցավոք դա այլևս հնարավոր չի լինի։",
     "apiServiceContactCta": "Կապվեք մեզ հետ",
-    "apiServiceContinueCta": "Շարունակել այնուամենայնիվ",
+    "apiServiceContinueCta": "Շարունակել միգրացիան",
+    "merchantTools": {
+      "title": "Մենք ամեն ինչ նախատեսել ենք",
+      "body": "Մուտքային վճարումների բոլոր գործիքները շարունակում են աշխատել։ Պարզապես ավելացրեք ձեր Lightning հասցեն։",
+      "cta": "Հասկացա",
+      "terminalTitle": "Blink Terminal",
+      "terminalBody": "Վաճառքի կետ ցանկացած զննարկիչում։",
+      "donationTitle": "Նվիրատվության կոճակ",
+      "donationBody": "Ընդունեք նվիրատվություններ ցանկացած կայքում։",
+      "btcpayTitle": "BTCPay հավելում",
+      "btcpayBody": "Lightning վճարումներ ձեր BTCPay Server-ում։",
+      "woocommerceTitle": "WooCommerce հավելում",
+      "woocommerceBody": "Bitcoin վճարում ձեր առցանց խանութի համար։"
+    },
     "resumeFailed": "Ձեր տեղափոխումը վերսկսելիս ինչ-որ բան սխալ գնաց։ Խնդրում ենք սկսել այն նորից։",
     "migrationRequiredBody": "Ժամանակն է ձեր պահպանվող հաշիվը տեղափոխել ոչ պահպանող հաշիվ։ Դա պարտադիր է կարգավորող պատճառներով։ Բայց նաև՝ դա ավելի լավ է ձեզ համար։",
     "migrationRequiredForcedBody": "Ժամանակն է ձեր պահպանվող հաշիվը տեղափոխել ոչ պահպանող հաշիվ։ Դա պարտադիր է կարգավորող պատճառներով։ Բայց նաև՝ դա ավելի լավ է ձեզ համար։ Դա պահանջվում է կարգավորող պատճառներով:\n\nՄի անհանգստացիր, ոչ պահառու տարբերակը երկարաժամկետ հեռանկարում ավելի լավ կլինի քեզ համար:",
@@ -3653,10 +3822,15 @@
     "explainerCheck5": "Ձեր հաշվից կպահվի Spark ցանցի վճար",
     "explainerCta": "Հասկանում եմ",
     "transferringFunds": "Ձեր միջոցները փոխանցվում են։ Դա պետք է ավարտվի մի քանի վայրկյանի ընթացքում։",
+    "transferDelayed": {
+      "body": "Ձեր միջոցները ձեր նոր հաշվի ճանապարհին են։ Դա տևում է սովորականից երկար — պահեք հավելվածը բաց, և մենք ավտոմատ կավարտենք։",
+      "contactSupportCta": "Կապվել աջակցության հետ"
+    },
     "clockOutOfSync": {
       "body": "Ձեր սարքի ամսաթիվն ու ժամը համաժամացված չեն։ Դրանք ավտոմատ դարձրեք՝ շարունակելու համար։",
       "retryCta": "Կրկին փորձել"
-    }
+    },
+    "closeUnavailable": "Ձեր միջոցներն ապահով են ձեր նոր դրամապանակում։ Մենք դեռ փակում ենք ձեր հին հաշիվը, խնդրում ենք մի պահից նորից փորձել։"
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Պահառությամբ",
@@ -3684,6 +3858,7 @@
     "phraseSubtitleStep2": "Մուտքագրեք ձեր պահուստային արտահայտության մնացած բառերը",
     "nextWords": "Հաջորդ 6 բառերը",
     "paste": "Փակցնել",
+    "pasteFailed": "Չհաջողվեց կարդալ ժամանակավոր շտեմարանից: Խնդրում ենք ձեռքով մուտքագրել ձեր պահուստային արտահայտությունը:",
     "enterWord": "Բառ",
     "invalidMnemonic": "Անվավեր պահեստային արտահայտություն: Խնդրում ենք ստուգել՝ արդյոք բառերի կարգը ճիշտ է:",
     "restoring": "Վերականգնում ենք ձեր դրամապանակը...",
@@ -3695,7 +3870,9 @@
     "enterPassword": "Մուտքագրեք ձեր գաղտնագրման գաղտնաբառը",
     "wrongPassword": "Սխալ գաղտնաբառ։ Խնդրում ենք կրկին փորձել։",
     "pickBackupTitle": "Ընտրեք դրամապանակ",
-    "pickBackupDescription": "Ընտրեք պահեստավորում վերականգնելու համար"
+    "pickBackupDescription": "Ընտրեք պահեստավորում վերականգնելու համար",
+    "recognizePhraseTitle": "Ճանաչո՞ւմ եք այս պահուստային արտահայտությունը:",
+    "recognizePhraseBody": "Երբեք մի՛ մուտքագրեք բառեր, որ ուրիշն է ուղարկել ձեզ:"
   },
   "BackupNudge": {
     "title": "Ձեր միջոցները վտանգի տակ են",
@@ -3705,6 +3882,11 @@
     "modalTitle": "Ապահովեք ձեր միջոցները",
     "modalDescription": "Խիստ խորհուրդ ենք տալիս պահուստավորել ձեր դրամապանակը՝ միջոցների ամբողջական կորուստը կանխելու համար, եթե կորցնեք այս սարքը։",
     "secureMe": "Ապահովել դրամապանակը"
+  },
+  "BackupRequired": {
+    "modalTitle": "Back up your wallet first",
+    "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
+    "backupNow": "Back up wallet"
   },
   "NonCustodialInfoBulletin": {
     "title": "Սա ոչ պահպանող հաշիվ է",
@@ -3744,7 +3926,7 @@
     "noAccountTitle": "Պահառու հաշիվ է պահանջվում",
     "noAccountDescription": "{featureName: string}-ի համար անհրաժեշտ է Blink պահառու հաշիվ։",
     "featureCircles": "Circles",
-    "featureEarn": "Վաստակել",
+    "featureEarn": "Սովորել",
     "featureCard": "Քարտ"
   },
   "WalletCreationScreen": {

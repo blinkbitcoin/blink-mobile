@@ -18,6 +18,12 @@ jest.mock("@app/graphql/generated", () => ({
   useLanguageQuery: (opts: unknown) => mockUseLanguageQuery(opts),
   useUserUpdateLanguageMutation: () => [jest.fn(), { loading: false }],
   useExportCsvSettingLazyQuery: () => [jest.fn(), { loading: false }],
+  // AccountPOS reads the display currency to build its terminal link. That query is
+  // the one exception to the skip rule this suite guards: use-effective-display-currency
+  // keeps it unauthed-safe with fetchPolicy "cache-only" instead of skip, so it never
+  // reaches the network for a logged-out user either.
+  useDisplayCurrencyQuery: () => ({ data: undefined, loading: false }),
+  useAccountUpdateDisplayCurrencyMutation: () => [jest.fn(), { loading: false }],
 }))
 
 jest.mock("@react-navigation/native", () => ({
@@ -44,7 +50,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
         createAddress: () => "Create address",
         pos: () => "POS",
         staticQr: () => "Static QR",
-        donationButton: () => "Donation Button",
+        donationButton: () => "Donate Button",
         btcpayServer: () => "BTCPay Server",
         woocommerce: () => "Woocommerce",
         logInOrCreateAccount: () => "Login",
@@ -116,6 +122,7 @@ jest.mock("@app/components/set-lightning-address-modal", () => ({
 
 jest.mock("@react-native-firebase/crashlytics", () => () => ({
   recordError: jest.fn(),
+  log: jest.fn(),
 }))
 
 jest.mock("react-native-share", () => ({
@@ -125,6 +132,7 @@ jest.mock("react-native-share", () => ({
 
 import { AccountBanner } from "@app/screens/settings-screen/account/banner"
 import { useLoginMethods } from "@app/screens/settings-screen/account/login-methods-hook"
+import { useCustodialSecuritySignals } from "@app/custodial/hooks/use-security-signals"
 import { DefaultWallet } from "@app/screens/settings-screen/settings/account-default-wallet"
 import { AccountLNAddress } from "@app/screens/settings-screen/settings/account-ln-address"
 import { AccountPOS } from "@app/screens/settings-screen/settings/account-pos"
@@ -237,6 +245,34 @@ describe("settings skips graphql queries when unauthenticated", () => {
 
     it("does not skip when authed and keeps fetchPolicy: cache-and-network", () => {
       renderHook(() => useLoginMethods(), { wrapper: wrap(true) })
+
+      expect(mockUseSettingsScreenQuery).toHaveBeenCalledWith({
+        skip: false,
+        fetchPolicy: "cache-and-network",
+      })
+    })
+  })
+
+  describe("useCustodialSecuritySignals", () => {
+    const wrap = (isAuthed: boolean) => {
+      const Wrapper = ({ children }: { children: React.ReactNode }) => (
+        <IsAuthedContextProvider value={isAuthed}>{children}</IsAuthedContextProvider>
+      )
+      Wrapper.displayName = "AuthWrapper"
+      return Wrapper
+    }
+
+    it("applies skip: !isAuthed while preserving fetchPolicy: cache-and-network", () => {
+      renderHook(() => useCustodialSecuritySignals(), { wrapper: wrap(false) })
+
+      expect(mockUseSettingsScreenQuery).toHaveBeenCalledWith({
+        skip: true,
+        fetchPolicy: "cache-and-network",
+      })
+    })
+
+    it("does not skip when authed and keeps fetchPolicy: cache-and-network", () => {
+      renderHook(() => useCustodialSecuritySignals(), { wrapper: wrap(true) })
 
       expect(mockUseSettingsScreenQuery).toHaveBeenCalledWith({
         skip: false,

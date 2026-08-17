@@ -5,6 +5,38 @@ import { ThemeProvider } from "@rn-vui/themed"
 import theme from "@app/rne-theme/theme"
 import { FeeTierSelector } from "@app/screens/send-bitcoin-screen/fee-tier-selector"
 
+/** react-native-modal grabs an InteractionManager handle on open, which RN warns is deprecated. */
+jest.mock("react-native-modal", () => {
+  const MockModal = ({
+    children,
+    isVisible,
+    onBackdropPress,
+    onBackButtonPress,
+  }: {
+    children: React.ReactNode
+    isVisible: boolean
+    onBackdropPress: () => void
+    onBackButtonPress: () => void
+  }) =>
+    isVisible
+      ? React.createElement(
+          "View",
+          { testID: "modal" },
+          React.createElement("View", {
+            testID: "modal-backdrop",
+            onPress: onBackdropPress,
+          }),
+          React.createElement("View", {
+            testID: "modal-back-button",
+            onPress: onBackButtonPress,
+          }),
+          children,
+        )
+      : null
+  MockModal.displayName = "MockModal"
+  return MockModal
+})
+
 const buildOptions = () => [
   { id: "fast", label: "Fast", detail: "30 sat/vB" },
   { id: "medium", label: "Medium", detail: "20 sat/vB" },
@@ -61,11 +93,53 @@ describe("FeeTierSelector", () => {
     expect(onSelect).toHaveBeenCalledWith("slow")
   })
 
+  it("swaps the caret for a spinner while the fees are being quoted", () => {
+    const { getByTestId } = renderSelector({ loading: true })
+
+    expect(getByTestId("fee-tier-spinner")).toBeTruthy()
+  })
+
+  it("shows no spinner once the quote has landed", () => {
+    const { queryByTestId } = renderSelector()
+
+    expect(queryByTestId("fee-tier-spinner")).toBeNull()
+  })
+
+  it("still opens the tier list while quoting", () => {
+    const onSelect = jest.fn()
+    const { getByTestId } = renderSelector({ loading: true, onSelect })
+
+    fireEvent.press(getByTestId("fee-tier-dropdown"))
+    fireEvent.press(getByTestId("fee-tier-slow"))
+
+    expect(onSelect).toHaveBeenCalledWith("slow")
+  })
+
   it("renders gracefully when the selected id is unknown", () => {
     // Pass a selected id that isn't in options to ensure no crash.
     const { getByTestId } = renderSelector({ selected: "nonexistent" as never })
 
     expect(getByTestId("fee-tier-dropdown")).toBeTruthy()
+  })
+
+  it("closes the tier list when the backdrop is pressed", () => {
+    const { getByTestId, queryByTestId } = renderSelector()
+
+    fireEvent.press(getByTestId("fee-tier-dropdown"))
+    expect(getByTestId("fee-tier-slow")).toBeTruthy()
+
+    fireEvent.press(getByTestId("modal-backdrop"))
+
+    expect(queryByTestId("fee-tier-slow")).toBeNull()
+  })
+
+  it("closes the tier list on the hardware back button", () => {
+    const { getByTestId, queryByTestId } = renderSelector()
+
+    fireEvent.press(getByTestId("fee-tier-dropdown"))
+    fireEvent.press(getByTestId("modal-back-button"))
+
+    expect(queryByTestId("fee-tier-slow")).toBeNull()
   })
 
   it("hides detail when an option's detail is empty", () => {

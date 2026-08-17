@@ -8,12 +8,27 @@ import { ContextForScreen } from "../../../helper"
 import { flushEffects } from "../../../../helpers/flush-effects"
 
 const mockNavigate = jest.fn()
-let mockStep = 1
+const mockSetOptions = jest.fn()
+let mockStep: unknown = 1
+let mockHasParams = true
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
-  useNavigation: () => ({ navigate: mockNavigate }),
-  useRoute: () => ({ params: { step: mockStep } }),
+  useNavigation: () => ({ navigate: mockNavigate, setOptions: mockSetOptions }),
+  useRoute: () => ({ params: mockHasParams ? { step: mockStep } : undefined }),
 }))
+
+const mockReportError = jest.fn()
+jest.mock("@app/utils/error-logging", () => ({
+  ...jest.requireActual("@app/utils/error-logging"),
+  reportError: (...args: readonly unknown[]) => mockReportError(...args),
+}))
+
+const renderHeaderRight = () => {
+  const calls = mockSetOptions.mock.calls
+  const lastOptions = calls[calls.length - 1]?.[0]
+  if (!lastOptions?.headerRight) throw new Error("headerRight was not set")
+  return render(<ContextForScreen>{lastOptions.headerRight()}</ContextForScreen>)
+}
 
 const mockCopyToClipboard = jest.fn()
 let mockCountdown = { remainingSeconds: 0, isExpired: true }
@@ -38,6 +53,12 @@ jest.mock("react-native-inappbrowser-reborn", () => ({
   default: { open: jest.fn(() => Promise.resolve()) },
 }))
 
+const mockOpenExternalUrl = jest.fn()
+jest.mock("@app/utils/external", () => ({
+  ...jest.requireActual("@app/utils/external"),
+  openExternalUrl: (...args: unknown[]) => mockOpenExternalUrl(...args),
+}))
+
 jest.mock("@app/screens/settings-screen/group", () => {
   const { View } = jest.requireActual("react-native")
   return {
@@ -58,7 +79,62 @@ describe("BackupPhraseScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockStep = 1
+    mockHasParams = true
     mockCountdown = { remainingSeconds: 0, isExpired: true }
+  })
+
+  /** Deep links and navigation-state rehydration can deliver missing or malformed params;
+   *  the screen falls back to step 1 (the first six words) instead of throwing into the
+   *  app-wide ErrorBoundary, which replaces the whole navigation tree (#4070). */
+  describe("route param guards", () => {
+    it("falls back to step 1 when the route delivers no params", async () => {
+      mockHasParams = false
+
+      const { getByText, queryByText } = render(
+        <ContextForScreen>
+          <BackupPhraseScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      await waitFor(() => expect(getByText("youth")).toBeTruthy())
+      expect(queryByText("ritual")).toBeNull()
+      expect(mockReportError).toHaveBeenCalledTimes(1)
+      expect(mockReportError).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.any(Error),
+        expect.objectContaining({
+          dedupKey: "backup-phrase-params-missing",
+          alwaysRecord: true,
+        }),
+      )
+    })
+
+    it("falls back to step 1 when the route delivers an out-of-range step", async () => {
+      mockStep = 7
+
+      const { getByText, queryByText } = render(
+        <ContextForScreen>
+          <BackupPhraseScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      await waitFor(() => expect(getByText("youth")).toBeTruthy())
+      expect(queryByText("ritual")).toBeNull()
+      expect(mockReportError).toHaveBeenCalledTimes(1)
+    })
+
+    it("does not report valid params", async () => {
+      render(
+        <ContextForScreen>
+          <BackupPhraseScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      expect(mockReportError).not.toHaveBeenCalled()
+    })
   })
 
   describe("step 1", () => {
@@ -184,14 +260,15 @@ describe("BackupPhraseScreen", () => {
   })
 
   describe("shared", () => {
-    it("renders copy button", async () => {
-      const { getByText } = render(
+    it("renders copy button in the header", async () => {
+      render(
         <ContextForScreen>
           <BackupPhraseScreen />
         </ContextForScreen>,
       )
       await flushEffects()
 
+      const { getByText } = renderHeaderRight()
       expect(getByText(LL.BackupScreen.ManualBackup.Phrase.copy())).toBeTruthy()
     })
 
@@ -204,13 +281,32 @@ describe("BackupPhraseScreen", () => {
       await flushEffects()
 
       await waitFor(() => expect(getByText("youth")).toBeTruthy())
-      fireEvent.press(getByText(LL.BackupScreen.ManualBackup.Phrase.copy()))
+      const { getByText: getHeaderText } = renderHeaderRight()
+      fireEvent.press(getHeaderText(LL.BackupScreen.ManualBackup.Phrase.copy()))
       expect(mockCopyToClipboard).toHaveBeenCalledWith(
         expect.objectContaining({
           content: expect.stringContaining("youth"),
           message: LL.BackupScreen.ManualBackup.Phrase.copiedToast(),
         }),
       )
+    })
+
+    it("announces the Copy button by its visible label, not the test id", async () => {
+      render(
+        <ContextForScreen>
+          <BackupPhraseScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      const { getByTestId } = renderHeaderRight()
+      const button = getByTestId("backup-phrase-copy")
+      // `testProps` sets accessibilityLabel to the test id; the explicit
+      // accessibilityLabel after the spread must win.
+      expect(button.props.accessibilityLabel).toBe(
+        LL.BackupScreen.ManualBackup.Phrase.copy(),
+      )
+      expect(button.props.hitSlop).toEqual({ top: 12, bottom: 12, left: 12, right: 12 })
     })
 
     it("renders spark compatible link", async () => {
@@ -223,6 +319,32 @@ describe("BackupPhraseScreen", () => {
 
       expect(
         getByText(LL.BackupScreen.ManualBackup.Phrase.sparkCompatibleLink()),
+      ).toBeTruthy()
+    })
+
+    it("opens the spark-compatible link from the info banner", () => {
+      const { getByText } = render(
+        <ContextForScreen>
+          <BackupPhraseScreen />
+        </ContextForScreen>,
+      )
+
+      fireEvent.press(
+        getByText(LL.BackupScreen.ManualBackup.Phrase.sparkCompatibleLink()),
+      )
+
+      expect(mockOpenExternalUrl).toHaveBeenCalledWith("https://example.com")
+    })
+
+    it("renders the do-not-share warning card", () => {
+      const { getByText } = render(
+        <ContextForScreen>
+          <BackupPhraseScreen />
+        </ContextForScreen>,
+      )
+
+      expect(
+        getByText(LL.BackupScreen.ManualBackup.Phrase.doNotShareWarning()),
       ).toBeTruthy()
     })
   })

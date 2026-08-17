@@ -28,6 +28,7 @@ export const usePendingMigrationAccounts = () => {
   const { ownerId, loading: ownerLoading } = useCustodialOwnerId()
   const [pendingByOwner, setPendingByOwner] = useState<Record<string, string>>({})
   const [loading, setLoading] = useState(true)
+  const [hasError, setHasError] = useState(false)
   const isMountedRef = useRef(true)
 
   const activeAccountId = activeAccount?.id ?? null
@@ -40,39 +41,52 @@ export const usePendingMigrationAccounts = () => {
 
   const storageKey = getPendingAccountsStorageKey(environment)
 
+  /** The error only clears on a read that succeeds (the self-heal counts: the record
+   *  itself was read fine), never at the start of one, so a retry never presents the
+   *  still-empty map as settled data while the read is in flight. Resolves instead of
+   *  rejecting; the failure already traveled through reportError and hasError. */
+  const load = useCallback(
+    (): Promise<void> =>
+      loadPendingProvisionedAccounts(storageKey)
+        .then((pending) => {
+          if (!isMountedRef.current) return
+
+          const activatedOwner = Object.keys(pending).find(
+            (owner) => pending[owner] === activeAccountId,
+          )
+          if (activatedOwner) {
+            const { [activatedOwner]: activated, ...rest } = pending
+            setPendingByOwner(rest)
+            setHasError(false)
+            setLoading(false)
+            clearPendingProvisionedAccount(storageKey, activatedOwner).catch((err) => {
+              reportError("Pending migration account self-heal", err)
+            })
+            return
+          }
+
+          setPendingByOwner(pending)
+          setHasError(false)
+          setLoading(false)
+        })
+        .catch((err) => {
+          reportError("Pending migration accounts load", err)
+          if (!isMountedRef.current) return
+          setHasError(true)
+          setLoading(false)
+        }),
+    [storageKey, activeAccountId],
+  )
+
   const reloadPendingAccounts = useCallback(() => {
     isMountedRef.current = true
 
-    loadPendingProvisionedAccounts(storageKey)
-      .then((pending) => {
-        if (!isMountedRef.current) return
-
-        const activatedOwner = Object.keys(pending).find(
-          (owner) => pending[owner] === activeAccountId,
-        )
-        if (activatedOwner) {
-          const { [activatedOwner]: activated, ...rest } = pending
-          setPendingByOwner(rest)
-          setLoading(false)
-          clearPendingProvisionedAccount(storageKey, activatedOwner).catch((err) => {
-            reportError("Pending migration account self-heal", err)
-          })
-          return
-        }
-
-        setPendingByOwner(pending)
-        setLoading(false)
-      })
-      .catch((err) => {
-        reportError("Pending migration accounts load", err)
-        if (!isMountedRef.current) return
-        setLoading(false)
-      })
+    load()
 
     return () => {
       isMountedRef.current = false
     }
-  }, [storageKey, activeAccountId])
+  }, [load])
 
   useFocusEffect(reloadPendingAccounts)
 
@@ -122,5 +136,11 @@ export const usePendingMigrationAccounts = () => {
     savePendingAccount,
     clearPendingAccount,
     loading: loading || ownerLoading,
+    /** A read failure surfaced, not swallowed: an unreadable record read as "no pending
+     *  wallet" would tell the gate this device was wiped when it wasn't. */
+    hasError,
+    /** Imperative reload for retry screens; leaves the mount flag alone so a retry
+     *  resolving after unmount still drops its update. */
+    refetch: load,
   }
 }

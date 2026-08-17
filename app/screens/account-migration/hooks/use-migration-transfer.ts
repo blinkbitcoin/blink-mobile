@@ -4,14 +4,14 @@ import { gql } from "@apollo/client"
 
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { MigrationStatus, useMigrationCommitMutation } from "@app/graphql/generated"
-import { isNetworkFailure } from "@app/graphql/is-network-failure"
+import { isNetworkFailure } from "@app/graphql/transport-error"
 import { isDeviceClockSkewed } from "@app/graphql/server-time"
 import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
 import {
   buildMigrationTransferRequest,
   MigrationSdkStatus,
 } from "@app/self-custodial/migration-transfer-request"
-import { MigrationSupportReason } from "@app/types/migration"
+import { MigrationRejectionCode, MigrationSupportReason } from "@app/types/migration"
 import { reportError } from "@app/utils/error-logging"
 
 import {
@@ -19,6 +19,7 @@ import {
   currentProofTimestamp,
 } from "../utils/migration-proof"
 
+import { useMigrationReceiveConfirmation } from "./use-migration-receive-confirmation"
 import { useMigrationStatus } from "./use-migration-status"
 
 gql`
@@ -42,10 +43,6 @@ const DISCLOSURE_VERSION = "v1"
 /** The server settles a drain in seconds, so the phase is re-read often enough to feel
  *  immediate without turning a slow settle into a burst of reads. */
 const STATUS_POLL_INTERVAL_MS = 2000
-
-/** The backend gives a stale proof and a bad destination the same code; the clock skew
- *  tells them apart, and any other code falls through to support (fail-safe). */
-const STALE_PROOF_REJECTION_CODE = "MIGRATION_INVALID_DESTINATION"
 
 /**
  * Custodial accounts whose commit has already fired this session. Unlike a per-mount ref
@@ -75,11 +72,17 @@ export const resetMigrationCommitGuard = (): void => {
 type UseMigrationTransferArgs = {
   custodialAccountId: string | null
   selfCustodialAccountId: string | null
+  /** From the checkpoint; null on records saved before the field existed. */
+  expectedReceiveSats: number | null
   skip: boolean
 }
 
 type UseMigrationTransfer = {
   isTransferred: boolean
+  /** Whether the receive was actually seen, as opposed to released by the notice window.
+   *  Only the irreversible half of the completion reads it. */
+  isReceiveProven: boolean
+  isReceiveDelayed: boolean
   failureReason: MigrationSupportReason | null
   isClockOutOfSync: boolean
   hasConnectionIssue: boolean
@@ -96,6 +99,7 @@ type UseMigrationTransfer = {
 export const useMigrationTransfer = ({
   custodialAccountId,
   selfCustodialAccountId,
+  expectedReceiveSats,
   skip,
 }: UseMigrationTransferArgs): UseMigrationTransfer => {
   const network = useSparkNetwork()
@@ -128,14 +132,30 @@ export const useMigrationTransfer = ({
   })
 
   const hasServerFailed = status === MigrationStatus.Failed
+  const isServerCompleted = status === MigrationStatus.Completed
+  const hasFailed = failureReason !== null
+
+  /** COMPLETED is the sender's word only; the swap must also wait for the receiver's,
+   *  or the user lands in a wallet whose funds are still in transit (#4102). */
+  const isReceiveGateSkipped = skip || !isServerCompleted || hasFailed
+  const { isReceiveConfirmed, isReceiveProven, isReceiveDelayed } =
+    useMigrationReceiveConfirmation({
+      selfCustodialAccountId,
+      expectedReceiveSats,
+      skip: isReceiveGateSkipped,
+    })
 
   /** A failure already handed the user to support, so a later COMPLETED from a stray poll
    *  must not also swap the session out from under that screen. */
-  const isTransferred = status === MigrationStatus.Completed && failureReason === null
+  const isTransferred = isServerCompleted && !hasFailed && isReceiveConfirmed
 
+  /** Stops on the server's terminal phase, not on isTransferred: the phase can no longer
+   *  change while the receive gate waits, so polling on would only re-run the server's
+   *  resume routine for the length of the wait. */
   useEffect(() => {
-    if (isTransferred || hasServerFailed || failureReason !== null) setHasStopped(true)
-  }, [isTransferred, hasServerFailed, failureReason])
+    const hasServerSettled = isServerCompleted || hasServerFailed
+    if (hasServerSettled || hasFailed) setHasStopped(true)
+  }, [isServerCompleted, hasServerFailed, hasFailed])
 
   /** A phase past IN_PROGRESS means the commit did land (the drop hit the response, not the
    *  request): the transfer is under way, so the notice clears and the screen watches it. */
@@ -158,10 +178,10 @@ export const useMigrationTransfer = ({
   /** The owner id can resolve a tick after mount; once it does, restore any failure the
    *  guard already remembers so a re-entered screen routes to support rather than spinning. */
   useEffect(() => {
-    if (!custodialAccountId || failureReason !== null) return
+    if (!custodialAccountId || hasFailed) return
     const rememberedFailure = settledCommitFailures.get(custodialAccountId)
     if (rememberedFailure) setFailureReason(rememberedFailure)
-  }, [custodialAccountId, failureReason])
+  }, [custodialAccountId, hasFailed])
 
   const commit = useCallback(
     async (custodialId: string, selfCustodialId: string) => {
@@ -214,9 +234,10 @@ export const useMigrationTransfer = ({
 
       /** A skewed clock makes the proof stale, which the backend rejects under the
        *  bad-destination code; that code plus a real skew is what earns a retry rather
-       *  than a handover to support. */
+       *  than a handover to support. Any other code falls through to support (fail-safe). */
       const isStaleProofRejection =
-        rejection.code === STALE_PROOF_REJECTION_CODE && isDeviceClockSkewed()
+        rejection.code === MigrationRejectionCode.InvalidDestination &&
+        isDeviceClockSkewed()
       if (isStaleProofRejection) {
         setIsClockOutOfSync(true)
         return
@@ -229,7 +250,6 @@ export const useMigrationTransfer = ({
   /** The server is waiting for a destination only while IN_PROGRESS: TRANSFERRING already
    *  has one, and committing a second invoice is refused as a state conflict. */
   const isAwaitingDestination = status === MigrationStatus.InProgress
-  const hasFailed = failureReason !== null
   /** A recoverable issue (skewed clock or lost connection) pauses the commit; clearing the
    *  flag on retry flips canCommit back to true and re-fires the effect. */
   const hasRecoverableIssue = isClockOutOfSync || hasConnectionIssue
@@ -302,6 +322,8 @@ export const useMigrationTransfer = ({
 
   return {
     isTransferred,
+    isReceiveProven,
+    isReceiveDelayed,
     failureReason: activeFailureReason,
     isClockOutOfSync,
     hasConnectionIssue,

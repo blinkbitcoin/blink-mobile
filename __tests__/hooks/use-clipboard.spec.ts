@@ -3,11 +3,20 @@ import { renderHook, act } from "@testing-library/react-hooks"
 import { useClipboard } from "@app/hooks/use-clipboard"
 
 const mockSetString = jest.fn()
+const mockGetString = jest.fn(() => Promise.resolve(""))
 const mockToastShow = jest.fn()
 
 jest.mock("@react-native-clipboard/clipboard", () => ({
   setString: (content: string) => mockSetString(content),
+  getString: () => mockGetString(),
 }))
+
+const flushMicrotasks = async () =>
+  act(async () => {
+    await Promise.resolve()
+    await Promise.resolve()
+    await Promise.resolve()
+  })
 
 jest.mock("@app/utils/toast", () => ({
   toastShow: (params: { type: string; message: string }) => mockToastShow(params),
@@ -116,7 +125,8 @@ describe("useClipboard", () => {
   })
 
   describe("auto-clear", () => {
-    it("clears clipboard after specified delay", () => {
+    it("clears clipboard after specified delay when it still holds the copied content", async () => {
+      mockGetString.mockResolvedValue("secret")
       const { result } = renderHook(() => useClipboard(5000))
 
       act(() => {
@@ -129,8 +139,26 @@ describe("useClipboard", () => {
       act(() => {
         jest.advanceTimersByTime(5000)
       })
+      await flushMicrotasks()
 
       expect(mockSetString).toHaveBeenCalledWith("")
+    })
+
+    it("leaves the clipboard alone when the user has since copied something else", async () => {
+      mockGetString.mockResolvedValue("something else entirely")
+      const { result } = renderHook(() => useClipboard(5000))
+
+      act(() => {
+        result.current.copyToClipboard({ content: "secret" })
+      })
+      mockSetString.mockClear()
+
+      act(() => {
+        jest.advanceTimersByTime(5000)
+      })
+      await flushMicrotasks()
+
+      expect(mockSetString).not.toHaveBeenCalled()
     })
 
     it("does not clear clipboard when clearAfterMs is not provided", () => {
@@ -149,7 +177,8 @@ describe("useClipboard", () => {
       expect(mockSetString).not.toHaveBeenCalled()
     })
 
-    it("resets timer on subsequent copy", () => {
+    it("resets timer on subsequent copy", async () => {
+      mockGetString.mockResolvedValue("second")
       const { result } = renderHook(() => useClipboard(5000))
 
       act(() => {
@@ -169,17 +198,20 @@ describe("useClipboard", () => {
       act(() => {
         jest.advanceTimersByTime(3000)
       })
+      await flushMicrotasks()
 
       expect(mockSetString).not.toHaveBeenCalled()
 
       act(() => {
         jest.advanceTimersByTime(2000)
       })
+      await flushMicrotasks()
 
       expect(mockSetString).toHaveBeenCalledWith("")
     })
 
-    it("cleans up timer on unmount", () => {
+    it("clears a pending secret immediately when the consumer unmounts", async () => {
+      mockGetString.mockResolvedValue("test")
       const { result, unmount } = renderHook(() => useClipboard(5000))
 
       act(() => {
@@ -188,10 +220,42 @@ describe("useClipboard", () => {
 
       mockSetString.mockClear()
       unmount()
+      await flushMicrotasks()
+
+      expect(mockSetString).toHaveBeenCalledWith("")
+    })
+
+    it("does not clear again after the delay when unmount already cleared", async () => {
+      mockGetString.mockResolvedValue("test")
+      const { result, unmount } = renderHook(() => useClipboard(5000))
+
+      act(() => {
+        result.current.copyToClipboard({ content: "test" })
+      })
+
+      unmount()
+      await flushMicrotasks()
+      mockSetString.mockClear()
 
       act(() => {
         jest.advanceTimersByTime(10_000)
       })
+      await flushMicrotasks()
+
+      expect(mockSetString).not.toHaveBeenCalled()
+    })
+
+    it("does not touch the clipboard on unmount when no timed copy is pending", async () => {
+      mockGetString.mockResolvedValue("persistent")
+      const { result, unmount } = renderHook(() => useClipboard())
+
+      act(() => {
+        result.current.copyToClipboard({ content: "persistent" })
+      })
+
+      mockSetString.mockClear()
+      unmount()
+      await flushMicrotasks()
 
       expect(mockSetString).not.toHaveBeenCalled()
     })

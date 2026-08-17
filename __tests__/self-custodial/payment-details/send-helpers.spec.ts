@@ -78,6 +78,7 @@ jest.mock("@app/screens/send-bitcoin-screen/fee-tier-selector", () => ({
 const mockRecordError = jest.fn()
 jest.mock("@react-native-firebase/crashlytics", () => () => ({
   recordError: (...args: unknown[]) => mockRecordError(...args),
+  log: jest.fn(),
 }))
 
 const mockSdk = {
@@ -161,6 +162,156 @@ describe("createGetFee", () => {
     const result = await getFee()
 
     expect(result.amount).toBeUndefined()
+  })
+
+  // A failed quote used to return a bare `{ amount: undefined }`, so the confirmation
+  // screen could only show its generic "unable to calculate fee" dead end. The classified
+  // code lets it name the cause — most often a full-balance send the user can just lower.
+  it("classifies a thrown SdkError(InsufficientFunds) into the errors array", async () => {
+    mockPrepareSendPayment.mockRejectedValue(sdkError("InsufficientFunds"))
+
+    const getFee = createGetFee({
+      sdk: mockSdk,
+      paymentRequest: "lnbc1...",
+      amount: undefined,
+    })
+    const result = await getFee()
+
+    expect(result.amount).toBeUndefined()
+    expect(result.errors).toEqual([
+      {
+        __typename: "GraphQLApplicationError",
+        message: SelfCustodialErrorCode.InsufficientFunds,
+      },
+    ])
+  })
+
+  it("classifies a thrown SdkError(NetworkError) into the errors array", async () => {
+    mockPrepareSendPayment.mockRejectedValue(sdkError("NetworkError"))
+
+    const getFee = createGetFee({
+      sdk: mockSdk,
+      paymentRequest: "lnbc1...",
+      amount: undefined,
+    })
+    const result = await getFee()
+
+    expect(result.errors?.[0]?.message).toBe(SelfCustodialErrorCode.NetworkError)
+  })
+
+  it("falls back to the Generic code for a non-SdkError throw", async () => {
+    mockPrepareSendPayment.mockRejectedValue(new Error("fail"))
+
+    const getFee = createGetFee({
+      sdk: mockSdk,
+      paymentRequest: "lnbc1...",
+      amount: undefined,
+    })
+    const result = await getFee()
+
+    expect(result.errors?.[0]?.message).toBe(SelfCustodialErrorCode.Generic)
+  })
+
+  // `use-fee` only reports thrown errors, and this never throws — so without reporting
+  // here the failure is invisible in Crashlytics.
+  it("records an unexplained fee failure to crashlytics", async () => {
+    mockPrepareSendPayment.mockRejectedValue(new Error("prepare refused"))
+
+    const getFee = createGetFee({
+      sdk: mockSdk,
+      paymentRequest: "lnbc1...",
+      amount: undefined,
+    })
+    await getFee()
+
+    expect(mockRecordError).toHaveBeenCalledWith(
+      expect.objectContaining({ message: "prepare refused" }),
+    )
+  })
+
+  // The SDK adds the fee on top of the amount, so sending the full balance is the common
+  // way to fail a quote. The user lowers the amount and succeeds — not a defect, and it
+  // would otherwise fire a non-fatal per attempt, per user, on a flow that works.
+  it("keeps an InsufficientFunds quote failure a breadcrumb, not a non-fatal", async () => {
+    mockPrepareSendPayment.mockRejectedValue(sdkError("InsufficientFunds"))
+
+    const getFee = createGetFee({
+      sdk: mockSdk,
+      paymentRequest: "lnbc1...",
+      amount: undefined,
+    })
+    const result = await getFee()
+
+    expect(result.errors?.[0]?.message).toBe(SelfCustodialErrorCode.InsufficientFunds)
+    expect(mockRecordError).not.toHaveBeenCalled()
+  })
+
+  it("keeps a BelowMinimum quote failure a breadcrumb, not a non-fatal", async () => {
+    mockPrepareSendPayment.mockRejectedValue(
+      sdkError("Generic", ["amount below minimum"]),
+    )
+
+    const getFee = createGetFee({
+      sdk: mockSdk,
+      paymentRequest: "lnbc1...",
+      amount: undefined,
+    })
+    const result = await getFee()
+
+    expect(result.errors?.[0]?.message).toBe(SelfCustodialErrorCode.BelowMinimum)
+    expect(mockRecordError).not.toHaveBeenCalled()
+  })
+
+  it("still records an InvalidInput quote failure — it can mean our own bug", async () => {
+    mockPrepareSendPayment.mockRejectedValue(sdkError("InvalidInput"))
+
+    const getFee = createGetFee({
+      sdk: mockSdk,
+      paymentRequest: "lnbc1...",
+      amount: undefined,
+    })
+    const result = await getFee()
+
+    expect(result.errors?.[0]?.message).toBe(SelfCustodialErrorCode.InvalidInput)
+    expect(mockRecordError).toHaveBeenCalled()
+  })
+
+  it("records non-Error throws as a scoped Error so Sentry never gets a bare string", async () => {
+    mockPrepareSendPayment.mockRejectedValue("network blip")
+
+    const getFee = createGetFee({
+      sdk: mockSdk,
+      paymentRequest: "lnbc1...",
+      amount: undefined,
+    })
+    await getFee()
+
+    expect(mockRecordError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: expect.stringContaining(
+          "Self-custodial Lightning fee failed: network blip",
+        ),
+      }),
+    )
+  })
+
+  it("leaves errors unset on a successful quote", async () => {
+    mockPrepareSendPayment.mockResolvedValue({
+      paymentMethod: {
+        tag: "Bolt11Invoice",
+        inner: { sparkTransferFeeSats: BigInt(3), lightningFeeSats: BigInt(21) },
+      },
+    })
+
+    const getFee = createGetFee({
+      sdk: mockSdk,
+      paymentRequest: "lnbc1...",
+      amount: undefined,
+    })
+    const result = await getFee()
+
+    expect(result.errors).toBeUndefined()
+    expect(mockRecordError).not.toHaveBeenCalled()
   })
 
   it("threads the SDK dust adjustment through to amountAdjustment", async () => {
@@ -303,6 +454,27 @@ describe("createGetFeeOnchain", () => {
     expect(result.amount).toBeUndefined()
   })
 
+  // Nothing throws on this path, so it produced no error code and no crash report at all.
+  it("reports the Generic code when extractOnchainFees returns null", async () => {
+    mockPrepareSendPayment.mockResolvedValue({
+      amount: BigInt(50000),
+      paymentMethod: { tag: "Bolt11Invoice", inner: {} },
+    })
+
+    const getFee = createGetFeeOnchain(
+      { sdk: mockSdk, paymentRequest: "lnbc1...", amount: BigInt(50000) },
+      "medium",
+    )
+    const result = await getFee()
+
+    expect(result.errors?.[0]?.message).toBe(SelfCustodialErrorCode.Generic)
+    expect(mockRecordError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: expect.stringContaining("no BitcoinAddress fee quote"),
+      }),
+    )
+  })
+
   it("returns undefined amount when prepare fails", async () => {
     mockPrepareSendPayment.mockRejectedValue(new Error("fail"))
 
@@ -313,6 +485,45 @@ describe("createGetFeeOnchain", () => {
     const result = await getFee()
 
     expect(result.amount).toBeUndefined()
+  })
+
+  it("classifies a thrown SdkError(InsufficientFunds) into the errors array", async () => {
+    mockPrepareSendPayment.mockRejectedValue(sdkError("InsufficientFunds"))
+
+    const getFee = createGetFeeOnchain(
+      { sdk: mockSdk, paymentRequest: "bc1q...", amount: BigInt(50000) },
+      "fast",
+    )
+    const result = await getFee()
+
+    expect(result.errors?.[0]?.message).toBe(SelfCustodialErrorCode.InsufficientFunds)
+  })
+
+  it("records onchain fee failures to crashlytics with a scoped Error", async () => {
+    mockPrepareSendPayment.mockRejectedValue(new Error("prepare refused"))
+
+    const getFee = createGetFeeOnchain(
+      { sdk: mockSdk, paymentRequest: "bc1q...", amount: BigInt(50000) },
+      "fast",
+    )
+    await getFee()
+
+    expect(mockRecordError).toHaveBeenCalledWith(
+      expect.objectContaining({ message: "prepare refused" }),
+    )
+  })
+
+  it("leaves errors unset on a successful quote", async () => {
+    mockPrepareSendPayment.mockResolvedValue(onchainPrepared)
+
+    const getFee = createGetFeeOnchain(
+      { sdk: mockSdk, paymentRequest: "bc1q...", amount: BigInt(50000) },
+      "medium",
+    )
+    const result = await getFee()
+
+    expect(result.errors).toBeUndefined()
+    expect(mockRecordError).not.toHaveBeenCalled()
   })
 })
 

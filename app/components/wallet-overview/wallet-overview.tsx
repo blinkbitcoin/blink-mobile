@@ -15,12 +15,15 @@ import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { testProps } from "@app/utils/testProps"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { HiddenBalancePlaceholder } from "@app/components/hidden-balance-placeholder/hidden-balance-placeholder"
 import { GaloyIcon } from "../atomic/galoy-icon"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { NotificationBadge } from "@app/components/notification-badge"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { CurrencyPill, useEqualPillWidth } from "../atomic/currency-pill"
+
+const CARD_NUMBER_MASK = "••••"
 
 const Loader = () => {
   const styles = useStyles()
@@ -60,6 +63,8 @@ type Props = {
   setIsStablesatModalVisible: (value: boolean) => void
   onRestrictedTap?: () => void
   wallets?: readonly WalletBalance[]
+  hasCard?: boolean
+  cardLastFour?: string | null
   showBtcNotification?: boolean
   showUsdNotification?: boolean
 }
@@ -69,11 +74,13 @@ const WalletOverview: React.FC<Props> = ({
   setIsStablesatModalVisible,
   onRestrictedTap,
   wallets,
+  hasCard = false,
+  cardLastFour,
   showBtcNotification = false,
   showUsdNotification = false,
 }) => {
   const isDollarBalanceRestricted = useDollarBalanceRestricted()
-  const { hideAmount, switchMemoryHideAmount } = useHideAmount()
+  const { hideAmount, toggleHideAmount } = useHideAmount()
 
   const { LL } = useI18nContext()
   const isAuthed = useIsAuthed()
@@ -132,13 +139,18 @@ const WalletOverview: React.FC<Props> = ({
   const [pressedUsd, setPressedUsd] = useState(false)
   const { widthStyle: pillWidthStyle, onPillLayout } = useEqualPillWidth()
 
+  const showCardLastFour = Boolean(cardLastFour) && !hideAmount
+  const maskedCardNumber = showCardLastFour
+    ? `${CARD_NUMBER_MASK} ${cardLastFour}`
+    : CARD_NUMBER_MASK
+
   return (
     <View style={styles.container}>
       <View style={styles.myAccounts}>
         <Text type="p1" bold {...testProps(LL.HomeScreen.myAccounts())}>
           {LL.HomeScreen.myAccounts()}
         </Text>
-        <Pressable onPress={switchMemoryHideAmount}>
+        <Pressable onPress={toggleHideAmount}>
           <GaloyIcon name={hideAmount ? "eye-slash" : "eye"} size={24} />
         </Pressable>
       </View>
@@ -169,10 +181,15 @@ const WalletOverview: React.FC<Props> = ({
           {loading ? (
             <Loader />
           ) : hideAmount ? (
-            <Text>****</Text>
+            <HiddenBalancePlaceholder size="small" />
           ) : (
             <View style={[styles.hideableArea, pressedBtc && styles.pressedOpacity]}>
-              <Text type="p1" bold {...testProps("bitcoin-balance")}>
+              <Text
+                type="p1"
+                bold
+                style={styles.boldBalance}
+                {...testProps("bitcoin-balance")}
+              >
                 {btcInUnderlyingCurrency}
               </Text>
               <Text type="p3">{btcInDisplayCurrencyFormatted}</Text>
@@ -225,7 +242,7 @@ const WalletOverview: React.FC<Props> = ({
                 {!hideAmount && (
                   <>
                     {usdInUnderlyingCurrency ? (
-                      <Text type="p1" bold>
+                      <Text type="p1" bold style={styles.boldBalance}>
                         {usdInUnderlyingCurrency}
                       </Text>
                     ) : null}
@@ -233,17 +250,40 @@ const WalletOverview: React.FC<Props> = ({
                       {...testProps("stablesats-balance")}
                       type={usdInUnderlyingCurrency ? "p3" : "p1"}
                       bold={!usdInUnderlyingCurrency}
+                      style={!usdInUnderlyingCurrency && styles.boldBalance}
                     >
                       {usdInDisplayCurrencyFormatted}
                     </Text>
                   </>
                 )}
-                {hideAmount && <Text>****</Text>}
+                {hideAmount && <HiddenBalancePlaceholder size="small" />}
               </View>
             )}
           </View>
         </Pressable>
       </DisabledFeature>
+
+      {hasCard && (
+        <>
+          <View style={styles.separator} />
+          <Pressable onPress={() => navigation.navigate("cardDashboardScreen")}>
+            <View style={styles.displayTextView}>
+              <View style={styles.currency}>
+                <CurrencyPill
+                  currency={WalletCurrency.Usd}
+                  label={LL.common.card()}
+                  highlighted={false}
+                  containerSize="medium"
+                  containerStyle={[pillWidthStyle, styles.cardPillBackground]}
+                />
+              </View>
+              <Text type="p1" bold>
+                {maskedCardNumber}
+              </Text>
+            </View>
+          </Pressable>
+        </>
+      )}
     </View>
   )
 }
@@ -307,6 +347,9 @@ const useStyles = makeStyles(({ colors }) => ({
   restrictionLabelText: {
     textAlign: "right",
   },
+  boldBalance: {
+    fontFamily: "SourceSansPro-Bold",
+  },
   loaderContainer: {
     flex: 1,
     justifyContent: "flex-end",
@@ -315,4 +358,7 @@ const useStyles = makeStyles(({ colors }) => ({
     marginTop: 5,
   },
   pressedOpacity: { opacity: 0.7 },
+  cardPillBackground: {
+    backgroundColor: colors._cardPill,
+  },
 }))

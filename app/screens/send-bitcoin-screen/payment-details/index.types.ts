@@ -11,6 +11,7 @@ import {
   OnChainUsdPaymentSendAsBtcDenominatedMutationHookResult,
   OnChainUsdPaymentSendMutationHookResult,
   PaymentSendResult,
+  PayoutSpeed,
   useLnInvoiceFeeProbeMutation,
   useLnNoAmountInvoiceFeeProbeMutation,
   useLnNoAmountUsdInvoiceFeeProbeMutation,
@@ -109,6 +110,10 @@ export type SetSuccessAction<T extends WalletCurrency> = (
   successAction: LNURLPaySuccessAction | undefined,
 ) => PaymentDetail<T>
 
+export type SetPayoutSpeed<T extends WalletCurrency> = (
+  payoutSpeed: PayoutSpeed,
+) => PaymentDetail<T>
+
 type BasePaymentDetail<T extends WalletCurrency> = {
   memo?: string
   paymentType:
@@ -166,6 +171,29 @@ export type PaymentDetailSetSuccessAction<T extends WalletCurrency> = {
   successAction?: LNURLPaySuccessAction
 }
 
+/** Only custodial on-chain sends carry a payout speed; every other rail leaves it unset. */
+export type PaymentDetailSetPayoutSpeed<T extends WalletCurrency> = {
+  setPayoutSpeed?: SetPayoutSpeed<T>
+  payoutSpeed?: PayoutSpeed
+}
+
+/**
+ * Which of the three on-chain fee endpoints answers for a payment. Set by the factory that
+ * already picks the endpoint for getFee, so anything quoting fees ahead of the confirmation
+ * screen reads it from here instead of re-deriving the same rule and drifting from it.
+ */
+export const OnchainFeeQuote = {
+  Btc: "btc",
+  Usd: "usd",
+  UsdAsBtcDenominated: "usd_as_btc_denominated",
+} as const
+
+export type OnchainFeeQuote = (typeof OnchainFeeQuote)[keyof typeof OnchainFeeQuote]
+
+export type PaymentDetailOnchainFeeQuote = {
+  feeQuote?: OnchainFeeQuote
+}
+
 // sendPayment and getFee are defined together
 export type PaymentDetailSendPaymentGetFee<T extends WalletCurrency> =
   | {
@@ -192,6 +220,9 @@ type LnurlSpecificProperties<T extends WalletCurrency> =
   | {
       paymentType: typeof PaymentType.Lnurl
       lnurlParams: LnUrlPayServiceResponse
+      /** The bolt11 invoice fetched from the lnurl service; set once an invoice exists
+       *  (i.e. when the payment is sendable). The lnurl string itself is `destination`. */
+      paymentRequest?: string
       setInvoice: SetInvoice<T>
       setSuccessAction: SetSuccessAction<T>
       isMerchant: boolean
@@ -203,7 +234,9 @@ export type PaymentDetail<T extends WalletCurrency> = BasePaymentDetail<T> &
   PaymentDetailSetMemo<T> &
   PaymentDetailSetAmount<T> &
   PaymentDetailSendPaymentGetFee<T> &
-  PaymentDetailSetSuccessAction<T>
+  PaymentDetailSetSuccessAction<T> &
+  PaymentDetailSetPayoutSpeed<T> &
+  PaymentDetailOnchainFeeQuote
 
 export const AmountInvalidReason = {
   InsufficientBalance: "InsufficientBalance",

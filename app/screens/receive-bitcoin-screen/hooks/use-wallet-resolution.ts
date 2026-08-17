@@ -19,7 +19,10 @@ gql`
         deposit {
           minBankFee
           minBankFeeThreshold
-          ratio
+          tiers {
+            maxAmount
+            amount
+          }
         }
       }
     }

@@ -11,7 +11,7 @@ import { FlatList } from "react-native-gesture-handler"
 import { gql } from "@apollo/client"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { Screen } from "@app/components/screen"
-import { useAppConfig } from "@app/hooks"
+import { useAppConfig, useDisplayCurrency } from "@app/hooks"
 import {
   UserContact,
   useAccountDefaultWalletLazyQuery,
@@ -22,11 +22,11 @@ import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { logParseDestinationResult } from "@app/utils/analytics"
+import { reportError } from "@app/utils/error-logging"
 import { toastShow } from "@app/utils/toast"
 import { PaymentType } from "@blinkbitcoin/blink-client"
 import Clipboard from "@react-native-clipboard/clipboard"
 import { CountryCode, PhoneNumber } from "libphonenumber-js/mobile"
-import crashlytics from "@react-native-firebase/crashlytics"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { SearchBar } from "@rn-vui/base"
@@ -47,6 +47,7 @@ import { resolveDestination } from "./payment-destination/resolve-destination"
 import {
   DestinationDirection,
   InvalidDestinationReason,
+  isMerchantChoiceDestination,
 } from "./payment-destination/index.types"
 import {
   DestinationState,
@@ -188,6 +189,7 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
   })
 
   const { myWalletIds, bitcoinNetwork, lnurlDomains } = useScanContext()
+  const { displayCurrency } = useDisplayCurrency()
 
   // forcing price refresh
   useRealtimePriceQuery({
@@ -350,11 +352,24 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
           bitcoinNetwork,
           lnurlDomains,
           accountDefaultWalletQuery,
+          displayCurrency,
         },
         { sdk, network: sparkNetwork },
         lnAddressHostname,
       )
       logParseDestinationResult(wrappedDestination)
+
+      if (isMerchantChoiceDestination(wrappedDestination)) {
+        setGoToNextScreenWhenValid(false)
+        dispatchDestinationStateAction({
+          type: SendBitcoinActions.SetUnparsedDestination,
+          payload: { unparsedDestination: rawInput },
+        })
+        navigation.navigate("merchantSelection", {
+          merchants: wrappedDestination.validDestination.merchants,
+        })
+        return
+      }
 
       if (wrappedDestination.valid === false) {
         if (wrappedDestination.invalidReason === InvalidDestinationReason.SelfPayment) {
@@ -457,6 +472,7 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
       sdk,
       sparkNetwork,
       lnAddressHostname,
+      displayCurrency,
     ],
   )
 
@@ -600,7 +616,7 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
     if (destinationState.destinationState === DestinationState.Validating) return
     onFocusedInput(InputType.Search)
     try {
-      const clipboard = await Clipboard.getString()
+      const clipboard = (await Clipboard.getString()).trim()
       updateMatchingContacts(clipboard)
       dispatchDestinationStateAction({
         type: SendBitcoinActions.SetUnparsedPastedDestination,
@@ -612,9 +628,7 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
         waitAndValidateDestination(clipboard)
       }
     } catch (err) {
-      if (err instanceof Error) {
-        crashlytics().recordError(err)
-      }
+      reportError("send-bitcoin-destination", err)
       toastShow({
         type: "error",
         message: (translations) =>
@@ -637,7 +651,12 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
       const handle = item?.handle?.trim() ?? ""
       const displayHandle =
         handle && !handle.includes("@") ? `${handle}@${lnAddressHostname}` : handle
-      const parsePhone = parseValidPhone(displayHandle)
+      /**
+       * parse the raw handle: a phone contact should enter the phone flow, but a
+       * handle that is already a lightning address never should, even when its
+       * local part looks like a phone number
+       */
+      const parsePhone = parseValidPhone(handle)
 
       if (parsePhone?.isValid() && activeInputRef.current === InputType.Search) {
         onFocusedInput(InputType.Phone)
@@ -955,9 +974,7 @@ const PhoneInputSection: React.FC<PhoneInputSectionProps> = ({
         setKeepCountryCode(true)
       }, 100)
     } catch (err) {
-      if (err instanceof Error) {
-        crashlytics().recordError(err)
-      }
+      reportError("send-bitcoin-destination", err)
       toastShow({
         type: "error",
         message: (translations) =>
@@ -974,6 +991,8 @@ const PhoneInputSection: React.FC<PhoneInputSectionProps> = ({
     waitAndValidateDestination,
     LL,
     setRawPhoneNumber,
+    dispatchDestinationStateAction,
+    setKeepCountryCode,
   ])
 
   useEffect(() => {
@@ -1022,6 +1041,7 @@ const PhoneInputSection: React.FC<PhoneInputSectionProps> = ({
     destinationState.destinationState,
     parseValidPhone,
     setRawPhoneNumber,
+    activeInputRef,
   ])
 
   return (

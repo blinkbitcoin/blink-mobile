@@ -62,6 +62,14 @@ describe("NotificationCardUI", () => {
     expect(getByText("Test Body")).toBeTruthy()
   })
 
+  it("styles the title with the themed bold preset so it outranks the body", () => {
+    const { getByText } = render(<NotificationCardUI {...defaultProps} />)
+
+    expect(getByText("Test Title").props).toMatchObject({ type: "p3", bold: true })
+    expect(getByText("Test Body").props).toMatchObject({ type: "p3" })
+    expect(getByText("Test Body").props.bold).toBeUndefined()
+  })
+
   it("renders icon when provided", () => {
     const { queryByTestId } = render(
       <NotificationCardUI {...defaultProps} icon="warning" />,
@@ -143,5 +151,27 @@ describe("NotificationCardUI", () => {
     expect(queryByTestId("galoy-icon-bell")).toBeTruthy()
     expect(queryByTestId("primary-button")).toBeTruthy()
     expect(getByText("Go to settings")).toBeTruthy()
+  })
+
+  it("renders an inert card without action: title and body but no touchable container", () => {
+    const screen = render(<NotificationCardUI title="Test Title" text="Test Body" />)
+
+    expect(screen.getByText("Test Title")).toBeTruthy()
+    expect(screen.getByText("Test Body")).toBeTruthy()
+    expect(screen.UNSAFE_queryByType(TouchableOpacity)).toBeNull()
+  })
+
+  it("renders no button without action, even when a buttonLabel is passed", () => {
+    const { queryByTestId } = render(
+      <NotificationCardUI title="Test Title" text="Test Body" buttonLabel="Click me" />,
+    )
+
+    expect(queryByTestId("primary-button")).toBeNull()
+  })
+
+  it("keeps the touchable container when action is present", () => {
+    const screen = render(<NotificationCardUI {...defaultProps} />)
+
+    expect(screen.UNSAFE_queryByType(TouchableOpacity)).toBeTruthy()
   })
 })

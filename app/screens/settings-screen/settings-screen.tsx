@@ -8,6 +8,7 @@ import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
+import { headerRightNoGlass } from "@app/components/header-no-glass"
 import { BackupStatus, useBackupState } from "@app/self-custodial/providers/backup-state"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { Screen } from "@app/components/screen"
@@ -49,6 +50,7 @@ import { MoveToNonCustodialSetting } from "./settings/account-move-to-noncustodi
 import { SwitchAccountSetting } from "./settings/multi-account"
 import { StableBalanceSetting } from "./settings/stable-balance"
 import { ViewBackupPhraseSetting } from "./settings/view-backup-phrase"
+import { BackupWalletSetting } from "./settings/backup-wallet"
 
 // All queries in settings have to be set here so that the server is not hit with
 // multiple requests for each query
@@ -129,7 +131,12 @@ export const SettingsScreen: React.FC = () => {
       ThemeSetting,
       StableBalanceSetting,
     ],
-    securityAndPrivacy: [TotpSetting, OnDeviceSecuritySetting, ViewBackupPhraseSetting],
+    securityAndPrivacy: [
+      TotpSetting,
+      OnDeviceSecuritySetting,
+      ViewBackupPhraseSetting,
+      BackupWalletSetting,
+    ],
     advanced: [ExportCsvSetting, ApiAccessSetting],
     community: [NeedHelpSetting, JoinCommunitySetting],
   }
@@ -140,8 +147,8 @@ export const SettingsScreen: React.FC = () => {
     const count =
       unackNotificationCount?.me
         ?.unacknowledgedStatefulNotificationsWithoutBulletinEnabledCount || 0
-    navigation.setOptions({
-      headerRight: () => (
+    navigation.setOptions(
+      headerRightNoGlass(() => (
         <TouchableOpacity onPress={() => navigation.navigate("notificationHistory")}>
           <GaloyIcon name="bell" size={24} style={styles.headerRight} />
           {count !== 0 && (
@@ -152,8 +159,8 @@ export const SettingsScreen: React.FC = () => {
             />
           )}
         </TouchableOpacity>
-      ),
-    })
+      )),
+    )
   }, [navigation, styles, unackNotificationCount])
 
   return (
@@ -185,9 +192,9 @@ export const SettingsScreen: React.FC = () => {
           name={LL.common.securityAndPrivacy()}
           items={items.securityAndPrivacy}
         />
-        {!isSelfCustodialMode && (
-          <SettingsGroup name={LL.common.advanced()} items={items.advanced} />
-        )}
+        {/* Rows gate themselves by account mode (CSV export branches, API access is
+            custodial-only) and SettingsGroup collapses when every row returns null. */}
+        <SettingsGroup name={LL.common.advanced()} items={items.advanced} />
         <SettingsGroup name={LL.common.support()} items={items.community} />
         <VersionComponent />
       </ScrollView>

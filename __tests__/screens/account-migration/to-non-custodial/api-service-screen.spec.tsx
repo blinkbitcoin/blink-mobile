@@ -44,6 +44,16 @@ describe("MigrationApiServiceScreen", () => {
     expect(screen.getByText(LL.AccountMigration.apiServiceContinueCta())).toBeTruthy()
   })
 
+  it("offers continuing the migration first and Contact us below it", async () => {
+    renderScreen()
+    await flushEffects()
+
+    const [firstAction, secondAction] = screen.getAllByRole("button")
+
+    expect(firstAction.props.testID).toBe("migration-api-continue-cta")
+    expect(secondAction.props.testID).toBe("migration-api-contact-cta")
+  })
+
   it("opens the support email when Contact us is pressed", async () => {
     renderScreen()
     await flushEffects()
@@ -55,7 +65,7 @@ describe("MigrationApiServiceScreen", () => {
     )
   })
 
-  it("acknowledges the warning when Continue anyways is pressed", async () => {
+  it("acknowledges the warning when the migration is continued", async () => {
     renderScreen()
     await flushEffects()
 

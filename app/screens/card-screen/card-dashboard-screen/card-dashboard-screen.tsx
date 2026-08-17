@@ -15,6 +15,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { BackendFeatureGate } from "@app/components/backend-feature-gate"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { BlinkCard } from "@app/components/blink-card"
+import { headerRightNoGlass } from "@app/components/header-no-glass"
 import {
   CardActionButtons,
   CardBalanceSection,
@@ -24,11 +25,10 @@ import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
-import { CardStatus } from "@app/graphql/generated"
 import { toastShow } from "@app/utils/toast"
 
 import { useCardData } from "../hooks/use-card-data"
-import { isCardFrozen } from "../utils/card-display"
+import { isCardFrozen, isCardUsable } from "../utils/card-display"
 
 import { useCardBalance, useCardFreeze, useCardTransactions } from "./hooks"
 
@@ -73,13 +73,13 @@ const CardDashboardScreenContent: React.FC = () => {
   }, [navigation])
 
   useEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
+    navigation.setOptions(
+      headerRightNoGlass(() => (
         <TouchableOpacity style={styles.headerRight} onPress={handleSettingsPress}>
           <GaloyIcon name="settings" size={24} color={colors.black} />
         </TouchableOpacity>
-      ),
-    })
+      )),
+    )
   }, [navigation, styles.headerRight, colors.black, handleSettingsPress])
 
   useEffect(() => {
@@ -116,8 +116,7 @@ const CardDashboardScreenContent: React.FC = () => {
 
   if (!card) return <EmptyScreen message={LL.CardFlow.CardDashboard.noCardAvailable()} />
 
-  const isUsable = card.status === CardStatus.Active || card.status === CardStatus.Locked
-  if (!isUsable)
+  if (!isCardUsable(card.status))
     return <EmptyScreen message={LL.CardFlow.CardDashboard.cardNotUsable()} />
 
   const cardNumber = card.lastFour

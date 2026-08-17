@@ -4,6 +4,7 @@ import {
   formatCardType,
   formatIssuedDate,
   isCardFrozen,
+  isCardUsable,
   mapTransactionStatus,
 } from "@app/screens/card-screen/utils/card-display"
 
@@ -23,6 +24,32 @@ describe("card-display utils", () => {
 
     it("returns false for NotActivated status", () => {
       expect(isCardFrozen(CardStatus.NotActivated)).toBe(false)
+    })
+  })
+
+  describe("isCardUsable", () => {
+    it("returns true for Active status", () => {
+      expect(isCardUsable(CardStatus.Active)).toBe(true)
+    })
+
+    it("returns true for Locked status", () => {
+      expect(isCardUsable(CardStatus.Locked)).toBe(true)
+    })
+
+    it("returns false for Canceled status", () => {
+      expect(isCardUsable(CardStatus.Canceled)).toBe(false)
+    })
+
+    it("returns false for Failed status", () => {
+      expect(isCardUsable(CardStatus.Failed)).toBe(false)
+    })
+
+    it("returns false for NotActivated status", () => {
+      expect(isCardUsable(CardStatus.NotActivated)).toBe(false)
+    })
+
+    it("returns false for Requested status", () => {
+      expect(isCardUsable(CardStatus.Requested)).toBe(false)
     })
   })
 
