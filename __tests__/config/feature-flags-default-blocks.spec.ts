@@ -94,4 +94,28 @@ describe("defaultRemoteConfig: compliance country lists", () => {
     expect(defaultRemoteConfig.custodialCreationBlockedCountries).toEqual(expected)
     expect(defaultRemoteConfig.selfCustodialCreationBlockedCountries).toEqual(expected)
   })
+
+  it("offboardOnlyCountries contains only uppercase ISO-3166 alpha-2 codes with no duplicates", () => {
+    assertCanonical(defaultRemoteConfig.offboardOnlyCountries)
+  })
+
+  it("offboardOnlyCountries defaults to the UAE, Nepal, Algeria, China and Myanmar", () => {
+    expect(defaultRemoteConfig.offboardOnlyCountries).toEqual([
+      "AE",
+      "NP",
+      "DZ",
+      "CN",
+      "MM",
+    ])
+  })
+
+  /** The registered default is what runs before the first fetch lands and on every fetch
+   *  that fails; releasing the swap on the server's COMPLETED alone is the #4102 report. */
+  it("migrationDelayedRedirectEnabled defaults to holding the swap", () => {
+    expect(defaultRemoteConfig.migrationDelayedRedirectEnabled).toBe(false)
+  })
+
+  it("migrationReceiveDelayedNoticeMs defaults to the one minute product asked for", () => {
+    expect(defaultRemoteConfig.migrationReceiveDelayedNoticeMs).toBe(60_000)
+  })
 })

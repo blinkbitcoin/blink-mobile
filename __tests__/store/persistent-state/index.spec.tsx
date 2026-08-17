@@ -21,6 +21,7 @@ jest.mock("@app/utils/storage", () => ({
 const mockRecordError = jest.fn()
 jest.mock("@react-native-firebase/crashlytics", () => () => ({
   recordError: (...args: unknown[]) => mockRecordError(...args),
+  log: jest.fn(),
 }))
 
 const TestConsumer: React.FC = () => {
@@ -84,7 +85,11 @@ describe("PersistentStateProvider", () => {
     })
 
     expect(screen.getByTestId("token").props.children).toBe("saved-token")
-    expect(screen.getByTestId("schema").props.children).toBe(14)
+    // The point is that an old state migrates all the way up, so track the latest
+    // version rather than a literal that every schema bump would have to chase.
+    expect(screen.getByTestId("schema").props.children).toBe(
+      defaultPersistentState.schemaVersion,
+    )
   })
 
   it("falls back to default state when no persisted data exists", async () => {
@@ -202,7 +207,7 @@ describe("PersistentStateProvider", () => {
       galoyInstance: { id: "Main" },
       galoyAuthToken: "old-token",
     })
-    mockSaveJson.mockRejectedValueOnce(new Error("disk full"))
+    mockSaveJson.mockRejectedValueOnce(new Error("saveJson timed out"))
 
     render(
       <PersistentStateProvider>
@@ -223,7 +228,7 @@ describe("PersistentStateProvider", () => {
       expect(mockRecordError).toHaveBeenCalledTimes(1)
     })
     expect(mockRecordError.mock.calls[0][0]).toBeInstanceOf(Error)
-    expect(mockRecordError.mock.calls[0][0].message).toBe("disk full")
+    expect(mockRecordError.mock.calls[0][0].message).toBe("saveJson timed out")
 
     // The in-memory update survives the failed persist, so the app keeps working.
     expect(screen.getByTestId("token").props.children).toBe("new-token")

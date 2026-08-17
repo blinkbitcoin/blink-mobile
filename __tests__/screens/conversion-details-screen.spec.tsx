@@ -5,7 +5,7 @@ import {
   type StyleProp,
   type ViewStyle,
 } from "react-native"
-import { it } from "@jest/globals"
+import { describe, it } from "@jest/globals"
 import { fireEvent, render, waitFor, act } from "@testing-library/react-native"
 import { MockedProvider, MockedResponse } from "@apollo/client/testing"
 import { NavigationContainer } from "@react-navigation/native"
@@ -32,6 +32,16 @@ import { loadLocale } from "@app/i18n/i18n-util.sync"
 import theme from "@app/rne-theme/theme"
 import { createCache } from "@app/graphql/cache"
 import { DisplayCurrency as DisplayCurrencyType } from "@app/types/amounts"
+import { withDeviceLocale } from "../helpers/device-locale"
+
+/**
+ * The amount being typed is grouped by the device's locale (the bare
+ * toLocaleString() in formatNumberPadNumber), so every "100,000 SAT" in this
+ * file is really an en-US expectation. State it, or the file asserts whatever
+ * locale the machine running it is set to. The device-locale suite at the
+ * bottom of the file nests its own locales on top of this one.
+ */
+withDeviceLocale("en-US")
 
 jest.mock("@app/store/persistent-state", () => ({
   ...jest.requireActual("@app/store/persistent-state"),
@@ -154,6 +164,12 @@ const calculateExpectedSatsFromUsd = (usdCents: number): number => {
   return sats
 }
 
+/**
+ * Converted amounts are formatted by formatCurrencyHelper
+ * (@app/hooks/use-display-currency), which pins "en-US" whatever the device is
+ * set to, so this stays "en-US" even in the device-locale suite at the bottom
+ * of the file, which is the point of that suite.
+ */
 const formatNumber = (amount: number, fractionDigits: number) =>
   Intl.NumberFormat("en-US", {
     minimumFractionDigits: fractionDigits,
@@ -2380,4 +2396,79 @@ describe("Self-custodial percentage chip happy-path", () => {
       }),
     )
   })
+})
+
+/**
+ * The screen formats its two kinds of value differently, and the split is only
+ * visible on a device that is not en-US:
+ *
+ *  - the field being typed in shows the number pad's own string
+ *    (formatNumberPadNumber -> bare toLocaleString), grouped the way the user's
+ *    device groups digits
+ *  - every other field shows the converted amount (formatMoneyAmount ->
+ *    formatCurrencyHelper), which pins "en-US"
+ *
+ * Running the same interaction under several device locales is what holds that
+ * split in place — on an en-US machine the two are indistinguishable.
+ */
+describe("Device locale", () => {
+  const deviceLocaleCases = [
+    { deviceLocale: "de-DE", typedSats: "100.000" },
+    { deviceLocale: "hi-IN", typedSats: "1,00,000" },
+  ]
+
+  describe.each(deviceLocaleCases)(
+    "on a device set to $deviceLocale",
+    ({ deviceLocale, typedSats }) => {
+      withDeviceLocale(deviceLocale)
+
+      beforeEach(() => {
+        jest.useFakeTimers()
+      })
+
+      afterEach(() => {
+        jest.useRealTimers()
+      })
+
+      it("groups the typed sats the device's way, leaving the conversion en-US", async () => {
+        const Wrapper = createTestWrapper(
+          createGraphQLMocks({ btcBalance: 100000, usdBalance: 50000 }),
+        )
+
+        const { getByTestId, getByPlaceholderText } = render(
+          <Wrapper>
+            <ConversionDetailsScreen />
+          </Wrapper>,
+        )
+
+        await waitFor(() => {
+          expect(getByTestId("Key 1")).toBeTruthy()
+        })
+
+        const btcInput = getByPlaceholderText("0 SAT")
+        const usdInput = getByPlaceholderText("$0")
+
+        act(() => {
+          fireEvent(btcInput, "focus")
+        })
+
+        await act(async () => {
+          pressKeys(getByTestId, ["1", "0", "0", "0", "0", "0"])
+        })
+
+        act(() => {
+          jest.advanceTimersByTime(1500)
+        })
+
+        const expectedUsdCents = calculateExpectedUsdFromSats(100000)
+
+        await waitFor(() => {
+          expect(btcInput.props.value).toBe(`${typedSats} SAT`)
+          expect(usdInput.props.value).toBe(
+            withApprox(formatUsdCents(expectedUsdCents), true),
+          )
+        })
+      })
+    },
+  )
 })

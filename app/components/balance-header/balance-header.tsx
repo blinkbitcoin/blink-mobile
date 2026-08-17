@@ -4,6 +4,7 @@ import { Pressable, TouchableOpacity, View, Text } from "react-native"
 
 import { makeStyles } from "@rn-vui/themed"
 
+import { HiddenBalancePlaceholder } from "@app/components/hidden-balance-placeholder/hidden-balance-placeholder"
 import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { BalanceMode } from "@app/hooks/use-balance-mode"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -14,6 +15,11 @@ import { StatusPill, type StatusPillVariant } from "../status-pill"
 /** The 32pt balance sits directly under the fixed-size home header chrome;
  *  uncapped Dynamic Type makes it overrun the username row above. */
 const MAX_BALANCE_FONT_SIZE_MULTIPLIER = 1.4
+
+/** Long pending amounts must not push the balance off-center: the real pill and
+ *  the centering ghost cap at the same width and shrink together, otherwise the
+ *  double-width centering trick breaks asymmetrically. */
+const MAX_STATUS_PILL_WIDTH = 120
 
 const Loader = () => {
   const styles = useStyles()
@@ -34,6 +40,7 @@ const Loader = () => {
 export type StatusBadge = {
   label: string
   status: StatusPillVariant
+  onPress?: () => void
 }
 
 type Props = {
@@ -56,7 +63,7 @@ export const BalanceHeader: React.FC<Props> = ({
   const styles = useStyles()
   const { LL } = useI18nContext()
 
-  const { hideAmount, switchMemoryHideAmount } = useHideAmount()
+  const { hideAmount, toggleHideAmount } = useHideAmount()
   const currentMode = mode ?? BalanceMode.Btc
 
   const modeLabel =
@@ -69,16 +76,11 @@ export const BalanceHeader: React.FC<Props> = ({
   return (
     <View {...testProps("balance-header")} style={styles.balanceHeaderContainer}>
       {hideAmount ? (
-        <TouchableOpacity onPress={switchMemoryHideAmount}>
-          <Text
-            style={styles.balanceHiddenText}
-            maxFontSizeMultiplier={MAX_BALANCE_FONT_SIZE_MULTIPLIER}
-          >
-            ****
-          </Text>
+        <TouchableOpacity style={styles.balanceWrapper} onPress={toggleHideAmount}>
+          <HiddenBalancePlaceholder size="large" />
         </TouchableOpacity>
       ) : (
-        <TouchableOpacity onPress={switchMemoryHideAmount}>
+        <TouchableOpacity onPress={toggleHideAmount}>
           <View style={styles.amountWrapper}>
             {showBadge && statusBadge ? (
               <StatusPill
@@ -105,6 +107,7 @@ export const BalanceHeader: React.FC<Props> = ({
               <StatusPill
                 label={statusBadge.label}
                 status={statusBadge.status}
+                onPress={statusBadge.onPress}
                 testID="balance-status-badge"
                 style={styles.statusPill}
               />
@@ -131,13 +134,20 @@ const useStyles = makeStyles(({ colors }) => ({
     alignItems: "center",
     textAlign: "center",
   },
+  balanceWrapper: {
+    height: 48,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   amountWrapper: {
+    height: 48,
     flexDirection: "row",
-    alignItems: "flex-start",
+    alignItems: "center",
     alignSelf: "center",
   },
   primaryBalanceText: {
     fontSize: 32,
+    fontWeight: "bold",
     color: colors.black,
   },
   loaderBackground: {
@@ -145,11 +155,6 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   loaderForefound: {
     color: colors.loaderForeground,
-  },
-  balanceHiddenText: {
-    fontSize: 32,
-    fontWeight: "bold",
-    color: colors.black,
   },
   modeToggle: {
     marginTop: 4,
@@ -165,9 +170,13 @@ const useStyles = makeStyles(({ colors }) => ({
   statusPill: {
     marginLeft: 6,
     marginTop: 2,
+    flexShrink: 1,
+    maxWidth: MAX_STATUS_PILL_WIDTH,
   },
   statusPillGhost: {
     marginRight: 6,
     marginTop: 2,
+    flexShrink: 1,
+    maxWidth: MAX_STATUS_PILL_WIDTH,
   },
 }))

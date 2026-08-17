@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 
 import { type BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
 
@@ -10,68 +10,92 @@ import {
   SdkFeeError,
 } from "@app/screens/send-bitcoin-screen/hooks/use-onchain-fee-tiers"
 import {
+  buildZeroTiers,
+  FeeUnit,
   type FeeTierInfo,
   FeeTierOption,
   FeeTierOption as Tier,
 } from "@app/screens/send-bitcoin-screen/hooks/fee-tiers.types"
+import { useQuoteStatus } from "@app/screens/send-bitcoin-screen/hooks/use-quote-status"
 
-const DEFAULT_TIERS: Record<FeeTierOption, FeeTierInfo> = {
-  [Tier.Fast]: { feeSats: 0, etaMinutes: ETA_MINUTES[Tier.Fast] },
-  [Tier.Medium]: { feeSats: 0, etaMinutes: ETA_MINUTES[Tier.Medium] },
-  [Tier.Slow]: { feeSats: 0, etaMinutes: ETA_MINUTES[Tier.Slow] },
-}
+const DEFAULT_TIERS = buildZeroTiers(ETA_MINUTES, FeeUnit.SatPerVbyte)
 
 type RecommendedFeeTiersResult = {
   tiers: Record<FeeTierOption, FeeTierInfo>
   error: SdkFeeError | null
+  hasQuote: boolean
 }
+
+/**
+ * The rates are network-wide rather than per payment, so being enabled is the whole of what
+ * a quote depends on and one constant stands in for the inputs the other rails key on.
+ */
+const RECOMMENDED_FEES_KEY = "recommended-fees"
 
 export const useRecommendedFeeTiers = (
   sdk: BreezSdkInterface | null,
   enabled: boolean,
 ): RecommendedFeeTiersResult => {
   const [tiers, setTiers] = useState(DEFAULT_TIERS)
-  const [error, setError] = useState<SdkFeeError | null>(null)
+  /** Holds only the reason; whether it still applies is decided by the keyed failure flag. */
+  const [failureReason, setFailureReason] = useState<SdkFeeError | null>(null)
+  const inputsKey = sdk && enabled ? RECOMMENDED_FEES_KEY : null
+  const { hasQuote, hasFailed, discardQuote, markQuoted, markFailed } =
+    useQuoteStatus(inputsKey)
+  // Discards stale resolutions when refund mode is toggled mid-flight.
+  const requestTokenRef = useRef(0)
+
+  const error = hasFailed ? failureReason : null
 
   const fetchFees = useCallback(async () => {
-    if (!sdk || !enabled) {
-      setError(null)
-      return
-    }
+    requestTokenRef.current += 1
+    const token = requestTokenRef.current
+    // The rates go with the quote, so a caller reading tiers cannot see a discarded rate.
+    discardQuote()
+    setTiers(DEFAULT_TIERS)
+
+    if (!sdk || !enabled) return
 
     try {
       const rates = await getRecommendedFees(sdk)
+      if (token !== requestTokenRef.current) return
+
       setTiers({
         [Tier.Fast]: {
-          feeSats: rates.fastest,
+          feeAmount: rates.fastest,
+          feeUnit: FeeUnit.SatPerVbyte,
           etaMinutes: ETA_MINUTES[Tier.Fast],
         },
         [Tier.Medium]: {
-          feeSats: rates.halfHour,
+          feeAmount: rates.halfHour,
+          feeUnit: FeeUnit.SatPerVbyte,
           etaMinutes: ETA_MINUTES[Tier.Medium],
         },
         [Tier.Slow]: {
-          feeSats: rates.economy,
+          feeAmount: rates.economy,
+          feeUnit: FeeUnit.SatPerVbyte,
           etaMinutes: ETA_MINUTES[Tier.Slow],
         },
       })
-      setError(null)
+      markQuoted()
     } catch (err) {
-      setError(classifySdkFeeError(err))
+      if (token !== requestTokenRef.current) return
+      setFailureReason(classifySdkFeeError(err))
+      markFailed()
     }
-  }, [sdk, enabled])
+  }, [sdk, enabled, discardQuote, markQuoted, markFailed])
 
   useEffect(() => {
     fetchFees()
   }, [fetchFees])
 
-  return { tiers, error }
+  return { tiers, error, hasQuote }
 }
 
 export const getFeeRateSatPerVb = (
   tiers: Record<FeeTierOption, FeeTierInfo>,
 ): Record<FeeTierOption, number> => ({
-  [Tier.Fast]: tiers[Tier.Fast].feeSats,
-  [Tier.Medium]: tiers[Tier.Medium].feeSats,
-  [Tier.Slow]: tiers[Tier.Slow].feeSats,
+  [Tier.Fast]: tiers[Tier.Fast].feeAmount,
+  [Tier.Medium]: tiers[Tier.Medium].feeAmount,
+  [Tier.Slow]: tiers[Tier.Slow].feeAmount,
 })

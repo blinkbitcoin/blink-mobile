@@ -10,6 +10,23 @@ describe("getPosUrl", () => {
   it("appends the address to the terminal host", () => {
     expect(getPosUrl("alice")).toBe("https://terminal.blinkbtc.com/alice")
   })
+
+  it("passes the display currency to the terminal", () => {
+    expect(getPosUrl("alice", "EUR")).toBe(
+      "https://terminal.blinkbtc.com/alice?display=EUR",
+    )
+  })
+
+  it("omits the query string when no currency is known", () => {
+    expect(getPosUrl("alice", "")).toBe("https://terminal.blinkbtc.com/alice")
+    expect(getPosUrl("alice", undefined)).toBe("https://terminal.blinkbtc.com/alice")
+  })
+
+  it("does not let a currency append another parameter", () => {
+    expect(getPosUrl("alice", "EU R&amount=1")).toBe(
+      "https://terminal.blinkbtc.com/alice?display=EU%20R%26amount%3D1",
+    )
+  })
 })
 
 describe("getPrintableQrCodeUrl", () => {

@@ -36,7 +36,32 @@ type BackupMethod = (typeof BackupMethod)[keyof typeof BackupMethod]
 
 type BackupState = {
   status: BackupStatus
+  /** Most recent completed method (last-wins); use completedMethods to know
+   *  everything the user has done. */
   method: BackupMethod | null
+  completedMethods?: BackupMethod[]
+}
+
+/** The fallback branch doubles as the migration for records persisted before
+ *  completedMethods existed. */
+export const completedMethodsOf = (state: BackupState | null): BackupMethod[] =>
+  state?.completedMethods ??
+  (state?.status === BackupStatus.Completed && state.method ? [state.method] : [])
+
+/** Spreads prev so fields this module doesn't know about survive the write. Note
+ *  the two writers hand it different prevs: markBackupCompletedFor re-reads
+ *  storage, while the provider merges against its in-memory state. */
+const withCompletedMethod = (
+  prev: BackupState | null,
+  method: BackupMethod,
+): BackupState => {
+  const methods = completedMethodsOf(prev)
+  return {
+    ...prev,
+    status: BackupStatus.Completed,
+    method,
+    completedMethods: methods.includes(method) ? methods : [...methods, method],
+  }
 }
 
 type BackupStateContextValue = {
@@ -59,7 +84,15 @@ const defaultContextValue: BackupStateContextValue = {
 const BackupStateContext = createContext<BackupStateContextValue>(defaultContextValue)
 
 const readBackupState = async (key: string): Promise<BackupState | null> => {
-  const raw = await AsyncStorage.getItem(key)
+  /** The provider mounts above the app ErrorBoundary, so a rejection from this read has
+   *  no net at all; a failed read reports and falls back to the default state. */
+  let raw: string | null
+  try {
+    raw = await AsyncStorage.getItem(key)
+  } catch (err) {
+    reportError("Backup state read", err)
+    return null
+  }
   if (!raw) return null
   try {
     const parsed = JSON.parse(raw)
@@ -80,8 +113,9 @@ export const markBackupCompletedFor = async (
   accountId: string,
   method: BackupMethod,
 ): Promise<void> => {
-  const state: BackupState = { status: BackupStatus.Completed, method }
-  await AsyncStorage.setItem(backupStateKeyFor(accountId), JSON.stringify(state))
+  const key = backupStateKeyFor(accountId)
+  const prev = await readBackupState(key)
+  await AsyncStorage.setItem(key, JSON.stringify(withCompletedMethod(prev, method)))
 }
 
 export const BackupStateProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
@@ -104,7 +138,12 @@ export const BackupStateProvider: React.FC<React.PropsWithChildren> = ({ childre
       if (!mounted) return
       setBackupState(fresh ?? defaultState)
     }
-    load()
+    /* istanbul ignore next -- readBackupState catches everything today, so this net is
+     * unreachable; it stays because the provider mounts above the app ErrorBoundary and
+     * a future refactor that lets load() reject must not become an unhandled rejection */
+    load().catch((err) => {
+      reportError("Backup state load", err)
+    })
     return () => {
       mounted = false
     }
@@ -126,9 +165,9 @@ export const BackupStateProvider: React.FC<React.PropsWithChildren> = ({ childre
 
   const setBackupCompleted = useCallback(
     (method: BackupMethod) => {
-      persist({ status: BackupStatus.Completed, method })
+      persist(withCompletedMethod(backupState, method))
     },
-    [persist],
+    [persist, backupState],
   )
 
   const resetBackupState = useCallback(() => {

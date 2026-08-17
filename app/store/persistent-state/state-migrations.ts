@@ -117,8 +117,59 @@ type PersistentState_14 = {
   stableTokenRestricted?: boolean
 }
 
-const migrate14ToCurrent = (state: PersistentState_14): Promise<PersistentState> =>
+type PersistentState_15 = {
+  schemaVersion: 15
+  galoyInstance: GaloyInstanceInput
+  galoyAuthToken: string
+  activeAccountId?: string
+  selfCustodialDefaultWalletCurrency?: "BTC" | "USD"
+  selfCustodialDefaultWalletCurrencyByAccountId?: Record<string, "BTC" | "USD">
+  selfCustodialDisplayCurrencyByAccountId?: Record<string, string>
+  selfCustodialLanguageByAccountId?: Record<string, string>
+  themeByAccountId?: Record<string, "system" | "light" | "dark">
+  defaultAccountModalShownByAccountId?: Record<string, boolean>
+  stablesatsRestrictedCustodial?: boolean
+  stableTokenTransferBlocked?: boolean
+  stablesatsTransferBlocked?: boolean
+  stableTokenRestricted?: boolean
+  // Quiz progress for accounts the backend keeps no quiz record for (self-custodial).
+  completedQuizIdsByAccountId?: Record<string, string[]>
+}
+
+type PersistentState_16 = {
+  schemaVersion: 16
+  galoyInstance: GaloyInstanceInput
+  galoyAuthToken: string
+  activeAccountId?: string
+  selfCustodialDefaultWalletCurrency?: "BTC" | "USD"
+  selfCustodialDefaultWalletCurrencyByAccountId?: Record<string, "BTC" | "USD">
+  selfCustodialDisplayCurrencyByAccountId?: Record<string, string>
+  selfCustodialLanguageByAccountId?: Record<string, string>
+  themeByAccountId?: Record<string, "system" | "light" | "dark">
+  defaultAccountModalShownByAccountId?: Record<string, boolean>
+  stablesatsRestrictedCustodial?: boolean
+  stableTokenTransferBlocked?: boolean
+  stablesatsTransferBlocked?: boolean
+  stableTokenRestricted?: boolean
+  // Quiz progress for accounts the backend keeps no quiz record for (self-custodial).
+  completedQuizIdsByAccountId?: Record<string, string[]>
+  // "Always hide balance" setting. It used to live on the Apollo cache, which only
+  // restores when an auth token is present and is purged on logout, so the setting
+  // silently reset for self-custodial users.
+  alwaysHideBalance?: boolean
+  // The visibility the user last left the app in, consulted only when alwaysHideBalance
+  // is off. Device-wide, not per-account: hiding is about who can see the screen.
+  balanceHidden?: boolean
+}
+
+const migrate16ToCurrent = (state: PersistentState_16): Promise<PersistentState> =>
   Promise.resolve(state)
+
+const migrate15ToCurrent = (state: PersistentState_15): Promise<PersistentState> =>
+  migrate16ToCurrent({ ...state, schemaVersion: 16 })
+
+const migrate14ToCurrent = (state: PersistentState_14): Promise<PersistentState> =>
+  migrate15ToCurrent({ ...state, schemaVersion: 15 })
 
 const migrate13ToCurrent = (state: PersistentState_13): Promise<PersistentState> =>
   migrate14ToCurrent({ ...state, schemaVersion: 14 })
@@ -241,6 +292,8 @@ type StateMigrations = {
   12: (state: PersistentState_12) => Promise<PersistentState>
   13: (state: PersistentState_13) => Promise<PersistentState>
   14: (state: PersistentState_14) => Promise<PersistentState>
+  15: (state: PersistentState_15) => Promise<PersistentState>
+  16: (state: PersistentState_16) => Promise<PersistentState>
 }
 
 const stateMigrations: StateMigrations = {
@@ -256,12 +309,14 @@ const stateMigrations: StateMigrations = {
   12: migrate12ToCurrent,
   13: migrate13ToCurrent,
   14: migrate14ToCurrent,
+  15: migrate15ToCurrent,
+  16: migrate16ToCurrent,
 }
 
-export type PersistentState = PersistentState_14
+export type PersistentState = PersistentState_16
 
 export const defaultPersistentState: PersistentState = {
-  schemaVersion: 14,
+  schemaVersion: 16,
   galoyInstance: { id: "Main" },
   galoyAuthToken: "",
 }
@@ -288,7 +343,7 @@ export const migratePersistentState = async (
   if (!data || !(data.schemaVersion in stateMigrations)) {
     return { status: MigrationStatus.NoData }
   }
-  const schemaVersion: 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 =
+  const schemaVersion: 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 =
     data.schemaVersion
   try {
     const migration = stateMigrations[schemaVersion]

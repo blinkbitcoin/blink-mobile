@@ -13,6 +13,35 @@ jest.mock("@app/graphql/is-authed-context", () => ({
   useIsAuthed: () => mockUseIsAuthed(),
 }))
 
+/** Overrides only activeAccount so the self-custodial gating cases can flip the mode
+ *  while every other registry consumer keeps the real provider behavior. */
+const mockAccountRegistryOverride: { activeAccount: unknown } = {
+  activeAccount: undefined,
+}
+jest.mock("@app/hooks/use-account-registry", () => {
+  const actual = jest.requireActual("@app/hooks/use-account-registry")
+  return {
+    ...actual,
+    useAccountRegistry: () => ({
+      ...actual.useAccountRegistry(),
+      ...(mockAccountRegistryOverride.activeAccount
+        ? { activeAccount: mockAccountRegistryOverride.activeAccount }
+        : {}),
+    }),
+  }
+})
+
+/** The self-custodial rows read the wallet context; a connected stub keeps them out of
+ *  their loading-skeleton states so the gating assertions can find row titles. */
+jest.mock("@app/self-custodial/providers/wallet", () => ({
+  useSelfCustodialWallet: () => ({
+    sdk: {},
+    lightningAddress: null,
+    wallets: [],
+    allTransactions: [],
+  }),
+}))
+
 import React from "react"
 import { TouchableOpacity, View } from "react-native"
 import {
@@ -33,6 +62,7 @@ import { SettingsRow } from "@app/screens/settings-screen/row"
 import { LevelContextProvider, AccountLevel } from "@app/graphql/level-context"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import mocks from "@app/graphql/mocks"
+import { AccountType } from "@app/types/wallet"
 import { ContextForScreen } from "../helper"
 import { flushEffects } from "../../helpers/flush-effects"
 
@@ -288,6 +318,7 @@ describe("Settings Screen", () => {
     jest.clearAllMocks()
     // clearAllMocks does not reset return values, so re-arm the default explicitly
     mockUseIsAuthed.mockReturnValue(true)
+    mockAccountRegistryOverride.activeAccount = undefined
     loadLocale("en")
     testState = createTestState()
   })
@@ -577,6 +608,39 @@ describe("Settings Screen", () => {
     expect(screen.queryByTestId("Recovery method-group")).toBeNull()
 
     await flushEffects()
+  })
+
+  it("shows the Advanced group with CSV export and API access for a custodial account", async () => {
+    render(
+      <ContextForScreen>
+        <LoggedInWithUsername mock={mocksWithUsername} />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    expect(screen.getByTestId("Advanced-group")).toBeTruthy()
+    expect(screen.getByText("Export all transactions")).toBeTruthy()
+    expect(screen.getByText("API integration")).toBeTruthy()
+  })
+
+  it("shows CSV export without API access for a self-custodial account", async () => {
+    mockAccountRegistryOverride.activeAccount = {
+      id: "sc-1",
+      type: AccountType.SelfCustodial,
+    }
+
+    render(
+      <ContextForScreen>
+        <LoggedInWithUsername mock={mocksWithUsername} />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    expect(screen.getByTestId("Advanced-group")).toBeTruthy()
+    expect(screen.getByText("Export all transactions")).toBeTruthy()
+    expect(screen.queryByText("API integration")).toBeNull()
   })
 
   it("skips the unread-notifications query when not authenticated", async () => {

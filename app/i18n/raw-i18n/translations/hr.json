@@ -1,4 +1,38 @@
 {
+  "ApiScreen": {
+    "keysGroupTitle": "API ključevi",
+    "noKeys": "Još nema API ključeva",
+    "createKey": "Stvori API ključ",
+    "createTitle": "Novi API ključ",
+    "keyCreatedTitle": "API ključ je stvoren",
+    "keyName": "Naziv ključa",
+    "keyNamePlaceholder": "npr. BTCPay Server",
+    "scopeRead": "Čitanje",
+    "scopeReadDescription": "Pregled stanja i povijesti transakcija",
+    "scopeReceive": "Primanje",
+    "scopeReceiveDescription": "Stvaranje računa i primanje uplata",
+    "scopeWrite": "Pisanje",
+    "writeScopeDashboardOnly": "Ključevi koji mogu slati uplate mogu se stvoriti samo na dashboard.blink.sv",
+    "expiry": "Istječe",
+    "expiry30Days": "30 dana",
+    "expiry90Days": "90 dana",
+    "expiryNever": "Nikad",
+    "expiresOn": "Istječe {date: string}",
+    "neverExpires": "Nikad ne istječe",
+    "revoked": "Opozvan",
+    "expired": "Istekao {date: string}",
+    "expiredNoDate": "Istekao",
+    "secretWarning": "Ovo je jedini put da se ključ prikazuje. Kopirajte ga ili podijelite sada i sigurno ga pohranite.",
+    "secretCopied": "API ključ kopiran. Međuspremnik se briše za 1 minutu",
+    "revokeTitle": "Opozvati API ključ?",
+    "revokeBody": "\"{name: string}\" odmah će prestati raditi. Ovo se ne može poništiti.",
+    "revoke": "Opozovi",
+    "revokeSuccess": "API ključ opozvan",
+    "createError": "API ključ nije moguće stvoriti. Pokušajte ponovno.",
+    "revokeError": "API ključ nije moguće opozvati. Pokušajte ponovno.",
+    "loadError": "Vaše API ključeve nije moguće učitati. Pokušajte kasnije.",
+    "done": "Gotovo"
+  },
   "GaloyAddressScreen": {
     "title": "Primi plaćanje koristeći:",
     "buttonTitle": "Postavi svoju adresu",
@@ -2003,7 +2037,7 @@
     "satAccumulated": "Sat akumulirani",
     "satsEarned": "{formattedNumber | sats} osvojeno",
     "sectionsCompleted": "Završili ste",
-    "title": "Zaradi",
+    "title": "Učenje",
     "unlockQuestion": "Za otključavanje odgovorite na pitanje:",
     "youEarned": "Zaradio si",
     "registerTitle": "Morate nadograditi svoj račun",
@@ -2011,6 +2045,7 @@
     "oneSectionADay": "Jedna sekcija dnevno!",
     "availableTomorrow": "Vratite se sutra i nastavite zarađivati satove dok učite.\n\nIli kliknite nastavi za nastavak učenja bez nagrada.",
     "motivatingBadger": "Prokopajte se kroz ove lekcije i zarađujte dok učite",
+    "motivatingBadgerNoRewards": "Prokopajte se kroz ove lekcije i naučite više o Bitcoinu",
     "continueNoRewards": "Nastavi (bez nagrada)",
     "somethingNotRight": "Nešto nije u redu...",
     "defaultErrorMessage": "{errorMessage: string} Molimo pokušajte ponovo kasnije.\nIli kliknite nastavi za nastavak učenja bez nagrada.",
@@ -2049,7 +2084,7 @@
     "login": "Prijava",
     "loginOrRestore": "Prijava / Obnova",
     "logBackInWith": "Prijavi se ponovo s",
-    "headline": "Novčanik koji pokreće Galoy",
+    "headline": "Novčanik koji pokreće Blink",
     "startTrialAccount": "Započni s probnim računom",
     "startWithTrialAccount": "Započni s probnim računom",
     "registerPhoneAccount": "Registrirajte telefonski račun",
@@ -2075,6 +2110,7 @@
     "error": "Ups. Nešto je pošlo po zlu prilikom dohvaćanja vaše lokacije"
   },
   "HomeScreen": {
+    "pendingReceiveBadge": "+{amount: string} u tijeku",
     "receive": "Primi",
     "send": "Šalji",
     "title": "Doma",
@@ -2163,6 +2199,9 @@
     "lightningInvoice": "Lightning račun",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Naknada za polog: {fee} SAT za iznose ispod {threshold} SAT ili {overFee} SAT za pologe iznad {threshold} SAT",
+    "depositFeeTiers": "Deposit fees: {tiers: string}",
+    "depositFeeTierUpTo": "{fee: string} SAT up to {max: string} SAT",
+    "depositFeeTierAbove": "{fee: string} SAT above {min: string} SAT",
     "autoConvertMinAmount": "Iznosi manji od {minSats: number} satoshija / {minFiat: string} ne mogu se automatski pretvoriti u Dolare. Primit ćete Bitcoin.",
     "autoConvertFailed": "Uplata primljena, ali konverzija nije uspjela.",
     "pleaseWaitForConversion": "Pričekajte dok se konverzija ne dovrši"
@@ -2196,6 +2235,22 @@
     "imageLibraryPermissionsNotGranted": "Nemamo dopuštenja za pristup biblioteci slika. Provjerite postavke aplikacije za svoju platformu."
   },
   "SecurityScreen": {
+    "securityScore": {
+      "title": "Ocjena sigurnosti {done: number}/{total: number}",
+      "levelLow": "niska",
+      "levelMedium": "srednja",
+      "levelHigh": "visoka",
+      "set": "Postavi",
+      "enabled": "Uključeno",
+      "signals": {
+        "cloudBackup": "Sigurnosna kopija u oblaku",
+        "manualBackup": "Ručna sigurnosna kopija",
+        "appLock": "Biometrija/PIN",
+        "hideBalance": "Sakrij stanje",
+        "twoFactor": "Dvofaktorska autentifikacija (2FA)",
+        "emailVerified": "Potvrđena e-pošta"
+      }
+    },
     "title": "Sigurnost i privatnost",
     "biometricDescription": "Otključajte otiskom prsta ili prepoznavanjem lica.",
     "biometricTitle": "Biometrijski",
@@ -2220,7 +2275,6 @@
     "totalLabel": "Ukupno:",
     "totalExceed": "Ukupno premašuje vaš saldo od {balance: string}",
     "maxFeeSelected": "Ovo je najveća naknada koja će vam biti naplaćena za ovu transakciju. Nakon izvršenja plaćanja može ispasti manje.",
-    "feeError": "Neuspješno izračunavanje naknade",
     "invoiceAlreadyPaid": "Ovaj račun je već plaćen",
     "somethingWentWrong": "Nešto je pošlo po zlu",
     "paymentAlreadyAttempted": "Plaćanje je već pokušano.\n\nAko želite ponovo poslati ovo plaćanje, počnite ispočetka.",
@@ -2261,6 +2315,10 @@
     "invalidPhoneNumber": "Unesite valjani broj mobitela",
     "phoneNotAllowed": "Ovo polje ne prihvaća telefonske brojeve"
   },
+  "MerchantSelectionScreen": {
+    "title": "Odaberite opciju plaćanja",
+    "empty": "Nema dostupnih opcija plaćanja."
+  },
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Transakcija bi trebala biti poslana u mempool",
     "amount": "Iznos",
@@ -2279,7 +2337,6 @@
     "notConfirmed": "Uplata je poslana\nali još nije potvrđena\n\nMožete provjeriti status\nplaćanja u Transakcijama",
     "note": "Napomena ili oznaka",
     "success": "Uplata je uspješno poslana",
-    "suggestionInput": "Unesi svoj prijedlog",
     "max": "Max",
     "maxAmount": "Maksimalni iznos",
     "title": "Šalji Bitcoin",
@@ -2307,7 +2364,7 @@
     "recipient": "Primatelj",
     "time": "Vrijeme",
     "type": "Vrsta",
-    "feeTier": "Brzina naknade",
+    "feeTier": "Prioritet transakcije",
     "fast": "Brzo",
     "medium": "Srednje",
     "slow": "Sporo",
@@ -2320,7 +2377,7 @@
   },
   "SettingsScreen": {
     "createAddress": "Stvori adresu",
-    "donationButton": "Gumb za donacije",
+    "donationButton": "Gumb za doniranje",
     "btcpayServer": "BTCPay Server",
     "woocommerce": "WooCommerce",
     "staticQr": "Statični QR za ispis",
@@ -2528,7 +2585,11 @@
     "receivingAccount": "Račun primatelj",
     "sendingAccount": "Račun pošiljatelj",
     "txNotBroadcast": "Vaša transakcija trenutno je na čekanju i bit će emitirana na Bitcoin mrežu za koji trenutak.",
-    "momentarily": "uskoro"
+    "momentarily": "uskoro",
+    "findingAccount": "Traženje računa za ovu uplatu...",
+    "txNotFoundInAccounts": "Ova uplata nije pronađena ni na jednom računu na ovom uređaju. Možda pripada računu koji je odjavljen.",
+    "txLoadFailed": "Ovu uplatu nije moguće učitati. Provjerite vezu i pokušajte ponovno.",
+    "switchedForPayment": "Prebačeno na {identifier: string} za prikaz ove uplate"
   },
   "FeeRatesScreen": {
     "title": "Stope naknada",
@@ -2543,6 +2604,7 @@
     "lightningTransactions": "Lightning transakcije",
     "onchainBelowThreshold": "Onchain ispod {threshold: string} SAT",
     "onchainAboveThreshold": "Onchain iznad {threshold: string} SAT",
+    "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Naknada za prijenos",
     "noFee": "bez naknade",
     "lightningSendFee": "{fee: string} + ~{routingFee: string} naknada za usmjeravanje",
@@ -2593,7 +2655,8 @@
       "tooLong": "Adresa mora imati najviše 50 znakova",
       "invalidCharacter": "Adresa može sadržavati samo slova, brojke i donje crte",
       "addressUnavailable": "Nažalost, ova adresa je već zauzeta",
-      "unknownError": "Došlo je do nepoznate pogreške, molimo pokušajte ponovno kasnije"
+      "unknownError": "Došlo je do nepoznate pogreške, molimo pokušajte ponovno kasnije",
+      "backupRequired": "Back up your wallet before creating a Lightning address"
     },
     "receiveMoney": "Primajte novac od drugih Lightning novčanika i korisnika {bankName: string} s ovom adresom.",
     "itCannotBeChanged": "Kasnije se ne može promijeniti."
@@ -2758,6 +2821,7 @@
     "bitcoinPrice": "Cijena Bitcoina",
     "btcAccount": "Bitcoin račun",
     "cancel": "Poništi",
+    "card": "Kartica",
     "close": "Zatvori",
     "confirm": "Potvrdi",
     "convert": "Pretvori",
@@ -2776,6 +2840,7 @@
     "fee": "naknada",
     "Fee": "Naknada",
     "fees": "Naknade",
+    "feeError": "Neuspješno izračunavanje naknade",
     "firstName": "Ime",
     "from": "Od",
     "hour": "sat",
@@ -2898,11 +2963,9 @@
     "email": "Email",
     "sms": "SMS",
     "faq": "Česta pitanja",
-    "enjoyingApp": "Uživate u aplikaciji?",
     "statusPage": "Stranica statusa",
     "telegram": "Telegram",
     "mattermost": "Mattermost",
-    "thankYouText": "Hvala vam na povratnim informacijama, želite li predložiti poboljšanje?",
     "defaultEmailSubject": "{bankName: string} - Podrška",
     "defaultSupportMessage": "Bok! Trebam pomoć s {bankName: string}, koristim verziju {version: string} na {os: string}.",
     "emailCopied": "e-pošta {email: string} kopirana u međuspremnik",
@@ -3072,6 +3135,66 @@
       "limitUpdateSuccess": "Ograničenje uspješno ažurirano",
       "limitUpdateError": "Nije moguće ažurirati ograničenje",
       "limitMustBePositive": "Ograničenje mora biti veće od nule"
+    },
+    "CardFeeSchedule": {
+      "title": "Raspored naknada Blink kartice",
+      "effectiveDate": "Vrijedi od 1. srpnja 2026.",
+      "sections": {
+        "cardFees": "Naknade za karticu",
+        "transactionFees": "Naknade za transakcije",
+        "overdraft": "Prekoračenje (financirani način)"
+      },
+      "fees": {
+        "annualFee": {
+          "title": "Godišnja naknada",
+          "subtitle": "Oslobođena prve godine od datuma izdavanja kartice",
+          "value": "{amount: string} / godišnje"
+        },
+        "cardReplacement": {
+          "title": "Zamjena kartice"
+        },
+        "usdTransactionFee": {
+          "title": "Naknada za transakciju u USD",
+          "subtitle": "Primjenjuje se na svaku transakciju u američkim dolarima"
+        },
+        "foreignTransactionFee": {
+          "title": "Naknada za inozemnu transakciju",
+          "subtitle": "Primjenjuje se na svaku transakciju u valuti različitoj od američkog dolara"
+        },
+        "maximumOverdraft": {
+          "title": "Maksimalno prekoračenje",
+          "subtitle": "Mora se vratiti unutar 7 dana"
+        },
+        "lateRepaymentFee": {
+          "title": "Naknada za zakašnjelu otplatu",
+          "subtitle": "Naplaćuje se ako se prekoračenje ne vrati unutar 7 dana"
+        }
+      },
+      "btcConversion": {
+        "title": "Konverzija BTC-a",
+        "body": "Kada transakcija zahtijeva konverziju BTC-a u USD, konverzija se izvršava po važećem tečaju, koji može uključivati maržu koja odražava trošak konverzije."
+      },
+      "feesUpdateNotice": {
+        "text": "Naknade se s vremena na vrijeme mogu ažurirati. Blink će obavijestiti najmanje 30 dana unaprijed prije nego što bilo koja promjena naknada stupi na snagu, u skladu s",
+        "linkText": "Ugovorom o korištenju kartice"
+      },
+      "creditModeNotice": "Kreditni način trenutno nije aktivan. Ako se Kreditni način aktivira, primjenjive kamatne stope, naknade i objave prava naplate bit će dostavljene prije aktivacije.",
+      "additionalDetails": {
+        "title": "Dodatni detalji o naknadama",
+        "overdraft": {
+          "label": "Prekoračenje",
+          "text": ". U određenim okolnostima može se odobriti transakcija koja uzrokuje pad stanja na vašoj kartici ispod nule. Maksimalno prekoračenje iznosi {maxOverdraft: string}. Prekoračenje morate vratiti unutar 7 dana prijenosom dodatnih sredstava na stanje vaše kartice."
+        },
+        "foreignCurrency": {
+          "label": "Strana valuta",
+          "text": ". Ako izvršite transakciju u stranoj valuti, mreža kartice pretvara je u USD koristeći vlastite postupke konverzije. Tečaj na datum obrade može se razlikovati od datuma transakcije."
+        },
+        "noHiddenFees": {
+          "label": "Bez skrivenih naknada",
+          "text": ". Nema naknada za otvaranje računa, neaktivnost, upite o stanju ni za zatvaranje vaše kartice."
+        }
+      },
+      "backButton": "Natrag"
     },
     "CardDetails": {
       "title": "Detalji kartice",
@@ -3418,6 +3541,7 @@
         "perYear": "godišnje",
         "status": {
           "label": "Status",
+          "specialOfferLabel": "Posebna ponuda",
           "paymentPending": "Plaćanje na Čekanju",
           "firstYearFree": "Prva godina besplatno"
         },
@@ -3431,7 +3555,11 @@
           "cardholderAgreement": "Ugovor vlasnika kartice",
           "and": "i"
         },
-        "renew": "Razumijem da će se moja pretplata automatski obnoviti za 1 godinu"
+        "feeSchedule": {
+          "text": "Pregledao sam i slažem se s dokumentom",
+          "linkText": "Cjenik naknada za Blink Card"
+        },
+        "renew": "Razumijem da će se moja pretplata automatski obnoviti za {months: number} mjeseci"
       },
       "CardIntroducing": {
         "title": "Predstavljamo",
@@ -3493,13 +3621,29 @@
         "buttonText": "Pošalji prijavu",
         "select": "odaberi"
       },
+      "Acknowledgement": {
+        "title": "Uvjeti i odredbe",
+        "acceptButton": "Prihvati",
+        "eSignConsent": {
+          "text": "Prihvaćam",
+          "linkText": "privolu za elektronički potpis"
+        },
+        "privacyAndTerms": {
+          "text": "Prihvaćam",
+          "privacyPolicyLinkText": "Pravila o privatnosti izdavatelja",
+          "and": ", i",
+          "cardTermsLinkText": "Uvjete kartice Blink"
+        },
+        "certifyAccuracy": "Potvrđujem da su podaci koje sam dao točni i da ću se pridržavati svih pravila i zahtjeva povezanih s mojom karticom Blink Visa",
+        "acknowledgeSolicitation": "Potvrđujem da podnošenje zahtjeva za karticu Blink Visa ne predstavlja neovlašteno oglašavanje"
+      },
       "CardPreapproved": {
         "title": "Unaprijed ste odobreni za Blink Visa karticu!",
         "buttonText": "Zatvori"
       },
       "CardProcessing": {
         "title": "Obrađujemo vašu prijavu",
-        "subtitle": "Procijenjeno vrijeme čekanja: {waitTime: string}",
+        "subtitle": "Obavijestit ćemo te čim budemo spremni",
         "buttonText": "Zatvori"
       }
     }
@@ -3535,7 +3679,8 @@
         "savedConfirm": "Spremio sam je",
         "copy": "Kopiraj",
         "continueButton": "Nastavi",
-        "testBackup": "Testirajte sigurnosnu kopiju"
+        "testBackup": "Testirajte sigurnosnu kopiju",
+        "doNotShareWarning": "Nemojte ovo pokazivati nikome, uključujući podršku"
       },
       "Confirm": {
         "headerTitle": "Potvrdite sigurnosnu frazu",
@@ -3567,6 +3712,7 @@
       "uploadSuccess": "Sigurnosna kopija spremljena u {provider}",
       "uploadFailed": "Učitavanje sigurnosne kopije nije uspjelo",
       "signInFailed": "Prijava na {provider} nije uspjela",
+      "storageAccessRequired": "Dopustite pristup {provider: string} sigurnosnoj kopiji novčanika i pokušajte ponovno.",
       "cloudNotAvailable": "iCloud Drive nije dostupan. Prijavite se na iCloud u Postavkama i omogućite iCloud Drive.",
       "networkError": "Pogreška mreže. Provjerite vezu i pokušajte ponovno.",
       "existingBackupTitle": "Sigurnosna kopija pronađena",
@@ -3581,6 +3727,12 @@
     "contactSupport": {
       "title": "Kontaktirajte podršku",
       "body": "Nešto je pošlo po zlu, ali ne brinite, vaša su sredstva sigurna. Obratite se podršci za pomoć.\n\nOve informacije mogu pomoći podršci da riješi vaš slučaj:",
+      "selfHelp": {
+        "title": "Pokušajmo ponovno",
+        "body": "Ne brinite — vaša su sredstva sigurna. Migracija može potrajati nekoliko minuta, a ponekad je koraku dovoljan novi početak.\n\nZapočnite migraciju iznova — potrajat će samo trenutak.\n\nVidite li i dalje ovaj zaslon? Obratite se podršci i podijelite podatke u nastavku:",
+        "contactSupportCta": "Kontaktirajte podršku"
+      },
+      "closeRefusedBody": "Vaša migracija je dovršena i vaša sredstva su u novom novčaniku. Vaš stari račun možda je još uvijek otvoren. Podrška će to provjeriti i zatvoriti ga ako treba.\n\nOve informacije mogu pomoći podršci da riješi vaš slučaj:",
       "reasonLabel": "Razlog",
       "accountIdLabel": "ID računa",
       "pubKeyLabel": "pubKey",
@@ -3605,6 +3757,10 @@
       "title": "Važno",
       "body": "Prijeđite na račun bez skrbništva putem vođene migracije ili podignite sredstva prije {date}. Primanje prestaje {receiveStopsDate}.",
       "migrateCta": "Migriraj"
+    },
+    "offboardBulletin": {
+      "title": "Važno",
+      "body": "Vaš račun registriran je u regiji u kojoj ne možemo nuditi račune. Podignite svoja sredstva prije 31. kolovoza. Primanje prestaje 10. kolovoza."
     },
     "dollarBalanceModal": {
       "title": "Ne možemo migrirati vaš dolarski saldo",
@@ -3633,10 +3789,23 @@
     "downloadHistoryTitle": "Preuzmite povijest transakcija",
     "downloadHistoryBody": "Vaš novi račun počinje iznova. Ako želite zadržati evidenciju svojih transakcija, preuzmite ih sada kao CSV.",
     "downloadHistoryDownloadCta": "Preuzmi",
-    "apiServiceTitle": "API usluga nije dostupna",
-    "apiServiceBody": "Primjećujemo da imate aktivne API ključeve. Blink ne može pružati API u ne-skrbničkom načinu rada.\n\nAko ovisite o Blinkovom API-ju, kontaktirajte nas što prije i dat ćemo sve od sebe da vam pomognemo s glatkim prijelazom.",
+    "apiServiceTitle": "O vašim API ključevima",
+    "apiServiceBody": "Vaš račun ima aktivne API ključeve. API neće biti dostupan nakon prelaska na način rada bez skrbništva.\n\nBlink ima aplikacije bez skrbništva koje zamjenjuju većinu funkcija API-ja, osim slanja. Pronaći ćete ih u izborniku Postavke.\n\nAko koristite API za slanje, nažalost to više neće biti moguće.",
     "apiServiceContactCta": "Kontaktirajte nas",
-    "apiServiceContinueCta": "Ipak nastavi",
+    "apiServiceContinueCta": "Nastavi migraciju",
+    "merchantTools": {
+      "title": "Mislili smo na sve",
+      "body": "Svi alati za dolazne uplate i dalje rade. Samo dodajte svoju Lightning adresu.",
+      "cta": "Razumijem",
+      "terminalTitle": "Blink Terminal",
+      "terminalBody": "Prodajno mjesto u bilo kojem pregledniku.",
+      "donationTitle": "Gumb za doniranje",
+      "donationBody": "Primajte donacije na bilo kojoj web stranici.",
+      "btcpayTitle": "BTCPay dodatak",
+      "btcpayBody": "Lightning plaćanja na vašem BTCPay Serveru.",
+      "woocommerceTitle": "WooCommerce dodatak",
+      "woocommerceBody": "Plaćanje Bitcoinom za vašu internetsku trgovinu."
+    },
     "resumeFailed": "Nešto je pošlo po zlu pri nastavku migracije. Molimo započnite je ponovno.",
     "migrationRequiredBody": "Vrijeme je da migrirate svoj skrbnički račun na račun bez skrbništva.",
     "migrationRequiredForcedBody": "Vrijeme je da migrirate svoj skrbnički račun na račun bez skrbništva. To je obavezno iz regulatornih razloga.\n\nBez brige, non-custodial će ti dugoročno biti bolji.",
@@ -3653,10 +3822,15 @@
     "explainerCheck5": "S tvog računa bit će naplaćena mrežna naknada Spark",
     "explainerCta": "Razumijem",
     "transferringFunds": "Prebacujemo vaša sredstva. Trebalo bi biti gotovo za nekoliko sekundi.",
+    "transferDelayed": {
+      "body": "Vaša sredstva su na putu prema vašem novom računu. Traje duže nego inače — držite aplikaciju otvorenom i automatski ćemo dovršiti.",
+      "contactSupportCta": "Kontaktirajte podršku"
+    },
     "clockOutOfSync": {
       "body": "Datum i vrijeme vašeg uređaja nisu usklađeni. Postavite ih na automatski način rada za nastavak.",
       "retryCta": "Pokušaj ponovno"
-    }
+    },
+    "closeUnavailable": "Vaša su sredstva sigurna u vašem novom novčaniku. Još zatvaramo vaš stari račun, pokušajte ponovno za trenutak."
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Pod skrbništvom",
@@ -3684,6 +3858,7 @@
     "phraseSubtitleStep2": "Unesite ostatak vaše sigurnosne fraze",
     "nextWords": "Sljedećih 6 riječi",
     "paste": "Zalijepi",
+    "pasteFailed": "Čitanje iz međuspremnika nije uspjelo. Unesite svoju sigurnosnu frazu ručno.",
     "enterWord": "Riječ",
     "invalidMnemonic": "Neispravna pričuvna fraza. Provjerite je li redoslijed riječi točan.",
     "restoring": "Obnavljanje vašeg novčanika...",
@@ -3695,7 +3870,9 @@
     "enterPassword": "Unesite lozinku za šifriranje",
     "wrongPassword": "Netočna lozinka. Pokušajte ponovo.",
     "pickBackupTitle": "Odaberite novčanik",
-    "pickBackupDescription": "Odaberite sigurnosnu kopiju za vraćanje"
+    "pickBackupDescription": "Odaberite sigurnosnu kopiju za vraćanje",
+    "recognizePhraseTitle": "Prepoznajete li ovu frazu za sigurnosnu kopiju?",
+    "recognizePhraseBody": "Nikada ne unosite riječi koje vam je poslao netko drugi."
   },
   "BackupNudge": {
     "title": "Vaša sredstva su u opasnosti",
@@ -3705,6 +3882,11 @@
     "modalTitle": "Osigurajte svoja sredstva",
     "modalDescription": "Preporučujemo da napravite sigurnosnu kopiju novčanika kako biste spriječili potpuni gubitak sredstava u slučaju da izgubite ovaj uređaj.",
     "secureMe": "Osiguraj novčanik"
+  },
+  "BackupRequired": {
+    "modalTitle": "Back up your wallet first",
+    "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
+    "backupNow": "Back up wallet"
   },
   "NonCustodialInfoBulletin": {
     "title": "Ovo je račun bez skrbništva",
@@ -3744,7 +3926,7 @@
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
     "featureCircles": "Circles",
-    "featureEarn": "Earn",
+    "featureEarn": "Učenje",
     "featureCard": "Card"
   },
   "WalletCreationScreen": {

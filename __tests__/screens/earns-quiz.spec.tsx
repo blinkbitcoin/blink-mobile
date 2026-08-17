@@ -14,6 +14,18 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
 import { ContextForScreen } from "./helper"
 
+const mockPopTo = jest.fn()
+jest.mock("@react-navigation/native", () => {
+  const actual = jest.requireActual("@react-navigation/native")
+  return {
+    ...actual,
+    useNavigation: () => ({
+      ...actual.useNavigation?.(),
+      popTo: mockPopTo,
+    }),
+  }
+})
+
 jest.mock("react-native-modal", () => {
   const MockedModal = ({
     isVisible,
@@ -225,5 +237,49 @@ describe("EarnQuiz", () => {
     await waitFor(() => {
       expect(getByText(LL.EarnScreen.continueNoRewards())).toBeTruthy()
     })
+  })
+
+  it("closes the error modal by popping back to the existing Primary tabs", async () => {
+    const { mocks } = buildMocks({
+      id: quizId,
+      errorCode: "NOT_ENOUGH_BALANCE_FOR_QUIZ",
+    })
+    const routeParams: RootStackParamList["earnsQuiz"] = {
+      id: quizId,
+      isAvailable: true,
+    }
+    const { getByText, queryByText } = renderEarnQuiz({ routeParams, mocks })
+
+    const answersContent = getQuizQuestionsContent({ LL })
+    const answersFlat = answersContent.map((item) => item.content).flatMap((item) => item)
+    const card = answersFlat.find((item) => item.id === quizId)
+    if (!card) {
+      throw new Error("Quiz card not found")
+    }
+
+    const earnButtonLabel = LL.EarnScreen.earnSats({
+      formattedNumber: 100,
+    })
+    await waitFor(() => {
+      expect(getByText(earnButtonLabel)).toBeTruthy()
+    })
+    await act(async () => {
+      fireEvent.press(getByText(earnButtonLabel))
+    })
+
+    await act(async () => {
+      fireEvent.press(findPressableParent(getByText(card.answers[0])))
+    })
+
+    await waitFor(() => {
+      expect(getByText(LL.common.close())).toBeTruthy()
+    })
+    mockPopTo.mockClear()
+    await act(async () => {
+      fireEvent.press(getByText(LL.common.close()))
+    })
+
+    expect(mockPopTo).toHaveBeenCalledWith("Primary")
+    expect(queryByText(LL.EarnScreen.continueNoRewards())).toBeNull()
   })
 })

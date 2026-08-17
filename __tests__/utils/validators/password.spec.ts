@@ -1,4 +1,6 @@
-import { validatePassword } from "@app/utils/validators/password"
+import en from "@app/i18n/en"
+import type { Translations } from "@app/i18n/i18n-types"
+import { MIN_PASSWORD_LENGTH, validatePassword } from "@app/utils/validators/password"
 
 describe("validatePassword", () => {
   describe("default minimum-length policy", () => {
@@ -23,12 +25,19 @@ describe("validatePassword", () => {
     })
   })
 
-  describe("custom policy regex", () => {
-    it("validates against the provided pattern instead of the default", () => {
-      const requiresDigit = /\d/
+  describe("policy constant", () => {
+    it("exposes the minimum length the policy enforces", () => {
+      expect(MIN_PASSWORD_LENGTH).toBe(12)
+      expect(validatePassword("x".repeat(MIN_PASSWORD_LENGTH)).valid).toBe(true)
+      expect(validatePassword("x".repeat(MIN_PASSWORD_LENGTH - 1)).valid).toBe(false)
+    })
 
-      expect(validatePassword("abc1", requiresDigit).valid).toBe(true)
-      expect(validatePassword("abcd", requiresDigit).valid).toBe(false)
+    it("matches the user-facing copy, so validation and copy cannot drift apart", () => {
+      const { passwordPlaceholder, passwordTooShort } = (en as Translations).BackupScreen
+        .CloudBackup
+
+      expect(passwordPlaceholder).toContain(String(MIN_PASSWORD_LENGTH))
+      expect(passwordTooShort).toContain(String(MIN_PASSWORD_LENGTH))
     })
   })
 })

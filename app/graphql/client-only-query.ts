@@ -8,12 +8,6 @@ import {
   BetaQuery,
   CountryCodeDocument,
   CountryCodeQuery,
-  FeedbackModalShownDocument,
-  FeedbackModalShownQuery,
-  HiddenBalanceToolTipDocument,
-  HiddenBalanceToolTipQuery,
-  HideBalanceDocument,
-  HideBalanceQuery,
   InnerCircleValueDocument,
   InnerCircleValueQuery,
   IntroducingCirclesModalShownDocument,
@@ -32,12 +26,11 @@ import {
 } from "./generated"
 
 export default gql`
+  # Legacy read-only source for the "always hide balance" setting, which now lives in
+  # PersistentState. Kept so HideAmountContainer can adopt the value one last time for
+  # users upgrading from an older build; removable after a couple of releases.
   query hideBalance {
     hideBalance @client
-  }
-
-  query hiddenBalanceToolTip {
-    hiddenBalanceToolTip @client
   }
 
   query beta {
@@ -55,10 +48,6 @@ export default gql`
       latitudeDelta
       longitudeDelta
     }
-  }
-
-  query feedbackModalShown {
-    feedbackModalShown @client
   }
 
   query introducingCirclesModalShown {
@@ -89,42 +78,6 @@ export default gql`
     }
   }
 `
-
-export const saveHideBalance = (
-  client: ApolloClient<unknown>,
-  status: boolean,
-): boolean => {
-  try {
-    client.writeQuery<HideBalanceQuery>({
-      query: HideBalanceDocument,
-      data: {
-        __typename: "Query",
-        hideBalance: status,
-      },
-    })
-    return status
-  } catch {
-    return false
-  }
-}
-
-export const saveHiddenBalanceToolTip = (
-  client: ApolloClient<unknown>,
-  status: boolean,
-): boolean => {
-  try {
-    client.writeQuery<HiddenBalanceToolTipQuery>({
-      query: HiddenBalanceToolTipDocument,
-      data: {
-        __typename: "Query",
-        hiddenBalanceToolTip: status,
-      },
-    })
-    return status
-  } catch {
-    return false
-  }
-}
 
 export const activateBeta = (client: ApolloClient<unknown>, status: boolean) => {
   try {
@@ -171,20 +124,6 @@ export const updateMapLastCoords = (client: ApolloClient<unknown>, region: Regio
     })
   } catch {
     console.warn("impossible to update map last coords")
-  }
-}
-
-export const setFeedbackModalShown = (client: ApolloClient<unknown>, shown: boolean) => {
-  try {
-    client.writeQuery<FeedbackModalShownQuery>({
-      query: FeedbackModalShownDocument,
-      data: {
-        __typename: "Query",
-        feedbackModalShown: shown,
-      },
-    })
-  } catch {
-    console.warn("unable to update feedbackModalShown")
   }
 }
 

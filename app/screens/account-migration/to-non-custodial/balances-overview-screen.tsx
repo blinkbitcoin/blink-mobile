@@ -97,14 +97,17 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
     skip: isLnRepointBlocked,
   })
 
-  /** The checkpoint only remembers which screen to resume on. Gated on focus so a
+  /** The checkpoint only remembers which screen to resume on — plus the preview's
+   *  receive figure, which the transfer's receive gate needs and which is knowable only
+   *  here, before the drain empties the balance the preview reads. Gated on focus so a
    *  background instance (this screen stays mounted under the completion screen) never
    *  re-saves the checkpoint the migration just cleared, and on ready figures so it is
    *  never recorded before the commit point exists. */
+  const expectedReceiveSats = preview.expectedReceiveSats
   useEffect(() => {
-    if (!isFocused || checkpointLoading || !preview.isReady) return
-    saveCheckpoint(MigrationCheckpoint.BalancesOverview)
-  }, [isFocused, checkpointLoading, preview.isReady, saveCheckpoint])
+    if (!isFocused || checkpointLoading || expectedReceiveSats === null) return
+    saveCheckpoint(MigrationCheckpoint.BalancesOverview, { expectedReceiveSats })
+  }, [isFocused, checkpointLoading, expectedReceiveSats, saveCheckpoint])
 
   /**
    * The ways this screen ends without an Approve to offer, as one value: the preview

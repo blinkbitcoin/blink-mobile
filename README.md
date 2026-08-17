@@ -6,6 +6,11 @@
 
 This repository is the Blink mobile application. The goal is to make a mobile application compatible with Galoy's backend that can be customized and used by any community or organization. It is built with [React Native](https://reactnative.dev/), and runs on both iOS and Android.
 
+## Responsible Disclosure
+
+Found critical bugs/vulnerabilities?
+Please contact our team by email at security@blink.sv .
+
 ## Screenshots
 
 <img src=".readme/home.png" alt="Screenshot 1" width="150"> <img src=".readme/receive-LNURL.png" alt="Screenshot 2" width="150"> <img src=".readme/send-step3.png" alt="Screenshot 3" width="150"> <img src=".readme/btcmap.png" alt="Screenshot 4" width="150">

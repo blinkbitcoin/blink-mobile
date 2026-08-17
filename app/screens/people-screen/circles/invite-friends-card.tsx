@@ -8,7 +8,7 @@ import { PressableCard } from "@app/components/pressable-card"
 import { getInviteLink } from "@app/config/appinfo"
 import { useInviteQuery } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import crashlytics from "@react-native-firebase/crashlytics"
+import { reportError } from "@app/utils/error-logging"
 import { makeStyles, Text } from "@rn-vui/themed"
 
 gql`
@@ -42,7 +42,7 @@ export const InviteFriendsCard = () => {
       }
     } catch (err) {
       if (err instanceof Error) {
-        crashlytics().recordError(err)
+        reportError("invite-friends", err)
         Alert.alert(err.message)
       }
     }

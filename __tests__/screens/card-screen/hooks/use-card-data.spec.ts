@@ -109,6 +109,20 @@ describe("useCardData", () => {
     expect(mockUseCardQuery).toHaveBeenCalledWith(expect.objectContaining({ skip: true }))
   })
 
+  it("skips the query when the skip option is passed even while authenticated", () => {
+    mockUseIsAuthed.mockReturnValue(true)
+    mockUseCardQuery.mockReturnValue({
+      data: undefined,
+      loading: false,
+      error: undefined,
+      refetch: jest.fn(),
+    })
+
+    renderHook(() => useCardData({ skip: true }))
+
+    expect(mockUseCardQuery).toHaveBeenCalledWith(expect.objectContaining({ skip: true }))
+  })
+
   it("uses network-only fetch policy", () => {
     mockUseCardQuery.mockReturnValue({
       data: undefined,

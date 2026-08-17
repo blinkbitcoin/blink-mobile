@@ -6,6 +6,7 @@ import { HomeAuthedDocument, useLnInvoiceCreateMutation } from "@app/graphql/gen
 import { useLnUpdateHashPaid } from "@app/graphql/ln-update-context"
 import { usePayments } from "@app/hooks/use-payments"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { isHttpsUrl } from "@app/utils/lnurl"
 import { useTranslateSdkError } from "@app/self-custodial/hooks"
 import { PaymentResultStatus } from "@app/types/payment"
 import { AccountType } from "@app/types/wallet"
@@ -204,6 +205,13 @@ const useCustodialRedemption = ({
     if (!enabled || !withdrawalInvoice) return
 
     const submitToCallback = async () => {
+      // Defense in depth: resolveLnurlDestination already gates the callback to
+      // https, but this hook fetches it directly, so enforce it here too.
+      if (!isHttpsUrl(callback)) {
+        setErrorMessage(LL.RedeemBitcoinScreen.redeemingError())
+        return
+      }
+
       const urlObject = new URL(callback)
       urlObject.searchParams.set("k1", k1)
       urlObject.searchParams.set("pr", withdrawalInvoice.paymentRequest)

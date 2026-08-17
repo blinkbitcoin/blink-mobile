@@ -6,7 +6,8 @@ import { Screen } from "@app/components/screen"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useFeeRatesQuery } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { formatDepositFees } from "@app/utils/deposit-fees"
+import { TranslationFunctions } from "@app/i18n/i18n-types"
+import { formatDepositFeeTiers } from "@app/utils/deposit-fees"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { SettingsGroup } from "./group"
@@ -18,7 +19,10 @@ gql`
         deposit {
           minBankFee
           minBankFeeThreshold
-          ratio
+          tiers {
+            maxAmount
+            amount
+          }
         }
       }
     }
@@ -27,6 +31,25 @@ gql`
 
 const formatBps = (bps: number): string =>
   `${(bps / 100).toLocaleString("en-US", { maximumFractionDigits: 2 })}%`
+
+// A tier is bounded below by the previous tier's ceiling and above by its own;
+// the first tier has no lower bound and the last has no upper one.
+const depositTierLabel = (
+  LL: TranslationFunctions,
+  minAmount: string | null,
+  maxAmount: string | null,
+): string => {
+  if (maxAmount === null) {
+    return LL.FeeRatesScreen.onchainAboveThreshold({ threshold: minAmount ?? "0" })
+  }
+  if (minAmount === null) {
+    return LL.FeeRatesScreen.onchainBelowThreshold({ threshold: maxAmount })
+  }
+  return LL.FeeRatesScreen.onchainBetweenThresholds({
+    lower: minAmount,
+    upper: maxAmount,
+  })
+}
 
 // Remote-config contract: a negative rate hides its row (and the section when
 // no rows remain), 0 renders as "no fee", positive values render the rate.
@@ -182,25 +205,16 @@ export const FeeRatesScreen: React.FC = () => {
       },
     ]
     if (deposit) {
-      const { fee, threshold, overFee } = formatDepositFees(deposit)
-      items.push(
-        function OnchainBelowRow() {
+      // One row per tier, so a tier added server-side shows up on its own
+      // instead of being folded into a neighbour's range.
+      formatDepositFeeTiers(deposit).forEach(({ amount, minAmount, maxAmount }) => {
+        const label = depositTierLabel(LL, minAmount, maxAmount)
+        items.push(function OnchainTierRow() {
           return (
-            <FeeRateRow
-              label={LL.FeeRatesScreen.onchainBelowThreshold({ threshold })}
-              value={LL.FeeRatesScreen.satAmount({ amount: fee })}
-            />
+            <FeeRateRow label={label} value={LL.FeeRatesScreen.satAmount({ amount })} />
           )
-        },
-        function OnchainAboveRow() {
-          return (
-            <FeeRateRow
-              label={LL.FeeRatesScreen.onchainAboveThreshold({ threshold })}
-              value={LL.FeeRatesScreen.satAmount({ amount: overFee })}
-            />
-          )
-        },
-      )
+        })
+      })
     } else if (loading) {
       // Wrapped so SettingsGroup's `x({})` filter call creates the element
       // without executing LoadingRow's hooks in the group's render.

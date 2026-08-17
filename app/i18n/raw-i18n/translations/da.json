@@ -1,4 +1,38 @@
 {
+  "ApiScreen": {
+    "keysGroupTitle": "API-nøgler",
+    "noKeys": "Ingen API-nøgler endnu",
+    "createKey": "Opret API-nøgle",
+    "createTitle": "Ny API-nøgle",
+    "keyCreatedTitle": "API-nøgle oprettet",
+    "keyName": "Nøglenavn",
+    "keyNamePlaceholder": "f.eks. BTCPay Server",
+    "scopeRead": "Læs",
+    "scopeReadDescription": "Se saldo og transaktionshistorik",
+    "scopeReceive": "Modtag",
+    "scopeReceiveDescription": "Opret fakturaer og modtag betalinger",
+    "scopeWrite": "Skriv",
+    "writeScopeDashboardOnly": "Nøgler, der kan sende betalinger, kan kun oprettes på dashboard.blink.sv",
+    "expiry": "Udløber",
+    "expiry30Days": "30 dage",
+    "expiry90Days": "90 dage",
+    "expiryNever": "Aldrig",
+    "expiresOn": "Udløber {date: string}",
+    "neverExpires": "Udløber aldrig",
+    "revoked": "Tilbagekaldt",
+    "expired": "Udløb {date: string}",
+    "expiredNoDate": "Udløbet",
+    "secretWarning": "Dette er den eneste gang, nøglen vises. Kopiér eller del den nu, og opbevar den sikkert.",
+    "secretCopied": "API-nøgle kopieret. Udklipsholderen ryddes om 1 minut",
+    "revokeTitle": "Tilbagekald API-nøgle?",
+    "revokeBody": "\"{name: string}\" holder straks op med at virke. Dette kan ikke fortrydes.",
+    "revoke": "Tilbagekald",
+    "revokeSuccess": "API-nøgle tilbagekaldt",
+    "createError": "API-nøglen kunne ikke oprettes. Prøv igen.",
+    "revokeError": "API-nøglen kunne ikke tilbagekaldes. Prøv igen.",
+    "loadError": "Dine API-nøgler kunne ikke indlæses. Prøv igen senere.",
+    "done": "Færdig"
+  },
   "GaloyAddressScreen": {
     "title": "Modtag betaling via:",
     "buttonTitle": "Indtast din adresse",
@@ -2003,7 +2037,7 @@
     "satAccumulated": "Sats akkumuleret",
     "satsEarned": "{formattedNumber | sats} optjent",
     "sectionsCompleted": "Du har fuldført",
-    "title": "Optjen",
+    "title": "Lær",
     "unlockQuestion": "For at låse op, besvar spørgsmålet:",
     "youEarned": "Du har tjent",
     "registerTitle": "Din konto skal opgraderes",
@@ -2011,6 +2045,7 @@
     "oneSectionADay": "Ét afsnit om dagen!",
     "availableTomorrow": "This section will be available tomorrow!",
     "motivatingBadger": "Dig your way through these lessons and earn as you learn",
+    "motivatingBadgerNoRewards": "Grav dig gennem disse lektioner og lær om Bitcoin",
     "continueNoRewards": "Fortsæt (ingen belønning)",
     "somethingNotRight": "Noget er ikke helt rigtigt...",
     "defaultErrorMessage": "{errorMessage: string} Prøv venligst igen senere.\nEller klik for at fortsætte med at lære uden belønning.",
@@ -2049,7 +2084,7 @@
     "login": "Log ind",
     "loginOrRestore": "Log ind / Gendan",
     "logBackInWith": "Log ind igen med",
-    "headline": "Tegnebogen er drevet af Galoy",
+    "headline": "Tegnebogen er drevet af Blink",
     "startTrialAccount": "Start med en prøvekonto",
     "startWithTrialAccount": "Start med en prøvekonto",
     "registerPhoneAccount": "Registrer telefonkonto",
@@ -2075,6 +2110,7 @@
     "error": "Oops. Something went wrong while getting your location"
   },
   "HomeScreen": {
+    "pendingReceiveBadge": "+{amount: string} afventende",
     "receive": "Modtag",
     "send": "Send",
     "title": "Hjem",
@@ -2163,6 +2199,9 @@
     "lightningInvoice": "Lightning-faktura",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Indbetalingsgebyr: {fee} SAT for beløb under {threshold} SAT eller {overFee} SAT for indbetalinger over {threshold} SAT",
+    "depositFeeTiers": "Deposit fees: {tiers: string}",
+    "depositFeeTierUpTo": "{fee: string} SAT up to {max: string} SAT",
+    "depositFeeTierAbove": "{fee: string} SAT above {min: string} SAT",
     "autoConvertMinAmount": "Beløb under {minSats: number} sats / {minFiat: string} kan ikke automatisk konverteres til Dollar. Du modtager Bitcoin i stedet.",
     "autoConvertFailed": "Betaling modtaget, men konverteringen mislykkedes.",
     "pleaseWaitForConversion": "Vent venligst, indtil konverteringen er færdig"
@@ -2196,6 +2235,22 @@
     "imageLibraryPermissionsNotGranted": "Vi har ikke tilladelser til at få adgang til billedbiblioteket. Tjek venligst appindstillingerne for din platform."
   },
   "SecurityScreen": {
+    "securityScore": {
+      "title": "Sikkerhedsscore {done: number}/{total: number}",
+      "levelLow": "lav",
+      "levelMedium": "mellem",
+      "levelHigh": "høj",
+      "set": "Indstil",
+      "enabled": "Aktiveret",
+      "signals": {
+        "cloudBackup": "Cloud-backup",
+        "manualBackup": "Manuel backup",
+        "appLock": "Biometri/PIN",
+        "hideBalance": "Skjul saldo",
+        "twoFactor": "Tofaktorgodkendelse (2FA)",
+        "emailVerified": "Verificeret e-mail"
+      }
+    },
     "title": "Sikkerhed og privatliv",
     "biometricDescription": "Lås op med fingeraftryk eller ansigtsgenkendelse.",
     "biometricTitle": "Biometrisk",
@@ -2220,7 +2275,6 @@
     "totalLabel": "Total:",
     "totalExceed": "Totalen overstiger din saldo på {balance: string}",
     "maxFeeSelected": "Dette er det maksimale gebyr, du vil blive opkrævet for denne transaktion. Det kan ende med at være mindre, når betalingen er foretaget.",
-    "feeError": "Kunne ikke beregne gebyr",
     "invoiceAlreadyPaid": "Denne faktura er allerede blevet betalt",
     "somethingWentWrong": "Noget gik galt",
     "paymentAlreadyAttempted": "Betalingen er allerede forsøgt gennemført.\n\nHvis du ønsker at sende denne betaling igen, venligst start forfra.",
@@ -2261,6 +2315,10 @@
     "invalidPhoneNumber": "Indtast et gyldigt mobilnummer",
     "phoneNotAllowed": "Dette felt accepterer ikke telefonnumre"
   },
+  "MerchantSelectionScreen": {
+    "title": "Vælg betalingsmulighed",
+    "empty": "Der er ingen betalingsmuligheder tilgængelige."
+  },
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Transaktionen skulle nu blive tilføjet til mempool",
     "amount": "Beløb",
@@ -2279,7 +2337,6 @@
     "notConfirmed": "Betalingen er sendt, men er endnu ikke bekræftet.\n\nDu kan tjekke status på betalingen under Transaktioner",
     "note": "Note eller mærkat",
     "success": "Betalingen er sendt med succes",
-    "suggestionInput": "Indtast dit forslag",
     "max": "Maks",
     "maxAmount": "Maks beløb",
     "title": "Send Bitcoin",
@@ -2307,7 +2364,7 @@
     "recipient": "Modtager",
     "time": "Tidspunkt",
     "type": "Type",
-    "feeTier": "Gebyrhastighed",
+    "feeTier": "Transaktionsprioritet",
     "fast": "Hurtig",
     "medium": "Medium",
     "slow": "Langsom",
@@ -2320,7 +2377,7 @@
   },
   "SettingsScreen": {
     "createAddress": "Opret adresse",
-    "donationButton": "Donationsknap",
+    "donationButton": "Donér-knap",
     "btcpayServer": "BTCPay Server",
     "woocommerce": "WooCommerce",
     "staticQr": "Printbar statisk QR",
@@ -2528,7 +2585,11 @@
     "receivingAccount": "Modtagelseskonto",
     "sendingAccount": "Afsendelseskonto",
     "txNotBroadcast": "Din transaktion er i kø. Den bør vises i mempoolen om {countdown: string}.",
-    "momentarily": "Et øjeblik"
+    "momentarily": "Et øjeblik",
+    "findingAccount": "Finder kontoen for denne betaling...",
+    "txNotFoundInAccounts": "Denne betaling blev ikke fundet på nogen konto på denne enhed. Den tilhører muligvis en konto, der er logget ud.",
+    "txLoadFailed": "Kunne ikke indlæse denne betaling. Tjek din forbindelse, og prøv igen.",
+    "switchedForPayment": "Skiftede til {identifier: string} for at vise denne betaling"
   },
   "FeeRatesScreen": {
     "title": "Gebyrsatser",
@@ -2543,6 +2604,7 @@
     "lightningTransactions": "Lightning-transaktioner",
     "onchainBelowThreshold": "Onchain under {threshold: string} SAT",
     "onchainAboveThreshold": "Onchain over {threshold: string} SAT",
+    "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Overførselsgebyr",
     "noFee": "intet gebyr",
     "lightningSendFee": "{fee: string} + ~{routingFee: string} routinggebyr",
@@ -2593,7 +2655,8 @@
       "tooLong": "Adressen må maksimalt være 50 tegn lang",
       "invalidCharacter": "Adressen kan kun indeholde bogstaver, tal og understregninger",
       "addressUnavailable": "Beklager, denne adresse er allerede taget",
-      "unknownError": "Der opstod en ukendt fejl, prøv igen senere"
+      "unknownError": "Der opstod en ukendt fejl, prøv igen senere",
+      "backupRequired": "Back up your wallet before creating a Lightning address"
     },
     "receiveMoney": "Modtag penge fra andre lightning tegnebøger bøger og {bankName: string} brugere med denne adresse.",
     "itCannotBeChanged": "Det kan ikke ændres senere."
@@ -2758,6 +2821,7 @@
     "bitcoinPrice": "Bitcoin Pris",
     "btcAccount": "Bitcoin-konto",
     "cancel": "Annuller",
+    "card": "Kort",
     "close": "Luk",
     "confirm": "Bekræft",
     "convert": "Konverter",
@@ -2776,6 +2840,7 @@
     "fee": "gebyr",
     "Fee": "Gebyr",
     "fees": "Gebyrer",
+    "feeError": "Kunne ikke beregne gebyr",
     "firstName": "Fornavn",
     "from": "Fra",
     "hour": "time",
@@ -2898,11 +2963,9 @@
     "email": "Email",
     "sms": "SMS",
     "faq": "Ofte stillede spørgsmål",
-    "enjoyingApp": "Er du glad for at bruge appen?",
     "statusPage": "Statusside",
     "telegram": "Telegram",
     "mattermost": "Mattermost",
-    "thankYouText": "Tak for feedbacket, vil du foreslå en forbedring?",
     "defaultEmailSubject": "{bankName: string} - Support",
     "defaultSupportMessage": "Hej! Jeg har brug for hjælp med {bankName: string}. Jeg bruger version {version: string} på {os: string}.",
     "emailCopied": "email {email: string} kopieret til udklipsholder",
@@ -3072,6 +3135,66 @@
       "limitUpdateSuccess": "Grænse opdateret",
       "limitUpdateError": "Kunne ikke opdatere grænsen",
       "limitMustBePositive": "Grænsen skal være større end nul"
+    },
+    "CardFeeSchedule": {
+      "title": "Blink-kortets gebyrplan",
+      "effectiveDate": "Gældende fra 1. juli 2026",
+      "sections": {
+        "cardFees": "Kortgebyrer",
+        "transactionFees": "Transaktionsgebyrer",
+        "overdraft": "Overtræk (finansieret tilstand)"
+      },
+      "fees": {
+        "annualFee": {
+          "title": "Årligt gebyr",
+          "subtitle": "Frafaldes det første år fra datoen for kortudstedelse",
+          "value": "{amount: string} / år"
+        },
+        "cardReplacement": {
+          "title": "Kortudskiftning"
+        },
+        "usdTransactionFee": {
+          "title": "USD-transaktionsgebyr",
+          "subtitle": "Gælder for hver transaktion i amerikanske dollar"
+        },
+        "foreignTransactionFee": {
+          "title": "Udenlandsk transaktionsgebyr",
+          "subtitle": "Gælder for hver transaktion i en anden valuta end amerikanske dollar"
+        },
+        "maximumOverdraft": {
+          "title": "Maksimalt overtræk",
+          "subtitle": "Skal tilbagebetales inden for 7 dage"
+        },
+        "lateRepaymentFee": {
+          "title": "Gebyr for sen tilbagebetaling",
+          "subtitle": "Opkræves, hvis overtrækket ikke tilbagebetales inden for 7 dage"
+        }
+      },
+      "btcConversion": {
+        "title": "BTC-konvertering",
+        "body": "Når en transaktion kræver konvertering af BTC til USD, udføres konverteringen til den gældende vekselkurs, som kan omfatte et spænd, der afspejler omkostningerne ved konverteringen."
+      },
+      "feesUpdateNotice": {
+        "text": "Gebyrer kan opdateres fra tid til anden. Blink giver mindst 30 dages varsel, før eventuelle gebyrændringer træder i kraft, i overensstemmelse med",
+        "linkText": "Kortholderaftalen"
+      },
+      "creditModeNotice": "Kredittilstand er ikke aktiv i øjeblikket. Hvis Kredittilstand aktiveres, vil de gældende rentesatser, gebyrer og oplysninger om faktureringsrettigheder blive givet før aktivering.",
+      "additionalDetails": {
+        "title": "Yderligere gebyroplysninger",
+        "overdraft": {
+          "label": "Overtræk",
+          "text": ". Under visse omstændigheder kan en transaktion blive godkendt, som får din kortsaldo til at falde under nul. Det maksimale overtræk er {maxOverdraft: string}. Du skal tilbagebetale overtrækket inden for 7 dage ved at overføre yderligere midler til din kortsaldo."
+        },
+        "foreignCurrency": {
+          "label": "Udenlandsk valuta",
+          "text": ". Hvis du foretager en transaktion i en udenlandsk valuta, konverterer kortnetværket den til USD ved hjælp af sine egne konverteringsprocedurer. Kursen på behandlingsdatoen kan afvige fra transaktionsdatoen."
+        },
+        "noHiddenFees": {
+          "label": "Ingen skjulte gebyrer",
+          "text": ". Der er ingen gebyrer for kontooprettelse, inaktivitet, saldoforespørgsler eller lukning af dit kort."
+        }
+      },
+      "backButton": "Tilbage"
     },
     "CardDetails": {
       "title": "Kortoplysninger",
@@ -3418,6 +3541,7 @@
         "perYear": "per år",
         "status": {
           "label": "Status",
+          "specialOfferLabel": "Særtilbud",
           "paymentPending": "Betaling Afventer",
           "firstYearFree": "Første år gratis"
         },
@@ -3431,7 +3555,11 @@
           "cardholderAgreement": "Kortholderaftalen",
           "and": "og"
         },
-        "renew": "Jeg forstår, at mit abonnement automatisk fornyes om 1 år"
+        "feeSchedule": {
+          "text": "Jeg har gennemgået og accepterer",
+          "linkText": "Blink Card-gebyroversigt"
+        },
+        "renew": "Jeg forstår, at mit abonnement automatisk fornyes om {months: number} måneder"
       },
       "CardIntroducing": {
         "title": "Introduktion",
@@ -3493,13 +3621,29 @@
         "buttonText": "Indsend ansøgning",
         "select": "vælg"
       },
+      "Acknowledgement": {
+        "title": "Vilkår og betingelser",
+        "acceptButton": "Accepter",
+        "eSignConsent": {
+          "text": "Jeg accepterer",
+          "linkText": "E-Sign-samtykke"
+        },
+        "privacyAndTerms": {
+          "text": "Jeg accepterer",
+          "privacyPolicyLinkText": "udstederens privatlivspolitik",
+          "and": ", og",
+          "cardTermsLinkText": "Blink-kortvilkår"
+        },
+        "certifyAccuracy": "Jeg bekræfter, at de oplysninger, jeg har givet, er korrekte, og at jeg vil overholde alle regler og krav vedrørende mit Blink Visa-kort",
+        "acknowledgeSolicitation": "Jeg anerkender, at ansøgning om Blink Visa-kortet ikke udgør uautoriseret henvendelse"
+      },
       "CardPreapproved": {
         "title": "Du er blevet forhåndsgodkendt til Blink Visa-kortet!",
         "buttonText": "Luk"
       },
       "CardProcessing": {
         "title": "Behandler din ansøgning",
-        "subtitle": "Estimeret ventetid: {waitTime: string}",
+        "subtitle": "Vi giver dig besked, så snart vi er klar",
         "buttonText": "Luk"
       }
     }
@@ -3535,7 +3679,8 @@
         "savedConfirm": "Jeg har gemt den",
         "copy": "Kopiér",
         "continueButton": "Fortsæt",
-        "testBackup": "Test din backup"
+        "testBackup": "Test din backup",
+        "doNotShareWarning": "Vis ikke dette til nogen, heller ikke support"
       },
       "Confirm": {
         "headerTitle": "Bekræft backup-sætning",
@@ -3567,6 +3712,7 @@
       "uploadSuccess": "Sikkerhedskopi gemt i {provider}",
       "uploadFailed": "Kunne ikke uploade sikkerhedskopi",
       "signInFailed": "Kunne ikke logge ind på {provider}",
+      "storageAccessRequired": "Giv {provider: string} adgang til din tegnebogs sikkerhedskopi, og prøv igen.",
       "cloudNotAvailable": "iCloud Drive er ikke tilgængelig. Log ind på iCloud i Indstillinger, og slå iCloud Drive til.",
       "networkError": "Netværksfejl. Tjek din forbindelse, og prøv igen.",
       "existingBackupTitle": "Sikkerhedskopi fundet",
@@ -3581,6 +3727,12 @@
     "contactSupport": {
       "title": "Kontakt support",
       "body": "Noget gik galt, men bare rolig, dine midler er sikre. Kontakt venligst support for at få hjælp.\n\nDu kan få brug for disse oplysninger, så support kan løse din sag:",
+      "selfHelp": {
+        "title": "Lad os prøve igen",
+        "body": "Bare rolig — dine midler er sikre. Migreringen kan tage et par minutter, og nogle gange skal et trin bare starte forfra.\n\nStart migreringen forfra — det tager kun et øjeblik.\n\nSer du stadig denne skærm? Kontakt support, og del oplysningerne nedenfor:",
+        "contactSupportCta": "Kontakt support"
+      },
+      "closeRefusedBody": "Din migrering er fuldført, og dine midler er i din nye tegnebog. Din gamle konto er muligvis stadig åben. Supporten tjekker det og lukker den om nødvendigt.\n\nDu kan få brug for disse oplysninger, så support kan løse din sag:",
       "reasonLabel": "Årsag",
       "accountIdLabel": "Konto-ID",
       "pubKeyLabel": "pubKey",
@@ -3605,6 +3757,10 @@
       "title": "Vigtigt",
       "body": "Skift til en ikke-depotkonto via guidet migrering, eller hæv dine midler, inden {date}. Modtagelse stopper den {receiveStopsDate}.",
       "migrateCta": "Migrér"
+    },
+    "offboardBulletin": {
+      "title": "Vigtigt",
+      "body": "Din konto er registreret i en region, hvor vi ikke kan tilbyde konti. Hæv dine midler inden den 31. august. Modtagelse stopper den 10. august."
     },
     "dollarBalanceModal": {
       "title": "Vi kan ikke migrere din dollarsaldo",
@@ -3633,10 +3789,23 @@
     "downloadHistoryTitle": "Download din transaktionshistorik",
     "downloadHistoryBody": "Din nye konto starter på en frisk. Hvis du vil bevare en oversigt over dine transaktioner, skal du downloade dem som CSV nu.",
     "downloadHistoryDownloadCta": "Download",
-    "apiServiceTitle": "API-tjeneste ikke tilgængelig",
-    "apiServiceBody": "Vi bemærker, at du har aktive API-nøgler. Blink kan ikke levere API'en i non-custodial tilstand.\n\nHvis du er afhængig af Blinks API, så kontakt os hurtigt, og vi vil gøre vores bedste for at hjælpe med en glidende overgang.",
+    "apiServiceTitle": "Om dine API-nøgler",
+    "apiServiceBody": "Din konto har aktive API-nøgler. API'en vil ikke være tilgængelig, efter du skifter til non-custodial.\n\nBlink har non-custodial apps, der erstatter de fleste af API'ens funktioner, undtagen afsendelse. Du finder dem i menuen Indstillinger.\n\nHvis du bruger API'en til at sende, vil det desværre ikke længere være muligt.",
     "apiServiceContactCta": "Kontakt os",
-    "apiServiceContinueCta": "Fortsæt alligevel",
+    "apiServiceContinueCta": "Fortsæt migreringen",
+    "merchantTools": {
+      "title": "Vi har styr på det",
+      "body": "Alle værktøjer til indgående betalinger virker fortsat. Tilføj blot din Lightning-adresse.",
+      "cta": "Forstået",
+      "terminalTitle": "Blink Terminal",
+      "terminalBody": "En kasseterminal i enhver browser.",
+      "donationTitle": "Donér-knap",
+      "donationBody": "Modtag donationer på enhver hjemmeside.",
+      "btcpayTitle": "BTCPay-plugin",
+      "btcpayBody": "Lightning-betalinger på din BTCPay Server.",
+      "woocommerceTitle": "WooCommerce-plugin",
+      "woocommerceBody": "Bitcoin-betaling til din netbutik."
+    },
     "resumeFailed": "Noget gik galt under genoptagelsen af din migrering. Start den venligst igen.",
     "migrationRequiredBody": "Det er tid til at migrere din depotkonto til en ikke-depotkonto.",
     "migrationRequiredForcedBody": "Det er tid til at migrere din depotkonto til en ikke-depotkonto. Det er påkrævet af regulatoriske årsager.\n\nIngen grund til bekymring, non-custodial vil være bedre for dig i det lange løb.",
@@ -3653,10 +3822,15 @@
     "explainerCheck5": "Din konto vil blive trukket et Spark-netværksgebyr",
     "explainerCta": "Jeg forstår",
     "transferringFunds": "Overfører dine midler. Det skulle være færdigt om få sekunder.",
+    "transferDelayed": {
+      "body": "Dine midler er på vej til din nye konto. Det tager længere tid end normalt — hold appen åben, så afslutter vi automatisk.",
+      "contactSupportCta": "Kontakt support"
+    },
     "clockOutOfSync": {
       "body": "Din enheds dato og klokkeslæt er ude af synkronisering. Indstil dem til automatisk for at fortsætte.",
       "retryCta": "Prøv igen"
-    }
+    },
+    "closeUnavailable": "Dine midler er sikre i din nye tegnebog. Vi er stadig ved at lukke din gamle konto, prøv venligst igen om et øjeblik."
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Forvaltet",
@@ -3684,6 +3858,7 @@
     "phraseSubtitleStep2": "Indtast resten af din sikkerhedsfrase",
     "nextWords": "Næste 6 ord",
     "paste": "Indsæt",
+    "pasteFailed": "Kunne ikke læse fra udklipsholderen. Indtast venligst din sikkerhedsfrase manuelt.",
     "enterWord": "Ord",
     "invalidMnemonic": "Ugyldig backup-frase. Kontroller venligst om ordrækkefølgen er korrekt.",
     "restoring": "Gendanner din tegnebog...",
@@ -3695,7 +3870,9 @@
     "enterPassword": "Indtast din krypteringsadgangskode",
     "wrongPassword": "Forkert adgangskode. Prøv venligst igen.",
     "pickBackupTitle": "Vælg en tegnebog",
-    "pickBackupDescription": "Vælg en sikkerhedskopi at gendanne"
+    "pickBackupDescription": "Vælg en sikkerhedskopi at gendanne",
+    "recognizePhraseTitle": "Genkender du denne backup-sætning?",
+    "recognizePhraseBody": "Indtast aldrig ord, som en anden har sendt dig."
   },
   "BackupNudge": {
     "title": "Dine midler er i fare",
@@ -3705,6 +3882,11 @@
     "modalTitle": "Sikr dine midler",
     "modalDescription": "Vi anbefaler stærkt, at du sikkerhedskopierer din tegnebog for at forhindre et fuldstændigt tab af midler, hvis du mister denne enhed.",
     "secureMe": "Sikr tegnebog"
+  },
+  "BackupRequired": {
+    "modalTitle": "Back up your wallet first",
+    "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
+    "backupNow": "Back up wallet"
   },
   "NonCustodialInfoBulletin": {
     "title": "Dette er en ikke-depotkonto",
@@ -3744,7 +3926,7 @@
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
     "featureCircles": "Circles",
-    "featureEarn": "Earn",
+    "featureEarn": "Lær",
     "featureCard": "Card"
   },
   "WalletCreationScreen": {

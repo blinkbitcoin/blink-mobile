@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react"
-import { Keyboard, Pressable, View } from "react-native"
+import React from "react"
+import { Pressable, View } from "react-native"
 
 import { Text, makeStyles } from "@rn-vui/themed"
 
@@ -8,28 +8,21 @@ type SuggestionBarProps = {
   onSelect: (value: string) => void
 }
 
+/** Renders in flow, directly above its bottom-anchored sibling (the screen's CTA).
+ *  Every screen that mounts this sits inside the Screen component's
+ *  KeyboardAvoidingView, so the parent is already lifted above the keyboard — the bar
+ *  must not add its own keyboard offset on top, or the chips land a keyboard-height
+ *  above the footer, on top of the input rows (#4088 review follow-up). */
 export const SuggestionBar: React.FC<SuggestionBarProps> = ({
   suggestions,
   onSelect,
 }) => {
   const styles = useStyles()
-  const [keyboardHeight, setKeyboardHeight] = useState(0)
-
-  useEffect(() => {
-    const showSub = Keyboard.addListener("keyboardDidShow", (e) =>
-      setKeyboardHeight(e.endCoordinates.height),
-    )
-    const hideSub = Keyboard.addListener("keyboardDidHide", () => setKeyboardHeight(0))
-    return () => {
-      showSub.remove()
-      hideSub.remove()
-    }
-  }, [])
 
   if (suggestions.length === 0) return null
 
   return (
-    <View style={[styles.container, { bottom: keyboardHeight }]}>
+    <View style={styles.container}>
       {suggestions.map((item) => (
         <Pressable
           key={item}
@@ -47,9 +40,6 @@ export const SuggestionBar: React.FC<SuggestionBarProps> = ({
 
 const useStyles = makeStyles(({ colors }) => ({
   container: {
-    position: "absolute",
-    left: 0,
-    right: 0,
     flexDirection: "row",
     justifyContent: "center",
     gap: 10,

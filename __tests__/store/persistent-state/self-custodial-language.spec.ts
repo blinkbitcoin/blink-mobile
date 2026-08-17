@@ -1,12 +1,13 @@
 import {
   getSelfCustodialLanguage,
   withSelfCustodialLanguage,
+  withSelfCustodialLanguageForAccount,
 } from "@app/store/persistent-state/self-custodial-language"
 import { PersistentState } from "@app/store/persistent-state/state-migrations"
 import { DefaultAccountId } from "@app/types/wallet"
 
 const baseState: PersistentState = {
-  schemaVersion: 14,
+  schemaVersion: 16,
   galoyInstance: { id: "Main" },
   galoyAuthToken: "",
 }
@@ -130,5 +131,26 @@ describe("withSelfCustodialLanguage", () => {
 
   it("returns the same state when no active account is set", () => {
     expect(withSelfCustodialLanguage(baseState, "es")).toBe(baseState)
+  })
+})
+
+describe("withSelfCustodialLanguageForAccount", () => {
+  it("writes for an explicit id while the active account is custodial", () => {
+    const state: PersistentState = {
+      ...baseState,
+      activeAccountId: DefaultAccountId.Custodial,
+    }
+
+    const next = withSelfCustodialLanguageForAccount(state, "self-custodial-new", "es")
+
+    expect(next.selfCustodialLanguageByAccountId).toEqual({
+      "self-custodial-new": "es",
+    })
+  })
+
+  it("refuses the custodial sentinel as target id", () => {
+    expect(
+      withSelfCustodialLanguageForAccount(baseState, DefaultAccountId.Custodial, "es"),
+    ).toBe(baseState)
   })
 })

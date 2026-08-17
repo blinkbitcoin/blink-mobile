@@ -15,8 +15,15 @@ const TERMINAL_URL = "https://terminal.blinkbtc.com"
  */
 const encodeUsername = (address: string): string => encodeURIComponent(address)
 
-export const getPosUrl = (address: string): string => {
-  return `${TERMINAL_URL}/${encodeUsername(address)}`
+/**
+ * `displayCurrency` becomes the terminal's `display` query param, which pre-selects the
+ * currency the point of sale prices in. The terminal falls back to USD for codes it does
+ * not know, so passing our own setting through stays safe if the two lists ever drift.
+ */
+export const getPosUrl = (address: string, displayCurrency?: string): string => {
+  const posUrl = `${TERMINAL_URL}/${encodeUsername(address)}`
+  if (!displayCurrency) return posUrl
+  return `${posUrl}?display=${encodeURIComponent(displayCurrency)}`
 }
 
 export const getPrintableQrCodeUrl = (address: string): string => {

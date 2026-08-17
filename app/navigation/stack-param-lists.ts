@@ -1,7 +1,4 @@
 import { NavigatorScreenParams } from "@react-navigation/native"
-
-export const PhraseStep = { First: 1, Second: 2 } as const
-export type PhraseStep = (typeof PhraseStep)[keyof typeof PhraseStep]
 import { LNURLPaySuccessAction } from "lnurl-pay"
 
 import { IconNamesType } from "@app/components/atomic/galoy-icon"
@@ -10,6 +7,7 @@ import { EarnSectionType } from "@app/screens/earns-screen/sections"
 import { PhoneLoginInitiateType } from "@app/screens/phone-auth-screen"
 import {
   PaymentDestination,
+  MerchantChoice,
   ReceiveDestination,
 } from "@app/screens/send-bitcoin-screen/payment-destination/index.types"
 import { PaymentDetail } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
@@ -21,6 +19,14 @@ import { MigrationSupportOrigin, MigrationSupportReason } from "@app/types/migra
 
 import { AuthenticationScreenPurpose, PinScreenPurpose } from "../utils/enum"
 
+export const PhraseStep = { First: 1, Second: 2 } as const
+export type PhraseStep = (typeof PhraseStep)[keyof typeof PhraseStep]
+
+/** Deep links and navigation-state rehydration can deliver params the route type says are
+ *  impossible; the phrase screens use this to fall back instead of throwing. */
+export const isPhraseStep = (value: unknown): value is PhraseStep =>
+  value === PhraseStep.First || value === PhraseStep.Second
+
 export type RootStackParamList = {
   getStarted: undefined
   accountTypeSelection: { mode: AccountTypeMode }
@@ -29,6 +35,10 @@ export type RootStackParamList = {
   liteDeviceAccount: {
     appCheckToken: string
   }
+  // Dev-only route: root-navigator registers it only when __DEV__ (lazy
+  // require there). navigate("developerScreen") still type-checks in release
+  // builds but is dropped as an unhandled action — gate any new call site
+  // with __DEV__, or reuse useSecretMenuTrigger.
   developerScreen: undefined
   login: {
     type: PhoneLoginInitiateType
@@ -59,6 +69,9 @@ export type RootStackParamList = {
   }
   sendBitcoinDetails: {
     paymentDestination: PaymentDestination
+  }
+  merchantSelection: {
+    merchants: MerchantChoice[]
   }
   sendBitcoinConfirmation: {
     paymentDetail: PaymentDetail<WalletCurrency>
@@ -121,7 +134,7 @@ export type RootStackParamList = {
   phoneFlow: NavigatorScreenParams<PhoneValidationStackParamList>
   phoneRegistrationInitiate: undefined
   phoneRegistrationValidate: { phone: string; channel: PhoneCodeChannelType }
-  transactionDetail: { txid: string }
+  transactionDetail: { txid: string; recipientUserId?: string }
   unclaimedDepositsScreen: undefined
   transactionHistory?: {
     wallets?: ReadonlyArray<{
@@ -136,6 +149,7 @@ export type RootStackParamList = {
   profileScreen: undefined
   notificationSettingsScreen: undefined
   apiScreen: undefined
+  apiKeyCreateScreen: undefined
   transactionLimitsScreen: undefined
   feeRatesScreen: undefined
   acceptTermsAndConditions: NewAccountFlowParamsList
@@ -156,6 +170,7 @@ export type RootStackParamList = {
   notificationHistory: undefined
   onboarding: NavigatorScreenParams<OnboardingStackParamList>
   cardDashboardScreen: undefined
+  cardFeeScheduleScreen: undefined
   cardAddToMobileWalletScreen: {
     lastFour: string
     holderName: string
@@ -196,6 +211,7 @@ export type RootStackParamList = {
   cardOnboardingPaymentScreen: undefined
   cardOnboardingLoadingScreen: undefined
   cardOnboardingPersonalInfoScreen: undefined
+  cardOnboardingAcknowledgementScreen: undefined
   cardOnboardingPreapprovedScreen: undefined
   cardOnboardingProcessingScreen: undefined
   cardOnboardingApprovedScreen: undefined
@@ -214,12 +230,16 @@ export type RootStackParamList = {
   accountMigrationStart: undefined
   accountMigrationExplainer: undefined
   accountMigrationKeepReceiving: undefined
+  accountMigrationMerchantTools: undefined
   accountMigrationDownloadHistory: undefined
   accountMigrationBalancesOverview: undefined
   accountMigrationTransferringFunds: undefined
   accountMigrationContactSupport: {
     reason: MigrationSupportReason
     origin?: MigrationSupportOrigin
+    /** Named by a handover raised after the session was discarded, when the live `me` query
+     *  can no longer answer for the custodial account the ticket is about. */
+    custodialAccountId?: string
   }
   selfCustodialRestorePhrase: { step: PhraseStep; words?: string[] }
   selfCustodialRestoreMethod: undefined

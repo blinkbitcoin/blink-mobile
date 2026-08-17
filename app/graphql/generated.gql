@@ -98,6 +98,7 @@ mutation accountDelete {
   accountDelete {
     errors {
       message
+      code
       __typename
     }
     success
@@ -223,6 +224,43 @@ mutation accountUpdateDisplayCurrency($input: AccountUpdateDisplayCurrencyInput!
   }
 }
 
+mutation apiKeyCreate($input: ApiKeyCreateInput!) {
+  apiKeyCreate(input: $input) {
+    apiKey {
+      id
+      name
+      createdAt
+      revoked
+      expired
+      lastUsedAt
+      expiresAt
+      scopes
+      readOnly
+      __typename
+    }
+    apiKeySecret
+    __typename
+  }
+}
+
+mutation apiKeyRevoke($input: ApiKeyRevokeInput!) {
+  apiKeyRevoke(input: $input) {
+    apiKey {
+      id
+      name
+      createdAt
+      revoked
+      expired
+      lastUsedAt
+      expiresAt
+      scopes
+      readOnly
+      __typename
+    }
+    __typename
+  }
+}
+
 mutation captchaCreateChallenge {
   captchaCreateChallenge {
     errors {
@@ -309,17 +347,6 @@ mutation contactCreate($input: ContactCreateInput!) {
 
 mutation deviceNotificationTokenCreate($input: DeviceNotificationTokenCreateInput!) {
   deviceNotificationTokenCreate(input: $input) {
-    errors {
-      message
-      __typename
-    }
-    success
-    __typename
-  }
-}
-
-mutation feedbackSubmit($input: FeedbackSubmitInput!) {
-  feedbackSubmit(input: $input) {
     errors {
       message
       __typename
@@ -1152,6 +1179,25 @@ query analytics {
   }
 }
 
+query apiKeys {
+  me {
+    id
+    apiKeys {
+      id
+      name
+      createdAt
+      revoked
+      expired
+      lastUsedAt
+      expiresAt
+      scopes
+      readOnly
+      __typename
+    }
+    __typename
+  }
+}
+
 query btcPriceList($range: PriceGraphRange!) {
   btcPriceList(range: $range) {
     timestamp
@@ -1322,7 +1368,11 @@ query feeRates {
       deposit {
         minBankFee
         minBankFeeThreshold
-        ratio
+        tiers {
+          maxAmount
+          amount
+          __typename
+        }
         __typename
       }
       __typename
@@ -1583,25 +1633,126 @@ query notificationSettings {
   }
 }
 
-query onChainTxFee($walletId: WalletId!, $address: OnChainAddress!, $amount: SatAmount!) {
-  onChainTxFee(walletId: $walletId, address: $address, amount: $amount) {
+query onChainTxFee($walletId: WalletId!, $address: OnChainAddress!, $amount: SatAmount!, $speed: PayoutSpeed!) {
+  onChainTxFee(
+    walletId: $walletId
+    address: $address
+    amount: $amount
+    speed: $speed
+  ) {
     amount
     __typename
   }
 }
 
-query onChainUsdTxFee($walletId: WalletId!, $address: OnChainAddress!, $amount: CentAmount!) {
-  onChainUsdTxFee(walletId: $walletId, address: $address, amount: $amount) {
+query onChainTxFeeBySpeed($walletId: WalletId!, $address: OnChainAddress!, $amount: SatAmount!) {
+  fast: onChainTxFee(
+    walletId: $walletId
+    address: $address
+    amount: $amount
+    speed: FAST
+  ) {
+    amount
+    __typename
+  }
+  medium: onChainTxFee(
+    walletId: $walletId
+    address: $address
+    amount: $amount
+    speed: MEDIUM
+  ) {
+    amount
+    __typename
+  }
+  slow: onChainTxFee(
+    walletId: $walletId
+    address: $address
+    amount: $amount
+    speed: SLOW
+  ) {
     amount
     __typename
   }
 }
 
-query onChainUsdTxFeeAsBtcDenominated($walletId: WalletId!, $address: OnChainAddress!, $amount: SatAmount!) {
+query onChainUsdTxFee($walletId: WalletId!, $address: OnChainAddress!, $amount: CentAmount!, $speed: PayoutSpeed!) {
+  onChainUsdTxFee(
+    walletId: $walletId
+    address: $address
+    amount: $amount
+    speed: $speed
+  ) {
+    amount
+    __typename
+  }
+}
+
+query onChainUsdTxFeeAsBtcDenominated($walletId: WalletId!, $address: OnChainAddress!, $amount: SatAmount!, $speed: PayoutSpeed!) {
   onChainUsdTxFeeAsBtcDenominated(
     walletId: $walletId
     address: $address
     amount: $amount
+    speed: $speed
+  ) {
+    amount
+    __typename
+  }
+}
+
+query onChainUsdTxFeeAsBtcDenominatedBySpeed($walletId: WalletId!, $address: OnChainAddress!, $amount: SatAmount!) {
+  fast: onChainUsdTxFeeAsBtcDenominated(
+    walletId: $walletId
+    address: $address
+    amount: $amount
+    speed: FAST
+  ) {
+    amount
+    __typename
+  }
+  medium: onChainUsdTxFeeAsBtcDenominated(
+    walletId: $walletId
+    address: $address
+    amount: $amount
+    speed: MEDIUM
+  ) {
+    amount
+    __typename
+  }
+  slow: onChainUsdTxFeeAsBtcDenominated(
+    walletId: $walletId
+    address: $address
+    amount: $amount
+    speed: SLOW
+  ) {
+    amount
+    __typename
+  }
+}
+
+query onChainUsdTxFeeBySpeed($walletId: WalletId!, $address: OnChainAddress!, $amount: CentAmount!) {
+  fast: onChainUsdTxFee(
+    walletId: $walletId
+    address: $address
+    amount: $amount
+    speed: FAST
+  ) {
+    amount
+    __typename
+  }
+  medium: onChainUsdTxFee(
+    walletId: $walletId
+    address: $address
+    amount: $amount
+    speed: MEDIUM
+  ) {
+    amount
+    __typename
+  }
+  slow: onChainUsdTxFee(
+    walletId: $walletId
+    address: $address
+    amount: $amount
+    speed: SLOW
   ) {
     amount
     __typename
@@ -1615,7 +1766,11 @@ query paymentRequest {
       deposit {
         minBankFee
         minBankFeeThreshold
-        ratio
+        tiers {
+          maxAmount
+          amount
+          __typename
+        }
         __typename
       }
       __typename
@@ -1921,6 +2076,25 @@ query totpRegistrationScreen {
   }
 }
 
+query transactionByIdForWallet($walletId: WalletId!, $txId: ID!) {
+  me {
+    id
+    defaultAccount {
+      id
+      walletById(walletId: $walletId) {
+        id
+        transactionById(transactionId: $txId) {
+          ...Transaction
+          __typename
+        }
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+}
+
 query transactionListForContact($username: Username!, $first: Int, $after: String, $last: Int, $before: String) {
   me {
     id
@@ -1946,6 +2120,57 @@ query transactionListForDefaultAccount($first: Int, $after: String, $walletIds: 
       }
       transactions(first: $first, after: $after, walletIds: $walletIds) {
         ...TransactionList
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+}
+
+query transactionOwnershipProbe($first: Int) {
+  me {
+    id
+    defaultAccount {
+      id
+      wallets {
+        id
+        __typename
+      }
+      pendingIncomingTransactions {
+        id
+        __typename
+      }
+      transactions(first: $first) {
+        edges {
+          node {
+            id
+            __typename
+          }
+          __typename
+        }
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+}
+
+query transactionsByPaymentHash($walletId: WalletId!, $paymentHash: PaymentHash!) {
+  me {
+    id
+    defaultAccount {
+      id
+      walletById(walletId: $walletId) {
+        id
+        transactionsByPaymentHash(paymentHash: $paymentHash) {
+          id
+          status
+          direction
+          createdAt
+          __typename
+        }
         __typename
       }
       __typename

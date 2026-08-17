@@ -104,6 +104,20 @@ describe("resolveDestination", () => {
       expect(result).toBe(invalid)
     })
 
+    it("trims surrounding whitespace from the raw input before parsing", async () => {
+      const parsed = { valid: true, validDestination: { paymentType: "Lightning" } }
+      mockParseDestination.mockResolvedValue(parsed)
+
+      const result = await resolveDestination(
+        { ...baseParams, rawInput: "  lnbc1...  " },
+        { sdk: null, network: SparkNetwork.Regtest },
+        lnAddressHostname,
+      )
+
+      expect(mockParseDestination).toHaveBeenCalledWith(baseParams)
+      expect(result).toBe(parsed)
+    })
+
     it("does not attempt the Spark pre-check when sdk is null", async () => {
       mockParseDestination.mockResolvedValue({ valid: false })
 
@@ -221,6 +235,31 @@ describe("resolveDestination", () => {
       expect(mockParseDestination).toHaveBeenCalledWith({
         ...baseParams,
         rawInput: "esaudeveloper@blink.sv",
+      })
+    })
+
+    it("passes trimmed input to the Spark pre-check and the parser", async () => {
+      const parsed = { valid: true, validDestination: { paymentType: "Intraledger" } }
+
+      mockParseSparkAddress.mockResolvedValue(null)
+      mockParseDestination.mockResolvedValue(parsed)
+      mockResolveUsername.mockResolvedValue(parsed)
+      mockWrapDestination.mockReturnValue(parsed)
+
+      await resolveDestination(
+        { ...baseParams, rawInput: "  sparkrt1qabc  " },
+        { sdk: fakeSdk, network: SparkNetwork.Regtest },
+        lnAddressHostname,
+      )
+
+      expect(mockParseSparkAddress).toHaveBeenCalledWith(
+        fakeSdk,
+        "sparkrt1qabc",
+        SparkNetwork.Regtest,
+      )
+      expect(mockParseDestination).toHaveBeenCalledWith({
+        ...baseParams,
+        rawInput: "sparkrt1qabc",
       })
     })
 

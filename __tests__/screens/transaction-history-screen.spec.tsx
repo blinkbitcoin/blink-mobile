@@ -69,6 +69,11 @@ jest.mock("@app/graphql/mocks", () => {
   }
 })
 
+// Records the onPress identity handed to each row, so a test can assert the
+// screen shares one stable callback instead of a fresh closure per row —
+// a fresh closure defeats React.memo and re-renders the whole list.
+const mockOnPressIdentities: Array<(txid: string) => void> = []
+
 jest.mock("@app/components/transaction-item", () => {
   const React = jest.requireActual("react")
   const { Text } = jest.requireActual("react-native")
@@ -77,11 +82,17 @@ jest.mock("@app/components/transaction-item", () => {
     txid: string
     highlight?: boolean
     testId?: string
+    onPress?: (txid: string) => void
   }
 
-  const MemoizedTransactionItem = ({ txid, highlight, testId }: Props) => (
-    <Text testID={testId}>{`${txid}:${highlight ? "highlight" : "no-highlight"}`}</Text>
-  )
+  const MemoizedTransactionItem = ({ txid, highlight, testId, onPress }: Props) => {
+    if (onPress) {
+      mockOnPressIdentities.push(onPress)
+    }
+    return (
+      <Text testID={testId}>{`${txid}:${highlight ? "highlight" : "no-highlight"}`}</Text>
+    )
+  }
 
   return {
     __esModule: true,
@@ -257,12 +268,42 @@ const buildTransactionMocks = ({
 describe("TransactionHistoryScreen", () => {
   beforeEach(() => {
     loadLocale("en")
+    mockOnPressIdentities.length = 0
   })
 
   afterEach(() => {
     cleanup()
     currentMocks = []
     currentTxLastSeen = { btcId: "", usdId: "" }
+  })
+
+  it("hands every row the same onPress callback, across re-renders", async () => {
+    currentTxLastSeen = {
+      btcId: "507f1f77bcf86cd799439010",
+      usdId: "507f1f77bcf86cd799439010",
+    }
+
+    currentMocks = buildTransactionMocks({
+      btcTxId: "507f1f77bcf86cd799439011",
+      usdTxId: "507f1f77bcf86cd799439012",
+    })
+
+    const screen = render(
+      <ContextForScreen>
+        <TransactionHistoryScreen route={mockRouteWithCurrencyFilter()} />
+      </ContextForScreen>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId("transaction-by-index-1")).toBeTruthy()
+    })
+
+    // Force a screen re-render: a per-row closure would be rebuilt here.
+    const dropdown = screen.getByTestId("wallet-filter-dropdown")
+    await act(() => fireEvent.press(dropdown))
+
+    expect(mockOnPressIdentities.length).toBeGreaterThan(1)
+    expect(new Set(mockOnPressIdentities).size).toBe(1)
   })
 
   it("shows all transactions by default", async () => {

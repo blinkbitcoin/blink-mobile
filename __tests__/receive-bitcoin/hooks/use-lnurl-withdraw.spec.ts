@@ -138,6 +138,26 @@ describe("useLnurlWithdraw", () => {
     expect(calledUrl).toContain("pr=lnbc1test_payment_request")
   })
 
+  it("refuses a non-https callback without fetching it", async () => {
+    const alertSpy = jest.spyOn(Alert, "alert")
+
+    const { result } = renderHook(() =>
+      useLnurlWithdraw(validPr as Parameters<typeof useLnurlWithdraw>[0]),
+    )
+
+    await act(async () => {
+      await result.current({
+        validDestination: {
+          callback: "http://example.com/lnurl/withdraw",
+          k1: "random_k1_value",
+        },
+      } as Parameters<ReturnType<typeof useLnurlWithdraw>>[0])
+    })
+
+    expect(alertSpy).toHaveBeenCalledWith("Redeeming error")
+    expect(mockFetch).not.toHaveBeenCalled()
+  })
+
   it("shows submission error on non-ok response", async () => {
     // The hook logs the simulated failure via console.error; capture it so the
     // expected error doesn't pollute CI logs (and assert it actually happened).
