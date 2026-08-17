@@ -11,9 +11,6 @@ const mockedFetch = fetchPlaceDetails as jest.MockedFunction<typeof fetchPlaceDe
 const detailsFor = (id: number, name: string): BtcMapPlaceDetails => ({
   id,
   name,
-  acceptsLightning: false,
-  acceptsOnchain: false,
-  acceptsContactless: false,
 })
 
 const deferred = <T>() => {

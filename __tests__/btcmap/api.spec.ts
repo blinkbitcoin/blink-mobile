@@ -216,14 +216,11 @@ describe("fetchPlacesDelta", () => {
 })
 
 describe("fetchPlaceDetails", () => {
-  it("reads payment methods and contact fallbacks out of the raw OSM tags", async () => {
+  it("reads contact fallbacks out of the raw OSM tags", async () => {
     mockedGet.mockResolvedValue({
       data: {
         "id": 7,
         "name": "Cafe",
-        "osm:payment:lightning": "yes",
-        "osm:payment:onchain": "no",
-        "osm:payment:lightning_contactless": "yes",
         "osm:contact:phone": "+1 555 0100",
       },
       headers: {},
@@ -231,10 +228,20 @@ describe("fetchPlaceDetails", () => {
 
     const details = await fetchPlaceDetails(7)
 
-    expect(details.acceptsLightning).toBe(true)
-    expect(details.acceptsOnchain).toBe(false)
-    expect(details.acceptsContactless).toBe(true)
     expect(details.phone).toBe("+1 555 0100")
+  })
+
+  it("no longer asks for the accepted-payment-method tags", async () => {
+    // Nothing renders them, so they are not worth the response size.
+    mockedGet.mockResolvedValue({ data: { id: 7 }, headers: {} })
+
+    await fetchPlaceDetails(7)
+
+    const fields = String(paramsOf(0).fields)
+    expect(fields).not.toContain("osm:payment:lightning")
+    expect(fields).not.toContain("osm:payment:onchain")
+    // The payment URI is a different thing and is still needed.
+    expect(fields).toContain("osm:payment:uri")
   })
 
   it("prefers the promoted field over its raw OSM twin", async () => {

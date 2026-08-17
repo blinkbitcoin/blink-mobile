@@ -24,13 +24,10 @@ import { paymentUri } from "./urls"
 // and asking for it is what makes the API include tombstones at all.
 const LIST_FIELDS = "id,lat,lon,icon,boosted_until,updated_at,deleted_at"
 
-// BTC Map exposes raw OpenStreetMap tags under an `osm:` prefix. Payment
-// methods and the contact fallbacks have no first-class field, so they only
-// arrive this way — and the response keys keep the prefix.
+// BTC Map exposes raw OpenStreetMap tags under an `osm:` prefix. The payment
+// URI and the contact fallbacks have no first-class field, so they only arrive
+// this way — and the response keys keep the prefix.
 const PAYMENT_TAGS = {
-  lightning: "osm:payment:lightning",
-  onchain: "osm:payment:onchain",
-  contactless: "osm:payment:lightning_contactless",
   uri: "osm:payment:uri",
   pouch: "osm:payment:pouch",
   coinos: "osm:payment:coinos",
@@ -83,9 +80,6 @@ const osmTag = (wire: BtcMapPlaceDetailsWire, tag: string): string | undefined =
   return typeof value === "string" ? value : undefined
 }
 
-const acceptsTag = (wire: BtcMapPlaceDetailsWire, tag: string): boolean =>
-  osmTag(wire, tag) === "yes"
-
 const paymentUrl = (wire: BtcMapPlaceDetailsWire): string | undefined => {
   // btcmap.org refuses to hand a user off to an arbitrary scheme, and neither
   // do we — see the allowlists in `urls.ts`, which every OSM-sourced link on
@@ -123,9 +117,6 @@ export const toPlaceDetails = (wire: BtcMapPlaceDetailsWire): BtcMapPlaceDetails
   requiredAppUrl: wire.required_app_url,
   osmId: wire.osm_id,
   paymentUrl: paymentUrl(wire),
-  acceptsLightning: acceptsTag(wire, PAYMENT_TAGS.lightning),
-  acceptsOnchain: acceptsTag(wire, PAYMENT_TAGS.onchain),
-  acceptsContactless: acceptsTag(wire, PAYMENT_TAGS.contactless),
 })
 
 /**

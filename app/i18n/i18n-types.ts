@@ -6569,14 +6569,6 @@ type RootTranslation = {
 		 */
 		navigate: string
 		/**
-		 * A​c​c​e​p​t​s
-		 */
-		accepts: string
-		/**
-		 * C​o​n​t​a​c​t​l​e​s​s
-		 */
-		contactless: string
-		/**
 		 * P​a​y​ ​t​h​i​s​ ​m​e​r​c​h​a​n​t
 		 */
 		payMerchant: string
@@ -19941,14 +19933,6 @@ export type TranslationFunctions = {
 		 * Navigate
 		 */
 		navigate: () => LocalizedString
-		/**
-		 * Accepts
-		 */
-		accepts: () => LocalizedString
-		/**
-		 * Contactless
-		 */
-		contactless: () => LocalizedString
 		/**
 		 * Pay this merchant
 		 */

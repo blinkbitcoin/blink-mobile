@@ -72,7 +72,4 @@ export type BtcMapPlaceDetails = {
   osmId?: string
   // Where to send someone who wants to pay, if the place published one.
   paymentUrl?: string
-  acceptsLightning: boolean
-  acceptsOnchain: boolean
-  acceptsContactless: boolean
 }

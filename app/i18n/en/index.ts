@@ -2119,8 +2119,6 @@ const en: BaseTranslation = {
     openNow: "Open now",
     closedNow: "Closed",
     navigate: "Navigate",
-    accepts: "Accepts",
-    contactless: "Contactless",
     payMerchant: "Pay this merchant",
     requiresApp: "Needs a specific app to pay",
     boosted: "Boosted",

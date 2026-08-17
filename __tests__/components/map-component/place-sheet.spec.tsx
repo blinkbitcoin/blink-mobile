@@ -40,9 +40,6 @@ const details = (overrides: Partial<BtcMapPlaceDetails> = {}): BtcMapPlaceDetail
   id: 42,
   name: "Satoshi Coffee",
   address: "1 Bishopsgate, London",
-  acceptsLightning: false,
-  acceptsOnchain: false,
-  acceptsContactless: false,
   ...overrides,
 })
 
@@ -135,15 +132,6 @@ describe("PlaceSheet", () => {
     await waitFor(() =>
       expect(never.getByText("This location needs to be surveyed")).toBeTruthy(),
     )
-  })
-
-  it("lists the payment methods the place actually advertises", async () => {
-    setDetails(details({ acceptsLightning: true, acceptsContactless: true }))
-    const { getByText, queryByText } = renderSheet()
-
-    await waitFor(() => expect(getByText("Lightning")).toBeTruthy())
-    expect(getByText("Contactless")).toBeTruthy()
-    expect(queryByText("Onchain")).toBeNull()
   })
 
   it("shares the place's page on btcmap.org, keyed by its OSM id", async () => {

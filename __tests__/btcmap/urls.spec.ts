@@ -13,9 +13,6 @@ import { BtcMapPlaceDetails } from "@app/btcmap/types"
 
 const details = (overrides: Partial<BtcMapPlaceDetails> = {}): BtcMapPlaceDetails => ({
   id: 42,
-  acceptsLightning: false,
-  acceptsOnchain: false,
-  acceptsContactless: false,
   ...overrides,
 })
 

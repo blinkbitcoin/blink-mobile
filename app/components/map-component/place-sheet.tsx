@@ -302,12 +302,6 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
     </Pressable>
   )
 
-  const acceptsLabels = [
-    details?.acceptsLightning ? LL.common.lightning() : "",
-    details?.acceptsOnchain ? LL.common.onchain() : "",
-    details?.acceptsContactless ? LL.MapScreen.contactless() : "",
-  ].filter(Boolean)
-
   // Brand names, so they stay untranslated — the same three btcmap.org lists.
   const socials = (
     [
@@ -520,20 +514,6 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
                   )}
               </View>
 
-              {acceptsLabels.length > 0 && (
-                <View style={styles.accepts}>
-                  <Text style={styles.sectionLabel}>{LL.MapScreen.accepts()}</Text>
-                  <View style={styles.chips}>
-                    {acceptsLabels.map((label) => (
-                      <View key={label} style={styles.acceptsPill}>
-                        <GaloyIcon name="bitcoin" size={12} color={colors.primary} />
-                        <Text style={styles.acceptsPillText}>{label}</Text>
-                      </View>
-                    ))}
-                  </View>
-                </View>
-              )}
-
               {Boolean(details?.description) && (
                 <Text style={styles.description}>{details?.description}</Text>
               )}
@@ -735,30 +715,6 @@ const useStyles = makeStyles(({ colors }, { bottomInset, accent }: StyleProps) =
     flex: 1,
     fontSize: 14,
     color: colors.primary,
-  },
-  sectionLabel: {
-    fontSize: 12,
-    fontWeight: "600",
-    color: colors.grey2,
-    textTransform: "uppercase",
-    letterSpacing: 0.5,
-  },
-  accepts: {
-    rowGap: 8,
-  },
-  acceptsPill: {
-    flexDirection: "row",
-    alignItems: "center",
-    columnGap: 6,
-    backgroundColor: colors.grey5,
-    borderRadius: 12,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-  },
-  acceptsPillText: {
-    fontSize: 12,
-    fontWeight: "600",
-    color: colors.black,
   },
   chips: {
     flexDirection: "row",
