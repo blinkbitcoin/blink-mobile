@@ -174,6 +174,12 @@ export default function MapComponent({
         showsUserLocation={permissionsStatus === RESULTS.GRANTED}
         showsMyLocationButton={false}
         initialRegion={userLocation}
+        // The basemap draws its own restaurants, shops and stations, which read
+        // as merchants we vouch for and bury the ones we do. Suppressing them
+        // takes both mechanisms: the style sheet is Google's and only reaches
+        // Android, while iOS renders Apple Maps, which ignores it and honours
+        // this prop instead.
+        showsPointsOfInterests={false}
         customMapStyle={themeMode === "dark" ? MapStyles.dark : MapStyles.light}
         onRegionChangeComplete={handleRegionChangeComplete}
         moveOnMarkerPress={false}

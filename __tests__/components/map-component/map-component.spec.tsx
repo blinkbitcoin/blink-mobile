@@ -4,6 +4,7 @@ import { fireEvent, render, waitFor } from "@testing-library/react-native"
 
 import { BtcMapPlace, useBtcMapPlaces } from "@app/btcmap"
 import MapComponent from "@app/components/map-component"
+import MapStyles from "@app/components/map-component/map-styles.json"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { getUserRegion } from "@app/screens/map-screen/functions"
 
@@ -29,12 +30,15 @@ jest.mock("react-native-permissions", () => ({
   },
 }))
 
+let capturedMapProps: Record<string, unknown> | undefined
 jest.mock("react-native-maps", () => {
   const ReactActual = jest.requireActual<typeof React>("react")
   const RN = jest.requireActual<typeof import("react-native")>("react-native")
   const MapView = ReactActual.forwardRef(
-    ({ children }: { children?: React.ReactNode }, _ref: React.Ref<unknown>) =>
-      ReactActual.createElement(RN.View, { testID: "map-view" }, children),
+    (props: { children?: React.ReactNode }, _ref: React.Ref<unknown>) => {
+      capturedMapProps = props as Record<string, unknown>
+      return ReactActual.createElement(RN.View, { testID: "map-view" }, props.children)
+    },
   )
   MapView.displayName = "MockMapView"
   return {
@@ -100,6 +104,7 @@ beforeEach(() => {
   jest.clearAllMocks()
   loadLocale("en")
   capturedSheetProps = undefined
+  capturedMapProps = undefined
   setPlaces()
 })
 
@@ -173,5 +178,44 @@ describe("MapComponent", () => {
         longitude: REGION.longitude,
       }),
     )
+  })
+})
+
+describe("MapComponent basemap", () => {
+  it("hides the basemap's own places so only our pins are on the map", async () => {
+    // Apple Maps ignores customMapStyle, so iOS needs the prop; Android needs
+    // the style sheet. Dropping either one puts Google's or Apple's own
+    // restaurants and shops back next to merchants we actually vouch for.
+    renderMap()
+
+    await waitFor(() => expect(capturedMapProps).toBeDefined())
+    expect(capturedMapProps?.showsPointsOfInterests).toBe(false)
+
+    expect(capturedMapProps?.customMapStyle).toBeDefined()
+  })
+
+  it("suppresses the basemap's places in both themes", () => {
+    // Light shipped as an empty array, so Google drew every default POI; dark
+    // only recoloured their labels.
+    type Rule = {
+      featureType?: string
+      elementType?: string
+      stylers: Record<string, string>[]
+    }
+    const themes: Rule[][] = [MapStyles.light, MapStyles.dark]
+
+    for (const rules of themes) {
+      const hides = (featureType: string, elementType?: string) =>
+        rules.some(
+          (rule) =>
+            rule.featureType === featureType &&
+            rule.elementType === elementType &&
+            rule.stylers.some((styler) => styler.visibility === "off"),
+        )
+
+      expect(hides("poi", "labels")).toBe(true)
+      expect(hides("poi.business")).toBe(true)
+      expect(hides("transit", "labels")).toBe(true)
+    }
   })
 })
