@@ -37,10 +37,13 @@ export const ClusterMarker: React.FC<Props> = React.memo(({ cluster, onPress }) 
   } = useTheme()
   // Discs are react-native-svg like the pins are, so they need the same paint
   // window before tracking can be turned off — see use-marker-settle.
-  const tracksViewChanges = useMarkerSettle(`${colors.success}|${cluster.count}`)
+  const { markerRef, tracksViewChanges } = useMarkerSettle(
+    `${colors.success}|${cluster.count}`,
+  )
 
   return (
     <Marker
+      ref={markerRef}
       identifier={`btcmap-cluster-${cluster.id}`}
       testID={`btcmap-cluster-${cluster.id}`}
       coordinate={{ latitude: cluster.latitude, longitude: cluster.longitude }}

@@ -7,7 +7,7 @@ import { BtcMapPlace } from "@app/btcmap"
 import theme from "@app/rne-theme/theme"
 import { dark, light } from "@app/rne-theme/colors"
 import { ClusterMarker } from "@app/components/map-component/cluster-marker"
-import { markerAnchor, markerHeight } from "@app/components/map-component/marker-layout"
+import { MARKER_ANCHOR, MARKER_HEIGHT } from "@app/components/map-component/marker-layout"
 import { PlaceMarker } from "@app/components/map-component/place-marker"
 import {
   PIN_COLOR_BOOSTED,
@@ -16,19 +16,36 @@ import {
 } from "@app/components/map-component/pin-shape"
 import { useMarkerSettle } from "@app/components/map-component/use-marker-settle"
 
+// Every Marker the components mount records its redraw() here, keyed by testID,
+// so the tests can assert the native icon was forced to refresh.
+const redraws: Record<string, jest.Mock> = {}
+
 jest.mock("react-native-maps", () => {
   const ReactActual = jest.requireActual<typeof React>("react")
   const RN = jest.requireActual<typeof import("react-native")>("react-native")
   return {
     __esModule: true,
-    Marker: (props: Record<string, unknown> & { children?: React.ReactNode }) =>
-      ReactActual.createElement(
-        RN.View,
-        { testID: props.testID as string, ...props },
-        props.children as React.ReactNode,
-      ),
+    Marker: ReactActual.forwardRef(
+      (
+        props: Record<string, unknown> & { children?: React.ReactNode },
+        ref: React.Ref<unknown>,
+      ) => {
+        const testID = props.testID as string
+        ReactActual.useImperativeHandle(ref, () => {
+          redraws[testID] = redraws[testID] ?? jest.fn()
+          return { redraw: redraws[testID] }
+        })
+        return ReactActual.createElement(
+          RN.View,
+          { testID, ...props },
+          props.children as React.ReactNode,
+        )
+      },
+    ),
   }
 })
+
+const redrawsFor = (testID: string) => redraws[testID]?.mock.calls.length ?? 0
 
 const place = (overrides: Partial<BtcMapPlace> = {}): BtcMapPlace => ({
   id: 1,
@@ -55,7 +72,10 @@ const pinFill = (node: React.ReactElement) =>
 const trackingOf = (tree: ReturnType<typeof render>, testID: string) =>
   tree.getByTestId(testID).props.tracksViewChanges
 
-beforeEach(() => jest.useFakeTimers())
+beforeEach(() => {
+  jest.useFakeTimers()
+  for (const key of Object.keys(redraws)) delete redraws[key]
+})
 afterEach(() => jest.useRealTimers())
 
 describe("useMarkerSettle", () => {
@@ -63,10 +83,10 @@ describe("useMarkerSettle", () => {
     // Tracking on forever is ruinous with hundreds of pins; off from the first
     // frame snapshots a blank marker on Android.
     const { result } = renderHook(() => useMarkerSettle("a"))
-    expect(result.current).toBe(true)
+    expect(result.current.tracksViewChanges).toBe(true)
 
     act(() => jest.advanceTimersByTime(500))
-    expect(result.current).toBe(false)
+    expect(result.current.tracksViewChanges).toBe(false)
   })
 
   it("re-opens the window when what is drawn changes", () => {
@@ -77,10 +97,59 @@ describe("useMarkerSettle", () => {
       { initialProps: { appearance: "a" } },
     )
     act(() => jest.advanceTimersByTime(500))
-    expect(result.current).toBe(false)
+    expect(result.current.tracksViewChanges).toBe(false)
 
     rerender({ appearance: "b" })
-    expect(result.current).toBe(true)
+    expect(result.current.tracksViewChanges).toBe(true)
+  })
+
+  it("forces a last rasterisation as the window closes", () => {
+    // Android's tracker stops re-capturing a couple of frames after the view
+    // changed, whatever the prop says, and the library's own final-render
+    // fallback is behind an early return that trips once it has. Without this
+    // the marker keeps whatever half-painted bitmap it had at that moment.
+    const redraw = jest.fn()
+    const { rerender } = renderHook(
+      ({ appearance }: { appearance: string }) => {
+        const settle = useMarkerSettle(appearance)
+        // @ts-expect-error -- standing in for the native marker handle
+        settle.markerRef.current = { redraw }
+        return settle
+      },
+      { initialProps: { appearance: "a" } },
+    )
+
+    expect(redraw).not.toHaveBeenCalled()
+    act(() => jest.advanceTimersByTime(500))
+    expect(redraw).toHaveBeenCalledTimes(1)
+
+    // And again each time the window is reopened and closes.
+    rerender({ appearance: "b" })
+    act(() => jest.advanceTimersByTime(500))
+    expect(redraw).toHaveBeenCalledTimes(2)
+  })
+
+  it("does not redraw a window that was reopened before it closed", () => {
+    const redraw = jest.fn()
+    const { rerender } = renderHook(
+      ({ appearance }: { appearance: string }) => {
+        const settle = useMarkerSettle(appearance)
+        // @ts-expect-error -- standing in for the native marker handle
+        settle.markerRef.current = { redraw }
+        return settle
+      },
+      { initialProps: { appearance: "a" } },
+    )
+
+    act(() => jest.advanceTimersByTime(200))
+    rerender({ appearance: "b" })
+    act(() => jest.advanceTimersByTime(200))
+
+    // The first timer was cleared, so the pin is not captured mid-change.
+    expect(redraw).not.toHaveBeenCalled()
+
+    act(() => jest.advanceTimersByTime(300))
+    expect(redraw).toHaveBeenCalledTimes(1)
   })
 })
 
@@ -116,24 +185,22 @@ describe("PlaceMarker", () => {
     }
   })
 
-  it("keeps the teardrop tip on the coordinate whether or not it is labelled", () => {
-    // The anchor is the tip's position as a fraction of the view. A label makes
-    // the view taller, so a constant anchor would push labelled pins north of
-    // where the merchant actually is.
-    expect(markerAnchor(false)).toEqual({ x: 0.5, y: 1 })
-
-    const labelled = markerAnchor(true)
-    expect(labelled.x).toBe(0.5)
-    expect(labelled.y).toBeCloseTo(PIN_HEIGHT / markerHeight(true), 5)
-    expect(labelled.y).toBeLessThan(1)
+  it("keeps the teardrop tip on the coordinate, labelled or not", () => {
+    // The anchor is the tip's position as a fraction of the view, so it must not
+    // move when a name arrives: Android applies a new anchor immediately while
+    // the bitmap is still the old one, which drops the pin off its coordinate
+    // for as long as the two disagree — permanently, if the repaint is missed.
+    expect(MARKER_ANCHOR.x).toBe(0.5)
+    expect(MARKER_ANCHOR.y).toBeCloseTo(PIN_HEIGHT / MARKER_HEIGHT, 5)
+    expect(MARKER_ANCHOR.y).toBeLessThan(1)
 
     const anchorOf = (name?: string) =>
       render(
         withTheme(<PlaceMarker place={place()} name={name} onPress={jest.fn()} />),
       ).getByTestId("btcmap-place-1").props.anchor
 
-    expect(anchorOf()).toEqual(markerAnchor(false))
-    expect(anchorOf("Satoshi Coffee")).toEqual(markerAnchor(true))
+    expect(anchorOf()).toEqual(MARKER_ANCHOR)
+    expect(anchorOf("Satoshi Coffee")).toEqual(anchorOf())
   })
 
   it("draws the merchant's name under the pin when one is known", () => {
@@ -144,7 +211,6 @@ describe("PlaceMarker", () => {
     )
     expect(withName.getByText("Satoshi Coffee")).toBeTruthy()
 
-    // No name yet means no label and no reserved space for one.
     const without = render(withTheme(<PlaceMarker place={place()} onPress={jest.fn()} />))
     expect(without.queryByText("Satoshi Coffee")).toBeNull()
   })
@@ -155,6 +221,7 @@ describe("PlaceMarker", () => {
     const tree = render(withTheme(<PlaceMarker place={place()} onPress={jest.fn()} />))
     act(() => jest.advanceTimersByTime(500))
     expect(trackingOf(tree, "btcmap-place-1")).toBe(false)
+    expect(redrawsFor("btcmap-place-1")).toBe(1)
 
     tree.rerender(
       withTheme(
@@ -163,6 +230,12 @@ describe("PlaceMarker", () => {
     )
 
     expect(trackingOf(tree, "btcmap-place-1")).toBe(true)
+
+    // Reopening the window is not enough on its own — the native tracker gives
+    // up after a couple of frames — so the label's paint is forced home too.
+    act(() => jest.advanceTimersByTime(500))
+    expect(trackingOf(tree, "btcmap-place-1")).toBe(false)
+    expect(redrawsFor("btcmap-place-1")).toBe(2)
   })
 
   it("repaints when a sync flips the place's boost", () => {

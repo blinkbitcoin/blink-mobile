@@ -8,17 +8,21 @@ export const LABEL_LINE_HEIGHT = 14
 export const LABEL_GAP = 2
 
 /**
- * The marker view's height, which the anchor is derived from.
+ * The marker view's height — constant, including for a pin with no name yet.
  *
  * The teardrop's tip has to land on the place's coordinate, so the anchor is the
- * tip's position as a fraction of the whole view — not a constant. Adding a
- * label below the pin makes the view taller, and an anchor left at 1 would push
- * every labelled pin north of where it actually is.
+ * tip's position as a fraction of the whole view. Sizing the view to whether a
+ * label is present would move that fraction the moment a name arrives, and names
+ * arrive from a separate request long after the pins are drawn.
+ *
+ * That is worse than it sounds on Android. `anchor` is applied to the marker
+ * immediately, while the bitmap is only re-rasterised when the view is being
+ * tracked — so for as long as the two disagree the pin sits ~12px below its own
+ * coordinate, and if the re-rasterisation is missed it stays there. Reserving
+ * the label's row always costs an empty strip nothing is drawn in, and buys an
+ * anchor that never moves.
  */
-export const markerHeight = (hasLabel: boolean): number =>
-  hasLabel ? PIN_HEIGHT + LABEL_GAP + LABEL_LINE_HEIGHT : PIN_HEIGHT
+export const MARKER_HEIGHT = PIN_HEIGHT + LABEL_GAP + LABEL_LINE_HEIGHT
 
-export const markerAnchor = (hasLabel: boolean) => ({
-  x: 0.5,
-  y: PIN_HEIGHT / markerHeight(hasLabel),
-})
+/** Horizontally centred, vertically on the teardrop's tip. */
+export const MARKER_ANCHOR = { x: 0.5, y: PIN_HEIGHT / MARKER_HEIGHT }

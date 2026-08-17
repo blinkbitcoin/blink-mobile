@@ -10,7 +10,7 @@ import {
   LABEL_GAP,
   LABEL_LINE_HEIGHT,
   LABEL_MAX_WIDTH,
-  markerAnchor,
+  MARKER_ANCHOR,
 } from "./marker-layout"
 import { useMarkerSettle } from "./use-marker-settle"
 import {
@@ -39,18 +39,20 @@ export const PlaceMarker: React.FC<Props> = React.memo(({ place, name, onPress }
   // nobody can see would undo the point of `useMarkerSettle`.
   const color = usePinColor(isBoosted(place.boostedUntil, new Date()))
   const glyph = materialIconName(place.icon)
-  const hasLabel = Boolean(name)
 
   // The label is part of what gets rasterised, so it belongs in the settle key —
   // a name arriving after the pin has painted has to reopen the paint window.
-  const tracksViewChanges = useMarkerSettle(`${glyph}|${color}|${name ?? ""}`)
+  const { markerRef, tracksViewChanges } = useMarkerSettle(
+    `${glyph}|${color}|${name ?? ""}`,
+  )
 
   return (
     <Marker
+      ref={markerRef}
       identifier={`btcmap-place-${place.id}`}
       testID={`btcmap-place-${place.id}`}
       coordinate={{ latitude: place.latitude, longitude: place.longitude }}
-      anchor={markerAnchor(hasLabel)}
+      anchor={MARKER_ANCHOR}
       tracksViewChanges={tracksViewChanges}
       onPress={() => onPress(place)}
     >
@@ -65,12 +67,14 @@ export const PlaceMarker: React.FC<Props> = React.memo(({ place, name, onPress }
           />
         </View>
 
-        {hasLabel && (
-          <View style={styles.labelRow}>
-            {/* Font scaling is off and the line count fixed on purpose: the
-                anchor is computed from this view's height, so text that grows
-                would drag every labelled pin off its coordinate. The full name
-                is one tap away in the sheet. */}
+        {/* Always present, even with nothing in it — the anchor is computed from
+            this view's height, and a row that appears when a name arrives would
+            move every labelled pin off its coordinate. See marker-layout.ts. */}
+        <View style={styles.labelRow}>
+          {Boolean(name) && (
+            /* Font scaling is off and the line count fixed for the same reason:
+               text that grows changes the height the anchor was derived from.
+               The full name is one tap away in the sheet. */
             <Text
               style={styles.label}
               numberOfLines={1}
@@ -79,8 +83,8 @@ export const PlaceMarker: React.FC<Props> = React.memo(({ place, name, onPress }
             >
               {name}
             </Text>
-          </View>
-        )}
+          )}
+        </View>
       </View>
     </Marker>
   )
