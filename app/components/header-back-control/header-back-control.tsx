@@ -2,6 +2,7 @@ import React from "react"
 import { Platform, View } from "react-native"
 import { HeaderBackButton } from "@react-navigation/elements"
 import { useNavigation } from "@react-navigation/native"
+import { NativeStackHeaderBackProps } from "@react-navigation/native-stack"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
 // native-stack wraps headerLeft in react-native-screens' ScreenStackHeaderLeftView,
@@ -48,8 +49,23 @@ const HeaderBackButtonWithTheme = (
   )
 }
 
-export const headerBackControl = ({ canGoBack = true }: HeaderBackControlParams = {}) =>
-  canGoBack ? HeaderBackButtonWithTheme : InvisibleBackButton
+/**
+ * The render function handed to `headerLeft` must never call hooks itself, which is why
+ * it returns an element instead of the button component: native-stack invokes
+ * `headerLeft` inline while it computes the header config (useHeaderConfigProps, called
+ * from NativeStackView's own body), so hooks called there land on that fiber rather than
+ * on the button's. Any screen that then replaces `headerLeft` with a hookless render (the
+ * KYC webview, the account-delete flow) leaves that fiber rendering fewer hooks than the
+ * previous pass, which throws "Rendered fewer hooks than expected" and drops the whole
+ * navigation tree into the app-wide error boundary (#4176).
+ */
+export const headerBackControl = ({ canGoBack = true }: HeaderBackControlParams = {}) => {
+  const HeaderBack = (props: NativeStackHeaderBackProps): React.ReactNode =>
+    canGoBack ? <HeaderBackButtonWithTheme {...props} /> : <InvisibleBackButton />
+  HeaderBack.displayName = "HeaderBack"
+
+  return HeaderBack
+}
 
 const useStyles = makeStyles(() => {
   const isAndroid = Platform.OS === "android"
