@@ -7,7 +7,8 @@ import { BtcMapPlace } from "@app/btcmap"
 import theme from "@app/rne-theme/theme"
 import { dark, light } from "@app/rne-theme/colors"
 import { ClusterMarker } from "@app/components/map-component/cluster-marker"
-import { MARKER_ANCHOR, MARKER_HEIGHT } from "@app/components/map-component/marker-layout"
+import { LABEL_ANCHOR, PIN_ANCHOR } from "@app/components/map-component/marker-layout"
+import { PlaceLabelMarker } from "@app/components/map-component/place-label-marker"
 import { PlaceMarker } from "@app/components/map-component/place-marker"
 import {
   PIN_COLOR_BOOSTED,
@@ -195,62 +196,40 @@ describe("PlaceMarker", () => {
     }
   })
 
-  it("keeps the teardrop tip on the coordinate, labelled or not", () => {
-    // The anchor is the tip's position as a fraction of the view, so it must not
-    // move when a name arrives: Android applies a new anchor immediately while
-    // the bitmap is still the old one, which drops the pin off its coordinate
-    // for as long as the two disagree — permanently, if the repaint is missed.
-    expect(MARKER_ANCHOR.x).toBe(0.5)
-    expect(MARKER_ANCHOR.y).toBeCloseTo(PIN_HEIGHT / MARKER_HEIGHT, 5)
-    expect(MARKER_ANCHOR.y).toBeLessThan(1)
+  it("puts the teardrop tip on the coordinate with a constant anchor", () => {
+    // The pin is alone in its view, so the tip is simply the view's bottom edge.
+    expect(PIN_ANCHOR).toEqual({ x: 0.5, y: 1 })
 
-    const anchorOf = (name?: string) =>
-      render(
-        withTheme(<PlaceMarker place={place()} name={name} onPress={jest.fn()} />),
-      ).getByTestId("btcmap-place-1").props.anchor
-
-    expect(anchorOf()).toEqual(MARKER_ANCHOR)
-    expect(anchorOf("Satoshi Coffee")).toEqual(anchorOf())
-  })
-
-  it("draws the merchant's name under the pin when one is known", () => {
-    const withName = render(
-      withTheme(
-        <PlaceMarker place={place()} name="Satoshi Coffee" onPress={jest.fn()} />,
-      ),
-    )
-    expect(withName.getByText("Satoshi Coffee")).toBeTruthy()
-
-    const without = render(withTheme(<PlaceMarker place={place()} onPress={jest.fn()} />))
-    expect(without.queryByText("Satoshi Coffee")).toBeNull()
-  })
-
-  it("repaints when a name arrives after the pin has already painted", () => {
-    // Tracking is off 400ms after mount, and Android then serves the cached
-    // bitmap — a label that never reopens the window never appears.
     const tree = render(withTheme(<PlaceMarker place={place()} onPress={jest.fn()} />))
-    act(() => jest.advanceTimersByTime(500))
+    expect(tree.getByTestId("btcmap-place-1").props.anchor).toEqual(PIN_ANCHOR)
+  })
+
+  it("draws nothing but the pin, whatever the place is called", () => {
+    // The regression this guards: the view used to hold the label too, so it was
+    // sized by the name's width and the pin's position inside its own bitmap
+    // moved with the character count. Any bitmap captured against a different
+    // layout then sliced the pin instead of shifting it.
+    const tree = render(withTheme(<PlaceMarker place={place()} onPress={jest.fn()} />))
+
+    expect(tree.UNSAFE_getAllByType(Path)).toHaveLength(1)
+    expect(tree.queryByText("Satoshi Coffee")).toBeNull()
+
+    const style = tree.getByTestId("btcmap-place-1").props.children.props.style
+    expect(style).toEqual(expect.objectContaining({ width: 32, height: PIN_HEIGHT }))
+  })
+
+  it("does not repaint when a name arrives", () => {
+    // A name reaches PlaceLabelMarker now, so the pin — long since rasterised
+    // and frozen — is not asked to change at all.
+    const tree = render(withTheme(<PlaceMarker place={place()} onPress={jest.fn()} />))
+    act(() => jest.advanceTimersByTime(2500))
     expect(trackingOf(tree, "btcmap-place-1")).toBe(false)
-    expect(redrawsFor("btcmap-place-1")).toBe(1)
+    const settled = redrawsFor("btcmap-place-1")
 
-    tree.rerender(
-      withTheme(
-        <PlaceMarker place={place()} name="Satoshi Coffee" onPress={jest.fn()} />,
-      ),
-    )
+    tree.rerender(withTheme(<PlaceMarker place={place()} onPress={jest.fn()} />))
 
-    expect(trackingOf(tree, "btcmap-place-1")).toBe(true)
-
-    // Reopening the window is not enough on its own — the native tracker gives
-    // up after a couple of frames — so the label's paint is forced home too,
-    // and again later in case it had not finished by the first pass.
-    const beforeLabel = redrawsFor("btcmap-place-1")
-    act(() => jest.advanceTimersByTime(500))
     expect(trackingOf(tree, "btcmap-place-1")).toBe(false)
-    expect(redrawsFor("btcmap-place-1")).toBe(beforeLabel + 1)
-
-    act(() => jest.advanceTimersByTime(2000))
-    expect(redrawsFor("btcmap-place-1")).toBeGreaterThan(beforeLabel + 1)
+    expect(redrawsFor("btcmap-place-1")).toBe(settled)
   })
 
   it("repaints when a sync flips the place's boost", () => {
@@ -265,6 +244,48 @@ describe("PlaceMarker", () => {
     )
 
     expect(trackingOf(tree, "btcmap-place-1")).toBe(true)
+  })
+})
+
+describe("PlaceLabelMarker", () => {
+  it("hangs the name from the same coordinate, just under the tip", () => {
+    expect(LABEL_ANCHOR).toEqual({ x: 0.5, y: 0 })
+
+    const tree = render(
+      withTheme(
+        <PlaceLabelMarker place={place()} name="Satoshi Coffee" onPress={jest.fn()} />,
+      ),
+    )
+
+    expect(tree.getByText("Satoshi Coffee")).toBeTruthy()
+    const marker = tree.getByTestId("btcmap-label-1")
+    expect(marker.props.anchor).toEqual(LABEL_ANCHOR)
+    expect(marker.props.coordinate).toEqual({ latitude: 51.5, longitude: -0.12 })
+  })
+
+  it("settles and forces its paint like every other marker", () => {
+    const tree = render(
+      withTheme(
+        <PlaceLabelMarker place={place()} name="Satoshi Coffee" onPress={jest.fn()} />,
+      ),
+    )
+    expect(trackingOf(tree, "btcmap-label-1")).toBe(true)
+
+    act(() => jest.advanceTimersByTime(2500))
+    expect(trackingOf(tree, "btcmap-label-1")).toBe(false)
+    expect(redrawsFor("btcmap-label-1")).toBeGreaterThan(1)
+  })
+
+  it("opens the place when the name is tapped, not just the pin", () => {
+    const onPress = jest.fn()
+    const tree = render(
+      withTheme(
+        <PlaceLabelMarker place={place()} name="Satoshi Coffee" onPress={onPress} />,
+      ),
+    )
+
+    tree.getByTestId("btcmap-label-1").props.onPress()
+    expect(onPress).toHaveBeenCalledWith(place())
   })
 })
 

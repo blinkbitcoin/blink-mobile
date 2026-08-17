@@ -4,14 +4,9 @@ import { Marker } from "react-native-maps"
 import MaterialIcon from "react-native-vector-icons/MaterialIcons"
 
 import { BtcMapPlace, isBoosted, materialIconName } from "@app/btcmap"
-import { Text, makeStyles } from "@rn-vui/themed"
+import { makeStyles } from "@rn-vui/themed"
 
-import {
-  LABEL_GAP,
-  LABEL_LINE_HEIGHT,
-  LABEL_MAX_WIDTH,
-  MARKER_ANCHOR,
-} from "./marker-layout"
+import { PIN_ANCHOR } from "./marker-layout"
 import { useMarkerSettle } from "./use-marker-settle"
 import {
   PIN_GLYPH_COLOR,
@@ -26,11 +21,20 @@ import {
 
 type Props = {
   place: BtcMapPlace
-  name?: string
   onPress: (place: BtcMapPlace) => void
 }
 
-export const PlaceMarker: React.FC<Props> = React.memo(({ place, name, onPress }) => {
+/**
+ * One teardrop, and nothing else.
+ *
+ * The merchant's name is drawn by `PlaceLabelMarker` at the same coordinate
+ * rather than inside this view. Keeping it out is what makes this marker's
+ * bitmap deterministic: the view is exactly the pin's size whatever the place is
+ * called, so a name arriving — which happens long after the pin has painted and
+ * frozen — cannot resize it, cannot move the pin within it, and cannot leave a
+ * sliced bitmap behind. See `marker-layout.ts`.
+ */
+export const PlaceMarker: React.FC<Props> = React.memo(({ place, onPress }) => {
   const styles = useStyles()
   // Read at render time, and this component is memoised, so nothing schedules a
   // repaint at the moment a boost lapses — a pin can stay orange until the next
@@ -40,11 +44,8 @@ export const PlaceMarker: React.FC<Props> = React.memo(({ place, name, onPress }
   const color = usePinColor(isBoosted(place.boostedUntil, new Date()))
   const glyph = materialIconName(place.icon)
 
-  // The label is part of what gets rasterised, so it belongs in the settle key —
-  // a name arriving after the pin has painted has to reopen the paint window.
-  const { markerRef, tracksViewChanges } = useMarkerSettle(
-    `${glyph}|${color}|${name ?? ""}`,
-  )
+  // No name in the key: nothing about the label reaches these pixels any more.
+  const { markerRef, tracksViewChanges } = useMarkerSettle(`${glyph}|${color}`)
 
   return (
     <Marker
@@ -52,39 +53,18 @@ export const PlaceMarker: React.FC<Props> = React.memo(({ place, name, onPress }
       identifier={`btcmap-place-${place.id}`}
       testID={`btcmap-place-${place.id}`}
       coordinate={{ latitude: place.latitude, longitude: place.longitude }}
-      anchor={MARKER_ANCHOR}
+      anchor={PIN_ANCHOR}
       tracksViewChanges={tracksViewChanges}
       onPress={() => onPress(place)}
     >
-      <View style={styles.marker}>
-        <View style={styles.pin}>
-          <PinShape color={color} />
-          <MaterialIcon
-            name={glyph}
-            size={PIN_GLYPH_SIZE}
-            color={PIN_GLYPH_COLOR}
-            style={styles.glyph}
-          />
-        </View>
-
-        {/* Always present, even with nothing in it — the anchor is computed from
-            this view's height, and a row that appears when a name arrives would
-            move every labelled pin off its coordinate. See marker-layout.ts. */}
-        <View style={styles.labelRow}>
-          {Boolean(name) && (
-            /* Font scaling is off and the line count fixed for the same reason:
-               text that grows changes the height the anchor was derived from.
-               The full name is one tap away in the sheet. */
-            <Text
-              style={styles.label}
-              numberOfLines={1}
-              ellipsizeMode="tail"
-              allowFontScaling={false}
-            >
-              {name}
-            </Text>
-          )}
-        </View>
+      <View style={styles.pin}>
+        <PinShape color={color} />
+        <MaterialIcon
+          name={glyph}
+          size={PIN_GLYPH_SIZE}
+          color={PIN_GLYPH_COLOR}
+          style={styles.glyph}
+        />
       </View>
     </Marker>
   )
@@ -92,10 +72,7 @@ export const PlaceMarker: React.FC<Props> = React.memo(({ place, name, onPress }
 
 PlaceMarker.displayName = "PlaceMarker"
 
-const useStyles = makeStyles(({ colors }) => ({
-  marker: {
-    alignItems: "center",
-  },
+const useStyles = makeStyles(() => ({
   pin: {
     width: PIN_WIDTH,
     height: PIN_HEIGHT,
@@ -104,23 +81,5 @@ const useStyles = makeStyles(({ colors }) => ({
     position: "absolute",
     left: PIN_GLYPH_LEFT,
     top: PIN_GLYPH_TOP,
-  },
-  labelRow: {
-    height: LABEL_LINE_HEIGHT,
-    marginTop: LABEL_GAP,
-    maxWidth: LABEL_MAX_WIDTH,
-    overflow: "hidden",
-  },
-  label: {
-    fontSize: 11,
-    lineHeight: LABEL_LINE_HEIGHT,
-    fontWeight: "600",
-    color: colors.black,
-    textAlign: "center",
-    // React Native has no text halo, and a label has to stay readable over
-    // whatever the basemap puts behind it.
-    textShadowColor: colors.white,
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 3,
   },
 }))

@@ -19,6 +19,7 @@ import { ClusterMarker, ClusterMarkerData } from "./cluster-marker"
 import LocationButtonCopy from "./location-button-copy"
 import MapStyles from "./map-styles.json"
 import { OpenSettingsElement, OpenSettingsModal } from "./open-settings-modal"
+import { PlaceLabelMarker } from "./place-label-marker"
 import { PlaceMarker } from "./place-marker"
 import { PlaceSheet } from "./place-sheet"
 import { usePlaceClusters } from "./use-place-clusters"
@@ -208,13 +209,22 @@ export default function MapComponent({
           />
         ))}
         {places.map((place) => (
-          <PlaceMarker
-            key={place.id}
-            place={place}
-            name={names.get(place.id)}
-            onPress={handlePlacePress}
-          />
+          <PlaceMarker key={place.id} place={place} onPress={handlePlacePress} />
         ))}
+        {/* Separate markers, not children of the pins: a name arriving has to
+            mount something new rather than resize a pin that has already
+            rasterised — see place-marker.tsx. */}
+        {places.map((place) => {
+          const name = names.get(place.id)
+          return name ? (
+            <PlaceLabelMarker
+              key={`label-${place.id}`}
+              place={place}
+              name={name}
+              onPress={handlePlacePress}
+            />
+          ) : null
+        })}
       </MapView>
 
       {isLoading && !allPlaces.length && (
