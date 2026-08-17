@@ -33,5 +33,5 @@ export const AccountModeSetting: React.FC = () => {
       entry: ChooseExperienceEntry.Settings,
     })
 
-  return <SettingsRow title={title} leftGaloyIcon="location" action={openModeSelection} />
+  return <SettingsRow title={title} leftGaloyIcon="spinner" action={openModeSelection} />
 }

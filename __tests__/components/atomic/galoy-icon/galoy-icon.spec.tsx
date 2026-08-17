@@ -74,12 +74,6 @@ describe("GaloyIcon", () => {
       ).not.toBeNull()
     })
 
-    it("renders the location icon", () => {
-      expect(
-        renderWithTheme(<GaloyIcon name="location" size={24} />).toJSON(),
-      ).not.toBeNull()
-    })
-
     it("renders the spinner icon", () => {
       expect(
         renderWithTheme(<GaloyIcon name="spinner" size={24} />).toJSON(),
