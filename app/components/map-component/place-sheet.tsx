@@ -128,7 +128,10 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
   // the sheet, so without this it would still hold the moment the map tab first
   // appeared — days ago, on a process that has been alive that long.
   React.useEffect(() => {
-    if (place) setNow(new Date())
+    if (!place) return
+    setNow(new Date())
+    // Reopening always starts low again, however it was left last time.
+    setExpanded(false)
   }, [place])
 
   // Then keep re-reading it while the sheet is open, so a place that opens or
@@ -161,13 +164,18 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
   }, [peekHeight, sheetHeight, peekOffset])
 
   React.useEffect(() => {
-    if (place && peekHeight) {
-      // Reopening always starts low again, however it was left last time.
-      offset.value = withSpring(sheetHeight - peekHeight, SPRING)
-      setExpanded(false)
+    if (!place) {
+      offset.value = withTiming(sheetHeight, { duration: CLOSE_DURATION_MS })
+      return
     }
-    if (!place) offset.value = withTiming(sheetHeight, { duration: CLOSE_DURATION_MS })
-  }, [place, peekHeight, sheetHeight, offset])
+    // Follow the measurement only while resting low. The header block grows
+    // once the details land — a place that can only be paid through another app
+    // gains a whole card — and a sheet the user has already pulled up must not
+    // drop back down under them when that happens.
+    if (peekHeight && !isExpanded) {
+      offset.value = withSpring(sheetHeight - peekHeight, SPRING)
+    }
+  }, [place, peekHeight, sheetHeight, isExpanded, offset])
 
   const pan = React.useMemo(
     () =>
@@ -393,6 +401,25 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
                 <Text style={styles.navigateText}>{LL.MapScreen.navigate()}</Text>
               </Pressable>
 
+              {/* Sits with the header rather than down among the contact rows:
+                  "you cannot pay here with this wallet" is worth knowing before
+                  setting off, so it has to be visible without expanding. */}
+              {Boolean(appUrl) && (
+                <View style={styles.infoCard} testID="requires-app-card">
+                  <Text style={styles.infoCardText}>{LL.MapScreen.requiresApp()}</Text>
+                  <Pressable
+                    onPress={() => openUrl(appUrl ?? "")}
+                    accessibilityRole="link"
+                  >
+                    {/* The scheme is noise here — what is worth reading is
+                        where it goes, path and all. */}
+                    <Text style={styles.infoCardLink}>
+                      {(appUrl ?? "").replace(/^https?:\/\//i, "")}
+                    </Text>
+                  </Pressable>
+                </View>
+              )}
+
               <View style={styles.status}>
                 {openingState !== OpeningState.Unknown && (
                   <View style={styles.badge}>
@@ -490,10 +517,6 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
                 {Boolean(details?.paymentUrl) &&
                   renderRow("lightning", LL.MapScreen.payMerchant(), () =>
                     openUrl(details?.paymentUrl ?? ""),
-                  )}
-                {Boolean(appUrl) &&
-                  renderRow("info", LL.MapScreen.requiresApp(), () =>
-                    openUrl(appUrl ?? ""),
                   )}
               </View>
 
@@ -627,6 +650,24 @@ const useStyles = makeStyles(({ colors }, { bottomInset, accent }: StyleProps) =
     fontSize: 17,
     fontWeight: "700",
     color: colors._white,
+  },
+  infoCard: {
+    backgroundColor: colors.grey5,
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    rowGap: 6,
+  },
+  infoCardText: {
+    fontSize: 13,
+    color: colors.black,
+  },
+  infoCardLink: {
+    fontSize: 13,
+    color: colors.black,
+    // Underlined rather than tinted: the card is already a coloured block, and
+    // a second accent inside it competes with the Navigate button above.
+    textDecorationLine: "underline",
   },
   status: {
     flexDirection: "row",

@@ -360,7 +360,9 @@ describe("PlaceSheet contact and payment rows", () => {
     fireEvent.press(getByText("satoshi.example"))
     expect(mockedOpenExternal).toHaveBeenCalledWith("https://satoshi.example/menu")
 
-    fireEvent.press(getByText("Needs a specific app to pay"))
+    // On the companion-app card the sentence is prose; the URL under it is the
+    // part that opens.
+    fireEvent.press(getByText("wallet.example"))
     expect(mockedOpenExternal).toHaveBeenCalledWith("https://wallet.example")
 
     fireEvent.press(getByText("Instagram"))
@@ -382,11 +384,26 @@ describe("PlaceSheet contact and payment rows", () => {
     expect(Linking.openURL).toHaveBeenCalledWith("lightning:lnurl1abc")
   })
 
-  it("warns when paying needs a particular app", async () => {
-    setDetails(details({ requiredAppUrl: "example.com/wallet" }))
-    const { getByText } = renderSheet()
+  it("warns on a card, beside Navigate, when paying needs a particular app", async () => {
+    // "You cannot pay here with this wallet" has to be readable before setting
+    // off, so the card sits in the block the lower rest position shows rather
+    // than down among the contact rows.
+    setDetails(details({ requiredAppUrl: "www.moneybadger.co.za/pay" }))
+    const { getByTestId } = renderSheet()
 
-    await waitFor(() => expect(getByText("Needs a specific app to pay")).toBeTruthy())
+    await waitFor(() => expect(getByTestId("requires-app-card")).toBeTruthy())
+
+    const card = within(getByTestId("requires-app-card"))
+    expect(card.getByText("Needs a specific app to pay")).toBeTruthy()
+    // Shown without the scheme, but still the whole path.
+    expect(card.getByText("www.moneybadger.co.za/pay")).toBeTruthy()
+
+    expect(
+      within(getByTestId("place-sheet-peek")).getByTestId("requires-app-card"),
+    ).toBeTruthy()
+
+    fireEvent.press(card.getByText("www.moneybadger.co.za/pay"))
+    expect(mockedOpenExternal).toHaveBeenCalledWith("https://www.moneybadger.co.za/pay")
   })
 
   it("links to the btcmap.org page by numeric id before details arrive", async () => {
