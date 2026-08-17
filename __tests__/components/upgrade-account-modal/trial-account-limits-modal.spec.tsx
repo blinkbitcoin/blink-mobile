@@ -24,6 +24,7 @@ import { TrialAccountLimitsModal } from "@app/components/upgrade-account-modal"
 
 loadLocale("en")
 loadLocale("es")
+loadLocale("de")
 const LL = i18nObject("en")
 
 const accountLimitsMock = (withdrawalCents: number) => ({
@@ -153,11 +154,28 @@ describe("TrialAccountLimitsModal", () => {
       ),
     )
 
+    // "1500", not the English "1,500": Spanish leaves four-digit numbers
+    // ungrouped.
     await waitFor(() =>
       expect(
-        getByText("Límite de transacciones diarias de USD 1,500", { exact: false }),
+        getByText("Límite de transacciones diarias de USD 1500", { exact: false }),
       ).toBeTruthy(),
     )
+  })
+
+  it("groups the amount for the reader's language, not for English", async () => {
+    // German's thousands separator is the character English uses as a decimal
+    // point, so an en-US-formatted "1,500" does not merely look foreign there —
+    // it reads as one and a half.
+    const { getByText } = render(
+      wrap(
+        <TrialAccountLimitsModal isVisible={true} closeModal={jest.fn()} />,
+        [accountLimitsMock(150000)],
+        "de",
+      ),
+    )
+
+    await waitFor(() => expect(getByText("USD 1.500", { exact: false })).toBeTruthy())
   })
 
   it("keeps the fallback pinned to the audited enforced limit", () => {
