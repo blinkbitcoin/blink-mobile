@@ -35,8 +35,11 @@ export default function LocationButtonCopy({
 const useStyles = makeStyles(({ colors }) => ({
   button: {
     position: "absolute",
-    bottom: 28,
-    left: 8,
+    // Sits above the ODbL credit, which shares this corner. The gap is bigger
+    // than the credit needs at default text size so that scaling it up — it is
+    // an attribution we are obliged to keep legible — moves it behind nothing.
+    bottom: 48,
+    right: 8,
     zIndex: 99,
   },
   android: {
