@@ -4,10 +4,26 @@ import {
   Modal,
   Platform,
   Pressable,
-  ScrollView,
   Share,
   View,
+  useWindowDimensions,
 } from "react-native"
+import {
+  Gesture,
+  GestureDetector,
+  GestureHandlerRootView,
+} from "react-native-gesture-handler"
+import Animated, {
+  Extrapolation,
+  interpolate,
+  runOnJS,
+  useAnimatedRef,
+  useAnimatedStyle,
+  useScrollViewOffset,
+  useSharedValue,
+  withSpring,
+  withTiming,
+} from "react-native-reanimated"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import MaterialIcon from "react-native-vector-icons/MaterialIcons"
 
@@ -44,18 +60,50 @@ import { usePinColor } from "./pin-shape"
 const REFRESH_INTERVAL_MS = 60_000
 const SCRIM_COLOR = "rgba(0, 0, 0, 0.4)"
 
+// How much of the screen the sheet covers once fully open. Short of the whole
+// thing on purpose: the pin stays visible, so it is still clear which place is
+// being read about.
+const SHEET_RATIO = 0.88
+
+// Dragged this much further down than the snap point it started from, the sheet
+// is being dismissed rather than resized.
+const DISMISS_DISTANCE = 80
+
+// Where a flick would end up, so a fast short drag still snaps the way it was
+// thrown rather than the way it happens to have stopped.
+const VELOCITY_PROJECTION = 0.15
+
+const SPRING = { damping: 20, stiffness: 220, mass: 0.6 }
+const CLOSE_DURATION_MS = 200
+
 type Props = {
   place: BtcMapPlace | null
   userLocation?: LatLng
   onClose: () => void
 }
 
+/**
+ * The place's details, on a sheet with two resting positions.
+ *
+ * It opens at the lower one, which is measured rather than guessed: whatever the
+ * header block turns out to be — name, the Navigate button, and how much the
+ * place can be trusted — is exactly what shows, so the one action most people
+ * want is under their thumb without reading anything. Dragging up rests it at
+ * full height, where the rest of the detail lives.
+ *
+ * The scroll view only scrolls once the sheet is fully open. Below that the
+ * whole sheet takes the drag, so a pull anywhere on it resizes rather than
+ * scrolling a list that has nowhere to go.
+ */
 export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) => {
   const {
     theme: { colors },
   } = useTheme()
   const { LL, locale } = useI18nContext()
   const insets = useSafeAreaInsets()
+  const { height: windowHeight } = useWindowDimensions()
+
+  const sheetHeight = Math.round(windowHeight * SHEET_RATIO)
 
   // Hold on to what was last opened so the sheet still has something to draw
   // while it slides back out; `place` goes null the moment it is dismissed.
@@ -92,6 +140,99 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
     const timer = setInterval(() => setNow(new Date()), REFRESH_INTERVAL_MS)
     return () => clearInterval(timer)
   }, [place, isTimeSensitive])
+
+  // Offset from the sheet's own top: 0 is fully open, `sheetHeight` is off the
+  // bottom of the screen.
+  const offset = useSharedValue(sheetHeight)
+  const dragStart = useSharedValue(0)
+  // The resting offset that leaves the header block showing, once it has been
+  // measured. Until then the sheet stays off-screen rather than guessing.
+  const peekOffset = useSharedValue(sheetHeight)
+  const [peekHeight, setPeekHeight] = React.useState(0)
+  const [isExpanded, setExpanded] = React.useState(false)
+
+  const scrollRef = useAnimatedRef<Animated.ScrollView>()
+  // Read straight off the scroll view, so the pan can tell a drag on a list
+  // that is already at its top from one that is scrolling it back up.
+  const scrollOffset = useScrollViewOffset(scrollRef)
+
+  React.useEffect(() => {
+    peekOffset.value = peekHeight ? sheetHeight - peekHeight : sheetHeight
+  }, [peekHeight, sheetHeight, peekOffset])
+
+  React.useEffect(() => {
+    if (place && peekHeight) {
+      // Reopening always starts low again, however it was left last time.
+      offset.value = withSpring(sheetHeight - peekHeight, SPRING)
+      setExpanded(false)
+    }
+    if (!place) offset.value = withTiming(sheetHeight, { duration: CLOSE_DURATION_MS })
+  }, [place, peekHeight, sheetHeight, offset])
+
+  const pan = React.useMemo(
+    () =>
+      Gesture.Pan()
+        // Small movements belong to whatever is underneath — a tap on a link
+        // should not have to be perfectly still.
+        .activeOffsetY([-12, 12])
+        // So a downward drag at the top of the list can collapse the sheet
+        // instead of the scroll view swallowing it. The cast is a types-only
+        // gap: gesture-handler declares a ref to a component *type* here, and
+        // reads the instance the animated ref actually holds.
+        .simultaneousWithExternalGesture(
+          scrollRef as unknown as React.RefObject<React.ComponentType>,
+        )
+        .onBegin(() => {
+          dragStart.value = offset.value
+        })
+        .onUpdate((event) => {
+          // Fully open with the list scrolled down, a downward drag is the list
+          // being scrolled back up, not the sheet being pulled shut.
+          if (dragStart.value === 0 && scrollOffset.value > 0 && event.translationY > 0) {
+            return
+          }
+          offset.value = Math.max(0, dragStart.value + event.translationY)
+        })
+        .onEnd((event) => {
+          const projected = offset.value + event.velocityY * VELOCITY_PROJECTION
+
+          if (projected > peekOffset.value + DISMISS_DISTANCE) {
+            offset.value = withTiming(
+              sheetHeight,
+              { duration: CLOSE_DURATION_MS },
+              (finished) => {
+                if (finished) runOnJS(onClose)()
+              },
+            )
+            return
+          }
+
+          const toFull = projected < peekOffset.value / 2
+          offset.value = withSpring(toFull ? 0 : peekOffset.value, SPRING)
+          runOnJS(setExpanded)(toFull)
+        }),
+    [dragStart, offset, peekOffset, scrollOffset, scrollRef, sheetHeight, onClose],
+  )
+
+  // Dependency arrays are passed explicitly rather than left to the Babel
+  // plugin to infer, so these still work where it is not applied — the test
+  // environment among them.
+  const sheetStyle = useAnimatedStyle(
+    () => ({ transform: [{ translateY: offset.value }] }),
+    [offset],
+  )
+
+  const backdropStyle = useAnimatedStyle(
+    () => ({
+      opacity: interpolate(
+        offset.value,
+        [sheetHeight, peekOffset.value],
+        [0, 1],
+        Extrapolation.CLAMP,
+      ),
+    }),
+    [offset, peekOffset, sheetHeight],
+  )
 
   const boosted = isBoosted(details?.boostedUntil ?? shown?.boostedUntil, now)
   const styles = useStyles({ bottomInset: insets.bottom, accent: usePinColor(boosted) })
@@ -146,15 +287,6 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
     </Pressable>
   )
 
-  const renderAction = (icon: IconNamesType, label: string, onPress: () => void) => (
-    <Pressable style={styles.action} onPress={onPress} accessibilityRole="button">
-      <View style={styles.actionIcon}>
-        <GaloyIcon name={icon} size={18} color={colors.primary} />
-      </View>
-      <Text style={styles.actionLabel}>{label}</Text>
-    </Pressable>
-  )
-
   const renderChip = (label: string, url: string) => (
     <Pressable key={label} style={styles.chip} onPress={() => openUrl(url)}>
       <Text style={styles.chipText}>{label}</Text>
@@ -196,48 +328,72 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
     <Modal
       visible={Boolean(place)}
       transparent
-      animationType="slide"
+      animationType="none"
       onRequestClose={onClose}
     >
-      <Pressable
-        style={styles.backdrop}
-        onPress={onClose}
-        accessibilityRole="button"
-        accessibilityLabel={LL.common.close()}
-      />
-      <View style={styles.sheet}>
-        <View style={styles.handle} />
+      {/* Gestures inside a Modal need their own root on Android — the one in
+          app.tsx does not reach into a separate window. */}
+      <GestureHandlerRootView style={styles.root}>
+        <Animated.View style={[styles.backdrop, backdropStyle]}>
+          <Pressable
+            style={styles.backdropPress}
+            onPress={onClose}
+            accessibilityRole="button"
+            accessibilityLabel={LL.common.close()}
+          />
+        </Animated.View>
 
-        <ScrollView
-          style={styles.scroll}
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-        >
-          <View style={styles.header}>
-            <View style={styles.avatar}>
-              <MaterialIcon
-                name={materialIconName(shown.icon)}
-                size={24}
-                color={colors._white}
-              />
-            </View>
+        <GestureDetector gesture={pan}>
+          <Animated.View
+            style={[styles.sheet, { height: sheetHeight }, sheetStyle]}
+            testID="place-sheet"
+          >
+            <View style={styles.handle} />
 
-            <View style={styles.headerText}>
-              {isLoading && !details ? (
-                <Skeleton animation="pulse" style={styles.nameSkeleton} />
-              ) : (
-                <Text style={styles.name} numberOfLines={2}>
-                  {name || LL.MapScreen.unnamedPlace()}
-                </Text>
-              )}
+            {/* What the lower resting position shows. Its measured height is
+                the snap point, so this block decides where the sheet stops. */}
+            <View
+              testID="place-sheet-peek"
+              style={styles.peek}
+              onLayout={(event) => setPeekHeight(event.nativeEvent.layout.height)}
+            >
+              <View style={styles.header}>
+                <View style={styles.avatar}>
+                  <MaterialIcon
+                    name={materialIconName(shown.icon)}
+                    size={22}
+                    color={colors._white}
+                  />
+                </View>
 
-              {Boolean(details?.address) && (
-                <Text style={styles.address} numberOfLines={2}>
-                  {details?.address}
-                </Text>
-              )}
+                {isLoading && !details ? (
+                  <Skeleton animation="pulse" style={styles.nameSkeleton} />
+                ) : (
+                  <Text style={styles.name} numberOfLines={2}>
+                    {name || LL.MapScreen.unnamedPlace()}
+                  </Text>
+                )}
 
-              <View style={styles.badges}>
+                <Pressable
+                  testID="share-place"
+                  onPress={share}
+                  accessibilityRole="button"
+                  accessibilityLabel={LL.common.share()}
+                  hitSlop={12}
+                >
+                  <GaloyIcon name="share" size={22} color={colors.primary} />
+                </Pressable>
+              </View>
+
+              <Pressable
+                style={styles.navigate}
+                onPress={navigate}
+                accessibilityRole="button"
+              >
+                <Text style={styles.navigateText}>{LL.MapScreen.navigate()}</Text>
+              </Pressable>
+
+              <View style={styles.status}>
                 {openingState !== OpeningState.Unknown && (
                   <View style={styles.badge}>
                     <Text
@@ -258,113 +414,136 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
                     <Text style={styles.badgeBoosted}>{LL.MapScreen.boosted()}</Text>
                   </View>
                 )}
-              </View>
-            </View>
-          </View>
-
-          {hasError && (
-            <Pressable style={styles.errorRow} onPress={retry}>
-              <GaloyIcon name="warning" size={16} color={colors.error} />
-              <Text style={styles.errorText}>{LL.MapScreen.detailsError()}</Text>
-              <Text style={styles.retryText}>{LL.common.tryAgain()}</Text>
-            </Pressable>
-          )}
-
-          {isLoading && !details && (
-            <View style={styles.skeletonBlock}>
-              <Skeleton animation="pulse" style={styles.skeletonRow} />
-              <Skeleton animation="pulse" style={styles.skeletonRow} />
-              <Skeleton animation="pulse" style={styles.skeletonRow} />
-            </View>
-          )}
-
-          <View style={styles.rows}>
-            {Boolean(details?.openingHours) &&
-              renderRow("clock", details?.openingHours ?? "")}
-            {/* The number and address are worth reading even when they are not
-                in a shape we are willing to hand to the dialer or mail app, so
-                these two rows stay — they just stop being tappable. */}
-            {Boolean(details?.phone) &&
-              renderRow(
-                "phone",
-                details?.phone ?? "",
-                phoneUrl ? () => openUrl(phoneUrl) : undefined,
-              )}
-            {Boolean(websiteUrl) &&
-              renderRow("globe", hostOf(websiteUrl ?? ""), () =>
-                openUrl(websiteUrl ?? ""),
-              )}
-            {Boolean(details?.email) &&
-              renderRow(
-                "email-add",
-                details?.email ?? "",
-                emailUrl ? () => openUrl(emailUrl) : undefined,
-              )}
-            {Boolean(details?.paymentUrl) &&
-              renderRow("lightning", LL.MapScreen.payMerchant(), () =>
-                openUrl(details?.paymentUrl ?? ""),
-              )}
-            {Boolean(appUrl) &&
-              renderRow("info", LL.MapScreen.requiresApp(), () => openUrl(appUrl ?? ""))}
-          </View>
-
-          {acceptsLabels.length > 0 && (
-            <View style={styles.accepts}>
-              <Text style={styles.sectionLabel}>{LL.MapScreen.accepts()}</Text>
-              <View style={styles.chips}>
-                {acceptsLabels.map((label) => (
-                  <View key={label} style={styles.acceptsPill}>
-                    <GaloyIcon name="bitcoin" size={12} color={colors.primary} />
-                    <Text style={styles.acceptsPillText}>{label}</Text>
+                {Boolean(details) && (
+                  <View style={styles.verification}>
+                    <GaloyIcon
+                      name={
+                        verification === VerificationState.Verified
+                          ? "check-circle"
+                          : "warning"
+                      }
+                      size={14}
+                      color={
+                        verification === VerificationState.Verified
+                          ? colors._green
+                          : colors.grey2
+                      }
+                    />
+                    <Text style={styles.verificationText}>{verificationLabel}</Text>
                   </View>
-                ))}
+                )}
               </View>
             </View>
-          )}
 
-          {Boolean(details) && (
-            <View style={styles.row}>
-              <GaloyIcon
-                name={
-                  verification === VerificationState.Verified ? "check-circle" : "warning"
-                }
-                size={16}
-                color={
-                  verification === VerificationState.Verified
-                    ? colors._green
-                    : colors.grey2
-                }
-              />
-              <Text style={styles.rowText}>{verificationLabel}</Text>
-            </View>
-          )}
+            <Animated.ScrollView
+              testID="place-sheet-scroll"
+              ref={scrollRef}
+              style={styles.scroll}
+              contentContainerStyle={styles.scrollContent}
+              showsVerticalScrollIndicator={false}
+              // Below full height the sheet itself takes the drag; a list that
+              // cannot be seen has nothing to scroll.
+              scrollEnabled={isExpanded}
+            >
+              {hasError && (
+                <Pressable style={styles.errorRow} onPress={retry}>
+                  <GaloyIcon name="warning" size={16} color={colors.error} />
+                  <Text style={styles.errorText}>{LL.MapScreen.detailsError()}</Text>
+                  <Text style={styles.retryText}>{LL.common.tryAgain()}</Text>
+                </Pressable>
+              )}
 
-          {Boolean(details?.description) && (
-            <Text style={styles.description}>{details?.description}</Text>
-          )}
+              {isLoading && !details && (
+                <View style={styles.skeletonBlock}>
+                  <Skeleton animation="pulse" style={styles.skeletonRow} />
+                  <Skeleton animation="pulse" style={styles.skeletonRow} />
+                  <Skeleton animation="pulse" style={styles.skeletonRow} />
+                </View>
+              )}
 
-          <View style={styles.actions}>
-            {renderAction("map", LL.MapScreen.navigate(), navigate)}
-            {Boolean(phoneUrl) &&
-              renderAction("phone", LL.common.phone(), () => openUrl(phoneUrl ?? ""))}
-            {renderAction("share", LL.common.share(), share)}
-          </View>
+              {Boolean(details?.address) && (
+                <Text style={styles.address}>{details?.address}</Text>
+              )}
 
-          {socials.length > 0 && (
-            <View style={styles.chips}>
-              {socials.map(([label, url]) => renderChip(label, url))}
-            </View>
-          )}
+              <View style={styles.rows}>
+                {Boolean(details?.openingHours) &&
+                  renderRow("clock", details?.openingHours ?? "")}
+                {/* The number and address are worth reading even when they are
+                    not in a shape we are willing to hand to the dialer or mail
+                    app, so these two rows stay — they just stop being tappable. */}
+                {Boolean(details?.phone) &&
+                  renderRow(
+                    "phone",
+                    details?.phone ?? "",
+                    phoneUrl ? () => openUrl(phoneUrl) : undefined,
+                  )}
+                {Boolean(websiteUrl) &&
+                  renderRow("globe", hostOf(websiteUrl ?? ""), () =>
+                    openUrl(websiteUrl ?? ""),
+                  )}
+                {Boolean(details?.email) &&
+                  renderRow(
+                    "email-add",
+                    details?.email ?? "",
+                    emailUrl ? () => openUrl(emailUrl) : undefined,
+                  )}
+                {Boolean(details?.paymentUrl) &&
+                  renderRow("lightning", LL.MapScreen.payMerchant(), () =>
+                    openUrl(details?.paymentUrl ?? ""),
+                  )}
+                {Boolean(appUrl) &&
+                  renderRow("info", LL.MapScreen.requiresApp(), () =>
+                    openUrl(appUrl ?? ""),
+                  )}
+              </View>
 
-          <Pressable
-            style={styles.profileLink}
-            onPress={() => openUrl(merchantUrl(details, shown.id))}
-          >
-            <Text style={styles.profileLinkText}>{LL.MapScreen.seeOnBtcMap()}</Text>
-            <GaloyIcon name="arrow-square-out" size={14} color={colors.primary} />
-          </Pressable>
-        </ScrollView>
-      </View>
+              {acceptsLabels.length > 0 && (
+                <View style={styles.accepts}>
+                  <Text style={styles.sectionLabel}>{LL.MapScreen.accepts()}</Text>
+                  <View style={styles.chips}>
+                    {acceptsLabels.map((label) => (
+                      <View key={label} style={styles.acceptsPill}>
+                        <GaloyIcon name="bitcoin" size={12} color={colors.primary} />
+                        <Text style={styles.acceptsPillText}>{label}</Text>
+                      </View>
+                    ))}
+                  </View>
+                </View>
+              )}
+
+              {Boolean(details?.description) && (
+                <Text style={styles.description}>{details?.description}</Text>
+              )}
+
+              {socials.length > 0 && (
+                <View style={styles.chips}>
+                  {socials.map(([label, url]) => renderChip(label, url))}
+                </View>
+              )}
+
+              <Pressable
+                style={styles.profileLink}
+                onPress={() => openUrl(merchantUrl(details, shown.id))}
+              >
+                <Text style={styles.profileLinkText}>{LL.MapScreen.seeOnBtcMap()}</Text>
+                <GaloyIcon name="arrow-square-out" size={14} color={colors.primary} />
+              </Pressable>
+
+              {/* Dragging the sheet down closes it, but that is a gesture you
+                  have to know about. This is the same thing, spelled out, and
+                  it is the last thing you reach going down the detail. */}
+              <Pressable
+                testID="close-place-sheet"
+                style={styles.close}
+                onPress={onClose}
+                accessibilityRole="button"
+              >
+                <Text style={styles.closeText}>{LL.common.close()}</Text>
+              </Pressable>
+            </Animated.ScrollView>
+          </Animated.View>
+        </GestureDetector>
+      </GestureHandlerRootView>
     </Modal>
   )
 }
@@ -372,11 +551,22 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
 type StyleProps = { bottomInset: number; accent: string }
 
 const useStyles = makeStyles(({ colors }, { bottomInset, accent }: StyleProps) => ({
-  backdrop: {
+  root: {
     flex: 1,
+    justifyContent: "flex-end",
+  },
+  backdrop: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     // A scrim has to darken in both themes; the theme's backdrop tokens invert
     // and would brighten the map behind the sheet in dark mode.
     backgroundColor: SCRIM_COLOR,
+  },
+  backdropPress: {
+    flex: 1,
   },
   sheet: {
     backgroundColor: colors.white,
@@ -386,8 +576,6 @@ const useStyles = makeStyles(({ colors }, { bottomInset, accent }: StyleProps) =
     borderBottomWidth: 0,
     borderColor: colors.grey4,
     paddingTop: 8,
-    paddingBottom: bottomInset + 16,
-    maxHeight: "80%",
   },
   handle: {
     alignSelf: "center",
@@ -397,47 +585,55 @@ const useStyles = makeStyles(({ colors }, { bottomInset, accent }: StyleProps) =
     backgroundColor: colors.grey3,
     marginBottom: 8,
   },
-  scroll: {
-    flexShrink: 1,
-  },
-  scrollContent: {
+  peek: {
     paddingHorizontal: 20,
-    rowGap: 16,
+    rowGap: 14,
+    paddingBottom: 14,
   },
   header: {
     flexDirection: "row",
+    alignItems: "center",
     columnGap: 12,
   },
   avatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 12,
+    width: 40,
+    height: 40,
+    borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: accent,
   },
-  headerText: {
-    flex: 1,
-    rowGap: 4,
-  },
   name: {
+    flex: 1,
     fontSize: 20,
     fontWeight: "600",
     color: colors.black,
   },
   nameSkeleton: {
+    flex: 1,
     height: 22,
-    width: "70%",
     borderRadius: 4,
   },
-  address: {
-    fontSize: 14,
-    color: colors.grey1,
+  // The one thing most people open this sheet to do, so it gets the width and
+  // the accent rather than sharing a row of small icons.
+  navigate: {
+    backgroundColor: colors.primary,
+    borderRadius: 28,
+    minHeight: 56,
+    alignItems: "center",
+    justifyContent: "center",
   },
-  badges: {
+  navigateText: {
+    fontSize: 17,
+    fontWeight: "700",
+    color: colors._white,
+  },
+  status: {
     flexDirection: "row",
+    alignItems: "center",
+    flexWrap: "wrap",
     columnGap: 8,
-    marginTop: 2,
+    rowGap: 6,
   },
   badge: {
     backgroundColor: colors.grey5,
@@ -459,6 +655,32 @@ const useStyles = makeStyles(({ colors }, { bottomInset, accent }: StyleProps) =
     fontSize: 12,
     fontWeight: "600",
     color: colors.primary,
+  },
+  verification: {
+    flexDirection: "row",
+    alignItems: "center",
+    columnGap: 6,
+    flexShrink: 1,
+  },
+  verificationText: {
+    fontSize: 12,
+    color: colors.grey1,
+    flexShrink: 1,
+  },
+  scroll: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingHorizontal: 20,
+    paddingBottom: bottomInset + 24,
+    rowGap: 16,
+    // So a place with little to say still puts Close at the foot of the sheet
+    // rather than leaving it stranded halfway up under a short list.
+    flexGrow: 1,
+  },
+  address: {
+    fontSize: 14,
+    color: colors.grey1,
   },
   rows: {
     rowGap: 4,
@@ -529,31 +751,6 @@ const useStyles = makeStyles(({ colors }, { bottomInset, accent }: StyleProps) =
     fontSize: 14,
     color: colors.grey1,
   },
-  actions: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    borderTopWidth: 1,
-    borderBottomWidth: 1,
-    borderColor: colors.grey4,
-    paddingVertical: 12,
-  },
-  action: {
-    alignItems: "center",
-    rowGap: 4,
-    minWidth: 64,
-  },
-  actionIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: colors.grey5,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  actionLabel: {
-    fontSize: 11,
-    color: colors.grey1,
-  },
   errorRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -586,6 +783,18 @@ const useStyles = makeStyles(({ colors }, { bottomInset, accent }: StyleProps) =
   },
   profileLinkText: {
     fontSize: 14,
+    fontWeight: "600",
+    color: colors.primary,
+  },
+  close: {
+    // Pushed to the foot of the scroll area by whatever space is left over.
+    marginTop: "auto",
+    alignItems: "center",
+    justifyContent: "center",
+    minHeight: 48,
+  },
+  closeText: {
+    fontSize: 17,
     fontWeight: "600",
     color: colors.primary,
   },

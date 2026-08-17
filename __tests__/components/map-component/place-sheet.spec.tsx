@@ -1,6 +1,6 @@
 import React from "react"
 import { Linking, Share } from "react-native"
-import { act, render, fireEvent, waitFor } from "@testing-library/react-native"
+import { act, render, fireEvent, waitFor, within } from "@testing-library/react-native"
 
 import { BtcMapPlace, BtcMapPlaceDetails } from "@app/btcmap"
 import { useBtcMapPlaceDetails } from "@app/btcmap/use-place-details"
@@ -148,10 +148,11 @@ describe("PlaceSheet", () => {
 
   it("shares the place's page on btcmap.org, keyed by its OSM id", async () => {
     setDetails(details({ osmId: "node:12607455734" }))
-    const { getByText } = renderSheet()
+    const { getByTestId } = renderSheet()
 
-    await waitFor(() => expect(getByText("Share")).toBeTruthy())
-    fireEvent.press(getByText("Share"))
+    // Share is an icon beside the name now, so it is reached by its label.
+    await waitFor(() => expect(getByTestId("share-place")).toBeTruthy())
+    fireEvent.press(getByTestId("share-place"))
 
     expect(Share.share).toHaveBeenCalledWith({
       message: "https://btcmap.org/merchant/node:12607455734",
@@ -169,6 +170,63 @@ describe("PlaceSheet", () => {
     expect(mockedOpenExternal).toHaveBeenCalledWith(
       "https://www.satoshicoffee.example/menu",
     )
+  })
+
+  it("opens at the lower rest position, with Navigate already showing", async () => {
+    // The point of the two-stop sheet: the action most people came for is under
+    // their thumb before they have read anything or dragged anywhere.
+    const { getByTestId, getByText } = renderSheet()
+
+    await waitFor(() => expect(getByText("Satoshi Coffee")).toBeTruthy())
+
+    const peek = getByTestId("place-sheet-peek")
+    expect(within(peek).getByText("Navigate")).toBeTruthy()
+    expect(within(peek).getByText("Satoshi Coffee")).toBeTruthy()
+  })
+
+  it("locks the list until the sheet is dragged up", async () => {
+    // Below full height a drag has to resize the sheet. A scroll view that took
+    // it instead would swallow the gesture on a list with nowhere to go.
+    const { getByTestId, getByText } = renderSheet()
+
+    await waitFor(() => expect(getByText("Satoshi Coffee")).toBeTruthy())
+    expect(getByTestId("place-sheet-scroll").props.scrollEnabled).toBe(false)
+  })
+
+  it("keeps the detail out of the block the lower position shows", async () => {
+    // Address, hours and contacts live past the fold, so the header block stays
+    // the same height whatever the place happens to publish.
+    setDetails(
+      details({
+        openingHours: "24/7",
+        phone: "+44 20 7946 0100",
+        address: "1 Bishopsgate",
+      }),
+    )
+    const { getByTestId, getByText } = renderSheet()
+
+    await waitFor(() => expect(getByText("Satoshi Coffee")).toBeTruthy())
+
+    const peek = getByTestId("place-sheet-peek")
+    expect(within(peek).queryByText("24/7")).toBeNull()
+    expect(within(peek).queryByText("+44 20 7946 0100")).toBeNull()
+    expect(within(peek).queryByText("1 Bishopsgate")).toBeNull()
+  })
+
+  it("closes from the button at the foot of the detail", async () => {
+    // Dragging down closes it too, but that is a gesture you have to know
+    // about — this is the same thing spelled out, past the last of the detail.
+    const onClose = jest.fn()
+    const { getByTestId, getByText } = renderSheet({ onClose })
+
+    await waitFor(() => expect(getByText("Satoshi Coffee")).toBeTruthy())
+
+    // Not in the block the lower rest position shows: it belongs at the end of
+    // the detail, not next to Navigate.
+    expect(within(getByTestId("place-sheet-peek")).queryByText("Close")).toBeNull()
+
+    fireEvent.press(getByTestId("close-place-sheet"))
+    expect(onClose).toHaveBeenCalled()
   })
 
   it("offers a retry when the details request failed", async () => {
