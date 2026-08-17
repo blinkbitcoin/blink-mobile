@@ -7069,6 +7069,60 @@ type RootTranslation = {
 		 * S​e​t​ ​P​I​N
 		 */
 		setPin: string
+		securityScore: {
+			/**
+			 * S​e​c​u​r​i​t​y​ ​s​c​o​r​e​ ​{​d​o​n​e​}​/​{​t​o​t​a​l​}
+			 * @param {number} done
+			 * @param {number} total
+			 */
+			title: RequiredParams<'done' | 'total'>
+			/**
+			 * l​o​w
+			 */
+			levelLow: string
+			/**
+			 * m​e​d​i​u​m
+			 */
+			levelMedium: string
+			/**
+			 * h​i​g​h
+			 */
+			levelHigh: string
+			/**
+			 * S​e​t
+			 */
+			set: string
+			/**
+			 * E​n​a​b​l​e​d
+			 */
+			enabled: string
+			signals: {
+				/**
+				 * C​l​o​u​d​ ​b​a​c​k​u​p
+				 */
+				cloudBackup: string
+				/**
+				 * M​a​n​u​a​l​ ​b​a​c​k​u​p
+				 */
+				manualBackup: string
+				/**
+				 * B​i​o​m​e​t​r​i​c​s​/​P​I​N
+				 */
+				appLock: string
+				/**
+				 * H​i​d​e​ ​b​a​l​a​n​c​e
+				 */
+				hideBalance: string
+				/**
+				 * T​w​o​-​f​a​c​t​o​r​ ​a​u​t​h​e​n​t​i​c​a​t​i​o​n​ ​(​2​F​A​)
+				 */
+				twoFactor: string
+				/**
+				 * V​e​r​i​f​i​e​d​ ​e​m​a​i​l
+				 */
+				emailVerified: string
+			}
+		}
 	}
 	SendBitcoinConfirmationScreen: {
 		/**
@@ -7121,10 +7175,6 @@ type RootTranslation = {
 		 * T​h​i​s​ ​i​s​ ​t​h​e​ ​m​a​x​i​m​u​m​ ​f​e​e​ ​y​o​u​ ​w​i​l​l​ ​b​e​ ​c​h​a​r​g​e​d​ ​f​o​r​ ​t​h​i​s​ ​t​r​a​n​s​a​c​t​i​o​n​.​ ​ ​I​t​ ​m​a​y​ ​e​n​d​ ​u​p​ ​b​e​i​n​g​ ​l​e​s​s​ ​o​n​c​e​ ​t​h​e​ ​p​a​y​m​e​n​t​ ​h​a​s​ ​b​e​e​n​ ​m​a​d​e​.
 		 */
 		maxFeeSelected: string
-		/**
-		 * U​n​a​b​l​e​ ​t​o​ ​c​a​l​c​u​l​a​t​e​ ​f​e​e
-		 */
-		feeError: string
 		/**
 		 * T​h​i​s​ ​i​n​v​o​i​c​e​ ​h​a​s​ ​a​l​r​e​a​d​y​ ​b​e​e​n​ ​p​a​i​d
 		 */
@@ -7486,7 +7536,7 @@ type RootTranslation = {
 		 */
 		type: string
 		/**
-		 * F​e​e​ ​s​p​e​e​d
+		 * T​r​a​n​s​a​c​t​i​o​n​ ​p​r​i​o​r​i​t​y
 		 */
 		feeTier: string
 		/**
@@ -9338,6 +9388,10 @@ type RootTranslation = {
 		 * F​e​e​s
 		 */
 		fees: string
+		/**
+		 * U​n​a​b​l​e​ ​t​o​ ​c​a​l​c​u​l​a​t​e​ ​f​e​e
+		 */
+		feeError: string
 		/**
 		 * F​i​r​s​t​ ​N​a​m​e
 		 */
@@ -12377,6 +12431,10 @@ type RootTranslation = {
 			retryCta: string
 		}
 		/**
+		 * Y​o​u​r​ ​f​u​n​d​s​ ​a​r​e​ ​s​a​f​e​ ​i​n​ ​y​o​u​r​ ​n​e​w​ ​w​a​l​l​e​t​.​ ​W​e​ ​a​r​e​ ​s​t​i​l​l​ ​c​l​o​s​i​n​g​ ​y​o​u​r​ ​o​l​d​ ​a​c​c​o​u​n​t​,​ ​p​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​ ​i​n​ ​a​ ​m​o​m​e​n​t​.
+		 */
+		closeUnavailable: string
+		/**
 		 * T​i​m​e​ ​t​o​ ​u​p​g​r​a​d​e
 		 */
 		migrationRequiredTitle: string
@@ -12643,6 +12701,12 @@ type RootTranslation = {
 				 */
 				contactSupportCta: string
 			}
+			/**
+			 * Y​o​u​r​ ​m​i​g​r​a​t​i​o​n​ ​i​s​ ​c​o​m​p​l​e​t​e​ ​a​n​d​ ​y​o​u​r​ ​f​u​n​d​s​ ​a​r​e​ ​i​n​ ​y​o​u​r​ ​n​e​w​ ​w​a​l​l​e​t​.​ ​Y​o​u​r​ ​o​l​d​ ​a​c​c​o​u​n​t​ ​m​a​y​ ​s​t​i​l​l​ ​b​e​ ​o​p​e​n​.​ ​S​u​p​p​o​r​t​ ​w​i​l​l​ ​c​h​e​c​k​ ​a​n​d​ ​c​l​o​s​e​ ​i​t​ ​i​f​ ​i​t​ ​i​s​.​
+		​
+		​Y​o​u​ ​m​a​y​ ​n​e​e​d​ ​t​h​i​s​ ​i​n​f​o​r​m​a​t​i​o​n​ ​t​o​ ​h​e​l​p​ ​s​u​p​p​o​r​t​ ​r​e​s​o​l​v​e​ ​y​o​u​r​ ​c​a​s​e​:
+			 */
+			closeRefusedBody: string
 			/**
 			 * R​e​a​s​o​n
 			 */
@@ -20286,6 +20350,58 @@ export type TranslationFunctions = {
 		 * Set PIN
 		 */
 		setPin: () => LocalizedString
+		securityScore: {
+			/**
+			 * Security score {done}/{total}
+			 */
+			title: (arg: { done: number, total: number }) => LocalizedString
+			/**
+			 * low
+			 */
+			levelLow: () => LocalizedString
+			/**
+			 * medium
+			 */
+			levelMedium: () => LocalizedString
+			/**
+			 * high
+			 */
+			levelHigh: () => LocalizedString
+			/**
+			 * Set
+			 */
+			set: () => LocalizedString
+			/**
+			 * Enabled
+			 */
+			enabled: () => LocalizedString
+			signals: {
+				/**
+				 * Cloud backup
+				 */
+				cloudBackup: () => LocalizedString
+				/**
+				 * Manual backup
+				 */
+				manualBackup: () => LocalizedString
+				/**
+				 * Biometrics/PIN
+				 */
+				appLock: () => LocalizedString
+				/**
+				 * Hide balance
+				 */
+				hideBalance: () => LocalizedString
+				/**
+				 * Two-factor authentication (2FA)
+				 */
+				twoFactor: () => LocalizedString
+				/**
+				 * Verified email
+				 */
+				emailVerified: () => LocalizedString
+			}
+		}
 	}
 	SendBitcoinConfirmationScreen: {
 		/**
@@ -20336,10 +20452,6 @@ export type TranslationFunctions = {
 		 * This is the maximum fee you will be charged for this transaction.  It may end up being less once the payment has been made.
 		 */
 		maxFeeSelected: () => LocalizedString
-		/**
-		 * Unable to calculate fee
-		 */
-		feeError: () => LocalizedString
 		/**
 		 * This invoice has already been paid
 		 */
@@ -20681,7 +20793,7 @@ export type TranslationFunctions = {
 		 */
 		type: () => LocalizedString
 		/**
-		 * Fee speed
+		 * Transaction priority
 		 */
 		feeTier: () => LocalizedString
 		/**
@@ -22490,6 +22602,10 @@ export type TranslationFunctions = {
 		 * Fees
 		 */
 		fees: () => LocalizedString
+		/**
+		 * Unable to calculate fee
+		 */
+		feeError: () => LocalizedString
 		/**
 		 * First Name
 		 */
@@ -25481,6 +25597,10 @@ export type TranslationFunctions = {
 			retryCta: () => LocalizedString
 		}
 		/**
+		 * Your funds are safe in your new wallet. We are still closing your old account, please try again in a moment.
+		 */
+		closeUnavailable: () => LocalizedString
+		/**
 		 * Time to upgrade
 		 */
 		migrationRequiredTitle: () => LocalizedString
@@ -25741,6 +25861,12 @@ export type TranslationFunctions = {
 				 */
 				contactSupportCta: () => LocalizedString
 			}
+			/**
+			 * Your migration is complete and your funds are in your new wallet. Your old account may still be open. Support will check and close it if it is.
+	
+		You may need this information to help support resolve your case:
+			 */
+			closeRefusedBody: () => LocalizedString
 			/**
 			 * Reason
 			 */

@@ -48,7 +48,7 @@ export const BalanceHeader: React.FC<Props> = ({
   const styles = useStyles()
   const { LL } = useI18nContext()
 
-  const { hideAmount, switchMemoryHideAmount } = useHideAmount()
+  const { hideAmount, toggleHideAmount } = useHideAmount()
   const currentMode = mode ?? BalanceMode.Btc
 
   const modeLabel =
@@ -59,11 +59,11 @@ export const BalanceHeader: React.FC<Props> = ({
   return (
     <View {...testProps("balance-header")} style={styles.balanceHeaderContainer}>
       {hideAmount ? (
-        <TouchableOpacity style={styles.balanceWrapper} onPress={switchMemoryHideAmount}>
+        <TouchableOpacity style={styles.balanceWrapper} onPress={toggleHideAmount}>
           <HiddenBalancePlaceholder size="large" />
         </TouchableOpacity>
       ) : (
-        <TouchableOpacity onPress={switchMemoryHideAmount}>
+        <TouchableOpacity onPress={toggleHideAmount}>
           <View style={styles.amountWrapper}>
             {loading ? (
               <Loader />

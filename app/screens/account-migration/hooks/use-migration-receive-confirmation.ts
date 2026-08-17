@@ -33,6 +33,13 @@ type UseMigrationReceiveConfirmationArgs = {
 
 type UseMigrationReceiveConfirmation = {
   isReceiveConfirmed: boolean
+  /**
+   * Confirmed by an actual look at the wallet, never by the notice window elapsing. The
+   * irreversible half of the completion — deleting the custodial account — keys off this
+   * rather than `isReceiveConfirmed`, because the timeout release proves nothing about
+   * where the funds are, and an account deleted while they are still in it is gone.
+   */
+  isReceiveProven: boolean
   isReceiveDelayed: boolean
 }
 
@@ -46,7 +53,9 @@ type UseMigrationReceiveConfirmation = {
  * an empty new one. After the remote-configured notice window it raises `isReceiveDelayed`
  * so the screen can say the wait is unusual and offer support, while still polling —
  * unless the delayed-redirect flag is on, in which case the elapsed window releases the
- * gate instead (the pre-#4102 behavior, kept reachable without an app release).
+ * gate instead (the pre-#4102 behavior, kept reachable without an app release). That
+ * release moves the user, never the custodial account: `isReceiveProven` stays false, so
+ * the deletion waits for a real confirmation that no flag can substitute for.
  */
 export const useMigrationReceiveConfirmation = ({
   selfCustodialAccountId,
@@ -185,12 +194,16 @@ export const useMigrationReceiveConfirmation = ({
     return () => clearTimeout(timer)
   }, [isWatching, selfCustodialAccountId, migrationReceiveDelayedNoticeMs])
 
+  /** A zero-receive migration counts as proven, not merely released: nothing was ever
+   *  going to arrive, so an empty wallet is the confirmed outcome rather than an unknown. */
+  const isReceiveProven = !skip && (isReceiveConfirmed || isConfirmedWithoutWaiting)
+
   /** A skipped gate is inert, whatever it remembers: a caller that re-skips after a
    *  late failure must not keep receiving a notice (or a confirmation) minted for a
    *  swap that is no longer allowed to happen. */
   return {
-    isReceiveConfirmed:
-      !skip && (isReceiveConfirmed || isConfirmedWithoutWaiting || isReleasedByTimeout),
+    isReceiveConfirmed: isReceiveProven || (!skip && isReleasedByTimeout),
+    isReceiveProven,
     /** Also masked once anything confirms — including the timeout release, which must
      *  swap at once rather than flash the "taking longer" copy it just made moot. */
     isReceiveDelayed:

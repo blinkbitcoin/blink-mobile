@@ -2235,6 +2235,22 @@
     "imageLibraryPermissionsNotGranted": "Kami tidak ada kebenaran untuk mengakses galeri imej anda. Sila periksa tetapan pada aplikasi pada peranti anda."
   },
   "SecurityScreen": {
+    "securityScore": {
+      "title": "Skor keselamatan {done: number}/{total: number}",
+      "levelLow": "rendah",
+      "levelMedium": "sederhana",
+      "levelHigh": "tinggi",
+      "set": "Tetapkan",
+      "enabled": "Diaktifkan",
+      "signals": {
+        "cloudBackup": "Sandaran awan",
+        "manualBackup": "Sandaran manual",
+        "appLock": "Biometrik/PIN",
+        "hideBalance": "Sembunyikan baki",
+        "twoFactor": "Pengesahan dua faktor (2FA)",
+        "emailVerified": "E-mel disahkan"
+      }
+    },
     "title": "Keselamatan dan Privasi",
     "biometricDescription": "Buka dengan cap jari atau pengesahan wajah.",
     "biometricTitle": "Biometrik",
@@ -2259,7 +2275,6 @@
     "totalLabel": "Jumlah:",
     "totalExceed": "Jumlah yang melebihi baki anda {balance: string}",
     "maxFeeSelected": "Ini adalah cas bayaran maksimum yang akan dikenakan untuk transaksi ini. Tapi cas ni mungkin akan lagi rendah bila bayaran telah dibuat.",
-    "feeError": "Gagal untuk kira berapa cas dikenakan",
     "invoiceAlreadyPaid": "Invois ini telah pun dibayar",
     "somethingWentWrong": "Sesuatu tidak kena",
     "paymentAlreadyAttempted": "Bayaran telah pun dicuba.\n\nJika anda mahu menghantar bayaran ini semula, mulakan dari awal.",
@@ -2349,7 +2364,7 @@
     "recipient": "Penerima",
     "time": "Masa",
     "type": "Jenis",
-    "feeTier": "Kelajuan yuran",
+    "feeTier": "Keutamaan transaksi",
     "fast": "Cepat",
     "medium": "Sederhana",
     "slow": "Perlahan",
@@ -2825,6 +2840,7 @@
     "fee": "Cas",
     "Fee": "Cas",
     "fees": "Cas-cas",
+    "feeError": "Gagal untuk kira berapa cas dikenakan",
     "firstName": "Nama Pertama",
     "from": "Daripada ",
     "hour": "sejam",
@@ -3716,6 +3732,7 @@
         "body": "Jangan risau — dana anda selamat. Pemindahan mungkin mengambil masa beberapa minit, dan kadangkala satu langkah hanya perlu dimulakan semula.\n\nMulakan pemindahan sekali lagi — ia hanya mengambil masa sebentar.\n\nMasih melihat skrin ini? Hubungi sokongan dan kongsikan maklumat di bawah:",
         "contactSupportCta": "Hubungi sokongan"
       },
+      "closeRefusedBody": "Migrasi anda telah selesai dan dana anda berada dalam dompet baharu anda. Akaun lama anda mungkin masih terbuka. Sokongan akan menyemaknya dan menutupnya jika perlu.\n\nAnda mungkin memerlukan maklumat ini untuk membantu sokongan menyelesaikan kes anda:",
       "reasonLabel": "Sebab",
       "accountIdLabel": "ID akaun",
       "pubKeyLabel": "pubKey",
@@ -3812,7 +3829,8 @@
     "clockOutOfSync": {
       "body": "Tarikh dan masa peranti anda tidak segerak. Tetapkan kepada automatik untuk meneruskan.",
       "retryCta": "Cuba lagi"
-    }
+    },
+    "closeUnavailable": "Dana anda selamat dalam dompet baharu anda. Kami masih menutup akaun lama anda, sila cuba lagi sebentar."
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Kustodian",

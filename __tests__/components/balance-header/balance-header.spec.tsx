@@ -8,12 +8,14 @@ import { BalanceMode } from "@app/hooks/use-balance-mode"
 import { BalanceHeader } from "@app/components/balance-header/balance-header"
 
 const mockSwitchMemoryHideAmount = jest.fn()
+const mockToggleHideAmount = jest.fn()
 let mockHideAmount = false
 
 jest.mock("@app/graphql/hide-amount-context", () => ({
   useHideAmount: () => ({
     hideAmount: mockHideAmount,
     switchMemoryHideAmount: mockSwitchMemoryHideAmount,
+    toggleHideAmount: mockToggleHideAmount,
   }),
 }))
 

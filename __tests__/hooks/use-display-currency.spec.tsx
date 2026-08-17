@@ -57,7 +57,26 @@ const setPriceConversion = ({
   })
 }
 
+// Restored unconditionally: jest is configured with neither restoreMocks nor
+// resetMocks, so a spy left in place by a failing assertion would break every
+// later formatting test and bury the real failure.
+let numberFormatSpy: jest.SpyInstance | undefined
+
+// Counts only the constructions for the fraction-digit count under test, so an
+// unrelated formatter built during the same render cannot move the number.
+const constructionsAt = (fractionDigits: number) =>
+  (numberFormatSpy?.mock.calls ?? []).filter(
+    ([, options]) =>
+      (options as Intl.NumberFormatOptions | undefined)?.maximumFractionDigits ===
+      fractionDigits,
+  ).length
+
 describe("useDisplayCurrency", () => {
+  afterEach(() => {
+    numberFormatSpy?.mockRestore()
+    numberFormatSpy = undefined
+  })
+
   beforeEach(() => {
     jest.clearAllMocks()
     mockUseIsAuthed.mockReturnValue(true)
@@ -328,6 +347,58 @@ describe("useDisplayCurrency", () => {
       })
 
       expect(formatted).toBe("$100.00 USD")
+    })
+
+    it("constructs at most one Intl.NumberFormat per fraction-digit count", () => {
+      // 7 fraction digits is used by no other test in this file, so the
+      // module-level formatter cache is cold on the first run and warm after.
+      setCurrencyList([
+        { id: "USD", symbol: "$", fractionDigits: 2 },
+        { id: "XTS", symbol: "¤", fractionDigits: 7 },
+      ])
+      numberFormatSpy = jest.spyOn(Intl, "NumberFormat")
+
+      const { result } = renderHook(() => useDisplayCurrency())
+
+      const formatted = Array.from({ length: 25 }, (_, index) =>
+        result.current.formatCurrency({
+          amountInMajorUnits: index,
+          currency: "XTS",
+        }),
+      )
+
+      expect(constructionsAt(7)).toBe(1)
+      expect(formatted[0]).toBe("¤0.0000000")
+      expect(formatted[24]).toBe("¤24.0000000")
+    })
+
+    it("keeps interleaved fraction-digit counts on their own formatter", () => {
+      // The cache is keyed on fraction digits alone. Two currencies formatted
+      // alternately is what catches a key that stops distinguishing them, since
+      // both would then read back through whichever formatter was built first.
+      setCurrencyList([
+        { id: "XTA", symbol: "¤", fractionDigits: 5 },
+        { id: "XTB", symbol: "¤", fractionDigits: 6 },
+      ])
+      numberFormatSpy = jest.spyOn(Intl, "NumberFormat")
+
+      const { result } = renderHook(() => useDisplayCurrency())
+
+      const formatted = Array.from({ length: 8 }, (_, index) =>
+        result.current.formatCurrency({
+          amountInMajorUnits: 1,
+          currency: index % 2 === 0 ? "XTA" : "XTB",
+        }),
+      )
+
+      expect(formatted.filter((_, index) => index % 2 === 0)).toEqual(
+        Array(4).fill("¤1.00000"),
+      )
+      expect(formatted.filter((_, index) => index % 2 === 1)).toEqual(
+        Array(4).fill("¤1.000000"),
+      )
+      expect(constructionsAt(5)).toBe(1)
+      expect(constructionsAt(6)).toBe(1)
     })
   })
 

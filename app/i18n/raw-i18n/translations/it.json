@@ -2235,6 +2235,22 @@
         "imageLibraryPermissionsNotGranted": "Non abbiamo i permessi per accedere alla libreria immagini. Controlla le impostazioni dell'app per la tua piattaforma."
     },
     "SecurityScreen": {
+        "securityScore": {
+            "title": "Punteggio di sicurezza {done: number}/{total: number}",
+            "levelLow": "basso",
+            "levelMedium": "medio",
+            "levelHigh": "alto",
+            "set": "Imposta",
+            "enabled": "Attivo",
+            "signals": {
+                "cloudBackup": "Backup su cloud",
+                "manualBackup": "Backup manuale",
+                "appLock": "Biometria/PIN",
+                "hideBalance": "Nascondi saldo",
+                "twoFactor": "Autenticazione a due fattori (2FA)",
+                "emailVerified": "Email verificata"
+            }
+        },
         "title": "Sicurezza e Privacy",
         "biometricDescription": "Sblocca il riconoscimento facciale o con impronta digitale.",
         "biometricTitle": "Biometrico",
@@ -2259,7 +2275,6 @@
         "totalLabel": "Totale:",
         "totalExceed": "Il totale supera il saldo {balance: string}",
         "maxFeeSelected": "Questa è la commissione massima che ti verrà addebitata per questa transazione. Una volta effettuato il pagamento, il costo potrebbe risultare inferiore.",
-        "feeError": "Impossibile calcolare la tariffa",
         "invoiceAlreadyPaid": "Questa fattura è già stata pagata",
         "somethingWentWrong": "Qualcosa è andato storto",
         "paymentAlreadyAttempted": "Pagamento già tentato.\n\nSe vuoi inviare di nuovo questo pagamento, ricomincia da zero.",
@@ -2349,7 +2364,7 @@
         "recipient": "Destinatario",
         "time": "Ora",
         "type": "Tipo",
-        "feeTier": "Velocità della commissione",
+        "feeTier": "Priorità della transazione",
         "fast": "Veloce",
         "medium": "Medio",
         "slow": "Lento",
@@ -2825,6 +2840,7 @@
         "fee": "commissione",
         "Fee": "Commissione",
         "fees": "Commissioni",
+        "feeError": "Impossibile calcolare la tariffa",
         "firstName": "Nome",
         "from": "Da",
         "hour": "ora",
@@ -3716,6 +3732,7 @@
                 "body": "Non preoccuparti — i tuoi fondi sono al sicuro. La migrazione può richiedere qualche minuto e a volte a un passaggio serve solo ricominciare.\n\nRicomincia la migrazione da capo — ci vuole solo un attimo.\n\nVedi ancora questa schermata? Contatta il supporto e condividi i dati qui sotto:",
                 "contactSupportCta": "Contatta il supporto"
             },
+            "closeRefusedBody": "La tua migrazione è completata e i tuoi fondi sono nel tuo nuovo portafoglio. Il tuo vecchio account potrebbe essere ancora aperto. L'assistenza lo verificherà e lo chiuderà se necessario.\n\nPotresti aver bisogno di queste informazioni per aiutare il supporto a risolvere il tuo caso:",
             "reasonLabel": "Motivo",
             "accountIdLabel": "ID account",
             "pubKeyLabel": "pubKey",
@@ -3812,7 +3829,8 @@
         "clockOutOfSync": {
             "body": "La data e l'ora del tuo dispositivo non sono sincronizzate. Impostale su automatico per continuare.",
             "retryCta": "Riprova"
-        }
+        },
+        "closeUnavailable": "I tuoi fondi sono al sicuro nel tuo nuovo portafoglio. Stiamo ancora chiudendo il tuo vecchio account, riprova tra un momento."
     },
     "AccountTypeSelectionScreen": {
         "custodialLabel": "Custodito",

@@ -39,7 +39,10 @@ import { useHasTransitioned, useTransactionSeenState } from "@app/hooks"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { reportError } from "@app/utils/error-logging"
 
-import { MemoizedTransactionItem } from "@app/components/transaction-item"
+import {
+  MemoizedTransactionItem,
+  TRANSACTION_LIST_WINDOW_SIZE,
+} from "@app/components/transaction-item"
 import { toastShow } from "../../utils/toast"
 
 import TransactionHistorySkeleton from "./transaction-history-skeleton"
@@ -68,6 +71,8 @@ gql`
 const INITIAL_ITEMS_TO_RENDER = 14
 const RENDER_BATCH_SIZE = 14
 const QUERY_BATCH_SIZE = INITIAL_ITEMS_TO_RENDER * 1.5
+
+const keyExtractor = (item: TransactionFragment) => item.id
 
 type TransactionHistoryScreenProps = {
   route: RouteProp<RootStackParamList, "transactionHistory">
@@ -429,10 +434,19 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
           memo: item.memo,
           direction: item.direction,
         })}
-        onPress={() => handleItemPress(item.id)}
+        onPress={handleItemPress}
       />
     ),
     [shouldHighlightTransactionId, handleItemPress],
+  )
+
+  const renderSectionHeader = React.useCallback(
+    ({ section: { title } }: { section: { title: string } }) => (
+      <View style={styles.sectionHeaderContainer}>
+        <Text style={styles.sectionHeaderText}>{title}</Text>
+      </View>
+    ),
+    [styles.sectionHeaderContainer, styles.sectionHeaderText],
   )
 
   if (error) {
@@ -511,12 +525,9 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
         showsVerticalScrollIndicator={false}
         maxToRenderPerBatch={RENDER_BATCH_SIZE}
         initialNumToRender={INITIAL_ITEMS_TO_RENDER}
+        windowSize={TRANSACTION_LIST_WINDOW_SIZE}
         renderItem={renderItem}
-        renderSectionHeader={({ section: { title } }) => (
-          <View style={styles.sectionHeaderContainer}>
-            <Text style={styles.sectionHeaderText}>{title}</Text>
-          </View>
-        )}
+        renderSectionHeader={renderSectionHeader}
         ListEmptyComponent={
           <View style={styles.noTransactionView}>
             <Text style={styles.noTransactionText}>
@@ -525,7 +536,7 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
           </View>
         }
         sections={sections}
-        keyExtractor={(item) => item.id}
+        keyExtractor={keyExtractor}
         onEndReached={fetchNextTransactionsPage}
         onEndReachedThreshold={0.5}
         onRefresh={handleRefresh}

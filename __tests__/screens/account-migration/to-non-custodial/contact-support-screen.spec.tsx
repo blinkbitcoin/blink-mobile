@@ -37,6 +37,7 @@ const mockAddListener = jest.fn(
   (_event: string, _listener: BeforeRemoveListener) => mockRemoveListener,
 )
 let mockOrigin: MigrationSupportOrigin | undefined
+let mockCustodialAccountId: string | undefined
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
   useNavigation: () => ({
@@ -47,7 +48,13 @@ jest.mock("@react-navigation/native", () => ({
     addListener: mockAddListener,
   }),
   useRoute: () => ({
-    params: mockHasParams ? { reason: mockReason, origin: mockOrigin } : undefined,
+    params: mockHasParams
+      ? {
+          reason: mockReason,
+          origin: mockOrigin,
+          custodialAccountId: mockCustodialAccountId,
+        }
+      : undefined,
   }),
   useFocusEffect: (callback: () => void | (() => void)) =>
     jest.requireActual<typeof import("react")>("react").useEffect(callback, [callback]),
@@ -83,12 +90,13 @@ const mockBuildDiagnostics = () =>
   ].filter((diagnostic) => Boolean(diagnostic.value))
 
 jest.mock("@app/screens/account-migration/hooks/use-migration-support-email", () => ({
-  useMigrationSupportEmail: (reason: string) => mockUseMigrationSupportEmail(reason),
+  useMigrationSupportEmail: (reason: string, custodialAccountId?: string) =>
+    mockUseMigrationSupportEmail(reason, custodialAccountId),
 }))
 
 const MOCK_SUPPORT_DETAILS_TEXT = "reason and identity and environment block"
 
-const mockUseMigrationSupportEmail = jest.fn((reason: string) => ({
+const mockUseMigrationSupportEmail = jest.fn((reason: string, _id?: string) => ({
   cardDetails: [
     { label: LLSupport.reasonLabel(), value: reason },
     ...mockBuildDiagnostics(),
@@ -111,6 +119,7 @@ describe("MigrationContactSupportScreen", () => {
     mockReason = MigrationSupportReason.PreviewUnavailable
     mockHasParams = true
     mockOrigin = undefined
+    mockCustodialAccountId = undefined
     mockDetails = {
       accountId: "18A4242",
       pubKey: "spbc1pdjsovJFPej9i2vuK",
@@ -118,6 +127,43 @@ describe("MigrationContactSupportScreen", () => {
       email: "email@email.com",
       phone: "+1 374 9383 993",
     }
+  })
+
+  /** The migration succeeded here, so the generic "something went wrong" would contradict
+   *  the success the user was just shown: only the old account is left, and the app cannot
+   *  prove it is still open, so the copy asks support to check rather than asserting. */
+  it("tells a refused close that the migration worked and only the old account is left", async () => {
+    mockReason = MigrationSupportReason.CustodialAccountCloseRefused
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.getByText(LLSupport.closeRefusedBody())).toBeTruthy()
+    expect(screen.queryByText(LLSupport.body())).toBeNull()
+  })
+
+  it("keeps the generic body for every other reason", async () => {
+    renderScreen()
+    await flushEffects()
+
+    expect(
+      screen.getByText(
+        "Something went wrong but don't worry your funds are safe, please contact support for assistance.\n\nYou may need this information to help support resolve your case:",
+      ),
+    ).toBeTruthy()
+  })
+
+  /** The session is already discarded by the time this handover opens, so the live account
+   *  query is skipped and the id has to arrive as a param or the ticket names nobody. */
+  it("passes the custodial account id through to the ticket details", async () => {
+    mockReason = MigrationSupportReason.CustodialAccountCloseRefused
+    mockCustodialAccountId = "custodial-1"
+    renderScreen()
+    await flushEffects()
+
+    expect(mockUseMigrationSupportEmail).toHaveBeenCalledWith(
+      "custodial-account-close-refused",
+      "custodial-1",
+    )
   })
 
   it("redirects the hardware back to the commit point instead of exiting", async () => {
@@ -238,6 +284,23 @@ describe("MigrationContactSupportScreen", () => {
     expect(mockAddListener).not.toHaveBeenCalled()
   })
 
+  /** The commit path resets Home underneath before handing over, so Back returns there
+   *  rather than to a commit screen the finished migration has already left. */
+  it("dismisses the hardware back when opened from the close-refused handover", async () => {
+    mockOrigin = MigrationSupportOrigin.CloseRefused
+    const { BackHandler } =
+      jest.requireActual<typeof import("react-native")>("react-native")
+    const addListenerSpy = jest.spyOn(BackHandler, "addEventListener")
+    renderScreen()
+    await flushEffects()
+
+    const handler = addListenerSpy.mock.calls[0][1] as () => boolean
+
+    expect(handler()).toBe(true)
+    expect(mockGoBack).toHaveBeenCalledTimes(1)
+    expect(mockNavigate).not.toHaveBeenCalledWith("accountMigrationBalancesOverview")
+  })
+
   /** From the gate handover (a lock with nothing to resume, #4070) there is nothing behind
    *  this screen: the gate underneath would only replay the handover, and the commit path
    *  would fabricate a commit screen for an account with no provisioned wallet. Support is
@@ -289,7 +352,10 @@ describe("MigrationContactSupportScreen", () => {
 
     expect(screen.getByText(LLSupport.reasonLabel())).toBeTruthy()
     expect(screen.getByText("locked-without-checkpoint")).toBeTruthy()
-    expect(mockUseMigrationSupportEmail).toHaveBeenCalledWith("locked-without-checkpoint")
+    expect(mockUseMigrationSupportEmail).toHaveBeenCalledWith(
+      "locked-without-checkpoint",
+      undefined,
+    )
   })
 
   it("renders the hero, every diagnostics row and the contact action", async () => {
@@ -447,6 +513,15 @@ describe("MigrationContactSupportScreen", () => {
     ]
     const allReasons: MigrationSupportReason[] = Object.values(MigrationSupportReason)
 
+    /** The close refusal keeps the support-first hero but swaps the body: the migration
+     *  itself succeeded, so the generic "something went wrong" would contradict it. */
+    const expectedBody = (reason: MigrationSupportReason) => {
+      if (RESTART_RESOLVABLE.includes(reason)) return LLSupport.selfHelp.body()
+      return reason === MigrationSupportReason.CustodialAccountCloseRefused
+        ? LLSupport.closeRefusedBody()
+        : LLSupport.body()
+    }
+
     allReasons.forEach((reason) => {
       const expectsSelfHelp = RESTART_RESOLVABLE.includes(reason)
       const variant = expectsSelfHelp ? "self-help" : "support-first"
@@ -459,11 +534,7 @@ describe("MigrationContactSupportScreen", () => {
         expect(
           screen.getByTestId(expectsSelfHelp ? "icon-refresh" : "icon-headset"),
         ).toBeTruthy()
-        expect(
-          screen.queryByText(
-            expectsSelfHelp ? LLSupport.selfHelp.body() : LLSupport.body(),
-          ),
-        ).toBeTruthy()
+        expect(screen.queryByText(expectedBody(reason))).toBeTruthy()
         expect(
           screen.queryByText(
             expectsSelfHelp ? LLSupport.body() : LLSupport.selfHelp.body(),
@@ -519,7 +590,7 @@ describe("MigrationContactSupportScreen", () => {
     renderScreen()
     await flushEffects()
 
-    expect(mockUseMigrationSupportEmail).toHaveBeenCalledWith("start-refused")
+    expect(mockUseMigrationSupportEmail).toHaveBeenCalledWith("start-refused", undefined)
   })
 
   /** The error screen is the support channel, so what failed is on the screen,
@@ -540,7 +611,7 @@ describe("MigrationContactSupportScreen", () => {
     renderScreen()
     await flushEffects()
 
-    expect(mockUseMigrationSupportEmail).toHaveBeenCalledWith("unknown")
+    expect(mockUseMigrationSupportEmail).toHaveBeenCalledWith("unknown", undefined)
     // The fallback must never read as self-help: a restart is not a known remedy for a
     // reason we could not identify, so the stranded user gets the support-first framing.
     expect(screen.getByTestId("icon-headset")).toBeTruthy()

@@ -85,7 +85,11 @@ describe("PersistentStateProvider", () => {
     })
 
     expect(screen.getByTestId("token").props.children).toBe("saved-token")
-    expect(screen.getByTestId("schema").props.children).toBe(15)
+    // The point is that an old state migrates all the way up, so track the latest
+    // version rather than a literal that every schema bump would have to chase.
+    expect(screen.getByTestId("schema").props.children).toBe(
+      defaultPersistentState.schemaVersion,
+    )
   })
 
   it("falls back to default state when no persisted data exists", async () => {

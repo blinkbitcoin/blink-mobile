@@ -2235,6 +2235,22 @@
     "imageLibraryPermissionsNotGranted": "We don't have permissions to access the image library.  Please check app settings for your platform."
   },
   "SecurityScreen": {
+    "securityScore": {
+      "title": "درجة الأمان {done: number}/{total: number}",
+      "levelLow": "منخفضة",
+      "levelMedium": "متوسطة",
+      "levelHigh": "مرتفعة",
+      "set": "تعيين",
+      "enabled": "مفعّل",
+      "signals": {
+        "cloudBackup": "نسخ احتياطي سحابي",
+        "manualBackup": "نسخ احتياطي يدوي",
+        "appLock": "البصمة/PIN",
+        "hideBalance": "إخفاء الرصيد",
+        "twoFactor": "المصادقة الثنائية (2FA)",
+        "emailVerified": "بريد إلكتروني موثّق"
+      }
+    },
     "title": "الأمان والخصوصية",
     "biometricDescription": "افتح بالبصمة أو التعرّف بالوجه",
     "biometricTitle": "بيومتري",
@@ -2259,7 +2275,6 @@
     "totalLabel": "المجموع :",
     "totalExceed": "الإجمالي أكبر من ميزانيتك التي تبلغ {balance: string}",
     "maxFeeSelected": "هذا هو الحد الأقصى للرسوم التي ستُقتضى منك لهذه المعاملة. قد تكون أقل من ذلك عند إتمام الدفع.",
-    "feeError": "فشل في حساب العمولة",
     "invoiceAlreadyPaid": "تم دفع هذه الفاتورة بالفعل",
     "somethingWentWrong": "حدث خطأ ما",
     "paymentAlreadyAttempted": "تمت محاولة الدفع بالفعل.\n\nإذا أردت إرسال هذه الدفعة مرة أخرى، ابدأ من جديد.",
@@ -2349,7 +2364,7 @@
     "recipient": "المستلم",
     "time": "الوقت",
     "type": "النوع",
-    "feeTier": "سرعة الرسوم",
+    "feeTier": "أولوية المعاملة",
     "fast": "سريع",
     "medium": "متوسط",
     "slow": "بطيء",
@@ -2825,6 +2840,7 @@
     "fee": "عمولة",
     "Fee": "رسوم تحويل",
     "fees": "رُسوم",
+    "feeError": "فشل في حساب العمولة",
     "firstName": "الاسم الشخصي",
     "from": "من",
     "hour": "ساعة ",
@@ -3716,6 +3732,7 @@
         "body": "لا تقلق — أموالك آمنة. قد يستغرق الترحيل بضع دقائق، وأحيانًا تحتاج إحدى الخطوات إلى بداية جديدة فقط.\n\nابدأ الترحيل من جديد — لن يستغرق الأمر سوى لحظة.\n\nهل ما زلت ترى هذه الشاشة؟ تواصل مع الدعم وشارك التفاصيل أدناه:",
         "contactSupportCta": "تواصل مع الدعم"
       },
+      "closeRefusedBody": "اكتمل ترحيلك وأموالك الآن في محفظتك الجديدة. قد يكون حسابك القديم لا يزال مفتوحًا. سيتحقق فريق الدعم وسيغلقه إذا كان كذلك.\n\nقد تحتاج إلى هذه المعلومات لمساعدة الدعم في حل حالتك:",
       "reasonLabel": "السبب",
       "accountIdLabel": "معرّف الحساب",
       "pubKeyLabel": "pubKey",
@@ -3812,7 +3829,8 @@
     "clockOutOfSync": {
       "body": "تاريخ ووقت جهازك غير متزامنين. اضبطهما على الوضع التلقائي للمتابعة.",
       "retryCta": "حاول مرة أخرى"
-    }
+    },
+    "closeUnavailable": "أموالك آمنة في محفظتك الجديدة. ما زلنا نغلق حسابك القديم، يرجى المحاولة مرة أخرى بعد لحظات."
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "محفوظ",

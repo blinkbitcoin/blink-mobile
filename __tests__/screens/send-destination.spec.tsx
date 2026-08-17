@@ -226,7 +226,7 @@ describe("SendBitcoinDestinationScreen", () => {
   })
 
   const createLnurlPayParams = (identifier: string): LnUrlPayServiceResponse => ({
-    callback: "mocked_callback",
+    callback: "https://example.com/callback",
     fixed: true,
     min: 0 as Satoshis,
     max: 2000 as Satoshis,

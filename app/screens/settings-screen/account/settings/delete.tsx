@@ -1,4 +1,4 @@
-import { useState } from "react"
+import React, { useState } from "react"
 import { Alert, TextInput, View } from "react-native"
 import Modal from "react-native-modal"
 
@@ -24,11 +24,15 @@ import { useSwitchToNextProfile } from "@app/hooks/use-switch-to-next-profile"
 import { SettingsButton } from "../../button"
 import { useAccountDeleteContext } from "../account-delete-context"
 
+/** The migration flow closes the emptied custodial account with this same mutation, and
+ *  codegen allows one document per operation name, so this one is shared: `code` is what
+ *  lets that caller tell a transient refusal from a terminal one. */
 gql`
   mutation accountDelete {
     accountDelete {
       errors {
         message
+        code
       }
       success
     }
@@ -108,6 +112,13 @@ export const Delete = () => {
     }
   }
 
+  /** The deletion hides every way off this screen while it runs; a deletion that did not
+   *  happen has to give them back, or the user is left on a dead screen with no exit. */
+  const releaseDeletionLock = () => {
+    navigation.setOptions({ headerLeft: undefined, gestureEnabled: true })
+    setAccountIsBeingDeleted(false)
+  }
+
   const deleteUserAccount = async () => {
     try {
       const accountToDeleteToken = appConfig.token
@@ -142,15 +153,25 @@ export const Delete = () => {
           },
         ])
       } else {
+        /** The server can answer with neither a success nor a rejection, which reading the
+         *  first error unguarded turns into a TypeError: the generic alert then replaces the
+         *  reason and the hidden back button never comes back. */
+        const rejectionMessage = res.data?.accountDelete?.errors?.[0]?.message
+        const deleteErrorMessage = LL.support.deleteAccountError({
+          email: CONTACT_EMAIL_ADDRESS,
+        })
+
+        releaseDeletionLock()
         Alert.alert(
           LL.common.error(),
-          LL.support.deleteAccountError({ email: CONTACT_EMAIL_ADDRESS }) +
-            "\n\n" +
-            res.data?.accountDelete?.errors[0].message,
+          rejectionMessage
+            ? `${deleteErrorMessage}\n\n${rejectionMessage}`
+            : deleteErrorMessage,
         )
       }
     } catch (err) {
       console.error(err)
+      releaseDeletionLock()
       Alert.alert(
         LL.common.error(),
         LL.support.deleteAccountError({ email: CONTACT_EMAIL_ADDRESS }),

@@ -167,9 +167,7 @@ describe("choose-wallet modal respects hide-balance", () => {
   const renderScreen = (hideAmount: boolean) =>
     render(
       <ContextForScreen>
-        <HideAmountContextProvider
-          value={{ hideAmount, switchMemoryHideAmount: jest.fn() }}
-        >
+        <HideAmountContextProvider value={{ hideAmount, toggleHideAmount: jest.fn() }}>
           <Intraledger />
         </HideAmountContextProvider>
       </ContextForScreen>,

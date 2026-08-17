@@ -1,7 +1,11 @@
 import type { Operation } from "@apollo/client"
 import type { NetworkError } from "@apollo/client/errors"
 
-import { hasIdempotencyKey, shouldRetryOperation } from "@app/graphql/retry-policy"
+import {
+  hasIdempotencyKey,
+  shouldRetryOperation,
+  shouldRetryUnauthorized,
+} from "@app/graphql/retry-policy"
 
 /** A settled network failure with no HTTP status, as a lost response surfaces. */
 const networkError = new Error("Network request failed") as NetworkError
@@ -19,6 +23,24 @@ const MIGRATION_OPERATIONS = [
   "migrationStart",
   "migrationCommit",
   "migrationLnAddressTransfer",
+]
+
+/** Deleting the account cannot be undone, and the resend cannot authenticate itself either:
+ *  it spent the only token that could. */
+const IRREVERSIBLE_OPERATIONS = [...MIGRATION_OPERATIONS, "accountDelete"]
+
+/**
+ * The on-chain fee quotes, single-speed and by-speed alike. A silent resend with backoff
+ * only holds the send screen on a spinner, since the caller surfaces the failure and lets
+ * the sender ask again.
+ */
+const ONCHAIN_FEE_QUOTES = [
+  "onChainTxFee",
+  "onChainUsdTxFee",
+  "onChainUsdTxFeeAsBtcDenominated",
+  "onChainTxFeeBySpeed",
+  "onChainUsdTxFeeBySpeed",
+  "onChainUsdTxFeeAsBtcDenominatedBySpeed",
 ]
 
 describe("shouldRetryOperation", () => {
@@ -42,11 +64,45 @@ describe("shouldRetryOperation", () => {
     expect(shouldRetryOperation(networkError, "onChainPaymentSendAll")).toBe(false)
   })
 
-  describe("custodial-to-self-custodial migration mutations", () => {
-    MIGRATION_OPERATIONS.forEach((operationName) => {
+  describe("on-chain fee quotes", () => {
+    ONCHAIN_FEE_QUOTES.forEach((operationName) => {
+      it(`does not resend ${operationName} behind the sender's back`, () => {
+        expect(shouldRetryOperation(networkError, operationName)).toBe(false)
+      })
+    })
+  })
+
+  describe("irreversible custodial-to-self-custodial migration mutations", () => {
+    IRREVERSIBLE_OPERATIONS.forEach((operationName) => {
       it(`does not resend ${operationName} after a lost response`, () => {
         expect(shouldRetryOperation(networkError, operationName)).toBe(false)
       })
+    })
+  })
+})
+
+describe("shouldRetryUnauthorized", () => {
+  it("does not retry when there is no error", () => {
+    expect(shouldRetryUnauthorized(null, RETRYABLE_OPERATION)).toBe(false)
+  })
+
+  it("does not retry a failure that is not a 401", () => {
+    expect(shouldRetryUnauthorized(networkError, RETRYABLE_OPERATION)).toBe(false)
+  })
+
+  it("retries a 401 on an ordinary operation", () => {
+    expect(shouldRetryUnauthorized(unauthorizedError, RETRYABLE_OPERATION)).toBe(true)
+  })
+
+  /** The resend carries the same token, so it can only 401 again; for these it also risks a
+   *  second, irreversible landing. */
+  it("does not retry a 401 on a non-idempotent payment send", () => {
+    expect(shouldRetryUnauthorized(unauthorizedError, NON_IDEMPOTENT_PAYMENT)).toBe(false)
+  })
+
+  IRREVERSIBLE_OPERATIONS.forEach((operationName) => {
+    it(`does not retry a 401 on ${operationName}`, () => {
+      expect(shouldRetryUnauthorized(unauthorizedError, operationName)).toBe(false)
     })
   })
 })
