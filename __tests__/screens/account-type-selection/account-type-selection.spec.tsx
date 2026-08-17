@@ -107,9 +107,14 @@ jest.mock("@app/utils/testProps", () => ({
   testProps: (id: string) => ({ testID: id }),
 }))
 
-jest.mock("@app/screens/phone-auth-screen", () => ({
-  PhoneLoginInitiateType: { Login: "Login" },
-}))
+/**
+ * The screen only needs PhoneLoginInitiateType from the barrel, so the barrel is
+ * replaced by its leaf module: that keeps the real wire values while leaving the
+ * firebase app-check native module out of the test.
+ */
+jest.mock("@app/screens/phone-auth-screen", () =>
+  jest.requireActual("@app/screens/phone-auth-screen/phone-login-initiate-type"),
+)
 
 describe("AccountTypeSelectionScreen", () => {
   beforeEach(() => {

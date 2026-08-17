@@ -38,18 +38,9 @@ jest.mock("@app/hooks/use-intra-ledger-conversion", () => ({
     mockUseIntraLedgerConversion(config),
 }))
 
-jest.mock("react-native-modal", () => {
-  const ReactNs = jest.requireActual<typeof import("react")>("react")
-  const RN = jest.requireActual<typeof import("react-native")>("react-native")
-  const MockModal = ({
-    children,
-    isVisible,
-  }: {
-    children: React.ReactNode
-    isVisible: boolean
-  }) => (isVisible ? ReactNs.createElement(RN.View, null, children) : null)
-  return { __esModule: true, default: MockModal }
-})
+jest.mock("react-native-modal", () =>
+  jest.requireActual("@mocks/react-native-modal-mock"),
+)
 
 import { UsdConvertToBtcModal } from "@app/components/usd-convert-to-btc-modal"
 
