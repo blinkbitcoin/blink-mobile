@@ -966,6 +966,8 @@ export type FeesInformation = {
 /** Provides global settings for the application which might have an impact for the user. */
 export type Globals = {
   readonly __typename: 'Globals';
+  /** Daily transaction limits enforced for each account level, in USD cents. */
+  readonly accountLimitsByLevel: ReadonlyArray<AccountLevelLimits>;
   /** Current block height and block hash */
   readonly blockInfo?: Maybe<BlockInfo>;
   readonly buildInformation: BuildInformation;
@@ -3409,6 +3411,11 @@ export type KycFlowStartMutationVariables = Exact<{
 
 export type KycFlowStartMutation = { readonly __typename: 'Mutation', readonly kycFlowStart: { readonly __typename: 'OnboardingFlowStartResult', readonly workflowRunId: string, readonly tokenWeb: string } };
 
+export type AccountLimitsByLevelQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type AccountLimitsByLevelQuery = { readonly __typename: 'Query', readonly globals?: { readonly __typename: 'Globals', readonly accountLimitsByLevel: ReadonlyArray<{ readonly __typename: 'AccountLevelLimits', readonly level: AccountLevel, readonly withdrawal: number }> } | null };
+
 export type UserLogoutMutationVariables = Exact<{
   input: UserLogoutInput;
 }>;
@@ -3973,11 +3980,6 @@ export type AccountUpdateDisplayCurrencyMutationVariables = Exact<{
 
 
 export type AccountUpdateDisplayCurrencyMutation = { readonly __typename: 'Mutation', readonly accountUpdateDisplayCurrency: { readonly __typename: 'AccountUpdateDisplayCurrencyPayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly account?: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly displayCurrency: string } | null } };
-
-export type AccountLimitsByLevelQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type AccountLimitsByLevelQuery = { readonly __typename: 'Query', readonly globals?: { readonly __typename: 'Globals', readonly accountLimitsByLevel: ReadonlyArray<{ readonly __typename: 'AccountLevelLimits', readonly level: AccountLevel, readonly withdrawal: number }> } | null };
 
 export type FeeRatesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -5369,6 +5371,48 @@ export function useKycFlowStartMutation(baseOptions?: Apollo.MutationHookOptions
 export type KycFlowStartMutationHookResult = ReturnType<typeof useKycFlowStartMutation>;
 export type KycFlowStartMutationResult = Apollo.MutationResult<KycFlowStartMutation>;
 export type KycFlowStartMutationOptions = Apollo.BaseMutationOptions<KycFlowStartMutation, KycFlowStartMutationVariables>;
+export const AccountLimitsByLevelDocument = gql`
+    query accountLimitsByLevel {
+  globals {
+    accountLimitsByLevel {
+      level
+      withdrawal
+    }
+  }
+}
+    `;
+
+/**
+ * __useAccountLimitsByLevelQuery__
+ *
+ * To run a query within a React component, call `useAccountLimitsByLevelQuery` and pass it any options that fit your needs.
+ * When your component renders, `useAccountLimitsByLevelQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useAccountLimitsByLevelQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useAccountLimitsByLevelQuery(baseOptions?: Apollo.QueryHookOptions<AccountLimitsByLevelQuery, AccountLimitsByLevelQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<AccountLimitsByLevelQuery, AccountLimitsByLevelQueryVariables>(AccountLimitsByLevelDocument, options);
+      }
+export function useAccountLimitsByLevelLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<AccountLimitsByLevelQuery, AccountLimitsByLevelQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<AccountLimitsByLevelQuery, AccountLimitsByLevelQueryVariables>(AccountLimitsByLevelDocument, options);
+        }
+export function useAccountLimitsByLevelSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<AccountLimitsByLevelQuery, AccountLimitsByLevelQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<AccountLimitsByLevelQuery, AccountLimitsByLevelQueryVariables>(AccountLimitsByLevelDocument, options);
+        }
+export type AccountLimitsByLevelQueryHookResult = ReturnType<typeof useAccountLimitsByLevelQuery>;
+export type AccountLimitsByLevelLazyQueryHookResult = ReturnType<typeof useAccountLimitsByLevelLazyQuery>;
+export type AccountLimitsByLevelSuspenseQueryHookResult = ReturnType<typeof useAccountLimitsByLevelSuspenseQuery>;
+export type AccountLimitsByLevelQueryResult = Apollo.QueryResult<AccountLimitsByLevelQuery, AccountLimitsByLevelQueryVariables>;
 export const UserLogoutDocument = gql`
     mutation userLogout($input: UserLogoutInput!) {
   userLogout(input: $input) {
@@ -9285,48 +9329,6 @@ export function useAccountUpdateDisplayCurrencyMutation(baseOptions?: Apollo.Mut
 export type AccountUpdateDisplayCurrencyMutationHookResult = ReturnType<typeof useAccountUpdateDisplayCurrencyMutation>;
 export type AccountUpdateDisplayCurrencyMutationResult = Apollo.MutationResult<AccountUpdateDisplayCurrencyMutation>;
 export type AccountUpdateDisplayCurrencyMutationOptions = Apollo.BaseMutationOptions<AccountUpdateDisplayCurrencyMutation, AccountUpdateDisplayCurrencyMutationVariables>;
-export const AccountLimitsByLevelDocument = gql`
-    query accountLimitsByLevel {
-  globals {
-    accountLimitsByLevel {
-      level
-      withdrawal
-    }
-  }
-}
-    `;
-
-/**
- * __useAccountLimitsByLevelQuery__
- *
- * To run a query within a React component, call `useAccountLimitsByLevelQuery` and pass it any options that fit your needs.
- * When your component renders, `useAccountLimitsByLevelQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useAccountLimitsByLevelQuery({
- *   variables: {
- *   },
- * });
- */
-export function useAccountLimitsByLevelQuery(baseOptions?: Apollo.QueryHookOptions<AccountLimitsByLevelQuery, AccountLimitsByLevelQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<AccountLimitsByLevelQuery, AccountLimitsByLevelQueryVariables>(AccountLimitsByLevelDocument, options);
-      }
-export function useAccountLimitsByLevelLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<AccountLimitsByLevelQuery, AccountLimitsByLevelQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<AccountLimitsByLevelQuery, AccountLimitsByLevelQueryVariables>(AccountLimitsByLevelDocument, options);
-        }
-export function useAccountLimitsByLevelSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<AccountLimitsByLevelQuery, AccountLimitsByLevelQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<AccountLimitsByLevelQuery, AccountLimitsByLevelQueryVariables>(AccountLimitsByLevelDocument, options);
-        }
-export type AccountLimitsByLevelQueryHookResult = ReturnType<typeof useAccountLimitsByLevelQuery>;
-export type AccountLimitsByLevelLazyQueryHookResult = ReturnType<typeof useAccountLimitsByLevelLazyQuery>;
-export type AccountLimitsByLevelSuspenseQueryHookResult = ReturnType<typeof useAccountLimitsByLevelSuspenseQuery>;
-export type AccountLimitsByLevelQueryResult = Apollo.QueryResult<AccountLimitsByLevelQuery, AccountLimitsByLevelQueryVariables>;
 export const FeeRatesDocument = gql`
     query feeRates {
   globals {
@@ -10265,6 +10267,7 @@ export type ResolversTypes = {
   AccountEnableNotificationCategoryInput: AccountEnableNotificationCategoryInput;
   AccountEnableNotificationChannelInput: AccountEnableNotificationChannelInput;
   AccountLevel: AccountLevel;
+  AccountLevelLimits: ResolverTypeWrapper<AccountLevelLimits>;
   AccountLimit: ResolverTypeWrapper<ResolversInterfaceTypes<ResolversTypes>['AccountLimit']>;
   AccountLimits: ResolverTypeWrapper<AccountLimits>;
   AccountMigration: ResolverTypeWrapper<AccountMigration>;
@@ -10575,6 +10578,7 @@ export type ResolversParentTypes = {
   AccountDisableNotificationChannelInput: AccountDisableNotificationChannelInput;
   AccountEnableNotificationCategoryInput: AccountEnableNotificationCategoryInput;
   AccountEnableNotificationChannelInput: AccountEnableNotificationChannelInput;
+  AccountLevelLimits: AccountLevelLimits;
   AccountLimit: ResolversInterfaceTypes<ResolversParentTypes>['AccountLimit'];
   AccountLimits: AccountLimits;
   AccountMigration: AccountMigration;
@@ -10876,6 +10880,15 @@ export type AccountResolvers<ContextType = any, ParentType extends ResolversPare
 export type AccountDeletePayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['AccountDeletePayload'] = ResolversParentTypes['AccountDeletePayload']> = {
   errors?: Resolver<ReadonlyArray<ResolversTypes['Error']>, ParentType, ContextType>;
   success?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type AccountLevelLimitsResolvers<ContextType = any, ParentType extends ResolversParentTypes['AccountLevelLimits'] = ResolversParentTypes['AccountLevelLimits']> = {
+  convert?: Resolver<ResolversTypes['CentAmount'], ParentType, ContextType>;
+  internalSend?: Resolver<ResolversTypes['CentAmount'], ParentType, ContextType>;
+  interval?: Resolver<ResolversTypes['Seconds'], ParentType, ContextType>;
+  level?: Resolver<ResolversTypes['AccountLevel'], ParentType, ContextType>;
+  withdrawal?: Resolver<ResolversTypes['CentAmount'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -11361,6 +11374,7 @@ export type FeesInformationResolvers<ContextType = any, ParentType extends Resol
 };
 
 export type GlobalsResolvers<ContextType = any, ParentType extends ResolversParentTypes['Globals'] = ResolversParentTypes['Globals']> = {
+  accountLimitsByLevel?: Resolver<ReadonlyArray<ResolversTypes['AccountLevelLimits']>, ParentType, ContextType>;
   blockInfo?: Resolver<Maybe<ResolversTypes['BlockInfo']>, ParentType, ContextType>;
   buildInformation?: Resolver<ResolversTypes['BuildInformation'], ParentType, ContextType>;
   feesInformation?: Resolver<ResolversTypes['FeesInformation'], ParentType, ContextType>;
@@ -12316,6 +12330,7 @@ export type WelcomeProfileResolvers<ContextType = any, ParentType extends Resolv
 export type Resolvers<ContextType = any> = {
   Account?: AccountResolvers<ContextType>;
   AccountDeletePayload?: AccountDeletePayloadResolvers<ContextType>;
+  AccountLevelLimits?: AccountLevelLimitsResolvers<ContextType>;
   AccountLimit?: AccountLimitResolvers<ContextType>;
   AccountLimits?: AccountLimitsResolvers<ContextType>;
   AccountMigration?: AccountMigrationResolvers<ContextType>;
