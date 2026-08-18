@@ -152,6 +152,7 @@ as such and no longer routes to `sendBitcoinDestination` from a pin.
 | Offline cache | ~2.4 MB of places chunked at 5k rows across AsyncStorage, meta row written last so a torn write reads as "no cache" |
 | Per-place detail | Fetched on tap; the snapshot holds only id, coordinates, icon and boost |
 | Labels | Fetched per settled viewport, on a ~1.1 km grid so the centre is not a location trail |
+| Marker removal | Needs `patches/react-native-maps+1.27.2.patch`: `safeAddFeature` overwrote instead of inserting, so filtered-out pins stayed on the map forever. Pinned by `__tests__/patches/maps-marker-removal-patch.spec.ts` |
 | Untrusted input | Every OSM-sourced link is scheme-checked in `btcmap/urls.ts` before it reaches `Linking.openURL` |
 | Kill switch | `btcMapPlacesEnabled` in Remote Config empties the map without a release |
 
