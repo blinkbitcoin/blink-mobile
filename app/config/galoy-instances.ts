@@ -77,8 +77,18 @@ export const resolveGaloyInstanceOrDefault = (
     // A Custom instance persisted by an older app version lacks fields added
     // since it was saved (e.g. fiatUrl, sparkExplorer) — backfill those from
     // the Main instance defaults while keeping every persisted custom value.
+    //
+    // A blank string counts as absent, not as a custom value: the developer
+    // screen seeds every URL input with "" when the current instance is not
+    // Custom and saves them verbatim, so a user who switches to Custom while
+    // filling in only some fields would otherwise persist "" over the defaults.
+    // For kycUrl/fiatUrl that empties the WebView entry allowlist and locks KYC
+    // and buy/sell out behind a generic error (see webview.tsx entryOrigins).
     const persistedFields = Object.fromEntries(
-      Object.entries(input).filter(([, value]) => value !== undefined),
+      Object.entries(input).filter(
+        ([, value]) =>
+          value !== undefined && !(typeof value === "string" && value.trim() === ""),
+      ),
     )
     return { ...GALOY_INSTANCES[0], ...persistedFields, id: "Custom" }
   }

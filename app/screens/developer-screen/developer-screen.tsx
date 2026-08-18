@@ -293,6 +293,7 @@ export const DeveloperScreen: React.FC = () => {
             onPress={() =>
               navigate("webView", {
                 url: urlWebView,
+                allowArbitraryUrl: true,
               })
             }
           />

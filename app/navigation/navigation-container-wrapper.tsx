@@ -20,6 +20,7 @@ import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useMigrationBlocker } from "@app/screens/account-migration/hooks/use-migration-blocker"
 
+import { DEEP_LINK_SCREENS } from "./deep-link-screens"
 import { isMigrationRoute } from "./migration-routes"
 import { RootStackParamList } from "./stack-param-lists"
 import { isUnlockInProgress } from "./unlock-routes"
@@ -283,59 +284,7 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
       "lnurl://",
     ],
     config: {
-      screens: {
-        Primary: {
-          screens: {
-            Home: "home",
-            People: {
-              path: "people",
-              initialRouteName: "peopleHome",
-              screens: {
-                circlesDashboard: "circles",
-              },
-            },
-            Earn: "earn",
-            Map: "map",
-          },
-        },
-        priceHistory: "price",
-        receiveBitcoin: "receive",
-        conversionDetails: "convert",
-        scanningQRCode: "scan-qr",
-        totpRegistrationInitiate: "settings/2fa",
-        currency: "settings/display-currency",
-        defaultWallet: "settings/default-account",
-        language: "settings/language",
-        theme: "settings/theme",
-        security: "settings/security",
-        accountScreen: "settings/account",
-        transactionLimitsScreen: "settings/tx-limits",
-        feeRatesScreen: "settings/fee-rates",
-        notificationSettingsScreen: "settings/notifications",
-        emailRegistrationInitiate: "settings/email",
-        settings: "settings",
-        cardDashboardScreen: "card",
-        cardDetailsScreen: "card/details",
-        cardLimitsScreen: "card/limits",
-        cardSettingsScreen: "card/settings",
-        cardStatementsScreen: "card/statements",
-        cardTransactionDetailsScreen: {
-          path: "card/transaction/:transactionId",
-        },
-        accountMigrationEntry: "account-migration",
-        cardOnboardingWelcomeScreen: "card/onboarding",
-        cardOnboardingSubscribeScreen: "card/onboarding/subscribe",
-        cardOnboardingLoadingScreen: "card/onboarding/loading",
-        cardOnboardingPersonalInfoScreen: "card/onboarding/personal-info",
-        cardOnboardingAcknowledgementScreen: "card/onboarding/acknowledgement",
-        cardOnboardingProcessingScreen: "card/onboarding/processing",
-        cardOnboardingPreapprovedScreen: "card/onboarding/preapproved",
-        cardOnboardingApprovedScreen: "card/onboarding/approved",
-        transactionDetail: {
-          path: "transaction/:txid",
-        },
-        sendBitcoinDestination: ":payment",
-      },
+      screens: DEEP_LINK_SCREENS,
     },
     getInitialURL: async () => {
       const url = await Linking.getInitialURL()
