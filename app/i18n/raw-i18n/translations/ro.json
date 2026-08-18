@@ -72,6 +72,7 @@
   },
   "AuthenticationScreen": {
     "authenticationDescription": "Autentificați-vă pentru a continua",
+    "authenticationRequired": "Este necesară autentificarea. Puteți seta un cod PIN sau date biometrice în setările de securitate.",
     "setUp": "Configurați autentificarea biometrică",
     "setUpAuthenticationDescription": "Utilizați autentificarea biometrică",
     "skip": "Săriți peste",
@@ -2122,6 +2123,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "PIN incorect. {attemptsRemaining: number} încercări rămase.",
+    "enterPin": "Introduceți codul PIN",
     "oneAttemptRemaining": "PIN incorect. 1 încercare rămasă.",
     "setPin": "Setează codul PIN",
     "setPinFailedMatch": "Pinurile nu se potrivesc - Setează codul PIN",
@@ -3413,8 +3415,7 @@
         "pinChangedTitle": "PIN schimbat",
         "pinChangedSubtitle": "PIN-ul dvs. a fost schimbat cu succes.",
         "pinChangedToast": "PIN-ul a fost schimbat cu succes",
-        "biometricDescription": "Verificați-vă identitatea pentru a schimba PIN-ul",
-        "biometricRequired": "Autentificarea biometrică este necesară pentru a schimba PIN-ul."
+        "biometricDescription": "Verificați-vă identitatea pentru a schimba PIN-ul"
       }
     },
     "ReplaceCard": {

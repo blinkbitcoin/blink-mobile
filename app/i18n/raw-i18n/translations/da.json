@@ -72,6 +72,7 @@
   },
   "AuthenticationScreen": {
     "authenticationDescription": "Autentificer for at fortsætte",
+    "authenticationRequired": "Godkendelse er påkrævet. Du kan opsætte en PIN-kode eller biometri i sikkerhedsindstillingerne.",
     "setUp": "Opsætning af Biometrisk Autentificering",
     "setUpAuthenticationDescription": "Brug biometrisk autentificering",
     "skip": "Spring over",
@@ -2122,6 +2123,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "Forkert PIN-kode. {attemptsRemaining: number} forsøg tilbage.",
+    "enterPin": "Indtast din PIN-kode",
     "oneAttemptRemaining": "Forkert PIN-kode. 1 forsøg tilbage.",
     "setPin": "Vælg din PIN-kode.",
     "setPinFailedMatch": "PIN-koderne matcher ikke - Vælg din PIN-kode.",
@@ -3413,8 +3415,7 @@
         "pinChangedTitle": "PIN ændret",
         "pinChangedSubtitle": "Din PIN er blevet ændret.",
         "pinChangedToast": "PIN er ændret",
-        "biometricDescription": "Bekræft din identitet for at ændre PIN-kode",
-        "biometricRequired": "Biometrisk godkendelse er påkrævet for at ændre din PIN-kode."
+        "biometricDescription": "Bekræft din identitet for at ændre PIN-kode"
       }
     },
     "ReplaceCard": {

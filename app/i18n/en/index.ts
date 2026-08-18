@@ -46,6 +46,8 @@ const en: BaseTranslation = {
   },
   AuthenticationScreen: {
     authenticationDescription: "Authenticate to continue",
+    authenticationRequired:
+      "Authentication is required. You can set up a PIN or biometrics in Security settings.",
     setUp: "Set up Biometric Authentication",
     setUpAuthenticationDescription: "Use biometric to authenticate",
     skip: "Skip",
@@ -2126,6 +2128,7 @@ const en: BaseTranslation = {
   },
   PinScreen: {
     attemptsRemaining: "Incorrect PIN. {attemptsRemaining: number} attempts remaining.",
+    enterPin: "Enter your PIN code",
     oneAttemptRemaining: "Incorrect PIN. 1 attempt remaining.",
     setPin: "Set your PIN code",
     setPinFailedMatch: "Pins didn't match - Set your PIN code",
@@ -3571,8 +3574,6 @@ const en: BaseTranslation = {
         enterNewPin: "Enter new PIN",
         enterNewPinSubtitle: "Please enter your new 4-digit PIN.",
         biometricDescription: "Verify your identity to change PIN",
-        biometricRequired:
-          "Biometric authentication is required to change your PIN.",
         pinChangedTitle: "PIN changed",
         pinChangedSubtitle: "Your PIN has been changed successfully.",
         pinChangedToast: "PIN has been changed successfully",

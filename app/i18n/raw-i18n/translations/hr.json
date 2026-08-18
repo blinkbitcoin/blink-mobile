@@ -72,6 +72,7 @@
   },
   "AuthenticationScreen": {
     "authenticationDescription": "Autentificirajte se za nastavak",
+    "authenticationRequired": "Potrebna je autentifikacija. PIN kod ili biometriju možete postaviti u sigurnosnim postavkama.",
     "setUp": "Postavite biometrijsku autentifikaciju",
     "setUpAuthenticationDescription": "Koristite biometriju za autentifikaciju",
     "skip": "Preskoči",
@@ -2122,6 +2123,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "Netočan PIN. {attemptsRemaining: number} preostalih pokušaja.",
+    "enterPin": "Unesite svoj PIN kod",
     "oneAttemptRemaining": "Netočan PIN. Preostao je 1 pokušaj.",
     "setPin": "Postavite svoj PIN kod",
     "setPinFailedMatch": "Pinovi se ne podudaraju - postavite svoj PIN kod",
@@ -3413,8 +3415,7 @@
         "pinChangedTitle": "PIN promijenjen",
         "pinChangedSubtitle": "Vaš PIN je uspješno promijenjen.",
         "pinChangedToast": "PIN je uspješno promijenjen",
-        "biometricDescription": "Potvrdite svoj identitet za promjenu PIN-a",
-        "biometricRequired": "Biometrijska autentifikacija je potrebna za promjenu vašeg PIN-a."
+        "biometricDescription": "Potvrdite svoj identitet za promjenu PIN-a"
       }
     },
     "ReplaceCard": {

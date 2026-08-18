@@ -72,6 +72,7 @@
   },
   "AuthenticationScreen": {
     "authenticationDescription": "Overte sa, aby ste mohli pokračovať",
+    "authenticationRequired": "Vyžaduje sa overenie. PIN kód alebo biometriu si môžete nastaviť v nastaveniach zabezpečenia.",
     "setUp": "Nastavenie biometrického overovania",
     "setUpAuthenticationDescription": "Použitie biometrických údajov na overovanie",
     "skip": "Preskočiť",
@@ -2122,6 +2123,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "Nesprávny PIN kód. Zostávajú {attemptsRemaining: number} pokusy.",
+    "enterPin": "Zadajte svoj PIN kód",
     "oneAttemptRemaining": "Nesprávny PIN kód. Zostáva 1 pokus.",
     "setPin": "Nastavenie PIN kódu",
     "setPinFailedMatch": "PINy sa nezhodujú - nastavte svoj PIN kód",
@@ -3413,8 +3415,7 @@
         "pinChangedTitle": "PIN zmenený",
         "pinChangedSubtitle": "Váš PIN bol úspešne zmenený.",
         "pinChangedToast": "PIN bol úspešne zmenený",
-        "biometricDescription": "Overte svoju totožnosť na zmenu PINu",
-        "biometricRequired": "Na zmenu PINu je vyžadovaná biometrická autentifikácia."
+        "biometricDescription": "Overte svoju totožnosť na zmenu PINu"
       }
     },
     "ReplaceCard": {

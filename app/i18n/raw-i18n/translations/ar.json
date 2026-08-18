@@ -72,6 +72,7 @@
   },
   "AuthenticationScreen": {
     "authenticationDescription": "التحقّق من اجل المتابعة",
+    "authenticationRequired": "المصادقة مطلوبة. يمكنك إعداد رمز PIN أو المصادقة الحيوية في إعدادات الأمان.",
     "setUp": "إعداد التحقق البيومتري",
     "setUpAuthenticationDescription": "استعمل وسيلة التحقق البيومتري",
     "skip": "تخطى",
@@ -2122,6 +2123,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "رمز شخصي خاطئ. بقي {attemptsRemaining: string} محاولات.",
+    "enterPin": "أدخل رمز PIN الخاص بك",
     "oneAttemptRemaining": "رمز شخصي خاطئ. بقيت محاولة واحدة.",
     "setPin": "عيّن رمزك الشخصي (PIN)",
     "setPinFailedMatch": "رموز ال PIN غير متوافقة - قم بتعيين رمز PIN الخاص بك",
@@ -3413,8 +3415,7 @@
         "pinChangedTitle": "تم تغيير رقم التعريف",
         "pinChangedSubtitle": "تم تغيير رقم التعريف الشخصي بنجاح.",
         "pinChangedToast": "تم تغيير رمز PIN بنجاح",
-        "biometricDescription": "تحقق من هويتك لتغيير رمز PIN",
-        "biometricRequired": "المصادقة البيومترية مطلوبة لتغيير رمز PIN الخاص بك."
+        "biometricDescription": "تحقق من هويتك لتغيير رمز PIN"
       }
     },
     "ReplaceCard": {

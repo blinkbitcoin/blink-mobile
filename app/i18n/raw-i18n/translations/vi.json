@@ -72,6 +72,7 @@
   },
   "AuthenticationScreen": {
     "authenticationDescription": "Xác thực để tiếp tục",
+    "authenticationRequired": "Cần xác thực. Bạn có thể thiết lập mã PIN hoặc sinh trắc học trong cài đặt bảo mật.",
     "setUp": "Đặt xác thực vân tay",
     "setUpAuthenticationDescription": "Sử dụng vân tay để xác thực",
     "skip": "Bỏ qua",
@@ -2122,6 +2123,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "Mã PIN không chính xác. Còn lại {attemptsRemaining: number} lần thử.",
+    "enterPin": "Nhập mã PIN của bạn",
     "oneAttemptRemaining": "Mã PIN không chính xác. Còn lại 1 lần thử .",
     "setPin": "Đặt mã PIN của bạn",
     "setPinFailedMatch": "Mã PIN không khớp - Đặt mã PIN của bạn",
@@ -3413,8 +3415,7 @@
         "pinChangedTitle": "Đã đổi PIN",
         "pinChangedSubtitle": "PIN của bạn đã được đổi thành công.",
         "pinChangedToast": "Đã thay đổi mã PIN thành công",
-        "biometricDescription": "Xác minh danh tính của bạn để thay đổi mã PIN",
-        "biometricRequired": "Xác thực sinh trắc học là bắt buộc để thay đổi mã PIN của bạn."
+        "biometricDescription": "Xác minh danh tính của bạn để thay đổi mã PIN"
       }
     },
     "ReplaceCard": {

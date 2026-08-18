@@ -176,6 +176,10 @@ type RootTranslation = {
 		 */
 		authenticationDescription: string
 		/**
+		 * A​u​t​h​e​n​t​i​c​a​t​i​o​n​ ​i​s​ ​r​e​q​u​i​r​e​d​.​ ​Y​o​u​ ​c​a​n​ ​s​e​t​ ​u​p​ ​a​ ​P​I​N​ ​o​r​ ​b​i​o​m​e​t​r​i​c​s​ ​i​n​ ​S​e​c​u​r​i​t​y​ ​s​e​t​t​i​n​g​s​.
+		 */
+		authenticationRequired: string
+		/**
 		 * S​e​t​ ​u​p​ ​B​i​o​m​e​t​r​i​c​ ​A​u​t​h​e​n​t​i​c​a​t​i​o​n
 		 */
 		setUp: string
@@ -6583,6 +6587,10 @@ type RootTranslation = {
 		 */
 		attemptsRemaining: RequiredParams<'attemptsRemaining'>
 		/**
+		 * E​n​t​e​r​ ​y​o​u​r​ ​P​I​N​ ​c​o​d​e
+		 */
+		enterPin: string
+		/**
 		 * I​n​c​o​r​r​e​c​t​ ​P​I​N​.​ ​1​ ​a​t​t​e​m​p​t​ ​r​e​m​a​i​n​i​n​g​.
 		 */
 		oneAttemptRemaining: string
@@ -11386,10 +11394,6 @@ type RootTranslation = {
 				 */
 				biometricDescription: string
 				/**
-				 * B​i​o​m​e​t​r​i​c​ ​a​u​t​h​e​n​t​i​c​a​t​i​o​n​ ​i​s​ ​r​e​q​u​i​r​e​d​ ​t​o​ ​c​h​a​n​g​e​ ​y​o​u​r​ ​P​I​N​.
-				 */
-				biometricRequired: string
-				/**
 				 * P​I​N​ ​c​h​a​n​g​e​d
 				 */
 				pinChangedTitle: string
@@ -13488,6 +13492,10 @@ export type TranslationFunctions = {
 		 * Authenticate to continue
 		 */
 		authenticationDescription: () => LocalizedString
+		/**
+		 * Authentication is required. You can set up a PIN or biometrics in Security settings.
+		 */
+		authenticationRequired: () => LocalizedString
 		/**
 		 * Set up Biometric Authentication
 		 */
@@ -19887,6 +19895,10 @@ export type TranslationFunctions = {
 		 */
 		attemptsRemaining: (arg: { attemptsRemaining: number }) => LocalizedString
 		/**
+		 * Enter your PIN code
+		 */
+		enterPin: () => LocalizedString
+		/**
 		 * Incorrect PIN. 1 attempt remaining.
 		 */
 		oneAttemptRemaining: () => LocalizedString
@@ -24567,10 +24579,6 @@ export type TranslationFunctions = {
 				 * Verify your identity to change PIN
 				 */
 				biometricDescription: () => LocalizedString
-				/**
-				 * Biometric authentication is required to change your PIN.
-				 */
-				biometricRequired: () => LocalizedString
 				/**
 				 * PIN changed
 				 */

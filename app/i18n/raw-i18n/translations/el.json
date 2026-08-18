@@ -72,6 +72,7 @@
   },
   "AuthenticationScreen": {
     "authenticationDescription": "Πιστοποιήστε την ταυτότητα για να συνεχίσετε",
+    "authenticationRequired": "Απαιτείται έλεγχος ταυτότητας. Μπορείτε να ορίσετε κωδικό PIN ή βιομετρικά στοιχεία στις ρυθμίσεις ασφαλείας.",
     "setUp": "Δημιουργήστε βιομετρική πιστοποίηση γνησιότητας",
     "setUpAuthenticationDescription": "Χρησιμοποιήστε βιομετρικά για πιστοποίηση γνησιότητας",
     "skip": "Παραλείψτε το",
@@ -2122,6 +2123,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "Λανθασμένο PIN. {attemptsRemaining: number} προσπάθειες που απομένουν.",
+    "enterPin": "Εισαγάγετε τον κωδικό σας PIN",
     "oneAttemptRemaining": "Λανθασμένο PIN. Απομένει 1 προσπάθεια.",
     "setPin": "Ορίστε τον κωδικό σας PIN ",
     "setPinFailedMatch": "Οι κωδικοί PIN δεν ταιριάζουν - Ορίστε τον κωδικό PIN σας",
@@ -3413,8 +3415,7 @@
         "pinChangedTitle": "Το PIN άλλαξε",
         "pinChangedSubtitle": "Το PIN σας άλλαξε επιτυχώς.",
         "pinChangedToast": "Ο κωδικός PIN άλλαξε επιτυχώς",
-        "biometricDescription": "Επαληθεύστε την ταυτότητά σας για αλλαγή PIN",
-        "biometricRequired": "Η βιομετρική ταυτοποίηση απαιτείται για την αλλαγή του PIN σας."
+        "biometricDescription": "Επαληθεύστε την ταυτότητά σας για αλλαγή PIN"
       }
     },
     "ReplaceCard": {

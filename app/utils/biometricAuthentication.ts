@@ -53,7 +53,12 @@ export default class BiometricWrapper {
       FingerprintScanner.release()
       await FingerprintScanner.authenticate({
         description,
-        fallbackEnabled: true,
+        // The library's iOS policy is hardcoded biometric-only
+        // (deviceOwnerAuthenticationWithBiometrics), so this flag only controls
+        // whether a fallback BUTTON renders — one whose tap can only ever reject
+        // with UserFallback. Don't offer a button that always fails; the pin
+        // fallback lives in useLocalAuthGate instead. Android ignores the flag.
+        fallbackEnabled: false,
       })
 
       handleSuccess()

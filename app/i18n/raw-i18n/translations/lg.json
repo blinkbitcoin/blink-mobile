@@ -72,6 +72,7 @@
   },
   "AuthenticationScreen": {
     "authenticationDescription": "Kakasa okugenda mu maaso",
+    "authenticationRequired": "Okakasibwa kwetaagisa. Osobola okuteekawo PIN oba biometriks mu ntegeka z'obukuumi.",
     "setUp": "Teekateeka okukakasa kwa Biometric",
     "setUpAuthenticationDescription": "Kozesa biometric okukakasa",
     "skip": "Buuka",
@@ -2122,6 +2123,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "PIN enkyamu. {attemptsRemaining: number} okugezaako okusigaddewo.",
+    "enterPin": "Teeka pini koodi yo",
     "oneAttemptRemaining": "PIN enkyamu. mulundi 1 ogw'okugezaako ogusigaddewo.",
     "setPin": "Kola PIN yo",
     "setPinFailedMatch": "Pins tezikwatagana - Kola PIN yo",
@@ -3413,8 +3415,7 @@
         "pinChangedTitle": "PIN ekyusiddwa",
         "pinChangedSubtitle": "PIN yo ekyusiddwa bulungi.",
         "pinChangedToast": "PIN ekyusiddwa obulungi",
-        "biometricDescription": "Kakasa obuntubulamu bwo okukyusa PIN",
-        "biometricRequired": "Okukakasa kw'ebiometrike kwetaagisa okukyusa PIN yo."
+        "biometricDescription": "Kakasa obuntubulamu bwo okukyusa PIN"
       }
     },
     "ReplaceCard": {

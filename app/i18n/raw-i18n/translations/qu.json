@@ -72,6 +72,7 @@
   },
   "AuthenticationScreen": {
     "authenticationDescription": "Kaypi tukuyta munanki",
+    "authenticationRequired": "Riqsichiyqa necesitakun. PIN kodta utaq biometriata seguridad kamachinapi churayta atinki.",
     "setUp": "Biometric Authentication tukuyta munay",
     "setUpAuthenticationDescription": "Biometric tukuytaq munan",
     "skip": "Atipanichu",
@@ -2122,6 +2123,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "Mana kani PIN. {attemptsRemaining: number} rantiq kani.",
+    "enterPin": "PIN kodiykita yaykuchiy",
     "oneAttemptRemaining": "Mana kani PIN. 1 rantiq kani.",
     "setPin": "PIN kodiyan kani",
     "setPinFailedMatch": "PIN kodiyan mana kani - PIN kodiyan kani.",
@@ -3413,8 +3415,7 @@
         "pinChangedTitle": "PIN tikrasqa",
         "pinChangedSubtitle": "PIN nisqayki allinta tikrasqa.",
         "pinChangedToast": "PIN allinta tikrasqa",
-        "biometricDescription": "Kikinykita qhaway PIN-ta tikranapaq",
-        "biometricRequired": "Biométrica takyachiy ruranayuqmi PIN-ta tikranapaq."
+        "biometricDescription": "Kikinykita qhaway PIN-ta tikranapaq"
       }
     },
     "ReplaceCard": {

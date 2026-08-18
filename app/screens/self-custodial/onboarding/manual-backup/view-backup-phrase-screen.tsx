@@ -1,4 +1,4 @@
-import React, { useCallback, useLayoutEffect } from "react"
+import React, { useLayoutEffect } from "react"
 import { ActivityIndicator, ScrollView, View } from "react-native"
 
 import { makeStyles, useTheme } from "@rn-vui/themed"
@@ -7,15 +7,15 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloyTertiaryButton } from "@app/components/atomic/galoy-tertiary-button"
-import { headerRightNoGlass, noHeaderRight } from "@app/components/header-no-glass"
+import { headerRightNoGlass } from "@app/components/header-no-glass"
 import { WarningCard } from "@app/components/warning-card"
 import { MnemonicWordsGrid } from "@app/components/mnemonic-words-grid"
 import { Screen } from "@app/components/screen"
 import { SparkCompatibleInfo } from "@app/components/spark-compatible-info"
+import { useAuthGateFailureHandler, useLocalAuthGate } from "@app/hooks"
 import { useScreenSecurity } from "@app/hooks/use-screen-security"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { useBiometricGate } from "@app/screens/card-screen/hooks/use-biometric-gate"
 import { testProps } from "@app/utils/testProps"
 
 import { useViewBackupPhrase } from "../hooks"
@@ -29,31 +29,43 @@ export const ViewBackupPhraseScreen: React.FC = () => {
   const {
     theme: { colors },
   } = useTheme()
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-
   useScreenSecurity()
 
-  const handleAuthFailure = useCallback(() => navigation.goBack(), [navigation])
+  const handleAuthFailure = useAuthGateFailureHandler()
 
-  const authenticated = useBiometricGate({
+  const authenticated = useLocalAuthGate({
     description: LL.BackupScreen.ManualBackup.Phrase.authDescription(),
     onFailure: handleAuthFailure,
-    onlyIfBiometricsEnabled: true,
+    // Product decision (blink-wip#1064): with NO app lock configured, the user
+    // keeps one-tap access to their own backup phrase — the backup path is not
+    // blocked behind lock setup. A factor they did configure is still enforced.
+    required: false,
   })
+
+  if (!authenticated) {
+    return (
+      <Screen preset="fixed">
+        <ActivityIndicator style={styles.loader} color={colors.primary} />
+      </Screen>
+    )
+  }
+
+  return <BackupPhraseContent />
+}
+
+/** Mounted only once the gate has passed: useViewBackupPhrase pulls the mnemonic
+ *  out of the keystore, so neither the words nor the header Copy handler exist
+ *  anywhere in the tree while authentication is still pending. */
+const BackupPhraseContent: React.FC = () => {
+  const { LL } = useI18nContext()
+  const styles = useStyles()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   const { words, handleCopy, handleTestBackup } = useViewBackupPhrase()
 
   const copyLabel = LL.BackupScreen.ManualBackup.Phrase.copy()
 
-  // The header sits outside the `!authenticated` early return below, so it has to
-  // gate itself: without this the Copy button is mounted — and copies the full
-  // mnemonic — while the biometric prompt is still pending.
   useLayoutEffect(() => {
-    if (!authenticated) {
-      navigation.setOptions(noHeaderRight)
-      return
-    }
-
     navigation.setOptions(
       headerRightNoGlass(() => (
         <GaloyTertiaryButton
@@ -67,15 +79,7 @@ export const ViewBackupPhraseScreen: React.FC = () => {
         />
       )),
     )
-  }, [navigation, authenticated, copyLabel, handleCopy, styles])
-
-  if (!authenticated) {
-    return (
-      <Screen preset="fixed">
-        <ActivityIndicator style={styles.loader} color={colors.primary} />
-      </Screen>
-    )
-  }
+  }, [navigation, copyLabel, handleCopy, styles])
 
   return (
     <Screen preset="fixed">

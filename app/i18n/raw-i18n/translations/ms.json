@@ -72,6 +72,7 @@
   },
   "AuthenticationScreen": {
     "authenticationDescription": "Pengesahan anda diperlukan",
+    "authenticationRequired": "Pengesahan diperlukan. Anda boleh menetapkan kod PIN atau biometrik dalam tetapan keselamatan.",
     "setUp": "Tetapkan pengesahan Biometrik",
     "setUpAuthenticationDescription": "Gunakan biometrik untuk pengesahan",
     "skip": "Langkau",
@@ -2122,6 +2123,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "Salah No PIN. {Percubaan yang tinggal: number} kali lagi percubaan.",
+    "enterPin": "Masukkan kod PIN anda",
     "oneAttemptRemaining": "Salah no PIN. 1 lagi percubaan.",
     "setPin": "Tetapkan kod PIN anda",
     "setPinFailedMatch": "Pin tak sama - Tetapkan kod PIN anda",
@@ -3413,8 +3415,7 @@
         "pinChangedTitle": "PIN ditukar",
         "pinChangedSubtitle": "PIN anda telah berjaya ditukar.",
         "pinChangedToast": "PIN berjaya ditukar",
-        "biometricDescription": "Sahkan identiti anda untuk menukar PIN",
-        "biometricRequired": "Pengesahan biometrik diperlukan untuk menukar PIN anda."
+        "biometricDescription": "Sahkan identiti anda untuk menukar PIN"
       }
     },
     "ReplaceCard": {

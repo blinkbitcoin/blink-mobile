@@ -72,6 +72,7 @@
   },
   "AuthenticationScreen": {
     "authenticationDescription": "Confirma la teva identitat per continuar",
+    "authenticationRequired": "Cal autenticació. Pots configurar un codi PIN o biometria a la configuració de seguretat.",
     "setUp": "Configura la identificació biomètrica",
     "setUpAuthenticationDescription": "Utilitza la identificació biomètrica",
     "skip": "Omet",
@@ -2122,6 +2123,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "PIN incorrecte. Queden {attemptsRemaining: string} intents.",
+    "enterPin": "Introdueix el teu codi PIN",
     "oneAttemptRemaining": "PIN incorrecte. Queda 1 intent.",
     "setPin": "Configura el teu codi PIN",
     "setPinFailedMatch": "Els Pins no coincideixen - Estableix el teu codi PIN",
@@ -3413,8 +3415,7 @@
         "pinChangedTitle": "PIN canviat",
         "pinChangedSubtitle": "El vostre PIN s'ha canviat correctament.",
         "pinChangedToast": "El PIN s'ha canviat correctament",
-        "biometricDescription": "Verifiqueu la vostra identitat per canviar el PIN",
-        "biometricRequired": "L'autenticació biomètrica és necessària per canviar el vostre PIN."
+        "biometricDescription": "Verifiqueu la vostra identitat per canviar el PIN"
       }
     },
     "ReplaceCard": {

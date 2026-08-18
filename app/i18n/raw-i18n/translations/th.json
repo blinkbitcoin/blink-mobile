@@ -72,6 +72,7 @@
   },
   "AuthenticationScreen": {
     "authenticationDescription": "ยืนยันตัวตนเพื่อดำเนินการต่อ",
+    "authenticationRequired": "จำเป็นต้องมีการยืนยันตัวตน คุณสามารถตั้งค่าพินโค้ดหรือไบโอเมตริกได้ในการตั้งค่าความปลอดภัย",
     "setUp": "เปิดใช้งานการยืนยันตัวตนด้วยไบโอเมทริกซ์",
     "setUpAuthenticationDescription": "ใช้ไบโอเมทริกซ์เพื่อยืนยันตัวตน",
     "skip": "ข้าม",
@@ -2122,6 +2123,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "พินนี้ผิด มีโอกาสใส่พินอีก {attemptsRemaining: number} ครั้ง",
+    "enterPin": "ป้อนพินโค้ด",
     "oneAttemptRemaining": "พินนี้ผิด โอกาสสุดท้าย",
     "setPin": "ตั้งค่าพินโค้ด",
     "setPinFailedMatch": "พินไม่ตรงกัน - ตั้งค่าพินโค้ดอีกครั้ง",
@@ -3413,8 +3415,7 @@
         "pinChangedTitle": "เปลี่ยน PIN แล้ว",
         "pinChangedSubtitle": "PIN ของคุณถูกเปลี่ยนเรียบร้อยแล้ว",
         "pinChangedToast": "เปลี่ยน PIN สำเร็จแล้ว",
-        "biometricDescription": "ยืนยันตัวตนของคุณเพื่อเปลี่ยนรหัส PIN",
-        "biometricRequired": "ต้องใช้การยืนยันตัวตนด้วยไบโอเมตริกเพื่อเปลี่ยนรหัส PIN ของคุณ"
+        "biometricDescription": "ยืนยันตัวตนของคุณเพื่อเปลี่ยนรหัส PIN"
       }
     },
     "ReplaceCard": {

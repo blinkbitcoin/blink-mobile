@@ -72,6 +72,7 @@
     },
     "AuthenticationScreen": {
         "authenticationDescription": "Autenticar para continuar",
+        "authenticationRequired": "É necessária autenticação. Você pode configurar um código PIN ou biometria nas configurações de segurança.",
         "setUp": "Configurar autenticação biométrica",
         "setUpAuthenticationDescription": "Usar biometria para autenticar",
         "skip": "Pular",
@@ -2122,6 +2123,7 @@
     },
     "PinScreen": {
         "attemptsRemaining": "PIN incorreto. {attemptsRemaining: string} tentativas restantes.",
+        "enterPin": "Insira seu código PIN",
         "oneAttemptRemaining": "PIN incorreto. 1 tentativa restante.",
         "setPin": "Defina seu código PIN",
         "setPinFailedMatch": "Os PINs não correspondem - Defina seu código PIN",
@@ -3413,8 +3415,7 @@
                 "pinChangedTitle": "PIN alterado",
                 "pinChangedSubtitle": "Seu PIN foi alterado com sucesso.",
                 "pinChangedToast": "O PIN foi alterado com sucesso",
-                "biometricDescription": "Verifique sua identidade para alterar o PIN",
-                "biometricRequired": "A autenticação biométrica é necessária para alterar seu PIN."
+                "biometricDescription": "Verifique sua identidade para alterar o PIN"
             }
         },
         "ReplaceCard": {

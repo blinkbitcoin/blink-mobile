@@ -11,12 +11,11 @@ import { headerRightNoGlass } from "@app/components/header-no-glass"
 import { InfoSection, InfoCard } from "@app/components/card-screen"
 import { Screen } from "@app/components/screen"
 import { CardStatus } from "@app/graphql/generated"
-import { useClipboard } from "@app/hooks"
+import { useAuthGateFailureHandler, useClipboard, useLocalAuthGate } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { formatCardDisplayNumber } from "@app/utils/helper"
 
-import { useBiometricGate } from "./hooks/use-biometric-gate"
 import { useCardData } from "./hooks/use-card-data"
 import { isCardFrozen, formatCardType, formatIssuedDate } from "./utils/card-display"
 
@@ -33,9 +32,11 @@ export const CardDetailsScreen: React.FC = () => {
 
   const handleDismiss = useCallback(() => navigation.goBack(), [navigation])
 
-  const authenticated = useBiometricGate({
+  const handleAuthFailure = useAuthGateFailureHandler()
+
+  const authenticated = useLocalAuthGate({
     description: LL.CardFlow.CardDetails.authDescription(),
-    onFailure: handleDismiss,
+    onFailure: handleAuthFailure,
   })
 
   const { card, loading: cardLoading } = useCardData()

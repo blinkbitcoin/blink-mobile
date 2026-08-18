@@ -72,6 +72,7 @@
     },
     "AuthenticationScreen": {
         "authenticationDescription": "認証して続ける",
+        "authenticationRequired": "認証が必要です。セキュリティ設定でPINコードまたは生体認証を設定できます。",
         "setUp": "生体認証の設定",
         "setUpAuthenticationDescription": "生体認証を有効にする",
         "skip": "スキップ",
@@ -2122,6 +2123,7 @@
     },
     "PinScreen": {
         "attemptsRemaining": "PINコードが間違っています。残り{attemptsRemaining: number}回トライできます。",
+        "enterPin": "PINコードを入力してください",
         "oneAttemptRemaining": "PINコードが間違っています。残り1回トライできます。",
         "setPin": "PINコードを設定してください",
         "setPinFailedMatch": "PINコードが一致しませんでした。PINコードを設定してください",
@@ -3413,8 +3415,7 @@
                 "pinChangedTitle": "PINが変更されました",
                 "pinChangedSubtitle": "PINが正常に変更されました。",
                 "pinChangedToast": "PINが正常に変更されました",
-                "biometricDescription": "PINを変更するために本人確認を行ってください",
-                "biometricRequired": "PINを変更するには生体認証が必要です。"
+                "biometricDescription": "PINを変更するために本人確認を行ってください"
             }
         },
         "ReplaceCard": {

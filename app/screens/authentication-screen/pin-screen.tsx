@@ -1,5 +1,5 @@
 import * as React from "react"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Alert, Text, View } from "react-native"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RouteProp, useNavigation } from "@react-navigation/native"
@@ -17,6 +17,7 @@ import { RootStackParamList } from "../../navigation/stack-param-lists"
 import { PinScreenPurpose } from "../../utils/enum"
 import { sleep } from "../../utils/sleep"
 import KeyStoreWrapper from "../../utils/storage/secureStorage"
+import { testProps } from "../../utils/testProps"
 
 type Props = {
   route: RouteProp<RootStackParamList, "pin">
@@ -28,23 +29,102 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, "pin">>()
 
   const { logout } = useLogout()
-  const { screenPurpose, isResume = false } = route.params
+  const {
+    screenPurpose,
+    isResume = false,
+    onChallengeSuccess,
+    onChallengeFailure,
+  } = route.params
+  /** Called for every purpose, deliberately: its side effects are inert outside the app
+   *  lock — the back-press swallow is isResume-gated and completeUnlock is only invoked
+   *  from the AuthenticatePin branch. Hooks can't be conditional; don't try. */
   const { completeUnlock } = useUnlockScreen({ isResume })
   const { LL } = useI18nContext()
   const [enteredPIN, setEnteredPIN] = useState("")
-  const [helperText, setHelperText] = useState(
-    screenPurpose === PinScreenPurpose.SetPin ? LL.PinScreen.setPin() : "",
-  )
+  const [helperText, setHelperText] = useState(() => {
+    if (screenPurpose === PinScreenPurpose.SetPin) return LL.PinScreen.setPin()
+    if (screenPurpose === PinScreenPurpose.ChallengePin) return LL.PinScreen.enterPin()
+    return ""
+  })
   const [previousPIN, setPreviousPIN] = useState("")
-  const [pinAttempts, setPinAttempts] = useState(0)
 
   const MAX_PIN_ATTEMPTS = 3
 
+  /** Locked from the moment a 4th digit dispatches a completion handler until the
+   *  attempt resolves, so nothing typed mid-decision (or during the lockout's
+   *  logout window) can reach a handler that already made its call. */
+  const inputLockedRef = useRef(false)
+
+  /** Re-arms the keypad for another attempt; the lockout and success paths
+   *  deliberately never call it — the screen is departing. */
+  const resetPinInput = () => {
+    inputLockedRef.current = false
+    setEnteredPIN("")
+  }
+
+  const challengeResolvedRef = useRef(false)
+
+  /** Dismissal is a decline: a challenge can be swiped or backed away (gestures stay on
+   *  for non-resume pin screens, and the BackHandler swallow is isResume-gated), and the
+   *  caller must hear about it exactly once. Success and lockout mark the ref before
+   *  they navigate, so the pop they trigger stays silent here. */
   useEffect(() => {
-    ;(async () => {
-      setPinAttempts(await KeyStoreWrapper.getPinAttemptsOrZero())
-    })()
-  }, [])
+    if (screenPurpose !== PinScreenPurpose.ChallengePin) return
+    return navigation.addListener("beforeRemove", (e) => {
+      if (challengeResolvedRef.current) return
+      challengeResolvedRef.current = true
+      /** Only a pop-family removal is the user declining (swipe and header back
+       *  dispatch POP, hardware back GO_BACK). A RESET/REPLACE is a removal the
+       *  challenge doesn't own — it unmounts the caller too, so a decline
+       *  callback would fire into a screen that no longer exists. */
+      const actionType = e.data.action.type
+      if (
+        actionType === "POP" ||
+        actionType === "POP_TO_TOP" ||
+        actionType === "GO_BACK"
+      ) {
+        /** Deferred: this listener runs inside the removing pop's dispatch, so a
+         *  goBack the caller issues in response would coalesce with the pop
+         *  already in flight and be swallowed — stranding the caller on its
+         *  pending screen. Next tick, the stack has settled and it pops cleanly. */
+        setTimeout(() => onChallengeFailure?.(), 0)
+      }
+    })
+  }, [screenPurpose, navigation, onChallengeFailure])
+
+  /** Shared by the unlock and the challenge: the keystore counter is one budget of three
+   *  guesses across both, and exhausting it ends the session the way the app lock does —
+   *  failing softly at the cap would hand out a fresh guess per re-entry. */
+  const handleWrongPin = async (pinAttempts: number) => {
+    if (pinAttempts < MAX_PIN_ATTEMPTS - 1) {
+      const newPinAttempts = pinAttempts + 1
+      await KeyStoreWrapper.setPinAttempts(newPinAttempts.toString())
+      resetPinInput()
+      if (newPinAttempts === MAX_PIN_ATTEMPTS - 1) {
+        setHelperText(LL.PinScreen.oneAttemptRemaining())
+      } else {
+        const attemptsRemaining = MAX_PIN_ATTEMPTS - newPinAttempts
+        setHelperText(LL.PinScreen.attemptsRemaining({ attemptsRemaining }))
+      }
+    } else {
+      setEnteredPIN("")
+      setHelperText(LL.PinScreen.tooManyAttempts())
+      try {
+        await logout()
+        await sleep(1000)
+      } catch {
+        /** Logout is best-effort here: the lockout's terminal answer is the reset
+         *  below, and the challenge path marks challengeResolvedRef before calling
+         *  us — a thrown error without the reset would strand the caller waiting
+         *  on a callback that can no longer fire. */
+      } finally {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "Primary" }],
+        })
+      }
+    }
+  }
 
   const handleCompletedPinForAuthenticatePin = async (newEnteredPIN: string) => {
     if (newEnteredPIN === (await KeyStoreWrapper.getPinOrEmptyString())) {
@@ -55,46 +135,52 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
           routes: [{ name: "Primary" }],
         }),
       )
-    } else if (pinAttempts < MAX_PIN_ATTEMPTS - 1) {
-      const newPinAttempts = pinAttempts + 1
-      KeyStoreWrapper.setPinAttempts(newPinAttempts.toString())
-      setPinAttempts(newPinAttempts)
-      setEnteredPIN("")
-      if (newPinAttempts === MAX_PIN_ATTEMPTS - 1) {
-        setHelperText(LL.PinScreen.oneAttemptRemaining())
-      } else {
-        const attemptsRemaining = MAX_PIN_ATTEMPTS - newPinAttempts
-        setHelperText(LL.PinScreen.attemptsRemaining({ attemptsRemaining }))
-      }
     } else {
-      setHelperText(LL.PinScreen.tooManyAttempts())
-      await logout()
-      await sleep(1000)
-      navigation.reset({
-        index: 0,
-        routes: [{ name: "Primary" }],
-      })
+      await handleWrongPin(await KeyStoreWrapper.getPinAttemptsOrZero())
     }
+  }
+
+  const handleCompletedPinForChallenge = async (newEnteredPIN: string) => {
+    if (newEnteredPIN === (await KeyStoreWrapper.getPinOrEmptyString())) {
+      challengeResolvedRef.current = true
+      KeyStoreWrapper.resetPinAttempts()
+      onChallengeSuccess?.()
+      navigation.goBack()
+      return
+    }
+    const pinAttempts = await KeyStoreWrapper.getPinAttemptsOrZero()
+    if (pinAttempts >= MAX_PIN_ATTEMPTS - 1) {
+      /** The lockout reset unmounts the caller — that is the outcome, so the failure
+       *  callback (whose only job is dismissing the gated screen) must stay quiet. */
+      challengeResolvedRef.current = true
+    }
+    await handleWrongPin(pinAttempts)
   }
 
   const handleCompletedPinForSetPin = (newEnteredPIN: string) => {
     if (previousPIN.length === 0) {
       setPreviousPIN(newEnteredPIN)
       setHelperText(LL.PinScreen.verifyPin())
-      setEnteredPIN("")
+      resetPinInput()
     } else {
       verifyPINCodeMatches(newEnteredPIN)
     }
   }
 
   const addDigit = (digit: string) => {
+    if (inputLockedRef.current) {
+      return
+    }
     if (enteredPIN.length < 4) {
       const newEnteredPIN = enteredPIN + digit
       setEnteredPIN(newEnteredPIN)
 
       if (newEnteredPIN.length === 4) {
+        inputLockedRef.current = true
         if (screenPurpose === PinScreenPurpose.AuthenticatePin) {
           handleCompletedPinForAuthenticatePin(newEnteredPIN)
+        } else if (screenPurpose === PinScreenPurpose.ChallengePin) {
+          handleCompletedPinForChallenge(newEnteredPIN)
         } else if (screenPurpose === PinScreenPurpose.SetPin) {
           handleCompletedPinForSetPin(newEnteredPIN)
         }
@@ -119,7 +205,7 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
   const returnToSetPin = () => {
     setPreviousPIN("")
     setHelperText(LL.PinScreen.setPinFailedMatch())
-    setEnteredPIN("")
+    resetPinInput()
   }
 
   const circleComponentForDigit = (digit: number) => {
@@ -178,9 +264,14 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
           {buttonComponentForDigit("0")}
           <View style={styles.pinPadButtonContainer}>
             <Button
+              {...testProps("pin-backspace")}
               buttonStyle={styles.pinPadButton}
               icon={<GaloyIcon name="arrow-left" size={32} color="white" />}
-              onPress={() => setEnteredPIN(enteredPIN.slice(0, -1))}
+              onPress={() => {
+                if (!inputLockedRef.current) {
+                  setEnteredPIN(enteredPIN.slice(0, -1))
+                }
+              }}
             />
           </View>
         </View>
