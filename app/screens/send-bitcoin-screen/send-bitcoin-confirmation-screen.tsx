@@ -43,7 +43,11 @@ import { useSendBalances } from "./hooks/use-send-wallets"
 import { useVerifyPaymentSettled } from "./hooks/use-verify-payment-settled"
 import { PaymentSendExtraInfo } from "./payment-details/index.types"
 import useFee from "./use-fee"
-import { PaymentSendCompletedStatus, useSendPayment } from "./use-send-payment"
+import {
+  IDEMPOTENCY_KEY_UNAVAILABLE,
+  PaymentSendCompletedStatus,
+  useSendPayment,
+} from "./use-send-payment"
 import { useSaveLnAddressContact } from "./use-save-lnaddress-contact"
 import { ellipsizeMiddle } from "@app/utils/helper"
 
@@ -153,7 +157,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     loading: sendPaymentLoading,
     sendPayment,
     hasAttemptedSend,
-  } = useSendPayment(sendPaymentMutation)
+  } = useSendPayment(sendPaymentMutation, paymentDetail.idempotencyKeyRef)
 
   // Self-custodial fee failures carry a classified SDK code; custodial ones carry raw
   // GraphQL text that is not fit to show, so only the former replaces the generic string.
@@ -358,7 +362,11 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
           return
         }
 
-        setPaymentError(err.message || err.toString())
+        setPaymentError(
+          err.message === IDEMPOTENCY_KEY_UNAVAILABLE
+            ? LL.SendBitcoinConfirmationScreen.somethingWentWrong()
+            : err.message || err.toString(),
+        )
       }
     }
   }, [
@@ -611,7 +619,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
                 loadingText={LL.SendBitcoinConfirmationScreen.slideConfirming()}
                 onSwipe={handleSendPayment}
                 disabled={
-                  !validAmount || hasAttemptedSend || feeUnavailable || dustNotEvaluable
+                  !validAmount || !sendPayment || feeUnavailable || dustNotEvaluable
                 }
               />
             </View>

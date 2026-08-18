@@ -919,11 +919,40 @@ describe("SendBitcoinConfirmationScreen — skipBalanceCheck matrix", () => {
     expect(screen.getByTestId("slider").props.accessibilityState.disabled).toBe(false)
   })
 
-  it("(isSendingMax=false, hasAttemptedSend=true) over balance — slider disabled + no error", async () => {
+  it("(isSendingMax=false, hasAttemptedSend=true) over balance — no error, and a retry is still offered", async () => {
+    // hasAttemptedSend is sticky: it suppresses the balance check because the backend may
+    // already have debited the wallet. It no longer gates the slider — whether another
+    // attempt is allowed is expressed solely by sendPayment, so an ambiguous failure can
+    // be retried under the same idempotency key.
     mockUseSendPayment.mockReturnValue({
       loading: false,
       hasAttemptedSend: true,
       sendPayment: sendPaymentMock,
+    })
+
+    render(
+      <ContextForScreen>
+        <Intraledger route={buildUsdSettlementRoute(1100)} />
+      </ContextForScreen>,
+    )
+
+    await act(
+      () =>
+        new Promise((resolve) => {
+          setTimeout(resolve, 10)
+        }),
+    )
+
+    expect(screen.queryByText(/exceeds your balance/i)).toBeNull()
+    expect(screen.getByTestId("slider").props.accessibilityState.disabled).toBe(false)
+  })
+
+  it("(hasAttemptedSend=true, sendPayment withheld) over balance — slider disabled + no error", async () => {
+    // The hook withholds sendPayment while a send is in flight or terminally settled.
+    mockUseSendPayment.mockReturnValue({
+      loading: false,
+      hasAttemptedSend: true,
+      sendPayment: undefined,
     })
 
     render(
