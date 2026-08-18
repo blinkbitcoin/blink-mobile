@@ -292,5 +292,35 @@ describe("useSendPayment attempt gating", () => {
     expect(sendPaymentMutation).not.toHaveBeenCalled()
     expect(result.current.loading).toBe(false)
     expect(result.current.sendPayment).toBeDefined()
+    // Nothing reached the network, so the balance check must stay armed: the flag's
+    // contract is "a send attempt reached the network", and here nothing did.
+    expect(result.current.hasAttemptedSend).toBe(false)
+  })
+
+  it("lets a mutation that bypasses Apollo send without stamping a key", async () => {
+    // The self-custodial rail drives its SDK directly and never touches the nine wrapped
+    // mutations, so nothing carries the header; the minted key is written to the ref and
+    // goes unused. Replay protection on that rail is the SDK's own concern — this pins
+    // that the new call shape neither breaks the rail nor pretends to cover it.
+    const idempotencyKeyRef: IdempotencyKeyRef = {}
+    const sdkSend = jest.fn().mockResolvedValue(undefined)
+    const sendPaymentMutation = async () => {
+      await sdkSend()
+      return { status: PaymentSendResult.Success }
+    }
+
+    const { result } = renderHook(() =>
+      useSendPayment(sendPaymentMutation, idempotencyKeyRef),
+    )
+    const sendResult = await invoke(result.current.sendPayment)
+
+    expect(sdkSend).toHaveBeenCalledTimes(1)
+    MUTATION_NAMES.forEach((name) => {
+      expect(mockMutateFns[name]).not.toHaveBeenCalled()
+    })
+    expect(idempotencyKeyRef.current).toBe(KEY_A)
+    expect(sendResult).toEqual({ status: PaymentSendResult.Success })
+    expect(result.current.hasAttemptedSend).toBe(true)
+    expect(result.current.sendPayment).toBeUndefined()
   })
 })

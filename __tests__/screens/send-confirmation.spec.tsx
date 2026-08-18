@@ -1266,4 +1266,34 @@ describe("SendBitcoinConfirmationScreen — 409 idempotency conflict recovery", 
     expect(screen.queryByText(IDEMPOTENCY_KEY_UNAVAILABLE)).toBeNull()
     expect(verifyPaymentSettledMock).not.toHaveBeenCalled()
   })
+
+  it("keeps the slider armed after an ambiguous throw, so the user can retry", async () => {
+    // A non-409 throw is the ambiguous case: the request may have landed. The hook
+    // reopens sendPayment under the same key (pinned in the hook spec); the screen's half
+    // of the contract is that the slider is gated by sendPayment alone, never by
+    // hasAttemptedSend, so a second swipe actually fires.
+    sendPaymentMock
+      .mockRejectedValueOnce(new Error("network died"))
+      .mockResolvedValueOnce({ status: "SUCCESS", extraInfo: {} })
+
+    render(
+      <ContextForScreen>
+        <LightningLnURL route={buildLnurlRoute()} />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("slider"))
+    })
+
+    expect(screen.getByText("network died")).toBeTruthy()
+    expect(verifyPaymentSettledMock).not.toHaveBeenCalled()
+    expect(screen.getByTestId("slider").props.accessibilityState.disabled).toBe(false)
+
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("slider"))
+    })
+
+    expect(sendPaymentMock).toHaveBeenCalledTimes(2)
+  })
 })

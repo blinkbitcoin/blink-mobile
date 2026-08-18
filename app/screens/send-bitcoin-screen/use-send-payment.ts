@@ -265,7 +265,6 @@ export const useSendPayment = (
   const sendPayment = useMemo(() => {
     return sendPaymentMutation && !sendLocked
       ? async () => {
-          setHasAttemptedSend(true)
           setSendLocked(true)
           setLocalLoading(true)
 
@@ -290,6 +289,11 @@ export const useSendPayment = (
           if (idempotencyKeyRef) {
             idempotencyKeyRef.current = idempotencyKey
           }
+
+          // Set only once the key exists and the mutation is about to fire: before this
+          // point nothing has reached the network, so a CSPRNG failure must not suppress
+          // the balance check for the rest of the mount.
+          setHasAttemptedSend(true)
 
           try {
             const { status, errors, extraInfo, transaction } = await sendPaymentMutation({
