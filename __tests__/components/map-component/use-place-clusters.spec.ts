@@ -1,6 +1,7 @@
 import { Dimensions } from "react-native"
 import { renderHook } from "@testing-library/react-native"
 import { Region } from "react-native-maps"
+import Supercluster from "supercluster"
 
 import { BtcMapPlace } from "@app/btcmap"
 import { usePlaceClusters } from "@app/components/map-component/use-place-clusters"
@@ -148,6 +149,115 @@ describe("usePlaceClusters", () => {
       const { result } = renderHook(() => usePlaceClusters(KNOT, STREET))
 
       expect(result.current.dropped).toBe(0)
+    })
+  })
+
+  describe("the indexed slice of the world", () => {
+    // Indexing is the one expensive thing here — over all ~29k places it took
+    // 1.1 s on a slow device, and it happens again every time a category is
+    // switched on or off. These pin the scoping that took it to single digits.
+    let load: jest.SpyInstance
+
+    // Somewhere far from the knot, so a view over one excludes the other.
+    const FARAWAY: BtcMapPlace[] = Array.from({ length: 20 }, (_, index) => ({
+      id: 1000 + index,
+      latitude: 40.7128 + index * 0.0004,
+      longitude: -74.006 + index * 0.0004,
+      icon: "hotel",
+    }))
+    const ALL = [...KNOT, ...FARAWAY]
+
+    const pointsIndexed = () => load.mock.calls.at(-1)?.[0].length
+
+    beforeEach(() => {
+      load = jest.spyOn(Supercluster.prototype, "load")
+    })
+
+    afterEach(() => jest.restoreAllMocks())
+
+    it("indexes what is around the view, not the whole world", () => {
+      renderHook(() => usePlaceClusters(ALL, CITY))
+
+      expect(pointsIndexed()).toBe(KNOT.length)
+    })
+
+    it("reuses the index while the map stays inside the slice", () => {
+      // The padding exists to buy this: panning must not pay for indexing.
+      const { rerender } = renderHook(
+        ({ view }: { view: Region }) => usePlaceClusters(ALL, view),
+        { initialProps: { view: CITY } },
+      )
+      expect(load).toHaveBeenCalledTimes(1)
+
+      rerender({ view: { ...CITY, latitude: CITY.latitude + CITY.latitudeDelta / 4 } })
+
+      expect(load).toHaveBeenCalledTimes(1)
+    })
+
+    it("rebuilds once the map leaves it", () => {
+      const { rerender } = renderHook(
+        ({ view }: { view: Region }) => usePlaceClusters(ALL, view),
+        { initialProps: { view: CITY } },
+      )
+
+      rerender({ view: { ...CITY, latitude: 40.7128, longitude: -74.006 } })
+
+      expect(load).toHaveBeenCalledTimes(2)
+      expect(pointsIndexed()).toBe(FARAWAY.length)
+    })
+
+    it("rebuilds when the place list changes under it, wherever the map is", () => {
+      // This is the filter: same view, fewer places, and the index has to stop
+      // reflecting the ones that were switched off.
+      const cafes: BtcMapPlace[] = [
+        { id: 500, latitude: 51.5074, longitude: -0.1274, icon: "local_cafe" },
+        { id: 501, latitude: 51.5076, longitude: -0.1272, icon: "local_cafe" },
+      ]
+      const { rerender } = renderHook(
+        ({ places }: { places: BtcMapPlace[] }) => usePlaceClusters(places, CITY),
+        { initialProps: { places: [...ALL, ...cafes] } },
+      )
+      expect(pointsIndexed()).toBe(KNOT.length + cafes.length)
+
+      rerender({ places: cafes })
+
+      expect(load).toHaveBeenCalledTimes(2)
+      expect(pointsIndexed()).toBe(cafes.length)
+    })
+
+    it("indexes nothing at all when the filter empties the view", () => {
+      // Not a smaller index — no index. Building one over nothing is work spent
+      // to draw nothing.
+      const { result, rerender } = renderHook(
+        ({ places }: { places: BtcMapPlace[] }) => usePlaceClusters(places, CITY),
+        { initialProps: { places: ALL } },
+      )
+
+      rerender({ places: FARAWAY })
+
+      expect(load).toHaveBeenCalledTimes(1)
+      expect(result.current.places).toEqual([])
+      expect(result.current.clusters).toEqual([])
+    })
+
+    it("keeps both sides of the date line when the slice runs past it", () => {
+      // A padded box around Fiji reaches past 180°, where a plain longitude
+      // comparison would throw away everything on one side of it.
+      const dateline: BtcMapPlace[] = [
+        { id: 1, latitude: -17.7, longitude: 179.5, icon: "storefront" },
+        { id: 2, latitude: -17.7, longitude: -179.5, icon: "storefront" },
+      ]
+      const overFiji: Region = {
+        latitude: -17.7,
+        longitude: 180,
+        latitudeDelta: 4,
+        longitudeDelta: 4,
+      }
+
+      const { result } = renderHook(() => usePlaceClusters(dateline, overFiji))
+
+      expect(pointsIndexed()).toBe(2)
+      expect(result.current.places.map((place) => place.id).sort()).toEqual([1, 2])
     })
   })
 
