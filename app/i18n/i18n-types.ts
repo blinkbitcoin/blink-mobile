@@ -6594,6 +6594,106 @@ type RootTranslation = {
 		 * T​h​i​s​ ​l​o​c​a​t​i​o​n​ ​n​e​e​d​s​ ​t​o​ ​b​e​ ​s​u​r​v​e​y​e​d
 		 */
 		needsSurvey: string
+		/**
+		 * C​o​u​l​d​n​'​t​ ​s​e​a​r​c​h​ ​t​h​i​s​ ​a​r​e​a
+		 */
+		searchError: string
+		/**
+		 * C​l​e​a​r​ ​s​e​a​r​c​h
+		 */
+		clearSearch: string
+		/**
+		 * N​o​t​h​i​n​g​ ​t​o​ ​s​h​o​w
+		 */
+		nothingToShow: string
+		/**
+		 * {​d​i​s​t​a​n​c​e​}​ ​m​e​t​e​r​s​ ​a​w​a​y
+		 * @param {string} distance
+		 */
+		metersAway: RequiredParams<'distance'>
+		/**
+		 * {​d​i​s​t​a​n​c​e​}​ ​k​m​ ​a​w​a​y
+		 * @param {string} distance
+		 */
+		kilometersAway: RequiredParams<'distance'>
+		/**
+		 * F​i​l​t​e​r​s
+		 */
+		filters: string
+		/**
+		 * C​a​t​e​g​o​r​i​e​s
+		 */
+		categories: string
+		/**
+		 * S​e​l​e​c​t​ ​a​l​l
+		 */
+		selectAll: string
+		/**
+		 * C​l​e​a​r​ ​a​l​l
+		 */
+		clearAll: string
+		category: {
+			/**
+			 * R​e​s​t​a​u​r​a​n​t​s
+			 */
+			restaurants: string
+			/**
+			 * C​a​f​é​s
+			 */
+			cafes: string
+			/**
+			 * B​a​k​e​r​i​e​s​ ​&​ ​s​w​e​e​t​s
+			 */
+			bakeries: string
+			/**
+			 * B​a​r​s​ ​&​ ​n​i​g​h​t​l​i​f​e
+			 */
+			bars: string
+			/**
+			 * G​r​o​c​e​r​i​e​s
+			 */
+			groceries: string
+			/**
+			 * S​h​o​p​s
+			 */
+			shops: string
+			/**
+			 * A​T​M​s​ ​&​ ​e​x​c​h​a​n​g​e
+			 */
+			money: string
+			/**
+			 * H​o​t​e​l​s​ ​&​ ​l​o​d​g​i​n​g
+			 */
+			lodging: string
+			/**
+			 * C​a​r​s​ ​&​ ​f​u​e​l
+			 */
+			automotive: string
+			/**
+			 * H​e​a​l​t​h
+			 */
+			health: string
+			/**
+			 * B​e​a​u​t​y​ ​&​ ​w​e​l​l​n​e​s​s
+			 */
+			beauty: string
+			/**
+			 * S​e​r​v​i​c​e​s
+			 */
+			services: string
+			/**
+			 * S​p​o​r​t​s​ ​&​ ​o​u​t​d​o​o​r​s
+			 */
+			sports: string
+			/**
+			 * L​e​i​s​u​r​e​ ​&​ ​c​u​l​t​u​r​e
+			 */
+			leisure: string
+			/**
+			 * O​t​h​e​r
+			 */
+			other: string
+		}
 	}
 	HomeScreen: {
 		/**
@@ -19957,6 +20057,104 @@ export type TranslationFunctions = {
 		 * This location needs to be surveyed
 		 */
 		needsSurvey: () => LocalizedString
+		/**
+		 * Couldn't search this area
+		 */
+		searchError: () => LocalizedString
+		/**
+		 * Clear search
+		 */
+		clearSearch: () => LocalizedString
+		/**
+		 * Nothing to show
+		 */
+		nothingToShow: () => LocalizedString
+		/**
+		 * {distance} meters away
+		 */
+		metersAway: (arg: { distance: string }) => LocalizedString
+		/**
+		 * {distance} km away
+		 */
+		kilometersAway: (arg: { distance: string }) => LocalizedString
+		/**
+		 * Filters
+		 */
+		filters: () => LocalizedString
+		/**
+		 * Categories
+		 */
+		categories: () => LocalizedString
+		/**
+		 * Select all
+		 */
+		selectAll: () => LocalizedString
+		/**
+		 * Clear all
+		 */
+		clearAll: () => LocalizedString
+		category: {
+			/**
+			 * Restaurants
+			 */
+			restaurants: () => LocalizedString
+			/**
+			 * Cafés
+			 */
+			cafes: () => LocalizedString
+			/**
+			 * Bakeries & sweets
+			 */
+			bakeries: () => LocalizedString
+			/**
+			 * Bars & nightlife
+			 */
+			bars: () => LocalizedString
+			/**
+			 * Groceries
+			 */
+			groceries: () => LocalizedString
+			/**
+			 * Shops
+			 */
+			shops: () => LocalizedString
+			/**
+			 * ATMs & exchange
+			 */
+			money: () => LocalizedString
+			/**
+			 * Hotels & lodging
+			 */
+			lodging: () => LocalizedString
+			/**
+			 * Cars & fuel
+			 */
+			automotive: () => LocalizedString
+			/**
+			 * Health
+			 */
+			health: () => LocalizedString
+			/**
+			 * Beauty & wellness
+			 */
+			beauty: () => LocalizedString
+			/**
+			 * Services
+			 */
+			services: () => LocalizedString
+			/**
+			 * Sports & outdoors
+			 */
+			sports: () => LocalizedString
+			/**
+			 * Leisure & culture
+			 */
+			leisure: () => LocalizedString
+			/**
+			 * Other
+			 */
+			other: () => LocalizedString
+		}
 	}
 	HomeScreen: {
 		/**

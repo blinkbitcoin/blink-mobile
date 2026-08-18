@@ -12,6 +12,7 @@ import {
 } from "./config"
 import { LatLng } from "./geo"
 import {
+  BtcMapNamedPlace,
   BtcMapPlace,
   BtcMapPlaceDetails,
   BtcMapPlaceDetailsWire,
@@ -293,22 +294,30 @@ export const fetchPlacesDelta = async (since: string): Promise<BtcMapDelta> => {
   return { upserted, removedIds, syncedUpTo, needsReseed: false }
 }
 
+// The search endpoint answers with the detail shape *and* the list shape's
+// geometry, which is what makes it the one endpoint that can place a result on
+// the map and say what it is called.
+type BtcMapSearchWire = BtcMapPlaceWire & BtcMapPlaceDetailsWire
+
 /**
- * Names for every place within `radiusKm` of a point, in one request.
+ * Every named place within `radiusKm` of a point, in one request.
  *
- * The offline snapshot has no names — the CDN dump does not carry them — so map
- * labels come from here rather than from bloating that snapshot with all ~29k.
- * At the zoom labels appear this is a sub-kilometre radius: a handful of places
- * and a couple of KB, against 2.8 MB for the full uncompressed name list.
+ * The offline snapshot has no names — the CDN dump does not carry them — so both
+ * the map labels and the search list come from here rather than from bloating
+ * that snapshot with all ~29k. At the zoom labels appear this is a sub-kilometre
+ * radius: a handful of places and a couple of KB, against 2.8 MB for the full
+ * uncompressed name list.
  *
- * The endpoint ignores `fields` and always returns its own rich shape, so the
- * rest of each row is discarded here.
+ * The endpoint ignores `fields` and `limit` and always returns everything in the
+ * circle, so the radius is the only thing that bounds the response — see the
+ * caps in `use-place-search.ts`. Rows without a name or coordinates are dropped:
+ * they can neither be matched against what was typed nor drawn where they are.
  */
-export const fetchPlaceNamesNear = async (
+export const fetchPlacesNear = async (
   center: LatLng,
   radiusKm: number,
-): Promise<Map<number, string>> => {
-  const { data } = await axios.get<BtcMapPlaceDetailsWire[]>(
+): Promise<BtcMapNamedPlace[]> => {
+  const { data } = await axios.get<BtcMapSearchWire[]>(
     `${BTCMAP_API_BASE_URL}/places/search`,
     {
       params: {
@@ -321,12 +330,21 @@ export const fetchPlaceNamesNear = async (
     },
   )
 
-  const names = new Map<number, string>()
-  for (const place of data) {
-    if (place.name) names.set(place.id, place.name)
-  }
-  return names
+  return data.filter(isRenderablePlace).flatMap((place) => {
+    const name = place.name?.trim()
+    if (!name) return []
+
+    const address = place.address?.trim()
+    return [{ ...toPlace(place), name, ...(address ? { address } : {}) }]
+  })
 }
+
+/** Just the names, for the labels drawn under the pins. */
+export const fetchPlaceNamesNear = async (
+  center: LatLng,
+  radiusKm: number,
+): Promise<Map<number, string>> =>
+  new Map((await fetchPlacesNear(center, radiusKm)).map(({ id, name }) => [id, name]))
 
 export const fetchPlaceDetails = async (id: number): Promise<BtcMapPlaceDetails> => {
   const { data } = await axios.get<BtcMapPlaceDetailsWire>(

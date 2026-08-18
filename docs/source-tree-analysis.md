@@ -191,6 +191,10 @@ module is a **read-only** consumer of it; nothing in the app writes back.
 | `storage.ts` | The offline snapshot, chunked across AsyncStorage rows |
 | `use-places.ts` | Cache-first place list, gated on the `btcMapPlacesEnabled` kill switch |
 | `use-place-details.ts` | Per-place detail fetch, on tap |
+| `use-place-names.ts` | Names for the labels drawn under the pins, per settled viewport |
+| `use-place-search.ts` | Named places around the current view, for the search list |
+| `search.ts` | Accent-folded name matching and nearest-first ranking |
+| `categories.ts` | Icon → filter category buckets, and the filter itself |
 | `opening-hours.ts` | Partial OSM `opening_hours` reader → open / closed / unknown |
 | `verification.ts` | Survey freshness and boost state |
 | `icons.ts`, `urls.ts`, `geo.ts` | Marker glyph resolution, link shaping, distance |
