@@ -33,7 +33,13 @@ const formatUsdCents = (cents: number, locale: string): string =>
  */
 export const useLevel1DailyLimit = (): { limit: string } => {
   const { locale } = useI18nContext()
-  const { data } = useAccountLimitsByLevelQuery()
+  // cache-and-network, not the default cache-first: the Apollo cache is
+  // persisted to AsyncStorage (apollo3-cache-persist in client.tsx), so a
+  // cache-first read would render a stale limit on every launch after a
+  // backend change — including a *lowered* limit, which is the over-promise
+  // compliance failure this hook exists to prevent. The cached value still
+  // renders instantly; the network response corrects it.
+  const { data } = useAccountLimitsByLevelQuery({ fetchPolicy: "cache-and-network" })
 
   const level1 = data?.globals?.accountLimitsByLevel.find(
     (limits) => limits.level === AccountLevel.One,

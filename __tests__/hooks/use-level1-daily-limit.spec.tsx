@@ -1,8 +1,13 @@
 import React, { PropsWithChildren } from "react"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
 
+import { InMemoryCache } from "@apollo/client"
 import { MockedProvider, MockedResponse } from "@apollo/client/testing"
-import { AccountLimitsByLevelDocument } from "@app/graphql/generated"
+import {
+  AccountLevel,
+  AccountLimitsByLevelDocument,
+  AccountLimitsByLevelQuery,
+} from "@app/graphql/generated"
 import TypesafeI18n from "@app/i18n/i18n-react"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import {
@@ -32,9 +37,9 @@ const limitsMock = (rows: LevelRow[]): MockedResponse => ({
 // The locale must be pinned, not inherited: without a provider the hook formats
 // with the host machine's ICU default, so these assertions pass under en-US CI
 // and fail on, e.g., a de-DE or en-ZA developer machine.
-const wrapper = (mocks: ReadonlyArray<MockedResponse>) => {
+const wrapper = (mocks: ReadonlyArray<MockedResponse>, cache?: InMemoryCache) => {
   const Wrapper: React.FC<PropsWithChildren> = ({ children }) => (
-    <MockedProvider mocks={mocks}>
+    <MockedProvider mocks={mocks} cache={cache}>
       <TypesafeI18n locale="en">{children}</TypesafeI18n>
     </MockedProvider>
   )
@@ -100,5 +105,38 @@ describe("useLevel1DailyLimit", () => {
     })
 
     await waitFor(() => expect(result.current.limit).toBe("999.5"))
+  })
+
+  it("refreshes a stale cached value from the network", async () => {
+    // The app's Apollo cache is persisted to AsyncStorage, so this stands in
+    // for a relaunch after ops changed the limit: the persisted 99900 renders
+    // first, and cache-and-network must then correct it. With the default
+    // cache-first the second assertion never fires and the app advertises the
+    // old — possibly higher — limit forever.
+    const staleCache = new InMemoryCache()
+    staleCache.writeQuery<AccountLimitsByLevelQuery>({
+      query: AccountLimitsByLevelDocument,
+      data: {
+        __typename: "Query",
+        globals: {
+          __typename: "Globals",
+          accountLimitsByLevel: [
+            { __typename: "AccountLevelLimits", level: AccountLevel.One, withdrawal: 99900 },
+          ],
+        },
+      },
+    })
+
+    const { result } = renderHook(() => useLevel1DailyLimit(), {
+      wrapper: wrapper(
+        [limitsMock([{ level: "ONE", withdrawal: 150000 }])],
+        staleCache,
+      ),
+    })
+
+    // the persisted value renders immediately — no loading flash of fallback
+    expect(result.current.limit).toBe("999")
+
+    await waitFor(() => expect(result.current.limit).toBe("1,500"))
   })
 })
