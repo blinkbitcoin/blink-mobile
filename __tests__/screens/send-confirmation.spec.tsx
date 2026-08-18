@@ -6,6 +6,7 @@ import { act, fireEvent, render, screen } from "@testing-library/react-native"
 import { DisplayCurrency, toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { ConvertAmountAdjustment } from "@app/types/payment"
 import { WalletCurrency } from "@app/graphql/generated"
+import { IDEMPOTENCY_KEY_UNAVAILABLE } from "@app/screens/send-bitcoin-screen/use-send-payment"
 import * as PaymentDetails from "@app/screens/send-bitcoin-screen/payment-details/intraledger"
 import { ConvertMoneyAmount } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
 import * as PaymentDetailsLightning from "@app/screens/send-bitcoin-screen/payment-details/lightning"
@@ -181,7 +182,11 @@ jest.mock("@app/screens/send-bitcoin-screen/use-save-lnaddress-contact", () => (
 
 const sendPaymentMock = jest.fn()
 const mockUseSendPayment = jest.fn()
+// Spread the real module: the screen also imports IDEMPOTENCY_KEY_UNAVAILABLE from here,
+// and a wholesale mock would make that constant undefined, silently disabling the
+// comparison the error-mapping test exercises.
 jest.mock("@app/screens/send-bitcoin-screen/use-send-payment", () => ({
+  ...jest.requireActual("@app/screens/send-bitcoin-screen/use-send-payment"),
   useSendPayment: () => mockUseSendPayment(),
 }))
 
@@ -1241,5 +1246,24 @@ describe("SendBitcoinConfirmationScreen — 409 idempotency conflict recovery", 
 
     expect(verifyPaymentSettledMock).not.toHaveBeenCalled()
     expect(screen.getByText("insufficient balance")).toBeTruthy()
+  })
+
+  it("shows a generic error when the CSPRNG cannot mint an idempotency key", async () => {
+    // The hook rejects with a sentinel rather than a raw Nitro string; the screen must
+    // translate it instead of showing the user "idempotency-key-unavailable".
+    sendPaymentMock.mockRejectedValueOnce(new Error(IDEMPOTENCY_KEY_UNAVAILABLE))
+
+    render(
+      <ContextForScreen>
+        <LightningLnURL route={buildLnurlRoute()} />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("slider"))
+    })
+
+    expect(screen.queryByText(IDEMPOTENCY_KEY_UNAVAILABLE)).toBeNull()
+    expect(verifyPaymentSettledMock).not.toHaveBeenCalled()
   })
 })

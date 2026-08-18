@@ -3,6 +3,7 @@ import { LnUrlPayServiceResponse } from "lnurl-pay"
 import { WalletCurrency } from "@app/graphql/generated"
 import {
   createAmountLightningPaymentDetails,
+  createAmountOnchainPaymentDetails,
   createIntraledgerPaymentDetails,
   createLnurlPaymentDetails,
   createNoAmountLightningPaymentDetails,
@@ -73,6 +74,14 @@ const minted = (detail: Probe): Probe => {
 
 const keyOf = (detail: Probe): string | undefined => detail.idempotencyKeyRef?.current
 
+/**
+ * A detail whose params already carry the minted ref, produced by a preserve setter. Any
+ * re-mint assertion must start here: from a freshly created detail the params never held a
+ * ref at all, so "dropped it" and "never had one" are indistinguishable and the assertion
+ * passes whether or not the factory actually drops it.
+ */
+const carryingRef = (detail: Probe): Probe => minted(detail).setMemo?.("carried") as Probe
+
 describe("idempotency key ref — intraledger", () => {
   const base = () =>
     asProbe(
@@ -102,12 +111,12 @@ describe("idempotency key ref — intraledger", () => {
   })
 
   it("drops the key when the amount changes", () => {
-    expect(keyOf(minted(base()).setAmount?.(otherAmount) as Probe)).toBeUndefined()
+    expect(keyOf(carryingRef(base()).setAmount?.(otherAmount) as Probe)).toBeUndefined()
   })
 
   it("drops the key when the sending wallet changes", () => {
     expect(
-      keyOf(minted(base()).setSendingWalletDescriptor(otherBtcWallet)),
+      keyOf(carryingRef(base()).setSendingWalletDescriptor(otherBtcWallet)),
     ).toBeUndefined()
   })
 })
@@ -131,9 +140,9 @@ describe("idempotency key ref — no-amount lightning", () => {
   })
 
   it("drops the key on a new amount or wallet", () => {
-    expect(keyOf(minted(base()).setAmount?.(otherAmount) as Probe)).toBeUndefined()
+    expect(keyOf(carryingRef(base()).setAmount?.(otherAmount) as Probe)).toBeUndefined()
     expect(
-      keyOf(minted(base()).setSendingWalletDescriptor(otherBtcWallet)),
+      keyOf(carryingRef(base()).setSendingWalletDescriptor(otherBtcWallet)),
     ).toBeUndefined()
   })
 })
@@ -149,10 +158,16 @@ describe("idempotency key ref — amount lightning", () => {
       }),
     )
 
-  it("keeps the key across a memo edit and drops it on a wallet switch", () => {
+  it("keeps the key across memo and display-currency rebuilds", () => {
     expect(keyOf(minted(base()).setMemo?.("note") as Probe)).toBe("minted-key")
+    expect(keyOf(minted(base()).setConvertMoneyAmount(convertMoneyAmount))).toBe(
+      "minted-key",
+    )
+  })
+
+  it("drops the key on a wallet switch", () => {
     expect(
-      keyOf(minted(base()).setSendingWalletDescriptor(otherBtcWallet)),
+      keyOf(carryingRef(base()).setSendingWalletDescriptor(otherBtcWallet)),
     ).toBeUndefined()
   })
 })
@@ -196,8 +211,17 @@ describe("idempotency key ref — lnurl", () => {
     expect(keyOf(minted(base()).setMemo?.("note") as Probe)).toBe("minted-key")
   })
 
-  it("drops the key on a new amount", () => {
-    expect(keyOf(minted(base()).setAmount?.(otherAmount) as Probe)).toBeUndefined()
+  it("keeps the key across a display-currency rebuild", () => {
+    expect(keyOf(minted(base()).setConvertMoneyAmount(convertMoneyAmount))).toBe(
+      "minted-key",
+    )
+  })
+
+  it("drops the key on a new amount or wallet", () => {
+    expect(keyOf(carryingRef(base()).setAmount?.(otherAmount) as Probe)).toBeUndefined()
+    expect(
+      keyOf(carryingRef(base()).setSendingWalletDescriptor(otherBtcWallet)),
+    ).toBeUndefined()
   })
 })
 
@@ -220,9 +244,39 @@ describe("idempotency key ref — onchain", () => {
   })
 
   it("drops the key on a new amount or wallet", () => {
-    expect(keyOf(minted(base()).setAmount?.(otherAmount) as Probe)).toBeUndefined()
+    expect(keyOf(carryingRef(base()).setAmount?.(otherAmount) as Probe)).toBeUndefined()
     expect(
-      keyOf(minted(base()).setSendingWalletDescriptor(otherBtcWallet)),
+      keyOf(carryingRef(base()).setSendingWalletDescriptor(otherBtcWallet)),
+    ).toBeUndefined()
+  })
+})
+
+describe("idempotency key ref — amount onchain", () => {
+  const base = () =>
+    asProbe(
+      createAmountOnchainPaymentDetails({
+        address: "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+        destinationSpecifiedAmount: btcSettlementAmount,
+        sendingWalletDescriptor: btcWallet,
+        convertMoneyAmount,
+      }),
+    )
+
+  it("gives every fresh intent its own ref", () => {
+    expect(base().idempotencyKeyRef).toBeDefined()
+    expect(base().idempotencyKeyRef).not.toBe(base().idempotencyKeyRef)
+  })
+
+  it("keeps the key across memo and display-currency rebuilds", () => {
+    expect(keyOf(minted(base()).setMemo?.("note") as Probe)).toBe("minted-key")
+    expect(keyOf(minted(base()).setConvertMoneyAmount(convertMoneyAmount))).toBe(
+      "minted-key",
+    )
+  })
+
+  it("drops the key on a wallet switch", () => {
+    expect(
+      keyOf(carryingRef(base()).setSendingWalletDescriptor(otherBtcWallet)),
     ).toBeUndefined()
   })
 })
