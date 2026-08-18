@@ -28,7 +28,7 @@ jest.mock("@react-navigation/native", () => ({
 
 const mockGetAccountMode = jest.fn()
 const mockSetAccountMode = jest.fn()
-jest.mock("@app/hooks/use-self-custodial-account-mode", () => ({
+jest.mock("@app/self-custodial/hooks/use-self-custodial-account-mode", () => ({
   useSelfCustodialAccountMode: () => ({
     getAccountMode: mockGetAccountMode,
     setAccountMode: mockSetAccountMode,

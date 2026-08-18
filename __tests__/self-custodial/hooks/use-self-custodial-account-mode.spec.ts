@@ -1,6 +1,6 @@
 import { act, renderHook } from "@testing-library/react-native"
 
-import { useSelfCustodialAccountMode } from "@app/hooks/use-self-custodial-account-mode"
+import { useSelfCustodialAccountMode } from "@app/self-custodial/hooks/use-self-custodial-account-mode"
 import { PersistentState } from "@app/store/persistent-state/state-migrations"
 import { AccountMode } from "@app/types/account"
 

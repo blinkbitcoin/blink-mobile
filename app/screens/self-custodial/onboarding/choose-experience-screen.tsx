@@ -7,12 +7,12 @@ import { makeStyles, useTheme } from "@rn-vui/themed"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { IconHero } from "@app/components/icon-hero"
 import { OptionCard, OptionCardGroup } from "@app/components/option-card-group"
-import { useSelfCustodialAccountMode } from "@app/hooks/use-self-custodial-account-mode"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import {
   ChooseExperienceContinueRoute,
   RootStackParamList,
 } from "@app/navigation/stack-param-lists"
+import { useSelfCustodialAccountMode } from "@app/self-custodial/hooks/use-self-custodial-account-mode"
 import { AccountMode } from "@app/types/account"
 import { testProps } from "@app/utils/testProps"
 
