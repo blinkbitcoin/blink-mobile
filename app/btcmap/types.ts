@@ -44,6 +44,15 @@ export type BtcMapPlace = {
   boostedUntil?: string
 }
 
+// A place from the nearby-search endpoint, which — unlike the offline snapshot —
+// knows what it is called. Named, because a place with no name is nothing a
+// search can match and nothing a result row could show.
+//
+// The address comes along because it is what a result row has left to say when
+// the phone does not know where it is and no distance can be worked out. Under
+// half the places carry one, so it is a fallback, not a second subtitle.
+export type BtcMapNamedPlace = BtcMapPlace & { name: string; address?: string }
+
 export type BtcMapSnapshot = {
   places: BtcMapPlace[]
   // Cursor for the next incremental sync: the `updated_at` we have caught up to.

@@ -1,6 +1,6 @@
 import React from "react"
 import { Region } from "react-native-maps"
-import { fireEvent, render, waitFor } from "@testing-library/react-native"
+import { act, fireEvent, render, waitFor } from "@testing-library/react-native"
 
 import { BtcMapPlace, useBtcMapPlaces } from "@app/btcmap"
 import MapComponent from "@app/components/map-component"
@@ -62,6 +62,24 @@ jest.mock("@app/components/map-component/place-sheet", () => ({
   },
 }))
 
+// Same for the search and the filter: each has its own spec, so here they are
+// only a way to see what the map asks them for and to answer back.
+let capturedSearchProps: Record<string, unknown> | undefined
+jest.mock("@app/components/map-component/place-search-modal", () => ({
+  PlaceSearchModal: (props: Record<string, unknown>) => {
+    capturedSearchProps = props
+    return null
+  },
+}))
+
+let capturedFilterProps: Record<string, unknown> | undefined
+jest.mock("@app/components/map-component/category-filter-sheet", () => ({
+  CategoryFilterSheet: (props: Record<string, unknown>) => {
+    capturedFilterProps = props
+    return null
+  },
+}))
+
 const mockedPlaces = useBtcMapPlaces as jest.MockedFunction<typeof useBtcMapPlaces>
 const mockedGetUserRegion = getUserRegion as jest.MockedFunction<typeof getUserRegion>
 
@@ -72,11 +90,11 @@ const REGION: Region = {
   longitudeDelta: 0.02,
 }
 
-const place = (id: number): BtcMapPlace => ({
+const place = (id: number, icon = "local_cafe"): BtcMapPlace => ({
   id,
   latitude: 51.5 + id / 10000,
   longitude: -0.12,
-  icon: "local_cafe",
+  icon,
 })
 
 const setPlaces = (overrides: Partial<ReturnType<typeof useBtcMapPlaces>> = {}) =>
@@ -104,6 +122,8 @@ beforeEach(() => {
   jest.clearAllMocks()
   loadLocale("en")
   capturedSheetProps = undefined
+  capturedSearchProps = undefined
+  capturedFilterProps = undefined
   capturedMapProps = undefined
   setPlaces()
 })
@@ -177,6 +197,150 @@ describe("MapComponent", () => {
         latitude: REGION.latitude,
         longitude: REGION.longitude,
       }),
+    )
+  })
+})
+
+describe("MapComponent search", () => {
+  it("keeps the search shut until it is asked for", async () => {
+    const { getByTestId } = renderMap()
+
+    await waitFor(() => expect(capturedSearchProps?.isVisible).toBe(false))
+
+    fireEvent.press(getByTestId("open-place-search"))
+
+    await waitFor(() => expect(capturedSearchProps?.isVisible).toBe(true))
+  })
+
+  it("searches the area the map is looking at", async () => {
+    renderMap()
+
+    await waitFor(() =>
+      expect(capturedSearchProps?.center).toEqual({
+        latitude: REGION.latitude,
+        longitude: REGION.longitude,
+      }),
+    )
+    expect(capturedSearchProps?.viewportRadiusKm).toBeGreaterThan(0)
+  })
+
+  it("hands the search the phone's own position to measure distances from", async () => {
+    // Without it the list has no honest distance to print, so it must arrive
+    // rather than be inferred from where the map happens to be pointed.
+    mockedGetUserRegion.mockImplementation((callback) => callback(REGION))
+    const { getByTestId } = renderMap()
+
+    await waitFor(() => expect(capturedSearchProps?.userLocation).toBeUndefined())
+
+    fireEvent.press(getByTestId("location-button"))
+
+    await waitFor(() =>
+      expect(capturedSearchProps?.userLocation).toEqual({
+        latitude: REGION.latitude,
+        longitude: REGION.longitude,
+      }),
+    )
+  })
+
+  it("opens the sheet on the place picked out of the search", async () => {
+    const { getByTestId } = renderMap()
+
+    await waitFor(() => expect(capturedSearchProps).toBeDefined())
+    fireEvent.press(getByTestId("open-place-search"))
+
+    const picked = { ...place(7), name: "Satoshi Coffee" }
+    act(() => {
+      ;(capturedSearchProps?.onSelect as (p: BtcMapPlace) => void)(picked)
+    })
+
+    // Closed, so the map it just flew to is what the user is left looking at.
+    await waitFor(() => expect(capturedSearchProps?.isVisible).toBe(false))
+    expect((capturedSheetProps?.place as BtcMapPlace)?.id).toBe(7)
+  })
+})
+
+describe("MapComponent category filter", () => {
+  const chooseMoney = () =>
+    act(() => {
+      ;(capturedFilterProps?.onChange as (c: ReadonlySet<string>) => void)(
+        new Set(["money"]),
+      )
+    })
+
+  it("keeps the filter shut until it is asked for", async () => {
+    const { getByTestId } = renderMap()
+
+    await waitFor(() => expect(capturedFilterProps?.isVisible).toBe(false))
+
+    fireEvent.press(getByTestId("open-category-filter"))
+
+    await waitFor(() => expect(capturedFilterProps?.isVisible).toBe(true))
+  })
+
+  it("draws every pin until a category is chosen", async () => {
+    setPlaces({ places: [place(1, "restaurant"), place(2, "local_atm")] })
+    const { getByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("btcmap-place-1")).toBeTruthy())
+    expect(getByTestId("btcmap-place-2")).toBeTruthy()
+  })
+
+  it("drops the pins outside the chosen categories", async () => {
+    setPlaces({ places: [place(1, "restaurant"), place(2, "local_atm")] })
+    const { getByTestId, queryByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("btcmap-place-1")).toBeTruthy())
+    chooseMoney()
+
+    await waitFor(() => expect(queryByTestId("btcmap-place-1")).toBeNull())
+    expect(getByTestId("btcmap-place-2")).toBeTruthy()
+  })
+
+  it("puts every pin back when the filter is cleared", async () => {
+    setPlaces({ places: [place(1, "restaurant"), place(2, "local_atm")] })
+    const { getByTestId, queryByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("btcmap-place-1")).toBeTruthy())
+    chooseMoney()
+    await waitFor(() => expect(queryByTestId("btcmap-place-1")).toBeNull())
+
+    act(() => {
+      ;(capturedFilterProps?.onChange as (c: ReadonlySet<string>) => void)(new Set())
+    })
+
+    await waitFor(() => expect(getByTestId("btcmap-place-1")).toBeTruthy())
+  })
+
+  it("says on the button that the map is showing less than everything", async () => {
+    // The tint alone does not reach a screen reader, and "why is my shop
+    // missing" is exactly the question a forgotten filter creates.
+    const { getByTestId } = renderMap()
+
+    await waitFor(() =>
+      expect(getByTestId("open-category-filter").props.accessibilityState).toMatchObject({
+        selected: false,
+      }),
+    )
+
+    chooseMoney()
+
+    await waitFor(() =>
+      expect(getByTestId("open-category-filter").props.accessibilityState).toMatchObject({
+        selected: true,
+      }),
+    )
+  })
+
+  it("tells the search what the map is already filtered to", async () => {
+    // Otherwise the list contradicts the map it is sitting over.
+    setPlaces({ places: [place(1, "restaurant")] })
+    renderMap()
+
+    await waitFor(() => expect(capturedFilterProps).toBeDefined())
+    chooseMoney()
+
+    await waitFor(() =>
+      expect(capturedSearchProps?.categories).toEqual(new Set(["money"])),
     )
   })
 })

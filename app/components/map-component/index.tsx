@@ -6,7 +6,14 @@ import { PermissionStatus, RESULTS, request } from "react-native-permissions"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 import { useApolloClient } from "@apollo/client"
-import { BtcMapPlace, LatLng, useBtcMapPlaceNames, useBtcMapPlaces } from "@app/btcmap"
+import {
+  BtcMapPlace,
+  LatLng,
+  PlaceCategory,
+  placesInCategories,
+  useBtcMapPlaceNames,
+  useBtcMapPlaces,
+} from "@app/btcmap"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { updateMapLastCoords } from "@app/graphql/client-only-query"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -15,19 +22,26 @@ import { useFocusEffect } from "@react-navigation/native"
 import { isIOS } from "@rn-vui/base"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
+import { CategoryFilterSheet } from "./category-filter-sheet"
 import { ClusterMarker, ClusterMarkerData } from "./cluster-marker"
 import LocationButtonCopy from "./location-button-copy"
+import { MapSearchBar, searchBarBottom } from "./map-search-bar"
 import MapStyles from "./map-styles.json"
 import { OpenSettingsElement, OpenSettingsModal } from "./open-settings-modal"
 import { PlaceLabelMarker } from "./place-label-marker"
 import { PlaceMarker } from "./place-marker"
+import { PlaceSearchModal } from "./place-search-modal"
 import { PlaceSheet } from "./place-sheet"
 import { usePlaceClusters } from "./use-place-clusters"
-import { radiusKmForRegion, zoomForRegion } from "./viewport"
+import { longitudeDeltaForZoom, radiusKmForRegion, zoomForRegion } from "./viewport"
 
 // btcmap.org starts labelling its pins here too. Below it the pins are packed
 // tightly enough that names would overlap into noise.
 const LABEL_MIN_ZOOM = 15
+
+// Close enough that the pin is drawn on its own rather than swallowed by a
+// cluster — see CLUSTERING_DISABLED_ZOOM.
+const SEARCH_RESULT_ZOOM = 17
 
 const SAVE_COORDS_DEBOUNCE_MS = 1000
 const FLY_TO_DURATION_MS = 350
@@ -65,6 +79,12 @@ export default function MapComponent({
   // opening-hours badge working without an app restart.
   const [coords, setCoords] = React.useState<LatLng | undefined>(userCoords)
   const [selectedPlace, setSelectedPlace] = React.useState<BtcMapPlace | null>(null)
+  const [isSearchOpen, setSearchOpen] = React.useState(false)
+  const [isFilterOpen, setFilterOpen] = React.useState(false)
+  // Empty means "everything", not "nothing" — see `placesInCategories`.
+  const [categories, setCategories] = React.useState<ReadonlySet<PlaceCategory>>(
+    () => new Set(),
+  )
 
   const { places: allPlaces, isLoading, hasError, refresh } = useBtcMapPlaces()
 
@@ -72,13 +92,28 @@ export default function MapComponent({
   // otherwise show whatever was cached when the process started. `refresh` is a
   // no-op unless the cache has actually aged out.
   useFocusEffect(refresh)
-  const { places, clusters, regionForCluster } = usePlaceClusters(allPlaces, region)
+
+  // Memoised for the array identity as much as for the work: the clusterer
+  // rebuilds its index over all ~29k points whenever this changes, so panning
+  // must not hand it a fresh copy of the same list.
+  const visiblePlaces = React.useMemo(
+    () => placesInCategories(allPlaces, categories),
+    [allPlaces, categories],
+  )
+
+  const { places, clusters, regionForCluster } = usePlaceClusters(visiblePlaces, region)
+
+  const center = React.useMemo(
+    () => ({ latitude: region.latitude, longitude: region.longitude }),
+    [region.latitude, region.longitude],
+  )
+  const viewportRadiusKm = radiusKmForRegion(region)
 
   // Names are not in the offline snapshot, so they are fetched for the viewport
   // — and only once it is tight enough for labels to be legible.
   const names = useBtcMapPlaceNames({
-    center: { latitude: region.latitude, longitude: region.longitude },
-    radiusKm: radiusKmForRegion(region),
+    center,
+    radiusKm: viewportRadiusKm,
     enabled: zoomForRegion(region) >= LABEL_MIN_ZOOM,
   })
 
@@ -180,6 +215,29 @@ export default function MapComponent({
 
   const closeSheet = React.useCallback(() => setSelectedPlace(null), [])
 
+  // A result is picked from a list that may be describing somewhere off screen,
+  // so the map goes to it before the sheet opens over it — otherwise closing the
+  // sheet leaves the user looking at wherever they were before.
+  const handleSearchSelect = React.useCallback((place: BtcMapPlace) => {
+    setSearchOpen(false)
+
+    const current = regionRef.current
+    const longitudeDelta = longitudeDeltaForZoom(SEARCH_RESULT_ZOOM)
+    mapViewRef.current?.animateToRegion(
+      {
+        latitude: place.latitude,
+        longitude: place.longitude,
+        longitudeDelta,
+        latitudeDelta:
+          longitudeDelta *
+          (current.latitudeDelta / Math.max(current.longitudeDelta, 1e-6)),
+      },
+      FLY_TO_DURATION_MS,
+    )
+
+    setSelectedPlace(place)
+  }, [])
+
   return (
     <View style={styles.viewContainer}>
       <MapView
@@ -227,6 +285,13 @@ export default function MapComponent({
         })}
       </MapView>
 
+      <MapSearchBar
+        topInset={insets.top}
+        onSearchPress={() => setSearchOpen(true)}
+        onFilterPress={() => setFilterOpen(true)}
+        isFiltered={categories.size > 0}
+      />
+
       {isLoading && !allPlaces.length && (
         <View style={styles.statusPill}>
           <ActivityIndicator size="small" color={colors.primary} />
@@ -257,6 +322,23 @@ export default function MapComponent({
 
       <OpenSettingsModal ref={openSettingsModalRef} />
 
+      <PlaceSearchModal
+        isVisible={isSearchOpen}
+        center={center}
+        userLocation={coords}
+        viewportRadiusKm={viewportRadiusKm}
+        categories={categories}
+        onSelect={handleSearchSelect}
+        onClose={() => setSearchOpen(false)}
+      />
+
+      <CategoryFilterSheet
+        isVisible={isFilterOpen}
+        selected={categories}
+        onChange={setCategories}
+        onClose={() => setFilterOpen(false)}
+      />
+
       <PlaceSheet place={selectedPlace} userLocation={coords} onClose={closeSheet} />
     </View>
   )
@@ -272,8 +354,8 @@ const useStyles = makeStyles(({ colors }, { topInset }: { topInset: number }) =>
 
   statusPill: {
     position: "absolute",
-    // The screen leaves the top edge to the map, so the pill reserves its own.
-    top: topInset + 12,
+    // Under the search bar, which now owns the top edge of the map.
+    top: searchBarBottom(topInset) + 10,
     alignSelf: "center",
     flexDirection: "row",
     alignItems: "center",
