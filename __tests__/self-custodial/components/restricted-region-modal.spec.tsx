@@ -21,7 +21,7 @@ jest.mock("react-native-modal", () => {
 })
 
 import { BLOCKED_COUNTRIES_FAQ_LINK } from "@app/config"
-import { RestrictedRegionModal } from "@app/components/restricted-region/restricted-region-modal"
+import { RestrictedRegionModal } from "@app/self-custodial/components/restricted-region-modal"
 
 loadLocale("en")
 const LL = i18nObject("en")

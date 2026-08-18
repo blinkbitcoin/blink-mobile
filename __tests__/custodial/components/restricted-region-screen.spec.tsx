@@ -38,7 +38,7 @@ jest.mock("@app/hooks/use-contact-support", () => ({
 }))
 
 import { BLOCKED_COUNTRIES_FAQ_LINK } from "@app/config"
-import { RestrictedRegionScreen } from "@app/components/restricted-region/restricted-region-screen"
+import { RestrictedRegionScreen } from "@app/custodial/components/restricted-region-screen"
 
 loadLocale("en")
 const LL = i18nObject("en")

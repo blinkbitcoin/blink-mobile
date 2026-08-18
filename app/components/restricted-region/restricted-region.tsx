@@ -11,11 +11,10 @@ import React, {
 import { useFeatureFlags, useRemoteConfig } from "@app/config/feature-flags-context"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { isBlockedCountry, useIpCountryLookup } from "@app/hooks/use-device-location"
+import { RestrictedRegionScreen } from "@app/custodial/components/restricted-region-screen"
 import { bootSplashGate } from "@app/navigation/boot-splash-gate"
+import { RestrictedRegionModal } from "@app/self-custodial/components/restricted-region-modal"
 import { AccountType } from "@app/types/wallet"
-
-import { RestrictedRegionModal } from "./restricted-region-modal"
-import { RestrictedRegionScreen } from "./restricted-region-screen"
 
 type RestrictedRegionContextType = {
   isRestrictedRegion: boolean
@@ -85,8 +84,8 @@ const useEvaluateRestrictedRegion = (): RestrictedRegionEvaluation => {
   }
 }
 
-/** Hosts the sanctions surfaces: the custodial variant blocks the whole session, since
- *  every custodial function is Blink-served; the non-custodial one presents once per
+/** Hosts the sanctions surfaces: the custodial one blocks the whole session, since
+ *  every custodial function is Blink-served; the self-custodial one presents once per
  *  restricted session and leaves the local wallet usable. */
 export const RestrictedRegionProvider: React.FC<React.PropsWithChildren> = ({
   children,

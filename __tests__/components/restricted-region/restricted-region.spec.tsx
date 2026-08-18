@@ -54,7 +54,7 @@ jest.mock("@app/navigation/boot-splash-gate", () => ({
 }))
 
 const mockModal = jest.fn()
-jest.mock("@app/components/restricted-region/restricted-region-modal", () => {
+jest.mock("@app/self-custodial/components/restricted-region-modal", () => {
   const ReactNs = jest.requireActual<typeof import("react")>("react")
   const RN = jest.requireActual<typeof import("react-native")>("react-native")
   return {
@@ -75,7 +75,7 @@ jest.mock("@app/components/restricted-region/restricted-region-modal", () => {
   }
 })
 
-jest.mock("@app/components/restricted-region/restricted-region-screen", () => {
+jest.mock("@app/custodial/components/restricted-region-screen", () => {
   const ReactNs = jest.requireActual<typeof import("react")>("react")
   const RN = jest.requireActual<typeof import("react-native")>("react-native")
   return {

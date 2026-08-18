@@ -6,16 +6,16 @@ import { BLOCKED_COUNTRIES_FAQ_LINK } from "@app/config"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
-import CustomModal from "../custom-modal/custom-modal"
-import { RestrictedRegionBody } from "./restricted-region-body"
+import CustomModal from "@app/components/custom-modal/custom-modal"
+import { RestrictedRegionBody } from "@app/components/restricted-region/restricted-region-body"
 
 type RestrictedRegionModalProps = {
   isVisible: boolean
   onDismiss: () => void
 }
 
-/** The non-custodial variant: dismissible, because the local wallet stays usable behind
- *  it; closing never restores Blink-served features. */
+/** Dismissible, because the local wallet stays usable behind it; closing never
+ *  restores Blink-served features. */
 export const RestrictedRegionModal: React.FC<RestrictedRegionModalProps> = ({
   isVisible,
   onDismiss,

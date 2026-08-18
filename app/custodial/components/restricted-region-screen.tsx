@@ -16,10 +16,10 @@ import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { testProps } from "@app/utils/testProps"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
-import { RestrictedRegionBody } from "./restricted-region-body"
+import { RestrictedRegionBody } from "@app/components/restricted-region/restricted-region-body"
 
-/** The custodial variant: every custodial function is Blink-served, so the block covers
- *  the whole session and offers no way back into the app while it holds. */
+/** Every custodial function is Blink-served, so the block covers the whole session
+ *  and offers no way back into the app while it holds. */
 export const RestrictedRegionScreen: React.FC = () => {
   const { LL } = useI18nContext()
   const styles = useStyles()
@@ -113,7 +113,7 @@ export const RestrictedRegionScreen: React.FC = () => {
             />
             {/* The external browser is deliberate here: this block renders inside a
                 native Modal, which nothing (InAppBrowser included) can present above.
-                The dismissible non-custodial modal uses the in-app browser instead. */}
+                The dismissible self-custodial modal uses the in-app browser instead. */}
             <GaloySecondaryButton
               title={LL.RestrictedRegion.learnMore()}
               onPress={() => Linking.openURL(BLOCKED_COUNTRIES_FAQ_LINK)}
