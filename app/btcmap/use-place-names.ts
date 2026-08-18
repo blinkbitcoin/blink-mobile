@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react"
 import { recordAppError, toError } from "@app/utils/error-reporting"
 
 import { fetchPlaceNamesNear } from "./api"
-import { LatLng } from "./geo"
+import { LatLng, PRIVACY_GRID_SLACK_KM, snapToPrivacyGrid } from "./geo"
 
 // Panning settles into a burst of region changes; one request per settled view
 // is the point, not one per frame.
@@ -12,21 +12,6 @@ const DEBOUNCE_MS = 350
 // Names are kept while the user pans around a neighbourhood so going back over
 // old ground does not blank the labels, but not forever.
 const MAX_CACHED_NAMES = 2000
-
-// The viewport centre is the one thing on this screen that leaves the device
-// describing where the user is, and it would otherwise go to a third party once
-// per settled pan — a timestamped trail of home, work and the shop in between,
-// at a zoom precise enough to be a street address. Snapping it to a ~1.1 km grid
-// means every look around a neighbourhood asks the same question, so the trail
-// collapses to the cell rather than the path taken through it.
-const GRID_STEPS_PER_DEGREE = 100
-const snapToGrid = (value: number) =>
-  Math.round(value * GRID_STEPS_PER_DEGREE) / GRID_STEPS_PER_DEGREE
-
-// Half the diagonal of one grid cell, so the widened radius still reaches
-// wherever inside it the user actually is. Latitude dominates: a cell is at its
-// widest at the equator, where 0.005° is ~0.56 km each way.
-const GRID_SLACK_KM = 0.8
 
 type Viewport = {
   center: LatLng
@@ -56,11 +41,10 @@ export const useBtcMapPlaceNames = (viewport: Viewport): ReadonlyMap<number, str
   const { enabled } = viewport
   // Quantised before it reaches the dependency array, so a pan that stays
   // inside one cell does not even re-run the effect, let alone re-ask.
-  const latitude = snapToGrid(viewport.center.latitude)
-  const longitude = snapToGrid(viewport.center.longitude)
+  const { latitude, longitude } = snapToPrivacyGrid(viewport.center)
   // Rounded for the same reason, and because a radius carried to fifteen
   // decimal places is a fingerprint of the exact viewport it came from.
-  const radiusKm = Math.round((viewport.radiusKm + GRID_SLACK_KM) * 100) / 100
+  const radiusKm = Math.round((viewport.radiusKm + PRIVACY_GRID_SLACK_KM) * 100) / 100
 
   useEffect(() => {
     if (!enabled) return undefined

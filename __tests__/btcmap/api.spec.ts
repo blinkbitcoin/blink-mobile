@@ -1,6 +1,12 @@
 import axios from "axios"
 
-import { fetchPlaceDetails, fetchPlacesDelta, fetchPlacesSnapshot } from "@app/btcmap/api"
+import {
+  fetchPlaceDetails,
+  fetchPlaceNamesNear,
+  fetchPlacesDelta,
+  fetchPlacesNear,
+  fetchPlacesSnapshot,
+} from "@app/btcmap/api"
 import { BTCMAP_MAX_PAGES, BTCMAP_PAGE_SIZE } from "@app/btcmap/config"
 
 jest.mock("axios")
@@ -332,5 +338,96 @@ describe("fetchPlaceDetails", () => {
     })
 
     expect((await fetchPlaceDetails(7)).paymentUrl).toBe("https://app.pouch.ph/alice")
+  })
+})
+
+describe("fetchPlacesNear", () => {
+  it("asks the search endpoint about the circle it was given", async () => {
+    mockedGet.mockResolvedValue({ data: [], headers: {} })
+
+    await fetchPlacesNear({ latitude: 51.5, longitude: -0.12 }, 25)
+
+    expect(mockedGet.mock.calls[0][0]).toContain("/places/search")
+    // eslint-disable-next-line camelcase
+    expect(paramsOf(0)).toEqual({ lat: 51.5, lon: -0.12, radius_km: 25 })
+  })
+
+  it("returns places the map can draw and the list can name", async () => {
+    mockedGet.mockResolvedValue({
+      data: [
+        {
+          id: 1,
+          lat: 10,
+          lon: 20,
+          icon: "local_cafe",
+          name: "Satoshi Coffee",
+          address: "1 Bishopsgate, London",
+        },
+      ],
+      headers: {},
+    })
+
+    expect(await fetchPlacesNear({ latitude: 10, longitude: 20 }, 5)).toEqual([
+      {
+        id: 1,
+        latitude: 10,
+        longitude: 20,
+        icon: "local_cafe",
+        boostedUntil: undefined,
+        name: "Satoshi Coffee",
+        address: "1 Bishopsgate, London",
+      },
+    ])
+  })
+
+  it("leaves the address off rather than carrying a blank one", async () => {
+    // It is what a result row falls back to when there is no distance to show,
+    // and an empty string would render as a blank second line.
+    mockedGet.mockResolvedValue({
+      data: [
+        { id: 1, lat: 10, lon: 20, icon: "hotel", name: "Hotel", address: "   " },
+        { id: 2, lat: 10, lon: 20, icon: "hotel", name: "Hostel" },
+      ],
+      headers: {},
+    })
+
+    const places = await fetchPlacesNear({ latitude: 10, longitude: 20 }, 5)
+
+    expect(places.map((place) => place.address)).toEqual([undefined, undefined])
+  })
+
+  it("drops rows a result could not be built from", async () => {
+    // A row with no name matches nothing typed and has nothing to show; one with
+    // no coordinates cannot be flown to.
+    mockedGet.mockResolvedValue({
+      data: [
+        { id: 1, lat: 10, lon: 20, icon: "hotel", name: "Hotel" },
+        { id: 2, lat: 10, lon: 20, icon: "hotel" },
+        { id: 3, lat: 10, lon: 20, icon: "hotel", name: "   " },
+        { id: 4, lon: 20, icon: "hotel", name: "Nowhere" },
+      ],
+      headers: {},
+    })
+
+    const places = await fetchPlacesNear({ latitude: 10, longitude: 20 }, 5)
+
+    expect(places.map((place) => place.id)).toEqual([1])
+  })
+})
+
+describe("fetchPlaceNamesNear", () => {
+  it("reduces the same response to the labels drawn under the pins", async () => {
+    mockedGet.mockResolvedValue({
+      data: [
+        { id: 1, lat: 10, lon: 20, icon: "hotel", name: "Hotel" },
+        { id: 2, lat: 10, lon: 20, icon: "hotel" },
+      ],
+      headers: {},
+    })
+
+    const names = await fetchPlaceNamesNear({ latitude: 10, longitude: 20 }, 1)
+
+    expect(names.get(1)).toBe("Hotel")
+    expect(names.has(2)).toBe(false)
   })
 })
