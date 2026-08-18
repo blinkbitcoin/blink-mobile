@@ -2235,6 +2235,22 @@
     "imageLibraryPermissionsNotGranted": "Asinayo imvume yokufikelela kwithala lemifanekiso. Nceda ujonge iisetingi ze-app kwiqonga lakho."
   },
   "SecurityScreen": {
+    "securityScore": {
+      "title": "Amanqaku okhuseleko {done: number}/{total: number}",
+      "levelLow": "phantsi",
+      "levelMedium": "phakathi",
+      "levelHigh": "phezulu",
+      "set": "Misela",
+      "enabled": "Ivuliwe",
+      "signals": {
+        "cloudBackup": "Ukugcina kwilifu",
+        "manualBackup": "Ukugcina ngesandla",
+        "appLock": "Ibhayometriki/i-PIN",
+        "hideBalance": "Fihla ibhalansi",
+        "twoFactor": "Ungqinisiso lwezinto ezimbini (2FA)",
+        "emailVerified": "I-imeyile eqinisekisiweyo"
+      }
+    },
     "title": "Ukhuseleko noBucala",
     "biometricDescription": "Vula ngomnwe okanye ukuqaphela ubuso.",
     "biometricTitle": "Ibhayometriki",
@@ -2259,7 +2275,6 @@
     "totalLabel": "Iyonke",
     "totalExceed": "Iyonke igqithile kwibhalansi yakho {balance: string}",
     "maxFeeSelected": "Lo ngowona mrhumo uphezulu oza kubizwa ngawo kule ntengiselwano. Inokuphela incinci xa intlawulo yenziwe.",
-    "feeError": "Ayiphumelelanga ukubala umrhumo",
     "invoiceAlreadyPaid": "Le invoyisi sele ihlawuliwe",
     "somethingWentWrong": "Ikhona into engahambi kakuhle",
     "paymentAlreadyAttempted": "Intlawulo sele izanyiwe.\n\nUkuba ufuna ukuthumela le ntlawulo kwakhona, qala ekuqaleni.",
@@ -2349,7 +2364,7 @@
     "recipient": "Umamkeli",
     "time": "Ixesha",
     "type": "Uhlobo",
-    "feeTier": "Isantya semirhumo",
+    "feeTier": "Ukubaluleka kwentengiselwano",
     "fast": "Ngokukhawuleza",
     "medium": "Phakathi",
     "slow": "Ngokucothayo",
@@ -2825,6 +2840,7 @@
     "fee": "fee",
     "Fee": "Umrhumo",
     "fees": "Fees",
+    "feeError": "Ayiphumelelanga ukubala umrhumo",
     "firstName": "First Name",
     "from": "From",
     "hour": "hour",
@@ -3716,6 +3732,7 @@
         "body": "Ungakhathazeki — imali yakho ikhuselekile. Ufuduko lunokuthatha imizuzu embalwa, kwaye ngamanye amaxesha inyathelo lifuna nje ukuqala kwakhona.\n\nQala ufuduko kwakhona — kuthatha umzuzwana nje.\n\nUsayibona esi sikrini? Qhagamshelana nenkxaso wabelane ngeenkcukacha ezingezantsi:",
         "contactSupportCta": "Qhagamshelana nenkxaso"
       },
+      "closeRefusedBody": "Ukufuduka kwakho kugqityiwe kwaye imali yakho ikwisipaji sakho esitsha. Iakhawunti yakho endala isenokuba ivuliwe. Inkxaso iza kujonga kwaye iyivale ukuba kunjalo.\n\nUsenokufuna olu lwazi ukunceda inkxaso isombulule ityala lakho:",
       "reasonLabel": "Isizathu",
       "accountIdLabel": "I-ID yeakhawunti",
       "pubKeyLabel": "pubKey",
@@ -3812,7 +3829,8 @@
     "clockOutOfSync": {
       "body": "Umhla nexesha lesixhobo sakho azihambelani. Zimisele ukuba zizenzekele ukuze uqhubeke.",
       "retryCta": "Zama kwakhona"
-    }
+    },
+    "closeUnavailable": "Imali yakho ikhuselekile kwisipaji sakho esitsha. Sisavala iakhawunti yakho endala, nceda uzame kwakhona emzuzwaneni."
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Igciniwe",

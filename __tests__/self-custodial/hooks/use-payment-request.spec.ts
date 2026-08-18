@@ -20,7 +20,10 @@ const mockRecordError = jest.fn()
 const mockAddPendingAutoConvert = jest.fn()
 const mockFetchAutoConvertMinSats = jest.fn()
 const mockUseReceiveAssetMode = jest.fn()
+const mockPendingDeposits = jest.fn()
 const mockFormatMoneyAmount = jest.fn()
+const mockLoadIssuedOnchainAddress = jest.fn()
+const mockSaveIssuedOnchainAddress = jest.fn()
 
 jest.mock("@app/self-custodial/bridge", () => ({
   createReceiveLightning: () => mockReceiveLightning,
@@ -42,6 +45,12 @@ jest.mock("@app/self-custodial/hooks/use-receive-asset-mode", () => ({
   useReceiveAssetMode: () => mockUseReceiveAssetMode(),
 }))
 
+// The real hook subscribes to navigation focus, which a bare renderHook has no
+// container for; the receive screen it feeds is always inside one.
+jest.mock("@app/self-custodial/hooks/use-pending-deposits", () => ({
+  usePendingDeposits: () => mockPendingDeposits(),
+}))
+
 jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () => mockSelfCustodialWallet(),
 }))
@@ -58,9 +67,23 @@ jest.mock("@app/hooks/use-display-currency", () => ({
   useDisplayCurrency: () => ({ formatMoneyAmount: mockFormatMoneyAmount }),
 }))
 
+jest.mock("@app/hooks/use-account-registry", () => ({
+  useAccountRegistry: () => ({
+    activeAccount: { id: "sc-account-1", type: "self-custodial" },
+  }),
+}))
+
+jest.mock("@app/self-custodial/storage/onchain-address", () => ({
+  ...jest.requireActual("@app/self-custodial/storage/onchain-address"),
+  loadIssuedOnchainAddress: (...args: unknown[]) => mockLoadIssuedOnchainAddress(...args),
+  saveIssuedOnchainAddress: (...args: unknown[]) => mockSaveIssuedOnchainAddress(...args),
+}))
+
 describe("usePaymentRequest", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockLoadIssuedOnchainAddress.mockResolvedValue(null)
+    mockSaveIssuedOnchainAddress.mockResolvedValue(undefined)
     applyPaymentRequestDefaults({
       receiveLightning: mockReceiveLightning,
       receiveOnchain: mockReceiveOnchain,
@@ -70,6 +93,7 @@ describe("usePaymentRequest", () => {
       addPendingAutoConvert: mockAddPendingAutoConvert,
       fetchAutoConvertMinSats: mockFetchAutoConvertMinSats,
       useReceiveAssetMode: mockUseReceiveAssetMode,
+      pendingDeposits: mockPendingDeposits,
       formatMoneyAmount: mockFormatMoneyAmount,
     })
   })
@@ -78,6 +102,7 @@ describe("usePaymentRequest", () => {
     mockSelfCustodialWallet.mockReturnValue({
       sdk: undefined,
       lastReceivedPaymentId: null,
+      allTransactions: [],
     })
 
     const { result } = renderHook(() => usePaymentRequest())
@@ -300,6 +325,7 @@ describe("usePaymentRequest", () => {
     mockSelfCustodialWallet.mockReturnValue({
       sdk: mockSdk,
       lastReceivedPaymentId: "payment-abc-123",
+      allTransactions: [],
     })
     rerender({})
 
@@ -312,6 +338,7 @@ describe("usePaymentRequest", () => {
     mockSelfCustodialWallet.mockReturnValue({
       sdk: mockSdk,
       lastReceivedPaymentId: "payment-already-seen",
+      allTransactions: [],
     })
 
     const { result } = renderHook(() => usePaymentRequest())
@@ -333,6 +360,7 @@ describe("usePaymentRequest", () => {
     mockSelfCustodialWallet.mockReturnValue({
       sdk: mockSdk,
       lastReceivedPaymentId: "payment-first",
+      allTransactions: [],
     })
     rerender({})
 
@@ -345,6 +373,7 @@ describe("usePaymentRequest", () => {
     mockSelfCustodialWallet.mockReturnValue({
       sdk: mockSdk,
       lastReceivedPaymentId: "payment-first",
+      allTransactions: [],
     })
     mockReceiveLightning.mockResolvedValue({ invoice: "lnbc1second..." })
 
@@ -430,6 +459,7 @@ describe("usePaymentRequest", () => {
       mockSelfCustodialWallet.mockReturnValue({
         sdk: { id: "different-sdk" },
         lastReceivedPaymentId: null,
+        allTransactions: [],
       })
 
       rerender({})
@@ -437,6 +467,9 @@ describe("usePaymentRequest", () => {
       await waitFor(() => {
         expect(result.current?.onchainAddress).toBe("bc1qsecond...")
       })
+
+      // A reconnect alone must not rotate — the address is only stale once used.
+      expect(mockReceiveOnchain).toHaveBeenLastCalledWith({ newAddress: false })
     })
   })
 
@@ -652,6 +685,7 @@ describe("usePaymentRequest", () => {
         sdk: mockSdk,
         lastReceivedPaymentId: null,
         lightningAddress,
+        allTransactions: [],
       })
     }
 

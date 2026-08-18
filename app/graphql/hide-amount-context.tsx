@@ -2,10 +2,10 @@ import { createContext, useContext } from "react"
 
 const HideAmountContext = createContext<{
   hideAmount: boolean
-  switchMemoryHideAmount: () => void
+  toggleHideAmount: () => void
 }>({
   hideAmount: false,
-  switchMemoryHideAmount: () => {},
+  toggleHideAmount: () => {},
 })
 
 export const HideAmountContextProvider = HideAmountContext.Provider

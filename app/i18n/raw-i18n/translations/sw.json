@@ -2235,6 +2235,22 @@
     "imageLibraryPermissionsNotGranted": "Hatuna ruhusa ya kupata maktaba ya picha. Tafadhali angalia vipimo vya programu kwenye jukwaa lako."
   },
   "SecurityScreen": {
+    "securityScore": {
+      "title": "Alama ya usalama {done: number}/{total: number}",
+      "levelLow": "chini",
+      "levelMedium": "wastani",
+      "levelHigh": "juu",
+      "set": "Weka",
+      "enabled": "Imewashwa",
+      "signals": {
+        "cloudBackup": "Hifadhi rudufu ya wingu",
+        "manualBackup": "Hifadhi rudufu ya mkono",
+        "appLock": "Bayometriki/PIN",
+        "hideBalance": "Ficha salio",
+        "twoFactor": "Uthibitishaji wa hatua mbili (2FA)",
+        "emailVerified": "Barua pepe iliyothibitishwa"
+      }
+    },
     "title": "Usalama na Faragha",
     "biometricDescription": "Fungua kutumia alama za vidole au utambuzi kwa uso.",
     "biometricTitle": "Biometriki",
@@ -2259,7 +2275,6 @@
     "totalLabel": "Jumla:",
     "totalExceed": "Jumla imezidi baki lako la {balance: string}",
     "maxFeeSelected": "Hii ndio ada ya juu zaidi ambayo unawezalipishwa kwa malipo haya. Inaweza kuishia kuwa kidogo malipo yatakapofanyika.",
-    "feeError": "Tuna tatizo kuhesabu ada",
     "invoiceAlreadyPaid": "Laini ya malipo imekwisha kulipiwa",
     "somethingWentWrong": "Kitu kimeenda vibaya",
     "paymentAlreadyAttempted": "Malipo tayari yamejaribiwa.\n\nIkiwa unataka kutuma malipo haya tena, anza upya.",
@@ -2349,7 +2364,7 @@
     "recipient": "Mpokeaji",
     "time": "Muda",
     "type": "Aina",
-    "feeTier": "Kasi ya ada",
+    "feeTier": "Kipaumbele cha muamala",
     "fast": "Haraka",
     "medium": "Wastani",
     "slow": "Polepole",
@@ -2825,6 +2840,7 @@
     "fee": "ada",
     "Fee": "Ada",
     "fees": "Ada",
+    "feeError": "Tuna tatizo kuhesabu ada",
     "firstName": "Jina la kwanza",
     "from": "Kutoka",
     "hour": "saa",
@@ -3716,6 +3732,7 @@
         "body": "Usiwe na wasiwasi — fedha zako ziko salama. Uhamishaji unaweza kuchukua dakika chache, na wakati mwingine hatua moja inahitaji tu kuanza upya.\n\nAnza uhamishaji upya — inachukua muda mfupi tu.\n\nBado unaona skrini hii? Wasiliana na usaidizi na ushiriki maelezo yaliyo hapa chini:",
         "contactSupportCta": "Wasiliana na usaidizi"
       },
+      "closeRefusedBody": "Uhamishaji wako umekamilika na fedha zako ziko katika pochi yako mpya. Akaunti yako ya zamani huenda bado iko wazi. Timu ya usaidizi itakagua na kuifunga ikiwa ndivyo.\n\nUnaweza kuhitaji taarifa hizi ili kusaidia usaidizi kutatua kesi yako:",
       "reasonLabel": "Sababu",
       "accountIdLabel": "Kitambulisho cha akaunti",
       "pubKeyLabel": "pubKey",
@@ -3812,7 +3829,8 @@
     "clockOutOfSync": {
       "body": "Tarehe na saa za kifaa chako hazijaoanishwa. Ziweke kwa kiotomatiki ili kuendelea.",
       "retryCta": "Jaribu tena"
-    }
+    },
+    "closeUnavailable": "Fedha zako ziko salama katika pochi yako mpya. Bado tunafunga akaunti yako ya zamani, tafadhali jaribu tena baada ya muda mfupi."
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Iliyohifadhiwa",

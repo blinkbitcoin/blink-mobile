@@ -37,15 +37,7 @@ describe("CardCreatePinScreen", () => {
     mockUpdatePin.mockResolvedValue(true)
   })
 
-  // StepsProgressBar runs an Animated.timing (real-timer, ~120ms) whose frames
-  // land after the synchronous test body returns. Wait the animation out inside
-  // act() so its updates neither warn nor leak into the next test.
   afterEach(async () => {
-    await act(async () => {
-      await new Promise<void>((resolve) => {
-        setTimeout(resolve, 200)
-      })
-    })
     await flushEffects()
   })
 

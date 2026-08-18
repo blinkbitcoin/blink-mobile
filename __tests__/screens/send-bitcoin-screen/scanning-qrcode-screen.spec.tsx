@@ -1,7 +1,13 @@
 import React from "react"
 import { Alert } from "react-native"
 import { Network as mockSparkNetwork } from "@breeztech/breez-sdk-spark-react-native"
-import { act, render, waitFor } from "@testing-library/react-native"
+import {
+  act,
+  fireEvent,
+  render,
+  waitFor,
+  type RenderAPI,
+} from "@testing-library/react-native"
 
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { Network } from "@app/graphql/generated"
@@ -81,13 +87,27 @@ jest.mock("@react-native-clipboard/clipboard", () => ({
   default: { getString: jest.fn().mockResolvedValue("") },
 }))
 
+const mockDetect = jest.fn()
 jest.mock("rn-qr-generator", () => ({
   __esModule: true,
-  default: { detect: jest.fn().mockResolvedValue({ values: [] }) },
+  default: { detect: (...args: unknown[]) => mockDetect(...args) },
 }))
 
+const mockLaunchImageLibrary = jest.fn()
 jest.mock("react-native-image-picker", () => ({
-  launchImageLibrary: jest.fn().mockResolvedValue({ assets: [] }),
+  launchImageLibrary: (...args: unknown[]) => mockLaunchImageLibrary(...args),
+}))
+
+const mockToastShow = jest.fn()
+jest.mock("@app/utils/toast", () => ({
+  ...jest.requireActual("@app/utils/toast"),
+  toastShow: (...args: unknown[]) => mockToastShow(...args),
+}))
+
+const mockReportError = jest.fn()
+jest.mock("@app/utils/error-logging", () => ({
+  ...jest.requireActual("@app/utils/error-logging"),
+  reportError: (...args: readonly unknown[]) => mockReportError(...args),
 }))
 
 const alertSpy = jest.spyOn(Alert, "alert").mockImplementation(() => {})
@@ -129,6 +149,8 @@ describe("ScanningQRCodeScreen", () => {
     lastReadCode = null
     mockScanContext.mockReturnValue(custodialScanContext)
     mockSelfCustodialWallet.mockReturnValue({ sdk: null })
+    mockLaunchImageLibrary.mockResolvedValue({ assets: [] })
+    mockDetect.mockResolvedValue({ values: [] })
   })
 
   it("calls resolveDestination with sdk=null when active wallet is custodial", async () => {
@@ -329,5 +351,188 @@ describe("ScanningQRCodeScreen", () => {
     await fireScan("lnbc1same")
 
     expect(mockResolveDestination).toHaveBeenCalledTimes(1)
+  })
+
+  /**
+   * pending gates every scan and is only cleared from this alert, so a rejection that
+   * skipped the alert left the camera and the gallery button dead for the whole screen.
+   */
+  it("keeps scanning alive when resolving rejects with something that is not an Error", async () => {
+    mockResolveDestination.mockRejectedValue({ code: "E_RESOLVE" })
+
+    await renderScreen()
+    await fireScan("lnbc1first")
+
+    await waitFor(() =>
+      expect(alertSpy).toHaveBeenCalledWith(
+        "Unexpected error occurred",
+        "",
+        expect.anything(),
+      ),
+    )
+    expect(mockReportError).toHaveBeenCalledWith(
+      "scanning-qrcode",
+      new Error('{"code":"E_RESOLVE"}'),
+    )
+
+    const [, , buttons] = alertSpy.mock.calls[0]
+    await act(async () => {
+      buttons?.[0].onPress?.()
+    })
+
+    mockResolveDestination.mockResolvedValue({
+      valid: true,
+      destinationDirection: DestinationDirection.Send,
+      validDestination: { paymentType: "Lightning" },
+      createPaymentDetail: jest.fn(),
+    })
+    await fireScan("lnbc1second")
+
+    expect(mockResolveDestination).toHaveBeenCalledTimes(2)
+  })
+
+  describe("picking a QR from the gallery", () => {
+    const openGallery = async (screen: RenderAPI) => {
+      await act(async () => {
+        fireEvent.press(screen.getByTestId("open-gallery"))
+      })
+    }
+
+    /**
+     * The decoder holds the decoded bitmap and one integer per pixel on top of it, so an
+     * unbounded photo is an out-of-memory crash rather than a slow read.
+     */
+    it("bounds the picked image before the decoder ever sees it", async () => {
+      const screen = await renderScreen()
+      await openGallery(screen)
+
+      expect(mockLaunchImageLibrary).toHaveBeenCalledWith({
+        mediaType: "photo",
+        maxWidth: 2048,
+        maxHeight: 2048,
+      })
+    })
+
+    it("resolves the QR found in the picked image", async () => {
+      mockLaunchImageLibrary.mockResolvedValue({ assets: [{ uri: "file:///photo.jpg" }] })
+      mockDetect.mockResolvedValue({ values: ["lnbc1fromgallery"] })
+      mockResolveDestination.mockResolvedValue({
+        valid: true,
+        destinationDirection: DestinationDirection.Send,
+        validDestination: { paymentType: "Lightning" },
+        createPaymentDetail: jest.fn(),
+      })
+
+      const screen = await renderScreen()
+      await openGallery(screen)
+
+      expect(mockDetect).toHaveBeenCalledWith({ uri: "file:///photo.jpg" })
+      await waitFor(() => expect(mockResolveDestination).toHaveBeenCalled())
+      const [destination] = mockResolveDestination.mock.calls[0]
+      expect(destination).toEqual(
+        expect.objectContaining({ rawInput: "lnbc1fromgallery", inputSource: "qr" }),
+      )
+    })
+
+    it("tells the user when the picked image holds no QR", async () => {
+      mockLaunchImageLibrary.mockResolvedValue({ assets: [{ uri: "file:///photo.jpg" }] })
+      mockDetect.mockResolvedValue({ values: [] })
+
+      const screen = await renderScreen()
+      await openGallery(screen)
+
+      await waitFor(() => expect(alertSpy).toHaveBeenCalled())
+      expect(mockResolveDestination).not.toHaveBeenCalled()
+    })
+
+    it("resolves nothing when the picker comes back empty", async () => {
+      mockLaunchImageLibrary.mockResolvedValue({ assets: [] })
+
+      const screen = await renderScreen()
+      await openGallery(screen)
+
+      expect(mockDetect).not.toHaveBeenCalled()
+      expect(mockResolveDestination).not.toHaveBeenCalled()
+    })
+
+    /**
+     * processInvoice drops whatever it is handed while a scan is in flight, so a picker
+     * opened now would cost the user a trip through the gallery and end in silence.
+     */
+    it("stays shut while a scan is already in flight", async () => {
+      mockResolveDestination.mockReturnValue(new Promise(() => {}))
+
+      const screen = await renderScreen()
+      await act(async () => {
+        lastReadCode?.({ nativeEvent: { codeStringValue: "lnbc1inflight" } })
+      })
+
+      await openGallery(screen)
+
+      expect(mockLaunchImageLibrary).not.toHaveBeenCalled()
+    })
+
+    it("surfaces a picker failure instead of dying on it", async () => {
+      mockLaunchImageLibrary.mockRejectedValue(new Error("picker exploded"))
+
+      const screen = await renderScreen()
+      await openGallery(screen)
+
+      await waitFor(() =>
+        expect(alertSpy).toHaveBeenCalledWith("Unexpected error occurred"),
+      )
+      expect(mockReportError).toHaveBeenCalledWith(
+        "scanning-qrcode",
+        new Error("picker exploded"),
+      )
+    })
+
+    /**
+     * A native module can reject with something that is not an Error, and narrowing the
+     * catch on instanceof would drop those rejections with no alert and nothing reported.
+     * What it rejected with belongs in error reporting, not in a dialog.
+     */
+    it("surfaces a picker rejection that is not an Error", async () => {
+      mockLaunchImageLibrary.mockRejectedValue({ code: "E_PICKER_UNAVAILABLE" })
+
+      const screen = await renderScreen()
+      await openGallery(screen)
+
+      await waitFor(() =>
+        expect(alertSpy).toHaveBeenCalledWith("Unexpected error occurred"),
+      )
+      expect(mockReportError).toHaveBeenCalledWith(
+        "scanning-qrcode",
+        new Error('{"code":"E_PICKER_UNAVAILABLE"}'),
+      )
+    })
+
+    it("tells the user when the image library permission was refused", async () => {
+      mockLaunchImageLibrary.mockResolvedValue({ errorCode: "permission" })
+
+      const screen = await renderScreen()
+      await openGallery(screen)
+
+      await waitFor(() => expect(mockToastShow).toHaveBeenCalled())
+      expect(mockDetect).not.toHaveBeenCalled()
+    })
+
+    it("does not go quiet when the picker fails for any other reason", async () => {
+      mockLaunchImageLibrary.mockResolvedValue({
+        errorCode: "others",
+        errorMessage: "Unsupported file type",
+      })
+
+      const screen = await renderScreen()
+      await openGallery(screen)
+
+      await waitFor(() => expect(alertSpy).toHaveBeenCalled())
+      expect(mockReportError).toHaveBeenCalledWith(
+        "scanning-qrcode",
+        new Error("Image library failed: others Unsupported file type"),
+      )
+      expect(mockToastShow).not.toHaveBeenCalled()
+      expect(mockDetect).not.toHaveBeenCalled()
+    })
   })
 })

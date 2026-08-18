@@ -2235,6 +2235,22 @@
         "imageLibraryPermissionsNotGranted": "Não temos permissões para acessar a biblioteca de imagens. Por favor, verifique as configurações do aplicativo para a sua plataforma."
     },
     "SecurityScreen": {
+        "securityScore": {
+            "title": "Pontuação de segurança {done: number}/{total: number}",
+            "levelLow": "baixa",
+            "levelMedium": "média",
+            "levelHigh": "alta",
+            "set": "Configurar",
+            "enabled": "Ativado",
+            "signals": {
+                "cloudBackup": "Backup na nuvem",
+                "manualBackup": "Backup manual",
+                "appLock": "Biometria/PIN",
+                "hideBalance": "Ocultar saldo",
+                "twoFactor": "Autenticação de dois fatores (2FA)",
+                "emailVerified": "E-mail verificado"
+            }
+        },
         "title": "Segurança e Privacidade",
         "biometricDescription": "Desbloqueie com impressão digital ou reconhecimento facial.",
         "biometricTitle": "Biometria",
@@ -2259,7 +2275,6 @@
         "totalLabel": "Total:",
         "totalExceed": "O total excede seu saldo de {balance: string}",
         "maxFeeSelected": "Esta é a taxa máxima que será cobrada por esta transação. Pode acabar sendo menor uma vez que o pagamento foi feito.",
-        "feeError": "Não foi possível calcular a taxa.",
         "invoiceAlreadyPaid": "Esta fatura já foi paga",
         "somethingWentWrong": "Algo deu errado",
         "paymentAlreadyAttempted": "Pagamento já tentado.\n\nSe você deseja enviar esse pagamento novamente, comece do zero.",
@@ -2349,7 +2364,7 @@
         "recipient": "Destinatário",
         "time": "Hora",
         "type": "Tipo",
-        "feeTier": "Velocidade da taxa",
+        "feeTier": "Prioridade da transação",
         "fast": "Rápido",
         "medium": "Médio",
         "slow": "Lento",
@@ -2825,6 +2840,7 @@
         "fee": "taxa",
         "Fee": "Taxa:",
         "fees": "Taxas",
+        "feeError": "Não foi possível calcular a taxa.",
         "firstName": "Primeiro Nome",
         "from": "De",
         "hour": "hora",
@@ -3716,6 +3732,7 @@
                 "body": "Não se preocupe — seus fundos estão seguros. A migração pode levar alguns minutos, e às vezes uma etapa só precisa recomeçar.\n\nComece a migração de novo — leva só um instante.\n\nAinda está vendo esta tela? Entre em contato com o suporte e compartilhe os dados abaixo:",
                 "contactSupportCta": "Contate o suporte"
             },
+            "closeRefusedBody": "A sua migração foi concluída e os seus fundos estão na sua nova carteira. A sua conta antiga pode ainda estar aberta. O suporte vai verificar e fechá-la se for o caso.\n\nVocê pode precisar destas informações para ajudar o suporte a resolver o seu caso:",
             "reasonLabel": "Motivo",
             "accountIdLabel": "ID da conta",
             "pubKeyLabel": "pubKey",
@@ -3812,7 +3829,8 @@
         "clockOutOfSync": {
             "body": "A data e a hora do teu dispositivo estão dessincronizadas. Define-as como automáticas para continuar.",
             "retryCta": "Tentar novamente"
-        }
+        },
+        "closeUnavailable": "Seus fundos estão seguros na sua nova carteira. Ainda estamos fechando sua conta antiga, tente novamente em instantes."
     },
     "AccountTypeSelectionScreen": {
         "custodialLabel": "Custodiada",

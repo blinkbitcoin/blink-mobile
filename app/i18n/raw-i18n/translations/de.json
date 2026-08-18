@@ -2235,6 +2235,22 @@
         "imageLibraryPermissionsNotGranted": "Wir haben keine Berechtigung für den Zugriff auf die Bilderbibliothek. Bitte überprüfen Sie die App-Einstellungen für Ihre Plattform."
     },
     "SecurityScreen": {
+        "securityScore": {
+            "title": "Sicherheitsbewertung {done: number}/{total: number}",
+            "levelLow": "niedrig",
+            "levelMedium": "mittel",
+            "levelHigh": "hoch",
+            "set": "Einrichten",
+            "enabled": "Aktiviert",
+            "signals": {
+                "cloudBackup": "Cloud-Backup",
+                "manualBackup": "Manuelles Backup",
+                "appLock": "Biometrie/PIN",
+                "hideBalance": "Guthaben verbergen",
+                "twoFactor": "Zwei-Faktor-Authentifizierung (2FA)",
+                "emailVerified": "Verifizierte E-Mail-Adresse"
+            }
+        },
         "title": "Sicherheit und Datenschutz",
         "biometricDescription": "Mit Fingerabdruck oder Gesichtserkennung entsperren.",
         "biometricTitle": "Biometrie",
@@ -2259,7 +2275,6 @@
         "totalLabel": "Gesamt:",
         "totalExceed": "Der Gesamtbetrag übersteigt dein Guthaben von {balance: string}",
         "maxFeeSelected": "Dies ist die maximale Transaktionsgebühr. Die tatsächlich gezahlte Gebühr kann weniger betragen.",
-        "feeError": "Kann Gebühr nicht berechnen",
         "invoiceAlreadyPaid": "Diese Invoice ist bereits bezahlt worden",
         "somethingWentWrong": "Etwas ist schief gegeangen",
         "paymentAlreadyAttempted": "Die Zahlung wurde bereits versucht.\n\nWenn Sie diese Zahlung erneut senden möchten, beginnen Sie von vorne.",
@@ -2349,7 +2364,7 @@
         "recipient": "Empfänger",
         "time": "Uhrzeit",
         "type": "Typ",
-        "feeTier": "Gebührengeschwindigkeit",
+        "feeTier": "Transaktionspriorität",
         "fast": "Schnell",
         "medium": "Mittel",
         "slow": "Langsam",
@@ -2825,6 +2840,7 @@
         "fee": "Gebühr",
         "Fee": "Gebühr",
         "fees": "Gebühren",
+        "feeError": "Kann Gebühr nicht berechnen",
         "firstName": "Vorname",
         "from": "Von",
         "hour": "Stunde",
@@ -3716,6 +3732,7 @@
                 "body": "Keine Sorge — dein Guthaben ist sicher. Die Migration kann ein paar Minuten dauern, und manchmal braucht ein Schritt einfach einen Neustart.\n\nStarte die Migration noch einmal — das dauert nur einen Moment.\n\nSiehst du diesen Bildschirm immer noch? Kontaktiere den Support und teile die folgenden Daten:",
                 "contactSupportCta": "Support kontaktieren"
             },
+            "closeRefusedBody": "Deine Migration ist abgeschlossen und dein Guthaben befindet sich in deiner neuen Wallet. Dein altes Konto ist möglicherweise noch offen. Der Support prüft das und schließt es gegebenenfalls.\n\nDiese Informationen können dem Support helfen, deinen Fall zu lösen:",
             "reasonLabel": "Grund",
             "accountIdLabel": "Konto-ID",
             "pubKeyLabel": "pubKey",
@@ -3812,7 +3829,8 @@
         "clockOutOfSync": {
             "body": "Datum und Uhrzeit deines Geräts sind nicht synchron. Stelle sie auf automatisch, um fortzufahren.",
             "retryCta": "Erneut versuchen"
-        }
+        },
+        "closeUnavailable": "Deine Gelder sind sicher in deiner neuen Wallet. Wir schließen dein altes Konto noch, bitte versuche es gleich noch einmal."
     },
     "AccountTypeSelectionScreen": {
         "custodialLabel": "Verwahrt",

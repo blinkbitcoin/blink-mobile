@@ -2263,6 +2263,22 @@ const en: BaseTranslation = {
       "Set a 4-digit numerical PIN to unlock",
     pinTitle: "PIN code",
     setPin: "Set PIN",
+    securityScore: {
+      title: "Security score {done: number}/{total: number}",
+      levelLow: "low",
+      levelMedium: "medium",
+      levelHigh: "high",
+      set: "Set",
+      enabled: "Enabled",
+      signals: {
+        cloudBackup: "Cloud backup",
+        manualBackup: "Manual backup",
+        appLock: "Biometrics/PIN",
+        hideBalance: "Hide balance",
+        twoFactor: "Two-factor authentication (2FA)",
+        emailVerified: "Verified email",
+      },
+    },
   },
   SendBitcoinConfirmationScreen: {
     amountLabel: "Amount:",
@@ -2279,7 +2295,6 @@ const en: BaseTranslation = {
     totalExceed: "Total exceeds your balance of {balance: string}",
     maxFeeSelected:
       "This is the maximum fee you will be charged for this transaction.  It may end up being less once the payment has been made.",
-    feeError: "Unable to calculate fee",
     invoiceAlreadyPaid: "This invoice has already been paid",
     somethingWentWrong: "Something went wrong",
     paymentAlreadyAttempted:
@@ -2389,7 +2404,7 @@ const en: BaseTranslation = {
     recipient: "Recipient",
     time: "Time",
     type: "Type",
-    feeTier: "Fee speed",
+    feeTier: "Transaction priority",
     fast: "Fast",
     medium: "Medium",
     slow: "Slow",
@@ -2950,6 +2965,7 @@ const en: BaseTranslation = {
     fee: "fee",
     Fee: "Fee",
     fees: "Fees",
+    feeError: "Unable to calculate fee",
     firstName: "First Name",
     from: "From",
     hour: "hour",
@@ -3902,6 +3918,8 @@ const en: BaseTranslation = {
       body: "Your device's date and time are out of sync. Set them to automatic to continue.",
       retryCta: "Try again",
     },
+    closeUnavailable:
+      "Your funds are safe in your new wallet. We are still closing your old account, please try again in a moment.",
     migrationRequiredTitle: "Time to upgrade",
     migrationRequiredBody:
       "It's time to migrate your custodial account to a non-custodial account.",
@@ -3981,6 +3999,8 @@ const en: BaseTranslation = {
         body: "Don't worry — your funds are safe. Migrating can take a few minutes, and sometimes a step just needs a fresh start.\n\nStart the migration over — it only takes a moment.\n\nStill seeing this screen? Contact support and share the details below:",
         contactSupportCta: "Contact support",
       },
+      closeRefusedBody:
+        "Your migration is complete and your funds are in your new wallet. Your old account may still be open. Support will check and close it if it is.\n\nYou may need this information to help support resolve your case:",
       reasonLabel: "Reason",
       accountIdLabel: "Account ID",
       pubKeyLabel: "pubKey",

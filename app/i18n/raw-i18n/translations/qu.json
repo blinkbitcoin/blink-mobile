@@ -2235,6 +2235,22 @@
     "imageLibraryPermissionsNotGranted": "We don't have permissions to access the image library.  Please check app settings for your platform."
   },
   "SecurityScreen": {
+    "securityScore": {
+      "title": "Seguridadpa puntajen {done: number}/{total: number}",
+      "levelLow": "pisi",
+      "levelMedium": "chawpi",
+      "levelHigh": "hatun",
+      "set": "Churay",
+      "enabled": "Aktivasqa",
+      "signals": {
+        "cloudBackup": "Phuyupi copia de seguridad",
+        "manualBackup": "Makiwan copia de seguridad",
+        "appLock": "Biometria/PIN",
+        "hideBalance": "Saldota pakay",
+        "twoFactor": "Iskay factorwan riqsichikuy (2FA)",
+        "emailVerified": "Correo electrónico chiqaqchasqa"
+      }
+    },
     "title": "Chiqapkay Pakasqa kaypas",
     "biometricDescription": "Ñuqaqa biometric kaniyta yachanakuyta sutichaq",
     "biometricTitle": "Biometric",
@@ -2259,7 +2275,6 @@
     "totalLabel": "Suma:",
     "totalExceed": "Kaniyta rikuyta munanpi, kaniyta rikuyta munanpi ch'usaq kayniyta rikuy munanpi kawsayniyta qillqata sutichinaqinmi. Chaynamanta kaniyta rikuyta munanpi, {balance: string} kawsayniyta qillqata sutichinaqinmi ch'usaq kayniyta rikuy munanpi ch'usaqta munanpi kawsayniyta qillqata sutichinaqinmi.",
     "maxFeeSelected": "Chaynamanta kaniyta rikuyta munanpi, kaniyta rikuyta munanpi ch'usaq kayniyta rikuy munanpi kawsayniyta qillqata sutichinaqinmi. Kaniytaikuyta munanpi kawsayniyta qillqata sutichinaqinmi chaypi ch'usaq kayniyta rikuy munanpi ch'usaqta munanpi kawsayniyta qillqata sutichinaqinmi.",
-    "feeError": "Chaynamanta kaniyta rikuyta munanpi, ch'usaq kayniyta rikuyta munanpi ch'usaqta munanpi kawsayniyta qillqata sutichinaqin.",
     "invoiceAlreadyPaid": "Kay facturata pagasqañam",
     "somethingWentWrong": "Imapas mana allinchu kasqa",
     "paymentAlreadyAttempted": "Pagota ruwasqaña kanku.\n\nWatiqmanta kay pagota apachiyta munaspaykiqa, qallarimanta qallariy.",
@@ -2349,7 +2364,7 @@
     "recipient": "Chaskiq",
     "time": "Pacha",
     "type": "Laya",
-    "feeTier": "Qullqi usqhay",
+    "feeTier": "Apachiypa ñawpaqnin",
     "fast": "Usqhay",
     "medium": "Chawpi",
     "slow": "Allillamanta",
@@ -2825,6 +2840,7 @@
     "fee": "chiqanakuy",
     "Fee": "Chiqanakuy",
     "fees": "Chiqanakuy",
+    "feeError": "Chaynamanta kaniyta rikuyta munanpi, ch'usaq kayniyta rikuyta munanpi ch'usaqta munanpi kawsayniyta qillqata sutichinaqin.",
     "firstName": "Hanay sutiyuq",
     "from": "Kayman",
     "hour": "P'unchaw",
@@ -3716,6 +3732,7 @@
         "body": "Ama llakikuychu — qullqiykikuna waqaychasqam kachkan. Astakuyqa pisi minutokunatam apanman, wakinpitaq huk ruwayllam musuqmanta qallariyta munan.\n\nAstakuyta musuqmanta qallariy — pisi pachallatam apan.\n\n¿Kay pantallatachu rikuchkankiraq? Yanapakuyta maskay, kay willakuykunatapas willay:",
         "contactSupportCta": "Yanapakuyta maskay"
       },
+      "closeRefusedBody": "Astakuyniyki tukusqañam, qullqiykipas musuq qhipiykipiñam. Mawk'a cuentayki kicharisqaraq kanman. Yanapaqkuna qhawarinqaku, chaymanta wichq'anqaku chayna kaptin.\n\nKay willakuykunata munawaq yanapakuqkuna hawkachinankupaq:",
       "reasonLabel": "Imarayku",
       "accountIdLabel": "Kuenta ID",
       "pubKeyLabel": "pubKey",
@@ -3812,7 +3829,8 @@
     "clockOutOfSync": {
       "body": "Dispositivoykipa p'unchawnin hinaspa horan mana huñusqachu. Automáticoman churay qatinaykipaq.",
       "retryCta": "Kutiy yapamuy"
-    }
+    },
+    "closeUnavailable": "Qullqiykiqa musuq qipiykipi allinmi kachkan. Ñawpaq cuentaykitaraq wichqachkaniku, ama hina kaspa huk ratumanta yapamanta ruway."
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Waqaychasqa",

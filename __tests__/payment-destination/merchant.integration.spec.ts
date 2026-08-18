@@ -110,7 +110,7 @@ describe("merchant payment destination integration", () => {
       termsUrl: "https://boltz.exchange/terms",
     }
     const lnurlParams = {
-      callback: "mocked_callback",
+      callback: "https://example.com/callback",
       fixed: true,
       min: 0 as Satoshis,
       max: 2000 as Satoshis,
@@ -161,7 +161,7 @@ describe("merchant payment destination integration", () => {
     }
     const selectedMerchant = merchantChoices.validDestination.merchants[0]
     const lnurlParams = {
-      callback: "mocked_callback",
+      callback: "https://example.com/callback",
       fixed: true,
       min: 0 as Satoshis,
       max: 2000 as Satoshis,

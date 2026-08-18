@@ -3,6 +3,7 @@ import { Alert } from "react-native"
 import fetch from "cross-fetch"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { isHttpsUrl } from "@app/utils/lnurl"
 
 import { ReceiveDestination } from "../../send-bitcoin-screen/payment-destination/index.types"
 import { Invoice } from "../payment/index.types"
@@ -30,6 +31,13 @@ export const useLnurlWithdraw = (pr: LnurlWithdrawablePr | null | undefined) => 
       }
 
       const { callback, k1 } = destination.validDestination
+
+      // Defense in depth: resolveLnurlDestination already gates the callback to
+      // https, but this hook fetches it directly, so enforce it here too.
+      if (!isHttpsUrl(callback)) {
+        Alert.alert(LL.RedeemBitcoinScreen.redeemingError())
+        return
+      }
 
       const urlObject = new URL(callback)
       const searchParams = urlObject.searchParams

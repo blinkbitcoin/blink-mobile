@@ -44,7 +44,12 @@ jest.mock("@app/self-custodial/migration-transfer-request", () => ({
 
 /** Confirmed by default so the server phase stays the deciding voice in the existing
  *  cases; the receive-gate cases below flip it. */
-let mockReceiveConfirmation = { isReceiveConfirmed: true, isReceiveDelayed: false }
+let mockReceiveConfirmation: {
+  isReceiveConfirmed: boolean
+  isReceiveDelayed: boolean
+  /** Only the timeout-release case sets this apart from the confirmation. */
+  isReceiveProven?: boolean
+} = { isReceiveConfirmed: true, isReceiveDelayed: false }
 const mockUseReceiveConfirmation = jest.fn()
 
 jest.mock(
@@ -52,7 +57,10 @@ jest.mock(
   () => ({
     useMigrationReceiveConfirmation: (args: unknown) => {
       mockUseReceiveConfirmation(args)
-      return mockReceiveConfirmation
+      return {
+        isReceiveProven: mockReceiveConfirmation.isReceiveConfirmed,
+        ...mockReceiveConfirmation,
+      }
     },
   }),
 )
@@ -389,6 +397,22 @@ describe("useMigrationTransfer", () => {
     await flushEffects()
 
     expect(result.current.isTransferred).toBe(true)
+  })
+
+  /** The screen hands this to the completion, which spends it on the one irreversible
+   *  step: a gate opened by the notice window must not delete the custodial account. */
+  it("passes the proven receive through untouched, apart from the swap", async () => {
+    mockStatus = MigrationStatus.Completed
+    mockReceiveConfirmation = {
+      isReceiveConfirmed: true,
+      isReceiveProven: false,
+      isReceiveDelayed: false,
+    }
+    const { result } = renderTransfer()
+    await flushEffects()
+
+    expect(result.current.isTransferred).toBe(true)
+    expect(result.current.isReceiveProven).toBe(false)
   })
 
   /** The phase can no longer change once the server settled COMPLETED, so the status

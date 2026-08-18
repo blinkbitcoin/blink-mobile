@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react"
 import { gql } from "@apollo/client"
 
 import { useMigrationStartMutation } from "@app/graphql/generated"
-import { isNetworkFailure } from "@app/graphql/is-network-failure"
+import { isNetworkFailure } from "@app/graphql/transport-error"
 import { reportError } from "@app/utils/error-logging"
 
 gql`

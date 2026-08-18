@@ -89,6 +89,7 @@ describe("useMigrationReceiveConfirmation", () => {
     expect(mockCheckReceiveLanded).not.toHaveBeenCalled()
     expect(result.current).toEqual({
       isReceiveConfirmed: false,
+      isReceiveProven: false,
       isReceiveDelayed: false,
     })
   })
@@ -131,6 +132,7 @@ describe("useMigrationReceiveConfirmation", () => {
 
     expect(result.current).toEqual({
       isReceiveConfirmed: true,
+      isReceiveProven: true,
       isReceiveDelayed: false,
     })
   })
@@ -149,6 +151,7 @@ describe("useMigrationReceiveConfirmation", () => {
 
     expect(result.current).toEqual({
       isReceiveConfirmed: false,
+      isReceiveProven: false,
       isReceiveDelayed: false,
     })
     expect(mockCheckReceiveLanded.mock.calls).toHaveLength(checksSoFar)
@@ -383,6 +386,45 @@ describe("useMigrationReceiveConfirmation", () => {
 
     expect(result.current.isReceiveConfirmed).toBe(true)
     expect(result.current.isReceiveDelayed).toBe(false)
+  })
+
+  /** The release moves the user, never the custodial account: nothing was ever seen to
+   *  land, so the deletion that reads this stays put (#4102). */
+  it("does not call the release proven", async () => {
+    mockRemoteConfig.migrationDelayedRedirectEnabled = true
+
+    const { result } = renderGate()
+    await flushCheck()
+    await advance(DELAYED_NOTICE_MS)
+
+    expect(result.current.isReceiveConfirmed).toBe(true)
+    expect(result.current.isReceiveProven).toBe(false)
+  })
+
+  it("proves the receive when a check actually finds the funds", async () => {
+    mockCheckReceiveLanded.mockResolvedValue(ok(landed))
+
+    const { result } = renderGate()
+    await flushCheck()
+
+    expect(result.current.isReceiveProven).toBe(true)
+  })
+
+  /** Nothing was ever going to arrive, so an empty wallet is the confirmed outcome rather
+   *  than an unknown one: the close may run. */
+  it("proves a zero-receive migration without the SDK", async () => {
+    const { result } = renderGate({ expectedReceiveSats: 0 })
+    await flushCheck()
+
+    expect(result.current.isReceiveProven).toBe(true)
+    expect(mockCheckReceiveLanded).not.toHaveBeenCalled()
+  })
+
+  it("proves nothing while the gate is skipped", async () => {
+    const { result } = renderGate({ skip: true })
+    await flushCheck()
+
+    expect(result.current.isReceiveProven).toBe(false)
   })
 
   it("stops checking once the timeout releases the gate", async () => {

@@ -8,6 +8,7 @@ import { recordAppError } from "@app/utils/error-reporting"
 import { utils as lnurlUtils } from "lnurl-pay"
 
 import { WalletCurrency } from "@app/graphql/generated"
+import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { usePriceConversion } from "@app/hooks/use-price-conversion"
@@ -23,6 +24,7 @@ import {
   WalletOrDisplayCurrency,
   toBtcMoneyAmount,
 } from "@app/types/amounts"
+import { AccountType } from "@app/types/wallet"
 import { toSatsAmount } from "@app/utils/amounts"
 import { buildBitcoinUri } from "@app/utils/bitcoin-uri"
 
@@ -34,7 +36,15 @@ import {
 import { createReceiveLightning, createReceiveOnchain } from "../bridge"
 import { AutoConvertStatus, useAutoConvertStatus } from "../providers/auto-convert-status"
 import { useSelfCustodialWallet } from "../providers/wallet"
+import { findLatestOnchainReceiptId } from "../providers/wallet-snapshot"
+import {
+  latestOnchainReceiptId,
+  loadIssuedOnchainAddress,
+  mergeSeenPendingDepositIds,
+  saveIssuedOnchainAddress,
+} from "../storage/onchain-address"
 
+import { usePendingDeposits } from "./use-pending-deposits"
 import { useReceiveAssetMode } from "./use-receive-asset-mode"
 import type { InvoiceData, SelfCustodialPaymentRequestState } from "./types"
 
@@ -66,8 +76,42 @@ const buildGenerationKey = (parts: {
 const isSameGeneration = (a: GenerationInputs | null, b: GenerationInputs): boolean =>
   a !== null && a.sdk === b.sdk && a.key === b.key
 
+/**
+ * The deposit marker the rotation decision is made against.
+ *
+ * The loaded history is one page deep, so it answers "has money arrived on-chain?"
+ * only while an on-chain receipt is still near the top of it. A wallet that keeps
+ * paying over Lightning pushes that receipt off the page, and the marker would go
+ * blind for as long as it stayed there — handing out the paid address again. Reading
+ * through to the SDK covers that gap; a receipt already on the page is by definition
+ * the newest one, so the extra query is skipped.
+ *
+ * Failure resolves to null, which the caller reads as "we do not know yet" — never as
+ * "nothing has arrived" — so a lookup that cannot run leaves the address as it is.
+ */
+const resolveDepositMarker = async (
+  sdk: BreezSdkInterface,
+  loadedMarker: string | null,
+): Promise<string | null> => {
+  if (loadedMarker !== null) return loadedMarker
+  try {
+    return await findLatestOnchainReceiptId(sdk)
+  } catch (err) {
+    recordAppError(
+      err instanceof Error
+        ? err
+        : new Error(`Self-custodial onchain deposit marker lookup failed: ${err}`),
+    )
+    return null
+  }
+}
+
 export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => {
-  const { sdk, lastReceivedPaymentId, lightningAddress } = useSelfCustodialWallet()
+  const { sdk, lastReceivedPaymentId, lightningAddress, allTransactions } =
+    useSelfCustodialWallet()
+  const { activeAccount } = useAccountRegistry()
+  const selfCustodialAccountId =
+    activeAccount?.type === AccountType.SelfCustodial ? activeAccount.id : null
   const { wallets, isReady } = useActiveWallet()
   const { convertMoneyAmount } = usePriceConversion()
   const { formatMoneyAmount } = useDisplayCurrency()
@@ -287,27 +331,130 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
     generateRequest(generation)
   }, [generation, generateRequest])
 
+  /**
+   * Marks how far the wallet's on-chain receive history had progressed when we last
+   * issued an address. The SDK never says which address a deposit paid, so a change
+   * here is our signal that the displayed address has been used.
+   *
+   * This reads the history the app has loaded, which is what makes a deposit landing
+   * while the QR is on screen re-run the effect below. It is only ever half the
+   * answer: `resolveDepositMarker` falls through to the SDK when this page holds no
+   * on-chain receipt, since an empty page does not mean an empty history.
+   *
+   * Being wrong in the rotating direction is cheap — the SDK keeps every address it
+   * has issued under watch (see `ReceiveOnchainParams.newAddress`), so a needless
+   * rotation costs an address, never a payment.
+   */
+  const loadedDepositMarker = useMemo(
+    () => latestOnchainReceiptId(allTransactions),
+    [allTransactions],
+  )
+  const loadedDepositMarkerRef = useRef(loadedDepositMarker)
+  loadedDepositMarkerRef.current = loadedDepositMarker
+
+  /**
+   * A deposit small enough to be fee-gated waits in `listPendingDeposits` and never
+   * reaches the payment history above, so the marker alone would keep handing out the
+   * address it landed on. Tracked by id (`txid:vout`) rather than by count: the listing
+   * resolves empty both when nothing is pending and when it failed, and only "an id I
+   * have not seen" is evidence of anything.
+   */
+  const { deposits: pendingDeposits } = usePendingDeposits()
+  const pendingDepositIds = useMemo(
+    () => pendingDeposits.map((deposit) => deposit.id),
+    [pendingDeposits],
+  )
+  const pendingDepositIdsRef = useRef(pendingDepositIds)
+  pendingDepositIdsRef.current = pendingDepositIds
+  const pendingDepositKey = pendingDepositIds.join(",")
+
+  // Only the newest request may publish its address: this runs again whenever the
+  // marker or the pending-deposit list changes, so a slow request can otherwise land
+  // after the one that replaced it and show a superseded address.
+  const onchainRequestIdRef = useRef(0)
+
+  const issueOnchainAddress = useCallback(async () => {
+    if (!sdk) return
+    const pendingIds = pendingDepositIdsRef.current
+    onchainRequestIdRef.current += 1
+    const requestId = onchainRequestIdRef.current
+
+    const marker = await resolveDepositMarker(sdk, loadedDepositMarkerRef.current)
+
+    // Rotating is only worth anything if we can record that we did: without an account
+    // id there is nowhere to write, so every run would rotate again and remember
+    // nothing — a fresh address per render, and still no reuse detection. Serve the
+    // SDK's existing address instead and leave the tracking to the next run that has
+    // an account to key on. This state is transient, an account switch mid-render.
+    const canTrackReuse = selfCustodialAccountId !== null
+    const issued = canTrackReuse
+      ? await loadIssuedOnchainAddress(selfCustodialAccountId)
+      : null
+    const seenPendingIds = issued?.seenPendingDepositIds ?? []
+
+    /**
+     * Rotate only on positive evidence that this address has been used:
+     *
+     * - a `null` marker means neither the loaded history nor the SDK lookback behind
+     *   it could name an on-chain receipt (cold start, a reconnect, a failed refresh)
+     *   — "we do not know yet" is not "nothing has arrived", and treating it as such
+     *   rotated on every offline visit;
+     * - no stored record at all with receipts present is the first run after
+     *   upgrade, where the SDK's current address may well be the paid one, so we
+     *   rotate once rather than adopting it;
+     * - an unclaimed deposit we have not recorded means money is sitting on the
+     *   displayed address even though no payment exists for it yet.
+     */
+    const markerMoved = marker !== null && issued?.depositMarker !== marker
+    const hasUnseenPendingDeposit = pendingIds.some((id) => !seenPendingIds.includes(id))
+    const shouldRotate = canTrackReuse && (markerMoved || hasUnseenPendingDeposit)
+
+    const result = await createReceiveOnchain(sdk)({ newAddress: shouldRotate })
+    if (!result.address) {
+      // The adapter reports failures as an error-only result rather than throwing,
+      // so without this the address request would fail in complete silence.
+      recordAppError(
+        new Error(
+          `Self-custodial onchain address request returned no address: ${JSON.stringify(
+            result.errors ?? [],
+          )}`,
+        ),
+      )
+      return
+    }
+    if (requestId !== onchainRequestIdRef.current) return
+
+    setOnchainAddress(result.address)
+    if (!canTrackReuse) return
+    await saveIssuedOnchainAddress(selfCustodialAccountId, {
+      address: result.address,
+      // Never let a snapshot that has not loaded erase a marker we already had:
+      // the next refresh would otherwise read it back as a fresh deposit.
+      depositMarker: marker ?? issued?.depositMarker ?? null,
+      // Accepted cost: once this deposit is claimed it becomes a payment, the marker
+      // moves, and we rotate a second time — away from an address that was never
+      // used. One spare address, versus threading the deposit txid onto the shared
+      // transaction type to recognise the two views of the same deposit.
+      seenPendingDepositIds: mergeSeenPendingDepositIds(
+        issued?.seenPendingDepositIds,
+        pendingIds,
+      ),
+    })
+  }, [sdk, selfCustodialAccountId])
+
+  // Runs on mount and again whenever an on-chain receipt or an unclaimed deposit
+  // lands — covering both "the deposit arrived while the QR was on screen" and "it
+  // arrived while the app was closed". Re-saving the record keeps this idempotent.
   useEffect(() => {
     if (!sdk) return
-    let cancelled = false
-    const adapter = createReceiveOnchain(sdk)
-    adapter()
-      .then((result: { address?: string }) => {
-        if (cancelled) return
-        if (result.address) setOnchainAddress(result.address)
-      })
-      .catch((err) => {
-        if (cancelled) return
-        recordAppError(
-          err instanceof Error
-            ? err
-            : new Error(`Self-custodial receive onchain adapter failed: ${err}`),
-        )
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [sdk])
+    issueOnchainAddress().catch((err) => {
+      recordAppError(
+        err instanceof Error
+          ? err
+          : new Error(`Self-custodial receive onchain adapter failed: ${err}`),
+      )
+    })
+  }, [sdk, issueOnchainAddress, loadedDepositMarker, pendingDepositKey])
 
   useEffect(() => {
     if (!sdk) return

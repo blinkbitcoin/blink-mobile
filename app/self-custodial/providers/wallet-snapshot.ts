@@ -12,6 +12,7 @@ import { toWalletId, type WalletState } from "@app/types/wallet"
 import { findUsdbToken, getWalletInfo, listPayments } from "../bridge"
 import { recordErrorOnce } from "../logging"
 import { isKnownPayment, mapSelfCustodialTransactions } from "../mappers/transaction"
+import { latestOnchainReceiptId } from "../storage/onchain-address"
 
 const TRANSACTIONS_PER_PAGE = 20
 
@@ -30,15 +31,16 @@ type PaymentsPage = {
 const fetchAndMapPayments = async (
   sdk: BreezSdkInterface,
   offset: number,
+  pageSize: number = TRANSACTIONS_PER_PAGE,
 ): Promise<PaymentsPage> => {
-  const response = await listPayments(sdk, offset, TRANSACTIONS_PER_PAGE)
+  const response = await listPayments(sdk, offset, pageSize)
   const transactions = mapSelfCustodialTransactions(
     response.payments.filter(isKnownPayment),
   )
   return {
     transactions,
     rawCount: response.payments.length,
-    hasMore: response.payments.length >= TRANSACTIONS_PER_PAGE,
+    hasMore: response.payments.length >= pageSize,
   }
 }
 
@@ -153,3 +155,42 @@ export const loadMoreTransactions = async (
   sdk: BreezSdkInterface,
   rawOffset: number,
 ): Promise<PaymentsPage> => fetchAndMapPayments(sdk, rawOffset)
+
+/**
+ * Larger pages than the UI uses: this walk only looks at one field per payment and
+ * stops at the first on-chain receipt, so fewer round trips beats a shorter page.
+ */
+const ONCHAIN_LOOKBACK_PAGE_SIZE = 100
+/**
+ * 300 payments back. Past that we report "not found", which reads as "we do not know"
+ * and never rotates — the same standstill as before this lookback existed, and the
+ * next deposit puts a receipt back at the top of the history to arm it again.
+ */
+const ONCHAIN_LOOKBACK_MAX_PAGES = 3
+
+/**
+ * The newest on-chain receipt in the wallet, read straight from the SDK rather than
+ * from the page of history the UI happens to hold.
+ *
+ * `allTransactions` only carries the newest page, so a wallet that has transacted past
+ * it shows no on-chain receipt at all — indistinguishable from one that has never been
+ * paid on-chain, which is exactly the case where the receive screen must not hand out
+ * a used address. Callers ask for this only when that page has none.
+ */
+export const findLatestOnchainReceiptId = async (
+  sdk: BreezSdkInterface,
+): Promise<string | null> => {
+  for (let page = 0; page < ONCHAIN_LOOKBACK_MAX_PAGES; page += 1) {
+    const { transactions, hasMore } = await fetchAndMapPayments(
+      sdk,
+      page * ONCHAIN_LOOKBACK_PAGE_SIZE,
+      ONCHAIN_LOOKBACK_PAGE_SIZE,
+    )
+    const receiptId = latestOnchainReceiptId(transactions)
+    if (receiptId) return receiptId
+    // A short page is the end of the history: there is no receipt to find, rather
+    // than one we ran out of budget before reaching.
+    if (!hasMore) return null
+  }
+  return null
+}

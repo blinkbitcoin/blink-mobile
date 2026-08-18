@@ -10,6 +10,20 @@ export type AccountMigrationPreview = {
   receiveSats: number
 }
 
+/** The backend rejection codes the migration reads off a mutation payload: a server
+ *  contract rather than one hook's detail, so a rename lands in a single place. */
+export const MigrationRejectionCode = {
+  /** Refused while a transfer is still draining. Transient by contract. */
+  StateConflict: "MIGRATION_STATE_CONFLICT",
+  /** The phone-deletion cap, carrying the server's own contact-support copy. */
+  OperationRestricted: "OPERATION_RESTRICTED",
+  /** A stale proof and a bad destination share this code; the clock skew tells them apart. */
+  InvalidDestination: "MIGRATION_INVALID_DESTINATION",
+} as const
+
+export type MigrationRejectionCode =
+  (typeof MigrationRejectionCode)[keyof typeof MigrationRejectionCode]
+
 /**
  * Why the migration handed the user to support. Deliberately NOT translated: the value is
  * copied out of an email by a human, so it has to stay greppable whatever locale produced
@@ -39,6 +53,13 @@ export const MigrationSupportReason = {
   ReceiveDelayed: "receive-delayed",
   /** The lightning-address re-point onto the migrated account failed. */
   LnAddressTransferFailed: "ln-address-transfer-failed",
+  /** The server refused to close the emptied custodial account for good (the phone-deletion
+   *  cap). The migration itself finished; the account stays open until support removes it. */
+  CustodialAccountCloseRefused: "custodial-account-close-refused",
+  /** The funds landed, but finishing on this device threw: the session discard, the
+   *  checkpoint clear or the pending-wallet write. Distinct from a transfer failure so
+   *  support does not go looking for money that never moved. */
+  CompletionFailed: "completion-failed",
   /** The support screen was reached without a reason, e.g. after a navigation-state
    *  restore; a named fallback so the ticket is never blank and never a bare string. */
   Unknown: "unknown",
@@ -85,7 +106,28 @@ export const MigrationSupportOrigin = {
    *  watched underneath, so backing out returns to the screen watching it rather than
    *  popping to the commit screen, which would unmount the gate with it. */
   ReceiveDelayed: "receive-delayed",
+  /** Raised by the commit path after it resets the stack with Home underneath, so Back
+   *  returns there rather than fabricating a commit screen for a finished migration. */
+  CloseRefused: "close-refused",
 } as const
 
 export type MigrationSupportOrigin =
   (typeof MigrationSupportOrigin)[keyof typeof MigrationSupportOrigin]
+
+/**
+ * How an attempt to finish a migration ended. Closing the emptied custodial account has
+ * exactly one window: the session discard that follows destroys the only token that can
+ * authenticate the deletion. So an unsettled close finishes nothing and keeps the session
+ * and the checkpoint for a retry, while a settled refusal finishes everything and leaves
+ * the account itself to support.
+ */
+export const MigrationCompletion = {
+  Completed: "completed",
+  /** No provisioned self-custodial account on this device, so there is nothing to swap to. */
+  AccountMissing: "account-missing",
+  CloseUnavailable: "close-unavailable",
+  CloseRefused: "close-refused",
+} as const
+
+export type MigrationCompletion =
+  (typeof MigrationCompletion)[keyof typeof MigrationCompletion]
