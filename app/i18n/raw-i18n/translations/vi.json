@@ -2420,6 +2420,7 @@
   },
   "SettingsScreen": {
     "createAddress": "Tạo địa chỉ",
+    "addressDisabled": "(đã tắt)",
     "donationButton": "Nút quyên góp",
     "btcpayServer": "BTCPay Server",
     "woocommerce": "WooCommerce",
@@ -2562,20 +2563,20 @@
   },
   "StablesatsRestriction": {
     "walletLabel": "không khả dụng tại khu vực của bạn",
-    "anonModeWalletLabel": "không khả dụng ở chế độ Anon"
+    "anonModeWalletLabel": "không khả dụng ở chế độ Incognito"
   },
   "AnonModeConvertModal": {
     "title": "Hãy chuyển số dư Đô la của bạn trước",
-    "body": "Chế độ Anon chỉ hỗ trợ số dư Bitcoin. Hãy chuyển số dư Đô la của bạn sang số dư Bitcoin để chuyển chế độ."
+    "body": "Chế độ Incognito chỉ hỗ trợ số dư Bitcoin. Hãy chuyển số dư Đô la của bạn sang số dư Bitcoin để chuyển chế độ."
   },
   "EnhancedModePrompt": {
     "title": "Tính năng này cần chế độ Enhanced",
-    "body": "Bạn đang ở chế độ Anon, Blink không biết khu vực của bạn nên một số tính năng không khả dụng. Chuyển sang Enhanced để chạy kiểm tra vị trí và mở khóa mọi tính năng cho khu vực của bạn.",
+    "body": "Bạn đang ở chế độ Incognito, Blink không biết khu vực của bạn nên một số tính năng không khả dụng. Chuyển sang Enhanced để chạy kiểm tra vị trí và mở khóa mọi tính năng cho khu vực của bạn.",
     "switchButton": "Chuyển sang Enhanced"
   },
   "ModeSwitchSuccessScreen": {
-    "enhanced": "Đã chuyển sang chế độ Enhanced phi lưu ký",
-    "anon": "Đã chuyển sang chế độ Anon phi lưu ký"
+    "enhanced": "Đã chuyển sang chế độ Enhanced\nphi lưu ký",
+    "anon": "Đã chuyển sang chế độ Incognito\nphi lưu ký"
   },
   "DollarBalanceRestriction": {
     "modalTitle": "Số dư đô la không khả dụng tại khu vực của bạn"

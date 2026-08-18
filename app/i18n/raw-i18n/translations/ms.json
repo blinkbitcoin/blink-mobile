@@ -2420,6 +2420,7 @@
   },
   "SettingsScreen": {
     "createAddress": "Cipta alamat",
+    "addressDisabled": "(dilumpuhkan)",
     "donationButton": "Butang derma",
     "btcpayServer": "BTCPay Server",
     "woocommerce": "WooCommerce",
@@ -2562,20 +2563,20 @@
   },
   "StablesatsRestriction": {
     "walletLabel": "tidak tersedia di rantau anda",
-    "anonModeWalletLabel": "tidak tersedia dalam mod Anon"
+    "anonModeWalletLabel": "tidak tersedia dalam mod Incognito"
   },
   "AnonModeConvertModal": {
     "title": "Pindahkan baki Dolar anda dahulu",
-    "body": "Mod Anon hanya menyokong baki Bitcoin. Pindahkan baki Dolar anda ke baki Bitcoin untuk bertukar."
+    "body": "Mod Incognito hanya menyokong baki Bitcoin. Pindahkan baki Dolar anda ke baki Bitcoin untuk bertukar."
   },
   "EnhancedModePrompt": {
     "title": "Ciri ini memerlukan mod Enhanced",
-    "body": "Anda dalam mod Anon, Blink tidak mengetahui wilayah anda, jadi sesetengah ciri tidak tersedia. Tukar kepada Enhanced untuk menjalankan semakan lokasi dan membuka semua ciri untuk wilayah anda.",
+    "body": "Anda dalam mod Incognito, Blink tidak mengetahui wilayah anda, jadi sesetengah ciri tidak tersedia. Tukar kepada Enhanced untuk menjalankan semakan lokasi dan membuka semua ciri untuk wilayah anda.",
     "switchButton": "Tukar kepada Enhanced"
   },
   "ModeSwitchSuccessScreen": {
-    "enhanced": "Bertukar kepada mod Enhanced bukan kustodian",
-    "anon": "Bertukar kepada mod Anon bukan kustodian"
+    "enhanced": "Bertukar kepada mod Enhanced\nbukan kustodian",
+    "anon": "Bertukar kepada mod Incognito\nbukan kustodian"
   },
   "DollarBalanceRestriction": {
     "modalTitle": "Baki dolar tidak tersedia di rantau anda"

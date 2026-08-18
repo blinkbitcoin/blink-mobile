@@ -2420,6 +2420,7 @@
   },
   "SettingsScreen": {
     "createAddress": "Tinkunata ruray",
+    "addressDisabled": "(mana atikuq)",
     "donationButton": "Qaray ñit'ana",
     "btcpayServer": "BTCPay Server",
     "woocommerce": "WooCommerce",
@@ -2562,20 +2563,20 @@
   },
   "StablesatsRestriction": {
     "walletLabel": "mana kapunchu suyuykipi",
-    "anonModeWalletLabel": "mana Anon modopi kanchu"
+    "anonModeWalletLabel": "mana Incognito modopi kanchu"
   },
   "AnonModeConvertModal": {
     "title": "Ñawpaqta Dolar qullqiykita astay",
-    "body": "Anon modoqa Bitcoin qullqillata sayachin. Dolar qullqiykita Bitcoin qullqiman astay tikranaykipaq."
+    "body": "Incognito modoqa Bitcoin qullqillata sayachin. Dolar qullqiykita Bitcoin qullqiman astay tikranaykipaq."
   },
   "EnhancedModePrompt": {
     "title": "Kay ruray Enhanced modota munan",
-    "body": "Anon modopi kachkanki, Blink mana region-niykita riqsinchu, chaymi wakin ruraykunaqa mana kanchu. Enhanced-man tikray kiti qhawayta ruranapaq, hinaspa region-niykipaq llapan ruraykunata kichananpaq.",
+    "body": "Incognito modopi kachkanki, Blink mana region-niykita riqsinchu, chaymi wakin ruraykunaqa mana kanchu. Enhanced-man tikray kiti qhawayta ruranapaq, hinaspa region-niykipaq llapan ruraykunata kichananpaq.",
     "switchButton": "Enhanced-man tikray"
   },
   "ModeSwitchSuccessScreen": {
-    "enhanced": "Enhanced mana waqaychasqa modoman tikrasqa",
-    "anon": "Anon mana waqaychasqa modoman tikrasqa"
+    "enhanced": "Enhanced mana waqaychasqa\nmodoman tikrasqa",
+    "anon": "Incognito mana waqaychasqa\nmodoman tikrasqa"
   },
   "DollarBalanceRestriction": {
     "modalTitle": "Dólar saldoqa mana kapunchu suyuykipi"

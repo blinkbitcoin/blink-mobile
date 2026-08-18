@@ -2420,6 +2420,7 @@
   },
   "SettingsScreen": {
     "createAddress": "Yenza idilesi",
+    "addressDisabled": "(icimile)",
     "donationButton": "Iqhosha lomnikelo",
     "btcpayServer": "BTCPay Server",
     "woocommerce": "WooCommerce",
@@ -2562,20 +2563,20 @@
   },
   "StablesatsRestriction": {
     "walletLabel": "ayifumaneki kummandla wakho",
-    "anonModeWalletLabel": "ayifumaneki kwimo ye-Anon"
+    "anonModeWalletLabel": "ayifumaneki kwimo ye-Incognito"
   },
   "AnonModeConvertModal": {
     "title": "Qala udlulisele ibhalansi yakho yeDola",
-    "body": "Imo ye-Anon ixhasa ibhalansi ye-Bitcoin kuphela. Dlulisela ibhalansi yakho yeDola kwibhalansi ye-Bitcoin ukuze utshintshe."
+    "body": "Imo ye-Incognito ixhasa ibhalansi ye-Bitcoin kuphela. Dlulisela ibhalansi yakho yeDola kwibhalansi ye-Bitcoin ukuze utshintshe."
   },
   "EnhancedModePrompt": {
     "title": "Olu phawu lufuna imo ye-Enhanced",
-    "body": "Ukwimo ye-Anon, uBlink akawazi ummandla wakho, ngoko amanye amaphawu awafumaneki. Tshintshela kwi-Enhanced ukuze kwenziwe ukhangelo lwendawo kuvulwe onke amaphawu ommandla wakho.",
+    "body": "Ukwimo ye-Incognito, uBlink akawazi ummandla wakho, ngoko amanye amaphawu awafumaneki. Tshintshela kwi-Enhanced ukuze kwenziwe ukhangelo lwendawo kuvulwe onke amaphawu ommandla wakho.",
     "switchButton": "Tshintshela kwi-Enhanced"
   },
   "ModeSwitchSuccessScreen": {
-    "enhanced": "Utshintshele kwimo ye-Enhanced engagciniwe",
-    "anon": "Utshintshele kwimo ye-Anon engagciniwe"
+    "enhanced": "Utshintshele kwimo ye-Enhanced\nengagciniwe",
+    "anon": "Utshintshele kwimo ye-Incognito\nengagciniwe"
   },
   "DollarBalanceRestriction": {
     "modalTitle": "Ibhalansi yedola ayifumaneki kummandla wakho"

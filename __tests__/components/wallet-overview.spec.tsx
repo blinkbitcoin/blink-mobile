@@ -213,7 +213,7 @@ describe("WalletOverview", () => {
       ).toBeTruthy()
     })
 
-    it("shows the Anon mode label when the mode is Anon and the balance is empty", async () => {
+    it("shows the Incognito mode label when the mode is Anon and the balance is empty", async () => {
       mockIsAnonMode = true
       const emptyUsdWallets: readonly WalletBalance[] = [
         { id: "btc-id", walletCurrency: WalletCurrency.Btc, balance: 174726 },
@@ -227,19 +227,19 @@ describe("WalletOverview", () => {
       await flushEffects()
 
       expect(
-        getByText("not available in Anon mode", { includeHiddenElements: true }),
+        getByText("not available in Incognito mode", { includeHiddenElements: true }),
       ).toBeTruthy()
       expect(queryByText("not available in your region")).toBeNull()
     })
 
-    it("keeps showing the amount in Anon mode when the balance is not empty", async () => {
+    it("keeps showing the amount in Incognito mode when the balance is not empty", async () => {
       mockIsAnonMode = true
       const onGatedTap = jest.fn()
 
       const { getByTestId, queryByText } = renderOverview({ onGatedTap })
       await flushEffects()
 
-      expect(queryByText("not available in Anon mode")).toBeNull()
+      expect(queryByText("not available in Incognito mode")).toBeNull()
       expect(
         getByTestId("stablesats-balance", { includeHiddenElements: true }),
       ).toBeTruthy()
@@ -286,7 +286,7 @@ describe("WalletOverview", () => {
       expect(getByText("usd-underlying", { includeHiddenElements: true })).toBeTruthy()
     })
 
-    it("routes the gated dollar tap to onGatedTap in Anon mode", async () => {
+    it("routes the gated dollar tap to onGatedTap in Incognito mode", async () => {
       mockIsAnonMode = true
       const onGatedTap = jest.fn()
       const emptyUsdWallets: readonly WalletBalance[] = [
@@ -298,7 +298,7 @@ describe("WalletOverview", () => {
       await flushEffects()
 
       fireEvent.press(
-        getByText("not available in Anon mode", { includeHiddenElements: true }),
+        getByText("not available in Incognito mode", { includeHiddenElements: true }),
       )
 
       expect(onGatedTap).toHaveBeenCalledTimes(1)

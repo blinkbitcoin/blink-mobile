@@ -2420,6 +2420,7 @@
   },
   "SettingsScreen": {
     "createAddress": "إنشاء عنوان",
+    "addressDisabled": "(معطّل)",
     "donationButton": "زر التبرع",
     "btcpayServer": "BTCPay Server",
     "woocommerce": "WooCommerce",
@@ -2562,20 +2563,20 @@
   },
   "StablesatsRestriction": {
     "walletLabel": "غير متاح في منطقتك",
-    "anonModeWalletLabel": "غير متاح في وضع Anon"
+    "anonModeWalletLabel": "غير متاح في وضع Incognito"
   },
   "AnonModeConvertModal": {
     "title": "حوّل رصيدك بالدولار أولًا",
-    "body": "وضع Anon يدعم رصيد Bitcoin فقط. حوّل رصيدك بالدولار إلى رصيد Bitcoin للتبديل."
+    "body": "وضع Incognito يدعم رصيد Bitcoin فقط. حوّل رصيدك بالدولار إلى رصيد Bitcoin للتبديل."
   },
   "EnhancedModePrompt": {
     "title": "هذه الميزة تتطلب وضع Enhanced",
-    "body": "أنت في وضع Anon، لا يعرف Blink منطقتك، لذا بعض الميزات غير متاحة. بدّل إلى Enhanced لإجراء فحص الموقع وفتح جميع الميزات لمنطقتك.",
+    "body": "أنت في وضع Incognito، لا يعرف Blink منطقتك، لذا بعض الميزات غير متاحة. بدّل إلى Enhanced لإجراء فحص الموقع وفتح جميع الميزات لمنطقتك.",
     "switchButton": "التبديل إلى Enhanced"
   },
   "ModeSwitchSuccessScreen": {
-    "enhanced": "تم التبديل إلى وضع Enhanced المحفوظ ذاتيًا",
-    "anon": "تم التبديل إلى وضع Anon المحفوظ ذاتيًا"
+    "enhanced": "تم التبديل إلى وضع Enhanced\nالمحفوظ ذاتيًا",
+    "anon": "تم التبديل إلى وضع Incognito\nالمحفوظ ذاتيًا"
   },
   "DollarBalanceRestriction": {
     "modalTitle": "رصيد الدولار غير متاح في منطقتك"

@@ -2420,6 +2420,7 @@
   },
   "SettingsScreen": {
     "createAddress": "Vytvořit adresu",
+    "addressDisabled": "(zakázáno)",
     "donationButton": "Darovací tlačítko",
     "btcpayServer": "BTCPay Server",
     "woocommerce": "WooCommerce",
@@ -2562,20 +2563,20 @@
   },
   "StablesatsRestriction": {
     "walletLabel": "není ve vašem regionu k dispozici",
-    "anonModeWalletLabel": "není k dispozici v režimu Anon"
+    "anonModeWalletLabel": "není k dispozici v režimu Incognito"
   },
   "AnonModeConvertModal": {
     "title": "Nejprve převeďte svůj dolarový zůstatek",
-    "body": "Režim Anon podporuje pouze bitcoinový zůstatek. Převeďte svůj dolarový zůstatek na bitcoinový, abyste mohli přepnout."
+    "body": "Režim Incognito podporuje pouze bitcoinový zůstatek. Převeďte svůj dolarový zůstatek na bitcoinový, abyste mohli přepnout."
   },
   "EnhancedModePrompt": {
     "title": "Tato funkce vyžaduje režim Enhanced",
-    "body": "Jste v režimu Anon, Blink nezná váš region, takže některé funkce nejsou k dispozici. Přepněte na Enhanced, aby proběhla kontrola polohy a odemkly se všechny funkce pro váš region.",
+    "body": "Jste v režimu Incognito, Blink nezná váš region, takže některé funkce nejsou k dispozici. Přepněte na Enhanced, aby proběhla kontrola polohy a odemkly se všechny funkce pro váš region.",
     "switchButton": "Přepnout na Enhanced"
   },
   "ModeSwitchSuccessScreen": {
-    "enhanced": "Přepnuto na režim Enhanced s vlastní správou",
-    "anon": "Přepnuto na režim Anon s vlastní správou"
+    "enhanced": "Přepnuto na režim Enhanced\ns vlastní správou",
+    "anon": "Přepnuto na režim Incognito\ns vlastní správou"
   },
   "DollarBalanceRestriction": {
     "modalTitle": "Dolarový zůstatek není ve vašem regionu k dispozici"

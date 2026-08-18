@@ -80,12 +80,13 @@ describe("AccountModeSetting", () => {
     })
   })
 
-  it("opens the mode selection screen from the Anon row", () => {
+  /** The stored value stays `anon`; only the label the user reads is Incognito. */
+  it("opens the mode selection screen from the Incognito row", () => {
     mockAccountMode = AccountMode.Anon
 
     const { getByText } = renderRow()
 
-    fireEvent.press(getByText("Mode: Anon"))
+    fireEvent.press(getByText("Mode: Incognito"))
 
     expect(mockNavigate).toHaveBeenCalledWith("selfCustodialChooseExperience", {
       entry: "settings",

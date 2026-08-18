@@ -2420,6 +2420,7 @@
   },
   "SettingsScreen": {
     "createAddress": "Buat alamat",
+    "addressDisabled": "(nonaktif)",
     "donationButton": "Tombol donasi",
     "btcpayServer": "BTCPay Server",
     "woocommerce": "WooCommerce",
@@ -2562,20 +2563,20 @@
   },
   "StablesatsRestriction": {
     "walletLabel": "tidak tersedia di wilayah Anda",
-    "anonModeWalletLabel": "tidak tersedia dalam mode Anon"
+    "anonModeWalletLabel": "tidak tersedia dalam mode Incognito"
   },
   "AnonModeConvertModal": {
     "title": "Transfer saldo Dolar Anda terlebih dahulu",
-    "body": "Mode Anon hanya mendukung saldo Bitcoin. Transfer saldo Dolar Anda ke saldo Bitcoin untuk beralih."
+    "body": "Mode Incognito hanya mendukung saldo Bitcoin. Transfer saldo Dolar Anda ke saldo Bitcoin untuk beralih."
   },
   "EnhancedModePrompt": {
     "title": "Fitur ini memerlukan mode Enhanced",
-    "body": "Anda dalam mode Anon, Blink tidak mengetahui wilayah Anda, jadi beberapa fitur tidak tersedia. Beralih ke Enhanced untuk menjalankan pemeriksaan lokasi dan membuka semua fitur untuk wilayah Anda.",
+    "body": "Anda dalam mode Incognito, Blink tidak mengetahui wilayah Anda, jadi beberapa fitur tidak tersedia. Beralih ke Enhanced untuk menjalankan pemeriksaan lokasi dan membuka semua fitur untuk wilayah Anda.",
     "switchButton": "Beralih ke Enhanced"
   },
   "ModeSwitchSuccessScreen": {
-    "enhanced": "Beralih ke mode Enhanced non-kustodian",
-    "anon": "Beralih ke mode Anon non-kustodian"
+    "enhanced": "Beralih ke mode Enhanced\nnon-kustodian",
+    "anon": "Beralih ke mode Incognito\nnon-kustodian"
   },
   "DollarBalanceRestriction": {
     "modalTitle": "Saldo dolar tidak tersedia di wilayah Anda"

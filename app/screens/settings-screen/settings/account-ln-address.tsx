@@ -10,6 +10,7 @@ import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useAppConfig, useClipboard } from "@app/hooks"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { useSelfCustodialAccountMode } from "@app/self-custodial/hooks/use-self-custodial-account-mode"
 import { BackupStatus, useBackupState } from "@app/self-custodial/providers/backup-state"
 import { AccountType } from "@app/types/wallet"
 import { getLightningAddress } from "@app/utils/pay-links"
@@ -31,12 +32,16 @@ export const AccountLNAddress: React.FC = () => {
 type LightningAddressRowProps = {
   address: string | null
   loading?: boolean
+  /** Marks the address as unusable: the row says so and drops the copy affordance,
+   *  while `address` stays the bare address so nothing can copy the label. */
+  isDisabled?: boolean
   renderModal: (modal: { isVisible: boolean; toggleModal: () => void }) => React.ReactNode
 }
 
 const LightningAddressRow: React.FC<LightningAddressRowProps> = ({
   address,
   loading,
+  isDisabled = false,
   renderModal,
 }) => {
   const {
@@ -53,19 +58,36 @@ const LightningAddressRow: React.FC<LightningAddressRowProps> = ({
       message: LL.GaloyAddressScreen.copiedLightningAddressToClipboard(),
     })
 
+  const isAddressCopyable = Boolean(address) && !isDisabled
+  const disabledSuffix = isDisabled ? ` ${LL.SettingsScreen.addressDisabled()}` : ""
+  const displayedTitle = address
+    ? `${address}${disabledSuffix}`
+    : LL.SettingsScreen.createAddress()
+
+  /** A disabled address is inert: the label is not an address, so copying it would hand
+   *  the user a string no wallet can pay. Without one at all, the row still creates one. */
+  const handleAction = () => {
+    if (!address) {
+      toggleModal()
+      return
+    }
+    if (isDisabled) return
+    copyAddress(address)
+  }
+
   return (
     <>
       <SettingsRow
         loading={loading}
-        title={address ?? LL.SettingsScreen.createAddress()}
-        subtitleShorter={(address ?? "").length > SUBTITLE_SHORTER_LENGTH}
+        title={displayedTitle}
+        subtitleShorter={displayedTitle.length > SUBTITLE_SHORTER_LENGTH}
         leftGaloyIcon="lightning-address"
         rightIcon={
-          address ? (
+          isAddressCopyable ? (
             <GaloyIcon name="copy-paste" size={20} color={colors.primary} />
           ) : undefined
         }
-        action={address ? () => copyAddress(address) : toggleModal}
+        action={handleAction}
       />
       {renderModal({ isVisible: isModalShown, toggleModal })}
     </>
@@ -96,11 +118,14 @@ const CustodialLightningAddressRow: React.FC = () => {
 const SelfCustodialLightningAddressRow: React.FC = () => {
   const address = useSelfCustodialLightningAddress()
   const { backupState } = useBackupState()
+  const { isAnonMode } = useSelfCustodialAccountMode()
   const isBackupRequired = backupState.status !== BackupStatus.Completed
 
   return (
     <LightningAddressRow
       address={address}
+      /** Incognito cannot receive, so the row says so next to the address it still shows. */
+      isDisabled={isAnonMode}
       renderModal={({ isVisible, toggleModal }) =>
         isBackupRequired ? (
           <BackupRequiredModal isVisible={isVisible} onClose={toggleModal} />

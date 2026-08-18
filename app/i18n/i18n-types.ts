@@ -7923,6 +7923,10 @@ type RootTranslation = {
 		 */
 		createAddress: string
 		/**
+		 * (​d​i​s​a​b​l​e​d​)
+		 */
+		addressDisabled: string
+		/**
 		 * D​o​n​a​t​e​ ​B​u​t​t​o​n
 		 */
 		donationButton: string
@@ -8549,7 +8553,7 @@ type RootTranslation = {
 		 */
 		walletLabel: string
 		/**
-		 * n​o​t​ ​a​v​a​i​l​a​b​l​e​ ​i​n​ ​A​n​o​n​ ​m​o​d​e
+		 * n​o​t​ ​a​v​a​i​l​a​b​l​e​ ​i​n​ ​I​n​c​o​g​n​i​t​o​ ​m​o​d​e
 		 */
 		anonModeWalletLabel: string
 	}
@@ -8559,7 +8563,7 @@ type RootTranslation = {
 		 */
 		title: string
 		/**
-		 * A​n​o​n​ ​M​o​d​e​ ​s​u​p​p​o​r​t​s​ ​t​h​e​ ​B​i​t​c​o​i​n​ ​B​a​l​a​n​c​e​ ​o​n​l​y​.​ ​T​r​a​n​s​f​e​r​ ​y​o​u​r​ ​D​o​l​l​a​r​ ​B​a​l​a​n​c​e​ ​t​o​ ​y​o​u​r​ ​B​i​t​c​o​i​n​ ​B​a​l​a​n​c​e​ ​t​o​ ​s​w​i​t​c​h​.
+		 * I​n​c​o​g​n​i​t​o​ ​M​o​d​e​ ​s​u​p​p​o​r​t​s​ ​t​h​e​ ​B​i​t​c​o​i​n​ ​B​a​l​a​n​c​e​ ​o​n​l​y​.​ ​T​r​a​n​s​f​e​r​ ​y​o​u​r​ ​D​o​l​l​a​r​ ​B​a​l​a​n​c​e​ ​t​o​ ​y​o​u​r​ ​B​i​t​c​o​i​n​ ​B​a​l​a​n​c​e​ ​t​o​ ​s​w​i​t​c​h​.
 		 */
 		body: string
 	}
@@ -8569,7 +8573,7 @@ type RootTranslation = {
 		 */
 		title: string
 		/**
-		 * Y​o​u​'​r​e​ ​i​n​ ​A​n​o​n​ ​M​o​d​e​,​ ​B​l​i​n​k​ ​d​o​e​s​n​'​t​ ​k​n​o​w​ ​y​o​u​r​ ​r​e​g​i​o​n​,​ ​s​o​ ​s​o​m​e​ ​f​e​a​t​u​r​e​s​ ​a​r​e​n​'​t​ ​a​v​a​i​l​a​b​l​e​.​ ​S​w​i​t​c​h​ ​t​o​ ​E​n​h​a​n​c​e​d​ ​t​o​ ​r​u​n​ ​a​ ​l​o​c​a​t​i​o​n​ ​c​h​e​c​k​ ​a​n​d​ ​u​n​l​o​c​k​ ​a​l​l​ ​f​e​a​t​u​r​e​s​ ​f​o​r​ ​y​o​u​r​ ​r​e​g​i​o​n​.
+		 * Y​o​u​'​r​e​ ​i​n​ ​I​n​c​o​g​n​i​t​o​ ​M​o​d​e​,​ ​B​l​i​n​k​ ​d​o​e​s​n​'​t​ ​k​n​o​w​ ​y​o​u​r​ ​r​e​g​i​o​n​,​ ​s​o​ ​s​o​m​e​ ​f​e​a​t​u​r​e​s​ ​a​r​e​n​'​t​ ​a​v​a​i​l​a​b​l​e​.​ ​S​w​i​t​c​h​ ​t​o​ ​E​n​h​a​n​c​e​d​ ​t​o​ ​r​u​n​ ​a​ ​l​o​c​a​t​i​o​n​ ​c​h​e​c​k​ ​a​n​d​ ​u​n​l​o​c​k​ ​a​l​l​ ​f​e​a​t​u​r​e​s​ ​f​o​r​ ​y​o​u​r​ ​r​e​g​i​o​n​.
 		 */
 		body: string
 		/**
@@ -8579,11 +8583,13 @@ type RootTranslation = {
 	}
 	ModeSwitchSuccessScreen: {
 		/**
-		 * S​w​i​t​c​h​e​d​ ​t​o​ ​E​n​h​a​n​c​e​d​ ​N​o​n​-​c​u​s​t​o​d​i​a​l​ ​M​o​d​e
+		 * S​w​i​t​c​h​e​d​ ​t​o​ ​E​n​h​a​n​c​e​d​
+	​N​o​n​-​c​u​s​t​o​d​i​a​l​ ​M​o​d​e
 		 */
 		enhanced: string
 		/**
-		 * S​w​i​t​c​h​e​d​ ​t​o​ ​A​n​o​n​ ​N​o​n​-​c​u​s​t​o​d​i​a​l​ ​M​o​d​e
+		 * S​w​i​t​c​h​e​d​ ​t​o​ ​I​n​c​o​g​n​i​t​o​
+	​N​o​n​-​c​u​s​t​o​d​i​a​l​ ​M​o​d​e
 		 */
 		anon: string
 	}
@@ -21418,6 +21424,10 @@ export type TranslationFunctions = {
 		 */
 		createAddress: () => LocalizedString
 		/**
+		 * (disabled)
+		 */
+		addressDisabled: () => LocalizedString
+		/**
 		 * Donate Button
 		 */
 		donationButton: () => LocalizedString
@@ -22034,7 +22044,7 @@ export type TranslationFunctions = {
 		 */
 		walletLabel: () => LocalizedString
 		/**
-		 * not available in Anon mode
+		 * not available in Incognito mode
 		 */
 		anonModeWalletLabel: () => LocalizedString
 	}
@@ -22044,7 +22054,7 @@ export type TranslationFunctions = {
 		 */
 		title: () => LocalizedString
 		/**
-		 * Anon Mode supports the Bitcoin Balance only. Transfer your Dollar Balance to your Bitcoin Balance to switch.
+		 * Incognito Mode supports the Bitcoin Balance only. Transfer your Dollar Balance to your Bitcoin Balance to switch.
 		 */
 		body: () => LocalizedString
 	}
@@ -22054,7 +22064,7 @@ export type TranslationFunctions = {
 		 */
 		title: () => LocalizedString
 		/**
-		 * You're in Anon Mode, Blink doesn't know your region, so some features aren't available. Switch to Enhanced to run a location check and unlock all features for your region.
+		 * You're in Incognito Mode, Blink doesn't know your region, so some features aren't available. Switch to Enhanced to run a location check and unlock all features for your region.
 		 */
 		body: () => LocalizedString
 		/**
@@ -22064,11 +22074,13 @@ export type TranslationFunctions = {
 	}
 	ModeSwitchSuccessScreen: {
 		/**
-		 * Switched to Enhanced Non-custodial Mode
+		 * Switched to Enhanced
+	Non-custodial Mode
 		 */
 		enhanced: () => LocalizedString
 		/**
-		 * Switched to Anon Non-custodial Mode
+		 * Switched to Incognito
+	Non-custodial Mode
 		 */
 		anon: () => LocalizedString
 	}

@@ -2420,6 +2420,7 @@
   },
   "SettingsScreen": {
     "createAddress": "Adres aanmaken",
+    "addressDisabled": "(uitgeschakeld)",
     "donationButton": "Doneerknop",
     "btcpayServer": "BTCPay Server",
     "woocommerce": "WooCommerce",
@@ -2562,20 +2563,20 @@
   },
   "StablesatsRestriction": {
     "walletLabel": "niet beschikbaar in jouw regio",
-    "anonModeWalletLabel": "niet beschikbaar in Anon-modus"
+    "anonModeWalletLabel": "niet beschikbaar in Incognito-modus"
   },
   "AnonModeConvertModal": {
     "title": "Zet eerst je dollarsaldo over",
-    "body": "De Anon-modus ondersteunt alleen het Bitcoin-saldo. Zet je dollarsaldo over naar je Bitcoin-saldo om te wisselen."
+    "body": "De Incognito-modus ondersteunt alleen het Bitcoin-saldo. Zet je dollarsaldo over naar je Bitcoin-saldo om te wisselen."
   },
   "EnhancedModePrompt": {
     "title": "Deze functie vereist de Enhanced-modus",
-    "body": "Je bent in Anon-modus, Blink kent je regio niet, dus sommige functies zijn niet beschikbaar. Schakel over naar Enhanced om een locatiecontrole uit te voeren en alle functies voor je regio te ontgrendelen.",
+    "body": "Je bent in Incognito-modus, Blink kent je regio niet, dus sommige functies zijn niet beschikbaar. Schakel over naar Enhanced om een locatiecontrole uit te voeren en alle functies voor je regio te ontgrendelen.",
     "switchButton": "Overschakelen naar Enhanced"
   },
   "ModeSwitchSuccessScreen": {
-    "enhanced": "Overgeschakeld naar zelfbeheerde Enhanced-modus",
-    "anon": "Overgeschakeld naar zelfbeheerde Anon-modus"
+    "enhanced": "Overgeschakeld naar\nzelfbeheerde Enhanced-modus",
+    "anon": "Overgeschakeld naar\nzelfbeheerde Incognito-modus"
   },
   "DollarBalanceRestriction": {
     "modalTitle": "Dollar-saldo is niet beschikbaar in jouw regio"

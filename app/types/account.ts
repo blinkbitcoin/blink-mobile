@@ -20,8 +20,9 @@ export const AccountMode = {
 
 export type AccountMode = (typeof AccountMode)[keyof typeof AccountMode]
 
-/** Product mode names, never localized. */
+/** Product mode names, never localized. The stored value stays `anon`: the rename to
+ *  Incognito is what the user reads, not what the account records. */
 export const ACCOUNT_MODE_NAMES: Record<AccountMode, string> = {
   [AccountMode.Enhanced]: "Enhanced",
-  [AccountMode.Anon]: "Anon",
+  [AccountMode.Anon]: "Incognito",
 }

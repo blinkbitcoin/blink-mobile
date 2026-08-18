@@ -2420,6 +2420,7 @@
   },
   "SettingsScreen": {
     "createAddress": "Creează adresă",
+    "addressDisabled": "(dezactivat)",
     "donationButton": "Buton de donare",
     "btcpayServer": "BTCPay Server",
     "woocommerce": "WooCommerce",
@@ -2562,20 +2563,20 @@
   },
   "StablesatsRestriction": {
     "walletLabel": "nu este disponibil în regiunea ta",
-    "anonModeWalletLabel": "indisponibil în modul Anon"
+    "anonModeWalletLabel": "indisponibil în modul Incognito"
   },
   "AnonModeConvertModal": {
     "title": "Transferă mai întâi soldul tău în dolari",
-    "body": "Modul Anon acceptă doar soldul Bitcoin. Transferă soldul tău în dolari în soldul Bitcoin pentru a comuta."
+    "body": "Modul Incognito acceptă doar soldul Bitcoin. Transferă soldul tău în dolari în soldul Bitcoin pentru a comuta."
   },
   "EnhancedModePrompt": {
     "title": "Această funcție necesită modul Enhanced",
-    "body": "Ești în modul Anon, Blink nu îți cunoaște regiunea, așa că unele funcții nu sunt disponibile. Treci la Enhanced pentru a rula o verificare a locației și a debloca toate funcțiile pentru regiunea ta.",
+    "body": "Ești în modul Incognito, Blink nu îți cunoaște regiunea, așa că unele funcții nu sunt disponibile. Treci la Enhanced pentru a rula o verificare a locației și a debloca toate funcțiile pentru regiunea ta.",
     "switchButton": "Treci la Enhanced"
   },
   "ModeSwitchSuccessScreen": {
-    "enhanced": "Ai trecut la modul Enhanced fără custodie",
-    "anon": "Ai trecut la modul Anon fără custodie"
+    "enhanced": "Ai trecut la modul Enhanced\nfără custodie",
+    "anon": "Ai trecut la modul Incognito\nfără custodie"
   },
   "DollarBalanceRestriction": {
     "modalTitle": "Soldul în dolari nu este disponibil în regiunea ta"

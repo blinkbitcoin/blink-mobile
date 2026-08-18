@@ -16,6 +16,7 @@ import { useAppConfig, useClipboard } from "@app/hooks"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { useSelfCustodialAccountMode } from "@app/self-custodial/hooks/use-self-custodial-account-mode"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { AccountType } from "@app/types/wallet"
 import { useNavigation } from "@react-navigation/native"
@@ -88,8 +89,16 @@ const SelfCustodialAccountBanner: React.FC = () => {
   const { LL } = useI18nContext()
   const { lightningAddress } = useSelfCustodialWallet()
   const { copyToClipboard } = useClipboard()
+  const { isAnonMode } = useSelfCustodialAccountMode()
 
   if (!lightningAddress) return null
+
+  /** Incognito cannot receive, so the address is labelled disabled and loses its copy
+   *  affordance rather than being handed out as one that could be paid. The tap goes
+   *  inert with the icon: a row that still copied would contradict the label. */
+  const displayedAddress = isAnonMode
+    ? `${lightningAddress} ${LL.SettingsScreen.addressDisabled()}`
+    : lightningAddress
 
   const handleCopy = () =>
     copyToClipboard({
@@ -98,19 +107,19 @@ const SelfCustodialAccountBanner: React.FC = () => {
     })
 
   return (
-    <TouchableOpacity onPress={handleCopy} style={styles.outer}>
+    <TouchableOpacity onPress={isAnonMode ? undefined : handleCopy} style={styles.outer}>
       <View style={styles.iconContainer}>
         <AccountIcon size={25} />
       </View>
       <View style={styles.textContainer}>
         <Text type="p2" numberOfLines={1} ellipsizeMode="middle">
-          {lightningAddress}
+          {displayedAddress}
         </Text>
         <Text type="p3" style={styles.subtitle}>
           {LL.SettingsScreen.nonCustodialAccount()}
         </Text>
       </View>
-      <GaloyIcon name="copy-paste" size={20} color={colors.primary} />
+      {!isAnonMode && <GaloyIcon name="copy-paste" size={20} color={colors.primary} />}
     </TouchableOpacity>
   )
 }

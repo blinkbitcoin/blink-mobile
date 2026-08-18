@@ -2420,6 +2420,7 @@
   },
   "SettingsScreen": {
     "createAddress": "Kola endagiriro",
+    "addressDisabled": "(tekikola)",
     "donationButton": "Bbatani y'okuwaayo",
     "btcpayServer": "BTCPay Server",
     "woocommerce": "WooCommerce",
@@ -2562,20 +2563,20 @@
   },
   "StablesatsRestriction": {
     "walletLabel": "teriiwo mu kitundu kyo",
-    "anonModeWalletLabel": "tekiriiwo mu modu ya Anon"
+    "anonModeWalletLabel": "tekiriiwo mu modu ya Incognito"
   },
   "AnonModeConvertModal": {
     "title": "Sooka okyuse ssente zo eza Doola",
-    "body": "Modu ya Anon ekola ku balansi ya Bitcoin yokka. Kyusa balansi yo eya Doola ku balansi ya Bitcoin okusobola okukyuka."
+    "body": "Modu ya Incognito ekola ku balansi ya Bitcoin yokka. Kyusa balansi yo eya Doola ku balansi ya Bitcoin okusobola okukyuka."
   },
   "EnhancedModePrompt": {
     "title": "Ekintu kino kyetaaga modu ya Enhanced",
-    "body": "Oli mu modu ya Anon, Blink temanyi kitundu kyo, n'olwekyo ebintu ebimu tebiriiwo. Kyusa ku Enhanced okukola okukebera ekifo n'okusumulula ebintu byonna eby'ekitundu kyo.",
+    "body": "Oli mu modu ya Incognito, Blink temanyi kitundu kyo, n'olwekyo ebintu ebimu tebiriiwo. Kyusa ku Enhanced okukola okukebera ekifo n'okusumulula ebintu byonna eby'ekitundu kyo.",
     "switchButton": "Kyusa ku Enhanced"
   },
   "ModeSwitchSuccessScreen": {
-    "enhanced": "Okyusizza ku modu ya Enhanced eyeefuga",
-    "anon": "Okyusizza ku modu ya Anon eyeefuga"
+    "enhanced": "Okyusizza ku modu ya Enhanced\neyeefuga",
+    "anon": "Okyusizza ku modu ya Incognito\neyeefuga"
   },
   "DollarBalanceRestriction": {
     "modalTitle": "Bbalansi ya doola teriiwo mu kitundu kyo"

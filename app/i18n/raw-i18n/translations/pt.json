@@ -2420,6 +2420,7 @@
     },
     "SettingsScreen": {
         "createAddress": "Criar endereço",
+        "addressDisabled": "(desativado)",
         "donationButton": "Botão Doar",
         "btcpayServer": "BTCPay Server",
         "woocommerce": "WooCommerce",
@@ -2562,20 +2563,20 @@
     },
     "StablesatsRestriction": {
         "walletLabel": "não está disponível na sua região",
-        "anonModeWalletLabel": "não disponível no modo Anon"
+        "anonModeWalletLabel": "não disponível no modo Incognito"
     },
     "AnonModeConvertModal": {
         "title": "Transfira primeiro o seu saldo em dólares",
-        "body": "O modo Anon suporta apenas o saldo em Bitcoin. Transfira o seu saldo em dólares para o saldo em Bitcoin para mudar."
+        "body": "O modo Incognito suporta apenas o saldo em Bitcoin. Transfira o seu saldo em dólares para o saldo em Bitcoin para mudar."
     },
     "EnhancedModePrompt": {
         "title": "Este recurso precisa do modo Enhanced",
-        "body": "Você está no modo Anon, o Blink não conhece a sua região, então alguns recursos não estão disponíveis. Mude para Enhanced para executar uma verificação de localização e desbloquear todos os recursos da sua região.",
+        "body": "Você está no modo Incognito, o Blink não conhece a sua região, então alguns recursos não estão disponíveis. Mude para Enhanced para executar uma verificação de localização e desbloquear todos os recursos da sua região.",
         "switchButton": "Mudar para Enhanced"
     },
     "ModeSwitchSuccessScreen": {
-        "enhanced": "Mudou para o modo Enhanced não custodiado",
-        "anon": "Mudou para o modo Anon não custodiado"
+        "enhanced": "Mudou para o modo Enhanced\nnão custodiado",
+        "anon": "Mudou para o modo Incognito\nnão custodiado"
     },
     "DollarBalanceRestriction": {
         "modalTitle": "O saldo em dólares não está disponível na sua região"

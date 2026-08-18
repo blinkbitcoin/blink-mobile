@@ -2420,6 +2420,7 @@
   },
   "SettingsScreen": {
     "createAddress": "Unda anwani",
+    "addressDisabled": "(imezimwa)",
     "donationButton": "Kitufe cha kuchangia",
     "btcpayServer": "BTCPay Server",
     "woocommerce": "WooCommerce",
@@ -2562,20 +2563,20 @@
   },
   "StablesatsRestriction": {
     "walletLabel": "haipatikani katika eneo lako",
-    "anonModeWalletLabel": "haipatikani katika hali ya Anon"
+    "anonModeWalletLabel": "haipatikani katika hali ya Incognito"
   },
   "AnonModeConvertModal": {
     "title": "Hamisha kwanza salio lako la Dola",
-    "body": "Hali ya Anon inaauni salio la Bitcoin pekee. Hamisha salio lako la Dola kwenda salio la Bitcoin ili kubadilisha."
+    "body": "Hali ya Incognito inaauni salio la Bitcoin pekee. Hamisha salio lako la Dola kwenda salio la Bitcoin ili kubadilisha."
   },
   "EnhancedModePrompt": {
     "title": "Kipengele hiki kinahitaji hali ya Enhanced",
-    "body": "Uko katika hali ya Anon, Blink haijui eneo lako, hivyo baadhi ya vipengele havipatikani. Badilisha kwenda Enhanced ili ukaguzi wa mahali ufanyike na vipengele vyote vya eneo lako vifunguliwe.",
+    "body": "Uko katika hali ya Incognito, Blink haijui eneo lako, hivyo baadhi ya vipengele havipatikani. Badilisha kwenda Enhanced ili ukaguzi wa mahali ufanyike na vipengele vyote vya eneo lako vifunguliwe.",
     "switchButton": "Badilisha kwenda Enhanced"
   },
   "ModeSwitchSuccessScreen": {
-    "enhanced": "Umebadilisha kwenda hali ya Enhanced isiyohifadhiwa",
-    "anon": "Umebadilisha kwenda hali ya Anon isiyohifadhiwa"
+    "enhanced": "Umebadilisha kwenda\nhali ya Enhanced isiyohifadhiwa",
+    "anon": "Umebadilisha kwenda\nhali ya Incognito isiyohifadhiwa"
   },
   "DollarBalanceRestriction": {
     "modalTitle": "Salio la dola haipatikani katika eneo lako"

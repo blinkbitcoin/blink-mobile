@@ -2420,6 +2420,7 @@
   },
   "SettingsScreen": {
     "createAddress": "Направи адресу",
+    "addressDisabled": "(онемогућено)",
     "donationButton": "Дугме за донирање",
     "btcpayServer": "BTCPay Server",
     "woocommerce": "WooCommerce",
@@ -2562,20 +2563,20 @@
   },
   "StablesatsRestriction": {
     "walletLabel": "није доступан у вашем региону",
-    "anonModeWalletLabel": "није доступно у Anon режиму"
+    "anonModeWalletLabel": "није доступно у Incognito режиму"
   },
   "AnonModeConvertModal": {
     "title": "Прво пребаците свој доларски салдо",
-    "body": "Anon режим подржава само Bitcoin салдо. Пребаците свој доларски салдо на Bitcoin салдо да бисте се пребацили."
+    "body": "Incognito режим подржава само Bitcoin салдо. Пребаците свој доларски салдо на Bitcoin салдо да бисте се пребацили."
   },
   "EnhancedModePrompt": {
     "title": "Ова функција захтева Enhanced режим",
-    "body": "У Anon сте режиму, Blink не зна ваш регион, па неке функције нису доступне. Пребаците се на Enhanced да би се извршила провера локације и откључале све функције за ваш регион.",
+    "body": "У Incognito сте режиму, Blink не зна ваш регион, па неке функције нису доступне. Пребаците се на Enhanced да би се извршила провера локације и откључале све функције за ваш регион.",
     "switchButton": "Пребаци на Enhanced"
   },
   "ModeSwitchSuccessScreen": {
-    "enhanced": "Пребачено на Enhanced режим без старатељства",
-    "anon": "Пребачено на Anon режим без старатељства"
+    "enhanced": "Пребачено на Enhanced режим\nбез старатељства",
+    "anon": "Пребачено на Incognito режим\nбез старатељства"
   },
   "DollarBalanceRestriction": {
     "modalTitle": "Доларски салдо није доступан у вашем региону"

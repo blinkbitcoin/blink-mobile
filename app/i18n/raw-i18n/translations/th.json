@@ -2420,6 +2420,7 @@
   },
   "SettingsScreen": {
     "createAddress": "สร้างแอดเดรส",
+    "addressDisabled": "(ปิดใช้งาน)",
     "donationButton": "ปุ่มบริจาค",
     "btcpayServer": "BTCPay Server",
     "woocommerce": "WooCommerce",
@@ -2562,20 +2563,20 @@
   },
   "StablesatsRestriction": {
     "walletLabel": "ไม่พร้อมใช้งานในภูมิภาคของคุณ",
-    "anonModeWalletLabel": "ไม่พร้อมใช้งานในโหมด Anon"
+    "anonModeWalletLabel": "ไม่พร้อมใช้งานในโหมด Incognito"
   },
   "AnonModeConvertModal": {
     "title": "โอนยอดคงเหลือดอลลาร์ของคุณก่อน",
-    "body": "โหมด Anon รองรับเฉพาะยอดคงเหลือ Bitcoin เท่านั้น โอนยอดคงเหลือดอลลาร์ของคุณไปยังยอดคงเหลือ Bitcoin เพื่อสลับโหมด"
+    "body": "โหมด Incognito รองรับเฉพาะยอดคงเหลือ Bitcoin เท่านั้น โอนยอดคงเหลือดอลลาร์ของคุณไปยังยอดคงเหลือ Bitcoin เพื่อสลับโหมด"
   },
   "EnhancedModePrompt": {
     "title": "ฟีเจอร์นี้ต้องใช้โหมด Enhanced",
-    "body": "คุณอยู่ในโหมด Anon Blink ไม่ทราบภูมิภาคของคุณ ฟีเจอร์บางอย่างจึงใช้งานไม่ได้ สลับไปใช้ Enhanced เพื่อตรวจสอบตำแหน่งและปลดล็อกฟีเจอร์ทั้งหมดสำหรับภูมิภาคของคุณ",
+    "body": "คุณอยู่ในโหมด Incognito Blink ไม่ทราบภูมิภาคของคุณ ฟีเจอร์บางอย่างจึงใช้งานไม่ได้ สลับไปใช้ Enhanced เพื่อตรวจสอบตำแหน่งและปลดล็อกฟีเจอร์ทั้งหมดสำหรับภูมิภาคของคุณ",
     "switchButton": "สลับไปใช้ Enhanced"
   },
   "ModeSwitchSuccessScreen": {
-    "enhanced": "สลับไปใช้โหมด Enhanced ควบคุมด้วยตัวเองแล้ว",
-    "anon": "สลับไปใช้โหมด Anon ควบคุมด้วยตัวเองแล้ว"
+    "enhanced": "สลับไปใช้โหมด Enhanced\nควบคุมด้วยตัวเองแล้ว",
+    "anon": "สลับไปใช้โหมด Incognito\nควบคุมด้วยตัวเองแล้ว"
   },
   "DollarBalanceRestriction": {
     "modalTitle": "ยอดเงินดอลลาร์ไม่พร้อมใช้งานในภูมิภาคของคุณ"

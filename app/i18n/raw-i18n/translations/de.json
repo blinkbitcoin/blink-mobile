@@ -2420,6 +2420,7 @@
     },
     "SettingsScreen": {
         "createAddress": "Adresse erstellen",
+        "addressDisabled": "(deaktiviert)",
         "donationButton": "Spenden-Button",
         "btcpayServer": "BTCPay Server",
         "woocommerce": "WooCommerce",
@@ -2562,20 +2563,20 @@
     },
     "StablesatsRestriction": {
         "walletLabel": "in deiner Region nicht verfügbar",
-        "anonModeWalletLabel": "im Anon-Modus nicht verfügbar"
+        "anonModeWalletLabel": "im Incognito-Modus nicht verfügbar"
     },
     "AnonModeConvertModal": {
         "title": "Übertrage zuerst dein Dollar-Guthaben",
-        "body": "Der Anon-Modus unterstützt nur das Bitcoin-Guthaben. Übertrage dein Dollar-Guthaben auf dein Bitcoin-Guthaben, um zu wechseln."
+        "body": "Der Incognito-Modus unterstützt nur das Bitcoin-Guthaben. Übertrage dein Dollar-Guthaben auf dein Bitcoin-Guthaben, um zu wechseln."
     },
     "EnhancedModePrompt": {
         "title": "Diese Funktion benötigt den Enhanced-Modus",
-        "body": "Du bist im Anon-Modus, Blink kennt deine Region nicht, daher sind einige Funktionen nicht verfügbar. Wechsle zu Enhanced, um eine Standortprüfung durchzuführen und alle Funktionen für deine Region freizuschalten.",
+        "body": "Du bist im Incognito-Modus, Blink kennt deine Region nicht, daher sind einige Funktionen nicht verfügbar. Wechsle zu Enhanced, um eine Standortprüfung durchzuführen und alle Funktionen für deine Region freizuschalten.",
         "switchButton": "Zu Enhanced wechseln"
     },
     "ModeSwitchSuccessScreen": {
-        "enhanced": "Zum selbstverwahrten Enhanced-Modus gewechselt",
-        "anon": "Zum selbstverwahrten Anon-Modus gewechselt"
+        "enhanced": "Zum selbstverwahrten\nEnhanced-Modus gewechselt",
+        "anon": "Zum selbstverwahrten\nIncognito-Modus gewechselt"
     },
     "DollarBalanceRestriction": {
         "modalTitle": "Dollar-Guthaben ist in deiner Region nicht verfügbar"

@@ -2420,6 +2420,7 @@
   },
   "SettingsScreen": {
     "createAddress": "Adres oluştur",
+    "addressDisabled": "(devre dışı)",
     "donationButton": "Bağış düğmesi",
     "btcpayServer": "BTCPay Server",
     "woocommerce": "WooCommerce",
@@ -2562,20 +2563,20 @@
   },
   "StablesatsRestriction": {
     "walletLabel": "bölgenizde kullanılamıyor",
-    "anonModeWalletLabel": "Anon modunda kullanılamaz"
+    "anonModeWalletLabel": "Incognito modunda kullanılamaz"
   },
   "AnonModeConvertModal": {
     "title": "Önce Dolar bakiyeni aktar",
-    "body": "Anon modu yalnızca Bitcoin bakiyesini destekler. Geçiş yapmak için Dolar bakiyeni Bitcoin bakiyene aktar."
+    "body": "Incognito modu yalnızca Bitcoin bakiyesini destekler. Geçiş yapmak için Dolar bakiyeni Bitcoin bakiyene aktar."
   },
   "EnhancedModePrompt": {
     "title": "Bu özellik Enhanced modu gerektirir",
-    "body": "Anon modundasın, Blink bölgeni bilmiyor, bu yüzden bazı özellikler kullanılamıyor. Konum denetimi yapılması ve bölgen için tüm özelliklerin açılması için Enhanced moduna geç.",
+    "body": "Incognito modundasın, Blink bölgeni bilmiyor, bu yüzden bazı özellikler kullanılamıyor. Konum denetimi yapılması ve bölgen için tüm özelliklerin açılması için Enhanced moduna geç.",
     "switchButton": "Enhanced moduna geç"
   },
   "ModeSwitchSuccessScreen": {
-    "enhanced": "Emanetsiz Enhanced moduna geçildi",
-    "anon": "Emanetsiz Anon moduna geçildi"
+    "enhanced": "Emanetsiz Enhanced\nmoduna geçildi",
+    "anon": "Emanetsiz Incognito\nmoduna geçildi"
   },
   "DollarBalanceRestriction": {
     "modalTitle": "Dolar bakiyesi bölgenizde kullanılamıyor"

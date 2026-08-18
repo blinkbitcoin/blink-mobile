@@ -2506,6 +2506,7 @@ const en: BaseTranslation = {
     pos: "Point of Sale",
     posCopied: "Your point of sale link has been copied",
     createAddress: "Create address",
+    addressDisabled: "(disabled)",
     donationButton: "Donate Button",
     btcpayServer: "BTCPay Server",
     woocommerce: "WooCommerce",
@@ -2702,20 +2703,20 @@ const en: BaseTranslation = {
   },
   StablesatsRestriction: {
     walletLabel: "not available in your region",
-    anonModeWalletLabel: "not available in Anon mode",
+    anonModeWalletLabel: "not available in Incognito mode",
   },
   AnonModeConvertModal: {
     title: "Transfer your Dollar Balance first",
-    body: "Anon Mode supports the Bitcoin Balance only. Transfer your Dollar Balance to your Bitcoin Balance to switch.",
+    body: "Incognito Mode supports the Bitcoin Balance only. Transfer your Dollar Balance to your Bitcoin Balance to switch.",
   },
   EnhancedModePrompt: {
     title: "This feature needs Enhanced Mode",
-    body: "You're in Anon Mode, Blink doesn't know your region, so some features aren't available. Switch to Enhanced to run a location check and unlock all features for your region.",
+    body: "You're in Incognito Mode, Blink doesn't know your region, so some features aren't available. Switch to Enhanced to run a location check and unlock all features for your region.",
     switchButton: "Switch to Enhanced",
   },
   ModeSwitchSuccessScreen: {
-    enhanced: "Switched to Enhanced Non-custodial Mode",
-    anon: "Switched to Anon Non-custodial Mode",
+    enhanced: "Switched to Enhanced\nNon-custodial Mode",
+    anon: "Switched to Incognito\nNon-custodial Mode",
   },
   DollarBalanceRestriction: {
     modalTitle: "Dollar Balance is not available in your region",
