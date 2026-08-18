@@ -112,9 +112,7 @@ describe("SelfCustodialAccountBanner", () => {
 
     const { getByText, queryByTestId } = renderBanner()
 
-    fireEvent.press(
-      getByText(`satoshi@blink.sv ${LL.SettingsScreen.addressDisabled()}`),
-    )
+    fireEvent.press(getByText(`satoshi@blink.sv ${LL.SettingsScreen.addressDisabled()}`))
 
     expect(mockPromptEnhancedMode).toHaveBeenCalledTimes(1)
     expect(mockCopyToClipboard).not.toHaveBeenCalled()
