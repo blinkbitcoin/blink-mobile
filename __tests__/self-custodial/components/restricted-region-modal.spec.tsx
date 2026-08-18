@@ -2,10 +2,18 @@ import React from "react"
 
 import { fireEvent, render } from "@testing-library/react-native"
 import { InAppBrowser } from "react-native-inappbrowser-reborn"
-import { ThemeProvider } from "@rn-vui/themed"
+import { ThemeProvider, useTheme } from "@rn-vui/themed"
 import TypesafeI18n from "@app/i18n/i18n-react"
 import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
+
+const mockGaloyIcon = jest.fn()
+jest.mock("@app/components/atomic/galoy-icon", () => ({
+  GaloyIcon: (props: { name: string; color?: string }) => {
+    mockGaloyIcon(props)
+    return null
+  },
+}))
 
 jest.mock("react-native-modal", () => {
   const ReactNs = jest.requireActual<typeof import("react")>("react")
@@ -26,10 +34,19 @@ import { RestrictedRegionModal } from "@app/self-custodial/components/restricted
 loadLocale("en")
 const LL = i18nObject("en")
 
+/** Reads the palette from inside the same provider the modal renders under, so the
+ *  colour assertion follows the theme instead of hardcoding a hex. */
+let themeColors: { primary: string } | undefined
+const ThemeProbe: React.FC = () => {
+  themeColors = useTheme().theme.colors
+  return null
+}
+
 const renderModal = (onDismiss: () => void, isVisible = true) =>
   render(
     <ThemeProvider>
       <TypesafeI18n locale="en">
+        <ThemeProbe />
         <RestrictedRegionModal isVisible={isVisible} onDismiss={onDismiss} />
       </TypesafeI18n>
     </ThemeProvider>,
@@ -62,6 +79,16 @@ describe("RestrictedRegionModal", () => {
     fireEvent.press(getByText(LL.common.close()))
 
     expect(onDismiss).toHaveBeenCalledTimes(1)
+  })
+
+  /** The brand primary, matching the custodial full-screen block, so the two sanctions
+   *  surfaces read as one feature. It must not fall back to the warning colour. */
+  it("tints the icon with the theme primary", () => {
+    renderModal(jest.fn())
+
+    expect(mockGaloyIcon).toHaveBeenCalledWith(
+      expect.objectContaining({ name: "warning", color: themeColors?.primary }),
+    )
   })
 
   /** In-app browser, unlike the full-screen custodial block: this modal is a JS

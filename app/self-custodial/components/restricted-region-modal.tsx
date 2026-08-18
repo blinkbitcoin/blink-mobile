@@ -31,7 +31,7 @@ export const RestrictedRegionModal: React.FC<RestrictedRegionModalProps> = ({
       isVisible={isVisible}
       toggleModal={onDismiss}
       showCloseIconButton={true}
-      image={<GaloyIcon name="warning" size={80} color={colors.warning} />}
+      image={<GaloyIcon name="warning" size={80} color={colors.primary} />}
       title={LL.RestrictedRegion.title()}
       body={<RestrictedRegionBody style={styles.body} />}
       primaryButtonTitle={LL.common.close()}
