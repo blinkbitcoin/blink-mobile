@@ -357,9 +357,12 @@ export const createNoAmountOnchainPaymentDetails = <T extends WalletCurrency>(
     })
   }
 
+  // Speed rides on the wire input but is no part of the money movement (destination,
+  // amount, wallet), so the key is kept: dropping it would let a fee-tier switch after an
+  // ambiguous failure mint a fresh key and slip a duplicate past the backend's dedupe.
   const setPayoutSpeed = (newPayoutSpeed: PayoutSpeed) => {
     return createNoAmountOnchainPaymentDetails({
-      ...params,
+      ...paramsWithKey,
       payoutSpeed: newPayoutSpeed,
     })
   }
@@ -567,9 +570,12 @@ export const createAmountOnchainPaymentDetails = <T extends WalletCurrency>(
     })
   }
 
+  // Speed rides on the wire input but is no part of the money movement (destination,
+  // amount, wallet), so the key is kept: dropping it would let a fee-tier switch after an
+  // ambiguous failure mint a fresh key and slip a duplicate past the backend's dedupe.
   const setPayoutSpeed = (newPayoutSpeed: PayoutSpeed) => {
     return createAmountOnchainPaymentDetails({
-      ...params,
+      ...paramsWithKey,
       payoutSpeed: newPayoutSpeed,
     })
   }

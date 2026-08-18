@@ -1,6 +1,6 @@
 import { LnUrlPayServiceResponse } from "lnurl-pay"
 
-import { WalletCurrency } from "@app/graphql/generated"
+import { PayoutSpeed, WalletCurrency } from "@app/graphql/generated"
 import {
   createAmountLightningPaymentDetails,
   createAmountOnchainPaymentDetails,
@@ -30,6 +30,7 @@ type Probe = {
   setAmount?: (amount: unknown) => Probe
   setInvoice?: (args: unknown) => Probe
   setSuccessAction?: (action: unknown) => Probe
+  setPayoutSpeed?: (speed: unknown) => Probe
 }
 
 const asProbe = (detail: unknown): Probe => detail as Probe
@@ -243,6 +244,18 @@ describe("idempotency key ref — onchain", () => {
     expect(keyOf(minted(base()).setMemo?.("note") as Probe)).toBe("minted-key")
   })
 
+  it("keeps the key across a payout-speed change", () => {
+    // A fee-tier switch changes the fee, not the money movement — and the details screen
+    // exposes it after an ambiguous failure, so dropping the key here would let the retry
+    // mint a fresh one and slip a duplicate past the backend's dedupe.
+    expect(keyOf(minted(base()).setPayoutSpeed?.(PayoutSpeed.Slow) as Probe)).toBe(
+      "minted-key",
+    )
+    expect(keyOf(carryingRef(base()).setPayoutSpeed?.(PayoutSpeed.Slow) as Probe)).toBe(
+      "minted-key",
+    )
+  })
+
   it("drops the key on a new amount or wallet", () => {
     expect(keyOf(carryingRef(base()).setAmount?.(otherAmount) as Probe)).toBeUndefined()
     expect(
@@ -270,6 +283,17 @@ describe("idempotency key ref — amount onchain", () => {
   it("keeps the key across memo and display-currency rebuilds", () => {
     expect(keyOf(minted(base()).setMemo?.("note") as Probe)).toBe("minted-key")
     expect(keyOf(minted(base()).setConvertMoneyAmount(convertMoneyAmount))).toBe(
+      "minted-key",
+    )
+  })
+
+  it("keeps the key across a payout-speed change", () => {
+    // Same rule as the no-amount rail: the fee tier is reachable after an ambiguous
+    // failure, and it changes the quote, not the money movement.
+    expect(keyOf(minted(base()).setPayoutSpeed?.(PayoutSpeed.Slow) as Probe)).toBe(
+      "minted-key",
+    )
+    expect(keyOf(carryingRef(base()).setPayoutSpeed?.(PayoutSpeed.Slow) as Probe)).toBe(
       "minted-key",
     )
   })
