@@ -93,7 +93,7 @@ type ConvertModalProps = {
   onTransfer: () => void
 }
 const mockConvertModal = jest.fn<null, [ConvertModalProps]>(() => null)
-jest.mock("@app/components/anon-mode-convert-modal", () => ({
+jest.mock("@app/self-custodial/components/anon-mode-convert-modal", () => ({
   AnonModeConvertModal: (props: ConvertModalProps) => mockConvertModal(props),
 }))
 

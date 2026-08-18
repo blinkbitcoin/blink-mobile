@@ -19,7 +19,7 @@ jest.mock("react-native-modal", () => {
   return { __esModule: true, default: MockModal }
 })
 
-import { AnonModeConvertModal } from "@app/components/anon-mode-convert-modal"
+import { AnonModeConvertModal } from "@app/self-custodial/components/anon-mode-convert-modal"
 
 loadLocale("en")
 const LL = i18nObject("en")

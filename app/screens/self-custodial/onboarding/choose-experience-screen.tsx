@@ -4,7 +4,7 @@ import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
-import { AnonModeConvertModal } from "@app/components/anon-mode-convert-modal"
+import { AnonModeConvertModal } from "@app/self-custodial/components/anon-mode-convert-modal"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { IconHero } from "@app/components/icon-hero"
 import { OptionCard, OptionCardGroup } from "@app/components/option-card-group"

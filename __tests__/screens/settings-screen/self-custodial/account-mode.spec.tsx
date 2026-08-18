@@ -3,7 +3,7 @@ import { fireEvent, render } from "@testing-library/react-native"
 import { ThemeProvider } from "@rn-vui/themed"
 
 import theme from "@app/rne-theme/theme"
-import { AccountModeSetting } from "@app/screens/settings-screen/settings/account-mode"
+import { AccountModeSetting } from "@app/screens/settings-screen/self-custodial/account-mode"
 import { AccountMode } from "@app/types/account"
 import { AccountType } from "@app/types/wallet"
 
