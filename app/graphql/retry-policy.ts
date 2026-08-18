@@ -32,6 +32,9 @@ const noRetryOperations = [
   "onChainTxFee",
   "onChainUsdTxFee",
   "onChainUsdTxFeeAsBtcDenominated",
+  "onChainTxFeeBySpeed",
+  "onChainUsdTxFeeBySpeed",
+  "onChainUsdTxFeeAsBtcDenominatedBySpeed",
 
   // no need to retry to upload the token
   // specially as it's running on app start

@@ -51,8 +51,10 @@ jest.mock("@app/i18n/i18n-react", () => ({
 }))
 
 // --- @react-navigation/native ---
+// jest.fn so the focus subscription itself is assertable: only highlighted rows
+// should subscribe, otherwise opening a transaction re-renders every mounted row.
 jest.mock("@react-navigation/native", () => ({
-  useIsFocused: () => true,
+  useIsFocused: jest.fn(() => true),
 }))
 
 // --- @app/components/animations ---
@@ -74,8 +76,17 @@ jest.mock(
 )
 
 // --- child components that would otherwise require native modules ---
+// The mount counter is what makes a remount of the row subtree assertable:
+// re-rendering leaves it alone, unmounting and rebuilding bumps it.
+let mockIconMounts = 0
 jest.mock("@app/components/icon-transactions", () => ({
-  IconTransaction: () => null,
+  IconTransaction: () => {
+    const react = jest.requireActual("react")
+    react.useEffect(() => {
+      mockIconMounts += 1
+    }, [])
+    return null
+  },
 }))
 
 jest.mock("@app/components/transaction-date", () => ({
@@ -145,11 +156,15 @@ jest.mock("@app/types/amounts", () => ({
 
 // ─── imports needed for mocking ───────────────────────────────────────────────
 import { useFragment } from "@apollo/client"
+import { useIsFocused } from "@react-navigation/native"
 import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { useAppConfig } from "@app/hooks"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
+import { useBounceInAnimation } from "@app/components/animations"
 
 const mockUseFragment = useFragment as jest.Mock
+const mockUseBounceInAnimation = useBounceInAnimation as jest.Mock
+const mockUseIsFocused = useIsFocused as jest.Mock
 const mockUseHideAmount = useHideAmount as jest.Mock
 const mockUseAppConfig = useAppConfig as jest.Mock
 const mockUseDisplayCurrency = useDisplayCurrency as jest.Mock
@@ -175,8 +190,13 @@ const makeTx = (overrides = {}) => ({
 
 beforeEach(() => {
   jest.clearAllMocks()
+  mockIconMounts = 0
 
   mockUseFragment.mockReturnValue({ data: makeTx() })
+
+  // clearAllMocks keeps return values, so pin the default here rather than let
+  // a test that needs an unfocused screen leak into the ones after it.
+  mockUseIsFocused.mockReturnValue(true)
 
   mockUseHideAmount.mockReturnValue({
     hideAmount: false,
@@ -254,6 +274,26 @@ describe("MemoizedTransactionItem", () => {
       expect(mockOnPress).toHaveBeenCalledTimes(1)
     })
 
+    it("passes its own txid to onPress, so the list can share one callback", () => {
+      const mockOnPress = jest.fn()
+
+      const { getByTestId } = render(
+        <MemoizedTransactionItem txid="tx-1" onPress={mockOnPress} />,
+      )
+      fireEvent.press(getByTestId("transaction-item"))
+
+      expect(mockOnPress).toHaveBeenCalledWith("tx-1")
+    })
+
+    it("stays inert when no onPress is given", () => {
+      // The contact-transactions list renders rows without a handler, and they
+      // must not look tappable: handlePress is always defined internally, so
+      // only the guard at the call site keeps those rows from being pressable.
+      const { getByTestId } = render(<MemoizedTransactionItem txid="tx-1" />)
+
+      expect(getByTestId("transaction-item").props.onPress).toBeUndefined()
+    })
+
     it("pressing the hidden placeholder does not toggle hide state", () => {
       const mockToggle = jest.fn()
       mockUseHideAmount.mockReturnValue({
@@ -267,6 +307,95 @@ describe("MemoizedTransactionItem", () => {
       fireEvent.press(getByTestId("hidden-balance-placeholder"))
 
       expect(mockToggle).not.toHaveBeenCalled()
+    })
+  })
+
+  describe("re-render cost", () => {
+    it("does not subscribe to navigation focus when not highlighted", () => {
+      render(<MemoizedTransactionItem txid="tx-1" />)
+
+      expect(mockUseIsFocused).not.toHaveBeenCalled()
+    })
+
+    it("subscribes to navigation focus when highlighted", () => {
+      render(<MemoizedTransactionItem txid="tx-1" highlight />)
+
+      expect(mockUseIsFocused).toHaveBeenCalled()
+    })
+
+    it("does not remount the row when the highlight clears", () => {
+      // Tapping an unseen transaction marks it seen, which flips highlight
+      // true -> false. Swapping the element type at that position would throw
+      // the whole row subtree away and rebuild it.
+      const { rerender } = render(<MemoizedTransactionItem txid="tx-1" highlight />)
+      expect(mockIconMounts).toBe(1)
+
+      rerender(<MemoizedTransactionItem txid="tx-1" highlight={false} />)
+
+      expect(mockIconMounts).toBe(1)
+    })
+
+    it("does not remount the row when the highlight turns on", () => {
+      // The screen's highlight baseline and last-seen ids both arrive after the
+      // rows have mounted, so the row the user came to see mounts unhighlighted
+      // and flips false -> true. That is the common direction, and it must not
+      // rebuild the subtree either.
+      const { rerender } = render(
+        <MemoizedTransactionItem txid="tx-1" highlight={false} />,
+      )
+      expect(mockIconMounts).toBe(1)
+
+      rerender(<MemoizedTransactionItem txid="tx-1" highlight />)
+
+      expect(mockIconMounts).toBe(1)
+    })
+
+    it("stops the bounce when the highlight clears, without dropping the subscriber", () => {
+      const { rerender } = render(<MemoizedTransactionItem txid="tx-1" highlight />)
+      expect(mockUseBounceInAnimation).toHaveBeenLastCalledWith(
+        expect.objectContaining({ visible: true }),
+      )
+
+      rerender(<MemoizedTransactionItem txid="tx-1" highlight={false} />)
+
+      expect(mockUseBounceInAnimation).toHaveBeenLastCalledWith(
+        expect.objectContaining({ visible: false }),
+      )
+    })
+  })
+
+  describe("bounce-in wiring", () => {
+    it("drives the bounce with the focus state and the row's timings", () => {
+      // Guards the move of the subscription into its own component: rendering
+      // the subscriber without still calling the animation would leave every
+      // other test in this file green while the bounce silently stopped.
+      mockUseIsFocused.mockReturnValue(true)
+
+      render(<MemoizedTransactionItem txid="tx-1" highlight />)
+
+      expect(mockUseBounceInAnimation).toHaveBeenCalledWith({
+        isFocused: true,
+        visible: true,
+        scale: expect.objectContaining({ value: 1 }),
+        delay: 300,
+        duration: 120,
+      })
+    })
+
+    it("passes the focus state through when the screen is not focused", () => {
+      mockUseIsFocused.mockReturnValue(false)
+
+      render(<MemoizedTransactionItem txid="tx-1" highlight />)
+
+      expect(mockUseBounceInAnimation).toHaveBeenLastCalledWith(
+        expect.objectContaining({ isFocused: false }),
+      )
+    })
+
+    it("does not run the bounce for a row that was never highlighted", () => {
+      render(<MemoizedTransactionItem txid="tx-1" />)
+
+      expect(mockUseBounceInAnimation).not.toHaveBeenCalled()
     })
   })
 

@@ -40,25 +40,36 @@ export const UnclaimedDepositsScreen: React.FC = () => {
   const [refundAddress, setRefundAddress] = useState("")
   const [feeTier, setFeeTier] = useState<FeeTierOption>(FeeTierOption.Medium)
 
-  const { tiers: feeTiers, error: feeTiersError } = useRecommendedFeeTiers(
-    sdk ?? null,
-    refundDepositId !== null,
-  )
+  const {
+    tiers: feeTiers,
+    error: feeTiersError,
+    hasQuote: hasFeeRateQuote,
+  } = useRecommendedFeeTiers(sdk ?? null, refundDepositId !== null)
   const feeTierOptions = buildFeeTierOptions({
+    hasQuote: hasFeeRateQuote,
     tiers: feeTiers,
     labels: {
       [FeeTierOption.Fast]: LL.SendBitcoinScreen.fast(),
       [FeeTierOption.Medium]: LL.SendBitcoinScreen.medium(),
       [FeeTierOption.Slow]: LL.SendBitcoinScreen.slow(),
     },
-    formatSats: (rate) => LL.UnclaimedDeposit.feeRateUnit({ rate }),
+    formatFee: ({ feeAmount }) => LL.UnclaimedDeposit.feeRateUnit({ rate: feeAmount }),
     locale,
   })
 
   const isRefundMode = refundDepositId !== null
   const hasAddress = refundAddress.trim().length > 0
-  const selectedFeeRate = feeTiers[feeTier].feeSats
-  const canSubmitRefund = hasAddress && feeTiersError === null && selectedFeeRate > 0
+  const selectedFeeRate = feeTiers[feeTier].feeAmount
+  const hasFeeRateError = feeTiersError !== null
+  const isFeeRateBroadcastable = selectedFeeRate > 0
+  /**
+   * The quote gate stops a rate the labels never showed from being submitted; the rate
+   * itself still has to be one the network would accept.
+   */
+  const canSubmitRefund =
+    hasAddress && !hasFeeRateError && hasFeeRateQuote && isFeeRateBroadcastable
+  const isRefundSubmitDisabled = !canSubmitRefund || isBusy
+  const isClaimDisabled = isBusy || isRefundMode
 
   const resetRefund = () => {
     setRefundDepositId(null)
@@ -115,7 +126,7 @@ export const UnclaimedDepositsScreen: React.FC = () => {
                     <GaloyTertiaryButton
                       title={LL.UnclaimedDeposit.claim()}
                       onPress={() => handleClaim(deposit)}
-                      disabled={isBusy || isRefundMode}
+                      disabled={isClaimDisabled}
                       {...testProps(`claim-${deposit.id}`)}
                     />
                   )}
@@ -161,7 +172,7 @@ export const UnclaimedDepositsScreen: React.FC = () => {
                         />
                       ))}
                     </View>
-                    {feeTiersError !== null && (
+                    {hasFeeRateError && (
                       <Text style={styles.errorText}>
                         {LL.UnclaimedDeposit.feeRateUnavailable()}
                       </Text>
@@ -182,7 +193,7 @@ export const UnclaimedDepositsScreen: React.FC = () => {
                       <GaloyTertiaryButton
                         title={LL.UnclaimedDeposit.refundNow()}
                         onPress={() => onRefund(deposit.id)}
-                        disabled={!canSubmitRefund || isBusy}
+                        disabled={isRefundSubmitDisabled}
                         {...testProps("refund-now-button")}
                       />
                     )}

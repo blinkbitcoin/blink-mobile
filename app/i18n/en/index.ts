@@ -2295,7 +2295,6 @@ const en: BaseTranslation = {
     totalExceed: "Total exceeds your balance of {balance: string}",
     maxFeeSelected:
       "This is the maximum fee you will be charged for this transaction.  It may end up being less once the payment has been made.",
-    feeError: "Unable to calculate fee",
     invoiceAlreadyPaid: "This invoice has already been paid",
     somethingWentWrong: "Something went wrong",
     paymentAlreadyAttempted:
@@ -2405,7 +2404,7 @@ const en: BaseTranslation = {
     recipient: "Recipient",
     time: "Time",
     type: "Type",
-    feeTier: "Fee speed",
+    feeTier: "Transaction priority",
     fast: "Fast",
     medium: "Medium",
     slow: "Slow",
@@ -2966,6 +2965,7 @@ const en: BaseTranslation = {
     fee: "fee",
     Fee: "Fee",
     fees: "Fees",
+    feeError: "Unable to calculate fee",
     firstName: "First Name",
     from: "From",
     hour: "hour",

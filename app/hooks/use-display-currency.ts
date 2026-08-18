@@ -56,6 +56,26 @@ const usdDisplayCurrency = {
 
 const defaultDisplayCurrency = usdDisplayCurrency
 
+// Constructing an Intl.NumberFormat is the most expensive part of formatting an
+// amount, and the options only ever vary by fraction digits, so one instance per
+// distinct count is enough for the whole app. The key space is the set of
+// fraction-digit counts across supported display currencies — a handful of values.
+const numberFormatters = new Map<number, Intl.NumberFormat>()
+
+const numberFormatterFor = (fractionDigits: number): Intl.NumberFormat => {
+  const cached = numberFormatters.get(fractionDigits)
+  if (cached) {
+    return cached
+  }
+
+  const formatter = Intl.NumberFormat("en-US", {
+    minimumFractionDigits: fractionDigits,
+    maximumFractionDigits: fractionDigits,
+  })
+  numberFormatters.set(fractionDigits, formatter)
+  return formatter
+}
+
 const formatCurrencyHelper = ({
   amountInMajorUnits,
   symbol,
@@ -73,12 +93,11 @@ const formatCurrencyHelper = ({
 }) => {
   const isNegative = Number(amountInMajorUnits) < 0
   const decimalPlaces = fractionDigits
-  const amountStr = Intl.NumberFormat("en-US", {
-    minimumFractionDigits: decimalPlaces,
-    maximumFractionDigits: decimalPlaces,
-    // FIXME this workaround of using .format and not .formatNumber is
-    // because hermes haven't fully implemented Intl.NumberFormat yet
-  }).format(Math.abs(Number(amountInMajorUnits)))
+  // FIXME this workaround of using .format and not .formatNumber is
+  // because hermes haven't fully implemented Intl.NumberFormat yet
+  const amountStr = numberFormatterFor(decimalPlaces).format(
+    Math.abs(Number(amountInMajorUnits)),
+  )
   return `${isApproximate ? `${APPROXIMATE_PREFIX} ` : ""}${
     isNegative && withSign ? "-" : ""
   }${symbol}${amountStr}${currencyCode ? ` ${currencyCode}` : ""}`

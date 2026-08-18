@@ -165,7 +165,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   const feeErrorText =
     (isSelfCustodialErrorCode(feeErrorCode)
       ? translateSdkError(feeErrorCode)
-      : undefined) ?? String(LL.SendBitcoinConfirmationScreen.feeError())
+      : undefined) ?? String(LL.common.feeError())
   let feeDisplayText = feeErrorText
   currencyFeeAmount = feeErrorText
   satFeeAmount = feeErrorText

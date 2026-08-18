@@ -29,6 +29,20 @@ const MIGRATION_OPERATIONS = [
  *  it spent the only token that could. */
 const IRREVERSIBLE_OPERATIONS = [...MIGRATION_OPERATIONS, "accountDelete"]
 
+/**
+ * The on-chain fee quotes, single-speed and by-speed alike. A silent resend with backoff
+ * only holds the send screen on a spinner, since the caller surfaces the failure and lets
+ * the sender ask again.
+ */
+const ONCHAIN_FEE_QUOTES = [
+  "onChainTxFee",
+  "onChainUsdTxFee",
+  "onChainUsdTxFeeAsBtcDenominated",
+  "onChainTxFeeBySpeed",
+  "onChainUsdTxFeeBySpeed",
+  "onChainUsdTxFeeAsBtcDenominatedBySpeed",
+]
+
 describe("shouldRetryOperation", () => {
   it("does not retry when there is no error", () => {
     expect(shouldRetryOperation(null, RETRYABLE_OPERATION)).toBe(false)
@@ -48,6 +62,14 @@ describe("shouldRetryOperation", () => {
 
   it("does not retry an on-chain send-all", () => {
     expect(shouldRetryOperation(networkError, "onChainPaymentSendAll")).toBe(false)
+  })
+
+  describe("on-chain fee quotes", () => {
+    ONCHAIN_FEE_QUOTES.forEach((operationName) => {
+      it(`does not resend ${operationName} behind the sender's back`, () => {
+        expect(shouldRetryOperation(networkError, operationName)).toBe(false)
+      })
+    })
   })
 
   describe("irreversible custodial-to-self-custodial migration mutations", () => {
