@@ -18,6 +18,13 @@ jest.mock("@app/self-custodial/hooks/use-self-custodial-account-mode", () => ({
   useSelfCustodialAccountMode: () => ({ isAnonMode: mockIsAnonMode }),
 }))
 
+let mockActiveAccountType: string | undefined = "custodial"
+jest.mock("@app/hooks/use-account-registry", () => ({
+  useAccountRegistry: () => ({
+    activeAccount: mockActiveAccountType ? { type: mockActiveAccountType } : undefined,
+  }),
+}))
+
 jest.mock("@app/i18n/i18n-react", () => ({
   useI18nContext: () => ({
     LL: {
@@ -58,6 +65,7 @@ describe("VersionComponent", () => {
     mockUseIpCountryCode.mockReset()
     mockNavigate.mockClear()
     mockIsAnonMode = false
+    mockActiveAccountType = "custodial"
   })
 
   it("shows the registered and detected countries below the version", () => {
@@ -154,15 +162,52 @@ describe("VersionComponent", () => {
     expect(mockUseIpCountryCode).toHaveBeenCalledWith(true)
   })
 
-  it("states no country in Anon mode", () => {
+  /** Registration is a custodial compliance fact. A self-custodial account never
+   *  registers a region, so reporting one would be inventing a fact it does not hold. */
+  it("reports only the detected region for a self-custodial account", () => {
+    mockActiveAccountType = "self-custodial"
+    mockUsePhoneCountryCode.mockReturnValue("US")
+    mockUseIpCountryCode.mockReturnValue("SV")
+
+    const { getByText, queryByText } = render(<VersionComponent />)
+
+    expect(getByText(/Detected: SV/)).toBeTruthy()
+    expect(queryByText(/Registered:/)).toBeNull()
+  })
+
+  it("detects nothing in Incognito, where no region is ever resolved", () => {
+    mockActiveAccountType = "self-custodial"
     mockIsAnonMode = true
     mockUsePhoneCountryCode.mockReturnValue(undefined)
     mockUseIpCountryCode.mockReturnValue(undefined)
 
     const { getByText, queryByText } = render(<VersionComponent />)
 
-    expect(getByText(/Country: Unknown/)).toBeTruthy()
+    expect(getByText(/Detected: Unknown/)).toBeTruthy()
     expect(queryByText(/Registered:/)).toBeNull()
-    expect(queryByText(/Detected:/)).toBeNull()
+    expect(queryByText(/Country:/)).toBeNull()
+  })
+
+  /** Incognito must not leak a detected region even if the lookup somehow resolved one. */
+  it("still detects nothing in Incognito when an ip country is present", () => {
+    mockActiveAccountType = "self-custodial"
+    mockIsAnonMode = true
+    mockUsePhoneCountryCode.mockReturnValue("US")
+    mockUseIpCountryCode.mockReturnValue("SV")
+
+    const { getByText, queryByText } = render(<VersionComponent />)
+
+    expect(getByText(/Detected: Unknown/)).toBeTruthy()
+    expect(queryByText(/SV/)).toBeNull()
+  })
+
+  it("keeps both registered and detected for a custodial account", () => {
+    mockActiveAccountType = "custodial"
+    mockUsePhoneCountryCode.mockReturnValue("US")
+    mockUseIpCountryCode.mockReturnValue("SE")
+
+    const { getByText } = render(<VersionComponent />)
+
+    expect(getByText(/Registered: US · Detected: SE/)).toBeTruthy()
   })
 })
