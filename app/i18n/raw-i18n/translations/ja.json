@@ -3890,12 +3890,12 @@
         "selfCustodialDisabled": "ノンカストディアルは一時的に利用できません。"
     },
     "ChooseExperienceScreen": {
-        "title": "エクスペリエンスを選択",
-        "subtitle": "選択内容によって利用できる機能が決まります。プライバシーを最大限に高めるには Anon を選択してください。\n\nモードは後で切り替えられます。",
-        "enhancedLabel": "Enhanced\nノンカストディアル",
-        "enhancedDescription": "アプリが位置情報を確認して地域を設定します。",
-        "anonLabel": "Anon\nノンカストディアル",
-        "anonDescription": "チェックなし。地域データなし。Bitcoin 残高のみ。",
+        "title": "ノンカストディアルモードを選択",
+        "subtitle": "選択によって利用できる機能が決まります。いつでも切り替えられます。",
+        "enhancedLabel": "Enhanced\nモード",
+        "enhancedDescription": "お客様の地域を利用して、その場所で利用可能な有用なサービスを解放します。",
+        "anonLabel": "Incognito\nモード",
+        "anonDescription": "プライバシーを最大限に。機能は少なめ。",
         "continueButton": "続行"
     },
     "UnsupportedRegionScreen": {

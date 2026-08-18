@@ -3903,12 +3903,12 @@
         "createFailed": "Failed to create wallet. Please try again."
     },
     "ChooseExperienceScreen": {
-        "title": "Choose your experience",
-        "subtitle": "Your choice decides which features are available. For maximum privacy choose Anon.\n\nYou can switch between the modes later.",
-        "enhancedLabel": "Enhanced\nNon-custodial",
-        "enhancedDescription": "The app checks your location to set your region.",
-        "anonLabel": "Anon\nNon-custodial",
-        "anonDescription": "No checks. No region data. Bitcoin Balance only.",
+        "title": "Select non-custodial mode",
+        "subtitle": "Your choice decides which features are available. You can switch whenever you want.",
+        "enhancedLabel": "Enhanced\nMode",
+        "enhancedDescription": "We use your region to unlock valuable services available where you are.",
+        "anonLabel": "Incognito\nMode",
+        "anonDescription": "For maximum privacy. Less features.",
         "continueButton": "Continue"
     },
     "UnsupportedRegionScreen": {

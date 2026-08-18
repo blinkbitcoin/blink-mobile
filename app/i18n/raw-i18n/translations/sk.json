@@ -3890,12 +3890,12 @@
     "selfCustodialDisabled": "Nesprávcovský režim je dočasne nedostupný."
   },
   "ChooseExperienceScreen": {
-    "title": "Vyberte si svoj zážitok",
-    "subtitle": "Vaša voľba určuje, ktoré funkcie sú dostupné. Pre maximálne súkromie zvoľte Anon.\n\nMedzi režimami môžete prepínať neskôr.",
-    "enhancedLabel": "Enhanced\nVlastná správa",
-    "enhancedDescription": "Aplikácia skontroluje vašu polohu a nastaví váš región.",
-    "anonLabel": "Anon\nVlastná správa",
-    "anonDescription": "Žiadne kontroly. Žiadne údaje o regióne. Iba zostatok v Bitcoine.",
+    "title": "Vyberte režim s vlastnou správou",
+    "subtitle": "Vaša voľba určuje, ktoré funkcie sú dostupné. Kedykoľvek môžete prepnúť.",
+    "enhancedLabel": "Enhanced\nrežim",
+    "enhancedDescription": "Vašu oblasť používame na odomknutie cenných služieb dostupných tam, kde ste.",
+    "anonLabel": "Incognito\nrežim",
+    "anonDescription": "Pre maximálne súkromie. Menej funkcií.",
     "continueButton": "Pokračovať"
   },
   "UnsupportedRegionScreen": {

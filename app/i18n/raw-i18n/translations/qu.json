@@ -3890,12 +3890,12 @@
     "selfCustodialDisabled": "Mana-waqaychay manaraqmi atikunchu."
   },
   "ChooseExperienceScreen": {
-    "title": "Ruwayniykita akllay",
-    "subtitle": "Akllayniyki mayqin funcionkunas kanqanta churan. Astawan pakaypaq, Anon akllay.\n\nModokunapi qhipaman tikrachiwaq.",
-    "enhancedLabel": "Enhanced\nMana waqaychasqa",
-    "enhancedDescription": "Aplicacionqa maypi kasqaykita qhawan regionniykita churanapaq.",
-    "anonLabel": "Anon\nMana waqaychasqa",
-    "anonDescription": "Mana qhawaykuna. Mana region willakuykuna. Bitcoin qullqilla.",
+    "title": "Akllay mana waqaychasqa modota",
+    "subtitle": "Akllasqayki imakunas atikunqa chayta churan. Mayllapipas t'ikrayta atinki.",
+    "enhancedLabel": "Enhanced\nModo",
+    "enhancedDescription": "Suyuykita llamk'achiyku allin serviciokunata kicharinapaq maypichus kachkanki chaypi.",
+    "anonLabel": "Incognito\nModo",
+    "anonDescription": "Astawan pakasqa kanaykipaq. Aslla ruwaykuna.",
     "continueButton": "Hinaspa"
   },
   "UnsupportedRegionScreen": {

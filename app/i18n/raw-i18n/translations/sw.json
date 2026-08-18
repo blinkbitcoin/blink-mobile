@@ -3890,12 +3890,12 @@
     "selfCustodialDisabled": "Isiyo na ulinzi haipatikani kwa muda."
   },
   "ChooseExperienceScreen": {
-    "title": "Chagua matumizi yako",
-    "subtitle": "Chaguo lako huamua vipengele vipi vinapatikana. Kwa faragha ya juu zaidi, chagua Anon.\n\nUnaweza kubadilisha kati ya njia baadaye.",
-    "enhancedLabel": "Enhanced\nIsiyohifadhiwa",
-    "enhancedDescription": "Programu hukagua eneo lako ili kuweka mkoa wako.",
-    "anonLabel": "Anon\nIsiyohifadhiwa",
-    "anonDescription": "Hakuna ukaguzi. Hakuna data ya eneo. Salio la Bitcoin pekee.",
+    "title": "Chagua hali isiyohifadhiwa",
+    "subtitle": "Chaguo lako huamua ni vipengele vipi vinapatikana. Unaweza kubadilisha wakati wowote.",
+    "enhancedLabel": "Enhanced\nHali",
+    "enhancedDescription": "Tunatumia eneo lako kufungua huduma muhimu zinazopatikana mahali ulipo.",
+    "anonLabel": "Incognito\nHali",
+    "anonDescription": "Kwa faragha ya juu zaidi. Vipengele vichache.",
     "continueButton": "Endelea"
   },
   "UnsupportedRegionScreen": {

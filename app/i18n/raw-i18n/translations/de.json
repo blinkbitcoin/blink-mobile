@@ -3890,12 +3890,12 @@
         "selfCustodialDisabled": "Nicht-verwahrend ist vorübergehend nicht verfügbar."
     },
     "ChooseExperienceScreen": {
-        "title": "Wähle dein Erlebnis",
-        "subtitle": "Deine Wahl bestimmt, welche Funktionen verfügbar sind. Für maximale Privatsphäre wähle Anon.\n\nDu kannst später zwischen den Modi wechseln.",
-        "enhancedLabel": "Enhanced\nSelbstverwahrt",
-        "enhancedDescription": "Die App prüft deinen Standort, um deine Region festzulegen.",
-        "anonLabel": "Anon\nSelbstverwahrt",
-        "anonDescription": "Keine Prüfungen. Keine Regionsdaten. Nur Bitcoin-Guthaben.",
+        "title": "Selbstverwahrten Modus wählen",
+        "subtitle": "Deine Wahl bestimmt, welche Funktionen verfügbar sind. Du kannst jederzeit wechseln.",
+        "enhancedLabel": "Enhanced\nModus",
+        "enhancedDescription": "Wir nutzen deine Region, um wertvolle Dienste freizuschalten, die dort verfügbar sind, wo du bist.",
+        "anonLabel": "Incognito\nModus",
+        "anonDescription": "Für maximale Privatsphäre. Weniger Funktionen.",
         "continueButton": "Weiter"
     },
     "UnsupportedRegionScreen": {

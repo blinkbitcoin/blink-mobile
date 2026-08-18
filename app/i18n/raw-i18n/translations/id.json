@@ -3890,12 +3890,12 @@
     "selfCustodialDisabled": "Non-kustodial sementara tidak tersedia."
   },
   "ChooseExperienceScreen": {
-    "title": "Pilih pengalaman Anda",
-    "subtitle": "Pilihan Anda menentukan fitur mana yang tersedia. Untuk privasi maksimal, pilih Anon.\n\nAnda dapat beralih antar mode nanti.",
-    "enhancedLabel": "Enhanced\nNon-kustodian",
-    "enhancedDescription": "Aplikasi memeriksa lokasi Anda untuk menetapkan wilayah Anda.",
-    "anonLabel": "Anon\nNon-kustodian",
-    "anonDescription": "Tanpa pemeriksaan. Tanpa data wilayah. Hanya saldo Bitcoin.",
+    "title": "Pilih mode non-kustodian",
+    "subtitle": "Pilihanmu menentukan fitur mana yang tersedia. Kamu bisa beralih kapan saja.",
+    "enhancedLabel": "Enhanced\nMode",
+    "enhancedDescription": "Kami menggunakan regionmu untuk membuka layanan berharga yang tersedia di tempatmu.",
+    "anonLabel": "Incognito\nMode",
+    "anonDescription": "Untuk privasi maksimal. Lebih sedikit fitur.",
     "continueButton": "Lanjutkan"
   },
   "UnsupportedRegionScreen": {

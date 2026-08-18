@@ -3890,12 +3890,12 @@
     "selfCustodialDisabled": "I-non-custodial ayifumaneki okwexeshana."
   },
   "ChooseExperienceScreen": {
-    "title": "Khetha amava akho",
-    "subtitle": "Ukhetho lwakho lugqiba ukuba yeyiphi imisebenzi efumanekayo. Ukufumana ubumfihlo obuphezulu, khetha i-Anon.\n\nUngatshintsha phakathi kweemowudi kamva.",
-    "enhancedLabel": "Enhanced\nEngagciniwe",
-    "enhancedDescription": "Usetyenziso lujonga indawo okuyo ukuze umisele ummandla wakho.",
-    "anonLabel": "Anon\nEngagciniwe",
-    "anonDescription": "Akukho zikhangelo. Akukho datha yommandla. Ibhalansi ye-Bitcoin kuphela.",
+    "title": "Khetha imowudi engagciniwe",
+    "subtitle": "Ukhetho lwakho lugqiba ukuba zeziphi iimpawu ezifumanekayo. Ungatshintsha nanini na.",
+    "enhancedLabel": "Enhanced\nImowudi",
+    "enhancedDescription": "Sisebenzisa ummandla wakho ukuvula iinkonzo ezixabisekileyo ezifumaneka apho ukhoyo.",
+    "anonLabel": "Incognito\nImowudi",
+    "anonDescription": "Ukufumana ubumfihlo obuphezulu. Iimpawu ezimbalwa.",
     "continueButton": "Qhubeka"
   },
   "UnsupportedRegionScreen": {

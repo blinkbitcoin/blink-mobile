@@ -3890,12 +3890,12 @@
         "selfCustodialDisabled": "La modalidad no custodial no está disponible temporalmente."
     },
     "ChooseExperienceScreen": {
-        "title": "Elige tu experiencia",
-        "subtitle": "Tu elección decide qué funciones están disponibles. Para máxima privacidad elige Anon.\n\nPuedes cambiar entre los modos más tarde.",
-        "enhancedLabel": "Enhanced\nNo custodiada",
-        "enhancedDescription": "La app verifica tu ubicación para definir tu región.",
-        "anonLabel": "Anon\nNo custodiada",
-        "anonDescription": "Sin verificaciones. Sin datos de región. Solo saldo en Bitcoin.",
+        "title": "Selecciona el modo no custodiado",
+        "subtitle": "Tu elección decide qué funciones están disponibles. Puedes cambiar cuando quieras.",
+        "enhancedLabel": "Enhanced\nModo",
+        "enhancedDescription": "Usamos tu región para desbloquear servicios valiosos disponibles donde estás.",
+        "anonLabel": "Incognito\nModo",
+        "anonDescription": "Para máxima privacidad. Menos funciones.",
         "continueButton": "Continuar"
     },
     "UnsupportedRegionScreen": {

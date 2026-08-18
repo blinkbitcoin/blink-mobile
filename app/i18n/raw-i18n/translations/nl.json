@@ -3890,12 +3890,12 @@
     "selfCustodialDisabled": "Niet-bewarend is tijdelijk niet beschikbaar."
   },
   "ChooseExperienceScreen": {
-    "title": "Kies je ervaring",
-    "subtitle": "Je keuze bepaalt welke functies beschikbaar zijn. Kies Anon voor maximale privacy.\n\nJe kunt later tussen de modi wisselen.",
-    "enhancedLabel": "Enhanced\nZelfbeheerd",
-    "enhancedDescription": "De app controleert je locatie om je regio in te stellen.",
-    "anonLabel": "Anon\nZelfbeheerd",
-    "anonDescription": "Geen controles. Geen regiogegevens. Alleen Bitcoin-saldo.",
+    "title": "Kies zelfbeheerde modus",
+    "subtitle": "Jouw keuze bepaalt welke functies beschikbaar zijn. Je kunt altijd wisselen.",
+    "enhancedLabel": "Enhanced\nModus",
+    "enhancedDescription": "We gebruiken je regio om waardevolle diensten te ontgrendelen die beschikbaar zijn waar je bent.",
+    "anonLabel": "Incognito\nModus",
+    "anonDescription": "Voor maximale privacy. Minder functies.",
     "continueButton": "Doorgaan"
   },
   "UnsupportedRegionScreen": {

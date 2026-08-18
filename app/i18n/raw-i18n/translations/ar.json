@@ -3890,12 +3890,12 @@
     "selfCustodialDisabled": "غير الحفظ غير متاح مؤقتًا."
   },
   "ChooseExperienceScreen": {
-    "title": "اختر تجربتك",
-    "subtitle": "اختيارك يحدد الميزات المتاحة. للحصول على أقصى قدر من الخصوصية، اختر Anon.\n\nيمكنك التبديل بين الأوضاع لاحقًا.",
-    "enhancedLabel": "Enhanced\nمحفوظ ذاتيًا",
-    "enhancedDescription": "يتحقق التطبيق من موقعك لتحديد منطقتك.",
-    "anonLabel": "Anon\nمحفوظ ذاتيًا",
-    "anonDescription": "لا عمليات تحقق. لا بيانات عن المنطقة. رصيد Bitcoin فقط.",
+    "title": "اختر الوضع المحفوظ ذاتيًا",
+    "subtitle": "اختيارك يحدد الميزات المتاحة. يمكنك التبديل متى شئت.",
+    "enhancedLabel": "Enhanced\nالوضع",
+    "enhancedDescription": "نستخدم منطقتك لفتح خدمات قيّمة متاحة في مكانك.",
+    "anonLabel": "Incognito\nالوضع",
+    "anonDescription": "لأقصى درجات الخصوصية. ميزات أقل.",
     "continueButton": "متابعة"
   },
   "UnsupportedRegionScreen": {

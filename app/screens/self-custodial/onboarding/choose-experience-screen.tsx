@@ -18,6 +18,8 @@ import { testProps } from "@app/utils/testProps"
 
 import { OnboardingScreenLayout } from "./layouts"
 
+const MODE_ICON_SIZE = 22
+
 /**
  * Lets a self-custodial user pick their region posture (Enhanced or Anon) during
  * onboarding. On continue it forwards to the destination its caller passed, so the same
@@ -49,6 +51,7 @@ export const ChooseExperienceScreen: React.FC = () => {
     {
       key: AccountMode.Enhanced,
       icon: "magic-wand",
+      iconSize: MODE_ICON_SIZE,
       title: LLScreen.enhancedLabel(),
       description: LLScreen.enhancedDescription(),
       testID: "mode-enhanced",
@@ -56,6 +59,7 @@ export const ChooseExperienceScreen: React.FC = () => {
     {
       key: AccountMode.Anon,
       icon: "sunglasses",
+      iconSize: MODE_ICON_SIZE,
       title: LLScreen.anonLabel(),
       description: LLScreen.anonDescription(),
       testID: "mode-anon",
@@ -83,7 +87,6 @@ export const ChooseExperienceScreen: React.FC = () => {
 
   return (
     <OnboardingScreenLayout
-      headerless
       footer={
         <GaloyPrimaryButton
           title={LLScreen.continueButton()}

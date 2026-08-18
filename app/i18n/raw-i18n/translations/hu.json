@@ -3890,12 +3890,12 @@
     "selfCustodialDisabled": "Az önrendelkező mód átmenetileg nem érhető el."
   },
   "ChooseExperienceScreen": {
-    "title": "Válaszd ki az élményed",
-    "subtitle": "A választásod dönti el, mely funkciók érhetők el. A maximális adatvédelemért válaszd az Anont.\n\nKésőbb válthatsz a módok között.",
-    "enhancedLabel": "Enhanced\nÖnrendelkező",
-    "enhancedDescription": "Az alkalmazás ellenőrzi a helyzeted a régiód beállításához.",
-    "anonLabel": "Anon\nÖnrendelkező",
-    "anonDescription": "Nincs ellenőrzés. Nincs régióadat. Csak Bitcoin-egyenleg.",
+    "title": "Válassz önrendelkező módot",
+    "subtitle": "A választásod dönti el, mely funkciók érhetők el. Bármikor válthatsz.",
+    "enhancedLabel": "Enhanced\nmód",
+    "enhancedDescription": "A régiódat arra használjuk, hogy feloldjuk az ott elérhető értékes szolgáltatásokat.",
+    "anonLabel": "Incognito\nmód",
+    "anonDescription": "A maximális adatvédelemért. Kevesebb funkció.",
     "continueButton": "Folytatás"
   },
   "UnsupportedRegionScreen": {

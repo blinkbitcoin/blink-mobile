@@ -886,7 +886,9 @@ export const RootStack = () => {
       <RootNavigator.Screen
         name="selfCustodialChooseExperience"
         component={ChooseExperienceScreen}
-        options={{ headerShown: false, gestureEnabled: false }}
+        /** Header for the back arrow, but the swipe stays blocked: leaving by gesture
+         *  is undirected, so the arrow is the one deliberate way out. */
+        options={{ title: "", gestureEnabled: false }}
       />
       <RootNavigator.Screen
         name="selfCustodialWalletCreation"

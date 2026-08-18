@@ -3890,12 +3890,12 @@
     "selfCustodialDisabled": "Nie-bewaring is tydelik onbeskikbaar."
   },
   "ChooseExperienceScreen": {
-    "title": "Kies jou ervaring",
-    "subtitle": "Jou keuse bepaal watter kenmerke beskikbaar is. Kies Anon vir maksimum privaatheid.\n\nJy kan later tussen die modusse wissel.",
-    "enhancedLabel": "Enhanced\nSelf-bewaard",
-    "enhancedDescription": "Die app kontroleer jou ligging om jou streek te stel.",
-    "anonLabel": "Anon\nSelf-bewaard",
-    "anonDescription": "Geen kontroles nie. Geen streekdata nie. Slegs Bitcoin-saldo.",
+    "title": "Kies self-bewaarde modus",
+    "subtitle": "Jou keuse bepaal watter funksies beskikbaar is. Jy kan enige tyd wissel.",
+    "enhancedLabel": "Enhanced\nModus",
+    "enhancedDescription": "Ons gebruik jou streek om waardevolle dienste te ontsluit wat beskikbaar is waar jy is.",
+    "anonLabel": "Incognito\nModus",
+    "anonDescription": "Vir maksimum privaatheid. Minder funksies.",
     "continueButton": "Gaan voort"
   },
   "UnsupportedRegionScreen": {

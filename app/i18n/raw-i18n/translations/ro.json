@@ -3890,12 +3890,12 @@
     "selfCustodialDisabled": "Non-custodial este temporar indisponibil."
   },
   "ChooseExperienceScreen": {
-    "title": "Alege-ți experiența",
-    "subtitle": "Alegerea ta decide ce funcții sunt disponibile. Pentru confidențialitate maximă, alege Anon.\n\nPoți comuta între moduri mai târziu.",
-    "enhancedLabel": "Enhanced\nFără custodie",
-    "enhancedDescription": "Aplicația îți verifică locația pentru a-ți stabili regiunea.",
-    "anonLabel": "Anon\nFără custodie",
-    "anonDescription": "Fără verificări. Fără date despre regiune. Doar sold în Bitcoin.",
+    "title": "Selectează modul non-custodial",
+    "subtitle": "Alegerea ta decide ce funcții sunt disponibile. Poți schimba oricând.",
+    "enhancedLabel": "Enhanced\nMod",
+    "enhancedDescription": "Folosim regiunea ta pentru a debloca servicii valoroase disponibile acolo unde ești.",
+    "anonLabel": "Incognito\nMod",
+    "anonDescription": "Pentru confidențialitate maximă. Mai puține funcții.",
     "continueButton": "Continuă"
   },
   "UnsupportedRegionScreen": {

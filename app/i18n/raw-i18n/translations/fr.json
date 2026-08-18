@@ -3890,12 +3890,12 @@
         "selfCustodialDisabled": "La non-custodial est temporairement indisponible."
     },
     "ChooseExperienceScreen": {
-        "title": "Choisissez votre expérience",
-        "subtitle": "Votre choix détermine les fonctionnalités disponibles. Pour une confidentialité maximale, choisissez Anon.\n\nVous pourrez changer de mode plus tard.",
-        "enhancedLabel": "Enhanced\nSans garde",
-        "enhancedDescription": "L'application vérifie votre position pour définir votre région.",
-        "anonLabel": "Anon\nSans garde",
-        "anonDescription": "Aucune vérification. Aucune donnée de région. Solde Bitcoin uniquement.",
+        "title": "Sélectionnez le mode sans garde",
+        "subtitle": "Votre choix détermine les fonctionnalités disponibles. Vous pouvez changer quand vous voulez.",
+        "enhancedLabel": "Enhanced\nMode",
+        "enhancedDescription": "Nous utilisons votre région pour débloquer des services utiles disponibles là où vous êtes.",
+        "anonLabel": "Incognito\nMode",
+        "anonDescription": "Pour une confidentialité maximale. Moins de fonctionnalités.",
         "continueButton": "Continuer"
     },
     "UnsupportedRegionScreen": {

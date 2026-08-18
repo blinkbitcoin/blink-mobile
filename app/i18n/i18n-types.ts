@@ -12990,31 +12990,29 @@ type RootTranslation = {
 	}
 	ChooseExperienceScreen: {
 		/**
-		 * C​h​o​o​s​e​ ​y​o​u​r​ ​e​x​p​e​r​i​e​n​c​e
+		 * S​e​l​e​c​t​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​m​o​d​e
 		 */
 		title: string
 		/**
-		 * Y​o​u​r​ ​c​h​o​i​c​e​ ​d​e​c​i​d​e​s​ ​w​h​i​c​h​ ​f​e​a​t​u​r​e​s​ ​a​r​e​ ​a​v​a​i​l​a​b​l​e​.​ ​F​o​r​ ​m​a​x​i​m​u​m​ ​p​r​i​v​a​c​y​ ​c​h​o​o​s​e​ ​A​n​o​n​.​
-	​
-	​Y​o​u​ ​c​a​n​ ​s​w​i​t​c​h​ ​b​e​t​w​e​e​n​ ​t​h​e​ ​m​o​d​e​s​ ​l​a​t​e​r​.
+		 * Y​o​u​r​ ​c​h​o​i​c​e​ ​d​e​c​i​d​e​s​ ​w​h​i​c​h​ ​f​e​a​t​u​r​e​s​ ​a​r​e​ ​a​v​a​i​l​a​b​l​e​.​ ​Y​o​u​ ​c​a​n​ ​s​w​i​t​c​h​ ​w​h​e​n​e​v​e​r​ ​y​o​u​ ​w​a​n​t​.
 		 */
 		subtitle: string
 		/**
 		 * E​n​h​a​n​c​e​d​
-	​N​o​n​-​c​u​s​t​o​d​i​a​l
+	​M​o​d​e
 		 */
 		enhancedLabel: string
 		/**
-		 * T​h​e​ ​a​p​p​ ​c​h​e​c​k​s​ ​y​o​u​r​ ​l​o​c​a​t​i​o​n​ ​t​o​ ​s​e​t​ ​y​o​u​r​ ​r​e​g​i​o​n​.
+		 * W​e​ ​u​s​e​ ​y​o​u​r​ ​r​e​g​i​o​n​ ​t​o​ ​u​n​l​o​c​k​ ​v​a​l​u​a​b​l​e​ ​s​e​r​v​i​c​e​s​ ​a​v​a​i​l​a​b​l​e​ ​w​h​e​r​e​ ​y​o​u​ ​a​r​e​.
 		 */
 		enhancedDescription: string
 		/**
-		 * A​n​o​n​
-	​N​o​n​-​c​u​s​t​o​d​i​a​l
+		 * I​n​c​o​g​n​i​t​o​
+	​M​o​d​e
 		 */
 		anonLabel: string
 		/**
-		 * N​o​ ​c​h​e​c​k​s​.​ ​N​o​ ​r​e​g​i​o​n​ ​d​a​t​a​.​ ​B​i​t​c​o​i​n​ ​B​a​l​a​n​c​e​ ​o​n​l​y​.
+		 * F​o​r​ ​m​a​x​i​m​u​m​ ​p​r​i​v​a​c​y​.​ ​L​e​s​s​ ​f​e​a​t​u​r​e​s​.
 		 */
 		anonDescription: string
 		/**
@@ -26350,31 +26348,29 @@ export type TranslationFunctions = {
 	}
 	ChooseExperienceScreen: {
 		/**
-		 * Choose your experience
+		 * Select non-custodial mode
 		 */
 		title: () => LocalizedString
 		/**
-		 * Your choice decides which features are available. For maximum privacy choose Anon.
-
-	You can switch between the modes later.
+		 * Your choice decides which features are available. You can switch whenever you want.
 		 */
 		subtitle: () => LocalizedString
 		/**
 		 * Enhanced
-	Non-custodial
+	Mode
 		 */
 		enhancedLabel: () => LocalizedString
 		/**
-		 * The app checks your location to set your region.
+		 * We use your region to unlock valuable services available where you are.
 		 */
 		enhancedDescription: () => LocalizedString
 		/**
-		 * Anon
-	Non-custodial
+		 * Incognito
+	Mode
 		 */
 		anonLabel: () => LocalizedString
 		/**
-		 * No checks. No region data. Bitcoin Balance only.
+		 * For maximum privacy. Less features.
 		 */
 		anonDescription: () => LocalizedString
 		/**

@@ -3890,12 +3890,12 @@
     "selfCustodialDisabled": "Ikke-forvaltning er midlertidigt utilgængelig."
   },
   "ChooseExperienceScreen": {
-    "title": "Vælg din oplevelse",
-    "subtitle": "Dit valg bestemmer, hvilke funktioner der er tilgængelige. Vælg Anon for maksimalt privatliv.\n\nDu kan skifte mellem tilstandene senere.",
-    "enhancedLabel": "Enhanced\nSelvforvaltet",
-    "enhancedDescription": "Appen tjekker din placering for at indstille din region.",
-    "anonLabel": "Anon\nSelvforvaltet",
-    "anonDescription": "Ingen tjek. Ingen regionsdata. Kun Bitcoin-saldo.",
+    "title": "Vælg selvforvaltet tilstand",
+    "subtitle": "Dit valg afgør, hvilke funktioner der er tilgængelige. Du kan skifte, når du vil.",
+    "enhancedLabel": "Enhanced\ntilstand",
+    "enhancedDescription": "Vi bruger din region til at låse op for værdifulde tjenester, der er tilgængelige, hvor du er.",
+    "anonLabel": "Incognito\ntilstand",
+    "anonDescription": "For maksimalt privatliv. Færre funktioner.",
     "continueButton": "Fortsæt"
   },
   "UnsupportedRegionScreen": {

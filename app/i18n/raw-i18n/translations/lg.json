@@ -3890,12 +3890,12 @@
     "selfCustodialDisabled": "Tekikola kati ku non-custodial."
   },
   "ChooseExperienceScreen": {
-    "title": "Londa engeri gy'oyagala",
-    "subtitle": "Ky'olonda kye kisalawo ebikozesebwa ebiriwo. Okusinga obwekusifu, londa Anon.\n\nOsobola okukyusa wakati w'engeri oluvannyuma.",
-    "enhancedLabel": "Enhanced\nYeefuga",
-    "enhancedDescription": "App ekebera we oli okuteekawo ekitundu kyo.",
-    "anonLabel": "Anon\nYeefuga",
-    "anonDescription": "Tewali kukebera. Tewali data ya kitundu. Bitcoin balansi yokka.",
+    "title": "Londa engeri ey'okweefuga",
+    "subtitle": "Ky'olonda kye kisalawo ebikozesebwa ebiriwo. Osobola okukyusa buli lw'oyagala.",
+    "enhancedLabel": "Enhanced\nEngeri",
+    "enhancedDescription": "Tukozesa ekitundu kyo okuggulawo obuweereza obw'omugaso obuli mu kifo mw'oli.",
+    "anonLabel": "Incognito\nEngeri",
+    "anonDescription": "Olw'eby'ekyama ebisingayo. Ebikozesebwa bitono.",
     "continueButton": "Weyongerayo"
   },
   "UnsupportedRegionScreen": {

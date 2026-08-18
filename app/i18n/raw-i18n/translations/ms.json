@@ -3890,12 +3890,12 @@
     "selfCustodialDisabled": "Bukan kustodial tidak tersedia buat sementara waktu."
   },
   "ChooseExperienceScreen": {
-    "title": "Pilih pengalaman anda",
-    "subtitle": "Pilihan anda menentukan ciri yang tersedia. Untuk privasi maksimum, pilih Anon.\n\nAnda boleh bertukar antara mod kemudian.",
-    "enhancedLabel": "Enhanced\nBukan kustodian",
-    "enhancedDescription": "Aplikasi menyemak lokasi anda untuk menetapkan wilayah anda.",
-    "anonLabel": "Anon\nBukan kustodian",
-    "anonDescription": "Tiada semakan. Tiada data wilayah. Baki Bitcoin sahaja.",
+    "title": "Pilih mod bukan kustodian",
+    "subtitle": "Pilihan anda menentukan ciri yang tersedia. Anda boleh bertukar bila-bila masa.",
+    "enhancedLabel": "Enhanced\nMod",
+    "enhancedDescription": "Kami menggunakan wilayah anda untuk membuka perkhidmatan berharga yang tersedia di tempat anda.",
+    "anonLabel": "Incognito\nMod",
+    "anonDescription": "Untuk privasi maksimum. Kurang ciri.",
     "continueButton": "Teruskan"
   },
   "UnsupportedRegionScreen": {

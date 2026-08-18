@@ -3890,12 +3890,12 @@
     "selfCustodialDisabled": "Phi giám sát hiện không khả dụng."
   },
   "ChooseExperienceScreen": {
-    "title": "Chọn trải nghiệm của bạn",
-    "subtitle": "Lựa chọn của bạn quyết định những tính năng nào khả dụng. Để có quyền riêng tư tối đa, hãy chọn Anon.\n\nBạn có thể chuyển đổi giữa các chế độ sau.",
-    "enhancedLabel": "Enhanced\nPhi lưu ký",
-    "enhancedDescription": "Ứng dụng kiểm tra vị trí của bạn để thiết lập khu vực của bạn.",
-    "anonLabel": "Anon\nPhi lưu ký",
-    "anonDescription": "Không kiểm tra. Không có dữ liệu khu vực. Chỉ số dư Bitcoin.",
+    "title": "Chọn chế độ phi lưu ký",
+    "subtitle": "Lựa chọn của bạn quyết định những tính năng khả dụng. Bạn có thể chuyển bất cứ lúc nào.",
+    "enhancedLabel": "Enhanced\nChế độ",
+    "enhancedDescription": "Chúng tôi dùng khu vực của bạn để mở khóa các dịch vụ giá trị có sẵn nơi bạn ở.",
+    "anonLabel": "Incognito\nChế độ",
+    "anonDescription": "Để riêng tư tối đa. Ít tính năng hơn.",
     "continueButton": "Tiếp tục"
   },
   "UnsupportedRegionScreen": {

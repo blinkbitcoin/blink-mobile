@@ -3890,12 +3890,12 @@
     "selfCustodialDisabled": "Saklamasız mod geçici olarak kullanılamıyor."
   },
   "ChooseExperienceScreen": {
-    "title": "Deneyiminizi seçin",
-    "subtitle": "Seçiminiz hangi özelliklerin kullanılabilir olduğunu belirler. Maksimum gizlilik için Anon'u seçin.\n\nModlar arasında daha sonra geçiş yapabilirsiniz.",
-    "enhancedLabel": "Enhanced\nEmanetsiz",
-    "enhancedDescription": "Uygulama, bölgenizi belirlemek için konumunuzu kontrol eder.",
-    "anonLabel": "Anon\nEmanetsiz",
-    "anonDescription": "Kontrol yok. Bölge verisi yok. Yalnızca Bitcoin bakiyesi.",
+    "title": "Emanetsiz modu seçin",
+    "subtitle": "Seçiminiz hangi özelliklerin kullanılabilir olduğunu belirler. İstediğiniz zaman değiştirebilirsiniz.",
+    "enhancedLabel": "Enhanced\nMod",
+    "enhancedDescription": "Bulunduğunuz yerde sunulan değerli hizmetlerin kilidini açmak için bölgenizi kullanırız.",
+    "anonLabel": "Incognito\nMod",
+    "anonDescription": "Maksimum gizlilik için. Daha az özellik.",
     "continueButton": "Devam et"
   },
   "UnsupportedRegionScreen": {
