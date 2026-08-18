@@ -3,10 +3,14 @@ import { act, renderHook, waitFor } from "@testing-library/react-native"
 
 import { MockedProvider, MockedResponse } from "@apollo/client/testing"
 import { AccountLimitsByLevelDocument } from "@app/graphql/generated"
+import TypesafeI18n from "@app/i18n/i18n-react"
+import { loadLocale } from "@app/i18n/i18n-util.sync"
 import {
   FALLBACK_LEVEL1_DAILY_LIMIT_CENTS,
   useLevel1DailyLimit,
 } from "@app/hooks/use-level1-daily-limit"
+
+loadLocale("en")
 
 type LevelRow = { level: string; withdrawal: number }
 
@@ -25,9 +29,14 @@ const limitsMock = (rows: LevelRow[]): MockedResponse => ({
   },
 })
 
+// The locale must be pinned, not inherited: without a provider the hook formats
+// with the host machine's ICU default, so these assertions pass under en-US CI
+// and fail on, e.g., a de-DE or en-ZA developer machine.
 const wrapper = (mocks: ReadonlyArray<MockedResponse>) => {
   const Wrapper: React.FC<PropsWithChildren> = ({ children }) => (
-    <MockedProvider mocks={mocks}>{children}</MockedProvider>
+    <MockedProvider mocks={mocks}>
+      <TypesafeI18n locale="en">{children}</TypesafeI18n>
+    </MockedProvider>
   )
   return Wrapper
 }
