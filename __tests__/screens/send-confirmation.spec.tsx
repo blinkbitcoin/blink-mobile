@@ -6,6 +6,7 @@ import { act, fireEvent, render, screen } from "@testing-library/react-native"
 import { DisplayCurrency, toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { ConvertAmountAdjustment } from "@app/types/payment"
 import { WalletCurrency } from "@app/graphql/generated"
+import { IDEMPOTENCY_KEY_UNAVAILABLE } from "@app/screens/send-bitcoin-screen/use-send-payment"
 import * as PaymentDetails from "@app/screens/send-bitcoin-screen/payment-details/intraledger"
 import { ConvertMoneyAmount } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
 import * as PaymentDetailsLightning from "@app/screens/send-bitcoin-screen/payment-details/lightning"
@@ -181,7 +182,11 @@ jest.mock("@app/screens/send-bitcoin-screen/use-save-lnaddress-contact", () => (
 
 const sendPaymentMock = jest.fn()
 const mockUseSendPayment = jest.fn()
+// Spread the real module: the screen also imports IDEMPOTENCY_KEY_UNAVAILABLE from here,
+// and a wholesale mock would make that constant undefined, silently disabling the
+// comparison the error-mapping test exercises.
 jest.mock("@app/screens/send-bitcoin-screen/use-send-payment", () => ({
+  ...jest.requireActual("@app/screens/send-bitcoin-screen/use-send-payment"),
   useSendPayment: () => mockUseSendPayment(),
 }))
 
@@ -919,11 +924,40 @@ describe("SendBitcoinConfirmationScreen — skipBalanceCheck matrix", () => {
     expect(screen.getByTestId("slider").props.accessibilityState.disabled).toBe(false)
   })
 
-  it("(isSendingMax=false, hasAttemptedSend=true) over balance — slider disabled + no error", async () => {
+  it("(isSendingMax=false, hasAttemptedSend=true) over balance — no error, and a retry is still offered", async () => {
+    // hasAttemptedSend is sticky: it suppresses the balance check because the backend may
+    // already have debited the wallet. It no longer gates the slider — whether another
+    // attempt is allowed is expressed solely by sendPayment, so an ambiguous failure can
+    // be retried under the same idempotency key.
     mockUseSendPayment.mockReturnValue({
       loading: false,
       hasAttemptedSend: true,
       sendPayment: sendPaymentMock,
+    })
+
+    render(
+      <ContextForScreen>
+        <Intraledger route={buildUsdSettlementRoute(1100)} />
+      </ContextForScreen>,
+    )
+
+    await act(
+      () =>
+        new Promise((resolve) => {
+          setTimeout(resolve, 10)
+        }),
+    )
+
+    expect(screen.queryByText(/exceeds your balance/i)).toBeNull()
+    expect(screen.getByTestId("slider").props.accessibilityState.disabled).toBe(false)
+  })
+
+  it("(hasAttemptedSend=true, sendPayment withheld) over balance — slider disabled + no error", async () => {
+    // The hook withholds sendPayment while a send is in flight or terminally settled.
+    mockUseSendPayment.mockReturnValue({
+      loading: false,
+      hasAttemptedSend: true,
+      sendPayment: undefined,
     })
 
     render(
@@ -1212,5 +1246,54 @@ describe("SendBitcoinConfirmationScreen — 409 idempotency conflict recovery", 
 
     expect(verifyPaymentSettledMock).not.toHaveBeenCalled()
     expect(screen.getByText("insufficient balance")).toBeTruthy()
+  })
+
+  it("shows a generic error when the CSPRNG cannot mint an idempotency key", async () => {
+    // The hook rejects with a sentinel rather than a raw Nitro string; the screen must
+    // translate it instead of showing the user "idempotency-key-unavailable".
+    sendPaymentMock.mockRejectedValueOnce(new Error(IDEMPOTENCY_KEY_UNAVAILABLE))
+
+    render(
+      <ContextForScreen>
+        <LightningLnURL route={buildLnurlRoute()} />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("slider"))
+    })
+
+    expect(screen.queryByText(IDEMPOTENCY_KEY_UNAVAILABLE)).toBeNull()
+    expect(verifyPaymentSettledMock).not.toHaveBeenCalled()
+  })
+
+  it("keeps the slider armed after an ambiguous throw, so the user can retry", async () => {
+    // A non-409 throw is the ambiguous case: the request may have landed. The hook
+    // reopens sendPayment under the same key (pinned in the hook spec); the screen's half
+    // of the contract is that the slider is gated by sendPayment alone, never by
+    // hasAttemptedSend, so a second swipe actually fires.
+    sendPaymentMock
+      .mockRejectedValueOnce(new Error("network died"))
+      .mockResolvedValueOnce({ status: "SUCCESS", extraInfo: {} })
+
+    render(
+      <ContextForScreen>
+        <LightningLnURL route={buildLnurlRoute()} />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("slider"))
+    })
+
+    expect(screen.getByText("network died")).toBeTruthy()
+    expect(verifyPaymentSettledMock).not.toHaveBeenCalled()
+    expect(screen.getByTestId("slider").props.accessibilityState.disabled).toBe(false)
+
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("slider"))
+    })
+
+    expect(sendPaymentMock).toHaveBeenCalledTimes(2)
   })
 })
