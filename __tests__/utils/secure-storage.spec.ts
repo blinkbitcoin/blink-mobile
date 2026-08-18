@@ -537,3 +537,189 @@ describe("KeyStoreWrapper session-profile methods", () => {
     })
   })
 })
+
+describe("KeyStoreWrapper active-token methods", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  describe("getActiveToken", () => {
+    it("returns the stored token from the 'galoyAuthToken' key", async () => {
+      mockGet.mockResolvedValue("ory_st_secret")
+
+      const result = await KeyStoreWrapper.getActiveToken()
+
+      expect(result).toBe("ory_st_secret")
+      expect(mockGet).toHaveBeenCalledWith("galoyAuthToken")
+    })
+
+    it("returns an empty string when the key is missing or the keystore fails", async () => {
+      mockGet.mockRejectedValue(new Error("not found"))
+
+      const result = await KeyStoreWrapper.getActiveToken()
+
+      expect(result).toBe("")
+    })
+  })
+
+  describe("readActiveToken", () => {
+    // Both native modules reject a missing key rather than resolving empty, so
+    // "no token" and "the read went wrong" arrive as the same rejection and
+    // only the code separates them. Callers that would overwrite or delete a
+    // credential on an empty read depend on this distinction.
+    const keyNotFound = () =>
+      Object.assign(new Error("key does not present"), {
+        code: "404",
+      })
+
+    it("reports a stored token as found", async () => {
+      mockGet.mockResolvedValue("ory_st_secret")
+
+      expect(await KeyStoreWrapper.readActiveToken()).toEqual({
+        status: "found",
+        token: "ory_st_secret",
+      })
+    })
+
+    it("reports the 404 rejection as absent, not as a failure", async () => {
+      mockGet.mockRejectedValue(keyNotFound())
+
+      expect(await KeyStoreWrapper.readActiveToken()).toEqual({ status: "absent" })
+    })
+
+    it("reports any other rejection as a failed read", async () => {
+      const err = Object.assign(new Error("keystore locked"), { code: "9" })
+      mockGet.mockRejectedValue(err)
+
+      expect(await KeyStoreWrapper.readActiveToken()).toEqual({ status: "failed", err })
+    })
+
+    it("treats a codeless rejection as a failed read rather than assuming absence", async () => {
+      mockGet.mockRejectedValue(new Error("something unexpected"))
+
+      const result = await KeyStoreWrapper.readActiveToken()
+
+      expect(result.status).toBe("failed")
+    })
+
+    it("collapses to an empty string through getActiveToken either way", async () => {
+      mockGet.mockRejectedValue(keyNotFound())
+      expect(await KeyStoreWrapper.getActiveToken()).toBe("")
+
+      mockGet.mockRejectedValue(new Error("keystore locked"))
+      expect(await KeyStoreWrapper.getActiveToken()).toBe("")
+    })
+  })
+
+  describe("setActiveToken", () => {
+    it("writes the token with ALWAYS_THIS_DEVICE_ONLY accessibility", async () => {
+      mockSet.mockResolvedValue(undefined)
+
+      const result = await KeyStoreWrapper.setActiveToken("ory_st_secret")
+
+      expect(result).toBe(true)
+      expect(mockSet).toHaveBeenCalledWith("galoyAuthToken", "ory_st_secret", {
+        accessible: "ALWAYS_THIS_DEVICE_ONLY",
+      })
+    })
+
+    it("returns false on storage error", async () => {
+      mockSet.mockRejectedValue(new Error("write locked"))
+
+      const result = await KeyStoreWrapper.setActiveToken("ory_st_secret")
+
+      expect(result).toBe(false)
+    })
+  })
+
+  describe("removeActiveToken", () => {
+    it("removes the key and returns true", async () => {
+      mockRemove.mockResolvedValue(undefined)
+
+      const result = await KeyStoreWrapper.removeActiveToken()
+
+      expect(result).toBe(true)
+      expect(mockRemove).toHaveBeenCalledWith("galoyAuthToken")
+    })
+
+    it("returns false when the keystore rejects", async () => {
+      mockRemove.mockRejectedValue(new Error("keystore unavailable"))
+
+      const result = await KeyStoreWrapper.removeActiveToken()
+
+      expect(result).toBe(false)
+    })
+  })
+})
+
+describe("KeyStoreWrapper clearUninstallSurvivingCredentials", () => {
+  const onFailure = jest.fn()
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockRemove.mockResolvedValue(undefined)
+  })
+
+  it("removes the active token and the session profiles, and only those", async () => {
+    await KeyStoreWrapper.clearUninstallSurvivingCredentials(onFailure)
+
+    expect(mockRemove).toHaveBeenCalledWith("galoyAuthToken")
+    expect(mockRemove).toHaveBeenCalledWith("sessionProfiles")
+    // Mnemonics are deliberately NOT wiped (wallet keys outliving uninstall
+    // is a product decision, not cleanup) — nothing else may be touched.
+    expect(mockRemove).toHaveBeenCalledTimes(2)
+    expect(onFailure).not.toHaveBeenCalled()
+  })
+
+  it("retries a failed removal once and stays silent when the retry lands", async () => {
+    mockRemove
+      .mockRejectedValueOnce(new Error("keystore busy")) // token, attempt 1
+      .mockResolvedValue(undefined)
+
+    await KeyStoreWrapper.clearUninstallSurvivingCredentials(onFailure)
+
+    const tokenAttempts = mockRemove.mock.calls.filter(([k]) => k === "galoyAuthToken")
+    expect(tokenAttempts).toHaveLength(2)
+    expect(onFailure).not.toHaveBeenCalled()
+  })
+
+  it("reports a persistently failing token removal and still wipes the profiles", async () => {
+    mockRemove.mockImplementation((key: string) =>
+      key === "galoyAuthToken"
+        ? Promise.reject(new Error("keystore unavailable"))
+        : Promise.resolve(undefined),
+    )
+
+    await KeyStoreWrapper.clearUninstallSurvivingCredentials(onFailure)
+
+    expect(onFailure).toHaveBeenCalledTimes(1)
+    expect(onFailure).toHaveBeenCalledWith("active token")
+    // One slot failing must not stop the other from being cleared.
+    expect(mockRemove).toHaveBeenCalledWith("sessionProfiles")
+  })
+
+  it("reports a persistently failing profile removal by name", async () => {
+    mockRemove.mockImplementation((key: string) =>
+      key === "sessionProfiles"
+        ? Promise.reject(new Error("keystore unavailable"))
+        : Promise.resolve(undefined),
+    )
+
+    await KeyStoreWrapper.clearUninstallSurvivingCredentials(onFailure)
+
+    expect(onFailure).toHaveBeenCalledTimes(1)
+    expect(onFailure).toHaveBeenCalledWith("session profiles")
+  })
+
+  it("reports every slot when the keystore is fully unavailable, and never throws", async () => {
+    mockRemove.mockRejectedValue(new Error("keystore unavailable"))
+
+    await expect(
+      KeyStoreWrapper.clearUninstallSurvivingCredentials(onFailure),
+    ).resolves.toBeUndefined()
+
+    expect(onFailure).toHaveBeenCalledTimes(2)
+    expect(onFailure).toHaveBeenNthCalledWith(1, "active token")
+    expect(onFailure).toHaveBeenNthCalledWith(2, "session profiles")
+  })
+})

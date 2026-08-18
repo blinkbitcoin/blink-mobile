@@ -26,7 +26,7 @@ gql`
 `
 
 const useLogout = () => {
-  const { resetState } = usePersistentStateContext()
+  const { resetState, clearToken } = usePersistentStateContext()
   const [userLogoutMutation] = useUserLogoutMutation({
     fetchPolicy: "no-cache",
   })
@@ -38,11 +38,29 @@ const useLogout = () => {
       isValidToken = true,
     }: LogoutOptions = {}): Promise<void> => {
       try {
-        let context
-        const deviceToken = await messaging().getToken()
+        // Isolated: a failed push-token fetch must never skip the local
+        // key-store cleanup below. The server-side revocation is best-effort
+        // and simply skipped without a device token.
+        let deviceToken: string | undefined
+        try {
+          deviceToken = await messaging().getToken()
+        } catch (err) {
+          reportError("logout device token fetch", err)
+        }
 
+        let context: { headers: { authorization: string } } | undefined
         if (token) {
           await KeyStoreWrapper.removeSessionProfileByToken(token)
+          // Removing the profile that backs the active session must also drop
+          // the keychain token: a crash before the caller saves the next
+          // token would otherwise resurrect a session whose profile is gone.
+          // Via the provider, so its dirty-check ref learns the slot is empty —
+          // a direct keystore removal would leave the ref stale and make every
+          // later save skip the write it thinks already happened.
+          const activeToken = await KeyStoreWrapper.getActiveToken()
+          if (activeToken === token) {
+            await clearToken()
+          }
           context = { headers: { authorization: `Bearer ${token}` } }
         } else {
           await AsyncStorage.multiRemove([SCHEMA_VERSION_KEY])
@@ -50,11 +68,12 @@ const useLogout = () => {
           await KeyStoreWrapper.removePin()
           await KeyStoreWrapper.removePinAttempts()
           await KeyStoreWrapper.removeSessionProfiles()
+          await clearToken()
         }
 
         logLogout()
 
-        if (token && isValidToken) {
+        if (token && isValidToken && deviceToken) {
           await Promise.race([
             userLogoutMutation({
               context,
@@ -80,7 +99,7 @@ const useLogout = () => {
         }
       }
     },
-    [resetState, userLogoutMutation],
+    [resetState, clearToken, userLogoutMutation],
   )
 
   return {

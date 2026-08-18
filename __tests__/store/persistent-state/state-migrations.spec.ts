@@ -478,14 +478,27 @@ describe("state-migrations schema 10", () => {
       }
     })
 
-    it("returns status='no-data' for an unknown schemaVersion (no error, no rawData payload)", async () => {
-      const result = await migratePersistentState({ schemaVersion: 999 })
-      expect(result).toEqual({ status: MigrationStatus.NoData })
+    it("returns status='failed', not 'no-data', for an unrecognized schemaVersion", async () => {
+      // A blob we can't read is not a fresh install: a downgrade from a future
+      // schema must not be treated as a reinstall (which wipes the keychain).
+      const futureBlob = { schemaVersion: 999, galoyInstance: { id: "Main" } }
+      const result = await migratePersistentState(futureBlob)
+
+      expect(result.status).toBe(MigrationStatus.Failed)
+      if (result.status === MigrationStatus.Failed) {
+        expect(result.error.message).toContain("schemaVersion")
+        // rawData must travel with the failure so the caller can quarantine it
+        expect(result.rawData).toBe(futureBlob)
+      }
     })
 
-    it("returns status='no-data' for null input", async () => {
-      const result = await migratePersistentState(null)
-      expect(result).toEqual({ status: MigrationStatus.NoData })
+    it("returns status='no-data' only for a genuinely absent blob", async () => {
+      expect(await migratePersistentState(null)).toEqual({
+        status: MigrationStatus.NoData,
+      })
+      expect(await migratePersistentState(undefined)).toEqual({
+        status: MigrationStatus.NoData,
+      })
     })
 
     it("wraps a non-Error rejection into an Error when a migration throws a primitive", async () => {

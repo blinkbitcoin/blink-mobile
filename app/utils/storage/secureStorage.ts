@@ -1,10 +1,39 @@
 import RNSecureKeyStore, { ACCESSIBLE } from "react-native-secure-key-store"
 
+// The keychain slot and the legacy persisted-blob field share this name.
+// Pinned forever: existing installs already store entries under it.
+export const GALOY_AUTH_TOKEN_KEY = "galoyAuthToken"
+// Type-level handle so other modules can pin their own copy of the literal to
+// this one at compile time without a runtime import (specs mock this module
+// wholesale, which would erase a runtime named export).
+export type GaloyAuthTokenKey = typeof GALOY_AUTH_TOKEN_KEY
+
+/**
+ * The outcome of a keychain read, with "nothing stored" kept distinct from
+ * "the read failed" — see readActiveToken.
+ */
+export type ActiveTokenRead =
+  | { status: "found"; token: string }
+  | { status: "absent" }
+  | { status: "failed"; err: unknown }
+
+// Both native modules reject a missing key with code "404" (ios/RNSecureKeyStore.m
+// `get`, android RNSecureKeyStoreModule#get). Every other code means the read
+// itself went wrong.
+const KEY_NOT_FOUND_CODE = "404"
+
+const isKeyNotFound = (err: unknown): boolean =>
+  typeof err === "object" &&
+  err !== null &&
+  "code" in err &&
+  String((err as { code: unknown }).code) === KEY_NOT_FOUND_CODE
+
 export default class KeyStoreWrapper {
   private static readonly IS_BIOMETRICS_ENABLED = "isBiometricsEnabled"
   private static readonly PIN = "PIN"
   private static readonly PIN_ATTEMPTS = "pinAttempts"
   private static readonly SESSION_PROFILES = "sessionProfiles"
+  private static readonly ACTIVE_TOKEN = GALOY_AUTH_TOKEN_KEY
   private static readonly MNEMONIC = "mnemonic"
   private static readonly MNEMONIC_NETWORK = "mnemonic_network"
 
@@ -135,6 +164,86 @@ export default class KeyStoreWrapper {
     } catch (err) {
       return false
     }
+  }
+
+  /**
+   * A missing key is a rejection, not an empty read, on both platforms — so
+   * "nothing stored" and "the keystore is unhappy" arrive the same way and only
+   * the error code tells them apart. Callers that would destroy or overwrite a
+   * credential based on an empty read must use this instead of getActiveToken.
+   */
+  public static async readActiveToken(): Promise<ActiveTokenRead> {
+    try {
+      const token = await RNSecureKeyStore.get(KeyStoreWrapper.ACTIVE_TOKEN)
+      return token ? { status: "found", token } : { status: "absent" }
+    } catch (err) {
+      // "404" is the one code both the iOS and Android modules reserve for a
+      // key that is not there; anything else (locked keystore, decrypt error,
+      // unknown) is a failed read and must not be read as "no token".
+      return isKeyNotFound(err) ? { status: "absent" } : { status: "failed", err }
+    }
+  }
+
+  /**
+   * Collapses absent and failed to "": convenient, and safe only where an empty
+   * result leads to doing nothing. Use readActiveToken where it leads to a write.
+   */
+  public static async getActiveToken(): Promise<string> {
+    const read = await KeyStoreWrapper.readActiveToken()
+    return read.status === "found" ? read.token : ""
+  }
+
+  public static async setActiveToken(token: string): Promise<boolean> {
+    try {
+      // ALWAYS_THIS_DEVICE_ONLY over WHEN_UNLOCKED: iOS can cold-start the app in the
+      // background while locked (UIBackgroundModes remote-notification), and a failed
+      // read here degrades to a silent logged-out session.
+      await RNSecureKeyStore.set(KeyStoreWrapper.ACTIVE_TOKEN, token, {
+        accessible: ACCESSIBLE.ALWAYS_THIS_DEVICE_ONLY,
+      })
+      return true
+    } catch {
+      return false
+    }
+  }
+
+  public static async removeActiveToken(): Promise<boolean> {
+    try {
+      await RNSecureKeyStore.remove(KeyStoreWrapper.ACTIVE_TOKEN)
+      return true
+    } catch {
+      return false
+    }
+  }
+
+  /**
+   * Reinstall guard: the iOS keychain outlives the app install, so a genuine
+   * fresh install must clear every session credential the UI can reach.
+   * Owning the list here means adding a new uninstall-surviving slot and
+   * adding it to this wipe are the same edit, in the same file.
+   *
+   * Mnemonics are deliberately excluded: wallet keys outliving uninstall is a
+   * recovery/product decision, not cleanup (and their account index does not
+   * survive uninstall, so they cannot be enumerated here anyway).
+   *
+   * Each removal is retried once; a persistent failure is reported through
+   * onFailure but never thrown, and never stops the remaining slots — boot
+   * must go on and every slot must get its attempt.
+   */
+  public static async clearUninstallSurvivingCredentials(
+    onFailure: (what: string) => void,
+  ): Promise<void> {
+    const removeWithRetry = async (remove: () => Promise<boolean>, what: string) => {
+      // One immediate retry, no backoff: the failures worth a second attempt
+      // here are one-shot keystore hiccups, and boot cannot wait out anything
+      // longer-lived — the NoData branch re-runs this on the next launch.
+      const ok = (await remove()) || (await remove())
+      if (!ok) {
+        onFailure(what)
+      }
+    }
+    await removeWithRetry(KeyStoreWrapper.removeActiveToken, "active token")
+    await removeWithRetry(KeyStoreWrapper.removeSessionProfiles, "session profiles")
   }
 
   private static mnemonicKeyFor(accountId: string): string {

@@ -3,22 +3,32 @@ import {
   MigrationStatus,
 } from "../app/store/persistent-state/state-migrations"
 
-it("reports no-data for an empty object (no schemaVersion key)", async () => {
-  const result = await migratePersistentState({})
-  expect(result).toEqual({ status: MigrationStatus.NoData })
+// A blob that exists but can't be read is Failed, not NoData: NoData now means
+// "genuinely fresh install" and triggers the reinstall keychain wipe, so any
+// present-but-unreadable blob must never be classified as it.
+
+it("reports failed for an empty object (no schemaVersion key)", async () => {
+  const rawData = {}
+  const result = await migratePersistentState(rawData)
+  expect(result.status).toBe(MigrationStatus.Failed)
+  if (result.status === MigrationStatus.Failed) {
+    expect(result.error.message).toContain("schemaVersion")
+    expect(result.rawData).toBe(rawData)
+  }
 })
 
-it("reports no-data for an unknown schemaVersion", async () => {
-  const result = await migratePersistentState({
-    schemaVersion: 0,
-    isUsdDisabled: true,
-  })
-  expect(result).toEqual({ status: MigrationStatus.NoData })
+it("reports failed for an unknown schemaVersion", async () => {
+  const rawData = { schemaVersion: 0, isUsdDisabled: true }
+  const result = await migratePersistentState(rawData)
+  expect(result.status).toBe(MigrationStatus.Failed)
+  if (result.status === MigrationStatus.Failed) {
+    expect(result.rawData).toBe(rawData)
+  }
 })
 
-it("reports no-data for a negative schemaVersion", async () => {
+it("reports failed for a negative schemaVersion", async () => {
   const result = await migratePersistentState({ schemaVersion: -2 })
-  expect(result).toEqual({ status: MigrationStatus.NoData })
+  expect(result.status).toBe(MigrationStatus.Failed)
 })
 
 it("migration from 5 to current returns ok with the migrated state", async () => {
