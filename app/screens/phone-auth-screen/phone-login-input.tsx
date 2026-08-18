@@ -19,6 +19,7 @@ import type { InputRef } from "@app/types/themed-input"
 
 import { Screen } from "../../components/screen"
 import { PhoneChannelButton } from "./phone-channel-buttons"
+import { PhoneLoginInitiateType } from "./phone-login-initiate-type"
 import type { PhoneValidationStackParamList } from "../../navigation/stack-param-lists"
 import {
   ErrorType,
@@ -95,15 +96,7 @@ const useStyles = makeStyles(({ colors }) => ({
   loadingView: { flex: 1, justifyContent: "center", alignItems: "center" },
 }))
 
-export const PhoneLoginInitiateType = {
-  Login: "Login",
-  CreateAccount: "CreateAccount",
-} as const
-
 const DisableCountriesForAccountCreation = [""]
-
-export type PhoneLoginInitiateType =
-  (typeof PhoneLoginInitiateType)[keyof typeof PhoneLoginInitiateType]
 type PhoneLoginInitiateScreenProps = {
   route: RouteProp<PhoneValidationStackParamList, "phoneLoginInitiate">
 }

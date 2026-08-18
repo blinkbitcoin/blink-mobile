@@ -4,7 +4,7 @@ import { LNURLPaySuccessAction } from "lnurl-pay"
 import { IconNamesType } from "@app/components/atomic/galoy-icon"
 import { PhoneCodeChannelType, UserContact, WalletCurrency } from "@app/graphql/generated"
 import { EarnSectionType } from "@app/screens/earns-screen/sections"
-import { PhoneLoginInitiateType } from "@app/screens/phone-auth-screen"
+import { PhoneLoginInitiateType } from "@app/screens/phone-auth-screen/phone-login-initiate-type"
 import {
   PaymentDestination,
   MerchantChoice,

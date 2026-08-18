@@ -2097,7 +2097,7 @@
       "sendingLimit": "Okukendeeza ku kkomo ku kusindika buli lunaku",
       "noOnchain": "Teri kufuna bitcoin onchain",
       "recoveryOption": "Zza ssente zo nga okozesa SMS oba email",
-      "dailyLimit": "Omusasula gw'obusuubuzi gwa buli lunaku gwa USD 1,000",
+      "dailyLimit": "Omusasula gw'obusuubuzi gwa buli lunaku gwa USD {limit: string}",
       "onchainReceive": "Funa Bitcoin ku onchain"
     }
   },
@@ -2699,7 +2699,7 @@
       "mainTitle": "Tukusanyukira ku Mutendera 1",
       "title": "Ebipya ebikugguddwaako ku akawunti yo:",
       "receiveBitcoinDescription": "Funa Bitcoin ng'okozesa ennamba y'essimu yo",
-      "dailyLimitDescription": "Senda okutuuka ku USD 1,000 buli lunaku",
+      "dailyLimitDescription": "Senda okutuuka ku USD {limit: string} buli lunaku",
       "onchainDescription": "Funa okusasula kwa on-chain"
     },
     "emailBenefits": {

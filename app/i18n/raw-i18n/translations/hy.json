@@ -2097,7 +2097,7 @@
       "sendingLimit": "Օրական բիթքոյն ուղարկելու նվազեցված սահմանաչափ",
       "noOnchain": "Չկա բիթքոյնների ստացում բլոկչեյնում",
       "recoveryOption": "Վերականգնել միջոցները SMS-ով կամ էլ.փոստով",
-      "dailyLimit": "USD 1,000 daily transaction limit",
+      "dailyLimit": "USD {limit: string} օրական գործարքային սահմանաչափ",
       "onchainReceive": "Ստանալ Bitcoin onchain"
     }
   },
@@ -2699,7 +2699,7 @@
       "mainTitle": "Բարի գալուստ Մակարդակ 1",
       "title": "Ձեր հաշվի համար բացվեցին նոր հնարավորություններ՝",
       "receiveBitcoinDescription": "Ստանալ Bitcoin՝ օգտագործելով ձեր հեռախոսահամարը",
-      "dailyLimitDescription": "Send up to USD 1,000 per day",
+      "dailyLimitDescription": "Ուղարկեք օրական մինչև USD {limit: string}",
       "onchainDescription": "Ստանալ շղթային (onchain) վճարումներ"
     },
     "emailBenefits": {

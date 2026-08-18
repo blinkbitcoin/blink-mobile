@@ -2099,7 +2099,7 @@ const en: BaseTranslation = {
       sendingLimit: "Reduced daily sending limit",
       noOnchain: "No receiving bitcoin onchain",
       recoveryOption: "Recover funds by SMS or email",
-      dailyLimit: "USD 1,000 daily transaction limit",
+      dailyLimit: "USD {limit: string} daily transaction limit",
       onchainReceive: "Receive bitcoin onchain",
     },
   },
@@ -2816,7 +2816,7 @@ const en: BaseTranslation = {
       mainTitle: "Welcome to Level 1",
       title: "New features unlocked for your account:",
       receiveBitcoinDescription: "Receive Bitcoin using your phone number",
-      dailyLimitDescription: "Send up to USD 1,000 per day",
+      dailyLimitDescription: "Send up to USD {limit: string} per day",
       onchainDescription: "Receive on-chain payments",
     },
     emailBenefits: {

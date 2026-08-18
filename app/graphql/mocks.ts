@@ -16,6 +16,7 @@ import {
   MyLnUpdatesDocument,
   OnChainAddressCurrentDocument,
   PaymentRequestDocument,
+  AccountLimitsByLevelDocument,
   FeeRatesDocument,
   RealtimePriceDocument,
   ScanningQrCodeScreenDocument,
@@ -419,6 +420,25 @@ const mocks = [
             id: "84b26b88-89b0-5c6f-9d3d-fbead08f79d8",
             displayCurrency: "EUR",
           },
+        },
+      },
+    },
+  },
+  {
+    request: {
+      query: AccountLimitsByLevelDocument,
+    },
+    result: {
+      data: {
+        globals: {
+          __typename: "Globals",
+          accountLimitsByLevel: [
+            {
+              __typename: "AccountLevelLimits",
+              level: "ONE",
+              withdrawal: 99900,
+            },
+          ],
         },
       },
     },

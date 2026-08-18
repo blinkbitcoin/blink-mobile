@@ -1159,6 +1159,17 @@ query accountLimits {
   }
 }
 
+query accountLimitsByLevel {
+  globals {
+    accountLimitsByLevel {
+      level
+      withdrawal
+      __typename
+    }
+    __typename
+  }
+}
+
 query addressScreen {
   me {
     id

@@ -2097,7 +2097,7 @@
             "sendingLimit": "Reduziertes tägliches Sendelimit",
             "noOnchain": "Bitcoin können nicht onchain empfangen werden",
             "recoveryOption": "Guthaben per SMS oder E-Mail wiederherstellen",
-            "dailyLimit": "USD 1,000 tägliches Transaktionslimit",
+            "dailyLimit": "USD {limit: string} tägliches Transaktionslimit",
             "onchainReceive": "Bitcoin onchain empfangen"
         }
     },
@@ -2699,7 +2699,7 @@
             "mainTitle": "Willkommen auf Level 1",
             "title": "Neue Funktionen für dein Konto freigeschaltet:",
             "receiveBitcoinDescription": "Bitcoin über deine Telefonnummer empfangen",
-            "dailyLimitDescription": "Sende bis zu USD 1,000 pro Tag",
+            "dailyLimitDescription": "Sende bis zu USD {limit: string} pro Tag",
             "onchainDescription": "On-Chain-Zahlungen empfangen"
         },
         "emailBenefits": {

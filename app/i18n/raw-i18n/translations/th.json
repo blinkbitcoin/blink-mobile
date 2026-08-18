@@ -2097,7 +2097,7 @@
       "sendingLimit": "Reduced daily sending limit",
       "noOnchain": "No receiving bitcoin onchain",
       "recoveryOption": "กู้คืนเงินผ่าน SMS หรืออีเมล",
-      "dailyLimit": "วงเงินธุรกรรมรายวัน USD 1,000",
+      "dailyLimit": "วงเงินธุรกรรมรายวัน USD {limit: string}",
       "onchainReceive": "รับ Bitcoin แบบ Onchain"
     }
   },
@@ -2699,7 +2699,7 @@
       "mainTitle": "ยินดีต้อนรับสู่ระดับ 1",
       "title": "ฟีเจอร์ใหม่ที่ปลดล็อคสำหรับบัญชีของคุณ:",
       "receiveBitcoinDescription": "รับ Bitcoin โดยใช้หมายเลขโทรศัพท์ของคุณ",
-      "dailyLimitDescription": "ส่งได้สูงสุด USD 1,000 ต่อวัน",
+      "dailyLimitDescription": "ส่งได้สูงสุด USD {limit: string} ต่อวัน",
       "onchainDescription": "รับการชำระเงินแบบ On-chain"
     },
     "emailBenefits": {

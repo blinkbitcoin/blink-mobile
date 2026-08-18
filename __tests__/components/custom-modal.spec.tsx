@@ -22,38 +22,9 @@ jest.mock("@rn-vui/themed", () => {
   }
 })
 
-jest.mock("react-native-modal", () => {
-  const ReactNs = jest.requireActual<typeof import("react")>("react")
-  const RN = jest.requireActual<typeof import("react-native")>("react-native")
-  const MockModal = ({
-    children,
-    isVisible,
-    onBackdropPress,
-    onBackButtonPress,
-  }: {
-    children: React.ReactNode
-    isVisible: boolean
-    onBackdropPress?: () => void
-    onBackButtonPress?: () => void
-  }) =>
-    isVisible
-      ? ReactNs.createElement(
-          RN.View,
-          { testID: "modal" },
-          ReactNs.createElement(RN.Pressable, {
-            testID: "backdrop",
-            onPress: onBackdropPress,
-          }),
-          ReactNs.createElement(RN.Pressable, {
-            testID: "back-button",
-            onPress: onBackButtonPress,
-          }),
-          children,
-        )
-      : null
-  MockModal.displayName = "MockModal"
-  return MockModal
-})
+jest.mock("react-native-modal", () =>
+  jest.requireActual("@mocks/react-native-modal-mock"),
+)
 
 jest.mock("react-native-gesture-handler", () => {
   const RN = jest.requireActual<typeof import("react-native")>("react-native")

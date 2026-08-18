@@ -2097,7 +2097,7 @@
       "sendingLimit": "Hadkan penghantaran harian",
       "noOnchain": "Tiada penerimaan bitcoin dalam rangkaian utama atau on chain",
       "recoveryOption": "Pulihkan dana melalui SMS atau e-mel",
-      "dailyLimit": "Had transaksi harian USD 1,000",
+      "dailyLimit": "Had transaksi harian USD {limit: string}",
       "onchainReceive": "Terima bitcoin secara onchain"
     }
   },
@@ -2699,7 +2699,7 @@
       "mainTitle": "Selamat Datang ke Tahap 1",
       "title": "Ciri baharu telah dibuka untuk akaun anda:",
       "receiveBitcoinDescription": "Terima Bitcoin menggunakan nombor telefon anda",
-      "dailyLimitDescription": "Hantar sehingga USD 1,000 sehari",
+      "dailyLimitDescription": "Hantar sehingga USD {limit: string} sehari",
       "onchainDescription": "Terima bayaran on-chain"
     },
     "emailBenefits": {
