@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from "react"
+import { useCallback, useEffect, useMemo, useRef } from "react"
 import { Region } from "react-native-maps"
 import Supercluster from "supercluster"
 
@@ -23,11 +23,32 @@ const CLUSTER_OPTIONS = {
 // the list is capped rather than allowed to lock up the map.
 const MAX_RENDERED = 400
 
+// How much wider than the viewport the indexed slice of the world is.
+//
+// Building the index is the one expensive thing this hook does — 1.1 s over all
+// ~29k places on a slow device — and it has to happen again whenever the list
+// changes, which is every time a category is switched on or off. Indexing only
+// the places that could plausibly come into view instead makes that cost track
+// the zoom rather than the size of the world: a couple of hundred points over a
+// city, where it is a few milliseconds.
+//
+// At 3x, the box reaches a full viewport past every edge, so the map can be
+// panned a screen in any direction before the index is rebuilt — and the
+// rebuild it eventually pays for is a small one. That padding is also what
+// keeps the clustering honest: a cluster forms within `radius` (60 px) of its
+// members, a small fraction of a screen, so the only clusters that could be
+// under-counted for want of a neighbour outside the box are a whole viewport
+// off screen by the time they exist.
+const SCOPE_PADDING = 3
+
 type PlaceProperties = { place: BtcMapPlace }
 
 type ClusterOrPlace =
   | Supercluster.ClusterFeature<Supercluster.AnyProps>
   | Supercluster.PointFeature<PlaceProperties>
+
+/** West, south, east, north — the order supercluster wants them in. */
+type Bounds = [number, number, number, number]
 
 const EMPTY = {
   places: [] as BtcMapPlace[],
@@ -35,12 +56,48 @@ const EMPTY = {
   dropped: 0,
 }
 
-const boundsForRegion = (region: Region): [number, number, number, number] => [
-  region.longitude - region.longitudeDelta / 2,
-  region.latitude - region.latitudeDelta / 2,
-  region.longitude + region.longitudeDelta / 2,
-  region.latitude + region.latitudeDelta / 2,
+const boundsForRegion = (region: Region, scale = 1): Bounds => [
+  region.longitude - (region.longitudeDelta * scale) / 2,
+  region.latitude - (region.latitudeDelta * scale) / 2,
+  region.longitude + (region.longitudeDelta * scale) / 2,
+  region.latitude + (region.latitudeDelta * scale) / 2,
 ]
+
+const boundsContain = (outer: Bounds, inner: Bounds): boolean =>
+  outer[0] <= inner[0] &&
+  outer[1] <= inner[1] &&
+  outer[2] >= inner[2] &&
+  outer[3] >= inner[3]
+
+/**
+ * The places inside a box.
+ *
+ * A padded box can run past ±180°, and a place on the far side of the
+ * antimeridian has a longitude that no longer compares against it. Rather than
+ * split the box in two, longitude is left unbounded in that case: over-including
+ * costs a slightly larger index, where under-including would silently drop
+ * every pin on one side of the date line.
+ */
+const placesWithin = (places: BtcMapPlace[], bounds: Bounds): BtcMapPlace[] => {
+  const [west, south, east, north] = bounds
+  const wrapped = west < -180 || east > 180
+
+  return places.filter(
+    (place) =>
+      place.latitude >= south &&
+      place.latitude <= north &&
+      (wrapped || (place.longitude >= west && place.longitude <= east)),
+  )
+}
+
+// What the index currently holds, so a pan that stays inside it can reuse it.
+type Scope = {
+  // The list it was taken from, by identity: a new list — a category switched
+  // on, a sync landing — is a new scope however the map is pointed.
+  source: BtcMapPlace[]
+  bounds: Bounds
+  places: BtcMapPlace[]
+}
 
 /**
  * How far a place sits from the middle of the screen, for ranking only.
@@ -60,16 +117,39 @@ const offCentreRank = (place: BtcMapPlace, region: Region): number => {
 /**
  * Group ~30k places into what is worth drawing for the current viewport.
  *
- * Building the index is the expensive half and happens once per place list;
- * querying it per region change is cheap enough for the JS thread.
+ * Building the index is the expensive half, so it is built over the places
+ * around the current view rather than all ~29k — see SCOPE_PADDING. Querying it
+ * per region change is cheap enough for the JS thread either way.
  */
 export const usePlaceClusters = (places: BtcMapPlace[], region: Region | undefined) => {
+  // A cache of the last slice indexed, not state: it never holds anything the
+  // index does not already reflect, so recomputing it can only reproduce it.
+  const scopeRef = useRef<Scope | null>(null)
+
+  const scope = useMemo(() => {
+    if (!region) return null
+
+    const cached = scopeRef.current
+    if (
+      cached &&
+      cached.source === places &&
+      boundsContain(cached.bounds, boundsForRegion(region))
+    ) {
+      return cached
+    }
+
+    const bounds = boundsForRegion(region, SCOPE_PADDING)
+    const next: Scope = { source: places, bounds, places: placesWithin(places, bounds) }
+    scopeRef.current = next
+    return next
+  }, [places, region])
+
   const index = useMemo(() => {
-    if (!places.length) return null
+    if (!scope?.places.length) return null
 
     const clusterer = new Supercluster<PlaceProperties>(CLUSTER_OPTIONS)
     clusterer.load(
-      places.map((place) => ({
+      scope.places.map((place) => ({
         type: "Feature" as const,
         properties: { place },
         geometry: {
@@ -79,7 +159,7 @@ export const usePlaceClusters = (places: BtcMapPlace[], region: Region | undefin
       })),
     )
     return clusterer
-  }, [places])
+  }, [scope])
 
   const visible = useMemo(() => {
     if (!index || !region) return EMPTY
