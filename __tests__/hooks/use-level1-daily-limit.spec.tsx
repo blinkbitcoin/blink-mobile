@@ -109,10 +109,11 @@ describe("useLevel1DailyLimit", () => {
 
   it("refreshes a stale cached value from the network", async () => {
     // The app's Apollo cache is persisted to AsyncStorage, so this stands in
-    // for a relaunch after ops changed the limit: the persisted 99900 renders
-    // first, and cache-and-network must then correct it. With the default
-    // cache-first the second assertion never fires and the app advertises the
-    // old — possibly higher — limit forever.
+    // for a relaunch after ops changed the limit: the persisted value renders
+    // first, and cache-and-network must then correct it. Three distinct
+    // amounts, so each assertion has exactly one possible source — 250000 is
+    // neither the fallback nor the served value, so the first assertion fails
+    // if the cache is not read, and the second fails under cache-first.
     const staleCache = new InMemoryCache()
     staleCache.writeQuery<AccountLimitsByLevelQuery>({
       query: AccountLimitsByLevelDocument,
@@ -121,21 +122,23 @@ describe("useLevel1DailyLimit", () => {
         globals: {
           __typename: "Globals",
           accountLimitsByLevel: [
-            { __typename: "AccountLevelLimits", level: AccountLevel.One, withdrawal: 99900 },
+            {
+              __typename: "AccountLevelLimits",
+              level: AccountLevel.One,
+              withdrawal: 250000,
+            },
           ],
         },
       },
     })
 
     const { result } = renderHook(() => useLevel1DailyLimit(), {
-      wrapper: wrapper(
-        [limitsMock([{ level: "ONE", withdrawal: 150000 }])],
-        staleCache,
-      ),
+      wrapper: wrapper([limitsMock([{ level: "ONE", withdrawal: 150000 }])], staleCache),
     })
 
-    // the persisted value renders immediately — no loading flash of fallback
-    expect(result.current.limit).toBe("999")
+    // the persisted value renders immediately — no loading flash of the
+    // fallback, which would read "999"
+    expect(result.current.limit).toBe("2,500")
 
     await waitFor(() => expect(result.current.limit).toBe("1,500"))
   })
