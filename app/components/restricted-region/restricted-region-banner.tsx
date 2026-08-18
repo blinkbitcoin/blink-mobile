@@ -13,10 +13,8 @@ export const RestrictedRegionBanner: React.FC = () => {
 
   return (
     <View style={styles.container} {...testProps("restricted-region-banner")}>
-      <Text bold style={styles.title}>
-        {LL.RestrictedRegion.title()}
-      </Text>
-      <RestrictedRegionBody type="p3" style={styles.body} />
+      <Text style={styles.title}>{LL.RestrictedRegion.title()}</Text>
+      <RestrictedRegionBody style={styles.body} />
     </View>
   )
 }
@@ -24,15 +22,22 @@ export const RestrictedRegionBanner: React.FC = () => {
 const useStyles = makeStyles(({ colors }) => ({
   container: {
     borderWidth: 1,
-    borderColor: colors.warning,
+    borderColor: colors.primary,
     borderRadius: 12,
+    backgroundColor: colors.grey5,
     padding: 14,
   },
   title: {
-    color: colors.warning,
-    marginBottom: 6,
+    fontSize: 14,
+    fontWeight: "700",
+    lineHeight: 20,
+    color: colors.primary,
+    marginBottom: 2,
   },
   body: {
+    fontSize: 14,
+    fontWeight: "400",
+    lineHeight: 20,
     color: colors.black,
   },
 }))
