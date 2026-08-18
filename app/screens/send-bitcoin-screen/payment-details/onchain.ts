@@ -38,6 +38,11 @@ export const createNoAmountOnchainPaymentDetails = <T extends WalletCurrency>(
     address,
   } = params
 
+  // Same holder for every rebuild that leaves the money movement alone; see
+  // IdempotencyKeyRef. Setters that change the wire payload drop it instead.
+  const idempotencyKeyRef = params.idempotencyKeyRef ?? {}
+  const paramsWithKey = { ...params, idempotencyKeyRef }
+
   const settlementAmount = convertMoneyAmount(
     unitOfAccountAmount,
     sendingWalletDescriptor.currency,
@@ -288,6 +293,7 @@ export const createNoAmountOnchainPaymentDetails = <T extends WalletCurrency>(
   ) => {
     return createNoAmountOnchainPaymentDetails({
       ...params,
+      idempotencyKeyRef: undefined,
       isSendingMax: sendMax,
       unitOfAccountAmount: newUnitOfAccountAmount,
     })
@@ -298,7 +304,7 @@ export const createNoAmountOnchainPaymentDetails = <T extends WalletCurrency>(
     : {
         setMemo: (newMemo) =>
           createNoAmountOnchainPaymentDetails({
-            ...params,
+            ...paramsWithKey,
             senderSpecifiedMemo: newMemo,
           }),
         canSetMemo: true,
@@ -306,7 +312,7 @@ export const createNoAmountOnchainPaymentDetails = <T extends WalletCurrency>(
 
   const setConvertMoneyAmount = (newConvertMoneyAmount: ConvertMoneyAmount) => {
     return createNoAmountOnchainPaymentDetails({
-      ...params,
+      ...paramsWithKey,
       convertMoneyAmount: newConvertMoneyAmount,
     })
   }
@@ -316,11 +322,13 @@ export const createNoAmountOnchainPaymentDetails = <T extends WalletCurrency>(
   ) => {
     return createNoAmountOnchainPaymentDetails({
       ...params,
+      idempotencyKeyRef: undefined,
       sendingWalletDescriptor: newSendingWalletDescriptor,
     })
   }
 
   return {
+    idempotencyKeyRef,
     destination: address,
     settlementAmount,
     settlementAmountIsEstimated: sendingWalletDescriptor.currency !== WalletCurrency.Btc,
@@ -356,6 +364,11 @@ export const createAmountOnchainPaymentDetails = <T extends WalletCurrency>(
     senderSpecifiedMemo,
     address,
   } = params
+
+  // Same holder for every rebuild that leaves the money movement alone; see
+  // IdempotencyKeyRef. Setters that change the wire payload drop it instead.
+  const idempotencyKeyRef = params.idempotencyKeyRef ?? {}
+  const paramsWithKey = { ...params, idempotencyKeyRef }
 
   const settlementAmount = convertMoneyAmount(
     destinationSpecifiedAmount,
@@ -478,7 +491,7 @@ export const createAmountOnchainPaymentDetails = <T extends WalletCurrency>(
     : {
         setMemo: (newMemo) =>
           createAmountOnchainPaymentDetails({
-            ...params,
+            ...paramsWithKey,
             senderSpecifiedMemo: newMemo,
           }),
         canSetMemo: true,
@@ -486,7 +499,7 @@ export const createAmountOnchainPaymentDetails = <T extends WalletCurrency>(
 
   const setConvertMoneyAmount = (newConvertMoneyAmount: ConvertMoneyAmount) => {
     return createAmountOnchainPaymentDetails({
-      ...params,
+      ...paramsWithKey,
       convertMoneyAmount: newConvertMoneyAmount,
     })
   }
@@ -496,11 +509,13 @@ export const createAmountOnchainPaymentDetails = <T extends WalletCurrency>(
   ) => {
     return createAmountOnchainPaymentDetails({
       ...params,
+      idempotencyKeyRef: undefined,
       sendingWalletDescriptor: newSendingWalletDescriptor,
     })
   }
 
   return {
+    idempotencyKeyRef,
     destination: address,
     destinationSpecifiedAmount,
     settlementAmount,
