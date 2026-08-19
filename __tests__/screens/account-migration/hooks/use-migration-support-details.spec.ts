@@ -26,11 +26,20 @@ jest.mock("@app/self-custodial/hooks/use-spark-network", () => ({
 
 let mockDeriveRejects = false
 
+const mockDerive = jest.fn((mnemonic: string) =>
+  mockDeriveRejects
+    ? Promise.reject(new Error("signer unavailable"))
+    : Promise.resolve(mnemonic ? "02abc123pubkey" : ""),
+)
+
 jest.mock("@app/self-custodial/bridge", () => ({
-  deriveWalletIdentityPubkey: (mnemonic: string) =>
-    mockDeriveRejects
-      ? Promise.reject(new Error("signer unavailable"))
-      : Promise.resolve(mnemonic ? "02abc123pubkey" : ""),
+  deriveWalletIdentityPubkey: (mnemonic: string) => mockDerive(mnemonic),
+}))
+
+const mockReportError = jest.fn()
+
+jest.mock("@app/utils/error-logging", () => ({
+  reportError: (...args: unknown[]) => mockReportError(...args),
 }))
 
 describe("useMigrationSupportDetails", () => {
@@ -69,7 +78,7 @@ describe("useMigrationSupportDetails", () => {
 
   /** Derivation became async in SDK 0.22; a rejection must settle to an empty pubkey and
    *  leave the rest of the support details intact, not surface as an unhandled promise. */
-  it("settles with an empty pubkey when the derivation rejects", async () => {
+  it("settles with an empty pubkey when the derivation rejects, and reports it", async () => {
     mockDeriveRejects = true
 
     const { result } = renderHook(() => useMigrationSupportDetails())
@@ -77,10 +86,17 @@ describe("useMigrationSupportDetails", () => {
     await waitFor(() => expect(result.current.accountId).toBe("18A4242"))
     expect(result.current.pubKey).toBe("")
     expect(result.current.username).toBe("satoshin21")
+    /** This screen exists to hand support a pubkey; a blank field with no telemetry leaves
+     *  nobody able to explain it. */
+    expect(mockReportError).toHaveBeenCalledWith(
+      "deriveWalletIdentityPubkey",
+      expect.objectContaining({ message: "signer unavailable" }),
+    )
   })
 
-  /** Unmounting before the phrase resolves must not set state on a gone component. */
-  it("skips the pubkey update when unmounted before the phrase resolves", async () => {
+  /** Unmounting before the phrase resolves must not set state on a gone component, and must
+   *  not allocate the two seed-derived native signers for a screen that is already gone. */
+  it("skips the derivation and the pubkey update when unmounted before the phrase resolves", async () => {
     let resolvePhrase: (phrase: string) => void = () => {}
     mockLoadMnemonic = () =>
       new Promise((resolve) => {
@@ -93,6 +109,7 @@ describe("useMigrationSupportDetails", () => {
     await Promise.resolve()
 
     expect(result.current.pubKey).toBe("")
+    expect(mockDerive).not.toHaveBeenCalled()
   })
 
   it("falls back to empty strings while the data is unavailable", async () => {

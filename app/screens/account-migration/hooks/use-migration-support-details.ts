@@ -7,6 +7,7 @@ import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useLoadWalletMnemonic } from "@app/screens/self-custodial/onboarding/hooks/use-wallet-mnemonic"
 import { deriveWalletIdentityPubkey } from "@app/self-custodial/bridge"
 import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
+import { reportError } from "@app/utils/error-logging"
 
 gql`
   query migrationSupportDetails {
@@ -53,8 +54,15 @@ export const useMigrationSupportDetails = (): MigrationSupportDetails => {
   useEffect(() => {
     let mounted = true
     loadMnemonic()
-      .then((mnemonic) => (mnemonic ? deriveWalletIdentityPubkey(mnemonic, network) : ""))
-      .catch(() => "")
+      /** Checked before deriving, not only before the state write: an unmounted screen must
+       *  not allocate the two seed-derived native signers just to throw the result away. */
+      .then((mnemonic) =>
+        mounted && mnemonic ? deriveWalletIdentityPubkey(mnemonic, network) : "",
+      )
+      .catch((err) => {
+        reportError("deriveWalletIdentityPubkey", err)
+        return ""
+      })
       .then((pubkey) => {
         if (mounted) setPubKey(pubkey)
       })
