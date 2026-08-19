@@ -34,10 +34,31 @@ describe("spark backup format", () => {
     "02abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234567"
   const lightningAddress = "alice@example.com"
 
-  it("builds and parses an unencrypted payload", () => {
-    const raw = buildBackupPayload(mnemonic, { walletIdentifier })
+  /** A backup created before the password became mandatory. The app can no
+   *  longer produce this shape, so restore compatibility is pinned by these
+   *  hand-written fixtures instead of the builder. */
+  const legacyPlaintextPayload = (extra: Record<string, unknown> = {}) =>
+    JSON.stringify({
+      version: 1,
+      walletIdentifier,
+      createdAt: 1,
+      encrypted: false,
+      mnemonic,
+      ...extra,
+    })
 
-    expect(parseBackupPayload(raw)).toEqual({ mnemonic })
+  it("throws when built without a password: plaintext backups are never created", () => {
+    // @ts-expect-error password is also required at the type level
+    expect(() => buildBackupPayload(mnemonic, { walletIdentifier })).toThrow(
+      /requires a password/,
+    )
+    expect(() =>
+      buildBackupPayload(mnemonic, { walletIdentifier, password: "" }),
+    ).toThrow(/requires a password/)
+  })
+
+  it("parses a legacy plaintext payload (restore compatibility)", () => {
+    expect(parseBackupPayload(legacyPlaintextPayload())).toEqual({ mnemonic })
   })
 
   it("builds and parses an encrypted payload", () => {
@@ -283,9 +304,8 @@ describe("spark backup format", () => {
     expect(isEncryptedBackup(raw)).toBe(true)
   })
 
-  it("isEncryptedBackup returns false for unencrypted payloads", () => {
-    const raw = buildBackupPayload(mnemonic, { walletIdentifier })
-    expect(isEncryptedBackup(raw)).toBe(false)
+  it("isEncryptedBackup returns false for legacy plaintext payloads", () => {
+    expect(isEncryptedBackup(legacyPlaintextPayload())).toBe(false)
   })
 
   it("isEncryptedBackup returns false for invalid JSON", () => {
@@ -309,9 +329,10 @@ describe("spark backup format", () => {
     }
   })
 
-  it("parseEncryptedBackupPayload handles unencrypted payload", () => {
-    const raw = buildBackupPayload(mnemonic, { walletIdentifier })
-    expect(parseEncryptedBackupPayload(raw, "anything")).toEqual({ mnemonic })
+  it("parseEncryptedBackupPayload handles a legacy plaintext payload", () => {
+    expect(parseEncryptedBackupPayload(legacyPlaintextPayload(), "anything")).toEqual({
+      mnemonic,
+    })
   })
 
   it("matches the app payload shape with standards-compliant AES-GCM output", () => {
@@ -360,31 +381,29 @@ describe("spark backup format", () => {
       expect(typeof payload.createdAt).toBe("number")
     })
 
-    it("includes walletIdentifier in unencrypted payloads", () => {
-      const raw = buildBackupPayload(mnemonic, { walletIdentifier })
-      const payload = JSON.parse(raw) as { walletIdentifier: string }
-
-      expect(payload.walletIdentifier).toBe(walletIdentifier)
-    })
-
     it("persists lightningAddress when provided", () => {
-      const raw = buildBackupPayload(mnemonic, { walletIdentifier, lightningAddress })
+      const raw = buildBackupPayload(mnemonic, {
+        walletIdentifier,
+        lightningAddress,
+        password: "ValidPass1234!",
+      })
       const payload = JSON.parse(raw) as { lightningAddress?: string }
 
       expect(payload.lightningAddress).toBe(lightningAddress)
     })
 
     it("omits lightningAddress when not provided", () => {
-      const raw = buildBackupPayload(mnemonic, { walletIdentifier })
+      const raw = buildBackupPayload(mnemonic, {
+        walletIdentifier,
+        password: "ValidPass1234!",
+      })
       const payload = JSON.parse(raw) as { lightningAddress?: string }
 
       expect(payload.lightningAddress).toBeUndefined()
     })
 
-    it("parseBackupMetadata extracts metadata from unencrypted payload", () => {
-      const raw = buildBackupPayload(mnemonic, { walletIdentifier, lightningAddress })
-
-      expect(parseBackupMetadata(raw)).toEqual({
+    it("parseBackupMetadata extracts metadata from a legacy plaintext payload", () => {
+      expect(parseBackupMetadata(legacyPlaintextPayload({ lightningAddress }))).toEqual({
         version: 1,
         walletIdentifier,
         lightningAddress,

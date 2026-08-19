@@ -3697,8 +3697,7 @@
     },
     "CloudBackup": {
       "title": "Mari cadangkan dompet Anda",
-      "description": "Kami akan menyimpan cadangan frasa pemulihan Anda ke {provider} Anda.",
-      "encryptCheckbox": "Enkripsi dengan kata sandi tambahan",
+      "description": "Kami akan menyimpan cadangan frasa pemulihan Anda yang terenkripsi dan dilindungi kata sandi di {provider} Anda.",
       "password": "Kata sandi",
       "passwordPlaceholder": "(minimal 12 karakter)",
       "confirmPassword": "Konfirmasi kata sandi",

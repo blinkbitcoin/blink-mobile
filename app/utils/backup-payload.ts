@@ -41,7 +41,7 @@ export type BackupMetadata = {
 type BuildOptions = {
   walletIdentifier: string
   lightningAddress?: string
-  password?: string
+  password: string
   version?: number
 }
 
@@ -78,9 +78,12 @@ export const buildBackupPayload = (mnemonic: string, opts: BuildOptions): string
   const { walletIdentifier, lightningAddress, password, version = CURRENT_VERSION } = opts
   const base = buildBase({ walletIdentifier, lightningAddress, version })
 
+  // New backups are always encrypted. PlainBackupPayload survives only on the
+  // parse side, for backups created before the password became mandatory.
   if (!password) {
-    const payload: PlainBackupPayload = { ...base, encrypted: false, mnemonic }
-    return JSON.stringify(payload)
+    throw new Error(
+      "buildBackupPayload requires a password: plaintext backups are not created",
+    )
   }
 
   const { key, salt } = deriveKeyFromPassword(password)

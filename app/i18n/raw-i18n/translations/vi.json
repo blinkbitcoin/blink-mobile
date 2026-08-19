@@ -3697,8 +3697,7 @@
     },
     "CloudBackup": {
       "title": "Hãy sao lưu ví của bạn",
-      "description": "Chúng tôi sẽ lưu bản sao cụm từ khôi phục của bạn vào {provider} của bạn.",
-      "encryptCheckbox": "Mã hóa bằng mật khẩu bổ sung",
+      "description": "Chúng tôi sẽ lưu bản sao lưu được mã hóa và bảo vệ bằng mật khẩu của cụm từ khôi phục vào {provider} của bạn.",
       "password": "Mật khẩu",
       "passwordPlaceholder": "(tối thiểu 12 ký tự)",
       "confirmPassword": "Xác nhận mật khẩu",

@@ -3697,8 +3697,7 @@
     },
     "CloudBackup": {
       "title": "Tuhifadhi nakala ya mkoba wako",
-      "description": "Tutahifadhi nakala ya neno lako la kurejesha kwenye {provider} yako.",
-      "encryptCheckbox": "Ficha kwa nywila ya ziada",
+      "description": "Tutahifadhi nakala rudufu ya maneno yako ya kurejesha iliyosimbwa na kulindwa kwa nenosiri kwenye {provider} yako.",
       "password": "Nywila",
       "passwordPlaceholder": "(herufi 12 ndogo zaidi)",
       "confirmPassword": "Thibitisha nywila",

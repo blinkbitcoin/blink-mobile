@@ -3697,8 +3697,7 @@
         },
         "CloudBackup": {
             "title": "Sauvegardons votre portefeuille",
-            "description": "Nous enregistrerons une copie de votre phrase de sauvegarde dans votre {provider}.",
-            "encryptCheckbox": "Chiffrer avec un mot de passe supplémentaire",
+            "description": "Nous enregistrerons une sauvegarde chiffrée et protégée par mot de passe de votre phrase de récupération sur votre {provider}.",
             "password": "Mot de passe",
             "passwordPlaceholder": "(12 caractères minimum)",
             "confirmPassword": "Confirmer le mot de passe",

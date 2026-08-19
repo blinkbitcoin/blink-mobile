@@ -3697,8 +3697,7 @@
         },
         "CloudBackup": {
             "title": "Sichern wir Ihre Brieftasche",
-            "description": "Wir speichern eine Kopie Ihrer Sicherungsphrase in Ihrem {provider}.",
-            "encryptCheckbox": "Mit zusätzlichem Passwort verschlüsseln",
+            "description": "Wir speichern eine passwortgeschützte, verschlüsselte Sicherung Ihrer Sicherungsphrase in Ihrem {provider}.",
             "password": "Passwort",
             "passwordPlaceholder": "(mindestens 12 Zeichen)",
             "confirmPassword": "Passwort bestätigen",

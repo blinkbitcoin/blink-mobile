@@ -15,6 +15,7 @@ import {
   parseBackupMetadata,
 } from "@app/utils/backup-payload"
 import { confirmDialog } from "@app/utils/confirm-dialog"
+import { reportError } from "@app/utils/error-logging"
 import { toastShow } from "@app/utils/toast"
 
 import { getCloudProviderName } from "../utils"
@@ -43,13 +44,11 @@ const buildExistingBackupMessage = (
 }
 
 type UseCloudBackupParams = {
-  isEncrypted: boolean
   password: string
   version?: number
 }
 
 export const useCloudBackup = ({
-  isEncrypted,
   password,
   version = DEFAULT_BACKUP_VERSION,
 }: UseCloudBackupParams) => {
@@ -120,12 +119,22 @@ export const useCloudBackup = ({
       if (!confirmed) return
     }
 
-    const payload = buildBackupPayload(mnemonic, {
-      walletIdentifier: identityPubkey,
-      lightningAddress: lightningAddress ?? undefined,
-      password: isEncrypted ? password : undefined,
-      version,
-    })
+    /** Every backup now runs PBKDF2 + AES-GCM here, and the press handler is not awaited:
+     *  an escaping throw would become an unhandled rejection, stranding the user silently
+     *  after they already signed in and confirmed the overwrite. */
+    let payload: string
+    try {
+      payload = buildBackupPayload(mnemonic, {
+        walletIdentifier: identityPubkey,
+        lightningAddress: lightningAddress ?? undefined,
+        password,
+        version,
+      })
+    } catch (err) {
+      reportError("Cloud backup encryption", err)
+      toastShow({ message: LL.BackupScreen.CloudBackup.uploadFailed(), LL })
+      return
+    }
 
     const result = await upload(payload, filename, { ...session, accessToken })
     if (!result.success) {
@@ -143,7 +152,6 @@ export const useCloudBackup = ({
     })
     completeBackup({ method: BackupMethod.Cloud })
   }, [
-    isEncrypted,
     password,
     version,
     startSession,

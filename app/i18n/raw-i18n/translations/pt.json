@@ -3697,8 +3697,7 @@
         },
         "CloudBackup": {
             "title": "Vamos fazer backup da sua carteira",
-            "description": "Salvaremos uma cópia da sua frase de backup no seu {provider}.",
-            "encryptCheckbox": "Criptografar com senha adicional",
+            "description": "Salvaremos um backup criptografado e protegido por senha da sua frase de backup no seu {provider}.",
             "password": "Senha",
             "passwordPlaceholder": "(mínimo 12 caracteres)",
             "confirmPassword": "Confirmar senha",

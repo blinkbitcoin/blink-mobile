@@ -3834,8 +3834,7 @@ const en: BaseTranslation = {
     CloudBackup: {
       title: "Let's back up your wallet",
       description:
-        "We will save a backup of your backup phrase to your {provider: string}.",
-      encryptCheckbox: "Encrypt with additional password",
+        "We will save a password-protected, encrypted backup of your backup phrase to your {provider: string}.",
       password: "Password",
       passwordPlaceholder: "(12 characters minimum)",
       confirmPassword: "Confirm password",

@@ -3697,8 +3697,7 @@
     },
     "CloudBackup": {
       "title": "Napravimo sigurnosnu kopiju vašeg novčanika",
-      "description": "Spremit ćemo kopiju vaše sigurnosne fraze u vaš {provider}.",
-      "encryptCheckbox": "Šifriraj dodatnom lozinkom",
+      "description": "Spremit ćemo šifriranu sigurnosnu kopiju vaše fraze za oporavak, zaštićenu lozinkom, na vaš {provider}.",
       "password": "Lozinka",
       "passwordPlaceholder": "(najmanje 12 znakova)",
       "confirmPassword": "Potvrdi lozinku",
