@@ -5,6 +5,7 @@ import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useMigrationCheckpointState } from "@app/screens/account-migration/hooks/use-migration-checkpoint-state"
 import { deriveWalletIdentityPubkey } from "@app/self-custodial/bridge"
 import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
+import { reportError } from "@app/utils/error-logging"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
 /**
@@ -45,6 +46,8 @@ export const useWalletMnemonicState = (): WalletMnemonicState => {
     let mounted = true
     setLoading(true)
     loadMnemonic()
+      /** Defensive only: KeyStoreWrapper.getMnemonicForAccount already swallows a keychain
+       *  failure to null, so this promise has no reachable rejection to report. */
       .catch(() => "")
       .then((stored) => {
         if (!mounted) return
@@ -70,28 +73,35 @@ type WalletIdentity = {
 
 export const useWalletIdentity = (mnemonic: string): WalletIdentity => {
   const network = useSparkNetwork()
-  const [pubkey, setPubkey] = useState("")
-  const [loading, setLoading] = useState(false)
+  /** The pubkey is kept next to the phrase it was derived from so that "settled" is computed
+   *  from the current phrase rather than stored by an effect that runs one render too late.
+   *  A stored flag still reads false on the render the phrase changes, which hands consumers
+   *  the previous wallet's pubkey as if it were the current one. */
+  const [derived, setDerived] = useState({ forMnemonic: "", pubkey: "" })
 
   useEffect(() => {
-    if (!mnemonic) {
-      setPubkey("")
-      setLoading(false)
-      return
-    }
+    if (!mnemonic) return
     let mounted = true
-    setLoading(true)
     deriveWalletIdentityPubkey(mnemonic, network)
-      .catch(() => "")
-      .then((derived) => {
-        if (!mounted) return
-        setPubkey(derived)
-        setLoading(false)
+      .catch((err) => {
+        reportError("deriveWalletIdentityPubkey", err)
+        return ""
+      })
+      .then((pubkey) => {
+        if (mounted) setDerived({ forMnemonic: mnemonic, pubkey })
       })
     return () => {
       mounted = false
     }
   }, [mnemonic, network])
 
-  return { pubkey, loading }
+  const isSettled = derived.forMnemonic === mnemonic
+
+  return useMemo(
+    () => ({
+      pubkey: isSettled ? derived.pubkey : "",
+      loading: Boolean(mnemonic) && !isSettled,
+    }),
+    [mnemonic, isSettled, derived.pubkey],
+  )
 }

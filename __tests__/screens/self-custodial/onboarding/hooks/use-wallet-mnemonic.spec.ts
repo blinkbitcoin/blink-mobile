@@ -12,7 +12,12 @@ const mockUseActiveWallet = jest.fn()
 const mockUseAccountRegistry = jest.fn()
 const mockUseMigrationCheckpoint = jest.fn()
 const mockDeriveWalletIdentityPubkey = jest.fn()
+const mockReportError = jest.fn()
 const mockNetwork = "regtest"
+
+jest.mock("@app/utils/error-logging", () => ({
+  reportError: (...args: unknown[]) => mockReportError(...args),
+}))
 
 jest.mock("@app/utils/storage/secureStorage", () => ({
   __esModule: true,
@@ -222,12 +227,48 @@ describe("useWalletIdentity", () => {
     expect(mockDeriveWalletIdentityPubkey).not.toHaveBeenCalled()
   })
 
-  it("settles to an empty pubkey when derivation rejects", async () => {
-    mockDeriveWalletIdentityPubkey.mockRejectedValue(new Error("signer failed"))
+  it("settles to an empty pubkey when derivation rejects, and reports it", async () => {
+    const derivationError = new Error("signer failed")
+    mockDeriveWalletIdentityPubkey.mockRejectedValue(derivationError)
 
     const { result } = renderHook(() => useWalletIdentity("youth indicate void"))
 
     await waitFor(() => expect(result.current).toEqual({ pubkey: "", loading: false }))
+    expect(mockReportError).toHaveBeenCalledWith(
+      "deriveWalletIdentityPubkey",
+      derivationError,
+    )
+  })
+
+  /** The window this closes: with `loading` stored by the effect, the render that swaps the
+   *  phrase still reported loading:false next to the previous wallet's pubkey, so a backup
+   *  started in that frame wrote wallet B's phrase under wallet A's identity. */
+  it("never pairs a phrase with the pubkey of the previous one", async () => {
+    const { result, rerender } = renderHook(
+      ({ m }: { m: string }) => useWalletIdentity(m),
+      { initialProps: { m: "youth indicate void" } },
+    )
+    await waitFor(() =>
+      expect(result.current).toEqual({ pubkey: "derived-pubkey", loading: false }),
+    )
+
+    mockDeriveWalletIdentityPubkey.mockReturnValue(new Promise(() => {}))
+    rerender({ m: "other mnemonic words" })
+
+    expect(result.current).toEqual({ pubkey: "", loading: true })
+  })
+
+  it("keeps the same object identity across renders that change nothing", async () => {
+    const { result, rerender } = renderHook(
+      ({ m }: { m: string }) => useWalletIdentity(m),
+      { initialProps: { m: "youth indicate void" } },
+    )
+    await waitFor(() => expect(result.current.pubkey).toBe("derived-pubkey"))
+    const settled = result.current
+
+    rerender({ m: "youth indicate void" })
+
+    expect(result.current).toBe(settled)
   })
 
   it("derives once per mnemonic and re-derives when it changes", async () => {
