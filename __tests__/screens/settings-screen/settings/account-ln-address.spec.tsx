@@ -150,6 +150,20 @@ describe("AccountLNAddress (self-custodial)", () => {
     expect(lastRowProps().title).toBe("Create address")
   })
 
+  /** Registering an address is the very thing Incognito withholds: publishing one would
+   *  hand the LNURL server the identity the mode exists to keep back. */
+  it("refuses to open the registration modal in Incognito", () => {
+    mockUseSelfCustodialWallet.mockReturnValue({ lightningAddress: null })
+    mockIsAnonMode = true
+
+    render(<AccountLNAddress />)
+
+    act(() => (lastRowProps().action as () => void)())
+
+    expect(mockScModal.mock.calls.at(-1)?.[0]?.isVisible).toBe(false)
+    expect(mockBackupRequiredModal).not.toHaveBeenCalled()
+  })
+
   it("shows the registered address and copies it on press", () => {
     mockUseSelfCustodialWallet.mockReturnValue({ lightningAddress: SC_ADDRESS })
 

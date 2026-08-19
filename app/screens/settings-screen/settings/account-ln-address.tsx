@@ -10,7 +10,7 @@ import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useAppConfig, useClipboard } from "@app/hooks"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { useSelfCustodialAccountMode } from "@app/self-custodial/hooks/use-self-custodial-account-mode"
+import { useLightningAddressGated } from "@app/self-custodial/hooks/use-lightning-address-gate"
 import { BackupStatus, useBackupState } from "@app/self-custodial/providers/backup-state"
 import { AccountType } from "@app/types/wallet"
 import { getLightningAddress } from "@app/utils/pay-links"
@@ -64,14 +64,15 @@ const LightningAddressRow: React.FC<LightningAddressRowProps> = ({
     ? `${address}${disabledSuffix}`
     : LL.SettingsScreen.createAddress()
 
-  /** A disabled address is inert: the label is not an address, so copying it would hand
-   *  the user a string no wallet can pay. Without one at all, the row still creates one. */
+  /** A disabled address is inert both ways: the label is not an address, so copying it
+   *  would hand the user a string no wallet can pay, and registering a new one is the
+   *  very thing being withheld. Otherwise the row creates an address or copies it. */
   const handleAction = () => {
+    if (isDisabled) return
     if (!address) {
       toggleModal()
       return
     }
-    if (isDisabled) return
     copyAddress(address)
   }
 
@@ -118,14 +119,14 @@ const CustodialLightningAddressRow: React.FC = () => {
 const SelfCustodialLightningAddressRow: React.FC = () => {
   const address = useSelfCustodialLightningAddress()
   const { backupState } = useBackupState()
-  const { isAnonMode } = useSelfCustodialAccountMode()
+  const isLightningAddressGated = useLightningAddressGated()
   const isBackupRequired = backupState.status !== BackupStatus.Completed
 
   return (
     <LightningAddressRow
       address={address}
       /** Incognito cannot receive, so the row says so next to the address it still shows. */
-      isDisabled={isAnonMode}
+      isDisabled={isLightningAddressGated}
       renderModal={({ isVisible, toggleModal }) =>
         isBackupRequired ? (
           <BackupRequiredModal isVisible={isVisible} onClose={toggleModal} />
