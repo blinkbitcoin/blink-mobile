@@ -90,6 +90,40 @@ describe("useBadgeSlotContent", () => {
     expect(result.current).toBe("pending")
   })
 
+  /** Once the hold has handed the slot over, the transient badge finishing is not a
+   *  new event: re-arming the window there would unmount the pending row and replay
+   *  its entry animation, blanking the amount for the length of both. */
+  it("keeps the pending row when the unseen badge hides after the hold elapsed", () => {
+    const { result, rerender } = renderSlot({
+      showUnseenBadge: true,
+      hasPendingAmount: true,
+      unseenKey: "tx-1",
+      holdMs: 5_000,
+    })
+
+    act(() => {
+      jest.advanceTimersByTime(6_000)
+    })
+    expect(result.current).toBe("pending")
+
+    act(() => {
+      rerender({
+        showUnseenBadge: false,
+        hasPendingAmount: true,
+        unseenKey: "tx-1",
+        holdMs: 5_000,
+      })
+    })
+
+    expect(result.current).toBe("pending")
+
+    act(() => {
+      jest.advanceTimersByTime(AMOUNT_BADGE_ANIMATION.durationOut + 1)
+    })
+
+    expect(result.current).toBe("pending")
+  })
+
   it("gives a newly arrived transaction a fresh hold window", () => {
     const { result, rerender } = renderSlot({
       showUnseenBadge: true,

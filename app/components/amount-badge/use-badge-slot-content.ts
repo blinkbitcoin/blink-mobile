@@ -46,8 +46,15 @@ export const useBadgeSlotContent = ({
     return () => clearTimeout(timeout)
   }, [showUnseenBadge])
 
+  /** A new transaction earns a fresh window. The previous one *ending* must not: by
+   *  then the hold may have already handed the slot over, and re-arming it here would
+   *  take the slot back for one `durationOut` — long enough to unmount the pending row
+   *  and replay its entry animation. */
   useEffect(() => {
     setHoldExpired(false)
+  }, [unseenKey, holdMs])
+
+  useEffect(() => {
     if (!showUnseenBadge) return
 
     const timeout = setTimeout(
