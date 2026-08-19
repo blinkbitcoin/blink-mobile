@@ -56,9 +56,11 @@ describe("classifySdkError", () => {
     )
   })
 
-  it("maps InsufficientCpfpFunds (0.22) as InsufficientFunds", () => {
+  /** A CPFP fee-reserve shortfall on a unilateral exit is not the user's balance being too
+   *  low, so it must not render the insufficient-funds copy. */
+  it("maps InsufficientCpfpFunds (0.22) as Generic, not InsufficientFunds", () => {
     expect(classifySdkError(sdkError("InsufficientCpfpFunds"))).toBe(
-      SelfCustodialErrorCode.InsufficientFunds,
+      SelfCustodialErrorCode.Generic,
     )
   })
 

@@ -24,7 +24,6 @@ export const isSelfCustodialErrorCode = (
 const TAG_TO_CODE: Record<SdkErrorTags, SelfCustodialErrorCode> = {
   [SdkErrorTags.InsufficientFunds]: SelfCustodialErrorCode.InsufficientFunds,
   [SdkErrorTags.MaxDepositClaimFeeExceeded]: SelfCustodialErrorCode.InsufficientFunds,
-  [SdkErrorTags.InsufficientCpfpFunds]: SelfCustodialErrorCode.InsufficientFunds,
   [SdkErrorTags.NetworkError]: SelfCustodialErrorCode.NetworkError,
   [SdkErrorTags.ChainServiceError]: SelfCustodialErrorCode.NetworkError,
   [SdkErrorTags.InvalidInput]: SelfCustodialErrorCode.InvalidInput,
@@ -39,6 +38,10 @@ const TAG_TO_CODE: Record<SdkErrorTags, SelfCustodialErrorCode> = {
   [SdkErrorTags.OptimizationAlreadyRunning]: SelfCustodialErrorCode.Generic,
   [SdkErrorTags.OptimizationCancelled]: SelfCustodialErrorCode.Generic,
   [SdkErrorTags.FundingUtxoConflict]: SelfCustodialErrorCode.Generic,
+  /** Raised when the CPFP funding of a unilateral exit cannot cover its on-chain fees.
+   *  InsufficientFunds would read as an empty wallet, which is a different problem from
+   *  a fee reserve the user never chose. */
+  [SdkErrorTags.InsufficientCpfpFunds]: SelfCustodialErrorCode.Generic,
   [SdkErrorTags.Generic]: SelfCustodialErrorCode.Generic,
 }
 
