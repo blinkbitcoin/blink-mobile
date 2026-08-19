@@ -16,7 +16,7 @@ import { useAppConfig, useClipboard } from "@app/hooks"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { useSelfCustodialAccountMode } from "@app/self-custodial/hooks/use-self-custodial-account-mode"
+import { useLightningAddressGated } from "@app/self-custodial/hooks/use-lightning-address-gate"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { AccountType } from "@app/types/wallet"
 import { useNavigation } from "@react-navigation/native"
@@ -89,14 +89,14 @@ const SelfCustodialAccountBanner: React.FC = () => {
   const { LL } = useI18nContext()
   const { lightningAddress } = useSelfCustodialWallet()
   const { copyToClipboard } = useClipboard()
-  const { isAnonMode } = useSelfCustodialAccountMode()
+  const isLightningAddressGated = useLightningAddressGated()
 
   if (!lightningAddress) return null
 
   /** Incognito cannot receive, so the address is labelled disabled and loses its copy
    *  affordance rather than being handed out as one that could be paid. The tap goes
    *  inert with the icon: a row that still copied would contradict the label. */
-  const displayedAddress = isAnonMode
+  const displayedAddress = isLightningAddressGated
     ? `${lightningAddress} ${LL.SettingsScreen.addressDisabled()}`
     : lightningAddress
 
@@ -107,7 +107,10 @@ const SelfCustodialAccountBanner: React.FC = () => {
     })
 
   return (
-    <TouchableOpacity onPress={isAnonMode ? undefined : handleCopy} style={styles.outer}>
+    <TouchableOpacity
+      onPress={isLightningAddressGated ? undefined : handleCopy}
+      style={styles.outer}
+    >
       <View style={styles.iconContainer}>
         <AccountIcon size={25} />
       </View>
@@ -119,7 +122,9 @@ const SelfCustodialAccountBanner: React.FC = () => {
           {LL.SettingsScreen.nonCustodialAccount()}
         </Text>
       </View>
-      {!isAnonMode && <GaloyIcon name="copy-paste" size={20} color={colors.primary} />}
+      {!isLightningAddressGated && (
+        <GaloyIcon name="copy-paste" size={20} color={colors.primary} />
+      )}
     </TouchableOpacity>
   )
 }
