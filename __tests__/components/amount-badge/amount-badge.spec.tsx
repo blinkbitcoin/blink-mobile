@@ -36,7 +36,7 @@ describe("AmountBadge", () => {
     )
 
     const amount = getByText("+$1,234,567.89")
-    expect(amount.props.maxFontSizeMultiplier).toBeLessThanOrEqual(1.5)
+    expect(amount.props.maxFontSizeMultiplier).toBe(1.4)
     expect(amount.props.numberOfLines).toBe(1)
     expect(amount.props.ellipsizeMode).toBe("tail")
   })
