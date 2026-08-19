@@ -7,17 +7,22 @@ import {
   type Payment,
 } from "@breeztech/breez-sdk-spark-react-native"
 
+import { reportError } from "@app/utils/error-logging"
+
 /** defaultExternalSigners is typed with the bare signer interfaces, which omit the
  *  uniffi lifecycle method, though the concrete objects always carry it. */
 type DisposableSigner = { uniffiDestroy: () => void }
 
 /** Both destroys run from a finally, where a throw would strand the signer that has not
  *  been freed yet and replace the pubkey (or the original error) on the way out. */
-const destroySigner = (signer: unknown) => {
+const destroySigner = (signer: object) => {
   try {
     ;(signer as DisposableSigner).uniffiDestroy()
-  } catch {
-    // Already freed, or a binding without the uniffi lifecycle method.
+  } catch (err) {
+    /** Already freed, or a binding that no longer carries the uniffi lifecycle method.
+     *  Reported rather than swallowed: the second case leaves the seed-derived key material
+     *  resident in native memory until GC, which is what this call exists to prevent. */
+    reportError("destroySigner", err)
   }
 }
 

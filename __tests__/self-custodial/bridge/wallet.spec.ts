@@ -10,6 +10,12 @@ import {
   registerLightningAddress,
 } from "@app/self-custodial/bridge/wallet"
 
+const mockReportError = jest.fn()
+
+jest.mock("@app/utils/error-logging", () => ({
+  reportError: (...args: unknown[]) => mockReportError(...args),
+}))
+
 describe("deriveWalletIdentityPubkey", () => {
   const mockSigners = (getIdentityPublicKey: jest.Mock) => {
     const breezDestroy = jest.fn()
@@ -64,6 +70,23 @@ describe("deriveWalletIdentityPubkey", () => {
 
     await expect(deriveWalletIdentityPubkey("m", Network.Regtest)).resolves.toBe("02abff")
     expect(sparkDestroy).toHaveBeenCalledTimes(1)
+  })
+
+  /** A binding that no longer carries the lifecycle method throws the same way an
+   *  already-freed signer does, and that case leaves key material resident: swallowing it
+   *  would hide the one failure this call exists to prevent. */
+  it("reports a destroy failure instead of swallowing it", async () => {
+    const { breezDestroy } = mockSigners(
+      jest.fn().mockResolvedValue({ bytes: Uint8Array.from([0x02, 0xab, 0xff]).buffer }),
+    )
+    const destroyError = new Error("uniffiDestroy is not a function")
+    breezDestroy.mockImplementation(() => {
+      throw destroyError
+    })
+
+    await deriveWalletIdentityPubkey("m", Network.Regtest)
+
+    expect(mockReportError).toHaveBeenCalledWith("destroySigner", destroyError)
   })
 
   it("does not let a throwing destroy mask the original rejection", async () => {
