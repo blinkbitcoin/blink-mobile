@@ -11,6 +11,7 @@ import { logSelfCustodialBackupCompleted } from "@app/self-custodial/analytics"
 import { deriveWalletIdentityPubkey } from "@app/self-custodial/bridge"
 import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
 import { BackupMethod } from "@app/self-custodial/providers/backup-state"
+import { reportError } from "@app/utils/error-logging"
 import { toastShow } from "@app/utils/toast"
 
 import {
@@ -63,7 +64,10 @@ export const useBackupMethods = () => {
   const handleCredentialBackup = useCallback(async () => {
     const mnemonic = await loadMnemonic()
     const identityPubkey = mnemonic
-      ? await deriveWalletIdentityPubkey(mnemonic, network).catch(() => "")
+      ? await deriveWalletIdentityPubkey(mnemonic, network).catch((err) => {
+          reportError("deriveWalletIdentityPubkey", err)
+          return ""
+        })
       : ""
     if (!identityPubkey) {
       toastShow({

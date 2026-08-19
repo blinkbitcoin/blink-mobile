@@ -53,6 +53,11 @@ jest.mock("@app/self-custodial/bridge", () => ({
       : Promise.resolve(mockIdentityPubkey),
 }))
 
+const mockReportError = jest.fn()
+jest.mock("@app/utils/error-logging", () => ({
+  reportError: (...args: unknown[]) => mockReportError(...args),
+}))
+
 const mockCompleteBackup = jest.fn()
 jest.mock("@app/screens/self-custodial/onboarding/hooks/use-complete-backup", () => ({
   useCompleteBackup: () => mockCompleteBackup,
@@ -168,6 +173,11 @@ describe("useBackupMethods", () => {
         expect.objectContaining({ message: "Failed to save backup" }),
       )
       expect(mockNavigate).not.toHaveBeenCalled()
+      /** The toast tells the user; the report is what tells us which signer failed. */
+      expect(mockReportError).toHaveBeenCalledWith(
+        "deriveWalletIdentityPubkey",
+        expect.objectContaining({ message: "signer unavailable" }),
+      )
     })
 
     it("saves with the identity pubkey and navigates to success on completion", async () => {
