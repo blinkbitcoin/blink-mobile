@@ -167,5 +167,7 @@ export const useCloudBackup = ({
     lightningAddress,
   ])
 
-  return { handleBackup, loading: loading || identityPending }
+  const isBackupBusy = loading || identityPending
+
+  return { handleBackup, loading: isBackupBusy }
 }
