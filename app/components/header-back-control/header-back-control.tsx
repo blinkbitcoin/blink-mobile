@@ -63,7 +63,6 @@ const HeaderBackButtonWithTheme = (
 export const headerBackControl = ({ canGoBack = true }: HeaderBackControlParams = {}) => {
   const HeaderBack = (props: NativeStackHeaderBackProps): React.ReactNode =>
     canGoBack ? <HeaderBackButtonWithTheme {...props} /> : <InvisibleBackButton />
-  HeaderBack.displayName = "HeaderBack"
 
   return HeaderBack
 }
