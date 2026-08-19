@@ -8569,7 +8569,7 @@ type RootTranslation = {
 	}
 	EnhancedModePrompt: {
 		/**
-		 * T​h​i​s​ ​f​e​a​t​u​r​e​ ​n​e​e​d​s​ ​E​n​h​a​n​c​e​d​ ​M​o​d​e
+		 * T​h​i​s​ ​f​e​a​t​u​r​e​ ​r​e​q​u​i​r​e​s​ ​E​n​h​a​n​c​e​d​ ​M​o​d​e
 		 */
 		title: string
 		/**
@@ -22060,7 +22060,7 @@ export type TranslationFunctions = {
 	}
 	EnhancedModePrompt: {
 		/**
-		 * This feature needs Enhanced Mode
+		 * This feature requires Enhanced Mode
 		 */
 		title: () => LocalizedString
 		/**

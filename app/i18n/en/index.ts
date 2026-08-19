@@ -2710,7 +2710,7 @@ const en: BaseTranslation = {
     body: "Incognito Mode supports the Bitcoin Balance only. Transfer your Dollar Balance to your Bitcoin Balance to switch.",
   },
   EnhancedModePrompt: {
-    title: "This feature needs Enhanced Mode",
+    title: "This feature requires Enhanced Mode",
     body: "You're in Incognito Mode, Blink doesn't know your region, so some features aren't available. Switch to Enhanced to run a location check and unlock all features for your region.",
     switchButton: "Switch to Enhanced",
   },

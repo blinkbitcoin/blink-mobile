@@ -2570,7 +2570,7 @@
         "body": "Der Incognito-Modus unterstützt nur das Bitcoin-Guthaben. Übertrage dein Dollar-Guthaben auf dein Bitcoin-Guthaben, um zu wechseln."
     },
     "EnhancedModePrompt": {
-        "title": "Diese Funktion benötigt den Enhanced-Modus",
+        "title": "Diese Funktion erfordert den Enhanced-Modus",
         "body": "Du bist im Incognito-Modus, Blink kennt deine Region nicht, daher sind einige Funktionen nicht verfügbar. Wechsle zu Enhanced, um eine Standortprüfung durchzuführen und alle Funktionen für deine Region freizuschalten.",
         "switchButton": "Zu Enhanced wechseln"
     },

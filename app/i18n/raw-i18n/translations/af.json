@@ -2570,7 +2570,7 @@
     "body": "Incognito-modus ondersteun slegs die Bitcoin-saldo. Dra jou Dollar-saldo na jou Bitcoin-saldo oor om oor te skakel."
   },
   "EnhancedModePrompt": {
-    "title": "Hierdie funksie benodig Enhanced-modus",
+    "title": "Hierdie funksie vereis Enhanced-modus",
     "body": "Jy is in Incognito-modus, Blink ken nie jou streek nie, dus is sommige funksies nie beskikbaar nie. Skakel oor na Enhanced om 'n liggingkontrole uit te voer en al die funksies vir jou streek te ontsluit.",
     "switchButton": "Skakel oor na Enhanced"
   },

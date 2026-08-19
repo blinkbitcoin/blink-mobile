@@ -2570,7 +2570,7 @@
     "body": "Chế độ Incognito chỉ hỗ trợ số dư Bitcoin. Hãy chuyển số dư Đô la của bạn sang số dư Bitcoin để chuyển chế độ."
   },
   "EnhancedModePrompt": {
-    "title": "Tính năng này cần chế độ Enhanced",
+    "title": "Tính năng này yêu cầu chế độ Enhanced",
     "body": "Bạn đang ở chế độ Incognito, Blink không biết khu vực của bạn nên một số tính năng không khả dụng. Chuyển sang Enhanced để chạy kiểm tra vị trí và mở khóa mọi tính năng cho khu vực của bạn.",
     "switchButton": "Chuyển sang Enhanced"
   },

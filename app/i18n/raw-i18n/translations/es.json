@@ -2570,7 +2570,7 @@
         "body": "El modo Incognito solo admite el saldo en Bitcoin. Transfiere tu saldo en dólares a tu saldo en Bitcoin para cambiarte."
     },
     "EnhancedModePrompt": {
-        "title": "Esta función necesita el modo Enhanced",
+        "title": "Esta función requiere el modo Enhanced",
         "body": "Estás en modo Incognito, Blink no conoce tu región, así que algunas funciones no están disponibles. Cambia a Enhanced para ejecutar una verificación de ubicación y desbloquear todas las funciones para tu región.",
         "switchButton": "Cambiar a Enhanced"
     },
