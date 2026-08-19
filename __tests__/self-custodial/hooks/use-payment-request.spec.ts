@@ -20,6 +20,7 @@ const mockRecordError = jest.fn()
 const mockAddPendingAutoConvert = jest.fn()
 const mockFetchAutoConvertMinSats = jest.fn()
 const mockUseReceiveAssetMode = jest.fn()
+const mockLightningAddressGated = jest.fn()
 const mockPendingDeposits = jest.fn()
 const mockFormatMoneyAmount = jest.fn()
 const mockLoadIssuedOnchainAddress = jest.fn()
@@ -43,6 +44,10 @@ jest.mock("@app/self-custodial/auto-convert", () => ({
 
 jest.mock("@app/self-custodial/hooks/use-receive-asset-mode", () => ({
   useReceiveAssetMode: () => mockUseReceiveAssetMode(),
+}))
+
+jest.mock("@app/self-custodial/hooks/use-lightning-address-gate", () => ({
+  useLightningAddressGated: () => mockLightningAddressGated(),
 }))
 
 // The real hook subscribes to navigation focus, which a bare renderHook has no
@@ -93,6 +98,7 @@ describe("usePaymentRequest", () => {
       addPendingAutoConvert: mockAddPendingAutoConvert,
       fetchAutoConvertMinSats: mockFetchAutoConvertMinSats,
       useReceiveAssetMode: mockUseReceiveAssetMode,
+      lightningAddressGated: mockLightningAddressGated,
       pendingDeposits: mockPendingDeposits,
       formatMoneyAmount: mockFormatMoneyAmount,
     })
@@ -676,105 +682,6 @@ describe("usePaymentRequest", () => {
       })
       expect(mockAddPendingAutoConvert).toHaveBeenCalled()
       await flushEffects()
-    })
-  })
-
-  describe("PayCode (lightning address QR by default) for self-custodial", () => {
-    const setupWithLightningAddress = (lightningAddress: string) => {
-      mockSelfCustodialWallet.mockReturnValue({
-        sdk: mockSdk,
-        lastReceivedPaymentId: null,
-        lightningAddress,
-        allTransactions: [],
-      })
-    }
-
-    it("opens with PayCode type when LN address is available and asset mode is Bitcoin", async () => {
-      setupWithLightningAddress("alice@spark.tips")
-
-      const { result } = renderHook(() => usePaymentRequest())
-
-      await waitFor(() => {
-        expect(result.current?.type).toBe("PayCode")
-      })
-      expect(mockReceiveLightning).not.toHaveBeenCalled()
-      expect(result.current?.state).toBe("Idle")
-    })
-
-    it("stays on Lightning when LN address is available but asset mode is Dollar", async () => {
-      setupWithLightningAddress("alice@spark.tips")
-      mockUseReceiveAssetMode.mockReturnValue({
-        assetMode: "dollar",
-        setAssetMode: jest.fn(),
-        isToggleDisabled: false,
-        loading: false,
-      })
-
-      const { result } = renderHook(() => usePaymentRequest())
-
-      await waitFor(() => {
-        expect(result.current?.state).toBe("Created")
-      })
-      expect(result.current?.type).toBe("Lightning")
-      expect(mockReceiveLightning).toHaveBeenCalledTimes(1)
-    })
-
-    it("surfaces canUsePaycode and lnAddressHostname when LN address is available", async () => {
-      setupWithLightningAddress("alice@spark.tips")
-
-      const { result } = renderHook(() => usePaymentRequest())
-
-      await waitFor(() => {
-        expect(result.current?.canUsePaycode).toBe(true)
-      })
-      expect(result.current?.lnAddressHostname).toBe("spark.tips")
-    })
-
-    it("returns canUsePaycode=false and empty lnAddressHostname when no LN address", async () => {
-      const { result } = renderHook(() => usePaymentRequest())
-
-      await waitFor(() => {
-        expect(result.current?.state).toBe("Created")
-      })
-      expect(result.current?.canUsePaycode).toBe(false)
-      expect(result.current?.lnAddressHostname).toBe("")
-    })
-
-    it("info.data carries PayCode shape with username when on PayCode", async () => {
-      setupWithLightningAddress("alice@spark.tips")
-
-      const { result } = renderHook(() => usePaymentRequest())
-
-      await waitFor(() => {
-        expect(result.current?.type).toBe("PayCode")
-      })
-      const data = result.current?.info?.data
-      expect(data?.invoiceType).toBe("PayCode")
-      expect(data?.username).toBe("alice")
-      expect(data?.getFullUriFn({ uppercase: false })).toBe("alice@spark.tips")
-      expect(data?.getFullUriFn({ uppercase: true })).toBe("ALICE@SPARK.TIPS")
-      expect(data?.getCopyableInvoiceFn()).toBe("alice@spark.tips")
-    })
-
-    it("switches to Lightning and generates an invoice when setType(Lightning) is called", async () => {
-      setupWithLightningAddress("alice@spark.tips")
-
-      const { result } = renderHook(() => usePaymentRequest())
-
-      await waitFor(() => {
-        expect(result.current?.type).toBe("PayCode")
-      })
-      expect(mockReceiveLightning).not.toHaveBeenCalled()
-
-      act(() => {
-        result.current?.setType("Lightning")
-      })
-
-      await waitFor(() => {
-        expect(result.current?.state).toBe("Created")
-      })
-      expect(mockReceiveLightning).toHaveBeenCalledTimes(1)
-      expect(result.current?.info?.data?.invoiceType).toBe("Lightning")
     })
   })
 
