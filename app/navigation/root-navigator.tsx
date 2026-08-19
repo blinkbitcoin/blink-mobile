@@ -186,6 +186,12 @@ const DeveloperScreen: React.ComponentType | null = __DEV__
     require("../screens/developer-screen").DeveloperScreen
   : null
 
+/** Built once so every navigator hands `headerLeft` the same function. Calling the factory
+ *  inside a navigator's screenOptions would mint a new identity on each render, which stays
+ *  invisible only while native-stack invokes headerLeft instead of rendering it as an
+ *  element; the day that changes, the back button would remount on every render. */
+const defaultHeaderBack = headerBackControl()
+
 const RootNavigator = createNativeStackNavigator<RootStackParamList>()
 
 const withOfflineGate = <P extends object>(Screen: React.ComponentType<P>) => {
@@ -249,7 +255,7 @@ export const RootStack = () => {
         headerTitleStyle: styles.title,
         headerTintColor: colors.black,
         headerShadowVisible: false,
-        headerLeft: headerBackControl(),
+        headerLeft: defaultHeaderBack,
       }}
       initialRouteName={hasAccount ? "authenticationCheck" : "getStarted"}
     >
@@ -1023,7 +1029,7 @@ export const ContactNavigator = () => {
         headerTitleStyle: styles.title,
         headerTintColor: colors.black,
         headerShadowVisible: false,
-        headerLeft: headerBackControl(),
+        headerLeft: defaultHeaderBack,
       }}
       initialRouteName="peopleHome"
     >
@@ -1081,7 +1087,7 @@ export const PhoneLoginNavigator = () => {
         headerTitleStyle: styles.title,
         headerTintColor: colors.black,
         headerShadowVisible: false,
-        headerLeft: headerBackControl(),
+        headerLeft: defaultHeaderBack,
       }}
     >
       <StackPhoneValidation.Screen

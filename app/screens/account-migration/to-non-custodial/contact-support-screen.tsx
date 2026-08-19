@@ -140,10 +140,11 @@ export const MigrationContactSupportScreen: React.FC = () => {
    * beneath it swallows back, so the press is intercepted and redirected to the commit
    * point instead. Every other origin pops, which is already what the header control does.
    *
-   * Intercepting through the navigator rather than replacing `headerLeft` is deliberate: a
-   * `headerLeft` render function passed through `setOptions` makes the native stack header
-   * re-render with a different hook count on Android, which crashes the screen outright
-   * ("Rendered fewer hooks than expected") before any of this is reachable.
+   * Intercepting through the navigator rather than replacing `headerLeft` is deliberate:
+   * `beforeRemove` catches every way off the screen (the header button, the hardware back
+   * and the swipe gesture), while a replaced `headerLeft` would only catch the tap.
+   * (Replacing it used to crash outright with "Rendered fewer hooks than expected"; that
+   * was a repo bug in headerBackControl, fixed in #4176, not a native-stack law.)
    */
   const isRedirectingBackRef = useRef(false)
   useEffect(() => {
