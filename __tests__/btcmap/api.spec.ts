@@ -9,8 +9,10 @@ const mockedGet = axios.get as jest.MockedFunction<typeof axios.get>
 
 const wirePlace = (id: number, updatedAt: string, overrides = {}) => ({
   id,
-  lat: 1 + id / 1000,
-  lon: 2 + id / 1000,
+  // Keep synthetic coordinates valid even in the page-ceiling test, whose IDs
+  // run into the hundreds of thousands.
+  lat: -80 + (id % 160_000) / 1000,
+  lon: -170 + (id % 340_000) / 1000,
   icon: "storefront",
   // eslint-disable-next-line camelcase
   updated_at: updatedAt,
@@ -43,6 +45,32 @@ describe("fetchPlacesSnapshot", () => {
     expect(places).toEqual([
       { id: 1, latitude: 10, longitude: 20, icon: "hotel", boostedUntil: undefined },
     ])
+  })
+
+  it("drops malformed rows before they can reach the cache", async () => {
+    mockedGet.mockResolvedValue({
+      data: [
+        { id: 1, lat: 10, lon: 20, icon: "hotel" },
+        { lat: 10, lon: 20, icon: "hotel" },
+        { id: "2", lat: 10, lon: 20, icon: "hotel" },
+        { id: 3, lat: 10, lon: 20, icon: 42 },
+        { id: 4, lat: Number.NaN, lon: 20, icon: "hotel" },
+        { id: 5, lat: 10, lon: Number.POSITIVE_INFINITY, icon: "hotel" },
+        { id: 6, lat: 91, lon: 20, icon: "hotel" },
+        { id: 7, lat: 10, lon: -181, icon: "hotel" },
+      ],
+      headers: {},
+    })
+
+    expect((await fetchPlacesSnapshot()).places).toEqual([
+      { id: 1, latitude: 10, longitude: 20, icon: "hotel", boostedUntil: undefined },
+    ])
+  })
+
+  it("rejects a snapshot whose top-level shape is not an array", async () => {
+    mockedGet.mockResolvedValue({ data: { id: 1 }, headers: {} })
+
+    await expect(fetchPlacesSnapshot()).rejects.toThrow("non-array place list")
   })
 
   it("rewinds the CDN stamp, which runs ahead of the newest row it contains", async () => {
@@ -81,6 +109,31 @@ describe("fetchPlacesDelta", () => {
 
     expect(delta.upserted.map((place) => place.id)).toEqual([1])
     expect(delta.removedIds).toEqual([2])
+  })
+
+  it("does not cache malformed delta rows or invent removal IDs for them", async () => {
+    mockedGet.mockResolvedValue(
+      page([
+        wirePlace(1, "2026-08-01T00:00:00.000Z"),
+        // eslint-disable-next-line camelcase
+        { lat: 10, lon: 20, icon: "hotel", updated_at: "2026-08-01T00:00:00.001Z" },
+        wirePlace(2, "2026-08-01T00:00:00.002Z", { icon: 42 }),
+        wirePlace(3, "2026-08-01T00:00:00.003Z", { lat: 91 }),
+      ]),
+    )
+
+    const delta = await fetchPlacesDelta("2026-07-01T00:00:00.000Z")
+
+    expect(delta.upserted.map((place) => place.id)).toEqual([1])
+    expect(delta.removedIds).toEqual([])
+  })
+
+  it("rejects a delta page whose top-level shape is not an array", async () => {
+    mockedGet.mockResolvedValue({ data: { id: 1 }, headers: {} })
+
+    await expect(fetchPlacesDelta("2026-07-01T00:00:00.000Z")).rejects.toThrow(
+      "non-array place list",
+    )
   })
 
   it("keeps only the latest copy of a place that changed twice", async () => {

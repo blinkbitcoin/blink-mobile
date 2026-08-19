@@ -62,14 +62,63 @@ const DETAIL_FIELDS = [
   ...Object.values(CONTACT_TAGS),
 ].join(",")
 
-const isRenderablePlace = (place: BtcMapPlaceWire): boolean =>
-  !place.deleted_at && typeof place.lat === "number" && typeof place.lon === "number"
+type IdentifiedPlaceWire = BtcMapPlaceWire & { id: number }
+type RenderablePlaceWire = IdentifiedPlaceWire & {
+  lat: number
+  lon: number
+  icon: string
+}
 
-const toPlace = (place: BtcMapPlaceWire): BtcMapPlace => ({
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null && !Array.isArray(value)
+
+const isOptionalString = (value: unknown): value is string | undefined =>
+  value === undefined || typeof value === "string"
+
+const isNullableString = (value: unknown): value is string | null | undefined =>
+  value === null || isOptionalString(value)
+
+const isCoordinate = (value: unknown, minimum: number, maximum: number): boolean =>
+  typeof value === "number" &&
+  Number.isFinite(value) &&
+  value >= minimum &&
+  value <= maximum
+
+// The Axios type parameter is compile-time only. Keep every value from the
+// third-party feed unknown until it has passed these runtime checks.
+const isIdentifiedPlace = (value: unknown): value is IdentifiedPlaceWire => {
+  if (!isRecord(value)) return false
+
+  return (
+    typeof value.id === "number" &&
+    Number.isSafeInteger(value.id) &&
+    value.id > 0 &&
+    (value.lat === undefined || isCoordinate(value.lat, -90, 90)) &&
+    (value.lon === undefined || isCoordinate(value.lon, -180, 180)) &&
+    (value.icon === undefined || typeof value.icon === "string") &&
+    isOptionalString(value.boosted_until) &&
+    isOptionalString(value.updated_at) &&
+    isNullableString(value.deleted_at)
+  )
+}
+
+const isRenderablePlace = (value: unknown): value is RenderablePlaceWire =>
+  isIdentifiedPlace(value) &&
+  (value.deleted_at === undefined || value.deleted_at === null) &&
+  isCoordinate(value.lat, -90, 90) &&
+  isCoordinate(value.lon, -180, 180) &&
+  typeof value.icon === "string"
+
+const placeRows = (value: unknown): unknown[] => {
+  if (!Array.isArray(value)) throw new Error("BTC Map returned a non-array place list")
+  return value
+}
+
+const toPlace = (place: RenderablePlaceWire): BtcMapPlace => ({
   id: place.id,
-  latitude: place.lat as number,
-  longitude: place.lon as number,
-  icon: place.icon ?? "",
+  latitude: place.lat,
+  longitude: place.lon,
+  icon: place.icon,
   boostedUntil: place.boosted_until,
 })
 
@@ -134,7 +183,7 @@ export const fetchPlacesSnapshot = async (): Promise<{
   places: BtcMapPlace[]
   syncedUpTo: string
 }> => {
-  const response = await axios.get<BtcMapPlaceWire[]>(BTCMAP_PLACES_CDN_URL, {
+  const response = await axios.get<unknown>(BTCMAP_PLACES_CDN_URL, {
     timeout: BTCMAP_SNAPSHOT_TIMEOUT_MS,
   })
 
@@ -142,7 +191,7 @@ export const fetchPlacesSnapshot = async (): Promise<{
   const generatedAt = lastModified ? new Date(lastModified).getTime() : NaN
 
   return {
-    places: response.data.filter(isRenderablePlace).map(toPlace),
+    places: placeRows(response.data).filter(isRenderablePlace).map(toPlace),
     syncedUpTo: Number.isNaN(generatedAt)
       ? BTCMAP_EPOCH
       : new Date(generatedAt - BTCMAP_CDN_CURSOR_BACKDATE_MS).toISOString(),
@@ -174,7 +223,7 @@ export type BtcMapDelta = {
 export const fetchPlacesDelta = async (since: string): Promise<BtcMapDelta> => {
   // Last write wins: a place edited twice since the cursor appears twice, and
   // the later copy is the current one.
-  const changed = new Map<number, BtcMapPlaceWire>()
+  const changed = new Map<number, IdentifiedPlaceWire>()
 
   const rewind = (timestamp: string) =>
     new Date(new Date(timestamp).getTime() - 1).toISOString()
@@ -183,7 +232,7 @@ export const fetchPlacesDelta = async (since: string): Promise<BtcMapDelta> => {
   let newestSeen: string | undefined
 
   for (let page = 0; page < BTCMAP_MAX_PAGES; page += 1) {
-    const { data } = await axios.get<BtcMapPlaceWire[]>(`${BTCMAP_API_BASE_URL}/places`, {
+    const response = await axios.get<unknown>(`${BTCMAP_API_BASE_URL}/places`, {
       params: {
         // eslint-disable-next-line camelcase
         updated_since: cursor,
@@ -192,11 +241,14 @@ export const fetchPlacesDelta = async (since: string): Promise<BtcMapDelta> => {
       },
       timeout: BTCMAP_REQUEST_TIMEOUT_MS,
     })
+    const data = placeRows(response.data)
 
     if (!data.length) break
 
-    const firstUpdatedAt = data[0]?.updated_at
-    const lastUpdatedAt = data[data.length - 1]?.updated_at
+    const first = data[0]
+    const last = data[data.length - 1]
+    const firstUpdatedAt = isIdentifiedPlace(first) ? first.updated_at : undefined
+    const lastUpdatedAt = isIdentifiedPlace(last) ? last.updated_at : undefined
 
     // A full page that begins and ends on the same timestamp may have more rows
     // at that timestamp behind it, and no cursor can reach them.
@@ -209,7 +261,7 @@ export const fetchPlacesDelta = async (since: string): Promise<BtcMapDelta> => {
     }
 
     for (const place of data) {
-      changed.set(place.id, place)
+      if (isIdentifiedPlace(place)) changed.set(place.id, place)
     }
 
     if (lastUpdatedAt) newestSeen = lastUpdatedAt

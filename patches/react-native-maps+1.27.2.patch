@@ -2,7 +2,7 @@ diff --git a/node_modules/react-native-maps/android/src/main/java/com/rnmaps/map
 index ebf8780..63418f0 100644
 --- a/node_modules/react-native-maps/android/src/main/java/com/rnmaps/maps/MapView.java
 +++ b/node_modules/react-native-maps/android/src/main/java/com/rnmaps/maps/MapView.java
-@@ -1166,24 +1166,33 @@ public class MapView extends com.google.android.gms.maps.MapView implements Goog
+@@ -1166,24 +1166,34 @@ public class MapView extends com.google.android.gms.maps.MapView implements Goog
      }
  
      private void safeAddFeature(int index, MapFeature mapFeature){
@@ -15,6 +15,7 @@ index ebf8780..63418f0 100644
 +        // nothing left able to remove it, and every later index off by one, so
 +        // subsequent removals took the wrong markers off. Visible as pins that
 +        // linger after the set of markers changes without the camera moving.
++        // Upstream: https://github.com/react-native-maps/react-native-maps/issues/5977
          if(paused || features.size() < index){
              if (savedFeatures == null) {
                  savedFeatures = new ArrayList<>();

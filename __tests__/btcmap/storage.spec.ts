@@ -11,8 +11,10 @@ import { BtcMapPlace } from "@app/btcmap/types"
 
 const place = (id: number): BtcMapPlace => ({
   id,
-  latitude: id / 100,
-  longitude: id / 50,
+  // The chunking fixtures reach 12k rows; wrap them inside real coordinate
+  // ranges now that cached values are validated before use.
+  latitude: -80 + (id % 16_000) / 100,
+  longitude: -170 + (id % 34_000) / 100,
   icon: "storefront",
 })
 
@@ -61,6 +63,16 @@ describe("btcmap snapshot storage", () => {
   it("reports a torn snapshot as no snapshot rather than half a map", async () => {
     await writeSnapshot(snapshotOf(12_000))
     await AsyncStorage.removeItem("btcMapPlacesChunk1")
+
+    expect(await readSnapshot()).toBeNull()
+  })
+
+  it("rejects a malformed cached place before it can reach rendering", async () => {
+    await writeSnapshot(snapshotOf(2))
+    await AsyncStorage.setItem(
+      "btcMapPlacesChunk0",
+      JSON.stringify([place(1), { ...place(2), icon: 42 }]),
+    )
 
     expect(await readSnapshot()).toBeNull()
   })

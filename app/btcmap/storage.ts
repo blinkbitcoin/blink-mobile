@@ -23,6 +23,26 @@ type StoredMeta = {
   chunkCount: number
 }
 
+const isStoredPlace = (value: unknown): value is BtcMapPlace => {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false
+  const place = value as Record<string, unknown>
+  return (
+    typeof place.id === "number" &&
+    Number.isSafeInteger(place.id) &&
+    place.id > 0 &&
+    typeof place.latitude === "number" &&
+    Number.isFinite(place.latitude) &&
+    place.latitude >= -90 &&
+    place.latitude <= 90 &&
+    typeof place.longitude === "number" &&
+    Number.isFinite(place.longitude) &&
+    place.longitude >= -180 &&
+    place.longitude <= 180 &&
+    typeof place.icon === "string" &&
+    (place.boostedUntil === undefined || typeof place.boostedUntil === "string")
+  )
+}
+
 const isStoredMeta = (value: unknown): value is StoredMeta => {
   if (!value || typeof value !== "object") return false
   const meta = value as Record<string, unknown>
@@ -65,8 +85,8 @@ export const readSnapshot = async (): Promise<BtcMapSnapshot | null> => {
     const chunk = parseJson(value)
     // A missing or unreadable chunk means a torn snapshot, and half a map is
     // worse than no map — fall back to a cold load from the CDN.
-    if (!Array.isArray(chunk)) return null
-    places.push(...(chunk as BtcMapPlace[]))
+    if (!Array.isArray(chunk) || !chunk.every(isStoredPlace)) return null
+    places.push(...chunk)
   }
 
   return { places, syncedUpTo: meta.syncedUpTo, lastSyncedAt: meta.lastSyncedAt }

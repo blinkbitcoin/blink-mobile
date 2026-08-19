@@ -16,8 +16,8 @@ import { join } from "path"
  * On this map that is the category filter — the pins change without the camera
  * moving, so the stale markers are plainly visible and the filter looks broken.
  *
- * Upstream: not yet filed against react-native-maps. Filing it is the exit
- * criterion for deleting this patch.
+ * Upstream: https://github.com/react-native-maps/react-native-maps/issues/5977
+ * A release containing that fix is the exit criterion for deleting this patch.
  */
 
 const REPO_ROOT = join(__dirname, "..", "..")
