@@ -20,11 +20,15 @@ export const UnseenTxAmountBadge: React.FC<UnseenTxAmountBadgeProps> = ({
   visible = true,
   onPress,
   isOutgoing,
-}) => (
-  <AmountBadge
-    amountText={amountText}
-    variant={isOutgoing ? "outgoing" : "incoming"}
-    visible={visible}
-    onPress={onPress}
-  />
-)
+}) => {
+  const variant = isOutgoing ? "outgoing" : "incoming"
+
+  return (
+    <AmountBadge
+      amountText={amountText}
+      variant={variant}
+      visible={visible}
+      onPress={onPress}
+    />
+  )
+}

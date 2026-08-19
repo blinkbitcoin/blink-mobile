@@ -75,11 +75,16 @@ export const AmountBadge: React.FC<Props> = ({
     return () => clearTimeout(timeout)
   }, [visible])
 
+  const isPressable = Boolean(onPress)
+  const isPressDisabled = !visible || !isPressable
+  const pressRole = isPressable ? "button" : "text"
+  const accessibilityImportance = visible ? "auto" : "no-hide-descendants"
+
   return (
     <Pressable
-      accessibilityRole={onPress ? "button" : "text"}
+      accessibilityRole={pressRole}
       accessibilityLabel={accessibilityLabel ?? amountText}
-      disabled={!visible || !onPress}
+      disabled={isPressDisabled}
       onPress={onPress}
       style={styles.touch}
       testID={testID}
@@ -88,7 +93,7 @@ export const AmountBadge: React.FC<Props> = ({
         key={amountText}
         style={[styles.badge, { opacity, transform: [{ translateY }] }]}
         accessibilityElementsHidden={!visible}
-        importantForAccessibility={visible ? "auto" : "no-hide-descendants"}
+        importantForAccessibility={accessibilityImportance}
       >
         {shouldRender ? (
           <>
