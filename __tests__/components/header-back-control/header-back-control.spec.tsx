@@ -20,6 +20,10 @@ import { NativeStackHeaderBackProps } from "@react-navigation/native-stack"
 
 const mockGoBack = jest.fn()
 
+/* Everything but useNavigation stays real, which is what lets these tests render
+ * react-navigation's own ThemeProvider. A jest.spyOn on the module would be narrower
+ * still, but react-navigation v7 ships ESM only: its exports transpile to
+ * non-configurable getters and spying on one throws "Cannot redefine property". */
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
   useNavigation: () => ({ goBack: mockGoBack }),
@@ -36,12 +40,26 @@ const backButtonStyle = (button: { props: { style?: StyleProp<ViewStyle> } }) =>
 
 /* HeaderBackButton reads react-navigation's own theme, which normally comes from the
  * NavigationContainer the header lives in. */
-const renderHeaderLeft = (element: React.ReactNode) =>
-  render(
-    <NavigationThemeProvider value={navigationDefaultTheme}>
-      <ThemeProvider theme={theme}>{element}</ThemeProvider>
-    </NavigationThemeProvider>,
-  )
+const withProviders = (element: React.ReactNode) => (
+  <NavigationThemeProvider value={navigationDefaultTheme}>
+    <ThemeProvider theme={theme}>{element}</ThemeProvider>
+  </NavigationThemeProvider>
+)
+
+const renderHeaderLeft = (element: React.ReactNode) => render(withProviders(element))
+
+/* Stands in for native-stack's useHeaderConfigProps: it calls hooks of its own and then
+ * invokes `headerLeft` inline in the same body, which is what makes a hook called by the
+ * render function land on this fiber. */
+const HeaderConfigHost = ({
+  headerLeft,
+}: {
+  headerLeft: (props: NativeStackHeaderBackProps) => React.ReactNode
+}) => {
+  React.useState(0)
+
+  return <>{headerLeft(headerProps)}</>
+}
 
 describe("headerBackControl", () => {
   beforeEach(() => {
@@ -68,6 +86,52 @@ describe("headerBackControl", () => {
 
     // HeaderBackButton defers its onPress to the next frame.
     await waitFor(() => expect(mockGoBack).toHaveBeenCalledTimes(1))
+  })
+
+  /* The crash #4176 fixed: the KYC webview (webview.tsx) and the account-delete flow
+   * (delete.tsx) both hand `setOptions` a headerLeft that calls no hooks, so whatever this
+   * control puts there first must not call any either. */
+  it("survives a screen replacing the header with a hookless render", () => {
+    const { rerender } = render(
+      withProviders(<HeaderConfigHost headerLeft={headerBackControl()} />),
+    )
+
+    expect(() =>
+      rerender(withProviders(<HeaderConfigHost headerLeft={() => null} />)),
+    ).not.toThrow()
+  })
+
+  it("keeps going back allowed when the route carries no canGoBack param", () => {
+    const { getByLabelText } = renderHeaderLeft(
+      headerBackControl({ canGoBack: undefined })(headerProps),
+    )
+
+    expect(getByLabelText(BACK_BUTTON_LABEL)).toBeTruthy()
+  })
+
+  /* The onboarding screens flip this through setParams while the screen stays mounted
+   * (root-navigator.tsx:993, :1001), so the header has to swap controls mid-life. */
+  it("drops the back button when the route turns canGoBack off", () => {
+    const { queryByLabelText, rerender } = render(
+      withProviders(<HeaderConfigHost headerLeft={headerBackControl()} />),
+    )
+
+    rerender(
+      withProviders(
+        <HeaderConfigHost headerLeft={headerBackControl({ canGoBack: false })} />,
+      ),
+    )
+
+    expect(queryByLabelText(BACK_BUTTON_LABEL)).toBeNull()
+  })
+
+  it("passes the header's own props through to the button", () => {
+    const { getByLabelText } = renderHeaderLeft(
+      headerBackControl()({ ...headerProps, label: "Settings" }),
+    )
+
+    // HeaderBackButton builds its accessibility label from the one the header supplies.
+    expect(getByLabelText("Settings, back")).toBeTruthy()
   })
 
   it("renders the invisible placeholder when going back is not allowed", () => {

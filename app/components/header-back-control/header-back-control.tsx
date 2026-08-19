@@ -53,11 +53,12 @@ const HeaderBackButtonWithTheme = (
  * The render function handed to `headerLeft` must never call hooks itself, which is why
  * it returns an element instead of the button component: native-stack invokes
  * `headerLeft` inline while it computes the header config (useHeaderConfigProps, called
- * from NativeStackView's own body), so hooks called there land on that fiber rather than
- * on the button's. Any screen that then replaces `headerLeft` with a hookless render (the
- * KYC webview, the account-delete flow) leaves that fiber rendering fewer hooks than the
- * previous pass, which throws "Rendered fewer hooks than expected" and drops the whole
- * navigation tree into the app-wide error boundary (#4176).
+ * from SceneView, the per-screen child NativeStackView renders around each route), so
+ * hooks called there land on that fiber rather than on the button's. Any screen that then
+ * replaces `headerLeft` with a hookless render (the KYC webview, the account-delete flow)
+ * leaves that fiber rendering fewer hooks than the previous pass, which throws "Rendered
+ * fewer hooks than expected" and drops the whole navigation tree into the app-wide error
+ * boundary (#4176).
  */
 export const headerBackControl = ({ canGoBack = true }: HeaderBackControlParams = {}) => {
   const HeaderBack = (props: NativeStackHeaderBackProps): React.ReactNode =>
@@ -67,6 +68,9 @@ export const headerBackControl = ({ canGoBack = true }: HeaderBackControlParams 
   return HeaderBack
 }
 
+/** The platform check sits inside the factory rather than in a module constant so the
+ *  spec can vary `Platform.OS` per case without re-importing the module. makeStyles
+ *  memoizes per hook instance, so a fresh render always re-reads it. */
 const useStyles = makeStyles(() => {
   const isAndroid = Platform.OS === "android"
   const backButtonInsetCorrection = isAndroid ? ANDROID_BACK_BUTTON_INSET_CORRECTION : 0
