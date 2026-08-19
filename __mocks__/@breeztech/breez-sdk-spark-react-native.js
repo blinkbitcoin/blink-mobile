@@ -103,6 +103,13 @@ module.exports = {
   RegisterLightningAddressRequest: { create: (p) => p },
   SendPaymentRequest: { create: (p) => p },
   SyncWalletRequest: { create: (p) => p },
+  UpdateUserSettingsRequest: {
+    create: (p) => ({
+      stableBalanceActiveLabel: undefined,
+      sparkMasterIdentityPublicKey: undefined,
+      ...p,
+    }),
+  },
   ReceivePaymentRequest: { create: (p) => p },
   ReceivePaymentMethod: {
     SparkAddress: jest.fn().mockImplementation(() => ({ tag: "SparkAddress" })),

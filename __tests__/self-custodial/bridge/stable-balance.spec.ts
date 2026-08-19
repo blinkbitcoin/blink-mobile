@@ -7,6 +7,15 @@ const mockSet = jest.fn()
 const mockUnset = jest.fn()
 
 jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
+  /** Mirrors the generated factory: every field the SDK adds arrives with a "no change"
+   *  default, which is what the bridge relies on instead of listing them by hand. */
+  UpdateUserSettingsRequest: {
+    create: (partial: Record<string, unknown>) => ({
+      stableBalanceActiveLabel: undefined,
+      sparkMasterIdentityPublicKey: undefined,
+      ...partial,
+    }),
+  },
   StableBalanceActiveLabel: {
     Set: class SetClass {
       constructor(args: { label: string }) {
