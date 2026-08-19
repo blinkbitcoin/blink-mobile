@@ -15,6 +15,7 @@ import {
   Network,
   useBulletinsQuery,
 } from "@app/graphql/generated"
+import { HideAmountContextProvider } from "@app/graphql/hide-amount-context"
 import { IsAuthedContextProvider } from "@app/graphql/is-authed-context"
 import { mockCurrencyList } from "@app/graphql/mocks"
 import { ConvertDirection } from "@app/types/payment"
@@ -810,6 +811,9 @@ const runRestrictionInvariantCase = async ({
 
 const resetHomeScreenMocks = () => {
   currentMocks = []
+  /** Focus gates the badge auto-seen timers, so a suite that unfocuses the screen must
+   *  not decide what the next one sees. */
+  mockIsFocused = true
   mockActiveWalletOverride = null
   mockActiveAccountOverride = null
   mockDollarBalanceRestrictedOverride = false
@@ -1982,6 +1986,27 @@ describe("HomeScreen pending receive badge", () => {
       mockActiveWalletOverride = null
       mockActiveAccountOverride = null
       mockPendingDepositsOverride = null
+    })
+
+    /** The slot sits directly under the balance the placeholder replaces, so the deposit
+     *  amount must not spell out the figure the user just covered. */
+    it("hides the pending row while amounts are hidden", async () => {
+      mockActiveWalletOverride = selfCustodialWallet
+      mockPendingDepositsOverride = { deposits: [sparkDeposit("immature")] }
+
+      const { queryByTestId } = render(
+        <HideAmountContextProvider
+          value={{ hideAmount: true, toggleHideAmount: jest.fn() }}
+        >
+          <ContextForScreen>
+            <HomeScreen />
+          </ContextForScreen>
+        </HideAmountContextProvider>,
+      )
+
+      await flushEffects()
+
+      expect(queryByTestId("pending-receive-badge")).toBeNull()
     })
 
     it("shows the badge for an immature (unconfirmed) Spark deposit", async () => {

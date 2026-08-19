@@ -47,6 +47,7 @@ import { BackupNudgeBanner } from "@app/components/backup-nudge-banner"
 import { SelfCustodialInfoBulletin } from "@app/components/self-custodial-info-bulletin"
 import { BackupNudgeModal } from "@app/components/backup-nudge-modal"
 import { NetworkStatusBanner } from "@app/components/network-status-banner"
+import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
@@ -382,6 +383,9 @@ export const HomeScreen: React.FC = () => {
     () => navigation.navigate("unclaimedDepositsScreen"),
     [navigation],
   )
+  const openUnclaimedDepositsOnPress = hasImmatureDeposits
+    ? openUnclaimedDeposits
+    : undefined
 
   const transactions = useMemo(() => {
     const txs: TransactionFragment[] = []
@@ -439,10 +443,16 @@ export const HomeScreen: React.FC = () => {
     ? showOutgoingBadge
     : showIncomingBadge && Boolean(unseenAmountText)
 
+  /** Hidden amounts hide this one too: the slot sits directly under the balance the
+   *  placeholder replaced, so showing the deposit here would spell out the very figure
+   *  the user just covered. */
+  const { hideAmount } = useHideAmount()
+  const hasPendingAmount = Boolean(pendingReceiveAmountText) && !loading && !hideAmount
+
   const badgeSlotContent = useBadgeSlotContent({
     showUnseenBadge,
     unseenKey: latestUnseenTx?.id,
-    hasPendingAmount: Boolean(pendingReceiveAmountText) && !loading,
+    hasPendingAmount,
   })
 
   const [modalVisible, setModalVisible] = React.useState(false)
@@ -850,7 +860,7 @@ export const HomeScreen: React.FC = () => {
         ) : badgeSlotContent === "pending" && pendingReceiveAmountText ? (
           <PendingAmountBadge
             amountText={`+${pendingReceiveAmountText}`}
-            onPress={hasImmatureDeposits ? openUnclaimedDeposits : undefined}
+            onPress={openUnclaimedDepositsOnPress}
             accessibilityLabel={LL.HomeScreen.pendingReceiveBadge({
               amount: pendingReceiveAmountText,
             })}
