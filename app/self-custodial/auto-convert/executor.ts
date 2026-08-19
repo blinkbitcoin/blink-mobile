@@ -101,8 +101,10 @@ const matchesConversionAmount = (
 ): boolean => {
   /** 0.22 models a conversion as an array of legs. The AMM BTC→USDB path this matcher
    *  serves is single-leg, so the sats we sent are the first leg's source; a future
-   *  multi-hop route would need to pick its entry leg here deliberately. */
-  const from = payment.conversionDetails?.conversions[0]?.from
+   *  multi-hop route would need to pick its entry leg here deliberately. The array is
+   *  optional-chained because 0.22 rebuilds the legs on retrieval and can return none;
+   *  callers that skip the length guard would otherwise throw on the whole scan. */
+  const from = payment.conversionDetails?.conversions?.[0]?.from
   if (!from) return false
   const fromAmount = toNumber(from.amount)
   const tolerance = Math.max(
@@ -149,6 +151,10 @@ const hasAlreadyConverted = async (
         reportError(
           "hasAlreadyConverted",
           `completed conversion ${payment.id} has no legs; treating as already converted`,
+          /** The comment above declares this an expected SDK state, so it belongs in the
+           *  breadcrumb trail rather than the non-fatal list, where the payment id in the
+           *  message would open a separate issue on every occurrence. */
+          { expected: true },
         )
         return true
       }

@@ -271,9 +271,12 @@ describe("executeAutoConvert", () => {
 
     expect(outcome).toEqual({ status: "already-converted" })
     expect(mockGetConversionQuote).not.toHaveBeenCalled()
+    /** Declared expected: the payment id keeps the breadcrumb useful without opening a
+     *  separate non-fatal for every occurrence. */
     expect(mockReportError).toHaveBeenCalledWith(
       "hasAlreadyConverted",
       expect.stringContaining("conv-legless"),
+      { expected: true },
     )
   })
 
@@ -464,6 +467,49 @@ describe("findRecentConversionId", () => {
     )
 
     expect(id).toBeUndefined()
+  })
+
+  /** 0.22 rebuilds the legs on retrieval, so the array itself can be missing rather than
+   *  empty. Indexing it unguarded threw out of the find() predicate and abandoned the whole
+   *  scan, which left the later candidate unpaired and free to match the next receive. */
+  it("skips a conversion whose legs are missing entirely and keeps scanning", async () => {
+    const id = await findRecentConversionId(
+      sdkWith([
+        {
+          id: "conv-no-array",
+          conversionDetails: { status: "Completed" },
+        },
+        {
+          id: "conv-fresh",
+          conversionDetails: {
+            status: "Completed",
+            conversions: [{ from: { amount: 5000n } }],
+          },
+        },
+      ]),
+      { satsAmount: 5000, toleranceBps: 500, claimedConversionIds: new Set() },
+    )
+
+    expect(id).toBe("conv-fresh")
+  })
+
+  /** The AMM path this matcher serves is single-leg; a multi-hop route is matched on its
+   *  entry leg, so the sats we sent are compared against the first leg's source. */
+  it("matches a multi-leg conversion on its entry leg", async () => {
+    const id = await findRecentConversionId(
+      sdkWith([
+        {
+          id: "conv-multi",
+          conversionDetails: {
+            status: "Completed",
+            conversions: [{ from: { amount: 5000n } }, { from: { amount: 42n } }],
+          },
+        },
+      ]),
+      { satsAmount: 5000, toleranceBps: 500, claimedConversionIds: new Set() },
+    )
+
+    expect(id).toBe("conv-multi")
   })
 
   it("skips conversions already claimed by another receive", async () => {
