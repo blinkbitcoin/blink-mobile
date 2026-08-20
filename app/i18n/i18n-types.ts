@@ -6632,6 +6632,58 @@ type RootTranslation = {
 		 * C​l​e​a​r​ ​a​l​l
 		 */
 		clearAll: string
+		/**
+		 * A​d​d​ ​t​o​ ​m​a​p
+		 */
+		addPlace: string
+		/**
+		 * A​d​d​ ​a​ ​p​l​a​c​e
+		 */
+		addPlaceTitle: string
+		/**
+		 * M​o​v​e​ ​t​h​e​ ​m​a​p​ ​t​o​ ​p​u​t​ ​t​h​e​ ​p​i​n​ ​o​n​ ​t​h​e​ ​p​l​a​c​e
+		 */
+		placePinHint: string
+		/**
+		 * N​a​m​e
+		 */
+		placeName: string
+		/**
+		 * W​h​a​t​ ​t​h​e​ ​p​l​a​c​e​ ​i​s​ ​c​a​l​l​e​d
+		 */
+		placeNameHint: string
+		/**
+		 * A​d​d​r​e​s​s​ ​(​o​p​t​i​o​n​a​l​)
+		 */
+		placeAddress: string
+		/**
+		 * S​t​r​e​e​t​ ​a​n​d​ ​n​u​m​b​e​r
+		 */
+		placeAddressHint: string
+		/**
+		 * C​a​t​e​g​o​r​y
+		 */
+		placeCategory: string
+		/**
+		 * C​h​o​o​s​e​ ​a​ ​c​a​t​e​g​o​r​y
+		 */
+		chooseCategory: string
+		/**
+		 * L​o​c​a​t​i​o​n
+		 */
+		placeLocation: string
+		/**
+		 * C​h​a​n​g​e
+		 */
+		changeLocation: string
+		/**
+		 * B​T​C​ ​M​a​p​'​s​ ​c​o​m​m​u​n​i​t​y​ ​s​u​r​v​e​y​s​ ​e​v​e​r​y​ ​n​e​w​ ​p​l​a​c​e​ ​b​e​f​o​r​e​ ​i​t​ ​a​p​p​e​a​r​s​ ​o​n​ ​t​h​e​ ​m​a​p​.
+		 */
+		placeReviewNote: string
+		/**
+		 * S​e​n​d​i​n​g​ ​p​l​a​c​e​s​ ​i​s​n​'​t​ ​s​w​i​t​c​h​e​d​ ​o​n​ ​y​e​t
+		 */
+		submissionNotReady: string
 		category: {
 			/**
 			 * R​e​s​t​a​u​r​a​n​t​s
@@ -20224,6 +20276,58 @@ export type TranslationFunctions = {
 		 * Clear all
 		 */
 		clearAll: () => LocalizedString
+		/**
+		 * Add to map
+		 */
+		addPlace: () => LocalizedString
+		/**
+		 * Add a place
+		 */
+		addPlaceTitle: () => LocalizedString
+		/**
+		 * Move the map to put the pin on the place
+		 */
+		placePinHint: () => LocalizedString
+		/**
+		 * Name
+		 */
+		placeName: () => LocalizedString
+		/**
+		 * What the place is called
+		 */
+		placeNameHint: () => LocalizedString
+		/**
+		 * Address (optional)
+		 */
+		placeAddress: () => LocalizedString
+		/**
+		 * Street and number
+		 */
+		placeAddressHint: () => LocalizedString
+		/**
+		 * Category
+		 */
+		placeCategory: () => LocalizedString
+		/**
+		 * Choose a category
+		 */
+		chooseCategory: () => LocalizedString
+		/**
+		 * Location
+		 */
+		placeLocation: () => LocalizedString
+		/**
+		 * Change
+		 */
+		changeLocation: () => LocalizedString
+		/**
+		 * BTC Map's community surveys every new place before it appears on the map.
+		 */
+		placeReviewNote: () => LocalizedString
+		/**
+		 * Sending places isn't switched on yet
+		 */
+		submissionNotReady: () => LocalizedString
 		category: {
 			/**
 			 * Restaurants

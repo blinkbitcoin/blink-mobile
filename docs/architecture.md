@@ -140,10 +140,12 @@ RootStack (Stack Navigator)
 ### Merchant map data (`app/btcmap`)
 
 The map screen is the one feature that does not read from the Galoy backend. Its merchants
-come from [BTC Map](https://btcmap.org), the community-maintained OpenStreetMap overlay,
-and the app is a read-only consumer — nothing here writes back. This replaced the
-`businessMapMarkers` GraphQL query, so the map no longer shows Galoy-registered businesses
-as such and no longer routes to `sendBitcoinDestination` from a pin.
+come from [BTC Map](https://btcmap.org), the community-maintained OpenStreetMap overlay.
+Everything drawn is read from there; the only thing sent back is a proposal for a place
+that is missing, which BTC Map's own community then surveys — nothing in the app edits or
+verifies a place that already exists. This replaced the `businessMapMarkers` GraphQL query,
+so the map no longer shows Galoy-registered businesses as such and no longer routes to
+`sendBitcoinDestination` from a pin.
 
 | Concern | Approach |
 |---------|----------|
@@ -157,6 +159,8 @@ as such and no longer routes to `sendBitcoinDestination` from a pin.
 | Clustering | supercluster, indexed over a box 3× the viewport rather than the whole feed. A filter change re-indexes hundreds of points instead of ~29k, which is the difference between a 1.2 s freeze and an unnoticed one |
 | Marker removal | Needs `patches/react-native-maps+1.27.2.patch`: `safeAddFeature` overwrote instead of inserting, so filtered-out pins stayed on the map forever. Pinned by `__tests__/patches/maps-marker-removal-patch.spec.ts` |
 | Untrusted input | Every OSM-sourced link is scheme-checked in `btcmap/urls.ts` before it reaches `Linking.openURL` |
+| Adding a place | Custodial accounts only (`useIsAuthed() && !useIsSelfCustodialAccount()`), since the submission is to go out through our backend on a Blink session. Pin first, then the form: the pin is drawn at the centre of the map view and never moves, so the region's centre is what it points at |
+| Sending a place | Not wired. `btcmap/submission.ts` shapes and validates the payload; the call that would forward it to BTC Map is a TODO in `map-component/index.tsx`, and until it exists the user is told the place has not been sent |
 | Kill switch | `btcMapPlacesEnabled` in Remote Config empties the map without a release |
 
 Because the snapshot shares Android's AsyncStorage database with the persisted Apollo
@@ -232,7 +236,7 @@ cache, `AsyncStorage_db_size_in_MB` is raised from the 6 MB default in
 | Firebase Remote Config | Feature flags |
 | Firebase App Check | Device attestation |
 | GeeTest | Captcha verification |
-| BTC Map | Merchant map data (read-only, ODbL-attributed) |
+| BTC Map | Merchant map data (ODbL-attributed), and proposals for places missing from it |
 
 ## Security Considerations
 

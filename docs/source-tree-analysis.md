@@ -12,7 +12,7 @@ blink-mobile/
 ├── app/                          # Main application source
 │   ├── app.tsx                   # Root component with provider tree
 │   ├── assets/                   # Static assets
-│   ├── btcmap/                   # BTC Map merchant data (read-only)
+│   ├── btcmap/                   # BTC Map merchant data, and adding a place to it
 │   │   ├── fonts/                # Custom fonts
 │   │   ├── icons/                # 44 SVG icons
 │   │   ├── icons-redesign/       # Redesigned icons
@@ -181,8 +181,10 @@ The GraphQL directory contains the entire data layer:
 ## `app/btcmap/` — merchant data for the map
 
 The map screen's merchants come from [BTC Map](https://btcmap.org), the
-community-maintained OpenStreetMap overlay of places that accept bitcoin. This
-module is a **read-only** consumer of it; nothing in the app writes back.
+community-maintained OpenStreetMap overlay of places that accept bitcoin.
+Everything the app draws it reads from there. The one thing it sends back is a
+proposal for a place that is missing; nothing in the app edits or verifies a
+place that already exists.
 
 | File | Role |
 |------|------|
@@ -195,6 +197,7 @@ module is a **read-only** consumer of it; nothing in the app writes back.
 | `use-place-search.ts` | Named places around the current view, for the search list |
 | `search.ts` | Accent-folded name matching and nearest-first ranking |
 | `categories.ts` | Icon → filter category buckets, and the filter itself |
+| `submission.ts` | Shape and validation for a place someone is adding, plus how its coordinates read |
 | `opening-hours.ts` | Partial OSM `opening_hours` reader → open / closed / unknown |
 | `verification.ts` | Survey freshness and boost state |
 | `icons.ts`, `urls.ts`, `geo.ts` | Marker glyph resolution, link shaping, distance |

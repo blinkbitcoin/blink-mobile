@@ -10,18 +10,23 @@ import {
   BtcMapPlace,
   LatLng,
   PlaceCategory,
+  PlaceSubmission,
   placesInCategories,
   useBtcMapPlaceNames,
   useBtcMapPlaces,
 } from "@app/btcmap"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { updateMapLastCoords } from "@app/graphql/client-only-query"
+import { useIsAuthed } from "@app/graphql/is-authed-context"
+import { useIsSelfCustodialAccount } from "@app/hooks/use-is-self-custodial-account"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { LOCATION_PERMISSION, getUserRegion } from "@app/screens/map-screen/functions"
+import { toastShow } from "@app/utils/toast"
 import { useFocusEffect } from "@react-navigation/native"
 import { isIOS } from "@rn-vui/base"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
+import { AddPlaceModal } from "./add-place-modal"
 import { CategoryFilterSheet } from "./category-filter-sheet"
 import { ClusterMarker, ClusterMarkerData } from "./cluster-marker"
 import LocationButtonCopy from "./location-button-copy"
@@ -29,6 +34,7 @@ import { MapSearchBar, searchBarBottom } from "./map-search-bar"
 import MapStyles from "./map-styles.json"
 import { OpenSettingsElement, OpenSettingsModal } from "./open-settings-modal"
 import { PlaceLabelMarker } from "./place-label-marker"
+import { PlaceLocator, locatorBarTop } from "./place-locator"
 import { PlaceMarker } from "./place-marker"
 import { PlaceSearchModal } from "./place-search-modal"
 import { PlaceSheet } from "./place-sheet"
@@ -69,6 +75,15 @@ export default function MapComponent({
   const client = useApolloClient()
   const { LL } = useI18nContext()
 
+  // Adding a place is a custodial-account feature: the submission goes to BTC
+  // Map through our own backend, which needs a Blink session behind it.
+  // `useIsSelfCustodialAccount` rather than `useActiveWallet().isSelfCustodial`
+  // so the button does not flash into view during the renders where the
+  // self-custodial SDK has not reported yet.
+  const isAuthed = useIsAuthed()
+  const isSelfCustodialAccount = useIsSelfCustodialAccount()
+  const canAddPlace = isAuthed && !isSelfCustodialAccount
+
   const mapViewRef = React.useRef<MapView>(null)
   const openSettingsModalRef = React.useRef<OpenSettingsElement>(null)
   const isAndroidSecondPermissionRequest = React.useRef(false)
@@ -81,6 +96,13 @@ export default function MapComponent({
   const [selectedPlace, setSelectedPlace] = React.useState<BtcMapPlace | null>(null)
   const [isSearchOpen, setSearchOpen] = React.useState(false)
   const [isFilterOpen, setFilterOpen] = React.useState(false)
+  // Placing the pin, then describing what is under it. Null is neither.
+  const [addStep, setAddStep] = React.useState<"locating" | "describing" | null>(null)
+  const [pinnedLocation, setPinnedLocation] = React.useState<LatLng | null>(null)
+  // One attempt at adding a place. It keys the form, so what was typed survives
+  // a trip back to the map to move the pin but never outlives the attempt it
+  // was typed into.
+  const [addSession, setAddSession] = React.useState(0)
   // Empty means "everything", not "nothing" — see `placesInCategories`.
   const [categories, setCategories] = React.useState<ReadonlySet<PlaceCategory>>(
     () => new Set(),
@@ -209,9 +231,53 @@ export default function MapComponent({
     [regionForCluster],
   )
 
-  const handlePlacePress = React.useCallback((place: BtcMapPlace) => {
-    setSelectedPlace(place)
+  // While the pin is being placed, a tap on the map is aiming rather than
+  // asking about somewhere that is already on it, so the existing pins go quiet
+  // instead of opening a sheet over the thing being aimed.
+  const handlePlacePress = React.useCallback(
+    (place: BtcMapPlace) => {
+      if (addStep !== null) return
+      setSelectedPlace(place)
+    },
+    [addStep],
+  )
+
+  const startAddingPlace = React.useCallback(() => {
+    setSelectedPlace(null)
+    setPinnedLocation(null)
+    setAddSession((session) => session + 1)
+    setAddStep("locating")
   }, [])
+
+  // The pin never moves, so where it points is the centre of whatever region
+  // the map has settled on. Read from the ref rather than the state so a
+  // confirmation lands on the region the user is actually looking at.
+  const confirmPlaceLocation = React.useCallback(() => {
+    const { latitude, longitude } = regionRef.current
+    setPinnedLocation({ latitude, longitude })
+    setAddStep("describing")
+  }, [])
+
+  const handlePlaceSubmit = React.useCallback(
+    (submission: PlaceSubmission) => {
+      setAddStep(null)
+      setPinnedLocation(null)
+
+      // TODO: hand `submission` to the backend proxy that will forward it to
+      // BTC Map. That endpoint does not exist yet, so nothing leaves the device
+      // and the user is told the place has not been sent rather than thanked
+      // for one that went nowhere. Logged only in development: what someone
+      // typed about their shop has no reason to be in a release build's log.
+      if (__DEV__) console.log("BTC Map place submission", submission)
+
+      toastShow({
+        message: (translations) => translations.MapScreen.submissionNotReady(),
+        LL,
+        type: "warning",
+      })
+    },
+    [LL],
+  )
 
   const closeSheet = React.useCallback(() => setSelectedPlace(null), [])
 
@@ -302,12 +368,37 @@ export default function MapComponent({
         })}
       </MapView>
 
-      <MapSearchBar
-        topInset={insets.top}
-        onSearchPress={() => setSearchOpen(true)}
-        onFilterPress={() => setFilterOpen(true)}
-        isFiltered={categories.size > 0}
-      />
+      {/* Both are about reading the map, and neither belongs over a map that
+          is being used to point at something. */}
+      {addStep === null && (
+        <>
+          <MapSearchBar
+            topInset={insets.top}
+            onSearchPress={() => setSearchOpen(true)}
+            onFilterPress={() => setFilterOpen(true)}
+            isFiltered={categories.size > 0}
+          />
+
+          {canAddPlace && (
+            <Pressable
+              testID="open-add-place"
+              style={styles.addPlace}
+              onPress={startAddingPlace}
+              accessibilityRole="button"
+            >
+              <GaloyIcon name="plus" size={16} color={colors.primary} />
+              <Text style={styles.addPlaceText}>{LL.MapScreen.addPlace()}</Text>
+            </Pressable>
+          )}
+        </>
+      )}
+
+      {addStep === "locating" && (
+        <PlaceLocator
+          onConfirm={confirmPlaceLocation}
+          onCancel={() => setAddStep(null)}
+        />
+      )}
 
       {isLoading && !allPlaces.length && (
         <View style={styles.statusPill}>
@@ -330,6 +421,12 @@ export default function MapComponent({
             requestPermissions={requestLocationPermission}
             permissionStatus={permissionsStatus}
             centerOnUser={centerOnUser}
+            // Centring on yourself and then nudging the pin onto your own shop
+            // is the common way to place one, so this stays reachable while the
+            // locator's bar has the bottom of the map.
+            bottom={
+              addStep === "locating" ? locatorBarTop(insets.bottom) + 10 : undefined
+            }
           />
         )}
 
@@ -358,6 +455,18 @@ export default function MapComponent({
       />
 
       <PlaceSheet place={selectedPlace} userLocation={coords} onClose={closeSheet} />
+
+      <AddPlaceModal
+        key={addSession}
+        isVisible={addStep === "describing"}
+        location={pinnedLocation}
+        onSubmit={handlePlaceSubmit}
+        onChangeLocation={() => setAddStep("locating")}
+        onClose={() => {
+          setAddStep(null)
+          setPinnedLocation(null)
+        }}
+      />
     </View>
   )
 }
@@ -393,6 +502,24 @@ const useStyles = makeStyles(({ colors }, { topInset }: { topInset: number }) =>
     fontSize: 13,
     fontWeight: "600",
     color: colors.primary,
+  },
+  addPlace: {
+    position: "absolute",
+    left: 8,
+    bottom: 12,
+    zIndex: 99,
+    flexDirection: "row",
+    alignItems: "center",
+    columnGap: 6,
+    backgroundColor: colors.white,
+    borderRadius: 20,
+    paddingHorizontal: 14,
+    paddingVertical: 11,
+  },
+  addPlaceText: {
+    fontSize: 14,
+    fontWeight: "700",
+    color: colors.black,
   },
   attribution: {
     position: "absolute",

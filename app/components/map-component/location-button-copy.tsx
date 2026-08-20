@@ -9,18 +9,27 @@ import CenterLocationAndroid from "../../assets/icons/center-location-android.sv
 // Round, so it reads as a floating action over the map rather than a card.
 const BUTTON_SIZE = 44
 
+// Sits above the ODbL credit, which shares this corner. The gap is bigger than
+// the credit needs at default text size so that scaling it up — it is an
+// attribution we are obliged to keep legible — moves it behind nothing.
+const DEFAULT_BOTTOM = 48
+
 type Props = {
   requestPermissions: () => void
   centerOnUser: () => void
   permissionStatus?: PermissionStatus
+  /** Raised when something else has taken the bottom of the map, such as the
+   *  bar for placing a new pin. */
+  bottom?: number
 }
 
 export default function LocationButtonCopy({
   permissionStatus,
   centerOnUser,
   requestPermissions,
+  bottom = DEFAULT_BOTTOM,
 }: Props) {
-  const styles = useStyles()
+  const styles = useStyles({ bottom })
   const {
     theme: { colors },
   } = useTheme()
@@ -38,13 +47,10 @@ export default function LocationButtonCopy({
   )
 }
 
-const useStyles = makeStyles(({ colors }) => ({
+const useStyles = makeStyles(({ colors }, { bottom }: { bottom: number }) => ({
   button: {
     position: "absolute",
-    // Sits above the ODbL credit, which shares this corner. The gap is bigger
-    // than the credit needs at default text size so that scaling it up — it is
-    // an attribution we are obliged to keep legible — moves it behind nothing.
-    bottom: 48,
+    bottom,
     right: 8,
     zIndex: 99,
   },
