@@ -14,6 +14,8 @@ type UsePinLockoutParams = {
   readonly onWrongPin: () => void
   readonly onExhausted: () => void | Promise<void>
   readonly onUnrecorded: () => void | Promise<void>
+  /** The stored PIN could not be read; no budget was spent, so invite a retry. */
+  readonly onUnreadable: () => void
 }
 
 type UsePinLockout = {
@@ -35,8 +37,10 @@ type UsePinLockout = {
   readonly runGuarded: <T>(operation: () => Promise<T>) => Promise<T | undefined>
 }
 
+/** Floored: a stored count above the budget (a clear that could not land) must
+ *  not render as a negative number of attempts remaining. */
 const attemptsLeftAfter = (failures: number): number | null =>
-  failures > 0 ? MAX_PIN_ATTEMPTS - failures : null
+  failures > 0 ? Math.max(0, MAX_PIN_ATTEMPTS - failures) : null
 
 export const usePinLockout = ({
   enabled,
@@ -44,6 +48,7 @@ export const usePinLockout = ({
   onWrongPin,
   onExhausted,
   onUnrecorded,
+  onUnreadable,
 }: UsePinLockoutParams): UsePinLockout => {
   const guard = useInFlightGuard()
   const [isHydrated, setIsHydrated] = useState(!enabled)
@@ -107,12 +112,19 @@ export const usePinLockout = ({
             // stay put for the whole logout teardown.
             await onExhausted()
             return
+          case "unreadable":
+            // Nothing counted, nothing written: leave the lock and the attempt
+            // count exactly as they were and hand the keypad back, since a
+            // retry is what recovers from a transient keystore fault.
+            setIsVerifying(false)
+            onUnreadable()
+            return
           case "unrecorded":
             await onUnrecorded()
         }
       })
     },
-    [guard, onUnlocked, onWrongPin, onExhausted, onUnrecorded],
+    [guard, onUnlocked, onWrongPin, onExhausted, onUnrecorded, onUnreadable],
   )
 
   const canAcceptInput = useCallback(

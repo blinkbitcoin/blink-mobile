@@ -14,11 +14,10 @@ jest.mock("@app/utils/error-reporting", () => ({
 jest.mock("@app/utils/storage/secureStorage", () => ({
   __esModule: true,
   default: {
-    getPinOrEmptyString: jest.fn(),
+    getPin: jest.fn(),
     getPinFailureState: jest.fn(),
     setPinFailureState: jest.fn(),
     clearPinFailureState: jest.fn(),
-    repairPinLockedUntil: jest.fn(),
   },
 }))
 
@@ -35,10 +34,9 @@ const storedState = ({ attempts = 0, lockedUntil = 0 } = {}) => {
 
 beforeEach(() => {
   jest.clearAllMocks()
-  mockedStore.getPinOrEmptyString.mockResolvedValue(CORRECT_PIN)
+  mockedStore.getPin.mockResolvedValue(CORRECT_PIN)
   mockedStore.setPinFailureState.mockResolvedValue(true)
-  mockedStore.clearPinFailureState.mockResolvedValue(undefined)
-  mockedStore.repairPinLockedUntil.mockResolvedValue(true)
+  mockedStore.clearPinFailureState.mockResolvedValue(true)
   storedState()
 })
 
@@ -59,6 +57,7 @@ describe("verifyPin", () => {
       const order: string[] = []
       mockedStore.clearPinFailureState.mockImplementation(async () => {
         order.push("cleared")
+        return true
       })
       storedState({ attempts: 1 })
 
@@ -66,6 +65,24 @@ describe("verifyPin", () => {
       order.push("returned")
 
       expect(order).toEqual(["cleared", "returned"])
+    })
+
+    it("still unlocks when the failure state cannot be cleared, and reports it", async () => {
+      // Refusing entry over a storage fault would punish the one person who
+      // just proved the PIN — but the leftover count is sticky, so it is
+      // reported rather than dropped.
+      mockedStore.clearPinFailureState.mockResolvedValue(false)
+      storedState({ attempts: 1 })
+
+      await expect(verifyPin(CORRECT_PIN, NOW)).resolves.toEqual({
+        outcome: "unlocked",
+      })
+      expect(mockRecordAppError).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: "PIN lockout state could not be cleared",
+        }),
+        expect.objectContaining({ alwaysRecord: true }),
+      )
     })
 
     it("is refused while a lock is still in force, without spending budget", async () => {
@@ -81,29 +98,29 @@ describe("verifyPin", () => {
   })
 
   describe("the escalating schedule", () => {
-    it("locks for 30s and leaves 2 attempts after the first failure", async () => {
+    it("locks for 10s and leaves 2 attempts after the first failure", async () => {
       await expect(verifyPin(WRONG_PIN, NOW)).resolves.toEqual({
         outcome: "wrong",
         attemptsRemaining: 2,
-        lockedUntil: NOW + 30_000,
+        lockedUntil: NOW + 10_000,
       })
       expect(mockedStore.setPinFailureState).toHaveBeenCalledWith({
         attempts: 1,
-        lockedUntil: NOW + 30_000,
+        lockedUntil: NOW + 10_000,
       })
     })
 
-    it("locks for 60s and leaves 1 attempt after the second failure", async () => {
+    it("locks for 30s and leaves 1 attempt after the second failure", async () => {
       storedState({ attempts: 1 })
 
       await expect(verifyPin(WRONG_PIN, NOW)).resolves.toEqual({
         outcome: "wrong",
         attemptsRemaining: 1,
-        lockedUntil: NOW + 60_000,
+        lockedUntil: NOW + 30_000,
       })
       expect(mockedStore.setPinFailureState).toHaveBeenCalledWith({
         attempts: 1 + 1,
-        lockedUntil: NOW + 60_000,
+        lockedUntil: NOW + 30_000,
       })
     })
 
@@ -135,7 +152,7 @@ describe("verifyPin", () => {
       })
 
       const first = await verifyPin(WRONG_PIN, NOW)
-      const second = await verifyPin(WRONG_PIN, NOW + 61_000)
+      const second = await verifyPin(WRONG_PIN, NOW + 31_000)
 
       expect(first.outcome).toBe("wrong")
       expect(second.outcome).toBe("exhausted")
@@ -164,16 +181,16 @@ describe("verifyPin", () => {
         expect.objectContaining({ attempts: 1 }),
       )
       expect(mockedStore.setPinFailureState).not.toHaveBeenCalledWith(
-        expect.objectContaining({ lockedUntil: NOW + 30_000 }),
+        expect.objectContaining({ lockedUntil: NOW + 10_000 }),
       )
     })
 
     it("refuses a guess made while a stored lock is still running", async () => {
-      storedState({ attempts: 2, lockedUntil: NOW + 45_000 })
+      storedState({ attempts: 2, lockedUntil: NOW + 25_000 })
 
       await expect(verifyPin(WRONG_PIN, NOW)).resolves.toEqual({
         outcome: "locked",
-        lockedUntil: NOW + 45_000,
+        lockedUntil: NOW + 25_000,
       })
       expect(mockedStore.setPinFailureState).not.toHaveBeenCalled()
     })
@@ -203,12 +220,64 @@ describe("verifyPin", () => {
     })
   })
 
-  it("never unlocks when no pin is stored", async () => {
-    mockedStore.getPinOrEmptyString.mockResolvedValue("")
+  describe("when the stored pin cannot be read", () => {
+    // A keystore that throws transiently is indistinguishable from a wrong PIN
+    // through this library. Scoring it as one would log the user out and wipe
+    // their PIN after three unlucky unlocks, without a wrong digit typed.
+    const unreadable = [
+      ["the read failed", null],
+      ["nothing came back", ""],
+    ] as const
 
-    const result = await verifyPin("", NOW)
+    unreadable.forEach(([label, stored]) => {
+      it(`reports it as unreadable when ${label}`, async () => {
+        mockedStore.getPin.mockResolvedValue(stored)
 
-    expect(result.outcome).not.toBe("unlocked")
+        await expect(verifyPin(CORRECT_PIN, NOW)).resolves.toEqual({
+          outcome: "unreadable",
+        })
+      })
+
+      it(`spends no budget when ${label}`, async () => {
+        mockedStore.getPin.mockResolvedValue(stored)
+        storedState({ attempts: 2 })
+
+        const result = await verifyPin(WRONG_PIN, NOW)
+
+        expect(result.outcome).toBe("unreadable")
+        expect(mockedStore.setPinFailureState).not.toHaveBeenCalled()
+        expect(mockedStore.clearPinFailureState).not.toHaveBeenCalled()
+      })
+    })
+
+    it("reports the fault, so support sees more than a mystery logout", async () => {
+      mockedStore.getPin.mockResolvedValue(null)
+
+      await verifyPin(CORRECT_PIN, NOW)
+
+      expect(mockRecordAppError).toHaveBeenCalledWith(
+        expect.objectContaining({ message: "PIN could not be read" }),
+        expect.objectContaining({ alwaysRecord: true }),
+      )
+    })
+
+    it("never unlocks", async () => {
+      mockedStore.getPin.mockResolvedValue(null)
+
+      const result = await verifyPin("", NOW)
+
+      expect(result.outcome).not.toBe("unlocked")
+    })
+
+    it("is still refused while a lock is in force", async () => {
+      mockedStore.getPin.mockResolvedValue(null)
+      storedState({ attempts: 1, lockedUntil: NOW + 5_000 })
+
+      await expect(verifyPin(CORRECT_PIN, NOW)).resolves.toEqual({
+        outcome: "locked",
+        lockedUntil: NOW + 5_000,
+      })
+    })
   })
 })
 
@@ -222,7 +291,10 @@ describe("readPinLockState", () => {
     const state = await readPinLockState(NOW)
 
     expect(state.lockedUntil).toBe(NOW + MAX_LOCKOUT_MS)
-    expect(mockedStore.repairPinLockedUntil).toHaveBeenCalledWith(NOW + MAX_LOCKOUT_MS)
+    expect(mockedStore.setPinFailureState).toHaveBeenCalledWith({
+      attempts: 1,
+      lockedUntil: NOW + MAX_LOCKOUT_MS,
+    })
   })
 
   it("leaves a lock inside the schedule alone", async () => {
@@ -231,7 +303,7 @@ describe("readPinLockState", () => {
     const state = await readPinLockState(NOW)
 
     expect(state.lockedUntil).toBe(NOW + 20_000)
-    expect(mockedStore.repairPinLockedUntil).not.toHaveBeenCalled()
+    expect(mockedStore.setPinFailureState).not.toHaveBeenCalled()
   })
 
   it("floors a negative stored attempt count at zero", async () => {

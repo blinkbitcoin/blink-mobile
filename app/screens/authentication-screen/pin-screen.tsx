@@ -23,6 +23,10 @@ type Props = {
   route: RouteProp<RootStackParamList, "pin">
 }
 
+/** The number of digits an entry holds, and so the number of circles above the
+ *  keypad. One name for what used to be three separate literals. */
+const PIN_LENGTH = 4
+
 export const PinScreen: React.FC<Props> = ({ route }) => {
   const styles = useStyles()
 
@@ -40,6 +44,9 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
   const [previousPIN, setPreviousPIN] = useState("")
   /** Set only on the terminal outcomes, where the screen is about to go away. */
   const [farewellText, setFarewellText] = useState("")
+  /** A transient notice that is about the storage, not about the entry, so it
+   *  gets its own line instead of replacing the attempts-remaining one. */
+  const [noticeText, setNoticeText] = useState("")
 
   const endSession = useCallback(
     async (message: string) => {
@@ -65,6 +72,10 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
         }),
       ),
     onWrongPin: () => setEnteredPIN(""),
+    onUnreadable: () => {
+      setEnteredPIN("")
+      setNoticeText(LL.PinScreen.pinUnreadable())
+    },
     onExhausted: () => endSession(LL.PinScreen.tooManyAttempts()),
     onUnrecorded: () => endSession(LL.PinScreen.lockoutUnavailable()),
   })
@@ -81,11 +92,12 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
 
   const addDigit = (digit: string) => {
     if (!lockout.canAcceptInput()) return
-    if (enteredPIN.length >= 4) return
+    if (enteredPIN.length >= PIN_LENGTH) return
 
+    setNoticeText("")
     const newEnteredPIN = enteredPIN + digit
     setEnteredPIN(newEnteredPIN)
-    if (newEnteredPIN.length < 4) return
+    if (newEnteredPIN.length < PIN_LENGTH) return
 
     if (isAuthenticate) {
       lockout.submit(newEnteredPIN)
@@ -168,14 +180,14 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
     <Screen style={styles.container}>
       <View style={styles.topSpacer} />
       <View style={styles.circles}>
-        {circleComponentForDigit(0)}
-        {circleComponentForDigit(1)}
-        {circleComponentForDigit(2)}
-        {circleComponentForDigit(3)}
+        {Array.from({ length: PIN_LENGTH }, (_, digit) => (
+          <React.Fragment key={digit}>{circleComponentForDigit(digit)}</React.Fragment>
+        ))}
       </View>
       <View style={styles.helperTextContainer}>
         {/* Both lines, so a countdown never hides how many tries are left. */}
         <Text style={styles.helperText}>{attemptsText()}</Text>
+        {noticeText ? <Text style={styles.helperText}>{noticeText}</Text> : null}
         {lockout.isLocked ? (
           <Text style={styles.helperText}>
             {LL.PinScreen.tryAgainIn({ seconds: lockout.remainingSeconds })}

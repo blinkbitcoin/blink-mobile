@@ -29,21 +29,25 @@ const isKeyNotFound = (err: unknown): boolean =>
   String((err as { code: unknown }).code) === KEY_NOT_FOUND_CODE
 
 /**
- * The two keys behind the PIN lockout. They are only ever read, written and
- * cleared together — see the paired API at the bottom of this class.
+ * The failed-PIN state, stored as one value under one key — see the note above
+ * the PIN lockout block.
  */
 export type PinFailureState = {
   /** Consecutive wrong-PIN entries. */
-  attempts: number
+  readonly attempts: number
   /** Epoch ms the lock lifts at; 0 when no lock is in force. */
-  lockedUntil: number
+  readonly lockedUntil: number
 }
+
+const CLEARED_PIN_FAILURE_STATE: PinFailureState = { attempts: 0, lockedUntil: 0 }
 
 export default class KeyStoreWrapper {
   private static readonly IS_BIOMETRICS_ENABLED = "isBiometricsEnabled"
   private static readonly PIN = "PIN"
-  private static readonly PIN_ATTEMPTS = "pinAttempts"
-  private static readonly PIN_LOCKED_UNTIL = "pinLockedUntil"
+  private static readonly PIN_FAILURE_STATE = "pinFailureState"
+  /** Pre-lockout releases stored the bare attempt count here. Read once, then
+   *  erased — see getPinFailureState. */
+  private static readonly LEGACY_PIN_ATTEMPTS = "pinAttempts"
   private static readonly SESSION_PROFILES = "sessionProfiles"
   private static readonly ACTIVE_TOKEN = GALOY_AUTH_TOKEN_KEY
   private static readonly MNEMONIC = "mnemonic"
@@ -129,8 +133,14 @@ export default class KeyStoreWrapper {
     return KeyStoreWrapper.has(KeyStoreWrapper.PIN)
   }
 
-  public static async getPinOrEmptyString(): Promise<string> {
-    return (await KeyStoreWrapper.read(KeyStoreWrapper.PIN)) ?? ""
+  /**
+   * `null` means the PIN could not be read — which this library cannot tell
+   * apart from "no PIN is set", so both arrive that way. Callers must not score
+   * it as a wrong entry: a keystore that throws transiently would otherwise
+   * spend the attempt budget of a user who typed nothing wrong.
+   */
+  public static async getPin(): Promise<string | null> {
+    return KeyStoreWrapper.read(KeyStoreWrapper.PIN)
   }
 
   public static async setPin(pin: string): Promise<boolean> {
@@ -146,77 +156,87 @@ export default class KeyStoreWrapper {
   }
 
   // ── PIN lockout ───────────────────────────────────────────────────────────
-  // The attempt count and the lock expiry are one logical value split across
-  // two keys. Clearing one without the other locks out a user who has already
-  // proven who they are, so the single-key accessors are private and the only
-  // way in is the paired API below.
-
-  private static async getPinAttemptsOrZero(): Promise<number> {
-    return KeyStoreWrapper.readNumber(KeyStoreWrapper.PIN_ATTEMPTS, 0)
-  }
-
-  private static async setPinAttempts(attempts: number): Promise<boolean> {
-    return KeyStoreWrapper.write(
-      KeyStoreWrapper.PIN_ATTEMPTS,
-      String(attempts),
-      ACCESSIBLE.ALWAYS_THIS_DEVICE_ONLY,
-    )
-  }
-
-  private static async removePinAttempts(): Promise<boolean> {
-    return KeyStoreWrapper.erase(KeyStoreWrapper.PIN_ATTEMPTS)
-  }
-
-  private static async getPinLockedUntilOrZero(): Promise<number> {
-    return KeyStoreWrapper.readNumber(KeyStoreWrapper.PIN_LOCKED_UNTIL, 0)
-  }
-
-  private static async setPinLockedUntil(epochMs: number): Promise<boolean> {
-    return KeyStoreWrapper.write(
-      KeyStoreWrapper.PIN_LOCKED_UNTIL,
-      String(epochMs),
-      ACCESSIBLE.ALWAYS_THIS_DEVICE_ONLY,
-    )
-  }
-
-  private static async removePinLockedUntil(): Promise<boolean> {
-    return KeyStoreWrapper.erase(KeyStoreWrapper.PIN_LOCKED_UNTIL)
-  }
+  // The attempt count and the lock expiry are one logical value, so they live
+  // under one key as one serialized write. Two keys made a write non-atomic:
+  // if only the lock landed, the failure itself was lost, and the attacker got
+  // a free attempt cycle back the moment the lock expired.
 
   public static async getPinFailureState(): Promise<PinFailureState> {
-    const [attempts, lockedUntil] = await Promise.all([
-      KeyStoreWrapper.getPinAttemptsOrZero(),
-      KeyStoreWrapper.getPinLockedUntilOrZero(),
-    ])
-    return { attempts, lockedUntil }
+    const raw = await KeyStoreWrapper.read(KeyStoreWrapper.PIN_FAILURE_STATE)
+
+    if (raw !== null) {
+      return KeyStoreWrapper.parsePinFailureState(raw)
+    }
+
+    // Upgrade path: an install that failed a PIN before this release has an
+    // attempt count and no lock. Reading it keeps that budget spent; the next
+    // write moves it to the new key and erases this one.
+    const legacyAttempts = await KeyStoreWrapper.readNumber(
+      KeyStoreWrapper.LEGACY_PIN_ATTEMPTS,
+      0,
+    )
+    return { attempts: legacyAttempts, lockedUntil: 0 }
   }
 
-  /** False if either half failed to land — a caller that must not lose a
-   *  failed attempt has to check this. */
-  public static async setPinFailureState({
-    attempts,
-    lockedUntil,
-  }: PinFailureState): Promise<boolean> {
-    const written = await Promise.all([
-      KeyStoreWrapper.setPinAttempts(attempts),
-      KeyStoreWrapper.setPinLockedUntil(lockedUntil),
-    ])
-    return written.every(Boolean)
+  /** Missing, corrupt and non-finite all collapse to a clean slate, so no NaN
+   *  can escape into a comparison downstream. */
+  private static parsePinFailureState(raw: string): PinFailureState {
+    try {
+      const parsed = JSON.parse(raw)
+      const attempts = Number(parsed?.attempts)
+      const lockedUntil = Number(parsed?.lockedUntil)
+      if (!Number.isFinite(attempts) || !Number.isFinite(lockedUntil)) {
+        return CLEARED_PIN_FAILURE_STATE
+      }
+      return { attempts, lockedUntil }
+    } catch {
+      return CLEARED_PIN_FAILURE_STATE
+    }
   }
 
-  /** Drops both keys. A key that was already absent is the cleared state, so
-   *  there is no failure here a caller could act on. */
-  public static async clearPinFailureState(): Promise<void> {
-    await Promise.all([
-      KeyStoreWrapper.removePinAttempts(),
-      KeyStoreWrapper.removePinLockedUntil(),
-    ])
+  /** One write, so the boolean is the whole truth: false means the failure was
+   *  not recorded at all, which a caller that must not lose one has to act on. */
+  public static async setPinFailureState(state: PinFailureState): Promise<boolean> {
+    const written = await KeyStoreWrapper.write(
+      KeyStoreWrapper.PIN_FAILURE_STATE,
+      JSON.stringify({ attempts: state.attempts, lockedUntil: state.lockedUntil }),
+      ACCESSIBLE.ALWAYS_THIS_DEVICE_ONLY,
+    )
+
+    // The new key shadows the legacy one on read, so a failed erase here costs
+    // nothing but a stale entry.
+    if (written) await KeyStoreWrapper.erase(KeyStoreWrapper.LEGACY_PIN_ATTEMPTS)
+
+    return written
   }
 
-  /** Persists only the lock, leaving the attempt count alone. Used to repair a
-   *  stored lock that outran the schedule; it can only ever shorten one. */
-  public static async repairPinLockedUntil(epochMs: number): Promise<boolean> {
-    return KeyStoreWrapper.setPinLockedUntil(epochMs)
+  /**
+   * Drops the state, falling back to writing a cleared value when the erase
+   * fails: a failed erase leaves a spent attempt budget readable, and every
+   * later wrong entry would then log the user out on the spot.
+   *
+   * False means neither worked. Callers let the user in anyway — they proved
+   * the PIN — but should report it, since the state is now sticky.
+   */
+  public static async clearPinFailureState(): Promise<boolean> {
+    const [erased, legacyErased] = await Promise.all([
+      KeyStoreWrapper.erase(KeyStoreWrapper.PIN_FAILURE_STATE),
+      KeyStoreWrapper.erase(KeyStoreWrapper.LEGACY_PIN_ATTEMPTS),
+    ])
+
+    if (erased && legacyErased) return true
+
+    // An erase reports failure for a key that was never there too, so ask what
+    // is actually still readable rather than writing on every clear.
+    const remaining = await KeyStoreWrapper.getPinFailureState()
+    if (remaining.attempts === 0 && remaining.lockedUntil === 0) return true
+
+    // Writing the cleared value also shadows a legacy key that would not erase.
+    return KeyStoreWrapper.write(
+      KeyStoreWrapper.PIN_FAILURE_STATE,
+      JSON.stringify(CLEARED_PIN_FAILURE_STATE),
+      ACCESSIBLE.ALWAYS_THIS_DEVICE_ONLY,
+    )
   }
 
   // ── session profiles ──────────────────────────────────────────────────────

@@ -72,12 +72,12 @@ describe("useLockoutCountdown", () => {
     const start = Date.now()
     const { result, rerender } = renderHook(
       ({ lockedUntil }: { lockedUntil: number }) => useLockoutCountdown(lockedUntil),
-      { initialProps: { lockedUntil: start + 30_000 } },
+      { initialProps: { lockedUntil: start + 10_000 } },
     )
 
-    rerender({ lockedUntil: start + 60_000 })
+    rerender({ lockedUntil: start + 30_000 })
 
-    expect(result.current.remainingSeconds).toBe(60)
+    expect(result.current.remainingSeconds).toBe(30)
   })
 
   it("stops ticking once the lock has elapsed", async () => {

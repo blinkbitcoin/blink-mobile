@@ -2164,6 +2164,7 @@
     "attemptsRemaining": "Mã PIN không chính xác. Còn lại {attemptsRemaining: number} lần thử.",
     "lockoutUnavailable": "Không thể ghi lại lần thử không thành công một cách an toàn. Đang đăng xuất.",
     "oneAttemptRemaining": "Mã PIN không chính xác. Còn lại 1 lần thử .",
+    "pinUnreadable": "Không thể kiểm tra mã PIN của bạn. Vui lòng thử lại.",
     "setPin": "Đặt mã PIN của bạn",
     "setPinFailedMatch": "Mã PIN không khớp - Đặt mã PIN của bạn",
     "storePinFailed": "Không thể lưu mã pin của bạn.",

@@ -2164,6 +2164,7 @@
     "attemptsRemaining": "PIN incorect. {attemptsRemaining: number} încercări rămase.",
     "lockoutUnavailable": "Încercarea eșuată nu a putut fi înregistrată în siguranță. Deconectare.",
     "oneAttemptRemaining": "PIN incorect. 1 încercare rămasă.",
+    "pinUnreadable": "Nu am putut verifica PIN-ul. Vă rugăm să încercați din nou.",
     "setPin": "Setează codul PIN",
     "setPinFailedMatch": "Pinurile nu se potrivesc - Setează codul PIN",
     "storePinFailed": "Nu se poate stoca codul PIN.",

@@ -2164,6 +2164,7 @@
         "attemptsRemaining": "PIN incorrecto. Quedan {attemptsRemaining: string} intentos.",
         "lockoutUnavailable": "No se ha podido registrar el intento fallido de forma segura. Cerrando sesión.",
         "oneAttemptRemaining": "PIN incorrecto. Queda 1 intento.",
+        "pinUnreadable": "No se ha podido comprobar su PIN. Inténtelo de nuevo.",
         "setPin": "Establezca su PIN",
         "setPinFailedMatch": "El PIN no coincide. Establezca su PIN",
         "storePinFailed": "No se puede guardar su PIN.",

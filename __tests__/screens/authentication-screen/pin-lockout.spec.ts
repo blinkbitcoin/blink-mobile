@@ -18,13 +18,13 @@ describe("the attempt budget", () => {
 describe("lockoutMsForFailures", () => {
   it("escalates with consecutive failures", () => {
     expect(lockoutMsForFailures(0)).toBe(0)
-    expect(lockoutMsForFailures(1)).toBe(30_000)
-    expect(lockoutMsForFailures(2)).toBe(60_000)
+    expect(lockoutMsForFailures(1)).toBe(10_000)
+    expect(lockoutMsForFailures(2)).toBe(30_000)
   })
 
   it("caps at the last scheduled lockout", () => {
-    expect(lockoutMsForFailures(3)).toBe(60_000)
-    expect(lockoutMsForFailures(100)).toBe(60_000)
+    expect(lockoutMsForFailures(3)).toBe(30_000)
+    expect(lockoutMsForFailures(100)).toBe(30_000)
   })
 
   it("treats negative input as zero failures", () => {

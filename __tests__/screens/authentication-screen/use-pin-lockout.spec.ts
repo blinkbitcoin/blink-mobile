@@ -1,5 +1,6 @@
 import { act, renderHook } from "@testing-library/react-native"
 
+import { MAX_PIN_ATTEMPTS } from "@app/screens/authentication-screen/pin-lockout"
 import { usePinLockout } from "@app/screens/authentication-screen/use-pin-lockout"
 import {
   readPinLockState,
@@ -21,6 +22,7 @@ const callbacks = () => ({
   onWrongPin: jest.fn(),
   onExhausted: jest.fn(),
   onUnrecorded: jest.fn(),
+  onUnreadable: jest.fn(),
 })
 
 const renderLockout = (
@@ -254,5 +256,38 @@ describe("usePinLockout", () => {
 
     expect(warn).not.toHaveBeenCalled()
     warn.mockRestore()
+  })
+})
+
+describe("when the stored pin could not be read", () => {
+  const unreadableAfterAFailure = async () => {
+    mockedReadPinLockState.mockResolvedValue({ attempts: 1, lockedUntil: 0 })
+    mockedVerifyPin.mockResolvedValue({ outcome: "unreadable" })
+
+    const { result, handlers } = renderLockout()
+    await flushEffects()
+
+    await act(async () => {
+      result.current.submit("1234")
+    })
+
+    return { result, handlers }
+  }
+
+  it("tells the screen, and spends none of the displayed budget", async () => {
+    const { result, handlers } = await unreadableAfterAFailure()
+
+    expect(handlers.onUnreadable).toHaveBeenCalledTimes(1)
+    expect(handlers.onWrongPin).not.toHaveBeenCalled()
+    expect(handlers.onExhausted).not.toHaveBeenCalled()
+    expect(result.current.attemptsRemaining).toBe(MAX_PIN_ATTEMPTS - 1)
+  })
+
+  it("hands the keypad back, since a retry is what recovers from it", async () => {
+    const { result } = await unreadableAfterAFailure()
+
+    expect(result.current.isInputDisabled).toBe(false)
+    expect(result.current.canAcceptInput()).toBe(true)
+    expect(result.current.isLocked).toBe(false)
   })
 })

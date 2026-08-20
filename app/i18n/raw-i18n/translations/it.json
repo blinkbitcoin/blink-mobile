@@ -2164,6 +2164,7 @@
         "attemptsRemaining": "PIN errato. Hai {attemptsRemaining: number} tentativi rimanenti.",
         "lockoutUnavailable": "Impossibile registrare in modo sicuro il tentativo fallito. Eseguo log out.",
         "oneAttemptRemaining": "PIN errato. 1 tentativo rimasto.",
+        "pinUnreadable": "Impossibile verificare il PIN. Riprova.",
         "setPin": "Imposta il tuo codice PIN",
         "setPinFailedMatch": "I PIN non corrispondono - Imposta il tuo PIN",
         "storePinFailed": "Non è possibile salvare il tuo PIN.",

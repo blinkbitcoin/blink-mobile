@@ -2164,6 +2164,7 @@
     "attemptsRemaining": "رمز شخصي خاطئ. بقي {attemptsRemaining: string} محاولات.",
     "lockoutUnavailable": "تعذّر تسجيل المحاولة الفاشلة بشكل آمن. يتم تسجيل الخروج.",
     "oneAttemptRemaining": "رمز شخصي خاطئ. بقيت محاولة واحدة.",
+    "pinUnreadable": "تعذّر التحقق من رمزك الشخصي. يرجى المحاولة مرة أخرى.",
     "setPin": "عيّن رمزك الشخصي (PIN)",
     "setPinFailedMatch": "رموز ال PIN غير متوافقة - قم بتعيين رمز PIN الخاص بك",
     "storePinFailed": "غير قادر على تخزين ال PIN الخاص بك.",

@@ -2164,6 +2164,7 @@
     "attemptsRemaining": "Forkert PIN-kode. {attemptsRemaining: number} forsøg tilbage.",
     "lockoutUnavailable": "Det mislykkede forsøg kunne ikke registreres sikkert. Logger ud.",
     "oneAttemptRemaining": "Forkert PIN-kode. 1 forsøg tilbage.",
+    "pinUnreadable": "Din PIN-kode kunne ikke kontrolleres. Prøv venligst igen.",
     "setPin": "Vælg din PIN-kode.",
     "setPinFailedMatch": "PIN-koderne matcher ikke - Vælg din PIN-kode.",
     "storePinFailed": "Kunne ikke gemme din PIN-kode",

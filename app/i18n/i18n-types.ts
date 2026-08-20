@@ -6750,6 +6750,10 @@ type RootTranslation = {
 		 */
 		oneAttemptRemaining: string
 		/**
+		 * C​o​u​l​d​n​'​t​ ​c​h​e​c​k​ ​y​o​u​r​ ​P​I​N​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		pinUnreadable: string
+		/**
 		 * S​e​t​ ​y​o​u​r​ ​P​I​N​ ​c​o​d​e
 		 */
 		setPin: string
@@ -20217,6 +20221,10 @@ export type TranslationFunctions = {
 		 * Incorrect PIN. 1 attempt remaining.
 		 */
 		oneAttemptRemaining: () => LocalizedString
+		/**
+		 * Couldn't check your PIN. Please try again.
+		 */
+		pinUnreadable: () => LocalizedString
 		/**
 		 * Set your PIN code
 		 */

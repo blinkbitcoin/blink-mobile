@@ -2164,6 +2164,7 @@
         "attemptsRemaining": "PINコードが間違っています。残り{attemptsRemaining: number}回トライできます。",
         "lockoutUnavailable": "失敗した試行を安全に記録できませんでした。ログアウトします。",
         "oneAttemptRemaining": "PINコードが間違っています。残り1回トライできます。",
+        "pinUnreadable": "PINコードを確認できませんでした。もう一度お試しください。",
         "setPin": "PINコードを設定してください",
         "setPinFailedMatch": "PINコードが一致しませんでした。PINコードを設定してください",
         "storePinFailed": "PINコードを保存できません。",

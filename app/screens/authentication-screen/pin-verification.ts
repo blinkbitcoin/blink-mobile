@@ -24,6 +24,11 @@ export type PinVerification =
    * free. The caller must log out — see the note on failing closed below.
    */
   | { readonly outcome: "unrecorded" }
+  /**
+   * The stored PIN itself could not be read, so nothing was compared and no
+   * budget was spent. The caller should invite a retry — see verifyPin.
+   */
+  | { readonly outcome: "unreadable" }
 
 /**
  * Reads the persisted lockout and bounds it.
@@ -39,7 +44,7 @@ export const readPinLockState = async (now: number): Promise<PinFailureState> =>
   const lockedUntil = clampLockedUntil(stored.lockedUntil, now)
 
   if (lockedUntil !== stored.lockedUntil) {
-    await KeyStoreWrapper.repairPinLockedUntil(lockedUntil)
+    await KeyStoreWrapper.setPinFailureState({ attempts, lockedUntil })
   }
 
   return { attempts, lockedUntil }
@@ -66,16 +71,32 @@ export const verifyPin = async (
     return { outcome: "locked", lockedUntil }
   }
 
-  const storedPin = await KeyStoreWrapper.getPinOrEmptyString()
+  const storedPin = await KeyStoreWrapper.getPin()
 
-  // The emptiness check makes "no PIN set never unlocks" structural rather than
-  // an accident of entries always being four digits long.
-  if (storedPin.length > 0 && enteredPin === storedPin) {
+  // A keystore fault and a PIN that is not there arrive identically, and
+  // neither is something the user did: scoring it as a wrong entry would spend
+  // the budget — and eventually the session and the PIN — of someone who typed
+  // nothing wrong. Nothing is written, so a retry costs the attacker nothing
+  // either; what stops them is the same budget, still intact.
+  if (storedPin === null || storedPin.length === 0) {
+    recordAppError(new Error("PIN could not be read"), {
+      alwaysRecord: true,
+      dedupKey: "pin-read",
+    })
+    return { outcome: "unreadable" }
+  }
+
+  if (enteredPin === storedPin) {
     // Awaited so a kill right after unlock can't leave a stale future lock.
-    // Its result is deliberately not checked: the PIN was proven correct, and
-    // refusing entry over a storage fault would punish the wrong person. A
-    // lock left behind is bounded by clampLockedUntil on the next read.
-    await KeyStoreWrapper.clearPinFailureState()
+    // Entry is never refused over a storage fault — the PIN was proven correct
+    // — but a clear that could not land leaves a spent budget readable, which
+    // would log this user out on their next typo, so it is reported.
+    if (!(await KeyStoreWrapper.clearPinFailureState())) {
+      recordAppError(new Error("PIN lockout state could not be cleared"), {
+        alwaysRecord: true,
+        dedupKey: "pin-lockout-clear",
+      })
+    }
     return { outcome: "unlocked" }
   }
 

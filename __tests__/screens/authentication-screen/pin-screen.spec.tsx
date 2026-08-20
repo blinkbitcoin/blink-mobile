@@ -37,11 +37,10 @@ jest.mock("@app/hooks/use-logout", () => ({
 jest.mock("@app/utils/storage/secureStorage", () => ({
   __esModule: true,
   default: {
-    getPinOrEmptyString: jest.fn(),
+    getPin: jest.fn(),
     getPinFailureState: jest.fn(),
     setPinFailureState: jest.fn(),
     clearPinFailureState: jest.fn(),
-    repairPinLockedUntil: jest.fn(),
     setPin: jest.fn(),
     /** Read by the account registry the screen renders under. */
     getSessionProfiles: jest.fn(),
@@ -58,12 +57,12 @@ const mockedStore = jest.mocked(KeyStoreWrapper)
  * storage on every attempt. Keeping the values here lets a test unmount and
  * re-render the screen to model a force-quit and relaunch.
  */
-let stored: { pin: string; attempts: number; lockedUntil: number }
+let stored: { pin: string | null; attempts: number; lockedUntil: number }
 
 const primeStore = () => {
   stored = { pin: CORRECT_PIN, attempts: 0, lockedUntil: 0 }
 
-  mockedStore.getPinOrEmptyString.mockImplementation(async () => stored.pin)
+  mockedStore.getPin.mockImplementation(async () => stored.pin)
   mockedStore.getPinFailureState.mockImplementation(async () => ({
     attempts: stored.attempts,
     lockedUntil: stored.lockedUntil,
@@ -76,9 +75,6 @@ const primeStore = () => {
   mockedStore.clearPinFailureState.mockImplementation(async () => {
     stored.attempts = 0
     stored.lockedUntil = 0
-  })
-  mockedStore.repairPinLockedUntil.mockImplementation(async (lockedUntil) => {
-    stored.lockedUntil = lockedUntil
     return true
   })
   mockedStore.setPin.mockResolvedValue(true)
@@ -270,7 +266,7 @@ describe("PinScreen", () => {
       await flushEffects()
 
       await enterPin(WRONG_PIN)
-      await advance(31_000)
+      await advance(11_000)
 
       await enterPin(CORRECT_PIN)
 
@@ -280,7 +276,7 @@ describe("PinScreen", () => {
     })
 
     it("starts locked when a future lockout is persisted (survives relaunch)", async () => {
-      stored.lockedUntil = Date.now() + 30_000
+      stored.lockedUntil = Date.now() + 10_000
 
       renderScreen(false)
       await flushEffects()
@@ -309,7 +305,9 @@ describe("PinScreen", () => {
 
       renderScreen(false)
       await flushEffects()
-      expect(mockedStore.repairPinLockedUntil).toHaveBeenCalled()
+      expect(mockedStore.setPinFailureState).toHaveBeenCalledWith(
+        expect.objectContaining({ lockedUntil: expect.any(Number) }),
+      )
 
       await advance(MAX_LOCKOUT_MS + 1000)
       await enterPin(CORRECT_PIN)
@@ -350,12 +348,31 @@ describe("PinScreen", () => {
       ).toBeTruthy()
     })
 
+    it("invites a retry, and spends no budget, when the stored pin cannot be read", async () => {
+      // A keystore fault is not a wrong entry. Scoring it as one would log the
+      // user out and wipe their pin after three unlucky unlocks.
+      stored.pin = null
+      stored.attempts = 1
+
+      renderScreen(false)
+      await flushEffects()
+
+      await enterPin(CORRECT_PIN)
+
+      expect(screen.getByText("Couldn't check your PIN. Please try again.")).toBeTruthy()
+      expect(screen.getByText("Incorrect PIN. 2 attempts remaining.")).toBeTruthy()
+      expect(stored.attempts).toBe(1)
+      expect(mockLogout).not.toHaveBeenCalled()
+      expect(screen.queryByText(/try again in/i)).toBeNull()
+      expect(screen.getByText("1")).not.toBeDisabled()
+    })
+
     it("refuses a guess made on a fresh mount while the stored lock still runs", async () => {
       // The relaunch bypass: the screen's own state starts at zero attempts and
       // no lock, so a guess entered before hydration used to skip the lock and
       // write the attempt count back down to 1.
       stored.attempts = 2
-      stored.lockedUntil = Date.now() + 60_000
+      stored.lockedUntil = Date.now() + 25_000
 
       renderScreen(false)
       await enterPin(WRONG_PIN)
@@ -368,8 +385,8 @@ describe("PinScreen", () => {
       // Each guess lands in a freshly mounted screen that has hydrated nothing,
       // and the attacker has to sit out each lock. The budget still runs out.
       for (const { attempt, lockMs } of [
-        { attempt: 1, lockMs: 31_000 },
-        { attempt: 2, lockMs: 61_000 },
+        { attempt: 1, lockMs: 11_000 },
+        { attempt: 2, lockMs: 31_000 },
       ]) {
         const { unmount } = renderScreen(false)
         await flushEffects()
@@ -387,7 +404,7 @@ describe("PinScreen", () => {
     })
 
     it("never locks the set-pin flow", async () => {
-      stored.lockedUntil = Date.now() + 30_000
+      stored.lockedUntil = Date.now() + 10_000
 
       renderScreen(undefined, PinScreenPurpose.SetPin)
       await flushEffects()
@@ -421,7 +438,7 @@ describe("PinScreen", () => {
     /** Holds the verification open on its stored-pin read. */
     const holdVerification = () => {
       let release: (pin: string) => void = () => {}
-      mockedStore.getPinOrEmptyString.mockImplementation(
+      mockedStore.getPin.mockImplementation(
         () =>
           new Promise<string>((resolve) => {
             release = resolve
@@ -429,7 +446,7 @@ describe("PinScreen", () => {
       )
       return async () => {
         await act(async () => {
-          release(stored.pin)
+          release(stored.pin ?? "")
         })
       }
     }
@@ -460,7 +477,7 @@ describe("PinScreen", () => {
       fireEvent.press(screen.getByTestId("pinPadBackspace"))
       await enterPin(WRONG_PIN)
 
-      expect(mockedStore.getPinOrEmptyString).toHaveBeenCalledTimes(1)
+      expect(mockedStore.getPin).toHaveBeenCalledTimes(1)
       await release()
     })
 
@@ -471,7 +488,7 @@ describe("PinScreen", () => {
       const release = holdVerification()
       await enterPin(WRONG_PIN)
       await release()
-      await advance(31_000)
+      await advance(11_000)
 
       expect(screen.getByText("1")).not.toBeDisabled()
     })

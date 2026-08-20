@@ -4,6 +4,7 @@ import { Alert, View } from "react-native"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { recordAppError } from "@app/utils/error-reporting"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, useTheme } from "@rn-vui/themed"
@@ -41,8 +42,15 @@ export const AuthenticationScreen: React.FC<Props> = ({ route }) => {
   const handleAuthenticationSuccess = React.useCallback(async () => {
     if (screenPurpose === AuthenticationScreenPurpose.Authenticate) {
       // Awaited so a kill right after unlock can't leave a stale lock behind
-      // for a user who has just proven who they are biometrically.
-      await KeyStoreWrapper.clearPinFailureState()
+      // for a user who has just proven who they are biometrically. Unlock is
+      // never refused over it — but a clear that could not land leaves a spent
+      // attempt budget readable, so it is reported rather than dropped.
+      if (!(await KeyStoreWrapper.clearPinFailureState())) {
+        recordAppError(new Error("PIN lockout state could not be cleared"), {
+          alwaysRecord: true,
+          dedupKey: "pin-lockout-clear",
+        })
+      }
     } else if (screenPurpose === AuthenticationScreenPurpose.TurnOnAuthentication) {
       KeyStoreWrapper.setIsBiometricsEnabled()
     }

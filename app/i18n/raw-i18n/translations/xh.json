@@ -2164,6 +2164,7 @@
     "attemptsRemaining": "I-PIN engalunganga. {attemptsRemaining: number} imizamo eseleyo.",
     "lockoutUnavailable": "Akukwazekanga ukurekhoda umzamo ongaphumelelanga ngokukhuselekileyo. Ukuloga ngaphandle.",
     "oneAttemptRemaining": "PIN engalunganga. Kushiyeke umzamo “1”.",
+    "pinUnreadable": "Ayikwazanga ukujonga i-PIN yakho. Nceda uzame kwakhona.",
     "setPin": "Seta ikhowudi yakho ye-PIN",
     "setPinFailedMatch": "Pin azihambelani  - Seta ikhowudi yakho ye-PIN",
     "storePinFailed": "Ayikwazanga ukugcina iphini yakho.",
