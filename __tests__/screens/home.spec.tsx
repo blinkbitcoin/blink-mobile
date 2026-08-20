@@ -245,10 +245,16 @@ jest.mock("@app/self-custodial/hooks", () => {
     ...actual,
     useNonCustodialConversionLimits: (direction: string | undefined) =>
       mockUseNonCustodialConversionLimits(direction),
-    usePendingDeposits: () =>
-      mockPendingDepositsOverride
-        ? { refetch: async () => {}, ...mockPendingDepositsOverride }
-        : actual.usePendingDeposits(),
+    // Defaults to a settled stub rather than the real hook: its SDK listing
+    // resolves after the test body returns, so it updated HomeScreen outside
+    // act(). Nothing is lost — HomeScreen's pending-deposit rendering is
+    // covered through the override below, and the hook's own behavior in
+    // __tests__/self-custodial/hooks/use-pending-deposits.spec.ts.
+    usePendingDeposits: () => ({
+      deposits: [],
+      refetch: async () => {},
+      ...mockPendingDepositsOverride,
+    }),
   }
 })
 
