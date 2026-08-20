@@ -8,11 +8,9 @@ import { recordAppError } from "@app/utils/error-reporting"
 import { ClusterMarkerData } from "./cluster-marker"
 import { MAX_ZOOM, longitudeDeltaForZoom, zoomForRegion } from "./viewport"
 
-// Individual pins from zoom 15 in — the zoom LABEL_MIN_ZOOM starts naming them
-// at — so pins and their labels arrive together. Two levels earlier than
-// btcmap.org's 17. supercluster's `maxZoom` is the last level it still
-// clusters at.
-const CLUSTERING_DISABLED_ZOOM = 15
+// BTC Map stops clustering at zoom 17 and draws every pin from there in;
+// supercluster's `maxZoom` is the last level it still clusters at.
+const CLUSTERING_DISABLED_ZOOM = 17
 
 const CLUSTER_OPTIONS = {
   radius: 60,
@@ -20,7 +18,7 @@ const CLUSTER_OPTIONS = {
   minPoints: 3,
 }
 
-// Clustering already bounds what is on screen, but a dense city at zoom 15 can
+// Clustering already bounds what is on screen, but a dense city at zoom 16 can
 // still resolve to thousands of individual pins. Every pin is a native view, so
 // the list is capped rather than allowed to lock up the map.
 const MAX_RENDERED = 400

@@ -84,7 +84,7 @@ describe("usePlaceClusters", () => {
   })
 
   describe("the render cap", () => {
-    // Past zoom 14 supercluster stops grouping entirely, so every place in view
+    // Past zoom 16 supercluster stops grouping entirely, so every place in view
     // is its own pin however tightly packed — a dense city centre at street
     // zoom. 600 of them in a block, which is 200 more than the cap allows.
     const SPACING = 0.0000667
