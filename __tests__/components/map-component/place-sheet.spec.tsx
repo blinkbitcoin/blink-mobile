@@ -1,5 +1,6 @@
 import React from "react"
-import { Linking, Share } from "react-native"
+import { Linking, Share, StyleSheet } from "react-native"
+import { getAnimatedStyle } from "react-native-reanimated"
 import { act, render, fireEvent, waitFor, within } from "@testing-library/react-native"
 
 import { BtcMapPlace, BtcMapPlaceDetails } from "@app/btcmap"
@@ -16,9 +17,11 @@ jest.mock("@app/btcmap/use-place-details", () => ({
 
 jest.mock("@app/utils/external", () => ({ openExternalUrl: jest.fn() }))
 
+// Read lazily so a test can raise the home-indicator inset before rendering.
+let mockBottomInset = 0
 jest.mock("react-native-safe-area-context", () => ({
   ...jest.requireActual("react-native-safe-area-context"),
-  useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
+  useSafeAreaInsets: () => ({ top: 0, bottom: mockBottomInset, left: 0, right: 0 }),
 }))
 
 const mockedUseDetails = useBtcMapPlaceDetails as jest.MockedFunction<
@@ -62,6 +65,7 @@ const renderSheet = (props: Partial<React.ComponentProps<typeof PlaceSheet>> = {
 
 beforeEach(() => {
   jest.clearAllMocks()
+  mockBottomInset = 0
   loadLocale("en")
   jest.spyOn(Linking, "openURL").mockResolvedValue(true)
   mockedOpenExternal.mockResolvedValue(undefined)
@@ -170,6 +174,60 @@ describe("PlaceSheet", () => {
     const peek = getByTestId("place-sheet-peek")
     expect(within(peek).getByText("Navigate")).toBeTruthy()
     expect(within(peek).getByText("Satoshi Coffee")).toBeTruthy()
+  })
+
+  it("stays off screen until the peek has been measured, rather than guessing", async () => {
+    // No layout event has fired yet, so there is nothing to derive the snap
+    // point from — the sheet waits below the screen instead of opening to a
+    // made-up height and hopping once the real one lands.
+    const { getByTestId, getByText } = renderSheet()
+
+    await waitFor(() => expect(getByText("Satoshi Coffee")).toBeTruthy())
+
+    const sheet = getByTestId("place-sheet")
+    const sheetHeight = StyleSheet.flatten(sheet.props.style).height as number
+    expect(getAnimatedStyle(sheet)).toMatchObject({
+      transform: [{ translateY: sheetHeight }],
+    })
+  })
+
+  it("rests on the peek's bottom edge, lifted clear of the home indicator", async () => {
+    jest.useFakeTimers()
+    try {
+      mockBottomInset = 34
+      const { getByTestId } = renderSheet()
+      const sheet = getByTestId("place-sheet")
+      const sheetHeight = StyleSheet.flatten(sheet.props.style).height as number
+
+      fireEvent(getByTestId("place-sheet-peek"), "layout", {
+        nativeEvent: { layout: { x: 0, y: 24, width: 375, height: 200 } },
+      })
+      // Run the opening spring to rest.
+      await act(async () => {
+        jest.advanceTimersByTime(3000)
+      })
+
+      // The snap point is the peek's bottom edge (y + height — the handle and
+      // padding above it show inside the window too, so its bare height is not
+      // enough), plus the inset so the home indicator does not swallow the
+      // peek's last row.
+      expect(getAnimatedStyle(sheet)).toMatchObject({
+        transform: [{ translateY: sheetHeight - (24 + 200) - 34 }],
+      })
+
+      // A peek measured taller than the sheet can show stops at fully open
+      // rather than pushing the sheet's top edge off the screen's.
+      fireEvent(getByTestId("place-sheet-peek"), "layout", {
+        nativeEvent: { layout: { x: 0, y: 24, width: 375, height: sheetHeight * 2 } },
+      })
+      await act(async () => {
+        jest.advanceTimersByTime(3000)
+      })
+
+      expect(getAnimatedStyle(sheet)).toMatchObject({ transform: [{ translateY: 0 }] })
+    } finally {
+      jest.useRealTimers()
+    }
   })
 
   it("locks the list until the sheet is dragged up", async () => {
