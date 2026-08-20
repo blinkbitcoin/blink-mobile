@@ -9,7 +9,6 @@ import { makeStyles } from "@rn-vui/themed"
 import { PIN_ANCHOR } from "./marker-layout"
 import { useMarkerSettle } from "./use-marker-settle"
 import {
-  PIN_GLYPH_COLOR,
   PIN_GLYPH_LEFT,
   PIN_GLYPH_SIZE,
   PIN_GLYPH_TOP,
@@ -17,6 +16,7 @@ import {
   PIN_WIDTH,
   PinShape,
   usePinColor,
+  usePinGlyphColor,
 } from "./pin-shape"
 
 type Props = {
@@ -42,6 +42,7 @@ export const PlaceMarker: React.FC<Props> = React.memo(({ place, onPress }) => {
   // change re-renders the markers anyway, and a timer per pin to close a gap
   // nobody can see would undo the point of `useMarkerSettle`.
   const color = usePinColor(isBoosted(place.boostedUntil, new Date()))
+  const glyphColor = usePinGlyphColor()
   const glyph = materialIconName(place.icon)
 
   // No name in the key: nothing about the label reaches these pixels any more.
@@ -62,7 +63,7 @@ export const PlaceMarker: React.FC<Props> = React.memo(({ place, onPress }) => {
         <MaterialIcon
           name={glyph}
           size={PIN_GLYPH_SIZE}
-          color={PIN_GLYPH_COLOR}
+          color={glyphColor}
           style={styles.glyph}
         />
       </View>

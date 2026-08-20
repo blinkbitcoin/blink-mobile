@@ -1,6 +1,7 @@
 import React from "react"
 import { act, render, renderHook } from "@testing-library/react-native"
 import { Circle, Path } from "react-native-svg"
+import MaterialIcon from "react-native-vector-icons/MaterialIcons"
 import { ThemeProvider, createTheme } from "@rn-vui/themed"
 
 import { BtcMapPlace } from "@app/btcmap"
@@ -69,6 +70,15 @@ const inMode = (mode: "light" | "dark", node: React.ReactElement) => (
 const pinFill = (node: React.ReactElement) =>
   // eslint-disable-next-line camelcase -- testing-library exposes this verbatim
   render(node).UNSAFE_getAllByType(Path)[0].props.fill
+
+const glyphColor = (node: React.ReactElement) =>
+  // eslint-disable-next-line camelcase -- testing-library exposes this verbatim
+  render(node).UNSAFE_getAllByType(
+    // Types-only gap: @types/react-native-vector-icons resolves a nested
+    // @types/react, so Icon's class type is not the ComponentType this React
+    // declares. It is the same component at runtime, which is what matches.
+    MaterialIcon as unknown as React.ComponentType,
+  )[0].props.color
 
 const trackingOf = (tree: ReturnType<typeof render>, testID: string) =>
   tree.getByTestId(testID).props.tracksViewChanges
@@ -182,6 +192,18 @@ describe("PlaceMarker", () => {
     expect(
       pinFill(inMode("dark", <PlaceMarker place={place()} onPress={jest.fn()} />)),
     ).toBe(PIN_COLOR_DARK)
+  })
+
+  it("keeps the category glyph pinned white whatever the mode", () => {
+    // Every fill a pin can take is a saturated accent, two of them fixed past
+    // the theme entirely, so the glyph reads `_white` rather than the theme's
+    // `white` — that one is the background token and inverts to black, which
+    // would hollow the glyph out of the dark-mode periwinkle.
+    for (const mode of ["light", "dark"] as const) {
+      expect(
+        glyphColor(inMode(mode, <PlaceMarker place={place()} onPress={jest.fn()} />)),
+      ).toBe(light._white)
+    }
   })
 
   it("marks a boosted place out in both themes", () => {
@@ -343,7 +365,7 @@ describe("ClusterMarker", () => {
     }
   })
 
-  it("takes its colour from the theme rather than a hardcoded palette", () => {
+  it("takes its colour from our palette rather than the library's", () => {
     const fill = render(
       withTheme(<ClusterMarker cluster={cluster(4)} onPress={jest.fn()} />),
     )
@@ -353,6 +375,10 @@ describe("ClusterMarker", () => {
     // Guards the assertion against passing vacuously if the key ever stops
     // resolving: an undefined fill renders an invisible disc.
     expect(fill).toMatch(/^#[0-9a-f]{6}$/i)
-    expect(fill).toBe(theme.lightColors?.success)
+    // Read straight out of colors.ts, not off the built theme: createTheme
+    // backfills @rn-vui's defaults for every key we leave unset, so a token we
+    // do not define still answers — with a library colour, and against a theme
+    // lookup it compares equal to itself.
+    expect(fill).toBe(light._green)
   })
 })

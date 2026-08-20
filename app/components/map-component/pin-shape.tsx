@@ -25,7 +25,6 @@ export const PIN_GLYPH_TOP = 5.75
 // competes with the boosted pin — so it gets its own periwinkle.
 export const PIN_COLOR_DARK = "#8D9EDD"
 export const PIN_COLOR_BOOSTED = "#F7931A"
-export const PIN_GLYPH_COLOR = "#FFFFFF"
 
 /** The fill for a pin, which is the app's accent rather than btcmap.org's teal. */
 export const usePinColor = (isBoostedPlace: boolean): string => {
@@ -33,6 +32,20 @@ export const usePinColor = (isBoostedPlace: boolean): string => {
 
   if (isBoostedPlace) return PIN_COLOR_BOOSTED
   return theme.mode === "dark" ? PIN_COLOR_DARK : theme.colors.primary
+}
+
+/**
+ * The category glyph on a pin: pinned white, not the theme's `white`.
+ *
+ * Every fill `usePinColor` can return is a saturated accent — two of them fixed
+ * past the theme entirely — so the glyph must not invert with the mode. The
+ * theme's `white` is the background token and turns black in dark mode, which
+ * would hollow the glyph out of the periwinkle pin.
+ */
+export const usePinGlyphColor = (): string => {
+  const { theme } = useTheme()
+
+  return theme.colors._white
 }
 
 export const PinShape: React.FC<{ color: string }> = ({ color }) => (
