@@ -2104,10 +2104,24 @@
   "MapScreen": {
     "navToSettingsTitle": "Maypi kasqayki permisokuna",
     "navToSettingsText": "Blink nisqaman maypi kasqayki permisota quyta munaspaykiqa, ama hina kaspa churanakuyki nisqaman riy hinaspa chaypi hapichiy",
-    "payBusiness": "Kay allinmi kuskanchik",
     "openSettings": "Churanakuyta kichay",
     "title": "Pacha mapa",
-    "error": "Uyuyuy. Imapas mana allinchu kasqa maypi kasqaykita maskhashaspa"
+    "error": "Uyuyuy. Imapas mana allinchu kasqa maypi kasqaykita maskhashaspa",
+    "attribution": "BTC Map nisqamanta cheqakuna, © OpenStreetMap yanapaqkuna",
+    "unnamedPlace": "Mana sutiyuq cheqa",
+    "loadingPlaces": "BTC Map nisqamanta cheqakuna chaskichkan",
+    "placesError": "BTC Map nisqamanta cheqakuna mana chaskiy atikurqachu",
+    "detailsError": "Kay cheqa mana chaskiy atikurqachu",
+    "cannotOpenLink": "Kay celularpi mana ima kay t'inkita kichayta atinchu",
+    "openNow": "Kunan kichasqa",
+    "closedNow": "Wichq'asqa",
+    "navigate": "Ñan qhaway",
+    "payMerchant": "Kay qhatuqman qullqi quy",
+    "requiresApp": "Qullqi quypaq huk ruranapaq kaqmi ñawpaqta necesitakun",
+    "boosted": "Riqsichisqa",
+    "verifiedOn": "{date: string} p'unchawpi chiqanchasqa",
+    "lastVerifiedOn": "Qhipa kaq chiqanchay {date: string}",
+    "needsSurvey": "Kay cheqaqa chiqanchana kanan"
   },
   "HomeScreen": {
     "pendingReceiveBadge": "+{amount: string} Kanqaqmi",

@@ -2104,10 +2104,24 @@
   "MapScreen": {
     "navToSettingsTitle": "Izin lokasi",
     "navToSettingsText": "Jika Anda ingin memberikan izin lokasi Blink, silakan buka pengaturan Anda dan aktifkan di sana",
-    "payBusiness": "Bayar bisnis ini",
     "openSettings": "Buka pengaturan",
     "title": "Peta",
-    "error": "Ups. Terjadi kesalahan saat mendapatkan lokasi Anda."
+    "error": "Ups. Terjadi kesalahan saat mendapatkan lokasi Anda.",
+    "attribution": "Tempat dari BTC Map, © kontributor OpenStreetMap",
+    "unnamedPlace": "Tempat tanpa nama",
+    "loadingPlaces": "Memuat tempat dari BTC Map",
+    "placesError": "Gagal memuat tempat dari BTC Map",
+    "detailsError": "Gagal memuat tempat ini",
+    "cannotOpenLink": "Tidak ada aplikasi di ponsel ini yang bisa membuka tautan itu",
+    "openNow": "Buka sekarang",
+    "closedNow": "Tutup",
+    "navigate": "Rute",
+    "payMerchant": "Bayar pedagang ini",
+    "requiresApp": "Perlu aplikasi khusus untuk membayar",
+    "boosted": "Disorot",
+    "verifiedOn": "Diverifikasi {date: string}",
+    "lastVerifiedOn": "Terakhir diverifikasi {date: string}",
+    "needsSurvey": "Tempat ini perlu diverifikasi"
   },
   "HomeScreen": {
     "pendingReceiveBadge": "+{amount: string} tertunda",

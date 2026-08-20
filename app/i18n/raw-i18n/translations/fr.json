@@ -2104,10 +2104,24 @@
     "MapScreen": {
         "navToSettingsTitle": "Permissions de localisation",
         "navToSettingsText": "Si vous souhaitez accorder les permissions de localisation à Blink, veuillez accéder à vos paramètres et les activer",
-        "payBusiness": "payez cette entreprise",
         "openSettings": "Ouvrir les paramètres",
         "title": "Carte",
-        "error": "Oups. Un problème est survenu lors de la récupération de votre position"
+        "error": "Oups. Un problème est survenu lors de la récupération de votre position",
+        "attribution": "Lieux de BTC Map, © les contributeurs d'OpenStreetMap",
+        "unnamedPlace": "Lieu sans nom",
+        "loadingPlaces": "Chargement des lieux depuis BTC Map",
+        "placesError": "Impossible de charger les lieux depuis BTC Map",
+        "detailsError": "Impossible de charger ce lieu",
+        "cannotOpenLink": "Aucune application sur ce téléphone ne peut ouvrir ce lien",
+        "openNow": "Ouvert maintenant",
+        "closedNow": "Fermé",
+        "navigate": "Itinéraire",
+        "payMerchant": "Payer ce commerçant",
+        "requiresApp": "Nécessite une application spécifique pour payer",
+        "boosted": "Mis en avant",
+        "verifiedOn": "Vérifié le {date: string}",
+        "lastVerifiedOn": "Dernière vérification le {date: string}",
+        "needsSurvey": "Ce lieu doit être vérifié"
     },
     "HomeScreen": {
         "pendingReceiveBadge": "+{amount: string} en attente",

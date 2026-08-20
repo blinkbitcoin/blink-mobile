@@ -1222,22 +1222,6 @@ query btcPriceList($range: PriceGraphRange!) {
   }
 }
 
-query businessMapMarkers {
-  businessMapMarkers {
-    username
-    mapInfo {
-      title
-      coordinates {
-        longitude
-        latitude
-        __typename
-      }
-      __typename
-    }
-    __typename
-  }
-}
-
 query card {
   me {
     id

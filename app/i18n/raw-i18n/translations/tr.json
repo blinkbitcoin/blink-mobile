@@ -2104,10 +2104,24 @@
   "MapScreen": {
     "navToSettingsTitle": "Konum izni",
     "navToSettingsText": "Eğer Blink'e konum izni vermek istiyosanız lütfen ayarlarda ilgili yere gidip oradan onay verin",
-    "payBusiness": "Bu işletmeye ödeme yapın",
     "openSettings": "Ayarları aç",
     "title": "Harita",
-    "error": "Hay aksi. Konum bilgini alırken bir şeyler yanlış gitti."
+    "error": "Hay aksi. Konum bilgini alırken bir şeyler yanlış gitti.",
+    "attribution": "Yerler BTC Map'ten, © OpenStreetMap katkıcıları",
+    "unnamedPlace": "İsimsiz yer",
+    "loadingPlaces": "Yerler BTC Map'ten yükleniyor",
+    "placesError": "Yerler BTC Map'ten yüklenemedi",
+    "detailsError": "Bu yer yüklenemedi",
+    "cannotOpenLink": "Bu telefonda o bağlantıyı açabilecek bir uygulama yok",
+    "openNow": "Şu an açık",
+    "closedNow": "Kapalı",
+    "navigate": "Yol tarifi",
+    "payMerchant": "Bu işletmeye ödeme yap",
+    "requiresApp": "Ödeme için belirli bir uygulama gerekiyor",
+    "boosted": "Öne çıkarılmış",
+    "verifiedOn": "{date: string} tarihinde doğrulandı",
+    "lastVerifiedOn": "Son doğrulama {date: string}",
+    "needsSurvey": "Bu yerin doğrulanması gerekiyor"
   },
   "HomeScreen": {
     "pendingReceiveBadge": "+{amount: string} beklemede",

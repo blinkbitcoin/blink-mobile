@@ -2104,10 +2104,24 @@
   "MapScreen": {
     "navToSettingsTitle": "Permisos de ubicació",
     "navToSettingsText": "Si vols donar permis de ubicació a Blink, si us plau, navega fins a la configuració i habilita-ho allà.",
-    "payBusiness": "Pagar a aquest negoci.",
     "openSettings": "Obra la configuració",
     "title": "Mapa",
-    "error": "Oops. Alguna cosa ha anat malament mentre s'obtenia la teva ubicació."
+    "error": "Oops. Alguna cosa ha anat malament mentre s'obtenia la teva ubicació.",
+    "attribution": "Llocs de BTC Map, © col·laboradors d'OpenStreetMap",
+    "unnamedPlace": "Lloc sense nom",
+    "loadingPlaces": "Carregant llocs de BTC Map",
+    "placesError": "No s'han pogut carregar els llocs de BTC Map",
+    "detailsError": "No s'ha pogut carregar aquest lloc",
+    "cannotOpenLink": "Res en aquest telèfon no pot obrir aquest enllaç",
+    "openNow": "Obert ara",
+    "closedNow": "Tancat",
+    "navigate": "Com arribar-hi",
+    "payMerchant": "Paga a aquest comerç",
+    "requiresApp": "Cal una aplicació específica per pagar",
+    "boosted": "Destacat",
+    "verifiedOn": "Verificat el {date: string}",
+    "lastVerifiedOn": "Verificat per última vegada el {date: string}",
+    "needsSurvey": "Aquest lloc necessita ser verificat"
   },
   "HomeScreen": {
     "pendingReceiveBadge": "+{amount: string} pendent",

@@ -2104,10 +2104,24 @@
   "MapScreen": {
     "navToSettingsTitle": "Iimvume zendawo",
     "navToSettingsText": "Ukuba ungathanda ukunika Blink iimvume zendawo, nceda uye kwiisethingi zakho kwaye uzivule khona",
-    "payBusiness": "hlawula eli shishini",
     "openSettings": "Vula iisethingi",
     "title": "Imephu",
-    "error": "Owu. Kukho into engahambanga kakuhle ngelixa sifumana indawo yakho"
+    "error": "Owu. Kukho into engahambanga kakuhle ngelixa sifumana indawo yakho",
+    "attribution": "Iindawo ezivela kwiBTC Map, © abanikeli be-OpenStreetMap",
+    "unnamedPlace": "Indawo engenagama",
+    "loadingPlaces": "Kulayishwa iindawo kwiBTC Map",
+    "placesError": "Azikwazanga ukulayishwa iindawo kwiBTC Map",
+    "detailsError": "Ayikwazanga ukulayishwa le ndawo",
+    "cannotOpenLink": "Akukho nto kule fowuni inokuvula elo khonkco",
+    "openNow": "Ivulile ngoku",
+    "closedNow": "Ivaliwe",
+    "navigate": "Khokela",
+    "payMerchant": "Hlawula lo rhwebi",
+    "requiresApp": "Ifuna usetyenziso oluthile ukuze uhlawule",
+    "boosted": "Igqanyisiwe",
+    "verifiedOn": "Iqinisekisiwe nge-{date: string}",
+    "lastVerifiedOn": "Iqinisekiswe okokugqibela nge-{date: string}",
+    "needsSurvey": "Le ndawo ifuna ukuqinisekiswa"
   },
   "HomeScreen": {
     "pendingReceiveBadge": "+{amount: string} pending",

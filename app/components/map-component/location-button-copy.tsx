@@ -1,9 +1,13 @@
+import React from "react"
 import { TouchableOpacity, View } from "react-native"
 import { PermissionStatus, RESULTS } from "react-native-permissions"
 
-import { makeStyles } from "@rn-vui/themed"
+import { makeStyles, useTheme } from "@rn-vui/themed"
 
 import CenterLocationAndroid from "../../assets/icons/center-location-android.svg"
+
+// Round, so it reads as a floating action over the map rather than a card.
+const BUTTON_SIZE = 44
 
 type Props = {
   requestPermissions: () => void
@@ -17,14 +21,18 @@ export default function LocationButtonCopy({
   requestPermissions,
 }: Props) {
   const styles = useStyles()
+  const {
+    theme: { colors },
+  } = useTheme()
 
   return (
     <View style={styles.button}>
       <TouchableOpacity
+        testID="location-button"
         style={styles.android}
         onPress={permissionStatus === RESULTS.GRANTED ? centerOnUser : requestPermissions}
       >
-        <CenterLocationAndroid height={22} width={22} fill={"#656565"} />
+        <CenterLocationAndroid height={22} width={22} fill={colors.primary} />
       </TouchableOpacity>
     </View>
   )
@@ -33,15 +41,21 @@ export default function LocationButtonCopy({
 const useStyles = makeStyles(({ colors }) => ({
   button: {
     position: "absolute",
-    bottom: 28,
-    left: 8,
+    // Sits above the ODbL credit, which shares this corner. The gap is bigger
+    // than the credit needs at default text size so that scaling it up — it is
+    // an attribution we are obliged to keep legible — moves it behind nothing.
+    bottom: 48,
+    right: 8,
     zIndex: 99,
   },
   android: {
-    borderRadius: 2,
+    width: BUTTON_SIZE,
+    height: BUTTON_SIZE,
+    borderRadius: BUTTON_SIZE / 2,
+    alignItems: "center",
+    justifyContent: "center",
     opacity: 0.99,
     backgroundColor: colors.white,
-    padding: 8,
     shadowColor: colors.black,
     shadowOffset: {
       width: 0,
@@ -49,5 +63,8 @@ const useStyles = makeStyles(({ colors }) => ({
     },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
+    // shadow* is iOS-only, and this button is drawn over the map on both — so
+    // without this it sits flat on Android, which is where it is most needed.
+    elevation: 4,
   },
 }))

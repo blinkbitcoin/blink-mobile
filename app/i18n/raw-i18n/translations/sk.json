@@ -2104,10 +2104,24 @@
   "MapScreen": {
     "navToSettingsTitle": "Povolenia polohy",
     "navToSettingsText": "Ak chcete Blinku udeliť povolenia na polohu, prejdite do nastavení a povoľte ich tam",
-    "payBusiness": "Zaplaťte tomuto podniku",
     "openSettings": "Otvoriť nastavenia",
     "title": "Mapa",
-    "error": "Ojoj. Pri získavaní vašej polohy sa vyskytla chyba"
+    "error": "Ojoj. Pri získavaní vašej polohy sa vyskytla chyba",
+    "attribution": "Miesta z BTC Map, © prispievatelia OpenStreetMap",
+    "unnamedPlace": "Miesto bez názvu",
+    "loadingPlaces": "Načítavajú sa miesta z BTC Map",
+    "placesError": "Miesta z BTC Map sa nepodarilo načítať",
+    "detailsError": "Toto miesto sa nepodarilo načítať",
+    "cannotOpenLink": "Tento odkaz nemá v telefóne čo otvoriť",
+    "openNow": "Teraz otvorené",
+    "closedNow": "Zatvorené",
+    "navigate": "Navigovať",
+    "payMerchant": "Zaplatiť tomuto obchodníkovi",
+    "requiresApp": "Na platbu je potrebná konkrétna aplikácia",
+    "boosted": "Zvýraznené",
+    "verifiedOn": "Overené {date: string}",
+    "lastVerifiedOn": "Naposledy overené {date: string}",
+    "needsSurvey": "Toto miesto je potrebné overiť"
   },
   "HomeScreen": {
     "pendingReceiveBadge": "+{amount: string} čakajúce",

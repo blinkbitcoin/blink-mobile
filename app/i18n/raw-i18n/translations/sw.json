@@ -2104,10 +2104,24 @@
   "MapScreen": {
     "navToSettingsTitle": "Ruhusa za eneo",
     "navToSettingsText": "Ikiwa ungependa kutoa ruhusa za eneo la Blink, tafadhali nenda kwenye mipangilio yako na uiwashe hapo",
-    "payBusiness": "Lipa biashara hii",
     "openSettings": "Fungua mipangilio",
     "title": "Ramani",
-    "error": "Lo! Hitilafu fulani imetokea wakati wa kupata eneo lako"
+    "error": "Lo! Hitilafu fulani imetokea wakati wa kupata eneo lako",
+    "attribution": "Maeneo kutoka BTC Map, © wachangiaji wa OpenStreetMap",
+    "unnamedPlace": "Eneo lisilo na jina",
+    "loadingPlaces": "Inapakia maeneo kutoka BTC Map",
+    "placesError": "Imeshindwa kupakia maeneo kutoka BTC Map",
+    "detailsError": "Imeshindwa kupakia eneo hili",
+    "cannotOpenLink": "Hakuna kitu kwenye simu hii kinachoweza kufungua kiungo hicho",
+    "openNow": "Imefunguliwa sasa",
+    "closedNow": "Imefungwa",
+    "navigate": "Elekeza",
+    "payMerchant": "Lipa mfanyabiashara huyu",
+    "requiresApp": "Inahitaji programu maalum ili kulipa",
+    "boosted": "Imeangaziwa",
+    "verifiedOn": "Ilithibitishwa {date: string}",
+    "lastVerifiedOn": "Ilithibitishwa mara ya mwisho {date: string}",
+    "needsSurvey": "Eneo hili linahitaji kuthibitishwa"
   },
   "HomeScreen": {
     "pendingReceiveBadge": "+{amount: string} inasubiri",

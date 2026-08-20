@@ -2104,10 +2104,24 @@
   "MapScreen": {
     "navToSettingsTitle": "Helymeghatározási engedélyek",
     "navToSettingsText": "Ha szeretnéd engedélyezni hogy a Blink meghatározza a helyedet, kérjük, engedélyezd a beállításokban.",
-    "payBusiness": "Fizess ennek az üzletnek",
     "openSettings": "Beállítások megnyitása",
     "title": "Térkép",
-    "error": "Valami hiba történt a helyzeted lekérdezése közben"
+    "error": "Valami hiba történt a helyzeted lekérdezése közben",
+    "attribution": "Helyek a BTC Map-ról, © OpenStreetMap közreműködők",
+    "unnamedPlace": "Névtelen hely",
+    "loadingPlaces": "Helyek betöltése a BTC Map-ról",
+    "placesError": "Nem sikerült betölteni a helyeket a BTC Map-ról",
+    "detailsError": "Nem sikerült betölteni ezt a helyet",
+    "cannotOpenLink": "Ezen a telefonon semmi sem tudja megnyitni ezt a linket",
+    "openNow": "Most nyitva",
+    "closedNow": "Zárva",
+    "navigate": "Útvonal",
+    "payMerchant": "Fizetés ennek a kereskedőnek",
+    "requiresApp": "A fizetéshez külön alkalmazás kell",
+    "boosted": "Kiemelt",
+    "verifiedOn": "Ellenőrizve: {date: string}",
+    "lastVerifiedOn": "Utoljára ellenőrizve: {date: string}",
+    "needsSurvey": "Ezt a helyet ellenőrizni kell"
   },
   "HomeScreen": {
     "pendingReceiveBadge": "+{amount: string} Függőben",

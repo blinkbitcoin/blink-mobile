@@ -56,9 +56,6 @@ export const createCache = () =>
       RealtimePrice: {
         keyFields: [],
       },
-      MapMarker: {
-        keyFields: ["mapInfo", ["title", "coordinates"]],
-      },
       Contact: {
         fields: {
           prettyName: {

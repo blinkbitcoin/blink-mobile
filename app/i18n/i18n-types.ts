@@ -6521,10 +6521,6 @@ type RootTranslation = {
 		 */
 		navToSettingsText: string
 		/**
-		 * P​a​y​ ​t​h​i​s​ ​b​u​s​i​n​e​s​s
-		 */
-		payBusiness: string
-		/**
 		 * O​p​e​n​ ​s​e​t​t​i​n​g​s
 		 */
 		openSettings: string
@@ -6536,6 +6532,68 @@ type RootTranslation = {
 		 * O​o​p​s​.​ ​S​o​m​e​t​h​i​n​g​ ​w​e​n​t​ ​w​r​o​n​g​ ​w​h​i​l​e​ ​g​e​t​t​i​n​g​ ​y​o​u​r​ ​l​o​c​a​t​i​o​n
 		 */
 		error: string
+		/**
+		 * P​l​a​c​e​s​ ​f​r​o​m​ ​B​T​C​ ​M​a​p​,​ ​©​ ​O​p​e​n​S​t​r​e​e​t​M​a​p​ ​c​o​n​t​r​i​b​u​t​o​r​s
+		 */
+		attribution: string
+		/**
+		 * U​n​n​a​m​e​d​ ​p​l​a​c​e
+		 */
+		unnamedPlace: string
+		/**
+		 * L​o​a​d​i​n​g​ ​p​l​a​c​e​s​ ​f​r​o​m​ ​B​T​C​ ​M​a​p
+		 */
+		loadingPlaces: string
+		/**
+		 * C​o​u​l​d​n​'​t​ ​l​o​a​d​ ​p​l​a​c​e​s​ ​f​r​o​m​ ​B​T​C​ ​M​a​p
+		 */
+		placesError: string
+		/**
+		 * C​o​u​l​d​n​'​t​ ​l​o​a​d​ ​t​h​i​s​ ​p​l​a​c​e
+		 */
+		detailsError: string
+		/**
+		 * N​o​t​h​i​n​g​ ​o​n​ ​t​h​i​s​ ​p​h​o​n​e​ ​c​a​n​ ​o​p​e​n​ ​t​h​a​t​ ​l​i​n​k
+		 */
+		cannotOpenLink: string
+		/**
+		 * O​p​e​n​ ​n​o​w
+		 */
+		openNow: string
+		/**
+		 * C​l​o​s​e​d
+		 */
+		closedNow: string
+		/**
+		 * N​a​v​i​g​a​t​e
+		 */
+		navigate: string
+		/**
+		 * P​a​y​ ​t​h​i​s​ ​m​e​r​c​h​a​n​t
+		 */
+		payMerchant: string
+		/**
+		 * N​e​e​d​s​ ​a​ ​s​p​e​c​i​f​i​c​ ​a​p​p​ ​t​o​ ​p​a​y
+		 */
+		requiresApp: string
+		/**
+		 * B​o​o​s​t​e​d
+		 */
+		boosted: string
+		/**
+		 * V​e​r​i​f​i​e​d​ ​{​d​a​t​e​}
+		 * @param {string} date
+		 */
+		verifiedOn: RequiredParams<'date'>
+		/**
+		 * L​a​s​t​ ​v​e​r​i​f​i​e​d​ ​{​d​a​t​e​}
+		 * @param {string} date
+		 */
+		lastVerifiedOn: RequiredParams<'date'>
+		/**
+		 * T​h​i​s​ ​l​o​c​a​t​i​o​n​ ​n​e​e​d​s​ ​t​o​ ​b​e​ ​s​u​r​v​e​y​e​d
+		 */
+		needsSurvey: string
 	}
 	HomeScreen: {
 		/**
@@ -19828,10 +19886,6 @@ export type TranslationFunctions = {
 		 */
 		navToSettingsText: () => LocalizedString
 		/**
-		 * Pay this business
-		 */
-		payBusiness: () => LocalizedString
-		/**
 		 * Open settings
 		 */
 		openSettings: () => LocalizedString
@@ -19843,6 +19897,66 @@ export type TranslationFunctions = {
 		 * Oops. Something went wrong while getting your location
 		 */
 		error: () => LocalizedString
+		/**
+		 * Places from BTC Map, © OpenStreetMap contributors
+		 */
+		attribution: () => LocalizedString
+		/**
+		 * Unnamed place
+		 */
+		unnamedPlace: () => LocalizedString
+		/**
+		 * Loading places from BTC Map
+		 */
+		loadingPlaces: () => LocalizedString
+		/**
+		 * Couldn't load places from BTC Map
+		 */
+		placesError: () => LocalizedString
+		/**
+		 * Couldn't load this place
+		 */
+		detailsError: () => LocalizedString
+		/**
+		 * Nothing on this phone can open that link
+		 */
+		cannotOpenLink: () => LocalizedString
+		/**
+		 * Open now
+		 */
+		openNow: () => LocalizedString
+		/**
+		 * Closed
+		 */
+		closedNow: () => LocalizedString
+		/**
+		 * Navigate
+		 */
+		navigate: () => LocalizedString
+		/**
+		 * Pay this merchant
+		 */
+		payMerchant: () => LocalizedString
+		/**
+		 * Needs a specific app to pay
+		 */
+		requiresApp: () => LocalizedString
+		/**
+		 * Boosted
+		 */
+		boosted: () => LocalizedString
+		/**
+		 * Verified {date}
+		 */
+		verifiedOn: (arg: { date: string }) => LocalizedString
+		/**
+		 * Last verified {date}
+		 */
+		lastVerifiedOn: (arg: { date: string }) => LocalizedString
+		/**
+		 * This location needs to be surveyed
+		 */
+		needsSurvey: () => LocalizedString
 	}
 	HomeScreen: {
 		/**

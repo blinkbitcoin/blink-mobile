@@ -135,6 +135,30 @@ RootStack (Stack Navigator)
 | Persistent State | Settings, preferences | PersistentStateContext + AsyncStorage |
 | UI State | Loading, errors, modals | React Context + local state |
 | Feature Flags | Feature toggles | FeatureFlagContext |
+| Merchant Map | BTC Map places, held offline | `app/btcmap` + chunked AsyncStorage |
+
+### Merchant map data (`app/btcmap`)
+
+The map screen is the one feature that does not read from the Galoy backend. Its merchants
+come from [BTC Map](https://btcmap.org), the community-maintained OpenStreetMap overlay,
+and the app is a read-only consumer — nothing here writes back. This replaced the
+`businessMapMarkers` GraphQL query, so the map no longer shows Galoy-registered businesses
+as such and no longer routes to `sendBitcoinDestination` from a pin.
+
+| Concern | Approach |
+|---------|----------|
+| Cold start | One gzipped ~550 KB CDN snapshot (`cdn.static.btcmap.org`), not a paged API walk |
+| Staying current | `updated_since` delta against `api.btcmap.org/v4`, at most hourly, on focus and app resume |
+| Offline cache | ~2.4 MB of places chunked at 5k rows across AsyncStorage, meta row written last so a torn write reads as "no cache" |
+| Per-place detail | Fetched on tap; the snapshot holds only id, coordinates, icon and boost |
+| Labels | Fetched per settled viewport, on a ~1.1 km grid so the centre is not a location trail |
+| Marker removal | Needs `patches/react-native-maps+1.27.2.patch`: `safeAddFeature` overwrote instead of inserting, so filtered-out pins stayed on the map forever. Pinned by `__tests__/patches/maps-marker-removal-patch.spec.ts` |
+| Untrusted input | Every OSM-sourced link is scheme-checked in `btcmap/urls.ts` before it reaches `Linking.openURL` |
+| Kill switch | `btcMapPlacesEnabled` in Remote Config empties the map without a release |
+
+Because the snapshot shares Android's AsyncStorage database with the persisted Apollo
+cache, `AsyncStorage_db_size_in_MB` is raised from the 6 MB default in
+`android/gradle.properties`.
 
 ## Authentication Flow
 
@@ -205,6 +229,7 @@ RootStack (Stack Navigator)
 | Firebase Remote Config | Feature flags |
 | Firebase App Check | Device attestation |
 | GeeTest | Captcha verification |
+| BTC Map | Merchant map data (read-only, ODbL-attributed) |
 
 ## Security Considerations
 

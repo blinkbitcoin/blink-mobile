@@ -92,6 +92,7 @@
 	<key>UIAppFonts</key>
 	<array>
 		<string>Ionicons.ttf</string>
+		<string>MaterialIcons.ttf</string>
 		<string>SourceSansPro-Bold.ttf</string>
 		<string>SourceSansPro-BoldItalic.ttf</string>
 		<string>SourceSansPro-Italic.ttf</string>
