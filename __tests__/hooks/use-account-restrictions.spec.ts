@@ -1,4 +1,4 @@
-import { renderHook } from "@testing-library/react-native"
+import { act, renderHook } from "@testing-library/react-native"
 
 import { useAccountRestrictions } from "@app/hooks/use-account-restrictions"
 import { AccountType } from "@app/types/wallet"
@@ -8,6 +8,7 @@ const mockUseActiveWallet = jest.fn()
 const mockUseDeviceLocation = jest.fn()
 const mockUseIpCountryLookup = jest.fn()
 const mockUseCustodialRestrictionsQuery = jest.fn()
+const mockRefetch = jest.fn()
 let mockRemoteConfigReady = true
 let mockIsAuthed = true
 let mockIsRegistryHydrating = false
@@ -58,7 +59,7 @@ const UNRESTRICTED: ServerRestrictions = { dollarBalance: false, transfer: false
 
 /** null stands for "the query answered nothing", which `undefined` cannot: it would take
  *  the parameter default instead. */
-const setUp = ({
+const renderRestrictions = ({
   accountType = AccountType.Custodial,
   accountTypeOverride,
   countryCode,
@@ -70,6 +71,7 @@ const setUp = ({
   isRegistryHydrating = false,
   custodialRestrictions = UNRESTRICTED,
   isQueryLoading = false,
+  queryError,
 }: {
   accountType?: AccountType
   accountTypeOverride?: AccountType
@@ -82,6 +84,7 @@ const setUp = ({
   isRegistryHydrating?: boolean
   custodialRestrictions?: ServerRestrictions | null
   isQueryLoading?: boolean
+  queryError?: Error
 }) => {
   mockRemoteConfigReady = remoteConfigReady
   mockIsAuthed = isAuthed
@@ -96,9 +99,16 @@ const setUp = ({
   mockUseCustodialRestrictionsQuery.mockReturnValue({
     data: custodialRestrictions ? { custodialRestrictions } : undefined,
     loading: isQueryLoading,
+    error: queryError,
+    refetch: mockRefetch,
   })
-  return renderHook(() => useAccountRestrictions(accountTypeOverride)).result.current
+  return renderHook(() => useAccountRestrictions(accountTypeOverride))
 }
+
+/** The reading a test asserts on. Retry tests keep the render instead, since they have to
+ *  advance time and re-read. */
+const setUp = (options: Parameters<typeof renderRestrictions>[0]) =>
+  renderRestrictions(options).result.current
 
 /** What the query hook was told, so the skip decision can be read directly. */
 const lastQueryOptions = () => mockUseCustodialRestrictionsQuery.mock.calls.at(-1)?.[0]
@@ -194,6 +204,136 @@ describe("useAccountRestrictions", () => {
       expect(restrictions.dollarBalance).toBe(false)
       expect(restrictions.transfer).toBe(false)
       expect(restrictions.isSettled).toBe(true)
+    })
+  })
+
+  /**
+   * A request that never arrived and a served "no verdict" are the same absence of data,
+   * and the hook used to answer both with FAIL_CLOSED. One is the server speaking; the
+   * other is a lost packet, and `no-cache` leaves nothing to re-read, so the failure would
+   * govern the whole session until the user backgrounded the app and came back.
+   */
+  describe("a request that never arrived", () => {
+    const transportFailure = new Error("network request failed")
+
+    beforeEach(() => {
+      jest.useFakeTimers()
+      mockRefetch.mockResolvedValue({})
+    })
+
+    afterEach(() => {
+      jest.useRealTimers()
+    })
+
+    it("asks again instead of taking the failure for a verdict", () => {
+      renderRestrictions({ custodialRestrictions: null, queryError: transportFailure })
+
+      act(() => {
+        jest.advanceTimersByTime(1000)
+      })
+
+      expect(mockRefetch).toHaveBeenCalledTimes(1)
+    })
+
+    /** Gating on a lost packet is the latch; waiting is what a slow answer already gets. */
+    it("gates nothing while a retry is still owed", () => {
+      const { result } = renderRestrictions({
+        custodialRestrictions: null,
+        queryError: transportFailure,
+      })
+
+      expect(result.current.dollarBalance).toBe(false)
+      expect(result.current.transfer).toBe(false)
+      expect(result.current.isSettled).toBe(false)
+    })
+
+    it("takes the verdict a retry finally brings", () => {
+      const { result, rerender } = renderRestrictions({
+        custodialRestrictions: null,
+        queryError: transportFailure,
+      })
+
+      mockUseCustodialRestrictionsQuery.mockReturnValue({
+        data: { custodialRestrictions: { dollarBalance: false, transfer: true } },
+        loading: false,
+        error: undefined,
+        refetch: mockRefetch,
+      })
+      rerender(undefined)
+
+      expect(result.current).toEqual({
+        dollarBalance: false,
+        transfer: true,
+        isSettled: true,
+      })
+    })
+
+    /** Asking has stopped working, which is a determined absence of region rather than a
+     *  moment of one, so FAIL_CLOSED governs from here. */
+    it("gates every feature once the retries are spent", () => {
+      const { result } = renderRestrictions({
+        custodialRestrictions: null,
+        queryError: transportFailure,
+      })
+
+      /** One per commit: each retry is scheduled by the render that follows the last one,
+       *  and the delay doubles. */
+      act(() => {
+        jest.advanceTimersByTime(1000)
+      })
+      act(() => {
+        jest.advanceTimersByTime(2000)
+      })
+      act(() => {
+        jest.advanceTimersByTime(4000)
+      })
+      act(() => {
+        jest.advanceTimersByTime(60_000)
+      })
+
+      expect(mockRefetch).toHaveBeenCalledTimes(3)
+      expect(result.current).toEqual({
+        dollarBalance: true,
+        transfer: true,
+        isSettled: true,
+      })
+    })
+
+    /** Every mounted consumer runs this hook, so an unbacked-off retry would turn one
+     *  unreachable server into a burst of requests per screen. */
+    it("backs off rather than asking again at once", () => {
+      renderRestrictions({ custodialRestrictions: null, queryError: transportFailure })
+
+      act(() => {
+        jest.advanceTimersByTime(1000)
+      })
+      expect(mockRefetch).toHaveBeenCalledTimes(1)
+
+      act(() => {
+        jest.advanceTimersByTime(1000)
+      })
+      expect(mockRefetch).toHaveBeenCalledTimes(1)
+
+      act(() => {
+        jest.advanceTimersByTime(1000)
+      })
+      expect(mockRefetch).toHaveBeenCalledTimes(2)
+    })
+
+    /** The server answering "no verdict" is an answer, and the PRD gates on it. */
+    it("never asks again about a verdict the server actually served", () => {
+      const { result } = renderRestrictions({ custodialRestrictions: null })
+
+      act(() => {
+        jest.advanceTimersByTime(60_000)
+      })
+
+      expect(mockRefetch).not.toHaveBeenCalled()
+      expect(result.current).toEqual({
+        dollarBalance: true,
+        transfer: true,
+        isSettled: true,
+      })
     })
   })
 

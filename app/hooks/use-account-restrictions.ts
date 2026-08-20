@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react"
+
 import { CountryCode } from "libphonenumber-js/mobile"
 
 import { gql } from "@apollo/client"
@@ -54,6 +56,12 @@ const RESTRICTED_UNKNOWN_REGION: Restrictions = Object.freeze({
   dollarBalance: true,
   transfer: true,
 })
+
+/** A request that never arrived carries no verdict, but FAIL_CLOSED still has to govern
+ *  once asking has genuinely stopped working, so the retries are bounded rather than
+ *  endless. Backed off so a server that is down is not hammered by every mounted consumer. */
+const RESTRICTION_RETRY_LIMIT = 3
+const RESTRICTION_RETRY_BASE_DELAY_MS = 1000
 
 /**
  * Pure so the policy can be read without a render, and so both custody types answer to the
@@ -140,12 +148,43 @@ export const useAccountRestrictions = (
    * sources. It speaks only for a Blink account, so a session without one asks nothing.
    */
   const isQueryEnabled = !isSelfCustodial && isAuthed
-  const { data, loading: isQueryLoading } = useCustodialRestrictionsQuery({
+  const {
+    data,
+    loading: isQueryLoading,
+    error: queryError,
+    refetch,
+  } = useCustodialRestrictionsQuery({
     skip: !isQueryEnabled,
     /** The verdict follows the account's current standing, and the app re-asks on
      *  foreground, so a cached answer would outlive the session that earned it. */
     fetchPolicy: "no-cache",
   })
+
+  const [retryCount, setRetryCount] = useState(0)
+  const hasRetriesLeft = retryCount < RESTRICTION_RETRY_LIMIT
+
+  /**
+   * A dropped request and a served "no verdict" are not the same answer, and only the
+   * second one is the server speaking. Nothing else re-issues this query inside a session
+   * (`no-cache` leaves nothing to re-read, and the only refetch is on foreground), so
+   * without this a single lost request would hold its failure until the user backgrounded
+   * the app and came back.
+   */
+  useEffect(() => {
+    if (!queryError) {
+      setRetryCount(0)
+      return undefined
+    }
+    if (!hasRetriesLeft) return undefined
+    const timer = setTimeout(
+      () => {
+        setRetryCount((count) => count + 1)
+        refetch().catch(() => undefined)
+      },
+      RESTRICTION_RETRY_BASE_DELAY_MS * 2 ** retryCount,
+    )
+    return () => clearTimeout(timer)
+  }, [queryError, hasRetriesLeft, retryCount, refetch])
 
   /** A self-custodial wallet has no Blink account behind it, so no server verdict covers
    *  it and it keeps its own lists. */
@@ -171,6 +210,12 @@ export const useAccountRestrictions = (
   /** Held rather than judged while the answer is in flight: the surfaces read
    *  `isRegionPending` and wait, so this value is never shown. */
   if (isQueryLoading) return { ...UNRESTRICTED, isSettled: false }
+
+  /** Still being asked, so still unanswered: the surfaces wait exactly as they do for a
+   *  slow reply rather than being told the region is unknown. FAIL_CLOSED applies below,
+   *  once the retries are spent and asking has stopped working. */
+  const isRetryPending = Boolean(queryError) && hasRetriesLeft
+  if (isRetryPending) return { ...UNRESTRICTED, isSettled: false }
 
   const restrictions = data?.custodialRestrictions ?? RESTRICTED_UNKNOWN_REGION
 
