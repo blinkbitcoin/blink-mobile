@@ -5,6 +5,8 @@ import { act, render, fireEvent, waitFor, within } from "@testing-library/react-
 
 import { BtcMapPlace, BtcMapPlaceDetails } from "@app/btcmap"
 import { useBtcMapPlaceDetails } from "@app/btcmap/use-place-details"
+import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { PlaceSheet } from "@app/components/map-component/place-sheet"
 import { openExternalUrl } from "@app/utils/external"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
@@ -174,6 +176,21 @@ describe("PlaceSheet", () => {
     const peek = getByTestId("place-sheet-peek")
     expect(within(peek).getByText("Navigate")).toBeTruthy()
     expect(within(peek).getByText("Satoshi Coffee")).toBeTruthy()
+  })
+
+  it("presses the app's own buttons into service rather than restyling a Pressable", async () => {
+    // Navigate and Close are the shared primary and secondary buttons, so the
+    // pill radius, the on-primary title colour, the disabled and loading states
+    // and the press feedback all arrive from the theme. A local copy of any of
+    // that is a copy that drifts.
+    const tree = renderSheet()
+
+    await waitFor(() => expect(tree.getByText("Satoshi Coffee")).toBeTruthy())
+
+    // eslint-disable-next-line camelcase -- testing-library exposes this verbatim
+    expect(tree.UNSAFE_getByType(GaloyPrimaryButton).props.title).toBe("Navigate")
+    // eslint-disable-next-line camelcase -- testing-library exposes this verbatim
+    expect(tree.UNSAFE_getByType(GaloySecondaryButton).props.title).toBe("Close")
   })
 
   it("stays off screen until the peek has been measured, rather than guessing", async () => {

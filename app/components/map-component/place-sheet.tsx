@@ -48,6 +48,8 @@ import {
 } from "@app/btcmap"
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 import { GaloyInfo } from "@app/components/atomic/galoy-info"
+import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { recordAppError, toError } from "@app/utils/error-reporting"
 import { openExternalUrl } from "@app/utils/external"
@@ -383,13 +385,7 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
                 </Pressable>
               </View>
 
-              <Pressable
-                style={styles.navigate}
-                onPress={navigate}
-                accessibilityRole="button"
-              >
-                <Text style={styles.navigateText}>{LL.MapScreen.navigate()}</Text>
-              </Pressable>
+              <GaloyPrimaryButton title={LL.MapScreen.navigate()} onPress={navigate} />
 
               {/* Sits with the header rather than down among the contact rows:
                   "you cannot pay here with this wallet" is worth knowing before
@@ -530,14 +526,12 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
               {/* Dragging the sheet down closes it, but that is a gesture you
                   have to know about. This is the same thing, spelled out, and
                   it is the last thing you reach going down the detail. */}
-              <Pressable
+              <GaloySecondaryButton
                 testID="close-place-sheet"
-                style={styles.close}
+                title={LL.common.close()}
                 onPress={onClose}
-                accessibilityRole="button"
-              >
-                <Text style={styles.closeText}>{LL.common.close()}</Text>
-              </Pressable>
+                containerStyle={styles.close}
+              />
             </Animated.ScrollView>
           </Animated.View>
         </GestureDetector>
@@ -606,20 +600,6 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: StyleProps) => ({
     flex: 1,
     height: 22,
     borderRadius: 4,
-  },
-  // The one thing most people open this sheet to do, so it gets the width and
-  // the accent rather than sharing a row of small icons.
-  navigate: {
-    backgroundColor: colors.primary,
-    borderRadius: 28,
-    minHeight: 56,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  navigateText: {
-    fontSize: 17,
-    fontWeight: "700",
-    color: colors.white,
   },
   requiresAppLink: {
     // Restated rather than inherited: the themed Text falls back to black, not
@@ -735,13 +715,5 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: StyleProps) => ({
   close: {
     // Pushed to the foot of the scroll area by whatever space is left over.
     marginTop: "auto",
-    alignItems: "center",
-    justifyContent: "center",
-    minHeight: 48,
-  },
-  closeText: {
-    fontSize: 17,
-    fontWeight: "700",
-    color: colors.primary,
   },
 }))
