@@ -5,7 +5,10 @@ import { render } from "@testing-library/react-native"
 
 import { PhoneCodeChannelType } from "@app/graphql/generated"
 import { PhoneRegistrationInitiateScreen } from "@app/screens/phone-auth-screen/phone-registration-input"
-import { RequestPhoneCodeStatus } from "@app/screens/phone-auth-screen/request-phone-code-registration"
+import {
+  RequestPhoneCodeStatus,
+  type UseRequestPhoneCodeReturn,
+} from "@app/screens/phone-auth-screen/request-phone-code-registration"
 
 import { flushEffects } from "../../helpers/flush-effects"
 import { ContextForScreen } from "../helper"
@@ -25,7 +28,10 @@ jest.mock("@app/hooks/use-device-location", () => ({
   default: () => ({ countryCode: undefined, loading: false }),
 }))
 
-const mockRequestPhoneCodeRegistration = jest.fn()
+/** Typed against the hook's own return contract, so renaming a field the screen reads
+ *  fails here at compile time instead of leaving these tests green over a screen that
+ *  silently falls back to its defaults. */
+const mockRequestPhoneCodeRegistration: jest.Mock<UseRequestPhoneCodeReturn> = jest.fn()
 jest.mock("@app/screens/phone-auth-screen/request-phone-code-registration", () => ({
   ...jest.requireActual("@app/screens/phone-auth-screen/request-phone-code-registration"),
   useRequestPhoneCodeRegistration: () => mockRequestPhoneCodeRegistration(),
@@ -77,11 +83,13 @@ describe("PhoneRegistrationInitiateScreen", () => {
   })
 
   it("renders both halves of the phone row", async () => {
-    // eslint-disable-next-line camelcase -- testing-library exposes this API verbatim
-    const { UNSAFE_getByType } = await renderScreen()
+    const { getByTestId } = await renderScreen()
 
+    /** Reached by the same test id as the login screen's field. Querying the rn-vui
+     *  component type instead would break on any upgrade that re-wraps `Input`, and would
+     *  leave the field unreachable from e2e and accessibility tooling. */
     expect(mockCountryCodePicker).toHaveBeenCalled()
-    expect(UNSAFE_getByType(ThemedInput)).toBeTruthy()
+    expect(getByTestId("telephoneNumber")).toBeTruthy()
   })
 
   it("leaves the row's free space to the phone field, not to the country button", async () => {

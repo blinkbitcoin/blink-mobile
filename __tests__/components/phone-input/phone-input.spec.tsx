@@ -82,12 +82,15 @@ describe("PhoneInput", () => {
     )
 
     /** The phone auth screens each grew their own copy of this button and ended up with
-     *  two halves fighting over the row, which left the number unreadably narrow. Exactly
-     *  one of them may grow, and here it is the field. */
+     *  two halves fighting over the row, which left the number unreadably narrow. This
+     *  copy never had the defect, so the test guards it forward rather than proving a
+     *  fix: exactly one of the two may grow, and here it is the field. */
     const [props] = mockCountryCodePicker.mock.calls.at(-1) ?? []
     const button = StyleSheet.flatten(props.buttonStyle as StyleProp<ViewStyle>)
     expect(button.flex).toBeUndefined()
     expect(button.flexGrow).toBeUndefined()
+    expect(button.width).toBeUndefined()
+    expect(button.flexBasis).toBeUndefined()
 
     const field = StyleSheet.flatten(UNSAFE_getByType(ThemedInput).props.containerStyle)
     expect(field.flex).toBe(1)

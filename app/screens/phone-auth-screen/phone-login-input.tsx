@@ -56,8 +56,9 @@ const useStyles = makeStyles(({ colors }) => ({
   codeTextStyle: {},
   /** No `flex` here on purpose: the phone field beside it already takes the row's free
    *  space, so growing this button too would split the row in half and leave the number
-   *  too narrow to read. The width follows the flag and the calling code, and `minWidth`
-   *  only keeps it from twitching between a "+1" and a "+503". */
+   *  too narrow to read. A flag and a calling code come to a little under `minWidth` at
+   *  the default text size, so in practice the floor is the width, and what it buys is a
+   *  button that does not twitch between a "+1" and a "+503". */
   countryPickerButtonStyle: {
     minWidth: 110,
     borderColor: colors.primary5,

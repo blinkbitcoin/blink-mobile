@@ -8,7 +8,10 @@ import { PhoneCodeChannelType } from "@app/graphql/generated"
 import type { PhoneValidationStackParamList } from "@app/navigation/stack-param-lists"
 import { PhoneLoginInitiateType } from "@app/screens/phone-auth-screen/phone-login-initiate-type"
 import { PhoneLoginInitiateScreen } from "@app/screens/phone-auth-screen/phone-login-input"
-import { RequestPhoneCodeStatus } from "@app/screens/phone-auth-screen/request-phone-code-login"
+import {
+  RequestPhoneCodeStatus,
+  type UseRequestPhoneCodeReturn,
+} from "@app/screens/phone-auth-screen/request-phone-code-login"
 
 import { flushEffects } from "../../helpers/flush-effects"
 import { ContextForScreen } from "../helper"
@@ -34,7 +37,10 @@ jest.mock("@app/hooks/use-device-location", () => ({
   default: () => ({ countryCode: undefined, loading: false }),
 }))
 
-const mockRequestPhoneCodeLogin = jest.fn()
+/** Typed against the hook's own return contract, so renaming a field the screen reads
+ *  fails here at compile time instead of leaving these tests green over a screen that
+ *  silently falls back to its defaults. */
+const mockRequestPhoneCodeLogin: jest.Mock<UseRequestPhoneCodeReturn> = jest.fn()
 jest.mock("@app/screens/phone-auth-screen/request-phone-code-login", () => ({
   ...jest.requireActual("@app/screens/phone-auth-screen/request-phone-code-login"),
   useRequestPhoneCodeLogin: () => mockRequestPhoneCodeLogin(),
