@@ -78,17 +78,12 @@ export const useCompleteBackup = () => {
           toastShow({ message: LL.errors.generic(), LL })
           return
         }
-        /** Commit the mode-screen checkpoint before navigating, so an interruption there
-         *  resumes on the mode screen (the choice is still captured) without re-running the
-         *  backup. A failed write stops here so that resume promise holds; the screen stays
-         *  and a retry re-runs it. */
-        const isCheckpointSaved = await saveCheckpoint(
-          MigrationCheckpoint.ChooseExperience,
-        )
-        if (!isCheckpointSaved) {
-          toastShow({ message: LL.errors.generic(), LL })
-          return
-        }
+        /** Recorded so the stored step matches where the user actually stands, but never
+         *  gated on: the mode screen is not a commit point, so a resume routes to the
+         *  explainer whether or not this write lands. Blocking would only strand a user who
+         *  just finished their backup on a screen with nothing left to do. */
+        await saveCheckpoint(MigrationCheckpoint.ChooseExperience)
+
         navigation.navigate("selfCustodialChooseExperience", {
           onContinue: {
             route: ChooseExperienceContinueRoute.BalancesOverview,

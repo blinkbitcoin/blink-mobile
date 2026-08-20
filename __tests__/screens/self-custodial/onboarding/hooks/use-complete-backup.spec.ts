@@ -86,20 +86,23 @@ describe("useCompleteBackup", () => {
     })
   })
 
-  it("stops before the mode screen and toasts when the checkpoint write fails", async () => {
+  /** The mode screen is not a commit point, so a resume routes to the explainer with or
+   *  without this checkpoint. Blocking on the write would buy no resume behaviour and would
+   *  strand a user who just finished their backup on a screen with nothing left to do. */
+  it("continues to the mode screen when the checkpoint write fails", async () => {
     mockSaveCheckpoint.mockResolvedValueOnce(false)
 
     const { result } = renderHook(() => useCompleteBackup())
 
     await result.current({ method: "manual" })
 
-    expect(mockToastShow).toHaveBeenCalledWith(
-      expect.objectContaining({ message: "generic error" }),
-    )
-    expect(mockNavigate).not.toHaveBeenCalledWith(
-      "selfCustodialChooseExperience",
-      expect.anything(),
-    )
+    expect(mockToastShow).not.toHaveBeenCalled()
+    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialChooseExperience", {
+      onContinue: {
+        route: "accountMigrationBalancesOverview",
+        accountId: "migration-uuid",
+      },
+    })
   })
 
   it("marks the active self-custodial account on a standalone backup (no migration)", () => {
