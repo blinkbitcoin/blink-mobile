@@ -34,8 +34,14 @@ jest.mock("@app/self-custodial/hooks/use-self-custodial-account-mode", () => ({
 
 const sdk = { id: "sdk" }
 let mockSdk: typeof sdk | null = sdk
+/** The account the connected SDK signs as, which the switch window makes differ from the
+ *  active one. */
+let mockConnectedAccountId: string | null = "sc-1"
 jest.mock("@app/self-custodial/providers/wallet", () => ({
-  useSelfCustodialWallet: () => ({ sdk: mockSdk }),
+  useSelfCustodialWallet: () => ({
+    sdk: mockSdk,
+    connectedAccountId: mockConnectedAccountId,
+  }),
 }))
 
 /** The host of the self-custodial address, which is the LNURL server. */
@@ -61,6 +67,7 @@ describe("useAccountModeSync", () => {
     jest.clearAllMocks()
     mockAccountMode = AccountMode.Enhanced
     mockSdk = sdk
+    mockConnectedAccountId = "sc-1"
     mockPersistentState = {
       schemaVersion: 20,
       galoyInstance: { id: "Main" },
@@ -272,6 +279,85 @@ describe("useAccountModeSync", () => {
     await Promise.resolve()
 
     expect(mockRecoverLnurlServerMode).not.toHaveBeenCalled()
+  })
+
+  /**
+   * The provider tears down its SDK in an effect cleanup, which runs after the effects of
+   * its descendants. So for one commit on every account switch this hook sees the incoming
+   * account id beside the outgoing account's connection, and both effects would act on the
+   * wrong pairing: signing as the old account while filing the answer under the new one.
+   */
+  describe("the commit where the account switches", () => {
+    const switchToAccountWithOldConnection = () => {
+      mockPersistentState = {
+        ...mockPersistentState,
+        activeAccountId: "sc-2",
+      }
+      mockConnectedAccountId = "sc-1"
+    }
+
+    it("pushes nothing while the connection still belongs to the previous account", async () => {
+      mockAccountMode = AccountMode.Anon
+      switchToAccountWithOldConnection()
+
+      renderHook(() => useAccountModeSync())
+      await Promise.resolve()
+
+      expect(mockSetLnurlServerMode).not.toHaveBeenCalled()
+    })
+
+    /** The confirmation is what stops the next launch from pushing again, so recording it
+     *  against an account that was never pushed would silence that account for good. */
+    it("records no confirmation against the account it did not push", async () => {
+      mockAccountMode = AccountMode.Anon
+      switchToAccountWithOldConnection()
+
+      renderHook(() => useAccountModeSync())
+      await Promise.resolve()
+
+      expect(mockUpdateState).not.toHaveBeenCalled()
+    })
+
+    it("asks the server nothing while the connection belongs to the previous account", async () => {
+      mockAccountMode = null
+      switchToAccountWithOldConnection()
+
+      renderHook(() => useAccountModeSync())
+      await Promise.resolve()
+
+      expect(mockRecoverLnurlServerMode).not.toHaveBeenCalled()
+      expect(mockUpdateState).not.toHaveBeenCalled()
+    })
+
+    it("pushes once the connection catches up with the active account", async () => {
+      mockAccountMode = AccountMode.Anon
+      switchToAccountWithOldConnection()
+
+      const { rerender } = renderHook(() => useAccountModeSync())
+      await Promise.resolve()
+      expect(mockSetLnurlServerMode).not.toHaveBeenCalled()
+
+      mockConnectedAccountId = "sc-2"
+      rerender(undefined)
+
+      await waitFor(() =>
+        expect(mockSetLnurlServerMode).toHaveBeenCalledWith({
+          sdk,
+          serverUrl: SERVER_URL,
+          mode: AccountMode.Anon,
+        }),
+      )
+    })
+
+    /** A connection that names no account cannot be shown to be the active one's. */
+    it("stays quiet while the connection names no account", async () => {
+      mockConnectedAccountId = null
+
+      renderHook(() => useAccountModeSync())
+      await Promise.resolve()
+
+      expect(mockSetLnurlServerMode).not.toHaveBeenCalled()
+    })
   })
 
   it("pushes once rather than on every render", async () => {

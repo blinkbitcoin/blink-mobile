@@ -32,17 +32,29 @@ import { useSparkNetwork } from "./use-spark-network"
 export const useAccountModeSync = (): void => {
   const { accountMode } = useSelfCustodialAccountMode()
   const { persistentState, updateState } = usePersistentStateContext()
-  const { sdk } = useSelfCustodialWallet()
+  const { sdk, connectedAccountId } = useSelfCustodialWallet()
   const lnurlServerUrl = lnurlServerUrlFor(useSparkNetwork())
 
   const activeAccountId = resolveActiveSelfCustodialId(persistentState)
   const serverMode = activeAccountId
     ? getSelfCustodialServerAccountMode(persistentState, activeAccountId)
     : null
-  const isPushDue = Boolean(accountMode) && accountMode !== serverMode
+  /**
+   * The SDK signs as whichever account it connected for, while the mode and the record are
+   * read from persistent state. Those two disagree for a commit on every account switch,
+   * since the provider's teardown runs after this hook's effects: acting then would sign as
+   * the previous account, push its Lightning Address away, and file the confirmation under
+   * the new one, which would then never be pushed at all. Neither effect is due until the
+   * connection and the active account are the same account.
+   */
+  const isSdkOnActiveAccount =
+    Boolean(activeAccountId) && connectedAccountId === activeAccountId
+
+  const isPushDue =
+    isSdkOnActiveAccount && Boolean(accountMode) && accountMode !== serverMode
   /** An account that has never held a mode, whatever the reason: created before the modes
    *  existed, or provisioned on another device. */
-  const isResolveDue = Boolean(activeAccountId) && !accountMode
+  const isResolveDue = isSdkOnActiveAccount && !accountMode
 
   useEffect(() => {
     if (!sdk || !isResolveDue || !activeAccountId) return
