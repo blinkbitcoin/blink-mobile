@@ -10,9 +10,18 @@ type UseDollarBalanceRestrictionGuardOptions = {
   enabled?: boolean
 }
 
+export type DollarBalanceRestrictionGuard = {
+  /** A resolved refusal. The guard is already resetting to Primary, so the caller renders
+   *  nothing rather than flash a screen the user is being taken off. */
+  isRestricted: boolean
+  /** The verdict has not landed yet. Kept apart from the refusal because the two owe the
+   *  user different things: a refusal owes them nothing, a wait owes them a loader. */
+  isRegionPending: boolean
+}
+
 export const useDollarBalanceRestrictionGuard = ({
   enabled = true,
-}: UseDollarBalanceRestrictionGuardOptions = {}): boolean => {
+}: UseDollarBalanceRestrictionGuardOptions = {}): DollarBalanceRestrictionGuard => {
   const { isRestricted, isRegionPending } = useDollarBalanceRestriction()
   const navigation = useNavigation()
 
@@ -23,8 +32,8 @@ export const useDollarBalanceRestrictionGuard = ({
     navigation.dispatch(CommonActions.reset({ index: 0, routes: [{ name: "Primary" }] }))
   }, [shouldLeaveScreen, navigation])
 
-  /** The screen also hides while the region resolves, so a user who lands here on a cold
-   *  start cannot act on it before the verdict arrives; only a resolved restriction
-   *  bounces them out. */
-  return enabled && (isRestricted || isRegionPending)
+  return {
+    isRestricted: shouldLeaveScreen,
+    isRegionPending: enabled && isRegionPending,
+  }
 }

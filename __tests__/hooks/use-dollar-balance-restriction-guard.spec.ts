@@ -27,12 +27,12 @@ describe("useDollarBalanceRestrictionGuard", () => {
     jest.clearAllMocks()
   })
 
-  it("returns false and does not dispatch when not restricted", () => {
+  it("reports neither a restriction nor a wait when the region allows the screen", () => {
     mockUseDollarBalanceRestriction.mockReturnValue(UNRESTRICTED)
 
     const { result } = renderHook(() => useDollarBalanceRestrictionGuard())
 
-    expect(result.current).toBe(false)
+    expect(result.current).toEqual({ isRestricted: false, isRegionPending: false })
     expect(mockDispatch).not.toHaveBeenCalled()
     expect(mockReset).not.toHaveBeenCalled()
   })
@@ -42,7 +42,7 @@ describe("useDollarBalanceRestrictionGuard", () => {
 
     const { result } = renderHook(() => useDollarBalanceRestrictionGuard())
 
-    expect(result.current).toBe(true)
+    expect(result.current).toEqual({ isRestricted: true, isRegionPending: false })
     expect(mockReset).toHaveBeenCalledWith({
       index: 0,
       routes: [{ name: "Primary" }],
@@ -50,12 +50,14 @@ describe("useDollarBalanceRestrictionGuard", () => {
     expect(mockDispatch).toHaveBeenCalledWith(mockResetAction)
   })
 
-  it("hides the screen but never bounces while the region is still resolving", () => {
+  /** Kept apart from the restriction so the caller can render a loader for the wait: a
+   *  screen that reads them as one boolean shows a blank area instead. */
+  it("reports a wait, not a restriction, while the region is still resolving", () => {
     mockUseDollarBalanceRestriction.mockReturnValue(REGION_PENDING)
 
     const { result } = renderHook(() => useDollarBalanceRestrictionGuard())
 
-    expect(result.current).toBe(true)
+    expect(result.current).toEqual({ isRestricted: false, isRegionPending: true })
     expect(mockDispatch).not.toHaveBeenCalled()
   })
 
@@ -78,7 +80,7 @@ describe("useDollarBalanceRestrictionGuard", () => {
     mockUseDollarBalanceRestriction.mockReturnValue(UNRESTRICTED)
     rerender({})
 
-    expect(result.current).toBe(false)
+    expect(result.current).toEqual({ isRestricted: false, isRegionPending: false })
     expect(mockDispatch).not.toHaveBeenCalled()
   })
 
@@ -112,7 +114,7 @@ describe("useDollarBalanceRestrictionGuard", () => {
       useDollarBalanceRestrictionGuard({ enabled: false }),
     )
 
-    expect(result.current).toBe(false)
+    expect(result.current).toEqual({ isRestricted: false, isRegionPending: false })
     expect(mockDispatch).not.toHaveBeenCalled()
   })
 
@@ -123,7 +125,7 @@ describe("useDollarBalanceRestrictionGuard", () => {
       useDollarBalanceRestrictionGuard({ enabled: false }),
     )
 
-    expect(result.current).toBe(false)
+    expect(result.current).toEqual({ isRestricted: false, isRegionPending: false })
     expect(mockDispatch).not.toHaveBeenCalled()
   })
 })

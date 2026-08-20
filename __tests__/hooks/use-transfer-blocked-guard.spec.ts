@@ -32,7 +32,7 @@ describe("useTransferBlockedGuard", () => {
 
     const { result } = renderHook(() => useTransferBlockedGuard())
 
-    expect(result.current).toBe(false)
+    expect(result.current).toEqual({ isBlocked: false, isRegionPending: false })
     expect(mockDispatch).not.toHaveBeenCalled()
     expect(mockReset).not.toHaveBeenCalled()
   })
@@ -42,17 +42,17 @@ describe("useTransferBlockedGuard", () => {
 
     const { result } = renderHook(() => useTransferBlockedGuard())
 
-    expect(result.current).toBe(true)
+    expect(result.current).toEqual({ isBlocked: true, isRegionPending: false })
     expect(mockReset).toHaveBeenCalledWith({ index: 0, routes: [{ name: "Primary" }] })
     expect(mockDispatch).toHaveBeenCalledWith(mockResetAction)
   })
 
-  it("hides the screen but never bounces while the region is still resolving", () => {
+  it("reports a wait, not a block, while the region is still resolving", () => {
     mockUseTransferBlock.mockReturnValue(REGION_PENDING)
 
     const { result } = renderHook(() => useTransferBlockedGuard())
 
-    expect(result.current).toBe(true)
+    expect(result.current).toEqual({ isBlocked: false, isRegionPending: true })
     expect(mockDispatch).not.toHaveBeenCalled()
   })
 
@@ -75,7 +75,7 @@ describe("useTransferBlockedGuard", () => {
     mockUseTransferBlock.mockReturnValue(NOT_BLOCKED)
     rerender({})
 
-    expect(result.current).toBe(false)
+    expect(result.current).toEqual({ isBlocked: false, isRegionPending: false })
     expect(mockDispatch).not.toHaveBeenCalled()
   })
 
@@ -107,7 +107,7 @@ describe("useTransferBlockedGuard", () => {
 
     const { result } = renderHook(() => useTransferBlockedGuard({ enabled: false }))
 
-    expect(result.current).toBe(false)
+    expect(result.current).toEqual({ isBlocked: false, isRegionPending: false })
     expect(mockDispatch).not.toHaveBeenCalled()
   })
 
@@ -116,7 +116,7 @@ describe("useTransferBlockedGuard", () => {
 
     const { result } = renderHook(() => useTransferBlockedGuard({ enabled: false }))
 
-    expect(result.current).toBe(false)
+    expect(result.current).toEqual({ isBlocked: false, isRegionPending: false })
     expect(mockDispatch).not.toHaveBeenCalled()
   })
 })

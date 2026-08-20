@@ -10,9 +10,18 @@ type UseTransferBlockedGuardOptions = {
   enabled?: boolean
 }
 
+export type TransferBlockedGuard = {
+  /** A resolved block. The guard is already resetting to Primary, so the caller renders
+   *  nothing rather than flash a screen the user is being taken off. */
+  isBlocked: boolean
+  /** The verdict has not landed yet. Kept apart from the block because the two owe the
+   *  user different things: a block owes them nothing, a wait owes them a loader. */
+  isRegionPending: boolean
+}
+
 export const useTransferBlockedGuard = ({
   enabled = true,
-}: UseTransferBlockedGuardOptions = {}): boolean => {
+}: UseTransferBlockedGuardOptions = {}): TransferBlockedGuard => {
   const { isBlocked, isRegionPending } = useTransferBlock()
   const navigation = useNavigation()
 
@@ -23,8 +32,8 @@ export const useTransferBlockedGuard = ({
     navigation.dispatch(CommonActions.reset({ index: 0, routes: [{ name: "Primary" }] }))
   }, [shouldLeaveScreen, navigation])
 
-  /** The screen also hides while the region resolves, so a user who lands here on a cold
-   *  start cannot act on it before the verdict arrives; only a resolved block bounces
-   *  them out. */
-  return enabled && (isBlocked || isRegionPending)
+  return {
+    isBlocked: shouldLeaveScreen,
+    isRegionPending: enabled && isRegionPending,
+  }
 }
