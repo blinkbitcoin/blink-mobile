@@ -36,6 +36,12 @@ type Props = {
   categories: ReadonlySet<PlaceCategory>
   onSelect: (place: BtcMapNamedPlace) => void
   onClose: () => void
+  /**
+   * Fired once the modal has actually finished dismissing — iOS only, which is
+   * the one platform that needs to know: presenting another modal any earlier
+   * is silently dropped there.
+   */
+  onDismiss?: () => void
 }
 
 /**
@@ -59,6 +65,7 @@ export const PlaceSearchModal: React.FC<Props> = ({
   categories,
   onSelect,
   onClose,
+  onDismiss,
 }) => {
   const {
     theme: { colors },
@@ -171,6 +178,7 @@ export const PlaceSearchModal: React.FC<Props> = ({
       // before the window it lives in is attached, and the keyboard never comes
       // up. Focusing once the window is actually on screen does work.
       onShow={() => inputRef.current?.focus()}
+      onDismiss={onDismiss}
     >
       <View style={styles.screen}>
         <View style={styles.field}>

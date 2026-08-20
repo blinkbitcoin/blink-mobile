@@ -255,7 +255,32 @@ describe("MapComponent search", () => {
 
     // Closed, so the map it just flew to is what the user is left looking at.
     await waitFor(() => expect(capturedSearchProps?.isVisible).toBe(false))
-    expect((capturedSheetProps?.place as BtcMapPlace)?.id).toBe(7)
+
+    // But no sheet yet: both are native modals, and iOS silently drops one
+    // presented while the other is still dismissing. (The test environment is
+    // iOS; Android skips the wait, since its dialogs do not collide.)
+    expect(capturedSheetProps?.place).toBeNull()
+
+    act(() => {
+      ;(capturedSearchProps?.onDismiss as () => void)()
+    })
+
+    await waitFor(() => expect((capturedSheetProps?.place as BtcMapPlace)?.id).toBe(7))
+  })
+
+  it("does not open a sheet when the search is dismissed without a pick", async () => {
+    const { getByTestId } = renderMap()
+
+    await waitFor(() => expect(capturedSearchProps).toBeDefined())
+    fireEvent.press(getByTestId("open-place-search"))
+
+    act(() => {
+      ;(capturedSearchProps?.onClose as () => void)()
+      ;(capturedSearchProps?.onDismiss as () => void)()
+    })
+
+    await waitFor(() => expect(capturedSearchProps?.isVisible).toBe(false))
+    expect(capturedSheetProps?.place).toBeNull()
   })
 })
 

@@ -103,7 +103,10 @@ const isIdentifiedPlace = (value: unknown): value is IdentifiedPlaceWire => {
   )
 }
 
-const isRenderablePlace = (value: unknown): value is RenderablePlaceWire =>
+// Narrows by intersection rather than replacement, so a wire that carries more
+// than the renderable fields — the search wire, with its names and addresses —
+// keeps them through a `filter`.
+const isRenderablePlace = <T>(value: T): value is T & RenderablePlaceWire =>
   isIdentifiedPlace(value) &&
   (value.deleted_at === undefined || value.deleted_at === null) &&
   isCoordinate(value.lat, -90, 90) &&
