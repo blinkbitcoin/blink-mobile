@@ -73,7 +73,7 @@ import {
 } from "@app/self-custodial/hooks"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { ConvertDirection, DepositStatus } from "@app/types/payment"
-import { useBackupNudgeState } from "@app/hooks/use-backup-nudge-state"
+import { useBackupNudgeState } from "@app/self-custodial/hooks/use-backup-nudge-state"
 import { useSelfCustodialInfoBulletinState } from "@app/hooks/use-self-custodial-info-bulletin-state"
 import { getErrorMessages } from "@app/graphql/utils"
 import { getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
@@ -234,7 +234,8 @@ export const HomeScreen: React.FC = () => {
   const hasMultipleAccounts = accounts.length > 1
   const { stableBalanceEnabled } = useFeatureFlags()
   const { mode: balanceMode, toggleMode: toggleBalanceMode } = useBalanceMode()
-  const { shouldShowBanner, shouldShowModal, dismissBanner } = useBackupNudgeState()
+  const { shouldShowBanner, shouldShowModal, dismissBanner, dismissModal } =
+    useBackupNudgeState()
   const {
     shouldShow: shouldShowSelfCustodialInfoBulletin,
     dismiss: dismissSelfCustodialInfoBulletin,
@@ -940,10 +941,7 @@ export const HomeScreen: React.FC = () => {
         bottomOffset={15}
         onAction={() => navigation.navigate("transactionHistory")}
       />
-      <BackupNudgeModal
-        isVisible={shouldShowModal && isFocused}
-        onClose={dismissBanner}
-      />
+      <BackupNudgeModal isVisible={shouldShowModal && isFocused} onClose={dismissModal} />
     </Screen>
   )
 }

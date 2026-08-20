@@ -10,8 +10,19 @@ import {
   DisplayCurrency,
 } from "@app/types/amounts"
 
+type TotalBalanceOptions = {
+  /**
+   * Zeroing a restricted dollar balance is a display rule: the funds are still
+   * on the account, we just may not show them. Callers that measure what is at
+   * stake rather than what to render — the backup nudge, for one — pass false so
+   * a restricted user's stable-token holdings still count.
+   */
+  applyDollarRestriction?: boolean
+}
+
 export const useTotalBalance = (
   wallets?: readonly WalletBalance[],
+  { applyDollarRestriction = true }: TotalBalanceOptions = {},
 ): {
   formattedBalance: string
   numericBalance: number
@@ -20,7 +31,7 @@ export const useTotalBalance = (
 } => {
   const { formatMoneyAmount } = useDisplayCurrency()
   const { convertMoneyAmount } = usePriceConversion()
-  const isDollarBalanceRestricted = useDollarBalanceRestricted()
+  const isDollarBalanceRestricted = useDollarBalanceRestricted() && applyDollarRestriction
 
   // TODO: check that there are 2 wallets.
   // otherwise fail (account with more/less 2 wallets will not be working with the current mobile app)
