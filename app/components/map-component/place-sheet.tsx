@@ -25,7 +25,6 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
-import MaterialIcon from "react-native-vector-icons/MaterialIcons"
 
 import {
   BtcMapPlace,
@@ -38,7 +37,6 @@ import {
   isBoosted,
   isWebUrl,
   mailtoUrl,
-  materialIconName,
   merchantUrl,
   openingStateAt,
   sharesClockWith,
@@ -55,8 +53,6 @@ import { recordAppError, toError } from "@app/utils/error-reporting"
 import { openExternalUrl } from "@app/utils/external"
 import { toastShow } from "@app/utils/toast"
 import { Skeleton, Text, makeStyles, useTheme } from "@rn-vui/themed"
-
-import { usePinColor } from "./pin-shape"
 
 const REFRESH_INTERVAL_MS = 60_000
 const SCRIM_COLOR = "rgba(0, 0, 0, 0.4)"
@@ -244,7 +240,7 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
   )
 
   const boosted = isBoosted(details?.boostedUntil ?? shown?.boostedUntil, now)
-  const styles = useStyles({ bottomInset: insets.bottom, accent: usePinColor(boosted) })
+  const styles = useStyles({ bottomInset: insets.bottom })
 
   if (!shown) return null
 
@@ -291,7 +287,7 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
       disabled={!onPress}
       accessibilityRole={onPress ? "link" : "text"}
     >
-      <GaloyIcon name={icon} size={16} color={colors.grey1} />
+      <GaloyIcon name={icon} size={16} color={onPress ? colors.primary : colors.grey1} />
       <Text style={onPress ? styles.rowLink : styles.rowText}>{text}</Text>
     </Pressable>
   )
@@ -361,14 +357,6 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
               onLayout={(event) => setPeekHeight(event.nativeEvent.layout.height)}
             >
               <View style={styles.header}>
-                <View style={styles.avatar}>
-                  <MaterialIcon
-                    name={materialIconName(shown.icon)}
-                    size={22}
-                    color={colors._white}
-                  />
-                </View>
-
                 {isLoading && !details ? (
                   <Skeleton animation="pulse" style={styles.nameSkeleton} />
                 ) : (
@@ -547,9 +535,9 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
   )
 }
 
-type StyleProps = { bottomInset: number; accent: string }
+type StyleProps = { bottomInset: number }
 
-const useStyles = makeStyles(({ colors }, { bottomInset, accent }: StyleProps) => ({
+const useStyles = makeStyles(({ colors }, { bottomInset }: StyleProps) => ({
   root: {
     flex: 1,
     justifyContent: "flex-end",
@@ -593,14 +581,6 @@ const useStyles = makeStyles(({ colors }, { bottomInset, accent }: StyleProps) =
     flexDirection: "row",
     alignItems: "center",
     columnGap: 12,
-  },
-  avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 10,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: accent,
   },
   name: {
     flex: 1,
