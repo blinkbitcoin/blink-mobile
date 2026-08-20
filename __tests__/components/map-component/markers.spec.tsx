@@ -270,8 +270,12 @@ describe("PlaceMarker", () => {
 })
 
 describe("PlaceLabelMarker", () => {
-  it("hangs the name from the same coordinate, just under the tip", () => {
-    expect(LABEL_ANCHOR).toEqual({ x: 0.5, y: 0 })
+  it("stands the name beside the pin, anchored by a corner a name cannot move", () => {
+    // Bottom-left, not centred: the view's width follows its text, and only a
+    // corner the growth runs away from stays put for every name. Centring it
+    // would also put the name back under the tip, which is the placement that
+    // made two pins a thumb apart collide — see marker-layout.ts.
+    expect(LABEL_ANCHOR).toEqual({ x: 0, y: 1 })
 
     const tree = render(
       withTheme(

@@ -7,9 +7,12 @@ import { Text, makeStyles } from "@rn-vui/themed"
 
 import {
   LABEL_ANCHOR,
-  LABEL_GAP,
+  LABEL_BASELINE_DROP,
+  LABEL_FONT_SIZE,
+  LABEL_HALO_PADDING,
   LABEL_LINE_HEIGHT,
   LABEL_MAX_WIDTH,
+  LABEL_OFFSET_X,
 } from "./marker-layout"
 import { useMarkerSettle } from "./use-marker-settle"
 
@@ -20,7 +23,7 @@ type Props = {
 }
 
 /**
- * The merchant's name, as its own marker hanging under the pin's tip.
+ * The merchant's name, as its own marker standing beside the pin.
  *
  * Names are not in the offline snapshot; they arrive from a viewport request
  * some time after the pins have drawn. Giving them their own marker means that
@@ -30,6 +33,12 @@ type Props = {
  *
  * It is still tappable, so reaching for the name opens the place rather than
  * doing nothing.
+ *
+ * Whether a name is drawn at all is not decided here: `placeLabels` runs the
+ * collision pass over the whole viewport and the map only mounts the winners.
+ * Nothing in this view may move the text away from where that pass expects it,
+ * or the boxes it reserved stop describing the pixels — see `marker-layout.ts`
+ * for the offsets both sides read.
  */
 export const PlaceLabelMarker: React.FC<Props> = React.memo(
   ({ place, name, onPress }) => {
@@ -68,18 +77,25 @@ export const PlaceLabelMarker: React.FC<Props> = React.memo(
 PlaceLabelMarker.displayName = "PlaceLabelMarker"
 
 const useStyles = makeStyles(({ colors }) => ({
+  // Padding rather than a shift of the anchor: the view's bottom-left corner is
+  // what sits on the coordinate, so growing it up and to the right leaves that
+  // corner — and therefore the anchor — where it is for every name.
   labelRow: {
-    height: LABEL_LINE_HEIGHT,
-    marginTop: LABEL_GAP,
-    maxWidth: LABEL_MAX_WIDTH,
-    overflow: "hidden",
+    paddingLeft: LABEL_OFFSET_X,
+    paddingBottom: LABEL_BASELINE_DROP,
+    paddingTop: LABEL_HALO_PADDING,
+    paddingRight: LABEL_HALO_PADDING,
   },
   label: {
-    fontSize: 11,
+    height: LABEL_LINE_HEIGHT,
+    maxWidth: LABEL_MAX_WIDTH,
+    fontSize: LABEL_FONT_SIZE,
     lineHeight: LABEL_LINE_HEIGHT,
     fontWeight: "600",
     color: colors.black,
-    textAlign: "center",
+    // Beside the pin, not under it: the text grows away from the pin rather
+    // than to both sides of it.
+    textAlign: "left",
     // React Native has no text halo, and a label has to stay readable over
     // whatever the basemap puts behind it.
     textShadowColor: colors.white,

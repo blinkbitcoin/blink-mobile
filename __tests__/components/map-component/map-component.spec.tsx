@@ -2,7 +2,7 @@ import React from "react"
 import { Region } from "react-native-maps"
 import { act, fireEvent, render, waitFor } from "@testing-library/react-native"
 
-import { BtcMapPlace, useBtcMapPlaces } from "@app/btcmap"
+import { BtcMapPlace, useBtcMapPlaceNames, useBtcMapPlaces } from "@app/btcmap"
 import MapComponent from "@app/components/map-component"
 import MapStyles from "@app/components/map-component/map-styles.json"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
@@ -13,6 +13,8 @@ import { ContextForScreen } from "../../screens/helper"
 const mockRefresh = jest.fn()
 
 jest.mock("@app/btcmap/use-places", () => ({ useBtcMapPlaces: jest.fn() }))
+
+jest.mock("@app/btcmap/use-place-names", () => ({ useBtcMapPlaceNames: jest.fn() }))
 
 jest.mock("@app/screens/map-screen/functions", () => ({
   LOCATION_PERMISSION: "LOCATION",
@@ -81,6 +83,7 @@ jest.mock("@app/components/map-component/category-filter-sheet", () => ({
 }))
 
 const mockedPlaces = useBtcMapPlaces as jest.MockedFunction<typeof useBtcMapPlaces>
+const mockedNames = useBtcMapPlaceNames as jest.MockedFunction<typeof useBtcMapPlaceNames>
 const mockedGetUserRegion = getUserRegion as jest.MockedFunction<typeof getUserRegion>
 
 const REGION: Region = {
@@ -126,7 +129,19 @@ beforeEach(() => {
   capturedFilterProps = undefined
   capturedMapProps = undefined
   setPlaces()
+  mockedNames.mockReturnValue(new Map())
 })
+
+// The map is measured before anything can be placed in it, and the placement
+// works in the view's own pixels — so a test that wants labels has to lay it out.
+const layOutMap = async (width = 384, height = 720) => {
+  await waitFor(() => expect(capturedMapProps?.onLayout).toBeDefined())
+  await act(async () => {
+    ;(capturedMapProps?.onLayout as (event: unknown) => void)({
+      nativeEvent: { layout: { width, height, x: 0, y: 0 } },
+    })
+  })
+}
 
 describe("MapComponent", () => {
   it("says it is loading only while there is nothing to show", async () => {
@@ -170,6 +185,65 @@ describe("MapComponent", () => {
 
     await waitFor(() => expect(getByTestId("btcmap-place-1")).toBeTruthy())
     expect(getByTestId("btcmap-place-2")).toBeTruthy()
+  })
+
+  it("labels a place whose name has arrived, beside its pin", async () => {
+    const shop = place(1)
+    setPlaces({ places: [shop] })
+    mockedNames.mockReturnValue(new Map([[shop.id, "Pupusería Victoria"]]))
+
+    const { getByTestId } = renderMap()
+    await layOutMap()
+
+    expect(getByTestId("btcmap-label-1")).toBeTruthy()
+  })
+
+  it("drops the names that would land on each other, keeping the pins", async () => {
+    // Two merchants eleven metres apart — the density of Berlín, SV, where every
+    // name overlapped its neighbours into noise. Both pins must still draw: it
+    // is the name that loses a collision, never the merchant.
+    const near = { latitude: 51.5, longitude: -0.12, icon: "local_cafe" }
+    const places = [
+      { ...near, id: 1 },
+      { ...near, id: 2, latitude: 51.5001 },
+    ]
+    setPlaces({ places })
+    mockedNames.mockReturnValue(
+      new Map([
+        [1, "Pupusería Victoria"],
+        [2, "Tienda Maxim"],
+      ]),
+    )
+
+    const { getByTestId, queryByTestId } = renderMap()
+    await layOutMap()
+
+    expect(getByTestId("btcmap-place-1")).toBeTruthy()
+    expect(getByTestId("btcmap-place-2")).toBeTruthy()
+
+    const labelled = [1, 2].filter((id) => queryByTestId(`btcmap-label-${id}`))
+    expect(labelled).toHaveLength(1)
+  })
+
+  it("labels both when there is room for both", async () => {
+    // The same two names, a third of the viewport apart rather than a hair.
+    const places = [
+      { id: 1, latitude: 51.5, longitude: -0.12, icon: "local_cafe" },
+      { id: 2, latitude: 51.4945, longitude: -0.126, icon: "local_cafe" },
+    ]
+    setPlaces({ places })
+    mockedNames.mockReturnValue(
+      new Map([
+        [1, "Pupusería Victoria"],
+        [2, "Tienda Maxim"],
+      ]),
+    )
+
+    const { getByTestId } = renderMap()
+    await layOutMap()
+
+    expect(getByTestId("btcmap-label-1")).toBeTruthy()
+    expect(getByTestId("btcmap-label-2")).toBeTruthy()
   })
 
   it("opens the sheet on the place that was tapped", async () => {
