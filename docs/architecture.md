@@ -152,6 +152,9 @@ as such and no longer routes to `sendBitcoinDestination` from a pin.
 | Offline cache | ~2.4 MB of places chunked at 5k rows across AsyncStorage, meta row written last so a torn write reads as "no cache" |
 | Per-place detail | Fetched on tap; the snapshot holds only id, coordinates, icon and boost |
 | Labels | Fetched per settled viewport, on a ~1.1 km grid so the centre is not a location trail |
+| Search | One `places/search` call per opened search, on the same grid and radius-capped; typing then filters that list on-device, since the endpoint takes no text query |
+| Category filter | Buckets BTC Map's icon names (`btcmap/categories.ts`) — the only classification the offline snapshot carries, so filtering needs no network |
+| Clustering | supercluster, indexed over a box 3× the viewport rather than the whole feed. A filter change re-indexes hundreds of points instead of ~29k, which is the difference between a 1.2 s freeze and an unnoticed one |
 | Marker removal | Needs `patches/react-native-maps+1.27.2.patch`: `safeAddFeature` overwrote instead of inserting, so filtered-out pins stayed on the map forever. Pinned by `__tests__/patches/maps-marker-removal-patch.spec.ts` |
 | Untrusted input | Every OSM-sourced link is scheme-checked in `btcmap/urls.ts` before it reaches `Linking.openURL` |
 | Kill switch | `btcMapPlacesEnabled` in Remote Config empties the map without a release |
