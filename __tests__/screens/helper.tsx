@@ -105,10 +105,20 @@ const createThemeWithMode = (mode: ThemeMode) =>
     mode,
   })
 
-export const ContextForScreen: React.FC<
-  PropsWithChildren<{ headerShown?: boolean; accountRegistry?: AccountRegistrySeed }>
-> = ({ children, headerShown = false, accountRegistry }) => (
-  <ThemeProvider theme={theme}>
+/**
+ * The provider stack every screen spec renders under. Both exported wrappers
+ * differ only in the theme they supply and whether the header is shown, so the
+ * stack itself lives here once — otherwise the two copies drift, and a provider
+ * added to one silently misses half the suite.
+ */
+const ScreenScaffold: React.FC<
+  PropsWithChildren<{
+    themeValue: ReturnType<typeof createThemeWithMode>
+    headerShown: boolean
+    accountRegistry?: AccountRegistrySeed
+  }>
+> = ({ children, themeValue, headerShown, accountRegistry }) => (
+  <ThemeProvider theme={themeValue}>
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown }}>
         <Stack.Screen name="Home">
@@ -131,28 +141,26 @@ export const ContextForScreen: React.FC<
   </ThemeProvider>
 )
 
+export const ContextForScreen: React.FC<
+  PropsWithChildren<{ headerShown?: boolean; accountRegistry?: AccountRegistrySeed }>
+> = ({ children, headerShown = false, accountRegistry }) => (
+  <ScreenScaffold
+    themeValue={theme}
+    headerShown={headerShown}
+    accountRegistry={accountRegistry}
+  >
+    {children}
+  </ScreenScaffold>
+)
+
 export const ContextForScreenWithTheme: React.FC<
   PropsWithChildren<{ mode: ThemeMode; accountRegistry?: AccountRegistrySeed }>
 > = ({ children, mode, accountRegistry }) => (
-  <ThemeProvider theme={createThemeWithMode(mode)}>
-    <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Home">
-          {() => (
-            <MockedProvider mocks={mocks} cache={createCache()}>
-              <PersistentStateWrapper>
-                <TypesafeI18n locale={detectDefaultLocale()}>
-                  <IsAuthedContextProvider value={true}>
-                    <StubAccountRegistry {...accountRegistry}>
-                      {children}
-                    </StubAccountRegistry>
-                  </IsAuthedContextProvider>
-                </TypesafeI18n>
-              </PersistentStateWrapper>
-            </MockedProvider>
-          )}
-        </Stack.Screen>
-      </Stack.Navigator>
-    </NavigationContainer>
-  </ThemeProvider>
+  <ScreenScaffold
+    themeValue={createThemeWithMode(mode)}
+    headerShown={false}
+    accountRegistry={accountRegistry}
+  >
+    {children}
+  </ScreenScaffold>
 )
