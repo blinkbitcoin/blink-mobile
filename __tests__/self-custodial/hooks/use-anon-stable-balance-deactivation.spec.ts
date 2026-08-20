@@ -1,5 +1,7 @@
 import { renderHook, waitFor } from "@testing-library/react-native"
 
+import { flushEffects } from "../../helpers/flush-effects"
+
 import { useAnonStableBalanceDeactivation } from "@app/self-custodial/hooks/use-anon-stable-balance-deactivation"
 import { isStableBalanceAnonPaused } from "@app/store/persistent-state/stable-balance-anon-pause"
 import { PersistentState } from "@app/store/persistent-state/state-migrations"
@@ -34,6 +36,11 @@ jest.mock("@app/self-custodial/hooks/use-self-custodial-account-mode", () => ({
 const mockUseSelfCustodialWallet = jest.fn()
 jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () => mockUseSelfCustodialWallet(),
+}))
+
+let mockStableBalanceEnabled = true
+jest.mock("@app/config/feature-flags-context", () => ({
+  useFeatureFlags: () => ({ stableBalanceEnabled: mockStableBalanceEnabled }),
 }))
 
 const mockReportError = jest.fn()
@@ -72,6 +79,7 @@ describe("useAnonStableBalanceDeactivation", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockIsAnonMode = true
+    mockStableBalanceEnabled = true
     mockPersistentState = {
       schemaVersion: 19,
       galoyInstance: { id: "Main" },
@@ -189,6 +197,33 @@ describe("useAnonStableBalanceDeactivation", () => {
       }
       setupWallet({ isStableBalanceActive: false })
     }
+
+    /**
+     * The wallet provider reports `stableBalanceEnabled && sdkStableBalanceActive`, so a flag
+     * switched off while the user sat in Anon reads exactly like a user who had turned the
+     * feature off. Reactivating on that would switch a disabled feature back on.
+     */
+    it("does not reactivate once the remote flag has been switched off", async () => {
+      setupPausedByAnon()
+      mockStableBalanceEnabled = false
+
+      renderHook(() => useAnonStableBalanceDeactivation())
+      await flushEffects()
+
+      expect(mockActivateStableBalance).not.toHaveBeenCalled()
+    })
+
+    /** The marker survives, so the reactivation still owes the user their setting back if
+     *  the flag returns. */
+    it("keeps the marker while the flag is off, so a returning flag still restores it", async () => {
+      setupPausedByAnon()
+      mockStableBalanceEnabled = false
+
+      renderHook(() => useAnonStableBalanceDeactivation())
+      await flushEffects()
+
+      expect(mockUpdateState).not.toHaveBeenCalled()
+    })
 
     it("puts back the stable balance Anon switched off", async () => {
       setupPausedByAnon()

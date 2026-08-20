@@ -1,5 +1,6 @@
 import { useEffect } from "react"
 
+import { useFeatureFlags } from "@app/config/feature-flags-context"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useSelfCustodialAccountMode } from "@app/self-custodial/hooks/use-self-custodial-account-mode"
 import { usePersistentStateContext } from "@app/store/persistent-state"
@@ -27,6 +28,7 @@ import { useSelfCustodialWallet } from "../providers/wallet"
  */
 export const useAnonStableBalanceDeactivation = (): void => {
   const { isAnonMode } = useSelfCustodialAccountMode()
+  const { stableBalanceEnabled } = useFeatureFlags()
   const { persistentState, updateState } = usePersistentStateContext()
   const { sdk, isStableBalanceActive, status, wallets, refreshStableBalanceActive } =
     useSelfCustodialWallet()
@@ -45,8 +47,16 @@ export const useAnonStableBalanceDeactivation = (): void => {
   const wasPausedByAnon = Boolean(
     activeAccountId && isStableBalanceAnonPaused(persistentState, activeAccountId),
   )
+  /** `isStableBalanceActive` folds the remote flag into the SDK's own setting, so a flag
+   *  switched off while the user sat in Anon reads exactly like a user who turned the
+   *  feature off. Reactivating on that would switch a disabled feature back on behind the
+   *  flag, so the flag is read on its own rather than through the combined value. */
   const isReactivationDue =
-    !isAnonMode && wasPausedByAnon && isBalanceSettled && isStableBalanceActive === false
+    !isAnonMode &&
+    wasPausedByAnon &&
+    isBalanceSettled &&
+    stableBalanceEnabled &&
+    isStableBalanceActive === false
 
   useEffect(() => {
     if (!sdk || !isDeactivationDue || !activeAccountId) return
