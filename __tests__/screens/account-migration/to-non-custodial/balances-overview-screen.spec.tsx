@@ -971,19 +971,38 @@ describe("MigrationBalancesOverviewScreen", () => {
 describe("MigrationBalancesOverviewScreen dollar-region gating", () => {
   beforeEach(resetScreenMocks)
 
-  it("holds a spinner with Approve disabled while the dollar region is still resolving", async () => {
+  /**
+   * The self-custodial verdict waits on the IP lookup, which the still-custodial session has
+   * no phone country to shortcut, so this wait is seconds. Only the dollar rows depend on it:
+   * the bitcoin figures render at once, and Approve stays disabled, so nothing irreversible
+   * is committed against a dollar balance the region has not ruled on.
+   */
+  it("shows the bitcoin figures while the dollar rows wait for the region", async () => {
     mockDollarRegionPending = true
     renderScreen()
     await flushEffects()
 
-    /** The self-custodial verdict waits on the IP lookup, which the still-custodial
-     *  session has no phone country to shortcut. Rendering it as unrestricted would
-     *  promise a Dollar Balance the new account cannot hold and then swap it for
-     *  "not available", in the one step the user cannot take back. */
-    expect(screen.queryByText(LLOverview.currentBitcoinBalance())).toBeNull()
+    expect(screen.getByText(LLOverview.currentBitcoinBalance())).toBeTruthy()
+    expect(screen.queryByTestId("migration-balances-overview-loading")).toBeNull()
+  })
+
+  it("states no dollar figure while the region is still resolving", async () => {
+    mockDollarRegionPending = true
+    renderScreen()
+    await flushEffects()
+
+    /** Rendering it as unrestricted would promise a Dollar Balance the new account cannot
+     *  hold and then swap it for "not available", in the one step the user cannot take back. */
     expect(screen.queryByText("USD 0")).toBeNull()
     expect(screen.queryByText(LLOverview.dollarBalanceNotAvailable())).toBeNull()
-    expect(screen.getByTestId("migration-balances-overview-loading")).toBeTruthy()
+    expect(screen.getAllByTestId("dollar-value-pending").length).toBeGreaterThan(0)
+  })
+
+  it("keeps Approve disabled while the dollar region is still resolving", async () => {
+    mockDollarRegionPending = true
+    renderScreen()
+    await flushEffects()
+
     expect(screen.getByTestId("migration-balances-overview-approve")).toBeDisabled()
   })
 
@@ -1001,7 +1020,7 @@ describe("MigrationBalancesOverviewScreen dollar-region gating", () => {
     const { rerender } = renderScreen()
     await flushEffects()
 
-    expect(screen.getByTestId("migration-balances-overview-loading")).toBeTruthy()
+    expect(screen.getAllByTestId("dollar-value-pending").length).toBeGreaterThan(0)
 
     mockDollarRegionPending = false
     mockDollarRestricted = true

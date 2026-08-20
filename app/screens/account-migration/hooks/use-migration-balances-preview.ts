@@ -52,11 +52,11 @@ export const useMigrationBalancesPreview = () => {
     refetch: refetchBalances,
   } = useCustodialWalletBalances({ fetchPolicy: "cache-and-network" })
   const { formatMoneyAmount, moneyAmountToDisplayCurrencyString } = useDisplayCurrency()
-  /** Both sides gate the screen alongside the figures: rendering an unresolved region as
-   *  unrestricted would show the user a Dollar Balance the new account cannot hold and
-   *  then swap it for "not available" once the verdict lands, in the one step they cannot
-   *  take back. The self-custodial side waits on the IP lookup, which the still-custodial
-   *  session has no phone country to shortcut. */
+  /** Both sides gate the dollar rows: rendering an unresolved region as unrestricted would
+   *  show the user a Dollar Balance the new account cannot hold and then swap it for "not
+   *  available" once the verdict lands, in the one step they cannot take back. The
+   *  self-custodial side waits on the IP lookup, which the still-custodial session has no
+   *  phone country to shortcut, so this is seconds and only the dollar rows may spend them. */
   const {
     isRestricted: isNewDollarBalanceRestricted,
     isRegionPending: isNewDollarRegionPending,
@@ -78,10 +78,16 @@ export const useMigrationBalancesPreview = () => {
   } = useMigrationPreview()
 
   /** Both sources gate the screen: the balances feed the current Dollar Balance, the
-   *  preview feeds every bitcoin figure, and neither may render before it is known. */
+   *  preview feeds every bitcoin figure, and neither may render before it is known.
+   *
+   *  The region is deliberately not a third: it decides only whether the dollar figures are
+   *  muted, and on the self-custodial side it comes from an IP lookup walking its adapters.
+   *  Gating the screen on it held every bitcoin figure behind seconds of spinner on the last
+   *  step before an irreversible migration. The caller holds the dollar rows and Approve on
+   *  `isDollarRegionPending` instead. */
   const hasPreview = preview !== null
-  const isLoading = isPreviewLoading || areBalancesLoading || isDollarRegionPending
-  const isReady = areBalancesReady && hasPreview && !isDollarRegionPending
+  const isLoading = isPreviewLoading || areBalancesLoading
+  const isReady = areBalancesReady && hasPreview
 
   /**
    * A query that never ran is not an answer. Both sources skip while nobody is
@@ -143,6 +149,10 @@ export const useMigrationBalancesPreview = () => {
 
   return {
     isReady,
+    /** Whether the dollar verdict is still outstanding. The bitcoin figures do not depend on
+     *  it, so it is reported apart from `isReady`: the caller holds the dollar rows and
+     *  Approve on this, and renders everything else at once. */
+    isDollarRegionPending,
     /** The raw figure for the checkpoint, named for what the checkpoint calls it rather
      *  than shadowing the preview field whose type it does not share. Null until ready, so
      *  a placeholder zero is never mistaken for a real zero-receive migration. */
