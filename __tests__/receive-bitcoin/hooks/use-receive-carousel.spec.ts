@@ -1,4 +1,4 @@
-import { renderHook, act } from "@testing-library/react-hooks"
+import { renderHook, act } from "@testing-library/react-native"
 
 import { useReceiveCarousel } from "@app/screens/receive-bitcoin-screen/hooks/use-receive-carousel"
 import { WalletCurrency } from "@app/graphql/generated"

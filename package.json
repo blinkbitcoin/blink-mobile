@@ -194,7 +194,6 @@
     "@react-native/typescript-config": "0.76.9",
     "@rnx-kit/align-deps": "^3.2.1",
     "@testing-library/jest-native": "^5.4.1",
-    "@testing-library/react-hooks": "^8.0.1",
     "@testing-library/react-native": "^13.3.3",
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
     "@tsconfig/react-native": "^3.0.5",

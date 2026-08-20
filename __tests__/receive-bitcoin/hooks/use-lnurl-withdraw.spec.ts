@@ -1,4 +1,4 @@
-import { renderHook, act } from "@testing-library/react-hooks"
+import { renderHook, act } from "@testing-library/react-native"
 import { Alert } from "react-native"
 
 import { useLnurlWithdraw } from "@app/screens/receive-bitcoin-screen/hooks/use-lnurl-withdraw"

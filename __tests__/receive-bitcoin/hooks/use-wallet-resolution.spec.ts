@@ -1,4 +1,4 @@
-import { renderHook } from "@testing-library/react-hooks"
+import { renderHook } from "@testing-library/react-native"
 
 import { useWalletResolution } from "@app/screens/receive-bitcoin-screen/hooks/use-wallet-resolution"
 import { WalletCurrency, Network } from "@app/graphql/generated"

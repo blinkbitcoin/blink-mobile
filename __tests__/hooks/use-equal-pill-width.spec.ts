@@ -1,4 +1,4 @@
-import { act, renderHook } from "@testing-library/react-hooks"
+import { act, renderHook } from "@testing-library/react-native"
 import type { LayoutChangeEvent } from "react-native"
 
 import { useEqualPillWidth } from "@app/components/atomic/currency-pill/use-equal-pill-width"

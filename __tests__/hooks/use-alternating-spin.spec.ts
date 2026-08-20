@@ -1,4 +1,4 @@
-import { renderHook, act } from "@testing-library/react-hooks"
+import { renderHook, act } from "@testing-library/react-native"
 import { View } from "react-native"
 
 jest.mock("react-native-reanimated", () => ({
@@ -48,7 +48,7 @@ describe("useAlternatingSpin", () => {
   it("triggerSpin is a function after rerender", () => {
     const { result, rerender } = renderHook(() => useAlternatingSpin())
 
-    rerender()
+    rerender(undefined)
 
     expect(typeof result.current.triggerSpin).toBe("function")
   })

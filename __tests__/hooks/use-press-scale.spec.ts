@@ -1,4 +1,4 @@
-import { renderHook, act } from "@testing-library/react-hooks"
+import { renderHook, act } from "@testing-library/react-native"
 
 import { usePressScale } from "@app/components/animations/press-scale"
 
@@ -60,7 +60,7 @@ describe("usePressScale", () => {
     const firstPressIn = result.current.pressIn
     const firstPressOut = result.current.pressOut
 
-    rerender()
+    rerender(undefined)
 
     expect(result.current.pressIn).toBe(firstPressIn)
     expect(result.current.pressOut).toBe(firstPressOut)

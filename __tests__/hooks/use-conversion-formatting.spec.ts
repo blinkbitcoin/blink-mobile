@@ -1,4 +1,4 @@
-import { renderHook } from "@testing-library/react-hooks"
+import { renderHook } from "@testing-library/react-native"
 
 import { useConversionFormatting } from "@app/screens/conversion-flow/hooks/use-conversion-formatting"
 import { ConvertInputType } from "@app/components/transfer-amount-input"

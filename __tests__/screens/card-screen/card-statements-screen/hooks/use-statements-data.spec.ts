@@ -1,4 +1,4 @@
-import { renderHook } from "@testing-library/react-hooks"
+import { renderHook } from "@testing-library/react-native"
 import { useStatementsData } from "@app/screens/card-screen/card-statements-screen/hooks/use-statements-data"
 
 const mockUseIsAuthed = jest.fn()

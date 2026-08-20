@@ -1,4 +1,4 @@
-import { renderHook, act } from "@testing-library/react-hooks"
+import { renderHook, act } from "@testing-library/react-native"
 import type { RefObject } from "react"
 import type { View } from "react-native"
 import Share from "react-native-share"

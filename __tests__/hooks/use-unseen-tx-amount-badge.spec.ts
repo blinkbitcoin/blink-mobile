@@ -1,4 +1,4 @@
-import { renderHook } from "@testing-library/react-hooks"
+import { renderHook } from "@testing-library/react-native"
 
 import { TxDirection, type TransactionFragment } from "@app/graphql/generated"
 import { useUnseenTxAmountBadge } from "@app/components/unseen-tx-amount-badge"

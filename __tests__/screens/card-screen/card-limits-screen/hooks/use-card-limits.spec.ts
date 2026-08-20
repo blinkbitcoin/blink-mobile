@@ -1,4 +1,4 @@
-import { renderHook, act } from "@testing-library/react-hooks"
+import { renderHook, act } from "@testing-library/react-native"
 
 import { useCardLimits } from "@app/screens/card-screen/card-limits-screen/hooks/use-card-limits"
 

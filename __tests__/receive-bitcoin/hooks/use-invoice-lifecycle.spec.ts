@@ -1,4 +1,4 @@
-import { renderHook } from "@testing-library/react-hooks"
+import { renderHook } from "@testing-library/react-native"
 
 import { flushEffects } from "../../helpers/flush-effects"
 import { useInvoiceLifecycle } from "@app/screens/receive-bitcoin-screen/hooks/use-invoice-lifecycle"

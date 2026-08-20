@@ -1,4 +1,4 @@
-import { renderHook, act } from "@testing-library/react-hooks"
+import { renderHook, act } from "@testing-library/react-native"
 
 import { useReceiveFlow } from "@app/screens/receive-bitcoin-screen/hooks/use-receive-flow"
 import { Invoice } from "@app/screens/receive-bitcoin-screen/payment/index.types"
