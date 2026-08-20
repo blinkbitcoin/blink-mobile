@@ -6,6 +6,7 @@ import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-but
 import { useFeatureFlags } from "@app/config/feature-flags-context"
 import { useAppConfig } from "@app/hooks"
 import {
+  AccountOption,
   useAccountTypeOptions,
   ACCOUNT_OPTION_TO_FLOW,
 } from "@app/hooks/use-account-type-options"
@@ -24,7 +25,10 @@ import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 import AppLogoDarkMode from "../../assets/logo/app-logo-dark.svg"
 import AppLogoLightMode from "../../assets/logo/blink-logo-light.svg"
 import { Screen } from "../../components/screen"
-import { RootStackParamList } from "../../navigation/stack-param-lists"
+import {
+  ChooseExperienceContinueRoute,
+  RootStackParamList,
+} from "../../navigation/stack-param-lists"
 import useAppCheckToken from "./use-device-token"
 import { PhoneLoginInitiateType } from "../phone-auth-screen"
 
@@ -73,6 +77,15 @@ export const GetStartedScreen: React.FC = () => {
     })
 
     if (defaultSelected) {
+      /** A single offered type is submitted here rather than on the account type screen, so
+       *  this is where a self-custodial creation has to capture its region mode. Skipping to
+       *  terms would provision the account with no mode, and nothing asks again. */
+      if (defaultSelected === AccountOption.SelfCustodial) {
+        navigation.navigate("selfCustodialChooseExperience", {
+          onContinue: { route: ChooseExperienceContinueRoute.AcceptTerms },
+        })
+        return
+      }
       navigation.navigate("acceptTermsAndConditions", {
         flow: ACCOUNT_OPTION_TO_FLOW[defaultSelected],
       })

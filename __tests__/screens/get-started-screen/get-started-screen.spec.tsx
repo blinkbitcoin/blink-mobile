@@ -225,7 +225,10 @@ describe("GetStartedScreen", () => {
     expect(mockNavigate).toHaveBeenCalledWith("accountTypeSelection", { mode: "create" })
   })
 
-  it("routes directly to self-custodial T&C when only the self-custodial option exists (e.g. US)", () => {
+  /** A single offered type is submitted here rather than on the account type screen, which
+   *  is the only other place wired to the mode screen. Skipping straight to terms provisions
+   *  the account with no mode, and nothing asks again. */
+  it("routes through the mode screen when only the self-custodial option exists (e.g. US)", () => {
     mockUseAccountTypeOptions.mockReturnValue({
       options: ["selfCustodial"],
       defaultSelected: "selfCustodial",
@@ -236,9 +239,13 @@ describe("GetStartedScreen", () => {
     const { getByTestId } = render(<GetStartedScreen />)
     fireEvent.press(getByTestId("create-account-button"))
 
-    expect(mockNavigate).toHaveBeenCalledWith("acceptTermsAndConditions", {
-      flow: "selfCustodial",
+    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialChooseExperience", {
+      onContinue: { route: "acceptTermsAndConditions" },
     })
+    expect(mockNavigate).not.toHaveBeenCalledWith(
+      "acceptTermsAndConditions",
+      expect.anything(),
+    )
   })
 
   it("routes directly to trial T&C when non-custodial is off but custodial is allowed", () => {
@@ -259,6 +266,11 @@ describe("GetStartedScreen", () => {
     expect(mockNavigate).toHaveBeenCalledWith("acceptTermsAndConditions", {
       flow: "trial",
     })
+    /** The mode is a self-custodial concern: a custodial creation must not be diverted. */
+    expect(mockNavigate).not.toHaveBeenCalledWith(
+      "selfCustodialChooseExperience",
+      expect.anything(),
+    )
   })
 
   it("redirects to Unsupported region when every available option is region-blocked", () => {
