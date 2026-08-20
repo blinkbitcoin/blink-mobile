@@ -154,14 +154,14 @@ describe("MapComponent", () => {
     expect(mockRefresh).toHaveBeenCalled()
   })
 
-  it("credits OpenStreetMap, which the data's licence requires", async () => {
-    const { getByText } = renderMap()
+  it("keeps the licence credit off the map, where a large font swallowed it", async () => {
+    // It is a chip at a fixed 11pt no longer: at the system's largest font size
+    // it grew over the streets it was crediting. The credit now reads as a
+    // footnote at the foot of the place sheet, where it has room to grow — see
+    // place-sheet.spec.tsx.
+    const { queryByText } = renderMap()
 
-    await waitFor(() =>
-      expect(
-        getByText("Places from BTC Map, © OpenStreetMap contributors"),
-      ).toBeTruthy(),
-    )
+    await waitFor(() => expect(queryByText(/OpenStreetMap/)).toBeNull())
   })
 
   it("draws a pin for each place the clusterer resolves", async () => {

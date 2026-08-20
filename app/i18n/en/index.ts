@@ -2110,7 +2110,7 @@ const en: BaseTranslation = {
     openSettings: "Open settings",
     title: "Map",
     error: "Oops. Something went wrong while getting your location",
-    attribution: "Places from BTC Map, © OpenStreetMap contributors",
+    attribution: "Places from {btcMap: string}, © {openStreetMap: string} contributors",
     unnamedPlace: "Unnamed place",
     loadingPlaces: "Loading places from BTC Map",
     placesError: "Couldn't load places from BTC Map",

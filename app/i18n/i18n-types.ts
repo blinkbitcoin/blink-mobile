@@ -6533,9 +6533,11 @@ type RootTranslation = {
 		 */
 		error: string
 		/**
-		 * P​l​a​c​e​s​ ​f​r​o​m​ ​B​T​C​ ​M​a​p​,​ ​©​ ​O​p​e​n​S​t​r​e​e​t​M​a​p​ ​c​o​n​t​r​i​b​u​t​o​r​s
+		 * P​l​a​c​e​s​ ​f​r​o​m​ ​{​b​t​c​M​a​p​}​,​ ​©​ ​{​o​p​e​n​S​t​r​e​e​t​M​a​p​}​ ​c​o​n​t​r​i​b​u​t​o​r​s
+		 * @param {string} btcMap
+		 * @param {string} openStreetMap
 		 */
-		attribution: string
+		attribution: RequiredParams<'btcMap' | 'openStreetMap'>
 		/**
 		 * U​n​n​a​m​e​d​ ​p​l​a​c​e
 		 */
@@ -20129,9 +20131,9 @@ export type TranslationFunctions = {
 		 */
 		error: () => LocalizedString
 		/**
-		 * Places from BTC Map, © OpenStreetMap contributors
+		 * Places from {btcMap}, © {openStreetMap} contributors
 		 */
-		attribution: () => LocalizedString
+		attribution: (arg: { btcMap: string, openStreetMap: string }) => LocalizedString
 		/**
 		 * Unnamed place
 		 */

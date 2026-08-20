@@ -333,10 +333,6 @@ export default function MapComponent({
           />
         )}
 
-      {/* The places are OpenStreetMap data under ODbL, which asks that anyone
-          looking at it can see where it came from. */}
-      <Text style={styles.attribution}>{LL.MapScreen.attribution()}</Text>
-
       <OpenSettingsModal ref={openSettingsModalRef} />
 
       <PlaceSearchModal
@@ -393,18 +389,5 @@ const useStyles = makeStyles(({ colors }, { topInset }: { topInset: number }) =>
     fontSize: 13,
     fontWeight: "600",
     color: colors.primary,
-  },
-  attribution: {
-    position: "absolute",
-    right: 8,
-    bottom: 8,
-    fontSize: 11,
-    // This is the ODbL credit, so it has to stay readable over whatever the
-    // basemap happens to be — hence an opaque chip rather than a tint.
-    color: colors.grey1,
-    backgroundColor: colors.white,
-    borderRadius: 4,
-    paddingHorizontal: 5,
-    paddingVertical: 2,
   },
 }))

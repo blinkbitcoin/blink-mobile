@@ -202,9 +202,8 @@ describe("PlaceSheet", () => {
     await waitFor(() => expect(getByText("Satoshi Coffee")).toBeTruthy())
 
     const sheet = getByTestId("place-sheet")
-    const sheetHeight = StyleSheet.flatten(sheet.props.style).height as number
     expect(getAnimatedStyle(sheet)).toMatchObject({
-      transform: [{ translateY: sheetHeight }],
+      transform: [{ translateY: StyleSheet.flatten(sheet.props.style).height }],
     })
   })
 
@@ -251,6 +250,23 @@ describe("PlaceSheet", () => {
     } finally {
       jest.useRealTimers()
     }
+  })
+
+  it("credits BTC Map and OpenStreetMap, which the data's licence requires", async () => {
+    // The credit moved here off the map, where the system's largest font size
+    // grew it over the streets it was crediting.
+    const { getByTestId } = renderSheet()
+
+    await waitFor(() => expect(getByTestId("place-sheet-attribution")).toBeTruthy())
+    const credit = within(getByTestId("place-sheet-attribution"))
+
+    fireEvent.press(credit.getByText("BTC Map"))
+    expect(mockedOpenExternal).toHaveBeenCalledWith("https://btcmap.org")
+
+    fireEvent.press(credit.getByText("OpenStreetMap"))
+    expect(mockedOpenExternal).toHaveBeenCalledWith(
+      "https://www.openstreetmap.org/copyright",
+    )
   })
 
   it("locks the list until the sheet is dragged up", async () => {

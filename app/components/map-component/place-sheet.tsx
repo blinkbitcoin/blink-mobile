@@ -27,8 +27,10 @@ import Animated, {
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 import {
+  BTCMAP_SITE_URL,
   BtcMapPlace,
   LatLng,
+  OSM_COPYRIGHT_URL,
   OpeningState,
   VerificationState,
   directionsUrl,
@@ -74,6 +76,21 @@ const VELOCITY_PROJECTION = 0.15
 
 const SPRING = { damping: 20, stiffness: 220, mass: 0.6 }
 const CLOSE_DURATION_MS = 200
+
+// Brand names, so they stay untranslated. They are also what the ODbL credit is
+// split on below, which is why the sentence takes them as parameters rather
+// than spelling them out: a translator cannot move the link off the name.
+const BTC_MAP = "BTC Map"
+const OPEN_STREET_MAP = "OpenStreetMap"
+
+const ATTRIBUTION_LINKS: Record<string, string> = {
+  [BTC_MAP]: BTCMAP_SITE_URL,
+  [OPEN_STREET_MAP]: OSM_COPYRIGHT_URL,
+}
+
+// Capturing, so `split` hands back the names it split on and the sentence can
+// be reassembled with those two pieces drawn as links.
+const ATTRIBUTION_PATTERN = new RegExp(`(${BTC_MAP}|${OPEN_STREET_MAP})`)
 
 type Props = {
   place: BtcMapPlace | null
@@ -315,6 +332,15 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
     return url ? [[label, url] as [string, string]] : []
   })
 
+  // Split back apart so each brand name can be drawn as a link wherever the
+  // translation happens to place it. A locale that has not caught up with the
+  // parameters yet still names both, so it degrades to plain text, not to a
+  // missing credit.
+  const attribution = LL.MapScreen.attribution({
+    btcMap: BTC_MAP,
+    openStreetMap: OPEN_STREET_MAP,
+  }).split(ATTRIBUTION_PATTERN)
+
   const verificationLabel = {
     [VerificationState.Verified]: () =>
       LL.MapScreen.verifiedOn({
@@ -532,6 +558,29 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
                 onPress={onClose}
                 containerStyle={styles.close}
               />
+
+              {/* The places are OpenStreetMap data under ODbL, which asks that
+                  anyone looking at it can see where it came from and reach the
+                  licence. It reads as a footnote here rather than as a chip on
+                  the map, where a large system font size grew it until it
+                  covered the streets it was crediting. */}
+              <Text testID="place-sheet-attribution" style={styles.attribution}>
+                {attribution.map((part, index) => {
+                  const url = ATTRIBUTION_LINKS[part]
+                  return url ? (
+                    <Text
+                      key={`${part}-${index}`}
+                      style={styles.attributionLink}
+                      onPress={() => openUrl(url)}
+                      accessibilityRole="link"
+                    >
+                      {part}
+                    </Text>
+                  ) : (
+                    part
+                  )
+                })}
+              </Text>
             </Animated.ScrollView>
           </Animated.View>
         </GestureDetector>
@@ -715,5 +764,16 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: StyleProps) => ({
   close: {
     // Pushed to the foot of the scroll area by whatever space is left over.
     marginTop: "auto",
+  },
+  attribution: {
+    fontSize: 12,
+    color: colors.grey2,
+    textAlign: "center",
+  },
+  attributionLink: {
+    // Same grey as the sentence around it: this is a credit, not an action, so
+    // the underline is the only thing marking the two names as reachable.
+    color: colors.grey2,
+    textDecorationLine: "underline",
   },
 }))
