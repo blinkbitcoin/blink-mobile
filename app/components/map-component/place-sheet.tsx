@@ -77,6 +77,15 @@ const VELOCITY_PROJECTION = 0.15
 const SPRING = { damping: 20, stiffness: 220, mass: 0.6 }
 const CLOSE_DURATION_MS = 200
 
+// The sheet's outer shape is a rounded path, so Android antialiases every edge
+// of it — including the straight bottom one. The top and sides hide that under
+// their 1px border; the bottom has no border to hide it under, and the half-lit
+// pixel that is left reads as a hairline of scrim between the sheet and the
+// screen. The sheet has no bottom edge worth showing anyway — it rests on the
+// screen's — so it is drawn this much taller and pulled down by the same
+// amount, which puts the seam off-screen without moving anything that is on it.
+const BOTTOM_OVERHANG = 1
+
 // Brand names, so they stay untranslated. They are also what the ODbL credit is
 // split on below, which is why the sentence takes them as parameters rather
 // than spelling them out: a translator cannot move the link off the name.
@@ -374,7 +383,7 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
 
         <GestureDetector gesture={pan}>
           <Animated.View
-            style={[styles.sheet, { height: sheetHeight }, sheetStyle]}
+            style={[styles.sheet, { height: sheetHeight + BOTTOM_OVERHANG }, sheetStyle]}
             testID="place-sheet"
           >
             <View style={styles.handle} />
@@ -617,6 +626,8 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: StyleProps) => ({
     borderBottomWidth: 0,
     borderColor: colors.grey4,
     paddingTop: 8,
+    // Cancels the extra height above, so only the seam moves off-screen.
+    marginBottom: -BOTTOM_OVERHANG,
   },
   handle: {
     alignSelf: "center",

@@ -1,5 +1,6 @@
 import React from "react"
 import { Linking, Share, StyleSheet } from "react-native"
+import type { ReactTestInstance } from "react-test-renderer"
 import { getAnimatedStyle } from "react-native-reanimated"
 import { act, render, fireEvent, waitFor, within } from "@testing-library/react-native"
 
@@ -57,6 +58,15 @@ const setDetails = (value: BtcMapPlaceDetails | null, extra = {}) => {
     ...extra,
   })
 }
+
+// The sheet is painted this much taller than the height its animation is
+// measured against, so its antialiased bottom edge falls below the screen —
+// see BOTTOM_OVERHANG in the component.
+const BOTTOM_OVERHANG = 1
+
+/** The height the sheet's offsets are expressed in, not the one it is drawn at. */
+const animatedHeightOf = (sheet: ReactTestInstance) =>
+  (StyleSheet.flatten(sheet.props.style).height as number) - BOTTOM_OVERHANG
 
 const renderSheet = (props: Partial<React.ComponentProps<typeof PlaceSheet>> = {}) =>
   render(
@@ -203,7 +213,7 @@ describe("PlaceSheet", () => {
 
     const sheet = getByTestId("place-sheet")
     expect(getAnimatedStyle(sheet)).toMatchObject({
-      transform: [{ translateY: StyleSheet.flatten(sheet.props.style).height }],
+      transform: [{ translateY: animatedHeightOf(sheet) }],
     })
   })
 
@@ -213,7 +223,7 @@ describe("PlaceSheet", () => {
       mockBottomInset = 34
       const { getByTestId } = renderSheet()
       const sheet = getByTestId("place-sheet")
-      const sheetHeight = StyleSheet.flatten(sheet.props.style).height as number
+      const sheetHeight = animatedHeightOf(sheet)
 
       // The indicator is cleared by padding inside the peek, so the snap point
       // does not lift for it: a sheet resting higher than the peek's own edge
@@ -250,6 +260,27 @@ describe("PlaceSheet", () => {
     } finally {
       jest.useRealTimers()
     }
+  })
+
+  it("hangs its bottom edge below the screen, so no seam shows under it", async () => {
+    // The sheet's outer shape is a rounded path, which Android antialiases on
+    // every edge including the straight bottom one. Three of those edges hide
+    // the half-lit pixel under a border; the bottom has none, and what showed
+    // through it was a hairline of scrim between the sheet and the screen.
+    const { getByTestId } = renderSheet()
+    const sheet = getByTestId("place-sheet")
+    const style = StyleSheet.flatten(sheet.props.style)
+
+    // Nothing has been measured yet, so the sheet is parked one full offset
+    // down — which makes that offset the height it is animated against, read
+    // back off reanimated rather than restated here. It is a pixel short of the
+    // height the sheet is drawn at...
+    expect(getAnimatedStyle(sheet)).toMatchObject({
+      transform: [{ translateY: (style.height as number) - BOTTOM_OVERHANG }],
+    })
+    // ...and the sheet is pulled down by that same pixel, so the overhang lands
+    // off the bottom of the screen and nothing on the sheet moves to pay for it.
+    expect(style.marginBottom).toBe(-BOTTOM_OVERHANG)
   })
 
   it("credits BTC Map and OpenStreetMap, which the data's licence requires", async () => {
