@@ -2162,11 +2162,14 @@
     },
     "PinScreen": {
         "attemptsRemaining": "Falsche PIN. {attemptsRemaining: string} verbleibende Versuche.",
+        "lockoutUnavailable": "Der Fehlversuch konnte nicht sicher gespeichert werden. Du wirst nun ausgeloggt.",
         "oneAttemptRemaining": "Falsche PIN. Letzter Versuch.",
+        "pinUnreadable": "Deine PIN konnte nicht geprüft werden. Bitte versuche es erneut.",
         "setPin": "Erstelle deinen PIN Code",
         "setPinFailedMatch": "Die PINs stimmen nicht überein - Setze deinen PIN Code",
         "storePinFailed": "Dein PIN Code konnte nicht gespeichert werden.",
         "tooManyAttempts": "Zu viele Fehlversuche. Du wirst nun ausgeloggt.",
+        "tryAgainIn": "Versuche es in {seconds: number} s erneut.",
         "verifyPin": "Bestätige deinen PIN Code"
     },
     "PriceHistoryScreen": {

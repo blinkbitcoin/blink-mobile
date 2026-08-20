@@ -2162,11 +2162,14 @@
   },
   "PinScreen": {
     "attemptsRemaining": "Verkeerde PIN. {attemptsRemaining: number} probeerslae oor. ",
+    "lockoutUnavailable": "Kon nie die mislukte poging veilig aanteken nie. Teken uit.",
     "oneAttemptRemaining": "Verkeerde PIN, 1 probeerslag oor.",
+    "pinUnreadable": "Kon nie jou PIN nagaan nie. Probeer asseblief weer.",
     "setPin": "Stel jou PIN-kode in",
     "setPinFailedMatch": "PINs stem nie ooreen nie - Stel jou PIN-kode in",
     "storePinFailed": "Kan nie nou jou PIN stoor nie.",
     "tooManyAttempts": "Te veel verkeerde probeerslae. Teken uit. ",
+    "tryAgainIn": "Probeer weer oor {seconds: number} s.",
     "verifyPin": "Bevestig jou PIN-kode"
   },
   "PriceHistoryScreen": {

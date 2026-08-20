@@ -104,7 +104,7 @@ export const SecurityScreen: React.FC<Props> = ({ route, navigation }) => {
 
   const removePin = async () => {
     if (await KeyStoreWrapper.removePin()) {
-      KeyStoreWrapper.removePinAttempts()
+      await KeyStoreWrapper.clearPinFailureState()
       setIsPinEnabled(false)
     }
   }
@@ -183,7 +183,11 @@ export const SecurityScreen: React.FC<Props> = ({ route, navigation }) => {
               {LL.SecurityScreen.pinDescription()}
             </ListItem.Subtitle>
           </ListItem.Content>
-          <Switch value={isPinEnabled} onValueChange={onPinValueChanged} />
+          <Switch
+            testID="pin-switch"
+            value={isPinEnabled}
+            onValueChange={onPinValueChanged}
+          />
         </ListItem>
       </View>
 

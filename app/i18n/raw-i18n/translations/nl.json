@@ -2162,11 +2162,14 @@
   },
   "PinScreen": {
     "attemptsRemaining": "Onjuiste pincode. {attemptsRemaining: number} resterende pogingen.",
+    "lockoutUnavailable": "Kon de mislukte poging niet veilig vastleggen. Uitloggen.",
     "oneAttemptRemaining": "Onjuiste pincode. 1 poging over.",
+    "pinUnreadable": "Kon je pincode niet controleren. Probeer het opnieuw.",
     "setPin": "Stel uw PIN code in",
     "setPinFailedMatch": "Pincodes komen niet overeen - Stel uw pincode in",
     "storePinFailed": "Kan je pincode niet opslaan.",
     "tooManyAttempts": "Teveel mislukte pogingen. Uitloggen.",
+    "tryAgainIn": "Probeer het over {seconds: number} s opnieuw.",
     "verifyPin": "Verifieer uw pincode"
   },
   "PriceHistoryScreen": {

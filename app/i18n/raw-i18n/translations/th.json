@@ -2162,11 +2162,14 @@
   },
   "PinScreen": {
     "attemptsRemaining": "พินนี้ผิด มีโอกาสใส่พินอีก {attemptsRemaining: number} ครั้ง",
+    "lockoutUnavailable": "ไม่สามารถบันทึกการพยายามที่ผิดพลาดได้อย่างปลอดภัย ทำการออกจากระบบ",
     "oneAttemptRemaining": "พินนี้ผิด โอกาสสุดท้าย",
+    "pinUnreadable": "ไม่สามารถตรวจสอบพินของคุณได้ กรุณาลองอีกครั้ง",
     "setPin": "ตั้งค่าพินโค้ด",
     "setPinFailedMatch": "พินไม่ตรงกัน - ตั้งค่าพินโค้ดอีกครั้ง",
     "storePinFailed": "ไม่สามารถเก็บพินได้",
     "tooManyAttempts": "คุณใส่ผิดมากเกินไป ทำการออกจากระบบ",
+    "tryAgainIn": "ลองอีกครั้งใน {seconds: number} วินาที",
     "verifyPin": "ยืนยันพินโค้ด"
   },
   "PriceHistoryScreen": {

@@ -2162,11 +2162,14 @@
   },
   "PinScreen": {
     "attemptsRemaining": "PIN salah. {attemptsRemaining: number} percobaan tersisa.",
+    "lockoutUnavailable": "Tidak dapat mencatat percobaan gagal dengan aman. Keluar.",
     "oneAttemptRemaining": "PIN salah. 1 percobaan tersisa.",
+    "pinUnreadable": "Tidak dapat memeriksa PIN Anda. Silakan coba lagi.",
     "setPin": "Atur kode PIN Anda",
     "setPinFailedMatch": "PIN tidak cocok - Atur kode PIN Anda",
     "storePinFailed": "Tidak dapat menyimpan PIN Anda.",
     "tooManyAttempts": "Terlalu banyak percobaan gagal. Keluar.",
+    "tryAgainIn": "Coba lagi dalam {seconds: number} dtk.",
     "verifyPin": "Verifikasi kode PIN Anda"
   },
   "PriceHistoryScreen": {

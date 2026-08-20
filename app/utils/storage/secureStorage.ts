@@ -28,142 +28,271 @@ const isKeyNotFound = (err: unknown): boolean =>
   "code" in err &&
   String((err as { code: unknown }).code) === KEY_NOT_FOUND_CODE
 
+/**
+ * The failed-PIN state, stored as one value under one key — see the note above
+ * the PIN lockout block.
+ */
+export type PinFailureState = {
+  /** Consecutive wrong-PIN entries. */
+  readonly attempts: number
+  /** Epoch ms the lock lifts at; 0 when no lock is in force. */
+  readonly lockedUntil: number
+}
+
+export type PinFailureStateRead =
+  | { readonly status: "found"; readonly state: PinFailureState }
+  | { readonly status: "absent" }
+  | { readonly status: "failed"; readonly err: unknown }
+
+type SecureStoreRead =
+  | { readonly status: "found"; readonly value: string }
+  | { readonly status: "absent" }
+  | { readonly status: "failed"; readonly err: unknown }
+
+const CLEARED_PIN_FAILURE_STATE: PinFailureState = { attempts: 0, lockedUntil: 0 }
+
 export default class KeyStoreWrapper {
   private static readonly IS_BIOMETRICS_ENABLED = "isBiometricsEnabled"
   private static readonly PIN = "PIN"
-  private static readonly PIN_ATTEMPTS = "pinAttempts"
+  private static readonly PIN_FAILURE_STATE = "pinFailureState"
+  /** Pre-lockout releases stored the bare attempt count here. Read once, then
+   *  erased — see getPinFailureState. */
+  private static readonly LEGACY_PIN_ATTEMPTS = "pinAttempts"
   private static readonly SESSION_PROFILES = "sessionProfiles"
   private static readonly ACTIVE_TOKEN = GALOY_AUTH_TOKEN_KEY
   private static readonly MNEMONIC = "mnemonic"
   private static readonly MNEMONIC_NETWORK = "mnemonic_network"
 
-  public static async getIsBiometricsEnabled(): Promise<boolean> {
+  // ── keystore primitives ───────────────────────────────────────────────────
+  // Every method below is one of these four shapes. `accessible` is always
+  // passed explicitly and never defaulted: a default would let a new method
+  // silently downgrade the protection class of whatever it stores.
+
+  private static async write(
+    key: string,
+    value: string,
+    accessible: ACCESSIBLE,
+  ): Promise<boolean> {
     try {
-      await RNSecureKeyStore.get(KeyStoreWrapper.IS_BIOMETRICS_ENABLED)
+      await RNSecureKeyStore.set(key, value, { accessible })
       return true
     } catch {
       return false
     }
+  }
+
+  private static async erase(key: string): Promise<boolean> {
+    try {
+      await RNSecureKeyStore.remove(key)
+      return true
+    } catch {
+      return false
+    }
+  }
+
+  /** The keystore rejects for a missing key, so a successful read is presence. */
+  private static async has(key: string): Promise<boolean> {
+    try {
+      await RNSecureKeyStore.get(key)
+      return true
+    } catch {
+      return false
+    }
+  }
+
+  private static async readWithStatus(key: string): Promise<SecureStoreRead> {
+    try {
+      return { status: "found", value: await RNSecureKeyStore.get(key) }
+    } catch (err) {
+      return isKeyNotFound(err) ? { status: "absent" } : { status: "failed", err }
+    }
+  }
+
+  /** Collapses absent and failed for callers where either means do nothing. */
+  private static async read(key: string): Promise<string | null> {
+    const read = await KeyStoreWrapper.readWithStatus(key)
+    return read.status === "found" ? read.value : null
+  }
+
+  // ── biometrics ────────────────────────────────────────────────────────────
+
+  public static async getIsBiometricsEnabled(): Promise<boolean> {
+    return KeyStoreWrapper.has(KeyStoreWrapper.IS_BIOMETRICS_ENABLED)
   }
 
   public static async setIsBiometricsEnabled(): Promise<boolean> {
-    try {
-      await RNSecureKeyStore.set(KeyStoreWrapper.IS_BIOMETRICS_ENABLED, "1", {
-        accessible: ACCESSIBLE.ALWAYS_THIS_DEVICE_ONLY,
-      })
-      return true
-    } catch {
-      return false
-    }
+    return KeyStoreWrapper.write(
+      KeyStoreWrapper.IS_BIOMETRICS_ENABLED,
+      "1",
+      ACCESSIBLE.ALWAYS_THIS_DEVICE_ONLY,
+    )
   }
 
   public static async removeIsBiometricsEnabled(): Promise<boolean> {
-    try {
-      await RNSecureKeyStore.remove(KeyStoreWrapper.IS_BIOMETRICS_ENABLED)
-      return true
-    } catch {
-      return false
-    }
+    return KeyStoreWrapper.erase(KeyStoreWrapper.IS_BIOMETRICS_ENABLED)
   }
+
+  // ── the PIN itself ────────────────────────────────────────────────────────
 
   public static async getIsPinEnabled(): Promise<boolean> {
-    try {
-      await RNSecureKeyStore.get(KeyStoreWrapper.PIN)
-      return true
-    } catch {
-      return false
-    }
+    return KeyStoreWrapper.has(KeyStoreWrapper.PIN)
   }
 
-  public static async getPinOrEmptyString(): Promise<string> {
-    try {
-      return await RNSecureKeyStore.get(KeyStoreWrapper.PIN)
-    } catch {
-      return ""
-    }
+  /**
+   * `null` means the PIN could not be read — which this library cannot tell
+   * apart from "no PIN is set", so both arrive that way. Callers must not score
+   * it as a wrong entry: a keystore that throws transiently would otherwise
+   * spend the attempt budget of a user who typed nothing wrong.
+   */
+  public static async getPin(): Promise<string | null> {
+    return KeyStoreWrapper.read(KeyStoreWrapper.PIN)
   }
 
   public static async setPin(pin: string): Promise<boolean> {
-    try {
-      await RNSecureKeyStore.set(KeyStoreWrapper.PIN, pin, {
-        accessible: ACCESSIBLE.ALWAYS_THIS_DEVICE_ONLY,
-      })
-      return true
-    } catch {
-      return false
-    }
+    return KeyStoreWrapper.write(
+      KeyStoreWrapper.PIN,
+      pin,
+      ACCESSIBLE.ALWAYS_THIS_DEVICE_ONLY,
+    )
   }
 
   public static async removePin(): Promise<boolean> {
+    return KeyStoreWrapper.erase(KeyStoreWrapper.PIN)
+  }
+
+  // ── PIN lockout ───────────────────────────────────────────────────────────
+  // The attempt count and the lock expiry are one logical value, so they live
+  // under one key as one serialized write. Two keys made a write non-atomic:
+  // if only the lock landed, the failure itself was lost, and the attacker got
+  // a free attempt cycle back the moment the lock expired.
+
+  public static async getPinFailureState(): Promise<PinFailureStateRead> {
+    const current = await KeyStoreWrapper.readWithStatus(
+      KeyStoreWrapper.PIN_FAILURE_STATE,
+    )
+
+    if (current.status === "found") {
+      return {
+        status: "found",
+        state: KeyStoreWrapper.parsePinFailureState(current.value),
+      }
+    }
+    if (current.status === "failed") return current
+
+    // Upgrade path: an install that failed a PIN before this release has an
+    // attempt count and no lock. Reading it keeps that budget spent; the next
+    // write moves it to the new key and erases this one.
+    const legacy = await KeyStoreWrapper.readWithStatus(
+      KeyStoreWrapper.LEGACY_PIN_ATTEMPTS,
+    )
+    if (legacy.status === "failed") return legacy
+    if (legacy.status === "absent") return { status: "absent" }
+
+    const attempts = Number(legacy.value)
+    return {
+      status: "found",
+      state: {
+        attempts: Number.isFinite(attempts) ? attempts : 0,
+        lockedUntil: 0,
+      },
+    }
+  }
+
+  /** Missing, corrupt and non-finite all collapse to a clean slate, so no NaN
+   *  can escape into a comparison downstream. */
+  private static parsePinFailureState(raw: string): PinFailureState {
     try {
-      await RNSecureKeyStore.remove(KeyStoreWrapper.PIN)
+      const parsed = JSON.parse(raw)
+      const attempts = Number(parsed?.attempts)
+      const lockedUntil = Number(parsed?.lockedUntil)
+      if (!Number.isFinite(attempts) || !Number.isFinite(lockedUntil)) {
+        return CLEARED_PIN_FAILURE_STATE
+      }
+      return { attempts, lockedUntil }
+    } catch {
+      return CLEARED_PIN_FAILURE_STATE
+    }
+  }
+
+  /** One write, so the boolean is the whole truth: false means the failure was
+   *  not recorded at all, which a caller that must not lose one has to act on. */
+  public static async setPinFailureState(state: PinFailureState): Promise<boolean> {
+    const written = await KeyStoreWrapper.write(
+      KeyStoreWrapper.PIN_FAILURE_STATE,
+      JSON.stringify({ attempts: state.attempts, lockedUntil: state.lockedUntil }),
+      ACCESSIBLE.ALWAYS_THIS_DEVICE_ONLY,
+    )
+
+    // The new key shadows the legacy one on read, so a failed erase here costs
+    // nothing but a stale entry.
+    if (written) await KeyStoreWrapper.erase(KeyStoreWrapper.LEGACY_PIN_ATTEMPTS)
+
+    return written
+  }
+
+  /**
+   * Drops the state, falling back to writing a cleared value when the erase
+   * fails: a failed erase leaves a spent attempt budget readable, and every
+   * later wrong entry would then log the user out on the spot.
+   *
+   * False means neither worked. Callers let the user in anyway — they proved
+   * the PIN — but should report it, since the state is now sticky.
+   */
+  public static async clearPinFailureState(): Promise<boolean> {
+    const [erased, legacyErased] = await Promise.all([
+      KeyStoreWrapper.erase(KeyStoreWrapper.PIN_FAILURE_STATE),
+      KeyStoreWrapper.erase(KeyStoreWrapper.LEGACY_PIN_ATTEMPTS),
+    ])
+
+    if (erased && legacyErased) return true
+
+    // An erase reports failure for a key that was never there too, so ask what
+    // is actually still readable rather than writing on every clear.
+    const remaining = await KeyStoreWrapper.getPinFailureState()
+    if (remaining.status === "absent") return true
+    if (
+      remaining.status === "found" &&
+      remaining.state.attempts === 0 &&
+      remaining.state.lockedUntil === 0
+    ) {
       return true
-    } catch {
-      return false
     }
+
+    // Writing the cleared value also shadows a legacy key that would not erase.
+    return KeyStoreWrapper.write(
+      KeyStoreWrapper.PIN_FAILURE_STATE,
+      JSON.stringify(CLEARED_PIN_FAILURE_STATE),
+      ACCESSIBLE.ALWAYS_THIS_DEVICE_ONLY,
+    )
   }
 
-  public static async getPinAttemptsOrZero(): Promise<number> {
-    try {
-      return Number(await RNSecureKeyStore.get(KeyStoreWrapper.PIN_ATTEMPTS))
-    } catch {
-      return 0
-    }
-  }
-
-  public static async setPinAttempts(pinAttempts: string): Promise<boolean> {
-    try {
-      await RNSecureKeyStore.set(KeyStoreWrapper.PIN_ATTEMPTS, pinAttempts, {
-        accessible: ACCESSIBLE.ALWAYS_THIS_DEVICE_ONLY,
-      })
-      return true
-    } catch {
-      return false
-    }
-  }
-
-  public static async resetPinAttempts(): Promise<boolean> {
-    return KeyStoreWrapper.setPinAttempts("0")
-  }
-
-  public static async removePinAttempts(): Promise<boolean> {
-    try {
-      await RNSecureKeyStore.remove(KeyStoreWrapper.PIN_ATTEMPTS)
-      return true
-    } catch {
-      return false
-    }
-  }
+  // ── session profiles ──────────────────────────────────────────────────────
 
   public static async saveSessionProfiles(profiles: ProfileProps[]): Promise<boolean> {
     try {
-      const serialized = JSON.stringify(profiles)
-      await RNSecureKeyStore.set(KeyStoreWrapper.SESSION_PROFILES, serialized, {
-        accessible: ACCESSIBLE.ALWAYS_THIS_DEVICE_ONLY,
-      })
-      return true
-    } catch (err) {
+      return await KeyStoreWrapper.write(
+        KeyStoreWrapper.SESSION_PROFILES,
+        JSON.stringify(profiles),
+        ACCESSIBLE.ALWAYS_THIS_DEVICE_ONLY,
+      )
+    } catch {
+      // JSON.stringify can throw on a circular value.
       return false
     }
   }
 
   public static async getSessionProfiles(): Promise<ProfileProps[]> {
+    const data = await KeyStoreWrapper.read(KeyStoreWrapper.SESSION_PROFILES)
+    if (!data) return []
     try {
-      const data = await RNSecureKeyStore.get(KeyStoreWrapper.SESSION_PROFILES)
-      const parsed = data ? JSON.parse(data) : []
-      return parsed
-    } catch (err) {
+      return JSON.parse(data)
+    } catch {
       return []
     }
   }
 
   public static async removeSessionProfiles(): Promise<boolean> {
-    try {
-      await RNSecureKeyStore.remove(KeyStoreWrapper.SESSION_PROFILES)
-      return true
-    } catch (err) {
-      return false
-    }
+    return KeyStoreWrapper.erase(KeyStoreWrapper.SESSION_PROFILES)
   }
 
   /**
@@ -246,6 +375,14 @@ export default class KeyStoreWrapper {
     await removeWithRetry(KeyStoreWrapper.removeSessionProfiles, "session profiles")
   }
 
+  public static async removeSessionProfileByToken(token: string): Promise<boolean> {
+    const profiles = await KeyStoreWrapper.getSessionProfiles()
+    const remaining = profiles.filter((profile) => profile.token !== token)
+    return KeyStoreWrapper.saveSessionProfiles(remaining)
+  }
+
+  // ── per-account mnemonic ──────────────────────────────────────────────────
+
   private static mnemonicKeyFor(accountId: string): string {
     return `${KeyStoreWrapper.MNEMONIC}:${accountId}`
   }
@@ -255,74 +392,41 @@ export default class KeyStoreWrapper {
   }
 
   public static async getMnemonicForAccount(accountId: string): Promise<string | null> {
-    try {
-      return await RNSecureKeyStore.get(KeyStoreWrapper.mnemonicKeyFor(accountId))
-    } catch {
-      return null
-    }
+    return KeyStoreWrapper.read(KeyStoreWrapper.mnemonicKeyFor(accountId))
   }
 
   public static async setMnemonicForAccount(
     accountId: string,
     mnemonic: string,
   ): Promise<boolean> {
-    try {
-      await RNSecureKeyStore.set(KeyStoreWrapper.mnemonicKeyFor(accountId), mnemonic, {
-        accessible: ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
-      })
-      return true
-    } catch {
-      return false
-    }
+    return KeyStoreWrapper.write(
+      KeyStoreWrapper.mnemonicKeyFor(accountId),
+      mnemonic,
+      ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
+    )
   }
 
   public static async deleteMnemonicForAccount(accountId: string): Promise<boolean> {
-    try {
-      await RNSecureKeyStore.remove(KeyStoreWrapper.mnemonicKeyFor(accountId))
-      await RNSecureKeyStore.remove(
-        KeyStoreWrapper.mnemonicNetworkKeyFor(accountId),
-      ).catch(() => {})
-      return true
-    } catch {
-      return false
-    }
+    const removed = await KeyStoreWrapper.erase(KeyStoreWrapper.mnemonicKeyFor(accountId))
+    // The network marker is derived data; failing to drop it is tolerated.
+    await KeyStoreWrapper.erase(KeyStoreWrapper.mnemonicNetworkKeyFor(accountId))
+    return removed
   }
 
   public static async getMnemonicNetworkForAccount(
     accountId: string,
   ): Promise<string | null> {
-    try {
-      return await RNSecureKeyStore.get(KeyStoreWrapper.mnemonicNetworkKeyFor(accountId))
-    } catch {
-      return null
-    }
+    return KeyStoreWrapper.read(KeyStoreWrapper.mnemonicNetworkKeyFor(accountId))
   }
 
   public static async setMnemonicNetworkForAccount(
     accountId: string,
     network: string,
   ): Promise<boolean> {
-    try {
-      await RNSecureKeyStore.set(
-        KeyStoreWrapper.mnemonicNetworkKeyFor(accountId),
-        network,
-        {
-          accessible: ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
-        },
-      )
-      return true
-    } catch {
-      return false
-    }
-  }
-
-  public static async removeSessionProfileByToken(token: string): Promise<boolean> {
-    try {
-      const profiles = await KeyStoreWrapper.getSessionProfiles()
-      const updatedProfiles = profiles.filter((profile) => profile.token !== token)
-      return await KeyStoreWrapper.saveSessionProfiles(updatedProfiles)
-    } catch (err) {
-      return false
-    }
+    return KeyStoreWrapper.write(
+      KeyStoreWrapper.mnemonicNetworkKeyFor(accountId),
+      network,
+      ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
+    )
   }
 }

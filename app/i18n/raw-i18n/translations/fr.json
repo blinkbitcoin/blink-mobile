@@ -2162,11 +2162,14 @@
     },
     "PinScreen": {
         "attemptsRemaining": "NIP incorrect. {attemptsRemaining: number} tentatives restantes.",
+        "lockoutUnavailable": "Impossible d'enregistrer la tentative échouée en toute sécurité. Déconnexion.",
         "oneAttemptRemaining": "NIP incorrect. 1 tentative restante.",
+        "pinUnreadable": "Impossible de vérifier votre NIP. Veuillez réessayer.",
         "setPin": "Définissez votre code NIP",
         "setPinFailedMatch": "Les NIP ne correspondent pas - Corrigez votre code NIP",
         "storePinFailed": "Impossible d’enregistrer votre NIP.",
         "tooManyAttempts": "Trop de tentatives infructeuses. Déconnexion.",
+        "tryAgainIn": "Réessayez dans {seconds: number} s.",
         "verifyPin": "Validez votre code NIP"
     },
     "PriceHistoryScreen": {
