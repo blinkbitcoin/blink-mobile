@@ -1,5 +1,9 @@
 import { format } from "util"
 
+// The ambient `expect` is typed by @types/jest, which does not declare
+// `getState`; the @jest/globals one does, and is the same object at runtime.
+import { expect } from "@jest/globals"
+
 // Shared per-test setup/teardown (registered via setupFilesAfterEnv in jest.config.js).
 //
 // In CI, retry flaky tests at test granularity instead of re-running the whole
@@ -120,29 +124,99 @@ afterAll(() => {
 // The message is recorded here and thrown from a hook rather than thrown inline:
 // console.error runs inside React's commit phase, where throwing corrupts the
 // render and reports something unrelated.
-const escapedActUpdates: string[] = []
+//
+// Each record carries the test that was running when the warning was emitted.
+// RNTL's cleanup runs after this file's afterEach, so an unmount-time warning
+// from test A is only flushed at test B's afterEach; without the tag, B fails
+// naming a component from A and CI's retry re-runs B — which passes, because
+// the leak was never B's. The tag makes that case readable.
+type EscapedActUpdate = { line: string; testName: string }
+
+const escapedActUpdates: EscapedActUpdate[] = []
 const originalConsoleError = console.error.bind(console)
 
-console.error = (...args: unknown[]) => {
+// Where console.error output actually goes. Specs mute or capture it by
+// swapping this sink (see __tests__/helpers/silence-console-error.ts) rather
+// than replacing console.error, which would take the act() inspection below
+// with it. Reset after every test by the hook further down.
+let consoleErrorSink: (...args: unknown[]) => void = originalConsoleError
+
+const guardedConsoleError = (...args: unknown[]) => {
   const template = typeof args[0] === "string" ? args[0] : ""
   if (template.includes("was not wrapped in act(")) {
     // React names the component through a %s placeholder, so the template has
     // to be formatted before it reads as anything useful. Keep the first line
     // only; the full React stack still goes to stderr below.
     const formatted = format(...(args as [string, ...unknown[]]))
-    escapedActUpdates.push(formatted.split("\n")[0].trim())
+    escapedActUpdates.push({
+      line: formatted.split("\n")[0].trim(),
+      testName: expect.getState().currentTestName ?? "<outside a test>",
+    })
   }
-  originalConsoleError(...(args as Parameters<typeof console.error>))
+  consoleErrorSink(...args)
 }
 
+// Locked rather than assigned. A spec that did
+// `jest.spyOn(console, "error").mockImplementation(...)` used to switch the
+// guard off for its whole file — silently, and an afterEach check cannot catch
+// it, because specs restore the spy before the hook runs. Refusing the write
+// turns that into an immediate failure at the call site.
+//
+// jest.spyOn goes through Object.defineProperty, so what a spec actually sees
+// is `TypeError: Cannot redefine property: error` on the spyOn line. The fix is
+// always the same: use `silenceConsoleError()` from
+// __tests__/helpers/silence-console-error.ts, which mutes (and captures) the
+// output while leaving the guard installed. Direct assignment hits the setter
+// below and gets that message spelled out.
+Object.defineProperty(console, "error", {
+  configurable: false,
+  enumerable: true,
+  get: () => guardedConsoleError,
+  set: () => {
+    throw new Error(
+      `console.error is owned by the act() regression guard and cannot be ` +
+        `replaced — doing so would disable escaped-update detection for this ` +
+        `whole spec file. Use silenceConsoleError() from ` +
+        `__tests__/helpers/silence-console-error.ts, which mutes (and captures) ` +
+        `the output while leaving the guard installed.`,
+    )
+  },
+})
+
+/**
+ * Route console.error somewhere else for the current test, keeping the act()
+ * guard installed underneath. Used by `silenceConsoleError()`; specs should go
+ * through that helper rather than calling this directly.
+ */
+const setConsoleErrorSink = (sink: (...args: unknown[]) => void) => {
+  consoleErrorSink = sink
+}
+
+// The helper lives in __tests__/helpers and cannot import from a setup file, so
+// the seam is handed over on globalThis.
+;(globalThis as Record<string, unknown>).__setConsoleErrorSink = setConsoleErrorSink
+
 const failOnEscapedActUpdates = () => {
+  consoleErrorSink = originalConsoleError
+
   if (escapedActUpdates.length === 0) return
   const total = escapedActUpdates.length
-  const seen = [...new Set(escapedActUpdates)]
+  const currentTestName = expect.getState().currentTestName ?? ""
+  const seen = [...new Map(escapedActUpdates.map((u) => [`${u.testName}|${u.line}`, u]))]
   escapedActUpdates.length = 0
+
+  const elsewhere = seen.some(([, update]) => update.testName !== currentTestName)
+
   throw new Error(
     `${total} state update(s) escaped act():\n` +
-      `${seen.map((line) => `  - ${line}`).join("\n")}\n\n` +
+      `${seen
+        .map(([, update]) => `  - ${update.line}\n      (during: ${update.testName})`)
+        .join("\n")}\n\n` +
+      (elsewhere
+        ? `At least one update was emitted while a *different* test was running — ` +
+          `fix that test, not this one. Unmount-time warnings surface here because ` +
+          `RNTL's cleanup runs after this hook.\n\n`
+        : "") +
       `Await the render instead of letting it settle after the test body — see ` +
       `__tests__/helpers/flush-effects.ts. Full React stacks are above.`,
   )

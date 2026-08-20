@@ -10,6 +10,7 @@ import {
   usdWallet,
 } from "../../helpers/self-custodial-payment-request"
 import { usePaymentRequest } from "@app/self-custodial/hooks/use-payment-request"
+import { silenceConsoleError } from "../../helpers/silence-console-error"
 
 const mockReceiveLightning = jest.fn()
 const mockReceiveOnchain = jest.fn()
@@ -418,7 +419,7 @@ describe("usePaymentRequest", () => {
   describe("onchain adapter rejection (regression)", () => {
     it("does not crash the hook when createReceiveOnchain rejects", async () => {
       mockReceiveOnchain.mockRejectedValueOnce(new Error("onchain receive boom"))
-      const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {})
+      const consoleSpy = silenceConsoleError()
 
       const { result } = renderHook(() => usePaymentRequest())
 
@@ -431,14 +432,15 @@ describe("usePaymentRequest", () => {
 
     it("does not surface an unhandled rejection when the SDK adapter throws", async () => {
       const onUnhandled = jest.fn()
-      const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {})
+      const consoleSpy = silenceConsoleError()
       process.on("unhandledRejection", onUnhandled)
 
       mockReceiveOnchain.mockRejectedValueOnce(new Error("onchain rejected"))
       renderHook(() => usePaymentRequest())
-      await new Promise<void>((resolve) => {
-        setTimeout(resolve, 0)
-      })
+      // Settle the rejected adapter call inside act(): the hook commits state
+      // as it recovers, and letting that land after the test body is exactly
+      // the race the act() guard exists to catch.
+      await flushEffects()
       process.off("unhandledRejection", onUnhandled)
       consoleSpy.mockRestore()
 

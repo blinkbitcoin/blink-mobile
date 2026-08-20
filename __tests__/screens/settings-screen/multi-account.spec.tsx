@@ -140,6 +140,10 @@ describe("Settings", () => {
 
   it("saves the active custodial profile when a token is present and none are stored yet", async () => {
     mockAppConfigToken = "mock-token-1"
+    // Both `Once`s are consumed by the component under test: the shared wrapper
+    // supplies a settled registry rather than mounting AccountRegistryProvider,
+    // so nothing else reads the KeyStore here. First call finds no profile and
+    // triggers the save; the second sees it stored.
     ;(KeyStoreWrapper.getSessionProfiles as jest.Mock)
       .mockResolvedValueOnce([])
       .mockResolvedValueOnce(expectedProfiles)

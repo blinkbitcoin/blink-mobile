@@ -65,12 +65,29 @@ export const DEFAULT_ADAPTERS: IpLookupAdapter[] = [
   ipapiAdapter,
 ]
 
-if (
-  !Config.GEO_IPIFY_API_KEY &&
-  !Config.IPINFO_API_KEY &&
-  !Config.PROXYCHECK_API_KEY &&
-  !Config.IPAPI_API_KEY
-) {
+/**
+ * Warn once, on the first lookup rather than at module load.
+ *
+ * The keys are unset in every jest environment, so warning at import time meant
+ * every suite that pulled this module in — directly or through a screen — got
+ * the line, which is how it ended up on a global console.warn suppression list.
+ * Deferring it to the first actual lookup keeps the warning where it means
+ * something (a real request is about to run on a rate-limited free tier) and
+ * off the logs of tests that never look a country up.
+ */
+let hasWarnedAboutMissingKey = false
+
+const warnOnceIfNoApiKey = () => {
+  if (hasWarnedAboutMissingKey) return
+  if (
+    Config.GEO_IPIFY_API_KEY ||
+    Config.IPINFO_API_KEY ||
+    Config.PROXYCHECK_API_KEY ||
+    Config.IPAPI_API_KEY
+  ) {
+    return
+  }
+  hasWarnedAboutMissingKey = true
   console.warn(
     "[ip-country-lookup] No API key configured. Running on free tiers only (rate-limited). Set GEO_IPIFY_API_KEY, IPINFO_API_KEY, PROXYCHECK_API_KEY, or IPAPI_API_KEY in .env.local.",
   )
@@ -80,6 +97,8 @@ export const resolveIpCountryCode = async (
   adapters: IpLookupAdapter[] = DEFAULT_ADAPTERS,
   timeout: number = DEFAULT_TIMEOUT_MS,
 ): Promise<CountryCode | undefined> => {
+  warnOnceIfNoApiKey()
+
   for (const adapter of adapters) {
     try {
       const countryCode = await adapter(timeout)

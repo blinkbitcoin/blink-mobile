@@ -5,6 +5,7 @@ import { PaymentResultStatus } from "@app/types/payment"
 import { AccountType } from "@app/types/wallet"
 
 import { flushEffects } from "../../../helpers/flush-effects"
+import { silenceConsoleError } from "../../../helpers/silence-console-error"
 
 const mockUsePayments = jest.fn()
 const mockTranslateSdkError = jest.fn()
@@ -304,7 +305,7 @@ describe("useLnurlWithdrawRedemption — custodial branch", () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
-    consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => undefined)
+    consoleErrorSpy = silenceConsoleError()
     mockUsePayments.mockReturnValue({
       accountType: AccountType.Custodial,
       lnurlWithdraw: undefined,

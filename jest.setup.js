@@ -4,19 +4,16 @@
 // - "InteractionManager has been deprecated": @react-navigation/* internals and
 //   app/screens/transaction-history/transaction-history-screen.tsx
 // - "SafeAreaView has been deprecated": react-native-country-picker-modal
-// - "[ip-country-lookup] No API key configured": app/utils/ip-country-lookup.ts
-//   warns at module load when no geo API key env vars are set, which is always
-//   the case in the jest environment. The warning behavior itself is asserted
-//   in __tests__/utils/ip-country-lookup.spec.ts via a local console.warn spy
-//   (spies layer on top of this filter, so those assertions are unaffected).
 //
-// Anything not on this list still prints — new warnings stay visible. Before
-// adding a pattern here, make sure the warning is either third-party noise we
-// cannot fix or app behavior pinned by an explicit test assertion.
+// Both are third-party deprecations we cannot act on. Anything not on this list
+// still prints — new warnings stay visible. This list is for third-party noise
+// only: a warning our own code emits belongs fixed at the source, not hidden
+// here, because hiding it also hides the regression that would make it fire for
+// a real reason (app/utils/ip-country-lookup.ts was on this list until its
+// warning moved off module load and onto the first actual lookup).
 const SUPPRESSED_WARNINGS = [
   /InteractionManager has been deprecated/,
   /SafeAreaView has been deprecated/,
-  /\[ip-country-lookup\] No API key configured/,
 ]
 
 const originalWarn = console.warn.bind(console)

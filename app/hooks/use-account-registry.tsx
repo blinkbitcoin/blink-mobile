@@ -64,86 +64,34 @@ type AccountRegistryResult = {
   reloadSelfCustodialAccounts: () => Promise<void>
 }
 
-const AccountRegistryContext = createContext<AccountRegistryResult | null>(null)
+/**
+ * Exported so tests can supply a settled registry without mounting the
+ * provider's device reads — see `__tests__/screens/helper.tsx`. Application
+ * code goes through `AccountRegistryProvider` / `useAccountRegistry`.
+ */
+export const AccountRegistryContext = createContext<AccountRegistryResult | null>(null)
 
 /**
- * Owns the registry so its two device reads run once and are shared via context.
+ * Composes the registry value from inputs that have already been resolved.
  *
- * `skipHydration` is a test-only affordance: it skips the two async device
- * reads so the provider settles synchronously on mount. In the jest
- * environment those reads resolve to empty data anyway, but their promises
- * settle after the test body finishes, tripping React's "not wrapped in
- * act(...)" warning in every suite that mounts a screen. Production callers
- * must never pass it.
+ * Split out of the provider so "what the registry looks like" is defined once
+ * and stays independent of "where the data came from": the provider feeds it
+ * the two device reads, while tests feed it seeded entries directly.
  */
-export const AccountRegistryProvider = ({
-  children,
-  skipHydration = false,
+export const useComposedAccountRegistry = ({
+  selfCustodialEntries,
+  hasStoredCustodialProfile,
+  loading,
+  reloadSelfCustodialAccounts,
 }: {
-  children: ReactNode
-  skipHydration?: boolean
-}) => {
+  selfCustodialEntries: SelfCustodialAccountEntry[]
+  hasStoredCustodialProfile: boolean
+  loading: boolean
+  reloadSelfCustodialAccounts: () => Promise<void>
+}): AccountRegistryResult => {
   const isAuthed = useIsAuthed()
   const { persistentState, updateState } = usePersistentStateContext()
   const { LL } = useI18nContext()
-
-  const [selfCustodialEntries, setSelfCustodialEntries] = useState<
-    SelfCustodialAccountEntry[]
-  >(() => {
-    // Surface the active self-custodial id on first render to avoid the unauthed flash.
-    const id = persistentState.activeAccountId
-    if (!id || id === DefaultAccountId.Custodial) return []
-    return [{ id, lightningAddress: null }]
-  })
-
-  // KeyStore-derived so home agrees with switch-account when the live token has
-  // been cleared but a session profile is still saved.
-  const [hasStoredCustodialProfile, setHasStoredCustodialProfile] = useState(isAuthed)
-
-  // True until both async reads settle, so callers can wait before trusting `accounts`.
-  const [selfCustodialHydrating, setSelfCustodialHydrating] = useState(!skipHydration)
-  const [profilesHydrating, setProfilesHydrating] = useState(!skipHydration)
-
-  // Consumers can call the reload below at any time, so a read that is still in
-  // flight may resolve after a newer one has already answered. Applying it then
-  // would clobber fresher entries with stale ones, so late answers are dropped.
-  const reloadRequestRef = useRef(0)
-
-  const reloadSelfCustodialAccounts = useCallback(async () => {
-    if (skipHydration) return
-
-    const request = reloadRequestRef.current + 1
-    reloadRequestRef.current = request
-
-    setSelfCustodialHydrating(true)
-    const result = await listSelfCustodialAccounts()
-
-    if (reloadRequestRef.current !== request) return
-
-    if (result.status === StorageReadStatus.Ok) {
-      setSelfCustodialEntries(result.entries)
-    }
-    setSelfCustodialHydrating(false)
-  }, [skipHydration])
-
-  useEffect(() => {
-    reloadSelfCustodialAccounts()
-  }, [reloadSelfCustodialAccounts, persistentState.activeAccountId])
-
-  useEffect(() => {
-    if (skipHydration) return undefined
-    let mounted = true
-    setProfilesHydrating(true)
-    KeyStoreWrapper.getSessionProfiles().then((profiles) => {
-      if (mounted) {
-        setHasStoredCustodialProfile(profiles.length > 0)
-        setProfilesHydrating(false)
-      }
-    })
-    return () => {
-      mounted = false
-    }
-  }, [skipHydration, persistentState.galoyAuthToken, persistentState.activeAccountId])
 
   const accounts = useMemo(() => {
     const list: AccountDescriptor[] = []
@@ -180,12 +128,12 @@ export const AccountRegistryProvider = ({
     [updateState],
   )
 
-  const value = useMemo<AccountRegistryResult>(
+  return useMemo<AccountRegistryResult>(
     () => ({
       accounts,
       activeAccount,
       selfCustodialEntries,
-      loading: selfCustodialHydrating || profilesHydrating,
+      loading,
       setActiveAccountId,
       reloadSelfCustodialAccounts,
     }),
@@ -193,12 +141,79 @@ export const AccountRegistryProvider = ({
       accounts,
       activeAccount,
       selfCustodialEntries,
-      selfCustodialHydrating,
-      profilesHydrating,
+      loading,
       setActiveAccountId,
       reloadSelfCustodialAccounts,
     ],
   )
+}
+
+/** Owns the registry so its two device reads run once and are shared via context. */
+export const AccountRegistryProvider = ({ children }: { children: ReactNode }) => {
+  const isAuthed = useIsAuthed()
+  const { persistentState } = usePersistentStateContext()
+
+  const [selfCustodialEntries, setSelfCustodialEntries] = useState<
+    SelfCustodialAccountEntry[]
+  >(() => {
+    // Surface the active self-custodial id on first render to avoid the unauthed flash.
+    const id = persistentState.activeAccountId
+    if (!id || id === DefaultAccountId.Custodial) return []
+    return [{ id, lightningAddress: null }]
+  })
+
+  // KeyStore-derived so home agrees with switch-account when the live token has
+  // been cleared but a session profile is still saved.
+  const [hasStoredCustodialProfile, setHasStoredCustodialProfile] = useState(isAuthed)
+
+  // True until both async reads settle, so callers can wait before trusting `accounts`.
+  const [selfCustodialHydrating, setSelfCustodialHydrating] = useState(true)
+  const [profilesHydrating, setProfilesHydrating] = useState(true)
+
+  // Consumers can call the reload below at any time, so a read that is still in
+  // flight may resolve after a newer one has already answered. Applying it then
+  // would clobber fresher entries with stale ones, so late answers are dropped.
+  const reloadRequestRef = useRef(0)
+
+  const reloadSelfCustodialAccounts = useCallback(async () => {
+    const request = reloadRequestRef.current + 1
+    reloadRequestRef.current = request
+
+    setSelfCustodialHydrating(true)
+    const result = await listSelfCustodialAccounts()
+
+    if (reloadRequestRef.current !== request) return
+
+    if (result.status === StorageReadStatus.Ok) {
+      setSelfCustodialEntries(result.entries)
+    }
+    setSelfCustodialHydrating(false)
+  }, [])
+
+  useEffect(() => {
+    reloadSelfCustodialAccounts()
+  }, [reloadSelfCustodialAccounts, persistentState.activeAccountId])
+
+  useEffect(() => {
+    let mounted = true
+    setProfilesHydrating(true)
+    KeyStoreWrapper.getSessionProfiles().then((profiles) => {
+      if (mounted) {
+        setHasStoredCustodialProfile(profiles.length > 0)
+        setProfilesHydrating(false)
+      }
+    })
+    return () => {
+      mounted = false
+    }
+  }, [persistentState.galoyAuthToken, persistentState.activeAccountId])
+
+  const value = useComposedAccountRegistry({
+    selfCustodialEntries,
+    hasStoredCustodialProfile,
+    loading: selfCustodialHydrating || profilesHydrating,
+    reloadSelfCustodialAccounts,
+  })
 
   return (
     <AccountRegistryContext.Provider value={value}>

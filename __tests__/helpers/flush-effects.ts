@@ -20,10 +20,18 @@ import { act } from "@testing-library/react-native"
  * Tests that already await `waitFor`/`findBy*` on the resolved state do not need
  * this — the awaited query already settles the effects inside `act()`.
  */
+// Captured at import time, before any spec installs fake timers. Under
+// `jest.useFakeTimers()` the global `setImmediate` is replaced by one that only
+// fires when the spec advances the clock, so a flush scheduled on it would
+// never resolve and the test would time out. The real one yields to the event
+// loop once, which is all this needs: it settles already-pending promises
+// without disturbing the fake clock the spec is driving.
+const realSetImmediate = globalThis.setImmediate
+
 export const flushEffects = async (): Promise<void> => {
   await act(async () => {
     await new Promise<void>((resolve) => {
-      setImmediate(resolve)
+      realSetImmediate(resolve)
     })
   })
 }

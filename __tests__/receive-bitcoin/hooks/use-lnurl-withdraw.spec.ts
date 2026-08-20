@@ -3,6 +3,7 @@ import { Alert } from "react-native"
 
 import { useLnurlWithdraw } from "@app/screens/receive-bitcoin-screen/hooks/use-lnurl-withdraw"
 import { Invoice } from "@app/screens/receive-bitcoin-screen/payment/index.types"
+import { silenceConsoleError } from "../../helpers/silence-console-error"
 
 const mockLL = {
   RedeemBitcoinScreen: {
@@ -161,7 +162,7 @@ describe("useLnurlWithdraw", () => {
   it("shows submission error on non-ok response", async () => {
     // The hook logs the simulated failure via console.error; capture it so the
     // expected error doesn't pollute CI logs (and assert it actually happened).
-    const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {})
+    const consoleErrorSpy = silenceConsoleError()
     const alertSpy = jest.spyOn(Alert, "alert")
     mockFetch.mockResolvedValue({
       ok: false,
@@ -189,7 +190,7 @@ describe("useLnurlWithdraw", () => {
   it("shows redeeming error when response status is not ok", async () => {
     // The hook logs the simulated failure via console.error; capture it so the
     // expected error doesn't pollute CI logs (and assert it actually happened).
-    const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {})
+    const consoleErrorSpy = silenceConsoleError()
     const alertSpy = jest.spyOn(Alert, "alert")
     mockFetch.mockResolvedValue({
       ok: true,

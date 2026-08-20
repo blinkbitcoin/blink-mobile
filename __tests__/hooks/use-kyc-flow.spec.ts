@@ -3,6 +3,7 @@ import { Alert } from "react-native"
 
 import { useKycFlow } from "@app/hooks/use-kyc-flow"
 import { KycFlowType } from "@app/graphql/generated"
+import { silenceConsoleError } from "../helpers/silence-console-error"
 
 const mockNavigate = jest.fn()
 const mockGoBack = jest.fn()
@@ -189,7 +190,7 @@ describe("useKycFlow", () => {
   it("calls goBack on canceled error", async () => {
     // The hook logs the simulated failure via console.error; capture it so the
     // expected error doesn't pollute CI logs (and assert it actually happened).
-    const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {})
+    const consoleErrorSpy = silenceConsoleError()
     mockKycFlowStart.mockRejectedValue(new Error("Request canceled by user"))
 
     const { result } = renderHook(() => useKycFlow())
@@ -210,7 +211,7 @@ describe("useKycFlow", () => {
   it("shows Alert on other errors", async () => {
     // The hook logs the simulated failure via console.error; capture it so the
     // expected error doesn't pollute CI logs (and assert it actually happened).
-    const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {})
+    const consoleErrorSpy = silenceConsoleError()
     mockKycFlowStart.mockRejectedValue(new Error("Network failure"))
 
     const { result } = renderHook(() => useKycFlow())
