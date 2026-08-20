@@ -292,13 +292,6 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
     </Pressable>
   )
 
-  const renderChip = (label: string, url: string) => (
-    <Pressable key={label} style={styles.chip} onPress={() => openUrl(url)}>
-      <Text style={styles.chipText}>{label}</Text>
-      <GaloyIcon name="arrow-square-out" size={12} color={colors.primary} />
-    </Pressable>
-  )
-
   // Brand names, so they stay untranslated — the same three btcmap.org lists.
   const socials = (
     [
@@ -504,16 +497,16 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
                   renderRow("lightning", LL.MapScreen.payMerchant(), () =>
                     openUrl(details?.paymentUrl ?? ""),
                   )}
+                {/* No brand glyphs in the icon set, so they share one. */}
+                {socials.map(([label, url]) => (
+                  <React.Fragment key={label}>
+                    {renderRow("link", label, () => openUrl(url))}
+                  </React.Fragment>
+                ))}
               </View>
 
               {Boolean(details?.description) && (
                 <Text style={styles.description}>{details?.description}</Text>
-              )}
-
-              {socials.length > 0 && (
-                <View style={styles.chips}>
-                  {socials.map(([label, url]) => renderChip(label, url))}
-                </View>
               )}
 
               {/* Dragging the sheet down closes it, but that is a gesture you
@@ -691,26 +684,6 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: StyleProps) => ({
     color: colors.primary,
     textDecorationLine: "underline",
   },
-  chips: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    columnGap: 8,
-    rowGap: 8,
-  },
-  chip: {
-    flexDirection: "row",
-    alignItems: "center",
-    columnGap: 6,
-    borderWidth: 1,
-    borderColor: colors.grey4,
-    borderRadius: 16,
-    paddingHorizontal: 14,
-    minHeight: 44,
-  },
-  chipText: {
-    fontSize: 12,
-    color: colors.black,
-  },
   description: {
     fontSize: 14,
     color: colors.grey1,
@@ -747,7 +720,7 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: StyleProps) => ({
   },
   closeText: {
     fontSize: 17,
-    fontWeight: "600",
+    fontWeight: "700",
     color: colors.primary,
   },
 }))
