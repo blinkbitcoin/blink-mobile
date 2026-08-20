@@ -148,7 +148,10 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
   // The resting offset that leaves the header block showing, once it has been
   // measured. Until then the sheet stays off-screen rather than guessing.
   const peekOffset = useSharedValue(sheetHeight)
-  const [peekHeight, setPeekHeight] = React.useState(0)
+  // The peek's bottom edge within the sheet (y + height), not its bare height:
+  // the border, padding, and handle above it sit inside the visible window too,
+  // and counting only the height clipped their worth off the peek's last row.
+  const [peekBottom, setPeekBottom] = React.useState(0)
   const [isExpanded, setExpanded] = React.useState(false)
 
   const scrollRef = useAnimatedRef<Animated.ScrollView>()
@@ -156,9 +159,16 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
   // that is already at its top from one that is scrolling it back up.
   const scrollOffset = useScrollViewOffset(scrollRef)
 
+  // The home-indicator inset is added under the peek while resting: the sheet's
+  // foot sits at the screen edge there, and without the lift the inset swallows
+  // the status row — the verification line most of all.
+  const restingOffset = peekBottom
+    ? Math.max(0, sheetHeight - peekBottom - insets.bottom)
+    : sheetHeight
+
   React.useEffect(() => {
-    peekOffset.value = peekHeight ? sheetHeight - peekHeight : sheetHeight
-  }, [peekHeight, sheetHeight, peekOffset])
+    peekOffset.value = restingOffset
+  }, [restingOffset, peekOffset])
 
   React.useEffect(() => {
     if (!place) {
@@ -169,10 +179,10 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
     // once the details land — a place that can only be paid through another app
     // gains a whole card — and a sheet the user has already pulled up must not
     // drop back down under them when that happens.
-    if (peekHeight && !isExpanded) {
-      offset.value = withSpring(sheetHeight - peekHeight, SPRING)
+    if (peekBottom && !isExpanded) {
+      offset.value = withSpring(restingOffset, SPRING)
     }
-  }, [place, peekHeight, sheetHeight, isExpanded, offset])
+  }, [place, peekBottom, restingOffset, sheetHeight, isExpanded, offset])
 
   const pan = React.useMemo(
     () =>
@@ -342,12 +352,17 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
           >
             <View style={styles.handle} />
 
-            {/* What the lower resting position shows. Its measured height is
-                the snap point, so this block decides where the sheet stops. */}
+            {/* What the lower resting position shows. Its measured bottom edge
+                sets the snap point, so this block decides where the sheet
+                stops. */}
             <View
               testID="place-sheet-peek"
               style={styles.peek}
-              onLayout={(event) => setPeekHeight(event.nativeEvent.layout.height)}
+              onLayout={(event) =>
+                setPeekBottom(
+                  event.nativeEvent.layout.y + event.nativeEvent.layout.height,
+                )
+              }
             >
               <View style={styles.header}>
                 {isLoading && !details ? (
