@@ -2073,7 +2073,7 @@
         "openSettings": "Open settings",
         "title": "Map",
         "error": "Oops. Something went wrong while getting your location",
-        "attribution": "Places from {btcMap: string}, © {openStreetMap: string} contributors",
+        "attribution": "Places from BTC Map, © OpenStreetMap contributors",
         "unnamedPlace": "Unnamed place",
         "loadingPlaces": "Loading places from BTC Map",
         "placesError": "Couldn't load places from BTC Map",

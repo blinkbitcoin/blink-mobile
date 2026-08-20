@@ -87,8 +87,15 @@ const CLOSE_DURATION_MS = 200
 const BOTTOM_OVERHANG = 1
 
 // Brand names, so they stay untranslated. They are also what the ODbL credit is
-// split on below, which is why the sentence takes them as parameters rather
-// than spelling them out: a translator cannot move the link off the name.
+// split on below, to find the two spans that should be drawn as links.
+//
+// The sentence spells them out rather than taking them as parameters. Parameters
+// would guarantee the split always finds them, but only in a locale that had
+// caught up with them: every one of the 28 we ship carries the credit already,
+// with both names verbatim, so parameterising the English source would drift
+// from all 28 at once (see locale-parity.spec.ts) to buy a guarantee they do not
+// need. If a future translation does translate a brand name, that name loses its
+// link and stays plain text — the credit still reads, which is what ODbL asks.
 const BTC_MAP = "BTC Map"
 const OPEN_STREET_MAP = "OpenStreetMap"
 
@@ -341,14 +348,10 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
     return url ? [[label, url] as [string, string]] : []
   })
 
-  // Split back apart so each brand name can be drawn as a link wherever the
-  // translation happens to place it. A locale that has not caught up with the
-  // parameters yet still names both, so it degrades to plain text, not to a
-  // missing credit.
-  const attribution = LL.MapScreen.attribution({
-    btcMap: BTC_MAP,
-    openStreetMap: OPEN_STREET_MAP,
-  }).split(ATTRIBUTION_PATTERN)
+  // Split apart so each brand name can be drawn as a link wherever the
+  // translation happens to place it — the word order around them differs by
+  // locale, and only the names themselves are fixed.
+  const attribution = LL.MapScreen.attribution().split(ATTRIBUTION_PATTERN)
 
   const verificationLabel = {
     [VerificationState.Verified]: () =>
