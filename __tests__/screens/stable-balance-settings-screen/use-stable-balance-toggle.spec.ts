@@ -131,6 +131,24 @@ describe("useStableBalanceToggle", () => {
     expect(result.current.switchKey).toBe(initialSwitchKey + 1)
   })
 
+  /** The refusal above is silent by design, so the screen needs the pending state itself to
+   *  disable the control; without it the switch flips on and snaps back unexplained. */
+  it("surfaces the pending region so the screen can disable the switch", () => {
+    mockIsRegionPending = true
+
+    const { result } = renderToggle()
+
+    expect(result.current.isRegionPending).toBe(true)
+  })
+
+  it("reports no pending region once the verdict lands", () => {
+    mockIsRegionPending = false
+
+    const { result } = renderToggle()
+
+    expect(result.current.isRegionPending).toBe(false)
+  })
+
   it("does not accuse the region while it is still pending", async () => {
     mockIsRegionPending = true
     const { result } = renderToggle()

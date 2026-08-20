@@ -21,6 +21,11 @@ type Params = {
 
 export type StableBalanceToggleControls = {
   busy: boolean
+  /** The region verdict has not landed, so an activation would be refused. Surfaced so the
+   *  screen can disable the switch instead of letting it flip on and snap back unexplained;
+   *  this screen is self-custodial-only, which is the group whose region resolves over the
+   *  network and can take seconds. */
+  isRegionPending: boolean
   displayValue: boolean
   switchKey: number
   apply: (activate: boolean) => Promise<void>
@@ -111,6 +116,7 @@ export const useStableBalanceToggle = ({
 
   return {
     busy,
+    isRegionPending,
     displayValue: pendingValue ?? isStableBalanceActive,
     switchKey,
     apply,

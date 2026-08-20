@@ -39,13 +39,19 @@ export const StableBalanceSettingsScreen: React.FC = () => {
   } = useSelfCustodialWallet()
   const [pendingDirection, setPendingDirection] = useState<ToggleDirection | null>(null)
 
-  const { busy, displayValue, switchKey, apply, resyncSwitch } = useStableBalanceToggle({
-    sdk,
-    isStableBalanceActive: isStableBalanceActive ?? false,
-    refreshWallets,
-    refreshStableBalanceActive,
-    LL,
-  })
+  const { busy, isRegionPending, displayValue, switchKey, apply, resyncSwitch } =
+    useStableBalanceToggle({
+      sdk,
+      isStableBalanceActive: isStableBalanceActive ?? false,
+      refreshWallets,
+      refreshStableBalanceActive,
+      LL,
+    })
+
+  /** An activation is refused until the region resolves, so the control waits with a
+   *  spinner rather than accepting a tap it is about to undo. */
+  const isToggleWaiting = busy || isRegionPending
+  const isToggleDisabled = isToggleWaiting || !sdk
 
   const btcBalanceAmount =
     wallets.find((w) => w.walletCurrency === WalletCurrency.Btc)?.balance.amount ?? 0
@@ -109,12 +115,12 @@ export const StableBalanceSettingsScreen: React.FC = () => {
                 : LL.StableBalance.inactiveHint()}
             </Text>
           </View>
-          {busy ? <ActivityIndicator style={styles.spinner} /> : null}
+          {isToggleWaiting ? <ActivityIndicator style={styles.spinner} /> : null}
           <Switch
             key={switchKey}
             value={displayValue}
             onValueChange={handleToggle}
-            disabled={busy || !sdk}
+            disabled={isToggleDisabled}
             testID={SWITCH_TEST_ID}
             accessibilityLabel={LL.StableBalance.activationLabel()}
           />
