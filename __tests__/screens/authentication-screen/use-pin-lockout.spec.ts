@@ -17,6 +17,11 @@ jest.mock("@app/screens/authentication-screen/pin-verification", () => ({
 const mockedReadPinLockState = jest.mocked(readPinLockState)
 const mockedVerifyPin = jest.mocked(verifyPin)
 
+const readableState = (attempts = 0, lockedUntil = 0) => ({
+  status: "readable" as const,
+  state: { attempts, lockedUntil },
+})
+
 const callbacks = () => ({
   onUnlocked: jest.fn(),
   onWrongPin: jest.fn(),
@@ -37,7 +42,7 @@ const renderLockout = (
 
 beforeEach(() => {
   jest.clearAllMocks()
-  mockedReadPinLockState.mockResolvedValue({ attempts: 0, lockedUntil: 0 })
+  mockedReadPinLockState.mockResolvedValue(readableState())
   mockedVerifyPin.mockResolvedValue({ outcome: "unlocked" })
 })
 
@@ -56,7 +61,7 @@ describe("usePinLockout", () => {
 
   describe("hydration", () => {
     it("refuses input until the stored state has been read", async () => {
-      let release: (state: { attempts: number; lockedUntil: number }) => void = () => {}
+      let release: (state: ReturnType<typeof readableState>) => void = () => {}
       mockedReadPinLockState.mockReturnValue(
         new Promise((resolve) => {
           release = resolve
@@ -68,7 +73,7 @@ describe("usePinLockout", () => {
       expect(result.current.canAcceptInput()).toBe(false)
 
       await act(async () => {
-        release({ attempts: 0, lockedUntil: 0 })
+        release(readableState())
       })
       await flushEffects()
 
@@ -76,7 +81,7 @@ describe("usePinLockout", () => {
     })
 
     it("restores how many attempts are left", async () => {
-      mockedReadPinLockState.mockResolvedValue({ attempts: 2, lockedUntil: 0 })
+      mockedReadPinLockState.mockResolvedValue(readableState(2))
 
       const { result } = renderLockout()
       await flushEffects()
@@ -89,6 +94,71 @@ describe("usePinLockout", () => {
       await flushEffects()
 
       expect(result.current.attemptsRemaining).toBeNull()
+    })
+
+    it("reports an unreadable state and hands the keypad back for a retry", async () => {
+      mockedReadPinLockState.mockResolvedValue({ status: "unreadable" })
+
+      const { result, handlers } = renderLockout()
+      await flushEffects()
+
+      expect(handlers.onUnreadable).toHaveBeenCalledTimes(1)
+      expect(result.current.canAcceptInput()).toBe(true)
+      expect(result.current.attemptsRemaining).toBeNull()
+    })
+  })
+
+  describe("clock rollback", () => {
+    beforeEach(() => {
+      jest.useFakeTimers({ doNotFake: ["setImmediate"] })
+    })
+
+    afterEach(() => {
+      jest.useRealTimers()
+    })
+
+    it("re-reads the authoritative state to persist a repaired live expiry", async () => {
+      const start = Date.now()
+      mockedReadPinLockState
+        .mockResolvedValueOnce(readableState(1, start + 30_000))
+        .mockImplementation(async (now) => readableState(1, now + 30_000))
+
+      renderLockout()
+      await flushEffects()
+
+      act(() => {
+        jest.setSystemTime(start - 60 * 60 * 1000)
+        jest.advanceTimersByTime(250)
+      })
+      await flushEffects()
+
+      expect(mockedReadPinLockState).toHaveBeenCalledTimes(2)
+      expect(mockedReadPinLockState.mock.calls[1][0]).toBeLessThan(start - 59 * 60 * 1000)
+    })
+
+    it("reports an unreadable persisted repair while the local countdown continues", async () => {
+      const start = Date.now()
+      mockedReadPinLockState
+        .mockResolvedValueOnce(readableState(1, start + 30_000))
+        .mockResolvedValueOnce({ status: "unreadable" })
+
+      const { result, handlers } = renderLockout()
+      await flushEffects()
+
+      act(() => {
+        jest.setSystemTime(start - 60 * 60 * 1000)
+        jest.advanceTimersByTime(250)
+      })
+      await flushEffects()
+
+      expect(handlers.onUnreadable).toHaveBeenCalledTimes(1)
+      expect(result.current.remainingSeconds).toBe(30)
+
+      await act(async () => {
+        jest.advanceTimersByTime(10_000)
+      })
+      expect(result.current.remainingSeconds).toBe(20)
+      expect(mockedReadPinLockState).toHaveBeenCalledTimes(2)
     })
   })
 
@@ -175,7 +245,7 @@ describe("usePinLockout", () => {
 
   describe("reporting outcomes", () => {
     it("reports an unlock and drops any remembered failures", async () => {
-      mockedReadPinLockState.mockResolvedValue({ attempts: 2, lockedUntil: 0 })
+      mockedReadPinLockState.mockResolvedValue(readableState(2))
       const { result, handlers } = renderLockout()
       await flushEffects()
 
@@ -239,7 +309,7 @@ describe("usePinLockout", () => {
   })
 
   it("does not update state when the screen is gone before hydration finishes", async () => {
-    let release: (state: { attempts: number; lockedUntil: number }) => void = () => {}
+    let release: (state: ReturnType<typeof readableState>) => void = () => {}
     mockedReadPinLockState.mockReturnValue(
       new Promise((resolve) => {
         release = resolve
@@ -251,7 +321,7 @@ describe("usePinLockout", () => {
     unmount()
 
     await act(async () => {
-      release({ attempts: 1, lockedUntil: 0 })
+      release(readableState(1))
     })
 
     expect(warn).not.toHaveBeenCalled()
@@ -261,7 +331,7 @@ describe("usePinLockout", () => {
 
 describe("when the stored pin could not be read", () => {
   const unreadableAfterAFailure = async () => {
-    mockedReadPinLockState.mockResolvedValue({ attempts: 1, lockedUntil: 0 })
+    mockedReadPinLockState.mockResolvedValue(readableState(1))
     mockedVerifyPin.mockResolvedValue({ outcome: "unreadable" })
 
     const { result, handlers } = renderLockout()

@@ -39,6 +39,16 @@ export type PinFailureState = {
   readonly lockedUntil: number
 }
 
+export type PinFailureStateRead =
+  | { readonly status: "found"; readonly state: PinFailureState }
+  | { readonly status: "absent" }
+  | { readonly status: "failed"; readonly err: unknown }
+
+type SecureStoreRead =
+  | { readonly status: "found"; readonly value: string }
+  | { readonly status: "absent" }
+  | { readonly status: "failed"; readonly err: unknown }
+
 const CLEARED_PIN_FAILURE_STATE: PinFailureState = { attempts: 0, lockedUntil: 0 }
 
 export default class KeyStoreWrapper {
@@ -90,23 +100,18 @@ export default class KeyStoreWrapper {
     }
   }
 
-  /** `null` for a missing key and for a failed read — the two are not
-   *  distinguishable through this library on either platform. */
-  private static async read(key: string): Promise<string | null> {
+  private static async readWithStatus(key: string): Promise<SecureStoreRead> {
     try {
-      return await RNSecureKeyStore.get(key)
-    } catch {
-      return null
+      return { status: "found", value: await RNSecureKeyStore.get(key) }
+    } catch (err) {
+      return isKeyNotFound(err) ? { status: "absent" } : { status: "failed", err }
     }
   }
 
-  /** Missing, empty and unparseable all collapse to `fallback`, so a corrupt
-   *  entry can never leak a NaN into a comparison. */
-  private static async readNumber(key: string, fallback: number): Promise<number> {
-    const raw = await KeyStoreWrapper.read(key)
-    if (raw === null) return fallback
-    const parsed = Number(raw)
-    return Number.isFinite(parsed) ? parsed : fallback
+  /** Collapses absent and failed for callers where either means do nothing. */
+  private static async read(key: string): Promise<string | null> {
+    const read = await KeyStoreWrapper.readWithStatus(key)
+    return read.status === "found" ? read.value : null
   }
 
   // ── biometrics ────────────────────────────────────────────────────────────
@@ -161,21 +166,36 @@ export default class KeyStoreWrapper {
   // if only the lock landed, the failure itself was lost, and the attacker got
   // a free attempt cycle back the moment the lock expired.
 
-  public static async getPinFailureState(): Promise<PinFailureState> {
-    const raw = await KeyStoreWrapper.read(KeyStoreWrapper.PIN_FAILURE_STATE)
+  public static async getPinFailureState(): Promise<PinFailureStateRead> {
+    const current = await KeyStoreWrapper.readWithStatus(
+      KeyStoreWrapper.PIN_FAILURE_STATE,
+    )
 
-    if (raw !== null) {
-      return KeyStoreWrapper.parsePinFailureState(raw)
+    if (current.status === "found") {
+      return {
+        status: "found",
+        state: KeyStoreWrapper.parsePinFailureState(current.value),
+      }
     }
+    if (current.status === "failed") return current
 
     // Upgrade path: an install that failed a PIN before this release has an
     // attempt count and no lock. Reading it keeps that budget spent; the next
     // write moves it to the new key and erases this one.
-    const legacyAttempts = await KeyStoreWrapper.readNumber(
+    const legacy = await KeyStoreWrapper.readWithStatus(
       KeyStoreWrapper.LEGACY_PIN_ATTEMPTS,
-      0,
     )
-    return { attempts: legacyAttempts, lockedUntil: 0 }
+    if (legacy.status === "failed") return legacy
+    if (legacy.status === "absent") return { status: "absent" }
+
+    const attempts = Number(legacy.value)
+    return {
+      status: "found",
+      state: {
+        attempts: Number.isFinite(attempts) ? attempts : 0,
+        lockedUntil: 0,
+      },
+    }
   }
 
   /** Missing, corrupt and non-finite all collapse to a clean slate, so no NaN
@@ -229,7 +249,14 @@ export default class KeyStoreWrapper {
     // An erase reports failure for a key that was never there too, so ask what
     // is actually still readable rather than writing on every clear.
     const remaining = await KeyStoreWrapper.getPinFailureState()
-    if (remaining.attempts === 0 && remaining.lockedUntil === 0) return true
+    if (remaining.status === "absent") return true
+    if (
+      remaining.status === "found" &&
+      remaining.state.attempts === 0 &&
+      remaining.state.lockedUntil === 0
+    ) {
+      return true
+    }
 
     // Writing the cleared value also shadows a legacy key that would not erase.
     return KeyStoreWrapper.write(

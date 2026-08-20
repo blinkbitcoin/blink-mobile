@@ -29,7 +29,10 @@ const NOW = 1_700_000_000_000
 
 /** Puts the keystore in a known state before a verification. */
 const storedState = ({ attempts = 0, lockedUntil = 0 } = {}) => {
-  mockedStore.getPinFailureState.mockResolvedValue({ attempts, lockedUntil })
+  mockedStore.getPinFailureState.mockResolvedValue({
+    status: "found",
+    state: { attempts, lockedUntil },
+  })
 }
 
 beforeEach(() => {
@@ -279,9 +282,49 @@ describe("verifyPin", () => {
       })
     })
   })
+
+  describe("when the failure state cannot be read", () => {
+    it("refuses verification without comparing the PIN or changing the budget", async () => {
+      mockedStore.getPinFailureState.mockResolvedValue({
+        status: "failed",
+        err: new Error("keystore unavailable"),
+      })
+
+      await expect(verifyPin(CORRECT_PIN, NOW)).resolves.toEqual({
+        outcome: "unreadable",
+      })
+      expect(mockedStore.getPin).not.toHaveBeenCalled()
+      expect(mockedStore.setPinFailureState).not.toHaveBeenCalled()
+      expect(mockedStore.clearPinFailureState).not.toHaveBeenCalled()
+    })
+
+    it("reports the read failure", async () => {
+      mockedStore.getPinFailureState.mockResolvedValue({
+        status: "failed",
+        err: new Error("keystore unavailable"),
+      })
+
+      await verifyPin(CORRECT_PIN, NOW)
+
+      expect(mockRecordAppError).toHaveBeenCalledWith(
+        expect.objectContaining({ message: "PIN lockout state could not be read" }),
+        expect.objectContaining({ alwaysRecord: true }),
+      )
+    })
+  })
 })
 
 describe("readPinLockState", () => {
+  it("normalizes genuinely absent failure state to a clean readable state", async () => {
+    mockedStore.getPinFailureState.mockResolvedValue({ status: "absent" })
+
+    await expect(readPinLockState(NOW)).resolves.toEqual({
+      status: "readable",
+      state: { attempts: 0, lockedUntil: 0 },
+    })
+    expect(mockedStore.setPinFailureState).not.toHaveBeenCalled()
+  })
+
   it("cuts a lock that outran the schedule and repairs it in storage", async () => {
     // Without the write-back the bad value survives and re-imposes the full
     // lockout on every launch, forever.
@@ -290,7 +333,10 @@ describe("readPinLockState", () => {
 
     const state = await readPinLockState(NOW)
 
-    expect(state.lockedUntil).toBe(NOW + MAX_LOCKOUT_MS)
+    expect(state).toEqual({
+      status: "readable",
+      state: { attempts: 1, lockedUntil: NOW + MAX_LOCKOUT_MS },
+    })
     expect(mockedStore.setPinFailureState).toHaveBeenCalledWith({
       attempts: 1,
       lockedUntil: NOW + MAX_LOCKOUT_MS,
@@ -302,7 +348,10 @@ describe("readPinLockState", () => {
 
     const state = await readPinLockState(NOW)
 
-    expect(state.lockedUntil).toBe(NOW + 20_000)
+    expect(state).toEqual({
+      status: "readable",
+      state: { attempts: 1, lockedUntil: NOW + 20_000 },
+    })
     expect(mockedStore.setPinFailureState).not.toHaveBeenCalled()
   })
 
@@ -310,8 +359,8 @@ describe("readPinLockState", () => {
     storedState({ attempts: -3 })
 
     await expect(readPinLockState(NOW)).resolves.toEqual({
-      attempts: 0,
-      lockedUntil: 0,
+      status: "readable",
+      state: { attempts: 0, lockedUntil: 0 },
     })
   })
 })

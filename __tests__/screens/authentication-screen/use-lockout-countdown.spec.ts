@@ -46,6 +46,31 @@ describe("useLockoutCountdown", () => {
     expect(result.current.remainingSeconds).toBe(20)
   })
 
+  it("repairs a live expiry once when the wall clock moves backward", async () => {
+    const start = Date.now()
+    const onLockedUntilRepaired = jest.fn()
+    const { result } = renderHook(() =>
+      useLockoutCountdown(start + 30_000, onLockedUntilRepaired),
+    )
+
+    await advance(5_000)
+    expect(result.current.remainingSeconds).toBe(25)
+
+    act(() => {
+      jest.setSystemTime(start - 60 * 60 * 1000)
+    })
+    await advance(250)
+
+    expect(onLockedUntilRepaired).toHaveBeenCalledTimes(1)
+    expect(result.current.remainingSeconds).toBe(30)
+
+    await advance(10_000)
+    expect(result.current.remainingSeconds).toBe(20)
+
+    await advance(20_000)
+    expect(result.current.isLocked).toBe(false)
+  })
+
   it("keeps the lock up, and the label off zero, in the final part-second", async () => {
     // Flooring here would both unlock early and render "try again in 0s" for a
     // whole second while the keypad was still dead.

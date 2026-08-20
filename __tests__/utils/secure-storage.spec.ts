@@ -339,12 +339,15 @@ describe("KeyStoreWrapper PIN methods", () => {
 })
 
 describe("KeyStoreWrapper PIN lockout state", () => {
+  const missingKey = (message = "key has not been set") =>
+    Object.assign(new Error(message), { code: "404" })
+
   /** Answers each key with its own stored value; anything else rejects the way
    *  the keystore does for a missing key. */
   const storedKeys = (values: Record<string, string>) => {
     mockGet.mockImplementation(async (key: string) => {
       if (key in values) return values[key]
-      throw new Error(`${key} has not been set`)
+      throw missingKey(`${key} has not been set`)
     })
   }
 
@@ -362,17 +365,17 @@ describe("KeyStoreWrapper PIN lockout state", () => {
 
       const result = await KeyStoreWrapper.getPinFailureState()
 
-      expect(result).toEqual({ attempts: 2, lockedUntil: 1700000060000 })
+      expect(result).toEqual({
+        status: "found",
+        state: { attempts: 2, lockedUntil: 1700000060000 },
+      })
       expect(mockGet).toHaveBeenCalledWith("pinFailureState")
     })
 
     it("reports a clean slate when nothing is stored", async () => {
       storedKeys({})
 
-      expect(await KeyStoreWrapper.getPinFailureState()).toEqual({
-        attempts: 0,
-        lockedUntil: 0,
-      })
+      expect(await KeyStoreWrapper.getPinFailureState()).toEqual({ status: "absent" })
     })
 
     it("reads back a clean slate for a corrupt or non-finite value", async () => {
@@ -388,8 +391,8 @@ describe("KeyStoreWrapper PIN lockout state", () => {
         storedKeys({ pinFailureState: stored })
 
         expect(await KeyStoreWrapper.getPinFailureState()).toEqual({
-          attempts: 0,
-          lockedUntil: 0,
+          status: "found",
+          state: { attempts: 0, lockedUntil: 0 },
         })
       }
     })
@@ -399,8 +402,8 @@ describe("KeyStoreWrapper PIN lockout state", () => {
       storedKeys({ pinAttempts: "2" })
 
       expect(await KeyStoreWrapper.getPinFailureState()).toEqual({
-        attempts: 2,
-        lockedUntil: 0,
+        status: "found",
+        state: { attempts: 2, lockedUntil: 0 },
       })
     })
 
@@ -411,8 +414,36 @@ describe("KeyStoreWrapper PIN lockout state", () => {
       })
 
       expect(await KeyStoreWrapper.getPinFailureState()).toEqual({
-        attempts: 0,
-        lockedUntil: 0,
+        status: "found",
+        state: { attempts: 0, lockedUntil: 0 },
+      })
+    })
+
+    it("does not fall back when reading the current state fails", async () => {
+      const readError = new Error("keystore unavailable")
+      mockGet.mockImplementation(async (key: string) => {
+        if (key === "pinFailureState") throw readError
+        if (key === "pinAttempts") return "2"
+        throw missingKey()
+      })
+
+      await expect(KeyStoreWrapper.getPinFailureState()).resolves.toEqual({
+        status: "failed",
+        err: readError,
+      })
+      expect(mockGet).not.toHaveBeenCalledWith("pinAttempts")
+    })
+
+    it("does not treat a failed legacy read as a clean state", async () => {
+      const readError = new Error("keystore unavailable")
+      mockGet.mockImplementation(async (key: string) => {
+        if (key === "pinFailureState") throw missingKey()
+        throw readError
+      })
+
+      await expect(KeyStoreWrapper.getPinFailureState()).resolves.toEqual({
+        status: "failed",
+        err: readError,
       })
     })
   })
@@ -479,6 +510,18 @@ describe("KeyStoreWrapper PIN lockout state", () => {
       storedKeys({
         pinFailureState: JSON.stringify({ attempts: 3, lockedUntil: 1700000060000 }),
       })
+
+      expect(await KeyStoreWrapper.clearPinFailureState()).toBe(true)
+      expect(mockSet).toHaveBeenCalledWith(
+        "pinFailureState",
+        JSON.stringify({ attempts: 0, lockedUntil: 0 }),
+        { accessible: "ALWAYS_THIS_DEVICE_ONLY" },
+      )
+    })
+
+    it("writes a cleared value when the fallback read also fails", async () => {
+      mockRemove.mockRejectedValue(new Error("keystore locked"))
+      mockGet.mockRejectedValue(new Error("keystore unavailable"))
 
       expect(await KeyStoreWrapper.clearPinFailureState()).toBe(true)
       expect(mockSet).toHaveBeenCalledWith(

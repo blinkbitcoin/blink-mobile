@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 
 import { useInFlightGuard } from "@app/hooks/use-in-flight-guard"
 
@@ -55,8 +55,24 @@ export const usePinLockout = ({
   const [isVerifying, setIsVerifying] = useState(false)
   const [lockedUntil, setLockedUntil] = useState(0)
   const [attemptsRemaining, setAttemptsRemaining] = useState<number | null>(null)
+  const onUnreadableRef = useRef(onUnreadable)
+  onUnreadableRef.current = onUnreadable
 
-  const { remainingSeconds, isLocked } = useLockoutCountdown(enabled ? lockedUntil : 0)
+  const repairLiveLock = useCallback((now: number) => {
+    readPinLockState(now).then((read) => {
+      if (read.status === "unreadable") {
+        onUnreadableRef.current()
+        return
+      }
+      setLockedUntil(read.state.lockedUntil)
+      setAttemptsRemaining(attemptsLeftAfter(read.state.attempts))
+    })
+  }, [])
+
+  const { remainingSeconds, isLocked } = useLockoutCountdown(
+    enabled ? lockedUntil : 0,
+    repairLiveLock,
+  )
 
   // Restores what the screen *shows* after a relaunch: the countdown, and how
   // many attempts are left. The decision itself never reads any of this — it
@@ -69,8 +85,13 @@ export const usePinLockout = ({
     const hydrate = async () => {
       const state = await readPinLockState(Date.now())
       if (cancelled) return
-      setLockedUntil(state.lockedUntil)
-      setAttemptsRemaining(attemptsLeftAfter(state.attempts))
+      if (state.status === "unreadable") {
+        setIsHydrated(true)
+        onUnreadableRef.current()
+        return
+      }
+      setLockedUntil(state.state.lockedUntil)
+      setAttemptsRemaining(attemptsLeftAfter(state.state.attempts))
       setIsHydrated(true)
     }
     hydrate()

@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
-import { remainingLockoutMs } from "./pin-lockout"
+import { clampLockedUntil, remainingLockoutMs } from "./pin-lockout"
 
 /**
  * Well under a second, so the keypad comes back just after the lock truly
@@ -24,16 +24,29 @@ type LockoutCountdown = {
  * Takes a number rather than a Date so callers need no memoisation, and stops
  * its own interval once the lock elapses.
  */
-export const useLockoutCountdown = (lockedUntil: number): LockoutCountdown => {
+export const useLockoutCountdown = (
+  lockedUntil: number,
+  onLockedUntilRepaired?: (now: number) => void,
+): LockoutCountdown => {
+  const onLockedUntilRepairedRef = useRef(onLockedUntilRepaired)
+  onLockedUntilRepairedRef.current = onLockedUntilRepaired
+
   const [remainingMs, setRemainingMs] = useState(() =>
     remainingLockoutMs(lockedUntil, Date.now()),
   )
 
   useEffect(() => {
     let interval: ReturnType<typeof setInterval> | undefined
+    let effectiveLockedUntil = lockedUntil
 
     const tick = () => {
-      const remaining = remainingLockoutMs(lockedUntil, Date.now())
+      const now = Date.now()
+      const repairedLockedUntil = clampLockedUntil(effectiveLockedUntil, now)
+      if (repairedLockedUntil !== effectiveLockedUntil) {
+        effectiveLockedUntil = repairedLockedUntil
+        onLockedUntilRepairedRef.current?.(now)
+      }
+      const remaining = remainingLockoutMs(effectiveLockedUntil, now)
       setRemainingMs(remaining)
       if (remaining <= 0 && interval) clearInterval(interval)
     }
@@ -41,7 +54,7 @@ export const useLockoutCountdown = (lockedUntil: number): LockoutCountdown => {
     // Resync immediately, so a fresh lock never renders a stale value first.
     tick()
 
-    if (remainingLockoutMs(lockedUntil, Date.now()) > 0) {
+    if (remainingLockoutMs(effectiveLockedUntil, Date.now()) > 0) {
       interval = setInterval(tick, TICK_MS)
     }
 

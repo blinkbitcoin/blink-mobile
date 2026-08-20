@@ -64,8 +64,8 @@ const primeStore = () => {
 
   mockedStore.getPin.mockImplementation(async () => stored.pin)
   mockedStore.getPinFailureState.mockImplementation(async () => ({
-    attempts: stored.attempts,
-    lockedUntil: stored.lockedUntil,
+    status: "found",
+    state: { attempts: stored.attempts, lockedUntil: stored.lockedUntil },
   }))
   mockedStore.setPinFailureState.mockImplementation(async ({ attempts, lockedUntil }) => {
     stored.attempts = attempts

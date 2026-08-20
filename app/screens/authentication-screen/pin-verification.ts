@@ -30,6 +30,10 @@ export type PinVerification =
    */
   | { readonly outcome: "unreadable" }
 
+export type PinLockStateRead =
+  | { readonly status: "readable"; readonly state: PinFailureState }
+  | { readonly status: "unreadable" }
+
 /**
  * Reads the persisted lockout and bounds it.
  *
@@ -37,8 +41,18 @@ export type PinVerification =
  * it was written, then got corrected backward) is repaired in place, so it is
  * cut once instead of re-imposing the full lockout on every single launch.
  */
-export const readPinLockState = async (now: number): Promise<PinFailureState> => {
-  const stored = await KeyStoreWrapper.getPinFailureState()
+export const readPinLockState = async (now: number): Promise<PinLockStateRead> => {
+  const read = await KeyStoreWrapper.getPinFailureState()
+
+  if (read.status === "failed") {
+    recordAppError(new Error("PIN lockout state could not be read"), {
+      alwaysRecord: true,
+      dedupKey: "pin-lockout-read",
+    })
+    return { status: "unreadable" }
+  }
+
+  const stored = read.status === "found" ? read.state : { attempts: 0, lockedUntil: 0 }
 
   const attempts = Math.max(0, Math.trunc(stored.attempts))
   const lockedUntil = clampLockedUntil(stored.lockedUntil, now)
@@ -47,7 +61,7 @@ export const readPinLockState = async (now: number): Promise<PinFailureState> =>
     await KeyStoreWrapper.setPinFailureState({ attempts, lockedUntil })
   }
 
-  return { attempts, lockedUntil }
+  return { status: "readable", state: { attempts, lockedUntil } }
 }
 
 /**
@@ -65,7 +79,13 @@ export const verifyPin = async (
   enteredPin: string,
   now: number = Date.now(),
 ): Promise<PinVerification> => {
-  const { attempts, lockedUntil } = await readPinLockState(now)
+  const lockState = await readPinLockState(now)
+
+  if (lockState.status === "unreadable") {
+    return { outcome: "unreadable" }
+  }
+
+  const { attempts, lockedUntil } = lockState.state
 
   if (remainingLockoutMs(lockedUntil, now) > 0) {
     return { outcome: "locked", lockedUntil }
