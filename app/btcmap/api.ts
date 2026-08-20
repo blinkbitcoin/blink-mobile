@@ -103,7 +103,9 @@ const isIdentifiedPlace = (value: unknown): value is IdentifiedPlaceWire => {
   )
 }
 
-const isRenderablePlace = (value: unknown): value is RenderablePlaceWire =>
+// Generic so filtering keeps what the caller already knows — the search rows
+// would otherwise lose their name and address to the narrowing.
+const isRenderablePlace = <T>(value: T): value is T & RenderablePlaceWire =>
   isIdentifiedPlace(value) &&
   (value.deleted_at === undefined || value.deleted_at === null) &&
   isCoordinate(value.lat, -90, 90) &&
