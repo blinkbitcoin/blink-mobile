@@ -382,7 +382,9 @@ describe("PlaceSheet contact and payment rows", () => {
     await waitFor(() => expect(getByTestId("requires-app-card")).toBeTruthy())
 
     const card = within(getByTestId("requires-app-card"))
-    expect(card.getByText("Needs a specific app to pay")).toBeTruthy()
+    // Substring match: the message and the link are one Text tree inside the
+    // standard GaloyInfo box, so no node carries the message text alone.
+    expect(card.getByText("Needs a specific app to pay", { exact: false })).toBeTruthy()
     // Shown without the scheme, but still the whole path.
     expect(card.getByText("www.moneybadger.co.za/pay")).toBeTruthy()
 
