@@ -1,4 +1,4 @@
-import { Network, defaultExternalSigner } from "@breeztech/breez-sdk-spark-react-native"
+import { Network, defaultExternalSigners } from "@breeztech/breez-sdk-spark-react-native"
 
 import {
   checkLightningAddressAvailable,
@@ -10,41 +10,97 @@ import {
   registerLightningAddress,
 } from "@app/self-custodial/bridge/wallet"
 
-describe("deriveWalletIdentityPubkey", () => {
-  it("derives the identity pubkey offline from the mnemonic and frees the signer", () => {
-    const uniffiDestroy = jest.fn()
-    const identityPublicKey = jest
-      .fn()
-      .mockReturnValue({ bytes: Uint8Array.from([0x02, 0xab, 0xff]).buffer })
-    ;(defaultExternalSigner as jest.Mock).mockReturnValue({
-      identityPublicKey,
-      uniffiDestroy,
-    })
+const mockReportError = jest.fn()
 
-    const pubkey = deriveWalletIdentityPubkey("youth indicate void", Network.Regtest)
+jest.mock("@app/utils/error-logging", () => ({
+  reportError: (...args: unknown[]) => mockReportError(...args),
+}))
+
+describe("deriveWalletIdentityPubkey", () => {
+  const mockSigners = (getIdentityPublicKey: jest.Mock) => {
+    const breezDestroy = jest.fn()
+    const sparkDestroy = jest.fn()
+    ;(defaultExternalSigners as jest.Mock).mockReturnValue({
+      breezSigner: { uniffiDestroy: breezDestroy },
+      sparkSigner: { getIdentityPublicKey, uniffiDestroy: sparkDestroy },
+    })
+    return { breezDestroy, sparkDestroy }
+  }
+
+  it("derives the identity pubkey offline from the mnemonic and frees both signers", async () => {
+    const { breezDestroy, sparkDestroy } = mockSigners(
+      jest.fn().mockResolvedValue({ bytes: Uint8Array.from([0x02, 0xab, 0xff]).buffer }),
+    )
+
+    const pubkey = await deriveWalletIdentityPubkey(
+      "youth indicate void",
+      Network.Regtest,
+    )
 
     expect(pubkey).toBe("02abff")
-    expect(defaultExternalSigner).toHaveBeenCalledWith(
+    expect(defaultExternalSigners).toHaveBeenCalledWith(
       "youth indicate void",
       undefined,
       Network.Regtest,
       undefined,
     )
-    expect(uniffiDestroy).toHaveBeenCalledTimes(1)
+    expect(breezDestroy).toHaveBeenCalledTimes(1)
+    expect(sparkDestroy).toHaveBeenCalledTimes(1)
   })
 
-  it("frees the signer even when reading the pubkey throws", () => {
-    const uniffiDestroy = jest.fn()
-    const identityPublicKey = jest.fn(() => {
-      throw new Error("read failed")
-    })
-    ;(defaultExternalSigner as jest.Mock).mockReturnValue({
-      identityPublicKey,
-      uniffiDestroy,
+  it("frees both signers even when reading the pubkey rejects, and propagates the error", async () => {
+    const { breezDestroy, sparkDestroy } = mockSigners(
+      jest.fn().mockRejectedValue(new Error("read failed")),
+    )
+
+    await expect(deriveWalletIdentityPubkey("m", Network.Regtest)).rejects.toThrow(
+      "read failed",
+    )
+    expect(breezDestroy).toHaveBeenCalledTimes(1)
+    expect(sparkDestroy).toHaveBeenCalledTimes(1)
+  })
+
+  it("still frees the second signer and returns the pubkey when the first destroy throws", async () => {
+    const { breezDestroy, sparkDestroy } = mockSigners(
+      jest.fn().mockResolvedValue({ bytes: Uint8Array.from([0x02, 0xab, 0xff]).buffer }),
+    )
+    breezDestroy.mockImplementation(() => {
+      throw new Error("already freed")
     })
 
-    expect(() => deriveWalletIdentityPubkey("m", Network.Regtest)).toThrow("read failed")
-    expect(uniffiDestroy).toHaveBeenCalledTimes(1)
+    await expect(deriveWalletIdentityPubkey("m", Network.Regtest)).resolves.toBe("02abff")
+    expect(sparkDestroy).toHaveBeenCalledTimes(1)
+  })
+
+  /** A binding that no longer carries the lifecycle method throws the same way an
+   *  already-freed signer does, and that case leaves key material resident: swallowing it
+   *  would hide the one failure this call exists to prevent. */
+  it("reports a destroy failure instead of swallowing it", async () => {
+    const { breezDestroy } = mockSigners(
+      jest.fn().mockResolvedValue({ bytes: Uint8Array.from([0x02, 0xab, 0xff]).buffer }),
+    )
+    const destroyError = new Error("uniffiDestroy is not a function")
+    breezDestroy.mockImplementation(() => {
+      throw destroyError
+    })
+
+    await deriveWalletIdentityPubkey("m", Network.Regtest)
+
+    expect(mockReportError).toHaveBeenCalledWith("destroySigner", destroyError)
+  })
+
+  it("does not let a throwing destroy mask the original rejection", async () => {
+    const { breezDestroy, sparkDestroy } = mockSigners(
+      jest.fn().mockRejectedValue(new Error("read failed")),
+    )
+    breezDestroy.mockImplementation(() => {
+      throw new Error("already freed")
+    })
+
+    await expect(deriveWalletIdentityPubkey("m", Network.Regtest)).rejects.toThrow(
+      "read failed",
+    )
+    expect(sparkDestroy).toHaveBeenCalledTimes(1)
   })
 })
 

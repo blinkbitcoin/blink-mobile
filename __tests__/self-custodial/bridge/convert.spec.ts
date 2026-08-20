@@ -79,7 +79,10 @@ describe("createGetConversionQuote — BTC → USD", () => {
     // destination amount is dynamic based on rate, so we only assert the
     // SDK contract (token id + conversion options) is wired correctly.
     const prepArg = sdk.prepareSendPayment.mock.calls[0][0]
-    expect(prepArg.paymentRequest).toBe("sp1own-spark-address")
+    expect(prepArg.paymentRequest).toEqual({
+      tag: "Input",
+      inner: { input: "sp1own-spark-address" },
+    })
     expect(prepArg.tokenIdentifier).toBe("usdb-token-id")
     expect(prepArg.conversionOptions.conversionType).toEqual({ tag: "FromBitcoin" })
     expect(prepArg.conversionOptions.maxSlippageBps).toBe(50)
@@ -195,7 +198,10 @@ describe("createGetConversionQuote — USD → BTC", () => {
 
     expect(quote).not.toBeNull()
     const arg = sdk.prepareSendPayment.mock.calls[0][0]
-    expect(arg.paymentRequest).toBe("sp1own-spark-address")
+    expect(arg.paymentRequest).toEqual({
+      tag: "Input",
+      inner: { input: "sp1own-spark-address" },
+    })
     expect(arg.tokenIdentifier).toBeUndefined()
     expect(arg.conversionOptions.conversionType).toEqual({
       tag: "ToBitcoin",

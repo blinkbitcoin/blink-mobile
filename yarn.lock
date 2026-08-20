@@ -1842,10 +1842,10 @@
   resolved "https://registry.yarnpkg.com/@blinkbitcoin/react-native-geetest-module/-/react-native-geetest-module-0.1.2.tgz#6efc28450ae4e5ee80104c0754b183c589882351"
   integrity sha512-donA4DoTcJvV0RpVjXAyko0UPyPk5nAGElwEE2Nvyc6PQcp0gH/2OSj5OwR2tbnRW+0rPjzOYcrR+93vCXZoGw==
 
-"@breeztech/breez-sdk-spark-react-native@0.15.0":
-  version "0.15.0"
-  resolved "https://registry.yarnpkg.com/@breeztech/breez-sdk-spark-react-native/-/breez-sdk-spark-react-native-0.15.0.tgz#2d52247fb320eb9cc420cdf170f2b71c45f5427d"
-  integrity sha512-/ojZryGNydNonLpAOfrnawO8m91nH/NliTtrs+7tMfIgsrcqxu7/PmhIGj8Yo7gRk8Th0WnCQY+8aPZbR6q5tg==
+"@breeztech/breez-sdk-spark-react-native@0.22.0":
+  version "0.22.0"
+  resolved "https://registry.yarnpkg.com/@breeztech/breez-sdk-spark-react-native/-/breez-sdk-spark-react-native-0.22.0.tgz#0db8325cec75947ec2a9e309b1a59c509d149522"
+  integrity sha512-t81chUcuJIQpdygst56JttHD/FQ9c0zAKeFeNFryxcNgQww8azBZGJiCquXkgLcu15qj7YO0cqXM9Qo6ZY43mQ==
   dependencies:
     uniffi-bindgen-react-native "^0.29.3-1"
 
