@@ -215,7 +215,11 @@ export const useIpCountryLookup = (enabled: boolean): IpCountryLookup => {
     setHasLookupFinished(false)
     resolveIpCountryCodeCached().then((code) => {
       if (!active) return
-      if (code) setIpCountryCode(code)
+      /** Written even when the lookup comes back empty. A re-lookup that fails has to report
+       *  unresolved: holding the previous answer would settle this session on the country the
+       *  last connection resolved, which is the cross-session latch the generation exists to
+       *  drop. */
+      setIpCountryCode(code)
       setHasLookupFinished(true)
     })
     return () => {
