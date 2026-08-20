@@ -49,6 +49,7 @@ import {
   webUrl,
 } from "@app/btcmap"
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
+import { GaloyInfo } from "@app/components/atomic/galoy-info"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { recordAppError, toError } from "@app/utils/error-reporting"
 import { openExternalUrl } from "@app/utils/external"
@@ -399,18 +400,21 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
                   "you cannot pay here with this wallet" is worth knowing before
                   setting off, so it has to be visible without expanding. */}
               {Boolean(appUrl) && (
-                <View style={styles.infoCard} testID="requires-app-card">
-                  <Text style={styles.infoCardText}>{LL.MapScreen.requiresApp()}</Text>
-                  <Pressable
-                    onPress={() => openUrl(appUrl ?? "")}
-                    accessibilityRole="link"
-                  >
+                <View testID="requires-app-card">
+                  <GaloyInfo>
+                    {LL.MapScreen.requiresApp()}
+                    {"\n"}
                     {/* The scheme is noise here — what is worth reading is
                         where it goes, path and all. */}
-                    <Text style={styles.infoCardLink}>
+                    <Text
+                      type="p3"
+                      style={styles.requiresAppLink}
+                      onPress={() => openUrl(appUrl ?? "")}
+                      accessibilityRole="link"
+                    >
                       {(appUrl ?? "").replace(/^https?:\/\//i, "")}
                     </Text>
-                  </Pressable>
+                  </GaloyInfo>
                 </View>
               )}
 
@@ -623,22 +627,11 @@ const useStyles = makeStyles(({ colors }, { bottomInset, accent }: StyleProps) =
     fontWeight: "700",
     color: colors.white,
   },
-  infoCard: {
-    backgroundColor: colors.grey5,
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    rowGap: 6,
-  },
-  infoCardText: {
-    fontSize: 13,
-    color: colors.black,
-  },
-  infoCardLink: {
-    fontSize: 13,
-    color: colors.black,
-    // Underlined rather than tinted: the card is already a coloured block, and
-    // a second accent inside it competes with the Navigate button above.
+  requiresAppLink: {
+    // Restated rather than inherited: the themed Text falls back to black, not
+    // to the surrounding GaloyInfo tint.
+    color: colors.blue5,
+    fontWeight: "700",
     textDecorationLine: "underline",
   },
   status: {
@@ -714,7 +707,9 @@ const useStyles = makeStyles(({ colors }, { bottomInset, accent }: StyleProps) =
   rowLink: {
     flex: 1,
     fontSize: 14,
+    fontWeight: "700",
     color: colors.primary,
+    textDecorationLine: "underline",
   },
   chips: {
     flexDirection: "row",
