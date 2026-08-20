@@ -843,6 +843,7 @@ const resetHomeScreenMocks = () => {
   })
 }
 
+// eslint-disable-next-line max-lines-per-function -- one screen's suite, sharing the mock reset above; splitting solely to meet the line cap would scatter cases that are read together
 describe("HomeScreen", () => {
   beforeEach(resetHomeScreenMocks)
 
@@ -1235,6 +1236,36 @@ describe("HomeScreen", () => {
 
     expect(mockNavigate).not.toHaveBeenCalledWith("conversionDetails")
     expect(mockDollarBalanceModalVisible).toBe(false)
+
+    mockActiveWalletOverride = null
+  })
+
+  /**
+   * The region decides the dollar figure and nothing else, but one shared loader carried the
+   * whole header. A self-custodial user has no phone number, so the country comes from an IP
+   * lookup walking its adapters: holding everything on it meant seconds of spinners over a
+   * total, a username and a Bitcoin balance the app already had.
+   */
+  it("keeps the balance and the bitcoin row readable while the region is still resolving", async () => {
+    mockRegionPendingOverride = true
+    mockActiveWalletOverride = selfCustodialReadyWalletOverride(5000)
+    currentMocks = generateHomeMock({
+      level: AccountLevel.One,
+      network: Network.Mainnet,
+      btcBalance: 1000,
+      usdBalance: 5000,
+    })
+
+    const { getByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    expect(getByTestId("balance-value")).toBeTruthy()
+    expect(getByTestId("bitcoin-balance")).toBeTruthy()
 
     mockActiveWalletOverride = null
   })

@@ -53,8 +53,14 @@ export const useTotalBalance = (
     ? convertMoneyAmount?.(toUsdMoneyAmount(0), DisplayCurrency)
     : convertMoneyAmount?.(toUsdMoneyAmount(usdWallet?.balance), DisplayCurrency)
 
-  const isPriceConversionPending = !convertMoneyAmount
-  const isLoading = isPriceConversionPending || isRegionPending
+  /** The price conversion is the only thing this loader waits on. The region is deliberately
+   *  not part of it: callers hand this one flag to the whole header, so folding the region in
+   *  blanks the username, the total and the Bitcoin row for as long as the country takes to
+   *  resolve, and none of those three depend on it. A self-custodial user has no phone number
+   *  to read the country from, so that wait is the IP lookup walking its adapters, which is
+   *  seconds rather than a frame. The dollar figure is the one that depends on the verdict,
+   *  and it holds itself: WalletOverview loads its row off `isRegionPending` directly. */
+  const isLoading = !convertMoneyAmount
 
   if (!btcAmount || !usdAmount) {
     return {
