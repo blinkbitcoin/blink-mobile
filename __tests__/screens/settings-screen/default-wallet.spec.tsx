@@ -65,7 +65,7 @@ const renderScreen = () =>
 describe("DefaultWalletScreen region gate", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockGuard.mockReturnValue({ isRestricted: false, isRegionPending: false })
+    mockGuard.mockReturnValue({ isGated: false, isRegionPending: false })
   })
 
   /**
@@ -73,7 +73,7 @@ describe("DefaultWalletScreen region gate", () => {
    * blank screen under the header for as long as the region takes to resolve.
    */
   it("renders a loader while the region is still resolving", () => {
-    mockGuard.mockReturnValue({ isRestricted: false, isRegionPending: true })
+    mockGuard.mockReturnValue({ isGated: false, isRegionPending: true })
 
     const { getByTestId } = renderScreen()
 
@@ -83,7 +83,7 @@ describe("DefaultWalletScreen region gate", () => {
   /** A resolved restriction is already resetting to Primary, so a loader would promise a
    *  screen the user is being taken off. */
   it("renders nothing once the region resolves to a restriction", () => {
-    mockGuard.mockReturnValue({ isRestricted: true, isRegionPending: false })
+    mockGuard.mockReturnValue({ isGated: true, isRegionPending: false })
 
     const { queryByTestId } = renderScreen()
 
