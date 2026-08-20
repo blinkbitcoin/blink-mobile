@@ -32,6 +32,11 @@ jest.mock("@app/hooks", () => ({
   useClipboard: () => ({ copyToClipboard: mockCopyToClipboard }),
 }))
 
+const mockPromptEnhancedMode = jest.fn()
+jest.mock("@app/components/enhanced-mode-prompt", () => ({
+  useEnhancedModePrompt: () => ({ promptEnhancedMode: mockPromptEnhancedMode }),
+}))
+
 let mockIsAnonMode = false
 jest.mock("@app/self-custodial/hooks/use-self-custodial-account-mode", () => ({
   useSelfCustodialAccountMode: () => ({ isAnonMode: mockIsAnonMode }),
@@ -112,21 +117,50 @@ describe("SelfCustodialAccountBanner", () => {
 
     const { getByText, queryByTestId } = renderBanner()
 
+    /** The gate hides the row's own labels from screen readers and stands in for them, so
+     *  the text is still on screen but no longer part of the accessibility tree. */
     expect(
-      getByText(`satoshi@blink.sv ${LL.SettingsScreen.addressDisabled()}`),
+      getByText(`satoshi@blink.sv ${LL.SettingsScreen.addressDisabled()}`, {
+        includeHiddenElements: true,
+      }),
     ).toBeTruthy()
     expect(queryByTestId("galoy-icon-copy-paste")).toBeNull()
   })
 
-  /** The row must not keep copying behind a label that says it cannot receive. */
+  /** The row must not keep copying behind a label that says it cannot receive. The gate
+   *  swallows the touch, so the tap lands on the wrapper rather than the row beneath it. */
   it("does not copy on tap in Incognito", () => {
     mockIsAnonMode = true
 
-    const { getByText } = renderBanner()
+    const { getByLabelText } = renderBanner()
 
-    fireEvent.press(getByText(`satoshi@blink.sv ${LL.SettingsScreen.addressDisabled()}`))
+    fireEvent.press(
+      getByLabelText(`satoshi@blink.sv ${LL.SettingsScreen.addressDisabled()}`),
+    )
 
     expect(mockCopyToClipboard).not.toHaveBeenCalled()
+  })
+
+  /** Every other gated surface explains itself when tapped. This row dropped its handler
+   *  instead, so it kept the press animation and answered with nothing. */
+  it("opens the Enhanced prompt when the gated row is tapped", () => {
+    mockIsAnonMode = true
+
+    const { getByLabelText } = renderBanner()
+
+    fireEvent.press(
+      getByLabelText(`satoshi@blink.sv ${LL.SettingsScreen.addressDisabled()}`),
+    )
+
+    expect(mockPromptEnhancedMode).toHaveBeenCalledTimes(1)
+  })
+
+  it("leaves the prompt alone outside Incognito", () => {
+    const { getByText } = renderBanner()
+
+    fireEvent.press(getByText("satoshi@blink.sv"))
+
+    expect(mockPromptEnhancedMode).not.toHaveBeenCalled()
   })
 
   it("renders nothing without a lightning address", () => {

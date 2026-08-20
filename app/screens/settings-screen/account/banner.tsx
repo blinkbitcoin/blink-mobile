@@ -9,6 +9,8 @@ import { TouchableOpacity, View } from "react-native"
 import { TouchableWithoutFeedback } from "react-native-gesture-handler"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
+import { DisabledFeature } from "@app/components/disabled-feature"
+import { useEnhancedModePrompt } from "@app/components/enhanced-mode-prompt"
 import { useSettingsScreenQuery } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { AccountLevel, useLevel } from "@app/graphql/level-context"
@@ -90,12 +92,12 @@ const SelfCustodialAccountBanner: React.FC = () => {
   const { lightningAddress } = useSelfCustodialWallet()
   const { copyToClipboard } = useClipboard()
   const isLightningAddressGated = useLightningAddressGated()
+  const { promptEnhancedMode } = useEnhancedModePrompt()
 
   if (!lightningAddress) return null
 
   /** Incognito cannot receive, so the address is labelled disabled and loses its copy
-   *  affordance rather than being handed out as one that could be paid. The tap goes
-   *  inert with the icon: a row that still copied would contradict the label. */
+   *  affordance rather than being handed out as one that could be paid. */
   const displayedAddress = isLightningAddressGated
     ? `${lightningAddress} ${LL.SettingsScreen.addressDisabled()}`
     : lightningAddress
@@ -106,26 +108,32 @@ const SelfCustodialAccountBanner: React.FC = () => {
       message: LL.GaloyAddressScreen.copiedLightningAddressToClipboard(),
     })
 
+  /** Wrapped like every other gated surface rather than merely dropping `onPress`: the
+   *  wrapper is what swallows the touch, so the row stops playing a press animation it has
+   *  nothing to answer with, and the tap explains the gate instead of doing nothing. */
   return (
-    <TouchableOpacity
-      onPress={isLightningAddressGated ? undefined : handleCopy}
-      style={styles.outer}
+    <DisabledFeature
+      disabled={isLightningAddressGated}
+      onDisabledPress={promptEnhancedMode}
+      accessibilityLabel={displayedAddress}
     >
-      <View style={styles.iconContainer}>
-        <AccountIcon size={25} />
-      </View>
-      <View style={styles.textContainer}>
-        <Text type="p2" numberOfLines={1} ellipsizeMode="middle">
-          {displayedAddress}
-        </Text>
-        <Text type="p3" style={styles.subtitle}>
-          {LL.SettingsScreen.nonCustodialAccount()}
-        </Text>
-      </View>
-      {!isLightningAddressGated && (
-        <GaloyIcon name="copy-paste" size={20} color={colors.primary} />
-      )}
-    </TouchableOpacity>
+      <TouchableOpacity onPress={handleCopy} style={styles.outer}>
+        <View style={styles.iconContainer}>
+          <AccountIcon size={25} />
+        </View>
+        <View style={styles.textContainer}>
+          <Text type="p2" numberOfLines={1} ellipsizeMode="middle">
+            {displayedAddress}
+          </Text>
+          <Text type="p3" style={styles.subtitle}>
+            {LL.SettingsScreen.nonCustodialAccount()}
+          </Text>
+        </View>
+        {!isLightningAddressGated && (
+          <GaloyIcon name="copy-paste" size={20} color={colors.primary} />
+        )}
+      </TouchableOpacity>
+    </DisabledFeature>
   )
 }
 
