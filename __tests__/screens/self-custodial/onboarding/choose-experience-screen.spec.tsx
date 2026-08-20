@@ -67,13 +67,20 @@ jest.mock("@app/self-custodial/hooks/use-self-custodial-account-mode", () => ({
 
 let mockUsdBalance = 0
 let mockWalletReady = true
+let mockWalletStatus = "ready"
 jest.mock("@app/hooks/use-active-wallet", () => ({
   useActiveWallet: () => ({
     wallets: [
       { id: "usd-1", walletCurrency: "USD", balance: { amount: mockUsdBalance } },
     ],
     isReady: mockWalletReady,
+    status: mockWalletStatus,
   }),
+}))
+
+const mockToastShow = jest.fn()
+jest.mock("@app/utils/toast", () => ({
+  toastShow: (...args: unknown[]) => mockToastShow(...args),
 }))
 
 const mockRefreshWallets = jest.fn()
@@ -155,6 +162,7 @@ describe("ChooseExperienceScreen", () => {
     mockStoredModes = {}
     mockUsdBalance = 0
     mockWalletReady = true
+    mockWalletStatus = "ready"
     mockRefreshWallets.mockResolvedValue(undefined)
     mockRouteParams = {
       onContinue: { route: "selfCustodialBackupSuccess", accountId: "sc-account-1" },
@@ -440,7 +448,11 @@ describe("ChooseExperienceScreen", () => {
     mockWalletReady = true
     mockRefreshWallets.mockReturnValue(new Promise(() => {}))
 
-    await renderScreen()
+    const { getByTestId } = await renderScreen()
+
+    /** Only the Anon-bound switch reads the balance, so the wait is only owed once Anon is
+     *  the selection. */
+    fireEvent.press(getByTestId("mode-anon"))
 
     expect(mockPrimaryButton).toHaveBeenLastCalledWith(
       expect.objectContaining({ disabled: true, loading: true }),
@@ -517,6 +529,83 @@ describe("ChooseExperienceScreen", () => {
     )
     expect(mockSetActiveAccountMode).not.toHaveBeenCalled()
     expect(mockGoBack).not.toHaveBeenCalled()
+  })
+
+  /**
+   * Offline and Error are settled answers, not stages: waiting on them never ends, which
+   * left Continue disabled with a spinner and nothing to say. The refusal is now spoken and
+   * the switch is simply not made.
+   */
+  it("refuses the Anon switch out loud when the wallet is offline", async () => {
+    mockRouteParams = { entry: "settings" }
+    mockAccountMode = AccountMode.Enhanced
+    mockWalletReady = false
+    mockWalletStatus = "offline"
+    const { getByTestId } = await renderScreen()
+
+    fireEvent.press(getByTestId("mode-anon"))
+
+    expect(mockPrimaryButton).toHaveBeenLastCalledWith(
+      expect.objectContaining({ disabled: false, loading: false }),
+    )
+
+    const { onPress } = mockPrimaryButton.mock.calls.at(-1)?.[0] as PrimaryButtonProps
+    act(() => onPress())
+
+    expect(mockToastShow).toHaveBeenCalledTimes(1)
+    expect(mockSetActiveAccountMode).not.toHaveBeenCalled()
+  })
+
+  it("refuses the Anon switch out loud when the wallet errored", async () => {
+    mockRouteParams = { entry: "settings" }
+    mockAccountMode = AccountMode.Enhanced
+    mockWalletReady = false
+    mockWalletStatus = "error"
+    const { getByTestId } = await renderScreen()
+
+    fireEvent.press(getByTestId("mode-anon"))
+    const { onPress } = mockPrimaryButton.mock.calls.at(-1)?.[0] as PrimaryButtonProps
+    act(() => onPress())
+
+    expect(mockToastShow).toHaveBeenCalledTimes(1)
+    expect(mockSetActiveAccountMode).not.toHaveBeenCalled()
+  })
+
+  /**
+   * Leaving Anon decides nothing about the balance, so it never waits on the wallet. A user
+   * who lost connectivity inside Incognito could otherwise never get back out.
+   */
+  it("lets the Enhanced-bound switch through with an unreachable wallet", async () => {
+    mockRouteParams = { entry: "settings" }
+    mockAccountMode = AccountMode.Anon
+    mockWalletReady = false
+    mockWalletStatus = "offline"
+    const { getByTestId } = await renderScreen()
+
+    fireEvent.press(getByTestId("mode-enhanced"))
+
+    expect(mockPrimaryButton).toHaveBeenLastCalledWith(
+      expect.objectContaining({ disabled: false, loading: false }),
+    )
+
+    const { onPress } = mockPrimaryButton.mock.calls.at(-1)?.[0] as PrimaryButtonProps
+    act(() => onPress())
+
+    expect(mockSetActiveAccountMode).toHaveBeenCalledWith(AccountMode.Enhanced)
+    expect(mockToastShow).not.toHaveBeenCalled()
+  })
+
+  it("does not hold Continue for the Enhanced-bound switch while the wallet syncs", async () => {
+    mockRouteParams = { entry: "settings" }
+    mockAccountMode = AccountMode.Anon
+    mockWalletReady = false
+    const { getByTestId } = await renderScreen()
+
+    fireEvent.press(getByTestId("mode-enhanced"))
+
+    expect(mockPrimaryButton).toHaveBeenLastCalledWith(
+      expect.objectContaining({ disabled: false, loading: false }),
+    )
   })
 
   it("does not hold Continue for onboarding entries while the wallet syncs", async () => {

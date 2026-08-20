@@ -20,6 +20,8 @@ import { armModeSelectionConversion } from "@app/screens/conversion-flow/drain-c
 import { useSelfCustodialAccountMode } from "@app/self-custodial/hooks/use-self-custodial-account-mode"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { AccountMode } from "@app/types/account"
+import { ActiveWalletStatus } from "@app/types/wallet"
+import { toastShow } from "@app/utils/toast"
 import { testProps } from "@app/utils/testProps"
 
 import { OnboardingScreenLayout } from "./layouts"
@@ -46,7 +48,7 @@ export const ChooseExperienceScreen: React.FC = () => {
   const route = useRoute<RouteProp<RootStackParamList, "selfCustodialChooseExperience">>()
   const { accountMode, getModeFor, setAccountMode, setActiveAccountMode } =
     useSelfCustodialAccountMode()
-  const { wallets, isReady: isWalletReady } = useActiveWallet()
+  const { wallets, isReady: isWalletReady, status: walletStatus } = useActiveWallet()
   const { refreshWallets } = useSelfCustodialWallet()
   const [isConvertModalVisible, setIsConvertModalVisible] = useState(false)
 
@@ -89,9 +91,24 @@ export const ChooseExperienceScreen: React.FC = () => {
 
   const usdWallet = wallets.find((wallet) => wallet.walletCurrency === WalletCurrency.Usd)
   const hasDollarBalance = (usdWallet?.balance.amount ?? 0) > 0
+
+  /** Offline and Error are answers, not stages: neither becomes Ready by waiting, so the
+   *  balance behind the gate is never going to arrive. Reading them as "still loading" is
+   *  what left Continue spinning with nothing to say. */
+  const isWalletUnreachable =
+    walletStatus === ActiveWalletStatus.Offline ||
+    walletStatus === ActiveWalletStatus.Error
+
+  /** Only the switch INTO Anon reads the balance, since that is what decides whether the
+   *  dollars must be drained first. Leaving Anon decides nothing, so it never waits: a user
+   *  who lost connectivity inside Incognito could otherwise never get back out. */
+  const isAnonBound = selected === AccountMode.Anon
+  const isBalanceRequired = isSettingsEntry && isAnonBound
+
   /** The settings entry gates the Anon switch on the live balance, which is unknown
    *  until the wallet syncs: wait rather than let a cold start skip the gate. */
-  const isContinueWaiting = isSettingsEntry && (!isWalletReady || isRefreshingWallets)
+  const isContinueWaiting =
+    isBalanceRequired && !isWalletUnreachable && (!isWalletReady || isRefreshingWallets)
 
   /**
    * Restore and migration arrive with the account already activated and only the screen
@@ -139,6 +156,12 @@ export const ChooseExperienceScreen: React.FC = () => {
 
   const handleContinue = () => {
     if (!onContinue) {
+      /** The gate cannot be honoured without the balance, and no amount of waiting will
+       *  produce it, so the refusal is said out loud rather than left as a dead button. */
+      if (isBalanceRequired && isWalletUnreachable) {
+        toastShow({ message: LL.errors.network.connection(), LL })
+        return
+      }
       const isSwitchingToAnon =
         selected === AccountMode.Anon && accountMode !== AccountMode.Anon
       const isBalanceUnknown = !isWalletReady
