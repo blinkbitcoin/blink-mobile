@@ -78,7 +78,15 @@ export const AccountTypeSelectionScreen: React.FC = () => {
     navigation.navigate("selfCustodialRestoreMethod")
   }
 
-  const isContinueDisabled = !selected || isChecking || !isFirstSignupRuleReady
+  /** The account count behind `isFirstSignupRuleReady` is read by one path only: the
+   *  custodial creation, whose first-signup rule needs it. Restore navigates straight to
+   *  login or the restore method, and a self-custodial creation is answered after the mode
+   *  screen, so neither ever asks. Waiting on it in those modes disabled Continue over a
+   *  rule that was never going to be consulted, and the registry re-hydrates whenever the
+   *  active account changes, so the wait could return mid-session and swallow a press. */
+  const isFirstSignupRuleConsulted = isCreateMode && selected === AccountOption.Custodial
+  const isRuleStillHydrating = isFirstSignupRuleConsulted && !isFirstSignupRuleReady
+  const isContinueDisabled = !selected || isChecking || isRuleStillHydrating
 
   /** A selection changed mid-check would leave the answer describing the option the user
    *  moved away from, so the cards hold still until it lands. */

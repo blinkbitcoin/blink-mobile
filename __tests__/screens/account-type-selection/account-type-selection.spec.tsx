@@ -331,6 +331,44 @@ describe("AccountTypeSelectionScreen", () => {
     expect(getByTestId("continue-button").props.disabled).toBe(true)
   })
 
+  /**
+   * The account count is read by the custodial creation alone. Restore navigates straight to
+   * login or the restore method, and a self-custodial creation is answered after the mode
+   * screen, so holding Continue in those modes waits on a rule that is never consulted. The
+   * registry also re-hydrates when the active account changes, which could bring the wait
+   * back mid-session and swallow a press.
+   */
+  it("does not wait for the account count in restore mode", () => {
+    mockIsFirstSignupRuleReady.mockReturnValue(false)
+    mockMode.mockReturnValue("restore")
+
+    const { getByTestId } = render(<AccountTypeSelectionScreen />)
+    fireEvent.press(getByTestId("custodial-option"))
+
+    expect(getByTestId("continue-button").props.disabled).toBe(false)
+  })
+
+  it("does not wait for the account count when restoring self-custodial", () => {
+    mockIsFirstSignupRuleReady.mockReturnValue(false)
+    mockMode.mockReturnValue("restore")
+
+    const { getByTestId } = render(<AccountTypeSelectionScreen />)
+    fireEvent.press(getByTestId("self-custodial-option"))
+
+    expect(getByTestId("continue-button").props.disabled).toBe(false)
+  })
+
+  /** A self-custodial creation is refused after the mode screen, if at all, so this screen
+   *  has nothing to hold it for. */
+  it("does not wait for the account count when creating self-custodial", () => {
+    mockIsFirstSignupRuleReady.mockReturnValue(false)
+
+    const { getByTestId } = render(<AccountTypeSelectionScreen />)
+    fireEvent.press(getByTestId("self-custodial-option"))
+
+    expect(getByTestId("continue-button").props.disabled).toBe(false)
+  })
+
   it("renders only the cards the offered options name", () => {
     mockUseAccountTypeOptions.mockReturnValue({
       options: ["selfCustodial"],
