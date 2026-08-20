@@ -196,30 +196,51 @@ const setConsoleErrorSink = (sink: (...args: unknown[]) => void) => {
 // the seam is handed over on globalThis.
 ;(globalThis as Record<string, unknown>).__setConsoleErrorSink = setConsoleErrorSink
 
+const dedupe = (updates: EscapedActUpdate[]): EscapedActUpdate[] => [
+  ...new Map(
+    updates.map((update) => [`${update.testName}|${update.line}`, update]),
+  ).values(),
+]
+
+const describeEscapedUpdates = (
+  updates: EscapedActUpdate[],
+  total: number,
+  currentTestName: string,
+): string => {
+  const listed = dedupe(updates)
+    .map((update) => `  - ${update.line}\n      (during: ${update.testName})`)
+    .join("\n")
+
+  const fromAnotherTest = dedupe(updates).some(
+    (update) => update.testName !== currentTestName,
+  )
+
+  const misattribution = fromAnotherTest
+    ? `At least one update was emitted while a *different* test was running — ` +
+      `fix that test, not this one. Unmount-time warnings surface here because ` +
+      `RNTL's cleanup runs after this hook.\n\n`
+    : ""
+
+  return (
+    `${total} state update(s) escaped act():\n${listed}\n\n` +
+    misattribution +
+    `Await the render instead of letting it settle after the test body — see ` +
+    `__tests__/helpers/flush-effects.ts. Full React stacks are above.`
+  )
+}
+
 const failOnEscapedActUpdates = () => {
   consoleErrorSink = originalConsoleError
-
   if (escapedActUpdates.length === 0) return
-  const total = escapedActUpdates.length
-  const currentTestName = expect.getState().currentTestName ?? ""
-  const seen = [...new Map(escapedActUpdates.map((u) => [`${u.testName}|${u.line}`, u]))]
+
+  const message = describeEscapedUpdates(
+    escapedActUpdates,
+    escapedActUpdates.length,
+    expect.getState().currentTestName ?? "",
+  )
   escapedActUpdates.length = 0
 
-  const elsewhere = seen.some(([, update]) => update.testName !== currentTestName)
-
-  throw new Error(
-    `${total} state update(s) escaped act():\n` +
-      `${seen
-        .map(([, update]) => `  - ${update.line}\n      (during: ${update.testName})`)
-        .join("\n")}\n\n` +
-      (elsewhere
-        ? `At least one update was emitted while a *different* test was running — ` +
-          `fix that test, not this one. Unmount-time warnings surface here because ` +
-          `RNTL's cleanup runs after this hook.\n\n`
-        : "") +
-      `Await the render instead of letting it settle after the test body — see ` +
-      `__tests__/helpers/flush-effects.ts. Full React stacks are above.`,
-  )
+  throw new Error(message)
 }
 
 // Registered last so it runs after the microtask drain above (jest-circus runs
