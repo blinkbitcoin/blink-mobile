@@ -68,7 +68,7 @@ export const MapSearchBar: React.FC<Props> = ({
         <GaloyIcon
           name="menu"
           size={22}
-          color={isFiltered ? colors._white : colors.primary}
+          color={isFiltered ? colors.white : colors.primary}
         />
       </Pressable>
     </View>

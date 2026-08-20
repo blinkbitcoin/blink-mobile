@@ -621,7 +621,7 @@ const useStyles = makeStyles(({ colors }, { bottomInset, accent }: StyleProps) =
   navigateText: {
     fontSize: 17,
     fontWeight: "700",
-    color: colors._white,
+    color: colors.white,
   },
   infoCard: {
     backgroundColor: colors.grey5,
