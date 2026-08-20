@@ -191,7 +191,7 @@ describe("PlaceSheet", () => {
     })
   })
 
-  it("rests on the peek's bottom edge, lifted clear of the home indicator", async () => {
+  it("rests on the peek's bottom edge, clear of the home indicator", async () => {
     jest.useFakeTimers()
     try {
       mockBottomInset = 34
@@ -199,7 +199,14 @@ describe("PlaceSheet", () => {
       const sheet = getByTestId("place-sheet")
       const sheetHeight = StyleSheet.flatten(sheet.props.style).height as number
 
-      fireEvent(getByTestId("place-sheet-peek"), "layout", {
+      // The indicator is cleared by padding inside the peek, so the snap point
+      // does not lift for it: a sheet resting higher than the peek's own edge
+      // uncovers the top of the row behind it, and half a row of contact detail
+      // sliced by the screen edge reads as a rendering fault.
+      const peek = getByTestId("place-sheet-peek")
+      expect(StyleSheet.flatten(peek.props.style).paddingBottom).toBe(14 + 34)
+
+      fireEvent(peek, "layout", {
         nativeEvent: { layout: { x: 0, y: 24, width: 375, height: 200 } },
       })
       // Run the opening spring to rest.
@@ -207,12 +214,11 @@ describe("PlaceSheet", () => {
         jest.advanceTimersByTime(3000)
       })
 
-      // The snap point is the peek's bottom edge (y + height — the handle and
-      // padding above it show inside the window too, so its bare height is not
-      // enough), plus the inset so the home indicator does not swallow the
-      // peek's last row.
+      // The snap point is the peek's bottom edge — y + height, since the handle
+      // and padding above it show inside the window too, so its bare height is
+      // not enough — and nothing beyond it.
       expect(getAnimatedStyle(sheet)).toMatchObject({
-        transform: [{ translateY: sheetHeight - (24 + 200) - 34 }],
+        transform: [{ translateY: sheetHeight - (24 + 200) }],
       })
 
       // A peek measured taller than the sheet can show stops at fully open
@@ -239,9 +245,10 @@ describe("PlaceSheet", () => {
     expect(getByTestId("place-sheet-scroll").props.scrollEnabled).toBe(false)
   })
 
-  it("keeps the detail out of the block the lower position shows", async () => {
-    // Address, hours and contacts live past the fold, so the header block stays
-    // the same height whatever the place happens to publish.
+  it("shows where and when in the block the lower position rests on", async () => {
+    // Where the place is and when it is open are read on the way to deciding
+    // whether to set off, so they sit with Navigate. The ways to reach it are
+    // not, so they wait behind a drag.
     setDetails(
       details({
         openingHours: "24/7",
@@ -254,9 +261,9 @@ describe("PlaceSheet", () => {
     await waitFor(() => expect(getByText("Satoshi Coffee")).toBeTruthy())
 
     const peek = getByTestId("place-sheet-peek")
-    expect(within(peek).queryByText("24/7")).toBeNull()
+    expect(within(peek).getByText("1 Bishopsgate")).toBeTruthy()
+    expect(within(peek).getByText("24/7")).toBeTruthy()
     expect(within(peek).queryByText("+44 20 7946 0100")).toBeNull()
-    expect(within(peek).queryByText("1 Bishopsgate")).toBeNull()
   })
 
   it("closes from the button at the foot of the detail", async () => {
