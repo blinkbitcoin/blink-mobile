@@ -175,6 +175,13 @@ export const ChooseExperienceScreen: React.FC = () => {
    * Every other entry already has its account.
    */
   const resolveCreationRefusal = async (): Promise<CreationBlockReason | null> => {
+    /**
+     * Anon is exempt from `selfCustodialCreationBlockedCountries`, and not by omission: the
+     * list is keyed by country, and the only way to know the country is the lookup Anon
+     * exists to refuse. Running it here would resolve the very thing the mode promises not
+     * to, so the two lists are peers in name only. Enhanced consents to the lookup and is
+     * refused on its answer; Anon is never asked and so can never be refused.
+     */
     if (selected === AccountMode.Anon) return null
     return checkBlockReason(AccountOption.SelfCustodial)
   }

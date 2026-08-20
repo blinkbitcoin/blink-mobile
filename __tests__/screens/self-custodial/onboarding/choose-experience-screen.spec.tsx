@@ -814,6 +814,36 @@ describe("ChooseExperienceScreen", () => {
       )
     })
 
+    /**
+     * The asymmetry stated outright: in a country on `selfCustodialCreationBlockedCountries`
+     * Enhanced is refused and Incognito is not. It is not an omission. The list is keyed by
+     * country, and the only way to learn the country is the lookup Incognito exists to
+     * refuse, so asking would resolve the very thing the mode promises not to.
+     */
+    it("creates in Incognito from a country that refuses an Enhanced creation", async () => {
+      mockCheckBlockReason.mockResolvedValue("region")
+      const { getByTestId } = await renderCreation()
+
+      fireEvent.press(getByTestId(continueTestId))
+      await flushEffects()
+
+      expect(mockNavigate).toHaveBeenCalledWith("unsupportedRegion", { reason: "region" })
+
+      mockNavigate.mockClear()
+      fireEvent.press(getByTestId("mode-anon"))
+      fireEvent.press(getByTestId(continueTestId))
+      await flushEffects()
+
+      expect(mockNavigate).toHaveBeenCalledWith("acceptTermsAndConditions", {
+        flow: "selfCustodial",
+        mode: AccountMode.Anon,
+      })
+      expect(mockNavigate).not.toHaveBeenCalledWith(
+        "unsupportedRegion",
+        expect.anything(),
+      )
+    })
+
     it("holds Continue while the region is being resolved", async () => {
       mockIsChecking.mockReturnValue(true)
       await renderCreation()
