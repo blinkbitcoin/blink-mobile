@@ -38,6 +38,8 @@ import {
   useOutgoingBadgeVisibility,
   useIncomingBadgeAutoSeen,
 } from "@app/components/unseen-tx-amount-badge"
+import { useBadgeSlotContent } from "@app/components/amount-badge"
+import { PendingAmountBadge } from "@app/components/pending-amount-badge"
 
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useFeatureFlags, useRemoteConfig } from "@app/config/feature-flags-context"
@@ -45,6 +47,7 @@ import { BackupNudgeBanner } from "@app/components/backup-nudge-banner"
 import { SelfCustodialInfoBulletin } from "@app/components/self-custodial-info-bulletin"
 import { BackupNudgeModal } from "@app/components/backup-nudge-modal"
 import { NetworkStatusBanner } from "@app/components/network-status-banner"
+import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
@@ -359,30 +362,29 @@ export const HomeScreen: React.FC = () => {
   const transactionsEdges = dataAuthed?.me?.defaultAccount?.transactions?.edges
 
   /** Fetched once here and shared with the UnclaimedDepositBanner below, so the
-   *  pending pill and that banner can never disagree about the same deposits. */
+   *  pending row and that banner can never disagree about the same deposits. */
   const { deposits, refetch: refetchPendingDeposits } = usePendingDeposits()
 
-  /** Pending deposits stay visible beside the balance until confirmed —
-   *  unlike the unseen-tx badge below, which auto-dismisses (blink-wip#937). */
+  /** Pending deposits stay visible under the balance until confirmed —
+   *  unlike the unseen-tx badge sharing that slot, which auto-dismisses
+   *  (blink-wip#937). */
   const { pendingReceiveAmountText } = usePendingReceiveAmount({
     pendingIncomingTransactions,
     deposits,
   })
-  /** The banner below only counts actionable deposits, so the pill carries the
-   *  immature deposits' inspection path (txid / mempool link) to the
-   *  unclaimed-deposits screen. Custodial pending receives have no such
-   *  screen — their pill stays inert. */
+  /** The banner below only counts actionable deposits, so the pending row
+   *  carries the immature deposits' inspection path (txid / mempool link) to
+   *  the unclaimed-deposits screen. Custodial pending receives have no such
+   *  screen — their row stays inert. */
   const hasImmatureDeposits = deposits.some(
     ({ status }) => status === DepositStatus.Immature,
   )
-  const pendingStatusBadge = pendingReceiveAmountText
-    ? {
-        label: LL.HomeScreen.pendingReceiveBadge({ amount: pendingReceiveAmountText }),
-        status: "warning" as const,
-        onPress: hasImmatureDeposits
-          ? () => navigation.navigate("unclaimedDepositsScreen")
-          : undefined,
-      }
+  const openUnclaimedDeposits = React.useCallback(
+    () => navigation.navigate("unclaimedDepositsScreen"),
+    [navigation],
+  )
+  const openUnclaimedDepositsOnPress = hasImmatureDeposits
+    ? openUnclaimedDeposits
     : undefined
 
   const transactions = useMemo(() => {
@@ -433,6 +435,24 @@ export const HomeScreen: React.FC = () => {
     isOutgoing,
     unseenCurrency: latestUnseenTx?.settlementCurrency,
     markTxSeen,
+  })
+
+  /** Both amount badges live in the same slot under the balance: the unseen-tx
+   *  one takes it while it is on screen, the pending row holds it otherwise. */
+  const showUnseenBadge = isOutgoing
+    ? showOutgoingBadge
+    : showIncomingBadge && Boolean(unseenAmountText)
+
+  /** Hidden amounts hide this one too: the slot sits directly under the balance the
+   *  placeholder replaced, so showing the deposit here would spell out the very figure
+   *  the user just covered. */
+  const { hideAmount } = useHideAmount()
+  const hasPendingAmount = Boolean(pendingReceiveAmountText) && !loading && !hideAmount
+
+  const badgeSlotContent = useBadgeSlotContent({
+    showUnseenBadge,
+    unseenKey: latestUnseenTx?.id,
+    hasPendingAmount,
   })
 
   const [modalVisible, setModalVisible] = React.useState(false)
@@ -827,20 +847,25 @@ export const HomeScreen: React.FC = () => {
         showStableBalanceToggle={showStableBalanceToggle}
         mode={balanceMode}
         onModeChange={toggleBalanceMode}
-        statusBadge={pendingStatusBadge}
       />
       <View style={styles.badgeSlot}>
-        <UnseenTxAmountBadge
-          key={latestUnseenTx?.id}
-          amountText={unseenAmountText ?? ""}
-          visible={
-            isOutgoing
-              ? showOutgoingBadge
-              : showIncomingBadge && Boolean(unseenAmountText)
-          }
-          onPress={handleUnseenBadgePress}
-          isOutgoing={isOutgoing}
-        />
+        {badgeSlotContent === "unseen" ? (
+          <UnseenTxAmountBadge
+            key={latestUnseenTx?.id}
+            amountText={unseenAmountText ?? ""}
+            visible={showUnseenBadge}
+            onPress={handleUnseenBadgePress}
+            isOutgoing={isOutgoing}
+          />
+        ) : badgeSlotContent === "pending" && pendingReceiveAmountText ? (
+          <PendingAmountBadge
+            amountText={`+${pendingReceiveAmountText}`}
+            onPress={openUnclaimedDepositsOnPress}
+            accessibilityLabel={LL.HomeScreen.pendingReceiveBadge({
+              amount: pendingReceiveAmountText,
+            })}
+          />
+        ) : null}
       </View>
       <ScrollView
         {...testProps("home-screen")}
@@ -1014,7 +1039,9 @@ const useStyles = makeStyles(({ colors }) => ({
     backgroundColor: colors.grey4,
   },
   badgeSlot: {
-    height: 35,
+    // minHeight, not height: at 20pt x the 1.4 font cap the badge's line box
+    // overruns 35pt, and a fixed height clips it (#4120).
+    minHeight: 35,
     marginVertical: 3,
     justifyContent: "center",
     alignItems: "center",

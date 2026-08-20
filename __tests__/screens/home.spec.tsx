@@ -15,6 +15,7 @@ import {
   Network,
   useBulletinsQuery,
 } from "@app/graphql/generated"
+import { HideAmountContextProvider } from "@app/graphql/hide-amount-context"
 import { IsAuthedContextProvider } from "@app/graphql/is-authed-context"
 import { mockCurrencyList } from "@app/graphql/mocks"
 import { ConvertDirection } from "@app/types/payment"
@@ -810,6 +811,9 @@ const runRestrictionInvariantCase = async ({
 
 const resetHomeScreenMocks = () => {
   currentMocks = []
+  /** Focus gates the badge auto-seen timers, so a suite that unfocuses the screen must
+   *  not decide what the next one sees. */
+  mockIsFocused = true
   mockActiveWalletOverride = null
   mockActiveAccountOverride = null
   mockDollarBalanceRestrictedOverride = false
@@ -1888,7 +1892,12 @@ describe("HomeScreen wind-down states", () => {
 })
 
 describe("HomeScreen pending receive badge", () => {
-  beforeEach(resetHomeScreenMocks)
+  beforeEach(() => {
+    resetHomeScreenMocks()
+    // The unseen-tx badge only auto-dismisses on a focused screen, and it owns
+    // the same slot as the pending row — earlier suites leave this false.
+    mockIsFocused = true
+  })
 
   const mocksWithPendingDeposit = () =>
     generateHomeMock({
@@ -1899,47 +1908,23 @@ describe("HomeScreen pending receive badge", () => {
       pendingIncomingTransactions: [pendingOnchainReceiveTx],
     })
 
-  it("shows the pending amount beside the balance while a deposit is unconfirmed", async () => {
+  /** The pending row and the unseen-tx badge share one slot under the balance:
+   *  a freshly arrived receive is announced by the transient badge first, and
+   *  the pending row takes the slot back when that window closes — the hand-back
+   *  itself is pinned in use-badge-slot-content.spec, which can drive its
+   *  timers. */
+  it("yields the badge slot to the unseen-tx badge as the receive arrives", async () => {
     currentMocks = mocksWithPendingDeposit()
 
-    const { findByTestId } = render(
+    const { queryByTestId } = render(
       <ContextForScreen>
         <HomeScreen />
       </ContextForScreen>,
     )
 
-    expect(await findByTestId("balance-status-badge")).toBeTruthy()
-
     await flushEffects()
-  })
 
-  /** The regression in blink-wip#937: the only pending signal at the top was the
-   *  unseen-tx badge, which auto-dismisses after ~5s. The pending badge is
-   *  state-driven and must outlive that window. */
-  it("keeps the pending badge past the unseen-badge auto-dismiss window", async () => {
-    jest.useFakeTimers({ doNotFake: ["setImmediate"] })
-    try {
-      currentMocks = mocksWithPendingDeposit()
-
-      const { findByTestId, getByTestId } = render(
-        <ContextForScreen>
-          <HomeScreen />
-        </ContextForScreen>,
-      )
-
-      expect(await findByTestId("balance-status-badge")).toBeTruthy()
-
-      // 5s auto-seen delay + 180ms hide-to-mark gap + slack
-      act(() => {
-        jest.advanceTimersByTime(5_500)
-      })
-
-      expect(getByTestId("balance-status-badge")).toBeTruthy()
-
-      await flushEffects()
-    } finally {
-      jest.useRealTimers()
-    }
+    expect(queryByTestId("pending-receive-badge")).toBeNull()
   })
 
   it("hides the badge while nothing is pending", async () => {
@@ -1958,7 +1943,7 @@ describe("HomeScreen pending receive badge", () => {
 
     await flushEffects()
 
-    expect(queryByTestId("balance-status-badge")).toBeNull()
+    expect(queryByTestId("pending-receive-badge")).toBeNull()
   })
 
   describe("self-custodial", () => {
@@ -2003,6 +1988,27 @@ describe("HomeScreen pending receive badge", () => {
       mockPendingDepositsOverride = null
     })
 
+    /** The slot sits directly under the balance the placeholder replaces, so the deposit
+     *  amount must not spell out the figure the user just covered. */
+    it("hides the pending row while amounts are hidden", async () => {
+      mockActiveWalletOverride = selfCustodialWallet
+      mockPendingDepositsOverride = { deposits: [sparkDeposit("immature")] }
+
+      const { queryByTestId } = render(
+        <HideAmountContextProvider
+          value={{ hideAmount: true, toggleHideAmount: jest.fn() }}
+        >
+          <ContextForScreen>
+            <HomeScreen />
+          </ContextForScreen>
+        </HideAmountContextProvider>,
+      )
+
+      await flushEffects()
+
+      expect(queryByTestId("pending-receive-badge")).toBeNull()
+    })
+
     it("shows the badge for an immature (unconfirmed) Spark deposit", async () => {
       mockActiveWalletOverride = selfCustodialWallet
       mockPendingDepositsOverride = { deposits: [sparkDeposit("immature")] }
@@ -2013,9 +2019,39 @@ describe("HomeScreen pending receive badge", () => {
         </ContextForScreen>,
       )
 
-      expect(await findByTestId("balance-status-badge")).toBeTruthy()
+      expect(await findByTestId("pending-receive-badge")).toBeTruthy()
 
       await flushEffects()
+    })
+
+    /** The regression in blink-wip#937: the only pending signal at the top was
+     *  the unseen-tx badge, which auto-dismisses after ~5s. This row is
+     *  state-driven and must outlive that window. */
+    it("keeps the pending row past the unseen-badge auto-dismiss window", async () => {
+      jest.useFakeTimers({ doNotFake: ["setImmediate"] })
+      try {
+        mockActiveWalletOverride = selfCustodialWallet
+        mockPendingDepositsOverride = { deposits: [sparkDeposit("immature")] }
+
+        const { findByTestId, getByTestId } = render(
+          <ContextForScreen>
+            <HomeScreen />
+          </ContextForScreen>,
+        )
+
+        expect(await findByTestId("pending-receive-badge")).toBeTruthy()
+
+        // 5s auto-seen delay + 180ms hide-to-mark gap + slack
+        act(() => {
+          jest.advanceTimersByTime(30_000)
+        })
+
+        expect(getByTestId("pending-receive-badge")).toBeTruthy()
+
+        await flushEffects()
+      } finally {
+        jest.useRealTimers()
+      }
     })
 
     it("ignores custodial pending receives while the Spark SDK is still connecting", async () => {
@@ -2041,7 +2077,7 @@ describe("HomeScreen pending receive badge", () => {
 
       await flushEffects()
 
-      expect(queryByTestId("balance-status-badge")).toBeNull()
+      expect(queryByTestId("pending-receive-badge")).toBeNull()
     })
 
     it("opens the unclaimed-deposits screen when the immature-deposit pill is tapped", async () => {
@@ -2056,7 +2092,7 @@ describe("HomeScreen pending receive badge", () => {
         </ContextForScreen>,
       )
 
-      fireEvent.press(await findByTestId("balance-status-badge"))
+      fireEvent.press(await findByTestId("pending-receive-badge"))
 
       expect(mockNavigate).toHaveBeenCalledWith("unclaimedDepositsScreen")
 
@@ -2075,7 +2111,7 @@ describe("HomeScreen pending receive badge", () => {
 
       await flushEffects()
 
-      expect(queryByTestId("balance-status-badge")).toBeNull()
+      expect(queryByTestId("pending-receive-badge")).toBeNull()
     })
   })
 })

@@ -1,15 +1,6 @@
 import * as React from "react"
-import { Animated, Pressable } from "react-native"
-import { Text, makeStyles } from "@rn-vui/themed"
 
-import { useDropInOutAnimation } from "@app/components/animations"
-
-const UNSEEN_BADGE_ANIMATION = {
-  delay: 300,
-  distance: 15,
-  durationIn: 180,
-  durationOut: 180,
-}
+import { AmountBadge } from "@app/components/amount-badge"
 
 type UnseenTxAmountBadgeProps = {
   amountText: string
@@ -18,67 +9,26 @@ type UnseenTxAmountBadgeProps = {
   isOutgoing?: boolean
 }
 
+/**
+ * The amount of the latest transaction the user has not acknowledged yet.
+ * Transient: the screen's visibility hooks auto-dismiss it after a few seconds,
+ * which is the whole difference from the pending-deposit row it shares the slot
+ * with.
+ */
 export const UnseenTxAmountBadge: React.FC<UnseenTxAmountBadgeProps> = ({
   amountText,
   visible = true,
   onPress,
   isOutgoing,
 }) => {
-  const styles = useStyles({ isOutgoing })
-  const { opacity, translateY } = useDropInOutAnimation({
-    visible,
-    delay: UNSEEN_BADGE_ANIMATION.delay,
-    distance: UNSEEN_BADGE_ANIMATION.distance,
-    durationIn: UNSEEN_BADGE_ANIMATION.durationIn,
-    durationOut: UNSEEN_BADGE_ANIMATION.durationOut,
-  })
-
-  const [shouldRender, setShouldRender] = React.useState(visible)
-
-  React.useEffect(() => {
-    if (visible) {
-      setShouldRender(true)
-      return
-    }
-
-    const timeout = setTimeout(() => {
-      setShouldRender(false)
-    }, UNSEEN_BADGE_ANIMATION.durationOut)
-
-    return () => clearTimeout(timeout)
-  }, [visible])
+  const variant = isOutgoing ? "outgoing" : "incoming"
 
   return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={amountText}
-      disabled={!visible}
+    <AmountBadge
+      amountText={amountText}
+      variant={variant}
+      visible={visible}
       onPress={onPress}
-      style={styles.touch}
-    >
-      <Animated.View
-        key={amountText}
-        style={[styles.badge, { opacity, transform: [{ translateY }] }]}
-        accessibilityElementsHidden={!visible}
-        importantForAccessibility={visible ? "auto" : "no-hide-descendants"}
-      >
-        {shouldRender ? <Text style={styles.text}>{amountText}</Text> : null}
-      </Animated.View>
-    </Pressable>
+    />
   )
 }
-
-const useStyles = makeStyles(({ colors }, { isOutgoing }: { isOutgoing?: boolean }) => ({
-  touch: {
-    alignSelf: "center",
-  },
-  badge: {
-    borderRadius: 8,
-    paddingHorizontal: 20,
-    alignSelf: "center",
-  },
-  text: {
-    fontSize: 20,
-    color: isOutgoing ? colors.grey2 : colors._green,
-  },
-}))
