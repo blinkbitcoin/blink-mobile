@@ -35,6 +35,14 @@ export const ChooseExperienceContinueRoute = {
 export type ChooseExperienceContinueRoute =
   (typeof ChooseExperienceContinueRoute)[keyof typeof ChooseExperienceContinueRoute]
 
+/** Whether the mode screen can offer a way back. Creation arrives from the account type
+ *  screen with nothing provisioned yet, so leaving costs the user nothing. Restore and
+ *  migration arrive after the account is already activated, and only the screen ahead
+ *  resets to Primary: going back there strands a live account on an onboarding screen. */
+export const canGoBackFromChooseExperience = (
+  onContinue: RootStackParamList["selfCustodialChooseExperience"]["onContinue"],
+): boolean => onContinue.route === ChooseExperienceContinueRoute.AcceptTerms
+
 export type RootStackParamList = {
   getStarted: undefined
   accountTypeSelection: { mode: AccountTypeMode }

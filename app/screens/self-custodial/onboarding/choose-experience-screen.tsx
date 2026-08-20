@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { View } from "react-native"
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
@@ -9,6 +9,7 @@ import { IconHero } from "@app/components/icon-hero"
 import { OptionCard, OptionCardGroup } from "@app/components/option-card-group"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import {
+  canGoBackFromChooseExperience,
   ChooseExperienceContinueRoute,
   RootStackParamList,
 } from "@app/navigation/stack-param-lists"
@@ -19,6 +20,10 @@ import { testProps } from "@app/utils/testProps"
 import { OnboardingScreenLayout } from "./layouts"
 
 const MODE_ICON_SIZE = 22
+
+/** The actions a user's own back press dispatches, and the only ones this screen refuses:
+ *  the header arrow and the Android hardware back raise GO_BACK, the swipe raises POP. */
+const BACKWARD_ACTIONS = ["GO_BACK", "POP"]
 
 /**
  * Lets a self-custodial user pick their region posture (Enhanced or Anon) during
@@ -46,6 +51,25 @@ export const ChooseExperienceScreen: React.FC = () => {
   const [selected, setSelected] = useState<AccountMode>(
     storedMode ?? AccountMode.Enhanced,
   )
+
+  /**
+   * Restore and migration arrive with the account already activated and only the screen
+   * ahead resetting to Primary, so leaving backwards would strand a live account on an
+   * onboarding screen with no mode recorded. Guarding through the navigator rather than the
+   * hidden header arrow alone is deliberate: `beforeRemove` also catches the Android
+   * hardware back, which suppressing the arrow does not.
+   *
+   * Only the backward actions are refused. A removal this screen did not cause, an app-lock
+   * or migration-gate reset, has to keep working, and blocking those is how a guard meant
+   * to protect the user ends up trapping them instead.
+   */
+  useEffect(() => {
+    if (canGoBackFromChooseExperience(onContinue)) return
+    return navigation.addListener("beforeRemove", (event) => {
+      if (!BACKWARD_ACTIONS.includes(event.data.action.type)) return
+      event.preventDefault()
+    })
+  }, [navigation, onContinue])
 
   const options: OptionCard<AccountMode>[] = [
     {

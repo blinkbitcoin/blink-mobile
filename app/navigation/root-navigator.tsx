@@ -163,6 +163,7 @@ import {
   MigrationTransferringFundsScreen,
 } from "@app/screens/account-migration"
 import {
+  canGoBackFromChooseExperience,
   OnboardingStackParamList,
   PeopleStackParamList,
   PhoneValidationStackParamList,
@@ -174,7 +175,7 @@ import { useResumeCompletedMigration } from "@app/screens/account-migration/hook
 import { WindDownReceiveGate } from "@app/screens/account-migration/wind-down-receive-gate"
 import { AcceptTermsAndConditionsScreen } from "@app/screens/accept-t-and-c"
 import { TouchableOpacity } from "react-native"
-import { useNavigation } from "@react-navigation/native"
+import { RouteProp, useNavigation } from "@react-navigation/native"
 import { ApiScreen } from "@app/screens/settings-screen/api-screen"
 import { ApiKeyCreateScreen } from "@app/screens/settings-screen/api/api-key-create-screen"
 
@@ -192,6 +193,31 @@ const DeveloperScreen: React.ComponentType | null = __DEV__
  *  invisible only while native-stack invokes headerLeft instead of rendering it as an
  *  element; the day that changes, the back button would remount on every render. */
 const defaultHeaderBack = headerBackControl()
+/** Same reasoning as `defaultHeaderBack`: built once so the screens that refuse a back
+ *  press hand `headerLeft` a stable identity instead of minting one per render. */
+const suppressedHeaderBack = headerBackControl({ canGoBack: false })
+
+/**
+ * The swipe stays blocked for every entry: leaving by gesture is undirected, so the arrow is
+ * the one deliberate way out, and only creation has anywhere to take it.
+ *
+ * Swapping `headerLeft` rather than setting `headerBackVisible` is what keeps this to one
+ * control: the navigator already supplies a custom `headerLeft`, so enabling the native
+ * button on top of it renders a second arrow beside the first.
+ */
+const chooseExperienceOptions = ({
+  route,
+}: {
+  route: RouteProp<RootStackParamList, "selfCustodialChooseExperience">
+}) => {
+  const canGoBack = canGoBackFromChooseExperience(route.params.onContinue)
+
+  return {
+    title: "",
+    gestureEnabled: false,
+    headerLeft: canGoBack ? defaultHeaderBack : suppressedHeaderBack,
+  }
+}
 
 const RootNavigator = createNativeStackNavigator<RootStackParamList>()
 
@@ -886,9 +912,7 @@ export const RootStack = () => {
       <RootNavigator.Screen
         name="selfCustodialChooseExperience"
         component={ChooseExperienceScreen}
-        /** Header for the back arrow, but the swipe stays blocked: leaving by gesture
-         *  is undirected, so the arrow is the one deliberate way out. */
-        options={{ title: "", gestureEnabled: false }}
+        options={chooseExperienceOptions}
       />
       <RootNavigator.Screen
         name="selfCustodialWalletCreation"

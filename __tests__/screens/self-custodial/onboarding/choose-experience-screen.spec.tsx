@@ -14,6 +14,25 @@ import { ContextForScreen } from "../../helper"
 import { flushEffects } from "../../../helpers/flush-effects"
 
 const mockNavigate = jest.fn()
+const mockUnsubscribe = jest.fn()
+type BeforeRemoveEvent = {
+  data: { action: { type: string } }
+  preventDefault: () => void
+}
+type BeforeRemoveListener = (event: BeforeRemoveEvent) => void
+let capturedBeforeRemove: BeforeRemoveListener | undefined
+const mockAddListener = jest.fn((event: string, listener: BeforeRemoveListener) => {
+  if (event === "beforeRemove") capturedBeforeRemove = listener
+  return mockUnsubscribe
+})
+
+/** Dispatches the removal the listener sees, so a test names the action it is exercising
+ *  rather than the shape react-navigation happens to hand over. */
+const dispatchRemoval = (type: string) => {
+  const preventDefault = jest.fn()
+  capturedBeforeRemove?.({ data: { action: { type } }, preventDefault })
+  return preventDefault
+}
 type OnContinue = RootStackParamList["selfCustodialChooseExperience"]["onContinue"]
 let mockOnContinue: OnContinue = {
   route: "selfCustodialBackupSuccess",
@@ -22,7 +41,7 @@ let mockOnContinue: OnContinue = {
 
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
-  useNavigation: () => ({ navigate: mockNavigate }),
+  useNavigation: () => ({ navigate: mockNavigate, addListener: mockAddListener }),
   useRoute: () => ({ params: { onContinue: mockOnContinue } }),
 }))
 
@@ -77,6 +96,7 @@ describe("ChooseExperienceScreen", () => {
     jest.clearAllMocks()
     mockGetAccountMode.mockReturnValue(undefined)
     mockOnContinue = { route: "selfCustodialBackupSuccess", accountId: "sc-account-1" }
+    capturedBeforeRemove = undefined
   })
 
   it("renders the spinner hero with the title", async () => {
@@ -194,5 +214,67 @@ describe("ChooseExperienceScreen", () => {
     expect(mockSetAccountMode).not.toHaveBeenCalled()
     /** No account exists yet, so there is nothing to read a stored mode from. */
     expect(mockGetAccountMode).not.toHaveBeenCalled()
+  })
+
+  /**
+   * Restore and migration activate the account before this screen and only the screen ahead
+   * resets to Primary, so every way backwards has to be refused, not just the header arrow.
+   * Hiding that arrow leaves the Android hardware back untouched, which is what this guard
+   * is for.
+   */
+  describe("leaving backwards", () => {
+    it("refuses the hardware back on the restore entry, which arrives with a live account", async () => {
+      mockOnContinue = { route: "selfCustodialBackupSuccess", accountId: "sc-account-1" }
+      await renderScreen()
+
+      expect(capturedBeforeRemove).toBeDefined()
+      expect(dispatchRemoval("GO_BACK")).toHaveBeenCalled()
+    })
+
+    it("refuses the swipe on the restore entry", async () => {
+      mockOnContinue = { route: "selfCustodialBackupSuccess", accountId: "sc-account-1" }
+      await renderScreen()
+
+      expect(dispatchRemoval("POP")).toHaveBeenCalled()
+    })
+
+    it("refuses the hardware back on the migration entry, which arrives past its backup", async () => {
+      mockOnContinue = {
+        route: "accountMigrationBalancesOverview",
+        accountId: "sc-account-1",
+      }
+      await renderScreen()
+
+      expect(dispatchRemoval("GO_BACK")).toHaveBeenCalled()
+    })
+
+    /** Creation provisioned nothing yet, so the account type screen behind it is a coherent
+     *  place to return to and the guard must stay out of the way. */
+    it("registers no guard on the creation entry", async () => {
+      mockOnContinue = { route: "acceptTermsAndConditions" }
+      await renderScreen()
+
+      expect(mockAddListener).not.toHaveBeenCalledWith(
+        "beforeRemove",
+        expect.any(Function),
+      )
+    })
+
+    /** The guard refuses the user's own back, not every removal. An app-lock or
+     *  migration-gate reset has to keep working, and blocking those is how a guard meant to
+     *  protect the user ends up trapping them instead. */
+    it("lets a reset through, which the screen itself did not cause", async () => {
+      await renderScreen()
+
+      expect(dispatchRemoval("RESET")).not.toHaveBeenCalled()
+    })
+
+    /** Continuing dispatches NAVIGATE, which removes this screen whenever the destination
+     *  already sits on the stack. Refusing that would trap the user on the way forward. */
+    it("lets the forward navigation through", async () => {
+      await renderScreen()
+
+      expect(dispatchRemoval("NAVIGATE")).not.toHaveBeenCalled()
+    })
   })
 })
