@@ -1,5 +1,5 @@
 import React from "react"
-import { StyleProp, TextInput, ViewStyle } from "react-native"
+import { StyleProp, StyleSheet, TextInput, ViewStyle } from "react-native"
 import { Input, ThemeProvider, createTheme } from "@rn-vui/themed"
 import { act, fireEvent, render } from "@testing-library/react-native"
 
@@ -36,6 +36,7 @@ const DIMMED_STYLE = { opacity: 0.6 }
 /** The query needs a plain component type, and rn-vui types `Input`'s ref as the bare
  *  TextInput underneath it, which does not fit one. Only the style prop is read here. */
 const ThemedInput = Input as unknown as React.ComponentType<{
+  containerStyle: StyleProp<ViewStyle>
   inputContainerStyle: StyleProp<ViewStyle>
 }>
 
@@ -72,6 +73,27 @@ describe("PhoneInput", () => {
     renderInput(<PhoneInput value="" onChangeText={jest.fn()} />)
 
     expect(mockCountryCodePicker).not.toHaveBeenCalled()
+  })
+
+  it("leaves the row's free space to the phone field, not to the country button", () => {
+    // eslint-disable-next-line camelcase -- testing-library exposes this API verbatim
+    const { UNSAFE_getByType } = renderInput(
+      <PhoneInput value="" onChangeText={jest.fn()} />,
+    )
+
+    /** The phone auth screens each grew their own copy of this button and ended up with
+     *  two halves fighting over the row, which left the number unreadably narrow. This
+     *  copy never had the defect, so the test guards it forward rather than proving a
+     *  fix: exactly one of the two may grow, and here it is the field. */
+    const [props] = mockCountryCodePicker.mock.calls.at(-1) ?? []
+    const button = StyleSheet.flatten(props.buttonStyle as StyleProp<ViewStyle>)
+    expect(button.flex).toBeUndefined()
+    expect(button.flexGrow).toBeUndefined()
+    expect(button.width).toBeUndefined()
+    expect(button.flexBasis).toBeUndefined()
+
+    const field = StyleSheet.flatten(UNSAFE_getByType(ThemedInput).props.containerStyle)
+    expect(field.flex).toBe(1)
   })
 
   it("dims both halves of the field when the caller disables it", () => {
