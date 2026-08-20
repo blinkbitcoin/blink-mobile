@@ -11,6 +11,7 @@ import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-but
 import { ContactSupportButton } from "@app/components/contact-support-button/contact-support-button"
 import { PhoneCodeChannelType } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { testProps } from "@app/utils/testProps"
 import { makeStyles, useTheme, Text, Input } from "@rn-vui/themed"
 
 import { Screen } from "../../components/screen"
@@ -157,6 +158,7 @@ export const PhoneRegistrationInitiateScreen: React.FC = () => {
             buttonStyle={styles.countryPickerButtonStyle}
           />
           <Input
+            {...testProps("telephoneNumber")}
             placeholder={PLACEHOLDER_PHONE_NUMBER}
             containerStyle={styles.inputComponentContainerStyle}
             inputContainerStyle={styles.inputContainerStyle}
@@ -217,6 +219,11 @@ const useStyles = makeStyles(({ colors }) => ({
   },
 
   codeTextStyle: {},
+  /** No `flex` here on purpose: the phone field beside it already takes the row's free
+   *  space, so growing this button too would split the row in half and leave the number
+   *  too narrow to read. A flag and a calling code come to a little under `minWidth` at
+   *  the default text size, so in practice the floor is the width, and what it buys is a
+   *  button that does not twitch between a "+1" and a "+503". */
   countryPickerButtonStyle: {
     minWidth: 110,
     borderColor: colors.primary5,
@@ -226,7 +233,6 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    flex: 1,
   },
   inputComponentContainerStyle: {
     flex: 1,

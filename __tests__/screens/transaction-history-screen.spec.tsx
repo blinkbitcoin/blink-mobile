@@ -12,6 +12,8 @@ import {
 } from "@app/graphql/generated"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
+import { waitForStableRender } from "../helpers/wait-for-stable-render"
+
 import { ContextForScreen } from "./helper"
 
 let currentMocks: MockedResponse[] = []
@@ -346,6 +348,7 @@ describe("TransactionHistoryScreen", () => {
     await waitFor(() => {
       expect(screen.getByTestId("transaction-by-index-0")).toBeTruthy()
     })
+    await waitForStableRender(screen)
 
     const dropdown = screen.getByTestId("wallet-filter-dropdown")
     await act(() => fireEvent.press(dropdown))
@@ -354,12 +357,23 @@ describe("TransactionHistoryScreen", () => {
 
     await act(() => fireEvent.press(btcOption))
 
+    // Wait for the refetched row, then settle: the dropped row is asserted by
+    // absence, and `waitFor` alone would pass on any frame that has not
+    // rendered it *yet*.
     await waitFor(() => {
       expect(screen.getByTestId("transaction-by-index-0").props.children).toContain(
         "507f1f77bcf86cd799439011",
       )
-      expect(screen.queryByTestId("transaction-by-index-1")).toBeNull()
     })
+    await waitFor(() => {
+      expect(screen.getByTestId("transaction-by-index-0")).toBeTruthy()
+    })
+    await waitForStableRender(screen)
+
+    expect(screen.getByTestId("transaction-by-index-0").props.children).toContain(
+      "507f1f77bcf86cd799439011",
+    )
+    expect(screen.queryByTestId("transaction-by-index-1")).toBeNull()
   })
 
   it("filters only BTC by route param", async () => {
@@ -379,9 +393,7 @@ describe("TransactionHistoryScreen", () => {
       </ContextForScreen>,
     )
 
-    await waitFor(() => {
-      expect(screen.getByTestId("transaction-by-index-0")).toBeTruthy()
-    })
+    await waitForStableRender(screen)
 
     expect(screen.getByTestId("transaction-by-index-0").props.children).toContain(
       "507f1f77bcf86cd799439011",
@@ -409,6 +421,7 @@ describe("TransactionHistoryScreen", () => {
     await waitFor(() => {
       expect(screen.getByTestId("transaction-by-index-0")).toBeTruthy()
     })
+    await waitForStableRender(screen)
 
     const dropdown = screen.getByTestId("wallet-filter-dropdown")
     await act(() => fireEvent.press(dropdown))
@@ -420,8 +433,13 @@ describe("TransactionHistoryScreen", () => {
       expect(screen.getByTestId("transaction-by-index-0").props.children).toContain(
         "507f1f77bcf86cd799439012",
       )
-      expect(screen.queryByTestId("transaction-by-index-1")).toBeNull()
     })
+    await waitForStableRender(screen)
+
+    expect(screen.getByTestId("transaction-by-index-0").props.children).toContain(
+      "507f1f77bcf86cd799439012",
+    )
+    expect(screen.queryByTestId("transaction-by-index-1")).toBeNull()
   })
 
   it("highlights none when lastSeen ids are missing", async () => {
@@ -441,9 +459,21 @@ describe("TransactionHistoryScreen", () => {
     await waitFor(() => {
       expect(screen.getByTestId("transaction-by-index-0")).toBeTruthy()
     })
+    // With no lastSeen ids the screen passes through a transient highlight: the
+    // baseline materialises empty, the mapper's "never seen => highlight the
+    // newest" rule fires, then markTxSeen writes the ids into the cache and the
+    // highlight settles off again. Waiting for the rows to merely *exist* lands
+    // on whichever of those frames the machine is on, so settle the tree first.
+    await waitForStableRender(screen)
 
     expect(screen.getByTestId("transaction-by-index-0").props.children).toContain(
+      "507f1f77bcf86cd799439012",
+    )
+    expect(screen.getByTestId("transaction-by-index-0").props.children).toContain(
       "no-highlight",
+    )
+    expect(screen.getByTestId("transaction-by-index-1").props.children).toContain(
+      "507f1f77bcf86cd799439011",
     )
     expect(screen.getByTestId("transaction-by-index-1").props.children).toContain(
       "no-highlight",
@@ -470,6 +500,9 @@ describe("TransactionHistoryScreen", () => {
     await waitFor(() => {
       expect(screen.getByTestId("transaction-by-index-0")).toBeTruthy()
     })
+    // Settling first is what makes this assertion mean "the highlight survives
+    // markTxSeen writing the cache back", rather than "some frame had it".
+    await waitForStableRender(screen)
 
     // min(lastSeenBtcId,lastSeenUsdId) = ...9015 and both are unseen => highlighted
     expect(screen.getByTestId("transaction-by-index-0").props.children).toContain(
@@ -478,15 +511,5 @@ describe("TransactionHistoryScreen", () => {
     expect(screen.getByTestId("transaction-by-index-1").props.children).toContain(
       "highlight",
     )
-
-    // ensure highlight doesn't flip off after `markTxSeen` updates cache
-    await waitFor(() => {
-      expect(screen.getByTestId("transaction-by-index-0").props.children).toContain(
-        "highlight",
-      )
-      expect(screen.getByTestId("transaction-by-index-1").props.children).toContain(
-        "highlight",
-      )
-    })
   })
 })

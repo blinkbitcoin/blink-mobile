@@ -84,6 +84,52 @@ describe("useAccountRegistry", () => {
     expect(result.current.loading).toBe(false)
   })
 
+  it("keeps the newest self-custodial read when an older one resolves late", async () => {
+    mockUseIsAuthed.mockReturnValue(true)
+
+    let resolveStale: (value: unknown) => void = () => undefined
+    let resolveFresh: (value: unknown) => void = () => undefined
+    mockListSelfCustodialAccounts
+      .mockReturnValueOnce({ status: "ok", entries: [] })
+      .mockReturnValueOnce(
+        new Promise((resolve) => {
+          resolveStale = resolve
+        }),
+      )
+      .mockReturnValueOnce(
+        new Promise((resolve) => {
+          resolveFresh = resolve
+        }),
+      )
+
+    const { result } = renderHook(() => useAccountRegistry(), {
+      wrapper: AccountRegistryProvider,
+    })
+    await flushAsyncEffects()
+
+    await act(async () => {
+      result.current.reloadSelfCustodialAccounts()
+      result.current.reloadSelfCustodialAccounts()
+      resolveFresh({
+        status: "ok",
+        entries: [{ id: "fresh-id", lightningAddress: null }],
+      })
+      await Promise.resolve()
+    })
+
+    await act(async () => {
+      resolveStale({
+        status: "ok",
+        entries: [{ id: "stale-id", lightningAddress: null }],
+      })
+      await Promise.resolve()
+    })
+
+    expect(result.current.selfCustodialEntries).toEqual([
+      { id: "fresh-id", lightningAddress: null },
+    ])
+  })
+
   it("returns custodial account when authenticated", async () => {
     mockUseIsAuthed.mockReturnValue(true)
 
