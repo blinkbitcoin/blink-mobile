@@ -29,6 +29,7 @@ import LocationButtonCopy from "./location-button-copy"
 import { MapSearchBar, searchBarBottom } from "./map-search-bar"
 import MapStyles from "./map-styles.json"
 import { OpenSettingsElement, OpenSettingsModal } from "./open-settings-modal"
+import { truncateLabel } from "./marker-layout"
 import { PlaceLabelMarker } from "./place-label-marker"
 import { PlaceMarker } from "./place-marker"
 import { PlaceSearchModal } from "./place-search-modal"
@@ -135,6 +136,15 @@ export default function MapComponent({
     )
   }, [])
 
+  // Cut to the label's character budget once, here, so the collision pass and
+  // the views it admits are given the very same strings. Truncating in either
+  // place alone would have the boxes reserved in screen space describe a name
+  // nobody draws — too wide, and neighbours dropped for room never used.
+  const labelNames = React.useMemo(
+    () => new Map([...names].map(([id, name]) => [id, truncateLabel(name)])),
+    [names],
+  )
+
   // Which names can be drawn without landing on one another.
   //
   // Recomputed only when the camera settles, because `region` is only written by
@@ -144,8 +154,9 @@ export default function MapComponent({
   // in; a fade is not available to us, since these are native marker views whose
   // opacity cannot be animated without re-rasterising every one of them.
   const labelledPlaceIds = React.useMemo(
-    () => (viewport ? placeLabels(places, names, { region, viewport }) : EMPTY_LABELS),
-    [places, names, region, viewport],
+    () =>
+      viewport ? placeLabels(places, labelNames, { region, viewport }) : EMPTY_LABELS,
+    [places, labelNames, region, viewport],
   )
 
   // toggle modal from inside modal component instead of here in the parent
@@ -326,7 +337,9 @@ export default function MapComponent({
             pin whose name lost still draws; it is the name that is dropped, not
             the merchant. */}
         {places.map((place) => {
-          const name = labelledPlaceIds.has(place.id) ? names.get(place.id) : undefined
+          const name = labelledPlaceIds.has(place.id)
+            ? labelNames.get(place.id)
+            : undefined
           return name ? (
             <PlaceLabelMarker
               key={`label-${place.id}`}

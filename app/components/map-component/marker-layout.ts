@@ -3,9 +3,59 @@
 
 import { PIN_HEIGHT, PIN_WIDTH } from "./pin-shape"
 
-export const LABEL_MAX_WIDTH = 132
-export const LABEL_LINE_HEIGHT = 14
-export const LABEL_FONT_SIZE = 11
+export const LABEL_LINE_HEIGHT = 15
+export const LABEL_FONT_SIZE = 12
+
+/**
+ * How many characters of a merchant's name are drawn before it is cut short.
+ *
+ * A hard character count rather than only the width clamp below, because the
+ * clamp is a property of the pixels and this is a property of the map: a long
+ * name is not just a wide label, it is a label that reserves a strip of the
+ * viewport several neighbours could have used. Cutting every name to the same
+ * budget makes what the collision pass has to arbitrate roughly uniform, so the
+ * names that survive a crowd stop depending on which merchant happened to
+ * register the longest string. The full name is one tap away in the sheet.
+ */
+export const LABEL_MAX_CHARACTERS = 16
+
+/** The mark that stands for the characters `truncateLabel` removed. */
+export const LABEL_ELLIPSIS = "\u2026"
+
+/**
+ * A merchant's name, cut to `LABEL_MAX_CHARACTERS` if it runs past it.
+ *
+ * Counted in code points, not UTF-16 units: names arrive from OpenStreetMap in
+ * every script there is, and slicing a string by `.length` cuts an astral
+ * character in half and leaves a lone surrogate behind — a replacement glyph in
+ * the middle of a name.
+ *
+ * A cut that lands on a space would leave the ellipsis floating a word's gap
+ * away from the text, so the trailing whitespace goes with the removed half.
+ *
+ * Both the collision pass and the view that draws the name must be given the
+ * *same* string: the boxes reserved in `label-collision.ts` are measured from
+ * whatever is passed in, so measuring the full name and drawing a shortened one
+ * would reserve a strip much wider than the pixels used. `map-component`
+ * truncates once, before either sees a name — see the `labelNames` memo there.
+ */
+export const truncateLabel = (name: string): string => {
+  const characters = [...name]
+  if (characters.length <= LABEL_MAX_CHARACTERS) return name
+
+  return characters.slice(0, LABEL_MAX_CHARACTERS).join("").trimEnd() + LABEL_ELLIPSIS
+}
+
+/**
+ * The width the label view may reach before the text is ellipsised by layout
+ * rather than by `truncateLabel`.
+ *
+ * Sized so a name at the full character budget still fits when every one of
+ * those characters is a capital — past that (a name of nothing but `M`s) the
+ * clamp takes over, which is the safe direction: it is the width the pixels are
+ * actually held to.
+ */
+export const LABEL_MAX_WIDTH = 144
 
 /**
  * The pin's teardrop tip sits on the place's coordinate.

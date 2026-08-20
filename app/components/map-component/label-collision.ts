@@ -92,7 +92,7 @@ export const projectToScreen = (
   return { x, y }
 }
 
-// Per-character advance as a fraction of the font size, for the label's 11dp
+// Per-character advance as a fraction of the font size, for the label's 12dp
 // semibold system face.
 //
 // Measuring the real thing means laying every name out off-screen, which costs
@@ -102,7 +102,10 @@ export const projectToScreen = (
 // hides a label that would have fitted, where one estimated too narrow puts two
 // names on top of each other — the thing this module exists to prevent.
 const NARROW_CHARACTERS = new Set(" .,:;'\"`|!ijlt()[]{}/\\-".split(""))
-const WIDE_CHARACTERS = new Set("mwMW@%".split(""))
+// The ellipsis `truncateLabel` appends is nearly an em wide in the system face,
+// so it belongs here rather than taking the default: a shortened name is exactly
+// the case where the estimate must not come out under the pixels.
+const WIDE_CHARACTERS = new Set("mwMW@%\u2026".split(""))
 const NARROW_RATIO = 0.32
 const WIDE_RATIO = 0.92
 const UPPERCASE_RATIO = 0.66

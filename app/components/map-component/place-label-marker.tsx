@@ -16,6 +16,20 @@ import {
 } from "./marker-layout"
 import { useMarkerSettle } from "./use-marker-settle"
 
+/**
+ * The halo behind a name in light mode: the theme's `white` taken 60% of the way
+ * to black.
+ *
+ * A pure white halo disappears into a pale basemap and leaves the text with
+ * nothing but its own weight to hold it off the roads underneath. Darkening the
+ * halo gives the glyphs an edge that reads at a glance without turning into an
+ * offset drop shadow, which at this size smears the counters shut.
+ *
+ * Dark mode needs no equivalent constant: the theme's `white` is already
+ * `#000000` there, which is as dark as this can go.
+ */
+export const LABEL_HALO_COLOR_LIGHT = "#666666"
+
 type Props = {
   place: BtcMapPlace
   name: string
@@ -76,7 +90,7 @@ export const PlaceLabelMarker: React.FC<Props> = React.memo(
 
 PlaceLabelMarker.displayName = "PlaceLabelMarker"
 
-const useStyles = makeStyles(({ colors }) => ({
+const useStyles = makeStyles(({ colors, mode }) => ({
   // Padding rather than a shift of the anchor: the view's bottom-left corner is
   // what sits on the coordinate, so growing it up and to the right leaves that
   // corner — and therefore the anchor — where it is for every name.
@@ -97,8 +111,11 @@ const useStyles = makeStyles(({ colors }) => ({
     // than to both sides of it.
     textAlign: "left",
     // React Native has no text halo, and a label has to stay readable over
-    // whatever the basemap puts behind it.
-    textShadowColor: colors.white,
+    // whatever the basemap puts behind it. `colors.white` is the background
+    // token, so it inverts with the mode and the halo is always the opposite of
+    // the glyphs — black behind white text in dark mode, and in light mode the
+    // darkened white above rather than the flat one, which the basemap swallows.
+    textShadowColor: mode === "dark" ? colors.white : LABEL_HALO_COLOR_LIGHT,
     textShadowOffset: { width: 0, height: 0 },
     textShadowRadius: 3,
   },

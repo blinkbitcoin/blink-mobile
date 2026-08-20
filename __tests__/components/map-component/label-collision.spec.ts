@@ -8,9 +8,12 @@ import {
   projectToScreen,
 } from "@app/components/map-component/label-collision"
 import {
+  LABEL_ELLIPSIS,
+  LABEL_MAX_CHARACTERS,
   LABEL_MAX_WIDTH,
   LABEL_OFFSET_X,
   LABEL_OFFSET_Y,
+  truncateLabel,
 } from "@app/components/map-component/marker-layout"
 
 // A phone-shaped map view. Nothing here reads Dimensions — the placement is
@@ -127,6 +130,58 @@ describe("estimateLabelWidth", () => {
 
   it("costs nothing for an empty name", () => {
     expect(estimateLabelWidth("")).toBe(0)
+  })
+})
+
+describe("truncateLabel", () => {
+  it("leaves a name that fits exactly as it is", () => {
+    expect(truncateLabel("Tienda Maxim")).toBe("Tienda Maxim")
+    expect(truncateLabel("a".repeat(LABEL_MAX_CHARACTERS))).toBe(
+      "a".repeat(LABEL_MAX_CHARACTERS),
+    )
+  })
+
+  it("keeps the budget's worth of characters and marks the rest", () => {
+    expect(truncateLabel("Pupusería Victoria")).toBe("Pupusería Victor" + LABEL_ELLIPSIS)
+    expect([...truncateLabel("a".repeat(40))]).toHaveLength(LABEL_MAX_CHARACTERS + 1)
+  })
+
+  it("does not leave the ellipsis floating a word's gap from the text", () => {
+    // The cut lands on the space between "Restaurante" and "Los": keeping it
+    // would draw "Restaurante Los …" with a hole before the mark.
+    expect(truncateLabel("Restaurante Los Cocos")).toBe(
+      "Restaurante Los" + LABEL_ELLIPSIS,
+    )
+  })
+
+  it("counts code points, so an astral character is never cut in half", () => {
+    // Sixteen emoji are sixteen characters to a reader and thirty-two UTF-16
+    // units to `.length` — slicing by the latter ends the string on a lone
+    // surrogate, which draws as a replacement box.
+    const emoji = "☕️".repeat(2) + "🍕".repeat(20)
+    const truncated = truncateLabel(emoji)
+
+    expect([...truncated]).toHaveLength(LABEL_MAX_CHARACTERS + 1)
+    expect(truncated).not.toMatch(/[\uD800-\uDFFF]$/)
+  })
+
+  it("narrows the strip a long name asks the placement for", () => {
+    // Which is the whole point of the budget: an unshortened name clamps to the
+    // full width the view may reach and reserves it away from its neighbours.
+    const long = "l".repeat(60)
+
+    expect(estimateLabelWidth(long)).toBe(LABEL_MAX_WIDTH)
+    expect(estimateLabelWidth(truncateLabel(long))).toBeLessThan(LABEL_MAX_WIDTH)
+  })
+
+  it("charges the ellipsis rather than letting it run past the estimate", () => {
+    // A mark this wide taking the default per-character bucket would put the
+    // estimate under the pixels — the one direction this module must not err in.
+    const cut = truncateLabel("l".repeat(60))
+
+    expect(estimateLabelWidth(cut)).toBeGreaterThan(
+      estimateLabelWidth(cut.replace(LABEL_ELLIPSIS, "")),
+    )
   })
 })
 

@@ -246,6 +246,57 @@ describe("MapComponent", () => {
     expect(getByTestId("btcmap-label-2")).toBeTruthy()
   })
 
+  it("cuts a long name down rather than drawing it across the map", async () => {
+    const shop = place(1)
+    setPlaces({ places: [shop] })
+    mockedNames.mockReturnValue(new Map([[shop.id, "Pupusería Victoria"]]))
+
+    const { getByText, queryByText } = renderMap()
+    await layOutMap()
+
+    expect(getByText("Pupusería Victor\u2026")).toBeTruthy()
+    expect(queryByText("Pupusería Victoria")).toBeNull()
+  })
+
+  it("reserves for a shortened name only the strip it draws in", async () => {
+    // The collision pass and the view have to be handed the same string. Given
+    // the whole name the pass measures a box that clamps to the widest a label
+    // may be and takes that strip away from the neighbour — while the view
+    // draws sixteen characters and leaves most of it empty.
+    //
+    // These two sit 100dp apart at this region's scale: wider than the box a
+    // sixteen-character name needs, narrower than the one the full name claims.
+    // Truncate in only one of the two places and the second name disappears.
+    const dpToLongitude = REGION.longitudeDelta / 384
+    const places = [
+      {
+        id: 1,
+        latitude: REGION.latitude,
+        longitude: REGION.longitude - 50 * dpToLongitude,
+        icon: "local_cafe",
+      },
+      {
+        id: 2,
+        latitude: REGION.latitude,
+        longitude: REGION.longitude + 50 * dpToLongitude,
+        icon: "local_cafe",
+      },
+    ]
+    setPlaces({ places })
+    mockedNames.mockReturnValue(
+      new Map([
+        [1, "l".repeat(60)],
+        [2, "l".repeat(60)],
+      ]),
+    )
+
+    const { getByTestId } = renderMap()
+    await layOutMap()
+
+    expect(getByTestId("btcmap-label-1")).toBeTruthy()
+    expect(getByTestId("btcmap-label-2")).toBeTruthy()
+  })
+
   it("opens the sheet on the place that was tapped", async () => {
     setPlaces({ places: [place(1)] })
     const { getByTestId } = renderMap()
@@ -479,6 +530,38 @@ describe("MapComponent basemap", () => {
       expect(hides("poi", "labels")).toBe(true)
       expect(hides("poi.business")).toBe(true)
       expect(hides("transit", "labels")).toBe(true)
+    }
+  })
+
+  it("quiets the street names the merchant labels have to be read against", () => {
+    // Every side street carrying its name is the layer our own labels compete
+    // with hardest — same size, same weight, drawn underneath and everywhere.
+    // Highways keep theirs: with nothing named at all the map stops being
+    // navigable, and a motorway label is rare enough not to crowd a merchant.
+    //
+    // Android only. iOS draws Apple Maps, which ignores this style sheet and
+    // offers no equivalent, so street names stay there — `showsPointsOfInterests`
+    // is the only label control MapKit exposes and it does not reach roads.
+    type Rule = {
+      featureType?: string
+      elementType?: string
+      stylers: Record<string, string>[]
+    }
+    const themes: Rule[][] = [MapStyles.light, MapStyles.dark]
+
+    for (const rules of themes) {
+      const hides = (featureType: string) =>
+        rules.some(
+          (rule) =>
+            rule.featureType === featureType &&
+            rule.elementType === "labels" &&
+            rule.stylers.some((styler) => styler.visibility === "off"),
+        )
+
+      expect(hides("road.local")).toBe(true)
+      expect(hides("road.arterial")).toBe(true)
+      expect(hides("road")).toBe(false)
+      expect(hides("road.highway")).toBe(false)
     }
   })
 })

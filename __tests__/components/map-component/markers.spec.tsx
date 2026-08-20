@@ -1,4 +1,5 @@
 import React from "react"
+import { StyleSheet, View } from "react-native"
 import { act, render, renderHook } from "@testing-library/react-native"
 import { Circle, Path } from "react-native-svg"
 import MaterialIcon from "react-native-vector-icons/MaterialIcons"
@@ -8,8 +9,19 @@ import { BtcMapPlace } from "@app/btcmap"
 import theme from "@app/rne-theme/theme"
 import { dark, light } from "@app/rne-theme/colors"
 import { ClusterMarker } from "@app/components/map-component/cluster-marker"
-import { LABEL_ANCHOR, PIN_ANCHOR } from "@app/components/map-component/marker-layout"
-import { PlaceLabelMarker } from "@app/components/map-component/place-label-marker"
+import { labelBox, projectToScreen } from "@app/components/map-component/label-collision"
+import {
+  LABEL_ANCHOR,
+  LABEL_FONT_SIZE,
+  LABEL_HALO_PADDING,
+  LABEL_LINE_HEIGHT,
+  LABEL_MAX_WIDTH,
+  PIN_ANCHOR,
+} from "@app/components/map-component/marker-layout"
+import {
+  LABEL_HALO_COLOR_LIGHT,
+  PlaceLabelMarker,
+} from "@app/components/map-component/place-label-marker"
 import { PlaceMarker } from "@app/components/map-component/place-marker"
 import {
   PIN_COLOR_BOOSTED,
@@ -269,6 +281,26 @@ describe("PlaceMarker", () => {
   })
 })
 
+const label = () => (
+  <PlaceLabelMarker place={place()} name="Satoshi Coffee" onPress={jest.fn()} />
+)
+
+const textStyleOf = (node: React.ReactElement) =>
+  StyleSheet.flatten(render(node).getByText("Satoshi Coffee").props.style)
+
+const haloOf = (node: React.ReactElement) => textStyleOf(node).textShadowColor
+
+// The only styled View in the label's marker is the row that pads the text away
+// from the coordinate its bottom-left corner sits on.
+const rowStyleOf = (node: React.ReactElement) =>
+  StyleSheet.flatten(
+    // eslint-disable-next-line camelcase -- testing-library exposes this verbatim
+    render(node)
+      .UNSAFE_getAllByType(View)
+      .map((view) => StyleSheet.flatten(view.props.style))
+      .find((style) => style?.paddingLeft !== undefined),
+  )
+
 describe("PlaceLabelMarker", () => {
   it("stands the name beside the pin, anchored by a corner a name cannot move", () => {
     // Bottom-left, not centred: the view's width follows its text, and only a
@@ -300,6 +332,60 @@ describe("PlaceLabelMarker", () => {
     act(() => jest.advanceTimersByTime(2500))
     expect(trackingOf(tree, "btcmap-label-1")).toBe(false)
     expect(redrawsFor("btcmap-label-1")).toBeGreaterThan(1)
+  })
+
+  it("darkens the halo in light mode, where a white one is swallowed", () => {
+    // `colors.white` is the background token and is #FFFFFF in light mode, which
+    // over a pale basemap leaves the glyphs nothing but their own weight to
+    // stand on. Dark mode needs no equivalent: the same token is already black
+    // there, behind white text.
+    expect(haloOf(inMode("light", label()))).toBe(LABEL_HALO_COLOR_LIGHT)
+    expect(haloOf(inMode("light", label()))).not.toBe(light.white)
+
+    expect(haloOf(inMode("dark", label()))).toBe(dark.white)
+    expect(textStyleOf(inMode("dark", label())).color).toBe(dark.black)
+  })
+
+  it("draws the name in the pixels the collision pass reserved for it", () => {
+    // The two halves of this are written in different files and neither can see
+    // the other: `label-collision.ts` reserves a rectangle in screen space, and
+    // the padding below is what actually puts the glyphs somewhere. Change one
+    // and the boxes stop describing the pixels — labels drift off the strip
+    // that was held for them, or overlap one the pass believed was clear.
+    const frame = {
+      region: {
+        latitude: 51.5,
+        longitude: -0.12,
+        latitudeDelta: 0.02,
+        longitudeDelta: 0.02,
+      },
+      viewport: { width: 384, height: 720 },
+    }
+    const shop = place()
+    const reserved = labelBox(shop, "Satoshi Coffee", frame)
+    const { x, y } = projectToScreen(shop, frame)
+
+    const text = textStyleOf(withTheme(label()))
+    const row = rowStyleOf(withTheme(label()))
+
+    // The marker's bottom-left corner is on the coordinate, so the padding is
+    // measured from (x, y) and the text sits inside it.
+    const drawn = {
+      left: x + Number(row.paddingLeft),
+      bottom: y - Number(row.paddingBottom),
+      height: Number(text.height),
+    }
+
+    expect(drawn.left).toBe(reserved.left + LABEL_HALO_PADDING)
+    expect(drawn.bottom - drawn.height / 2).toBe((reserved.top + reserved.bottom) / 2)
+    expect(drawn.height).toBe(reserved.bottom - reserved.top - LABEL_HALO_PADDING * 2)
+
+    // And the widest the text may draw is the widest a box is ever reserved.
+    expect(text.maxWidth).toBe(LABEL_MAX_WIDTH)
+    expect(text.fontSize).toBe(LABEL_FONT_SIZE)
+    expect(text.lineHeight).toBe(LABEL_LINE_HEIGHT)
+    expect(row.paddingTop).toBe(LABEL_HALO_PADDING)
+    expect(row.paddingRight).toBe(LABEL_HALO_PADDING)
   })
 
   it("opens the place when the name is tapped, not just the pin", () => {
