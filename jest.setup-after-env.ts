@@ -1,3 +1,5 @@
+import { format } from "util"
+
 // Shared per-test setup/teardown (registered via setupFilesAfterEnv in jest.config.js).
 //
 // In CI, retry flaky tests at test granularity instead of re-running the whole
@@ -99,3 +101,56 @@ afterAll(() => {
   jest.useRealTimers()
   clearLiveTimers()
 })
+
+// --- act() regression guard ---------------------------------------------
+//
+// React logs "An update to X inside a test was not wrapped in act(...)" through
+// console.error whenever a state update lands after the test body returned.
+// Each one marks a real race: the assertions ran against a tree that was still
+// changing. Left as warnings they scroll past, and the suite drifts back into
+// noise (this happened after #3820), so they fail the test instead.
+//
+// Fixing one: await the render rather than silencing the warning — `await
+// waitFor(...)` / `await findBy*` for state you can assert on, or
+// `await flushEffects()` (__tests__/helpers/flush-effects.ts) for a
+// render-and-assert test whose effects settle on their own. If the update comes
+// from a provider the shared wrapper mounts, fix it at the wrapper — patching
+// spec by spec is whack-a-mole, since which suites trip is timing-dependent.
+//
+// The message is recorded here and thrown from a hook rather than thrown inline:
+// console.error runs inside React's commit phase, where throwing corrupts the
+// render and reports something unrelated.
+const escapedActUpdates: string[] = []
+const originalConsoleError = console.error.bind(console)
+
+console.error = (...args: unknown[]) => {
+  const template = typeof args[0] === "string" ? args[0] : ""
+  if (template.includes("was not wrapped in act(")) {
+    // React names the component through a %s placeholder, so the template has
+    // to be formatted before it reads as anything useful. Keep the first line
+    // only; the full React stack still goes to stderr below.
+    const formatted = format(...(args as [string, ...unknown[]]))
+    escapedActUpdates.push(formatted.split("\n")[0].trim())
+  }
+  originalConsoleError(...(args as Parameters<typeof console.error>))
+}
+
+const failOnEscapedActUpdates = () => {
+  if (escapedActUpdates.length === 0) return
+  const total = escapedActUpdates.length
+  const seen = [...new Set(escapedActUpdates)]
+  escapedActUpdates.length = 0
+  throw new Error(
+    `${total} state update(s) escaped act():\n` +
+      `${seen.map((line) => `  - ${line}`).join("\n")}\n\n` +
+      `Await the render instead of letting it settle after the test body — see ` +
+      `__tests__/helpers/flush-effects.ts. Full React stacks are above.`,
+  )
+}
+
+// Registered last so it runs after the microtask drain above (jest-circus runs
+// afterEach hooks in registration order). RNTL registers its own cleanup when a
+// spec imports it — i.e. after this file — so unmount-time warnings land after
+// this hook has run; afterAll catches those.
+afterEach(failOnEscapedActUpdates)
+afterAll(failOnEscapedActUpdates)
