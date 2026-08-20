@@ -163,7 +163,10 @@ const intraledgerRoute = {
 
 const Intraledger = () => <SendBitcoinDetailsScreen route={intraledgerRoute} />
 
-describe("choose-wallet modal respects hide-balance", () => {
+// The send flow deliberately opts out of hide-balance: the user is already
+// transacting and needs the numbers to pick a wallet, and there is no reveal
+// affordance inside the flow. See issue #4125.
+describe("choose-wallet modal always shows amounts", () => {
   const renderScreen = (hideAmount: boolean) =>
     render(
       <ContextForScreen>
@@ -199,17 +202,28 @@ describe("choose-wallet modal respects hide-balance", () => {
     expect(screen.queryAllByTestId("hidden-balance-placeholder")).toHaveLength(0)
   })
 
-  it("does not render wallet amounts in the picker while hidden", async () => {
+  it("still shows wallet amounts in the picker while hide-balance is on", async () => {
     renderScreen(true)
     await openWalletPicker()
 
-    // one placeholder in the inline "From" selector + one per modal wallet row
-    expect(screen.getAllByTestId("hidden-balance-placeholder")).toHaveLength(3)
     expect(
-      within(screen.getByTestId(WalletCurrency.Btc)).queryAllByText(/\d/),
-    ).toHaveLength(0)
+      within(screen.getByTestId(WalletCurrency.Btc)).getAllByText(/\d/).length,
+    ).toBeGreaterThan(0)
     expect(
-      within(screen.getByTestId(WalletCurrency.Usd)).queryAllByText(/\d/),
-    ).toHaveLength(0)
+      within(screen.getByTestId(WalletCurrency.Usd)).getAllByText(/\d/).length,
+    ).toBeGreaterThan(0)
+    expect(screen.queryAllByTestId("hidden-balance-placeholder")).toHaveLength(0)
+  })
+
+  it("shows the balance in the inline From field while hide-balance is on", async () => {
+    renderScreen(true)
+    await flushAsync()
+    await flushAsync()
+
+    expect(
+      within(screen.getByTestId(`${WalletCurrency.Btc} Wallet Balance`)).getAllByText(
+        /\d/,
+      ).length,
+    ).toBeGreaterThan(0)
   })
 })
