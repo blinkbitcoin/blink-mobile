@@ -103,6 +103,52 @@ describe("useBtcMapPlaceSearch", () => {
     expect(result.current.hasError).toBe(false)
   })
 
+  it("clears the list when the search reopens over somewhere else", async () => {
+    const { result, rerender } = renderHook(
+      (hookProps: Parameters<typeof useBtcMapPlaceSearch>[0]) =>
+        useBtcMapPlaceSearch(hookProps),
+      { initialProps: props() },
+    )
+    await waitFor(() => expect(result.current.places).toEqual([PLACE]))
+
+    // Close the search, pan the map to another city, reopen — and let the
+    // fetch for the new area hang, the way a phone connection does.
+    mockedFetch.mockReturnValueOnce(new Promise(() => {}))
+    await act(async () => {
+      rerender(props({ enabled: false }))
+    })
+    await act(async () => {
+      rerender(props({ enabled: true, center: { latitude: 13.7, longitude: -89.2 } }))
+    })
+
+    // The old city's rows would still be pressable, and tapping one flies the
+    // map right back to where the user just left.
+    expect(result.current.places).toEqual([])
+    expect(result.current.isLoading).toBe(true)
+  })
+
+  it("keeps the list up while reopening refreshes the same area", async () => {
+    const { result, rerender } = renderHook(
+      (hookProps: Parameters<typeof useBtcMapPlaceSearch>[0]) =>
+        useBtcMapPlaceSearch(hookProps),
+      { initialProps: props() },
+    )
+    await waitFor(() => expect(result.current.places).toEqual([PLACE]))
+
+    mockedFetch.mockReturnValueOnce(new Promise(() => {}))
+    await act(async () => {
+      rerender(props({ enabled: false }))
+    })
+    await act(async () => {
+      rerender(props({ enabled: true }))
+    })
+
+    // Same area, same answer expected — blinking through an empty list would
+    // only make the reopen feel broken.
+    expect(result.current.places).toEqual([PLACE])
+    expect(result.current.isLoading).toBe(true)
+  })
+
   it("ignores a response for an area the user has already left", async () => {
     let resolveStale: (value: BtcMapNamedPlace[]) => void = () => {}
     mockedFetch.mockReturnValueOnce(

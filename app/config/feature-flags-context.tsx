@@ -38,6 +38,7 @@ const ReplaceCardDeliveryConfigKey = "replaceCardDeliveryConfig"
 const SparkCompatibleWalletsUrlKey = "sparkCompatibleWalletsUrl"
 const BackupNudgeBannerThresholdKey = "backupNudgeBannerThreshold"
 const BackupNudgeModalThresholdKey = "backupNudgeModalThreshold"
+const BackupNudgeModalCooldownMsKey = "backupNudgeModalCooldownMs"
 const NonCustodialEnabledKey = "nonCustodialEnabled"
 const StableBalanceEnabledKey = "stableBalanceEnabled"
 const DollarRestrictionCacheEnabledKey = "dollarRestrictionCacheEnabled"
@@ -109,6 +110,7 @@ type RemoteConfig = {
   [SparkCompatibleWalletsUrlKey]: string
   [BackupNudgeBannerThresholdKey]: number
   [BackupNudgeModalThresholdKey]: number
+  [BackupNudgeModalCooldownMsKey]: number
   [NonCustodialEnabledKey]: boolean
   [StableBalanceEnabledKey]: boolean
   [DollarRestrictionCacheEnabledKey]: boolean
@@ -214,6 +216,10 @@ export const defaultRemoteConfig: RemoteConfig = {
   sparkCompatibleWalletsUrl: "https://docs.spark.money/wallets/overview",
   backupNudgeBannerThreshold: 2100,
   backupNudgeModalThreshold: 21000,
+  /** How long the self-custodial backup modal stays dismissed after the user closes it.
+   *  The less intrusive home-screen nudge banner takes over in the meantime, so the
+   *  warning never disappears entirely (#4156). */
+  backupNudgeModalCooldownMs: 24 * 60 * 60 * 1000,
   nonCustodialEnabled: false,
   stableBalanceEnabled: false,
   dollarRestrictionCacheEnabled: true,
@@ -401,6 +407,16 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           .getValue(BackupNudgeModalThresholdKey)
           .asNumber()
 
+        // asNumber() yields 0 for a malformed remote value, and a zero cooldown would
+        // make the modal undismissable again — fall back to the shipped default.
+        const remoteBackupNudgeModalCooldownMs = remoteConfigInstance()
+          .getValue(BackupNudgeModalCooldownMsKey)
+          .asNumber()
+        const backupNudgeModalCooldownMs =
+          remoteBackupNudgeModalCooldownMs > 0
+            ? remoteBackupNudgeModalCooldownMs
+            : defaultRemoteConfig.backupNudgeModalCooldownMs
+
         const nonCustodialEnabled = remoteConfigInstance()
           .getValue(NonCustodialEnabledKey)
           .asBoolean()
@@ -526,6 +542,7 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           sparkCompatibleWalletsUrl,
           backupNudgeBannerThreshold,
           backupNudgeModalThreshold,
+          backupNudgeModalCooldownMs,
           nonCustodialEnabled,
           stableBalanceEnabled,
           dollarRestrictionCacheEnabled,

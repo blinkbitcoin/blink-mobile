@@ -215,6 +215,19 @@ export default function MapComponent({
 
   const closeSheet = React.useCallback(() => setSelectedPlace(null), [])
 
+  // The sheet cannot open in the same breath as the search closes on iOS: both
+  // are native modals, and iOS silently drops one presented while another is
+  // still dismissing. So the picked place is parked here until the search
+  // modal reports its dismissal finished. Android's dialogs do not collide —
+  // and never report — so there the sheet opens directly instead.
+  const pendingSearchPlace = React.useRef<BtcMapPlace | null>(null)
+
+  const handleSearchDismiss = React.useCallback(() => {
+    const pending = pendingSearchPlace.current
+    pendingSearchPlace.current = null
+    if (pending) setSelectedPlace(pending)
+  }, [])
+
   // A result is picked from a list that may be describing somewhere off screen,
   // so the map goes to it before the sheet opens over it — otherwise closing the
   // sheet leaves the user looking at wherever they were before.
@@ -235,7 +248,11 @@ export default function MapComponent({
       FLY_TO_DURATION_MS,
     )
 
-    setSelectedPlace(place)
+    if (isIOS) {
+      pendingSearchPlace.current = place
+    } else {
+      setSelectedPlace(place)
+    }
   }, [])
 
   return (
@@ -330,6 +347,7 @@ export default function MapComponent({
         categories={categories}
         onSelect={handleSearchSelect}
         onClose={() => setSearchOpen(false)}
+        onDismiss={handleSearchDismiss}
       />
 
       <CategoryFilterSheet

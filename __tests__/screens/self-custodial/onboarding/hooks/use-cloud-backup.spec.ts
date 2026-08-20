@@ -58,9 +58,19 @@ jest.mock("@app/utils/crypto", () => ({
 }))
 
 let mockIdentityPubkey: string | null = "test-pubkey-1234"
+let mockIdentityLoading = false
+let mockMnemonic = "youth indicate void"
+let mockMnemonicLoading = false
 jest.mock("@app/screens/self-custodial/onboarding/hooks/use-wallet-mnemonic", () => ({
-  useWalletMnemonic: () => "youth indicate void",
-  useWalletIdentity: () => mockIdentityPubkey,
+  useWalletMnemonic: () => mockMnemonic,
+  useWalletMnemonicState: () => ({
+    mnemonic: mockMnemonic,
+    loading: mockMnemonicLoading,
+  }),
+  useWalletIdentity: () => ({
+    pubkey: mockIdentityPubkey ?? "",
+    loading: mockIdentityLoading,
+  }),
 }))
 
 let mockLightningAddress: string | null = null
@@ -148,6 +158,9 @@ describe("useCloudBackup", () => {
     jest.clearAllMocks()
     mockLoading = false
     mockIdentityPubkey = "test-pubkey-1234"
+    mockIdentityLoading = false
+    mockMnemonic = "youth indicate void"
+    mockMnemonicLoading = false
     mockLightningAddress = null
     mockStartSession.mockResolvedValue(sessionOk(noExistingFile))
     mockDownloadById.mockResolvedValue({ success: false, reason: "not-found" })
@@ -510,6 +523,70 @@ describe("useCloudBackup", () => {
 
     expect(mockStartSession).not.toHaveBeenCalled()
     expect(mockUpload).not.toHaveBeenCalled()
+    expect(mockToastShow).toHaveBeenCalledWith(
+      expect.objectContaining({ message: "Upload failed" }),
+    )
+  })
+
+  it("reports loading and stays silent while the identity pubkey is still deriving", async () => {
+    mockIdentityPubkey = null
+    mockIdentityLoading = true
+
+    const { result } = renderHook(() =>
+      useCloudBackup({ isEncrypted: false, password: "" }),
+    )
+
+    expect(result.current.loading).toBe(true)
+
+    await act(async () => {
+      await result.current.handleBackup()
+    })
+
+    /** Mid-derivation is a race with the disabled CTA, not a failure: no toast. */
+    expect(mockStartSession).not.toHaveBeenCalled()
+    expect(mockUpload).not.toHaveBeenCalled()
+    expect(mockToastShow).not.toHaveBeenCalled()
+  })
+
+  /** The keychain read runs before derivation can start, and leaves the pubkey empty
+   *  without identityLoading ever being true — the longer of the two silent windows. */
+  it("reports loading and stays silent while the phrase is still being read", async () => {
+    mockMnemonic = ""
+    mockMnemonicLoading = true
+    mockIdentityPubkey = null
+    mockIdentityLoading = false
+
+    const { result } = renderHook(() =>
+      useCloudBackup({ isEncrypted: false, password: "" }),
+    )
+
+    expect(result.current.loading).toBe(true)
+
+    await act(async () => {
+      await result.current.handleBackup()
+    })
+
+    expect(mockStartSession).not.toHaveBeenCalled()
+    expect(mockUpload).not.toHaveBeenCalled()
+    expect(mockToastShow).not.toHaveBeenCalled()
+  })
+
+  it("still reports the local failure once the phrase read settles empty", async () => {
+    mockMnemonic = ""
+    mockMnemonicLoading = false
+    mockIdentityPubkey = null
+    mockIdentityLoading = false
+
+    const { result } = renderHook(() =>
+      useCloudBackup({ isEncrypted: false, password: "" }),
+    )
+
+    expect(result.current.loading).toBe(false)
+
+    await act(async () => {
+      await result.current.handleBackup()
+    })
+
     expect(mockToastShow).toHaveBeenCalledWith(
       expect.objectContaining({ message: "Upload failed" }),
     )

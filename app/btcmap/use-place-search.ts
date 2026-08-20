@@ -62,9 +62,14 @@ export const useBtcMapPlaceSearch = ({
   // left cannot overwrite a newer one.
   const requestRef = useRef(0)
 
-  // Snapped before it reaches the dependency array, so reopening the search
-  // after nudging the map neither re-asks nor tells BTC Map that the map was
-  // nudged. See `snapToPrivacyGrid`.
+  // The area `state.places` came from, so the next fetch can tell whether it
+  // is refreshing that list or replacing it.
+  const loadedAreaRef = useRef<string | null>(null)
+
+  // Snapped before it reaches the dependency array, so nudging the map neither
+  // re-runs the fetch mid-search nor tells BTC Map that the map was nudged.
+  // Reopening the search does ask again — `enabled` re-runs the effect — but
+  // for the same snapped area as before. See `snapToPrivacyGrid`.
   const { latitude, longitude } = snapToPrivacyGrid(center)
   const radiusKm = radiusFor(viewportRadiusKm)
 
@@ -73,21 +78,30 @@ export const useBtcMapPlaceSearch = ({
 
     requestRef.current += 1
     const request = requestRef.current
+    const areaKey = `${latitude},${longitude},${radiusKm}`
 
     const load = async () => {
-      // Keeps whatever is already listed on screen while the next area loads,
-      // so re-opening the search does not blink through an empty list.
-      setState((previous) => ({ ...previous, isLoading: true, hasError: false }))
+      // Keeps what is already listed on screen while the same area refreshes,
+      // so re-opening the search does not blink through an empty list. Another
+      // area's places are cleared instead: left standing they stay pressable,
+      // and tapping one flies the map back to wherever was searched last.
+      setState((previous) => ({
+        places: loadedAreaRef.current === areaKey ? previous.places : [],
+        isLoading: true,
+        hasError: false,
+      }))
 
       try {
         const places = await fetchPlacesNear({ latitude, longitude }, radiusKm)
         if (requestRef.current !== request) return
+        loadedAreaRef.current = areaKey
         setState({ places, isLoading: false, hasError: false })
       } catch (error) {
         recordAppError(toError(error), { dedupKey: "btcmap-place-search" })
         if (requestRef.current !== request) return
         // Cleared rather than left standing: results from another area, listed
         // under a failure the user is being asked to retry, are worse than none.
+        loadedAreaRef.current = null
         setState({ places: [], isLoading: false, hasError: true })
       }
     }

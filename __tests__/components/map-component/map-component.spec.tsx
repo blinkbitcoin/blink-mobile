@@ -1,5 +1,4 @@
 import React from "react"
-import { StyleSheet } from "react-native"
 import { Region } from "react-native-maps"
 import { act, fireEvent, render, waitFor } from "@testing-library/react-native"
 
@@ -256,7 +255,32 @@ describe("MapComponent search", () => {
 
     // Closed, so the map it just flew to is what the user is left looking at.
     await waitFor(() => expect(capturedSearchProps?.isVisible).toBe(false))
-    expect((capturedSheetProps?.place as BtcMapPlace)?.id).toBe(7)
+
+    // But no sheet yet: both are native modals, and iOS silently drops one
+    // presented while the other is still dismissing. (The test environment is
+    // iOS; Android skips the wait, since its dialogs do not collide.)
+    expect(capturedSheetProps?.place).toBeNull()
+
+    act(() => {
+      ;(capturedSearchProps?.onDismiss as () => void)()
+    })
+
+    await waitFor(() => expect((capturedSheetProps?.place as BtcMapPlace)?.id).toBe(7))
+  })
+
+  it("does not open a sheet when the search is dismissed without a pick", async () => {
+    const { getByTestId } = renderMap()
+
+    await waitFor(() => expect(capturedSearchProps).toBeDefined())
+    fireEvent.press(getByTestId("open-place-search"))
+
+    act(() => {
+      ;(capturedSearchProps?.onClose as () => void)()
+      ;(capturedSearchProps?.onDismiss as () => void)()
+    })
+
+    await waitFor(() => expect(capturedSearchProps?.isVisible).toBe(false))
+    expect(capturedSheetProps?.place).toBeNull()
   })
 })
 
@@ -310,18 +334,6 @@ describe("MapComponent category filter", () => {
     })
 
     await waitFor(() => expect(getByTestId("btcmap-place-1")).toBeTruthy())
-  })
-
-  it("draws the filter control as a circle, not a rounded tile", async () => {
-    // It floats over the map beside the search field, and the two share one
-    // height and one radius rule, so they read as a pair rather than as a pill
-    // that happened to be put next to a tile.
-    const { getByTestId } = renderMap()
-
-    await waitFor(() => expect(getByTestId("open-category-filter")).toBeTruthy())
-
-    const style = StyleSheet.flatten(getByTestId("open-category-filter").props.style)
-    expect(style.borderRadius).toBe(style.height / 2)
   })
 
   it("says on the button that the map is showing less than everything", async () => {

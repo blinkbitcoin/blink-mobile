@@ -103,8 +103,9 @@ const isIdentifiedPlace = (value: unknown): value is IdentifiedPlaceWire => {
   )
 }
 
-// Generic so filtering keeps what the caller already knows — the search rows
-// would otherwise lose their name and address to the narrowing.
+// Narrows by intersection rather than replacement, so a wire that carries more
+// than the renderable fields — the search wire, with its names and addresses —
+// keeps them through a `filter`.
 const isRenderablePlace = <T>(value: T): value is T & RenderablePlaceWire =>
   isIdentifiedPlace(value) &&
   (value.deleted_at === undefined || value.deleted_at === null) &&

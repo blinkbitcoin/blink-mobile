@@ -6,8 +6,9 @@ const SdkEvent_Tags = {
   PaymentFailed: "PaymentFailed",
   ClaimedDeposits: "ClaimedDeposits",
   UnclaimedDeposits: "UnclaimedDeposits",
-  Optimization: "Optimization",
+  AutoOptimization: "AutoOptimization",
   LightningAddressChanged: "LightningAddressChanged",
+  NewDeposits: "NewDeposits",
 }
 
 const PaymentDetails_Tags = {
@@ -42,6 +43,10 @@ const SdkError_Tags = {
   MissingUtxo: "MissingUtxo",
   LnurlError: "LnurlError",
   Signer: "Signer",
+  OptimizationAlreadyRunning: "OptimizationAlreadyRunning",
+  OptimizationCancelled: "OptimizationCancelled",
+  InsufficientCpfpFunds: "InsufficientCpfpFunds",
+  FundingUtxoConflict: "FundingUtxoConflict",
   Generic: "Generic",
 }
 
@@ -56,10 +61,14 @@ const SdkError = {
 module.exports = {
   connect: jest.fn(),
   defaultConfig: jest.fn().mockReturnValue({}),
-  defaultExternalSigner: jest.fn().mockReturnValue({
-    identityPublicKey: jest
-      .fn()
-      .mockReturnValue({ bytes: Uint8Array.from([2, 26, 33]).buffer }),
+  defaultExternalSigners: jest.fn().mockReturnValue({
+    breezSigner: { uniffiDestroy: jest.fn() },
+    sparkSigner: {
+      getIdentityPublicKey: jest
+        .fn()
+        .mockResolvedValue({ bytes: Uint8Array.from([2, 26, 33]).buffer }),
+      uniffiDestroy: jest.fn(),
+    },
   }),
   initLogging: jest.fn(),
   BitcoinNetwork: { Bitcoin: 0, Testnet3: 1, Testnet4: 2, Signet: 3, Regtest: 4 },
@@ -87,10 +96,20 @@ module.exports = {
     FlooredToMinLimit: "FlooredToMinLimit",
     IncreasedToAvoidDust: "IncreasedToAvoidDust",
   },
+  PaymentRequest: {
+    Input: jest.fn().mockImplementation((args) => ({ tag: "Input", inner: args })),
+  },
   PrepareSendPaymentRequest: { create: (p) => p },
   RegisterLightningAddressRequest: { create: (p) => p },
   SendPaymentRequest: { create: (p) => p },
   SyncWalletRequest: { create: (p) => p },
+  UpdateUserSettingsRequest: {
+    create: (p) => ({
+      stableBalanceActiveLabel: undefined,
+      sparkMasterIdentityPublicKey: undefined,
+      ...p,
+    }),
+  },
   ReceivePaymentRequest: { create: (p) => p },
   ReceivePaymentMethod: {
     SparkAddress: jest.fn().mockImplementation(() => ({ tag: "SparkAddress" })),

@@ -1,4 +1,5 @@
 import React from "react"
+import { Modal } from "react-native"
 import { fireEvent, render, waitFor } from "@testing-library/react-native"
 
 import { BtcMapNamedPlace, PlaceCategory } from "@app/btcmap"
@@ -202,5 +203,17 @@ describe("PlaceSearchModal", () => {
     renderModal({ isVisible: false })
 
     expect(mockedSearch).toHaveBeenCalledWith(expect.objectContaining({ enabled: false }))
+  })
+
+  it("reports its actual dismissal, which is when iOS can present the next modal", async () => {
+    // The map opens the place sheet off this signal; if it stops reaching the
+    // native modal, a search pick on iOS flies the map but never opens a sheet.
+    const onDismiss = jest.fn()
+    const view = renderModal({ onDismiss })
+
+    await waitFor(() => expect(view.UNSAFE_getByType(Modal)).toBeTruthy())
+    view.UNSAFE_getByType(Modal).props.onDismiss?.()
+
+    expect(onDismiss).toHaveBeenCalled()
   })
 })
