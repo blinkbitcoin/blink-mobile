@@ -39,7 +39,7 @@ describe("fetchContactPaymentsPage", () => {
     expect(page.transactions.map((t) => t.id)).toEqual(["mine"])
   })
 
-  it("leaves out receives, whose address is the one the payer resolved", async () => {
+  it("lists what the contact was paid and what they paid back", async () => {
     mockFetchAndMapPayments.mockResolvedValue(
       rawPage(
         [
@@ -52,7 +52,21 @@ describe("fetchContactPaymentsPage", () => {
 
     const page = await fetchContactPaymentsPage(sdk, "alice@blink.sv", 0)
 
-    expect(page.transactions.map((t) => t.id)).toEqual(["sent"])
+    expect(page.transactions.map((t) => t.id)).toEqual(["sent", "received"])
+  })
+
+  it("leaves out a receive addressed to anyone but the contact", async () => {
+    // A received payment that carries the user's own address rather than the sender's
+    // belongs to no contact, and must not surface on every contact screen.
+    mockFetchAndMapPayments.mockResolvedValue(
+      rawPage([tx("mine", "me@blink.sv", TransactionDirection.Receive)], {
+        hasMore: false,
+      }),
+    )
+
+    const page = await fetchContactPaymentsPage(sdk, "alice@blink.sv", 0)
+
+    expect(page.transactions).toEqual([])
   })
 
   it("matches regardless of case or surrounding whitespace", async () => {
