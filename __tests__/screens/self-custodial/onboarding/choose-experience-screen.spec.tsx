@@ -41,6 +41,11 @@ let mockRouteParams: RouteParams = {
   onContinue: { route: "selfCustodialBackupSuccess", accountId: "sc-account-1" },
 }
 
+let mockHasUsdWallet = true
+
+const mockCheckBlockReason = jest.fn()
+const mockIsChecking = jest.fn(() => false)
+
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
   useNavigation: () => ({
@@ -68,11 +73,20 @@ jest.mock("@app/self-custodial/hooks/use-self-custodial-account-mode", () => ({
 let mockUsdBalance = 0
 let mockWalletReady = true
 let mockWalletStatus = "ready"
+
+jest.mock("@app/hooks/use-creation-block", () => ({
+  useCreationBlock: () => ({
+    checkBlockReason: mockCheckBlockReason,
+    isChecking: mockIsChecking(),
+    isFirstSignupRuleReady: true,
+  }),
+}))
+
 jest.mock("@app/hooks/use-active-wallet", () => ({
   useActiveWallet: () => ({
-    wallets: [
-      { id: "usd-1", walletCurrency: "USD", balance: { amount: mockUsdBalance } },
-    ],
+    wallets: mockHasUsdWallet
+      ? [{ id: "usd-1", walletCurrency: "USD", balance: { amount: mockUsdBalance } }]
+      : [],
     isReady: mockWalletReady,
     status: mockWalletStatus,
   }),
@@ -161,9 +175,12 @@ describe("ChooseExperienceScreen", () => {
     mockAccountMode = null
     mockStoredModes = {}
     mockUsdBalance = 0
+    mockHasUsdWallet = true
     mockWalletReady = true
     mockWalletStatus = "ready"
     mockRefreshWallets.mockResolvedValue(undefined)
+    mockCheckBlockReason.mockResolvedValue(null)
+    mockIsChecking.mockReturnValue(false)
     mockRouteParams = {
       onContinue: { route: "selfCustodialBackupSuccess", accountId: "sc-account-1" },
     }
@@ -200,6 +217,7 @@ describe("ChooseExperienceScreen", () => {
     const { getByTestId } = await renderScreen()
 
     fireEvent.press(getByTestId(continueTestId))
+    await flushEffects()
 
     expect(mockSetAccountMode).toHaveBeenCalledWith("sc-account-1", AccountMode.Enhanced)
   })
@@ -209,6 +227,7 @@ describe("ChooseExperienceScreen", () => {
 
     fireEvent.press(getByTestId("mode-anon"))
     fireEvent.press(getByTestId(continueTestId))
+    await flushEffects()
 
     expect(mockSetAccountMode).toHaveBeenCalledWith("sc-account-1", AccountMode.Anon)
   })
@@ -220,6 +239,7 @@ describe("ChooseExperienceScreen", () => {
     const { getByTestId } = await renderScreen()
 
     fireEvent.press(getByTestId(continueTestId))
+    await flushEffects()
 
     expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSuccess")
   })
@@ -234,6 +254,7 @@ describe("ChooseExperienceScreen", () => {
     const { getByTestId } = await renderScreen()
 
     fireEvent.press(getByTestId(continueTestId))
+    await flushEffects()
 
     expect(mockNavigate).toHaveBeenCalledWith("accountMigrationBalancesOverview")
   })
@@ -249,6 +270,7 @@ describe("ChooseExperienceScreen", () => {
     const { getByTestId } = await renderScreen()
 
     fireEvent.press(getByTestId(continueTestId))
+    await flushEffects()
 
     /** The caller's account, not the active one, decides the preselection. */
     expect(mockSetAccountMode).toHaveBeenCalledWith("sc-account-2", AccountMode.Anon)
@@ -260,6 +282,7 @@ describe("ChooseExperienceScreen", () => {
     const { getByTestId } = await renderScreenWithStoredMode(AccountMode.Anon)
 
     fireEvent.press(getByTestId(continueTestId))
+    await flushEffects()
 
     expect(mockSetAccountMode).toHaveBeenCalledWith("sc-account-1", AccountMode.Anon)
   })
@@ -269,6 +292,7 @@ describe("ChooseExperienceScreen", () => {
 
     fireEvent.press(getByTestId("mode-enhanced"))
     fireEvent.press(getByTestId(continueTestId))
+    await flushEffects()
 
     expect(mockSetAccountMode).toHaveBeenCalledWith("sc-account-1", AccountMode.Enhanced)
   })
@@ -278,6 +302,7 @@ describe("ChooseExperienceScreen", () => {
     const { getByTestId } = await renderScreen()
 
     fireEvent.press(getByTestId(continueTestId))
+    await flushEffects()
 
     expect(mockSetAccountMode).toHaveBeenCalledWith("sc-account-1", AccountMode.Enhanced)
   })
@@ -287,6 +312,7 @@ describe("ChooseExperienceScreen", () => {
     const { getByTestId } = await renderScreen()
 
     fireEvent.press(getByTestId(continueTestId))
+    await flushEffects()
 
     expect(mockNavigate).toHaveBeenCalledWith("acceptTermsAndConditions", {
       flow: "selfCustodial",
@@ -301,6 +327,7 @@ describe("ChooseExperienceScreen", () => {
 
     fireEvent.press(getByTestId("mode-enhanced"))
     fireEvent.press(getByTestId(continueTestId))
+    await flushEffects()
 
     expect(mockSetActiveAccountMode).toHaveBeenCalledWith(AccountMode.Enhanced)
     expect(mockNavReplace).toHaveBeenCalledWith("selfCustodialModeSwitchSuccess", {
@@ -317,6 +344,7 @@ describe("ChooseExperienceScreen", () => {
     const { getByTestId } = await renderScreen()
 
     fireEvent.press(getByTestId(continueTestId))
+    await flushEffects()
 
     expect(mockSetActiveAccountMode).not.toHaveBeenCalled()
     expect(mockGoBack).toHaveBeenCalledTimes(1)
@@ -327,6 +355,7 @@ describe("ChooseExperienceScreen", () => {
     const { getByTestId } = await renderScreen()
 
     fireEvent.press(getByTestId(continueTestId))
+    await flushEffects()
 
     expect(mockSetAccountMode).toHaveBeenCalledWith("sc-account-1", AccountMode.Enhanced)
   })
@@ -338,6 +367,7 @@ describe("ChooseExperienceScreen", () => {
 
     fireEvent.press(getByTestId("mode-anon"))
     fireEvent.press(getByTestId(continueTestId))
+    await flushEffects()
 
     expect(mockSetActiveAccountMode).toHaveBeenCalledWith(AccountMode.Anon)
     expect(mockNavReplace).toHaveBeenCalledWith("selfCustodialModeSwitchSuccess", {
@@ -350,6 +380,7 @@ describe("ChooseExperienceScreen", () => {
     const { getByTestId } = await renderScreen()
 
     fireEvent.press(getByTestId(continueTestId))
+    await flushEffects()
 
     expect(mockSetAccountMode).toHaveBeenCalledWith("sc-account-1", AccountMode.Anon)
   })
@@ -362,6 +393,7 @@ describe("ChooseExperienceScreen", () => {
 
     fireEvent.press(getByTestId("mode-anon"))
     fireEvent.press(getByTestId(continueTestId))
+    await flushEffects()
 
     expect(mockConvertModal).toHaveBeenLastCalledWith(
       expect.objectContaining({ isVisible: true }),
@@ -376,6 +408,7 @@ describe("ChooseExperienceScreen", () => {
     const { getByTestId } = await renderScreen()
 
     fireEvent.press(getByTestId(continueTestId))
+    await flushEffects()
 
     expect(mockSetActiveAccountMode).toHaveBeenCalledWith(AccountMode.Anon)
     expect(mockNavReplace).toHaveBeenCalledWith("selfCustodialModeSwitchSuccess", {
@@ -413,6 +446,7 @@ describe("ChooseExperienceScreen", () => {
 
     fireEvent.press(getByTestId("mode-anon"))
     fireEvent.press(getByTestId(continueTestId))
+    await flushEffects()
 
     const { onTransfer } = mockConvertModal.mock.calls.at(-1)?.[0] as ConvertModalProps
     mockConvertModal.mockClear()
@@ -432,6 +466,7 @@ describe("ChooseExperienceScreen", () => {
 
     fireEvent.press(getByTestId("mode-anon"))
     fireEvent.press(getByTestId(continueTestId))
+    await flushEffects()
 
     const { toggleModal } = mockConvertModal.mock.calls.at(-1)?.[0] as ConvertModalProps
     mockConvertModal.mockClear()
@@ -505,6 +540,7 @@ describe("ChooseExperienceScreen", () => {
 
     fireEvent.press(getByTestId("mode-anon"))
     fireEvent.press(getByTestId(continueTestId))
+    await flushEffects()
 
     expect(mockPrimaryButton).toHaveBeenLastCalledWith(
       expect.objectContaining({ disabled: true, loading: true }),
@@ -522,7 +558,7 @@ describe("ChooseExperienceScreen", () => {
 
     fireEvent.press(getByTestId("mode-anon"))
     const { onPress } = mockPrimaryButton.mock.calls.at(-1)?.[0] as PrimaryButtonProps
-    act(() => onPress())
+    await act(async () => onPress())
 
     expect(mockConvertModal).toHaveBeenLastCalledWith(
       expect.objectContaining({ isVisible: true }),
@@ -550,7 +586,9 @@ describe("ChooseExperienceScreen", () => {
     )
 
     const { onPress } = mockPrimaryButton.mock.calls.at(-1)?.[0] as PrimaryButtonProps
-    act(() => onPress())
+    await act(async () => {
+      await onPress()
+    })
 
     expect(mockToastShow).toHaveBeenCalledTimes(1)
     expect(mockSetActiveAccountMode).not.toHaveBeenCalled()
@@ -565,7 +603,9 @@ describe("ChooseExperienceScreen", () => {
 
     fireEvent.press(getByTestId("mode-anon"))
     const { onPress } = mockPrimaryButton.mock.calls.at(-1)?.[0] as PrimaryButtonProps
-    act(() => onPress())
+    await act(async () => {
+      await onPress()
+    })
 
     expect(mockToastShow).toHaveBeenCalledTimes(1)
     expect(mockSetActiveAccountMode).not.toHaveBeenCalled()
@@ -589,7 +629,9 @@ describe("ChooseExperienceScreen", () => {
     )
 
     const { onPress } = mockPrimaryButton.mock.calls.at(-1)?.[0] as PrimaryButtonProps
-    act(() => onPress())
+    await act(async () => {
+      await onPress()
+    })
 
     expect(mockSetActiveAccountMode).toHaveBeenCalledWith(AccountMode.Enhanced)
     expect(mockToastShow).not.toHaveBeenCalled()
@@ -613,8 +655,23 @@ describe("ChooseExperienceScreen", () => {
     const { getByTestId } = await renderScreen()
 
     fireEvent.press(getByTestId(continueTestId))
+    await flushEffects()
 
     expect(mockSetAccountMode).toHaveBeenCalledWith("sc-account-1", AccountMode.Enhanced)
+  })
+
+  it("switches to Anon without the conversion gate when there is no dollar wallet", async () => {
+    mockRouteParams = { entry: "settings" }
+    mockAccountMode = AccountMode.Enhanced
+    mockHasUsdWallet = false
+    const { getByTestId } = await renderScreen()
+
+    fireEvent.press(getByTestId("mode-anon"))
+    fireEvent.press(getByTestId(continueTestId))
+    await flushEffects()
+
+    // Nothing to convert means nothing to warn about.
+    expect(mockSetActiveAccountMode).toHaveBeenCalledWith(AccountMode.Anon)
   })
 
   it("switches to Anon without the conversion gate when the dollar balance is empty", async () => {
@@ -625,6 +682,7 @@ describe("ChooseExperienceScreen", () => {
 
     fireEvent.press(getByTestId("mode-anon"))
     fireEvent.press(getByTestId(continueTestId))
+    await flushEffects()
 
     expect(mockSetActiveAccountMode).toHaveBeenCalledWith(AccountMode.Anon)
     expect(mockNavReplace).toHaveBeenCalledWith("selfCustodialModeSwitchSuccess", {
@@ -709,6 +767,149 @@ describe("ChooseExperienceScreen", () => {
         "beforeRemove",
         expect.any(Function),
       )
+    })
+  })
+
+  describe("the region rule on creation", () => {
+    const renderCreation = async () => {
+      mockRouteParams = { onContinue: { route: "acceptTermsAndConditions" } }
+      return renderScreen()
+    }
+
+    it("asks about the region once Enhanced is the chosen mode", async () => {
+      const { getByTestId } = await renderCreation()
+
+      fireEvent.press(getByTestId("mode-enhanced"))
+      fireEvent.press(getByTestId(continueTestId))
+      await flushEffects()
+
+      expect(mockCheckBlockReason).toHaveBeenCalledWith("selfCustodial")
+    })
+
+    it("never asks anything about an Anon user, the connection included", async () => {
+      const { getByTestId } = await renderCreation()
+
+      fireEvent.press(getByTestId("mode-anon"))
+      fireEvent.press(getByTestId(continueTestId))
+      await flushEffects()
+
+      expect(mockCheckBlockReason).not.toHaveBeenCalled()
+      expect(mockNavigate).toHaveBeenCalledWith("acceptTermsAndConditions", {
+        flow: "selfCustodial",
+        mode: AccountMode.Anon,
+      })
+    })
+
+    it("opens Unsupported region on a refusal instead of the terms", async () => {
+      mockCheckBlockReason.mockResolvedValue("region")
+      const { getByTestId } = await renderCreation()
+
+      fireEvent.press(getByTestId(continueTestId))
+      await flushEffects()
+
+      expect(mockNavigate).toHaveBeenCalledWith("unsupportedRegion", { reason: "region" })
+      expect(mockNavigate).not.toHaveBeenCalledWith(
+        "acceptTermsAndConditions",
+        expect.anything(),
+      )
+    })
+
+    /**
+     * The asymmetry stated outright: in a country on `selfCustodialCreationBlockedCountries`
+     * Enhanced is refused and Incognito is not. It is not an omission. The list is keyed by
+     * country, and the only way to learn the country is the lookup Incognito exists to
+     * refuse, so asking would resolve the very thing the mode promises not to.
+     */
+    it("creates in Incognito from a country that refuses an Enhanced creation", async () => {
+      mockCheckBlockReason.mockResolvedValue("region")
+      const { getByTestId } = await renderCreation()
+
+      fireEvent.press(getByTestId(continueTestId))
+      await flushEffects()
+
+      expect(mockNavigate).toHaveBeenCalledWith("unsupportedRegion", { reason: "region" })
+
+      mockNavigate.mockClear()
+      fireEvent.press(getByTestId("mode-anon"))
+      fireEvent.press(getByTestId(continueTestId))
+      await flushEffects()
+
+      expect(mockNavigate).toHaveBeenCalledWith("acceptTermsAndConditions", {
+        flow: "selfCustodial",
+        mode: AccountMode.Anon,
+      })
+      expect(mockNavigate).not.toHaveBeenCalledWith(
+        "unsupportedRegion",
+        expect.anything(),
+      )
+    })
+
+    it("holds Continue while the region is being resolved", async () => {
+      mockIsChecking.mockReturnValue(true)
+      await renderCreation()
+
+      expect(mockPrimaryButton).toHaveBeenLastCalledWith(
+        expect.objectContaining({ disabled: true, loading: true }),
+      )
+    })
+
+    it("does not navigate when the answer lands after the screen is gone", async () => {
+      let resolveCheck: (reason: string | null) => void = () => undefined
+      mockCheckBlockReason.mockReturnValue(
+        new Promise<string | null>((resolve) => {
+          resolveCheck = resolve
+        }),
+      )
+      const { getByTestId, unmount } = await renderCreation()
+
+      fireEvent.press(getByTestId(continueTestId))
+      unmount()
+      resolveCheck("region")
+      await flushEffects()
+
+      expect(mockNavigate).not.toHaveBeenCalled()
+    })
+
+    it("does nothing at all for an onward route this build does not know", async () => {
+      // Only reachable from a stale navigation state, which must not act on a guess.
+      mockRouteParams = {
+        onContinue: { route: "aRouteThisBuildNeverShipped" },
+      } as unknown as RouteParams
+      const { getByTestId } = await renderScreen()
+
+      fireEvent.press(getByTestId(continueTestId))
+      await flushEffects()
+
+      expect(mockNavigate).not.toHaveBeenCalled()
+      expect(mockSetAccountMode).not.toHaveBeenCalled()
+      expect(mockCheckBlockReason).not.toHaveBeenCalled()
+    })
+
+    it("holds the mode cards still while a check is running", async () => {
+      mockIsChecking.mockReturnValue(true)
+      const { getByTestId } = await renderCreation()
+
+      fireEvent.press(getByTestId("mode-anon"))
+      const { onPress } = mockPrimaryButton.mock.calls.at(-1)?.[0] as PrimaryButtonProps
+      await act(async () => onPress())
+
+      // Anon selected mid-check would otherwise navigate carrying the Enhanced it started on.
+      expect(mockNavigate).toHaveBeenCalledWith("acceptTermsAndConditions", {
+        flow: "selfCustodial",
+        mode: AccountMode.Enhanced,
+      })
+    })
+
+    it("leaves the entries that already hold an account alone", async () => {
+      mockCheckBlockReason.mockResolvedValue("region")
+      const { getByTestId } = await renderScreen()
+
+      fireEvent.press(getByTestId(continueTestId))
+      await flushEffects()
+
+      // A restore or a migration creates nothing, so no rule may refuse it.
+      expect(mockCheckBlockReason).not.toHaveBeenCalled()
+      expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSuccess")
     })
   })
 })

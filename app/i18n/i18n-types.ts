@@ -13099,6 +13099,22 @@ type RootTranslation = {
 		 * U​n​f​o​r​t​u​n​a​t​e​l​y​ ​w​e​ ​c​a​n​ ​n​o​t​ ​s​e​r​v​e​ ​u​s​e​r​s​ ​f​r​o​m​ ​y​o​u​r​ ​c​u​r​r​e​n​t​ ​r​e​g​i​o​n​.
 		 */
 		description: string
+		/**
+		 * U​n​f​o​r​t​u​n​a​t​e​l​y​ ​w​e​ ​c​a​n​ ​n​o​t​ ​c​r​e​a​t​e​ ​n​e​w​ ​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​s​ ​i​n​ ​y​o​u​r​ ​c​u​r​r​e​n​t​ ​r​e​g​i​o​n​.​ ​Y​o​u​ ​c​a​n​ ​u​s​e​ ​a​ ​s​e​l​f​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​ ​i​n​s​t​e​a​d​.
+		 */
+		custodialSignupDescription: string
+		/**
+		 * U​n​f​o​r​t​u​n​a​t​e​l​y​ ​w​e​ ​c​a​n​ ​n​o​t​ ​c​r​e​a​t​e​ ​n​e​w​ ​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​s​ ​i​n​ ​y​o​u​r​ ​c​u​r​r​e​n​t​ ​r​e​g​i​o​n​.
+		 */
+		custodialSignupOnlyDescription: string
+		/**
+		 * R​e​g​i​o​n​ ​n​o​t​ ​d​e​t​e​r​m​i​n​e​d
+		 */
+		unknownRegionTitle: string
+		/**
+		 * W​e​ ​c​o​u​l​d​ ​n​o​t​ ​d​e​t​e​r​m​i​n​e​ ​y​o​u​r​ ​r​e​g​i​o​n​.​ ​P​l​e​a​s​e​ ​c​h​e​c​k​ ​y​o​u​r​ ​c​o​n​n​e​c​t​i​o​n​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		unknownRegionDescription: string
 	}
 	RestoreScreen: {
 		/**
@@ -26527,6 +26543,22 @@ export type TranslationFunctions = {
 		 * Unfortunately we can not serve users from your current region.
 		 */
 		description: () => LocalizedString
+		/**
+		 * Unfortunately we can not create new custodial accounts in your current region. You can use a self-custodial account instead.
+		 */
+		custodialSignupDescription: () => LocalizedString
+		/**
+		 * Unfortunately we can not create new custodial accounts in your current region.
+		 */
+		custodialSignupOnlyDescription: () => LocalizedString
+		/**
+		 * Region not determined
+		 */
+		unknownRegionTitle: () => LocalizedString
+		/**
+		 * We could not determine your region. Please check your connection and try again.
+		 */
+		unknownRegionDescription: () => LocalizedString
 	}
 	RestoreScreen: {
 		/**

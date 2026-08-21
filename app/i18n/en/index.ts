@@ -4112,6 +4112,13 @@ const en: BaseTranslation = {
   UnsupportedRegionScreen: {
     title: "Unsupported region",
     description: "Unfortunately we can not serve users from your current region.",
+    custodialSignupDescription:
+      "Unfortunately we can not create new custodial accounts in your current region. You can use a self-custodial account instead.",
+    custodialSignupOnlyDescription:
+      "Unfortunately we can not create new custodial accounts in your current region.",
+    unknownRegionTitle: "Region not determined",
+    unknownRegionDescription:
+      "We could not determine your region. Please check your connection and try again.",
   },
   RestoreScreen: {
     title: "Restore wallet",

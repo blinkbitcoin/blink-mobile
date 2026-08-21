@@ -26,3 +26,18 @@ export const ACCOUNT_MODE_NAMES: Record<AccountMode, string> = {
   [AccountMode.Enhanced]: "Enhanced",
   [AccountMode.Anon]: "Incognito",
 }
+
+/**
+ * Why account creation was refused, which decides what the unsupported-region screen
+ * offers: a whole region closed to us leaves nothing, while only the first Blink account
+ * being refused still leaves self-custodial on the table.
+ */
+export const CreationBlockReason = {
+  Region: "region",
+  FirstCustodialSignup: "firstCustodialSignup",
+  /** The location never resolved, so compliance could not be checked either way. */
+  UnknownRegion: "unknownRegion",
+} as const
+
+export type CreationBlockReason =
+  (typeof CreationBlockReason)[keyof typeof CreationBlockReason]

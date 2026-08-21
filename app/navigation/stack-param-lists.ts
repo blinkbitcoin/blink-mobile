@@ -13,7 +13,7 @@ import {
 import { PaymentDetail } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
 import { PaymentSendCompletedStatus } from "@app/screens/send-bitcoin-screen/use-send-payment"
 import { DrainConversionReturn } from "@app/screens/conversion-flow/drain-conversion"
-import { AccountMode, AccountTypeMode } from "@app/types/account"
+import { AccountMode, AccountTypeMode, CreationBlockReason } from "@app/types/account"
 import { DisplayCurrency, MoneyAmount, WalletOrDisplayCurrency } from "@app/types/amounts"
 import { WalletDescriptor } from "@app/types/wallets"
 import { MigrationSupportOrigin, MigrationSupportReason } from "@app/types/migration"
@@ -65,7 +65,7 @@ export const canGoBackFromChooseExperience = (
 export type RootStackParamList = {
   getStarted: undefined
   accountTypeSelection: { mode: AccountTypeMode }
-  unsupportedRegion: undefined
+  unsupportedRegion: { reason?: CreationBlockReason } | undefined
   selfCustodialWalletCreation: { mode?: AccountMode } | undefined
   liteDeviceAccount: {
     appCheckToken: string

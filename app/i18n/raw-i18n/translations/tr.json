@@ -3923,7 +3923,11 @@
   },
   "UnsupportedRegionScreen": {
     "title": "Desteklenmeyen bölge",
-    "description": "Maalesef mevcut bölgenizdeki kullanıcılara hizmet veremiyoruz."
+    "description": "Maalesef mevcut bölgenizdeki kullanıcılara hizmet veremiyoruz.",
+    "custodialSignupDescription": "Maalesef mevcut bölgenizde yeni saklamalı hesap oluşturamıyoruz. Bunun yerine kendi saklamanızdaki bir hesabı kullanabilirsiniz.",
+    "custodialSignupOnlyDescription": "Maalesef mevcut bölgenizde yeni saklamalı hesap oluşturamıyoruz.",
+    "unknownRegionTitle": "Bölge belirlenemedi",
+    "unknownRegionDescription": "Bölgenizi belirleyemedik. Lütfen bağlantınızı kontrol edip tekrar deneyin."
   },
   "RestoreScreen": {
     "title": "Cüzdanı geri yükle",

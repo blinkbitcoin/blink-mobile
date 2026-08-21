@@ -3923,7 +3923,11 @@
   },
   "UnsupportedRegionScreen": {
     "title": "Regió no admesa",
-    "description": "Malauradament, no podem atendre usuaris de la vostra regió actual."
+    "description": "Malauradament, no podem atendre usuaris de la vostra regió actual.",
+    "custodialSignupDescription": "Malauradament no podem crear comptes de custòdia nous a la teva regió actual. Pots utilitzar un compte d'autocustòdia.",
+    "custodialSignupOnlyDescription": "Malauradament no podem crear comptes de custòdia nous a la teva regió actual.",
+    "unknownRegionTitle": "Regió no determinada",
+    "unknownRegionDescription": "No hem pogut determinar la teva regió. Comprova la connexió i torna-ho a provar."
   },
   "RestoreScreen": {
     "title": "Restaura la cartera",
