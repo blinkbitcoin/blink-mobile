@@ -16,7 +16,7 @@ export const GaloyErrorBox: React.FC<GaloyErrorBoxProps> = ({ errorMessage, noIc
   } = useTheme()
   const styles = useStyles()
 
-  const color = mode === "light" ? colors.error : colors.black
+  const color = mode === "light" ? colors.error : colors.textOnBackground
 
   return (
     <View style={styles.container}>
@@ -36,7 +36,7 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingHorizontal: 8,
     paddingVertical: 6,
     borderRadius: 8,
-    backgroundColor: colors.error9,
+    backgroundColor: colors.errorBackground,
     zIndex: 1,
   },
   textContainer: {
