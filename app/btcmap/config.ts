@@ -1,6 +1,8 @@
 // BTC Map (https://btcmap.org) is the community-maintained OpenStreetMap overlay
-// of merchants that accept bitcoin. This app is a read-only consumer of it:
-// we never create, edit or verify places from here.
+// of merchants that accept bitcoin. Everything the app draws it reads from here;
+// the one thing it sends back is a proposal for a place that is missing, which
+// BTC Map's own community then surveys. Nothing in the app edits or verifies a
+// place that already exists.
 
 export const BTCMAP_PLACES_CDN_URL = "https://cdn.static.btcmap.org/api/v4/places.json"
 export const BTCMAP_API_BASE_URL = "https://api.btcmap.org/v4"

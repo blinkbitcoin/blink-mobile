@@ -80,6 +80,45 @@ jest.mock("@app/components/map-component/category-filter-sheet", () => ({
   },
 }))
 
+// The form has its own spec too. Adding a place is two steps and only the first
+// happens on the map, so this stands in for the second.
+//
+// It counts its own mountings as well as reporting its props: the form holds
+// what has been typed, so the map throwing a half-filled one away is a mount
+// and keeping it across a trip back to the pin is the absence of one.
+let capturedAddPlaceProps: Record<string, unknown> | undefined
+let addPlaceMountCount = 0
+jest.mock("@app/components/map-component/add-place-modal", () => {
+  const ReactActual = jest.requireActual<typeof React>("react")
+  return {
+    AddPlaceModal: (props: Record<string, unknown>) => {
+      capturedAddPlaceProps = props
+      ReactActual.useEffect(() => {
+        addPlaceMountCount += 1
+      }, [])
+      return null
+    },
+  }
+})
+
+// Which account is signed in is the whole gate on adding a place, so both
+// halves of it are driven from here.
+let mockIsAuthed = true
+jest.mock("@app/graphql/is-authed-context", () => ({
+  ...jest.requireActual("@app/graphql/is-authed-context"),
+  useIsAuthed: () => mockIsAuthed,
+}))
+
+let mockIsSelfCustodialAccount = false
+jest.mock("@app/hooks/use-is-self-custodial-account", () => ({
+  useIsSelfCustodialAccount: () => mockIsSelfCustodialAccount,
+}))
+
+const mockToastShow = jest.fn()
+jest.mock("@app/utils/toast", () => ({
+  toastShow: (args: unknown) => mockToastShow(args),
+}))
+
 const mockedPlaces = useBtcMapPlaces as jest.MockedFunction<typeof useBtcMapPlaces>
 const mockedGetUserRegion = getUserRegion as jest.MockedFunction<typeof getUserRegion>
 
@@ -124,7 +163,11 @@ beforeEach(() => {
   capturedSheetProps = undefined
   capturedSearchProps = undefined
   capturedFilterProps = undefined
+  capturedAddPlaceProps = undefined
+  addPlaceMountCount = 0
   capturedMapProps = undefined
+  mockIsAuthed = true
+  mockIsSelfCustodialAccount = false
   setPlaces()
 })
 
@@ -406,5 +449,187 @@ describe("MapComponent basemap", () => {
       expect(hides("poi.business")).toBe(true)
       expect(hides("transit", "labels")).toBe(true)
     }
+  })
+})
+
+describe("MapComponent adding a place", () => {
+  it("offers it to a custodial account", async () => {
+    const { getByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+  })
+
+  it("does not offer it to a self-custodial account", async () => {
+    // The submission goes out through our backend on a Blink session, which a
+    // self-custodial account does not have — so the button is absent rather
+    // than present and failing at the end of a filled-in form.
+    mockIsSelfCustodialAccount = true
+    const { queryByTestId, getByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-place-search")).toBeTruthy())
+    expect(queryByTestId("open-add-place")).toBeNull()
+  })
+
+  it("does not offer it when nobody is signed in", async () => {
+    mockIsAuthed = false
+    const { queryByTestId, getByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-place-search")).toBeTruthy())
+    expect(queryByTestId("open-add-place")).toBeNull()
+  })
+
+  it("hands the map over to the pin, and takes the reading controls off it", async () => {
+    // Searching and filtering are about reading the map; neither belongs over
+    // one that is being aimed.
+    const { getByTestId, queryByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+    fireEvent.press(getByTestId("open-add-place"))
+
+    await waitFor(() => expect(getByTestId("confirm-place-location")).toBeTruthy())
+    expect(queryByTestId("open-place-search")).toBeNull()
+    expect(queryByTestId("open-category-filter")).toBeNull()
+    expect(queryByTestId("open-add-place")).toBeNull()
+  })
+
+  it("gives the form the centre of the map the pin was left on", async () => {
+    // The pin is drawn at the centre of the map view and never moves, so the
+    // region's centre is where it is pointing — no measuring, no conversion.
+    const { getByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+    fireEvent.press(getByTestId("open-add-place"))
+
+    const moved = { ...REGION, latitude: 13.496743, longitude: -89.439462 }
+    act(() => {
+      ;(capturedMapProps?.onRegionChangeComplete as (r: Region) => void)(moved)
+    })
+    fireEvent.press(getByTestId("confirm-place-location"))
+
+    await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(true))
+    expect(capturedAddPlaceProps?.location).toEqual({
+      latitude: moved.latitude,
+      longitude: moved.longitude,
+    })
+  })
+
+  it("goes back to the map when the pin needs moving", async () => {
+    const { getByTestId, queryByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+    fireEvent.press(getByTestId("open-add-place"))
+    fireEvent.press(getByTestId("confirm-place-location"))
+
+    await waitFor(() => expect(queryByTestId("confirm-place-location")).toBeNull())
+
+    act(() => {
+      ;(capturedAddPlaceProps?.onChangeLocation as () => void)()
+    })
+
+    await waitFor(() => expect(getByTestId("confirm-place-location")).toBeTruthy())
+    expect(capturedAddPlaceProps?.isVisible).toBe(false)
+  })
+
+  it("abandons the whole thing on cancel", async () => {
+    const { getByTestId, queryByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+    fireEvent.press(getByTestId("open-add-place"))
+    fireEvent.press(getByTestId("cancel-add-place"))
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+    expect(queryByTestId("confirm-place-location")).toBeNull()
+    expect(capturedAddPlaceProps?.isVisible).toBe(false)
+  })
+
+  it("leaves the pins alone while one is being placed", async () => {
+    // A tap on the map is aiming at that point, not asking about what is
+    // already on it.
+    setPlaces({ places: [place(1)] })
+    const { getByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+    fireEvent.press(getByTestId("open-add-place"))
+    fireEvent.press(getByTestId("btcmap-place-1"))
+
+    await waitFor(() => expect(getByTestId("confirm-place-location")).toBeTruthy())
+    expect(capturedSheetProps?.place).toBeNull()
+  })
+
+  it("says the place has not been sent, because it has not", async () => {
+    // The backend that would forward it to BTC Map does not exist yet. Until
+    // it does, thanking someone for a submission would be a lie.
+    const { getByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+    fireEvent.press(getByTestId("open-add-place"))
+    fireEvent.press(getByTestId("confirm-place-location"))
+
+    await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(true))
+    act(() => {
+      ;(capturedAddPlaceProps?.onSubmit as (s: unknown) => void)({
+        name: "Hope House",
+        category: "cafes",
+        latitude: REGION.latitude,
+        longitude: REGION.longitude,
+      })
+    })
+
+    await waitFor(() =>
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({ type: "warning" }),
+      ),
+    )
+    expect(capturedAddPlaceProps?.isVisible).toBe(false)
+  })
+})
+
+describe("MapComponent add-place drafts", () => {
+  const startAndConfirm = (getByTestId: (id: string) => unknown) => {
+    fireEvent.press(getByTestId("open-add-place") as never)
+    fireEvent.press(getByTestId("confirm-place-location") as never)
+  }
+
+  it("keeps what has been typed while the pin is moved", async () => {
+    // Going back to the map corrects one of the answers rather than starting
+    // again, so the form that comes back is the same one, still filled in.
+    const { getByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+    startAndConfirm(getByTestId)
+
+    await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(true))
+    const mountsBefore = addPlaceMountCount
+
+    act(() => {
+      ;(capturedAddPlaceProps?.onChangeLocation as () => void)()
+    })
+    fireEvent.press(getByTestId("confirm-place-location"))
+
+    await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(true))
+    expect(addPlaceMountCount).toBe(mountsBefore)
+  })
+
+  it("does not carry an abandoned place into the next one", async () => {
+    // Backing out to the map and then cancelling abandons the place. What had
+    // been typed about it must not turn up in the next attempt.
+    const { getByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+    startAndConfirm(getByTestId)
+
+    await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(true))
+    const mountsBefore = addPlaceMountCount
+
+    act(() => {
+      ;(capturedAddPlaceProps?.onChangeLocation as () => void)()
+    })
+    fireEvent.press(getByTestId("cancel-add-place"))
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+    startAndConfirm(getByTestId)
+
+    await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(true))
+    expect(addPlaceMountCount).toBeGreaterThan(mountsBefore)
   })
 })
