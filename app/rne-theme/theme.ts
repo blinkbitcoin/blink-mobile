@@ -21,7 +21,7 @@ const theme = createTheme({
     },
     Text: (props, { colors }) => {
       const universalStyle = {
-        color: props.color || colors.black,
+        color: props.color || colors.textOnBackground,
         fontFamily: "SourceSansPro-Regular",
       }
 

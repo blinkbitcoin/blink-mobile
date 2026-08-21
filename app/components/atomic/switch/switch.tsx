@@ -63,7 +63,7 @@ export const Switch: React.FC<SwitchProps> = ({
     const backgroundColor = interpolateColor(
       progress.value,
       [0, 1],
-      [colors.grey4, colors.primary],
+      [colors.border, colors.accent],
     )
     return {
       backgroundColor,
@@ -112,8 +112,8 @@ const useStyles = makeStyles(({ colors }) => ({
     width: THUMB_SIZE,
     height: THUMB_SIZE,
     borderRadius: THUMB_SIZE / 2,
-    backgroundColor: colors._white,
-    shadowColor: colors._black,
+    backgroundColor: colors.staticWhite,
+    shadowColor: colors.staticBlack,
     shadowOffset: {
       width: 0,
       height: 2,
