@@ -48,10 +48,12 @@ jest.mock("@app/config/feature-flags-context", () => ({
   }),
 }))
 
+const mockReadQuery = jest.fn(() => null as unknown)
+
 jest.mock("@apollo/client", () => ({
   ...jest.requireActual("@apollo/client"),
   useApolloClient: () => ({
-    readQuery: jest.fn(() => null),
+    readQuery: mockReadQuery,
   }),
 }))
 
@@ -90,6 +92,50 @@ const tx = (overrides: Partial<TransactionFragment>): TransactionFragment =>
 describe("useUnseenTxAmountBadge", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+  })
+
+  it("falls back to the cached custodial transactions when none are provided", () => {
+    mockReadQuery.mockReturnValue({
+      me: {
+        defaultAccount: {
+          pendingIncomingTransactions: [tx({ id: "cached", createdAt: 9 })],
+          transactions: { edges: [] },
+        },
+      },
+    })
+
+    const { result } = renderHook(() =>
+      useUnseenTxAmountBadge({
+        transactions: [],
+        hasUnseenBtcTx: true,
+        hasUnseenUsdTx: false,
+      }),
+    )
+
+    expect(result.current.latestUnseenTx?.id).toBe("cached")
+  })
+
+  it("never reads the custodial cache for a self-custodial account", () => {
+    mockReadQuery.mockReturnValue({
+      me: {
+        defaultAccount: {
+          pendingIncomingTransactions: [tx({ id: "cached", createdAt: 9 })],
+          transactions: { edges: [] },
+        },
+      },
+    })
+
+    const { result } = renderHook(() =>
+      useUnseenTxAmountBadge({
+        transactions: [],
+        isSelfCustodial: true,
+        hasUnseenBtcTx: true,
+        hasUnseenUsdTx: false,
+      }),
+    )
+
+    expect(mockReadQuery).not.toHaveBeenCalled()
+    expect(result.current.latestUnseenTx).toBeUndefined()
   })
 
   it("returns null when nothing unseen", () => {
@@ -171,7 +217,7 @@ describe("useUnseenTxAmountBadge", () => {
     expect(sendResult.current.unseenAmountText).toBe("BTC 10")
   })
 
-  it("navigates to transactionDetail using latest tx id", () => {
+  it("navigates to transactionDetail for the transaction it is given", () => {
     const { result } = renderHook(() =>
       useUnseenTxAmountBadge({
         transactions: [tx({ id: "navigate-me", createdAt: 10 })],
@@ -180,10 +226,24 @@ describe("useUnseenTxAmountBadge", () => {
       }),
     )
 
-    result.current.handleUnseenBadgePress()
+    result.current.navigateToTransaction("navigate-me")
 
     expect(mockNavigate).toHaveBeenCalledWith("transactionDetail", {
       txid: "navigate-me",
     })
+  })
+
+  it("does not navigate without a transaction to open", () => {
+    const { result } = renderHook(() =>
+      useUnseenTxAmountBadge({
+        transactions: [],
+        hasUnseenBtcTx: false,
+        hasUnseenUsdTx: false,
+      }),
+    )
+
+    result.current.navigateToTransaction("")
+
+    expect(mockNavigate).not.toHaveBeenCalled()
   })
 })
