@@ -204,6 +204,23 @@ describe("ContactTransactions", () => {
       expect(queryByTestId("contact-transactions-loading")).toBeNull()
     })
 
+    it("still holds its space when the history cannot be read", () => {
+      // The toast carries the failure; the layout must not move under it, or the send
+      // button climbs the screen on exactly the contact whose list is missing.
+      mockUseQuery.mockReturnValue({
+        error: new Error("network"),
+        data: undefined,
+        fetchMore: jest.fn(),
+      })
+
+      const { getByTestId, queryByTestId } = renderContactTransactions()
+
+      expect(
+        StyleSheet.flatten(getByTestId("contact-transactions-unavailable").props.style),
+      ).toMatchObject({ flex: 1 })
+      expect(queryByTestId("contact-transactions-list")).toBeNull()
+    })
+
     it("reports a failed query through a toast", () => {
       mockUseQuery.mockReturnValue({
         error: new Error("network"),
@@ -385,6 +402,18 @@ describe("ContactTransactions", () => {
       expect(screen.UNSAFE_getByType(SectionList).props.windowSize).toBe(
         TRANSACTION_LIST_WINDOW_SIZE,
       )
+    })
+
+    it("holds the space below it, so what follows keeps its place", () => {
+      // Whatever the contact's history holds, the list fills the room between the header
+      // and the send button: a short one must not pull that button up the screen.
+      const screen = renderContactTransactions()
+      const list = screen.UNSAFE_getByType(SectionList)
+
+      let container = list.parent
+      while (container && typeof container.type !== "string") container = container.parent
+
+      expect(StyleSheet.flatten(container?.props.style)).toMatchObject({ flex: 1 })
     })
 
     it("dates every row, so a payment is placed within its day", () => {
