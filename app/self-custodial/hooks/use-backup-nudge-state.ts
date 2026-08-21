@@ -123,12 +123,10 @@ export const useBackupNudgeState = (): BackupNudgeState => {
     [activeWallet.wallets],
   )
 
-  // Opt out of the dollar-balance restriction: it hides a balance, it does not
-  // remove it, and an unbacked stable-token holding is exactly as lost as an
-  // unbacked BTC one if the device goes.
-  const { satsBalance } = useTotalBalance(walletsForTotal, {
-    applyDollarRestriction: false,
-  })
+  /** The total counts held money whatever the region gate says, which is what this
+   *  nudge needs: an unbacked stable-token holding is exactly as lost as an unbacked
+   *  BTC one if the device goes. */
+  const { satsBalance } = useTotalBalance(walletsForTotal)
 
   const isBannerDismissedRecently =
     bannerDismissedAt !== null &&

@@ -4,6 +4,12 @@ import {
 } from "@app/navigation/stack-param-lists"
 
 describe("canGoBackFromChooseExperience", () => {
+  /** Settings carries no onward step: it opened this screen over a live session, which is a
+   *  coherent place to return to. */
+  it("allows going back from the settings entry, which has no onward step", () => {
+    expect(canGoBackFromChooseExperience(null)).toBe(true)
+  })
+
   it("allows going back from the creation entry, which provisioned nothing yet", () => {
     expect(
       canGoBackFromChooseExperience({

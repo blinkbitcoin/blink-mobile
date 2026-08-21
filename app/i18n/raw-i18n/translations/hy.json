@@ -2420,6 +2420,7 @@
   },
   "SettingsScreen": {
     "createAddress": "Ստեղծել հասցե",
+    "addressDisabled": "(անջատված)",
     "donationButton": "Նվիրատվության կոճակ",
     "btcpayServer": "BTCPay Server",
     "woocommerce": "WooCommerce",
@@ -2429,6 +2430,7 @@
     "apiAcess": "API ինտեգրացիա",
     "apiDocumentation": "API փաստաթղթեր",
     "apiDashboard": "API հասանելիություն և վահանակ",
+    "mode": "Ռեժիմ",
     "pos": "Վաճառքի կետ",
     "posCopied": "Վաճառքի կետի հղումը պատծենվել է",
     "activated": "Ակտիվացված է",
@@ -2560,7 +2562,21 @@
     "removedAccount": "Դուք հեռացրել եք {identifier: string} հաշիվը։"
   },
   "StablesatsRestriction": {
-    "walletLabel": "հասանելի չէ ձեր տարածաշրջանում"
+    "walletLabel": "հասանելի չէ ձեր տարածաշրջանում",
+    "anonModeWalletLabel": "հասանելի չէ Incognito ռեժիմում"
+  },
+  "AnonModeConvertModal": {
+    "title": "Նախ փոխանցեք ձեր դոլարային մնացորդը",
+    "body": "Incognito ռեժիմն աջակցում է միայն Bitcoin մնացորդին։ Փոխանցեք ձեր դոլարային մնացորդը Bitcoin մնացորդին՝ անցնելու համար։"
+  },
+  "EnhancedModePrompt": {
+    "title": "Այս գործառույթը պահանջում է Enhanced ռեժիմ",
+    "body": "Դուք Incognito ռեժիմում եք, Blink-ը չգիտի ձեր տարածաշրջանը, ուստի որոշ գործառույթներ հասանելի չեն։ Անցեք Enhanced-ի՝ գտնվելու վայրի ստուգում կատարելու և ձեր տարածաշրջանի բոլոր գործառույթները բացելու համար։",
+    "switchButton": "Անցնել Enhanced-ի"
+  },
+  "ModeSwitchSuccessScreen": {
+    "enhanced": "Անցաք ինքնապահառությամբ\nEnhanced ռեժիմի",
+    "anon": "Անցաք ինքնապահառությամբ\nIncognito ռեժիմի"
   },
   "DollarBalanceRestriction": {
     "modalTitle": "Դոլարային մնացորդը հասանելի չէ ձեր տարածաշրջանում"
@@ -2686,7 +2702,6 @@
     "letsGo": "Գնացի՛նք։",
     "stayInTrialMode": "Մնալ փորձնական ռեժիմում",
     "upgradeToLevel": "Թարմացնել Մակարդակ {level: number}",
-    "notNow": "Ոչ հիմա",
     "setUpLevelAccount": "Կարգավորել Մակարդակ {level: number} հաշիվը"
   },
   "SetAddressModal": {
@@ -2864,6 +2879,7 @@
     "bitcoinPrice": "Բիթքոյնի գինը",
     "btcAccount": "Բիթքոյն հաշիվ",
     "cancel": "Չեղարկել ",
+    "notNow": "Ոչ հիմա",
     "card": "Քարտ",
     "close": "Փակել",
     "confirm": "Հաստատել",

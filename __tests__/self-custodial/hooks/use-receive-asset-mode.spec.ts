@@ -4,14 +4,14 @@ import { useReceiveAssetMode } from "@app/self-custodial/hooks/use-receive-asset
 
 const mockSelfCustodialWallet = jest.fn()
 const mockPersistentState = jest.fn()
-const mockUseDollarBalanceRestriction = jest.fn()
+const mockUseDollarBalanceGate = jest.fn()
 
 jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () => mockSelfCustodialWallet(),
 }))
 
 jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
-  useDollarBalanceRestriction: () => mockUseDollarBalanceRestriction(),
+  useDollarBalanceGate: () => mockUseDollarBalanceGate(),
 }))
 
 jest.mock("@app/store/persistent-state", () => ({
@@ -25,8 +25,8 @@ describe("useReceiveAssetMode", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockPersistentState.mockReturnValue({})
-    mockUseDollarBalanceRestriction.mockReturnValue({
-      isRestricted: false,
+    mockUseDollarBalanceGate.mockReturnValue({
+      isGated: false,
       isRegionPending: false,
     })
   })
@@ -125,8 +125,8 @@ describe("useReceiveAssetMode", () => {
 
   describe("while the region is still resolving", () => {
     beforeEach(() => {
-      mockUseDollarBalanceRestriction.mockReturnValue({
-        isRestricted: false,
+      mockUseDollarBalanceGate.mockReturnValue({
+        isGated: false,
         isRegionPending: true,
       })
     })
@@ -161,8 +161,8 @@ describe("useReceiveAssetMode", () => {
       })
       const { result, rerender } = renderHook(() => useReceiveAssetMode())
 
-      mockUseDollarBalanceRestriction.mockReturnValue({
-        isRestricted: true,
+      mockUseDollarBalanceGate.mockReturnValue({
+        isGated: true,
         isRegionPending: false,
       })
       rerender({})
@@ -179,8 +179,8 @@ describe("useReceiveAssetMode", () => {
       })
       const { result, rerender } = renderHook(() => useReceiveAssetMode())
 
-      mockUseDollarBalanceRestriction.mockReturnValue({
-        isRestricted: false,
+      mockUseDollarBalanceGate.mockReturnValue({
+        isGated: false,
         isRegionPending: false,
       })
       rerender({})
@@ -278,8 +278,8 @@ describe("useReceiveAssetMode", () => {
 
   describe("dollar-balance restriction", () => {
     it("locks to Bitcoin and disables the toggle even when the preference is Dollar", () => {
-      mockUseDollarBalanceRestriction.mockReturnValue({
-        isRestricted: true,
+      mockUseDollarBalanceGate.mockReturnValue({
+        isGated: true,
         isRegionPending: false,
       })
       mockSelfCustodialWallet.mockReturnValue({ isStableBalanceActive: false })
@@ -293,8 +293,8 @@ describe("useReceiveAssetMode", () => {
     })
 
     it("locks to Bitcoin even when stable balance is active", () => {
-      mockUseDollarBalanceRestriction.mockReturnValue({
-        isRestricted: true,
+      mockUseDollarBalanceGate.mockReturnValue({
+        isGated: true,
         isRegionPending: false,
       })
       mockSelfCustodialWallet.mockReturnValue({ isStableBalanceActive: true })
@@ -304,8 +304,8 @@ describe("useReceiveAssetMode", () => {
     })
 
     it("exposes only Bitcoin on the Lightning rail", () => {
-      mockUseDollarBalanceRestriction.mockReturnValue({
-        isRestricted: true,
+      mockUseDollarBalanceGate.mockReturnValue({
+        isGated: true,
         isRegionPending: false,
       })
       mockSelfCustodialWallet.mockReturnValue({ isStableBalanceActive: false })
@@ -318,8 +318,8 @@ describe("useReceiveAssetMode", () => {
       const { result, rerender } = renderHook(() => useReceiveAssetMode())
       expect(result.current.assetMode).toBe("dollar")
 
-      mockUseDollarBalanceRestriction.mockReturnValue({
-        isRestricted: true,
+      mockUseDollarBalanceGate.mockReturnValue({
+        isGated: true,
         isRegionPending: false,
       })
       rerender({})

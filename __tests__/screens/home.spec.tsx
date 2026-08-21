@@ -22,12 +22,7 @@ import { ConvertDirection } from "@app/types/payment"
 
 let currentMocks: MockedResponse[] = []
 
-/** Mocked wholesale: the real module warns at load time when no API key is configured. */
-jest.mock("@app/utils/ip-country-lookup", () => ({
-  DEFAULT_ADAPTERS: [],
-  resolveIpCountryCode: jest.fn(async () => undefined),
-  resolveIpCountryCodeCached: jest.fn(async () => undefined),
-}))
+jest.mock("@app/utils/ip-country-lookup")
 
 jest.mock("@react-native-async-storage/async-storage", () => ({
   __esModule: true,
@@ -141,19 +136,36 @@ jest.mock("@app/config/feature-flags-context", () => {
   }
 })
 
+let mockIsAnonMode = false
+
 jest.mock("@app/hooks/use-transfer-blocked", () => ({
   useTransferBlocked: () => mockTransferBlockedOverride,
-  useTransferBlock: () => ({
-    isBlocked: mockTransferBlockedOverride,
+  useTransferGated: () => mockIsAnonMode || mockTransferBlockedOverride,
+  useTransferGate: () => ({
+    isGated: mockIsAnonMode || mockTransferBlockedOverride,
     isRegionPending: mockTransferRegionPendingOverride,
   }),
 }))
 
 jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
   useDollarBalanceRestricted: () => mockDollarBalanceRestrictedOverride,
-  useDollarBalanceRestriction: () => ({
-    isRestricted: mockDollarBalanceRestrictedOverride,
+  useDollarBalanceGated: () => mockIsAnonMode || mockDollarBalanceRestrictedOverride,
+  useDollarBalanceGate: () => ({
+    isGated: mockIsAnonMode || mockDollarBalanceRestrictedOverride,
     isRegionPending: mockRegionPendingOverride,
+  }),
+}))
+
+jest.mock("@app/self-custodial/hooks/use-self-custodial-account-mode", () => ({
+  useSelfCustodialAccountMode: () => ({ isAnonMode: mockIsAnonMode }),
+}))
+
+const mockPromptEnhancedMode = jest.fn()
+let mockEnhancedModePromptVisible = false
+jest.mock("@app/components/enhanced-mode-prompt", () => ({
+  useEnhancedModePrompt: () => ({
+    promptEnhancedMode: mockPromptEnhancedMode,
+    isEnhancedModePromptVisible: mockEnhancedModePromptVisible,
   }),
 }))
 
@@ -804,10 +816,16 @@ const runRestrictionInvariantCase = async ({
     return
   }
 
-  await waitFor(() => expect(getByTestId("transfer")).toBeTruthy())
-  await flushEffects()
+  /** A gated button leaves the accessibility tree, so it is only reachable to a query
+   *  that includes hidden elements; the press still routes up to the gate. */
+  const findTransfer = () =>
+    expectButton === "disabled"
+      ? getByTestId("transfer", { includeHiddenElements: true })
+      : getByTestId("transfer")
 
-  fireEvent.press(getByTestId("transfer"))
+  await waitFor(() => expect(findTransfer()).toBeTruthy())
+  await flushEffects()
+  fireEvent.press(findTransfer())
 
   if (expectButton === "disabled") {
     expect(mockDollarBalanceModalVisible).toBe(true)
@@ -829,12 +847,14 @@ const resetHomeScreenMocks = () => {
   mockRegionPendingOverride = false
   mockTransferRegionPendingOverride = false
   mockMigratePromptVisible = false
+  mockEnhancedModePromptVisible = false
   mockCanReopen = false
   mockReceiveBlocked = false
   mockReminderBulletinVisible = false
   mockTransferBlockedOverride = false
   mockDollarBalanceModalVisible = false
   mockForcedConversionParams = null
+  mockIsAnonMode = false
   jest.clearAllMocks()
   mockUseNonCustodialConversionLimits.mockReturnValue({
     limits: null,
@@ -1203,13 +1223,41 @@ describe("HomeScreen", () => {
 
     await flushEffects()
 
-    // Transfers are not blocked, so the button is rendered but disabled.
-    expect(getByTestId("transfer")).toBeTruthy()
+    // Transfers are not blocked, so the gate is rendered in the button's place.
+    expect(getByTestId("transfer", { includeHiddenElements: true })).toBeTruthy()
     expect(mockDollarBalanceModalVisible).toBe(false)
 
-    fireEvent.press(getByTestId("transfer"))
+    fireEvent.press(getByTestId("transfer", { includeHiddenElements: true }))
 
     expect(mockDollarBalanceModalVisible).toBe(true)
+
+    mockActiveWalletOverride = null
+  })
+
+  it("opens the Enhanced Mode prompt from the disabled transfer button in Anon mode", async () => {
+    mockIsAnonMode = true
+    mockActiveWalletOverride = selfCustodialReadyWalletOverride(5000)
+    currentMocks = generateHomeMock({
+      level: AccountLevel.One,
+      network: Network.Mainnet,
+      btcBalance: 1000,
+      usdBalance: 5000,
+    })
+
+    const { getByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    expect(getByTestId("transfer", { includeHiddenElements: true })).toBeTruthy()
+
+    fireEvent.press(getByTestId("transfer", { includeHiddenElements: true }))
+
+    expect(mockPromptEnhancedMode).toHaveBeenCalledTimes(1)
+    expect(mockDollarBalanceModalVisible).toBe(false)
 
     mockActiveWalletOverride = null
   })
@@ -1232,10 +1280,11 @@ describe("HomeScreen", () => {
 
     await flushEffects()
 
-    fireEvent.press(getByTestId("transfer"))
+    fireEvent.press(getByTestId("transfer", { includeHiddenElements: true }))
 
     expect(mockNavigate).not.toHaveBeenCalledWith("conversionDetails")
     expect(mockDollarBalanceModalVisible).toBe(false)
+    expect(mockPromptEnhancedMode).not.toHaveBeenCalled()
 
     mockActiveWalletOverride = null
   })
@@ -1879,6 +1928,38 @@ describe("HomeScreen wind-down states", () => {
     expect(queryByTestId("migrate-now-modal")).toBeNull()
   })
 
+  /** Two native modals cannot present at once on iOS, so the Enhanced prompt has to
+   *  suppress the migrate-now push like every other home modal. */
+  it("lets the Enhanced prompt outrank the migrate-now prompt", async () => {
+    mockMigratePromptVisible = true
+    mockEnhancedModePromptVisible = true
+
+    const { queryByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    expect(queryByTestId("migrate-now-modal")).toBeNull()
+  })
+
+  it("shows the migrate-now prompt once the Enhanced prompt closes", async () => {
+    mockMigratePromptVisible = true
+    mockEnhancedModePromptVisible = false
+
+    const { queryByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    expect(queryByTestId("migrate-now-modal")).toBeTruthy()
+  })
+
   it("lets the forced conversion outrank the migrate-now prompt", async () => {
     mockMigratePromptVisible = true
     mockDollarBalanceRestrictedOverride = true
@@ -1984,7 +2065,7 @@ describe("HomeScreen wind-down states", () => {
 
     expect(await findByTestId("migrate-now-modal")).toBeTruthy()
 
-    fireEvent.press(getByTestId("transfer"))
+    fireEvent.press(getByTestId("transfer", { includeHiddenElements: true }))
 
     expect(mockDollarBalanceModalVisible).toBe(true)
     expect(queryByTestId("migrate-now-modal")).toBeNull()
@@ -2005,7 +2086,7 @@ describe("HomeScreen wind-down states", () => {
 
     await flushEffects()
 
-    fireEvent.press(getByTestId("receive"))
+    fireEvent.press(getByTestId("receive", { includeHiddenElements: true }))
 
     expect(mockReopenMigratePrompt).toHaveBeenCalledTimes(1)
     expect(mockNavigate).not.toHaveBeenCalledWith("receiveBitcoin")

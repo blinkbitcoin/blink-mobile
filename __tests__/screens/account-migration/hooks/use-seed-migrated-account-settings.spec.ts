@@ -32,7 +32,7 @@ import { DisplayCurrencyDocument, LanguageDocument } from "@app/graphql/generate
 import { useSeedMigratedAccountSettings } from "@app/screens/account-migration/hooks/use-seed-migrated-account-settings"
 
 const baseState: PersistentState = {
-  schemaVersion: 18,
+  schemaVersion: 19,
   galoyInstance: { id: "Main" },
   galoyAuthToken: "",
   activeAccountId: DefaultAccountId.Custodial,

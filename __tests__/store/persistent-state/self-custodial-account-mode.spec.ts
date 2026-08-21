@@ -7,7 +7,7 @@ import { AccountMode } from "@app/types/account"
 import { DefaultAccountId } from "@app/types/wallet"
 
 const baseState: PersistentState = {
-  schemaVersion: 18,
+  schemaVersion: 19,
   galoyInstance: { id: "Main" },
   galoyAuthToken: "",
 }
@@ -87,42 +87,39 @@ describe("withSelfCustodialAccountMode", () => {
 })
 
 describe("getSelfCustodialAccountMode", () => {
-  it("reads back the mode the writer stored", () => {
-    const next = withSelfCustodialAccountMode(
-      baseState,
-      "self-custodial-1",
-      AccountMode.Anon,
-    )
-
-    expect(getSelfCustodialAccountMode(next, "self-custodial-1")).toBe(AccountMode.Anon)
-  })
-
-  it("returns undefined when the map has no entry for the account", () => {
+  it("returns the active self-custodial account's mode", () => {
     const state: PersistentState = {
       ...baseState,
-      selfCustodialAccountModeByAccountId: { "self-custodial-1": AccountMode.Enhanced },
-    }
-
-    expect(getSelfCustodialAccountMode(state, "restored-without-mode")).toBeUndefined()
-  })
-
-  /** The map is optional on the schema, so a state written before v17 has none at all. */
-  it("returns undefined when the map is absent entirely", () => {
-    expect(getSelfCustodialAccountMode(baseState, "self-custodial-1")).toBeUndefined()
-  })
-
-  it("keeps each account's mode separate (multi-account)", () => {
-    const state: PersistentState = {
-      ...baseState,
+      activeAccountId: "self-custodial-1",
       selfCustodialAccountModeByAccountId: {
-        "self-custodial-1": AccountMode.Enhanced,
-        "self-custodial-2": AccountMode.Anon,
+        "self-custodial-1": AccountMode.Anon,
+        "self-custodial-2": AccountMode.Enhanced,
       },
     }
 
-    expect(getSelfCustodialAccountMode(state, "self-custodial-1")).toBe(
-      AccountMode.Enhanced,
-    )
-    expect(getSelfCustodialAccountMode(state, "self-custodial-2")).toBe(AccountMode.Anon)
+    expect(getSelfCustodialAccountMode(state)).toBe(AccountMode.Anon)
+  })
+
+  it("returns null when the active account has not chosen a mode", () => {
+    const state: PersistentState = {
+      ...baseState,
+      activeAccountId: "self-custodial-1",
+    }
+
+    expect(getSelfCustodialAccountMode(state)).toBeNull()
+  })
+
+  it("returns null when the active account is custodial", () => {
+    const state: PersistentState = {
+      ...baseState,
+      activeAccountId: DefaultAccountId.Custodial,
+      selfCustodialAccountModeByAccountId: { "self-custodial-1": AccountMode.Anon },
+    }
+
+    expect(getSelfCustodialAccountMode(state)).toBeNull()
+  })
+
+  it("returns null when no account is active", () => {
+    expect(getSelfCustodialAccountMode(baseState)).toBeNull()
   })
 })

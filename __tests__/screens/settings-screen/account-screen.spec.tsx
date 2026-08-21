@@ -128,6 +128,10 @@ jest.mock("@app/graphql/generated", () => ({
   useSettingsScreenQuery: () => ({ data: null, loading: false }),
 }))
 
+jest.mock("@app/self-custodial/hooks/use-self-custodial-account-mode", () => ({
+  useSelfCustodialAccountMode: () => ({ isAnonMode: false }),
+}))
+
 const mockRefreshSelfCustodialWallets = jest.fn().mockResolvedValue(undefined)
 const mockUpdateCurrentSelfCustodialAccount = jest.fn().mockResolvedValue(undefined)
 jest.mock("@app/self-custodial/providers/wallet", () => ({

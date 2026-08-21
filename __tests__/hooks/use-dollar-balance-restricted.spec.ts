@@ -7,18 +7,18 @@ const mockUseRemoteConfig = jest.fn()
 const mockUseActiveWallet = jest.fn()
 const mockUseIpCountryLookup = jest.fn()
 
-/** Mocked wholesale: the real module warns at load time when no API key is configured. */
-jest.mock("@app/utils/ip-country-lookup", () => ({
-  DEFAULT_ADAPTERS: [],
-  resolveIpCountryCode: jest.fn(async () => undefined),
-  resolveIpCountryCodeCached: jest.fn(async () => undefined),
-}))
+jest.mock("@app/utils/ip-country-lookup")
 
 jest.mock("@app/hooks/use-device-location", () => ({
   __esModule: true,
   ...jest.requireActual("@app/hooks/use-device-location"),
   default: () => mockUseDeviceLocation(),
   useIpCountryLookup: (enabled: boolean) => mockUseIpCountryLookup(enabled),
+}))
+
+let mockIsAnonMode = false
+jest.mock("@app/self-custodial/hooks/use-self-custodial-account-mode", () => ({
+  useSelfCustodialAccountMode: () => ({ isAnonMode: mockIsAnonMode }),
 }))
 
 jest.mock("@app/config/feature-flags-context", () => ({
@@ -30,6 +30,8 @@ jest.mock("@app/hooks/use-active-wallet", () => ({
 }))
 
 import {
+  useDollarBalanceGate,
+  useDollarBalanceGated,
   useDollarBalanceRestricted,
   useDollarBalanceRestriction,
 } from "@app/hooks/use-dollar-balance-restricted"
@@ -46,6 +48,7 @@ const setIpLookup = (countryCode: string | undefined, isSettled = true): void =>
 
 const setup = (accountType: AccountType): void => {
   jest.clearAllMocks()
+  mockIsAnonMode = false
   mockUseDeviceLocation.mockReturnValue({ countryCode: undefined, source: undefined })
   mockUseRemoteConfig.mockReturnValue(remoteConfig)
   mockUseActiveWallet.mockReturnValue({ accountType })
@@ -139,6 +142,27 @@ describe("useDollarBalanceRestricted", () => {
     })
   })
 
+  describe("useDollarBalanceGated", () => {
+    const readGated = () => renderHook(() => useDollarBalanceGated()).result.current
+
+    beforeEach(() => setup(AccountType.SelfCustodial))
+
+    it("gates in Anon mode with no region resolved at all", () => {
+      mockIsAnonMode = true
+      expect(readGated()).toBe(true)
+    })
+
+    it("gates in a blocked region outside Anon mode", () => {
+      mockUseDeviceLocation.mockReturnValue({ countryCode: "FR" })
+      expect(readGated()).toBe(true)
+    })
+
+    it("does not gate when neither Anon nor the region applies", () => {
+      mockUseDeviceLocation.mockReturnValue({ countryCode: "AR" })
+      expect(readGated()).toBe(false)
+    })
+  })
+
   describe("while the region is still resolving", () => {
     beforeEach(() => setup(AccountType.Custodial))
 
@@ -172,6 +196,17 @@ describe("useDollarBalanceRestricted", () => {
 
       expect(readRestriction(AccountType.SelfCustodial)).toEqual({
         isRestricted: true,
+        isRegionPending: false,
+      })
+    })
+
+    /** Anon gates on the mode alone, so no region resolves and nothing pends. */
+    it("never pends in Anon mode", () => {
+      mockIsAnonMode = true
+      mockUseDeviceLocation.mockReturnValue({ countryCode: undefined, loading: false })
+
+      expect(renderHook(() => useDollarBalanceGate()).result.current).toEqual({
+        isGated: true,
         isRegionPending: false,
       })
     })

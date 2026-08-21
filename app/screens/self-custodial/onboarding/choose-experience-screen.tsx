@@ -4,17 +4,24 @@ import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
+import { AnonModeConvertModal } from "@app/self-custodial/components/anon-mode-convert-modal"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { IconHero } from "@app/components/icon-hero"
 import { OptionCard, OptionCardGroup } from "@app/components/option-card-group"
+import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { WalletCurrency } from "@app/graphql/generated"
 import {
   canGoBackFromChooseExperience,
   ChooseExperienceContinueRoute,
   RootStackParamList,
 } from "@app/navigation/stack-param-lists"
+import { armModeSelectionConversion } from "@app/screens/conversion-flow/drain-conversion"
 import { useSelfCustodialAccountMode } from "@app/self-custodial/hooks/use-self-custodial-account-mode"
+import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { AccountMode } from "@app/types/account"
+import { ActiveWalletStatus } from "@app/types/wallet"
+import { toastShow } from "@app/utils/toast"
 import { testProps } from "@app/utils/testProps"
 
 import { OnboardingScreenLayout } from "./layouts"
@@ -26,9 +33,9 @@ const MODE_ICON_SIZE = 22
 const BACKWARD_ACTIONS = ["GO_BACK", "POP"]
 
 /**
- * Lets a self-custodial user pick their region posture (Enhanced or Anon) during
- * onboarding. On continue it forwards to the destination its caller passed, so the same
- * screen serves creation, restore and migration.
+ * Lets a self-custodial user pick their region posture (Enhanced or Anon). The settings
+ * entry edits the active account in place; onboarding entries forward to the destination
+ * their caller passed, so the same screen serves creation, restore and migration.
  */
 export const ChooseExperienceScreen: React.FC = () => {
   const styles = useStyles()
@@ -39,18 +46,69 @@ export const ChooseExperienceScreen: React.FC = () => {
   const LLScreen = LL.ChooseExperienceScreen
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const route = useRoute<RouteProp<RootStackParamList, "selfCustodialChooseExperience">>()
-  const { getAccountMode, setAccountMode } = useSelfCustodialAccountMode()
+  const { accountMode, getModeFor, setAccountMode, setActiveAccountMode } =
+    useSelfCustodialAccountMode()
+  const { wallets, isReady: isWalletReady, status: walletStatus } = useActiveWallet()
+  const { refreshWallets } = useSelfCustodialWallet()
+  const [isConvertModalVisible, setIsConvertModalVisible] = useState(false)
 
-  const { onContinue } = route.params
-  const isAccountPending = onContinue.route === ChooseExperienceContinueRoute.AcceptTerms
-  /** Re-entry (a back press out of the next screen, or a migration resume onto this
-   *  screen) must not silently downgrade a deliberate Anon to the Enhanced default, so
-   *  seed from what the account already stored. Creation has no account to read yet. */
-  const storedMode = isAccountPending ? undefined : getAccountMode(onContinue.accountId)
+  /** Null on the settings entry; the onboarding entries carry their onward step. */
+  const onContinue = "entry" in route.params ? null : route.params.onContinue
+  const isSettingsEntry = onContinue === null
+  /** Carried back by the drain conversion, so the interrupted switch resumes selected. */
+  const settingsInitialMode =
+    "entry" in route.params ? route.params.initialMode ?? null : null
 
-  const [selected, setSelected] = useState<AccountMode>(
-    storedMode ?? AccountMode.Enhanced,
-  )
+  /** Settings preselects the active account's mode; a restore that already knows its
+   *  account honors that account's stored mode. Re-entry (a back press out of the next
+   *  screen, or a migration resume onto this one) must not silently downgrade a
+   *  deliberate Anon to the Enhanced default. Creation has no account to read yet. */
+  const storedOnboardingMode =
+    onContinue && "accountId" in onContinue ? getModeFor(onContinue.accountId) : null
+  const initialMode = onContinue
+    ? storedOnboardingMode ?? AccountMode.Enhanced
+    : settingsInitialMode ?? accountMode ?? AccountMode.Enhanced
+  const [selected, setSelected] = useState<AccountMode>(initialMode)
+
+  /** Tracked, not fired and forgotten: the drain conversion resets back here with
+   *  `isWalletReady` already true on the pre-conversion balance, so Continue must wait
+   *  for the refresh. A failure releases it rather than stranding the screen. */
+  const [isRefreshingWallets, setIsRefreshingWallets] = useState(false)
+
+  useEffect(() => {
+    if (!isSettingsEntry) return
+    let isActive = true
+    setIsRefreshingWallets(true)
+    refreshWallets()
+      .catch(() => undefined)
+      .finally(() => {
+        if (isActive) setIsRefreshingWallets(false)
+      })
+    return () => {
+      isActive = false
+    }
+  }, [isSettingsEntry, refreshWallets])
+
+  const usdWallet = wallets.find((wallet) => wallet.walletCurrency === WalletCurrency.Usd)
+  const hasDollarBalance = (usdWallet?.balance.amount ?? 0) > 0
+
+  /** Offline and Error are answers, not stages: neither becomes Ready by waiting, so the
+   *  balance behind the gate is never going to arrive. Reading them as "still loading" is
+   *  what left Continue spinning with nothing to say. */
+  const isWalletUnreachable =
+    walletStatus === ActiveWalletStatus.Offline ||
+    walletStatus === ActiveWalletStatus.Error
+
+  /** Only the switch INTO Anon reads the balance, since that is what decides whether the
+   *  dollars must be drained first. Leaving Anon decides nothing, so it never waits: a user
+   *  who lost connectivity inside Incognito could otherwise never get back out. */
+  const isAnonBound = selected === AccountMode.Anon
+  const isBalanceRequired = isSettingsEntry && isAnonBound
+
+  /** The settings entry gates the Anon switch on the live balance, which is unknown
+   *  until the wallet syncs: wait rather than let a cold start skip the gate. */
+  const isContinueWaiting =
+    isBalanceRequired && !isWalletUnreachable && (!isWalletReady || isRefreshingWallets)
 
   /**
    * Restore and migration arrive with the account already activated and only the screen
@@ -90,23 +148,60 @@ export const ChooseExperienceScreen: React.FC = () => {
     },
   ]
 
+  const goToDollarTransfer = () => {
+    setIsConvertModalVisible(false)
+    armModeSelectionConversion()
+    navigation.navigate("conversionDetails")
+  }
+
   const handleContinue = () => {
-    /** Creation has no account yet, so the mode rides through terms to wallet creation. */
-    if (onContinue.route === ChooseExperienceContinueRoute.AcceptTerms) {
-      navigation.navigate("acceptTermsAndConditions", {
-        flow: "selfCustodial",
-        mode: selected,
-      })
+    if (!onContinue) {
+      /** The gate cannot be honoured without the balance, and no amount of waiting will
+       *  produce it, so the refusal is said out loud rather than left as a dead button. */
+      if (isBalanceRequired && isWalletUnreachable) {
+        toastShow({ message: LL.errors.network.connection(), LL })
+        return
+      }
+      const isSwitchingToAnon =
+        selected === AccountMode.Anon && accountMode !== AccountMode.Anon
+      const isBalanceUnknown = !isWalletReady
+      /** A remaining (or still unknown) dollar balance must be converted before it
+       *  disappears behind Anon. */
+      if (isSwitchingToAnon && (hasDollarBalance || isBalanceUnknown)) {
+        setIsConvertModalVisible(true)
+        return
+      }
+      const isModeUnchanged = selected === accountMode
+      if (isModeUnchanged) {
+        navigation.goBack()
+        return
+      }
+      setActiveAccountMode(selected)
+      navigation.replace("selfCustodialModeSwitchSuccess", { mode: selected })
       return
     }
 
-    setAccountMode(onContinue.accountId, selected)
-
-    if (onContinue.route === ChooseExperienceContinueRoute.BackupSuccess) {
-      navigation.navigate("selfCustodialBackupSuccess")
-      return
+    switch (onContinue.route) {
+      /** Creation has no account yet, so the mode rides through terms to wallet creation. */
+      case ChooseExperienceContinueRoute.AcceptTerms:
+        navigation.navigate("acceptTermsAndConditions", {
+          flow: "selfCustodial",
+          mode: selected,
+        })
+        return
+      case ChooseExperienceContinueRoute.BackupSuccess:
+        setAccountMode(onContinue.accountId, selected)
+        navigation.navigate("selfCustodialBackupSuccess")
+        return
+      case ChooseExperienceContinueRoute.BalancesOverview:
+        setAccountMode(onContinue.accountId, selected)
+        navigation.navigate("accountMigrationBalancesOverview")
+        return
+      default: {
+        const _exhaustive: never = onContinue
+        return _exhaustive
+      }
     }
-    navigation.navigate("accountMigrationBalancesOverview")
   }
 
   return (
@@ -115,6 +210,8 @@ export const ChooseExperienceScreen: React.FC = () => {
         <GaloyPrimaryButton
           title={LLScreen.continueButton()}
           onPress={handleContinue}
+          disabled={isContinueWaiting}
+          loading={isContinueWaiting}
           {...testProps("choose-experience-continue")}
         />
       }
@@ -133,6 +230,14 @@ export const ChooseExperienceScreen: React.FC = () => {
           onSelect={setSelected}
         />
       </View>
+
+      {isConvertModalVisible && (
+        <AnonModeConvertModal
+          isVisible={isConvertModalVisible}
+          toggleModal={() => setIsConvertModalVisible(false)}
+          onTransfer={goToDollarTransfer}
+        />
+      )}
     </OnboardingScreenLayout>
   )
 }

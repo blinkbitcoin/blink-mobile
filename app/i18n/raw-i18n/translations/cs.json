@@ -2420,6 +2420,7 @@
   },
   "SettingsScreen": {
     "createAddress": "Vytvořit adresu",
+    "addressDisabled": "(zakázáno)",
     "donationButton": "Darovací tlačítko",
     "btcpayServer": "BTCPay Server",
     "woocommerce": "WooCommerce",
@@ -2429,6 +2430,7 @@
     "apiAcess": "Integrace API",
     "apiDocumentation": "Dokumentace API",
     "apiDashboard": "Přístup k API a nástěnka",
+    "mode": "Režim",
     "pos": "Pokladní místo",
     "posCopied": "Odkaz na vaše pokladní místo byl zkopírován",
     "activated": "Aktivováno",
@@ -2560,7 +2562,21 @@
     "removedAccount": "Odebrali jste účet {identifier: string}."
   },
   "StablesatsRestriction": {
-    "walletLabel": "není ve vašem regionu k dispozici"
+    "walletLabel": "není ve vašem regionu k dispozici",
+    "anonModeWalletLabel": "není k dispozici v režimu Incognito"
+  },
+  "AnonModeConvertModal": {
+    "title": "Nejprve převeďte svůj dolarový zůstatek",
+    "body": "Režim Incognito podporuje pouze bitcoinový zůstatek. Převeďte svůj dolarový zůstatek na bitcoinový, abyste mohli přepnout."
+  },
+  "EnhancedModePrompt": {
+    "title": "Tato funkce vyžaduje režim Enhanced",
+    "body": "Jste v režimu Incognito, Blink nezná váš region, takže některé funkce nejsou k dispozici. Přepněte na Enhanced, aby proběhla kontrola polohy a odemkly se všechny funkce pro váš region.",
+    "switchButton": "Přepnout na Enhanced"
+  },
+  "ModeSwitchSuccessScreen": {
+    "enhanced": "Přepnuto na režim Enhanced\ns vlastní správou",
+    "anon": "Přepnuto na režim Incognito\ns vlastní správou"
   },
   "DollarBalanceRestriction": {
     "modalTitle": "Dolarový zůstatek není ve vašem regionu k dispozici"
@@ -2686,7 +2702,6 @@
     "letsGo": "Jdeme na to!",
     "stayInTrialMode": "Zůstat ve zkušebním režimu",
     "upgradeToLevel": "Upgradovat na úroveň {level: number}",
-    "notNow": "Teď ne",
     "setUpLevelAccount": "Nastavit účet úrovně {level: number}"
   },
   "SetAddressModal": {
@@ -2864,6 +2879,7 @@
     "bitcoinPrice": "Cena bitcoinu",
     "btcAccount": "Bitcoinový zůstatek",
     "cancel": "Zrušit",
+    "notNow": "Teď ne",
     "card": "Karta",
     "close": "Zavřít",
     "confirm": "Potvrdit",

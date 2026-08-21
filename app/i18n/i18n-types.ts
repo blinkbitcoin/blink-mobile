@@ -7907,6 +7907,10 @@ type RootTranslation = {
 		 */
 		apiDashboard: string
 		/**
+		 * M​o​d​e
+		 */
+		mode: string
+		/**
 		 * P​o​i​n​t​ ​o​f​ ​S​a​l​e
 		 */
 		pos: string
@@ -7918,6 +7922,10 @@ type RootTranslation = {
 		 * C​r​e​a​t​e​ ​a​d​d​r​e​s​s
 		 */
 		createAddress: string
+		/**
+		 * (​d​i​s​a​b​l​e​d​)
+		 */
+		addressDisabled: string
 		/**
 		 * D​o​n​a​t​e​ ​B​u​t​t​o​n
 		 */
@@ -8544,6 +8552,46 @@ type RootTranslation = {
 		 * n​o​t​ ​a​v​a​i​l​a​b​l​e​ ​i​n​ ​y​o​u​r​ ​r​e​g​i​o​n
 		 */
 		walletLabel: string
+		/**
+		 * n​o​t​ ​a​v​a​i​l​a​b​l​e​ ​i​n​ ​I​n​c​o​g​n​i​t​o​ ​m​o​d​e
+		 */
+		anonModeWalletLabel: string
+	}
+	AnonModeConvertModal: {
+		/**
+		 * T​r​a​n​s​f​e​r​ ​y​o​u​r​ ​D​o​l​l​a​r​ ​B​a​l​a​n​c​e​ ​f​i​r​s​t
+		 */
+		title: string
+		/**
+		 * I​n​c​o​g​n​i​t​o​ ​M​o​d​e​ ​s​u​p​p​o​r​t​s​ ​t​h​e​ ​B​i​t​c​o​i​n​ ​B​a​l​a​n​c​e​ ​o​n​l​y​.​ ​T​r​a​n​s​f​e​r​ ​y​o​u​r​ ​D​o​l​l​a​r​ ​B​a​l​a​n​c​e​ ​t​o​ ​y​o​u​r​ ​B​i​t​c​o​i​n​ ​B​a​l​a​n​c​e​ ​t​o​ ​s​w​i​t​c​h​.
+		 */
+		body: string
+	}
+	EnhancedModePrompt: {
+		/**
+		 * T​h​i​s​ ​f​e​a​t​u​r​e​ ​r​e​q​u​i​r​e​s​ ​E​n​h​a​n​c​e​d​ ​M​o​d​e
+		 */
+		title: string
+		/**
+		 * Y​o​u​'​r​e​ ​i​n​ ​I​n​c​o​g​n​i​t​o​ ​M​o​d​e​,​ ​B​l​i​n​k​ ​d​o​e​s​n​'​t​ ​k​n​o​w​ ​y​o​u​r​ ​r​e​g​i​o​n​,​ ​s​o​ ​s​o​m​e​ ​f​e​a​t​u​r​e​s​ ​a​r​e​n​'​t​ ​a​v​a​i​l​a​b​l​e​.​ ​S​w​i​t​c​h​ ​t​o​ ​E​n​h​a​n​c​e​d​ ​t​o​ ​r​u​n​ ​a​ ​l​o​c​a​t​i​o​n​ ​c​h​e​c​k​ ​a​n​d​ ​u​n​l​o​c​k​ ​a​l​l​ ​f​e​a​t​u​r​e​s​ ​f​o​r​ ​y​o​u​r​ ​r​e​g​i​o​n​.
+		 */
+		body: string
+		/**
+		 * S​w​i​t​c​h​ ​t​o​ ​E​n​h​a​n​c​e​d
+		 */
+		switchButton: string
+	}
+	ModeSwitchSuccessScreen: {
+		/**
+		 * S​w​i​t​c​h​e​d​ ​t​o​ ​E​n​h​a​n​c​e​d​
+	​N​o​n​-​c​u​s​t​o​d​i​a​l​ ​M​o​d​e
+		 */
+		enhanced: string
+		/**
+		 * S​w​i​t​c​h​e​d​ ​t​o​ ​I​n​c​o​g​n​i​t​o​
+	​N​o​n​-​c​u​s​t​o​d​i​a​l​ ​M​o​d​e
+		 */
+		anon: string
 	}
 	DollarBalanceRestriction: {
 		/**
@@ -8870,10 +8918,6 @@ type RootTranslation = {
 		 * @param {number} level
 		 */
 		upgradeToLevel: RequiredParams<'level'>
-		/**
-		 * N​o​t​ ​n​o​w
-		 */
-		notNow: string
 		/**
 		 * S​e​t​ ​u​p​ ​L​e​v​e​l​ ​{​l​e​v​e​l​}​ ​a​c​c​o​u​n​t
 		 * @param {number} level
@@ -9489,6 +9533,10 @@ type RootTranslation = {
 		 * C​a​r​d
 		 */
 		card: string
+		/**
+		 * N​o​t​ ​n​o​w
+		 */
+		notNow: string
 		/**
 		 * C​l​o​s​e
 		 */
@@ -21360,6 +21408,10 @@ export type TranslationFunctions = {
 		 */
 		apiDashboard: () => LocalizedString
 		/**
+		 * Mode
+		 */
+		mode: () => LocalizedString
+		/**
 		 * Point of Sale
 		 */
 		pos: () => LocalizedString
@@ -21371,6 +21423,10 @@ export type TranslationFunctions = {
 		 * Create address
 		 */
 		createAddress: () => LocalizedString
+		/**
+		 * (disabled)
+		 */
+		addressDisabled: () => LocalizedString
 		/**
 		 * Donate Button
 		 */
@@ -21987,6 +22043,46 @@ export type TranslationFunctions = {
 		 * not available in your region
 		 */
 		walletLabel: () => LocalizedString
+		/**
+		 * not available in Incognito mode
+		 */
+		anonModeWalletLabel: () => LocalizedString
+	}
+	AnonModeConvertModal: {
+		/**
+		 * Transfer your Dollar Balance first
+		 */
+		title: () => LocalizedString
+		/**
+		 * Incognito Mode supports the Bitcoin Balance only. Transfer your Dollar Balance to your Bitcoin Balance to switch.
+		 */
+		body: () => LocalizedString
+	}
+	EnhancedModePrompt: {
+		/**
+		 * This feature requires Enhanced Mode
+		 */
+		title: () => LocalizedString
+		/**
+		 * You're in Incognito Mode, Blink doesn't know your region, so some features aren't available. Switch to Enhanced to run a location check and unlock all features for your region.
+		 */
+		body: () => LocalizedString
+		/**
+		 * Switch to Enhanced
+		 */
+		switchButton: () => LocalizedString
+	}
+	ModeSwitchSuccessScreen: {
+		/**
+		 * Switched to Enhanced
+	Non-custodial Mode
+		 */
+		enhanced: () => LocalizedString
+		/**
+		 * Switched to Incognito
+	Non-custodial Mode
+		 */
+		anon: () => LocalizedString
 	}
 	DollarBalanceRestriction: {
 		/**
@@ -22297,10 +22393,6 @@ export type TranslationFunctions = {
 		 * Upgrade to Level {level}
 		 */
 		upgradeToLevel: (arg: { level: number }) => LocalizedString
-		/**
-		 * Not now
-		 */
-		notNow: () => LocalizedString
 		/**
 		 * Set up Level {level} account
 		 */
@@ -22901,6 +22993,10 @@ export type TranslationFunctions = {
 		 * Card
 		 */
 		card: () => LocalizedString
+		/**
+		 * Not now
+		 */
+		notNow: () => LocalizedString
 		/**
 		 * Close
 		 */

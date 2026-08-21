@@ -9,8 +9,10 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { headerRightNoGlass } from "@app/components/header-no-glass"
+import { useEnhancedModePrompt } from "@app/components/enhanced-mode-prompt"
 import { BackupStatus, useBackupState } from "@app/self-custodial/providers/backup-state"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
+import { useSelfCustodialAccountMode } from "@app/self-custodial/hooks/use-self-custodial-account-mode"
 import { Screen } from "@app/components/screen"
 import { SettingsCard } from "./settings-card"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -27,6 +29,7 @@ import { PhoneSetting } from "./account/settings/phone"
 import { SettingsGroup } from "./group"
 import { DefaultWallet } from "./settings/account-default-wallet"
 import { AccountLevelSetting } from "./settings/account-level"
+import { AccountModeSetting } from "./self-custodial/account-mode"
 import { AccountLNAddress } from "./settings/account-ln-address"
 import { PhoneLnAddress } from "./settings/phone-ln-address"
 import { AccountPOS } from "./settings/account-pos"
@@ -104,10 +107,13 @@ export const SettingsScreen: React.FC = () => {
   const isSelfCustodialMode = activeAccount?.type === AccountType.SelfCustodial
   const shouldShowSettingsBanner =
     isSelfCustodialMode && backupState.status !== BackupStatus.Completed
+  const { isAnonMode } = useSelfCustodialAccountMode()
+  const { promptEnhancedMode } = useEnhancedModePrompt()
 
   const items = {
     account: [
       AccountLevelSetting,
+      AccountModeSetting,
       TxLimits,
       FeeRatesSetting,
       SwitchAccountSetting,
@@ -180,6 +186,8 @@ export const SettingsScreen: React.FC = () => {
         <SettingsGroup
           name={LL.SettingsScreen.addressScreen()}
           items={items.waysToGetPaid}
+          disabled={isAnonMode}
+          onDisabledPress={promptEnhancedMode}
         />
         {isAtLeastLevelOne && !isSelfCustodialMode && (
           <SettingsGroup

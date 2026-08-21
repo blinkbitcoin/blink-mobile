@@ -63,6 +63,8 @@ export type PaymentRequestMocks = {
   fetchAutoConvertMinSats: jest.Mock
   useReceiveAssetMode: jest.Mock
   formatMoneyAmount: jest.Mock
+  /** `useLightningAddressGated`, which decides whether the address is offered at all. */
+  lightningAddressGated: jest.Mock
   /** `usePendingDeposits`, which the hook consults before reusing an address. */
   pendingDeposits?: jest.Mock
 }
@@ -95,5 +97,6 @@ export const applyPaymentRequestDefaults = (mocks: PaymentRequestMocks): void =>
     isToggleDisabled: false,
     loading: false,
   })
+  mocks.lightningAddressGated.mockReturnValue(false)
   mocks.pendingDeposits?.mockReturnValue({ deposits: [], refetch: jest.fn() })
 }

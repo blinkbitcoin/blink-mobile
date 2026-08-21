@@ -2502,9 +2502,11 @@ const en: BaseTranslation = {
     apiAcess: "API integration",
     apiDocumentation: "API documentation",
     apiDashboard: "API access and dashboard",
+    mode: "Mode",
     pos: "Point of Sale",
     posCopied: "Your point of sale link has been copied",
     createAddress: "Create address",
+    addressDisabled: "(disabled)",
     donationButton: "Donate Button",
     btcpayServer: "BTCPay Server",
     woocommerce: "WooCommerce",
@@ -2701,6 +2703,20 @@ const en: BaseTranslation = {
   },
   StablesatsRestriction: {
     walletLabel: "not available in your region",
+    anonModeWalletLabel: "not available in Incognito mode",
+  },
+  AnonModeConvertModal: {
+    title: "Transfer your Dollar Balance first",
+    body: "Incognito Mode supports the Bitcoin Balance only. Transfer your Dollar Balance to your Bitcoin Balance to switch.",
+  },
+  EnhancedModePrompt: {
+    title: "This feature requires Enhanced Mode",
+    body: "You're in Incognito Mode, Blink doesn't know your region, so some features aren't available. Switch to Enhanced to run a location check and unlock all features for your region.",
+    switchButton: "Switch to Enhanced",
+  },
+  ModeSwitchSuccessScreen: {
+    enhanced: "Switched to Enhanced\nNon-custodial Mode",
+    anon: "Switched to Incognito\nNon-custodial Mode",
   },
   DollarBalanceRestriction: {
     modalTitle: "Dollar Balance is not available in your region",
@@ -2797,7 +2813,6 @@ const en: BaseTranslation = {
     letsGo: "Let's go!",
     stayInTrialMode: "Stay in trial mode",
     upgradeToLevel: "Upgrade to Level {level: number}",
-    notNow: "Not now",
     setUpLevelAccount: "Set up Level {level: number} account",
   },
   SetAddressModal: {
@@ -2990,6 +3005,7 @@ const en: BaseTranslation = {
     btcAccount: "Bitcoin Balance",
     cancel: "Cancel",
     card: "Card",
+    notNow: "Not now",
     close: "Close",
     confirm: "Confirm",
     convert: "Convert",

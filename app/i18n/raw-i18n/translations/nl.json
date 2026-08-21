@@ -2420,6 +2420,7 @@
   },
   "SettingsScreen": {
     "createAddress": "Adres aanmaken",
+    "addressDisabled": "(uitgeschakeld)",
     "donationButton": "Doneerknop",
     "btcpayServer": "BTCPay Server",
     "woocommerce": "WooCommerce",
@@ -2429,6 +2430,7 @@
     "apiAcess": "API-integratie",
     "apiDocumentation": "API-documentatie",
     "apiDashboard": "API-toegang en dashboard",
+    "mode": "Modus",
     "pos": "Kassasysteem",
     "posCopied": "Je kassasysteem-link is gekopieerd",
     "activated": "Geactiveerd",
@@ -2560,7 +2562,21 @@
     "removedAccount": "Je hebt account {identifier: string} verwijderd."
   },
   "StablesatsRestriction": {
-    "walletLabel": "niet beschikbaar in jouw regio"
+    "walletLabel": "niet beschikbaar in jouw regio",
+    "anonModeWalletLabel": "niet beschikbaar in Incognito-modus"
+  },
+  "AnonModeConvertModal": {
+    "title": "Zet eerst je dollarsaldo over",
+    "body": "De Incognito-modus ondersteunt alleen het Bitcoin-saldo. Zet je dollarsaldo over naar je Bitcoin-saldo om te wisselen."
+  },
+  "EnhancedModePrompt": {
+    "title": "Deze functie vereist de Enhanced-modus",
+    "body": "Je bent in Incognito-modus, Blink kent je regio niet, dus sommige functies zijn niet beschikbaar. Schakel over naar Enhanced om een locatiecontrole uit te voeren en alle functies voor je regio te ontgrendelen.",
+    "switchButton": "Overschakelen naar Enhanced"
+  },
+  "ModeSwitchSuccessScreen": {
+    "enhanced": "Overgeschakeld naar\nzelfbeheerde Enhanced-modus",
+    "anon": "Overgeschakeld naar\nzelfbeheerde Incognito-modus"
   },
   "DollarBalanceRestriction": {
     "modalTitle": "Dollar-saldo is niet beschikbaar in jouw regio"
@@ -2686,7 +2702,6 @@
     "letsGo": "Let's go!",
     "stayInTrialMode": "Blijf in proefmodus",
     "upgradeToLevel": "Upgraden naar niveau {level: number}",
-    "notNow": "Niet nu",
     "setUpLevelAccount": "Niveau {level: number} account instellen"
   },
   "SetAddressModal": {
@@ -2864,6 +2879,7 @@
     "bitcoinPrice": "Bitcoin Prijs",
     "btcAccount": "Bitcoinsaldo",
     "cancel": "Annuleer",
+    "notNow": "Niet nu",
     "card": "Kaart",
     "close": "Sluit",
     "confirm": "Bevestig",

@@ -1,6 +1,16 @@
 import { AccountMode } from "@app/types/account"
 
+import { resolveActiveSelfCustodialId } from "./active-self-custodial-account"
 import { PersistentState } from "./state-migrations"
+
+/** Null when the active account is custodial or has not chosen a mode yet. */
+export const getSelfCustodialAccountMode = (
+  state: PersistentState,
+): AccountMode | null => {
+  const id = resolveActiveSelfCustodialId(state)
+  if (!id) return null
+  return state.selfCustodialAccountModeByAccountId?.[id] ?? null
+}
 
 /**
  * Stores the mode against an explicit account id, like the mnemonic and backup state: at
@@ -18,13 +28,3 @@ export const withSelfCustodialAccountMode = (
     [accountId]: mode,
   },
 })
-
-/**
- * The account's stored mode, or undefined when it never passed the mode screen. Absent is
- * a real state consumers must handle rather than substitute a default for: it is not the
- * same as an explicit choice.
- */
-export const getSelfCustodialAccountMode = (
-  state: PersistentState,
-  accountId: string,
-): AccountMode | undefined => state.selfCustodialAccountModeByAccountId?.[accountId]

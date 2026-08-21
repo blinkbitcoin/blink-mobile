@@ -2420,6 +2420,7 @@
   },
   "SettingsScreen": {
     "createAddress": "Unda anwani",
+    "addressDisabled": "(imezimwa)",
     "donationButton": "Kitufe cha kuchangia",
     "btcpayServer": "BTCPay Server",
     "woocommerce": "WooCommerce",
@@ -2429,6 +2430,7 @@
     "apiAcess": "Ufikiaji wa API",
     "apiDocumentation": "Nyaraka za API",
     "apiDashboard": "Ufikiaji wa API na dashibodi",
+    "mode": "Hali",
     "pos": "Sehemu ya Uuzaji",
     "posCopied": "Kiungo chako cha mauzo kimenakiliwa",
     "activated": "Imewezeshwa",
@@ -2560,7 +2562,21 @@
     "removedAccount": "Umeondoa akaunti {identifier: string}."
   },
   "StablesatsRestriction": {
-    "walletLabel": "haipatikani katika eneo lako"
+    "walletLabel": "haipatikani katika eneo lako",
+    "anonModeWalletLabel": "haipatikani katika hali ya Incognito"
+  },
+  "AnonModeConvertModal": {
+    "title": "Hamisha kwanza salio lako la Dola",
+    "body": "Hali ya Incognito inaauni salio la Bitcoin pekee. Hamisha salio lako la Dola kwenda salio la Bitcoin ili kubadilisha."
+  },
+  "EnhancedModePrompt": {
+    "title": "Kipengele hiki kinahitaji hali ya Enhanced",
+    "body": "Uko katika hali ya Incognito, Blink haijui eneo lako, hivyo baadhi ya vipengele havipatikani. Badilisha kwenda Enhanced ili ukaguzi wa mahali ufanyike na vipengele vyote vya eneo lako vifunguliwe.",
+    "switchButton": "Badilisha kwenda Enhanced"
+  },
+  "ModeSwitchSuccessScreen": {
+    "enhanced": "Umebadilisha kwenda\nhali ya Enhanced isiyohifadhiwa",
+    "anon": "Umebadilisha kwenda\nhali ya Incognito isiyohifadhiwa"
   },
   "DollarBalanceRestriction": {
     "modalTitle": "Salio la dola haipatikani katika eneo lako"
@@ -2686,7 +2702,6 @@
     "letsGo": "Twende!",
     "stayInTrialMode": "Baki kwenye hali ya majaribio",
     "upgradeToLevel": "Boresha hadi Kiwango {level: number}",
-    "notNow": "Si sasa",
     "setUpLevelAccount": "Sanidi akaunti ya Kiwango {level: number}"
   },
   "SetAddressModal": {
@@ -2864,6 +2879,7 @@
     "bitcoinPrice": "Bei ya Bitcoin",
     "btcAccount": "Akaunti ya Bitcoin",
     "cancel": "Futa",
+    "notNow": "Si sasa",
     "card": "Kadi",
     "close": "Funga",
     "confirm": "Thibitisha",

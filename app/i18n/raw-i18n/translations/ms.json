@@ -2420,6 +2420,7 @@
   },
   "SettingsScreen": {
     "createAddress": "Cipta alamat",
+    "addressDisabled": "(dilumpuhkan)",
     "donationButton": "Butang derma",
     "btcpayServer": "BTCPay Server",
     "woocommerce": "WooCommerce",
@@ -2429,6 +2430,7 @@
     "apiAcess": "Integrasi API",
     "apiDocumentation": "Dokumentasi API",
     "apiDashboard": "Akses dan papan pemuka API",
+    "mode": "Mod",
     "pos": "Point of Sale",
     "posCopied": "Pautan Point of Sale anda telah disalin",
     "activated": "Telah diaktifkan",
@@ -2560,7 +2562,21 @@
     "removedAccount": "Anda telah mengalih keluar akaun {identifier: string}."
   },
   "StablesatsRestriction": {
-    "walletLabel": "tidak tersedia di rantau anda"
+    "walletLabel": "tidak tersedia di rantau anda",
+    "anonModeWalletLabel": "tidak tersedia dalam mod Incognito"
+  },
+  "AnonModeConvertModal": {
+    "title": "Pindahkan baki Dolar anda dahulu",
+    "body": "Mod Incognito hanya menyokong baki Bitcoin. Pindahkan baki Dolar anda ke baki Bitcoin untuk bertukar."
+  },
+  "EnhancedModePrompt": {
+    "title": "Ciri ini memerlukan mod Enhanced",
+    "body": "Anda dalam mod Incognito, Blink tidak mengetahui wilayah anda, jadi sesetengah ciri tidak tersedia. Tukar kepada Enhanced untuk menjalankan semakan lokasi dan membuka semua ciri untuk wilayah anda.",
+    "switchButton": "Tukar kepada Enhanced"
+  },
+  "ModeSwitchSuccessScreen": {
+    "enhanced": "Bertukar kepada mod Enhanced\nbukan kustodian",
+    "anon": "Bertukar kepada mod Incognito\nbukan kustodian"
   },
   "DollarBalanceRestriction": {
     "modalTitle": "Baki dolar tidak tersedia di rantau anda"
@@ -2686,7 +2702,6 @@
     "letsGo": "Ok, jom!",
     "stayInTrialMode": "Kekal dalam mode percubaan",
     "upgradeToLevel": "Naik taraf ke Tahap {level: number}",
-    "notNow": "Tidak sekarang",
     "setUpLevelAccount": "Sediakan akaun Tahap {level: number}"
   },
   "SetAddressModal": {
@@ -2864,6 +2879,7 @@
     "bitcoinPrice": "Harga Bitcoin",
     "btcAccount": "Akaun Bitcoin",
     "cancel": "Batal",
+    "notNow": "Tidak sekarang",
     "card": "Kad",
     "close": "Keluar",
     "confirm": "Pasti",

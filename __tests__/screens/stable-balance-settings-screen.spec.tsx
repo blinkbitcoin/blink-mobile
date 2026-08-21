@@ -43,10 +43,11 @@ const mockIsRegionPending = jest.fn(() => false)
 
 jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
   useDollarBalanceRestricted: () => false,
-  useDollarBalanceRestriction: () => ({
-    isRestricted: false,
+  useDollarBalanceGate: () => ({
+    isGated: false,
     isRegionPending: mockIsRegionPending(),
   }),
+  useDollarBalanceGated: () => false,
 }))
 
 jest.mock("@app/utils/toast", () => ({

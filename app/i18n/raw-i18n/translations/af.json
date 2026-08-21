@@ -2420,6 +2420,7 @@
   },
   "SettingsScreen": {
     "createAddress": "Skep adres",
+    "addressDisabled": "(gedeaktiveer)",
     "donationButton": "Skenk-knoppie",
     "btcpayServer": "BTCPay Server",
     "woocommerce": "WooCommerce",
@@ -2429,6 +2430,7 @@
     "apiAcess": "API-integrasie",
     "apiDocumentation": "API-dokumentasie",
     "apiDashboard": "API-toegang en kontroleskerm",
+    "mode": "Modus",
     "pos": "Punt van Verkoop",
     "posCopied": "Jou punt van verkoop-skakel is gekopieer",
     "activated": "Geaktiveer ",
@@ -2560,7 +2562,21 @@
     "removedAccount": "Jy het rekening {identifier: string} verwyder."
   },
   "StablesatsRestriction": {
-    "walletLabel": "nie beskikbaar in jou streek nie"
+    "walletLabel": "nie beskikbaar in jou streek nie",
+    "anonModeWalletLabel": "nie beskikbaar in Incognito-modus nie"
+  },
+  "AnonModeConvertModal": {
+    "title": "Dra eers jou Dollar-saldo oor",
+    "body": "Incognito-modus ondersteun slegs die Bitcoin-saldo. Dra jou Dollar-saldo na jou Bitcoin-saldo oor om oor te skakel."
+  },
+  "EnhancedModePrompt": {
+    "title": "Hierdie funksie vereis Enhanced-modus",
+    "body": "Jy is in Incognito-modus, Blink ken nie jou streek nie, dus is sommige funksies nie beskikbaar nie. Skakel oor na Enhanced om 'n liggingkontrole uit te voer en al die funksies vir jou streek te ontsluit.",
+    "switchButton": "Skakel oor na Enhanced"
+  },
+  "ModeSwitchSuccessScreen": {
+    "enhanced": "Oorgeskakel na Enhanced\nSelf-bewaarde modus",
+    "anon": "Oorgeskakel na Incognito\nSelf-bewaarde modus"
   },
   "DollarBalanceRestriction": {
     "modalTitle": "Dollar-saldo is nie beskikbaar in jou streek nie"
@@ -2686,7 +2702,6 @@
     "letsGo": "Hier gaat ons!",
     "stayInTrialMode": "Bly in die proefopsie",
     "upgradeToLevel": "Opgradeer na Vlak {level: number}",
-    "notNow": "Nie nou nie",
     "setUpLevelAccount": "Stel Vlak {level: number}-rekening op"
   },
   "SetAddressModal": {
@@ -2864,6 +2879,7 @@
     "bitcoinPrice": "Bitcoin-prys ",
     "btcAccount": "Bitcoin-rekening",
     "cancel": "Kanselleer ",
+    "notNow": "Nie nou nie",
     "card": "Kaart",
     "close": "Maak toe",
     "confirm": "Bevestig",

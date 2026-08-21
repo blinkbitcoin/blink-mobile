@@ -3,8 +3,11 @@ import React from "react"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
+import { DisabledFeature } from "@app/components/disabled-feature"
+import { useEnhancedModePrompt } from "@app/components/enhanced-mode-prompt"
 import { useFeatureFlags } from "@app/config/feature-flags-context"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
+import { useSelfCustodialAccountMode } from "@app/self-custodial/hooks/use-self-custodial-account-mode"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { AccountType } from "@app/types/wallet"
@@ -16,15 +19,23 @@ export const StableBalanceSetting: React.FC = () => {
   const { navigate } = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { activeAccount } = useAccountRegistry()
   const { nonCustodialEnabled, stableBalanceEnabled } = useFeatureFlags()
+  const { isAnonMode } = useSelfCustodialAccountMode()
+  const { promptEnhancedMode } = useEnhancedModePrompt()
 
   if (!nonCustodialEnabled || !stableBalanceEnabled) return null
   if (activeAccount?.type !== AccountType.SelfCustodial) return null
 
   return (
-    <SettingsRow
-      title={LL.StableBalance.settingsRowTitle()}
-      leftGaloyIcon="dollar"
-      action={() => navigate("stableBalanceSettings")}
-    />
+    <DisabledFeature
+      disabled={isAnonMode}
+      onDisabledPress={promptEnhancedMode}
+      accessibilityLabel={LL.StableBalance.settingsRowTitle()}
+    >
+      <SettingsRow
+        title={LL.StableBalance.settingsRowTitle()}
+        leftGaloyIcon="dollar"
+        action={() => navigate("stableBalanceSettings")}
+      />
+    </DisabledFeature>
   )
 }

@@ -44,6 +44,7 @@ import {
   saveIssuedOnchainAddress,
 } from "../storage/onchain-address"
 
+import { useLightningAddressGated } from "./use-lightning-address-gate"
 import { usePendingDeposits } from "./use-pending-deposits"
 import { useReceiveAssetMode } from "./use-receive-asset-mode"
 import type { InvoiceData, SelfCustodialPaymentRequestState } from "./types"
@@ -121,6 +122,7 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
     isToggleDisabled: isAssetToggleDisabled,
     loading: isAssetModeLoading,
   } = useReceiveAssetMode()
+  const isLightningAddressGated = useLightningAddressGated()
 
   const btcWallet = wallets.find((w) => w.walletCurrency === WalletCurrency.Btc)
   const usdWallet = wallets.find((w) => w.walletCurrency === WalletCurrency.Usd)
@@ -128,7 +130,9 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
   const parsedLnAddress = lightningAddress
     ? lnurlUtils.parseLightningAddress(lightningAddress)
     : null
-  const canUsePaycode = Boolean(parsedLnAddress)
+  /** The one gate on the address as a receive method: it drives the initial snap to
+   *  PayCode, every later transition back to it, and the QR the screen offers. */
+  const canUsePaycode = Boolean(parsedLnAddress) && !isLightningAddressGated
   const lnAddressUsername = parsedLnAddress?.username ?? ""
   const lnAddressHostname = parsedLnAddress?.domain ?? ""
 
@@ -325,6 +329,19 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
     if (shouldUsePaycode) setType(Invoice.PayCode)
     setTypeInitialized(true)
   }, [typeInitialized, canUsePaycode, assetMode, amount, memoChangeText, memo])
+
+  /**
+   * An address withheld while it is the displayed method has to be given up, not merely
+   * left unselected: generateRequest bails on PayCode, so a type parked there would keep
+   * an unpayable address on screen with no invoice ever replacing it.
+   *
+   * Keyed on the gate rather than on canUsePaycode, which also drops while the address is
+   * still resolving — the provider clears it on every account switch. Reacting to that
+   * would trade a momentary blank for a session stuck on invoices.
+   */
+  useEffect(() => {
+    if (isLightningAddressGated && type === Invoice.PayCode) setType(Invoice.Lightning)
+  }, [isLightningAddressGated, type])
 
   useEffect(() => {
     if (isSameGeneration(attemptedRef.current, generation)) return

@@ -15,7 +15,7 @@ import {
   type WalletBalance,
 } from "@app/graphql/wallets-utils"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
-import { useDollarBalanceRestriction } from "@app/hooks/use-dollar-balance-restricted"
+import { useDollarBalanceGate } from "@app/hooks/use-dollar-balance-restricted"
 import { usePersistentStateContext } from "@app/store/persistent-state"
 import { getSelfCustodialDefaultCurrency } from "@app/store/persistent-state/self-custodial-default-currency"
 import { type WalletState } from "@app/types/wallet"
@@ -55,8 +55,7 @@ export const useSendWallets = (): SendWallets => {
   const activeWallet = useActiveWallet()
   const { isSelfCustodial } = activeWallet
   const { persistentState } = usePersistentStateContext()
-  const { isRestricted: isDollarBalanceRestricted, isRegionPending } =
-    useDollarBalanceRestriction()
+  const { isGated: isDollarBalanceGated, isRegionPending } = useDollarBalanceGate()
 
   const { data, loading: custodialLoading } = useSendBitcoinDetailsScreenQuery({
     fetchPolicy: "cache-first",
@@ -90,7 +89,7 @@ export const useSendWallets = (): SendWallets => {
       loading: isSelfCustodialWalletLoading,
       isSelfCustodial: true,
     }
-    return restrictToBitcoinWhenBlocked(result, isDollarBalanceRestricted)
+    return restrictToBitcoinWhenBlocked(result, isDollarBalanceGated)
   }
 
   const custodialWallets = data?.me?.defaultAccount?.wallets
@@ -107,7 +106,7 @@ export const useSendWallets = (): SendWallets => {
     loading: isCustodialWalletLoading,
     isSelfCustodial: false,
   }
-  return restrictToBitcoinWhenBlocked(result, isDollarBalanceRestricted)
+  return restrictToBitcoinWhenBlocked(result, isDollarBalanceGated)
 }
 
 export const useSendBalances = (): {

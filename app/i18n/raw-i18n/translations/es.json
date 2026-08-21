@@ -2420,6 +2420,7 @@
     },
     "SettingsScreen": {
         "createAddress": "Crear dirección",
+        "addressDisabled": "(desactivada)",
         "donationButton": "Botón Donar",
         "btcpayServer": "BTCPay Server",
         "woocommerce": "WooCommerce",
@@ -2429,6 +2430,7 @@
         "apiAcess": "Integración de API",
         "apiDocumentation": "Documentación de la API",
         "apiDashboard": "Acceso a la API y panel de control",
+        "mode": "Modo",
         "pos": "Punto de venta",
         "posCopied": "Su enlace de punto de venta ha sido copiado",
         "activated": "Activada",
@@ -2560,7 +2562,21 @@
         "removedAccount": "Eliminaste la cuenta {identifier: string}."
     },
     "StablesatsRestriction": {
-        "walletLabel": "no está disponible en tu región"
+        "walletLabel": "no está disponible en tu región",
+        "anonModeWalletLabel": "no disponible en modo Incognito"
+    },
+    "AnonModeConvertModal": {
+        "title": "Transfiere primero tu saldo en dólares",
+        "body": "El modo Incognito solo admite el saldo en Bitcoin. Transfiere tu saldo en dólares a tu saldo en Bitcoin para cambiarte."
+    },
+    "EnhancedModePrompt": {
+        "title": "Esta función requiere el modo Enhanced",
+        "body": "Estás en modo Incognito, Blink no conoce tu región, así que algunas funciones no están disponibles. Cambia a Enhanced para ejecutar una verificación de ubicación y desbloquear todas las funciones para tu región.",
+        "switchButton": "Cambiar a Enhanced"
+    },
+    "ModeSwitchSuccessScreen": {
+        "enhanced": "Cambiaste al modo Enhanced\nno custodiado",
+        "anon": "Cambiaste al modo Incognito\nno custodiado"
     },
     "DollarBalanceRestriction": {
         "modalTitle": "El saldo en dólares no está disponible en tu región"
@@ -2686,7 +2702,6 @@
         "letsGo": "¡Vamos!",
         "stayInTrialMode": "Permanecer en modo de prueba",
         "upgradeToLevel": "Actualizar al Nivel {level: number}",
-        "notNow": "Ahora no",
         "setUpLevelAccount": "Configurar cuenta Nivel {level: number}"
     },
     "SetAddressModal": {
@@ -2863,6 +2878,7 @@
         "bitcoinPrice": "Precio de Bitcoin",
         "btcAccount": "Saldo Bitcoin",
         "cancel": "Cancelar",
+        "notNow": "Ahora no",
         "card": "Tarjeta",
         "close": "Cerrar ",
         "confirm": "Confirmar",

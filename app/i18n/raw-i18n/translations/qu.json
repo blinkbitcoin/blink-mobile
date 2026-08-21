@@ -2420,6 +2420,7 @@
   },
   "SettingsScreen": {
     "createAddress": "Tinkunata ruray",
+    "addressDisabled": "(mana atikuq)",
     "donationButton": "Qaray ñit'ana",
     "btcpayServer": "BTCPay Server",
     "woocommerce": "WooCommerce",
@@ -2429,6 +2430,7 @@
     "apiAcess": "API tinkiy",
     "apiDocumentation": "API qillqasqa",
     "apiDashboard": "API yaykuna dashboard nisqapas",
+    "mode": "Modo",
     "pos": "Rantikuna",
     "posCopied": "Rantikuna t'inkiykita copiasqañam",
     "activated": "Kawsayniyta rikuchiykachkanki",
@@ -2560,7 +2562,21 @@
     "removedAccount": "{identifier: string} cuentata qichurqanki."
   },
   "StablesatsRestriction": {
-    "walletLabel": "mana kapunchu suyuykipi"
+    "walletLabel": "mana kapunchu suyuykipi",
+    "anonModeWalletLabel": "mana Incognito modopi kanchu"
+  },
+  "AnonModeConvertModal": {
+    "title": "Ñawpaqta Dolar qullqiykita astay",
+    "body": "Incognito modoqa Bitcoin qullqillata sayachin. Dolar qullqiykita Bitcoin qullqiman astay tikranaykipaq."
+  },
+  "EnhancedModePrompt": {
+    "title": "Kay ruray Enhanced modota munan",
+    "body": "Incognito modopi kachkanki, Blink mana region-niykita riqsinchu, chaymi wakin ruraykunaqa mana kanchu. Enhanced-man tikray kiti qhawayta ruranapaq, hinaspa region-niykipaq llapan ruraykunata kichananpaq.",
+    "switchButton": "Enhanced-man tikray"
+  },
+  "ModeSwitchSuccessScreen": {
+    "enhanced": "Enhanced mana waqaychasqa\nmodoman tikrasqa",
+    "anon": "Incognito mana waqaychasqa\nmodoman tikrasqa"
   },
   "DollarBalanceRestriction": {
     "modalTitle": "Dólar saldoqa mana kapunchu suyuykipi"
@@ -2686,7 +2702,6 @@
     "letsGo": "Let's go!",
     "stayInTrialMode": "Stay in trial mode",
     "upgradeToLevel": "Nivel {level: number} man huñachiy",
-    "notNow": "Mana kunan",
     "setUpLevelAccount": "Nivel {level: number} cuentata wakichiy"
   },
   "SetAddressModal": {
@@ -2864,6 +2879,7 @@
     "bitcoinPrice": "Bitcoin qillqa k'iru",
     "btcAccount": "Bitcoin qillqa sutiyuq",
     "cancel": "T'akuy",
+    "notNow": "Mana kunan",
     "card": "Tarjeta",
     "close": "Umiy",
     "confirm": "Riqsichiy",

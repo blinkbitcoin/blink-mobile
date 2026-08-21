@@ -93,7 +93,7 @@ describe("LightningBenefitsScreen", () => {
       </ContextForScreen>,
     )
 
-    fireEvent.press(getByText(LL.UpgradeAccountModal.notNow()))
+    fireEvent.press(getByText(LL.common.notNow()))
     expect(mockNavigate).toHaveBeenCalledWith("onboarding", { screen: "supportScreen" })
   })
 
@@ -105,6 +105,6 @@ describe("LightningBenefitsScreen", () => {
     )
 
     expect(getByText(LL.OnboardingScreen.lightningBenefits.primaryButton())).toBeTruthy()
-    expect(getByText(LL.UpgradeAccountModal.notNow())).toBeTruthy()
+    expect(getByText(LL.common.notNow())).toBeTruthy()
   })
 })

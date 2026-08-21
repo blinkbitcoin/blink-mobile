@@ -146,6 +146,7 @@ import {
   ChooseExperienceScreen,
   WalletCreationScreen,
 } from "@app/screens/self-custodial/onboarding"
+import { ModeSwitchSuccessScreen } from "@app/screens/self-custodial/mode-switch-success-screen"
 import {
   RestoreMethodScreen,
   RestorePhraseScreen,
@@ -210,7 +211,11 @@ const chooseExperienceOptions = ({
 }: {
   route: RouteProp<RootStackParamList, "selfCustodialChooseExperience">
 }) => {
-  const canGoBack = canGoBackFromChooseExperience(route.params.onContinue)
+  const { params } = route
+  /** The settings entry carries no onward step, and it is the one entry that opened this
+   *  screen over a live session, so it keeps its way back. */
+  const onContinue = "onContinue" in params ? params.onContinue : null
+  const canGoBack = canGoBackFromChooseExperience(onContinue)
 
   return {
     title: "",
@@ -913,6 +918,11 @@ export const RootStack = () => {
         name="selfCustodialChooseExperience"
         component={ChooseExperienceScreen}
         options={chooseExperienceOptions}
+      />
+      <RootNavigator.Screen
+        name="selfCustodialModeSwitchSuccess"
+        component={ModeSwitchSuccessScreen}
+        options={{ headerShown: false }}
       />
       <RootNavigator.Screen
         name="selfCustodialWalletCreation"
