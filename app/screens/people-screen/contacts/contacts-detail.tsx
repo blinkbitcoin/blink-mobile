@@ -80,6 +80,7 @@ const useStyles = makeStyles(() => ({
     flex: 1,
     gap: 14,
     paddingHorizontal: 20,
+    paddingTop: 20,
   },
 
   sendContainer: {
