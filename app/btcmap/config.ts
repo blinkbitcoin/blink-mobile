@@ -6,6 +6,10 @@ export const BTCMAP_PLACES_CDN_URL = "https://cdn.static.btcmap.org/api/v4/place
 export const BTCMAP_API_BASE_URL = "https://api.btcmap.org/v4"
 export const BTCMAP_SITE_URL = "https://btcmap.org"
 
+// Where the ODbL credit points. OSM asks that the licence be one tap from
+// the data, and this is the page they nominate for it.
+export const OSM_COPYRIGHT_URL = "https://www.openstreetmap.org/copyright"
+
 // The v4 list endpoint caps a page at this many rows.
 export const BTCMAP_PAGE_SIZE = 5000
 

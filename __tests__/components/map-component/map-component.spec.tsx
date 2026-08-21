@@ -2,7 +2,7 @@ import React from "react"
 import { Region } from "react-native-maps"
 import { act, fireEvent, render, waitFor } from "@testing-library/react-native"
 
-import { BtcMapPlace, useBtcMapPlaces } from "@app/btcmap"
+import { BtcMapPlace, useBtcMapPlaceNames, useBtcMapPlaces } from "@app/btcmap"
 import MapComponent from "@app/components/map-component"
 import MapStyles from "@app/components/map-component/map-styles.json"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
@@ -13,6 +13,8 @@ import { ContextForScreen } from "../../screens/helper"
 const mockRefresh = jest.fn()
 
 jest.mock("@app/btcmap/use-places", () => ({ useBtcMapPlaces: jest.fn() }))
+
+jest.mock("@app/btcmap/use-place-names", () => ({ useBtcMapPlaceNames: jest.fn() }))
 
 jest.mock("@app/screens/map-screen/functions", () => ({
   LOCATION_PERMISSION: "LOCATION",
@@ -81,6 +83,7 @@ jest.mock("@app/components/map-component/category-filter-sheet", () => ({
 }))
 
 const mockedPlaces = useBtcMapPlaces as jest.MockedFunction<typeof useBtcMapPlaces>
+const mockedNames = useBtcMapPlaceNames as jest.MockedFunction<typeof useBtcMapPlaceNames>
 const mockedGetUserRegion = getUserRegion as jest.MockedFunction<typeof getUserRegion>
 
 const REGION: Region = {
@@ -126,7 +129,19 @@ beforeEach(() => {
   capturedFilterProps = undefined
   capturedMapProps = undefined
   setPlaces()
+  mockedNames.mockReturnValue(new Map())
 })
+
+// The map is measured before anything can be placed in it, and the placement
+// works in the view's own pixels — so a test that wants labels has to lay it out.
+const layOutMap = async (width = 384, height = 720) => {
+  await waitFor(() => expect(capturedMapProps?.onLayout).toBeDefined())
+  await act(async () => {
+    ;(capturedMapProps?.onLayout as (event: unknown) => void)({
+      nativeEvent: { layout: { width, height, x: 0, y: 0 } },
+    })
+  })
+}
 
 describe("MapComponent", () => {
   it("says it is loading only while there is nothing to show", async () => {
@@ -154,14 +169,14 @@ describe("MapComponent", () => {
     expect(mockRefresh).toHaveBeenCalled()
   })
 
-  it("credits OpenStreetMap, which the data's licence requires", async () => {
-    const { getByText } = renderMap()
+  it("keeps the licence credit off the map, where a large font swallowed it", async () => {
+    // It is a chip at a fixed 11pt no longer: at the system's largest font size
+    // it grew over the streets it was crediting. The credit now reads as a
+    // footnote at the foot of the place sheet, where it has room to grow — see
+    // place-sheet.spec.tsx.
+    const { queryByText } = renderMap()
 
-    await waitFor(() =>
-      expect(
-        getByText("Places from BTC Map, © OpenStreetMap contributors"),
-      ).toBeTruthy(),
-    )
+    await waitFor(() => expect(queryByText(/OpenStreetMap/)).toBeNull())
   })
 
   it("draws a pin for each place the clusterer resolves", async () => {
@@ -170,6 +185,116 @@ describe("MapComponent", () => {
 
     await waitFor(() => expect(getByTestId("btcmap-place-1")).toBeTruthy())
     expect(getByTestId("btcmap-place-2")).toBeTruthy()
+  })
+
+  it("labels a place whose name has arrived, beside its pin", async () => {
+    const shop = place(1)
+    setPlaces({ places: [shop] })
+    mockedNames.mockReturnValue(new Map([[shop.id, "Pupusería Victoria"]]))
+
+    const { getByTestId } = renderMap()
+    await layOutMap()
+
+    expect(getByTestId("btcmap-label-1")).toBeTruthy()
+  })
+
+  it("drops the names that would land on each other, keeping the pins", async () => {
+    // Two merchants eleven metres apart — the density of Berlín, SV, where every
+    // name overlapped its neighbours into noise. Both pins must still draw: it
+    // is the name that loses a collision, never the merchant.
+    const near = { latitude: 51.5, longitude: -0.12, icon: "local_cafe" }
+    const places = [
+      { ...near, id: 1 },
+      { ...near, id: 2, latitude: 51.5001 },
+    ]
+    setPlaces({ places })
+    mockedNames.mockReturnValue(
+      new Map([
+        [1, "Pupusería Victoria"],
+        [2, "Tienda Maxim"],
+      ]),
+    )
+
+    const { getByTestId, queryByTestId } = renderMap()
+    await layOutMap()
+
+    expect(getByTestId("btcmap-place-1")).toBeTruthy()
+    expect(getByTestId("btcmap-place-2")).toBeTruthy()
+
+    const labelled = [1, 2].filter((id) => queryByTestId(`btcmap-label-${id}`))
+    expect(labelled).toHaveLength(1)
+  })
+
+  it("labels both when there is room for both", async () => {
+    // The same two names, a third of the viewport apart rather than a hair.
+    const places = [
+      { id: 1, latitude: 51.5, longitude: -0.12, icon: "local_cafe" },
+      { id: 2, latitude: 51.4945, longitude: -0.126, icon: "local_cafe" },
+    ]
+    setPlaces({ places })
+    mockedNames.mockReturnValue(
+      new Map([
+        [1, "Pupusería Victoria"],
+        [2, "Tienda Maxim"],
+      ]),
+    )
+
+    const { getByTestId } = renderMap()
+    await layOutMap()
+
+    expect(getByTestId("btcmap-label-1")).toBeTruthy()
+    expect(getByTestId("btcmap-label-2")).toBeTruthy()
+  })
+
+  it("cuts a long name down rather than drawing it across the map", async () => {
+    const shop = place(1)
+    setPlaces({ places: [shop] })
+    mockedNames.mockReturnValue(new Map([[shop.id, "Pupusería Victoria"]]))
+
+    const { getByText, queryByText } = renderMap()
+    await layOutMap()
+
+    expect(getByText("Pupusería Victor\u2026")).toBeTruthy()
+    expect(queryByText("Pupusería Victoria")).toBeNull()
+  })
+
+  it("reserves for a shortened name only the strip it draws in", async () => {
+    // The collision pass and the view have to be handed the same string. Given
+    // the whole name the pass measures a box that clamps to the widest a label
+    // may be and takes that strip away from the neighbour — while the view
+    // draws sixteen characters and leaves most of it empty.
+    //
+    // These two sit 100dp apart at this region's scale: wider than the box a
+    // sixteen-character name needs, narrower than the one the full name claims.
+    // Truncate in only one of the two places and the second name disappears.
+    const dpToLongitude = REGION.longitudeDelta / 384
+    const places = [
+      {
+        id: 1,
+        latitude: REGION.latitude,
+        longitude: REGION.longitude - 50 * dpToLongitude,
+        icon: "local_cafe",
+      },
+      {
+        id: 2,
+        latitude: REGION.latitude,
+        longitude: REGION.longitude + 50 * dpToLongitude,
+        icon: "local_cafe",
+      },
+    ]
+    setPlaces({ places })
+    mockedNames.mockReturnValue(
+      new Map([
+        [1, "l".repeat(60)],
+        [2, "l".repeat(60)],
+      ]),
+    )
+
+    const { getByTestId } = renderMap()
+    await layOutMap()
+
+    expect(getByTestId("btcmap-label-1")).toBeTruthy()
+    expect(getByTestId("btcmap-label-2")).toBeTruthy()
   })
 
   it("opens the sheet on the place that was tapped", async () => {
@@ -405,6 +530,38 @@ describe("MapComponent basemap", () => {
       expect(hides("poi", "labels")).toBe(true)
       expect(hides("poi.business")).toBe(true)
       expect(hides("transit", "labels")).toBe(true)
+    }
+  })
+
+  it("quiets the street names the merchant labels have to be read against", () => {
+    // Every side street carrying its name is the layer our own labels compete
+    // with hardest — same size, same weight, drawn underneath and everywhere.
+    // Highways keep theirs: with nothing named at all the map stops being
+    // navigable, and a motorway label is rare enough not to crowd a merchant.
+    //
+    // Android only. iOS draws Apple Maps, which ignores this style sheet and
+    // offers no equivalent, so street names stay there — `showsPointsOfInterests`
+    // is the only label control MapKit exposes and it does not reach roads.
+    type Rule = {
+      featureType?: string
+      elementType?: string
+      stylers: Record<string, string>[]
+    }
+    const themes: Rule[][] = [MapStyles.light, MapStyles.dark]
+
+    for (const rules of themes) {
+      const hides = (featureType: string) =>
+        rules.some(
+          (rule) =>
+            rule.featureType === featureType &&
+            rule.elementType === "labels" &&
+            rule.stylers.some((styler) => styler.visibility === "off"),
+        )
+
+      expect(hides("road.local")).toBe(true)
+      expect(hides("road.arterial")).toBe(true)
+      expect(hides("road")).toBe(false)
+      expect(hides("road.highway")).toBe(false)
     }
   })
 })
