@@ -3,6 +3,8 @@ import { useCallback, useEffect, useRef } from "react"
 import { Linking } from "react-native"
 import RNBootSplash from "react-native-bootsplash"
 
+import { bootSplashGate } from "./boot-splash-gate"
+
 import analytics from "@react-native-firebase/analytics"
 import {
   createNavigationContainerRef,
@@ -326,7 +328,9 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
         {...(mode === "dark" ? { theme: DarkTheme } : {})}
         linking={linking}
         onReady={() => {
-          RNBootSplash.hide({ fade: true })
+          /** Cold-start gates (restricted-region verdict) may still be resolving; the
+           *  gate self-releases at its cap, so this can never defer the hide unbounded. */
+          bootSplashGate.whenReleased().then(() => RNBootSplash.hide({ fade: true }))
           console.log("NavigationContainer onReady")
           /** Cold-started already gated: reset now that the container is ready, since the
            *  effect above may have run before isReady() turned true. */

@@ -3,6 +3,8 @@ import React from "react"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
+import { DisabledFeature } from "@app/components/disabled-feature"
+import { useRestrictedRegion } from "@app/components/restricted-region"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useSelfCustodialAccountMode } from "@app/self-custodial/hooks/use-self-custodial-account-mode"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -21,6 +23,7 @@ export const AccountModeSetting: React.FC = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { activeAccount } = useAccountRegistry()
   const { accountMode } = useSelfCustodialAccountMode()
+  const { isRestrictedRegion, presentRestrictedRegionModal } = useRestrictedRegion()
 
   const isSelfCustodial = activeAccount?.type === AccountType.SelfCustodial
   if (!isSelfCustodial) return null
@@ -33,5 +36,14 @@ export const AccountModeSetting: React.FC = () => {
       entry: ChooseExperienceEntry.Settings,
     })
 
-  return <SettingsRow title={title} leftGaloyIcon="spinner" action={openModeSelection} />
+  /** Switching modes is blocked while the region is restricted. */
+  return (
+    <DisabledFeature
+      disabled={isRestrictedRegion}
+      onDisabledPress={presentRestrictedRegionModal}
+      accessibilityLabel={title}
+    >
+      <SettingsRow title={title} leftGaloyIcon="spinner" action={openModeSelection} />
+    </DisabledFeature>
+  )
 }

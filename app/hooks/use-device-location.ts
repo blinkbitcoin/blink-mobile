@@ -206,10 +206,10 @@ export const useIpCountryLookup = (enabled: boolean): IpCountryLookup => {
 
   const isLookupSettled = !isLookupEnabled || hasLookupFinished
 
-  /** Both fields derive from `isLookupEnabled` in the same render: the effect clears the
-   *  stored country a commit later, and returning it in between would leak a stale country
-   *  as a settled verdict on the render where the lookup disables (e.g. entering Anon
-   *  right after a resolve). */
+  /** Both fields derive from `isLookupEnabled` in the same render: the effect clears
+   *  the stored country a commit later, and returning it in between would leak a
+   *  stale country as a settled verdict on the render where the lookup disables
+   *  (e.g. entering Anon right after a resolve). */
   return {
     countryCode: isLookupEnabled ? ipCountryCode : undefined,
     isSettled: isLookupSettled,

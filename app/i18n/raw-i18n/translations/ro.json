@@ -2578,6 +2578,13 @@
     "enhanced": "Ai trecut la modul Enhanced\nfără custodie",
     "anon": "Ai trecut la modul Incognito\nfără custodie"
   },
+  "RestrictedRegion": {
+    "title": "Regiune restricționată detectată",
+    "body": "Conexiunea ta pare să provină dintr-o regiune restricționată. Blink nu poate furniza servicii din această locație. Soldurile tale nu sunt afectate.",
+    "bodyReturn": "Odată ce părăsești această regiune, toate funcțiile vor reveni la normal.",
+    "learnMore": "Află mai multe",
+    "contactSupport": "Contactează asistența"
+  },
   "DollarBalanceRestriction": {
     "modalTitle": "Soldul în dolari nu este disponibil în regiunea ta"
   },

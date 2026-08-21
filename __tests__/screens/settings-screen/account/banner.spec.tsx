@@ -32,14 +32,24 @@ jest.mock("@app/hooks", () => ({
   useClipboard: () => ({ copyToClipboard: mockCopyToClipboard }),
 }))
 
+let mockIsAnonMode = false
+jest.mock("@app/self-custodial/hooks/use-self-custodial-account-mode", () => ({
+  useSelfCustodialAccountMode: () => ({ isAnonMode: mockIsAnonMode }),
+}))
+
 const mockPromptEnhancedMode = jest.fn()
 jest.mock("@app/components/enhanced-mode-prompt", () => ({
   useEnhancedModePrompt: () => ({ promptEnhancedMode: mockPromptEnhancedMode }),
 }))
 
-let mockIsAnonMode = false
-jest.mock("@app/self-custodial/hooks/use-self-custodial-account-mode", () => ({
-  useSelfCustodialAccountMode: () => ({ isAnonMode: mockIsAnonMode }),
+let mockIsRestrictedRegion = false
+const mockPresentRestrictedRegionModal = jest.fn()
+jest.mock("@app/components/restricted-region", () => ({
+  useRestrictedRegion: () => ({
+    isRestrictedRegion: mockIsRestrictedRegion,
+    isRestrictedRegionModalVisible: false,
+    presentRestrictedRegionModal: mockPresentRestrictedRegionModal,
+  }),
 }))
 
 const mockUseSettingsScreenQuery = jest.fn()
@@ -58,14 +68,6 @@ jest.mock("@app/graphql/level-context", () => ({
   AccountLevel: { NonAuth: "NonAuth", One: "One" },
   useLevel: () => ({ currentLevel: mockCurrentLevel }),
 }))
-
-/** Rendered by name so a missing copy affordance is an absent node, not a styled one. */
-jest.mock("@app/components/atomic/galoy-icon", () => {
-  const { View } = jest.requireActual("react-native")
-  return {
-    GaloyIcon: ({ name }: { name: string }) => <View testID={`galoy-icon-${name}`} />,
-  }
-})
 
 import { AccountBanner } from "@app/screens/settings-screen/account/banner"
 
@@ -87,8 +89,7 @@ describe("SelfCustodialAccountBanner", () => {
     mockActiveAccountType = "self-custodial"
     mockLightningAddress = "satoshi@blink.sv"
     mockIsAnonMode = false
-    mockIsAuthed = false
-    mockCurrentLevel = "NonAuth"
+    mockIsRestrictedRegion = false
     mockUseSettingsScreenQuery.mockReturnValue({ data: undefined, loading: false })
   })
 
@@ -103,56 +104,48 @@ describe("SelfCustodialAccountBanner", () => {
     })
   })
 
-  it("offers the copy affordance and no suffix outside Incognito", () => {
-    const { getByText, queryByTestId } = renderBanner()
-
-    expect(getByText("satoshi@blink.sv")).toBeTruthy()
-    expect(queryByTestId("galoy-icon-copy-paste")).toBeTruthy()
-  })
-
-  /** Incognito cannot receive, so the address reads as disabled and loses the copy icon
-   *  rather than being offered as one that could be paid. */
-  it("marks the address disabled and drops the copy icon in Incognito", () => {
+  /** Incognito drops the copy affordance outright, rather than dimming it: the address
+   *  cannot receive at all there, so there is nothing worth copying. A restricted region
+   *  only dims it, since that same address pays again once the user leaves. */
+  it("prompts Enhanced Mode instead of copying in Incognito", () => {
     mockIsAnonMode = true
 
     const { getByText, queryByTestId } = renderBanner()
 
-    /** The gate hides the row's own labels from screen readers and stands in for them, so
-     *  the text is still on screen but no longer part of the accessibility tree. */
-    expect(
-      getByText(`satoshi@blink.sv ${LL.SettingsScreen.addressDisabled()}`, {
-        includeHiddenElements: true,
-      }),
-    ).toBeTruthy()
-    expect(queryByTestId("galoy-icon-copy-paste")).toBeNull()
-  })
-
-  /** The row must not keep copying behind a label that says it cannot receive. The gate
-   *  swallows the touch, so the tap lands on the wrapper rather than the row beneath it. */
-  it("does not copy on tap in Incognito", () => {
-    mockIsAnonMode = true
-
-    const { getByLabelText } = renderBanner()
-
-    fireEvent.press(
-      getByLabelText(`satoshi@blink.sv ${LL.SettingsScreen.addressDisabled()}`),
-    )
-
-    expect(mockCopyToClipboard).not.toHaveBeenCalled()
-  })
-
-  /** Every other gated surface explains itself when tapped. This row dropped its handler
-   *  instead, so it kept the press animation and answered with nothing. */
-  it("opens the Enhanced prompt when the gated row is tapped", () => {
-    mockIsAnonMode = true
-
-    const { getByLabelText } = renderBanner()
-
-    fireEvent.press(
-      getByLabelText(`satoshi@blink.sv ${LL.SettingsScreen.addressDisabled()}`),
-    )
+    fireEvent.press(getByText(`satoshi@blink.sv ${LL.SettingsScreen.addressDisabled()}`))
 
     expect(mockPromptEnhancedMode).toHaveBeenCalledTimes(1)
+    expect(mockCopyToClipboard).not.toHaveBeenCalled()
+    expect(queryByTestId("account-banner-copy")).toBeNull()
+  })
+
+  it("marks the address disabled in Incognito", () => {
+    mockIsAnonMode = true
+
+    const { getByText } = renderBanner()
+
+    expect(
+      getByText(`satoshi@blink.sv ${LL.SettingsScreen.addressDisabled()}`),
+    ).toBeTruthy()
+  })
+
+  it("opens the restricted-region modal instead of copying while restricted", () => {
+    mockIsRestrictedRegion = true
+
+    const { getByText, getByTestId } = renderBanner()
+
+    fireEvent.press(getByText("satoshi@blink.sv"))
+
+    expect(mockPresentRestrictedRegionModal).toHaveBeenCalledTimes(1)
+    expect(mockPromptEnhancedMode).not.toHaveBeenCalled()
+    expect(mockCopyToClipboard).not.toHaveBeenCalled()
+    expect(getByTestId("account-banner-copy").props.style).toEqual({ opacity: 0.5 })
+  })
+
+  it("keeps the copy icon at full opacity when nothing gates it", () => {
+    const { getByTestId } = renderBanner()
+
+    expect(getByTestId("account-banner-copy").props.style).toBeFalsy()
   })
 
   it("leaves the prompt alone outside Incognito", () => {
@@ -169,5 +162,67 @@ describe("SelfCustodialAccountBanner", () => {
     const { toJSON } = renderBanner()
 
     expect(toJSON()).toBeNull()
+  })
+})
+
+describe("CustodialAccountBanner", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockActiveAccountType = "custodial"
+    mockIsAuthed = true
+    mockCurrentLevel = "One"
+    mockUseSettingsScreenQuery.mockReturnValue({
+      data: { me: { username: "test1" } },
+      loading: false,
+    })
+  })
+
+  it("shows the lightning address for a logged-in user with a username", () => {
+    const { getByText } = renderBanner()
+
+    expect(getByText("test1@blink.sv")).toBeTruthy()
+  })
+
+  it("falls back to the generic user label without a username", () => {
+    mockUseSettingsScreenQuery.mockReturnValue({
+      data: { me: { username: null } },
+      loading: false,
+    })
+
+    const { getByText } = renderBanner()
+
+    expect(getByText(LL.common.blinkUser())).toBeTruthy()
+  })
+
+  it("offers login and resets to get-started when logged out", () => {
+    mockIsAuthed = false
+    mockCurrentLevel = "NonAuth"
+    mockUseSettingsScreenQuery.mockReturnValue({ data: undefined, loading: false })
+
+    const { getByText } = renderBanner()
+
+    fireEvent.press(getByText(LL.SettingsScreen.logInOrCreateAccount()))
+
+    expect(mockNavigationReset).toHaveBeenCalledWith({
+      index: 0,
+      routes: [{ name: "getStarted" }],
+    })
+  })
+
+  it("does not reset navigation when a logged-in user taps the banner", () => {
+    const { getByText } = renderBanner()
+
+    fireEvent.press(getByText("test1@blink.sv"))
+
+    expect(mockNavigationReset).not.toHaveBeenCalled()
+  })
+
+  it("shows a skeleton while the query loads", () => {
+    mockUseSettingsScreenQuery.mockReturnValue({ data: undefined, loading: true })
+
+    const { queryByText, toJSON } = renderBanner()
+
+    expect(queryByText(LL.common.blinkUser())).toBeNull()
+    expect(toJSON()).not.toBeNull()
   })
 })

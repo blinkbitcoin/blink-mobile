@@ -2578,6 +2578,13 @@
     "enhanced": "Prebačeno na Enhanced način\nbez skrbništva",
     "anon": "Prebačeno na Incognito način\nbez skrbništva"
   },
+  "RestrictedRegion": {
+    "title": "Otkrivena je ograničena regija",
+    "body": "Čini se da vaša veza dolazi iz ograničene regije. Blink ne može pružati usluge s ove lokacije. Vaša stanja nisu pogođena.",
+    "bodyReturn": "Čim napustite ovu regiju, sve će funkcije ponovno raditi normalno.",
+    "learnMore": "Saznajte više",
+    "contactSupport": "Kontaktirajte podršku"
+  },
   "DollarBalanceRestriction": {
     "modalTitle": "Dolarski saldo nije dostupan u vašoj regiji"
   },

@@ -2578,6 +2578,13 @@
     "enhanced": "Přepnuto na režim Enhanced\ns vlastní správou",
     "anon": "Přepnuto na režim Incognito\ns vlastní správou"
   },
+  "RestrictedRegion": {
+    "title": "Zjištěn omezený region",
+    "body": "Zdá se, že vaše připojení pochází z omezeného regionu. Blink z tohoto místa nemůže poskytovat služby. Vaše zůstatky nejsou dotčeny.",
+    "bodyReturn": "Jakmile tento region opustíte, vše se vrátí do normálu.",
+    "learnMore": "Zjistit více",
+    "contactSupport": "Kontaktovat podporu"
+  },
   "DollarBalanceRestriction": {
     "modalTitle": "Dolarový zůstatek není ve vašem regionu k dispozici"
   },

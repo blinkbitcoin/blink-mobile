@@ -2578,6 +2578,13 @@
     "enhanced": "Skiftet til Enhanced\nselvforvaltet tilstand",
     "anon": "Skiftet til Incognito\nselvforvaltet tilstand"
   },
+  "RestrictedRegion": {
+    "title": "Begrænset region registreret",
+    "body": "Din forbindelse ser ud til at komme fra en begrænset region. Blink kan ikke levere tjenester fra denne placering. Dine saldi er ikke påvirket.",
+    "bodyReturn": "Når du forlader denne region, vil al funktionalitet vende tilbage til normalen.",
+    "learnMore": "Læs mere",
+    "contactSupport": "Kontakt support"
+  },
   "DollarBalanceRestriction": {
     "modalTitle": "Dollar-saldo er ikke tilgængelig i din region"
   },

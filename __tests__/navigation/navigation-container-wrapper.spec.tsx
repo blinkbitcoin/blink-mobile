@@ -58,6 +58,22 @@ jest.mock("@react-navigation/native", () => ({
   },
 }))
 
+/** Hand-driven gate so a test can hold the splash and release it on demand. */
+let releaseBootSplashGate: () => void = () => {}
+const mockWhenReleased = jest.fn(
+  () =>
+    new Promise<void>((resolve) => {
+      releaseBootSplashGate = resolve
+    }),
+)
+jest.mock("@app/navigation/boot-splash-gate", () => ({
+  bootSplashGate: {
+    hold: jest.fn(),
+    release: jest.fn(),
+    whenReleased: () => mockWhenReleased(),
+  },
+}))
+
 jest.mock("@app/screens/account-migration/hooks/use-migration-blocker", () => ({
   useMigrationBlocker: () => ({ isVisible: mockBlockerVisible }),
 }))
@@ -83,6 +99,7 @@ jest.mock("@rn-vui/themed", () => ({
 import * as React from "react"
 import { Text } from "react-native"
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react-native"
+import RNBootSplash from "react-native-bootsplash"
 
 import { Action } from "@app/components/actions"
 import {
@@ -287,6 +304,42 @@ const navigateTo = (state: typeof mockRootState) => {
 
 const renderWrapper = (children: React.ReactNode) =>
   render(<NavigationContainerWrapper>{children}</NavigationContainerWrapper>)
+
+describe("NavigationContainerWrapper boot splash", () => {
+  /** onReady logs on the way past, which would print a console block from every spec that
+   *  fires it. */
+  const consoleLogSpy = jest.spyOn(console, "log")
+  beforeAll(() => consoleLogSpy.mockImplementation(() => {}))
+  afterAll(() => consoleLogSpy.mockRestore())
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockBlockerVisible = false
+    mockIsReady = true
+    mockOnReady = undefined
+    mockOnStateChange = undefined
+    mockRootState = STACK_AT_BLOCKER
+  })
+
+  /** A restricted custodial verdict replaces the whole session with the full-screen
+   *  block, so revealing Home before the gate releases would flash it first. */
+  it("defers hiding the boot splash until the gate releases", async () => {
+    renderWrapper(<Text testID="child">child</Text>)
+
+    /** The hide is wired from onReady, which the real container fires once mounted. */
+    await waitFor(() => expect(mockOnReady).toBeDefined())
+    act(() => mockOnReady?.())
+
+    await waitFor(() => expect(mockWhenReleased).toHaveBeenCalled())
+    expect(RNBootSplash.hide).not.toHaveBeenCalled()
+
+    await act(async () => {
+      releaseBootSplashGate()
+    })
+
+    expect(RNBootSplash.hide).toHaveBeenCalledWith({ fade: true })
+  })
+})
 
 describe("NavigationContainerWrapper armed-gate reset", () => {
   /** onReady logs on the way past, which would print a console block from every spec that

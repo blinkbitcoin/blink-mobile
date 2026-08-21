@@ -2578,6 +2578,13 @@
     "enhanced": "Overgeschakeld naar\nzelfbeheerde Enhanced-modus",
     "anon": "Overgeschakeld naar\nzelfbeheerde Incognito-modus"
   },
+  "RestrictedRegion": {
+    "title": "Beperkte regio gedetecteerd",
+    "body": "Je verbinding lijkt uit een beperkte regio te komen. Blink kan vanaf deze locatie geen diensten leveren. Je saldi zijn niet aangetast.",
+    "bodyReturn": "Zodra je deze regio verlaat, werkt alles weer normaal.",
+    "learnMore": "Meer informatie",
+    "contactSupport": "Contact opnemen met support"
+  },
   "DollarBalanceRestriction": {
     "modalTitle": "Dollar-saldo is niet beschikbaar in jouw regio"
   },
