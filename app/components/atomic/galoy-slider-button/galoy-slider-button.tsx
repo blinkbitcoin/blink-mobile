@@ -117,7 +117,7 @@ const GaloySliderButton = ({
             style={[
               styles.swipeButton,
               AnimatedStyles.swipeButton,
-              { backgroundColor: disabled ? colors.disabled : colors.primary },
+              { backgroundColor: disabled ? colors.disabled : colors.accent },
             ]}
             exiting={FadeOut.duration(400)}
             {...testProps("slider")}
@@ -138,7 +138,7 @@ const GaloySliderButton = ({
       {isLoading && (
         <Animated.View entering={FadeIn.duration(400)} style={styles.loadingContainer}>
           <Text style={styles.swipeText}>{loadingText}</Text>
-          <ActivityIndicator size="small" color={colors.primary} />
+          <ActivityIndicator size="small" color={colors.accent} />
         </Animated.View>
       )}
     </View>
@@ -148,9 +148,9 @@ const GaloySliderButton = ({
 const useStyles = makeStyles(({ colors }, { buttonWidth }: { buttonWidth: number }) => ({
   swipeButtonContainer: {
     height: 60,
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.surfaceInteractive,
     borderRadius: 30,
-    borderColor: colors.grey4,
+    borderColor: colors.border,
     borderWidth: 1,
     justifyContent: "center",
     alignItems: "center",
@@ -176,7 +176,7 @@ const useStyles = makeStyles(({ colors }, { buttonWidth }: { buttonWidth: number
     fontSize: 14,
     fontWeight: "400",
     zIndex: 2,
-    color: colors.grey2,
+    color: colors.textMuted,
   },
   loadingContainer: {
     display: "flex",
