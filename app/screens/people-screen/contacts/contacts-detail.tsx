@@ -17,6 +17,9 @@ import type {
 } from "../../../navigation/stack-param-lists"
 import { ContactTransactions } from "./contact-transactions"
 
+/** An address is one unbreakable thing: it is cut short rather than wrapped. */
+const ADDRESS_LINES = 1
+
 type ContactDetailProps = {
   route: RouteProp<PeopleStackParamList, "contactDetail">
 }
@@ -55,7 +58,12 @@ export const ContactsDetailScreenJSX: React.FC<ContactDetailScreenProps> = ({
 
   return (
     <Screen>
-      <IconHero icon="user" iconColor={colors.black} title={lightningAddress} />
+      <IconHero
+        icon="user"
+        iconColor={colors.black}
+        title={lightningAddress}
+        titleLines={ADDRESS_LINES}
+      />
       <View style={styles.body}>
         <ContactTransactions contact={contact} />
         <View style={styles.sendContainer}>

@@ -75,6 +75,14 @@ describe("ContactsDetailScreen", () => {
     expect(getByText("alice@blink.sv")).toBeTruthy()
   })
 
+  it("keeps a long address on one line rather than breaking it in two", () => {
+    const { getByText } = renderContactsDetail(
+      makeContact({ handle: "deepbassoon958@walletofsatoshi.com" }),
+    )
+
+    expect(getByText("deepbassoon958@walletofsatoshi.com").props.numberOfLines).toBe(1)
+  })
+
   it("completes a bare handle with the instance hostname", () => {
     const { getByText } = renderContactsDetail(makeContact({ handle: " alice " }))
 
