@@ -1,5 +1,5 @@
 import * as React from "react"
-import { ActivityIndicator, SectionList, Text, View } from "react-native"
+import { ActivityIndicator, SectionList, StyleSheet, Text, View } from "react-native"
 
 import { gql } from "@apollo/client"
 import {
@@ -43,11 +43,47 @@ type Props = {
 
 const keyExtractor = (item: { id: string }) => item.id
 
+const GROUP_RADIUS = 8
+
+/** The date group reads as one card, so only its outer rows carry the corners. */
+const groupStyles = StyleSheet.create({
+  firstRow: {
+    borderTopLeftRadius: GROUP_RADIUS,
+    borderTopRightRadius: GROUP_RADIUS,
+    overflow: "hidden",
+  },
+  lastRow: {
+    borderBottomLeftRadius: GROUP_RADIUS,
+    borderBottomRightRadius: GROUP_RADIUS,
+    overflow: "hidden",
+  },
+})
+
 // Rows here are deliberately not pressable: this list only shows the history
 // with one contact, it does not navigate into a transaction.
-const renderItem = ({ item }: { item: { id: string } }) => (
-  <MemoizedTransactionItem txid={item.id} />
-)
+const renderItem = ({
+  item,
+  index,
+  section,
+}: {
+  item: { id: string }
+  index: number
+  section: { data: readonly { id: string }[] }
+}) => {
+  const isFirst = index === 0
+  const isLast = index === section.data.length - 1
+
+  return (
+    <View style={[isFirst && groupStyles.firstRow, isLast && groupStyles.lastRow]}>
+      <MemoizedTransactionItem
+        txid={item.id}
+        subtitle
+        isFirst={isFirst}
+        isLast={isLast}
+      />
+    </View>
+  )
+}
 
 export const ContactTransactions = ({ contact }: Props) => {
   const styles = useStyles()
@@ -190,7 +226,6 @@ export const ContactTransactions = ({ contact }: Props) => {
 const useStyles = makeStyles(({ colors }) => ({
   activityIndicatorView: {
     alignItems: "center",
-    flex: 1,
     justifyContent: "center",
     marginVertical: 48,
   },
@@ -201,27 +236,27 @@ const useStyles = makeStyles(({ colors }) => ({
 
   noTransactionView: {
     alignItems: "center",
-    flex: 1,
     marginVertical: 48,
   },
 
+  /**
+   * Grows only as far as the transactions reach, so the send button below sits under the
+   * last one rather than at the bottom of the screen, and shrinks to scroll past that.
+   */
   screen: {
-    flex: 1,
-    borderRadius: 10,
-    borderColor: colors.grey4,
-    borderWidth: 2,
-    overflow: "hidden",
+    flexShrink: 1,
   },
 
   sectionHeaderContainer: {
-    backgroundColor: colors.grey5,
     flexDirection: "row",
     justifyContent: "space-between",
-    padding: 10,
+    paddingBottom: 3,
+    paddingTop: 10,
   },
 
   sectionHeaderText: {
     color: colors.black,
-    fontSize: 18,
+    fontSize: 14,
+    lineHeight: 20,
   },
 }))

@@ -3287,6 +3287,13 @@ export type WalletOverviewScreenQueryVariables = Exact<{ [key: string]: never; }
 
 export type WalletOverviewScreenQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly wallets: ReadonlyArray<{ readonly __typename: 'BTCWallet', readonly id: string, readonly balance: number, readonly walletCurrency: WalletCurrency } | { readonly __typename: 'UsdWallet', readonly id: string, readonly balance: number, readonly walletCurrency: WalletCurrency }> } } | null };
 
+export type UserContactUpdateAliasMutationVariables = Exact<{
+  input: UserContactUpdateAliasInput;
+}>;
+
+
+export type UserContactUpdateAliasMutation = { readonly __typename: 'Mutation', readonly userContactUpdateAlias: { readonly __typename: 'UserContactUpdateAliasPayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly contact?: { readonly __typename: 'UserContact', readonly alias?: string | null, readonly id: string } | null } };
+
 export type ExportCsvSettingQueryVariables = Exact<{
   walletIds: ReadonlyArray<Scalars['WalletId']['input']> | Scalars['WalletId']['input'];
 }>;
@@ -3671,13 +3678,6 @@ export type ContactsCardQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type ContactsCardQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly contacts: ReadonlyArray<{ readonly __typename: 'UserContact', readonly id: string, readonly handle: string, readonly username: string, readonly alias?: string | null, readonly transactionsCount: number }> } | null };
-
-export type UserContactUpdateAliasMutationVariables = Exact<{
-  input: UserContactUpdateAliasInput;
-}>;
-
-
-export type UserContactUpdateAliasMutation = { readonly __typename: 'Mutation', readonly userContactUpdateAlias: { readonly __typename: 'UserContactUpdateAliasPayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly contact?: { readonly __typename: 'UserContact', readonly alias?: string | null, readonly id: string } | null } };
 
 export type UserLoginMutationVariables = Exact<{
   input: UserLoginInput;
@@ -4505,6 +4505,45 @@ export type WalletOverviewScreenQueryHookResult = ReturnType<typeof useWalletOve
 export type WalletOverviewScreenLazyQueryHookResult = ReturnType<typeof useWalletOverviewScreenLazyQuery>;
 export type WalletOverviewScreenSuspenseQueryHookResult = ReturnType<typeof useWalletOverviewScreenSuspenseQuery>;
 export type WalletOverviewScreenQueryResult = Apollo.QueryResult<WalletOverviewScreenQuery, WalletOverviewScreenQueryVariables>;
+export const UserContactUpdateAliasDocument = gql`
+    mutation userContactUpdateAlias($input: UserContactUpdateAliasInput!) {
+  userContactUpdateAlias(input: $input) {
+    errors {
+      message
+    }
+    contact {
+      alias
+      id
+    }
+  }
+}
+    `;
+export type UserContactUpdateAliasMutationFn = Apollo.MutationFunction<UserContactUpdateAliasMutation, UserContactUpdateAliasMutationVariables>;
+
+/**
+ * __useUserContactUpdateAliasMutation__
+ *
+ * To run a mutation, you first call `useUserContactUpdateAliasMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUserContactUpdateAliasMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [userContactUpdateAliasMutation, { data, loading, error }] = useUserContactUpdateAliasMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUserContactUpdateAliasMutation(baseOptions?: Apollo.MutationHookOptions<UserContactUpdateAliasMutation, UserContactUpdateAliasMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UserContactUpdateAliasMutation, UserContactUpdateAliasMutationVariables>(UserContactUpdateAliasDocument, options);
+      }
+export type UserContactUpdateAliasMutationHookResult = ReturnType<typeof useUserContactUpdateAliasMutation>;
+export type UserContactUpdateAliasMutationResult = Apollo.MutationResult<UserContactUpdateAliasMutation>;
+export type UserContactUpdateAliasMutationOptions = Apollo.BaseMutationOptions<UserContactUpdateAliasMutation, UserContactUpdateAliasMutationVariables>;
 export const ExportCsvSettingDocument = gql`
     query ExportCsvSetting($walletIds: [WalletId!]!) {
   me {
@@ -7356,45 +7395,6 @@ export type ContactsCardQueryHookResult = ReturnType<typeof useContactsCardQuery
 export type ContactsCardLazyQueryHookResult = ReturnType<typeof useContactsCardLazyQuery>;
 export type ContactsCardSuspenseQueryHookResult = ReturnType<typeof useContactsCardSuspenseQuery>;
 export type ContactsCardQueryResult = Apollo.QueryResult<ContactsCardQuery, ContactsCardQueryVariables>;
-export const UserContactUpdateAliasDocument = gql`
-    mutation userContactUpdateAlias($input: UserContactUpdateAliasInput!) {
-  userContactUpdateAlias(input: $input) {
-    errors {
-      message
-    }
-    contact {
-      alias
-      id
-    }
-  }
-}
-    `;
-export type UserContactUpdateAliasMutationFn = Apollo.MutationFunction<UserContactUpdateAliasMutation, UserContactUpdateAliasMutationVariables>;
-
-/**
- * __useUserContactUpdateAliasMutation__
- *
- * To run a mutation, you first call `useUserContactUpdateAliasMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useUserContactUpdateAliasMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [userContactUpdateAliasMutation, { data, loading, error }] = useUserContactUpdateAliasMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useUserContactUpdateAliasMutation(baseOptions?: Apollo.MutationHookOptions<UserContactUpdateAliasMutation, UserContactUpdateAliasMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<UserContactUpdateAliasMutation, UserContactUpdateAliasMutationVariables>(UserContactUpdateAliasDocument, options);
-      }
-export type UserContactUpdateAliasMutationHookResult = ReturnType<typeof useUserContactUpdateAliasMutation>;
-export type UserContactUpdateAliasMutationResult = Apollo.MutationResult<UserContactUpdateAliasMutation>;
-export type UserContactUpdateAliasMutationOptions = Apollo.BaseMutationOptions<UserContactUpdateAliasMutation, UserContactUpdateAliasMutationVariables>;
 export const UserLoginDocument = gql`
     mutation userLogin($input: UserLoginInput!) {
   userLogin(input: $input) {

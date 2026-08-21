@@ -1,5 +1,5 @@
 import * as React from "react"
-import { SectionList } from "react-native"
+import { SectionList, StyleSheet } from "react-native"
 
 import { fireEvent, render } from "@testing-library/react-native"
 
@@ -66,19 +66,21 @@ jest.mock("@app/self-custodial/hooks/use-self-custodial-transaction-fragments", 
 }))
 
 /** Records the props each row is handed, so the list's contract with the row is assertable. */
-const mockRowProps: Array<{ txid: string; onPress?: (txid: string) => void }> = []
+type RowProps = {
+  txid: string
+  onPress?: (txid: string) => void
+  subtitle?: boolean
+  isFirst?: boolean
+  isLast?: boolean
+}
+
+const mockRowProps: RowProps[] = []
 
 jest.mock("@app/components/transaction-item", () => ({
   ...jest.requireActual("@app/components/transaction-item"),
-  MemoizedTransactionItem: ({
-    txid,
-    onPress,
-  }: {
-    txid: string
-    onPress?: (txid: string) => void
-  }) => {
+  MemoizedTransactionItem: ({ txid, onPress, subtitle, isFirst, isLast }: RowProps) => {
     const { View } = jest.requireActual("react-native")
-    mockRowProps.push({ txid, onPress })
+    mockRowProps.push({ txid, onPress, subtitle, isFirst, isLast })
     return <View testID={`transaction-${txid}`} />
   },
 }))
@@ -116,6 +118,9 @@ const contact: UserContact = {
   alias: "Alice",
   transactionsCount: 2,
 }
+
+/** The radius the date group's card carries, mirrored from the screen's own token. */
+const GROUP_RADIUS = 8
 
 const makeFragment = (id: string) => ({
   __typename: "Transaction" as const,
@@ -380,6 +385,68 @@ describe("ContactTransactions", () => {
       expect(screen.UNSAFE_getByType(SectionList).props.windowSize).toBe(
         TRANSACTION_LIST_WINDOW_SIZE,
       )
+    })
+
+    it("dates every row, so a payment is placed within its day", () => {
+      renderContactTransactions()
+
+      expect(mockRowProps.length).toBeGreaterThan(0)
+      expect(mockRowProps.every((props) => props.subtitle)).toBe(true)
+    })
+
+    it("marks the ends of a date group, which carry its card edges", () => {
+      mockUseQuery.mockReturnValue(
+        custodialQuery({
+          edges: [
+            { node: makeFragment("first-tx") },
+            { node: makeFragment("middle-tx") },
+            { node: makeFragment("last-tx") },
+          ],
+        }),
+      )
+
+      renderContactTransactions()
+
+      expect(
+        mockRowProps.map(({ txid, isFirst, isLast }) => ({ txid, isFirst, isLast })),
+      ).toEqual([
+        { txid: "first-tx", isFirst: true, isLast: false },
+        { txid: "middle-tx", isFirst: false, isLast: false },
+        { txid: "last-tx", isFirst: false, isLast: true },
+      ])
+    })
+
+    it("rounds the group's outer corners and nothing in between", () => {
+      mockUseQuery.mockReturnValue(
+        custodialQuery({
+          edges: [
+            { node: makeFragment("first-tx") },
+            { node: makeFragment("middle-tx") },
+            { node: makeFragment("last-tx") },
+          ],
+        }),
+      )
+
+      const { getByTestId } = renderContactTransactions()
+
+      /** The row wraps in the view that carries the corners, past the row component. */
+      const cornersOf = (txid: string) => {
+        let node = getByTestId(`transaction-${txid}`).parent
+        while (node && typeof node.type !== "string") node = node.parent
+        return StyleSheet.flatten(node?.props.style)
+      }
+
+      expect(cornersOf("first-tx")).toEqual({
+        borderTopLeftRadius: GROUP_RADIUS,
+        borderTopRightRadius: GROUP_RADIUS,
+        overflow: "hidden",
+      })
+      expect(cornersOf("middle-tx")).toEqual({})
+      expect(cornersOf("last-tx")).toEqual({
+        borderBottomLeftRadius: GROUP_RADIUS,
+        borderBottomRightRadius: GROUP_RADIUS,
+        overflow: "hidden",
+      })
     })
   })
 })
