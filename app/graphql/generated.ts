@@ -3377,6 +3377,11 @@ export type LevelQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type LevelQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly level: AccountLevel } } | null };
 
+export type CustodialRestrictionsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type CustodialRestrictionsQuery = { readonly __typename: 'Query', readonly custodialRestrictions: { readonly __typename: 'CustodialRestrictions', readonly dollarBalance: boolean, readonly transfer: boolean } };
+
 export type DisplayCurrencyQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -3422,6 +3427,11 @@ export type UserLogoutMutationVariables = Exact<{
 
 
 export type UserLogoutMutation = { readonly __typename: 'Mutation', readonly userLogout: { readonly __typename: 'SuccessPayload', readonly success?: boolean | null } };
+
+export type RegionCheckQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type RegionCheckQuery = { readonly __typename: 'Query', readonly regionCheck: { readonly __typename: 'RegionCheck', readonly countryCode?: string | null, readonly custodialCreationAllowed: boolean, readonly restricted: boolean } };
 
 export type TransactionOwnershipProbeQueryVariables = Exact<{
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -5149,6 +5159,46 @@ export type LevelQueryHookResult = ReturnType<typeof useLevelQuery>;
 export type LevelLazyQueryHookResult = ReturnType<typeof useLevelLazyQuery>;
 export type LevelSuspenseQueryHookResult = ReturnType<typeof useLevelSuspenseQuery>;
 export type LevelQueryResult = Apollo.QueryResult<LevelQuery, LevelQueryVariables>;
+export const CustodialRestrictionsDocument = gql`
+    query custodialRestrictions {
+  custodialRestrictions {
+    dollarBalance
+    transfer
+  }
+}
+    `;
+
+/**
+ * __useCustodialRestrictionsQuery__
+ *
+ * To run a query within a React component, call `useCustodialRestrictionsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCustodialRestrictionsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCustodialRestrictionsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useCustodialRestrictionsQuery(baseOptions?: Apollo.QueryHookOptions<CustodialRestrictionsQuery, CustodialRestrictionsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<CustodialRestrictionsQuery, CustodialRestrictionsQueryVariables>(CustodialRestrictionsDocument, options);
+      }
+export function useCustodialRestrictionsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CustodialRestrictionsQuery, CustodialRestrictionsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<CustodialRestrictionsQuery, CustodialRestrictionsQueryVariables>(CustodialRestrictionsDocument, options);
+        }
+export function useCustodialRestrictionsSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<CustodialRestrictionsQuery, CustodialRestrictionsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<CustodialRestrictionsQuery, CustodialRestrictionsQueryVariables>(CustodialRestrictionsDocument, options);
+        }
+export type CustodialRestrictionsQueryHookResult = ReturnType<typeof useCustodialRestrictionsQuery>;
+export type CustodialRestrictionsLazyQueryHookResult = ReturnType<typeof useCustodialRestrictionsLazyQuery>;
+export type CustodialRestrictionsSuspenseQueryHookResult = ReturnType<typeof useCustodialRestrictionsSuspenseQuery>;
+export type CustodialRestrictionsQueryResult = Apollo.QueryResult<CustodialRestrictionsQuery, CustodialRestrictionsQueryVariables>;
 export const DisplayCurrencyDocument = gql`
     query displayCurrency {
   me {
@@ -5471,6 +5521,47 @@ export function useUserLogoutMutation(baseOptions?: Apollo.MutationHookOptions<U
 export type UserLogoutMutationHookResult = ReturnType<typeof useUserLogoutMutation>;
 export type UserLogoutMutationResult = Apollo.MutationResult<UserLogoutMutation>;
 export type UserLogoutMutationOptions = Apollo.BaseMutationOptions<UserLogoutMutation, UserLogoutMutationVariables>;
+export const RegionCheckDocument = gql`
+    query regionCheck {
+  regionCheck {
+    countryCode
+    custodialCreationAllowed
+    restricted
+  }
+}
+    `;
+
+/**
+ * __useRegionCheckQuery__
+ *
+ * To run a query within a React component, call `useRegionCheckQuery` and pass it any options that fit your needs.
+ * When your component renders, `useRegionCheckQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useRegionCheckQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useRegionCheckQuery(baseOptions?: Apollo.QueryHookOptions<RegionCheckQuery, RegionCheckQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<RegionCheckQuery, RegionCheckQueryVariables>(RegionCheckDocument, options);
+      }
+export function useRegionCheckLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<RegionCheckQuery, RegionCheckQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<RegionCheckQuery, RegionCheckQueryVariables>(RegionCheckDocument, options);
+        }
+export function useRegionCheckSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<RegionCheckQuery, RegionCheckQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<RegionCheckQuery, RegionCheckQueryVariables>(RegionCheckDocument, options);
+        }
+export type RegionCheckQueryHookResult = ReturnType<typeof useRegionCheckQuery>;
+export type RegionCheckLazyQueryHookResult = ReturnType<typeof useRegionCheckLazyQuery>;
+export type RegionCheckSuspenseQueryHookResult = ReturnType<typeof useRegionCheckSuspenseQuery>;
+export type RegionCheckQueryResult = Apollo.QueryResult<RegionCheckQuery, RegionCheckQueryVariables>;
 export const TransactionOwnershipProbeDocument = gql`
     query transactionOwnershipProbe($first: Int) {
   me {

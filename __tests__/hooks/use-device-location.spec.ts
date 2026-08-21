@@ -17,9 +17,26 @@ jest.mock("libphonenumber-js/mobile", () => ({
 }))
 
 const mockResolveIpCountryCode = jest.fn()
+let mockLookupGeneration = 0
+let mockNotifyLookupReset: (() => void) | null = null
 jest.mock("@app/utils/ip-country-lookup", () => ({
   resolveIpCountryCodeCached: (...args: unknown[]) => mockResolveIpCountryCode(...args),
+  /** The hook subscribes to the session-start reset; `resetLookupGeneration` fires one. */
+  subscribeToIpCountryLookup: (listener: () => void) => {
+    mockNotifyLookupReset = listener
+    return () => {
+      mockNotifyLookupReset = null
+    }
+  },
+  getIpCountryLookupGeneration: () => mockLookupGeneration,
 }))
+
+/** Stands in for a session start dropping the shared lookup, which is what makes an
+ *  already-mounted consumer resolve again instead of keeping the last country. */
+const resetLookupGeneration = () => {
+  mockLookupGeneration += 1
+  mockNotifyLookupReset?.()
+}
 
 jest.mock("@app/utils/log-error", () => ({
   logError: (...args: unknown[]) => mockLogError(...args),
@@ -511,6 +528,54 @@ describe("useIpCountryLookup", () => {
     await act(async () => {})
 
     expect(result.current).toEqual({ countryCode: undefined, isSettled: true })
+  })
+
+  describe("a session-start reset", () => {
+    /**
+     * The reset exists to drop the previous session's answer. Reporting the old country as
+     * settled when the fresh lookup comes back empty is the cross-session latch it was added
+     * to remove, and the consumers that gate on `isSettled` cannot tell the two apart.
+     */
+    it("drops the previous country when the re-lookup finds none", async () => {
+      mockResolveIpCountryCode.mockResolvedValue("HK")
+      const { result } = renderHook(() => useIpCountryLookup(true))
+      await act(async () => {})
+      expect(result.current).toEqual({ countryCode: "HK", isSettled: true })
+
+      mockResolveIpCountryCode.mockResolvedValue(undefined)
+      await act(async () => {
+        resetLookupGeneration()
+      })
+
+      expect(result.current).toEqual({ countryCode: undefined, isSettled: true })
+    })
+
+    it("takes the new country when the re-lookup finds one", async () => {
+      mockResolveIpCountryCode.mockResolvedValue("HK")
+      const { result } = renderHook(() => useIpCountryLookup(true))
+      await act(async () => {})
+
+      mockResolveIpCountryCode.mockResolvedValue("SV")
+      await act(async () => {
+        resetLookupGeneration()
+      })
+
+      expect(result.current).toEqual({ countryCode: "SV", isSettled: true })
+    })
+
+    /** Unsettling is what makes the gates wait rather than answer from the old country. */
+    it("goes back to unsettled while the re-lookup is in flight", async () => {
+      mockResolveIpCountryCode.mockResolvedValue("HK")
+      const { result } = renderHook(() => useIpCountryLookup(true))
+      await act(async () => {})
+
+      mockResolveIpCountryCode.mockReturnValue(new Promise(() => {}))
+      act(() => {
+        resetLookupGeneration()
+      })
+
+      expect(result.current.isSettled).toBe(false)
+    })
   })
 
   it("discards a lookup still in flight when it gets disabled and relooks up on re-enable", async () => {

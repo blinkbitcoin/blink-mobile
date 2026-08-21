@@ -1,15 +1,13 @@
 import { useCallback, useState } from "react"
 
-import { useApolloClient } from "@apollo/client"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
-import { updateCountryCode } from "@app/graphql/client-only-query"
 import { CreationBlockReason } from "@app/types/account"
 import { decideCustodialEligibility } from "@app/utils/custodial-eligibility"
-import { resolveIpCountryCodeCached } from "@app/utils/ip-country-lookup"
 
 import { AccountOption } from "./use-account-type-options"
 import { useAccountRegistry } from "./use-account-registry"
 import { isBlockedCountry } from "./use-device-location"
+import { useRegionCheckLazy } from "./use-region-check"
 
 type CreationBlock = {
   checkBlockReason: (option: AccountOption) => Promise<CreationBlockReason | null>
@@ -27,49 +25,39 @@ type CreationBlock = {
  */
 export const useCreationBlock = (): CreationBlock => {
   const { accounts, loading: isRegistryHydrating } = useAccountRegistry()
-  const {
-    custodialCreationBlockedCountries,
-    selfCustodialCreationBlockedCountries,
-    custodialFirstSignupBlockedCountries,
-  } = useRemoteConfig()
-  const client = useApolloClient()
+  const { selfCustodialCreationBlockedCountries, custodialFirstSignupBlockedCountries } =
+    useRemoteConfig()
   const [isResolving, setIsResolving] = useState(false)
-
   /**
-   * The connection alone, matching the `regionCheck` query this will hand over to: an
-   * account being created has no phone of its own, and borrowing another account's would
-   * make the verdict depend on which one happens to be open. There is no local fallback
-   * either, since the country-code cache answers "SV" for an unset value and would turn
-   * "could not resolve" into a country nobody read.
+   * Asked for on submit, never subscribed to: browsing the creation screens locates nobody.
+   * The custodial verdict is the server's to give, and a self-custodial wallet has no Blink
+   * account behind it, so its own list answers for it.
    */
-  const resolveCountry = useCallback(async (): Promise<string | undefined> => {
-    const resolved = await resolveIpCountryCodeCached()
-    if (!resolved) return undefined
-
-    updateCountryCode(client, resolved)
-    return resolved.toUpperCase()
-  }, [client])
+  const resolveRegionCheck = useRegionCheckLazy()
 
   const checkBlockReason = useCallback(
     async (option: AccountOption): Promise<CreationBlockReason | null> => {
       setIsResolving(true)
       try {
-        const country = await resolveCountry()
-        if (country === undefined) return CreationBlockReason.UnknownRegion
+        const { countryCode, custodialCreationAllowed } = await resolveRegionCheck()
+        if (countryCode === undefined) return CreationBlockReason.UnknownRegion
 
-        const blockedCountriesByOption: Record<AccountOption, string[]> = {
-          [AccountOption.Custodial]: custodialCreationBlockedCountries,
-          [AccountOption.SelfCustodial]: selfCustodialCreationBlockedCountries,
+        /** Exhaustive on purpose: a third option fails to compile until it declares who
+         *  answers for it, rather than silently inheriting another type's rule. */
+        const isOptionAllowedByRegion: Record<AccountOption, boolean> = {
+          [AccountOption.Custodial]: custodialCreationAllowed,
+          [AccountOption.SelfCustodial]: !isBlockedCountry(
+            countryCode,
+            selfCustodialCreationBlockedCountries,
+          ),
         }
-        if (isBlockedCountry(country, blockedCountriesByOption[option])) {
-          return CreationBlockReason.Region
-        }
+        if (!isOptionAllowedByRegion[option]) return CreationBlockReason.Region
 
         /** Only Blink accounts answer to this rule; a self-custodial wallet is the user's own. */
         if (option !== AccountOption.Custodial) return null
 
         const isSignupAllowed = decideCustodialEligibility({
-          country,
+          country: countryCode,
           accountCount: accounts.length,
           custodialFirstSignupBlockedCountries,
         })
@@ -81,8 +69,7 @@ export const useCreationBlock = (): CreationBlock => {
     },
     [
       accounts.length,
-      resolveCountry,
-      custodialCreationBlockedCountries,
+      resolveRegionCheck,
       selfCustodialCreationBlockedCountries,
       custodialFirstSignupBlockedCountries,
     ],

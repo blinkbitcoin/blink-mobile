@@ -43,6 +43,23 @@ import { withDeviceLocale } from "../helpers/device-locale"
  */
 withDeviceLocale("en-US")
 
+/** The dollar-balance guard now holds the screen until remote config lands, and the
+ *  context default outside a provider is never-ready, which would hide it for good. */
+jest.mock("@app/config/feature-flags-context", () => ({
+  ...jest.requireActual("@app/config/feature-flags-context"),
+  useFeatureFlags: () => ({ remoteConfigReady: true }),
+}))
+
+/** The custodial verdict is the server's, and an unanswered query gates every feature
+ *  that needs a region, so this screen needs one served to be reachable at all. */
+jest.mock("@app/graphql/generated", () => ({
+  ...jest.requireActual("@app/graphql/generated"),
+  useCustodialRestrictionsQuery: () => ({
+    data: { custodialRestrictions: { dollarBalance: false, transfer: false } },
+    loading: false,
+  }),
+}))
+
 jest.mock("@app/store/persistent-state", () => ({
   ...jest.requireActual("@app/store/persistent-state"),
   usePersistentStateContext: () => ({

@@ -7,6 +7,9 @@ import {
   DEFAULT_ADAPTERS,
   resolveIpCountryCode,
   resolveIpCountryCodeCached,
+  resetIpCountryLookup,
+  getIpCountryLookupGeneration,
+  subscribeToIpCountryLookup,
 } from "@app/utils/ip-country-lookup"
 
 import { reportError } from "@app/utils/error-logging"
@@ -115,6 +118,62 @@ describe("resolveIpCountryCodeCached", () => {
 
     mockedAxios.get.mockClear()
     await expect(resolveIpCountryCodeCached()).resolves.toBe("DE")
+    expect(mockedAxios.get).not.toHaveBeenCalled()
+  })
+
+  /** The country a session runs under is the one its connection resolves to, so the
+   *  shared lookup cannot outlive the session that filled it. */
+  it("resolves against the connection again once the session is reset", async () => {
+    mockedAxios.get.mockResolvedValue({ data: { country: "DE" } })
+    await expect(resolveIpCountryCodeCached()).resolves.toBe("DE")
+
+    mockedAxios.get.mockClear()
+    mockedAxios.get.mockResolvedValue({ data: { country: "FR" } })
+
+    resetIpCountryLookup()
+
+    await expect(resolveIpCountryCodeCached()).resolves.toBe("FR")
+    expect(mockedAxios.get).toHaveBeenCalled()
+  })
+
+  it("notifies subscribers so a mounted consumer can resolve again", () => {
+    // Clearing the promise alone would only serve whatever mounts next.
+    const onChange = jest.fn()
+    const unsubscribe = subscribeToIpCountryLookup(onChange)
+    const before = getIpCountryLookupGeneration()
+
+    resetIpCountryLookup()
+
+    expect(onChange).toHaveBeenCalledTimes(1)
+    expect(getIpCountryLookupGeneration()).toBe(before + 1)
+
+    unsubscribe()
+    resetIpCountryLookup()
+    expect(onChange).toHaveBeenCalledTimes(1)
+  })
+
+  it("lets a lookup that was in flight across a reset keep its successor", async () => {
+    // The stale lookup settling must not clear the promise the next session installed,
+    // or that session spends another round of rate-limited calls.
+    let resolveStale: (value: { data: { country: string } }) => void = () => undefined
+    mockedAxios.get.mockReturnValueOnce(
+      new Promise((resolve) => {
+        resolveStale = resolve
+      }),
+    )
+    const stale = resolveIpCountryCodeCached()
+
+    resetIpCountryLookup()
+
+    mockedAxios.get.mockResolvedValue({ data: { country: "FR" } })
+    const fresh = resolveIpCountryCodeCached()
+
+    resolveStale({ data: { country: "" } })
+    await stale
+    await expect(fresh).resolves.toBe("FR")
+
+    mockedAxios.get.mockClear()
+    await expect(resolveIpCountryCodeCached()).resolves.toBe("FR")
     expect(mockedAxios.get).not.toHaveBeenCalled()
   })
 })

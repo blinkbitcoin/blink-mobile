@@ -13,16 +13,31 @@ jest.mock("@app/utils/ip-country-lookup")
 
 let mockIpCountry: string | undefined
 let mockIpSettled = true
-const mockUseIpCountryLookup = jest.fn<
-  { countryCode: string | undefined; isSettled: boolean },
-  [boolean]
->(() => ({ countryCode: mockIpCountry, isSettled: mockIpSettled }))
-jest.mock("@app/hooks/use-device-location", () => ({
-  ...jest.requireActual("@app/hooks/use-device-location"),
-  useIpCountryLookup: (enabled: boolean) => mockUseIpCountryLookup(enabled),
-  /** The wrapper resolves through the module-internal binding, so it must be mocked
-   *  alongside the lookup or a consumer of it would hit the real hook. */
-  useIpCountryCode: (enabled: boolean) => mockUseIpCountryLookup(enabled).countryCode,
+/** The custodial verdict is the server's now, so the region is driven through the query
+ *  the provider reads. `restricted` follows the same list the old lookup was matched
+ *  against, which is what these cases are written in terms of. */
+const CUSTODIAL_BLOCKED_COUNTRIES = ["CU", "IR"]
+const mockUseRegionCheckQuery = jest.fn((_options?: unknown) => ({
+  data: {
+    regionCheck: {
+      countryCode: mockIpCountry,
+      custodialCreationAllowed: !CUSTODIAL_BLOCKED_COUNTRIES.includes(
+        (mockIpCountry ?? "").toUpperCase(),
+      ),
+      restricted: CUSTODIAL_BLOCKED_COUNTRIES.includes(
+        (mockIpCountry ?? "").toUpperCase(),
+      ),
+    },
+  },
+  loading: !mockIpSettled,
+}))
+jest.mock("@app/graphql/generated", () => ({
+  ...jest.requireActual("@app/graphql/generated"),
+  useRegionCheckQuery: (options: unknown) => mockUseRegionCheckQuery(options),
+}))
+
+jest.mock("@app/self-custodial/hooks/use-self-custodial-account-mode", () => ({
+  useSelfCustodialAccountMode: () => ({ isAnonMode: false }),
 }))
 
 let mockActiveAccountType: AccountType | undefined = AccountType.SelfCustodial
@@ -37,7 +52,6 @@ jest.mock("@app/hooks/use-account-registry", () => ({
 let mockRemoteConfigReady = true
 jest.mock("@app/config/feature-flags-context", () => ({
   useRemoteConfig: () => ({
-    custodialCreationBlockedCountries: ["CU", "IR"],
     selfCustodialCreationBlockedCountries: ["KP"],
   }),
   useFeatureFlags: () => ({ remoteConfigReady: mockRemoteConfigReady }),
@@ -161,7 +175,9 @@ describe("RestrictedRegionProvider", () => {
     const { getByTestId } = renderWithProvider()
 
     expect(getByTestId("restricted-value").props.children).toBe("false")
-    expect(mockUseIpCountryLookup).toHaveBeenCalledWith(false)
+    expect(mockUseRegionCheckQuery).toHaveBeenCalledWith(
+      expect.objectContaining({ skip: true }),
+    )
     expect(mockGateRelease).toHaveBeenCalled()
     expect(mockGateHold).not.toHaveBeenCalled()
   })
@@ -189,14 +205,26 @@ describe("RestrictedRegionProvider", () => {
     expect(getByTestId("pending-value").props.children).toBe("true")
   })
 
-  it("holds the splash while remote config has not resolved for a custodial account", () => {
+  it("releases the splash for a custodial account before remote config resolves", () => {
+    // Its verdict is the server's now, and reads no compiled-in list to wait on.
     mockActiveAccountType = AccountType.Custodial
     mockRemoteConfigReady = false
 
     renderWithProvider()
 
-    expect(mockGateHold).toHaveBeenCalledWith(2000)
-    expect(mockGateRelease).not.toHaveBeenCalled()
+    expect(mockGateRelease).toHaveBeenCalled()
+  })
+
+  it("holds a self-custodial verdict until its own list has been fetched", () => {
+    // A list still in flight would have the verdict read off the compiled-in defaults,
+    // so the evaluation stays pending and no consumer may act on it yet.
+    mockActiveAccountType = AccountType.SelfCustodial
+    mockRemoteConfigReady = false
+    mockIpCountry = "KP"
+
+    const { getByTestId } = renderWithProvider()
+
+    expect(getByTestId("pending-value").props.children).toBe("true")
   })
 
   it("never holds the splash for a known self-custodial account", () => {

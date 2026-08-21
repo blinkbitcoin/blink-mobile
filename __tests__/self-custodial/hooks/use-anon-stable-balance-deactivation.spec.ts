@@ -15,7 +15,7 @@ jest.mock("@app/self-custodial/bridge", () => ({
 }))
 
 let mockPersistentState: PersistentState = {
-  schemaVersion: 19,
+  schemaVersion: 20,
   galoyInstance: { id: "Main" },
   galoyAuthToken: "",
   activeAccountId: "sc-1",
@@ -81,7 +81,7 @@ describe("useAnonStableBalanceDeactivation", () => {
     mockIsAnonMode = true
     mockStableBalanceEnabled = true
     mockPersistentState = {
-      schemaVersion: 19,
+      schemaVersion: 20,
       galoyInstance: { id: "Main" },
       galoyAuthToken: "",
       activeAccountId: "sc-1",

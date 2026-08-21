@@ -1,10 +1,14 @@
 import { CountryCode, parsePhoneNumber } from "libphonenumber-js/mobile"
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react"
 
 import { useApolloClient } from "@apollo/client"
 import { updateCountryCode } from "@app/graphql/client-only-query"
 import { useCountryCodeQuery, useSettingsScreenQuery } from "@app/graphql/generated"
-import { resolveIpCountryCodeCached } from "@app/utils/ip-country-lookup"
+import {
+  getIpCountryLookupGeneration,
+  resolveIpCountryCodeCached,
+  subscribeToIpCountryLookup,
+} from "@app/utils/ip-country-lookup"
 import { logError } from "@app/utils/log-error"
 
 import { useSelfCustodialAccountMode } from "@app/self-custodial/hooks/use-self-custodial-account-mode"
@@ -60,6 +64,13 @@ const useDeviceLocation = ({
   const [countryCode, setCountryCode] = useState<CountryCode | undefined>()
   const [detectionFailed, setDetectionFailed] = useState(false)
   const [source, setSource] = useState<LocationSource | undefined>()
+
+  /** Re-read at each session start so the IP branch resolves against the connection the
+   *  session actually runs on, rather than the one the screen mounted under. */
+  const lookupGeneration = useSyncExternalStore(
+    subscribeToIpCountryLookup,
+    getIpCountryLookupGeneration,
+  )
 
   const userPhone = settingsData?.me?.phone
 
@@ -144,7 +155,7 @@ const useDeviceLocation = ({
     return () => {
       active = false
     }
-  }, [isDetectionBlocked, data, client, userPhone])
+  }, [isDetectionBlocked, data, client, userPhone, lookupGeneration])
 
   if (isDetectionBlocked) return NO_LOCATION
 
@@ -187,6 +198,13 @@ export const useIpCountryLookup = (enabled: boolean): IpCountryLookup => {
   const [ipCountryCode, setIpCountryCode] = useState<CountryCode | undefined>()
   const [hasLookupFinished, setHasLookupFinished] = useState(false)
 
+  /** A session start drops the shared lookup; re-reading the generation here is what makes
+   *  an already-mounted consumer resolve again rather than keep last session's country. */
+  const lookupGeneration = useSyncExternalStore(
+    subscribeToIpCountryLookup,
+    getIpCountryLookupGeneration,
+  )
+
   useEffect(() => {
     if (!isLookupEnabled) {
       setIpCountryCode(undefined)
@@ -194,15 +212,20 @@ export const useIpCountryLookup = (enabled: boolean): IpCountryLookup => {
       return undefined
     }
     let active = true
+    setHasLookupFinished(false)
     resolveIpCountryCodeCached().then((code) => {
       if (!active) return
-      if (code) setIpCountryCode(code)
+      /** Written even when the lookup comes back empty. A re-lookup that fails has to report
+       *  unresolved: holding the previous answer would settle this session on the country the
+       *  last connection resolved, which is the cross-session latch the generation exists to
+       *  drop. */
+      setIpCountryCode(code)
       setHasLookupFinished(true)
     })
     return () => {
       active = false
     }
-  }, [isLookupEnabled])
+  }, [isLookupEnabled, lookupGeneration])
 
   const isLookupSettled = !isLookupEnabled || hasLookupFinished
 

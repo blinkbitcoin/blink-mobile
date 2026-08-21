@@ -6,12 +6,12 @@ import { CreationBlockReason } from "@app/types/account"
 
 const mockUseRemoteConfig = jest.fn()
 const mockUseAccountRegistry = jest.fn()
-const mockResolveIpCountryCodeCached = jest.fn()
+const mockClientQuery = jest.fn()
 const mockUpdateCountryCode = jest.fn()
 
 jest.mock("@apollo/client", () => ({
   ...jest.requireActual("@apollo/client"),
-  useApolloClient: () => ({}),
+  useApolloClient: () => ({ query: (options: unknown) => mockClientQuery(options) }),
 }))
 
 jest.mock("@app/graphql/client-only-query", () => ({
@@ -31,31 +31,49 @@ jest.mock("@app/hooks/use-account-registry", () => ({
 }))
 
 jest.mock("@app/utils/ip-country-lookup", () => ({
-  resolveIpCountryCodeCached: () => mockResolveIpCountryCodeCached(),
+  resolveIpCountryCodeCached: jest.fn(),
 }))
 
+/**
+ * The custodial half of the verdict is the server's own answer now, so it is stated rather
+ * than derived from a list; the self-custodial half still comes from a compiled-in list,
+ * since no Blink account stands behind that wallet.
+ */
 const setUp = ({
-  ipCountryCode,
+  countryCode,
+  custodialCreationAllowed = true,
+  hasServerAnswer = true,
   accountCount = 1,
   isRegistryHydrating = false,
-  custodialCreationBlockedCountries = ["CU", "IR"],
   selfCustodialCreationBlockedCountries = ["KP", "SY"],
   custodialFirstSignupBlockedCountries = [],
 }: {
-  ipCountryCode?: string
+  countryCode?: string
+  custodialCreationAllowed?: boolean
+  hasServerAnswer?: boolean
   accountCount?: number
   isRegistryHydrating?: boolean
-  custodialCreationBlockedCountries?: string[]
   selfCustodialCreationBlockedCountries?: string[]
   custodialFirstSignupBlockedCountries?: string[]
 }) => {
-  mockResolveIpCountryCodeCached.mockResolvedValue(ipCountryCode)
+  mockClientQuery.mockResolvedValue(
+    hasServerAnswer
+      ? {
+          data: {
+            regionCheck: {
+              countryCode,
+              custodialCreationAllowed,
+              restricted: !custodialCreationAllowed,
+            },
+          },
+        }
+      : { data: undefined },
+  )
   mockUseAccountRegistry.mockReturnValue({
     accounts: new Array(accountCount).fill({}),
     loading: isRegistryHydrating,
   })
   mockUseRemoteConfig.mockReturnValue({
-    custodialCreationBlockedCountries,
     selfCustodialCreationBlockedCountries,
     custodialFirstSignupBlockedCountries,
   })
@@ -78,15 +96,15 @@ describe("useCreationBlock", () => {
   beforeEach(() => jest.clearAllMocks())
 
   it("looks up nothing until an option is submitted", () => {
-    setUp({ ipCountryCode: "CU" })
+    setUp({ countryCode: "CU", custodialCreationAllowed: false })
 
     // Merely opening the screen must not locate anyone.
-    expect(mockResolveIpCountryCodeCached).not.toHaveBeenCalled()
+    expect(mockClientQuery).not.toHaveBeenCalled()
   })
 
   describe("regional rules", () => {
     it("refuses the custodial option from its own list", async () => {
-      const { result } = setUp({ ipCountryCode: "CU" })
+      const { result } = setUp({ countryCode: "CU", custodialCreationAllowed: false })
 
       expect(await check(result, AccountOption.Custodial)).toBe(
         CreationBlockReason.Region,
@@ -94,7 +112,7 @@ describe("useCreationBlock", () => {
     })
 
     it("refuses the self-custodial option from its own list", async () => {
-      const { result } = setUp({ ipCountryCode: "KP" })
+      const { result } = setUp({ countryCode: "KP" })
 
       expect(await check(result, AccountOption.SelfCustodial)).toBe(
         CreationBlockReason.Region,
@@ -103,8 +121,8 @@ describe("useCreationBlock", () => {
 
     it("reads each option from its own list, so the lists can diverge", async () => {
       const { result } = setUp({
-        ipCountryCode: "CU",
-        custodialCreationBlockedCountries: ["CU"],
+        countryCode: "CU",
+        custodialCreationAllowed: false,
         selfCustodialCreationBlockedCountries: ["KP"],
       })
 
@@ -115,7 +133,7 @@ describe("useCreationBlock", () => {
     })
 
     it("allows an option whose list does not carry the country", async () => {
-      const { result } = setUp({ ipCountryCode: "SV" })
+      const { result } = setUp({ countryCode: "SV" })
 
       expect(await check(result, AccountOption.Custodial)).toBeNull()
       expect(await check(result, AccountOption.SelfCustodial)).toBeNull()
@@ -123,8 +141,8 @@ describe("useCreationBlock", () => {
 
     it("matches case-insensitively", async () => {
       const { result } = setUp({
-        ipCountryCode: "cu",
-        custodialCreationBlockedCountries: ["CU"],
+        countryCode: "cu",
+        custodialCreationAllowed: false,
       })
 
       expect(await check(result, AccountOption.Custodial)).toBe(
@@ -136,7 +154,7 @@ describe("useCreationBlock", () => {
   describe("the first custodial signup", () => {
     it("is refused in a listed country when the device holds no account", async () => {
       const { result } = setUp({
-        ipCountryCode: "PK",
+        countryCode: "PK",
         accountCount: 0,
         custodialFirstSignupBlockedCountries: ["PK"],
       })
@@ -148,7 +166,7 @@ describe("useCreationBlock", () => {
 
     it("is allowed in that same country once an account exists", async () => {
       const { result } = setUp({
-        ipCountryCode: "PK",
+        countryCode: "PK",
         accountCount: 1,
         custodialFirstSignupBlockedCountries: ["PK"],
       })
@@ -159,7 +177,7 @@ describe("useCreationBlock", () => {
 
     it("never refuses the self-custodial option, which the rule does not govern", async () => {
       const { result } = setUp({
-        ipCountryCode: "PK",
+        countryCode: "PK",
         accountCount: 0,
         custodialFirstSignupBlockedCountries: ["PK"],
       })
@@ -169,9 +187,9 @@ describe("useCreationBlock", () => {
 
     it("yields to the regional rule, which is the stronger refusal", async () => {
       const { result } = setUp({
-        ipCountryCode: "CU",
+        countryCode: "CU",
         accountCount: 0,
-        custodialCreationBlockedCountries: ["CU"],
+        custodialCreationAllowed: false,
         custodialFirstSignupBlockedCountries: ["CU"],
       })
 
@@ -185,7 +203,7 @@ describe("useCreationBlock", () => {
   describe("the country it reads", () => {
     it("uppercases what the provider returned before matching any list", async () => {
       const { result } = setUp({
-        ipCountryCode: "pk",
+        countryCode: "pk",
         accountCount: 0,
         custodialFirstSignupBlockedCountries: ["PK"],
       })
@@ -197,7 +215,7 @@ describe("useCreationBlock", () => {
     })
 
     it("records the answer, so the rest of the app shares the country it read", async () => {
-      const { result } = setUp({ ipCountryCode: "SV" })
+      const { result } = setUp({ countryCode: "SV" })
 
       await check(result, AccountOption.Custodial)
 
@@ -205,7 +223,7 @@ describe("useCreationBlock", () => {
     })
 
     it("reports an unreadable location as such, rather than blaming the region", async () => {
-      const { result } = setUp({ ipCountryCode: undefined, accountCount: 5 })
+      const { result } = setUp({ countryCode: undefined, accountCount: 5 })
 
       // Someone who already holds accounts is not refused for a first signup.
       expect(await check(result, AccountOption.Custodial)).toBe(
@@ -216,33 +234,43 @@ describe("useCreationBlock", () => {
       )
     })
 
-    it("reads the connection and never an account's registered phone", async () => {
-      const { result } = setUp({ ipCountryCode: "CU" })
+    it("asks the server, which reads the connection and never a registered phone", async () => {
+      const { result } = setUp({ countryCode: "CU" })
 
       // Which account happens to be open must not decide who may create a new one.
       await check(result, AccountOption.Custodial)
 
-      expect(mockResolveIpCountryCodeCached).toHaveBeenCalled()
+      expect(mockClientQuery).toHaveBeenCalledWith(
+        expect.objectContaining({ fetchPolicy: "no-cache" }),
+      )
     })
   })
 
   describe("the flags a submit button waits on", () => {
     const setUpPending = () => {
-      let resolveLookup: (code: string) => void = () => undefined
-      mockResolveIpCountryCodeCached.mockReturnValue(
-        new Promise<string>((resolve) => {
-          resolveLookup = resolve
+      let resolveQuery: (result: unknown) => void = () => undefined
+      mockClientQuery.mockReturnValue(
+        new Promise((resolve) => {
+          resolveQuery = resolve
         }),
       )
       mockUseAccountRegistry.mockReturnValue({ accounts: [], loading: false })
       mockUseRemoteConfig.mockReturnValue({
-        custodialCreationBlockedCountries: [],
         selfCustodialCreationBlockedCountries: [],
         custodialFirstSignupBlockedCountries: [],
       })
       return {
         render: renderHook(() => useCreationBlock()),
-        resolve: () => resolveLookup("SV"),
+        resolve: () =>
+          resolveQuery({
+            data: {
+              regionCheck: {
+                countryCode: "SV",
+                custodialCreationAllowed: true,
+                restricted: false,
+              },
+            },
+          }),
       }
     }
 
@@ -266,7 +294,7 @@ describe("useCreationBlock", () => {
     })
 
     it("reports the first-signup rule unready while the account registry hydrates", () => {
-      const { result } = setUp({ ipCountryCode: "SV", isRegistryHydrating: true })
+      const { result } = setUp({ countryCode: "SV", isRegistryHydrating: true })
 
       // An empty registry mid-hydration would refuse a device that already holds accounts.
       expect(result.current.isFirstSignupRuleReady).toBe(false)
@@ -275,7 +303,7 @@ describe("useCreationBlock", () => {
     })
 
     it("reports the rule ready once the registry has settled", () => {
-      const { result } = setUp({ ipCountryCode: "SV" })
+      const { result } = setUp({ countryCode: "SV" })
 
       expect(result.current.isFirstSignupRuleReady).toBe(true)
     })
