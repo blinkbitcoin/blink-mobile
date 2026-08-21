@@ -183,7 +183,13 @@ export const ContactTransactions = ({ contact }: Props) => {
     })
   }, [hasTransactionsError, LL])
 
-  if (hasTransactionsError) return <></>
+  /**
+   * The failure is told through the toast, so the list itself has nothing to say — but it
+   * still holds its space, or the send button would climb the screen on the one contact
+   * whose history could not be read.
+   */
+  if (hasTransactionsError)
+    return <View style={styles.screen} testID="contact-transactions-unavailable" />
 
   /**
    * Until the query answers there is nothing to say about this contact, so the custodial
@@ -240,11 +246,11 @@ const useStyles = makeStyles(({ colors }) => ({
   },
 
   /**
-   * Grows only as far as the transactions reach, so the send button below sits under the
-   * last one rather than at the bottom of the screen, and shrinks to scroll past that.
+   * Takes the space between the header and the send button whatever the history holds, so
+   * the button keeps its place at the bottom instead of riding up under a short list.
    */
   screen: {
-    flexShrink: 1,
+    flex: 1,
   },
 
   sectionHeaderContainer: {
