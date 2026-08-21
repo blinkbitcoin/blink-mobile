@@ -230,12 +230,21 @@ describe("migration-checkpoint-storage", () => {
         [MigrationCheckpoint.BackupMethod, false],
         [MigrationCheckpoint.CloudBackup, false],
         [MigrationCheckpoint.BackupAlerts, false],
+        [MigrationCheckpoint.ChooseExperience, false],
         [MigrationCheckpoint.BalancesOverview, true],
       ])
     })
 
     it("does not hold without a checkpoint", () => {
       expect(isCommitPointCheckpoint(null)).toBe(false)
+    })
+
+    /** The mode screen sits before the commit point, so it restarts at the explainer like
+     *  every other pre-commit step rather than resuming onto itself. */
+    it("restarts the mode checkpoint at the explainer", () => {
+      expect(resolveCheckpointRoute(MigrationCheckpoint.ChooseExperience)).toEqual({
+        name: "accountMigrationExplainer",
+      })
     })
   })
 

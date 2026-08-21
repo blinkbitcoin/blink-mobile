@@ -3889,6 +3889,15 @@
         "createFailed": "Falha ao criar a carteira. Por favor, tente novamente.",
         "selfCustodialDisabled": "O modo não custodial está temporariamente indisponível."
     },
+    "ChooseExperienceScreen": {
+        "title": "Selecione o modo não custodiado",
+        "subtitle": "Sua escolha define quais recursos estão disponíveis. Você pode alternar quando quiser.",
+        "enhancedLabel": "Enhanced\nModo",
+        "enhancedDescription": "Usamos sua região para desbloquear serviços valiosos disponíveis onde você está.",
+        "anonLabel": "Incognito\nModo",
+        "anonDescription": "Para máxima privacidade. Menos recursos.",
+        "continueButton": "Continuar"
+    },
     "UnsupportedRegionScreen": {
         "title": "Região não suportada",
         "description": "Infelizmente não podemos atender utilizadores da sua região atual."

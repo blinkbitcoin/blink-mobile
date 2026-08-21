@@ -3889,6 +3889,15 @@
     "createFailed": "Không thể tạo ví. Vui lòng thử lại.",
     "selfCustodialDisabled": "Phi giám sát hiện không khả dụng."
   },
+  "ChooseExperienceScreen": {
+    "title": "Chọn chế độ phi lưu ký",
+    "subtitle": "Lựa chọn của bạn quyết định những tính năng khả dụng. Bạn có thể chuyển bất cứ lúc nào.",
+    "enhancedLabel": "Enhanced\nChế độ",
+    "enhancedDescription": "Chúng tôi dùng khu vực của bạn để mở khóa các dịch vụ giá trị có sẵn nơi bạn ở.",
+    "anonLabel": "Incognito\nChế độ",
+    "anonDescription": "Để riêng tư tối đa. Ít tính năng hơn.",
+    "continueButton": "Tiếp tục"
+  },
   "UnsupportedRegionScreen": {
     "title": "Khu vực không được hỗ trợ",
     "description": "Rất tiếc, chúng tôi không thể phục vụ người dùng từ khu vực hiện tại của bạn."

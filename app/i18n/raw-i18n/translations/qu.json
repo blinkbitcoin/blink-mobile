@@ -3889,6 +3889,15 @@
     "createFailed": "Manan walletta paqarichiyta atinkuchu. Allinta llamk'apuy.",
     "selfCustodialDisabled": "Mana-waqaychay manaraqmi atikunchu."
   },
+  "ChooseExperienceScreen": {
+    "title": "Akllay mana waqaychasqa modota",
+    "subtitle": "Akllasqayki imakunas atikunqa chayta churan. Mayllapipas t'ikrayta atinki.",
+    "enhancedLabel": "Enhanced\nModo",
+    "enhancedDescription": "Suyuykita llamk'achiyku allin serviciokunata kicharinapaq maypichus kachkanki chaypi.",
+    "anonLabel": "Incognito\nModo",
+    "anonDescription": "Astawan pakasqa kanaykipaq. Aslla ruwaykuna.",
+    "continueButton": "Hinaspa"
+  },
   "UnsupportedRegionScreen": {
     "title": "Mana yanapasqa suyu",
     "description": "Llakikuypaq, kunan suyuykimanta ruraqkunata mana yanapayta atiykuchu."

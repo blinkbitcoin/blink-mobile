@@ -3889,6 +3889,15 @@
         "createFailed": "Impossibile creare il wallet. Riprova.",
         "selfCustodialDisabled": "La modalità non custodial è temporaneamente non disponibile."
     },
+    "ChooseExperienceScreen": {
+        "title": "Seleziona la modalità non custodita",
+        "subtitle": "La tua scelta determina quali funzioni sono disponibili. Puoi cambiare quando vuoi.",
+        "enhancedLabel": "Enhanced\nModalità",
+        "enhancedDescription": "Usiamo la tua regione per sbloccare servizi utili disponibili dove ti trovi.",
+        "anonLabel": "Incognito\nModalità",
+        "anonDescription": "Per la massima privacy. Meno funzioni.",
+        "continueButton": "Continua"
+    },
     "UnsupportedRegionScreen": {
         "title": "Regione non supportata",
         "description": "Purtroppo non possiamo servire gli utenti dalla tua regione attuale."

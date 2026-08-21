@@ -1,9 +1,11 @@
 import { renderHook } from "@testing-library/react-native"
 
+import { MigrationCheckpoint } from "@app/screens/account-migration/hooks"
 import { useCompleteBackup } from "@app/screens/self-custodial/onboarding/hooks/use-complete-backup"
 import { reportError } from "@app/utils/error-logging"
 
 const mockNavigate = jest.fn()
+const mockSaveCheckpoint = jest.fn()
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
   useNavigation: () => ({ navigate: mockNavigate }),
@@ -35,6 +37,7 @@ jest.mock("@app/screens/account-migration/hooks", () => ({
   useMigrationCheckpointState: () => ({
     checkpoint: mockCheckpoint,
     accountId: mockMigrationAccountId,
+    saveCheckpoint: mockSaveCheckpoint,
   }),
 }))
 
@@ -64,6 +67,7 @@ describe("useCompleteBackup", () => {
     mockCheckpoint = "backupAlerts"
     mockMigrationAccountId = "migration-uuid"
     mockMarkBackupCompletedFor.mockResolvedValue(undefined)
+    mockSaveCheckpoint.mockResolvedValue(true)
   })
 
   it("marks the provisioned account and continues to the balance summary during a migration", async () => {
@@ -73,7 +77,32 @@ describe("useCompleteBackup", () => {
 
     expect(mockMarkBackupCompletedFor).toHaveBeenCalledWith("migration-uuid", "manual")
     expect(mockSetBackupCompleted).not.toHaveBeenCalled()
-    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationBalancesOverview")
+    expect(mockSaveCheckpoint).toHaveBeenCalledWith(MigrationCheckpoint.ChooseExperience)
+    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialChooseExperience", {
+      onContinue: {
+        route: "accountMigrationBalancesOverview",
+        accountId: "migration-uuid",
+      },
+    })
+  })
+
+  /** The mode screen is not a commit point, so a resume routes to the explainer with or
+   *  without this checkpoint. Blocking on the write would buy no resume behaviour and would
+   *  strand a user who just finished their backup on a screen with nothing left to do. */
+  it("continues to the mode screen when the checkpoint write fails", async () => {
+    mockSaveCheckpoint.mockResolvedValueOnce(false)
+
+    const { result } = renderHook(() => useCompleteBackup())
+
+    await result.current({ method: "manual" })
+
+    expect(mockToastShow).not.toHaveBeenCalled()
+    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialChooseExperience", {
+      onContinue: {
+        route: "accountMigrationBalancesOverview",
+        accountId: "migration-uuid",
+      },
+    })
   })
 
   it("marks the active self-custodial account on a standalone backup (no migration)", () => {
@@ -126,7 +155,10 @@ describe("useCompleteBackup", () => {
     expect(mockToastShow).toHaveBeenCalledWith(
       expect.objectContaining({ message: "generic error" }),
     )
-    expect(mockNavigate).not.toHaveBeenCalledWith("accountMigrationBalancesOverview")
+    expect(mockNavigate).not.toHaveBeenCalledWith(
+      "selfCustodialChooseExperience",
+      expect.anything(),
+    )
   })
 
   it("marks the active account as a re-backup when it was already backed up", () => {

@@ -3889,6 +3889,15 @@
     "createFailed": "Kon nie tronk skep nie. Probeer asseblief weer.",
     "selfCustodialDisabled": "Nie-bewaring is tydelik onbeskikbaar."
   },
+  "ChooseExperienceScreen": {
+    "title": "Kies self-bewaarde modus",
+    "subtitle": "Jou keuse bepaal watter funksies beskikbaar is. Jy kan enige tyd wissel.",
+    "enhancedLabel": "Enhanced\nModus",
+    "enhancedDescription": "Ons gebruik jou streek om waardevolle dienste te ontsluit wat beskikbaar is waar jy is.",
+    "anonLabel": "Incognito\nModus",
+    "anonDescription": "Vir maksimum privaatheid. Minder funksies.",
+    "continueButton": "Gaan voort"
+  },
   "UnsupportedRegionScreen": {
     "title": "Nie-ondersteunde streek",
     "description": "Ongelukkig kan ons nie gebruikers uit jou huidige streek bedien nie."

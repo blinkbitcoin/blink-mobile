@@ -3889,6 +3889,15 @@
     "createFailed": "Nem sikerült létrehozni a pénztárcát. Kérjük, próbáld újra.",
     "selfCustodialDisabled": "Az önrendelkező mód átmenetileg nem érhető el."
   },
+  "ChooseExperienceScreen": {
+    "title": "Válassz önrendelkező módot",
+    "subtitle": "A választásod dönti el, mely funkciók érhetők el. Bármikor válthatsz.",
+    "enhancedLabel": "Enhanced\nmód",
+    "enhancedDescription": "A régiódat arra használjuk, hogy feloldjuk az ott elérhető értékes szolgáltatásokat.",
+    "anonLabel": "Incognito\nmód",
+    "anonDescription": "A maximális adatvédelemért. Kevesebb funkció.",
+    "continueButton": "Folytatás"
+  },
   "UnsupportedRegionScreen": {
     "title": "Nem támogatott régió",
     "description": "Sajnos nem tudjuk kiszolgálni a jelenlegi régiódból érkező felhasználókat."

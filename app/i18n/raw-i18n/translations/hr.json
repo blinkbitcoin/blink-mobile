@@ -3889,6 +3889,15 @@
     "createFailed": "Neuspjelo stvaranje novčanika. Molimo pokušajte ponovno.",
     "selfCustodialDisabled": "Nekustodijska opcija je privremeno nedostupna."
   },
+  "ChooseExperienceScreen": {
+    "title": "Odaberite način bez skrbništva",
+    "subtitle": "Vaš izbor određuje koje su značajke dostupne. Možete promijeniti kad god želite.",
+    "enhancedLabel": "Enhanced\nnačin",
+    "enhancedDescription": "Vašu regiju koristimo za otključavanje vrijednih usluga dostupnih ondje gdje jeste.",
+    "anonLabel": "Incognito\nnačin",
+    "anonDescription": "Za maksimalnu privatnost. Manje značajki.",
+    "continueButton": "Nastavi"
+  },
   "UnsupportedRegionScreen": {
     "title": "Nepodržana regija",
     "description": "Nažalost ne možemo pružati uslugu korisnicima iz vaše trenutne regije."

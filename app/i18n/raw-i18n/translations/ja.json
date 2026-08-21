@@ -3889,6 +3889,15 @@
         "createFailed": "ウォレットの作成に失敗しました。もう一度お試しください。",
         "selfCustodialDisabled": "ノンカストディアルは一時的に利用できません。"
     },
+    "ChooseExperienceScreen": {
+        "title": "ノンカストディアルモードを選択",
+        "subtitle": "選択によって利用できる機能が決まります。いつでも切り替えられます。",
+        "enhancedLabel": "Enhanced\nモード",
+        "enhancedDescription": "お客様の地域を利用して、その場所で利用可能な有用なサービスを解放します。",
+        "anonLabel": "Incognito\nモード",
+        "anonDescription": "プライバシーを最大限に。機能は少なめ。",
+        "continueButton": "続行"
+    },
     "UnsupportedRegionScreen": {
         "title": "未対応の地域",
         "description": "申し訳ございませんが、現在の地域のユーザーにはサービスをご提供できません。"

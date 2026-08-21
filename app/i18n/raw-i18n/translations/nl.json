@@ -3889,6 +3889,15 @@
     "createFailed": "Kon portemonnee niet aanmaken. Probeer het opnieuw.",
     "selfCustodialDisabled": "Niet-bewarend is tijdelijk niet beschikbaar."
   },
+  "ChooseExperienceScreen": {
+    "title": "Kies zelfbeheerde modus",
+    "subtitle": "Jouw keuze bepaalt welke functies beschikbaar zijn. Je kunt altijd wisselen.",
+    "enhancedLabel": "Enhanced\nModus",
+    "enhancedDescription": "We gebruiken je regio om waardevolle diensten te ontgrendelen die beschikbaar zijn waar je bent.",
+    "anonLabel": "Incognito\nModus",
+    "anonDescription": "Voor maximale privacy. Minder functies.",
+    "continueButton": "Doorgaan"
+  },
   "UnsupportedRegionScreen": {
     "title": "Niet-ondersteunde regio",
     "description": "Helaas kunnen we geen gebruikers uit je huidige regio bedienen."

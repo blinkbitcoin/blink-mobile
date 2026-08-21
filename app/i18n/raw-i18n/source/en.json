@@ -3902,6 +3902,15 @@
         "restoreComingSoonDescription": "Restore flow will be available in a future update.",
         "createFailed": "Failed to create wallet. Please try again."
     },
+    "ChooseExperienceScreen": {
+        "title": "Select non-custodial mode",
+        "subtitle": "Your choice decides which features are available. You can switch whenever you want.",
+        "enhancedLabel": "Enhanced\nMode",
+        "enhancedDescription": "We use your region to unlock valuable services available where you are.",
+        "anonLabel": "Incognito\nMode",
+        "anonDescription": "For maximum privacy. Less features.",
+        "continueButton": "Continue"
+    },
     "UnsupportedRegionScreen": {
         "title": "Unsupported region",
         "description": "Unfortunately we can not serve users from your current region."

@@ -3889,6 +3889,15 @@
     "createFailed": "Tekisobose okukola wallet. Tugezeeyo nate.",
     "selfCustodialDisabled": "Tekikola kati ku non-custodial."
   },
+  "ChooseExperienceScreen": {
+    "title": "Londa engeri ey'okweefuga",
+    "subtitle": "Ky'olonda kye kisalawo ebikozesebwa ebiriwo. Osobola okukyusa buli lw'oyagala.",
+    "enhancedLabel": "Enhanced\nEngeri",
+    "enhancedDescription": "Tukozesa ekitundu kyo okuggulawo obuweereza obw'omugaso obuli mu kifo mw'oli.",
+    "anonLabel": "Incognito\nEngeri",
+    "anonDescription": "Olw'eby'ekyama ebisingayo. Ebikozesebwa bitono.",
+    "continueButton": "Weyongerayo"
+  },
   "UnsupportedRegionScreen": {
     "title": "Ekitundu ekitawagirwa",
     "description": "Eky'embi, tetusobola kuweereza bakozesa abava mu kitundu kyo eky'okaakano."

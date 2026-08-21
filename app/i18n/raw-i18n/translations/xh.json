@@ -3889,6 +3889,15 @@
     "createFailed": "Ayikwazanga ukudala iwallet. Nceda zama kwakhona.",
     "selfCustodialDisabled": "I-non-custodial ayifumaneki okwexeshana."
   },
+  "ChooseExperienceScreen": {
+    "title": "Khetha imowudi engagciniwe",
+    "subtitle": "Ukhetho lwakho lugqiba ukuba zeziphi iimpawu ezifumanekayo. Ungatshintsha nanini na.",
+    "enhancedLabel": "Enhanced\nImowudi",
+    "enhancedDescription": "Sisebenzisa ummandla wakho ukuvula iinkonzo ezixabisekileyo ezifumaneka apho ukhoyo.",
+    "anonLabel": "Incognito\nImowudi",
+    "anonDescription": "Ukufumana ubumfihlo obuphezulu. Iimpawu ezimbalwa.",
+    "continueButton": "Qhubeka"
+  },
   "UnsupportedRegionScreen": {
     "title": "Ummandla ongaxhaswanga",
     "description": "Ngelishwa asikwazi ukunceda abasebenzisi abavela kummandla wakho wangoku."

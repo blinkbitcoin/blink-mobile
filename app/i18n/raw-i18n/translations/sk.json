@@ -3889,6 +3889,15 @@
     "createFailed": "Nepodarilo sa vytvoriť peňaženku. Skúste to znova.",
     "selfCustodialDisabled": "Nesprávcovský režim je dočasne nedostupný."
   },
+  "ChooseExperienceScreen": {
+    "title": "Vyberte režim s vlastnou správou",
+    "subtitle": "Vaša voľba určuje, ktoré funkcie sú dostupné. Kedykoľvek môžete prepnúť.",
+    "enhancedLabel": "Enhanced\nrežim",
+    "enhancedDescription": "Vašu oblasť používame na odomknutie cenných služieb dostupných tam, kde ste.",
+    "anonLabel": "Incognito\nrežim",
+    "anonDescription": "Pre maximálne súkromie. Menej funkcií.",
+    "continueButton": "Pokračovať"
+  },
   "UnsupportedRegionScreen": {
     "title": "Nepodporovaný región",
     "description": "Bohužiaľ nemôžeme obsluhovať používateľov z vášho aktuálneho regiónu."

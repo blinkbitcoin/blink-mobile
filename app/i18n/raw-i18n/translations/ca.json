@@ -3889,6 +3889,15 @@
     "createFailed": "No s'ha pogut crear la cartera. Si us plau, torna-ho a provar.",
     "selfCustodialDisabled": "El mode no custodial està temporalment no disponible."
   },
+  "ChooseExperienceScreen": {
+    "title": "Selecciona el mode no custodiat",
+    "subtitle": "La teva elecció decideix quines funcions estan disponibles. Pots canviar quan vulguis.",
+    "enhancedLabel": "Enhanced\nMode",
+    "enhancedDescription": "Fem servir la teva regió per desbloquejar serveis valuosos disponibles allà on ets.",
+    "anonLabel": "Incognito\nMode",
+    "anonDescription": "Per a màxima privadesa. Menys funcions.",
+    "continueButton": "Continuar"
+  },
   "UnsupportedRegionScreen": {
     "title": "Regió no admesa",
     "description": "Malauradament, no podem atendre usuaris de la vostra regió actual."

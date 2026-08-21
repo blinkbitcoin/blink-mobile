@@ -3889,6 +3889,15 @@
     "createFailed": "Cüzdan oluşturulamadı. Lütfen tekrar deneyin.",
     "selfCustodialDisabled": "Saklamasız mod geçici olarak kullanılamıyor."
   },
+  "ChooseExperienceScreen": {
+    "title": "Emanetsiz modu seçin",
+    "subtitle": "Seçiminiz hangi özelliklerin kullanılabilir olduğunu belirler. İstediğiniz zaman değiştirebilirsiniz.",
+    "enhancedLabel": "Enhanced\nMod",
+    "enhancedDescription": "Bulunduğunuz yerde sunulan değerli hizmetlerin kilidini açmak için bölgenizi kullanırız.",
+    "anonLabel": "Incognito\nMod",
+    "anonDescription": "Maksimum gizlilik için. Daha az özellik.",
+    "continueButton": "Devam et"
+  },
   "UnsupportedRegionScreen": {
     "title": "Desteklenmeyen bölge",
     "description": "Maalesef mevcut bölgenizdeki kullanıcılara hizmet veremiyoruz."

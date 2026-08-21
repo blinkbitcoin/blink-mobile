@@ -6,7 +6,7 @@ import { getThemePreference } from "@app/store/persistent-state/theme-preference
 import { DefaultAccountId } from "@app/types/wallet"
 
 const baseState: PersistentState = {
-  schemaVersion: 17,
+  schemaVersion: 18,
   galoyInstance: { id: "Main" },
   galoyAuthToken: "",
 }

@@ -3889,6 +3889,15 @@
     "createFailed": "Gagal membuat dompet. Silakan coba lagi.",
     "selfCustodialDisabled": "Non-kustodial sementara tidak tersedia."
   },
+  "ChooseExperienceScreen": {
+    "title": "Pilih mode non-kustodian",
+    "subtitle": "Pilihanmu menentukan fitur mana yang tersedia. Kamu bisa beralih kapan saja.",
+    "enhancedLabel": "Enhanced\nMode",
+    "enhancedDescription": "Kami menggunakan regionmu untuk membuka layanan berharga yang tersedia di tempatmu.",
+    "anonLabel": "Incognito\nMode",
+    "anonDescription": "Untuk privasi maksimal. Lebih sedikit fitur.",
+    "continueButton": "Lanjutkan"
+  },
   "UnsupportedRegionScreen": {
     "title": "Wilayah tidak didukung",
     "description": "Sayangnya kami tidak dapat melayani pengguna dari wilayah Anda saat ini."

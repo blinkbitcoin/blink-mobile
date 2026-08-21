@@ -10,6 +10,8 @@ type OnboardingScreenLayoutProps = {
   footer?: React.ReactNode
   scrollable?: boolean
   keyboardShouldPersistTaps?: "handled" | "always" | "never"
+  /** Add when the screen has no navigation header, so the top safe-area inset applies. */
+  headerless?: boolean
 }
 
 export const OnboardingScreenLayout: React.FC<OnboardingScreenLayoutProps> = ({
@@ -17,8 +19,10 @@ export const OnboardingScreenLayout: React.FC<OnboardingScreenLayoutProps> = ({
   footer,
   scrollable = false,
   keyboardShouldPersistTaps,
+  headerless = false,
 }) => {
   const styles = useStyles()
+  const headerShown = headerless ? false : undefined
 
   const content = scrollable ? (
     <ScrollView
@@ -32,7 +36,7 @@ export const OnboardingScreenLayout: React.FC<OnboardingScreenLayoutProps> = ({
   )
 
   return (
-    <Screen preset="fixed">
+    <Screen preset="fixed" headerShown={headerShown}>
       <View style={styles.container}>
         {content}
         {footer && <View style={styles.footer}>{footer}</View>}

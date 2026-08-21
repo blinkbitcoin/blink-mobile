@@ -12988,6 +12988,38 @@ type RootTranslation = {
 		 */
 		createFailed: string
 	}
+	ChooseExperienceScreen: {
+		/**
+		 * S​e​l​e​c​t​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​m​o​d​e
+		 */
+		title: string
+		/**
+		 * Y​o​u​r​ ​c​h​o​i​c​e​ ​d​e​c​i​d​e​s​ ​w​h​i​c​h​ ​f​e​a​t​u​r​e​s​ ​a​r​e​ ​a​v​a​i​l​a​b​l​e​.​ ​Y​o​u​ ​c​a​n​ ​s​w​i​t​c​h​ ​w​h​e​n​e​v​e​r​ ​y​o​u​ ​w​a​n​t​.
+		 */
+		subtitle: string
+		/**
+		 * E​n​h​a​n​c​e​d​
+	​M​o​d​e
+		 */
+		enhancedLabel: string
+		/**
+		 * W​e​ ​u​s​e​ ​y​o​u​r​ ​r​e​g​i​o​n​ ​t​o​ ​u​n​l​o​c​k​ ​v​a​l​u​a​b​l​e​ ​s​e​r​v​i​c​e​s​ ​a​v​a​i​l​a​b​l​e​ ​w​h​e​r​e​ ​y​o​u​ ​a​r​e​.
+		 */
+		enhancedDescription: string
+		/**
+		 * I​n​c​o​g​n​i​t​o​
+	​M​o​d​e
+		 */
+		anonLabel: string
+		/**
+		 * F​o​r​ ​m​a​x​i​m​u​m​ ​p​r​i​v​a​c​y​.​ ​L​e​s​s​ ​f​e​a​t​u​r​e​s​.
+		 */
+		anonDescription: string
+		/**
+		 * C​o​n​t​i​n​u​e
+		 */
+		continueButton: string
+	}
 	UnsupportedRegionScreen: {
 		/**
 		 * U​n​s​u​p​p​o​r​t​e​d​ ​r​e​g​i​o​n
@@ -26313,6 +26345,38 @@ export type TranslationFunctions = {
 		 * Failed to create wallet. Please try again.
 		 */
 		createFailed: () => LocalizedString
+	}
+	ChooseExperienceScreen: {
+		/**
+		 * Select non-custodial mode
+		 */
+		title: () => LocalizedString
+		/**
+		 * Your choice decides which features are available. You can switch whenever you want.
+		 */
+		subtitle: () => LocalizedString
+		/**
+		 * Enhanced
+	Mode
+		 */
+		enhancedLabel: () => LocalizedString
+		/**
+		 * We use your region to unlock valuable services available where you are.
+		 */
+		enhancedDescription: () => LocalizedString
+		/**
+		 * Incognito
+	Mode
+		 */
+		anonLabel: () => LocalizedString
+		/**
+		 * For maximum privacy. Less features.
+		 */
+		anonDescription: () => LocalizedString
+		/**
+		 * Continue
+		 */
+		continueButton: () => LocalizedString
 	}
 	UnsupportedRegionScreen: {
 		/**

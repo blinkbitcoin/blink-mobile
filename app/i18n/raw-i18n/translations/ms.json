@@ -3889,6 +3889,15 @@
     "createFailed": "Gagal mencipta dompet. Sila cuba lagi.",
     "selfCustodialDisabled": "Bukan kustodial tidak tersedia buat sementara waktu."
   },
+  "ChooseExperienceScreen": {
+    "title": "Pilih mod bukan kustodian",
+    "subtitle": "Pilihan anda menentukan ciri yang tersedia. Anda boleh bertukar bila-bila masa.",
+    "enhancedLabel": "Enhanced\nMod",
+    "enhancedDescription": "Kami menggunakan wilayah anda untuk membuka perkhidmatan berharga yang tersedia di tempat anda.",
+    "anonLabel": "Incognito\nMod",
+    "anonDescription": "Untuk privasi maksimum. Kurang ciri.",
+    "continueButton": "Teruskan"
+  },
   "UnsupportedRegionScreen": {
     "title": "Wilayah tidak disokong",
     "description": "Malangnya kami tidak dapat melayani pengguna dari wilayah semasa anda."

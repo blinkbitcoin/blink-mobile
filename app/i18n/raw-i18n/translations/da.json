@@ -3889,6 +3889,15 @@
     "createFailed": "Kunne ikke oprette tegnebog. Prøv venligst igen.",
     "selfCustodialDisabled": "Ikke-forvaltning er midlertidigt utilgængelig."
   },
+  "ChooseExperienceScreen": {
+    "title": "Vælg selvforvaltet tilstand",
+    "subtitle": "Dit valg afgør, hvilke funktioner der er tilgængelige. Du kan skifte, når du vil.",
+    "enhancedLabel": "Enhanced\ntilstand",
+    "enhancedDescription": "Vi bruger din region til at låse op for værdifulde tjenester, der er tilgængelige, hvor du er.",
+    "anonLabel": "Incognito\ntilstand",
+    "anonDescription": "For maksimalt privatliv. Færre funktioner.",
+    "continueButton": "Fortsæt"
+  },
   "UnsupportedRegionScreen": {
     "title": "Ikke-understøttet region",
     "description": "Desværre kan vi ikke betjene brugere fra din nuværende region."

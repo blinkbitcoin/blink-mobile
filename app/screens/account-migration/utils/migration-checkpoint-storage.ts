@@ -6,6 +6,7 @@ export enum MigrationCheckpoint {
   BackupMethod = "backupMethod",
   CloudBackup = "cloudBackup",
   BackupAlerts = "backupAlerts",
+  ChooseExperience = "chooseExperience",
   BalancesOverview = "balancesOverview",
 }
 
@@ -40,6 +41,7 @@ const IS_COMMIT_POINT_BY_CHECKPOINT: Record<MigrationCheckpoint, boolean> = {
   [MigrationCheckpoint.BackupMethod]: false,
   [MigrationCheckpoint.CloudBackup]: false,
   [MigrationCheckpoint.BackupAlerts]: false,
+  [MigrationCheckpoint.ChooseExperience]: false,
   [MigrationCheckpoint.BalancesOverview]: true,
 }
 
