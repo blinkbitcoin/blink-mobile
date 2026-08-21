@@ -1,6 +1,6 @@
 import React from "react"
 
-import { fireEvent, render, waitFor } from "@testing-library/react-native"
+import { act, fireEvent, render, waitFor } from "@testing-library/react-native"
 
 import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
@@ -30,6 +30,25 @@ jest.mock("@app/utils/biometricAuthentication", () => ({
     authenticate: (...args: unknown[]) => mockAuthenticate(...args),
   },
 }))
+
+const mockReleaseScreenSecurity = jest.fn(() => Promise.resolve())
+let mockLeaseReady: Promise<void> = Promise.resolve()
+jest.mock("@app/utils/screen-security", () => ({
+  acquireScreenSecurity: () => ({
+    ready: mockLeaseReady,
+    release: mockReleaseScreenSecurity,
+  }),
+}))
+
+const deferred = <T,>() => {
+  let resolve: (value: T) => void = () => {}
+  let reject: (reason: Error) => void = () => {}
+  const promise = new Promise<T>((res, rej) => {
+    resolve = res
+    reject = rej
+  })
+  return { promise, resolve, reject }
+}
 
 const renderHeaderRight = () => {
   const calls = mockSetOptions.mock.calls
@@ -78,6 +97,48 @@ describe("ViewBackupPhraseScreen", () => {
       .spyOn(KeyStoreWrapper, "getIsBiometricsEnabled")
       .mockResolvedValue(false)
     mockIsSensorAvailable.mockResolvedValue(true)
+    mockLeaseReady = Promise.resolve()
+  })
+
+  /** Until the screen guard is actually on, neither the words nor the header Copy
+   *  action may exist — a pending or failed registration must not paint the
+   *  mnemonic. */
+  describe("screen security gate", () => {
+    it("shows no words and installs no Copy action while registration is pending", async () => {
+      const registration = deferred<void>()
+      mockLeaseReady = registration.promise
+
+      const { queryByText } = render(
+        <ContextForScreen>
+          <ViewBackupPhraseScreen />
+        </ContextForScreen>,
+      )
+      await act(async () => {})
+
+      expect(queryByText("youth")).toBeNull()
+      expect(headerRightWasInstalled()).toBe(false)
+
+      registration.resolve(undefined)
+      await waitFor(() => expect(queryByText("youth")).toBeTruthy())
+      expect(headerRightWasInstalled()).toBe(true)
+    })
+
+    it("keeps the words unmounted after registration fails", async () => {
+      const registration = deferred<void>()
+      mockLeaseReady = registration.promise
+
+      const { queryByText, findByTestId } = render(
+        <ContextForScreen>
+          <ViewBackupPhraseScreen />
+        </ContextForScreen>,
+      )
+      await act(async () => {})
+      registration.reject(new Error("native failure"))
+
+      expect(await findByTestId("screen-security-retry")).toBeTruthy()
+      expect(queryByText("youth")).toBeNull()
+      expect(headerRightWasInstalled()).toBe(false)
+    })
   })
 
   it("renders all 12 words once the mnemonic loads", async () => {

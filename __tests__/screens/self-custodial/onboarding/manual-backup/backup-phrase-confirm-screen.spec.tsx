@@ -99,13 +99,10 @@ jest.mock("@app/utils/error-logging", () => ({
   reportError: (...args: readonly unknown[]) => mockReportError(...args),
 }))
 
-const mockEnableScreenSecurity = jest.fn()
-const mockDisableScreenSecurity = jest.fn()
+const mockReleaseScreenSecurity = jest.fn(() => Promise.resolve())
+const mockAcquireScreenSecurity = jest.fn()
 jest.mock("@app/utils/screen-security", () => ({
-  enableScreenSecurity: (...args: readonly unknown[]) =>
-    mockEnableScreenSecurity(...args),
-  disableScreenSecurity: (...args: readonly unknown[]) =>
-    mockDisableScreenSecurity(...args),
+  acquireScreenSecurity: () => mockAcquireScreenSecurity(),
 }))
 
 loadLocale("en")
@@ -117,8 +114,10 @@ describe("BackupPhraseConfirmScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     jest.useFakeTimers({ doNotFake: ["setImmediate"] })
-    mockEnableScreenSecurity.mockResolvedValue(undefined)
-    mockDisableScreenSecurity.mockResolvedValue(undefined)
+    mockAcquireScreenSecurity.mockReturnValue({
+      ready: Promise.resolve(),
+      release: mockReleaseScreenSecurity,
+    })
     mockCheckpoint.mockReturnValue(null)
     mockMigrationAccountId.mockReturnValue("migration-uuid")
     mockCheckpointLoading.mockReturnValue(false)
@@ -582,7 +581,7 @@ describe("BackupPhraseConfirmScreen", () => {
   /** The screen shows individual mnemonic words with their positions, so it must carry
    *  the same screenshot/screen-recording protection as the backup-phrase screen. */
   describe("screen security", () => {
-    it("enables screenshot protection on mount", async () => {
+    it("acquires screen protection on mount", async () => {
       render(
         <ContextForScreen>
           <BackupPhraseConfirmScreen />
@@ -590,10 +589,10 @@ describe("BackupPhraseConfirmScreen", () => {
       )
       await flushEffects()
 
-      expect(mockEnableScreenSecurity).toHaveBeenCalledTimes(1)
+      expect(mockAcquireScreenSecurity).toHaveBeenCalledTimes(1)
     })
 
-    it("disables screenshot protection on unmount", async () => {
+    it("releases screen protection on unmount", async () => {
       const { unmount } = render(
         <ContextForScreen>
           <BackupPhraseConfirmScreen />
@@ -603,7 +602,7 @@ describe("BackupPhraseConfirmScreen", () => {
 
       unmount()
 
-      expect(mockDisableScreenSecurity).toHaveBeenCalledTimes(1)
+      expect(mockReleaseScreenSecurity).toHaveBeenCalledTimes(1)
     })
   })
 })

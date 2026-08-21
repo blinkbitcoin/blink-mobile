@@ -10,8 +10,8 @@ import { GaloyTertiaryButton } from "@app/components/atomic/galoy-tertiary-butto
 import { headerRightNoGlass } from "@app/components/header-no-glass"
 import { WarningCard } from "@app/components/warning-card"
 import { Screen } from "@app/components/screen"
+import { ScreenSecurityGate } from "@app/components/screen-security-gate"
 import { SparkCompatibleInfo } from "@app/components/spark-compatible-info"
-import { useScreenSecurity } from "@app/hooks/use-screen-security"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { reportError } from "@app/utils/error-logging"
 import { testProps } from "@app/utils/testProps"
@@ -31,7 +31,9 @@ const HEADER_BUTTON_HIT_SLOP = { top: 12, bottom: 12, left: 12, right: 12 }
 
 type PhraseRouteProp = RouteProp<RootStackParamList, "selfCustodialBackupPhrase">
 
-export const BackupPhraseScreen: React.FC = () => {
+/** The gate mounts this only once the screenshot guard is actually on — the words
+ *  and the header Copy action must not exist while registration is pending. */
+const BackupPhraseContent: React.FC = () => {
   const { LL } = useI18nContext()
   const styles = useStyles()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
@@ -51,8 +53,6 @@ export const BackupPhraseScreen: React.FC = () => {
       { dedupKey: "backup-phrase-params-missing", alwaysRecord: true },
     )
   }, [hasValidStep])
-
-  useScreenSecurity()
 
   const {
     firstCard,
@@ -123,6 +123,12 @@ export const BackupPhraseScreen: React.FC = () => {
     </Screen>
   )
 }
+
+export const BackupPhraseScreen: React.FC = () => (
+  <ScreenSecurityGate>
+    <BackupPhraseContent />
+  </ScreenSecurityGate>
+)
 
 const useStyles = makeStyles(({ colors }) => ({
   content: {
