@@ -88,6 +88,20 @@ describe("useSelfCustodialContacts", () => {
     expect(mockListContacts).not.toHaveBeenCalled()
   })
 
+  it("list() answers with nothing while the wallet is not connected", async () => {
+    mockUseSelfCustodialWallet.mockReturnValue({ sdk: null })
+    const { result } = renderHook(() => useSelfCustodialContacts())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    let contacts: Awaited<ReturnType<typeof result.current.list>>["contacts"] = []
+    await act(async () => {
+      ;({ contacts } = await result.current.list())
+    })
+
+    expect(contacts).toEqual([])
+    expect(mockListContacts).not.toHaveBeenCalled()
+  })
+
   it("exposes full write capabilities", async () => {
     const { result } = renderHook(() => useSelfCustodialContacts())
     await waitFor(() => expect(result.current.loading).toBe(false))
@@ -140,6 +154,21 @@ describe("useSelfCustodialContacts", () => {
       id: "c1",
       name: "Alice 2",
       paymentIdentifier: "alice@blink.sv",
+    })
+  })
+
+  it("update() keeps the name when only the payment identifier changes", async () => {
+    const { result } = renderHook(() => useSelfCustodialContacts())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    await act(async () => {
+      await result.current.update("c1", { paymentIdentifier: "alice@other.sv" })
+    })
+
+    expect(mockUpdateContact).toHaveBeenCalledWith(mockSdk, {
+      id: "c1",
+      name: "Alice",
+      paymentIdentifier: "alice@other.sv",
     })
   })
 
@@ -232,5 +261,36 @@ describe("useSelfCustodialContacts", () => {
       "alice@blink.sv",
       0,
     )
+  })
+
+  it("holds no contacts when the first read fails, and stops loading", async () => {
+    // A failed read leaves the screen with nothing to match against rather than a
+    // half-populated list, and must not spin forever.
+    mockListContacts.mockRejectedValue(new Error("sdk unavailable"))
+
+    const { result } = renderHook(() => useSelfCustodialContacts())
+
+    await waitFor(() => expect(result.current.loading).toBe(false))
+    await expect(result.current.update("c1", { displayName: "Alice 2" })).rejects.toThrow(
+      /Contact c1 not found/,
+    )
+  })
+
+  it("ignores a read that answers after it unmounts", async () => {
+    let rejectRead: (error: Error) => void = () => {}
+    mockListContacts.mockReturnValue(
+      new Promise((_resolve, reject) => {
+        rejectRead = reject
+      }),
+    )
+
+    const { unmount } = renderHook(() => useSelfCustodialContacts())
+    unmount()
+
+    await act(async () => {
+      rejectRead(new Error("late"))
+    })
+
+    expect(mockListContacts).toHaveBeenCalledWith(mockSdk)
   })
 })
