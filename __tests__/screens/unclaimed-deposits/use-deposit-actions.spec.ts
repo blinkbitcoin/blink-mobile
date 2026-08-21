@@ -15,15 +15,11 @@ const mockRefundDeposit = jest.fn()
 const mockGetClaimFee = jest.fn()
 const mockToastShow = jest.fn()
 
+/** Held in a mock so one test can take the wallet away and see what the hook does. */
+const mockUsePayments = jest.fn()
+
 jest.mock("@app/hooks/use-payments", () => ({
-  usePayments: () => ({
-    listPendingDeposits: mockListPendingDeposits,
-    claimDeposit: {
-      claimDeposit: mockClaimDeposit,
-      refundDeposit: mockRefundDeposit,
-      getClaimFee: mockGetClaimFee,
-    },
-  }),
+  usePayments: () => mockUsePayments(),
 }))
 
 jest.mock("@app/i18n/i18n-react", () => ({
@@ -40,6 +36,14 @@ jest.mock("@app/i18n/i18n-react", () => ({
         claimFailed: ({ error }: { error: string }) => `Claim failed: ${error}`,
         claimSuccess: () => "Deposit claimed",
         error: () => "Error",
+      },
+      /** The real translator reads these, so the hook renders sentences, not codes. */
+      SelfCustodialError: {
+        insufficientFunds: () => "Not enough funds",
+        belowMinimum: () => "Below the minimum",
+        networkError: () => "Network connection problem",
+        invalidInput: () => "The payment details look invalid",
+        generic: () => "Something went wrong. Please try again.",
       },
     },
   }),
@@ -62,9 +66,57 @@ const buildDeposit = (overrides: Partial<PendingDeposit> = {}): PendingDeposit =
 describe("useDepositActions", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockUsePayments.mockReturnValue({
+      listPendingDeposits: mockListPendingDeposits,
+      claimDeposit: {
+        claimDeposit: mockClaimDeposit,
+        refundDeposit: mockRefundDeposit,
+        getClaimFee: mockGetClaimFee,
+      },
+    })
     mockListPendingDeposits.mockResolvedValue({ deposits: [] })
     mockRefundDeposit.mockResolvedValue({ status: PaymentResultStatus.Success })
     mockClaimDeposit.mockResolvedValue({ status: PaymentResultStatus.Success })
+  })
+
+  describe("without a connected wallet", () => {
+    beforeEach(() => {
+      mockUsePayments.mockReturnValue({
+        listPendingDeposits: undefined,
+        claimDeposit: undefined,
+      })
+    })
+
+    it("says so instead of claiming into nothing", async () => {
+      const { result } = renderHook(() => useDepositActions())
+
+      await act(async () => {
+        await result.current.handleClaim(buildDeposit())
+      })
+
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({ message: "Error" }),
+      )
+      expect(mockClaimDeposit).not.toHaveBeenCalled()
+    })
+
+    it("holds an empty list rather than reading one it cannot read", async () => {
+      const { result } = renderHook(() => useDepositActions())
+      await act(async () => {})
+
+      expect(result.current.deposits).toEqual([])
+      expect(mockListPendingDeposits).not.toHaveBeenCalled()
+    })
+
+    it("does not attempt a refund", async () => {
+      const { result } = renderHook(() => useDepositActions())
+
+      await act(async () => {
+        await result.current.handleRefund(buildDeposit(), "bc1qaddr", 3)
+      })
+
+      expect(mockRefundDeposit).not.toHaveBeenCalled()
+    })
   })
 
   describe("handleRefund — fee rate validation", () => {
@@ -121,6 +173,94 @@ describe("useDepositActions", () => {
         destinationAddress: "bc1qaddr",
         feeRateSatPerVb: 12,
       })
+    })
+
+    it("explains a refund refused because the deposit is below dust", async () => {
+      mockRefundDeposit.mockResolvedValue({ status: PaymentResultStatus.Failed })
+
+      const { result } = renderHook(() => useDepositActions())
+
+      await act(async () => {
+        await result.current.handleRefund(
+          buildDeposit({ errorReason: DepositErrorReason.BelowDust }),
+          "bc1qaddr",
+          5,
+        )
+      })
+
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({ message: "Below dust" }),
+      )
+    })
+
+    it("explains a refund refused because the network fee is too high", async () => {
+      mockRefundDeposit.mockResolvedValue({ status: PaymentResultStatus.Failed })
+
+      const { result } = renderHook(() => useDepositActions())
+
+      await act(async () => {
+        await result.current.handleRefund(
+          buildDeposit({
+            errorReason: DepositErrorReason.FeeExceeded,
+            requiredFeeSats: 420,
+          }),
+          "bc1qaddr",
+          5,
+        )
+      })
+
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({ message: "Fee exceeded 420" }),
+      )
+    })
+
+    it("names a zero fee when a refund refusal carries no figure", async () => {
+      mockRefundDeposit.mockResolvedValue({ status: PaymentResultStatus.Failed })
+
+      const { result } = renderHook(() => useDepositActions())
+
+      await act(async () => {
+        await result.current.handleRefund(
+          buildDeposit({ errorReason: DepositErrorReason.FeeExceeded }),
+          "bc1qaddr",
+          5,
+        )
+      })
+
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({ message: "Fee exceeded 0" }),
+      )
+    })
+
+    it("keeps an empty refund failure message empty", async () => {
+      mockRefundDeposit.mockResolvedValue({
+        status: PaymentResultStatus.Failed,
+        errors: [{ message: "" }],
+      })
+
+      const { result } = renderHook(() => useDepositActions())
+
+      await act(async () => {
+        await result.current.handleRefund(buildDeposit(), "bc1qaddr", 5)
+      })
+
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({ message: "Refund failed: " }),
+      )
+    })
+
+    it("falls back to a plain error when a refund failure says nothing at all", async () => {
+      mockRefundDeposit.mockResolvedValue({ status: PaymentResultStatus.Failed })
+
+      const { result } = renderHook(() => useDepositActions())
+
+      await act(async () => {
+        await result.current.handleRefund(buildDeposit(), "bc1qaddr", 5)
+      })
+
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({ message: "Error" }),
+      )
     })
 
     it("surfaces SDK refund failure as a toast", async () => {
@@ -225,6 +365,145 @@ describe("useDepositActions", () => {
 
       expect(mockToastShow).toHaveBeenCalledWith(
         expect.objectContaining({ message: "Fee exceeded 198" }),
+      )
+    })
+
+    it("tells the reader what happened rather than repeating the SDK's code", async () => {
+      mockClaimDeposit.mockResolvedValue({
+        status: PaymentResultStatus.Failed,
+        errors: [{ message: "sc_generic" }],
+      })
+
+      const { result } = renderHook(() => useDepositActions())
+
+      await act(async () => {
+        await result.current.handleClaim(buildDeposit())
+      })
+
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: "Claim failed: Something went wrong. Please try again.",
+        }),
+      )
+    })
+
+    it("explains a deposit too small to claim", async () => {
+      mockClaimDeposit.mockResolvedValue({ status: PaymentResultStatus.Failed })
+
+      const { result } = renderHook(() => useDepositActions())
+
+      await act(async () => {
+        await result.current.handleClaim(
+          buildDeposit({ errorReason: DepositErrorReason.BelowDust }),
+        )
+      })
+
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({ message: "Below dust" }),
+      )
+    })
+
+    it("explains a deposit the network no longer holds", async () => {
+      mockClaimDeposit.mockResolvedValue({ status: PaymentResultStatus.Failed })
+
+      const { result } = renderHook(() => useDepositActions())
+
+      await act(async () => {
+        await result.current.handleClaim(
+          buildDeposit({ errorReason: DepositErrorReason.MissingUtxo }),
+        )
+      })
+
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({ message: "Missing UTXO" }),
+      )
+    })
+
+    it("names a zero fee when the SDK reported no figure with its refusal", async () => {
+      mockClaimDeposit.mockResolvedValue({ status: PaymentResultStatus.Failed })
+
+      const { result } = renderHook(() => useDepositActions())
+
+      await act(async () => {
+        await result.current.handleClaim(
+          buildDeposit({ errorReason: DepositErrorReason.FeeExceeded }),
+        )
+      })
+
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({ message: "Fee exceeded 0" }),
+      )
+    })
+
+    it("keeps an empty failure message empty rather than inventing one", async () => {
+      mockClaimDeposit.mockResolvedValue({
+        status: PaymentResultStatus.Failed,
+        errors: [{ message: "" }],
+      })
+
+      const { result } = renderHook(() => useDepositActions())
+
+      await act(async () => {
+        await result.current.handleClaim(buildDeposit())
+      })
+
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({ message: "Claim failed: " }),
+      )
+    })
+
+    it("falls back to a plain error when the failure says nothing at all", async () => {
+      mockClaimDeposit.mockResolvedValue({ status: PaymentResultStatus.Failed })
+
+      const { result } = renderHook(() => useDepositActions())
+
+      await act(async () => {
+        await result.current.handleClaim(buildDeposit())
+      })
+
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({ message: "Error" }),
+      )
+    })
+
+    it("marks the deposit as processing while its claim is in flight", async () => {
+      let settleClaim: (value: unknown) => void = () => {}
+      mockClaimDeposit.mockReturnValue(
+        new Promise((resolve) => {
+          settleClaim = resolve
+        }),
+      )
+
+      const { result } = renderHook(() => useDepositActions())
+      const deposit = buildDeposit()
+
+      act(() => {
+        result.current.handleClaim(deposit)
+      })
+
+      await waitFor(() => expect(result.current.isBusy).toBe(true))
+      expect(result.current.isProcessing(deposit.id, "claim")).toBe(true)
+      expect(result.current.isProcessing("another-deposit", "claim")).toBe(false)
+
+      await act(async () => {
+        settleClaim({ status: PaymentResultStatus.Success })
+      })
+    })
+
+    it("leaves a message that is not a classified code exactly as it came", async () => {
+      mockClaimDeposit.mockResolvedValue({
+        status: PaymentResultStatus.Failed,
+        errors: [{ message: "Invalid depositId: garbage" }],
+      })
+
+      const { result } = renderHook(() => useDepositActions())
+
+      await act(async () => {
+        await result.current.handleClaim(buildDeposit())
+      })
+
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({ message: "Claim failed: Invalid depositId: garbage" }),
       )
     })
   })
