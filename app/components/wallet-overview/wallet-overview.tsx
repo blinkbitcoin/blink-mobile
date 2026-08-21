@@ -9,7 +9,7 @@ import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { getBtcWallet, getUsdWallet, WalletBalance } from "@app/graphql/wallets-utils"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
-import { useDollarBalanceRestricted } from "@app/hooks/use-dollar-balance-restricted"
+import { useDollarBalanceRestriction } from "@app/hooks/use-dollar-balance-restricted"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { testProps } from "@app/utils/testProps"
@@ -79,7 +79,8 @@ const WalletOverview: React.FC<Props> = ({
   showBtcNotification = false,
   showUsdNotification = false,
 }) => {
-  const isDollarBalanceRestricted = useDollarBalanceRestricted()
+  const { isRestricted: isDollarBalanceRestricted, isRegionPending } =
+    useDollarBalanceRestriction()
   const { hideAmount, toggleHideAmount } = useHideAmount()
 
   const { LL } = useI18nContext()
@@ -144,6 +145,14 @@ const WalletOverview: React.FC<Props> = ({
     ? `${CARD_NUMBER_MASK} ${cardLastFour}`
     : CARD_NUMBER_MASK
 
+  /** The dollar row rides the same loader while the region resolves, and stays inert
+   *  meanwhile: reading the unresolved region as unrestricted is what showed a restricted
+   *  user their balance at launch. The explanation waits too, since it would be wrong for
+   *  a user who turns out to be unrestricted. */
+  const isDollarBalanceLoading = loading || isRegionPending
+  const isDollarRowInert = isDollarBalanceRestricted || isRegionPending
+  const onDollarBalanceRestrictedPress = isRegionPending ? undefined : onRestrictedTap
+
   return (
     <View style={styles.container}>
       <View style={styles.myAccounts}>
@@ -201,8 +210,8 @@ const WalletOverview: React.FC<Props> = ({
       <View style={styles.separator} />
 
       <DisabledFeature
-        disabled={isDollarBalanceRestricted}
-        onDisabledPress={onRestrictedTap}
+        disabled={isDollarRowInert}
+        onDisabledPress={onDollarBalanceRestrictedPress}
       >
         <Pressable
           onPressIn={() => setPressedUsd(true)}
@@ -228,7 +237,7 @@ const WalletOverview: React.FC<Props> = ({
                 <GaloyIcon color={colors.grey1} name="question" size={18} />
               </Pressable>
             </View>
-            {loading ? (
+            {isDollarBalanceLoading ? (
               <Loader />
             ) : isDollarBalanceRestricted ? (
               <View style={[styles.hideableArea, styles.restrictionLabel]}>

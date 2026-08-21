@@ -2,7 +2,7 @@ import { useCallback, useState } from "react"
 
 import type { BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
 
-import { useDollarBalanceRestricted } from "@app/hooks/use-dollar-balance-restricted"
+import { useDollarBalanceRestriction } from "@app/hooks/use-dollar-balance-restricted"
 import { logSelfCustodialStableBalanceActivated } from "@app/self-custodial/analytics"
 import { activateStableBalance } from "@app/self-custodial/bridge"
 import { SparkToken } from "@app/self-custodial/config"
@@ -21,6 +21,11 @@ type Params = {
 
 export type StableBalanceToggleControls = {
   busy: boolean
+  /** The region verdict has not landed, so an activation would be refused. Surfaced so the
+   *  screen can disable the switch instead of letting it flip on and snap back unexplained;
+   *  this screen is self-custodial-only, which is the group whose region resolves over the
+   *  network and can take seconds. */
+  isRegionPending: boolean
   displayValue: boolean
   switchKey: number
   apply: (activate: boolean) => Promise<void>
@@ -34,7 +39,8 @@ export const useStableBalanceToggle = ({
   refreshStableBalanceActive,
   LL,
 }: Params): StableBalanceToggleControls => {
-  const isDollarBalanceRestricted = useDollarBalanceRestricted()
+  const { isRestricted: isDollarBalanceRestricted, isRegionPending } =
+    useDollarBalanceRestriction()
   const [busy, setBusy] = useState(false)
   const [pendingValue, setPendingValue] = useState<boolean | null>(null)
   const [switchKey, setSwitchKey] = useState(0)
@@ -55,6 +61,14 @@ export const useStableBalanceToggle = ({
           LL,
           type: "error",
         })
+        resyncSwitch()
+        return
+      }
+
+      /** No toast: the region has not accused the user yet, so it snaps back silently
+       *  rather than claim a restriction that may not hold. */
+      const isActivationUnresolved = activate && isRegionPending
+      if (isActivationUnresolved) {
         resyncSwitch()
         return
       }
@@ -92,6 +106,7 @@ export const useStableBalanceToggle = ({
       sdk,
       busy,
       isDollarBalanceRestricted,
+      isRegionPending,
       refreshStableBalanceActive,
       refreshWallets,
       LL,
@@ -101,6 +116,7 @@ export const useStableBalanceToggle = ({
 
   return {
     busy,
+    isRegionPending,
     displayValue: pendingValue ?? isStableBalanceActive,
     switchKey,
     apply,

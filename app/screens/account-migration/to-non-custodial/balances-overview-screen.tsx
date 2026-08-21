@@ -187,9 +187,14 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
 
   /** Approve commits against a server-side flow, so it stays off until the server has
    *  confirmed one exists and the lightning address has moved, not merely until the
-   *  figures render. */
+   *  figures render. The dollar verdict is held to the same bar: the figures may render
+   *  before it lands, but nothing irreversible may be approved against a dollar balance
+   *  the region has not ruled on. */
   const isApproveDisabled =
-    !preview.isReady || !migrationStart.isStarted || !lnAddressTransfer.isTransferred
+    !preview.isReady ||
+    preview.isDollarRegionPending ||
+    !migrationStart.isStarted ||
+    !lnAddressTransfer.isTransferred
 
   return (
     <Screen preset="fixed" headerShown={false}>
@@ -210,6 +215,7 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
               dollarLabel={LLOverview.currentDollarBalance()}
               dollarValue={preview.currentDollarBalance}
               isDollarValueMuted={preview.isCurrentDollarBalanceRestricted}
+              isDollarValuePending={preview.isDollarRegionPending}
             />
 
             <RichText text={preview.networkFeeLine} style={styles.networkFee} />
@@ -225,6 +231,7 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
               dollarLabel={LLOverview.newDollarBalance()}
               dollarValue={preview.newDollarBalance}
               isDollarValueMuted={preview.isNewDollarBalanceRestricted}
+              isDollarValuePending={preview.isDollarRegionPending}
             />
           </ScrollView>
         ) : (

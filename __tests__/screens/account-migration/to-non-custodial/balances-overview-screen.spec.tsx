@@ -38,6 +38,7 @@ const rejectedMigrationStart = {
 }
 let mockDollarRestricted = false
 let mockCurrentDollarRestricted = false
+let mockDollarRegionPending = false
 let mockConvertReady = true
 
 let mockIsFocused = true
@@ -162,6 +163,11 @@ jest.mock("@app/config/feature-flags-context", () => ({
 jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
   useDollarBalanceRestricted: (accountType: string) =>
     accountType === "custodial" ? mockCurrentDollarRestricted : mockDollarRestricted,
+  useDollarBalanceRestriction: (accountType: string) => ({
+    isRestricted:
+      accountType === "custodial" ? mockCurrentDollarRestricted : mockDollarRestricted,
+    isRegionPending: mockDollarRegionPending,
+  }),
 }))
 
 jest.mock("@app/hooks/use-display-currency", () => ({
@@ -179,18 +185,20 @@ jest.mock("@app/hooks/use-display-currency", () => ({
   }),
 }))
 
-const renderScreen = () =>
-  render(
-    <ContextForScreen>
-      <MigrationBalancesOverviewScreen />
-    </ContextForScreen>,
-  )
+const screenTree = () => (
+  <ContextForScreen>
+    <MigrationBalancesOverviewScreen />
+  </ContextForScreen>
+)
+
+const renderScreen = () => render(screenTree())
 
 const resetScreenMocks = () => {
   jest.clearAllMocks()
   loadLocale("en")
   mockDollarRestricted = false
   mockCurrentDollarRestricted = false
+  mockDollarRegionPending = false
   mockConvertReady = true
   mockCheckpointLoading = false
   mockCheckpointAccountId = "sc-account-1"
@@ -957,6 +965,70 @@ describe("MigrationBalancesOverviewScreen", () => {
     fireEvent.press(screen.getByTestId("migration-balances-overview-retry"))
 
     expect(mockLnRetry).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe("MigrationBalancesOverviewScreen dollar-region gating", () => {
+  beforeEach(resetScreenMocks)
+
+  /**
+   * The self-custodial verdict waits on the IP lookup, which the still-custodial session has
+   * no phone country to shortcut, so this wait is seconds. Only the dollar rows depend on it:
+   * the bitcoin figures render at once, and Approve stays disabled, so nothing irreversible
+   * is committed against a dollar balance the region has not ruled on.
+   */
+  it("shows the bitcoin figures while the dollar rows wait for the region", async () => {
+    mockDollarRegionPending = true
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.getByText(LLOverview.currentBitcoinBalance())).toBeTruthy()
+    expect(screen.queryByTestId("migration-balances-overview-loading")).toBeNull()
+  })
+
+  it("states no dollar figure while the region is still resolving", async () => {
+    mockDollarRegionPending = true
+    renderScreen()
+    await flushEffects()
+
+    /** Rendering it as unrestricted would promise a Dollar Balance the new account cannot
+     *  hold and then swap it for "not available", in the one step the user cannot take back. */
+    expect(screen.queryByText("USD 0")).toBeNull()
+    expect(screen.queryByText(LLOverview.dollarBalanceNotAvailable())).toBeNull()
+    expect(screen.getAllByTestId("dollar-value-pending").length).toBeGreaterThan(0)
+  })
+
+  it("keeps Approve disabled while the dollar region is still resolving", async () => {
+    mockDollarRegionPending = true
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.getByTestId("migration-balances-overview-approve")).toBeDisabled()
+  })
+
+  it("does not hand over to support while the dollar region is still resolving", async () => {
+    mockDollarRegionPending = true
+    renderScreen()
+    await flushEffects()
+
+    /** A region that has not answered yet is not a source that answered with nothing. */
+    expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  it("shows the restricted new dollar balance once the pending region settles", async () => {
+    mockDollarRegionPending = true
+    const { rerender } = renderScreen()
+    await flushEffects()
+
+    expect(screen.getAllByTestId("dollar-value-pending").length).toBeGreaterThan(0)
+
+    mockDollarRegionPending = false
+    mockDollarRestricted = true
+    rerender(screenTree())
+    await flushEffects()
+
+    expect(screen.getByText(LLOverview.dollarBalanceNotAvailable())).toBeTruthy()
+    expect(screen.getAllByText("USD 0")).toHaveLength(1)
   })
 })
 

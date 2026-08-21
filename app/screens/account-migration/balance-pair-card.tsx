@@ -1,9 +1,10 @@
 import React from "react"
-import { View } from "react-native"
+import { ActivityIndicator, View } from "react-native"
 
-import { makeStyles } from "@rn-vui/themed"
+import { makeStyles, Text } from "@rn-vui/themed"
 
 import { InfoRow } from "@app/components/card-screen/info-row"
+import { testProps } from "@app/utils/testProps"
 
 type BalancePairCardProps = {
   bitcoinLabel: string
@@ -12,6 +13,10 @@ type BalancePairCardProps = {
   dollarLabel: string
   dollarValue: string
   isDollarValueMuted?: boolean
+  /** The region has not said yet whether this figure is muted. Showing the number now would
+   *  state a balance the verdict may be about to withdraw, so the row waits on its own while
+   *  the bitcoin row above it renders. */
+  isDollarValuePending?: boolean
 }
 
 /** One balances card of the commit screen: a Bitcoin row and a Dollar row. */
@@ -22,6 +27,7 @@ export const BalancePairCard: React.FC<BalancePairCardProps> = ({
   dollarLabel,
   dollarValue,
   isDollarValueMuted,
+  isDollarValuePending,
 }) => {
   const styles = useStyles()
 
@@ -34,12 +40,21 @@ export const BalancePairCard: React.FC<BalancePairCardProps> = ({
         isLabelRegular
       />
       <View style={styles.separator} />
-      <InfoRow
-        label={dollarLabel}
-        value={dollarValue}
-        isValueMuted={isDollarValueMuted}
-        isLabelRegular
-      />
+      {isDollarValuePending ? (
+        <View style={styles.dollarPendingRow} {...testProps("dollar-value-pending")}>
+          <Text type="p2" style={styles.dollarPendingLabel}>
+            {dollarLabel}
+          </Text>
+          <ActivityIndicator size="small" />
+        </View>
+      ) : (
+        <InfoRow
+          label={dollarLabel}
+          value={dollarValue}
+          isValueMuted={isDollarValueMuted}
+          isLabelRegular
+        />
+      )}
     </View>
   )
 }
@@ -56,5 +71,13 @@ const useStyles = makeStyles(({ colors }) => ({
   separator: {
     height: 1,
     backgroundColor: colors.grey4,
+  },
+  dollarPendingRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  dollarPendingLabel: {
+    color: colors.grey1,
   },
 }))

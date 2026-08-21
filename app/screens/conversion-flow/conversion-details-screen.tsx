@@ -1,6 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
-import { View, Animated, Easing, LayoutChangeEvent } from "react-native"
+import {
+  View,
+  ActivityIndicator,
+  Animated,
+  Easing,
+  LayoutChangeEvent,
+} from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { gql } from "@apollo/client"
 
@@ -33,6 +39,7 @@ import {
 } from "@app/types/amounts"
 
 import { Screen } from "@app/components/screen"
+import { testProps } from "@app/utils/testProps"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { useDollarBalanceRestrictionGuard } from "@app/hooks/use-dollar-balance-restriction-guard"
 import { useTransferBlockedGuard } from "@app/hooks/use-transfer-blocked-guard"
@@ -96,13 +103,42 @@ export const ConversionDetailsScreen = () => {
   /** A migration conversion waives the region restriction that would otherwise bounce a
    *  restricted user home: emptying the dollar balance is the one way for them to migrate,
    *  and the gate arming the flag (not a deep-linkable param) is what confirms it. */
-  const isDollarBalanceRestricted = useDollarBalanceRestrictionGuard({
-    enabled: !isMigrationConversion,
-  })
-  const isTransferBlocked = useTransferBlockedGuard({ enabled: !isMigrationConversion })
-  if (isDollarBalanceRestricted || isTransferBlocked) return null
+  const isGuardEnabled = !isMigrationConversion
+  const dollarBalanceGuard = useDollarBalanceRestrictionGuard({ enabled: isGuardEnabled })
+  const transferGuard = useTransferBlockedGuard({ enabled: isGuardEnabled })
+
+  const isRefused = dollarBalanceGuard.isRestricted || transferGuard.isBlocked
+  const isRegionPending =
+    dollarBalanceGuard.isRegionPending || transferGuard.isRegionPending
+
+  /** A refusal is already navigating the user away, so there is nothing to render. */
+  if (isRefused) return null
+
+  /** The wait is not a refusal, and this screen is reachable by routes other than the home
+   *  transfer button, which hides itself while pending. Rendering nothing here would leave
+   *  a deep-linked user on an empty area under the header until the verdict lands. */
+  if (isRegionPending) return <ConversionDetailsRegionPending />
 
   return <ConversionDetailsScreenContent isMigrationConversion={isMigrationConversion} />
+}
+
+const ConversionDetailsRegionPending = () => {
+  const styles = useStyles(false)
+  const {
+    theme: { colors },
+  } = useTheme()
+
+  return (
+    <Screen preset="fixed">
+      <View style={styles.regionPendingContainer}>
+        <ActivityIndicator
+          size="large"
+          color={colors.primary}
+          {...testProps("conversion-details-region-pending")}
+        />
+      </View>
+    </Screen>
+  )
 }
 
 type ConversionDetailsScreenContentProps = {
@@ -851,6 +887,11 @@ const ConversionDetailsScreenContent = ({
 }
 
 const useStyles = makeStyles(({ colors }, currencyInput: boolean) => ({
+  regionPendingContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   iconSlotContainer: {
     width: 30,
     height: 22,

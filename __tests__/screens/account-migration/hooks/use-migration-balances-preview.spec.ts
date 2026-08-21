@@ -26,6 +26,7 @@ jest.mock("@app/screens/account-migration/hooks/use-custodial-wallet-balances", 
 
 jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
   useDollarBalanceRestricted: () => false,
+  useDollarBalanceRestriction: () => ({ isRestricted: false, isRegionPending: false }),
 }))
 
 jest.mock("@app/hooks/use-display-currency", () => ({

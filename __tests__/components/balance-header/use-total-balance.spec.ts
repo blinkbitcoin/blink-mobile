@@ -9,6 +9,7 @@ const mockFormatMoneyAmount = jest.fn(
     `$${(moneyAmount.amount / 100).toFixed(2)}`,
 )
 const mockUseDollarBalanceRestricted = jest.fn()
+const mockIsRegionPending = jest.fn()
 
 jest.mock("@app/hooks", () => ({
   usePriceConversion: () => ({ convertMoneyAmount: mockConvertMoneyAmount() }),
@@ -20,6 +21,10 @@ jest.mock("@app/hooks/use-display-currency", () => ({
 
 jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
   useDollarBalanceRestricted: () => mockUseDollarBalanceRestricted(),
+  useDollarBalanceRestriction: () => ({
+    isRestricted: mockUseDollarBalanceRestricted(),
+    isRegionPending: mockIsRegionPending(),
+  }),
 }))
 
 const wallets = [
@@ -31,6 +36,80 @@ describe("useTotalBalance", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockUseDollarBalanceRestricted.mockReturnValue(false)
+    mockIsRegionPending.mockReturnValue(false)
+  })
+
+  /**
+   * Callers hand this one flag to the whole header, so holding it for the region blanked the
+   * username, the total and the Bitcoin row too, none of which the region decides. On the
+   * self-custodial path the country comes from an IP lookup, so that is seconds of loaders
+   * over figures the app already had. The dollar row holds itself in WalletOverview.
+   */
+  it("does not hold the header's loader for a pending region", () => {
+    mockConvertMoneyAmount.mockReturnValue(({ amount }: { amount: number }) => ({
+      amount,
+      currency: "DisplayCurrency",
+      currencyCode: "USD",
+    }))
+    mockIsRegionPending.mockReturnValue(true)
+
+    const { result } = renderHook(() => useTotalBalance(wallets))
+
+    expect(result.current.isLoading).toBe(false)
+  })
+
+  /** The figures the region does not decide stay readable through the whole wait. */
+  it("reports the bitcoin-only total while the region is pending", () => {
+    mockConvertMoneyAmount.mockReturnValue(({ amount }: { amount: number }) => ({
+      amount,
+      currency: "DisplayCurrency",
+      currencyCode: "USD",
+    }))
+    mockIsRegionPending.mockReturnValue(true)
+
+    const { result } = renderHook(() => useTotalBalance(wallets))
+
+    expect(result.current.isLoading).toBe(false)
+    expect(result.current.satsBalance).toBe(1_000_000)
+  })
+
+  /** Price conversion is the one thing the header genuinely cannot render without, and it
+   *  still holds even while the region is pending. */
+  it("still holds the loader when price conversion has not bootstrapped, region pending or not", () => {
+    mockConvertMoneyAmount.mockReturnValue(undefined)
+    mockIsRegionPending.mockReturnValue(true)
+
+    const { result } = renderHook(() => useTotalBalance(wallets))
+
+    expect(result.current.isLoading).toBe(true)
+  })
+
+  it("keeps the dollars out of satsBalance while the region is pending", () => {
+    mockConvertMoneyAmount.mockReturnValue(({ amount }: { amount: number }) => ({
+      amount,
+      currency: "DisplayCurrency",
+      currencyCode: "USD",
+    }))
+    mockIsRegionPending.mockReturnValue(true)
+
+    const { result } = renderHook(() => useTotalBalance(wallets))
+
+    /** Read without consulting isLoading by the backup nudge, so a pending region must
+     *  not inflate it with dollars that vanish once the verdict lands. */
+    expect(result.current.satsBalance).toBe(1_000_000)
+  })
+
+  it("counts the dollars back into satsBalance once the region settles unrestricted", () => {
+    mockConvertMoneyAmount.mockReturnValue(({ amount }: { amount: number }) => ({
+      amount,
+      currency: "DisplayCurrency",
+      currencyCode: "USD",
+    }))
+    mockIsRegionPending.mockReturnValue(false)
+
+    const { result } = renderHook(() => useTotalBalance(wallets))
+
+    expect(result.current.satsBalance).toBe(1_050_000)
   })
 
   it("flags isLoading=true while price conversion is bootstrapping (account-switch window)", () => {

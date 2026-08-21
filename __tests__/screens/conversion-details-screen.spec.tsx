@@ -91,6 +91,22 @@ jest.mock("@app/hooks/use-device-location", () => ({
   default: () => ({ countryCode: "SV", loading: false }),
 }))
 
+/** Both gates default to "allowed" so the rest of this file exercises the screen itself;
+ *  the region-gate suite at the bottom is the one that varies them. */
+const mockDollarBalanceGuard = jest.fn(() => ({
+  isRestricted: false,
+  isRegionPending: false,
+}))
+const mockTransferGuard = jest.fn(() => ({ isBlocked: false, isRegionPending: false }))
+
+jest.mock("@app/hooks/use-dollar-balance-restriction-guard", () => ({
+  useDollarBalanceRestrictionGuard: () => mockDollarBalanceGuard(),
+}))
+
+jest.mock("@app/hooks/use-transfer-blocked-guard", () => ({
+  useTransferBlockedGuard: () => mockTransferGuard(),
+}))
+
 jest.mock("@app/self-custodial/hooks", () => ({
   useNonCustodialConversionLimits: (...args: unknown[]) =>
     mockUseNonCustodialConversionLimits(...args),
@@ -2471,4 +2487,97 @@ describe("Device locale", () => {
       })
     },
   )
+})
+
+/**
+ * A refusal and a wait are different answers and owe the user different screens. Reading
+ * them as one boolean is what left a deep-linked user on an empty area under the header
+ * until the region resolved, which can take seconds on the IP path.
+ */
+describe("ConversionDetailsScreen region gate", () => {
+  const buildMocks = () =>
+    createGraphQLMocks({
+      btcBalance: 100000,
+      usdBalance: 50000,
+    })
+
+  beforeEach(() => {
+    mockDollarBalanceGuard.mockReturnValue({
+      isRestricted: false,
+      isRegionPending: false,
+    })
+    mockTransferGuard.mockReturnValue({ isBlocked: false, isRegionPending: false })
+  })
+
+  it("renders a loader while the dollar region is still resolving", async () => {
+    mockDollarBalanceGuard.mockReturnValue({ isRestricted: false, isRegionPending: true })
+    const Wrapper = createTestWrapper(buildMocks())
+
+    const { getByTestId, queryByTestId } = render(
+      <Wrapper>
+        <ConversionDetailsScreen />
+      </Wrapper>,
+    )
+
+    expect(getByTestId("conversion-details-region-pending")).toBeTruthy()
+    expect(queryByTestId("wallet-toggle-button")).toBeNull()
+  })
+
+  it("renders a loader while the transfer region is still resolving", async () => {
+    mockTransferGuard.mockReturnValue({ isBlocked: false, isRegionPending: true })
+    const Wrapper = createTestWrapper(buildMocks())
+
+    const { getByTestId } = render(
+      <Wrapper>
+        <ConversionDetailsScreen />
+      </Wrapper>,
+    )
+
+    expect(getByTestId("conversion-details-region-pending")).toBeTruthy()
+  })
+
+  /** A resolved refusal is already resetting to Primary, so a loader would promise a screen
+   *  the user is being taken off. */
+  it("renders nothing once the region resolves to a restriction", async () => {
+    mockDollarBalanceGuard.mockReturnValue({ isRestricted: true, isRegionPending: false })
+    const Wrapper = createTestWrapper(buildMocks())
+
+    const { queryByTestId } = render(
+      <Wrapper>
+        <ConversionDetailsScreen />
+      </Wrapper>,
+    )
+
+    expect(queryByTestId("conversion-details-region-pending")).toBeNull()
+    expect(queryByTestId("wallet-toggle-button")).toBeNull()
+  })
+
+  it("renders nothing once the region resolves to a transfer block", async () => {
+    mockTransferGuard.mockReturnValue({ isBlocked: true, isRegionPending: false })
+    const Wrapper = createTestWrapper(buildMocks())
+
+    const { queryByTestId } = render(
+      <Wrapper>
+        <ConversionDetailsScreen />
+      </Wrapper>,
+    )
+
+    expect(queryByTestId("conversion-details-region-pending")).toBeNull()
+    expect(queryByTestId("wallet-toggle-button")).toBeNull()
+  })
+
+  it("renders the screen once the region resolves to allowed", async () => {
+    const Wrapper = createTestWrapper(buildMocks())
+
+    const { getByTestId, queryByTestId } = render(
+      <Wrapper>
+        <ConversionDetailsScreen />
+      </Wrapper>,
+    )
+
+    await waitFor(() => {
+      expect(getByTestId("wallet-toggle-button")).toBeTruthy()
+    })
+    expect(queryByTestId("conversion-details-region-pending")).toBeNull()
+  })
 })
