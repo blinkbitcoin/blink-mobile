@@ -54,17 +54,6 @@ const useStyles = makeStyles(({ colors }) => ({
     borderRadius: BUTTON_SIZE / 2,
     alignItems: "center",
     justifyContent: "center",
-    opacity: 0.99,
     backgroundColor: colors.white,
-    shadowColor: colors.black,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    // shadow* is iOS-only, and this button is drawn over the map on both — so
-    // without this it sits flat on Android, which is where it is most needed.
-    elevation: 4,
   },
 }))

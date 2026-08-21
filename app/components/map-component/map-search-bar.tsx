@@ -65,10 +65,14 @@ export const MapSearchBar: React.FC<Props> = ({
         // everything, rather than the state living only in the tint.
         accessibilityState={{ selected: isFiltered }}
       >
+        {/* Bold, because the design's dots are chunkier than a regular-weight
+            Phosphor set draws them, and three small dots are easy to lose
+            against a map. */}
         <GaloyIcon
-          name="menu"
+          name="ellipsis"
           size={22}
-          color={isFiltered ? colors._white : colors.primary}
+          weight="bold"
+          color={isFiltered ? colors.white : colors.primary}
         />
       </Pressable>
     </View>
@@ -110,7 +114,9 @@ const useStyles = makeStyles(({ colors }, { topInset }: { topInset: number }) =>
   filter: {
     width: CONTROL_HEIGHT,
     height: CONTROL_HEIGHT,
-    borderRadius: 12,
+    // A circle, on the same radius rule as the field beside it, so the pair
+    // reads as two controls of one family rather than a pill and a tile.
+    borderRadius: CONTROL_HEIGHT / 2,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: colors.white,

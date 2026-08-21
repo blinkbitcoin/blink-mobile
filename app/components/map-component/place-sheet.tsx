@@ -25,7 +25,6 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
-import MaterialIcon from "react-native-vector-icons/MaterialIcons"
 
 import {
   BtcMapPlace,
@@ -38,7 +37,6 @@ import {
   isBoosted,
   isWebUrl,
   mailtoUrl,
-  materialIconName,
   merchantUrl,
   openingStateAt,
   sharesClockWith,
@@ -49,13 +47,14 @@ import {
   webUrl,
 } from "@app/btcmap"
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
+import { GaloyInfo } from "@app/components/atomic/galoy-info"
+import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { recordAppError, toError } from "@app/utils/error-reporting"
 import { openExternalUrl } from "@app/utils/external"
 import { toastShow } from "@app/utils/toast"
 import { Skeleton, Text, makeStyles, useTheme } from "@rn-vui/themed"
-
-import { usePinColor } from "./pin-shape"
 
 const REFRESH_INTERVAL_MS = 60_000
 const SCRIM_COLOR = "rgba(0, 0, 0, 0.4)"
@@ -86,10 +85,10 @@ type Props = {
  * The place's details, on a sheet with two resting positions.
  *
  * It opens at the lower one, which is measured rather than guessed: whatever the
- * header block turns out to be — name, the Navigate button, and how much the
- * place can be trusted — is exactly what shows, so the one action most people
- * want is under their thumb without reading anything. Dragging up rests it at
- * full height, where the rest of the detail lives.
+ * header block turns out to be — name, the Navigate button, how much the place
+ * can be trusted, and where and when it is open — is exactly what shows, so the
+ * one action most people want is under their thumb without reading anything.
+ * Dragging up rests it at full height, where the contact detail lives.
  *
  * The scroll view only scrolls once the sheet is fully open. Below that the
  * whole sheet takes the drag, so a pull anywhere on it resizes rather than
@@ -151,7 +150,10 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
   // The resting offset that leaves the header block showing, once it has been
   // measured. Until then the sheet stays off-screen rather than guessing.
   const peekOffset = useSharedValue(sheetHeight)
-  const [peekHeight, setPeekHeight] = React.useState(0)
+  // The peek's bottom edge within the sheet (y + height), not its bare height:
+  // the border, padding, and handle above it sit inside the visible window too,
+  // and counting only the height clipped their worth off the peek's last row.
+  const [peekBottom, setPeekBottom] = React.useState(0)
   const [isExpanded, setExpanded] = React.useState(false)
 
   const scrollRef = useAnimatedRef<Animated.ScrollView>()
@@ -159,9 +161,15 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
   // that is already at its top from one that is scrolling it back up.
   const scrollOffset = useScrollViewOffset(scrollRef)
 
+  // Exactly the measured bottom edge. The home indicator is cleared by padding
+  // inside the peek instead (see `peek` below), so the strip above it belongs to
+  // the peek: resting any higher than this uncovers the top of the row behind
+  // it, and a row sliced through its glyphs reads as a rendering fault.
+  const restingOffset = peekBottom ? Math.max(0, sheetHeight - peekBottom) : sheetHeight
+
   React.useEffect(() => {
-    peekOffset.value = peekHeight ? sheetHeight - peekHeight : sheetHeight
-  }, [peekHeight, sheetHeight, peekOffset])
+    peekOffset.value = restingOffset
+  }, [restingOffset, peekOffset])
 
   React.useEffect(() => {
     if (!place) {
@@ -172,10 +180,10 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
     // once the details land — a place that can only be paid through another app
     // gains a whole card — and a sheet the user has already pulled up must not
     // drop back down under them when that happens.
-    if (peekHeight && !isExpanded) {
-      offset.value = withSpring(sheetHeight - peekHeight, SPRING)
+    if (peekBottom && !isExpanded) {
+      offset.value = withSpring(restingOffset, SPRING)
     }
-  }, [place, peekHeight, sheetHeight, isExpanded, offset])
+  }, [place, peekBottom, restingOffset, sheetHeight, isExpanded, offset])
 
   const pan = React.useMemo(
     () =>
@@ -243,7 +251,7 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
   )
 
   const boosted = isBoosted(details?.boostedUntil ?? shown?.boostedUntil, now)
-  const styles = useStyles({ bottomInset: insets.bottom, accent: usePinColor(boosted) })
+  const styles = useStyles({ bottomInset: insets.bottom })
 
   if (!shown) return null
 
@@ -290,15 +298,8 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
       disabled={!onPress}
       accessibilityRole={onPress ? "link" : "text"}
     >
-      <GaloyIcon name={icon} size={16} color={colors.grey1} />
+      <GaloyIcon name={icon} size={16} color={onPress ? colors.primary : colors.grey1} />
       <Text style={onPress ? styles.rowLink : styles.rowText}>{text}</Text>
-    </Pressable>
-  )
-
-  const renderChip = (label: string, url: string) => (
-    <Pressable key={label} style={styles.chip} onPress={() => openUrl(url)}>
-      <Text style={styles.chipText}>{label}</Text>
-      <GaloyIcon name="arrow-square-out" size={12} color={colors.primary} />
     </Pressable>
   )
 
@@ -352,22 +353,19 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
           >
             <View style={styles.handle} />
 
-            {/* What the lower resting position shows. Its measured height is
-                the snap point, so this block decides where the sheet stops. */}
+            {/* What the lower resting position shows. Its measured bottom edge
+                sets the snap point, so this block decides where the sheet
+                stops. */}
             <View
               testID="place-sheet-peek"
               style={styles.peek}
-              onLayout={(event) => setPeekHeight(event.nativeEvent.layout.height)}
+              onLayout={(event) =>
+                setPeekBottom(
+                  event.nativeEvent.layout.y + event.nativeEvent.layout.height,
+                )
+              }
             >
               <View style={styles.header}>
-                <View style={styles.avatar}>
-                  <MaterialIcon
-                    name={materialIconName(shown.icon)}
-                    size={22}
-                    color={colors._white}
-                  />
-                </View>
-
                 {isLoading && !details ? (
                   <Skeleton animation="pulse" style={styles.nameSkeleton} />
                 ) : (
@@ -387,30 +385,27 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
                 </Pressable>
               </View>
 
-              <Pressable
-                style={styles.navigate}
-                onPress={navigate}
-                accessibilityRole="button"
-              >
-                <Text style={styles.navigateText}>{LL.MapScreen.navigate()}</Text>
-              </Pressable>
+              <GaloyPrimaryButton title={LL.MapScreen.navigate()} onPress={navigate} />
 
               {/* Sits with the header rather than down among the contact rows:
                   "you cannot pay here with this wallet" is worth knowing before
                   setting off, so it has to be visible without expanding. */}
               {Boolean(appUrl) && (
-                <View style={styles.infoCard} testID="requires-app-card">
-                  <Text style={styles.infoCardText}>{LL.MapScreen.requiresApp()}</Text>
-                  <Pressable
-                    onPress={() => openUrl(appUrl ?? "")}
-                    accessibilityRole="link"
-                  >
+                <View testID="requires-app-card">
+                  <GaloyInfo>
+                    {LL.MapScreen.requiresApp()}
+                    {"\n"}
                     {/* The scheme is noise here — what is worth reading is
                         where it goes, path and all. */}
-                    <Text style={styles.infoCardLink}>
+                    <Text
+                      type="p3"
+                      style={styles.requiresAppLink}
+                      onPress={() => openUrl(appUrl ?? "")}
+                      accessibilityRole="link"
+                    >
                       {(appUrl ?? "").replace(/^https?:\/\//i, "")}
                     </Text>
-                  </Pressable>
+                  </GaloyInfo>
                 </View>
               )}
 
@@ -454,6 +449,16 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
                   </View>
                 )}
               </View>
+
+              {/* Where the place is and when it is open, under the status row as
+                  the design has them: both are read on the way to deciding
+                  whether to set off, so neither is worth a drag to reach. */}
+              {Boolean(details?.address) && (
+                <Text style={styles.peekFact}>{details?.address}</Text>
+              )}
+              {Boolean(details?.openingHours) && (
+                <Text style={styles.peekFact}>{details?.openingHours}</Text>
+              )}
             </View>
 
             <Animated.ScrollView
@@ -482,13 +487,7 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
                 </View>
               )}
 
-              {Boolean(details?.address) && (
-                <Text style={styles.address}>{details?.address}</Text>
-              )}
-
               <View style={styles.rows}>
-                {Boolean(details?.openingHours) &&
-                  renderRow("clock", details?.openingHours ?? "")}
                 {/* The number and address are worth reading even when they are
                     not in a shape we are willing to hand to the dialer or mail
                     app, so these two rows stay — they just stop being tappable. */}
@@ -512,29 +511,27 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
                   renderRow("lightning", LL.MapScreen.payMerchant(), () =>
                     openUrl(details?.paymentUrl ?? ""),
                   )}
+                {/* No brand glyphs in the icon set, so they share one. */}
+                {socials.map(([label, url]) => (
+                  <React.Fragment key={label}>
+                    {renderRow("link", label, () => openUrl(url))}
+                  </React.Fragment>
+                ))}
               </View>
 
               {Boolean(details?.description) && (
                 <Text style={styles.description}>{details?.description}</Text>
               )}
 
-              {socials.length > 0 && (
-                <View style={styles.chips}>
-                  {socials.map(([label, url]) => renderChip(label, url))}
-                </View>
-              )}
-
               {/* Dragging the sheet down closes it, but that is a gesture you
                   have to know about. This is the same thing, spelled out, and
                   it is the last thing you reach going down the detail. */}
-              <Pressable
+              <GaloySecondaryButton
                 testID="close-place-sheet"
-                style={styles.close}
+                title={LL.common.close()}
                 onPress={onClose}
-                accessibilityRole="button"
-              >
-                <Text style={styles.closeText}>{LL.common.close()}</Text>
-              </Pressable>
+                containerStyle={styles.close}
+              />
             </Animated.ScrollView>
           </Animated.View>
         </GestureDetector>
@@ -543,9 +540,9 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
   )
 }
 
-type StyleProps = { bottomInset: number; accent: string }
+type StyleProps = { bottomInset: number }
 
-const useStyles = makeStyles(({ colors }, { bottomInset, accent }: StyleProps) => ({
+const useStyles = makeStyles(({ colors }, { bottomInset }: StyleProps) => ({
   root: {
     flex: 1,
     justifyContent: "flex-end",
@@ -583,20 +580,15 @@ const useStyles = makeStyles(({ colors }, { bottomInset, accent }: StyleProps) =
   peek: {
     paddingHorizontal: 20,
     rowGap: 14,
-    paddingBottom: 14,
+    // The sheet's foot sits at the screen edge while resting, so the home
+    // indicator is cleared here rather than by resting higher than the peek —
+    // lifting the snap point instead only uncovers the row behind it.
+    paddingBottom: 14 + bottomInset,
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
     columnGap: 12,
-  },
-  avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 10,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: accent,
   },
   name: {
     flex: 1,
@@ -609,36 +601,11 @@ const useStyles = makeStyles(({ colors }, { bottomInset, accent }: StyleProps) =
     height: 22,
     borderRadius: 4,
   },
-  // The one thing most people open this sheet to do, so it gets the width and
-  // the accent rather than sharing a row of small icons.
-  navigate: {
-    backgroundColor: colors.primary,
-    borderRadius: 28,
-    minHeight: 56,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  navigateText: {
-    fontSize: 17,
+  requiresAppLink: {
+    // Restated rather than inherited: the themed Text falls back to black, not
+    // to the surrounding GaloyInfo tint.
+    color: colors.blue5,
     fontWeight: "700",
-    color: colors._white,
-  },
-  infoCard: {
-    backgroundColor: colors.grey5,
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    rowGap: 6,
-  },
-  infoCardText: {
-    fontSize: 13,
-    color: colors.black,
-  },
-  infoCardLink: {
-    fontSize: 13,
-    color: colors.black,
-    // Underlined rather than tinted: the card is already a coloured block, and
-    // a second accent inside it competes with the Navigate button above.
     textDecorationLine: "underline",
   },
   status: {
@@ -680,6 +647,10 @@ const useStyles = makeStyles(({ colors }, { bottomInset, accent }: StyleProps) =
     color: colors.grey1,
     flexShrink: 1,
   },
+  peekFact: {
+    fontSize: 14,
+    color: colors.grey1,
+  },
   scroll: {
     flex: 1,
   },
@@ -690,10 +661,6 @@ const useStyles = makeStyles(({ colors }, { bottomInset, accent }: StyleProps) =
     // So a place with little to say still puts Close at the foot of the sheet
     // rather than leaving it stranded halfway up under a short list.
     flexGrow: 1,
-  },
-  address: {
-    fontSize: 14,
-    color: colors.grey1,
   },
   rows: {
     rowGap: 4,
@@ -714,27 +681,9 @@ const useStyles = makeStyles(({ colors }, { bottomInset, accent }: StyleProps) =
   rowLink: {
     flex: 1,
     fontSize: 14,
+    fontWeight: "700",
     color: colors.primary,
-  },
-  chips: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    columnGap: 8,
-    rowGap: 8,
-  },
-  chip: {
-    flexDirection: "row",
-    alignItems: "center",
-    columnGap: 6,
-    borderWidth: 1,
-    borderColor: colors.grey4,
-    borderRadius: 16,
-    paddingHorizontal: 14,
-    minHeight: 44,
-  },
-  chipText: {
-    fontSize: 12,
-    color: colors.black,
+    textDecorationLine: "underline",
   },
   description: {
     fontSize: 14,
@@ -766,13 +715,5 @@ const useStyles = makeStyles(({ colors }, { bottomInset, accent }: StyleProps) =
   close: {
     // Pushed to the foot of the scroll area by whatever space is left over.
     marginTop: "auto",
-    alignItems: "center",
-    justifyContent: "center",
-    minHeight: 48,
-  },
-  closeText: {
-    fontSize: 17,
-    fontWeight: "600",
-    color: colors.primary,
   },
 }))

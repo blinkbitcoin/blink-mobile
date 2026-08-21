@@ -1,9 +1,12 @@
 import React from "react"
-import { Linking, Share } from "react-native"
+import { Linking, Share, StyleSheet } from "react-native"
+import { getAnimatedStyle } from "react-native-reanimated"
 import { act, render, fireEvent, waitFor, within } from "@testing-library/react-native"
 
 import { BtcMapPlace, BtcMapPlaceDetails } from "@app/btcmap"
 import { useBtcMapPlaceDetails } from "@app/btcmap/use-place-details"
+import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { PlaceSheet } from "@app/components/map-component/place-sheet"
 import { openExternalUrl } from "@app/utils/external"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
@@ -16,9 +19,11 @@ jest.mock("@app/btcmap/use-place-details", () => ({
 
 jest.mock("@app/utils/external", () => ({ openExternalUrl: jest.fn() }))
 
+// Read lazily so a test can raise the home-indicator inset before rendering.
+let mockBottomInset = 0
 jest.mock("react-native-safe-area-context", () => ({
   ...jest.requireActual("react-native-safe-area-context"),
-  useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
+  useSafeAreaInsets: () => ({ top: 0, bottom: mockBottomInset, left: 0, right: 0 }),
 }))
 
 const mockedUseDetails = useBtcMapPlaceDetails as jest.MockedFunction<
@@ -62,6 +67,7 @@ const renderSheet = (props: Partial<React.ComponentProps<typeof PlaceSheet>> = {
 
 beforeEach(() => {
   jest.clearAllMocks()
+  mockBottomInset = 0
   loadLocale("en")
   jest.spyOn(Linking, "openURL").mockResolvedValue(true)
   mockedOpenExternal.mockResolvedValue(undefined)
@@ -172,6 +178,81 @@ describe("PlaceSheet", () => {
     expect(within(peek).getByText("Satoshi Coffee")).toBeTruthy()
   })
 
+  it("presses the app's own buttons into service rather than restyling a Pressable", async () => {
+    // Navigate and Close are the shared primary and secondary buttons, so the
+    // pill radius, the on-primary title colour, the disabled and loading states
+    // and the press feedback all arrive from the theme. A local copy of any of
+    // that is a copy that drifts.
+    const tree = renderSheet()
+
+    await waitFor(() => expect(tree.getByText("Satoshi Coffee")).toBeTruthy())
+
+    // eslint-disable-next-line camelcase -- testing-library exposes this verbatim
+    expect(tree.UNSAFE_getByType(GaloyPrimaryButton).props.title).toBe("Navigate")
+    // eslint-disable-next-line camelcase -- testing-library exposes this verbatim
+    expect(tree.UNSAFE_getByType(GaloySecondaryButton).props.title).toBe("Close")
+  })
+
+  it("stays off screen until the peek has been measured, rather than guessing", async () => {
+    // No layout event has fired yet, so there is nothing to derive the snap
+    // point from — the sheet waits below the screen instead of opening to a
+    // made-up height and hopping once the real one lands.
+    const { getByTestId, getByText } = renderSheet()
+
+    await waitFor(() => expect(getByText("Satoshi Coffee")).toBeTruthy())
+
+    const sheet = getByTestId("place-sheet")
+    const sheetHeight = StyleSheet.flatten(sheet.props.style).height as number
+    expect(getAnimatedStyle(sheet)).toMatchObject({
+      transform: [{ translateY: sheetHeight }],
+    })
+  })
+
+  it("rests on the peek's bottom edge, clear of the home indicator", async () => {
+    jest.useFakeTimers()
+    try {
+      mockBottomInset = 34
+      const { getByTestId } = renderSheet()
+      const sheet = getByTestId("place-sheet")
+      const sheetHeight = StyleSheet.flatten(sheet.props.style).height as number
+
+      // The indicator is cleared by padding inside the peek, so the snap point
+      // does not lift for it: a sheet resting higher than the peek's own edge
+      // uncovers the top of the row behind it, and half a row of contact detail
+      // sliced by the screen edge reads as a rendering fault.
+      const peek = getByTestId("place-sheet-peek")
+      expect(StyleSheet.flatten(peek.props.style).paddingBottom).toBe(14 + 34)
+
+      fireEvent(peek, "layout", {
+        nativeEvent: { layout: { x: 0, y: 24, width: 375, height: 200 } },
+      })
+      // Run the opening spring to rest.
+      await act(async () => {
+        jest.advanceTimersByTime(3000)
+      })
+
+      // The snap point is the peek's bottom edge — y + height, since the handle
+      // and padding above it show inside the window too, so its bare height is
+      // not enough — and nothing beyond it.
+      expect(getAnimatedStyle(sheet)).toMatchObject({
+        transform: [{ translateY: sheetHeight - (24 + 200) }],
+      })
+
+      // A peek measured taller than the sheet can show stops at fully open
+      // rather than pushing the sheet's top edge off the screen's.
+      fireEvent(getByTestId("place-sheet-peek"), "layout", {
+        nativeEvent: { layout: { x: 0, y: 24, width: 375, height: sheetHeight * 2 } },
+      })
+      await act(async () => {
+        jest.advanceTimersByTime(3000)
+      })
+
+      expect(getAnimatedStyle(sheet)).toMatchObject({ transform: [{ translateY: 0 }] })
+    } finally {
+      jest.useRealTimers()
+    }
+  })
+
   it("locks the list until the sheet is dragged up", async () => {
     // Below full height a drag has to resize the sheet. A scroll view that took
     // it instead would swallow the gesture on a list with nowhere to go.
@@ -181,9 +262,10 @@ describe("PlaceSheet", () => {
     expect(getByTestId("place-sheet-scroll").props.scrollEnabled).toBe(false)
   })
 
-  it("keeps the detail out of the block the lower position shows", async () => {
-    // Address, hours and contacts live past the fold, so the header block stays
-    // the same height whatever the place happens to publish.
+  it("shows where and when in the block the lower position rests on", async () => {
+    // Where the place is and when it is open are read on the way to deciding
+    // whether to set off, so they sit with Navigate. The ways to reach it are
+    // not, so they wait behind a drag.
     setDetails(
       details({
         openingHours: "24/7",
@@ -196,9 +278,9 @@ describe("PlaceSheet", () => {
     await waitFor(() => expect(getByText("Satoshi Coffee")).toBeTruthy())
 
     const peek = getByTestId("place-sheet-peek")
-    expect(within(peek).queryByText("24/7")).toBeNull()
+    expect(within(peek).getByText("1 Bishopsgate")).toBeTruthy()
+    expect(within(peek).getByText("24/7")).toBeTruthy()
     expect(within(peek).queryByText("+44 20 7946 0100")).toBeNull()
-    expect(within(peek).queryByText("1 Bishopsgate")).toBeNull()
   })
 
   it("closes from the button at the foot of the detail", async () => {
@@ -382,7 +464,9 @@ describe("PlaceSheet contact and payment rows", () => {
     await waitFor(() => expect(getByTestId("requires-app-card")).toBeTruthy())
 
     const card = within(getByTestId("requires-app-card"))
-    expect(card.getByText("Needs a specific app to pay")).toBeTruthy()
+    // Substring match: the message and the link are one Text tree inside the
+    // standard GaloyInfo box, so no node carries the message text alone.
+    expect(card.getByText("Needs a specific app to pay", { exact: false })).toBeTruthy()
     // Shown without the scheme, but still the whole path.
     expect(card.getByText("www.moneybadger.co.za/pay")).toBeTruthy()
 
