@@ -120,6 +120,20 @@ describe("useCustodialContactAdapter", () => {
     expect(mockRefetch).toHaveBeenCalled()
   })
 
+  it("answers with an empty list when the refetch comes back without contacts", async () => {
+    // A rename whose refetch answers with nothing leaves the caller an empty list to
+    // render rather than reading `contacts` off undefined data.
+    mockRefetch.mockResolvedValue({ data: undefined })
+    const { result } = renderHook(() => useCustodialContactAdapter())
+
+    let updated: Awaited<ReturnType<typeof result.current.update>> | undefined
+    await act(async () => {
+      updated = await result.current.update("c1", { displayName: "New Alice" })
+    })
+
+    expect(updated).toEqual({ contacts: [] })
+  })
+
   it("rejects updating an unknown contact id", async () => {
     const { result } = renderHook(() => useCustodialContactAdapter())
 
