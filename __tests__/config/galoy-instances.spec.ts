@@ -1,4 +1,5 @@
 import { resolveGaloyInstanceOrDefault, GALOY_INSTANCES } from "@app/config"
+import { silenceConsoleError } from "../helpers/silence-console-error"
 
 it("get a full object with BBW", () => {
   const res = resolveGaloyInstanceOrDefault({ id: "Main" })
@@ -19,7 +20,7 @@ it("get a full object with Local", () => {
 })
 
 it("falls back to the Main instance for an unknown standard id", () => {
-  const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {})
+  const consoleErrorSpy = silenceConsoleError()
 
   const res = resolveGaloyInstanceOrDefault({ id: "Nonexistent" } as never)
 

@@ -1,4 +1,5 @@
 import { logError } from "@app/utils/log-error"
+import { silenceConsoleError } from "../helpers/silence-console-error"
 
 const mockLog = jest.fn()
 const mockRecordError = jest.fn()
@@ -21,7 +22,7 @@ describe("logError", () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
-    consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => undefined)
+    consoleErrorSpy = silenceConsoleError()
   })
 
   afterEach(() => {

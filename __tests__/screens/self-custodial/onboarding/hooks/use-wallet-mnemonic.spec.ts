@@ -6,6 +6,7 @@ import {
   useWalletMnemonicState,
 } from "@app/screens/self-custodial/onboarding/hooks/use-wallet-mnemonic"
 import { AccountType } from "@app/types/wallet"
+import { silenceConsoleError } from "../../../../helpers/silence-console-error"
 
 const mockGetMnemonicForAccount = jest.fn()
 const mockUseActiveWallet = jest.fn()
@@ -295,7 +296,7 @@ describe("useWalletIdentity", () => {
         resolveDerivation = resolve
       }),
     )
-    const consoleError = jest.spyOn(console, "error").mockImplementation(() => {})
+    const consoleError = silenceConsoleError()
 
     try {
       const { unmount } = renderHook(() => useWalletIdentity("youth indicate void"))

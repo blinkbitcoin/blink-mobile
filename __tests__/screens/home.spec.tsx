@@ -14,15 +14,21 @@ import {
   HomeUnauthedDocument,
   Network,
   useBulletinsQuery,
+  WalletCurrency,
 } from "@app/graphql/generated"
 import { HideAmountContextProvider } from "@app/graphql/hide-amount-context"
 import { IsAuthedContextProvider } from "@app/graphql/is-authed-context"
 import { mockCurrencyList } from "@app/graphql/mocks"
-import { ConvertDirection } from "@app/types/payment"
+import type { usePendingDeposits } from "@app/self-custodial/hooks"
+import {
+  ConvertDirection,
+  type DepositStatus,
+  type PendingDeposit,
+} from "@app/types/payment"
 
 let currentMocks: MockedResponse[] = []
 
-/** Mocked wholesale: the real module warns at load time when no API key is configured. */
+/** Mocked wholesale so these specs never reach a real geo lookup. */
 jest.mock("@app/utils/ip-country-lookup", () => ({
   DEFAULT_ADAPTERS: [],
   resolveIpCountryCode: jest.fn(async () => undefined),
@@ -242,10 +248,10 @@ jest.mock("@app/components/migration-reminder-bulletin", () => {
 })
 
 const mockUseNonCustodialConversionLimits = jest.fn()
-let mockPendingDepositsOverride: {
-  deposits: unknown[]
-  refetch?: () => Promise<void>
-} | null = null
+// Typed against the hook so a rename or a dropped field on the real return
+// type fails the typecheck here rather than only at runtime in HomeScreen.
+let mockPendingDepositsOverride: Partial<ReturnType<typeof usePendingDeposits>> | null =
+  null
 
 jest.mock("@app/self-custodial/hooks", () => {
   const actual = jest.requireActual("@app/self-custodial/hooks")
@@ -253,6 +259,9 @@ jest.mock("@app/self-custodial/hooks", () => {
     ...actual,
     useNonCustodialConversionLimits: (direction: string | undefined) =>
       mockUseNonCustodialConversionLimits(direction),
+    // The real hook by default — it is what keeps HomeScreen wired to the
+    // hook's actual shape. Only the tests that need seeded deposits replace it,
+    // through the override.
     usePendingDeposits: () =>
       mockPendingDepositsOverride
         ? { refetch: async () => {}, ...mockPendingDepositsOverride }
@@ -808,6 +817,9 @@ const runRestrictionInvariantCase = async ({
   await flushEffects()
 
   fireEvent.press(getByTestId("transfer"))
+  // The press re-runs the pending-deposit listing; settle it before asserting
+  // so the assertions read a tree that has stopped changing.
+  await flushEffects()
 
   if (expectButton === "disabled") {
     expect(mockDollarBalanceModalVisible).toBe(true)
@@ -1208,6 +1220,7 @@ describe("HomeScreen", () => {
     expect(mockDollarBalanceModalVisible).toBe(false)
 
     fireEvent.press(getByTestId("transfer"))
+    await flushEffects()
 
     expect(mockDollarBalanceModalVisible).toBe(true)
 
@@ -1985,6 +1998,7 @@ describe("HomeScreen wind-down states", () => {
     expect(await findByTestId("migrate-now-modal")).toBeTruthy()
 
     fireEvent.press(getByTestId("transfer"))
+    await flushEffects()
 
     expect(mockDollarBalanceModalVisible).toBe(true)
     expect(queryByTestId("migrate-now-modal")).toBeNull()
@@ -2160,11 +2174,15 @@ describe("HomeScreen pending receive badge", () => {
       isSelfCustodial: true,
       needsBackendAuth: false,
     }
-    const sparkDeposit = (status: string) => ({
+    const sparkDeposit = (status: DepositStatus): PendingDeposit => ({
       id: "abc:0",
       txid: "abc",
       vout: 0,
-      amount: { amount: 50_000, currency: "BTC", currencyCode: "BTC" },
+      amount: {
+        amount: 50_000,
+        currency: WalletCurrency.Btc,
+        currencyCode: "BTC",
+      },
       status,
       errorReason: null,
     })

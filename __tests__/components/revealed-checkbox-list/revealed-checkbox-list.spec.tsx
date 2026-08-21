@@ -3,6 +3,7 @@ import { fireEvent, render, screen } from "@testing-library/react-native"
 import { ThemeProvider } from "@rn-vui/themed"
 
 import { RevealedCheckboxList } from "@app/components/revealed-checkbox-list"
+import { silenceConsoleError } from "../../helpers/silence-console-error"
 
 const labels = ["First", "Second", "Third"]
 
@@ -67,7 +68,7 @@ describe("RevealedCheckboxList", () => {
   })
 
   it("gives duplicate labels stable, independent keys (no key collision)", () => {
-    const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {})
+    const errorSpy = silenceConsoleError()
     const onAllCheckedChange = jest.fn()
     render(
       <ThemeProvider>

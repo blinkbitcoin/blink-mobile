@@ -1,4 +1,4 @@
-import { renderHook, act } from "@testing-library/react-hooks"
+import { renderHook, act } from "@testing-library/react-native"
 import { NotificationChannel } from "@app/graphql/generated"
 import {
   useNotificationToggle,

@@ -1,4 +1,4 @@
-import { renderHook } from "@testing-library/react-hooks"
+import { renderHook } from "@testing-library/react-native"
 
 import { useDisplayPaymentRequest } from "@app/screens/receive-bitcoin-screen/hooks/use-display-payment-request"
 import { Invoice } from "@app/screens/receive-bitcoin-screen/payment/index.types"

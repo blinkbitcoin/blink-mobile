@@ -64,13 +64,94 @@ type AccountRegistryResult = {
   reloadSelfCustodialAccounts: () => Promise<void>
 }
 
-const AccountRegistryContext = createContext<AccountRegistryResult | null>(null)
+/**
+ * Exported so tests can supply a settled registry without mounting the
+ * provider's device reads — see `__tests__/screens/helper.tsx`. Application
+ * code goes through `AccountRegistryProvider` / `useAccountRegistry`.
+ */
+export const AccountRegistryContext = createContext<AccountRegistryResult | null>(null)
+
+/**
+ * Composes the registry value from inputs that have already been resolved.
+ *
+ * Split out of the provider so "what the registry looks like" is defined once
+ * and stays independent of "where the data came from": the provider feeds it
+ * the two device reads, while tests feed it seeded entries directly.
+ */
+export const useComposedAccountRegistry = ({
+  selfCustodialEntries,
+  hasStoredCustodialProfile,
+  loading,
+  reloadSelfCustodialAccounts,
+}: {
+  selfCustodialEntries: SelfCustodialAccountEntry[]
+  hasStoredCustodialProfile: boolean
+  loading: boolean
+  reloadSelfCustodialAccounts: () => Promise<void>
+}): AccountRegistryResult => {
+  const isAuthed = useIsAuthed()
+  const { persistentState, updateState } = usePersistentStateContext()
+  const { LL } = useI18nContext()
+
+  const accounts = useMemo(() => {
+    const list: AccountDescriptor[] = []
+
+    if (isAuthed || hasStoredCustodialProfile) {
+      list.push(createCustodialDescriptor(LL.AccountTypeSelectionScreen.custodialLabel()))
+    }
+
+    const fallbackLabel = LL.AccountTypeSelectionScreen.selfCustodialLabel()
+    for (const entry of selfCustodialEntries) {
+      list.push(
+        createSelfCustodialDescriptor(entry.id, entry.lightningAddress ?? fallbackLabel),
+      )
+    }
+
+    return markSelected(list, persistentState.activeAccountId)
+  }, [
+    isAuthed,
+    hasStoredCustodialProfile,
+    selfCustodialEntries,
+    persistentState.activeAccountId,
+    LL.AccountTypeSelectionScreen,
+  ])
+
+  const activeAccount = useMemo(() => accounts.find((a) => a.selected), [accounts])
+
+  const setActiveAccountId = useCallback(
+    (id: string) => {
+      updateState((prev) => {
+        if (!prev) return prev
+        return { ...prev, activeAccountId: id }
+      })
+    },
+    [updateState],
+  )
+
+  return useMemo<AccountRegistryResult>(
+    () => ({
+      accounts,
+      activeAccount,
+      selfCustodialEntries,
+      loading,
+      setActiveAccountId,
+      reloadSelfCustodialAccounts,
+    }),
+    [
+      accounts,
+      activeAccount,
+      selfCustodialEntries,
+      loading,
+      setActiveAccountId,
+      reloadSelfCustodialAccounts,
+    ],
+  )
+}
 
 /** Owns the registry so its two device reads run once and are shared via context. */
 export const AccountRegistryProvider = ({ children }: { children: ReactNode }) => {
   const isAuthed = useIsAuthed()
-  const { persistentState, updateState } = usePersistentStateContext()
-  const { LL } = useI18nContext()
+  const { persistentState } = usePersistentStateContext()
 
   const [selfCustodialEntries, setSelfCustodialEntries] = useState<
     SelfCustodialAccountEntry[]
@@ -127,60 +208,12 @@ export const AccountRegistryProvider = ({ children }: { children: ReactNode }) =
     }
   }, [persistentState.galoyAuthToken, persistentState.activeAccountId])
 
-  const accounts = useMemo(() => {
-    const list: AccountDescriptor[] = []
-
-    if (isAuthed || hasStoredCustodialProfile) {
-      list.push(createCustodialDescriptor(LL.AccountTypeSelectionScreen.custodialLabel()))
-    }
-
-    const fallbackLabel = LL.AccountTypeSelectionScreen.selfCustodialLabel()
-    for (const entry of selfCustodialEntries) {
-      list.push(
-        createSelfCustodialDescriptor(entry.id, entry.lightningAddress ?? fallbackLabel),
-      )
-    }
-
-    return markSelected(list, persistentState.activeAccountId)
-  }, [
-    isAuthed,
-    hasStoredCustodialProfile,
+  const value = useComposedAccountRegistry({
     selfCustodialEntries,
-    persistentState.activeAccountId,
-    LL.AccountTypeSelectionScreen,
-  ])
-
-  const activeAccount = useMemo(() => accounts.find((a) => a.selected), [accounts])
-
-  const setActiveAccountId = useCallback(
-    (id: string) => {
-      updateState((prev) => {
-        if (!prev) return prev
-        return { ...prev, activeAccountId: id }
-      })
-    },
-    [updateState],
-  )
-
-  const value = useMemo<AccountRegistryResult>(
-    () => ({
-      accounts,
-      activeAccount,
-      selfCustodialEntries,
-      loading: selfCustodialHydrating || profilesHydrating,
-      setActiveAccountId,
-      reloadSelfCustodialAccounts,
-    }),
-    [
-      accounts,
-      activeAccount,
-      selfCustodialEntries,
-      selfCustodialHydrating,
-      profilesHydrating,
-      setActiveAccountId,
-      reloadSelfCustodialAccounts,
-    ],
-  )
+    hasStoredCustodialProfile,
+    loading: selfCustodialHydrating || profilesHydrating,
+    reloadSelfCustodialAccounts,
+  })
 
   return (
     <AccountRegistryContext.Provider value={value}>

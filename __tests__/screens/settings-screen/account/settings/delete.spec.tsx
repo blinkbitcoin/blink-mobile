@@ -6,6 +6,7 @@ import { ThemeProvider, createTheme } from "@rn-vui/themed"
 
 import { dark, light } from "@app/rne-theme/colors"
 import { Delete } from "@app/screens/settings-screen/account/settings/delete"
+import { silenceConsoleError } from "../../../../helpers/silence-console-error"
 
 const mockDeleteAccount = jest.fn()
 const mockSetAccountIsBeingDeleted = jest.fn()
@@ -343,7 +344,7 @@ describe("Delete", () => {
 
   describe("when the mutation throws", () => {
     beforeEach(() => {
-      jest.spyOn(console, "error").mockImplementation(() => {})
+      silenceConsoleError()
       mockDeleteAccount.mockRejectedValue(new Error("network down"))
     })
 

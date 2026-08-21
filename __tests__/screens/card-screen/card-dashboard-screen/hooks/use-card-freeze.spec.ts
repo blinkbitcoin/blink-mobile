@@ -1,4 +1,4 @@
-import { renderHook, act } from "@testing-library/react-hooks"
+import { renderHook, act } from "@testing-library/react-native"
 import { CardStatus } from "@app/graphql/generated"
 import { useCardFreeze } from "@app/screens/card-screen/card-dashboard-screen/hooks/use-card-freeze"
 

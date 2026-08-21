@@ -1,4 +1,4 @@
-import { act, renderHook } from "@testing-library/react-hooks"
+import { act, renderHook } from "@testing-library/react-native"
 
 import { useDebouncedEffect } from "@app/hooks/use-debounce"
 
@@ -77,7 +77,7 @@ describe("useDebouncedEffect", () => {
   it("should reset debounce when dependencies change", () => {
     const callback = jest.fn()
     const { rerender } = renderHook(
-      ({ dep }) => useDebouncedEffect(callback, 500, [dep]),
+      ({ dep }: { dep: number }) => useDebouncedEffect(callback, 500, [dep]),
       { initialProps: { dep: 1 } },
     )
 
@@ -179,7 +179,8 @@ describe("useDebouncedEffect", () => {
   it("should clear timeout when enabled changes to false", () => {
     const callback = jest.fn()
     const { rerender } = renderHook(
-      ({ enabled }) => useDebouncedEffect(callback, 500, [], { enabled }),
+      ({ enabled }: { enabled: boolean }) =>
+        useDebouncedEffect(callback, 500, [], { enabled }),
       { initialProps: { enabled: true } },
     )
 
@@ -199,7 +200,8 @@ describe("useDebouncedEffect", () => {
   it("should only call leading once until trailing executes", () => {
     const callback = jest.fn()
     const { rerender } = renderHook(
-      ({ dep }) => useDebouncedEffect(callback, 500, [dep], { leading: true }),
+      ({ dep }: { dep: number }) =>
+        useDebouncedEffect(callback, 500, [dep], { leading: true }),
       { initialProps: { dep: 1 } },
     )
 
@@ -225,9 +227,12 @@ describe("useDebouncedEffect", () => {
     const callback = jest.fn(() => {
       counter += 1
     })
-    const { rerender } = renderHook(({ cb }) => useDebouncedEffect(cb, 500, []), {
-      initialProps: { cb: callback },
-    })
+    const { rerender } = renderHook(
+      ({ cb }: { cb: () => void }) => useDebouncedEffect(cb, 500, []),
+      {
+        initialProps: { cb: callback },
+      },
+    )
 
     counter = 10
 

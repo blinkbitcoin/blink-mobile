@@ -282,28 +282,57 @@ describe("no-key warning", () => {
     jest.resetModules()
   })
 
-  it("warns on module load when no API keys are configured", () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const loadWithKeys = (keys: Record<string, string>): any => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let mod: any
     jest.isolateModules(() => {
-      jest.mock("react-native-config", () => ({
-        GEO_IPIFY_API_KEY: "",
-        IPINFO_API_KEY: "",
-        PROXYCHECK_API_KEY: "",
-        IPAPI_API_KEY: "",
-      }))
-      require("@app/utils/ip-country-lookup") // eslint-disable-line @typescript-eslint/no-var-requires
+      jest.mock("react-native-config", () => keys)
+      mod = require("@app/utils/ip-country-lookup") // eslint-disable-line @typescript-eslint/no-var-requires
     })
+    return mod
+  }
+
+  const noKeys = {
+    GEO_IPIFY_API_KEY: "",
+    IPINFO_API_KEY: "",
+    PROXYCHECK_API_KEY: "",
+    IPAPI_API_KEY: "",
+  }
+
+  it("stays quiet at module load, so importers that never look up see nothing", () => {
+    loadWithKeys(noKeys)
+
+    expect(warnSpy).not.toHaveBeenCalled()
+  })
+
+  it("warns on the first lookup when no API keys are configured", async () => {
+    const mod = loadWithKeys(noKeys)
+
+    await mod.resolveIpCountryCode([])
+
     expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("No API key configured"))
   })
 
-  it("does not warn when at least one API key is configured", () => {
-    jest.isolateModules(() => {
-      jest.mock("react-native-config", () => ({
-        GEO_IPIFY_API_KEY: "test-key",
-        IPINFO_API_KEY: "",
-        IPAPI_API_KEY: "",
-      }))
-      require("@app/utils/ip-country-lookup") // eslint-disable-line @typescript-eslint/no-var-requires
+  it("warns only once however many lookups run", async () => {
+    const mod = loadWithKeys(noKeys)
+
+    await mod.resolveIpCountryCode([])
+    await mod.resolveIpCountryCode([])
+    await mod.resolveIpCountryCode([])
+
+    expect(warnSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it("does not warn when at least one API key is configured", async () => {
+    const mod = loadWithKeys({
+      GEO_IPIFY_API_KEY: "test-key",
+      IPINFO_API_KEY: "",
+      IPAPI_API_KEY: "",
     })
+
+    await mod.resolveIpCountryCode([])
+
     expect(warnSpy).not.toHaveBeenCalled()
   })
 })

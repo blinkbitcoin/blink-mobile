@@ -1,4 +1,4 @@
-import { renderHook, act } from "@testing-library/react-hooks"
+import { renderHook, act } from "@testing-library/react-native"
 
 import { WalletCurrency } from "@app/graphql/generated"
 import { useSyncedInputValues } from "@app/screens/conversion-flow/hooks/use-synced-input-values"
@@ -247,7 +247,13 @@ describe("useSyncedInputValues", () => {
 
   it("does not update when wallets are undefined", () => {
     const { result, rerender } = renderHook(
-      ({ fromWallet, toWallet }) =>
+      ({
+        fromWallet,
+        toWallet,
+      }: {
+        fromWallet: typeof mockBtcWallet | undefined
+        toWallet: typeof mockUsdWallet | undefined
+      }) =>
         useSyncedInputValues({
           fromWallet,
           toWallet,
@@ -255,8 +261,8 @@ describe("useSyncedInputValues", () => {
         }),
       {
         initialProps: {
-          fromWallet: undefined as typeof mockBtcWallet | undefined,
-          toWallet: undefined as typeof mockUsdWallet | undefined,
+          fromWallet: undefined,
+          toWallet: undefined,
         },
       },
     )

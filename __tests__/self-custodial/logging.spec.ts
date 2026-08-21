@@ -3,6 +3,7 @@ import {
   createSdkLogListener,
   logSdkEvent,
 } from "@app/self-custodial/logging"
+import { silenceConsoleError } from "../helpers/silence-console-error"
 
 const mockLog = jest.fn()
 const mockRecordError = jest.fn()
@@ -23,11 +24,13 @@ const loadFreshLoggingModule = () => {
 }
 
 describe("logSdkEvent", () => {
+  let consoleErrors: ReturnType<typeof silenceConsoleError>
+
   beforeEach(() => {
     jest.clearAllMocks()
     jest.spyOn(console, "debug").mockImplementation()
     jest.spyOn(console, "warn").mockImplementation()
-    jest.spyOn(console, "error").mockImplementation()
+    consoleErrors = silenceConsoleError()
   })
 
   afterEach(() => {
@@ -62,7 +65,7 @@ describe("logSdkEvent", () => {
     const fresh = loadFreshLoggingModule()
     fresh.logSdkEvent(SdkLogLevel.Error, "error message")
 
-    expect(console.error).toHaveBeenCalledWith("[SparkSDK] error message")
+    expect(consoleErrors).toHaveBeenCalledWith("[SparkSDK] error message")
     expect(mockRecordError).toHaveBeenCalledWith(
       expect.objectContaining({ message: "[SparkSDK] error message" }),
     )
@@ -102,7 +105,7 @@ describe("createSdkLogListener", () => {
     jest.clearAllMocks()
     jest.spyOn(console, "debug").mockImplementation()
     jest.spyOn(console, "warn").mockImplementation()
-    jest.spyOn(console, "error").mockImplementation()
+    silenceConsoleError()
   })
 
   afterEach(() => {

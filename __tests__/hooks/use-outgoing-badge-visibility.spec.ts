@@ -1,4 +1,4 @@
-import { renderHook, act } from "@testing-library/react-hooks"
+import { renderHook, act } from "@testing-library/react-native"
 
 import { useOutgoingBadgeVisibility } from "@app/components/unseen-tx-amount-badge"
 
@@ -132,7 +132,7 @@ describe("useOutgoingBadgeVisibility", () => {
     const ttlMs = 1000
 
     const { rerender } = renderHook(
-      ({ txId }) =>
+      ({ txId }: { txId: string }) =>
         useOutgoingBadgeVisibility({
           txId,
           isOutgoing: true,

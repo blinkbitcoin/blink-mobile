@@ -1,4 +1,4 @@
-import { act, renderHook } from "@testing-library/react-hooks"
+import { act, renderHook } from "@testing-library/react-native"
 
 jest.mock("@apollo/client", () => {
   const actual = jest.requireActual("@apollo/client")

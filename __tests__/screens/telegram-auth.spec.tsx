@@ -2,7 +2,7 @@
 import React from "react"
 import axios from "axios"
 import { Linking } from "react-native"
-import { renderHook, act } from "@testing-library/react-hooks"
+import { renderHook, act } from "@testing-library/react-native"
 
 import {
   useTelegramLogin,

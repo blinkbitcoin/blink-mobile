@@ -11,6 +11,7 @@ import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 import { useNetworkError } from "@app/graphql/network-error-context"
 import { NetworkErrorCode } from "@app/graphql/error-code"
 import { NetworkErrorComponent } from "@app/graphql/network-error-component"
+import { silenceConsoleError } from "../helpers/silence-console-error"
 
 jest.mock("@app/graphql/network-error-context")
 jest.mock("@app/i18n/i18n-react")
@@ -265,7 +266,7 @@ describe("NetworkErrorComponent", () => {
     // The component logs the simulated storage failure via console.error;
     // capture it so the expected error doesn't pollute CI logs (and assert it
     // actually happened).
-    const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {})
+    const consoleErrorSpy = silenceConsoleError()
     ;(KeyStoreWrapper.getSessionProfiles as jest.Mock).mockRejectedValue(
       new Error("Storage error"),
     )

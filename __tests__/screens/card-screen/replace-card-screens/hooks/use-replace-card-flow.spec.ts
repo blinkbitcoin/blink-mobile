@@ -1,4 +1,4 @@
-import { act, renderHook } from "@testing-library/react-hooks"
+import { act, renderHook } from "@testing-library/react-native"
 
 import { useReplaceCardFlow } from "@app/screens/card-screen/replace-card-screens/hooks/use-replace-card-flow"
 import { ShippingAddress } from "@app/screens/card-screen/types"

@@ -31,6 +31,8 @@ import TypesafeI18n from "@app/i18n/i18n-react"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import theme from "@app/rne-theme/theme"
 import { createCache } from "@app/graphql/cache"
+
+import { flushEffects } from "../helpers/flush-effects"
 import { DisplayCurrency as DisplayCurrencyType } from "@app/types/amounts"
 import { withDeviceLocale } from "../helpers/device-locale"
 
@@ -67,8 +69,6 @@ jest.mock("@app/hooks/use-account-registry", () => ({
 }))
 
 const mockNavigate = jest.fn()
-const originalConsoleError = console.error
-let consoleErrorSpy: jest.SpyInstance | null = null
 
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
@@ -635,22 +635,6 @@ const assertConversionValues = async ({
   }
 }
 
-beforeAll(() => {
-  consoleErrorSpy = jest
-    .spyOn(console, "error")
-    .mockImplementation((message, ...args) => {
-      const text = String(message)
-      if (text.includes("not wrapped in act")) return
-      originalConsoleError(message, ...args)
-    })
-})
-
-afterAll(() => {
-  if (!consoleErrorSpy) return
-  consoleErrorSpy.mockRestore()
-  consoleErrorSpy = null
-})
-
 const defaultActiveWallet = {
   isSelfCustodial: false,
   isReady: false,
@@ -697,6 +681,9 @@ describe("Initial render with both wallets having balance", () => {
 
     expect(getByPlaceholderText("0 SAT")).toBeTruthy()
     expect(getByPlaceholderText("$0")).toBeTruthy()
+    // The mocked Apollo queries deliver after the body returns; settle them
+    // inside act() so the assertions above are the last word on this tree.
+    await flushEffects()
   })
 
   it("toggle button is enabled", async () => {
@@ -714,6 +701,9 @@ describe("Initial render with both wallets having balance", () => {
 
     const toggleButton = getByTestId("wallet-toggle-button")
     expect(toggleButton.props.accessibilityState?.disabled).toBe(false)
+    // The mocked Apollo queries deliver after the body returns; settle them
+    // inside act() so the assertions above are the last word on this tree.
+    await flushEffects()
   })
 
   it("next button is disabled when no amount entered", async () => {
@@ -731,6 +721,9 @@ describe("Initial render with both wallets having balance", () => {
 
     const nextButton = getByTestId("next-button")
     expect(nextButton.props.accessibilityState?.disabled).toBe(true)
+    // The mocked Apollo queries deliver after the body returns; settle them
+    // inside act() so the assertions above are the last word on this tree.
+    await flushEffects()
   })
 
   it("percentage buttons are rendered", async () => {
@@ -750,6 +743,9 @@ describe("Initial render with both wallets having balance", () => {
     expect(getByTestId("convert-75%")).toBeTruthy()
     expect(getByTestId("convert-100%")).toBeTruthy()
     expect(getByTestId("convert-25%")).toBeTruthy()
+    // The mocked Apollo queries deliver after the body returns; settle them
+    // inside act() so the assertions above are the last word on this tree.
+    await flushEffects()
   })
 })
 
@@ -773,6 +769,9 @@ describe("Initial render based on wallet balance", () => {
     })
 
     expect(getByPlaceholderText("0 SAT")).toBeTruthy()
+    // The mocked Apollo queries deliver after the body returns; settle them
+    // inside act() so the assertions above are the last word on this tree.
+    await flushEffects()
   })
 
   it("starts with USD as from when only USD has balance", async () => {
@@ -794,6 +793,9 @@ describe("Initial render based on wallet balance", () => {
     })
 
     expect(getByPlaceholderText("$0")).toBeTruthy()
+    // The mocked Apollo queries deliver after the body returns; settle them
+    // inside act() so the assertions above are the last word on this tree.
+    await flushEffects()
   })
 })
 
@@ -842,6 +844,9 @@ describe("Toggle without amount - Critical bug test", () => {
       expect(() => getByPlaceholderText("$0")).not.toThrow()
       expect(() => getByPlaceholderText("0 SAT")).not.toThrow()
     })
+    // The mocked Apollo queries deliver after the body returns; settle them
+    // inside act() so the assertions above are the last word on this tree.
+    await flushEffects()
   })
 
   it("toggle button remains enabled after toggle without amount", async () => {
@@ -1510,6 +1515,9 @@ describe("Empty state handling", () => {
 
     expect(queryByTestId("wallet-toggle-button")).toBeNull()
     expect(queryByTestId("next-button")).toBeNull()
+    // The mocked Apollo queries deliver after the body returns; settle them
+    // inside act() so the assertions above are the last word on this tree.
+    await flushEffects()
   })
 })
 
@@ -2004,8 +2012,12 @@ describe("Comprehensive conversion scenarios", () => {
     let primary: PrimaryAmount | null = null
     const expectedFocusedField = computeFocusedField(scenario.actions)
 
-    const advanceTimers = (ms: number) => {
-      act(() => {
+    // Async act: the fired timers hand off to promise chains (Apollo's mocked
+    // link delivers its result that way), and a synchronous act() returns
+    // before those microtasks run — the resulting commit then lands outside
+    // act() and trips the guard.
+    const advanceTimers = async (ms: number) => {
+      await act(async () => {
         jest.advanceTimersByTime(ms)
         jest.runAllTimers()
       })
@@ -2019,7 +2031,7 @@ describe("Comprehensive conversion scenarios", () => {
           Array.from({ length: 10 }, () => "⌫"),
         )
       })
-      advanceTimers(1500)
+      await advanceTimers(1500)
     }
 
     const focusField = async (field: Field) => {
@@ -2039,7 +2051,7 @@ describe("Comprehensive conversion scenarios", () => {
         await act(async () => {
           fireEvent.press(getByTestId("wallet-toggle-button"))
         })
-        advanceTimers(shouldWaitRecalc ? 1500 : 200)
+        await advanceTimers(shouldWaitRecalc ? 1500 : 200)
         ;[fromCurrency, toCurrency] = [toCurrency, fromCurrency]
         if (primary) {
           primary = {
@@ -2055,7 +2067,7 @@ describe("Comprehensive conversion scenarios", () => {
           await act(async () => {
             fireEvent.press(getByTestId("wallet-toggle-button"))
           })
-          advanceTimers(shouldWaitRecalc ? 1500 : 200)
+          await advanceTimers(shouldWaitRecalc ? 1500 : 200)
           ;[fromCurrency, toCurrency] = [toCurrency, fromCurrency]
           if (primary) {
             primary = {
@@ -2087,7 +2099,7 @@ describe("Comprehensive conversion scenarios", () => {
         await act(async () => {
           pressKeys(getByTestId, digits)
         })
-        advanceTimers(1500)
+        await advanceTimers(1500)
         primary = {
           currency: fieldCurrency,
           amount: amountFromDigits(fieldCurrency, digits, displayCurrency),
@@ -2106,7 +2118,7 @@ describe("Comprehensive conversion scenarios", () => {
         await act(async () => {
           pressKeys(getByTestId, action.digits)
         })
-        advanceTimers(1500)
+        await advanceTimers(1500)
         primary = {
           currency: fieldCurrency,
           amount: amountFromDigits(fieldCurrency, action.digits, displayCurrency),
@@ -2122,7 +2134,7 @@ describe("Comprehensive conversion scenarios", () => {
         await act(async () => {
           fireEvent.press(getByTestId(`convert-${action.value}%`))
         })
-        advanceTimers(1500)
+        await advanceTimers(1500)
         const balance =
           fromCurrency === WalletCurrency.Btc
             ? scenario.options.btcBalance
@@ -2257,6 +2269,9 @@ describe("Self-custodial conversion limits gating", () => {
         "Transfers are temporarily unavailable",
       )
     })
+    // The mocked Apollo queries deliver after the body returns; settle them
+    // inside act() so the assertions above are the last word on this tree.
+    await flushEffects()
   })
 
   it("keeps Next disabled while limits load successfully but amount is below the minimum", async () => {
@@ -2279,6 +2294,9 @@ describe("Self-custodial conversion limits gating", () => {
     })
 
     expect(getByTestId("next-button").props.accessibilityState?.disabled).toBe(true)
+    // The mocked Apollo queries deliver after the body returns; settle them
+    // inside act() so the assertions above are the last word on this tree.
+    await flushEffects()
   })
 
   it("disables Next when the conversion guard reports hasQuoteError", async () => {
@@ -2306,6 +2324,9 @@ describe("Self-custodial conversion limits gating", () => {
     })
 
     expect(getByTestId("next-button").props.accessibilityState?.disabled).toBe(true)
+    // The mocked Apollo queries deliver after the body returns; settle them
+    // inside act() so the assertions above are the last word on this tree.
+    await flushEffects()
   })
 
   it("disables Next during the self-custodial SDK boot window — accountType=SelfCustodial + isReady=false", async () => {
@@ -2327,6 +2348,9 @@ describe("Self-custodial conversion limits gating", () => {
     })
 
     expect(getByTestId("next-button").props.accessibilityState?.disabled).toBe(true)
+    // The mocked Apollo queries deliver after the body returns; settle them
+    // inside act() so the assertions above are the last word on this tree.
+    await flushEffects()
   })
 })
 
@@ -2411,6 +2435,9 @@ describe("Self-custodial percentage chip happy-path", () => {
         }),
       }),
     )
+    // The mocked Apollo queries deliver after the body returns; settle them
+    // inside act() so the assertions above are the last word on this tree.
+    await flushEffects()
   })
 })
 

@@ -2,6 +2,7 @@ import { Alert, AlertButton } from "react-native"
 import { renderHook } from "@testing-library/react-native"
 
 import { useEmailReverification } from "@app/hooks/use-email-reverification"
+import { silenceConsoleError } from "../helpers/silence-console-error"
 
 const EMAIL = "someone@example.com"
 
@@ -55,7 +56,7 @@ describe("useEmailReverification", () => {
     jest.spyOn(Alert, "alert").mockImplementation(() => {})
     // The give-up branches log on purpose; the assertions cover them.
     jest.spyOn(console, "warn").mockImplementation(() => {})
-    jest.spyOn(console, "error").mockImplementation(() => {})
+    silenceConsoleError()
     mockEmailDelete.mockResolvedValue({ data: {} })
     mockRegistrationInitiate.mockResolvedValue(
       registrationResult({ errors: [], emailRegistrationId: "registration-id" }),

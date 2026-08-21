@@ -8,6 +8,7 @@ if (typeof window !== "undefined" && !window.dispatchEvent) {
 }
 
 import { AutoConvertListenerMount } from "@app/self-custodial/components/auto-convert-listener-mount"
+import { silenceConsoleError } from "../../helpers/silence-console-error"
 
 const mockListener = jest.fn()
 
@@ -52,7 +53,7 @@ describe("AutoConvertListenerMount", () => {
       }
     }
 
-    const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {})
+    const consoleErrorSpy = silenceConsoleError()
     render(
       <Boundary>
         <AutoConvertListenerMount />

@@ -1,4 +1,4 @@
-import { renderHook, act } from "@testing-library/react-hooks"
+import { renderHook, act } from "@testing-library/react-native"
 
 import { useConversionOverlayFocus } from "@app/screens/conversion-flow/hooks/use-conversion-overlay-focus"
 import { ConvertInputType } from "@app/components/transfer-amount-input"

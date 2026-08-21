@@ -1,4 +1,4 @@
-import { renderHook, act } from "@testing-library/react-hooks"
+import { renderHook, act } from "@testing-library/react-native"
 import { Share, Alert } from "react-native"
 
 import { usePaymentActions } from "@app/screens/receive-bitcoin-screen/hooks/use-payment-actions"

@@ -1,4 +1,4 @@
-import { act, renderHook } from "@testing-library/react-hooks"
+import { act, renderHook } from "@testing-library/react-native"
 
 import {
   useOrderCardFlow,
@@ -130,8 +130,9 @@ describe("useOrderCardFlow", () => {
   describe("late initialAddress sync", () => {
     it("syncs when initialAddress transitions from null to a value", () => {
       const { result, rerender } = renderHook(
-        ({ initialAddress }) => useOrderCardFlow({ initialAddress }),
-        { initialProps: { initialAddress: null as ShippingAddress | null } },
+        ({ initialAddress }: { initialAddress: ShippingAddress | null }) =>
+          useOrderCardFlow({ initialAddress }),
+        { initialProps: { initialAddress: null } },
       )
 
       expect(result.current.state.useRegisteredAddress).toBe(false)
@@ -149,8 +150,9 @@ describe("useOrderCardFlow", () => {
       }
 
       const { result, rerender } = renderHook(
-        ({ initialAddress }) => useOrderCardFlow({ initialAddress }),
-        { initialProps: { initialAddress: mockAddress as ShippingAddress | null } },
+        ({ initialAddress }: { initialAddress: ShippingAddress | null }) =>
+          useOrderCardFlow({ initialAddress }),
+        { initialProps: { initialAddress: mockAddress } },
       )
 
       rerender({ initialAddress: newAddress })

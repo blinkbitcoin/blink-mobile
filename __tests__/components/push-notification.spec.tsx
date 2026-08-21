@@ -6,6 +6,7 @@ import { PushNotificationComponent } from "@app/components/push-notification/pus
 import { BulletinsDocument } from "@app/graphql/generated"
 
 import { flushEffects } from "../helpers/flush-effects"
+import { silenceConsoleError } from "../helpers/silence-console-error"
 
 const mockRefetchQueries = jest.fn()
 jest.mock("@apollo/client", () => ({
@@ -149,9 +150,7 @@ describe("PushNotificationComponent", () => {
     })
 
     it("logs instead of throwing when opening the link fails", () => {
-      const consoleErrorSpy = jest
-        .spyOn(console, "error")
-        .mockImplementation(() => undefined)
+      const consoleErrorSpy = silenceConsoleError()
       openURLSpy.mockImplementationOnce(() => {
         throw new Error("no handler for scheme")
       })

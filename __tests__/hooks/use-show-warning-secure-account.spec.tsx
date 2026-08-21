@@ -1,6 +1,5 @@
 import * as React from "react"
 import { PropsWithChildren } from "react"
-import { act } from "react-test-renderer"
 
 import { MockedProvider } from "@apollo/client/testing"
 import {
@@ -11,7 +10,7 @@ import {
 } from "@app/graphql/generated"
 import { IsAuthedContextProvider } from "@app/graphql/is-authed-context"
 import { useShowWarningSecureAccount } from "@app/screens/settings-screen/account/show-warning-secure-account-hook"
-import { renderHook } from "@testing-library/react-hooks"
+import { act, renderHook } from "@testing-library/react-native"
 
 jest.mock("@app/store/persistent-state", () => ({
   ...jest.requireActual("@app/store/persistent-state"),

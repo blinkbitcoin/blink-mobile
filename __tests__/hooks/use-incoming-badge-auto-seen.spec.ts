@@ -1,4 +1,4 @@
-import { renderHook, act } from "@testing-library/react-hooks"
+import { renderHook, act } from "@testing-library/react-native"
 
 import { WalletCurrency } from "@app/graphql/generated"
 import { useIncomingBadgeAutoSeen } from "@app/components/unseen-tx-amount-badge/use-incoming-badge-auto-seen"

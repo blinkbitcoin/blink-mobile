@@ -11,9 +11,14 @@ import { NavigationContainer } from "@react-navigation/native"
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import { createTheme, ThemeProvider } from "@rn-vui/themed"
 
+import type { SelfCustodialAccountEntry } from "@app/self-custodial/storage/account-index"
+
 import { createCache } from "../../app/graphql/cache"
 import { IsAuthedContextProvider } from "../../app/graphql/is-authed-context"
-import { AccountRegistryProvider } from "../../app/hooks/use-account-registry"
+import {
+  AccountRegistryContext,
+  useComposedAccountRegistry,
+} from "../../app/hooks/use-account-registry"
 import { PersistentStateContext } from "../../app/store/persistent-state"
 
 const PersistentStateWrapper: React.FC<PropsWithChildren> = ({ children }) => (
@@ -33,6 +38,47 @@ const PersistentStateWrapper: React.FC<PropsWithChildren> = ({ children }) => (
   >
     <>{children}</>
   </PersistentStateContext.Provider>
+)
+
+export type AccountRegistrySeed = {
+  entries?: SelfCustodialAccountEntry[]
+  hasStoredCustodialProfile?: boolean
+}
+
+/**
+ * A *settled* account registry — it never performs the provider's two device
+ * reads, so mocking `listSelfCustodialAccounts` or
+ * `KeyStoreWrapper.getSessionProfiles` does not reach it. Those reads resolve
+ * after a synchronous test body returns, which trips React's "not wrapped in
+ * act(...)" warning in every suite that mounts a screen.
+ *
+ * To render a screen against self-custodial accounts, seed them through the
+ * `accountRegistry` prop on the wrappers below. To exercise hydration itself,
+ * mount `AccountRegistryProvider` directly and `await flushEffects()`.
+ *
+ * `hasStoredCustodialProfile` defaults to `true` to match the provider under
+ * these wrappers, which mount `IsAuthedContextProvider value={true}`.
+ */
+// Stable identities: the composed value is memoised on these, so fresh
+// literals per render would hand every consumer a new registry each time.
+const NO_ENTRIES: SelfCustodialAccountEntry[] = []
+const noopReload = async () => {}
+
+const StubAccountRegistry: React.FC<PropsWithChildren<AccountRegistrySeed>> = ({
+  children,
+  entries = NO_ENTRIES,
+  hasStoredCustodialProfile = true,
+}) => (
+  <AccountRegistryContext.Provider
+    value={useComposedAccountRegistry({
+      selfCustodialEntries: entries,
+      hasStoredCustodialProfile,
+      loading: false,
+      reloadSelfCustodialAccounts: noopReload,
+    })}
+  >
+    {children}
+  </AccountRegistryContext.Provider>
 )
 
 export const findPressableParent = (
@@ -59,11 +105,20 @@ const createThemeWithMode = (mode: ThemeMode) =>
     mode,
   })
 
-export const ContextForScreen: React.FC<PropsWithChildren<{ headerShown?: boolean }>> = ({
-  children,
-  headerShown = false,
-}) => (
-  <ThemeProvider theme={theme}>
+/**
+ * The provider stack every screen spec renders under. Both exported wrappers
+ * differ only in the theme they supply and whether the header is shown, so the
+ * stack itself lives here once — otherwise the two copies drift, and a provider
+ * added to one silently misses half the suite.
+ */
+const ScreenScaffold: React.FC<
+  PropsWithChildren<{
+    themeValue: ReturnType<typeof createThemeWithMode>
+    headerShown: boolean
+    accountRegistry?: AccountRegistrySeed
+  }>
+> = ({ children, themeValue, headerShown, accountRegistry }) => (
+  <ThemeProvider theme={themeValue}>
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown }}>
         <Stack.Screen name="Home">
@@ -72,7 +127,9 @@ export const ContextForScreen: React.FC<PropsWithChildren<{ headerShown?: boolea
               <PersistentStateWrapper>
                 <TypesafeI18n locale={detectDefaultLocale()}>
                   <IsAuthedContextProvider value={true}>
-                    <AccountRegistryProvider>{children}</AccountRegistryProvider>
+                    <StubAccountRegistry {...accountRegistry}>
+                      {children}
+                    </StubAccountRegistry>
                   </IsAuthedContextProvider>
                 </TypesafeI18n>
               </PersistentStateWrapper>
@@ -84,26 +141,26 @@ export const ContextForScreen: React.FC<PropsWithChildren<{ headerShown?: boolea
   </ThemeProvider>
 )
 
+export const ContextForScreen: React.FC<
+  PropsWithChildren<{ headerShown?: boolean; accountRegistry?: AccountRegistrySeed }>
+> = ({ children, headerShown = false, accountRegistry }) => (
+  <ScreenScaffold
+    themeValue={theme}
+    headerShown={headerShown}
+    accountRegistry={accountRegistry}
+  >
+    {children}
+  </ScreenScaffold>
+)
+
 export const ContextForScreenWithTheme: React.FC<
-  PropsWithChildren<{ mode: ThemeMode }>
-> = ({ children, mode }) => (
-  <ThemeProvider theme={createThemeWithMode(mode)}>
-    <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Home">
-          {() => (
-            <MockedProvider mocks={mocks} cache={createCache()}>
-              <PersistentStateWrapper>
-                <TypesafeI18n locale={detectDefaultLocale()}>
-                  <IsAuthedContextProvider value={true}>
-                    <AccountRegistryProvider>{children}</AccountRegistryProvider>
-                  </IsAuthedContextProvider>
-                </TypesafeI18n>
-              </PersistentStateWrapper>
-            </MockedProvider>
-          )}
-        </Stack.Screen>
-      </Stack.Navigator>
-    </NavigationContainer>
-  </ThemeProvider>
+  PropsWithChildren<{ mode: ThemeMode; accountRegistry?: AccountRegistrySeed }>
+> = ({ children, mode, accountRegistry }) => (
+  <ScreenScaffold
+    themeValue={createThemeWithMode(mode)}
+    headerShown={false}
+    accountRegistry={accountRegistry}
+  >
+    {children}
+  </ScreenScaffold>
 )

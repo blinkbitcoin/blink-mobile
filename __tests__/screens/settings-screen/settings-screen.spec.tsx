@@ -197,7 +197,7 @@ jest.mock("@apollo/client", () => {
   }
 })
 
-/** Mocked wholesale: the real module warns at load time when no API key is configured. */
+/** Mocked wholesale so these specs never reach a real geo lookup. */
 jest.mock("@app/utils/ip-country-lookup", () => ({
   DEFAULT_ADAPTERS: [],
   resolveIpCountryCode: jest.fn(async () => undefined),

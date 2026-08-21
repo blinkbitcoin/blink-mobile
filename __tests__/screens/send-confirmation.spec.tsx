@@ -46,7 +46,10 @@ jest.mock("@app/store/persistent-state", () => ({
 }))
 
 jest.mock("@app/hooks/use-account-registry", () => ({
-  AccountRegistryProvider: ({ children }: { children: React.ReactNode }) => children,
+  // Only the consumer hook is stubbed: the shared screen wrapper builds its
+  // settled registry from this module's context and value builder, so replacing
+  // the module wholesale would leave it without either.
+  ...jest.requireActual("@app/hooks/use-account-registry"),
   useAccountRegistry: () => ({
     accounts: [],
     activeAccount: undefined,

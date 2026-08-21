@@ -1,4 +1,4 @@
-import { renderHook } from "@testing-library/react-hooks"
+import { renderHook } from "@testing-library/react-native"
 
 import { useShippingAddressData } from "@app/screens/card-screen/card-shipping-address-screen/hooks/use-shipping-address-data"
 

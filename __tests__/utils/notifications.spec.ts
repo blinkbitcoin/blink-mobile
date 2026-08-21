@@ -1,4 +1,5 @@
 import { addDeviceToken } from "@app/utils/notifications"
+import { silenceConsoleError } from "../helpers/silence-console-error"
 
 const mockGetToken = jest.fn()
 
@@ -28,7 +29,7 @@ describe("addDeviceToken error reporting", () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
-    consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => undefined)
+    consoleErrorSpy = silenceConsoleError()
   })
 
   afterEach(() => {
