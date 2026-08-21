@@ -1,5 +1,6 @@
 import { useCallback, useMemo } from "react"
 
+import { gql } from "@apollo/client"
 import {
   useContactsQuery,
   useUserContactUpdateAliasMutation,
@@ -12,6 +13,20 @@ import {
   type ContactTransactionsPage,
 } from "@app/types/contact"
 import { AccountType } from "@app/types/wallet"
+
+gql`
+  mutation userContactUpdateAlias($input: UserContactUpdateAliasInput!) {
+    userContactUpdateAlias(input: $input) {
+      errors {
+        message
+      }
+      contact {
+        alias
+        id
+      }
+    }
+  }
+`
 
 const unsupported = (operation: string): Error =>
   new Error(`Custodial contacts do not support ${operation}`)
