@@ -1,6 +1,6 @@
 import { type BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
 
-import { TransactionDirection, type NormalizedTransaction } from "@app/types/transaction"
+import { type NormalizedTransaction } from "@app/types/transaction"
 import { normalizeString } from "@app/utils/helper"
 
 import { fetchAndMapPayments, TRANSACTIONS_PER_PAGE } from "./payments-page"
@@ -25,14 +25,13 @@ export type ContactPaymentsPage = {
  * The SDK cannot filter payments by counterparty, so a contact's history is found by
  * matching the lightning address the mapper already carries on each transaction.
  *
- * Restricted to sends: `lnAddress` comes from `lnurlPayInfo`, which on a receive holds
- * the address the payer resolved, so an unrestricted match would list a user's own
- * incoming payments as payments with this contact.
+ * Both directions count: a conversation with a contact is what they were paid and what
+ * they paid back, and the history screen already reads a received payment's address as
+ * its counterparty. The address itself is the filter, so a receive that carries the
+ * user's own address instead of the sender's simply never matches a contact.
  */
 const matchesContact = (tx: NormalizedTransaction, identifier: string): boolean =>
-  tx.direction === TransactionDirection.Send &&
-  tx.lnAddress !== undefined &&
-  normalizeString(tx.lnAddress) === identifier
+  tx.lnAddress !== undefined && normalizeString(tx.lnAddress) === identifier
 
 /**
  * Reads one page of a contact's payments, resuming from `rawOffset`.
