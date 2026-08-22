@@ -161,9 +161,52 @@
     "jest/no-identical-title": "error",
     "jest/prefer-to-have-length": "warn",
     "jest/valid-expect": "error",
-    "jest/no-async-promise-executor": "off"
+    "jest/no-async-promise-executor": "off",
+
+    // Design token migration (see app/rne-theme/colors.ts):
+    // (a) legacy appearance-named color tokens are deprecated — warn so existing
+    //     code keeps working but new code uses the semantic tokens instead.
+    // (b) static* tokens never invert with the theme — error outside the
+    //     allowlist in "overrides" below (QR code, camera, earns section,
+    //     and atomic components that paint on colored surfaces).
+    "no-restricted-syntax": [
+      "warn",
+      {
+        "selector": ":matches(MemberExpression[object.name='colors'], MemberExpression[object.property.name='colors']) > Identifier.property[name=/^(white|black|primary[345]?|grey[0-7]|red|error9|blue5|backdropWhite|backdropWhiter|_(white|black|lightGrey|lighterGrey|lightBlue|darkGrey|cardPill|blue|orange|sky|green|primary1|primary2|warningLight))$/]",
+        "message": "Deprecated color token — use the semantic token instead (see app/rne-theme/colors.ts)."
+      },
+      {
+        "selector": ":matches(MemberExpression[object.name='colors'], MemberExpression[object.property.name='colors']) > Identifier.property[name=/^static/]",
+        "message": "static* colors never invert with the theme and are only allowed in the QR/camera/earns allowlist (see .eslintrc.json overrides)."
+      }
+    ]
 
   },
+  "overrides": [
+    {
+      // allowlist for static* tokens: the legacy-name warning stays active here
+      "files": [
+        "app/screens/receive-bitcoin-screen/**",
+        "app/screens/send-bitcoin-screen/scanning-qrcode-screen.tsx",
+        "app/components/totp-export/totp-qr.tsx",
+        "app/screens/earns-screen/**",
+        "app/screens/earns-map-screen/**",
+        "app/components/atomic/switch/**",
+        "app/components/atomic/galoy-currency-bubble/**",
+        "app/components/atomic/galoy-currency-bubble-text/**",
+        "app/components/atomic/currency-pill/**"
+      ],
+      "rules": {
+        "no-restricted-syntax": [
+          "warn",
+          {
+            "selector": ":matches(MemberExpression[object.name='colors'], MemberExpression[object.property.name='colors']) > Identifier.property[name=/^(white|black|primary[345]?|grey[0-7]|red|error9|blue5|backdropWhite|backdropWhiter|_(white|black|lightGrey|lighterGrey|lightBlue|darkGrey|cardPill|blue|orange|sky|green|primary1|primary2|warningLight))$/]",
+            "message": "Deprecated color token — use the semantic token instead (see app/rne-theme/colors.ts)."
+          }
+        ]
+      }
+    }
+  ],
   "settings": {
     "react": {
       "version": "detect"
