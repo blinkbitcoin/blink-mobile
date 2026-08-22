@@ -72,9 +72,16 @@ const CustodialAccountBanner: React.FC = () => {
         <View style={styles.iconContainer}>
           <AccountIcon size={25} />
         </View>
-        <Text type="p2">
-          {isUserLoggedIn ? usernameTitle : LL.SettingsScreen.logInOrCreateAccount()}
-        </Text>
+        <View style={styles.textContainer}>
+          <Text type="p2" numberOfLines={1} ellipsizeMode="middle">
+            {isUserLoggedIn ? usernameTitle : LL.SettingsScreen.logInOrCreateAccount()}
+          </Text>
+          {isUserLoggedIn && (
+            <Text type="p3" style={styles.subtitle}>
+              {LL.SettingsScreen.custodialAccount()}
+            </Text>
+          )}
+        </View>
       </View>
     </TouchableWithoutFeedback>
   )

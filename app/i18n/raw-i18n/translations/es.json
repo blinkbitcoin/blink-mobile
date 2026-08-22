@@ -2391,6 +2391,7 @@
         "activated": "Activada",
         "addressScreen": "Formas de recibir pagos",
         "nonCustodialAccount": "Cuenta no custodial",
+        "custodialAccount": "Cuenta custodial",
         "tapUserName": "Ingrese aquí para configurarlo",
         "notifications": "Notificaciones",
         "title": "Configuración",

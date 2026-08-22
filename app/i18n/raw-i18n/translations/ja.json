@@ -2391,6 +2391,7 @@
         "activated": "アクティベーション",
         "addressScreen": "さまざまな受金方法を見る",
         "nonCustodialAccount": "非カストディアルアカウント",
+        "custodialAccount": "カストディアルアカウント",
         "tapUserName": "タップしてユーザー名を設定する",
         "notifications": "通知",
         "title": "設定",

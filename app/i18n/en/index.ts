@@ -2468,6 +2468,7 @@ const en: BaseTranslation = {
     activated: "Activated",
     addressScreen: "Ways to get paid",
     nonCustodialAccount: "Non-custodial account",
+    custodialAccount: "Custodial account",
     tapUserName: "Tap to set username",
     notifications: "Notifications",
     title: "Settings",

@@ -2391,6 +2391,7 @@
         "activated": "Attivato",
         "addressScreen": "Modi per farsi pagare",
         "nonCustodialAccount": "Account non custodiale",
+        "custodialAccount": "Account custodiale",
         "tapUserName": "Tocca per impostare l'username",
         "notifications": "Notifiche",
         "title": "Impostazioni",
