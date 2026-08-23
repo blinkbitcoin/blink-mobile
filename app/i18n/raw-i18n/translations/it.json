@@ -3822,6 +3822,7 @@
         "reminderBulletin": {
             "title": "Importante",
             "body": "Passa a un account non custodiale tramite la migrazione guidata, oppure preleva i tuoi fondi, entro il {date}. La ricezione si interrompe il {receiveStopsDate}.",
+            "bodyReceiveDisabled": "La ricezione si è interrotta. Passa a un account non custodiale tramite la migrazione guidata, oppure preleva i tuoi fondi, entro il {date}.",
             "migrateCta": "Migra"
         },
         "offboardBulletin": {

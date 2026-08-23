@@ -3822,6 +3822,7 @@
     "reminderBulletin": {
       "title": "Belangrik",
       "body": "Skuif na 'n nie-bewaarrekening via begeleide migrasie, of onttrek jou fondse, voor {date}. Ontvangs stop op {receiveStopsDate}.",
+      "bodyReceiveDisabled": "Ontvangs het gestop. Skuif na 'n nie-bewaarrekening via begeleide migrasie, of onttrek jou fondse, voor {date}.",
       "migrateCta": "Migreer"
     },
     "offboardBulletin": {

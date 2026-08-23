@@ -12901,6 +12901,11 @@ type RootTranslation = {
 			 */
 			body: RequiredParams<'date' | 'receiveStopsDate'>
 			/**
+			 * R​e​c​e​i​v​i​n​g​ ​h​a​s​ ​s​t​o​p​p​e​d​.​ ​M​o​v​e​ ​t​o​ ​a​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​ ​v​i​a​ ​g​u​i​d​e​d​ ​m​i​g​r​a​t​i​o​n​,​ ​o​r​ ​w​i​t​h​d​r​a​w​,​ ​b​e​f​o​r​e​ ​{​d​a​t​e​}​.
+			 * @param {string} date
+			 */
+			bodyReceiveDisabled: RequiredParams<'date'>
+			/**
 			 * M​i​g​r​a​t​e
 			 */
 			migrateCta: string
@@ -26344,6 +26349,10 @@ export type TranslationFunctions = {
 			 * Move to a non-custodial account via guided migration, or withdraw, before {date}. Receiving stops {receiveStopsDate}.
 			 */
 			body: (arg: { date: string, receiveStopsDate: string }) => LocalizedString
+			/**
+			 * Receiving has stopped. Move to a non-custodial account via guided migration, or withdraw, before {date}.
+			 */
+			bodyReceiveDisabled: (arg: { date: string }) => LocalizedString
 			/**
 			 * Migrate
 			 */

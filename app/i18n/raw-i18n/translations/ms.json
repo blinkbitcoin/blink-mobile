@@ -3822,6 +3822,7 @@
     "reminderBulletin": {
       "title": "Penting",
       "body": "Beralih kepada akaun bukan kustodial melalui migrasi berpandu, atau keluarkan dana anda, sebelum {date}. Penerimaan berhenti pada {receiveStopsDate}.",
+      "bodyReceiveDisabled": "Penerimaan telah berhenti. Beralih kepada akaun bukan kustodial melalui migrasi berpandu, atau keluarkan dana anda, sebelum {date}.",
       "migrateCta": "Pindah"
     },
     "offboardBulletin": {

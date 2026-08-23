@@ -3822,6 +3822,7 @@
     "reminderBulletin": {
       "title": "Dôležité",
       "body": "Prejdite na nesverenecký účet pomocou riadenej migrácie alebo si vyberte prostriedky pred {date}. Prijímanie sa skončí {receiveStopsDate}.",
+      "bodyReceiveDisabled": "Prijímanie sa skončilo. Prejdite na nesverenecký účet pomocou riadenej migrácie alebo si vyberte prostriedky pred {date}.",
       "migrateCta": "Migrovať"
     },
     "offboardBulletin": {

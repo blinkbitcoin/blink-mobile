@@ -3822,6 +3822,7 @@
     "reminderBulletin": {
       "title": "مهم",
       "body": "انتقل إلى حساب غير حافظ عبر الترحيل الموجّه، أو اسحب أموالك، قبل {date}. يتوقف الاستلام في {receiveStopsDate}.",
+      "bodyReceiveDisabled": "توقف الاستلام. انتقل إلى حساب غير حافظ عبر الترحيل الموجّه، أو اسحب أموالك، قبل {date}.",
       "migrateCta": "رحّل"
     },
     "offboardBulletin": {

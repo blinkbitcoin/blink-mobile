@@ -36,6 +36,7 @@ describe("useMigrationReminderBulletin", () => {
     const { result } = renderHook(() => useMigrationReminderBulletin())
 
     expect(result.current.isVisible).toBe(true)
+    expect(result.current.phase).toBe(WindDownStatus.PreCutoff)
     expect(result.current.deadlineTimestamp).toBe(affectedWindDown.finalDeadline)
     expect(result.current.receiveDisabledTimestamp).toBe(
       affectedWindDown.receiveDisabledAt,
@@ -43,12 +44,17 @@ describe("useMigrationReminderBulletin", () => {
     expect(result.current.timezone).toBe(affectedWindDown.timezone)
   })
 
-  it("hides once receiving is disabled, where the migrate-now modal takes over", () => {
+  /** The migrate-now modal also fires in this phase, but it is dismissible for the session
+   *  and leaves the dashboard with no entry into the migration behind it. */
+  it("keeps showing once receiving is disabled, reporting that phase", () => {
     mockStatus = WindDownStatus.ReceiveDisabled
 
     const { result } = renderHook(() => useMigrationReminderBulletin())
 
-    expect(result.current.isVisible).toBe(false)
+    expect(result.current.isVisible).toBe(true)
+    expect(result.current.phase).toBe(WindDownStatus.ReceiveDisabled)
+    expect(result.current.deadlineTimestamp).toBe(affectedWindDown.finalDeadline)
+    expect(result.current.timezone).toBe(affectedWindDown.timezone)
   })
 
   it("hides once the gate closes, where the blocker takes the whole home", () => {

@@ -19,6 +19,7 @@ import { HideAmountContextProvider } from "@app/graphql/hide-amount-context"
 import { IsAuthedContextProvider } from "@app/graphql/is-authed-context"
 import { mockCurrencyList } from "@app/graphql/mocks"
 import { ConvertDirection } from "@app/types/payment"
+import { WindDownStatus } from "@app/types/wind-down"
 
 let currentMocks: MockedResponse[] = []
 
@@ -254,10 +255,12 @@ jest.mock("@app/components/migrate-now-modal", () => {
 })
 
 let mockReminderBulletinVisible = false
+let mockReminderBulletinPhase: WindDownStatus = WindDownStatus.PreCutoff
 
 jest.mock("@app/screens/account-migration/hooks/use-migration-reminder-bulletin", () => ({
   useMigrationReminderBulletin: () => ({
     isVisible: mockReminderBulletinVisible,
+    phase: mockReminderBulletinPhase,
     deadlineTimestamp: 1787003999,
     receiveDisabledTimestamp: 1785189600,
     timezone: "Europe/Paris",
@@ -889,6 +892,7 @@ const resetHomeScreenMocks = () => {
   mockCanReopen = false
   mockReceiveBlocked = false
   mockReminderBulletinVisible = false
+  mockReminderBulletinPhase = WindDownStatus.PreCutoff
   mockTransferBlockedOverride = false
   mockDollarBalanceModalVisible = false
   mockForcedConversionParams = null
@@ -1933,6 +1937,7 @@ describe("HomeScreen wind-down states", () => {
     mockCanReopen = false
     mockReceiveBlocked = false
     mockReminderBulletinVisible = false
+    mockReminderBulletinPhase = WindDownStatus.PreCutoff
     mockTransferBlockedOverride = false
     mockDollarBalanceModalVisible = false
     jest.clearAllMocks()
@@ -2181,7 +2186,39 @@ describe("HomeScreen wind-down states", () => {
     await flushEffects()
   })
 
-  it("keeps the reminder bulletin hidden outside the pre-cutoff phase", async () => {
+  /** The dashboard entry the dismissible migrate-now modal leaves behind once closed. */
+  it("keeps the migration reminder bulletin once receiving is disabled", async () => {
+    mockReminderBulletinVisible = true
+    mockReminderBulletinPhase = WindDownStatus.ReceiveDisabled
+
+    const { findByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    expect(await findByTestId("migration-reminder-bulletin")).toBeTruthy()
+
+    await flushEffects()
+  })
+
+  it("forwards the wind-down phase so the bulletin can pick its copy", async () => {
+    mockReminderBulletinVisible = true
+    mockReminderBulletinPhase = WindDownStatus.ReceiveDisabled
+
+    render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    const { phase } = mockMigrationReminderBulletin.mock.calls[0][0]
+    expect(phase).toBe(WindDownStatus.ReceiveDisabled)
+  })
+
+  it("keeps the reminder bulletin hidden in a phase that does not call for it", async () => {
     const { queryByTestId } = render(
       <ContextForScreen>
         <HomeScreen />

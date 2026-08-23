@@ -968,6 +968,7 @@ export const HomeScreen: React.FC = () => {
         {reminderBulletin.isVisible && (
           <MigrationReminderBulletin
             onMigrate={goToMigration}
+            phase={reminderBulletin.phase}
             deadlineTimestamp={reminderBulletin.deadlineTimestamp}
             receiveDisabledTimestamp={reminderBulletin.receiveDisabledTimestamp}
             timezone={reminderBulletin.timezone}

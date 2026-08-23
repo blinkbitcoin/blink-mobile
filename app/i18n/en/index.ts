@@ -4051,6 +4051,8 @@ const en: BaseTranslation = {
     reminderBulletin: {
       title: "Important",
       body: "Move to a non-custodial account via guided migration, or withdraw, before {date: string}. Receiving stops {receiveStopsDate: string}.",
+      bodyReceiveDisabled:
+        "Receiving has stopped. Move to a non-custodial account via guided migration, or withdraw, before {date: string}.",
       migrateCta: "Migrate",
     },
     offboardBulletin: {

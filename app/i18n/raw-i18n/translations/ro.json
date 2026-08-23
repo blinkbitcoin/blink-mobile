@@ -3822,6 +3822,7 @@
     "reminderBulletin": {
       "title": "Important",
       "body": "Treci la un cont non-custodial prin migrarea ghidată sau retrage-ți fondurile înainte de {date}. Primirea se oprește pe {receiveStopsDate}.",
+      "bodyReceiveDisabled": "Primirea s-a oprit. Treci la un cont non-custodial prin migrarea ghidată sau retrage-ți fondurile înainte de {date}.",
       "migrateCta": "Migrează"
     },
     "offboardBulletin": {

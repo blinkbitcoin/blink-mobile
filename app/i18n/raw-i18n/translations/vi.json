@@ -3822,6 +3822,7 @@
     "reminderBulletin": {
       "title": "Quan trọng",
       "body": "Hãy chuyển sang tài khoản không lưu ký qua quy trình di chuyển có hướng dẫn, hoặc rút tiền, trước {date}. Việc nhận sẽ dừng vào {receiveStopsDate}.",
+      "bodyReceiveDisabled": "Việc nhận đã dừng. Hãy chuyển sang tài khoản không lưu ký qua quy trình di chuyển có hướng dẫn, hoặc rút tiền, trước {date}.",
       "migrateCta": "Chuyển"
     },
     "offboardBulletin": {

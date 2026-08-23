@@ -3822,6 +3822,7 @@
         "reminderBulletin": {
             "title": "Importante",
             "body": "Mude para uma conta não custodial através da migração guiada, ou retire os seus fundos, antes de {date}. O recebimento termina em {receiveStopsDate}.",
+            "bodyReceiveDisabled": "O recebimento terminou. Mude para uma conta não custodial através da migração guiada, ou retire os seus fundos, antes de {date}.",
             "migrateCta": "Migrar"
         },
         "offboardBulletin": {

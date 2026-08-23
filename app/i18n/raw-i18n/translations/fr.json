@@ -3822,6 +3822,7 @@
         "reminderBulletin": {
             "title": "Important",
             "body": "Passez à un compte non-custodial via la migration guidée, ou retirez vos fonds, avant le {date}. La réception s'arrête le {receiveStopsDate}.",
+            "bodyReceiveDisabled": "La réception s'est arrêtée. Passez à un compte non-custodial via la migration guidée, ou retirez vos fonds, avant le {date}.",
             "migrateCta": "Migrer"
         },
         "offboardBulletin": {

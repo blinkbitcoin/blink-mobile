@@ -3822,6 +3822,7 @@
         "reminderBulletin": {
             "title": "重要",
             "body": "{date}までに、ガイド付き移行で非カストディアルアカウントに移行するか、資金を引き出してください。{receiveStopsDate}に受け取りが停止します。",
+            "bodyReceiveDisabled": "受け取りは停止しました。{date}までに、ガイド付き移行で非カストディアルアカウントに移行するか、資金を引き出してください。",
             "migrateCta": "移行"
         },
         "offboardBulletin": {

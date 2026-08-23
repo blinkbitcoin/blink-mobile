@@ -3822,6 +3822,7 @@
     "reminderBulletin": {
       "title": "Kubalulekile",
       "body": "Yiya kwiakhawunti engagcinwanga ngofuduko olukhokelwayo, okanye ukhuphe imali yakho, phambi kwe-{date}. Ukufumana kuyakuma nge-{receiveStopsDate}.",
+      "bodyReceiveDisabled": "Ukufumana kumile. Yiya kwiakhawunti engagcinwanga ngofuduko olukhokelwayo, okanye ukhuphe imali yakho, phambi kwe-{date}.",
       "migrateCta": "Fuduka"
     },
     "offboardBulletin": {
