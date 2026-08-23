@@ -540,7 +540,11 @@ export const HomeScreen: React.FC = () => {
 
   const { migrateNowPrompt, offboardBulletin, reminderBulletin, receiveBlocked } =
     useWindDownHomeNudges()
-  const { dismissForSession: dismissMigrateNowPrompt } = migrateNowPrompt
+  const {
+    canReopen: canReopenMigrateNowPrompt,
+    dismissForSession: dismissMigrateNowPrompt,
+    reopen: reopenMigrateNowPrompt,
+  } = migrateNowPrompt
   /** Dismissing first keeps the modal from floating over the pushed migration flow. */
   const goToMigration = React.useCallback(() => {
     dismissMigrateNowPrompt()
@@ -564,7 +568,12 @@ export const HomeScreen: React.FC = () => {
   const closeUpgradeModal = () => setIsUpgradeModalVisible(false)
   const closeRestrictionModal = () => setIsRestrictionModalVisible(false)
   /** Anon outranks the region explanation (its remedy is switching modes), and the
-   *  sanctions block outranks the compliance one (it is the stricter layer). */
+   *  sanctions block outranks the compliance one (it is the stricter layer). The wind-down
+   *  nudge outranks the compliance modal in turn: that modal is a dead end (a title and a
+   *  Close), while an account whose custodial service is ending has one remedy, and both
+   *  gated surfaces are entry points a user hunting for it will try. `canReopen` is exactly
+   *  "the migrate-now nudge can surface", so a region-gated account with no wind-down, or
+   *  one whose self-custodial stack is off, still gets the compliance explanation. */
   const onGatedDollarTap = () => {
     if (isAnonMode) {
       promptEnhancedMode()
@@ -572,6 +581,10 @@ export const HomeScreen: React.FC = () => {
     }
     if (isRestrictedRegion) {
       presentRestrictedRegionModal()
+      return
+    }
+    if (canReopenMigrateNowPrompt) {
+      reopenMigrateNowPrompt()
       return
     }
     setIsRestrictionModalVisible(true)

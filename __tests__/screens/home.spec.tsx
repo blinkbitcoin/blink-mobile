@@ -2172,6 +2172,56 @@ describe("HomeScreen wind-down states", () => {
     mockActiveWalletOverride = null
   })
 
+  const renderWithGatedDollarBalance = async () => {
+    mockDollarBalanceRestrictedOverride = true
+    // usdBalance stays 0 so the forced-conversion modal never auto-opens
+    currentMocks = generateHomeMock({
+      level: AccountLevel.Two,
+      network: Network.Mainnet,
+      btcBalance: 1000,
+      usdBalance: 0,
+    })
+
+    const view = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+    return view
+  }
+
+  /** The wind-down's only remedy has to be reachable from the surfaces the region gate
+   *  greys out, since a user hunting for it will try them: the compliance modal they used
+   *  to open is a title and a Close button, with nothing about the migration. The greyed
+   *  dollar row is the other entry point and shares this exact callback (`onGatedTap`),
+   *  whose wiring wallet-overview.spec covers. */
+  it("reopens the migrate-now prompt from the disabled transfer button", async () => {
+    mockCanReopen = true
+
+    const { getByTestId } = await renderWithGatedDollarBalance()
+
+    fireEvent.press(getByTestId("transfer", { includeHiddenElements: true }))
+
+    expect(mockReopenMigratePrompt).toHaveBeenCalledTimes(1)
+    expect(mockDollarBalanceModalVisible).toBe(false)
+    expect(mockNavigate).not.toHaveBeenCalledWith("conversionDetails")
+  })
+
+  /** The gate also greys these surfaces for regions with no wind-down at all, and those
+   *  accounts have no migration to be pushed into. */
+  it("keeps the region explanation when no migrate-now prompt can surface", async () => {
+    mockCanReopen = false
+
+    const { getByTestId } = await renderWithGatedDollarBalance()
+
+    fireEvent.press(getByTestId("transfer", { includeHiddenElements: true }))
+
+    expect(mockDollarBalanceModalVisible).toBe(true)
+    expect(mockReopenMigratePrompt).not.toHaveBeenCalled()
+  })
+
   it("shows the migration reminder bulletin in the pre-cutoff phase", async () => {
     mockReminderBulletinVisible = true
 
@@ -2772,6 +2822,32 @@ describe("HomeScreen restricted region", () => {
     expect(mockPresentRestrictedRegionModal).toHaveBeenCalledTimes(1)
     expect(mockPromptEnhancedMode).not.toHaveBeenCalled()
     expect(mockDollarBalanceModalVisible).toBe(false)
+  })
+
+  /** Sanctions are the stricter layer: a sanctioned session must not be pushed into a
+   *  migration whose destination it may not be allowed to reach either. */
+  it("prefers the sanctions modal over the migrate-now nudge when both would apply", async () => {
+    mockIsRestrictedRegion = true
+    mockCanReopen = true
+    currentMocks = generateHomeMock({
+      level: AccountLevel.One,
+      network: Network.Mainnet,
+      btcBalance: 1000,
+      usdBalance: 0,
+    })
+
+    const { getByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    fireEvent.press(getByTestId("transfer", { includeHiddenElements: true }))
+
+    expect(mockPresentRestrictedRegionModal).toHaveBeenCalledTimes(1)
+    expect(mockReopenMigratePrompt).not.toHaveBeenCalled()
   })
 
   it("prefers the Enhanced prompt over the sanctions modal when both would apply", async () => {
