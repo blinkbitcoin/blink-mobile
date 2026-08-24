@@ -2162,14 +2162,11 @@
   },
   "PinScreen": {
     "attemptsRemaining": "Yanlış PIN kodu. Kalan deneme hakkınız: {attemptsRemaining: number}",
-    "lockoutUnavailable": "Başarısız deneme güvenli şekilde kaydedilemedi. Çıkış yapılıyor.",
     "oneAttemptRemaining": "Yanlış PIN kodu. Kalan deneme hakkınız: 1",
-    "pinUnreadable": "PIN kodunuz kontrol edilemedi. Lütfen tekrar deneyin.",
     "setPin": "PIN kodunu ayarla",
     "setPinFailedMatch": "Pin kodu eşleşmedi - PIN kodunu ayarla",
     "storePinFailed": "Pin'in kaydedilemedi.",
     "tooManyAttempts": "Çok fazla başarısız deneme. Çıkış yapılıyor.",
-    "tryAgainIn": "{seconds: number} sn sonra tekrar deneyin.",
     "verifyPin": "PIN kodunu onayla"
   },
   "PriceHistoryScreen": {

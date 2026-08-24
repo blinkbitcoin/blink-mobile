@@ -2162,14 +2162,11 @@
   },
   "PinScreen": {
     "attemptsRemaining": "Salah No PIN. {Percubaan yang tinggal: number} kali lagi percubaan.",
-    "lockoutUnavailable": "Tidak dapat merekod percubaan yang gagal dengan selamat. Daftar keluar sekarang",
     "oneAttemptRemaining": "Salah no PIN. 1 lagi percubaan.",
-    "pinUnreadable": "Tidak dapat menyemak PIN anda. Sila cuba lagi.",
     "setPin": "Tetapkan kod PIN anda",
     "setPinFailedMatch": "Pin tak sama - Tetapkan kod PIN anda",
     "storePinFailed": "Tak boleh nak simpan kod pin anda.",
     "tooManyAttempts": "Terlalu banyak percubaan yang gagal. Daftar keluar sekarang",
-    "tryAgainIn": "Cuba lagi dalam {seconds: number} s.",
     "verifyPin": "Sahkan kod PIN anda"
   },
   "PriceHistoryScreen": {

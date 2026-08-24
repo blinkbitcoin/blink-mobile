@@ -2162,14 +2162,11 @@
   },
   "PinScreen": {
     "attemptsRemaining": "Неисправан ПИН. Преостало је {attemptsRemaining: number} покушаја.",
-    "lockoutUnavailable": "Неуспели покушај није могуће безбедно забележити. Одјављивање.",
     "oneAttemptRemaining": "Неисправан ПИН. Преостао је 1 покушај.",
-    "pinUnreadable": "Није било могуће проверити ваш ПИН. Покушајте поново.",
     "setPin": "Поставите свој ПИН код",
     "setPinFailedMatch": "ПИН-ови се не подударају - Поставите свој ПИН код",
     "storePinFailed": "Неуспешно снимање ПИН кода.",
     "tooManyAttempts": "Превише неуспелих покушаја. Одјављивање.",
-    "tryAgainIn": "Покушајте поново за {seconds: number} с.",
     "verifyPin": "Потврдите свој ПИН код"
   },
   "PriceHistoryScreen": {

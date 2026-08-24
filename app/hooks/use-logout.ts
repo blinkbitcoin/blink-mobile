@@ -66,7 +66,7 @@ const useLogout = () => {
           await AsyncStorage.multiRemove([SCHEMA_VERSION_KEY])
           await KeyStoreWrapper.removeIsBiometricsEnabled()
           await KeyStoreWrapper.removePin()
-          await KeyStoreWrapper.clearPinFailureState()
+          await KeyStoreWrapper.removePinAttempts()
           await KeyStoreWrapper.removeSessionProfiles()
           await clearToken()
         }

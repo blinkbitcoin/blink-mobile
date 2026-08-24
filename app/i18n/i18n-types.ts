@@ -6742,17 +6742,9 @@ type RootTranslation = {
 		 */
 		attemptsRemaining: RequiredParams<'attemptsRemaining'>
 		/**
-		 * C​o​u​l​d​n​'​t​ ​r​e​c​o​r​d​ ​t​h​e​ ​f​a​i​l​e​d​ ​a​t​t​e​m​p​t​ ​s​e​c​u​r​e​l​y​.​ ​L​o​g​g​i​n​g​ ​o​u​t​.
-		 */
-		lockoutUnavailable: string
-		/**
 		 * I​n​c​o​r​r​e​c​t​ ​P​I​N​.​ ​1​ ​a​t​t​e​m​p​t​ ​r​e​m​a​i​n​i​n​g​.
 		 */
 		oneAttemptRemaining: string
-		/**
-		 * C​o​u​l​d​n​'​t​ ​c​h​e​c​k​ ​y​o​u​r​ ​P​I​N​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
-		 */
-		pinUnreadable: string
 		/**
 		 * S​e​t​ ​y​o​u​r​ ​P​I​N​ ​c​o​d​e
 		 */
@@ -6769,11 +6761,6 @@ type RootTranslation = {
 		 * T​o​o​ ​m​a​n​y​ ​f​a​i​l​e​d​ ​a​t​t​e​m​p​t​s​.​ ​L​o​g​g​i​n​g​ ​o​u​t​.
 		 */
 		tooManyAttempts: string
-		/**
-		 * T​r​y​ ​a​g​a​i​n​ ​i​n​ ​{​s​e​c​o​n​d​s​}​s​.
-		 * @param {number} seconds
-		 */
-		tryAgainIn: RequiredParams<'seconds'>
 		/**
 		 * V​e​r​i​f​y​ ​y​o​u​r​ ​P​I​N​ ​c​o​d​e
 		 */
@@ -20337,17 +20324,9 @@ export type TranslationFunctions = {
 		 */
 		attemptsRemaining: (arg: { attemptsRemaining: number }) => LocalizedString
 		/**
-		 * Couldn't record the failed attempt securely. Logging out.
-		 */
-		lockoutUnavailable: () => LocalizedString
-		/**
 		 * Incorrect PIN. 1 attempt remaining.
 		 */
 		oneAttemptRemaining: () => LocalizedString
-		/**
-		 * Couldn't check your PIN. Please try again.
-		 */
-		pinUnreadable: () => LocalizedString
 		/**
 		 * Set your PIN code
 		 */
@@ -20364,10 +20343,6 @@ export type TranslationFunctions = {
 		 * Too many failed attempts. Logging out.
 		 */
 		tooManyAttempts: () => LocalizedString
-		/**
-		 * Try again in {seconds}s.
-		 */
-		tryAgainIn: (arg: { seconds: number }) => LocalizedString
 		/**
 		 * Verify your PIN code
 		 */

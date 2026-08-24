@@ -2162,14 +2162,11 @@
     },
     "PinScreen": {
         "attemptsRemaining": "PIN incorreto. {attemptsRemaining: string} tentativas restantes.",
-        "lockoutUnavailable": "Não foi possível registar a tentativa falhada em segurança. Saindo.",
         "oneAttemptRemaining": "PIN incorreto. 1 tentativa restante.",
-        "pinUnreadable": "Não foi possível verificar o seu PIN. Tente novamente.",
         "setPin": "Defina seu código PIN",
         "setPinFailedMatch": "Os PINs não correspondem - Defina seu código PIN",
         "storePinFailed": "Não foi possível armazenar seu pin.",
         "tooManyAttempts": "Muitas tentativas falharam. Saindo.",
-        "tryAgainIn": "Tente novamente em {seconds: number} s.",
         "verifyPin": "Verifique seu código PIN"
     },
     "PriceHistoryScreen": {
