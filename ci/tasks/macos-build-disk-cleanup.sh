@@ -212,6 +212,11 @@ cleanup_workspace_build_outputs() {
   remove_path "$CI_ROOT/repo/android/build"
   remove_path "$CI_ROOT/repo/ios/build"
   remove_path "$CI_ROOT/repo/ios/Blink.ipa"
+  # build.sh always runs `nix develop -c yarn install` before building, so
+  # node_modules is regenerated from scratch every run regardless of what was
+  # here before — safe to drop, and it was sitting at 7.5G unused between
+  # builds in the 2026-08-24 disk-full incident.
+  remove_path "$CI_ROOT/repo/node_modules"
 }
 
 cleanup_xcode_artifacts() {
