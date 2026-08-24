@@ -3776,6 +3776,7 @@
             "passwordMismatch": "パスワードが一致しません",
             "uploadSuccess": "{provider}にバックアップを保存しました",
             "uploadFailed": "バックアップのアップロードに失敗しました",
+            "backupFailed": "バックアップの作成に失敗しました",
             "signInFailed": "{provider}へのサインインに失敗しました",
             "storageAccessRequired": "ウォレットのバックアップのために {provider: string} へのアクセスを許可してから、もう一度お試しください。",
             "cloudNotAvailable": "iCloud Driveが利用できません。設定からiCloudにサインインし、iCloud Driveを有効にしてください。",

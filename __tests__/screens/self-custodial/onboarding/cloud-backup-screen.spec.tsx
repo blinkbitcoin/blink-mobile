@@ -130,6 +130,26 @@ describe("CloudBackupScreen", () => {
     expect(view.UNSAFE_queryByType(ActivityIndicator)).toBeTruthy()
   })
 
+  /** The hook's guard already makes a re-entrant run a no-op, but the CTA must also stop
+   *  accepting the tap: a live-looking button through sign-in, the overwrite dialog and the
+   *  synchronous key derivation is what makes users tap twice in the first place. */
+  it("does not re-invoke handleBackup while the hook reports loading", async () => {
+    mockLoading = true
+
+    /** The title is replaced by the spinner in this state, so the CTA is reached by testID
+     *  rather than by its label. */
+    const { getByTestId } = render(
+      <ContextForScreen>
+        <CloudBackupScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    fireEvent.press(getByTestId("cloud-backup-continue"))
+
+    expect(mockHandleBackup).not.toHaveBeenCalled()
+  })
+
   /** With the checkbox gone, this disabled gate is the only thing keeping an empty or
    *  mismatched password out of `buildBackupPayload`, which now throws on one. */
   it("disables continue and does not back up while the form is invalid", async () => {

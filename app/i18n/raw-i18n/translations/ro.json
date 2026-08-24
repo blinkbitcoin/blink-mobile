@@ -3776,6 +3776,7 @@
       "passwordMismatch": "Parolele nu se potrivesc",
       "uploadSuccess": "Copie de siguranță salvată în {provider}",
       "uploadFailed": "Încarcărea copiei de siguranță a eșuat",
+      "backupFailed": "Crearea copiei de siguranță a eșuat",
       "signInFailed": "Conectarea la {provider} a eșuat",
       "storageAccessRequired": "Permite accesul {provider: string} la copia de rezervă a portofelului, apoi încearcă din nou.",
       "cloudNotAvailable": "iCloud Drive nu este disponibil. Conectează-te la iCloud din Setări și activează iCloud Drive.",

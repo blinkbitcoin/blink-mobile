@@ -3776,6 +3776,7 @@
             "passwordMismatch": "Les mots de passe ne correspondent pas",
             "uploadSuccess": "Sauvegarde enregistrée dans {provider}",
             "uploadFailed": "Échec du téléchargement de la sauvegarde",
+            "backupFailed": "Échec de la création de la sauvegarde",
             "signInFailed": "Échec de la connexion à {provider}",
             "storageAccessRequired": "Autorisez l'accès de {provider: string} à la sauvegarde de votre portefeuille, puis réessayez.",
             "cloudNotAvailable": "iCloud Drive n'est pas disponible. Veuillez vous connecter à iCloud dans les Réglages et activer iCloud Drive.",

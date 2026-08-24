@@ -12490,6 +12490,10 @@ type RootTranslation = {
 			 */
 			uploadFailed: string
 			/**
+			 * F​a​i​l​e​d​ ​t​o​ ​c​r​e​a​t​e​ ​b​a​c​k​u​p
+			 */
+			backupFailed: string
+			/**
 			 * F​a​i​l​e​d​ ​t​o​ ​s​i​g​n​ ​i​n​ ​t​o​ ​{​p​r​o​v​i​d​e​r​}
 			 * @param {string} provider
 			 */
@@ -25943,6 +25947,10 @@ export type TranslationFunctions = {
 			 * Failed to upload backup
 			 */
 			uploadFailed: () => LocalizedString
+			/**
+			 * Failed to create backup
+			 */
+			backupFailed: () => LocalizedString
 			/**
 			 * Failed to sign in to {provider}
 			 */

@@ -3776,6 +3776,7 @@
       "passwordMismatch": "Wachtwoorden komen niet overeen",
       "uploadSuccess": "Back-up opgeslagen in {provider}",
       "uploadFailed": "Uploaden van back-up mislukt",
+      "backupFailed": "Maken van back-up mislukt",
       "signInFailed": "Aanmelden bij {provider} mislukt",
       "storageAccessRequired": "Geef {provider: string} toegang tot de back-up van je wallet en probeer het opnieuw.",
       "cloudNotAvailable": "iCloud Drive is niet beschikbaar. Meld je aan bij iCloud in Instellingen en schakel iCloud Drive in.",

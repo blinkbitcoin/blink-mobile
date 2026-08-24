@@ -26,6 +26,7 @@ import {
   parseBackupPayload,
   parseEncryptedBackupPayload,
 } from "@app/utils/backup-payload"
+import { MIN_PASSWORD_LENGTH } from "@app/utils/validators/password"
 
 describe("spark backup format", () => {
   const mnemonic =
@@ -55,6 +56,27 @@ describe("spark backup format", () => {
     expect(() =>
       buildBackupPayload(mnemonic, { walletIdentifier, password: "" }),
     ).toThrow(/requires a password/)
+  })
+
+  /** The type-level requirement enforces presence, not policy. The builder owns the policy
+   *  too, so a second backup surface wired to a weaker field cannot quietly encrypt a real
+   *  mnemonic under a 5-character password. */
+  it("throws on a password below the policy minimum, not just an empty one", () => {
+    const oneShortOfPolicy = "a".repeat(MIN_PASSWORD_LENGTH - 1)
+
+    expect(() =>
+      buildBackupPayload(mnemonic, { walletIdentifier, password: "short" }),
+    ).toThrow(/requires a password/)
+    expect(() =>
+      buildBackupPayload(mnemonic, { walletIdentifier, password: oneShortOfPolicy }),
+    ).toThrow(/requires a password/)
+
+    expect(() =>
+      buildBackupPayload(mnemonic, {
+        walletIdentifier,
+        password: "a".repeat(MIN_PASSWORD_LENGTH),
+      }),
+    ).not.toThrow()
   })
 
   it("parses a legacy plaintext payload (restore compatibility)", () => {

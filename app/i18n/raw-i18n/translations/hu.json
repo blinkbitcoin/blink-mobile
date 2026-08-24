@@ -3776,6 +3776,7 @@
       "passwordMismatch": "A jelszavak nem egyeznek",
       "uploadSuccess": "Biztonsági mentés elmentve a {provider} tárhelyre",
       "uploadFailed": "A biztonsági mentés feltöltése sikertelen",
+      "backupFailed": "A biztonsági mentés létrehozása sikertelen",
       "signInFailed": "Nem sikerült bejelentkezni a következőbe: {provider}",
       "storageAccessRequired": "Engedélyezze a(z) {provider: string} hozzáférést a tárca biztonsági mentéséhez, majd próbálja újra.",
       "cloudNotAvailable": "Az iCloud Drive nem érhető el. Jelentkezz be az iCloudba a Beállításokban, és engedélyezd az iCloud Drive-ot.",

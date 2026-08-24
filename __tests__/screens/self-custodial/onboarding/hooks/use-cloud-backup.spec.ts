@@ -1,4 +1,4 @@
-import { renderHook, act } from "@testing-library/react-native"
+import { renderHook, act, waitFor } from "@testing-library/react-native"
 import { Platform } from "react-native"
 
 import { useCloudBackup } from "@app/screens/self-custodial/onboarding/hooks/use-cloud-backup"
@@ -68,7 +68,7 @@ const MNEMONIC = "youth indicate void"
 
 let mockIdentityPubkey: string | null = "test-pubkey-1234"
 let mockIdentityLoading = false
-let mockMnemonic = "youth indicate void"
+let mockMnemonic = MNEMONIC
 let mockMnemonicLoading = false
 jest.mock("@app/screens/self-custodial/onboarding/hooks/use-wallet-mnemonic", () => ({
   useWalletMnemonic: () => mockMnemonic,
@@ -110,6 +110,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
         CloudBackup: {
           uploadSuccess: ({ provider }: { provider: string }) => `Saved to ${provider}`,
           uploadFailed: () => "Upload failed",
+          backupFailed: () => "Failed to create backup",
           signInFailed: () => "Sign in failed",
           cloudNotAvailable: () => "iCloud not available",
           networkError: () => "Network error",
@@ -146,7 +147,7 @@ describe("useCloudBackup", () => {
     mockLoading = false
     mockIdentityPubkey = "test-pubkey-1234"
     mockIdentityLoading = false
-    mockMnemonic = "youth indicate void"
+    mockMnemonic = MNEMONIC
     mockMnemonicLoading = false
     mockLightningAddress = null
     mockStartSession.mockResolvedValue(sessionOk(noExistingFile))
@@ -216,9 +217,14 @@ describe("useCloudBackup", () => {
     })
 
     expect(mockToastShow).toHaveBeenCalledWith(
-      expect.objectContaining({ message: "Upload failed" }),
+      expect.objectContaining({ message: "Failed to create backup" }),
     )
-    expect(mockRecordError).toHaveBeenCalled()
+    /** Without the operation, a spike of native crypto failures lands on the dashboard as an
+     *  anonymous Error and alerting keyed on the flow name never fires. */
+    expect(mockRecordError).toHaveBeenCalledWith(
+      expect.objectContaining({ message: "native crypto unavailable" }),
+      "Cloud backup encryption",
+    )
     expect(mockUpload).not.toHaveBeenCalled()
     expect(mockCompleteBackup).not.toHaveBeenCalled()
   })
@@ -236,9 +242,124 @@ describe("useCloudBackup", () => {
 
     expect(mockUpload).not.toHaveBeenCalled()
     expect(mockToastShow).toHaveBeenCalledWith(
-      expect.objectContaining({ message: "Upload failed" }),
+      expect.objectContaining({ message: "Failed to create backup" }),
     )
     expect(mockCompleteBackup).not.toHaveBeenCalled()
+  })
+
+  /** A password below the policy minimum must not reach the encryption step: the builder
+   *  owns the policy, so a caller wired to a weaker field fails loudly instead of shipping
+   *  a weakly-encrypted mnemonic to the user's cloud. */
+  it("aborts rather than uploading when the password is below the policy minimum", async () => {
+    mockUpload.mockResolvedValue({ success: true })
+
+    const { result } = renderHook(() => useCloudBackup({ password: "short" }))
+
+    await act(async () => {
+      await expect(result.current.handleBackup()).resolves.toBeUndefined()
+    })
+
+    expect(mockEncryptAesGcm).not.toHaveBeenCalled()
+    expect(mockUpload).not.toHaveBeenCalled()
+    expect(mockToastShow).toHaveBeenCalledWith(
+      expect.objectContaining({ message: "Failed to create backup" }),
+    )
+    expect(mockCompleteBackup).not.toHaveBeenCalled()
+  })
+
+  /** The press handler is not awaited, so nothing upstream serializes taps. A second tap
+   *  while the first run is still in the sign-in sheet must be a no-op, not a second session
+   *  racing a second upload onto the same file. */
+  it("ignores a second handleBackup while the first is still in flight", async () => {
+    let releaseSession: (sessionResult: unknown) => void = () => {}
+    mockStartSession.mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          releaseSession = resolve
+        }),
+    )
+    mockUpload.mockResolvedValue({ success: true })
+
+    const { result } = renderHook(() => useCloudBackup({ password: "mypassword123" }))
+
+    await act(async () => {
+      const first = result.current.handleBackup()
+      const second = result.current.handleBackup()
+
+      expect(mockStartSession).toHaveBeenCalledTimes(1)
+
+      releaseSession(sessionOk(noExistingFile))
+      await Promise.all([first, second])
+    })
+
+    expect(mockStartSession).toHaveBeenCalledTimes(1)
+    expect(mockUpload).toHaveBeenCalledTimes(1)
+    expect(mockCompleteBackup).toHaveBeenCalledTimes(1)
+  })
+
+  /** The reviewer's exact scenario: a tap while the overwrite dialog is already open must
+   *  not stack a second dialog, and must not turn one confirmation into two uploads. */
+  it("does not stack a second overwrite dialog on a double tap", async () => {
+    mockStartSession.mockResolvedValue(sessionOk(withExistingFile))
+    let releaseDialog: (confirmed: boolean) => void = () => {}
+    mockConfirmDialog.mockImplementation(
+      () =>
+        new Promise<boolean>((resolve) => {
+          releaseDialog = resolve
+        }),
+    )
+    mockUpload.mockResolvedValue({ success: true })
+
+    const { result } = renderHook(() => useCloudBackup({ password: "mypassword123" }))
+
+    await act(async () => {
+      const first = result.current.handleBackup()
+      await waitFor(() => expect(mockConfirmDialog).toHaveBeenCalledTimes(1))
+
+      const second = result.current.handleBackup()
+      releaseDialog(true)
+      await Promise.all([first, second])
+    })
+
+    expect(mockConfirmDialog).toHaveBeenCalledTimes(1)
+    expect(mockUpload).toHaveBeenCalledTimes(1)
+  })
+
+  /** `loading` from the provider hook only covers upload/download. If the busy window ever
+   *  narrows back to that, the CTA goes idle during sign-in, the overwrite dialog, and the
+   *  synchronous 600k-iteration derivation — the exact window a second tap must be
+   *  impossible in. `mockLoading` stays false here, so a true reading can only come from
+   *  the hook's own busy state. */
+  it("reports busy from the first tap through the upload, not only during the upload", async () => {
+    let releaseSession: (sessionResult: unknown) => void = () => {}
+    mockStartSession.mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          releaseSession = resolve
+        }),
+    )
+    mockUpload.mockResolvedValue({ success: true })
+
+    const { result } = renderHook(() => useCloudBackup({ password: "mypassword123" }))
+
+    expect(result.current.loading).toBe(false)
+
+    /** The busy flag is set synchronously by the tap, so a sync `act` flushes the render that
+     *  the CTA reads; the session stays pending, pinning the state to the pre-upload window. */
+    let run: Promise<void> | undefined
+    act(() => {
+      run = result.current.handleBackup()
+    })
+
+    expect(result.current.loading).toBe(true)
+
+    await act(async () => {
+      releaseSession(sessionOk(noExistingFile))
+      await run
+    })
+
+    expect(result.current.loading).toBe(false)
+    expect(mockUpload).toHaveBeenCalledTimes(1)
   })
 
   /** The success path tags the analytics event by platform; on android that is google_drive. */
@@ -350,7 +471,7 @@ describe("useCloudBackup", () => {
         lightningAddress: "alice@blink.sv",
         createdAt: createdAtMs,
         encrypted: false,
-        mnemonic: "youth indicate void",
+        mnemonic: MNEMONIC,
       }),
     })
     mockUpload.mockResolvedValue({ success: true })
@@ -385,7 +506,7 @@ describe("useCloudBackup", () => {
         version: 1,
         walletIdentifier: "test-pubkey-1234",
         encrypted: false,
-        mnemonic: "youth indicate void",
+        mnemonic: MNEMONIC,
       }),
       accessToken: "refreshed-token",
     })
@@ -450,7 +571,7 @@ describe("useCloudBackup", () => {
         walletIdentifier: "test-pubkey-1234",
         createdAt: 0,
         encrypted: false,
-        mnemonic: "youth indicate void",
+        mnemonic: MNEMONIC,
       }),
     })
     mockConfirmDialog.mockResolvedValue(false)
@@ -528,7 +649,7 @@ describe("useCloudBackup", () => {
     expect(mockStartSession).not.toHaveBeenCalled()
     expect(mockUpload).not.toHaveBeenCalled()
     expect(mockToastShow).toHaveBeenCalledWith(
-      expect.objectContaining({ message: "Upload failed" }),
+      expect.objectContaining({ message: "Failed to create backup" }),
     )
   })
 
@@ -536,9 +657,7 @@ describe("useCloudBackup", () => {
     mockIdentityPubkey = null
     mockIdentityLoading = true
 
-    const { result } = renderHook(() =>
-      useCloudBackup({ isEncrypted: false, password: "" }),
-    )
+    const { result } = renderHook(() => useCloudBackup({ password: "" }))
 
     expect(result.current.loading).toBe(true)
 
@@ -560,9 +679,7 @@ describe("useCloudBackup", () => {
     mockIdentityPubkey = null
     mockIdentityLoading = false
 
-    const { result } = renderHook(() =>
-      useCloudBackup({ isEncrypted: false, password: "" }),
-    )
+    const { result } = renderHook(() => useCloudBackup({ password: "" }))
 
     expect(result.current.loading).toBe(true)
 
@@ -581,9 +698,7 @@ describe("useCloudBackup", () => {
     mockIdentityPubkey = null
     mockIdentityLoading = false
 
-    const { result } = renderHook(() =>
-      useCloudBackup({ isEncrypted: false, password: "" }),
-    )
+    const { result } = renderHook(() => useCloudBackup({ password: "" }))
 
     expect(result.current.loading).toBe(false)
 
@@ -592,7 +707,7 @@ describe("useCloudBackup", () => {
     })
 
     expect(mockToastShow).toHaveBeenCalledWith(
-      expect.objectContaining({ message: "Upload failed" }),
+      expect.objectContaining({ message: "Failed to create backup" }),
     )
   })
 

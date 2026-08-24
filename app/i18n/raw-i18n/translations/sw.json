@@ -3776,6 +3776,7 @@
       "passwordMismatch": "Nywila hazifanani",
       "uploadSuccess": "Nakala imehifadhiwa kwenye {provider}",
       "uploadFailed": "Imeshindwa kupakia nakala",
+      "backupFailed": "Imeshindwa kuunda nakala",
       "signInFailed": "Imeshindwa kuingia katika {provider}",
       "storageAccessRequired": "Ruhusu {provider: string} kufikia nakala rudufu ya pochi yako, kisha ujaribu tena.",
       "cloudNotAvailable": "iCloud Drive haipatikani. Tafadhali ingia katika iCloud kupitia Mipangilio na uwashe iCloud Drive.",

@@ -34,44 +34,16 @@ jest.mock("@app/config/appinfo", () => ({
     `blink-spark-backup-${name.toLowerCase()}-`,
 }))
 
+/** Only the decrypt path is stubbed — it needs real AES-GCM material this spec's fixtures do
+ *  not carry. The plaintext-restore path runs the real `parseBackupPayload` /
+ *  `isEncryptedBackup` / `parseBackupMetadata`, so "legacy backups still restore" is pinned
+ *  against the shipping parser rather than against a re-implementation of it. */
 jest.mock("@app/utils/backup-payload", () => {
-  const actual = jest.requireActual("@app/utils/backup-payload")
+  const actual = jest.requireActual(
+    "@app/utils/backup-payload",
+  ) as typeof import("@app/utils/backup-payload")
   return {
     ...actual,
-    isEncryptedBackup: (content: string) => {
-      try {
-        return JSON.parse(content)?.encrypted === true
-      } catch {
-        return false
-      }
-    },
-    parseBackupPayload: (content: string) => {
-      const parsed = JSON.parse(content) as { mnemonic: string }
-      return { mnemonic: parsed.mnemonic }
-    },
-    parseBackupMetadata: (content: string) => {
-      try {
-        const parsed = JSON.parse(content) as {
-          version?: number
-          walletIdentifier?: string
-          lightningAddress?: string
-          encrypted?: boolean
-          createdAt?: number
-        }
-        if (typeof parsed.walletIdentifier !== "string" || !parsed.walletIdentifier) {
-          return null
-        }
-        return {
-          version: parsed.version ?? 1,
-          walletIdentifier: parsed.walletIdentifier,
-          lightningAddress: parsed.lightningAddress,
-          createdAt: parsed.createdAt ?? 0,
-          encrypted: parsed.encrypted === true,
-        }
-      } catch {
-        return null
-      }
-    },
     parseEncryptedBackupPayload: jest.fn((content: string, _password: string) => {
       const parsed = JSON.parse(content) as { mnemonic: string }
       return { mnemonic: parsed.mnemonic }
@@ -865,6 +837,40 @@ describe("useCloudRestore", () => {
     expect(mockRecordError).toHaveBeenCalled()
     expect(result.current.hasError).toBe(true)
     expect(result.current.errorMessage).toBeNull()
+  })
+})
+
+describe("useCloudRestore legacy plaintext compatibility", () => {
+  /** The app can no longer produce a plaintext backup, so this shape only ever arrives from
+   *  a user's cloud, written before the password became mandatory. It runs through the real
+   *  parser here: "the parser accepts it" and "a user can actually restore from it" are the
+   *  two ends of the compatibility claim, and this closes the loop between them. */
+  it("restores a legacy plaintext backup through the real parser", async () => {
+    const legacyMnemonic =
+      "youth indicate void nation bundle execute ritual artwork harvest genuine plunge captain"
+
+    mockListBackups.mockResolvedValue({
+      success: true,
+      entries: [{ id: "file-1", name: "blink-spark-backup-main-pubkey1.json" }],
+      accessToken: "token",
+    })
+    mockDownloadById.mockResolvedValue({
+      success: true,
+      content: JSON.stringify({
+        version: 1,
+        walletIdentifier: "pubkey1",
+        createdAt: 1,
+        encrypted: false,
+        mnemonic: legacyMnemonic,
+      }),
+    })
+
+    const { result } = renderHook(() => useCloudRestore())
+
+    await waitFor(() => {
+      expect(mockRestore).toHaveBeenCalledWith(legacyMnemonic)
+    })
+    expect(result.current.isPassword).toBe(false)
   })
 })
 

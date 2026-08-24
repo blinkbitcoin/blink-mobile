@@ -3776,6 +3776,7 @@
       "passwordMismatch": "Mật khẩu không khớp",
       "uploadSuccess": "Bản sao lưu đã được lưu vào {provider}",
       "uploadFailed": "Không thể tải lên bản sao lưu",
+      "backupFailed": "Không thể tạo bản sao lưu",
       "signInFailed": "Không thể đăng nhập vào {provider}",
       "storageAccessRequired": "Cho phép {provider: string} truy cập bản sao lưu ví của bạn, rồi thử lại.",
       "cloudNotAvailable": "iCloud Drive không khả dụng. Vui lòng đăng nhập iCloud trong Cài đặt và bật iCloud Drive.",

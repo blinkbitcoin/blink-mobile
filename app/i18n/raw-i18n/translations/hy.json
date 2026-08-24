@@ -3776,6 +3776,7 @@
       "passwordMismatch": "Գաղտնաբառերը չեն համընկնում",
       "uploadSuccess": "Պահուստային պատճենը պահպանվել է {provider}-ում",
       "uploadFailed": "Պահուստային պատճենի վերբեռնումը ձախողվեց",
+      "backupFailed": "Պահուստային պատճենի ստեղծումը ձախողվեց",
       "signInFailed": "{provider}-ին մուտքը ձախողվեց",
       "storageAccessRequired": "Թույլատրեք {provider: string}-ի հասանելիությունը ձեր դրամապանակի պահուստային պատճենին, ապա փորձեք կրկին։",
       "cloudNotAvailable": "iCloud Drive հասանելի չէ։ Մուտք գործեք iCloud Կարգավորումներից և միացրեք iCloud Drive-ը։",

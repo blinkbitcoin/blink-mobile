@@ -44,6 +44,8 @@ export const CloudBackupScreen: React.FC = () => {
 
   useMigrationBackupCheckpoint(MigrationCheckpoint.CloudBackup)
 
+  const isContinueDisabled = !isValid || loading
+
   return (
     <Screen preset="fixed">
       <View style={styles.container}>
@@ -98,7 +100,7 @@ export const CloudBackupScreen: React.FC = () => {
         <View style={styles.buttonsContainer}>
           <GaloyPrimaryButton
             title={LL.BackupScreen.CloudBackup.continueButton()}
-            disabled={!isValid}
+            disabled={isContinueDisabled}
             loading={loading}
             onPress={handleBackup}
             {...testProps("cloud-backup-continue")}

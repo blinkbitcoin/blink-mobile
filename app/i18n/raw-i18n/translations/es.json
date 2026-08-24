@@ -3776,6 +3776,7 @@
             "passwordMismatch": "Las contraseñas no coinciden",
             "uploadSuccess": "Respaldo guardado en {provider}",
             "uploadFailed": "Error al subir el respaldo",
+            "backupFailed": "Error al crear el respaldo",
             "signInFailed": "No se pudo iniciar sesión en {provider}",
             "storageAccessRequired": "Permite el acceso de {provider: string} al respaldo de tu billetera e inténtalo de nuevo.",
             "cloudNotAvailable": "iCloud Drive no está disponible. Inicia sesión en iCloud desde Ajustes y activa iCloud Drive.",

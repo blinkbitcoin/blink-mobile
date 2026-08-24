@@ -6,6 +6,7 @@ import {
   deriveKeyFromPassword,
   encryptAesGcm,
 } from "./crypto"
+import { MIN_PASSWORD_LENGTH, validatePassword } from "./validators/password"
 
 type BaseBackupPayload = {
   version: number
@@ -78,11 +79,14 @@ export const buildBackupPayload = (mnemonic: string, opts: BuildOptions): string
   const { walletIdentifier, lightningAddress, password, version = CURRENT_VERSION } = opts
   const base = buildBase({ walletIdentifier, lightningAddress, version })
 
-  // New backups are always encrypted. PlainBackupPayload survives only on the
-  // parse side, for backups created before the password became mandatory.
-  if (!password) {
+  /** New backups are always encrypted; PlainBackupPayload survives only on the parse side,
+   *  for backups created before the password became mandatory. The policy itself is owned by
+   *  `validatePassword`, so the screen's gate and this last line of defense cannot drift: a
+   *  later caller wired to a weaker field still cannot ship a weakly-encrypted mnemonic. */
+  const isPasswordAcceptable = Boolean(password) && validatePassword(password).valid
+  if (!isPasswordAcceptable) {
     throw new Error(
-      "buildBackupPayload requires a password: plaintext backups are not created",
+      `buildBackupPayload requires a password of at least ${MIN_PASSWORD_LENGTH} characters: plaintext backups are not created`,
     )
   }
 

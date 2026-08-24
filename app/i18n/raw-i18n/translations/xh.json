@@ -3776,6 +3776,7 @@
       "passwordMismatch": "Amagama okugqitha awafani",
       "uploadSuccess": "Ikopi igcinwe kwi-{provider}",
       "uploadFailed": "Ukufaka ikopi akuphumelelanga",
+      "backupFailed": "Ukwenza ikopi akuphumelelanga",
       "signInFailed": "Akuphumelelanga ukungena ku-{provider}",
       "storageAccessRequired": "Vumela {provider: string} ukufikelela kugcino lwesipaji sakho, uze uzame kwakhona.",
       "cloudNotAvailable": "I-iCloud Drive ayifumaneki. Nceda ngena ku-iCloud kwiisetingi uvule i-iCloud Drive.",

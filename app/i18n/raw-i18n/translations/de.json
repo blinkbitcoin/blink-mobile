@@ -3776,6 +3776,7 @@
             "passwordMismatch": "Passwörter stimmen nicht überein",
             "uploadSuccess": "Sicherung in {provider} gespeichert",
             "uploadFailed": "Fehler beim Hochladen der Sicherung",
+            "backupFailed": "Fehler beim Erstellen der Sicherung",
             "signInFailed": "Anmeldung bei {provider} fehlgeschlagen",
             "storageAccessRequired": "Erlaube {provider: string} den Zugriff auf deine Wallet-Sicherung und versuche es erneut.",
             "cloudNotAvailable": "iCloud Drive ist nicht verfügbar. Bitte melde dich in den Einstellungen bei iCloud an und aktiviere iCloud Drive.",

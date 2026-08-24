@@ -3776,6 +3776,7 @@
       "passwordMismatch": "Лозинке се не подударају",
       "uploadSuccess": "Резервна копија сачувана у {provider}",
       "uploadFailed": "Отпремање резервне копије није успело",
+      "backupFailed": "Прављење резервне копије није успело",
       "signInFailed": "Пријављивање на {provider} није успело",
       "storageAccessRequired": "Дозволите {provider: string} приступ резервној копији новчаника, па покушајте поново.",
       "cloudNotAvailable": "iCloud Drive није доступан. Пријавите се на iCloud у Подешавањима и омогућите iCloud Drive.",

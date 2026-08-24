@@ -3776,6 +3776,7 @@
       "passwordMismatch": "Contraseñakuna mana tupanchu",
       "uploadSuccess": "Waqaychay {provider} nisqaman waqaychasqa",
       "uploadFailed": "Waqaychayta apachiy mana atikurqanchu",
+      "backupFailed": "Waqaychayta ruray mana atikurqanchu",
       "signInFailed": "{provider}-man yaykuy mana atikurqachu",
       "storageAccessRequired": "{provider: string} yaykuyta saqiy wallet waqaychasqaykiman, chaymanta yapamanta ruway.",
       "cloudNotAvailable": "iCloud Drive mana kachkanchu. Iskayllapi iCloudman yaykuy hinaspa iCloud Drive-ta hatarichiy.",

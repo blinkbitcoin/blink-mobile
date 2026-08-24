@@ -1,8 +1,9 @@
-import { useCallback } from "react"
+import { useCallback, useState } from "react"
 import { Platform } from "react-native"
 
 import { getCloudBackupFilename } from "@app/config/appinfo"
 import { useAppConfig } from "@app/hooks"
+import { useInFlightGuard } from "@app/hooks/use-in-flight-guard"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { TranslationFunctions } from "@app/i18n/i18n-types"
 import { logSelfCustodialBackupCompleted } from "@app/self-custodial/analytics"
@@ -55,6 +56,8 @@ export const useCloudBackup = ({
   const { LL } = useI18nContext()
   const completeBackup = useCompleteBackup()
   const { appConfig } = useAppConfig()
+  const guard = useInFlightGuard()
+  const [backupInProgress, setBackupInProgress] = useState(false)
   const { startSession, upload, downloadById, resolveErrorMessage, loading } =
     usePlatformCloudBackup()
   const { mnemonic, loading: mnemonicLoading } = useWalletMnemonicState()
@@ -65,7 +68,7 @@ export const useCloudBackup = ({
    *  windows leave the pubkey empty without it being a failure. */
   const identityPending = mnemonicLoading || identityLoading
 
-  const handleBackup = useCallback(async () => {
+  const runBackup = useCallback(async () => {
     const provider = getCloudProviderName(LL)
 
     /** Every non-cancelled Drive failure carries its own remedy (e.g. storageAccessRequired for
@@ -82,8 +85,9 @@ export const useCloudBackup = ({
 
     if (!identityPubkey) {
       /** The pubkey is derived locally from the phrase, with no cloud involved, so a missing
-       *  one is a local failure: signInFailed would misdirect the user to their cloud account. */
-      toastShow({ message: LL.BackupScreen.CloudBackup.uploadFailed(), LL })
+       *  one is a local failure: neither signInFailed nor uploadFailed applies, since no
+       *  upload was ever attempted and the cloud account is not at fault. */
+      toastShow({ message: LL.BackupScreen.CloudBackup.backupFailed(), LL })
       return
     }
 
@@ -129,7 +133,8 @@ export const useCloudBackup = ({
 
     /** Every backup now runs PBKDF2 + AES-GCM here, and the press handler is not awaited:
      *  an escaping throw would become an unhandled rejection, stranding the user silently
-     *  after they already signed in and confirmed the overwrite. */
+     *  after they already signed in and confirmed the overwrite. The in-flight guard on
+     *  `handleBackup` protects the other half of that same unawaited boundary. */
     let payload: string
     try {
       payload = buildBackupPayload(mnemonic, {
@@ -140,7 +145,7 @@ export const useCloudBackup = ({
       })
     } catch (err) {
       reportError("Cloud backup encryption", err)
-      toastShow({ message: LL.BackupScreen.CloudBackup.uploadFailed(), LL })
+      toastShow({ message: LL.BackupScreen.CloudBackup.backupFailed(), LL })
       return
     }
 
@@ -175,7 +180,23 @@ export const useCloudBackup = ({
     lightningAddress,
   ])
 
-  const isBackupBusy = loading || identityPending
+  /** `loading` from the provider hook only covers `upload`/`downloadById`. Everything before
+   *  them — the sign-in sheet, the overwrite dialog, and the synchronous 600k-iteration
+   *  PBKDF2 derivation — would otherwise run with the CTA idle, so a second tap could stack
+   *  a second dialog and race a second upload onto the same file. The guard makes the
+   *  re-entry a no-op; `backupInProgress` is what the CTA reads so the whole window spins. */
+  const handleBackup = useCallback(async () => {
+    await guard.run(async () => {
+      setBackupInProgress(true)
+      try {
+        await runBackup()
+      } finally {
+        setBackupInProgress(false)
+      }
+    })
+  }, [guard, runBackup])
+
+  const isBackupBusy = loading || identityPending || backupInProgress
 
   return { handleBackup, loading: isBackupBusy }
 }

@@ -3776,6 +3776,7 @@
       "passwordMismatch": "Şifreler uyuşmuyor",
       "uploadSuccess": "Yedek {provider} hesabına kaydedildi",
       "uploadFailed": "Yedek yüklenemedi",
+      "backupFailed": "Yedek oluşturulamadı",
       "signInFailed": "{provider} hesabınıza giriş yapılamadı",
       "storageAccessRequired": "Cüzdan yedeğiniz için {provider: string} erişimine izin verin, ardından tekrar deneyin.",
       "cloudNotAvailable": "iCloud Drive kullanılamıyor. Lütfen Ayarlar'dan iCloud'da oturum açın ve iCloud Drive'ı etkinleştirin.",

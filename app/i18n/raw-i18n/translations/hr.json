@@ -3776,6 +3776,7 @@
       "passwordMismatch": "Lozinke se ne podudaraju",
       "uploadSuccess": "Sigurnosna kopija spremljena u {provider}",
       "uploadFailed": "Učitavanje sigurnosne kopije nije uspjelo",
+      "backupFailed": "Izrada sigurnosne kopije nije uspjela",
       "signInFailed": "Prijava na {provider} nije uspjela",
       "storageAccessRequired": "Dopustite pristup {provider: string} sigurnosnoj kopiji novčanika i pokušajte ponovno.",
       "cloudNotAvailable": "iCloud Drive nije dostupan. Prijavite se na iCloud u Postavkama i omogućite iCloud Drive.",

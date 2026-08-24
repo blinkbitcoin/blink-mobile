@@ -3776,6 +3776,7 @@
       "passwordMismatch": "Kata sandi tidak cocok",
       "uploadSuccess": "Cadangan disimpan ke {provider}",
       "uploadFailed": "Gagal mengunggah cadangan",
+      "backupFailed": "Gagal membuat cadangan",
       "signInFailed": "Gagal masuk ke {provider}",
       "storageAccessRequired": "Izinkan akses {provider: string} ke cadangan dompet Anda, lalu coba lagi.",
       "cloudNotAvailable": "iCloud Drive tidak tersedia. Silakan masuk ke iCloud di Pengaturan dan aktifkan iCloud Drive.",

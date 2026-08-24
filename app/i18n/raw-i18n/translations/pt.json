@@ -3776,6 +3776,7 @@
             "passwordMismatch": "As senhas não coincidem",
             "uploadSuccess": "Backup salvo no {provider}",
             "uploadFailed": "Falha ao enviar o backup",
+            "backupFailed": "Falha ao criar o backup",
             "signInFailed": "Falha ao iniciar sessão em {provider}",
             "storageAccessRequired": "Permita o acesso do {provider: string} ao backup da sua carteira e tente novamente.",
             "cloudNotAvailable": "O iCloud Drive não está disponível. Inicie sessão no iCloud em Ajustes e ative o iCloud Drive.",
