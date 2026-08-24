@@ -3822,6 +3822,7 @@
     "reminderBulletin": {
       "title": "Fontos",
       "body": "Váltson át egy nem letétkezelt fiókra az irányított átköltöztetéssel, vagy vegye fel az egyenlegét {date} előtt. A fogadás megszűnik: {receiveStopsDate}.",
+      "bodyReceiveDisabled": "A fogadás megszűnt. Váltson át egy nem letétkezelt fiókra az irányított átköltöztetéssel, vagy vegye fel az egyenlegét {date} előtt.",
       "migrateCta": "Átköltözés"
     },
     "offboardBulletin": {

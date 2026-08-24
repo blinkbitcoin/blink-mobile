@@ -3822,6 +3822,7 @@
     "reminderBulletin": {
       "title": "Vigtigt",
       "body": "Skift til en ikke-depotkonto via guidet migrering, eller hæv dine midler, inden {date}. Modtagelse stopper den {receiveStopsDate}.",
+      "bodyReceiveDisabled": "Modtagelse er stoppet. Skift til en ikke-depotkonto via guidet migrering, eller hæv dine midler, inden {date}.",
       "migrateCta": "Migrér"
     },
     "offboardBulletin": {

@@ -3822,6 +3822,7 @@
         "reminderBulletin": {
             "title": "Wichtig",
             "body": "Wechsle bis zum {date} über die geführte Migration zu einem nicht-verwahrten Konto oder zahle dein Guthaben aus. Der Empfang endet am {receiveStopsDate}.",
+            "bodyReceiveDisabled": "Der Empfang ist beendet. Wechsle bis zum {date} über die geführte Migration zu einem nicht-verwahrten Konto oder zahle dein Guthaben aus.",
             "migrateCta": "Migrieren"
         },
         "offboardBulletin": {

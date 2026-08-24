@@ -3822,6 +3822,7 @@
     "reminderBulletin": {
       "title": "Muhimu",
       "body": "Hamia kwenye akaunti isiyo ya udhamini kupitia uhamishaji unaoongozwa, au toa fedha zako, kabla ya {date}. Kupokea kutasimama {receiveStopsDate}.",
+      "bodyReceiveDisabled": "Kupokea kumesimama. Hamia kwenye akaunti isiyo ya udhamini kupitia uhamishaji unaoongozwa, au toa fedha zako, kabla ya {date}.",
       "migrateCta": "Hamia"
     },
     "offboardBulletin": {

@@ -3822,6 +3822,7 @@
     "reminderBulletin": {
       "title": "Ancha allin",
       "body": "Astakuy mana waqaychasqa kuentaman pusaykachasqa astakuywan, otaq qullqiykita hurquy, {date} manaraq chayamuchkaptin. Chaskiyqa {receiveStopsDate}-pi tukukunqa.",
+      "bodyReceiveDisabled": "Chaskiyqa tukukunñam. Astakuy mana waqaychasqa kuentaman pusaykachasqa astakuywan, otaq qullqiykita hurquy, {date} manaraq chayamuchkaptin.",
       "migrateCta": "Astakuy"
     },
     "offboardBulletin": {

@@ -3822,6 +3822,7 @@
     "reminderBulletin": {
       "title": "Belangrijk",
       "body": "Stap vóór {date} over naar een niet-bewaarde rekening via begeleide migratie, of neem je tegoed op. Ontvangen stopt op {receiveStopsDate}.",
+      "bodyReceiveDisabled": "Ontvangen is gestopt. Stap vóór {date} over naar een niet-bewaarde rekening via begeleide migratie, of neem je tegoed op.",
       "migrateCta": "Migreer"
     },
     "offboardBulletin": {

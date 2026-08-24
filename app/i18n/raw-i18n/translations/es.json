@@ -3822,6 +3822,7 @@
         "reminderBulletin": {
             "title": "Importante",
             "body": "Pasa a una cuenta no custodial mediante la migración guiada, o retira tus fondos, antes del {date}. La recepción se detiene el {receiveStopsDate}.",
+            "bodyReceiveDisabled": "La recepción se ha detenido. Pasa a una cuenta no custodial mediante la migración guiada, o retira tus fondos, antes del {date}.",
             "migrateCta": "Migrar"
         },
         "offboardBulletin": {

@@ -19,6 +19,7 @@ import { HideAmountContextProvider } from "@app/graphql/hide-amount-context"
 import { IsAuthedContextProvider } from "@app/graphql/is-authed-context"
 import { mockCurrencyList } from "@app/graphql/mocks"
 import { ConvertDirection } from "@app/types/payment"
+import { WindDownStatus } from "@app/types/wind-down"
 
 let currentMocks: MockedResponse[] = []
 
@@ -254,10 +255,12 @@ jest.mock("@app/components/migrate-now-modal", () => {
 })
 
 let mockReminderBulletinVisible = false
+let mockReminderBulletinPhase: WindDownStatus = WindDownStatus.PreCutoff
 
 jest.mock("@app/screens/account-migration/hooks/use-migration-reminder-bulletin", () => ({
   useMigrationReminderBulletin: () => ({
     isVisible: mockReminderBulletinVisible,
+    phase: mockReminderBulletinPhase,
     deadlineTimestamp: 1787003999,
     receiveDisabledTimestamp: 1785189600,
     timezone: "Europe/Paris",
@@ -889,6 +892,7 @@ const resetHomeScreenMocks = () => {
   mockCanReopen = false
   mockReceiveBlocked = false
   mockReminderBulletinVisible = false
+  mockReminderBulletinPhase = WindDownStatus.PreCutoff
   mockTransferBlockedOverride = false
   mockDollarBalanceModalVisible = false
   mockForcedConversionParams = null
@@ -1933,6 +1937,7 @@ describe("HomeScreen wind-down states", () => {
     mockCanReopen = false
     mockReceiveBlocked = false
     mockReminderBulletinVisible = false
+    mockReminderBulletinPhase = WindDownStatus.PreCutoff
     mockTransferBlockedOverride = false
     mockDollarBalanceModalVisible = false
     jest.clearAllMocks()
@@ -2167,6 +2172,56 @@ describe("HomeScreen wind-down states", () => {
     mockActiveWalletOverride = null
   })
 
+  const renderWithGatedDollarBalance = async () => {
+    mockDollarBalanceRestrictedOverride = true
+    // usdBalance stays 0 so the forced-conversion modal never auto-opens
+    currentMocks = generateHomeMock({
+      level: AccountLevel.Two,
+      network: Network.Mainnet,
+      btcBalance: 1000,
+      usdBalance: 0,
+    })
+
+    const view = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+    return view
+  }
+
+  /** The wind-down's only remedy has to be reachable from the surfaces the region gate
+   *  greys out, since a user hunting for it will try them: the compliance modal they used
+   *  to open is a title and a Close button, with nothing about the migration. The greyed
+   *  dollar row is the other entry point and shares this exact callback (`onGatedTap`),
+   *  whose wiring wallet-overview.spec covers. */
+  it("reopens the migrate-now prompt from the disabled transfer button", async () => {
+    mockCanReopen = true
+
+    const { getByTestId } = await renderWithGatedDollarBalance()
+
+    fireEvent.press(getByTestId("transfer", { includeHiddenElements: true }))
+
+    expect(mockReopenMigratePrompt).toHaveBeenCalledTimes(1)
+    expect(mockDollarBalanceModalVisible).toBe(false)
+    expect(mockNavigate).not.toHaveBeenCalledWith("conversionDetails")
+  })
+
+  /** The gate also greys these surfaces for regions with no wind-down at all, and those
+   *  accounts have no migration to be pushed into. */
+  it("keeps the region explanation when no migrate-now prompt can surface", async () => {
+    mockCanReopen = false
+
+    const { getByTestId } = await renderWithGatedDollarBalance()
+
+    fireEvent.press(getByTestId("transfer", { includeHiddenElements: true }))
+
+    expect(mockDollarBalanceModalVisible).toBe(true)
+    expect(mockReopenMigratePrompt).not.toHaveBeenCalled()
+  })
+
   it("shows the migration reminder bulletin in the pre-cutoff phase", async () => {
     mockReminderBulletinVisible = true
 
@@ -2181,7 +2236,39 @@ describe("HomeScreen wind-down states", () => {
     await flushEffects()
   })
 
-  it("keeps the reminder bulletin hidden outside the pre-cutoff phase", async () => {
+  /** The dashboard entry the dismissible migrate-now modal leaves behind once closed. */
+  it("keeps the migration reminder bulletin once receiving is disabled", async () => {
+    mockReminderBulletinVisible = true
+    mockReminderBulletinPhase = WindDownStatus.ReceiveDisabled
+
+    const { findByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    expect(await findByTestId("migration-reminder-bulletin")).toBeTruthy()
+
+    await flushEffects()
+  })
+
+  it("forwards the wind-down phase so the bulletin can pick its copy", async () => {
+    mockReminderBulletinVisible = true
+    mockReminderBulletinPhase = WindDownStatus.ReceiveDisabled
+
+    render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    const { phase } = mockMigrationReminderBulletin.mock.calls[0][0]
+    expect(phase).toBe(WindDownStatus.ReceiveDisabled)
+  })
+
+  it("keeps the reminder bulletin hidden in a phase that does not call for it", async () => {
     const { queryByTestId } = render(
       <ContextForScreen>
         <HomeScreen />
@@ -2735,6 +2822,32 @@ describe("HomeScreen restricted region", () => {
     expect(mockPresentRestrictedRegionModal).toHaveBeenCalledTimes(1)
     expect(mockPromptEnhancedMode).not.toHaveBeenCalled()
     expect(mockDollarBalanceModalVisible).toBe(false)
+  })
+
+  /** Sanctions are the stricter layer: a sanctioned session must not be pushed into a
+   *  migration whose destination it may not be allowed to reach either. */
+  it("prefers the sanctions modal over the migrate-now nudge when both would apply", async () => {
+    mockIsRestrictedRegion = true
+    mockCanReopen = true
+    currentMocks = generateHomeMock({
+      level: AccountLevel.One,
+      network: Network.Mainnet,
+      btcBalance: 1000,
+      usdBalance: 0,
+    })
+
+    const { getByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    fireEvent.press(getByTestId("transfer", { includeHiddenElements: true }))
+
+    expect(mockPresentRestrictedRegionModal).toHaveBeenCalledTimes(1)
+    expect(mockReopenMigratePrompt).not.toHaveBeenCalled()
   })
 
   it("prefers the Enhanced prompt over the sanctions modal when both would apply", async () => {

@@ -3822,6 +3822,7 @@
     "reminderBulletin": {
       "title": "Penting",
       "body": "Beralihlah ke akun non-kustodial melalui migrasi terpandu, atau tarik dana Anda, sebelum {date}. Penerimaan berhenti pada {receiveStopsDate}.",
+      "bodyReceiveDisabled": "Penerimaan telah berhenti. Beralihlah ke akun non-kustodial melalui migrasi terpandu, atau tarik dana Anda, sebelum {date}.",
       "migrateCta": "Migrasi"
     },
     "offboardBulletin": {

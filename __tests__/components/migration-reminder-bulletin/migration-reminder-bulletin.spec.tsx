@@ -6,6 +6,7 @@ import TypesafeI18n from "@app/i18n/i18n-react"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
 import { MigrationReminderBulletin } from "@app/components/migration-reminder-bulletin"
+import { WindDownStatus } from "@app/types/wind-down"
 
 loadLocale("en")
 
@@ -25,6 +26,7 @@ const renderBulletin = (
     wrap(
       <MigrationReminderBulletin
         onMigrate={jest.fn()}
+        phase={WindDownStatus.PreCutoff}
         deadlineTimestamp={AUG_31_2026_NOON_UTC}
         receiveDisabledTimestamp={AUG_10_2026_NOON_UTC}
         timezone="UTC"
@@ -40,6 +42,25 @@ describe("MigrationReminderBulletin", () => {
     expect(getByText("Important")).toBeTruthy()
     expect(getByText(/before August 31/)).toBeTruthy()
     expect(getByText(/Receiving stops August 10/)).toBeTruthy()
+    expect(getByText("Migrate")).toBeTruthy()
+  })
+
+  /** The pre-cutoff body announces the receive cutoff as a future event; past it that
+   *  sentence would be dated before the day it is read. */
+  it("drops the receive-cutoff sentence once receiving has stopped", () => {
+    const { getByText, queryByText } = renderBulletin({
+      phase: WindDownStatus.ReceiveDisabled,
+    })
+
+    expect(getByText(/Receiving has stopped/)).toBeTruthy()
+    expect(getByText(/before August 31/)).toBeTruthy()
+    expect(queryByText(/Receiving stops August 10/)).toBeNull()
+  })
+
+  it("keeps the title and the migrate CTA across both phases", () => {
+    const { getByText } = renderBulletin({ phase: WindDownStatus.ReceiveDisabled })
+
+    expect(getByText("Important")).toBeTruthy()
     expect(getByText("Migrate")).toBeTruthy()
   })
 

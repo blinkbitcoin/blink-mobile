@@ -3822,6 +3822,7 @@
     "reminderBulletin": {
       "title": "Važno",
       "body": "Prijeđite na račun bez skrbništva putem vođene migracije ili podignite sredstva prije {date}. Primanje prestaje {receiveStopsDate}.",
+      "bodyReceiveDisabled": "Primanje je prestalo. Prijeđite na račun bez skrbništva putem vođene migracije ili podignite sredstva prije {date}.",
       "migrateCta": "Migriraj"
     },
     "offboardBulletin": {

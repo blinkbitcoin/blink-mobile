@@ -3822,6 +3822,7 @@
     "reminderBulletin": {
       "title": "Important",
       "body": "Passa a un compte no custodi mitjançant la migració guiada, o retira els teus fons, abans del {date}. La recepció s'atura el {receiveStopsDate}.",
+      "bodyReceiveDisabled": "La recepció s'ha aturat. Passa a un compte no custodi mitjançant la migració guiada, o retira els teus fons, abans del {date}.",
       "migrateCta": "Migra"
     },
     "offboardBulletin": {

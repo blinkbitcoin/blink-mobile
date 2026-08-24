@@ -3822,6 +3822,7 @@
     "reminderBulletin": {
       "title": "Önemli",
       "body": "{date} tarihinden önce rehberli taşıma ile saklamasız bir hesaba geçin veya paranızı çekin. Alma, {receiveStopsDate} tarihinde durur.",
+      "bodyReceiveDisabled": "Alma durdu. {date} tarihinden önce rehberli taşıma ile saklamasız bir hesaba geçin veya paranızı çekin.",
       "migrateCta": "Taşı"
     },
     "offboardBulletin": {
