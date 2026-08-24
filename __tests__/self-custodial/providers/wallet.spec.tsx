@@ -707,6 +707,7 @@ describe("SelfCustodialWalletProvider", () => {
       expect.objectContaining({
         message: expect.stringContaining("initial sync failed"),
       }),
+      "Refresh",
     )
   })
 
@@ -749,6 +750,7 @@ describe("SelfCustodialWalletProvider", () => {
       expect.objectContaining({
         message: expect.stringContaining("transient sync fail"),
       }),
+      "Refresh",
     )
   })
 

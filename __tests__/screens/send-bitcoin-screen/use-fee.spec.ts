@@ -140,6 +140,7 @@ describe("useFee", () => {
     expect(asErrored(result.current).errors).toBeUndefined()
     expect(mockRecordError).toHaveBeenCalledWith(
       expect.objectContaining({ message: "quote exploded" }),
+      "use-fee",
     )
   })
 

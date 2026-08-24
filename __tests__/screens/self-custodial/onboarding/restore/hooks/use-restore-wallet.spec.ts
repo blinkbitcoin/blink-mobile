@@ -374,6 +374,7 @@ describe("useRestoreWallet", () => {
 
     expect(mockRecordError).toHaveBeenCalledWith(
       expect.objectContaining({ message: expect.stringContaining("string error") }),
+      "Wallet restore",
     )
   })
 

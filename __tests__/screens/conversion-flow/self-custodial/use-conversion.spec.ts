@@ -223,7 +223,10 @@ describe("useSelfCustodialConversion", () => {
       await result.current.execute()
     })
 
-    expect(mockRecordError).toHaveBeenCalledWith(expect.any(Error))
+    expect(mockRecordError).toHaveBeenCalledWith(
+      expect.any(Error),
+      "Self-custodial conversion execute",
+    )
     expect(result.current.errorMessage).toBe("SDK exploded")
     expect(mockOnSuccess).not.toHaveBeenCalled()
   })
@@ -337,7 +340,10 @@ describe("useSelfCustodialConversion", () => {
     })
 
     expect(result.current.errorMessage).toBe("Generic error")
-    expect(mockRecordError).toHaveBeenCalledWith(expect.any(Error))
+    expect(mockRecordError).toHaveBeenCalledWith(
+      expect.any(Error),
+      "Self-custodial conversion execute",
+    )
     expect(ReactNativeHapticFeedback.trigger).toHaveBeenCalledWith("notificationError", {
       ignoreAndroidSystemSettings: true,
     })

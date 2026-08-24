@@ -229,6 +229,7 @@ describe("createGetFee", () => {
 
     expect(mockRecordError).toHaveBeenCalledWith(
       expect.objectContaining({ message: "prepare refused" }),
+      "Self-custodial Lightning fee",
     )
   })
 
@@ -295,6 +296,7 @@ describe("createGetFee", () => {
           "Self-custodial Lightning fee failed: network blip",
         ),
       }),
+      "Self-custodial Lightning fee",
     )
   })
 
@@ -475,6 +477,7 @@ describe("createGetFeeOnchain", () => {
       expect.objectContaining({
         message: expect.stringContaining("no BitcoinAddress fee quote"),
       }),
+      "Self-custodial onchain fee",
     )
   })
 
@@ -513,6 +516,7 @@ describe("createGetFeeOnchain", () => {
 
     expect(mockRecordError).toHaveBeenCalledWith(
       expect.objectContaining({ message: "prepare refused" }),
+      "Self-custodial onchain fee",
     )
   })
 
@@ -609,6 +613,7 @@ describe("createSendMutation", () => {
 
     expect(mockRecordError).toHaveBeenCalledWith(
       expect.objectContaining({ message: "payment refused" }),
+      "Self-custodial Lightning send",
     )
   })
 
@@ -629,6 +634,7 @@ describe("createSendMutation", () => {
           "Self-custodial Lightning send failed: network blip",
         ),
       }),
+      "Self-custodial Lightning send",
     )
   })
 

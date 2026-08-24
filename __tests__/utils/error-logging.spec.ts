@@ -26,14 +26,30 @@ describe("reportError", () => {
 
     reportError("Sync", err)
 
-    expect(mockRecordError).toHaveBeenCalledWith(err)
+    expect(mockRecordError).toHaveBeenCalledWith(err, "Sync")
   })
 
-  it("wraps non-Error throws with the operation context", () => {
+  /** The regression this guards: an `Error` used to reach Crashlytics with the operation
+   *  dropped, so a native failure landed on the dashboard as an anonymous error nobody could
+   *  trace to a flow, and alerting keyed on the operation never fired. */
+  it("carries the operation on an Error, without rewriting its message or stack", () => {
+    const err = new Error("native crypto unavailable")
+    const originalStack = err.stack
+
+    reportError("Cloud backup encryption", err)
+
+    expect(mockRecordError).toHaveBeenCalledWith(err, "Cloud backup encryption")
+    expect(mockRecordError.mock.calls[0][0].message).toBe("native crypto unavailable")
+    expect(mockRecordError.mock.calls[0][0].stack).toBe(originalStack)
+    expect(mockLog).toHaveBeenCalledWith("[defect] native crypto unavailable")
+  })
+
+  it("wraps non-Error throws, carrying the operation alongside", () => {
     reportError("Sync", "string rejection")
 
     expect(mockRecordError).toHaveBeenCalledWith(
       expect.objectContaining({ message: "Sync failed: string rejection" }),
+      "Sync",
     )
   })
 

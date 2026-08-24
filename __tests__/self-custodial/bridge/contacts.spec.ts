@@ -222,6 +222,7 @@ describe("findOrCreateContact", () => {
       expect.objectContaining({
         message: expect.stringContaining("safety cap"),
       }),
+      "Contact lookup pagination",
     )
   })
 })

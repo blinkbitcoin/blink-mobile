@@ -155,7 +155,7 @@ describe("usePaymentActions", () => {
         await result.current.share()
       })
 
-      expect(mockRecordError).toHaveBeenCalledWith(error)
+      expect(mockRecordError).toHaveBeenCalledWith(error, "payment-actions")
       expect(alertSpy).toHaveBeenCalledWith("Share failed")
     })
 

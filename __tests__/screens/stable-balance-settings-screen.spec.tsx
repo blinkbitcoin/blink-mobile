@@ -382,7 +382,7 @@ describe("StableBalanceSettingsScreen", () => {
     fireEvent(getByTestId("stable-balance-switch"), "pressIn")
 
     await waitFor(() => {
-      expect(mockRecordError).toHaveBeenCalledWith(failure)
+      expect(mockRecordError).toHaveBeenCalledWith(failure, "Stable Balance toggle")
       expect(mockToastShow).toHaveBeenCalledTimes(1)
     })
     expect(mockToastShow.mock.calls[0][0].type).toBe("error")
@@ -401,7 +401,7 @@ describe("StableBalanceSettingsScreen", () => {
     fireEvent(getByTestId("stable-balance-switch"), "pressIn")
 
     await waitFor(() => {
-      expect(mockRecordError).toHaveBeenCalledWith(failure)
+      expect(mockRecordError).toHaveBeenCalledWith(failure, "Stable Balance deactivate")
       expect(mockToastShow).toHaveBeenCalledTimes(1)
     })
     /** The refresh still runs after a failed deactivation, re-syncing the

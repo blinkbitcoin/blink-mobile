@@ -208,7 +208,7 @@ describe("probeSelfCustodialAccountWallets", () => {
 
     await probeSelfCustodialAccountWallets(TEST_ACCOUNT_ID, Network.Regtest, TEST_LEEWAY)
 
-    expect(mockRecordError).toHaveBeenCalledWith(disconnectError)
+    expect(mockRecordError).toHaveBeenCalledWith(disconnectError, "Probe SDK disconnect")
   })
 
   it("wraps a non-Error disconnect rejection into an Error before recording it", async () => {
@@ -227,6 +227,7 @@ describe("probeSelfCustodialAccountWallets", () => {
       expect.objectContaining({
         message: expect.stringContaining("Probe SDK disconnect failed"),
       }),
+      "Probe SDK disconnect",
     )
   })
 })

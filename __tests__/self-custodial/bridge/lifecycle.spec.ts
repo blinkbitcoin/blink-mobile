@@ -449,6 +449,7 @@ describe("selfCustodialRestoreWallet", () => {
     expect(mockDeleteMnemonic).toHaveBeenCalledTimes(1)
     expect(mockRecordError).toHaveBeenCalledWith(
       expect.objectContaining({ message: expect.stringContaining("SDK init refused") }),
+      "Wallet restore",
     )
   })
 })

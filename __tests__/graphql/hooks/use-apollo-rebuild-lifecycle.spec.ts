@@ -78,7 +78,7 @@ describe("useApolloRebuildLifecycle", () => {
     })
 
     expect(() => rerender({ token: "token-b" })).not.toThrow()
-    expect(mockRecordError).toHaveBeenCalledWith(stopError)
+    expect(mockRecordError).toHaveBeenCalledWith(stopError, "Apollo client stop")
   })
 
   it("does not re-run on identical token across renders — no spurious rebuild log", () => {

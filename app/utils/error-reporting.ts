@@ -56,6 +56,10 @@ export type RecordAppErrorOptions = {
   dedupKey?: string
   /** Bypass the connectivity downgrade (crash-adjacent sites); `expected` still wins. */
   alwaysRecord?: boolean
+  /** The failing flow, e.g. "Cloud backup encryption". Becomes the non-fatal's `jsErrorName`,
+   *  which Crashlytics shows as the issue title and alerts on. The error's own message and
+   *  stack stay untouched, so the real throw site survives. */
+  operation?: string
 }
 
 export const classifyError = (
@@ -76,6 +80,12 @@ export const recordAppError = (error: Error, options?: RecordAppErrorOptions): v
   if (options?.dedupKey) {
     if (recordedDedupKeys.has(options.dedupKey)) return
     recordedDedupKeys.add(options.dedupKey)
+  }
+  /** `jsErrorName` is only forwarded when there is one: callers with no operation keep the
+   *  single-argument call they have always made, and their Crashlytics grouping is unchanged. */
+  if (options?.operation) {
+    crashlytics().recordError(error, options.operation)
+    return
   }
   crashlytics().recordError(error)
 }
