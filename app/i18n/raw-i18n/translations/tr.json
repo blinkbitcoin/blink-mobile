@@ -2500,7 +2500,7 @@
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Hesabınızda 5 dolardan fazla para var",
     "itsATrialAccount": "Deneme hesaplarının işlem limitleri azaltılmıştır ve kurtarma yöntemi yoktur. Telefonunuzu kaybederseniz veya uygulamayı kaldırırsanız, paranız kurtarılamaz.",
-    "accountBeingDeleted": "Hesabınız siliniyor, lütfen bekleyiniz...",
+    "accountBeingDeleted": "Hesabınız kapatılıyor, lütfen bekleyiniz...",
     "dangerZone": "Tehlikeli Bölge",
     "phoneDeletedSuccessfully": "Telefon başarılı bir şekilde silindi",
     "phoneNumber": "Telefon Numarası",
@@ -3035,17 +3035,17 @@
     "defaultEmailSubject": "{bankName: string}  - Destek",
     "defaultSupportMessage": "Selamlar! {bankName: string} ile ilgili yardıma ihtiyacım var. {os: string} cihazımda {version: string} sürümünü kullanıyorum.",
     "emailCopied": "E-posta {email: string} panoya kopyalandı",
-    "deleteAccount": "Hesabı sil",
+    "deleteAccount": "Hesabı kapat",
     "delete": "sil",
-    "typeDelete": "Hesap silme işlemini onaylamak için lütfen \"{delete: string}\" yazın",
+    "typeDelete": "Hesap kapatma işlemini onaylamak için lütfen \"{delete: string}\" yazın",
     "finalConfirmationAccountDeletionTitle": "Son Onay Gerekli",
-    "finalConfirmationAccountDeletionMessage": "Hesabınızı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.",
-    "deleteAccountBalanceWarning": "Hesabınızı silmek, mevcut bakiyenize erişiminizi kaybetmenize neden olacaktır. Devam etmek istediğinizden emin misiniz?",
-    "deleteAccountConfirmation": "Hesabınız silinmek üzere yazılmıştır.\n\nYasal gereklilikle ilgili deneme süresi sona erdiğinde, hesabınızla ilgili kalan veriler kalıcı olarak silinecektir.",
-    "deleteAccountFromPhone": "Merhaba!, lütfen hesabımı silin. Telefon numaram {phoneNumber: string}.",
+    "finalConfirmationAccountDeletionMessage": "Hesabınız kapandıktan sonra hesabınıza erişemez veya hesabınızı kullanamazsınız. Yasalar ve saklama yükümlülüklerimiz gereği belirli kayıtları saklayabiliriz. Hesabınızı kapatmak istediğinizden emin misiniz?",
+    "deleteAccountBalanceWarning": "Hesabınızı kapatmak, mevcut bakiyenize erişiminizi kaybetmenize neden olacaktır. Devam etmek istediğinizden emin misiniz?",
+    "deleteAccountConfirmation": "Hesabınız kapatıldı.\n\nYasalar ve saklama yükümlülüklerimiz gereği belirli kayıtları saklayabiliriz.",
+    "deleteAccountFromPhone": "Merhaba!, lütfen hesabımı kapatın. Telefon numaram {phoneNumber: string}.",
     "deleteAccountError": "Bir şeyler yanlış gitti. Daha fazla yardım için {email: string} ile iletişime geçin.",
     "bye": "Güle güle!",
-    "deleteAccountWarning": "Dikkat: Hesap silme işlemi kalıcıdır!\nSilmeden önce cüzdanlarınızda bakiye olmadığından emin olun.\nSilinen hesap geri getirilemez."
+    "deleteAccountWarning": "Dikkat: Hesap kapatma işlemi kalıcıdır!\nKapatmadan önce cüzdanlarınızda bakiye olmadığından emin olun.\nKapatılan hesap geri getirilemez.\nYasal gereklilikler nedeniyle belirli kayıtları saklayabiliriz."
   },
   "lnurl": {
     "overLimit": "Maksimum miktarın üzerinde gönderemezsiniz",

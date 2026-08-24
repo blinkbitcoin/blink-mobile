@@ -2500,7 +2500,7 @@
     "AccountScreen": {
         "fundsMoreThan5Dollars": "Votre compte contient plus de 5 $",
         "itsATrialAccount": "Les comptes d'essai ont des limites de transaction réduites et aucune méthode de récupération. Si vous perdez votre téléphone ou désinstallez l'application, vos fonds seront irrécupérables.",
-        "accountBeingDeleted": "Votre compte est en cours de suppression, veuillez patienter…",
+        "accountBeingDeleted": "Votre compte est en cours de clôture, veuillez patienter…",
         "dangerZone": "Zone de danger",
         "phoneDeletedSuccessfully": "Numéro de téléphone supprimé avec succès",
         "phoneNumber": "Numéro de téléphone",
@@ -3035,17 +3035,17 @@
         "defaultEmailSubject": "Aide {bankName: string} ",
         "defaultSupportMessage": "Bonjour ! J’ai besoin d’aide avec {bankName: string}, j’utilise la version {version: string} sur {os: string}.",
         "emailCopied": "e-mail {email: string} copié dans le presse-papier",
-        "deleteAccount": "Supprimer le compte",
+        "deleteAccount": "Clôturer le compte",
         "delete": "Supprimer",
-        "typeDelete": "Merci de taper \"{delete: string}\" pour confirmer la suppression du compte.",
+        "typeDelete": "Merci de taper \"{delete: string}\" pour confirmer la clôture du compte.",
         "finalConfirmationAccountDeletionTitle": "Confirmation finale requise",
-        "finalConfirmationAccountDeletionMessage": "Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.",
-        "deleteAccountBalanceWarning": "Supprimer votre compte entrainera la perte de l’accès à votre solde actuel. Êtes-vous sûr de vouloir continuer ?",
-        "deleteAccountConfirmation": "Votre compte a été inscrit en vue de sa suppression.\n\nLorsque le temps de probation lié aux exigences réglementaires sera terminé, les données restantes associées à votre compte seront supprimées définitivement.",
-        "deleteAccountFromPhone": "Bonjour ! Merci de supprimer mon compte. Mon numéro de téléphone est le {phoneNumber: string}.",
+        "finalConfirmationAccountDeletionMessage": "Après la clôture, vous ne pourrez plus accéder à votre compte ni l'utiliser. Nous pouvons conserver certains dossiers comme l'exigent la loi et nos obligations de conservation. Êtes-vous sûr de vouloir clôturer votre compte ?",
+        "deleteAccountBalanceWarning": "Clôturer votre compte entraînera la perte de l'accès à votre solde actuel. Êtes-vous sûr de vouloir continuer ?",
+        "deleteAccountConfirmation": "Votre compte a été clôturé.\n\nNous pouvons conserver certains dossiers comme l'exigent la loi et nos obligations de conservation.",
+        "deleteAccountFromPhone": "Bonjour ! Merci de clôturer mon compte. Mon numéro de téléphone est le {phoneNumber: string}.",
         "deleteAccountError": "Une erreur est survenue. Contacter {email: string} pour recevoir une aide supplémentaire.",
         "bye": "Salut !",
-        "deleteAccountWarning": "Attention : la suppression du compte est permanente !\nAssurez-vous que les portefeuilles ne contiennent plus de fonds avant la suppression.\nUn compte supprimé ne peut pas être réactivé."
+        "deleteAccountWarning": "Attention : la clôture du compte est permanente !\nAssurez-vous que les portefeuilles ne contiennent plus de fonds avant la clôture.\nUn compte clôturé ne peut pas être réactivé.\nNous pouvons conserver certains dossiers si la loi l'exige."
     },
     "lnurl": {
         "overLimit": "Vous ne pouvez pas envoyer plus que le montant maximum",

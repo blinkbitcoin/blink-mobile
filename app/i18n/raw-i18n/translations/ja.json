@@ -2500,7 +2500,7 @@
     "AccountScreen": {
         "fundsMoreThan5Dollars": "アカウントの残高が$5を超えています",
         "itsATrialAccount": "トライアルアカウントは取引限度額が低く、復元方法がありません。携帯電話を紛失したりアプリを削除すると、資金を復元できなくなります。",
-        "accountBeingDeleted": "アカウントを削除中です。しばらくお待ちください...",
+        "accountBeingDeleted": "アカウントを閉じています。しばらくお待ちください...",
         "dangerZone": "危険ゾーン",
         "phoneDeletedSuccessfully": "電話番号を削除しました",
         "phoneNumber": "電話番号",
@@ -3035,17 +3035,17 @@
         "defaultEmailSubject": "{bankName: string} - サポート",
         "defaultSupportMessage": "Hey there! I need some help with {bankName: string}, I'm using the version {version: string} on {os: string}.",
         "emailCopied": "メールアドレス{email: string}がクリップボードにコピーされました",
-        "deleteAccount": "ウォレットを削除する",
+        "deleteAccount": "アカウントを閉じる",
         "delete": "削除",
-        "typeDelete": "ウォレットを削除するには、\"{delete: string}\"と入力してください",
+        "typeDelete": "アカウントの閉鎖を確認するには「{delete: string}」と入力してください",
         "finalConfirmationAccountDeletionTitle": "アカウントを削除して、本当によろしいでしょうか？",
-        "finalConfirmationAccountDeletionMessage": "本当にウォレットを削除しますか？このアクションは取り消すことができません。",
-        "deleteAccountBalanceWarning": "ウォレットを削除すると、現在のウォレット残高にアクセスできなくなります。本当によろしいですか？",
-        "deleteAccountConfirmation": "あなたのウォレットは削除されました。\n\n規制要件に関連する保護観察期間が終了すると、あなたのアカウントに関連する残りのデータは永久に削除されます。",
-        "deleteAccountFromPhone": "Hey there!, please delete my account. My phone number is {phoneNumber: string}.",
+        "finalConfirmationAccountDeletionMessage": "閉鎖後は、アカウントへのアクセスや利用ができなくなります。法令および当社の保管義務により、特定の記録を保持する場合があります。本当にアカウントを閉じますか？",
+        "deleteAccountBalanceWarning": "アカウントを閉じると、現在の残高へのアクセスを失います。続行してもよろしいですか？",
+        "deleteAccountConfirmation": "アカウントが閉じられました。\n\n法令および当社の保管義務により、特定の記録を保持する場合があります。",
+        "deleteAccountFromPhone": "こんにちは！アカウントを閉じてください。私の電話番号は {phoneNumber: string} です。",
         "deleteAccountError": "エラーが発生しました。お問い合わせは{email: string}までお願いします。",
         "bye": "バイバイ！",
-        "deleteAccountWarning": "ご注意：アカウントの削除は元に戻せません！\n削除前にウォレットに資金がないことを確認してください。\n削除されたアカウントは復元できません。"
+        "deleteAccountWarning": "注意：アカウントの閉鎖は永久です！\n閉じる前にウォレットに資金がないことを確認してください。\n閉じられたアカウントは復元できません。\n法令により特定の記録を保持する場合があります。"
     },
     "lnurl": {
         "overLimit": "最大限度額以上の送金はできません",

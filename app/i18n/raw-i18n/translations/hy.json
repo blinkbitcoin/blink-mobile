@@ -2500,7 +2500,7 @@
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Ձեր հաշվին $5-ից ավելի միջոցներ կան",
     "itsATrialAccount": "Փորձարկային հաշիվներն ունեն սահմանափակված գործարքի սահմանաչափեր և վերականգնման մեթոդ չունեն։ Եթե կորցնեք ձեր հեռախոսը կամ ջնջեք հավելվածը՝ ձեր միջոցները անվերականգնելի կլինեն։",
-    "accountBeingDeleted": "Ձեր հաշիվը ջնջվում է՝ խնդրում ենք սպասել...",
+    "accountBeingDeleted": "Ձեր հաշիվը փակվում է՝ խնդրում ենք սպասել...",
     "dangerZone": "Վտանգավոր գոտի",
     "phoneDeletedSuccessfully": "Հեռախոսահամարը հաջողությամբ ջնջվել է",
     "phoneNumber": "Հեռախոսահամար",
@@ -3035,17 +3035,17 @@
     "defaultEmailSubject": "{bankName: string} - Աջակցություն",
     "defaultSupportMessage": "Ողջու՛յն։ Օգնություն է հարկավոր {bankName: string}ի առիթով, ես պգտագործում եմ {version: string} տարբերակը {os: string}ով։ ",
     "emailCopied": "էլ․ հասցե {email: string} պատճենվեց ժամանակավոր շտեմարանում ",
-    "deleteAccount": "Ջնջել հաշիվը",
+    "deleteAccount": "Փակել հաշիվը",
     "delete": "ջնջել",
-    "typeDelete": "Խնդրում ենք տպել  \"{delete: string}\"՝ հաշվի ջնջումը հաստատելու համար",
+    "typeDelete": "Մուտքագրեք «{delete: string}»՝ հաշվի փակումը հաստատելու համար",
     "finalConfirmationAccountDeletionTitle": "Հարկավոր է վերջնական հաստատում",
-    "finalConfirmationAccountDeletionMessage": "Դուք համոզվա՞ծ եք, որ ցանկանում եք ջնջեկ Ձեր հածիվը։ Այս գործողությունն անշրջելի է։ ",
-    "deleteAccountBalanceWarning": "Ձեր հաշվի ջնջումը կբերի Ձեր ընթացիկ հավեկշռի կորստի։ Դուք համոզվա՞ծ եք, որ ցանկանում եք շարունակել։ ",
-    "deleteAccountConfirmation": "Ձեր հաշիվը ուղարկվել է ջնջման։\n\nԵրբ կարգավորող պահանջների հետ կապված փորձաշրջանն ավարտվի, Ձեր հաշվի հետ կապված մնացած տվյալները ընդմիշտ կջնջվեն:",
-    "deleteAccountFromPhone": "Ողջու՛յն, խնդրում եմ ջնջել իմ հաշիվը։ Իմ հեռախոսահամարն է {phoneNumber: string}։ ",
+    "finalConfirmationAccountDeletionMessage": "Փակելուց հետո Դուք չեք կարող մուտք գործել Ձեր հաշիվ կամ օգտվել դրանից: Մենք կարող ենք պահպանել որոշ գրառումներ, ինչպես պահանջվում է օրենքով և մեր պահպանման պարտավորություններով: Վստա՞ծ եք, որ ցանկանում եք փակել Ձեր հաշիվը:",
+    "deleteAccountBalanceWarning": "Ձեր հաշվի փակումը կբերի Ձեր ընթացիկ մնացորդի մուտքի կորստի: Վստա՞ծ եք, որ ցանկանում եք շարունակել:",
+    "deleteAccountConfirmation": "Ձեր հաշիվը փակված է:\n\nՄենք կարող ենք պահպանել որոշ գրառումներ, ինչպես պահանջվում է օրենքով և մեր պահպանման պարտավորություններով:",
+    "deleteAccountFromPhone": "Ողջույն: Խնդրում եմ փակեք իմ հաշիվը: Իմ հեռախոսահամարն է {phoneNumber: string}:",
     "deleteAccountError": "Սխալ։ Կապ հաստատեք {email: string} հետագա աջակցության համար։ ",
     "bye": "Հաջողությու՛ն։ ",
-    "deleteAccountWarning": "Delays delays delays delays delays delays delays delays delays\nDelays delays delays delays delays delays delays delays\nDelays delays delays delays delays delays delays delays delays"
+    "deleteAccountWarning": "Ուշադրություն. Հաշվի փակումն անշրջելի է:\nՓակելուց առաջ համոզվեք, որ դրամապանակներում միջոցներ չկան:\nՓակված հաշիվը հնարավոր չէ վերականգնել:\nՄենք կարող ենք պահպանել որոշ գրառումներ, ինչպես պահանջվում է օրենքով:"
   },
   "lnurl": {
     "overLimit": "Դուք չեք կարող առավելագույն չափը գերազանցող գումար ուղարկել",
