@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react"
 import { Text } from "react-native"
+import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 
 import { makeStyles, useTheme } from "@rn-vui/themed"
 import { useNavigation } from "@react-navigation/native"
@@ -279,7 +280,9 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
         iconBackgroundColor={colors._warningLight}
         footer={screenFooter}
       >
-        <Text style={styles.message}>{message}</Text>
+        <Text maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER} style={styles.message}>
+          {message}
+        </Text>
       </StatusScreenLayout>
     </Screen>
   )

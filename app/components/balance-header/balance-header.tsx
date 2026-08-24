@@ -8,11 +8,8 @@ import { HiddenBalancePlaceholder } from "@app/components/hidden-balance-placeho
 import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { BalanceMode } from "@app/hooks/use-balance-mode"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 import { testProps } from "@app/utils/testProps"
-
-/** The 32pt balance sits directly under the fixed-size home header chrome;
- *  uncapped Dynamic Type makes it overrun the username row above. */
-const MAX_BALANCE_FONT_SIZE_MULTIPLIER = 1.4
 
 const Loader = () => {
   const styles = useStyles()
@@ -72,7 +69,7 @@ export const BalanceHeader: React.FC<Props> = ({
                 {...testProps("balance-value")}
                 style={styles.primaryBalanceText}
                 allowFontScaling
-                maxFontSizeMultiplier={MAX_BALANCE_FONT_SIZE_MULTIPLIER}
+                maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
                 adjustsFontSizeToFit
               >
                 {formattedBalance}
@@ -88,7 +85,12 @@ export const BalanceHeader: React.FC<Props> = ({
           style={styles.modeToggle}
           {...testProps("balance-mode-toggle")}
         >
-          <Text style={styles.modeToggleText}>{modeLabel}</Text>
+          <Text
+            maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
+            style={styles.modeToggleText}
+          >
+            {modeLabel}
+          </Text>
         </Pressable>
       ) : null}
     </View>

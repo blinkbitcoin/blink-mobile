@@ -1,5 +1,6 @@
 import React from "react"
 import { Text, View } from "react-native"
+import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 
 import { makeStyles } from "@rn-vui/themed"
 
@@ -14,8 +15,16 @@ export const NumberedStepsList: React.FC<NumberedStepsListProps> = ({ steps }) =
     <View style={styles.container}>
       {steps.map((content, index) => (
         <View key={index} style={styles.row}>
-          <Text style={[styles.base, styles.number]}>{`${index + 1}.`}</Text>
-          <Text style={[styles.base, styles.text]}>{content}</Text>
+          <Text
+            maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
+            style={[styles.base, styles.number]}
+          >{`${index + 1}.`}</Text>
+          <Text
+            maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
+            style={[styles.base, styles.text]}
+          >
+            {content}
+          </Text>
         </View>
       ))}
     </View>

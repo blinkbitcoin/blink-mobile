@@ -1,6 +1,7 @@
 import * as React from "react"
 import { useState } from "react"
 import { Dimensions, Text, View, Alert } from "react-native"
+import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 import { TouchableOpacity } from "react-native-gesture-handler"
 import { useSharedValue } from "react-native-reanimated"
 import Carousel from "react-native-reanimated-carousel"
@@ -249,7 +250,11 @@ export const EarnSection = ({ route }: Props) => {
             </View>
           </TouchableOpacity>
           <View>
-            <Text style={styles.itemTitle} numberOfLines={3}>
+            <Text
+              maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
+              style={styles.itemTitle}
+              numberOfLines={3}
+            >
               {item.title}
             </Text>
             <Button
@@ -285,8 +290,15 @@ export const EarnSection = ({ route }: Props) => {
         </View>
         {!item.enabled && (
           <>
-            <Text style={styles.unlockQuestion}>{LL.EarnScreen.unlockQuestion()}</Text>
-            <Text style={styles.unlock}>{item.nonEnabledMessage}</Text>
+            <Text
+              maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
+              style={styles.unlockQuestion}
+            >
+              {LL.EarnScreen.unlockQuestion()}
+            </Text>
+            <Text maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER} style={styles.unlock}>
+              {item.nonEnabledMessage}
+            </Text>
           </>
         )}
       </>

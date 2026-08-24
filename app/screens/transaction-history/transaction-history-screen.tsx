@@ -1,5 +1,6 @@
 import * as React from "react"
 import { InteractionManager, SectionList, Text, View } from "react-native"
+import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 import { makeStyles } from "@rn-vui/themed"
 import { gql, useApolloClient } from "@apollo/client"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
@@ -443,7 +444,12 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
   const renderSectionHeader = React.useCallback(
     ({ section: { title } }: { section: { title: string } }) => (
       <View style={styles.sectionHeaderContainer}>
-        <Text style={styles.sectionHeaderText}>{title}</Text>
+        <Text
+          maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
+          style={styles.sectionHeaderText}
+        >
+          {title}
+        </Text>
       </View>
     ),
     [styles.sectionHeaderContainer, styles.sectionHeaderText],
@@ -530,7 +536,10 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
         renderSectionHeader={renderSectionHeader}
         ListEmptyComponent={
           <View style={styles.noTransactionView}>
-            <Text style={styles.noTransactionText}>
+            <Text
+              maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
+              style={styles.noTransactionText}
+            >
               {LL.TransactionScreen.noTransaction()}
             </Text>
           </View>
