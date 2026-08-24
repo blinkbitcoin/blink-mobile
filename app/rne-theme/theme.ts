@@ -3,6 +3,7 @@ import { StyleProp, TextStyle } from "react-native"
 import { createTheme } from "@rn-vui/themed"
 
 import { light, dark } from "./colors"
+import { MAX_FONT_SIZE_MULTIPLIER } from "./text-scaling"
 
 const theme = createTheme({
   lightColors: light,
@@ -61,6 +62,7 @@ const theme = createTheme({
         : {}
 
       return {
+        maxFontSizeMultiplier: MAX_FONT_SIZE_MULTIPLIER,
         style: {
           ...universalStyle,
           ...sizeStyle,
