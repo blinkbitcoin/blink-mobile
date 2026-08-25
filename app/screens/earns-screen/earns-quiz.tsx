@@ -508,6 +508,7 @@ export const EarnQuiz = ({ route }: Props) => {
           <View>
             {recordedAnswer.indexOf(0) === -1 ? null : (
               <Button
+                titleProps={{ maxFontSizeMultiplier: MAX_FONT_SIZE_MULTIPLIER }}
                 title={LL.EarnScreen.keepDigging()}
                 type="outline"
                 onPress={async () => close()}
@@ -546,6 +547,7 @@ export const EarnQuiz = ({ route }: Props) => {
                   : LL.EarnScreen.sectionsCompleted()}
               </Text>
               <Button
+                titleProps={{ maxFontSizeMultiplier: MAX_FONT_SIZE_MULTIPLIER }}
                 title={LL.EarnScreen.reviewQuiz()}
                 type="clear"
                 titleStyle={styles.completedTitleStyle}
@@ -554,6 +556,7 @@ export const EarnQuiz = ({ route }: Props) => {
             </>
           )) || (
             <Button
+              titleProps={{ maxFontSizeMultiplier: MAX_FONT_SIZE_MULTIPLIER }}
               title={
                 isAvailable
                   ? LL.EarnScreen.earnSats({

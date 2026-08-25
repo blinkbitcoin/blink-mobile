@@ -152,6 +152,7 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
     return (
       <View style={styles.pinPadButtonContainer}>
         <Button
+          titleProps={{ maxFontSizeMultiplier: MAX_FONT_SIZE_MULTIPLIER }}
           buttonStyle={styles.pinPadButton}
           titleStyle={styles.pinPadButtonTitle}
           disabled={lockout.isInputDisabled}
@@ -228,6 +229,7 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
           {buttonComponentForDigit("0")}
           <View style={styles.pinPadButtonContainer}>
             <Button
+              titleProps={{ maxFontSizeMultiplier: MAX_FONT_SIZE_MULTIPLIER }}
               testID="pinPadBackspace"
               buttonStyle={styles.pinPadButton}
               disabled={lockout.isInputDisabled}

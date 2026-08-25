@@ -158,6 +158,7 @@ export const AllContactsScreen: React.FC = () => {
   if (contacts.length > 0) {
     SearchBarContent = (
       <SearchBar
+        maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
         {...testProps(LL.common.search())}
         placeholder={LL.common.search()}
         value={searchText}

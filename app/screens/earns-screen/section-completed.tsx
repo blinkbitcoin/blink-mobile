@@ -95,6 +95,7 @@ export const SectionCompleted: React.FC<Props> = ({ route }) => {
           {sectionTitle}
         </Text>
         <Button
+          titleProps={{ maxFontSizeMultiplier: MAX_FONT_SIZE_MULTIPLIER }}
           title={LL.EarnScreen.keepDigging()}
           type="solid"
           buttonStyle={styles.buttonStyle}

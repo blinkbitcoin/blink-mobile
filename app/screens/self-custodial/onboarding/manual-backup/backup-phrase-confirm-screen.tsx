@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef } from "react"
 import { TextInput, View } from "react-native"
+import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { useNavigation, useRoute, RouteProp } from "@react-navigation/native"
@@ -124,6 +125,7 @@ export const BackupPhraseConfirmScreen: React.FC = () => {
                       {challenge.index + 1}.
                     </Text>
                     <TextInput
+                      maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
                       ref={(ref) => {
                         inputRefs.current[i] = ref
                       }}

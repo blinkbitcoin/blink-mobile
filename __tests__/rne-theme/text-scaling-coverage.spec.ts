@@ -21,27 +21,82 @@ const sourceFiles = (dir: string): string[] =>
     return entry.isFile() && entry.name.endsWith(".tsx") ? [entryPath] : []
   })
 
-/** The local name React Native's `Text` carries in this file, or null if it imports none. */
-const reactNativeTextName = (source: string): string | null => {
-  const rnImport = /import\s*\{([^}]*)\}\s*from\s*"react-native"/s.exec(source)
-  if (!rnImport) return null
+/**
+ * The local name a React Native component carries in this file, or null if it imports none.
+ * Both of these render text the theme cannot reach: the label and the field the user types
+ * into, placeholder included.
+ */
+const reactNativeName = (source: string, component: string): string | null => {
+  /** Every react-native import, not the first: a file may split its values across two, and
+   *  reading only one silently exempts the rest of the file from the walk. */
+  const rnImports = [...source.matchAll(/import\s*\{([^}]*)\}\s*from\s*"react-native"/gs)]
 
-  const imported = /(?:^|,)\s*Text(?:\s+as\s+(\w+))?\s*(?:,|$)/s.exec(rnImport[1])
-  if (!imported) return null
+  const imported = new RegExp(
+    `(?:^|,)\\s*${component}(?:\\s+as\\s+(\\w+))?\\s*(?:,|$)`,
+    "s",
+  )
 
-  return imported[1] ?? "Text"
+  for (const rnImport of rnImports) {
+    const match = imported.exec(rnImport[1])
+    if (match) return match[1] ?? component
+  }
+
+  return null
 }
 
-/** Every opening tag of that component, with the props it was given. */
+/**
+ * Every JSX opening tag of that component. A type position names the same component
+ * without rendering anything (`useRef<TextInput>`, `Array<TextInput | null>`), and the
+ * difference is what sits before the angle bracket: a generic is always opened by the
+ * identifier it belongs to, where JSX never is.
+ */
 const openingTags = (source: string, name: string): string[] => {
-  const tags = new RegExp(`<${name}(\\s[^>]*)?>`, "gs")
-  return [...source.matchAll(tags)].map((match) => match[0])
+  const starts = new RegExp(`(^|[^\\w.])<${name}(?=[\\s/>])`, "gs")
+
+  return [...source.matchAll(starts)].flatMap((start) => {
+    const from = start.index + start[0].length
+
+    /**
+     * Scanned rather than matched to the next `>`: a prop can hold one of its own, and an
+     * arrow in a handler would end the tag early and hide every prop after it, reporting a
+     * capped component as uncapped. Braces are what tell them apart.
+     */
+    let depth = 0
+    for (let at = from; at < source.length; at += 1) {
+      const char = source[at]
+      if (char === "{") depth += 1
+      else if (char === "}") depth -= 1
+      else if (char === ">" && depth === 0) return [source.slice(from, at)]
+    }
+
+    return []
+  })
 }
 
-describe("text scaling coverage", () => {
-  const offenders = sourceFiles(APP_DIR).flatMap((file) => {
+/**
+ * The theme reaches components imported from `@rn-vui/themed` and nothing else, so the same
+ * component taken from `@rn-vui/base` renders outside the policy: a Button drawn from there
+ * grows its title past the ceiling, and a SearchBar its placeholder. They carry it as props
+ * instead, which is what these two look for.
+ */
+const uncappedFromBase = (): string[] =>
+  sourceFiles(APP_DIR).flatMap((file) => {
     const source = fs.readFileSync(file, "utf8")
-    const name = reactNativeTextName(source)
+    const baseImport = /import\s*\{([^}]*)\}\s*from\s*"@rn-vui\/base"/s.exec(source)
+    if (!baseImport) return []
+
+    const uncapped = ["Button", "SearchBar"]
+      .filter((component) => new RegExp(`\\b${component}\\b`).test(baseImport[1]))
+      .flatMap((component) => openingTags(source, component))
+      .filter((tag) => !tag.includes("maxFontSizeMultiplier"))
+
+    return uncapped.length > 0 ? [path.relative(APP_DIR, file)] : []
+  })
+
+const uncappedIn = (component: string): string[] =>
+  sourceFiles(APP_DIR).flatMap((file) => {
+    const source = fs.readFileSync(file, "utf8")
+    const name = reactNativeName(source, component)
     if (!name) return []
 
     const uncapped = openingTags(source, name).filter(
@@ -49,6 +104,13 @@ describe("text scaling coverage", () => {
     )
     return uncapped.length > 0 ? [path.relative(APP_DIR, file)] : []
   })
+
+describe("text scaling coverage", () => {
+  const offenders = [
+    ...uncappedIn("Text"),
+    ...uncappedIn("TextInput"),
+    ...uncappedFromBase(),
+  ]
 
   /**
    * Fails with the files to fix rather than a bare boolean: whoever adds the next screen
@@ -65,5 +127,43 @@ describe("text scaling coverage", () => {
 
   it("holds a ceiling to cap them to", () => {
     expect(MAX_FONT_SIZE_MULTIPLIER).toBeGreaterThan(1)
+  })
+})
+
+/**
+ * The walk is only worth what it reads: a tag it cuts short hides the props that follow,
+ * and a component it never recognises is exempt without anyone noticing. Both failures
+ * are silent in the walk above, so they are pinned here.
+ */
+describe("the walk's own reading", () => {
+  it("keeps a tag whole past an arrow in one of its props", () => {
+    const source = `<Text onPress={() => close()} maxFontSizeMultiplier={CAP}>hi</Text>`
+
+    expect(openingTags(source, "Text")[0]).toContain("maxFontSizeMultiplier")
+  })
+
+  it("reads a tag broken across lines", () => {
+    const source = `<Text\n  style={styles.a}\n  maxFontSizeMultiplier={CAP}\n>\n  hi\n</Text>`
+
+    expect(openingTags(source, "Text")[0]).toContain("maxFontSizeMultiplier")
+  })
+
+  /** A type position renders nothing; counting it would report a file that has no tag. */
+  it("passes over the component named as a type", () => {
+    const source = `const ref = useRef<TextInput>(null)`
+
+    expect(openingTags(source, "TextInput")).toEqual([])
+  })
+
+  it("finds the component however the file spreads its react-native imports", () => {
+    const source = `import { View } from "react-native"\nimport { Text as RNText } from "react-native"`
+
+    expect(reactNativeName(source, "Text")).toBe("RNText")
+  })
+
+  it("names nothing for a file that imports no such component", () => {
+    const source = `import { View } from "react-native"`
+
+    expect(reactNativeName(source, "Text")).toBeNull()
   })
 })

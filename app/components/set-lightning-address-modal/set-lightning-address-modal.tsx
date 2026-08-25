@@ -1,5 +1,6 @@
 import React, { useState } from "react"
 import { View, TextInput } from "react-native"
+import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 
 import { gql } from "@apollo/client"
 import { useAppConfig, useSaveSessionProfile } from "@app/hooks"
@@ -200,6 +201,7 @@ export const SetLightningAddressModalUI = ({
         <View style={styles.bodyStyle}>
           <View style={styles.textInputContainerStyle}>
             <TextInput
+              maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
               autoCorrect={false}
               autoComplete="off"
               style={styles.textInputStyle}

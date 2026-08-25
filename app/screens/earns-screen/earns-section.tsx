@@ -258,6 +258,7 @@ export const EarnSection = ({ route }: Props) => {
               {item.title}
             </Text>
             <Button
+              titleProps={{ maxFontSizeMultiplier: MAX_FONT_SIZE_MULTIPLIER }}
               onPress={() => open(item.id)}
               disabled={!item.enabled}
               disabledStyle={styles.buttonStyleDisabled}

@@ -1,5 +1,6 @@
 import React, { useState } from "react"
 import { Pressable, TextInput, View } from "react-native"
+import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
@@ -33,6 +34,7 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
       <Text style={styles.label}>{label}</Text>
       <View style={styles.inputContainer}>
         <TextInput
+          maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
           style={styles.input}
           value={value}
           onChangeText={onChangeText}

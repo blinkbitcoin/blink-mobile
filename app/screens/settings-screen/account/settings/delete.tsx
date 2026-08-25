@@ -1,5 +1,6 @@
 import React, { useState } from "react"
 import { Alert, TextInput, View } from "react-native"
+import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 import Modal from "react-native-modal"
 
 import { gql } from "@apollo/client"
@@ -199,6 +200,7 @@ export const Delete = () => {
         </View>
         <Text type="p1">{LL.support.typeDelete({ delete: LL.support.delete() })}</Text>
         <TextInput
+          maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
           autoCapitalize="none"
           style={styles.textInput}
           onChangeText={setText}
