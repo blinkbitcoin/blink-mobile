@@ -569,6 +569,11 @@ describe("KeyStoreWrapper session-profile methods", () => {
     name: "Bob",
   } as unknown as ProfileProps
 
+  // Both native modules reject a missing key rather than resolving empty, and
+  // only this code separates "nothing stored" from "the read went wrong".
+  const keyNotFound = () =>
+    Object.assign(new Error("key does not present"), { code: "404" })
+
   describe("saveSessionProfiles", () => {
     it("serializes profiles to JSON and writes them with ALWAYS_THIS_DEVICE_ONLY", async () => {
       mockSet.mockResolvedValue(undefined)
@@ -590,6 +595,18 @@ describe("KeyStoreWrapper session-profile methods", () => {
 
       expect(result).toBe(false)
     })
+
+    it("returns false without writing when the profiles cannot be serialized", async () => {
+      const circular: Record<string, unknown> = { token: "tok-a" }
+      circular.self = circular
+
+      const result = await KeyStoreWrapper.saveSessionProfiles([
+        circular as unknown as ProfileProps,
+      ])
+
+      expect(result).toBe(false)
+      expect(mockSet).not.toHaveBeenCalled()
+    })
   })
 
   describe("getSessionProfiles", () => {
@@ -603,7 +620,7 @@ describe("KeyStoreWrapper session-profile methods", () => {
     })
 
     it("returns an empty array when the key is missing", async () => {
-      mockGet.mockRejectedValue(new Error("not found"))
+      mockGet.mockRejectedValue(keyNotFound())
 
       const result = await KeyStoreWrapper.getSessionProfiles()
 
@@ -616,6 +633,68 @@ describe("KeyStoreWrapper session-profile methods", () => {
       const result = await KeyStoreWrapper.getSessionProfiles()
 
       expect(result).toEqual([])
+    })
+
+    it("collapses a failed read to an empty array", async () => {
+      mockGet.mockRejectedValue(new Error("keystore locked"))
+
+      const result = await KeyStoreWrapper.getSessionProfiles()
+
+      expect(result).toEqual([])
+    })
+  })
+
+  describe("readSessionProfiles", () => {
+    it("returns the stored profiles as found", async () => {
+      mockGet.mockResolvedValue(JSON.stringify([profileA, profileB]))
+
+      const result = await KeyStoreWrapper.readSessionProfiles()
+
+      expect(result).toEqual({ status: "found", profiles: [profileA, profileB] })
+      expect(mockGet).toHaveBeenCalledWith("sessionProfiles")
+    })
+
+    it("reports absent when the key is not there", async () => {
+      mockGet.mockRejectedValue(keyNotFound())
+
+      const result = await KeyStoreWrapper.readSessionProfiles()
+
+      expect(result).toEqual({ status: "absent" })
+    })
+
+    it("reports absent when the stored payload is empty", async () => {
+      mockGet.mockResolvedValue("")
+
+      const result = await KeyStoreWrapper.readSessionProfiles()
+
+      expect(result).toEqual({ status: "absent" })
+    })
+
+    it("reports failed when the read fails for any reason other than a missing key", async () => {
+      const err = new Error("keystore locked")
+      mockGet.mockRejectedValue(err)
+
+      const result = await KeyStoreWrapper.readSessionProfiles()
+
+      expect(result).toEqual({ status: "failed", err })
+    })
+
+    // A payload nobody can parse holds no session to protect, so it is reported
+    // absent and the next write heals the slot rather than being refused forever.
+    it("reports absent when the stored payload will not parse", async () => {
+      mockGet.mockResolvedValue("{ truncated")
+
+      const result = await KeyStoreWrapper.readSessionProfiles()
+
+      expect(result).toEqual({ status: "absent" })
+    })
+
+    it("reports absent when the stored payload parses to something other than an array", async () => {
+      mockGet.mockResolvedValue(JSON.stringify({ token: "tok-a" }))
+
+      const result = await KeyStoreWrapper.readSessionProfiles()
+
+      expect(result).toEqual({ status: "absent" })
     })
   })
 
@@ -674,6 +753,26 @@ describe("KeyStoreWrapper session-profile methods", () => {
       const result = await KeyStoreWrapper.removeSessionProfileByToken("tok-a")
 
       expect(result).toBe(false)
+    })
+
+    it("writes nothing when the read fails, leaving the other profiles stored", async () => {
+      mockGet.mockRejectedValue(new Error("keystore locked"))
+      mockSet.mockResolvedValue(undefined)
+
+      const result = await KeyStoreWrapper.removeSessionProfileByToken("tok-a")
+
+      expect(result).toBe(false)
+      expect(mockSet).not.toHaveBeenCalled()
+    })
+
+    it("writes nothing when no profiles are stored", async () => {
+      mockGet.mockRejectedValue(keyNotFound())
+      mockSet.mockResolvedValue(undefined)
+
+      const result = await KeyStoreWrapper.removeSessionProfileByToken("tok-a")
+
+      expect(result).toBe(true)
+      expect(mockSet).not.toHaveBeenCalled()
     })
   })
 })
