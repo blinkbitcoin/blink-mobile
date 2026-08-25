@@ -6,6 +6,9 @@ import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 const mockClearToken = jest.fn()
 const mockResetState = jest.fn()
 const mockLogoutMutation = jest.fn()
+const mockGetDeviceToken = jest.fn()
+const mockAsyncStorage = { multiRemove: jest.fn() }
+const mockReportError = jest.fn()
 
 jest.mock("@app/store/persistent-state", () => ({
   usePersistentStateContext: () => ({
@@ -22,9 +25,17 @@ jest.mock("@app/utils/analytics", () => ({
   logLogout: jest.fn(),
 }))
 
+jest.mock("@react-native-firebase/messaging", () => () => ({
+  getToken: () => mockGetDeviceToken(),
+}))
+
+jest.mock("@app/utils/error-logging", () => ({
+  reportError: (...args: unknown[]) => mockReportError(...args),
+}))
+
 jest.mock("@react-native-async-storage/async-storage", () => ({
   __esModule: true,
-  default: { multiRemove: jest.fn().mockResolvedValue(undefined) },
+  default: { multiRemove: (...args: unknown[]) => mockAsyncStorage.multiRemove(...args) },
 }))
 
 jest.mock("@app/utils/storage/secureStorage", () => ({
@@ -55,6 +66,8 @@ beforeEach(() => {
   mockedStore.clearPinFailureState.mockResolvedValue(true)
   mockedStore.removeSessionProfiles.mockResolvedValue(true)
   mockedStore.getActiveToken.mockResolvedValue("")
+  mockGetDeviceToken.mockResolvedValue("")
+  mockAsyncStorage.multiRemove.mockResolvedValue(undefined)
   mockLogoutMutation.mockResolvedValue({ data: {} })
 })
 
@@ -74,6 +87,88 @@ describe("useLogout", () => {
     expect(mockedStore.clearPinFailureState.mock.invocationCallOrder[0]).toBeLessThan(
       mockResetState.mock.invocationCallOrder[0],
     )
+  })
+
+  it("erases the saved session profiles by default", async () => {
+    await logoutOnce()
+
+    expect(mockedStore.removeSessionProfiles).toHaveBeenCalledTimes(1)
+  })
+
+  it("keeps everything the device stored when asked to, and still ends the session", async () => {
+    // The caller could not read the store, so the list it would erase is the
+    // one it never saw. The PIN goes with it: a live token left behind without
+    // the lock that guarded it is worse than either alone. Dropping the schema
+    // marker would undo the whole thing, since the next boot would read as a
+    // fresh install and sweep the profiles anyway.
+    await logoutOnce({ preserveStoredCredentials: true })
+
+    expect(mockedStore.removeSessionProfiles).not.toHaveBeenCalled()
+    expect(mockedStore.removePin).not.toHaveBeenCalled()
+    expect(mockedStore.removeIsBiometricsEnabled).not.toHaveBeenCalled()
+    expect(mockedStore.clearPinFailureState).not.toHaveBeenCalled()
+    expect(mockAsyncStorage.multiRemove).not.toHaveBeenCalled()
+    // The active session still ends.
+    expect(mockClearToken).toHaveBeenCalledTimes(1)
+    expect(mockResetState).toHaveBeenCalledTimes(1)
+  })
+
+  it("drops the keychain token when the session signed out is the active one", async () => {
+    mockedStore.getActiveToken.mockResolvedValue("active-token")
+
+    await logoutOnce({ token: "active-token" })
+
+    expect(mockClearToken).toHaveBeenCalledTimes(1)
+  })
+
+  it("revokes the session server-side when there is a device token to send", async () => {
+    mockGetDeviceToken.mockResolvedValue("device-token")
+
+    await logoutOnce({ token: "active-token" })
+
+    expect(mockLogoutMutation).toHaveBeenCalledWith(
+      expect.objectContaining({ variables: { input: { deviceToken: "device-token" } } }),
+    )
+  })
+
+  it("reports a failed device-token fetch and signs out anyway", async () => {
+    mockGetDeviceToken.mockRejectedValue(new Error("messaging unavailable"))
+
+    await logoutOnce({ token: "active-token" })
+
+    expect(mockReportError).toHaveBeenCalledWith(
+      "logout device token fetch",
+      expect.any(Error),
+    )
+    expect(mockLogoutMutation).not.toHaveBeenCalled()
+    expect(mockResetState).toHaveBeenCalledTimes(1)
+  })
+
+  it("gives up on a hanging revocation instead of blocking the sign-out", async () => {
+    const consoleDebugSpy = jest.spyOn(console, "debug").mockImplementation(() => {})
+    jest.useFakeTimers()
+    mockGetDeviceToken.mockResolvedValue("device-token")
+    mockLogoutMutation.mockReturnValue(new Promise(() => {}))
+
+    const { result } = renderHook(() => useLogout())
+    const signOut = result.current.logout({ token: "active-token" })
+    await jest.advanceTimersByTimeAsync(2000)
+    await signOut
+
+    expect(mockResetState).toHaveBeenCalledTimes(1)
+    jest.useRealTimers()
+    consoleDebugSpy.mockRestore()
+  })
+
+  it("reports a teardown failure and still resets the state", async () => {
+    const consoleDebugSpy = jest.spyOn(console, "debug").mockImplementation(() => {})
+    mockedStore.removePin.mockRejectedValue(new Error("keystore locked"))
+
+    await logoutOnce()
+
+    expect(mockReportError).toHaveBeenCalledWith("logout", expect.any(Error))
+    expect(mockResetState).toHaveBeenCalledTimes(1)
+    consoleDebugSpy.mockRestore()
   })
 
   it("leaves this device's PIN alone when another session's token is logged out", async () => {

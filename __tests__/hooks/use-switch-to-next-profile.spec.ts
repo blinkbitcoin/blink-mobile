@@ -1,12 +1,16 @@
 import { act, renderHook } from "@testing-library/react-native"
 
-import { useSwitchToNextProfile } from "@app/hooks/use-switch-to-next-profile"
+import {
+  SwitchProfileOutcome,
+  useSwitchToNextProfile,
+} from "@app/hooks/use-switch-to-next-profile"
 
 const mockLogout = jest.fn()
 const mockSaveToken = jest.fn()
 const mockNavigate = jest.fn()
 const mockToastShow = jest.fn()
-const mockGetSessionProfiles = jest.fn()
+const mockReportError = jest.fn()
+const mockReadSessionProfiles = jest.fn()
 
 jest.mock("@app/hooks/use-logout", () => ({
   __esModule: true,
@@ -31,12 +35,20 @@ jest.mock("@app/utils/toast", () => ({
   toastShow: (...args: unknown[]) => mockToastShow(...args),
 }))
 
+jest.mock("@app/utils/error-logging", () => ({
+  reportError: (...args: unknown[]) => mockReportError(...args),
+}))
+
 jest.mock("@app/utils/storage/secureStorage", () => ({
   __esModule: true,
   default: {
-    getSessionProfiles: (...args: unknown[]) => mockGetSessionProfiles(...args),
+    readSessionProfiles: (...args: unknown[]) => mockReadSessionProfiles(...args),
   },
 }))
+
+const storeProfiles = (profiles: unknown[]) => {
+  mockReadSessionProfiles.mockResolvedValue({ status: "found", profiles })
+}
 
 const profileA = { token: "tok-a", username: "alice", accountId: "acct-a" }
 const profileB = { token: "tok-b", username: "bob", accountId: "acct-b" }
@@ -49,15 +61,15 @@ describe("useSwitchToNextProfile", () => {
   })
 
   it("deactivates the old token before saving the next profile's token", async () => {
-    mockGetSessionProfiles.mockResolvedValue([profileA, profileB])
+    storeProfiles([profileA, profileB])
 
     const { result } = renderHook(() => useSwitchToNextProfile())
-    let nextProfile
+    let switchResult
     await act(async () => {
-      nextProfile = await result.current.switchToNextProfile("tok-a")
+      switchResult = await result.current.switchToNextProfile("tok-a")
     })
 
-    expect(nextProfile).toEqual(profileB)
+    expect(switchResult).toBe(SwitchProfileOutcome.Switched)
     // No server revocation for a session the caller has already invalidated.
     expect(mockLogout).toHaveBeenCalledWith({
       stateToDefault: false,
@@ -75,15 +87,15 @@ describe("useSwitchToNextProfile", () => {
   })
 
   it("still deactivates the old session when there is no next profile, but saves nothing", async () => {
-    mockGetSessionProfiles.mockResolvedValue([profileA])
+    storeProfiles([profileA])
 
     const { result } = renderHook(() => useSwitchToNextProfile())
-    let nextProfile
+    let switchResult
     await act(async () => {
-      nextProfile = await result.current.switchToNextProfile("tok-a")
+      switchResult = await result.current.switchToNextProfile("tok-a")
     })
 
-    expect(nextProfile).toBeUndefined()
+    expect(switchResult).toBe(SwitchProfileOutcome.NoOtherProfile)
     expect(mockLogout).toHaveBeenCalledWith({
       stateToDefault: false,
       token: "tok-a",
@@ -92,5 +104,44 @@ describe("useSwitchToNextProfile", () => {
     expect(mockSaveToken).not.toHaveBeenCalled()
     expect(mockNavigate).not.toHaveBeenCalled()
     expect(mockToastShow).not.toHaveBeenCalled()
+  })
+
+  // An unreadable store must never reach the caller as "no other profile":
+  // callers answer that with a full logout, which erases every saved session.
+  it("reports the store as unreadable instead of claiming there is no next profile", async () => {
+    mockReadSessionProfiles.mockResolvedValue({
+      status: "failed",
+      err: new Error("keystore locked"),
+    })
+
+    const { result } = renderHook(() => useSwitchToNextProfile())
+    let switchResult
+    await act(async () => {
+      switchResult = await result.current.switchToNextProfile("tok-a")
+    })
+
+    expect(switchResult).toBe(SwitchProfileOutcome.ProfilesUnreadable)
+    expect(mockReportError).toHaveBeenCalledTimes(1)
+    // The dead session still goes, scoped to its own token.
+    expect(mockLogout).toHaveBeenCalledWith({
+      stateToDefault: false,
+      token: "tok-a",
+      isValidToken: false,
+    })
+    expect(mockSaveToken).not.toHaveBeenCalled()
+    expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  it("treats an empty store as no next profile", async () => {
+    mockReadSessionProfiles.mockResolvedValue({ status: "absent" })
+
+    const { result } = renderHook(() => useSwitchToNextProfile())
+    let switchResult
+    await act(async () => {
+      switchResult = await result.current.switchToNextProfile("tok-a")
+    })
+
+    expect(switchResult).toBe(SwitchProfileOutcome.NoOtherProfile)
+    expect(mockSaveToken).not.toHaveBeenCalled()
   })
 })

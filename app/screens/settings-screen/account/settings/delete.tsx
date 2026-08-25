@@ -19,7 +19,10 @@ import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { useTheme, Text, makeStyles } from "@rn-vui/themed"
 
-import { useSwitchToNextProfile } from "@app/hooks/use-switch-to-next-profile"
+import {
+  SwitchProfileOutcome,
+  useSwitchToNextProfile,
+} from "@app/hooks/use-switch-to-next-profile"
 
 import { SettingsButton } from "../../button"
 import { useAccountDeleteContext } from "../account-delete-context"
@@ -134,16 +137,27 @@ export const Delete = () => {
       if (res.data?.accountDelete?.success) {
         setAccountIsBeingDeleted(false)
 
-        const nextProfile = await switchToNextProfile(accountToDeleteToken)
-        if (!nextProfile) {
-          await logout({ stateToDefault: true })
+        const outcome = await switchToNextProfile(accountToDeleteToken)
+        const hasSwitched = outcome === SwitchProfileOutcome.Switched
+        if (!hasSwitched) {
+          // The logout erases every saved session, which is only correct once
+          // we know there is none left. An unreadable store is ignorance, not
+          // that knowledge, so keep the list and sign out of everything else.
+          // Known cost: the same failed read left the deleted account in that
+          // list, so it can still be offered and will 401 once. Cheaper than
+          // erasing sessions that were only invisible.
+          const isStoreUnreadable = outcome === SwitchProfileOutcome.ProfilesUnreadable
+          await logout({
+            stateToDefault: true,
+            preserveStoredCredentials: isStoreUnreadable,
+          })
         }
 
         Alert.alert(LL.support.bye(), LL.support.deleteAccountConfirmation(), [
           {
             text: LL.common.ok(),
             onPress: () => {
-              if (!nextProfile) {
+              if (!hasSwitched) {
                 navigation.reset({
                   index: 0,
                   routes: [{ name: "getStarted" }],
