@@ -2191,7 +2191,7 @@
     },
     "ReceiveScreen": {
         "nfc": "NFC",
-        "enterAmountFirst": "Please enter an amount first",
+        "enterAmountFirst": "Merci de saisir d'abord un montant",
         "activateNotifications": "Souhaitez-vous activer les notifications pour être prévenu lorsque le paiement est bien parvenu ?",
         "copyClipboard": "La facture a été copiée dans le presse-papier",
         "copyClipboardBitcoin": "L’adresse Bitcoin a été copiée dans le presse-papier",
@@ -2237,7 +2237,7 @@
         "receiveViaPaycode": "Recevoir via un code de paiement",
         "receiveViaOnchain": "Recevoir via On-chain",
         "payCodeOrLNURL": "Code de paiement/ LNURL",
-        "cantReceiveZeroSats": "You can't receive zero sats. Please enter an amount corresponding to 1 or more sats.",
+        "cantReceiveZeroSats": "Vous ne pouvez pas recevoir zéro sat. Merci de saisir un montant correspondant à 1 sat ou plus.",
         "lightningAddress": "Adresse lightning",
         "lightningInvoice": "Facture lightning",
         "bitcoinOnchain": "Bitcoin onchain",
@@ -2270,7 +2270,7 @@
         "confirmOpenLink": "Êtes-vous sûr de vouloir ouvrir ce lien ?",
         "noQrCode": "Nous n’avons pas trouvé de code QR dans l’image",
         "title": "Scanner QR",
-        "permissionCamera": "We need permission to use your camera",
+        "permissionCamera": "Nous avons besoin de votre autorisation pour utiliser la caméra",
         "noCamera": "Aucune caméra trouvée",
         "openSettings": "Ouvrir les paramètres",
         "unableToOpenSettings": "Impossible d'ouvrir les paramètres",
@@ -2721,7 +2721,7 @@
             "invalidCharacter": "L’adresse ne peut contenir que des lettres, chiffres et des tirets.",
             "addressUnavailable": "Désolé, cette adresse est déjà utilisée",
             "unknownError": "Une erreur inconnue est survenue, merci d’essayer ultérieurement",
-            "backupRequired": "Back up your wallet before creating a Lightning address"
+            "backupRequired": "Sauvegardez votre portefeuille avant de créer une adresse Lightning"
         },
         "receiveMoney": "Recevoir de l’argent depuis d’autres portefeuilles Lightning et d’utilisateurs {bankName: string} avec cette adresse.",
         "itCannotBeChanged": "Ce ne sera plus possible de changer après"
@@ -3715,8 +3715,8 @@
         }
     },
     "BackupScreen": {
-        "title": "Back up your wallet",
-        "description": "Choose a backup method to secure your funds",
+        "title": "Sauvegardez votre portefeuille",
+        "description": "Choisissez une méthode de sauvegarde pour sécuriser vos fonds",
         "BackupMethod": {
             "title": "Choisissez votre méthode de sauvegarde",
             "subtitle": "Nous recommandons {provider} pour les nouveaux utilisateurs.",
@@ -3916,9 +3916,9 @@
     "ChooseExperienceScreen": {
         "title": "Sélectionnez le mode sans garde",
         "subtitle": "Votre choix détermine les fonctionnalités disponibles. Vous pouvez changer quand vous voulez.",
-        "enhancedLabel": "Enhanced\nMode",
+        "enhancedLabel": "Mode\nAmélioré",
         "enhancedDescription": "Nous utilisons votre région pour débloquer des services utiles disponibles là où vous êtes.",
-        "anonLabel": "Incognito\nMode",
+        "anonLabel": "Mode\nIncognito",
         "anonDescription": "Pour une confidentialité maximale. Moins de fonctionnalités.",
         "continueButton": "Continuer"
     },
@@ -3964,9 +3964,9 @@
         "secureMe": "Sécuriser le portefeuille"
     },
     "BackupRequired": {
-        "modalTitle": "Back up your wallet first",
-        "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
-        "backupNow": "Back up wallet"
+        "modalTitle": "Sauvegardez d'abord votre portefeuille",
+        "modalDescription": "Votre adresse Lightning est liée de façon permanente à ce portefeuille. Sauvegardez d'abord votre phrase de sauvegarde pour ne jamais perdre l'accès à votre adresse et à vos fonds.",
+        "backupNow": "Sauvegarder le portefeuille"
     },
     "NonCustodialInfoBulletin": {
         "title": "Ceci est un compte non-custodial",
