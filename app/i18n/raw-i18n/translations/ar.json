@@ -2500,7 +2500,7 @@
   "AccountScreen": {
     "fundsMoreThan5Dollars": "حسابك يحتوي على أكثر من 5$",
     "itsATrialAccount": "الحسابات التجريبية لها حدود معاملات مخفّضة ولا تتوفر بها وسيلة استرداد. إذا فقدت هاتفك أو حذفت التطبيق، ستكون أموالك غير قابلة للاسترداد.",
-    "accountBeingDeleted": "جارٍ حذف حسابك، يرجى الانتظار...",
+    "accountBeingDeleted": "جارٍ إغلاق حسابك، يرجى الانتظار...",
     "dangerZone": "منطقة الخطر",
     "phoneDeletedSuccessfully": "تم حذف رقم الهاتف بنجاح",
     "phoneNumber": "رقم الهاتف",
@@ -3035,17 +3035,17 @@
     "defaultEmailSubject": "{bankName: string} - مركز الدعم",
     "defaultSupportMessage": "مرحبا! أحتاج إلى بعض المساعدة في {bankName: string}، أنا أستخدم الإصدار {version: string} على {os: string}.",
     "emailCopied": "نُسخ عنوان البريد {email: string}  إلى الحافظة",
-    "deleteAccount": "Delete account",
+    "deleteAccount": "إغلاق الحساب",
     "delete": "delete",
-    "typeDelete": "Please type \"{delete: string}\" to confirm account deletion",
+    "typeDelete": "يرجى كتابة \"{delete: string}\" لتأكيد إغلاق الحساب",
     "finalConfirmationAccountDeletionTitle": "Final Confirmation Required",
-    "finalConfirmationAccountDeletionMessage": "Are you sure you want to delete your account? This action is irreversible.",
-    "deleteAccountBalanceWarning": "Deleting your account will cause you to lose access to your current balance. Are you sure you want to proceed?",
-    "deleteAccountConfirmation": "Your account has been written for deletion.\n\nWhen the probation period related to regulatory requirement is over, the remaining data related to your account will be permanently deleted.",
-    "deleteAccountFromPhone": "Hey there!, please delete my account. My phone number is {phoneNumber: string}.",
+    "finalConfirmationAccountDeletionMessage": "بعد الإغلاق، لن تتمكن من الوصول إلى حسابك أو استخدامه. قد نحتفظ ببعض السجلات وفقًا لما يقتضيه القانون والتزاماتنا المتعلقة بالاحتفاظ بالسجلات. هل أنت متأكد أنك تريد إغلاق حسابك؟",
+    "deleteAccountBalanceWarning": "سيؤدي إغلاق حسابك إلى فقدان الوصول إلى رصيدك الحالي. هل أنت متأكد أنك تريد المتابعة؟",
+    "deleteAccountConfirmation": "تم إغلاق حسابك.\n\nقد نحتفظ ببعض السجلات وفقًا لما يقتضيه القانون والتزاماتنا بالاحتفاظ بالسجلات.",
+    "deleteAccountFromPhone": "مرحبًا! يرجى إغلاق حسابي. رقم هاتفي هو {phoneNumber: string}.",
     "deleteAccountError": "Something went wrong. Contact {email: string} for further assistance.",
     "bye": "Bye!",
-    "deleteAccountWarning": "تنبيه: حذف الحساب نهائي!\nتأكد من أن المحافظ لا تحتوي على أموال قبل الحذف.\nلا يمكن استعادة الحساب المحذوف."
+    "deleteAccountWarning": "تنبيه: إغلاق الحساب نهائي!\nتأكد من أن المحافظ لا تحتوي على أموال قبل الإغلاق.\nلا يمكن استعادة الحساب المغلق.\nقد نحتفظ ببعض السجلات وفقًا لما يقتضيه القانون."
   },
   "lnurl": {
     "overLimit": "لا يمكنك إرسال مبلغ أكثر من الحد الأعلى",

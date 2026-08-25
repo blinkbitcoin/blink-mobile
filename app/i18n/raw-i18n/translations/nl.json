@@ -2500,7 +2500,7 @@
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Je account heeft meer dan $5",
     "itsATrialAccount": "Proefaccounts hebben lagere transactielimieten en geen herstelmethode. Als je je telefoon verliest of de app verwijdert, zijn je fondsen onherstelbaar.",
-    "accountBeingDeleted": "Je account wordt verwijderd, even geduld...",
+    "accountBeingDeleted": "Je account wordt gesloten, even geduld...",
     "dangerZone": "Gevarenzone",
     "phoneDeletedSuccessfully": "Telefoonnummer succesvol verwijderd",
     "phoneNumber": "Telefoonnummer",
@@ -3035,17 +3035,17 @@
     "defaultEmailSubject": "{bankName: string} - Klantenservice",
     "defaultSupportMessage": "Hallo daar! Ik heb hulp nodig met {bankName: string}, ik gebruik de versie {version: string} op {os: string}.",
     "emailCopied": "email {email: string} gekopieerd naar klembord",
-    "deleteAccount": "Account verwijderen",
+    "deleteAccount": "Account sluiten",
     "delete": "verwijderen",
-    "typeDelete": "Typ '{delete: string}' om de verwijdering van het account te bevestigen",
+    "typeDelete": "Typ '{delete: string}' om het sluiten van het account te bevestigen",
     "finalConfirmationAccountDeletionTitle": "Definitieve bevestiging vereist",
-    "finalConfirmationAccountDeletionMessage": "Weet u zeker dat u uw account wilt verwijderen? Deze actie is onomkeerbaar.",
-    "deleteAccountBalanceWarning": "Als u uw account verwijdert, verliest u de toegang tot uw huidige saldo. Weet je zeker dat je verder wilt gaan?",
-    "deleteAccountConfirmation": "Uw account is geschreven voor verwijdering.\n\nWanneer de proefperiode in verband met de wettelijke vereisten voorbij is, worden de resterende gegevens met betrekking tot uw account permanent verwijderd.",
-    "deleteAccountFromPhone": "Hallo daar!, verwijder alstublieft mijn account. Mijn telefoonnummer is {phoneNumber: string}.",
+    "finalConfirmationAccountDeletionMessage": "Na het sluiten heeft u geen toegang meer tot uw account en kunt u het niet meer gebruiken. Wij kunnen bepaalde gegevens bewaren voor zover dit wettelijk vereist is of voortvloeit uit onze bewaarplicht. Weet u zeker dat u uw account wilt sluiten?",
+    "deleteAccountBalanceWarning": "Als u uw account sluit, verliest u de toegang tot uw huidige saldo. Weet u zeker dat u verder wilt gaan?",
+    "deleteAccountConfirmation": "Uw account is gesloten.\n\nWij kunnen bepaalde gegevens bewaren voor zover dit wettelijk vereist is of voortvloeit uit onze bewaarplicht.",
+    "deleteAccountFromPhone": "Hallo daar!, sluit alstublieft mijn account. Mijn telefoonnummer is {phoneNumber: string}.",
     "deleteAccountError": "Er is iets fout gegaan. Neem contact op met {email: string} voor verdere hulp.",
     "bye": "Doei!",
-    "deleteAccountWarning": "Let op: accountverwijdering is permanent!\nZorg ervoor dat wallets geen fondsen bevatten voordat je verwijdert.\nEen verwijderd account kan niet worden hersteld."
+    "deleteAccountWarning": "Let op: het sluiten van het account is permanent!\nZorg ervoor dat wallets geen fondsen bevatten voordat u sluit.\nEen gesloten account kan niet worden hersteld.\nWij kunnen bepaalde gegevens bewaren als de wet dit vereist."
   },
   "lnurl": {
     "overLimit": "U kunt niet meer dan het maximale bedrag verzenden",

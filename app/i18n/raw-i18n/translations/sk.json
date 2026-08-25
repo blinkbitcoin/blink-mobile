@@ -2500,7 +2500,7 @@
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Váš účet má viac ako 5 USD",
     "itsATrialAccount": "Skúšobné účty majú znížené limity transakcií a nemajú žiadnu metódu obnovy. Ak stratíte telefón alebo odinštalujete aplikáciu, vaše prostriedky budú nenávratné.",
-    "accountBeingDeleted": "Váš účet sa odstraňuje, čakajte prosím...",
+    "accountBeingDeleted": "Váš účet sa zatvára, čakajte prosím...",
     "dangerZone": "Nebezpečná zóna",
     "phoneDeletedSuccessfully": "Telefón bol úspešne odstránený",
     "phoneNumber": "Telefónne číslo",
@@ -3035,17 +3035,17 @@
     "defaultEmailSubject": "{bankName: string} - Podpora",
     "defaultSupportMessage": "Dobrý deň! Potrebujem pomoc s {bankName: string}, používam verziu {version: string} na {os: string}.",
     "emailCopied": "e-mail {email: string} skopírovaný do schránky",
-    "deleteAccount": "Zmazať účet",
+    "deleteAccount": "Zatvoriť účet",
     "delete": "zmazať",
-    "typeDelete": "Zmazanie účtu potvrdíte zadaním \"{delete: string}\"",
+    "typeDelete": "Zatvorenie účtu potvrdíte zadaním \"{delete: string}\"",
     "finalConfirmationAccountDeletionTitle": "Vyžaduje sa konečné potvrdenie",
-    "finalConfirmationAccountDeletionMessage": "Naozaj chcete zmazať svoj účet? Táto akcia je nezvratná.",
-    "deleteAccountBalanceWarning": "Zmazaním účtu stratíte prístup k aktuálnemu zostatku. Ste si istí, že chcete pokračovať?",
-    "deleteAccountConfirmation": "Váš účet bol pridaný do zoznamu na zmazanie.\n\nPo uplynutí čakacej lehoty súvisiacej s regulačnými požiadavkami budú všetky údaje týkajúce sa vášho účtu trvalo vymazané.",
-    "deleteAccountFromPhone": "Dobrý deň!, prosím, zmažte môj účet. Moje telefónne číslo je {phoneNumber: string}.",
+    "finalConfirmationAccountDeletionMessage": "Po zatvorení nebudete mať prístup k svojmu účtu ani ho nebudete môcť používať. Niektoré záznamy môžeme uchovávať, ak to vyžaduje zákon a naše povinnosti uchovávania údajov. Naozaj chcete svoj účet zatvoriť?",
+    "deleteAccountBalanceWarning": "Zatvorením účtu stratíte prístup k aktuálnemu zostatku. Ste si istí, že chcete pokračovať?",
+    "deleteAccountConfirmation": "Váš účet bol zatvorený.\n\nNiektoré záznamy môžeme uchovávať, ak to vyžaduje zákon a naše povinnosti uchovávania údajov.",
+    "deleteAccountFromPhone": "Dobrý deň!, prosím, zatvorte môj účet. Moje telefónne číslo je {phoneNumber: string}.",
     "deleteAccountError": "Niečo sa pokazilo. Pre ďalšiu pomoc kontaktujte {email: string}",
     "bye": "Dovidenia!",
-    "deleteAccountWarning": "Pozor: Zmazanie účtu je trvalé!\nPred zmazaním sa uistite, že peňaženky nemajú žiadne prostriedky.\nZmazaný účet nie je možné obnoviť."
+    "deleteAccountWarning": "Pozor: Zatvorenie účtu je trvalé!\nPred zatvorením sa uistite, že peňaženky nemajú žiadne prostriedky.\nZatvorený účet nie je možné obnoviť.\nNiektoré záznamy môžeme uchovávať, ak to vyžaduje zákon."
   },
   "lnurl": {
     "overLimit": "Nemôžete poslať viac ako maximálnu sumu",

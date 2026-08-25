@@ -8162,7 +8162,7 @@ type RootTranslation = {
 		 */
 		itsATrialAccount: string
 		/**
-		 * Y​o​u​r​ ​a​c​c​o​u​n​t​ ​i​s​ ​b​e​i​n​g​ ​d​e​l​e​t​e​d​,​ ​p​l​e​a​s​e​ ​w​a​i​t​.​.​.
+		 * Y​o​u​r​ ​a​c​c​o​u​n​t​ ​i​s​ ​b​e​i​n​g​ ​c​l​o​s​e​d​,​ ​p​l​e​a​s​e​ ​w​a​i​t​.​.​.
 		 */
 		accountBeingDeleted: string
 		/**
@@ -10117,7 +10117,7 @@ type RootTranslation = {
 		 */
 		emailCopied: RequiredParams<'email'>
 		/**
-		 * D​e​l​e​t​e​ ​a​c​c​o​u​n​t
+		 * C​l​o​s​e​ ​a​c​c​o​u​n​t
 		 */
 		deleteAccount: string
 		/**
@@ -10125,7 +10125,7 @@ type RootTranslation = {
 		 */
 		'delete': string
 		/**
-		 * P​l​e​a​s​e​ ​t​y​p​e​ ​"​{​d​e​l​e​t​e​}​"​ ​t​o​ ​c​o​n​f​i​r​m​ ​a​c​c​o​u​n​t​ ​d​e​l​e​t​i​o​n
+		 * P​l​e​a​s​e​ ​t​y​p​e​ ​"​{​d​e​l​e​t​e​}​"​ ​t​o​ ​c​o​n​f​i​r​m​ ​a​c​c​o​u​n​t​ ​c​l​o​s​u​r​e
 		 * @param {string} delete
 		 */
 		typeDelete: RequiredParams<'delete'>
@@ -10134,21 +10134,21 @@ type RootTranslation = {
 		 */
 		finalConfirmationAccountDeletionTitle: string
 		/**
-		 * A​r​e​ ​y​o​u​ ​s​u​r​e​ ​y​o​u​ ​w​a​n​t​ ​t​o​ ​d​e​l​e​t​e​ ​y​o​u​r​ ​a​c​c​o​u​n​t​?​ ​T​h​i​s​ ​a​c​t​i​o​n​ ​i​s​ ​i​r​r​e​v​e​r​s​i​b​l​e​.
+		 * A​f​t​e​r​ ​c​l​o​s​i​n​g​,​ ​y​o​u​ ​w​o​n​'​t​ ​b​e​ ​a​b​l​e​ ​t​o​ ​a​c​c​e​s​s​ ​o​r​ ​u​s​e​ ​y​o​u​r​ ​a​c​c​o​u​n​t​.​ ​W​e​ ​m​a​y​ ​r​e​t​a​i​n​ ​c​e​r​t​a​i​n​ ​r​e​c​o​r​d​s​ ​a​s​ ​r​e​q​u​i​r​e​d​ ​b​y​ ​l​a​w​ ​a​n​d​ ​o​u​r​ ​r​e​t​e​n​t​i​o​n​ ​o​b​l​i​g​a​t​i​o​n​s​.​ ​A​r​e​ ​y​o​u​ ​s​u​r​e​ ​y​o​u​ ​w​a​n​t​ ​t​o​ ​c​l​o​s​e​ ​y​o​u​r​ ​a​c​c​o​u​n​t​?
 		 */
 		finalConfirmationAccountDeletionMessage: string
 		/**
-		 * D​e​l​e​t​i​n​g​ ​y​o​u​r​ ​a​c​c​o​u​n​t​ ​w​i​l​l​ ​c​a​u​s​e​ ​y​o​u​ ​t​o​ ​l​o​s​e​ ​a​c​c​e​s​s​ ​t​o​ ​y​o​u​r​ ​c​u​r​r​e​n​t​ ​b​a​l​a​n​c​e​.​ ​A​r​e​ ​y​o​u​ ​s​u​r​e​ ​y​o​u​ ​w​a​n​t​ ​t​o​ ​p​r​o​c​e​e​d​?
+		 * C​l​o​s​i​n​g​ ​y​o​u​r​ ​a​c​c​o​u​n​t​ ​w​i​l​l​ ​c​a​u​s​e​ ​y​o​u​ ​t​o​ ​l​o​s​e​ ​a​c​c​e​s​s​ ​t​o​ ​y​o​u​r​ ​c​u​r​r​e​n​t​ ​b​a​l​a​n​c​e​.​ ​A​r​e​ ​y​o​u​ ​s​u​r​e​ ​y​o​u​ ​w​a​n​t​ ​t​o​ ​p​r​o​c​e​e​d​?
 		 */
 		deleteAccountBalanceWarning: string
 		/**
-		 * Y​o​u​r​ ​a​c​c​o​u​n​t​ ​h​a​s​ ​b​e​e​n​ ​w​r​i​t​t​e​n​ ​f​o​r​ ​d​e​l​e​t​i​o​n​.​
+		 * Y​o​u​r​ ​a​c​c​o​u​n​t​ ​h​a​s​ ​b​e​e​n​ ​c​l​o​s​e​d​.​
 	​
-	​W​h​e​n​ ​t​h​e​ ​p​r​o​b​a​t​i​o​n​ ​p​e​r​i​o​d​ ​r​e​l​a​t​e​d​ ​t​o​ ​r​e​g​u​l​a​t​o​r​y​ ​r​e​q​u​i​r​e​m​e​n​t​ ​i​s​ ​o​v​e​r​,​ ​t​h​e​ ​r​e​m​a​i​n​i​n​g​ ​d​a​t​a​ ​r​e​l​a​t​e​d​ ​t​o​ ​y​o​u​r​ ​a​c​c​o​u​n​t​ ​w​i​l​l​ ​b​e​ ​p​e​r​m​a​n​e​n​t​l​y​ ​d​e​l​e​t​e​d​.
+	​W​e​ ​m​a​y​ ​r​e​t​a​i​n​ ​c​e​r​t​a​i​n​ ​r​e​c​o​r​d​s​ ​a​s​ ​r​e​q​u​i​r​e​d​ ​b​y​ ​l​a​w​ ​a​n​d​ ​o​u​r​ ​r​e​t​e​n​t​i​o​n​ ​o​b​l​i​g​a​t​i​o​n​s​.
 		 */
 		deleteAccountConfirmation: string
 		/**
-		 * H​e​y​ ​t​h​e​r​e​!​,​ ​p​l​e​a​s​e​ ​d​e​l​e​t​e​ ​m​y​ ​a​c​c​o​u​n​t​.​ ​M​y​ ​p​h​o​n​e​ ​n​u​m​b​e​r​ ​i​s​ ​{​p​h​o​n​e​N​u​m​b​e​r​}​.
+		 * H​e​y​ ​t​h​e​r​e​!​,​ ​p​l​e​a​s​e​ ​c​l​o​s​e​ ​m​y​ ​a​c​c​o​u​n​t​.​ ​M​y​ ​p​h​o​n​e​ ​n​u​m​b​e​r​ ​i​s​ ​{​p​h​o​n​e​N​u​m​b​e​r​}​.
 		 * @param {string} phoneNumber
 		 */
 		deleteAccountFromPhone: RequiredParams<'phoneNumber'>
@@ -10162,9 +10162,10 @@ type RootTranslation = {
 		 */
 		bye: string
 		/**
-		 * A​t​t​e​n​t​i​o​n​:​ ​A​c​c​o​u​n​t​ ​d​e​l​e​t​i​o​n​ ​i​s​ ​p​e​r​m​a​n​e​n​t​!​
-	​M​a​k​e​ ​s​u​r​e​ ​w​a​l​l​e​t​s​ ​h​a​v​e​ ​n​o​ ​f​u​n​d​s​ ​b​e​f​o​r​e​ ​d​e​l​e​t​i​n​g​.​
-	​D​e​l​e​t​e​d​ ​a​c​c​o​u​n​t​ ​c​a​n​n​o​t​ ​b​e​ ​r​e​i​n​s​t​a​t​e​d​.
+		 * A​t​t​e​n​t​i​o​n​:​ ​C​l​o​s​i​n​g​ ​y​o​u​r​ ​a​c​c​o​u​n​t​ ​i​s​ ​p​e​r​m​a​n​e​n​t​!​
+	​M​a​k​e​ ​s​u​r​e​ ​w​a​l​l​e​t​s​ ​h​a​v​e​ ​n​o​ ​f​u​n​d​s​ ​b​e​f​o​r​e​ ​c​l​o​s​i​n​g​.​
+	​A​ ​c​l​o​s​e​d​ ​a​c​c​o​u​n​t​ ​c​a​n​n​o​t​ ​b​e​ ​r​e​i​n​s​t​a​t​e​d​.​
+	​W​e​ ​m​a​y​ ​r​e​t​a​i​n​ ​c​e​r​t​a​i​n​ ​r​e​c​o​r​d​s​ ​a​s​ ​r​e​q​u​i​r​e​d​ ​b​y​ ​l​a​w​.
 		 */
 		deleteAccountWarning: string
 	}
@@ -21704,7 +21705,7 @@ export type TranslationFunctions = {
 		 */
 		itsATrialAccount: () => LocalizedString
 		/**
-		 * Your account is being deleted, please wait...
+		 * Your account is being closed, please wait...
 		 */
 		accountBeingDeleted: () => LocalizedString
 		/**
@@ -23612,7 +23613,7 @@ export type TranslationFunctions = {
 		 */
 		emailCopied: (arg: { email: string }) => LocalizedString
 		/**
-		 * Delete account
+		 * Close account
 		 */
 		deleteAccount: () => LocalizedString
 		/**
@@ -23620,7 +23621,7 @@ export type TranslationFunctions = {
 		 */
 		'delete': () => LocalizedString
 		/**
-		 * Please type "{delete}" to confirm account deletion
+		 * Please type "{delete}" to confirm account closure
 		 */
 		typeDelete: (arg: { delete: string }) => LocalizedString
 		/**
@@ -23628,21 +23629,21 @@ export type TranslationFunctions = {
 		 */
 		finalConfirmationAccountDeletionTitle: () => LocalizedString
 		/**
-		 * Are you sure you want to delete your account? This action is irreversible.
+		 * After closing, you won't be able to access or use your account. We may retain certain records as required by law and our retention obligations. Are you sure you want to close your account?
 		 */
 		finalConfirmationAccountDeletionMessage: () => LocalizedString
 		/**
-		 * Deleting your account will cause you to lose access to your current balance. Are you sure you want to proceed?
+		 * Closing your account will cause you to lose access to your current balance. Are you sure you want to proceed?
 		 */
 		deleteAccountBalanceWarning: () => LocalizedString
 		/**
-		 * Your account has been written for deletion.
+		 * Your account has been closed.
 
-	When the probation period related to regulatory requirement is over, the remaining data related to your account will be permanently deleted.
+	We may retain certain records as required by law and our retention obligations.
 		 */
 		deleteAccountConfirmation: () => LocalizedString
 		/**
-		 * Hey there!, please delete my account. My phone number is {phoneNumber}.
+		 * Hey there!, please close my account. My phone number is {phoneNumber}.
 		 */
 		deleteAccountFromPhone: (arg: { phoneNumber: string }) => LocalizedString
 		/**
@@ -23654,9 +23655,10 @@ export type TranslationFunctions = {
 		 */
 		bye: () => LocalizedString
 		/**
-		 * Attention: Account deletion is permanent!
-	Make sure wallets have no funds before deleting.
-	Deleted account cannot be reinstated.
+		 * Attention: Closing your account is permanent!
+	Make sure wallets have no funds before closing.
+	A closed account cannot be reinstated.
+	We may retain certain records as required by law.
 		 */
 		deleteAccountWarning: () => LocalizedString
 	}

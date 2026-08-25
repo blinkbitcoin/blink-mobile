@@ -2500,7 +2500,7 @@
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Akawunti yo erina omuwendo ogusoba mu $5",
     "itsATrialAccount": "Akawunti z'okugezesa zikendeezezza ku nkola y'okutunda era tewali ngeri ya kuzzaawo. Bw'ofiirwa essimu yo oba okuggyawo app, ssente zo zijja kuba tezisobola kufunibwa.",
-    "accountBeingDeleted": "Akawunti yo eri mu kusazibwaamu, tukusaba olinde...",
+    "accountBeingDeleted": "Akawunti yo eri mu kugaazibwawo, tukusaba olinde...",
     "dangerZone": "Ekitundu Eky'akabi",
     "phoneDeletedSuccessfully": "Essimu eggyiddwaawo bulungi",
     "phoneNumber": "Ennamba Y'essimu",
@@ -3035,17 +3035,17 @@
     "defaultEmailSubject": "{bankName: string} - Okuwagira",
     "defaultSupportMessage": "Ab'eyo! Nze nneetaaga obuyambi ku {bankName: string}, nkozesa enkyusa {type: string} ku {os: string}.",
     "emailCopied": "email {email: string} ekoppedwa ku clipboard",
-    "deleteAccount": "Sazaamu akawunti",
+    "deleteAccount": "Ggalawo akawunti",
     "delete": "siimuula",
-    "typeDelete": "Tukusaba wandiika \"{delete: string}\" okukakasa okuggyawo kwa akawunti",
+    "typeDelete": "Wandika \"{delete: string}\" okukakasa okuggalawo akawunti",
     "finalConfirmationAccountDeletionTitle": "Okukakasa Okusembayo Kwetaagisa",
-    "finalConfirmationAccountDeletionMessage": "Kakasa nti oyagala kusazaamu akawunti yo? Ekikolwa kino tekikyuka.",
-    "deleteAccountBalanceWarning": "Okusazaamu akawunti yo kijja kukuleetera okufiirwa bbalansi gw’olina kati. Kakasa nti oyagala kugenda mu maaso?",
-    "deleteAccountConfirmation": "Akawunti yo ewandiikiddwa okusazibwamu.\n\nEkiseera ky’okugezesebwa ekikwatagana n’obwetaavu bw’okulungamya bwe kinaaba kiwedde, eby'okunoonyereza ebigaddewo ebikwata ku akawunti yo bijja kusazibwamu enkalakkalira.",
-    "deleteAccountFromPhone": "Abeeyo!, nsaba osazeemu akawunti yange. Ennamba yange ey'essimu ye {phoneNumber: string}.",
+    "finalConfirmationAccountDeletionMessage": "Oluvanyuma lw'okuggalawo, tojjakuba na kufuna akawunti yo wadde okugikozesa. Tuyinza kukuuma ebiwandiiko ebimu nga amateeka n'obuvunaanyizibwa bwaffe mu kukuuma ebiwandiiko bwe bitawaana. Okakasa nti oyagala okuggalawo akawunti yo?",
+    "deleteAccountBalanceWarning": "Okuggalawo akawunti yo kujjakukufiirwa okufuna ssente zo ez'omu kaseera kano. Okakasa nti oyagala okweyongerayo?",
+    "deleteAccountConfirmation": "Akawunti yo egaaziddwawo.\n\nTuyinza kukuuma ebiwandiiko ebimu nga amateeka n'obuvunaanyizibwa bwaffe mu kukuuma ebiwandiiko bwe bitawaana.",
+    "deleteAccountFromPhone": "Nkulamusizza! Nkusaba oggalawo akawunti yange. Ennamba yange ey'essimu ye {phoneNumber: string}.",
     "deleteAccountError": "Waliwo ekitatambudde bulungi. Tukirira {email: string} okufuna obuyambi.",
     "bye": "Tweelaba!",
-    "deleteAccountWarning": "Weetegereze: Okusazaamu akawunti tekukyusika!\nKakasa nti waleti zo tezirina ssente nga tonnasazaamu.\nAkawunti eyasaziddwaamu tesobola kuddizibwa."
+    "deleteAccountWarning": "Kulabula: Okuggalawo akawunti kwa lubeerera!\nKakasa nti walooti tezirina ssente nga tonnaggalawo.\nAkawunti egaaziddwawo teyinza kuddizibwa.\nTuyinza kukuuma ebiwandiiko ebimu nga amateeka bwe galagira."
   },
   "lnurl": {
     "overLimit": "Tosobola kusindika ssente ezisukka mu muwendo ogusinga obunene",

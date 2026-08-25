@@ -2500,7 +2500,7 @@
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Akun Anda memiliki lebih dari $5",
     "itsATrialAccount": "Akun percobaan memiliki batas transaksi yang lebih rendah dan tidak ada metode pemulihan. Jika Anda kehilangan ponsel atau menghapus aplikasi, dana Anda tidak dapat dipulihkan.",
-    "accountBeingDeleted": "Akun Anda sedang dihapus, harap tunggu...",
+    "accountBeingDeleted": "Akun Anda sedang ditutup, harap tunggu...",
     "dangerZone": "Zona Berbahaya",
     "phoneDeletedSuccessfully": "Nomor telepon berhasil dihapus",
     "phoneNumber": "Nomor Telepon",
@@ -3035,17 +3035,17 @@
     "defaultEmailSubject": "{bankName: string} - Dukungan",
     "defaultSupportMessage": "Halo! Saya membutuhkan bantuan dengan {bankName: string}, saya menggunakan versi {version: string} pada {os: string}.",
     "emailCopied": "email {email: string} disalin ke clipboard",
-    "deleteAccount": "Hapus akun",
+    "deleteAccount": "Tutup akun",
     "delete": "hapus",
-    "typeDelete": "Ketik \"{delete: string}\" untuk mengonfirmasi penghapusan akun",
+    "typeDelete": "Silakan ketik \"{delete: string}\" untuk mengonfirmasi penutupan akun",
     "finalConfirmationAccountDeletionTitle": "Konfirmasi Akhir Diperlukan",
-    "finalConfirmationAccountDeletionMessage": "Apakah Anda yakin ingin menghapus akun Anda? Tindakan ini tidak dapat dibatalkan.",
-    "deleteAccountBalanceWarning": "Menghapus akun Anda akan menyebabkan Anda kehilangan akses ke saldo Anda saat ini. Apakah Anda yakin ingin melanjutkan?",
-    "deleteAccountConfirmation": "Akun Anda telah diatur untuk dihapus.\n\nSetelah masa percobaan terkait persyaratan regulasi selesai, data yang tersisa terkait akun Anda akan dihapus secara permanen.",
-    "deleteAccountFromPhone": "Hai! Silakan hapus akun saya. Nomor telepon saya adalah {phoneNumber: string}.",
+    "finalConfirmationAccountDeletionMessage": "Setelah ditutup, Anda tidak akan dapat mengakses atau menggunakan akun Anda. Kami dapat menyimpan catatan tertentu sebagaimana diwajibkan oleh hukum dan kewajiban penyimpanan kami. Apakah Anda yakin ingin menutup akun Anda?",
+    "deleteAccountBalanceWarning": "Menutup akun Anda akan menyebabkan Anda kehilangan akses ke saldo Anda saat ini. Apakah Anda yakin ingin melanjutkan?",
+    "deleteAccountConfirmation": "Akun Anda telah ditutup.\n\nKami dapat menyimpan catatan tertentu sebagaimana diwajibkan oleh hukum dan kewajiban penyimpanan kami.",
+    "deleteAccountFromPhone": "Halo!, tolong tutup akun saya. Nomor telepon saya adalah {phoneNumber: string}.",
     "deleteAccountError": "Terjadi kesalahan. Hubungi {email: string} untuk bantuan lebih lanjut.",
     "bye": "Selamat tinggal!",
-    "deleteAccountWarning": "Perhatian: Penghapusan akun bersifat permanen!\nPastikan dompet tidak memiliki dana sebelum menghapus.\nAkun yang dihapus tidak dapat dipulihkan."
+    "deleteAccountWarning": "Perhatian: Penutupan akun bersifat permanen!\nPastikan dompet tidak memiliki dana sebelum menutup.\nAkun yang ditutup tidak dapat dipulihkan.\nKami dapat menyimpan catatan tertentu sebagaimana diwajibkan oleh hukum."
   },
   "lnurl": {
     "overLimit": "Anda tidak dapat mengirim lebih dari jumlah maksimum.",

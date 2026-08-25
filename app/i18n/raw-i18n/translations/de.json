@@ -2500,7 +2500,7 @@
     "AccountScreen": {
         "fundsMoreThan5Dollars": "Ihr Konto hat mehr als $5",
         "itsATrialAccount": "Testkonten haben reduzierte Transaktionslimits und keine Wiederherstellungsmethode. Wenn Sie Ihr Telefon verlieren oder die App deinstallieren, können Sie Ihr Guthaben nicht wiederherstellen.",
-        "accountBeingDeleted": "Ihr Konto wird gelöscht, bitte warten Sie...",
+        "accountBeingDeleted": "Ihr Konto wird geschlossen, bitte warten Sie...",
         "dangerZone": "Gefahrenzone",
         "phoneDeletedSuccessfully": "Telefonnummer erfolgreich gelöscht",
         "phoneNumber": "Telefonnummer",
@@ -3035,17 +3035,17 @@
         "defaultEmailSubject": "{bankName: string} - Support",
         "defaultSupportMessage": "Hey! Ich brauche Hilfe mit {bankName: string}, ich benutze Version {version: string} auf {os: string}.",
         "emailCopied": "E-Mail {email: string} in Zwischenablage kopiert",
-        "deleteAccount": "Account löschen",
+        "deleteAccount": "Account schließen",
         "delete": "Löschen",
-        "typeDelete": "Bitte gib \"{delete: string}\" ein, um die Löschung deines Accounts zu bestätigen",
+        "typeDelete": "Bitte gib \"{delete: string}\" ein, um die Schließung deines Accounts zu bestätigen",
         "finalConfirmationAccountDeletionTitle": "Erneute Bestätigung erforderlich",
-        "finalConfirmationAccountDeletionMessage": "Bist du sicher, dass du deinen Account löschen willst? Dieser Vorgang kann nicht rückgängig gemacht werden.",
-        "deleteAccountBalanceWarning": "Wenn du deinen Account löschst, kannst du nicht mehr über dein Konto verfügen. Bist du sicher, dass du fortfahren willst?",
-        "deleteAccountConfirmation": "Dein Account wurde für die Löschung vorgemerkt.\n\nWenn die gesetzliche Übergangsfrist abgelaufen ist, werden alle deine verbleibenden Daten dauerhaft gelöscht.",
-        "deleteAccountFromPhone": "Hey, bitte löscht meinen Account. Meine Telefonnummer ist {phoneNumber: string}.",
+        "finalConfirmationAccountDeletionMessage": "Nach der Schließung kannst du nicht mehr auf deinen Account zugreifen oder ihn nutzen. Wir können bestimmte Daten aufbewahren, soweit dies gesetzlich vorgeschrieben ist oder unseren Aufbewahrungspflichten entspricht. Bist du sicher, dass du deinen Account schließen willst?",
+        "deleteAccountBalanceWarning": "Wenn du deinen Account schließt, verlierst du den Zugriff auf dein aktuelles Guthaben. Bist du sicher, dass du fortfahren willst?",
+        "deleteAccountConfirmation": "Dein Account wurde geschlossen.\n\nWir können bestimmte Daten aufbewahren, soweit dies gesetzlich vorgeschrieben ist oder unseren Aufbewahrungspflichten entspricht.",
+        "deleteAccountFromPhone": "Hey, bitte schließt meinen Account. Meine Telefonnummer ist {phoneNumber: string}.",
         "deleteAccountError": "Etwas ist schief gelaufen. Bitte kontaktiere {email: string}, um weitere Hilfe zu erhalten.",
         "bye": "Auf Wiedersehen!",
-        "deleteAccountWarning": "Achtung: Die Kontolöschung ist endgültig!\nStelle sicher, dass die Wallets kein Guthaben mehr haben, bevor du löschst.\nEin gelöschtes Konto kann nicht wiederhergestellt werden."
+        "deleteAccountWarning": "Achtung: Die Schließung des Accounts ist endgültig!\nStelle sicher, dass die Wallets kein Guthaben mehr haben, bevor du schließt.\nEin geschlossener Account kann nicht wiederhergestellt werden.\nWir können bestimmte Daten gesetzlich bedingt aufbewahren."
     },
     "lnurl": {
         "overLimit": "Du kannst nicht mehr als den Maximalbetrag senden",
