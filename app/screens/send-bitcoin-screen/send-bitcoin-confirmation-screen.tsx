@@ -510,26 +510,34 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
                 onLayout={onPillLayout(sendingWalletDescriptor.currency)}
               />
             </View>
-            <View style={styles.walletSelectorInfoContainer}>
-              <View style={styles.walletSelectorTypeTextContainer}>
-                {hideAmount ? (
-                  <HiddenBalancePlaceholder size="small" />
-                ) : sendingWalletDescriptor.currency === WalletCurrency.Btc ? (
-                  <Text style={styles.walletCurrencyText}>{btcPrimaryText}</Text>
-                ) : (
-                  <Text style={styles.walletCurrencyText}>{usdPrimaryText}</Text>
-                )}
-              </View>
-              {!hideAmount && (
-                <View style={styles.walletSelectorBalanceContainer}>
-                  {sendingWalletDescriptor.currency === WalletCurrency.Btc ? (
-                    <Text>{btcSecondaryText}</Text>
-                  ) : (
-                    <Text>{usdSecondaryText}</Text>
-                  )}
-                </View>
+            <View
+              style={
+                hideAmount
+                  ? styles.walletSelectorInfoContainerHidden
+                  : styles.walletSelectorInfoContainer
+              }
+            >
+              {hideAmount ? (
+                <HiddenBalancePlaceholder size="small" />
+              ) : (
+                <>
+                  <View style={styles.walletSelectorTypeTextContainer}>
+                    {sendingWalletDescriptor.currency === WalletCurrency.Btc ? (
+                      <Text style={styles.walletCurrencyText}>{btcPrimaryText}</Text>
+                    ) : (
+                      <Text style={styles.walletCurrencyText}>{usdPrimaryText}</Text>
+                    )}
+                  </View>
+                  <View style={styles.walletSelectorBalanceContainer}>
+                    {sendingWalletDescriptor.currency === WalletCurrency.Btc ? (
+                      <Text>{btcSecondaryText}</Text>
+                    ) : (
+                      <Text>{usdSecondaryText}</Text>
+                    )}
+                  </View>
+                  <View />
+                </>
               )}
-              <View />
             </View>
           </View>
         </View>
@@ -668,6 +676,13 @@ const useStyles = makeStyles(({ colors }) => ({
   walletSelectorInfoContainer: {
     flex: 1,
     flexDirection: "column",
+  },
+  // The placeholder is a single 12pt row, so it cannot reuse the two-line
+  // layout above: walletSelectorTypeTextContainer is flex-end, which pins a
+  // lone child to the bottom of the column and drops it below the pill.
+  walletSelectorInfoContainerHidden: {
+    flex: 1,
+    justifyContent: "center",
   },
   walletSelectorTypeTextContainer: {
     flex: 1,
