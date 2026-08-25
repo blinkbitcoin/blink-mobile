@@ -2162,14 +2162,11 @@
   },
   "PinScreen": {
     "attemptsRemaining": "PIN incorrecte. Queden {attemptsRemaining: string} intents.",
-    "lockoutUnavailable": "No s'ha pogut registrar l'intent fallit de manera segura. Tancant la sessió.",
     "oneAttemptRemaining": "PIN incorrecte. Queda 1 intent.",
-    "pinUnreadable": "No s'ha pogut comprovar el PIN. Torna-ho a provar.",
     "setPin": "Configura el teu codi PIN",
     "setPinFailedMatch": "Els Pins no coincideixen - Estableix el teu codi PIN",
     "storePinFailed": "No es pot desar el teu pin.",
     "tooManyAttempts": "Massa intents fallits. Tancant la sessió.",
-    "tryAgainIn": "Torna-ho a provar d'aquí a {seconds: number} s.",
     "verifyPin": "Verifica el teu codi PIN"
   },
   "PriceHistoryScreen": {

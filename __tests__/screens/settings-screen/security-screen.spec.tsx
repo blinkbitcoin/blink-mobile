@@ -18,8 +18,6 @@ const mockSettingsData = jest.fn()
 const mockUseFocusEffect = jest.fn()
 const mockGetIsBiometricsEnabled = jest.fn()
 const mockGetIsPinEnabled = jest.fn()
-const mockRemovePin = jest.fn()
-const mockClearPinFailureState = jest.fn()
 const mockEmailDelete = jest.fn()
 const mockRegistrationInitiate = jest.fn()
 const mockUpdateState = jest.fn()
@@ -86,8 +84,6 @@ jest.mock("@app/utils/storage/secureStorage", () => ({
   default: {
     getIsBiometricsEnabled: () => mockGetIsBiometricsEnabled(),
     getIsPinEnabled: () => mockGetIsPinEnabled(),
-    removePin: () => mockRemovePin(),
-    clearPinFailureState: () => mockClearPinFailureState(),
   },
 }))
 
@@ -210,8 +206,6 @@ const applyDefaultMocks = () => {
   })
   mockGetIsBiometricsEnabled.mockResolvedValue(false)
   mockGetIsPinEnabled.mockResolvedValue(false)
-  mockRemovePin.mockResolvedValue(true)
-  mockClearPinFailureState.mockResolvedValue(true)
   mockEmailDelete.mockResolvedValue({ data: {} })
   mockRegistrationInitiate.mockResolvedValue({
     data: {
@@ -459,44 +453,5 @@ describe("SecurityScreen — always hide balance", () => {
       expect.objectContaining({ alwaysHideBalance: false }),
     )
     expect(hideBalanceChecked(getByTestId("always-hide-balance-switch"))).toBe(false)
-  })
-})
-
-describe("SecurityScreen — turning the PIN off", () => {
-  beforeEach(applyDefaultMocks)
-
-  const renderWithPinOn = async () => {
-    mockGetIsPinEnabled.mockResolvedValue(true)
-    const rendered = renderScreen()
-
-    await act(async () => {
-      focusCallbacks().forEach((callback) => callback())
-    })
-
-    return rendered
-  }
-
-  it("clears the lockout along with the PIN", async () => {
-    // Otherwise a lock outlives the PIN that produced it and greets the next
-    // PIN the user sets.
-    const { getByTestId } = await renderWithPinOn()
-
-    await act(async () => {
-      fireEvent(getByTestId("pin-switch"), "pressIn")
-    })
-
-    expect(mockRemovePin).toHaveBeenCalledTimes(1)
-    expect(mockClearPinFailureState).toHaveBeenCalledTimes(1)
-  })
-
-  it("leaves the lockout in place when the PIN itself could not be removed", async () => {
-    mockRemovePin.mockResolvedValue(false)
-    const { getByTestId } = await renderWithPinOn()
-
-    await act(async () => {
-      fireEvent(getByTestId("pin-switch"), "pressIn")
-    })
-
-    expect(mockClearPinFailureState).not.toHaveBeenCalled()
   })
 })

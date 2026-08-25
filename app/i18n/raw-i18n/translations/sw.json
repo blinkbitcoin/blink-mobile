@@ -2162,14 +2162,11 @@
   },
   "PinScreen": {
     "attemptsRemaining": "Pini sahihi. {attemptsRemaining: number} yamesalia.",
-    "lockoutUnavailable": "Imeshindwa kurekodi jaribio lililokosa kwa usalama. Kutoka nje ya programu.",
     "oneAttemptRemaining": "Pini si sahihi. Jaribio 1 limesalia.",
-    "pinUnreadable": "Imeshindwa kuangalia pini yako. Tafadhali jaribu tena.",
     "setPin": "Andikisha pini yako",
     "setPinFailedMatch": "Pini hazikulingana - Andikisha Pini yako.",
     "storePinFailed": "Imeshindwa kuhifadhi pini yako.",
     "tooManyAttempts": "Majaribio mengi sana yaliyokosa. Kutoka nje ya programu.",
-    "tryAgainIn": "Jaribu tena baada ya sekunde {seconds: number}.",
     "verifyPin": "Thibitisha nambari yako ya pini"
   },
   "PriceHistoryScreen": {
