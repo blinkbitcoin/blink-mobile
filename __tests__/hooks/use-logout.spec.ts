@@ -98,6 +98,25 @@ describe("useLogout", () => {
     expect(mockResetState).toHaveBeenCalledTimes(1)
   })
 
+  it("preserves the PIN when the caller asks to (a lockout-triggered logout)", async () => {
+    // A logout forced by exhausting PIN attempts must not delete the very
+    // lock it is enforcing: getIsPinEnabled() is just "is a PIN stored", so
+    // removing it here would leave the next screen ungated. Everything else
+    // "logout" wipes (session, biometrics, device state) still applies.
+    const { result } = renderHook(() => useLogout())
+
+    await act(async () => {
+      await result.current.logout({ preservePin: true })
+    })
+
+    expect(mockRemovePin).not.toHaveBeenCalled()
+    expect(mockRemoveIsBiometricsEnabled).toHaveBeenCalledTimes(1)
+    expect(mockRemovePinAttempts).toHaveBeenCalledTimes(1)
+    expect(mockRemoveSessionProfiles).toHaveBeenCalledTimes(1)
+    expect(mockClearToken).toHaveBeenCalledTimes(1)
+    expect(mockResetState).toHaveBeenCalledTimes(1)
+  })
+
   it("profile logout (explicit token) removes only that profile, not the active keychain token", async () => {
     mockGetActiveToken.mockResolvedValue("current-session-token")
     const { result } = renderHook(() => useLogout())

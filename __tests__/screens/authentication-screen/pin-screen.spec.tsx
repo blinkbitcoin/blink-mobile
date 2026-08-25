@@ -13,6 +13,8 @@ import { flushEffects } from "../../helpers/flush-effects"
 const mockReset = jest.fn()
 const mockGoBack = jest.fn()
 const mockSetAppUnlocked = jest.fn()
+const mockLogout = jest.fn()
+const mockGetPinAttemptsOrZero = jest.fn().mockResolvedValue(0)
 
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
@@ -25,20 +27,22 @@ jest.mock("@app/navigation/navigation-container-wrapper", () => ({
 
 jest.mock("@app/hooks/use-logout", () => ({
   __esModule: true,
-  default: () => ({ logout: jest.fn() }),
+  default: () => ({ logout: mockLogout }),
 }))
 
 jest.mock("@app/utils/storage/secureStorage", () => ({
   __esModule: true,
   default: {
     getPinOrEmptyString: jest.fn().mockResolvedValue("1234"),
-    getPinAttemptsOrZero: jest.fn().mockResolvedValue(0),
+    getPinAttemptsOrZero: () => mockGetPinAttemptsOrZero(),
     resetPinAttempts: jest.fn(),
     setPinAttempts: jest.fn(),
     /** Read by the account registry the screen renders under. */
     getSessionProfiles: jest.fn().mockResolvedValue([]),
   },
 }))
+
+jest.mock("@app/utils/sleep", () => ({ sleep: jest.fn().mockResolvedValue(undefined) }))
 
 const CORRECT_PIN = "1234"
 const WRONG_PIN = "9999"
@@ -162,5 +166,38 @@ describe("PinScreen", () => {
     expect(mockSetAppUnlocked).not.toHaveBeenCalled()
     expect(mockGoBack).not.toHaveBeenCalled()
     expect(mockReset).not.toHaveBeenCalled()
+  })
+
+  describe("exhausting the attempt budget", () => {
+    it("logs out without deleting the PIN, so the attacker lands back on a gate, not Home", async () => {
+      // Regression for the multi-account/anon-wallet bypass: a bare logout()
+      // call here deletes the PIN, which is the only thing gating re-entry
+      // (getIsPinEnabled() is just "is a PIN stored"). A third wrong guess
+      // must never resolve onto Primary directly.
+      mockGetPinAttemptsOrZero.mockResolvedValue(2)
+      renderScreen(false)
+      await flushEffects()
+
+      await enterPin(WRONG_PIN)
+
+      expect(mockLogout).toHaveBeenCalledWith({ preservePin: true })
+      expect(mockReset).not.toHaveBeenCalledWith({
+        index: 0,
+        routes: [{ name: "Primary" }],
+      })
+    })
+
+    it("routes back through the authentication gate instead of Primary", async () => {
+      mockGetPinAttemptsOrZero.mockResolvedValue(2)
+      renderScreen(false)
+      await flushEffects()
+
+      await enterPin(WRONG_PIN)
+
+      expect(mockReset).toHaveBeenCalledWith({
+        index: 0,
+        routes: [{ name: "authenticationCheck" }],
+      })
+    })
   })
 })

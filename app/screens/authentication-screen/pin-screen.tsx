@@ -68,11 +68,16 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
       }
     } else {
       setHelperText(LL.PinScreen.tooManyAttempts())
-      await logout()
+      // The PIN must survive its own lockout: it is the only thing that
+      // gates the next screen (getIsPinEnabled() is just "is a PIN
+      // stored"), so deleting it here — and landing straight on Primary —
+      // would hand an attacker who never typed a correct PIN a working
+      // wallet the moment the lock supposedly kicks in.
+      await logout({ preservePin: true })
       await sleep(1000)
       navigation.reset({
         index: 0,
-        routes: [{ name: "Primary" }],
+        routes: [{ name: "authenticationCheck" }],
       })
     }
   }

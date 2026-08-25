@@ -15,6 +15,12 @@ type LogoutOptions = {
   stateToDefault?: boolean
   token?: string
   isValidToken?: boolean
+  /**
+   * Keep the device PIN in place. A PIN-exhaustion logout must not delete
+   * the PIN it exists to enforce — getIsPinEnabled() is just "is a PIN
+   * stored", so removing it here would leave the very next screen ungated.
+   */
+  preservePin?: boolean
 }
 
 gql`
@@ -36,6 +42,7 @@ const useLogout = () => {
       stateToDefault = true,
       token,
       isValidToken = true,
+      preservePin = false,
     }: LogoutOptions = {}): Promise<void> => {
       try {
         // Isolated: a failed push-token fetch must never skip the local
@@ -65,7 +72,9 @@ const useLogout = () => {
         } else {
           await AsyncStorage.multiRemove([SCHEMA_VERSION_KEY])
           await KeyStoreWrapper.removeIsBiometricsEnabled()
-          await KeyStoreWrapper.removePin()
+          if (!preservePin) {
+            await KeyStoreWrapper.removePin()
+          }
           await KeyStoreWrapper.removePinAttempts()
           await KeyStoreWrapper.removeSessionProfiles()
           await clearToken()
