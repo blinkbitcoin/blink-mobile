@@ -163,10 +163,10 @@ const intraledgerRoute = {
 
 const Intraledger = () => <SendBitcoinDetailsScreen route={intraledgerRoute} />
 
-// The send flow deliberately opts out of hide-balance: the user is already
-// transacting and needs the numbers to pick a wallet, and there is no reveal
-// affordance inside the flow. See issue #4125.
-describe("choose-wallet modal always shows amounts", () => {
+// Hide-balance still applies to the details screen at a glance: the inline
+// "From" field stays masked. Opening the choose-wallet modal is the deliberate
+// act that reveals the amounts needed to pick a wallet. See issue #4125.
+describe("choose-wallet modal reveals amounts the inline field masks", () => {
   const renderScreen = (hideAmount: boolean) =>
     render(
       <ContextForScreen>
@@ -212,11 +212,32 @@ describe("choose-wallet modal always shows amounts", () => {
     expect(
       within(screen.getByTestId(WalletCurrency.Usd)).getAllByText(/\d/).length,
     ).toBeGreaterThan(0)
-    expect(screen.queryAllByTestId("hidden-balance-placeholder")).toHaveLength(0)
+    // Scoped to the modal rows: the inline "From" field is still mounted
+    // behind the modal and renders its placeholder there.
+    expect(
+      within(screen.getByTestId(WalletCurrency.Btc)).queryAllByTestId(
+        "hidden-balance-placeholder",
+      ),
+    ).toHaveLength(0)
+    expect(
+      within(screen.getByTestId(WalletCurrency.Usd)).queryAllByTestId(
+        "hidden-balance-placeholder",
+      ),
+    ).toHaveLength(0)
   })
 
-  it("shows the balance in the inline From field while hide-balance is on", async () => {
+  it("masks the balance in the inline From field while hide-balance is on", async () => {
     renderScreen(true)
+    await flushAsync()
+    await flushAsync()
+
+    // Modal is closed, so the only placeholder on screen is the inline field.
+    expect(screen.queryAllByTestId("hidden-balance-placeholder")).toHaveLength(1)
+    expect(screen.queryByTestId(`${WalletCurrency.Btc} Wallet Balance`)).toBeNull()
+  })
+
+  it("shows the balance in the inline From field when balances are visible", async () => {
+    renderScreen(false)
     await flushAsync()
     await flushAsync()
 
