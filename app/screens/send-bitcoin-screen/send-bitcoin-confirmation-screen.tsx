@@ -7,10 +7,12 @@ import { gql } from "@apollo/client"
 import { CurrencyPill, useEqualPillWidth } from "@app/components/atomic/currency-pill"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import GaloySliderButton from "@app/components/atomic/galoy-slider-button/galoy-slider-button"
+import { HiddenBalancePlaceholder } from "@app/components/hidden-balance-placeholder/hidden-balance-placeholder"
 import { PaymentDestinationDisplay } from "@app/components/payment-destination-display"
 import { Screen } from "@app/components/screen"
 import { WarningBanner } from "@app/components/warning-banner"
 import { Transaction, WalletCurrency } from "@app/graphql/generated"
+import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { isIdempotencyConflict } from "@app/graphql/is-idempotency-conflict"
 import { useClipboard, useDisplayCurrency } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -77,6 +79,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
       NativeStackNavigationProp<RootStackParamList, "sendBitcoinConfirmation">
     >()
 
+  const { hideAmount } = useHideAmount()
   const { widthStyle: pillWidthStyle, onPillLayout } = useEqualPillWidth()
 
   const { paymentDetail } = route.params
@@ -509,19 +512,23 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
             </View>
             <View style={styles.walletSelectorInfoContainer}>
               <View style={styles.walletSelectorTypeTextContainer}>
-                {sendingWalletDescriptor.currency === WalletCurrency.Btc ? (
+                {hideAmount ? (
+                  <HiddenBalancePlaceholder size="small" />
+                ) : sendingWalletDescriptor.currency === WalletCurrency.Btc ? (
                   <Text style={styles.walletCurrencyText}>{btcPrimaryText}</Text>
                 ) : (
                   <Text style={styles.walletCurrencyText}>{usdPrimaryText}</Text>
                 )}
               </View>
-              <View style={styles.walletSelectorBalanceContainer}>
-                {sendingWalletDescriptor.currency === WalletCurrency.Btc ? (
-                  <Text>{btcSecondaryText}</Text>
-                ) : (
-                  <Text>{usdSecondaryText}</Text>
-                )}
-              </View>
+              {!hideAmount && (
+                <View style={styles.walletSelectorBalanceContainer}>
+                  {sendingWalletDescriptor.currency === WalletCurrency.Btc ? (
+                    <Text>{btcSecondaryText}</Text>
+                  ) : (
+                    <Text>{usdSecondaryText}</Text>
+                  )}
+                </View>
+              )}
               <View />
             </View>
           </View>
