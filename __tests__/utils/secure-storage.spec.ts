@@ -4,6 +4,46 @@ const mockGet = jest.fn()
 const mockSet = jest.fn()
 const mockRemove = jest.fn()
 
+const mockSetInternet = jest.fn()
+const mockGetInternet = jest.fn()
+const mockHasInternet = jest.fn()
+const mockResetInternet = jest.fn()
+
+// The six non-mnemonic slots now read and write through the Keychain-backed
+// store (blinkbitcoin/blink-wip#1161). The legacy mock below still drives every
+// read: an unmigrated slot misses in the new store and falls through to it,
+// which is the migration path itself.
+jest.mock("react-native-keychain", () => ({
+  __esModule: true,
+  setInternetCredentials: (...args: unknown[]) => mockSetInternet(...args),
+  getInternetCredentials: (...args: unknown[]) => mockGetInternet(...args),
+  hasInternetCredentials: (...args: unknown[]) => mockHasInternet(...args),
+  resetInternetCredentials: (...args: unknown[]) => mockResetInternet(...args),
+  ACCESSIBLE: {
+    WHEN_UNLOCKED_THIS_DEVICE_ONLY: "AccessibleWhenUnlockedThisDeviceOnly",
+    AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY: "AccessibleAfterFirstUnlockThisDeviceOnly",
+  },
+}))
+
+/** What every migrated slot is written under — see MIGRATED_ACCESSIBLE. */
+const MIGRATED_ACCESSIBLE = "AccessibleAfterFirstUnlockThisDeviceOnly"
+const serverFor = (slot: string) => `secure-store.blink.local/${slot}`
+
+/** A slot whose value still lives in the legacy store, as an upgrading install has it. */
+const onlyInLegacyStore = (values: Record<string, string>) => {
+  mockGetInternet.mockResolvedValue(false)
+  mockGet.mockImplementation(async (key: string) => {
+    if (key in values) return values[key]
+    throw Object.assign(new Error("key does not present"), { code: "404" })
+  })
+}
+
+const expectMigratedWrite = (slot: string, value: string) => {
+  expect(mockSetInternet).toHaveBeenCalledWith(serverFor(slot), slot, value, {
+    accessible: MIGRATED_ACCESSIBLE,
+  })
+}
+
 jest.mock("react-native-secure-key-store", () => ({
   __esModule: true,
   default: {
@@ -20,6 +60,10 @@ jest.mock("react-native-secure-key-store", () => ({
 describe("KeyStoreWrapper per-account mnemonic methods", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockSetInternet.mockResolvedValue({ service: "mock" })
+    mockGetInternet.mockResolvedValue(false)
+    mockHasInternet.mockResolvedValue(false)
+    mockResetInternet.mockResolvedValue(undefined)
   })
 
   describe("getMnemonicForAccount", () => {
@@ -38,6 +82,23 @@ describe("KeyStoreWrapper per-account mnemonic methods", () => {
       const result = await KeyStoreWrapper.getMnemonicForAccount("alice")
 
       expect(result).toBeNull()
+    })
+
+    // The legacy primitives are the mnemonics' only path until
+    // blinkbitcoin/blink-wip#1162, so the missing-key code still has to be told
+    // apart from a real fault there.
+    it("returns null for a key that is not there", async () => {
+      mockGet.mockRejectedValue(
+        Object.assign(new Error("key does not present"), { code: "404" }),
+      )
+
+      expect(await KeyStoreWrapper.getMnemonicForAccount("alice")).toBeNull()
+    })
+
+    it("returns null for a rejection carrying no code at all", async () => {
+      mockGet.mockRejectedValue("not even an error")
+
+      expect(await KeyStoreWrapper.getMnemonicForAccount("alice")).toBeNull()
     })
 
     it("isolates accounts by hitting a different key per id", async () => {
@@ -190,6 +251,10 @@ describe("KeyStoreWrapper per-account mnemonic methods", () => {
 describe("KeyStoreWrapper biometrics methods", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockSetInternet.mockResolvedValue({ service: "mock" })
+    mockGetInternet.mockResolvedValue(false)
+    mockHasInternet.mockResolvedValue(false)
+    mockResetInternet.mockResolvedValue(undefined)
   })
 
   describe("getIsBiometricsEnabled", () => {
@@ -203,7 +268,7 @@ describe("KeyStoreWrapper biometrics methods", () => {
     })
 
     it("returns false when the flag is missing", async () => {
-      mockGet.mockRejectedValue(new Error("not found"))
+      onlyInLegacyStore({})
 
       const result = await KeyStoreWrapper.getIsBiometricsEnabled()
 
@@ -211,20 +276,50 @@ describe("KeyStoreWrapper biometrics methods", () => {
     })
   })
 
-  describe("setIsBiometricsEnabled", () => {
-    it("writes '1' with ALWAYS_THIS_DEVICE_ONLY accessibility", async () => {
-      mockSet.mockResolvedValue(undefined)
+  describe("readIsBiometricsEnabled", () => {
+    it("reports the flag as set", async () => {
+      mockHasInternet.mockResolvedValue(true)
 
-      const result = await KeyStoreWrapper.setIsBiometricsEnabled()
+      expect(await KeyStoreWrapper.readIsBiometricsEnabled()).toEqual({ status: "yes" })
+    })
 
-      expect(result).toBe(true)
-      expect(mockSet).toHaveBeenCalledWith("isBiometricsEnabled", "1", {
-        accessible: "ALWAYS_THIS_DEVICE_ONLY",
+    it("reports an unset flag as no, not as a failure", async () => {
+      onlyInLegacyStore({})
+
+      expect(await KeyStoreWrapper.readIsBiometricsEnabled()).toEqual({ status: "no" })
+    })
+
+    // The whole point of the sibling: a gate that scored this as "no" would
+    // leave the app open for a user who does have a lock.
+    it("reports a store that cannot answer as failed, never as no", async () => {
+      mockHasInternet.mockRejectedValue(new Error("keystore locked"))
+      mockGetInternet.mockRejectedValue(new Error("keystore locked"))
+
+      expect(await KeyStoreWrapper.readIsBiometricsEnabled()).toMatchObject({
+        status: "failed",
       })
     })
 
+    it("finds a flag that has not migrated yet, and moves it while answering", async () => {
+      onlyInLegacyStore({ isBiometricsEnabled: "1" })
+
+      expect(await KeyStoreWrapper.readIsBiometricsEnabled()).toEqual({ status: "yes" })
+      expectMigratedWrite("isBiometricsEnabled", "1")
+      expect(mockRemove).toHaveBeenCalledWith("isBiometricsEnabled")
+    })
+  })
+
+  describe("setIsBiometricsEnabled", () => {
+    it("writes '1' with AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY accessibility", async () => {
+      const result = await KeyStoreWrapper.setIsBiometricsEnabled()
+
+      expect(result).toBe(true)
+      expectMigratedWrite("isBiometricsEnabled", "1")
+      expect(mockSet).not.toHaveBeenCalled()
+    })
+
     it("returns false on storage error", async () => {
-      mockSet.mockRejectedValue(new Error("write locked"))
+      mockSetInternet.mockRejectedValue(new Error("write locked"))
 
       const result = await KeyStoreWrapper.setIsBiometricsEnabled()
 
@@ -255,6 +350,10 @@ describe("KeyStoreWrapper biometrics methods", () => {
 describe("KeyStoreWrapper PIN methods", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockSetInternet.mockResolvedValue({ service: "mock" })
+    mockGetInternet.mockResolvedValue(false)
+    mockHasInternet.mockResolvedValue(false)
+    mockResetInternet.mockResolvedValue(undefined)
   })
 
   describe("getIsPinEnabled", () => {
@@ -297,20 +396,46 @@ describe("KeyStoreWrapper PIN methods", () => {
     })
   })
 
-  describe("setPin", () => {
-    it("writes the PIN with ALWAYS_THIS_DEVICE_ONLY accessibility", async () => {
-      mockSet.mockResolvedValue(undefined)
+  describe("readIsPinEnabled", () => {
+    it("reports a set PIN", async () => {
+      mockHasInternet.mockResolvedValue(true)
 
+      expect(await KeyStoreWrapper.readIsPinEnabled()).toEqual({ status: "yes" })
+    })
+
+    it("reports no PIN as no, not as a failure", async () => {
+      onlyInLegacyStore({})
+
+      expect(await KeyStoreWrapper.readIsPinEnabled()).toEqual({ status: "no" })
+    })
+
+    it("reports a store that cannot answer as failed, never as no", async () => {
+      mockHasInternet.mockRejectedValue(new Error("keystore locked"))
+      mockGetInternet.mockRejectedValue(new Error("keystore locked"))
+
+      expect(await KeyStoreWrapper.readIsPinEnabled()).toMatchObject({ status: "failed" })
+    })
+
+    it("finds a PIN that has not migrated yet, and moves it while answering", async () => {
+      onlyInLegacyStore({ PIN: "1234" })
+
+      expect(await KeyStoreWrapper.readIsPinEnabled()).toEqual({ status: "yes" })
+      expectMigratedWrite("PIN", "1234")
+      expect(mockRemove).toHaveBeenCalledWith("PIN")
+    })
+  })
+
+  describe("setPin", () => {
+    it("writes the PIN with AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY accessibility", async () => {
       const result = await KeyStoreWrapper.setPin("1234")
 
       expect(result).toBe(true)
-      expect(mockSet).toHaveBeenCalledWith("PIN", "1234", {
-        accessible: "ALWAYS_THIS_DEVICE_ONLY",
-      })
+      expectMigratedWrite("PIN", "1234")
+      expect(mockSet).not.toHaveBeenCalled()
     })
 
     it("returns false on storage error", async () => {
-      mockSet.mockRejectedValue(new Error("write locked"))
+      mockSetInternet.mockRejectedValue(new Error("write locked"))
 
       const result = await KeyStoreWrapper.setPin("1234")
 
@@ -355,6 +480,10 @@ describe("KeyStoreWrapper PIN lockout state", () => {
     jest.clearAllMocks()
     mockSet.mockResolvedValue(undefined)
     mockRemove.mockResolvedValue(undefined)
+    mockSetInternet.mockResolvedValue({ service: "mock" })
+    mockGetInternet.mockResolvedValue(false)
+    mockHasInternet.mockResolvedValue(false)
+    mockResetInternet.mockResolvedValue(undefined)
   })
 
   describe("getPinFailureState", () => {
@@ -383,7 +512,6 @@ describe("KeyStoreWrapper PIN lockout state", () => {
       // the wrong branch, so it must never escape this layer.
       for (const stored of [
         "not json",
-        "",
         JSON.stringify({ attempts: "abc", lockedUntil: 1 }),
         JSON.stringify({ attempts: 1, lockedUntil: "Infinity" }),
         JSON.stringify(null),
@@ -395,6 +523,15 @@ describe("KeyStoreWrapper PIN lockout state", () => {
           state: { attempts: 0, lockedUntil: 0 },
         })
       }
+    })
+
+    it("reads a non-numeric legacy count back as a clean slate", async () => {
+      storedKeys({ pinAttempts: "not a number" })
+
+      expect(await KeyStoreWrapper.getPinFailureState()).toEqual({
+        status: "found",
+        state: { attempts: 0, lockedUntil: 0 },
+      })
     })
 
     it("carries a pre-lockout install's attempt count over from the legacy key", async () => {
@@ -448,19 +585,43 @@ describe("KeyStoreWrapper PIN lockout state", () => {
     })
   })
 
+  describe("migrating the lockout slots", () => {
+    it("moves a lockout state that still lives in the legacy store", async () => {
+      const stored = JSON.stringify({ attempts: 2, lockedUntil: 1700000060000 })
+      onlyInLegacyStore({ pinFailureState: stored })
+
+      expect(await KeyStoreWrapper.getPinFailureState()).toEqual({
+        status: "found",
+        state: { attempts: 2, lockedUntil: 1700000060000 },
+      })
+      expectMigratedWrite("pinFailureState", stored)
+      expect(mockRemove).toHaveBeenCalledWith("pinFailureState")
+    })
+
+    it("moves a pre-lockout install's bare attempt count, budget intact", async () => {
+      onlyInLegacyStore({ pinAttempts: "2" })
+
+      expect(await KeyStoreWrapper.getPinFailureState()).toEqual({
+        status: "found",
+        state: { attempts: 2, lockedUntil: 0 },
+      })
+      expectMigratedWrite("pinAttempts", "2")
+      expect(mockRemove).toHaveBeenCalledWith("pinAttempts")
+    })
+  })
+
   describe("setPinFailureState", () => {
-    it("writes one value under one key with ALWAYS_THIS_DEVICE_ONLY accessibility", async () => {
+    it("writes one value under one key with AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY accessibility", async () => {
       const result = await KeyStoreWrapper.setPinFailureState({
         attempts: 2,
         lockedUntil: 1700000060000,
       })
 
       expect(result).toBe(true)
-      expect(mockSet).toHaveBeenCalledTimes(1)
-      expect(mockSet).toHaveBeenCalledWith(
+      expect(mockSetInternet).toHaveBeenCalledTimes(1)
+      expectMigratedWrite(
         "pinFailureState",
         JSON.stringify({ attempts: 2, lockedUntil: 1700000060000 }),
-        { accessible: "ALWAYS_THIS_DEVICE_ONLY" },
       )
     })
 
@@ -473,7 +634,7 @@ describe("KeyStoreWrapper PIN lockout state", () => {
     it("reports failure — and leaves the legacy key alone — when the write is rejected", async () => {
       // Single write, so `false` is the whole truth: nothing was recorded, and
       // the caller must treat the failure as unrecorded rather than half-kept.
-      mockSet.mockRejectedValue(new Error("write locked"))
+      mockSetInternet.mockRejectedValue(new Error("write locked"))
 
       const result = await KeyStoreWrapper.setPinFailureState({
         attempts: 1,
@@ -492,7 +653,7 @@ describe("KeyStoreWrapper PIN lockout state", () => {
       expect(result).toBe(true)
       expect(mockRemove).toHaveBeenCalledWith("pinFailureState")
       expect(mockRemove).toHaveBeenCalledWith("pinAttempts")
-      expect(mockSet).not.toHaveBeenCalled()
+      expect(mockSetInternet).not.toHaveBeenCalled()
     })
 
     it("writes nothing when the erase only failed because nothing was stored", async () => {
@@ -512,10 +673,9 @@ describe("KeyStoreWrapper PIN lockout state", () => {
       })
 
       expect(await KeyStoreWrapper.clearPinFailureState()).toBe(true)
-      expect(mockSet).toHaveBeenCalledWith(
+      expectMigratedWrite(
         "pinFailureState",
         JSON.stringify({ attempts: 0, lockedUntil: 0 }),
-        { accessible: "ALWAYS_THIS_DEVICE_ONLY" },
       )
     })
 
@@ -524,10 +684,9 @@ describe("KeyStoreWrapper PIN lockout state", () => {
       mockGet.mockRejectedValue(new Error("keystore unavailable"))
 
       expect(await KeyStoreWrapper.clearPinFailureState()).toBe(true)
-      expect(mockSet).toHaveBeenCalledWith(
+      expectMigratedWrite(
         "pinFailureState",
         JSON.stringify({ attempts: 0, lockedUntil: 0 }),
-        { accessible: "ALWAYS_THIS_DEVICE_ONLY" },
       )
     })
 
@@ -536,16 +695,40 @@ describe("KeyStoreWrapper PIN lockout state", () => {
       storedKeys({ pinAttempts: "3" })
 
       expect(await KeyStoreWrapper.clearPinFailureState()).toBe(true)
-      expect(mockSet).toHaveBeenCalledWith(
+      expectMigratedWrite(
         "pinFailureState",
         JSON.stringify({ attempts: 0, lockedUntil: 0 }),
-        { accessible: "ALWAYS_THIS_DEVICE_ONLY" },
       )
+    })
+
+    // An erase reports failure for a key that was never there too, so a failed
+    // erase over nothing readable is a clear, not a fault: writing on it would
+    // put an item back where none was.
+    it("writes nothing when a failed erase left the slot empty anyway", async () => {
+      onlyInLegacyStore({})
+      mockResetInternet.mockRejectedValue(new Error("keystore locked"))
+
+      expect(await KeyStoreWrapper.clearPinFailureState()).toBe(true)
+      expect(mockSetInternet).not.toHaveBeenCalled()
+    })
+
+    it("writes nothing when a failed erase left an already-clean slate", async () => {
+      // The legacy copy is there and will not drop, so the erase genuinely
+      // fails and the fallback has to decide on what is still readable.
+      onlyInLegacyStore({
+        pinFailureState: JSON.stringify({ attempts: 0, lockedUntil: 0 }),
+      })
+      mockRemove.mockRejectedValue(new Error("keystore locked"))
+
+      expect(await KeyStoreWrapper.clearPinFailureState()).toBe(true)
+      // The one write is the migrating read moving the value across, not a
+      // clear written over a slate that was already clean.
+      expect(mockSetInternet).toHaveBeenCalledTimes(1)
     })
 
     it("reports false when neither the erase nor the repair lands", async () => {
       mockRemove.mockRejectedValue(new Error("keystore locked"))
-      mockSet.mockRejectedValue(new Error("keystore locked"))
+      mockSetInternet.mockRejectedValue(new Error("keystore locked"))
       storedKeys({ pinFailureState: JSON.stringify({ attempts: 3, lockedUntil: 0 }) })
 
       expect(await KeyStoreWrapper.clearPinFailureState()).toBe(false)
@@ -556,6 +739,10 @@ describe("KeyStoreWrapper PIN lockout state", () => {
 describe("KeyStoreWrapper session-profile methods", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockSetInternet.mockResolvedValue({ service: "mock" })
+    mockGetInternet.mockResolvedValue(false)
+    mockHasInternet.mockResolvedValue(false)
+    mockResetInternet.mockResolvedValue(undefined)
   })
 
   const profileA = {
@@ -575,21 +762,15 @@ describe("KeyStoreWrapper session-profile methods", () => {
     Object.assign(new Error("key does not present"), { code: "404" })
 
   describe("saveSessionProfiles", () => {
-    it("serializes profiles to JSON and writes them with ALWAYS_THIS_DEVICE_ONLY", async () => {
-      mockSet.mockResolvedValue(undefined)
-
+    it("serializes profiles to JSON and writes them with AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY", async () => {
       const result = await KeyStoreWrapper.saveSessionProfiles([profileA, profileB])
 
       expect(result).toBe(true)
-      expect(mockSet).toHaveBeenCalledWith(
-        "sessionProfiles",
-        JSON.stringify([profileA, profileB]),
-        { accessible: "ALWAYS_THIS_DEVICE_ONLY" },
-      )
+      expectMigratedWrite("sessionProfiles", JSON.stringify([profileA, profileB]))
     })
 
     it("returns false on storage error", async () => {
-      mockSet.mockRejectedValue(new Error("write locked"))
+      mockSetInternet.mockRejectedValue(new Error("write locked"))
 
       const result = await KeyStoreWrapper.saveSessionProfiles([profileA])
 
@@ -698,6 +879,17 @@ describe("KeyStoreWrapper session-profile methods", () => {
     })
   })
 
+  describe("migrating the session-profile slot", () => {
+    it("moves a profile list that still lives in the legacy store", async () => {
+      const stored = JSON.stringify([profileA, profileB])
+      onlyInLegacyStore({ sessionProfiles: stored })
+
+      expect(await KeyStoreWrapper.getSessionProfiles()).toEqual([profileA, profileB])
+      expectMigratedWrite("sessionProfiles", stored)
+      expect(mockRemove).toHaveBeenCalledWith("sessionProfiles")
+    })
+  })
+
   describe("removeSessionProfiles", () => {
     it("removes the sessionProfiles key and returns true", async () => {
       mockRemove.mockResolvedValue(undefined)
@@ -725,11 +917,7 @@ describe("KeyStoreWrapper session-profile methods", () => {
       const result = await KeyStoreWrapper.removeSessionProfileByToken("tok-a")
 
       expect(result).toBe(true)
-      expect(mockSet).toHaveBeenCalledWith(
-        "sessionProfiles",
-        JSON.stringify([profileB]),
-        { accessible: "ALWAYS_THIS_DEVICE_ONLY" },
-      )
+      expectMigratedWrite("sessionProfiles", JSON.stringify([profileB]))
     })
 
     it("rewrites the same list when no token matches", async () => {
@@ -739,16 +927,12 @@ describe("KeyStoreWrapper session-profile methods", () => {
       const result = await KeyStoreWrapper.removeSessionProfileByToken("tok-missing")
 
       expect(result).toBe(true)
-      expect(mockSet).toHaveBeenCalledWith(
-        "sessionProfiles",
-        JSON.stringify([profileA, profileB]),
-        expect.any(Object),
-      )
+      expectMigratedWrite("sessionProfiles", JSON.stringify([profileA, profileB]))
     })
 
     it("returns false when the rewrite fails", async () => {
       mockGet.mockResolvedValue(JSON.stringify([profileA, profileB]))
-      mockSet.mockRejectedValue(new Error("write locked"))
+      mockSetInternet.mockRejectedValue(new Error("write locked"))
 
       const result = await KeyStoreWrapper.removeSessionProfileByToken("tok-a")
 
@@ -780,6 +964,10 @@ describe("KeyStoreWrapper session-profile methods", () => {
 describe("KeyStoreWrapper active-token methods", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockSetInternet.mockResolvedValue({ service: "mock" })
+    mockGetInternet.mockResolvedValue(false)
+    mockHasInternet.mockResolvedValue(false)
+    mockResetInternet.mockResolvedValue(undefined)
   })
 
   describe("getActiveToken", () => {
@@ -850,20 +1038,45 @@ describe("KeyStoreWrapper active-token methods", () => {
     })
   })
 
-  describe("setActiveToken", () => {
-    it("writes the token with ALWAYS_THIS_DEVICE_ONLY accessibility", async () => {
-      mockSet.mockResolvedValue(undefined)
+  describe("migrating the active-token slot", () => {
+    it("moves a token that still lives in the legacy store", async () => {
+      onlyInLegacyStore({ galoyAuthToken: "ory_st_secret" })
 
+      expect(await KeyStoreWrapper.readActiveToken()).toEqual({
+        status: "found",
+        token: "ory_st_secret",
+      })
+      expectMigratedWrite("galoyAuthToken", "ory_st_secret")
+      expect(mockRemove).toHaveBeenCalledWith("galoyAuthToken")
+    })
+
+    // The steady state after migration: the legacy library is never touched
+    // again, which is what keeps its unscoped reinstall wipe from firing.
+    it("stops reading the legacy store once the token has moved", async () => {
+      mockGetInternet.mockResolvedValue({
+        username: "galoyAuthToken",
+        password: "ory_st_secret",
+      })
+
+      expect(await KeyStoreWrapper.readActiveToken()).toEqual({
+        status: "found",
+        token: "ory_st_secret",
+      })
+      expect(mockGet).not.toHaveBeenCalled()
+    })
+  })
+
+  describe("setActiveToken", () => {
+    it("writes the token with AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY accessibility", async () => {
       const result = await KeyStoreWrapper.setActiveToken("ory_st_secret")
 
       expect(result).toBe(true)
-      expect(mockSet).toHaveBeenCalledWith("galoyAuthToken", "ory_st_secret", {
-        accessible: "ALWAYS_THIS_DEVICE_ONLY",
-      })
+      expectMigratedWrite("galoyAuthToken", "ory_st_secret")
+      expect(mockSet).not.toHaveBeenCalled()
     })
 
     it("returns false on storage error", async () => {
-      mockSet.mockRejectedValue(new Error("write locked"))
+      mockSetInternet.mockRejectedValue(new Error("write locked"))
 
       const result = await KeyStoreWrapper.setActiveToken("ory_st_secret")
 
@@ -897,20 +1110,47 @@ describe("KeyStoreWrapper clearUninstallSurvivingCredentials", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockRemove.mockResolvedValue(undefined)
+    mockSetInternet.mockResolvedValue({ service: "mock" })
+    mockGetInternet.mockResolvedValue(false)
+    mockHasInternet.mockResolvedValue(false)
+    mockResetInternet.mockResolvedValue(undefined)
+    // Nothing left in the legacy store, so a removal that reports failure is
+    // reporting the new store's failure and not a key that was never there.
+    onlyInLegacyStore({})
   })
 
-  it("removes the active token and the session profiles, and only those", async () => {
+  /** A slot the legacy store still holds and refuses to give up: the removal is
+   *  not provably done, which is the only thing that counts as a failure. */
+  const legacyRefusesToDrop = (slot: string) => {
+    onlyInLegacyStore({ [slot]: "still here" })
+    mockRemove.mockRejectedValue(new Error("keystore unavailable"))
+  }
+
+  it("removes every uninstall-surviving slot, and only those", async () => {
     await KeyStoreWrapper.clearUninstallSurvivingCredentials(onFailure)
 
-    expect(mockRemove).toHaveBeenCalledWith("galoyAuthToken")
-    expect(mockRemove).toHaveBeenCalledWith("sessionProfiles")
+    for (const slot of [
+      "galoyAuthToken",
+      "sessionProfiles",
+      // The app lock survives an uninstall in the new store exactly as the
+      // session did, and a reinstall booting into someone else's PIN strands
+      // whoever installs next.
+      "PIN",
+      "pinFailureState",
+      "pinAttempts",
+      "isBiometricsEnabled",
+    ]) {
+      expect(mockRemove).toHaveBeenCalledWith(slot)
+    }
     // Mnemonics are deliberately NOT wiped (wallet keys outliving uninstall
     // is a product decision, not cleanup) — nothing else may be touched.
-    expect(mockRemove).toHaveBeenCalledTimes(2)
+    expect(mockRemove).not.toHaveBeenCalledWith("mnemonic")
+    expect(mockRemove).not.toHaveBeenCalledWith("mnemonic_network")
     expect(onFailure).not.toHaveBeenCalled()
   })
 
   it("retries a failed removal once and stays silent when the retry lands", async () => {
+    onlyInLegacyStore({ galoyAuthToken: "still here" })
     mockRemove
       .mockRejectedValueOnce(new Error("keystore busy")) // token, attempt 1
       .mockResolvedValue(undefined)
@@ -923,6 +1163,7 @@ describe("KeyStoreWrapper clearUninstallSurvivingCredentials", () => {
   })
 
   it("reports a persistently failing token removal and still wipes the profiles", async () => {
+    legacyRefusesToDrop("galoyAuthToken")
     mockRemove.mockImplementation((key: string) =>
       key === "galoyAuthToken"
         ? Promise.reject(new Error("keystore unavailable"))
@@ -938,11 +1179,7 @@ describe("KeyStoreWrapper clearUninstallSurvivingCredentials", () => {
   })
 
   it("reports a persistently failing profile removal by name", async () => {
-    mockRemove.mockImplementation((key: string) =>
-      key === "sessionProfiles"
-        ? Promise.reject(new Error("keystore unavailable"))
-        : Promise.resolve(undefined),
-    )
+    legacyRefusesToDrop("sessionProfiles")
 
     await KeyStoreWrapper.clearUninstallSurvivingCredentials(onFailure)
 
@@ -951,14 +1188,21 @@ describe("KeyStoreWrapper clearUninstallSurvivingCredentials", () => {
   })
 
   it("reports every slot when the keystore is fully unavailable, and never throws", async () => {
+    mockGet.mockRejectedValue(new Error("keystore unavailable"))
     mockRemove.mockRejectedValue(new Error("keystore unavailable"))
 
     await expect(
       KeyStoreWrapper.clearUninstallSurvivingCredentials(onFailure),
     ).resolves.toBeUndefined()
 
-    expect(onFailure).toHaveBeenCalledTimes(2)
-    expect(onFailure).toHaveBeenNthCalledWith(1, "active token")
-    expect(onFailure).toHaveBeenNthCalledWith(2, "session profiles")
+    // The lockout state is absent from this list on purpose: clearing it falls
+    // back to writing a clean slate when the erase fails, and a stored
+    // {attempts: 0, lockedUntil: 0} strands nobody.
+    expect(onFailure.mock.calls.flat()).toEqual([
+      "active token",
+      "session profiles",
+      "pin",
+      "biometrics flag",
+    ])
   })
 })

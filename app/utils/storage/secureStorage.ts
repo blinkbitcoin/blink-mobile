@@ -1,4 +1,15 @@
-import RNSecureKeyStore, { ACCESSIBLE } from "react-native-secure-key-store"
+import { ACCESSIBLE } from "react-native-keychain"
+import RNSecureKeyStore, {
+  ACCESSIBLE as LEGACY_ACCESSIBLE,
+} from "react-native-secure-key-store"
+
+import { type SecureExists, secureWrite } from "./secure-store"
+import {
+  type ReadThroughArgs,
+  existsThrough,
+  readThrough,
+  removeThrough,
+} from "./secure-store-migration"
 
 // The keychain slot and the legacy persisted-blob field share this name.
 // Pinned forever: existing installs already store entries under it.
@@ -79,15 +90,76 @@ export default class KeyStoreWrapper {
   private static readonly MNEMONIC = "mnemonic"
   private static readonly MNEMONIC_NETWORK = "mnemonic_network"
 
-  // ── keystore primitives ───────────────────────────────────────────────────
-  // Every method below is one of these four shapes. `accessible` is always
-  // passed explicitly and never defaulted: a default would let a new method
-  // silently downgrade the protection class of whatever it stores.
+  /**
+   * The slots that have moved to the Keychain-backed store
+   * (blinkbitcoin/blink-wip#1161). Each carries the protection class its value
+   * is written under and whether a migrated legacy copy is erased. Mnemonics
+   * are deliberately absent: they move in blinkbitcoin/blink-wip#1162.
+   *
+   * **The protection class changes for all of them.**
+   * `react-native-keychain` has no `ALWAYS_THIS_DEVICE_ONLY` — Apple deprecated
+   * `kSecAttrAccessibleAlwaysThisDeviceOnly` in iOS 12 — and the closest class
+   * is a strict improvement: the old one was readable while the device was
+   * locked. What it costs is one window. `Info.plist` declares
+   * `UIBackgroundModes: remote-notification`, so a silent push can launch the
+   * app after a reboot but before the first passcode entry, where an
+   * `AFTER_FIRST_UNLOCK*` read returns `errSecInteractionNotAllowed` and the
+   * adapter reports `failed`. Every caller below is written so that `failed` is
+   * never scored as absent — that scoring is the only thing that turns this
+   * window into an incident.
+   *
+   * **`deleteLegacyOnMigrate` is true for all of them.** These values mutate: a
+   * PIN changes, a token rotates, profiles churn. A surviving legacy copy would
+   * be a stale-credential resurrection on downgrade, and a revoked token coming
+   * back to life is worse than a session that is merely gone.
+   *
+   * On Android this is all a no-op: both libraries ignore `accessible` there.
+   */
+  private static readonly MIGRATED_ACCESSIBLE =
+    ACCESSIBLE.AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY
+
+  private static slotFor(key: string): ReadThroughArgs {
+    return {
+      slot: key,
+      legacyKey: key,
+      accessible: KeyStoreWrapper.MIGRATED_ACCESSIBLE,
+      deleteLegacyOnMigrate: true,
+    }
+  }
+
+  // ── migrated-slot primitives ──────────────────────────────────────────────
+  // Reads and existence probes go through the read-through helper, so a slot
+  // still living in the legacy store migrates the first time it is touched.
+  // Writes never read through: they land in the new store only.
+
+  private static async migratedWrite(key: string, value: string): Promise<boolean> {
+    return secureWrite(key, value, KeyStoreWrapper.MIGRATED_ACCESSIBLE)
+  }
+
+  private static async migratedErase(key: string): Promise<boolean> {
+    return removeThrough({ slot: key, legacyKey: key })
+  }
+
+  private static async migratedReadWithStatus(key: string): Promise<SecureStoreRead> {
+    return readThrough(KeyStoreWrapper.slotFor(key))
+  }
+
+  /** Collapses absent and failed for callers where either means do nothing. */
+  private static async migratedRead(key: string): Promise<string | null> {
+    const read = await KeyStoreWrapper.migratedReadWithStatus(key)
+    return read.status === "found" ? read.value : null
+  }
+
+  // ── legacy-only primitives ────────────────────────────────────────────────
+  // Still backed by react-native-secure-key-store, and used only by the slots
+  // that have not moved yet. `accessible` is always passed explicitly and never
+  // defaulted: a default would let a new method silently downgrade the
+  // protection class of whatever it stores.
 
   private static async write(
     key: string,
     value: string,
-    accessible: ACCESSIBLE,
+    accessible: LEGACY_ACCESSIBLE,
   ): Promise<boolean> {
     try {
       await RNSecureKeyStore.set(key, value, { accessible })
@@ -100,16 +172,6 @@ export default class KeyStoreWrapper {
   private static async erase(key: string): Promise<boolean> {
     try {
       await RNSecureKeyStore.remove(key)
-      return true
-    } catch {
-      return false
-    }
-  }
-
-  /** The keystore rejects for a missing key, so a successful read is presence. */
-  private static async has(key: string): Promise<boolean> {
-    try {
-      await RNSecureKeyStore.get(key)
       return true
     } catch {
       return false
@@ -132,26 +194,50 @@ export default class KeyStoreWrapper {
 
   // ── biometrics ────────────────────────────────────────────────────────────
 
+  /**
+   * Whether the flag is set, with "the store could not answer" kept separate.
+   * The gates that decide whether to show the lock screen must use this and
+   * treat `failed` as enabled: scoring it as absent is what silently unlocks
+   * the app during the pre-first-unlock window this slot's new protection
+   * class introduces.
+   */
+  public static async readIsBiometricsEnabled(): Promise<SecureExists> {
+    return existsThrough(KeyStoreWrapper.slotFor(KeyStoreWrapper.IS_BIOMETRICS_ENABLED))
+  }
+
+  /**
+   * Collapses failed to false, which is what every caller did before this slot
+   * moved. Safe only where a false merely hides a settings toggle; use
+   * readIsBiometricsEnabled anywhere it decides whether the app is locked.
+   */
   public static async getIsBiometricsEnabled(): Promise<boolean> {
-    return KeyStoreWrapper.has(KeyStoreWrapper.IS_BIOMETRICS_ENABLED)
+    const read = await KeyStoreWrapper.readIsBiometricsEnabled()
+    return read.status === "yes"
   }
 
   public static async setIsBiometricsEnabled(): Promise<boolean> {
-    return KeyStoreWrapper.write(
-      KeyStoreWrapper.IS_BIOMETRICS_ENABLED,
-      "1",
-      ACCESSIBLE.ALWAYS_THIS_DEVICE_ONLY,
-    )
+    return KeyStoreWrapper.migratedWrite(KeyStoreWrapper.IS_BIOMETRICS_ENABLED, "1")
   }
 
   public static async removeIsBiometricsEnabled(): Promise<boolean> {
-    return KeyStoreWrapper.erase(KeyStoreWrapper.IS_BIOMETRICS_ENABLED)
+    return KeyStoreWrapper.migratedErase(KeyStoreWrapper.IS_BIOMETRICS_ENABLED)
   }
 
   // ── the PIN itself ────────────────────────────────────────────────────────
 
+  /**
+   * Whether a PIN is set, with "the store could not answer" kept separate. The
+   * gates that decide whether to lock the app must use this and treat `failed`
+   * as enabled: a false there skips the lock screen outright.
+   */
+  public static async readIsPinEnabled(): Promise<SecureExists> {
+    return existsThrough(KeyStoreWrapper.slotFor(KeyStoreWrapper.PIN))
+  }
+
+  /** Collapses failed to false — see readIsPinEnabled before using it on a gate. */
   public static async getIsPinEnabled(): Promise<boolean> {
-    return KeyStoreWrapper.has(KeyStoreWrapper.PIN)
+    const read = await KeyStoreWrapper.readIsPinEnabled()
+    return read.status === "yes"
   }
 
   /**
@@ -161,19 +247,15 @@ export default class KeyStoreWrapper {
    * spend the attempt budget of a user who typed nothing wrong.
    */
   public static async getPin(): Promise<string | null> {
-    return KeyStoreWrapper.read(KeyStoreWrapper.PIN)
+    return KeyStoreWrapper.migratedRead(KeyStoreWrapper.PIN)
   }
 
   public static async setPin(pin: string): Promise<boolean> {
-    return KeyStoreWrapper.write(
-      KeyStoreWrapper.PIN,
-      pin,
-      ACCESSIBLE.ALWAYS_THIS_DEVICE_ONLY,
-    )
+    return KeyStoreWrapper.migratedWrite(KeyStoreWrapper.PIN, pin)
   }
 
   public static async removePin(): Promise<boolean> {
-    return KeyStoreWrapper.erase(KeyStoreWrapper.PIN)
+    return KeyStoreWrapper.migratedErase(KeyStoreWrapper.PIN)
   }
 
   // ── PIN lockout ───────────────────────────────────────────────────────────
@@ -183,7 +265,7 @@ export default class KeyStoreWrapper {
   // a free attempt cycle back the moment the lock expired.
 
   public static async getPinFailureState(): Promise<PinFailureStateRead> {
-    const current = await KeyStoreWrapper.readWithStatus(
+    const current = await KeyStoreWrapper.migratedReadWithStatus(
       KeyStoreWrapper.PIN_FAILURE_STATE,
     )
 
@@ -198,7 +280,7 @@ export default class KeyStoreWrapper {
     // Upgrade path: an install that failed a PIN before this release has an
     // attempt count and no lock. Reading it keeps that budget spent; the next
     // write moves it to the new key and erases this one.
-    const legacy = await KeyStoreWrapper.readWithStatus(
+    const legacy = await KeyStoreWrapper.migratedReadWithStatus(
       KeyStoreWrapper.LEGACY_PIN_ATTEMPTS,
     )
     if (legacy.status === "failed") return legacy
@@ -233,15 +315,14 @@ export default class KeyStoreWrapper {
   /** One write, so the boolean is the whole truth: false means the failure was
    *  not recorded at all, which a caller that must not lose one has to act on. */
   public static async setPinFailureState(state: PinFailureState): Promise<boolean> {
-    const written = await KeyStoreWrapper.write(
+    const written = await KeyStoreWrapper.migratedWrite(
       KeyStoreWrapper.PIN_FAILURE_STATE,
       JSON.stringify({ attempts: state.attempts, lockedUntil: state.lockedUntil }),
-      ACCESSIBLE.ALWAYS_THIS_DEVICE_ONLY,
     )
 
     // The new key shadows the legacy one on read, so a failed erase here costs
     // nothing but a stale entry.
-    if (written) await KeyStoreWrapper.erase(KeyStoreWrapper.LEGACY_PIN_ATTEMPTS)
+    if (written) await KeyStoreWrapper.migratedErase(KeyStoreWrapper.LEGACY_PIN_ATTEMPTS)
 
     return written
   }
@@ -256,8 +337,8 @@ export default class KeyStoreWrapper {
    */
   public static async clearPinFailureState(): Promise<boolean> {
     const [erased, legacyErased] = await Promise.all([
-      KeyStoreWrapper.erase(KeyStoreWrapper.PIN_FAILURE_STATE),
-      KeyStoreWrapper.erase(KeyStoreWrapper.LEGACY_PIN_ATTEMPTS),
+      KeyStoreWrapper.migratedErase(KeyStoreWrapper.PIN_FAILURE_STATE),
+      KeyStoreWrapper.migratedErase(KeyStoreWrapper.LEGACY_PIN_ATTEMPTS),
     ])
 
     if (erased && legacyErased) return true
@@ -275,10 +356,9 @@ export default class KeyStoreWrapper {
     }
 
     // Writing the cleared value also shadows a legacy key that would not erase.
-    return KeyStoreWrapper.write(
+    return KeyStoreWrapper.migratedWrite(
       KeyStoreWrapper.PIN_FAILURE_STATE,
       JSON.stringify(CLEARED_PIN_FAILURE_STATE),
-      ACCESSIBLE.ALWAYS_THIS_DEVICE_ONLY,
     )
   }
 
@@ -286,10 +366,9 @@ export default class KeyStoreWrapper {
 
   public static async saveSessionProfiles(profiles: ProfileProps[]): Promise<boolean> {
     try {
-      return await KeyStoreWrapper.write(
+      return await KeyStoreWrapper.migratedWrite(
         KeyStoreWrapper.SESSION_PROFILES,
         JSON.stringify(profiles),
-        ACCESSIBLE.ALWAYS_THIS_DEVICE_ONLY,
       )
     } catch {
       // JSON.stringify can throw on a circular value.
@@ -315,10 +394,12 @@ export default class KeyStoreWrapper {
    * Reporting it absent lets the next login heal the slot.
    */
   public static async readSessionProfiles(): Promise<SessionProfilesRead> {
-    const read = await KeyStoreWrapper.readWithStatus(KeyStoreWrapper.SESSION_PROFILES)
+    const read = await KeyStoreWrapper.migratedReadWithStatus(
+      KeyStoreWrapper.SESSION_PROFILES,
+    )
+    // An empty payload never reaches here: both stores report one as absent,
+    // so a `found` always carries something to parse.
     if (read.status !== "found") return read
-    // An empty payload is a slot that holds nothing, not a broken one.
-    if (!read.value) return { status: "absent" }
 
     try {
       const parsed = JSON.parse(read.value)
@@ -341,7 +422,7 @@ export default class KeyStoreWrapper {
   }
 
   public static async removeSessionProfiles(): Promise<boolean> {
-    return KeyStoreWrapper.erase(KeyStoreWrapper.SESSION_PROFILES)
+    return KeyStoreWrapper.migratedErase(KeyStoreWrapper.SESSION_PROFILES)
   }
 
   /**
@@ -355,15 +436,11 @@ export default class KeyStoreWrapper {
    * branch its callers take is unreachable there.
    */
   public static async readActiveToken(): Promise<ActiveTokenRead> {
-    try {
-      const token = await RNSecureKeyStore.get(KeyStoreWrapper.ACTIVE_TOKEN)
-      return token ? { status: "found", token } : { status: "absent" }
-    } catch (err) {
-      // "404" is the one code both the iOS and Android modules reserve for a
-      // key that is not there; anything else (locked keystore, decrypt error,
-      // unknown) is a failed read and must not be read as "no token".
-      return isKeyNotFound(err) ? { status: "absent" } : { status: "failed", err }
-    }
+    const read = await KeyStoreWrapper.migratedReadWithStatus(
+      KeyStoreWrapper.ACTIVE_TOKEN,
+    )
+    if (read.status === "found") return { status: "found", token: read.value }
+    return read
   }
 
   /**
@@ -376,26 +453,11 @@ export default class KeyStoreWrapper {
   }
 
   public static async setActiveToken(token: string): Promise<boolean> {
-    try {
-      // ALWAYS_THIS_DEVICE_ONLY over WHEN_UNLOCKED: iOS can cold-start the app in the
-      // background while locked (UIBackgroundModes remote-notification), and a failed
-      // read here degrades to a silent logged-out session.
-      await RNSecureKeyStore.set(KeyStoreWrapper.ACTIVE_TOKEN, token, {
-        accessible: ACCESSIBLE.ALWAYS_THIS_DEVICE_ONLY,
-      })
-      return true
-    } catch {
-      return false
-    }
+    return KeyStoreWrapper.migratedWrite(KeyStoreWrapper.ACTIVE_TOKEN, token)
   }
 
   public static async removeActiveToken(): Promise<boolean> {
-    try {
-      await RNSecureKeyStore.remove(KeyStoreWrapper.ACTIVE_TOKEN)
-      return true
-    } catch {
-      return false
-    }
+    return KeyStoreWrapper.migratedErase(KeyStoreWrapper.ACTIVE_TOKEN)
   }
 
   /**
@@ -403,6 +465,24 @@ export default class KeyStoreWrapper {
    * fresh install must clear every session credential the UI can reach.
    * Owning the list here means adding a new uninstall-surviving slot and
    * adding it to this wipe are the same edit, in the same file.
+   *
+   * Two consequences of the slots above moving stores, both deliberate and
+   * neither free:
+   *
+   * 1. On iOS the legacy library's unscoped sweep used to delete the app's own
+   *    generic passwords, mnemonics included, on the first legacy call after a
+   *    reinstall. The read-through helper disarms that sweep before every
+   *    legacy touch, so mnemonics now survive an uninstall for the first time.
+   *    That is the product decision recorded in blinkbitcoin/blink-wip#1143
+   *    (finding 2) and it blocks blinkbitcoin/blink-wip#1162; it arrives here
+   *    ahead of that answer and nothing in this file can defer it.
+   * 2. Adding the PIN and the biometrics flag widens a known false positive:
+   *    the caller reaches this through `MigrationStatus.NoData`, which a
+   *    throwing AsyncStorage read can produce without a reinstall, and the app
+   *    lock now goes with the session. Taken deliberately — a real reinstall
+   *    otherwise boots the next owner into a PIN nobody on the device chose,
+   *    which is unrecoverable, while this costs a lock the user can set again
+   *    on a boot that already signed them out loudly.
    *
    * Mnemonics are deliberately excluded: wallet keys outliving uninstall is a
    * recovery/product decision, not cleanup (and their account index does not
@@ -426,6 +506,13 @@ export default class KeyStoreWrapper {
     }
     await removeWithRetry(KeyStoreWrapper.removeActiveToken, "active token")
     await removeWithRetry(KeyStoreWrapper.removeSessionProfiles, "session profiles")
+    // The migrated slots are Keychain internet credentials, which outlive an
+    // uninstall exactly as the legacy items did — and the app lock is the one
+    // that strands its new owner, since a reinstall would boot into a PIN
+    // nobody on this device ever chose.
+    await removeWithRetry(KeyStoreWrapper.removePin, "pin")
+    await removeWithRetry(KeyStoreWrapper.clearPinFailureState, "pin lockout state")
+    await removeWithRetry(KeyStoreWrapper.removeIsBiometricsEnabled, "biometrics flag")
   }
 
   public static async removeSessionProfileByToken(token: string): Promise<boolean> {
@@ -463,7 +550,7 @@ export default class KeyStoreWrapper {
     return KeyStoreWrapper.write(
       KeyStoreWrapper.mnemonicKeyFor(accountId),
       mnemonic,
-      ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
+      LEGACY_ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
     )
   }
 
@@ -487,7 +574,7 @@ export default class KeyStoreWrapper {
     return KeyStoreWrapper.write(
       KeyStoreWrapper.mnemonicNetworkKeyFor(accountId),
       network,
-      ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
+      LEGACY_ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
     )
   }
 }
