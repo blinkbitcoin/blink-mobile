@@ -18,6 +18,11 @@ export const useScreenSecurity = (): ScreenSecurityState => {
   const [state, setState] = useState<ScreenSecurityState>("activating")
 
   useEffect(() => {
+    // A theme flip re-runs this effect: the cleanup releases the only lease and
+    // the guard drops before the fresh registration lands. Reset to
+    // "activating" so the gate re-hides the content for that window instead of
+    // leaving it mounted behind a guard that is momentarily off.
+    setState("activating")
     const lease = acquireScreenSecurity(colors.black)
     let mounted = true
 
