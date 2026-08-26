@@ -236,7 +236,11 @@ const RestorePhraseContent: React.FC = () => {
 }
 
 export const RestorePhraseScreen: React.FC = () => (
-  <ScreenSecurityGate>
+  // Input-only screen: the user types a phrase they already hold. Failing closed
+  // here would lock a reinstalling user out of their funds on a device where
+  // registration never succeeds, so the gate degrades to mounting the content
+  // unprotected after its retries are exhausted.
+  <ScreenSecurityGate failOpen>
     <RestorePhraseContent />
   </ScreenSecurityGate>
 )
