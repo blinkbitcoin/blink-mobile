@@ -1,5 +1,6 @@
 import React from "react"
 import { Alert } from "react-native"
+import type { ReactTestInstance } from "react-test-renderer"
 import { Network as mockSparkNetwork } from "@breeztech/breez-sdk-spark-react-native"
 import {
   act,
@@ -99,6 +100,11 @@ jest.mock("react-native-image-picker", () => ({
 }))
 
 const mockToastShow = jest.fn()
+jest.mock("react-native-safe-area-context", () => ({
+  ...jest.requireActual("react-native-safe-area-context"),
+  useSafeAreaInsets: () => ({ top: 24, bottom: 48, left: 0, right: 0 }),
+}))
+
 jest.mock("@app/utils/toast", () => ({
   ...jest.requireActual("@app/utils/toast"),
   toastShow: (...args: unknown[]) => mockToastShow(...args),
@@ -389,6 +395,44 @@ describe("ScanningQRCodeScreen", () => {
     await fireScan("lnbc1second")
 
     expect(mockResolveDestination).toHaveBeenCalledTimes(2)
+  })
+
+  /**
+   * The controls used to sit at fixed offsets from the window edge. From Android 15 the
+   * window runs under the system bars, so those offsets put the gallery and clipboard
+   * buttons behind the navigation bar and the close button behind the status bar.
+   */
+  describe("clearing the system bars", () => {
+    const flattenedStyle = (node: { props: { style?: unknown } }) =>
+      Object.assign({}, ...[node.props.style].flat(Infinity).filter(Boolean)) as Record<
+        string,
+        number | undefined
+      >
+
+    const styleOfAncestorWith = (node: ReactTestInstance | null, key: string) => {
+      let current = node
+      while (current) {
+        const style = flattenedStyle(current)
+        if (style[key] !== undefined) return style
+        current = current.parent
+      }
+      throw new Error(`no ancestor carries a ${key} style`)
+    }
+
+    it("offsets the bottom controls by the bottom inset", async () => {
+      const screen = await renderScreen()
+      const gallery = screen.getByTestId("open-gallery")
+
+      expect(styleOfAncestorWith(gallery, "bottom").bottom).toBe(48 + 24)
+    })
+
+    it("offsets the close button by the top inset", async () => {
+      const screen = await renderScreen()
+      const closeIcon = screen.UNSAFE_getAllByProps({ name: "close" })[0]
+      const closeContainer = closeIcon.parent?.parent
+
+      expect(flattenedStyle(closeContainer as never).marginTop).toBe(24 + 16)
+    })
   })
 
   describe("picking a QR from the gallery", () => {
