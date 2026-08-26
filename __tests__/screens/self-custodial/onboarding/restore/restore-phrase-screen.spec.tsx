@@ -582,5 +582,21 @@ describe("RestorePhraseScreen", () => {
 
       expect(mockReleaseScreenSecurity).toHaveBeenCalledTimes(1)
     })
+
+    /** Restore is input-only — the user types a phrase they already hold — so the
+     *  gate fails open: a device where registration never succeeds must not lock
+     *  the user out of their funds. */
+    it("still renders the inputs when screen protection cannot be acquired", async () => {
+      mockAcquireScreenSecurity.mockReturnValue({
+        ready: Promise.reject(new Error("native failure")),
+        release: mockReleaseScreenSecurity,
+      })
+
+      renderScreen()
+      await flushEffects()
+
+      expect(mockUseRestorePhrase).toHaveBeenCalled()
+      expect(mockMnemonicWordInput).toHaveBeenCalled()
+    })
   })
 })
