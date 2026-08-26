@@ -14,9 +14,10 @@ jest.mock("@app/utils/error-logging", () => ({
   reportError: (...args: readonly unknown[]) => mockReportError(...args),
 }))
 
+let themeBlack = "#000000"
 jest.mock("@rn-vui/themed", () => ({
   useTheme: () => ({
-    theme: { colors: { black: "#000000" } },
+    theme: { colors: { black: themeBlack } },
   }),
 }))
 
@@ -40,6 +41,7 @@ const leaseWith = (
 describe("useScreenSecurity", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    themeBlack = "#000000"
   })
 
   it("starts activating and acquires a lease with the theme's background color", () => {
@@ -109,5 +111,30 @@ describe("useScreenSecurity", () => {
     await waitFor(() =>
       expect(mockReportError).toHaveBeenCalledWith("Disable screen security", failure),
     )
+  })
+
+  /** A theme flip re-runs the effect: the old lease is released and the guard
+   *  drops before the fresh registration lands. The state must fall back to
+   *  "activating" for that window so the gate re-hides the content. */
+  it("re-gates while re-acquiring after the background color changes", async () => {
+    const first = deferred<void>()
+    const firstLease = leaseWith(first.promise)
+    mockAcquireScreenSecurity.mockReturnValue(firstLease)
+
+    const { result, rerender } = renderHook(() => useScreenSecurity())
+    first.resolve(undefined)
+    await waitFor(() => expect(result.current).toBe("active"))
+
+    const second = deferred<void>()
+    mockAcquireScreenSecurity.mockReturnValue(leaseWith(second.promise))
+    themeBlack = "#111111"
+    rerender({})
+
+    await waitFor(() => expect(result.current).toBe("activating"))
+    expect(firstLease.release).toHaveBeenCalledTimes(1)
+    expect(mockAcquireScreenSecurity).toHaveBeenCalledWith("#111111")
+
+    second.resolve(undefined)
+    await waitFor(() => expect(result.current).toBe("active"))
   })
 })
