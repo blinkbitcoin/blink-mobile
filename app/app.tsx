@@ -10,6 +10,7 @@ import ErrorBoundary from "react-native-error-boundary"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import "react-native-reanimated"
 import { RootSiblingParent } from "react-native-root-siblings"
+import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-context"
 // for URL; need a polyfill on react native
 import "react-native-url-polyfill/auto"
 
@@ -59,47 +60,53 @@ if (__DEV__) console.log(`Loaded default locale: ${defaultLocale}`)
 export const App = () => (
   /* eslint-disable-next-line react-native/no-inline-styles */
   <GestureHandlerRootView style={{ flex: 1 }}>
-    <PersistentStateProvider>
-      <TypesafeI18n locale={detectDefaultLocale()}>
-        <GaloyClient>
-          <GaloyThemeProvider>
-            <FeatureFlagContextProvider>
-              <CustodialWalletProvider>
-                <SelfCustodialWalletProvider>
-                  <BackupStateProvider>
-                    <AutoConvertStatusProvider>
-                      <ActionsProvider>
-                        <MigrationBlockerProvider>
-                          <NavigationContainerWrapper>
-                            <ErrorBoundary FallbackComponent={ErrorScreen}>
-                              <RootSiblingParent>
-                                <EnhancedModePromptProvider>
-                                  <RestrictedRegionProvider>
-                                    <NotificationsProvider>
-                                      <AppStateWrapper />
-                                      <PushNotificationComponent />
-                                      <AutoConvertListenerMount />
-                                      <AccountModeSyncMount />
-                                      <RootStack />
-                                      <NetworkErrorComponent />
-                                      <ActionModals />
-                                    </NotificationsProvider>
-                                  </RestrictedRegionProvider>
-                                </EnhancedModePromptProvider>
-                                <GaloyToast />
-                              </RootSiblingParent>
-                            </ErrorBoundary>
-                          </NavigationContainerWrapper>
-                        </MigrationBlockerProvider>
-                      </ActionsProvider>
-                    </AutoConvertStatusProvider>
-                  </BackupStateProvider>
-                </SelfCustodialWalletProvider>
-              </CustodialWalletProvider>
-            </FeatureFlagContextProvider>
-          </GaloyThemeProvider>
-        </GaloyClient>
-      </TypesafeI18n>
-    </PersistentStateProvider>
+    {/* Every screen reads its window insets from here. React Navigation supplies a
+        provider of its own inside each navigator, but only there and only after the
+        first frame, so anything rendered outside or before it measured zero insets
+        and drew under the system bars. */}
+    <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+      <PersistentStateProvider>
+        <TypesafeI18n locale={detectDefaultLocale()}>
+          <GaloyClient>
+            <GaloyThemeProvider>
+              <FeatureFlagContextProvider>
+                <CustodialWalletProvider>
+                  <SelfCustodialWalletProvider>
+                    <BackupStateProvider>
+                      <AutoConvertStatusProvider>
+                        <ActionsProvider>
+                          <MigrationBlockerProvider>
+                            <NavigationContainerWrapper>
+                              <ErrorBoundary FallbackComponent={ErrorScreen}>
+                                <RootSiblingParent>
+                                  <EnhancedModePromptProvider>
+                                    <RestrictedRegionProvider>
+                                      <NotificationsProvider>
+                                        <AppStateWrapper />
+                                        <PushNotificationComponent />
+                                        <AutoConvertListenerMount />
+                                        <AccountModeSyncMount />
+                                        <RootStack />
+                                        <NetworkErrorComponent />
+                                        <ActionModals />
+                                      </NotificationsProvider>
+                                    </RestrictedRegionProvider>
+                                  </EnhancedModePromptProvider>
+                                  <GaloyToast />
+                                </RootSiblingParent>
+                              </ErrorBoundary>
+                            </NavigationContainerWrapper>
+                          </MigrationBlockerProvider>
+                        </ActionsProvider>
+                      </AutoConvertStatusProvider>
+                    </BackupStateProvider>
+                  </SelfCustodialWalletProvider>
+                </CustodialWalletProvider>
+              </FeatureFlagContextProvider>
+            </GaloyThemeProvider>
+          </GaloyClient>
+        </TypesafeI18n>
+      </PersistentStateProvider>
+    </SafeAreaProvider>
   </GestureHandlerRootView>
 )
