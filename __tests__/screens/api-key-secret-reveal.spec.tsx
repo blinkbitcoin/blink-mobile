@@ -1,4 +1,5 @@
 import React from "react"
+import { Alert, AlertButton } from "react-native"
 import { act, fireEvent, render, screen } from "@testing-library/react-native"
 
 import { i18nObject } from "@app/i18n/i18n-util"
@@ -76,11 +77,18 @@ const renderReveal = () =>
     </ContextForScreen>,
   )
 
+const lastAlertButtons = (): AlertButton[] => {
+  const alertMock = jest.mocked(Alert.alert)
+  const call = alertMock.mock.calls[alertMock.mock.calls.length - 1]
+  return call?.[2] ?? []
+}
+
 describe("ApiKeySecretReveal", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     beforeRemoveListeners.length = 0
     mockLeaseReady = Promise.resolve()
+    jest.spyOn(Alert, "alert").mockImplementation(() => {})
   })
 
   it("hides the header back button and disables the swipe-back gesture", async () => {
@@ -124,14 +132,46 @@ describe("ApiKeySecretReveal", () => {
 
       expect(screen.queryByTestId("api-key-secret")).toBeNull()
       expect(screen.queryByText(LL.common.share())).toBeNull()
-      expect(mockSetOptions).not.toHaveBeenCalled()
 
       registration.resolve(undefined)
       await screen.findByTestId("api-key-secret")
       expect(screen.getByText(LL.common.share())).toBeTruthy()
     })
 
-    it("keeps the secret unmounted after registration fails, and Back still leaves", async () => {
+    /** The secret sits in the parent screen's state from the moment it is
+     *  created, so the dismissal guard must hold even while the gated content
+     *  is not mounted — otherwise a back swipe pops the screen and the
+     *  server-once secret is gone without warning. */
+    it("blocks dismissal while registration is still pending", async () => {
+      const registration = deferred<void>()
+      mockLeaseReady = registration.promise
+
+      renderReveal()
+      await act(async () => {})
+
+      expect(screen.queryByTestId("api-key-secret")).toBeNull()
+      expect(mockSetOptions).toHaveBeenCalledWith(
+        expect.objectContaining({ headerBackVisible: false, gestureEnabled: false }),
+      )
+      expect(beforeRemoveListeners.length).toBeGreaterThan(0)
+      const event = emitBeforeRemove()
+      expect(event.preventDefault).toHaveBeenCalled()
+    })
+
+    it("still blocks dismissal after registration fails", async () => {
+      const registration = deferred<void>()
+      mockLeaseReady = registration.promise
+
+      renderReveal()
+      await act(async () => {})
+      registration.reject(new Error("native failure"))
+      await screen.findByTestId("screen-security-retry")
+
+      const event = emitBeforeRemove()
+      expect(event.preventDefault).toHaveBeenCalled()
+    })
+
+    it("keeps the secret unmounted after registration fails, and Back asks before discarding it", async () => {
       const registration = deferred<void>()
       mockLeaseReady = registration.promise
 
@@ -141,10 +181,40 @@ describe("ApiKeySecretReveal", () => {
 
       await screen.findByTestId("screen-security-retry")
       expect(screen.queryByTestId("api-key-secret")).toBeNull()
-      expect(mockSetOptions).not.toHaveBeenCalled()
 
       fireEvent.press(screen.getByTestId("screen-security-back"))
+
+      // No silent discard: the user confirms before the unrecoverable secret goes.
+      expect(mockGoBack).not.toHaveBeenCalled()
+      expect(Alert.alert).toHaveBeenCalledWith(
+        LL.ApiScreen.discardSecretTitle(),
+        LL.ApiScreen.discardSecretBody(),
+        expect.any(Array),
+      )
+
+      const discard = lastAlertButtons().find((button) => button.style === "destructive")
+      discard?.onPress?.()
       expect(mockGoBack).toHaveBeenCalledTimes(1)
+      const event = emitBeforeRemove()
+      expect(event.preventDefault).not.toHaveBeenCalled()
+    })
+
+    it("does not leave when the discard confirmation is cancelled", async () => {
+      const registration = deferred<void>()
+      mockLeaseReady = registration.promise
+
+      renderReveal()
+      await act(async () => {})
+      registration.reject(new Error("native failure"))
+      await screen.findByTestId("screen-security-retry")
+
+      fireEvent.press(screen.getByTestId("screen-security-back"))
+      const cancel = lastAlertButtons().find((button) => button.style === "cancel")
+      cancel?.onPress?.()
+
+      expect(mockGoBack).not.toHaveBeenCalled()
+      const event = emitBeforeRemove()
+      expect(event.preventDefault).toHaveBeenCalled()
     })
   })
 })
