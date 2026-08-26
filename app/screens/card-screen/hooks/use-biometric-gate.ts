@@ -30,8 +30,11 @@ export const useBiometricGate = ({
     const gate = async () => {
       try {
         if (onlyIfBiometricsEnabledRef.current) {
-          const biometricsEnabled = await KeyStoreWrapper.getIsBiometricsEnabled()
-          if (!biometricsEnabled) {
+          /** Fails closed. This gate stands in front of the recovery phrase, so
+           *  a store that cannot say whether biometrics are on must not be read
+           *  as "off" and waved through — only a definite `no` skips the prompt. */
+          const biometrics = await KeyStoreWrapper.readIsBiometricsEnabled()
+          if (biometrics.status === "no") {
             setAuthenticated(true)
             return
           }
