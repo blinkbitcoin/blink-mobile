@@ -33,6 +33,27 @@ export type ResolveLnurlDestinationParams = {
   myWalletIds: string[]
 }
 
+const SERVER_ERROR_STATUS = 500
+
+/**
+ * lnurl-pay rejects for three different things: an address it cannot even build a
+ * URL from, a service that answered with something that is not a pay request, and a
+ * service that could not answer at all. Only the last one is worth telling the user
+ * to retry, and two shapes prove it. A 5xx is the service failing out loud. A
+ * rejection carrying the request but no response is the request never arriving
+ * (refused, DNS, TLS, timeout), which is how an outage usually reads. A 404 is
+ * neither: the service answered, and answered that this destination does not exist.
+ */
+const isLnurlServerFailure = (err: unknown): boolean => {
+  const { response, request } = (err ?? {}) as {
+    response?: { status?: unknown }
+    request?: unknown
+  }
+  const status = response?.status
+  if (typeof status === "number") return status >= SERVER_ERROR_STATUS
+  return request !== undefined
+}
+
 export const resolveLnurlDestination = async ({
   parsedLnurlDestination,
   lnurlDomains,
@@ -95,41 +116,57 @@ export const resolveLnurlDestination = async ({
       })
     }
 
-    // Check for lnurl pay request
+    // Check for lnurl pay request. The request is guarded on its own so a service
+    // that failed on its own side can be told apart from a destination that is not
+    // payable. Merchant till codes resolve through this call, and reporting the
+    // merchant service's own outage as "not a valid Bitcoin address or Lightning
+    // invoice" is what sent a shopper looking for a parser bug that was not there.
+    let lnurlPayParams: LnUrlPayServiceResponse
     try {
-      const lnurlPayParams = await requestPayServiceParams({
+      lnurlPayParams = await requestPayServiceParams({
         lnUrlOrAddress: parsedLnurlDestination.lnurl,
       })
+    } catch (err) {
+      const isServiceFailure = isLnurlServerFailure(err)
+      return {
+        valid: false,
+        invalidReason: isServiceFailure
+          ? InvalidDestinationReason.LnurlServiceError
+          : InvalidDestinationReason.LnurlUnsupported,
+        invalidPaymentDestination: parsedLnurlDestination,
+      } as const
+    }
 
-      if (lnurlPayParams) {
-        // Same https requirement for the pay callback: the Breez SDK fetches it
-        // on self-custodial sends, and the backend on custodial ones. LnurlError
-        // rather than LnurlUnsupported for the reason given above.
-        if (!isHttpsUrl(lnurlPayParams.callback)) {
-          return {
-            valid: false,
-            invalidReason: InvalidDestinationReason.LnurlError,
-            invalidPaymentDestination: parsedLnurlDestination,
-          } as const
-        }
-
-        const maybeIntraledgerDestination = await tryGetIntraLedgerDestinationFromLnurl({
-          lnurlDomains,
-          lnurlPayParams,
-          myWalletIds,
-          accountDefaultWalletQuery,
-        })
-        if (maybeIntraledgerDestination && maybeIntraledgerDestination.valid) {
-          return maybeIntraledgerDestination
-        }
-
-        return createLnurlPaymentDestination({
-          lnurlParams: lnurlPayParams,
-          ...parsedLnurlDestination,
-        })
+    try {
+      // Same https requirement for the pay callback: the Breez SDK fetches it
+      // on self-custodial sends, and the backend on custodial ones. LnurlError
+      // rather than LnurlUnsupported for the reason given above.
+      if (!isHttpsUrl(lnurlPayParams.callback)) {
+        return {
+          valid: false,
+          invalidReason: InvalidDestinationReason.LnurlError,
+          invalidPaymentDestination: parsedLnurlDestination,
+        } as const
       }
+
+      const maybeIntraledgerDestination = await tryGetIntraLedgerDestinationFromLnurl({
+        lnurlDomains,
+        lnurlPayParams,
+        myWalletIds,
+        accountDefaultWalletQuery,
+      })
+      if (maybeIntraledgerDestination && maybeIntraledgerDestination.valid) {
+        return maybeIntraledgerDestination
+      }
+
+      return createLnurlPaymentDestination({
+        lnurlParams: lnurlPayParams,
+        ...parsedLnurlDestination,
+      })
     } catch {
-      // Do nothing because it may be a lnurl withdraw request
+      // Resolving the account behind the lnurl is a separate lookup against our own
+      // backend, and its failure is not a statement about the lnurl. Kept swallowed,
+      // as it was before.
     }
 
     return {

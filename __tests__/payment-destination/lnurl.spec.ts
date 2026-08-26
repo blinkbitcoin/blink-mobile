@@ -607,3 +607,166 @@ describe("lnurl https enforcement", () => {
     )
   })
 })
+
+/**
+ * A merchant till code is an ordinary lnurl pay address pointed at the merchant's
+ * service, so every failure that service can have arrives through this one call.
+ * Folding it into LnurlUnsupported told the user their code was not a Bitcoin
+ * address or Lightning invoice at all, which is what #1175 was filed as.
+ */
+describe("lnurl service failures", () => {
+  const merchantLnurl = "https%3A%2F%2Fmerchant.example%2Fbill%2F1@codes.example"
+
+  const merchant = {
+    id: "example-tills",
+    lnurl: merchantLnurl,
+    category: "merchant-payment" as const,
+    title: "Example Tills",
+    description: "Example merchant",
+    companyName: "Example",
+    termsUrl: "https://merchant.example/terms",
+    displayCurrency: "ZAR",
+  }
+
+  const baseParams = {
+    lnurlDomains: ["ourdomain.com"],
+    accountDefaultWalletQuery: jest.fn(),
+    myWalletIds: ["testwalletid"],
+  }
+
+  const resolveMerchantLnurl = () =>
+    resolveLnurlDestination({
+      parsedLnurlDestination: {
+        paymentType: PaymentType.Lnurl,
+        valid: true,
+        lnurl: merchantLnurl,
+        isMerchant: true,
+        merchant,
+      },
+      ...baseParams,
+    })
+
+  beforeEach(() => {
+    mockRequestPayServiceParams.mockReset()
+    mockGetParams.mockReset()
+    mockGetParams.mockResolvedValue(manualMockLNURLResponse())
+  })
+
+  const httpError = (status: number) =>
+    Object.assign(new Error(`Request failed with status code ${status}`), {
+      response: { status },
+    })
+
+  it("reports a service that failed on its own side as a service error", async () => {
+    mockRequestPayServiceParams.mockRejectedValue(httpError(500))
+
+    expect(await resolveMerchantLnurl()).toEqual(
+      expect.objectContaining({
+        valid: false,
+        invalidReason: InvalidDestinationReason.LnurlServiceError,
+      }),
+    )
+  })
+
+  it("reports a service that is down for maintenance as a service error", async () => {
+    mockRequestPayServiceParams.mockRejectedValue(httpError(503))
+
+    expect(await resolveMerchantLnurl()).toEqual(
+      expect.objectContaining({
+        valid: false,
+        invalidReason: InvalidDestinationReason.LnurlServiceError,
+      }),
+    )
+  })
+
+  /**
+   * A 404 is the service answering, and answering that this destination does not
+   * exist. Telling the user to try again later would be a lie, and it is the answer
+   * a mistyped lightning address gets.
+   */
+  /**
+   * How an outage actually reaches us: refused, DNS, TLS or timeout, so the request
+   * was made and nothing came back. Nothing about the destination was established.
+   */
+  it("reports a service that never answered as a service error", async () => {
+    mockRequestPayServiceParams.mockRejectedValue(
+      Object.assign(new Error("Network Error"), { request: {}, code: "ERR_NETWORK" }),
+    )
+
+    expect(await resolveMerchantLnurl()).toEqual(
+      expect.objectContaining({
+        valid: false,
+        invalidReason: InvalidDestinationReason.LnurlServiceError,
+      }),
+    )
+  })
+
+  it("keeps reporting a destination the service does not know as unsupported", async () => {
+    mockRequestPayServiceParams.mockRejectedValue(httpError(404))
+
+    expect(await resolveMerchantLnurl()).toEqual(
+      expect.objectContaining({
+        valid: false,
+        invalidReason: InvalidDestinationReason.LnurlUnsupported,
+      }),
+    )
+  })
+
+  it("keeps reporting an address the library rejects outright as unsupported", async () => {
+    mockRequestPayServiceParams.mockRejectedValue(new Error("Invalid lnUrlOrAddress"))
+
+    expect(await resolveMerchantLnurl()).toEqual(
+      expect.objectContaining({
+        valid: false,
+        invalidReason: InvalidDestinationReason.LnurlUnsupported,
+      }),
+    )
+  })
+
+  /**
+   * What an lnurl-auth or channel-request QR resolves to: the service answers, with
+   * something that is not a pay request. Blink can never pay it, so "try again
+   * later" would be wrong however many times the user retries.
+   */
+  it("keeps reporting a response that is not a pay request as unsupported", async () => {
+    mockRequestPayServiceParams.mockRejectedValue(new Error("Invalid pay service params"))
+
+    expect(await resolveMerchantLnurl()).toEqual(
+      expect.objectContaining({
+        valid: false,
+        invalidReason: InvalidDestinationReason.LnurlUnsupported,
+      }),
+    )
+  })
+
+  /**
+   * The account lookup behind an lnurl is a separate request against our own backend.
+   * It failing is not the merchant service failing, so it must not be reported as one.
+   */
+  it("keeps reporting a failed account lookup as unsupported", async () => {
+    mockRequestPayServiceParams.mockResolvedValue(
+      manualMockLnUrlPayServiceResponse("someone@ourdomain.com"),
+    )
+    baseParams.accountDefaultWalletQuery.mockRejectedValue(new Error("network down"))
+
+    expect(await resolveMerchantLnurl()).toEqual(
+      expect.objectContaining({
+        valid: false,
+        invalidReason: InvalidDestinationReason.LnurlUnsupported,
+      }),
+    )
+  })
+
+  it("still resolves a merchant code the service can answer", async () => {
+    mockRequestPayServiceParams.mockResolvedValue(
+      manualMockLnUrlPayServiceResponse(merchantLnurl),
+    )
+
+    expect(await resolveMerchantLnurl()).toEqual(
+      expect.objectContaining({
+        valid: true,
+        destinationDirection: DestinationDirection.Send,
+      }),
+    )
+  })
+})
