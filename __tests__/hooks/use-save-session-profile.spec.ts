@@ -7,7 +7,7 @@ import { useSaveSessionProfile } from "@app/hooks/use-save-session-profile"
 const mockSaveToken = jest.fn()
 const mockUpdateState = jest.fn()
 const mockFetchUsername = jest.fn()
-const mockGetSessionProfiles = jest.fn()
+const mockReadSessionProfiles = jest.fn()
 const mockSaveSessionProfiles = jest.fn()
 const mockResetUpgradeModal = jest.fn()
 const mockUpdateDeviceSessionCount = jest.fn()
@@ -52,7 +52,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
 jest.mock("@app/utils/storage/secureStorage", () => ({
   __esModule: true,
   default: {
-    getSessionProfiles: (...args: unknown[]) => mockGetSessionProfiles(...args),
+    readSessionProfiles: (...args: unknown[]) => mockReadSessionProfiles(...args),
     saveSessionProfiles: (...args: unknown[]) => mockSaveSessionProfiles(...args),
   },
 }))
@@ -72,11 +72,15 @@ const setUserMe = (me: {
   mockFetchUsername.mockResolvedValue({ data: { me } })
 }
 
+const storeProfiles = (profiles: unknown[]) => {
+  mockReadSessionProfiles.mockResolvedValue({ status: "found", profiles })
+}
+
 describe("useSaveSessionProfile", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockSaveToken.mockResolvedValue(undefined)
-    mockGetSessionProfiles.mockResolvedValue([])
+    storeProfiles([])
     mockSaveSessionProfiles.mockResolvedValue(true)
   })
 
@@ -88,7 +92,7 @@ describe("useSaveSessionProfile", () => {
 
       expect(mockSaveToken).not.toHaveBeenCalled()
       expect(mockUpdateState).not.toHaveBeenCalled()
-      expect(mockGetSessionProfiles).not.toHaveBeenCalled()
+      expect(mockReadSessionProfiles).not.toHaveBeenCalled()
     })
 
     it("writes activeAccountId = DefaultAccountId.Custodial after saving the token", async () => {
@@ -152,9 +156,7 @@ describe("useSaveSessionProfile", () => {
     })
 
     it("returns early without saving the new profile when the token is already stored", async () => {
-      mockGetSessionProfiles.mockResolvedValue([
-        { token: "existing-token", accountId: "acct-1", selected: true },
-      ])
+      storeProfiles([{ token: "existing-token", accountId: "acct-1", selected: true }])
 
       const { result } = renderHook(() => useSaveSessionProfile())
 
@@ -187,9 +189,7 @@ describe("useSaveSessionProfile", () => {
 
     it("re-fetches and replaces a degraded profile (no accountId) instead of returning early", async () => {
       setUserMe({ id: "u1", username: "alice", defaultAccount: { id: "acct-1" } })
-      mockGetSessionProfiles.mockResolvedValue([
-        { token: "new-token", identifier: "Blink user", selected: true },
-      ])
+      storeProfiles([{ token: "new-token", identifier: "Blink user", selected: true }])
 
       const { result } = renderHook(() => useSaveSessionProfile())
 
@@ -205,9 +205,7 @@ describe("useSaveSessionProfile", () => {
 
     it("saves a brand-new profile alongside the deselected previous ones", async () => {
       setUserMe({ id: "u1", username: "alice", defaultAccount: { id: "acct-new" } })
-      mockGetSessionProfiles.mockResolvedValue([
-        { token: "old-token", accountId: "acct-old", selected: true },
-      ])
+      storeProfiles([{ token: "old-token", accountId: "acct-old", selected: true }])
 
       const { result } = renderHook(() => useSaveSessionProfile())
 
@@ -224,7 +222,7 @@ describe("useSaveSessionProfile", () => {
 
     it("re-selects the existing profile when the user signs in again with a fresh token", async () => {
       setUserMe({ id: "u1", username: "alice", defaultAccount: { id: "acct-existing" } })
-      mockGetSessionProfiles.mockResolvedValue([
+      storeProfiles([
         { token: "stale-token", accountId: "acct-existing", selected: false },
         { token: "other-token", accountId: "acct-other", selected: true },
       ])
@@ -243,12 +241,58 @@ describe("useSaveSessionProfile", () => {
       expect(existing.token).toBe("fresh-token")
       expect(other.selected).toBe(false)
     })
+
+    it("writes nothing when the profiles read fails, so the other sessions survive", async () => {
+      setUserMe({ id: "u1", username: "alice", defaultAccount: { id: "acct-new" } })
+      mockReadSessionProfiles.mockResolvedValue({
+        status: "failed",
+        err: new Error("keystore locked"),
+      })
+
+      const { result } = renderHook(() => useSaveSessionProfile())
+
+      await result.current.saveProfile("new-token")
+
+      expect(mockSaveSessionProfiles).not.toHaveBeenCalled()
+      expect(mockRecordError).toHaveBeenCalledTimes(1)
+      // The login itself still stands: only the profile list is left alone
+      expect(mockSaveToken).toHaveBeenCalledWith("new-token")
+      // and its own side effects run, since they belong to the login
+      expect(mockResetUpgradeModal).toHaveBeenCalledTimes(1)
+      expect(mockUpdateDeviceSessionCount).toHaveBeenCalledWith(expect.anything(), {
+        reset: true,
+      })
+    })
+
+    it("writes nothing when /me resolves without a user", async () => {
+      mockFetchUsername.mockResolvedValue({ data: { me: null } })
+
+      const { result } = renderHook(() => useSaveSessionProfile())
+
+      await result.current.saveProfile("new-token")
+
+      expect(mockSaveSessionProfiles).not.toHaveBeenCalled()
+    })
+
+    it("saves the first profile when nothing is stored yet", async () => {
+      setUserMe({ id: "u1", username: "alice", defaultAccount: { id: "acct-new" } })
+      mockReadSessionProfiles.mockResolvedValue({ status: "absent" })
+
+      const { result } = renderHook(() => useSaveSessionProfile())
+
+      await result.current.saveProfile("new-token")
+
+      expect(mockSaveSessionProfiles).toHaveBeenCalledTimes(1)
+      const saved = mockSaveSessionProfiles.mock.calls[0][0]
+      expect(saved).toHaveLength(1)
+      expect(saved[0].accountId).toBe("acct-new")
+    })
   })
 
   describe("updateCurrentProfile", () => {
     it("heals a degraded profile by token match once defaultAccount resolves", async () => {
       setUserMe({ id: "u1", username: "alice", defaultAccount: { id: "acct-1" } })
-      mockGetSessionProfiles.mockResolvedValue([
+      storeProfiles([
         { token: "current-token", identifier: "Blink user", selected: true },
       ])
 
@@ -261,6 +305,58 @@ describe("useSaveSessionProfile", () => {
       expect(saved).toHaveLength(1)
       expect(saved[0].accountId).toBe("acct-1")
       expect(saved[0].identifier).toBe("alice")
+    })
+
+    it("leaves a profile that matches neither the account nor the token untouched", async () => {
+      setUserMe({ id: "u1", username: "alice", defaultAccount: { id: "acct-1" } })
+      const other = { token: "other-token", accountId: "acct-other", selected: false }
+      storeProfiles([other])
+
+      const { result } = renderHook(() => useSaveSessionProfile())
+
+      await result.current.updateCurrentProfile()
+
+      expect(mockSaveSessionProfiles).toHaveBeenCalledWith([other])
+    })
+
+    it("writes nothing when the current profile cannot be fetched", async () => {
+      mockFetchUsername.mockResolvedValue({ data: { me: null } })
+      storeProfiles([{ token: "current-token", accountId: "acct-1", selected: true }])
+
+      const { result } = renderHook(() => useSaveSessionProfile())
+
+      await result.current.updateCurrentProfile()
+
+      expect(mockSaveSessionProfiles).not.toHaveBeenCalled()
+    })
+
+    it("writes nothing when the profiles read fails, so the other sessions survive", async () => {
+      setUserMe({ id: "u1", username: "alice", defaultAccount: { id: "acct-1" } })
+      mockReadSessionProfiles.mockResolvedValue({
+        status: "failed",
+        err: new Error("keystore locked"),
+      })
+
+      const { result } = renderHook(() => useSaveSessionProfile())
+
+      await result.current.updateCurrentProfile()
+
+      expect(mockSaveSessionProfiles).not.toHaveBeenCalled()
+      expect(mockRecordError).toHaveBeenCalledTimes(1)
+      // The read comes first, so the /me round trip is skipped too
+      expect(mockFetchUsername).not.toHaveBeenCalled()
+    })
+
+    it("writes nothing when no profiles are stored, since there is none to update", async () => {
+      setUserMe({ id: "u1", username: "alice", defaultAccount: { id: "acct-1" } })
+      mockReadSessionProfiles.mockResolvedValue({ status: "absent" })
+
+      const { result } = renderHook(() => useSaveSessionProfile())
+
+      await result.current.updateCurrentProfile()
+
+      expect(mockSaveSessionProfiles).not.toHaveBeenCalled()
+      expect(mockFetchUsername).not.toHaveBeenCalled()
     })
   })
 })

@@ -17,9 +17,25 @@ export type ActiveTokenRead =
   | { status: "absent" }
   | { status: "failed"; err: unknown }
 
+/**
+ * The outcome of a session-profiles read, with "nothing stored" kept distinct
+ * from "the read failed" — see readSessionProfiles.
+ */
+export type SessionProfilesRead =
+  | { status: "found"; profiles: ProfileProps[] }
+  | { status: "absent" }
+  | { status: "failed"; err: unknown }
+
 // Both native modules reject a missing key with code "404" (ios/RNSecureKeyStore.m
 // `get`, android RNSecureKeyStoreModule#get). Every other code means the read
 // itself went wrong.
+//
+// True on Android only. The iOS module discards the OSStatus from
+// SecItemCopyMatching (`searchKeychainCopyMatching` returns nil for any failure)
+// and `get` rejects nil with "404", so an entitlement or decode error is
+// indistinguishable from a missing key there. Every caller that branches on this
+// therefore degrades to "absent" on iOS; the distinction becomes real when the
+// slots move to react-native-keychain (blink-wip#1161).
 const KEY_NOT_FOUND_CODE = "404"
 
 const isKeyNotFound = (err: unknown): boolean =>
@@ -281,14 +297,47 @@ export default class KeyStoreWrapper {
     }
   }
 
-  public static async getSessionProfiles(): Promise<ProfileProps[]> {
-    const data = await KeyStoreWrapper.read(KeyStoreWrapper.SESSION_PROFILES)
-    if (!data) return []
+  /**
+   * A missing key is a rejection, not an empty read, so "no profiles stored"
+   * and "the keystore is unhappy" arrive the same way and only the error code
+   * tells them apart — the same distinction readActiveToken draws. Callers that
+   * write the list back must use this instead of getSessionProfiles: an empty
+   * list scored from a failed read deletes every profile, and profiles carry
+   * their sessions' tokens.
+   *
+   * Platform caveat: this only separates the two cases on Android — see the
+   * note above KEY_NOT_FOUND_CODE.
+   *
+   * A payload that will not parse, or that parses to something other than an
+   * array, is reported as absent rather than failed: it holds nothing a caller
+   * could preserve, so refusing to overwrite it would protect no session while
+   * permanently disabling multi-account — nothing else ever clears this key.
+   * Reporting it absent lets the next login heal the slot.
+   */
+  public static async readSessionProfiles(): Promise<SessionProfilesRead> {
+    const read = await KeyStoreWrapper.readWithStatus(KeyStoreWrapper.SESSION_PROFILES)
+    if (read.status !== "found") return read
+    // An empty payload is a slot that holds nothing, not a broken one.
+    if (!read.value) return { status: "absent" }
+
     try {
-      return JSON.parse(data)
+      const parsed = JSON.parse(read.value)
+      return Array.isArray(parsed)
+        ? { status: "found", profiles: parsed }
+        : { status: "absent" }
     } catch {
-      return []
+      return { status: "absent" }
     }
+  }
+
+  /**
+   * Collapses absent and failed to an empty list: convenient, and safe only
+   * where that renders an empty list. Use readSessionProfiles where it leads
+   * to a write.
+   */
+  public static async getSessionProfiles(): Promise<ProfileProps[]> {
+    const read = await KeyStoreWrapper.readSessionProfiles()
+    return read.status === "found" ? read.profiles : []
   }
 
   public static async removeSessionProfiles(): Promise<boolean> {
@@ -300,6 +349,10 @@ export default class KeyStoreWrapper {
    * "nothing stored" and "the keystore is unhappy" arrive the same way and only
    * the error code tells them apart. Callers that would destroy or overwrite a
    * credential based on an empty read must use this instead of getActiveToken.
+   *
+   * The code only tells them apart on Android — see the note above
+   * KEY_NOT_FOUND_CODE. On iOS every failed read reports absent, so the failed
+   * branch its callers take is unreachable there.
    */
   public static async readActiveToken(): Promise<ActiveTokenRead> {
     try {
@@ -376,8 +429,16 @@ export default class KeyStoreWrapper {
   }
 
   public static async removeSessionProfileByToken(token: string): Promise<boolean> {
-    const profiles = await KeyStoreWrapper.getSessionProfiles()
-    const remaining = profiles.filter((profile) => profile.token !== token)
+    const read = await KeyStoreWrapper.readSessionProfiles()
+    // Rewriting the list from a failed read would sign every other saved
+    // account out; leaving this one entry behind is the lesser harm. The
+    // logout caller ignores the result either way, so false is a report, not
+    // a branch.
+    if (read.status === "failed") return false
+    // Nothing stored means nothing to remove — and no reason to write "[]".
+    if (read.status === "absent") return true
+
+    const remaining = read.profiles.filter((profile) => profile.token !== token)
     return KeyStoreWrapper.saveSessionProfiles(remaining)
   }
 
