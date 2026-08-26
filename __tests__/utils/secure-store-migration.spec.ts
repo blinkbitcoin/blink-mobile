@@ -509,6 +509,63 @@ describe("per-slot serialization", () => {
     expect(await queued).toEqual({ status: "absent" })
   })
 
+  it("drops the migrating write of an abandoned read that lands after a remove", async () => {
+    jest.useFakeTimers()
+    let releaseAbandonedRead: () => void = () => {}
+    mockedSecureRead.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          releaseAbandonedRead = () => resolve({ status: "absent" })
+        }),
+    )
+    mockedLegacyRead.mockResolvedValue({ status: "found", value: "stale-token" })
+    mockedLegacyErase.mockResolvedValue(true)
+    mockedSecureRemove.mockResolvedValue(true)
+
+    const abandoned = readThrough(ARGS)
+    await jest.advanceTimersByTimeAsync(30_000)
+    expect(await abandoned).toEqual({
+      status: "failed",
+      err: expect.objectContaining({
+        message: "secure store sessionProfiles timed out after 30000ms",
+      }),
+    })
+
+    expect(await removeThrough(REMOVE_ARGS)).toBe(true)
+    mockedSecureWrite.mockClear()
+
+    // The hung native call finally answers. Its continuation is the danger: it
+    // still holds the legacy value it was migrating, and the slot it was
+    // migrating into has since been emptied by the remove above.
+    releaseAbandonedRead()
+    await jest.advanceTimersByTimeAsync(0)
+
+    expect(mockedSecureWrite).not.toHaveBeenCalled()
+  })
+
+  it("drops the new-store delete of an abandoned remove that lands late", async () => {
+    jest.useFakeTimers()
+    let releaseAbandonedErase: () => void = () => {}
+    mockedLegacyErase.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          releaseAbandonedErase = () => resolve(true)
+        }),
+    )
+    mockedSecureRemove.mockResolvedValue(true)
+
+    const abandoned = removeThrough(REMOVE_ARGS)
+    await jest.advanceTimersByTimeAsync(30_000)
+    expect(await abandoned).toBe(false)
+
+    // The slot is free now, so whatever a caller writes next is what lives
+    // there. The abandoned remove must not reach in and empty it.
+    releaseAbandonedErase()
+    await jest.advanceTimersByTimeAsync(0)
+
+    expect(mockedSecureRemove).not.toHaveBeenCalled()
+  })
+
   it("keeps an account id out of the timeout message", async () => {
     jest.useFakeTimers()
     mockedSecureRead.mockImplementation(() => new Promise<never>(() => {}))

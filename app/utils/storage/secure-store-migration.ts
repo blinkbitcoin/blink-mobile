@@ -89,14 +89,44 @@ const SLOT_OPERATION_TIMEOUT_MS = 30_000
  */
 const pendingBySlot = new Map<string, Promise<void>>()
 
-const onSlot = <T>(slot: string, task: () => Promise<T>): Promise<T> => {
+/**
+ * Passed to every queued task so it can ask whether it still holds the slot.
+ *
+ * The timeout cannot cancel a hung native call — `withTimeout` only races it —
+ * so an abandoned task keeps running and its continuation still fires. Freeing
+ * the queue while that task is alive is what makes the two overlap: the task
+ * has to stop mutating on its own, and this is how it is told to.
+ *
+ * Every side effect that follows an `await` inside a task is guarded by it.
+ * Unguarded, a read that hangs past the timeout and resolves after a logout has
+ * emptied the slot writes the legacy value it was mid-migration back into the
+ * new store, restoring the credential the logout just removed.
+ */
+type IsCurrent = () => boolean
+
+const onSlot = <T>(
+  slot: string,
+  task: (isCurrent: IsCurrent) => Promise<T>,
+): Promise<T> => {
   const previous = pendingBySlot.get(slot) ?? Promise.resolve()
-  // The timeout cannot cancel a hung native call, but it does let the queue
-  // move on, and it lands the caller on the `failed` path the rest of this
-  // design is built to handle safely.
-  const result = previous.then(() =>
-    withTimeout(task(), SLOT_OPERATION_TIMEOUT_MS, `secure store ${keyClassOf(slot)}`),
-  )
+  const result = previous.then(() => {
+    // Scoped to this operation, so it is collected with the closure rather than
+    // living in a map that has to be pruned. Pruning is the hazard here: a
+    // reset counter would hand a still-running abandoned task its slot back.
+    let isAbandoned = false
+    const running = task(() => !isAbandoned)
+
+    return withTimeout(
+      running,
+      SLOT_OPERATION_TIMEOUT_MS,
+      `secure store ${keyClassOf(slot)}`,
+    ).catch((err) => {
+      // Reached on timeout, where the task is still running and must stop, and
+      // on a task that rejected, where the flag is set on work already over.
+      isAbandoned = true
+      throw err
+    })
+  })
 
   // What gets queued is the settled promise, not the result: it absorbs the
   // rejection so that one failed operation cannot cancel the work behind it,
@@ -156,7 +186,22 @@ export type RemoveThroughArgs = {
   readonly legacyKey: string
 }
 
-const runRead = async (args: ReadThroughArgs): Promise<SecureRead> => {
+/**
+ * The answer an abandoned task gives instead of its real one. It is not
+ * normally observed — the caller was handed a timeout the moment the slot was
+ * taken away — but `failed` is the only honest value left: the slot moved on,
+ * so whatever this task read no longer describes it. Reporting the value it was
+ * holding would be reporting a credential that may since have been deleted.
+ */
+const abandoned = (slot: string): { status: "failed"; err: unknown } => ({
+  status: "failed",
+  err: new Error(`secure store ${keyClassOf(slot)} operation was abandoned`),
+})
+
+const runRead = async (
+  args: ReadThroughArgs,
+  isCurrent: IsCurrent,
+): Promise<SecureRead> => {
   const current = await secureRead(args.slot)
 
   // The steady state after migration: the legacy library is never touched
@@ -178,19 +223,30 @@ const runRead = async (args: ReadThroughArgs): Promise<SecureRead> => {
   // scoring the first as absent is what deletes credentials downstream.
   if (legacy.status === "failed") return legacy
 
+  // Both stores have answered, so the slot may have changed hands while they
+  // did. Everything above this line only reads; everything below it writes.
+  if (!isCurrent()) return abandoned(args.slot)
+
   logLegacyHit(args.legacyKey)
 
   // A failed write leaves the legacy copy intact and retries on the next read:
   // migration bookkeeping must never cost availability, so the erase outcome is
   // reported inside `eraseLegacyCopy` and never changes what the caller gets.
   const written = await secureWrite(args.slot, legacy.value, args.accessible)
-  const shouldEraseLegacy = written && args.deleteLegacyOnMigrate
+  // Re-checked because the write is itself an await: a slot handed over while
+  // it was in flight leaves this erase as the one side effect still ahead. An
+  // unerased legacy copy is the harmless outcome — the new store answers first,
+  // so it stays unreachable, and the next `removeThrough` clears it.
+  const shouldEraseLegacy = written && args.deleteLegacyOnMigrate && isCurrent()
   if (shouldEraseLegacy) await eraseLegacyCopy(args.legacyKey)
 
   return legacy
 }
 
-const runRemove = async (args: RemoveThroughArgs): Promise<boolean> => {
+const runRemove = async (
+  args: RemoveThroughArgs,
+  isCurrent: IsCurrent,
+): Promise<boolean> => {
   // The legacy copy goes first, and a copy that is not provably gone stops the
   // removal there. While the new store still holds the value it answers first,
   // so the survivor stays unreachable; emptying the new store anyway would turn
@@ -205,15 +261,23 @@ const runRemove = async (args: RemoveThroughArgs): Promise<boolean> => {
   const legacyGone = await eraseLegacyCopy(args.legacyKey)
   if (!legacyGone) return false
 
+  // The mirror of the read guard: emptying the new store after the slot has
+  // moved on deletes whatever took this value's place. `false` is already the
+  // contract for "not provably gone", so the caller keeps treating it as set.
+  if (!isCurrent()) return false
+
   return secureRemove(args.slot)
 }
 
-const runExists = async (args: ReadThroughArgs): Promise<SecureExists> => {
+const runExists = async (
+  args: ReadThroughArgs,
+  isCurrent: IsCurrent,
+): Promise<SecureExists> => {
   const current = await secureExists(args.slot)
   if (current.status === "yes") return current
   if (current.status === "failed") return current
 
-  const read = await runRead(args)
+  const read = await runRead(args, isCurrent)
   if (read.status === "found") return { status: "yes" }
   if (read.status === "absent") return { status: "no" }
   return { status: "failed", err: read.err }
@@ -232,7 +296,7 @@ const runExists = async (args: ReadThroughArgs): Promise<SecureExists> => {
  */
 export const readThrough = async (args: ReadThroughArgs): Promise<SecureRead> => {
   try {
-    return await onSlot(args.slot, () => runRead(args))
+    return await onSlot(args.slot, (isCurrent) => runRead(args, isCurrent))
   } catch (err) {
     return { status: "failed", err }
   }
@@ -252,7 +316,7 @@ export const readThrough = async (args: ReadThroughArgs): Promise<SecureRead> =>
  */
 export const removeThrough = async (args: RemoveThroughArgs): Promise<boolean> => {
   try {
-    return await onSlot(args.slot, () => runRemove(args))
+    return await onSlot(args.slot, (isCurrent) => runRemove(args, isCurrent))
   } catch {
     return false
   }
@@ -272,7 +336,7 @@ export const removeThrough = async (args: RemoveThroughArgs): Promise<boolean> =
  */
 export const existsThrough = async (args: ReadThroughArgs): Promise<SecureExists> => {
   try {
-    return await onSlot(args.slot, () => runExists(args))
+    return await onSlot(args.slot, (isCurrent) => runExists(args, isCurrent))
   } catch (err) {
     return { status: "failed", err }
   }
