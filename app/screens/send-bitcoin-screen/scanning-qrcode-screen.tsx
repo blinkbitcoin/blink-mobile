@@ -232,6 +232,20 @@ export const ScanningQRCodeScreen: React.FC = () => {
               ],
             )
             break
+          case "LnurlServiceError":
+            Alert.alert(
+              LL.ScanningQRCodeScreen.unresolvedTitle(),
+              LL.ScanningQRCodeScreen.unresolvedContent({
+                found: data.toString(),
+              }),
+              [
+                {
+                  text: LL.common.ok(),
+                  onPress: () => setPending(false),
+                },
+              ],
+            )
+            break
           case "UnknownDestination":
             if (isValidHttpUrl(data.toString())) {
               Alert.alert(
