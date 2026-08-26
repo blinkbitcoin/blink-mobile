@@ -3,12 +3,13 @@ import RNSecureKeyStore, {
   ACCESSIBLE as LEGACY_ACCESSIBLE,
 } from "react-native-secure-key-store"
 
-import { type SecureExists, secureWrite } from "./secure-store"
+import { type SecureExists } from "./secure-store"
 import {
   type ReadThroughArgs,
   existsThrough,
   readThrough,
   removeThrough,
+  writeThrough,
 } from "./secure-store-migration"
 
 // The keychain slot and the legacy persisted-blob field share this name.
@@ -133,7 +134,11 @@ export default class KeyStoreWrapper {
   // Writes never read through: they land in the new store only.
 
   private static async migratedWrite(key: string, value: string): Promise<boolean> {
-    return secureWrite(key, value, KeyStoreWrapper.MIGRATED_ACCESSIBLE)
+    return writeThrough({
+      slot: key,
+      value,
+      accessible: KeyStoreWrapper.MIGRATED_ACCESSIBLE,
+    })
   }
 
   private static async migratedErase(key: string): Promise<boolean> {
