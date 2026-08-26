@@ -1,3 +1,4 @@
+import axios from "axios"
 import { bech32 } from "bech32"
 import { LNURLResponse, LNURLWithdrawParams, getParams } from "js-lnurl"
 import { requestPayServiceParams, LnUrlPayServiceResponse, Satoshis } from "lnurl-pay"
@@ -20,6 +21,11 @@ jest.mock("lnurl-pay", () => ({
   requestPayServiceParams: jest.fn(),
 }))
 
+jest.mock("axios", () => ({
+  __esModule: true,
+  default: { get: jest.fn() },
+}))
+
 jest.mock("js-lnurl", () => ({
   getParams: jest.fn(),
 }))
@@ -32,6 +38,7 @@ const mockRequestPayServiceParams = requestPayServiceParams as jest.MockedFuncti
   typeof requestPayServiceParams
 >
 const mockGetParams = getParams as jest.MockedFunction<typeof getParams>
+const mockAxiosGet = axios.get as jest.MockedFunction<typeof axios.get>
 const mockCreateLnurlPaymentDetail = createLnurlPaymentDetails as jest.MockedFunction<
   typeof createLnurlPaymentDetails
 >
@@ -684,6 +691,29 @@ describe("lnurl service failures", () => {
    * exist. Telling the user to try again later would be a lie, and it is the answer
    * a mistyped lightning address gets.
    */
+  /**
+   * Not hypothetical: blink's own swap provider answers HTTP 200 with
+   * {"status":"ERROR","reason":"swap provider unavailable"} while it is down, and a
+   * scan of a swap merchant code landed on "Enter a valid destination" until the
+   * resolver started reading the body rather than only the HTTP status.
+   */
+  it("reports a service that announces its own outage in the body as a service error", async () => {
+    mockAxiosGet.mockResolvedValue({
+      data: { status: "ERROR", reason: "swap provider unavailable" },
+    })
+    mockRequestPayServiceParams.mockImplementation(async ({ fetchGet }) => {
+      await fetchGet?.({ url: "https://swap.example/.well-known/lnurlp/x" })
+      throw new Error("unreachable: the fetcher rejects on an ERROR body")
+    })
+
+    expect(await resolveMerchantLnurl()).toEqual(
+      expect.objectContaining({
+        valid: false,
+        invalidReason: InvalidDestinationReason.LnurlServiceError,
+      }),
+    )
+  })
+
   /**
    * How an outage actually reaches us: refused, DNS, TLS or timeout, so the request
    * was made and nothing came back. Nothing about the destination was established.

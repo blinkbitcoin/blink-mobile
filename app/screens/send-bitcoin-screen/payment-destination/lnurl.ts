@@ -1,5 +1,6 @@
+import axios from "axios"
 import { getParams } from "js-lnurl"
-import { requestPayServiceParams, LnUrlPayServiceResponse } from "lnurl-pay"
+import { requestPayServiceParams, LnUrlPayServiceResponse, FetcGetArgs } from "lnurl-pay"
 
 import {
   AccountDefaultWalletLazyQueryHookResult,
@@ -34,21 +35,50 @@ export type ResolveLnurlDestinationParams = {
 }
 
 const SERVER_ERROR_STATUS = 500
+const LNURL_ERROR_STATUS = "ERROR"
+
+type LnurlServiceFailure = Error & { readonly isLnurlServiceFailure: true }
+
+const lnurlServiceFailure = (reason: string): LnurlServiceFailure =>
+  Object.assign(new Error(reason), { isLnurlServiceFailure: true as const })
+
+/**
+ * LUD-06 lets a service report its own failure with HTTP 200 and a body of
+ * {status: "ERROR"}, which is how blink's own swap provider announces an outage.
+ * lnurl-pay turns that into a plain Error carrying the service's reason text,
+ * indistinguishable from its own input validation by the time it reaches a caller,
+ * so the distinction is drawn here while the response is still whole. The URL
+ * arrives already vetted: lnurl-pay checks it is a URL and refuses onion hosts
+ * before calling a fetcher, and the app vets the lnurl this was derived from.
+ */
+const fetchLnurlPayJson = async ({
+  url,
+  params,
+}: FetcGetArgs): Promise<Record<string, unknown>> => {
+  const { data } = await axios.get(url, { params })
+  if (data?.status === LNURL_ERROR_STATUS) {
+    throw lnurlServiceFailure(String(data.reason ?? ""))
+  }
+  return data
+}
 
 /**
  * lnurl-pay rejects for three different things: an address it cannot even build a
  * URL from, a service that answered with something that is not a pay request, and a
  * service that could not answer at all. Only the last one is worth telling the user
- * to retry, and two shapes prove it. A 5xx is the service failing out loud. A
+ * to retry, and three shapes prove it. A 5xx is the service failing out loud, a
+ * {status: "ERROR"} body is the service saying so in LUD-06's own words, and a
  * rejection carrying the request but no response is the request never arriving
- * (refused, DNS, TLS, timeout), which is how an outage usually reads. A 404 is
- * neither: the service answered, and answered that this destination does not exist.
+ * (refused, DNS, TLS, timeout). A 404 is none of those: the service answered, and
+ * answered that this destination does not exist.
  */
 const isLnurlServerFailure = (err: unknown): boolean => {
-  const { response, request } = (err ?? {}) as {
+  const { response, request, isLnurlServiceFailure } = (err ?? {}) as {
     response?: { status?: unknown }
     request?: unknown
+    isLnurlServiceFailure?: unknown
   }
+  if (isLnurlServiceFailure === true) return true
   const status = response?.status
   if (typeof status === "number") return status >= SERVER_ERROR_STATUS
   return request !== undefined
@@ -125,6 +155,7 @@ export const resolveLnurlDestination = async ({
     try {
       lnurlPayParams = await requestPayServiceParams({
         lnUrlOrAddress: parsedLnurlDestination.lnurl,
+        fetchGet: fetchLnurlPayJson,
       })
     } catch (err) {
       const isServiceFailure = isLnurlServerFailure(err)

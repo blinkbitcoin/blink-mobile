@@ -135,9 +135,9 @@ describe("merchant payment destination integration", () => {
       displayCurrency: "USD",
     })
 
-    expect(requestPayServiceParamsMock).toHaveBeenCalledWith({
-      lnUrlOrAddress: expectedMerchant.lnurl,
-    })
+    expect(requestPayServiceParamsMock).toHaveBeenCalledWith(
+      expect.objectContaining({ lnUrlOrAddress: expectedMerchant.lnurl }),
+    )
     expect(isMerchantChoiceDestination(result)).toBe(false)
     expect(result).toEqual(
       expect.objectContaining({
@@ -234,9 +234,9 @@ describe("merchant payment destination integration", () => {
 
       await parseBillUrl()
 
-      expect(requestPayServiceParamsMock).toHaveBeenCalledWith({
-        lnUrlOrAddress: billLnurl,
-      })
+      expect(requestPayServiceParamsMock).toHaveBeenCalledWith(
+        expect.objectContaining({ lnUrlOrAddress: billLnurl }),
+      )
     })
 
     it("reports a service that cannot resolve the bill as a service error", async () => {
