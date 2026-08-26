@@ -57,6 +57,53 @@ describe("useBiometricGate", () => {
     expect(mockAuthenticate).toHaveBeenCalled()
   })
 
+  /** The pre-first-unlock window makes the setting unreadable. Waving the user
+   *  through because the sensor is also unavailable would score that unreadable
+   *  setting as "no gate needed", which is the mistake the short-circuit above
+   *  exists to prevent. */
+  it("calls onFailure when the setting cannot be read and the sensor is unavailable", async () => {
+    mockReadIsBiometricsEnabled.mockResolvedValue({
+      status: "failed",
+      err: new Error("keystore locked"),
+    })
+    mockIsSensorAvailable.mockResolvedValue(false)
+
+    const onFailure = jest.fn()
+    const { result } = renderHook(() =>
+      useBiometricGate({
+        description: "test",
+        onFailure,
+        onlyIfBiometricsEnabled: true,
+      }),
+    )
+
+    await act(async () => {})
+
+    expect(onFailure).toHaveBeenCalled()
+    expect(result.current).toBe(false)
+  })
+
+  /** The counterpart: a readable setting keeps the old behaviour, so a device
+   *  whose sensor is genuinely gone is not locked out of its own screen. */
+  it("still authenticates when the setting reads on and the sensor is unavailable", async () => {
+    mockReadIsBiometricsEnabled.mockResolvedValue(biometricsSetting(true))
+    mockIsSensorAvailable.mockResolvedValue(false)
+
+    const onFailure = jest.fn()
+    const { result } = renderHook(() =>
+      useBiometricGate({
+        description: "test",
+        onFailure,
+        onlyIfBiometricsEnabled: true,
+      }),
+    )
+
+    await act(async () => {})
+
+    expect(onFailure).not.toHaveBeenCalled()
+    expect(result.current).toBe(true)
+  })
+
   it("sets authenticated true when sensor not available and required false", async () => {
     mockIsSensorAvailable.mockResolvedValue(false)
 
