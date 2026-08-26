@@ -4,6 +4,7 @@ import { render } from "@testing-library/react-native"
 
 import { AppStateWrapper } from "@app/navigation/app-state"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
+import type { SecureExists } from "@app/utils/storage/secure-store"
 
 import { flushEffects } from "../helpers/flush-effects"
 
@@ -58,10 +59,14 @@ jest.mock("@app/utils/analytics", () => ({
 jest.mock("@app/utils/storage/secureStorage", () => ({
   __esModule: true,
   default: {
-    getIsPinEnabled: jest.fn(),
-    getIsBiometricsEnabled: jest.fn(),
+    readIsPinEnabled: jest.fn(),
+    readIsBiometricsEnabled: jest.fn(),
   },
 }))
+
+/** The gate fails closed, so a lock is "off" only on a definite `no`. */
+const enablement = (isEnabled: boolean): SecureExists =>
+  isEnabled ? { status: "yes" } : { status: "no" }
 
 const mockedKeyStore = jest.mocked(KeyStoreWrapper)
 
@@ -78,8 +83,8 @@ const GRACE_PERIOD_SECONDS = 60
 const renderWrapper = () => render(<AppStateWrapper />)
 
 const setLock = ({ pin, biometrics }: { pin: boolean; biometrics: boolean }) => {
-  mockedKeyStore.getIsPinEnabled.mockResolvedValue(pin)
-  mockedKeyStore.getIsBiometricsEnabled.mockResolvedValue(biometrics)
+  mockedKeyStore.readIsPinEnabled.mockResolvedValue(enablement(pin))
+  mockedKeyStore.readIsBiometricsEnabled.mockResolvedValue(enablement(biometrics))
 }
 
 /** Sends the app away and brings it back after `secondsAway` of wall clock. */
@@ -169,6 +174,29 @@ describe("AppStateWrapper", () => {
 
       expect(mockSetAppLocked).not.toHaveBeenCalled()
       expect(mockNavigate).not.toHaveBeenCalled()
+    })
+
+    /** The migrated slots can report a failed read in the window before the
+     *  first unlock after a reboot. Scoring that as "no lock set" is what would
+     *  leave the app open for a user who does have one. */
+    it("locks when the store cannot say whether a lock is set", async () => {
+      mockedKeyStore.readIsPinEnabled.mockResolvedValue({
+        status: "failed",
+        err: new Error("keystore locked"),
+      })
+      mockedKeyStore.readIsBiometricsEnabled.mockResolvedValue({
+        status: "failed",
+        err: new Error("keystore locked"),
+      })
+      renderWrapper()
+      await flushEffects()
+
+      await leaveAndReturn(GRACE_PERIOD_SECONDS * 2)
+
+      expect(mockSetAppLocked).toHaveBeenCalledTimes(1)
+      expect(mockNavigate).toHaveBeenCalledWith("authenticationCheck", {
+        isResume: true,
+      })
     })
 
     it("honors a grace period served by the remote config", async () => {
