@@ -239,7 +239,12 @@ export const RestorePhraseScreen: React.FC = () => (
   // Input-only screen: the user types a phrase they already hold. Failing closed
   // here would lock a reinstalling user out of their funds on a device where
   // registration never succeeds, so the gate degrades to mounting the content
-  // unprotected after its retries are exhausted.
+  // unprotected after its retries are exhausted. Deliberately no user-facing
+  // warning on that degraded path: the failure is reported through reportError,
+  // and a screenshot-protection warning would read as an error in a flow where
+  // nothing went wrong from the user's side. Backup-phrase-confirm stays
+  // fail-closed on purpose — a blocked confirm strands no funds, since the user
+  // still holds the phrase and can restart the backup.
   <ScreenSecurityGate failOpen>
     <RestorePhraseContent />
   </ScreenSecurityGate>
