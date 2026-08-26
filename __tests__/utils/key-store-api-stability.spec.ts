@@ -42,6 +42,7 @@ const PINNED_SURFACE = [
   "prototype",
   "read",
   "readActiveToken",
+  "readSessionProfiles",
   "readWithStatus",
   "removeActiveToken",
   "removeIsBiometricsEnabled",
