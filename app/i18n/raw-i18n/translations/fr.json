@@ -2265,7 +2265,9 @@
     "ScanningQRCodeScreen": {
         "invalidContent": "Nous avons trouvé :\n\n{found: string}\n\nCeci n'est pas une adresse valide pour une facture Lightning.",
         "expiredContent": "Nous avons trouvé : \n\n{found: string}\n\nCette facture a expiré",
+        "unresolvedContent": "Nous avons trouvé :\n\n{found: string}\n\nNous n'avons pas pu traiter ce code. Il a peut-être expiré, ou le service est temporairement indisponible. Demandez un nouveau code ou réessayez plus tard.",
         "invalidTitle": "Code QR invalide",
+        "unresolvedTitle": "Code indisponible",
         "openLinkTitle": "Ouvrir le lien",
         "confirmOpenLink": "Êtes-vous sûr de vouloir ouvrir ce lien ?",
         "noQrCode": "Nous n’avons pas trouvé de code QR dans l’image",
@@ -2340,6 +2342,7 @@
         "selfPaymentError": "{lnAddress: string} est votre adresse {bankName: string}.",
         "selfPaymentAdvice": "Si vous souhaitez envoyer de l’argent à un autre compte que le vôtre, vous pouvez utiliser une facture avec une adresse Lightning Network LN ou BTC à la place.",
         "lnAddressError": "Nous ne pouvons pas accéder à cette adresse Lightning. Si vous êtes sûr qu’elle existe, vous pouvez essayer à nouveau ultérieurement.",
+        "lnurlServiceError": "Nous n'avons pas pu traiter ce code. Il a peut-être expiré, ou le service est temporairement indisponible.",
         "lnAddressAdvice": "Assurez-vous que l’orthographe est correcte ou bien demandez au bénéficiaire une facture ou une adresse BTC à la place.",
         "unknownLightning": "Nous ne pouvons pas analyser cette adresse Lightning. Merci de réessayer.",
         "unknownOnchain": "Nous ne pouvons pas analyser cette adresse Bitcoin. Merci de réessayer.",

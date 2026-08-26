@@ -2265,7 +2265,9 @@
     "ScanningQRCodeScreen": {
         "invalidContent": "Encontramos:\n\n{found: string}\n\nEste não é um endereço Bitcoin válido ou fatura Lightning",
         "expiredContent": "Nós achamos:\n\n{encontrado: string}\n\nEsta fatura expirou",
+        "unresolvedContent": "Encontrámos:\n\n{found: string}\n\nNão conseguimos processar este código. Pode ter expirado ou o serviço pode estar temporariamente indisponível. Peça um novo código ou tente novamente mais tarde.",
         "invalidTitle": "Código QR inválido",
+        "unresolvedTitle": "Código indisponível",
         "openLinkTitle": "Abrir link",
         "confirmOpenLink": "Tem certeza que deseja abrir este link?",
         "noQrCode": "Não foi possível encontrar um código QR na imagem",
@@ -2340,6 +2342,7 @@
         "selfPaymentError": "{lnAddress: string} é seu {bankName: string} endereço.",
         "selfPaymentAdvice": "Se você quiser enviar dinheiro para outra conta sua, pode usar uma fatura, LN ou um endereço de BTC.",
         "lnAddressError": "Não conseguimos acessar este endereço Lightning. Se tiver certeza de que existe, tente novamente mais tarde.",
+        "lnurlServiceError": "Não conseguimos processar este código. Pode ter expirado ou o serviço pode estar temporariamente indisponível.",
         "lnAddressAdvice": "Certifique-se de que a ortografia está correta ou peça ao destinatário uma fatura ou endereço BTC.",
         "unknownLightning": "Nós não conseguimos analisar este endereço Lightning. Por favor tente novamente.",
         "unknownOnchain": "Nós não conseguimos analisar este enderço de Bitcoin. Por favor tentar novamente.",
