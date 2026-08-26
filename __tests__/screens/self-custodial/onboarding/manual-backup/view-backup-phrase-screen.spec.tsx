@@ -139,6 +139,26 @@ describe("ViewBackupPhraseScreen", () => {
       expect(queryByText("youth")).toBeNull()
       expect(headerRightWasInstalled()).toBe(false)
     })
+
+    /** Protect first, then prompt: the biometric gate lives inside the gated
+     *  content, so it must not fire while registration is still pending. */
+    it("does not fire the biometric prompt while registration is pending", async () => {
+      mockGetIsBiometricsEnabled.mockResolvedValue(true)
+      const registration = deferred<void>()
+      mockLeaseReady = registration.promise
+
+      render(
+        <ContextForScreen>
+          <ViewBackupPhraseScreen />
+        </ContextForScreen>,
+      )
+      await act(async () => {})
+
+      expect(mockAuthenticate).not.toHaveBeenCalled()
+
+      registration.resolve(undefined)
+      await waitFor(() => expect(mockAuthenticate).toHaveBeenCalledTimes(1))
+    })
   })
 
   it("renders all 12 words once the mnemonic loads", async () => {
