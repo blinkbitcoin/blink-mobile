@@ -16,6 +16,8 @@ const NAVIGATION_DIR = path.join(APP_DIR, "navigation")
 
 type Route = { name: string; component: string; file: string }
 
+type HeaderLessScreen = { label: string; component: string }
+
 const readSource = (file: string): string => fs.readFileSync(file, "utf8")
 
 const navigationSources = (): string[] =>
@@ -43,6 +45,16 @@ const headerLessRoutes = (): Route[] => {
   return routes
 }
 
+const BAILOUT_RENDER = /return\s*\(?\s*<([A-Z]\w*)(?![\w.])[^<>]*\/>/g
+
+/**
+ * A component the file hands the whole screen over to before any header is in play: the
+ * navigator bails out to it instead of mounting its tree, or a header-less route
+ * delegates to it. It draws with no toolbar above it, so the same rule reaches it.
+ */
+const bailoutRenders = (source: string): string[] =>
+  [...source.matchAll(BAILOUT_RENDER)].map((match) => match[1])
+
 const sourceFiles = (dir: string): string[] =>
   fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
     const full = path.join(dir, entry.name)
@@ -51,14 +63,60 @@ const sourceFiles = (dir: string): string[] =>
     return isSource ? [full] : []
   })
 
+let appSources: string[] | null = null
+
 const componentFile = (component: string): string | null => {
   const declaration = new RegExp(
     `export (?:const|function) ${component}\\b|const ${component}: React\\.FC`,
   )
-  for (const file of sourceFiles(APP_DIR)) {
+  appSources = appSources ?? sourceFiles(APP_DIR)
+  for (const file of appSources) {
     if (declaration.test(readSource(file))) return file
   }
   return null
+}
+
+/**
+ * Every screen that renders without a header: the header-less routes, the components a
+ * navigator bails out to, and whatever those in turn delegate to.
+ */
+const headerLessScreens = (): HeaderLessScreen[] => {
+  const screens: HeaderLessScreen[] = []
+  const queued = new Set<string>()
+  const pending: HeaderLessScreen[] = []
+
+  const enqueue = (screen: HeaderLessScreen) => {
+    if (queued.has(screen.component)) return
+    queued.add(screen.component)
+    pending.push(screen)
+  }
+
+  for (const route of headerLessRoutes()) {
+    enqueue({ label: route.name, component: route.component })
+  }
+  for (const file of navigationSources()) {
+    for (const component of bailoutRenders(readSource(file))) {
+      enqueue({ label: `${path.basename(file)} bail-out`, component })
+    }
+  }
+
+  const enqueueDelegates = (screen: HeaderLessScreen) => {
+    /** An accepted exception already answers for everything it draws, delegates included. */
+    if (HANDLES_ITS_OWN_INSETS.has(screen.component)) return
+    const file = componentFile(screen.component)
+    if (!file) return
+    for (const component of bailoutRenders(readSource(file))) {
+      enqueue({ label: `${screen.component} bail-out`, component })
+    }
+  }
+
+  while (pending.length > 0) {
+    const screen = pending.shift() as HeaderLessScreen
+    screens.push(screen)
+    enqueueDelegates(screen)
+  }
+
+  return screens
 }
 
 /**
@@ -109,25 +167,25 @@ const declaresTopInset = (source: string): boolean => {
 }
 
 describe("header-less routes and the top inset", () => {
-  const routes = headerLessRoutes()
+  const screens = headerLessScreens()
 
-  it("finds the header-less routes to check", () => {
-    expect(routes.length).toBeGreaterThan(0)
+  it("finds the header-less screens to check", () => {
+    expect(screens.length).toBeGreaterThan(0)
   })
 
   it("keeps no stale entries in the exception list", () => {
-    const headerLess = new Set(routes.map((route) => route.component))
+    const headerLess = new Set(screens.map((screen) => screen.component))
     const stale = [...HANDLES_ITS_OWN_INSETS].filter(
       (component) => !headerLess.has(component),
     )
     expect(stale).toEqual([])
   })
 
-  routes
-    .filter((route) => !HANDLES_ITS_OWN_INSETS.has(route.component))
-    .forEach((route) => {
-      it(`${route.name} (${route.component}) asks Screen for the top inset`, () => {
-        const file = componentFile(route.component)
+  screens
+    .filter((screen) => !HANDLES_ITS_OWN_INSETS.has(screen.component))
+    .forEach((screen) => {
+      it(`${screen.label} (${screen.component}) asks Screen for the top inset`, () => {
+        const file = componentFile(screen.component)
         expect(file).not.toBeNull()
         expect(declaresTopInset(readSource(file as string))).toBe(true)
       })
