@@ -2143,7 +2143,8 @@
     "placeLocation": "Vị trí",
     "changeLocation": "Thay đổi",
     "placeReviewNote": "Cộng đồng BTC Map kiểm tra mọi địa điểm mới trước khi hiển thị trên bản đồ.",
-    "submissionNotReady": "Việc gửi địa điểm chưa được bật",
+    "placeSubmitted": "Đã gửi địa điểm — cộng đồng BTC Map sẽ kiểm tra",
+    "placeSubmissionFailed": "Không thể gửi địa điểm. Hãy kiểm tra kết nối và thử lại.",
     "category": {
       "restaurants": "Nhà hàng",
       "cafes": "Quán cà phê",

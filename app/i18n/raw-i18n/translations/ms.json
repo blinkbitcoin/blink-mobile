@@ -2143,7 +2143,8 @@
     "placeLocation": "Lokasi",
     "changeLocation": "Tukar",
     "placeReviewNote": "Komuniti BTC Map menyemak setiap tempat baharu sebelum ia muncul di peta.",
-    "submissionNotReady": "Penghantaran tempat belum diaktifkan",
+    "placeSubmitted": "Tempat dihantar — komuniti BTC Map akan menyemaknya",
+    "placeSubmissionFailed": "Tempat tidak dapat dihantar. Semak sambungan anda dan cuba lagi.",
     "category": {
       "restaurants": "Restoran",
       "cafes": "Kafe",

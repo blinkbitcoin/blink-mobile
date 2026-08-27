@@ -2143,7 +2143,8 @@
         "placeLocation": "位置",
         "changeLocation": "変更",
         "placeReviewNote": "BTC Mapのコミュニティが確認してから、新しい場所がマップに表示されます。",
-        "submissionNotReady": "場所の送信はまだ有効になっていません",
+        "placeSubmitted": "場所を送信しました。BTC Mapのコミュニティが確認します",
+        "placeSubmissionFailed": "場所を送信できませんでした。接続を確認して、もう一度お試しください。",
         "category": {
             "restaurants": "レストラン",
             "cafes": "カフェ",

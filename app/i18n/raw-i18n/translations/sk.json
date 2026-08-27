@@ -2143,7 +2143,8 @@
     "placeLocation": "Poloha",
     "changeLocation": "Zmeniť",
     "placeReviewNote": "Komunita BTC Map overí každé nové miesto, kým sa objaví na mape.",
-    "submissionNotReady": "Odosielanie miest zatiaľ nie je zapnuté",
+    "placeSubmitted": "Miesto bolo odoslané — komunita BTC Map ho overí",
+    "placeSubmissionFailed": "Miesto sa nepodarilo odoslať. Skontrolujte pripojenie a skúste to znova.",
     "category": {
       "restaurants": "Reštaurácie",
       "cafes": "Kaviarne",

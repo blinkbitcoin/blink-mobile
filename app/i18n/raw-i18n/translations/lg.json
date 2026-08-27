@@ -2143,7 +2143,8 @@
     "placeLocation": "Ekifo",
     "changeLocation": "Kyusa",
     "placeReviewNote": "Ekibiina kya BTC Map kikebera buli kifo ekiggya nga tekinnalabika ku mmaapu.",
-    "submissionNotReady": "Okusindika ebifo tekunnatandika",
+    "placeSubmitted": "Ekifo kisindiddwa — ekibiina kya BTC Map kijja kukikebera",
+    "placeSubmissionFailed": "Ekifo tekisobodde kusindikwa. Kebera entaanya yo oluddemu ogezeko.",
     "category": {
       "restaurants": "Eby'okuliirwamu",
       "cafes": "Wooteeri za kaawa",

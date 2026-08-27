@@ -2143,7 +2143,8 @@
     "placeLocation": "Mahali",
     "changeLocation": "Badilisha",
     "placeReviewNote": "Jumuiya ya BTC Map hukagua kila mahali papya kabla ya kuonekana kwenye ramani.",
-    "submissionNotReady": "Kutuma maeneo bado hakujawashwa",
+    "placeSubmitted": "Mahali pametumwa — jumuiya ya BTC Map itapakagua",
+    "placeSubmissionFailed": "Mahali hayakuweza kutumwa. Angalia muunganisho wako na ujaribu tena.",
     "category": {
       "restaurants": "Migahawa",
       "cafes": "Kafe",

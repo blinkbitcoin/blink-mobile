@@ -2143,7 +2143,8 @@
     "placeLocation": "Helyzet",
     "changeLocation": "Módosítás",
     "placeReviewNote": "A BTC Map közössége minden új helyet ellenőriz, mielőtt megjelenne a térképen.",
-    "submissionNotReady": "A helyek beküldése még nincs bekapcsolva",
+    "placeSubmitted": "A hely elküldve — a BTC Map közössége ellenőrzi",
+    "placeSubmissionFailed": "A helyet nem sikerült elküldeni. Ellenőrizze a kapcsolatát, és próbálja újra.",
     "category": {
       "restaurants": "Éttermek",
       "cafes": "Kávézók",

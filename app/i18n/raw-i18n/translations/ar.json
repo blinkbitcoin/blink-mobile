@@ -2143,7 +2143,8 @@
     "placeLocation": "الموقع",
     "changeLocation": "تغيير",
     "placeReviewNote": "يتحقق مجتمع BTC Map من كل مكان جديد قبل ظهوره على الخريطة.",
-    "submissionNotReady": "إرسال الأماكن غير مفعّل بعد",
+    "placeSubmitted": "تم إرسال المكان — سيراجعه مجتمع BTC Map",
+    "placeSubmissionFailed": "تعذّر إرسال المكان. تحقق من اتصالك وحاول مرة أخرى.",
     "category": {
       "restaurants": "مطاعم",
       "cafes": "مقاهٍ",

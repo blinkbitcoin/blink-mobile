@@ -2143,7 +2143,8 @@
     "placeLocation": "ตำแหน่ง",
     "changeLocation": "เปลี่ยน",
     "placeReviewNote": "ชุมชน BTC Map จะตรวจสอบสถานที่ใหม่ทุกแห่งก่อนแสดงบนแผนที่",
-    "submissionNotReady": "การส่งสถานที่ยังไม่เปิดใช้งาน",
+    "placeSubmitted": "ส่งสถานที่แล้ว — ชุมชน BTC Map จะตรวจสอบ",
+    "placeSubmissionFailed": "ไม่สามารถส่งสถานที่ได้ โปรดตรวจสอบการเชื่อมต่อแล้วลองอีกครั้ง",
     "category": {
       "restaurants": "ร้านอาหาร",
       "cafes": "ร้านกาแฟ",

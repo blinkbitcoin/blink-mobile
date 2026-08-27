@@ -2143,7 +2143,8 @@
     "placeLocation": "Ligging",
     "changeLocation": "Verander",
     "placeReviewNote": "BTC Map se gemeenskap ondersoek elke nuwe plek voordat dit op die kaart verskyn.",
-    "submissionNotReady": "Die stuur van plekke is nog nie aangeskakel nie",
+    "placeSubmitted": "Plek gestuur — BTC Map se gemeenskap sal dit ondersoek",
+    "placeSubmissionFailed": "Die plek kon nie gestuur word nie. Kontroleer jou verbinding en probeer weer.",
     "category": {
       "restaurants": "Restaurante",
       "cafes": "Kafees",

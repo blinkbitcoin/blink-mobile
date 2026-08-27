@@ -2143,7 +2143,8 @@
     "placeLocation": "Locatie",
     "changeLocation": "Wijzig",
     "placeReviewNote": "De community van BTC Map controleert elke nieuwe plek voordat die op de kaart verschijnt.",
-    "submissionNotReady": "Plekken versturen staat nog niet aan",
+    "placeSubmitted": "Plek verstuurd — de community van BTC Map controleert hem",
+    "placeSubmissionFailed": "De plek kon niet worden verstuurd. Controleer je verbinding en probeer het opnieuw.",
     "category": {
       "restaurants": "Restaurants",
       "cafes": "Cafés",

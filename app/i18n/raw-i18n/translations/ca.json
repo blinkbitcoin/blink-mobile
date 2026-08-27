@@ -2143,7 +2143,8 @@
     "placeLocation": "Ubicació",
     "changeLocation": "Canvia",
     "placeReviewNote": "La comunitat de BTC Map revisa cada lloc nou abans que aparegui al mapa.",
-    "submissionNotReady": "L'enviament de llocs encara no està activat",
+    "placeSubmitted": "Lloc enviat: la comunitat de BTC Map el revisarà",
+    "placeSubmissionFailed": "No s'ha pogut enviar el lloc. Comprova la connexió i torna-ho a provar.",
     "category": {
       "restaurants": "Restaurants",
       "cafes": "Cafeteries",

@@ -2143,7 +2143,8 @@
     "placeLocation": "Տեղադրություն",
     "changeLocation": "Փոխել",
     "placeReviewNote": "BTC Map-ի համայնքը ստուգում է յուրաքանչյուր նոր վայր՝ նախքան քարտեզում հայտնվելը։",
-    "submissionNotReady": "Վայրերի ուղարկումը դեռ միացված չէ",
+    "placeSubmitted": "Վայրն ուղարկված է. BTC Map-ի համայնքը կստուգի այն",
+    "placeSubmissionFailed": "Վայրը չհաջողվեց ուղարկել: Ստուգեք Ձեր կապը և փորձեք նորից:",
     "category": {
       "restaurants": "Ռեստորաններ",
       "cafes": "Սրճարաններ",

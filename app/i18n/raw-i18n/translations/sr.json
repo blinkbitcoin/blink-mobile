@@ -2143,7 +2143,8 @@
     "placeLocation": "Локација",
     "changeLocation": "Промени",
     "placeReviewNote": "Заједница BTC Map-а проверава свако ново место пре него што се појави на мапи.",
-    "submissionNotReady": "Слање места још није укључено",
+    "placeSubmitted": "Место је послато — заједница BTC Map-а ће га проверити",
+    "placeSubmissionFailed": "Место није могло да се пошаље. Проверите везу и покушајте поново.",
     "category": {
       "restaurants": "Ресторани",
       "cafes": "Кафићи",

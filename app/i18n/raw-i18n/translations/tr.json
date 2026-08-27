@@ -2143,7 +2143,8 @@
     "placeLocation": "Konum",
     "changeLocation": "Değiştir",
     "placeReviewNote": "BTC Map topluluğu, her yeni yeri haritada görünmeden önce kontrol eder.",
-    "submissionNotReady": "Yer gönderme henüz açık değil",
+    "placeSubmitted": "Yer gönderildi — BTC Map topluluğu inceleyecek",
+    "placeSubmissionFailed": "Yer gönderilemedi. Bağlantınızı kontrol edip tekrar deneyin.",
     "category": {
       "restaurants": "Restoranlar",
       "cafes": "Kafeler",

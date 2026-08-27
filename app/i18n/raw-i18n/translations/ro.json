@@ -2143,7 +2143,8 @@
     "placeLocation": "Locație",
     "changeLocation": "Schimbă",
     "placeReviewNote": "Comunitatea BTC Map verifică fiecare loc nou înainte să apară pe hartă.",
-    "submissionNotReady": "Trimiterea locurilor nu este încă activată",
+    "placeSubmitted": "Loc trimis — comunitatea BTC Map îl va verifica",
+    "placeSubmissionFailed": "Locul nu a putut fi trimis. Verifică conexiunea și încearcă din nou.",
     "category": {
       "restaurants": "Restaurante",
       "cafes": "Cafenele",

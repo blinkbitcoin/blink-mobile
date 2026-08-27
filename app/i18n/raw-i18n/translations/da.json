@@ -2143,7 +2143,8 @@
     "placeLocation": "Placering",
     "changeLocation": "Skift",
     "placeReviewNote": "BTC Maps fællesskab tjekker hvert nyt sted, før det vises på kortet.",
-    "submissionNotReady": "Indsendelse af steder er ikke slået til endnu",
+    "placeSubmitted": "Sted sendt — BTC Maps fællesskab vil gennemgå det",
+    "placeSubmissionFailed": "Stedet kunne ikke sendes. Tjek din forbindelse og prøv igen.",
     "category": {
       "restaurants": "Restauranter",
       "cafes": "Caféer",
