@@ -7,6 +7,7 @@ import { reportError } from "@app/utils/error-logging"
 
 import {
   MigrationCheckpoint,
+  MigrationTargetOrigin,
   type StoredCheckpoint,
   clearCheckpointFromStorage,
   getStorageKey,
@@ -24,6 +25,7 @@ type SaveCheckpointOptions = {
   provisionedAccountId?: string
   expectedReceiveSats?: number
   sparkInvoice?: string
+  targetOrigin?: MigrationTargetOrigin
 }
 
 /**
@@ -93,9 +95,15 @@ export const useMigrationCheckpointState = () => {
   const expectedReceiveSats = isOwnedByActiveAccount
     ? stored?.expectedReceiveSats ?? null
     : null
-  /** Null on a record written before the field existed, which the receive check reads as
-   *  "this describes a provisioned wallet" and answers by balance, as it always did. */
+  /** Null on a record written before the field existed, which leaves the receive
+   *  unprovable — the flow then takes its delayed-receive path. */
   const sparkInvoice = isOwnedByActiveAccount ? stored?.sparkInvoice ?? null : null
+  /** Kept raw for the write path: defaulting here too would stamp "provisioned" onto every
+   *  record that never carried an origin, turning a read-side assumption into stored data. */
+  const storedTargetOrigin = isOwnedByActiveAccount ? stored?.targetOrigin : undefined
+  /** Absent means provisioned: that was the only way to obtain a target before the field
+   *  existed, so a record written then keeps the behaviour it was saved under. */
+  const targetOrigin = storedTargetOrigin ?? MigrationTargetOrigin.Provisioned
 
   /** Resolves false when the write fails, so callers can stop the flow instead of
    *  advancing on a checkpoint that only exists in memory. Re-sending what this hook
@@ -108,6 +116,7 @@ export const useMigrationCheckpointState = () => {
         provisionedAccountId,
         expectedReceiveSats: expectedReceiveSatsUpdate,
         sparkInvoice: sparkInvoiceUpdate,
+        targetOrigin: targetOriginUpdate,
       }: SaveCheckpointOptions = {},
     ): Promise<boolean> => {
       /** Without a resolved owner the checkpoint cannot be keyed, and saving would erase the
@@ -121,6 +130,7 @@ export const useMigrationCheckpointState = () => {
         expectedReceiveSats:
           expectedReceiveSatsUpdate ?? expectedReceiveSats ?? undefined,
         sparkInvoice: sparkInvoiceUpdate ?? sparkInvoice ?? undefined,
+        targetOrigin: targetOriginUpdate ?? storedTargetOrigin ?? undefined,
       }
       setStored((existing) => mergeCheckpoint(existing, update))
       try {
@@ -131,7 +141,14 @@ export const useMigrationCheckpointState = () => {
         return false
       }
     },
-    [storageKey, ownerId, accountId, expectedReceiveSats, sparkInvoice],
+    [
+      storageKey,
+      ownerId,
+      accountId,
+      expectedReceiveSats,
+      sparkInvoice,
+      storedTargetOrigin,
+    ],
   )
 
   const clearCheckpoint = useCallback(() => {
@@ -154,6 +171,10 @@ export const useMigrationCheckpointState = () => {
     accountId,
     expectedReceiveSats,
     sparkInvoice,
+    targetOrigin,
+    /** The value as stored, without the provisioned default. A caller deciding what to
+     *  write needs to tell "no origin recorded" from "recorded as provisioned". */
+    storedTargetOrigin,
     /** The owner the record was actually saved under, null on one written before owners
      *  existed. Read by consumers that spend something irreversible, since the ownership
      *  flag above claims an owner-less record for whoever is active. */
