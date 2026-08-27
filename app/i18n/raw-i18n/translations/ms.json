@@ -2513,7 +2513,7 @@
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Akaun anda mempunyai lebih daripada $5",
     "itsATrialAccount": "Akaun percubaan mempunyai had transaksi yang dikurangkan dan tiada kaedah pemulihan. Jika anda kehilangan telefon atau menyahpasang aplikasi, dana anda tidak dapat dipulihkan.",
-    "accountBeingDeleted": "Akaun anda sedang dipadam, sila tunggu...",
+    "accountBeingDeleted": "Akaun anda sedang ditutup, sila tunggu...",
     "dangerZone": "Zon bahaya",
     "phoneDeletedSuccessfully": "Nombor telefon berjaya dipadam",
     "phoneNumber": "Nombor Telefon",
@@ -3048,17 +3048,17 @@
     "defaultEmailSubject": "Sokongan - {bankName: string}",
     "defaultSupportMessage": "Hai! Saya perlukan bantuan daripada {bankName: string}, Saya menggunakan versi {version: string} pada {os: string}.",
     "emailCopied": "emel {email: string} telah disalin ke clipboard",
-    "deleteAccount": "Padam akaun",
+    "deleteAccount": "Tutup akaun",
     "delete": "padam",
-    "typeDelete": "Sila taip \"{delete: string} untuk pastikan bahawa akaun ini akan dilupuskan.",
+    "typeDelete": "Sila taip \"{delete: string}\" untuk mengesahkan penutupan akaun",
     "finalConfirmationAccountDeletionTitle": "Pengsahan Akhir Diperlukan",
-    "finalConfirmationAccountDeletionMessage": "Anda pasti nak lupuskan akaun anda? Anda ini tidak boleh berpatah balik dengan keputusan ini.",
-    "deleteAccountBalanceWarning": "Melupuskan akaun anda akan mengakibatkan kehilangan akses anda pada baki semasa. Anda pasti nak teruskan juga?",
-    "deleteAccountConfirmation": "Anda telah memutuskan untuk memadam akaun anda.\n\nSekiranya tempoh percubaan berkenaan dengan keperluan regulasi telah tamat, baki data yang berkaitan dengan akaun anda akan dipadam selamanya.",
-    "deleteAccountFromPhone": "Hai!, sila nyah aktifkan akaun saya. Nombor telefon saya adalah {phoneNumber: string}.",
+    "finalConfirmationAccountDeletionMessage": "Selepas ditutup, anda tidak akan dapat mengakses atau menggunakan akaun anda. Kami mungkin menyimpan rekod tertentu sebagaimana yang dikehendaki oleh undang-undang dan kewajipan penyimpanan kami. Adakah anda pasti mahu menutup akaun anda?",
+    "deleteAccountBalanceWarning": "Menutup akaun anda akan menyebabkan anda kehilangan akses kepada baki semasa anda. Adakah anda pasti mahu meneruskan?",
+    "deleteAccountConfirmation": "Akaun anda telah ditutup.\n\nKami mungkin menyimpan rekod tertentu sebagaimana yang dikehendaki oleh undang-undang dan kewajipan penyimpanan kami.",
+    "deleteAccountFromPhone": "Hai!, sila tutup akaun saya. Nombor telefon saya adalah {phoneNumber: string}.",
     "deleteAccountError": "Sesuatu yang salah telah berlaku  Hubungi {email: string} untuk bantuan lanjut.",
     "bye": "Selamat tinggal!",
-    "deleteAccountWarning": "Perhatian: Pemadaman akaun adalah kekal!\nPastikan dompet tiada dana sebelum memadam.\nAkaun yang dipadam tidak boleh dipulihkan."
+    "deleteAccountWarning": "Perhatian: Penutupan akaun adalah kekal!\nPastikan dompet tiada dana sebelum menutup.\nAkaun yang ditutup tidak boleh dipulihkan.\nKami mungkin menyimpan rekod tertentu sebagaimana dikehendaki oleh undang-undang."
   },
   "lnurl": {
     "overLimit": "Tak boleh hantar lebih daripada jumlah maksimum anda",
@@ -3835,6 +3835,7 @@
     "reminderBulletin": {
       "title": "Penting",
       "body": "Beralih kepada akaun bukan kustodial melalui migrasi berpandu, atau keluarkan dana anda, sebelum {date}. Penerimaan berhenti pada {receiveStopsDate}.",
+      "bodyReceiveDisabled": "Penerimaan telah berhenti. Beralih kepada akaun bukan kustodial melalui migrasi berpandu, atau keluarkan dana anda, sebelum {date}.",
       "migrateCta": "Pindah"
     },
     "offboardBulletin": {

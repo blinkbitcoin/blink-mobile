@@ -2513,7 +2513,7 @@
     "AccountScreen": {
         "fundsMoreThan5Dollars": "Il tuo account ha più di $ 5",
         "itsATrialAccount": "Gli account di prova hanno limiti di transazione ridotti e nessun metodo di recupero. Se perdi il telefono o disinstalli l'app, i tuoi fondi non saranno recuperabili.",
-        "accountBeingDeleted": "Il tuo account verrà eliminato, attendi...",
+        "accountBeingDeleted": "Il tuo account è in fase di chiusura, attendi...",
         "dangerZone": "Zona pericolosa",
         "phoneDeletedSuccessfully": "Telefono eliminato con successo",
         "phoneNumber": "Numero di telefono",
@@ -3048,17 +3048,17 @@
         "defaultEmailSubject": "{bankName: string} - Supporto",
         "defaultSupportMessage": "Ciao! Ho bisogno di aiuto con {bankName: string}. Sto usando la versione {version: string} su {os: string}.",
         "emailCopied": "email {email: string} copiata negli appunti",
-        "deleteAccount": "Elimina account",
+        "deleteAccount": "Chiudi account",
         "delete": "Elimina",
-        "typeDelete": "Digitare \"{delete: string}\" per confermare l'eliminazione dell'account",
+        "typeDelete": "Digita \"{delete: string}\" per confermare la chiusura dell'account",
         "finalConfirmationAccountDeletionTitle": "Conferma finale richiesta",
-        "finalConfirmationAccountDeletionMessage": "Sei sicuro di voler eliminare il tuo account? Questa azione è irreversibile.",
-        "deleteAccountBalanceWarning": "L'eliminazione del tuo account ti farà perdere l'accesso al tuo saldo attuale. Vuoi procedere?",
-        "deleteAccountConfirmation": "Il tuo account è stato scritto per l'eliminazione.\n\nQuando il periodo di prova relativo ai requisiti normativi sarà terminato, i dati rimanenti relativi al tuo account saranno eliminati definitivamente.",
-        "deleteAccountFromPhone": "Ciao!, per favore cancella il mio account. Il mio numero di telefono è {phoneNumber: string}.",
+        "finalConfirmationAccountDeletionMessage": "Dopo la chiusura, non potrai più accedere al tuo account né utilizzarlo. Potremmo conservare alcuni dati come richiesto dalla legge e dai nostri obblighi di conservazione. Sei sicuro di voler chiudere il tuo account?",
+        "deleteAccountBalanceWarning": "La chiusura del tuo account ti farà perdere l'accesso al tuo saldo attuale. Sei sicuro di voler procedere?",
+        "deleteAccountConfirmation": "Il tuo account è stato chiuso.\n\nPotremmo conservare alcuni dati come richiesto dalla legge e dai nostri obblighi di conservazione.",
+        "deleteAccountFromPhone": "Ciao! Per favore chiudete il mio account. Il mio numero di telefono è {phoneNumber: string}.",
         "deleteAccountError": "Qualcosa è andato storto. Contatta {email: string} per ulteriore assistenza.",
         "bye": "Ciao!",
-        "deleteAccountWarning": "Attenzione: l'eliminazione dell'account è permanente!\nAssicurati che i wallet non contengano fondi prima di eliminare.\nL'account eliminato non può essere ripristinato."
+        "deleteAccountWarning": "Attenzione: la chiusura dell'account è permanente!\nAssicurati che i wallet non abbiano fondi prima della chiusura.\nUn account chiuso non può essere ripristinato.\nPotremmo conservare alcuni dati come richiesto dalla legge."
     },
     "lnurl": {
         "overLimit": "Non è possibile inviare più dell'importo massimo",
@@ -3835,6 +3835,7 @@
         "reminderBulletin": {
             "title": "Importante",
             "body": "Passa a un account non custodiale tramite la migrazione guidata, oppure preleva i tuoi fondi, entro il {date}. La ricezione si interrompe il {receiveStopsDate}.",
+            "bodyReceiveDisabled": "La ricezione si è interrotta. Passa a un account non custodiale tramite la migrazione guidata, oppure preleva i tuoi fondi, entro il {date}.",
             "migrateCta": "Migra"
         },
         "offboardBulletin": {

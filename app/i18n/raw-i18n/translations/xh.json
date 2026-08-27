@@ -2513,7 +2513,7 @@
   "AccountScreen": {
     "fundsMoreThan5Dollars": "I-akhawunti yakho inangaphezulu kwe-$5",
     "itsATrialAccount": "Ii-akhawunti zovavanyo zineemida ezincitshisiweyo zentlawulo kwaye azinandlela yokubuyisela. Ukuba ulahlekelwa yifowuni yakho okanye ususa i-app, imali yakho ayizukubuyiseka.",
-    "accountBeingDeleted": "I-akhawunti yakho iyacinywa, nceda ulinde...",
+    "accountBeingDeleted": "I-akhawunti yakho iyavalwa, nceda ulinde...",
     "dangerZone": "Indawo eyingozi",
     "phoneDeletedSuccessfully": "Inombolo yomnxeba icinywe ngempumelelo",
     "phoneNumber": "Inombolo Yomnxeba",
@@ -3048,17 +3048,17 @@
     "defaultEmailSubject": "{bankName: string} - Support",
     "defaultSupportMessage": "Hey there! I need some help with {bankName: string}, I'm using the version {version: string} on {os: string}.",
     "emailCopied": "email {email: string} copied to clipboard",
-    "deleteAccount": "Delete account",
+    "deleteAccount": "Vala i-akhawunti",
     "delete": "delete",
-    "typeDelete": "Please type \"{delete: string}\" to confirm account deletion",
+    "typeDelete": "Nceda chwetheza \"{delete: string}\" ukuze uqinisekise ukuvalwa kwe-akhawunti",
     "finalConfirmationAccountDeletionTitle": "Final Confirmation Required",
-    "finalConfirmationAccountDeletionMessage": "Are you sure you want to delete your account? This action is irreversible.",
-    "deleteAccountBalanceWarning": "Deleting your account will cause you to lose access to your current balance. Are you sure you want to proceed?",
-    "deleteAccountConfirmation": "Your account has been written for deletion.\n\nWhen the probation period related to regulatory requirement is over, the remaining data related to your account will be permanently deleted.",
-    "deleteAccountFromPhone": "Hey there!, please delete my account. My phone number is {phoneNumber: string}.",
+    "finalConfirmationAccountDeletionMessage": "Emva kokuvalwa, awukwazi ukufikelela okanye usebenzise i-akhawunti yakho. Sinokugcina iirekhodi ezithile njengoko kufunwa yil umthetho kunye neembopheleko zethu zokugcina. Uqinisekile ukuba ufuna ukuvala i-akhawunti yakho?",
+    "deleteAccountBalanceWarning": "Ukuvala i-akhawunti yakho kuya kukwenza ulahlekelwe ukufikelela kwibhalansi yakho yangoku. Uqinisekile ukuba ufuna ukuqhubeka?",
+    "deleteAccountConfirmation": "I-akhawunti yakho ivaliwe.\n\nSinokugcina iirekhodi ezithile njengoko kufunwa yil umthetho kunye neembopheleko zethu zokugcina.",
+    "deleteAccountFromPhone": "Molo!, nceda uvale i-akhawunti yam. Inombolo yam yefowuni ngu {phoneNumber: string}.",
     "deleteAccountError": "Something went wrong. Contact {email: string} for further assistance.",
     "bye": "Bye!",
-    "deleteAccountWarning": "Qaphela: Ukucinywa kwe-akhawunti kusisigxina!\nQinisekisa ukuba iiwoleti azinayo imali ngaphambi kokucima.\nI-akhawunti ecinyiweyo ayinakubuyiselwa."
+    "deleteAccountWarning": "Qaphela: Ukuvalwa kwe-akhawunti kusisigxina!\nQinisekisa ukuba iiwoleti azinayo imali ngaphambi kokuvala.\nI-akhawunti evaliweyo ayinakubuyiselwa.\nSinokugcina iirekhodi ezithile njengoko kufunwa luluthetho."
   },
   "lnurl": {
     "overLimit": "You can't send more than max amount",
@@ -3835,6 +3835,7 @@
     "reminderBulletin": {
       "title": "Kubalulekile",
       "body": "Yiya kwiakhawunti engagcinwanga ngofuduko olukhokelwayo, okanye ukhuphe imali yakho, phambi kwe-{date}. Ukufumana kuyakuma nge-{receiveStopsDate}.",
+      "bodyReceiveDisabled": "Ukufumana kumile. Yiya kwiakhawunti engagcinwanga ngofuduko olukhokelwayo, okanye ukhuphe imali yakho, phambi kwe-{date}.",
       "migrateCta": "Fuduka"
     },
     "offboardBulletin": {

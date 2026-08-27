@@ -2513,7 +2513,7 @@
     "AccountScreen": {
         "fundsMoreThan5Dollars": "Sua conta possui mais de $5",
         "itsATrialAccount": "Contas de teste possuem limites reduzidos de transação e não há método de recuperação. Se você perder seu celular ou desinstalar o aplicativo, seus fundos não serão recuperados.",
-        "accountBeingDeleted": "Sua conta está sendo deletada, por favor espere...",
+        "accountBeingDeleted": "Sua conta está sendo encerrada, por favor espere...",
         "dangerZone": "Zona de perigo",
         "phoneDeletedSuccessfully": "Telefone excluído com sucesso",
         "phoneNumber": "Número de Telefone",
@@ -3048,17 +3048,17 @@
         "defaultEmailSubject": "{bankName: string} - Suporte",
         "defaultSupportMessage": "Ei! Preciso de ajuda com {bankName: string}, estou usando a versão {version: string} em {os: string}.",
         "emailCopied": "email {email: string} copiado para a área de transferência",
-        "deleteAccount": "Apagar conta",
+        "deleteAccount": "Encerrar conta",
         "delete": "apagar",
-        "typeDelete": "Por favor digite \"{delete: string}\" para confirmar apagar conta",
+        "typeDelete": "Por favor digite \"{delete: string}\" para confirmar o encerramento da conta",
         "finalConfirmationAccountDeletionTitle": "Confirmação Final Requerida",
-        "finalConfirmationAccountDeletionMessage": "Você tem a certeza que quer apagar a sua conta? Esta ação é irreversível.",
-        "deleteAccountBalanceWarning": "Excluir sua conta fará com que você perca o acesso ao seu saldo atual. Tem certeza de que deseja continuar?",
-        "deleteAccountConfirmation": "Sua conta foi configurada para ser apagada.\n\nQuando o período de experiência relacionado ao requisito regulatório terminar, os dados restantes relacionados à sua conta serão excluídos permanentemente.",
-        "deleteAccountFromPhone": "Olá! Por favor apague a minha conta. Meu contato telefônico é {phoneNumber: string}.",
+        "finalConfirmationAccountDeletionMessage": "Após o encerramento, você não poderá acessar nem usar sua conta. Podemos reter certos registros conforme exigido por lei e por nossas obrigações de retenção. Tem certeza de que deseja encerrar sua conta?",
+        "deleteAccountBalanceWarning": "Encerrar sua conta fará com que você perca o acesso ao seu saldo atual. Tem certeza de que deseja continuar?",
+        "deleteAccountConfirmation": "Sua conta foi encerrada.\n\nPodemos reter certos registros conforme exigido por lei e por nossas obrigações de retenção.",
+        "deleteAccountFromPhone": "Olá! Por favor, encerre a minha conta. Meu contato telefônico é {phoneNumber: string}.",
         "deleteAccountError": "Algo deu errado. Fale com {email: string}  para mais assistência.",
         "bye": "Adeus!",
-        "deleteAccountWarning": "Atenção: A exclusão da conta é permanente!\nCertifique-se de que as carteiras não possuem fundos antes de excluir.\nContas excluídas não podem ser recuperadas."
+        "deleteAccountWarning": "Atenção: O encerramento da conta é permanente!\nCertifique-se de que as carteiras não possuem fundos antes de encerrar.\nUma conta encerrada não pode ser recuperada.\nPodemos reter certos registros conforme exigido por lei."
     },
     "lnurl": {
         "overLimit": "Você não pode enviar mais do que o valor máximo",
@@ -3835,6 +3835,7 @@
         "reminderBulletin": {
             "title": "Importante",
             "body": "Mude para uma conta não custodial através da migração guiada, ou retire os seus fundos, antes de {date}. O recebimento termina em {receiveStopsDate}.",
+            "bodyReceiveDisabled": "O recebimento terminou. Mude para uma conta não custodial através da migração guiada, ou retire os seus fundos, antes de {date}.",
             "migrateCta": "Migrar"
         },
         "offboardBulletin": {

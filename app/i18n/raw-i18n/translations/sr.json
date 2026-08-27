@@ -2513,7 +2513,7 @@
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Ваш налог има више од $5",
     "itsATrialAccount": "Пробни налози имају смањене лимите за трансакције и немају метод опоравка. Ако изгубите телефон или деинсталирате апликацију, ваша средства ће бити неповратна.",
-    "accountBeingDeleted": "Ваш налог се брише, молимо сачекајте...",
+    "accountBeingDeleted": "Ваш налог се затвара, молимо сачекајте...",
     "dangerZone": "Опасна зона",
     "phoneDeletedSuccessfully": "Телефон је успешно уклоњен",
     "phoneNumber": "Број телефона",
@@ -3048,17 +3048,17 @@
     "defaultEmailSubject": "{bankName: string} - Подршка",
     "defaultSupportMessage": "Хеј, треба ми помоћ у вези са {bankName: string}, користим верзију {version: string} на оперативном систему {os: string}.",
     "emailCopied": "адреса е-поште {email: string} је копирана у клипборд",
-    "deleteAccount": "Обриши налог",
+    "deleteAccount": "Затвори налог",
     "delete": "обриши",
-    "typeDelete": "Please type \"{delete: string}\" to confirm account deletion",
+    "typeDelete": "Укуцајте \"{delete: string}\" да потврдите затварање налога",
     "finalConfirmationAccountDeletionTitle": "Final Confirmation Required",
-    "finalConfirmationAccountDeletionMessage": "Are you sure you want to delete your account? This action is irreversible.",
-    "deleteAccountBalanceWarning": "Deleting your account will cause you to lose access to your current balance. Are you sure you want to proceed?",
-    "deleteAccountConfirmation": "Your account has been written for deletion.\n\nWhen the probation period related to regulatory requirement is over, the remaining data related to your account will be permanently deleted.",
-    "deleteAccountFromPhone": "Hey there!, please delete my account. My phone number is {phoneNumber: string}.",
+    "finalConfirmationAccountDeletionMessage": "Након затварања нећете моћи да приступите свом налогу нити да га користите. Можемо задржати одређене записе у складу са законом и нашим обавезама чувања података. Да ли сте сигурни да желите да затворите свој налог?",
+    "deleteAccountBalanceWarning": "Затварањем налога изгубићете приступ тренутном стању. Да ли сте сигурни да желите да наставите?",
+    "deleteAccountConfirmation": "Ваш налог је затворен.\n\nМожемо задржати одређене записе у складу са законом и нашим обавезама чувања података.",
+    "deleteAccountFromPhone": "Здраво!, молим вас затворите мој налог. Мој број телефона је {phoneNumber: string}.",
     "deleteAccountError": "Something went wrong. Contact {email: string} for further assistance.",
     "bye": "Bye!",
-    "deleteAccountWarning": "Пажња: Брисање налога је трајно!\nУверите се да новчаници немају средстава пре брисања.\nОбрисани налог се не може вратити."
+    "deleteAccountWarning": "Пажња: Затварање налога је трајно!\nПре затварања проверите да новчаници немају средстава.\nЗатворени налог се не може вратити.\nМожемо задржати одређене записе у складу са законом."
   },
   "lnurl": {
     "overLimit": "Не можете послати више од максималног износа",
@@ -3835,6 +3835,7 @@
     "reminderBulletin": {
       "title": "Важно",
       "body": "Пређите на не-кастодијални налог путем вођене миграције или подигните средства пре {date}. Примање престаје {receiveStopsDate}.",
+      "bodyReceiveDisabled": "Примање је престало. Пређите на не-кастодијални налог путем вођене миграције или подигните средства пре {date}.",
       "migrateCta": "Мигрирај"
     },
     "offboardBulletin": {

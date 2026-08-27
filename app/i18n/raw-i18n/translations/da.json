@@ -2513,7 +2513,7 @@
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Din konto har mere end $5",
     "itsATrialAccount": "Prøvekonti har reducerede transaktionsgrænser og ingen gendannelsesmetode. Hvis du mister din telefon eller afinstallerer appen, vil dine midler være uoprettelige.",
-    "accountBeingDeleted": "Din konto er ved at blive slettet, vent venligst...",
+    "accountBeingDeleted": "Din konto er ved at blive lukket, vent venligst...",
     "dangerZone": "Farezone",
     "phoneDeletedSuccessfully": "Telefonnummer slettet",
     "phoneNumber": "Telefonnummer",
@@ -3048,17 +3048,17 @@
     "defaultEmailSubject": "{bankName: string} - Support",
     "defaultSupportMessage": "Hej! Jeg har brug for hjælp med {bankName: string}. Jeg bruger version {version: string} på {os: string}.",
     "emailCopied": "email {email: string} kopieret til udklipsholder",
-    "deleteAccount": "Slet konto",
+    "deleteAccount": "Luk konto",
     "delete": "slet",
-    "typeDelete": "Indtast venligst \"{delete: string}\" for at bekræfte sletning af konto",
+    "typeDelete": "Indtast venligst \"{delete: string}\" for at bekræfte lukning af kontoen",
     "finalConfirmationAccountDeletionTitle": "Endelig bekræftelse påkrævet",
-    "finalConfirmationAccountDeletionMessage": "Er du sikker på, at du vil slette din konto? Denne handling kan ikke fortrydes.",
-    "deleteAccountBalanceWarning": "At slette din konto vil medføre, at du mister adgang til din nuværende saldo. Er du sikker på, at du vil fortsætte?",
-    "deleteAccountConfirmation": "Din konto er blevet sendt til sletning.\n\nNår prøvetidsperioden i forbindelse med lovgivningsmæssige krav er slut, vil de resterende data relateret til din konto blive slettet permanent.",
-    "deleteAccountFromPhone": "Hej der!, venligst slet min konto. Mit telefonnummer er {phoneNumber: string}.",
+    "finalConfirmationAccountDeletionMessage": "Efter lukning vil du ikke kunne få adgang til eller bruge din konto. Vi kan opbevare visse oplysninger, som påkrævet af loven og vores opbevaringsforpligtelser. Er du sikker på, at du vil lukke din konto?",
+    "deleteAccountBalanceWarning": "Hvis du lukker din konto, mister du adgangen til din nuværende saldo. Er du sikker på, at du vil fortsætte?",
+    "deleteAccountConfirmation": "Din konto er blevet lukket.\n\nVi kan opbevare visse oplysninger, som påkrævet af loven og vores opbevaringsforpligtelser.",
+    "deleteAccountFromPhone": "Hej! Luk venligst min konto. Mit telefonnummer er {phoneNumber: string}.",
     "deleteAccountError": "Noget gik galt. Kontakt {email: string} for yderligere assistance.",
     "bye": "Farvel!",
-    "deleteAccountWarning": "Bemærk: Kontosletning er permanent!\nSørg for, at wallets ikke har midler, inden du sletter.\nSlettede konti kan ikke gendannes."
+    "deleteAccountWarning": "Bemærk: Lukning af kontoen er permanent!\nSørg for, at tegnebøgerne ikke har penge, før du lukker.\nEn lukket konto kan ikke genoprettes.\nVi kan opbevare visse oplysninger, som påkrævet af loven."
   },
   "lnurl": {
     "overLimit": "Du kan ikke sende mere end maks beløbet",
@@ -3835,6 +3835,7 @@
     "reminderBulletin": {
       "title": "Vigtigt",
       "body": "Skift til en ikke-depotkonto via guidet migrering, eller hæv dine midler, inden {date}. Modtagelse stopper den {receiveStopsDate}.",
+      "bodyReceiveDisabled": "Modtagelse er stoppet. Skift til en ikke-depotkonto via guidet migrering, eller hæv dine midler, inden {date}.",
       "migrateCta": "Migrér"
     },
     "offboardBulletin": {

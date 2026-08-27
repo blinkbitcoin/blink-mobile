@@ -2513,7 +2513,7 @@
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Jou rekening het meer as $5",
     "itsATrialAccount": "Proefrekening het verminderde transaksielimiete en geen herstelmetode nie. As jy jou foon verloor of die app deïnstalleer, sal jou fondse onherstelbaar wees.",
-    "accountBeingDeleted": "Jou rekening word uitgevee, wag asseblief...",
+    "accountBeingDeleted": "Jou rekening word gesluit, wag asseblief...",
     "dangerZone": "Gevaarsone",
     "phoneDeletedSuccessfully": "Telefoonnommer suksesvol verwyder",
     "phoneNumber": "Telefoonnommer",
@@ -3048,17 +3048,17 @@
     "defaultEmailSubject": "{bankName: string} - Ondersteuning",
     "defaultSupportMessage": "Hi daar! Ek benodig hulp met {bankName: string}, ek gebruik weergawe {version: string} op {os: string}. ",
     "emailCopied": "e-pos {email: string} oorgedra na knipbord",
-    "deleteAccount": "Skrap rekening",
+    "deleteAccount": "Sluit rekening",
     "delete": "Vee uit",
-    "typeDelete": "Tik asseblief \"{delete: string}\" om rekeningskrap te bevestig",
+    "typeDelete": "Tik asseblief \"{delete: string}\" om die sluiting van die rekening te bevestig",
     "finalConfirmationAccountDeletionTitle": "Finale bevestiging word vereis",
-    "finalConfirmationAccountDeletionMessage": "Is jy seker jy wil jou rekening skrap? Hierdie aksie is onomkeerbaar.",
-    "deleteAccountBalanceWarning": "Deur jou rekening uit te vee sal jy toegang tot jou fondse verloor. Is jy seker jy wil voortgaan? ",
-    "deleteAccountConfirmation": "Jou rekening is nou in die proses om uitgevee te word. \n\nWanneer die wagperiode verstryk het soos bepaal deur die relevante owerheid sal alle oorblywende data met betrekking tot hierdie rekening permanent verwyder word. ",
-    "deleteAccountFromPhone": "Hallo daar, vee asseblief my rekening uit. My selfonnommer is {phoneNumber: string}.",
+    "finalConfirmationAccountDeletionMessage": "Na sluiting sal jy nie toegang tot jou rekening hê of dit kan gebruik nie. Ons kan sekere rekords hou soos vereis deur die wet en ons bewaringsverpligtinge. Is jy seker jy wil jou rekening sluit?",
+    "deleteAccountBalanceWarning": "As jy jou rekening sluit, sal jy toegang tot jou huidige saldo verloor. Is jy seker jy wil voortgaan?",
+    "deleteAccountConfirmation": "Jou rekening is gesluit.\n\nOns kan sekere rekords hou soos vereis deur die wet en ons bewaringsverpligtinge.",
+    "deleteAccountFromPhone": "Hallo daar!, sluit asseblief my rekening. My telefoonnommer is {phoneNumber: string}.",
     "deleteAccountError": "Iets het foutgegaan. Kontak asseblief {email: string} vir verdere hulp. ",
     "bye": "Totsiens!",
-    "deleteAccountWarning": "Let op: Rekeningverwydering is permanent!\nMaak seker beursies het geen fondse voor verwydering nie.\nVerwyderde rekening kan nie herinstel word nie."
+    "deleteAccountWarning": "Let wel: Die sluiting van die rekening is permanent!\nMaak seker dat beursies geen fondse het voor sluiting nie.\n'n Geslote rekening kan nie herstel word nie.\nOns kan sekere rekords hou soos deur die wet vereis."
   },
   "lnurl": {
     "overLimit": "Jy kan nie meer as die maksimum bedrag stuur nie",
@@ -3835,6 +3835,7 @@
     "reminderBulletin": {
       "title": "Belangrik",
       "body": "Skuif na 'n nie-bewaarrekening via begeleide migrasie, of onttrek jou fondse, voor {date}. Ontvangs stop op {receiveStopsDate}.",
+      "bodyReceiveDisabled": "Ontvangs het gestop. Skuif na 'n nie-bewaarrekening via begeleide migrasie, of onttrek jou fondse, voor {date}.",
       "migrateCta": "Migreer"
     },
     "offboardBulletin": {

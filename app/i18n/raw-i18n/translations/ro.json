@@ -2513,7 +2513,7 @@
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Contul dvs. are mai mult de 5 USD",
     "itsATrialAccount": "Conturile de probă au limite reduse de tranzacție și nicio metodă de recuperare. Dacă vă pierdeți telefonul sau dezinstalați aplicația, fondurile dvs. nu vor putea fi recuperate.",
-    "accountBeingDeleted": "Contul dvs. este în curs de ștergere, vă rugăm să așteptați ...",
+    "accountBeingDeleted": "Contul dvs. este în curs de închidere, vă rugăm să așteptați...",
     "dangerZone": "Zona periculoasă",
     "phoneDeletedSuccessfully": "Numărul de telefon a fost șters cu succes",
     "phoneNumber": "Număr de telefon",
@@ -3048,17 +3048,17 @@
     "defaultEmailSubject": "{bankName: string} - Asistență",
     "defaultSupportMessage": "Bună! Am nevoie de ajutor cu {bankName: string}, folosesc versiunea {version: string} pe {os: string}.",
     "emailCopied": "e-mail {email: string} copiat în clipboard",
-    "deleteAccount": "Ștergeți contul",
+    "deleteAccount": "Închide contul",
     "delete": "delete",
-    "typeDelete": "Tastați \"{delete: string}\" pentru a confirma ștergerea contului",
+    "typeDelete": "Te rugăm să tastezi \"{delete: string}\" pentru a confirma închiderea contului",
     "finalConfirmationAccountDeletionTitle": "Este necesară confirmarea finală",
-    "finalConfirmationAccountDeletionMessage": "Sigur doriți să vă ștergeți contul? Această acțiune este ireversibilă.",
-    "deleteAccountBalanceWarning": "Ștergerea contului vă va face să pierdeți accesul la soldul curent. Sunteți sigur că doriți să continuați?",
-    "deleteAccountConfirmation": "Contul dvs. a fost selectat pentru ștergere.\n\nLa încheierea perioadei de probă legate de cerințele de reglementare, datele rămase referitoare la contul dvs. vor fi șterse definitiv.",
-    "deleteAccountFromPhone": "Bună!, Vă rugăm să ștergeți contul meu. Numărul meu de telefon este {phoneNumber: string}.",
+    "finalConfirmationAccountDeletionMessage": "După închidere, nu veți putea accesa sau utiliza contul. Este posibil să păstrăm anumite înregistrări conform cerințelor legale și obligațiilor noastre de păstrare. Sigur doriți să închideți contul?",
+    "deleteAccountBalanceWarning": "Închiderea contului vă va face să pierdeți accesul la soldul curent. Sigur doriți să continuați?",
+    "deleteAccountConfirmation": "Contul dvs. a fost închis.\n\nEste posibil să păstrăm anumite înregistrări conform cerințelor legale și obligațiilor noastre de păstrare.",
+    "deleteAccountFromPhone": "Bună!, vă rugăm să închideți contul meu. Numărul meu de telefon este {phoneNumber: string}.",
     "deleteAccountError": "Ceva nu a mers bine. Contactați {email: string} pentru asistență suplimentară.",
     "bye": "La revedere!",
-    "deleteAccountWarning": "Atenție: Ștergerea contului este permanentă!\nAsigurați-vă că portofelele nu au fonduri înainte de ștergere.\nContul șters nu poate fi reinstaurat."
+    "deleteAccountWarning": "Atenție: Închiderea contului este permanentă!\nAsigurați-vă că portofelele nu au fonduri înainte de închidere.\nUn cont închis nu poate fi restabilit.\nEste posibil să păstrăm anumite înregistrări conform cerințelor legale."
   },
   "lnurl": {
     "overLimit": "Nu puteți trimite mai mult decât suma maximă",
@@ -3835,6 +3835,7 @@
     "reminderBulletin": {
       "title": "Important",
       "body": "Treci la un cont non-custodial prin migrarea ghidată sau retrage-ți fondurile înainte de {date}. Primirea se oprește pe {receiveStopsDate}.",
+      "bodyReceiveDisabled": "Primirea s-a oprit. Treci la un cont non-custodial prin migrarea ghidată sau retrage-ți fondurile înainte de {date}.",
       "migrateCta": "Migrează"
     },
     "offboardBulletin": {

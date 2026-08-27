@@ -1,6 +1,6 @@
 import debounce from "lodash.debounce"
 import React from "react"
-import { ActivityIndicator, Pressable, View } from "react-native"
+import { ActivityIndicator, LayoutChangeEvent, Pressable, View } from "react-native"
 import MapView, { Region } from "react-native-maps"
 import { PermissionStatus, RESULTS, request } from "react-native-permissions"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
@@ -32,10 +32,12 @@ import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 import { AddPlaceModal } from "./add-place-modal"
 import { CategoryFilterSheet } from "./category-filter-sheet"
 import { ClusterMarker, ClusterMarkerData } from "./cluster-marker"
+import { Viewport, placeLabels } from "./label-collision"
 import LocationButtonCopy from "./location-button-copy"
 import { MapSearchBar, searchBarBottom } from "./map-search-bar"
 import MapStyles from "./map-styles.json"
 import { OpenSettingsElement, OpenSettingsModal } from "./open-settings-modal"
+import { truncateLabel } from "./marker-layout"
 import { PlaceLabelMarker } from "./place-label-marker"
 import { PlaceLocator, locatorBarTop } from "./place-locator"
 import { PlaceMarker } from "./place-marker"
@@ -51,6 +53,9 @@ const LABEL_MIN_ZOOM = 15
 // Close enough that the pin is drawn on its own rather than swallowed by a
 // cluster — see CLUSTERING_DISABLED_ZOOM.
 const SEARCH_RESULT_ZOOM = 17
+
+// Nothing is labelled before the map has been laid out once, which is a frame.
+const EMPTY_LABELS: ReadonlySet<number> = new Set()
 
 const SAVE_COORDS_DEBOUNCE_MS = 1000
 const FLY_TO_DURATION_MS = 350
@@ -147,6 +152,43 @@ export default function MapComponent({
     radiusKm: viewportRadiusKm,
     enabled: zoomForRegion(region) >= LABEL_MIN_ZOOM,
   })
+
+  // The collision pass works in screen space, so it needs the size of the view
+  // the region is drawn into — the map's own, not the window's, since the tab
+  // bar below it is not map.
+  const [viewport, setViewport] = React.useState<Viewport | null>(null)
+  const handleLayout = React.useCallback(({ nativeEvent }: LayoutChangeEvent) => {
+    const { width, height } = nativeEvent.layout
+    // Same size, same object: this feeds a memo that re-runs the placement.
+    setViewport((current) =>
+      current && current.width === width && current.height === height
+        ? current
+        : { width, height },
+    )
+  }, [])
+
+  // Cut to the label's character budget once, here, so the collision pass and
+  // the views it admits are given the very same strings. Truncating in either
+  // place alone would have the boxes reserved in screen space describe a name
+  // nobody draws — too wide, and neighbours dropped for room never used.
+  const labelNames = React.useMemo(
+    () => new Map([...names].map(([id, name]) => [id, truncateLabel(name)])),
+    [names],
+  )
+
+  // Which names can be drawn without landing on one another.
+  //
+  // Recomputed only when the camera settles, because `region` is only written by
+  // `onRegionChangeComplete` — so the names on screen mid-gesture are the ones
+  // the last settled camera chose, and they resolve when the map comes to rest.
+  // btcmap.org's MapLibre layer redoes this every frame and fades the difference
+  // in; a fade is not available to us, since these are native marker views whose
+  // opacity cannot be animated without re-rasterising every one of them.
+  const labelledPlaceIds = React.useMemo(
+    () =>
+      viewport ? placeLabels(places, labelNames, { region, viewport }) : EMPTY_LABELS,
+    [places, labelNames, region, viewport],
+  )
 
   // toggle modal from inside modal component instead of here in the parent
   const toggleModal = React.useCallback(
@@ -341,6 +383,7 @@ export default function MapComponent({
       <MapView
         ref={mapViewRef}
         style={styles.map}
+        onLayout={handleLayout}
         showsUserLocation={permissionsStatus === RESULTS.GRANTED}
         showsMyLocationButton={false}
         initialRegion={userLocation}
@@ -369,9 +412,15 @@ export default function MapComponent({
         ))}
         {/* Separate markers, not children of the pins: a name arriving has to
             mount something new rather than resize a pin that has already
-            rasterised — see place-marker.tsx. */}
+            rasterised — see place-marker.tsx.
+
+            Only the names that won a place in the collision pass are mounted. A
+            pin whose name lost still draws; it is the name that is dropped, not
+            the merchant. */}
         {places.map((place) => {
-          const name = names.get(place.id)
+          const name = labelledPlaceIds.has(place.id)
+            ? labelNames.get(place.id)
+            : undefined
           return name ? (
             <PlaceLabelMarker
               key={`label-${place.id}`}
@@ -444,10 +493,6 @@ export default function MapComponent({
             }
           />
         )}
-
-      {/* The places are OpenStreetMap data under ODbL, which asks that anyone
-          looking at it can see where it came from. */}
-      <Text style={styles.attribution}>{LL.MapScreen.attribution()}</Text>
 
       <OpenSettingsModal ref={openSettingsModalRef} />
 
@@ -535,18 +580,5 @@ const useStyles = makeStyles(({ colors }, { topInset }: { topInset: number }) =>
     fontSize: 14,
     fontWeight: "700",
     color: colors.black,
-  },
-  attribution: {
-    position: "absolute",
-    right: 8,
-    bottom: 8,
-    fontSize: 11,
-    // This is the ODbL credit, so it has to stay readable over whatever the
-    // basemap happens to be — hence an opaque chip rather than a tint.
-    color: colors.grey1,
-    backgroundColor: colors.white,
-    borderRadius: 4,
-    paddingHorizontal: 5,
-    paddingVertical: 2,
   },
 }))

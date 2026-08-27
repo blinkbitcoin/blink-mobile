@@ -2513,7 +2513,7 @@
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Váš účet má více než $5",
     "itsATrialAccount": "Zkušební účty mají snížené transakční limity a žádnou metodu obnovení. Pokud ztratíte telefon nebo odinstalujete aplikaci, vaše prostředky budou nenávratně ztraceny.",
-    "accountBeingDeleted": "Váš účet je mazán, prosím čekejte...",
+    "accountBeingDeleted": "Váš účet se zavírá, prosím čekejte...",
     "dangerZone": "Nebezpečná zóna",
     "phoneDeletedSuccessfully": "Telefonní číslo úspěšně odstraněno",
     "phoneNumber": "Telefonní číslo",
@@ -3048,17 +3048,17 @@
     "defaultEmailSubject": "{bankName: string} - Podpora",
     "defaultSupportMessage": "Zdravím! Potřebuji pomoc s {bankName: string}, používám verzi {version: string} na {os: string}.",
     "emailCopied": "email {email: string} zkopírován do schránky",
-    "deleteAccount": "Smazat účet",
+    "deleteAccount": "Zavřít účet",
     "delete": "smazat",
-    "typeDelete": "Smazání účtu potvrdíte zadáním \"{delete: string}\".",
+    "typeDelete": "Zavření účtu potvrdíte zadáním \"{delete: string}\".",
     "finalConfirmationAccountDeletionTitle": "Požadováno závěrečné potvrzení",
-    "finalConfirmationAccountDeletionMessage": "Opravdu chcete svůj účet smazat? Tato akce je nevratná.",
-    "deleteAccountBalanceWarning": "Smazáním účtu ztratíte přístup k aktuálnímu zůstatku. Jste si jisti, že chcete pokračovat?",
-    "deleteAccountConfirmation": "Váš účet byl zapsán ke smazání.\n\nPo uplynutí čekací doby související s regulačním požadavkem budou zbývající údaje týkající se vašeho účtu trvale vymazány.",
-    "deleteAccountFromPhone": "Ahoj!, prosím, smažte můj účet. Moje telefonní číslo je {phoneNumber: string}.",
+    "finalConfirmationAccountDeletionMessage": "Po zavření nebudete mít ke svému účtu přístup ani jej nebudete moci používat. Některé záznamy můžeme uchovávat, pokud to vyžaduje zákon a naše povinnosti uchovávání údajů. Opravdu chcete svůj účet zavřít?",
+    "deleteAccountBalanceWarning": "Zavřením účtu ztratíte přístup k aktuálnímu zůstatku. Jste si jisti, že chcete pokračovat?",
+    "deleteAccountConfirmation": "Váš účet byl zavřen.\n\nNěkteré záznamy můžeme uchovávat, pokud to vyžaduje zákon a naše povinnosti uchovávání údajů.",
+    "deleteAccountFromPhone": "Ahoj!, prosím, zavřete můj účet. Moje telefonní číslo je {phoneNumber: string}.",
     "deleteAccountError": "Něco se pokazilo. Pro další pomoc kontaktujte {email: string}.",
     "bye": "Nashledanou!",
-    "deleteAccountWarning": "Pozor: Smazání účtu je nevratné!\nPřed smazáním se ujistěte, že peněženky nemají žádné prostředky.\nSmazaný účet nelze obnovit."
+    "deleteAccountWarning": "Pozor: Zavření účtu je nevratné!\nPřed zavřením se ujistěte, že peněženky nemají žádné prostředky.\nZavřený účet nelze obnovit.\nNěkteré záznamy můžeme uchovávat, pokud to vyžaduje zákon."
   },
   "lnurl": {
     "overLimit": "Nemůžete poslat více než maximální částku",
@@ -3835,6 +3835,7 @@
     "reminderBulletin": {
       "title": "Důležité",
       "body": "Přejděte na nesvěřenský účet pomocí řízené migrace, nebo si vyberte prostředky, před {date}. Přijímání končí {receiveStopsDate}.",
+      "bodyReceiveDisabled": "Přijímání skončilo. Přejděte na nesvěřenský účet pomocí řízené migrace, nebo si vyberte prostředky, před {date}.",
       "migrateCta": "Migrovat"
     },
     "offboardBulletin": {

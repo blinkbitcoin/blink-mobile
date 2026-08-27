@@ -2513,7 +2513,7 @@
   "AccountScreen": {
     "fundsMoreThan5Dollars": "El teu compte té més de 5$",
     "itsATrialAccount": "Els comptes de prova tenen límits de transaccions reduïts i cap mètode de recuperació. Si perds el telèfon o desinstal·les l'aplicació, els teus fons seran irrecuperables.",
-    "accountBeingDeleted": "El teu compte s'està suprimint, si us plau espera...",
+    "accountBeingDeleted": "El teu compte s'està tancant, si us plau espera...",
     "dangerZone": "Zona Perillosa",
     "phoneDeletedSuccessfully": "El telèfon s'ha suprimit correctament",
     "phoneNumber": "Número de telèfon",
@@ -3048,17 +3048,17 @@
     "defaultEmailSubject": "{bankName: string} - Suport",
     "defaultSupportMessage": "Hola! Necessito ajuda amb {bankName: string}, utilitzo la versió {version: string} de {os: string}.",
     "emailCopied": "l'adreça electrònica {email: string} s'ha copiat al porta-retalls",
-    "deleteAccount": "Elimina el compte",
+    "deleteAccount": "Tancar el compte",
     "delete": "esborrar",
-    "typeDelete": "Escriu \"{delete: string}\" per confirmar la supressió del compte",
+    "typeDelete": "Escriu \"{delete: string}\" per confirmar el tancament del compte",
     "finalConfirmationAccountDeletionTitle": "Cal la confirmació final",
-    "finalConfirmationAccountDeletionMessage": "Estas segur que vols suprimir el teu compte? Aquesta acció és irreversible.",
-    "deleteAccountBalanceWarning": "Si suprimeixes el teu compte, perdras l'accés al teu saldo actual. Estàs segur que vols continuar?",
-    "deleteAccountConfirmation": "El seu compte ha estat marcat per a la supressió.\n\nQuan finalitzi el període de prova relacionat amb els requisits normatius, les dades restants relacionades amb el seu compte seran eliminades de manera permanent.",
-    "deleteAccountFromPhone": "Hola!, si us plau, esborra el meu compte. El meu número de telèfon és {phoneNumber: string}.",
+    "finalConfirmationAccountDeletionMessage": "Després de tancar-lo, no podràs accedir al teu compte ni utilitzar-lo. És possible que conservem certs registres segons ho exigeixi la llei i les nostres obligacions de retenció. Estàs segur que vols tancar el teu compte?",
+    "deleteAccountBalanceWarning": "Si tanques el compte, perdràs l'accés al teu saldo actual. Estàs segur que vols continuar?",
+    "deleteAccountConfirmation": "El teu compte s'ha tancat.\n\nÉs possible que conservem certs registres segons ho exigeixi la llei i les nostres obligacions de retenció.",
+    "deleteAccountFromPhone": "Hola! Si us plau, tanqueu el meu compte. El meu número de telèfon és {phoneNumber: string}.",
     "deleteAccountError": "Alguna cosa ha anat malament. Contacta amb {email: string} per obtenir més ajuda.",
     "bye": "Adéu!",
-    "deleteAccountWarning": "Atenció: L'eliminació del compte és permanent!\nAssegura't que els moneders no tinguin fons abans d'eliminar.\nEl compte eliminat no es pot restablir."
+    "deleteAccountWarning": "Atenció: el tancament del compte és permanent!\nAssegura't que les carteres no tinguin fons abans de tancar-lo.\nUn compte tancat no es pot restaurar.\nÉs possible que conservem certs registres segons ho exigeixi la llei."
   },
   "lnurl": {
     "overLimit": "No pots enviar més que l'import màxim",
@@ -3835,6 +3835,7 @@
     "reminderBulletin": {
       "title": "Important",
       "body": "Passa a un compte no custodi mitjançant la migració guiada, o retira els teus fons, abans del {date}. La recepció s'atura el {receiveStopsDate}.",
+      "bodyReceiveDisabled": "La recepció s'ha aturat. Passa a un compte no custodi mitjançant la migració guiada, o retira els teus fons, abans del {date}.",
       "migrateCta": "Migra"
     },
     "offboardBulletin": {

@@ -2513,7 +2513,7 @@
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Akaunti yako ina zaidi ya $5",
     "itsATrialAccount": "Akaunti za majaribio zimepunguza vikomo vya ununuzi na hakuna njia ya kurejesha. Ukipoteza simu yako au ukiondoa programu, pesa zako hazitarejeshwa.",
-    "accountBeingDeleted": "Akaunti yako inafutwa, tafadhali subiri...",
+    "accountBeingDeleted": "Akaunti yako inafungwa, tafadhali subiri...",
     "dangerZone": "Eneo la Hatari",
     "phoneDeletedSuccessfully": "Simu imefutwa",
     "phoneNumber": "Nambari ya Simu",
@@ -3048,17 +3048,17 @@
     "defaultEmailSubject": "{bankName: string} - Usaidizi",
     "defaultSupportMessage": "Hujambo! Nahitaji usaidizi wa {bankName: string}, ninatumia toleo la {version: string} kwenye {os: string}.",
     "emailCopied": "Barua pepe {email: string} imenakiliwa kwenye ubao wa kunakili",
-    "deleteAccount": "Futa akaunti",
+    "deleteAccount": "Funga akaunti",
     "delete": "futa",
-    "typeDelete": "Tafadhali andika \"{delete: string}\" kuthibitisha kufuta akaunti",
+    "typeDelete": "Tafadhali andika \"{delete: string}\" kuthibitisha kufungwa kwa akaunti",
     "finalConfirmationAccountDeletionTitle": "Thibitisho la Mwisho Linalohitajika",
-    "finalConfirmationAccountDeletionMessage": "Una uhakika unataka kufuta akaunti yako? Hatua hii haiwezi kubadilishwa.",
-    "deleteAccountBalanceWarning": "Kufuta akaunti yako kutasababisha kupoteza ufikiaji wa salio lako la sasa. Una uhakika unataka kuendelea?",
-    "deleteAccountConfirmation": "Akaunti yako imeandikwa kwa kufutwa.\n\nWakati kipindi cha majaribio kinachohusiana na mahitaji ya kisheria kinapomalizika, data iliyobaki kuhusiana na akaunti yako itafutwa kabisa.",
-    "deleteAccountFromPhone": "Habari!, tafadhali futa akaunti yangu. Namba yangu ya simu ni {phoneNumber: string}.",
+    "finalConfirmationAccountDeletionMessage": "Baada ya kufungwa, hutaweza kufikia au kutumia akaunti yako. Tunaweza kuhifadhi rekodi fulani kama inavyohitajika na sheria na wajibu wetu wa kuhifadhi. Una uhakika unataka kufunga akaunti yako?",
+    "deleteAccountBalanceWarning": "Kufunga akaunti yako kutakufanya upoteze ufikiaji wa salio lako la sasa. Una uhakika unataka kuendelea?",
+    "deleteAccountConfirmation": "Akaunti yako imefungwa.\n\nTunaweza kuhifadhi rekodi fulani kama inavyohitajika na sheria na wajibu wetu wa kuhifadhi.",
+    "deleteAccountFromPhone": "Habari!, tafadhali funga akaunti yangu. Nambari yangu ya simu ni {phoneNumber: string}.",
     "deleteAccountError": "Kuna kitu kimeenda kombo. Wasiliana na {email: string} kwa msaada zaidi.",
     "bye": "Kwaheri!",
-    "deleteAccountWarning": "Tahadhari: Kufuta akaunti ni kwa kudumu!\nHakikisha mikoba haina fedha kabla ya kufuta.\nAkaunti iliyofutwa haiwezi kurejeshwa."
+    "deleteAccountWarning": "Kumbuka: Kufunga akaunti ni kwa kudumu!\nHakikisha pochi hazina fedha kabla ya kufunga.\nAkaunti iliyofungwa haiwezi kurejeshwa.\nTunaweza kuhifadhi rekodi fulani kama inavyohitajika na sheria."
   },
   "lnurl": {
     "overLimit": "Huwezi kutuma zaidi ya kiasi cha juu",
@@ -3835,6 +3835,7 @@
     "reminderBulletin": {
       "title": "Muhimu",
       "body": "Hamia kwenye akaunti isiyo ya udhamini kupitia uhamishaji unaoongozwa, au toa fedha zako, kabla ya {date}. Kupokea kutasimama {receiveStopsDate}.",
+      "bodyReceiveDisabled": "Kupokea kumesimama. Hamia kwenye akaunti isiyo ya udhamini kupitia uhamishaji unaoongozwa, au toa fedha zako, kabla ya {date}.",
       "migrateCta": "Hamia"
     },
     "offboardBulletin": {

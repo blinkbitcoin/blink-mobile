@@ -2513,7 +2513,7 @@
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Cuentaykipi $5 aswan qullqi kachkan",
     "itsATrialAccount": "Prueba cuentakunaqa pisiyachisqa ruwana topekunayuq hinaspa mana kutichiy ñannikunayuq kanku. Celularniykita chinkachispayki utaq app nisqata qichuspayki, qullqiykiqa mana kutichiy atikuqchu kanqa.",
-    "accountBeingDeleted": "Cuentaykita qichushashanku, ama hina kaspa suyay...",
+    "accountBeingDeleted": "Cuentayki wichq'akashan, ama hina kaspa suyay...",
     "dangerZone": "Manchay suyuniq",
     "phoneDeletedSuccessfully": "Teléfonota allinmi qichusqa",
     "phoneNumber": "Teléfono yupay",
@@ -3048,17 +3048,17 @@
     "defaultEmailSubject": "{bankName: string} - Yachanakuy",
     "defaultSupportMessage": "¡Juyayay! Qanqa atipuni {bankName: string}piyta kani, {os: string}ta allinmi version {version: string}ninchikmi. Kaypi yachanichu.",
     "emailCopied": "Imayna {email: string} qillqanman yuraqchanku chimpusqan.",
-    "deleteAccount": "Delete account",
+    "deleteAccount": "Cuentata wichq'ay",
     "delete": "delete",
-    "typeDelete": "Please type \"{delete: string}\" to confirm account deletion",
+    "typeDelete": "\"{delete: string}\" nisqata qillqay cuenta wichq'asqanpaq",
     "finalConfirmationAccountDeletionTitle": "Final Confirmation Required",
-    "finalConfirmationAccountDeletionMessage": "Are you sure you want to delete your account? This action is irreversible.",
-    "deleteAccountBalanceWarning": "Deleting your account will cause you to lose access to your current balance. Are you sure you want to proceed?",
-    "deleteAccountConfirmation": "Your account has been written for deletion.\n\nWhen the probation period related to regulatory requirement is over, the remaining data related to your account will be permanently deleted.",
-    "deleteAccountFromPhone": "Hey there!, please delete my account. My phone number is {phoneNumber: string}.",
+    "finalConfirmationAccountDeletionMessage": "Wichq'asqa qhipaqa manam cuentaykiqman yaykuyta ni llamk'achiyta atinkiñachu. Icha wakin willakuykunata waqaychasunmi leywan hinallataq waqaychay obligacionniykuwan kamasqa. Cheqaqchu cuentaykita wichq'ayta munanki?",
+    "deleteAccountBalanceWarning": "Cuentaykita wichq'ayqa qullqiykimanta yaykuyta chinkachinqa. Cheqaqchu hinallata ruwayta munanki?",
+    "deleteAccountConfirmation": "Cuentayki wichq'asqañam.\n\nIcha wakin willakuykunata waqaychaykuymi leywan waqaychay obligacionniykuwan kamasqa.",
+    "deleteAccountFromPhone": "Napaykuy!, ama hina kaspa cuentayta wichq'ay. Teléfono numeroyqa {phoneNumber: string}.",
     "deleteAccountError": "Something went wrong. Contact {email: string} for further assistance.",
     "bye": "Bye!",
-    "deleteAccountWarning": "Yuyay: ¡Cuenta qichuyqa wiñaypaqmi!\nQichuypa ñawpaqta walletakunapi mana qullqi kananpaq chiqapchay.\nQichusqa cuentaqa mana kutichiy atikuqchu."
+    "deleteAccountWarning": "Yuyay: Cuenta wichq'ayqa wiñaypaqmi!\nWichq'aypa ñawpaqta walletakunapi mana qullqi kananpaq chiqapchay.\nWichq'asqa cuentaqa mana kutichiy atikunchu.\nIcha wakin willakuykunata waqaychaykuymi ley kamasqan."
   },
   "lnurl": {
     "overLimit": "Monto yachanapaq kachkanman.",
@@ -3835,6 +3835,7 @@
     "reminderBulletin": {
       "title": "Ancha allin",
       "body": "Astakuy mana waqaychasqa kuentaman pusaykachasqa astakuywan, otaq qullqiykita hurquy, {date} manaraq chayamuchkaptin. Chaskiyqa {receiveStopsDate}-pi tukukunqa.",
+      "bodyReceiveDisabled": "Chaskiyqa tukukunñam. Astakuy mana waqaychasqa kuentaman pusaykachasqa astakuywan, otaq qullqiykita hurquy, {date} manaraq chayamuchkaptin.",
       "migrateCta": "Astakuy"
     },
     "offboardBulletin": {

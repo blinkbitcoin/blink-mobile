@@ -2513,7 +2513,7 @@
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Vaš račun ima više od $5",
     "itsATrialAccount": "Probni računi imaju smanjene limite transakcija i nemaju metodu oporavka. Ako izgubite telefon ili deinstalirate aplikaciju, vaša sredstva neće biti moguće oporaviti.",
-    "accountBeingDeleted": "Vaš račun se briše, molimo pričekajte...",
+    "accountBeingDeleted": "Vaš račun se zatvara, molimo pričekajte...",
     "dangerZone": "Opasna zona",
     "phoneDeletedSuccessfully": "Telefonski broj uspješno izbrisan",
     "phoneNumber": "Telefonski broj",
@@ -3048,17 +3048,17 @@
     "defaultEmailSubject": "{bankName: string} - Podrška",
     "defaultSupportMessage": "Bok! Trebam pomoć s {bankName: string}, koristim verziju {version: string} na {os: string}.",
     "emailCopied": "e-pošta {email: string} kopirana u međuspremnik",
-    "deleteAccount": "Izbriši račun",
+    "deleteAccount": "Zatvori račun",
     "delete": "izbrisati",
-    "typeDelete": "Unesite \"{delete: string}\" za potvrdu brisanja računa",
+    "typeDelete": "Upišite \"{delete: string}\" za potvrdu zatvaranja računa",
     "finalConfirmationAccountDeletionTitle": "Potrebna konačna potvrda",
-    "finalConfirmationAccountDeletionMessage": "Jeste li sigurni da želite izbrisati svoj račun? Ova radnja je nepovratna.",
-    "deleteAccountBalanceWarning": "Brisanjem računa izgubit ćete pristup svom trenutnom stanju. Jeste li sigurni da želite nastaviti?",
-    "deleteAccountConfirmation": "Vaš račun je označen za brisanje.\n\nKada probno razdoblje povezano s regulatornim zahtjevima završi, preostali podaci povezani s vašim računom bit će trajno izbrisani.",
-    "deleteAccountFromPhone": "Bok!, molim vas izbrišite moj račun. Moj broj telefona je {phoneNumber: string}.",
+    "finalConfirmationAccountDeletionMessage": "Nakon zatvaranja nećete moći pristupiti svom računu niti ga koristiti. Možemo zadržati određene zapise kako zahtijevaju zakon i naše obveze čuvanja podataka. Jeste li sigurni da želite zatvoriti svoj račun?",
+    "deleteAccountBalanceWarning": "Zatvaranjem računa izgubit ćete pristup trenutnom stanju. Jeste li sigurni da želite nastaviti?",
+    "deleteAccountConfirmation": "Vaš račun je zatvoren.\n\nMožemo zadržati određene zapise kako zahtijevaju zakon i naše obveze čuvanja podataka.",
+    "deleteAccountFromPhone": "Pozdrav!, molim vas zatvorite moj račun. Moj broj telefona je {phoneNumber: string}.",
     "deleteAccountError": "Nešto je pošlo po zlu. Kontaktirajte {email: string} za dodatnu pomoć.",
     "bye": "Pozdrav!",
-    "deleteAccountWarning": "Pažnja: Brisanje računa je trajno!\nProvjerite da novčanici nemaju sredstava prije brisanja.\nIzbrisani račun ne može biti vraćen."
+    "deleteAccountWarning": "Pažnja: Zatvaranje računa je trajno!\nPrije zatvaranja provjerite da novčanici nemaju sredstava.\nZatvoreni račun nije moguće vratiti.\nMožemo zadržati određene zapise kako zahtijeva zakon."
   },
   "lnurl": {
     "overLimit": "Ne možete poslati više od maksimalnog iznosa",
@@ -3835,6 +3835,7 @@
     "reminderBulletin": {
       "title": "Važno",
       "body": "Prijeđite na račun bez skrbništva putem vođene migracije ili podignite sredstva prije {date}. Primanje prestaje {receiveStopsDate}.",
+      "bodyReceiveDisabled": "Primanje je prestalo. Prijeđite na račun bez skrbništva putem vođene migracije ili podignite sredstva prije {date}.",
       "migrateCta": "Migriraj"
     },
     "offboardBulletin": {

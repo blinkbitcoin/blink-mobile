@@ -15,6 +15,22 @@ type LogoutOptions = {
   stateToDefault?: boolean
   token?: string
   isValidToken?: boolean
+  /**
+   * Signs out of the active session and leaves everything the device has
+   * stored alone: the saved profiles, the PIN, the biometrics flag and the
+   * schema marker. For the one case where "there is nothing left" is not
+   * knowledge but ignorance — the keystore could not be read, so erasing would
+   * delete sessions we never saw.
+   *
+   * The group cannot be split. Profiles without the PIN would leave live
+   * bearer tokens behind with the lock that guarded them gone, and dropping
+   * the schema marker alone makes the next boot read as a fresh install, whose
+   * reinstall sweep erases the profiles anyway.
+   *
+   * Only the untokened path reads this; a call that passes a token is already
+   * scoped to that one session and destroys nothing else.
+   */
+  preserveStoredCredentials?: boolean
 }
 
 gql`
@@ -36,6 +52,7 @@ const useLogout = () => {
       stateToDefault = true,
       token,
       isValidToken = true,
+      preserveStoredCredentials = false,
     }: LogoutOptions = {}): Promise<void> => {
       try {
         // Isolated: a failed push-token fetch must never skip the local
@@ -63,11 +80,13 @@ const useLogout = () => {
           }
           context = { headers: { authorization: `Bearer ${token}` } }
         } else {
-          await AsyncStorage.multiRemove([SCHEMA_VERSION_KEY])
-          await KeyStoreWrapper.removeIsBiometricsEnabled()
-          await KeyStoreWrapper.removePin()
-          await KeyStoreWrapper.clearPinFailureState()
-          await KeyStoreWrapper.removeSessionProfiles()
+          if (!preserveStoredCredentials) {
+            await AsyncStorage.multiRemove([SCHEMA_VERSION_KEY])
+            await KeyStoreWrapper.removeIsBiometricsEnabled()
+            await KeyStoreWrapper.removePin()
+            await KeyStoreWrapper.clearPinFailureState()
+            await KeyStoreWrapper.removeSessionProfiles()
+          }
           await clearToken()
         }
 

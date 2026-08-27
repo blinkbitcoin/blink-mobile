@@ -2513,7 +2513,7 @@
   "AccountScreen": {
     "fundsMoreThan5Dollars": "บัญชีของคุณมีมากกว่า $5",
     "itsATrialAccount": "บัญชีทดลองมีวงเงินธุรกรรมที่จำกัดและไม่มีวิธีกู้คืน หากคุณทำโทรศัพท์หายหรือถอนการติดตั้งแอป เงินของคุณจะไม่สามารถกู้คืนได้",
-    "accountBeingDeleted": "บัญชีของคุณกำลังถูกลบ กรุณารอสักครู่...",
+    "accountBeingDeleted": "บัญชีของคุณกำลังถูกปิด กรุณารอสักครู่...",
     "dangerZone": "โซนอันตราย",
     "phoneDeletedSuccessfully": "ลบหมายเลขโทรศัพท์สำเร็จแล้ว",
     "phoneNumber": "หมายเลขโทรศัพท์",
@@ -3048,17 +3048,17 @@
     "defaultEmailSubject": "{bankName: string} - Support",
     "defaultSupportMessage": "Hey there! I need some help with {bankName: string}, I'm using the version {version: string} on {os: string}.",
     "emailCopied": "email {email: string} ปยังคลิปบอร์ดแล้ว",
-    "deleteAccount": "Delete account",
+    "deleteAccount": "ปิดบัญชี",
     "delete": "delete",
-    "typeDelete": "Please type \"{delete: string}\" to confirm account deletion",
+    "typeDelete": "โปรดพิมพ์ \"{delete: string}\" เพื่อยืนยันการปิดบัญชี",
     "finalConfirmationAccountDeletionTitle": "Final Confirmation Required",
-    "finalConfirmationAccountDeletionMessage": "Are you sure you want to delete your account? This action is irreversible.",
-    "deleteAccountBalanceWarning": "Deleting your account will cause you to lose access to your current balance. Are you sure you want to proceed?",
-    "deleteAccountConfirmation": "Your account has been written for deletion.\n\nWhen the probation period related to regulatory requirement is over, the remaining data related to your account will be permanently deleted.",
-    "deleteAccountFromPhone": "Hey there!, please delete my account. My phone number is {phoneNumber: string}.",
+    "finalConfirmationAccountDeletionMessage": "หลังจากปิดบัญชีแล้ว คุณจะไม่สามารถเข้าถึงหรือใช้งานบัญชีของคุณได้ เราอาจเก็บรักษาบันทึกบางอย่างตามที่กฎหมายและข้อผูกพันด้านการเก็บรักษาของเรากำหนด คุณแน่ใจหรือไม่ว่าต้องการปิดบัญชีของคุณ?",
+    "deleteAccountBalanceWarning": "การปิดบัญชีของคุณจะทำให้คุณสูญเสียการเข้าถึงยอดคงเหลือปัจจุบัน คุณแน่ใจหรือไม่ว่าต้องการดำเนินการต่อ?",
+    "deleteAccountConfirmation": "บัญชีของคุณถูกปิดแล้ว\n\nเราอาจเก็บรักษาบันทึกบางอย่างตามที่กฎหมายและข้อผูกพันด้านการเก็บรักษาของเรากำหนด",
+    "deleteAccountFromPhone": "สวัสดี! โปรดปิดบัญชีของฉัน หมายเลขโทรศัพท์ของฉันคือ {phoneNumber: string}",
     "deleteAccountError": "Something went wrong. Contact {email: string} for further assistance.",
     "bye": "Bye!",
-    "deleteAccountWarning": "คำเตือน: การลบบัญชีเป็นการถาวร!\nตรวจสอบว่ากระเป๋าไม่มีเงินเหลือก่อนลบ\nบัญชีที่ถูกลบไม่สามารถกู้คืนได้"
+    "deleteAccountWarning": "ข้อควรระวัง: การปิดบัญชีเป็นการกระทำถาวร!\nตรวจสอบให้แน่ใจว่ากระเป๋าเงินไม่มีเงินคงเหลือก่อนปิดบัญชี\nบัญชีที่ปิดแล้วไม่สามารถกู้คืนได้\nเราอาจเก็บรักษาบันทึกบางอย่างตามที่กฎหมายกำหนด"
   },
   "lnurl": {
     "overLimit": "คุณไม่สามารถส่งเงินได้เกินกว่านี้",
@@ -3835,6 +3835,7 @@
     "reminderBulletin": {
       "title": "สำคัญ",
       "body": "ย้ายไปยังบัญชีแบบไม่ฝากดูแลผ่านการย้ายแบบมีคำแนะนำ หรือถอนเงินของคุณ ก่อน {date} การรับจะหยุดในวันที่ {receiveStopsDate}",
+      "bodyReceiveDisabled": "การรับหยุดแล้ว ย้ายไปยังบัญชีแบบไม่ฝากดูแลผ่านการย้ายแบบมีคำแนะนำ หรือถอนเงินของคุณ ก่อน {date}",
       "migrateCta": "ย้าย"
     },
     "offboardBulletin": {

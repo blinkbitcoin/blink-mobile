@@ -2513,7 +2513,7 @@
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Tài khoản của bạn có hơn $5",
     "itsATrialAccount": "Tài khoản dùng thử có giới hạn giao dịch thấp hơn và không có phương thức khôi phục. Nếu bạn mất điện thoại hoặc gỡ cài đặt ứng dụng, tiền của bạn sẽ không thể khôi phục.",
-    "accountBeingDeleted": "Tài khoản của bạn đang được xóa, vui lòng chờ...",
+    "accountBeingDeleted": "Tài khoản của bạn đang được đóng, vui lòng chờ...",
     "dangerZone": "Vùng nguy hiểm",
     "phoneDeletedSuccessfully": "Đã xóa số điện thoại thành công",
     "phoneNumber": "Số Điện thoại",
@@ -3048,17 +3048,17 @@
     "defaultEmailSubject": "{bankName: string} - Support",
     "defaultSupportMessage": "Hey there! I need some help with {bankName: string}, I'm using the version {version: string} on {os: string}.",
     "emailCopied": "email {email: string} đã sao chép vào bộ nhớ tạm",
-    "deleteAccount": "Delete account",
+    "deleteAccount": "Đóng tài khoản",
     "delete": "delete",
-    "typeDelete": "Please type \"{delete: string}\" to confirm account deletion",
+    "typeDelete": "Vui lòng nhập \"{delete: string}\" để xác nhận đóng tài khoản",
     "finalConfirmationAccountDeletionTitle": "Final Confirmation Required",
-    "finalConfirmationAccountDeletionMessage": "Are you sure you want to delete your account? This action is irreversible.",
-    "deleteAccountBalanceWarning": "Deleting your account will cause you to lose access to your current balance. Are you sure you want to proceed?",
-    "deleteAccountConfirmation": "Your account has been written for deletion.\n\nWhen the probation period related to regulatory requirement is over, the remaining data related to your account will be permanently deleted.",
-    "deleteAccountFromPhone": "Hey there!, please delete my account. My phone number is {phoneNumber: string}.",
+    "finalConfirmationAccountDeletionMessage": "Sau khi đóng, bạn sẽ không thể truy cập hoặc sử dụng tài khoản của mình. Chúng tôi có thể lưu giữ một số hồ sơ theo yêu cầu của pháp luật và nghĩa vụ lưu trữ của chúng tôi. Bạn có chắc chắn muốn đóng tài khoản của mình không?",
+    "deleteAccountBalanceWarning": "Việc đóng tài khoản sẽ khiến bạn mất quyền truy cập vào số dư hiện tại. Bạn có chắc chắn muốn tiếp tục không?",
+    "deleteAccountConfirmation": "Tài khoản của bạn đã được đóng.\n\nChúng tôi có thể lưu giữ một số hồ sơ theo yêu cầu của pháp luật và nghĩa vụ lưu trữ của chúng tôi.",
+    "deleteAccountFromPhone": "Xin chào!, vui lòng đóng tài khoản của tôi. Số điện thoại của tôi là {phoneNumber: string}.",
     "deleteAccountError": "Something went wrong. Contact {email: string} for further assistance.",
     "bye": "Bye!",
-    "deleteAccountWarning": "Chú ý: Việc xóa tài khoản là vĩnh viễn!\nHãy đảm bảo các ví không còn tiền trước khi xóa.\nTài khoản đã xóa không thể khôi phục."
+    "deleteAccountWarning": "Lưu ý: Việc đóng tài khoản là vĩnh viễn!\nHãy đảm bảo ví không còn tiền trước khi đóng.\nTài khoản đã đóng không thể khôi phục.\nChúng tôi có thể lưu giữ một số hồ sơ theo yêu cầu của pháp luật."
   },
   "lnurl": {
     "overLimit": "Bạn không thể gửi quá mức tiền tối đa",
@@ -3835,6 +3835,7 @@
     "reminderBulletin": {
       "title": "Quan trọng",
       "body": "Hãy chuyển sang tài khoản không lưu ký qua quy trình di chuyển có hướng dẫn, hoặc rút tiền, trước {date}. Việc nhận sẽ dừng vào {receiveStopsDate}.",
+      "bodyReceiveDisabled": "Việc nhận đã dừng. Hãy chuyển sang tài khoản không lưu ký qua quy trình di chuyển có hướng dẫn, hoặc rút tiền, trước {date}.",
       "migrateCta": "Chuyển"
     },
     "offboardBulletin": {

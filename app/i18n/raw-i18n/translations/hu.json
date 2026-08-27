@@ -2513,7 +2513,7 @@
   "AccountScreen": {
     "fundsMoreThan5Dollars": "A számládon több mint 5 dollár van",
     "itsATrialAccount": "A próba felhasználói fiókok korlátozott tranzakciós kerettel rendelkeznek, és nincs visszaállításukra lehetőség. Ha elveszíted a telefonodat vagy eltávolítod az alkalmazást, a pénzedhez többé nem férsz hozzá.",
-    "accountBeingDeleted": "A felhasználói fiókod törlése folyamatban van, kérlek várj...",
+    "accountBeingDeleted": "A fiókod lezárása folyamatban van, kérlek várj...",
     "dangerZone": "Veszélyzóna",
     "phoneDeletedSuccessfully": "A telefon sikeresen törölve",
     "phoneNumber": "Telefonszám",
@@ -3048,17 +3048,17 @@
     "defaultEmailSubject": "{bankName: string} - Támogatás",
     "defaultSupportMessage": "Szia! Segítségre van szükségem a {bankName: string}kel kapcsolatban, a(z) {version: string} verziót használom a(z) {os: string} operációs rendszeren.",
     "emailCopied": "{email: string} email cím a vágólapra másolva",
-    "deleteAccount": "Felhasználói fiók törlése",
+    "deleteAccount": "Fiók lezárása",
     "delete": "törlés",
-    "typeDelete": "Kérlek írd be a(z) \"{delete: string}\" szót a számla törlésének megerősítéséhez",
+    "typeDelete": "Írd be: \"{delete: string}\" a fiók lezárásának megerősítéséhez",
     "finalConfirmationAccountDeletionTitle": "Végleges megerősítés szükséges",
-    "finalConfirmationAccountDeletionMessage": "Biztosan törölni akarod a felhasználói fiókodat? Ez a művelet visszafordíthatatlan.",
-    "deleteAccountBalanceWarning": "A fiókod törlése a jelenlegi egyenleged elvesztéséhez vezet. Biztosan folytatnád?",
-    "deleteAccountConfirmation": "A fiókod törlésre került.\n\nAmikor a szabályozási követelmények szerinti próbaidőszak lejár, a fiókhoz kapcsolódó fennmaradó adatok véglegesen törlődnek.",
-    "deleteAccountFromPhone": "Szia! Kérem a fiókom törlését. A telefonszámom: {phoneNumber: string}.",
+    "finalConfirmationAccountDeletionMessage": "A lezárás után nem fogsz tudni hozzáférni a fiókodhoz, és nem tudod használni. Előfordulhat, hogy bizonyos adatokat a törvény és az adatmegőrzési kötelezettségeink által megkövetelt módon megőrzünk. Biztosan lezárod a fiókodat?",
+    "deleteAccountBalanceWarning": "A fiók lezárásával elveszíted a hozzáférést a jelenlegi egyenlegedhez. Biztosan folytatod?",
+    "deleteAccountConfirmation": "A fiókod lezárásra került.\n\nElőfordulhat, hogy bizonyos adatokat a törvény és az adatmegőrzési kötelezettségeink által megkövetelt módon megőrzünk.",
+    "deleteAccountFromPhone": "Szia! Kérem, zárják le a fiókomat. A telefonszámom: {phoneNumber: string}.",
     "deleteAccountError": "Valami hiba történt. További segítségért lépj kapcsolatba az alábbi email címen: {email: string}.",
     "bye": "Viszlát!",
-    "deleteAccountWarning": "Figyelem: A fiók törlése végleges!\nGyőződj meg róla, hogy a tárcákban nincs egyenleg a törlés előtt.\nA törölt fiókot nem lehet visszaállítani."
+    "deleteAccountWarning": "Figyelem: A fiók lezárása végleges!\nA lezárás előtt győződj meg róla, hogy a tárcákban nincs egyenleg.\nA lezárt fiókot nem lehet visszaállítani.\nElőfordulhat, hogy bizonyos adatokat törvényi kötelezettség miatt megőrzünk."
   },
   "lnurl": {
     "overLimit": "Nem küldhetsz többet, mint a maximális összeg",
@@ -3835,6 +3835,7 @@
     "reminderBulletin": {
       "title": "Fontos",
       "body": "Váltson át egy nem letétkezelt fiókra az irányított átköltöztetéssel, vagy vegye fel az egyenlegét {date} előtt. A fogadás megszűnik: {receiveStopsDate}.",
+      "bodyReceiveDisabled": "A fogadás megszűnt. Váltson át egy nem letétkezelt fiókra az irányított átköltöztetéssel, vagy vegye fel az egyenlegét {date} előtt.",
       "migrateCta": "Átköltözés"
     },
     "offboardBulletin": {

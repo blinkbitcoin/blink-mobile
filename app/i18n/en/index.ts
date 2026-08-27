@@ -2597,7 +2597,7 @@ const en: BaseTranslation = {
     fundsMoreThan5Dollars: "Your account has more than $5",
     itsATrialAccount:
       "Trial accounts have reduced transaction limits and no recovery method. If you lose your phone or uninstall the app, your funds will be unrecoverable.",
-    accountBeingDeleted: "Your account is being deleted, please wait...",
+    accountBeingDeleted: "Your account is being closed, please wait...",
     dangerZone: "Danger zone",
     phoneDeletedSuccessfully: "Phone deleted successfully",
     phoneNumber: "Phone Number",
@@ -3180,22 +3180,22 @@ const en: BaseTranslation = {
     defaultSupportMessage:
       "Hey there! I need some help with {bankName: string}, I'm using the version {version: string} on {os: string}.",
     emailCopied: "email {email: string} copied to clipboard",
-    deleteAccount: "Delete account",
+    deleteAccount: "Close account",
     delete: "delete",
-    typeDelete: 'Please type "{delete: string}" to confirm account deletion',
+    typeDelete: 'Please type "{delete: string}" to confirm account closure',
     finalConfirmationAccountDeletionTitle: "Final Confirmation Required",
     finalConfirmationAccountDeletionMessage:
-      "Are you sure you want to delete your account? This action is irreversible.",
+      "After closing, you won't be able to access or use your account. We may retain certain records as required by law and our retention obligations. Are you sure you want to close your account?",
     deleteAccountBalanceWarning:
-      "Deleting your account will cause you to lose access to your current balance. Are you sure you want to proceed?",
+      "Closing your account will cause you to lose access to your current balance. Are you sure you want to proceed?",
     deleteAccountConfirmation:
-      "Your account has been written for deletion.\n\nWhen the probation period related to regulatory requirement is over, the remaining data related to your account will be permanently deleted.",
+      "Your account has been closed.\n\nWe may retain certain records as required by law and our retention obligations.",
     deleteAccountFromPhone:
-      "Hey there!, please delete my account. My phone number is {phoneNumber: string}.",
+      "Hey there!, please close my account. My phone number is {phoneNumber: string}.",
     deleteAccountError:
       "Something went wrong. Contact {email: string} for further assistance.",
     bye: "Bye!",
-    deleteAccountWarning: "Attention: Account deletion is permanent!\nMake sure wallets have no funds before deleting.\nDeleted account cannot be reinstated.",
+    deleteAccountWarning: "Attention: Closing your account is permanent!\nMake sure wallets have no funds before closing.\nA closed account cannot be reinstated.\nWe may retain certain records as required by law.",
   },
   lnurl: {
     overLimit: "You can't send more than max amount",
@@ -4067,6 +4067,8 @@ const en: BaseTranslation = {
     reminderBulletin: {
       title: "Important",
       body: "Move to a non-custodial account via guided migration, or withdraw, before {date: string}. Receiving stops {receiveStopsDate: string}.",
+      bodyReceiveDisabled:
+        "Receiving has stopped. Move to a non-custodial account via guided migration, or withdraw, before {date: string}.",
       migrateCta: "Migrate",
     },
     offboardBulletin: {
