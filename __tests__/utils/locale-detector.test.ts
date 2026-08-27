@@ -1,12 +1,23 @@
 import {
   detectDefaultCurrency,
+  detectDefaultLocale,
+  getLanguageFromString,
+  getLocaleFromLanguage,
   matchOsLocaleToSupportedLocale,
 } from "../../app/utils/locale-detector"
 
+type OsLocale = {
+  countryCode: string
+  languageTag: string
+  languageCode: string
+  isRTL: boolean
+}
+
 const mockGetCurrencies = jest.fn<string[], []>()
+const mockGetLocales = jest.fn<OsLocale[], []>()
 jest.mock("react-native-localize", () => ({
   getCurrencies: () => mockGetCurrencies(),
-  getLocales: () => [],
+  getLocales: () => mockGetLocales(),
 }))
 
 describe("matchOsLocaleToSupportedLocale", () => {
@@ -70,5 +81,53 @@ describe("detectDefaultCurrency", () => {
     mockGetCurrencies.mockReturnValue(["CRC"])
 
     expect(detectDefaultCurrency([])).toBeUndefined()
+  })
+})
+
+describe("detectDefaultLocale", () => {
+  it("reads the locale the OS reports", () => {
+    mockGetLocales.mockReturnValue([
+      { countryCode: "CA", languageTag: "fr-CA", languageCode: "fr", isRTL: false },
+    ])
+
+    expect(detectDefaultLocale()).toBe("fr")
+  })
+
+  it("falls back to english when the OS reports nothing", () => {
+    mockGetLocales.mockReturnValue([])
+
+    expect(detectDefaultLocale()).toBe("en")
+  })
+})
+
+describe("getLanguageFromString", () => {
+  it("treats a missing language as the OS default", () => {
+    expect(getLanguageFromString()).toBe("DEFAULT")
+  })
+
+  it("keeps a language the app supports", () => {
+    expect(getLanguageFromString("es")).toBe("es")
+  })
+
+  it("accepts the region-tagged values written server side before", () => {
+    expect(getLanguageFromString("pt-BR")).toBe("pt")
+  })
+
+  it("treats an unsupported language as the OS default", () => {
+    expect(getLanguageFromString("na-XY")).toBe("DEFAULT")
+  })
+})
+
+describe("getLocaleFromLanguage", () => {
+  it("resolves DEFAULT against the OS", () => {
+    mockGetLocales.mockReturnValue([
+      { countryCode: "SV", languageTag: "es-SV", languageCode: "es", isRTL: false },
+    ])
+
+    expect(getLocaleFromLanguage("DEFAULT")).toBe("es")
+  })
+
+  it("returns a chosen language untouched", () => {
+    expect(getLocaleFromLanguage("fr")).toBe("fr")
   })
 })
