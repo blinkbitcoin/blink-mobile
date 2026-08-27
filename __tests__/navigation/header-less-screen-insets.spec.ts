@@ -156,8 +156,56 @@ const declaresHeaderHidden = (tag: string): boolean => {
   return headerShown[1].trim() !== "true"
 }
 
+/**
+ * The opening tag of every `<Name ...>` in the file, ending at the `>` that closes it
+ * rather than at one nested inside a prop like `header={<Close />}` or an arrow.
+ */
+const openingTags = (source: string, name: string): string[] => {
+  const tags: string[] = []
+  for (const match of source.matchAll(new RegExp(`<${name}\\b`, "g"))) {
+    const start = match.index as number
+    let depth = 0
+    for (let i = start; i < source.length; i += 1) {
+      if (source[i] === "<") depth += 1
+      if (source[i] === ">" && source[i - 1] !== "=") depth -= 1
+      if (depth === 0) {
+        tags.push(source.slice(start, i + 1))
+        break
+      }
+    }
+  }
+  return tags
+}
+
+const HEADER_PASSTHROUGH = /<Screen\b[^>]*headerShown=\{headerShown\}/
+const LAYOUT_EXPORT = /export const (\w+): React\.FC/g
+
+/**
+ * A layout that takes a `headerShown` prop and hands it straight to `Screen`. A screen
+ * built on one never writes `<Screen>` itself, so the rule has to reach through it. A
+ * screen that passes some other flag, like `getStarted`, is answering for itself.
+ *
+ * Every component the file exports counts, not just the first: naming the wrong one would
+ * take the layout out of the rule without failing anything.
+ */
+let insetLayouts: string[] | null = null
+
+const layoutComponents = (): string[] => {
+  appSources = appSources ?? sourceFiles(APP_DIR)
+  insetLayouts =
+    insetLayouts ??
+    appSources.flatMap((file) => {
+      const source = readSource(file)
+      if (!HEADER_PASSTHROUGH.test(source)) return []
+      return [...source.matchAll(LAYOUT_EXPORT)].map((exported) => exported[1])
+    })
+  return insetLayouts
+}
+
 const declaresTopInset = (source: string): boolean => {
-  const screenTags = source.match(/<Screen\b[^>]*>/g) ?? []
+  const screenTags = ["Screen", ...layoutComponents()].flatMap((name) =>
+    openingTags(source, name),
+  )
   if (screenTags.length === 0) return true
   return screenTags.every((tag) => {
     const optsOut = /\bunsafe\b/.test(tag)
@@ -171,6 +219,12 @@ describe("header-less routes and the top inset", () => {
 
   it("finds the header-less screens to check", () => {
     expect(screens.length).toBeGreaterThan(0)
+  })
+
+  /** Screens built on a layout carry no `<Screen>` of their own, so losing the layouts
+   *  would wave them through on nothing rather than fail. */
+  it("finds the layouts that forward headerShown", () => {
+    expect(layoutComponents().length).toBeGreaterThan(0)
   })
 
   it("keeps no stale entries in the exception list", () => {
