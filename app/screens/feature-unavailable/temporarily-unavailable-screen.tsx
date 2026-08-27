@@ -16,7 +16,7 @@ export const TemporarilyUnavailableScreen: React.FC = () => {
   const { LL } = useI18nContext()
 
   return (
-    <Screen preset="fixed">
+    <Screen preset="fixed" headerShown={false}>
       <View style={styles.container} {...testProps("temporarily-unavailable-screen")}>
         <GaloyIcon name="warning" size={64} color={colors.warning} />
         <Text type="h1" style={styles.title}>

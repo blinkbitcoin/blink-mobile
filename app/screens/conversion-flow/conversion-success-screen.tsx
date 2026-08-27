@@ -70,7 +70,7 @@ export const ConversionSuccessScreen = () => {
   }, [navigation, returnTo])
 
   return (
-    <Screen preset="scroll" style={styles.screen}>
+    <Screen preset="scroll" style={styles.screen} headerShown={false}>
       <View style={styles.container}>
         <SuccessIconAnimation>
           <GaloyIcon name={"payment-success"} size={128} />

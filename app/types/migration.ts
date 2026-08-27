@@ -38,6 +38,11 @@ export const MigrationSupportReason = {
   StartRefused: "start-refused",
   /** The checkpoint reached the transfer with no provisioned self-custodial account. */
   SelfCustodialAccountMissing: "self-custodial-account-missing",
+  /** The commit screen settled without the custodial owner id the lightning-address
+   *  re-point signs its proof against (the session is no longer custodial, or the owner
+   *  query answered with nothing). The re-point cannot fire at all without it, so it is a
+   *  settled failure rather than a wait that resolves itself. */
+  CustodialOwnerMissing: "custodial-owner-missing",
   /** The migration finished server-side, but the destination self-custodial account is no
    *  longer on this device (its key is gone, e.g. after a reinstall), so the resume swap
    *  cannot run and no retry brings it back. */

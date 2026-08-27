@@ -1,3 +1,5 @@
+import { useCallback } from "react"
+
 import { gql } from "@apollo/client"
 
 import { useMigrationOwnerQuery } from "@app/graphql/generated"
@@ -21,6 +23,21 @@ type UseCustodialOwnerId = {
    *  constant. Null for a non-custodial session or before the query resolves. */
   ownerId: string | null
   loading: boolean
+  /** Whether the query never ran, because nobody is authenticated or the active account is
+   *  not the custodial one. A skipped query reports neither loading nor an answer, so
+   *  callers that treat a settled null as a failure must exclude it: a session that just
+   *  ended is not an account without an owner. */
+  isSkipped: boolean
+  /**
+   * Whether the query failed, by any cause. Deliberately NOT split into network and
+   * settled kinds the way the preview is: there the settled kind is the server answering
+   * that this account has no migration, which is final, while an authenticated custodial
+   * session always has an owner, so every error here is a request that failed rather than
+   * an answer. Callers spend it on a retry; only a query that answered without an owner
+   * is a failure worth handing to support.
+   */
+  hasError: boolean
+  refetch: () => Promise<unknown>
 }
 
 /**
@@ -34,14 +51,29 @@ export const useCustodialOwnerId = (): UseCustodialOwnerId => {
   const { activeAccount } = useAccountRegistry()
   const isCustodial = activeAccount?.type === AccountType.Custodial
 
-  /** no-cache: a cached me could serve the previous account's owner id after a switch. */
-  const { data, loading } = useMigrationOwnerQuery({
-    skip: !isAuthed || !isCustodial,
+  const isSkipped = !isAuthed || !isCustodial
+
+  /** no-cache: a cached me could serve the previous account's owner id after a switch.
+   *  notifyOnNetworkStatusChange reopens `loading` for a refetch, so a caller reading a
+   *  settled null as a missing owner never reads one mid-retry. */
+  const { data, loading, error, refetch } = useMigrationOwnerQuery({
+    skip: isSkipped,
     fetchPolicy: "no-cache",
+    notifyOnNetworkStatusChange: true,
   })
+
+  /** A skipped query is on standby, where a refetch would run it anyway: the one session
+   *  that must never ask for `me` is the one that stopped being custodial. */
+  const refetchWhenRunning = useCallback(
+    () => (isSkipped ? Promise.resolve() : refetch()),
+    [isSkipped, refetch],
+  )
 
   return {
     ownerId: isCustodial ? data?.me?.defaultAccount?.id ?? null : null,
     loading: isCustodial && loading,
+    isSkipped,
+    hasError: Boolean(error),
+    refetch: refetchWhenRunning,
   }
 }
