@@ -5,7 +5,10 @@ import { useNavigation } from "@react-navigation/native"
 import type { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useDisplayCurrency } from "@app/hooks"
-import { useAccountTransactions } from "@app/hooks/use-account-transactions"
+import {
+  isAnnounceableTransaction,
+  useAccountTransactions,
+} from "@app/hooks/use-account-transactions"
 import { toWalletAmount } from "@app/types/amounts"
 import { TransactionFragment, TxDirection, WalletCurrency } from "@app/graphql/generated"
 
@@ -36,13 +39,11 @@ export const useUnseenTxAmountBadge = ({
     if (hasUnseenBtcTx) unseenCurrencies.push(WalletCurrency.Btc)
     if (hasUnseenUsdTx) unseenCurrencies.push(WalletCurrency.Usd)
 
-    const unseenTransactions = baseTransactions.filter((tx) => {
-      if (!unseenCurrencies.includes(tx.settlementCurrency)) return false
-      if (tx.settlementAmount === 0) return false
-      if (tx.memo?.toLowerCase() === feeReimbursementMemo.toLowerCase()) return false
-
-      return true
-    })
+    const unseenTransactions = baseTransactions.filter(
+      (tx) =>
+        unseenCurrencies.includes(tx.settlementCurrency) &&
+        isAnnounceableTransaction(tx, feeReimbursementMemo),
+    )
 
     if (unseenTransactions.length === 0) return
 

@@ -14,7 +14,10 @@ import {
   withTxLastSeenId,
 } from "@app/store/persistent-state/tx-last-seen"
 
-import { useAccountTransactions } from "./use-account-transactions"
+import {
+  isAnnounceableTransaction,
+  useAccountTransactions,
+} from "./use-account-transactions"
 
 const getLatestTransactionId = (
   transactions: ReadonlyArray<TransactionFragment>,
@@ -24,8 +27,7 @@ const getLatestTransactionId = (
   const filteredTransactions = transactions.filter(
     (transaction) =>
       transaction.settlementCurrency === currency &&
-      transaction.settlementAmount !== 0 &&
-      transaction.memo?.toLowerCase() !== feeReimbursementMemo.toLowerCase(),
+      isAnnounceableTransaction(transaction, feeReimbursementMemo),
   )
   if (filteredTransactions.length === 0) return ""
 

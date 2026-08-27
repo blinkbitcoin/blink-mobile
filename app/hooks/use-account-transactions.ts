@@ -40,6 +40,20 @@ export const toCustodialTransactions = (
 }
 
 /**
+ * Whether a transaction is one the user should be told about. A zero settlement carries no
+ * amount to announce, and a fee reimbursement is the ledger's own echo of a send the user
+ * was already shown. The badge and the seen state both filter on this, and they have to
+ * agree: a transaction one of them counts and the other skips leaves an unseen mark with
+ * nothing to clear it, so the rule lives here rather than at each call site.
+ */
+export const isAnnounceableTransaction = (
+  transaction: TransactionFragment,
+  feeReimbursementMemo: string,
+): boolean =>
+  transaction.settlementAmount !== 0 &&
+  transaction.memo?.toLowerCase() !== feeReimbursementMemo.toLowerCase()
+
+/**
  * The transactions a caller should read for the active account. A custodial caller may
  * pass nothing and get the cached home query instead, so a screen that never runs that
  * query still sees them. A self-custodial account has no `me` behind that cache, so an
