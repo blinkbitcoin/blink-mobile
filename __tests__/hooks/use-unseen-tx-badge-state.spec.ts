@@ -233,6 +233,33 @@ describe("useUnseenTxBadgeState", () => {
     expect(mockMarkTxSeen).toHaveBeenCalledWith(WalletCurrency.Usd)
   })
 
+  /** A send replaced by a newer one before its timer fires is marked seen by the cleanup,
+   *  which runs with the render that armed it. So the currency it marks is the one that
+   *  was on screen, never the one that replaced it. */
+  it("marks the superseded currency when a newer send replaces the badge", () => {
+    mockAmountBadge.mockReturnValue({
+      latestUnseenTx: { id: "tx-btc", settlementCurrency: WalletCurrency.Btc },
+      unseenAmountText: "-0.001 BTC",
+      navigateToTransaction: mockNavigateToTransaction,
+      isOutgoing: true,
+    })
+
+    const { rerender } = renderBadgeState()
+
+    mockAmountBadge.mockReturnValue({
+      latestUnseenTx: { id: "tx-usd", settlementCurrency: WalletCurrency.Usd },
+      unseenAmountText: "-$5.00",
+      navigateToTransaction: mockNavigateToTransaction,
+      isOutgoing: true,
+    })
+    rerender(undefined)
+
+    const [{ onHide: hideSupersededBadge }] = mockOutgoingVisibility.mock.calls[0]
+    hideSupersededBadge()
+
+    expect(mockMarkTxSeen).toHaveBeenCalledWith(WalletCurrency.Btc)
+  })
+
   it("does not mark anything as seen without an unseen transaction", () => {
     renderBadgeState()
 
