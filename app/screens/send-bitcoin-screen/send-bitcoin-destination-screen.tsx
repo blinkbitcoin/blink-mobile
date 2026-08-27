@@ -30,6 +30,7 @@ import { CountryCode, PhoneNumber } from "libphonenumber-js/mobile"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { SearchBar } from "@rn-vui/base"
+import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 import { makeStyles, useTheme, Text, ListItem } from "@rn-vui/themed"
 
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
@@ -761,6 +762,7 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
           onResponderRelease={() => onFocusedInput(InputType.Search)}
         >
           <SearchBar
+            maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
             {...testProps(LL.SendBitcoinScreen.placeholder())}
             placeholder={LL.SendBitcoinScreen.placeholder()}
             value={

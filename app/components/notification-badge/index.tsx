@@ -1,5 +1,6 @@
 import React from "react"
 import { Text as RNText, ViewStyle } from "react-native"
+import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 import Animated, { useSharedValue, useAnimatedStyle } from "react-native-reanimated"
 import { makeStyles } from "@rn-vui/themed"
 import { useIsFocused } from "@react-navigation/native"
@@ -55,7 +56,12 @@ export const NotificationBadge: React.FC<NotificationProps> = ({
 
   return (
     <Animated.View pointerEvents="none" style={[styles.pill, animatedStyle, style]}>
-      <RNText numberOfLines={1} ellipsizeMode="tail" style={styles.pillText}>
+      <RNText
+        maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
+        numberOfLines={1}
+        ellipsizeMode="tail"
+        style={styles.pillText}
+      >
         {text}
       </RNText>
     </Animated.View>

@@ -16,10 +16,14 @@ import Animated, {
 import { testProps } from "@app/utils/testProps"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
+import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
+
 import { GaloyIcon } from "../galoy-icon"
 
 const BUTTON_WIDTH = Dimensions.get("screen").width - 40
 const SWIPE_RANGE = BUTTON_WIDTH - 50
+/** The knob's diameter, which the label has to stay clear of. */
+const SWIPE_KNOB_SIZE = 60
 const isRTL = I18nManager.isRTL
 
 type SwipeButtonPropsType = {
@@ -125,7 +129,10 @@ const GaloySliderButton = ({
         </GestureDetector>
       )}
       {!disabled && (
-        <Animated.Text style={[styles.swipeText, AnimatedStyles.swipeText]}>
+        <Animated.Text
+          maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
+          style={[styles.swipeText, AnimatedStyles.swipeText]}
+        >
           {initialText}
         </Animated.Text>
       )}
@@ -155,8 +162,8 @@ const useStyles = makeStyles(({ colors }) => ({
   swipeButton: {
     position: "absolute",
     left: 0,
-    height: 60,
-    width: 60,
+    height: SWIPE_KNOB_SIZE,
+    width: SWIPE_KNOB_SIZE,
     borderRadius: 30,
     zIndex: 3,
     alignItems: "center",
@@ -167,6 +174,14 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   swipeText: {
     alignSelf: "center",
+    /** The knob rides over the left of the track, so the label keeps clear of it rather
+     *  than running underneath: at the larger text sizes it grew into the knob and read as
+     *  a half word. Wrapping inside what is left still fits the track's height. */
+    /** Only the left needs clearing: the knob rests there and the label reads to its
+     *  right. Padding both sides would cost the label twice the room on a small screen. */
+    paddingLeft: SWIPE_KNOB_SIZE + 10,
+    paddingRight: 12,
+    textAlign: "center",
     fontSize: 14,
     fontWeight: "400",
     zIndex: 2,

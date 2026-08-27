@@ -1,5 +1,6 @@
 import React, { useState } from "react"
 import { TextInput, View } from "react-native"
+import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
@@ -52,6 +53,7 @@ export const DeleteAccountConfirmModal: React.FC<Props> = ({
             })}
           </Text>
           <TextInput
+            maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
             autoCapitalize="none"
             style={styles.textInput}
             onChangeText={setConfirmText}

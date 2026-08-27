@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react"
 import { View, TextInput, Keyboard, Modal } from "react-native"
+import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
@@ -198,6 +199,7 @@ export const SetLightningAddressScreen: React.FC<{
 
         <View style={styles.textInputContainerStyle}>
           <TextInput
+            maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
             autoCorrect={false}
             autoComplete="off"
             style={styles.textInputStyle}

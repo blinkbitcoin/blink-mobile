@@ -1,5 +1,6 @@
 import * as React from "react"
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native"
+import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 import { ScrollView, TouchableOpacity } from "react-native-gesture-handler"
 import { SvgProps } from "react-native-svg"
 
@@ -151,7 +152,9 @@ const EarnMapScreenContent: React.FC = () => {
 
     return (
       <>
-        <Text style={styles.finishText}>{LL.EarnScreen.finishText()}</Text>
+        <Text maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER} style={styles.finishText}>
+          {LL.EarnScreen.finishText()}
+        </Text>
         {length % 2 ? <LeftFinish /> : <RightFinish />}
       </>
     )
@@ -243,7 +246,12 @@ const EarnMapScreenContent: React.FC = () => {
               <View style={styles.fullView}>
                 <ProgressBar progress={progressSection} />
                 <Icon style={styles.icon} width={50} height={50} />
-                <Text style={styles.textStyleBox}>{text}</Text>
+                <Text
+                  maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
+                  style={styles.textStyleBox}
+                >
+                  {text}
+                </Text>
               </View>
             </TouchableOpacity>
           </View>
@@ -322,7 +330,10 @@ const EarnMapScreenContent: React.FC = () => {
                 {progress === 0 && <BottomStart height={159} width={BADGER_WIDTH} />}
               </View>
               <View style={styles.bottomSectionInner}>
-                <Text style={styles.bottomSectionText}>
+                <Text
+                  maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
+                  style={styles.bottomSectionText}
+                >
                   {rewardsAvailable
                     ? LL.EarnScreen.motivatingBadger()
                     : LL.EarnScreen.motivatingBadgerNoRewards()}
@@ -342,7 +353,10 @@ const EarnMapScreenContent: React.FC = () => {
         backgroundModalColor={colors.white}
         body={
           <View style={styles.modalBody}>
-            <Text style={styles.modalBodyText}>
+            <Text
+              maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
+              style={styles.modalBodyText}
+            >
               {LL.EarnScreen.customMessages.oneSectionADay.message()}
             </Text>
           </View>

@@ -8,6 +8,7 @@ import { Switch } from "@app/components/atomic/switch"
 import { Screen } from "@app/components/screen"
 import { ApiKeysDocument, Scope, useApiKeyCreateMutation } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { cappedFontScale } from "@app/rne-theme/text-scaling"
 import { testProps } from "@app/utils/testProps"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
@@ -191,10 +192,16 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   expiryRow: {
     flexDirection: "row",
+    flexWrap: "wrap",
     columnGap: 10,
+    rowGap: 10,
   },
   expiryPill: {
-    flex: 1,
+    /** Three across at the default text size, and a basis that grows with it: past the
+     *  point where the three no longer fit, they wrap onto another row instead of cutting
+     *  "Never" down to "Nev". */
+    flexGrow: 1,
+    flexBasis: 90 * cappedFontScale(),
     alignItems: "center",
     paddingVertical: 12,
     borderRadius: 8,

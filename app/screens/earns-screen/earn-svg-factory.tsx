@@ -1,5 +1,6 @@
 import * as React from "react"
 import { Dimensions, Text } from "react-native"
+import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 
 import WhatIsFiat from "./01-fiat-currency-01.svg"
 import LimitedSupply from "./01-limited-supply-01.svg"
@@ -427,6 +428,10 @@ export const SVGs = ({ name, width, theme }: ISVGs): React.ReactNode => {
       return <AnsoffMatrix width={rWidth} />
 
     default:
-      return <Text>{name} does not exist</Text>
+      return (
+        <Text maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}>
+          {name} does not exist
+        </Text>
+      )
   }
 }

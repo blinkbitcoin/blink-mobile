@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native"
+import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
@@ -141,6 +142,7 @@ export const InputField: React.FC<InputFieldProps> = ({
         <Text style={styles.label}>{label}</Text>
         <View style={[styles.valueContainer, disabled && styles.valueContainerDisabled]}>
           <TextInput
+            maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
             style={[styles.value, styles.editableInput]}
             value={displayValue}
             onChangeText={(text) => {

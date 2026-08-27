@@ -113,9 +113,6 @@ const ANY_POSITIVE_CENT_MINIMUM = 1
  *  area anchored 15pt up); content needs at least that much bottom padding for
  *  the last bulletin to be readable at max scroll. */
 const SCROLL_BOTTOM_CLEARANCE = 100
-/** Header chrome (username row, balance) sits between fixed-size icon buttons;
- *  uncapped Dynamic Type pushes the settings menu out of reach. */
-const MAX_HEADER_FONT_SIZE_MULTIPLIER = 1.4
 
 gql`
   query homeAuthed {
@@ -881,11 +878,7 @@ export const HomeScreen: React.FC = () => {
             {!loading && usernameTitle && (
               <Pressable onPress={canSwitchAccount ? handleSwitchPress : null}>
                 <View style={styles.profileContainer}>
-                  <Text
-                    {...testProps("home-username")}
-                    type="p2"
-                    maxFontSizeMultiplier={MAX_HEADER_FONT_SIZE_MULTIPLIER}
-                  >
+                  <Text {...testProps("home-username")} type="p2">
                     {usernameTitle}
                   </Text>
                   {canSwitchAccount && <GaloyIcon name={"caret-down"} size={18} />}

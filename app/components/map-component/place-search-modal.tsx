@@ -7,6 +7,7 @@ import {
   TextInput,
   View,
 } from "react-native"
+import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 import {
@@ -183,6 +184,7 @@ export const PlaceSearchModal: React.FC<Props> = ({
       <View style={styles.screen}>
         <View style={styles.field}>
           <TextInput
+            maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
             testID="place-search-input"
             ref={inputRef}
             style={styles.input}

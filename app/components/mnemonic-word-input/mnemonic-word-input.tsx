@@ -1,5 +1,6 @@
 import React, { forwardRef, useImperativeHandle, useRef } from "react"
 import { TextInput, View } from "react-native"
+import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
@@ -46,6 +47,7 @@ export const MnemonicWordInput = forwardRef<
         {index + 1}.
       </Text>
       <TextInput
+        maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
         ref={inputRef}
         style={styles.input}
         placeholder={placeholder}
