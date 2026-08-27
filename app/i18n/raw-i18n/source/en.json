@@ -2109,7 +2109,8 @@
         "placeLocation": "Location",
         "changeLocation": "Change",
         "placeReviewNote": "BTC Map's community surveys every new place before it appears on the map.",
-        "submissionNotReady": "Sending places isn't switched on yet",
+        "placeSubmitted": "Place sent — BTC Map's community will review it",
+        "placeSubmissionFailed": "The place could not be sent. Check your connection and try again.",
         "category": {
             "restaurants": "Restaurants",
             "cafes": "Cafés",

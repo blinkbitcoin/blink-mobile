@@ -2,6 +2,40 @@ extend type Contact {
   prettyName: String!
 }
 
+# TODO: remove once api.staging.blink.sv serves btcMapPlaceSubmit. These are
+# server schema additions (from the blink repo) that the deployed schema does
+# not have yet; codegen merges this file with the remote schema, and duplicate
+# definitions will fail once the API catches up.
+extend type Mutation {
+  """
+  Submit a place to BTC Map. Submissions from trusted sources appear on BTC Map right away; BTC Map editors process them later for eventual inclusion in OpenStreetMap.
+  """
+  btcMapPlaceSubmit(input: BtcMapPlaceSubmitInput!): BtcMapPlacePayload!
+}
+
+type BtcMapPlace {
+  externalId: String!
+  id: ID!
+  origin: String!
+}
+
+type BtcMapPlacePayload {
+  errors: [Error!]!
+  place: BtcMapPlace
+}
+
+input BtcMapPlaceSubmitInput {
+  category: String!
+  latitude: Float!
+  longitude: Float!
+  name: String!
+
+  """
+  Client-generated UUID identifying this submission. Reuse the same value when retrying after a failed or ambiguous request so the retry does not create a duplicate place. Resubmitting with the same submissionId and different place fields updates the original submission instead.
+  """
+  submissionId: ID!
+}
+
 extend type Query {
   hideBalance: Boolean!
   price: String # FIXME test only?

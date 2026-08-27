@@ -6681,9 +6681,13 @@ type RootTranslation = {
 		 */
 		placeReviewNote: string
 		/**
-		 * S​e​n​d​i​n​g​ ​p​l​a​c​e​s​ ​i​s​n​'​t​ ​s​w​i​t​c​h​e​d​ ​o​n​ ​y​e​t
+		 * P​l​a​c​e​ ​s​e​n​t​ ​—​ ​B​T​C​ ​M​a​p​'​s​ ​c​o​m​m​u​n​i​t​y​ ​w​i​l​l​ ​r​e​v​i​e​w​ ​i​t
 		 */
-		submissionNotReady: string
+		placeSubmitted: string
+		/**
+		 * T​h​e​ ​p​l​a​c​e​ ​c​o​u​l​d​ ​n​o​t​ ​b​e​ ​s​e​n​t​.​ ​C​h​e​c​k​ ​y​o​u​r​ ​c​o​n​n​e​c​t​i​o​n​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		placeSubmissionFailed: string
 		category: {
 			/**
 			 * R​e​s​t​a​u​r​a​n​t​s
@@ -20325,9 +20329,13 @@ export type TranslationFunctions = {
 		 */
 		placeReviewNote: () => LocalizedString
 		/**
-		 * Sending places isn't switched on yet
+		 * Place sent — BTC Map's community will review it
 		 */
-		submissionNotReady: () => LocalizedString
+		placeSubmitted: () => LocalizedString
+		/**
+		 * The place could not be sent. Check your connection and try again.
+		 */
+		placeSubmissionFailed: () => LocalizedString
 		category: {
 			/**
 			 * Restaurants

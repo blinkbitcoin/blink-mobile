@@ -457,6 +457,28 @@ export type BlockInfo = {
   readonly blockHeight?: Maybe<Scalars['Int']['output']>;
 };
 
+export type BtcMapPlace = {
+  readonly __typename: 'BtcMapPlace';
+  readonly externalId: Scalars['String']['output'];
+  readonly id: Scalars['ID']['output'];
+  readonly origin: Scalars['String']['output'];
+};
+
+export type BtcMapPlacePayload = {
+  readonly __typename: 'BtcMapPlacePayload';
+  readonly errors: ReadonlyArray<Error>;
+  readonly place?: Maybe<BtcMapPlace>;
+};
+
+export type BtcMapPlaceSubmitInput = {
+  readonly category: Scalars['String']['input'];
+  readonly latitude: Scalars['Float']['input'];
+  readonly longitude: Scalars['Float']['input'];
+  readonly name: Scalars['String']['input'];
+  /** Client-generated UUID identifying this submission. Reuse the same value when retrying after a failed or ambiguous request so the retry does not create a duplicate place. Resubmitting with the same submissionId and different place fields updates the original submission instead. */
+  readonly submissionId: Scalars['ID']['input'];
+};
+
 export type BuildInformation = {
   readonly __typename: 'BuildInformation';
   readonly commitHash?: Maybe<Scalars['String']['output']>;
@@ -1520,6 +1542,8 @@ export type Mutation = {
   readonly apiKeyRemoveLimit: ApiKeySetLimitPayload;
   readonly apiKeyRevoke: ApiKeyRevokePayload;
   readonly apiKeySetLimit: ApiKeySetLimitPayload;
+  /** Submit a place to BTC Map. Submissions from trusted sources appear on BTC Map right away; BTC Map editors process them later for eventual inclusion in OpenStreetMap. */
+  readonly btcMapPlaceSubmit: BtcMapPlacePayload;
   readonly callbackEndpointAdd: CallbackEndpointAddPayload;
   readonly callbackEndpointDelete: SuccessPayload;
   readonly captchaCreateChallenge: CaptchaCreateChallengePayload;
@@ -1707,6 +1731,11 @@ export type MutationApiKeyRevokeArgs = {
 
 export type MutationApiKeySetLimitArgs = {
   input: ApiKeySetLimitInput;
+};
+
+
+export type MutationBtcMapPlaceSubmitArgs = {
+  input: BtcMapPlaceSubmitInput;
 };
 
 
@@ -3248,6 +3277,13 @@ export const WindDownStatus = {
 } as const;
 
 export type WindDownStatus = typeof WindDownStatus[keyof typeof WindDownStatus];
+export type BtcMapPlaceSubmitMutationVariables = Exact<{
+  input: BtcMapPlaceSubmitInput;
+}>;
+
+
+export type BtcMapPlaceSubmitMutation = { readonly __typename: 'Mutation', readonly btcMapPlaceSubmit: { readonly __typename: 'BtcMapPlacePayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly place?: { readonly __typename: 'BtcMapPlace', readonly id: string, readonly origin: string, readonly externalId: string } | null } };
+
 export type MobileUpdateQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -4206,6 +4242,46 @@ export const CardTransactionDetailsFragmentDoc = gql`
   createdAt
 }
     `;
+export const BtcMapPlaceSubmitDocument = gql`
+    mutation btcMapPlaceSubmit($input: BtcMapPlaceSubmitInput!) {
+  btcMapPlaceSubmit(input: $input) {
+    errors {
+      message
+    }
+    place {
+      id
+      origin
+      externalId
+    }
+  }
+}
+    `;
+export type BtcMapPlaceSubmitMutationFn = Apollo.MutationFunction<BtcMapPlaceSubmitMutation, BtcMapPlaceSubmitMutationVariables>;
+
+/**
+ * __useBtcMapPlaceSubmitMutation__
+ *
+ * To run a mutation, you first call `useBtcMapPlaceSubmitMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useBtcMapPlaceSubmitMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [btcMapPlaceSubmitMutation, { data, loading, error }] = useBtcMapPlaceSubmitMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useBtcMapPlaceSubmitMutation(baseOptions?: Apollo.MutationHookOptions<BtcMapPlaceSubmitMutation, BtcMapPlaceSubmitMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<BtcMapPlaceSubmitMutation, BtcMapPlaceSubmitMutationVariables>(BtcMapPlaceSubmitDocument, options);
+      }
+export type BtcMapPlaceSubmitMutationHookResult = ReturnType<typeof useBtcMapPlaceSubmitMutation>;
+export type BtcMapPlaceSubmitMutationResult = Apollo.MutationResult<BtcMapPlaceSubmitMutation>;
+export type BtcMapPlaceSubmitMutationOptions = Apollo.BaseMutationOptions<BtcMapPlaceSubmitMutation, BtcMapPlaceSubmitMutationVariables>;
 export const MobileUpdateDocument = gql`
     query mobileUpdate {
   mobileVersions {
@@ -10567,6 +10643,10 @@ export type ResolversTypes = {
   Authorization: ResolverTypeWrapper<Authorization>;
   BTCWallet: ResolverTypeWrapper<BtcWallet>;
   BlockInfo: ResolverTypeWrapper<BlockInfo>;
+  BtcMapPlace: ResolverTypeWrapper<BtcMapPlace>;
+  BtcMapPlacePayload: ResolverTypeWrapper<BtcMapPlacePayload>;
+  BtcMapPlaceSubmitInput: BtcMapPlaceSubmitInput;
+  Float: ResolverTypeWrapper<Scalars['Float']['output']>;
   BuildInformation: ResolverTypeWrapper<BuildInformation>;
   CallbackEndpoint: ResolverTypeWrapper<CallbackEndpoint>;
   CallbackEndpointAddInput: CallbackEndpointAddInput;
@@ -10586,7 +10666,6 @@ export type ResolversTypes = {
   CardCreateInput: CardCreateInput;
   CardHolder: ResolverTypeWrapper<CardHolder>;
   CardMerchant: ResolverTypeWrapper<CardMerchant>;
-  Float: ResolverTypeWrapper<Scalars['Float']['output']>;
   CardPinUpdateInput: CardPinUpdateInput;
   CardReplaceInput: CardReplaceInput;
   CardSecretsEncrypted: ResolverTypeWrapper<CardSecretsEncrypted>;
@@ -10877,6 +10956,10 @@ export type ResolversParentTypes = {
   Authorization: Authorization;
   BTCWallet: BtcWallet;
   BlockInfo: BlockInfo;
+  BtcMapPlace: BtcMapPlace;
+  BtcMapPlacePayload: BtcMapPlacePayload;
+  BtcMapPlaceSubmitInput: BtcMapPlaceSubmitInput;
+  Float: Scalars['Float']['output'];
   BuildInformation: BuildInformation;
   CallbackEndpoint: CallbackEndpoint;
   CallbackEndpointAddInput: CallbackEndpointAddInput;
@@ -10896,7 +10979,6 @@ export type ResolversParentTypes = {
   CardCreateInput: CardCreateInput;
   CardHolder: CardHolder;
   CardMerchant: CardMerchant;
-  Float: Scalars['Float']['output'];
   CardPinUpdateInput: CardPinUpdateInput;
   CardReplaceInput: CardReplaceInput;
   CardSecretsEncrypted: CardSecretsEncrypted;
@@ -11300,6 +11382,19 @@ export type BtcWalletResolvers<ContextType = any, ParentType extends ResolversPa
 export type BlockInfoResolvers<ContextType = any, ParentType extends ResolversParentTypes['BlockInfo'] = ResolversParentTypes['BlockInfo']> = {
   blockHash?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   blockHeight?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type BtcMapPlaceResolvers<ContextType = any, ParentType extends ResolversParentTypes['BtcMapPlace'] = ResolversParentTypes['BtcMapPlace']> = {
+  externalId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  origin?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type BtcMapPlacePayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['BtcMapPlacePayload'] = ResolversParentTypes['BtcMapPlacePayload']> = {
+  errors?: Resolver<ReadonlyArray<ResolversTypes['Error']>, ParentType, ContextType>;
+  place?: Resolver<Maybe<ResolversTypes['BtcMapPlace']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -11888,6 +11983,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   apiKeyRemoveLimit?: Resolver<ResolversTypes['ApiKeySetLimitPayload'], ParentType, ContextType, RequireFields<MutationApiKeyRemoveLimitArgs, 'input'>>;
   apiKeyRevoke?: Resolver<ResolversTypes['ApiKeyRevokePayload'], ParentType, ContextType, RequireFields<MutationApiKeyRevokeArgs, 'input'>>;
   apiKeySetLimit?: Resolver<ResolversTypes['ApiKeySetLimitPayload'], ParentType, ContextType, RequireFields<MutationApiKeySetLimitArgs, 'input'>>;
+  btcMapPlaceSubmit?: Resolver<ResolversTypes['BtcMapPlacePayload'], ParentType, ContextType, RequireFields<MutationBtcMapPlaceSubmitArgs, 'input'>>;
   callbackEndpointAdd?: Resolver<ResolversTypes['CallbackEndpointAddPayload'], ParentType, ContextType, RequireFields<MutationCallbackEndpointAddArgs, 'input'>>;
   callbackEndpointDelete?: Resolver<ResolversTypes['SuccessPayload'], ParentType, ContextType, RequireFields<MutationCallbackEndpointDeleteArgs, 'input'>>;
   captchaCreateChallenge?: Resolver<ResolversTypes['CaptchaCreateChallengePayload'], ParentType, ContextType>;
@@ -12622,6 +12718,8 @@ export type Resolvers<ContextType = any> = {
   Authorization?: AuthorizationResolvers<ContextType>;
   BTCWallet?: BtcWalletResolvers<ContextType>;
   BlockInfo?: BlockInfoResolvers<ContextType>;
+  BtcMapPlace?: BtcMapPlaceResolvers<ContextType>;
+  BtcMapPlacePayload?: BtcMapPlacePayloadResolvers<ContextType>;
   BuildInformation?: BuildInformationResolvers<ContextType>;
   CallbackEndpoint?: CallbackEndpointResolvers<ContextType>;
   CallbackEndpointAddPayload?: CallbackEndpointAddPayloadResolvers<ContextType>;

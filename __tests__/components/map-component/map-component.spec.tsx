@@ -119,6 +119,13 @@ jest.mock("@app/utils/toast", () => ({
   toastShow: (args: unknown) => mockToastShow(args),
 }))
 
+// The hook talks to the backend; here the map only needs to be told whether
+// the place went.
+const mockSubmitPlace = jest.fn()
+jest.mock("@app/btcmap/use-place-submission", () => ({
+  useSubmitBtcMapPlace: () => ({ submitPlace: mockSubmitPlace }),
+}))
+
 const mockedPlaces = useBtcMapPlaces as jest.MockedFunction<typeof useBtcMapPlaces>
 const mockedGetUserRegion = getUserRegion as jest.MockedFunction<typeof getUserRegion>
 
@@ -168,6 +175,7 @@ beforeEach(() => {
   capturedMapProps = undefined
   mockIsAuthed = true
   mockIsSelfCustodialAccount = false
+  mockSubmitPlace.mockResolvedValue(true)
   setPlaces()
 })
 
@@ -556,9 +564,8 @@ describe("MapComponent adding a place", () => {
     expect(capturedSheetProps?.place).toBeNull()
   })
 
-  it("says the place has not been sent, because it has not", async () => {
-    // The backend that would forward it to BTC Map does not exist yet. Until
-    // it does, thanking someone for a submission would be a lie.
+  it("closes the form and says thanks once BTC Map has the place", async () => {
+    mockSubmitPlace.mockResolvedValue(true)
     const { getByTestId } = renderMap()
 
     await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
@@ -566,8 +573,8 @@ describe("MapComponent adding a place", () => {
     fireEvent.press(getByTestId("confirm-place-location"))
 
     await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(true))
-    act(() => {
-      ;(capturedAddPlaceProps?.onSubmit as (s: unknown) => void)({
+    await act(async () => {
+      await (capturedAddPlaceProps?.onSubmit as (s: unknown) => Promise<void>)({
         name: "Hope House",
         category: "cafes",
         latitude: REGION.latitude,
@@ -575,12 +582,89 @@ describe("MapComponent adding a place", () => {
       })
     })
 
+    expect(mockSubmitPlace).toHaveBeenCalledWith(
+      expect.objectContaining({ name: "Hope House", category: "cafes" }),
+      expect.any(String),
+    )
     await waitFor(() =>
       expect(mockToastShow).toHaveBeenCalledWith(
-        expect.objectContaining({ type: "warning" }),
+        expect.objectContaining({ type: "success" }),
       ),
     )
-    expect(capturedAddPlaceProps?.isVisible).toBe(false)
+    await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(false))
+  })
+
+  it("keeps the form open when the place could not be sent, so a retry resends the same submission", async () => {
+    // A retry of the same attempt must carry the same submissionId: that is
+    // the idempotency key the backend deduplicates on.
+    mockSubmitPlace.mockResolvedValue(false)
+    const { getByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+    fireEvent.press(getByTestId("open-add-place"))
+    fireEvent.press(getByTestId("confirm-place-location"))
+
+    await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(true))
+    const submission = {
+      name: "Hope House",
+      category: "cafes",
+      latitude: REGION.latitude,
+      longitude: REGION.longitude,
+    }
+    const onSubmit = capturedAddPlaceProps?.onSubmit as (s: unknown) => Promise<void>
+
+    await act(async () => {
+      await onSubmit(submission)
+    })
+
+    await waitFor(() => expect(mockToastShow).toHaveBeenCalled())
+    expect(mockToastShow).not.toHaveBeenCalledWith(
+      expect.objectContaining({ type: "success" }),
+    )
+    expect(capturedAddPlaceProps?.isVisible).toBe(true)
+
+    await act(async () => {
+      await onSubmit(submission)
+    })
+
+    expect(mockSubmitPlace).toHaveBeenCalledTimes(2)
+    expect(mockSubmitPlace.mock.calls[0][1]).toEqual(mockSubmitPlace.mock.calls[1][1])
+  })
+
+  it("mints a fresh submission id for a new attempt", async () => {
+    mockSubmitPlace.mockResolvedValue(false)
+    const { getByTestId } = renderMap()
+    const submission = {
+      name: "Hope House",
+      category: "cafes",
+      latitude: REGION.latitude,
+      longitude: REGION.longitude,
+    }
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+    fireEvent.press(getByTestId("open-add-place"))
+    fireEvent.press(getByTestId("confirm-place-location"))
+
+    await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(true))
+    await act(async () => {
+      await (capturedAddPlaceProps?.onSubmit as (s: unknown) => Promise<void>)(submission)
+    })
+
+    // Abandon the attempt and start another one.
+    act(() => {
+      ;(capturedAddPlaceProps?.onChangeLocation as () => void)()
+    })
+    fireEvent.press(getByTestId("cancel-add-place"))
+    fireEvent.press(getByTestId("open-add-place"))
+    fireEvent.press(getByTestId("confirm-place-location"))
+
+    await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(true))
+    await act(async () => {
+      await (capturedAddPlaceProps?.onSubmit as (s: unknown) => Promise<void>)(submission)
+    })
+
+    expect(mockSubmitPlace).toHaveBeenCalledTimes(2)
+    expect(mockSubmitPlace.mock.calls[0][1]).not.toEqual(mockSubmitPlace.mock.calls[1][1])
   })
 })
 

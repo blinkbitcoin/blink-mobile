@@ -4,6 +4,7 @@ import { ActivityIndicator, Pressable, View } from "react-native"
 import MapView, { Region } from "react-native-maps"
 import { PermissionStatus, RESULTS, request } from "react-native-permissions"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
+import { v4 as uuidv4 } from "uuid"
 
 import { useApolloClient } from "@apollo/client"
 import {
@@ -14,6 +15,7 @@ import {
   placesInCategories,
   useBtcMapPlaceNames,
   useBtcMapPlaces,
+  useSubmitBtcMapPlace,
 } from "@app/btcmap"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { updateMapLastCoords } from "@app/graphql/client-only-query"
@@ -103,12 +105,16 @@ export default function MapComponent({
   // a trip back to the map to move the pin but never outlives the attempt it
   // was typed into.
   const [addSession, setAddSession] = React.useState(0)
+  // The idempotency key of the attempt: the backend deduplicates submissions on
+  // it, so every retry of one attempt reuses it and a new attempt mints one.
+  const submissionIdRef = React.useRef(uuidv4())
   // Empty means "everything", not "nothing" — see `placesInCategories`.
   const [categories, setCategories] = React.useState<ReadonlySet<PlaceCategory>>(
     () => new Set(),
   )
 
   const { places: allPlaces, isLoading, hasError, refresh } = useBtcMapPlaces()
+  const { submitPlace } = useSubmitBtcMapPlace()
 
   // The map tab is never unmounted, so returning to it days later would
   // otherwise show whatever was cached when the process started. `refresh` is a
@@ -246,6 +252,7 @@ export default function MapComponent({
     setSelectedPlace(null)
     setPinnedLocation(null)
     setAddSession((session) => session + 1)
+    submissionIdRef.current = uuidv4()
     setAddStep("locating")
   }, [])
 
@@ -259,24 +266,29 @@ export default function MapComponent({
   }, [])
 
   const handlePlaceSubmit = React.useCallback(
-    (submission: PlaceSubmission) => {
+    async (submission: PlaceSubmission) => {
+      const submitted = await submitPlace(submission, submissionIdRef.current)
+
+      if (!submitted) {
+        // The form stays open: what was typed is exactly what a retry should
+        // send, under the same submissionId.
+        toastShow({
+          message: (translations) => translations.MapScreen.placeSubmissionFailed(),
+          LL,
+        })
+        return
+      }
+
       setAddStep(null)
       setPinnedLocation(null)
 
-      // TODO: hand `submission` to the backend proxy that will forward it to
-      // BTC Map. That endpoint does not exist yet, so nothing leaves the device
-      // and the user is told the place has not been sent rather than thanked
-      // for one that went nowhere. Logged only in development: what someone
-      // typed about their shop has no reason to be in a release build's log.
-      if (__DEV__) console.log("BTC Map place submission", submission)
-
       toastShow({
-        message: (translations) => translations.MapScreen.submissionNotReady(),
+        message: (translations) => translations.MapScreen.placeSubmitted(),
         LL,
-        type: "warning",
+        type: "success",
       })
     },
-    [LL],
+    [LL, submitPlace],
   )
 
   const closeSheet = React.useCallback(() => setSelectedPlace(null), [])
