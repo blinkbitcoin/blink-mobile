@@ -3888,6 +3888,7 @@
     "explainerCheck4": "Blink API kullanılamayacak",
     "explainerCheck5": "Hesabından bir Spark ağ ücreti düşülecek",
     "explainerCta": "Anladım",
+    "explainerImportCta": "Mevcut bir kurtarma ifadesini kullan",
     "transferringFunds": "Bakiyeniz aktarılıyor. Birkaç saniye içinde tamamlanacaktır.",
     "transferDelayed": {
       "body": "Bakiyeniz yeni hesabınıza aktarılıyor. Bu, normalden uzun sürüyor — uygulamayı açık tutun, işlemi otomatik olarak tamamlayacağız.",

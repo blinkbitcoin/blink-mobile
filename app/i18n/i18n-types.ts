@@ -12651,6 +12651,10 @@ type RootTranslation = {
 		 */
 		explainerCta: string
 		/**
+		 * U​s​e​ ​a​n​ ​e​x​i​s​t​i​n​g​ ​r​e​c​o​v​e​r​y​ ​p​h​r​a​s​e
+		 */
+		explainerImportCta: string
+		/**
 		 * T​r​a​n​s​f​e​r​r​i​n​g​ ​y​o​u​r​ ​f​u​n​d​s​.​ ​I​t​ ​s​h​o​u​l​d​ ​b​e​ ​d​o​n​e​ ​i​n​ ​a​ ​f​e​w​ ​s​e​c​o​n​d​s​.
 		 */
 		transferringFunds: string
@@ -26106,6 +26110,10 @@ export type TranslationFunctions = {
 		 * I understand
 		 */
 		explainerCta: () => LocalizedString
+		/**
+		 * Use an existing recovery phrase
+		 */
+		explainerImportCta: () => LocalizedString
 		/**
 		 * Transferring your funds. It should be done in a few seconds.
 		 */

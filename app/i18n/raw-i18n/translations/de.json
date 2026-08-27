@@ -3888,6 +3888,7 @@
         "explainerCheck4": "Blink API wird nicht verfügbar sein",
         "explainerCheck5": "Deinem Konto wird eine Spark-Netzwerkgebühr abgezogen",
         "explainerCta": "Ich verstehe",
+        "explainerImportCta": "Eine vorhandene Wiederherstellungsphrase verwenden",
         "transferringFunds": "Deine Guthaben werden übertragen. Es sollte in wenigen Sekunden abgeschlossen sein.",
         "transferDelayed": {
             "body": "Deine Guthaben sind auf dem Weg zu deinem neuen Konto. Es dauert länger als üblich — lass die App geöffnet, wir schließen es automatisch ab.",

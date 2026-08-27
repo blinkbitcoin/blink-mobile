@@ -3888,6 +3888,7 @@
     "explainerCheck4": "Blink API nebude k dispozici",
     "explainerCheck5": "Z tvého účtu bude stržen síťový poplatek Spark",
     "explainerCta": "Rozumím",
+    "explainerImportCta": "Použít stávající obnovovací frázi",
     "transferringFunds": "Převádíme vaše prostředky. Mělo by to být hotové za několik sekund.",
     "transferDelayed": {
       "body": "Vaše prostředky jsou na cestě do vašeho nového účtu. Trvá to déle než obvykle — nechte aplikaci otevřenou a dokončíme to automaticky.",

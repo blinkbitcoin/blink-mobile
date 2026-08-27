@@ -3888,6 +3888,7 @@
     "explainerCheck4": "Blink API vil ikke være tilgængelig",
     "explainerCheck5": "Din konto vil blive trukket et Spark-netværksgebyr",
     "explainerCta": "Jeg forstår",
+    "explainerImportCta": "Brug en eksisterende gendannelsessætning",
     "transferringFunds": "Overfører dine midler. Det skulle være færdigt om få sekunder.",
     "transferDelayed": {
       "body": "Dine midler er på vej til din nye konto. Det tager længere tid end normalt — hold appen åben, så afslutter vi automatisk.",

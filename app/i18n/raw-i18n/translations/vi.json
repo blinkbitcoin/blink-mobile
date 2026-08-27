@@ -3888,6 +3888,7 @@
     "explainerCheck4": "API của Blink sẽ không khả dụng",
     "explainerCheck5": "Tài khoản của bạn sẽ bị trừ phí mạng Spark",
     "explainerCta": "Tôi hiểu",
+    "explainerImportCta": "Dùng cụm từ khôi phục hiện có",
     "transferringFunds": "Đang chuyển tiền của bạn. Sẽ hoàn tất trong vài giây.",
     "transferDelayed": {
       "body": "Tiền của bạn đang trên đường chuyển đến tài khoản mới. Quá trình này lâu hơn bình thường — hãy giữ ứng dụng mở và chúng tôi sẽ tự động hoàn tất.",

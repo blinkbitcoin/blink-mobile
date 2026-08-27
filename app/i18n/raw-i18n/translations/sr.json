@@ -3888,6 +3888,7 @@
     "explainerCheck4": "Blink API неће бити доступан",
     "explainerCheck5": "Са твог налога биће наплаћена мрежна накнада Spark",
     "explainerCta": "Разумем",
+    "explainerImportCta": "Koristi postojeću frazu za oporavak",
     "transferringFunds": "Пребацујемо ваша средства. Требало би да буде готово за неколико секунди.",
     "transferDelayed": {
       "body": "Ваша средства су на путу ка вашем новом налогу. Траје дуже него обично — држите апликацију отвореном и аутоматски ћемо завршити.",

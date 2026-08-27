@@ -3888,6 +3888,7 @@
     "explainerCheck4": "Blink API tidak akan tersedia",
     "explainerCheck5": "Akun Anda akan dikenakan biaya jaringan Spark",
     "explainerCta": "Saya mengerti",
+    "explainerImportCta": "Gunakan frasa pemulihan yang ada",
     "transferringFunds": "Mentransfer dana Anda. Seharusnya selesai dalam beberapa detik.",
     "transferDelayed": {
       "body": "Dana Anda sedang dalam perjalanan ke akun baru Anda. Ini memakan waktu lebih lama dari biasanya — biarkan aplikasi tetap terbuka dan kami akan menyelesaikannya secara otomatis.",

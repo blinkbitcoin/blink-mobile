@@ -3888,6 +3888,7 @@
         "explainerCheck4": "L'API de Blink ne sera pas disponible",
         "explainerCheck5": "Des frais de réseau Spark seront déduits de votre compte",
         "explainerCta": "Je comprends",
+        "explainerImportCta": "Utiliser une phrase de récupération existante",
         "transferringFunds": "Transfert de vos fonds en cours. Cela devrait être terminé en quelques secondes.",
         "transferDelayed": {
             "body": "Vos fonds sont en route vers votre nouveau compte. Cela prend plus de temps que d'habitude — gardez l'application ouverte et nous terminerons automatiquement.",

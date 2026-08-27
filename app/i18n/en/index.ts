@@ -3974,6 +3974,7 @@ const en: BaseTranslation = {
     explainerCheck4: "Blink API will not be available",
     explainerCheck5: "Your account will be deducted with a Spark network fee",
     explainerCta: "I understand",
+    explainerImportCta: "Use an existing recovery phrase",
     transferringFunds:
       "Transferring your funds. It should be done in a few seconds.",
     transferDelayed: {

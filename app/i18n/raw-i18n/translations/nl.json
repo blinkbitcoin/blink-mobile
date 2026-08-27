@@ -3888,6 +3888,7 @@
     "explainerCheck4": "Blink API zal niet beschikbaar zijn",
     "explainerCheck5": "Er worden Spark-netwerkkosten van je account afgeschreven",
     "explainerCta": "Ik begrijp het",
+    "explainerImportCta": "Een bestaande herstelzin gebruiken",
     "transferringFunds": "Je saldo wordt overgedragen. Het zou binnen enkele seconden klaar moeten zijn.",
     "transferDelayed": {
       "body": "Je saldo is onderweg naar je nieuwe account. Het duurt langer dan gebruikelijk — houd de app open, dan ronden we het automatisch af.",

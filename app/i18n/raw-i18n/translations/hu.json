@@ -3888,6 +3888,7 @@
     "explainerCheck4": "A Blink API nem lesz elérhető",
     "explainerCheck5": "A fiókodból levonásra kerül egy Spark hálózati díj",
     "explainerCta": "Megértettem",
+    "explainerImportCta": "Meglévő helyreállítási kifejezés használata",
     "transferringFunds": "Átutalás folyamatban. Néhány másodperc alatt befejeződik.",
     "transferDelayed": {
       "body": "A pénzed úton van az új számládra. A szokásosnál tovább tart — hagyd nyitva az alkalmazást, és automatikusan befejezzük.",

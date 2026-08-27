@@ -5,10 +5,11 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { useTheme } from "@rn-vui/themed"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { IconHero } from "@app/components/icon-hero"
 import { RevealedCheckboxList } from "@app/components/revealed-checkbox-list"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { PhraseStep, RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useMigrationAccount } from "@app/screens/account-migration/hooks"
 import { MigrationStepLayout } from "@app/screens/account-migration/migration-step-layout"
 import { testProps } from "@app/utils/testProps"
@@ -44,16 +45,33 @@ export const MigrationExplainerScreen: React.FC = () => {
     }
   }, [ensureAccount, navigation])
 
+  /** The phrase screen owns the import and hands the flow back to the terms step, so this
+   *  only has to get the user there carrying the migration flag. */
+  const handleImport = useCallback(() => {
+    navigation.navigate("selfCustodialRestorePhrase", {
+      step: PhraseStep.First,
+      flow: "migration",
+    })
+  }, [navigation])
+
   return (
     <MigrationStepLayout
       footer={
-        <GaloyPrimaryButton
-          title={LL.AccountMigration.explainerCta()}
-          disabled={isMoveDisabled}
-          loading={isProvisioning}
-          onPress={handleMove}
-          {...testProps("migration-explainer-cta")}
-        />
+        <>
+          <GaloyPrimaryButton
+            title={LL.AccountMigration.explainerCta()}
+            disabled={isMoveDisabled}
+            loading={isProvisioning}
+            onPress={handleMove}
+            {...testProps("migration-explainer-cta")}
+          />
+          <GaloySecondaryButton
+            title={LL.AccountMigration.explainerImportCta()}
+            disabled={isMoveDisabled}
+            onPress={handleImport}
+            {...testProps("migration-explainer-import")}
+          />
+        </>
       }
     >
       <IconHero
