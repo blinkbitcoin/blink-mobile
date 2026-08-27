@@ -1,4 +1,13 @@
-import { matchOsLocaleToSupportedLocale } from "../../app/utils/locale-detector"
+import {
+  detectDefaultCurrency,
+  matchOsLocaleToSupportedLocale,
+} from "../../app/utils/locale-detector"
+
+const mockGetCurrencies = jest.fn<string[], []>()
+jest.mock("react-native-localize", () => ({
+  getCurrencies: () => mockGetCurrencies(),
+  getLocales: () => [],
+}))
 
 describe("matchOsLocaleToSupportedLocale", () => {
   it("exactly matches a supported locale", () => {
@@ -23,5 +32,43 @@ describe("matchOsLocaleToSupportedLocale", () => {
     ]
     const locale = matchOsLocaleToSupportedLocale(unsupportedCountryAndLang)
     expect(locale).toEqual("en")
+  })
+})
+
+describe("detectDefaultCurrency", () => {
+  const supportedCurrencyIds = ["USD", "EUR", "GBP", "CRC"]
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it("returns the currency the device prefers", () => {
+    mockGetCurrencies.mockReturnValue(["CRC", "USD"])
+
+    expect(detectDefaultCurrency(supportedCurrencyIds)).toBe("CRC")
+  })
+
+  it("takes the next device currency when the preferred one cannot be priced", () => {
+    mockGetCurrencies.mockReturnValue(["XBT", "GBP"])
+
+    expect(detectDefaultCurrency(supportedCurrencyIds)).toBe("GBP")
+  })
+
+  it("returns undefined when no device currency can be priced", () => {
+    mockGetCurrencies.mockReturnValue(["XBT", "XAU"])
+
+    expect(detectDefaultCurrency(supportedCurrencyIds)).toBeUndefined()
+  })
+
+  it("returns undefined when the device names no currency", () => {
+    mockGetCurrencies.mockReturnValue([])
+
+    expect(detectDefaultCurrency(supportedCurrencyIds)).toBeUndefined()
+  })
+
+  it("returns undefined when nothing is known to be priceable yet", () => {
+    mockGetCurrencies.mockReturnValue(["CRC"])
+
+    expect(detectDefaultCurrency([])).toBeUndefined()
   })
 })
