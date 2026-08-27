@@ -272,7 +272,7 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
   const screenFooter = isRecoverable ? recoverableFooter : waitingFooter
 
   return (
-    <Screen preset="fixed">
+    <Screen preset="fixed" headerShown={false}>
       <StatusScreenLayout
         icon="clock"
         iconColor={colors.warning}

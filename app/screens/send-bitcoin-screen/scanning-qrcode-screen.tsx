@@ -13,6 +13,7 @@ import Svg, { Circle } from "react-native-svg"
 import { Camera, CameraType } from "react-native-camera-kit"
 import { check, request, PERMISSIONS, RESULTS } from "react-native-permissions"
 import RNQRGenerator from "rn-qr-generator"
+import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 import { gql } from "@apollo/client"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
@@ -47,7 +48,13 @@ import { testProps } from "@app/utils/testProps"
 import { resolveDestination } from "./payment-destination/resolve-destination"
 
 const { width: screenWidth } = Dimensions.get("window")
-const { height: screenHeight } = Dimensions.get("window")
+
+/** Gaps kept between the scanner's own controls and whatever the system draws over the
+ *  window. From Android 15 the window runs edge to edge, so the status bar and the
+ *  navigation or gesture bar sit on top of the camera preview rather than beside it, and
+ *  a control placed at a fixed offset from the window edge lands underneath them. */
+const CLOSE_BUTTON_GAP = 16
+const BOTTOM_CONTROLS_GAP = 24
 
 /**
  * Longest side the picker is allowed to hand back. The QR decoder holds the decoded
@@ -108,6 +115,7 @@ export const ScanningQRCodeScreen: React.FC = () => {
   })
 
   const { LL } = useI18nContext()
+  const insets = useSafeAreaInsets()
   const { displayCurrency } = useDisplayCurrency()
   const { sdk } = useSelfCustodialWallet()
   const sparkNetwork = useSparkNetwork()
@@ -424,6 +432,8 @@ export const ScanningQRCodeScreen: React.FC = () => {
    *  so opening it would read as a dead button. Dimming says the same thing the guard
    *  does, before the user spends a trip through the gallery on it. */
   const galleryIconStyle = pending ? styles.iconGaleryPending : styles.iconGalery
+  const closeInsetStyle = { marginTop: insets.top + CLOSE_BUTTON_GAP }
+  const bottomControlsInsetStyle = { bottom: insets.bottom + BOTTOM_CONTROLS_GAP }
 
   return (
     <Screen unsafe>
@@ -443,14 +453,14 @@ export const ScanningQRCodeScreen: React.FC = () => {
           <View style={styles.rectangle} />
         </View>
         <Pressable onPress={navigation.goBack}>
-          <View style={styles.close}>
+          <View style={[styles.close, closeInsetStyle]}>
             <Svg viewBox="0 0 100 100">
               <Circle cx={50} cy={50} r={50} fill={colors._white} opacity={0.5} />
             </Svg>
             <GaloyIcon name="close" size={64} style={styles.iconClose} />
           </View>
         </Pressable>
-        <View style={styles.openGallery}>
+        <View style={[styles.openGallery, bottomControlsInsetStyle]}>
           <Pressable
             {...testProps("open-gallery")}
             disabled={pending}
@@ -483,15 +493,13 @@ const useStyles = makeStyles(({ colors }) => ({
     alignSelf: "flex-end",
     height: 64,
     marginRight: 16,
-    marginTop: 40,
     width: 64,
   },
 
   openGallery: {
-    height: 128,
+    height: 64,
     left: 32,
     position: "absolute",
-    top: screenHeight - 96,
     width: screenWidth,
   },
 

@@ -260,7 +260,7 @@ export const MigrationGate: React.FC = () => {
 
   if (hasGateDataError) {
     return (
-      <Screen preset="fixed">
+      <Screen preset="fixed" headerShown={false}>
         <View style={styles.messageContainer}>
           <GaloyIcon name="warning" size={64} color={colors.warning} />
           <Text type="p1" style={styles.messageText}>
@@ -283,7 +283,7 @@ export const MigrationGate: React.FC = () => {
    *  migration would flash the intro it is about to navigate away from. */
   if (isGateDataLoading || shouldResumeLockedMigration) {
     return (
-      <Screen preset="fixed">
+      <Screen preset="fixed" headerShown={false}>
         <View style={styles.loadingContainer}>
           <ActivityIndicator
             size="large"
