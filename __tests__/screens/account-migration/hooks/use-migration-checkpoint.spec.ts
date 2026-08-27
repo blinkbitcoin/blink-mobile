@@ -11,6 +11,7 @@ const mockLoadCheckpoint = jest.fn()
 const mockSaveCheckpointToStorage = jest.fn()
 const mockClearCheckpointFromStorage = jest.fn()
 const mockReportError = jest.fn()
+const mockRefetchOwnerId = jest.fn()
 let mockActiveAccount: { id: string; type: string } | undefined
 let mockOwnerId: string | null = "custodial-1"
 let mockFocusCallback: (() => void | (() => void)) | null = null
@@ -47,7 +48,11 @@ jest.mock("@app/hooks/use-account-registry", () => ({
 }))
 
 jest.mock("@app/screens/account-migration/hooks/use-custodial-owner-id", () => ({
-  useCustodialOwnerId: () => ({ ownerId: mockOwnerId, loading: false }),
+  useCustodialOwnerId: () => ({
+    ownerId: mockOwnerId,
+    loading: false,
+    refetch: mockRefetchOwnerId,
+  }),
 }))
 
 jest.mock("@app/hooks/use-app-config", () => ({
@@ -56,16 +61,19 @@ jest.mock("@app/hooks/use-app-config", () => ({
   }),
 }))
 
+const resetCheckpointMocks = () => {
+  jest.clearAllMocks()
+  mockActiveAccount = { id: "custodial-1", type: "custodial" }
+  mockOwnerId = "custodial-1"
+  mockRefetchOwnerId.mockResolvedValue(undefined)
+  mockFocusCallback = null
+  mockLoadCheckpoint.mockResolvedValue(null)
+  mockSaveCheckpointToStorage.mockResolvedValue(undefined)
+  mockClearCheckpointFromStorage.mockResolvedValue(undefined)
+}
+
 describe("useMigrationCheckpoint", () => {
-  beforeEach(() => {
-    jest.clearAllMocks()
-    mockActiveAccount = { id: "custodial-1", type: "custodial" }
-    mockOwnerId = "custodial-1"
-    mockFocusCallback = null
-    mockLoadCheckpoint.mockResolvedValue(null)
-    mockSaveCheckpointToStorage.mockResolvedValue(undefined)
-    mockClearCheckpointFromStorage.mockResolvedValue(undefined)
-  })
+  beforeEach(resetCheckpointMocks)
 
   it("starts with null checkpoint and loading true", async () => {
     const { result } = renderHook(() => useMigrationCheckpoint())
@@ -777,6 +785,59 @@ describe("useMigrationCheckpoint", () => {
 
     await act(async () => {
       resolveLoad!(null)
+    })
+  })
+})
+
+describe("useMigrationCheckpoint owner recovery", () => {
+  beforeEach(resetCheckpointMocks)
+
+  /** The ids are keyed by an owner this hook resolves on its OWN uncached query, which can
+   *  fail while a caller's separate instance is healthy. A retry that only reloaded storage
+   *  would leave that lookup failed and the ids null for good, since nothing else re-runs
+   *  it short of remounting the screen. */
+  it("reruns the owner query on refetch, not only the storage read", async () => {
+    mockOwnerId = null
+    /** A fresh object per read, the way parsing storage gives one: the same reference back
+     *  would let React skip the render that picks the recovered owner up. */
+    mockLoadCheckpoint.mockImplementation(() =>
+      Promise.resolve({
+        step: MigrationCheckpoint.BackupAlerts,
+        savedAt: Date.now(),
+        accountId: "sc-account-2",
+        custodialAccountId: "custodial-1",
+      }),
+    )
+
+    const { result } = renderHook(() => useMigrationCheckpoint())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+    expect(result.current.accountId).toBeNull()
+
+    mockRefetchOwnerId.mockImplementation(() => {
+      mockOwnerId = "custodial-1"
+      return Promise.resolve()
+    })
+
+    await act(async () => {
+      await result.current.refetch()
+    })
+
+    expect(mockRefetchOwnerId).toHaveBeenCalled()
+    expect(result.current.accountId).toBe("sc-account-2")
+  })
+
+  /** The retry stays one promise that resolves whatever failed: the gate Promise.alls it,
+   *  and an owner query rejecting there would double-report a failure hasError already
+   *  carries. */
+  it("resolves instead of rejecting when the refetched owner query fails again", async () => {
+    mockOwnerId = null
+    mockRefetchOwnerId.mockRejectedValue(new Error("offline"))
+
+    const { result } = renderHook(() => useMigrationCheckpoint())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    await act(async () => {
+      await expect(result.current.refetch()).resolves.toBeUndefined()
     })
   })
 })

@@ -112,11 +112,16 @@ let mockLnAddressTransfer = {
   retry: mockLnRetry,
 }
 
+let mockCheckpointHasError = false
+const mockRefetchCheckpoint = jest.fn()
+
 jest.mock("@app/screens/account-migration/hooks", () => ({
   ...jest.requireActual("@app/screens/account-migration/hooks"),
   useMigrationCheckpoint: () => ({
     accountId: mockCheckpointAccountId,
     loading: mockCheckpointLoading,
+    hasError: mockCheckpointHasError,
+    refetch: mockRefetchCheckpoint,
     saveCheckpoint: mockSaveCheckpoint,
   }),
 }))
@@ -128,9 +133,30 @@ jest.mock("@app/self-custodial/hooks/use-self-custodial-account-mode", () => ({
   }),
 }))
 
+let mockOwnerIdLoading = false
+let mockOwnerIdSkipped = false
+let mockOwnerIdError = false
+const mockRefetchOwnerId = jest.fn()
+
 jest.mock("@app/screens/account-migration/hooks/use-custodial-owner-id", () => ({
-  useCustodialOwnerId: () => ({ ownerId: mockOwnerId, loading: false }),
+  useCustodialOwnerId: () => ({
+    ownerId: mockOwnerId,
+    loading: mockOwnerIdLoading,
+    isSkipped: mockOwnerIdSkipped,
+    hasError: mockOwnerIdError,
+    refetch: mockRefetchOwnerId,
+  }),
 }))
+
+/** The re-point as it stands before it has answered: nothing moved, nothing failed. The
+ *  state every id that never arrived leaves it in, since it cannot fire without them. */
+const unsettledLnTransfer = () => ({
+  isTransferred: false,
+  isRejected: false,
+  isAccountMissing: false,
+  hasConnectionIssue: false,
+  retry: mockLnRetry,
+})
 
 const mockUseLnAddressTransfer = jest.fn()
 jest.mock(
@@ -216,6 +242,12 @@ const resetScreenMocks = () => {
   mockCheckpointAccountId = "sc-account-1"
   mockStoredModes = {}
   mockOwnerId = "owner-1"
+  mockOwnerIdLoading = false
+  mockOwnerIdSkipped = false
+  mockOwnerIdError = false
+  mockCheckpointHasError = false
+  mockRefetchOwnerId.mockResolvedValue(undefined)
+  mockRefetchCheckpoint.mockResolvedValue(undefined)
   mockLnAddressTransfer = {
     isTransferred: true,
     isRejected: false,
@@ -1013,6 +1045,203 @@ describe("MigrationBalancesOverviewScreen lightning-address re-point gating", ()
     fireEvent.press(screen.getByTestId("migration-balances-overview-retry"))
 
     expect(mockLnRetry).toHaveBeenCalledTimes(1)
+  })
+
+  /**
+   * The re-point never fires without both ids, and a hook that never fires reports neither
+   * a failure nor a connection issue, so an id that settled missing used to leave Approve
+   * disabled for good with nothing on screen to act on: no message, no retry, and a
+   * swallowed hardware back. Support is the only honest destination.
+   */
+  it("hands over to support when the custodial owner id settles missing", async () => {
+    mockOwnerId = null
+    /** The re-point cannot have moved anything without the id it signs its proof with. */
+    mockLnAddressTransfer = unsettledLnTransfer()
+
+    renderScreen()
+    await flushEffects()
+
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
+      reason: "custodial-owner-missing",
+      origin: "commit",
+    })
+  })
+
+  /** Softer than the owner's rule on purpose: the checkpoint keys its id by an owner it
+   *  resolves through its own instance of the query, which can fail while this screen's is
+   *  healthy, so a null read there is not proof no account was provisioned. */
+  it("offers the retry rather than support when no self-custodial account was provisioned", async () => {
+    mockCheckpointAccountId = null
+    mockLnAddressTransfer = unsettledLnTransfer()
+
+    renderScreen()
+    await flushEffects()
+
+    expect(mockNavigate).not.toHaveBeenCalled()
+    expect(screen.getByTestId("migration-balances-overview-retry")).toBeTruthy()
+  })
+
+  /** An id still in flight is a wait, not a failure: handing over on it would send every
+   *  user whose owner query is a beat slow to support in the one step they cannot undo. */
+  it("keeps waiting instead of handing over while the owner id is still loading", async () => {
+    mockOwnerId = null
+    mockOwnerIdLoading = true
+    mockLnAddressTransfer = unsettledLnTransfer()
+
+    renderScreen()
+    await flushEffects()
+
+    expect(mockNavigate).not.toHaveBeenCalled()
+    expect(screen.getByTestId("migration-balances-overview-approve")).toBeDisabled()
+  })
+
+  /**
+   * A session that ended (or an active account that is no longer the custodial one) skips
+   * the owner query, which then reports neither loading nor an answer, and nulls the
+   * checkpoint's id with it. Reading that silence as a missing id would hand a user whose
+   * token merely expired to support, in the one step they cannot take back.
+   */
+  it("keeps waiting instead of handing over when the owner query was skipped", async () => {
+    mockOwnerId = null
+    mockOwnerIdSkipped = true
+    mockCheckpointAccountId = null
+    mockLnAddressTransfer = unsettledLnTransfer()
+
+    renderScreen()
+    await flushEffects()
+
+    expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  /**
+   * A dropped owner query settles with no id and no loading, which reads exactly like an
+   * account that has no owner. Handing over on it would send a user whose request merely
+   * failed to support, in the one step they cannot take back, so the network kind offers
+   * the retry the rest of the screen's sources already do.
+   */
+  it("offers the retry instead of support when the owner query failed", async () => {
+    mockOwnerId = null
+    mockOwnerIdError = true
+    /** The checkpoint keys its own id by the owner, so the same dropped query nulls both:
+     *  guarding only the owner's half would let the provisioned account's reason through. */
+    mockCheckpointAccountId = null
+    mockLnAddressTransfer = unsettledLnTransfer()
+
+    renderScreen()
+    await flushEffects()
+
+    expect(mockNavigate).not.toHaveBeenCalled()
+    expect(screen.getByTestId("migration-balances-overview-retry")).toBeTruthy()
+  })
+
+  /** The checkpoint is healed alongside the owner: a storage read that failed is one of
+   *  the reasons the ids are unreadable, and the retry must clear all of them. */
+  it("refetches the checkpoint alongside the owner when the retry is pressed", async () => {
+    mockOwnerId = null
+    mockOwnerIdError = true
+    mockCheckpointAccountId = null
+    mockLnAddressTransfer = unsettledLnTransfer()
+    mockUseMigrationQuery.mockReturnValue({
+      ...migrationQueryResult({
+        balanceSats: 1000,
+        feeSats: 10,
+        feeCoveredByBlink: false,
+        receiveSats: 990,
+      }),
+      refetch: mockRefetchMigration,
+    })
+    mockUseWalletOverviewScreenQuery.mockReturnValue({
+      ...walletOverviewQueryResult({ btcBalance: 1000, usdBalance: 0 }),
+      refetch: mockRefetchWallets,
+    })
+
+    renderScreen()
+    await flushEffects()
+
+    fireEvent.press(screen.getByTestId("migration-balances-overview-retry"))
+
+    expect(mockRefetchCheckpoint).toHaveBeenCalledTimes(1)
+  })
+
+  it("refetches the owner id alongside the rest when the retry is pressed", async () => {
+    mockOwnerId = null
+    mockOwnerIdError = true
+    mockLnAddressTransfer = unsettledLnTransfer()
+    mockUseMigrationQuery.mockReturnValue({
+      ...migrationQueryResult({
+        balanceSats: 1000,
+        feeSats: 10,
+        feeCoveredByBlink: false,
+        receiveSats: 990,
+      }),
+      refetch: mockRefetchMigration,
+    })
+    mockUseWalletOverviewScreenQuery.mockReturnValue({
+      ...walletOverviewQueryResult({ btcBalance: 1000, usdBalance: 0 }),
+      refetch: mockRefetchWallets,
+    })
+
+    renderScreen()
+    await flushEffects()
+
+    fireEvent.press(screen.getByTestId("migration-balances-overview-retry"))
+
+    expect(mockRefetchOwnerId).toHaveBeenCalledTimes(1)
+  })
+
+  /**
+   * The retry takes Approve's place on this screen, so a source that no longer holds
+   * anything back must not claim it: past the re-point the ids are spent, and offering a
+   * retry then would hide a commit the user is ready to make behind an error about
+   * nothing.
+   */
+  it("keeps Approve rather than the retry when a spent id source fails", async () => {
+    mockCheckpointHasError = true
+
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.queryByTestId("migration-balances-overview-retry")).toBeNull()
+    expect(screen.getByTestId("migration-balances-overview-approve")).not.toBeDisabled()
+  })
+
+  /** Past the re-point the ids have done their work, and the session that carried them is
+   *  about to be discarded by the completion swap: an owner that goes missing then is not
+   *  a failure to hand a finished re-point to support over. */
+  it("does not hand over for a missing owner once the address has moved", async () => {
+    mockOwnerId = null
+
+    renderScreen()
+    await flushEffects()
+
+    expect(mockNavigate).not.toHaveBeenCalled()
+    expect(screen.getByTestId("migration-balances-overview-approve")).not.toBeDisabled()
+  })
+
+  /** A checkpoint the device could not read is not a migration without a provisioned
+   *  account: the flag exists so an unreadable store is never mistaken for a wiped one. */
+  it("offers the retry when the checkpoint could not be read", async () => {
+    mockCheckpointAccountId = null
+    mockCheckpointHasError = true
+    mockLnAddressTransfer = unsettledLnTransfer()
+
+    renderScreen()
+    await flushEffects()
+
+    expect(mockNavigate).not.toHaveBeenCalled()
+    expect(screen.getByTestId("migration-balances-overview-retry")).toBeTruthy()
+  })
+
+  /** The ids are only judged once the re-point is unblocked: a preview still in flight
+   *  owns the screen's failure story, and a not-yet-loaded id is not a missing one. */
+  it("does not blame a missing owner id while the preview is in flight", async () => {
+    mockOwnerId = null
+    mockUseMigrationQuery.mockReturnValue({ data: undefined, loading: true })
+
+    renderScreen()
+    await flushEffects()
+
+    expect(mockNavigate).not.toHaveBeenCalled()
   })
 })
 
