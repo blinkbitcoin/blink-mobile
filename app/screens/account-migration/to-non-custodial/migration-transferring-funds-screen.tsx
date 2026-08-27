@@ -40,6 +40,8 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
   const {
     migrationAccountId,
     migrationExpectedReceiveSats,
+    migrationSparkInvoice,
+    recordMigrationSparkInvoice,
     custodialAccountId,
     migrationLoading,
     completeMigration,
@@ -100,6 +102,8 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
     custodialAccountId,
     selfCustodialAccountId: migrationAccountId,
     expectedReceiveSats: migrationExpectedReceiveSats,
+    sparkInvoice: migrationSparkInvoice,
+    recordSparkInvoice: recordMigrationSparkInvoice,
     skip: isTransferSkipped,
   })
 
