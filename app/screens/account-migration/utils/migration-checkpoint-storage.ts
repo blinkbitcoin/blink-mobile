@@ -19,6 +19,10 @@ export type StoredCheckpoint = {
    *  point — the only moment it is knowable (after the drain the preview reads an already
    *  emptied balance). Absent on records saved by app versions before the field existed. */
   expectedReceiveSats?: number
+  /** The invoice this migration issued for the drain, captured at the commit point. What
+   *  proves the receive landed: payable once, and only by this migration. Absent on records
+   *  saved by app versions before the field existed. */
+  sparkInvoice?: string
 }
 
 /**
@@ -64,8 +68,14 @@ export const isExpired = (
 export const validateStoredCheckpoint = (raw: unknown): StoredCheckpoint | null => {
   if (!raw || typeof raw !== "object") return null
 
-  const { step, savedAt, accountId, custodialAccountId, expectedReceiveSats } =
-    raw as StoredCheckpoint
+  const {
+    step,
+    savedAt,
+    accountId,
+    custodialAccountId,
+    expectedReceiveSats,
+    sparkInvoice,
+  } = raw as StoredCheckpoint
 
   if (!Object.values(MigrationCheckpoint).includes(step)) return null
   if (typeof savedAt !== "number") return null
@@ -78,12 +88,18 @@ export const validateStoredCheckpoint = (raw: unknown): StoredCheckpoint | null 
   const hasUsableExpectedReceiveSats =
     typeof expectedReceiveSats === "number" && Number.isFinite(expectedReceiveSats)
 
+  /** Advisory in the same way, and for the same reason: a malformed invoice drops on its
+   *  own rather than taking the step and ids down with it. */
+  const hasUsableSparkInvoice =
+    typeof sparkInvoice === "string" && sparkInvoice.length > 0
+
   return {
     step,
     savedAt,
     accountId,
     custodialAccountId,
     expectedReceiveSats: hasUsableExpectedReceiveSats ? expectedReceiveSats : undefined,
+    sparkInvoice: hasUsableSparkInvoice ? sparkInvoice : undefined,
   }
 }
 
@@ -125,6 +141,7 @@ export type CheckpointUpdate = {
   accountId?: string
   custodialAccountId?: string
   expectedReceiveSats?: number
+  sparkInvoice?: string
 }
 
 /**
@@ -148,12 +165,19 @@ export const mergeCheckpoint = (
     ? existing?.expectedReceiveSats
     : undefined
 
+  /** Not write-once, unlike the figure above: a retried commit mints a fresh invoice and
+   *  sends THAT one to the server, so keeping the first would leave the gate watching for a
+   *  payment nobody will make. The newest recorded invoice is the one that was asked for.
+   *  Owner scoping still applies — another profile's invoice is never inherited. */
+  const inheritedSparkInvoice = hasSameOwner ? existing?.sparkInvoice : undefined
+
   return {
     step: update.step,
     savedAt: Date.now(),
     accountId: update.accountId ?? (hasSameOwner ? existing?.accountId : undefined),
     custodialAccountId: update.custodialAccountId,
     expectedReceiveSats: inheritedExpectedReceiveSats ?? update.expectedReceiveSats,
+    sparkInvoice: update.sparkInvoice ?? inheritedSparkInvoice,
   }
 }
 
