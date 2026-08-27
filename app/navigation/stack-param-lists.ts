@@ -312,7 +312,14 @@ export type RootStackParamList = {
      *  can no longer answer for the custodial account the ticket is about. */
     custodialAccountId?: string
   }
-  selfCustodialRestorePhrase: { step: PhraseStep; words?: string[] }
+  /** `flow` names who owns the phrase once it validates. Absent means onboarding restore,
+   *  which activates the wallet immediately; "migration" hands it to the migration flow,
+   *  which must keep the custodial account active until it commits. */
+  selfCustodialRestorePhrase: {
+    step: PhraseStep
+    words?: string[]
+    flow?: "migration"
+  }
   selfCustodialRestoreMethod: undefined
   selfCustodialCloudRestore: undefined
   stableBalanceSettings: undefined

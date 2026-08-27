@@ -12,18 +12,30 @@ import { splitWords } from "@app/utils/bip39-wordlist"
 import { reportError } from "@app/utils/error-logging"
 import { toastShow } from "@app/utils/toast"
 
+import { useMigrationAccount } from "@app/screens/account-migration/hooks"
+
 import { MNEMONIC_WORD_COUNT, WORDS_PER_STEP } from "../../utils"
 import { RestoreWalletStatus, useRestoreWallet } from "./use-restore-wallet"
 
 type RestorePhraseParams = {
   step: PhraseStep
   initialWords?: string[]
+  /** Absent means onboarding restore, which activates the wallet at once. "migration"
+   *  hands the phrase to the migration flow instead, which must leave the custodial
+   *  account active until it commits. */
+  flow?: "migration"
 }
 
-export const useRestorePhrase = ({ step, initialWords }: RestorePhraseParams) => {
+export const useRestorePhrase = ({ step, initialWords, flow }: RestorePhraseParams) => {
   const { LL } = useI18nContext()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { restore, status: restoreStatus } = useRestoreWallet()
+  const {
+    importAccount,
+    isProvisioning,
+    loading: migrationLoading,
+  } = useMigrationAccount()
+  const isMigrationFlow = flow === "migration"
   const [validationError, setValidationError] = useState<string | null>(null)
 
   const isStep1 = step === PhraseStep.First
@@ -45,11 +57,12 @@ export const useRestorePhrase = ({ step, initialWords }: RestorePhraseParams) =>
         navigation.navigate("selfCustodialRestorePhrase", {
           step: PhraseStep.Second,
           words: parsed,
+          flow,
         })
       }
       return accepted
     },
-    [bip39, isStep1, navigation],
+    [bip39, isStep1, navigation, flow],
   )
 
   /** Wired to a header onPress, so a clipboard rejection would surface as an unhandled
@@ -73,8 +86,9 @@ export const useRestorePhrase = ({ step, initialWords }: RestorePhraseParams) =>
     navigation.navigate("selfCustodialRestorePhrase", {
       step: PhraseStep.Second,
       words: bip39.words,
+      flow,
     })
-  }, [navigation, bip39.words])
+  }, [navigation, bip39.words, flow])
 
   const handleRestore = useCallback(async () => {
     const mnemonic = bip39.words.join(" ")
@@ -82,8 +96,29 @@ export const useRestorePhrase = ({ step, initialWords }: RestorePhraseParams) =>
       setValidationError(LL.RestoreScreen.invalidMnemonic())
       return
     }
+    if (isMigrationFlow) {
+      /** The owner id is still being read, and savePendingAccount throws without it. Going
+       *  ahead would derive and register the wallet, fail the checkpoint, and leave the
+       *  user a generic error plus a new account and zero migration progress. */
+      if (migrationLoading) return
+      /** importAccount reports its own failures and answers null, so a failed import
+       *  leaves the user on this screen with the phrase they typed still in hand. */
+      const importedAccountId = await importAccount(mnemonic)
+      if (importedAccountId) {
+        navigation.navigate("acceptTermsAndConditions", { flow: "migration" })
+      }
+      return
+    }
     await restore(mnemonic).catch(() => {})
-  }, [bip39.words, restore, LL])
+  }, [
+    bip39.words,
+    restore,
+    LL,
+    isMigrationFlow,
+    migrationLoading,
+    importAccount,
+    navigation,
+  ])
 
   const updateWord = useCallback(
     (index: number, value: string) => {
@@ -92,6 +127,18 @@ export const useRestorePhrase = ({ step, initialWords }: RestorePhraseParams) =>
     },
     [bip39],
   )
+
+  /** The screen only speaks RestoreWalletStatus, so the migration import reports its
+   *  in-flight state through the same vocabulary instead of adding a second flag. The owner
+   *  query is deliberately NOT folded in: it resolves on mount, and reporting it here would
+   *  cover an empty phrase form with the full-page restoring spinner. */
+  const isImporting = isMigrationFlow && isProvisioning
+  const status = isImporting ? RestoreWalletStatus.Restoring : restoreStatus
+
+  /** handleRestore refuses while the owner is still being read, so the button has to say
+   *  so. Kept apart from isValid, which also drives the invalid-phrase message and the
+   *  per-word correctness marks — a phrase in flight is not a phrase that is wrong. */
+  const isSubmitBlocked = isMigrationFlow && migrationLoading
 
   return {
     words: bip39.words,
@@ -109,8 +156,9 @@ export const useRestorePhrase = ({ step, initialWords }: RestorePhraseParams) =>
     updateWord,
     handlePasteFromClipboard,
     isValid,
+    isSubmitBlocked,
     validationError,
-    status: restoreStatus,
+    status,
     isStep1,
     handleContinue,
     handleRestore,
