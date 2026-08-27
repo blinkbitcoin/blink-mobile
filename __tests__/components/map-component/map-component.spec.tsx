@@ -114,6 +114,13 @@ jest.mock("@app/hooks/use-is-self-custodial-account", () => ({
   useIsSelfCustodialAccount: () => mockIsSelfCustodialAccount,
 }))
 
+// The backend refuses place submissions below account level two, so the
+// button's third gate is driven from here too.
+let mockIsAtLeastLevelTwo = true
+jest.mock("@app/graphql/level-context", () => ({
+  useLevel: () => ({ isAtLeastLevelTwo: mockIsAtLeastLevelTwo }),
+}))
+
 const mockToastShow = jest.fn()
 jest.mock("@app/utils/toast", () => ({
   toastShow: (args: unknown) => mockToastShow(args),
@@ -175,6 +182,7 @@ beforeEach(() => {
   capturedMapProps = undefined
   mockIsAuthed = true
   mockIsSelfCustodialAccount = false
+  mockIsAtLeastLevelTwo = true
   mockSubmitPlace.mockResolvedValue(true)
   setPlaces()
 })
@@ -461,10 +469,20 @@ describe("MapComponent basemap", () => {
 })
 
 describe("MapComponent adding a place", () => {
-  it("offers it to a custodial account", async () => {
+  it("offers it to a custodial account at level two", async () => {
     const { getByTestId } = renderMap()
 
     await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+  })
+
+  it("does not offer it below account level two", async () => {
+    // The backend refuses the submission for anything lower, so the button is
+    // absent rather than present and failing at the end of a filled-in form.
+    mockIsAtLeastLevelTwo = false
+    const { queryByTestId, getByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-place-search")).toBeTruthy())
+    expect(queryByTestId("open-add-place")).toBeNull()
   })
 
   it("does not offer it to a self-custodial account", async () => {

@@ -20,6 +20,7 @@ import {
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { updateMapLastCoords } from "@app/graphql/client-only-query"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
+import { useLevel } from "@app/graphql/level-context"
 import { useIsSelfCustodialAccount } from "@app/hooks/use-is-self-custodial-account"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { LOCATION_PERMISSION, getUserRegion } from "@app/screens/map-screen/functions"
@@ -77,14 +78,16 @@ export default function MapComponent({
   const client = useApolloClient()
   const { LL } = useI18nContext()
 
-  // Adding a place is a custodial-account feature: the submission goes to BTC
-  // Map through our own backend, which needs a Blink session behind it.
+  // Adding a place is a level-two custodial-account feature: the submission
+  // goes to BTC Map through our own backend, which needs a Blink session
+  // behind it and rejects anything below account level two.
   // `useIsSelfCustodialAccount` rather than `useActiveWallet().isSelfCustodial`
   // so the button does not flash into view during the renders where the
   // self-custodial SDK has not reported yet.
   const isAuthed = useIsAuthed()
   const isSelfCustodialAccount = useIsSelfCustodialAccount()
-  const canAddPlace = isAuthed && !isSelfCustodialAccount
+  const { isAtLeastLevelTwo } = useLevel()
+  const canAddPlace = isAuthed && !isSelfCustodialAccount && isAtLeastLevelTwo
 
   const mapViewRef = React.useRef<MapView>(null)
   const openSettingsModalRef = React.useRef<OpenSettingsElement>(null)
