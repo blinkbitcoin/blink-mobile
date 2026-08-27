@@ -12,6 +12,7 @@ const mockSaveCheckpoint = jest.fn()
 let mockAccountId: string | undefined
 let mockCheckpoint: string | null
 let mockExpectedReceiveSats: number | null
+let mockTargetOrigin = "provisioned"
 let mockCheckpointOwnerId: string | null
 
 jest.mock("@app/screens/account-migration/hooks/use-migration-checkpoint-state", () => ({
@@ -20,6 +21,7 @@ jest.mock("@app/screens/account-migration/hooks/use-migration-checkpoint-state",
     saveCheckpoint: mockSaveCheckpoint,
     accountId: mockAccountId,
     expectedReceiveSats: mockExpectedReceiveSats,
+    targetOrigin: mockTargetOrigin,
     checkpointOwnerId: mockCheckpointOwnerId,
     clearCheckpoint: mockClearCheckpoint,
   }),
@@ -109,6 +111,7 @@ describe("useCompleteMigration", () => {
     mockCheckpoint = "backupAlerts"
     mockSaveCheckpoint.mockResolvedValue(true)
     mockExpectedReceiveSats = 21000
+    mockTargetOrigin = "provisioned"
     mockDiscardCustodialSession.mockResolvedValue(undefined)
     mockSeedMigratedSettings.mockResolvedValue(undefined)
     mockCloseCustodialAccount.mockResolvedValue(AccountCloseOutcome.Closed)
@@ -193,6 +196,26 @@ describe("useCompleteMigration", () => {
     expect(mockSeedMigratedSettings.mock.invocationCallOrder[0]).toBeLessThan(
       mockDiscardCustodialSession.mock.invocationCallOrder[0],
     )
+  })
+
+  /** An adopted wallet arrived with settings the user chose for it before this migration
+   *  existed; copying the custodial ones over them is loss, not carry-over. */
+  it("leaves an adopted wallet's own settings alone", async () => {
+    mockTargetOrigin = "adopted"
+
+    await complete()
+
+    expect(mockSeedMigratedSettings).not.toHaveBeenCalled()
+  })
+
+  /** A wallet restored here is new to this device and holds no preferences of its own, so
+   *  it takes the custodial ones like a provisioned wallet does. */
+  it("copies the settings onto a wallet restored during the migration", async () => {
+    mockTargetOrigin = "restored"
+
+    await complete()
+
+    expect(mockSeedMigratedSettings).toHaveBeenCalledWith("sc-account-1")
   })
 
   it("completes the migration even when copying the settings fails", async () => {
