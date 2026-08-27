@@ -81,13 +81,16 @@ export const useUnseenTxBadgeState = ({
   const isAnnouncingIncoming = incomingAnnouncement !== null
   const badgeAmountText = incomingAnnouncement?.amountText ?? unseenAmountText
   const badgeTxId = incomingAnnouncement?.txId ?? latestUnseenTx?.id
-  const isOutgoingBadge = isAnnouncingIncoming ? false : isOutgoing
-
-  /** The outgoing badge must not run its cycle behind an incoming one: it would never be
-   *  painted and would still mark its transaction seen when it hid. Suppressing its inputs
-   *  parks it until the incoming announcement is released and it can show for real. */
-  const outgoingTxId = isAnnouncingIncoming ? undefined : latestUnseenTx?.id
-  const outgoingAmountText = isAnnouncingIncoming ? null : unseenAmountText
+  /**
+   * The outgoing badge must not run its cycle behind an incoming one: it would never be
+   * painted and would still mark its transaction seen when it hid. Suppressing its inputs
+   * parks it until the incoming announcement is released and it can show for real. All
+   * three travel as one value because the visibility hook keys off each of them
+   * separately, so suppressing only some would leave it running on a half-parked badge.
+   */
+  const outgoingBadge = isAnnouncingIncoming
+    ? { txId: undefined, amountText: null, isOutgoing: false }
+    : { txId: latestUnseenTx?.id, amountText: unseenAmountText, isOutgoing }
 
   const handleOutgoingBadgeHide = useCallback(() => {
     if (latestUnseenTx?.settlementCurrency) {
@@ -96,9 +99,9 @@ export const useUnseenTxBadgeState = ({
   }, [latestUnseenTx?.settlementCurrency, markTxSeen])
 
   const showOutgoingBadge = useOutgoingBadgeVisibility({
-    txId: outgoingTxId,
-    amountText: outgoingAmountText,
-    isOutgoing: isOutgoingBadge,
+    txId: outgoingBadge.txId,
+    amountText: outgoingBadge.amountText,
+    isOutgoing: outgoingBadge.isOutgoing,
     onHide: handleOutgoingBadgeHide,
   })
 
@@ -121,7 +124,7 @@ export const useUnseenTxBadgeState = ({
     handleUnseenBadgePress,
     showIncomingBadge,
     showOutgoingBadge,
-    isOutgoing: isOutgoingBadge,
+    isOutgoing: outgoingBadge.isOutgoing,
     latestUnseenTxId: badgeTxId,
     transactionCount: transactions.length,
   }
