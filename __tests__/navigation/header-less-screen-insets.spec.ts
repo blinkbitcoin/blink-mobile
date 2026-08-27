@@ -86,14 +86,25 @@ const HANDLES_ITS_OWN_INSETS = new Set([
   "PhoneLoginNavigator",
 ])
 
+/**
+ * `Screen` only adds the top edge when it is told the header is hidden, so a hard
+ * `headerShown={true}` leaves the status bar uncovered. A screen may still pass an
+ * expression: `getStarted` shows its header only when there is somewhere to go back to,
+ * and hands `Screen` the very flag it toggles the header with.
+ */
+const declaresHeaderHidden = (tag: string): boolean => {
+  const headerShown = tag.match(/headerShown=\{([^}]*)\}/)
+  if (!headerShown) return false
+  return headerShown[1].trim() !== "true"
+}
+
 const declaresTopInset = (source: string): boolean => {
   const screenTags = source.match(/<Screen\b[^>]*>/g) ?? []
   if (screenTags.length === 0) return true
   return screenTags.every((tag) => {
-    const passesHeaderShown = tag.includes("headerShown=")
     const optsOut = /\bunsafe\b/.test(tag)
     const overridesEdges = /edges=\{\[[^\]]*"top"/.test(tag)
-    return passesHeaderShown || optsOut || overridesEdges
+    return declaresHeaderHidden(tag) || optsOut || overridesEdges
   })
 }
 
