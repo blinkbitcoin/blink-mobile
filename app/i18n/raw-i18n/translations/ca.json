@@ -2265,7 +2265,9 @@
   "ScanningQRCodeScreen": {
     "invalidContent": "Hem trobat:\n\n{found: string}\n\nAquesta no és una adreça Bitcoin vàlida o una factura Lightning",
     "expiredContent": "Hem trobat:\n\n{found: string}\n\nAquesta factura ha caducat",
+    "unresolvedContent": "Hem trobat:\n\n{found: string}\n\nNo hem pogut processar aquest codi. Pot ser que hagi caducat o que el servei no estigui disponible temporalment. Demana un codi nou o torna-ho a provar més tard.",
     "invalidTitle": "Codi QR no vàlid",
+    "unresolvedTitle": "Codi no disponible",
     "openLinkTitle": "Obrir l'enllaç",
     "confirmOpenLink": "Estàs segur que vols obrir aquest enllaç?",
     "noQrCode": "No hem trobat cap codi QR a la imatge",
@@ -2340,6 +2342,7 @@
     "selfPaymentError": "{lnAddress: string} és la teva adreça {bankName: string} .",
     "selfPaymentAdvice": "Si vols enviar diners a un altre compte teu, pots utilitzar una adreça de factura, LN o BTC.",
     "lnAddressError": "No podem contactar a aquesta adreça de Lightning. Si estas segur que existeix, tornar-ho a provar més tard.",
+    "lnurlServiceError": "No hem pogut processar aquest codi. Pot ser que hagi caducat o que el servei no estigui disponible temporalment.",
     "lnAddressAdvice": "Revisa que l'ortografia sigui correcta o demana al destinatari una factura o una adreça BTC.",
     "unknownLightning": "No podem analitzar aquesta adreça Lightning. Si us plau torna-ho.a provar",
     "unknownOnchain": "No podem analitzar aquesta adreça Bitcoin. Si us plau torna-ho a provar.",

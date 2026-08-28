@@ -2265,7 +2265,9 @@
   "ScanningQRCodeScreen": {
     "invalidContent": "Am găsit:\n\n{found: string}\n\nAceasta nu este o adresă Bitcoin validă sau o factură Lightning",
     "expiredContent": "Am găsit:\n\n{found: string}\n\nAceastă factură a expirat",
+    "unresolvedContent": "Am găsit:\n\n{found: string}\n\nNu am putut procesa acest cod. Este posibil să fi expirat sau serviciul să fie temporar indisponibil. Cere un cod nou sau încearcă din nou mai târziu.",
     "invalidTitle": "Cod QR invalid",
+    "unresolvedTitle": "Cod indisponibil",
     "openLinkTitle": "Deschide Link",
     "confirmOpenLink": "Sunteți sigur că doriți să deschideți acest link?",
     "noQrCode": "Nu am putut găsi un cod QR în imagine",
@@ -2340,6 +2342,7 @@
     "selfPaymentError": "{lnAddress: string} este adresa {bankName: string}.",
     "selfPaymentAdvice": "Dacă doriți să trimiteți bani către un alt cont pe care îl dețineți, puteți utiliza în schimb o factură, o adresă LN sau BTC.",
     "lnAddressError": "Nu putem avea acces la această adresă Lightning. Dacă sunteți sigur că există, puteți încerca din nou mai târziu.",
+    "lnurlServiceError": "Nu am putut procesa acest cod. Este posibil să fi expirat sau serviciul să fie temporar indisponibil.",
     "lnAddressAdvice": "Asigurați-vă că ortografia este corectă sau cereți destinatarului o factură sau o adresă BTC.",
     "unknownLightning": "Nu putem analiza această adresă Lightning. Vă rugăm să încercați din nou.",
     "unknownOnchain": "Nu putem analiza această adresă Bitcoin. Vă rugăm să încercați din nou.",

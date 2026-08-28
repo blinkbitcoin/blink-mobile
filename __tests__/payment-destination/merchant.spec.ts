@@ -132,9 +132,9 @@ describe("merchant payment destinations", () => {
       displayCurrency: "USD",
     })
 
-    expect(requestPayServiceParamsMock).toHaveBeenCalledWith({
-      lnUrlOrAddress: merchant.lnurl,
-    })
+    expect(requestPayServiceParamsMock).toHaveBeenCalledWith(
+      expect.objectContaining({ lnUrlOrAddress: merchant.lnurl }),
+    )
     expect(isMerchantChoiceDestination(result)).toBe(false)
     expect(result).toEqual(
       expect.objectContaining({
