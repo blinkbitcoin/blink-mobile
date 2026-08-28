@@ -195,6 +195,27 @@ describe("BackupPhraseScreen", () => {
 
       expect(mockReportError).not.toHaveBeenCalled()
     })
+
+    /** The report must not wait for the screen guard: on a device where registration
+     *  keeps failing the gated content never mounts, and the signal would be lost. */
+    it("reports malformed params even while the guard is still pending", async () => {
+      mockHasParams = false
+      mockLeaseReady = new Promise(() => {}) // the guard never activates
+
+      render(
+        <ContextForScreen>
+          <BackupPhraseScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      expect(mockReportError).toHaveBeenCalledTimes(1)
+      expect(mockReportError).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.any(Error),
+        expect.objectContaining({ dedupKey: "backup-phrase-params-missing" }),
+      )
+    })
   })
 
   describe("step 1", () => {
