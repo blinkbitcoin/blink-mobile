@@ -87,9 +87,14 @@ const registerWithRetries = async (backgroundColor: string): Promise<void> => {
       return
     } catch (error) {
       lastError = error
-      // The first failure is reported by the lease holder via `ready`; only the
-      // retries report from here.
-      if (attempt > 0) reportError("Retry enable screen security", error)
+      // Every failed attempt is reported as it happens: waiting for the final
+      // rejection (up to RETRY_LIMIT × RETRY_DELAY later) would hide the failure
+      // onset from monitoring. The lease holder still reports the exhaustion
+      // itself via `ready`.
+      reportError(
+        attempt === 0 ? "Enable screen security" : "Retry enable screen security",
+        error,
+      )
       if (attempt < ENABLE_RETRY_LIMIT && leaseCount > 0) await sleepBetweenRetries()
     }
   }
