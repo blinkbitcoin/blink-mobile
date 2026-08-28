@@ -198,6 +198,7 @@ place that already exists.
 | `search.ts` | Accent-folded name matching and nearest-first ranking |
 | `categories.ts` | Icon → filter category buckets, and the filter itself |
 | `submission.ts` | Shape and validation for a place someone is adding, plus how its coordinates read |
+| `use-place-submission.ts` | The `btcMapPlaceSubmit` mutation, retried under one `submissionId` per attempt |
 | `opening-hours.ts` | Partial OSM `opening_hours` reader → open / closed / unknown |
 | `verification.ts` | Survey freshness and boost state |
 | `icons.ts`, `urls.ts`, `geo.ts` | Marker glyph resolution, link shaping, distance |

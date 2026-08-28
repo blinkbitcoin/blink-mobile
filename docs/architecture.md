@@ -159,9 +159,9 @@ so the map no longer shows Galoy-registered businesses as such and no longer rou
 | Clustering | supercluster, indexed over a box 3× the viewport rather than the whole feed. A filter change re-indexes hundreds of points instead of ~29k, which is the difference between a 1.2 s freeze and an unnoticed one |
 | Marker removal | Needs `patches/react-native-maps+1.27.2.patch`: `safeAddFeature` overwrote instead of inserting, so filtered-out pins stayed on the map forever. Pinned by `__tests__/patches/maps-marker-removal-patch.spec.ts` |
 | Untrusted input | Every OSM-sourced link is scheme-checked in `btcmap/urls.ts` before it reaches `Linking.openURL` |
-| Adding a place | Custodial accounts only (`useIsAuthed() && !useIsSelfCustodialAccount()`), since the submission is to go out through our backend on a Blink session. Pin first, then the form: the pin is drawn at the centre of the map view and never moves, so the region's centre is what it points at |
-| Sending a place | Not wired. `btcmap/submission.ts` shapes and validates the payload; the call that would forward it to BTC Map is a TODO in `map-component/index.tsx`, and until it exists the user is told the place has not been sent |
-| Kill switch | `btcMapPlacesEnabled` in Remote Config empties the map without a release |
+| Adding a place | Level-two custodial accounts only (`useIsAuthed() && !useIsSelfCustodialAccount() && isAtLeastLevelTwo`), and only while the `btcMapPlacesEnabled` kill switch is on, since the submission goes out through our backend on a Blink session. Pin first, then the form: the pin is drawn at the centre of the map view and never moves, so the region's centre is what it points at |
+| Sending a place | `btcmap/use-place-submission.ts` fires the `btcMapPlaceSubmit` mutation; `btcmap/submission.ts` shapes and validates the payload. A client-minted `submissionId` is the idempotency key: retries of one attempt reuse it, so a resent request updates the original submission rather than duplicating the place |
+| Kill switch | `btcMapPlacesEnabled` in Remote Config empties the map and takes the add-place flow with it, without a release |
 
 Because the snapshot shares Android's AsyncStorage database with the persisted Apollo
 cache, `AsyncStorage_db_size_in_MB` is raised from the 6 MB default in
