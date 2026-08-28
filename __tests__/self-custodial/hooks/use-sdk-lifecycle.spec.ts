@@ -24,11 +24,11 @@ jest.mock("@app/self-custodial/hooks/use-spark-network", () => ({
   useSparkNetwork: () => mockSparkNetwork.Regtest,
 }))
 
-const mockGetMnemonicForAccount = jest.fn()
+const mockReadMnemonicWithStatus = jest.fn()
 jest.mock("@app/utils/storage/secureStorage", () => ({
   __esModule: true,
   default: {
-    getMnemonicForAccount: (id: string) => mockGetMnemonicForAccount(id),
+    readMnemonicWithStatus: (id: string) => mockReadMnemonicWithStatus(id),
   },
 }))
 
@@ -120,7 +120,10 @@ describe("useSdkLifecycle", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockDepositClaimLeewayVbyte = 7
-    mockGetMnemonicForAccount.mockResolvedValue("word1 word2 word3")
+    mockReadMnemonicWithStatus.mockResolvedValue({
+      status: "found",
+      value: "word1 word2 word3",
+    })
     mockValidateStoredNetwork.mockResolvedValue(true)
     mockGetSnapshot.mockResolvedValue({
       wallets: [],
@@ -149,12 +152,31 @@ describe("useSdkLifecycle", () => {
     })
 
     it("falls to Unavailable when the keystore has no mnemonic for the account", async () => {
-      mockGetMnemonicForAccount.mockResolvedValue(null)
+      mockReadMnemonicWithStatus.mockResolvedValue({ status: "absent" })
 
       const { result } = renderHook(() => useSdkLifecycle("acct-1", 0))
 
       await waitFor(() => {
         expect(result.current.status).toBe(ActiveWalletStatus.Unavailable)
+      })
+      expect(mockInitSdk).not.toHaveBeenCalled()
+    })
+
+    /**
+     * Unavailable is terminal for an account: it reads as "there is no wallet
+     * here". A keystore that could not answer says nothing of the sort, and
+     * Error is the status the retry and backoff wiring already listens on.
+     */
+    it("falls to Error, not Unavailable, when the keystore cannot answer", async () => {
+      mockReadMnemonicWithStatus.mockResolvedValue({
+        status: "failed",
+        err: new Error("keystore locked"),
+      })
+
+      const { result } = renderHook(() => useSdkLifecycle("acct-1", 0))
+
+      await waitFor(() => {
+        expect(result.current.status).toBe(ActiveWalletStatus.Error)
       })
       expect(mockInitSdk).not.toHaveBeenCalled()
     })
@@ -217,7 +239,7 @@ describe("useSdkLifecycle", () => {
         expect(result.current.sdk).toBe(sdk)
       })
 
-      expect(mockGetMnemonicForAccount).toHaveBeenCalledWith("acct-1")
+      expect(mockReadMnemonicWithStatus).toHaveBeenCalledWith("acct-1")
       expect(mockValidateStoredNetwork).toHaveBeenCalledWith(
         "acct-1",
         mockSparkNetwork.Regtest,
