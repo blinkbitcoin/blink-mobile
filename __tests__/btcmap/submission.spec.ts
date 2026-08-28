@@ -1,5 +1,4 @@
 import {
-  PLACE_ADDRESS_MAX_LENGTH,
   PLACE_NAME_MAX_LENGTH,
   PlaceSubmissionDraft,
   buildPlaceSubmission,
@@ -10,7 +9,6 @@ const LOCATION = { latitude: 13.496743, longitude: -89.439462 }
 
 const draft = (overrides: Partial<PlaceSubmissionDraft> = {}): PlaceSubmissionDraft => ({
   name: "Hope House",
-  address: "Calle El Zonte",
   category: "cafes",
   location: LOCATION,
   ...overrides,
@@ -20,7 +18,6 @@ describe("buildPlaceSubmission", () => {
   it("carries every filled-in field through", () => {
     expect(buildPlaceSubmission(draft())).toEqual({
       name: "Hope House",
-      address: "Calle El Zonte",
       category: "cafes",
       latitude: LOCATION.latitude,
       longitude: LOCATION.longitude,
@@ -38,6 +35,12 @@ describe("buildPlaceSubmission", () => {
     // BTC Map draws a place as the icon its category resolves to, so one
     // without a category is a place with no pin.
     expect(buildPlaceSubmission(draft({ category: null }))).toBeNull()
+  })
+
+  it("refuses a place whose category is the catch-all", () => {
+    // "other" is a filter bucket for icons we do not recognise, not a
+    // description of a place — submitting it would tell BTC Map nothing.
+    expect(buildPlaceSubmission(draft({ category: "other" }))).toBeNull()
   })
 
   it("refuses a place that was never put anywhere", () => {
@@ -69,22 +72,10 @@ describe("buildPlaceSubmission", () => {
     })
   })
 
-  it("leaves the address out entirely when nobody typed one", () => {
-    // It is optional, and an empty string is a value: sending one would claim
-    // the place has an address that is blank.
-    const submission = buildPlaceSubmission(draft({ address: "   " }))
-
-    expect(submission).not.toBeNull()
-    expect(submission).not.toHaveProperty("address")
-  })
-
-  it("caps both free-text fields", () => {
-    const submission = buildPlaceSubmission(
-      draft({ name: "a".repeat(500), address: "b".repeat(500) }),
-    )
+  it("caps the name", () => {
+    const submission = buildPlaceSubmission(draft({ name: "a".repeat(500) }))
 
     expect(submission?.name).toHaveLength(PLACE_NAME_MAX_LENGTH)
-    expect(submission?.address).toHaveLength(PLACE_ADDRESS_MAX_LENGTH)
   })
 })
 

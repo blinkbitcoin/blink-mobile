@@ -181,6 +181,18 @@ export const PLACE_CATEGORIES: readonly PlaceCategory[] = [
   "other",
 ]
 
+export type SubmittablePlaceCategory = Exclude<PlaceCategory, "other">
+
+/**
+ * What the add-a-place form offers: everything but the catch-all. `other` is a
+ * bucket for icons we do not recognise on existing pins, not a description of a
+ * place — a submission under it would tell BTC Map nothing about what is there.
+ */
+export const SUBMITTABLE_PLACE_CATEGORIES: readonly SubmittablePlaceCategory[] =
+  PLACE_CATEGORIES.filter(
+    (category): category is SubmittablePlaceCategory => category !== "other",
+  )
+
 const CATEGORY_BY_ICON: ReadonlyMap<string, PlaceCategory> = new Map(
   Object.entries(CATEGORY_ICONS).flatMap(([category, icons]) =>
     icons.map((icon) => [icon, category as PlaceCategory] as const),
