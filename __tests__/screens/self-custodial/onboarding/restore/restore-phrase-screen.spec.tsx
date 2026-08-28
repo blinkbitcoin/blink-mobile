@@ -620,5 +620,21 @@ describe("RestorePhraseScreen", () => {
        *  re-activation, losing every word the user had entered. */
       expect(mockUseRestorePhrase).toHaveBeenCalled()
     })
+
+    it("clears the Paste action from the header when the content unmounts", async () => {
+      mockUseRestorePhrase.mockReturnValue({ ...defaultHookReturn, isStep1: true })
+
+      const { unmount } = renderScreen()
+      await flushEffects()
+      expect(headerRightWasInstalled()).toBe(true)
+
+      unmount()
+
+      /** setOptions has no owner: the route keeps the last value, so without the
+       *  cleanup Paste would stay live in the header with the guard off. */
+      expect(lastSetOptions()).toEqual(
+        expect.objectContaining({ headerRight: undefined }),
+      )
+    })
   })
 })
