@@ -143,7 +143,7 @@ describe("ViewBackupPhraseScreen", () => {
     /** Protect first, then prompt: the biometric gate lives inside the gated
      *  content, so it must not fire while registration is still pending. */
     it("does not fire the biometric prompt while registration is pending", async () => {
-      mockGetIsBiometricsEnabled.mockResolvedValue(true)
+      mockReadIsBiometricsEnabled.mockResolvedValue({ status: "yes" })
       const registration = deferred<void>()
       mockLeaseReady = registration.promise
 
