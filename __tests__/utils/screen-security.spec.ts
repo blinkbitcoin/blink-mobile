@@ -279,7 +279,9 @@ describe("screen-security", () => {
     expect(settled).toHaveBeenCalledWith("resolved")
   })
 
-  it("reports each failed retry and rejects only once they are exhausted", async () => {
+  /** Every failed attempt is reported as it happens so monitoring sees the failure
+   *  onset, not just the exhaustion up to RETRY_LIMIT × RETRY_DELAY later. */
+  it("reports each failed attempt and rejects only once they are exhausted", async () => {
     const { acquireScreenSecurity } = loadModule()
     mockRegister.mockRejectedValue(new Error("native failure"))
 
@@ -289,13 +291,19 @@ describe("screen-security", () => {
     await jest.advanceTimersByTimeAsync(RETRY_DELAY_MS * (RETRY_LIMIT - 1))
     // Initial attempt plus RETRY_LIMIT - 1 retries have failed; one retry left.
     expect(mockRegister).toHaveBeenCalledTimes(RETRY_LIMIT)
+    expect(mockReportError).toHaveBeenCalledTimes(RETRY_LIMIT)
     expect(settled).not.toHaveBeenCalled()
 
     await jest.advanceTimersByTimeAsync(RETRY_DELAY_MS * 2)
 
     expect(mockRegister).toHaveBeenCalledTimes(1 + RETRY_LIMIT)
     expect(settled).toHaveBeenCalledWith("rejected")
-    expect(mockReportError).toHaveBeenCalledTimes(RETRY_LIMIT)
+    expect(mockReportError).toHaveBeenCalledTimes(1 + RETRY_LIMIT)
+    expect(mockReportError).toHaveBeenNthCalledWith(
+      1,
+      "Enable screen security",
+      expect.any(Error),
+    )
   })
 
   it("cancels a pending retry when the last lease releases", async () => {
