@@ -599,4 +599,26 @@ describe("RestorePhraseScreen", () => {
       expect(mockMnemonicWordInput).toHaveBeenCalled()
     })
   })
+
+  /** Both regressions below come from the same place: the gate unmounts its subtree
+   *  whenever the guard drops, and a theme flip re-registers the guard with the new
+   *  mask colour. What the user typed, and the header action the content installed,
+   *  must both survive that. */
+  describe("surviving a gate re-activation", () => {
+    it("keeps the phrase state above the gate, so a pending guard cannot wipe it", async () => {
+      // Never-settling lease: the gate stays on its spinner and mounts no content.
+      mockAcquireScreenSecurity.mockReturnValue({
+        ready: new Promise<void>(() => {}),
+        release: mockReleaseScreenSecurity,
+      })
+
+      renderScreen()
+      await flushEffects()
+
+      /** The hook holding the typed words runs even with the content unmounted.
+       *  Held inside the gate it would be torn down and re-created on every
+       *  re-activation, losing every word the user had entered. */
+      expect(mockUseRestorePhrase).toHaveBeenCalled()
+    })
+  })
 })
