@@ -23,35 +23,28 @@ import { type Challenge, isValidChallenges } from "../utils"
 
 type ConfirmRouteProp = RouteProp<RootStackParamList, "selfCustodialBackupPhraseConfirm">
 
-/** A stable empty fallback, so a params read that somehow bypasses the wrapper's
- *  redirect does not feed useBackupConfirm a fresh array identity on every render. */
-const EMPTY_CHALLENGES: Challenge[] = []
+type BackupPhraseConfirmContentProps = {
+  challenges: Challenge[]
+  checkpointLoading: boolean
+  confirm: ReturnType<typeof useBackupConfirm>
+  onComplete: () => void
+}
 
 /** The gate mounts this only once the screenshot guard is actually on — the typed
- *  words must not exist while registration is pending. */
-const BackupPhraseConfirmContent: React.FC = () => {
+ *  words must not exist while registration is pending. The answers themselves are
+ *  held above the gate and handed in, so an unmount hides them without wiping
+ *  what the user has already typed. */
+const BackupPhraseConfirmContent: React.FC<BackupPhraseConfirmContentProps> = ({
+  challenges,
+  checkpointLoading,
+  confirm,
+  onComplete,
+}) => {
   const { LL } = useI18nContext()
   const styles = useStyles()
   const {
     theme: { colors },
   } = useTheme()
-
-  // Malformed params never reach this component — the screen wrapper below
-  // redirects before the gate mounts; the fallback is only a defensive default.
-  const { params } = useRoute<ConfirmRouteProp>()
-  const challengesParam = params?.challenges
-  const challenges = isValidChallenges(challengesParam)
-    ? challengesParam
-    : EMPTY_CHALLENGES
-  const successMessage = params?.successMessage
-
-  const { loading: checkpointLoading } = useMigrationCheckpoint()
-  const completeBackup = useCompleteBackup()
-
-  const onComplete = useCallback(() => {
-    logSelfCustodialBackupCompleted({ backupMethod: "manual" })
-    completeBackup({ method: BackupMethod.Manual, message: successMessage })
-  }, [completeBackup, successMessage])
 
   const {
     inputs,
@@ -66,7 +59,7 @@ const BackupPhraseConfirmContent: React.FC = () => {
     isWordWrong,
     focusRequest,
     clearFocusRequest,
-  } = useBackupConfirm({ challenges, onComplete, disabled: checkpointLoading })
+  } = confirm
 
   const anyWrong = challenges.some((_, i) => isWordWrong(i))
   const isConfirmDisabled = !allCorrect || checkpointLoading
@@ -197,16 +190,52 @@ const RedirectToBackupStart: React.FC = () => {
   return null
 }
 
-export const BackupPhraseConfirmScreen: React.FC = () => {
-  const { params } = useRoute<ConfirmRouteProp>()
+type GatedConfirmProps = {
+  challenges: Challenge[]
+  successMessage?: string
+}
 
-  if (!isValidChallenges(params?.challenges)) return <RedirectToBackupStart />
+/** Sits between the redirect guard and the gate so the confirmation state can be
+ *  held above the gate: its subtree is unmounted every time the guard drops (a
+ *  theme flip re-registers it), and the words the user has already typed must
+ *  survive that. Safe here because useBackupConfirm's only effect is the
+ *  all-correct auto-advance, which cannot fire while the inputs are empty. */
+const GatedConfirm: React.FC<GatedConfirmProps> = ({ challenges, successMessage }) => {
+  const { loading: checkpointLoading } = useMigrationCheckpoint()
+  const completeBackup = useCompleteBackup()
+
+  const onComplete = useCallback(() => {
+    logSelfCustodialBackupCompleted({ backupMethod: "manual" })
+    completeBackup({ method: BackupMethod.Manual, message: successMessage })
+  }, [completeBackup, successMessage])
+
+  const confirm = useBackupConfirm({
+    challenges,
+    onComplete,
+    disabled: checkpointLoading,
+  })
 
   return (
     <ScreenSecurityGate>
-      <BackupPhraseConfirmContent />
+      <BackupPhraseConfirmContent
+        challenges={challenges}
+        checkpointLoading={checkpointLoading}
+        confirm={confirm}
+        onComplete={onComplete}
+      />
     </ScreenSecurityGate>
   )
+}
+
+export const BackupPhraseConfirmScreen: React.FC = () => {
+  const { params } = useRoute<ConfirmRouteProp>()
+  const challenges = params?.challenges
+
+  /** The one place the params are judged: the validated value is handed down, so
+   *  nothing below re-derives it and the two checks cannot drift apart. */
+  if (!isValidChallenges(challenges)) return <RedirectToBackupStart />
+
+  return <GatedConfirm challenges={challenges} successMessage={params?.successMessage} />
 }
 
 const useStyles = makeStyles(({ colors }) => ({
