@@ -73,36 +73,36 @@ export const GaloyIconButton = ({
       case iconOnly && disabled:
         return {
           opacity: 0.7,
-          color: color || colors.primary,
+          color: color || colors.accent,
           backgroundColor: colors.transparent,
         }
       case iconOnly && pressed:
         return {
           opacity: 0.7,
-          color: color || colors.primary,
-          backgroundColor: backgroundColor || colors.grey4,
+          color: color || colors.accent,
+          backgroundColor: backgroundColor || colors.border,
         }
       case iconOnly && !pressed:
         return {
-          color: color || colors.primary,
+          color: color || colors.accent,
           backgroundColor: colors.transparent,
         }
       case !iconOnly && disabled:
         return {
           opacity: 0.7,
-          color: color || colors.primary,
-          backgroundColor: backgroundColor || colors.grey4,
+          color: color || colors.accent,
+          backgroundColor: backgroundColor || colors.border,
         }
       case !iconOnly && pressed:
         return {
           opacity: 0.7,
-          color: color || colors.primary,
-          backgroundColor: backgroundColor || colors.grey4,
+          color: color || colors.accent,
+          backgroundColor: backgroundColor || colors.border,
         }
       case !iconOnly && !pressed:
         return {
-          color: color || colors.primary,
-          backgroundColor: backgroundColor || colors.grey4,
+          color: color || colors.accent,
+          backgroundColor: backgroundColor || colors.border,
         }
       default:
         return {}
@@ -159,7 +159,7 @@ export const GaloyEditButton = ({ disabled, ...remainingProps }: PressableProps)
       height: 32,
       borderRadius: 8,
       opacity: disabled ? 0.7 : 1,
-      backgroundColor: pressed ? colors.grey4 : colors.grey5,
+      backgroundColor: pressed ? colors.border : colors.surfaceInteractive,
       alignItems: "center",
       justifyContent: "center",
     }
@@ -176,7 +176,7 @@ export const GaloyEditButton = ({ disabled, ...remainingProps }: PressableProps)
         <GaloyIcon
           name="pencil"
           size={20}
-          color={colors.primary}
+          color={colors.accent}
           opacity={pressed ? 0.7 : 1}
         />
       )}
@@ -204,7 +204,7 @@ const useStyles = makeStyles(
       width: iconContainerSize,
       height: iconContainerSize,
       borderRadius: iconContainerSize / 2,
-      backgroundColor: isIconOnly ? colors.transparent : customBg || colors.grey4,
+      backgroundColor: isIconOnly ? colors.transparent : customBg || colors.border,
       opacity: 0.7,
       alignItems: "center",
       justifyContent: "center",
