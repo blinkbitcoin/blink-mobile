@@ -40,19 +40,10 @@ const BackupPhraseContent: React.FC = () => {
 
   /** Deep links and navigation-state rehydration can deliver missing or malformed params
    *  despite the route type; a bare destructure here threw into the app-wide ErrorBoundary,
-   *  replacing the whole navigation tree (#4070). Fall back to the first six words. */
+   *  replacing the whole navigation tree (#4070). Fall back to the first six words. The
+   *  report lives in the screen wrapper below, ahead of the gate. */
   const stepParam = useRoute<PhraseRouteProp>().params?.step
-  const hasValidStep = isPhraseStep(stepParam)
-  const step = hasValidStep ? stepParam : PhraseStep.First
-
-  useEffect(() => {
-    if (hasValidStep) return
-    reportError(
-      "Backup phrase route params missing",
-      new Error("Route delivered no valid step"),
-      { dedupKey: "backup-phrase-params-missing", alwaysRecord: true },
-    )
-  }, [hasValidStep])
+  const step = isPhraseStep(stepParam) ? stepParam : PhraseStep.First
 
   const {
     firstCard,
@@ -124,11 +115,28 @@ const BackupPhraseContent: React.FC = () => {
   )
 }
 
-export const BackupPhraseScreen: React.FC = () => (
-  <ScreenSecurityGate>
-    <BackupPhraseContent />
-  </ScreenSecurityGate>
-)
+export const BackupPhraseScreen: React.FC = () => {
+  // Report ahead of the gate, not inside the gated content: on a device where
+  // registration keeps failing the content never mounts, and the signal that the
+  // route delivered no valid step would be lost with it. The fallback itself is
+  // benign (step 1 is this screen's own entry), so the content keeps it.
+  const stepParam = useRoute<PhraseRouteProp>().params?.step
+
+  useEffect(() => {
+    if (isPhraseStep(stepParam)) return
+    reportError(
+      "Backup phrase route params missing",
+      new Error("Route delivered no valid step"),
+      { dedupKey: "backup-phrase-params-missing", alwaysRecord: true },
+    )
+  }, [stepParam])
+
+  return (
+    <ScreenSecurityGate>
+      <BackupPhraseContent />
+    </ScreenSecurityGate>
+  )
+}
 
 const useStyles = makeStyles(({ colors }) => ({
   content: {
