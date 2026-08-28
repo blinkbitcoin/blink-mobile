@@ -5,14 +5,6 @@ import { DepositFeesInformation } from "@app/utils/deposit-fees"
 
 import { InvoiceType, PaymentRequestStateType } from "./index.types"
 
-/**
- * What the receive screen needs from whichever hook is driving it. Both account
- * types implement this: the custodial hook in this folder's `hooks/`, and the
- * self-custodial one in `@app/self-custodial/hooks`. It lives with the screen
- * because the screen is what the contract is for — a field that only one side can
- * populate is optional and says so, rather than the whole type claiming an owner.
- */
-
 type UriParams = { uppercase?: boolean; prefix?: boolean }
 
 /** The request currently on screen, in the shape the QR and copy actions need. */
@@ -25,6 +17,13 @@ export type ReceiveInvoiceInfo = {
   getCopyableInvoiceFn: () => string
 }
 
+/**
+ * What the receive screen needs from whichever hook is driving it. Both account
+ * types implement this: the custodial hook in the screen's own `hooks/`, and the
+ * self-custodial one in `@app/self-custodial/hooks`. It lives with the screen
+ * because the screen is what the contract is for — a field that only one side can
+ * populate is optional and says so, rather than the whole type claiming an owner.
+ */
 export type ReceivePaymentRequestState = {
   type: InvoiceType
   state?: PaymentRequestStateType
