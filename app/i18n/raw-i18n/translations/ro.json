@@ -3484,8 +3484,7 @@
         "pinChangedTitle": "PIN schimbat",
         "pinChangedSubtitle": "PIN-ul dvs. a fost schimbat cu succes.",
         "pinChangedToast": "PIN-ul a fost schimbat cu succes",
-        "biometricDescription": "Verificați-vă identitatea pentru a schimba PIN-ul",
-        "biometricRequired": "Autentificarea biometrică este necesară pentru a schimba PIN-ul."
+        "biometricDescription": "Verificați-vă identitatea pentru a schimba PIN-ul"
       }
     },
     "ReplaceCard": {

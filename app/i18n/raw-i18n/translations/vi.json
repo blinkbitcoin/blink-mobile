@@ -3484,8 +3484,7 @@
         "pinChangedTitle": "Đã đổi PIN",
         "pinChangedSubtitle": "PIN của bạn đã được đổi thành công.",
         "pinChangedToast": "Đã thay đổi mã PIN thành công",
-        "biometricDescription": "Xác minh danh tính của bạn để thay đổi mã PIN",
-        "biometricRequired": "Xác thực sinh trắc học là bắt buộc để thay đổi mã PIN của bạn."
+        "biometricDescription": "Xác minh danh tính của bạn để thay đổi mã PIN"
       }
     },
     "ReplaceCard": {

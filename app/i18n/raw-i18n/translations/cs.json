@@ -3484,8 +3484,7 @@
         "pinChangedTitle": "PIN změněn",
         "pinChangedSubtitle": "Váš PIN byl úspěšně změněn.",
         "pinChangedToast": "PIN byl úspěšně změněn",
-        "biometricDescription": "Ověřte svou totožnost pro změnu PINu",
-        "biometricRequired": "Pro změnu PINu je vyžadována biometrická autentizace."
+        "biometricDescription": "Ověřte svou totožnost pro změnu PINu"
       }
     },
     "ReplaceCard": {

@@ -11655,10 +11655,6 @@ type RootTranslation = {
 				 */
 				biometricDescription: string
 				/**
-				 * B​i​o​m​e​t​r​i​c​ ​a​u​t​h​e​n​t​i​c​a​t​i​o​n​ ​i​s​ ​r​e​q​u​i​r​e​d​ ​t​o​ ​c​h​a​n​g​e​ ​y​o​u​r​ ​P​I​N​.
-				 */
-				biometricRequired: string
-				/**
 				 * P​I​N​ ​c​h​a​n​g​e​d
 				 */
 				pinChangedTitle: string
@@ -25150,10 +25146,6 @@ export type TranslationFunctions = {
 				 * Verify your identity to change PIN
 				 */
 				biometricDescription: () => LocalizedString
-				/**
-				 * Biometric authentication is required to change your PIN.
-				 */
-				biometricRequired: () => LocalizedString
 				/**
 				 * PIN changed
 				 */

@@ -3484,8 +3484,7 @@
         "pinChangedTitle": "PIN ændret",
         "pinChangedSubtitle": "Din PIN er blevet ændret.",
         "pinChangedToast": "PIN er ændret",
-        "biometricDescription": "Bekræft din identitet for at ændre PIN-kode",
-        "biometricRequired": "Biometrisk godkendelse er påkrævet for at ændre din PIN-kode."
+        "biometricDescription": "Bekræft din identitet for at ændre PIN-kode"
       }
     },
     "ReplaceCard": {

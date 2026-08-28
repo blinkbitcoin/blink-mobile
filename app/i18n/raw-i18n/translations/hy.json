@@ -3484,8 +3484,7 @@
         "pinChangedTitle": "PIN-ը փոխվեց",
         "pinChangedSubtitle": "Ձեր PIN-ը հաջողությամբ փոխվել է։",
         "pinChangedToast": "PIN կոդը հաջողությամբ փոխվել է։",
-        "biometricDescription": "Հաստատեք ձեր ինքնությունը PIN-ը փոխելու համար",
-        "biometricRequired": "Կենսաբանական նույնականացումը պահանջվում է PIN-ը փոխելու համար:"
+        "biometricDescription": "Հաստատեք ձեր ինքնությունը PIN-ը փոխելու համար"
       }
     },
     "ReplaceCard": {

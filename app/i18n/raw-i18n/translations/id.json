@@ -3484,8 +3484,7 @@
         "pinChangedTitle": "PIN diubah",
         "pinChangedSubtitle": "PIN Anda telah berhasil diubah.",
         "pinChangedToast": "PIN berhasil diubah",
-        "biometricDescription": "Verifikasi identitas Anda untuk mengubah PIN",
-        "biometricRequired": "Autentikasi biometrik diperlukan untuk mengubah PIN Anda."
+        "biometricDescription": "Verifikasi identitas Anda untuk mengubah PIN"
       }
     },
     "ReplaceCard": {

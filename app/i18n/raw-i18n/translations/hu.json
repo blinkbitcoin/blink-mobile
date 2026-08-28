@@ -3484,8 +3484,7 @@
         "pinChangedTitle": "PIN megváltoztatva",
         "pinChangedSubtitle": "A PIN kódja sikeresen megváltozott.",
         "pinChangedToast": "A PIN-kód sikeresen módosítva",
-        "biometricDescription": "Igazolja személyazonosságát a PIN megváltoztatásához",
-        "biometricRequired": "Biometrikus hitelesítés szükséges a PIN megváltoztatásához."
+        "biometricDescription": "Igazolja személyazonosságát a PIN megváltoztatásához"
       }
     },
     "ReplaceCard": {

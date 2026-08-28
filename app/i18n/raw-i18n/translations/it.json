@@ -3484,8 +3484,7 @@
                 "pinChangedTitle": "PIN cambiato",
                 "pinChangedSubtitle": "Il tuo PIN è stato cambiato con successo.",
                 "pinChangedToast": "Il PIN è stato modificato con successo",
-                "biometricDescription": "Verifica la tua identità per cambiare il PIN",
-                "biometricRequired": "L'autenticazione biometrica è necessaria per cambiare il PIN."
+                "biometricDescription": "Verifica la tua identità per cambiare il PIN"
             }
         },
         "ReplaceCard": {

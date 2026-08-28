@@ -3484,8 +3484,7 @@
         "pinChangedTitle": "PIN promijenjen",
         "pinChangedSubtitle": "Vaš PIN je uspješno promijenjen.",
         "pinChangedToast": "PIN je uspješno promijenjen",
-        "biometricDescription": "Potvrdite svoj identitet za promjenu PIN-a",
-        "biometricRequired": "Biometrijska autentifikacija je potrebna za promjenu vašeg PIN-a."
+        "biometricDescription": "Potvrdite svoj identitet za promjenu PIN-a"
       }
     },
     "ReplaceCard": {

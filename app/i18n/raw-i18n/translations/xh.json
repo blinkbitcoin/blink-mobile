@@ -3484,8 +3484,7 @@
         "pinChangedTitle": "I-PIN itshintshiwe",
         "pinChangedSubtitle": "I-PIN yakho itshintshwe ngempumelelo.",
         "pinChangedToast": "I-PIN itshintshiwe ngempumelelo",
-        "biometricDescription": "Qinisekisa isazisi sakho ukuze utshintshe iPIN",
-        "biometricRequired": "Ukuqinisekiswa kwe-biometric kuyafuneka ukutshintsha iPIN yakho."
+        "biometricDescription": "Qinisekisa isazisi sakho ukuze utshintshe iPIN"
       }
     },
     "ReplaceCard": {

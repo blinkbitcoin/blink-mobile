@@ -3484,8 +3484,7 @@
                 "pinChangedTitle": "PINが変更されました",
                 "pinChangedSubtitle": "PINが正常に変更されました。",
                 "pinChangedToast": "PINが正常に変更されました",
-                "biometricDescription": "PINを変更するために本人確認を行ってください",
-                "biometricRequired": "PINを変更するには生体認証が必要です。"
+                "biometricDescription": "PINを変更するために本人確認を行ってください"
             }
         },
         "ReplaceCard": {
