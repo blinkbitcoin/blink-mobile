@@ -9,39 +9,20 @@ import { toWalletMoneyAmount } from "@app/types/amounts"
 import { type NormalizedTransaction } from "@app/types/transaction"
 import { toWalletId, type WalletState } from "@app/types/wallet"
 
-import { findUsdbToken, getWalletInfo, listPayments } from "../bridge"
+import { findUsdbToken, getWalletInfo } from "../bridge"
 import { recordErrorOnce } from "../logging"
-import { isKnownPayment, mapSelfCustodialTransactions } from "../mappers/transaction"
 import { latestOnchainReceiptId } from "../storage/onchain-address"
 
-const TRANSACTIONS_PER_PAGE = 20
+import {
+  fetchAndMapPayments,
+  TRANSACTIONS_PER_PAGE,
+  type PaymentsPage,
+} from "./payments-page"
 
 const getStableBalance = (token: TokenBalance | undefined): number => {
   if (!token) return 0
   const decimals = token.tokenMetadata?.decimals ?? 0
   return tokenBaseUnitsToCents(Number(token.balance), decimals)
-}
-
-type PaymentsPage = {
-  transactions: NormalizedTransaction[]
-  rawCount: number
-  hasMore: boolean
-}
-
-const fetchAndMapPayments = async (
-  sdk: BreezSdkInterface,
-  offset: number,
-  pageSize: number = TRANSACTIONS_PER_PAGE,
-): Promise<PaymentsPage> => {
-  const response = await listPayments(sdk, offset, pageSize)
-  const transactions = mapSelfCustodialTransactions(
-    response.payments.filter(isKnownPayment),
-  )
-  return {
-    transactions,
-    rawCount: response.payments.length,
-    hasMore: response.payments.length >= pageSize,
-  }
 }
 
 type WalletBalances = {

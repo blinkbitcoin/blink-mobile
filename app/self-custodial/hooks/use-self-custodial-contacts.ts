@@ -1,8 +1,6 @@
 import { useCallback, useEffect, useState } from "react"
 
 import {
-  PaymentDetails_Tags as PaymentDetailsTags,
-  PaymentType as SdkPaymentType,
   type BreezSdkInterface,
   type Contact as SdkContact,
 } from "@breeztech/breez-sdk-spark-react-native"
@@ -11,22 +9,33 @@ import {
   type Contact,
   type ContactAdapter,
   type ContactListResult,
+  type ContactTransactionsPage,
 } from "@app/types/contact"
-import { type NormalizedTransaction } from "@app/types/transaction"
 import { AccountType } from "@app/types/wallet"
-import { normalizeString } from "@app/utils/helper"
 
 import {
   findOrCreateContact as bridgeFindOrCreateContact,
   deleteContact as bridgeDeleteContact,
   listContacts as bridgeListContacts,
-  listPayments as bridgeListPayments,
   updateContact as bridgeUpdateContact,
 } from "../bridge"
-import { mapSelfCustodialTransactions } from "../mappers/transaction"
+import { fetchContactPaymentsPage } from "../providers/contact-payments"
 import { useSelfCustodialWallet } from "../providers/wallet"
 
-const MATCHED_PAYMENTS_LIMIT = 100
+const EMPTY_TRANSACTIONS_PAGE: ContactTransactionsPage = {
+  transactions: [],
+  nextCursor: null,
+}
+
+/**
+ * The cursor this adapter hands out is a stringified SDK offset. Anything else is not
+ * ours to interpret, so it restarts from the beginning rather than passing NaN to the SDK
+ * and looping forever on a request that can never advance.
+ */
+const toRawOffset = (cursor?: string | null): number => {
+  const offset = Number(cursor)
+  return Number.isSafeInteger(offset) && offset >= 0 ? offset : 0
+}
 
 const mapSdkContact = (c: SdkContact): Contact => ({
   id: c.id,
@@ -129,29 +138,24 @@ export const useSelfCustodialContacts = (): ContactAdapter & {
   )
 
   const getTransactions = useCallback(
-    async (contactId: string): Promise<NormalizedTransaction[]> => {
-      if (!sdk) return []
-      const target = contacts.find((c) => c.id === contactId)
-      if (!target) return []
+    async (
+      paymentIdentifier: string,
+      cursor?: string | null,
+    ): Promise<ContactTransactionsPage> => {
+      if (!sdk) return EMPTY_TRANSACTIONS_PAGE
 
-      const normalizedIdentifier = normalizeString(target.paymentIdentifier)
-      const response = await bridgeListPayments(sdk, 0, MATCHED_PAYMENTS_LIMIT)
+      const page = await fetchContactPaymentsPage(
+        sdk,
+        paymentIdentifier,
+        toRawOffset(cursor),
+      )
 
-      const matched = response.payments.filter((payment) => {
-        if (payment.paymentType !== SdkPaymentType.Send) return false
-
-        const details = payment.details
-        if (!details || details.tag !== PaymentDetailsTags.Lightning) return false
-
-        const lnAddress = details.inner.lnurlPayInfo?.lnAddress
-        if (!lnAddress) return false
-
-        return normalizeString(lnAddress) === normalizedIdentifier
-      })
-
-      return mapSelfCustodialTransactions(matched)
+      return {
+        transactions: page.transactions,
+        nextCursor: page.hasMore ? String(page.rawOffset) : null,
+      }
     },
-    [contacts, sdk],
+    [sdk],
   )
 
   return {
