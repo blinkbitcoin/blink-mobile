@@ -4,9 +4,9 @@ import { ICarouselInstance } from "react-native-reanimated-carousel"
 import { WalletCurrency } from "@app/graphql/generated"
 import { AccountLevel, useLevel } from "@app/graphql/level-context"
 
-import type { SelfCustodialPaymentRequestState } from "@app/self-custodial/hooks/types"
+import type { ReceivePaymentRequestState } from "../payment/request-state.types"
 
-type RequestState = SelfCustodialPaymentRequestState
+type RequestState = ReceivePaymentRequestState
 
 enum CarouselPage {
   Lightning = 0,
