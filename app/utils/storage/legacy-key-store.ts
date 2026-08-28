@@ -9,12 +9,13 @@ import type { SecureRead } from "./secure-store"
  * `.eslintrc.json` is what keeps new call paths from reaching the library
  * directly.
  *
- * The invariant is not complete yet, and this file is not what completes it:
- * `secureStorage.ts` holds the one other exception in that config and still
- * calls the library unguarded, so on iOS the reinstall sweep is armed on its
- * first boot-path read exactly as it is today. That closes when its slots move
- * behind the read-through helper in blinkbitcoin/blink-wip#1161 and the
- * exception goes away.
+ * The invariant is complete as of blinkbitcoin/blink-wip#1162: with the
+ * mnemonics behind the read-through helper, `secureStorage.ts` no longer calls
+ * the library at all, its exception in that config is gone, and this module is
+ * the only door left. So on iOS the reinstall sweep is disarmed before every
+ * touch rather than depending on which caller the boot path reaches first —
+ * which is why the mnemonics are now cleared deliberately, by
+ * `clearUninstallSurvivingCredentials`, instead of by that sweep.
  *
  * This module is the read-and-erase half of the migration off that library
  * (blinkbitcoin/blink-wip#1143); it deliberately has no write primitive.
