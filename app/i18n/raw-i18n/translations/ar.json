@@ -2162,6 +2162,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "رمز شخصي خاطئ. بقي {attemptsRemaining: string} محاولات.",
+    "enterPin": "أدخل رمز PIN الخاص بك",
     "lockoutUnavailable": "تعذّر تسجيل المحاولة الفاشلة بشكل آمن. يتم تسجيل الخروج.",
     "oneAttemptRemaining": "رمز شخصي خاطئ. بقيت محاولة واحدة.",
     "pinUnreadable": "تعذّر التحقق من رمزك الشخصي. يرجى المحاولة مرة أخرى.",

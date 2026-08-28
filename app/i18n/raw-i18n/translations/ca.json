@@ -2162,6 +2162,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "PIN incorrecte. Queden {attemptsRemaining: string} intents.",
+    "enterPin": "Introdueix el teu codi PIN",
     "lockoutUnavailable": "No s'ha pogut registrar l'intent fallit de manera segura. Tancant la sessió.",
     "oneAttemptRemaining": "PIN incorrecte. Queda 1 intent.",
     "pinUnreadable": "No s'ha pogut comprovar el PIN. Torna-ho a provar.",

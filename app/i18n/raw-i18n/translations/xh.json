@@ -2162,6 +2162,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "I-PIN engalunganga. {attemptsRemaining: number} imizamo eseleyo.",
+    "enterPin": "Faka ikhowudi yakho ye-PIN",
     "lockoutUnavailable": "Akukwazekanga ukurekhoda umzamo ongaphumelelanga ngokukhuselekileyo. Ukuloga ngaphandle.",
     "oneAttemptRemaining": "PIN engalunganga. Kushiyeke umzamo “1”.",
     "pinUnreadable": "Ayikwazanga ukujonga i-PIN yakho. Nceda uzame kwakhona.",

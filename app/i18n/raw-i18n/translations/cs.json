@@ -2162,6 +2162,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "Nesprávný kód PIN. {attemptsRemaining: string} zbývající pokusy.",
+    "enterPin": "Zadejte svůj PIN kód",
     "lockoutUnavailable": "Neúspěšný pokus se nepodařilo bezpečně zaznamenat. Odhlášení.",
     "oneAttemptRemaining": "Nesprávný kód PIN. Zbývá 1 pokus.",
     "pinUnreadable": "Kód PIN se nepodařilo ověřit. Zkuste to prosím znovu.",

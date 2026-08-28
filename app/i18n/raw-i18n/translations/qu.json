@@ -2162,6 +2162,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "Mana kani PIN. {attemptsRemaining: number} rantiq kani.",
+    "enterPin": "PIN kodiykita yaykuchiy",
     "lockoutUnavailable": "Manam allinta waqaychayta atirqanchu pantasqa kutita. Chiqanichu.",
     "oneAttemptRemaining": "Mana kani PIN. 1 rantiq kani.",
     "pinUnreadable": "Manam PIN nikita qhawayta atirqanchu. Wakmanta ruwaykuy.",

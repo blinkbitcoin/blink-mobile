@@ -2162,6 +2162,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "Salah No PIN. {Percubaan yang tinggal: number} kali lagi percubaan.",
+    "enterPin": "Masukkan kod PIN anda",
     "lockoutUnavailable": "Tidak dapat merekod percubaan yang gagal dengan selamat. Daftar keluar sekarang",
     "oneAttemptRemaining": "Salah no PIN. 1 lagi percubaan.",
     "pinUnreadable": "Tidak dapat menyemak PIN anda. Sila cuba lagi.",

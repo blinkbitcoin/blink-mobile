@@ -2162,6 +2162,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "Неисправан ПИН. Преостало је {attemptsRemaining: number} покушаја.",
+    "enterPin": "Унесите свој ПИН код",
     "lockoutUnavailable": "Неуспели покушај није могуће безбедно забележити. Одјављивање.",
     "oneAttemptRemaining": "Неисправан ПИН. Преостао је 1 покушај.",
     "pinUnreadable": "Није било могуће проверити ваш ПИН. Покушајте поново.",

@@ -2162,6 +2162,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "Forkert PIN-kode. {attemptsRemaining: number} forsøg tilbage.",
+    "enterPin": "Indtast din PIN-kode",
     "lockoutUnavailable": "Det mislykkede forsøg kunne ikke registreres sikkert. Logger ud.",
     "oneAttemptRemaining": "Forkert PIN-kode. 1 forsøg tilbage.",
     "pinUnreadable": "Din PIN-kode kunne ikke kontrolleres. Prøv venligst igen.",

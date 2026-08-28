@@ -2162,6 +2162,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "Սխալ PIN: {attemptsRemaining: number} փորձեր են մնացել։ ",
+    "enterPin": "Մուտքագրեք Ձեր PIN ծածկագիրը",
     "lockoutUnavailable": "Չհաջողվեց ապահով կերպով գրանցել ձախողված փորձը։ Ելք համակարգից։",
     "oneAttemptRemaining": "Սխալ PIN: 1 փորձ է մնացել։ ",
     "pinUnreadable": "Չհաջողվեց ստուգել Ձեր PIN-ը։ Խնդրում ենք կրկին փորձել։",

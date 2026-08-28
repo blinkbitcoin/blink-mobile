@@ -88,7 +88,15 @@ export type RootStackParamList = {
     isPinEnabled: boolean
     isResume?: boolean
   }
-  pin: { screenPurpose: PinScreenPurpose; isResume?: boolean }
+  pin: {
+    screenPurpose: PinScreenPurpose
+    isResume?: boolean
+    /** ChallengePin only. Function params are non-serializable (the same accepted
+     *  trade-off as selectionScreen.onSelect) and are dropped on state rehydration,
+     *  so both stay optional and every call is optional-chained. */
+    onChallengeSuccess?: () => void
+    onChallengeFailure?: () => void
+  }
   Primary: undefined
   earnsSection: { section: EarnSectionType; isAvailable: boolean }
   earnsQuiz: { id: string; isAvailable: boolean }

@@ -2162,6 +2162,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "Yanlış PIN kodu. Kalan deneme hakkınız: {attemptsRemaining: number}",
+    "enterPin": "PIN kodunu gir",
     "lockoutUnavailable": "Başarısız deneme güvenli şekilde kaydedilemedi. Çıkış yapılıyor.",
     "oneAttemptRemaining": "Yanlış PIN kodu. Kalan deneme hakkınız: 1",
     "pinUnreadable": "PIN kodunuz kontrol edilemedi. Lütfen tekrar deneyin.",

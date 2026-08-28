@@ -2162,6 +2162,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "Pini sahihi. {attemptsRemaining: number} yamesalia.",
+    "enterPin": "Ingiza pini yako",
     "lockoutUnavailable": "Imeshindwa kurekodi jaribio lililokosa kwa usalama. Kutoka nje ya programu.",
     "oneAttemptRemaining": "Pini si sahihi. Jaribio 1 limesalia.",
     "pinUnreadable": "Imeshindwa kuangalia pini yako. Tafadhali jaribu tena.",

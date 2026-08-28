@@ -1,5 +1,5 @@
 import * as React from "react"
-import { useCallback, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { Alert, Text, View } from "react-native"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RouteProp, useNavigation } from "@react-navigation/native"
@@ -33,15 +33,57 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, "pin">>()
 
   const { logout } = useLogout()
-  const { screenPurpose, isResume = false } = route.params
+  const {
+    screenPurpose,
+    isResume = false,
+    onChallengeSuccess,
+    onChallengeFailure,
+  } = route.params
+  /** Called for every purpose, deliberately: its side effects are inert outside the app
+   *  lock — the back-press swallow is isResume-gated and completeUnlock is only invoked
+   *  from the AuthenticatePin branch. Hooks can't be conditional; don't try. */
   const { completeUnlock } = useUnlockScreen({ isResume })
   const { LL } = useI18nContext()
   const isAuthenticate = screenPurpose === PinScreenPurpose.AuthenticatePin
+  const isChallenge = screenPurpose === PinScreenPurpose.ChallengePin
+  /** Both purposes verify a PIN the user already set, so both answer to the one
+   *  shared attempt budget and its escalating lockout. Only SetPin is exempt —
+   *  there is nothing to be wrong about yet. */
+  const isVerifyingExistingPin = isAuthenticate || isChallenge
   const [enteredPIN, setEnteredPIN] = useState("")
-  const [helperText, setHelperText] = useState(
-    screenPurpose === PinScreenPurpose.SetPin ? LL.PinScreen.setPin() : "",
-  )
+  const [helperText, setHelperText] = useState(() => {
+    if (screenPurpose === PinScreenPurpose.SetPin) return LL.PinScreen.setPin()
+    if (isChallenge) return LL.PinScreen.enterPin()
+    return ""
+  })
   const [previousPIN, setPreviousPIN] = useState("")
+  const challengeResolvedRef = useRef(false)
+
+  /** Dismissal is a decline: a challenge can be swiped or backed away (gestures stay on
+   *  for non-resume pin screens, and the BackHandler swallow is isResume-gated), and the
+   *  caller must hear about it exactly once. Success and lockout mark the ref before
+   *  they navigate, so the pop they trigger stays silent here. */
+  useEffect(() => {
+    if (!isChallenge) return undefined
+    return navigation.addListener("beforeRemove", (e) => {
+      if (challengeResolvedRef.current) return
+      challengeResolvedRef.current = true
+      /** Only a pop-family removal is the user declining (swipe and header back
+       *  dispatch POP, hardware back GO_BACK). A RESET is a removal the challenge
+       *  doesn't own — the lockout's logout unmounts the caller too, so a decline
+       *  callback would fire into a screen that no longer exists. */
+      const actionType = e.data.action.type
+      const isPopFamilyRemoval =
+        actionType === "POP" || actionType === "POP_TO_TOP" || actionType === "GO_BACK"
+      if (!isPopFamilyRemoval) return
+      /** Deferred: this listener runs inside the removing pop's dispatch, so a
+       *  goBack the caller issues in response would coalesce with the pop
+       *  already in flight and be swallowed — stranding the caller on its
+       *  pending screen. Next tick, the stack has settled and it pops cleanly. */
+      setTimeout(() => onChallengeFailure?.(), 0)
+    })
+  }, [isChallenge, navigation, onChallengeFailure])
+
   /** Set only on the terminal outcomes, where the screen is about to go away. */
   const [farewellText, setFarewellText] = useState("")
   /** A transient notice that is about the storage, not about the entry, so it
@@ -52,25 +94,50 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
     async (message: string) => {
       setEnteredPIN("")
       setFarewellText(message)
-      await logout()
-      await sleep(1000)
-      navigation.reset({
-        index: 0,
-        routes: [{ name: "Primary" }],
-      })
+      try {
+        await logout()
+        await sleep(1000)
+      } catch {
+        /** Swallowed, not rethrown: usePinLockout awaits this from a floating
+         *  promise, so a rejection would surface as an unhandled one. */
+      } finally {
+        /** In a finally so a rejected logout cannot strand the screen. A
+         *  challenge caller is already marked resolved by the removal this
+         *  reset performs, so a screen that never left would leave it waiting
+         *  on a callback that can no longer fire. */
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "Primary" }],
+        })
+      }
     },
     [logout, navigation],
   )
 
+  /** The challenge's success answer: tell the caller before leaving, and mark it
+   *  resolved so the pop this triggers is not also read as a decline. */
+  const resolveChallenge = () => {
+    challengeResolvedRef.current = true
+    onChallengeSuccess?.()
+    navigation.goBack()
+  }
+
   const lockout = usePinLockout({
-    enabled: isAuthenticate,
-    onUnlocked: () =>
+    enabled: isVerifyingExistingPin,
+    onUnlocked: () => {
+      /** A challenge answers its caller and steps back; it must never unlock the
+       *  app, which is a different question that this screen was not asked. */
+      if (isChallenge) {
+        resolveChallenge()
+        return
+      }
       completeUnlock(() =>
         navigation.reset({
           index: 0,
           routes: [{ name: "Primary" }],
         }),
-      ),
+      )
+    },
     onWrongPin: () => setEnteredPIN(""),
     onUnreadable: () => {
       setEnteredPIN("")
@@ -99,7 +166,7 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
     setEnteredPIN(newEnteredPIN)
     if (newEnteredPIN.length < PIN_LENGTH) return
 
-    if (isAuthenticate) {
+    if (isVerifyingExistingPin) {
       lockout.submit(newEnteredPIN)
     } else if (screenPurpose === PinScreenPurpose.SetPin) {
       handleCompletedPinForSetPin(newEnteredPIN)
@@ -167,7 +234,7 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
   // storage, so it survives a relaunch instead of living in its own state.
   const attemptsText = () => {
     if (farewellText) return farewellText
-    if (!isAuthenticate) return helperText
+    if (!isVerifyingExistingPin) return helperText
     if (lockout.attemptsRemaining === null) return helperText
     return lockout.attemptsRemaining === 1
       ? LL.PinScreen.oneAttemptRemaining()

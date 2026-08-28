@@ -2162,6 +2162,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "Mã PIN không chính xác. Còn lại {attemptsRemaining: number} lần thử.",
+    "enterPin": "Nhập mã PIN của bạn",
     "lockoutUnavailable": "Không thể ghi lại lần thử không thành công một cách an toàn. Đang đăng xuất.",
     "oneAttemptRemaining": "Mã PIN không chính xác. Còn lại 1 lần thử .",
     "pinUnreadable": "Không thể kiểm tra mã PIN của bạn. Vui lòng thử lại.",

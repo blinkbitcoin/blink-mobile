@@ -6742,6 +6742,10 @@ type RootTranslation = {
 		 */
 		attemptsRemaining: RequiredParams<'attemptsRemaining'>
 		/**
+		 * E​n​t​e​r​ ​y​o​u​r​ ​P​I​N​ ​c​o​d​e
+		 */
+		enterPin: string
+		/**
 		 * C​o​u​l​d​n​'​t​ ​r​e​c​o​r​d​ ​t​h​e​ ​f​a​i​l​e​d​ ​a​t​t​e​m​p​t​ ​s​e​c​u​r​e​l​y​.​ ​L​o​g​g​i​n​g​ ​o​u​t​.
 		 */
 		lockoutUnavailable: string
@@ -20354,6 +20358,10 @@ export type TranslationFunctions = {
 		 * Incorrect PIN. {attemptsRemaining} attempts remaining.
 		 */
 		attemptsRemaining: (arg: { attemptsRemaining: number }) => LocalizedString
+		/**
+		 * Enter your PIN code
+		 */
+		enterPin: () => LocalizedString
 		/**
 		 * Couldn't record the failed attempt securely. Logging out.
 		 */

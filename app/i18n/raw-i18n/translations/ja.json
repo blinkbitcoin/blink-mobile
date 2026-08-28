@@ -2162,6 +2162,7 @@
     },
     "PinScreen": {
         "attemptsRemaining": "PINコードが間違っています。残り{attemptsRemaining: number}回トライできます。",
+        "enterPin": "PINコードを入力してください",
         "lockoutUnavailable": "失敗した試行を安全に記録できませんでした。ログアウトします。",
         "oneAttemptRemaining": "PINコードが間違っています。残り1回トライできます。",
         "pinUnreadable": "PINコードを確認できませんでした。もう一度お試しください。",

@@ -2162,6 +2162,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "Λανθασμένο PIN. {attemptsRemaining: number} προσπάθειες που απομένουν.",
+    "enterPin": "Εισαγάγετε τον κωδικό σας PIN",
     "lockoutUnavailable": "Δεν ήταν δυνατή η ασφαλής καταγραφή της αποτυχημένης προσπάθειας. Αποσύνδεση.",
     "oneAttemptRemaining": "Λανθασμένο PIN. Απομένει 1 προσπάθεια.",
     "pinUnreadable": "Δεν ήταν δυνατός ο έλεγχος του PIN σας. Δοκιμάστε ξανά.",

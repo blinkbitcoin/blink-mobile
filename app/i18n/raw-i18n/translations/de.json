@@ -2162,6 +2162,7 @@
     },
     "PinScreen": {
         "attemptsRemaining": "Falsche PIN. {attemptsRemaining: string} verbleibende Versuche.",
+        "enterPin": "Gib deinen PIN Code ein",
         "lockoutUnavailable": "Der Fehlversuch konnte nicht sicher gespeichert werden. Du wirst nun ausgeloggt.",
         "oneAttemptRemaining": "Falsche PIN. Letzter Versuch.",
         "pinUnreadable": "Deine PIN konnte nicht geprüft werden. Bitte versuche es erneut.",

@@ -2162,6 +2162,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "PIN enkyamu. {attemptsRemaining: number} okugezaako okusigaddewo.",
+    "enterPin": "Teeka pini koodi yo",
     "lockoutUnavailable": "Tetusobodde kuwandiika kugezaako okulemeredwa mu bukuumi. Logging out.",
     "oneAttemptRemaining": "PIN enkyamu. mulundi 1 ogw'okugezaako ogusigaddewo.",
     "pinUnreadable": "Tetusobodde kukebera PIN yo. Gezaako nate.",

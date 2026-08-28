@@ -2128,6 +2128,7 @@
     },
     "PinScreen": {
         "attemptsRemaining": "Incorrect PIN. {attemptsRemaining: number} attempts remaining.",
+        "enterPin": "Enter your PIN code",
         "lockoutUnavailable": "Couldn't record the failed attempt securely. Logging out.",
         "oneAttemptRemaining": "Incorrect PIN. 1 attempt remaining.",
         "pinUnreadable": "Couldn't check your PIN. Please try again.",

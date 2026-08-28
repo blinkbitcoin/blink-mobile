@@ -6,6 +6,8 @@ export const AuthenticationScreenPurpose = {
 export const PinScreenPurpose = {
   AuthenticatePin: "AuthenticatePin",
   SetPin: "SetPin",
+  /** Verify the pin for the calling screen and report back — never unlocks the app. */
+  ChallengePin: "ChallengePin",
 } as const
 
 export type AuthenticationScreenPurpose =

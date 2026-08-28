@@ -2162,6 +2162,7 @@
     },
     "PinScreen": {
         "attemptsRemaining": "PIN errato. Hai {attemptsRemaining: number} tentativi rimanenti.",
+        "enterPin": "Inserisci il tuo codice PIN",
         "lockoutUnavailable": "Impossibile registrare in modo sicuro il tentativo fallito. Eseguo log out.",
         "oneAttemptRemaining": "PIN errato. 1 tentativo rimasto.",
         "pinUnreadable": "Impossibile verificare il PIN. Riprova.",

@@ -2162,6 +2162,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "Verkeerde PIN. {attemptsRemaining: number} probeerslae oor. ",
+    "enterPin": "Voer jou PIN-kode in",
     "lockoutUnavailable": "Kon nie die mislukte poging veilig aanteken nie. Teken uit.",
     "oneAttemptRemaining": "Verkeerde PIN, 1 probeerslag oor.",
     "pinUnreadable": "Kon nie jou PIN nagaan nie. Probeer asseblief weer.",

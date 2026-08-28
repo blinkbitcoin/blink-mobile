@@ -2162,6 +2162,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "Onjuiste pincode. {attemptsRemaining: number} resterende pogingen.",
+    "enterPin": "Voer uw pincode in",
     "lockoutUnavailable": "Kon de mislukte poging niet veilig vastleggen. Uitloggen.",
     "oneAttemptRemaining": "Onjuiste pincode. 1 poging over.",
     "pinUnreadable": "Kon je pincode niet controleren. Probeer het opnieuw.",

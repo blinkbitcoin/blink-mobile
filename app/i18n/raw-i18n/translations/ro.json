@@ -2162,6 +2162,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "PIN incorect. {attemptsRemaining: number} încercări rămase.",
+    "enterPin": "Introduceți codul PIN",
     "lockoutUnavailable": "Încercarea eșuată nu a putut fi înregistrată în siguranță. Deconectare.",
     "oneAttemptRemaining": "PIN incorect. 1 încercare rămasă.",
     "pinUnreadable": "Nu am putut verifica PIN-ul. Vă rugăm să încercați din nou.",

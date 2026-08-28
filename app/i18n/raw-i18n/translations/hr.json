@@ -2162,6 +2162,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "Netočan PIN. {attemptsRemaining: number} preostalih pokušaja.",
+    "enterPin": "Unesite svoj PIN kod",
     "lockoutUnavailable": "Neuspjeli pokušaj nije moguće sigurno zabilježiti. Odjava.",
     "oneAttemptRemaining": "Netočan PIN. Preostao je 1 pokušaj.",
     "pinUnreadable": "Nije moguće provjeriti vaš PIN. Pokušajte ponovno.",
