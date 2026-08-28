@@ -2139,10 +2139,7 @@ const en: BaseTranslation = {
     placePinHint: "Move the map to put the pin on the place",
     placeName: "Name",
     placeNameHint: "What the place is called",
-    placeAddress: "Address (optional)",
-    placeAddressHint: "Street and number",
     placeCategory: "Category",
-    chooseCategory: "Choose a category",
     placeLocation: "Location",
     changeLocation: "Change",
     placeReviewNote:

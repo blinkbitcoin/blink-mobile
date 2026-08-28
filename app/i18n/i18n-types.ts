@@ -6653,21 +6653,9 @@ type RootTranslation = {
 		 */
 		placeNameHint: string
 		/**
-		 * A​d​d​r​e​s​s​ ​(​o​p​t​i​o​n​a​l​)
-		 */
-		placeAddress: string
-		/**
-		 * S​t​r​e​e​t​ ​a​n​d​ ​n​u​m​b​e​r
-		 */
-		placeAddressHint: string
-		/**
 		 * C​a​t​e​g​o​r​y
 		 */
 		placeCategory: string
-		/**
-		 * C​h​o​o​s​e​ ​a​ ​c​a​t​e​g​o​r​y
-		 */
-		chooseCategory: string
 		/**
 		 * L​o​c​a​t​i​o​n
 		 */
@@ -20307,21 +20295,9 @@ export type TranslationFunctions = {
 		 */
 		placeNameHint: () => LocalizedString
 		/**
-		 * Address (optional)
-		 */
-		placeAddress: () => LocalizedString
-		/**
-		 * Street and number
-		 */
-		placeAddressHint: () => LocalizedString
-		/**
 		 * Category
 		 */
 		placeCategory: () => LocalizedString
-		/**
-		 * Choose a category
-		 */
-		chooseCategory: () => LocalizedString
 		/**
 		 * Location
 		 */
