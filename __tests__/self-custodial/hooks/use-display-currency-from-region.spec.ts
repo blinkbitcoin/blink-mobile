@@ -1,7 +1,10 @@
 import { renderHook, waitFor } from "@testing-library/react-native"
 
 import { useDisplayCurrencyFromRegion } from "@app/self-custodial/hooks/use-display-currency-from-region"
-import { PersistentState } from "@app/store/persistent-state/state-migrations"
+import {
+  defaultPersistentState,
+  PersistentState,
+} from "@app/store/persistent-state/state-migrations"
 import { DefaultAccountId } from "@app/types/wallet"
 
 const mockGetCurrencies = jest.fn<string[], []>()
@@ -38,9 +41,7 @@ describe("useDisplayCurrencyFromRegion", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockPersistentState = {
-      schemaVersion: 20,
-      galoyInstance: { id: "Main" },
-      galoyAuthToken: "",
+      ...defaultPersistentState,
       activeAccountId: SELF_CUSTODIAL_ID,
     }
     mockGetCurrencies.mockReturnValue(["CRC", "USD"])
