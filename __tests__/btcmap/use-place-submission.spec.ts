@@ -11,7 +11,6 @@ jest.mock("@app/graphql/generated", () => ({
 
 const submission: PlaceSubmission = {
   name: "Hope House",
-  address: "12 Main Street",
   category: "cafes",
   latitude: 13.496743,
   longitude: -89.439462,
@@ -31,15 +30,15 @@ describe("useSubmitBtcMapPlace", () => {
       data: {
         btcMapPlaceSubmit: {
           errors: [],
-          place: { id: "1", origin: "btcmap", externalId: "abc:def" },
+          place: { id: "1" },
         },
       },
     })
     const { submitPlace } = renderSubmit()
 
-    let submitted: boolean | undefined
+    let outcome: Awaited<ReturnType<typeof submitPlace>> | undefined
     await act(async () => {
-      submitted = await submitPlace(submission, submissionId)
+      outcome = await submitPlace(submission, submissionId)
     })
 
     expect(mockMutate).toHaveBeenCalledWith({
@@ -53,10 +52,13 @@ describe("useSubmitBtcMapPlace", () => {
         },
       },
     })
-    expect(submitted).toBe(true)
+    expect(outcome).toEqual({ submitted: true })
   })
 
-  it("is not done when the payload carries errors", async () => {
+  it("hands back the backend's reason when the payload carries errors", async () => {
+    // A refusal is not a dropped request: retrying it verbatim would never
+    // succeed, so the reason has to reach the user rather than "check your
+    // connection".
     mockMutate.mockResolvedValue({
       data: {
         btcMapPlaceSubmit: {
@@ -67,23 +69,23 @@ describe("useSubmitBtcMapPlace", () => {
     })
     const { submitPlace } = renderSubmit()
 
-    let submitted: boolean | undefined
+    let outcome: Awaited<ReturnType<typeof submitPlace>> | undefined
     await act(async () => {
-      submitted = await submitPlace(submission, submissionId)
+      outcome = await submitPlace(submission, submissionId)
     })
 
-    expect(submitted).toBe(false)
+    expect(outcome).toEqual({ submitted: false, message: "rate limited" })
   })
 
-  it("is not done when the request never got an answer", async () => {
+  it("reports no reason when the request never got an answer", async () => {
     mockMutate.mockRejectedValue(new Error("network down"))
     const { submitPlace } = renderSubmit()
 
-    let submitted: boolean | undefined
+    let outcome: Awaited<ReturnType<typeof submitPlace>> | undefined
     await act(async () => {
-      submitted = await submitPlace(submission, submissionId)
+      outcome = await submitPlace(submission, submissionId)
     })
 
-    expect(submitted).toBe(false)
+    expect(outcome).toEqual({ submitted: false, message: null })
   })
 })

@@ -12,17 +12,26 @@ gql`
       }
       place {
         id
-        origin
-        externalId
       }
     }
   }
 `
 
-export type SubmitPlace = (
+/**
+ * `submitted` means BTC Map took the place. When it did not, `message` is the
+ * backend's own reason for refusing — a rate limit, a level too low, a
+ * duplicate — and null when the request never got an answer at all, since the
+ * advice for each is different: the first is the place, the second the
+ * connection.
+ */
+type SubmitPlaceOutcome =
+  | { submitted: true }
+  | { submitted: false; message: string | null }
+
+type SubmitPlace = (
   submission: PlaceSubmission,
   submissionId: string,
-) => Promise<boolean>
+) => Promise<SubmitPlaceOutcome>
 
 /**
  * Sends a place to BTC Map through the Blink backend, which proxies it.
@@ -31,10 +40,6 @@ export type SubmitPlace = (
  * so the caller mints one per attempt at adding a place and reuses it for every
  * retry of that attempt — a resent request updates the original submission
  * rather than drawing the shop onto the map twice.
- *
- * True means BTC Map took the place; false covers both a refused payload and a
- * request that never got an answer, since to the person filling in the form
- * both are "it did not go, try again".
  */
 export const useSubmitBtcMapPlace = (): { submitPlace: SubmitPlace } => {
   const [btcMapPlaceSubmit] = useBtcMapPlaceSubmitMutation()
@@ -53,9 +58,12 @@ export const useSubmitBtcMapPlace = (): { submitPlace: SubmitPlace } => {
         },
       })
       const payload = data?.btcMapPlaceSubmit
-      return Boolean(payload && payload.errors.length === 0 && payload.place)
+      if (payload && payload.errors.length === 0 && payload.place) {
+        return { submitted: true }
+      }
+      return { submitted: false, message: payload?.errors[0]?.message ?? null }
     } catch {
-      return false
+      return { submitted: false, message: null }
     }
   }
 

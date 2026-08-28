@@ -269,8 +269,6 @@ mutation btcMapPlaceSubmit($input: BtcMapPlaceSubmitInput!) {
     }
     place {
       id
-      origin
-      externalId
       __typename
     }
     __typename

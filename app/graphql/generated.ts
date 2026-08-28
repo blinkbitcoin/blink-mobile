@@ -3282,7 +3282,7 @@ export type BtcMapPlaceSubmitMutationVariables = Exact<{
 }>;
 
 
-export type BtcMapPlaceSubmitMutation = { readonly __typename: 'Mutation', readonly btcMapPlaceSubmit: { readonly __typename: 'BtcMapPlacePayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly place?: { readonly __typename: 'BtcMapPlace', readonly id: string, readonly origin: string, readonly externalId: string } | null } };
+export type BtcMapPlaceSubmitMutation = { readonly __typename: 'Mutation', readonly btcMapPlaceSubmit: { readonly __typename: 'BtcMapPlacePayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly place?: { readonly __typename: 'BtcMapPlace', readonly id: string } | null } };
 
 export type MobileUpdateQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -4250,8 +4250,6 @@ export const BtcMapPlaceSubmitDocument = gql`
     }
     place {
       id
-      origin
-      externalId
     }
   }
 }
