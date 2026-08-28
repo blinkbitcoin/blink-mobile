@@ -155,6 +155,46 @@ describe("screen-security", () => {
     expect(mockUnregister).not.toHaveBeenCalled()
   })
 
+  /** Theme flip on a mounted screen: the effect releases the old lease and re-acquires
+   *  with the new color in the same tick, so the queued teardown cancels itself and no
+   *  fresh registration task would run on the lease count alone. The color the guard
+   *  was registered with must be tracked, or the native guard keeps the stale color. */
+  it("re-registers when a same-tick replace changes the background color", async () => {
+    const { acquireScreenSecurity } = loadModule()
+
+    const leaving = acquireScreenSecurity("#ffffff")
+    await leaving.ready
+
+    const releasePromise = leaving.release()
+    const arriving = acquireScreenSecurity("#000000")
+    await Promise.all([releasePromise, arriving.ready])
+
+    expect(mockUnregister).toHaveBeenCalledTimes(1)
+    expect(mockRegister).toHaveBeenCalledTimes(2)
+    expect(mockRegister).toHaveBeenLastCalledWith({ backgroundColor: "#000000" })
+  })
+
+  /** A color change can also land while the previous registration is still in flight;
+   *  the arriving lease's queued task must re-register behind it with the new color. */
+  it("applies a color change that arrives while a registration is in flight", async () => {
+    const { acquireScreenSecurity } = loadModule()
+    const pendingRegister = deferred<void>()
+    mockRegister.mockReturnValueOnce(pendingRegister.promise)
+
+    const leaving = acquireScreenSecurity("#ffffff")
+    await jest.advanceTimersByTimeAsync(0)
+    expect(mockRegister).toHaveBeenCalledWith({ backgroundColor: "#ffffff" })
+
+    const releasePromise = leaving.release()
+    const arriving = acquireScreenSecurity("#000000")
+    pendingRegister.resolve(undefined)
+    await Promise.all([releasePromise, arriving.ready])
+    await jest.advanceTimersByTimeAsync(0)
+
+    expect(mockRegister).toHaveBeenCalledTimes(2)
+    expect(mockRegister).toHaveBeenLastCalledWith({ backgroundColor: "#000000" })
+  })
+
   /** A lease acquired after release() but before the queued teardown runs cancels
    *  the teardown at the run-time lease-count check — the guard simply stays on. */
   it("cancels a queued teardown when a lease arrives before it runs", async () => {
