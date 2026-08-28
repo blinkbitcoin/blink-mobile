@@ -117,10 +117,26 @@ jest.mock("@app/hooks/use-is-self-custodial-account", () => ({
 }))
 
 // The backend refuses place submissions below account level two, so the
-// button's third gate is driven from here too.
+// button's third gate is driven from here too. The rest of the module is the
+// real thing — mocking it wholesale would leave AccountLevel and
+// LevelContextProvider undefined for everything else in the render tree.
 let mockIsAtLeastLevelTwo = true
 jest.mock("@app/graphql/level-context", () => ({
-  useLevel: () => ({ isAtLeastLevelTwo: mockIsAtLeastLevelTwo }),
+  ...jest.requireActual("@app/graphql/level-context"),
+  useLevel: () => ({
+    isAtLeastLevelZero: true,
+    isAtLeastLevelOne: true,
+    isAtLeastLevelTwo: mockIsAtLeastLevelTwo,
+    isAtLeastLevelThree: false,
+    currentLevel: "TWO",
+  }),
+}))
+
+// The kill switch's other half: off means no pins and no way to add one.
+let mockBtcMapPlacesEnabled = true
+jest.mock("@app/config/feature-flags-context", () => ({
+  ...jest.requireActual("@app/config/feature-flags-context"),
+  useRemoteConfig: () => ({ btcMapPlacesEnabled: mockBtcMapPlacesEnabled }),
 }))
 
 const mockToastShow = jest.fn()
@@ -186,7 +202,8 @@ beforeEach(() => {
   mockIsAuthed = true
   mockIsSelfCustodialAccount = false
   mockIsAtLeastLevelTwo = true
-  mockSubmitPlace.mockResolvedValue(true)
+  mockBtcMapPlacesEnabled = true
+  mockSubmitPlace.mockResolvedValue({ submitted: true })
   setPlaces()
   mockedNames.mockReturnValue(new Map())
 })
@@ -661,6 +678,45 @@ describe("MapComponent adding a place", () => {
     expect(queryByTestId("open-add-place")).toBeNull()
   })
 
+  it("does not offer it while the kill switch is off", async () => {
+    // The flag empties the map; leaving the button behind would keep
+    // submissions flowing to the backend, which is what the flag exists to stop.
+    mockBtcMapPlacesEnabled = false
+    const { queryByTestId, getByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-place-search")).toBeTruthy())
+    expect(queryByTestId("open-add-place")).toBeNull()
+  })
+
+  it("toasts the backend's own reason when the place is refused", async () => {
+    // A refusal is permanent — "check your connection" would send the user
+    // retrying a payload that can never go through.
+    mockSubmitPlace.mockResolvedValue({ submitted: false, message: "rate limited" })
+    const { getByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+    fireEvent.press(getByTestId("open-add-place"))
+    fireEvent.press(getByTestId("confirm-place-location"))
+
+    await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(true))
+    await act(async () => {
+      await (capturedAddPlaceProps?.onSubmit as (s: unknown) => Promise<void>)({
+        name: "Hope House",
+        category: "cafes",
+        latitude: REGION.latitude,
+        longitude: REGION.longitude,
+      })
+    })
+
+    await waitFor(() =>
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({ message: "rate limited" }),
+      ),
+    )
+    // Still open: the typed place is the user's to fix or abandon.
+    expect(capturedAddPlaceProps?.isVisible).toBe(true)
+  })
+
   it("hands the map over to the pin, and takes the reading controls off it", async () => {
     // Searching and filtering are about reading the map; neither belongs over
     // one that is being aimed.
@@ -740,7 +796,7 @@ describe("MapComponent adding a place", () => {
   })
 
   it("closes the form and says thanks once BTC Map has the place", async () => {
-    mockSubmitPlace.mockResolvedValue(true)
+    mockSubmitPlace.mockResolvedValue({ submitted: true })
     const { getByTestId } = renderMap()
 
     await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
@@ -772,7 +828,7 @@ describe("MapComponent adding a place", () => {
   it("keeps the form open when the place could not be sent, so a retry resends the same submission", async () => {
     // A retry of the same attempt must carry the same submissionId: that is
     // the idempotency key the backend deduplicates on.
-    mockSubmitPlace.mockResolvedValue(false)
+    mockSubmitPlace.mockResolvedValue({ submitted: false, message: null })
     const { getByTestId } = renderMap()
 
     await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
@@ -807,7 +863,7 @@ describe("MapComponent adding a place", () => {
   })
 
   it("mints a fresh submission id for a new attempt", async () => {
-    mockSubmitPlace.mockResolvedValue(false)
+    mockSubmitPlace.mockResolvedValue({ submitted: false, message: null })
     const { getByTestId } = renderMap()
     const submission = {
       name: "Hope House",

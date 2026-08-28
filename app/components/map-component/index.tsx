@@ -4,7 +4,6 @@ import { ActivityIndicator, LayoutChangeEvent, Pressable, View } from "react-nat
 import MapView, { Region } from "react-native-maps"
 import { PermissionStatus, RESULTS, request } from "react-native-permissions"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
-import { v4 as uuidv4 } from "uuid"
 
 import { useApolloClient } from "@apollo/client"
 import {
@@ -18,6 +17,7 @@ import {
   useSubmitBtcMapPlace,
 } from "@app/btcmap"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
+import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { updateMapLastCoords } from "@app/graphql/client-only-query"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useLevel } from "@app/graphql/level-context"
@@ -25,6 +25,7 @@ import { useIsSelfCustodialAccount } from "@app/hooks/use-is-self-custodial-acco
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { LOCATION_PERMISSION, getUserRegion } from "@app/screens/map-screen/functions"
 import { toastShow } from "@app/utils/toast"
+import { generateSecureRandomUUID } from "@app/utils/uuid"
 import { useFocusEffect } from "@react-navigation/native"
 import { isIOS } from "@rn-vui/base"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
@@ -88,11 +89,15 @@ export default function MapComponent({
   // behind it and rejects anything below account level two.
   // `useIsSelfCustodialAccount` rather than `useActiveWallet().isSelfCustodial`
   // so the button does not flash into view during the renders where the
-  // self-custodial SDK has not reported yet.
+  // self-custodial SDK has not reported yet. The kill switch gates it too:
+  // emptying the pins while submissions keep flowing to the backend is the
+  // outcome `btcMapPlacesEnabled` exists to avoid.
   const isAuthed = useIsAuthed()
   const isSelfCustodialAccount = useIsSelfCustodialAccount()
   const { isAtLeastLevelTwo } = useLevel()
-  const canAddPlace = isAuthed && !isSelfCustodialAccount && isAtLeastLevelTwo
+  const { btcMapPlacesEnabled } = useRemoteConfig()
+  const canAddPlace =
+    isAuthed && !isSelfCustodialAccount && isAtLeastLevelTwo && btcMapPlacesEnabled
 
   const mapViewRef = React.useRef<MapView>(null)
   const openSettingsModalRef = React.useRef<OpenSettingsElement>(null)
@@ -108,6 +113,12 @@ export default function MapComponent({
   const [isFilterOpen, setFilterOpen] = React.useState(false)
   // Placing the pin, then describing what is under it. Null is neither.
   const [addStep, setAddStep] = React.useState<"locating" | "describing" | null>(null)
+  const isAddingPlace = addStep !== null
+  const isLocatingPlace = addStep === "locating"
+  const isDescribingPlace = addStep === "describing"
+  // Read by the submit handler after its await, when `addStep` may have moved on.
+  const addStepRef = React.useRef(addStep)
+  addStepRef.current = addStep
   const [pinnedLocation, setPinnedLocation] = React.useState<LatLng | null>(null)
   // One attempt at adding a place. It keys the form, so what was typed survives
   // a trip back to the map to move the pin but never outlives the attempt it
@@ -115,7 +126,10 @@ export default function MapComponent({
   const [addSession, setAddSession] = React.useState(0)
   // The idempotency key of the attempt: the backend deduplicates submissions on
   // it, so every retry of one attempt reuses it and a new attempt mints one.
-  const submissionIdRef = React.useRef(uuidv4())
+  // Null until the attempt's first send — minting one is async, because a UUID's
+  // randomness has to come from the platform CSPRNG (see `utils/uuid.ts`), and
+  // an attempt abandoned before submitting never needs one.
+  const submissionIdRef = React.useRef<string | null>(null)
   // Empty means "everything", not "nothing" — see `placesInCategories`.
   const [categories, setCategories] = React.useState<ReadonlySet<PlaceCategory>>(
     () => new Set(),
@@ -297,7 +311,8 @@ export default function MapComponent({
     setSelectedPlace(null)
     setPinnedLocation(null)
     setAddSession((session) => session + 1)
-    submissionIdRef.current = uuidv4()
+    // The next attempt's id is minted on its first send — see the ref above.
+    submissionIdRef.current = null
     setAddStep("locating")
   }, [])
 
@@ -312,13 +327,29 @@ export default function MapComponent({
 
   const handlePlaceSubmit = React.useCallback(
     async (submission: PlaceSubmission) => {
-      const submitted = await submitPlace(submission, submissionIdRef.current)
+      let submissionId = submissionIdRef.current
+      if (!submissionId) {
+        submissionId = await generateSecureRandomUUID()
+        // No race to atomically avoid: the form's in-flight guard means only
+        // one send per attempt is ever between its first line and this one.
+        // eslint-disable-next-line require-atomic-updates
+        submissionIdRef.current = submissionId
+      }
+      const outcome = await submitPlace(submission, submissionId)
 
-      if (!submitted) {
+      // The send outlives the form when the modal is closed mid-flight; a
+      // response for an attempt that is no longer on screen gets neither a
+      // toast nor a state change.
+      if (addStepRef.current !== "describing") return
+
+      if (!outcome.submitted) {
         // The form stays open: what was typed is exactly what a retry should
-        // send, under the same submissionId.
+        // send, under the same submissionId. A refusal carries the backend's
+        // reason; a request that never got an answer gets the generic one.
         toastShow({
-          message: (translations) => translations.MapScreen.placeSubmissionFailed(),
+          message:
+            outcome.message ??
+            ((translations) => translations.MapScreen.placeSubmissionFailed()),
           LL,
         })
         return
@@ -434,7 +465,7 @@ export default function MapComponent({
 
       {/* Both are about reading the map, and neither belongs over a map that
           is being used to point at something. */}
-      {addStep === null && (
+      {!isAddingPlace && (
         <>
           <MapSearchBar
             topInset={insets.top}
@@ -457,7 +488,7 @@ export default function MapComponent({
         </>
       )}
 
-      {addStep === "locating" && (
+      {isLocatingPlace && (
         <PlaceLocator
           onConfirm={confirmPlaceLocation}
           onCancel={() => setAddStep(null)}
@@ -488,9 +519,7 @@ export default function MapComponent({
             // Centring on yourself and then nudging the pin onto your own shop
             // is the common way to place one, so this stays reachable while the
             // locator's bar has the bottom of the map.
-            bottom={
-              addStep === "locating" ? locatorBarTop(insets.bottom) + 10 : undefined
-            }
+            bottom={isLocatingPlace ? locatorBarTop(insets.bottom) + 10 : undefined}
           />
         )}
 
@@ -518,7 +547,7 @@ export default function MapComponent({
 
       <AddPlaceModal
         key={addSession}
-        isVisible={addStep === "describing"}
+        isVisible={isDescribingPlace}
         location={pinnedLocation}
         onSubmit={handlePlaceSubmit}
         onChangeLocation={() => setAddStep("locating")}
