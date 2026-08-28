@@ -160,8 +160,9 @@ const onSlot = <T>(
  * A refused blank counts as not gone. It is the conservative half of a real
  * trade-off, recorded at `runRemove`.
  *
- * The seeds still live only in the legacy store, so for them this is the whole
- * erase, and a retried removal relies on the same answer.
+ * A seed an earlier release stored stays here until a read moves it, and its
+ * removal clears this copy before it empties the new store, so a retried
+ * removal relies on the same answer.
  */
 export const eraseLegacyCopy = async (legacyKey: string): Promise<boolean> => {
   const erased = await legacyErase(legacyKey)
