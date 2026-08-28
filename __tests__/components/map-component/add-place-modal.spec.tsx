@@ -26,6 +26,11 @@ const renderModal = (props: Partial<React.ComponentProps<typeof AddPlaceModal>> 
     </ContextForScreen>,
   )
 
+const fillInForm = (getByTestId: (id: string) => unknown) => {
+  fireEvent.changeText(getByTestId("place-name-input") as never, "Hope House")
+  fireEvent.press(getByTestId("place-category-cafes") as never)
+}
+
 beforeEach(() => {
   jest.clearAllMocks()
   loadLocale("en")
@@ -60,6 +65,14 @@ describe("AddPlaceModal", () => {
     expect(onSubmit).not.toHaveBeenCalled()
   })
 
+  it("does not offer the catch-all category", () => {
+    // "other" is a filter bucket for unrecognised icons, not a description of
+    // a place — a submission under it would tell BTC Map nothing.
+    const { queryByTestId } = renderModal()
+
+    expect(queryByTestId("place-category-other")).toBeNull()
+  })
+
   it("says on the button that there is still something missing", async () => {
     // Disabled and translucent is the whole explanation, so it has to reach a
     // screen reader as well as an eye.
@@ -71,8 +84,7 @@ describe("AddPlaceModal", () => {
       }),
     )
 
-    fireEvent.changeText(getByTestId("place-name-input"), "Hope House")
-    fireEvent.press(getByTestId("place-category-cafes"))
+    fillInForm(getByTestId)
 
     await waitFor(() =>
       expect(getByTestId("submit-place").props.accessibilityState).toMatchObject({
@@ -85,18 +97,43 @@ describe("AddPlaceModal", () => {
     const { getByTestId } = renderModal()
 
     await waitFor(() => expect(getByTestId("place-name-input")).toBeTruthy())
-    fireEvent.changeText(getByTestId("place-name-input"), "Hope House")
-    fireEvent.changeText(getByTestId("place-address-input"), "Calle El Zonte")
-    fireEvent.press(getByTestId("place-category-cafes"))
+    fillInForm(getByTestId)
     fireEvent.press(getByTestId("submit-place"))
 
     await waitFor(() =>
       expect(onSubmit).toHaveBeenCalledWith({
         name: "Hope House",
-        address: "Calle El Zonte",
         category: "cafes",
         latitude: LOCATION.latitude,
         longitude: LOCATION.longitude,
+      }),
+    )
+  })
+
+  it("sends once no matter how often submit is tapped while a send is in flight", async () => {
+    // The send is a network round trip; without the guard each tap would fire
+    // its own mutation and stack its own toast.
+    let resolveSend: (() => void) | undefined
+    onSubmit.mockImplementation(
+      () =>
+        new Promise<void>((resolve) => {
+          resolveSend = resolve
+        }),
+    )
+    const { getByTestId } = renderModal()
+
+    await waitFor(() => expect(getByTestId("place-name-input")).toBeTruthy())
+    fillInForm(getByTestId)
+    fireEvent.press(getByTestId("submit-place"))
+    fireEvent.press(getByTestId("submit-place"))
+    fireEvent.press(getByTestId("submit-place"))
+
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1))
+
+    resolveSend?.()
+    await waitFor(() =>
+      expect(getByTestId("submit-place").props.accessibilityState).toMatchObject({
+        disabled: false,
       }),
     )
   })

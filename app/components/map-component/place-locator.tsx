@@ -1,7 +1,9 @@
 import React from "react"
-import { Pressable, View } from "react-native"
+import { View } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 
+import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { Text, makeStyles } from "@rn-vui/themed"
 
@@ -48,23 +50,20 @@ export const PlaceLocator: React.FC<Props> = ({ onConfirm, onCancel }) => {
       </View>
 
       <View style={styles.bar}>
-        <Pressable
+        <GaloySecondaryButton
           testID="cancel-add-place"
-          style={styles.cancel}
+          title={LL.common.cancel()}
           onPress={onCancel}
-          accessibilityRole="button"
-        >
-          <Text style={styles.cancelText}>{LL.common.cancel()}</Text>
-        </Pressable>
+          containerStyle={styles.cancelContainer}
+          buttonStyle={styles.cancelButton}
+        />
 
-        <Pressable
+        <GaloyPrimaryButton
           testID="confirm-place-location"
-          style={styles.confirm}
+          title={LL.common.next()}
           onPress={onConfirm}
-          accessibilityRole="button"
-        >
-          <Text style={styles.confirmText}>{LL.common.next()}</Text>
-        </Pressable>
+          containerStyle={styles.confirmContainer}
+        />
       </View>
     </View>
   )
@@ -114,30 +113,15 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: { bottomInset: number
     alignItems: "center",
     columnGap: 12,
   },
-  cancel: {
+  cancelContainer: {
     flex: 1,
-    minHeight: BAR_HEIGHT,
-    borderRadius: 25,
-    alignItems: "center",
-    justifyContent: "center",
+  },
+  // The design-system secondary button is transparent; over a map it needs its
+  // own surface.
+  cancelButton: {
     backgroundColor: colors.white,
   },
-  cancelText: {
-    fontSize: 17,
-    fontWeight: "700",
-    color: colors.primary,
-  },
-  confirm: {
+  confirmContainer: {
     flex: 2,
-    minHeight: BAR_HEIGHT,
-    borderRadius: 25,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: colors.primary,
-  },
-  confirmText: {
-    fontSize: 17,
-    fontWeight: "700",
-    color: colors.white,
   },
 }))

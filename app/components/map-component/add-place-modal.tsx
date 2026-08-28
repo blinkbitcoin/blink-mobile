@@ -12,15 +12,15 @@ import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 import {
   LatLng,
-  PLACE_ADDRESS_MAX_LENGTH,
-  PLACE_CATEGORIES,
   PLACE_NAME_MAX_LENGTH,
   PlaceCategory,
   PlaceSubmission,
+  SUBMITTABLE_PLACE_CATEGORIES,
   buildPlaceSubmission,
   formatCoordinates,
 } from "@app/btcmap"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
+import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
@@ -28,7 +28,7 @@ type Props = {
   isVisible: boolean
   /** Where the pin was dropped, which is what the place is being added at. */
   location: LatLng | null
-  onSubmit: (submission: PlaceSubmission) => void
+  onSubmit: (submission: PlaceSubmission) => void | Promise<void>
   /** Back to the map to move the pin, keeping whatever has been typed. */
   onChangeLocation: () => void
   onClose: () => void
@@ -39,7 +39,7 @@ type Props = {
  *
  * Full screen rather than a sheet over the map: the location question has
  * already been answered by this point, so there is nothing left to see behind
- * it, and three fields plus a keyboard do not fit under one.
+ * it, and the fields plus a keyboard do not fit under one.
  *
  * The name and the category are both required — see `buildPlaceSubmission` for
  * why the category is. Submit stays disabled rather than explaining itself
@@ -64,15 +64,24 @@ export const AddPlaceModal: React.FC<Props> = ({
   const styles = useStyles({ topInset: insets.top, bottomInset: insets.bottom })
 
   const [name, setName] = React.useState("")
-  const [address, setAddress] = React.useState("")
   const [category, setCategory] = React.useState<PlaceCategory | null>(null)
+  // Sending is a round trip. The guard keeps a second tap from firing a
+  // concurrent mutation, and the spinner is what tells the first tap landed.
+  const [isSubmitting, setSubmitting] = React.useState(false)
 
   const nameInputRef = React.useRef<TextInput>(null)
 
-  const submission = buildPlaceSubmission({ name, address, category, location })
+  const submission = buildPlaceSubmission({ name, category, location })
+  const isSubmitDisabled = !submission || isSubmitting
 
-  const submit = () => {
-    if (submission) onSubmit(submission)
+  const submit = async () => {
+    if (!submission || isSubmitting) return
+    setSubmitting(true)
+    try {
+      await onSubmit(submission)
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -143,34 +152,19 @@ export const AddPlaceModal: React.FC<Props> = ({
               placeholderTextColor={colors.grey2}
               maxLength={PLACE_NAME_MAX_LENGTH}
               autoCorrect={false}
-              returnKeyType="next"
+              returnKeyType="done"
               accessibilityLabel={LL.MapScreen.placeName()}
             />
           </View>
 
           <View style={styles.field}>
-            <Text style={styles.label}>{LL.MapScreen.placeAddress()}</Text>
-            <TextInput
-              testID="place-address-input"
-              style={styles.input}
-              value={address}
-              onChangeText={setAddress}
-              placeholder={LL.MapScreen.placeAddressHint()}
-              placeholderTextColor={colors.grey2}
-              maxLength={PLACE_ADDRESS_MAX_LENGTH}
-              autoCorrect={false}
-              returnKeyType="done"
-              accessibilityLabel={LL.MapScreen.placeAddress()}
-            />
-          </View>
-
-          <View style={styles.field}>
             <Text style={styles.label}>{LL.MapScreen.placeCategory()}</Text>
-            {/* Fifteen short labels, so they are all on screen and one tap
-                away. A picker behind a row would hide the choice being made
-                and cost two taps to make it. */}
+            {/* Short labels, so they are all on screen and one tap away. A
+                picker behind a row would hide the choice being made and cost
+                two taps to make it. `other` is not offered: it is a filter
+                bucket, not a description of a place. */}
             <View style={styles.chips}>
-              {PLACE_CATEGORIES.map((option) => {
+              {SUBMITTABLE_PLACE_CATEGORIES.map((option) => {
                 const isSelected = option === category
                 return (
                   <Pressable
@@ -200,16 +194,13 @@ export const AddPlaceModal: React.FC<Props> = ({
         </ScrollView>
 
         <View style={styles.footer}>
-          <Pressable
+          <GaloyPrimaryButton
             testID="submit-place"
-            style={[styles.submit, !submission && styles.submitDisabled]}
+            title={LL.common.submit()}
             onPress={submit}
-            disabled={!submission}
-            accessibilityRole="button"
-            accessibilityState={{ disabled: !submission }}
-          >
-            <Text style={styles.submitText}>{LL.common.submit()}</Text>
-          </Pressable>
+            disabled={isSubmitDisabled}
+            loading={isSubmitting}
+          />
         </View>
       </KeyboardAvoidingView>
     </Modal>
@@ -318,22 +309,5 @@ const useStyles = makeStyles(({ colors }, { topInset, bottomInset }: StyleProps)
     paddingHorizontal: 20,
     paddingTop: 12,
     paddingBottom: bottomInset + 12,
-  },
-  submit: {
-    minHeight: 50,
-    borderRadius: 25,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: colors.primary,
-  },
-  // Translucent rather than a grey fill, so the button that is about to become
-  // pressable is still recognisably the same button.
-  submitDisabled: {
-    opacity: 0.5,
-  },
-  submitText: {
-    fontSize: 17,
-    fontWeight: "700",
-    color: colors.white,
   },
 }))
