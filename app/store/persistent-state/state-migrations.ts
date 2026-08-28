@@ -261,8 +261,43 @@ type PersistentState_20 = {
   selfCustodialServerAccountModeByAccountId?: Record<string, AccountMode>
 }
 
-const migrate20ToCurrent = (state: PersistentState_20): Promise<PersistentState> =>
+type PersistentState_21 = {
+  schemaVersion: 21
+  galoyInstance: GaloyInstanceInput
+  galoyAuthToken: string
+  activeAccountId?: string
+  selfCustodialDefaultWalletCurrency?: "BTC" | "USD"
+  selfCustodialDefaultWalletCurrencyByAccountId?: Record<string, "BTC" | "USD">
+  selfCustodialDisplayCurrencyByAccountId?: Record<string, string>
+  selfCustodialLanguageByAccountId?: Record<string, string>
+  themeByAccountId?: Record<string, "system" | "light" | "dark">
+  defaultAccountModalShownByAccountId?: Record<string, boolean>
+  // Quiz progress for accounts the backend keeps no quiz record for (self-custodial).
+  completedQuizIdsByAccountId?: Record<string, string[]>
+  // "Always hide balance" setting. It used to live on the Apollo cache, which only
+  // restores when an auth token is present and is purged on logout, so the setting
+  // silently reset for self-custodial users.
+  alwaysHideBalance?: boolean
+  // The visibility the user last left the app in, consulted only when alwaysHideBalance
+  // is off. Device-wide, not per-account: hiding is about who can see the screen.
+  balanceHidden?: boolean
+  selfCustodialAccountModeByAccountId?: Record<string, AccountMode>
+  // Accounts whose Stable Balance was switched off by Anon Mode, not by the user.
+  stableBalanceAnonPausedByAccountId?: Record<string, boolean>
+  // The mode the LNURL server last confirmed, so a mode is pushed once rather than on
+  // every launch: each Enhanced push costs the server a paid country lookup.
+  selfCustodialServerAccountModeByAccountId?: Record<string, AccountMode>
+  // Last transaction seen per currency, for accounts whose Apollo cache is never
+  // restored from disk (self-custodial). Custodial keeps this in the cache itself.
+  txLastSeenByAccountId?: Record<string, { btcId: string; usdId: string }>
+}
+
+const migrate21ToCurrent = (state: PersistentState_21): Promise<PersistentState> =>
   Promise.resolve(state)
+
+/** Adds the per-account self-custodial last-seen transaction; nothing to backfill. */
+const migrate20ToCurrent = (state: PersistentState_20): Promise<PersistentState> =>
+  migrate21ToCurrent({ ...state, schemaVersion: 21 })
 
 /** Adds the optional per-account server-confirmed mode. Deliberately not backfilled from
  *  the local mode: an account that chose one before this version has never told the
@@ -428,6 +463,7 @@ type StateMigrations = {
   18: (state: PersistentState_18) => Promise<PersistentState>
   19: (state: PersistentState_19) => Promise<PersistentState>
   20: (state: PersistentState_20) => Promise<PersistentState>
+  21: (state: PersistentState_21) => Promise<PersistentState>
 }
 
 const stateMigrations: StateMigrations = {
@@ -449,12 +485,13 @@ const stateMigrations: StateMigrations = {
   18: migrate18ToCurrent,
   19: migrate19ToCurrent,
   20: migrate20ToCurrent,
+  21: migrate21ToCurrent,
 }
 
-export type PersistentState = PersistentState_20
+export type PersistentState = PersistentState_21
 
 export const defaultPersistentState: PersistentState = {
-  schemaVersion: 20,
+  schemaVersion: 21,
   galoyInstance: { id: "Main" },
   galoyAuthToken: "",
 }
@@ -510,7 +547,9 @@ export const migratePersistentState = async (
     | 16
     | 17
     | 18
-    | 19 = data.schemaVersion
+    | 19
+    | 20
+    | 21 = data.schemaVersion
   try {
     const migration = stateMigrations[schemaVersion]
     const state = await migration(data)

@@ -1,87 +1,56 @@
 import { useCallback, useMemo } from "react"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { useNavigation } from "@react-navigation/native"
-import { useApolloClient } from "@apollo/client"
 
 import type { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useDisplayCurrency } from "@app/hooks"
-import { toWalletAmount } from "@app/types/amounts"
 import {
-  TransactionFragment,
-  TxDirection,
-  WalletCurrency,
-  HomeAuthedDocument,
-  HomeAuthedQuery,
-  TxStatus,
-} from "@app/graphql/generated"
+  isAnnounceableTransaction,
+  useAccountTransactions,
+} from "@app/hooks/use-account-transactions"
+import { toWalletAmount } from "@app/types/amounts"
+import { TransactionFragment, TxDirection, WalletCurrency } from "@app/graphql/generated"
 
 type UnseenTxAmountBadgeParams = {
-  transactions?: TransactionFragment[] | null
+  transactions?: readonly TransactionFragment[] | null
+  isSelfCustodial?: boolean
   hasUnseenUsdTx: boolean
   hasUnseenBtcTx: boolean
 }
 
 export const useUnseenTxAmountBadge = ({
   transactions,
+  isSelfCustodial = false,
   hasUnseenUsdTx,
   hasUnseenBtcTx,
 }: UnseenTxAmountBadgeParams) => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { formatCurrency, formatMoneyAmount } = useDisplayCurrency()
   const { feeReimbursementMemo } = useRemoteConfig()
-  const client = useApolloClient()
 
-  const readCachedTransactions = useCallback((): ReadonlyArray<TransactionFragment> => {
-    const data = client.readQuery<HomeAuthedQuery>({ query: HomeAuthedDocument })
-    const pendingTransactions =
-      data?.me?.defaultAccount?.pendingIncomingTransactions || []
-    const transactionEdges = data?.me?.defaultAccount?.transactions?.edges
-    if (!transactionEdges?.length) return pendingTransactions
-
-    const settledTransactions = transactionEdges
-      .map((edge) => edge.node)
-      .filter(
-        (transaction) =>
-          transaction.status !== TxStatus.Pending ||
-          transaction.direction === TxDirection.Send,
-      )
-    if (pendingTransactions.length === 0) return settledTransactions
-
-    return [...pendingTransactions, ...settledTransactions]
-  }, [client])
+  const baseTransactions = useAccountTransactions({ isSelfCustodial, transactions })
 
   const latestUnseenTx = useMemo(() => {
-    const baseTransactions =
-      transactions && transactions.length > 0 ? transactions : readCachedTransactions()
-
-    if (!baseTransactions || baseTransactions.length === 0) return
+    if (baseTransactions.length === 0) return
     if (!hasUnseenBtcTx && !hasUnseenUsdTx) return
 
     const unseenCurrencies: WalletCurrency[] = []
     if (hasUnseenBtcTx) unseenCurrencies.push(WalletCurrency.Btc)
     if (hasUnseenUsdTx) unseenCurrencies.push(WalletCurrency.Usd)
 
-    const unseenTransactions = baseTransactions.filter((tx) => {
-      if (!unseenCurrencies.includes(tx.settlementCurrency)) return false
-      if (tx.settlementAmount === 0) return false
-      if (tx.memo?.toLowerCase() === feeReimbursementMemo.toLowerCase()) return false
-
-      return true
-    })
+    const unseenTransactions = baseTransactions.filter(
+      (tx) =>
+        unseenCurrencies.includes(tx.settlementCurrency) &&
+        isAnnounceableTransaction(tx, feeReimbursementMemo),
+    )
 
     if (unseenTransactions.length === 0) return
 
     return unseenTransactions.reduce((latest, tx) =>
       tx.createdAt > latest.createdAt ? tx : latest,
     )
-  }, [
-    transactions,
-    hasUnseenBtcTx,
-    hasUnseenUsdTx,
-    feeReimbursementMemo,
-    readCachedTransactions,
-  ])
+  }, [baseTransactions, hasUnseenBtcTx, hasUnseenUsdTx, feeReimbursementMemo])
 
   const unseenAmountText = useMemo(() => {
     if (!latestUnseenTx) return null
@@ -119,16 +88,22 @@ export const useUnseenTxAmountBadge = ({
     return direction === TxDirection.Receive ? `+${formatted}` : formatted
   }, [latestUnseenTx, formatCurrency, formatMoneyAmount])
 
-  const handleUnseenBadgePress = useCallback(() => {
-    if (!latestUnseenTx?.id) return
+  /** Takes the transaction to open rather than reading the newest unseen one: once a badge
+   *  is announced its transaction is already marked seen, so by the time it can be pressed
+   *  there is no unseen transaction left to derive the target from. */
+  const navigateToTransaction = useCallback(
+    (txid: string) => {
+      if (!txid) return
 
-    navigation.navigate("transactionDetail", { txid: latestUnseenTx.id })
-  }, [navigation, latestUnseenTx?.id])
+      navigation.navigate("transactionDetail", { txid })
+    },
+    [navigation],
+  )
 
   return {
     latestUnseenTx,
     unseenAmountText,
-    handleUnseenBadgePress,
+    navigateToTransaction,
     isOutgoing: latestUnseenTx?.direction === TxDirection.Send,
   }
 }
