@@ -1315,9 +1315,7 @@ describe("hide balance", () => {
   const renderWithHideAmount = (hideAmount: boolean) =>
     render(
       <ContextForScreen>
-        <HideAmountContextProvider
-          value={{ hideAmount, switchMemoryHideAmount: jest.fn() }}
-        >
+        <HideAmountContextProvider value={{ hideAmount, toggleHideAmount: jest.fn() }}>
           <Intraledger route={route} />
         </HideAmountContextProvider>
       </ContextForScreen>,
