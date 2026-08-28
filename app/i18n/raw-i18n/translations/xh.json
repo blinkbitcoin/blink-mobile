@@ -31,6 +31,8 @@
     "createError": "Ayikwazanga ukwenza isitshixo se-API. Nceda uzame kwakhona.",
     "revokeError": "Ayikwazanga ukurhoxisa isitshixo se-API. Nceda uzame kwakhona.",
     "loadError": "Ayikwazanga ukulayisha izitshixo zakho ze-API. Nceda uzame kamva.",
+    "discardSecretTitle": "Ukulahla le sitshixo se-API?",
+    "discardSecretBody": "Eli lelona xesha kuphela imfihlo eboniswa ngalo. Ukuba ushiya ngoku, isitshixo asisoze sabuyiswa kwaye kuya kufuneka udale esitsha.",
     "done": "Kwenziwe"
   },
   "GaloyAddressScreen": {

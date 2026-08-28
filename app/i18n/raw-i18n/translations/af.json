@@ -31,6 +31,8 @@
     "createError": "Kon nie die API-sleutel skep nie. Probeer weer.",
     "revokeError": "Kon nie die API-sleutel herroep nie. Probeer weer.",
     "loadError": "Kon nie jou API-sleutels laai nie. Probeer later weer.",
+    "discardSecretTitle": "Gooi hierdie API-sleutel weg?",
+    "discardSecretBody": "Dit is die enigste keer wat die geheim gewys word. As jy nou weggaan, kan die sleutel nie herwin word nie en sal jy 'n nuwe een moet skep.",
     "done": "Klaar"
   },
   "GaloyAddressScreen": {

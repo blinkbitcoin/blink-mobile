@@ -31,6 +31,8 @@
     "createError": "API llave mana rurayta atikurqanchu. Yapamanta ruray.",
     "revokeError": "API llave mana chinkachiyta atikurqanchu. Yapamanta ruray.",
     "loadError": "API llavekuna mana cargayta atikurqanchu. Qhipaman ruray.",
+    "discardSecretTitle": "¿Kay API llave-ta wikch'unkichu?",
+    "discardSecretBody": "Kayllam secreto rikuchisqa kanqa. Kunan ripuspaqa llave-ta manam kutichiy atinki, chaymi musuq-ta ruwanayki kanqa.",
     "done": "Tukusqa"
   },
   "GaloyAddressScreen": {
