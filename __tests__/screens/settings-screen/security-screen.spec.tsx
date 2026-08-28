@@ -6,6 +6,7 @@ import { ThemeProvider } from "@rn-vui/themed"
 
 import { SecurityScreen } from "@app/screens/settings-screen/security-screen"
 import theme from "@app/rne-theme/theme"
+import { PinScreenPurpose } from "@app/utils/enum"
 import { PersistentStateContext } from "@app/store/persistent-state"
 import { PersistentState } from "@app/store/persistent-state/state-migrations"
 import { AccountType } from "@app/types/wallet"
@@ -19,6 +20,8 @@ const mockUseFocusEffect = jest.fn()
 const mockGetIsBiometricsEnabled = jest.fn()
 const mockGetIsPinEnabled = jest.fn()
 const mockRemovePin = jest.fn()
+const mockSetIsBiometricsEnabled = jest.fn()
+const mockRemoveIsBiometricsEnabled = jest.fn()
 const mockClearPinFailureState = jest.fn()
 const mockEmailDelete = jest.fn()
 const mockRegistrationInitiate = jest.fn()
@@ -87,8 +90,15 @@ jest.mock("@app/utils/storage/secureStorage", () => ({
     getIsBiometricsEnabled: () => mockGetIsBiometricsEnabled(),
     getIsPinEnabled: () => mockGetIsPinEnabled(),
     removePin: () => mockRemovePin(),
+    setIsBiometricsEnabled: () => mockSetIsBiometricsEnabled(),
+    removeIsBiometricsEnabled: () => mockRemoveIsBiometricsEnabled(),
     clearPinFailureState: () => mockClearPinFailureState(),
   },
+}))
+
+const mockToastShow = jest.fn()
+jest.mock("@app/utils/toast", () => ({
+  toastShow: (...args: unknown[]) => mockToastShow(...args),
 }))
 
 jest.mock("@react-navigation/native", () => ({
@@ -119,6 +129,8 @@ jest.mock("@app/i18n/i18n-react", () => ({
       },
       SecurityScreen: {
         biometricTitle: () => "Biometric",
+        biometryNotAvailable: () => "Biometry not available",
+        biometryNotEnrolled: () => "Biometry not enrolled",
         biometricDescription: () => "Unlock with fingerprint or facial recognition.",
         hideBalanceTitle: () => "Always hide balance",
         pinTitle: () => "PIN code",
@@ -211,6 +223,8 @@ const applyDefaultMocks = () => {
   mockGetIsBiometricsEnabled.mockResolvedValue(false)
   mockGetIsPinEnabled.mockResolvedValue(false)
   mockRemovePin.mockResolvedValue(true)
+  mockSetIsBiometricsEnabled.mockResolvedValue(true)
+  mockRemoveIsBiometricsEnabled.mockResolvedValue(true)
   mockClearPinFailureState.mockResolvedValue(true)
   mockEmailDelete.mockResolvedValue({ data: {} })
   mockRegistrationInitiate.mockResolvedValue({
@@ -362,6 +376,139 @@ describe("SecurityScreen security score card", () => {
 
     await waitFor(() => expect(BiometricWrapper.authenticate).toHaveBeenCalled())
     expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  /** The signal is satisfied by biometrics OR a pin, so its action must not dead
+   *  end on a device that cannot do the first — it used to report a biometrics
+   *  error and leave the card with nothing the user could act on. */
+  describe("the app-lock signal when biometrics cannot be used", () => {
+    const biometrics = () =>
+      jest.requireMock("@app/utils/biometricAuthentication").default
+
+    it("opens the set-pin screen when there is no sensor", async () => {
+      biometrics().isSensorAvailable.mockResolvedValue(false)
+
+      const { getByTestId } = renderScreen()
+
+      fireEvent.press(getByTestId("security-score-appLock"))
+
+      await waitFor(() =>
+        expect(mockNavigate).toHaveBeenCalledWith("pin", {
+          screenPurpose: PinScreenPurpose.SetPin,
+        }),
+      )
+      expect(biometrics().authenticate).not.toHaveBeenCalled()
+      expect(mockToastShow).not.toHaveBeenCalled()
+    })
+
+    it("opens the set-pin screen when probing the sensor throws", async () => {
+      biometrics().isSensorAvailable.mockRejectedValue(new Error("no enrolment"))
+
+      const { getByTestId } = renderScreen()
+
+      fireEvent.press(getByTestId("security-score-appLock"))
+
+      await waitFor(() =>
+        expect(mockNavigate).toHaveBeenCalledWith("pin", {
+          screenPurpose: PinScreenPurpose.SetPin,
+        }),
+      )
+      expect(mockToastShow).not.toHaveBeenCalled()
+    })
+  })
+
+  describe("the device toggles either action can reach", () => {
+    const biometrics = () =>
+      jest.requireMock("@app/utils/biometricAuthentication").default
+
+    it("records biometrics once the OS prompt is passed", async () => {
+      biometrics().isSensorAvailable.mockResolvedValue(true)
+      biometrics().authenticate.mockImplementation(
+        (_description: string, onSuccess: () => void) => onSuccess(),
+      )
+
+      const { getByTestId } = renderScreen()
+
+      fireEvent(getByTestId("biometrics-switch"), "valueChange", true)
+
+      await waitFor(() => expect(mockSetIsBiometricsEnabled).toHaveBeenCalledTimes(1))
+    })
+
+    it("records nothing when the OS prompt is cancelled", async () => {
+      biometrics().isSensorAvailable.mockResolvedValue(true)
+      biometrics().authenticate.mockImplementation(
+        (_description: string, _onSuccess: () => void, onFailure: () => void) =>
+          onFailure(),
+      )
+
+      const { getByTestId } = renderScreen()
+
+      fireEvent(getByTestId("biometrics-switch"), "valueChange", true)
+
+      await waitFor(() => expect(biometrics().authenticate).toHaveBeenCalledTimes(1))
+      /** Cancelling is not an error the user needs told about — they did it. */
+      expect(mockSetIsBiometricsEnabled).not.toHaveBeenCalled()
+      expect(mockToastShow).not.toHaveBeenCalled()
+    })
+
+    it("turns biometrics back off from the switch", async () => {
+      const { getByTestId } = renderScreen()
+
+      fireEvent(getByTestId("biometrics-switch"), "valueChange", false)
+
+      await waitFor(() => expect(mockRemoveIsBiometricsEnabled).toHaveBeenCalledTimes(1))
+      expect(biometrics().authenticate).not.toHaveBeenCalled()
+      expect(mockToastShow).not.toHaveBeenCalled()
+    })
+
+    it("opens the set-pin screen from the pin switch", () => {
+      const { getByTestId } = renderScreen()
+
+      fireEvent(getByTestId("pin-switch"), "valueChange", true)
+
+      expect(mockNavigate).toHaveBeenCalledWith("pin", {
+        screenPurpose: PinScreenPurpose.SetPin,
+      })
+    })
+  })
+
+  /** The counterpart: the switch names biometrics, so it must still say why they
+   *  cannot be turned on rather than quietly substituting a pin. */
+  describe("the biometrics switch when biometrics cannot be used", () => {
+    const biometrics = () =>
+      jest.requireMock("@app/utils/biometricAuthentication").default
+
+    const toastedMessage = () =>
+      mockToastShow.mock.calls[0][0].message({
+        SecurityScreen: {
+          biometryNotAvailable: () => "noSensor",
+          biometryNotEnrolled: () => "notEnrolled",
+        },
+      })
+
+    it("explains a missing sensor instead of opening the set-pin screen", async () => {
+      biometrics().isSensorAvailable.mockResolvedValue(false)
+
+      const { getByTestId } = renderScreen()
+
+      fireEvent(getByTestId("biometrics-switch"), "valueChange", true)
+
+      await waitFor(() => expect(mockToastShow).toHaveBeenCalledTimes(1))
+      expect(toastedMessage()).toBe("noSensor")
+      expect(mockNavigate).not.toHaveBeenCalled()
+    })
+
+    it("explains a missing enrolment instead of opening the set-pin screen", async () => {
+      biometrics().isSensorAvailable.mockRejectedValue(new Error("no enrolment"))
+
+      const { getByTestId } = renderScreen()
+
+      fireEvent(getByTestId("biometrics-switch"), "valueChange", true)
+
+      await waitFor(() => expect(mockToastShow).toHaveBeenCalledTimes(1))
+      expect(toastedMessage()).toBe("notEnrolled")
+      expect(mockNavigate).not.toHaveBeenCalled()
+    })
   })
 
   it("turns hide balance on in place from its Set row", () => {
