@@ -84,6 +84,12 @@ jest.mock("@app/utils/storage/secureStorage", () => ({
   __esModule: true,
   default: {
     getMnemonicForAccount: (id: string) => mockGetMnemonicForAccount(id),
+    // Derived from the plain read so the fixtures below keep working; a spec
+    // that cares about failed-vs-absent overrides this directly.
+    readMnemonicWithStatus: async (id: string) => {
+      const mnemonic = await mockGetMnemonicForAccount(id)
+      return mnemonic ? { status: "found", value: mnemonic } : { status: "absent" }
+    },
     getMnemonicNetworkForAccount: (id: string) => mockGetMnemonicNetworkForAccount(id),
     getSessionProfiles: jest.fn().mockResolvedValue([]),
   },
