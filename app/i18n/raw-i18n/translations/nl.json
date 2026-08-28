@@ -31,6 +31,8 @@
     "createError": "Kan de API-sleutel niet aanmaken. Probeer het opnieuw.",
     "revokeError": "Kan de API-sleutel niet intrekken. Probeer het opnieuw.",
     "loadError": "Kan je API-sleutels niet laden. Probeer het later opnieuw.",
+    "discardSecretTitle": "Deze API-sleutel verwijderen?",
+    "discardSecretBody": "Dit is de enige keer dat het geheim wordt getoond. Als je nu weggaat, kan de sleutel niet worden hersteld en moet je een nieuwe aanmaken.",
     "done": "Klaar"
   },
   "GaloyAddressScreen": {

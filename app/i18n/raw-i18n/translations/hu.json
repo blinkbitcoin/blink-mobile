@@ -31,6 +31,8 @@
     "createError": "Az API-kulcs létrehozása nem sikerült. Próbálja újra.",
     "revokeError": "Az API-kulcs visszavonása nem sikerült. Próbálja újra.",
     "loadError": "Az API-kulcsok betöltése nem sikerült. Próbálja később.",
+    "discardSecretTitle": "Elveti ezt az API-kulcsot?",
+    "discardSecretBody": "A titok csak most jelenik meg. Ha most távozik, a kulcs nem állítható vissza, és újat kell létrehoznia.",
     "done": "Kész"
   },
   "GaloyAddressScreen": {
