@@ -186,6 +186,12 @@ export type RemoveThroughArgs = {
   readonly legacyKey: string
 }
 
+export type WriteThroughArgs = {
+  readonly slot: string
+  readonly value: string
+  readonly accessible: ACCESSIBLE
+}
+
 /**
  * The answer an abandoned task gives instead of its real one. It is not
  * normally observed — the caller was handed a timeout the moment the slot was
@@ -317,6 +323,28 @@ export const readThrough = async (args: ReadThroughArgs): Promise<SecureRead> =>
 export const removeThrough = async (args: RemoveThroughArgs): Promise<boolean> => {
   try {
     return await onSlot(args.slot, (isCurrent) => runRemove(args, isCurrent))
+  } catch {
+    return false
+  }
+}
+
+/**
+ * Writes a slot, taking its turn in the same per-slot queue as the reads and
+ * removes.
+ *
+ * The write still never reads through: it touches the new store only. What the
+ * queue buys is order. Unserialized, a read-through migration that has already
+ * fetched the legacy value lands its stale write on top of a newer one — a
+ * rotated token replaced by the one it rotated away from — and a write still in
+ * flight completes after a remove and brings the credential back. Both are the
+ * resurrection `removeThrough` exists to prevent, arriving through the one door
+ * that was not queued.
+ */
+export const writeThrough = async (args: WriteThroughArgs): Promise<boolean> => {
+  try {
+    return await onSlot(args.slot, () =>
+      secureWrite(args.slot, args.value, args.accessible),
+    )
   } catch {
     return false
   }

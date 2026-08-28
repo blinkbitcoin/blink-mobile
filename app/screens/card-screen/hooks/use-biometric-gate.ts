@@ -29,17 +29,29 @@ export const useBiometricGate = ({
   useEffect(() => {
     const gate = async () => {
       try {
-        if (onlyIfBiometricsEnabledRef.current) {
-          const biometricsEnabled = await KeyStoreWrapper.getIsBiometricsEnabled()
-          if (!biometricsEnabled) {
-            setAuthenticated(true)
-            return
-          }
+        /** Fails closed. This gate stands in front of the recovery phrase, so
+         *  a store that cannot say whether biometrics are on must not be read
+         *  as "off" and waved through — only a definite `no` skips the prompt. */
+        const biometrics = onlyIfBiometricsEnabledRef.current
+          ? await KeyStoreWrapper.readIsBiometricsEnabled()
+          : null
+        if (biometrics?.status === "no") {
+          setAuthenticated(true)
+          return
         }
+        const isSettingUnreadable = biometrics?.status === "failed"
 
         const sensorAvailable = await BiometricWrapper.isSensorAvailable()
         if (!sensorAvailable) {
-          if (requiredRef.current) {
+          /** An unreadable setting must not reach the wave-through either. The
+           *  slot's protection class leaves a window before the first unlock
+           *  where the read fails, and scoring that as "no gate needed" is the
+           *  same mistake the short-circuit above refuses to make — one step
+           *  later. Closing here costs a retry, not access: the failure clears
+           *  once the device is unlocked, whereas a definite `no` never reaches
+           *  this line and a genuinely disabled sensor still waves through. */
+          const shouldFailClosed = requiredRef.current || isSettingUnreadable
+          if (shouldFailClosed) {
             onFailureRef.current()
             return
           }

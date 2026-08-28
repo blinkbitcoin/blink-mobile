@@ -38,12 +38,28 @@ export const AuthenticationCheckScreen: React.FC = () => {
 
   useEffect(() => {
     ;(async () => {
-      const isPinEnabled = await KeyStoreWrapper.getIsPinEnabled()
+      /** Fails closed, like the resume gate: a read that could not answer is
+       *  treated as enabled, so a storage fault sends the user to a lock they
+       *  can pass rather than past a lock they cannot see. */
+      const pinRead = await KeyStoreWrapper.readIsPinEnabled()
+      const isPinEnabled = pinRead.status !== "no"
+      const biometricsRead = await KeyStoreWrapper.readIsBiometricsEnabled()
+      const isBiometricsEnabled = biometricsRead.status !== "no"
 
-      if (
-        (await BiometricWrapper.isSensorAvailable()) &&
-        (await KeyStoreWrapper.getIsBiometricsEnabled())
-      ) {
+      /**
+       * A lock we inferred rather than read is not one we can promise the user
+       * can pass: the PIN screen would compare against a secret it also cannot
+       * read, and it offers no way out. The authentication screen does — it
+       * carries the logout escape and still routes to the PIN — so an uncertain
+       * lock goes there instead of into a keypad with no exit.
+       */
+      const isLockUncertain =
+        pinRead.status === "failed" || biometricsRead.status === "failed"
+
+      const isBiometricPromptUsable =
+        (await BiometricWrapper.isSensorAvailable()) && isBiometricsEnabled
+
+      if (isBiometricPromptUsable || isLockUncertain) {
         navigation.replace("authentication", {
           screenPurpose: AuthenticationScreenPurpose.Authenticate,
           isPinEnabled,

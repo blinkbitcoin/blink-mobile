@@ -6,6 +6,7 @@ import {
   existsThrough,
   readThrough,
   removeThrough,
+  writeThrough,
 } from "@app/utils/storage/secure-store-migration"
 import {
   secureExists,
@@ -564,6 +565,89 @@ describe("per-slot serialization", () => {
     await jest.advanceTimersByTimeAsync(0)
 
     expect(mockedSecureRemove).not.toHaveBeenCalled()
+  })
+
+  /** The read-through has already fetched the legacy value when a fresh one is
+   *  saved. Unqueued, its migrating write lands last and the rotated credential
+   *  is replaced by the one it rotated away from. */
+  it("does not let a read-through migration overwrite a write issued after it", async () => {
+    const calls: string[] = []
+    mockedSecureRead.mockResolvedValue({ status: "absent" })
+    // Settles a few microtasks late, which is what lets an unqueued write slip
+    // in front of the migrating one. Resolving rather than hanging keeps the
+    // implementation from leaking a pending promise into the specs after it.
+    mockedLegacyRead.mockImplementation(async () => {
+      await Promise.resolve()
+      await Promise.resolve()
+      return { status: "found", value: "stale-token" }
+    })
+    mockedSecureWrite.mockImplementation(async (_slot, value) => {
+      calls.push(`write:${value}`)
+      return true
+    })
+
+    const read = readThrough(ARGS)
+    const write = writeThrough({
+      slot: ARGS.slot,
+      value: "rotated-token",
+      accessible: ARGS.accessible,
+    })
+
+    await read
+    expect(await write).toBe(true)
+
+    // Invocation order survives: the read was queued first, so its migrating
+    // write runs first, and the token saved afterwards is the one left behind.
+    expect(calls).toEqual(["write:stale-token", "write:rotated-token"])
+  })
+
+  /** The inverse race: a write still in flight when a logout removes the slot
+   *  must not complete afterwards and restore the session. */
+  it("does not let a write in flight complete after a remove queued behind it", async () => {
+    const calls: string[] = []
+    mockedSecureWrite.mockImplementation(async (_slot, value) => {
+      await Promise.resolve()
+      await Promise.resolve()
+      await Promise.resolve()
+      calls.push(`write:${value}`)
+      return true
+    })
+    mockedLegacyErase.mockImplementation(async () => {
+      calls.push("legacy:erase")
+      return true
+    })
+    mockedSecureRemove.mockImplementation(async () => {
+      calls.push("remove:new")
+      return true
+    })
+
+    const write = writeThrough({
+      slot: ARGS.slot,
+      value: "session-token",
+      accessible: ARGS.accessible,
+    })
+    const remove = removeThrough(REMOVE_ARGS)
+
+    expect(await write).toBe(true)
+    expect(await remove).toBe(true)
+
+    // The remove runs strictly after the slow write, so the slot ends empty
+    // rather than holding a credential the logout already cleared.
+    expect(calls).toEqual(["write:session-token", "legacy:erase", "remove:new"])
+  })
+
+  /** Same contract as the other public helpers: nothing here rejects, so a
+   *  thrown adapter reaches the caller as a plain false. */
+  it("reports a thrown write as false rather than rejecting", async () => {
+    mockedSecureWrite.mockRejectedValue(new Error("adapter blew up"))
+
+    const write = await writeThrough({
+      slot: ARGS.slot,
+      value: "session-token",
+      accessible: ARGS.accessible,
+    })
+
+    expect(write).toBe(false)
   })
 
   it("keeps an account id out of the timeout message", async () => {
