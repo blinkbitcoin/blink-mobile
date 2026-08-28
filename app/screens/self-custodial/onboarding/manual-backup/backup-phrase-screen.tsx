@@ -7,7 +7,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloyTertiaryButton } from "@app/components/atomic/galoy-tertiary-button"
-import { headerRightNoGlass } from "@app/components/header-no-glass"
+import { headerRightNoGlass, noHeaderRight } from "@app/components/header-no-glass"
 import { WarningCard } from "@app/components/warning-card"
 import { Screen } from "@app/components/screen"
 import { ScreenSecurityGate } from "@app/components/screen-security-gate"
@@ -71,6 +71,11 @@ const BackupPhraseContent: React.FC = () => {
         />
       )),
     )
+    /** Header options outlive the component that set them — the route keeps the
+     *  last value and unmounting the setter does not revert it. Without this the
+     *  gate would hide the phrase while leaving Copy live in the header, one tap
+     *  away from the clipboard, exactly while the guard is off. */
+    return () => navigation.setOptions(noHeaderRight)
   }, [navigation, copyLabel, handleCopy, styles])
 
   const renderWord = (word: string, index: number) => (

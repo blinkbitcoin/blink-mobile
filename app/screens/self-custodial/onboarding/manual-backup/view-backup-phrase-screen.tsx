@@ -52,7 +52,7 @@ const ViewBackupPhraseContent: React.FC = () => {
   useLayoutEffect(() => {
     if (!authenticated) {
       navigation.setOptions(noHeaderRight)
-      return
+      return undefined
     }
 
     navigation.setOptions(
@@ -68,6 +68,11 @@ const ViewBackupPhraseContent: React.FC = () => {
         />
       )),
     )
+    /** Header options outlive the component that set them — the route keeps the
+     *  last value and unmounting the setter does not revert it. Without this the
+     *  gate would hide the phrase while leaving Copy live in the header, one tap
+     *  away from the clipboard, exactly while the guard is off. */
+    return () => navigation.setOptions(noHeaderRight)
   }, [navigation, authenticated, copyLabel, handleCopy, styles])
 
   if (!authenticated) {
