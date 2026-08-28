@@ -133,11 +133,79 @@ export const findSelfCustodialAccountByMnemonic = async (
 
   const normalized = normalizeMnemonic(mnemonic)
   for (const entry of result.entries) {
-    const stored = await KeyStoreWrapper.getMnemonicForAccount(entry.id)
-    if (stored && normalizeMnemonic(stored) === normalized) {
+    const stored = await KeyStoreWrapper.readMnemonicWithStatus(entry.id)
+    // A read that could not answer is not "this is a different account". Scored
+    // that way, a restore of a wallet already on the device reports no match and
+    // the caller creates a second account for the same seed.
+    if (stored.status === "failed") {
+      const error =
+        stored.err instanceof Error
+          ? stored.err
+          : new Error(`Mnemonic read failed: ${stored.err}`)
+      return { status: StorageReadStatus.ReadFailed, error }
+    }
+    if (stored.status === "found" && normalizeMnemonic(stored.value) === normalized) {
       return { status: StorageReadStatus.Ok, id: entry.id }
     }
   }
 
   return { status: StorageReadStatus.Ok, id: null }
+}
+
+export type SweepResult =
+  | { status: "ok"; migrated: number }
+  | { status: "incomplete"; failures: number }
+
+/**
+ * Migrates the mnemonic of every account in the index, whether or not the user
+ * ever opens it.
+ *
+ * The read-through alone moves a value when something reads it, so an account
+ * left untouched between this release and the one that drops the legacy store
+ * would never migrate, and its mnemonic would become unreachable at that point.
+ * The index survives upgrades, so the accounts can be enumerated and there is no
+ * reason to leave that to chance.
+ *
+ * Migration is the side effect of the read: no new write path exists here, and
+ * a value already in the new store is answered from there without touching the
+ * legacy one. Safe to run repeatedly and alongside the lazy path, which is what
+ * lets a failure simply be retried on the next boot.
+ */
+export const sweepMnemonicMigration = async (): Promise<SweepResult> => {
+  const result = await readIndex()
+  // No index means no enumeration; the next boot reads it again. Reporting zero
+  // migrations here would look like a completed sweep over accounts never seen.
+  if (result.status === StorageReadStatus.ReadFailed) {
+    return { status: "incomplete", failures: 0 }
+  }
+
+  let migrated = 0
+  let failures = 0
+
+  for (const entry of result.entries) {
+    // Per account, so one unreadable slot cannot strand the accounts behind it.
+    const mnemonic = await KeyStoreWrapper.readMnemonicWithStatus(entry.id)
+    if (mnemonic.status === "failed") {
+      failures += 1
+      recordAppError(
+        mnemonic.err instanceof Error
+          ? mnemonic.err
+          : new Error(`Mnemonic sweep read failed: ${mnemonic.err}`),
+        { dedupKey: "storage-mnemonic-sweep-failed" },
+      )
+    } else {
+      if (mnemonic.status === "found") {
+        migrated += 1
+        // An upgrading install stored its mnemonics before that list existed,
+        // so this is the only place they get recorded — and without the record
+        // the reinstall wipe has no account to reach.
+        await KeyStoreWrapper.rememberMnemonicAccount(entry.id)
+      }
+      // The network marker rides along: it is read for its side effect only,
+      // and an account with no marker is not a failure.
+      await KeyStoreWrapper.getMnemonicNetworkForAccount(entry.id)
+    }
+  }
+
+  return failures > 0 ? { status: "incomplete", failures } : { status: "ok", migrated }
 }
