@@ -31,7 +31,11 @@ export const resolveDestination = async (
   session: SparkSession,
   lnAddressHostname: string,
 ): Promise<ParseDestinationResult> => {
-  const params = { ...rawParams, rawInput: rawParams.rawInput.trim() }
+  const params = {
+    ...rawParams,
+    rawInput: rawParams.rawInput.trim(),
+    lnAddressHostname,
+  }
   const { sdk, network } = session
   if (!sdk) {
     const parsed = await parseDestination(params)

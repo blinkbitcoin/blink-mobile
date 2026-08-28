@@ -370,6 +370,173 @@ describe("resolve lnurl destination", () => {
       )
     })
   })
+
+  /**
+   * A paycode QR points at the point-of-sale host, which declares the account under that
+   * host. A self-custodial sender declares no domains of its own, so nothing routes the
+   * destination over the ledger and the declared address is what the payer sees.
+   */
+  describe("with a paycode served by our point of sale", () => {
+    const paycodeDestinationParams = {
+      parsedLnurlDestination: {
+        paymentType: PaymentType.Lnurl,
+        valid: true,
+        lnurl: "lnurlpaycodestring",
+        isMerchant: false,
+      } as const,
+      lnurlDomains: [],
+      accountDefaultWalletQuery: jest.fn(),
+      myWalletIds: ["testwalletid"],
+    }
+
+    const resolvePaycode = async (lnAddressHostname?: string) => {
+      mockRequestPayServiceParams.mockResolvedValue(
+        manualMockLnUrlPayServiceResponse("alice@pay.blink.sv"),
+      )
+      mockGetParams.mockResolvedValue(manualMockLNURLResponse())
+
+      return resolveLnurlDestination({ ...paycodeDestinationParams, lnAddressHostname })
+    }
+
+    it("restates the address with the hostname the recipient's receive screen shows", async () => {
+      const destination = await resolvePaycode("blink.sv")
+
+      expect(destination).toEqual(
+        expect.objectContaining({
+          valid: true,
+          validDestination: expect.objectContaining({
+            paymentType: PaymentType.Lnurl,
+            lnurlParams: expect.objectContaining({ identifier: "alice@blink.sv" }),
+          }),
+        }),
+      )
+    })
+
+    it("leaves the rest of the service's answer untouched", async () => {
+      const destination = await resolvePaycode("blink.sv")
+
+      expect(destination.valid && destination.validDestination).toEqual(
+        expect.objectContaining({
+          lnurlParams: expect.objectContaining({
+            callback: "https://example.com/callback",
+            domain: "example.com",
+          }),
+        }),
+      )
+    })
+
+    it("keeps the declared address when no canonical hostname is known", async () => {
+      const destination = await resolvePaycode()
+
+      expect(destination.valid && destination.validDestination).toEqual(
+        expect.objectContaining({
+          lnurlParams: expect.objectContaining({ identifier: "alice@pay.blink.sv" }),
+        }),
+      )
+    })
+
+    it("recognises the instance regardless of how its hostname is cased", async () => {
+      const destination = await resolvePaycode("BLINK.SV")
+
+      expect(destination.valid && destination.validDestination).toEqual(
+        expect.objectContaining({
+          lnurlParams: expect.objectContaining({ identifier: "alice@BLINK.SV" }),
+        }),
+      )
+    })
+
+    it("leaves the address alone on an instance those hosts do not belong to", async () => {
+      const destination = await resolvePaycode("pay.staging.blink.sv")
+
+      expect(destination.valid && destination.validDestination).toEqual(
+        expect.objectContaining({
+          lnurlParams: expect.objectContaining({ identifier: "alice@pay.blink.sv" }),
+        }),
+      )
+    })
+
+    it("carries on when the service declared no address at all", async () => {
+      mockRequestPayServiceParams.mockResolvedValue(manualMockLnUrlPayServiceResponse(""))
+      mockGetParams.mockResolvedValue(manualMockLNURLResponse())
+
+      const destination = await resolveLnurlDestination({
+        ...paycodeDestinationParams,
+        lnAddressHostname: "blink.sv",
+      })
+
+      expect(destination.valid && destination.validDestination).toEqual(
+        expect.objectContaining({
+          paymentType: PaymentType.Lnurl,
+          lnurlParams: expect.objectContaining({ identifier: "" }),
+        }),
+      )
+    })
+  })
+
+  describe("with an address served by someone else", () => {
+    it("keeps the address exactly as that service declared it", async () => {
+      mockRequestPayServiceParams.mockResolvedValue(
+        manualMockLnUrlPayServiceResponse("alice@example.com"),
+      )
+      mockGetParams.mockResolvedValue(manualMockLNURLResponse())
+
+      const destination = await resolveLnurlDestination({
+        parsedLnurlDestination: {
+          paymentType: PaymentType.Lnurl,
+          valid: true,
+          lnurl: "alice@example.com",
+          isMerchant: false,
+        } as const,
+        lnurlDomains: [],
+        accountDefaultWalletQuery: jest.fn(),
+        myWalletIds: ["testwalletid"],
+        lnAddressHostname: "blink.sv",
+      })
+
+      expect(destination.valid && destination.validDestination).toEqual(
+        expect.objectContaining({
+          lnurlParams: expect.objectContaining({ identifier: "alice@example.com" }),
+        }),
+      )
+    })
+  })
+
+  describe("with a paycode a custodial sender can pay over the ledger", () => {
+    it("still recognises the account from the address the service declared", async () => {
+      mockRequestPayServiceParams.mockResolvedValue(
+        manualMockLnUrlPayServiceResponse("alice@pay.blink.sv"),
+      )
+      mockGetParams.mockResolvedValue(manualMockLNURLResponse())
+
+      const destination = await resolveLnurlDestination({
+        parsedLnurlDestination: {
+          paymentType: PaymentType.Lnurl,
+          valid: true,
+          lnurl: "lnurlpaycodestring",
+          isMerchant: false,
+        } as const,
+        lnurlDomains: ["pay.blink.sv"],
+        accountDefaultWalletQuery: jest.fn().mockResolvedValue({
+          data: {
+            accountDefaultWallet: {
+              __typename: "BtcWallet",
+              id: "recipientwalletid",
+              walletCurrency: "BTC",
+            },
+          },
+        }),
+        myWalletIds: ["testwalletid"],
+        lnAddressHostname: "blink.sv",
+      })
+
+      expect(destination.valid && destination.validDestination).toEqual(
+        expect.objectContaining({
+          paymentType: PaymentType.Intraledger,
+          handle: "alice",
+        }),
+      )
+    })
+  })
 })
 
 describe("create lnurl destination", () => {

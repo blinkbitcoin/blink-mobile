@@ -43,6 +43,8 @@ const baseParams = {
 }
 
 const lnAddressHostname = "blink.sv"
+/** The parser is handed the canonical hostname resolveDestination was called with. */
+const parsedParams = { ...baseParams, lnAddressHostname }
 const fakeSdk = { id: "sdk" } as never
 
 describe("resolveDestination", () => {
@@ -81,9 +83,9 @@ describe("resolveDestination", () => {
         lnAddressHostname,
       )
 
-      expect(mockParseDestination).toHaveBeenNthCalledWith(1, baseParams)
+      expect(mockParseDestination).toHaveBeenNthCalledWith(1, parsedParams)
       expect(mockParseDestination).toHaveBeenNthCalledWith(2, {
-        ...baseParams,
+        ...parsedParams,
         preferLnurlForInternalHandles: true,
       })
       expect(mockResolveUsername).not.toHaveBeenCalled()
@@ -114,7 +116,7 @@ describe("resolveDestination", () => {
         lnAddressHostname,
       )
 
-      expect(mockParseDestination).toHaveBeenCalledWith(baseParams)
+      expect(mockParseDestination).toHaveBeenCalledWith(parsedParams)
       expect(result).toBe(parsed)
     })
 
@@ -204,7 +206,7 @@ describe("resolveDestination", () => {
         lnAddressHostname,
       )
 
-      expect(mockParseDestination).toHaveBeenCalledWith(baseParams)
+      expect(mockParseDestination).toHaveBeenCalledWith(parsedParams)
       expect(mockResolveUsername).toHaveBeenCalledWith(
         parsed,
         lnAddressHostname,
@@ -233,7 +235,7 @@ describe("resolveDestination", () => {
       await resolveLnAddress("esaudeveloper@blink.sv")
 
       expect(mockParseDestination).toHaveBeenCalledWith({
-        ...baseParams,
+        ...parsedParams,
         rawInput: "esaudeveloper@blink.sv",
       })
     })
@@ -258,9 +260,28 @@ describe("resolveDestination", () => {
         SparkNetwork.Regtest,
       )
       expect(mockParseDestination).toHaveBeenCalledWith({
-        ...baseParams,
+        ...parsedParams,
         rawInput: "sparkrt1qabc",
       })
+    })
+
+    it("hands the parser the canonical hostname so a paycode of ours is spelled the way its owner receives it", async () => {
+      const parsed = { valid: true, validDestination: { paymentType: "Lnurl" } }
+
+      mockParseSparkAddress.mockResolvedValue(null)
+      mockParseDestination.mockResolvedValue(parsed)
+      mockResolveUsername.mockResolvedValue(parsed)
+      mockWrapDestination.mockReturnValue(parsed)
+
+      await resolveDestination(
+        baseParams,
+        { sdk: fakeSdk, network: SparkNetwork.Regtest },
+        lnAddressHostname,
+      )
+
+      expect(mockParseDestination).toHaveBeenCalledWith(
+        expect.objectContaining({ lnAddressHostname }),
+      )
     })
 
     it("wraps whatever resolveUsername returns, including invalid results", async () => {

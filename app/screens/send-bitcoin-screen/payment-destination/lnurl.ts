@@ -2,6 +2,7 @@ import axios from "axios"
 import { getParams } from "js-lnurl"
 import { requestPayServiceParams, LnUrlPayServiceResponse, FetcGetArgs } from "lnurl-pay"
 
+import { LNURL_DOMAINS } from "@app/config"
 import {
   AccountDefaultWalletLazyQueryHookResult,
   WalletCurrency,
@@ -13,6 +14,7 @@ import {
   isHttpsUrl,
   lud17Url,
 } from "@app/utils/lnurl"
+import { canonicalizeOwnLightningAddress } from "@app/utils/pay-links"
 import { LnurlPaymentDestination, PaymentType } from "@blinkbitcoin/blink-client"
 
 import { createLnurlPaymentDetails } from "../payment-details"
@@ -32,6 +34,7 @@ export type ResolveLnurlDestinationParams = {
   lnurlDomains: string[]
   accountDefaultWalletQuery: AccountDefaultWalletLazyQueryHookResult[0]
   myWalletIds: string[]
+  lnAddressHostname?: string
 }
 
 const SERVER_ERROR_STATUS = 500
@@ -84,11 +87,45 @@ const isLnurlServerFailure = (err: unknown): boolean => {
   return request !== undefined
 }
 
+/**
+ * The address a pay service declares is what the send flow shows the payer. Ours name the
+ * host that served them, which for a paycode is the point-of-sale front (`pay.blink.sv`)
+ * rather than the hostname the recipient's own receive screen displays. Restating it
+ * keeps both sides of the same payment spelling the account the same way; the callback,
+ * the domain and the raw service data are left untouched, so nothing about how the
+ * payment is made changes.
+ *
+ * The hosts that are ours are not the domains the scan was resolved with: those decide
+ * whether a destination is paid over the ledger, and a self-custodial account declares
+ * none of them so its sends always go out over lightning. They are the aliases of one
+ * service, so the restating only happens while the app is pointed at that same service:
+ * on another instance those hosts belong to someone else and are left alone.
+ */
+const withCanonicalIdentifier = (
+  lnurlPayParams: LnUrlPayServiceResponse,
+  lnAddressHostname: string | undefined,
+): LnUrlPayServiceResponse => {
+  const isTheAliasedInstance = LNURL_DOMAINS.some(
+    (ownDomain) => ownDomain.toLowerCase() === lnAddressHostname?.toLowerCase(),
+  )
+  if (!lnurlPayParams.identifier || !isTheAliasedInstance) return lnurlPayParams
+
+  const identifier = canonicalizeOwnLightningAddress({
+    lightningAddress: lnurlPayParams.identifier,
+    ownDomains: LNURL_DOMAINS,
+    lnAddressHostname,
+  })
+  if (identifier === lnurlPayParams.identifier) return lnurlPayParams
+
+  return { ...lnurlPayParams, identifier }
+}
+
 export const resolveLnurlDestination = async ({
   parsedLnurlDestination,
   lnurlDomains,
   accountDefaultWalletQuery,
   myWalletIds,
+  lnAddressHostname,
 }: ResolveLnurlDestinationParams): Promise<ParseDestinationResult> => {
   // TODO: Move all logic to galoy client or out of galoy client, currently lnurl pay is handled by galoy client
   // but lnurl withdraw is handled here
@@ -180,6 +217,8 @@ export const resolveLnurlDestination = async ({
         } as const
       }
 
+      // Reads the address the service declared, before the restating below, so which
+      // destinations are paid over the ledger is left exactly as it was.
       const maybeIntraledgerDestination = await tryGetIntraLedgerDestinationFromLnurl({
         lnurlDomains,
         lnurlPayParams,
@@ -191,7 +230,7 @@ export const resolveLnurlDestination = async ({
       }
 
       return createLnurlPaymentDestination({
-        lnurlParams: lnurlPayParams,
+        lnurlParams: withCanonicalIdentifier(lnurlPayParams, lnAddressHostname),
         ...parsedLnurlDestination,
       })
     } catch {

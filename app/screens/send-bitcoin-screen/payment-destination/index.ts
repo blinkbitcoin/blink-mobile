@@ -34,6 +34,7 @@ export const parseDestination = async ({
   inputSource,
   displayCurrency,
   preferLnurlForInternalHandles,
+  lnAddressHostname,
 }: ParseDestinationParams): Promise<ParseDestinationResult> => {
   const destination = rawInput.trim()
   const parsedDestination = parsePaymentDestination({
@@ -66,6 +67,7 @@ export const parseDestination = async ({
         lnurlDomains,
         accountDefaultWalletQuery,
         myWalletIds,
+        lnAddressHostname,
       })
     }
 
@@ -97,6 +99,7 @@ export const parseDestination = async ({
         lnurlDomains,
         accountDefaultWalletQuery,
         myWalletIds,
+        lnAddressHostname,
       })
     }
     case PaymentType.Lightning: {
@@ -119,6 +122,7 @@ export const parseDestination = async ({
             lnurlDomains,
             accountDefaultWalletQuery,
             myWalletIds,
+            lnAddressHostname,
           })
           if (lnurlDestination.valid) {
             return lnurlDestination

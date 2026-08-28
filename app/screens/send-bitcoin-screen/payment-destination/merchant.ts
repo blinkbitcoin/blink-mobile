@@ -34,6 +34,7 @@ export const resolveMerchantChoiceDestination = async ({
     lnurlDomains: params.lnurlDomains,
     accountDefaultWalletQuery: params.accountDefaultWalletQuery,
     myWalletIds: params.myWalletIds,
+    lnAddressHostname: params.lnAddressHostname,
   })
 
   return sdk ? wrapDestination(destination, sdk) : destination

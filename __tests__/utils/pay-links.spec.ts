@@ -1,4 +1,5 @@
 import {
+  canonicalizeOwnLightningAddress,
   extractLightningAddressUsername,
   getDonationButtonUrl,
   getLightningAddress,
@@ -111,5 +112,73 @@ describe("extractLightningAddressUsername", () => {
 
   it("preserves the username only when multiple @ are present", () => {
     expect(extractLightningAddressUsername("alice@bob@blink.sv")).toBe("alice")
+  })
+})
+
+describe("canonicalizeOwnLightningAddress", () => {
+  const ownDomains = ["blink.sv", "pay.blink.sv", "pay.bbw.sv"]
+  const canonicalize = (lightningAddress: string, lnAddressHostname = "blink.sv") =>
+    canonicalizeOwnLightningAddress({
+      lightningAddress,
+      ownDomains,
+      lnAddressHostname,
+    })
+
+  it("restates one of our own hosts with the canonical hostname", () => {
+    expect(canonicalize("alice@pay.blink.sv")).toBe("alice@blink.sv")
+  })
+
+  it("restates the legacy bitcoin beach host too", () => {
+    expect(canonicalize("alice@pay.bbw.sv")).toBe("alice@blink.sv")
+  })
+
+  it("leaves an address already on the canonical hostname untouched", () => {
+    expect(canonicalize("alice@blink.sv")).toBe("alice@blink.sv")
+  })
+
+  it("matches our hosts regardless of case", () => {
+    expect(canonicalize("alice@PAY.Blink.SV")).toBe("alice@blink.sv")
+  })
+
+  it("leaves an address served by anyone else exactly as declared", () => {
+    expect(canonicalize("alice@example.com")).toBe("alice@example.com")
+  })
+
+  it("leaves a host that merely ends with one of ours untouched", () => {
+    expect(canonicalize("alice@evil-pay.blink.sv.attacker.com")).toBe(
+      "alice@evil-pay.blink.sv.attacker.com",
+    )
+  })
+
+  it("leaves a value that is not an address untouched", () => {
+    expect(canonicalize("alice")).toBe("alice")
+  })
+
+  it("leaves a malformed address carrying several @ untouched", () => {
+    expect(canonicalize("alice@bob@pay.blink.sv")).toBe("alice@bob@pay.blink.sv")
+  })
+
+  it("leaves an address with no username untouched", () => {
+    expect(canonicalize("@pay.blink.sv")).toBe("@pay.blink.sv")
+  })
+
+  it("returns the address unchanged when no canonical hostname is known", () => {
+    expect(
+      canonicalizeOwnLightningAddress({
+        lightningAddress: "alice@pay.blink.sv",
+        ownDomains,
+        lnAddressHostname: undefined,
+      }),
+    ).toBe("alice@pay.blink.sv")
+  })
+
+  it("returns the address unchanged when no host is ours", () => {
+    expect(
+      canonicalizeOwnLightningAddress({
+        lightningAddress: "alice@pay.blink.sv",
+        ownDomains: [],
+        lnAddressHostname: "blink.sv",
+      }),
+    ).toBe("alice@pay.blink.sv")
   })
 })

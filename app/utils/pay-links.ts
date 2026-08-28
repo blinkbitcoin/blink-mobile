@@ -49,3 +49,35 @@ export const extractLightningAddressUsername = (
   const [username] = lightningAddress.split("@")
   return username || null
 }
+
+const LIGHTNING_ADDRESS_PARTS = 2
+
+/**
+ * One account answers on more than one of our own hosts: `pay.blink.sv` fronts the point
+ * of sale and `pay.bbw.sv` is the legacy Bitcoin Beach domain, and each one names itself
+ * in the address it serves back. The app spells an account with a single hostname
+ * everywhere it shows one, so an address that is ours is restated with that hostname.
+ * An address served by anyone else is left exactly as it was declared.
+ */
+export const canonicalizeOwnLightningAddress = ({
+  lightningAddress,
+  ownDomains,
+  lnAddressHostname,
+}: {
+  lightningAddress: string
+  ownDomains: string[]
+  lnAddressHostname: string | undefined
+}): string => {
+  if (!lnAddressHostname) return lightningAddress
+
+  const parts = lightningAddress.split("@")
+  if (parts.length !== LIGHTNING_ADDRESS_PARTS) return lightningAddress
+
+  const [username, domain] = parts
+  const isOwnDomain = ownDomains.some(
+    (ownDomain) => ownDomain.toLowerCase() === domain.toLowerCase(),
+  )
+  if (!username || !isOwnDomain) return lightningAddress
+
+  return `${username}@${lnAddressHostname}`
+}

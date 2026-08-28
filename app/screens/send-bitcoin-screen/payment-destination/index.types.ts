@@ -47,6 +47,8 @@ export type ParseDestinationParams = {
   inputSource?: InputSource
   displayCurrency?: string
   preferLnurlForInternalHandles?: boolean
+  /** Absent where the caller only handles destinations that can never be one of ours. */
+  lnAddressHostname?: string
 }
 
 export const DestinationDirection = {
