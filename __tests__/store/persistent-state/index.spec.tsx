@@ -20,6 +20,13 @@ jest.mock("@app/utils/storage", () => ({
   getAllKeys: (...args: unknown[]) => mockGetAllKeys(...args),
 }))
 
+const mockSweepMnemonicMigration = jest.fn()
+// Scheduled off the boot path once the state has loaded; its own spec covers
+// what it does, and here it must not add reports to the ones under assertion.
+jest.mock("@app/self-custodial/storage/account-index", () => ({
+  sweepMnemonicMigration: (...args: unknown[]) => mockSweepMnemonicMigration(...args),
+}))
+
 const mockGetActiveToken = jest.fn()
 const mockReadActiveToken = jest.fn()
 const mockSetActiveToken = jest.fn()
@@ -101,6 +108,7 @@ const TestConsumer: React.FC = () => {
 const setupStorageMockDefaults = () => {
   jest.clearAllMocks()
   storedStrings.clear()
+  mockSweepMnemonicMigration.mockResolvedValue({ status: "ok", migrated: 0 })
   mockSaveJson.mockResolvedValue(undefined)
   mockSaveString.mockResolvedValue(true)
   mockLoadString.mockImplementation(async (key: string) => storedStrings.get(key) ?? null)
