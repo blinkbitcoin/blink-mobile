@@ -1,11 +1,11 @@
 import * as React from "react"
 import {
   Alert,
-  Dimensions,
   Linking,
   Platform,
   Pressable,
   StyleSheet,
+  useWindowDimensions,
   View,
 } from "react-native"
 import { launchImageLibrary } from "react-native-image-picker"
@@ -46,8 +46,6 @@ import {
 import { testProps } from "@app/utils/testProps"
 
 import { resolveDestination } from "./payment-destination/resolve-destination"
-
-const { width: screenWidth } = Dimensions.get("window")
 
 /** Gaps kept between the scanner's own controls and whatever the system draws over the
  *  window. From Android 15 the window runs edge to edge, so the status bar and the
@@ -324,7 +322,11 @@ export const ScanningQRCodeScreen: React.FC = () => {
     [scannedCache, processInvoice],
   )
 
-  const styles = useStyles()
+  const { width, height } = useWindowDimensions()
+  /** The viewfinder is square, so it is bounded by the shorter edge. Sizing it off
+   *  the width put its horizontal borders off-screen once the screen could rotate. */
+  const shortestEdge = Math.min(width, height)
+  const styles = useStyles({ width, shortestEdge })
 
   const handleInvoicePaste = async () => {
     try {
@@ -488,55 +490,57 @@ export const ScanningQRCodeScreen: React.FC = () => {
   )
 }
 
-const useStyles = makeStyles(({ colors }) => ({
-  close: {
-    alignSelf: "flex-end",
-    height: 64,
-    marginRight: 16,
-    width: 64,
-  },
+const useStyles = makeStyles(
+  ({ colors }, { width, shortestEdge }: { width: number; shortestEdge: number }) => ({
+    close: {
+      alignSelf: "flex-end",
+      height: 64,
+      marginRight: 16,
+      width: 64,
+    },
 
-  openGallery: {
-    height: 64,
-    left: 32,
-    position: "absolute",
-    width: screenWidth,
-  },
+    openGallery: {
+      height: 64,
+      left: 32,
+      position: "absolute",
+      width,
+    },
 
-  rectangle: {
-    borderColor: colors.primary,
-    borderWidth: 2,
-    height: screenWidth * 0.75,
-    width: screenWidth * 0.75,
-  },
+    rectangle: {
+      borderColor: colors.primary,
+      borderWidth: 2,
+      height: shortestEdge * 0.75,
+      width: shortestEdge * 0.75,
+    },
 
-  rectangleContainer: {
-    alignItems: "center",
-    bottom: 0,
-    justifyContent: "center",
-    left: 0,
-    position: "absolute",
-    right: 0,
-    top: 0,
-  },
+    rectangleContainer: {
+      alignItems: "center",
+      bottom: 0,
+      justifyContent: "center",
+      left: 0,
+      position: "absolute",
+      right: 0,
+      top: 0,
+    },
 
-  iconClose: { position: "absolute", top: -2, color: colors._black },
+    iconClose: { position: "absolute", top: -2, color: colors._black },
 
-  iconGalery: { opacity: 0.8 },
+    iconGalery: { opacity: 0.8 },
 
-  iconGaleryPending: { opacity: 0.4 },
+    iconGaleryPending: { opacity: 0.4 },
 
-  iconClipboard: { opacity: 0.8, position: "absolute", bottom: "5%", right: "15%" },
+    iconClipboard: { opacity: 0.8, position: "absolute", bottom: "5%", right: "15%" },
 
-  permissionMissing: {
-    alignItems: "center",
-    flex: 1,
-    justifyContent: "center",
-    rowGap: 32,
-  },
+    permissionMissing: {
+      alignItems: "center",
+      flex: 1,
+      justifyContent: "center",
+      rowGap: 32,
+    },
 
-  permissionMissingText: {
-    width: "80%",
-    textAlign: "center",
-  },
-}))
+    permissionMissingText: {
+      width: "80%",
+      textAlign: "center",
+    },
+  }),
+)

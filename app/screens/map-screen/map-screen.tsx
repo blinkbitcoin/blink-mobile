@@ -1,7 +1,7 @@
 import { CountryCode } from "libphonenumber-js/mobile"
 import * as React from "react"
 // eslint-disable-next-line react-native/split-platform-components
-import { Alert, Dimensions } from "react-native"
+import { Alert, useWindowDimensions } from "react-native"
 import { Region } from "react-native-maps"
 import { check, PermissionStatus, RESULTS } from "react-native-permissions"
 
@@ -24,9 +24,13 @@ const EL_ZONTE_COORDS = {
 }
 
 // essentially calculates zoom for location being set based on country
-const { height, width } = Dimensions.get("window")
 const LATITUDE_DELTA = 15 // <-- decrease for more zoom
-const LONGITUDE_DELTA = LATITUDE_DELTA * (width / height)
+
+/** Read per render rather than once at import: the window is not a constant on a device
+ *  that rotates, and a span measured against the wrong aspect ratio zooms to the wrong
+ *  area. */
+const longitudeDeltaFor = (width: number, height: number): number =>
+  LATITUDE_DELTA * (width / height)
 
 Geolocation.setRNConfiguration({
   skipPermissionRequests: true,
@@ -44,6 +48,8 @@ export const MapScreen: React.FC = () => {
   const { countryCode, loading } = useDeviceLocation()
   const { data: lastRegion, error: lastRegionError } = useRegionQuery()
   const { LL } = useI18nContext()
+  const { width, height } = useWindowDimensions()
+  const longitudeDelta = longitudeDeltaFor(width, height)
 
   const [initialLocation, setInitialLocation] = React.useState<Region>()
   const [userCoords, setUserCoords] = React.useState<LatLng>()
@@ -110,7 +116,7 @@ export const MapScreen: React.FC = () => {
             latitude: countryCoords.lat,
             longitude: countryCoords.lng,
             latitudeDelta: LATITUDE_DELTA,
-            longitudeDelta: LONGITUDE_DELTA,
+            longitudeDelta,
           }
           setInitialLocation(region)
           // backup if country code is not recognized
@@ -119,7 +125,7 @@ export const MapScreen: React.FC = () => {
         }
       }
     }
-  }, [isInitializing, countryCode, lastRegion, loading, initialLocation])
+  }, [isInitializing, countryCode, lastRegion, loading, initialLocation, longitudeDelta])
 
   return (
     <Screen edges={["left", "right"]}>
