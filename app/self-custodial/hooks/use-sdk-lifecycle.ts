@@ -265,11 +265,20 @@ export const useSdkLifecycle = (
     }
 
     const initialize = async () => {
-      const mnemonic = await KeyStoreWrapper.getMnemonicForAccount(accountId)
-      if (!mnemonic) {
+      const stored = await KeyStoreWrapper.readMnemonicWithStatus(accountId)
+      // A keystore that could not answer is not an account without a wallet.
+      // Unavailable is terminal for this account, so scoring a transient
+      // failure as such tells the user their wallet is gone; Error is the
+      // status the retry and backoff wiring already listens on.
+      if (stored.status === "failed") {
+        if (mounted) setStatus(ActiveWalletStatus.Error)
+        return
+      }
+      if (stored.status === "absent") {
         if (mounted) setStatus(ActiveWalletStatus.Unavailable)
         return
       }
+      const mnemonic = stored.value
 
       const networkValid = await validateStoredNetwork(accountId, network)
       if (!networkValid) {
