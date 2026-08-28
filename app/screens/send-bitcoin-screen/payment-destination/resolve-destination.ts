@@ -46,9 +46,21 @@ export const resolveDestination = async (
     return wrapDestination(resolveSparkDestination(sparkParsed), sdk)
   }
 
-  const parsed = await parseDestination(params)
+  /**
+   * A self-custodial wallet has no token for the intraledger mutation a Blink handle
+   * would otherwise resolve to, so its own accounts are paid over lightning like
+   * anyone else's. Its domains are declared for the same reason the flag is set: they
+   * are what lets a Blink pay code be recognised as naming an account rather than
+   * being fetched as an opaque lnurl, which is what showed the pay host on screen.
+   */
+  const selfCustodialParams = {
+    ...params,
+    preferLnurlForInternalHandles: true,
+    canPayIntraledger: false,
+  }
+  const parsed = await parseDestination(selfCustodialParams)
   const destination = await resolveUsername(parsed, lnAddressHostname, (rawInput) =>
-    parseDestination({ ...params, rawInput }),
+    parseDestination({ ...selfCustodialParams, rawInput }),
   )
   return wrapDestination(destination, sdk)
 }
