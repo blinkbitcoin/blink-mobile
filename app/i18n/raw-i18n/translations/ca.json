@@ -31,6 +31,8 @@
     "createError": "No s'ha pogut crear la clau API. Torna-ho a provar.",
     "revokeError": "No s'ha pogut revocar la clau API. Torna-ho a provar.",
     "loadError": "No s'han pogut carregar les teves claus API. Torna-ho a provar més tard.",
+    "discardSecretTitle": "Descartar aquesta clau d'API?",
+    "discardSecretBody": "Aquesta és l'única vegada que es mostra el secret. Si surts ara, la clau no es podrà recuperar i hauràs de crear-ne una de nova.",
     "done": "Fet"
   },
   "GaloyAddressScreen": {

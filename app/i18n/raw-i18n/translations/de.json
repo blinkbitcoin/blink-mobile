@@ -31,6 +31,8 @@
         "createError": "Der API-Schlüssel konnte nicht erstellt werden. Bitte versuche es erneut.",
         "revokeError": "Der API-Schlüssel konnte nicht widerrufen werden. Bitte versuche es erneut.",
         "loadError": "Deine API-Schlüssel konnten nicht geladen werden. Bitte versuche es später erneut.",
+        "discardSecretTitle": "Diesen API-Schlüssel verwerfen?",
+        "discardSecretBody": "Das Geheimnis wird nur dieses eine Mal angezeigt. Wenn du jetzt gehst, kann der Schlüssel nicht wiederhergestellt werden und du musst einen neuen erstellen.",
         "done": "Fertig"
     },
     "GaloyAddressScreen": {
