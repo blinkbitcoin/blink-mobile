@@ -23,8 +23,8 @@ import { type Challenge, isValidChallenges } from "../utils"
 
 type ConfirmRouteProp = RouteProp<RootStackParamList, "selfCustodialBackupPhraseConfirm">
 
-/** A stable empty fallback, so the one frame rendered before the redirect does not feed
- *  useBackupConfirm a fresh array identity on every render. */
+/** A stable empty fallback, so a params read that somehow bypasses the wrapper's
+ *  redirect does not feed useBackupConfirm a fresh array identity on every render. */
 const EMPTY_CHALLENGES: Challenge[] = []
 
 /** The gate mounts this only once the screenshot guard is actually on — the typed
@@ -35,30 +35,15 @@ const BackupPhraseConfirmContent: React.FC = () => {
   const {
     theme: { colors },
   } = useTheme()
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
-  /** Deep links and navigation-state rehydration can deliver missing or malformed params
-   *  despite the route type; a bare destructure here threw into the app-wide ErrorBoundary,
-   *  replacing the whole navigation tree (#4070). A confirm screen without its challenges
-   *  is dead — nothing to type — so it redirects to the first backup step with `replace`,
-   *  keeping the broken route out of the back stack. */
+  // Malformed params never reach this component — the screen wrapper below
+  // redirects before the gate mounts; the fallback is only a defensive default.
   const { params } = useRoute<ConfirmRouteProp>()
   const challengesParam = params?.challenges
   const challenges = isValidChallenges(challengesParam)
     ? challengesParam
     : EMPTY_CHALLENGES
   const successMessage = params?.successMessage
-  const hasValidChallenges = challenges.length > 0
-
-  useEffect(() => {
-    if (hasValidChallenges) return
-    reportError(
-      "Backup confirm route params missing",
-      new Error("Route delivered no valid challenges"),
-      { dedupKey: "backup-confirm-params-missing", alwaysRecord: true },
-    )
-    navigation.replace("selfCustodialBackupPhrase", { step: PhraseStep.First })
-  }, [hasValidChallenges, navigation])
 
   const { loading: checkpointLoading } = useMigrationCheckpoint()
   const completeBackup = useCompleteBackup()
@@ -187,11 +172,42 @@ const BackupPhraseConfirmContent: React.FC = () => {
   )
 }
 
-export const BackupPhraseConfirmScreen: React.FC = () => (
-  <ScreenSecurityGate>
-    <BackupPhraseConfirmContent />
-  </ScreenSecurityGate>
-)
+/** Deep links and navigation-state rehydration can deliver missing or malformed params
+ *  despite the route type; a bare destructure in the content threw into the app-wide
+ *  ErrorBoundary, replacing the whole navigation tree (#4070). A confirm screen without
+ *  its challenges is dead — nothing to type — so it redirects to the first backup step
+ *  with `replace`, keeping the broken route out of the back stack.
+ *
+ *  This runs ahead of the gate, not inside the gated content: on a device where
+ *  registration keeps failing the content never mounts, and a redirect living behind
+ *  the gate would leave the user stuck on the guard's Retry/Back view with no way
+ *  back to the self-heal. */
+const RedirectToBackupStart: React.FC = () => {
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+
+  useEffect(() => {
+    reportError(
+      "Backup confirm route params missing",
+      new Error("Route delivered no valid challenges"),
+      { dedupKey: "backup-confirm-params-missing", alwaysRecord: true },
+    )
+    navigation.replace("selfCustodialBackupPhrase", { step: PhraseStep.First })
+  }, [navigation])
+
+  return null
+}
+
+export const BackupPhraseConfirmScreen: React.FC = () => {
+  const { params } = useRoute<ConfirmRouteProp>()
+
+  if (!isValidChallenges(params?.challenges)) return <RedirectToBackupStart />
+
+  return (
+    <ScreenSecurityGate>
+      <BackupPhraseConfirmContent />
+    </ScreenSecurityGate>
+  )
+}
 
 const useStyles = makeStyles(({ colors }) => ({
   container: {
