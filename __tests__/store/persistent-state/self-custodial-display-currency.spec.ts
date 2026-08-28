@@ -7,14 +7,14 @@ import { PersistentState } from "@app/store/persistent-state/state-migrations"
 import { DefaultAccountId } from "@app/types/wallet"
 
 const baseState: PersistentState = {
-  schemaVersion: 20,
+  schemaVersion: 21,
   galoyInstance: { id: "Main" },
   galoyAuthToken: "",
 }
 
 describe("getSelfCustodialDisplayCurrency", () => {
-  it("returns USD as the ultimate default", () => {
-    expect(getSelfCustodialDisplayCurrency(baseState)).toBe("USD")
+  it("returns undefined when nothing has been stored", () => {
+    expect(getSelfCustodialDisplayCurrency(baseState)).toBeUndefined()
   })
 
   it("returns the per-account map value when set for the active id", () => {
@@ -50,33 +50,43 @@ describe("getSelfCustodialDisplayCurrency", () => {
     ).toBe("GBP")
   })
 
-  it("falls back to USD when map is absent for the active id", () => {
+  it("returns undefined when the map holds nothing for the active id", () => {
     const state: PersistentState = {
       ...baseState,
       activeAccountId: "self-custodial-new",
       selfCustodialDisplayCurrencyByAccountId: { "self-custodial-other": "EUR" },
     }
 
+    expect(getSelfCustodialDisplayCurrency(state)).toBeUndefined()
+  })
+
+  it("tells a deliberate USD apart from an unanswered preference", () => {
+    const state: PersistentState = {
+      ...baseState,
+      activeAccountId: "self-custodial-1",
+      selfCustodialDisplayCurrencyByAccountId: { "self-custodial-1": "USD" },
+    }
+
     expect(getSelfCustodialDisplayCurrency(state)).toBe("USD")
   })
 
-  it("returns USD when active is custodial", () => {
+  it("returns undefined when active is custodial", () => {
     const state: PersistentState = {
       ...baseState,
       activeAccountId: DefaultAccountId.Custodial,
       selfCustodialDisplayCurrencyByAccountId: { "self-custodial-1": "EUR" },
     }
 
-    expect(getSelfCustodialDisplayCurrency(state)).toBe("USD")
+    expect(getSelfCustodialDisplayCurrency(state)).toBeUndefined()
   })
 
-  it("returns USD when there is no active account", () => {
+  it("returns undefined when there is no active account", () => {
     const state: PersistentState = {
       ...baseState,
       selfCustodialDisplayCurrencyByAccountId: { "self-custodial-1": "EUR" },
     }
 
-    expect(getSelfCustodialDisplayCurrency(state)).toBe("USD")
+    expect(getSelfCustodialDisplayCurrency(state)).toBeUndefined()
   })
 })
 

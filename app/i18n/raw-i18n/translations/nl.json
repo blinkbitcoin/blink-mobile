@@ -2265,7 +2265,9 @@
   "ScanningQRCodeScreen": {
     "invalidContent": "We hebben gevonden:\n\n{found: string}\n\nDit is geen geldig Bitcoin-adres of Lightning-factuur",
     "expiredContent": "We hebben gevonden:\n\n{found: string}\n\nDeze factuur is verlopen",
+    "unresolvedContent": "We vonden:\n\n{found: string}\n\nWe konden deze code niet verwerken. Mogelijk is hij verlopen of is de dienst tijdelijk niet beschikbaar. Vraag om een nieuwe code of probeer het later opnieuw.",
     "invalidTitle": "Ongeldige QR-code",
+    "unresolvedTitle": "Code niet beschikbaar",
     "openLinkTitle": "Link openen",
     "confirmOpenLink": "Weet je zeker dat je deze link wilt openen?",
     "noQrCode": "We konden geen QR-code in de afbeelding vinden",
@@ -2340,6 +2342,7 @@
     "selfPaymentError": "{lnAddress: string} is uw {bankName: string} adres.",
     "selfPaymentAdvice": "Als u geld wilt overmaken naar een andere rekening waarvan u de eigenaar bent, kunt u in plaats daarvan een factuur-, LN- of BTC-adres gebruiken.",
     "lnAddressError": "We kunnen dit Lightning-adres niet bereiken. Als u zeker weet dat het bestaat, kunt u het later opnieuw proberen.",
+    "lnurlServiceError": "We konden deze code niet verwerken. Mogelijk is hij verlopen of is de dienst tijdelijk niet beschikbaar.",
     "lnAddressAdvice": "Zorg ervoor dat de spelling juist is of vraag de ontvanger in plaats daarvan om een factuur of BTC-adres.",
     "unknownLightning": "We kunnen dit Lightning-adres niet ontleden. Probeer het opnieuw.",
     "unknownOnchain": "We kunnen dit Bitcoin-adres niet ontleden. Probeer het opnieuw.",

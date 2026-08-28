@@ -435,6 +435,75 @@ describe("ScanningQRCodeScreen", () => {
     })
   })
 
+  /**
+   * A merchant till code resolves through an LNURL service, and that service failing
+   * says nothing about the code. Reporting it as an invalid QR sent a shopper, and the
+   * ticket they filed, after a parser bug that was not there.
+   */
+  it("tells the user the code could not be processed when the lnurl service fails", async () => {
+    mockResolveDestination.mockResolvedValue({
+      valid: false,
+      invalidReason: "LnurlServiceError",
+      invalidPaymentDestination: { paymentType: "lnurl" },
+    })
+
+    await renderScreen()
+    await fireScan("https://za.wigroup.co/bill/172366037")
+
+    await waitFor(() =>
+      expect(alertSpy).toHaveBeenCalledWith(
+        "Code Not Available",
+        expect.stringContaining("We could not process this code"),
+        expect.anything(),
+      ),
+    )
+    expect(alertSpy).not.toHaveBeenCalledWith(
+      "Invalid QR Code",
+      expect.anything(),
+      expect.anything(),
+    )
+  })
+
+  it("keeps scanning alive after the code could not be processed", async () => {
+    mockResolveDestination.mockResolvedValue({
+      valid: false,
+      invalidReason: "LnurlServiceError",
+      invalidPaymentDestination: { paymentType: "lnurl" },
+    })
+
+    await renderScreen()
+    await fireScan("https://za.wigroup.co/bill/172366037")
+
+    await waitFor(() => expect(alertSpy).toHaveBeenCalled())
+    const [, , buttons] = alertSpy.mock.calls[0]
+    await act(async () => {
+      buttons?.[0].onPress?.()
+    })
+
+    await fireScan("https://za.wigroup.co/bill/172366038")
+
+    expect(mockResolveDestination).toHaveBeenCalledTimes(2)
+  })
+
+  it("still reports an unknown non-url destination as an invalid QR", async () => {
+    mockResolveDestination.mockResolvedValue({
+      valid: false,
+      invalidReason: "UnknownDestination",
+      invalidPaymentDestination: { paymentType: "unknown" },
+    })
+
+    await renderScreen()
+    await fireScan("not-a-destination")
+
+    await waitFor(() =>
+      expect(alertSpy).toHaveBeenCalledWith(
+        "Invalid QR Code",
+        expect.stringContaining("not a valid Bitcoin address"),
+        expect.anything(),
+      ),
+    )
+  })
+
   describe("picking a QR from the gallery", () => {
     const openGallery = async (screen: RenderAPI) => {
       await act(async () => {

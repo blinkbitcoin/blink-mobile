@@ -6,7 +6,7 @@ import { getThemePreference } from "@app/store/persistent-state/theme-preference
 import { DefaultAccountId } from "@app/types/wallet"
 
 const baseState: PersistentState = {
-  schemaVersion: 20,
+  schemaVersion: 21,
   galoyInstance: { id: "Main" },
   galoyAuthToken: "",
 }
@@ -80,7 +80,7 @@ describe("seedMigratedAccountSettings", () => {
     expect(next).toBe(baseState)
 
     const activated: PersistentState = { ...next, activeAccountId: migratedId }
-    expect(getSelfCustodialDisplayCurrency(activated)).toBe("USD")
+    expect(getSelfCustodialDisplayCurrency(activated)).toBeUndefined()
     expect(getSelfCustodialLanguage(activated)).toBe("DEFAULT")
     expect(getThemePreference(activated)).toBe("system")
   })

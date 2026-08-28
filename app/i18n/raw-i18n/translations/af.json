@@ -2265,7 +2265,9 @@
   "ScanningQRCodeScreen": {
     "invalidContent": "Ons kry:\n\n{found: string}\n\nHierdie is nie 'n geldige Bitcoin-adres of Lightningfaktuur nie",
     "expiredContent": "Ons het gevind: \n\n{found: string}\n\nHierdie faktuur het reeds verval",
+    "unresolvedContent": "Ons het gevind:\n\n{found: string}\n\nOns kon nie hierdie kode verwerk nie. Dit het dalk verval, of die diens is tydelik onbeskikbaar. Vra vir 'n nuwe kode of probeer later weer.",
     "invalidTitle": "Ongeldige QR kode",
+    "unresolvedTitle": "Kode nie beskikbaar nie",
     "openLinkTitle": "Maak skakel oop",
     "confirmOpenLink": "Is jy seker jy wil hierdie skakel oopmaak?",
     "noQrCode": "Ons kon nie 'n QR kode in die prent opspoor nie",
@@ -2340,6 +2342,7 @@
     "selfPaymentError": "{lnAddress: string} is jou {bankName: string} adres. ",
     "selfPaymentAdvice": "As jy geld wil stuur na 'n ander rekening wat jy besit kan jy gebruik maak van 'n LN-faktuur of BTC-adres. ",
     "lnAddressError": "Ons sukkel om hierdie adres te bereik. As jy seker is dat dit korrek is en bestaan kan jy weer later probeer. ",
+    "lnurlServiceError": "Ons kon nie hierdie kode verwerk nie. Dit het dalk verval, of die diens is tydelik onbeskikbaar.",
     "lnAddressAdvice": "Maak seker die spelling is reg of vra die onvanger eerder vir 'n BTC-adres. ",
     "unknownLightning": "Ons kan nie hierdie Lightning-adres verwerk nie. Probeer asseblief weer. ",
     "unknownOnchain": "Ons kan nie hierdie Bitcoin-adres verwerk nie. Probeer asseblief weer. ",
