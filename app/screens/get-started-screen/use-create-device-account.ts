@@ -1,7 +1,5 @@
 import { useState, useCallback } from "react"
 import * as Keychain from "react-native-keychain"
-import { generateSecureRandom } from "react-native-securerandom"
-import { v4 as uuidv4 } from "uuid"
 
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
@@ -15,13 +13,9 @@ import {
   logCreatedDeviceAccount,
 } from "@app/utils/analytics"
 import { reportError } from "@app/utils/error-logging"
+import { generateSecureRandomUUID } from "@app/utils/uuid"
 
 const DEVICE_ACCOUNT_CREDENTIALS_KEY = "device-account"
-
-const generateSecureRandomUUID = async (): Promise<string> => {
-  const randomBytes = await generateSecureRandom(16)
-  return uuidv4({ random: randomBytes })
-}
 
 export const useCreateDeviceAccount = () => {
   const [loading, setLoading] = useState(false)
