@@ -243,6 +243,54 @@ describe("PinScreen", () => {
     expect(mockReset).not.toHaveBeenCalled()
   })
 
+  describe("the dismiss control", () => {
+    /** The screen carries no header, so without this the only ways out are the
+     *  edge swipe and the hardware back — neither of which is visible. */
+    it("is absent on the app lock, which must offer no way out", async () => {
+      renderScreen(true)
+      await flushEffects()
+
+      expect(screen.queryByTestId("pinScreenDismiss")).toBeNull()
+    })
+
+    it("is absent on a cold-start unlock too", async () => {
+      renderScreen(false)
+      await flushEffects()
+
+      expect(screen.queryByTestId("pinScreenDismiss")).toBeNull()
+    })
+
+    it("leaves the set-pin flow when pressed", async () => {
+      renderScreen(undefined, PinScreenPurpose.SetPin)
+      await flushEffects()
+
+      fireEvent.press(screen.getByTestId("pinScreenDismiss"))
+
+      expect(mockGoBack).toHaveBeenCalledTimes(1)
+    })
+
+    it("leaves a challenge when pressed, which the caller reads as a decline", async () => {
+      /** The goBack dispatches a POP, and the beforeRemove listener turns that
+       *  into the decline — the same path a swipe takes. */
+      renderScreen(undefined, PinScreenPurpose.ChallengePin, {
+        onChallengeSuccess: jest.fn(),
+        onChallengeFailure: jest.fn(),
+      })
+      await flushEffects()
+
+      fireEvent.press(screen.getByTestId("pinScreenDismiss"))
+
+      expect(mockGoBack).toHaveBeenCalledTimes(1)
+    })
+
+    it("is announced, not just tappable", async () => {
+      renderScreen(undefined, PinScreenPurpose.SetPin)
+      await flushEffects()
+
+      expect(screen.getByLabelText("Back")).toBeTruthy()
+    })
+  })
+
   describe("ChallengePin: verifying the pin for a caller without touching the app lock", () => {
     const renderChallenge = (callbacks: ChallengeCallbacks) =>
       renderScreen(undefined, PinScreenPurpose.ChallengePin, callbacks)

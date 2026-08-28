@@ -1,9 +1,10 @@
 import * as React from "react"
 import { useCallback, useEffect, useRef, useState } from "react"
-import { Alert, Text, View } from "react-native"
+import { Alert, Text, TouchableOpacity, View } from "react-native"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
+import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { Button } from "@rn-vui/base"
 import { makeStyles } from "@rn-vui/themed"
 
@@ -27,10 +28,14 @@ type Props = {
  *  keypad. One name for what used to be three separate literals. */
 const PIN_LENGTH = 4
 
+/** Distance from the screen's top-left corner to the dismiss control. */
+const DISMISS_INSET = 16
+
 export const PinScreen: React.FC<Props> = ({ route }) => {
   const styles = useStyles()
 
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, "pin">>()
+  const insets = useSafeAreaInsets()
 
   const { logout } = useLogout()
   const {
@@ -50,6 +55,12 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
    *  shared attempt budget and its escalating lockout. Only SetPin is exempt —
    *  there is nothing to be wrong about yet. */
   const isVerifyingExistingPin = isAuthenticate || isChallenge
+  /** Settings jobs and a caller's challenge are both dismissable — the back
+   *  gesture already leaves them, and this is its visible counterpart on the
+   *  screen, which carries no header to go back with — the route is pushed, not
+   *  presented as a modal, so it reads as back rather than dismiss. The app lock
+   *  renders none: a way out of it is the one thing it must not offer. */
+  const isDismissable = !isAuthenticate
   const [enteredPIN, setEnteredPIN] = useState("")
   const [helperText, setHelperText] = useState(() => {
     if (screenPurpose === PinScreenPurpose.SetPin) return LL.PinScreen.setPin()
@@ -293,6 +304,22 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
         </View>
       </View>
       <View style={styles.bottomSpacer} />
+      {/* Last child on purpose: an absolute view earlier in the tree is painted
+          under, and hit-tested behind, every sibling that follows it — and the
+          top spacer covers exactly the corner this sits in. */}
+      {isDismissable ? (
+        <TouchableOpacity
+          style={[styles.dismiss, { top: insets.top + DISMISS_INSET }]}
+          onPress={() => navigation.goBack()}
+          accessibilityRole="button"
+          accessibilityLabel={LL.common.back()}
+          testID="pinScreenDismiss"
+        >
+          {/* caret-left at 20, the same back affordance the webview header uses.
+              Not arrow-left: that glyph is the backspace on this very keypad. */}
+          <GaloyIcon name="caret-left" size={20} color="white" />
+        </TouchableOpacity>
+      ) : null}
     </Screen>
   )
 }
@@ -300,6 +327,16 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
 const useStyles = makeStyles(({ colors }) => ({
   bottomSpacer: {
     flex: 1,
+  },
+
+  /** Absolute, so adding it cannot shift the keypad's flex layout. The screen is
+   *  header-less by design, so this sits where a header back would — and the
+   *  safe-area top inset is added at render, because this Screen's SafeAreaView
+   *  does not pad the top edge and the corner is where a notch lands. */
+  dismiss: {
+    position: "absolute",
+    left: DISMISS_INSET,
+    padding: 8,
   },
 
   circleContainer: {
