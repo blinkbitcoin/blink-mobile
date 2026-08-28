@@ -72,6 +72,7 @@
   },
   "AuthenticationScreen": {
     "authenticationDescription": "Autentificați-vă pentru a continua",
+    "authenticationRequired": "Este necesară autentificarea. Puteți seta un cod PIN sau date biometrice în setările de securitate.",
     "setUp": "Configurați autentificarea biometrică",
     "setUpAuthenticationDescription": "Utilizați autentificarea biometrică",
     "skip": "Săriți peste",

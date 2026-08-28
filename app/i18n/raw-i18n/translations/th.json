@@ -72,6 +72,7 @@
   },
   "AuthenticationScreen": {
     "authenticationDescription": "ยืนยันตัวตนเพื่อดำเนินการต่อ",
+    "authenticationRequired": "จำเป็นต้องมีการยืนยันตัวตน คุณสามารถตั้งค่าพินโค้ดหรือไบโอเมตริกได้ในการตั้งค่าความปลอดภัย",
     "setUp": "เปิดใช้งานการยืนยันตัวตนด้วยไบโอเมทริกซ์",
     "setUpAuthenticationDescription": "ใช้ไบโอเมทริกซ์เพื่อยืนยันตัวตน",
     "skip": "ข้าม",

@@ -72,6 +72,7 @@
   },
   "AuthenticationScreen": {
     "authenticationDescription": "التحقّق من اجل المتابعة",
+    "authenticationRequired": "المصادقة مطلوبة. يمكنك إعداد رمز PIN أو المصادقة الحيوية في إعدادات الأمان.",
     "setUp": "إعداد التحقق البيومتري",
     "setUpAuthenticationDescription": "استعمل وسيلة التحقق البيومتري",
     "skip": "تخطى",

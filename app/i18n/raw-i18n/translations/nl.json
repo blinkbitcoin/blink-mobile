@@ -72,6 +72,7 @@
   },
   "AuthenticationScreen": {
     "authenticationDescription": "Authenticeer om verder te gaan",
+    "authenticationRequired": "Verificatie is vereist. U kunt een pincode of biometrie instellen in de beveiligingsinstellingen.",
     "setUp": "Biometrische authenticatie instellen",
     "setUpAuthenticationDescription": "Gebruik je biometrische authenticatie om verder te gaan",
     "skip": "Overslaan",

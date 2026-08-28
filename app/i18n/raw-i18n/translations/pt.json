@@ -72,6 +72,7 @@
     },
     "AuthenticationScreen": {
         "authenticationDescription": "Autenticar para continuar",
+        "authenticationRequired": "É necessária autenticação. Você pode configurar um código PIN ou biometria nas configurações de segurança.",
         "setUp": "Configurar autenticação biométrica",
         "setUpAuthenticationDescription": "Usar biometria para autenticar",
         "skip": "Pular",

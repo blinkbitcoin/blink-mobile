@@ -72,6 +72,7 @@
   },
   "AuthenticationScreen": {
     "authenticationDescription": "Qinisekisa ukuqhubeka",
+    "authenticationRequired": "Kufuneka uqinisekiso. Ungaseta ikhowudi ye-PIN okanye i-biometrics kusetingi zokhuseleko.",
     "setUp": "Cwangcisa uQinisekiso lwebhayometriki",
     "setUpAuthenticationDescription": "Sebenzisa ibhayometriki ukungqinisisa",
     "skip": "Tsiba",

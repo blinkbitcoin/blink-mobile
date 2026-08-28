@@ -72,6 +72,7 @@
   },
   "AuthenticationScreen": {
     "authenticationDescription": "Bevestig om voort te gaan",
+    "authenticationRequired": "Verifikasie word vereis. Jy kan 'n PIN of biometrie in Sekuriteit-instellings opstel.",
     "setUp": "Opstel van biometriese verifikasie",
     "setUpAuthenticationDescription": "Gebruik boimetriese verifikasie",
     "skip": "Gaan verby",

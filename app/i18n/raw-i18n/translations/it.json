@@ -72,6 +72,7 @@
     },
     "AuthenticationScreen": {
         "authenticationDescription": "Autenticati per continuare",
+        "authenticationRequired": "È richiesta l'autenticazione. Puoi impostare un codice PIN o la biometria nelle impostazioni di sicurezza.",
         "setUp": "Impostare l'Autenticazione Biometrica",
         "setUpAuthenticationDescription": "Usa dati biometrici per autenticare",
         "skip": "Salta",

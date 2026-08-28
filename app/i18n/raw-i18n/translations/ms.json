@@ -72,6 +72,7 @@
   },
   "AuthenticationScreen": {
     "authenticationDescription": "Pengesahan anda diperlukan",
+    "authenticationRequired": "Pengesahan diperlukan. Anda boleh menetapkan kod PIN atau biometrik dalam tetapan keselamatan.",
     "setUp": "Tetapkan pengesahan Biometrik",
     "setUpAuthenticationDescription": "Gunakan biometrik untuk pengesahan",
     "skip": "Langkau",

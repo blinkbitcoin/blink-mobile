@@ -72,6 +72,7 @@
     },
     "AuthenticationScreen": {
         "authenticationDescription": "認証して続ける",
+        "authenticationRequired": "認証が必要です。セキュリティ設定でPINコードまたは生体認証を設定できます。",
         "setUp": "生体認証の設定",
         "setUpAuthenticationDescription": "生体認証を有効にする",
         "skip": "スキップ",

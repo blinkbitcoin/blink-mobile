@@ -72,6 +72,7 @@
   },
   "AuthenticationScreen": {
     "authenticationDescription": "Thibitisha ili kuendelea",
+    "authenticationRequired": "Uthibitishaji unahitajika. Unaweza kuweka pini au bayometriki katika mipangilio ya usalama.",
     "setUp": "Weka uthibitishaji wa kibayometriki",
     "setUpAuthenticationDescription": "Tumia uthibitishaji wa kibiometriki",
     "skip": "Ruka",

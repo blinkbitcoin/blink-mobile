@@ -176,6 +176,10 @@ type RootTranslation = {
 		 */
 		authenticationDescription: string
 		/**
+		 * A​u​t​h​e​n​t​i​c​a​t​i​o​n​ ​i​s​ ​r​e​q​u​i​r​e​d​.​ ​Y​o​u​ ​c​a​n​ ​s​e​t​ ​u​p​ ​a​ ​P​I​N​ ​o​r​ ​b​i​o​m​e​t​r​i​c​s​ ​i​n​ ​S​e​c​u​r​i​t​y​ ​s​e​t​t​i​n​g​s​.
+		 */
+		authenticationRequired: string
+		/**
 		 * S​e​t​ ​u​p​ ​B​i​o​m​e​t​r​i​c​ ​A​u​t​h​e​n​t​i​c​a​t​i​o​n
 		 */
 		setUp: string
@@ -13806,6 +13810,10 @@ export type TranslationFunctions = {
 		 * Authenticate to continue
 		 */
 		authenticationDescription: () => LocalizedString
+		/**
+		 * Authentication is required. You can set up a PIN or biometrics in Security settings.
+		 */
+		authenticationRequired: () => LocalizedString
 		/**
 		 * Set up Biometric Authentication
 		 */

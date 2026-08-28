@@ -72,6 +72,7 @@
   },
   "AuthenticationScreen": {
     "authenticationDescription": "Autentificer for at fortsætte",
+    "authenticationRequired": "Godkendelse er påkrævet. Du kan opsætte en PIN-kode eller biometri i sikkerhedsindstillingerne.",
     "setUp": "Opsætning af Biometrisk Autentificering",
     "setUpAuthenticationDescription": "Brug biometrisk autentificering",
     "skip": "Spring over",

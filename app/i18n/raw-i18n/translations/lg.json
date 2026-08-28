@@ -72,6 +72,7 @@
   },
   "AuthenticationScreen": {
     "authenticationDescription": "Kakasa okugenda mu maaso",
+    "authenticationRequired": "Okakasibwa kwetaagisa. Osobola okuteekawo PIN oba biometriks mu ntegeka z'obukuumi.",
     "setUp": "Teekateeka okukakasa kwa Biometric",
     "setUpAuthenticationDescription": "Kozesa biometric okukakasa",
     "skip": "Buuka",
