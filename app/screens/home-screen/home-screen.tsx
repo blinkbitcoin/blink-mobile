@@ -34,9 +34,7 @@ import SlideUpHandle from "@app/components/slide-up-handle"
 import { Screen } from "@app/components/screen"
 import {
   UnseenTxAmountBadge,
-  useUnseenTxAmountBadge,
-  useOutgoingBadgeVisibility,
-  useIncomingBadgeAutoSeen,
+  useUnseenTxBadgeState,
 } from "@app/components/unseen-tx-amount-badge"
 import { useBadgeSlotContent } from "@app/components/amount-badge"
 import { PendingAmountBadge } from "@app/components/pending-amount-badge"
@@ -84,16 +82,9 @@ import { UnclaimedDepositBanner } from "@app/components/unclaimed-deposit-banner
 import { testProps } from "@app/utils/testProps"
 import { isIos } from "@app/utils/helper"
 import { extractLightningAddressUsername } from "@app/utils/pay-links"
-import {
-  useAppConfig,
-  useAutoShowUpgradeModal,
-  useTransactionSeenState,
-} from "@app/hooks"
+import { useAppConfig, useAutoShowUpgradeModal } from "@app/hooks"
 import {
   AccountLevel,
-  TransactionFragment,
-  TxDirection,
-  TxStatus,
   useBulletinsQuery,
   useHomeAuthedQuery,
   useHomeUnauthedQuery,
@@ -229,6 +220,7 @@ export const HomeScreen: React.FC = () => {
     refreshWallets: refreshSelfCustodialWallets,
     isStableBalanceActive,
     lightningAddress: selfCustodialLightningAddress,
+    allTransactions: selfCustodialAllTransactions,
   } = useSelfCustodialWallet()
   const { accounts, activeAccount } = useAccountRegistry()
   const hasMultipleAccounts = accounts.length > 1
@@ -388,54 +380,28 @@ export const HomeScreen: React.FC = () => {
     ? openUnclaimedDeposits
     : undefined
 
-  const transactions = useMemo(() => {
-    const txs: TransactionFragment[] = []
-    if (pendingIncomingTransactions) txs.push(...pendingIncomingTransactions)
-    const settled =
-      transactionsEdges
-        ?.map((e) => e.node)
-        .filter(
-          (tx) => tx.status !== TxStatus.Pending || tx.direction === TxDirection.Send,
-        ) ?? []
-    txs.push(...settled)
-    return txs
-  }, [pendingIncomingTransactions, transactionsEdges])
-
-  const { hasUnseenBtcTx, hasUnseenUsdTx, markTxSeen } = useTransactionSeenState(
-    accountId || "",
-    transactions,
-  )
-
   const { canShowUpgradeModal, markShownUpgradeModal } = useAutoShowUpgradeModal({
     cooldownDays: upgradeModalCooldownDays,
     enabled: isAuthed && levelAccount === AccountLevel.Zero,
   })
 
-  const { latestUnseenTx, unseenAmountText, handleUnseenBadgePress, isOutgoing } =
-    useUnseenTxAmountBadge({
-      transactions,
-      hasUnseenBtcTx,
-      hasUnseenUsdTx,
-    })
-
-  const handleOutgoingBadgeHide = React.useCallback(() => {
-    if (latestUnseenTx?.settlementCurrency) {
-      markTxSeen(latestUnseenTx.settlementCurrency)
-    }
-  }, [latestUnseenTx?.settlementCurrency, markTxSeen])
-
-  const showOutgoingBadge = useOutgoingBadgeVisibility({
-    txId: latestUnseenTx?.id,
-    amountText: unseenAmountText,
+  const {
+    hasUnseenBtcTx,
+    hasUnseenUsdTx,
+    unseenAmountText,
+    handleUnseenBadgePress,
+    showIncomingBadge,
+    showOutgoingBadge,
     isOutgoing,
-    onHide: handleOutgoingBadgeHide,
-  })
-
-  const showIncomingBadge = useIncomingBadgeAutoSeen({
+    latestUnseenTxId,
+    transactionCount,
+  } = useUnseenTxBadgeState({
+    isSelfCustodial,
     isFocused,
-    isOutgoing,
-    unseenCurrency: latestUnseenTx?.settlementCurrency,
-    markTxSeen,
+    custodialAccountId: accountId,
+    selfCustodialTransactions: selfCustodialAllTransactions,
+    pendingIncomingTransactions,
+    transactionEdges: transactionsEdges,
   })
 
   /** Both amount badges live in the same slot under the balance: the unseen-tx
@@ -452,7 +418,7 @@ export const HomeScreen: React.FC = () => {
 
   const badgeSlotContent = useBadgeSlotContent({
     showUnseenBadge,
-    unseenKey: latestUnseenTx?.id,
+    unseenKey: latestUnseenTxId,
     hasPendingAmount,
   })
 
@@ -665,7 +631,7 @@ export const HomeScreen: React.FC = () => {
     }
   }, [refetch])
 
-  const numberOfTxs = transactions.length
+  const numberOfTxs = transactionCount
 
   const onMenuClick = (target: Target) => {
     if (!isSelfCustodial && !isAuthed) {
@@ -913,7 +879,7 @@ export const HomeScreen: React.FC = () => {
       <View style={styles.badgeSlot}>
         {badgeSlotContent === "unseen" ? (
           <UnseenTxAmountBadge
-            key={latestUnseenTx?.id}
+            key={latestUnseenTxId}
             amountText={unseenAmountText ?? ""}
             visible={showUnseenBadge}
             onPress={handleUnseenBadgePress}

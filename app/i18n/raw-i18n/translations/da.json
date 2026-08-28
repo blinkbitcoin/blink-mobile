@@ -2276,7 +2276,9 @@
   "ScanningQRCodeScreen": {
     "invalidContent": "Vi fandt:\n\n{found: string}\n\nDette er ikke en gyldig Bitcoin adresse eller Lightning-faktura",
     "expiredContent": "Vi fandt:\n\n{found: string}\n\nDenne faktura er udløbet",
+    "unresolvedContent": "Vi fandt:\n\n{found: string}\n\nVi kunne ikke behandle denne kode. Den kan være udløbet, eller tjenesten er midlertidigt utilgængelig. Bed om en ny kode, eller prøv igen senere.",
     "invalidTitle": "Ugyldig QR-kode",
+    "unresolvedTitle": "Koden er ikke tilgængelig",
     "openLinkTitle": "Åbn link",
     "confirmOpenLink": "Er du sikker på, at du vil åbne dette link?",
     "noQrCode": "Vi kunne ikke finde en QR-kode på billedet",
@@ -2351,6 +2353,7 @@
     "selfPaymentError": "{lnAddress: string} er din {bankName: string} adresse.",
     "selfPaymentAdvice": "Hvis du vil sende penge til en anden konto, som du ejer, kan du bruge en faktura, LN eller BTC adresse i stedet.",
     "lnAddressError": "Vi kan ikke nå denne Lightning-adresse. Hvis du er sikker på, at den eksisterer, kan du prøve igen senere.",
+    "lnurlServiceError": "Vi kunne ikke behandle denne kode. Den kan være udløbet, eller tjenesten er midlertidigt utilgængelig.",
     "lnAddressAdvice": "Sørg enten for, at stavningen er korrekt, eller bed modtageren om en faktura eller BTC adresse i stedet.",
     "unknownLightning": "Vi kan ikke tyde denne Lightning-adresse. Prøv venligst igen.",
     "unknownOnchain": "Vi kan ikke tyde denne Bitcoin-adresse. Prøv venligst igen.",

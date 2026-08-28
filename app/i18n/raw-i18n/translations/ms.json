@@ -2276,7 +2276,9 @@
   "ScanningQRCodeScreen": {
     "invalidContent": "Kami jumpa:\n\n{jumpa: string}\n\nIni bukan alamat Bitcoin atau invois Lightning yang betul",
     "expiredContent": "Kami jumpa:\n\n{jumpa: string}\n\nInvois telah tamat tempoh",
+    "unresolvedContent": "Kami menemui:\n\n{found: string}\n\nKami tidak dapat memproses kod ini. Ia mungkin telah tamat tempoh, atau perkhidmatan tidak tersedia buat sementara waktu. Minta kod baharu atau cuba lagi nanti.",
     "invalidTitle": "Kod QR tak betul",
+    "unresolvedTitle": "Kod tidak tersedia",
     "openLinkTitle": "Buka Pautan",
     "confirmOpenLink": "Adakah anda pasti mahu membuka pautan ini?",
     "noQrCode": "Kami tak dapat kesan kod QR pada imej ini",
@@ -2351,6 +2353,7 @@
     "selfPaymentError": "{lnAddress: string} adalah alamat {bankName: string} anda",
     "selfPaymentAdvice": "Jika anda nak hantar wang kepada akaun lain kepunyaan anda, anda boleh gunakan invois, LN atau alamat BTC ",
     "lnAddressError": "Kami tak dapat nak capai alamat LN ini. Jika anda pasti alamat ini betul, sila cuba lagi.",
+    "lnurlServiceError": "Kami tidak dapat memproses kod ini. Ia mungkin telah tamat tempoh, atau perkhidmatan tidak tersedia buat sementara waktu.",
     "lnAddressAdvice": "Pastikan ejaan anda betul atau minta penerima beri invois atau alamat BTC",
     "unknownLightning": "Kami tak dapat kesan, analisa alamat LN ini. Cuba lagi",
     "unknownOnchain": "Kami tak dapat kesan, analisa alamat Bitcoin ini. Cuba lagi",

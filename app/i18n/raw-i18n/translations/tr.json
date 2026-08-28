@@ -2276,7 +2276,9 @@
   "ScanningQRCodeScreen": {
     "invalidContent": "Şunu bulduk:\n\n{found: string}\n\nBu geçerli bir Bitcoin adresi ya da Lightning faturası değil",
     "expiredContent": "Şunu bulduk:\n\n{found: string}\n\nBu faturanın süresi dolmuş",
+    "unresolvedContent": "Şunu bulduk:\n\n{found: string}\n\nBu kodu işleyemedik. Süresi dolmuş olabilir veya hizmet geçici olarak kullanılamıyor olabilir. Yeni bir kod isteyin ya da daha sonra tekrar deneyin.",
     "invalidTitle": "Geçersiz QR kodu",
+    "unresolvedTitle": "Kod kullanılamıyor",
     "openLinkTitle": "Bağlantıyı aç",
     "confirmOpenLink": "Bu bağlantıyı açmak istediğinizden emin misiniz?",
     "noQrCode": "Görselde QR kodu bulamadık",
@@ -2351,6 +2353,7 @@
     "selfPaymentError": "{lnAddress: string} sizin {bankName: string} adresinizdir.",
     "selfPaymentAdvice": "Sahip olduğunuz başka bir hesaba para göndermek istiyorsanız, bunun yerine bir fatura, LN veya BTC adresi kullanabilirsiniz.",
     "lnAddressError": "Bu Lightning adresine ulaşamıyoruz. Var olduğundan eminseniz, daha sonra tekrar deneyebilirsiniz.",
+    "lnurlServiceError": "Bu kodu işleyemedik. Süresi dolmuş olabilir veya hizmet geçici olarak kullanılamıyor olabilir.",
     "lnAddressAdvice": "Ya yazımın doğru olduğundan emin olun ya da alıcıdan bunun yerine bir fatura veya BTC adresi isteyin.",
     "unknownLightning": "Bu Lightning adresini çözümleyemedik. Lütfen tekrar deneyiniz.",
     "unknownOnchain": "Bu Bitcoin adresinin çözümleyemedik. Lütfen tekrar deneyiniz.",

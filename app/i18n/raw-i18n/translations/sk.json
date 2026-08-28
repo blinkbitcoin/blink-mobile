@@ -2276,7 +2276,9 @@
   "ScanningQRCodeScreen": {
     "invalidContent": "Našli sme:\n\n{found: string}\n\nToto nie je platná bitcoinová adresa alebo Lightning faktúra",
     "expiredContent": "Zistili sme:\n\n{found: string}\n\nTáto faktúra už vypršala",
+    "unresolvedContent": "Našli sme:\n\n{found: string}\n\nTento kód sa nepodarilo spracovať. Mohol vypršať alebo je služba dočasne nedostupná. Vyžiadajte si nový kód alebo to skúste neskôr.",
     "invalidTitle": "Neplatný QR kód",
+    "unresolvedTitle": "Kód nie je dostupný",
     "openLinkTitle": "Otvoriť odkaz",
     "confirmOpenLink": "Naozaj chcete otvoriť tento odkaz?",
     "noQrCode": "Na obrázku sme nenašli QR kód.",
@@ -2351,6 +2353,7 @@
     "selfPaymentError": "{lnAddress: string} je vaša {bankName: string} adresa.",
     "selfPaymentAdvice": "Ak chcete poslať peniaze na iný účet, ktorý vlastníte, použite LN faktúru alebo adresu, prípadne BTC adresu.",
     "lnAddressError": "Na túto Lightning adresu sa nemôžeme pripojiť. Ak ste si istí, že existuje, skúste to prosím neskôr.",
+    "lnurlServiceError": "Tento kód sa nepodarilo spracovať. Mohol vypršať alebo je služba dočasne nedostupná.",
     "lnAddressAdvice": "Uistite sa, že máte správny text, alebo požiadajte príjemcu o LN faktúru alebo BTC adresu.",
     "unknownLightning": "Túto Lightning adresu nemôžeme spracovať. Skúste to prosím znova.",
     "unknownOnchain": "Túto bitcoinovú adresu nemôžeme spracovať. Skúste to prosím znova.",

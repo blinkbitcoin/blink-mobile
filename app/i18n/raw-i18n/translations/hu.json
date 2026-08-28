@@ -2276,7 +2276,9 @@
   "ScanningQRCodeScreen": {
     "invalidContent": "Ezt találtuk:\n\n{found: string}\n\nEz nem egy érvényes Bitcoin cím vagy Lightning fizetési kérelem",
     "expiredContent": "Ezt találtuk:\n\n{found: string}\n\nEz a fizetési kérelem lejárt",
+    "unresolvedContent": "Ezt találtuk:\n\n{found: string}\n\nNem tudtuk feldolgozni ezt a kódot. Lehet, hogy lejárt, vagy a szolgáltatás átmenetileg nem érhető el. Kérj új kódot, vagy próbáld újra később.",
     "invalidTitle": "Érvénytelen QR kód",
+    "unresolvedTitle": "A kód nem érhető el",
     "openLinkTitle": "Link megnyítása",
     "confirmOpenLink": "Biztos meg akarod nyitni?",
     "noQrCode": "Nem találtunk QR kódot a képen",
@@ -2351,6 +2353,7 @@
     "selfPaymentError": "{lnAddress: string} a te {bankName: string} címed.",
     "selfPaymentAdvice": "Ha pénzt szeretnél küldeni egy másik saját számládra, használj inkább egy LN fizetési kérelmet, vagy BTC címet.",
     "lnAddressError": "Nem érjük el ezt a Lightning címet. Ha biztos vagy benne, hogy létezik, próbáld újra később.",
+    "lnurlServiceError": "Nem tudtuk feldolgozni ezt a kódot. Lehet, hogy lejárt, vagy a szolgáltatás átmenetileg nem érhető el.",
     "lnAddressAdvice": "Ellenőrizd a helyesírást, vagy kérd meg a címzettet, hogy küldjön LN fizetési kérelmet vagy BTC címet inkább.",
     "unknownLightning": "Nem tudjuk értelmezni ezt a Lightning címet. Kérjük, próbáld újra.",
     "unknownOnchain": "Nem tudjuk értelmezni ezt a Bitcoin címet. Kérjük, próbáld újra.",

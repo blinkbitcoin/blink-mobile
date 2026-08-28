@@ -2276,7 +2276,9 @@
   "ScanningQRCodeScreen": {
     "invalidContent": "Našli smo:\n\n{found: string}\n\nOvo nije valjana Bitcoin adresa ili Lightning faktura",
     "expiredContent": "Našli smo:\n\n{found: string}\n\nOva faktura je istekla",
+    "unresolvedContent": "Pronašli smo:\n\n{found: string}\n\nNismo mogli obraditi ovaj kôd. Možda je istekao ili usluga privremeno nije dostupna. Zatražite novi kôd ili pokušajte ponovno kasnije.",
     "invalidTitle": "Nevažeći QR kod",
+    "unresolvedTitle": "Kôd nije dostupan",
     "openLinkTitle": "Otvori poveznicu",
     "confirmOpenLink": "Jeste li sigurni da želite otvoriti ovu poveznicu?",
     "noQrCode": "Nismo mogli pronaći QR kod na slici",
@@ -2351,6 +2353,7 @@
     "selfPaymentError": "{lnAddress: string} je vaša {bankName: string} adresa.",
     "selfPaymentAdvice": "Ako želite poslati novac na drugi račun koji posjedujete, umjesto toga možete koristiti fakturu, LN ili BTC adresu.",
     "lnAddressError": "Ne možemo doći do ove Lightning adrese. Ako ste sigurni da postoji, možete pokušati ponovno kasnije.",
+    "lnurlServiceError": "Nismo mogli obraditi ovaj kôd. Možda je istekao ili usluga privremeno nije dostupna.",
     "lnAddressAdvice": "Provjerite je li točno napisano ili umjesto toga tražite od primatelja fakturu ili BTC adresu.",
     "unknownLightning": "Ne možemo analizirati ovu Lightning adresu. Molimo pokušajte ponovno.",
     "unknownOnchain": "Ne možemo analizirati ovu Lightning adresu. Molimo pokušajte ponovno.",

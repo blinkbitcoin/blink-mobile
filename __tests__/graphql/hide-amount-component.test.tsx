@@ -16,7 +16,7 @@ jest.mock("@apollo/client", () => ({
 }))
 
 const baseState: PersistentState = {
-  schemaVersion: 20,
+  schemaVersion: 21,
   galoyInstance: { id: "Main" },
   galoyAuthToken: "",
 }

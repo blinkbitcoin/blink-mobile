@@ -2276,7 +2276,9 @@
   "ScanningQRCodeScreen": {
     "invalidContent": "Sifumene: {ifunyenwe: umtya} Le ayisiyiyo idilesi yeBitcoin esebenzayo okanye i-invoyisi yoMbane",
     "expiredContent": "Sifumene: {ifunyenwe: umtya} Le invoyisi iphelelwe lixesha",
+    "unresolvedContent": "Sifumene:\n\n{found: string}\n\nAsikwazanga ukuqhuba le khowudi. Isenokuba iphelelwe lixesha, okanye inkonzo ayifumaneki okwexeshana. Cela ikhowudi entsha okanye uzame kwakhona kamva.",
     "invalidTitle": "Ikhowudi yeQR engasebenziyo",
+    "unresolvedTitle": "Ikhowudi ayifumaneki",
     "openLinkTitle": "Vula iLinki",
     "confirmOpenLink": "Uqinisekile ukuba ufuna ukuvula le linki?",
     "noQrCode": "Asikwazanga ukufumana ikhowudi ye-QR emfanekisweni",
@@ -2351,6 +2353,7 @@
     "selfPaymentError": "{lnAddress: string} yeyakho {bankName: string} idilesi.",
     "selfPaymentAdvice": "Ukuba ufuna ukuthumela imali kwenye iakhawunti yakho, ungasebenzisa i-invoyisi, i-LN okanye idilesi ye-BTC endaweni yoko.",
     "lnAddressError": "Asikwazi ukufikelela kule dilesi yoMbane. Ukuba uqinisekile ukuba ikhona, ungazama kwakhona kamva.",
+    "lnurlServiceError": "Asikwazanga ukuqhuba le khowudi. Isenokuba iphelelwe lixesha, okanye inkonzo ayifumaneki okwexeshana.",
     "lnAddressAdvice": "Qiniseka ukuba upelo luchanekile okanye cela umamkeli nge-invoyisi okanye idilesi ye-BTC endaweni yoko.",
     "unknownLightning": "Asikwazi ukuyicalula le dilesi yoMbane. Nceda zama kwakhona.",
     "unknownOnchain": "Asikwazi ukuyicalula le dilesi yoMbane. Nceda zama kwakhona.",

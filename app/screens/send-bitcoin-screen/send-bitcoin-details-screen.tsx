@@ -374,34 +374,22 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
                     onLayout={onPillLayout(wallet.walletCurrency)}
                   />
                 </View>
-                <View
-                  style={
-                    hideAmount
-                      ? styles.walletSelectorInfoContainerHidden
-                      : styles.walletSelectorInfoContainer
-                  }
-                >
-                  {hideAmount ? (
-                    <HiddenBalancePlaceholder size="small" />
-                  ) : (
-                    <>
-                      <View style={styles.walletSelectorTypeTextContainer}>
-                        {wallet.walletCurrency === WalletCurrency.Btc ? (
-                          <Text style={styles.walletCurrencyText}>{btcPrimaryText}</Text>
-                        ) : (
-                          <Text style={styles.walletCurrencyText}>{usdPrimaryText}</Text>
-                        )}
-                      </View>
-                      <View style={styles.walletSelectorBalanceContainer}>
-                        {wallet.walletCurrency === WalletCurrency.Btc ? (
-                          <Text>{btcSecondaryText}</Text>
-                        ) : (
-                          <Text>{usdSecondaryText}</Text>
-                        )}
-                      </View>
-                      <View />
-                    </>
-                  )}
+                <View style={styles.walletSelectorInfoContainer}>
+                  <View style={styles.walletSelectorTypeTextContainer}>
+                    {wallet.walletCurrency === WalletCurrency.Btc ? (
+                      <Text style={styles.walletCurrencyText}>{btcPrimaryText}</Text>
+                    ) : (
+                      <Text style={styles.walletCurrencyText}>{usdPrimaryText}</Text>
+                    )}
+                  </View>
+                  <View style={styles.walletSelectorBalanceContainer}>
+                    {wallet.walletCurrency === WalletCurrency.Btc ? (
+                      <Text>{btcSecondaryText}</Text>
+                    ) : (
+                      <Text>{usdSecondaryText}</Text>
+                    )}
+                  </View>
+                  <View />
                 </View>
               </View>
             </TouchableWithoutFeedback>

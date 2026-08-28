@@ -2276,7 +2276,9 @@
   "ScanningQRCodeScreen": {
     "invalidContent": "Ñuqaqa kaniyta rikuyta munanpi,\n\n{found: string}\n\nBitcoin kaniyta ch'usaq kayniyta rikuy munanpi, Lightning invoice kaniyta ch'usaq kayniyta rikuy munanpi chhikan",
     "expiredContent": "Ñuqaqa kaniyta rikuyta munanpi,\n\n{found: string}\n\nKaniyta rikuyta munanpi chhikan",
+    "unresolvedContent": "Tarirqaniku:\n\n{found: string}\n\nKay kodigota mana llamk'apuyta atirqanikuchu. Ichapas pacharqun, otaq servicio pisi pachalla mana kanchu. Musuq kodigota mañakuy otaq qhipaman yapamanta ruway.",
     "invalidTitle": "QR kaniyta ch'usaq kayniyta rikuy munanpi chhikan",
+    "unresolvedTitle": "Kodigo mana kanchu",
     "openLinkTitle": "T'inkita kichay",
     "confirmOpenLink": "¿Chiqaptachu kay t'inkita kichayta munankí?",
     "noQrCode": "Ñuqaqa kaniyta rikuyta munanpi, QR kaniyta rikuyta sutichaqta chhikanmi",
@@ -2351,6 +2353,7 @@
     "selfPaymentError": "{lnAddress: string} kaniyta rikuyta munanpi, kawsayniyta qillqata sutichinaqinmi {bankName: string} kaniyta rikuyta munanpi.",
     "selfPaymentAdvice": "Ñuqaqa kaniyta rikuyta munanpi, ñuqaqa kaniyta rikuyta munanpi kawsayniyta qillqata sutichinaqinmi kaniyta rikuyta munanpi kaniyta yachanakuyta sutichinaqinmi, invoice, LN kawsayniyta qillqata sutichinaqinmi kaniyta rikuyta munanpi kawsayniyta qillqata sutichinaqinmi BTC kaniyta rikuyta munanpi yachanakuyta sutichqinmi.",
     "lnAddressError": "Chaynamanta kaniyta rikuyta munanpi, Lightning kawsayniyta qillqata sutichinaqinmi kaniyta rikuyta munanpi impuyta. Ñuqaqa kaniyta rikuyta munanpi kayniyta qillqata sutichinaqinmi, chaynamanta kaniyta rikuyta munanpi kawsayniyta qillqata sutichinaqinmi kaniyta rikuchiy.",
+    "lnurlServiceError": "Kay kodigota mana llamk'apuyta atirqanikuchu. Ichapas pacharqun, otaq servicio pisi pachalla mana kanchu.",
     "lnAddressAdvice": "Kaniyta yachanakuyta sutichinaqinmi k'anchaypi yachanakuyta sutichqinmi, invoice kaniyta rikuyta munanpi kawsayniyta qillqata sutichinaqinmi BTC kaniyta rikuyta munanpi yachanakuyta sutichqinmi.",
     "unknownLightning": "Chaynamanta kaniyta rikuyta munanpi, Lightning kawsayniyta qillqata sutichinaqinmi kaniyta rikuyta munanpi impuyta, chaynamanta kaniyta rikuyta munanpi kawsayniyta qillqata sutichinaqin kaniyta rikuchiy.",
     "unknownOnchain": "Chaynamanta kaniyta rikuyta munanpi, Bitcoin kawsayniyta qillqata sutichinaqinmi kaniyta rikuyta munanpi impuyta, chaynamanta kaniyta rikuyta munanpi kawsayniyta qillqata sutichinaqinmi kaniyta rikuchiy.",

@@ -2276,7 +2276,9 @@
   "ScanningQRCodeScreen": {
     "invalidContent": "Tulipata:\n\n{found: string} \n\nHii sio anwani halisi ya Bitcoin wala ankara ya Lightning.",
     "expiredContent": "Tulipata:{found: string} Ankara hii imeisha muda wake",
+    "unresolvedContent": "Tumepata:\n\n{found: string}\n\nHatukuweza kuchakata msimbo huu. Huenda umeisha muda wake, au huduma haipatikani kwa muda. Omba msimbo mpya au ujaribu tena baadaye.",
     "invalidTitle": "QR Code batili.",
+    "unresolvedTitle": "Msimbo haupatikani",
     "openLinkTitle": "Fungua Kiungo",
     "confirmOpenLink": "Je, una uhakika unataka kufungua kiungo hiki?",
     "noQrCode": "Hatukuweza kupata msimbo wa QR kwenye picha",
@@ -2351,6 +2353,7 @@
     "selfPaymentError": "{lnAddress: string} ni anwani yako ya {bankName: string}",
     "selfPaymentAdvice": "Ikiwa unataka kutuma pesa kwa akaunti yako nyingine, unaweza kutumia ankara ya malipo, LN au anwani ya BTC badala yake.",
     "lnAddressError": "Hatuwezi kupata anwani hii ya Lightning. Ikiwa una uhakika iko, unaweza jaribu tena baadaye.",
+    "lnurlServiceError": "Hatukuweza kuchakata msimbo huu. Huenda umeisha muda wake, au huduma haipatikani kwa muda.",
     "lnAddressAdvice": "Hakikisha kwamba tahajia ni sahihi ama uliza anayepokea akupe ankara ya malipo ama anwani ya BTC.",
     "unknownLightning": "Hatuwezi kuchanganua anwani hii ya Lightning. Tafadhali jaribu tena",
     "unknownOnchain": "Hatuwezi kuchanganua anwani hii ya Bitcoin. Tafadhali jaribu tena.",

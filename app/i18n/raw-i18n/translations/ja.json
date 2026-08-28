@@ -2276,7 +2276,9 @@
     "ScanningQRCodeScreen": {
         "invalidContent": "無効な情報：\n\n{found: string}\n\nこれは有効なビットコイン・アドレスまたはライトニング・インボイスではありません。",
         "expiredContent": "無効な情報：\n\n{found: string}\n\n有効期限切れのインボイスです",
+        "unresolvedContent": "見つかった情報：\n\n{found: string}\n\nこのコードを処理できませんでした。有効期限が切れているか、サービスが一時的に利用できない可能性があります。新しいコードを依頼するか、のちほど再トライしてください。",
         "invalidTitle": "無効なQRコード",
+        "unresolvedTitle": "コードを利用できません",
         "openLinkTitle": "リンクを開く",
         "confirmOpenLink": "このリンクを開いてもよろしいですか？",
         "noQrCode": "QRコードは見つかりませんでした",
@@ -2351,6 +2353,7 @@
         "selfPaymentError": "{lnAddress: string}は、あなたの{bankName: string}アドレスです。",
         "selfPaymentAdvice": "あなたが所有している別ウォレットに送金したい場合は、代わりにライトニング・インボイス、またはビットコイン・アドレスを使用することができます。",
         "lnAddressError": "このライトニング・アドレスにアクセスできません。アドレスに誤りがない場合は、のちほど再トライしてください。",
+        "lnurlServiceError": "このコードを処理できませんでした。有効期限が切れているか、サービスが一時的に利用できない可能性があります。",
         "lnAddressAdvice": "スペルが正しいことを確認するか、代わりにライトニング・インボイスまたはビットコイン・アドレスを受金者にお尋ねください。",
         "unknownLightning": "ライトニング・アドレスを読み込めません。もう一度トライしてみてください。",
         "unknownOnchain": "ビットコイン・アドレスを読み込めません。もう一度トライしてみてください。",

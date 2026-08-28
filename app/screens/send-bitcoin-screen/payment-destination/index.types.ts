@@ -105,6 +105,7 @@ export const InvalidDestinationReason = {
   UsernameDoesNotExist: "UsernameDoesNotExist",
   SelfPayment: "SelfPayment",
   LnurlUnsupported: "LnurlUnsupported",
+  LnurlServiceError: "LnurlServiceError",
   LnurlError: "LnurlError",
   UnknownLightning: "UnknownLightning",
   UnknownOnchain: "UnknownOnchain",

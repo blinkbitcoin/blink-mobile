@@ -24,6 +24,18 @@ export const detectDefaultLocale = (): Locales => {
   return matchOsLocaleToSupportedLocale(localesFromOs)
 }
 
+/**
+ * The device's preferred currency, taken from the OS region and locale settings, so it
+ * costs no permission and no network call. Undefined when the device names no currency the
+ * backend can price, which leaves the caller on its own fallback.
+ */
+export const detectDefaultCurrency = (
+  supportedCurrencyIds: readonly string[],
+): string | undefined => {
+  const currenciesFromOs = RNLocalize.getCurrencies()
+  return currenciesFromOs.find((currencyId) => supportedCurrencyIds.includes(currencyId))
+}
+
 export const Languages = ["DEFAULT", ...locales] as const
 
 export type Language = (typeof Languages)[number]

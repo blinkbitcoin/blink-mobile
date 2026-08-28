@@ -7,6 +7,7 @@ import { DisplayCurrency, toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/
 import { ConvertAmountAdjustment } from "@app/types/payment"
 import { WalletCurrency } from "@app/graphql/generated"
 import { IDEMPOTENCY_KEY_UNAVAILABLE } from "@app/screens/send-bitcoin-screen/use-send-payment"
+import { HideAmountContextProvider } from "@app/graphql/hide-amount-context"
 import * as PaymentDetails from "@app/screens/send-bitcoin-screen/payment-details/intraledger"
 import { ConvertMoneyAmount } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
 import * as PaymentDetailsLightning from "@app/screens/send-bitcoin-screen/payment-details/lightning"
@@ -237,6 +238,15 @@ jest.mock("@react-navigation/native", () => ({
     setOptions: jest.fn(),
   }),
 }))
+
+// The placeholder renders bare Views without a testID; stub it so the specs
+// can query for it. hideAmount defaults to false, so the other specs in this
+// file never render it.
+jest.mock("@app/components/hidden-balance-placeholder/hidden-balance-placeholder", () => {
+  const { View } = jest.requireActual("react-native")
+  const MockHiddenBalancePlaceholder = () => <View testID="hidden-balance-placeholder" />
+  return { HiddenBalancePlaceholder: MockHiddenBalancePlaceholder }
+})
 
 jest.mock("@app/components/atomic/galoy-slider-button/galoy-slider-button", () => {
   type Props = {
@@ -1295,5 +1305,43 @@ describe("SendBitcoinConfirmationScreen — 409 idempotency conflict recovery", 
     })
 
     expect(sendPaymentMock).toHaveBeenCalledTimes(2)
+  })
+})
+
+// The confirmation screen is a resting screen, not a picker: nothing on it
+// has to be compared against a balance, so hide-balance applies here the way
+// it does on the home screen. The amount being authorised stays readable.
+describe("hide balance", () => {
+  const renderWithHideAmount = (hideAmount: boolean) =>
+    render(
+      <ContextForScreen>
+        <HideAmountContextProvider value={{ hideAmount, toggleHideAmount: jest.fn() }}>
+          <Intraledger route={route} />
+        </HideAmountContextProvider>
+      </ContextForScreen>,
+    )
+
+  it("masks the From balance while hide-balance is on", async () => {
+    renderWithHideAmount(true)
+    await flushEffects()
+
+    // Exactly one placeholder: the From block. A second would mean the
+    // amount or fee field had been masked too, which is not the intent.
+    expect(screen.queryAllByTestId("hidden-balance-placeholder")).toHaveLength(1)
+  })
+
+  it("leaves the amount being sent readable while hide-balance is on", async () => {
+    renderWithHideAmount(true)
+    await flushEffects()
+
+    const { children } = await screen.findByLabelText("Successful Fee")
+    expect(children).toEqual(["₦0 ($0.00)"])
+  })
+
+  it("shows the From balance when balances are visible", async () => {
+    renderWithHideAmount(false)
+    await flushEffects()
+
+    expect(screen.queryAllByTestId("hidden-balance-placeholder")).toHaveLength(0)
   })
 })

@@ -2276,7 +2276,9 @@
   "ScanningQRCodeScreen": {
     "invalidContent": "Kami menemukan:\n\n{found: string}\n\nIni bukan alamat Bitcoin atau faktur Lightning yang valid",
     "expiredContent": "Kami menemukan:\n\n{found: string}\n\nFaktur ini telah kedaluwarsa",
+    "unresolvedContent": "Kami menemukan:\n\n{found: string}\n\nKami tidak dapat memproses kode ini. Kode mungkin sudah kedaluwarsa, atau layanan sedang tidak tersedia untuk sementara. Mintalah kode baru atau coba lagi nanti.",
     "invalidTitle": "Kode QR Tidak Valid",
+    "unresolvedTitle": "Kode tidak tersedia",
     "openLinkTitle": "Buka Tautan",
     "confirmOpenLink": "Apakah Anda yakin ingin membuka tautan ini?",
     "noQrCode": "Kami tidak dapat menemukan kode QR dalam gambar",
@@ -2351,6 +2353,7 @@
     "selfPaymentError": "{lnAddress: string} adalah alamat {bankName: string} Anda.",
     "selfPaymentAdvice": "Jika Anda ingin mengirim uang ke akun lain milik Anda, gunakan faktur, LN, atau alamat BTC.",
     "lnAddressError": "Kami tidak dapat mencapai alamat Lightning ini. Jika Anda yakin itu ada, coba lagi nanti.",
+    "lnurlServiceError": "Kami tidak dapat memproses kode ini. Kode mungkin sudah kedaluwarsa, atau layanan sedang tidak tersedia untuk sementara.",
     "lnAddressAdvice": "Pastikan ejaan benar atau minta penerima memberikan faktur atau alamat BTC.",
     "unknownLightning": "Kami tidak dapat mengurai alamat Lightning ini. Silakan coba lagi.",
     "unknownOnchain": "Kami tidak dapat mengurai alamat Bitcoin ini. Silakan coba lagi.",

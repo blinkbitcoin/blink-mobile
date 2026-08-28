@@ -135,9 +135,9 @@ describe("merchant payment destination integration", () => {
       displayCurrency: "USD",
     })
 
-    expect(requestPayServiceParamsMock).toHaveBeenCalledWith({
-      lnUrlOrAddress: expectedMerchant.lnurl,
-    })
+    expect(requestPayServiceParamsMock).toHaveBeenCalledWith(
+      expect.objectContaining({ lnUrlOrAddress: expectedMerchant.lnurl }),
+    )
     expect(isMerchantChoiceDestination(result)).toBe(false)
     expect(result).toEqual(
       expect.objectContaining({
@@ -203,5 +203,84 @@ describe("merchant payment destination integration", () => {
         }),
       }),
     )
+  })
+  /**
+   * The reported payload from blink-wip#1175. blink-client already matches the host
+   * and hands back a Money Badger lnurl, so a rejected scan is the merchant service
+   * answering, not a parser that failed to recognise the code. Pinned here because
+   * the ticket was filed as a parsing gap and the next reader will assume the same.
+   */
+  describe("a scanned merchant bill URL", () => {
+    const billUrl = "https://za.wigroup.co/bill/172366037"
+    const billLnurl = "https%3A%2F%2Fza.wigroup.co%2Fbill%2F172366037@cryptoqr.net"
+
+    const parseBillUrl = () =>
+      parseDestination({
+        rawInput: billUrl,
+        myWalletIds: ["wallet-id"],
+        bitcoinNetwork: Network.Mainnet,
+        lnurlDomains: ["blink.sv"],
+        accountDefaultWalletQuery: jest.fn() as never,
+        inputSource: "qr",
+        displayCurrency: "ZAR",
+      })
+
+    it("reaches the merchant lnurl service instead of being rejected as unparseable", async () => {
+      requestPayServiceParamsMock.mockRejectedValue(
+        Object.assign(new Error("Request failed with status code 500"), {
+          response: { status: 500 },
+        }),
+      )
+
+      await parseBillUrl()
+
+      expect(requestPayServiceParamsMock).toHaveBeenCalledWith(
+        expect.objectContaining({ lnUrlOrAddress: billLnurl }),
+      )
+    })
+
+    it("reports a service that cannot resolve the bill as a service error", async () => {
+      requestPayServiceParamsMock.mockRejectedValue(
+        Object.assign(new Error("Request failed with status code 500"), {
+          response: { status: 500 },
+        }),
+      )
+
+      expect(await parseBillUrl()).toEqual(
+        expect.objectContaining({
+          valid: false,
+          invalidReason: InvalidDestinationReason.LnurlServiceError,
+        }),
+      )
+    })
+
+    it("pays the bill when the merchant service resolves it", async () => {
+      requestPayServiceParamsMock.mockResolvedValue({
+        callback: "https://cryptoqr.net/callback",
+        fixed: true,
+        min: 0 as Satoshis,
+        max: 2000 as Satoshis,
+        domain: "cryptoqr.net",
+        metadata: [["text/plain", "Bootlegger Hartenbos"]],
+        metadataHash: "mocked_metadata_hash",
+        identifier: billLnurl,
+        description: "Bootlegger Hartenbos",
+        image: "",
+        commentAllowed: 0,
+        rawData: {},
+      })
+
+      expect(await parseBillUrl()).toEqual(
+        expect.objectContaining({
+          valid: true,
+          destinationDirection: DestinationDirection.Send,
+          validDestination: expect.objectContaining({
+            paymentType: PaymentType.Lnurl,
+            lnurl: billLnurl,
+            isMerchant: true,
+          }),
+        }),
+      )
+    })
   })
 })

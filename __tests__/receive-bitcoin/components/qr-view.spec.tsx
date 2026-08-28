@@ -4,6 +4,15 @@ import { render } from "@testing-library/react-native"
 import { QRView } from "@app/screens/receive-bitcoin-screen/qr-view"
 import { Invoice } from "@app/screens/receive-bitcoin-screen/payment/index.types"
 
+/** Mocked at the module the index re-exports, rather than by spreading `react-native`
+ *  itself: that spread pulls in the whole index eagerly and the dev-menu TurboModule
+ *  throws under jest. */
+const mockWindow = { width: 360, height: 800, scale: 2, fontScale: 1 }
+jest.mock("react-native/Libraries/Utilities/useWindowDimensions", () => ({
+  __esModule: true,
+  default: () => mockWindow,
+}))
+
 jest.mock("@rn-vui/themed", () => ({
   makeStyles: () => () => ({
     container: {},
@@ -99,6 +108,55 @@ const defaultProps = {
 describe("QRView", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockWindow.width = 360
+    mockWindow.height = 800
+    mockWindow.scale = 2
+  })
+
+  /** The code is square, so the window's shorter edge is what it has to fit inside. Taking
+   *  the width instead clipped it in landscape, and a clipped QR cannot be scanned. */
+  describe("sizing against the window", () => {
+    type RenderedNode = {
+      type?: string
+      props?: { size?: number }
+      children?: RenderedNode[] | null
+    }
+
+    const findQrSize = (
+      node: RenderedNode | RenderedNode[] | null,
+    ): number | undefined => {
+      if (!node) return undefined
+      if (Array.isArray(node)) {
+        return node.map(findQrSize).find((size) => size !== undefined)
+      }
+      if (node.type === "QRCode") return node.props?.size
+      return findQrSize(node.children ?? null)
+    }
+
+    const renderedQrSize = (): number | undefined => {
+      const { toJSON } = render(<QRView {...defaultProps} />)
+      return findQrSize(toJSON() as RenderedNode | RenderedNode[] | null)
+    }
+
+    it("fills the width in portrait", () => {
+      expect(renderedQrSize()).toBe(194)
+    })
+
+    it("keeps the portrait size in landscape rather than following the long edge", () => {
+      const portrait = renderedQrSize()
+
+      mockWindow.width = 800
+      mockWindow.height = 360
+
+      expect(renderedQrSize()).toBe(portrait)
+    })
+
+    it("never asks for more than the shorter edge leaves", () => {
+      mockWindow.width = 800
+      mockWindow.height = 360
+
+      expect(renderedQrSize()).toBeLessThanOrEqual(360)
+    })
   })
 
   it("renders QR code when ready with getFullUri", () => {

@@ -69,14 +69,14 @@ loadLocale("en")
 const LL = i18nObject("en")
 
 describe("ViewBackupPhraseScreen", () => {
-  let mockGetIsBiometricsEnabled: jest.SpyInstance
+  let mockReadIsBiometricsEnabled: jest.SpyInstance
 
   beforeEach(() => {
     jest.clearAllMocks()
     // biometrics disabled by default: the gate passes without prompting
-    mockGetIsBiometricsEnabled = jest
-      .spyOn(KeyStoreWrapper, "getIsBiometricsEnabled")
-      .mockResolvedValue(false)
+    mockReadIsBiometricsEnabled = jest
+      .spyOn(KeyStoreWrapper, "readIsBiometricsEnabled")
+      .mockResolvedValue({ status: "no" })
     mockIsSensorAvailable.mockResolvedValue(true)
   })
 
@@ -220,7 +220,7 @@ describe("ViewBackupPhraseScreen", () => {
   })
 
   it("shows the phrase after successful biometric auth when the setting is enabled", async () => {
-    mockGetIsBiometricsEnabled.mockResolvedValue(true)
+    mockReadIsBiometricsEnabled.mockResolvedValue({ status: "yes" })
     mockAuthenticate.mockImplementation((_desc: string, onSuccess: () => void) => {
       onSuccess()
     })
@@ -240,7 +240,7 @@ describe("ViewBackupPhraseScreen", () => {
   })
 
   it("goes back without showing the phrase when biometric auth fails", async () => {
-    mockGetIsBiometricsEnabled.mockResolvedValue(true)
+    mockReadIsBiometricsEnabled.mockResolvedValue({ status: "yes" })
     mockAuthenticate.mockImplementation(
       (_desc: string, _onSuccess: () => void, onFail: () => void) => {
         onFail()
@@ -258,7 +258,7 @@ describe("ViewBackupPhraseScreen", () => {
   })
 
   it("does not show the phrase while biometric auth is pending", async () => {
-    mockGetIsBiometricsEnabled.mockResolvedValue(true)
+    mockReadIsBiometricsEnabled.mockResolvedValue({ status: "yes" })
     mockAuthenticate.mockImplementation(() => {
       // user has not responded to the prompt yet
     })
@@ -274,7 +274,7 @@ describe("ViewBackupPhraseScreen", () => {
   })
 
   it("does not install the header Copy button while biometric auth is pending", async () => {
-    mockGetIsBiometricsEnabled.mockResolvedValue(true)
+    mockReadIsBiometricsEnabled.mockResolvedValue({ status: "yes" })
     mockAuthenticate.mockImplementation(() => {
       // user has not responded to the prompt yet
     })
@@ -295,7 +295,7 @@ describe("ViewBackupPhraseScreen", () => {
   })
 
   it("does not install the header Copy button when biometric auth fails", async () => {
-    mockGetIsBiometricsEnabled.mockResolvedValue(true)
+    mockReadIsBiometricsEnabled.mockResolvedValue({ status: "yes" })
     mockAuthenticate.mockImplementation(
       (_desc: string, _onSuccess: () => void, onFail: () => void) => {
         onFail()
@@ -313,7 +313,7 @@ describe("ViewBackupPhraseScreen", () => {
   })
 
   it("installs the header Copy button once biometric auth succeeds", async () => {
-    mockGetIsBiometricsEnabled.mockResolvedValue(true)
+    mockReadIsBiometricsEnabled.mockResolvedValue({ status: "yes" })
     mockAuthenticate.mockImplementation((_desc: string, onSuccess: () => void) => {
       onSuccess()
     })

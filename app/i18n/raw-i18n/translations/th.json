@@ -2276,7 +2276,9 @@
   "ScanningQRCodeScreen": {
     "invalidContent": "เราพบว่า:\n\n{found: string}\n\nไม่ตรงกับ Bitcoin address หรือ Lightning invoice",
     "expiredContent": "เราพบว่า:\n\n{found: string}\n\nInvoice นี้หมดอายุ",
+    "unresolvedContent": "เราพบ:\n\n{found: string}\n\nเราไม่สามารถประมวลผลรหัสนี้ได้ รหัสอาจหมดอายุแล้ว หรือบริการอาจไม่พร้อมใช้งานชั่วคราว ขอรหัสใหม่หรือลองอีกครั้งในภายหลัง",
     "invalidTitle": "QR Code ไม่ถูกต้อง",
+    "unresolvedTitle": "ไม่สามารถใช้รหัสนี้ได้",
     "openLinkTitle": "เปิดลิงก์",
     "confirmOpenLink": "คุณแน่ใจหรือไม่ว่าต้องการเปิดลิงก์นี้?",
     "noQrCode": "ไม่พบ QR Code ในรูป",
@@ -2351,6 +2353,7 @@
     "selfPaymentError": "{lnAddress: string} คือแอดเดรส {bankName: string} ของคุณ",
     "selfPaymentAdvice": "ถ้าต้องการส่งเงินไปยังบัญชีอื่นที่คุณเป็นเจ้าของ คุณสามารถใช้อินวอยซ์, ไลท์นิ่งแอดเดรส หรือบิตคอยน์แอดเดรสแทนได้",
     "lnAddressError": "เราไม่สามารถเชื่อมต่อไปยังไลท์นิ่งแอดเดรสนี้ได้ ถ้าคุณมั่นใจว่ามันมีตัวตนอยู่จริง คุณสามารถลองใหม่ได้ภายหลัง",
+    "lnurlServiceError": "เราไม่สามารถประมวลผลรหัสนี้ได้ รหัสอาจหมดอายุแล้ว หรือบริการอาจไม่พร้อมใช้งานชั่วคราว",
     "lnAddressAdvice": "ลองเช็คอีกครั้งว่าสะกดถูกต้องไหม ไม่อย่างนั้นก็ลองขอไลท์นิ่งอินวอยซ์หรือบิตคอยน์แอดเดรสมาใช้แทน",
     "unknownLightning": "เราไม่สามารถวาง Lightning address โปรดลองอีกครั้ง",
     "unknownOnchain": "เราไม่สามารถวาง Bitcoin address โปรดลองอีกครั้ง",

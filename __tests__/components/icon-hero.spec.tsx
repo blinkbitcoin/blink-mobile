@@ -26,6 +26,37 @@ describe("IconHero", () => {
     expect(getByText("Test Title")).toBeTruthy()
   })
 
+  it("lets a title wrap by default, because a heading is a sentence", async () => {
+    const { getByText } = render(
+      <ContextForScreen>
+        <IconHero icon="cloud-arrow-up" iconColor="green" title="Test Title" />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    expect(getByText("Test Title").props.numberOfLines).toBeUndefined()
+  })
+
+  it("cuts a title short when the caller caps its lines", async () => {
+    // A lightning address is one unbreakable thing: wrapping it mid-address reads as two
+    // addresses, so a screen showing one asks for a single line instead.
+    const { getByText } = render(
+      <ContextForScreen>
+        <IconHero
+          icon="cloud-arrow-up"
+          iconColor="green"
+          title="deepbassoon958@walletofsatoshi.com"
+          titleLines={1}
+        />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    const title = getByText("deepbassoon958@walletofsatoshi.com")
+    expect(title.props.numberOfLines).toBe(1)
+    expect(title.props.ellipsizeMode).toBe("middle")
+  })
+
   it("renders subtitle when provided", async () => {
     const { getByText } = render(
       <ContextForScreen>

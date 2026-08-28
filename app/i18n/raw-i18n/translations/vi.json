@@ -2276,7 +2276,9 @@
   "ScanningQRCodeScreen": {
     "invalidContent": "Chúng tôi đã tìm thấy:\n\n{found: string}\n\nĐây không phải là địa chỉ Bitcoin hoặc hóa đơn Lightning hợp lệ",
     "expiredContent": "We found:\n\n{found: string}\n\nThis invoice has expired",
+    "unresolvedContent": "Chúng tôi tìm thấy:\n\n{found: string}\n\nChúng tôi không thể xử lý mã này. Mã có thể đã hết hạn hoặc dịch vụ tạm thời không khả dụng. Hãy yêu cầu mã mới hoặc thử lại sau.",
     "invalidTitle": "Mã QR không hợp lệ",
+    "unresolvedTitle": "Mã không khả dụng",
     "openLinkTitle": "Mở Liên kết",
     "confirmOpenLink": "Bạn có chắc muốn mở liên kết này không?",
     "noQrCode": "Chúng tôi không thể tìm thấy mã QR trong hình ảnh",
@@ -2351,6 +2353,7 @@
     "selfPaymentError": "{lnAddress: string} là địa chỉ {bankName: string} của bạn.",
     "selfPaymentAdvice": "Nếu bạn muốn gửi tiền đến một tài khoản khác mà bạn sở hữu, bạn có thể sử dụng hóa đơn, địa chỉ LN hoặc BTC để thay thế.",
     "lnAddressError": "Chúng tôi không thể truy cập địa chỉ Lightning này. Nếu bạn chắc chắn rằng nó tồn tại, bạn có thể thử lại sau.",
+    "lnurlServiceError": "Chúng tôi không thể xử lý mã này. Mã có thể đã hết hạn hoặc dịch vụ tạm thời không khả dụng.",
     "lnAddressAdvice": "Đảm bảo viết đúng chính tả hoặc yêu cầu người nhận cung cấp hóa đơn hoặc địa chỉ BTC.",
     "unknownLightning": "Chúng tôi không thể phân tích địa chỉ Lightning này. Vui lòng thử lại.",
     "unknownOnchain": "Chúng tôi không thể phân tích địa chỉ Bitcoin này. Vui lòng thử lại.",

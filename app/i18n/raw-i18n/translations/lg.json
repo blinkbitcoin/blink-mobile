@@ -2276,7 +2276,9 @@
   "ScanningQRCodeScreen": {
     "invalidContent": "Twazudde:\n\n{found: string}\n\nEno si ndagiriro ya Bitcoin entuufu oba yinivoyisi ya Lightning",
     "expiredContent": "Twazudde:\n\n{found: string}\n\nEno yinivoyisi eweddekko",
+    "unresolvedContent": "Twazudde:\n\n{found: string}\n\nTetusobodde kukola ku koodi eno. Oboolyawo ebbanga lyayo liweddeko, oba obuweereza tebuliiwo kaseera. Saba koodi empya oba ogezaako oluvannyuma.",
     "invalidTitle": "QR Code etali ntuufu",
+    "unresolvedTitle": "Koodi teri wa kukozesa",
     "openLinkTitle": "Gulawo Link",
     "confirmOpenLink": "Okakasa nti oyagala kuggulawo link eno?",
     "noQrCode": "Tetusobola kuzuula QR code mu kifaananyi",
@@ -2351,6 +2353,7 @@
     "selfPaymentError": "{lnAddress: string} ye ndagiriro yo eya {bankName: string}.",
     "selfPaymentAdvice": "Bwoba oyagala okusindika ssente ku akawunti endala gy'olina, osobola okukozesa yinivoyisi, LN oba endagiriro eya BTC.",
     "lnAddressError": "Tetusobola kutuuka ku ndagiriro eno eya Lightning. Bw’oba ​​okakasa nti kiriwo, osobola okuddamu okugezaako oluvannyuma.",
+    "lnurlServiceError": "Tetusobodde kukola ku koodi eno. Oboolyawo ebbanga lyayo liweddeko, oba obuweereza tebuliiwo kaseera.",
     "lnAddressAdvice": "Kakasa nti enjawulo mu mpandiika ntuufu oba saba oyo afuna yinivoyisi oba endagiriro ya BTC.",
     "unknownLightning": "Tetusobola kutuuka ku ndagiriro eno eya Lightning. Tukusaba okugezaako oluvannyuma.",
     "unknownOnchain": "Tetusobola kusengejja ndagiriro ya Bitcoin. Tukusaba oddemu ogezeeko.",
