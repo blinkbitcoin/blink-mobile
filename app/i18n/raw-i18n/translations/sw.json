@@ -31,6 +31,8 @@
     "createError": "Imeshindwa kuunda ufunguo wa API. Tafadhali jaribu tena.",
     "revokeError": "Imeshindwa kubatilisha ufunguo wa API. Tafadhali jaribu tena.",
     "loadError": "Imeshindwa kupakia funguo zako za API. Tafadhali jaribu tena baadaye.",
+    "discardSecretTitle": "Tupa ufunguo huu wa API?",
+    "discardSecretBody": "Hii ndiyo mara pekee siri inayoonyeshwa. Ukiacha sasa, ufunguo hauwezi kupatikana tena na utalazimika kuunda mpya.",
     "done": "Imekamilika"
   },
   "GaloyAddressScreen": {
