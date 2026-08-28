@@ -431,4 +431,23 @@ describe("BackupPhraseScreen", () => {
       ).toBeTruthy()
     })
   })
+
+  /** setOptions has no owner: the route keeps the last value, so a header action
+   *  installed by gated content outlives the unmount that was supposed to hide it. */
+  it("clears the Copy action from the header when the content unmounts", async () => {
+    const { unmount } = render(
+      <ContextForScreen>
+        <BackupPhraseScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+    expect(mockSetOptions).toHaveBeenCalled()
+
+    unmount()
+
+    const calls = mockSetOptions.mock.calls
+    expect(calls[calls.length - 1]?.[0]).toEqual(
+      expect.objectContaining({ headerRight: undefined }),
+    )
+  })
 })

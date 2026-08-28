@@ -92,7 +92,7 @@ const RestorePhraseContent: React.FC<RestorePhraseContentProps> = ({ step, resto
   useLayoutEffect(() => {
     if (!isStep1) {
       navigation.setOptions(noHeaderRight)
-      return
+      return undefined
     }
     navigation.setOptions(
       headerRightNoGlass(() => (
@@ -107,6 +107,11 @@ const RestorePhraseContent: React.FC<RestorePhraseContentProps> = ({ step, resto
         />
       )),
     )
+    /** Header options outlive the component that set them — the route keeps the
+     *  last value and unmounting the setter does not revert it. Without this the
+     *  gate would hide the inputs while leaving Paste live in the header, one tap
+     *  away from the clipboard, exactly while the guard is off. */
+    return () => navigation.setOptions(noHeaderRight)
   }, [navigation, isStep1, handlePasteFromClipboard, pasteLabel, styles])
 
   if (status === RestoreStatus.Restoring) {
