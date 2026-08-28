@@ -31,7 +31,16 @@ export type ScreenSecurityLease = {
  *  unregister/register. */
 let leaseCount = 0
 let registered = false
-let registering = false
+/** The color the live guard was registered with. `registered` alone cannot tell a
+ *  same-tick replace that only changed the theme (release + re-acquire in one
+ *  effect pass, so the queued teardown cancels itself) apart from one that changed
+ *  nothing — but the former must still re-register, or the native guard keeps the
+ *  stale color. */
+let registeredColor: string | undefined
+/** The color the newest live lease asked for. Read inside the queued task rather
+ *  than captured at enqueue time: a lease that lands while earlier tasks are still
+ *  queued is the one the guard must end up with. */
+let desiredColor: string | undefined
 let pending: Promise<void> = Promise.resolve()
 
 // A screen whose registration rejected would otherwise stay unprotected for its
@@ -101,35 +110,56 @@ const registerWithRetries = async (backgroundColor: string): Promise<void> => {
   throw lastError
 }
 
-const startRegistration = (backgroundColor: string): void => {
-  // A cycle already in flight is shared: concurrent leases just join its waiters.
-  if (registering) return
-  registering = true
+const startRegistration = (): void => {
+  // One task per acquire; the queue serializes them, so concurrent leases simply
+  // no-op behind the task that lands the registration and share its waiter settle.
   enqueue(async () => {
     try {
       // Decided at run time, not call time: a teardown queued ahead of this task
       // may have run by now, and a `registered` flag read at call time would be
       // stale exactly when it matters.
+      const color = desiredColor
+      if (color === undefined) return
       if (!registered) {
-        await registerWithRetries(backgroundColor)
+        await registerWithRetries(color)
         // Serialized by the queue: no other task can touch `registered` here.
         // eslint-disable-next-line require-atomic-updates
         registered = true
+        // eslint-disable-next-line require-atomic-updates
+        registeredColor = color
+      } else if (registeredColor !== color) {
+        // A same-tick replace with a new color (a theme flip re-acquires the lease
+        // before the queued teardown runs) cancels the teardown, so without this
+        // branch the native guard would keep the stale color. Registering over a
+        // live guard cannot be relied on to replace it, so it comes down first.
+        try {
+          await ScreenGuard.unregister()
+        } finally {
+          // Same reasoning as the teardown below: after a rejected unregister the
+          // native state is unknown and `false` is the only recoverable state.
+          // eslint-disable-next-line require-atomic-updates
+          registered = false
+          // eslint-disable-next-line require-atomic-updates
+          registeredColor = undefined
+        }
+        await registerWithRetries(color)
+        // eslint-disable-next-line require-atomic-updates
+        registered = true
+        // eslint-disable-next-line require-atomic-updates
+        registeredColor = color
       }
       settleWaiters((waiter) => waiter.resolve())
     } catch (error) {
       // A cycle abandoned because the last lease was released has nobody to
       // report to; a genuinely exhausted cycle fails every waiter.
       if (leaseCount > 0) settleWaiters((waiter) => waiter.reject(error))
-    } finally {
-      // eslint-disable-next-line require-atomic-updates
-      registering = false
     }
   })
 }
 
 export const acquireScreenSecurity = (backgroundColor: string): ScreenSecurityLease => {
   leaseCount += 1
+  desiredColor = backgroundColor
 
   const waiter: Waiter = { resolve: () => {}, reject: () => {} }
   const ready = new Promise<void>((resolve, reject) => {
@@ -138,7 +168,7 @@ export const acquireScreenSecurity = (backgroundColor: string): ScreenSecurityLe
   })
   waiters.push(waiter)
 
-  startRegistration(backgroundColor)
+  startRegistration()
 
   let released = false
   let releasePromise: Promise<void> | undefined
@@ -169,6 +199,8 @@ export const acquireScreenSecurity = (backgroundColor: string): ScreenSecurityLe
         // harmless if the shield is in fact still on.
         // eslint-disable-next-line require-atomic-updates
         registered = false
+        // eslint-disable-next-line require-atomic-updates
+        registeredColor = undefined
       }
     })
     return releasePromise
