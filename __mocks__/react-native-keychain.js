@@ -4,6 +4,7 @@ const resetGenericPassword = jest.fn(() => Promise.resolve(true))
 
 const setInternetCredentials = jest.fn(() => Promise.resolve({ service: "mock-service" }))
 const getInternetCredentials = jest.fn(() => Promise.resolve(false))
+const hasInternetCredentials = jest.fn(() => Promise.resolve(false))
 const resetInternetCredentials = jest.fn(() => Promise.resolve(undefined))
 
 const ACCESSIBLE = {
@@ -21,6 +22,7 @@ export {
   resetGenericPassword,
   setInternetCredentials,
   getInternetCredentials,
+  hasInternetCredentials,
   resetInternetCredentials,
   ACCESSIBLE,
 }
@@ -31,6 +33,7 @@ export default {
   resetGenericPassword,
   setInternetCredentials,
   getInternetCredentials,
+  hasInternetCredentials,
   resetInternetCredentials,
   ACCESSIBLE,
 }
