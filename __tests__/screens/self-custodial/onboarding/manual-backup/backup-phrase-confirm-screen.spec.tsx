@@ -269,6 +269,28 @@ describe("BackupPhraseConfirmScreen", () => {
       expect(mockReplace).not.toHaveBeenCalled()
       expect(mockReportError).not.toHaveBeenCalled()
     })
+
+    /** The redirect must not wait for the screen guard: on a device where
+     *  registration keeps failing, the gated content never mounts, so a redirect
+     *  living behind the gate would leave the user stuck on the error view. */
+    it("redirects ahead of the gate, without acquiring screen protection", async () => {
+      mockRouteParams.mockReturnValue(undefined)
+      mockAcquireScreenSecurity.mockReturnValue({
+        // The guard never settles — the gate would sit on its spinner forever.
+        ready: new Promise(() => {}),
+        release: mockReleaseScreenSecurity,
+      })
+
+      render(
+        <ContextForScreen>
+          <BackupPhraseConfirmScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      expect(mockReplace).toHaveBeenCalledWith("selfCustodialBackupPhrase", { step: 1 })
+      expect(mockAcquireScreenSecurity).not.toHaveBeenCalled()
+    })
   })
 
   it("renders subtitle and input fields", async () => {
