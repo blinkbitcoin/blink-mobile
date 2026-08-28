@@ -35,38 +35,22 @@ type RestorePhraseRouteProp = RouteProp<RootStackParamList, "selfCustodialRestor
 // The clear tertiary button has no padding, so its hit area is the text bounds.
 const HEADER_BUTTON_HIT_SLOP = { top: 12, bottom: 12, left: 12, right: 12 }
 
+type RestorePhraseContentProps = {
+  step: PhraseStep
+  restore: ReturnType<typeof useRestorePhrase>
+}
+
 /** The gate mounts this only once the screenshot guard is actually on — the typed
- *  words and the header Paste action must not exist while registration is pending. */
-const RestorePhraseContent: React.FC = () => {
+ *  words and the header Paste action must not exist while registration is pending.
+ *  The phrase state itself is held above the gate and handed in, so an unmount
+ *  hides the words without destroying them. */
+const RestorePhraseContent: React.FC<RestorePhraseContentProps> = ({ step, restore }) => {
   const { LL } = useI18nContext()
   const styles = useStyles()
   const {
     theme: { colors },
   } = useTheme()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-
-  /** Deep links and navigation-state rehydration can deliver missing or malformed params
-   *  despite the route type; a bare destructure here threw into the app-wide ErrorBoundary,
-   *  replacing the whole navigation tree (#4070). Fall back to step 1, where a restore
-   *  starts anyway. Step 2 is only valid together with the words entered on step 1 —
-   *  without them it renders inputs 7-12 over a phrase that can never validate. */
-  const { params } = useRoute<RestorePhraseRouteProp>()
-  const stepParam = params?.step
-  const wordsParam = params?.words
-  const wordsOk = isValidStepTwoWords(wordsParam)
-  const hasValidParams =
-    isPhraseStep(stepParam) && (stepParam === PhraseStep.First || wordsOk)
-  const step = hasValidParams ? stepParam : PhraseStep.First
-  const initialWords = hasValidParams && wordsOk ? wordsParam : undefined
-
-  useEffect(() => {
-    if (hasValidParams) return
-    reportError(
-      "Restore phrase route params missing",
-      new Error("Route delivered no valid step/words combination"),
-      { dedupKey: "restore-phrase-params-missing", alwaysRecord: true },
-    )
-  }, [hasValidParams])
 
   const {
     stepWords,
@@ -87,7 +71,7 @@ const RestorePhraseContent: React.FC = () => {
     handleRestore,
     focusRequest,
     clearFocusRequest,
-  } = useRestorePhrase({ step, initialWords })
+  } = restore
 
   const showInvalidMnemonic = !isStep1 && allFilled && !isValid
   const showError = Boolean(validationError) || showInvalidMnemonic
@@ -235,20 +219,52 @@ const RestorePhraseContent: React.FC = () => {
   )
 }
 
-export const RestorePhraseScreen: React.FC = () => (
-  // Input-only screen: the user types a phrase they already hold. Failing closed
-  // here would lock a reinstalling user out of their funds on a device where
-  // registration never succeeds, so the gate degrades to mounting the content
-  // unprotected after its retries are exhausted. Deliberately no user-facing
-  // warning on that degraded path: the failure is reported through reportError,
-  // and a screenshot-protection warning would read as an error in a flow where
-  // nothing went wrong from the user's side. Backup-phrase-confirm stays
-  // fail-closed on purpose — a blocked confirm strands no funds, since the user
-  // still holds the phrase and can restart the backup.
-  <ScreenSecurityGate failOpen>
-    <RestorePhraseContent />
-  </ScreenSecurityGate>
-)
+export const RestorePhraseScreen: React.FC = () => {
+  /** Deep links and navigation-state rehydration can deliver missing or malformed params
+   *  despite the route type; a bare destructure threw into the app-wide ErrorBoundary,
+   *  replacing the whole navigation tree (#4070). Fall back to step 1, where a restore
+   *  starts anyway. Step 2 is only valid together with the words entered on step 1 —
+   *  without them it renders inputs 7-12 over a phrase that can never validate. */
+  const { params } = useRoute<RestorePhraseRouteProp>()
+  const stepParam = params?.step
+  const wordsParam = params?.words
+  const wordsOk = isValidStepTwoWords(wordsParam)
+  const hasValidParams =
+    isPhraseStep(stepParam) && (stepParam === PhraseStep.First || wordsOk)
+  const step = hasValidParams ? stepParam : PhraseStep.First
+  const initialWords = hasValidParams && wordsOk ? wordsParam : undefined
+
+  useEffect(() => {
+    if (hasValidParams) return
+    reportError(
+      "Restore phrase route params missing",
+      new Error("Route delivered no valid step/words combination"),
+      { dedupKey: "restore-phrase-params-missing", alwaysRecord: true },
+    )
+  }, [hasValidParams])
+
+  /** Held above the gate deliberately. The gate unmounts its subtree every time the
+   *  guard drops — a theme flip re-registers it with the new mask colour — and the
+   *  words the user has already typed must survive that. Safe to run here because
+   *  useRestorePhrase has no mount effects: the clipboard read and the restore both
+   *  hang off presses, so nothing sensitive happens before the guard is on. */
+  const restore = useRestorePhrase({ step, initialWords })
+
+  return (
+    // Input-only screen: the user types a phrase they already hold. Failing closed
+    // here would lock a reinstalling user out of their funds on a device where
+    // registration never succeeds, so the gate degrades to mounting the content
+    // unprotected after its retries are exhausted. Deliberately no user-facing
+    // warning on that degraded path: the failure is reported through reportError,
+    // and a screenshot-protection warning would read as an error in a flow where
+    // nothing went wrong from the user's side. Backup-phrase-confirm stays
+    // fail-closed on purpose — a blocked confirm strands no funds, since the user
+    // still holds the phrase and can restart the backup.
+    <ScreenSecurityGate failOpen>
+      <RestorePhraseContent step={step} restore={restore} />
+    </ScreenSecurityGate>
+  )
+}
 
 const useStyles = makeStyles(({ colors }) => ({
   subtitle: {

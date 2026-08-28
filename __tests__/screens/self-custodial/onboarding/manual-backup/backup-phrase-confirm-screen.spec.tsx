@@ -627,4 +627,30 @@ describe("BackupPhraseConfirmScreen", () => {
       expect(mockReleaseScreenSecurity).toHaveBeenCalledTimes(1)
     })
   })
+
+  /** The gate unmounts its subtree whenever the guard drops — a theme flip
+   *  re-registers it with the new mask colour — so the answers the user has
+   *  already typed are held above the gate and handed in. */
+  describe("surviving a gate re-activation", () => {
+    it("builds the confirmation state above the gate, so a pending guard cannot wipe it", async () => {
+      // Never-settling lease: the gate stays on its spinner and mounts no content.
+      mockAcquireScreenSecurity.mockReturnValue({
+        ready: new Promise<void>(() => {}),
+        release: mockReleaseScreenSecurity,
+      })
+
+      const { queryByTestId } = render(
+        <ContextForScreen>
+          <BackupPhraseConfirmScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      // The gated content is genuinely absent...
+      expect(queryByTestId("confirm-word-0")).toBeNull()
+      // ...while the layer that owns the typed answers has still run. Held inside
+      // the gate it would be torn down and rebuilt on every re-activation.
+      expect(mockCheckpointLoading).toHaveBeenCalled()
+    })
+  })
 })
