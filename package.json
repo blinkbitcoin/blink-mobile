@@ -61,7 +61,7 @@
   "dependencies": {
     "@apollo/client": "^3.9.11",
     "@bitcoinerlab/secp256k1": "^1.1.1",
-    "@blinkbitcoin/blink-client": "1.1.0",
+    "@blinkbitcoin/blink-client": "1.1.1",
     "@blinkbitcoin/react-native-geetest-module": "0.1.2",
     "@breeztech/breez-sdk-spark-react-native": "0.22.0",
     "@expo/react-native-action-sheet": "^4.0.1",
