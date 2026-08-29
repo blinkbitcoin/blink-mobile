@@ -25,8 +25,8 @@ const mockKycFlowStart = jest.fn()
 jest.mock("@app/graphql/generated", () => ({
   useKycFlowStartMutation: () => [mockKycFlowStart],
   KycFlowType: {
-    Full: "FULL",
-    Basic: "BASIC",
+    Card: "CARD",
+    UpgradeLevelTwo: "UPGRADE_LEVEL_TWO",
   },
 }))
 
