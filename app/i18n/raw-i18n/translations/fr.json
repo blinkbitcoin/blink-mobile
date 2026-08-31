@@ -2142,6 +2142,7 @@
         "placeReviewNote": "Les nouveaux lieux sont envoyés à BTC Map. Sa communauté vérifie et entretient tout ce qui figure sur la carte.",
         "placeSubmitted": "Lieu envoyé à BTC Map : merci de l'avoir ajouté",
         "placeSubmissionFailed": "Le lieu n'a pas pu être envoyé. Vérifiez votre connexion et réessayez.",
+        "placeRefused": "BTC Map n'a pas pu accepter ce lieu. Rien n'a été ajouté à la carte.",
         "category": {
             "restaurants": "Restaurants",
             "cafes": "Cafés",

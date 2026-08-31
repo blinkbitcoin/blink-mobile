@@ -2147,6 +2147,8 @@ const en: BaseTranslation = {
     placeSubmitted: "Place sent to BTC Map — thanks for adding it",
     placeSubmissionFailed:
       "The place could not be sent. Check your connection and try again.",
+    placeRefused:
+      "BTC Map could not accept this place. Nothing was added to the map.",
     category: {
       restaurants: "Restaurants",
       cafes: "Cafés",

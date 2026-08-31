@@ -2142,6 +2142,7 @@
     "placeReviewNote": "Ebifo ebiggya bisindikibwa ku BTC Map. Ekibiina kyayo kikebera era kikuuma buli kimu ekiri ku mmaapu.",
     "placeSubmitted": "Ekifo kisindikiddwa ku BTC Map — weebale okukyongerako",
     "placeSubmissionFailed": "Ekifo tekisobodde kusindikwa. Kebera entaanya yo oluddemu ogezeko.",
+    "placeRefused": "BTC Map tesobodde kukkiriza kifo kino. Tewali kyongeddwa ku mmaapu.",
     "category": {
       "restaurants": "Eby'okuliirwamu",
       "cafes": "Wooteeri za kaawa",

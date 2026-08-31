@@ -2142,6 +2142,7 @@
         "placeReviewNote": "新しい場所はBTC Mapに送信されます。マップ上のすべてはBTC Mapのコミュニティが確認・管理しています。",
         "placeSubmitted": "BTC Mapに場所を送信しました。追加していただきありがとうございます",
         "placeSubmissionFailed": "場所を送信できませんでした。接続を確認して、もう一度お試しください。",
+        "placeRefused": "BTC Mapはこの場所を受け付けられませんでした。マップには何も追加されていません。",
         "category": {
             "restaurants": "レストラン",
             "cafes": "カフェ",

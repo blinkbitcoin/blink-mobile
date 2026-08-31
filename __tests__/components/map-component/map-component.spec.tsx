@@ -214,6 +214,25 @@ beforeEach(() => {
   mockedNames.mockReturnValue(new Map())
 })
 
+type SendPlace = (submission: unknown) => Promise<string | null>
+
+const SUBMISSION = {
+  name: "Hope House",
+  category: "cafes",
+  latitude: REGION.latitude,
+  longitude: REGION.longitude,
+}
+
+// The form is stubbed out here, so this is what tapping its submit button
+// amounts to — including what the map answers back for the form to show.
+const sendFromForm = async (): Promise<{ reason?: string | null }> => {
+  const sent: { reason?: string | null } = {}
+  await act(async () => {
+    sent.reason = await (capturedAddPlaceProps?.onSubmit as SendPlace)(SUBMISSION)
+  })
+  return sent
+}
+
 // The map is measured before anything can be placed in it, and the placement
 // works in the view's own pixels — so a test that wants labels has to lay it out.
 const layOutMap = async (width = 384, height = 720) => {
@@ -694,10 +713,13 @@ describe("MapComponent adding a place", () => {
     expect(queryByTestId("open-add-place")).toBeNull()
   })
 
-  it("toasts the backend's own reason when the place is refused", async () => {
+  it("tells the form a refusal is about the place, not the connection", async () => {
     // A refusal is permanent — "check your connection" would send the user
-    // retrying a payload that can never go through.
-    mockSubmitPlace.mockResolvedValue({ submitted: false, message: "rate limited" })
+    // retrying a payload that can never go through. It is our own translated
+    // sentence rather than the backend's, which only ever comes back in
+    // English, and it goes to the form rather than into a toast: the form is a
+    // native modal over everything, and the app's toast is mounted outside it.
+    mockSubmitPlace.mockResolvedValue({ submitted: false, refused: true })
     const { getByTestId } = renderMap()
 
     await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
@@ -705,20 +727,12 @@ describe("MapComponent adding a place", () => {
     fireEvent.press(getByTestId("confirm-place-location"))
 
     await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(true))
-    await act(async () => {
-      await (capturedAddPlaceProps?.onSubmit as (s: unknown) => Promise<void>)({
-        name: "Hope House",
-        category: "cafes",
-        latitude: REGION.latitude,
-        longitude: REGION.longitude,
-      })
-    })
+    const sent = await sendFromForm()
 
-    await waitFor(() =>
-      expect(mockToastShow).toHaveBeenCalledWith(
-        expect.objectContaining({ message: "rate limited" }),
-      ),
+    expect(sent.reason).toBe(
+      "BTC Map could not accept this place. Nothing was added to the map.",
     )
+    expect(mockToastShow).not.toHaveBeenCalled()
     // Still open: the typed place is the user's to fix or abandon.
     expect(capturedAddPlaceProps?.isVisible).toBe(true)
   })
@@ -885,7 +899,7 @@ describe("MapComponent adding a place", () => {
   it("keeps the form open when the place could not be sent, so a retry resends the same submission", async () => {
     // A retry of the same attempt must carry the same submissionId: that is
     // the idempotency key the backend deduplicates on.
-    mockSubmitPlace.mockResolvedValue({ submitted: false, message: null })
+    mockSubmitPlace.mockResolvedValue({ submitted: false, refused: false })
     const { getByTestId } = renderMap()
 
     await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
@@ -893,34 +907,25 @@ describe("MapComponent adding a place", () => {
     fireEvent.press(getByTestId("confirm-place-location"))
 
     await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(true))
-    const submission = {
-      name: "Hope House",
-      category: "cafes",
-      latitude: REGION.latitude,
-      longitude: REGION.longitude,
-    }
-    const onSubmit = capturedAddPlaceProps?.onSubmit as (s: unknown) => Promise<void>
 
-    await act(async () => {
-      await onSubmit(submission)
-    })
+    const first = await sendFromForm()
 
-    await waitFor(() => expect(mockToastShow).toHaveBeenCalled())
-    expect(mockToastShow).not.toHaveBeenCalledWith(
-      expect.objectContaining({ type: "success" }),
+    // A request that never got an answer carries no reason of its own, so the
+    // form is given the generic one rather than nothing.
+    expect(first.reason).toBe(
+      "The place could not be sent. Check your connection and try again.",
     )
+    expect(mockToastShow).not.toHaveBeenCalled()
     expect(capturedAddPlaceProps?.isVisible).toBe(true)
 
-    await act(async () => {
-      await onSubmit(submission)
-    })
+    await sendFromForm()
 
     expect(mockSubmitPlace).toHaveBeenCalledTimes(2)
     expect(mockSubmitPlace.mock.calls[0][1]).toEqual(mockSubmitPlace.mock.calls[1][1])
   })
 
   it("mints a fresh submission id for a new attempt", async () => {
-    mockSubmitPlace.mockResolvedValue({ submitted: false, message: null })
+    mockSubmitPlace.mockResolvedValue({ submitted: false, refused: false })
     const { getByTestId } = renderMap()
     const submission = {
       name: "Hope House",

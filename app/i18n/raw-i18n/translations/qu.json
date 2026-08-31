@@ -2142,6 +2142,7 @@
     "placeReviewNote": "Musuq cheqakunaqa BTC Map-man rinku. Ayllunmi mapapi kaqkunata qhawan hinaspa waqaychan.",
     "placeSubmitted": "Cheqaqa BTC Map-man apachikurqan — yupaychani yapasqaykimanta",
     "placeSubmissionFailed": "Cheqata mana apachikuyta atirqanchu. Wiqanaykita qhawapay, hokmanta alliykachay.",
+    "placeRefused": "BTC Map manam kay cheqata chaskiyta atirqanchu. Mapapiqa manam imapas yapasqachu.",
     "category": {
       "restaurants": "Mikhuna wasikuna",
       "cafes": "Kafe wasikuna",

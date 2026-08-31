@@ -2142,6 +2142,7 @@
     "placeReviewNote": "Els llocs nous van a BTC Map. La seva comunitat revisa i manté tot el que hi ha al mapa.",
     "placeSubmitted": "Lloc enviat a BTC Map: gràcies per afegir-lo",
     "placeSubmissionFailed": "No s'ha pogut enviar el lloc. Comprova la connexió i torna-ho a provar.",
+    "placeRefused": "BTC Map no ha pogut acceptar aquest lloc. No s'ha afegit res al mapa.",
     "category": {
       "restaurants": "Restaurants",
       "cafes": "Cafeteries",

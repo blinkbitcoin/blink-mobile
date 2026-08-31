@@ -2142,6 +2142,7 @@
     "placeReviewNote": "Tempat baru dikirim ke BTC Map. Komunitasnya meninjau dan memelihara semua yang ada di peta.",
     "placeSubmitted": "Tempat dikirim ke BTC Map — terima kasih telah menambahkannya",
     "placeSubmissionFailed": "Tempat tidak dapat dikirim. Periksa koneksi Anda dan coba lagi.",
+    "placeRefused": "BTC Map tidak dapat menerima tempat ini. Tidak ada yang ditambahkan ke peta.",
     "category": {
       "restaurants": "Restoran",
       "cafes": "Kafe",

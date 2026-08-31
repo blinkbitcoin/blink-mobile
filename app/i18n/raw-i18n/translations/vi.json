@@ -2142,6 +2142,7 @@
     "placeReviewNote": "Địa điểm mới được gửi tới BTC Map. Cộng đồng của BTC Map kiểm tra và duy trì mọi thứ trên bản đồ.",
     "placeSubmitted": "Đã gửi địa điểm tới BTC Map — cảm ơn bạn đã thêm",
     "placeSubmissionFailed": "Không thể gửi địa điểm. Hãy kiểm tra kết nối và thử lại.",
+    "placeRefused": "BTC Map không thể chấp nhận địa điểm này. Không có gì được thêm vào bản đồ.",
     "category": {
       "restaurants": "Nhà hàng",
       "cafes": "Quán cà phê",

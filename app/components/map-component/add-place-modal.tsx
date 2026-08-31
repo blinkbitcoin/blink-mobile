@@ -28,7 +28,11 @@ type Props = {
   isVisible: boolean
   /** Where the pin was dropped, which is what the place is being added at. */
   location: LatLng | null
-  onSubmit: (submission: PlaceSubmission) => void | Promise<void>
+  /**
+   * Sends the place. Resolves to why it did not go — a message ready to be
+   * read — or to null when it did.
+   */
+  onSubmit: (submission: PlaceSubmission) => Promise<string | null>
   /** Back to the map to move the pin, keeping whatever has been typed. */
   onChangeLocation: () => void
   onClose: () => void
@@ -68,6 +72,11 @@ export const AddPlaceModal: React.FC<Props> = ({
   // Sending is a round trip. The guard keeps a second tap from firing a
   // concurrent mutation, and the spinner is what tells the first tap landed.
   const [isSubmitting, setSubmitting] = React.useState(false)
+  // Why the last send did not go. It is shown here rather than raised as a
+  // toast because this is a native modal and the app's toast is mounted outside
+  // it: a toast raised from behind this window is drawn behind it too, so the
+  // failure would be invisible and the form would look untouched.
+  const [error, setError] = React.useState<string | null>(null)
 
   const nameInputRef = React.useRef<TextInput>(null)
 
@@ -77,8 +86,9 @@ export const AddPlaceModal: React.FC<Props> = ({
   const submit = async () => {
     if (!submission || isSubmitting) return
     setSubmitting(true)
+    setError(null)
     try {
-      await onSubmit(submission)
+      setError(await onSubmit(submission))
     } finally {
       setSubmitting(false)
     }
@@ -131,7 +141,12 @@ export const AddPlaceModal: React.FC<Props> = ({
               </Text>
               <Pressable
                 testID="change-place-location"
-                onPress={onChangeLocation}
+                // The failure was about the place as it stood, pin included, so
+                // it stops being true the moment the pin is on the move.
+                onPress={() => {
+                  setError(null)
+                  onChangeLocation()
+                }}
                 accessibilityRole="button"
                 hitSlop={8}
               >
@@ -194,6 +209,14 @@ export const AddPlaceModal: React.FC<Props> = ({
         </ScrollView>
 
         <View style={styles.footer}>
+          {error ? (
+            <View style={styles.error} accessibilityLiveRegion="polite">
+              <GaloyIcon name="warning-circle" size={14} color={colors.error} />
+              <Text testID="place-submission-error" style={styles.errorText}>
+                {error}
+              </Text>
+            </View>
+          ) : null}
           <GaloyPrimaryButton
             testID="submit-place"
             title={LL.common.submit()}
@@ -309,5 +332,19 @@ const useStyles = makeStyles(({ colors }, { topInset, bottomInset }: StyleProps)
     paddingHorizontal: 20,
     paddingTop: 12,
     paddingBottom: bottomInset + 12,
+    rowGap: 10,
+  },
+  // Above the button rather than by the fields: what failed is the send, and
+  // the button is where the eye already is when it does.
+  error: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    columnGap: 8,
+  },
+  errorText: {
+    flex: 1,
+    fontSize: 13,
+    lineHeight: 18,
+    color: colors.error,
   },
 }))

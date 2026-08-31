@@ -2142,6 +2142,7 @@
     "placeReviewNote": "Locurile noi ajung la BTC Map. Comunitatea sa verifică și întreține tot ce se află pe hartă.",
     "placeSubmitted": "Loc trimis către BTC Map — mulțumim că l-ai adăugat",
     "placeSubmissionFailed": "Locul nu a putut fi trimis. Verifică conexiunea și încearcă din nou.",
+    "placeRefused": "BTC Map nu a putut accepta acest loc. Nu s-a adăugat nimic pe hartă.",
     "category": {
       "restaurants": "Restaurante",
       "cafes": "Cafenele",

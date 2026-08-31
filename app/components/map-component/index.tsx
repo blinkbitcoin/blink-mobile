@@ -339,11 +339,23 @@ export default function MapComponent({
     setAddStep("describing")
   }, [])
 
+  /**
+   * Sends the place and answers the form with what to say about it.
+   *
+   * A failure is the form's to report rather than this screen's: the form is a
+   * native modal over everything, so a toast raised from under it is drawn
+   * under it too — see `add-place-modal.tsx`. Success is the other way round,
+   * since by then the form is gone and there is nothing left to say it on.
+   */
   const handlePlaceSubmit = React.useCallback(
-    async (submission: PlaceSubmission) => {
+    async (submission: PlaceSubmission): Promise<string | null> => {
       let submissionId = submissionIdRef.current
       if (!submissionId) {
-        submissionId = await generateSecureRandomUUID()
+        try {
+          submissionId = await generateSecureRandomUUID()
+        } catch {
+          return LL.MapScreen.placeSubmissionFailed()
+        }
         // No race to atomically avoid: the form's in-flight guard means only
         // one send per attempt is ever between its first line and this one.
         // eslint-disable-next-line require-atomic-updates
@@ -352,21 +364,19 @@ export default function MapComponent({
       const outcome = await submitPlace(submission, submissionId)
 
       // The send outlives the form when the modal is closed mid-flight; a
-      // response for an attempt that is no longer on screen gets neither a
-      // toast nor a state change.
-      if (addStepRef.current !== "describing") return
+      // response for an attempt that is no longer on screen closes nothing and
+      // reports nothing.
+      if (addStepRef.current !== "describing") return null
 
+      // The form stays open with the reason on it: what was typed is exactly
+      // what a retry should send, under the same submissionId. A refusal is
+      // about the place and a dropped request is about the connection, so they
+      // do not share a sentence — but neither of them borrows the backend's,
+      // which only ever comes back in English.
       if (!outcome.submitted) {
-        // The form stays open: what was typed is exactly what a retry should
-        // send, under the same submissionId. A refusal carries the backend's
-        // reason; a request that never got an answer gets the generic one.
-        toastShow({
-          message:
-            outcome.message ??
-            ((translations) => translations.MapScreen.placeSubmissionFailed()),
-          LL,
-        })
-        return
+        return outcome.refused
+          ? LL.MapScreen.placeRefused()
+          : LL.MapScreen.placeSubmissionFailed()
       }
 
       setAddStep(null)
@@ -377,6 +387,7 @@ export default function MapComponent({
         LL,
         type: "success",
       })
+      return null
     },
     [LL, submitPlace],
   )

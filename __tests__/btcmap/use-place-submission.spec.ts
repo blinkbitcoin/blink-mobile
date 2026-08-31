@@ -55,10 +55,11 @@ describe("useSubmitBtcMapPlace", () => {
     expect(outcome).toEqual({ submitted: true })
   })
 
-  it("hands back the backend's reason when the payload carries errors", async () => {
+  it("calls a payload carrying errors a refusal", async () => {
     // A refusal is not a dropped request: retrying it verbatim would never
-    // succeed, so the reason has to reach the user rather than "check your
-    // connection".
+    // succeed, so it has to be told apart from one rather than answered with
+    // "check your connection". The backend's own wording is not carried up —
+    // it only ever comes back in English.
     mockMutate.mockResolvedValue({
       data: {
         btcMapPlaceSubmit: {
@@ -74,10 +75,10 @@ describe("useSubmitBtcMapPlace", () => {
       outcome = await submitPlace(submission, submissionId)
     })
 
-    expect(outcome).toEqual({ submitted: false, message: "rate limited" })
+    expect(outcome).toEqual({ submitted: false, refused: true })
   })
 
-  it("reports no reason when the request never got an answer", async () => {
+  it("does not call a request that never got an answer a refusal", async () => {
     mockMutate.mockRejectedValue(new Error("network down"))
     const { submitPlace } = renderSubmit()
 
@@ -86,6 +87,27 @@ describe("useSubmitBtcMapPlace", () => {
       outcome = await submitPlace(submission, submissionId)
     })
 
-    expect(outcome).toEqual({ submitted: false, message: null })
+    expect(outcome).toEqual({ submitted: false, refused: false })
+  })
+
+  it("does not call an answer with neither errors nor a place a refusal", async () => {
+    // Nothing came back to have refused it, so it counts as the answer that
+    // never arrived — which is what it amounts to.
+    mockMutate.mockResolvedValue({
+      data: {
+        btcMapPlaceSubmit: {
+          errors: [],
+          place: null,
+        },
+      },
+    })
+    const { submitPlace } = renderSubmit()
+
+    let outcome: Awaited<ReturnType<typeof submitPlace>> | undefined
+    await act(async () => {
+      outcome = await submitPlace(submission, submissionId)
+    })
+
+    expect(outcome).toEqual({ submitted: false, refused: false })
   })
 })

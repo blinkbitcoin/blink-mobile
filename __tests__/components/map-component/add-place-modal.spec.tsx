@@ -8,7 +8,7 @@ import { ContextForScreen } from "../../screens/helper"
 
 const LOCATION = { latitude: 13.496743, longitude: -89.439462 }
 
-const onSubmit = jest.fn()
+const onSubmit = jest.fn<Promise<string | null>, [unknown]>()
 const onChangeLocation = jest.fn()
 const onClose = jest.fn()
 
@@ -33,6 +33,7 @@ const fillInForm = (getByTestId: (id: string) => unknown) => {
 
 beforeEach(() => {
   jest.clearAllMocks()
+  onSubmit.mockResolvedValue(null)
   loadLocale("en")
 })
 
@@ -116,8 +117,8 @@ describe("AddPlaceModal", () => {
     let resolveSend: (() => void) | undefined
     onSubmit.mockImplementation(
       () =>
-        new Promise<void>((resolve) => {
-          resolveSend = resolve
+        new Promise<string | null>((resolve) => {
+          resolveSend = () => resolve(null)
         }),
     )
     const { getByTestId } = renderModal()
@@ -136,6 +137,60 @@ describe("AddPlaceModal", () => {
         disabled: false,
       }),
     )
+  })
+
+  it("says on the form itself why the place did not go", async () => {
+    // This is a native modal over the whole app and the app's toast is mounted
+    // outside it, so a failure reported that way is drawn behind this window:
+    // the form would sit there looking as though the tap had done nothing.
+    onSubmit.mockResolvedValue("Too many places sent today. Try again tomorrow.")
+    const { getByTestId, getByText } = renderModal()
+
+    await waitFor(() => expect(getByTestId("place-name-input")).toBeTruthy())
+    fillInForm(getByTestId)
+    fireEvent.press(getByTestId("submit-place"))
+
+    await waitFor(() =>
+      expect(getByText("Too many places sent today. Try again tomorrow.")).toBeTruthy(),
+    )
+    // And the form is still there to retry or correct.
+    expect(getByTestId("submit-place")).toBeTruthy()
+  })
+
+  it("takes the last failure off the form when the place goes", async () => {
+    // Leaving it up would have a place that has just been sent still reading as
+    // one that could not be.
+    onSubmit.mockResolvedValueOnce("Too many places sent today.")
+    const { getByTestId, queryByTestId } = renderModal()
+
+    await waitFor(() => expect(getByTestId("place-name-input")).toBeTruthy())
+    fillInForm(getByTestId)
+    fireEvent.press(getByTestId("submit-place"))
+
+    await waitFor(() => expect(getByTestId("place-submission-error")).toBeTruthy())
+
+    onSubmit.mockResolvedValue(null)
+    fireEvent.press(getByTestId("submit-place"))
+
+    await waitFor(() => expect(queryByTestId("place-submission-error")).toBeNull())
+  })
+
+  it("takes the last failure off when the pin goes back on the move", async () => {
+    // It was a failure about the place as it stood, pin included, so it stops
+    // being true as soon as the pin is being moved.
+    onSubmit.mockResolvedValue("Too many places sent today.")
+    const { getByTestId, queryByTestId } = renderModal()
+
+    await waitFor(() => expect(getByTestId("place-name-input")).toBeTruthy())
+    fillInForm(getByTestId)
+    fireEvent.press(getByTestId("submit-place"))
+
+    await waitFor(() => expect(getByTestId("place-submission-error")).toBeTruthy())
+
+    fireEvent.press(getByTestId("change-place-location"))
+
+    expect(onChangeLocation).toHaveBeenCalled()
+    await waitFor(() => expect(queryByTestId("place-submission-error")).toBeNull())
   })
 
   it("lets a category be taken back off", async () => {

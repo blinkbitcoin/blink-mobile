@@ -18,15 +18,17 @@ gql`
 `
 
 /**
- * `submitted` means BTC Map took the place. When it did not, `message` is the
- * backend's own reason for refusing — a rate limit, a level too low, a
- * duplicate — and null when the request never got an answer at all, since the
- * advice for each is different: the first is the place, the second the
- * connection.
+ * `submitted` means BTC Map took the place. When it did not, `refused` says
+ * which kind of failure it was: the backend answered and turned the place down
+ * — a rate limit, a level too low, a duplicate — or the request never got an
+ * answer at all. The advice for each is different, the first being about the
+ * place and the second about the connection.
+ *
+ * The backend's own wording is deliberately not carried: it is English, and it
+ * would be shown to whoever submitted the place in whatever language they read
+ * the app in.
  */
-type SubmitPlaceOutcome =
-  | { submitted: true }
-  | { submitted: false; message: string | null }
+type SubmitPlaceOutcome = { submitted: true } | { submitted: false; refused: boolean }
 
 type SubmitPlace = (
   submission: PlaceSubmission,
@@ -61,9 +63,12 @@ export const useSubmitBtcMapPlace = (): { submitPlace: SubmitPlace } => {
       if (payload && payload.errors.length === 0 && payload.place) {
         return { submitted: true }
       }
-      return { submitted: false, message: payload?.errors[0]?.message ?? null }
+      // An answer with neither errors nor a place is not a refusal — there is
+      // nothing to have refused it over — so it counts as an answer that never
+      // arrived, which is what it amounts to.
+      return { submitted: false, refused: Boolean(payload?.errors.length) }
     } catch {
-      return { submitted: false, message: null }
+      return { submitted: false, refused: false }
     }
   }
 

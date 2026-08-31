@@ -2142,6 +2142,7 @@
     "placeReviewNote": "Yeni yerler BTC Map'e gönderilir. Haritadaki her şeyi BTC Map topluluğu kontrol eder ve güncel tutar.",
     "placeSubmitted": "Yer BTC Map'e gönderildi — eklediğiniz için teşekkürler",
     "placeSubmissionFailed": "Yer gönderilemedi. Bağlantınızı kontrol edip tekrar deneyin.",
+    "placeRefused": "BTC Map bu yeri kabul edemedi. Haritaya hiçbir şey eklenmedi.",
     "category": {
       "restaurants": "Restoranlar",
       "cafes": "Kafeler",

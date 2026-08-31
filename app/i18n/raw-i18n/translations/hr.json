@@ -2142,6 +2142,7 @@
     "placeReviewNote": "Nova mjesta šalju se u BTC Map. Tamošnja zajednica pregledava i održava sve što je na karti.",
     "placeSubmitted": "Mjesto je poslano u BTC Map — hvala što ste ga dodali",
     "placeSubmissionFailed": "Mjesto nije moguće poslati. Provjerite svoju vezu i pokušajte ponovno.",
+    "placeRefused": "BTC Map nije mogao prihvatiti ovo mjesto. Na kartu nije dodano ništa.",
     "category": {
       "restaurants": "Restorani",
       "cafes": "Kafići",

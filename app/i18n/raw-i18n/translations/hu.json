@@ -2142,6 +2142,7 @@
     "placeReviewNote": "Az új helyek a BTC Map-hez kerülnek. Az ottani közösség ellenőrzi és karbantartja mindazt, ami a térképen van.",
     "placeSubmitted": "A hely elküldve a BTC Map-nek — köszönjük, hogy hozzáadta",
     "placeSubmissionFailed": "A helyet nem sikerült elküldeni. Ellenőrizze a kapcsolatát, és próbálja újra.",
+    "placeRefused": "A BTC Map nem tudta elfogadni ezt a helyet. Semmi sem került fel a térképre.",
     "category": {
       "restaurants": "Éttermek",
       "cafes": "Kávézók",

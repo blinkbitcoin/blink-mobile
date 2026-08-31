@@ -6676,6 +6676,10 @@ type RootTranslation = {
 		 * T​h​e​ ​p​l​a​c​e​ ​c​o​u​l​d​ ​n​o​t​ ​b​e​ ​s​e​n​t​.​ ​C​h​e​c​k​ ​y​o​u​r​ ​c​o​n​n​e​c​t​i​o​n​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​.
 		 */
 		placeSubmissionFailed: string
+		/**
+		 * B​T​C​ ​M​a​p​ ​c​o​u​l​d​ ​n​o​t​ ​a​c​c​e​p​t​ ​t​h​i​s​ ​p​l​a​c​e​.​ ​N​o​t​h​i​n​g​ ​w​a​s​ ​a​d​d​e​d​ ​t​o​ ​t​h​e​ ​m​a​p​.
+		 */
+		placeRefused: string
 		category: {
 			/**
 			 * R​e​s​t​a​u​r​a​n​t​s
@@ -20340,6 +20344,10 @@ export type TranslationFunctions = {
 		 * The place could not be sent. Check your connection and try again.
 		 */
 		placeSubmissionFailed: () => LocalizedString
+		/**
+		 * BTC Map could not accept this place. Nothing was added to the map.
+		 */
+		placeRefused: () => LocalizedString
 		category: {
 			/**
 			 * Restaurants

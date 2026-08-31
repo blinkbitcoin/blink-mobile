@@ -2142,6 +2142,7 @@
     "placeReviewNote": "Nová místa se odesílají do BTC Map. Tamní komunita kontroluje a spravuje vše, co je na mapě.",
     "placeSubmitted": "Místo odesláno do BTC Map — děkujeme za jeho přidání",
     "placeSubmissionFailed": "Místo se nepodařilo odeslat. Zkontrolujte připojení a zkuste to znovu.",
+    "placeRefused": "BTC Map toto místo nepřijal. Na mapu nebylo nic přidáno.",
     "category": {
       "restaurants": "Restaurace",
       "cafes": "Kavárny",

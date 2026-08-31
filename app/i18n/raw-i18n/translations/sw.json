@@ -2142,6 +2142,7 @@
     "placeReviewNote": "Maeneo mapya hutumwa kwa BTC Map. Jumuiya yake hukagua na kutunza kila kitu kilicho kwenye ramani.",
     "placeSubmitted": "Mahali pametumwa kwa BTC Map — asante kwa kupaongeza",
     "placeSubmissionFailed": "Mahali hayakuweza kutumwa. Angalia muunganisho wako na ujaribu tena.",
+    "placeRefused": "BTC Map haikuweza kukubali mahali hapa. Hakuna chochote kilichoongezwa kwenye ramani.",
     "category": {
       "restaurants": "Migahawa",
       "cafes": "Kafe",
