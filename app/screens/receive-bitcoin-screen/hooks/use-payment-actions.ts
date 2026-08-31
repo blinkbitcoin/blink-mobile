@@ -1,6 +1,7 @@
 import { useCallback } from "react"
 import { Alert, Share } from "react-native"
 
+import { cancelPendingClipboardClear } from "@app/hooks/use-clipboard"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { TranslationFunctions } from "@app/i18n/i18n-types"
 import { reportError } from "@app/utils/error-logging"
@@ -29,6 +30,7 @@ export const usePaymentActions = ({
   const copyToClipboard = useCallback(() => {
     if (!copyableContent) return
 
+    cancelPendingClipboardClear()
     Clipboard.setString(copyableContent)
     toastShow({
       message: toastMessageByType[invoiceType],
