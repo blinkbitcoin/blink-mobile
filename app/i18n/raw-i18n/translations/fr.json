@@ -3765,10 +3765,28 @@
                 "testSuccess": "Votre phrase de sauvegarde est correcte"
             }
         },
+        "BundleExport": {
+            "title": "Une dernière chose",
+            "subtitle": "Si Spark devient indisponible, utilisez ce paquet pour sortir on-chain. Ce paquet est sensible. Gardez-le privé.",
+            "subtitlePending": "Votre paquet d'urgence est créé automatiquement dès que vous recevez des fonds, puis maintenu à jour. Vous pouvez le télécharger à tout moment depuis les Paramètres.",
+            "download": "Télécharger le paquet",
+            "copy": "Copier",
+            "sensitiveTitle": "Sensible",
+            "skip": "Passer",
+            "learnMore": "En savoir plus sur la sortie unilatérale",
+            "learnMoreTitle": "Sortie unilatérale",
+            "learnMoreBody": "Spark garde vos bitcoins hors chaîne pour que les paiements soient instantanés et bon marché. Si ses opérateurs devenaient indisponibles, ce paquet et votre phrase de récupération vous permettent de déplacer vos fonds on-chain vous-même, sans Blink. Cela prend plusieurs semaines et coûte des frais on-chain : c'est un filet de sécurité, pas une voie quotidienne.",
+            "sensitiveConfirm": "Télécharger",
+            "savedTitle": "Paquet d'urgence enregistré",
+            "sensitiveBody": "Ce fichier contient des données sensibles du portefeuille et doit rester privé. Si vous perdez cet appareil, vous ne pourrez pas utiliser la récupération par paquet d'urgence."
+        },
         "CloudBackup": {
             "title": "Sauvegardons votre portefeuille",
             "description": "Nous enregistrerons une copie de votre phrase de sauvegarde dans votre {provider}.",
             "encryptCheckbox": "Chiffrer avec un mot de passe supplémentaire",
+            "autoBundleCheckbox": "Sauvegardes automatiques",
+            "autoBundleHint": "Permet la sortie unilatérale si les opérateurs Spark deviennent indisponibles.",
+            "autoBundleNeedsPassword": "Ajoutez un mot de passe ci-dessus pour l'activer. Sans mot de passe, votre sauvegarde de récupération se trouverait à côté d'une phrase de récupération non protégée.",
             "password": "Mot de passe",
             "passwordPlaceholder": "(12 caractères minimum)",
             "confirmPassword": "Confirmer le mot de passe",

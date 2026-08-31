@@ -3765,10 +3765,28 @@
         "testSuccess": "La teva frase de còpia de seguretat és correcta"
       }
     },
+    "BundleExport": {
+      "title": "Una última cosa",
+      "subtitle": "Si Spark deixa d'estar disponible, utilitza aquest paquet per sortir a la cadena. Aquest paquet és sensible. Mantén-lo privat.",
+      "subtitlePending": "El teu paquet d'emergència es crea automàticament quan reps fons, i es manté actualitzat. El pots baixar en qualsevol moment des de Configuració.",
+      "download": "Baixa el paquet",
+      "copy": "Copiar",
+      "sensitiveTitle": "Sensible",
+      "skip": "Omet",
+      "learnMore": "Més informació sobre la sortida unilateral",
+      "learnMoreTitle": "Sortida unilateral",
+      "learnMoreBody": "Spark manté els teus bitcoins fora de la cadena perquè els pagaments siguin instantanis i barats. Si els seus operadors deixessin d'estar disponibles, aquest paquet i la teva frase de recuperació et permeten moure els fons a la cadena tu mateix, sense Blink. És un procés de setmanes i té comissions de cadena, així que és una xarxa de seguretat, no una via quotidiana.",
+      "sensitiveConfirm": "Baixa",
+      "savedTitle": "Paquet d'emergència desat",
+      "sensitiveBody": "Aquest fitxer conté dades sensibles del moneder i s'ha de mantenir privat. Si perds aquest dispositiu, no podràs fer servir la recuperació del paquet d'emergència."
+    },
     "CloudBackup": {
       "title": "Fem una còpia de seguretat de la teva cartera",
       "description": "Desarem una còpia de la teva frase de seguretat al teu {provider}.",
       "encryptCheckbox": "Xifrar amb contrasenya addicional",
+      "autoBundleCheckbox": "Còpies automàtiques",
+      "autoBundleHint": "Permet la sortida unilateral si els operadors de Spark deixen d'estar disponibles.",
+      "autoBundleNeedsPassword": "Afegeix una contrasenya a dalt per activar-ho. Sense contrasenya, la còpia de recuperació quedaria al costat d'una frase de recuperació desprotegida.",
       "password": "Contrasenya",
       "passwordPlaceholder": "(mínim 12 caràcters)",
       "confirmPassword": "Confirmar contrasenya",

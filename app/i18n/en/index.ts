@@ -3907,6 +3907,10 @@ const en: BaseTranslation = {
       title: "Let's back up your wallet",
       description:
         "We will save a backup of your backup phrase to your {provider: string}.",
+      autoBundleCheckbox: "Automatic backups",
+      autoBundleHint: "Enables unilateral exit in case Spark operators go offline",
+      autoBundleNeedsPassword:
+        "Add a password above to enable this. Without one, your recovery backup would sit next to an unprotected backup phrase.",
       encryptCheckbox: "Encrypt with additional password",
       password: "Password",
       passwordPlaceholder: "(12 characters minimum)",
@@ -3933,6 +3937,25 @@ const en: BaseTranslation = {
       storageAccessRequired: "Allow {provider: string} access to your wallet backup, then try again.",
       cloudNotAvailable: "iCloud Drive is not available. Please sign in to iCloud in Settings and enable iCloud Drive.",
       networkError: "Network error. Please check your connection and try again.",
+    },
+    BundleExport: {
+      title: "One last thing",
+      subtitle:
+        "In case of Spark going offline, use this bundle to exit onchain. This bundle is sensitive. Keep it private.",
+      subtitlePending:
+        "Your emergency bundle is created automatically once you receive funds, and kept up to date from then on. You can download it any time from Settings.",
+      learnMore: "Learn more about unilateral exit",
+      learnMoreTitle: "Unilateral exit",
+      learnMoreBody:
+        "Spark keeps your bitcoin off-chain so payments are instant and cheap. If its operators ever became unavailable, this bundle plus your backup phrase lets you move your funds onchain yourself, without Blink. It is a multi-week process and costs onchain fees, so it is a safety net rather than an everyday route.",
+      download: "Download bundle",
+      copy: "Copy",
+      skip: "Skip",
+      sensitiveTitle: "Sensitive",
+      sensitiveBody:
+        "This file is sensitive wallet data and must be kept private. If you lose this device, you will not be able to use emergency bundle recovery.",
+      sensitiveConfirm: "Download",
+      savedTitle: "Emergency bundle saved",
     },
     ManualBackup: {
       Alerts: {

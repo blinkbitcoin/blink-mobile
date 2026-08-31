@@ -3765,10 +3765,28 @@
         "testSuccess": "Maneno yako ya hifadhi ni sahihi"
       }
     },
+    "BundleExport": {
+      "title": "Jambo la mwisho",
+      "subtitle": "Iwapo Spark haitapatikana, tumia kifurushi hiki kutoka on-chain. Kifurushi hiki ni nyeti. Kiweke faragha.",
+      "subtitlePending": "Kifurushi chako cha dharura huundwa kiotomatiki mara tu unapopokea fedha, na huendelea kusasishwa. Unaweza kukipakua wakati wowote kwenye Mipangilio.",
+      "download": "Pakua kifurushi",
+      "copy": "Nakili",
+      "sensitiveTitle": "Nyeti",
+      "skip": "Ruka",
+      "learnMore": "Jifunze zaidi kuhusu kutoka kwa upande mmoja",
+      "learnMoreTitle": "Kutoka kwa upande mmoja",
+      "learnMoreBody": "Spark huhifadhi bitcoin yako nje ya mnyororo ili malipo yawe ya papo hapo na ya bei nafuu. Iwapo waendeshaji wake hawatapatikana, kifurushi hiki pamoja na fungu lako la maneno hukuwezesha kuhamisha fedha on-chain mwenyewe, bila Blink. Huchukua wiki kadhaa na hugharimu ada za on-chain, hivyo ni wavu wa usalama, si njia ya kila siku.",
+      "sensitiveConfirm": "Pakua",
+      "savedTitle": "Kifurushi cha dharura kimehifadhiwa",
+      "sensitiveBody": "Faili hili lina data nyeti ya pochi na lazima liwekwe faragha. Ukipoteza kifaa hiki, hutaweza kutumia urejeshaji wa kifurushi cha dharura."
+    },
     "CloudBackup": {
       "title": "Tuhifadhi nakala ya mkoba wako",
       "description": "Tutahifadhi nakala ya neno lako la kurejesha kwenye {provider} yako.",
       "encryptCheckbox": "Ficha kwa nywila ya ziada",
+      "autoBundleCheckbox": "Nakala rudufu za kiotomatiki",
+      "autoBundleHint": "Huwezesha kutoka kwa upande mmoja iwapo waendeshaji wa Spark hawatapatikana.",
+      "autoBundleNeedsPassword": "Ongeza nenosiri hapo juu ili kuwezesha hili. Bila nenosiri, nakala yako ya urejeshaji ingekaa kando ya fungu la maneno lisilolindwa.",
       "password": "Nywila",
       "passwordPlaceholder": "(herufi 12 ndogo zaidi)",
       "confirmPassword": "Thibitisha nywila",

@@ -3765,10 +3765,28 @@
                 "testSuccess": "La tua frase di backup è corretta"
             }
         },
+        "BundleExport": {
+            "title": "Un'ultima cosa",
+            "subtitle": "Se Spark non fosse più disponibile, usa questo pacchetto per uscire on-chain. Questo pacchetto è sensibile. Tienilo privato.",
+            "subtitlePending": "Il tuo pacchetto di emergenza viene creato automaticamente non appena ricevi fondi, e resta aggiornato. Puoi scaricarlo in qualsiasi momento dalle Impostazioni.",
+            "download": "Scarica il pacchetto",
+            "copy": "Copia",
+            "sensitiveTitle": "Sensibile",
+            "skip": "Salta",
+            "learnMore": "Scopri di più sull'uscita unilaterale",
+            "learnMoreTitle": "Uscita unilaterale",
+            "learnMoreBody": "Spark tiene i tuoi bitcoin fuori dalla catena perché i pagamenti siano istantanei ed economici. Se i suoi operatori non fossero più disponibili, questo pacchetto insieme alla tua frase di recupero ti permette di spostare i fondi on-chain da solo, senza Blink. È un processo di più settimane con commissioni on-chain: una rete di sicurezza, non una via quotidiana.",
+            "sensitiveConfirm": "Scarica",
+            "savedTitle": "Pacchetto di emergenza salvato",
+            "sensitiveBody": "Questo file contiene dati sensibili del portafoglio e deve restare privato. Se perdi questo dispositivo, non potrai usare il recupero dal pacchetto di emergenza."
+        },
         "CloudBackup": {
             "title": "Eseguiamo il backup del portafoglio",
             "description": "Salveremo una copia della tua frase di backup nel tuo {provider}.",
             "encryptCheckbox": "Crittografa con password aggiuntiva",
+            "autoBundleCheckbox": "Backup automatici",
+            "autoBundleHint": "Consente l'uscita unilaterale se gli operatori Spark non fossero più disponibili.",
+            "autoBundleNeedsPassword": "Aggiungi una password qui sopra per attivarlo. Senza password, il backup di recupero si troverebbe accanto a una frase di recupero non protetta.",
             "password": "Password",
             "passwordPlaceholder": "(minimo 12 caratteri)",
             "confirmPassword": "Conferma password",

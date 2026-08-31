@@ -3765,10 +3765,28 @@
         "testSuccess": "Ibinzana lakho lokugcina lichanekile"
       }
     },
+    "BundleExport": {
+      "title": "Into yokugqibela",
+      "subtitle": "Ukuba iSpark ayifumaneki, sebenzisa le ngqokelela ukuphuma kwi-chain. Le ngqokelela ibucayi. Yigcine iyimfihlo.",
+      "subtitlePending": "Ingqokelela yakho yongxamiseko yenziwa ngokuzenzekelayo xa ufumana imali, kwaye igcinwa ihlaziyiwe. Ungayikhuphela nanini na kwiiSetingi.",
+      "download": "Khuphela ingqokelela",
+      "copy": "Kopa",
+      "sensitiveTitle": "Ibucayi",
+      "skip": "Tsiba",
+      "learnMore": "Funda ngakumbi ngokuphuma kwelinye icala",
+      "learnMoreTitle": "Ukuphuma kwelinye icala",
+      "learnMoreBody": "ISpark igcina iibhitikhoyini zakho ngaphandle kwe-chain ukuze intlawulo ibe ngoko nangoko kwaye ityale kancinci. Ukuba abaqhubi bayo abafumaneki, le ngqokelela kunye nebinzana lakho lokubuyisela ikuvumela ukuba uhambise imali yakho kwi-chain ngokwakho, ngaphandle kweBlink. Kuthatha iiveki kwaye kubiza iintlawulo ze-chain, ngoko yinethi yokhuseleko, ayisosuku ngosuku.",
+      "sensitiveConfirm": "Khuphela",
+      "savedTitle": "Ingqokelela yongxamiseko igciniwe",
+      "sensitiveBody": "Le fayile iqulethe idatha yesipaji ebucayi kwaye kufuneka igcinwe iyimfihlo. Ukuba ulahlekelwa sesi sixhobo, awuyi kukwazi ukusebenzisa ukubuyisela kwingqokelela yongxamiseko."
+    },
     "CloudBackup": {
       "title": "Masigcine isipaji sakho",
       "description": "Siza kugcina ikopi yesivakalisi sakho sokugcina kwi-{provider} yakho.",
       "encryptCheckbox": "Bethelela ngegama lokugqitha elongezelelweyo",
+      "autoBundleCheckbox": "Ugcino oluzenzekelayo",
+      "autoBundleHint": "Yenza ukuphuma kwelinye icala kwenzeke ukuba abaqhubi be-Spark abafumaneki.",
+      "autoBundleNeedsPassword": "Yongeza igama lokugqitha ngasentla ukuze uvule oku. Ngaphandle kwalo, ugcino lwakho lokubuyisela beluya kuhlala ecaleni kwebinzana lokubuyisela elingakhuselwanga.",
       "password": "Igama lokugqitha",
       "passwordPlaceholder": "(ubuncinane oonobumba abayi-12)",
       "confirmPassword": "Qinisekisa igama lokugqitha",

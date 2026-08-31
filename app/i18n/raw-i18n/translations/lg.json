@@ -3765,10 +3765,28 @@
         "testSuccess": "Ebigambo byo ebya bbakappu birongoofu"
       }
     },
+    "BundleExport": {
+      "title": "Ekintu ekimu eky'enkomerero",
+      "subtitle": "Singa Spark egaana okukola, kozesa ekipakiti kino okufuluma ku chain. Ekipakiti kino kya kyama. Kikuume mu kyama.",
+      "subtitlePending": "Ekipakiti kyo eky'obwangu kikolebwa kyokka ng'ofunye ssente, era kyongera okutereezebwa. Osobola okukiggya buli kiseera mu Settings.",
+      "download": "Ggya ekipakiti",
+      "copy": "Koppa",
+      "sensitiveTitle": "Kya kyama",
+      "skip": "Buuka",
+      "learnMore": "Manya ebisingawo ku kufuluma ku lwo",
+      "learnMoreTitle": "Okufuluma ku lwo",
+      "learnMoreBody": "Spark ekuuma bitcoin yo ebweru wa chain okusobozesa okusasula okw'amangu era okutali kwa bbeeyi. Singa abakozesa baayo bagaana okukola, ekipakiti kino awamu n'ebigambo byo eby'okuzza obuggya bikusobozesa okutwala ssente zo ku chain wekka, awatali Blink. Kitwala wiiki nnyingi era kirimu ebisale bya chain, kale kya bukuumi so si kkubo lya buli lunaku.",
+      "sensitiveConfirm": "Ggya",
+      "savedTitle": "Ekipakiti eky'obwangu kikuumiddwa",
+      "sensitiveBody": "Fayiro eno erimu data ya wallet ey'ekyama era eteekwa okukuumibwa mu kyama. Bw'oba ofiiriddwa ekyuma kino, tojja kusobola kukozesa kuzza buggya okuva mu kipakiti eky'obwangu."
+    },
     "CloudBackup": {
       "title": "Ka tukoppe akawunti yo",
       "description": "Tujja kutereka kopi y'ekigambo kyo eky'okukuuma mu {provider} yo.",
       "encryptCheckbox": "Kiziyiza n'ekigambo eky'okustreyitinga ekirala",
+      "autoBundleCheckbox": "Bakaapu ez'obwannamu",
+      "autoBundleHint": "Kisobozesa okufuluma ku lwo bw'oba abakozesa ba Spark bagaanye okukola.",
+      "autoBundleNeedsPassword": "Yongerako ekigambo eky'ekyama waggulu okukisobozesa. Awatali kyo, bakaapu yo ey'okuzza obuggya yandibadde kumpi n'ebigambo by'okuzza obuggya ebitakuumiddwa.",
       "password": "Ekigambo eky'okuyingira",
       "passwordPlaceholder": "(obunene 12 ennukuta)",
       "confirmPassword": "Kakasa ekigambo eky'okuyingira",

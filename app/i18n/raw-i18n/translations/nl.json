@@ -3765,10 +3765,28 @@
         "testSuccess": "Je back-upzin is correct"
       }
     },
+    "BundleExport": {
+      "title": "Nog één ding",
+      "subtitle": "Als Spark offline gaat, gebruik je deze bundel om on-chain uit te stappen. Deze bundel is gevoelig. Houd hem privé.",
+      "subtitlePending": "Je noodbundel wordt automatisch aangemaakt zodra je geld ontvangt, en daarna up-to-date gehouden. Je kunt hem altijd downloaden via Instellingen.",
+      "download": "Bundel downloaden",
+      "copy": "Kopiëren",
+      "sensitiveTitle": "Gevoelig",
+      "skip": "Overslaan",
+      "learnMore": "Meer over eenzijdige uitstap",
+      "learnMoreTitle": "Eenzijdige uitstap",
+      "learnMoreBody": "Spark houdt je bitcoin buiten de keten zodat betalingen direct en goedkoop zijn. Mochten de operators ooit onbereikbaar worden, dan kun je met deze bundel en je herstelzin je geld zelf on-chain verplaatsen, zonder Blink. Het duurt weken en kost on-chain kosten: een vangnet, geen dagelijkse route.",
+      "sensitiveConfirm": "Downloaden",
+      "savedTitle": "Noodbundel opgeslagen",
+      "sensitiveBody": "Dit bestand bevat gevoelige walletgegevens en moet privé blijven. Als je dit apparaat verliest, kun je herstel via de noodbundel niet gebruiken."
+    },
     "CloudBackup": {
       "title": "Laten we een back-up maken van je portemonnee",
       "description": "We slaan een back-up van je herstelzin op in je {provider}.",
       "encryptCheckbox": "Versleutelen met extra wachtwoord",
+      "autoBundleCheckbox": "Automatische back-ups",
+      "autoBundleHint": "Maakt eenzijdige uitstap mogelijk als Spark-operators offline gaan.",
+      "autoBundleNeedsPassword": "Voeg hierboven een wachtwoord toe om dit in te schakelen. Zonder wachtwoord zou je herstelback-up naast een onbeschermde herstelzin staan.",
       "password": "Wachtwoord",
       "passwordPlaceholder": "(minimaal 12 tekens)",
       "confirmPassword": "Bevestig wachtwoord",

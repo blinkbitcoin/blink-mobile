@@ -3765,10 +3765,28 @@
         "testSuccess": "A biztonsági mentési kifejezésed helyes"
       }
     },
+    "BundleExport": {
+      "title": "Még egy dolog",
+      "subtitle": "Ha a Spark elérhetetlenné válik, ezzel a csomaggal léphetsz ki on-chain. Ez a csomag érzékeny. Tartsd titokban.",
+      "subtitlePending": "A vészhelyzeti csomag automatikusan létrejön, amint pénzt kapsz, és onnantól naprakész marad. Bármikor letöltheted a Beállításokból.",
+      "download": "Csomag letöltése",
+      "copy": "Másolás",
+      "sensitiveTitle": "Érzékeny",
+      "skip": "Kihagyás",
+      "learnMore": "Tudj meg többet az egyoldalú kilépésről",
+      "learnMoreTitle": "Egyoldalú kilépés",
+      "learnMoreBody": "A Spark a láncon kívül tartja a bitcoinodat, hogy a fizetések azonnaliak és olcsók legyenek. Ha az üzemeltetői elérhetetlenné válnának, ez a csomag a helyreállítási kifejezéseddel együtt lehetővé teszi, hogy magad mozgasd a pénzed on-chain, Blink nélkül. Több hetes folyamat, on-chain díjakkal – biztonsági háló, nem mindennapi útvonal.",
+      "sensitiveConfirm": "Letöltés",
+      "savedTitle": "Vészhelyzeti csomag mentve",
+      "sensitiveBody": "Ez a fájl érzékeny tárcaadatokat tartalmaz, és titokban kell tartani. Ha elveszíted ezt az eszközt, nem tudod használni a vészhelyzeti csomagból való helyreállítást."
+    },
     "CloudBackup": {
       "title": "Készítsünk biztonsági mentést a tárcádról",
       "description": "Elmentjük a biztonsági kifejezésed másolatát a {provider} tárhelyedre.",
       "encryptCheckbox": "Titkosítás további jelszóval",
+      "autoBundleCheckbox": "Automatikus mentések",
+      "autoBundleHint": "Lehetővé teszi az egyoldalú kilépést, ha a Spark üzemeltetői elérhetetlenné válnak.",
+      "autoBundleNeedsPassword": "A bekapcsoláshoz adj meg fent egy jelszót. Enélkül a helyreállítási mentés egy védtelen helyreállítási kifejezés mellett állna.",
       "password": "Jelszó",
       "passwordPlaceholder": "(legalább 12 karakter)",
       "confirmPassword": "Jelszó megerősítése",

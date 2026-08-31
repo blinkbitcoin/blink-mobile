@@ -3765,10 +3765,28 @@
         "testSuccess": "Yedekleme ifaden doğru"
       }
     },
+    "BundleExport": {
+      "title": "Son bir şey",
+      "subtitle": "Spark kullanılamaz hale gelirse, zincir üzerinden çıkmak için bu paketi kullan. Bu paket hassastır. Gizli tut.",
+      "subtitlePending": "Acil durum paketin, para aldığın anda otomatik olarak oluşturulur ve güncel tutulur. Ayarlar'dan istediğin zaman indirebilirsin.",
+      "download": "Paketi indir",
+      "copy": "Kopyala",
+      "sensitiveTitle": "Hassas",
+      "skip": "Atla",
+      "learnMore": "Tek taraflı çıkış hakkında daha fazla bilgi",
+      "learnMoreTitle": "Tek taraflı çıkış",
+      "learnMoreBody": "Spark, ödemelerin anında ve ucuz olması için bitcoin'ini zincir dışında tutar. Operatörleri bir gün kullanılamaz hale gelirse, bu paket ve kurtarma ifadenle paranı Blink olmadan kendin zincir üzerine taşıyabilirsin. Haftalar sürer ve zincir ücretleri vardır; yani günlük bir yol değil, bir güvenlik ağıdır.",
+      "sensitiveConfirm": "İndir",
+      "savedTitle": "Acil durum paketi kaydedildi",
+      "sensitiveBody": "Bu dosya hassas cüzdan verileri içerir ve gizli tutulmalıdır. Bu cihazı kaybedersen acil durum paketiyle kurtarmayı kullanamazsın."
+    },
     "CloudBackup": {
       "title": "Cüzdanınızı yedekleyelim",
       "description": "Yedek ifadenizin bir kopyasını {provider} hesabınıza kaydedeceğiz.",
       "encryptCheckbox": "Ek şifre ile şifrele",
+      "autoBundleCheckbox": "Otomatik yedeklemeler",
+      "autoBundleHint": "Spark operatörleri kullanılamaz hale gelirse tek taraflı çıkışı mümkün kılar.",
+      "autoBundleNeedsPassword": "Bunu etkinleştirmek için yukarıya bir parola ekle. Parola olmadan kurtarma yedeğin, korunmayan bir kurtarma ifadesinin yanında dururdu.",
       "password": "Şifre",
       "passwordPlaceholder": "(en az 12 karakter)",
       "confirmPassword": "Şifreyi onayla",

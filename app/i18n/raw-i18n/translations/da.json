@@ -3765,10 +3765,28 @@
         "testSuccess": "Din backup-frase er korrekt"
       }
     },
+    "BundleExport": {
+      "title": "En sidste ting",
+      "subtitle": "Hvis Spark går offline, kan du bruge dette bundt til at gå on-chain. Dette bundt er følsomt. Hold det privat.",
+      "subtitlePending": "Dit nødbundt oprettes automatisk, når du modtager midler, og holdes opdateret derefter. Du kan altid downloade det fra Indstillinger.",
+      "download": "Download bundt",
+      "copy": "Kopiér",
+      "sensitiveTitle": "Følsom",
+      "skip": "Spring over",
+      "learnMore": "Læs mere om ensidig exit",
+      "learnMoreTitle": "Ensidig exit",
+      "learnMoreBody": "Spark holder dine bitcoin uden for kæden, så betalinger er øjeblikkelige og billige. Skulle operatørerne blive utilgængelige, lader dette bundt sammen med din gendannelsessætning dig selv flytte midlerne on-chain, uden Blink. Det tager uger og koster on-chain-gebyrer, så det er et sikkerhedsnet, ikke en daglig rute.",
+      "sensitiveConfirm": "Download",
+      "savedTitle": "Nødbundt gemt",
+      "sensitiveBody": "Denne fil indeholder følsomme tegnebogsdata og skal holdes privat. Hvis du mister denne enhed, kan du ikke bruge gendannelse fra nødbundtet."
+    },
     "CloudBackup": {
       "title": "Lad os sikkerhedskopiere din tegnebog",
       "description": "Vi gemmer en sikkerhedskopi af din gendannelsesfrase i din {provider}.",
       "encryptCheckbox": "Kryptér med ekstra adgangskode",
+      "autoBundleCheckbox": "Automatiske sikkerhedskopier",
+      "autoBundleHint": "Muliggør ensidig exit, hvis Spark-operatører går offline.",
+      "autoBundleNeedsPassword": "Tilføj en adgangskode ovenfor for at aktivere dette. Uden en ville din gendannelsessikkerhedskopi ligge ved siden af en ubeskyttet gendannelsessætning.",
       "password": "Adgangskode",
       "passwordPlaceholder": "(minimum 12 tegn)",
       "confirmPassword": "Bekræft adgangskode",

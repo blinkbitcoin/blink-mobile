@@ -90,6 +90,7 @@ import CloseCrossWithBackground from "@app/assets/icons-redesign/close-cross-wit
 import GooglePay from "@app/assets/icons/google-pay.svg"
 import LightningAddress from "@app/assets/icons-redesign/lightning-address.svg"
 import PaymentError from "@app/assets/icons-redesign/payment-error.svg"
+import EmergencyKit from "@app/assets/icons-redesign/emergency-kit.svg"
 import PaymentPending from "@app/assets/icons-redesign/payment-pending.svg"
 import PaymentSuccess from "@app/assets/icons-redesign/payment-success.svg"
 import PhysicalCard from "@app/assets/icons-redesign/physical-card.svg"
@@ -226,6 +227,7 @@ const customSvgMap = {
   "google-pay": GooglePay,
   "lightning-address": LightningAddress,
   "payment-error": PaymentError,
+  "emergency-kit": EmergencyKit,
   "payment-pending": PaymentPending,
   "payment-success": PaymentSuccess,
   "physical-card": PhysicalCard,
@@ -302,8 +304,8 @@ export const GaloyIcon = ({
   name,
   size,
   sizeVariant,
-  width,
-  height,
+  width = 0,
+  height = 0,
   color,
   style,
   backgroundColor,
@@ -316,9 +318,7 @@ export const GaloyIcon = ({
   } = useTheme()
 
   const resolvedSize =
-    size ??
-    (sizeVariant ? ICON_SIZES[sizeVariant] : undefined) ??
-    Math.max(width ?? 0, height ?? 0)
+    size ?? (sizeVariant ? ICON_SIZES[sizeVariant] : undefined) ?? Math.max(width, height)
   const resolvedColor = color || colors.black
 
   const styles = useStyles({

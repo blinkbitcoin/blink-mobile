@@ -74,6 +74,26 @@ jest.mock("@app/screens/self-custodial/onboarding/hooks/use-wallet-mnemonic", ()
 }))
 
 let mockLightningAddress: string | null = null
+// The hook now records the recovery-bundle cloud-sync opt-in against the
+// active self-custodial account, so the registry has to be stubbed.
+let mockActiveAccount: { id: string; type: string } | null = {
+  id: "account-1",
+  type: "self-custodial",
+}
+jest.mock("@app/hooks/use-account-registry", () => ({
+  useAccountRegistry: () => ({ activeAccount: mockActiveAccount }),
+}))
+
+const mockWriteSettings = jest.fn().mockResolvedValue(undefined)
+jest.mock("@app/self-custodial/recovery-bundle/settings", () => ({
+  ...jest.requireActual("@app/self-custodial/recovery-bundle/settings"),
+  readRecoveryBundleSettings: jest
+    .fn()
+    .mockResolvedValue({ autoRefresh: true, cloudSync: false }),
+  writeRecoveryBundleSettings: (...args: readonly unknown[]) =>
+    mockWriteSettings(...args),
+}))
+
 jest.mock("@app/self-custodial/hooks/use-self-custodial-account-info", () => ({
   useSelfCustodialAccountInfo: () => ({
     lightningAddress: mockLightningAddress,
@@ -637,5 +657,116 @@ describe("useCloudBackup", () => {
 
     const uploadedPayload = mockUpload.mock.calls[0][0] as string
     expect(uploadedPayload).not.toContain("lightningAddress")
+  })
+
+  describe("recovery-bundle cloud sync opt-in", () => {
+    it("stays off when the user did not ask for it (D4)", async () => {
+      mockUpload.mockResolvedValue({ success: true })
+
+      const { result } = renderHook(() =>
+        useCloudBackup({ isEncrypted: true, password: "hunter2hunter2" }),
+      )
+      await act(async () => {
+        await result.current.handleBackup()
+      })
+
+      // Off by default even though the seed just went to the same provider.
+      expect(mockWriteSettings).not.toHaveBeenCalled()
+    })
+
+    it("records the opt-in once the seed backup landed", async () => {
+      mockUpload.mockResolvedValue({ success: true })
+
+      const { result } = renderHook(() =>
+        useCloudBackup({
+          isEncrypted: true,
+          password: "hunter2hunter2",
+          autoBundleSync: true,
+        }),
+      )
+      await act(async () => {
+        await result.current.handleBackup()
+      })
+
+      expect(mockWriteSettings).toHaveBeenCalledWith(
+        "account-1",
+        expect.objectContaining({ cloudSync: true }),
+      )
+    })
+
+    it("refuses the opt-in without a password on the seed backup (D9)", async () => {
+      mockUpload.mockResolvedValue({ success: true })
+
+      const { result } = renderHook(() =>
+        useCloudBackup({ isEncrypted: false, password: "", autoBundleSync: true }),
+      )
+      await act(async () => {
+        await result.current.handleBackup()
+      })
+
+      // The seed-encrypted bundle must never sit next to an unencrypted seed:
+      // the co-located seed would decrypt it on the spot.
+      expect(mockWriteSettings).not.toHaveBeenCalled()
+    })
+
+    it("does not fail the seed backup when the opt-in cannot be recorded", async () => {
+      // The seed reached the provider; a settings write failing afterwards is
+      // recoverable from Settings and must not read as a failed backup.
+      mockUpload.mockResolvedValue({ success: true })
+      mockWriteSettings.mockRejectedValue(new Error("disk full"))
+
+      const { result } = renderHook(() =>
+        useCloudBackup({
+          isEncrypted: true,
+          password: "hunter2hunter2",
+          autoBundleSync: true,
+        }),
+      )
+      await act(async () => {
+        await result.current.handleBackup()
+      })
+
+      expect(mockWriteSettings).toHaveBeenCalled()
+      expect(result.current.loading).toBe(false)
+    })
+
+    it("has no bundle to sync when the active account is not self-custodial", async () => {
+      mockUpload.mockResolvedValue({ success: true })
+      mockActiveAccount = { id: "account-2", type: "custodial" }
+
+      const { result } = renderHook(() =>
+        useCloudBackup({
+          isEncrypted: true,
+          password: "hunter2hunter2",
+          autoBundleSync: true,
+        }),
+      )
+      await act(async () => {
+        await result.current.handleBackup()
+      })
+
+      // Custodial accounts have no recovery bundle, so there is nothing the
+      // setting could refer to.
+      expect(mockWriteSettings).not.toHaveBeenCalled()
+      mockActiveAccount = { id: "account-1", type: "self-custodial" }
+    })
+
+    it("does not enable sync when the upload failed", async () => {
+      mockUpload.mockResolvedValue({ success: false, reason: "network" })
+
+      const { result } = renderHook(() =>
+        useCloudBackup({
+          isEncrypted: true,
+          password: "hunter2hunter2",
+          autoBundleSync: true,
+        }),
+      )
+      await act(async () => {
+        await result.current.handleBackup()
+      })
+
+      // Otherwise sync points at a provider holding no seed backup at all.
+      expect(mockWriteSettings).not.toHaveBeenCalled()
+    })
   })
 })
