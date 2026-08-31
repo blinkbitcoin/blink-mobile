@@ -2139,8 +2139,8 @@
         "placeCategory": "Catégorie",
         "placeLocation": "Position",
         "changeLocation": "Modifier",
-        "placeReviewNote": "La communauté BTC Map vérifie chaque nouveau lieu avant qu'il apparaisse sur la carte.",
-        "placeSubmitted": "Lieu envoyé : la communauté BTC Map va l'examiner",
+        "placeReviewNote": "Les nouveaux lieux sont envoyés à BTC Map. Sa communauté vérifie et entretient tout ce qui figure sur la carte.",
+        "placeSubmitted": "Lieu envoyé à BTC Map : merci de l'avoir ajouté",
         "placeSubmissionFailed": "Le lieu n'a pas pu être envoyé. Vérifiez votre connexion et réessayez.",
         "category": {
             "restaurants": "Restaurants",

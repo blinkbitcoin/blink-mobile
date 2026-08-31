@@ -2139,8 +2139,8 @@
     "placeCategory": "Categorie",
     "placeLocation": "Locație",
     "changeLocation": "Schimbă",
-    "placeReviewNote": "Comunitatea BTC Map verifică fiecare loc nou înainte să apară pe hartă.",
-    "placeSubmitted": "Loc trimis — comunitatea BTC Map îl va verifica",
+    "placeReviewNote": "Locurile noi ajung la BTC Map. Comunitatea sa verifică și întreține tot ce se află pe hartă.",
+    "placeSubmitted": "Loc trimis către BTC Map — mulțumim că l-ai adăugat",
     "placeSubmissionFailed": "Locul nu a putut fi trimis. Verifică conexiunea și încearcă din nou.",
     "category": {
       "restaurants": "Restaurante",

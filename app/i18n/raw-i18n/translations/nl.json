@@ -2139,8 +2139,8 @@
     "placeCategory": "Categorie",
     "placeLocation": "Locatie",
     "changeLocation": "Wijzig",
-    "placeReviewNote": "De community van BTC Map controleert elke nieuwe plek voordat die op de kaart verschijnt.",
-    "placeSubmitted": "Plek verstuurd — de community van BTC Map controleert hem",
+    "placeReviewNote": "Nieuwe plekken gaan naar BTC Map. De community daar controleert en onderhoudt alles op de kaart.",
+    "placeSubmitted": "Plek verstuurd naar BTC Map — bedankt voor het toevoegen",
     "placeSubmissionFailed": "De plek kon niet worden verstuurd. Controleer je verbinding en probeer het opnieuw.",
     "category": {
       "restaurants": "Restaurants",

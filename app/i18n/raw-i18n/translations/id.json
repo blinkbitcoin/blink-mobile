@@ -2139,8 +2139,8 @@
     "placeCategory": "Kategori",
     "placeLocation": "Lokasi",
     "changeLocation": "Ubah",
-    "placeReviewNote": "Komunitas BTC Map memeriksa setiap tempat baru sebelum muncul di peta.",
-    "placeSubmitted": "Tempat terkirim — komunitas BTC Map akan meninjaunya",
+    "placeReviewNote": "Tempat baru dikirim ke BTC Map. Komunitasnya meninjau dan memelihara semua yang ada di peta.",
+    "placeSubmitted": "Tempat dikirim ke BTC Map — terima kasih telah menambahkannya",
     "placeSubmissionFailed": "Tempat tidak dapat dikirim. Periksa koneksi Anda dan coba lagi.",
     "category": {
       "restaurants": "Restoran",

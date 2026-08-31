@@ -2139,8 +2139,8 @@
     "placeCategory": "Kategorie",
     "placeLocation": "Poloha",
     "changeLocation": "Změnit",
-    "placeReviewNote": "Komunita BTC Map ověří každé nové místo, než se objeví na mapě.",
-    "placeSubmitted": "Místo odesláno — komunita BTC Map ho zkontroluje",
+    "placeReviewNote": "Nová místa se odesílají do BTC Map. Tamní komunita kontroluje a spravuje vše, co je na mapě.",
+    "placeSubmitted": "Místo odesláno do BTC Map — děkujeme za jeho přidání",
     "placeSubmissionFailed": "Místo se nepodařilo odeslat. Zkontrolujte připojení a zkuste to znovu.",
     "category": {
       "restaurants": "Restaurace",

@@ -2139,8 +2139,8 @@
     "placeCategory": "Danh mục",
     "placeLocation": "Vị trí",
     "changeLocation": "Thay đổi",
-    "placeReviewNote": "Cộng đồng BTC Map kiểm tra mọi địa điểm mới trước khi hiển thị trên bản đồ.",
-    "placeSubmitted": "Đã gửi địa điểm — cộng đồng BTC Map sẽ kiểm tra",
+    "placeReviewNote": "Địa điểm mới được gửi tới BTC Map. Cộng đồng của BTC Map kiểm tra và duy trì mọi thứ trên bản đồ.",
+    "placeSubmitted": "Đã gửi địa điểm tới BTC Map — cảm ơn bạn đã thêm",
     "placeSubmissionFailed": "Không thể gửi địa điểm. Hãy kiểm tra kết nối và thử lại.",
     "category": {
       "restaurants": "Nhà hàng",

@@ -2143,8 +2143,8 @@ const en: BaseTranslation = {
     placeLocation: "Location",
     changeLocation: "Change",
     placeReviewNote:
-      "BTC Map's community surveys every new place before it appears on the map.",
-    placeSubmitted: "Place sent — BTC Map's community will review it",
+      "New places go to BTC Map. Its community reviews and maintains everything on the map.",
+    placeSubmitted: "Place sent to BTC Map — thanks for adding it",
     placeSubmissionFailed:
       "The place could not be sent. Check your connection and try again.",
     category: {

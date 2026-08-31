@@ -2139,8 +2139,8 @@
     "placeCategory": "الفئة",
     "placeLocation": "الموقع",
     "changeLocation": "تغيير",
-    "placeReviewNote": "يتحقق مجتمع BTC Map من كل مكان جديد قبل ظهوره على الخريطة.",
-    "placeSubmitted": "تم إرسال المكان — سيراجعه مجتمع BTC Map",
+    "placeReviewNote": "تُرسل الأماكن الجديدة إلى BTC Map. ويراجع مجتمعها كل ما على الخريطة ويحافظ عليه.",
+    "placeSubmitted": "تم إرسال المكان إلى BTC Map — شكرًا لإضافته",
     "placeSubmissionFailed": "تعذّر إرسال المكان. تحقق من اتصالك وحاول مرة أخرى.",
     "category": {
       "restaurants": "مطاعم",

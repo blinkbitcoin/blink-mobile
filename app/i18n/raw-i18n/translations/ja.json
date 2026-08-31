@@ -2139,8 +2139,8 @@
         "placeCategory": "カテゴリー",
         "placeLocation": "位置",
         "changeLocation": "変更",
-        "placeReviewNote": "BTC Mapのコミュニティが確認してから、新しい場所がマップに表示されます。",
-        "placeSubmitted": "場所を送信しました。BTC Mapのコミュニティが確認します",
+        "placeReviewNote": "新しい場所はBTC Mapに送信されます。マップ上のすべてはBTC Mapのコミュニティが確認・管理しています。",
+        "placeSubmitted": "BTC Mapに場所を送信しました。追加していただきありがとうございます",
         "placeSubmissionFailed": "場所を送信できませんでした。接続を確認して、もう一度お試しください。",
         "category": {
             "restaurants": "レストラン",

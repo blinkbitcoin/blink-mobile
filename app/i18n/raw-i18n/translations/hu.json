@@ -2139,8 +2139,8 @@
     "placeCategory": "Kategória",
     "placeLocation": "Helyzet",
     "changeLocation": "Módosítás",
-    "placeReviewNote": "A BTC Map közössége minden új helyet ellenőriz, mielőtt megjelenne a térképen.",
-    "placeSubmitted": "A hely elküldve — a BTC Map közössége ellenőrzi",
+    "placeReviewNote": "Az új helyek a BTC Map-hez kerülnek. Az ottani közösség ellenőrzi és karbantartja mindazt, ami a térképen van.",
+    "placeSubmitted": "A hely elküldve a BTC Map-nek — köszönjük, hogy hozzáadta",
     "placeSubmissionFailed": "A helyet nem sikerült elküldeni. Ellenőrizze a kapcsolatát, és próbálja újra.",
     "category": {
       "restaurants": "Éttermek",

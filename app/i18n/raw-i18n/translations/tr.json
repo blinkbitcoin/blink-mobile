@@ -2139,8 +2139,8 @@
     "placeCategory": "Kategori",
     "placeLocation": "Konum",
     "changeLocation": "Değiştir",
-    "placeReviewNote": "BTC Map topluluğu, her yeni yeri haritada görünmeden önce kontrol eder.",
-    "placeSubmitted": "Yer gönderildi — BTC Map topluluğu inceleyecek",
+    "placeReviewNote": "Yeni yerler BTC Map'e gönderilir. Haritadaki her şeyi BTC Map topluluğu kontrol eder ve güncel tutar.",
+    "placeSubmitted": "Yer BTC Map'e gönderildi — eklediğiniz için teşekkürler",
     "placeSubmissionFailed": "Yer gönderilemedi. Bağlantınızı kontrol edip tekrar deneyin.",
     "category": {
       "restaurants": "Restoranlar",

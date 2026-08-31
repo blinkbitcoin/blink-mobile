@@ -2139,8 +2139,8 @@
     "placeCategory": "Kategori",
     "placeLocation": "Placering",
     "changeLocation": "Skift",
-    "placeReviewNote": "BTC Maps fællesskab tjekker hvert nyt sted, før det vises på kortet.",
-    "placeSubmitted": "Sted sendt — BTC Maps fællesskab vil gennemgå det",
+    "placeReviewNote": "Nye steder sendes til BTC Map. Fællesskabet dér gennemgår og vedligeholder alt på kortet.",
+    "placeSubmitted": "Sted sendt til BTC Map — tak fordi du tilføjede det",
     "placeSubmissionFailed": "Stedet kunne ikke sendes. Tjek din forbindelse og prøv igen.",
     "category": {
       "restaurants": "Restauranter",

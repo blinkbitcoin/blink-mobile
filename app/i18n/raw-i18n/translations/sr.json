@@ -2139,8 +2139,8 @@
     "placeCategory": "Категорија",
     "placeLocation": "Локација",
     "changeLocation": "Промени",
-    "placeReviewNote": "Заједница BTC Map-а проверава свако ново место пре него што се појави на мапи.",
-    "placeSubmitted": "Место је послато — заједница BTC Map-а ће га проверити",
+    "placeReviewNote": "Нова места се шаљу у BTC Map. Тамошња заједница проверава и одржава све што је на мапи.",
+    "placeSubmitted": "Место је послато у BTC Map — хвала што сте га додали",
     "placeSubmissionFailed": "Место није могло да се пошаље. Проверите везу и покушајте поново.",
     "category": {
       "restaurants": "Ресторани",

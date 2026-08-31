@@ -6665,11 +6665,11 @@ type RootTranslation = {
 		 */
 		changeLocation: string
 		/**
-		 * B​T​C​ ​M​a​p​'​s​ ​c​o​m​m​u​n​i​t​y​ ​s​u​r​v​e​y​s​ ​e​v​e​r​y​ ​n​e​w​ ​p​l​a​c​e​ ​b​e​f​o​r​e​ ​i​t​ ​a​p​p​e​a​r​s​ ​o​n​ ​t​h​e​ ​m​a​p​.
+		 * N​e​w​ ​p​l​a​c​e​s​ ​g​o​ ​t​o​ ​B​T​C​ ​M​a​p​.​ ​I​t​s​ ​c​o​m​m​u​n​i​t​y​ ​r​e​v​i​e​w​s​ ​a​n​d​ ​m​a​i​n​t​a​i​n​s​ ​e​v​e​r​y​t​h​i​n​g​ ​o​n​ ​t​h​e​ ​m​a​p​.
 		 */
 		placeReviewNote: string
 		/**
-		 * P​l​a​c​e​ ​s​e​n​t​ ​—​ ​B​T​C​ ​M​a​p​'​s​ ​c​o​m​m​u​n​i​t​y​ ​w​i​l​l​ ​r​e​v​i​e​w​ ​i​t
+		 * P​l​a​c​e​ ​s​e​n​t​ ​t​o​ ​B​T​C​ ​M​a​p​ ​—​ ​t​h​a​n​k​s​ ​f​o​r​ ​a​d​d​i​n​g​ ​i​t
 		 */
 		placeSubmitted: string
 		/**
@@ -20329,11 +20329,11 @@ export type TranslationFunctions = {
 		 */
 		changeLocation: () => LocalizedString
 		/**
-		 * BTC Map's community surveys every new place before it appears on the map.
+		 * New places go to BTC Map. Its community reviews and maintains everything on the map.
 		 */
 		placeReviewNote: () => LocalizedString
 		/**
-		 * Place sent — BTC Map's community will review it
+		 * Place sent to BTC Map — thanks for adding it
 		 */
 		placeSubmitted: () => LocalizedString
 		/**
