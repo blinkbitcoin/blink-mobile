@@ -55,6 +55,11 @@ const depositTierLabel = (
 // no rows remain), 0 renders as "no fee", positive values render the rate.
 const isRowVisible = (bps: number): boolean => bps >= 0
 
+// Lightning sends under this amount are not charged. Fixed server-side rather
+// than priced through feeRatesConfig, so it is a constant here; move it onto
+// the remote config if it ever needs to change without an app release.
+const LIGHTNING_FREE_BELOW_SATS = 100
+
 type FeeRateRowProps = {
   label: string
   value: string
@@ -148,6 +153,18 @@ export const FeeRatesScreen: React.FC = () => {
                     ),
                   })
             }
+          />
+        )
+      })
+      // Qualifies the row above, so it is gated on the same flag: hiding
+      // lightning sends must not leave its exemption stranded on its own.
+      items.push(function LightningBelowThresholdRow() {
+        return (
+          <FeeRateRow
+            label={LL.FeeRatesScreen.lightningBelowThreshold({
+              threshold: LIGHTNING_FREE_BELOW_SATS.toLocaleString("en-US"),
+            })}
+            value={LL.FeeRatesScreen.noFee()}
           />
         )
       })

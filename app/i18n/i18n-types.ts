@@ -8788,19 +8788,24 @@ type RootTranslation = {
 		 */
 		lightning: string
 		/**
+		 * L​i​g​h​t​n​i​n​g​ ​b​e​l​o​w​ ​{​t​h​r​e​s​h​o​l​d​}​ ​S​A​T
+		 * @param {string} threshold
+		 */
+		lightningBelowThreshold: RequiredParams<'threshold'>
+		/**
 		 * I​n​t​r​a​l​e​d​g​e​r
 		 */
 		intraledger: string
 		/**
-		 * O​n​c​h​a​i​n​ ​p​r​i​o​r​i​t​y​ ​(​a​s​a​p​)
+		 * O​n​c​h​a​i​n​ ​P​r​i​o​r​i​t​y​ ​(​~​1​0​m​)
 		 */
 		onchainPriority: string
 		/**
-		 * O​n​c​h​a​i​n​ ​s​t​a​n​d​a​r​d​ ​(​~​4​h​)
+		 * O​n​c​h​a​i​n​ ​S​t​a​n​d​a​r​d​ ​(​~​4​h​)
 		 */
 		onchainStandard: string
 		/**
-		 * O​n​c​h​a​i​n​ ​e​c​o​n​o​m​y
+		 * O​n​c​h​a​i​n​ ​E​c​o​n​o​m​y​ ​(​~​2​4​h​)
 		 */
 		onchainEconomy: string
 		/**
@@ -22333,19 +22338,23 @@ export type TranslationFunctions = {
 		 */
 		lightning: () => LocalizedString
 		/**
+		 * Lightning below {threshold} SAT
+		 */
+		lightningBelowThreshold: (arg: { threshold: string }) => LocalizedString
+		/**
 		 * Intraledger
 		 */
 		intraledger: () => LocalizedString
 		/**
-		 * Onchain priority (asap)
+		 * Onchain Priority (~10m)
 		 */
 		onchainPriority: () => LocalizedString
 		/**
-		 * Onchain standard (~4h)
+		 * Onchain Standard (~4h)
 		 */
 		onchainStandard: () => LocalizedString
 		/**
-		 * Onchain economy
+		 * Onchain Economy (~24h)
 		 */
 		onchainEconomy: () => LocalizedString
 		/**
