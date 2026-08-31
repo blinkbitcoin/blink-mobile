@@ -4198,6 +4198,25 @@ const en: BaseTranslation = {
     cta: "Read",
   },
   RecoveryBundleScreen: {
+    howItWorksCta: "How recovery works",
+    howItWorksTitle: "How recovery works",
+    howItWorksBody:
+      "If Spark becomes unavailable, this backup lets you move your funds onchain yourself, without Blink. Recovery is a multi-week process: transactions are broadcast, then a waiting period passes before the funds can be swept to a wallet you choose. It also costs onchain fees, which you pay from a separate Bitcoin balance. Small amounts may cost more to recover than they are worth.",
+    dollarNotCovered:
+      "Your Dollar balance is not covered by onchain recovery. Only Bitcoin can be recovered this way.",
+    nudgeMissingTitle: "Your funds have no recovery backup",
+    nudgeMissingBody:
+      "Set up your recovery backup so you can move your funds onchain if Spark becomes unavailable.",
+    nudgeOnlyOnThisDeviceTitle: "Your emergency bundle is only on this phone",
+    nudgeOnlyOnThisDeviceBody:
+      "Save a copy somewhere else. If you lose this phone, the copy stored on it goes with it and your funds cannot be recovered onchain.",
+    nudgeStaleTitle: "Your recovery backup is out of date",
+    nudgeStaleBody:
+      "It no longer matches your balance. Refresh it so a recovery would return everything you hold.",
+    nudgeCta: "Open recovery backup",
+    chipFresh: "Backed up",
+    chipStale: "Out of date",
+    chipMissing: "Not set up",
     settingsTitle: "Recovery backup",
     title: "Recovery backup",
     description:
