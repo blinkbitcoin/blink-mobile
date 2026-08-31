@@ -62,8 +62,9 @@ export const completedMethodsOf = (state: BackupState | null): BackupMethod[] =>
 /** Spreads prev so fields this module doesn't know about survive the write. Note
  *  the two writers hand it different prevs: markBackupCompletedFor re-reads
  *  storage, while the provider merges against its in-memory state.
- *  cloudPasswordProtected is not carried over from prev — each completion
- *  declares its own, so it resets unless the caller passes it again. */
+ *  cloudPasswordProtected falls back to prev when this completion doesn't carry
+ *  one, so a manual or keychain completion doesn't erase what an earlier cloud
+ *  backup recorded. */
 const withCompletedMethod = (
   prev: BackupState | null,
   method: BackupMethod,
@@ -75,7 +76,7 @@ const withCompletedMethod = (
     status: BackupStatus.Completed,
     method,
     completedMethods: methods.includes(method) ? methods : [...methods, method],
-    cloudPasswordProtected: options?.cloudPasswordProtected,
+    cloudPasswordProtected: options?.cloudPasswordProtected ?? prev?.cloudPasswordProtected,
   }
 }
 
