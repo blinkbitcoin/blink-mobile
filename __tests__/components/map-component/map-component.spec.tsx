@@ -738,7 +738,7 @@ describe("MapComponent adding a place", () => {
     const sent = await sendFromForm()
 
     expect(sent.reason).toBe(
-      "BTC Map could not accept this place. Nothing was added to the map.",
+      "BTC Map could not accept this place — it may already be on the map. Nothing was changed.",
     )
     expect(mockToastShow).not.toHaveBeenCalled()
     // Still open: the typed place is the user's to fix or abandon.
@@ -971,7 +971,7 @@ describe("MapComponent adding a place", () => {
   it("does not let an abandoned attempt's answer land on the next place", async () => {
     // The send outlives the form it was typed into. When it finally answers,
     // the form on screen may be a different place's — which it must not close,
-    // and must not report itself over.
+    // and must not report a failure over.
     let landAbandoned: ((outcome: unknown) => void) | undefined
     mockSubmitPlace.mockImplementationOnce(
       () =>
@@ -1007,10 +1007,15 @@ describe("MapComponent adding a place", () => {
       await inFlight
     })
 
-    // The place being described now is still on screen, and nothing was said
-    // about a place the user has already walked away from.
+    // The place being described now is still on screen, and the abandoned
+    // attempt reported nothing to it. The success itself is still announced,
+    // though: the place is on its way to BTC Map either way, and an
+    // unannounced success invites a resubmission under a new submission id,
+    // which the backend can no longer deduplicate.
     expect(capturedAddPlaceProps?.isVisible).toBe(true)
-    expect(mockToastShow).not.toHaveBeenCalled()
+    expect(mockToastShow).toHaveBeenCalledWith(
+      expect.objectContaining({ type: "success" }),
+    )
     expect(abandoned.reason).toBeNull()
   })
 
@@ -1059,6 +1064,63 @@ describe("MapComponent adding a place", () => {
     expect(mockSubmitPlace.mock.calls[0][1]).not.toEqual(
       uuidv4({ random: abandonedBytes }),
     )
+  })
+
+  it("says thanks even when the attempt was given up before the answer arrived", async () => {
+    // Closing the form mid-flight does not unsend the request: the place may
+    // still reach BTC Map. If that landing is kept quiet, the user believes
+    // the add failed and does it again — under a fresh submission id, so the
+    // backend's deduplication no longer recognises it as the same place.
+    let land: ((outcome: unknown) => void) | undefined
+    mockSubmitPlace.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          land = resolve
+        }),
+    )
+    const { getByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+    fireEvent.press(getByTestId("open-add-place"))
+    fireEvent.press(getByTestId("confirm-place-location"))
+    await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(true))
+
+    const inFlight = (capturedAddPlaceProps?.onSubmit as SendPlace)(SUBMISSION)
+    await waitFor(() => expect(mockSubmitPlace).toHaveBeenCalledTimes(1))
+
+    act(() => {
+      ;(capturedAddPlaceProps?.onClose as () => void)()
+    })
+
+    await act(async () => {
+      land?.({ submitted: true })
+      await inFlight
+    })
+
+    expect(mockToastShow).toHaveBeenCalledWith(
+      expect.objectContaining({ type: "success" }),
+    )
+  })
+
+  it("tells the form when the submission id could not be minted", async () => {
+    // No id, no send: without the idempotency key the backend cannot
+    // deduplicate, so the place must not go out without one — and the form
+    // must say why nothing happened rather than sit there looking untouched.
+    mockedSecureRandom.mockRejectedValueOnce(new Error("no CSPRNG"))
+    const { getByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+    fireEvent.press(getByTestId("open-add-place"))
+    fireEvent.press(getByTestId("confirm-place-location"))
+    await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(true))
+
+    const sent = await sendFromForm()
+
+    expect(sent.reason).toBe(
+      "The place could not be sent. Check your connection and try again.",
+    )
+    expect(mockSubmitPlace).not.toHaveBeenCalled()
+    expect(capturedAddPlaceProps?.isVisible).toBe(true)
   })
 })
 

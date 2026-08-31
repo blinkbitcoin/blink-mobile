@@ -1,4 +1,6 @@
+import { ApolloError } from "@apollo/client"
 import { act, renderHook } from "@testing-library/react-native"
+import { GraphQLError } from "graphql"
 
 import { PlaceSubmission } from "@app/btcmap/submission"
 import { useSubmitBtcMapPlace } from "@app/btcmap/use-place-submission"
@@ -80,6 +82,39 @@ describe("useSubmitBtcMapPlace", () => {
 
   it("does not call a request that never got an answer a refusal", async () => {
     mockMutate.mockRejectedValue(new Error("network down"))
+    const { submitPlace } = renderSubmit()
+
+    let outcome: Awaited<ReturnType<typeof submitPlace>> | undefined
+    await act(async () => {
+      outcome = await submitPlace(submission, submissionId)
+    })
+
+    expect(outcome).toEqual({ submitted: false, refused: false })
+  })
+
+  it("calls a top-level GraphQL error a refusal, not a dropped request", async () => {
+    // Apollo rejects the promise on top-level GraphQL errors too, so a request
+    // the server answered and turned down — an unknown mutation, a validation
+    // failure — arrives here as a rejection. Answering it with "check your
+    // connection" would send the user retrying something that can never go
+    // through.
+    mockMutate.mockRejectedValue(
+      new ApolloError({
+        graphQLErrors: [new GraphQLError('Cannot query field "btcMapPlaceSubmit"')],
+      }),
+    )
+    const { submitPlace } = renderSubmit()
+
+    let outcome: Awaited<ReturnType<typeof submitPlace>> | undefined
+    await act(async () => {
+      outcome = await submitPlace(submission, submissionId)
+    })
+
+    expect(outcome).toEqual({ submitted: false, refused: true })
+  })
+
+  it("does not call a bare network failure a refusal", async () => {
+    mockMutate.mockRejectedValue(new ApolloError({ networkError: new Error("offline") }))
     const { submitPlace } = renderSubmit()
 
     let outcome: Awaited<ReturnType<typeof submitPlace>> | undefined

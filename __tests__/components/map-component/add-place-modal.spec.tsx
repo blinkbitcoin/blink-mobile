@@ -193,6 +193,29 @@ describe("AddPlaceModal", () => {
     await waitFor(() => expect(queryByTestId("place-submission-error")).toBeNull())
   })
 
+  it("takes the last failure off when the place itself is edited", async () => {
+    // Same reason as the pin: the failure described the place as it stood, so
+    // once the name or the category changes it is accusing a place that no
+    // longer exists.
+    onSubmit.mockResolvedValue("Too many places sent today.")
+    const { getByTestId, queryByTestId } = renderModal()
+
+    await waitFor(() => expect(getByTestId("place-name-input")).toBeTruthy())
+    fillInForm(getByTestId)
+    fireEvent.press(getByTestId("submit-place"))
+
+    await waitFor(() => expect(getByTestId("place-submission-error")).toBeTruthy())
+
+    fireEvent.changeText(getByTestId("place-name-input"), "Hope House Café")
+    await waitFor(() => expect(queryByTestId("place-submission-error")).toBeNull())
+
+    fireEvent.press(getByTestId("submit-place"))
+    await waitFor(() => expect(getByTestId("place-submission-error")).toBeTruthy())
+
+    fireEvent.press(getByTestId("place-category-bars"))
+    await waitFor(() => expect(queryByTestId("place-submission-error")).toBeNull())
+  })
+
   it("lets a category be taken back off", async () => {
     // The chips are one choice rather than a set, so the only way out of a
     // mis-tap is tapping the same chip again.

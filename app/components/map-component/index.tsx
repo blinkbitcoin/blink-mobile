@@ -317,13 +317,12 @@ export default function MapComponent({
   // While the pin is being placed, a tap on the map is aiming rather than
   // asking about somewhere that is already on it, so the existing pins go quiet
   // instead of opening a sheet over the thing being aimed.
-  const handlePlacePress = React.useCallback(
-    (place: BtcMapPlace) => {
-      if (addStep !== null) return
-      setSelectedPlace(place)
-    },
-    [addStep],
-  )
+  const handlePlacePress = React.useCallback((place: BtcMapPlace) => {
+    // From the ref, like the cluster handler's: a callback keyed on `addStep`
+    // would change identity on every step transition and re-render the markers.
+    if (addStepRef.current !== null) return
+    setSelectedPlace(place)
+  }, [])
 
   const startAddingPlace = React.useCallback(() => {
     setSelectedPlace(null)
@@ -352,8 +351,10 @@ export default function MapComponent({
    * since by then the form is gone and there is nothing left to say it on.
    *
    * Both awaits are long enough for the attempt underneath to be abandoned and
-   * another one started, so what comes back is only applied while it still
-   * belongs to the attempt on screen.
+   * another one started, so what comes back is applied to the form only while
+   * it still belongs to the attempt on screen. The success toast is the one
+   * exception: it announces a place BTC Map now has, which stays true whatever
+   * the form has done since.
    */
   const handlePlaceSubmit = React.useCallback(
     async (submission: PlaceSubmission): Promise<string | null> => {
@@ -378,9 +379,24 @@ export default function MapComponent({
       }
       const outcome = await submitPlace(submission, submissionId)
 
-      // The send outlives the form when the modal is closed mid-flight. A
-      // response for an attempt that is no longer the one on screen closes
-      // nothing and reports nothing — least of all over a later attempt.
+      // Success is announced even when the attempt that sent it has since been
+      // abandoned: the place is on its way to BTC Map either way, and an
+      // unannounced success invites a resubmission under a new submissionId —
+      // which the backend can no longer deduplicate. The toast is app-level so
+      // it is visible once the form is closed; when a later attempt's form is
+      // open it is drawn behind that modal (see `add-place-modal.tsx`), which
+      // is the price of not losing the confirmation entirely.
+      if (outcome.submitted) {
+        toastShow({
+          message: (translations) => translations.MapScreen.placeSubmitted(),
+          LL,
+          type: "success",
+        })
+      }
+
+      // Everything else belongs to the form that sent it: a response for an
+      // attempt that is no longer the one on screen closes nothing and reports
+      // nothing over a later attempt.
       if (addStepRef.current !== "describing" || addSessionRef.current !== attempt) {
         return null
       }
@@ -399,11 +415,6 @@ export default function MapComponent({
       setAddStep(null)
       setPinnedLocation(null)
 
-      toastShow({
-        message: (translations) => translations.MapScreen.placeSubmitted(),
-        LL,
-        type: "success",
-      })
       return null
     },
     [LL, submitPlace],

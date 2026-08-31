@@ -6677,7 +6677,7 @@ type RootTranslation = {
 		 */
 		placeSubmissionFailed: string
 		/**
-		 * B​T​C​ ​M​a​p​ ​c​o​u​l​d​ ​n​o​t​ ​a​c​c​e​p​t​ ​t​h​i​s​ ​p​l​a​c​e​.​ ​N​o​t​h​i​n​g​ ​w​a​s​ ​a​d​d​e​d​ ​t​o​ ​t​h​e​ ​m​a​p​.
+		 * B​T​C​ ​M​a​p​ ​c​o​u​l​d​ ​n​o​t​ ​a​c​c​e​p​t​ ​t​h​i​s​ ​p​l​a​c​e​ ​—​ ​i​t​ ​m​a​y​ ​a​l​r​e​a​d​y​ ​b​e​ ​o​n​ ​t​h​e​ ​m​a​p​.​ ​N​o​t​h​i​n​g​ ​w​a​s​ ​c​h​a​n​g​e​d​.
 		 */
 		placeRefused: string
 		category: {
@@ -20345,7 +20345,7 @@ export type TranslationFunctions = {
 		 */
 		placeSubmissionFailed: () => LocalizedString
 		/**
-		 * BTC Map could not accept this place. Nothing was added to the map.
+		 * BTC Map could not accept this place — it may already be on the map. Nothing was changed.
 		 */
 		placeRefused: () => LocalizedString
 		category: {

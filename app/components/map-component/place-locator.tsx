@@ -38,6 +38,7 @@ export const PlaceLocator: React.FC<Props> = ({ onConfirm, onCancel }) => {
   const { LL } = useI18nContext()
   const insets = useSafeAreaInsets()
   const styles = useStyles({ bottomInset: insets.bottom })
+  // The pin being aimed is never a boosted place — it is not a place at all yet.
   const pinColor = usePinColor(false)
 
   return (

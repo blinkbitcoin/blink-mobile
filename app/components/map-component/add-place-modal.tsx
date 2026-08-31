@@ -80,6 +80,18 @@ export const AddPlaceModal: React.FC<Props> = ({
 
   const nameInputRef = React.useRef<TextInput>(null)
 
+  // A failure on the form is about the place as it stood, so editing the place
+  // — name, category, or the pin (see the location row) — takes it off:
+  // otherwise a refusal keeps accusing a place that no longer exists.
+  const editName = (text: string) => {
+    setName(text)
+    setError(null)
+  }
+  const editCategory = (option: PlaceCategory) => {
+    setCategory((current) => (current === option ? null : option))
+    setError(null)
+  }
+
   const submission = buildPlaceSubmission({ name, category, location })
   const isSubmitDisabled = !submission || isSubmitting
 
@@ -162,7 +174,7 @@ export const AddPlaceModal: React.FC<Props> = ({
               ref={nameInputRef}
               style={styles.input}
               value={name}
-              onChangeText={setName}
+              onChangeText={editName}
               placeholder={LL.MapScreen.placeNameHint()}
               placeholderTextColor={colors.grey2}
               maxLength={PLACE_NAME_MAX_LENGTH}
@@ -186,7 +198,7 @@ export const AddPlaceModal: React.FC<Props> = ({
                     key={option}
                     testID={`place-category-${option}`}
                     style={[styles.chip, isSelected && styles.chipSelected]}
-                    onPress={() => setCategory(isSelected ? null : option)}
+                    onPress={() => editCategory(option)}
                     accessibilityRole="button"
                     accessibilityState={{ selected: isSelected }}
                   >

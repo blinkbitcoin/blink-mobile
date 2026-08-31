@@ -1,4 +1,6 @@
-import { gql } from "@apollo/client"
+import React from "react"
+
+import { ApolloError, gql } from "@apollo/client"
 
 import { useBtcMapPlaceSubmitMutation } from "@app/graphql/generated"
 
@@ -46,31 +48,42 @@ type SubmitPlace = (
 export const useSubmitBtcMapPlace = (): { submitPlace: SubmitPlace } => {
   const [btcMapPlaceSubmit] = useBtcMapPlaceSubmitMutation()
 
-  const submitPlace: SubmitPlace = async (submission, submissionId) => {
-    try {
-      const { data } = await btcMapPlaceSubmit({
-        variables: {
-          input: {
-            submissionId,
-            name: submission.name,
-            category: submission.category,
-            latitude: submission.latitude,
-            longitude: submission.longitude,
+  const submitPlace: SubmitPlace = React.useCallback(
+    async (submission, submissionId) => {
+      try {
+        const { data } = await btcMapPlaceSubmit({
+          variables: {
+            input: {
+              submissionId,
+              name: submission.name,
+              category: submission.category,
+              latitude: submission.latitude,
+              longitude: submission.longitude,
+            },
           },
-        },
-      })
-      const payload = data?.btcMapPlaceSubmit
-      if (payload && payload.errors.length === 0 && payload.place) {
-        return { submitted: true }
+        })
+        const payload = data?.btcMapPlaceSubmit
+        if (payload && payload.errors.length === 0 && payload.place) {
+          return { submitted: true }
+        }
+        // An answer with neither errors nor a place is not a refusal — there is
+        // nothing to have refused it over — so it counts as an answer that never
+        // arrived, which is what it amounts to.
+        return { submitted: false, refused: Boolean(payload?.errors.length) }
+      } catch (error) {
+        // Apollo rejects the promise on a top-level GraphQL error as well as on
+        // a network failure, and the two are not the same failure: a GraphQL
+        // error means the server answered and turned the request down, so
+        // "check your connection" would send the user chasing a problem that
+        // is not theirs — and retrying will never fix.
+        if (error instanceof ApolloError && error.graphQLErrors.length > 0) {
+          return { submitted: false, refused: true }
+        }
+        return { submitted: false, refused: false }
       }
-      // An answer with neither errors nor a place is not a refusal — there is
-      // nothing to have refused it over — so it counts as an answer that never
-      // arrived, which is what it amounts to.
-      return { submitted: false, refused: Boolean(payload?.errors.length) }
-    } catch {
-      return { submitted: false, refused: false }
-    }
-  }
+    },
+    [btcMapPlaceSubmit],
+  )
 
   return { submitPlace }
 }
