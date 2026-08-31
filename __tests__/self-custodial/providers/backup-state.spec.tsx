@@ -585,6 +585,7 @@ describe("BackupStateProvider", () => {
         JSON.stringify({
           status: "completed",
           method: "cloud",
+          completedMethods: ["cloud"],
           cloudPasswordProtected: true,
         }),
       )
