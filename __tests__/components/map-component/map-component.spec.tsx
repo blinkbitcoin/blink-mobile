@@ -1,5 +1,7 @@
 import React from "react"
 import { Region } from "react-native-maps"
+import { generateSecureRandom } from "react-native-securerandom"
+import { v4 as uuidv4 } from "uuid"
 import { act, fireEvent, render, waitFor } from "@testing-library/react-native"
 
 import { BtcMapPlace, useBtcMapPlaceNames, useBtcMapPlaces } from "@app/btcmap"
@@ -160,6 +162,12 @@ jest.mock("@app/btcmap/use-place-submission", () => ({
 const mockedPlaces = useBtcMapPlaces as jest.MockedFunction<typeof useBtcMapPlaces>
 const mockedNames = useBtcMapPlaceNames as jest.MockedFunction<typeof useBtcMapPlaceNames>
 const mockedGetUserRegion = getUserRegion as jest.MockedFunction<typeof getUserRegion>
+// Root-level module mock, so it is already a jest.fn — see
+// __mocks__/react-native-securerandom.js. Held onto here so a test can keep an
+// id half-minted.
+const mockedSecureRandom = generateSecureRandom as jest.MockedFunction<
+  typeof generateSecureRandom
+>
 
 const REGION: Region = {
   latitude: 51.5,
@@ -958,6 +966,99 @@ describe("MapComponent adding a place", () => {
 
     expect(mockSubmitPlace).toHaveBeenCalledTimes(2)
     expect(mockSubmitPlace.mock.calls[0][1]).not.toEqual(mockSubmitPlace.mock.calls[1][1])
+  })
+
+  it("does not let an abandoned attempt's answer land on the next place", async () => {
+    // The send outlives the form it was typed into. When it finally answers,
+    // the form on screen may be a different place's — which it must not close,
+    // and must not report itself over.
+    let landAbandoned: ((outcome: unknown) => void) | undefined
+    mockSubmitPlace.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          landAbandoned = resolve
+        }),
+    )
+    const { getByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+    fireEvent.press(getByTestId("open-add-place"))
+    fireEvent.press(getByTestId("confirm-place-location"))
+    await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(true))
+
+    const abandoned: { reason?: string | null } = {}
+    const inFlight = (capturedAddPlaceProps?.onSubmit as SendPlace)(SUBMISSION).then(
+      (reason) => {
+        abandoned.reason = reason
+      },
+    )
+    await waitFor(() => expect(mockSubmitPlace).toHaveBeenCalledTimes(1))
+
+    // Give up on it and start describing somewhere else.
+    act(() => {
+      ;(capturedAddPlaceProps?.onClose as () => void)()
+    })
+    fireEvent.press(getByTestId("open-add-place"))
+    fireEvent.press(getByTestId("confirm-place-location"))
+    await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(true))
+
+    await act(async () => {
+      landAbandoned?.({ submitted: true })
+      await inFlight
+    })
+
+    // The place being described now is still on screen, and nothing was said
+    // about a place the user has already walked away from.
+    expect(capturedAddPlaceProps?.isVisible).toBe(true)
+    expect(mockToastShow).not.toHaveBeenCalled()
+    expect(abandoned.reason).toBeNull()
+  })
+
+  it("does not leave an abandoned attempt's id behind for the next place", async () => {
+    // Minting the id is a round trip of its own, and the attempt can be given
+    // up during it. The id must not be written down afterwards: the backend
+    // deduplicates on it, so the next place would arrive as an edit of the one
+    // that was abandoned — the wrong shop, overwritten.
+    const abandonedBytes = new Uint8Array(16).fill(7)
+    let mintAbandoned: ((bytes: Uint8Array) => void) | undefined
+    mockedSecureRandom.mockImplementationOnce(
+      () =>
+        new Promise<Uint8Array>((resolve) => {
+          mintAbandoned = resolve
+        }),
+    )
+    const { getByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+    fireEvent.press(getByTestId("open-add-place"))
+    fireEvent.press(getByTestId("confirm-place-location"))
+    await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(true))
+
+    const inFlight = (capturedAddPlaceProps?.onSubmit as SendPlace)(SUBMISSION)
+    await waitFor(() => expect(mintAbandoned).toBeDefined())
+
+    // Given up on while the id was still being minted.
+    act(() => {
+      ;(capturedAddPlaceProps?.onClose as () => void)()
+    })
+    fireEvent.press(getByTestId("open-add-place"))
+    fireEvent.press(getByTestId("confirm-place-location"))
+    await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(true))
+
+    await act(async () => {
+      mintAbandoned?.(abandonedBytes)
+      await inFlight
+    })
+
+    // Nothing was sent for the attempt that was walked away from.
+    expect(mockSubmitPlace).not.toHaveBeenCalled()
+
+    await sendFromForm()
+
+    expect(mockSubmitPlace).toHaveBeenCalledTimes(1)
+    expect(mockSubmitPlace.mock.calls[0][1]).not.toEqual(
+      uuidv4({ random: abandonedBytes }),
+    )
   })
 })
 

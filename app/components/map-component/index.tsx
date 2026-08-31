@@ -125,6 +125,10 @@ export default function MapComponent({
   // a trip back to the map to move the pin but never outlives the attempt it
   // was typed into.
   const [addSession, setAddSession] = React.useState(0)
+  // Read by the submit handler after its awaits, when the attempt on screen may
+  // be a later one than the one that was sent.
+  const addSessionRef = React.useRef(addSession)
+  addSessionRef.current = addSession
   // The idempotency key of the attempt: the backend deduplicates submissions on
   // it, so every retry of one attempt reuses it and a new attempt mints one.
   // Null until the attempt's first send — minting one is async, because a UUID's
@@ -346,9 +350,15 @@ export default function MapComponent({
    * native modal over everything, so a toast raised from under it is drawn
    * under it too — see `add-place-modal.tsx`. Success is the other way round,
    * since by then the form is gone and there is nothing left to say it on.
+   *
+   * Both awaits are long enough for the attempt underneath to be abandoned and
+   * another one started, so what comes back is only applied while it still
+   * belongs to the attempt on screen.
    */
   const handlePlaceSubmit = React.useCallback(
     async (submission: PlaceSubmission): Promise<string | null> => {
+      const attempt = addSessionRef.current
+
       let submissionId = submissionIdRef.current
       if (!submissionId) {
         try {
@@ -356,6 +366,11 @@ export default function MapComponent({
         } catch {
           return LL.MapScreen.placeSubmissionFailed()
         }
+        // Abandoned while the id was being minted. Nothing to send — and the id
+        // must not be left in the ref for the next attempt to pick up, since
+        // the backend deduplicates on it and would take the next place as an
+        // edit of this one.
+        if (addSessionRef.current !== attempt) return null
         // No race to atomically avoid: the form's in-flight guard means only
         // one send per attempt is ever between its first line and this one.
         // eslint-disable-next-line require-atomic-updates
@@ -363,10 +378,12 @@ export default function MapComponent({
       }
       const outcome = await submitPlace(submission, submissionId)
 
-      // The send outlives the form when the modal is closed mid-flight; a
-      // response for an attempt that is no longer on screen closes nothing and
-      // reports nothing.
-      if (addStepRef.current !== "describing") return null
+      // The send outlives the form when the modal is closed mid-flight. A
+      // response for an attempt that is no longer the one on screen closes
+      // nothing and reports nothing — least of all over a later attempt.
+      if (addStepRef.current !== "describing" || addSessionRef.current !== attempt) {
+        return null
+      }
 
       // The form stays open with the reason on it: what was typed is exactly
       // what a retry should send, under the same submissionId. A refusal is
