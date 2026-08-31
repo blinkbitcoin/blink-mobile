@@ -2510,7 +2510,7 @@ const en: BaseTranslation = {
     mode: "Mode",
     pos: "Point of Sale",
     posCopied: "Your point of sale link has been copied",
-    createAddress: "Create address",
+    createAddress: "Set receive address",
     addressDisabled: "(disabled)",
     donationButton: "Donate Button",
     btcpayServer: "BTCPay Server",

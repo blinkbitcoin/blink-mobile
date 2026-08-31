@@ -2422,7 +2422,7 @@
         "sdkGenericError": "Impossible d'estimer les frais. Essayez un montant différent."
     },
     "SettingsScreen": {
-        "createAddress": "Créer une adresse",
+        "createAddress": "Adresse de réception",
         "addressDisabled": "(désactivée)",
         "donationButton": "Bouton de don",
         "btcpayServer": "BTCPay Server",

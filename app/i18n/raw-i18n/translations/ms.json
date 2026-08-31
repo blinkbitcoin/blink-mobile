@@ -2422,7 +2422,7 @@
     "sdkGenericError": "Tidak dapat menganggarkan yuran. Sila cuba jumlah yang berbeza."
   },
   "SettingsScreen": {
-    "createAddress": "Cipta alamat",
+    "createAddress": "Tetapkan alamat terima",
     "addressDisabled": "(dilumpuhkan)",
     "donationButton": "Butang derma",
     "btcpayServer": "BTCPay Server",

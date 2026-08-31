@@ -2422,7 +2422,7 @@
         "sdkGenericError": "Não foi possível estimar as taxas. Tente um valor diferente."
     },
     "SettingsScreen": {
-        "createAddress": "Criar endereço",
+        "createAddress": "Endereço de recebimento",
         "addressDisabled": "(desativado)",
         "donationButton": "Botão Doar",
         "btcpayServer": "BTCPay Server",

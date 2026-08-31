@@ -2422,7 +2422,7 @@
     "sdkGenericError": "Nu se pot estima comisioanele. Încercați o sumă diferită."
   },
   "SettingsScreen": {
-    "createAddress": "Creează adresă",
+    "createAddress": "Setează adresa de primire",
     "addressDisabled": "(dezactivat)",
     "donationButton": "Buton de donare",
     "btcpayServer": "BTCPay Server",

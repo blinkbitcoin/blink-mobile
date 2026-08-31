@@ -2422,7 +2422,7 @@
     "sdkGenericError": "Nem sikerült megbecsülni a díjakat. Próbáljon másik összeget."
   },
   "SettingsScreen": {
-    "createAddress": "Cím létrehozása",
+    "createAddress": "Fogadási cím beállítása",
     "addressDisabled": "(letiltva)",
     "donationButton": "Adományozás gomb",
     "btcpayServer": "BTCPay Server",

@@ -2422,7 +2422,7 @@
         "sdkGenericError": "No se pueden estimar las comisiones. Intenta con un monto diferente."
     },
     "SettingsScreen": {
-        "createAddress": "Crear dirección",
+        "createAddress": "Dirección para recibir",
         "addressDisabled": "(desactivada)",
         "donationButton": "Botón Donar",
         "btcpayServer": "BTCPay Server",
