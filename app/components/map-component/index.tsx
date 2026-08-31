@@ -116,7 +116,8 @@ export default function MapComponent({
   const isAddingPlace = addStep !== null
   const isLocatingPlace = addStep === "locating"
   const isDescribingPlace = addStep === "describing"
-  // Read by the submit handler after its await, when `addStep` may have moved on.
+  // Read by the submit handler after its awaits, when `addStep` may have moved
+  // on, and by the cluster handler, which has to stay a stable callback.
   const addStepRef = React.useRef(addStep)
   addStepRef.current = addStep
   const [pinnedLocation, setPinnedLocation] = React.useState<LatLng | null>(null)
@@ -277,6 +278,15 @@ export default function MapComponent({
   // fresh callback and re-render the lot of them.
   const regionRef = React.useRef(region)
 
+  // The camera is somewhere for the whole of a fling or a fly-to, not only once
+  // it stops, and confirming the pin reads this ref — so it follows the camera
+  // rather than its last resting place. Nothing but the ref: this fires every
+  // frame of a gesture, and re-rendering ~29k points' worth of markers on each
+  // of them is what `region` being written only on settle exists to avoid.
+  const handleRegionChange = React.useCallback((nextRegion: Region) => {
+    regionRef.current = nextRegion
+  }, [])
+
   const handleRegionChangeComplete = React.useCallback(
     (nextRegion: Region) => {
       regionRef.current = nextRegion
@@ -288,6 +298,10 @@ export default function MapComponent({
 
   const handleClusterPress = React.useCallback(
     (cluster: ClusterMarkerData) => {
+      // Same reason the pins go quiet below: while the pin is being placed the
+      // map is being aimed, and flying off to a cluster takes it off whatever
+      // was being aimed at. From the ref, so that this stays one callback.
+      if (addStepRef.current !== null) return
       mapViewRef.current?.animateToRegion(
         regionForCluster(cluster, regionRef.current),
         FLY_TO_DURATION_MS,
@@ -425,6 +439,7 @@ export default function MapComponent({
         // this prop instead.
         showsPointsOfInterests={false}
         customMapStyle={themeMode === "dark" ? MapStyles.dark : MapStyles.light}
+        onRegionChange={handleRegionChange}
         onRegionChangeComplete={handleRegionChangeComplete}
         moveOnMarkerPress={false}
         rotateEnabled={false}

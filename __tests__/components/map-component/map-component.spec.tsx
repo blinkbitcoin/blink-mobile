@@ -33,12 +33,18 @@ jest.mock("react-native-permissions", () => ({
 }))
 
 let capturedMapProps: Record<string, unknown> | undefined
+// The map only ever moves through this handle, so it is also the only way to
+// see whether a tap moved it.
+const mockAnimateToRegion = jest.fn()
 jest.mock("react-native-maps", () => {
   const ReactActual = jest.requireActual<typeof React>("react")
   const RN = jest.requireActual<typeof import("react-native")>("react-native")
   const MapView = ReactActual.forwardRef(
-    (props: { children?: React.ReactNode }, _ref: React.Ref<unknown>) => {
+    (props: { children?: React.ReactNode }, ref: React.Ref<unknown>) => {
       capturedMapProps = props as Record<string, unknown>
+      ReactActual.useImperativeHandle(ref, () => ({
+        animateToRegion: mockAnimateToRegion,
+      }))
       return ReactActual.createElement(RN.View, { testID: "map-view" }, props.children)
     },
   )
@@ -793,6 +799,57 @@ describe("MapComponent adding a place", () => {
 
     await waitFor(() => expect(getByTestId("confirm-place-location")).toBeTruthy())
     expect(capturedSheetProps?.place).toBeNull()
+  })
+
+  it("flies to a cluster that is tapped", async () => {
+    // The anchor for the test below: a cluster press does move the camera, so
+    // that press going nowhere while the pin is out means something.
+    setPlaces({ places: [place(1), place(2), place(3)] })
+    const { getAllByTestId } = renderMap()
+
+    await waitFor(() => expect(getAllByTestId(/^btcmap-cluster-/)).toHaveLength(1))
+    fireEvent.press(getAllByTestId(/^btcmap-cluster-/)[0])
+
+    expect(mockAnimateToRegion).toHaveBeenCalled()
+  })
+
+  it("leaves the clusters alone while a pin is being placed", async () => {
+    // Same reason the pins go quiet: a tap while aiming is aiming, and flying
+    // off to a cluster takes the map off whatever was under the pin.
+    setPlaces({ places: [place(1), place(2), place(3)] })
+    const { getAllByTestId, getByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+    fireEvent.press(getByTestId("open-add-place"))
+
+    await waitFor(() => expect(getByTestId("confirm-place-location")).toBeTruthy())
+    mockAnimateToRegion.mockClear()
+    fireEvent.press(getAllByTestId(/^btcmap-cluster-/)[0])
+
+    expect(mockAnimateToRegion).not.toHaveBeenCalled()
+    expect(getByTestId("confirm-place-location")).toBeTruthy()
+  })
+
+  it("confirms the pin where the camera is, not where it last came to rest", async () => {
+    // A fling or a fly-to reports the camera for the whole of the movement and
+    // settles only at the end. Reading the settled region instead would put the
+    // place wherever the map was before the last move — one tap behind.
+    const { getByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+    fireEvent.press(getByTestId("open-add-place"))
+
+    const moving = { ...REGION, latitude: 13.496743, longitude: -89.439462 }
+    act(() => {
+      ;(capturedMapProps?.onRegionChange as (r: Region) => void)(moving)
+    })
+    fireEvent.press(getByTestId("confirm-place-location"))
+
+    await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(true))
+    expect(capturedAddPlaceProps?.location).toEqual({
+      latitude: moving.latitude,
+      longitude: moving.longitude,
+    })
   })
 
   it("closes the form and says thanks once BTC Map has the place", async () => {
