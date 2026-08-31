@@ -2422,7 +2422,7 @@
     "sdkGenericError": "Nije moguće proceniti naknade. Pokušajte sa drugim iznosom."
   },
   "SettingsScreen": {
-    "createAddress": "Направи адресу",
+    "createAddress": "Постави адресу за пријем",
     "addressDisabled": "(онемогућено)",
     "donationButton": "Дугме за донирање",
     "btcpayServer": "BTCPay Server",

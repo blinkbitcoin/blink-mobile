@@ -2422,7 +2422,7 @@
     "sdkGenericError": "No s'han pogut estimar les comissions. Proveu un import diferent."
   },
   "SettingsScreen": {
-    "createAddress": "Crea una adreça",
+    "createAddress": "Posa adreça per rebre",
     "addressDisabled": "(desactivat)",
     "donationButton": "Botó Donar",
     "btcpayServer": "BTCPay Server",

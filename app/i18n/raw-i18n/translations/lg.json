@@ -2422,7 +2422,7 @@
     "sdkGenericError": "Tesobola kusoma ssente z'obukozi. Gezaako omuwendo omulala."
   },
   "SettingsScreen": {
-    "createAddress": "Kola endagiriro",
+    "createAddress": "Endagiriro y'okufuna",
     "addressDisabled": "(tekikola)",
     "donationButton": "Bbatani y'okuwaayo",
     "btcpayServer": "BTCPay Server",

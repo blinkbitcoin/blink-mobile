@@ -73,7 +73,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
   useI18nContext: () => ({
     LL: {
       SettingsScreen: {
-        createAddress: () => "Create address",
+        createAddress: () => "Set receive address",
         addressDisabled: () => "(disabled)",
       },
       GaloyAddressScreen: { copiedLightningAddressToClipboard: () => "Copied" },
@@ -105,7 +105,7 @@ describe("AccountLNAddress (self-custodial)", () => {
 
     render(<AccountLNAddress />)
 
-    expect(lastRowProps().title).toBe("Create address")
+    expect(lastRowProps().title).toBe("Set receive address")
     expect(lastRowProps().rightIcon).toBeUndefined()
     expect(mockScModal.mock.calls.at(-1)?.[0]?.isVisible).toBe(false)
 
@@ -147,7 +147,7 @@ describe("AccountLNAddress (self-custodial)", () => {
 
     render(<AccountLNAddress />)
 
-    expect(lastRowProps().title).toBe("Create address")
+    expect(lastRowProps().title).toBe("Set receive address")
   })
 
   /** Registering an address is the very thing Incognito withholds: publishing one would
@@ -186,7 +186,7 @@ describe("AccountLNAddress (self-custodial)", () => {
 
     render(<AccountLNAddress />)
 
-    expect(lastRowProps().title).toBe("Create address")
+    expect(lastRowProps().title).toBe("Set receive address")
     expect(mockBackupRequiredModal.mock.calls.at(-1)?.[0]?.isVisible).toBe(false)
 
     act(() => (lastRowProps().action as () => void)())
@@ -269,7 +269,7 @@ describe("AccountLNAddress (custodial)", () => {
 
     render(<AccountLNAddress />)
 
-    expect(lastRowProps().title).toBe("Create address")
+    expect(lastRowProps().title).toBe("Set receive address")
     expect(lastRowProps().rightIcon).toBeUndefined()
     expect(mockCustodialModal.mock.calls.at(-1)?.[0]?.isVisible).toBe(false)
 

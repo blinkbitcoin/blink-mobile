@@ -2422,7 +2422,7 @@
         "sdkGenericError": "Gebühren können nicht geschätzt werden. Bitte versuchen Sie einen anderen Betrag."
     },
     "SettingsScreen": {
-        "createAddress": "Adresse erstellen",
+        "createAddress": "Empfangsadresse setzen",
         "addressDisabled": "(deaktiviert)",
         "donationButton": "Spenden-Button",
         "btcpayServer": "BTCPay Server",

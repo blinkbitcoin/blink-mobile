@@ -2422,7 +2422,7 @@
     "sdkGenericError": "Nelze odhadnout poplatky. Zkuste jiný částku."
   },
   "SettingsScreen": {
-    "createAddress": "Vytvořit adresu",
+    "createAddress": "Nastavit adresu příjmu",
     "addressDisabled": "(zakázáno)",
     "donationButton": "Darovací tlačítko",
     "btcpayServer": "BTCPay Server",

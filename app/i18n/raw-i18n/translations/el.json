@@ -2422,7 +2422,7 @@
     "sdkGenericError": "Αδυναμία εκτίμησης τελών. Δοκιμάστε διαφορετικό ποσό."
   },
   "SettingsScreen": {
-    "createAddress": "Δημιουργία διεύθυνσης",
+    "createAddress": "Ορισμός διεύθυνσης λήψης",
     "addressDisabled": "(απενεργοποιημένο)",
     "donationButton": "Κουμπί δωρεάς",
     "btcpayServer": "BTCPay Server",

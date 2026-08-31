@@ -2422,7 +2422,7 @@
         "sdkGenericError": "Impossibile stimare le commissioni. Prova con un importo diverso."
     },
     "SettingsScreen": {
-        "createAddress": "Crea indirizzo",
+        "createAddress": "Indirizzo di ricezione",
         "addressDisabled": "(disattivato)",
         "donationButton": "Pulsante Dona",
         "btcpayServer": "BTCPay Server",

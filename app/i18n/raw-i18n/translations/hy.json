@@ -2422,7 +2422,7 @@
     "sdkGenericError": "Հնարավոր չէ հաշվարկել վճարները։ Խնդրում ենք փորձել այլ գումար։"
   },
   "SettingsScreen": {
-    "createAddress": "Ստեղծել հասցե",
+    "createAddress": "Սահմանել ստացման հասցեն",
     "addressDisabled": "(անջատված)",
     "donationButton": "Նվիրատվության կոճակ",
     "btcpayServer": "BTCPay Server",

@@ -49,7 +49,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
       },
       SettingsScreen: {
         setByOs: () => "Default",
-        createAddress: () => "Create address",
+        createAddress: () => "Set receive address",
         pos: () => "POS",
         staticQr: () => "Static QR",
         donationButton: () => "Donate Button",
