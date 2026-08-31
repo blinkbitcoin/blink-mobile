@@ -22,7 +22,7 @@ import { useDollarBalanceGated } from "@app/hooks/use-dollar-balance-restricted"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { usePaymentRequest as useSelfCustodialPaymentRequest } from "@app/self-custodial/hooks"
-import type { SelfCustodialPaymentRequestState } from "@app/self-custodial/hooks/types"
+import type { ReceivePaymentRequestState } from "./payment/request-state.types"
 import { ActiveWalletStatus } from "@app/types/wallet"
 import { testProps } from "@app/utils/testProps"
 
@@ -88,9 +88,9 @@ const ReceiveScreen = () => {
 }
 
 type ReceiveScreenContentProps = {
-  requestState: SelfCustodialPaymentRequestState
+  requestState: ReceivePaymentRequestState
   isSelfCustodial: boolean
-  selfCustodialRequest: SelfCustodialPaymentRequestState | null | undefined
+  selfCustodialRequest: ReceivePaymentRequestState | null | undefined
 }
 
 const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({

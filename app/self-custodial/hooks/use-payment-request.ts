@@ -19,6 +19,10 @@ import {
   PaymentRequestState,
   PaymentRequestStateType,
 } from "@app/screens/receive-bitcoin-screen/payment/index.types"
+import type {
+  ReceiveInvoiceInfo,
+  ReceivePaymentRequestState,
+} from "@app/screens/receive-bitcoin-screen/payment/request-state.types"
 import {
   MoneyAmount,
   WalletOrDisplayCurrency,
@@ -47,7 +51,6 @@ import {
 import { useLightningAddressGated } from "./use-lightning-address-gate"
 import { usePendingDeposits } from "./use-pending-deposits"
 import { useReceiveAssetMode } from "./use-receive-asset-mode"
-import type { InvoiceData, SelfCustodialPaymentRequestState } from "./types"
 
 /**
  * The identity of a generation: the sdk instance plus a key covering everything else the
@@ -107,7 +110,7 @@ const resolveDepositMarker = async (
   }
 }
 
-export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => {
+export const usePaymentRequest = (): ReceivePaymentRequestState | null => {
   const { sdk, lastReceivedPaymentId, lightningAddress, allTransactions } =
     useSelfCustodialWallet()
   const { activeAccount } = useAccountRegistry()
@@ -562,7 +565,7 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
 
   if (!sdk || !btcWallet || !convertMoneyAmount) return null
 
-  const buildInvoiceData = (): InvoiceData | undefined => {
+  const buildInvoiceData = (): ReceiveInvoiceInfo | undefined => {
     if (type === Invoice.PayCode && lightningAddress) {
       return {
         invoiceType: Invoice.PayCode,

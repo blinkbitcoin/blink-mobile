@@ -2,6 +2,7 @@ import { Network } from "@breeztech/breez-sdk-spark-react-native"
 import Config from "react-native-config"
 import { DocumentDirectoryPath } from "react-native-fs"
 
+import { LNURL_DOMAINS } from "@app/config/appinfo"
 import { type GaloyInstanceName } from "@app/config/galoy-instances"
 
 export const SparkToken = {
@@ -38,6 +39,19 @@ const REGTEST_LNURL_DOMAIN = "staging.blink.sv"
 
 export const lnurlDomainFor = (network: Network): string =>
   network === Network.Mainnet ? MAINNET_LNURL_DOMAIN : REGTEST_LNURL_DOMAIN
+
+const REGTEST_PAY_DOMAIN = "pay.staging.blink.sv"
+
+/**
+ * Every host that serves one of our own accounts on this network, the address domain
+ * first: the point of sale answers on `pay.*` while an account is spelled without it.
+ * Kept per network because a host belongs to the deployment that serves it, and
+ * declaring another one's would name an account this network never issued.
+ */
+export const lnurlDomainsFor = (network: Network): string[] =>
+  network === Network.Mainnet
+    ? LNURL_DOMAINS
+    : [lnurlDomainFor(network), REGTEST_PAY_DOMAIN]
 
 /**
  * Base URL of the LNURL server for a self-custodial account: the same host its address is

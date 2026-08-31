@@ -1832,10 +1832,10 @@
     "@noble/hashes" "^1.1.5"
     "@noble/secp256k1" "^1.7.1"
 
-"@blinkbitcoin/blink-client@1.1.0":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/@blinkbitcoin/blink-client/-/blink-client-1.1.0.tgz#49a0034d798f90976698d1086cc1e2de8cf149b3"
-  integrity sha512-xcWuzOPgT+2gJrELMSTC452X4k2g120hk4YrGets5j0XbO04Vf6MMnNBkA++kHOhB/LfPT4fMH+kNdlTZ4vjbw==
+"@blinkbitcoin/blink-client@1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@blinkbitcoin/blink-client/-/blink-client-1.1.1.tgz#a5f101966d1e13ac5388f74ee7ad0b1cc0d4e951"
+  integrity sha512-kKbvnxFX12ERIhOPvPGskgIngVCX5kcKWkwkh66MauBIIocaYLJM/Q7DoYloXLAuzQqsyy+FTScWYj+eXVaUSw==
 
 "@blinkbitcoin/react-native-geetest-module@0.1.2":
   version "0.1.2"
