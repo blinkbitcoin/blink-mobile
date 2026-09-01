@@ -28,7 +28,7 @@ export const TransferInvestScreen: React.FC = () => {
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
         <IconHero
           icon="send"
-          iconColor={colors._green}
+          iconColor={colors.black}
           title={LL.CardFlow.Onboarding.TransferInvest.title()}
         />
 
