@@ -3762,6 +3762,9 @@
                 },
                 "buttonText": "署名に進む"
             },
+            "SignInvest": {
+                "label": "契約書に署名する"
+            },
             "TransferInvest": {
                 "title": "投資額を送金してください",
                 "paragraphs": {

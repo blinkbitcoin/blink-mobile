@@ -3714,6 +3714,9 @@
         },
         "buttonText": "Procedir a Signar"
       },
+      "SignInvest": {
+        "label": "Signa l'acord"
+      },
       "TransferInvest": {
         "title": "Transfereix la teva inversió",
         "paragraphs": {
