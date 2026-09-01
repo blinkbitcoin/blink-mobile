@@ -179,9 +179,7 @@ describe("useKycFlow", () => {
       },
     })
 
-    const { result } = renderHook(() =>
-      useKycFlow({ firstName: "   ", lastName: " " }),
-    )
+    const { result } = renderHook(() => useKycFlow({ firstName: "   ", lastName: " " }))
 
     await act(async () => {
       await result.current.startKyc()
