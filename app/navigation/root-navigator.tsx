@@ -311,7 +311,7 @@ const investmentOnboardingScreens = (LL: TranslationFunctions) => (
       component={TransferInvestScreen}
       options={{
         title: "",
-        headerLeft: () => <></>,
+        headerBackVisible: false,
         ...headerCloseControlOptions(),
       }}
     />
@@ -320,7 +320,7 @@ const investmentOnboardingScreens = (LL: TranslationFunctions) => (
       component={InsufficientBalanceScreen}
       options={{
         title: "",
-        headerLeft: () => <></>,
+        headerBackVisible: false,
         ...headerCloseControlOptions(),
       }}
     />
@@ -329,7 +329,7 @@ const investmentOnboardingScreens = (LL: TranslationFunctions) => (
       component={DepositPendingScreen}
       options={{
         title: "",
-        headerLeft: () => <></>,
+        headerBackVisible: false,
         ...headerCloseControlOptions(),
       }}
     />
