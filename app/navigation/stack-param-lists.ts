@@ -275,6 +275,7 @@ export type RootStackParamList = {
   cardOnboardingWelcomeInvestScreen: undefined
   cardOnboardingSelectInvestScreen: undefined
   cardOnboardingTermSheetScreen: { selectedAmountUsd: number }
+  cardOnboardingSignInvestScreen: { selectedAmountUsd: number }
   cardOnboardingTransferInvestScreen: {
     selectedAmountUsd: number
     /** The satoshis the signed agreement names, carried from the signing step. It is what
