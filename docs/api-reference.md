@@ -296,6 +296,19 @@ useDeviceNotificationTokenCreateMutation({
 })
 ```
 
+### BTC Map
+```typescript
+// Propose a missing place to BTC Map. Level-two custodial accounts only;
+// the client-minted submissionId is the idempotency key — retries of one
+// attempt must reuse it (a resend updates the original submission rather
+// than duplicating the place).
+useBtcMapPlaceSubmitMutation({
+  variables: {
+    input: { submissionId, name, category, latitude, longitude }
+  }
+})
+```
+
 ## Error Handling
 
 GraphQL errors are handled in `app/graphql/error-code.ts`:

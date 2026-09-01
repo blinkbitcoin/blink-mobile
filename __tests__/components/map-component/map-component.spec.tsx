@@ -152,6 +152,13 @@ jest.mock("@app/utils/toast", () => ({
   toastShow: (args: unknown) => mockToastShow(args),
 }))
 
+// Failures are reported rather than swallowed — see use-place-submission.ts and
+// the submission-id minting in index.tsx. Held onto so a test can see them.
+const mockReportError = jest.fn()
+jest.mock("@app/utils/error-logging", () => ({
+  reportError: (...args: unknown[]) => mockReportError(...args),
+}))
+
 // The hook talks to the backend; here the map only needs to be told whether
 // the place went.
 const mockSubmitPlace = jest.fn()
@@ -1102,6 +1109,47 @@ describe("MapComponent adding a place", () => {
     )
   })
 
+  it("closes the attempt when the answer lands after the pin went back on the move", async () => {
+    // The form's "Change" is tappable while a send is in flight, so a success
+    // can arrive with the attempt sitting back on the pin-aiming step. Leaving
+    // it open then would let a second send reuse the attempt's submissionId —
+    // which the backend takes as an edit of the place it just accepted.
+    let land: ((outcome: unknown) => void) | undefined
+    mockSubmitPlace.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          land = resolve
+        }),
+    )
+    const { getByTestId, queryByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+    fireEvent.press(getByTestId("open-add-place"))
+    fireEvent.press(getByTestId("confirm-place-location"))
+    await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(true))
+
+    const inFlight = (capturedAddPlaceProps?.onSubmit as SendPlace)(SUBMISSION)
+    await waitFor(() => expect(mockSubmitPlace).toHaveBeenCalledTimes(1))
+
+    // Back to moving the pin while the send is still out.
+    act(() => {
+      ;(capturedAddPlaceProps?.onChangeLocation as () => void)()
+    })
+    await waitFor(() => expect(getByTestId("confirm-place-location")).toBeTruthy())
+
+    await act(async () => {
+      land?.({ submitted: true })
+      await inFlight
+    })
+
+    expect(mockToastShow).toHaveBeenCalledWith(
+      expect.objectContaining({ type: "success" }),
+    )
+    // The attempt is over: nothing left aimed at a place BTC Map already has.
+    await waitFor(() => expect(queryByTestId("confirm-place-location")).toBeNull())
+    expect(capturedAddPlaceProps?.isVisible).toBe(false)
+  })
+
   it("tells the form when the submission id could not be minted", async () => {
     // No id, no send: without the idempotency key the backend cannot
     // deduplicate, so the place must not go out without one — and the form
@@ -1116,8 +1164,13 @@ describe("MapComponent adding a place", () => {
 
     const sent = await sendFromForm()
 
-    expect(sent.reason).toBe(
-      "The place could not be sent. Check your connection and try again.",
+    // What failed is the device's CSPRNG, not the connection — the form gets
+    // the generic error rather than connection advice that cannot apply, and
+    // the failure is reported rather than swallowed.
+    expect(sent.reason).toBe("There was an error.\nPlease try again later.")
+    expect(mockReportError).toHaveBeenCalledWith(
+      "mintBtcMapSubmissionId",
+      expect.any(Error),
     )
     expect(mockSubmitPlace).not.toHaveBeenCalled()
     expect(capturedAddPlaceProps?.isVisible).toBe(true)

@@ -60,6 +60,14 @@ describe("shouldRetryOperation", () => {
     expect(shouldRetryOperation(networkError, NON_IDEMPOTENT_PAYMENT)).toBe(false)
   })
 
+  it("retries a BTC Map place submission, which its submissionId makes idempotent", () => {
+    // btcMapPlaceSubmit stays off the no-retry list on purpose: every retry of
+    // an attempt carries the attempt's client-minted submissionId, so a resent
+    // request updates the original submission instead of duplicating the place.
+    // If that keying ever goes away, this operation belongs on the no-retry list.
+    expect(shouldRetryOperation(networkError, "btcMapPlaceSubmit")).toBe(true)
+  })
+
   it("does not retry an on-chain send-all", () => {
     expect(shouldRetryOperation(networkError, "onChainPaymentSendAll")).toBe(false)
   })
@@ -98,6 +106,12 @@ describe("shouldRetryUnauthorized", () => {
    *  second, irreversible landing. */
   it("does not retry a 401 on a non-idempotent payment send", () => {
     expect(shouldRetryUnauthorized(unauthorizedError, NON_IDEMPOTENT_PAYMENT)).toBe(false)
+  })
+
+  it("retries a 401 on a BTC Map place submission, idempotent by submissionId", () => {
+    // Same reasoning as the transport retry: the resent request carries the
+    // attempt's submissionId, so the backend deduplicates it.
+    expect(shouldRetryUnauthorized(unauthorizedError, "btcMapPlaceSubmit")).toBe(true)
   })
 
   IRREVERSIBLE_OPERATIONS.forEach((operationName) => {

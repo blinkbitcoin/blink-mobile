@@ -6669,7 +6669,7 @@ type RootTranslation = {
 		 */
 		placeReviewNote: string
 		/**
-		 * P​l​a​c​e​ ​s​e​n​t​ ​t​o​ ​B​T​C​ ​M​a​p​ ​—​ ​t​h​a​n​k​s​ ​f​o​r​ ​a​d​d​i​n​g​ ​i​t
+		 * P​l​a​c​e​ ​s​e​n​t​ ​t​o​ ​B​T​C​ ​M​a​p​ ​—​ ​t​h​a​n​k​s​ ​f​o​r​ ​a​d​d​i​n​g​ ​i​t​.​ ​N​e​w​ ​p​l​a​c​e​s​ ​c​a​n​ ​t​a​k​e​ ​a​ ​w​h​i​l​e​ ​t​o​ ​a​p​p​e​a​r​ ​o​n​ ​t​h​e​ ​m​a​p​.
 		 */
 		placeSubmitted: string
 		/**
@@ -20337,7 +20337,7 @@ export type TranslationFunctions = {
 		 */
 		placeReviewNote: () => LocalizedString
 		/**
-		 * Place sent to BTC Map — thanks for adding it
+		 * Place sent to BTC Map — thanks for adding it. New places can take a while to appear on the map.
 		 */
 		placeSubmitted: () => LocalizedString
 		/**

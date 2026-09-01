@@ -24,6 +24,7 @@ import { useLevel } from "@app/graphql/level-context"
 import { useIsSelfCustodialAccount } from "@app/hooks/use-is-self-custodial-account"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { LOCATION_PERMISSION, getUserRegion } from "@app/screens/map-screen/functions"
+import { reportError } from "@app/utils/error-logging"
 import { toastShow } from "@app/utils/toast"
 import { generateSecureRandomUUID } from "@app/utils/uuid"
 import { useFocusEffect } from "@react-navigation/native"
@@ -117,18 +118,25 @@ export default function MapComponent({
   const isLocatingPlace = addStep === "locating"
   const isDescribingPlace = addStep === "describing"
   // Read by the submit handler after its awaits, when `addStep` may have moved
-  // on, and by the cluster handler, which has to stay a stable callback.
+  // on, and by the cluster handler, which has to stay a stable callback. Synced
+  // in an effect rather than during render: writing a ref in the render body is
+  // impure under concurrent rendering, and every reader runs after the commit.
   const addStepRef = React.useRef(addStep)
-  addStepRef.current = addStep
+  React.useEffect(() => {
+    addStepRef.current = addStep
+  }, [addStep])
   const [pinnedLocation, setPinnedLocation] = React.useState<LatLng | null>(null)
   // One attempt at adding a place. It keys the form, so what was typed survives
   // a trip back to the map to move the pin but never outlives the attempt it
   // was typed into.
   const [addSession, setAddSession] = React.useState(0)
   // Read by the submit handler after its awaits, when the attempt on screen may
-  // be a later one than the one that was sent.
+  // be a later one than the one that was sent. Synced in an effect, like
+  // `addStepRef` above.
   const addSessionRef = React.useRef(addSession)
-  addSessionRef.current = addSession
+  React.useEffect(() => {
+    addSessionRef.current = addSession
+  }, [addSession])
   // The idempotency key of the attempt: the backend deduplicates submissions on
   // it, so every retry of one attempt reuses it and a new attempt mints one.
   // Null until the attempt's first send — minting one is async, because a UUID's
@@ -364,8 +372,14 @@ export default function MapComponent({
       if (!submissionId) {
         try {
           submissionId = await generateSecureRandomUUID()
-        } catch {
-          return LL.MapScreen.placeSubmissionFailed()
+        } catch (mintingError) {
+          // No id, no send: without the idempotency key the backend cannot
+          // deduplicate, so the place must not go out without one. What failed
+          // here is the device's CSPRNG, not the connection, so the form gets
+          // the generic error rather than connection advice — and the failure
+          // is a defect worth a non-fatal, not a silent catch.
+          reportError("mintBtcMapSubmissionId", mintingError)
+          return LL.errors.generic()
         }
         // Abandoned while the id was being minted. Nothing to send — and the id
         // must not be left in the ref for the next attempt to pick up, since
@@ -392,11 +406,22 @@ export default function MapComponent({
           LL,
           type: "success",
         })
+
+        // The attempt is over, whatever step it is on: the answer can land
+        // after the form went back to moving the pin, and leaving the attempt
+        // open then would let its next send arrive as an edit of the place BTC
+        // Map just took. Only the attempt that sent it closes, though — a
+        // later one is another place's business.
+        if (addSessionRef.current === attempt) {
+          setAddStep(null)
+          setPinnedLocation(null)
+        }
+        return null
       }
 
-      // Everything else belongs to the form that sent it: a response for an
-      // attempt that is no longer the one on screen closes nothing and reports
-      // nothing over a later attempt.
+      // A failure belongs to the form that sent it: a response for an attempt
+      // that is no longer the one on screen closes nothing and reports nothing
+      // over a later attempt.
       if (addStepRef.current !== "describing" || addSessionRef.current !== attempt) {
         return null
       }
@@ -406,16 +431,9 @@ export default function MapComponent({
       // about the place and a dropped request is about the connection, so they
       // do not share a sentence — but neither of them borrows the backend's,
       // which only ever comes back in English.
-      if (!outcome.submitted) {
-        return outcome.refused
-          ? LL.MapScreen.placeRefused()
-          : LL.MapScreen.placeSubmissionFailed()
-      }
-
-      setAddStep(null)
-      setPinnedLocation(null)
-
-      return null
+      return outcome.refused
+        ? LL.MapScreen.placeRefused()
+        : LL.MapScreen.placeSubmissionFailed()
     },
     [LL, submitPlace],
   )

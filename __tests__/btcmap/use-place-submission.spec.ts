@@ -11,6 +11,14 @@ jest.mock("@app/graphql/generated", () => ({
   useBtcMapPlaceSubmitMutation: () => [mockMutate],
 }))
 
+// Failures are reported rather than swallowed — expected ones as breadcrumbs,
+// the rest as non-fatals. Held onto so the tests can see what would reach
+// Crashlytics.
+const mockReportError = jest.fn()
+jest.mock("@app/utils/error-logging", () => ({
+  reportError: (...args: unknown[]) => mockReportError(...args),
+}))
+
 const submission: PlaceSubmission = {
   name: "Hope House",
   category: "cafes",
@@ -55,6 +63,7 @@ describe("useSubmitBtcMapPlace", () => {
       },
     })
     expect(outcome).toEqual({ submitted: true })
+    expect(mockReportError).not.toHaveBeenCalled()
   })
 
   it("calls a payload carrying errors a refusal", async () => {
@@ -78,6 +87,13 @@ describe("useSubmitBtcMapPlace", () => {
     })
 
     expect(outcome).toEqual({ submitted: false, refused: true })
+    // ...but it is reported: a rate limit and a duplicate read the same on the
+    // form, and support can only tell them apart here.
+    expect(mockReportError).toHaveBeenCalledWith(
+      "btcMapPlaceSubmit",
+      expect.objectContaining({ message: "place refused: rate limited" }),
+      { expected: true },
+    )
   })
 
   it("does not call a request that never got an answer a refusal", async () => {
@@ -90,6 +106,7 @@ describe("useSubmitBtcMapPlace", () => {
     })
 
     expect(outcome).toEqual({ submitted: false, refused: false })
+    expect(mockReportError).toHaveBeenCalledWith("btcMapPlaceSubmit", expect.any(Error))
   })
 
   it("calls a top-level GraphQL error a refusal, not a dropped request", async () => {
@@ -111,6 +128,11 @@ describe("useSubmitBtcMapPlace", () => {
     })
 
     expect(outcome).toEqual({ submitted: false, refused: true })
+    expect(mockReportError).toHaveBeenCalledWith(
+      "btcMapPlaceSubmit",
+      expect.any(ApolloError),
+      { expected: true },
+    )
   })
 
   it("does not call a bare network failure a refusal", async () => {
@@ -123,6 +145,9 @@ describe("useSubmitBtcMapPlace", () => {
     })
 
     expect(outcome).toEqual({ submitted: false, refused: false })
+    // Reported all the same — connectivity downgrades itself to a breadcrumb,
+    // so this never becomes non-fatal noise.
+    expect(mockReportError).toHaveBeenCalledWith("btcMapPlaceSubmit", expect.any(Error))
   })
 
   it("does not call an answer with neither errors nor a place a refusal", async () => {
@@ -144,5 +169,7 @@ describe("useSubmitBtcMapPlace", () => {
     })
 
     expect(outcome).toEqual({ submitted: false, refused: false })
+    // Nothing to report either: an empty answer carries no reason worth logging.
+    expect(mockReportError).not.toHaveBeenCalled()
   })
 })

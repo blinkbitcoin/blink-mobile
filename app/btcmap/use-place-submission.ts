@@ -3,6 +3,7 @@ import React from "react"
 import { ApolloError, gql } from "@apollo/client"
 
 import { useBtcMapPlaceSubmitMutation } from "@app/graphql/generated"
+import { reportError } from "@app/utils/error-logging"
 
 import { PlaceSubmission } from "./submission"
 
@@ -66,6 +67,20 @@ export const useSubmitBtcMapPlace = (): { submitPlace: SubmitPlace } => {
         if (payload && payload.errors.length === 0 && payload.place) {
           return { submitted: true }
         }
+        // The refusal's own wording goes to Crashlytics rather than the user:
+        // it only ever comes back in English, but it is the only way support
+        // can tell a rate limit from a duplicate, which the form's single
+        // sentence deliberately does not. An expected outcome, so a breadcrumb
+        // rather than a non-fatal.
+        if (payload?.errors.length) {
+          reportError(
+            "btcMapPlaceSubmit",
+            new Error(
+              `place refused: ${payload.errors.map(({ message }) => message).join("; ")}`,
+            ),
+            { expected: true },
+          )
+        }
         // An answer with neither errors nor a place is not a refusal — there is
         // nothing to have refused it over — so it counts as an answer that never
         // arrived, which is what it amounts to.
@@ -77,8 +92,12 @@ export const useSubmitBtcMapPlace = (): { submitPlace: SubmitPlace } => {
         // "check your connection" would send the user chasing a problem that
         // is not theirs — and retrying will never fix.
         if (error instanceof ApolloError && error.graphQLErrors.length > 0) {
+          reportError("btcMapPlaceSubmit", error, { expected: true })
           return { submitted: false, refused: true }
         }
+        // A connectivity failure downgrades itself to a breadcrumb inside
+        // reportError; anything else is a defect worth a non-fatal.
+        reportError("btcMapPlaceSubmit", error)
         return { submitted: false, refused: false }
       }
     },
