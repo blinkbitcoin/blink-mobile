@@ -3937,6 +3937,9 @@ const en: BaseTranslation = {
         },
         buttonText: "Proceed to Sign",
       },
+      SignInvest: {
+        label: "Sign the agreement",
+      },
       TransferInvest: {
         title: "Transfer your investment",
         paragraphs: {

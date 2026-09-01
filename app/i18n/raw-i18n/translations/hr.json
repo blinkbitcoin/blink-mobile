@@ -3753,6 +3753,9 @@
         },
         "buttonText": "Nastavi na Potpis"
       },
+      "SignInvest": {
+        "label": "Potpišite ugovor"
+      },
       "TransferInvest": {
         "title": "Prenesite svoje ulaganje",
         "paragraphs": {

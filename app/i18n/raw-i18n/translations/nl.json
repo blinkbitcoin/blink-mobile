@@ -3753,6 +3753,9 @@
         },
         "buttonText": "Ga naar Ondertekening"
       },
+      "SignInvest": {
+        "label": "Onderteken de overeenkomst"
+      },
       "TransferInvest": {
         "title": "Draag je investering over",
         "paragraphs": {
