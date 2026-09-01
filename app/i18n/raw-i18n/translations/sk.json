@@ -3744,6 +3744,9 @@
         },
         "buttonText": "Pokračovať k Podpisu"
       },
+      "SignInvest": {
+        "label": "Podpísať zmluvu"
+      },
       "TransferInvest": {
         "title": "Preveďte svoju investíciu",
         "paragraphs": {

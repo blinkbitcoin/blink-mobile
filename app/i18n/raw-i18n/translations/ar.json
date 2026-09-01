@@ -3744,6 +3744,9 @@
         },
         "buttonText": "المتابعة للتوقيع"
       },
+      "SignInvest": {
+        "label": "وقّع الاتفاقية"
+      },
       "TransferInvest": {
         "title": "حوّل استثمارك",
         "paragraphs": {

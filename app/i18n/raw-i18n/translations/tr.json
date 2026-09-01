@@ -3744,6 +3744,9 @@
         },
         "buttonText": "İmzaya Geç"
       },
+      "SignInvest": {
+        "label": "Sözleşmeyi imzala"
+      },
       "TransferInvest": {
         "title": "Yatırımınızı transfer edin",
         "paragraphs": {

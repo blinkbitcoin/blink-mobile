@@ -3744,6 +3744,9 @@
         },
         "buttonText": "Gaan voort om te Teken"
       },
+      "SignInvest": {
+        "label": "Teken die ooreenkoms"
+      },
       "TransferInvest": {
         "title": "Dra jou belegging oor",
         "paragraphs": {

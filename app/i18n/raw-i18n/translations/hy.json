@@ -3744,6 +3744,9 @@
         },
         "buttonText": "Անցնել ստորագրմանը"
       },
+      "SignInvest": {
+        "label": "Ստորագրել համաձայնագիրը"
+      },
       "TransferInvest": {
         "title": "Փոխանցեք Ձեր ներդրումը",
         "paragraphs": {
