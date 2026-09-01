@@ -2,6 +2,12 @@ name: "Test"
 on:
   pull_request:
     branches: [main]
+# Reading @blinkbitcoin/esign-* from GitHub Packages needs this on the job token;
+# the default token has no package access.
+permissions:
+  contents: read
+  packages: read
+
 jobs:
   check-code:
     name: Tests
@@ -11,6 +17,11 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version-file: .nvmrc
+          # The @blinkbitcoin scope resolves from GitHub Packages (see .npmrc),
+          # which needs auth even to read. Written to a runner-local npmrc so the
+          # token never has to live in the repo's own .npmrc.
+          registry-url: https://npm.pkg.github.com
+          scope: "@blinkbitcoin"
       # The self-hosted runners ship no system yarn, unlike the GH-hosted
       # images.
       - run: npm install -g yarn
@@ -22,6 +33,8 @@ jobs:
           path: node_modules
           key: node-modules-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
       - run: yarn install --frozen-lockfile
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       # Flake handling happens at test granularity now: jest retries individual
       # failing tests in CI (see jest.setup-after-env.ts) and logs each retried
       # error, instead of silently re-running the whole job.
@@ -39,12 +52,19 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version-file: .nvmrc
+          # The @blinkbitcoin scope resolves from GitHub Packages (see .npmrc),
+          # which needs auth even to read. Written to a runner-local npmrc so the
+          # token never has to live in the repo's own .npmrc.
+          registry-url: https://npm.pkg.github.com
+          scope: "@blinkbitcoin"
       # Gradle needs node_modules for the RN gradle plugins and autolinking.
       - uses: actions/cache@v4
         with:
           path: node_modules
           key: node-modules-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
       - run: yarn install --frozen-lockfile
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       # Caches ~/.gradle/caches and the wrapper between runs.
       - uses: gradle/actions/setup-gradle@v4
       - run: ./gradlew :app:testDebugUnitTest
