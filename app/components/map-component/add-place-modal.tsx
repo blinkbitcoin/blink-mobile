@@ -153,6 +153,12 @@ export const AddPlaceModal: React.FC<Props> = ({
               </Text>
               <Pressable
                 testID="change-place-location"
+                // Shut while the send is in flight, because by then there is no
+                // location left to change: the request carries the pin as it
+                // stood when submit was tapped, so a correction made now would
+                // not reach it. The place would land at the old spot and the
+                // success would announce it over a map showing the new one.
+                disabled={isSubmitting}
                 // The failure was about the place as it stood, pin included, so
                 // it stops being true the moment the pin is on the move.
                 onPress={() => {
@@ -162,7 +168,9 @@ export const AddPlaceModal: React.FC<Props> = ({
                 accessibilityRole="button"
                 hitSlop={8}
               >
-                <Text style={styles.change}>{LL.MapScreen.changeLocation()}</Text>
+                <Text style={[styles.change, isSubmitting && styles.changeDisabled]}>
+                  {LL.MapScreen.changeLocation()}
+                </Text>
               </Pressable>
             </View>
           </View>
@@ -304,6 +312,9 @@ const useStyles = makeStyles(({ colors }, { topInset, bottomInset }: StyleProps)
     fontSize: 15,
     fontWeight: "700",
     color: colors.primary,
+  },
+  changeDisabled: {
+    color: colors.grey3,
   },
   chips: {
     flexDirection: "row",

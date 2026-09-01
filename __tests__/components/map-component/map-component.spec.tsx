@@ -119,10 +119,28 @@ jest.mock("@app/graphql/is-authed-context", () => ({
   useIsAuthed: () => mockIsAuthed,
 }))
 
+// Only the hook is swapped, not the module: `ContextForScreen` mounts the
+// provider that lives in it, and the rest of the tree reads the real registry
+// through the same hook.
 let mockIsSelfCustodialAccount = false
-jest.mock("@app/hooks/use-is-self-custodial-account", () => ({
-  useIsSelfCustodialAccount: () => mockIsSelfCustodialAccount,
-}))
+jest.mock("@app/hooks/use-account-registry", () => {
+  const actual = jest.requireActual<typeof import("@app/hooks/use-account-registry")>(
+    "@app/hooks/use-account-registry",
+  )
+  const { AccountType } =
+    jest.requireActual<typeof import("@app/types/wallet")>("@app/types/wallet")
+  return {
+    ...actual,
+    useAccountRegistry: () => ({
+      ...actual.useAccountRegistry(),
+      activeAccount: {
+        type: mockIsSelfCustodialAccount
+          ? AccountType.SelfCustodial
+          : AccountType.Custodial,
+      },
+    }),
+  }
+})
 
 // The backend refuses place submissions below account level two, so the
 // button's third gate is driven from here too. The rest of the module is the

@@ -21,9 +21,10 @@ import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { updateMapLastCoords } from "@app/graphql/client-only-query"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useLevel } from "@app/graphql/level-context"
-import { useIsSelfCustodialAccount } from "@app/hooks/use-is-self-custodial-account"
+import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { LOCATION_PERMISSION, getUserRegion } from "@app/screens/map-screen/functions"
+import { AccountType } from "@app/types/wallet"
 import { reportError } from "@app/utils/error-logging"
 import { toastShow } from "@app/utils/toast"
 import { generateSecureRandomUUID } from "@app/utils/uuid"
@@ -88,13 +89,17 @@ export default function MapComponent({
   // Adding a place is a level-two custodial-account feature: the submission
   // goes to BTC Map through our own backend, which needs a Blink session
   // behind it and rejects anything below account level two.
-  // `useIsSelfCustodialAccount` rather than `useActiveWallet().isSelfCustodial`
-  // so the button does not flash into view during the renders where the
-  // self-custodial SDK has not reported yet. The kill switch gates it too:
-  // emptying the pins while submissions keep flowing to the backend is the
-  // outcome `btcMapPlacesEnabled` exists to avoid.
+  // Which account is signed in comes from the registry rather than from
+  // `useActiveWallet().isSelfCustodial`, for two reasons. The registry has the
+  // answer before the self-custodial SDK has reported, so the button never
+  // flashes into view; and it leaves this component unsubscribed from both
+  // wallets, which a map wants — every balance that moves would otherwise
+  // re-render the whole screen, marker list included, to re-decide one button.
+  // The kill switch gates it too: emptying the pins while submissions keep
+  // flowing to the backend is the outcome `btcMapPlacesEnabled` exists to avoid.
   const isAuthed = useIsAuthed()
-  const isSelfCustodialAccount = useIsSelfCustodialAccount()
+  const { activeAccount } = useAccountRegistry()
+  const isSelfCustodialAccount = activeAccount?.type === AccountType.SelfCustodial
   const { isAtLeastLevelTwo } = useLevel()
   const { btcMapPlacesEnabled } = useRemoteConfig()
   const canAddPlace =

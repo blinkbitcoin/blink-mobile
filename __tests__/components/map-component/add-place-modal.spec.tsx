@@ -139,6 +139,44 @@ describe("AddPlaceModal", () => {
     )
   })
 
+  it("will not put the pin back on the move while the send is in flight", async () => {
+    // The request carries the pin as it stood when submit was tapped, so there
+    // is nothing left for a correction to reach: the place would land at the
+    // old spot while the map showed the new one, and the success would announce
+    // it over a pin that is not where it went.
+    let resolveSend: (() => void) | undefined
+    onSubmit.mockImplementation(
+      () =>
+        new Promise<string | null>((resolve) => {
+          resolveSend = () => resolve(null)
+        }),
+    )
+    const { getByTestId } = renderModal()
+
+    await waitFor(() => expect(getByTestId("place-name-input")).toBeTruthy())
+    fillInForm(getByTestId)
+    fireEvent.press(getByTestId("submit-place"))
+
+    await waitFor(() =>
+      expect(getByTestId("change-place-location").props.accessibilityState).toMatchObject(
+        { disabled: true },
+      ),
+    )
+    fireEvent.press(getByTestId("change-place-location"))
+    expect(onChangeLocation).not.toHaveBeenCalled()
+
+    // Only for as long as the send is: the pin is the first thing worth
+    // correcting once the place has been turned down.
+    resolveSend?.()
+    await waitFor(() =>
+      expect(getByTestId("change-place-location").props.accessibilityState).toMatchObject(
+        { disabled: false },
+      ),
+    )
+    fireEvent.press(getByTestId("change-place-location"))
+    expect(onChangeLocation).toHaveBeenCalled()
+  })
+
   it("says on the form itself why the place did not go", async () => {
     // This is a native modal over the whole app and the app's toast is mounted
     // outside it, so a failure reported that way is drawn behind this window:
