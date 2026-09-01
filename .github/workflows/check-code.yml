@@ -7,6 +7,12 @@ on:
   pull_request:
     branches: [main]
 
+# Reading @blinkbitcoin/esign-* from GitHub Packages needs this on the job token;
+# the default token has no package access.
+permissions:
+  contents: read
+  packages: read
+
 jobs:
   check-code:
     name: Check Code
@@ -17,6 +23,13 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: "yarn"
+          # The @blinkbitcoin scope resolves from GitHub Packages (see .npmrc),
+          # which needs auth even to read. Written to a runner-local npmrc so the
+          # token never has to live in the repo's own .npmrc.
+          registry-url: https://npm.pkg.github.com
+          scope: "@blinkbitcoin"
       - run: yarn install --frozen-lockfile
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Run check code
         run: make check-code

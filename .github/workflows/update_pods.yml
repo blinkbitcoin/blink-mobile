@@ -7,6 +7,12 @@ on:
     branches:
       - dependabot/npm_and_yarn/**
 
+# Reading @blinkbitcoin/esign-* from GitHub Packages needs this on the job token;
+# the default token has no package access.
+permissions:
+  contents: read
+  packages: read
+
 jobs:
   run:
     name: Run pod install
@@ -17,8 +23,14 @@ jobs:
           token: ${{ secrets.GT }}
           ref: ${{ github.head_ref }}
 
+      # No setup-node here, so the scoped auth the other workflows get from it has
+      # to be written by hand. The runner is ephemeral, so the home npmrc is fine.
       - name: Install Packages
-        run: yarn install --non-interactive --frozen-lockfile
+        run: |
+          echo "//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}" >> ~/.npmrc
+          yarn install --non-interactive --frozen-lockfile
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Cache node_modules and Pods
         uses: actions/cache@v3
