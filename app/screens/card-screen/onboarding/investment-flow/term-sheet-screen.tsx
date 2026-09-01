@@ -57,7 +57,7 @@ export const TermSheetScreen: React.FC = () => {
   )
 
   const handleNext = () => {
-    navigation.navigate("cardOnboardingTransferInvestScreen", { selectedAmountUsd })
+    navigation.navigate("cardOnboardingSignInvestScreen", { selectedAmountUsd })
   }
 
   return (
