@@ -62,7 +62,7 @@ export const SelectInvestScreen: React.FC = () => {
                 <Text type="p2" style={styles.limitText}>
                   ${item.value.toLocaleString()} {item.percent}
                 </Text>
-                {isNotLastItem && <View style={styles.limitBgOptionSelected} />}
+                {isNotLastItem && <View style={styles.limitSeparator} />}
               </TouchableOpacity>
             )
           })}
@@ -95,7 +95,10 @@ const useStyles = makeStyles(({ colors }) => ({
   limitOption: {
     position: "relative",
     width: "100%",
-    height: 50,
+    /** Grows rather than clips: a fixed height cuts the longer labels off at large
+     *  OS font scales, the same way the titles on the other screens did. */
+    minHeight: 50,
+    paddingVertical: 4,
     borderWidth: 1,
     borderColor: colors.transparent,
     overflow: "hidden",
@@ -106,9 +109,10 @@ const useStyles = makeStyles(({ colors }) => ({
     backgroundColor: colors.grey6,
     borderRadius: 8,
   },
-  limitBgOptionSelected: {
+  limitSeparator: {
     width: "97%",
     height: 1,
+    backgroundColor: colors.grey4,
     position: "absolute",
     bottom: 0,
     alignSelf: "center",
