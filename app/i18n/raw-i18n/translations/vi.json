@@ -3718,6 +3718,9 @@
         },
         "buttonText": "Tiến hành Ký"
       },
+      "SignInvest": {
+        "label": "Ký thỏa thuận"
+      },
       "TransferInvest": {
         "title": "Chuyển khoản đầu tư của bạn",
         "paragraphs": {
