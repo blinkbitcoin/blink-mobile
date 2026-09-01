@@ -835,7 +835,7 @@ export const RootStack = () => {
         component={WelcomeInvestScreen}
         options={{
           title: "",
-          headerRight: headerCloseControl(),
+          ...headerCloseControlOptions(),
         }}
       />
       <RootNavigator.Screen
@@ -843,7 +843,7 @@ export const RootStack = () => {
         component={CompanyValuationScreen}
         options={{
           title: "",
-          headerRight: headerCloseControl(),
+          ...headerCloseControlOptions(),
         }}
       />
       <RootNavigator.Screen
@@ -851,7 +851,7 @@ export const RootStack = () => {
         component={SelectInvestScreen}
         options={{
           title: "",
-          headerRight: headerCloseControl(),
+          ...headerCloseControlOptions(),
         }}
       />
       <RootNavigator.Screen
@@ -859,7 +859,7 @@ export const RootStack = () => {
         component={TermSheetScreen}
         options={{
           title: LL.CardFlow.Onboarding.TermSheet.title(),
-          headerRight: headerCloseControl(),
+          ...headerCloseControlOptions(),
         }}
       />
       <RootNavigator.Screen
@@ -868,7 +868,7 @@ export const RootStack = () => {
         options={{
           title: "",
           headerLeft: () => <></>,
-          headerRight: headerCloseControl(),
+          ...headerCloseControlOptions(),
         }}
       />
       <RootNavigator.Screen
@@ -877,7 +877,7 @@ export const RootStack = () => {
         options={{
           title: "",
           headerLeft: () => <></>,
-          headerRight: headerCloseControl(),
+          ...headerCloseControlOptions(),
         }}
       />
       <RootNavigator.Screen
@@ -886,7 +886,7 @@ export const RootStack = () => {
         options={{
           title: "",
           headerLeft: () => <></>,
-          headerRight: headerCloseControl(),
+          ...headerCloseControlOptions(),
         }}
       />
       <RootNavigator.Screen
