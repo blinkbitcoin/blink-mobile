@@ -314,7 +314,6 @@ export const DeveloperScreen: React.FC = () => {
           <Button
             title="Onboarding Phase 2: Investment"
             containerStyle={styles.button}
-            disabled={true}
             onPress={() =>
               testBulletinsStore.add({
                 id: `test-deeplink-invest-${Date.now()}`,
@@ -328,7 +327,6 @@ export const DeveloperScreen: React.FC = () => {
           <Button
             title="Onboarding Phase 3: Card Dashboard"
             containerStyle={styles.button}
-            disabled={true}
             onPress={() =>
               testBulletinsStore.add({
                 id: `test-deeplink-dashboard-${Date.now()}`,
