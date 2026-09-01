@@ -3718,6 +3718,9 @@
         },
         "buttonText": "Continuă la Semnătură"
       },
+      "SignInvest": {
+        "label": "Semnați acordul"
+      },
       "TransferInvest": {
         "title": "Transferă-ți investiția",
         "paragraphs": {
