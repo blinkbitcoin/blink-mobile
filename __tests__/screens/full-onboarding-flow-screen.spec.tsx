@@ -54,14 +54,20 @@ jest.mock("@app/hooks/use-app-config", () => ({
 
 // Trap: the screen must never start a KYC flow the user did not ask for -- not
 // with the empty names it mounts with, and not with the partial names it holds
-// while the user is still typing. The matcher is deliberately total: an
-// unrequested start whose variables match no mock misses the mock link, gets
-// swallowed by the hook's catch, and never navigates -- so a "did not start"
-// test would pass for the wrong reason. It is listed last because MockLink
-// takes the first entry that matches, which keeps the John/Doe mock in play.
+// while the user is still typing. The matcher is deliberately total, and it
+// records: an unrequested start whose variables match no mock misses the mock
+// link, gets swallowed by the hook's catch, and never navigates -- so a "did
+// not navigate" test on its own would pass for the wrong reason. MockLink
+// consults the matcher synchronously, as the request leaves the screen, which
+// makes "was never called" a statement about the request itself, whatever the
+// reply does or fails to do afterwards.
+const unrequestedKycStart = jest.fn(() => true)
+
+// Listed last because MockLink takes the first entry that matches, which keeps
+// the John/Doe mock in play.
 const kycFlowStartTrap: MockedResponse = {
   request: { query: KycFlowStartDocument },
-  variableMatcher: () => true,
+  variableMatcher: unrequestedKycStart,
   maxUsageCount: Number.POSITIVE_INFINITY,
   result: {
     data: {
@@ -165,7 +171,9 @@ describe("FullOnboardingFlowScreen", () => {
   // waitFor returns on its first non-throwing evaluation, so anchoring on a
   // render alone can win the race against a request the screen already sent.
   // MockLink replies on a macrotask: one turn lands the reply, the next lands
-  // whatever it triggered. Every "did not navigate" below runs after this.
+  // whatever it triggered. Every "did not navigate" below runs after this, and
+  // pairs it with unrequestedKycStart, which sees the request itself and so
+  // does not depend on the reply arriving inside this window.
   const settleNetwork = async () => {
     await flushAsync()
     await flushAsync()
@@ -183,7 +191,12 @@ describe("FullOnboardingFlowScreen", () => {
   }
 
   const pressAlertButton = async (index: number) => {
-    const button = alertSpy.mock.calls[0][2]?.[index]
+    // The alert currently on screen, and its handler insisted upon: a missing
+    // button or a missing onPress makes the optional call below a no-op, which
+    // no assertion afterwards can tell apart from a press that did nothing.
+    const button = alertSpy.mock.calls.at(-1)?.[2]?.[index]
+    expect(button?.onPress).toBeDefined()
+
     await act(async () => {
       button?.onPress?.()
     })
@@ -203,6 +216,7 @@ describe("FullOnboardingFlowScreen", () => {
       await renderScreen()
       await settleNetwork()
 
+      expect(unrequestedKycStart).not.toHaveBeenCalled()
       expect(mockNavigate).not.toHaveBeenCalled()
     })
 
@@ -230,6 +244,7 @@ describe("FullOnboardingFlowScreen", () => {
       })
       await settleNetwork()
 
+      expect(unrequestedKycStart).not.toHaveBeenCalled()
       expect(alertSpy).not.toHaveBeenCalled()
       expect(mockNavigate).not.toHaveBeenCalled()
     })
@@ -261,6 +276,7 @@ describe("FullOnboardingFlowScreen", () => {
       await pressAlertButton(0)
       await settleNetwork()
 
+      expect(unrequestedKycStart).not.toHaveBeenCalled()
       expect(mockNavigate).not.toHaveBeenCalled()
       expect(mockGoBack).not.toHaveBeenCalled()
       expect(screen.getByDisplayValue("John")).toBeTruthy()
@@ -326,6 +342,10 @@ describe("FullOnboardingFlowScreen", () => {
       await settleNetwork()
 
       expect(alertSpy).toHaveBeenCalledTimes(1)
+      // The John/Doe mock is consumed by the start already in flight, so a
+      // second one -- including a press wired straight to startKyc, which
+      // would leave the alert count alone -- falls through to the trap.
+      expect(unrequestedKycStart).not.toHaveBeenCalled()
       expect(mockNavigate).not.toHaveBeenCalled()
     })
   })
@@ -342,8 +362,9 @@ describe("FullOnboardingFlowScreen", () => {
       fireEvent.changeText(screen.getByPlaceholderText("Last name"), "\t\n ")
       expect(screen.getByTestId("Next")).toBeDisabled()
 
-      // Pressing by title routes through the button's own disabled guard;
-      // pressing the RNE wrapper's pressable parent bypasses it.
+      // The testID sits on the touchable RNE renders, so this takes the same
+      // route a real tap does: RNTL asks that touchable's press responder
+      // whether it will accept the touch, and a disabled one refuses.
       fireEvent.press(screen.getByTestId("Next"))
       expect(alertSpy).not.toHaveBeenCalled()
 
@@ -382,6 +403,7 @@ describe("FullOnboardingFlowScreen", () => {
         expect(screen.queryByTestId("Next")).toBeNull()
 
         await settleNetwork()
+        expect(unrequestedKycStart).not.toHaveBeenCalled()
         expect(mockNavigate).not.toHaveBeenCalled()
       },
     )
