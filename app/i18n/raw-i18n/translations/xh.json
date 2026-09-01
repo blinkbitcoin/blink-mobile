@@ -3718,6 +3718,9 @@
         },
         "buttonText": "Qhubeka ukuya kuSayina"
       },
+      "SignInvest": {
+        "label": "Tyikitya isivumelwano"
+      },
       "TransferInvest": {
         "title": "Dlulisela utyalo-mali lwakho",
         "paragraphs": {

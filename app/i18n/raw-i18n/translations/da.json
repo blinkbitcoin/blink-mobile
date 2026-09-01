@@ -3718,6 +3718,9 @@
         },
         "buttonText": "Fortsæt til Underskrift"
       },
+      "SignInvest": {
+        "label": "Underskriv aftalen"
+      },
       "TransferInvest": {
         "title": "Overfør din investering",
         "paragraphs": {
