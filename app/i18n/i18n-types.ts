@@ -12369,6 +12369,12 @@ type RootTranslation = {
 				 */
 				buttonText: string
 			}
+			SignInvest: {
+				/**
+				 * S​i​g​n​ ​t​h​e​ ​a​g​r​e​e​m​e​n​t
+				 */
+				label: string
+			}
 			TransferInvest: {
 				/**
 				 * T​r​a​n​s​f​e​r​ ​y​o​u​r​ ​i​n​v​e​s​t​m​e​n​t
@@ -26058,6 +26064,12 @@ export type TranslationFunctions = {
 				 * Proceed to Sign
 				 */
 				buttonText: () => LocalizedString
+			}
+			SignInvest: {
+				/**
+				 * Sign the agreement
+				 */
+				label: () => LocalizedString
 			}
 			TransferInvest: {
 				/**

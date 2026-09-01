@@ -3715,6 +3715,9 @@
         },
         "buttonText": "Endelea kwa Kusaini"
       },
+      "SignInvest": {
+        "label": "Saini makubaliano"
+      },
       "TransferInvest": {
         "title": "Hamisha uwekezaji wako",
         "paragraphs": {
