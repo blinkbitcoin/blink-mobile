@@ -940,15 +940,6 @@ export const HomeScreen: React.FC = () => {
             </React.Fragment>
           ))}
         </View>
-        {/* TEMPORARY: shortcut into the card investment onboarding flow while it is
-            being reviewed. Debug builds only, and meant to be deleted before merge. */}
-        {__DEV__ && (
-          <GaloyPrimaryButton
-            title="DEV: Investment flow"
-            containerStyle={styles.devInvestmentFlowButton}
-            onPress={() => navigation.navigate("cardOnboardingWelcomeInvestScreen")}
-          />
-        )}
         {isSelfCustodial && <UnclaimedDepositBanner deposits={deposits} />}
         <NetworkStatusBanner />
         {shouldShowBanner && <BackupNudgeBanner onDismiss={dismissBanner} />}
@@ -1000,10 +991,6 @@ const useStyles = makeStyles(({ colors }) => ({
     justifyContent: "space-between",
     alignItems: "center",
     columnGap: 12,
-  },
-  /** TEMPORARY: goes out with the DEV investment-flow shortcut above. */
-  devInvestmentFlowButton: {
-    marginTop: 12,
   },
   noTransaction: {
     alignItems: "center",
