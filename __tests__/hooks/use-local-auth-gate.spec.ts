@@ -13,10 +13,29 @@ import { toastShow } from "@app/utils/toast"
 
 const mockPush = jest.fn()
 const mockGoBack = jest.fn()
+const mockDispatch = jest.fn()
+
+/** The stack the gated screen belongs to, and the screen's own route key: the
+ *  failure handler names the route it removes rather than saying "back". */
+const STACK_KEY = "stack-key"
+const CALLER_ROUTE_KEY = "caller-route-key"
 
 jest.mock("@react-navigation/native", () => ({
-  useNavigation: () => ({ push: mockPush, goBack: mockGoBack }),
+  ...jest.requireActual("@react-navigation/native"),
+  useNavigation: () => ({
+    push: mockPush,
+    goBack: mockGoBack,
+    dispatch: mockDispatch,
+    getState: () => ({ key: "stack-key" }),
+  }),
+  useRoute: () => ({ key: "caller-route-key" }),
 }))
+
+/** What a keyed removal of the caller looks like on the wire. */
+const poppedRouteKey = () => {
+  const [action] = mockDispatch.mock.calls[0] ?? []
+  return action?.source
+}
 
 jest.mock("@app/utils/toast", () => ({
   toastShow: jest.fn(),
@@ -396,7 +415,7 @@ describe("useAuthGateFailureHandler", () => {
     act(() => result.current("noFactor"))
 
     expect(toastShow).toHaveBeenCalledTimes(1)
-    expect(mockGoBack).toHaveBeenCalledTimes(1)
+    expect(mockDispatch).toHaveBeenCalledTimes(1)
 
     /** The toast copy is wired to the shared (non-card) namespace. */
     const { message } = (toastShow as jest.Mock).mock.calls[0][0]
@@ -412,7 +431,7 @@ describe("useAuthGateFailureHandler", () => {
     act(() => result.current("unavailable"))
 
     expect(toastShow).toHaveBeenCalledTimes(1)
-    expect(mockGoBack).toHaveBeenCalledTimes(1)
+    expect(mockDispatch).toHaveBeenCalledTimes(1)
   })
 
   it("bounces silently on a deliberate decline", () => {
@@ -421,6 +440,44 @@ describe("useAuthGateFailureHandler", () => {
     act(() => result.current("declined"))
 
     expect(toastShow).not.toHaveBeenCalled()
-    expect(mockGoBack).toHaveBeenCalledTimes(1)
+    expect(mockDispatch).toHaveBeenCalledTimes(1)
+  })
+
+  /**
+   * A gate result can land after something else has been pushed on top — an OS
+   * biometric prompt interrupted by backgrounding calls back once the resume
+   * relock is already showing. An unkeyed removal takes whatever is on top,
+   * which there is the lock screen itself.
+   */
+  describe("what it removes", () => {
+    it("names the gated route rather than saying 'back'", () => {
+      const { result } = renderHook(() => useAuthGateFailureHandler())
+
+      act(() => result.current("unavailable"))
+
+      expect(mockGoBack).not.toHaveBeenCalled()
+      expect(poppedRouteKey()).toBe(CALLER_ROUTE_KEY)
+    })
+
+    it("targets the stack it belongs to, which is what makes the key count", () => {
+      // StackRouter honours `source` only when `target` is the navigator's own
+      // key; without it the pop silently falls back to the top of the stack.
+      const { result } = renderHook(() => useAuthGateFailureHandler())
+
+      act(() => result.current("declined"))
+
+      const [action] = mockDispatch.mock.calls[0]
+      expect(action.target).toBe(STACK_KEY)
+    })
+
+    it("removes exactly one route", () => {
+      const { result } = renderHook(() => useAuthGateFailureHandler())
+
+      act(() => result.current("declined"))
+
+      const [action] = mockDispatch.mock.calls[0]
+      expect(action.type).toBe("POP")
+      expect(action.payload).toEqual({ count: 1 })
+    })
   })
 })

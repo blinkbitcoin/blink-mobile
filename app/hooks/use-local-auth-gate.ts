@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 
-import { useNavigation } from "@react-navigation/native"
+import { StackActions, useNavigation, useRoute } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -41,10 +41,20 @@ type UseLocalAuthGateParams = {
  * bounce unless the user caused it themselves. Declines are silent — the user
  * cancelled and knows why; the settings-advice toast is for the causes where
  * they lack (or cannot use) a factor.
+ *
+ * The removal names the gated route rather than saying "back". A gate result can
+ * land late — an OS biometric prompt interrupted by backgrounding calls back
+ * after the resume relock has pushed the app-lock screen — and `goBack()` sets
+ * `source` but never `target`, which is the pair `StackRouter` requires before
+ * it honours the source (see its POP case). Unkeyed, the pop takes whatever is
+ * on top: the lock screen, leaving app content behind it unauthenticated.
+ * Keyed, it removes the screen that failed the gate and leaves the lock in
+ * place, which is the outcome in both the ordinary case and the raced one.
  */
 export const useAuthGateFailureHandler = () => {
   const { LL } = useI18nContext()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+  const route = useRoute()
 
   return useCallback(
     (reason: AuthGateFailureReason) => {
@@ -55,9 +65,13 @@ export const useAuthGateFailureHandler = () => {
           LL,
         })
       }
-      navigation.goBack()
+      navigation.dispatch({
+        ...StackActions.pop(1),
+        source: route.key,
+        target: navigation.getState().key,
+      })
     },
-    [navigation, LL],
+    [navigation, route.key, LL],
   )
 }
 

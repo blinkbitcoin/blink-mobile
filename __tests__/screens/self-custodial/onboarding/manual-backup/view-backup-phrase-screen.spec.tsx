@@ -13,6 +13,7 @@ const mockNavigate = jest.fn()
 const mockPush = jest.fn()
 const mockGoBack = jest.fn()
 const mockSetOptions = jest.fn()
+const mockDispatch = jest.fn()
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
   useNavigation: () => ({
@@ -20,8 +21,19 @@ jest.mock("@react-navigation/native", () => ({
     push: mockPush,
     goBack: mockGoBack,
     setOptions: mockSetOptions,
+    dispatch: mockDispatch,
+    getState: () => ({ key: "stack-key" }),
   }),
+  useRoute: () => ({ key: "view-backup-phrase-route-key" }),
 }))
+
+/** The gate removes the screen by name rather than saying "back", so a result
+ *  landing after something else was pushed cannot pop that instead. */
+const expectGateBouncedTheScreen = () => {
+  expect(mockDispatch).toHaveBeenCalledTimes(1)
+  const [action] = mockDispatch.mock.calls[0]
+  expect(action.source).toBe("view-backup-phrase-route-key")
+}
 
 const mockIsSensorAvailable = jest.fn()
 const mockAuthenticate = jest.fn()
@@ -278,7 +290,8 @@ describe("ViewBackupPhraseScreen", () => {
       </ContextForScreen>,
     )
 
-    await waitFor(() => expect(mockGoBack).toHaveBeenCalledTimes(1))
+    await waitFor(() => expect(mockDispatch).toHaveBeenCalledTimes(1))
+    expectGateBouncedTheScreen()
     expect(mockToastShow).toHaveBeenCalledTimes(1)
     expect(queryByText("youth")).toBeNull()
     expect(mockUseWalletMnemonic).not.toHaveBeenCalled()
@@ -337,7 +350,7 @@ describe("ViewBackupPhraseScreen", () => {
       </ContextForScreen>,
     )
 
-    await waitFor(() => expect(mockGoBack).toHaveBeenCalledTimes(1))
+    await waitFor(() => expect(mockDispatch).toHaveBeenCalledTimes(1))
     expect(headerRightWasInstalled()).toBe(false)
   })
 
@@ -415,12 +428,12 @@ describe("ViewBackupPhraseScreen", () => {
           expect.objectContaining({ screenPurpose: "ChallengePin" }),
         ),
       )
-      expect(mockGoBack).not.toHaveBeenCalled()
+      expect(mockDispatch).not.toHaveBeenCalled()
       expect(queryByText("youth")).toBeNull()
 
       await act(async () => challengeParams().onChallengeFailure())
 
-      expect(mockGoBack).toHaveBeenCalledTimes(1)
+      expectGateBouncedTheScreen()
       /** A deliberate decline bounces silently — the user cancelled and knows
        *  why; the settings-advice toast is for the can't-authenticate causes. */
       expect(mockToastShow).not.toHaveBeenCalled()
@@ -439,7 +452,7 @@ describe("ViewBackupPhraseScreen", () => {
         </ContextForScreen>,
       )
 
-      await waitFor(() => expect(mockGoBack).toHaveBeenCalledTimes(1))
+      await waitFor(() => expect(mockDispatch).toHaveBeenCalledTimes(1))
       expect(mockAuthenticate).not.toHaveBeenCalled()
       expect(mockToastShow).toHaveBeenCalledTimes(1)
       expect(queryByText("youth")).toBeNull()

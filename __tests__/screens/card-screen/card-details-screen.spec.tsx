@@ -18,6 +18,7 @@ const mockGoBack = jest.fn()
 const mockSetOptions = jest.fn()
 const mockNavigate = jest.fn()
 const mockPush = jest.fn()
+const mockDispatch = jest.fn()
 jest.mock("@react-navigation/native", () => {
   const actualNav = jest.requireActual("@react-navigation/native")
   return {
@@ -27,9 +28,20 @@ jest.mock("@react-navigation/native", () => {
       setOptions: mockSetOptions,
       navigate: mockNavigate,
       push: mockPush,
+      dispatch: mockDispatch,
+      getState: () => ({ key: "stack-key" }),
     }),
+    useRoute: () => ({ key: "card-details-route-key" }),
   }
 })
+
+/** The gate removes the screen by name rather than saying "back", so a result
+ *  landing after something else was pushed cannot pop that instead. */
+const expectGateBouncedTheScreen = () => {
+  expect(mockDispatch).toHaveBeenCalledTimes(1)
+  const [action] = mockDispatch.mock.calls[0]
+  expect(action.source).toBe("card-details-route-key")
+}
 
 const mockCopyToClipboard = jest.fn()
 const mockUseClipboard = jest.fn((_clearAfterMs?: number) => ({
@@ -186,7 +198,7 @@ describe("CardDetailsScreen", () => {
         "pin",
         expect.objectContaining({ screenPurpose: "ChallengePin" }),
       )
-      expect(mockGoBack).not.toHaveBeenCalled()
+      expect(mockDispatch).not.toHaveBeenCalled()
     })
 
     it("explains and navigates back on biometric failure with no pin to fall back to", async () => {
@@ -205,7 +217,7 @@ describe("CardDetailsScreen", () => {
       await act(async () => {})
 
       expect(toastShow).toHaveBeenCalled()
-      expect(mockGoBack).toHaveBeenCalled()
+      expectGateBouncedTheScreen()
     })
 
     it("bounces silently when the pin challenge is declined", async () => {
@@ -227,7 +239,7 @@ describe("CardDetailsScreen", () => {
 
       /** The user cancelled and knows why; setup advice here would mislead. */
       expect(toastShow).not.toHaveBeenCalled()
-      expect(mockGoBack).toHaveBeenCalledTimes(1)
+      expectGateBouncedTheScreen()
     })
 
     it("fails closed when no factor is configured at all", async () => {
@@ -245,7 +257,7 @@ describe("CardDetailsScreen", () => {
       expect(queryByText("Card number")).toBeNull()
       expect(mockAuthenticate).not.toHaveBeenCalled()
       expect(toastShow).toHaveBeenCalled()
-      expect(mockGoBack).toHaveBeenCalled()
+      expectGateBouncedTheScreen()
     })
   })
 
