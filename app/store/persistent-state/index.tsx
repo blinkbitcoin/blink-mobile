@@ -7,7 +7,13 @@ import { sweepMnemonicMigration } from "@app/self-custodial/storage/account-inde
 import { recordAppError } from "@app/utils/error-reporting"
 
 import { reportError } from "@app/utils/error-logging"
-import { getAllKeys, loadString, saveJson, saveString } from "@app/utils/storage"
+import {
+  getAllKeys,
+  loadString,
+  readString,
+  saveJson,
+  saveString,
+} from "@app/utils/storage"
 import KeyStoreWrapper, { type GaloyAuthTokenKey } from "@app/utils/storage/secureStorage"
 
 import {
@@ -203,14 +209,12 @@ const handleFreshInstall = async (): Promise<LoadedPersistentState> => {
   return { state: defaultPersistentState, persistedToken: "" }
 }
 
-const handleUnusableBlob = async (
-  error: Error,
-  quarantine: () => Promise<void>,
-): Promise<LoadedPersistentState> => {
-  recordAppError(error, { alwaysRecord: true })
-  await quarantine()
-  // The credential lives in the keychain and is unaffected by blob damage:
-  // losing settings must not cost the session.
+/**
+ * Boots on defaults while keeping whatever session the keychain still holds.
+ * The credential lives there and is unaffected by anything that went wrong with
+ * the blob: losing settings must not cost the session.
+ */
+const bootOnDefaultsKeepingSession = async (): Promise<LoadedPersistentState> => {
   const keychainToken = await KeyStoreWrapper.getActiveToken()
   return {
     state: { ...defaultPersistentState, galoyAuthToken: keychainToken },
@@ -218,20 +222,52 @@ const handleUnusableBlob = async (
   }
 }
 
+const handleUnusableBlob = async (
+  error: Error,
+  quarantine: () => Promise<void>,
+): Promise<LoadedPersistentState> => {
+  recordAppError(error, { alwaysRecord: true })
+  await quarantine()
+  return bootOnDefaultsKeepingSession()
+}
+
+/**
+ * The store could not answer, which is the one thing an absent key must never
+ * be confused with.
+ *
+ * Nothing is quarantined: the blob was not read, so there is no damage to
+ * describe and no reason to assume any. Nothing is wiped either, which is the
+ * whole point — the fresh-install branch destroys every credential that
+ * outlives an uninstall, and since blinkbitcoin/blink-wip#1162 that includes
+ * the mnemonics, from both stores. A transient AsyncStorage fault answered that
+ * way would take a user's key material with it.
+ *
+ * This boot runs on defaults and the next one reads the blob again.
+ */
+const handleUnreadableStore = async (err: unknown): Promise<LoadedPersistentState> => {
+  recordAppError(
+    err instanceof Error ? err : new Error(`Persistent state read failed: ${err}`),
+    { alwaysRecord: true },
+  )
+  return bootOnDefaultsKeepingSession()
+}
+
 export const loadPersistentState = async (): Promise<LoadedPersistentState> => {
   // Fire-and-forget: quarantine hygiene must never delay app boot.
   scrubQuarantinedTokens().catch(() => {})
 
   // Read as text and parse here rather than via loadJson, which reports an
-  // absent key and an unparseable one identically. That distinction is now
+  // absent key and an unparseable one identically. That distinction is
   // load-bearing: "absent" triggers the reinstall wipe, and a truncated blob
   // must never be mistaken for a fresh install and cost the user every session
-  // credential they have. (A getItem that throws still surfaces as null, so a
-  // failed read remains indistinguishable from an absent key — closing that
-  // would mean changing loadString's contract for all of its callers.)
-  const raw = await loadString(PERSISTENT_STATE_KEY)
+  // credential they have. readString draws the third one this branch needs — a
+  // read that failed is not a key that is not there.
+  const read = await readString(PERSISTENT_STATE_KEY)
+  if (read.status === "failed") return handleUnreadableStore(read.err)
+
   let data: unknown = null
-  if (raw !== null) {
+  if (read.status === "found") {
+    const raw = read.value
     try {
       data = JSON.parse(raw)
     } catch (err) {
