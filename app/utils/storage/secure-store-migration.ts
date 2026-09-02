@@ -104,7 +104,16 @@ const pendingBySlot = new Map<string, Promise<void>>()
  */
 type IsCurrent = () => boolean
 
-const onSlot = <T>(
+/**
+ * Exported for the one caller that needs the queue without the migration: the
+ * mnemonic account list is read-modify-written as a whole in `secureStorage.ts`
+ * and has no legacy copy to read through. Taking its turn here is what makes
+ * that transaction atomic against every other one on the same slot.
+ *
+ * Never call it from inside a task already holding the same slot — the inner
+ * call would wait on the outer one and neither would ever finish.
+ */
+export const onSlot = <T>(
   slot: string,
   task: (isCurrent: IsCurrent) => Promise<T>,
 ): Promise<T> => {
