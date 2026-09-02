@@ -2689,7 +2689,6 @@
     "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Átutalási díj",
     "noFee": "díjmentes",
-    "lightningSendFee": "{fee: string} + ~{routingFee: string} útválasztási díj",
     "fromApprox": "~{fee: string}-tól",
     "satAmount": "{amount: string} SAT",
     "error": "Jelenleg nem lehet lekérdezni a díjakat"

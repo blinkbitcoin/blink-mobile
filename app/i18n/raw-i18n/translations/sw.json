@@ -2689,7 +2689,6 @@
     "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Ada ya uhamisho",
     "noFee": "hakuna ada",
-    "lightningSendFee": "{fee: string} + ~{routingFee: string} ada ya uelekezaji",
     "fromApprox": "kuanzia ~{fee: string}",
     "satAmount": "{amount: string} SAT",
     "error": "Hatuwezi kupata ada kwa wakati huu"

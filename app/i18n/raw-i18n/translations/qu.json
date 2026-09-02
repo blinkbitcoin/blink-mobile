@@ -2689,7 +2689,6 @@
     "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Astaypa chanin",
     "noFee": "mana chaniyuq",
-    "lightningSendFee": "{fee: string} + ~{routingFee: string} purichiy chanin",
     "fromApprox": "~{fee: string}manta",
     "satAmount": "{amount: string} SAT",
     "error": "Kunanqa mana chaninkunata chaskiyta atinchikchu"

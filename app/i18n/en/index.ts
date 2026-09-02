@@ -2809,7 +2809,6 @@ const en: BaseTranslation = {
       "Onchain between {lower: string} and {upper: string} SAT",
     transferFee: "Transfer fee",
     noFee: "no fee",
-    lightningSendFee: "{fee: string} + ~{routingFee: string} routing fee",
     fromApprox: "from ~{fee: string}",
     satAmount: "{amount: string} SAT",
     error: "Unable to fetch fees at this time",

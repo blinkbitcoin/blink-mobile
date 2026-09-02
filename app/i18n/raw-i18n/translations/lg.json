@@ -2689,7 +2689,6 @@
     "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Ekisale ky'okuweereza",
     "noFee": "tewali kisale",
-    "lightningSendFee": "{fee: string} + ~{routingFee: string} ekisale ky'okutambuza",
     "fromApprox": "okuva ku ~{fee: string}",
     "satAmount": "{amount: string} SAT",
     "error": "Tetusobodde kufuna bisale mu kiseera kino"

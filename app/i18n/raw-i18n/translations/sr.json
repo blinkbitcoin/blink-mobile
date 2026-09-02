@@ -2689,7 +2689,6 @@
     "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Накнада за пренос",
     "noFee": "без накнаде",
-    "lightningSendFee": "{fee: string} + ~{routingFee: string} накнада за рутирање",
     "fromApprox": "од ~{fee: string}",
     "satAmount": "{amount: string} SAT",
     "error": "Тренутно није могуће преузети накнаде"

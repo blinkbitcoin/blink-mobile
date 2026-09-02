@@ -2689,7 +2689,6 @@
     "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Caj pindahan",
     "noFee": "tiada caj",
-    "lightningSendFee": "{fee: string} + ~{routingFee: string} caj penghalaan",
     "fromApprox": "dari ~{fee: string}",
     "satAmount": "{amount: string} SAT",
     "error": "Tak dapat mendapatkan caj buat masa ini"

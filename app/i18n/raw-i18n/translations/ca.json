@@ -2689,7 +2689,6 @@
     "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Comissió de transferència",
     "noFee": "sense comissió",
-    "lightningSendFee": "{fee: string} + ~{routingFee: string} de comissió d'encaminament",
     "fromApprox": "des de ~{fee: string}",
     "satAmount": "{amount: string} SAT",
     "error": "No es poden obtenir les comissions en aquest moment"

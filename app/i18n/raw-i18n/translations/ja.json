@@ -2689,7 +2689,6 @@
         "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
         "transferFee": "振替手数料",
         "noFee": "手数料なし",
-        "lightningSendFee": "{fee: string} + ~{routingFee: string} ルーティング手数料",
         "fromApprox": "~{fee: string} から",
         "satAmount": "{amount: string} SAT",
         "error": "現時点では手数料を取得できません"

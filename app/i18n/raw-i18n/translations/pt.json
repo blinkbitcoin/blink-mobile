@@ -2689,7 +2689,6 @@
         "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
         "transferFee": "Taxa de transferência",
         "noFee": "sem taxa",
-        "lightningSendFee": "{fee: string} + ~{routingFee: string} de taxa de roteamento",
         "fromApprox": "a partir de ~{fee: string}",
         "satAmount": "{amount: string} SAT",
         "error": "Incapaz de obter as taxas agora"

@@ -73,20 +73,20 @@ describe("FeeRatesScreen", () => {
     await findByText("2,500 SAT")
   })
 
-  it("shows the lightning send fee once remote config sets non-zero rates", async () => {
-    mockFeeRatesConfig = {
-      ...defaultFeeRatesConfig,
-      lightningSendBps: 20,
-      lightningRoutingBps: 10,
-    }
+  it("shows the lightning send rate alone once remote config sets a non-zero rate", async () => {
+    mockFeeRatesConfig = { ...defaultFeeRatesConfig, lightningSendBps: 20 }
 
-    const { getByText, findByText } = render(
+    const { getByText, queryByText, findByText } = render(
       <ContextForScreen>
         <FeeRatesScreen />
       </ContextForScreen>,
     )
 
-    expect(getByText("0.2% + ~0.1% routing fee")).toBeTruthy()
+    expect(getByText("0.2%")).toBeTruthy()
+    // The rate is quoted on its own — no routing-fee addendum, and not the
+    // "from ~" hedge the onchain tiers carry.
+    expect(queryByText(/routing/i)).toBeNull()
+    expect(queryByText("from ~0.2%")).toBeNull()
 
     await findByText("2,500 SAT")
   })

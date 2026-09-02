@@ -2689,7 +2689,6 @@
     "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Փոխանցման վճար",
     "noFee": "առանց վճարի",
-    "lightningSendFee": "{fee: string} + ~{routingFee: string} երթուղավորման վճար",
     "fromApprox": "սկսած ~{fee: string}-ից",
     "satAmount": "{amount: string} SAT",
     "error": "Չհաջողվեց ստանալ վճարներն այս պահին"

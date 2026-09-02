@@ -2689,7 +2689,6 @@
     "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Poplatek za převod",
     "noFee": "bez poplatku",
-    "lightningSendFee": "{fee: string} + ~{routingFee: string} směrovací poplatek",
     "fromApprox": "od ~{fee: string}",
     "satAmount": "{amount: string} SAT",
     "error": "V tuto chvíli nelze načíst poplatky"

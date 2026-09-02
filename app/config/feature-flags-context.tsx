@@ -67,7 +67,6 @@ type ReplaceCardDeliveryConfig = Record<string, DeliveryOptionConfig>
 
 export type FeeRatesConfig = {
   lightningSendBps: number
-  lightningRoutingBps: number
   onchainPriorityBps: number
   onchainStandardBps: number
   onchainEconomyBps: number
@@ -135,7 +134,6 @@ const defaultReplaceCardDeliveryConfig = {
 // rows can be shown/hidden and repriced remotely without an app release.
 export const defaultFeeRatesConfig: FeeRatesConfig = {
   lightningSendBps: 0,
-  lightningRoutingBps: 0,
   onchainPriorityBps: 90,
   onchainStandardBps: -1,
   onchainEconomyBps: -1,
