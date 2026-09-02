@@ -31,6 +31,8 @@
     "createError": "API ključ nije moguće stvoriti. Pokušajte ponovno.",
     "revokeError": "API ključ nije moguće opozvati. Pokušajte ponovno.",
     "loadError": "Vaše API ključeve nije moguće učitati. Pokušajte kasnije.",
+    "discardSecretTitle": "Odbaciti ovaj API ključ?",
+    "discardSecretBody": "Ovo je jedini put da se tajna prikazuje. Ako sada odete, ključ se neće moći vratiti i morat ćete stvoriti novi.",
     "done": "Gotovo"
   },
   "GaloyAddressScreen": {

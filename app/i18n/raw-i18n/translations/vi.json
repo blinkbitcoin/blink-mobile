@@ -31,6 +31,8 @@
     "createError": "Không thể tạo khóa API. Vui lòng thử lại.",
     "revokeError": "Không thể thu hồi khóa API. Vui lòng thử lại.",
     "loadError": "Không thể tải các khóa API của bạn. Vui lòng thử lại sau.",
+    "discardSecretTitle": "Hủy bỏ khóa API này?",
+    "discardSecretBody": "Đây là lần duy nhất khóa bí mật được hiển thị. Nếu bạn rời đi bây giờ, khóa sẽ không thể khôi phục và bạn sẽ cần tạo khóa mới.",
     "done": "Xong"
   },
   "GaloyAddressScreen": {

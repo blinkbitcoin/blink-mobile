@@ -31,6 +31,8 @@
     "createError": "Cheia API nu a putut fi creată. Încearcă din nou.",
     "revokeError": "Cheia API nu a putut fi revocată. Încearcă din nou.",
     "loadError": "Cheile tale API nu au putut fi încărcate. Încearcă mai târziu.",
+    "discardSecretTitle": "Renunți la această cheie API?",
+    "discardSecretBody": "Aceasta este singura dată când secretul este afișat. Dacă pleci acum, cheia nu poate fi recuperată și va trebui să creezi una nouă.",
     "done": "Gata"
   },
   "GaloyAddressScreen": {

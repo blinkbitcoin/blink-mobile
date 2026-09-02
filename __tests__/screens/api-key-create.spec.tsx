@@ -6,7 +6,7 @@ import Clipboard from "@react-native-clipboard/clipboard"
 import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { ApiKeyCreateScreen } from "@app/screens/settings-screen/api/api-key-create-screen"
-import { enableScreenSecurity } from "@app/utils/screen-security"
+import { acquireScreenSecurity } from "@app/utils/screen-security"
 
 import { ContextForScreen } from "./helper"
 import { flushEffects } from "../helpers/flush-effects"
@@ -69,8 +69,10 @@ jest.mock("@react-native-clipboard/clipboard", () => ({
 }))
 
 jest.mock("@app/utils/screen-security", () => ({
-  enableScreenSecurity: jest.fn(() => Promise.resolve()),
-  disableScreenSecurity: jest.fn(() => Promise.resolve()),
+  acquireScreenSecurity: jest.fn(() => ({
+    ready: Promise.resolve(),
+    release: jest.fn(() => Promise.resolve()),
+  })),
 }))
 
 loadLocale("en")
@@ -165,7 +167,7 @@ describe("ApiKeyCreateScreen", () => {
 
     expect(await screen.findByText(API_KEY_SECRET)).toBeTruthy()
     expect(screen.getByText(LL.ApiScreen.secretWarning())).toBeTruthy()
-    expect(enableScreenSecurity).toHaveBeenCalled()
+    expect(acquireScreenSecurity).toHaveBeenCalled()
 
     fireEvent.press(screen.getByTestId("api-key-secret"))
     expect(Clipboard.setString).toHaveBeenCalledWith(API_KEY_SECRET)

@@ -11,8 +11,8 @@ import { headerRightNoGlass, noHeaderRight } from "@app/components/header-no-gla
 import { WarningCard } from "@app/components/warning-card"
 import { MnemonicWordsGrid } from "@app/components/mnemonic-words-grid"
 import { Screen } from "@app/components/screen"
+import { ScreenSecurityGate } from "@app/components/screen-security-gate"
 import { SparkCompatibleInfo } from "@app/components/spark-compatible-info"
-import { useScreenSecurity } from "@app/hooks/use-screen-security"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useBiometricGate } from "@app/screens/card-screen/hooks/use-biometric-gate"
@@ -23,15 +23,16 @@ import { useViewBackupPhrase } from "../hooks"
 // The clear tertiary button has no padding, so its hit area is the text bounds.
 const HEADER_BUTTON_HIT_SLOP = { top: 12, bottom: 12, left: 12, right: 12 }
 
-export const ViewBackupPhraseScreen: React.FC = () => {
+/** The gate mounts this only once the screenshot guard is actually on — the words
+ *  and the header Copy action must not exist while registration is pending. The
+ *  biometric prompt likewise fires only after the guard is active. */
+const ViewBackupPhraseContent: React.FC = () => {
   const { LL } = useI18nContext()
   const styles = useStyles()
   const {
     theme: { colors },
   } = useTheme()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-
-  useScreenSecurity()
 
   const handleAuthFailure = useCallback(() => navigation.goBack(), [navigation])
 
@@ -51,7 +52,7 @@ export const ViewBackupPhraseScreen: React.FC = () => {
   useLayoutEffect(() => {
     if (!authenticated) {
       navigation.setOptions(noHeaderRight)
-      return
+      return undefined
     }
 
     navigation.setOptions(
@@ -67,6 +68,11 @@ export const ViewBackupPhraseScreen: React.FC = () => {
         />
       )),
     )
+    /** Header options outlive the component that set them — the route keeps the
+     *  last value and unmounting the setter does not revert it. Without this the
+     *  gate would hide the phrase while leaving Copy live in the header, one tap
+     *  away from the clipboard, exactly while the guard is off. */
+    return () => navigation.setOptions(noHeaderRight)
   }, [navigation, authenticated, copyLabel, handleCopy, styles])
 
   if (!authenticated) {
@@ -98,6 +104,12 @@ export const ViewBackupPhraseScreen: React.FC = () => {
     </Screen>
   )
 }
+
+export const ViewBackupPhraseScreen: React.FC = () => (
+  <ScreenSecurityGate>
+    <ViewBackupPhraseContent />
+  </ScreenSecurityGate>
+)
 
 const useStyles = makeStyles(() => ({
   loader: {
