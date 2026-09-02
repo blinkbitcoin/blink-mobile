@@ -79,14 +79,14 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
     return navigation.addListener("beforeRemove", (e) => {
       if (challengeResolvedRef.current) return
       challengeResolvedRef.current = true
-      /** Only a pop-family removal is the user declining (swipe and header back
-       *  dispatch POP, hardware back GO_BACK). A RESET is a removal the challenge
-       *  doesn't own — the lockout's logout unmounts the caller too, so a decline
-       *  callback would fire into a screen that no longer exists. */
-      const actionType = e.data.action.type
-      const isPopFamilyRemoval =
-        actionType === "POP" || actionType === "POP_TO_TOP" || actionType === "GO_BACK"
-      if (!isPopFamilyRemoval) return
+      /** RESET is the one removal the challenge doesn't own — the lockout's
+       *  logout unmounts the caller too, so a decline callback would fire into a
+       *  screen that no longer exists. Every OTHER removal declines, including
+       *  the ones no allowlist anticipated: a REPLACE from a deep link takes
+       *  this screen away while the caller stays mounted, and staying silent
+       *  there leaves it waiting on a callback that can never come. */
+      const isStackReset = e.data.action.type === "RESET"
+      if (isStackReset) return
       /** Deferred: this listener runs inside the removing pop's dispatch, so a
        *  goBack the caller issues in response would coalesce with the pop
        *  already in flight and be swallowed — stranding the caller on its
@@ -126,8 +126,16 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
   )
 
   /** The challenge's success answer: tell the caller before leaving, and mark it
-   *  resolved so the pop this triggers is not also read as a decline. */
+   *  resolved so the pop this triggers is not also read as a decline.
+   *
+   *  The ref is CHECKED as well as set, which is what makes it one latch for
+   *  both outcomes rather than a flag each path writes. A dismiss landing while
+   *  the entry is still being verified latches it first and schedules the
+   *  decline; the verification then finishes and must not also report success,
+   *  or the caller renders its protected content and is popped out of it a tick
+   *  later. */
   const resolveChallenge = () => {
+    if (challengeResolvedRef.current) return
     challengeResolvedRef.current = true
     onChallengeSuccess?.()
     navigation.goBack()
@@ -214,6 +222,24 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
     setHelperText(LL.PinScreen.setPinFailedMatch())
     setEnteredPIN("")
   }
+
+  /** The terminal outcomes set the farewell and then tear the session down, so a
+   *  dismiss tapped in that window declines into a session already going away
+   *  and races the reset that ends it.
+   *
+   *  Deliberately NOT the keypad's `isInputDisabled`: that is also true for the
+   *  whole lockout countdown, and a challenge the user cannot currently answer
+   *  is exactly when they most want to leave it. The back gesture allows that
+   *  regardless, so disabling the control there would only make the visible
+   *  affordance disagree with the gesture it stands for.
+   *
+   *  The `disabled` prop is the whole guard here, unlike on the keypad, which
+   *  additionally asks the lockout at press time because its `disabled` had an
+   *  observed bypass — a backspace from a render predating the verification in
+   *  flight. Nothing derives this from a stale render: it is this render's own
+   *  state, so a second check inside the handler would be a branch nothing can
+   *  reach. */
+  const isTearingDown = Boolean(farewellText)
 
   const circleComponentForDigit = (digit: number) => {
     return (
@@ -310,6 +336,7 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
       {isDismissable ? (
         <TouchableOpacity
           style={[styles.dismiss, { top: insets.top + DISMISS_INSET }]}
+          disabled={isTearingDown}
           onPress={() => navigation.goBack()}
           accessibilityRole="button"
           accessibilityLabel={LL.common.back()}
