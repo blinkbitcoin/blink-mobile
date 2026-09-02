@@ -2689,7 +2689,6 @@
     "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "رسوم التحويل",
     "noFee": "بدون رسوم",
-    "lightningSendFee": "{fee: string} + ~{routingFee: string} رسوم توجيه",
     "fromApprox": "من ~{fee: string}",
     "satAmount": "{amount: string} SAT",
     "error": "لم يُستطَع الحصول على الرسوم الآن"

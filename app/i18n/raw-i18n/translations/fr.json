@@ -2689,7 +2689,6 @@
         "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
         "transferFee": "Frais de transfert",
         "noFee": "aucuns frais",
-        "lightningSendFee": "{fee: string} + ~{routingFee: string} de frais de routage",
         "fromApprox": "à partir de ~{fee: string}",
         "satAmount": "{amount: string} SAT",
         "error": "Impossible de récupérer les frais pour le moment"

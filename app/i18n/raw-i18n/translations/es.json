@@ -2689,7 +2689,6 @@
         "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
         "transferFee": "Comisión por transferencia",
         "noFee": "sin comisión",
-        "lightningSendFee": "{fee: string} + ~{routingFee: string} de comisión de enrutamiento",
         "fromApprox": "desde ~{fee: string}",
         "satAmount": "{amount: string} SAT",
         "error": "No se pueden obtener las comisiones en este momento"

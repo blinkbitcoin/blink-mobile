@@ -138,20 +138,13 @@ export const FeeRatesScreen: React.FC = () => {
     const items: React.FC[] = []
     if (isRowVisible(feeRatesConfig.lightningSendBps)) {
       items.push(function LightningSendRow() {
-        const isFree =
-          feeRatesConfig.lightningSendBps === 0 && feeRatesConfig.lightningRoutingBps <= 0
         return (
           <FeeRateRow
             label={LL.FeeRatesScreen.lightning()}
             value={
-              isFree
+              feeRatesConfig.lightningSendBps === 0
                 ? LL.FeeRatesScreen.noFee()
-                : LL.FeeRatesScreen.lightningSendFee({
-                    fee: formatBps(feeRatesConfig.lightningSendBps),
-                    routingFee: formatBps(
-                      Math.max(feeRatesConfig.lightningRoutingBps, 0),
-                    ),
-                  })
+                : formatBps(feeRatesConfig.lightningSendBps)
             }
           />
         )

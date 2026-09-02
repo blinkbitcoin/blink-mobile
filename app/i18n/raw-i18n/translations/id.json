@@ -2689,7 +2689,6 @@
     "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Biaya transfer",
     "noFee": "tanpa biaya",
-    "lightningSendFee": "{fee: string} + ~{routingFee: string} biaya routing",
     "fromApprox": "mulai ~{fee: string}",
     "satAmount": "{amount: string} SAT",
     "error": "Tidak dapat mengambil biaya saat ini"

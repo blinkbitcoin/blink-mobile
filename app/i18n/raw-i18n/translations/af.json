@@ -2689,7 +2689,6 @@
     "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Oordragfooi",
     "noFee": "geen fooi",
-    "lightningSendFee": "{fee: string} + ~{routingFee: string} roeteringsfooi",
     "fromApprox": "vanaf ~{fee: string}",
     "satAmount": "{amount: string} SAT",
     "error": "Kan nie nou fooie verkry nie"

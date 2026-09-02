@@ -2689,7 +2689,6 @@
     "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Taxă de transfer",
     "noFee": "fără taxă",
-    "lightningSendFee": "{fee: string} + ~{routingFee: string} taxă de rutare",
     "fromApprox": "de la ~{fee: string}",
     "satAmount": "{amount: string} SAT",
     "error": "Nu se pot obține taxele în acest moment"

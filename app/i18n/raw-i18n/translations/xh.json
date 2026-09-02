@@ -2689,7 +2689,6 @@
     "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Umrhumo wokudlulisela",
     "noFee": "akukho mrhumo",
-    "lightningSendFee": "{fee: string} + ~{routingFee: string} umrhumo wokuthumela",
     "fromApprox": "ukusuka ku-~{fee: string}",
     "satAmount": "{amount: string} SAT",
     "error": "Ayikwazanga kufumana imirhumo ngeli xesha"

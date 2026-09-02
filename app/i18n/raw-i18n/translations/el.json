@@ -2689,7 +2689,6 @@
     "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Τέλος μεταφοράς",
     "noFee": "χωρίς τέλη",
-    "lightningSendFee": "{fee: string} + ~{routingFee: string} τέλος δρομολόγησης",
     "fromApprox": "από ~{fee: string}",
     "satAmount": "{amount: string} SAT",
     "error": "Δεν είναι δυνατή η λήψη των τελών αυτή τη στιγμή"

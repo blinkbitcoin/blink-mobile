@@ -2689,7 +2689,6 @@
     "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Phí chuyển khoản",
     "noFee": "miễn phí",
-    "lightningSendFee": "{fee: string} + ~{routingFee: string} phí định tuyến",
     "fromApprox": "từ ~{fee: string}",
     "satAmount": "{amount: string} SAT",
     "error": "Không thể lấy thông tin phí tại thời điểm này"

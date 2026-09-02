@@ -8885,12 +8885,6 @@ type RootTranslation = {
 		 */
 		noFee: string
 		/**
-		 * {​f​e​e​}​ ​+​ ​~​{​r​o​u​t​i​n​g​F​e​e​}​ ​r​o​u​t​i​n​g​ ​f​e​e
-		 * @param {string} fee
-		 * @param {string} routingFee
-		 */
-		lightningSendFee: RequiredParams<'fee' | 'routingFee'>
-		/**
 		 * f​r​o​m​ ​~​{​f​e​e​}
 		 * @param {string} fee
 		 */
@@ -22477,10 +22471,6 @@ export type TranslationFunctions = {
 		 * no fee
 		 */
 		noFee: () => LocalizedString
-		/**
-		 * {fee} + ~{routingFee} routing fee
-		 */
-		lightningSendFee: (arg: { fee: string, routingFee: string }) => LocalizedString
 		/**
 		 * from ~{fee}
 		 */

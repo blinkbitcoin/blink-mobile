@@ -2689,7 +2689,6 @@
     "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Overførselsgebyr",
     "noFee": "intet gebyr",
-    "lightningSendFee": "{fee: string} + ~{routingFee: string} routinggebyr",
     "fromApprox": "fra ~{fee: string}",
     "satAmount": "{amount: string} SAT",
     "error": "Kunne ikke hente gebyrer i øjeblikket"

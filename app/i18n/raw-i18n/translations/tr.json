@@ -2689,7 +2689,6 @@
     "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Transfer ücreti",
     "noFee": "ücretsiz",
-    "lightningSendFee": "{fee: string} + ~{routingFee: string} yönlendirme ücreti",
     "fromApprox": "en az ~{fee: string}",
     "satAmount": "{amount: string} SAT",
     "error": "Şu an için ücretlere ulaşamıyoruz"

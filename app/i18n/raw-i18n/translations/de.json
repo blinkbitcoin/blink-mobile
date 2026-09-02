@@ -2689,7 +2689,6 @@
         "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
         "transferFee": "Übertragungsgebühr",
         "noFee": "keine Gebühr",
-        "lightningSendFee": "{fee: string} + ~{routingFee: string} Routing-Gebühr",
         "fromApprox": "ab ~{fee: string}",
         "satAmount": "{amount: string} SAT",
         "error": "Gebühren können aktuell nicht abgerufen werden"

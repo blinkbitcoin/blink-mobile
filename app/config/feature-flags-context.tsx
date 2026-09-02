@@ -67,7 +67,6 @@ type ReplaceCardDeliveryConfig = Record<string, DeliveryOptionConfig>
 
 export type FeeRatesConfig = {
   lightningSendBps: number
-  lightningRoutingBps: number
   onchainPriorityBps: number
   onchainStandardBps: number
   onchainEconomyBps: number
@@ -133,12 +132,18 @@ const defaultReplaceCardDeliveryConfig = {
 // Fee rates page contract: a negative rate hides its row (and the section when
 // no rows remain), 0 renders as "no fee", positive values render the rate — so
 // rows can be shown/hidden and repriced remotely without an app release.
+//
+// The three onchain rates are the payout speeds a custodial send actually
+// offers, priced apart because the queue you pick changes what you pay:
+// PAYOUT_SPEED_BY_FEE_TIER maps Fast/Medium/Slow onto the ~10m/~4h/~24h queues
+// the send screen's tier selector shows. All three ship visible — quoting only
+// Priority reads as one flat onchain rate and overstates what a Standard or
+// Economy send costs.
 export const defaultFeeRatesConfig: FeeRatesConfig = {
   lightningSendBps: 0,
-  lightningRoutingBps: 0,
   onchainPriorityBps: 90,
-  onchainStandardBps: -1,
-  onchainEconomyBps: -1,
+  onchainStandardBps: 60,
+  onchainEconomyBps: 40,
   transferBps: 50,
 }
 

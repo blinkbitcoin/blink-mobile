@@ -2689,7 +2689,6 @@
     "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "ค่าธรรมเนียมการโอน",
     "noFee": "ไม่มีค่าธรรมเนียม",
-    "lightningSendFee": "{fee: string} + ~{routingFee: string} ค่าธรรมเนียมการกำหนดเส้นทาง",
     "fromApprox": "เริ่มต้น ~{fee: string}",
     "satAmount": "{amount: string} SAT",
     "error": "ไม่สามารถเรียกค่าธรรมเนียมได้ในขณะนี้"
