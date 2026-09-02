@@ -51,7 +51,7 @@ describe("FeeRatesScreen", () => {
   })
 
   it("renders Send, Receive and Transfer sections with remote-config default rates", async () => {
-    const { getByText, getAllByText, queryByText, findByText } = render(
+    const { getByText, getAllByText, findByText } = render(
       <ContextForScreen>
         <FeeRatesScreen />
       </ContextForScreen>,
@@ -63,9 +63,15 @@ describe("FeeRatesScreen", () => {
 
     expect(getByText("Lightning")).toBeTruthy()
     expect(getAllByText("no fee")).toHaveLength(4)
+
+    // An onchain send is priced by the payout queue it is put on, so each of
+    // the three speeds the send screen offers is quoted at its own rate.
+    expect(getByText("Onchain Priority (~10m)")).toBeTruthy()
     expect(getByText("from ~0.9%")).toBeTruthy()
-    expect(queryByText("Onchain Standard (~4h)")).toBeNull()
-    expect(queryByText("Onchain Economy (~24h)")).toBeNull()
+    expect(getByText("Onchain Standard (~4h)")).toBeTruthy()
+    expect(getByText("from ~0.6%")).toBeTruthy()
+    expect(getByText("Onchain Economy (~24h)")).toBeTruthy()
+    expect(getByText("from ~0.4%")).toBeTruthy()
 
     expect(getByText("Transfer fee")).toBeTruthy()
     expect(getByText("0.5%")).toBeTruthy()
@@ -91,23 +97,45 @@ describe("FeeRatesScreen", () => {
     await findByText("2,500 SAT")
   })
 
-  it("shows onchain standard and economy tiers when remote config enables them", async () => {
+  it("reprices each onchain tier independently from remote config", async () => {
     mockFeeRatesConfig = {
       ...defaultFeeRatesConfig,
-      onchainStandardBps: 60,
-      onchainEconomyBps: 40,
+      onchainPriorityBps: 120,
+      onchainStandardBps: 75,
+      onchainEconomyBps: 0,
     }
 
-    const { getByText, findByText } = render(
+    const { getByText, getAllByText, queryByText, findByText } = render(
       <ContextForScreen>
         <FeeRatesScreen />
       </ContextForScreen>,
     )
 
-    expect(getByText("Onchain Standard (~4h)")).toBeTruthy()
-    expect(getByText("from ~0.6%")).toBeTruthy()
+    expect(getByText("from ~1.2%")).toBeTruthy()
+    expect(getByText("from ~0.75%")).toBeTruthy()
+    // A repriced tier must not leave its shipped fallback on screen.
+    expect(queryByText("from ~0.9%")).toBeNull()
+    expect(queryByText("from ~0.6%")).toBeNull()
+    // Zero is free, not hidden: the row stays and reads "no fee".
     expect(getByText("Onchain Economy (~24h)")).toBeTruthy()
-    expect(getByText("from ~0.4%")).toBeTruthy()
+    expect(getAllByText("no fee")).toHaveLength(5)
+
+    await findByText("2,500 SAT")
+  })
+
+  it("hides only the onchain tiers remote config sets negative", async () => {
+    mockFeeRatesConfig = { ...defaultFeeRatesConfig, onchainStandardBps: -1 }
+
+    const { getByText, queryByText, findByText } = render(
+      <ContextForScreen>
+        <FeeRatesScreen />
+      </ContextForScreen>,
+    )
+
+    expect(queryByText("Onchain Standard (~4h)")).toBeNull()
+    expect(queryByText("from ~0.6%")).toBeNull()
+    expect(getByText("Onchain Priority (~10m)")).toBeTruthy()
+    expect(getByText("Onchain Economy (~24h)")).toBeTruthy()
 
     await findByText("2,500 SAT")
   })
@@ -133,12 +161,6 @@ describe("FeeRatesScreen", () => {
   })
 
   it("renders every Send row in the order the design specifies", async () => {
-    mockFeeRatesConfig = {
-      ...defaultFeeRatesConfig,
-      onchainStandardBps: 60,
-      onchainEconomyBps: 40,
-    }
-
     const { getAllByText, findByText } = render(
       <ContextForScreen>
         <FeeRatesScreen />
