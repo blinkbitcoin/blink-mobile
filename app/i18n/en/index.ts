@@ -2134,6 +2134,25 @@ const en: BaseTranslation = {
     categories: "Categories",
     selectAll: "Select all",
     clearAll: "Clear all",
+    addPlace: "Add to map",
+    addPlaceTitle: "Add a place",
+    placePinHint: "Move the map to put the pin on the place",
+    placeName: "Name",
+    placeNameHint: "What the place is called",
+    placeCategory: "Category",
+    placeLocation: "Location",
+    changeLocation: "Change",
+    placeReviewNote:
+      "New places go to BTC Map. Its community reviews and maintains everything on the map.",
+    placeSubmitted:
+      "Place sent to BTC Map — thanks for adding it. New places can take a while to appear on the map.",
+    placeSubmissionFailed:
+      "The place could not be sent. Check your connection and try again.",
+    // One sentence on purpose: the refusal's real reason (a rate limit, a level
+    // too low, a duplicate) is logged to Crashlytics — see use-place-submission.ts —
+    // and the form offers the likeliest one rather than a list.
+    placeRefused:
+      "BTC Map could not accept this place — it may already be on the map. Nothing was changed.",
     category: {
       restaurants: "Restaurants",
       cafes: "Cafés",

@@ -3277,6 +3277,13 @@ export const WindDownStatus = {
 } as const;
 
 export type WindDownStatus = typeof WindDownStatus[keyof typeof WindDownStatus];
+export type BtcMapPlaceSubmitMutationVariables = Exact<{
+  input: BtcMapPlaceSubmitInput;
+}>;
+
+
+export type BtcMapPlaceSubmitMutation = { readonly __typename: 'Mutation', readonly btcMapPlaceSubmit: { readonly __typename: 'BtcMapPlacePayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly place?: { readonly __typename: 'BtcMapPlace', readonly id: string } | null } };
+
 export type MobileUpdateQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -4235,6 +4242,44 @@ export const CardTransactionDetailsFragmentDoc = gql`
   createdAt
 }
     `;
+export const BtcMapPlaceSubmitDocument = gql`
+    mutation btcMapPlaceSubmit($input: BtcMapPlaceSubmitInput!) {
+  btcMapPlaceSubmit(input: $input) {
+    errors {
+      message
+    }
+    place {
+      id
+    }
+  }
+}
+    `;
+export type BtcMapPlaceSubmitMutationFn = Apollo.MutationFunction<BtcMapPlaceSubmitMutation, BtcMapPlaceSubmitMutationVariables>;
+
+/**
+ * __useBtcMapPlaceSubmitMutation__
+ *
+ * To run a mutation, you first call `useBtcMapPlaceSubmitMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useBtcMapPlaceSubmitMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [btcMapPlaceSubmitMutation, { data, loading, error }] = useBtcMapPlaceSubmitMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useBtcMapPlaceSubmitMutation(baseOptions?: Apollo.MutationHookOptions<BtcMapPlaceSubmitMutation, BtcMapPlaceSubmitMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<BtcMapPlaceSubmitMutation, BtcMapPlaceSubmitMutationVariables>(BtcMapPlaceSubmitDocument, options);
+      }
+export type BtcMapPlaceSubmitMutationHookResult = ReturnType<typeof useBtcMapPlaceSubmitMutation>;
+export type BtcMapPlaceSubmitMutationResult = Apollo.MutationResult<BtcMapPlaceSubmitMutation>;
+export type BtcMapPlaceSubmitMutationOptions = Apollo.BaseMutationOptions<BtcMapPlaceSubmitMutation, BtcMapPlaceSubmitMutationVariables>;
 export const MobileUpdateDocument = gql`
     query mobileUpdate {
   mobileVersions {
