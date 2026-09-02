@@ -8,7 +8,8 @@ import {
 } from "@blinkbitcoin/esign-react-native/webform"
 
 import { Screen } from "@app/components/screen"
-import { ESIGN_ALLOWED_ORIGIN, ESIGN_INVESTMENT_FORM_URL } from "@app/config"
+import { ESIGN_ALLOWED_ORIGIN } from "@app/config"
+import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { logError } from "@app/utils/log-error"
@@ -20,11 +21,13 @@ import { logError } from "@app/utils/log-error"
  * which is where the signer chose to start. A failure stays put, so the component
  * can offer its own retry.
  *
- * Needs ESIGN_INVESTMENT_FORM_URL set: with no form to embed the session cannot
- * start and the step has no way forward, so the flow must not ship without it.
+ * Needs cardInvestmentEsignFormUrl set in remote config: with no form to embed the
+ * session cannot start and the step has no way forward, so the flow must not ship
+ * without it.
  */
 export const SignInvestScreen: React.FC = () => {
   const { LL } = useI18nContext()
+  const { cardInvestmentEsignFormUrl } = useRemoteConfig()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   /** Replaces rather than pushes: the agreement cannot be unsigned, so leaving this
@@ -50,14 +53,15 @@ export const SignInvestScreen: React.FC = () => {
     [],
   )
 
-  /** Built once: rebuilding it on every render would restart the signing session. */
+  /** Rebuilt only when the form changes: a new source on every render would restart
+   *  the signing session. */
   const source = React.useMemo(
     () =>
       createPublicUrlSource({
-        url: ESIGN_INVESTMENT_FORM_URL,
+        url: cardInvestmentEsignFormUrl,
         allowedOrigin: ESIGN_ALLOWED_ORIGIN,
       }),
-    [],
+    [cardInvestmentEsignFormUrl],
   )
 
   return (

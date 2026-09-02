@@ -34,8 +34,21 @@ jest.mock("@app/config", () => {
   const actual = jest.requireActual("@app/config")
   return {
     ...actual,
-    ESIGN_INVESTMENT_FORM_URL: "https://forms.example.test/investment-agreement",
     ESIGN_ALLOWED_ORIGIN: "https://apps.example.test",
+  }
+})
+
+/** Read through a getter so a test can render the screen with no form published. */
+const mockFormUrl = { current: TEST_FORM_URL }
+
+jest.mock("@app/config/feature-flags-context", () => {
+  const actual = jest.requireActual("@app/config/feature-flags-context")
+  return {
+    ...actual,
+    useRemoteConfig: () => ({
+      ...actual.defaultRemoteConfig,
+      cardInvestmentEsignFormUrl: mockFormUrl.current,
+    }),
   }
 })
 
@@ -117,6 +130,7 @@ describe("SignInvestScreen", () => {
     loadLocale("en")
     jest.clearAllMocks()
     mockLastProps.current = null
+    mockFormUrl.current = TEST_FORM_URL
   })
 
   it("renders without crashing", async () => {
@@ -131,7 +145,7 @@ describe("SignInvestScreen", () => {
     expect(getByText("Sign the agreement")).toBeTruthy()
   })
 
-  it("builds the source from the configured form url and origin", async () => {
+  it("builds the source from the remote-config form url and the allowed origin", async () => {
     await renderScreen()
 
     const source = mockLastProps.current?.source as {
@@ -157,6 +171,28 @@ describe("SignInvestScreen", () => {
     })
 
     expect(mockLastProps.current?.source).toBe(firstSource)
+  })
+
+  it("rebuilds the source when a different form is published", async () => {
+    const { rerender } = await renderScreen()
+
+    const firstSource = mockLastProps.current?.source
+    mockFormUrl.current = "https://forms.example.test/second-agreement"
+
+    await act(async () => {
+      rerender(
+        <ContextForScreen>
+          <SignInvestScreen />
+        </ContextForScreen>,
+      )
+    })
+
+    expect(mockLastProps.current?.source).not.toBe(firstSource)
+
+    const source = mockLastProps.current?.source as {
+      start: () => Promise<{ url: string }>
+    }
+    expect((await source.start()).url).toBe("https://forms.example.test/second-agreement")
   })
 
   it("advances to the transfer step once the agreement is signed", async () => {
