@@ -79,6 +79,10 @@ jest.mock("react-native-reanimated", () => {
 jest.mock("@app/utils/biometricAuthentication", () => ({
   __esModule: true,
   default: {
+    /** The screen reads the probe's full answer: `isSensorAvailable` collapses
+     *  "no sensor" and "nothing enrolled" into one false, and those two get
+     *  different copy. */
+    readSensorAvailability: jest.fn().mockResolvedValue("unavailable"),
     isSensorAvailable: jest.fn().mockResolvedValue(false),
     authenticate: jest.fn(),
   },
@@ -368,7 +372,7 @@ describe("SecurityScreen security score card", () => {
     const BiometricWrapper = jest.requireMock(
       "@app/utils/biometricAuthentication",
     ).default
-    BiometricWrapper.isSensorAvailable.mockResolvedValue(true)
+    BiometricWrapper.readSensorAvailability.mockResolvedValue("available")
 
     const { getByTestId } = renderScreen()
 
@@ -386,7 +390,7 @@ describe("SecurityScreen security score card", () => {
       jest.requireMock("@app/utils/biometricAuthentication").default
 
     it("opens the set-pin screen when there is no sensor", async () => {
-      biometrics().isSensorAvailable.mockResolvedValue(false)
+      biometrics().readSensorAvailability.mockResolvedValue("unavailable")
 
       const { getByTestId } = renderScreen()
 
@@ -401,8 +405,8 @@ describe("SecurityScreen security score card", () => {
       expect(mockToastShow).not.toHaveBeenCalled()
     })
 
-    it("opens the set-pin screen when probing the sensor throws", async () => {
-      biometrics().isSensorAvailable.mockRejectedValue(new Error("no enrolment"))
+    it("opens the set-pin screen when the sensor has no enrolment", async () => {
+      biometrics().readSensorAvailability.mockResolvedValue("notEnrolled")
 
       const { getByTestId } = renderScreen()
 
@@ -415,6 +419,42 @@ describe("SecurityScreen security score card", () => {
       )
       expect(mockToastShow).not.toHaveBeenCalled()
     })
+
+    /** The way out the probe cannot see: the sensor works, the prompt opens, and
+     *  the user closes it. That is still a tap on "Set" with nothing to show for
+     *  it, so it is a dead end like any other. */
+    it("opens the set-pin screen when the OS prompt is cancelled", async () => {
+      biometrics().readSensorAvailability.mockResolvedValue("available")
+      biometrics().authenticate.mockImplementation(
+        (_description: string, _onSuccess: () => void, onFailure: () => void) =>
+          onFailure(),
+      )
+
+      const { getByTestId } = renderScreen()
+
+      fireEvent.press(getByTestId("security-score-appLock"))
+
+      await waitFor(() =>
+        expect(mockNavigate).toHaveBeenCalledWith("pin", {
+          screenPurpose: PinScreenPurpose.SetPin,
+        }),
+      )
+      expect(mockSetIsBiometricsEnabled).not.toHaveBeenCalled()
+    })
+
+    it("still records biometrics when the prompt is passed, rather than always routing to the pin", async () => {
+      biometrics().readSensorAvailability.mockResolvedValue("available")
+      biometrics().authenticate.mockImplementation(
+        (_description: string, onSuccess: () => void) => onSuccess(),
+      )
+
+      const { getByTestId } = renderScreen()
+
+      fireEvent.press(getByTestId("security-score-appLock"))
+
+      await waitFor(() => expect(mockSetIsBiometricsEnabled).toHaveBeenCalledTimes(1))
+      expect(mockNavigate).not.toHaveBeenCalled()
+    })
   })
 
   describe("the device toggles either action can reach", () => {
@@ -422,7 +462,7 @@ describe("SecurityScreen security score card", () => {
       jest.requireMock("@app/utils/biometricAuthentication").default
 
     it("records biometrics once the OS prompt is passed", async () => {
-      biometrics().isSensorAvailable.mockResolvedValue(true)
+      biometrics().readSensorAvailability.mockResolvedValue("available")
       biometrics().authenticate.mockImplementation(
         (_description: string, onSuccess: () => void) => onSuccess(),
       )
@@ -435,7 +475,7 @@ describe("SecurityScreen security score card", () => {
     })
 
     it("records nothing when the OS prompt is cancelled", async () => {
-      biometrics().isSensorAvailable.mockResolvedValue(true)
+      biometrics().readSensorAvailability.mockResolvedValue("available")
       biometrics().authenticate.mockImplementation(
         (_description: string, _onSuccess: () => void, onFailure: () => void) =>
           onFailure(),
@@ -449,6 +489,9 @@ describe("SecurityScreen security score card", () => {
       /** Cancelling is not an error the user needs told about — they did it. */
       expect(mockSetIsBiometricsEnabled).not.toHaveBeenCalled()
       expect(mockToastShow).not.toHaveBeenCalled()
+      /** And it is not a reason to offer a pin either: the switch names
+       *  biometrics, so the two entry points part ways on exactly this. */
+      expect(mockNavigate).not.toHaveBeenCalled()
     })
 
     it("turns biometrics back off from the switch", async () => {
@@ -487,7 +530,7 @@ describe("SecurityScreen security score card", () => {
       })
 
     it("explains a missing sensor instead of opening the set-pin screen", async () => {
-      biometrics().isSensorAvailable.mockResolvedValue(false)
+      biometrics().readSensorAvailability.mockResolvedValue("unavailable")
 
       const { getByTestId } = renderScreen()
 
@@ -499,7 +542,7 @@ describe("SecurityScreen security score card", () => {
     })
 
     it("explains a missing enrolment instead of opening the set-pin screen", async () => {
-      biometrics().isSensorAvailable.mockRejectedValue(new Error("no enrolment"))
+      biometrics().readSensorAvailability.mockResolvedValue("notEnrolled")
 
       const { getByTestId } = renderScreen()
 

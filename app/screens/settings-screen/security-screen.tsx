@@ -17,7 +17,9 @@ import type { SecuritySignalKey } from "@app/types/security-score"
 import { Screen } from "../../components/screen"
 import { useLoginMethods } from "./account/login-methods-hook"
 import type { RootStackParamList } from "../../navigation/stack-param-lists"
-import BiometricWrapper from "../../utils/biometricAuthentication"
+import BiometricWrapper, {
+  type SensorAvailability,
+} from "../../utils/biometricAuthentication"
 import { PinScreenPurpose } from "../../utils/enum"
 import KeyStoreWrapper from "../../utils/storage/secureStorage"
 import { toastShow } from "../../utils/toast"
@@ -28,15 +30,16 @@ type Props = {
   route: RouteProp<RootStackParamList, "security">
 }
 
-/** Why biometrics could not be turned on: no sensor at all, or a sensor that
- *  threw when probed, which is what a missing enrolment looks like. */
-type BiometricsUnavailableReason = "noSensor" | "notEnrolled"
+/** Why biometrics could not be turned on. The vocabulary is the wrapper's, not a
+ *  parallel one: a reason this screen invented could name a state the probe
+ *  cannot actually report — see BiometricWrapper.readSensorAvailability. */
+type BiometricsUnavailableReason = Exclude<SensorAvailability, "available">
 
 const BIOMETRICS_UNAVAILABLE_MESSAGE: Record<
   BiometricsUnavailableReason,
   (translations: TranslationFunctions) => string
 > = {
-  noSensor: (translations) => translations.SecurityScreen.biometryNotAvailable(),
+  unavailable: (translations) => translations.SecurityScreen.biometryNotAvailable(),
   notEnrolled: (translations) => translations.SecurityScreen.biometryNotEnrolled(),
 }
 
@@ -77,33 +80,32 @@ export const SecurityScreen: React.FC<Props> = ({ route, navigation }) => {
   }, [])
 
   /**
-   * Turns biometrics on, handing the caller whichever way it could not be used:
-   * the sensor is absent, or probing it threw (no enrolment). What to do about
-   * that differs by caller, so neither answer is baked in here.
+   * Turns biometrics on, handing the caller each way it could fail to happen.
+   * What to do about them differs by caller, so no answer is baked in here.
+   *
+   * The two are separate because they are different events. `onUnavailable`
+   * means the device cannot offer biometrics at all; `onPromptDeclined` means it
+   * can, and the user closed the prompt. A caller may reasonably treat the first
+   * as something to explain and the second as nothing at all.
    */
   const enableBiometrics = useCallback(
-    async (onUnavailable: (reason: BiometricsUnavailableReason) => void) => {
-      /** The probe's verdict is reached inside the try, the caller's answer runs
-       *  outside it: this handler navigates, and a throw from it must not be
-       *  read as a failed probe and answered a second time. */
-      let unavailableReason: BiometricsUnavailableReason
-      try {
-        if (await BiometricWrapper.isSensorAvailable()) {
-          // Presents the OS specific authentication prompt
-          BiometricWrapper.authenticate(
-            LL.AuthenticationScreen.setUpAuthenticationDescription(),
-            handleAuthenticationSuccess,
-            handleAuthenticationFailure,
-          )
-          return
-        }
-        unavailableReason = "noSensor"
-      } catch {
-        unavailableReason = "notEnrolled"
+    async (
+      onUnavailable: (reason: BiometricsUnavailableReason) => void,
+      onPromptDeclined: () => void,
+    ) => {
+      const availability = await BiometricWrapper.readSensorAvailability()
+      if (availability !== "available") {
+        onUnavailable(availability)
+        return
       }
-      onUnavailable(unavailableReason)
+      // Presents the OS specific authentication prompt
+      BiometricWrapper.authenticate(
+        LL.AuthenticationScreen.setUpAuthenticationDescription(),
+        handleAuthenticationSuccess,
+        onPromptDeclined,
+      )
     },
-    [LL, handleAuthenticationSuccess, handleAuthenticationFailure],
+    [LL, handleAuthenticationSuccess],
   )
 
   /** The switch's answer: the user asked for biometrics by name, so say why it
@@ -124,14 +126,14 @@ export const SecurityScreen: React.FC<Props> = ({ route, navigation }) => {
   const onBiometricsValueChanged = useCallback(
     async (value: boolean) => {
       if (value) {
-        await enableBiometrics(warnBiometricsUnavailable)
+        await enableBiometrics(warnBiometricsUnavailable, handleAuthenticationFailure)
         return
       }
       if (await KeyStoreWrapper.removeIsBiometricsEnabled()) {
         setIsBiometricsEnabled(false)
       }
     },
-    [enableBiometrics, warnBiometricsUnavailable],
+    [enableBiometrics, warnBiometricsUnavailable, handleAuthenticationFailure],
   )
 
   const onPinValueChanged = async (value: boolean) => {
@@ -173,10 +175,12 @@ export const SecurityScreen: React.FC<Props> = ({ route, navigation }) => {
       cloudBackup: () => navigation.navigate("selfCustodialCloudBackup"),
       manualBackup: () => navigation.navigate("selfCustodialBackupSecurityChecks"),
       /** The signal is satisfied by either factor (use-security-score), so its
-       *  action must not dead-end on a device whose sensor is missing or
-       *  unenrolled: it falls through to setting a PIN rather than reporting a
-       *  biometrics error the user cannot act on. */
-      appLock: () => enableBiometrics(goToSetPin),
+       *  action must not dead-end. Every way biometrics can fail to happen falls
+       *  through to setting a PIN: a missing or unenrolled sensor, and equally a
+       *  prompt the user closed — that last one is still a tap on "Set" with
+       *  nothing to show for it, and leaving it silent is the dead end this
+       *  action exists to avoid. */
+      appLock: () => enableBiometrics(goToSetPin, goToSetPin),
       hideBalance: () => setAlwaysHideBalance(true),
       twoFactor: () => navigation.navigate("totpRegistrationInitiate"),
       emailVerified: onEmailSignalPress,
