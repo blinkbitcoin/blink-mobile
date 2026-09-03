@@ -1,0 +1,138 @@
+#!/bin/bash
+# Fake `xcrun simctl` for the integration tests.
+#
+# Backs a device list with a flat file at $FAKE_DEVICES, one "udid|name|state"
+# per line, and implements only the verbs claim-session.sh / release-session.sh
+# actually call. Keeps the suite from creating real simulators, which would be
+# slow and would itself be a concurrency hazard on a shared Mac.
+
+set -euo pipefail
+
+[ "${1:-}" = "simctl" ] || { echo "fake xcrun: only 'simctl' is supported, got '${1:-}'" >&2; exit 64; }
+shift
+
+DB="${FAKE_DEVICES:?FAKE_DEVICES not set}"
+touch "$DB"
+
+# Every invocation is recorded so tests can assert on call ordering and args.
+[ -n "${FAKE_ARGS_LOG:-}" ] && echo "simctl $*" >> "$FAKE_ARGS_LOG"
+
+case "${1:-}" in
+  list)
+    case "${2:-}" in
+      runtimes)
+        echo '{"runtimes":[{"name":"iOS 26.5","identifier":"com.apple.CoreSimulator.SimRuntime.iOS-26-5","version":"26.5","isAvailable":true},{"name":"iOS 18.6","identifier":"com.apple.CoreSimulator.SimRuntime.iOS-18-6","version":"18.6","isAvailable":true}]}'
+        ;;
+      devices)
+        booted_only=0
+        [ "${3:-}" = "booted" ] && booted_only=1
+        python3 -c '
+import json, sys
+db, booted_only = sys.argv[1], int(sys.argv[2])
+devices = []
+for line in open(db):
+    line = line.strip()
+    if not line:
+        continue
+    udid, name, state = line.split("|")
+    if booted_only and state != "Booted":
+        continue
+    devices.append({"udid": udid, "name": name, "state": state, "isAvailable": True})
+print(json.dumps({"devices": {"com.apple.CoreSimulator.SimRuntime.iOS-26-5": devices}}))
+' "$DB" "$booted_only"
+        ;;
+      *) echo "fake xcrun: unsupported list target '${2:-}'" >&2; exit 64 ;;
+    esac
+    ;;
+
+  create)
+    name="${2:?}"
+    udid="FAKE-$(date +%s)-$RANDOM"
+    printf '%s|%s|Shutdown\n' "$udid" "$name" >> "$DB"
+    echo "$udid"
+    ;;
+
+  boot|bootstatus)
+    udid="${2:?}"
+    already=$(python3 -c '
+import sys
+db, udid = sys.argv[1], sys.argv[2]
+for line in open(db):
+    parts = line.strip().split("|")
+    if len(parts) == 3 and parts[0] == udid:
+        print("1" if parts[2] == "Booted" else "0")
+        break
+else:
+    print("missing")
+' "$DB" "$udid")
+    [ "$already" = "missing" ] && { echo "fake xcrun: no such device $udid" >&2; exit 1; }
+    # bootstatus reports only; boot mutates.
+    if [ "$1" = "bootstatus" ]; then
+      [ "$already" = "1" ] && exit 0 || exit 1
+    fi
+    python3 -c '
+import sys
+db, udid = sys.argv[1], sys.argv[2]
+rows = [l.strip().split("|") for l in open(db) if l.strip()]
+with open(db, "w") as f:
+    for u, n, s in rows:
+        f.write("%s|%s|%s\n" % (u, n, "Booted" if u == udid else s))
+' "$DB" "$udid"
+    ;;
+
+  shutdown)
+    udid="${2:?}"
+    [ "$udid" = "all" ] && { echo "fake xcrun: 'shutdown all' is forbidden" >&2; exit 70; }
+    python3 -c '
+import sys
+db, udid = sys.argv[1], sys.argv[2]
+rows = [l.strip().split("|") for l in open(db) if l.strip()]
+with open(db, "w") as f:
+    for u, n, s in rows:
+        f.write("%s|%s|%s\n" % (u, n, "Shutdown" if u == udid else s))
+' "$DB" "$udid"
+    ;;
+
+  delete)
+    udid="${2:?}"
+    [ "$udid" = "all" ] && { echo "fake xcrun: 'delete all' is forbidden" >&2; exit 70; }
+    python3 -c '
+import sys
+db, udid = sys.argv[1], sys.argv[2]
+rows = [l for l in open(db) if l.strip() and l.split("|")[0] != udid]
+with open(db, "w") as f:
+    f.writelines(rows)
+' "$DB" "$udid"
+    ;;
+
+  spawn) exit 0 ;;  # `defaults write` on the device — recorded in the args log above
+
+  terminate) exit 0 ;;  # app process kill — nothing to model beyond the log entry
+
+  # Installed apps are modelled as directories under $FAKE_APP_ROOT/<udid>/<bundle>.app
+  get_app_container)
+    udid="${2:?}"; bundle="${3:?}"
+    APPROOT="${FAKE_APP_ROOT:?FAKE_APP_ROOT not set}"
+    path="$APPROOT/$udid/$bundle.app"
+    [ -d "$path" ] || { echo "fake xcrun: no app container for $bundle" >&2; exit 1; }
+    echo "$path"
+    ;;
+
+  install)
+    udid="${2:?}"; app_path="${3:?}"
+    APPROOT="${FAKE_APP_ROOT:?FAKE_APP_ROOT not set}"
+    [ -d "$app_path" ] || { echo "fake xcrun: install source missing: $app_path" >&2; exit 1; }
+    bundle=$(cat "$app_path/fake-bundle-id" 2>/dev/null || basename "$app_path" .app)
+    mkdir -p "$APPROOT/$udid"
+    rm -rf "$APPROOT/$udid/$bundle.app"
+    cp -R "$app_path" "$APPROOT/$udid/$bundle.app"
+    ;;
+
+  uninstall)
+    udid="${2:?}"; bundle="${3:?}"
+    APPROOT="${FAKE_APP_ROOT:?FAKE_APP_ROOT not set}"
+    rm -rf "$APPROOT/$udid/$bundle.app"
+    ;;
+
+  *) echo "fake xcrun: unsupported verb '${1:-}'" >&2; exit 64 ;;
+esac

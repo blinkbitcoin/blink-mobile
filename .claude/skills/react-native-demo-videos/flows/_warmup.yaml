@@ -1,0 +1,11 @@
+> Unrecorded warm-up. Maestro installs its driver onto a device the first time
+> it drives one — about 20 seconds with an installer visible on screen. Running
+> this before the recorder starts keeps that out of the demo.
+>
+> APP_ID is injected by record-flow.sh (-e APP_ID=...) from DEMO_APP_ID_IOS on
+> an iOS simulator, DEMO_APP_ID_ANDROID on an Android emulator.
+appId: ${APP_ID}
+---
+- launchApp
+- waitForAnimationToEnd:
+    timeout: 5000
