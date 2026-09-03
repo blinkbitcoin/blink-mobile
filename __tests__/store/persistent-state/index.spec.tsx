@@ -24,11 +24,13 @@ jest.mock("@app/utils/storage", () => ({
 
 const mockSweepMnemonicMigration = jest.fn()
 const mockReadSelfCustodialIndexPresence = jest.fn()
-// Scheduled off the boot path once the state has loaded; its own spec covers
-// what it does, and here it must not add reports to the ones under assertion.
-// The account index is the second witness the key-material wipe waits for.
+const mockPurgeLegacyKeyStoreOnce = jest.fn()
+// Scheduled off the boot path once the state has loaded; their own specs cover
+// what they do, and here they must not add reports to the ones under assertion.
+// The account index is also the second witness the key-material wipe waits for.
 jest.mock("@app/self-custodial/storage/account-index", () => ({
   sweepMnemonicMigration: (...args: unknown[]) => mockSweepMnemonicMigration(...args),
+  purgeLegacyKeyStoreOnce: (...args: unknown[]) => mockPurgeLegacyKeyStoreOnce(...args),
   readSelfCustodialIndexPresence: (...args: unknown[]) =>
     mockReadSelfCustodialIndexPresence(...args),
   SelfCustodialIndexPresence: {
@@ -128,6 +130,7 @@ const setupStorageMockDefaults = () => {
   mockSweepMnemonicMigration.mockResolvedValue({ status: "ok", migrated: 0 })
   // A real reinstall clears the index, so absence is the default here.
   mockReadSelfCustodialIndexPresence.mockResolvedValue("absent")
+  mockPurgeLegacyKeyStoreOnce.mockResolvedValue({ status: "done" })
   mockSaveJson.mockResolvedValue(undefined)
   mockSaveString.mockResolvedValue(true)
   mockLoadString.mockImplementation(async (key: string) => storedStrings.get(key) ?? null)
