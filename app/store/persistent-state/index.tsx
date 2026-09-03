@@ -2,7 +2,10 @@ import { createContext, useContext, PropsWithChildren } from "react"
 import * as React from "react"
 import { InteractionManager } from "react-native"
 
-import { sweepMnemonicMigration } from "@app/self-custodial/storage/account-index"
+import {
+  purgeLegacyKeyStoreOnce,
+  sweepMnemonicMigration,
+} from "@app/self-custodial/storage/account-index"
 
 import { recordAppError } from "@app/utils/error-reporting"
 
@@ -408,10 +411,15 @@ export const PersistentStateProvider: React.FC<PropsWithChildren> = ({ children 
       // Scheduled after the interactions this boot has queued, so a slow
       // keystore cannot compete with the first frame.
       InteractionManager.runAfterInteractions(() => {
-        sweepMnemonicMigration().catch(() => {
-          // Never rejects by contract; a caught error here would still be a
-          // migration detail and must not reach a boot path.
-        })
+        // The purge is chained onto the sweep rather than scheduled beside it:
+        // it deletes the legacy mnemonic copies, so it must see whether every
+        // account's value actually reached the new store first.
+        sweepMnemonicMigration()
+          .then(purgeLegacyKeyStoreOnce)
+          .catch(() => {
+            // Neither rejects by contract; a caught error here would still be a
+            // migration detail and must not reach a boot path.
+          })
       })
     })()
   }, [])
