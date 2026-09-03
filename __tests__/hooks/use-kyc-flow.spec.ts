@@ -25,8 +25,8 @@ const mockKycFlowStart = jest.fn()
 jest.mock("@app/graphql/generated", () => ({
   useKycFlowStartMutation: () => [mockKycFlowStart],
   KycFlowType: {
-    Full: "FULL",
-    Basic: "BASIC",
+    Card: "CARD",
+    UpgradeLevelTwo: "UPGRADE_LEVEL_TWO",
   },
 }))
 
@@ -115,6 +115,79 @@ describe("useKycFlow", () => {
     expect(mockKycFlowStart).toHaveBeenCalledWith({
       variables: {
         input: { firstName: "John", lastName: "Doe", type: KycFlowType.Card },
+      },
+    })
+  })
+
+  it("trims leading and trailing whitespace from firstName and lastName", async () => {
+    mockKycFlowStart.mockResolvedValue({
+      data: {
+        kycFlowStart: {
+          tokenWeb: "t",
+          workflowRunId: "w",
+        },
+      },
+    })
+
+    const { result } = renderHook(() =>
+      useKycFlow({ firstName: "  John ", lastName: "\tDoe\n" }),
+    )
+
+    await act(async () => {
+      await result.current.startKyc()
+    })
+
+    expect(mockKycFlowStart).toHaveBeenCalledWith({
+      variables: {
+        input: { firstName: "John", lastName: "Doe", type: undefined },
+      },
+    })
+  })
+
+  it("preserves internal whitespace in names", async () => {
+    mockKycFlowStart.mockResolvedValue({
+      data: {
+        kycFlowStart: {
+          tokenWeb: "t",
+          workflowRunId: "w",
+        },
+      },
+    })
+
+    const { result } = renderHook(() =>
+      useKycFlow({ firstName: "Mary Jane", lastName: "van der Berg" }),
+    )
+
+    await act(async () => {
+      await result.current.startKyc()
+    })
+
+    expect(mockKycFlowStart).toHaveBeenCalledWith({
+      variables: {
+        input: { firstName: "Mary Jane", lastName: "van der Berg", type: undefined },
+      },
+    })
+  })
+
+  it("sends empty string for whitespace-only names", async () => {
+    mockKycFlowStart.mockResolvedValue({
+      data: {
+        kycFlowStart: {
+          tokenWeb: "t",
+          workflowRunId: "w",
+        },
+      },
+    })
+
+    const { result } = renderHook(() => useKycFlow({ firstName: "   ", lastName: " " }))
+
+    await act(async () => {
+      await result.current.startKyc()
+    })
+
+    expect(mockKycFlowStart).toHaveBeenCalledWith({
+      variables: {
+        input: { firstName: "", lastName: "", type: undefined },
       },
     })
   })
