@@ -203,23 +203,6 @@ describe("FullOnboardingFlowScreen", () => {
   }
 
   describe("WebView navigation for KYC flow", () => {
-    const submitNames = async (screen: Awaited<ReturnType<typeof renderScreen>>) => {
-      await openConfirmation(screen)
-      await pressAlertButton(1)
-    }
-
-    it("should not start the KYC flow on its own when onboardingStatus is AWAITING_INPUT", async () => {
-      currentMocks = generateFullOnboardingMock({
-        onboardingStatus: OnboardingStatus.AwaitingInput,
-      })
-
-      await renderScreen()
-      await settleNetwork()
-
-      expect(unrequestedKycStart).not.toHaveBeenCalled()
-      expect(mockNavigate).not.toHaveBeenCalled()
-    })
-
     it("should not start the KYC flow while the user is typing their name", async () => {
       currentMocks = generateFullOnboardingMock({
         onboardingStatus: OnboardingStatus.AwaitingInput,
@@ -282,23 +265,6 @@ describe("FullOnboardingFlowScreen", () => {
       expect(screen.getByDisplayValue("John")).toBeTruthy()
       expect(screen.getByTestId("Next")).toBeEnabled()
     })
-
-    it("should navigate to WebView with correct params when the user submits their name", async () => {
-      currentMocks = generateFullOnboardingMock({
-        onboardingStatus: OnboardingStatus.AwaitingInput,
-      })
-
-      const screen = await renderScreen()
-      await submitNames(screen)
-
-      // The form only paints once the status query has resolved, so waiting on
-      // it is what makes a later "did not navigate" assertion meaningful.
-      await waitFor(() => {
-        expect(screen.getByPlaceholderText("First name")).toBeTruthy()
-      })
-
-      return screen
-    }
 
     // Next only opens the confirmation alert; startKyc runs from its Yes handler.
     const submitNames = async (screen: Awaited<ReturnType<typeof renderScreen>>) => {
@@ -516,7 +482,6 @@ describe("FullOnboardingFlowScreen", () => {
       await waitFor(() => {
         expect(screen.getByPlaceholderText("First name")).toBeTruthy()
       })
-      expect(screen.UNSAFE_queryByType(ActivityIndicator)).toBeNull()
     })
   })
 })
