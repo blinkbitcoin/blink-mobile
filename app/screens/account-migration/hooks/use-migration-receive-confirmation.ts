@@ -26,6 +26,13 @@ type UseMigrationReceiveConfirmationArgs = {
    * and an unknown expectation waits like a funded one — the delayed notice is its way out.
    */
   expectedReceiveSats: number | null
+  /**
+   * The invoice this migration issued for the drain. What the check matches, instead of
+   * reading a balance that only means "the drain landed" while the target is a wallet this
+   * flow provisioned and nothing else could have funded. Null leaves the receive unprovable
+   * — the flow then takes its delayed-receive path rather than confirming on the balance.
+   */
+  sparkInvoice: string | null
   /** True until the server phase is COMPLETED: before the drain is even paid there is
    *  nothing to look for, and each look opens a whole SDK connection. */
   skip: boolean
@@ -60,6 +67,7 @@ type UseMigrationReceiveConfirmation = {
 export const useMigrationReceiveConfirmation = ({
   selfCustodialAccountId,
   expectedReceiveSats,
+  sparkInvoice,
   skip,
 }: UseMigrationReceiveConfirmationArgs): UseMigrationReceiveConfirmation => {
   const network = useSparkNetwork()
@@ -121,6 +129,7 @@ export const useMigrationReceiveConfirmation = ({
           accountId,
           network,
           leewaySatPerVbyte: selfCustodialDepositClaimLeewayVbyte,
+          sparkInvoice,
         })
       } catch (err) {
         /** A keystore read that threw before the SDK result shape existed: transient as
@@ -164,7 +173,13 @@ export const useMigrationReceiveConfirmation = ({
       isActive = false
       if (timer) clearTimeout(timer)
     }
-  }, [isWatching, selfCustodialAccountId, network, selfCustodialDepositClaimLeewayVbyte])
+  }, [
+    isWatching,
+    selfCustodialAccountId,
+    network,
+    selfCustodialDepositClaimLeewayVbyte,
+    sparkInvoice,
+  ])
 
   /** The notice measures the wait for the receive, not the whole transfer: it runs from a
    *  timestamp rather than the effect's own lifetime because both callers recompute `skip`
