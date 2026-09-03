@@ -172,6 +172,10 @@ export const onSlot = <T>(
  * A seed an earlier release stored stays here until a read moves it, and its
  * removal clears this copy before it empties the new store, so a retried
  * removal relies on the same answer.
+ *
+ * Exported for the one-shot purge, which erases legacy copies the read path is
+ * no longer allowed to reach and needs the same proof of absence to decide
+ * whether it may record itself as done.
  */
 export const eraseLegacyCopy = async (legacyKey: string): Promise<boolean> => {
   const erased = await legacyErase(legacyKey)

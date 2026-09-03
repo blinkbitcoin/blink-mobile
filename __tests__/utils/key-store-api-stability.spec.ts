@@ -52,6 +52,8 @@ const PINNED_SURFACE = [
   "name",
   "parsePinFailureState",
   "prototype",
+  "purgeLegacyKeyStore",
+  "purgeSlot",
   "readActiveToken",
   "readIsBiometricsEnabled",
   "readIsPinEnabled",
