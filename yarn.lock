@@ -1837,17 +1837,17 @@
   resolved "https://registry.yarnpkg.com/@blinkbitcoin/blink-client/-/blink-client-1.1.1.tgz#a5f101966d1e13ac5388f74ee7ad0b1cc0d4e951"
   integrity sha512-kKbvnxFX12ERIhOPvPGskgIngVCX5kcKWkwkh66MauBIIocaYLJM/Q7DoYloXLAuzQqsyy+FTScWYj+eXVaUSw==
 
-"@blinkbitcoin/esign-core@0.1.0-pre.28.a9c1a82":
-  version "0.1.0-pre.28.a9c1a82"
-  resolved "https://npm.pkg.github.com/download/@blinkbitcoin/esign-core/0.1.0-pre.28.a9c1a82/03b841c219df28a8f2056a51b10a5a823ec1fb84#03b841c219df28a8f2056a51b10a5a823ec1fb84"
-  integrity sha512-MVf67HtOsOYm/D2Pf8Lwakz/HQ20nzOk3PLDppBd0bTpJO3nj2CBs13Yu0op740eaD+ay7GUR9X4AeB6b5FcXA==
+"@blinkbitcoin/esign-core@0.1.0":
+  version "0.1.0"
+  resolved "https://npm.pkg.github.com/download/@blinkbitcoin/esign-core/0.1.0/a26bde73507bfe2aecb102ac51791ba4fae6005c#a26bde73507bfe2aecb102ac51791ba4fae6005c"
+  integrity sha512-GXIFjbnFUmfEPeIYYlsxVjBnp8yMKyyYIsHwy+6SqCBRX3Ft3dOjVP023pSDP1Sv8vDStNfTYkNtEIJk586BkQ==
 
-"@blinkbitcoin/esign-react-native@^0.1.0-pre.28.a9c1a82":
-  version "0.1.0-pre.28.a9c1a82"
-  resolved "https://npm.pkg.github.com/download/@blinkbitcoin/esign-react-native/0.1.0-pre.28.a9c1a82/76c63f1192697c6c4ba3246a31fb209c54fc33a8#76c63f1192697c6c4ba3246a31fb209c54fc33a8"
-  integrity sha512-88FmCLQSgUCGjuMsBiESrUs9yeSAkI3lDfKwc4tZYmOvqSVQY1jrHp8W456vzIa+LKBEyZfOjc6tI+6ScoP6hw==
+"@blinkbitcoin/esign-react-native@0.1.0":
+  version "0.1.0"
+  resolved "https://npm.pkg.github.com/download/@blinkbitcoin/esign-react-native/0.1.0/0eda41c8a1f0727b85f4c0dbc48ddcf8b1c5b9ff#0eda41c8a1f0727b85f4c0dbc48ddcf8b1c5b9ff"
+  integrity sha512-Cfw9k21XurfTdP5n9aiJG68cv2O679y+09Z/kqgVPIV8TetKE4Yzue7nq876G0yNwfnLkXjkVDAnCDQph4WMzw==
   dependencies:
-    "@blinkbitcoin/esign-core" "0.1.0-pre.28.a9c1a82"
+    "@blinkbitcoin/esign-core" "0.1.0"
 
 "@blinkbitcoin/react-native-geetest-module@0.1.2":
   version "0.1.2"
