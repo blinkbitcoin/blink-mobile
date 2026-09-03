@@ -261,6 +261,20 @@ mutation apiKeyRevoke($input: ApiKeyRevokeInput!) {
   }
 }
 
+mutation btcMapPlaceSubmit($input: BtcMapPlaceSubmitInput!) {
+  btcMapPlaceSubmit(input: $input) {
+    errors {
+      message
+      __typename
+    }
+    place {
+      id
+      __typename
+    }
+    __typename
+  }
+}
+
 mutation captchaCreateChallenge {
   captchaCreateChallenge {
     errors {

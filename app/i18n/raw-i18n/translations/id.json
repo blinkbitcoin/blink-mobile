@@ -72,6 +72,7 @@
   },
   "AuthenticationScreen": {
     "authenticationDescription": "Autentikasi untuk melanjutkan",
+    "authenticationRequired": "Autentikasi diperlukan. Anda dapat mengatur kode PIN atau biometrik di pengaturan keamanan.",
     "setUp": "Atur Autentikasi Biometrik",
     "setUpAuthenticationDescription": "Gunakan biometrik untuk mengautentikasi",
     "skip": "Lewati",
@@ -2131,6 +2132,18 @@
     "categories": "Kategori",
     "selectAll": "Pilih semua",
     "clearAll": "Hapus semua",
+    "addPlace": "Tambahkan ke peta",
+    "addPlaceTitle": "Tambahkan tempat",
+    "placePinHint": "Geser peta agar penanda tepat di tempatnya",
+    "placeName": "Nama",
+    "placeNameHint": "Nama tempat ini",
+    "placeCategory": "Kategori",
+    "placeLocation": "Lokasi",
+    "changeLocation": "Ubah",
+    "placeReviewNote": "Tempat baru dikirim ke BTC Map. Komunitasnya meninjau dan memelihara semua yang ada di peta.",
+    "placeSubmitted": "Tempat dikirim ke BTC Map — terima kasih telah menambahkannya",
+    "placeSubmissionFailed": "Tempat tidak dapat dikirim. Periksa koneksi Anda dan coba lagi.",
+    "placeRefused": "BTC Map tidak dapat menerima tempat ini. Tidak ada yang ditambahkan ke peta.",
     "category": {
       "restaurants": "Restoran",
       "cafes": "Kafe",
@@ -2162,6 +2175,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "PIN salah. {attemptsRemaining: number} percobaan tersisa.",
+    "enterPin": "Masukkan kode PIN Anda",
     "lockoutUnavailable": "Tidak dapat mencatat percobaan gagal dengan aman. Keluar.",
     "oneAttemptRemaining": "PIN salah. 1 percobaan tersisa.",
     "pinUnreadable": "Tidak dapat memeriksa PIN Anda. Silakan coba lagi.",
@@ -2666,17 +2680,17 @@
     "receive": "Terima",
     "transfer": "Transfer",
     "lightning": "Lightning",
+    "lightningBelowThreshold": "Lightning di bawah {threshold: string} SAT",
     "intraledger": "Intraledger",
-    "onchainPriority": "Onchain prioritas (secepatnya)",
+    "onchainPriority": "Onchain prioritas (~10 menit)",
     "onchainStandard": "Onchain standar (~4 jam)",
-    "onchainEconomy": "Onchain ekonomis",
+    "onchainEconomy": "Onchain ekonomis (~24 jam)",
     "lightningTransactions": "Transaksi Lightning",
     "onchainBelowThreshold": "Onchain di bawah {threshold: string} SAT",
     "onchainAboveThreshold": "Onchain di atas {threshold: string} SAT",
     "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Biaya transfer",
     "noFee": "tanpa biaya",
-    "lightningSendFee": "{fee: string} + ~{routingFee: string} biaya routing",
     "fromApprox": "mulai ~{fee: string}",
     "satAmount": "{amount: string} SAT",
     "error": "Tidak dapat mengambil biaya saat ini"
@@ -3482,8 +3496,7 @@
         "pinChangedTitle": "PIN diubah",
         "pinChangedSubtitle": "PIN Anda telah berhasil diubah.",
         "pinChangedToast": "PIN berhasil diubah",
-        "biometricDescription": "Verifikasi identitas Anda untuk mengubah PIN",
-        "biometricRequired": "Autentikasi biometrik diperlukan untuk mengubah PIN Anda."
+        "biometricDescription": "Verifikasi identitas Anda untuk mengubah PIN"
       }
     },
     "ReplaceCard": {

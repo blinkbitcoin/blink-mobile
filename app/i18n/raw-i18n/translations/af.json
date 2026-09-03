@@ -72,6 +72,7 @@
   },
   "AuthenticationScreen": {
     "authenticationDescription": "Bevestig om voort te gaan",
+    "authenticationRequired": "Verifikasie word vereis. Jy kan 'n PIN of biometrie in Sekuriteit-instellings opstel.",
     "setUp": "Opstel van biometriese verifikasie",
     "setUpAuthenticationDescription": "Gebruik boimetriese verifikasie",
     "skip": "Gaan verby",
@@ -2131,6 +2132,18 @@
     "categories": "Kategorieë",
     "selectAll": "Kies alles",
     "clearAll": "Wis alles",
+    "addPlace": "Voeg by kaart",
+    "addPlaceTitle": "Voeg 'n plek by",
+    "placePinHint": "Skuif die kaart om die speld op die plek te sit",
+    "placeName": "Naam",
+    "placeNameHint": "Wat die plek genoem word",
+    "placeCategory": "Kategorie",
+    "placeLocation": "Ligging",
+    "changeLocation": "Verander",
+    "placeReviewNote": "Nuwe plekke gaan na BTC Map. Sy gemeenskap ondersoek en onderhou alles op die kaart.",
+    "placeSubmitted": "Plek na BTC Map gestuur — dankie dat jy dit bygevoeg het",
+    "placeSubmissionFailed": "Die plek kon nie gestuur word nie. Kontroleer jou verbinding en probeer weer.",
+    "placeRefused": "BTC Map kon nie hierdie plek aanvaar nie. Niks is by die kaart gevoeg nie.",
     "category": {
       "restaurants": "Restaurante",
       "cafes": "Kafees",
@@ -2162,6 +2175,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "Verkeerde PIN. {attemptsRemaining: number} probeerslae oor. ",
+    "enterPin": "Voer jou PIN-kode in",
     "lockoutUnavailable": "Kon nie die mislukte poging veilig aanteken nie. Teken uit.",
     "oneAttemptRemaining": "Verkeerde PIN, 1 probeerslag oor.",
     "pinUnreadable": "Kon nie jou PIN nagaan nie. Probeer asseblief weer.",
@@ -2666,17 +2680,17 @@
     "receive": "Ontvang",
     "transfer": "Oordrag",
     "lightning": "Lightning",
+    "lightningBelowThreshold": "Lightning onder {threshold: string} SAT",
     "intraledger": "Intraledger",
-    "onchainPriority": "Onchain prioriteit (so gou moontlik)",
+    "onchainPriority": "Onchain prioriteit (~10 min)",
     "onchainStandard": "Onchain standaard (~4u)",
-    "onchainEconomy": "Onchain ekonomies",
+    "onchainEconomy": "Onchain ekonomies (~24u)",
     "lightningTransactions": "Lightning-transaksies",
     "onchainBelowThreshold": "Onchain onder {threshold: string} SAT",
     "onchainAboveThreshold": "Onchain bo {threshold: string} SAT",
     "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Oordragfooi",
     "noFee": "geen fooi",
-    "lightningSendFee": "{fee: string} + ~{routingFee: string} roeteringsfooi",
     "fromApprox": "vanaf ~{fee: string}",
     "satAmount": "{amount: string} SAT",
     "error": "Kan nie nou fooie verkry nie"
@@ -3482,8 +3496,7 @@
         "pinChangedTitle": "PIN verander",
         "pinChangedSubtitle": "Jou PIN is suksesvol verander.",
         "pinChangedToast": "PIN is suksesvol verander",
-        "biometricDescription": "Verifieer jou identiteit om PIN te verander",
-        "biometricRequired": "Biometriese verifikasie is nodig om jou PIN te verander."
+        "biometricDescription": "Verifieer jou identiteit om PIN te verander"
       }
     },
     "ReplaceCard": {

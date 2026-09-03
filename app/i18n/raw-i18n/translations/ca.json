@@ -72,6 +72,7 @@
   },
   "AuthenticationScreen": {
     "authenticationDescription": "Confirma la teva identitat per continuar",
+    "authenticationRequired": "Cal autenticació. Pots configurar un codi PIN o biometria a la configuració de seguretat.",
     "setUp": "Configura la identificació biomètrica",
     "setUpAuthenticationDescription": "Utilitza la identificació biomètrica",
     "skip": "Omet",
@@ -2131,6 +2132,18 @@
     "categories": "Categories",
     "selectAll": "Selecciona-ho tot",
     "clearAll": "Esborra-ho tot",
+    "addPlace": "Afegeix al mapa",
+    "addPlaceTitle": "Afegeix un lloc",
+    "placePinHint": "Mou el mapa per posar el marcador sobre el lloc",
+    "placeName": "Nom",
+    "placeNameHint": "Com es diu el lloc",
+    "placeCategory": "Categoria",
+    "placeLocation": "Ubicació",
+    "changeLocation": "Canvia",
+    "placeReviewNote": "Els llocs nous van a BTC Map. La seva comunitat revisa i manté tot el que hi ha al mapa.",
+    "placeSubmitted": "Lloc enviat a BTC Map: gràcies per afegir-lo",
+    "placeSubmissionFailed": "No s'ha pogut enviar el lloc. Comprova la connexió i torna-ho a provar.",
+    "placeRefused": "BTC Map no ha pogut acceptar aquest lloc. No s'ha afegit res al mapa.",
     "category": {
       "restaurants": "Restaurants",
       "cafes": "Cafeteries",
@@ -2162,6 +2175,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "PIN incorrecte. Queden {attemptsRemaining: string} intents.",
+    "enterPin": "Introdueix el teu codi PIN",
     "lockoutUnavailable": "No s'ha pogut registrar l'intent fallit de manera segura. Tancant la sessió.",
     "oneAttemptRemaining": "PIN incorrecte. Queda 1 intent.",
     "pinUnreadable": "No s'ha pogut comprovar el PIN. Torna-ho a provar.",
@@ -2666,17 +2680,17 @@
     "receive": "Rebre",
     "transfer": "Transferència",
     "lightning": "Lightning",
+    "lightningBelowThreshold": "Lightning per sota de {threshold: string} SAT",
     "intraledger": "Intraledger",
-    "onchainPriority": "Onchain prioritari (al més aviat possible)",
+    "onchainPriority": "Onchain prioritari (~10 min)",
     "onchainStandard": "Onchain estàndard (~4h)",
-    "onchainEconomy": "Onchain econòmic",
+    "onchainEconomy": "Onchain econòmic (~24h)",
     "lightningTransactions": "Transaccions Lightning",
     "onchainBelowThreshold": "Onchain per sota de {threshold: string} SAT",
     "onchainAboveThreshold": "Onchain per sobre de {threshold: string} SAT",
     "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Comissió de transferència",
     "noFee": "sense comissió",
-    "lightningSendFee": "{fee: string} + ~{routingFee: string} de comissió d'encaminament",
     "fromApprox": "des de ~{fee: string}",
     "satAmount": "{amount: string} SAT",
     "error": "No es poden obtenir les comissions en aquest moment"
@@ -3482,8 +3496,7 @@
         "pinChangedTitle": "PIN canviat",
         "pinChangedSubtitle": "El vostre PIN s'ha canviat correctament.",
         "pinChangedToast": "El PIN s'ha canviat correctament",
-        "biometricDescription": "Verifiqueu la vostra identitat per canviar el PIN",
-        "biometricRequired": "L'autenticació biomètrica és necessària per canviar el vostre PIN."
+        "biometricDescription": "Verifiqueu la vostra identitat per canviar el PIN"
       }
     },
     "ReplaceCard": {

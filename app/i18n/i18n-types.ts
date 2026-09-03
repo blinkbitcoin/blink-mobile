@@ -176,6 +176,10 @@ type RootTranslation = {
 		 */
 		authenticationDescription: string
 		/**
+		 * A​u​t​h​e​n​t​i​c​a​t​i​o​n​ ​i​s​ ​r​e​q​u​i​r​e​d​.​ ​Y​o​u​ ​c​a​n​ ​s​e​t​ ​u​p​ ​a​ ​P​I​N​ ​o​r​ ​b​i​o​m​e​t​r​i​c​s​ ​i​n​ ​S​e​c​u​r​i​t​y​ ​s​e​t​t​i​n​g​s​.
+		 */
+		authenticationRequired: string
+		/**
 		 * S​e​t​ ​u​p​ ​B​i​o​m​e​t​r​i​c​ ​A​u​t​h​e​n​t​i​c​a​t​i​o​n
 		 */
 		setUp: string
@@ -6632,6 +6636,54 @@ type RootTranslation = {
 		 * C​l​e​a​r​ ​a​l​l
 		 */
 		clearAll: string
+		/**
+		 * A​d​d​ ​t​o​ ​m​a​p
+		 */
+		addPlace: string
+		/**
+		 * A​d​d​ ​a​ ​p​l​a​c​e
+		 */
+		addPlaceTitle: string
+		/**
+		 * M​o​v​e​ ​t​h​e​ ​m​a​p​ ​t​o​ ​p​u​t​ ​t​h​e​ ​p​i​n​ ​o​n​ ​t​h​e​ ​p​l​a​c​e
+		 */
+		placePinHint: string
+		/**
+		 * N​a​m​e
+		 */
+		placeName: string
+		/**
+		 * W​h​a​t​ ​t​h​e​ ​p​l​a​c​e​ ​i​s​ ​c​a​l​l​e​d
+		 */
+		placeNameHint: string
+		/**
+		 * C​a​t​e​g​o​r​y
+		 */
+		placeCategory: string
+		/**
+		 * L​o​c​a​t​i​o​n
+		 */
+		placeLocation: string
+		/**
+		 * C​h​a​n​g​e
+		 */
+		changeLocation: string
+		/**
+		 * N​e​w​ ​p​l​a​c​e​s​ ​g​o​ ​t​o​ ​B​T​C​ ​M​a​p​.​ ​I​t​s​ ​c​o​m​m​u​n​i​t​y​ ​r​e​v​i​e​w​s​ ​a​n​d​ ​m​a​i​n​t​a​i​n​s​ ​e​v​e​r​y​t​h​i​n​g​ ​o​n​ ​t​h​e​ ​m​a​p​.
+		 */
+		placeReviewNote: string
+		/**
+		 * P​l​a​c​e​ ​s​e​n​t​ ​t​o​ ​B​T​C​ ​M​a​p​ ​—​ ​t​h​a​n​k​s​ ​f​o​r​ ​a​d​d​i​n​g​ ​i​t​.​ ​N​e​w​ ​p​l​a​c​e​s​ ​c​a​n​ ​t​a​k​e​ ​a​ ​w​h​i​l​e​ ​t​o​ ​a​p​p​e​a​r​ ​o​n​ ​t​h​e​ ​m​a​p​.
+		 */
+		placeSubmitted: string
+		/**
+		 * T​h​e​ ​p​l​a​c​e​ ​c​o​u​l​d​ ​n​o​t​ ​b​e​ ​s​e​n​t​.​ ​C​h​e​c​k​ ​y​o​u​r​ ​c​o​n​n​e​c​t​i​o​n​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		placeSubmissionFailed: string
+		/**
+		 * B​T​C​ ​M​a​p​ ​c​o​u​l​d​ ​n​o​t​ ​a​c​c​e​p​t​ ​t​h​i​s​ ​p​l​a​c​e​ ​—​ ​i​t​ ​m​a​y​ ​a​l​r​e​a​d​y​ ​b​e​ ​o​n​ ​t​h​e​ ​m​a​p​.​ ​N​o​t​h​i​n​g​ ​w​a​s​ ​c​h​a​n​g​e​d​.
+		 */
+		placeRefused: string
 		category: {
 			/**
 			 * R​e​s​t​a​u​r​a​n​t​s
@@ -6741,6 +6793,10 @@ type RootTranslation = {
 		 * @param {number} attemptsRemaining
 		 */
 		attemptsRemaining: RequiredParams<'attemptsRemaining'>
+		/**
+		 * E​n​t​e​r​ ​y​o​u​r​ ​P​I​N​ ​c​o​d​e
+		 */
+		enterPin: string
 		/**
 		 * C​o​u​l​d​n​'​t​ ​r​e​c​o​r​d​ ​t​h​e​ ​f​a​i​l​e​d​ ​a​t​t​e​m​p​t​ ​s​e​c​u​r​e​l​y​.​ ​L​o​g​g​i​n​g​ ​o​u​t​.
 		 */
@@ -8788,19 +8844,24 @@ type RootTranslation = {
 		 */
 		lightning: string
 		/**
+		 * L​i​g​h​t​n​i​n​g​ ​b​e​l​o​w​ ​{​t​h​r​e​s​h​o​l​d​}​ ​S​A​T
+		 * @param {string} threshold
+		 */
+		lightningBelowThreshold: RequiredParams<'threshold'>
+		/**
 		 * I​n​t​r​a​l​e​d​g​e​r
 		 */
 		intraledger: string
 		/**
-		 * O​n​c​h​a​i​n​ ​p​r​i​o​r​i​t​y​ ​(​a​s​a​p​)
+		 * O​n​c​h​a​i​n​ ​P​r​i​o​r​i​t​y​ ​(​~​1​0​m​)
 		 */
 		onchainPriority: string
 		/**
-		 * O​n​c​h​a​i​n​ ​s​t​a​n​d​a​r​d​ ​(​~​4​h​)
+		 * O​n​c​h​a​i​n​ ​S​t​a​n​d​a​r​d​ ​(​~​4​h​)
 		 */
 		onchainStandard: string
 		/**
-		 * O​n​c​h​a​i​n​ ​e​c​o​n​o​m​y
+		 * O​n​c​h​a​i​n​ ​E​c​o​n​o​m​y​ ​(​~​2​4​h​)
 		 */
 		onchainEconomy: string
 		/**
@@ -8831,12 +8892,6 @@ type RootTranslation = {
 		 * n​o​ ​f​e​e
 		 */
 		noFee: string
-		/**
-		 * {​f​e​e​}​ ​+​ ​~​{​r​o​u​t​i​n​g​F​e​e​}​ ​r​o​u​t​i​n​g​ ​f​e​e
-		 * @param {string} fee
-		 * @param {string} routingFee
-		 */
-		lightningSendFee: RequiredParams<'fee' | 'routingFee'>
 		/**
 		 * f​r​o​m​ ​~​{​f​e​e​}
 		 * @param {string} fee
@@ -11647,10 +11702,6 @@ type RootTranslation = {
 				 */
 				biometricDescription: string
 				/**
-				 * B​i​o​m​e​t​r​i​c​ ​a​u​t​h​e​n​t​i​c​a​t​i​o​n​ ​i​s​ ​r​e​q​u​i​r​e​d​ ​t​o​ ​c​h​a​n​g​e​ ​y​o​u​r​ ​P​I​N​.
-				 */
-				biometricRequired: string
-				/**
 				 * P​I​N​ ​c​h​a​n​g​e​d
 				 */
 				pinChangedTitle: string
@@ -13802,6 +13853,10 @@ export type TranslationFunctions = {
 		 * Authenticate to continue
 		 */
 		authenticationDescription: () => LocalizedString
+		/**
+		 * Authentication is required. You can set up a PIN or biometrics in Security settings.
+		 */
+		authenticationRequired: () => LocalizedString
 		/**
 		 * Set up Biometric Authentication
 		 */
@@ -20247,6 +20302,54 @@ export type TranslationFunctions = {
 		 * Clear all
 		 */
 		clearAll: () => LocalizedString
+		/**
+		 * Add to map
+		 */
+		addPlace: () => LocalizedString
+		/**
+		 * Add a place
+		 */
+		addPlaceTitle: () => LocalizedString
+		/**
+		 * Move the map to put the pin on the place
+		 */
+		placePinHint: () => LocalizedString
+		/**
+		 * Name
+		 */
+		placeName: () => LocalizedString
+		/**
+		 * What the place is called
+		 */
+		placeNameHint: () => LocalizedString
+		/**
+		 * Category
+		 */
+		placeCategory: () => LocalizedString
+		/**
+		 * Location
+		 */
+		placeLocation: () => LocalizedString
+		/**
+		 * Change
+		 */
+		changeLocation: () => LocalizedString
+		/**
+		 * New places go to BTC Map. Its community reviews and maintains everything on the map.
+		 */
+		placeReviewNote: () => LocalizedString
+		/**
+		 * Place sent to BTC Map — thanks for adding it. New places can take a while to appear on the map.
+		 */
+		placeSubmitted: () => LocalizedString
+		/**
+		 * The place could not be sent. Check your connection and try again.
+		 */
+		placeSubmissionFailed: () => LocalizedString
+		/**
+		 * BTC Map could not accept this place — it may already be on the map. Nothing was changed.
+		 */
+		placeRefused: () => LocalizedString
 		category: {
 			/**
 			 * Restaurants
@@ -20354,6 +20457,10 @@ export type TranslationFunctions = {
 		 * Incorrect PIN. {attemptsRemaining} attempts remaining.
 		 */
 		attemptsRemaining: (arg: { attemptsRemaining: number }) => LocalizedString
+		/**
+		 * Enter your PIN code
+		 */
+		enterPin: () => LocalizedString
 		/**
 		 * Couldn't record the failed attempt securely. Logging out.
 		 */
@@ -22333,19 +22440,23 @@ export type TranslationFunctions = {
 		 */
 		lightning: () => LocalizedString
 		/**
+		 * Lightning below {threshold} SAT
+		 */
+		lightningBelowThreshold: (arg: { threshold: string }) => LocalizedString
+		/**
 		 * Intraledger
 		 */
 		intraledger: () => LocalizedString
 		/**
-		 * Onchain priority (asap)
+		 * Onchain Priority (~10m)
 		 */
 		onchainPriority: () => LocalizedString
 		/**
-		 * Onchain standard (~4h)
+		 * Onchain Standard (~4h)
 		 */
 		onchainStandard: () => LocalizedString
 		/**
-		 * Onchain economy
+		 * Onchain Economy (~24h)
 		 */
 		onchainEconomy: () => LocalizedString
 		/**
@@ -22372,10 +22483,6 @@ export type TranslationFunctions = {
 		 * no fee
 		 */
 		noFee: () => LocalizedString
-		/**
-		 * {fee} + ~{routingFee} routing fee
-		 */
-		lightningSendFee: (arg: { fee: string, routingFee: string }) => LocalizedString
 		/**
 		 * from ~{fee}
 		 */
@@ -25134,10 +25241,6 @@ export type TranslationFunctions = {
 				 * Verify your identity to change PIN
 				 */
 				biometricDescription: () => LocalizedString
-				/**
-				 * Biometric authentication is required to change your PIN.
-				 */
-				biometricRequired: () => LocalizedString
 				/**
 				 * PIN changed
 				 */

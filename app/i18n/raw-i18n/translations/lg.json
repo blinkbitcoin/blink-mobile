@@ -72,6 +72,7 @@
   },
   "AuthenticationScreen": {
     "authenticationDescription": "Kakasa okugenda mu maaso",
+    "authenticationRequired": "Okakasibwa kwetaagisa. Osobola okuteekawo PIN oba biometriks mu ntegeka z'obukuumi.",
     "setUp": "Teekateeka okukakasa kwa Biometric",
     "setUpAuthenticationDescription": "Kozesa biometric okukakasa",
     "skip": "Buuka",
@@ -2131,6 +2132,18 @@
     "categories": "Ebika",
     "selectAll": "Londa byonna",
     "clearAll": "Sazaamu byonna",
+    "addPlace": "Yongera ku mmaapu",
+    "addPlaceTitle": "Yongera ekifo",
+    "placePinHint": "Tambuza mmaapu ossewo akabonero ku kifo",
+    "placeName": "Erinnya",
+    "placeNameHint": "Ekifo bwe kiyitibwa",
+    "placeCategory": "Ekika",
+    "placeLocation": "Ekifo",
+    "changeLocation": "Kyusa",
+    "placeReviewNote": "Ebifo ebiggya bisindikibwa ku BTC Map. Ekibiina kyayo kikebera era kikuuma buli kimu ekiri ku mmaapu.",
+    "placeSubmitted": "Ekifo kisindikiddwa ku BTC Map — weebale okukyongerako",
+    "placeSubmissionFailed": "Ekifo tekisobodde kusindikwa. Kebera entaanya yo oluddemu ogezeko.",
+    "placeRefused": "BTC Map tesobodde kukkiriza kifo kino. Tewali kyongeddwa ku mmaapu.",
     "category": {
       "restaurants": "Eby'okuliirwamu",
       "cafes": "Wooteeri za kaawa",
@@ -2162,6 +2175,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "PIN enkyamu. {attemptsRemaining: number} okugezaako okusigaddewo.",
+    "enterPin": "Teeka pini koodi yo",
     "lockoutUnavailable": "Tetusobodde kuwandiika kugezaako okulemeredwa mu bukuumi. Logging out.",
     "oneAttemptRemaining": "PIN enkyamu. mulundi 1 ogw'okugezaako ogusigaddewo.",
     "pinUnreadable": "Tetusobodde kukebera PIN yo. Gezaako nate.",
@@ -2666,17 +2680,17 @@
     "receive": "Funa",
     "transfer": "Weereza",
     "lightning": "Lightning",
+    "lightningBelowThreshold": "Lightning wansi wa {threshold: string} SAT",
     "intraledger": "Intraledger",
-    "onchainPriority": "Onchain eyasooka (mangu ddala)",
+    "onchainPriority": "Onchain eyasooka (~10 min)",
     "onchainStandard": "Onchain eya bulijjo (~4h)",
-    "onchainEconomy": "Onchain ey'omuwendo omutono",
+    "onchainEconomy": "Onchain ey'omuwendo omutono (~24h)",
     "lightningTransactions": "Emirimu gya Lightning",
     "onchainBelowThreshold": "Onchain wansi wa {threshold: string} SAT",
     "onchainAboveThreshold": "Onchain waggulu wa {threshold: string} SAT",
     "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Ekisale ky'okuweereza",
     "noFee": "tewali kisale",
-    "lightningSendFee": "{fee: string} + ~{routingFee: string} ekisale ky'okutambuza",
     "fromApprox": "okuva ku ~{fee: string}",
     "satAmount": "{amount: string} SAT",
     "error": "Tetusobodde kufuna bisale mu kiseera kino"
@@ -3482,8 +3496,7 @@
         "pinChangedTitle": "PIN ekyusiddwa",
         "pinChangedSubtitle": "PIN yo ekyusiddwa bulungi.",
         "pinChangedToast": "PIN ekyusiddwa obulungi",
-        "biometricDescription": "Kakasa obuntubulamu bwo okukyusa PIN",
-        "biometricRequired": "Okukakasa kw'ebiometrike kwetaagisa okukyusa PIN yo."
+        "biometricDescription": "Kakasa obuntubulamu bwo okukyusa PIN"
       }
     },
     "ReplaceCard": {

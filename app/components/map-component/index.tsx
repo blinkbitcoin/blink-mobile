@@ -10,18 +10,29 @@ import {
   BtcMapPlace,
   LatLng,
   PlaceCategory,
+  PlaceSubmission,
   placesInCategories,
   useBtcMapPlaceNames,
   useBtcMapPlaces,
+  useSubmitBtcMapPlace,
 } from "@app/btcmap"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
+import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { updateMapLastCoords } from "@app/graphql/client-only-query"
+import { useIsAuthed } from "@app/graphql/is-authed-context"
+import { useLevel } from "@app/graphql/level-context"
+import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { LOCATION_PERMISSION, getUserRegion } from "@app/screens/map-screen/functions"
+import { AccountType } from "@app/types/wallet"
+import { reportError } from "@app/utils/error-logging"
+import { toastShow } from "@app/utils/toast"
+import { generateSecureRandomUUID } from "@app/utils/uuid"
 import { useFocusEffect } from "@react-navigation/native"
 import { isIOS } from "@rn-vui/base"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
+import { AddPlaceModal } from "./add-place-modal"
 import { CategoryFilterSheet } from "./category-filter-sheet"
 import { ClusterMarker, ClusterMarkerData } from "./cluster-marker"
 import { Viewport, placeLabels } from "./label-collision"
@@ -31,6 +42,7 @@ import MapStyles from "./map-styles.json"
 import { OpenSettingsElement, OpenSettingsModal } from "./open-settings-modal"
 import { truncateLabel } from "./marker-layout"
 import { PlaceLabelMarker } from "./place-label-marker"
+import { PlaceLocator, locatorBarTop } from "./place-locator"
 import { PlaceMarker } from "./place-marker"
 import { PlaceSearchModal } from "./place-search-modal"
 import { PlaceSheet } from "./place-sheet"
@@ -74,6 +86,25 @@ export default function MapComponent({
   const client = useApolloClient()
   const { LL } = useI18nContext()
 
+  // Adding a place is a level-two custodial-account feature: the submission
+  // goes to BTC Map through our own backend, which needs a Blink session
+  // behind it and rejects anything below account level two.
+  // Which account is signed in comes from the registry rather than from
+  // `useActiveWallet().isSelfCustodial`, for two reasons. The registry has the
+  // answer before the self-custodial SDK has reported, so the button never
+  // flashes into view; and it leaves this component unsubscribed from both
+  // wallets, which a map wants — every balance that moves would otherwise
+  // re-render the whole screen, marker list included, to re-decide one button.
+  // The kill switch gates it too: emptying the pins while submissions keep
+  // flowing to the backend is the outcome `btcMapPlacesEnabled` exists to avoid.
+  const isAuthed = useIsAuthed()
+  const { activeAccount } = useAccountRegistry()
+  const isSelfCustodialAccount = activeAccount?.type === AccountType.SelfCustodial
+  const { isAtLeastLevelTwo } = useLevel()
+  const { btcMapPlacesEnabled } = useRemoteConfig()
+  const canAddPlace =
+    isAuthed && !isSelfCustodialAccount && isAtLeastLevelTwo && btcMapPlacesEnabled
+
   const mapViewRef = React.useRef<MapView>(null)
   const openSettingsModalRef = React.useRef<OpenSettingsElement>(null)
   const isAndroidSecondPermissionRequest = React.useRef(false)
@@ -86,12 +117,44 @@ export default function MapComponent({
   const [selectedPlace, setSelectedPlace] = React.useState<BtcMapPlace | null>(null)
   const [isSearchOpen, setSearchOpen] = React.useState(false)
   const [isFilterOpen, setFilterOpen] = React.useState(false)
+  // Placing the pin, then describing what is under it. Null is neither.
+  const [addStep, setAddStep] = React.useState<"locating" | "describing" | null>(null)
+  const isAddingPlace = addStep !== null
+  const isLocatingPlace = addStep === "locating"
+  const isDescribingPlace = addStep === "describing"
+  // Read by the submit handler after its awaits, when `addStep` may have moved
+  // on, and by the cluster handler, which has to stay a stable callback. Synced
+  // in an effect rather than during render: writing a ref in the render body is
+  // impure under concurrent rendering, and every reader runs after the commit.
+  const addStepRef = React.useRef(addStep)
+  React.useEffect(() => {
+    addStepRef.current = addStep
+  }, [addStep])
+  const [pinnedLocation, setPinnedLocation] = React.useState<LatLng | null>(null)
+  // One attempt at adding a place. It keys the form, so what was typed survives
+  // a trip back to the map to move the pin but never outlives the attempt it
+  // was typed into.
+  const [addSession, setAddSession] = React.useState(0)
+  // Read by the submit handler after its awaits, when the attempt on screen may
+  // be a later one than the one that was sent. Synced in an effect, like
+  // `addStepRef` above.
+  const addSessionRef = React.useRef(addSession)
+  React.useEffect(() => {
+    addSessionRef.current = addSession
+  }, [addSession])
+  // The idempotency key of the attempt: the backend deduplicates submissions on
+  // it, so every retry of one attempt reuses it and a new attempt mints one.
+  // Null until the attempt's first send — minting one is async, because a UUID's
+  // randomness has to come from the platform CSPRNG (see `utils/uuid.ts`), and
+  // an attempt abandoned before submitting never needs one.
+  const submissionIdRef = React.useRef<string | null>(null)
   // Empty means "everything", not "nothing" — see `placesInCategories`.
   const [categories, setCategories] = React.useState<ReadonlySet<PlaceCategory>>(
     () => new Set(),
   )
 
   const { places: allPlaces, isLoading, hasError, refresh } = useBtcMapPlaces()
+  const { submitPlace } = useSubmitBtcMapPlace()
 
   // The map tab is never unmounted, so returning to it days later would
   // otherwise show whatever was cached when the process started. `refresh` is a
@@ -232,6 +295,15 @@ export default function MapComponent({
   // fresh callback and re-render the lot of them.
   const regionRef = React.useRef(region)
 
+  // The camera is somewhere for the whole of a fling or a fly-to, not only once
+  // it stops, and confirming the pin reads this ref — so it follows the camera
+  // rather than its last resting place. Nothing but the ref: this fires every
+  // frame of a gesture, and re-rendering ~29k points' worth of markers on each
+  // of them is what `region` being written only on settle exists to avoid.
+  const handleRegionChange = React.useCallback((nextRegion: Region) => {
+    regionRef.current = nextRegion
+  }, [])
+
   const handleRegionChangeComplete = React.useCallback(
     (nextRegion: Region) => {
       regionRef.current = nextRegion
@@ -243,6 +315,10 @@ export default function MapComponent({
 
   const handleClusterPress = React.useCallback(
     (cluster: ClusterMarkerData) => {
+      // Same reason the pins go quiet below: while the pin is being placed the
+      // map is being aimed, and flying off to a cluster takes it off whatever
+      // was being aimed at. From the ref, so that this stays one callback.
+      if (addStepRef.current !== null) return
       mapViewRef.current?.animateToRegion(
         regionForCluster(cluster, regionRef.current),
         FLY_TO_DURATION_MS,
@@ -251,9 +327,121 @@ export default function MapComponent({
     [regionForCluster],
   )
 
+  // While the pin is being placed, a tap on the map is aiming rather than
+  // asking about somewhere that is already on it, so the existing pins go quiet
+  // instead of opening a sheet over the thing being aimed.
   const handlePlacePress = React.useCallback((place: BtcMapPlace) => {
+    // From the ref, like the cluster handler's: a callback keyed on `addStep`
+    // would change identity on every step transition and re-render the markers.
+    if (addStepRef.current !== null) return
     setSelectedPlace(place)
   }, [])
+
+  const startAddingPlace = React.useCallback(() => {
+    setSelectedPlace(null)
+    setPinnedLocation(null)
+    setAddSession((session) => session + 1)
+    // The next attempt's id is minted on its first send — see the ref above.
+    submissionIdRef.current = null
+    setAddStep("locating")
+  }, [])
+
+  // The pin never moves, so where it points is the centre of whatever region
+  // the map has settled on. Read from the ref rather than the state so a
+  // confirmation lands on the region the user is actually looking at.
+  const confirmPlaceLocation = React.useCallback(() => {
+    const { latitude, longitude } = regionRef.current
+    setPinnedLocation({ latitude, longitude })
+    setAddStep("describing")
+  }, [])
+
+  /**
+   * Sends the place and answers the form with what to say about it.
+   *
+   * A failure is the form's to report rather than this screen's: the form is a
+   * native modal over everything, so a toast raised from under it is drawn
+   * under it too — see `add-place-modal.tsx`. Success is the other way round,
+   * since by then the form is gone and there is nothing left to say it on.
+   *
+   * Both awaits are long enough for the attempt underneath to be abandoned and
+   * another one started, so what comes back is applied to the form only while
+   * it still belongs to the attempt on screen. The success toast is the one
+   * exception: it announces a place BTC Map now has, which stays true whatever
+   * the form has done since.
+   */
+  const handlePlaceSubmit = React.useCallback(
+    async (submission: PlaceSubmission): Promise<string | null> => {
+      const attempt = addSessionRef.current
+
+      let submissionId = submissionIdRef.current
+      if (!submissionId) {
+        try {
+          submissionId = await generateSecureRandomUUID()
+        } catch (mintingError) {
+          // No id, no send: without the idempotency key the backend cannot
+          // deduplicate, so the place must not go out without one. What failed
+          // here is the device's CSPRNG, not the connection, so the form gets
+          // the generic error rather than connection advice — and the failure
+          // is a defect worth a non-fatal, not a silent catch.
+          reportError("mintBtcMapSubmissionId", mintingError)
+          return LL.errors.generic()
+        }
+        // Abandoned while the id was being minted. Nothing to send — and the id
+        // must not be left in the ref for the next attempt to pick up, since
+        // the backend deduplicates on it and would take the next place as an
+        // edit of this one.
+        if (addSessionRef.current !== attempt) return null
+        // No race to atomically avoid: the form's in-flight guard means only
+        // one send per attempt is ever between its first line and this one.
+        // eslint-disable-next-line require-atomic-updates
+        submissionIdRef.current = submissionId
+      }
+      const outcome = await submitPlace(submission, submissionId)
+
+      // Success is announced even when the attempt that sent it has since been
+      // abandoned: the place is on its way to BTC Map either way, and an
+      // unannounced success invites a resubmission under a new submissionId —
+      // which the backend can no longer deduplicate. The toast is app-level so
+      // it is visible once the form is closed; when a later attempt's form is
+      // open it is drawn behind that modal (see `add-place-modal.tsx`), which
+      // is the price of not losing the confirmation entirely.
+      if (outcome.submitted) {
+        toastShow({
+          message: (translations) => translations.MapScreen.placeSubmitted(),
+          LL,
+          type: "success",
+        })
+
+        // The attempt is over, whatever step it is on: the answer can land
+        // after the form went back to moving the pin, and leaving the attempt
+        // open then would let its next send arrive as an edit of the place BTC
+        // Map just took. Only the attempt that sent it closes, though — a
+        // later one is another place's business.
+        if (addSessionRef.current === attempt) {
+          setAddStep(null)
+          setPinnedLocation(null)
+        }
+        return null
+      }
+
+      // A failure belongs to the form that sent it: a response for an attempt
+      // that is no longer the one on screen closes nothing and reports nothing
+      // over a later attempt.
+      if (addStepRef.current !== "describing" || addSessionRef.current !== attempt) {
+        return null
+      }
+
+      // The form stays open with the reason on it: what was typed is exactly
+      // what a retry should send, under the same submissionId. A refusal is
+      // about the place and a dropped request is about the connection, so they
+      // do not share a sentence — but neither of them borrows the backend's,
+      // which only ever comes back in English.
+      return outcome.refused
+        ? LL.MapScreen.placeRefused()
+        : LL.MapScreen.placeSubmissionFailed()
+    },
+    [LL, submitPlace],
+  )
 
   const closeSheet = React.useCallback(() => setSelectedPlace(null), [])
 
@@ -313,6 +501,7 @@ export default function MapComponent({
         // this prop instead.
         showsPointsOfInterests={false}
         customMapStyle={themeMode === "dark" ? MapStyles.dark : MapStyles.light}
+        onRegionChange={handleRegionChange}
         onRegionChangeComplete={handleRegionChangeComplete}
         moveOnMarkerPress={false}
         rotateEnabled={false}
@@ -351,12 +540,37 @@ export default function MapComponent({
         })}
       </MapView>
 
-      <MapSearchBar
-        topInset={insets.top}
-        onSearchPress={() => setSearchOpen(true)}
-        onFilterPress={() => setFilterOpen(true)}
-        isFiltered={categories.size > 0}
-      />
+      {/* Both are about reading the map, and neither belongs over a map that
+          is being used to point at something. */}
+      {!isAddingPlace && (
+        <>
+          <MapSearchBar
+            topInset={insets.top}
+            onSearchPress={() => setSearchOpen(true)}
+            onFilterPress={() => setFilterOpen(true)}
+            isFiltered={categories.size > 0}
+          />
+
+          {canAddPlace && (
+            <Pressable
+              testID="open-add-place"
+              style={styles.addPlace}
+              onPress={startAddingPlace}
+              accessibilityRole="button"
+            >
+              <GaloyIcon name="plus" size={16} color={colors.primary} />
+              <Text style={styles.addPlaceText}>{LL.MapScreen.addPlace()}</Text>
+            </Pressable>
+          )}
+        </>
+      )}
+
+      {isLocatingPlace && (
+        <PlaceLocator
+          onConfirm={confirmPlaceLocation}
+          onCancel={() => setAddStep(null)}
+        />
+      )}
 
       {isLoading && !allPlaces.length && (
         <View style={styles.statusPill}>
@@ -379,6 +593,10 @@ export default function MapComponent({
             requestPermissions={requestLocationPermission}
             permissionStatus={permissionsStatus}
             centerOnUser={centerOnUser}
+            // Centring on yourself and then nudging the pin onto your own shop
+            // is the common way to place one, so this stays reachable while the
+            // locator's bar has the bottom of the map.
+            bottom={isLocatingPlace ? locatorBarTop(insets.bottom) + 10 : undefined}
           />
         )}
 
@@ -403,6 +621,18 @@ export default function MapComponent({
       />
 
       <PlaceSheet place={selectedPlace} userLocation={coords} onClose={closeSheet} />
+
+      <AddPlaceModal
+        key={addSession}
+        isVisible={isDescribingPlace}
+        location={pinnedLocation}
+        onSubmit={handlePlaceSubmit}
+        onChangeLocation={() => setAddStep("locating")}
+        onClose={() => {
+          setAddStep(null)
+          setPinnedLocation(null)
+        }}
+      />
     </View>
   )
 }
@@ -438,5 +668,23 @@ const useStyles = makeStyles(({ colors }, { topInset }: { topInset: number }) =>
     fontSize: 13,
     fontWeight: "600",
     color: colors.primary,
+  },
+  addPlace: {
+    position: "absolute",
+    left: 8,
+    bottom: 12,
+    zIndex: 99,
+    flexDirection: "row",
+    alignItems: "center",
+    columnGap: 6,
+    backgroundColor: colors.white,
+    borderRadius: 20,
+    paddingHorizontal: 14,
+    paddingVertical: 11,
+  },
+  addPlaceText: {
+    fontSize: 14,
+    fontWeight: "700",
+    color: colors.black,
   },
 }))

@@ -72,6 +72,7 @@
     },
     "AuthenticationScreen": {
         "authenticationDescription": "Authentifizieren zum Fortfahren",
+        "authenticationRequired": "Authentifizierung erforderlich. Du kannst einen PIN Code oder Biometrie in den Sicherheitseinstellungen einrichten.",
         "setUp": "Biometrische Authentifizierung einrichten",
         "setUpAuthenticationDescription": "Biometrie zur Authentifizierung verwenden",
         "skip": "Überspringen",
@@ -2131,6 +2132,18 @@
         "categories": "Kategorien",
         "selectAll": "Alle auswählen",
         "clearAll": "Alle abwählen",
+        "addPlace": "Zur Karte hinzufügen",
+        "addPlaceTitle": "Ort hinzufügen",
+        "placePinHint": "Verschiebe die Karte, bis die Nadel auf dem Ort steht",
+        "placeName": "Name",
+        "placeNameHint": "Wie der Ort heißt",
+        "placeCategory": "Kategorie",
+        "placeLocation": "Standort",
+        "changeLocation": "Ändern",
+        "placeReviewNote": "Neue Orte gehen an BTC Map. Die dortige Community prüft und pflegt alles, was auf der Karte steht.",
+        "placeSubmitted": "Ort an BTC Map gesendet – danke fürs Hinzufügen",
+        "placeSubmissionFailed": "Der Ort konnte nicht gesendet werden. Überprüfe deine Verbindung und versuche es erneut.",
+        "placeRefused": "BTC Map konnte diesen Ort nicht annehmen. Es wurde nichts zur Karte hinzugefügt.",
         "category": {
             "restaurants": "Restaurants",
             "cafes": "Cafés",
@@ -2162,6 +2175,7 @@
     },
     "PinScreen": {
         "attemptsRemaining": "Falsche PIN. {attemptsRemaining: string} verbleibende Versuche.",
+        "enterPin": "Gib deinen PIN Code ein",
         "lockoutUnavailable": "Der Fehlversuch konnte nicht sicher gespeichert werden. Du wirst nun ausgeloggt.",
         "oneAttemptRemaining": "Falsche PIN. Letzter Versuch.",
         "pinUnreadable": "Deine PIN konnte nicht geprüft werden. Bitte versuche es erneut.",
@@ -2666,17 +2680,17 @@
         "receive": "Erhalten",
         "transfer": "Übertragen",
         "lightning": "Lightning",
+        "lightningBelowThreshold": "Lightning unter {threshold: string} SAT",
         "intraledger": "Intraledger",
-        "onchainPriority": "Onchain Priorität (schnellstmöglich)",
+        "onchainPriority": "Onchain Priorität (~10 Min.)",
         "onchainStandard": "Onchain Standard (~4 Std.)",
-        "onchainEconomy": "Onchain Economy",
+        "onchainEconomy": "Onchain Economy (~24 Std.)",
         "lightningTransactions": "Lightning-Transaktionen",
         "onchainBelowThreshold": "Onchain unter {threshold: string} SAT",
         "onchainAboveThreshold": "Onchain über {threshold: string} SAT",
         "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
         "transferFee": "Übertragungsgebühr",
         "noFee": "keine Gebühr",
-        "lightningSendFee": "{fee: string} + ~{routingFee: string} Routing-Gebühr",
         "fromApprox": "ab ~{fee: string}",
         "satAmount": "{amount: string} SAT",
         "error": "Gebühren können aktuell nicht abgerufen werden"
@@ -3482,8 +3496,7 @@
                 "pinChangedTitle": "PIN geändert",
                 "pinChangedSubtitle": "Deine PIN wurde erfolgreich geändert.",
                 "pinChangedToast": "PIN wurde erfolgreich geändert",
-                "biometricDescription": "Bestätigen Sie Ihre Identität, um die PIN zu ändern",
-                "biometricRequired": "Biometrische Authentifizierung ist erforderlich, um Ihre PIN zu ändern."
+                "biometricDescription": "Bestätigen Sie Ihre Identität, um die PIN zu ändern"
             }
         },
         "ReplaceCard": {

@@ -72,6 +72,7 @@
   },
   "AuthenticationScreen": {
     "authenticationDescription": "Overte sa, aby ste mohli pokračovať",
+    "authenticationRequired": "Vyžaduje sa overenie. PIN kód alebo biometriu si môžete nastaviť v nastaveniach zabezpečenia.",
     "setUp": "Nastavenie biometrického overovania",
     "setUpAuthenticationDescription": "Použitie biometrických údajov na overovanie",
     "skip": "Preskočiť",
@@ -2131,6 +2132,18 @@
     "categories": "Kategórie",
     "selectAll": "Vybrať všetko",
     "clearAll": "Zrušiť všetko",
+    "addPlace": "Pridať na mapu",
+    "addPlaceTitle": "Pridať miesto",
+    "placePinHint": "Posuňte mapu tak, aby špendlík bol na danom mieste",
+    "placeName": "Názov",
+    "placeNameHint": "Ako sa miesto volá",
+    "placeCategory": "Kategória",
+    "placeLocation": "Poloha",
+    "changeLocation": "Zmeniť",
+    "placeReviewNote": "Nové miesta sa odosielajú do BTC Map. Tamojšia komunita kontroluje a spravuje všetko, čo je na mape.",
+    "placeSubmitted": "Miesto bolo odoslané do BTC Map — ďakujeme, že ste ho pridali",
+    "placeSubmissionFailed": "Miesto sa nepodarilo odoslať. Skontrolujte pripojenie a skúste to znova.",
+    "placeRefused": "BTC Map nemohol prijať toto miesto. Na mapu sa nič nepridalo.",
     "category": {
       "restaurants": "Reštaurácie",
       "cafes": "Kaviarne",
@@ -2162,6 +2175,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "Nesprávny PIN kód. Zostávajú {attemptsRemaining: number} pokusy.",
+    "enterPin": "Zadajte svoj PIN kód",
     "lockoutUnavailable": "Neúspešný pokus sa nepodarilo bezpečne zaznamenať. Odhlásenie.",
     "oneAttemptRemaining": "Nesprávny PIN kód. Zostáva 1 pokus.",
     "pinUnreadable": "PIN kód sa nepodarilo overiť. Skúste to znova.",
@@ -2666,17 +2680,17 @@
     "receive": "Prijať",
     "transfer": "Prevod",
     "lightning": "Lightning",
+    "lightningBelowThreshold": "Lightning pod {threshold: string} SAT",
     "intraledger": "Intraledger",
-    "onchainPriority": "Onchain prioritný (čo najskôr)",
+    "onchainPriority": "Onchain prioritný (~10 min)",
     "onchainStandard": "Onchain štandardný (~4h)",
-    "onchainEconomy": "Onchain ekonomický",
+    "onchainEconomy": "Onchain ekonomický (~24h)",
     "lightningTransactions": "Lightning transakcie",
     "onchainBelowThreshold": "Onchain pod {threshold: string} SAT",
     "onchainAboveThreshold": "Onchain nad {threshold: string} SAT",
     "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Poplatok za prevod",
     "noFee": "bez poplatku",
-    "lightningSendFee": "{fee: string} + ~{routingFee: string} smerovací poplatok",
     "fromApprox": "od ~{fee: string}",
     "satAmount": "{amount: string} SAT",
     "error": "Momentálne nie je možné načítať poplatky"
@@ -3482,8 +3496,7 @@
         "pinChangedTitle": "PIN zmenený",
         "pinChangedSubtitle": "Váš PIN bol úspešne zmenený.",
         "pinChangedToast": "PIN bol úspešne zmenený",
-        "biometricDescription": "Overte svoju totožnosť na zmenu PINu",
-        "biometricRequired": "Na zmenu PINu je vyžadovaná biometrická autentifikácia."
+        "biometricDescription": "Overte svoju totožnosť na zmenu PINu"
       }
     },
     "ReplaceCard": {

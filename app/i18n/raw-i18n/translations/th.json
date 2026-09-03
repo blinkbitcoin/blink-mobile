@@ -72,6 +72,7 @@
   },
   "AuthenticationScreen": {
     "authenticationDescription": "ยืนยันตัวตนเพื่อดำเนินการต่อ",
+    "authenticationRequired": "จำเป็นต้องมีการยืนยันตัวตน คุณสามารถตั้งค่าพินโค้ดหรือไบโอเมตริกได้ในการตั้งค่าความปลอดภัย",
     "setUp": "เปิดใช้งานการยืนยันตัวตนด้วยไบโอเมทริกซ์",
     "setUpAuthenticationDescription": "ใช้ไบโอเมทริกซ์เพื่อยืนยันตัวตน",
     "skip": "ข้าม",
@@ -2131,6 +2132,18 @@
     "categories": "หมวดหมู่",
     "selectAll": "เลือกทั้งหมด",
     "clearAll": "ล้างทั้งหมด",
+    "addPlace": "เพิ่มลงแผนที่",
+    "addPlaceTitle": "เพิ่มสถานที่",
+    "placePinHint": "เลื่อนแผนที่เพื่อวางหมุดบนสถานที่",
+    "placeName": "ชื่อ",
+    "placeNameHint": "สถานที่นี้ชื่ออะไร",
+    "placeCategory": "หมวดหมู่",
+    "placeLocation": "ตำแหน่ง",
+    "changeLocation": "เปลี่ยน",
+    "placeReviewNote": "สถานที่ใหม่จะถูกส่งไปยัง BTC Map ชุมชนของ BTC Map เป็นผู้ตรวจสอบและดูแลทุกอย่างบนแผนที่",
+    "placeSubmitted": "ส่งสถานที่ไปยัง BTC Map แล้ว — ขอบคุณที่เพิ่มเข้ามา",
+    "placeSubmissionFailed": "ไม่สามารถส่งสถานที่ได้ โปรดตรวจสอบการเชื่อมต่อแล้วลองอีกครั้ง",
+    "placeRefused": "BTC Map ไม่สามารถรับสถานที่นี้ได้ ไม่มีสิ่งใดถูกเพิ่มลงในแผนที่",
     "category": {
       "restaurants": "ร้านอาหาร",
       "cafes": "ร้านกาแฟ",
@@ -2162,6 +2175,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "พินนี้ผิด มีโอกาสใส่พินอีก {attemptsRemaining: number} ครั้ง",
+    "enterPin": "ป้อนพินโค้ด",
     "lockoutUnavailable": "ไม่สามารถบันทึกการพยายามที่ผิดพลาดได้อย่างปลอดภัย ทำการออกจากระบบ",
     "oneAttemptRemaining": "พินนี้ผิด โอกาสสุดท้าย",
     "pinUnreadable": "ไม่สามารถตรวจสอบพินของคุณได้ กรุณาลองอีกครั้ง",
@@ -2666,17 +2680,17 @@
     "receive": "รับเงิน",
     "transfer": "โอน",
     "lightning": "Lightning",
+    "lightningBelowThreshold": "Lightning ต่ำกว่า {threshold: string} SAT",
     "intraledger": "Intraledger",
-    "onchainPriority": "Onchain ด่วน (เร็วที่สุด)",
+    "onchainPriority": "Onchain ด่วน (~10 นาที)",
     "onchainStandard": "Onchain มาตรฐาน (~4 ชม.)",
-    "onchainEconomy": "Onchain ประหยัด",
+    "onchainEconomy": "Onchain ประหยัด (~24 ชม.)",
     "lightningTransactions": "ธุรกรรม Lightning",
     "onchainBelowThreshold": "Onchain ต่ำกว่า {threshold: string} SAT",
     "onchainAboveThreshold": "Onchain มากกว่า {threshold: string} SAT",
     "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "ค่าธรรมเนียมการโอน",
     "noFee": "ไม่มีค่าธรรมเนียม",
-    "lightningSendFee": "{fee: string} + ~{routingFee: string} ค่าธรรมเนียมการกำหนดเส้นทาง",
     "fromApprox": "เริ่มต้น ~{fee: string}",
     "satAmount": "{amount: string} SAT",
     "error": "ไม่สามารถเรียกค่าธรรมเนียมได้ในขณะนี้"
@@ -3482,8 +3496,7 @@
         "pinChangedTitle": "เปลี่ยน PIN แล้ว",
         "pinChangedSubtitle": "PIN ของคุณถูกเปลี่ยนเรียบร้อยแล้ว",
         "pinChangedToast": "เปลี่ยน PIN สำเร็จแล้ว",
-        "biometricDescription": "ยืนยันตัวตนของคุณเพื่อเปลี่ยนรหัส PIN",
-        "biometricRequired": "ต้องใช้การยืนยันตัวตนด้วยไบโอเมตริกเพื่อเปลี่ยนรหัส PIN ของคุณ"
+        "biometricDescription": "ยืนยันตัวตนของคุณเพื่อเปลี่ยนรหัส PIN"
       }
     },
     "ReplaceCard": {

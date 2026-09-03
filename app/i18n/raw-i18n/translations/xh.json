@@ -72,6 +72,7 @@
   },
   "AuthenticationScreen": {
     "authenticationDescription": "Qinisekisa ukuqhubeka",
+    "authenticationRequired": "Kufuneka uqinisekiso. Ungaseta ikhowudi ye-PIN okanye i-biometrics kusetingi zokhuseleko.",
     "setUp": "Cwangcisa uQinisekiso lwebhayometriki",
     "setUpAuthenticationDescription": "Sebenzisa ibhayometriki ukungqinisisa",
     "skip": "Tsiba",
@@ -2131,6 +2132,18 @@
     "categories": "Iindidi",
     "selectAll": "Khetha konke",
     "clearAll": "Cima konke",
+    "addPlace": "Yongeza kwimephu",
+    "addPlaceTitle": "Yongeza indawo",
+    "placePinHint": "Shukumisa imephu ubeke isalathiso kwindawo",
+    "placeName": "Igama",
+    "placeNameHint": "Le ndawo ibizwa ngokuba yintoni",
+    "placeCategory": "Udidi",
+    "placeLocation": "Indawo",
+    "changeLocation": "Tshintsha",
+    "placeReviewNote": "Iindawo ezintsha zithunyelwa kwi-BTC Map. Uluntu lwayo luhlola kwaye lugcine yonke into ekwimephu.",
+    "placeSubmitted": "Indawo ithunyelwe kwi-BTC Map — enkosi ngokuyongeza",
+    "placeSubmissionFailed": "Indawo ayikwazanga ukuthunyelwa. Jonga unxibelelwano lwakho uze uzame kwakhona.",
+    "placeRefused": "I-BTC Map ayikwazanga ukwamkela le ndawo. Akukho nto yongezwayo kwimephu.",
     "category": {
       "restaurants": "Iindawo zokutyela",
       "cafes": "Iikhefi",
@@ -2162,6 +2175,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "I-PIN engalunganga. {attemptsRemaining: number} imizamo eseleyo.",
+    "enterPin": "Faka ikhowudi yakho ye-PIN",
     "lockoutUnavailable": "Akukwazekanga ukurekhoda umzamo ongaphumelelanga ngokukhuselekileyo. Ukuloga ngaphandle.",
     "oneAttemptRemaining": "PIN engalunganga. Kushiyeke umzamo “1”.",
     "pinUnreadable": "Ayikwazanga ukujonga i-PIN yakho. Nceda uzame kwakhona.",
@@ -2666,17 +2680,17 @@
     "receive": "Yamkela",
     "transfer": "Dlulisela",
     "lightning": "Lightning",
+    "lightningBelowThreshold": "I-Lightning ngaphantsi kwe-{threshold: string} SAT",
     "intraledger": "Intraledger",
-    "onchainPriority": "I-Onchain ephambili (ngokukhawuleza)",
+    "onchainPriority": "I-Onchain ephambili (~10 min)",
     "onchainStandard": "I-Onchain eqhelekileyo (~4h)",
-    "onchainEconomy": "I-Onchain elondolozayo",
+    "onchainEconomy": "I-Onchain elondolozayo (~24h)",
     "lightningTransactions": "Iintengiselwano ze-Lightning",
     "onchainBelowThreshold": "I-Onchain ngaphantsi kwe-{threshold: string} SAT",
     "onchainAboveThreshold": "I-Onchain ngaphezulu kwe-{threshold: string} SAT",
     "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Umrhumo wokudlulisela",
     "noFee": "akukho mrhumo",
-    "lightningSendFee": "{fee: string} + ~{routingFee: string} umrhumo wokuthumela",
     "fromApprox": "ukusuka ku-~{fee: string}",
     "satAmount": "{amount: string} SAT",
     "error": "Ayikwazanga kufumana imirhumo ngeli xesha"
@@ -3482,8 +3496,7 @@
         "pinChangedTitle": "I-PIN itshintshiwe",
         "pinChangedSubtitle": "I-PIN yakho itshintshwe ngempumelelo.",
         "pinChangedToast": "I-PIN itshintshiwe ngempumelelo",
-        "biometricDescription": "Qinisekisa isazisi sakho ukuze utshintshe iPIN",
-        "biometricRequired": "Ukuqinisekiswa kwe-biometric kuyafuneka ukutshintsha iPIN yakho."
+        "biometricDescription": "Qinisekisa isazisi sakho ukuze utshintshe iPIN"
       }
     },
     "ReplaceCard": {

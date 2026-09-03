@@ -72,6 +72,7 @@
   },
   "AuthenticationScreen": {
     "authenticationDescription": "Thibitisha ili kuendelea",
+    "authenticationRequired": "Uthibitishaji unahitajika. Unaweza kuweka pini au bayometriki katika mipangilio ya usalama.",
     "setUp": "Weka uthibitishaji wa kibayometriki",
     "setUpAuthenticationDescription": "Tumia uthibitishaji wa kibiometriki",
     "skip": "Ruka",
@@ -2131,6 +2132,18 @@
     "categories": "Kategoria",
     "selectAll": "Chagua zote",
     "clearAll": "Futa zote",
+    "addPlace": "Ongeza kwenye ramani",
+    "addPlaceTitle": "Ongeza mahali",
+    "placePinHint": "Sogeza ramani ili alama iwe juu ya mahali hapo",
+    "placeName": "Jina",
+    "placeNameHint": "Mahali hapa panaitwaje",
+    "placeCategory": "Kategoria",
+    "placeLocation": "Mahali",
+    "changeLocation": "Badilisha",
+    "placeReviewNote": "Maeneo mapya hutumwa kwa BTC Map. Jumuiya yake hukagua na kutunza kila kitu kilicho kwenye ramani.",
+    "placeSubmitted": "Mahali pametumwa kwa BTC Map — asante kwa kupaongeza",
+    "placeSubmissionFailed": "Mahali hayakuweza kutumwa. Angalia muunganisho wako na ujaribu tena.",
+    "placeRefused": "BTC Map haikuweza kukubali mahali hapa. Hakuna chochote kilichoongezwa kwenye ramani.",
     "category": {
       "restaurants": "Migahawa",
       "cafes": "Kafe",
@@ -2162,6 +2175,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "Pini sahihi. {attemptsRemaining: number} yamesalia.",
+    "enterPin": "Ingiza pini yako",
     "lockoutUnavailable": "Imeshindwa kurekodi jaribio lililokosa kwa usalama. Kutoka nje ya programu.",
     "oneAttemptRemaining": "Pini si sahihi. Jaribio 1 limesalia.",
     "pinUnreadable": "Imeshindwa kuangalia pini yako. Tafadhali jaribu tena.",
@@ -2666,17 +2680,17 @@
     "receive": "Pokea",
     "transfer": "Hamisha",
     "lightning": "Lightning",
+    "lightningBelowThreshold": "Lightning chini ya {threshold: string} SAT",
     "intraledger": "Intraledger",
-    "onchainPriority": "Onchain kipaumbele (haraka iwezekanavyo)",
+    "onchainPriority": "Onchain kipaumbele (~dakika 10)",
     "onchainStandard": "Onchain kawaida (~saa 4)",
-    "onchainEconomy": "Onchain nafuu",
+    "onchainEconomy": "Onchain nafuu (~saa 24)",
     "lightningTransactions": "Miamala ya Lightning",
     "onchainBelowThreshold": "Onchain chini ya {threshold: string} SAT",
     "onchainAboveThreshold": "Onchain zaidi ya {threshold: string} SAT",
     "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Ada ya uhamisho",
     "noFee": "hakuna ada",
-    "lightningSendFee": "{fee: string} + ~{routingFee: string} ada ya uelekezaji",
     "fromApprox": "kuanzia ~{fee: string}",
     "satAmount": "{amount: string} SAT",
     "error": "Hatuwezi kupata ada kwa wakati huu"
@@ -3482,8 +3496,7 @@
         "pinChangedTitle": "PIN imebadilishwa",
         "pinChangedSubtitle": "PIN yako imebadilishwa kwa mafanikio.",
         "pinChangedToast": "PIN imebadilishwa kwa mafanikio",
-        "biometricDescription": "Thibitisha utambulisho wako kubadilisha PIN",
-        "biometricRequired": "Uthibitishaji wa kibayometriki unahitajika kubadilisha PIN yako."
+        "biometricDescription": "Thibitisha utambulisho wako kubadilisha PIN"
       }
     },
     "ReplaceCard": {

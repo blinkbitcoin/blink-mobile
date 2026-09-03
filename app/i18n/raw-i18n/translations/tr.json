@@ -72,6 +72,7 @@
   },
   "AuthenticationScreen": {
     "authenticationDescription": "Devam edebilmek için doğrula",
+    "authenticationRequired": "Kimlik doğrulama gerekli. Güvenlik ayarlarından PIN kodu veya biyometri ayarlayabilirsin.",
     "setUp": "Biyometrik doğrulamayı ayarlayın",
     "setUpAuthenticationDescription": "Doğrulama için biyometrik veri kullan",
     "skip": "Atla",
@@ -2131,6 +2132,18 @@
     "categories": "Kategoriler",
     "selectAll": "Tümünü seç",
     "clearAll": "Tümünü temizle",
+    "addPlace": "Haritaya ekle",
+    "addPlaceTitle": "Yer ekle",
+    "placePinHint": "İşaretçiyi yerin üzerine getirmek için haritayı kaydırın",
+    "placeName": "Ad",
+    "placeNameHint": "Buranın adı nedir",
+    "placeCategory": "Kategori",
+    "placeLocation": "Konum",
+    "changeLocation": "Değiştir",
+    "placeReviewNote": "Yeni yerler BTC Map'e gönderilir. Haritadaki her şeyi BTC Map topluluğu kontrol eder ve güncel tutar.",
+    "placeSubmitted": "Yer BTC Map'e gönderildi — eklediğiniz için teşekkürler",
+    "placeSubmissionFailed": "Yer gönderilemedi. Bağlantınızı kontrol edip tekrar deneyin.",
+    "placeRefused": "BTC Map bu yeri kabul edemedi. Haritaya hiçbir şey eklenmedi.",
     "category": {
       "restaurants": "Restoranlar",
       "cafes": "Kafeler",
@@ -2162,6 +2175,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "Yanlış PIN kodu. Kalan deneme hakkınız: {attemptsRemaining: number}",
+    "enterPin": "PIN kodunu gir",
     "lockoutUnavailable": "Başarısız deneme güvenli şekilde kaydedilemedi. Çıkış yapılıyor.",
     "oneAttemptRemaining": "Yanlış PIN kodu. Kalan deneme hakkınız: 1",
     "pinUnreadable": "PIN kodunuz kontrol edilemedi. Lütfen tekrar deneyin.",
@@ -2666,17 +2680,17 @@
     "receive": "Al",
     "transfer": "Transfer",
     "lightning": "Lightning",
+    "lightningBelowThreshold": "Lightning {threshold: string} SAT altı",
     "intraledger": "Intraledger",
-    "onchainPriority": "Onchain öncelikli (en kısa sürede)",
+    "onchainPriority": "Onchain öncelikli (~10 dakika)",
     "onchainStandard": "Onchain standart (~4 saat)",
-    "onchainEconomy": "Onchain ekonomik",
+    "onchainEconomy": "Onchain ekonomik (~24 saat)",
     "lightningTransactions": "Lightning işlemleri",
     "onchainBelowThreshold": "Onchain {threshold: string} SAT altı",
     "onchainAboveThreshold": "Onchain {threshold: string} SAT üzeri",
     "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Transfer ücreti",
     "noFee": "ücretsiz",
-    "lightningSendFee": "{fee: string} + ~{routingFee: string} yönlendirme ücreti",
     "fromApprox": "en az ~{fee: string}",
     "satAmount": "{amount: string} SAT",
     "error": "Şu an için ücretlere ulaşamıyoruz"
@@ -3482,8 +3496,7 @@
         "pinChangedTitle": "PIN değiştirildi",
         "pinChangedSubtitle": "PIN'iniz başarıyla değiştirildi.",
         "pinChangedToast": "PIN başarıyla değiştirildi",
-        "biometricDescription": "PIN'inizi değiştirmek için kimliğinizi doğrulayın",
-        "biometricRequired": "PIN'inizi değiştirmek için biyometrik kimlik doğrulama gereklidir."
+        "biometricDescription": "PIN'inizi değiştirmek için kimliğinizi doğrulayın"
       }
     },
     "ReplaceCard": {

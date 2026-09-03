@@ -1,5 +1,5 @@
 import React from "react"
-import { BackHandler } from "react-native"
+import { Alert, BackHandler } from "react-native"
 import { act, fireEvent, render, screen } from "@testing-library/react-native"
 
 import { PinScreen } from "@app/screens/authentication-screen/pin-screen"
@@ -17,10 +17,15 @@ import { flushEffects } from "../../helpers/flush-effects"
 const mockReset = jest.fn()
 const mockGoBack = jest.fn()
 const mockSetAppUnlocked = jest.fn()
+const mockAddListener = jest.fn()
 
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
-  useNavigation: () => ({ reset: mockReset, goBack: mockGoBack }),
+  useNavigation: () => ({
+    reset: mockReset,
+    goBack: mockGoBack,
+    addListener: mockAddListener,
+  }),
 }))
 
 jest.mock("@app/navigation/navigation-container-wrapper", () => ({
@@ -81,20 +86,30 @@ const primeStore = () => {
   mockedStore.getSessionProfiles.mockResolvedValue([])
 }
 
+type ChallengeCallbacks = {
+  onChallengeSuccess?: () => void
+  onChallengeFailure?: () => void
+}
+
 const buildRoute = (
   isResume?: boolean,
   screenPurpose: PinScreenPurpose = PinScreenPurpose.AuthenticatePin,
+  callbacks: ChallengeCallbacks = {},
 ): RouteProp<RootStackParamList, "pin"> =>
   ({
     key: "pin",
     name: "pin",
-    params: { screenPurpose, isResume },
+    params: { screenPurpose, isResume, ...callbacks },
   }) as RouteProp<RootStackParamList, "pin">
 
-const renderScreen = (isResume?: boolean, screenPurpose?: PinScreenPurpose) =>
+const renderScreen = (
+  isResume?: boolean,
+  screenPurpose?: PinScreenPurpose,
+  callbacks?: ChallengeCallbacks,
+) =>
   render(
     <ContextForScreen>
-      <PinScreen route={buildRoute(isResume, screenPurpose)} />
+      <PinScreen route={buildRoute(isResume, screenPurpose, callbacks)} />
     </ContextForScreen>,
   )
 
@@ -108,6 +123,24 @@ const pressBack = () => {
   )
   return registration?.[1]() ?? false
 }
+
+/** Runs whatever the screen registered for beforeRemove with the removing action's
+ *  type — POP for gesture/header back and the screen's own goBack, GO_BACK for the
+ *  hardware button, RESET for stack-wide resets the screen doesn't own. */
+const fireBeforeRemove = (actionType = "POP") => {
+  const registration = mockAddListener.mock.calls.find(
+    ([eventName]) => eventName === "beforeRemove",
+  )
+  registration?.[1]({ data: { action: { type: actionType } } })
+}
+
+/** The decline callback is deferred a tick past the removing pop's dispatch. */
+const flushDeferredDecline = () =>
+  act(async () => {
+    await new Promise((resolve) => {
+      setTimeout(resolve, 0)
+    })
+  })
 
 const enterPin = async (pin: string) => {
   for (const digit of pin.split("")) {
@@ -126,6 +159,7 @@ describe("PinScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     primeStore()
+    mockAddListener.mockReturnValue(jest.fn())
     backHandlerSpy = jest.spyOn(BackHandler, "addEventListener")
   })
 
@@ -207,6 +241,54 @@ describe("PinScreen", () => {
     expect(mockSetAppUnlocked).not.toHaveBeenCalled()
     expect(mockGoBack).not.toHaveBeenCalled()
     expect(mockReset).not.toHaveBeenCalled()
+  })
+
+  describe("the dismiss control", () => {
+    /** The screen carries no header, so without this the only ways out are the
+     *  edge swipe and the hardware back — neither of which is visible. */
+    it("is absent on the app lock, which must offer no way out", async () => {
+      renderScreen(true)
+      await flushEffects()
+
+      expect(screen.queryByTestId("pinScreenDismiss")).toBeNull()
+    })
+
+    it("is absent on a cold-start unlock too", async () => {
+      renderScreen(false)
+      await flushEffects()
+
+      expect(screen.queryByTestId("pinScreenDismiss")).toBeNull()
+    })
+
+    it("leaves the set-pin flow when pressed", async () => {
+      renderScreen(undefined, PinScreenPurpose.SetPin)
+      await flushEffects()
+
+      fireEvent.press(screen.getByTestId("pinScreenDismiss"))
+
+      expect(mockGoBack).toHaveBeenCalledTimes(1)
+    })
+
+    it("leaves a challenge when pressed, which the caller reads as a decline", async () => {
+      /** The goBack dispatches a POP, and the beforeRemove listener turns that
+       *  into the decline — the same path a swipe takes. */
+      renderScreen(undefined, PinScreenPurpose.ChallengePin, {
+        onChallengeSuccess: jest.fn(),
+        onChallengeFailure: jest.fn(),
+      })
+      await flushEffects()
+
+      fireEvent.press(screen.getByTestId("pinScreenDismiss"))
+
+      expect(mockGoBack).toHaveBeenCalledTimes(1)
+    })
+
+    it("is announced, not just tappable", async () => {
+      renderScreen(undefined, PinScreenPurpose.SetPin)
+      await flushEffects()
+
+      expect(screen.getByLabelText("Back")).toBeTruthy()
+    })
   })
 
   describe("brute-force lockout", () => {
@@ -417,6 +499,61 @@ describe("PinScreen", () => {
     })
   })
 
+  describe("SetPin: creating a pin from settings", () => {
+    it("re-arms after a mismatch so the user can start over", async () => {
+      renderScreen(undefined, PinScreenPurpose.SetPin)
+      await flushEffects()
+
+      await enterPin("1111")
+      await enterPin("2222")
+
+      expect(mockedStore.setPin).not.toHaveBeenCalled()
+
+      await enterPin("3333")
+      await enterPin("3333")
+
+      expect(mockedStore.setPin).toHaveBeenCalledWith("3333")
+      expect(mockGoBack).toHaveBeenCalledTimes(1)
+    })
+
+    it("explains a failed store and re-arms for another try", async () => {
+      mockedStore.setPin.mockResolvedValueOnce(false)
+      const alertSpy = jest.spyOn(Alert, "alert").mockImplementation(() => {})
+
+      renderScreen(undefined, PinScreenPurpose.SetPin)
+      await flushEffects()
+
+      await enterPin("1111")
+      await enterPin("1111")
+
+      expect(alertSpy).toHaveBeenCalledWith("Unable to store your pin.")
+      expect(mockGoBack).not.toHaveBeenCalled()
+
+      /** The failure path runs through returnToSetPin — the keypad must be live
+       *  again or the user is stuck. */
+      await enterPin("2222")
+      await enterPin("2222")
+
+      expect(mockedStore.setPin).toHaveBeenLastCalledWith("2222")
+      expect(mockGoBack).toHaveBeenCalledTimes(1)
+    })
+
+    it("backspace edits the entry between attempts", async () => {
+      renderScreen(undefined, PinScreenPurpose.SetPin)
+      await flushEffects()
+
+      /** Types "112", rubs out the stray 2, then finishes "1111". A backspace
+       *  that did nothing would leave "1121" and the verification would not
+       *  match, so setPin would never see this value. */
+      await enterPin("112")
+      fireEvent.press(screen.getByTestId("pinPadBackspace"))
+      await enterPin("11")
+      await enterPin("1111")
+
+      expect(mockedStore.setPin).toHaveBeenCalledWith("1111")
+    })
+  })
+
   describe("input while a verification is in flight", () => {
     beforeEach(() => {
       // flushEffects relies on setImmediate; keep it real so effects settle.
@@ -491,6 +628,423 @@ describe("PinScreen", () => {
       await advance(11_000)
 
       expect(screen.getByText("1")).not.toBeDisabled()
+    })
+  })
+})
+
+/** Split from the block above only to stay inside max-lines-per-function; the
+ *  arrangement is the same. */
+describe("PinScreen ChallengePin", () => {
+  beforeAll(() => {
+    loadLocale("en")
+  })
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    primeStore()
+    mockAddListener.mockReturnValue(jest.fn())
+    backHandlerSpy = jest.spyOn(BackHandler, "addEventListener")
+  })
+
+  afterEach(() => {
+    jest.restoreAllMocks()
+  })
+
+  describe("ChallengePin: verifying the pin for a caller without touching the app lock", () => {
+    const renderChallenge = (callbacks: ChallengeCallbacks) =>
+      renderScreen(undefined, PinScreenPurpose.ChallengePin, callbacks)
+
+    it("resolves the challenge and steps back on the correct pin, never unlocking the app", async () => {
+      const onChallengeSuccess = jest.fn()
+      const onChallengeFailure = jest.fn()
+      renderChallenge({ onChallengeSuccess, onChallengeFailure })
+      await flushEffects()
+
+      await enterPin(CORRECT_PIN)
+
+      expect(onChallengeSuccess).toHaveBeenCalledTimes(1)
+      expect(onChallengeFailure).not.toHaveBeenCalled()
+      expect(mockedStore.clearPinFailureState).toHaveBeenCalled()
+      expect(mockGoBack).toHaveBeenCalledTimes(1)
+      /** The load-bearing assertions: a challenge must never masquerade as the app unlock. */
+      expect(mockSetAppUnlocked).not.toHaveBeenCalled()
+      expect(mockReset).not.toHaveBeenCalled()
+    })
+
+    it("shows a label so the challenge isn't a bare keypad over arbitrary content", async () => {
+      renderChallenge({})
+      await flushEffects()
+
+      expect(screen.getByText("Enter your PIN code")).toBeTruthy()
+    })
+
+    it("does not report failure when the pop after success fires beforeRemove", async () => {
+      const onChallengeFailure = jest.fn()
+      renderChallenge({ onChallengeSuccess: jest.fn(), onChallengeFailure })
+      await flushEffects()
+
+      await enterPin(CORRECT_PIN)
+      fireBeforeRemove()
+      await flushDeferredDecline()
+
+      expect(onChallengeFailure).not.toHaveBeenCalled()
+    })
+
+    it("treats dismissal as a decline, exactly once", async () => {
+      const onChallengeSuccess = jest.fn()
+      const onChallengeFailure = jest.fn()
+      renderChallenge({ onChallengeSuccess, onChallengeFailure })
+      await flushEffects()
+
+      fireBeforeRemove()
+      fireBeforeRemove()
+      await flushDeferredDecline()
+
+      expect(onChallengeFailure).toHaveBeenCalledTimes(1)
+      expect(onChallengeSuccess).not.toHaveBeenCalled()
+    })
+
+    it("defers the decline callback until the removing pop has settled", async () => {
+      /** The listener runs inside the pop's dispatch; a goBack the caller issues
+       *  synchronously in response coalesces with that pop and is swallowed,
+       *  stranding the caller on its pending screen (found live: the backup
+       *  screen sat on its spinner forever after a decline). */
+      const onChallengeFailure = jest.fn()
+      renderChallenge({ onChallengeSuccess: jest.fn(), onChallengeFailure })
+      await flushEffects()
+
+      fireBeforeRemove()
+
+      expect(onChallengeFailure).not.toHaveBeenCalled()
+
+      await flushDeferredDecline()
+
+      expect(onChallengeFailure).toHaveBeenCalledTimes(1)
+    })
+
+    it("treats the hardware back as a decline too", async () => {
+      const onChallengeFailure = jest.fn()
+      renderChallenge({ onChallengeSuccess: jest.fn(), onChallengeFailure })
+      await flushEffects()
+
+      fireBeforeRemove("GO_BACK")
+      await flushDeferredDecline()
+
+      expect(onChallengeFailure).toHaveBeenCalledTimes(1)
+    })
+
+    it("stays silent when a stack-wide reset removes the challenge", async () => {
+      /** A reset (migration blocker, resume relock, the lockout's own logout)
+       *  unmounts the caller too — a decline callback would toast and goBack
+       *  into a screen that no longer exists. */
+      const onChallengeFailure = jest.fn()
+      renderChallenge({ onChallengeSuccess: jest.fn(), onChallengeFailure })
+      await flushEffects()
+
+      fireBeforeRemove("RESET")
+      await flushDeferredDecline()
+
+      expect(onChallengeFailure).not.toHaveBeenCalled()
+    })
+
+    it("a reset resolves the challenge: a pop arriving after it reports nothing", async () => {
+      const onChallengeFailure = jest.fn()
+      renderChallenge({ onChallengeSuccess: jest.fn(), onChallengeFailure })
+      await flushEffects()
+
+      fireBeforeRemove("RESET")
+      fireBeforeRemove("POP")
+      await flushDeferredDecline()
+
+      expect(onChallengeFailure).not.toHaveBeenCalled()
+    })
+
+    /**
+     * RESET is the one removal the challenge doesn't own, because it takes the
+     * caller with it. Every other removal leaves the caller mounted and waiting,
+     * so silence there is a caller stuck on a spinner forever — which is what an
+     * allowlist of pop-family types produced for everything it did not list.
+     */
+    it("declines when a removal the pop family never named takes the screen", async () => {
+      const onChallengeFailure = jest.fn()
+      renderChallenge({ onChallengeSuccess: jest.fn(), onChallengeFailure })
+      await flushEffects()
+
+      // A deep link or notification routing away while the challenge is focused.
+      fireBeforeRemove("REPLACE")
+      await flushDeferredDecline()
+
+      expect(onChallengeFailure).toHaveBeenCalledTimes(1)
+    })
+
+    it("declines on an action type nothing here anticipated", async () => {
+      const onChallengeFailure = jest.fn()
+      renderChallenge({ onChallengeSuccess: jest.fn(), onChallengeFailure })
+      await flushEffects()
+
+      fireBeforeRemove("SOME_FUTURE_ACTION")
+      await flushDeferredDecline()
+
+      expect(onChallengeFailure).toHaveBeenCalledTimes(1)
+    })
+
+    /**
+     * The two resolutions can be in flight at once: the entry is being verified
+     * when the user taps dismiss. Both used to fire, so the caller rendered its
+     * protected content and was popped out of it a tick later.
+     */
+    describe("a dismiss landing while the entry is still being verified", () => {
+      /** Holds `verifyPin` open at its stored-pin read. */
+      const verificationHeldOpen = () => {
+        let release = () => {}
+        mockedStore.getPin.mockImplementation(
+          () =>
+            new Promise<string | null>((resolve) => {
+              release = () => resolve(stored.pin)
+            }),
+        )
+        return () => release()
+      }
+
+      it("reports the decline and not also the success", async () => {
+        const release = verificationHeldOpen()
+        const onChallengeSuccess = jest.fn()
+        const onChallengeFailure = jest.fn()
+        renderChallenge({ onChallengeSuccess, onChallengeFailure })
+        await flushEffects()
+
+        await enterPin(CORRECT_PIN)
+        fireBeforeRemove()
+        await act(async () => {
+          release()
+        })
+        await flushDeferredDecline()
+
+        expect(onChallengeFailure).toHaveBeenCalledTimes(1)
+        expect(onChallengeSuccess).not.toHaveBeenCalled()
+      })
+
+      it("does not step back a second time on the verification that lost", async () => {
+        const release = verificationHeldOpen()
+        renderChallenge({ onChallengeSuccess: jest.fn(), onChallengeFailure: jest.fn() })
+        await flushEffects()
+
+        await enterPin(CORRECT_PIN)
+        fireBeforeRemove()
+        await act(async () => {
+          release()
+        })
+        await flushDeferredDecline()
+
+        /** The removal is already under way; a goBack here would pop whatever
+         *  the caller landed on. */
+        expect(mockGoBack).not.toHaveBeenCalled()
+      })
+
+      it("still resolves normally when nothing dismisses it", async () => {
+        const release = verificationHeldOpen()
+        const onChallengeSuccess = jest.fn()
+        const onChallengeFailure = jest.fn()
+        renderChallenge({ onChallengeSuccess, onChallengeFailure })
+        await flushEffects()
+
+        await enterPin(CORRECT_PIN)
+        await act(async () => {
+          release()
+        })
+        await flushDeferredDecline()
+
+        expect(onChallengeSuccess).toHaveBeenCalledTimes(1)
+        expect(onChallengeFailure).not.toHaveBeenCalled()
+        expect(mockGoBack).toHaveBeenCalledTimes(1)
+      })
+    })
+
+    /**
+     * The terminal outcomes set the farewell and then tear the session down. A
+     * dismiss tapped in that window declines into a session already going away
+     * and races the reset that ends it.
+     */
+    describe("the dismiss control during the lockout teardown", () => {
+      it("ignores a tap while the logout runs", async () => {
+        let releaseLogout!: () => void
+        mockLogout.mockReturnValueOnce(
+          new Promise<void>((resolve) => {
+            releaseLogout = resolve
+          }),
+        )
+        stored.attempts = 2
+
+        const onChallengeFailure = jest.fn()
+        renderChallenge({ onChallengeSuccess: jest.fn(), onChallengeFailure })
+        await flushEffects()
+
+        await enterPin(WRONG_PIN)
+        fireEvent.press(screen.getByTestId("pinScreenDismiss"))
+        await flushDeferredDecline()
+
+        expect(mockGoBack).not.toHaveBeenCalled()
+        expect(onChallengeFailure).not.toHaveBeenCalled()
+
+        releaseLogout()
+      })
+
+      /**
+       * Deliberately still live during the countdown, which is where gating the
+       * control on the keypad's own disabled state would have put it: a
+       * challenge the user cannot currently answer is exactly when they most
+       * want to leave, and the back gesture lets them regardless.
+       */
+      it("still dismisses while the lockout countdown runs", async () => {
+        renderChallenge({ onChallengeSuccess: jest.fn(), onChallengeFailure: jest.fn() })
+        await flushEffects()
+
+        await enterPin(WRONG_PIN)
+        expect(screen.getByText(/try again in/i)).toBeTruthy()
+
+        fireEvent.press(screen.getByTestId("pinScreenDismiss"))
+
+        expect(mockGoBack).toHaveBeenCalledTimes(1)
+      })
+    })
+
+    it("leaves the back press alone, so dismissal stays possible", async () => {
+      renderChallenge({})
+      await flushEffects()
+
+      expect(pressBack()).toBe(false)
+    })
+
+    it("counts a wrong pin against the shared attempts counter and stays up", async () => {
+      const onChallengeSuccess = jest.fn()
+      const onChallengeFailure = jest.fn()
+      renderChallenge({ onChallengeSuccess, onChallengeFailure })
+      await flushEffects()
+
+      await enterPin(WRONG_PIN)
+
+      /** One budget for both purposes: a challenge cannot be a free guessing
+       *  channel against the pin that protects the whole app. */
+      expect(stored.attempts).toBe(1)
+      expect(onChallengeSuccess).not.toHaveBeenCalled()
+      expect(onChallengeFailure).not.toHaveBeenCalled()
+      expect(mockGoBack).not.toHaveBeenCalled()
+      expect(mockReset).not.toHaveBeenCalled()
+    })
+
+    it("refuses a guess while the shared lockout from an earlier screen still runs", async () => {
+      stored.attempts = 1
+      stored.lockedUntil = Date.now() + 10_000
+
+      const onChallengeSuccess = jest.fn()
+      renderChallenge({ onChallengeSuccess, onChallengeFailure: jest.fn() })
+      await flushEffects()
+
+      await enterPin(CORRECT_PIN)
+
+      expect(onChallengeSuccess).not.toHaveBeenCalled()
+      expect(mockGoBack).not.toHaveBeenCalled()
+    })
+
+    it("still resets the stack when the lockout's logout fails", async () => {
+      /** The reset is the lockout's terminal answer; a logout error must not
+       *  strand the caller behind a challenge that can no longer resolve. */
+      mockLogout.mockRejectedValueOnce(new Error("network down"))
+      stored.attempts = 2
+
+      renderChallenge({ onChallengeSuccess: jest.fn(), onChallengeFailure: jest.fn() })
+      await flushEffects()
+
+      await enterPin(WRONG_PIN)
+
+      expect(mockReset).toHaveBeenCalledWith({
+        index: 0,
+        routes: [{ name: "Primary" }],
+      })
+    })
+
+    it("ignores input typed during the lockout's logout window", async () => {
+      /** The lockout awaits logout + a grace sleep before resetting the stack. The
+       *  keypad must be dead in that window: a correct pin typed there would
+       *  otherwise resolve the challenge against a session being destroyed. */
+      let releaseLogout!: () => void
+      mockLogout.mockReturnValueOnce(
+        new Promise<void>((resolve) => {
+          releaseLogout = resolve
+        }),
+      )
+      stored.attempts = 2
+
+      const onChallengeSuccess = jest.fn()
+      renderChallenge({ onChallengeSuccess, onChallengeFailure: jest.fn() })
+      await flushEffects()
+
+      await enterPin(WRONG_PIN)
+      await enterPin(CORRECT_PIN)
+
+      expect(mockLogout).toHaveBeenCalledTimes(1)
+      expect(onChallengeSuccess).not.toHaveBeenCalled()
+      expect(mockGoBack).not.toHaveBeenCalled()
+
+      releaseLogout()
+    })
+
+    describe("after the shared lockout elapses", () => {
+      beforeEach(() => {
+        // flushEffects relies on setImmediate; keep it real so effects settle.
+        jest.useFakeTimers({ doNotFake: ["setImmediate"] })
+      })
+
+      afterEach(() => {
+        jest.useRealTimers()
+      })
+
+      it("re-arms the keypad after a wrong guess, so the next attempt can resolve", async () => {
+        const onChallengeSuccess = jest.fn()
+        renderChallenge({ onChallengeSuccess, onChallengeFailure: jest.fn() })
+        await flushEffects()
+
+        await enterPin(WRONG_PIN)
+        expect(stored.attempts).toBe(1)
+
+        await flushEffects()
+        await act(async () => {
+          jest.advanceTimersByTime(MAX_LOCKOUT_MS + 1000)
+        })
+        await flushEffects()
+
+        await enterPin(CORRECT_PIN)
+
+        expect(onChallengeSuccess).toHaveBeenCalledTimes(1)
+        expect(mockGoBack).toHaveBeenCalledTimes(1)
+      })
+
+      it("answers the third wrong guess the way the app lock does: logout and reset", async () => {
+        /** The budget is the one the app lock enforces. Merely failing the challenge
+         *  at the cap would hand out a fresh guess per re-entry — an unbounded brute
+         *  force against the pin that protects the whole app. */
+        stored.attempts = 2
+        const onChallengeSuccess = jest.fn()
+        const onChallengeFailure = jest.fn()
+        renderChallenge({ onChallengeSuccess, onChallengeFailure })
+        await flushEffects()
+
+        await enterPin(WRONG_PIN)
+
+        expect(mockLogout).toHaveBeenCalledTimes(1)
+        await act(async () => {
+          jest.advanceTimersByTime(1000) // the screen sleeps 1s before resetting
+        })
+        await flushEffects()
+
+        expect(mockReset).toHaveBeenCalledWith({
+          index: 0,
+          routes: [{ name: "Primary" }],
+        })
+        /** The reset unmounts the caller; a failure callback into it would be noise. */
+        expect(onChallengeSuccess).not.toHaveBeenCalled()
+        expect(onChallengeFailure).not.toHaveBeenCalled()
+      })
     })
   })
 })

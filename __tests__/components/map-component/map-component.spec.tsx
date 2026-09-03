@@ -1,5 +1,7 @@
 import React from "react"
 import { Region } from "react-native-maps"
+import { generateSecureRandom } from "react-native-securerandom"
+import { v4 as uuidv4 } from "uuid"
 import { act, fireEvent, render, waitFor } from "@testing-library/react-native"
 
 import { BtcMapPlace, useBtcMapPlaceNames, useBtcMapPlaces } from "@app/btcmap"
@@ -33,12 +35,18 @@ jest.mock("react-native-permissions", () => ({
 }))
 
 let capturedMapProps: Record<string, unknown> | undefined
+// The map only ever moves through this handle, so it is also the only way to
+// see whether a tap moved it.
+const mockAnimateToRegion = jest.fn()
 jest.mock("react-native-maps", () => {
   const ReactActual = jest.requireActual<typeof React>("react")
   const RN = jest.requireActual<typeof import("react-native")>("react-native")
   const MapView = ReactActual.forwardRef(
-    (props: { children?: React.ReactNode }, _ref: React.Ref<unknown>) => {
+    (props: { children?: React.ReactNode }, ref: React.Ref<unknown>) => {
       capturedMapProps = props as Record<string, unknown>
+      ReactActual.useImperativeHandle(ref, () => ({
+        animateToRegion: mockAnimateToRegion,
+      }))
       return ReactActual.createElement(RN.View, { testID: "map-view" }, props.children)
     },
   )
@@ -82,9 +90,109 @@ jest.mock("@app/components/map-component/category-filter-sheet", () => ({
   },
 }))
 
+// The form has its own spec too. Adding a place is two steps and only the first
+// happens on the map, so this stands in for the second.
+//
+// It counts its own mountings as well as reporting its props: the form holds
+// what has been typed, so the map throwing a half-filled one away is a mount
+// and keeping it across a trip back to the pin is the absence of one.
+let capturedAddPlaceProps: Record<string, unknown> | undefined
+let addPlaceMountCount = 0
+jest.mock("@app/components/map-component/add-place-modal", () => {
+  const ReactActual = jest.requireActual<typeof React>("react")
+  return {
+    AddPlaceModal: (props: Record<string, unknown>) => {
+      capturedAddPlaceProps = props
+      ReactActual.useEffect(() => {
+        addPlaceMountCount += 1
+      }, [])
+      return null
+    },
+  }
+})
+
+// Which account is signed in is the whole gate on adding a place, so both
+// halves of it are driven from here.
+let mockIsAuthed = true
+jest.mock("@app/graphql/is-authed-context", () => ({
+  ...jest.requireActual("@app/graphql/is-authed-context"),
+  useIsAuthed: () => mockIsAuthed,
+}))
+
+// Only the hook is swapped, not the module: `ContextForScreen` mounts the
+// provider that lives in it, and the rest of the tree reads the real registry
+// through the same hook.
+let mockIsSelfCustodialAccount = false
+jest.mock("@app/hooks/use-account-registry", () => {
+  const actual = jest.requireActual<typeof import("@app/hooks/use-account-registry")>(
+    "@app/hooks/use-account-registry",
+  )
+  const { AccountType } =
+    jest.requireActual<typeof import("@app/types/wallet")>("@app/types/wallet")
+  return {
+    ...actual,
+    useAccountRegistry: () => ({
+      ...actual.useAccountRegistry(),
+      activeAccount: {
+        type: mockIsSelfCustodialAccount
+          ? AccountType.SelfCustodial
+          : AccountType.Custodial,
+      },
+    }),
+  }
+})
+
+// The backend refuses place submissions below account level two, so the
+// button's third gate is driven from here too. The rest of the module is the
+// real thing — mocking it wholesale would leave AccountLevel and
+// LevelContextProvider undefined for everything else in the render tree.
+let mockIsAtLeastLevelTwo = true
+jest.mock("@app/graphql/level-context", () => ({
+  ...jest.requireActual("@app/graphql/level-context"),
+  useLevel: () => ({
+    isAtLeastLevelZero: true,
+    isAtLeastLevelOne: true,
+    isAtLeastLevelTwo: mockIsAtLeastLevelTwo,
+    isAtLeastLevelThree: false,
+    currentLevel: "TWO",
+  }),
+}))
+
+// The kill switch's other half: off means no pins and no way to add one.
+let mockBtcMapPlacesEnabled = true
+jest.mock("@app/config/feature-flags-context", () => ({
+  ...jest.requireActual("@app/config/feature-flags-context"),
+  useRemoteConfig: () => ({ btcMapPlacesEnabled: mockBtcMapPlacesEnabled }),
+}))
+
+const mockToastShow = jest.fn()
+jest.mock("@app/utils/toast", () => ({
+  toastShow: (args: unknown) => mockToastShow(args),
+}))
+
+// Failures are reported rather than swallowed — see use-place-submission.ts and
+// the submission-id minting in index.tsx. Held onto so a test can see them.
+const mockReportError = jest.fn()
+jest.mock("@app/utils/error-logging", () => ({
+  reportError: (...args: unknown[]) => mockReportError(...args),
+}))
+
+// The hook talks to the backend; here the map only needs to be told whether
+// the place went.
+const mockSubmitPlace = jest.fn()
+jest.mock("@app/btcmap/use-place-submission", () => ({
+  useSubmitBtcMapPlace: () => ({ submitPlace: mockSubmitPlace }),
+}))
+
 const mockedPlaces = useBtcMapPlaces as jest.MockedFunction<typeof useBtcMapPlaces>
 const mockedNames = useBtcMapPlaceNames as jest.MockedFunction<typeof useBtcMapPlaceNames>
 const mockedGetUserRegion = getUserRegion as jest.MockedFunction<typeof getUserRegion>
+// Root-level module mock, so it is already a jest.fn — see
+// __mocks__/react-native-securerandom.js. Held onto here so a test can keep an
+// id half-minted.
+const mockedSecureRandom = generateSecureRandom as jest.MockedFunction<
+  typeof generateSecureRandom
+>
 
 const REGION: Region = {
   latitude: 51.5,
@@ -127,10 +235,36 @@ beforeEach(() => {
   capturedSheetProps = undefined
   capturedSearchProps = undefined
   capturedFilterProps = undefined
+  capturedAddPlaceProps = undefined
+  addPlaceMountCount = 0
   capturedMapProps = undefined
+  mockIsAuthed = true
+  mockIsSelfCustodialAccount = false
+  mockIsAtLeastLevelTwo = true
+  mockBtcMapPlacesEnabled = true
+  mockSubmitPlace.mockResolvedValue({ submitted: true })
   setPlaces()
   mockedNames.mockReturnValue(new Map())
 })
+
+type SendPlace = (submission: unknown) => Promise<string | null>
+
+const SUBMISSION = {
+  name: "Hope House",
+  category: "cafes",
+  latitude: REGION.latitude,
+  longitude: REGION.longitude,
+}
+
+// The form is stubbed out here, so this is what tapping its submit button
+// amounts to — including what the map answers back for the form to show.
+const sendFromForm = async (): Promise<{ reason?: string | null }> => {
+  const sent: { reason?: string | null } = {}
+  await act(async () => {
+    sent.reason = await (capturedAddPlaceProps?.onSubmit as SendPlace)(SUBMISSION)
+  })
+  return sent
+}
 
 // The map is measured before anything can be placed in it, and the placement
 // works in the view's own pixels — so a test that wants labels has to lay it out.
@@ -563,5 +697,550 @@ describe("MapComponent basemap", () => {
       expect(hides("road")).toBe(false)
       expect(hides("road.highway")).toBe(false)
     }
+  })
+})
+
+describe("MapComponent adding a place", () => {
+  it("offers it to a custodial account at level two", async () => {
+    const { getByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+  })
+
+  it("does not offer it below account level two", async () => {
+    // The backend refuses the submission for anything lower, so the button is
+    // absent rather than present and failing at the end of a filled-in form.
+    mockIsAtLeastLevelTwo = false
+    const { queryByTestId, getByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-place-search")).toBeTruthy())
+    expect(queryByTestId("open-add-place")).toBeNull()
+  })
+
+  it("does not offer it to a self-custodial account", async () => {
+    // The submission goes out through our backend on a Blink session, which a
+    // self-custodial account does not have — so the button is absent rather
+    // than present and failing at the end of a filled-in form.
+    mockIsSelfCustodialAccount = true
+    const { queryByTestId, getByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-place-search")).toBeTruthy())
+    expect(queryByTestId("open-add-place")).toBeNull()
+  })
+
+  it("does not offer it when nobody is signed in", async () => {
+    mockIsAuthed = false
+    const { queryByTestId, getByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-place-search")).toBeTruthy())
+    expect(queryByTestId("open-add-place")).toBeNull()
+  })
+
+  it("does not offer it while the kill switch is off", async () => {
+    // The flag empties the map; leaving the button behind would keep
+    // submissions flowing to the backend, which is what the flag exists to stop.
+    mockBtcMapPlacesEnabled = false
+    const { queryByTestId, getByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-place-search")).toBeTruthy())
+    expect(queryByTestId("open-add-place")).toBeNull()
+  })
+
+  it("tells the form a refusal is about the place, not the connection", async () => {
+    // A refusal is permanent — "check your connection" would send the user
+    // retrying a payload that can never go through. It is our own translated
+    // sentence rather than the backend's, which only ever comes back in
+    // English, and it goes to the form rather than into a toast: the form is a
+    // native modal over everything, and the app's toast is mounted outside it.
+    mockSubmitPlace.mockResolvedValue({ submitted: false, refused: true })
+    const { getByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+    fireEvent.press(getByTestId("open-add-place"))
+    fireEvent.press(getByTestId("confirm-place-location"))
+
+    await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(true))
+    const sent = await sendFromForm()
+
+    expect(sent.reason).toBe(
+      "BTC Map could not accept this place — it may already be on the map. Nothing was changed.",
+    )
+    expect(mockToastShow).not.toHaveBeenCalled()
+    // Still open: the typed place is the user's to fix or abandon.
+    expect(capturedAddPlaceProps?.isVisible).toBe(true)
+  })
+
+  it("hands the map over to the pin, and takes the reading controls off it", async () => {
+    // Searching and filtering are about reading the map; neither belongs over
+    // one that is being aimed.
+    const { getByTestId, queryByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+    fireEvent.press(getByTestId("open-add-place"))
+
+    await waitFor(() => expect(getByTestId("confirm-place-location")).toBeTruthy())
+    expect(queryByTestId("open-place-search")).toBeNull()
+    expect(queryByTestId("open-category-filter")).toBeNull()
+    expect(queryByTestId("open-add-place")).toBeNull()
+  })
+
+  it("gives the form the centre of the map the pin was left on", async () => {
+    // The pin is drawn at the centre of the map view and never moves, so the
+    // region's centre is where it is pointing — no measuring, no conversion.
+    const { getByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+    fireEvent.press(getByTestId("open-add-place"))
+
+    const moved = { ...REGION, latitude: 13.496743, longitude: -89.439462 }
+    act(() => {
+      ;(capturedMapProps?.onRegionChangeComplete as (r: Region) => void)(moved)
+    })
+    fireEvent.press(getByTestId("confirm-place-location"))
+
+    await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(true))
+    expect(capturedAddPlaceProps?.location).toEqual({
+      latitude: moved.latitude,
+      longitude: moved.longitude,
+    })
+  })
+
+  it("goes back to the map when the pin needs moving", async () => {
+    const { getByTestId, queryByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+    fireEvent.press(getByTestId("open-add-place"))
+    fireEvent.press(getByTestId("confirm-place-location"))
+
+    await waitFor(() => expect(queryByTestId("confirm-place-location")).toBeNull())
+
+    act(() => {
+      ;(capturedAddPlaceProps?.onChangeLocation as () => void)()
+    })
+
+    await waitFor(() => expect(getByTestId("confirm-place-location")).toBeTruthy())
+    expect(capturedAddPlaceProps?.isVisible).toBe(false)
+  })
+
+  it("abandons the whole thing on cancel", async () => {
+    const { getByTestId, queryByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+    fireEvent.press(getByTestId("open-add-place"))
+    fireEvent.press(getByTestId("cancel-add-place"))
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+    expect(queryByTestId("confirm-place-location")).toBeNull()
+    expect(capturedAddPlaceProps?.isVisible).toBe(false)
+  })
+
+  it("leaves the pins alone while one is being placed", async () => {
+    // A tap on the map is aiming at that point, not asking about what is
+    // already on it.
+    setPlaces({ places: [place(1)] })
+    const { getByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+    fireEvent.press(getByTestId("open-add-place"))
+    fireEvent.press(getByTestId("btcmap-place-1"))
+
+    await waitFor(() => expect(getByTestId("confirm-place-location")).toBeTruthy())
+    expect(capturedSheetProps?.place).toBeNull()
+  })
+
+  it("flies to a cluster that is tapped", async () => {
+    // The anchor for the test below: a cluster press does move the camera, so
+    // that press going nowhere while the pin is out means something.
+    setPlaces({ places: [place(1), place(2), place(3)] })
+    const { getAllByTestId } = renderMap()
+
+    await waitFor(() => expect(getAllByTestId(/^btcmap-cluster-/)).toHaveLength(1))
+    fireEvent.press(getAllByTestId(/^btcmap-cluster-/)[0])
+
+    expect(mockAnimateToRegion).toHaveBeenCalled()
+  })
+
+  it("leaves the clusters alone while a pin is being placed", async () => {
+    // Same reason the pins go quiet: a tap while aiming is aiming, and flying
+    // off to a cluster takes the map off whatever was under the pin.
+    setPlaces({ places: [place(1), place(2), place(3)] })
+    const { getAllByTestId, getByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+    fireEvent.press(getByTestId("open-add-place"))
+
+    await waitFor(() => expect(getByTestId("confirm-place-location")).toBeTruthy())
+    mockAnimateToRegion.mockClear()
+    fireEvent.press(getAllByTestId(/^btcmap-cluster-/)[0])
+
+    expect(mockAnimateToRegion).not.toHaveBeenCalled()
+    expect(getByTestId("confirm-place-location")).toBeTruthy()
+  })
+
+  it("confirms the pin where the camera is, not where it last came to rest", async () => {
+    // A fling or a fly-to reports the camera for the whole of the movement and
+    // settles only at the end. Reading the settled region instead would put the
+    // place wherever the map was before the last move — one tap behind.
+    const { getByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+    fireEvent.press(getByTestId("open-add-place"))
+
+    const moving = { ...REGION, latitude: 13.496743, longitude: -89.439462 }
+    act(() => {
+      ;(capturedMapProps?.onRegionChange as (r: Region) => void)(moving)
+    })
+    fireEvent.press(getByTestId("confirm-place-location"))
+
+    await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(true))
+    expect(capturedAddPlaceProps?.location).toEqual({
+      latitude: moving.latitude,
+      longitude: moving.longitude,
+    })
+  })
+
+  it("closes the form and says thanks once BTC Map has the place", async () => {
+    mockSubmitPlace.mockResolvedValue({ submitted: true })
+    const { getByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+    fireEvent.press(getByTestId("open-add-place"))
+    fireEvent.press(getByTestId("confirm-place-location"))
+
+    await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(true))
+    await act(async () => {
+      await (capturedAddPlaceProps?.onSubmit as (s: unknown) => Promise<void>)({
+        name: "Hope House",
+        category: "cafes",
+        latitude: REGION.latitude,
+        longitude: REGION.longitude,
+      })
+    })
+
+    expect(mockSubmitPlace).toHaveBeenCalledWith(
+      expect.objectContaining({ name: "Hope House", category: "cafes" }),
+      expect.any(String),
+    )
+    await waitFor(() =>
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({ type: "success" }),
+      ),
+    )
+    await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(false))
+  })
+
+  it("keeps the form open when the place could not be sent, so a retry resends the same submission", async () => {
+    // A retry of the same attempt must carry the same submissionId: that is
+    // the idempotency key the backend deduplicates on.
+    mockSubmitPlace.mockResolvedValue({ submitted: false, refused: false })
+    const { getByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+    fireEvent.press(getByTestId("open-add-place"))
+    fireEvent.press(getByTestId("confirm-place-location"))
+
+    await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(true))
+
+    const first = await sendFromForm()
+
+    // A request that never got an answer carries no reason of its own, so the
+    // form is given the generic one rather than nothing.
+    expect(first.reason).toBe(
+      "The place could not be sent. Check your connection and try again.",
+    )
+    expect(mockToastShow).not.toHaveBeenCalled()
+    expect(capturedAddPlaceProps?.isVisible).toBe(true)
+
+    await sendFromForm()
+
+    expect(mockSubmitPlace).toHaveBeenCalledTimes(2)
+    expect(mockSubmitPlace.mock.calls[0][1]).toEqual(mockSubmitPlace.mock.calls[1][1])
+  })
+
+  it("mints a fresh submission id for a new attempt", async () => {
+    mockSubmitPlace.mockResolvedValue({ submitted: false, refused: false })
+    const { getByTestId } = renderMap()
+    const submission = {
+      name: "Hope House",
+      category: "cafes",
+      latitude: REGION.latitude,
+      longitude: REGION.longitude,
+    }
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+    fireEvent.press(getByTestId("open-add-place"))
+    fireEvent.press(getByTestId("confirm-place-location"))
+
+    await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(true))
+    await act(async () => {
+      await (capturedAddPlaceProps?.onSubmit as (s: unknown) => Promise<void>)(submission)
+    })
+
+    // Abandon the attempt and start another one.
+    act(() => {
+      ;(capturedAddPlaceProps?.onChangeLocation as () => void)()
+    })
+    fireEvent.press(getByTestId("cancel-add-place"))
+    fireEvent.press(getByTestId("open-add-place"))
+    fireEvent.press(getByTestId("confirm-place-location"))
+
+    await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(true))
+    await act(async () => {
+      await (capturedAddPlaceProps?.onSubmit as (s: unknown) => Promise<void>)(submission)
+    })
+
+    expect(mockSubmitPlace).toHaveBeenCalledTimes(2)
+    expect(mockSubmitPlace.mock.calls[0][1]).not.toEqual(mockSubmitPlace.mock.calls[1][1])
+  })
+
+  it("does not let an abandoned attempt's answer land on the next place", async () => {
+    // The send outlives the form it was typed into. When it finally answers,
+    // the form on screen may be a different place's — which it must not close,
+    // and must not report a failure over.
+    let landAbandoned: ((outcome: unknown) => void) | undefined
+    mockSubmitPlace.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          landAbandoned = resolve
+        }),
+    )
+    const { getByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+    fireEvent.press(getByTestId("open-add-place"))
+    fireEvent.press(getByTestId("confirm-place-location"))
+    await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(true))
+
+    const abandoned: { reason?: string | null } = {}
+    const inFlight = (capturedAddPlaceProps?.onSubmit as SendPlace)(SUBMISSION).then(
+      (reason) => {
+        abandoned.reason = reason
+      },
+    )
+    await waitFor(() => expect(mockSubmitPlace).toHaveBeenCalledTimes(1))
+
+    // Give up on it and start describing somewhere else.
+    act(() => {
+      ;(capturedAddPlaceProps?.onClose as () => void)()
+    })
+    fireEvent.press(getByTestId("open-add-place"))
+    fireEvent.press(getByTestId("confirm-place-location"))
+    await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(true))
+
+    await act(async () => {
+      landAbandoned?.({ submitted: true })
+      await inFlight
+    })
+
+    // The place being described now is still on screen, and the abandoned
+    // attempt reported nothing to it. The success itself is still announced,
+    // though: the place is on its way to BTC Map either way, and an
+    // unannounced success invites a resubmission under a new submission id,
+    // which the backend can no longer deduplicate.
+    expect(capturedAddPlaceProps?.isVisible).toBe(true)
+    expect(mockToastShow).toHaveBeenCalledWith(
+      expect.objectContaining({ type: "success" }),
+    )
+    expect(abandoned.reason).toBeNull()
+  })
+
+  it("does not leave an abandoned attempt's id behind for the next place", async () => {
+    // Minting the id is a round trip of its own, and the attempt can be given
+    // up during it. The id must not be written down afterwards: the backend
+    // deduplicates on it, so the next place would arrive as an edit of the one
+    // that was abandoned — the wrong shop, overwritten.
+    const abandonedBytes = new Uint8Array(16).fill(7)
+    let mintAbandoned: ((bytes: Uint8Array) => void) | undefined
+    mockedSecureRandom.mockImplementationOnce(
+      () =>
+        new Promise<Uint8Array>((resolve) => {
+          mintAbandoned = resolve
+        }),
+    )
+    const { getByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+    fireEvent.press(getByTestId("open-add-place"))
+    fireEvent.press(getByTestId("confirm-place-location"))
+    await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(true))
+
+    const inFlight = (capturedAddPlaceProps?.onSubmit as SendPlace)(SUBMISSION)
+    await waitFor(() => expect(mintAbandoned).toBeDefined())
+
+    // Given up on while the id was still being minted.
+    act(() => {
+      ;(capturedAddPlaceProps?.onClose as () => void)()
+    })
+    fireEvent.press(getByTestId("open-add-place"))
+    fireEvent.press(getByTestId("confirm-place-location"))
+    await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(true))
+
+    await act(async () => {
+      mintAbandoned?.(abandonedBytes)
+      await inFlight
+    })
+
+    // Nothing was sent for the attempt that was walked away from.
+    expect(mockSubmitPlace).not.toHaveBeenCalled()
+
+    await sendFromForm()
+
+    expect(mockSubmitPlace).toHaveBeenCalledTimes(1)
+    expect(mockSubmitPlace.mock.calls[0][1]).not.toEqual(
+      uuidv4({ random: abandonedBytes }),
+    )
+  })
+
+  it("says thanks even when the attempt was given up before the answer arrived", async () => {
+    // Closing the form mid-flight does not unsend the request: the place may
+    // still reach BTC Map. If that landing is kept quiet, the user believes
+    // the add failed and does it again — under a fresh submission id, so the
+    // backend's deduplication no longer recognises it as the same place.
+    let land: ((outcome: unknown) => void) | undefined
+    mockSubmitPlace.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          land = resolve
+        }),
+    )
+    const { getByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+    fireEvent.press(getByTestId("open-add-place"))
+    fireEvent.press(getByTestId("confirm-place-location"))
+    await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(true))
+
+    const inFlight = (capturedAddPlaceProps?.onSubmit as SendPlace)(SUBMISSION)
+    await waitFor(() => expect(mockSubmitPlace).toHaveBeenCalledTimes(1))
+
+    act(() => {
+      ;(capturedAddPlaceProps?.onClose as () => void)()
+    })
+
+    await act(async () => {
+      land?.({ submitted: true })
+      await inFlight
+    })
+
+    expect(mockToastShow).toHaveBeenCalledWith(
+      expect.objectContaining({ type: "success" }),
+    )
+  })
+
+  it("closes the attempt when the answer lands after the pin went back on the move", async () => {
+    // The form's "Change" is tappable while a send is in flight, so a success
+    // can arrive with the attempt sitting back on the pin-aiming step. Leaving
+    // it open then would let a second send reuse the attempt's submissionId —
+    // which the backend takes as an edit of the place it just accepted.
+    let land: ((outcome: unknown) => void) | undefined
+    mockSubmitPlace.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          land = resolve
+        }),
+    )
+    const { getByTestId, queryByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+    fireEvent.press(getByTestId("open-add-place"))
+    fireEvent.press(getByTestId("confirm-place-location"))
+    await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(true))
+
+    const inFlight = (capturedAddPlaceProps?.onSubmit as SendPlace)(SUBMISSION)
+    await waitFor(() => expect(mockSubmitPlace).toHaveBeenCalledTimes(1))
+
+    // Back to moving the pin while the send is still out.
+    act(() => {
+      ;(capturedAddPlaceProps?.onChangeLocation as () => void)()
+    })
+    await waitFor(() => expect(getByTestId("confirm-place-location")).toBeTruthy())
+
+    await act(async () => {
+      land?.({ submitted: true })
+      await inFlight
+    })
+
+    expect(mockToastShow).toHaveBeenCalledWith(
+      expect.objectContaining({ type: "success" }),
+    )
+    // The attempt is over: nothing left aimed at a place BTC Map already has.
+    await waitFor(() => expect(queryByTestId("confirm-place-location")).toBeNull())
+    expect(capturedAddPlaceProps?.isVisible).toBe(false)
+  })
+
+  it("tells the form when the submission id could not be minted", async () => {
+    // No id, no send: without the idempotency key the backend cannot
+    // deduplicate, so the place must not go out without one — and the form
+    // must say why nothing happened rather than sit there looking untouched.
+    mockedSecureRandom.mockRejectedValueOnce(new Error("no CSPRNG"))
+    const { getByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+    fireEvent.press(getByTestId("open-add-place"))
+    fireEvent.press(getByTestId("confirm-place-location"))
+    await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(true))
+
+    const sent = await sendFromForm()
+
+    // What failed is the device's CSPRNG, not the connection — the form gets
+    // the generic error rather than connection advice that cannot apply, and
+    // the failure is reported rather than swallowed.
+    expect(sent.reason).toBe("There was an error.\nPlease try again later.")
+    expect(mockReportError).toHaveBeenCalledWith(
+      "mintBtcMapSubmissionId",
+      expect.any(Error),
+    )
+    expect(mockSubmitPlace).not.toHaveBeenCalled()
+    expect(capturedAddPlaceProps?.isVisible).toBe(true)
+  })
+})
+
+describe("MapComponent add-place drafts", () => {
+  const startAndConfirm = (getByTestId: (id: string) => unknown) => {
+    fireEvent.press(getByTestId("open-add-place") as never)
+    fireEvent.press(getByTestId("confirm-place-location") as never)
+  }
+
+  it("keeps what has been typed while the pin is moved", async () => {
+    // Going back to the map corrects one of the answers rather than starting
+    // again, so the form that comes back is the same one, still filled in.
+    const { getByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+    startAndConfirm(getByTestId)
+
+    await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(true))
+    const mountsBefore = addPlaceMountCount
+
+    act(() => {
+      ;(capturedAddPlaceProps?.onChangeLocation as () => void)()
+    })
+    fireEvent.press(getByTestId("confirm-place-location"))
+
+    await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(true))
+    expect(addPlaceMountCount).toBe(mountsBefore)
+  })
+
+  it("does not carry an abandoned place into the next one", async () => {
+    // Backing out to the map and then cancelling abandons the place. What had
+    // been typed about it must not turn up in the next attempt.
+    const { getByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+    startAndConfirm(getByTestId)
+
+    await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(true))
+    const mountsBefore = addPlaceMountCount
+
+    act(() => {
+      ;(capturedAddPlaceProps?.onChangeLocation as () => void)()
+    })
+    fireEvent.press(getByTestId("cancel-add-place"))
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+    startAndConfirm(getByTestId)
+
+    await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(true))
+    expect(addPlaceMountCount).toBeGreaterThan(mountsBefore)
   })
 })

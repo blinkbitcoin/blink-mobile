@@ -72,6 +72,7 @@
   },
   "AuthenticationScreen": {
     "authenticationDescription": "Autentificer for at fortsætte",
+    "authenticationRequired": "Godkendelse er påkrævet. Du kan opsætte en PIN-kode eller biometri i sikkerhedsindstillingerne.",
     "setUp": "Opsætning af Biometrisk Autentificering",
     "setUpAuthenticationDescription": "Brug biometrisk autentificering",
     "skip": "Spring over",
@@ -2131,6 +2132,18 @@
     "categories": "Kategorier",
     "selectAll": "Vælg alle",
     "clearAll": "Ryd alle",
+    "addPlace": "Tilføj til kort",
+    "addPlaceTitle": "Tilføj et sted",
+    "placePinHint": "Flyt kortet, så nålen står på stedet",
+    "placeName": "Navn",
+    "placeNameHint": "Hvad stedet hedder",
+    "placeCategory": "Kategori",
+    "placeLocation": "Placering",
+    "changeLocation": "Skift",
+    "placeReviewNote": "Nye steder sendes til BTC Map. Fællesskabet dér gennemgår og vedligeholder alt på kortet.",
+    "placeSubmitted": "Sted sendt til BTC Map — tak fordi du tilføjede det",
+    "placeSubmissionFailed": "Stedet kunne ikke sendes. Tjek din forbindelse og prøv igen.",
+    "placeRefused": "BTC Map kunne ikke tage imod dette sted. Der blev ikke tilføjet noget til kortet.",
     "category": {
       "restaurants": "Restauranter",
       "cafes": "Caféer",
@@ -2162,6 +2175,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "Forkert PIN-kode. {attemptsRemaining: number} forsøg tilbage.",
+    "enterPin": "Indtast din PIN-kode",
     "lockoutUnavailable": "Det mislykkede forsøg kunne ikke registreres sikkert. Logger ud.",
     "oneAttemptRemaining": "Forkert PIN-kode. 1 forsøg tilbage.",
     "pinUnreadable": "Din PIN-kode kunne ikke kontrolleres. Prøv venligst igen.",
@@ -2666,17 +2680,17 @@
     "receive": "Modtag",
     "transfer": "Overfør",
     "lightning": "Lightning",
+    "lightningBelowThreshold": "Lightning under {threshold: string} SAT",
     "intraledger": "Intraledger",
-    "onchainPriority": "Onchain prioritet (hurtigst muligt)",
+    "onchainPriority": "Onchain prioritet (~10 min)",
     "onchainStandard": "Onchain standard (~4t)",
-    "onchainEconomy": "Onchain økonomi",
+    "onchainEconomy": "Onchain økonomi (~24t)",
     "lightningTransactions": "Lightning-transaktioner",
     "onchainBelowThreshold": "Onchain under {threshold: string} SAT",
     "onchainAboveThreshold": "Onchain over {threshold: string} SAT",
     "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Overførselsgebyr",
     "noFee": "intet gebyr",
-    "lightningSendFee": "{fee: string} + ~{routingFee: string} routinggebyr",
     "fromApprox": "fra ~{fee: string}",
     "satAmount": "{amount: string} SAT",
     "error": "Kunne ikke hente gebyrer i øjeblikket"
@@ -3482,8 +3496,7 @@
         "pinChangedTitle": "PIN ændret",
         "pinChangedSubtitle": "Din PIN er blevet ændret.",
         "pinChangedToast": "PIN er ændret",
-        "biometricDescription": "Bekræft din identitet for at ændre PIN-kode",
-        "biometricRequired": "Biometrisk godkendelse er påkrævet for at ændre din PIN-kode."
+        "biometricDescription": "Bekræft din identitet for at ændre PIN-kode"
       }
     },
     "ReplaceCard": {

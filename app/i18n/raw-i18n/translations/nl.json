@@ -72,6 +72,7 @@
   },
   "AuthenticationScreen": {
     "authenticationDescription": "Authenticeer om verder te gaan",
+    "authenticationRequired": "Verificatie is vereist. U kunt een pincode of biometrie instellen in de beveiligingsinstellingen.",
     "setUp": "Biometrische authenticatie instellen",
     "setUpAuthenticationDescription": "Gebruik je biometrische authenticatie om verder te gaan",
     "skip": "Overslaan",
@@ -2131,6 +2132,18 @@
     "categories": "Categorieën",
     "selectAll": "Alles selecteren",
     "clearAll": "Alles wissen",
+    "addPlace": "Toevoegen aan kaart",
+    "addPlaceTitle": "Plek toevoegen",
+    "placePinHint": "Verschuif de kaart zodat de speld op de plek staat",
+    "placeName": "Naam",
+    "placeNameHint": "Hoe de plek heet",
+    "placeCategory": "Categorie",
+    "placeLocation": "Locatie",
+    "changeLocation": "Wijzig",
+    "placeReviewNote": "Nieuwe plekken gaan naar BTC Map. De community daar controleert en onderhoudt alles op de kaart.",
+    "placeSubmitted": "Plek verstuurd naar BTC Map — bedankt voor het toevoegen",
+    "placeSubmissionFailed": "De plek kon niet worden verstuurd. Controleer je verbinding en probeer het opnieuw.",
+    "placeRefused": "BTC Map kon deze plek niet accepteren. Er is niets aan de kaart toegevoegd.",
     "category": {
       "restaurants": "Restaurants",
       "cafes": "Cafés",
@@ -2162,6 +2175,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "Onjuiste pincode. {attemptsRemaining: number} resterende pogingen.",
+    "enterPin": "Voer uw pincode in",
     "lockoutUnavailable": "Kon de mislukte poging niet veilig vastleggen. Uitloggen.",
     "oneAttemptRemaining": "Onjuiste pincode. 1 poging over.",
     "pinUnreadable": "Kon je pincode niet controleren. Probeer het opnieuw.",
@@ -2666,17 +2680,17 @@
     "receive": "Ontvang",
     "transfer": "Overschrijven",
     "lightning": "Lightning",
+    "lightningBelowThreshold": "Lightning onder {threshold: string} SAT",
     "intraledger": "Intraledger",
-    "onchainPriority": "Onchain prioriteit (z.s.m.)",
+    "onchainPriority": "Onchain prioriteit (~10 min)",
     "onchainStandard": "Onchain standaard (~4u)",
-    "onchainEconomy": "Onchain voordelig",
+    "onchainEconomy": "Onchain voordelig (~24u)",
     "lightningTransactions": "Lightning-transacties",
     "onchainBelowThreshold": "Onchain onder {threshold: string} SAT",
     "onchainAboveThreshold": "Onchain boven {threshold: string} SAT",
     "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Overschrijvingskosten",
     "noFee": "geen kosten",
-    "lightningSendFee": "{fee: string} + ~{routingFee: string} routeringskosten",
     "fromApprox": "vanaf ~{fee: string}",
     "satAmount": "{amount: string} SAT",
     "error": "Kan momenteel geen kosten ophalen"
@@ -3482,8 +3496,7 @@
         "pinChangedTitle": "PIN gewijzigd",
         "pinChangedSubtitle": "Uw PIN is succesvol gewijzigd.",
         "pinChangedToast": "PIN is succesvol gewijzigd",
-        "biometricDescription": "Verifieer uw identiteit om uw PIN te wijzigen",
-        "biometricRequired": "Biometrische authenticatie is vereist om uw PIN te wijzigen."
+        "biometricDescription": "Verifieer uw identiteit om uw PIN te wijzigen"
       }
     },
     "ReplaceCard": {

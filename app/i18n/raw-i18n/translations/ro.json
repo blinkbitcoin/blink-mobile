@@ -72,6 +72,7 @@
   },
   "AuthenticationScreen": {
     "authenticationDescription": "Autentificați-vă pentru a continua",
+    "authenticationRequired": "Este necesară autentificarea. Puteți seta un cod PIN sau date biometrice în setările de securitate.",
     "setUp": "Configurați autentificarea biometrică",
     "setUpAuthenticationDescription": "Utilizați autentificarea biometrică",
     "skip": "Săriți peste",
@@ -2131,6 +2132,18 @@
     "categories": "Categorii",
     "selectAll": "Selectează tot",
     "clearAll": "Șterge tot",
+    "addPlace": "Adaugă pe hartă",
+    "addPlaceTitle": "Adaugă un loc",
+    "placePinHint": "Mută harta pentru a pune indicatorul pe loc",
+    "placeName": "Nume",
+    "placeNameHint": "Cum se numește locul",
+    "placeCategory": "Categorie",
+    "placeLocation": "Locație",
+    "changeLocation": "Schimbă",
+    "placeReviewNote": "Locurile noi ajung la BTC Map. Comunitatea sa verifică și întreține tot ce se află pe hartă.",
+    "placeSubmitted": "Loc trimis către BTC Map — mulțumim că l-ai adăugat",
+    "placeSubmissionFailed": "Locul nu a putut fi trimis. Verifică conexiunea și încearcă din nou.",
+    "placeRefused": "BTC Map nu a putut accepta acest loc. Nu s-a adăugat nimic pe hartă.",
     "category": {
       "restaurants": "Restaurante",
       "cafes": "Cafenele",
@@ -2162,6 +2175,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "PIN incorect. {attemptsRemaining: number} încercări rămase.",
+    "enterPin": "Introduceți codul PIN",
     "lockoutUnavailable": "Încercarea eșuată nu a putut fi înregistrată în siguranță. Deconectare.",
     "oneAttemptRemaining": "PIN incorect. 1 încercare rămasă.",
     "pinUnreadable": "Nu am putut verifica PIN-ul. Vă rugăm să încercați din nou.",
@@ -2666,17 +2680,17 @@
     "receive": "Primește",
     "transfer": "Transfer",
     "lightning": "Lightning",
+    "lightningBelowThreshold": "Lightning sub {threshold: string} SAT",
     "intraledger": "Intraledger",
-    "onchainPriority": "Onchain prioritar (cât mai curând)",
+    "onchainPriority": "Onchain prioritar (~10 min)",
     "onchainStandard": "Onchain standard (~4h)",
-    "onchainEconomy": "Onchain economic",
+    "onchainEconomy": "Onchain economic (~24h)",
     "lightningTransactions": "Tranzacții Lightning",
     "onchainBelowThreshold": "Onchain sub {threshold: string} SAT",
     "onchainAboveThreshold": "Onchain peste {threshold: string} SAT",
     "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Taxă de transfer",
     "noFee": "fără taxă",
-    "lightningSendFee": "{fee: string} + ~{routingFee: string} taxă de rutare",
     "fromApprox": "de la ~{fee: string}",
     "satAmount": "{amount: string} SAT",
     "error": "Nu se pot obține taxele în acest moment"
@@ -3482,8 +3496,7 @@
         "pinChangedTitle": "PIN schimbat",
         "pinChangedSubtitle": "PIN-ul dvs. a fost schimbat cu succes.",
         "pinChangedToast": "PIN-ul a fost schimbat cu succes",
-        "biometricDescription": "Verificați-vă identitatea pentru a schimba PIN-ul",
-        "biometricRequired": "Autentificarea biometrică este necesară pentru a schimba PIN-ul."
+        "biometricDescription": "Verificați-vă identitatea pentru a schimba PIN-ul"
       }
     },
     "ReplaceCard": {

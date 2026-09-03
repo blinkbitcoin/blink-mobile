@@ -72,6 +72,7 @@
   },
   "AuthenticationScreen": {
     "authenticationDescription": "Նույնականացնել՝ շարունակելու համար",
+    "authenticationRequired": "Պահանջվում է նույնականացում: Կարող եք սահմանել PIN ծածկագիր կամ կենսաչափական տվյալներ անվտանգության կարգավորումներում:",
     "setUp": "Սահմանել բիոմետրիկ նույնականացում",
     "setUpAuthenticationDescription": "Օգտագործել բիոմետրիկ համակարգ՝ նույնականացնելու համար",
     "skip": "Բաց թողնել",
@@ -2131,6 +2132,18 @@
     "categories": "Կատեգորիաներ",
     "selectAll": "Ընտրել բոլորը",
     "clearAll": "Մաքրել բոլորը",
+    "addPlace": "Ավելացնել քարտեզին",
+    "addPlaceTitle": "Ավելացնել վայր",
+    "placePinHint": "Տեղաշարժեք քարտեզը, որպեսզի նշիչը լինի վայրի վրա",
+    "placeName": "Անվանում",
+    "placeNameHint": "Ինչպես է կոչվում վայրը",
+    "placeCategory": "Կատեգորիա",
+    "placeLocation": "Տեղադրություն",
+    "changeLocation": "Փոխել",
+    "placeReviewNote": "Նոր վայրերն ուղարկվում են BTC Map: Նրա համայնքը ստուգում և պահպանում է քարտեզի վրա եղած ամեն ինչ:",
+    "placeSubmitted": "Վայրն ուղարկվեց BTC Map: Շնորհակալություն ավելացնելու համար",
+    "placeSubmissionFailed": "Վայրը չհաջողվեց ուղարկել: Ստուգեք Ձեր կապը և փորձեք նորից:",
+    "placeRefused": "BTC Map-ը չկարողացավ ընդունել այս վայրը: Քարտեզին ոչինչ չի ավելացվել:",
     "category": {
       "restaurants": "Ռեստորաններ",
       "cafes": "Սրճարաններ",
@@ -2162,6 +2175,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "Սխալ PIN: {attemptsRemaining: number} փորձեր են մնացել։ ",
+    "enterPin": "Մուտքագրեք Ձեր PIN ծածկագիրը",
     "lockoutUnavailable": "Չհաջողվեց ապահով կերպով գրանցել ձախողված փորձը։ Ելք համակարգից։",
     "oneAttemptRemaining": "Սխալ PIN: 1 փորձ է մնացել։ ",
     "pinUnreadable": "Չհաջողվեց ստուգել Ձեր PIN-ը։ Խնդրում ենք կրկին փորձել։",
@@ -2666,17 +2680,17 @@
     "receive": "Ստանալ",
     "transfer": "Փոխանցում",
     "lightning": "Lightning",
+    "lightningBelowThreshold": "Lightning {threshold: string} SAT-ից ցածր",
     "intraledger": "Intraledger",
-    "onchainPriority": "Onchain առաջնահերթ (հնարավորինս շուտ)",
+    "onchainPriority": "Onchain առաջնահերթ (~10ր)",
     "onchainStandard": "Onchain ստանդարտ (~4ժ)",
-    "onchainEconomy": "Onchain խնայողական",
+    "onchainEconomy": "Onchain խնայողական (~24ժ)",
     "lightningTransactions": "Lightning գործարքներ",
     "onchainBelowThreshold": "Onchain {threshold: string} SAT-ից ցածր",
     "onchainAboveThreshold": "Onchain {threshold: string} SAT-ից բարձր",
     "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Փոխանցման վճար",
     "noFee": "առանց վճարի",
-    "lightningSendFee": "{fee: string} + ~{routingFee: string} երթուղավորման վճար",
     "fromApprox": "սկսած ~{fee: string}-ից",
     "satAmount": "{amount: string} SAT",
     "error": "Չհաջողվեց ստանալ վճարներն այս պահին"
@@ -3482,8 +3496,7 @@
         "pinChangedTitle": "PIN-ը փոխվեց",
         "pinChangedSubtitle": "Ձեր PIN-ը հաջողությամբ փոխվել է։",
         "pinChangedToast": "PIN կոդը հաջողությամբ փոխվել է։",
-        "biometricDescription": "Հաստատեք ձեր ինքնությունը PIN-ը փոխելու համար",
-        "biometricRequired": "Կենսաբանական նույնականացումը պահանջվում է PIN-ը փոխելու համար:"
+        "biometricDescription": "Հաստատեք ձեր ինքնությունը PIN-ը փոխելու համար"
       }
     },
     "ReplaceCard": {

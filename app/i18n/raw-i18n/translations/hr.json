@@ -72,6 +72,7 @@
   },
   "AuthenticationScreen": {
     "authenticationDescription": "Autentificirajte se za nastavak",
+    "authenticationRequired": "Potrebna je autentifikacija. PIN kod ili biometriju možete postaviti u sigurnosnim postavkama.",
     "setUp": "Postavite biometrijsku autentifikaciju",
     "setUpAuthenticationDescription": "Koristite biometriju za autentifikaciju",
     "skip": "Preskoči",
@@ -2131,6 +2132,18 @@
     "categories": "Kategorije",
     "selectAll": "Odaberi sve",
     "clearAll": "Očisti sve",
+    "addPlace": "Dodaj na kartu",
+    "addPlaceTitle": "Dodaj mjesto",
+    "placePinHint": "Pomaknite kartu tako da pribadača bude na mjestu",
+    "placeName": "Naziv",
+    "placeNameHint": "Kako se mjesto zove",
+    "placeCategory": "Kategorija",
+    "placeLocation": "Lokacija",
+    "changeLocation": "Promijeni",
+    "placeReviewNote": "Nova mjesta šalju se u BTC Map. Tamošnja zajednica pregledava i održava sve što je na karti.",
+    "placeSubmitted": "Mjesto je poslano u BTC Map — hvala što ste ga dodali",
+    "placeSubmissionFailed": "Mjesto nije moguće poslati. Provjerite svoju vezu i pokušajte ponovno.",
+    "placeRefused": "BTC Map nije mogao prihvatiti ovo mjesto. Na kartu nije dodano ništa.",
     "category": {
       "restaurants": "Restorani",
       "cafes": "Kafići",
@@ -2162,6 +2175,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "Netočan PIN. {attemptsRemaining: number} preostalih pokušaja.",
+    "enterPin": "Unesite svoj PIN kod",
     "lockoutUnavailable": "Neuspjeli pokušaj nije moguće sigurno zabilježiti. Odjava.",
     "oneAttemptRemaining": "Netočan PIN. Preostao je 1 pokušaj.",
     "pinUnreadable": "Nije moguće provjeriti vaš PIN. Pokušajte ponovno.",
@@ -2666,17 +2680,17 @@
     "receive": "Primi",
     "transfer": "Prijenos",
     "lightning": "Lightning",
+    "lightningBelowThreshold": "Lightning ispod {threshold: string} SAT",
     "intraledger": "Intraledger",
-    "onchainPriority": "Onchain prioritetno (što prije)",
+    "onchainPriority": "Onchain prioritetno (~10 min)",
     "onchainStandard": "Onchain standardno (~4h)",
-    "onchainEconomy": "Onchain ekonomično",
+    "onchainEconomy": "Onchain ekonomično (~24h)",
     "lightningTransactions": "Lightning transakcije",
     "onchainBelowThreshold": "Onchain ispod {threshold: string} SAT",
     "onchainAboveThreshold": "Onchain iznad {threshold: string} SAT",
     "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Naknada za prijenos",
     "noFee": "bez naknade",
-    "lightningSendFee": "{fee: string} + ~{routingFee: string} naknada za usmjeravanje",
     "fromApprox": "od ~{fee: string}",
     "satAmount": "{amount: string} SAT",
     "error": "Trenutačno nije moguće dohvatiti naknade"
@@ -3482,8 +3496,7 @@
         "pinChangedTitle": "PIN promijenjen",
         "pinChangedSubtitle": "Vaš PIN je uspješno promijenjen.",
         "pinChangedToast": "PIN je uspješno promijenjen",
-        "biometricDescription": "Potvrdite svoj identitet za promjenu PIN-a",
-        "biometricRequired": "Biometrijska autentifikacija je potrebna za promjenu vašeg PIN-a."
+        "biometricDescription": "Potvrdite svoj identitet za promjenu PIN-a"
       }
     },
     "ReplaceCard": {

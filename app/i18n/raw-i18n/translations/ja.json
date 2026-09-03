@@ -72,6 +72,7 @@
     },
     "AuthenticationScreen": {
         "authenticationDescription": "認証して続ける",
+        "authenticationRequired": "認証が必要です。セキュリティ設定でPINコードまたは生体認証を設定できます。",
         "setUp": "生体認証の設定",
         "setUpAuthenticationDescription": "生体認証を有効にする",
         "skip": "スキップ",
@@ -2131,6 +2132,18 @@
         "categories": "カテゴリー",
         "selectAll": "すべて選択",
         "clearAll": "すべて解除",
+        "addPlace": "マップに追加",
+        "addPlaceTitle": "場所を追加",
+        "placePinHint": "マップを動かしてピンを場所に合わせてください",
+        "placeName": "名称",
+        "placeNameHint": "その場所の名前",
+        "placeCategory": "カテゴリー",
+        "placeLocation": "位置",
+        "changeLocation": "変更",
+        "placeReviewNote": "新しい場所はBTC Mapに送信されます。マップ上のすべてはBTC Mapのコミュニティが確認・管理しています。",
+        "placeSubmitted": "BTC Mapに場所を送信しました。追加していただきありがとうございます",
+        "placeSubmissionFailed": "場所を送信できませんでした。接続を確認して、もう一度お試しください。",
+        "placeRefused": "BTC Mapはこの場所を受け付けられませんでした。マップには何も追加されていません。",
         "category": {
             "restaurants": "レストラン",
             "cafes": "カフェ",
@@ -2162,6 +2175,7 @@
     },
     "PinScreen": {
         "attemptsRemaining": "PINコードが間違っています。残り{attemptsRemaining: number}回トライできます。",
+        "enterPin": "PINコードを入力してください",
         "lockoutUnavailable": "失敗した試行を安全に記録できませんでした。ログアウトします。",
         "oneAttemptRemaining": "PINコードが間違っています。残り1回トライできます。",
         "pinUnreadable": "PINコードを確認できませんでした。もう一度お試しください。",
@@ -2666,17 +2680,17 @@
         "receive": "受金",
         "transfer": "振替",
         "lightning": "ライトニング",
+        "lightningBelowThreshold": "ライトニング {threshold: string} SAT未満",
         "intraledger": "イントラレジャー",
-        "onchainPriority": "オンチェーン優先 (最速)",
+        "onchainPriority": "オンチェーン優先 (~10分)",
         "onchainStandard": "オンチェーン標準 (~4時間)",
-        "onchainEconomy": "オンチェーン節約",
+        "onchainEconomy": "オンチェーン節約 (~24時間)",
         "lightningTransactions": "ライトニング取引",
         "onchainBelowThreshold": "オンチェーン {threshold: string} SAT未満",
         "onchainAboveThreshold": "オンチェーン {threshold: string} SAT超",
         "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
         "transferFee": "振替手数料",
         "noFee": "手数料なし",
-        "lightningSendFee": "{fee: string} + ~{routingFee: string} ルーティング手数料",
         "fromApprox": "~{fee: string} から",
         "satAmount": "{amount: string} SAT",
         "error": "現時点では手数料を取得できません"
@@ -3482,8 +3496,7 @@
                 "pinChangedTitle": "PINが変更されました",
                 "pinChangedSubtitle": "PINが正常に変更されました。",
                 "pinChangedToast": "PINが正常に変更されました",
-                "biometricDescription": "PINを変更するために本人確認を行ってください",
-                "biometricRequired": "PINを変更するには生体認証が必要です。"
+                "biometricDescription": "PINを変更するために本人確認を行ってください"
             }
         },
         "ReplaceCard": {

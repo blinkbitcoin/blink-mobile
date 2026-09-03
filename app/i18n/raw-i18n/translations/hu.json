@@ -72,6 +72,7 @@
   },
   "AuthenticationScreen": {
     "authenticationDescription": "Feloldás a folytatáshoz",
+    "authenticationRequired": "Hitelesítés szükséges. PIN kódot vagy biometriát a biztonsági beállításokban állíthatsz be.",
     "setUp": "Biometrikus azonosítás beállítása",
     "setUpAuthenticationDescription": "Azonosítás biometrikus adatokkal",
     "skip": "Kihagy",
@@ -2131,6 +2132,18 @@
     "categories": "Kategóriák",
     "selectAll": "Összes kijelölése",
     "clearAll": "Összes törlése",
+    "addPlace": "Hozzáadás a térképhez",
+    "addPlaceTitle": "Hely hozzáadása",
+    "placePinHint": "Mozgasd a térképet, hogy a jelölő a helyre kerüljön",
+    "placeName": "Név",
+    "placeNameHint": "Hogy hívják a helyet",
+    "placeCategory": "Kategória",
+    "placeLocation": "Helyzet",
+    "changeLocation": "Módosítás",
+    "placeReviewNote": "Az új helyek a BTC Map-hez kerülnek. Az ottani közösség ellenőrzi és karbantartja mindazt, ami a térképen van.",
+    "placeSubmitted": "A hely elküldve a BTC Map-nek — köszönjük, hogy hozzáadta",
+    "placeSubmissionFailed": "A helyet nem sikerült elküldeni. Ellenőrizze a kapcsolatát, és próbálja újra.",
+    "placeRefused": "A BTC Map nem tudta elfogadni ezt a helyet. Semmi sem került fel a térképre.",
     "category": {
       "restaurants": "Éttermek",
       "cafes": "Kávézók",
@@ -2162,6 +2175,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "Helytelen PIN. {attemptsRemaining: number} próbálkozás maradt.",
+    "enterPin": "Add meg a PIN kódodat",
     "lockoutUnavailable": "A sikertelen próbálkozást nem sikerült biztonságosan rögzíteni. Kijelentkezés.",
     "oneAttemptRemaining": "Helytelen PIN. 1 próbálkozás maradt.",
     "pinUnreadable": "Nem sikerült ellenőrizni a PIN-kódot. Kérjük, próbálja újra.",
@@ -2666,17 +2680,17 @@
     "receive": "Fogadás",
     "transfer": "Átutalás",
     "lightning": "Lightning",
+    "lightningBelowThreshold": "Lightning {threshold: string} SAT alatt",
     "intraledger": "Intraledger",
-    "onchainPriority": "Onchain elsőbbségi (mihamarabb)",
+    "onchainPriority": "Onchain elsőbbségi (~10 perc)",
     "onchainStandard": "Onchain normál (~4 óra)",
-    "onchainEconomy": "Onchain gazdaságos",
+    "onchainEconomy": "Onchain gazdaságos (~24 óra)",
     "lightningTransactions": "Lightning tranzakciók",
     "onchainBelowThreshold": "Onchain {threshold: string} SAT alatt",
     "onchainAboveThreshold": "Onchain {threshold: string} SAT felett",
     "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Átutalási díj",
     "noFee": "díjmentes",
-    "lightningSendFee": "{fee: string} + ~{routingFee: string} útválasztási díj",
     "fromApprox": "~{fee: string}-tól",
     "satAmount": "{amount: string} SAT",
     "error": "Jelenleg nem lehet lekérdezni a díjakat"
@@ -3482,8 +3496,7 @@
         "pinChangedTitle": "PIN megváltoztatva",
         "pinChangedSubtitle": "A PIN kódja sikeresen megváltozott.",
         "pinChangedToast": "A PIN-kód sikeresen módosítva",
-        "biometricDescription": "Igazolja személyazonosságát a PIN megváltoztatásához",
-        "biometricRequired": "Biometrikus hitelesítés szükséges a PIN megváltoztatásához."
+        "biometricDescription": "Igazolja személyazonosságát a PIN megváltoztatásához"
       }
     },
     "ReplaceCard": {

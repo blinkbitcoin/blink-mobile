@@ -2,6 +2,10 @@ import React, { useCallback } from "react"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
+import {
+  useAuthGateFailureHandler,
+  useLocalAuthGate,
+} from "@app/hooks/use-local-auth-gate"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { toastShow } from "@app/utils/toast"
@@ -10,7 +14,6 @@ import { CardPinLayout } from "./card-pin-layout"
 import { useCardPinUpdate } from "./hooks/use-card-pin-update"
 import { usePinFlow } from "./hooks/use-pin-flow"
 import { isWeakPin } from "./validate-pin"
-import { useBiometricGate } from "../hooks/use-biometric-gate"
 
 const Step = {
   NewPin: 1,
@@ -22,17 +25,13 @@ export const CardChangePinScreen: React.FC = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { updatePin, loading } = useCardPinUpdate()
 
-  const handleBiometricFailure = useCallback(() => {
-    toastShow({
-      message: LL.CardFlow.PinScreens.ChangeFlow.biometricRequired(),
-      LL,
-    })
-    navigation.goBack()
-  }, [navigation, LL])
+  const handleAuthFailure = useAuthGateFailureHandler()
 
-  const authenticated = useBiometricGate({
+  const authenticated = useLocalAuthGate({
     description: LL.CardFlow.PinScreens.ChangeFlow.biometricDescription(),
-    onFailure: handleBiometricFailure,
+    onFailure: handleAuthFailure,
+    // Explicit although it is the default: changing the card pin must always
+    // demand a configured factor, and the spec pins this down.
     required: true,
   })
 

@@ -291,6 +291,64 @@ describe("FullOnboardingFlowScreen", () => {
       const screen = await renderScreen()
       await submitNames(screen)
 
+      // The form only paints once the status query has resolved, so waiting on
+      // it is what makes a later "did not navigate" assertion meaningful.
+      await waitFor(() => {
+        expect(screen.getByPlaceholderText("First name")).toBeTruthy()
+      })
+
+      return screen
+    }
+
+    // Next only opens the confirmation alert; startKyc runs from its Yes handler.
+    const submitNames = async (screen: Awaited<ReturnType<typeof renderScreen>>) => {
+      const alertSpy = jest.spyOn(Alert, "alert")
+
+      fireEvent.changeText(screen.getByPlaceholderText("First name"), "John")
+      fireEvent.changeText(screen.getByPlaceholderText("Last name"), "Doe")
+      fireEvent.press(screen.getByTestId("Next"))
+
+      await waitFor(() => {
+        expect(alertSpy).toHaveBeenCalled()
+      })
+
+      const confirmButton = alertSpy.mock.calls[0][2]?.[1]
+      await act(async () => {
+        confirmButton?.onPress?.()
+      })
+    }
+
+    // navigate() is only half the assertion. A start whose payload no longer
+    // matches the trap mock above fails inside the hook's catch, which never
+    // reaches navigate() either -- so an unrequested start would look exactly
+    // like a screen that correctly stayed put. Alert and goBack are that
+    // catch's own visible effects, so they keep this honest whatever shape the
+    // mutation's input drifts into.
+    it("should not start the KYC flow on its own when onboardingStatus is AWAITING_INPUT", async () => {
+      currentMocks = generateFullOnboardingMock({
+        onboardingStatus: OnboardingStatus.AwaitingInput,
+      })
+      const alertSpy = jest.spyOn(Alert, "alert")
+
+      await renderScreen()
+      // Let anything the mount kicked off actually settle. Without this the
+      // assertions can run before an unrequested mutation has resolved, and
+      // the test would report "stayed put" for a screen that did start one.
+      await act(async () => {})
+
+      expect(mockNavigate).not.toHaveBeenCalled()
+      expect(alertSpy).not.toHaveBeenCalled()
+      expect(mockGoBack).not.toHaveBeenCalled()
+    })
+
+    it("should navigate to WebView with correct params when the user submits their name", async () => {
+      currentMocks = generateFullOnboardingMock({
+        onboardingStatus: OnboardingStatus.AwaitingInput,
+      })
+
+      const screen = await renderScreen()
+      await submitNames(screen)
+
       await waitFor(() => {
         expect(mockNavigate).toHaveBeenCalledWith(
           "webView",

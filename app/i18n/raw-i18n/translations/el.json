@@ -72,6 +72,7 @@
   },
   "AuthenticationScreen": {
     "authenticationDescription": "Πιστοποιήστε την ταυτότητα για να συνεχίσετε",
+    "authenticationRequired": "Απαιτείται έλεγχος ταυτότητας. Μπορείτε να ορίσετε κωδικό PIN ή βιομετρικά στοιχεία στις ρυθμίσεις ασφαλείας.",
     "setUp": "Δημιουργήστε βιομετρική πιστοποίηση γνησιότητας",
     "setUpAuthenticationDescription": "Χρησιμοποιήστε βιομετρικά για πιστοποίηση γνησιότητας",
     "skip": "Παραλείψτε το",
@@ -2131,6 +2132,18 @@
     "categories": "Κατηγορίες",
     "selectAll": "Επιλογή όλων",
     "clearAll": "Καθαρισμός όλων",
+    "addPlace": "Προσθήκη στον χάρτη",
+    "addPlaceTitle": "Προσθήκη τοποθεσίας",
+    "placePinHint": "Μετακινήστε τον χάρτη για να βάλετε την πινέζα πάνω στο σημείο",
+    "placeName": "Όνομα",
+    "placeNameHint": "Πώς λέγεται το μέρος",
+    "placeCategory": "Κατηγορία",
+    "placeLocation": "Τοποθεσία",
+    "changeLocation": "Αλλαγή",
+    "placeReviewNote": "Τα νέα σημεία στέλνονται στο BTC Map. Η κοινότητά του ελέγχει και συντηρεί ό,τι υπάρχει στον χάρτη.",
+    "placeSubmitted": "Το σημείο στάλθηκε στο BTC Map — ευχαριστούμε που το προσθέσατε",
+    "placeSubmissionFailed": "Δεν ήταν δυνατή η αποστολή του σημείου. Ελέγξτε τη σύνδεσή σας και δοκιμάστε ξανά.",
+    "placeRefused": "Το BTC Map δεν μπόρεσε να δεχτεί αυτό το σημείο. Δεν προστέθηκε τίποτα στον χάρτη.",
     "category": {
       "restaurants": "Εστιατόρια",
       "cafes": "Καφετέριες",
@@ -2162,6 +2175,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "Λανθασμένο PIN. {attemptsRemaining: number} προσπάθειες που απομένουν.",
+    "enterPin": "Εισαγάγετε τον κωδικό σας PIN",
     "lockoutUnavailable": "Δεν ήταν δυνατή η ασφαλής καταγραφή της αποτυχημένης προσπάθειας. Αποσύνδεση.",
     "oneAttemptRemaining": "Λανθασμένο PIN. Απομένει 1 προσπάθεια.",
     "pinUnreadable": "Δεν ήταν δυνατός ο έλεγχος του PIN σας. Δοκιμάστε ξανά.",
@@ -2666,17 +2680,17 @@
     "receive": "Λήψη",
     "transfer": "Μεταφορά",
     "lightning": "Lightning",
+    "lightningBelowThreshold": "Lightning κάτω από {threshold: string} SAT",
     "intraledger": "Intraledger",
-    "onchainPriority": "Onchain προτεραιότητα (το συντομότερο)",
+    "onchainPriority": "Onchain προτεραιότητα (~10λ)",
     "onchainStandard": "Onchain κανονικό (~4ω)",
-    "onchainEconomy": "Onchain οικονομικό",
+    "onchainEconomy": "Onchain οικονομικό (~24ω)",
     "lightningTransactions": "Συναλλαγές Lightning",
     "onchainBelowThreshold": "Onchain κάτω από {threshold: string} SAT",
     "onchainAboveThreshold": "Onchain πάνω από {threshold: string} SAT",
     "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Τέλος μεταφοράς",
     "noFee": "χωρίς τέλη",
-    "lightningSendFee": "{fee: string} + ~{routingFee: string} τέλος δρομολόγησης",
     "fromApprox": "από ~{fee: string}",
     "satAmount": "{amount: string} SAT",
     "error": "Δεν είναι δυνατή η λήψη των τελών αυτή τη στιγμή"
@@ -3482,8 +3496,7 @@
         "pinChangedTitle": "Το PIN άλλαξε",
         "pinChangedSubtitle": "Το PIN σας άλλαξε επιτυχώς.",
         "pinChangedToast": "Ο κωδικός PIN άλλαξε επιτυχώς",
-        "biometricDescription": "Επαληθεύστε την ταυτότητά σας για αλλαγή PIN",
-        "biometricRequired": "Η βιομετρική ταυτοποίηση απαιτείται για την αλλαγή του PIN σας."
+        "biometricDescription": "Επαληθεύστε την ταυτότητά σας για αλλαγή PIN"
       }
     },
     "ReplaceCard": {
