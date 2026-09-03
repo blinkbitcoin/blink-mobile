@@ -164,8 +164,12 @@ export const onSlot = <T>(
  *
  * A read that cannot answer counts as not gone. It is the conservative half of
  * a real trade-off, recorded at `runRemove`.
+ *
+ * Exported for the one-shot purge, which erases legacy copies the read path is
+ * no longer allowed to reach and needs the same proof of absence to decide
+ * whether it may record itself as done.
  */
-const eraseLegacyCopy = async (legacyKey: string): Promise<boolean> => {
+export const eraseLegacyCopy = async (legacyKey: string): Promise<boolean> => {
   const erased = await legacyErase(legacyKey)
   if (erased) return true
 
