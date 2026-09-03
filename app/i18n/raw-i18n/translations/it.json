@@ -72,6 +72,7 @@
     },
     "AuthenticationScreen": {
         "authenticationDescription": "Autenticati per continuare",
+        "authenticationRequired": "È richiesta l'autenticazione. Puoi impostare un codice PIN o la biometria nelle impostazioni di sicurezza.",
         "setUp": "Impostare l'Autenticazione Biometrica",
         "setUpAuthenticationDescription": "Usa dati biometrici per autenticare",
         "skip": "Salta",
@@ -2174,6 +2175,7 @@
     },
     "PinScreen": {
         "attemptsRemaining": "PIN errato. Hai {attemptsRemaining: number} tentativi rimanenti.",
+        "enterPin": "Inserisci il tuo codice PIN",
         "lockoutUnavailable": "Impossibile registrare in modo sicuro il tentativo fallito. Eseguo log out.",
         "oneAttemptRemaining": "PIN errato. 1 tentativo rimasto.",
         "pinUnreadable": "Impossibile verificare il PIN. Riprova.",
@@ -3494,8 +3496,7 @@
                 "pinChangedTitle": "PIN cambiato",
                 "pinChangedSubtitle": "Il tuo PIN è stato cambiato con successo.",
                 "pinChangedToast": "Il PIN è stato modificato con successo",
-                "biometricDescription": "Verifica la tua identità per cambiare il PIN",
-                "biometricRequired": "L'autenticazione biometrica è necessaria per cambiare il PIN."
+                "biometricDescription": "Verifica la tua identità per cambiare il PIN"
             }
         },
         "ReplaceCard": {

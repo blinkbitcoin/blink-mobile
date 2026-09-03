@@ -72,6 +72,7 @@
   },
   "AuthenticationScreen": {
     "authenticationDescription": "Authenticeer om verder te gaan",
+    "authenticationRequired": "Verificatie is vereist. U kunt een pincode of biometrie instellen in de beveiligingsinstellingen.",
     "setUp": "Biometrische authenticatie instellen",
     "setUpAuthenticationDescription": "Gebruik je biometrische authenticatie om verder te gaan",
     "skip": "Overslaan",
@@ -2174,6 +2175,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "Onjuiste pincode. {attemptsRemaining: number} resterende pogingen.",
+    "enterPin": "Voer uw pincode in",
     "lockoutUnavailable": "Kon de mislukte poging niet veilig vastleggen. Uitloggen.",
     "oneAttemptRemaining": "Onjuiste pincode. 1 poging over.",
     "pinUnreadable": "Kon je pincode niet controleren. Probeer het opnieuw.",
@@ -3494,8 +3496,7 @@
         "pinChangedTitle": "PIN gewijzigd",
         "pinChangedSubtitle": "Uw PIN is succesvol gewijzigd.",
         "pinChangedToast": "PIN is succesvol gewijzigd",
-        "biometricDescription": "Verifieer uw identiteit om uw PIN te wijzigen",
-        "biometricRequired": "Biometrische authenticatie is vereist om uw PIN te wijzigen."
+        "biometricDescription": "Verifieer uw identiteit om uw PIN te wijzigen"
       }
     },
     "ReplaceCard": {

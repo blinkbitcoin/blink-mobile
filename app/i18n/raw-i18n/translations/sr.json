@@ -72,6 +72,7 @@
   },
   "AuthenticationScreen": {
     "authenticationDescription": "Аутентификујте се да би сте наставили",
+    "authenticationRequired": "Потребна је аутентификација. ПИН код или биометрију можете подесити у безбедносним подешавањима.",
     "setUp": "Подесите Биометријску Аутентификацију",
     "setUpAuthenticationDescription": "Користи биометрију за аутентификацију",
     "skip": "Прескочи",
@@ -2174,6 +2175,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "Неисправан ПИН. Преостало је {attemptsRemaining: number} покушаја.",
+    "enterPin": "Унесите свој ПИН код",
     "lockoutUnavailable": "Неуспели покушај није могуће безбедно забележити. Одјављивање.",
     "oneAttemptRemaining": "Неисправан ПИН. Преостао је 1 покушај.",
     "pinUnreadable": "Није било могуће проверити ваш ПИН. Покушајте поново.",
@@ -3494,8 +3496,7 @@
         "pinChangedTitle": "ПИН промењен",
         "pinChangedSubtitle": "Ваш ПИН је успешно промењен.",
         "pinChangedToast": "ПИН је успешно промењен",
-        "biometricDescription": "Потврдите свој идентитет за промену PIN-а",
-        "biometricRequired": "Биометријска аутентификација је потребна за промену вашег PIN-а."
+        "biometricDescription": "Потврдите свој идентитет за промену PIN-а"
       }
     },
     "ReplaceCard": {

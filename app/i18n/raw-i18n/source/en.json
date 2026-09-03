@@ -38,6 +38,7 @@
     },
     "AuthenticationScreen": {
         "authenticationDescription": "Authenticate to continue",
+        "authenticationRequired": "Authentication is required. You can set up a PIN or biometrics in Security settings.",
         "setUp": "Set up Biometric Authentication",
         "setUpAuthenticationDescription": "Use biometric to authenticate",
         "skip": "Skip",
@@ -2140,6 +2141,7 @@
     },
     "PinScreen": {
         "attemptsRemaining": "Incorrect PIN. {attemptsRemaining: number} attempts remaining.",
+        "enterPin": "Enter your PIN code",
         "lockoutUnavailable": "Couldn't record the failed attempt securely. Logging out.",
         "oneAttemptRemaining": "Incorrect PIN. 1 attempt remaining.",
         "pinUnreadable": "Couldn't check your PIN. Please try again.",
@@ -3501,7 +3503,6 @@
                 "enterNewPin": "Enter new PIN",
                 "enterNewPinSubtitle": "Please enter your new 4-digit PIN.",
                 "biometricDescription": "Verify your identity to change PIN",
-                "biometricRequired": "Biometric authentication is required to change your PIN.",
                 "pinChangedTitle": "PIN changed",
                 "pinChangedSubtitle": "Your PIN has been changed successfully.",
                 "pinChangedToast": "PIN has been changed successfully"

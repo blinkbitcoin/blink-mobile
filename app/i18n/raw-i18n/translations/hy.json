@@ -72,6 +72,7 @@
   },
   "AuthenticationScreen": {
     "authenticationDescription": "Նույնականացնել՝ շարունակելու համար",
+    "authenticationRequired": "Պահանջվում է նույնականացում: Կարող եք սահմանել PIN ծածկագիր կամ կենսաչափական տվյալներ անվտանգության կարգավորումներում:",
     "setUp": "Սահմանել բիոմետրիկ նույնականացում",
     "setUpAuthenticationDescription": "Օգտագործել բիոմետրիկ համակարգ՝ նույնականացնելու համար",
     "skip": "Բաց թողնել",
@@ -2174,6 +2175,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "Սխալ PIN: {attemptsRemaining: number} փորձեր են մնացել։ ",
+    "enterPin": "Մուտքագրեք Ձեր PIN ծածկագիրը",
     "lockoutUnavailable": "Չհաջողվեց ապահով կերպով գրանցել ձախողված փորձը։ Ելք համակարգից։",
     "oneAttemptRemaining": "Սխալ PIN: 1 փորձ է մնացել։ ",
     "pinUnreadable": "Չհաջողվեց ստուգել Ձեր PIN-ը։ Խնդրում ենք կրկին փորձել։",
@@ -3494,8 +3496,7 @@
         "pinChangedTitle": "PIN-ը փոխվեց",
         "pinChangedSubtitle": "Ձեր PIN-ը հաջողությամբ փոխվել է։",
         "pinChangedToast": "PIN կոդը հաջողությամբ փոխվել է։",
-        "biometricDescription": "Հաստատեք ձեր ինքնությունը PIN-ը փոխելու համար",
-        "biometricRequired": "Կենսաբանական նույնականացումը պահանջվում է PIN-ը փոխելու համար:"
+        "biometricDescription": "Հաստատեք ձեր ինքնությունը PIN-ը փոխելու համար"
       }
     },
     "ReplaceCard": {

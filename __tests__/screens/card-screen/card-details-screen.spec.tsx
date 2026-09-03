@@ -17,6 +17,8 @@ jest.mock("react-native-linear-gradient", () => ({
 const mockGoBack = jest.fn()
 const mockSetOptions = jest.fn()
 const mockNavigate = jest.fn()
+const mockPush = jest.fn()
+const mockDispatch = jest.fn()
 jest.mock("@react-navigation/native", () => {
   const actualNav = jest.requireActual("@react-navigation/native")
   return {
@@ -25,9 +27,21 @@ jest.mock("@react-navigation/native", () => {
       goBack: mockGoBack,
       setOptions: mockSetOptions,
       navigate: mockNavigate,
+      push: mockPush,
+      dispatch: mockDispatch,
+      getState: () => ({ key: "stack-key" }),
     }),
+    useRoute: () => ({ key: "card-details-route-key" }),
   }
 })
+
+/** The gate removes the screen by name rather than saying "back", so a result
+ *  landing after something else was pushed cannot pop that instead. */
+const expectGateBouncedTheScreen = () => {
+  expect(mockDispatch).toHaveBeenCalledTimes(1)
+  const [action] = mockDispatch.mock.calls[0]
+  expect(action.source).toBe("card-details-route-key")
+}
 
 const mockCopyToClipboard = jest.fn()
 const mockUseClipboard = jest.fn((_clearAfterMs?: number) => ({
@@ -46,6 +60,24 @@ jest.mock("@app/utils/biometricAuthentication", () => ({
     authenticate: (...args: unknown[]) => mockAuthenticate(...args),
   },
 }))
+
+const mockReadIsPinEnabled = jest.fn()
+const mockReadIsBiometricsEnabled = jest.fn()
+jest.mock("@app/utils/storage/secureStorage", () => ({
+  __esModule: true,
+  default: {
+    readIsPinEnabled: () => mockReadIsPinEnabled(),
+    readIsBiometricsEnabled: () => mockReadIsBiometricsEnabled(),
+    /** Read by the account registry the screen renders under. */
+    getSessionProfiles: jest.fn().mockResolvedValue([]),
+  },
+}))
+
+jest.mock("@app/utils/toast", () => ({
+  toastShow: jest.fn(),
+}))
+
+import { toastShow } from "@app/utils/toast"
 
 const mockUseCardData = jest.fn()
 jest.mock("@app/screens/card-screen/hooks/use-card-data", () => ({
@@ -82,7 +114,16 @@ const defaultCardData = {
 
 const setupMocks = (overrides?: { cardData?: Partial<typeof defaultCardData> }) => {
   mockUseCardData.mockReturnValue({ ...defaultCardData, ...overrides?.cardData })
-  mockIsSensorAvailable.mockResolvedValue(false)
+  /** Default arrangement: a biometrics user passing the prompt. The gate fails
+   *  closed in every unauthenticated arrangement, so most cases need a pass. */
+  mockReadIsPinEnabled.mockResolvedValue({ status: "no" })
+  mockReadIsBiometricsEnabled.mockResolvedValue({ status: "yes" })
+  mockIsSensorAvailable.mockResolvedValue(true)
+  mockAuthenticate.mockImplementation(
+    (_desc: string, onSuccess: () => void, _onFail: () => void) => {
+      onSuccess()
+    },
+  )
 }
 
 describe("CardDetailsScreen", () => {
@@ -97,30 +138,8 @@ describe("CardDetailsScreen", () => {
     jest.useRealTimers()
   })
 
-  describe("biometric authentication", () => {
-    it("skips biometric when sensor is not available", async () => {
-      mockIsSensorAvailable.mockResolvedValue(false)
-
-      const { getByText } = render(
-        <ContextForScreen>
-          <CardDetailsScreen />
-        </ContextForScreen>,
-      )
-
-      await act(async () => {})
-
-      expect(getByText("Card number")).toBeTruthy()
-      expect(mockAuthenticate).not.toHaveBeenCalled()
-    })
-
-    it("triggers biometric when sensor is available", async () => {
-      mockIsSensorAvailable.mockResolvedValue(true)
-      mockAuthenticate.mockImplementation(
-        (_desc: string, onSuccess: () => void, _onFail: () => void) => {
-          onSuccess()
-        },
-      )
-
+  describe("local auth gate", () => {
+    it("authenticates through the biometric prompt", async () => {
       const { getByText } = render(
         <ContextForScreen>
           <CardDetailsScreen />
@@ -137,8 +156,30 @@ describe("CardDetailsScreen", () => {
       expect(getByText("Card number")).toBeTruthy()
     })
 
-    it("navigates back on biometric failure", async () => {
-      mockIsSensorAvailable.mockResolvedValue(true)
+    it("does not open when the sensor is unavailable; challenges the pin instead", async () => {
+      /** The old gate's fail-open: a missing sensor rendered the card details with
+       *  no challenge at all. */
+      mockReadIsPinEnabled.mockResolvedValue({ status: "yes" })
+      mockIsSensorAvailable.mockResolvedValue(false)
+
+      const { queryByText } = render(
+        <ContextForScreen>
+          <CardDetailsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(queryByText("Card number")).toBeNull()
+      expect(mockAuthenticate).not.toHaveBeenCalled()
+      expect(mockPush).toHaveBeenCalledWith(
+        "pin",
+        expect.objectContaining({ screenPurpose: "ChallengePin" }),
+      )
+    })
+
+    it("falls back to the pin challenge on biometric failure", async () => {
+      mockReadIsPinEnabled.mockResolvedValue({ status: "yes" })
       mockAuthenticate.mockImplementation(
         (_desc: string, _onSuccess: () => void, onFail: () => void) => {
           onFail()
@@ -153,7 +194,70 @@ describe("CardDetailsScreen", () => {
 
       await act(async () => {})
 
-      expect(mockGoBack).toHaveBeenCalled()
+      expect(mockPush).toHaveBeenCalledWith(
+        "pin",
+        expect.objectContaining({ screenPurpose: "ChallengePin" }),
+      )
+      expect(mockDispatch).not.toHaveBeenCalled()
+    })
+
+    it("explains and navigates back on biometric failure with no pin to fall back to", async () => {
+      mockAuthenticate.mockImplementation(
+        (_desc: string, _onSuccess: () => void, onFail: () => void) => {
+          onFail()
+        },
+      )
+
+      render(
+        <ContextForScreen>
+          <CardDetailsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(toastShow).toHaveBeenCalled()
+      expectGateBouncedTheScreen()
+    })
+
+    it("bounces silently when the pin challenge is declined", async () => {
+      mockReadIsPinEnabled.mockResolvedValue({ status: "yes" })
+      mockIsSensorAvailable.mockResolvedValue(false)
+
+      render(
+        <ContextForScreen>
+          <CardDetailsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      const challengeParams = mockPush.mock.calls.find(
+        ([routeName]) => routeName === "pin",
+      )?.[1]
+      await act(async () => challengeParams.onChallengeFailure())
+
+      /** The user cancelled and knows why; setup advice here would mislead. */
+      expect(toastShow).not.toHaveBeenCalled()
+      expectGateBouncedTheScreen()
+    })
+
+    it("fails closed when no factor is configured at all", async () => {
+      mockReadIsPinEnabled.mockResolvedValue({ status: "no" })
+      mockReadIsBiometricsEnabled.mockResolvedValue({ status: "no" })
+
+      const { queryByText } = render(
+        <ContextForScreen>
+          <CardDetailsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(queryByText("Card number")).toBeNull()
+      expect(mockAuthenticate).not.toHaveBeenCalled()
+      expect(toastShow).toHaveBeenCalled()
+      expectGateBouncedTheScreen()
     })
   })
 

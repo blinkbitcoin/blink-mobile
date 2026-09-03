@@ -72,6 +72,7 @@
   },
   "AuthenticationScreen": {
     "authenticationDescription": "Qinisekisa ukuqhubeka",
+    "authenticationRequired": "Kufuneka uqinisekiso. Ungaseta ikhowudi ye-PIN okanye i-biometrics kusetingi zokhuseleko.",
     "setUp": "Cwangcisa uQinisekiso lwebhayometriki",
     "setUpAuthenticationDescription": "Sebenzisa ibhayometriki ukungqinisisa",
     "skip": "Tsiba",
@@ -2174,6 +2175,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "I-PIN engalunganga. {attemptsRemaining: number} imizamo eseleyo.",
+    "enterPin": "Faka ikhowudi yakho ye-PIN",
     "lockoutUnavailable": "Akukwazekanga ukurekhoda umzamo ongaphumelelanga ngokukhuselekileyo. Ukuloga ngaphandle.",
     "oneAttemptRemaining": "PIN engalunganga. Kushiyeke umzamo “1”.",
     "pinUnreadable": "Ayikwazanga ukujonga i-PIN yakho. Nceda uzame kwakhona.",
@@ -3494,8 +3496,7 @@
         "pinChangedTitle": "I-PIN itshintshiwe",
         "pinChangedSubtitle": "I-PIN yakho itshintshwe ngempumelelo.",
         "pinChangedToast": "I-PIN itshintshiwe ngempumelelo",
-        "biometricDescription": "Qinisekisa isazisi sakho ukuze utshintshe iPIN",
-        "biometricRequired": "Ukuqinisekiswa kwe-biometric kuyafuneka ukutshintsha iPIN yakho."
+        "biometricDescription": "Qinisekisa isazisi sakho ukuze utshintshe iPIN"
       }
     },
     "ReplaceCard": {

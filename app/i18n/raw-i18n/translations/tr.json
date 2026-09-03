@@ -72,6 +72,7 @@
   },
   "AuthenticationScreen": {
     "authenticationDescription": "Devam edebilmek için doğrula",
+    "authenticationRequired": "Kimlik doğrulama gerekli. Güvenlik ayarlarından PIN kodu veya biyometri ayarlayabilirsin.",
     "setUp": "Biyometrik doğrulamayı ayarlayın",
     "setUpAuthenticationDescription": "Doğrulama için biyometrik veri kullan",
     "skip": "Atla",
@@ -2174,6 +2175,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "Yanlış PIN kodu. Kalan deneme hakkınız: {attemptsRemaining: number}",
+    "enterPin": "PIN kodunu gir",
     "lockoutUnavailable": "Başarısız deneme güvenli şekilde kaydedilemedi. Çıkış yapılıyor.",
     "oneAttemptRemaining": "Yanlış PIN kodu. Kalan deneme hakkınız: 1",
     "pinUnreadable": "PIN kodunuz kontrol edilemedi. Lütfen tekrar deneyin.",
@@ -3494,8 +3496,7 @@
         "pinChangedTitle": "PIN değiştirildi",
         "pinChangedSubtitle": "PIN'iniz başarıyla değiştirildi.",
         "pinChangedToast": "PIN başarıyla değiştirildi",
-        "biometricDescription": "PIN'inizi değiştirmek için kimliğinizi doğrulayın",
-        "biometricRequired": "PIN'inizi değiştirmek için biyometrik kimlik doğrulama gereklidir."
+        "biometricDescription": "PIN'inizi değiştirmek için kimliğinizi doğrulayın"
       }
     },
     "ReplaceCard": {

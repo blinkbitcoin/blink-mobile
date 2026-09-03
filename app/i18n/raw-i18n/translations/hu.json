@@ -72,6 +72,7 @@
   },
   "AuthenticationScreen": {
     "authenticationDescription": "Feloldás a folytatáshoz",
+    "authenticationRequired": "Hitelesítés szükséges. PIN kódot vagy biometriát a biztonsági beállításokban állíthatsz be.",
     "setUp": "Biometrikus azonosítás beállítása",
     "setUpAuthenticationDescription": "Azonosítás biometrikus adatokkal",
     "skip": "Kihagy",
@@ -2174,6 +2175,7 @@
   },
   "PinScreen": {
     "attemptsRemaining": "Helytelen PIN. {attemptsRemaining: number} próbálkozás maradt.",
+    "enterPin": "Add meg a PIN kódodat",
     "lockoutUnavailable": "A sikertelen próbálkozást nem sikerült biztonságosan rögzíteni. Kijelentkezés.",
     "oneAttemptRemaining": "Helytelen PIN. 1 próbálkozás maradt.",
     "pinUnreadable": "Nem sikerült ellenőrizni a PIN-kódot. Kérjük, próbálja újra.",
@@ -3494,8 +3496,7 @@
         "pinChangedTitle": "PIN megváltoztatva",
         "pinChangedSubtitle": "A PIN kódja sikeresen megváltozott.",
         "pinChangedToast": "A PIN-kód sikeresen módosítva",
-        "biometricDescription": "Igazolja személyazonosságát a PIN megváltoztatásához",
-        "biometricRequired": "Biometrikus hitelesítés szükséges a PIN megváltoztatásához."
+        "biometricDescription": "Igazolja személyazonosságát a PIN megváltoztatásához"
       }
     },
     "ReplaceCard": {
