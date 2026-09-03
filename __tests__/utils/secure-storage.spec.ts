@@ -1733,3 +1733,220 @@ describe("KeyStoreWrapper clearUninstallSurvivingCredentials", () => {
     ])
   })
 })
+
+describe("KeyStoreWrapper.purgeLegacyKeyStore", () => {
+  /** Every key the purge is expected to name, in the order it names them. */
+  const FIXED_KEYS = [
+    "isBiometricsEnabled",
+    "PIN",
+    "pinFailureState",
+    "pinAttempts",
+    "sessionProfiles",
+    "galoyAuthToken",
+  ]
+
+  /**
+   * Both stores, so that a purge which migrates before erasing is exercised the
+   * way it runs: the legacy value moves across and the new store then answers
+   * for it.
+   */
+  const stores = {
+    legacy: new Map<string, string>(),
+    migrated: new Map<string, string>(),
+  }
+
+  const legacyNotFound = () =>
+    Object.assign(new Error("key does not present"), { code: "404" })
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    stores.legacy.clear()
+    stores.migrated.clear()
+
+    mockGet.mockImplementation(async (key: string) => {
+      const value = stores.legacy.get(key)
+      if (value === undefined) throw legacyNotFound()
+      return value
+    })
+    mockRemove.mockImplementation(async (key: string) => {
+      stores.legacy.delete(key)
+    })
+    mockGetInternet.mockImplementation(async (server: string) => {
+      const slot = server.replace("secure-store.blink.local/", "")
+      const value = stores.migrated.get(slot)
+      if (value === undefined) return false
+      return { username: slot, password: value }
+    })
+    mockSetInternet.mockImplementation(
+      async (server: string, slot: string, value: string) => {
+        stores.migrated.set(slot, value)
+        return { service: server }
+      },
+    )
+    mockResetInternet.mockResolvedValue(undefined)
+  })
+
+  it("erases the six fixed keys", async () => {
+    FIXED_KEYS.forEach((key) => stores.legacy.set(key, `${key}-value`))
+
+    const purged = await KeyStoreWrapper.purgeLegacyKeyStore([])
+
+    expect(purged).toBe(true)
+    expect([...stores.legacy.keys()]).toEqual([])
+  })
+
+  it("erases both mnemonic keys for every account it is given", async () => {
+    stores.legacy.set("mnemonic:alice", "alpha beta")
+    stores.legacy.set("mnemonic_network:alice", "bitcoin")
+
+    const purged = await KeyStoreWrapper.purgeLegacyKeyStore(["alice"])
+
+    expect(purged).toBe(true)
+    expect([...stores.legacy.keys()]).toEqual([])
+  })
+
+  it("moves a value to the new store before erasing it", async () => {
+    stores.legacy.set("mnemonic:alice", "alpha beta")
+
+    await KeyStoreWrapper.purgeLegacyKeyStore(["alice"])
+
+    expect(stores.migrated.get("mnemonic:alice")).toBe("alpha beta")
+  })
+
+  it("counts a key that was never there as gone", async () => {
+    const purged = await KeyStoreWrapper.purgeLegacyKeyStore([])
+
+    expect(purged).toBe(true)
+    expect(mockRemove).not.toHaveBeenCalled()
+  })
+
+  /**
+   * The failure this whole ordering exists for: a read-through answers `found`
+   * from the legacy store even when the migrating write failed, so erasing on
+   * that answer would delete the only copy of someone's seed.
+   */
+  it("keeps the legacy copy when the migrating write failed", async () => {
+    stores.legacy.set("mnemonic:alice", "alpha beta")
+    mockSetInternet.mockResolvedValue(false)
+
+    const purged = await KeyStoreWrapper.purgeLegacyKeyStore(["alice"])
+
+    expect(purged).toBe(false)
+    expect(stores.legacy.get("mnemonic:alice")).toBe("alpha beta")
+  })
+
+  it("keeps the legacy copy when the new store cannot be read back", async () => {
+    stores.legacy.set("PIN", "1234")
+    mockGetInternet.mockRejectedValue(new Error("keychain unavailable"))
+
+    const purged = await KeyStoreWrapper.purgeLegacyKeyStore([])
+
+    expect(purged).toBe(false)
+    expect(stores.legacy.get("PIN")).toBe("1234")
+  })
+
+  it("keeps going when the legacy store cannot say what it holds", async () => {
+    mockGet.mockRejectedValue(new Error("keychain unavailable"))
+
+    const purged = await KeyStoreWrapper.purgeLegacyKeyStore([])
+
+    expect(purged).toBe(false)
+    expect(mockRemove).not.toHaveBeenCalled()
+  })
+
+  /**
+   * The iOS module returns nil for any failed lookup and rejects it with the
+   * not-found code, so a read taken before first unlock reports an empty store
+   * rather than an unreadable one. Believing it would record the purge as done
+   * over a seed that never left the legacy store.
+   */
+  it("does not call a mnemonic purged on an empty legacy read alone", async () => {
+    const purged = await KeyStoreWrapper.purgeLegacyKeyStore(["alice"])
+
+    expect(purged).toBe(false)
+  })
+
+  it("calls a mnemonic purged once the new store holds it", async () => {
+    stores.migrated.set("mnemonic:alice", "alpha beta")
+    stores.migrated.set("mnemonic_network:alice", "bitcoin")
+
+    const purged = await KeyStoreWrapper.purgeLegacyKeyStore(["alice"])
+
+    expect(purged).toBe(true)
+  })
+
+  /**
+   * The marker is optional metadata, so demanding proof of it would leave the
+   * purge unable to finish for an account that never had one.
+   */
+  it("completes for an account with a seed but no network marker", async () => {
+    stores.migrated.set("mnemonic:alice", "alpha beta")
+
+    const purged = await KeyStoreWrapper.purgeLegacyKeyStore(["alice"])
+
+    expect(purged).toBe(true)
+  })
+
+  /** A user who never set a PIN has nothing here and must not be retried forever. */
+  it("accepts an empty legacy read for the session slots", async () => {
+    const purged = await KeyStoreWrapper.purgeLegacyKeyStore([])
+
+    expect(purged).toBe(true)
+  })
+
+  it("still purges every remaining slot after one of them fails", async () => {
+    FIXED_KEYS.forEach((key) => stores.legacy.set(key, `${key}-value`))
+    stores.legacy.set("mnemonic:alice", "alpha beta")
+    mockRemove.mockImplementation(async (key: string) => {
+      if (key === "PIN") throw new Error("keychain unavailable")
+      stores.legacy.delete(key)
+    })
+
+    const purged = await KeyStoreWrapper.purgeLegacyKeyStore(["alice"])
+
+    expect(purged).toBe(false)
+    expect([...stores.legacy.keys()]).toEqual(["PIN"])
+  })
+
+  /**
+   * The timeout only races a hung native call, it cannot cancel it. So the
+   * verify can still be running when its slot is handed on, and the erase that
+   * follows would then be deleting a legacy copy on behalf of a slot that has
+   * moved on.
+   */
+  it("drops the erase of a verify that lands after its slot moved on", async () => {
+    jest.useFakeTimers()
+    stores.legacy.set("PIN", "1234")
+    stores.migrated.set("PIN", "1234")
+
+    // The verify is the SECOND read of this slot: the read-through ahead of it
+    // does the first, and only the verify may be left holding a stale slot.
+    let releaseHungVerify: () => void = () => {}
+    let pinReads = 0
+    mockGetInternet.mockImplementation(async (server: string) => {
+      const slot = server.replace("secure-store.blink.local/", "")
+      if (slot === "PIN") {
+        pinReads += 1
+        if (pinReads === 2) {
+          return new Promise((resolve) => {
+            releaseHungVerify = () => resolve({ username: "PIN", password: "1234" })
+          })
+        }
+      }
+      const value = stores.migrated.get(slot)
+      if (value === undefined) return false
+      return { username: slot, password: value }
+    })
+
+    const purged = KeyStoreWrapper.purgeLegacyKeyStore([])
+    await jest.advanceTimersByTimeAsync(30_000)
+    expect(await purged).toBe(false)
+
+    mockRemove.mockClear()
+    releaseHungVerify()
+    await jest.advanceTimersByTimeAsync(0)
+
+    expect(mockRemove).not.toHaveBeenCalled()
+    jest.useRealTimers()
+  })
+})

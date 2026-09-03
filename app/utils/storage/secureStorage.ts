@@ -1,8 +1,9 @@
 import { ACCESSIBLE } from "react-native-keychain"
 
-import { eraseEntireLegacyStore } from "./legacy-key-store"
+import { eraseEntireLegacyStore, legacyRead } from "./legacy-key-store"
 import { type SecureExists, secureRead, secureRemove, secureWrite } from "./secure-store"
 import {
+  eraseLegacyCopy,
   type ReadThroughArgs,
   existsThrough,
   onSlot,
@@ -743,5 +744,133 @@ export default class KeyStoreWrapper {
       value: network,
       accessible: ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
     })
+  }
+
+  /**
+   * Finishes a slot's migration and then erases its legacy copy, in that order.
+   *
+   * Erasing first is what the obvious implementation does and it is wrong. A
+   * read-through reports `found` for a value it read out of the legacy store
+   * even when the migrating write failed, so "this slot has been read" is not
+   * evidence the new store holds anything. Erasing on that evidence deletes the
+   * only copy — a re-login for a session slot, and someone's seed for a
+   * mnemonic.
+   *
+   * So the new store has to say `found` itself before anything is deleted, and
+   * every step runs inside the slot queue: a read-through migrating this same
+   * slot concurrently sits between its own miss and its legacy read, and an
+   * unqueued erase in that window takes the value out from under it.
+   *
+   * False whenever the copy is not provably safe to remove, which simply leaves
+   * it for the next boot. Never rejects, like every other operation on this
+   * queue: a slot that timed out must cost its own key and not the ones behind
+   * it, which a rejection propagating out of the loop would.
+   */
+  private static async purgeSlot(
+    args: ReadThroughArgs,
+    requireMigrated: boolean,
+  ): Promise<boolean> {
+    // Migrates as its side effect, and takes its own turn in the queue. A slot
+    // nothing has read yet is unmigrated by definition, and this is the last
+    // chance it gets before its legacy copy is gone.
+    await readThrough(args)
+
+    try {
+      return await onSlot(args.slot, async (isCurrent) => {
+        const migratedFirst = await secureRead(args.slot)
+
+        const legacy = await legacyRead(args.legacyKey)
+        if (legacy.status === "failed") return false
+
+        // `absent` is not the proof it looks like on iOS: the native module
+        // discards the OSStatus and rejects every failed lookup with the
+        // not-found code, so a read taken before first unlock reports an empty
+        // store rather than an unreadable one. Believing it is what would let a
+        // silent-push launch record the purge as done over a mnemonic that
+        // never left the legacy store.
+        //
+        // Where getting it wrong costs a re-login, absence is accepted: a user
+        // who never set a PIN has nothing here and must not be retried forever.
+        // Where it costs a seed, the new store has to hold the value first.
+        if (legacy.status === "absent") {
+          return requireMigrated ? migratedFirst.status === "found" : true
+        }
+
+        // The only status that proves the value survived the move. `absent`
+        // means the migrating write failed, `failed` means the store could not
+        // say. Re-read, because the read-through above may have migrated it
+        // since.
+        const migrated = await secureRead(args.slot)
+        if (migrated.status !== "found") return false
+
+        if (!isCurrent()) return false
+
+        return eraseLegacyCopy(args.legacyKey)
+      })
+    } catch {
+      return false
+    }
+  }
+
+  /**
+   * Erases every item this app ever wrote to the legacy key store, by name.
+   *
+   * The migration moves a slot the first time something reads it, so a value
+   * nothing reads is still sitting in the legacy store; and the mnemonic slots
+   * keep their legacy copy deliberately, so those are there even after they
+   * migrate (see mnemonicSlotFor). This is what finally removes both, and it is
+   * the only thing that does: dropping the dependency deletes no data, it just
+   * removes the code that could have.
+   *
+   * By name rather than by service, unlike eraseEntireLegacyStore: a named
+   * delete is the half that also works on Android, where the legacy store is a
+   * shared-preferences file rather than a Keychain service.
+   *
+   * `accountIds` comes from the caller because the account index lives in
+   * AsyncStorage, outside this file. An id missing from that list leaves its
+   * mnemonic behind, which is the conservative direction: the key stays until a
+   * boot that can name it.
+   *
+   * True only when every key is provably gone, so that a caller recording this
+   * as done cannot record it over a store that still holds something.
+   */
+  public static async purgeLegacyKeyStore(accountIds: string[]): Promise<boolean> {
+    // What an empty legacy read is allowed to mean, carried per slot rather than
+    // derived from the key name: only the seed is held to the strict rule.
+    // Session slots may legitimately have never existed, and the network marker
+    // is optional metadata, so demanding proof of either would leave the purge
+    // unable to finish and retrying every boot forever.
+    const sessionSlots = [
+      KeyStoreWrapper.IS_BIOMETRICS_ENABLED,
+      KeyStoreWrapper.PIN,
+      KeyStoreWrapper.PIN_FAILURE_STATE,
+      KeyStoreWrapper.LEGACY_PIN_ATTEMPTS,
+      KeyStoreWrapper.SESSION_PROFILES,
+      KeyStoreWrapper.ACTIVE_TOKEN,
+    ].map((key) => ({ args: KeyStoreWrapper.slotFor(key), requireMigrated: false }))
+
+    const mnemonicSlots = accountIds.flatMap((accountId) => [
+      {
+        args: KeyStoreWrapper.mnemonicSlotFor(KeyStoreWrapper.mnemonicKeyFor(accountId)),
+        requireMigrated: true,
+      },
+      {
+        args: KeyStoreWrapper.mnemonicSlotFor(
+          KeyStoreWrapper.mnemonicNetworkKeyFor(accountId),
+        ),
+        requireMigrated: false,
+      },
+    ])
+
+    let allGone = true
+    for (const slot of [...sessionSlots, ...mnemonicSlots]) {
+      // Sequential, and never short-circuited: one slot that cannot be purged
+      // must not leave the rest behind for a purge that may not run again for
+      // months.
+      const gone = await KeyStoreWrapper.purgeSlot(slot.args, slot.requireMigrated)
+      if (!gone) allGone = false
+    }
+
+    return allGone
   }
 }
