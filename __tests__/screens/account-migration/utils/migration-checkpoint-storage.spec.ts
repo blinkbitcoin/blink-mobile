@@ -1,4 +1,5 @@
 import {
+  MigrationTargetOrigin,
   MigrationCheckpoint,
   clearCheckpointFromStorage,
   getStorageKey,
@@ -134,7 +135,7 @@ describe("migration-checkpoint-storage", () => {
     })
 
     /** Advisory like expectedReceiveSats: dropping it alone keeps the step and ids the
-     *  record resumes from, and an absent invoice falls back to the balance test. */
+     *  record resumes from, and an absent invoice leaves the receive unprovable. */
     it("drops a non-string value but keeps the rest of the record", () => {
       const result = validateStoredCheckpoint({
         step: MigrationCheckpoint.BalancesOverview,
@@ -151,6 +152,7 @@ describe("migration-checkpoint-storage", () => {
         custodialAccountId: "cust-1",
         expectedReceiveSats: undefined,
         sparkInvoice: undefined,
+        targetOrigin: undefined,
       })
     })
 
@@ -163,6 +165,49 @@ describe("migration-checkpoint-storage", () => {
         sparkInvoice: "",
       })
       expect(result?.sparkInvoice).toBeUndefined()
+    })
+  })
+
+  describe("validateStoredCheckpoint targetOrigin", () => {
+    it("keeps a recognised origin", () => {
+      const result = validateStoredCheckpoint({
+        step: MigrationCheckpoint.TermsAndConditions,
+        savedAt: 1000,
+        targetOrigin: MigrationTargetOrigin.Adopted,
+      })
+      expect(result?.targetOrigin).toBe(MigrationTargetOrigin.Adopted)
+    })
+
+    /** Advisory in the same way: dropping it alone keeps the step and ids the record
+     *  resumes from, and the readers treat undefined as provisioned. */
+    it("drops an unrecognised origin but keeps the rest of the record", () => {
+      const result = validateStoredCheckpoint({
+        step: MigrationCheckpoint.TermsAndConditions,
+        savedAt: 1000,
+        accountId: "sc-1",
+        custodialAccountId: "cust-1",
+        targetOrigin: "imported-somehow",
+      })
+
+      expect(result).toEqual({
+        step: MigrationCheckpoint.TermsAndConditions,
+        savedAt: 1000,
+        accountId: "sc-1",
+        custodialAccountId: "cust-1",
+        expectedReceiveSats: undefined,
+        sparkInvoice: undefined,
+        targetOrigin: undefined,
+      })
+    })
+
+    /** Records written before the field existed: absent is what the readers turn into
+     *  provisioned, the only way a target could be obtained then. */
+    it("leaves an absent origin undefined", () => {
+      const result = validateStoredCheckpoint({
+        step: MigrationCheckpoint.TermsAndConditions,
+        savedAt: 1000,
+      })
+      expect(result?.targetOrigin).toBeUndefined()
     })
   })
 

@@ -55,6 +55,12 @@ export const RestorePhraseScreen: React.FC = () => {
     isPhraseStep(stepParam) && (stepParam === PhraseStep.First || wordsOk)
   const step = hasValidParams ? stepParam : PhraseStep.First
   const initialWords = hasValidParams && wordsOk ? wordsParam : undefined
+  /** Validated on its own, deliberately not folded into hasValidParams: a rehydrated step 2
+   *  without its words falls back to step 1, and dropping the flow with it would hand the
+   *  re-typed phrase to the onboarding restore, which activates the wallet and switches
+   *  away from a custodial account still holding the funds. The literal validates itself. */
+  const isMigrationFlow = params?.flow === "migration"
+  const flow = isMigrationFlow ? "migration" : undefined
 
   useEffect(() => {
     if (hasValidParams) return
@@ -77,6 +83,7 @@ export const RestorePhraseScreen: React.FC = () => {
     stepFilled,
     allFilled,
     isValid,
+    isSubmitBlocked,
     validationError,
     status,
     isStep1,
@@ -84,7 +91,7 @@ export const RestorePhraseScreen: React.FC = () => {
     handleRestore,
     focusRequest,
     clearFocusRequest,
-  } = useRestorePhrase({ step, initialWords })
+  } = useRestorePhrase({ step, initialWords, flow })
 
   const showInvalidMnemonic = !isStep1 && allFilled && !isValid
   const showError = Boolean(validationError) || showInvalidMnemonic
@@ -165,7 +172,7 @@ export const RestorePhraseScreen: React.FC = () => {
   }
 
   const { subtitle, button: buttonTitle } = stepContent[step]
-  const buttonDisabled = isStep1 ? !stepFilled : !isValid
+  const buttonDisabled = isStep1 ? !stepFilled : !isValid || isSubmitBlocked
 
   return (
     <OnboardingScreenLayout
