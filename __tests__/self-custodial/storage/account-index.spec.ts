@@ -7,6 +7,7 @@ const mockRememberMnemonicAccount = jest.fn()
 const mockMnemonicExists = jest.fn()
 const mockMnemonicNetworkExists = jest.fn()
 const mockMnemonicIsMigrated = jest.fn()
+const mockPurgeLegacyKeyStore = jest.fn()
 
 jest.mock("@react-native-async-storage/async-storage", () => ({
   __esModule: true,
@@ -27,6 +28,7 @@ jest.mock("@app/utils/storage/secureStorage", () => ({
     mnemonicExists: (...args: unknown[]) => mockMnemonicExists(...args),
     mnemonicNetworkExists: (...args: unknown[]) => mockMnemonicNetworkExists(...args),
     mnemonicIsMigrated: (...args: unknown[]) => mockMnemonicIsMigrated(...args),
+    purgeLegacyKeyStore: (...args: unknown[]) => mockPurgeLegacyKeyStore(...args),
   },
 }))
 
@@ -47,11 +49,15 @@ import {
   readSelfCustodialIndexPresence,
   SelfCustodialIndexPresence,
   sweepMnemonicMigration,
+  purgeLegacyKeyStoreOnce,
   type SelfCustodialAccountEntry,
 } from "@app/self-custodial/storage/account-index"
 
 const ACCOUNT_INDEX_KEY = "selfCustodialAccountIndex"
 const LEGACY_ID_LIST_KEY = "selfCustodialAccountIds"
+const LEGACY_PURGE_DONE_KEY = "legacyKeyStorePurged"
+
+const SWEEP_OK = { status: "ok", migrated: 1 } as const
 
 const setIndex = (entries: SelfCustodialAccountEntry[]) => {
   mockGetItem.mockImplementation((key: string) =>
@@ -80,6 +86,7 @@ describe("self-custodial account-index", () => {
     mockMnemonicExists.mockResolvedValue({ status: "no" })
     mockMnemonicNetworkExists.mockResolvedValue({ status: "no" })
     mockMnemonicIsMigrated.mockResolvedValue({ status: "yes" })
+    mockPurgeLegacyKeyStore.mockResolvedValue(true)
   })
 
   describe("listSelfCustodialAccounts", () => {
@@ -751,6 +758,93 @@ describe("self-custodial account-index", () => {
       const second = await sweepMnemonicMigration()
 
       expect(second).toEqual(first)
+    })
+  })
+
+  describe("purgeLegacyKeyStoreOnce", () => {
+    /** The index is read for the account ids, and the done-flag from its own key. */
+    const setIndexAndFlag = (
+      entries: SelfCustodialAccountEntry[],
+      flag: string | null,
+    ) => {
+      mockGetItem.mockImplementation((key: string) => {
+        if (key === ACCOUNT_INDEX_KEY) return Promise.resolve(JSON.stringify(entries))
+        if (key === LEGACY_PURGE_DONE_KEY) return Promise.resolve(flag)
+        return Promise.resolve(null)
+      })
+    }
+
+    it("purges every account in the index and records itself as done", async () => {
+      setIndexAndFlag([{ id: "a1", lightningAddress: null }], null)
+
+      const result = await purgeLegacyKeyStoreOnce(SWEEP_OK)
+
+      expect(result).toEqual({ status: "done" })
+      expect(mockPurgeLegacyKeyStore).toHaveBeenCalledWith(["a1"])
+      expect(mockSetItem).toHaveBeenCalledWith(LEGACY_PURGE_DONE_KEY, "true")
+    })
+
+    it("purges the fixed keys when the index holds no accounts", async () => {
+      setIndexAndFlag([], null)
+
+      const result = await purgeLegacyKeyStoreOnce(SWEEP_OK)
+
+      expect(result).toEqual({ status: "done" })
+      expect(mockPurgeLegacyKeyStore).toHaveBeenCalledWith([])
+    })
+
+    it("does not purge while the sweep left an account unread", async () => {
+      setIndexAndFlag([{ id: "a1", lightningAddress: null }], null)
+
+      const result = await purgeLegacyKeyStoreOnce({ status: "incomplete", failures: 1 })
+
+      expect(result).toEqual({ status: "skipped", reason: "sweep-incomplete" })
+      expect(mockPurgeLegacyKeyStore).not.toHaveBeenCalled()
+    })
+
+    it("does not purge twice on the same install", async () => {
+      setIndexAndFlag([{ id: "a1", lightningAddress: null }], "true")
+
+      const result = await purgeLegacyKeyStoreOnce(SWEEP_OK)
+
+      expect(result).toEqual({ status: "skipped", reason: "already-done" })
+      expect(mockPurgeLegacyKeyStore).not.toHaveBeenCalled()
+    })
+
+    it("purges anyway when the done-flag cannot be read", async () => {
+      mockGetItem.mockImplementation((key: string) => {
+        if (key === LEGACY_PURGE_DONE_KEY) {
+          return Promise.reject(new Error("AsyncStorage unavailable"))
+        }
+        return Promise.resolve(JSON.stringify([{ id: "a1", lightningAddress: null }]))
+      })
+
+      const result = await purgeLegacyKeyStoreOnce(SWEEP_OK)
+
+      expect(result).toEqual({ status: "done" })
+      expect(mockPurgeLegacyKeyStore).toHaveBeenCalledWith(["a1"])
+    })
+
+    it("does not purge when the index cannot be read", async () => {
+      mockGetItem.mockImplementation((key: string) => {
+        if (key === LEGACY_PURGE_DONE_KEY) return Promise.resolve(null)
+        return Promise.reject(new Error("AsyncStorage unavailable"))
+      })
+
+      const result = await purgeLegacyKeyStoreOnce(SWEEP_OK)
+
+      expect(result).toEqual({ status: "skipped", reason: "index-unreadable" })
+      expect(mockPurgeLegacyKeyStore).not.toHaveBeenCalled()
+    })
+
+    it("leaves the flag unset when a key could not be erased", async () => {
+      setIndexAndFlag([{ id: "a1", lightningAddress: null }], null)
+      mockPurgeLegacyKeyStore.mockResolvedValue(false)
+
+      const result = await purgeLegacyKeyStoreOnce(SWEEP_OK)
+
+      expect(result).toEqual({ status: "incomplete" })
+      expect(mockSetItem).not.toHaveBeenCalledWith(LEGACY_PURGE_DONE_KEY, "true")
     })
   })
 })
