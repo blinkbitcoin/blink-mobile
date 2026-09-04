@@ -6,6 +6,7 @@ import { makeStyles, Text } from "@rn-vui/themed"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { Feature, FeatureItem } from "@app/components/card-screen"
+import { CloseHeader } from "@app/components/close-header"
 import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -38,9 +39,12 @@ export const TermSheetScreen: React.FC = () => {
   }
 
   return (
-    <Screen>
+    <Screen headerShown={false}>
+      <CloseHeader testID="term-sheet-close" />
       <View style={styles.container}>
-        <View style={styles.topSpacer} />
+        <Text type="h1" style={styles.title}>
+          {LL.CardFlow.Onboarding.TermSheet.title()}
+        </Text>
         <ScrollView
           style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}
@@ -70,8 +74,11 @@ const useStyles = makeStyles(({ colors }) => ({
   container: {
     flex: 1,
   },
-  topSpacer: {
-    marginTop: 30,
+  title: {
+    marginTop: 10,
+    marginBottom: 20,
+    paddingHorizontal: 20,
+    textAlign: "center",
   },
   scrollView: {
     flex: 1,
