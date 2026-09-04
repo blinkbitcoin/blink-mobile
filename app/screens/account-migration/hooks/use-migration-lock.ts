@@ -19,8 +19,8 @@ type MigrationLock = {
 /**
  * Whether the ACTIVE account is past the migration's point of no return, as the server
  * sees it. This is the whole lock: it survives a reinstall, which the local checkpoint
- * cannot (48h expiry, and AsyncStorage dies with the app), so the checkpoint is demoted
- * to remembering WHICH screen to resume on. The account type comes from the registry, as
+ * cannot (AsyncStorage dies with the app), so the checkpoint is demoted to remembering
+ * WHICH screen to resume on and this answers WHETHER there is still a flow to resume. The account type comes from the registry, as
  * in the wind-down gate, so a custodial migration never blocks a self-custodial session
  * the user switched to; and only a phase the server actually reported locks, because
  * locking every offline launch into a migration is far worse than letting a locked user

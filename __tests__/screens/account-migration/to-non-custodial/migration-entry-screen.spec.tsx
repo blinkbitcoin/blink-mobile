@@ -34,6 +34,18 @@ let mockIsAtCommitPoint = false
 let mockHasResumableCheckpoint = false
 let mockCheckpointLoading = false
 let mockSelfCustodialDisabled = false
+let mockIsLocked = true
+let mockLockLoading = false
+let mockLockError = false
+
+jest.mock("@app/screens/account-migration/hooks/use-migration-lock", () => ({
+  useMigrationLock: () => ({
+    isLocked: mockIsLocked,
+    loading: mockLockLoading,
+    hasError: mockLockError,
+    refetch: jest.fn(),
+  }),
+}))
 
 jest.mock("@app/screens/account-migration/hooks", () => ({
   useMigrationCheckpoint: () => ({
@@ -64,6 +76,9 @@ describe("MigrationEntryScreen", () => {
     mockHasResumableCheckpoint = false
     mockCheckpointLoading = false
     mockSelfCustodialDisabled = false
+    mockIsLocked = true
+    mockLockLoading = false
+    mockLockError = false
     mockRemoteConfigReady = true
     mockRegistryLoading = false
   })
@@ -152,5 +167,52 @@ describe("MigrationEntryScreen", () => {
 
     expect(mockReplace).toHaveBeenCalledWith("Primary")
     expect(mockGoBack).not.toHaveBeenCalled()
+  })
+
+  describe("the server owns whether a migration is still open", () => {
+    /** A device that left off on the commit screen: everything local says resume. */
+    const arriveWithCommitPointCheckpoint = (): void => {
+      mockIsAtCommitPoint = true
+      mockHasResumableCheckpoint = true
+    }
+
+    it("resumes while the server still holds the flow", () => {
+      arriveWithCommitPointCheckpoint()
+
+      render(<MigrationEntryScreen />)
+
+      expect(mockReplaceToCheckpoint).toHaveBeenCalledTimes(1)
+      expect(mockReplace).not.toHaveBeenCalled()
+    })
+
+    it("starts over once support has cleared the flow, whatever the device remembers", () => {
+      arriveWithCommitPointCheckpoint()
+      mockIsLocked = false
+
+      render(<MigrationEntryScreen />)
+
+      expect(mockReplace).toHaveBeenCalledWith("accountMigrationStart")
+      expect(mockReplaceToCheckpoint).not.toHaveBeenCalled()
+    })
+
+    it("waits for the server rather than resuming on a stale record", () => {
+      arriveWithCommitPointCheckpoint()
+      mockLockLoading = true
+
+      render(<MigrationEntryScreen />)
+
+      expect(mockReplaceToCheckpoint).not.toHaveBeenCalled()
+      expect(mockReplace).not.toHaveBeenCalled()
+    })
+
+    it("starts over when the server could not be asked, never resumes on a guess", () => {
+      arriveWithCommitPointCheckpoint()
+      mockLockError = true
+
+      render(<MigrationEntryScreen />)
+
+      expect(mockReplace).toHaveBeenCalledWith("accountMigrationStart")
+      expect(mockReplaceToCheckpoint).not.toHaveBeenCalled()
+    })
   })
 })
