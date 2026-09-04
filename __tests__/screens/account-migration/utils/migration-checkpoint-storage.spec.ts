@@ -3,7 +3,6 @@ import {
   clearCheckpointFromStorage,
   getStorageKey,
   isCommitPointCheckpoint,
-  isExpired,
   loadCheckpoint,
   resolveCheckpointRoute,
   saveCheckpointToStorage,
@@ -63,41 +62,6 @@ describe("migration-checkpoint-storage", () => {
     it("returns valid checkpoint", () => {
       const result = validateStoredCheckpoint({ step: "backupMethod", savedAt: 1000 })
       expect(result).toEqual({ step: "backupMethod", savedAt: 1000 })
-    })
-  })
-
-  describe("isExpired (48h uniform)", () => {
-    const now = 1000000000
-    const h = 60 * 60 * 1000
-
-    it("not expired at 24h", () => {
-      const cp = { step: MigrationCheckpoint.BackupMethod, savedAt: now - 24 * h }
-      expect(isExpired(cp, now)).toBe(false)
-    })
-
-    it("not expired at 47h", () => {
-      const cp = { step: MigrationCheckpoint.CloudBackup, savedAt: now - 47 * h }
-      expect(isExpired(cp, now)).toBe(false)
-    })
-
-    it("not expired at 1h", () => {
-      const cp = { step: MigrationCheckpoint.BackupAlerts, savedAt: now - Number(h) }
-      expect(isExpired(cp, now)).toBe(false)
-    })
-
-    it("expired at 49h for BackupMethod", () => {
-      const cp = { step: MigrationCheckpoint.BackupMethod, savedAt: now - 49 * h }
-      expect(isExpired(cp, now)).toBe(true)
-    })
-
-    it("expired at 49h for CloudBackup", () => {
-      const cp = { step: MigrationCheckpoint.CloudBackup, savedAt: now - 49 * h }
-      expect(isExpired(cp, now)).toBe(true)
-    })
-
-    it("expired at 49h for BackupAlerts", () => {
-      const cp = { step: MigrationCheckpoint.BackupAlerts, savedAt: now - 49 * h }
-      expect(isExpired(cp, now)).toBe(true)
     })
   })
 
@@ -249,7 +213,7 @@ describe("migration-checkpoint-storage", () => {
   })
 
   describe("loadCheckpoint", () => {
-    it("returns valid non-expired checkpoint", async () => {
+    it("returns the stored checkpoint", async () => {
       mockLoadJsonOrThrow.mockResolvedValue({
         step: "backupAlerts",
         savedAt: Date.now() - 1000,
@@ -262,15 +226,17 @@ describe("migration-checkpoint-storage", () => {
       })
     })
 
-    it("returns null and removes expired checkpoint", async () => {
+    it("keeps an old record, since only the server can retire a migration", async () => {
       mockLoadJsonOrThrow.mockResolvedValue({
-        step: "backupMethod",
-        savedAt: Date.now() - 49 * 60 * 60 * 1000,
+        step: MigrationCheckpoint.BalancesOverview,
+        savedAt: Date.now() - 30 * 24 * 60 * 60 * 1000,
+        accountId: "sc-1",
       })
 
       const result = await loadCheckpoint("test-key")
-      expect(result).toBeNull()
-      expect(mockRemove).toHaveBeenCalledWith("test-key")
+
+      expect(result).toMatchObject({ accountId: "sc-1" })
+      expect(mockRemove).not.toHaveBeenCalled()
     })
 
     it("returns null for invalid data", async () => {
@@ -549,10 +515,10 @@ describe("migration-checkpoint-storage", () => {
       expect(mockSaveJson).not.toHaveBeenCalled()
     })
 
-    it("drops an expired prior record's account id instead of lending it to the fresh save", async () => {
+    it("lends an old record's account id to the fresh save, so the wallet is reused", async () => {
       mockLoadJsonOrThrow.mockResolvedValue({
         step: MigrationCheckpoint.BackupMethod,
-        savedAt: Date.now() - 49 * 60 * 60 * 1000,
+        savedAt: Date.now() - 30 * 24 * 60 * 60 * 1000,
         accountId: "sc-1",
         custodialAccountId: "cust-1",
       })
@@ -565,9 +531,83 @@ describe("migration-checkpoint-storage", () => {
       expect(mockSaveJson).toHaveBeenCalledWith("test-key", {
         step: MigrationCheckpoint.BackupAlerts,
         savedAt: expect.any(Number),
-        accountId: undefined,
+        accountId: "sc-1",
         custodialAccountId: "cust-1",
       })
+    })
+  })
+
+  describe("a run that starts over", () => {
+    /** The only way back behind the commit point: the flow never walks backwards on its
+     *  own, so a step regression is a restart and its predecessor's figures are stale. */
+    const priorRun = {
+      step: MigrationCheckpoint.BalancesOverview,
+      savedAt: Date.now(),
+      accountId: "sc-1",
+      custodialAccountId: "cust-1",
+      expectedReceiveSats: 36726,
+    }
+
+    it("drops the previous run's expected receive amount", async () => {
+      mockLoadJsonOrThrow.mockResolvedValue(priorRun)
+
+      await saveCheckpointToStorage("test-key", {
+        step: MigrationCheckpoint.TermsAndConditions,
+        custodialAccountId: "cust-1",
+      })
+
+      expect(mockSaveJson).toHaveBeenCalledWith(
+        "test-key",
+        expect.objectContaining({ expectedReceiveSats: undefined }),
+      )
+    })
+
+    it("keeps the wallet it already provisioned", async () => {
+      mockLoadJsonOrThrow.mockResolvedValue(priorRun)
+
+      await saveCheckpointToStorage("test-key", {
+        step: MigrationCheckpoint.TermsAndConditions,
+        custodialAccountId: "cust-1",
+      })
+
+      expect(mockSaveJson).toHaveBeenCalledWith(
+        "test-key",
+        expect.objectContaining({ accountId: "sc-1" }),
+      )
+    })
+
+    it("takes the new run's own figure once it reaches the commit point again", async () => {
+      mockLoadJsonOrThrow.mockResolvedValue({
+        ...priorRun,
+        step: MigrationCheckpoint.TermsAndConditions,
+        expectedReceiveSats: undefined,
+      })
+
+      await saveCheckpointToStorage("test-key", {
+        step: MigrationCheckpoint.BalancesOverview,
+        custodialAccountId: "cust-1",
+        expectedReceiveSats: 41000,
+      })
+
+      expect(mockSaveJson).toHaveBeenCalledWith(
+        "test-key",
+        expect.objectContaining({ expectedReceiveSats: 41000 }),
+      )
+    })
+
+    it("still holds the figure across a re-entered commit screen", async () => {
+      mockLoadJsonOrThrow.mockResolvedValue(priorRun)
+
+      await saveCheckpointToStorage("test-key", {
+        step: MigrationCheckpoint.BalancesOverview,
+        custodialAccountId: "cust-1",
+        expectedReceiveSats: 0,
+      })
+
+      expect(mockSaveJson).toHaveBeenCalledWith(
+        "test-key",
+        expect.objectContaining({ expectedReceiveSats: 36726 }),
+      )
     })
   })
 
