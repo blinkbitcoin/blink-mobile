@@ -266,6 +266,13 @@ export type RootStackParamList = {
   cardOnboardingSubscribeScreen: undefined
   cardOnboardingPaymentScreen: undefined
   cardOnboardingLoadingScreen: undefined
+  cardOnboardingWelcomeInvestScreen: undefined
+  cardOnboardingSelectInvestScreen: undefined
+  cardOnboardingTermSheetScreen: undefined
+  cardOnboardingTransferInvestScreen: undefined
+  cardOnboardingInsufficientBalanceScreen: undefined
+  cardOnboardingDepositPendingScreen: undefined
+  cardOnboardingCompanyValuationScreen: undefined
   cardOnboardingPersonalInfoScreen: undefined
   cardOnboardingAcknowledgementScreen: undefined
   cardOnboardingPreapprovedScreen: undefined

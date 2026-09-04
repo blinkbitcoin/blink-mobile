@@ -1,4 +1,10 @@
 // Mock/placeholder data — labels will come from backend when available
+export const MOCK_INVESTMENT_AMOUNT = "$10,000"
+
+export const MOCK_BITCOIN_BALANCE = "$3,333"
+
+export const MOCK_INVESTMENT_SHORTFALL = "$6,667"
+
 export const MOCK_OCCUPATION_OPTIONS = [
   { value: "15-1132", label: "Software Developers, Applications" },
   { value: "11-1021", label: "General and Operations Managers" },
@@ -33,4 +39,14 @@ export const MOCK_EXPECTED_MONTHLY_VOLUME_OPTIONS = [
   { value: "1,000 - 1,999", label: "$1,000 - $1,999" },
   { value: "2,000 - 2,999", label: "$2,000 - $2,999" },
   { value: "3,000 or more", label: "$3,000 or more" },
+]
+
+export const MOCK_CREDIT_LIMIT_VALUES = [
+  { value: 1000, percent: 0.01 },
+  { value: 2500, percent: 0.025 },
+  { value: 5000, percent: 0.05 },
+  { value: 10000, percent: 0.1 },
+  { value: 25000, percent: 0.25 },
+  { value: 50000, percent: 0.5 },
+  { value: 100000, percent: 1 },
 ]
