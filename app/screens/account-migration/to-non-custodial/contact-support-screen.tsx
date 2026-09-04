@@ -112,8 +112,15 @@ export const MigrationContactSupportScreen: React.FC = () => {
   /** The commit path resets Home underneath before handing over, so it backs out the same
    *  way rather than to a commit screen the migration has already left behind. */
   const isCloseRefusedOrigin = params?.origin === MigrationSupportOrigin.CloseRefused
+  /** The gate is underneath this one too, but here it is worth returning to: the handover
+   *  is only offered once retries have failed, so the gate answers with its retry screen
+   *  instead of handing over again. A user who acted on the advice needs that door. */
+  const isGateStorageOrigin = params?.origin === MigrationSupportOrigin.GateStorage
   const isBackToScreenBeneath =
-    isResumeOrigin || isReceiveDelayedOrigin || isCloseRefusedOrigin
+    isResumeOrigin ||
+    isReceiveDelayedOrigin ||
+    isCloseRefusedOrigin ||
+    isGateStorageOrigin
   const isBackToCommitScreen = !isGateOrigin && !isBackToScreenBeneath
   const handleBack = useCallback(() => {
     if (isGateOrigin) return

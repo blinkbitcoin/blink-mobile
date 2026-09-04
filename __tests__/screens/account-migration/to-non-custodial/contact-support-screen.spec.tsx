@@ -333,6 +333,43 @@ describe("MigrationContactSupportScreen", () => {
     expect(options?.headerBackVisible).toBe(false)
   })
 
+  /** The storage handover comes from the same gate but is not terminal: it is only offered
+   *  once retries have failed, so the gate answers a return with its retry screen instead
+   *  of handing over again — and a user who freed up space needs exactly that. */
+  it("goes back to the gate when the store was merely unreadable", async () => {
+    mockOrigin = MigrationSupportOrigin.GateStorage
+    const { BackHandler } =
+      jest.requireActual<typeof import("react-native")>("react-native")
+    const addListenerSpy = jest.spyOn(BackHandler, "addEventListener")
+    renderScreen()
+    await flushEffects()
+
+    const handler = addListenerSpy.mock.calls[0][1] as () => boolean
+
+    expect(handler()).toBe(true)
+    expect(mockGoBack).toHaveBeenCalledTimes(1)
+    expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  it("keeps a back control for the storage handover", async () => {
+    mockOrigin = MigrationSupportOrigin.GateStorage
+    renderScreen()
+    await flushEffects()
+
+    const options = mockSetOptions.mock.calls.at(-1)?.[0]
+
+    expect(options?.headerShown).toBe(true)
+  })
+
+  it("shows the storage handover's reason code verbatim", async () => {
+    mockReason = MigrationSupportReason.StorageUnreadable
+    mockOrigin = MigrationSupportOrigin.GateStorage
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.getByText("storage-unreadable")).toBeTruthy()
+  })
+
   it("leaves a removal alone when opened from the gate handover", async () => {
     mockOrigin = MigrationSupportOrigin.Gate
     renderScreen()
