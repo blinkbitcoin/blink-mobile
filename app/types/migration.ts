@@ -110,6 +110,10 @@ export const MigrationSupportOrigin = {
   Commit: "commit",
   Resume: "resume",
   Gate: "gate",
+  /** A gate handover the gate itself can still resolve: unlike the one above, it is only
+   *  offered after retries have failed, so returning lands on a retry screen rather than
+   *  on a handover that fires again. The user who frees up space needs that way back. */
+  GateStorage: "gate-storage",
   /** The only handover the transfer is expected to survive: the receive is still being
    *  watched underneath, so backing out returns to the screen watching it rather than
    *  popping to the commit screen, which would unmount the gate with it. */

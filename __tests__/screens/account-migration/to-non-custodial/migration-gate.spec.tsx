@@ -1026,7 +1026,8 @@ describe("MigrationGate, with an unreadable device store", () => {
 
     expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
       reason: MigrationSupportReason.StorageUnreadable,
-      origin: MigrationSupportOrigin.Gate,
+      /** Not the terminal gate origin: a user who frees up space has to get back here. */
+      origin: MigrationSupportOrigin.GateStorage,
     })
   })
 

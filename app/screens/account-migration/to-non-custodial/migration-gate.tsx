@@ -231,7 +231,7 @@ export const MigrationGate: React.FC = () => {
   const goToStorageSupport = useCallback(() => {
     navigation.navigate("accountMigrationContactSupport", {
       reason: MigrationSupportReason.StorageUnreadable,
-      origin: MigrationSupportOrigin.Gate,
+      origin: MigrationSupportOrigin.GateStorage,
     })
   }, [navigation])
 
