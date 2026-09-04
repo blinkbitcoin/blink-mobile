@@ -6,6 +6,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { toastShow } from "@app/utils/toast"
 import { BLOCKED_COUNTRIES_FAQ_LINK } from "@app/config"
 import { useFeatureFlags } from "@app/config/feature-flags-context"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -50,7 +51,12 @@ export const AcceptTermsAndConditionsScreen: React.FC = () => {
        *  checkpoint write lands; otherwise a failed write would later re-prompt for terms the
        *  user already accepted. */
       const saved = await saveCheckpoint(MigrationCheckpoint.BackupMethod)
-      if (!saved) return
+      /** Told, not just refused: an unreadable store fails this write too, and a Continue
+       *  that answers a tap with nothing reads as a broken button. */
+      if (!saved) {
+        toastShow({ message: LL.errors.generic(), LL })
+        return
+      }
       navigation.navigate("selfCustodialBackupMethod")
       return
     }
