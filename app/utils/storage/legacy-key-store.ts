@@ -1,4 +1,5 @@
 import { Platform } from "react-native"
+import * as Keychain from "react-native-keychain"
 import RNSecureKeyStore from "react-native-secure-key-store"
 
 import type { SecureRead } from "./secure-store"
@@ -9,12 +10,15 @@ import type { SecureRead } from "./secure-store"
  * `.eslintrc.json` is what keeps new call paths from reaching the library
  * directly.
  *
- * The invariant is not complete yet, and this file is not what completes it:
- * `secureStorage.ts` holds the one other exception in that config and still
- * calls the library unguarded, so on iOS the reinstall sweep is armed on its
- * first boot-path read exactly as it is today. That closes when its slots move
- * behind the read-through helper in blinkbitcoin/blink-wip#1161 and the
- * exception goes away.
+ * The invariant is complete as of blinkbitcoin/blink-wip#1162: with the
+ * mnemonics behind the read-through helper, `secureStorage.ts` no longer calls
+ * the library at all, its exception in that config is gone, and this module is
+ * the only door left. So on iOS the reinstall sweep is disarmed before every
+ * touch rather than depending on which caller the boot path reaches first —
+ * which is why the mnemonics are now cleared deliberately, by
+ * `clearUninstallSurvivingCredentials`, instead of by that sweep. What it
+ * clears them WITH, for the accounts no list names, is `eraseEntireLegacyStore`
+ * below: the same outcome as the sweep, scoped to this store's own service.
  *
  * This module is the read-and-erase half of the migration off that library
  * (blinkbitcoin/blink-wip#1143); it deliberately has no write primitive.
@@ -97,6 +101,48 @@ export const legacyErase = async (key: string): Promise<boolean> => {
   try {
     await RNSecureKeyStore.remove(key)
     return true
+  } catch {
+    return false
+  }
+}
+
+/**
+ * The service every legacy item carries: `serviceName` in
+ * ios/RNSecureKeyStore.m l.39, set by `newSearchDictionary` on every read,
+ * write and delete the module makes. One item class, one service, no
+ * exceptions — which is what makes a single scoped delete reach the whole
+ * store and nothing outside it.
+ */
+const LEGACY_SERVICE = "RNSecureKeyStoreKeyChain"
+
+/**
+ * Erases every item the legacy store holds, without naming any of them.
+ *
+ * The reinstall wipe reaches per-account mnemonics through the list in
+ * `secureStorage.ts`, and that list only names accounts a build that HAD it
+ * recorded. An install that predates it stored mnemonics nothing now knows the
+ * ids of, and the sweep that used to catch them by accident — the module's own
+ * `clearSecureKeyStore`, fired on the first legacy touch after a reinstall — is
+ * disarmed before every call above. This is what replaces it, deliberately.
+ *
+ * **Scoped, where `clearSecureKeyStore` is not.** That one runs `SecItemDelete`
+ * over `kSecClassGenericPassword` and `kSecClassKey` with no service predicate,
+ * so it takes every generic password and key the app owns, this app's
+ * dependencies included. Deleting by `kSecAttrService` takes the legacy store
+ * and stops there. Nothing else in this app stores a generic password, and the
+ * new store's items are internet credentials, which this cannot match.
+ *
+ * `deletePasswordsForOptions` sets no match limit, so one call takes every item
+ * under the service rather than an OS-picked one, and `errSecItemNotFound` is
+ * resolved rather than raised — so `true` means gone or never there.
+ *
+ * iOS-only, like the guard above: an Android uninstall clears app storage, so
+ * nothing survives for this to reach.
+ */
+export const eraseEntireLegacyStore = async (): Promise<boolean> => {
+  if (Platform.OS !== "ios") return true
+  try {
+    return await Keychain.resetGenericPassword({ service: LEGACY_SERVICE })
   } catch {
     return false
   }

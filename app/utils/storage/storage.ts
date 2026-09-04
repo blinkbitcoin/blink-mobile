@@ -3,6 +3,10 @@ import AsyncStorage from "@react-native-async-storage/async-storage"
 /**
  * Loads a string from storage.
  *
+ * Collapses an absent key and a failed read into null, which is safe only where
+ * either one means do nothing. Use readString anywhere the answer decides
+ * whether something gets destroyed.
+ *
  * @param key The key to fetch.
  */
 export const loadString = async (key: string): Promise<string | null> => {
@@ -11,6 +15,40 @@ export const loadString = async (key: string): Promise<string | null> => {
   } catch {
     // not sure why this would fail... even reading the RN docs I'm unclear
     return null
+  }
+}
+
+/**
+ * The outcome of a string read, with "the key is not there" kept apart from
+ * "the read failed".
+ */
+export type StringRead =
+  | { readonly status: "found"; readonly value: string }
+  | { readonly status: "absent" }
+  | { readonly status: "failed"; readonly err: unknown }
+
+/**
+ * Loads a string without deciding that a store which could not answer is a
+ * store with nothing in it.
+ *
+ * Added rather than changing loadString, whose null-for-both contract every
+ * other caller reads as "skip this". The one caller that cannot live with it is
+ * loadPersistentState: an absent blob is its fresh-install signal, and that
+ * signal wipes the credentials which outlive an uninstall, mnemonics included.
+ * A throwing getItem answered as absent would spend that wipe on a device that
+ * was never reinstalled.
+ *
+ * An empty stored value is reported as found, not absent: a zero-length blob is
+ * a write that went wrong, and its caller has a branch for damage that is not
+ * the fresh-install one.
+ */
+export const readString = async (key: string): Promise<StringRead> => {
+  try {
+    const value = await AsyncStorage.getItem(key)
+    if (value === null) return { status: "absent" }
+    return { status: "found", value }
+  } catch (err) {
+    return { status: "failed", err }
   }
 }
 

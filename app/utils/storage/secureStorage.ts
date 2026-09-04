@@ -1,12 +1,11 @@
 import { ACCESSIBLE } from "react-native-keychain"
-import RNSecureKeyStore, {
-  ACCESSIBLE as LEGACY_ACCESSIBLE,
-} from "react-native-secure-key-store"
 
-import { type SecureExists } from "./secure-store"
+import { eraseEntireLegacyStore } from "./legacy-key-store"
+import { type SecureExists, secureRead, secureRemove, secureWrite } from "./secure-store"
 import {
   type ReadThroughArgs,
   existsThrough,
+  onSlot,
   readThrough,
   removeThrough,
   writeThrough,
@@ -38,24 +37,6 @@ export type SessionProfilesRead =
   | { status: "absent" }
   | { status: "failed"; err: unknown }
 
-// Both native modules reject a missing key with code "404" (ios/RNSecureKeyStore.m
-// `get`, android RNSecureKeyStoreModule#get). Every other code means the read
-// itself went wrong.
-//
-// True on Android only. The iOS module discards the OSStatus from
-// SecItemCopyMatching (`searchKeychainCopyMatching` returns nil for any failure)
-// and `get` rejects nil with "404", so an entitlement or decode error is
-// indistinguishable from a missing key there. Every caller that branches on this
-// therefore degrades to "absent" on iOS; the distinction becomes real when the
-// slots move to react-native-keychain (blink-wip#1161).
-const KEY_NOT_FOUND_CODE = "404"
-
-const isKeyNotFound = (err: unknown): boolean =>
-  typeof err === "object" &&
-  err !== null &&
-  "code" in err &&
-  String((err as { code: unknown }).code) === KEY_NOT_FOUND_CODE
-
 /**
  * The failed-PIN state, stored as one value under one key — see the note above
  * the PIN lockout block.
@@ -77,6 +58,27 @@ type SecureStoreRead =
   | { readonly status: "absent" }
   | { readonly status: "failed"; readonly err: unknown }
 
+/**
+ * What the tracked account list holds, or why it could not be produced.
+ *
+ * Three answers, because collapsing any two of them destroys something.
+ * `failed` read as `ok` with no ids would make the next write drop every id
+ * already tracked; `malformed` read that way would let the reinstall wipe
+ * report a clean sweep over mnemonics it never looked at.
+ */
+type MnemonicAccountsRead =
+  | { readonly status: "ok"; readonly accountIds: readonly string[] }
+  | { readonly status: "malformed" }
+  | { readonly status: "failed" }
+
+/**
+ * Account ids and nothing else. A single entry of another type is enough to
+ * make the list untrustworthy: the wipe would then work from a partial one and
+ * report the mnemonics it skipped as cleared.
+ */
+const isAccountIdList = (value: unknown): value is string[] =>
+  Array.isArray(value) && value.every((id) => typeof id === "string")
+
 const CLEARED_PIN_FAILURE_STATE: PinFailureState = { attempts: 0, lockedUntil: 0 }
 
 export default class KeyStoreWrapper {
@@ -90,12 +92,22 @@ export default class KeyStoreWrapper {
   private static readonly ACTIVE_TOKEN = GALOY_AUTH_TOKEN_KEY
   private static readonly MNEMONIC = "mnemonic"
   private static readonly MNEMONIC_NETWORK = "mnemonic_network"
+  /**
+   * Which accounts hold a mnemonic, so the reinstall wipe below can reach keys
+   * whose names carry an account id. The app's own index lives in AsyncStorage,
+   * which a reinstall clears, and enumerating the keychain is the one refactor
+   * this area must not have — see clearUninstallSurvivingCredentials. Storing
+   * the list beside the values it describes is what leaves the wipe with a
+   * fixed slot list and no enumeration.
+   *
+   * Account ids only. A leaked id names nothing a mnemonic could unlock.
+   */
+  private static readonly MNEMONIC_ACCOUNTS = "mnemonicAccounts"
 
   /**
-   * The slots that have moved to the Keychain-backed store
-   * (blinkbitcoin/blink-wip#1161). Each carries the protection class its value
-   * is written under and whether a migrated legacy copy is erased. Mnemonics
-   * are deliberately absent: they move in blinkbitcoin/blink-wip#1162.
+   * The protection class and erase rule for the six session slots that moved in
+   * blinkbitcoin/blink-wip#1161. Mnemonics moved too, in
+   * blinkbitcoin/blink-wip#1162, but on different terms — see mnemonicSlotFor.
    *
    * **The protection class changes for all of them.**
    * `react-native-keychain` has no `ALWAYS_THIS_DEVICE_ONLY` — Apple deprecated
@@ -128,6 +140,30 @@ export default class KeyStoreWrapper {
     }
   }
 
+  /**
+   * The mnemonic slots differ from every other migrated slot in two ways, both
+   * because losing one costs someone their money rather than a re-login
+   * (blinkbitcoin/blink-wip#1162).
+   *
+   * **The protection class does not change.** These are already
+   * `WHEN_UNLOCKED_THIS_DEVICE_ONLY` and stay there, so the silent-push window
+   * that `MIGRATED_ACCESSIBLE` accepts for the session slots never applies here.
+   *
+   * **The legacy copy is kept.** A mnemonic is immutable per account, so the two
+   * stores cannot diverge and the stale-value argument that justifies erasing
+   * the other slots does not hold. What retaining it buys is a downgrade and
+   * rollback that still find the value. The copies go in the explicit purge of
+   * blinkbitcoin/blink-wip#1163, never on the read path.
+   */
+  private static mnemonicSlotFor(key: string): ReadThroughArgs {
+    return {
+      slot: key,
+      legacyKey: key,
+      accessible: ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
+      deleteLegacyOnMigrate: false,
+    }
+  }
+
   // ── migrated-slot primitives ──────────────────────────────────────────────
   // Reads and existence probes go through the read-through helper, so a slot
   // still living in the legacy store migrates the first time it is touched.
@@ -152,48 +188,6 @@ export default class KeyStoreWrapper {
   /** Collapses absent and failed for callers where either means do nothing. */
   private static async migratedRead(key: string): Promise<string | null> {
     const read = await KeyStoreWrapper.migratedReadWithStatus(key)
-    return read.status === "found" ? read.value : null
-  }
-
-  // ── legacy-only primitives ────────────────────────────────────────────────
-  // Still backed by react-native-secure-key-store, and used only by the slots
-  // that have not moved yet. `accessible` is always passed explicitly and never
-  // defaulted: a default would let a new method silently downgrade the
-  // protection class of whatever it stores.
-
-  private static async write(
-    key: string,
-    value: string,
-    accessible: LEGACY_ACCESSIBLE,
-  ): Promise<boolean> {
-    try {
-      await RNSecureKeyStore.set(key, value, { accessible })
-      return true
-    } catch {
-      return false
-    }
-  }
-
-  private static async erase(key: string): Promise<boolean> {
-    try {
-      await RNSecureKeyStore.remove(key)
-      return true
-    } catch {
-      return false
-    }
-  }
-
-  private static async readWithStatus(key: string): Promise<SecureStoreRead> {
-    try {
-      return { status: "found", value: await RNSecureKeyStore.get(key) }
-    } catch (err) {
-      return isKeyNotFound(err) ? { status: "absent" } : { status: "failed", err }
-    }
-  }
-
-  /** Collapses absent and failed for callers where either means do nothing. */
-  private static async read(key: string): Promise<string | null> {
-    const read = await KeyStoreWrapper.readWithStatus(key)
     return read.status === "found" ? read.value : null
   }
 
@@ -474,13 +468,13 @@ export default class KeyStoreWrapper {
    * Two consequences of the slots above moving stores, both deliberate and
    * neither free:
    *
-   * 1. On iOS the legacy library's unscoped sweep used to delete the app's own
-   *    generic passwords, mnemonics included, on the first legacy call after a
-   *    reinstall. The read-through helper disarms that sweep before every
-   *    legacy touch, so mnemonics now survive an uninstall for the first time.
-   *    That is the product decision recorded in blinkbitcoin/blink-wip#1143
-   *    (finding 2) and it blocks blinkbitcoin/blink-wip#1162; it arrives here
-   *    ahead of that answer and nothing in this file can defer it.
+   * 1. On iOS the legacy library's unscoped sweep deleted the app's own generic
+   *    passwords, mnemonics included, on the first legacy call after a
+   *    reinstall — which is what used to clear them, by accident rather than by
+   *    decision, and only depending on which caller reached the library first.
+   *    Now that every slot reads through the helper, that sweep never fires, so
+   *    the mnemonics are removed here instead: same outcome, chosen rather than
+   *    inherited (blinkbitcoin/blink-wip#1162).
    * 2. Adding the PIN and the biometrics flag widens a known false positive:
    *    the caller reaches this through `MigrationStatus.NoData`, which a
    *    throwing AsyncStorage read can produce without a reinstall, and the app
@@ -489,9 +483,12 @@ export default class KeyStoreWrapper {
    *    which is unrecoverable, while this costs a lock the user can set again
    *    on a boot that already signed them out loudly.
    *
-   * Mnemonics are deliberately excluded: wallet keys outliving uninstall is a
-   * recovery/product decision, not cleanup (and their account index does not
-   * survive uninstall, so they cannot be enumerated here anyway).
+   * Mnemonics are included, and reached through the account list stored beside
+   * them — see MNEMONIC_ACCOUNTS. The keychain is never enumerated to find
+   * them: on iOS `getAllGenericPasswordServices` returns the legacy library's
+   * own service, and a reset on that service deletes every legacy item at once,
+   * mnemonics among them. A fixed slot list plus a list we maintain ourselves is
+   * what keeps that call out of this file.
    *
    * Each removal is retried once; a persistent failure is reported through
    * onFailure but never thrown, and never stops the remaining slots — boot
@@ -518,6 +515,29 @@ export default class KeyStoreWrapper {
     await removeWithRetry(KeyStoreWrapper.removePin, "pin")
     await removeWithRetry(KeyStoreWrapper.clearPinFailureState, "pin lockout state")
     await removeWithRetry(KeyStoreWrapper.removeIsBiometricsEnabled, "biometrics flag")
+
+    // A list that cannot be read, or cannot be trusted, leaves the per-account
+    // wipe with nothing to work from and says so. Treating either as empty
+    // would report a clean wipe over key material this boot never looked at.
+    const tracked = await KeyStoreWrapper.readMnemonicAccounts()
+    if (tracked.status === "ok") {
+      for (const accountId of tracked.accountIds) {
+        await removeWithRetry(
+          () => KeyStoreWrapper.deleteMnemonicForAccount(accountId),
+          "mnemonic",
+        )
+      }
+    } else {
+      onFailure("mnemonic account list")
+    }
+
+    // Last, and whatever the list said. The list names only the accounts a
+    // build that HAD it recorded, so an install predating it leaves mnemonics
+    // no id here can reach — and the accidental sweep that used to clear them
+    // is disarmed now that every slot reads through the helper. Erasing the
+    // legacy store by service is what covers them, and it is a no-op once
+    // there is nothing left in it (blinkbitcoin/blink-wip#1162).
+    await removeWithRetry(eraseEntireLegacyStore, "legacy key store")
   }
 
   public static async removeSessionProfileByToken(token: string): Promise<boolean> {
@@ -544,42 +564,184 @@ export default class KeyStoreWrapper {
     return `${KeyStoreWrapper.MNEMONIC_NETWORK}:${accountId}`
   }
 
+  /**
+   * The tracked account ids, or why they could not be produced.
+   *
+   * An absent slot is the only empty list this can report, and it is a real
+   * one: `untrackMnemonicAccount` removes the slot with the last id rather than
+   * storing `"[]"`, so nothing is stored precisely when nothing is tracked.
+   * Every other shape that is not a list of ids is `malformed`, never an empty
+   * list — see MnemonicAccountsRead for what collapsing them costs.
+   *
+   * Callers run inside the slot queue where they mutate; this read itself is
+   * not queued, so that it can be called from within a queued task.
+   */
+  private static async readMnemonicAccounts(): Promise<MnemonicAccountsRead> {
+    // Never read through: this slot is introduced with the new store, so the
+    // legacy library cannot hold it, and asking would be one more call into the
+    // library this migration exists to stop touching.
+    const read = await secureRead(KeyStoreWrapper.MNEMONIC_ACCOUNTS)
+    if (read.status === "absent") return { status: "ok", accountIds: [] }
+    if (read.status === "failed") return { status: "failed" }
+
+    try {
+      const parsed: unknown = JSON.parse(read.value)
+      if (!isAccountIdList(parsed)) return { status: "malformed" }
+      return { status: "ok", accountIds: parsed }
+    } catch {
+      return { status: "malformed" }
+    }
+  }
+
+  /**
+   * Records an account whose mnemonic was already stored before this list
+   * existed.
+   *
+   * Every upgrading install is in that position: its mnemonics arrive by
+   * migration, not by a write, so nothing else would ever record them and the
+   * reinstall wipe would have no account to reach. Called by the sweep, which
+   * is what enumerates them.
+   */
+  public static async rememberMnemonicAccount(accountId: string): Promise<void> {
+    return KeyStoreWrapper.trackMnemonicAccount(accountId)
+  }
+
+  /**
+   * Records an account in the list the reinstall wipe reads.
+   *
+   * Tracking is best effort by design: the mnemonic write is what the caller
+   * depends on, and failing that write is the only failure it should see. An id
+   * that never made it here costs the wipe one slot on a reinstall, which is the
+   * behaviour before this list existed, and the next write for that account
+   * records it again. That is also why the queue's rejection is swallowed:
+   * `setMnemonicForAccount` awaits this and must not start throwing.
+   *
+   * The read and the write are one turn in the slot queue. Split across two
+   * turns they are not atomic, and a boot sweep recording one account while a
+   * restore records another lands whichever write finishes last over the other,
+   * dropping an id the wipe then never reaches.
+   */
+  private static async trackMnemonicAccount(accountId: string): Promise<void> {
+    try {
+      await onSlot(KeyStoreWrapper.MNEMONIC_ACCOUNTS, async () => {
+        const tracked = await KeyStoreWrapper.readMnemonicAccounts()
+        if (tracked.status === "failed") return
+
+        // A list that will not parse is rewritten from scratch rather than left
+        // alone: it holds no id anything can recover, and refusing to touch it
+        // would retire tracking for every account written from here on.
+        const accountIds = tracked.status === "ok" ? tracked.accountIds : []
+        if (accountIds.includes(accountId)) return
+
+        await secureWrite(
+          KeyStoreWrapper.MNEMONIC_ACCOUNTS,
+          JSON.stringify([...accountIds, accountId]),
+          ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
+        )
+      })
+    } catch {
+      // The queue rejects on timeout. Best effort, as above.
+    }
+  }
+
+  /**
+   * Drops an account from the list, but only once its mnemonic is provably
+   * gone. Forgetting an id whose value survived would leave a mnemonic nothing
+   * can reach, which is the one outcome this list exists to prevent.
+   *
+   * One turn in the slot queue, for the reason given above trackMnemonicAccount.
+   */
+  private static async untrackMnemonicAccount(accountId: string): Promise<void> {
+    try {
+      await onSlot(KeyStoreWrapper.MNEMONIC_ACCOUNTS, async () => {
+        const tracked = await KeyStoreWrapper.readMnemonicAccounts()
+        // A malformed list is left exactly as it is, unlike in the write above:
+        // the ids still in it cannot be read out, so any rewrite here would
+        // forget accounts whose mnemonics are still stored. The wipe reports it
+        // instead, which is what gets it looked at.
+        if (tracked.status !== "ok") return
+        if (!tracked.accountIds.includes(accountId)) return
+
+        const remaining = tracked.accountIds.filter((id) => id !== accountId)
+        if (remaining.length > 0) {
+          await secureWrite(
+            KeyStoreWrapper.MNEMONIC_ACCOUNTS,
+            JSON.stringify(remaining),
+            ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
+          )
+          return
+        }
+
+        // Removed rather than stored as "[]", so an absent slot keeps meaning
+        // exactly "nothing is tracked" — see readMnemonicAccounts.
+        await secureRemove(KeyStoreWrapper.MNEMONIC_ACCOUNTS)
+      })
+    } catch {
+      // The queue rejects on timeout; the id stays tracked, which is the safe
+      // side of this one — the next wipe simply reaches a mnemonic already gone.
+    }
+  }
+
   public static async getMnemonicForAccount(accountId: string): Promise<string | null> {
-    return KeyStoreWrapper.read(KeyStoreWrapper.mnemonicKeyFor(accountId))
+    const read = await KeyStoreWrapper.readMnemonicWithStatus(accountId)
+    return read.status === "found" ? read.value : null
+  }
+
+  /** Keeps a failed read distinct from an account that has no mnemonic. */
+  public static async readMnemonicWithStatus(
+    accountId: string,
+  ): Promise<SecureStoreRead> {
+    return readThrough(
+      KeyStoreWrapper.mnemonicSlotFor(KeyStoreWrapper.mnemonicKeyFor(accountId)),
+    )
   }
 
   public static async setMnemonicForAccount(
     accountId: string,
     mnemonic: string,
   ): Promise<boolean> {
-    return KeyStoreWrapper.write(
-      KeyStoreWrapper.mnemonicKeyFor(accountId),
-      mnemonic,
-      LEGACY_ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
-    )
+    const written = await writeThrough({
+      slot: KeyStoreWrapper.mnemonicKeyFor(accountId),
+      value: mnemonic,
+      accessible: ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
+    })
+    // Tracked only once the value it describes exists, so the wipe is never
+    // pointed at a slot that was never written.
+    if (written) await KeyStoreWrapper.trackMnemonicAccount(accountId)
+    return written
   }
 
   public static async deleteMnemonicForAccount(accountId: string): Promise<boolean> {
-    const removed = await KeyStoreWrapper.erase(KeyStoreWrapper.mnemonicKeyFor(accountId))
+    const removed = await removeThrough({
+      slot: KeyStoreWrapper.mnemonicKeyFor(accountId),
+      legacyKey: KeyStoreWrapper.mnemonicKeyFor(accountId),
+    })
     // The network marker is derived data; failing to drop it is tolerated.
-    await KeyStoreWrapper.erase(KeyStoreWrapper.mnemonicNetworkKeyFor(accountId))
+    await removeThrough({
+      slot: KeyStoreWrapper.mnemonicNetworkKeyFor(accountId),
+      legacyKey: KeyStoreWrapper.mnemonicNetworkKeyFor(accountId),
+    })
+    if (removed) await KeyStoreWrapper.untrackMnemonicAccount(accountId)
     return removed
   }
 
   public static async getMnemonicNetworkForAccount(
     accountId: string,
   ): Promise<string | null> {
-    return KeyStoreWrapper.read(KeyStoreWrapper.mnemonicNetworkKeyFor(accountId))
+    const read = await readThrough(
+      KeyStoreWrapper.mnemonicSlotFor(KeyStoreWrapper.mnemonicNetworkKeyFor(accountId)),
+    )
+    return read.status === "found" ? read.value : null
   }
 
   public static async setMnemonicNetworkForAccount(
     accountId: string,
     network: string,
   ): Promise<boolean> {
-    return KeyStoreWrapper.write(
-      KeyStoreWrapper.mnemonicNetworkKeyFor(accountId),
-      network,
-      LEGACY_ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
-    )
+    return writeThrough({
+      slot: KeyStoreWrapper.mnemonicNetworkKeyFor(accountId),
+      value: network,
+      accessible: ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
+    })
   }
 }
