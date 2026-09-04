@@ -7,6 +7,7 @@ import {
   createPublicUrlSource,
 } from "@blinkbitcoin/esign-react-native/webform"
 
+import { CloseHeader } from "@app/components/close-header"
 import { Screen } from "@app/components/screen"
 import { ESIGN_ALLOWED_ORIGIN } from "@app/config"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
@@ -65,7 +66,8 @@ export const SignInvestScreen: React.FC = () => {
   )
 
   return (
-    <Screen>
+    <Screen headerShown={false}>
+      <CloseHeader testID="sign-invest-close" />
       <ESignature
         source={source}
         label={LL.CardFlow.Onboarding.SignInvest.label()}
