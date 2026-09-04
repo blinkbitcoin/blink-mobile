@@ -1,6 +1,8 @@
 import * as React from "react"
+import { View } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
+import { makeStyles } from "@rn-vui/themed"
 
 import {
   ESignature,
@@ -27,6 +29,7 @@ import { logError } from "@app/utils/log-error"
  * without it.
  */
 export const SignInvestScreen: React.FC = () => {
+  const styles = useStyles()
   const { LL } = useI18nContext()
   const { cardInvestmentEsignFormUrl } = useRemoteConfig()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
@@ -68,13 +71,25 @@ export const SignInvestScreen: React.FC = () => {
   return (
     <Screen headerShown={false}>
       <CloseHeader testID="sign-invest-close" />
-      <ESignature
-        source={source}
-        label={LL.CardFlow.Onboarding.SignInvest.label()}
-        onComplete={goToTransfer}
-        onCancel={goBack}
-        onError={reportSigningError}
-      />
+      {/* The embedded form paints its own white surface edge to edge, so without a
+          gap it butts straight up against the close control. The other screens in
+          the flow have their own top spacing and need none. */}
+      <View style={styles.content}>
+        <ESignature
+          source={source}
+          label={LL.CardFlow.Onboarding.SignInvest.label()}
+          onComplete={goToTransfer}
+          onCancel={goBack}
+          onError={reportSigningError}
+        />
+      </View>
     </Screen>
   )
 }
+
+const useStyles = makeStyles(() => ({
+  content: {
+    flex: 1,
+    paddingTop: 12,
+  },
+}))
