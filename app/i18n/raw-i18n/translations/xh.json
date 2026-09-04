@@ -3910,6 +3910,11 @@
       "body": "Imali yakho isendleleni eya kwiakhawunti yakho entsha. Kuthatha ixesha elide kunesiqhelo — gcina i-app ivulekile, siza kugqibezela ngokuzenzekelayo.",
       "contactSupportCta": "Qhagamshelana nenkxaso"
     },
+    "storageUnavailable": {
+      "unreadableBody": "Asikwazanga ukufunda inkqubela yokufuduka kwakho kwesi sixhobo. Akukho nto ilahlekileyo — imali yakho ikhuselekile kwaye inkqubela yakho isagcinwe.",
+      "outOfSpaceBody": "Isixhobo sakho asinandawo yokugcina eseleyo, ngoko asikwazi ukufunda inkqubela yokufuduka kwakho. Khulula indawo uze uzame kwakhona. Akukho nto ilahlekileyo — imali yakho ikhuselekile.",
+      "contactSupportCta": "Qhagamshelana nenkxaso"
+    },
     "clockOutOfSync": {
       "body": "Umhla nexesha lesixhobo sakho azihambelani. Zimisele ukuba zizenzekele ukuze uqhubeke.",
       "retryCta": "Zama kwakhona"

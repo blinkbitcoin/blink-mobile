@@ -3910,6 +3910,11 @@
       "body": "Je saldo is onderweg naar je nieuwe account. Het duurt langer dan gebruikelijk — houd de app open, dan ronden we het automatisch af.",
       "contactSupportCta": "Contact opnemen met support"
     },
+    "storageUnavailable": {
+      "unreadableBody": "We konden je migratievoortgang niet van dit apparaat lezen. Er is niets verloren: je tegoed is veilig en je voortgang is nog opgeslagen.",
+      "outOfSpaceBody": "Je apparaat heeft geen opslagruimte meer, dus we kunnen je migratievoortgang niet lezen. Maak ruimte vrij en probeer het opnieuw. Er is niets verloren: je tegoed is veilig.",
+      "contactSupportCta": "Neem contact op met support"
+    },
     "clockOutOfSync": {
       "body": "De datum en tijd van je apparaat lopen niet gelijk. Zet ze op automatisch om door te gaan.",
       "retryCta": "Opnieuw proberen"

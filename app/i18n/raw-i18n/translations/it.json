@@ -3910,6 +3910,11 @@
             "body": "I tuoi fondi sono in viaggio verso il tuo nuovo conto. Sta richiedendo più tempo del solito — tieni l'app aperta e completeremo automaticamente.",
             "contactSupportCta": "Contatta l'assistenza"
         },
+        "storageUnavailable": {
+            "unreadableBody": "Non siamo riusciti a leggere lo stato della tua migrazione su questo dispositivo. Non è andato perso nulla: i tuoi fondi sono al sicuro e i tuoi progressi sono ancora salvati.",
+            "outOfSpaceBody": "Il tuo dispositivo non ha più spazio di archiviazione, quindi non possiamo leggere lo stato della tua migrazione. Libera spazio e riprova. Non è andato perso nulla: i tuoi fondi sono al sicuro.",
+            "contactSupportCta": "Contatta l'assistenza"
+        },
         "clockOutOfSync": {
             "body": "La data e l'ora del tuo dispositivo non sono sincronizzate. Impostale su automatico per continuare.",
             "retryCta": "Riprova"

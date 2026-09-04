@@ -3910,6 +3910,11 @@
       "body": "Els teus fons estan de camí al teu nou compte. Està trigant més de l'habitual — mantén l'aplicació oberta i ho acabarem automàticament.",
       "contactSupportCta": "Contacta amb suport"
     },
+    "storageUnavailable": {
+      "unreadableBody": "No hem pogut llegir el progrés de la teva migració en aquest dispositiu. No s'ha perdut res: els teus fons estan segurs i el teu progrés continua desat.",
+      "outOfSpaceBody": "El teu dispositiu no té espai d'emmagatzematge lliure, així que no podem llegir el progrés de la teva migració. Allibera espai i torna-ho a provar. No s'ha perdut res: els teus fons estan segurs.",
+      "contactSupportCta": "Contacta amb suport"
+    },
     "clockOutOfSync": {
       "body": "La data i l'hora del teu dispositiu no estan sincronitzades. Configura-les en automàtic per continuar.",
       "retryCta": "Torna-ho a provar"

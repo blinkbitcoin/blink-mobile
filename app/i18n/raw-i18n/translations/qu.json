@@ -3910,6 +3910,11 @@
       "body": "Qullqiykiqa musuq cuentaykiman chayachkanña. Aswan unayta ruwakuchkan — app kichasqata saqiy, ñuqayku kikillanmanta tukuchisaqku.",
       "contactSupportCta": "Yanapakuqkunawan rimanakuy"
     },
+    "storageUnavailable": {
+      "unreadableBody": "Kay rurayniykipi migracionniykipa ñawpaqmanchasqanta mana ñawinchayta atinikuchu. Manam imapas chinkanchu: qullqiykiqa allinmi kachkan, ñawpaqmanchasqaykipas waqaychasqallam.",
+      "outOfSpaceBody": "Rurayniykipa waqaychanan mana kapunchu, chayrayku migracionniykipa ñawpaqmanchasqanta mana ñawinchayta atinikuchu. Kichariy tumpa, hinaspa yapamanta ruray. Manam imapas chinkanchu: qullqiykiqa allinmi kachkan.",
+      "contactSupportCta": "Yanapaqwan rimay"
+    },
     "clockOutOfSync": {
       "body": "Dispositivoykipa p'unchawnin hinaspa horan mana huñusqachu. Automáticoman churay qatinaykipaq.",
       "retryCta": "Kutiy yapamuy"

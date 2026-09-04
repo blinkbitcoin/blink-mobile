@@ -3910,6 +3910,11 @@
       "body": "Fedha zako ziko njiani kuelekea kwenye akaunti yako mpya. Inachukua muda mrefu kuliko kawaida — acha programu ikiwa wazi na tutakamilisha kiotomatiki.",
       "contactSupportCta": "Wasiliana na usaidizi"
     },
+    "storageUnavailable": {
+      "unreadableBody": "Hatukuweza kusoma maendeleo ya uhamishaji wako kutoka kwenye kifaa hiki. Hakuna kilichopotea — fedha zako ziko salama na maendeleo yako bado yamehifadhiwa.",
+      "outOfSpaceBody": "Kifaa chako hakina nafasi ya kuhifadhi iliyobaki, kwa hivyo hatuwezi kusoma maendeleo ya uhamishaji wako. Fungua nafasi kisha ujaribu tena. Hakuna kilichopotea — fedha zako ziko salama.",
+      "contactSupportCta": "Wasiliana na msaada"
+    },
     "clockOutOfSync": {
       "body": "Tarehe na saa za kifaa chako hazijaoanishwa. Ziweke kwa kiotomatiki ili kuendelea.",
       "retryCta": "Jaribu tena"

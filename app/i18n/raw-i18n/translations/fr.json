@@ -3910,6 +3910,11 @@
             "body": "Vos fonds sont en route vers votre nouveau compte. Cela prend plus de temps que d'habitude — gardez l'application ouverte et nous terminerons automatiquement.",
             "contactSupportCta": "Contacter le support"
         },
+        "storageUnavailable": {
+            "unreadableBody": "Nous n'avons pas pu lire la progression de votre migration sur cet appareil. Rien n'est perdu : vos fonds sont en sécurité et votre progression est toujours enregistrée.",
+            "outOfSpaceBody": "Votre appareil n'a plus d'espace de stockage, nous ne pouvons donc pas lire la progression de votre migration. Libérez de l'espace et réessayez. Rien n'est perdu : vos fonds sont en sécurité.",
+            "contactSupportCta": "Contacter le support"
+        },
         "clockOutOfSync": {
             "body": "La date et l'heure de votre appareil sont désynchronisées. Réglez-les sur automatique pour continuer.",
             "retryCta": "Réessayer"

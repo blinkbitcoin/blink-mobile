@@ -3910,6 +3910,11 @@
       "body": "Vaša sredstva su na putu prema vašem novom računu. Traje duže nego inače — držite aplikaciju otvorenom i automatski ćemo dovršiti.",
       "contactSupportCta": "Kontaktirajte podršku"
     },
+    "storageUnavailable": {
+      "unreadableBody": "Nismo mogli pročitati napredak vaše migracije s ovog uređaja. Ništa nije izgubljeno — vaša sredstva su sigurna, a napredak je i dalje spremljen.",
+      "outOfSpaceBody": "Vaš uređaj nema slobodnog prostora za pohranu pa ne možemo pročitati napredak vaše migracije. Oslobodite prostor i pokušajte ponovno. Ništa nije izgubljeno — vaša sredstva su sigurna.",
+      "contactSupportCta": "Kontaktirajte podršku"
+    },
     "clockOutOfSync": {
       "body": "Datum i vrijeme vašeg uređaja nisu usklađeni. Postavite ih na automatski način rada za nastavak.",
       "retryCta": "Pokušaj ponovno"

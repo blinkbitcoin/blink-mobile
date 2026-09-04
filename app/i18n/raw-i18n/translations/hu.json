@@ -3910,6 +3910,11 @@
       "body": "A pénzed úton van az új számládra. A szokásosnál tovább tart — hagyd nyitva az alkalmazást, és automatikusan befejezzük.",
       "contactSupportCta": "Kapcsolatfelvétel az ügyfélszolgálattal"
     },
+    "storageUnavailable": {
+      "unreadableBody": "Nem tudtuk beolvasni a migráció állapotát erről az eszközről. Semmi sem veszett el: az egyenleged biztonságban van, és az állapotod is megmaradt.",
+      "outOfSpaceBody": "Az eszközödön nincs több tárhely, ezért nem tudjuk beolvasni a migráció állapotát. Szabadíts fel helyet, és próbáld újra. Semmi sem veszett el: az egyenleged biztonságban van.",
+      "contactSupportCta": "Ügyfélszolgálat"
+    },
     "clockOutOfSync": {
       "body": "Az eszközöd dátuma és ideje nincs szinkronban. Állítsd automatikusra a folytatáshoz.",
       "retryCta": "Próbáld újra"

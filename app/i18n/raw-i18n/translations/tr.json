@@ -3910,6 +3910,11 @@
       "body": "Bakiyeniz yeni hesabınıza aktarılıyor. Bu, normalden uzun sürüyor — uygulamayı açık tutun, işlemi otomatik olarak tamamlayacağız.",
       "contactSupportCta": "Destek ile iletişime geçin"
     },
+    "storageUnavailable": {
+      "unreadableBody": "Taşıma ilerlemenizi bu cihazdan okuyamadık. Hiçbir şey kaybolmadı: paranız güvende ve ilerlemeniz hâlâ kayıtlı.",
+      "outOfSpaceBody": "Cihazınızda depolama alanı kalmadı, bu yüzden taşıma ilerlemenizi okuyamıyoruz. Yer açıp tekrar deneyin. Hiçbir şey kaybolmadı: paranız güvende.",
+      "contactSupportCta": "Destek ile iletişime geçin"
+    },
     "clockOutOfSync": {
       "body": "Cihazının tarih ve saati eşitlenmemiş. Devam etmek için otomatik olarak ayarla.",
       "retryCta": "Tekrar dene"
