@@ -56,8 +56,6 @@ export const MigrationSupportReason = {
   /** The server paid the migration out, but the receive into the new self-custodial
    *  wallet stayed unconfirmed past the notice window — the funds look stuck in transit. */
   ReceiveDelayed: "receive-delayed",
-  /** The lightning-address re-point onto the migrated account failed. */
-  LnAddressTransferFailed: "ln-address-transfer-failed",
   /** The server refused to close the emptied custodial account for good (the phone-deletion
    *  cap). The migration itself finished; the account stays open until support removes it. */
   CustodialAccountCloseRefused: "custodial-account-close-refused",

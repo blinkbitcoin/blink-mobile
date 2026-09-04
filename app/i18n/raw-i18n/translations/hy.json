@@ -3857,6 +3857,7 @@
       "newBitcoinBalance": "Նոր Bitcoin-ի մնացորդ",
       "newDollarBalance": "Նոր դոլարային մնացորդ",
       "dollarBalanceNotAvailable": "հասանելի չէ",
+      "lnAddressNotMoved": "Ձեր Lightning հասցեն հնարավոր չեղավ տեղափոխել։ Ձեր միջոցները այնուամենայնիվ կփոխանցվեն։",
       "networkFee": "Ցանցի վճար. <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Ցանցի վճար. <bold>{fee: string}</bold> (ծածկում է Blink-ը)",
       "retryCta": "Փորձել կրկին",

@@ -11,6 +11,7 @@ import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-but
 import { DollarBalanceMigrationModal } from "@app/components/dollar-balance-migration-modal"
 import { IconHero } from "@app/components/icon-hero"
 import { RichText } from "@app/components/rich-text"
+import { WarningBanner } from "@app/components/warning-banner"
 import { Screen } from "@app/components/screen"
 import { MigrationStatus } from "@app/graphql/generated"
 import { useContactSupport } from "@app/hooks/use-contact-support"
@@ -133,14 +134,25 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
   const startFailureReason = migrationStart.isRejected
     ? MigrationSupportReason.StartRefused
     : null
-  /** A missing device key is the same cause the commit reports; anything else is generic. */
+  /** The one re-point outcome that still hands over: a missing device key is the same cause
+   *  the commit reports, and it breaks the commit too. A refused re-point does not, which is
+   *  the whole point of the settled check below. */
   const lnAddressMissingReason = lnAddressTransfer.isAccountMissing
     ? MigrationSupportReason.SelfCustodialAccountMissing
     : null
-  const lnAddressRejectedReason = lnAddressTransfer.isRejected
-    ? MigrationSupportReason.LnAddressTransferFailed
-    : null
-  const lnAddressFailureReason = lnAddressMissingReason ?? lnAddressRejectedReason
+
+  /**
+   * The re-point is done as far as the migration is concerned: the address either moved or
+   * was refused, and neither leaves anything else to wait for.
+   *
+   * A refusal used to end the migration here. It must not: the address is a convenience and
+   * the funds are not, so a user whose address cannot move is left with an account locked
+   * server-side and no way to reach their money (blink-wip#1211). It is also the state every
+   * retry of an interrupted migration lands in, since the address has already moved to the
+   * pubkey of the attempt that failed and the lnurl server will refuse to move it again.
+   */
+  const isLnAddressSettled =
+    lnAddressTransfer.isTransferred || lnAddressTransfer.isRejected
 
   /**
    * The re-point fires for neither id, and reports nothing when it does not fire, so an id
@@ -177,7 +189,7 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
    *  done their work, and the session that carried them is about to be discarded by the
    *  completion swap: judging them past that point would hand a finished re-point to
    *  support. */
-  const areTransferIdsNeeded = !lnAddressTransfer.isTransferred
+  const areTransferIdsNeeded = !isLnAddressSettled
   const isMissingOwnerJudgeable =
     !isLnRepointBlocked && !isOwnerIdUnanswered && areTransferIdsNeeded
   const missingOwnerFailureReason = isMissingOwnerJudgeable
@@ -190,7 +202,7 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
   const handoverReason =
     failedReason ??
     startFailureReason ??
-    lnAddressFailureReason ??
+    lnAddressMissingReason ??
     missingOwnerFailureReason ??
     preview.unavailableReason
 
@@ -268,7 +280,7 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
     !preview.isReady ||
     preview.isDollarRegionPending ||
     !migrationStart.isStarted ||
-    !lnAddressTransfer.isTransferred
+    !isLnAddressSettled
 
   return (
     <Screen preset="fixed" headerShown={false}>
@@ -307,6 +319,12 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
               isDollarValueMuted={preview.isNewDollarBalanceUnavailable}
               isDollarValuePending={preview.isDollarRegionPending}
             />
+
+            {/** After the figures, not inside them: the before/after pair reads as one unit,
+             *  and the caveat belongs next to the button that acts on it. */}
+            {lnAddressTransfer.isRejected ? (
+              <WarningBanner>{LLOverview.lnAddressNotMoved()}</WarningBanner>
+            ) : null}
           </ScrollView>
         ) : (
           <View style={styles.loadingContainer}>

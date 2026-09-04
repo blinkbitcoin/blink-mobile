@@ -3857,6 +3857,7 @@
       "newBitcoinBalance": "رصيد البيتكوين الجديد",
       "newDollarBalance": "رصيد الدولار الجديد",
       "dollarBalanceNotAvailable": "غير متاح",
+      "lnAddressNotMoved": "تعذّر نقل عنوان Lightning الخاص بك. سيتم تحويل أموالك على أي حال.",
       "networkFee": "رسوم الشبكة: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "رسوم الشبكة: <bold>{fee: string}</bold> (تغطيها Blink)",
       "retryCta": "حاول مرة أخرى",

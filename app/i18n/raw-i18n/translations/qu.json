@@ -3857,6 +3857,7 @@
       "newBitcoinBalance": "Musuq Bitcoin qullqi",
       "newDollarBalance": "Musuq dólar qullqi",
       "dollarBalanceNotAvailable": "mana kapunchu",
+      "lnAddressNotMoved": "Lightning tiyasqaykita mana astiyta atikurqachu. Qullqiykiqa astisqallam kanqa.",
       "networkFee": "Red pago: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Red pago: <bold>{fee: string}</bold> (Blinkmi pagan)",
       "retryCta": "Yapamanta ruray",

@@ -3857,6 +3857,7 @@
       "newBitcoinBalance": "Salio jipya la Bitcoin",
       "newDollarBalance": "Salio jipya la Dola",
       "dollarBalanceNotAvailable": "haipatikani",
+      "lnAddressNotMoved": "Anwani yako ya Lightning haikuweza kuhamishwa. Fedha zako bado zitahamishwa.",
       "networkFee": "Ada ya mtandao: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Ada ya mtandao: <bold>{fee: string}</bold> (inalipwa na Blink)",
       "retryCta": "Jaribu tena",

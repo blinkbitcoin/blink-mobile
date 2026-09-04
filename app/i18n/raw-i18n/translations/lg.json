@@ -3857,6 +3857,7 @@
       "newBitcoinBalance": "Ssente za Bitcoin empya",
       "newDollarBalance": "Ssente za ddoola empya",
       "dollarBalanceNotAvailable": "tezeewo",
+      "lnAddressNotMoved": "Endagiriro yo eya Lightning tesobodde kujjulukuka. Ssente zo zijja kutwalibwa.",
       "networkFee": "Ssente z'omukutu: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Ssente z'omukutu: <bold>{fee: string}</bold> (zisasulwa Blink)",
       "retryCta": "Ddamu ogezeeko",

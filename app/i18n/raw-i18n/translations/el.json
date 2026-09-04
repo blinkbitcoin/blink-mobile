@@ -3857,6 +3857,7 @@
       "newBitcoinBalance": "Νέο υπόλοιπο Bitcoin",
       "newDollarBalance": "Νέο υπόλοιπο δολαρίου",
       "dollarBalanceNotAvailable": "μη διαθέσιμο",
+      "lnAddressNotMoved": "Η διεύθυνση Lightning σας δεν μπόρεσε να μεταφερθεί. Τα κεφάλαιά σας θα μεταφερθούν κανονικά.",
       "networkFee": "Τέλος δικτύου: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Τέλος δικτύου: <bold>{fee: string}</bold> (καλύπτεται από το Blink)",
       "retryCta": "Δοκιμάστε ξανά",

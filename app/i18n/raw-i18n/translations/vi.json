@@ -3857,6 +3857,7 @@
       "newBitcoinBalance": "Số dư Bitcoin mới",
       "newDollarBalance": "Số dư Đô la mới",
       "dollarBalanceNotAvailable": "không khả dụng",
+      "lnAddressNotMoved": "Không thể chuyển địa chỉ Lightning của bạn. Tiền của bạn vẫn sẽ được chuyển.",
       "networkFee": "Phí mạng: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Phí mạng: <bold>{fee: string}</bold> (do Blink chi trả)",
       "retryCta": "Thử lại",

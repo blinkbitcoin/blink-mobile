@@ -3857,6 +3857,7 @@
       "newBitcoinBalance": "Ny Bitcoin-saldo",
       "newDollarBalance": "Ny dollarsaldo",
       "dollarBalanceNotAvailable": "ikke tilgængelig",
+      "lnAddressNotMoved": "Din Lightning-adresse kunne ikke flyttes. Dine midler bliver stadig overført.",
       "networkFee": "Netværksgebyr: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Netværksgebyr: <bold>{fee: string}</bold> (dækkes af Blink)",
       "retryCta": "Prøv igen",

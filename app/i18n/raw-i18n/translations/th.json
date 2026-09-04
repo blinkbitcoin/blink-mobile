@@ -3857,6 +3857,7 @@
       "newBitcoinBalance": "ยอด Bitcoin ใหม่",
       "newDollarBalance": "ยอดดอลลาร์ใหม่",
       "dollarBalanceNotAvailable": "ไม่พร้อมใช้งาน",
+      "lnAddressNotMoved": "ไม่สามารถย้ายที่อยู่ Lightning ของคุณได้ เงินของคุณจะยังถูกโอนตามปกติ",
       "networkFee": "ค่าธรรมเนียมเครือข่าย: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "ค่าธรรมเนียมเครือข่าย: <bold>{fee: string}</bold> (Blink ออกให้)",
       "retryCta": "ลองอีกครั้ง",

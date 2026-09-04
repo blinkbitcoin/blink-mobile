@@ -3857,6 +3857,7 @@
       "newBitcoinBalance": "Nou saldo de Bitcoin",
       "newDollarBalance": "Nou saldo en dòlars",
       "dollarBalanceNotAvailable": "no disponible",
+      "lnAddressNotMoved": "No s'ha pogut moure la teva adreça Lightning. Els teus fons es transferiran igualment.",
       "networkFee": "Comissió de xarxa: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Comissió de xarxa: <bold>{fee: string}</bold> (coberta per Blink)",
       "retryCta": "Torna-ho a provar",

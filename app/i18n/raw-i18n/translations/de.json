@@ -3857,6 +3857,7 @@
             "newBitcoinBalance": "Neues Bitcoin-Guthaben",
             "newDollarBalance": "Neues Dollar-Guthaben",
             "dollarBalanceNotAvailable": "nicht verfügbar",
+            "lnAddressNotMoved": "Deine Lightning-Adresse konnte nicht verschoben werden. Dein Guthaben wird trotzdem übertragen.",
             "networkFee": "Netzwerkgebühr: <bold>{fee: string}</bold>",
             "networkFeeCoveredByBlink": "Netzwerkgebühr: <bold>{fee: string}</bold> (von Blink übernommen)",
             "retryCta": "Erneut versuchen",

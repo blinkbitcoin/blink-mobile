@@ -3857,6 +3857,7 @@
             "newBitcoinBalance": "新しいビットコイン残高",
             "newDollarBalance": "新しいドル残高",
             "dollarBalanceNotAvailable": "利用不可",
+            "lnAddressNotMoved": "Lightningアドレスを移行できませんでした。資金は引き続き送金されます。",
             "networkFee": "ネットワーク手数料: <bold>{fee: string}</bold>",
             "networkFeeCoveredByBlink": "ネットワーク手数料: <bold>{fee: string}</bold>（Blinkが負担）",
             "retryCta": "再試行",
