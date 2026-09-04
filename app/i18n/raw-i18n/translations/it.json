@@ -3857,6 +3857,7 @@
             "newBitcoinBalance": "Nuovo saldo Bitcoin",
             "newDollarBalance": "Nuovo saldo in dollari",
             "dollarBalanceNotAvailable": "non disponibile",
+            "lnAddressNotMoved": "Non è stato possibile spostare il tuo indirizzo Lightning. I tuoi fondi verranno comunque trasferiti.",
             "networkFee": "Commissione di rete: <bold>{fee: string}</bold>",
             "networkFeeCoveredByBlink": "Commissione di rete: <bold>{fee: string}</bold> (coperta da Blink)",
             "retryCta": "Riprova",

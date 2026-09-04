@@ -4058,6 +4058,8 @@ const en: BaseTranslation = {
       newBitcoinBalance: "New Bitcoin Balance",
       newDollarBalance: "New Dollar Balance",
       dollarBalanceNotAvailable: "not available",
+      lnAddressNotMoved:
+        "Your Lightning address could not be moved. Your funds will still be transferred.",
       networkFee: "Network fee: <bold>{fee: string}</bold>",
       networkFeeCoveredByBlink: "Network fee: <bold>{fee: string}</bold> (covered by Blink)",
       retryCta: "Try again",

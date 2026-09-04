@@ -3857,6 +3857,7 @@
       "newBitcoinBalance": "Új Bitcoin-egyenleg",
       "newDollarBalance": "Új dolláregyenleg",
       "dollarBalanceNotAvailable": "nem elérhető",
+      "lnAddressNotMoved": "A Lightning-címedet nem sikerült áthelyezni. Az egyenleged ettől függetlenül átkerül.",
       "networkFee": "Hálózati díj: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Hálózati díj: <bold>{fee: string}</bold> (a Blink fedezi)",
       "retryCta": "Próbáld újra",

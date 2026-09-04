@@ -3857,6 +3857,7 @@
       "newBitcoinBalance": "Nuwe Bitcoin-saldo",
       "newDollarBalance": "Nuwe Dollar-saldo",
       "dollarBalanceNotAvailable": "nie beskikbaar nie",
+      "lnAddressNotMoved": "Jou Lightning-adres kon nie geskuif word nie. Jou fondse word steeds oorgedra.",
       "networkFee": "Netwerkfooi: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Netwerkfooi: <bold>{fee: string}</bold> (deur Blink gedek)",
       "retryCta": "Probeer weer",

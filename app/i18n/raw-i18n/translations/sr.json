@@ -3857,6 +3857,7 @@
       "newBitcoinBalance": "Нови Bitcoin салдо",
       "newDollarBalance": "Нови доларски салдо",
       "dollarBalanceNotAvailable": "није доступно",
+      "lnAddressNotMoved": "Вашу Lightning адресу није било могуће преместити. Ваша средства ће свеједно бити пренета.",
       "networkFee": "Мрежна накнада: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Мрежна накнада: <bold>{fee: string}</bold> (сноси Blink)",
       "retryCta": "Покушај поново",

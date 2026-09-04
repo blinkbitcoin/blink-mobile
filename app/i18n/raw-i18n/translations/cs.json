@@ -3857,6 +3857,7 @@
       "newBitcoinBalance": "Nový zůstatek Bitcoinu",
       "newDollarBalance": "Nový dolarový zůstatek",
       "dollarBalanceNotAvailable": "není k dispozici",
+      "lnAddressNotMoved": "Vaši Lightning adresu se nepodařilo přesunout. Vaše prostředky budou přesto převedeny.",
       "networkFee": "Síťový poplatek: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Síťový poplatek: <bold>{fee: string}</bold> (hradí Blink)",
       "retryCta": "Zkusit znovu",

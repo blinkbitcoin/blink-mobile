@@ -3857,6 +3857,7 @@
       "newBitcoinBalance": "Yeni Bitcoin bakiyesi",
       "newDollarBalance": "Yeni Dolar bakiyesi",
       "dollarBalanceNotAvailable": "kullanılamıyor",
+      "lnAddressNotMoved": "Lightning adresiniz taşınamadı. Paranız yine de aktarılacak.",
       "networkFee": "Ağ ücreti: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Ağ ücreti: <bold>{fee: string}</bold> (Blink tarafından karşılanır)",
       "retryCta": "Tekrar dene",

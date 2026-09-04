@@ -3857,6 +3857,7 @@
       "newBitcoinBalance": "Baki Bitcoin baharu",
       "newDollarBalance": "Baki Dolar baharu",
       "dollarBalanceNotAvailable": "tidak tersedia",
+      "lnAddressNotMoved": "Alamat Lightning anda tidak dapat dipindahkan. Dana anda tetap akan dipindahkan.",
       "networkFee": "Yuran rangkaian: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Yuran rangkaian: <bold>{fee: string}</bold> (ditanggung oleh Blink)",
       "retryCta": "Cuba lagi",

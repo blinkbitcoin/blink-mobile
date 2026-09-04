@@ -3857,6 +3857,7 @@
       "newBitcoinBalance": "Ibhalansi entsha ye-Bitcoin",
       "newDollarBalance": "Ibhalansi entsha yeDola",
       "dollarBalanceNotAvailable": "ayifumaneki",
+      "lnAddressNotMoved": "Idilesi yakho ye-Lightning ayikwazanga ukususwa. Imali yakho isaza kudluliselwa.",
       "networkFee": "Umrhumo wothungelwano: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Umrhumo wothungelwano: <bold>{fee: string}</bold> (uhlawulwa nguBlink)",
       "retryCta": "Zama kwakhona",

@@ -931,23 +931,58 @@ describe("MigrationBalancesOverviewScreen", () => {
 describe("MigrationBalancesOverviewScreen lightning-address re-point gating", () => {
   beforeEach(resetScreenMocks)
 
-  /** The re-point is a precondition of the commit, so a settled failure hands over exactly
-   *  like a refused start. */
-  it("hands over to support when the lightning-address re-point fails", async () => {
-    mockLnAddressTransfer = {
-      isTransferred: false,
-      isRejected: true,
-      isAccountMissing: false,
-      hasConnectionIssue: false,
-      retry: mockLnRetry,
-    }
+  /**
+   * A refused re-point used to end the migration here, which left a user with an account
+   * locked server-side and no way to reach their funds (blink-wip#1211). The address is a
+   * convenience; the money is not.
+   */
+  const rejectedLnAddressTransfer = {
+    isTransferred: false,
+    isRejected: true,
+    isAccountMissing: false,
+    hasConnectionIssue: false,
+    retry: mockLnRetry,
+  }
+
+  it("does not hand over to support when the lightning-address re-point fails", async () => {
+    mockLnAddressTransfer = rejectedLnAddressTransfer
     renderScreen()
     await flushEffects()
 
-    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
-      reason: "ln-address-transfer-failed",
-      origin: "commit",
-    })
+    expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  it("still offers the commit when the lightning-address re-point fails", async () => {
+    mockLnAddressTransfer = rejectedLnAddressTransfer
+    const { getByText } = renderScreen()
+    await flushEffects()
+
+    expect(getByText("Approve")).toBeEnabled()
+  })
+
+  /** Migrating in silence would break the promise the flow opened with, that the address
+   *  moves along with the funds. */
+  it("says the address did not move when the re-point fails", async () => {
+    mockLnAddressTransfer = rejectedLnAddressTransfer
+    const { getByText } = renderScreen()
+    await flushEffects()
+
+    expect(
+      getByText(
+        "Your Lightning address could not be moved. Your funds will still be transferred.",
+      ),
+    ).toBeTruthy()
+  })
+
+  it("says nothing about the address when the re-point succeeds", async () => {
+    const { queryByText } = renderScreen()
+    await flushEffects()
+
+    expect(
+      queryByText(
+        "Your Lightning address could not be moved. Your funds will still be transferred.",
+      ),
+    ).toBeNull()
   })
 
   /** A re-point that failed for a missing device key is the same cause the commit reports,

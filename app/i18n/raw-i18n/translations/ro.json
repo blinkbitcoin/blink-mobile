@@ -3857,6 +3857,7 @@
       "newBitcoinBalance": "Sold Bitcoin nou",
       "newDollarBalance": "Sold în dolari nou",
       "dollarBalanceNotAvailable": "indisponibil",
+      "lnAddressNotMoved": "Adresa ta Lightning nu a putut fi mutată. Fondurile tale vor fi transferate oricum.",
       "networkFee": "Comision de rețea: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Comision de rețea: <bold>{fee: string}</bold> (acoperit de Blink)",
       "retryCta": "Încearcă din nou",
