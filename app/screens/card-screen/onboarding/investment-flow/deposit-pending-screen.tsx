@@ -5,6 +5,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { CloseHeader } from "@app/components/close-header"
 import { Screen } from "@app/components/screen"
 import { StatusScreenLayout } from "@app/components/status-screen-layout"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -23,7 +24,8 @@ export const DepositPendingScreen: React.FC = () => {
   }
 
   return (
-    <Screen preset="fixed">
+    <Screen preset="fixed" headerShown={false}>
+      <CloseHeader testID="deposit-pending-close" />
       <StatusScreenLayout
         icon="clock"
         iconColor={colors.primary}
