@@ -6,7 +6,6 @@ import MapIcon from "@app/assets/icons/map.svg"
 import ScanIcon from "@app/assets/icons/scan.svg"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { TranslationFunctions } from "@app/i18n/i18n-types"
 import {
   ConversionConfirmationScreen,
   ConversionDetailsScreen,
@@ -272,66 +271,42 @@ const UnclaimedDepositsGated = withOfflineGate(UnclaimedDepositsScreen)
 /** The card investment onboarding leg, kept out of RootStack so that function stays under
  *  the max-lines-per-function limit. A fragment rather than a component: the navigator
  *  reads its Screen children directly, and only fragments and groups are flattened. */
-const investmentOnboardingScreens = (LL: TranslationFunctions) => (
+const investmentOnboardingScreens = () => (
   <>
     <RootNavigator.Screen
       name="cardOnboardingWelcomeInvestScreen"
       component={WelcomeInvestScreen}
-      options={{
-        title: "",
-        ...headerCloseControlOptions(),
-      }}
+      options={{ headerShown: false }}
     />
     <RootNavigator.Screen
       name="cardOnboardingCompanyValuationScreen"
       component={CompanyValuationScreen}
-      options={{
-        title: "",
-        ...headerCloseControlOptions(),
-      }}
+      options={{ headerShown: false }}
     />
     <RootNavigator.Screen
       name="cardOnboardingSelectInvestScreen"
       component={SelectInvestScreen}
-      options={{
-        title: "",
-        ...headerCloseControlOptions(),
-      }}
+      options={{ headerShown: false }}
     />
     <RootNavigator.Screen
       name="cardOnboardingTermSheetScreen"
       component={TermSheetScreen}
-      options={{
-        title: LL.CardFlow.Onboarding.TermSheet.title(),
-        ...headerCloseControlOptions(),
-      }}
+      options={{ headerShown: false }}
     />
     <RootNavigator.Screen
       name="cardOnboardingTransferInvestScreen"
       component={TransferInvestScreen}
-      options={{
-        title: "",
-        headerBackVisible: false,
-        ...headerCloseControlOptions(),
-      }}
+      options={{ headerShown: false }}
     />
     <RootNavigator.Screen
       name="cardOnboardingInsufficientBalanceScreen"
       component={InsufficientBalanceScreen}
-      options={{
-        title: "",
-        headerBackVisible: false,
-        ...headerCloseControlOptions(),
-      }}
+      options={{ headerShown: false }}
     />
     <RootNavigator.Screen
       name="cardOnboardingDepositPendingScreen"
       component={DepositPendingScreen}
-      options={{
-        title: "",
-        headerBackVisible: false,
-        ...headerCloseControlOptions(),
-      }}
+      options={{ headerShown: false }}
     />
   </>
 )
@@ -898,7 +873,7 @@ export const RootStack = () => {
           ...headerCloseControlOptions(),
         }}
       />
-      {investmentOnboardingScreens(LL)}
+      {investmentOnboardingScreens()}
       <RootNavigator.Screen
         name="cardOnboardingPersonalInfoScreen"
         component={CardPersonalInformationScreen}
