@@ -4,6 +4,10 @@ import { useFocusEffect } from "@react-navigation/native"
 
 import { useAppConfig } from "@app/hooks/use-app-config"
 import { reportError } from "@app/utils/error-logging"
+import {
+  classifyStorageFailure,
+  StorageFailure,
+} from "@app/utils/storage/storage-failure"
 
 import {
   MigrationCheckpoint,
@@ -39,6 +43,7 @@ export const useMigrationCheckpointState = () => {
   const [stored, setStored] = useState<StoredCheckpoint | null>(null)
   const [loading, setLoading] = useState(true)
   const [hasError, setHasError] = useState(false)
+  const [storageFailure, setStorageFailure] = useState<StorageFailure | null>(null)
   const isFocusedRef = useRef(true)
 
   const {
@@ -61,12 +66,14 @@ export const useMigrationCheckpointState = () => {
           if (!isFocusedRef.current) return
           setStored(storedCheckpoint ?? null)
           setHasError(false)
+          setStorageFailure(null)
           setLoading(false)
         })
         .catch((err) => {
           reportError("Checkpoint load", err)
           if (!isFocusedRef.current) return
           setHasError(true)
+          setStorageFailure(classifyStorageFailure(err))
           setLoading(false)
         }),
     [storageKey],
@@ -169,6 +176,9 @@ export const useMigrationCheckpointState = () => {
      *  indistinguishable from a wiped device, and the gate would hand a resumable user
      *  to support (terminal for that origin) on a transient storage error. */
     hasError,
+    /** What the failed read was, when the message could say. Carried next to the flag
+     *  because only one of these failures is the user's to fix. */
+    storageFailure,
     /** Imperative reload for retry screens. Leaves the focus flag alone on purpose: a
      *  retry resolving after blur still drops its update, same as the focus reload. */
     refetch: reload,
