@@ -125,6 +125,7 @@ import {
   WelcomeInvestScreen,
   SelectInvestScreen,
   TermSheetScreen,
+  SignInvestScreen,
   TransferInvestScreen,
   InsufficientBalanceScreen,
   DepositPendingScreen,
@@ -291,6 +292,11 @@ const investmentOnboardingScreens = () => (
     <RootNavigator.Screen
       name="cardOnboardingTermSheetScreen"
       component={TermSheetScreen}
+      options={{ headerShown: false }}
+    />
+    <RootNavigator.Screen
+      name="cardOnboardingSignInvestScreen"
+      component={SignInvestScreen}
       options={{ headerShown: false }}
     />
     <RootNavigator.Screen

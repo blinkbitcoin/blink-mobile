@@ -81,7 +81,7 @@ describe("TermSheetScreen", () => {
     expect(getByText("Proceed to Sign")).toBeTruthy()
   })
 
-  it("navigates to transfer invest screen on button press", async () => {
+  it("navigates to the signing step on button press", async () => {
     const { getByText } = render(
       <ContextForScreen>
         <TermSheetScreen />
@@ -95,6 +95,6 @@ describe("TermSheetScreen", () => {
       fireEvent.press(button)
     })
 
-    expect(mockNavigate).toHaveBeenCalledWith("cardOnboardingTransferInvestScreen")
+    expect(mockNavigate).toHaveBeenCalledWith("cardOnboardingSignInvestScreen")
   })
 })

@@ -3714,6 +3714,9 @@
         },
         "buttonText": "Tovább az Aláíráshoz"
       },
+      "SignInvest": {
+        "label": "Írja alá a megállapodást"
+      },
       "TransferInvest": {
         "title": "Utald át a befektetésedet",
         "paragraphs": {
