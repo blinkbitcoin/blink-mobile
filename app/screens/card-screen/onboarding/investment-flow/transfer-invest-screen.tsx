@@ -6,6 +6,7 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { IconHero } from "@app/components/icon-hero"
+import { CloseHeader } from "@app/components/close-header"
 import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -24,7 +25,8 @@ export const TransferInvestScreen: React.FC = () => {
   }
 
   return (
-    <Screen>
+    <Screen headerShown={false}>
+      <CloseHeader testID="transfer-invest-close" />
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
         <IconHero
           icon="send"
