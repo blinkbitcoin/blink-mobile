@@ -12732,6 +12732,20 @@ type RootTranslation = {
 			 */
 			contactSupportCta: string
 		}
+		storageUnavailable: {
+			/**
+			 * W​e​ ​c​o​u​l​d​n​'​t​ ​r​e​a​d​ ​y​o​u​r​ ​m​i​g​r​a​t​i​o​n​ ​p​r​o​g​r​e​s​s​ ​f​r​o​m​ ​t​h​i​s​ ​d​e​v​i​c​e​.​ ​N​o​t​h​i​n​g​ ​i​s​ ​l​o​s​t​ ​—​ ​y​o​u​r​ ​f​u​n​d​s​ ​a​r​e​ ​s​a​f​e​ ​a​n​d​ ​y​o​u​r​ ​p​r​o​g​r​e​s​s​ ​i​s​ ​s​t​i​l​l​ ​s​a​v​e​d​.
+			 */
+			unreadableBody: string
+			/**
+			 * Y​o​u​r​ ​d​e​v​i​c​e​ ​h​a​s​ ​n​o​ ​s​t​o​r​a​g​e​ ​s​p​a​c​e​ ​l​e​f​t​,​ ​s​o​ ​w​e​ ​c​a​n​'​t​ ​r​e​a​d​ ​y​o​u​r​ ​m​i​g​r​a​t​i​o​n​ ​p​r​o​g​r​e​s​s​.​ ​F​r​e​e​ ​u​p​ ​s​o​m​e​ ​s​p​a​c​e​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​.​ ​N​o​t​h​i​n​g​ ​i​s​ ​l​o​s​t​ ​—​ ​y​o​u​r​ ​f​u​n​d​s​ ​a​r​e​ ​s​a​f​e​.
+			 */
+			outOfSpaceBody: string
+			/**
+			 * C​o​n​t​a​c​t​ ​s​u​p​p​o​r​t
+			 */
+			contactSupportCta: string
+		}
 		clockOutOfSync: {
 			/**
 			 * Y​o​u​r​ ​d​e​v​i​c​e​'​s​ ​d​a​t​e​ ​a​n​d​ ​t​i​m​e​ ​a​r​e​ ​o​u​t​ ​o​f​ ​s​y​n​c​.​ ​S​e​t​ ​t​h​e​m​ ​t​o​ ​a​u​t​o​m​a​t​i​c​ ​t​o​ ​c​o​n​t​i​n​u​e​.
@@ -26255,6 +26269,20 @@ export type TranslationFunctions = {
 			 * Your funds are on their way to your new account. This is taking longer than usual — keep the app open and we'll finish up automatically.
 			 */
 			body: () => LocalizedString
+			/**
+			 * Contact support
+			 */
+			contactSupportCta: () => LocalizedString
+		}
+		storageUnavailable: {
+			/**
+			 * We couldn't read your migration progress from this device. Nothing is lost — your funds are safe and your progress is still saved.
+			 */
+			unreadableBody: () => LocalizedString
+			/**
+			 * Your device has no storage space left, so we can't read your migration progress. Free up some space and try again. Nothing is lost — your funds are safe.
+			 */
+			outOfSpaceBody: () => LocalizedString
 			/**
 			 * Contact support
 			 */

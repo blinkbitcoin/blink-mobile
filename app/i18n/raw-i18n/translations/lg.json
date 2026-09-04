@@ -3910,6 +3910,11 @@
       "body": "Ssente zo ziri mu kkubo okutuuka ku akaawunti yo empya. Kino kitwala ebbanga okusinga bulijjo — leka app ng'eggule, tujja kukimaliriza kyokka.",
       "contactSupportCta": "Tuukirira abayambi"
     },
+    "storageUnavailable": {
+      "unreadableBody": "Tetusobodde kusoma bw'oyimiridde mu kujjulukuka ku kyuma kino. Tewali kibuze — ssente zo ziri bulungi era n'obw'oyimiridde bukyaterekeddwa.",
+      "outOfSpaceBody": "Ekyuma kyo tekirina bbanga lya kutereka lisigadde, noolwekyo tetusobola kusoma bw'oyimiridde mu kujjulukuka. Ggyawo ebimu ozzeemu ogezaako. Tewali kibuze — ssente zo ziri bulungi.",
+      "contactSupportCta": "Tukwatagane n'abayambi"
+    },
     "clockOutOfSync": {
       "body": "Ennaku n'obudde bw'ekyuma kyo tebituukagana. Bisseeko ku otomatiki osobole okweyongerayo.",
       "retryCta": "Ddamu ogezaako"

@@ -3910,6 +3910,11 @@
       "body": "Dana Anda sedang dalam perjalanan ke akun baru Anda. Ini memakan waktu lebih lama dari biasanya — biarkan aplikasi tetap terbuka dan kami akan menyelesaikannya secara otomatis.",
       "contactSupportCta": "Hubungi dukungan"
     },
+    "storageUnavailable": {
+      "unreadableBody": "Kami tidak dapat membaca progres migrasi Anda dari perangkat ini. Tidak ada yang hilang — dana Anda aman dan progres Anda masih tersimpan.",
+      "outOfSpaceBody": "Perangkat Anda tidak memiliki sisa ruang penyimpanan, sehingga kami tidak dapat membaca progres migrasi Anda. Kosongkan ruang lalu coba lagi. Tidak ada yang hilang — dana Anda aman.",
+      "contactSupportCta": "Hubungi dukungan"
+    },
     "clockOutOfSync": {
       "body": "Tanggal dan waktu perangkat Anda tidak sinkron. Atur ke otomatis untuk melanjutkan.",
       "retryCta": "Coba lagi"

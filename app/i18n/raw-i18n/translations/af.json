@@ -3910,6 +3910,11 @@
       "body": "Jou fondse is op pad na jou nuwe rekening. Dit neem langer as gewoonlik — hou die app oop en ons handel dit outomaties af.",
       "contactSupportCta": "Kontak ondersteuning"
     },
+    "storageUnavailable": {
+      "unreadableBody": "Ons kon nie jou migrasievordering op hierdie toestel lees nie. Niks is verlore nie — jou fondse is veilig en jou vordering is steeds gestoor.",
+      "outOfSpaceBody": "Jou toestel het geen bergingspasie oor nie, dus kan ons nie jou migrasievordering lees nie. Maak spasie oop en probeer weer. Niks is verlore nie — jou fondse is veilig.",
+      "contactSupportCta": "Kontak ondersteuning"
+    },
     "clockOutOfSync": {
       "body": "Die datum en tyd van jou toestel is nie in sinkronisasie nie. Stel dit op outomaties om voort te gaan.",
       "retryCta": "Probeer weer"
