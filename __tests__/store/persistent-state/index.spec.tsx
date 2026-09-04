@@ -23,10 +23,12 @@ jest.mock("@app/utils/storage", () => ({
 }))
 
 const mockSweepMnemonicMigration = jest.fn()
-// Scheduled off the boot path once the state has loaded; its own spec covers
-// what it does, and here it must not add reports to the ones under assertion.
+const mockPurgeLegacyKeyStoreOnce = jest.fn()
+// Scheduled off the boot path once the state has loaded; their own specs cover
+// what they do, and here they must not add reports to the ones under assertion.
 jest.mock("@app/self-custodial/storage/account-index", () => ({
   sweepMnemonicMigration: (...args: unknown[]) => mockSweepMnemonicMigration(...args),
+  purgeLegacyKeyStoreOnce: (...args: unknown[]) => mockPurgeLegacyKeyStoreOnce(...args),
 }))
 
 const mockGetActiveToken = jest.fn()
@@ -111,6 +113,7 @@ const setupStorageMockDefaults = () => {
   jest.clearAllMocks()
   storedStrings.clear()
   mockSweepMnemonicMigration.mockResolvedValue({ status: "ok", migrated: 0 })
+  mockPurgeLegacyKeyStoreOnce.mockResolvedValue({ status: "done" })
   mockSaveJson.mockResolvedValue(undefined)
   mockSaveString.mockResolvedValue(true)
   mockLoadString.mockImplementation(async (key: string) => storedStrings.get(key) ?? null)
