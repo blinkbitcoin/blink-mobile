@@ -311,10 +311,7 @@ const investmentOnboardingScreens = () => (
     <RootNavigator.Screen
       name="cardOnboardingSignInvestScreen"
       component={SignInvestScreen}
-      options={{
-        title: "",
-        ...headerCloseControlOptions(),
-      }}
+      options={{ headerShown: false }}
     />
     <RootNavigator.Screen
       name="cardOnboardingTransferInvestScreen"
