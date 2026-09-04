@@ -5,6 +5,10 @@ import { useFocusEffect } from "@react-navigation/native"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useAppConfig } from "@app/hooks/use-app-config"
 import { reportError } from "@app/utils/error-logging"
+import {
+  classifyStorageFailure,
+  StorageFailure,
+} from "@app/utils/storage/storage-failure"
 
 import {
   clearPendingProvisionedAccount,
@@ -29,6 +33,7 @@ export const usePendingMigrationAccounts = () => {
   const [pendingByOwner, setPendingByOwner] = useState<Record<string, string>>({})
   const [loading, setLoading] = useState(true)
   const [hasError, setHasError] = useState(false)
+  const [storageFailure, setStorageFailure] = useState<StorageFailure | null>(null)
   const isMountedRef = useRef(true)
 
   const activeAccountId = activeAccount?.id ?? null
@@ -58,6 +63,7 @@ export const usePendingMigrationAccounts = () => {
             const { [activatedOwner]: activated, ...rest } = pending
             setPendingByOwner(rest)
             setHasError(false)
+            setStorageFailure(null)
             setLoading(false)
             clearPendingProvisionedAccount(storageKey, activatedOwner).catch((err) => {
               reportError("Pending migration account self-heal", err)
@@ -67,12 +73,14 @@ export const usePendingMigrationAccounts = () => {
 
           setPendingByOwner(pending)
           setHasError(false)
+          setStorageFailure(null)
           setLoading(false)
         })
         .catch((err) => {
           reportError("Pending migration accounts load", err)
           if (!isMountedRef.current) return
           setHasError(true)
+          setStorageFailure(classifyStorageFailure(err))
           setLoading(false)
         }),
     [storageKey, activeAccountId],
@@ -139,6 +147,8 @@ export const usePendingMigrationAccounts = () => {
     /** A read failure surfaced, not swallowed: an unreadable record read as "no pending
      *  wallet" would tell the gate this device was wiped when it wasn't. */
     hasError,
+    /** What the failed read was, when the message could say. */
+    storageFailure,
     /** Imperative reload for retry screens; leaves the mount flag alone so a retry
      *  resolving after unmount still drops its update. */
     refetch: load,
