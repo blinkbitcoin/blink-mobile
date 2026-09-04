@@ -14,12 +14,12 @@ import {
   validateStoredCheckpoint,
 } from "@app/screens/account-migration/utils/migration-checkpoint-storage"
 
-const mockLoadJson = jest.fn()
+const mockLoadJsonOrThrow = jest.fn()
 const mockSaveJson = jest.fn()
 const mockRemove = jest.fn()
 
 jest.mock("@app/utils/storage", () => ({
-  loadJson: (...args: readonly unknown[]) => mockLoadJson(...args),
+  loadJsonOrThrow: (...args: readonly unknown[]) => mockLoadJsonOrThrow(...args),
   saveJson: (...args: readonly unknown[]) => mockSaveJson(...args),
   remove: (...args: readonly unknown[]) => mockRemove(...args),
 }))
@@ -250,7 +250,7 @@ describe("migration-checkpoint-storage", () => {
 
   describe("loadCheckpoint", () => {
     it("returns valid non-expired checkpoint", async () => {
-      mockLoadJson.mockResolvedValue({
+      mockLoadJsonOrThrow.mockResolvedValue({
         step: "backupAlerts",
         savedAt: Date.now() - 1000,
       })
@@ -263,7 +263,7 @@ describe("migration-checkpoint-storage", () => {
     })
 
     it("returns null and removes expired checkpoint", async () => {
-      mockLoadJson.mockResolvedValue({
+      mockLoadJsonOrThrow.mockResolvedValue({
         step: "backupMethod",
         savedAt: Date.now() - 49 * 60 * 60 * 1000,
       })
@@ -274,28 +274,27 @@ describe("migration-checkpoint-storage", () => {
     })
 
     it("returns null for invalid data", async () => {
-      mockLoadJson.mockResolvedValue({ step: "invalid" })
+      mockLoadJsonOrThrow.mockResolvedValue({ step: "invalid" })
 
       const result = await loadCheckpoint("test-key")
       expect(result).toBeNull()
     })
 
-    it("clears the key and re-throws on storage error so the caller can report", async () => {
-      mockLoadJson.mockRejectedValue(new Error("corrupt"))
+    it("re-throws on storage error so the caller can tell it from an empty store", async () => {
+      mockLoadJsonOrThrow.mockRejectedValue(new Error("corrupt"))
 
       await expect(loadCheckpoint("test-key")).rejects.toThrow("corrupt")
-      expect(mockRemove).toHaveBeenCalledWith("test-key")
     })
 
-    it("re-throws the original error even when the cleanup removal fails", async () => {
-      mockLoadJson.mockRejectedValue(new Error("corrupt"))
-      mockRemove.mockRejectedValue(new Error("remove failed"))
+    it("leaves the record alone when the read fails", async () => {
+      mockLoadJsonOrThrow.mockRejectedValue(new Error("corrupt"))
 
       await expect(loadCheckpoint("test-key")).rejects.toThrow("corrupt")
+      expect(mockRemove).not.toHaveBeenCalled()
     })
 
     it("returns null for null storage", async () => {
-      mockLoadJson.mockResolvedValue(null)
+      mockLoadJsonOrThrow.mockResolvedValue(null)
 
       const result = await loadCheckpoint("test-key")
       expect(result).toBeNull()
@@ -304,7 +303,7 @@ describe("migration-checkpoint-storage", () => {
 
   describe("saveCheckpointToStorage", () => {
     it("persists step and timestamp", async () => {
-      mockLoadJson.mockResolvedValue(null)
+      mockLoadJsonOrThrow.mockResolvedValue(null)
       const before = Date.now()
       await saveCheckpointToStorage("test-key", {
         step: MigrationCheckpoint.BackupAlerts,
@@ -321,7 +320,7 @@ describe("migration-checkpoint-storage", () => {
     })
 
     it("stores the provided account id and custodial owner", async () => {
-      mockLoadJson.mockResolvedValue(null)
+      mockLoadJsonOrThrow.mockResolvedValue(null)
       await saveCheckpointToStorage("test-key", {
         step: MigrationCheckpoint.BackupMethod,
         accountId: "sc-1",
@@ -337,7 +336,7 @@ describe("migration-checkpoint-storage", () => {
     })
 
     it("preserves an existing account id across step updates by the same owner", async () => {
-      mockLoadJson.mockResolvedValue({
+      mockLoadJsonOrThrow.mockResolvedValue({
         step: MigrationCheckpoint.BackupMethod,
         savedAt: Date.now(),
         accountId: "sc-1",
@@ -358,7 +357,7 @@ describe("migration-checkpoint-storage", () => {
     })
 
     it("drops the previous owner's account id when another account starts a flow", async () => {
-      mockLoadJson.mockResolvedValue({
+      mockLoadJsonOrThrow.mockResolvedValue({
         step: MigrationCheckpoint.BackupMethod,
         savedAt: Date.now(),
         accountId: "sc-1",
@@ -379,7 +378,7 @@ describe("migration-checkpoint-storage", () => {
     })
 
     it("claims an ownerless record without dropping its account id", async () => {
-      mockLoadJson.mockResolvedValue({
+      mockLoadJsonOrThrow.mockResolvedValue({
         step: MigrationCheckpoint.BackupMethod,
         savedAt: Date.now(),
         accountId: "sc-1",
@@ -399,7 +398,7 @@ describe("migration-checkpoint-storage", () => {
     })
 
     it("stores the expected receive amount alongside the step", async () => {
-      mockLoadJson.mockResolvedValue(null)
+      mockLoadJsonOrThrow.mockResolvedValue(null)
       await saveCheckpointToStorage("test-key", {
         step: MigrationCheckpoint.BalancesOverview,
         accountId: "sc-1",
@@ -417,7 +416,7 @@ describe("migration-checkpoint-storage", () => {
     })
 
     it("preserves the expected receive amount across step updates by the same owner", async () => {
-      mockLoadJson.mockResolvedValue({
+      mockLoadJsonOrThrow.mockResolvedValue({
         step: MigrationCheckpoint.BalancesOverview,
         savedAt: Date.now(),
         accountId: "sc-1",
@@ -442,7 +441,7 @@ describe("migration-checkpoint-storage", () => {
     /** The #4102 regression: the commit screen is re-enterable after the drain, and the
      *  preview it re-reads then answers 0 for an already emptied balance. */
     it("keeps the stored expected receive amount when a later save carries a post-drain zero", async () => {
-      mockLoadJson.mockResolvedValue({
+      mockLoadJsonOrThrow.mockResolvedValue({
         step: MigrationCheckpoint.BalancesOverview,
         savedAt: Date.now(),
         accountId: "sc-1",
@@ -466,7 +465,7 @@ describe("migration-checkpoint-storage", () => {
     })
 
     it("keeps the stored expected receive amount when a later save carries a different figure", async () => {
-      mockLoadJson.mockResolvedValue({
+      mockLoadJsonOrThrow.mockResolvedValue({
         step: MigrationCheckpoint.BalancesOverview,
         savedAt: Date.now(),
         accountId: "sc-1",
@@ -487,7 +486,7 @@ describe("migration-checkpoint-storage", () => {
     })
 
     it("takes the new owner's expected receive amount over the previous owner's", async () => {
-      mockLoadJson.mockResolvedValue({
+      mockLoadJsonOrThrow.mockResolvedValue({
         step: MigrationCheckpoint.BalancesOverview,
         savedAt: Date.now(),
         accountId: "sc-1",
@@ -511,7 +510,7 @@ describe("migration-checkpoint-storage", () => {
     })
 
     it("drops the previous owner's expected amount when another account starts a flow", async () => {
-      mockLoadJson.mockResolvedValue({
+      mockLoadJsonOrThrow.mockResolvedValue({
         step: MigrationCheckpoint.BalancesOverview,
         savedAt: Date.now(),
         accountId: "sc-1",
@@ -533,21 +532,25 @@ describe("migration-checkpoint-storage", () => {
       })
     })
 
-    it("saves the step even when reading the previous checkpoint fails", async () => {
-      mockLoadJson.mockRejectedValue(new Error("read failed"))
+    it("refuses to save when the previous checkpoint cannot be read", async () => {
+      mockLoadJsonOrThrow.mockRejectedValue(new Error("read failed"))
 
-      await saveCheckpointToStorage("test-key", {
-        step: MigrationCheckpoint.BackupAlerts,
-      })
+      await expect(
+        saveCheckpointToStorage("test-key", { step: MigrationCheckpoint.BackupAlerts }),
+      ).rejects.toThrow("read failed")
+    })
 
-      expect(mockSaveJson).toHaveBeenCalledWith("test-key", {
-        step: MigrationCheckpoint.BackupAlerts,
-        savedAt: expect.any(Number),
-      })
+    it("writes nothing over a record it could not read", async () => {
+      mockLoadJsonOrThrow.mockRejectedValue(new Error("read failed"))
+
+      await expect(
+        saveCheckpointToStorage("test-key", { step: MigrationCheckpoint.BackupAlerts }),
+      ).rejects.toThrow("read failed")
+      expect(mockSaveJson).not.toHaveBeenCalled()
     })
 
     it("drops an expired prior record's account id instead of lending it to the fresh save", async () => {
-      mockLoadJson.mockResolvedValue({
+      mockLoadJsonOrThrow.mockResolvedValue({
         step: MigrationCheckpoint.BackupMethod,
         savedAt: Date.now() - 49 * 60 * 60 * 1000,
         accountId: "sc-1",
@@ -581,20 +584,20 @@ describe("migration-checkpoint-storage", () => {
     })
 
     it("returns an empty map for missing or malformed storage", async () => {
-      mockLoadJson.mockResolvedValue(null)
+      mockLoadJsonOrThrow.mockResolvedValue(null)
       expect(await loadPendingProvisionedAccounts("pending-key")).toEqual({})
 
-      mockLoadJson.mockResolvedValue(["not", "a", "map"])
+      mockLoadJsonOrThrow.mockResolvedValue(["not", "a", "map"])
       expect(await loadPendingProvisionedAccounts("pending-key")).toEqual({})
 
-      mockLoadJson.mockResolvedValue({ "custodial-1": 42, "custodial-2": "sc-2" })
+      mockLoadJsonOrThrow.mockResolvedValue({ "custodial-1": 42, "custodial-2": "sc-2" })
       expect(await loadPendingProvisionedAccounts("pending-key")).toEqual({
         "custodial-2": "sc-2",
       })
     })
 
     it("saves a pending wallet without touching other owners", async () => {
-      mockLoadJson.mockResolvedValue({ "custodial-2": "sc-2" })
+      mockLoadJsonOrThrow.mockResolvedValue({ "custodial-2": "sc-2" })
 
       await savePendingProvisionedAccount("pending-key", {
         custodialAccountId: "custodial-1",
@@ -608,7 +611,10 @@ describe("migration-checkpoint-storage", () => {
     })
 
     it("clears only the given owner's pending wallet", async () => {
-      mockLoadJson.mockResolvedValue({ "custodial-1": "sc-1", "custodial-2": "sc-2" })
+      mockLoadJsonOrThrow.mockResolvedValue({
+        "custodial-1": "sc-1",
+        "custodial-2": "sc-2",
+      })
 
       await clearPendingProvisionedAccount("pending-key", "custodial-1")
 
