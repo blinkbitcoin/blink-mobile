@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from "react"
+import React, { useCallback, useEffect, useRef, useState } from "react"
 import { ActivityIndicator, ScrollView, View } from "react-native"
 import { useFocusEffect, useIsFocused, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
@@ -116,10 +116,29 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
    *  re-saves the checkpoint the migration just cleared, and on ready figures so it is
    *  never recorded before the commit point exists. */
   const expectedReceiveSats = preview.expectedReceiveSats
+  /**
+   * Watched, not fired and forgotten: the write refuses when the prior record cannot be
+   * read, and this is the one step that cannot be taken back. Approving without it leaves
+   * a drained account whose device remembers neither the commit point nor the figure the
+   * receive gate waits on, so the button holds until the record lands.
+   */
+  const [isCommitPointRecorded, setIsCommitPointRecorded] = useState(false)
+  const [hasCommitPointWriteFailed, setHasCommitPointWriteFailed] = useState(false)
+  const recordCommitPoint = useCallback(async (): Promise<void> => {
+    if (expectedReceiveSats === null) return
+    const isSaved = await saveCheckpoint(MigrationCheckpoint.BalancesOverview, {
+      expectedReceiveSats,
+    })
+    /** Latched, never unlatched: this runs again on every focus, figure change and retry,
+     *  and a later failure cannot un-record a write that already landed. */
+    setIsCommitPointRecorded((wasRecorded) => wasRecorded || isSaved)
+    setHasCommitPointWriteFailed(!isSaved)
+  }, [expectedReceiveSats, saveCheckpoint])
+
   useEffect(() => {
-    if (!isFocused || checkpointLoading || expectedReceiveSats === null) return
-    saveCheckpoint(MigrationCheckpoint.BalancesOverview, { expectedReceiveSats })
-  }, [isFocused, checkpointLoading, expectedReceiveSats, saveCheckpoint])
+    if (!isFocused || checkpointLoading) return
+    recordCommitPoint()
+  }, [isFocused, checkpointLoading, recordCommitPoint])
 
   /**
    * The ways this screen ends without an Approve to offer, as one value: the preview
@@ -243,11 +262,16 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
   const isIdSourceRetryable =
     areTransferIdsNeeded &&
     (hasOwnerIdError || hasCheckpointError || isProvisionedAccountMissing)
+  /** A refused commit-point write joins the retry rather than leaving the Approve it
+   *  holds off dead: this screen swallows the hardware back, so a disabled button with
+   *  nothing beside it is the one dead end it must never present. */
+  const isCommitPointWriteRetryable = hasCommitPointWriteFailed && !isCommitPointRecorded
   const isRetryable =
     preview.isRetryable ||
     migrationStart.hasConnectionIssue ||
     lnAddressTransfer.hasConnectionIssue ||
-    isIdSourceRetryable
+    isIdSourceRetryable ||
+    isCommitPointWriteRetryable
 
   const { retry: retryPreview } = preview
   const { retry: retryMigrationStart } = migrationStart
@@ -261,9 +285,11 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
     retryPreview()
     retryMigrationStart()
     retryLnAddressTransfer()
+    recordCommitPoint()
     refetchOwnerId().catch(() => undefined)
     refetchCheckpoint().catch(() => undefined)
   }, [
+    recordCommitPoint,
     retryPreview,
     retryMigrationStart,
     retryLnAddressTransfer,
@@ -280,7 +306,8 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
     !preview.isReady ||
     preview.isDollarRegionPending ||
     !migrationStart.isStarted ||
-    !isLnAddressSettled
+    !isLnAddressSettled ||
+    !isCommitPointRecorded
 
   return (
     <Screen preset="fixed" headerShown={false}>

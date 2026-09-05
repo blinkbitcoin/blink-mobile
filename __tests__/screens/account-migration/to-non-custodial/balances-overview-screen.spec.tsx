@@ -98,7 +98,8 @@ jest.mock("@app/utils/error-logging", () => ({
   reportError: (operation: string, err: unknown) => mockReportError(operation, err),
 }))
 
-const mockSaveCheckpoint = jest.fn()
+/** Resolves true like the real one: the commit point is recorded before Approve opens. */
+const mockSaveCheckpoint = jest.fn().mockResolvedValue(true)
 let mockCheckpointLoading = false
 
 let mockCheckpointAccountId: string | null = "sc-account-1"
@@ -233,6 +234,7 @@ const renderScreen = () => render(screenTree())
 
 const resetScreenMocks = () => {
   jest.clearAllMocks()
+  mockSaveCheckpoint.mockResolvedValue(true)
   loadLocale("en")
   mockDollarRestricted = false
   mockCurrentDollarRestricted = false
@@ -713,6 +715,60 @@ describe("MigrationBalancesOverviewScreen", () => {
 
     expect(handler()).toBe(true)
     expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  /** Approving without this record drains an account whose device then remembers neither
+   *  the step nor the figure the receive gate waits on. */
+  it("does not offer Approve when the commit-point write is refused", async () => {
+    mockSaveCheckpoint.mockResolvedValue(false)
+
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.queryByTestId("migration-balances-overview-approve")).toBeNull()
+  })
+
+  /** A withheld Approve with nothing beside it is the dead end this screen may never
+   *  present: the hardware back is swallowed here. */
+  it("offers a retry instead, rather than nothing at all", async () => {
+    mockSaveCheckpoint.mockResolvedValue(false)
+
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.getByTestId("migration-balances-overview-retry")).toBeTruthy()
+  })
+
+  it("re-attempts the write from that retry and opens Approve once it lands", async () => {
+    mockSaveCheckpoint.mockResolvedValue(false)
+    mockUseMigrationQuery.mockReturnValue({
+      ...migrationQueryResult({
+        balanceSats: 1000,
+        feeSats: 10,
+        feeCoveredByBlink: false,
+        receiveSats: 990,
+      }),
+      refetch: jest.fn(),
+    })
+    mockUseWalletOverviewScreenQuery.mockReturnValue({
+      ...walletOverviewQueryResult({ btcBalance: 1000, usdBalance: 0 }),
+      refetch: jest.fn(),
+    })
+    renderScreen()
+    await flushEffects()
+
+    mockSaveCheckpoint.mockResolvedValue(true)
+    fireEvent.press(screen.getByTestId("migration-balances-overview-retry"))
+    await flushEffects()
+
+    expect(screen.getByTestId("migration-balances-overview-approve")).toBeEnabled()
+  })
+
+  it("opens Approve once that record lands", async () => {
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.getByTestId("migration-balances-overview-approve")).toBeEnabled()
   })
 
   it("persists the commit-point checkpoint with the preview's receive figure", async () => {

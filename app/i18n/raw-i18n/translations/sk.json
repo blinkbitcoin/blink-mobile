@@ -3910,6 +3910,11 @@
       "body": "Vaše prostriedky sú na ceste do vášho nového účtu. Trvá to dlhšie než zvyčajne — nechajte aplikáciu otvorenú a dokončíme to automaticky.",
       "contactSupportCta": "Kontaktovať podporu"
     },
+    "storageUnavailable": {
+      "unreadableBody": "Nepodarilo sa nám načítať priebeh vašej migrácie z tohto zariadenia. Nič sa nestratilo — vaše prostriedky sú v bezpečí a váš postup je stále uložený.",
+      "outOfSpaceBody": "Vo vašom zariadení už nie je voľné úložisko, takže nedokážeme načítať priebeh migrácie. Uvoľnite miesto a skúste to znova. Nič sa nestratilo — vaše prostriedky sú v bezpečí.",
+      "contactSupportCta": "Kontaktovať podporu"
+    },
     "clockOutOfSync": {
       "body": "Dátum a čas vášho zariadenia nie sú synchronizované. Nastavte ich na automatické, aby ste mohli pokračovať.",
       "retryCta": "Skúsiť znova"

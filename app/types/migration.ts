@@ -51,6 +51,11 @@ export const MigrationSupportReason = {
    *  resumable checkpoint nor a reusable pending wallet (e.g. after a reinstall), so a
    *  restart would only provision another orphan; support is the only way forward. */
   LockedWithoutCheckpoint: "locked-without-checkpoint",
+  /** The device store would not answer, so whether this account can resume is unknown
+   *  rather than settled — told apart from the reason above on purpose, since that one
+   *  asserts the records are gone and this one asserts nothing. The records may well be
+   *  intact and unread, so support must not treat it as a wiped device. */
+  StorageUnreadable: "storage-unreadable",
   /** The transfer itself failed or threw. */
   TransferFailed: "transfer-failed",
   /** The server paid the migration out, but the receive into the new self-custodial
@@ -105,6 +110,10 @@ export const MigrationSupportOrigin = {
   Commit: "commit",
   Resume: "resume",
   Gate: "gate",
+  /** A gate handover the gate itself can still resolve: unlike the one above, it is only
+   *  offered after retries have failed, so returning lands on a retry screen rather than
+   *  on a handover that fires again. The user who frees up space needs that way back. */
+  GateStorage: "gate-storage",
   /** The only handover the transfer is expected to survive: the receive is still being
    *  watched underneath, so backing out returns to the screen watching it rather than
    *  popping to the commit screen, which would unmount the gate with it. */

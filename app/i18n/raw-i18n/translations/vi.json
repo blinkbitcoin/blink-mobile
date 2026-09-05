@@ -3910,6 +3910,11 @@
       "body": "Tiền của bạn đang trên đường chuyển đến tài khoản mới. Quá trình này lâu hơn bình thường — hãy giữ ứng dụng mở và chúng tôi sẽ tự động hoàn tất.",
       "contactSupportCta": "Liên hệ hỗ trợ"
     },
+    "storageUnavailable": {
+      "unreadableBody": "Chúng tôi không thể đọc tiến trình chuyển đổi của bạn từ thiết bị này. Không có gì bị mất: tiền của bạn vẫn an toàn và tiến trình vẫn được lưu.",
+      "outOfSpaceBody": "Thiết bị của bạn không còn dung lượng lưu trữ, nên chúng tôi không thể đọc tiến trình chuyển đổi của bạn. Hãy giải phóng dung lượng rồi thử lại. Không có gì bị mất: tiền của bạn vẫn an toàn.",
+      "contactSupportCta": "Liên hệ hỗ trợ"
+    },
     "clockOutOfSync": {
       "body": "Ngày và giờ trên thiết bị của bạn không đồng bộ. Đặt về tự động để tiếp tục.",
       "retryCta": "Thử lại"

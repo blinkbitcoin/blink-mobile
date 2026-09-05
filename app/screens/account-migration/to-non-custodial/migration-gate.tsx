@@ -7,6 +7,7 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { DollarBalanceMigrationModal } from "@app/components/dollar-balance-migration-modal"
 import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -16,6 +17,7 @@ import { MigrationSupportOrigin, MigrationSupportReason } from "@app/types/migra
 import { WindDownStatus } from "@app/types/wind-down"
 import { reportError } from "@app/utils/error-logging"
 import { testProps } from "@app/utils/testProps"
+import { StorageFailure } from "@app/utils/storage/storage-failure"
 
 import {
   useActiveApiKeys,
@@ -43,6 +45,11 @@ const resolveMigrationMode = (status: WindDownStatus | undefined): MigrationMode
   if (isPreClosurePhase) return "forcedPreDeadline"
   return "voluntary"
 }
+
+/** How many failed retries stand in for "this is not going to clear on its own". Low
+ *  enough that a trapped user is not left tapping, high enough that one bad read does not
+ *  send a recoverable device to support. */
+const MAX_RETRIES_BEFORE_STORAGE_HANDOVER = 3
 
 /**
  * Entry gate for the migration flow, the single choke point for the Settings entry
@@ -97,11 +104,13 @@ export const MigrationGate: React.FC = () => {
     hasError: checkpointError,
     refetch: refetchCheckpoint,
     hasResumableCheckpoint,
+    storageFailure: checkpointStorageFailure,
   } = useMigrationCheckpoint()
   const {
     reusablePendingAccountId,
     loading: pendingWalletLoading,
     hasError: pendingWalletError,
+    storageFailure: pendingWalletStorageFailure,
     refetch: refetchPendingWallet,
   } = useReusablePendingWallet()
 
@@ -119,11 +128,29 @@ export const MigrationGate: React.FC = () => {
     navigation.navigate("conversionDetails")
   }, [navigation])
 
+  const hasResumeDataError = checkpointError || pendingWalletError
+
+  /** Only this screen's storage branch may claim the device could not be read: the same
+   *  screen also serves API-key, balance and lock failures, and a user who is offline as
+   *  well would be sent looking at their phone for the network's problem. */
+  const hasNetworkDataError = apiKeysError || balancesError || lockError
+  const isStorageReadFailure =
+    isMigrationLocked && hasResumeDataError && !hasNetworkDataError
+
   /** Retry must not fail silently: catch the rejection, and disable/spin the button while it
    *  is in flight so repeated taps cannot stack requests over an unchanged error screen. */
   const [isRetrying, setIsRetrying] = useState(false)
+  /** Counted rather than diagnosed: the store's own message cannot say whether a failure
+   *  will clear (Android answers an unopenable database with "Database Error" and nothing
+   *  else), so repeated failure is the only honest evidence that retrying is not working,
+   *  and the escape below is offered on that instead of on a guess. */
+  const [failedRetryCount, setFailedRetryCount] = useState(0)
   const retryGateData = useCallback(async () => {
     setIsRetrying(true)
+    /** Only this device's failures count. A retry made while the network is what failed
+     *  says nothing about whether the store will ever answer, and carrying those attempts
+     *  over would arm the handover on the first local read that fails. */
+    if (isStorageReadFailure) setFailedRetryCount((previous) => previous + 1)
     try {
       await Promise.all([
         refetchApiKeys(),
@@ -138,6 +165,7 @@ export const MigrationGate: React.FC = () => {
       setIsRetrying(false)
     }
   }, [
+    isStorageReadFailure,
     refetchApiKeys,
     refetchBalances,
     refetchLock,
@@ -168,12 +196,44 @@ export const MigrationGate: React.FC = () => {
    *  look unlocked, so a settled error blocks with a retry instead. The local reads join
    *  only when locked — that is the only decision they feed, and an unreadable store there
    *  would impersonate a wiped device and hand a resumable user to terminal support. */
-  const hasResumeDataError = checkpointError || pendingWalletError
   const hasGateDataError =
     apiKeysError ||
     balancesError ||
     lockError ||
     (isMigrationLocked && hasResumeDataError)
+
+  /** Either read can be the one that failed. The answer the user can act on wins over the
+   *  one that says nothing, rather than whichever source happened to answer first. */
+  const isStorageOutOfSpace =
+    checkpointStorageFailure === StorageFailure.OutOfSpace ||
+    pendingWalletStorageFailure === StorageFailure.OutOfSpace
+
+  /** Only the locked flow strands anyone: unlocked, this screen sits over an app the user
+   *  can still walk away from, while locked it replaces it.
+   *
+   *  Held back while a retry is in flight: the count rises when one starts, so the last
+   *  one may still be about to succeed, and this button — unlike the primary, which
+   *  disables itself — would otherwise be tappable straight onto a screen with no way
+   *  back. */
+  const hasExhaustedStorageRetries =
+    failedRetryCount >= MAX_RETRIES_BEFORE_STORAGE_HANDOVER
+  const shouldOfferStorageHandover =
+    isStorageReadFailure && hasExhaustedStorageRetries && !isRetrying
+
+  /** The count belongs to one run of storage failures. A read that finally lands puts the
+   *  user back in the flow, and a failure that turns out to be the network's is not
+   *  evidence about this device, so neither may carry attempts into the next. */
+  useEffect(() => {
+    if (isStorageReadFailure) return
+    setFailedRetryCount(0)
+  }, [isStorageReadFailure])
+
+  const goToStorageSupport = useCallback(() => {
+    navigation.navigate("accountMigrationContactSupport", {
+      reason: MigrationSupportReason.StorageUnreadable,
+      origin: MigrationSupportOrigin.GateStorage,
+    })
+  }, [navigation])
 
   /** The API-key warning outranks the Dollar-Balance precondition in the entry order
    *  (entry, API-key check, Dollar Balance check, intro). */
@@ -259,20 +319,40 @@ export const MigrationGate: React.FC = () => {
   }
 
   if (hasGateDataError) {
+    /** Says what actually failed, and only inside this branch: the generic wording stays
+     *  for the failures that are the network's, since telling those users their device
+     *  could not be read would send them looking in the wrong place. */
+    const storageErrorBody = isStorageOutOfSpace
+      ? LL.AccountMigration.storageUnavailable.outOfSpaceBody()
+      : LL.AccountMigration.storageUnavailable.unreadableBody()
+    const gateErrorBody = isStorageReadFailure ? storageErrorBody : LL.errors.generic()
+
     return (
       <Screen preset="fixed" headerShown={false}>
-        <View style={styles.messageContainer}>
-          <GaloyIcon name="warning" size={64} color={colors.warning} />
-          <Text type="p1" style={styles.messageText}>
-            {LL.errors.generic()}
-          </Text>
-          <GaloyPrimaryButton
-            title={LL.common.tryAgain()}
-            onPress={retryGateData}
-            loading={isRetrying}
-            disabled={isRetrying}
-            {...testProps("migration-gate-retry")}
-          />
+        <View style={styles.errorContainer}>
+          <View style={styles.messageContainer}>
+            <GaloyIcon name="warning" size={64} color={colors.warning} />
+            <Text type="p1" style={styles.messageText}>
+              {gateErrorBody}
+            </Text>
+          </View>
+
+          <View style={styles.buttonsContainer}>
+            <GaloyPrimaryButton
+              title={LL.common.tryAgain()}
+              onPress={retryGateData}
+              loading={isRetrying}
+              disabled={isRetrying}
+              {...testProps("migration-gate-retry")}
+            />
+            {shouldOfferStorageHandover ? (
+              <GaloySecondaryButton
+                title={LL.AccountMigration.storageUnavailable.contactSupportCta()}
+                onPress={goToStorageSupport}
+                {...testProps("migration-gate-storage-support")}
+              />
+            ) : null}
+          </View>
         </View>
       </Screen>
     )
@@ -336,12 +416,23 @@ const useStyles = makeStyles(() => ({
     alignItems: "center",
     justifyContent: "center",
   },
+  errorContainer: {
+    flex: 1,
+  },
   messageContainer: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 32,
     gap: 16,
+  },
+  /** The flow's button block: same metrics as every other migration screen, so the
+   *  actions sit where the user has been finding them all the way here. */
+  buttonsContainer: {
+    gap: 10,
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+    paddingTop: 10,
   },
   messageText: {
     textAlign: "center",

@@ -3910,6 +3910,11 @@
             "body": "Seus fundos estão a caminho da sua nova conta. Está demorando mais que o normal — mantenha o aplicativo aberto e concluiremos automaticamente.",
             "contactSupportCta": "Falar com o suporte"
         },
+        "storageUnavailable": {
+            "unreadableBody": "Não conseguimos ler o progresso da sua migração neste dispositivo. Nada se perdeu: os seus fundos estão seguros e o seu progresso continua guardado.",
+            "outOfSpaceBody": "O seu dispositivo não tem espaço de armazenamento livre, por isso não conseguimos ler o progresso da sua migração. Liberte espaço e tente novamente. Nada se perdeu: os seus fundos estão seguros.",
+            "contactSupportCta": "Contactar o suporte"
+        },
         "clockOutOfSync": {
             "body": "A data e a hora do teu dispositivo estão dessincronizadas. Define-as como automáticas para continuar.",
             "retryCta": "Tentar novamente"

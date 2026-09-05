@@ -3910,6 +3910,11 @@
       "body": "Dine midler er på vej til din nye konto. Det tager længere tid end normalt — hold appen åben, så afslutter vi automatisk.",
       "contactSupportCta": "Kontakt support"
     },
+    "storageUnavailable": {
+      "unreadableBody": "Vi kunne ikke læse din migreringsstatus fra denne enhed. Intet er tabt — dine midler er sikre, og din status er stadig gemt.",
+      "outOfSpaceBody": "Der er ikke mere lagerplads på din enhed, så vi kan ikke læse din migreringsstatus. Frigør plads, og prøv igen. Intet er tabt — dine midler er sikre.",
+      "contactSupportCta": "Kontakt support"
+    },
     "clockOutOfSync": {
       "body": "Din enheds dato og klokkeslæt er ude af synkronisering. Indstil dem til automatisk for at fortsætte.",
       "retryCta": "Prøv igen"
