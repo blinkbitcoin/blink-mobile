@@ -142,17 +142,24 @@ export const mergeCheckpoint = (
   const hasRestarted =
     isCommitPointCheckpoint(existing?.step ?? null) &&
     !isCommitPointCheckpoint(update.step)
-  const isFigureInheritable = hasSameOwner && !hasRestarted
-  const inheritedExpectedReceiveSats = isFigureInheritable
+  const inheritedExpectedReceiveSats = hasSameOwner
     ? existing?.expectedReceiveSats
     : undefined
+
+  /** Dropped outright on a restart, not merely left uninherited: the caller re-sends the
+   *  figure it already knows on every save (to heal a write that never landed), so a
+   *  restart has to refuse it from both directions or the previous run's amount rides back
+   *  in through the update. The next commit point supplies the new run's own. */
+  const expectedReceiveSats = hasRestarted
+    ? undefined
+    : inheritedExpectedReceiveSats ?? update.expectedReceiveSats
 
   return {
     step: update.step,
     savedAt: Date.now(),
     accountId: update.accountId ?? (hasSameOwner ? existing?.accountId : undefined),
     custodialAccountId: update.custodialAccountId,
-    expectedReceiveSats: inheritedExpectedReceiveSats ?? update.expectedReceiveSats,
+    expectedReceiveSats,
   }
 }
 

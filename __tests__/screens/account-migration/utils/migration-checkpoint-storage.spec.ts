@@ -562,6 +562,23 @@ describe("migration-checkpoint-storage", () => {
       )
     })
 
+    /** The caller re-sends the figure it already holds on every save, to heal a write that
+     *  never landed, so a restart has to refuse it from the update as well. */
+    it("drops it even when the caller echoes it back in the update", async () => {
+      mockLoadJsonOrThrow.mockResolvedValue(priorRun)
+
+      await saveCheckpointToStorage("test-key", {
+        step: MigrationCheckpoint.BackupMethod,
+        custodialAccountId: "cust-1",
+        expectedReceiveSats: 36726,
+      })
+
+      expect(mockSaveJson).toHaveBeenCalledWith(
+        "test-key",
+        expect.objectContaining({ expectedReceiveSats: undefined }),
+      )
+    })
+
     it("keeps the wallet it already provisioned", async () => {
       mockLoadJsonOrThrow.mockResolvedValue(priorRun)
 
