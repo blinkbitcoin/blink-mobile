@@ -10,6 +10,7 @@ import {
   useMigrationCheckpoint,
   useSelfCustodialDisabled,
 } from "@app/screens/account-migration/hooks"
+import { useMigrationLock } from "@app/screens/account-migration/hooks/use-migration-lock"
 import { AccountType } from "@app/types/wallet"
 
 /** The single dispatcher for every migration entry: the deeplink (blink://account-migration),
@@ -20,6 +21,7 @@ export const MigrationEntryScreen: React.FC = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { activeAccount, loading: registryLoading } = useAccountRegistry()
   const { loading, replaceToCheckpoint, isAtCommitPoint } = useMigrationCheckpoint()
+  const { isLocked, loading: lockLoading, hasError: lockError } = useMigrationLock()
   const isSelfCustodialDisabled = useSelfCustodialDisabled()
   const { remoteConfigReady } = useFeatureFlags()
 
@@ -28,14 +30,21 @@ export const MigrationEntryScreen: React.FC = () => {
   /** Only the commit point resumes (#4109): a flow left before it restarts at the gate, so
    *  reopening replays the whole thing from its first step instead of dropping the user
    *  into a backup screen they have no context for. The kill-switch outranks even that: a
-   *  disabled stack falls through to the gate, which shows the unavailable screen. */
-  const shouldResume = !isSelfCustodialDisabled && isAtCommitPoint
+   *  disabled stack falls through to the gate, which shows the unavailable screen.
+   *
+   *  And only while the server still has that flow. The checkpoint records which screen
+   *  the device left off on, never whether the migration is still open — the server owns
+   *  that, and survives the reinstall the record cannot. Once support clears a stuck flow
+   *  the account reads unlocked, and resuming would drop the user back onto a commit screen
+   *  for a migration that no longer exists instead of letting them start over. */
+  const hasLiveServerFlow = isLocked && !lockError
+  const shouldResume = !isSelfCustodialDisabled && isAtCommitPoint && hasLiveServerFlow
 
   useEffect(() => {
     /** Wait for the account list and the flag too, not just the checkpoint: an unhydrated
      *  registry reads as non-self-custodial (bouncing an SC user into the custodial gate),
      *  and an unresolved flag reads as enabled (slipping a resume past a disabled stack). */
-    if (loading || registryLoading || !remoteConfigReady) return
+    if (loading || registryLoading || lockLoading || !remoteConfigReady) return
 
     if (isSelfCustodialAccount) {
       if (navigation.canGoBack()) {
@@ -55,6 +64,7 @@ export const MigrationEntryScreen: React.FC = () => {
   }, [
     loading,
     registryLoading,
+    lockLoading,
     remoteConfigReady,
     isSelfCustodialAccount,
     shouldResume,
