@@ -27,7 +27,9 @@ import {
   AccountModeSyncMount,
   AutoConvertListenerMount,
   DisplayCurrencyFromRegionMount,
+  TelemetryGateMount,
 } from "./self-custodial/components"
+import { initializeTelemetryGate } from "./self-custodial/measurement"
 import { AutoConvertStatusProvider } from "./self-custodial/providers/auto-convert-status"
 import { BackupStateProvider } from "./self-custodial/providers/backup-state"
 import { SelfCustodialWalletProvider } from "./self-custodial/providers/wallet"
@@ -54,6 +56,13 @@ import { RestrictedRegionProvider } from "./components/restricted-region"
 const defaultLocale = detectDefaultLocale()
 loadLocale(defaultLocale)
 if (__DEV__) console.log(`Loaded default locale: ${defaultLocale}`)
+
+// Shut the analytics gate before anything can log through it. Firebase persists the last
+// value of `setAnalyticsCollectionEnabled` across launches, so a device that was Enhanced
+// last run starts this one collecting — including automatic and screen-level events — and
+// the window before `TelemetryGateMount` resolves the real mode is precisely when a user
+// who has since switched to incognito would leak (FR-3).
+initializeTelemetryGate()
 
 /**
  * This is the root component of our app.
@@ -87,6 +96,7 @@ export const App = () => (
                                         <PushNotificationComponent />
                                         <AutoConvertListenerMount />
                                         <AccountModeSyncMount />
+                                        <TelemetryGateMount />
                                         <DisplayCurrencyFromRegionMount />
                                         <RootStack />
                                         <NetworkErrorComponent />

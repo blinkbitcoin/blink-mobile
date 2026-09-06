@@ -20,8 +20,10 @@ import {
 } from "../bridge"
 import { storageDirFor } from "../config"
 import { logSdkEvent, SdkLogLevel } from "../logging"
+import { logPaymentSettled } from "../measurement"
 import {
   extractPaymentId,
+  extractSettledPayment,
   PAYMENT_RECEIVED_EVENTS,
   REFRESH_EVENTS,
 } from "../providers/sdk-events"
@@ -243,6 +245,17 @@ export const useSdkLifecycle = (
           const paymentId = extractPaymentId(event)
           if (paymentId) setLastReceivedPaymentId(paymentId)
         }
+
+        /**
+         * Both directions are counted from here rather than from the send and receive call
+         * sites (FR-10, FR-11). The SDK is the only place that observes settlement itself:
+         * a send returns before it is final, and receives arrive with no call site at all —
+         * over the Lightning Address, a plain BOLT11 invoice, or a direct Spark transfer.
+         * The emitter is a no-op outside Enhanced mode and drops anything it cannot
+         * classify, so a repeat of this event costs a deduplicated row, never a wrong one.
+         */
+        const settled = extractSettledPayment(event)
+        if (settled) logPaymentSettled(settled)
         await refreshWallets()
       })
       if (abortRef.current || !mounted) {

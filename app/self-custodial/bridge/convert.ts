@@ -26,6 +26,7 @@ import { centsToTokenBaseUnits, tokenBaseUnitsToCents } from "@app/utils/amounts
 import { toNumber } from "@app/utils/helper"
 
 import { MAX_SLIPPAGE_BPS, requireSparkTokenIdentifier } from "../config"
+import { logConversionSettled } from "../measurement"
 
 import { buildConversionType, fetchConversionLimits } from "./limits"
 import { fetchUsdbDecimals, findUsdbToken } from "./token-balance"
@@ -282,7 +283,18 @@ const executePrepared = async (
   params: ConvertParams,
 ): Promise<PaymentAdapterResult> => {
   try {
-    await sdk.sendPayment(SendPaymentRequest.create({ prepareResponse: prepared }))
+    const response = await sdk.sendPayment(
+      SendPaymentRequest.create({ prepareResponse: prepared }),
+    )
+    /**
+     * Direction only, never volume: swap amounts are gated on OD-2, a policy decision
+     * rather than an engineering one (FR-15). The payment id is passed as a local
+     * deduplication key and is not transmitted (FR-24).
+     */
+    logConversionSettled({
+      direction: params.direction,
+      sdkPaymentId: response?.payment?.id ?? null,
+    })
     return { status: PaymentResultStatus.Success }
   } catch (err) {
     recordConvertError(err, params, "executePrepared")
