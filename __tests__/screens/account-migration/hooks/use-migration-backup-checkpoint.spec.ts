@@ -35,7 +35,7 @@ describe("useMigrationBackupCheckpoint", () => {
     mockIsSelfCustodial = false
     mockHasResumableCheckpoint = true
     mockLoading = false
-    mockSaveCheckpoint.mockResolvedValue(true)
+    mockSaveCheckpoint.mockResolvedValue({ isSaved: true, failure: null })
   })
 
   it("advances the checkpoint when the backup belongs to the migration", () => {
@@ -47,7 +47,7 @@ describe("useMigrationBackupCheckpoint", () => {
   /** Nothing here can be held back — the phrase is already on screen — but a step lost in
    *  silence sends the user back through a backup they already did, so it is reported. */
   it("reports a step the store refused to take", async () => {
-    mockSaveCheckpoint.mockResolvedValue(false)
+    mockSaveCheckpoint.mockResolvedValue({ isSaved: false, failure: null })
 
     renderHook(() => useMigrationBackupCheckpoint(MigrationCheckpoint.CloudBackup))
     await flushEffects()

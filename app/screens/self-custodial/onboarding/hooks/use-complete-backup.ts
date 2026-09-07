@@ -83,7 +83,9 @@ export const useCompleteBackup = () => {
          *  explainer whether or not this write lands. Blocking would only strand a user who
          *  just finished their backup on a screen with nothing left to do. Reported, though:
          *  a store refusing writes here is the same store the commit point depends on. */
-        const isStepRecorded = await saveCheckpoint(MigrationCheckpoint.ChooseExperience)
+        const { isSaved: isStepRecorded } = await saveCheckpoint(
+          MigrationCheckpoint.ChooseExperience,
+        )
         if (!isStepRecorded) {
           reportError(
             "Migration choose-experience checkpoint save",

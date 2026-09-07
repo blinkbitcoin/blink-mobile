@@ -4,6 +4,10 @@ import {
   useMigrationCheckpoint,
   MigrationCheckpoint,
 } from "@app/screens/account-migration/hooks"
+import {
+  StorageFailure,
+  type StorageWriteResult,
+} from "@app/utils/storage/storage-failure"
 
 const mockNavigate = jest.fn()
 const mockReplace = jest.fn()
@@ -298,47 +302,47 @@ describe("useMigrationCheckpoint", () => {
     expect(result.current.hasError).toBe(true)
   })
 
-  it("resolves true when the storage write succeeds", async () => {
+  it("resolves saved when the storage write succeeds", async () => {
     const { result } = renderHook(() => useMigrationCheckpoint())
     await waitFor(() => expect(result.current.loading).toBe(false))
 
-    let saved: boolean | undefined
+    let saveResult: StorageWriteResult | undefined
     await act(async () => {
-      saved = await result.current.saveCheckpoint(MigrationCheckpoint.BackupMethod)
+      saveResult = await result.current.saveCheckpoint(MigrationCheckpoint.BackupMethod)
     })
 
-    expect(saved).toBe(true)
+    expect(saveResult).toEqual({ isSaved: true, failure: null })
   })
 
-  it("reports the error and resolves false when saveCheckpointToStorage rejects", async () => {
+  it("reports the error and resolves not-saved when saveCheckpointToStorage rejects", async () => {
     mockSaveCheckpointToStorage.mockRejectedValue(new Error("disk full"))
 
     const { result } = renderHook(() => useMigrationCheckpoint())
     await waitFor(() => expect(result.current.loading).toBe(false))
 
-    let saved: boolean | undefined
+    let saveResult: StorageWriteResult | undefined
     await act(async () => {
-      saved = await result.current.saveCheckpoint(MigrationCheckpoint.BackupMethod)
+      saveResult = await result.current.saveCheckpoint(MigrationCheckpoint.BackupMethod)
     })
 
-    expect(saved).toBe(false)
+    expect(saveResult?.isSaved).toBe(false)
     expect(mockReportError).toHaveBeenCalledWith("Checkpoint save", expect.any(Error))
   })
 
-  it("refuses to save (resolves false) when the owner id has not resolved", async () => {
+  it("refuses to save (resolves not-saved) when the owner id has not resolved", async () => {
     mockOwnerId = null
 
     const { result } = renderHook(() => useMigrationCheckpoint())
     await waitFor(() => expect(result.current.loading).toBe(false))
 
-    let saved: boolean | undefined
+    let saveResult: StorageWriteResult | undefined
     await act(async () => {
-      saved = await result.current.saveCheckpoint(MigrationCheckpoint.BackupMethod)
+      saveResult = await result.current.saveCheckpoint(MigrationCheckpoint.BackupMethod)
     })
 
     /** A null-owner save would erase the stored owner + account id via mergeCheckpoint,
      *  wiping real progress; it must refuse instead of writing. */
-    expect(saved).toBe(false)
+    expect(saveResult).toEqual({ isSaved: false, failure: null })
     expect(mockSaveCheckpointToStorage).not.toHaveBeenCalled()
   })
 
@@ -847,6 +851,37 @@ describe("useMigrationCheckpoint owner recovery", () => {
  *  write, so a refused write left it reporting a step the disk never took. */
 describe("useMigrationCheckpoint write ordering", () => {
   beforeEach(resetCheckpointMocks)
+
+  /** The kind travels with the refusal so the toast can name a full disk. */
+  it("names an out-of-space write so the caller can say so", async () => {
+    mockSaveCheckpointToStorage.mockRejectedValue(
+      new Error("database or disk is full (code 13 SQLITE_FULL)"),
+    )
+
+    const { result } = renderHook(() => useMigrationCheckpoint())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    let saveResult: StorageWriteResult | undefined
+    await act(async () => {
+      saveResult = await result.current.saveCheckpoint(MigrationCheckpoint.BackupMethod)
+    })
+
+    expect(saveResult).toEqual({ isSaved: false, failure: StorageFailure.OutOfSpace })
+  })
+
+  it("leaves the failure unnamed when the message says nothing", async () => {
+    mockSaveCheckpointToStorage.mockRejectedValue(new Error("Database Error"))
+
+    const { result } = renderHook(() => useMigrationCheckpoint())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    let saveResult: StorageWriteResult | undefined
+    await act(async () => {
+      saveResult = await result.current.saveCheckpoint(MigrationCheckpoint.BackupMethod)
+    })
+
+    expect(saveResult).toEqual({ isSaved: false, failure: StorageFailure.Unknown })
+  })
 
   it("does not report a step the store refused to take", async () => {
     mockSaveCheckpointToStorage.mockRejectedValue(new Error("disk full"))

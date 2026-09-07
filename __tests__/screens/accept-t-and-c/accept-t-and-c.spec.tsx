@@ -64,7 +64,7 @@ jest.mock("@app/screens/get-started-screen/use-create-device-account", () => ({
 describe("AcceptTermsAndConditionsScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockSaveCheckpoint.mockResolvedValue(true)
+    mockSaveCheckpoint.mockResolvedValue({ isSaved: true, failure: null })
     mockFlow = "migration"
     mockMode = undefined
     loadLocale("en")
@@ -86,7 +86,7 @@ describe("AcceptTermsAndConditionsScreen", () => {
   })
 
   it("does not advance past the terms when the checkpoint write fails", async () => {
-    mockSaveCheckpoint.mockResolvedValue(false)
+    mockSaveCheckpoint.mockResolvedValue({ isSaved: false, failure: null })
     render(
       <ContextForScreen>
         <AcceptTermsAndConditionsScreen />

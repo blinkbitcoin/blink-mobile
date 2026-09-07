@@ -28,6 +28,13 @@ export const StorageFailure = {
 
 export type StorageFailure = (typeof StorageFailure)[keyof typeof StorageFailure]
 
+/** What a storage write answers with. The boolean alone loses the one thing the user can
+ *  act on, a full disk, so the kind travels with it. Null unless the write failed. */
+export type StorageWriteResult = {
+  isSaved: boolean
+  failure: StorageFailure | null
+}
+
 /**
  * Lowercased fragments that appear when the device is out of room. Only Android reaches
  * them today; iOS reports a fixed string that says nothing, so it classifies as Unknown and
