@@ -27,6 +27,7 @@ import {
 import { useCustodialWindDown } from "@app/screens/account-migration/hooks/use-custodial-wind-down"
 import { useMigrationLock } from "@app/screens/account-migration/hooks/use-migration-lock"
 import { useReusablePendingWallet } from "@app/screens/account-migration/hooks/use-reusable-pending-wallet"
+import { useStorageHandover } from "@app/screens/account-migration/hooks/use-storage-handover"
 import { armMigrationConversion } from "@app/screens/conversion-flow/drain-conversion"
 import { useSelfCustodialDisabled } from "@app/screens/account-migration/hooks/use-self-custodial-disabled"
 
@@ -45,11 +46,6 @@ const resolveMigrationMode = (status: WindDownStatus | undefined): MigrationMode
   if (isPreClosurePhase) return "forcedPreDeadline"
   return "voluntary"
 }
-
-/** How many failed retries stand in for "this is not going to clear on its own". Low
- *  enough that a trapped user is not left tapping, high enough that one bad read does not
- *  send a recoverable device to support. */
-const MAX_RETRIES_BEFORE_STORAGE_HANDOVER = 3
 
 /**
  * Entry gate for the migration flow, the single choke point for the Settings entry
@@ -130,48 +126,40 @@ export const MigrationGate: React.FC = () => {
 
   const hasResumeDataError = checkpointError || pendingWalletError
 
-  /** Only this screen's storage branch may claim the device could not be read: the same
-   *  screen also serves API-key, balance and lock failures, and a user who is offline as
-   *  well would be sent looking at their phone for the network's problem. */
-  const hasNetworkDataError = apiKeysError || balancesError || lockError
-  const isStorageReadFailure =
-    isMigrationLocked && hasResumeDataError && !hasNetworkDataError
+  /** Named for what it tests, not for one of its causes: any of the three server-backed
+   *  reads failing, GraphQL and auth errors included. It drives a user-facing decision —
+   *  don't blame the device — so a reader must not widen it on the strength of the name. */
+  const hasServerDataError = apiKeysError || balancesError || lockError
 
-  /** Retry must not fail silently: catch the rejection, and disable/spin the button while it
-   *  is in flight so repeated taps cannot stack requests over an unchanged error screen. */
-  const [isRetrying, setIsRetrying] = useState(false)
-  /** Counted rather than diagnosed: the store's own message cannot say whether a failure
-   *  will clear (Android answers an unopenable database with "Database Error" and nothing
-   *  else), so repeated failure is the only honest evidence that retrying is not working,
-   *  and the escape below is offered on that instead of on a guess. */
-  const [failedRetryCount, setFailedRetryCount] = useState(0)
-  const retryGateData = useCallback(async () => {
-    setIsRetrying(true)
-    /** Only this device's failures count. A retry made while the network is what failed
-     *  says nothing about whether the store will ever answer, and carrying those attempts
-     *  over would arm the handover on the first local read that fails. */
-    if (isStorageReadFailure) setFailedRetryCount((previous) => previous + 1)
-    try {
-      await Promise.all([
+  const refetchGateData = useCallback(
+    () =>
+      Promise.all([
         refetchApiKeys(),
         refetchBalances(),
         refetchLock(),
         refetchCheckpoint(),
         refetchPendingWallet(),
-      ])
-    } catch (err) {
-      reportError("Migration gate retry", err)
-    } finally {
-      setIsRetrying(false)
-    }
-  }, [
+      ]),
+    [
+      refetchApiKeys,
+      refetchBalances,
+      refetchLock,
+      refetchCheckpoint,
+      refetchPendingWallet,
+    ],
+  )
+
+  const {
     isStorageReadFailure,
-    refetchApiKeys,
-    refetchBalances,
-    refetchLock,
-    refetchCheckpoint,
-    refetchPendingWallet,
-  ])
+    isRetrying,
+    retry: retryGateData,
+    shouldOfferHandover: shouldOfferStorageHandover,
+  } = useStorageHandover({
+    isMigrationLocked,
+    hasResumeDataError,
+    hasServerDataError,
+    refetchGateData,
+  })
 
   /** Returning from the dollar-transfer conversion, refetch so the balance reflects the
    *  now-empty dollars instead of the cached pre-transfer figure. */
@@ -207,26 +195,6 @@ export const MigrationGate: React.FC = () => {
   const isStorageOutOfSpace =
     checkpointStorageFailure === StorageFailure.OutOfSpace ||
     pendingWalletStorageFailure === StorageFailure.OutOfSpace
-
-  /** Only the locked flow strands anyone: unlocked, this screen sits over an app the user
-   *  can still walk away from, while locked it replaces it.
-   *
-   *  Held back while a retry is in flight: the count rises when one starts, so the last
-   *  one may still be about to succeed, and this button — unlike the primary, which
-   *  disables itself — would otherwise be tappable straight onto a screen with no way
-   *  back. */
-  const hasExhaustedStorageRetries =
-    failedRetryCount >= MAX_RETRIES_BEFORE_STORAGE_HANDOVER
-  const shouldOfferStorageHandover =
-    isStorageReadFailure && hasExhaustedStorageRetries && !isRetrying
-
-  /** The count belongs to one run of storage failures. A read that finally lands puts the
-   *  user back in the flow, and a failure that turns out to be the network's is not
-   *  evidence about this device, so neither may carry attempts into the next. */
-  useEffect(() => {
-    if (isStorageReadFailure) return
-    setFailedRetryCount(0)
-  }, [isStorageReadFailure])
 
   const goToStorageSupport = useCallback(() => {
     navigation.navigate("accountMigrationContactSupport", {
