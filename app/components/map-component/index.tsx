@@ -102,8 +102,13 @@ export default function MapComponent({
   const isSelfCustodialAccount = activeAccount?.type === AccountType.SelfCustodial
   const { isAtLeastLevelTwo } = useLevel()
   const { btcMapPlacesEnabled } = useRemoteConfig()
+  // A dev build skips the gate so the flow can be walked through without a
+  // level-two custodial account behind it. `__DEV__` is inlined to false in
+  // release bundles, so this cannot open the button in a shipped app. The
+  // backend still refuses a submission the account is not entitled to make.
   const canAddPlace =
-    isAuthed && !isSelfCustodialAccount && isAtLeastLevelTwo && btcMapPlacesEnabled
+    __DEV__ ||
+    (isAuthed && !isSelfCustodialAccount && isAtLeastLevelTwo && btcMapPlacesEnabled)
 
   const mapViewRef = React.useRef<MapView>(null)
   const openSettingsModalRef = React.useRef<OpenSettingsElement>(null)

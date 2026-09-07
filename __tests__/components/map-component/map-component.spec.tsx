@@ -165,6 +165,16 @@ jest.mock("@app/config/feature-flags-context", () => ({
   useRemoteConfig: () => ({ btcMapPlacesEnabled: mockBtcMapPlacesEnabled }),
 }))
 
+// A dev build opens the add-place button whatever the gates say, and Jest's
+// React Native preset runs with `__DEV__` true — so every gate below is only
+// observable with it pinned to false. Restored after the file so nothing that
+// runs later inherits the release value.
+const realIsDevBuild = __DEV__
+const setDevBuild = (value: boolean) => {
+  ;(global as unknown as { __DEV__: boolean }).__DEV__ = value
+}
+afterAll(() => setDevBuild(realIsDevBuild))
+
 const mockToastShow = jest.fn()
 jest.mock("@app/utils/toast", () => ({
   toastShow: (args: unknown) => mockToastShow(args),
@@ -242,6 +252,7 @@ beforeEach(() => {
   mockIsSelfCustodialAccount = false
   mockIsAtLeastLevelTwo = true
   mockBtcMapPlacesEnabled = true
+  setDevBuild(false)
   mockSubmitPlace.mockResolvedValue({ submitted: true })
   setPlaces()
   mockedNames.mockReturnValue(new Map())
@@ -744,6 +755,20 @@ describe("MapComponent adding a place", () => {
 
     await waitFor(() => expect(getByTestId("open-place-search")).toBeTruthy())
     expect(queryByTestId("open-add-place")).toBeNull()
+  })
+
+  it("offers it in a dev build whatever the gates say", async () => {
+    // So the flow can be walked through on a debug build without a level-two
+    // custodial account behind it. Every gate is shut here, and the button is
+    // still there.
+    setDevBuild(true)
+    mockIsAuthed = false
+    mockIsSelfCustodialAccount = true
+    mockIsAtLeastLevelTwo = false
+    mockBtcMapPlacesEnabled = false
+    const { getByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
   })
 
   it("tells the form a refusal is about the place, not the connection", async () => {
