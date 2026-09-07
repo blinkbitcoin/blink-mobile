@@ -7,6 +7,7 @@ import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { AcceptTermsAndConditionsScreen } from "@app/screens/accept-t-and-c/accept-t-and-c"
 import { MigrationCheckpoint } from "@app/screens/account-migration/hooks"
 import { AccountMode } from "@app/types/account"
+import { StorageFailure } from "@app/utils/storage/storage-failure"
 
 import { ContextForScreen } from "../helper"
 import { flushEffects } from "../../helpers/flush-effects"
@@ -25,6 +26,12 @@ jest.mock("@react-navigation/native", () => ({
 }))
 
 const mockSaveCheckpoint = jest.fn()
+const mockToastShow = jest.fn()
+
+jest.mock("@app/utils/toast", () => ({
+  ...jest.requireActual("@app/utils/toast"),
+  toastShow: (args: unknown) => mockToastShow(args),
+}))
 
 /** Keeps the real device-location module (and its ip-country lookup) out of the suite. */
 jest.mock("@app/hooks/use-device-location", () => ({
@@ -86,7 +93,10 @@ describe("AcceptTermsAndConditionsScreen", () => {
   })
 
   it("does not advance past the terms when the checkpoint write fails", async () => {
-    mockSaveCheckpoint.mockResolvedValue({ isSaved: false, failure: null })
+    mockSaveCheckpoint.mockResolvedValue({
+      isSaved: false,
+      failure: StorageFailure.Unknown,
+    })
     render(
       <ContextForScreen>
         <AcceptTermsAndConditionsScreen />
@@ -98,6 +108,65 @@ describe("AcceptTermsAndConditionsScreen", () => {
     await flushEffects()
 
     expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  /** A Continue that answers a tap with nothing reads as a broken button, so the refusal
+   *  has to be said out loud. */
+  it("says so when the checkpoint write fails", async () => {
+    mockSaveCheckpoint.mockResolvedValue({
+      isSaved: false,
+      failure: StorageFailure.Unknown,
+    })
+    render(
+      <ContextForScreen>
+        <AcceptTermsAndConditionsScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    fireEvent.press(screen.getByText(LL.AcceptTermsAndConditionsScreen.accept()))
+    await flushEffects()
+
+    expect(mockToastShow).toHaveBeenCalledWith(
+      expect.objectContaining({ message: LL.errors.generic() }),
+    )
+  })
+
+  /** The one failure the user can go and fix gets its own words. */
+  it("names a full device rather than apologizing generically", async () => {
+    mockSaveCheckpoint.mockResolvedValue({
+      isSaved: false,
+      failure: StorageFailure.OutOfSpace,
+    })
+    render(
+      <ContextForScreen>
+        <AcceptTermsAndConditionsScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    fireEvent.press(screen.getByText(LL.AcceptTermsAndConditionsScreen.accept()))
+    await flushEffects()
+
+    expect(mockToastShow).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: LL.AccountMigration.storageUnavailable.outOfSpaceBody(),
+      }),
+    )
+  })
+
+  it("says nothing when the write lands", async () => {
+    render(
+      <ContextForScreen>
+        <AcceptTermsAndConditionsScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    fireEvent.press(screen.getByText(LL.AcceptTermsAndConditionsScreen.accept()))
+    await flushEffects()
+
+    expect(mockToastShow).not.toHaveBeenCalled()
   })
 
   it("checkpoints past the terms only when Accept is pressed", async () => {
