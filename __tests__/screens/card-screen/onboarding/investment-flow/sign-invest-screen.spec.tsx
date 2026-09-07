@@ -2,6 +2,7 @@ import React from "react"
 import { render, fireEvent, act } from "@testing-library/react-native"
 
 import { loadLocale } from "@app/i18n/i18n-util.sync"
+import { light } from "@app/rne-theme/colors"
 import { logError } from "@app/utils/log-error"
 import { SignInvestScreen } from "@app/screens/card-screen/onboarding/investment-flow/sign-invest-screen"
 
@@ -9,6 +10,10 @@ import { ContextForScreen } from "../../../helper"
 
 const TEST_FORM_URL = "https://forms.example.test/investment-agreement"
 const TEST_ALLOWED_ORIGIN = "https://apps.example.test"
+
+/** The real palette, so a renamed or dropped colour fails here rather than shipping the
+ *  library's own defaults. ContextForScreen renders in the light theme. */
+const palette = light
 
 jest.mock("@app/utils/log-error", () => ({
   logError: jest.fn(),
@@ -233,6 +238,51 @@ describe("SignInvestScreen", () => {
     expect(mockGoBack).not.toHaveBeenCalled()
     expect(mockNavigate).not.toHaveBeenCalled()
     expect(mockReplace).not.toHaveBeenCalled()
+  })
+
+  /** The component ships its own palette, which would read as another app's inside this
+   *  flow. Every colour it exposes is answered from the theme, so none is left behind. */
+  it("dresses the component in the app's colours", async () => {
+    await renderScreen()
+
+    expect(mockLastProps.current?.theme).toEqual({
+      primaryColor: palette.primary,
+      primaryTextColor: palette.white,
+      mutedTextColor: palette.grey1,
+      successColor: palette._green,
+      errorColor: palette.error,
+      warningColor: palette.warning,
+    })
+  })
+
+  /** The titles carry no colour of their own, so without this they fall back to the
+   *  platform's black and disappear on a dark background. */
+  it("gives the titles a colour that follows the theme", async () => {
+    await renderScreen()
+
+    const esignStyles = mockLastProps.current?.styles as { title: { color: string } }
+
+    expect(esignStyles.title.color).toBe(palette.black)
+  })
+
+  /** A new object on every render would restart the signing session, the same reason the
+   *  source is memoized. */
+  it("keeps the same theme and styles across re-renders", async () => {
+    const { rerender } = await renderScreen()
+
+    const firstTheme = mockLastProps.current?.theme
+    const firstStyles = mockLastProps.current?.styles
+
+    await act(async () => {
+      rerender(
+        <ContextForScreen>
+          <SignInvestScreen />
+        </ContextForScreen>,
+      )
+    })
+
+    expect(mockLastProps.current?.theme).toBe(firstTheme)
+    expect(mockLastProps.current?.styles).toBe(firstStyles)
   })
 
   it("reports the failure with its error code", async () => {
