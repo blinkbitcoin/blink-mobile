@@ -2,11 +2,12 @@ import * as React from "react"
 import { View } from "react-native"
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
-import { makeStyles } from "@rn-vui/themed"
+import { makeStyles, useTheme } from "@rn-vui/themed"
 
 import {
   ESignature,
   createPublicUrlSource,
+  type ESignatureProps,
 } from "@blinkbitcoin/esign-react-native/webform"
 
 import { CloseHeader } from "@app/components/close-header"
@@ -18,6 +19,12 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { logError } from "@app/utils/log-error"
 
 type SignInvestRoute = RouteProp<RootStackParamList, "cardOnboardingSignInvestScreen">
+
+/** Read off the Button theme and GaloyPrimaryButton: the library draws squarer buttons than
+ *  the pill ones the rest of the flow uses. */
+const BUTTON_MIN_HEIGHT = 50
+const BUTTON_HORIZONTAL_PADDING = 32
+const BUTTON_BORDER_RADIUS = 50
 
 /**
  * The signing step between the Term Sheet and the transfer: the subscription
@@ -33,6 +40,7 @@ type SignInvestRoute = RouteProp<RootStackParamList, "cardOnboardingSignInvestSc
 export const SignInvestScreen: React.FC = () => {
   const styles = useStyles()
   const { LL } = useI18nContext()
+  const { theme: esignTheme, styles: esignStyles } = useESignAppearance()
   const { cardInvestmentEsignFormUrl } = useRemoteConfig()
   const { selectedAmountUsd } = useRoute<SignInvestRoute>().params
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
@@ -46,10 +54,8 @@ export const SignInvestScreen: React.FC = () => {
 
   const goBack = React.useCallback(() => navigation.goBack(), [navigation])
 
-  /** Deliberately stays on the screen: the component renders its own error state with
-   *  a Retry, and a session that merely expired offers a Restart. Navigating away here
-   *  would tear both down before they paint and drop the signer at the Term Sheet with
-   *  no idea what went wrong. Leaving is the header close button's job. */
+  /** Stays on the screen on purpose: the component draws its own Retry, and navigating
+   *  away would tear it down before it paints. Leaving is the close button's job. */
   const reportSigningError = React.useCallback(
     (error: { code: string; message: string }) =>
       logError({
@@ -81,6 +87,8 @@ export const SignInvestScreen: React.FC = () => {
         <ESignature
           source={source}
           label={LL.CardFlow.Onboarding.SignInvest.label()}
+          theme={esignTheme}
+          styles={esignStyles}
           onComplete={goToTransfer}
           onCancel={goBack}
           onError={reportSigningError}
@@ -94,5 +102,55 @@ const useStyles = makeStyles(() => ({
   content: {
     flex: 1,
     paddingTop: 12,
+  },
+}))
+
+type ESignAppearance = {
+  theme: NonNullable<ESignatureProps["theme"]>
+  styles: NonNullable<ESignatureProps["styles"]>
+}
+
+/**
+ * How the embedded component is dressed. Its built-in screens ship an iOS-blue palette
+ * that answers no theme, so it would read as another app's here and keep its light greys
+ * in dark mode.
+ *
+ * Both halves stay stable across renders, or a new object would restart the signing
+ * session, the same reason the source is memoized.
+ */
+const useESignAppearance = (): ESignAppearance => {
+  const {
+    theme: { colors },
+  } = useTheme()
+  const styles = useESignStyles()
+
+  const theme = React.useMemo(
+    () => ({
+      primaryColor: colors.primary,
+      primaryTextColor: colors.white,
+      mutedTextColor: colors.grey1,
+      successColor: colors._green,
+      errorColor: colors.error,
+      warningColor: colors.warning,
+    }),
+    [colors],
+  )
+
+  return { theme, styles }
+}
+
+/** Only what the colours above cannot reach: the titles carry no colour of their own, so
+ *  they fall back to the platform's black and vanish on a dark background. */
+const useESignStyles = makeStyles(({ colors }) => ({
+  title: {
+    color: colors.black,
+  },
+  button: {
+    minHeight: BUTTON_MIN_HEIGHT,
+    paddingHorizontal: BUTTON_HORIZONTAL_PADDING,
+    borderRadius: BUTTON_BORDER_RADIUS,
+  },
+  cancelButton: {
+    minHeight: BUTTON_MIN_HEIGHT,
   },
 }))
