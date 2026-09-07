@@ -348,9 +348,14 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
             />
 
             {/** After the figures, not inside them: the before/after pair reads as one unit,
-             *  and the caveat belongs next to the button that acts on it. */}
+             *  and the caveat belongs next to the button that acts on it. The wrapper is
+             *  only a test handle, which the banner takes no prop for; it carries no width,
+             *  because the banner's own flex text already fills the content width under this
+             *  body's centring (checked on device at both string lengths). */}
             {isLnAddressRejected ? (
-              <WarningBanner>{LLOverview.lnAddressNotMoved()}</WarningBanner>
+              <View {...testProps("migration-balances-overview-ln-address-warning")}>
+                <WarningBanner>{LLOverview.lnAddressNotMoved()}</WarningBanner>
+              </View>
             ) : null}
           </ScrollView>
         ) : (

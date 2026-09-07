@@ -158,7 +158,10 @@ describe("useMigrationLnAddressTransfer", () => {
     expect(result.current.outcome).toBe(MigrationLnAddressOutcome.Transferred)
   })
 
-  it("hands an empty payload to support rather than a false success", async () => {
+  /** An answer with nothing in it leaves the address unaccounted for, so it settles as a
+   *  rejection rather than a false success — but not as a proof failure: the signature the
+   *  commit needs was produced, so the commit is unaffected and the migration goes on. */
+  it("settles an empty payload as rejected rather than a false success", async () => {
     mockTransfer.mockResolvedValue({ data: undefined })
     const { result } = renderTransfer()
     await flushEffects()
@@ -267,7 +270,9 @@ describe("useMigrationLnAddressTransfer", () => {
     expect(mockTransfer).toHaveBeenCalledTimes(1)
   })
 
-  it("hands a top-level rejection to support", async () => {
+  /** The refusal the banner on the commit screen actually describes: the server would not
+   *  move the address, which costs the migration nothing else. */
+  it("settles a top-level rejection as rejected", async () => {
     mockTransfer.mockResolvedValue(payload([], [{ message: "flag off" }]))
     const { result } = renderTransfer()
     await flushEffects()
@@ -279,7 +284,7 @@ describe("useMigrationLnAddressTransfer", () => {
     )
   })
 
-  it("hands a FAILED identifier to support and reports which one", async () => {
+  it("settles a FAILED identifier as rejected and reports which one", async () => {
     mockTransfer.mockResolvedValue(
       payload([{ identifier: "user", status: MigrationLnAddressTransferStatus.Failed }]),
     )
@@ -302,7 +307,9 @@ describe("useMigrationLnAddressTransfer", () => {
     expect(mockReportError).not.toHaveBeenCalled()
   })
 
-  it("hands a non-network throw to support", async () => {
+  /** The proof was signed before the mutation went out, so a throw from the mutation leaves
+   *  the commit with everything it needs: a rejection, not a proof failure. */
+  it("settles a non-network throw as rejected", async () => {
     mockTransfer.mockRejectedValue(new Error("boom"))
     const { result } = renderTransfer()
     await flushEffects()

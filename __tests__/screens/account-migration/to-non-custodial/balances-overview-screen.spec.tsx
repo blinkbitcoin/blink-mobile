@@ -924,6 +924,7 @@ describe("MigrationBalancesOverviewScreen lightning-address re-point gating", ()
    * convenience; the money is not.
    */
   const rejectedLnAddressTransfer = lnTransferWith(MigrationLnAddressOutcome.Rejected)
+  const WARNING_TEST_ID = "migration-balances-overview-ln-address-warning"
 
   it("does not hand over to support when the lightning-address re-point fails", async () => {
     mockLnAddressTransfer = rejectedLnAddressTransfer
@@ -931,39 +932,61 @@ describe("MigrationBalancesOverviewScreen lightning-address re-point gating", ()
     await flushEffects()
 
     expect(mockNavigate).not.toHaveBeenCalled()
+    /** Anchored on the screen it actually renders, so a spinner or a throw could not pass
+     *  for a migration that carried on. */
+    expect(screen.getByTestId("migration-balances-overview-approve")).not.toBeDisabled()
+    /** The telemetry has to stop with the navigation: a report on every focus would keep
+     *  filing tickets for a failure support no longer hears about. */
+    expect(mockReportError).not.toHaveBeenCalledWith(
+      "Migration handed over to support",
+      expect.anything(),
+    )
   })
 
   it("still offers the commit when the lightning-address re-point fails", async () => {
     mockLnAddressTransfer = rejectedLnAddressTransfer
-    const { getByText } = renderScreen()
+    renderScreen()
     await flushEffects()
 
-    expect(getByText("Approve")).toBeEnabled()
+    expect(screen.getByTestId("migration-balances-overview-approve")).not.toBeDisabled()
   })
 
   /** Migrating in silence would break the promise the flow opened with, that the address
    *  moves along with the funds. */
   it("says the address did not move when the re-point fails", async () => {
     mockLnAddressTransfer = rejectedLnAddressTransfer
-    const { getByText } = renderScreen()
+    renderScreen()
     await flushEffects()
 
-    expect(
-      getByText(
-        "Your Lightning address could not be moved. Your funds will still be transferred.",
-      ),
-    ).toBeTruthy()
+    expect(screen.getByTestId(WARNING_TEST_ID)).toBeTruthy()
+    expect(screen.getByText(LLOverview.lnAddressNotMoved())).toBeTruthy()
   })
 
   it("says nothing about the address when the re-point succeeds", async () => {
-    const { queryByText } = renderScreen()
+    renderScreen()
     await flushEffects()
 
-    expect(
-      queryByText(
-        "Your Lightning address could not be moved. Your funds will still be transferred.",
-      ),
-    ).toBeNull()
+    expect(screen.queryByTestId(WARNING_TEST_ID)).toBeNull()
+    expect(screen.queryByText(LLOverview.lnAddressNotMoved())).toBeNull()
+  })
+
+  /**
+   * The banner and the retry answer different sources, so they have to coexist: the retry
+   * cannot move an address the server already refused (the hook declines to re-fire a
+   * settled outcome), and hiding the caveat behind another source's error would migrate
+   * the user in silence.
+   */
+  it("keeps the caveat on screen next to a retry another source earned", async () => {
+    const offline = Object.assign(new Error("Network request failed"), {
+      networkError: new Error("offline"),
+    })
+    mockMigrationStart.mockRejectedValue(offline)
+    mockLnAddressTransfer = rejectedLnAddressTransfer
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.getByTestId("migration-balances-overview-retry")).toBeTruthy()
+    expect(screen.getByTestId(WARNING_TEST_ID)).toBeTruthy()
   })
 
   /** A re-point that failed for a missing device key is the same cause the commit reports,
@@ -1000,14 +1023,10 @@ describe("MigrationBalancesOverviewScreen lightning-address re-point gating", ()
    *  the address, so the screen must not claim it stayed behind. */
   it("does not show the address caveat when the proof could not be built", async () => {
     mockLnAddressTransfer = lnTransferWith(MigrationLnAddressOutcome.ProofFailed)
-    const { queryByText } = renderScreen()
+    renderScreen()
     await flushEffects()
 
-    expect(
-      queryByText(
-        "Your Lightning address could not be moved. Your funds will still be transferred.",
-      ),
-    ).toBeNull()
+    expect(screen.queryByTestId(WARNING_TEST_ID)).toBeNull()
   })
 
   /** When both preconditions fail at once, the start is the cause support hears about: it
@@ -1225,6 +1244,34 @@ describe("MigrationBalancesOverviewScreen lightning-address re-point gating", ()
     await flushEffects()
 
     expect(screen.queryByTestId("migration-balances-overview-retry")).toBeNull()
+    expect(screen.getByTestId("migration-balances-overview-approve")).not.toBeDisabled()
+  })
+
+  /** A refusal spends the ids as surely as a transfer does: the re-point will not fire
+   *  again either way, so an id source that fails afterwards must not take Approve away
+   *  from a user the migration has already decided to carry through. */
+  it("keeps Approve rather than the retry when a spent id source fails after a refusal", async () => {
+    mockLnAddressTransfer = rejectedLnAddressTransfer
+    mockCheckpointHasError = true
+
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.queryByTestId("migration-balances-overview-retry")).toBeNull()
+    expect(screen.getByTestId("migration-balances-overview-approve")).not.toBeDisabled()
+    expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  /** The same for the owner: past a refusal the session that carried it is about to be
+   *  discarded, so a missing owner is not a failure to hand over on. */
+  it("does not hand over for a missing owner once the re-point was refused", async () => {
+    mockLnAddressTransfer = rejectedLnAddressTransfer
+    mockOwnerId = null
+
+    renderScreen()
+    await flushEffects()
+
+    expect(mockNavigate).not.toHaveBeenCalled()
     expect(screen.getByTestId("migration-balances-overview-approve")).not.toBeDisabled()
   })
 
