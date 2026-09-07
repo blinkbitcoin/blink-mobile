@@ -1,6 +1,12 @@
 import debounce from "lodash.debounce"
 import React from "react"
-import { ActivityIndicator, LayoutChangeEvent, Pressable, View } from "react-native"
+import {
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  LayoutChangeEvent,
+  Pressable,
+  View,
+} from "react-native"
 import MapView, { Region } from "react-native-maps"
 import { PermissionStatus, RESULTS, request } from "react-native-permissions"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
@@ -32,7 +38,7 @@ import { useFocusEffect } from "@react-navigation/native"
 import { isIOS } from "@rn-vui/base"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
-import { AddPlaceModal } from "./add-place-modal"
+import { AddPlaceSheet } from "./add-place-sheet"
 import { CategoryFilterSheet } from "./category-filter-sheet"
 import { ClusterMarker, ClusterMarkerData } from "./cluster-marker"
 import { Viewport, placeLabels } from "./label-collision"
@@ -42,7 +48,7 @@ import MapStyles from "./map-styles.json"
 import { OpenSettingsElement, OpenSettingsModal } from "./open-settings-modal"
 import { truncateLabel } from "./marker-layout"
 import { PlaceLabelMarker } from "./place-label-marker"
-import { PlaceLocator, locatorBarTop } from "./place-locator"
+import { PlaceLocator } from "./place-locator"
 import { PlaceMarker } from "./place-marker"
 import { PlaceSearchModal } from "./place-search-modal"
 import { PlaceSheet } from "./place-sheet"
@@ -122,31 +128,27 @@ export default function MapComponent({
   const [selectedPlace, setSelectedPlace] = React.useState<BtcMapPlace | null>(null)
   const [isSearchOpen, setSearchOpen] = React.useState(false)
   const [isFilterOpen, setFilterOpen] = React.useState(false)
-  // Placing the pin, then describing what is under it. Null is neither.
-  const [addStep, setAddStep] = React.useState<"locating" | "describing" | null>(null)
-  const isAddingPlace = addStep !== null
-  const isLocatingPlace = addStep === "locating"
-  const isDescribingPlace = addStep === "describing"
-  // Read by the submit handler after its awaits, when `addStep` may have moved
-  // on, and by the cluster handler, which has to stay a stable callback. Synced
-  // in an effect rather than during render: writing a ref in the render body is
-  // impure under concurrent rendering, and every reader runs after the commit.
-  const addStepRef = React.useRef(addStep)
+  // Aiming the pin and saying what is under it are one step, on one screen: the
+  // map keeps the top half and the form takes the bottom.
+  const [isAddingPlace, setAddingPlace] = React.useState(false)
+  // Read by the submit handler after its awaits, when the attempt may have been
+  // closed, and by the cluster handler, which has to stay a stable callback.
+  // Synced in an effect rather than during render: writing a ref in the render
+  // body is impure under concurrent rendering, and every reader runs after the
+  // commit.
+  const isAddingPlaceRef = React.useRef(isAddingPlace)
   React.useEffect(() => {
-    addStepRef.current = addStep
-  }, [addStep])
-  const [pinnedLocation, setPinnedLocation] = React.useState<LatLng | null>(null)
-  // One attempt at adding a place. It keys the form, so what was typed survives
-  // a trip back to the map to move the pin but never outlives the attempt it
-  // was typed into.
-  const [addSession, setAddSession] = React.useState(0)
-  // Read by the submit handler after its awaits, when the attempt on screen may
-  // be a later one than the one that was sent. Synced in an effect, like
-  // `addStepRef` above.
-  const addSessionRef = React.useRef(addSession)
-  React.useEffect(() => {
-    addSessionRef.current = addSession
-  }, [addSession])
+    isAddingPlaceRef.current = isAddingPlace
+  }, [isAddingPlace])
+  // Which attempt at adding a place is the current one. The submit handler
+  // reads it after its awaits, when what comes back may belong to an attempt
+  // that has since been abandoned and replaced.
+  //
+  // A ref rather than state, and written where the attempt starts rather than
+  // synced from a render: nothing on screen is drawn from it. What used to be
+  // drawn from it was the form's `key`, and the form is now unmounted outright
+  // when the attempt ends, which is what throws away what was typed.
+  const addSessionRef = React.useRef(0)
   // The idempotency key of the attempt: the backend deduplicates submissions on
   // it, so every retry of one attempt reuses it and a new attempt mints one.
   // Null until the attempt's first send — minting one is async, because a UUID's
@@ -323,7 +325,7 @@ export default function MapComponent({
       // Same reason the pins go quiet below: while the pin is being placed the
       // map is being aimed, and flying off to a cluster takes it off whatever
       // was being aimed at. From the ref, so that this stays one callback.
-      if (addStepRef.current !== null) return
+      if (isAddingPlaceRef.current) return
       mapViewRef.current?.animateToRegion(
         regionForCluster(cluster, regionRef.current),
         FLY_TO_DURATION_MS,
@@ -336,37 +338,29 @@ export default function MapComponent({
   // asking about somewhere that is already on it, so the existing pins go quiet
   // instead of opening a sheet over the thing being aimed.
   const handlePlacePress = React.useCallback((place: BtcMapPlace) => {
-    // From the ref, like the cluster handler's: a callback keyed on `addStep`
-    // would change identity on every step transition and re-render the markers.
-    if (addStepRef.current !== null) return
+    // From the ref, like the cluster handler's: a callback keyed on the state
+    // would change identity whenever it flipped and re-render the markers.
+    if (isAddingPlaceRef.current) return
     setSelectedPlace(place)
   }, [])
 
   const startAddingPlace = React.useCallback(() => {
     setSelectedPlace(null)
-    setPinnedLocation(null)
-    setAddSession((session) => session + 1)
+    addSessionRef.current += 1
     // The next attempt's id is minted on its first send — see the ref above.
     submissionIdRef.current = null
-    setAddStep("locating")
+    setAddingPlace(true)
   }, [])
 
-  // The pin never moves, so where it points is the centre of whatever region
-  // the map has settled on. Read from the ref rather than the state so a
-  // confirmation lands on the region the user is actually looking at.
-  const confirmPlaceLocation = React.useCallback(() => {
-    const { latitude, longitude } = regionRef.current
-    setPinnedLocation({ latitude, longitude })
-    setAddStep("describing")
-  }, [])
+  const stopAddingPlace = React.useCallback(() => setAddingPlace(false), [])
 
   /**
    * Sends the place and answers the form with what to say about it.
    *
-   * A failure is the form's to report rather than this screen's: the form is a
-   * native modal over everything, so a toast raised from under it is drawn
-   * under it too — see `add-place-modal.tsx`. Success is the other way round,
-   * since by then the form is gone and there is nothing left to say it on.
+   * A failure is the form's to report rather than this screen's: it belongs
+   * beside the button that would retry it, on the sheet that still holds
+   * everything that was typed. Success is a toast, since by then the sheet is
+   * gone and there is nothing left to say it on.
    *
    * Both awaits are long enough for the attempt underneath to be abandoned and
    * another one started, so what comes back is applied to the form only while
@@ -406,10 +400,7 @@ export default function MapComponent({
       // Success is announced even when the attempt that sent it has since been
       // abandoned: the place is on its way to BTC Map either way, and an
       // unannounced success invites a resubmission under a new submissionId —
-      // which the backend can no longer deduplicate. The toast is app-level so
-      // it is visible once the form is closed; when a later attempt's form is
-      // open it is drawn behind that modal (see `add-place-modal.tsx`), which
-      // is the price of not losing the confirmation entirely.
+      // which the backend can no longer deduplicate.
       if (outcome.submitted) {
         toastShow({
           message: (translations) => translations.MapScreen.placeSubmitted(),
@@ -417,22 +408,17 @@ export default function MapComponent({
           type: "success",
         })
 
-        // The attempt is over, whatever step it is on: the answer can land
-        // after the form went back to moving the pin, and leaving the attempt
-        // open then would let its next send arrive as an edit of the place BTC
-        // Map just took. Only the attempt that sent it closes, though — a
-        // later one is another place's business.
-        if (addSessionRef.current === attempt) {
-          setAddStep(null)
-          setPinnedLocation(null)
-        }
+        // Leaving the attempt open would let its next send arrive as an edit of
+        // the place BTC Map just took, so it closes. Only the attempt that sent
+        // it, though — a later one is another place's business.
+        if (addSessionRef.current === attempt) setAddingPlace(false)
         return null
       }
 
       // A failure belongs to the form that sent it: a response for an attempt
       // that is no longer the one on screen closes nothing and reports nothing
       // over a later attempt.
-      if (addStepRef.current !== "describing" || addSessionRef.current !== attempt) {
+      if (!isAddingPlaceRef.current || addSessionRef.current !== attempt) {
         return null
       }
 
@@ -491,119 +477,138 @@ export default function MapComponent({
   }, [])
 
   return (
-    <View style={styles.viewContainer}>
-      <MapView
-        ref={mapViewRef}
-        style={styles.map}
-        onLayout={handleLayout}
-        showsUserLocation={permissionsStatus === RESULTS.GRANTED}
-        showsMyLocationButton={false}
-        initialRegion={userLocation}
-        // The basemap draws its own restaurants, shops and stations, which read
-        // as merchants we vouch for and bury the ones we do. Suppressing them
-        // takes both mechanisms: the style sheet is Google's and only reaches
-        // Android, while iOS renders Apple Maps, which ignores it and honours
-        // this prop instead.
-        showsPointsOfInterests={false}
-        customMapStyle={themeMode === "dark" ? MapStyles.dark : MapStyles.light}
-        onRegionChange={handleRegionChange}
-        onRegionChangeComplete={handleRegionChangeComplete}
-        moveOnMarkerPress={false}
-        rotateEnabled={false}
-        pitchEnabled={false}
-        toolbarEnabled={false}
-      >
-        {clusters.map((cluster) => (
-          <ClusterMarker
-            key={`cluster-${cluster.id}`}
-            cluster={cluster}
-            onPress={handleClusterPress}
-          />
-        ))}
-        {places.map((place) => (
-          <PlaceMarker key={place.id} place={place} onPress={handlePlacePress} />
-        ))}
-        {/* Separate markers, not children of the pins: a name arriving has to
-            mount something new rather than resize a pin that has already
-            rasterised — see place-marker.tsx.
-
-            Only the names that won a place in the collision pass are mounted. A
-            pin whose name lost still draws; it is the name that is dropped, not
-            the merchant. */}
-        {places.map((place) => {
-          const name = labelledPlaceIds.has(place.id)
-            ? labelNames.get(place.id)
-            : undefined
-          return name ? (
-            <PlaceLabelMarker
-              key={`label-${place.id}`}
-              place={place}
-              name={name}
-              onPress={handlePlacePress}
+    // Android resizes its own window for the keyboard; iOS does not, so this is
+    // what gives the two halves below a shorter screen to split there. They keep
+    // splitting it evenly, which is the point: typing takes room from the map as
+    // well as the form, so the pin being aimed stays in view while the name of
+    // what it is pointing at is typed. Only while there is a form — otherwise
+    // the search modal's own keyboard would resize the map behind it.
+    <KeyboardAvoidingView
+      style={styles.viewContainer}
+      behavior={isIOS && isAddingPlace ? "padding" : undefined}
+    >
+      <View style={styles.mapArea}>
+        <MapView
+          ref={mapViewRef}
+          style={styles.map}
+          onLayout={handleLayout}
+          showsUserLocation={permissionsStatus === RESULTS.GRANTED}
+          showsMyLocationButton={false}
+          initialRegion={userLocation}
+          // The basemap draws its own restaurants, shops and stations, which read
+          // as merchants we vouch for and bury the ones we do. Suppressing them
+          // takes both mechanisms: the style sheet is Google's and only reaches
+          // Android, while iOS renders Apple Maps, which ignores it and honours
+          // this prop instead.
+          showsPointsOfInterests={false}
+          customMapStyle={themeMode === "dark" ? MapStyles.dark : MapStyles.light}
+          onRegionChange={handleRegionChange}
+          onRegionChangeComplete={handleRegionChangeComplete}
+          moveOnMarkerPress={false}
+          rotateEnabled={false}
+          pitchEnabled={false}
+          toolbarEnabled={false}
+        >
+          {clusters.map((cluster) => (
+            <ClusterMarker
+              key={`cluster-${cluster.id}`}
+              cluster={cluster}
+              onPress={handleClusterPress}
             />
-          ) : null
-        })}
-      </MapView>
+          ))}
+          {places.map((place) => (
+            <PlaceMarker key={place.id} place={place} onPress={handlePlacePress} />
+          ))}
+          {/* Separate markers, not children of the pins: a name arriving has to
+              mount something new rather than resize a pin that has already
+              rasterised — see place-marker.tsx.
 
-      {/* Both are about reading the map, and neither belongs over a map that
-          is being used to point at something. */}
-      {!isAddingPlace && (
-        <>
-          <MapSearchBar
-            topInset={insets.top}
-            onSearchPress={() => setSearchOpen(true)}
-            onFilterPress={() => setFilterOpen(true)}
-            isFiltered={categories.size > 0}
-          />
+              Only the names that won a place in the collision pass are mounted.
+              A pin whose name lost still draws; it is the name that is dropped,
+              not the merchant. */}
+          {places.map((place) => {
+            const name = labelledPlaceIds.has(place.id)
+              ? labelNames.get(place.id)
+              : undefined
+            return name ? (
+              <PlaceLabelMarker
+                key={`label-${place.id}`}
+                place={place}
+                name={name}
+                onPress={handlePlacePress}
+              />
+            ) : null
+          })}
+        </MapView>
 
-          {canAddPlace && (
-            <Pressable
-              testID="open-add-place"
-              style={styles.addPlace}
-              onPress={startAddingPlace}
-              accessibilityRole="button"
-            >
-              <GaloyIcon name="plus" size={16} color={colors.primary} />
-              <Text style={styles.addPlaceText}>{LL.MapScreen.addPlace()}</Text>
-            </Pressable>
+        {/* Both are about reading the map, and neither belongs over a map that
+            is being used to point at something. */}
+        {!isAddingPlace && (
+          <>
+            <MapSearchBar
+              topInset={insets.top}
+              onSearchPress={() => setSearchOpen(true)}
+              onFilterPress={() => setFilterOpen(true)}
+              isFiltered={categories.size > 0}
+            />
+
+            {canAddPlace && (
+              <Pressable
+                testID="open-add-place"
+                style={styles.addPlace}
+                onPress={startAddingPlace}
+                accessibilityRole="button"
+              >
+                <GaloyIcon name="plus" size={16} color={colors.primary} />
+                <Text style={styles.addPlaceText}>{LL.MapScreen.addPlace()}</Text>
+              </Pressable>
+            )}
+          </>
+        )}
+
+        {isAddingPlace && <PlaceLocator />}
+
+        {isLoading && !allPlaces.length && (
+          <View style={styles.statusPill}>
+            <ActivityIndicator size="small" color={colors.primary} />
+            <Text style={styles.statusText}>{LL.MapScreen.loadingPlaces()}</Text>
+          </View>
+        )}
+
+        {hasError && (
+          <Pressable style={styles.statusPill} onPress={refresh}>
+            <GaloyIcon name="warning" size={16} color={colors.error} />
+            <Text style={styles.statusText}>{LL.MapScreen.placesError()}</Text>
+            <Text style={styles.retryText}>{LL.common.tryAgain()}</Text>
+          </Pressable>
+        )}
+
+        {permissionsStatus !== RESULTS.UNAVAILABLE &&
+          permissionsStatus !== RESULTS.LIMITED && (
+            // Centring on yourself and then nudging the pin onto your own shop is
+            // the common way to place one, so this stays on the map throughout.
+            // It needs no lifting to clear the form: the form is the map's
+            // sibling rather than something over it, so the bottom this is
+            // measured from is already the top of the form.
+            <LocationButtonCopy
+              requestPermissions={requestLocationPermission}
+              permissionStatus={permissionsStatus}
+              centerOnUser={centerOnUser}
+            />
           )}
-        </>
-      )}
+      </View>
 
-      {isLocatingPlace && (
-        <PlaceLocator
-          onConfirm={confirmPlaceLocation}
-          onCancel={() => setAddStep(null)}
+      {/* The other half of the screen, and the other half of the question. It
+          is unmounted when the attempt ends, which is what throws away what was
+          typed — so the map gets all of itself back and a next attempt starts
+          on an empty form. */}
+      {isAddingPlace && (
+        <AddPlaceSheet
+          location={center}
+          onSubmit={handlePlaceSubmit}
+          onClose={stopAddingPlace}
         />
       )}
-
-      {isLoading && !allPlaces.length && (
-        <View style={styles.statusPill}>
-          <ActivityIndicator size="small" color={colors.primary} />
-          <Text style={styles.statusText}>{LL.MapScreen.loadingPlaces()}</Text>
-        </View>
-      )}
-
-      {hasError && (
-        <Pressable style={styles.statusPill} onPress={refresh}>
-          <GaloyIcon name="warning" size={16} color={colors.error} />
-          <Text style={styles.statusText}>{LL.MapScreen.placesError()}</Text>
-          <Text style={styles.retryText}>{LL.common.tryAgain()}</Text>
-        </Pressable>
-      )}
-
-      {permissionsStatus !== RESULTS.UNAVAILABLE &&
-        permissionsStatus !== RESULTS.LIMITED && (
-          <LocationButtonCopy
-            requestPermissions={requestLocationPermission}
-            permissionStatus={permissionsStatus}
-            centerOnUser={centerOnUser}
-            // Centring on yourself and then nudging the pin onto your own shop
-            // is the common way to place one, so this stays reachable while the
-            // locator's bar has the bottom of the map.
-            bottom={isLocatingPlace ? locatorBarTop(insets.bottom) + 10 : undefined}
-          />
-        )}
 
       <OpenSettingsModal ref={openSettingsModalRef} />
 
@@ -626,19 +631,7 @@ export default function MapComponent({
       />
 
       <PlaceSheet place={selectedPlace} userLocation={coords} onClose={closeSheet} />
-
-      <AddPlaceModal
-        key={addSession}
-        isVisible={isDescribingPlace}
-        location={pinnedLocation}
-        onSubmit={handlePlaceSubmit}
-        onChangeLocation={() => setAddStep("locating")}
-        onClose={() => {
-          setAddStep(null)
-          setPinnedLocation(null)
-        }}
-      />
-    </View>
+    </KeyboardAvoidingView>
   )
 }
 
@@ -649,6 +642,14 @@ const useStyles = makeStyles(({ colors }, { topInset }: { topInset: number }) =>
   },
 
   viewContainer: { flex: 1 },
+
+  // Everything drawn on the map is positioned inside this rather than over the
+  // whole screen, so that "the bottom of the map" means the top of the form
+  // while one is open and the bottom of the screen when none is. The pin's
+  // centre — which is the coordinate being submitted — comes out right for the
+  // same reason: it is the centre of the map view, whatever height that view
+  // currently has.
+  mapArea: { flex: 1 },
 
   statusPill: {
     position: "absolute",
