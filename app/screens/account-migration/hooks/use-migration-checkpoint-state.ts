@@ -7,6 +7,7 @@ import { reportError } from "@app/utils/error-logging"
 import {
   classifyStorageFailure,
   StorageFailure,
+  type StorageWriteResult,
 } from "@app/utils/storage/storage-failure"
 
 import {
@@ -113,10 +114,11 @@ export const useMigrationCheckpointState = () => {
     ? stored?.expectedReceiveSats ?? null
     : null
 
-  /** Resolves false when the write fails, so callers can stop the flow instead of
-   *  advancing on a checkpoint that only exists in memory. Re-sending what this hook
-   *  already knows heals a failed write: mergeCheckpoint preserves what reached storage,
-   *  this covers what never did. */
+  /** Answers `isSaved: false` when the write fails, so callers can stop the flow instead of
+   *  advancing on a checkpoint that only exists in memory, and carries the kind of failure
+   *  with it so a full disk can be named rather than toasted as "something went wrong".
+   *  Re-sending what this hook already knows heals a failed write: mergeCheckpoint preserves
+   *  what reached storage, this covers what never did. */
   const saveCheckpoint = useCallback(
     async (
       step: MigrationCheckpoint,
@@ -124,11 +126,11 @@ export const useMigrationCheckpointState = () => {
         provisionedAccountId,
         expectedReceiveSats: expectedReceiveSatsUpdate,
       }: SaveCheckpointOptions = {},
-    ): Promise<boolean> => {
+    ): Promise<StorageWriteResult> => {
       /** Without a resolved owner the checkpoint cannot be keyed, and saving would erase the
        *  stored owner + account id via mergeCheckpoint; refuse so a null-owner window (an
        *  offline owner query) never wipes real progress. Callers gate on the false. */
-      if (!ownerId) return false
+      if (!ownerId) return { isSaved: false, failure: null }
       const update = {
         step,
         accountId: provisionedAccountId ?? accountId ?? undefined,
@@ -142,10 +144,10 @@ export const useMigrationCheckpointState = () => {
          *  hook reporting a step the store refused, which is how a resume ends up looking
          *  for an expected receive that was never written. */
         setStored((existing) => mergeCheckpoint(existing, update))
-        return true
+        return { isSaved: true, failure: null }
       } catch (err) {
         reportError("Checkpoint save", err)
-        return false
+        return { isSaved: false, failure: classifyStorageFailure(err) }
       }
     },
     [storageKey, ownerId, accountId, expectedReceiveSats],

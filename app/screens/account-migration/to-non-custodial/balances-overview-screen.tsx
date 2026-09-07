@@ -144,7 +144,7 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
   const [hasCommitPointWriteFailed, setHasCommitPointWriteFailed] = useState(false)
   const recordCommitPoint = useCallback(async (): Promise<void> => {
     if (expectedReceiveSats === null) return
-    const isSaved = await saveCheckpoint(MigrationCheckpoint.BalancesOverview, {
+    const { isSaved } = await saveCheckpoint(MigrationCheckpoint.BalancesOverview, {
       expectedReceiveSats,
     })
     /** Latched, never unlatched: this runs again on every focus, figure change and retry,

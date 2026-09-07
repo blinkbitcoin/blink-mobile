@@ -2,6 +2,7 @@ import { renderHook, act } from "@testing-library/react-native"
 
 import { useMigrationAccount } from "@app/screens/account-migration/hooks/use-migration-account"
 import { MigrationCheckpoint } from "@app/screens/account-migration/utils/migration-checkpoint-storage"
+import { StorageFailure } from "@app/utils/storage/storage-failure"
 
 const mockSaveCheckpoint = jest.fn()
 const mockProvision = jest.fn()
@@ -69,7 +70,7 @@ describe("useMigrationAccount", () => {
     jest.clearAllMocks()
     mockAccountId = null
     mockGuardBlocked = false
-    mockSaveCheckpoint.mockResolvedValue(true)
+    mockSaveCheckpoint.mockResolvedValue({ isSaved: true, failure: null })
     mockSavePendingAccount.mockResolvedValue(undefined)
     mockPendingForActiveAccount = null
     mockRegistryAccounts = []
@@ -125,7 +126,10 @@ describe("useMigrationAccount", () => {
   })
 
   it("stops the flow with the failure toast when the checkpoint write fails", async () => {
-    mockSaveCheckpoint.mockResolvedValue(false)
+    mockSaveCheckpoint.mockResolvedValue({
+      isSaved: false,
+      failure: StorageFailure.Unknown,
+    })
     const { result } = renderHook(() => useMigrationAccount())
 
     let ensured: string | null = "unset"
