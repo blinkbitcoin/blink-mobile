@@ -7,10 +7,13 @@
  * available, not a shortcut, which is why the set below is deliberately small: it names
  * the one failure a user can act on and refuses to guess at the rest.
  *
- * The markers are read off @react-native-async-storage/async-storage 2.2.0. They are that
- * version's wording, so an upgrade has to re-derive them — the spec pins the version and
- * fails when it moves, which is the reminder to come back here.
+ * The markers are read off the async-storage version pinned below. They are that version's
+ * wording, so an upgrade has to re-derive them — the spec asserts the pin against the
+ * installed package and fails when it moves, which is the reminder to come back here.
  */
+/** Exported so the spec asserts against this value rather than restating it: two copies of
+ *  the same fact drift, and the drift is exactly what the pin exists to catch. */
+export const PINNED_ASYNC_STORAGE_VERSION = "2.2.0"
 export const StorageFailure = {
   /** The device has no room left. The user can fix this one themselves. */
   OutOfSpace: "out-of-space",
@@ -26,9 +29,9 @@ export const StorageFailure = {
 export type StorageFailure = (typeof StorageFailure)[keyof typeof StorageFailure]
 
 /**
- * Lowercased fragments that appear when the device is out of room, across both platforms:
- * Android passes SQLite's own text through `e.getMessage()`, while iOS carries the
- * NSError's localizedDescription (NSCocoa 640 and NSPOSIX 28 word it the two ways below).
+ * Lowercased fragments that appear when the device is out of room. Only Android reaches
+ * them today; iOS reports a fixed string that says nothing, so it classifies as Unknown and
+ * gets the generic copy. The iOS wordings are kept for the day that changes.
  */
 const OUT_OF_SPACE_MARKERS = [
   "sqlite_full",
