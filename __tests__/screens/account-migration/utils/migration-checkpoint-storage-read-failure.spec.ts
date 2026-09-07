@@ -24,6 +24,7 @@ jest.mock("@react-native-async-storage/async-storage", () => ({
 
 import {
   MigrationCheckpoint,
+  clearPendingProvisionedAccount,
   loadCheckpoint,
   loadPendingProvisionedAccounts,
   savePendingProvisionedAccount,
@@ -153,6 +154,28 @@ describe("an unreadable store is not an empty one", () => {
     await expect(loadPendingProvisionedAccounts(PENDING_KEY)).resolves.toEqual({
       [OWNER_ID]: PROVISIONED_ACCOUNT_ID,
     })
+  })
+
+  /** The clear shares the save's hazard: it writes the map back minus one owner, so against
+   *  a store it could not read it would wipe every other owner's pending wallet. */
+  it("refuses to clear a pending wallet rather than wipe the owners it could not read", async () => {
+    isStoreUnreadable = true
+
+    await expect(
+      clearPendingProvisionedAccount(PENDING_KEY, OTHER_OWNER_ID),
+    ).rejects.toThrow(READ_FAILURE)
+
+    isStoreUnreadable = false
+
+    await expect(loadPendingProvisionedAccounts(PENDING_KEY)).resolves.toEqual({
+      [OWNER_ID]: PROVISIONED_ACCOUNT_ID,
+    })
+  })
+
+  it("still clears the one owner once the store answers", async () => {
+    await clearPendingProvisionedAccount(PENDING_KEY, OWNER_ID)
+
+    await expect(loadPendingProvisionedAccounts(PENDING_KEY)).resolves.toEqual({})
   })
 
   it("reads a truncated checkpoint as absent instead of stranding the key", async () => {

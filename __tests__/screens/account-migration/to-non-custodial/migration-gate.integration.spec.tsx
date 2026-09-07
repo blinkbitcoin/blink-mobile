@@ -155,6 +155,13 @@ jest.mock("@app/i18n/i18n-react", () => ({
     LL: {
       errors: { generic: () => "generic error" },
       common: { tryAgain: () => "Try Again" },
+      AccountMigration: {
+        storageUnavailable: {
+          outOfSpaceBody: () => "no space left",
+          unreadableBody: () => "could not read your progress",
+          contactSupportCta: () => "Contact support",
+        },
+      },
     },
   }),
 }))
@@ -219,6 +226,28 @@ describe("MigrationGate pending-wallet integration", () => {
       "custodial-1",
     )
     expect(mockNavigateToCheckpoint).not.toHaveBeenCalled()
+  })
+
+  /** The classifier's own seam, which every other spec fakes by injecting the kind into a
+   *  mocked hook. */
+  it("names a full device from the error the real hook caught", async () => {
+    mockLoadPendingProvisionedAccounts.mockRejectedValue(
+      new Error("database or disk is full (code 13 SQLITE_FULL)"),
+    )
+
+    const { getByText } = render(<MigrationGate />)
+
+    await waitFor(() => expect(getByText("no space left")).toBeTruthy())
+  })
+
+  /** And the other half: a message that says nothing must not be dressed up as advice. */
+  it("keeps the generic storage wording when the message says nothing", async () => {
+    mockLoadPendingProvisionedAccounts.mockRejectedValue(new Error("Database Error"))
+
+    const { getByText, queryByText } = render(<MigrationGate />)
+
+    await waitFor(() => expect(getByText("could not read your progress")).toBeTruthy())
+    expect(queryByText("no space left")).toBeNull()
   })
 
   /** The wiped-device signature end to end: an empty store (fresh reinstall) with the

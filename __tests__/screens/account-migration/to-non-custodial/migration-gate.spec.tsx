@@ -1031,41 +1031,9 @@ describe("MigrationGate, with an unreadable device store", () => {
     })
   })
 
-  it("keeps the escape hidden while the deciding retry is still in flight", async () => {
-    arriveAtStorageError()
-    /** A refetch that never settles holds the screen mid-retry, which is exactly when the
-     *  count has already risen but the answer is not in yet. */
-    mockUseActiveApiKeys.mockReturnValue(
-      apiKeysState({ refetch: () => new Promise(() => {}) }),
-    )
-    mockUseWalletOverviewScreenQuery.mockReturnValue({
-      ...walletOverviewQueryResult({ usdBalance: 0 }),
-      refetch: jest.fn(),
-    })
-
-    const { getByTestId, queryByTestId } = render(<MigrationGate />)
-    pressRetry(getByTestId, 3)
-    await act(async () => undefined)
-
-    expect(getByTestId("gate-retry-button").props.accessibilityState.disabled).toBe(true)
-    expect(queryByTestId("gate-storage-support-button")).toBeNull()
-  })
-
-  it("does not let failures that were the network's arm the escape", () => {
-    /** Three offline retries are not evidence about this device. */
-    mockIsMigrationLocked = true
-    mockLockError = true
-
-    const { getByTestId, queryByTestId, rerender } = render(<MigrationGate />)
-    pressRetry(getByTestId, 3)
-
-    mockLockError = false
-    mockCheckpointError = true
-    rerender(<MigrationGate />)
-
-    expect(queryByTestId("gate-storage-support-button")).toBeNull()
-  })
-
+  /** The rules this screen cannot honestly test live in the hook's own spec: the retry
+   *  button disables itself, so repeated presses never raise the count, and an unlocked
+   *  account never renders this screen at all. */
   it("says the store is unreadable only when the network sources answered", () => {
     arriveAtStorageError()
     mockLockError = true
@@ -1085,15 +1053,5 @@ describe("MigrationGate, with an unreadable device store", () => {
     const { getByText } = render(<MigrationGate />)
 
     expect(getByText("no space left")).toBeTruthy()
-  })
-
-  it("never strands an unlocked account, which can still leave the flow", () => {
-    mockIsMigrationLocked = false
-    mockLockError = true
-
-    const { getByTestId, queryByTestId } = render(<MigrationGate />)
-    pressRetry(getByTestId, 3)
-
-    expect(queryByTestId("gate-storage-support-button")).toBeNull()
   })
 })
