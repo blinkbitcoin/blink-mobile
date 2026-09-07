@@ -1,7 +1,7 @@
 import React from "react"
-import { fireEvent, render, waitFor } from "@testing-library/react-native"
+import { act, fireEvent, render, waitFor } from "@testing-library/react-native"
 
-import { AddPlaceModal } from "@app/components/map-component/add-place-modal"
+import { AddPlaceSheet } from "@app/components/map-component/add-place-sheet"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
 import { ContextForScreen } from "../../screens/helper"
@@ -9,22 +9,17 @@ import { ContextForScreen } from "../../screens/helper"
 const LOCATION = { latitude: 13.496743, longitude: -89.439462 }
 
 const onSubmit = jest.fn<Promise<string | null>, [unknown]>()
-const onChangeLocation = jest.fn()
 const onClose = jest.fn()
 
-const renderModal = (props: Partial<React.ComponentProps<typeof AddPlaceModal>> = {}) =>
-  render(
-    <ContextForScreen>
-      <AddPlaceModal
-        isVisible={true}
-        location={LOCATION}
-        onSubmit={onSubmit}
-        onChangeLocation={onChangeLocation}
-        onClose={onClose}
-        {...props}
-      />
-    </ContextForScreen>,
-  )
+type SheetProps = React.ComponentProps<typeof AddPlaceSheet>
+
+const sheet = (props: Partial<SheetProps> = {}) => (
+  <ContextForScreen>
+    <AddPlaceSheet location={LOCATION} onSubmit={onSubmit} onClose={onClose} {...props} />
+  </ContextForScreen>
+)
+
+const renderSheet = (props: Partial<SheetProps> = {}) => render(sheet(props))
 
 const fillInForm = (getByTestId: (id: string) => unknown) => {
   fireEvent.changeText(getByTestId("place-name-input") as never, "Hope House")
@@ -37,17 +32,48 @@ beforeEach(() => {
   loadLocale("en")
 })
 
-describe("AddPlaceModal", () => {
-  it("shows where the pin was dropped", async () => {
-    // The form is the only place the coordinates are readable, so a pin put
-    // down in the wrong street can still be caught before it is submitted.
-    const { getByText } = renderModal()
+describe("AddPlaceSheet", () => {
+  it("shows where the pin is pointing", async () => {
+    // The form is the only place the coordinates are readable, so a pin left in
+    // the wrong street can still be caught before it is submitted.
+    const { getByText } = renderSheet()
 
     await waitFor(() => expect(getByText("13.496743, -89.439462")).toBeTruthy())
   })
 
+  it("follows the map, since the map is on screen and being panned", async () => {
+    // The pin is aimed while this is open, so a row still naming where the map
+    // was when the form opened would be describing a different place than the
+    // one about to be submitted.
+    const { getByText, rerender } = renderSheet()
+
+    await waitFor(() => expect(getByText("13.496743, -89.439462")).toBeTruthy())
+
+    rerender(sheet({ location: { latitude: 13.5, longitude: -89.44 } }))
+
+    await waitFor(() => expect(getByText("13.500000, -89.440000")).toBeTruthy())
+  })
+
+  it("submits where the pin is by then, not where it was when the form opened", async () => {
+    const { getByTestId, rerender } = renderSheet()
+
+    await waitFor(() => expect(getByTestId("place-name-input")).toBeTruthy())
+    fillInForm(getByTestId)
+    rerender(sheet({ location: { latitude: 13.5, longitude: -89.44 } }))
+    fireEvent.press(getByTestId("submit-place"))
+
+    await waitFor(() =>
+      expect(onSubmit).toHaveBeenCalledWith({
+        name: "Hope House",
+        category: "cafes",
+        latitude: 13.5,
+        longitude: -89.44,
+      }),
+    )
+  })
+
   it("will not submit a place with no name", async () => {
-    const { getByTestId } = renderModal()
+    const { getByTestId } = renderSheet()
 
     await waitFor(() => expect(getByTestId("submit-place")).toBeTruthy())
     fireEvent.press(getByTestId("place-category-cafes"))
@@ -57,7 +83,7 @@ describe("AddPlaceModal", () => {
   })
 
   it("will not submit a place with no category", async () => {
-    const { getByTestId } = renderModal()
+    const { getByTestId } = renderSheet()
 
     await waitFor(() => expect(getByTestId("place-name-input")).toBeTruthy())
     fireEvent.changeText(getByTestId("place-name-input"), "Hope House")
@@ -69,7 +95,7 @@ describe("AddPlaceModal", () => {
   it("does not offer the catch-all category", () => {
     // "other" is a filter bucket for unrecognised icons, not a description of
     // a place — a submission under it would tell BTC Map nothing.
-    const { queryByTestId } = renderModal()
+    const { queryByTestId } = renderSheet()
 
     expect(queryByTestId("place-category-other")).toBeNull()
   })
@@ -77,7 +103,7 @@ describe("AddPlaceModal", () => {
   it("says on the button that there is still something missing", async () => {
     // Disabled and translucent is the whole explanation, so it has to reach a
     // screen reader as well as an eye.
-    const { getByTestId } = renderModal()
+    const { getByTestId } = renderSheet()
 
     await waitFor(() =>
       expect(getByTestId("submit-place").props.accessibilityState).toMatchObject({
@@ -95,7 +121,7 @@ describe("AddPlaceModal", () => {
   })
 
   it("submits the place once it has a name, a category and a pin", async () => {
-    const { getByTestId } = renderModal()
+    const { getByTestId } = renderSheet()
 
     await waitFor(() => expect(getByTestId("place-name-input")).toBeTruthy())
     fillInForm(getByTestId)
@@ -121,7 +147,7 @@ describe("AddPlaceModal", () => {
           resolveSend = () => resolve(null)
         }),
     )
-    const { getByTestId } = renderModal()
+    const { getByTestId } = renderSheet()
 
     await waitFor(() => expect(getByTestId("place-name-input")).toBeTruthy())
     fillInForm(getByTestId)
@@ -139,50 +165,44 @@ describe("AddPlaceModal", () => {
     )
   })
 
-  it("will not put the pin back on the move while the send is in flight", async () => {
-    // The request carries the pin as it stood when submit was tapped, so there
-    // is nothing left for a correction to reach: the place would land at the
-    // old spot while the map showed the new one, and the success would announce
-    // it over a pin that is not where it went.
-    let resolveSend: (() => void) | undefined
+  it("holds the row on the place it is sending, not on the map it cannot reach", async () => {
+    // The request carries the pin as it stood when submit was tapped, and the
+    // map is still pannable underneath. A row that kept following it would name
+    // a place the request is not going to, and the success would announce a
+    // place that is not where the row says it is.
+    let resolveSend: ((reason: string | null) => void) | undefined
     onSubmit.mockImplementation(
       () =>
         new Promise<string | null>((resolve) => {
-          resolveSend = () => resolve(null)
+          resolveSend = resolve
         }),
     )
-    const { getByTestId } = renderModal()
+    const { getByTestId, getByText, rerender } = renderSheet()
 
     await waitFor(() => expect(getByTestId("place-name-input")).toBeTruthy())
     fillInForm(getByTestId)
     fireEvent.press(getByTestId("submit-place"))
 
-    await waitFor(() =>
-      expect(getByTestId("change-place-location").props.accessibilityState).toMatchObject(
-        { disabled: true },
-      ),
-    )
-    fireEvent.press(getByTestId("change-place-location"))
-    expect(onChangeLocation).not.toHaveBeenCalled()
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1))
+    rerender(sheet({ location: { latitude: 13.5, longitude: -89.44 } }))
 
-    // Only for as long as the send is: the pin is the first thing worth
-    // correcting once the place has been turned down.
-    resolveSend?.()
-    await waitFor(() =>
-      expect(getByTestId("change-place-location").props.accessibilityState).toMatchObject(
-        { disabled: false },
-      ),
-    )
-    fireEvent.press(getByTestId("change-place-location"))
-    expect(onChangeLocation).toHaveBeenCalled()
+    expect(getByText("13.496743, -89.439462")).toBeTruthy()
+
+    // Only for as long as the send is. Once the place has been turned down the
+    // pin is the first thing worth correcting, so the row goes back to the map.
+    await act(async () => {
+      resolveSend?.("Too many places sent today.")
+    })
+
+    await waitFor(() => expect(getByText("13.500000, -89.440000")).toBeTruthy())
   })
 
   it("says on the form itself why the place did not go", async () => {
-    // This is a native modal over the whole app and the app's toast is mounted
-    // outside it, so a failure reported that way is drawn behind this window:
-    // the form would sit there looking as though the tap had done nothing.
+    // Beside the button that would retry it, and beside everything that was
+    // typed — a toast would put the reason at the other end of the screen from
+    // both, and take it away again before the retry.
     onSubmit.mockResolvedValue("Too many places sent today. Try again tomorrow.")
-    const { getByTestId, getByText } = renderModal()
+    const { getByTestId, getByText } = renderSheet()
 
     await waitFor(() => expect(getByTestId("place-name-input")).toBeTruthy())
     fillInForm(getByTestId)
@@ -199,7 +219,7 @@ describe("AddPlaceModal", () => {
     // Leaving it up would have a place that has just been sent still reading as
     // one that could not be.
     onSubmit.mockResolvedValueOnce("Too many places sent today.")
-    const { getByTestId, queryByTestId } = renderModal()
+    const { getByTestId, queryByTestId } = renderSheet()
 
     await waitFor(() => expect(getByTestId("place-name-input")).toBeTruthy())
     fillInForm(getByTestId)
@@ -213,11 +233,13 @@ describe("AddPlaceModal", () => {
     await waitFor(() => expect(queryByTestId("place-submission-error")).toBeNull())
   })
 
-  it("takes the last failure off when the pin goes back on the move", async () => {
-    // It was a failure about the place as it stood, pin included, so it stops
-    // being true as soon as the pin is being moved.
+  it("leaves the failure up when the map is merely panned", async () => {
+    // Moving the pin used to be a deliberate trip back to the map, and it took
+    // the failure off with it. The map is now under the form at all times, so
+    // the same rule would let an idle nudge wipe a message before it has been
+    // read. It goes on the next send instead.
     onSubmit.mockResolvedValue("Too many places sent today.")
-    const { getByTestId, queryByTestId } = renderModal()
+    const { getByTestId, rerender } = renderSheet()
 
     await waitFor(() => expect(getByTestId("place-name-input")).toBeTruthy())
     fillInForm(getByTestId)
@@ -225,10 +247,9 @@ describe("AddPlaceModal", () => {
 
     await waitFor(() => expect(getByTestId("place-submission-error")).toBeTruthy())
 
-    fireEvent.press(getByTestId("change-place-location"))
+    rerender(sheet({ location: { latitude: 13.5, longitude: -89.44 } }))
 
-    expect(onChangeLocation).toHaveBeenCalled()
-    await waitFor(() => expect(queryByTestId("place-submission-error")).toBeNull())
+    expect(getByTestId("place-submission-error")).toBeTruthy()
   })
 
   it("takes the last failure off when the place itself is edited", async () => {
@@ -236,7 +257,7 @@ describe("AddPlaceModal", () => {
     // once the name or the category changes it is accusing a place that no
     // longer exists.
     onSubmit.mockResolvedValue("Too many places sent today.")
-    const { getByTestId, queryByTestId } = renderModal()
+    const { getByTestId, queryByTestId } = renderSheet()
 
     await waitFor(() => expect(getByTestId("place-name-input")).toBeTruthy())
     fillInForm(getByTestId)
@@ -257,7 +278,7 @@ describe("AddPlaceModal", () => {
   it("lets a category be taken back off", async () => {
     // The chips are one choice rather than a set, so the only way out of a
     // mis-tap is tapping the same chip again.
-    const { getByTestId } = renderModal()
+    const { getByTestId } = renderSheet()
 
     await waitFor(() => expect(getByTestId("place-category-cafes")).toBeTruthy())
     fireEvent.press(getByTestId("place-category-cafes"))
@@ -278,42 +299,22 @@ describe("AddPlaceModal", () => {
   })
 
   it("keeps what has been typed while the pin is moved", async () => {
-    // Going back to the map is a correction, not a restart: retyping the name
-    // to fix the pin would make moving it not worth doing.
-    const { getByTestId, getByText, rerender } = renderModal()
+    // Panning is a correction, not a restart: retyping the name to fix the pin
+    // would make moving it not worth doing.
+    const { getByTestId, getByText, rerender } = renderSheet()
 
     await waitFor(() => expect(getByTestId("place-name-input")).toBeTruthy())
     fireEvent.changeText(getByTestId("place-name-input"), "Hope House")
-    fireEvent.press(getByTestId("change-place-location"))
+    fireEvent.press(getByTestId("place-category-cafes"))
 
-    expect(onChangeLocation).toHaveBeenCalled()
-
-    rerender(
-      <ContextForScreen>
-        <AddPlaceModal
-          isVisible={false}
-          location={LOCATION}
-          onSubmit={onSubmit}
-          onChangeLocation={onChangeLocation}
-          onClose={onClose}
-        />
-      </ContextForScreen>,
-    )
-    rerender(
-      <ContextForScreen>
-        <AddPlaceModal
-          isVisible={true}
-          location={{ latitude: 13.5, longitude: -89.44 }}
-          onSubmit={onSubmit}
-          onChangeLocation={onChangeLocation}
-          onClose={onClose}
-        />
-      </ContextForScreen>,
-    )
+    rerender(sheet({ location: { latitude: 13.5, longitude: -89.44 } }))
 
     await waitFor(() =>
       expect(getByTestId("place-name-input").props.value).toBe("Hope House"),
     )
+    expect(getByTestId("place-category-cafes").props.accessibilityState).toMatchObject({
+      selected: true,
+    })
     expect(getByText("13.500000, -89.440000")).toBeTruthy()
   })
 })

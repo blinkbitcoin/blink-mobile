@@ -12,24 +12,24 @@ const BUTTON_SIZE = 44
 // Sits above the ODbL credit, which shares this corner. The gap is bigger than
 // the credit needs at default text size so that scaling it up — it is an
 // attribution we are obliged to keep legible — moves it behind nothing.
-const DEFAULT_BOTTOM = 48
+//
+// Measured from the bottom of the map's own half of the screen, which is the
+// top of the add-place form whenever one is open — so nothing has to raise this
+// to keep it clear of one.
+const BOTTOM = 48
 
 type Props = {
   requestPermissions: () => void
   centerOnUser: () => void
   permissionStatus?: PermissionStatus
-  /** Raised when something else has taken the bottom of the map, such as the
-   *  bar for placing a new pin. */
-  bottom?: number
 }
 
 export default function LocationButtonCopy({
   permissionStatus,
   centerOnUser,
   requestPermissions,
-  bottom = DEFAULT_BOTTOM,
 }: Props) {
-  const styles = useStyles({ bottom })
+  const styles = useStyles()
   const {
     theme: { colors },
   } = useTheme()
@@ -47,10 +47,10 @@ export default function LocationButtonCopy({
   )
 }
 
-const useStyles = makeStyles(({ colors }, { bottom }: { bottom: number }) => ({
+const useStyles = makeStyles(({ colors }) => ({
   button: {
     position: "absolute",
-    bottom,
+    bottom: BOTTOM,
     right: 8,
     zIndex: 99,
   },

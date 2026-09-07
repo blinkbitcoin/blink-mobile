@@ -90,21 +90,28 @@ jest.mock("@app/components/map-component/category-filter-sheet", () => ({
   },
 }))
 
-// The form has its own spec too. Adding a place is two steps and only the first
-// happens on the map, so this stands in for the second.
+// The form has its own spec too, so this stands in for it — the map's side of
+// adding a place is the pin, the form's mounting, and what passes between them.
 //
-// It counts its own mountings as well as reporting its props: the form holds
-// what has been typed, so the map throwing a half-filled one away is a mount
-// and keeping it across a trip back to the pin is the absence of one.
+// Whether it is on screen is its being mounted at all now, rather than a prop:
+// the map unmounts it to end an attempt. It counts its mountings for the same
+// reason — the form holds what has been typed, so the map throwing a
+// half-filled one away is a mount and keeping it through a pan is the absence
+// of one.
 let capturedAddPlaceProps: Record<string, unknown> | undefined
 let addPlaceMountCount = 0
-jest.mock("@app/components/map-component/add-place-modal", () => {
+let isAddPlaceMounted = false
+jest.mock("@app/components/map-component/add-place-sheet", () => {
   const ReactActual = jest.requireActual<typeof React>("react")
   return {
-    AddPlaceModal: (props: Record<string, unknown>) => {
+    AddPlaceSheet: (props: Record<string, unknown>) => {
       capturedAddPlaceProps = props
       ReactActual.useEffect(() => {
         addPlaceMountCount += 1
+        isAddPlaceMounted = true
+        return () => {
+          isAddPlaceMounted = false
+        }
       }, [])
       return null
     },
@@ -237,6 +244,7 @@ beforeEach(() => {
   capturedFilterProps = undefined
   capturedAddPlaceProps = undefined
   addPlaceMountCount = 0
+  isAddPlaceMounted = false
   capturedMapProps = undefined
   mockIsAuthed = true
   mockIsSelfCustodialAccount = false
@@ -750,16 +758,15 @@ describe("MapComponent adding a place", () => {
     // A refusal is permanent — "check your connection" would send the user
     // retrying a payload that can never go through. It is our own translated
     // sentence rather than the backend's, which only ever comes back in
-    // English, and it goes to the form rather than into a toast: the form is a
-    // native modal over everything, and the app's toast is mounted outside it.
+    // English, and it goes to the form rather than into a toast: it belongs
+    // beside the button that would retry it.
     mockSubmitPlace.mockResolvedValue({ submitted: false, refused: true })
     const { getByTestId } = renderMap()
 
     await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
     fireEvent.press(getByTestId("open-add-place"))
-    fireEvent.press(getByTestId("confirm-place-location"))
 
-    await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(true))
+    await waitFor(() => expect(isAddPlaceMounted).toBe(true))
     const sent = await sendFromForm()
 
     expect(sent.reason).toBe(
@@ -767,7 +774,7 @@ describe("MapComponent adding a place", () => {
     )
     expect(mockToastShow).not.toHaveBeenCalled()
     // Still open: the typed place is the user's to fix or abandon.
-    expect(capturedAddPlaceProps?.isVisible).toBe(true)
+    expect(isAddPlaceMounted).toBe(true)
   })
 
   it("hands the map over to the pin, and takes the reading controls off it", async () => {
@@ -778,48 +785,51 @@ describe("MapComponent adding a place", () => {
     await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
     fireEvent.press(getByTestId("open-add-place"))
 
-    await waitFor(() => expect(getByTestId("confirm-place-location")).toBeTruthy())
+    await waitFor(() => expect(getByTestId("place-pin")).toBeTruthy())
     expect(queryByTestId("open-place-search")).toBeNull()
     expect(queryByTestId("open-category-filter")).toBeNull()
     expect(queryByTestId("open-add-place")).toBeNull()
   })
 
-  it("gives the form the centre of the map the pin was left on", async () => {
-    // The pin is drawn at the centre of the map view and never moves, so the
-    // region's centre is where it is pointing — no measuring, no conversion.
+  it("puts the pin and the form up together, on the one screen", async () => {
+    // Where a place is and what it is are one question. Asking the second only
+    // after the first has been answered and put away is what this replaced.
     const { getByTestId } = renderMap()
 
     await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
     fireEvent.press(getByTestId("open-add-place"))
 
+    await waitFor(() => expect(isAddPlaceMounted).toBe(true))
+    expect(getByTestId("place-pin")).toBeTruthy()
+  })
+
+  it("keeps the form pointed at the centre of the map as the map is panned", async () => {
+    // The pin is drawn at the centre of the map view and never moves, so the
+    // region's centre is where it is pointing — no measuring, no conversion.
+    // The map moves under an open form now, so this has to keep up with it:
+    // the row showing the coordinates and the request carry the same place.
+    const { getByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+    fireEvent.press(getByTestId("open-add-place"))
+
+    await waitFor(() => expect(isAddPlaceMounted).toBe(true))
+    expect(capturedAddPlaceProps?.location).toEqual({
+      latitude: REGION.latitude,
+      longitude: REGION.longitude,
+    })
+
     const moved = { ...REGION, latitude: 13.496743, longitude: -89.439462 }
     act(() => {
       ;(capturedMapProps?.onRegionChangeComplete as (r: Region) => void)(moved)
     })
-    fireEvent.press(getByTestId("confirm-place-location"))
 
-    await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(true))
-    expect(capturedAddPlaceProps?.location).toEqual({
-      latitude: moved.latitude,
-      longitude: moved.longitude,
-    })
-  })
-
-  it("goes back to the map when the pin needs moving", async () => {
-    const { getByTestId, queryByTestId } = renderMap()
-
-    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
-    fireEvent.press(getByTestId("open-add-place"))
-    fireEvent.press(getByTestId("confirm-place-location"))
-
-    await waitFor(() => expect(queryByTestId("confirm-place-location")).toBeNull())
-
-    act(() => {
-      ;(capturedAddPlaceProps?.onChangeLocation as () => void)()
-    })
-
-    await waitFor(() => expect(getByTestId("confirm-place-location")).toBeTruthy())
-    expect(capturedAddPlaceProps?.isVisible).toBe(false)
+    await waitFor(() =>
+      expect(capturedAddPlaceProps?.location).toEqual({
+        latitude: moved.latitude,
+        longitude: moved.longitude,
+      }),
+    )
   })
 
   it("abandons the whole thing on cancel", async () => {
@@ -827,11 +837,13 @@ describe("MapComponent adding a place", () => {
 
     await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
     fireEvent.press(getByTestId("open-add-place"))
-    fireEvent.press(getByTestId("cancel-add-place"))
+    act(() => {
+      ;(capturedAddPlaceProps?.onClose as () => void)()
+    })
 
     await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
-    expect(queryByTestId("confirm-place-location")).toBeNull()
-    expect(capturedAddPlaceProps?.isVisible).toBe(false)
+    expect(queryByTestId("place-pin")).toBeNull()
+    expect(isAddPlaceMounted).toBe(false)
   })
 
   it("leaves the pins alone while one is being placed", async () => {
@@ -844,7 +856,7 @@ describe("MapComponent adding a place", () => {
     fireEvent.press(getByTestId("open-add-place"))
     fireEvent.press(getByTestId("btcmap-place-1"))
 
-    await waitFor(() => expect(getByTestId("confirm-place-location")).toBeTruthy())
+    await waitFor(() => expect(getByTestId("place-pin")).toBeTruthy())
     expect(capturedSheetProps?.place).toBeNull()
   })
 
@@ -869,34 +881,47 @@ describe("MapComponent adding a place", () => {
     await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
     fireEvent.press(getByTestId("open-add-place"))
 
-    await waitFor(() => expect(getByTestId("confirm-place-location")).toBeTruthy())
+    await waitFor(() => expect(getByTestId("place-pin")).toBeTruthy())
     mockAnimateToRegion.mockClear()
     fireEvent.press(getAllByTestId(/^btcmap-cluster-/)[0])
 
     expect(mockAnimateToRegion).not.toHaveBeenCalled()
-    expect(getByTestId("confirm-place-location")).toBeTruthy()
+    expect(getByTestId("place-pin")).toBeTruthy()
   })
 
-  it("confirms the pin where the camera is, not where it last came to rest", async () => {
-    // A fling or a fly-to reports the camera for the whole of the movement and
-    // settles only at the end. Reading the settled region instead would put the
-    // place wherever the map was before the last move — one tap behind.
+  it("gives the form the camera it has settled on, not one still in flight", async () => {
+    // A fling reports the camera for the whole of the movement and settles only
+    // at the end. The form used to be opened by a tap and read the moving
+    // camera, so that the place landed where the map was going rather than
+    // where it had been. The form is now on screen with the coordinates on it
+    // throughout, so the rule flips: what is submitted has to be what that row
+    // is showing, and the row can only show a camera that has come to rest.
     const { getByTestId } = renderMap()
 
     await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
     fireEvent.press(getByTestId("open-add-place"))
+    await waitFor(() => expect(isAddPlaceMounted).toBe(true))
 
     const moving = { ...REGION, latitude: 13.496743, longitude: -89.439462 }
     act(() => {
       ;(capturedMapProps?.onRegionChange as (r: Region) => void)(moving)
     })
-    fireEvent.press(getByTestId("confirm-place-location"))
 
-    await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(true))
     expect(capturedAddPlaceProps?.location).toEqual({
-      latitude: moving.latitude,
-      longitude: moving.longitude,
+      latitude: REGION.latitude,
+      longitude: REGION.longitude,
     })
+
+    act(() => {
+      ;(capturedMapProps?.onRegionChangeComplete as (r: Region) => void)(moving)
+    })
+
+    await waitFor(() =>
+      expect(capturedAddPlaceProps?.location).toEqual({
+        latitude: moving.latitude,
+        longitude: moving.longitude,
+      }),
+    )
   })
 
   it("closes the form and says thanks once BTC Map has the place", async () => {
@@ -905,9 +930,8 @@ describe("MapComponent adding a place", () => {
 
     await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
     fireEvent.press(getByTestId("open-add-place"))
-    fireEvent.press(getByTestId("confirm-place-location"))
 
-    await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(true))
+    await waitFor(() => expect(isAddPlaceMounted).toBe(true))
     await act(async () => {
       await (capturedAddPlaceProps?.onSubmit as (s: unknown) => Promise<void>)({
         name: "Hope House",
@@ -926,7 +950,7 @@ describe("MapComponent adding a place", () => {
         expect.objectContaining({ type: "success" }),
       ),
     )
-    await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(false))
+    await waitFor(() => expect(isAddPlaceMounted).toBe(false))
   })
 
   it("keeps the form open when the place could not be sent, so a retry resends the same submission", async () => {
@@ -937,9 +961,8 @@ describe("MapComponent adding a place", () => {
 
     await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
     fireEvent.press(getByTestId("open-add-place"))
-    fireEvent.press(getByTestId("confirm-place-location"))
 
-    await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(true))
+    await waitFor(() => expect(isAddPlaceMounted).toBe(true))
 
     const first = await sendFromForm()
 
@@ -949,7 +972,7 @@ describe("MapComponent adding a place", () => {
       "The place could not be sent. Check your connection and try again.",
     )
     expect(mockToastShow).not.toHaveBeenCalled()
-    expect(capturedAddPlaceProps?.isVisible).toBe(true)
+    expect(isAddPlaceMounted).toBe(true)
 
     await sendFromForm()
 
@@ -969,22 +992,19 @@ describe("MapComponent adding a place", () => {
 
     await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
     fireEvent.press(getByTestId("open-add-place"))
-    fireEvent.press(getByTestId("confirm-place-location"))
 
-    await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(true))
+    await waitFor(() => expect(isAddPlaceMounted).toBe(true))
     await act(async () => {
       await (capturedAddPlaceProps?.onSubmit as (s: unknown) => Promise<void>)(submission)
     })
 
     // Abandon the attempt and start another one.
     act(() => {
-      ;(capturedAddPlaceProps?.onChangeLocation as () => void)()
+      ;(capturedAddPlaceProps?.onClose as () => void)()
     })
-    fireEvent.press(getByTestId("cancel-add-place"))
     fireEvent.press(getByTestId("open-add-place"))
-    fireEvent.press(getByTestId("confirm-place-location"))
 
-    await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(true))
+    await waitFor(() => expect(isAddPlaceMounted).toBe(true))
     await act(async () => {
       await (capturedAddPlaceProps?.onSubmit as (s: unknown) => Promise<void>)(submission)
     })
@@ -1008,8 +1028,7 @@ describe("MapComponent adding a place", () => {
 
     await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
     fireEvent.press(getByTestId("open-add-place"))
-    fireEvent.press(getByTestId("confirm-place-location"))
-    await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(true))
+    await waitFor(() => expect(isAddPlaceMounted).toBe(true))
 
     const abandoned: { reason?: string | null } = {}
     const inFlight = (capturedAddPlaceProps?.onSubmit as SendPlace)(SUBMISSION).then(
@@ -1024,8 +1043,7 @@ describe("MapComponent adding a place", () => {
       ;(capturedAddPlaceProps?.onClose as () => void)()
     })
     fireEvent.press(getByTestId("open-add-place"))
-    fireEvent.press(getByTestId("confirm-place-location"))
-    await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(true))
+    await waitFor(() => expect(isAddPlaceMounted).toBe(true))
 
     await act(async () => {
       landAbandoned?.({ submitted: true })
@@ -1037,7 +1055,7 @@ describe("MapComponent adding a place", () => {
     // though: the place is on its way to BTC Map either way, and an
     // unannounced success invites a resubmission under a new submission id,
     // which the backend can no longer deduplicate.
-    expect(capturedAddPlaceProps?.isVisible).toBe(true)
+    expect(isAddPlaceMounted).toBe(true)
     expect(mockToastShow).toHaveBeenCalledWith(
       expect.objectContaining({ type: "success" }),
     )
@@ -1061,8 +1079,7 @@ describe("MapComponent adding a place", () => {
 
     await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
     fireEvent.press(getByTestId("open-add-place"))
-    fireEvent.press(getByTestId("confirm-place-location"))
-    await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(true))
+    await waitFor(() => expect(isAddPlaceMounted).toBe(true))
 
     const inFlight = (capturedAddPlaceProps?.onSubmit as SendPlace)(SUBMISSION)
     await waitFor(() => expect(mintAbandoned).toBeDefined())
@@ -1072,8 +1089,7 @@ describe("MapComponent adding a place", () => {
       ;(capturedAddPlaceProps?.onClose as () => void)()
     })
     fireEvent.press(getByTestId("open-add-place"))
-    fireEvent.press(getByTestId("confirm-place-location"))
-    await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(true))
+    await waitFor(() => expect(isAddPlaceMounted).toBe(true))
 
     await act(async () => {
       mintAbandoned?.(abandonedBytes)
@@ -1107,8 +1123,7 @@ describe("MapComponent adding a place", () => {
 
     await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
     fireEvent.press(getByTestId("open-add-place"))
-    fireEvent.press(getByTestId("confirm-place-location"))
-    await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(true))
+    await waitFor(() => expect(isAddPlaceMounted).toBe(true))
 
     const inFlight = (capturedAddPlaceProps?.onSubmit as SendPlace)(SUBMISSION)
     await waitFor(() => expect(mockSubmitPlace).toHaveBeenCalledTimes(1))
@@ -1127,11 +1142,10 @@ describe("MapComponent adding a place", () => {
     )
   })
 
-  it("closes the attempt when the answer lands after the pin went back on the move", async () => {
-    // The form's "Change" is tappable while a send is in flight, so a success
-    // can arrive with the attempt sitting back on the pin-aiming step. Leaving
-    // it open then would let a second send reuse the attempt's submissionId —
-    // which the backend takes as an edit of the place it just accepted.
+  it("takes the pin off the map once BTC Map has the place", async () => {
+    // Leaving the attempt open would let a second send reuse its submissionId,
+    // which the backend takes as an edit of the place it just accepted — and
+    // would leave a pin aimed at a place that is already on its way.
     let land: ((outcome: unknown) => void) | undefined
     mockSubmitPlace.mockImplementationOnce(
       () =>
@@ -1143,17 +1157,14 @@ describe("MapComponent adding a place", () => {
 
     await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
     fireEvent.press(getByTestId("open-add-place"))
-    fireEvent.press(getByTestId("confirm-place-location"))
-    await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(true))
+    await waitFor(() => expect(isAddPlaceMounted).toBe(true))
 
     const inFlight = (capturedAddPlaceProps?.onSubmit as SendPlace)(SUBMISSION)
     await waitFor(() => expect(mockSubmitPlace).toHaveBeenCalledTimes(1))
 
-    // Back to moving the pin while the send is still out.
-    act(() => {
-      ;(capturedAddPlaceProps?.onChangeLocation as () => void)()
-    })
-    await waitFor(() => expect(getByTestId("confirm-place-location")).toBeTruthy())
+    // The map is still there to be panned while the send is out, so the pin is
+    // still on it.
+    expect(getByTestId("place-pin")).toBeTruthy()
 
     await act(async () => {
       land?.({ submitted: true })
@@ -1163,9 +1174,8 @@ describe("MapComponent adding a place", () => {
     expect(mockToastShow).toHaveBeenCalledWith(
       expect.objectContaining({ type: "success" }),
     )
-    // The attempt is over: nothing left aimed at a place BTC Map already has.
-    await waitFor(() => expect(queryByTestId("confirm-place-location")).toBeNull())
-    expect(capturedAddPlaceProps?.isVisible).toBe(false)
+    await waitFor(() => expect(queryByTestId("place-pin")).toBeNull())
+    expect(isAddPlaceMounted).toBe(false)
   })
 
   it("tells the form when the submission id could not be minted", async () => {
@@ -1177,8 +1187,7 @@ describe("MapComponent adding a place", () => {
 
     await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
     fireEvent.press(getByTestId("open-add-place"))
-    fireEvent.press(getByTestId("confirm-place-location"))
-    await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(true))
+    await waitFor(() => expect(isAddPlaceMounted).toBe(true))
 
     const sent = await sendFromForm()
 
@@ -1191,56 +1200,56 @@ describe("MapComponent adding a place", () => {
       expect.any(Error),
     )
     expect(mockSubmitPlace).not.toHaveBeenCalled()
-    expect(capturedAddPlaceProps?.isVisible).toBe(true)
+    expect(isAddPlaceMounted).toBe(true)
   })
 })
 
 describe("MapComponent add-place drafts", () => {
-  const startAndConfirm = (getByTestId: (id: string) => unknown) => {
-    fireEvent.press(getByTestId("open-add-place") as never)
-    fireEvent.press(getByTestId("confirm-place-location") as never)
-  }
-
   it("keeps what has been typed while the pin is moved", async () => {
-    // Going back to the map corrects one of the answers rather than starting
-    // again, so the form that comes back is the same one, still filled in.
+    // Panning corrects one of the answers rather than starting again, so the
+    // form that is still there is the same one, still filled in. A remount is
+    // what would empty it, and the map moving must not cause one.
     const { getByTestId } = renderMap()
 
     await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
-    startAndConfirm(getByTestId)
+    fireEvent.press(getByTestId("open-add-place"))
 
-    await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(true))
+    await waitFor(() => expect(isAddPlaceMounted).toBe(true))
     const mountsBefore = addPlaceMountCount
 
+    const moved = { ...REGION, latitude: 13.496743, longitude: -89.439462 }
     act(() => {
-      ;(capturedAddPlaceProps?.onChangeLocation as () => void)()
+      ;(capturedMapProps?.onRegionChangeComplete as (r: Region) => void)(moved)
     })
-    fireEvent.press(getByTestId("confirm-place-location"))
 
-    await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(true))
+    await waitFor(() =>
+      expect(capturedAddPlaceProps?.location).toEqual({
+        latitude: moved.latitude,
+        longitude: moved.longitude,
+      }),
+    )
     expect(addPlaceMountCount).toBe(mountsBefore)
   })
 
   it("does not carry an abandoned place into the next one", async () => {
-    // Backing out to the map and then cancelling abandons the place. What had
-    // been typed about it must not turn up in the next attempt.
+    // Closing abandons the place, and unmounting the form is what throws away
+    // what had been typed about it. It must not turn up in the next attempt.
     const { getByTestId } = renderMap()
 
     await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
-    startAndConfirm(getByTestId)
+    fireEvent.press(getByTestId("open-add-place"))
 
-    await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(true))
+    await waitFor(() => expect(isAddPlaceMounted).toBe(true))
     const mountsBefore = addPlaceMountCount
 
     act(() => {
-      ;(capturedAddPlaceProps?.onChangeLocation as () => void)()
+      ;(capturedAddPlaceProps?.onClose as () => void)()
     })
-    fireEvent.press(getByTestId("cancel-add-place"))
+    await waitFor(() => expect(isAddPlaceMounted).toBe(false))
 
-    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
-    startAndConfirm(getByTestId)
+    fireEvent.press(getByTestId("open-add-place"))
 
-    await waitFor(() => expect(capturedAddPlaceProps?.isVisible).toBe(true))
+    await waitFor(() => expect(isAddPlaceMounted).toBe(true))
     expect(addPlaceMountCount).toBeGreaterThan(mountsBefore)
   })
 })
