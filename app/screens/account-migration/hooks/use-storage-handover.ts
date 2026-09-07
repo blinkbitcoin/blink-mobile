@@ -74,13 +74,12 @@ export const useStorageHandover = ({
     }
   }, [isDeviceStorageFailure, refetchGateData])
 
-  /** The count belongs to one run of storage failures. A read that finally lands puts the
-   *  user back in the flow, and a failure that turns out to be the network's is not
-   *  evidence about this device, so neither may carry attempts into the next. */
+  /** Only a local read that LANDS ends the run. Resetting when the branch merely goes quiet
+   *  would also fire on a server failure, erasing the evidence every time the signal drops. */
   useEffect(() => {
-    if (isDeviceStorageFailure) return
+    if (hasResumeDataError) return
     setStorageRetryAttempts(0)
-  }, [isDeviceStorageFailure])
+  }, [hasResumeDataError])
 
   const hasExhaustedRetries = storageRetryAttempts >= MAX_RETRIES_BEFORE_STORAGE_HANDOVER
   /** Held back while a retry is in flight: the count rises when one starts, so the last one
