@@ -2,15 +2,9 @@ import { version as asyncStorageVersion } from "@react-native-async-storage/asyn
 
 import {
   classifyStorageFailure,
+  PINNED_ASYNC_STORAGE_VERSION,
   StorageFailure,
 } from "@app/utils/storage/storage-failure"
-
-/**
- * The version the markers were read off. Bumping the library without re-reading its error
- * surface is the way this classifier goes quietly wrong: the strings are that version's
- * wording, and nothing else in the build would notice them drifting.
- */
-const PINNED_ASYNC_STORAGE_VERSION = "2.2.0"
 
 describe("storage failure classification", () => {
   it("is pinned to the async-storage version its markers were read from", () => {
@@ -33,19 +27,33 @@ describe("storage failure classification", () => {
       expectOutOfSpace("error code 13: SQLITE_FULL")
     })
 
-    it("recognizes the POSIX 28 wording on iOS", () => {
-      expectOutOfSpace("The operation couldn't be completed. No space left on device")
-    })
-
-    it("recognizes the NSCocoa 640 wording on iOS", () => {
-      expectOutOfSpace(
-        'You can\u2019t save the file "manifest.json" because the volume is out of space.',
-      )
-    })
-
     it("matches regardless of the casing the platform used", () => {
       expect(classifyStorageFailure(new Error("DATABASE OR DISK IS FULL"))).toBe(
         StorageFailure.OutOfSpace,
+      )
+    })
+  })
+
+  /**
+   * Kept apart from the block above on purpose: these are the right markers for an iOS
+   * NSError, and none of them can reach JavaScript on the path this app takes. Without an
+   * RNCAsyncStorageDelegate — and there is none in ios/ — a failed read arrives as the fixed
+   * "Failed to read storage file." asserted under unknown below, so grouping these with the
+   * reachable Android cases would claim iOS coverage the app does not have. They earn their
+   * place as the contract a future delegate, or a free-space probe, would have to meet.
+   */
+  describe("out of space, on the wordings no iOS build reaches today", () => {
+    const expectOutOfSpace = (message: string): void => {
+      expect(classifyStorageFailure(new Error(message))).toBe(StorageFailure.OutOfSpace)
+    }
+
+    it("would recognize the POSIX 28 wording", () => {
+      expectOutOfSpace("The operation couldn't be completed. No space left on device")
+    })
+
+    it("would recognize the NSCocoa 640 wording", () => {
+      expectOutOfSpace(
+        'You can\u2019t save the file "manifest.json" because the volume is out of space.',
       )
     })
   })
