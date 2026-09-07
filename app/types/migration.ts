@@ -56,6 +56,12 @@ export const MigrationSupportReason = {
   /** The server paid the migration out, but the receive into the new self-custodial
    *  wallet stayed unconfirmed past the notice window — the funds look stuck in transit. */
   ReceiveDelayed: "receive-delayed",
+  /** The proof the lightning-address re-point signs could not be built on this device: the
+   *  SDK answered with a failure, or the keychain threw. The commit signs the same proof
+   *  through the same chain, so it would fail moments later — this is the one re-point
+   *  outcome the migration cannot carry on past. An address the server merely refused is
+   *  not: the funds move regardless and the commit screen says so. */
+  LnAddressTransferFailed: "ln-address-transfer-failed",
   /** The server refused to close the emptied custodial account for good (the phone-deletion
    *  cap). The migration itself finished; the account stays open until support removes it. */
   CustodialAccountCloseRefused: "custodial-account-close-refused",
@@ -121,6 +127,13 @@ export type MigrationSupportOrigin =
  * How the lightning-address re-point onto the migrated account ended: one value rather than
  * a bag of booleans, because the kinds are mutually exclusive and each earns a different
  * answer from the commit screen.
+ *
+ * The line that matters runs between a proof that could not be BUILT and an address the
+ * server REFUSED. The commit signs the same proof through the same SDK chain, so a proof
+ * failure is a failure the commit shares and the migration cannot promise past. A refusal
+ * is the address alone: the funds move regardless, so the screen says the address did not
+ * move and lets the commit through rather than stranding the user at the point of no return
+ * (blink-wip#1211).
  */
 export const MigrationLnAddressOutcome = {
   /** Nothing has answered yet: an attempt is in flight, or none fired for want of an id. */
@@ -131,8 +144,11 @@ export const MigrationLnAddressOutcome = {
   ConnectionIssue: "connection-issue",
   /** No device key for the account (a reinstall), the same cause the commit reports. */
   AccountMissing: "account-missing",
-  /** Any other settled failure a retry would only replay. */
+  /** The address did not move and a retry would only replay the same answer: the server
+   *  refused it, or answered without moving it. The commit's own proof is unaffected. */
   Rejected: "rejected",
+  /** The proof could not be built on this device, which breaks the commit too. */
+  ProofFailed: "proof-failed",
 } as const
 
 export type MigrationLnAddressOutcome =

@@ -979,11 +979,42 @@ describe("MigrationBalancesOverviewScreen lightning-address re-point gating", ()
     })
   })
 
+  /**
+   * The one re-point failure that still ends the migration: the commit signs the same proof
+   * through the same SDK chain, so promising the funds would move anyway would break that
+   * promise moments later, and the ticket would say the transfer failed rather than that
+   * the device could not sign.
+   */
+  it("hands over to support when the re-point's proof could not be built", async () => {
+    mockLnAddressTransfer = lnTransferWith(MigrationLnAddressOutcome.ProofFailed)
+    renderScreen()
+    await flushEffects()
+
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
+      reason: "ln-address-transfer-failed",
+      origin: "commit",
+    })
+  })
+
+  /** And it is not the refusal's banner: a proof that could not be built says nothing about
+   *  the address, so the screen must not claim it stayed behind. */
+  it("does not show the address caveat when the proof could not be built", async () => {
+    mockLnAddressTransfer = lnTransferWith(MigrationLnAddressOutcome.ProofFailed)
+    const { queryByText } = renderScreen()
+    await flushEffects()
+
+    expect(
+      queryByText(
+        "Your Lightning address could not be moved. Your funds will still be transferred.",
+      ),
+    ).toBeNull()
+  })
+
   /** When both preconditions fail at once, the start is the cause support hears about: it
    *  leads the handover chain, so one ticket names the root rather than the follow-on. */
   it("names the refused start when both the start and the re-point fail", async () => {
     mockMigrationStart.mockResolvedValue(rejectedMigrationStart)
-    mockLnAddressTransfer = lnTransferWith(MigrationLnAddressOutcome.Rejected)
+    mockLnAddressTransfer = lnTransferWith(MigrationLnAddressOutcome.ProofFailed)
     renderScreen()
     await flushEffects()
 

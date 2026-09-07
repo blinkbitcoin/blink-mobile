@@ -115,13 +115,15 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
     })
 
   /** Each kind earns a different answer below, so each is named where it is read rather
-   *  than compared inline: the address moved, the attempt was refused, the device has no
-   *  key for the account, or the network dropped the attempt. */
+   *  than compared inline: the address moved, the server refused it, the device has no key
+   *  for the account, the proof could not be built, or the network dropped the attempt. */
   const isLnAddressTransferred =
     lnAddressOutcome === MigrationLnAddressOutcome.Transferred
   const isLnAddressRejected = lnAddressOutcome === MigrationLnAddressOutcome.Rejected
   const isLnAddressAccountMissing =
     lnAddressOutcome === MigrationLnAddressOutcome.AccountMissing
+  const isLnAddressProofFailed =
+    lnAddressOutcome === MigrationLnAddressOutcome.ProofFailed
   const hasLnAddressConnectionIssue =
     lnAddressOutcome === MigrationLnAddressOutcome.ConnectionIssue
 
@@ -138,34 +140,44 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
   }, [isFocused, checkpointLoading, expectedReceiveSats, saveCheckpoint])
 
   /**
-   * The ways this screen ends without an Approve to offer, as one value: the preview
-   * settled empty, the wallet query failed, the server refused to start, or the
-   * lightning-address re-point failed. Each strands the user here where the hardware back
-   * is swallowed, and each is as final as the others, so support takes over rather than
-   * leaving an Approve that would commit into a flow the backend already declined. A
-   * re-point still waiting on its account ids only keeps Approve off (never a false
-   * handover on a transient skip); the always-present contact-support button is its escape.
-   * Null means none of them.
+   * The ways this screen ends without an Approve to offer, as one value: the preview settled
+   * empty, the wallet query failed, the server refused to start, the re-point found no
+   * device key, or the proof it signs could not be built. Each strands the user here where
+   * the hardware back is swallowed, and each is as final as the others, so support takes
+   * over rather than leaving an Approve that would commit into a flow the backend already
+   * declined.
+   *
+   * An address the server REFUSED is deliberately not one of them: it breaks nothing the
+   * commit needs, so it draws the banner below and the migration carries on. A re-point
+   * still waiting on its account ids only keeps Approve off (never a false handover on a
+   * transient skip); the always-present contact-support button is its escape. Null means
+   * none of them.
    */
   const startFailureReason = migrationStart.isRejected
     ? MigrationSupportReason.StartRefused
     : null
-  /** The one re-point outcome that still hands over: a missing device key is the same cause
-   *  the commit reports, and it breaks the commit too. A refused re-point does not, which is
-   *  the whole point of the settled check below. */
+  /** The two re-point outcomes that still hand over, both of them failures of the device
+   *  rather than of the address: a missing device key is the same cause the commit reports,
+   *  and a proof that could not be built breaks the commit the same way, since it signs the
+   *  same proof through the same SDK chain. */
   const lnAddressMissingReason = isLnAddressAccountMissing
     ? MigrationSupportReason.SelfCustodialAccountMissing
     : null
+  const lnAddressProofFailureReason = isLnAddressProofFailed
+    ? MigrationSupportReason.LnAddressTransferFailed
+    : null
 
   /**
-   * The re-point is done as far as the migration is concerned: the address either moved or
-   * was refused, and neither leaves anything else to wait for.
+   * The re-point is done as far as the commit is concerned: the address either moved or was
+   * refused, and neither leaves anything else to wait for.
    *
    * A refusal used to end the migration here. It must not: the address is a convenience and
    * the funds are not, so a user whose address cannot move is left with an account locked
-   * server-side and no way to reach their money (blink-wip#1211). It is also the state every
-   * retry of an interrupted migration lands in, since the address has already moved to the
-   * pubkey of the attempt that failed and the lnurl server will refuse to move it again.
+   * server-side and no way to reach their money (blink-wip#1211). An interrupted migration
+   * that resumes does NOT ordinarily land here — it reuses the pending wallet, so the same
+   * pubkey comes back already transferred — but one that provisions a fresh account does:
+   * the address is parked on the pubkey of the attempt that failed, which the user no longer
+   * holds, and the lnurl server will refuse to move it again.
    */
   const isLnAddressSettled = isLnAddressTransferred || isLnAddressRejected
 
@@ -218,6 +230,7 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
     failedReason ??
     startFailureReason ??
     lnAddressMissingReason ??
+    lnAddressProofFailureReason ??
     missingOwnerFailureReason ??
     preview.unavailableReason
 

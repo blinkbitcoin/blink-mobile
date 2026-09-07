@@ -196,7 +196,13 @@ describe("useMigrationLnAddressTransfer", () => {
     expect(mockBuildProof).toHaveBeenCalledTimes(1)
   })
 
-  it("hands a failed proof to support", async () => {
+  /**
+   * A device that cannot sign is not an address the server refused, and the two must not
+   * share an outcome: the commit signs the same proof through the same SDK chain, so
+   * telling this user their funds move anyway would break the promise moments later. It is
+   * the one re-point failure the migration still hands over.
+   */
+  it("settles a failed proof apart from a refusal, as a proof failure", async () => {
     mockBuildProof.mockResolvedValue({
       status: MigrationSdkStatus.Failed,
       error: new Error("sdk down"),
@@ -204,11 +210,28 @@ describe("useMigrationLnAddressTransfer", () => {
     const { result } = renderTransfer()
     await flushEffects()
 
-    expect(result.current.outcome).toBe(MigrationLnAddressOutcome.Rejected)
+    expect(result.current.outcome).toBe(MigrationLnAddressOutcome.ProofFailed)
     expect(mockReportError).toHaveBeenCalledWith(
       "Migration ln-address proof",
       expect.objectContaining({ message: "sdk down" }),
     )
+  })
+
+  /** A proof failure is as terminal as a missing device key: the same SDK would answer the
+   *  same way, so a retry only spends another connect-and-sign on it. */
+  it("does not retry after a failed proof", async () => {
+    mockBuildProof.mockResolvedValue({
+      status: MigrationSdkStatus.Failed,
+      error: new Error("sdk down"),
+    })
+    const { result } = renderTransfer()
+    await flushEffects()
+    expect(result.current.outcome).toBe(MigrationLnAddressOutcome.ProofFailed)
+
+    act(() => result.current.retry())
+    await flushEffects()
+
+    expect(mockBuildProof).toHaveBeenCalledTimes(1)
   })
 
   /** A dropped connection while signing the proof is retryable, not settled: it offers the
@@ -416,20 +439,20 @@ describe("useMigrationLnAddressTransfer", () => {
 
   /**
    * The proof is built before `run`'s own try, so a keychain that throws rejects it. That
-   * is a settled failure a retry only replays, not a wait that ran out, and support must
-   * not be told the attempt stalled when it threw.
+   * is a failure of the proof the commit signs too, not a wait that ran out, and support
+   * must not be told the attempt stalled when it threw.
    *
    * A stall stays retryable however often it happens: the attempt may still be in the air,
    * and the screen keeps its contact-support button on throughout, so a retry that cannot
    * land is never the user's only way out.
    */
-  it("hands a throw before the mutation to support rather than reporting a stall", async () => {
+  it("settles a throw before the mutation as a proof failure rather than a stall", async () => {
     mockBuildProof.mockRejectedValue(new Error("keychain unavailable"))
 
     const { result } = renderTransfer()
     await flushEffects()
 
-    expect(result.current.outcome).toBe(MigrationLnAddressOutcome.Rejected)
+    expect(result.current.outcome).toBe(MigrationLnAddressOutcome.ProofFailed)
     expect(mockReportError).toHaveBeenCalledWith(
       "Migration ln-address threw",
       expect.any(Error),

@@ -70,8 +70,8 @@ const STALLED = "stalled" as const
 type AttemptOutcome = MigrationLnAddressOutcome | typeof STALLED
 
 /** The outcomes a fresh attempt could still change. Everything else is settled: a rejection
- *  would replay the same answer, a missing device key cannot be conjured back, and a
- *  completed transfer would re-run the expensive connect-and-sign for nothing. */
+ *  or a failed proof would replay the same answer, a missing device key cannot be conjured
+ *  back, and a completed transfer would re-run the expensive connect-and-sign for nothing. */
 const RETRYABLE_OUTCOMES: ReadonlySet<MigrationLnAddressOutcome> = new Set([
   MigrationLnAddressOutcome.Pending,
   MigrationLnAddressOutcome.ConnectionIssue,
@@ -84,6 +84,11 @@ const RETRYABLE_OUTCOMES: ReadonlySet<MigrationLnAddressOutcome> = new Set([
  * top-level rejection) is a settled outcome, since ALREADY_TRANSFERRED and
  * SKIPPED_NOT_REGISTERED mean there was nothing left to move. The backend mutation is
  * idempotent, so a retry after a dropped network never double-registers.
+ *
+ * A failure of the address and a failure of the PROOF are reported apart, because the commit
+ * shares only the second: it signs the same proof through the same SDK chain, so telling a
+ * user whose device cannot sign that their funds will move anyway would be a promise broken
+ * moments later. See `MigrationLnAddressOutcome`.
  */
 export const useMigrationLnAddressTransfer = ({
   custodialAccountId,
@@ -161,9 +166,12 @@ export const useMigrationLnAddressTransfer = ({
         return MigrationLnAddressOutcome.AccountMissing
       }
 
+      /** Not a refusal of the address but of the device that had to sign for it, and the
+       *  commit signs the same proof through the same chain: it would fail moments later,
+       *  so this is the one re-point outcome that still hands the migration over. */
       if (proof.status !== MigrationSdkStatus.Ok) {
         reportError("Migration ln-address proof", proof.error)
-        return MigrationLnAddressOutcome.Rejected
+        return MigrationLnAddressOutcome.ProofFailed
       }
 
       try {
@@ -177,6 +185,10 @@ export const useMigrationLnAddressTransfer = ({
           },
         })
 
+        /** An answer with nothing in it leaves the address unaccounted for, so it settles
+         *  as a rejection rather than a success. Not a proof failure: the signature the
+         *  commit needs was produced, so the commit is unaffected and stranding the user
+         *  over an answer the address never gave would be the dead end this hook avoids. */
         const payload = data?.migrationLnAddressTransfer
         if (!payload) {
           reportError(
@@ -206,7 +218,9 @@ export const useMigrationLnAddressTransfer = ({
         const isRetryable = isNetworkFailure(err)
 
         /** A mutation the network never delivered can still land, so support never hears
-         *  about it; the caller's retry is what sends the next one. */
+         *  about it; the caller's retry is what sends the next one. A throw that is not the
+         *  network is a rejection rather than a proof failure: the proof was already signed
+         *  by the time the mutation went out, so the commit still has one. */
         if (!isRetryable) reportError("Migration ln-address failed", err)
         return isRetryable
           ? MigrationLnAddressOutcome.ConnectionIssue
@@ -226,15 +240,15 @@ export const useMigrationLnAddressTransfer = ({
     firedAttemptRef.current = attempt
 
     /** `run` settles every failure it can name, but the proof is built before its own try:
-     *  a keychain that throws rejects it, which is a settled failure a retry only replays,
-     *  not the wait running out. Named apart so the bound below is the only thing left that
-     *  can reject, and so support is never told an attempt stalled that in fact threw. */
+     *  a keychain that throws rejects it, which is a failure of the proof the commit signs
+     *  too, not the wait running out. Named apart so the bound below is the only thing left
+     *  that can reject, and so support is never told an attempt stalled that in fact threw. */
     const settledAttempt: Promise<AttemptOutcome> = run(
       custodialAccountId,
       selfCustodialAccountId,
     ).catch((err) => {
       reportError("Migration ln-address threw", err)
-      return MigrationLnAddressOutcome.Rejected
+      return MigrationLnAddressOutcome.ProofFailed
     })
 
     const attemptWithinBound = withTimeout(
