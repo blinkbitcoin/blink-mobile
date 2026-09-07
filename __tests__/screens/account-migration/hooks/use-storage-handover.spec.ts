@@ -99,8 +99,27 @@ describe("useStorageHandover", () => {
     expect(result.current.shouldOfferHandover).toBe(true)
   })
 
-  /** The run ends when a read finally lands, and its attempts must not carry into the
-   *  next one. */
+  /** The regression this guards: the reset used to fire when a server read failed, erasing
+   *  attempts on every signal drop and putting the escape out of reach. */
+  it("keeps the attempts a dropped connection interrupted", async () => {
+    const { result, rerender } = renderHandover()
+
+    await retryTimes(result, MAX_RETRIES_BEFORE_STORAGE_HANDOVER - 1)
+
+    /** The tunnel: the server reads fail too, so the storage branch goes quiet. */
+    rerender({ hasServerDataError: true })
+    await flushEffects()
+    /** And back out of it, with the store still refusing to answer. */
+    rerender({ hasServerDataError: false })
+    await flushEffects()
+
+    await retryTimes(result, 1)
+
+    expect(result.current.shouldOfferHandover).toBe(true)
+  })
+
+  /** The other half of the same rule: a local read that LANDS is the run ending, and its
+   *  attempts must not carry into the next one. */
   it("forgets the attempts once the store has answered", async () => {
     const { result, rerender } = renderHandover()
 
