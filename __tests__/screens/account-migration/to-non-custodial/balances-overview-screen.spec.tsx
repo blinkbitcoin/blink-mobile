@@ -8,6 +8,7 @@ import { loadLocale } from "@app/i18n/i18n-util.sync"
 
 import { MigrationCheckpoint } from "@app/screens/account-migration/hooks"
 import { MigrationBalancesOverviewScreen } from "@app/screens/account-migration/to-non-custodial/balances-overview-screen"
+import { MigrationLnAddressOutcome } from "@app/types/migration"
 import { ContextForScreen } from "../../helper"
 import { walletOverviewQueryResult } from "../helpers"
 import { flushEffects } from "../../../helpers/flush-effects"
@@ -104,13 +105,11 @@ let mockCheckpointLoading = false
 let mockCheckpointAccountId: string | null = "sc-account-1"
 let mockOwnerId: string | null = "owner-1"
 const mockLnRetry = jest.fn()
-let mockLnAddressTransfer = {
-  isTransferred: true,
-  isRejected: false,
-  isAccountMissing: false,
-  hasConnectionIssue: false,
+const lnTransferWith = (outcome: MigrationLnAddressOutcome) => ({
+  outcome,
   retry: mockLnRetry,
-}
+})
+let mockLnAddressTransfer = lnTransferWith(MigrationLnAddressOutcome.Transferred)
 
 let mockCheckpointHasError = false
 const mockRefetchCheckpoint = jest.fn()
@@ -150,13 +149,7 @@ jest.mock("@app/screens/account-migration/hooks/use-custodial-owner-id", () => (
 
 /** The re-point as it stands before it has answered: nothing moved, nothing failed. The
  *  state every id that never arrived leaves it in, since it cannot fire without them. */
-const unsettledLnTransfer = () => ({
-  isTransferred: false,
-  isRejected: false,
-  isAccountMissing: false,
-  hasConnectionIssue: false,
-  retry: mockLnRetry,
-})
+const unsettledLnTransfer = () => lnTransferWith(MigrationLnAddressOutcome.Pending)
 
 const mockUseLnAddressTransfer = jest.fn()
 jest.mock(
@@ -248,13 +241,7 @@ const resetScreenMocks = () => {
   mockCheckpointHasError = false
   mockRefetchOwnerId.mockResolvedValue(undefined)
   mockRefetchCheckpoint.mockResolvedValue(undefined)
-  mockLnAddressTransfer = {
-    isTransferred: true,
-    isRejected: false,
-    isAccountMissing: false,
-    hasConnectionIssue: false,
-    retry: mockLnRetry,
-  }
+  mockLnAddressTransfer = lnTransferWith(MigrationLnAddressOutcome.Transferred)
   mockIsFocused = true
   mockIsAuthed = true
   mockUseWalletOverviewScreenQuery.mockReturnValue(
@@ -936,13 +923,7 @@ describe("MigrationBalancesOverviewScreen lightning-address re-point gating", ()
    * locked server-side and no way to reach their funds (blink-wip#1211). The address is a
    * convenience; the money is not.
    */
-  const rejectedLnAddressTransfer = {
-    isTransferred: false,
-    isRejected: true,
-    isAccountMissing: false,
-    hasConnectionIssue: false,
-    retry: mockLnRetry,
-  }
+  const rejectedLnAddressTransfer = lnTransferWith(MigrationLnAddressOutcome.Rejected)
 
   it("does not hand over to support when the lightning-address re-point fails", async () => {
     mockLnAddressTransfer = rejectedLnAddressTransfer
@@ -988,13 +969,7 @@ describe("MigrationBalancesOverviewScreen lightning-address re-point gating", ()
   /** A re-point that failed for a missing device key is the same cause the commit reports,
    *  so support gets that reason, not the generic re-point failure. */
   it("names a missing device key on the re-point as account-missing", async () => {
-    mockLnAddressTransfer = {
-      isTransferred: false,
-      isRejected: false,
-      isAccountMissing: true,
-      hasConnectionIssue: false,
-      retry: mockLnRetry,
-    }
+    mockLnAddressTransfer = lnTransferWith(MigrationLnAddressOutcome.AccountMissing)
     renderScreen()
     await flushEffects()
 
@@ -1008,13 +983,7 @@ describe("MigrationBalancesOverviewScreen lightning-address re-point gating", ()
    *  leads the handover chain, so one ticket names the root rather than the follow-on. */
   it("names the refused start when both the start and the re-point fail", async () => {
     mockMigrationStart.mockResolvedValue(rejectedMigrationStart)
-    mockLnAddressTransfer = {
-      isTransferred: false,
-      isRejected: true,
-      isAccountMissing: false,
-      hasConnectionIssue: false,
-      retry: mockLnRetry,
-    }
+    mockLnAddressTransfer = lnTransferWith(MigrationLnAddressOutcome.Rejected)
     renderScreen()
     await flushEffects()
 
@@ -1026,13 +995,7 @@ describe("MigrationBalancesOverviewScreen lightning-address re-point gating", ()
 
   /** In-flight is not a failure: Approve stays off, but the user is NOT sent to support. */
   it("keeps Approve off until the lightning address has moved, without a handover", async () => {
-    mockLnAddressTransfer = {
-      isTransferred: false,
-      isRejected: false,
-      isAccountMissing: false,
-      hasConnectionIssue: false,
-      retry: mockLnRetry,
-    }
+    mockLnAddressTransfer = unsettledLnTransfer()
     renderScreen()
     await flushEffects()
 
@@ -1054,13 +1017,7 @@ describe("MigrationBalancesOverviewScreen lightning-address re-point gating", ()
   })
 
   it("retries the re-point along with the rest when it loses the network", async () => {
-    mockLnAddressTransfer = {
-      isTransferred: false,
-      isRejected: false,
-      isAccountMissing: false,
-      hasConnectionIssue: true,
-      retry: mockLnRetry,
-    }
+    mockLnAddressTransfer = lnTransferWith(MigrationLnAddressOutcome.ConnectionIssue)
     mockUseMigrationQuery.mockReturnValue({
       ...migrationQueryResult({
         balanceSats: 1000,

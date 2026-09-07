@@ -13,6 +13,7 @@ import {
   buildMigrationLnAddressProof,
   MigrationSdkStatus,
 } from "@app/self-custodial/migration-transfer-request"
+import { MigrationLnAddressOutcome } from "@app/types/migration"
 import { reportError } from "@app/utils/error-logging"
 import { withTimeout } from "@app/utils/with-timeout"
 
@@ -54,30 +55,27 @@ type UseMigrationLnAddressTransferArgs = {
 }
 
 type UseMigrationLnAddressTransfer = {
-  isTransferred: boolean
-  isRejected: boolean
-  /** No device key for the account (reinstall); distinct so the screen reuses the commit reason. */
-  isAccountMissing: boolean
-  hasConnectionIssue: boolean
+  /** The single state the screen reads: the kinds are mutually exclusive, and the screen
+   *  answers each one differently. */
+  outcome: MigrationLnAddressOutcome
   retry: () => void
 }
 
-/** transferred = every identifier settled (moved, already moved, or nothing to move);
- *  connection-issue = the network never delivered the mutation, so a retry can still land;
- *  account-missing = the device has no key for the account (a reinstall), the same cause the
- *  commit reports; rejected = any other settled failure a retry only replays, so support
- *  takes over. */
-const LnAddressOutcome = {
-  Transferred: "transferred",
-  ConnectionIssue: "connection-issue",
-  AccountMissing: "account-missing",
-  Rejected: "rejected",
-  /** The bound ran out before the attempt answered. Carried apart from the kinds above so
-   *  the report it earns is filed where superseded answers are already dropped. */
-  Stalled: "stalled",
-} as const
+/** The bound ran out before the attempt answered. Carried apart from the kinds the screen
+ *  reads so the report it earns is filed where superseded answers are already dropped, and
+ *  so the screen is never handed a kind it has no answer for: a stall settles as a
+ *  connection issue. */
+const STALLED = "stalled" as const
 
-type LnAddressOutcome = (typeof LnAddressOutcome)[keyof typeof LnAddressOutcome]
+type AttemptOutcome = MigrationLnAddressOutcome | typeof STALLED
+
+/** The outcomes a fresh attempt could still change. Everything else is settled: a rejection
+ *  would replay the same answer, a missing device key cannot be conjured back, and a
+ *  completed transfer would re-run the expensive connect-and-sign for nothing. */
+const RETRYABLE_OUTCOMES: ReadonlySet<MigrationLnAddressOutcome> = new Set([
+  MigrationLnAddressOutcome.Pending,
+  MigrationLnAddressOutcome.ConnectionIssue,
+])
 
 /**
  * Re-points the custodial lightning address(es) onto the freshly migrated self-custodial
@@ -96,10 +94,9 @@ export const useMigrationLnAddressTransfer = ({
   const { selfCustodialDepositClaimLeewayVbyte } = useRemoteConfig()
   const [transferLnAddress] = useMigrationLnAddressTransferMutation()
 
-  const [isTransferred, setIsTransferred] = useState(false)
-  const [isRejected, setIsRejected] = useState(false)
-  const [isAccountMissing, setIsAccountMissing] = useState(false)
-  const [hasConnectionIssue, setHasConnectionIssue] = useState(false)
+  const [outcome, setOutcome] = useState<MigrationLnAddressOutcome>(
+    MigrationLnAddressOutcome.Pending,
+  )
   const [attempt, setAttempt] = useState(0)
 
   /** Which attempt already went out, claimed before the request rather than after it
@@ -119,22 +116,24 @@ export const useMigrationLnAddressTransfer = ({
   }, [])
 
   /**
-   * Only an unsettled connection issue retries: a settled rejection or a missing device key
-   * would replay the same answer, and a completed transfer would re-run the expensive
-   * connect-and-sign for nothing (the shared retry fires for any of the screen's sources).
+   * Only an unsettled outcome retries, per `RETRYABLE_OUTCOMES` above (the shared retry
+   * fires for any of the screen's sources, so a settled one has to refuse for itself).
    *
    * An attempt still in the air is deliberately NOT excluded: after a stall the next one
    * queues behind it on the per-directory lock, which is exactly what lets a merely slow
    * connect-and-sign be followed by an attempt that lands once it finishes.
    */
   const retry = useCallback(() => {
-    if (isRejected || isTransferred || isAccountMissing) return
-    setHasConnectionIssue(false)
+    if (!RETRYABLE_OUTCOMES.has(outcome)) return
+    setOutcome(MigrationLnAddressOutcome.Pending)
     setAttempt((previous) => previous + 1)
-  }, [isRejected, isTransferred, isAccountMissing])
+  }, [outcome])
 
   const run = useCallback(
-    async (custodialId: string, selfCustodialId: string): Promise<LnAddressOutcome> => {
+    async (
+      custodialId: string,
+      selfCustodialId: string,
+    ): Promise<MigrationLnAddressOutcome> => {
       const proofTimestamp = currentProofTimestamp()
       const proof = await buildMigrationLnAddressProof({
         accountId: selfCustodialId,
@@ -151,7 +150,7 @@ export const useMigrationLnAddressTransfer = ({
       /** A dropped connection during the connect or the sign can be sent again, so it
        *  offers the shared retry rather than handing the user to support. */
       if (proof.status === MigrationSdkStatus.ConnectionError)
-        return LnAddressOutcome.ConnectionIssue
+        return MigrationLnAddressOutcome.ConnectionIssue
 
       /** No device key (reinstall): hand over as account-missing, like the commit path. */
       if (proof.status === MigrationSdkStatus.NoMnemonic) {
@@ -159,12 +158,12 @@ export const useMigrationLnAddressTransfer = ({
           "Migration ln-address account missing",
           new Error("No mnemonic for the provisioned account"),
         )
-        return LnAddressOutcome.AccountMissing
+        return MigrationLnAddressOutcome.AccountMissing
       }
 
       if (proof.status !== MigrationSdkStatus.Ok) {
         reportError("Migration ln-address proof", proof.error)
-        return LnAddressOutcome.Rejected
+        return MigrationLnAddressOutcome.Rejected
       }
 
       try {
@@ -184,7 +183,7 @@ export const useMigrationLnAddressTransfer = ({
             "Migration ln-address empty payload",
             new Error("migrationLnAddressTransfer returned no payload"),
           )
-          return LnAddressOutcome.Rejected
+          return MigrationLnAddressOutcome.Rejected
         }
 
         const [rejection] = payload.errors
@@ -199,16 +198,19 @@ export const useMigrationLnAddressTransfer = ({
             "Migration ln-address result failed",
             new Error(failedResults.map((result) => result.identifier).join(", ")),
           )
-        if (rejection || failedResults.length > 0) return LnAddressOutcome.Rejected
+        if (rejection || failedResults.length > 0)
+          return MigrationLnAddressOutcome.Rejected
 
-        return LnAddressOutcome.Transferred
+        return MigrationLnAddressOutcome.Transferred
       } catch (err) {
         const isRetryable = isNetworkFailure(err)
 
         /** A mutation the network never delivered can still land, so support never hears
          *  about it; the caller's retry is what sends the next one. */
         if (!isRetryable) reportError("Migration ln-address failed", err)
-        return isRetryable ? LnAddressOutcome.ConnectionIssue : LnAddressOutcome.Rejected
+        return isRetryable
+          ? MigrationLnAddressOutcome.ConnectionIssue
+          : MigrationLnAddressOutcome.Rejected
       }
     },
     [network, selfCustodialDepositClaimLeewayVbyte, transferLnAddress],
@@ -227,18 +229,19 @@ export const useMigrationLnAddressTransfer = ({
      *  a keychain that throws rejects it, which is a settled failure a retry only replays,
      *  not the wait running out. Named apart so the bound below is the only thing left that
      *  can reject, and so support is never told an attempt stalled that in fact threw. */
-    const settledAttempt = run(custodialAccountId, selfCustodialAccountId).catch(
-      (err) => {
-        reportError("Migration ln-address threw", err)
-        return LnAddressOutcome.Rejected
-      },
-    )
+    const settledAttempt: Promise<AttemptOutcome> = run(
+      custodialAccountId,
+      selfCustodialAccountId,
+    ).catch((err) => {
+      reportError("Migration ln-address threw", err)
+      return MigrationLnAddressOutcome.Rejected
+    })
 
     const attemptWithinBound = withTimeout(
       settledAttempt,
       LN_ADDRESS_TRANSFER_TIMEOUT_MS,
       "Migration ln-address re-point",
-    ).catch(() => LnAddressOutcome.Stalled)
+    ).catch((): AttemptOutcome => STALLED)
 
     /**
      * Dropped only when something newer owns the answer: the hook is gone, or a later
@@ -257,24 +260,21 @@ export const useMigrationLnAddressTransfer = ({
      * contact-support button on screen throughout, so a retry that cannot land is never the
      * user's only way out.
      */
-    attemptWithinBound.then((outcome) => {
+    attemptWithinBound.then((attemptOutcome) => {
       if (!isMountedRef.current || firedAttemptRef.current !== attempt) return
 
-      if (outcome === LnAddressOutcome.Stalled) {
+      if (attemptOutcome === STALLED) {
         reportError(
           "Migration ln-address stalled",
           new Error(`Re-point did not answer within ${LN_ADDRESS_TRANSFER_TIMEOUT_MS}ms`),
         )
-        setHasConnectionIssue(true)
+        setOutcome(MigrationLnAddressOutcome.ConnectionIssue)
         return
       }
 
-      if (outcome === LnAddressOutcome.Transferred) setIsTransferred(true)
-      else if (outcome === LnAddressOutcome.ConnectionIssue) setHasConnectionIssue(true)
-      else if (outcome === LnAddressOutcome.AccountMissing) setIsAccountMissing(true)
-      else setIsRejected(true)
+      setOutcome(attemptOutcome)
     })
   }, [skip, attempt, custodialAccountId, selfCustodialAccountId, run])
 
-  return { isTransferred, isRejected, isAccountMissing, hasConnectionIssue, retry }
+  return { outcome, retry }
 }

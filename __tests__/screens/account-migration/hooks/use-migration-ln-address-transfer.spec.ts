@@ -6,6 +6,7 @@ import {
   useMigrationLnAddressTransfer,
 } from "@app/screens/account-migration/hooks/use-migration-ln-address-transfer"
 import { MigrationSdkStatus } from "@app/self-custodial/migration-transfer-request"
+import { MigrationLnAddressOutcome } from "@app/types/migration"
 
 import { flushEffects } from "../../../helpers/flush-effects"
 
@@ -124,8 +125,7 @@ describe("useMigrationLnAddressTransfer", () => {
     const { result } = renderTransfer()
     await flushEffects()
 
-    expect(result.current.isTransferred).toBe(true)
-    expect(result.current.isRejected).toBe(false)
+    expect(result.current.outcome).toBe(MigrationLnAddressOutcome.Transferred)
   })
 
   /** Nothing left to move is still a settled outcome, not a failure. */
@@ -145,7 +145,7 @@ describe("useMigrationLnAddressTransfer", () => {
     const { result } = renderTransfer()
     await flushEffects()
 
-    expect(result.current.isTransferred).toBe(true)
+    expect(result.current.outcome).toBe(MigrationLnAddressOutcome.Transferred)
   })
 
   /** No identifiers to move is a settled success; a missing payload is not — it is an
@@ -155,7 +155,7 @@ describe("useMigrationLnAddressTransfer", () => {
     const { result } = renderTransfer()
     await flushEffects()
 
-    expect(result.current.isTransferred).toBe(true)
+    expect(result.current.outcome).toBe(MigrationLnAddressOutcome.Transferred)
   })
 
   it("hands an empty payload to support rather than a false success", async () => {
@@ -163,8 +163,7 @@ describe("useMigrationLnAddressTransfer", () => {
     const { result } = renderTransfer()
     await flushEffects()
 
-    expect(result.current.isRejected).toBe(true)
-    expect(result.current.isTransferred).toBe(false)
+    expect(result.current.outcome).toBe(MigrationLnAddressOutcome.Rejected)
     expect(mockReportError).toHaveBeenCalledWith(
       "Migration ln-address empty payload",
       expect.any(Error),
@@ -176,8 +175,7 @@ describe("useMigrationLnAddressTransfer", () => {
     const { result } = renderTransfer()
     await flushEffects()
 
-    expect(result.current.isAccountMissing).toBe(true)
-    expect(result.current.isRejected).toBe(false)
+    expect(result.current.outcome).toBe(MigrationLnAddressOutcome.AccountMissing)
     expect(mockTransfer).not.toHaveBeenCalled()
     expect(mockReportError).toHaveBeenCalledWith(
       "Migration ln-address account missing",
@@ -190,7 +188,7 @@ describe("useMigrationLnAddressTransfer", () => {
     mockBuildProof.mockResolvedValue({ status: MigrationSdkStatus.NoMnemonic })
     const { result } = renderTransfer()
     await flushEffects()
-    expect(result.current.isAccountMissing).toBe(true)
+    expect(result.current.outcome).toBe(MigrationLnAddressOutcome.AccountMissing)
 
     act(() => result.current.retry())
     await flushEffects()
@@ -206,7 +204,7 @@ describe("useMigrationLnAddressTransfer", () => {
     const { result } = renderTransfer()
     await flushEffects()
 
-    expect(result.current.isRejected).toBe(true)
+    expect(result.current.outcome).toBe(MigrationLnAddressOutcome.Rejected)
     expect(mockReportError).toHaveBeenCalledWith(
       "Migration ln-address proof",
       expect.objectContaining({ message: "sdk down" }),
@@ -223,8 +221,7 @@ describe("useMigrationLnAddressTransfer", () => {
     const { result } = renderTransfer()
     await flushEffects()
 
-    expect(result.current.hasConnectionIssue).toBe(true)
-    expect(result.current.isRejected).toBe(false)
+    expect(result.current.outcome).toBe(MigrationLnAddressOutcome.ConnectionIssue)
     expect(mockTransfer).not.toHaveBeenCalled()
     expect(mockReportError).not.toHaveBeenCalled()
   })
@@ -238,12 +235,12 @@ describe("useMigrationLnAddressTransfer", () => {
       .mockResolvedValue(okProof)
     const { result } = renderTransfer()
     await flushEffects()
-    expect(result.current.hasConnectionIssue).toBe(true)
+    expect(result.current.outcome).toBe(MigrationLnAddressOutcome.ConnectionIssue)
 
     act(() => result.current.retry())
     await flushEffects()
 
-    expect(result.current.isTransferred).toBe(true)
+    expect(result.current.outcome).toBe(MigrationLnAddressOutcome.Transferred)
     expect(mockTransfer).toHaveBeenCalledTimes(1)
   })
 
@@ -252,7 +249,7 @@ describe("useMigrationLnAddressTransfer", () => {
     const { result } = renderTransfer()
     await flushEffects()
 
-    expect(result.current.isRejected).toBe(true)
+    expect(result.current.outcome).toBe(MigrationLnAddressOutcome.Rejected)
     expect(mockReportError).toHaveBeenCalledWith(
       "Migration ln-address rejected",
       expect.objectContaining({ message: "flag off" }),
@@ -266,7 +263,7 @@ describe("useMigrationLnAddressTransfer", () => {
     const { result } = renderTransfer()
     await flushEffects()
 
-    expect(result.current.isRejected).toBe(true)
+    expect(result.current.outcome).toBe(MigrationLnAddressOutcome.Rejected)
     expect(mockReportError).toHaveBeenCalledWith(
       "Migration ln-address result failed",
       expect.objectContaining({ message: "user" }),
@@ -278,8 +275,7 @@ describe("useMigrationLnAddressTransfer", () => {
     const { result } = renderTransfer()
     await flushEffects()
 
-    expect(result.current.hasConnectionIssue).toBe(true)
-    expect(result.current.isRejected).toBe(false)
+    expect(result.current.outcome).toBe(MigrationLnAddressOutcome.ConnectionIssue)
     expect(mockReportError).not.toHaveBeenCalled()
   })
 
@@ -288,7 +284,7 @@ describe("useMigrationLnAddressTransfer", () => {
     const { result } = renderTransfer()
     await flushEffects()
 
-    expect(result.current.isRejected).toBe(true)
+    expect(result.current.outcome).toBe(MigrationLnAddressOutcome.Rejected)
     expect(mockReportError).toHaveBeenCalledWith(
       "Migration ln-address failed",
       expect.any(Error),
@@ -296,10 +292,11 @@ describe("useMigrationLnAddressTransfer", () => {
   })
 
   it("does not fire while the caller is skipping", async () => {
-    renderTransfer({ skip: true })
+    const { result } = renderTransfer({ skip: true })
     await flushEffects()
 
     expect(mockBuildProof).not.toHaveBeenCalled()
+    expect(result.current.outcome).toBe(MigrationLnAddressOutcome.Pending)
   })
 
   it("waits for both account ids before firing", async () => {
@@ -334,13 +331,13 @@ describe("useMigrationLnAddressTransfer", () => {
     mockTransfer.mockRejectedValueOnce(networkError())
     const { result } = renderTransfer()
     await flushEffects()
-    expect(result.current.hasConnectionIssue).toBe(true)
+    expect(result.current.outcome).toBe(MigrationLnAddressOutcome.ConnectionIssue)
 
     act(() => result.current.retry())
     await flushEffects()
 
     expect(mockTransfer).toHaveBeenCalledTimes(2)
-    expect(result.current.isTransferred).toBe(true)
+    expect(result.current.outcome).toBe(MigrationLnAddressOutcome.Transferred)
   })
 
   /** A superseded attempt — retried (via the screen's shared retry) while its first run was
@@ -358,23 +355,20 @@ describe("useMigrationLnAddressTransfer", () => {
 
     const { result } = renderTransfer()
     await flushEffects()
-    expect(result.current.isTransferred).toBe(false)
+    expect(result.current.outcome).toBe(MigrationLnAddressOutcome.Pending)
 
     act(() => result.current.retry())
     await flushEffects()
-    expect(result.current.isTransferred).toBe(true)
+    expect(result.current.outcome).toBe(MigrationLnAddressOutcome.Transferred)
 
     await act(async () => {
       resolveFirstProof({ status: MigrationSdkStatus.NoMnemonic })
       await flushEffects()
     })
 
-    expect(result.current.isTransferred).toBe(true)
-    expect(result.current.isRejected).toBe(false)
-    /** Every settled kind, not just the rejection: a superseded answer landing in any of
+    /** The one outcome covers every kind at once: a superseded answer landing in any of
      *  them would hand a completed re-point to support. */
-    expect(result.current.isAccountMissing).toBe(false)
-    expect(result.current.hasConnectionIssue).toBe(false)
+    expect(result.current.outcome).toBe(MigrationLnAddressOutcome.Transferred)
   })
 
   /** The shared retry button fires every source; a completed re-point must not re-run the
@@ -382,7 +376,7 @@ describe("useMigrationLnAddressTransfer", () => {
   it("does not re-fire a completed transfer on a shared retry", async () => {
     const { result } = renderTransfer()
     await flushEffects()
-    expect(result.current.isTransferred).toBe(true)
+    expect(result.current.outcome).toBe(MigrationLnAddressOutcome.Transferred)
 
     act(() => result.current.retry())
     await flushEffects()
@@ -410,9 +404,7 @@ describe("useMigrationLnAddressTransfer", () => {
         jest.advanceTimersByTime(LN_ADDRESS_TRANSFER_TIMEOUT_MS)
       })
 
-      expect(result.current.hasConnectionIssue).toBe(true)
-      expect(result.current.isRejected).toBe(false)
-      expect(result.current.isTransferred).toBe(false)
+      expect(result.current.outcome).toBe(MigrationLnAddressOutcome.ConnectionIssue)
       expect(mockReportError).toHaveBeenCalledWith(
         "Migration ln-address stalled",
         expect.any(Error),
@@ -437,8 +429,7 @@ describe("useMigrationLnAddressTransfer", () => {
     const { result } = renderTransfer()
     await flushEffects()
 
-    expect(result.current.isRejected).toBe(true)
-    expect(result.current.hasConnectionIssue).toBe(false)
+    expect(result.current.outcome).toBe(MigrationLnAddressOutcome.Rejected)
     expect(mockReportError).toHaveBeenCalledWith(
       "Migration ln-address threw",
       expect.any(Error),
@@ -475,7 +466,7 @@ describe("useMigrationLnAddressTransfer", () => {
     settleProof(okProof)
     await flushEffects()
 
-    expect(result.current.isTransferred).toBe(true)
+    expect(result.current.outcome).toBe(MigrationLnAddressOutcome.Transferred)
     expect(mockTransfer).toHaveBeenCalledTimes(1)
   })
 
@@ -485,7 +476,7 @@ describe("useMigrationLnAddressTransfer", () => {
     const { result } = renderTransfer()
     await flushEffects()
 
-    expect(result.current.isTransferred).toBe(true)
+    expect(result.current.outcome).toBe(MigrationLnAddressOutcome.Transferred)
     expect(mockReportError).not.toHaveBeenCalled()
   })
 
@@ -493,7 +484,7 @@ describe("useMigrationLnAddressTransfer", () => {
     mockTransfer.mockResolvedValue(payload([], [{ message: "flag off" }]))
     const { result } = renderTransfer()
     await flushEffects()
-    expect(result.current.isRejected).toBe(true)
+    expect(result.current.outcome).toBe(MigrationLnAddressOutcome.Rejected)
 
     act(() => result.current.retry())
     await flushEffects()

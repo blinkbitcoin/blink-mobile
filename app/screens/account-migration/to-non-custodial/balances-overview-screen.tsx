@@ -29,7 +29,11 @@ import { useEnsureMigrationStarted } from "@app/screens/account-migration/hooks/
 import { armMigrationConversion } from "@app/screens/conversion-flow/drain-conversion"
 import { useMigrationLnAddressTransfer } from "@app/screens/account-migration/hooks/use-migration-ln-address-transfer"
 import { useMigrationStatus } from "@app/screens/account-migration/hooks/use-migration-status"
-import { MigrationSupportOrigin, MigrationSupportReason } from "@app/types/migration"
+import {
+  MigrationLnAddressOutcome,
+  MigrationSupportOrigin,
+  MigrationSupportReason,
+} from "@app/types/migration"
 import { reportError } from "@app/utils/error-logging"
 import { testProps } from "@app/utils/testProps"
 
@@ -103,11 +107,23 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
    *  moves the address irreversibly. It needs the custodial session the completion swap
    *  discards, so this is the last place it can fire, and Approve waits on it. */
   const isLnRepointBlocked = !preview.isReady || !migrationStart.isStarted
-  const lnAddressTransfer = useMigrationLnAddressTransfer({
-    custodialAccountId: ownerId,
-    selfCustodialAccountId,
-    skip: isLnRepointBlocked,
-  })
+  const { outcome: lnAddressOutcome, retry: retryLnAddressTransfer } =
+    useMigrationLnAddressTransfer({
+      custodialAccountId: ownerId,
+      selfCustodialAccountId,
+      skip: isLnRepointBlocked,
+    })
+
+  /** Each kind earns a different answer below, so each is named where it is read rather
+   *  than compared inline: the address moved, the attempt was refused, the device has no
+   *  key for the account, or the network dropped the attempt. */
+  const isLnAddressTransferred =
+    lnAddressOutcome === MigrationLnAddressOutcome.Transferred
+  const isLnAddressRejected = lnAddressOutcome === MigrationLnAddressOutcome.Rejected
+  const isLnAddressAccountMissing =
+    lnAddressOutcome === MigrationLnAddressOutcome.AccountMissing
+  const hasLnAddressConnectionIssue =
+    lnAddressOutcome === MigrationLnAddressOutcome.ConnectionIssue
 
   /** The checkpoint only remembers which screen to resume on — plus the preview's
    *  receive figure, which the transfer's receive gate needs and which is knowable only
@@ -137,7 +153,7 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
   /** The one re-point outcome that still hands over: a missing device key is the same cause
    *  the commit reports, and it breaks the commit too. A refused re-point does not, which is
    *  the whole point of the settled check below. */
-  const lnAddressMissingReason = lnAddressTransfer.isAccountMissing
+  const lnAddressMissingReason = isLnAddressAccountMissing
     ? MigrationSupportReason.SelfCustodialAccountMissing
     : null
 
@@ -151,8 +167,7 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
    * retry of an interrupted migration lands in, since the address has already moved to the
    * pubkey of the attempt that failed and the lnurl server will refuse to move it again.
    */
-  const isLnAddressSettled =
-    lnAddressTransfer.isTransferred || lnAddressTransfer.isRejected
+  const isLnAddressSettled = isLnAddressTransferred || isLnAddressRejected
 
   /**
    * The re-point fires for neither id, and reports nothing when it does not fire, so an id
@@ -246,12 +261,11 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
   const isRetryable =
     preview.isRetryable ||
     migrationStart.hasConnectionIssue ||
-    lnAddressTransfer.hasConnectionIssue ||
+    hasLnAddressConnectionIssue ||
     isIdSourceRetryable
 
   const { retry: retryPreview } = preview
   const { retry: retryMigrationStart } = migrationStart
-  const { retry: retryLnAddressTransfer } = lnAddressTransfer
 
   /** The owner and the checkpoint join the shared retry because the re-point cannot fire
    *  without the ids they carry: refreshing everything else around a lookup that failed
@@ -322,7 +336,7 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
 
             {/** After the figures, not inside them: the before/after pair reads as one unit,
              *  and the caveat belongs next to the button that acts on it. */}
-            {lnAddressTransfer.isRejected ? (
+            {isLnAddressRejected ? (
               <WarningBanner>{LLOverview.lnAddressNotMoved()}</WarningBanner>
             ) : null}
           </ScrollView>

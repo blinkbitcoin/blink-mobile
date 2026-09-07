@@ -118,6 +118,27 @@ export type MigrationSupportOrigin =
   (typeof MigrationSupportOrigin)[keyof typeof MigrationSupportOrigin]
 
 /**
+ * How the lightning-address re-point onto the migrated account ended: one value rather than
+ * a bag of booleans, because the kinds are mutually exclusive and each earns a different
+ * answer from the commit screen.
+ */
+export const MigrationLnAddressOutcome = {
+  /** Nothing has answered yet: an attempt is in flight, or none fired for want of an id. */
+  Pending: "pending",
+  /** Every identifier settled: moved, already moved, or nothing to move. */
+  Transferred: "transferred",
+  /** The network never delivered the attempt, so a retry can still land. */
+  ConnectionIssue: "connection-issue",
+  /** No device key for the account (a reinstall), the same cause the commit reports. */
+  AccountMissing: "account-missing",
+  /** Any other settled failure a retry would only replay. */
+  Rejected: "rejected",
+} as const
+
+export type MigrationLnAddressOutcome =
+  (typeof MigrationLnAddressOutcome)[keyof typeof MigrationLnAddressOutcome]
+
+/**
  * How an attempt to finish a migration ended. Closing the emptied custodial account has
  * exactly one window: the session discard that follows destroys the only token that can
  * authenticate the deletion. So an unsettled close finishes nothing and keeps the session
