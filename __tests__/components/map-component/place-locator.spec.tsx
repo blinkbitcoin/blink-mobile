@@ -66,11 +66,13 @@ describe("PlaceLocator", () => {
 
 describe("locatorBarTop", () => {
   it("clears the licence credit and the bar, whatever the home-indicator inset", () => {
-    // bottomInset + 34 (the ODbL credit's gap) + 50 (the bar): anything raised
-    // by this much sits on the bar, never in it — the location button is the
-    // one thing that stays reachable while the pin is being aimed.
-    expect(locatorBarTop(0)).toBe(84)
-    expect(locatorBarTop(24)).toBe(108)
+    // bottomInset + 34 (the ODbL credit's gap) + 122 (the panel: 12 of padding
+    // and a hairline either side of a 50pt primary, a 4pt gap and a 42pt
+    // secondary): anything raised by this much sits on the bar, never in it —
+    // the location button is the one thing that stays reachable while the pin
+    // is being aimed.
+    expect(locatorBarTop(0)).toBe(156)
+    expect(locatorBarTop(24)).toBe(180)
   })
 })
 
@@ -88,7 +90,7 @@ describe("LocationButtonCopy", () => {
       ),
     )
 
-    expect(rootProps(toJSON())?.style).toMatchObject({ bottom: 118 })
+    expect(rootProps(toJSON())?.style).toMatchObject({ bottom: 190 })
   })
 
   it("keeps its default height over the licence credit otherwise", () => {

@@ -9,7 +9,14 @@ import { Text, makeStyles } from "@rn-vui/themed"
 
 import { PIN_HEIGHT, PinShape, usePinColor } from "./pin-shape"
 
-const BAR_HEIGHT = 50
+const BAR_PADDING = 12
+// The atoms' own heights: the primary's `minHeight`, and the secondary's 24px
+// line box inside the theme's 8px of vertical button padding.
+const PRIMARY_HEIGHT = 50
+const SECONDARY_HEIGHT = 42
+const BUTTON_GAP = 4
+/** The panel's full height, its hairline border included. */
+const BAR_HEIGHT = 2 + BAR_PADDING * 2 + PRIMARY_HEIGHT + BUTTON_GAP + SECONDARY_HEIGHT
 // Clear of the ODbL credit in the bottom-right corner, which the licence asks
 // stay readable and which this bar would otherwise sit on top of.
 const BAR_BOTTOM_GAP = 34
@@ -50,20 +57,22 @@ export const PlaceLocator: React.FC<Props> = ({ onConfirm, onCancel }) => {
         <PinShape color={pinColor} />
       </View>
 
+      {/* Stacked full width, primary first, the way every other pair of these
+          two reads across the app. The secondary is transparent by design, so
+          the panel — the same surface the map's other overlays paint — is what
+          keeps it off the imagery and legible. */}
       <View style={styles.bar}>
-        <GaloySecondaryButton
-          testID="cancel-add-place"
-          title={LL.common.cancel()}
-          onPress={onCancel}
-          containerStyle={styles.cancelContainer}
-          buttonStyle={styles.cancelButton}
-        />
-
         <GaloyPrimaryButton
           testID="confirm-place-location"
           title={LL.common.next()}
           onPress={onConfirm}
-          containerStyle={styles.confirmContainer}
+        />
+
+        <GaloySecondaryButton
+          testID="cancel-add-place"
+          title={LL.common.cancel()}
+          onPress={onCancel}
+          containerStyle={styles.cancel}
         />
       </View>
     </View>
@@ -110,19 +119,13 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: { bottomInset: number
     left: 12,
     right: 12,
     bottom: bottomInset + BAR_BOTTOM_GAP,
-    flexDirection: "row",
-    alignItems: "center",
-    columnGap: 12,
-  },
-  cancelContainer: {
-    flex: 1,
-  },
-  // The design-system secondary button is transparent; over a map it needs its
-  // own surface.
-  cancelButton: {
     backgroundColor: colors.white,
+    borderWidth: 1,
+    borderColor: colors.grey4,
+    borderRadius: 20,
+    padding: BAR_PADDING,
   },
-  confirmContainer: {
-    flex: 2,
+  cancel: {
+    marginTop: BUTTON_GAP,
   },
 }))
