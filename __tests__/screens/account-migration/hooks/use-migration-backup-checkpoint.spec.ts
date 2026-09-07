@@ -3,6 +3,8 @@ import { renderHook } from "@testing-library/react-native"
 import { useMigrationBackupCheckpoint } from "@app/screens/account-migration/hooks/use-migration-backup-checkpoint"
 import { MigrationCheckpoint } from "@app/screens/account-migration/utils/migration-checkpoint-storage"
 
+import { flushEffects } from "../../../helpers/flush-effects"
+
 const mockSaveCheckpoint = jest.fn()
 let mockIsSelfCustodial = false
 let mockHasResumableCheckpoint = true
@@ -20,18 +22,47 @@ jest.mock("@app/screens/account-migration/hooks/use-migration-checkpoint-state",
   }),
 }))
 
+const mockReportError = jest.fn()
+
+jest.mock("@app/utils/error-logging", () => ({
+  ...jest.requireActual("@app/utils/error-logging"),
+  reportError: (operation: string, err: unknown) => mockReportError(operation, err),
+}))
+
 describe("useMigrationBackupCheckpoint", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockIsSelfCustodial = false
     mockHasResumableCheckpoint = true
     mockLoading = false
+    mockSaveCheckpoint.mockResolvedValue(true)
   })
 
   it("advances the checkpoint when the backup belongs to the migration", () => {
     renderHook(() => useMigrationBackupCheckpoint(MigrationCheckpoint.CloudBackup))
 
     expect(mockSaveCheckpoint).toHaveBeenCalledWith(MigrationCheckpoint.CloudBackup)
+  })
+
+  /** Nothing here can be held back — the phrase is already on screen — but a step lost in
+   *  silence sends the user back through a backup they already did, so it is reported. */
+  it("reports a step the store refused to take", async () => {
+    mockSaveCheckpoint.mockResolvedValue(false)
+
+    renderHook(() => useMigrationBackupCheckpoint(MigrationCheckpoint.CloudBackup))
+    await flushEffects()
+
+    expect(mockReportError).toHaveBeenCalledWith(
+      "Migration backup checkpoint save",
+      expect.any(Error),
+    )
+  })
+
+  it("says nothing when the step is persisted", async () => {
+    renderHook(() => useMigrationBackupCheckpoint(MigrationCheckpoint.CloudBackup))
+    await flushEffects()
+
+    expect(mockReportError).not.toHaveBeenCalled()
   })
 
   it("waits for the checkpoint to load before saving", () => {
