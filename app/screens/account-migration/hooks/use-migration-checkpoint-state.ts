@@ -136,9 +136,12 @@ export const useMigrationCheckpointState = () => {
         expectedReceiveSats:
           expectedReceiveSatsUpdate ?? expectedReceiveSats ?? undefined,
       }
-      setStored((existing) => mergeCheckpoint(existing, update))
       try {
         await saveCheckpointToStorage(storageKey, update)
+        /** Applied only once the disk has it. An optimistic update here would leave the
+         *  hook reporting a step the store refused, which is how a resume ends up looking
+         *  for an expected receive that was never written. */
+        setStored((existing) => mergeCheckpoint(existing, update))
         return true
       } catch (err) {
         reportError("Checkpoint save", err)

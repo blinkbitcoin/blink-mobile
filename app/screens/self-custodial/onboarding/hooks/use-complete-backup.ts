@@ -81,8 +81,15 @@ export const useCompleteBackup = () => {
         /** Recorded so the stored step matches where the user actually stands, but never
          *  gated on: the mode screen is not a commit point, so a resume routes to the
          *  explainer whether or not this write lands. Blocking would only strand a user who
-         *  just finished their backup on a screen with nothing left to do. */
-        await saveCheckpoint(MigrationCheckpoint.ChooseExperience)
+         *  just finished their backup on a screen with nothing left to do. Reported, though:
+         *  a store refusing writes here is the same store the commit point depends on. */
+        const isStepRecorded = await saveCheckpoint(MigrationCheckpoint.ChooseExperience)
+        if (!isStepRecorded) {
+          reportError(
+            "Migration choose-experience checkpoint save",
+            new Error("Choose-experience step was not persisted"),
+          )
+        }
 
         navigation.navigate("selfCustodialChooseExperience", {
           onContinue: {

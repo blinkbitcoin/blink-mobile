@@ -112,8 +112,9 @@ describe("useMigrationCheckpoint", () => {
 
     await waitFor(() => expect(result.current.loading).toBe(false))
 
-    act(() => {
-      result.current.saveCheckpoint(MigrationCheckpoint.BackupMethod)
+    /** Awaited, because the hook now applies the step only once the write has landed. */
+    await act(async () => {
+      await result.current.saveCheckpoint(MigrationCheckpoint.BackupMethod)
     })
 
     expect(result.current.checkpoint).toBe(MigrationCheckpoint.BackupMethod)
@@ -129,8 +130,8 @@ describe("useMigrationCheckpoint", () => {
 
     await waitFor(() => expect(result.current.loading).toBe(false))
 
-    act(() => {
-      result.current.saveCheckpoint(MigrationCheckpoint.BackupMethod, {
+    await act(async () => {
+      await result.current.saveCheckpoint(MigrationCheckpoint.BackupMethod, {
         provisionedAccountId: "sc-account-1",
       })
     })
@@ -162,8 +163,8 @@ describe("useMigrationCheckpoint", () => {
 
     await waitFor(() => expect(result.current.loading).toBe(false))
 
-    act(() => {
-      result.current.saveCheckpoint(MigrationCheckpoint.BalancesOverview, {
+    await act(async () => {
+      await result.current.saveCheckpoint(MigrationCheckpoint.BalancesOverview, {
         provisionedAccountId: "sc-1",
         expectedReceiveSats: 21000,
       })
@@ -208,8 +209,8 @@ describe("useMigrationCheckpoint", () => {
 
     await waitFor(() => expect(result.current.loading).toBe(false))
 
-    act(() => {
-      result.current.saveCheckpoint(MigrationCheckpoint.BalancesOverview)
+    await act(async () => {
+      await result.current.saveCheckpoint(MigrationCheckpoint.BalancesOverview)
     })
 
     expect(mockSaveCheckpointToStorage).toHaveBeenCalledWith("migrationCheckpoint_main", {
@@ -720,8 +721,8 @@ describe("useMigrationCheckpoint", () => {
 
     await waitFor(() => expect(result.current.loading).toBe(false))
 
-    act(() => {
-      result.current.saveCheckpoint(MigrationCheckpoint.BackupAlerts)
+    await act(async () => {
+      await result.current.saveCheckpoint(MigrationCheckpoint.BackupAlerts)
     })
 
     expect(result.current.checkpoint).toBe(MigrationCheckpoint.BackupAlerts)
@@ -839,5 +840,37 @@ describe("useMigrationCheckpoint owner recovery", () => {
     await act(async () => {
       await expect(result.current.refetch()).resolves.toBeUndefined()
     })
+  })
+})
+
+/** What the hook admits to having stored. The optimistic update used to run before the
+ *  write, so a refused write left it reporting a step the disk never took. */
+describe("useMigrationCheckpoint write ordering", () => {
+  beforeEach(resetCheckpointMocks)
+
+  it("does not report a step the store refused to take", async () => {
+    mockSaveCheckpointToStorage.mockRejectedValue(new Error("disk full"))
+
+    const { result } = renderHook(() => useMigrationCheckpoint())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+    const checkpointBefore = result.current.checkpoint
+
+    await act(async () => {
+      await result.current.saveCheckpoint(MigrationCheckpoint.BalancesOverview)
+    })
+
+    expect(result.current.checkpoint).toBe(checkpointBefore)
+    expect(result.current.checkpoint).not.toBe(MigrationCheckpoint.BalancesOverview)
+  })
+
+  it("reports the step once the store has taken it", async () => {
+    const { result } = renderHook(() => useMigrationCheckpoint())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    await act(async () => {
+      await result.current.saveCheckpoint(MigrationCheckpoint.BalancesOverview)
+    })
+
+    expect(result.current.checkpoint).toBe(MigrationCheckpoint.BalancesOverview)
   })
 })
