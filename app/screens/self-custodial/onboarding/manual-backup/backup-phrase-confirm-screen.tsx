@@ -8,8 +8,8 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { Screen } from "@app/components/screen"
+import { ScreenSecurityGate } from "@app/components/screen-security-gate"
 import { SuggestionBar } from "@app/components/suggestion-bar"
-import { useScreenSecurity } from "@app/hooks/use-screen-security"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { PhraseStep, RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useMigrationCheckpoint } from "@app/screens/account-migration/hooks"
@@ -23,50 +23,28 @@ import { type Challenge, isValidChallenges } from "../utils"
 
 type ConfirmRouteProp = RouteProp<RootStackParamList, "selfCustodialBackupPhraseConfirm">
 
-/** A stable empty fallback, so the one frame rendered before the redirect does not feed
- *  useBackupConfirm a fresh array identity on every render. */
-const EMPTY_CHALLENGES: Challenge[] = []
+type BackupPhraseConfirmContentProps = {
+  challenges: Challenge[]
+  checkpointLoading: boolean
+  confirm: ReturnType<typeof useBackupConfirm>
+  onComplete: () => void
+}
 
-export const BackupPhraseConfirmScreen: React.FC = () => {
+/** The gate mounts this only once the screenshot guard is actually on — the typed
+ *  words must not exist while registration is pending. The answers themselves are
+ *  held above the gate and handed in, so an unmount hides them without wiping
+ *  what the user has already typed. */
+const BackupPhraseConfirmContent: React.FC<BackupPhraseConfirmContentProps> = ({
+  challenges,
+  checkpointLoading,
+  confirm,
+  onComplete,
+}) => {
   const { LL } = useI18nContext()
   const styles = useStyles()
   const {
     theme: { colors },
   } = useTheme()
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-
-  /** Deep links and navigation-state rehydration can deliver missing or malformed params
-   *  despite the route type; a bare destructure here threw into the app-wide ErrorBoundary,
-   *  replacing the whole navigation tree (#4070). A confirm screen without its challenges
-   *  is dead — nothing to type — so it redirects to the first backup step with `replace`,
-   *  keeping the broken route out of the back stack. */
-  const { params } = useRoute<ConfirmRouteProp>()
-  const challengesParam = params?.challenges
-  const challenges = isValidChallenges(challengesParam)
-    ? challengesParam
-    : EMPTY_CHALLENGES
-  const successMessage = params?.successMessage
-  const hasValidChallenges = challenges.length > 0
-
-  useEffect(() => {
-    if (hasValidChallenges) return
-    reportError(
-      "Backup confirm route params missing",
-      new Error("Route delivered no valid challenges"),
-      { dedupKey: "backup-confirm-params-missing", alwaysRecord: true },
-    )
-    navigation.replace("selfCustodialBackupPhrase", { step: PhraseStep.First })
-  }, [hasValidChallenges, navigation])
-
-  const { loading: checkpointLoading } = useMigrationCheckpoint()
-  const completeBackup = useCompleteBackup()
-
-  useScreenSecurity()
-
-  const onComplete = useCallback(() => {
-    logSelfCustodialBackupCompleted({ backupMethod: "manual" })
-    completeBackup({ method: BackupMethod.Manual, message: successMessage })
-  }, [completeBackup, successMessage])
 
   const {
     inputs,
@@ -81,7 +59,7 @@ export const BackupPhraseConfirmScreen: React.FC = () => {
     isWordWrong,
     focusRequest,
     clearFocusRequest,
-  } = useBackupConfirm({ challenges, onComplete, disabled: checkpointLoading })
+  } = confirm
 
   const anyWrong = challenges.some((_, i) => isWordWrong(i))
   const isConfirmDisabled = !allCorrect || checkpointLoading
@@ -185,6 +163,79 @@ export const BackupPhraseConfirmScreen: React.FC = () => {
       </View>
     </Screen>
   )
+}
+
+/** Deep links and navigation-state rehydration can deliver missing or malformed params
+ *  despite the route type; a bare destructure in the content threw into the app-wide
+ *  ErrorBoundary, replacing the whole navigation tree (#4070). A confirm screen without
+ *  its challenges is dead — nothing to type — so it redirects to the first backup step
+ *  with `replace`, keeping the broken route out of the back stack.
+ *
+ *  This runs ahead of the gate, not inside the gated content: on a device where
+ *  registration keeps failing the content never mounts, and a redirect living behind
+ *  the gate would leave the user stuck on the guard's Retry/Back view with no way
+ *  back to the self-heal. */
+const RedirectToBackupStart: React.FC = () => {
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+
+  useEffect(() => {
+    reportError(
+      "Backup confirm route params missing",
+      new Error("Route delivered no valid challenges"),
+      { dedupKey: "backup-confirm-params-missing", alwaysRecord: true },
+    )
+    navigation.replace("selfCustodialBackupPhrase", { step: PhraseStep.First })
+  }, [navigation])
+
+  return null
+}
+
+type GatedConfirmProps = {
+  challenges: Challenge[]
+  successMessage?: string
+}
+
+/** Sits between the redirect guard and the gate so the confirmation state can be
+ *  held above the gate: its subtree is unmounted every time the guard drops (a
+ *  theme flip re-registers it), and the words the user has already typed must
+ *  survive that. Safe here because useBackupConfirm's only effect is the
+ *  all-correct auto-advance, which cannot fire while the inputs are empty. */
+const GatedConfirm: React.FC<GatedConfirmProps> = ({ challenges, successMessage }) => {
+  const { loading: checkpointLoading } = useMigrationCheckpoint()
+  const completeBackup = useCompleteBackup()
+
+  const onComplete = useCallback(() => {
+    logSelfCustodialBackupCompleted({ backupMethod: "manual" })
+    completeBackup({ method: BackupMethod.Manual, message: successMessage })
+  }, [completeBackup, successMessage])
+
+  const confirm = useBackupConfirm({
+    challenges,
+    onComplete,
+    disabled: checkpointLoading,
+  })
+
+  return (
+    <ScreenSecurityGate>
+      <BackupPhraseConfirmContent
+        challenges={challenges}
+        checkpointLoading={checkpointLoading}
+        confirm={confirm}
+        onComplete={onComplete}
+      />
+    </ScreenSecurityGate>
+  )
+}
+
+export const BackupPhraseConfirmScreen: React.FC = () => {
+  const { params } = useRoute<ConfirmRouteProp>()
+  const challenges = params?.challenges
+
+  /** The one place the params are judged: the validated value is handed down, so
+   *  nothing below re-derives it and the two checks cannot drift apart. */
+  if (!isValidChallenges(challenges)) return <RedirectToBackupStart />
+
+  return <GatedConfirm challenges={challenges} successMessage={params?.successMessage} />
 }
 
 const useStyles = makeStyles(({ colors }) => ({
