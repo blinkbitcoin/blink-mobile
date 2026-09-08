@@ -68,6 +68,12 @@ export const AddPlacePanel: React.FC<Props> = ({ location, onSubmit, onClose }) 
   // it is called come first because they are what the map above is for — the
   // pin is aimed while these are typed — and the category is a fourteen-way
   // choice that wants the whole sheet to itself.
+  // Closing is asked for here and carried out by the sheet, which slides out
+  // and only then calls `onClose` to be taken off the map's layout. Calling it
+  // from the X directly would take the panel away in the frame it was pressed,
+  // while a drag slid it out — two exits from one surface.
+  const [isOpen, setOpen] = React.useState(true)
+
   const [step, setStep] = React.useState<"details" | "category">("details")
   // The pin as it stood when Continue was pressed. The map above stays
   // pannable the whole time this is open — that is the reason it is a panel —
@@ -137,7 +143,7 @@ export const AddPlacePanel: React.FC<Props> = ({ location, onSubmit, onClose }) 
   return (
     <BottomSheet
       testID="add-place-panel"
-      isVisible
+      isVisible={isOpen}
       onClose={onClose}
       presentation="inline"
       headerStyle={styles.header}
@@ -162,7 +168,7 @@ export const AddPlacePanel: React.FC<Props> = ({ location, onSubmit, onClose }) 
           <Text style={styles.title}>{LL.MapScreen.addPlaceTitle()}</Text>
           <Pressable
             testID="close-add-place"
-            onPress={onClose}
+            onPress={() => setOpen(false)}
             accessibilityRole="button"
             accessibilityLabel={LL.common.close()}
             hitSlop={12}
