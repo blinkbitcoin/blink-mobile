@@ -30,8 +30,6 @@ type CheckpointDestination = {
 
 const STORAGE_KEY_PREFIX = "migrationCheckpoint"
 
-const CHECKPOINT_EXPIRATION_MS = 48 * 60 * 60 * 1000 // 48h
-
 const DEFAULT_DESTINATION: CheckpointDestination = { name: "accountMigrationExplainer" }
 
 /** Exhaustive on purpose: a step added to the enum has no entry here and fails to compile,
@@ -55,11 +53,6 @@ export const isCommitPointCheckpoint = (
 
 export const getStorageKey = (environment: string): string =>
   `${STORAGE_KEY_PREFIX}_${environment.toLowerCase()}`
-
-export const isExpired = (
-  checkpoint: StoredCheckpoint,
-  now: number = Date.now(),
-): boolean => now - checkpoint.savedAt > CHECKPOINT_EXPIRATION_MS
 
 export const validateStoredCheckpoint = (raw: unknown): StoredCheckpoint | null => {
   if (!raw || typeof raw !== "object") return null
@@ -111,17 +104,7 @@ export const resolveCheckpointRoute = (
 export const loadCheckpoint = async (
   storageKey: string,
 ): Promise<StoredCheckpoint | null> => {
-  const raw = await loadJsonOrThrow(storageKey)
-  const parsed = validateStoredCheckpoint(raw)
-
-  if (!parsed) return null
-
-  if (isExpired(parsed)) {
-    await remove(storageKey)
-    return null
-  }
-
-  return parsed
+  return validateStoredCheckpoint(await loadJsonOrThrow(storageKey))
 }
 
 export type CheckpointUpdate = {
@@ -145,19 +128,38 @@ export const mergeCheckpoint = (
     existing?.custodialAccountId === undefined ||
     existing.custodialAccountId === update.custodialAccountId
 
-  /** Write-once for one owner's flow: the figure is only knowable before the drain, so a
-   *  re-entered commit screen would carry the post-drain zero the gate reads as "nothing
-   *  will ever arrive" and swap while the funds are still in transit (#4102). */
+  /**
+   * Write-once for one owner's RUN of the flow: the figure is only knowable before the
+   * drain, so a re-entered commit screen would carry the post-drain zero the gate reads as
+   * "nothing will ever arrive" and swap while the funds are still in transit (#4102).
+   *
+   * A run ends when the step falls back behind the commit point, which only a restart
+   * does — the flow never walks backwards on its own. Carrying the figure across that
+   * would let a previous attempt's amount decide when the funds of a new one have landed.
+   * The clock used to sever this by expiring the record; the step does it on the evidence
+   * instead.
+   */
+  const hasRestarted =
+    isCommitPointCheckpoint(existing?.step ?? null) &&
+    !isCommitPointCheckpoint(update.step)
   const inheritedExpectedReceiveSats = hasSameOwner
     ? existing?.expectedReceiveSats
     : undefined
+
+  /** Dropped outright on a restart, not merely left uninherited: the caller re-sends the
+   *  figure it already knows on every save (to heal a write that never landed), so a
+   *  restart has to refuse it from both directions or the previous run's amount rides back
+   *  in through the update. The next commit point supplies the new run's own. */
+  const expectedReceiveSats = hasRestarted
+    ? undefined
+    : inheritedExpectedReceiveSats ?? update.expectedReceiveSats
 
   return {
     step: update.step,
     savedAt: Date.now(),
     accountId: update.accountId ?? (hasSameOwner ? existing?.accountId : undefined),
     custodialAccountId: update.custodialAccountId,
-    expectedReceiveSats: inheritedExpectedReceiveSats ?? update.expectedReceiveSats,
+    expectedReceiveSats,
   }
 }
 
@@ -171,11 +173,7 @@ export const saveCheckpointToStorage = async (
   storageKey: string,
   update: CheckpointUpdate,
 ): Promise<void> => {
-  const stored = validateStoredCheckpoint(await loadJsonOrThrow(storageKey))
-  /** An expired prior record must not lend its accountId to the fresh save; treat it as
-   *  absent, matching loadCheckpoint, so the 48h expiry stays authoritative for the id. */
-  const isReusableRecord = stored !== null && !isExpired(stored)
-  const existing = isReusableRecord ? stored : null
+  const existing = validateStoredCheckpoint(await loadJsonOrThrow(storageKey))
   await saveJson(storageKey, mergeCheckpoint(existing, update))
 }
 
@@ -185,7 +183,7 @@ export const clearCheckpointFromStorage = async (storageKey: string): Promise<vo
 
 /**
  * Wallets provisioned for a migration but not yet activated, keyed by the custodial
- * account that started the flow. Unlike the checkpoint this record never expires: the
+ * account that started the flow. It never expires, and neither does the checkpoint: the
  * wallet exists (its phrase may already be written down), so a restarted flow must
  * reuse it instead of provisioning a zombie, and the account switcher must not offer it.
  */
