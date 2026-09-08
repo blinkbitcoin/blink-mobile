@@ -2134,6 +2134,7 @@
     "clearAll": "Összes törlése",
     "addPlace": "Hozzáadás a térképhez",
     "addPlaceTitle": "Hely hozzáadása",
+    "submitPlaceRequest": "Submit request",
     "placePinHint": "Mozgasd a térképet, hogy a jelölő a helyre kerüljön",
     "placeName": "Név",
     "placeNameHint": "Hogy hívják a helyet",

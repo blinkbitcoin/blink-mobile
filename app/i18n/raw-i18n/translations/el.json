@@ -2134,6 +2134,7 @@
     "clearAll": "Καθαρισμός όλων",
     "addPlace": "Προσθήκη στον χάρτη",
     "addPlaceTitle": "Προσθήκη τοποθεσίας",
+    "submitPlaceRequest": "Submit request",
     "placePinHint": "Μετακινήστε τον χάρτη για να βάλετε την πινέζα πάνω στο σημείο",
     "placeName": "Όνομα",
     "placeNameHint": "Πώς λέγεται το μέρος",

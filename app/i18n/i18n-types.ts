@@ -6641,9 +6641,13 @@ type RootTranslation = {
 		 */
 		addPlace: string
 		/**
-		 * A​d​d​ ​a​ ​p​l​a​c​e
+		 * S​u​g​g​e​s​t​ ​b​u​s​i​n​e​s​s
 		 */
 		addPlaceTitle: string
+		/**
+		 * S​u​b​m​i​t​ ​r​e​q​u​e​s​t
+		 */
+		submitPlaceRequest: string
 		/**
 		 * M​o​v​e​ ​t​h​e​ ​m​a​p​ ​t​o​ ​p​u​t​ ​t​h​e​ ​p​i​n​ ​o​n​ ​t​h​e​ ​p​l​a​c​e
 		 */
@@ -20311,9 +20315,13 @@ export type TranslationFunctions = {
 		 */
 		addPlace: () => LocalizedString
 		/**
-		 * Add a place
+		 * Suggest business
 		 */
 		addPlaceTitle: () => LocalizedString
+		/**
+		 * Submit request
+		 */
+		submitPlaceRequest: () => LocalizedString
 		/**
 		 * Move the map to put the pin on the place
 		 */

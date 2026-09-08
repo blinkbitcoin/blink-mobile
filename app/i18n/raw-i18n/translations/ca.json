@@ -2134,6 +2134,7 @@
     "clearAll": "Esborra-ho tot",
     "addPlace": "Afegeix al mapa",
     "addPlaceTitle": "Afegeix un lloc",
+    "submitPlaceRequest": "Submit request",
     "placePinHint": "Mou el mapa per posar el marcador sobre el lloc",
     "placeName": "Nom",
     "placeNameHint": "Com es diu el lloc",

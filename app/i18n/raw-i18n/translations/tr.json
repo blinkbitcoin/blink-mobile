@@ -2134,6 +2134,7 @@
     "clearAll": "Tümünü temizle",
     "addPlace": "Haritaya ekle",
     "addPlaceTitle": "Yer ekle",
+    "submitPlaceRequest": "Submit request",
     "placePinHint": "İşaretçiyi yerin üzerine getirmek için haritayı kaydırın",
     "placeName": "Ad",
     "placeNameHint": "Buranın adı nedir",

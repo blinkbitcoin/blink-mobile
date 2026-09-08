@@ -2134,6 +2134,7 @@
         "clearAll": "Alle abwählen",
         "addPlace": "Zur Karte hinzufügen",
         "addPlaceTitle": "Ort hinzufügen",
+        "submitPlaceRequest": "Submit request",
         "placePinHint": "Verschiebe die Karte, bis die Nadel auf dem Ort steht",
         "placeName": "Name",
         "placeNameHint": "Wie der Ort heißt",

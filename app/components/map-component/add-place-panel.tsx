@@ -61,6 +61,11 @@ export const AddPlacePanel: React.FC<Props> = ({ location, onSubmit, onClose }) 
   const { LL } = useI18nContext()
   const styles = useStyles()
 
+  // Which half of the question is being answered. Where the place is and what
+  // it is called come first because they are what the map above is for — the
+  // pin is aimed while these are typed — and the category is a fourteen-way
+  // choice that wants the whole sheet to itself.
+  const [step, setStep] = React.useState<"details" | "category">("details")
   const [name, setName] = React.useState("")
   const [category, setCategory] = React.useState<PlaceCategory | null>(null)
   // Sending is a round trip. The guard keeps a second tap from firing a
@@ -69,11 +74,6 @@ export const AddPlacePanel: React.FC<Props> = ({ location, onSubmit, onClose }) 
   // Why the last send did not go. It is shown here rather than raised as a
   // toast because it belongs beside the button that would retry it.
   const [error, setError] = React.useState<string | null>(null)
-  // The place a send in flight is for. The request carries the pin as it stood
-  // when submit was tapped, so while it is out the row has to keep showing
-  // that rather than following the map somewhere the request is not going.
-  const [sentLocation, setSentLocation] = React.useState<LatLng | null>(null)
-
   // A failure on the form is about the place as it stood, so editing the place
   // takes it off: otherwise a refusal keeps accusing a place that no longer
   // exists. Only a typed edit, though — the pin is a pan away at all times
@@ -91,23 +91,27 @@ export const AddPlacePanel: React.FC<Props> = ({ location, onSubmit, onClose }) 
     setError(null)
   }
 
-  const shownLocation = sentLocation ?? location
-
   const submission = buildPlaceSubmission({ name, category, location })
   const isSubmitDisabled = !submission || isSubmitting
+  // The name is the only thing the first step asks for that it can be missing:
+  // the pin always points somewhere, so there is always a location.
+  const canContinue = name.trim().length > 0
+
+  // Back to the details rather than out of the form. Nothing is cleared on the
+  // way — a name being corrected is the reason to come back here, and losing
+  // the category to fix a typo would be its own annoyance.
+  const goBack = () => {
+    setStep("details")
+    setError(null)
+  }
 
   const submit = async () => {
     if (!submission || isSubmitting) return
     setSubmitting(true)
     setError(null)
-    setSentLocation(location)
     try {
       const reason = await onSubmit(submission)
       setError(reason)
-      // A retry is free to be sent from wherever the pin is by then, so the row
-      // goes back to following the map. On success there is nothing to go back
-      // to: the map closes this.
-      if (reason) setSentLocation(null)
     } finally {
       setSubmitting(false)
     }
@@ -124,6 +128,17 @@ export const AddPlacePanel: React.FC<Props> = ({ location, onSubmit, onClose }) 
       footerStyle={styles.footer}
       header={
         <>
+          {step === "category" && (
+            <Pressable
+              testID="back-to-place-details"
+              onPress={goBack}
+              accessibilityRole="button"
+              accessibilityLabel={LL.common.back()}
+              hitSlop={12}
+            >
+              <GaloyIcon name="arrow-left" size={20} color={colors.primary} />
+            </Pressable>
+          )}
           <Text style={styles.title}>{LL.MapScreen.addPlaceTitle()}</Text>
           <Pressable
             testID="close-add-place"
@@ -138,7 +153,7 @@ export const AddPlacePanel: React.FC<Props> = ({ location, onSubmit, onClose }) 
       }
       footer={
         <>
-          {error ? (
+          {error && step === "category" ? (
             <View style={styles.error} accessibilityLiveRegion="polite">
               <GaloyIcon name="warning-circle" size={14} color={colors.error} />
               <Text testID="place-submission-error" style={styles.errorText}>
@@ -146,86 +161,104 @@ export const AddPlacePanel: React.FC<Props> = ({ location, onSubmit, onClose }) 
               </Text>
             </View>
           ) : null}
-          <GaloyPrimaryButton
-            testID="submit-place"
-            title={LL.common.submit()}
-            onPress={submit}
-            disabled={isSubmitDisabled}
-            loading={isSubmitting}
-          />
+          {step === "details" ? (
+            <GaloyPrimaryButton
+              testID="continue-place"
+              title={LL.common.continue()}
+              onPress={() => setStep("category")}
+              disabled={!canContinue}
+            />
+          ) : (
+            <GaloyPrimaryButton
+              testID="submit-place"
+              title={LL.MapScreen.submitPlaceRequest()}
+              onPress={submit}
+              disabled={isSubmitDisabled}
+              loading={isSubmitting}
+            />
+          )}
         </>
       }
     >
-      <View style={styles.field}>
-        <Text style={styles.label}>{LL.MapScreen.placeLocation()}</Text>
-        {/* Read-only, and with nothing to tap: the map above is the control
+      {step === "details" ? (
+        <>
+          <View style={styles.field}>
+            <Text style={styles.label}>{LL.MapScreen.placeLocation()}</Text>
+            {/* Read-only, and with nothing to tap: the map above is the control
               for this row, and it is on screen. */}
-        <View style={styles.locationRow}>
-          <GaloyIcon name="map-pin" size={16} color={colors.grey1} />
-          <Text testID="place-coordinates" style={styles.coordinates} numberOfLines={1}>
-            {formatCoordinates(shownLocation)}
-          </Text>
-        </View>
-      </View>
+            <View style={styles.locationRow}>
+              <GaloyIcon name="map-pin" size={16} color={colors.grey1} />
+              <Text
+                testID="place-coordinates"
+                style={styles.coordinates}
+                numberOfLines={1}
+              >
+                {formatCoordinates(location)}
+              </Text>
+            </View>
+          </View>
 
-      <View style={styles.field}>
-        <Text style={styles.label}>{LL.MapScreen.placeName()}</Text>
-        <TextInput
-          testID="place-name-input"
-          style={styles.input}
-          value={name}
-          onChangeText={editName}
-          placeholder={LL.MapScreen.placeNameHint()}
-          placeholderTextColor={colors.grey2}
-          maxLength={PLACE_NAME_MAX_LENGTH}
-          autoCorrect={false}
-          returnKeyType="done"
-          accessibilityLabel={LL.MapScreen.placeName()}
-        />
-      </View>
-
-      <View style={styles.field}>
-        <Text style={styles.label}>{LL.MapScreen.placeCategory()}</Text>
-        {/* All of them at once, rather than a row that opens a list. The
+          <View style={styles.field}>
+            <Text style={styles.label}>{LL.MapScreen.placeName()}</Text>
+            <TextInput
+              testID="place-name-input"
+              style={styles.input}
+              value={name}
+              onChangeText={editName}
+              placeholder={LL.MapScreen.placeNameHint()}
+              placeholderTextColor={colors.grey2}
+              maxLength={PLACE_NAME_MAX_LENGTH}
+              autoCorrect={false}
+              returnKeyType="done"
+              accessibilityLabel={LL.MapScreen.placeName()}
+            />
+          </View>
+        </>
+      ) : (
+        <>
+          <View style={styles.field}>
+            <Text style={styles.label}>{LL.MapScreen.placeCategory()}</Text>
+            {/* All of them at once, rather than a row that opens a list. The
               fourteen are short, familiar words and reading them is the fastest
               way to find the one that fits — a list of the same fourteen hides
               thirteen behind a tap and tells the user nothing they could not
-              already see. They are affordable here because the send button no
-              longer rides on the end of the form: it is held below the scroll,
-              so the chips can be as tall as they need and take the scroll with
-              them.
+              already see. They have the step to themselves and the send button
+              is held below the scroll, so they can be as tall as they need and
+              take the scroll with them rather than the button.
 
               `other` is not among them: it is the bucket unrecognised pins fall
               into, not a description of a place, and a submission under it
               would tell BTC Map nothing. */}
-        <View style={styles.chips}>
-          {SUBMITTABLE_PLACE_CATEGORIES.map((option) => {
-            const isSelected = option === category
-            return (
-              <Pressable
-                key={option}
-                testID={`place-category-${option}`}
-                style={[styles.chip, isSelected && styles.chipSelected]}
-                onPress={() => editCategory(option)}
-                accessibilityRole="button"
-                accessibilityState={{ selected: isSelected }}
-              >
-                <Text style={isSelected ? styles.chipTextSelected : styles.chipText}>
-                  {LL.MapScreen.category[option]()}
-                </Text>
-              </Pressable>
-            )
-          })}
-        </View>
-      </View>
+            <View style={styles.chips}>
+              {SUBMITTABLE_PLACE_CATEGORIES.map((option) => {
+                const isSelected = option === category
+                return (
+                  <Pressable
+                    key={option}
+                    testID={`place-category-${option}`}
+                    style={[styles.chip, isSelected && styles.chipSelected]}
+                    onPress={() => editCategory(option)}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected: isSelected }}
+                  >
+                    <Text style={isSelected ? styles.chipTextSelected : styles.chipText}>
+                      {LL.MapScreen.category[option]()}
+                    </Text>
+                  </Pressable>
+                )
+              })}
+            </View>
+          </View>
 
-      {/* Nothing here appears on the map on its own — saying so up front is
+          {/* Nothing here appears on the map on its own — saying so up front is
             what keeps "I added my shop and it isn't there" from being a
             surprise. */}
-      <View style={styles.note}>
-        <GaloyIcon name="info" size={16} color={colors.grey2} />
-        <Text style={styles.noteText}>{LL.MapScreen.placeReviewNote()}</Text>
-      </View>
+          <View style={styles.note}>
+            <GaloyIcon name="info" size={16} color={colors.grey2} />
+            <Text style={styles.noteText}>{LL.MapScreen.placeReviewNote()}</Text>
+          </View>
+        </>
+      )}
     </BottomSheet>
   )
 }
