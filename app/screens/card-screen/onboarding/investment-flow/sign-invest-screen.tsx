@@ -14,9 +14,17 @@ import { CloseHeader } from "@app/components/close-header"
 import { Screen } from "@app/components/screen"
 import { ESIGN_ALLOWED_ORIGIN } from "@app/config"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
+import { usePriceConversion } from "@app/hooks/use-price-conversion"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { logError } from "@app/utils/log-error"
+
+import { buildESignFormUrl } from "./esign-form-url"
+import {
+  resolveInvestmentTerms,
+  resolveSettlementQuote,
+  type SettlementQuote,
+} from "./investment-terms"
 
 type SignInvestRoute = RouteProp<RootStackParamList, "cardOnboardingSignInvestScreen">
 
@@ -42,6 +50,7 @@ export const SignInvestScreen: React.FC = () => {
   const { LL } = useI18nContext()
   const { theme: esignTheme, styles: esignStyles } = useESignAppearance()
   const { cardInvestmentEsignFormUrl } = useRemoteConfig()
+  const { usdPerSat } = usePriceConversion()
   const { selectedAmountUsd } = useRoute<SignInvestRoute>().params
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
@@ -66,15 +75,38 @@ export const SignInvestScreen: React.FC = () => {
     [],
   )
 
-  /** Rebuilt only when the form changes: a new source on every render would restart
-   *  the signing session. */
+  /**
+   * Taken once, from the first price that answers, and then held for the rest of the visit.
+   *
+   * The price feed polls, and following it would rewrite the form's url on every tick,
+   * restarting the signing session, possibly mid-signature. It would also be wrong on its
+   * own terms: the agreement fixes one rate, at one stamped moment, and owes the payment
+   * against that.
+   *
+   * A late price needs no wait of its own: the component embeds nothing until the signer
+   * asks it to. Checked on device by pressing both before and after the feed answered, and
+   * the form carried the figures either way.
+   */
+  const [settlement, setSettlement] = React.useState<SettlementQuote | null>(null)
+  React.useEffect(() => {
+    if (settlement) return
+
+    const quote = resolveSettlementQuote(usdPerSat, new Date())
+    if (quote) setSettlement(quote)
+  }, [usdPerSat, settlement])
+
+  /** Rebuilt only when the form, the amount or the rate changes: a new source on every
+   *  render would restart the signing session. */
   const source = React.useMemo(
     () =>
       createPublicUrlSource({
-        url: cardInvestmentEsignFormUrl,
+        url: buildESignFormUrl(
+          cardInvestmentEsignFormUrl,
+          resolveInvestmentTerms(selectedAmountUsd, settlement),
+        ),
         allowedOrigin: ESIGN_ALLOWED_ORIGIN,
       }),
-    [cardInvestmentEsignFormUrl],
+    [cardInvestmentEsignFormUrl, selectedAmountUsd, settlement],
   )
 
   return (
