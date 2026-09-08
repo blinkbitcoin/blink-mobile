@@ -178,6 +178,7 @@ export const buildMigrationTransferRequest = (
             amountSats: undefined,
             expirySecs: MIGRATION_INVOICE_EXPIRY_SECONDS,
             paymentHash: undefined,
+            receiverIdentityPublicKey: undefined,
           }),
         }),
       ),
