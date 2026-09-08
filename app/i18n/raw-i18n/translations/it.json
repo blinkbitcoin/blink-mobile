@@ -2141,6 +2141,7 @@
         "clearAll": "Cancella tutto",
         "addPlace": "Aggiungi alla mappa",
         "addPlaceTitle": "Aggiungi un luogo",
+        "submitPlaceRequest": "Submit request",
         "placePinHint": "Sposta la mappa per mettere il segnaposto sul luogo",
         "placeName": "Nome",
         "placeNameHint": "Come si chiama il luogo",

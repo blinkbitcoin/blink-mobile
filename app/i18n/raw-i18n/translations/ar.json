@@ -2141,6 +2141,7 @@
     "clearAll": "مسح الكل",
     "addPlace": "أضف إلى الخريطة",
     "addPlaceTitle": "إضافة مكان",
+    "submitPlaceRequest": "Submit request",
     "placePinHint": "حرّك الخريطة لوضع الدبوس على المكان",
     "placeName": "الاسم",
     "placeNameHint": "ما اسم هذا المكان",
