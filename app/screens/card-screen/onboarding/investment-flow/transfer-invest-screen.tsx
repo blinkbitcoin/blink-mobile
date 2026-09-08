@@ -1,6 +1,6 @@
 import * as React from "react"
 import { ScrollView, View } from "react-native"
-import { useNavigation } from "@react-navigation/native"
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
@@ -11,6 +11,17 @@ import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
+import {
+  formatUnitCount,
+  formatUsdAmount,
+  resolveInvestmentTerms,
+} from "./investment-terms"
+
+type TransferInvestRoute = RouteProp<
+  RootStackParamList,
+  "cardOnboardingTransferInvestScreen"
+>
+
 export const TransferInvestScreen: React.FC = () => {
   const styles = useStyles()
   const {
@@ -18,7 +29,13 @@ export const TransferInvestScreen: React.FC = () => {
   } = useTheme()
 
   const { LL } = useI18nContext()
+  const { selectedAmountUsd } = useRoute<TransferInvestRoute>().params
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+
+  const terms = React.useMemo(
+    () => resolveInvestmentTerms(selectedAmountUsd),
+    [selectedAmountUsd],
+  )
 
   const handleNext = () => {
     navigation.navigate("cardOnboardingInsufficientBalanceScreen")
@@ -36,11 +53,15 @@ export const TransferInvestScreen: React.FC = () => {
 
         <View style={styles.content}>
           <Text type="p2" style={styles.bodyText}>
-            {LL.CardFlow.Onboarding.TransferInvest.paragraphs.body1()}
+            {LL.CardFlow.Onboarding.TransferInvest.paragraphs.body1({
+              units: formatUnitCount(terms.units),
+            })}
           </Text>
 
           <Text type="p2" style={styles.bodyText}>
-            {LL.CardFlow.Onboarding.TransferInvest.paragraphs.body2()}
+            {LL.CardFlow.Onboarding.TransferInvest.paragraphs.body2({
+              amount: formatUsdAmount(terms.totalUsd),
+            })}
           </Text>
         </View>
       </ScrollView>

@@ -1,6 +1,6 @@
 import * as React from "react"
 import { ScrollView, View } from "react-native"
-import { useNavigation } from "@react-navigation/native"
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text } from "@rn-vui/themed"
 
@@ -11,16 +11,33 @@ import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
+import {
+  formatUnitCount,
+  formatUsdAmount,
+  resolveEquityPercent,
+  resolveInvestmentTerms,
+} from "./investment-terms"
+
+type TermSheetRoute = RouteProp<RootStackParamList, "cardOnboardingTermSheetScreen">
+
 export const TermSheetScreen: React.FC = () => {
   const styles = useStyles()
   const { LL } = useI18nContext()
+  const { selectedAmountUsd } = useRoute<TermSheetRoute>().params
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+
+  const terms = React.useMemo(
+    () => resolveInvestmentTerms(selectedAmountUsd),
+    [selectedAmountUsd],
+  )
 
   const EQUITIES: Feature[] = React.useMemo(
     () => [
       {
         icon: "upgrade" as const,
-        title: LL.CardFlow.Onboarding.TermSheet.equitySection.investment(),
+        title: LL.CardFlow.Onboarding.TermSheet.equitySection.investment({
+          amount: formatUsdAmount(terms.totalUsd),
+        }),
       },
       {
         icon: "coins" as const,
@@ -28,14 +45,17 @@ export const TermSheetScreen: React.FC = () => {
       },
       {
         icon: "bitcoin" as const,
-        title: LL.CardFlow.Onboarding.TermSheet.equitySection.units(),
+        title: LL.CardFlow.Onboarding.TermSheet.equitySection.units({
+          units: formatUnitCount(terms.units),
+          percent: resolveEquityPercent(terms),
+        }),
       },
     ],
-    [LL],
+    [LL, terms],
   )
 
   const handleNext = () => {
-    navigation.navigate("cardOnboardingTransferInvestScreen")
+    navigation.navigate("cardOnboardingTransferInvestScreen", { selectedAmountUsd })
   }
 
   return (
