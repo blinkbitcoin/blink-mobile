@@ -12913,6 +12913,10 @@ type RootTranslation = {
 			 */
 			dollarBalanceNotAvailable: string
 			/**
+			 * Y​o​u​r​ ​L​i​g​h​t​n​i​n​g​ ​a​d​d​r​e​s​s​ ​c​o​u​l​d​ ​n​o​t​ ​b​e​ ​m​o​v​e​d​.​ ​Y​o​u​r​ ​f​u​n​d​s​ ​w​i​l​l​ ​s​t​i​l​l​ ​b​e​ ​t​r​a​n​s​f​e​r​r​e​d​.
+			 */
+			lnAddressNotMoved: string
+			/**
 			 * N​e​t​w​o​r​k​ ​f​e​e​:​ ​<​b​o​l​d​>​{​f​e​e​}​<​/​b​o​l​d​>
 			 * @param {string} fee
 			 */
@@ -26439,6 +26443,10 @@ export type TranslationFunctions = {
 			 * not available
 			 */
 			dollarBalanceNotAvailable: () => LocalizedString
+			/**
+			 * Your Lightning address could not be moved. Your funds will still be transferred.
+			 */
+			lnAddressNotMoved: () => LocalizedString
 			/**
 			 * Network fee: <bold>{fee}</bold>
 			 */
