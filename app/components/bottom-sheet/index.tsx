@@ -176,6 +176,15 @@ export const BottomSheet: React.FC<Props> = ({
   // the header shows.
   const [headerBottom, setHeaderBottom] = React.useState(0)
   const [isExpanded, setExpanded] = React.useState(false)
+  // Inline there is no window to play the slide-out behind, so the sheet holds
+  // itself in the layout until its own exit has finished. Without it a caller
+  // that takes `isVisible` away gets two different exits from one surface:
+  // dragged, it slides out; closed from a button, it vanishes in the same
+  // frame and whatever it sat above snaps back to full height under it.
+  const [isLeaving, setLeaving] = React.useState(false)
+  // Only leaving from being open is an exit. Mounting hidden — which every
+  // modal caller does — is not something to animate out of, or to report.
+  const wasVisible = React.useRef(isVisible)
 
   const scrollRef = useAnimatedRef<Animated.ScrollView>()
   // Read straight off the scroll view, so the pan can tell a drag on a list
@@ -201,9 +210,32 @@ export const BottomSheet: React.FC<Props> = ({
     if (isVisible) setExpanded(false)
   }, [isVisible])
 
+  // The one exit, however it was asked for — a caller taking `isVisible` away,
+  // the back button, a drag past the dismiss distance. It slides out first and
+  // reports afterwards, so nothing disappears from the layout mid-animation.
+  const leave = React.useCallback(() => {
+    setLeaving(true)
+    offset.value = withTiming(
+      sheetHeight,
+      { duration: CLOSE_DURATION_MS },
+      (finished) => {
+        if (!finished) return
+        runOnJS(setLeaving)(false)
+        // Inline the caller has to take the sheet out of its own layout, so it
+        // is told when there is nothing left on screen to take out. A modal
+        // caller is the one that set `isVisible` false and its window hides
+        // itself, so it is not told a second time.
+        if (isInline) runOnJS(onClose)()
+      },
+    )
+  }, [isInline, offset, onClose, sheetHeight])
+
   React.useEffect(() => {
+    const hadBeenVisible = wasVisible.current
+    wasVisible.current = isVisible
+
     if (!isVisible) {
-      offset.value = withTiming(sheetHeight, { duration: CLOSE_DURATION_MS })
+      if (hadBeenVisible) leave()
       return
     }
     // Follow the measurement only while resting low. A header can grow after
@@ -220,6 +252,7 @@ export const BottomSheet: React.FC<Props> = ({
     isExpanded,
     offset,
     restsOnHeader,
+    leave,
   ])
 
   // Android's hardware back is the reflex for getting out of a form, and it is
@@ -232,11 +265,11 @@ export const BottomSheet: React.FC<Props> = ({
   React.useEffect(() => {
     if (!isInline || !isVisible) return undefined
     const subscription = BackHandler.addEventListener("hardwareBackPress", () => {
-      onClose()
+      leave()
       return true
     })
     return () => subscription.remove()
-  }, [isInline, isVisible, onClose])
+  }, [isInline, isVisible, leave])
 
   const pan = React.useMemo(
     () =>
@@ -390,7 +423,7 @@ export const BottomSheet: React.FC<Props> = ({
 
   // Inline there is no window to open and no scrim to press: the sheet is drawn
   // where it was placed, and everything around it keeps its own touches.
-  if (isInline) return isVisible ? sheet : null
+  if (isInline) return isVisible || isLeaving ? sheet : null
 
   return (
     <Modal visible={isVisible} transparent animationType="none" onRequestClose={onClose}>

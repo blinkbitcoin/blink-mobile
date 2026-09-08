@@ -413,8 +413,13 @@ describe("BottomSheet", () => {
       // Back is the reflex for getting out of a form, and inline there is no
       // `Modal` to take it. Unhandled it leaves the tab instead, which
       // unmounts the sheet and throws away everything typed into it.
-      expect((handler as () => boolean)()).toBe(true)
-      expect(onClose).toHaveBeenCalled()
+      await act(async () => {
+        expect((handler as () => boolean)()).toBe(true)
+      })
+
+      // Through the same exit the drag and the X take: out first, reported
+      // after, rather than the sheet going off in the frame back was pressed.
+      await waitFor(() => expect(onClose).toHaveBeenCalled())
 
       addListener.mockRestore()
     })
