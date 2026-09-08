@@ -19,7 +19,55 @@ jest.mock("react-native-safe-area-context", () => ({
   useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
 }))
 
+// `useScrollViewOffset` measures a real scroll view through an animated ref,
+// which never resolves under jest — every run logs "animatedRef is not
+// initialized" and the value stays 0, so the pan's scroll-versus-drag guard is
+// unreachable without standing in for it. Only that one hook is replaced; the
+// rest of reanimated is the real thing, since gesture-handler is built on it.
+//
+// The guard reads the offset once per drag update, so a test lists one reading
+// per update and the last one holds for everything after.
+let mockScrollReads: number[] = [0]
+const mockScrollOffset = {
+  get value() {
+    return (
+      (mockScrollReads.length > 1 ? mockScrollReads.shift() : mockScrollReads[0]) ?? 0
+    )
+  },
+}
+const scrollReads = (...values: number[]) => {
+  mockScrollReads = values
+}
+
+/**
+ * Long enough for a dismissal to have finished. `onClose` is called from the
+ * slide-out's completion rather than from the release, so "it did not close"
+ * only means anything once the slide-out has had its time.
+ */
+const settle = () =>
+  act(async () => {
+    await new Promise((resolve) => {
+      setTimeout(resolve, CLOSE_DURATION_MS + 100)
+    })
+  })
+
+/** Matches the sheet's own, which it does not export. */
+const CLOSE_DURATION_MS = 200
+
+jest.mock("react-native-reanimated", () => ({
+  __esModule: true,
+  ...jest.requireActual("react-native-reanimated"),
+  useScrollViewOffset: () => mockScrollOffset,
+}))
+
 const SHEET_TEST_ID = "sheet"
+
+/**
+ * Where the sheet is right now. A spring is never exactly at rest, so anything
+ * asserted against this wants a pixel of slack rather than an equality.
+ */
+const translateYOf = (sheet: ReactTestInstance) =>
+  (getAnimatedStyle(sheet).transform as [{ translateY: number }])[0].translateY
 
 /** The height the sheet's offsets are expressed in, not the one it is drawn at. */
 const animatedHeightOf = (sheet: ReactTestInstance) =>
@@ -43,6 +91,9 @@ const renderSheet = (props: Partial<React.ComponentProps<typeof BottomSheet>> = 
 beforeEach(() => {
   jest.clearAllMocks()
   loadLocale("en")
+  // At the top of its list, which is where every test that does not say
+  // otherwise expects to find it.
+  scrollReads(0)
 })
 
 describe("BottomSheet", () => {
@@ -189,6 +240,129 @@ describe("BottomSheet", () => {
     // Outside the scroll rather than at the end of it, so the content cannot
     // push it off the sheet.
     expect(within(getByTestId("sheet-scroll")).queryByText("Submit")).toBeNull()
+  })
+
+  it("does not dismiss on a flick that only sent the list back to the top", async () => {
+    const onClose = jest.fn()
+    const { getByTestId } = renderSheet({ onClose })
+
+    const sheet = await waitFor(() => getByTestId(SHEET_TEST_ID))
+    await waitFor(() =>
+      expect(getAnimatedStyle(sheet)).toMatchObject({ transform: [{ translateY: 0 }] }),
+    )
+
+    // Read to the bottom of a long list, then flicked down to get back to the
+    // top. The release velocity is an ordinary one for a flick, and on its own
+    // it projects far past the dismiss distance — but the sheet never moved,
+    // because the list took every frame of the drag.
+    scrollReads(300)
+    await act(async () => {
+      fireGestureHandler<PanGesture>(getByGestureTestId(PAN_TEST_ID), [
+        { translationY: 0, velocityY: 0 },
+        { translationY: 40, velocityY: 3000 },
+        { state: 5, translationY: 40, velocityY: 3000 },
+      ])
+    })
+    await settle()
+
+    expect(onClose).not.toHaveBeenCalled()
+    expect(getAnimatedStyle(sheet)).toMatchObject({ transform: [{ translateY: 0 }] })
+  })
+
+  it("picks the drag up where the list ran out rather than jumping it all at once", async () => {
+    const onClose = jest.fn()
+    const { getByTestId } = renderSheet({ onClose })
+
+    const sheet = await waitFor(() => getByTestId(SHEET_TEST_ID))
+    await waitFor(() =>
+      expect(getAnimatedStyle(sheet)).toMatchObject({ transform: [{ translateY: 0 }] }),
+    )
+
+    // 150 of the drag scrolled the list back to its top and only the last 50
+    // belong to the sheet. The whole 200 would be a dismissal; the 50 that are
+    // actually the sheet's are not, so it stays.
+    scrollReads(300, 0)
+    await act(async () => {
+      fireGestureHandler<PanGesture>(getByGestureTestId(PAN_TEST_ID), [
+        { translationY: 0, velocityY: 0 },
+        { translationY: 150, velocityY: 0 },
+        { translationY: 200, velocityY: 0 },
+        { state: 5, translationY: 200, velocityY: 0 },
+      ])
+    })
+    await settle()
+
+    expect(onClose).not.toHaveBeenCalled()
+    // And it sprang back home, rather than being carried off by the 150 that
+    // were never its to travel.
+    expect(Math.abs(translateYOf(sheet))).toBeLessThan(1)
+  })
+
+  it("dismisses on a short drag thrown hard enough to be going away", async () => {
+    const onClose = jest.fn()
+    const { getByTestId } = renderSheet({ onClose })
+
+    // Fully arrived first: dragged mid-entry the sheet is already far down the
+    // screen, and the distance alone would carry the decision.
+    const sheet = await waitFor(() => getByTestId(SHEET_TEST_ID))
+    await waitFor(() => expect(translateYOf(sheet)).toBe(0))
+
+    // Twenty pixels is nowhere near the dismiss distance standing still — the
+    // test above proves it stays — but thrown at 3,000 px/s it is on its way
+    // out, and the sheet goes where it was thrown rather than where it stopped.
+    await act(async () => {
+      fireGestureHandler<PanGesture>(getByGestureTestId(PAN_TEST_ID), [
+        { translationY: 0, velocityY: 0 },
+        { translationY: 20, velocityY: 3000 },
+        { state: 5, translationY: 20, velocityY: 3000 },
+      ])
+    })
+
+    await waitFor(() => expect(onClose).toHaveBeenCalled())
+  })
+
+  it("expands on a short drag thrown hard enough to be going up", async () => {
+    const { getByTestId } = renderSheet({
+      restsOnHeader: true,
+      header: <Text>title</Text>,
+      headerTestID: "sheet-header",
+      scrollTestID: "sheet-scroll",
+    })
+
+    const sheet = await waitFor(() => getByTestId(SHEET_TEST_ID))
+    const sheetHeight = animatedHeightOf(sheet)
+
+    await act(async () => {
+      fireEvent(getByTestId("sheet-header"), "layout", {
+        nativeEvent: { layout: { x: 0, y: 24, width: 300, height: 120 } },
+      })
+    })
+    const restOffset = sheetHeight - (24 + 120)
+    await waitFor(() =>
+      expect(getAnimatedStyle(sheet)).toMatchObject({
+        transform: [{ translateY: restOffset }],
+      }),
+    )
+
+    // Below full height the list is locked, since the sheet itself is taking
+    // the drag.
+    expect(getByTestId("sheet-scroll").props.scrollEnabled).toBe(false)
+
+    // Twenty pixels of travel is not halfway to the top, so only the throw can
+    // decide this one.
+    await act(async () => {
+      fireGestureHandler<PanGesture>(getByGestureTestId(PAN_TEST_ID), [
+        { translationY: 0, velocityY: 0 },
+        { translationY: -20, velocityY: -3000 },
+        { state: 5, translationY: -20, velocityY: -3000 },
+      ])
+    })
+
+    await waitFor(() =>
+      expect(getAnimatedStyle(sheet)).toMatchObject({ transform: [{ translateY: 0 }] }),
+    )
+    // And now that it is up, the list it holds is the thing that scrolls.
+    expect(getByTestId("sheet-scroll").props.scrollEnabled).toBe(true)
   })
 
   describe("inline", () => {
