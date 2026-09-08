@@ -9,6 +9,7 @@ import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { Screen } from "@app/components/screen"
 import { SuggestionBar } from "@app/components/suggestion-bar"
+import { useScreenSecurity } from "@app/hooks/use-screen-security"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { PhraseStep, RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useMigrationCheckpoint } from "@app/screens/account-migration/hooks"
@@ -59,6 +60,8 @@ export const BackupPhraseConfirmScreen: React.FC = () => {
 
   const { loading: checkpointLoading } = useMigrationCheckpoint()
   const completeBackup = useCompleteBackup()
+
+  useScreenSecurity()
 
   const onComplete = useCallback(() => {
     logSelfCustodialBackupCompleted({ backupMethod: "manual" })
