@@ -142,6 +142,37 @@ describe("DropdownComponent", () => {
     })
   })
 
+  describe("accessibility", () => {
+    it("announces the row as the control it is, and whether the list is open", () => {
+      // Without the role the row is read as the answer it currently shows,
+      // with nothing to say it can be changed.
+      const { getByTestId } = render(
+        <DropdownComponent {...defaultProps} placeholder="Select a country" />,
+      )
+
+      expect(getByTestId("dropdown").props.accessibilityRole).toBe("button")
+      expect(getByTestId("dropdown").props.accessibilityState).toMatchObject({
+        expanded: false,
+      })
+
+      fireEvent.press(getByTestId("dropdown"))
+
+      expect(getByTestId("dropdown").props.accessibilityState).toMatchObject({
+        expanded: true,
+      })
+    })
+
+    it("says so when there is nothing to open", () => {
+      const { getByTestId } = render(
+        <DropdownComponent {...defaultProps} disabled={true} />,
+      )
+
+      expect(getByTestId("dropdown").props.accessibilityState).toMatchObject({
+        disabled: true,
+      })
+    })
+  })
+
   describe("disabled state", () => {
     it("disables interaction when disabled", () => {
       const { getByTestId, queryByTestId } = render(

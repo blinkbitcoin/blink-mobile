@@ -2138,6 +2138,7 @@
     "placeName": "Naam",
     "placeNameHint": "Hoe de plek heet",
     "placeCategory": "Categorie",
+    "placeCategoryHint": "Kies een categorie",
     "placeLocation": "Locatie",
     "changeLocation": "Wijzig",
     "placeReviewNote": "Nieuwe plekken gaan naar BTC Map. De community daar controleert en onderhoudt alles op de kaart.",

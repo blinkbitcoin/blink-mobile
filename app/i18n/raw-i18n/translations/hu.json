@@ -2138,6 +2138,7 @@
     "placeName": "Név",
     "placeNameHint": "Hogy hívják a helyet",
     "placeCategory": "Kategória",
+    "placeCategoryHint": "Válassz kategóriát",
     "placeLocation": "Helyzet",
     "changeLocation": "Módosítás",
     "placeReviewNote": "Az új helyek a BTC Map-hez kerülnek. Az ottani közösség ellenőrzi és karbantartja mindazt, ami a térképen van.",

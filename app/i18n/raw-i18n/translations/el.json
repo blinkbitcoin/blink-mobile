@@ -2138,6 +2138,7 @@
     "placeName": "Όνομα",
     "placeNameHint": "Πώς λέγεται το μέρος",
     "placeCategory": "Κατηγορία",
+    "placeCategoryHint": "Επιλέξτε κατηγορία",
     "placeLocation": "Τοποθεσία",
     "changeLocation": "Αλλαγή",
     "placeReviewNote": "Τα νέα σημεία στέλνονται στο BTC Map. Η κοινότητά του ελέγχει και συντηρεί ό,τι υπάρχει στον χάρτη.",

@@ -2138,6 +2138,7 @@
     "placeName": "Nama",
     "placeNameHint": "Nama tempat ini",
     "placeCategory": "Kategori",
+    "placeCategoryHint": "Pilih kategori",
     "placeLocation": "Lokasi",
     "changeLocation": "Ubah",
     "placeReviewNote": "Tempat baru dikirim ke BTC Map. Komunitasnya meninjau dan memelihara semua yang ada di peta.",

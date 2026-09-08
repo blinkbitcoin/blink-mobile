@@ -2138,6 +2138,7 @@
     "placeName": "Naziv",
     "placeNameHint": "Kako se mjesto zove",
     "placeCategory": "Kategorija",
+    "placeCategoryHint": "Odaberite kategoriju",
     "placeLocation": "Lokacija",
     "changeLocation": "Promijeni",
     "placeReviewNote": "Nova mjesta šalju se u BTC Map. Tamošnja zajednica pregledava i održava sve što je na karti.",

@@ -2138,6 +2138,7 @@
     "placeName": "Nume",
     "placeNameHint": "Cum se numește locul",
     "placeCategory": "Categorie",
+    "placeCategoryHint": "Alege o categorie",
     "placeLocation": "Locație",
     "changeLocation": "Schimbă",
     "placeReviewNote": "Locurile noi ajung la BTC Map. Comunitatea sa verifică și întreține tot ce se află pe hartă.",

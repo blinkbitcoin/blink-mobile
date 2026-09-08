@@ -6,6 +6,14 @@ import { loadLocale } from "@app/i18n/i18n-util.sync"
 
 import { ContextForScreen } from "../../screens/helper"
 
+// The category dropdown puts its list in a react-native-modal, which renders
+// through a native host react-test-renderer never mounts. Without the stand-in
+// the options are unreachable and every category tap below would be pressing
+// nothing.
+jest.mock("react-native-modal", () =>
+  jest.requireActual("@mocks/react-native-modal-mock"),
+)
+
 const LOCATION = { latitude: 13.496743, longitude: -89.439462 }
 
 const onSubmit = jest.fn<Promise<string | null>, [unknown]>()
@@ -21,9 +29,19 @@ const sheet = (props: Partial<SheetProps> = {}) => (
 
 const renderSheet = (props: Partial<SheetProps> = {}) => render(sheet(props))
 
-const fillInForm = (getByTestId: (id: string) => unknown) => {
-  fireEvent.changeText(getByTestId("place-name-input") as never, "Hope House")
-  fireEvent.press(getByTestId("place-category-cafes") as never)
+type Queries = Pick<ReturnType<typeof renderSheet>, "getByTestId" | "getByText">
+
+// Two taps now: the row opens the list, and the option is inside it. The
+// options carry no testIDs of their own, so they are picked the way they are
+// read — the label the dropdown was handed.
+const chooseCategory = ({ getByTestId, getByText }: Queries, label: string) => {
+  fireEvent.press(getByTestId("place-category"))
+  fireEvent.press(getByText(label))
+}
+
+const fillInForm = (queries: Queries) => {
+  fireEvent.changeText(queries.getByTestId("place-name-input"), "Hope House")
+  chooseCategory(queries, "Cafés")
 }
 
 beforeEach(() => {
@@ -55,10 +73,10 @@ describe("AddPlaceSheet", () => {
   })
 
   it("submits where the pin is by then, not where it was when the form opened", async () => {
-    const { getByTestId, rerender } = renderSheet()
+    const { getByTestId, getByText, rerender } = renderSheet()
 
     await waitFor(() => expect(getByTestId("place-name-input")).toBeTruthy())
-    fillInForm(getByTestId)
+    fillInForm({ getByTestId, getByText })
     rerender(sheet({ location: { latitude: 13.5, longitude: -89.44 } }))
     fireEvent.press(getByTestId("submit-place"))
 
@@ -73,10 +91,10 @@ describe("AddPlaceSheet", () => {
   })
 
   it("will not submit a place with no name", async () => {
-    const { getByTestId } = renderSheet()
+    const { getByTestId, getByText } = renderSheet()
 
     await waitFor(() => expect(getByTestId("submit-place")).toBeTruthy())
-    fireEvent.press(getByTestId("place-category-cafes"))
+    chooseCategory({ getByTestId, getByText }, "Cafés")
     fireEvent.press(getByTestId("submit-place"))
 
     expect(onSubmit).not.toHaveBeenCalled()
@@ -95,15 +113,20 @@ describe("AddPlaceSheet", () => {
   it("does not offer the catch-all category", () => {
     // "other" is a filter bucket for unrecognised icons, not a description of
     // a place — a submission under it would tell BTC Map nothing.
-    const { queryByTestId } = renderSheet()
+    const { getByTestId, getByText, queryByText } = renderSheet()
 
-    expect(queryByTestId("place-category-other")).toBeNull()
+    fireEvent.press(getByTestId("place-category"))
+
+    // Anchored on a category that is offered: without it the absence below
+    // would also pass on a list that failed to open at all.
+    expect(getByText("Cafés")).toBeTruthy()
+    expect(queryByText("Other")).toBeNull()
   })
 
   it("says on the button that there is still something missing", async () => {
     // Disabled and translucent is the whole explanation, so it has to reach a
     // screen reader as well as an eye.
-    const { getByTestId } = renderSheet()
+    const { getByTestId, getByText } = renderSheet()
 
     await waitFor(() =>
       expect(getByTestId("submit-place").props.accessibilityState).toMatchObject({
@@ -111,7 +134,7 @@ describe("AddPlaceSheet", () => {
       }),
     )
 
-    fillInForm(getByTestId)
+    fillInForm({ getByTestId, getByText })
 
     await waitFor(() =>
       expect(getByTestId("submit-place").props.accessibilityState).toMatchObject({
@@ -121,10 +144,10 @@ describe("AddPlaceSheet", () => {
   })
 
   it("submits the place once it has a name, a category and a pin", async () => {
-    const { getByTestId } = renderSheet()
+    const { getByTestId, getByText } = renderSheet()
 
     await waitFor(() => expect(getByTestId("place-name-input")).toBeTruthy())
-    fillInForm(getByTestId)
+    fillInForm({ getByTestId, getByText })
     fireEvent.press(getByTestId("submit-place"))
 
     await waitFor(() =>
@@ -147,10 +170,10 @@ describe("AddPlaceSheet", () => {
           resolveSend = () => resolve(null)
         }),
     )
-    const { getByTestId } = renderSheet()
+    const { getByTestId, getByText } = renderSheet()
 
     await waitFor(() => expect(getByTestId("place-name-input")).toBeTruthy())
-    fillInForm(getByTestId)
+    fillInForm({ getByTestId, getByText })
     fireEvent.press(getByTestId("submit-place"))
     fireEvent.press(getByTestId("submit-place"))
     fireEvent.press(getByTestId("submit-place"))
@@ -180,7 +203,7 @@ describe("AddPlaceSheet", () => {
     const { getByTestId, getByText, rerender } = renderSheet()
 
     await waitFor(() => expect(getByTestId("place-name-input")).toBeTruthy())
-    fillInForm(getByTestId)
+    fillInForm({ getByTestId, getByText })
     fireEvent.press(getByTestId("submit-place"))
 
     await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1))
@@ -205,7 +228,7 @@ describe("AddPlaceSheet", () => {
     const { getByTestId, getByText } = renderSheet()
 
     await waitFor(() => expect(getByTestId("place-name-input")).toBeTruthy())
-    fillInForm(getByTestId)
+    fillInForm({ getByTestId, getByText })
     fireEvent.press(getByTestId("submit-place"))
 
     await waitFor(() =>
@@ -219,10 +242,10 @@ describe("AddPlaceSheet", () => {
     // Leaving it up would have a place that has just been sent still reading as
     // one that could not be.
     onSubmit.mockResolvedValueOnce("Too many places sent today.")
-    const { getByTestId, queryByTestId } = renderSheet()
+    const { getByTestId, getByText, queryByTestId } = renderSheet()
 
     await waitFor(() => expect(getByTestId("place-name-input")).toBeTruthy())
-    fillInForm(getByTestId)
+    fillInForm({ getByTestId, getByText })
     fireEvent.press(getByTestId("submit-place"))
 
     await waitFor(() => expect(getByTestId("place-submission-error")).toBeTruthy())
@@ -239,10 +262,10 @@ describe("AddPlaceSheet", () => {
     // the same rule would let an idle nudge wipe a message before it has been
     // read. It goes on the next send instead.
     onSubmit.mockResolvedValue("Too many places sent today.")
-    const { getByTestId, rerender } = renderSheet()
+    const { getByTestId, getByText, rerender } = renderSheet()
 
     await waitFor(() => expect(getByTestId("place-name-input")).toBeTruthy())
-    fillInForm(getByTestId)
+    fillInForm({ getByTestId, getByText })
     fireEvent.press(getByTestId("submit-place"))
 
     await waitFor(() => expect(getByTestId("place-submission-error")).toBeTruthy())
@@ -257,10 +280,10 @@ describe("AddPlaceSheet", () => {
     // once the name or the category changes it is accusing a place that no
     // longer exists.
     onSubmit.mockResolvedValue("Too many places sent today.")
-    const { getByTestId, queryByTestId } = renderSheet()
+    const { getByTestId, getByText, queryByTestId } = renderSheet()
 
     await waitFor(() => expect(getByTestId("place-name-input")).toBeTruthy())
-    fillInForm(getByTestId)
+    fillInForm({ getByTestId, getByText })
     fireEvent.press(getByTestId("submit-place"))
 
     await waitFor(() => expect(getByTestId("place-submission-error")).toBeTruthy())
@@ -271,31 +294,24 @@ describe("AddPlaceSheet", () => {
     fireEvent.press(getByTestId("submit-place"))
     await waitFor(() => expect(getByTestId("place-submission-error")).toBeTruthy())
 
-    fireEvent.press(getByTestId("place-category-bars"))
+    chooseCategory({ getByTestId, getByText }, "Bars & nightlife")
     await waitFor(() => expect(queryByTestId("place-submission-error")).toBeNull())
   })
 
-  it("lets a category be taken back off", async () => {
-    // The chips are one choice rather than a set, so the only way out of a
-    // mis-tap is tapping the same chip again.
-    const { getByTestId } = renderSheet()
+  it("lets a mis-tapped category be swapped for another", async () => {
+    // The way out of a mis-tap: the row can be opened again, and what it shows
+    // is the answer being given, so it has to be the one last chosen.
+    const { getByTestId, getByText, queryByText } = renderSheet()
 
-    await waitFor(() => expect(getByTestId("place-category-cafes")).toBeTruthy())
-    fireEvent.press(getByTestId("place-category-cafes"))
+    await waitFor(() => expect(getByTestId("place-category")).toBeTruthy())
+    chooseCategory({ getByTestId, getByText }, "Cafés")
 
-    await waitFor(() =>
-      expect(getByTestId("place-category-cafes").props.accessibilityState).toMatchObject({
-        selected: true,
-      }),
-    )
+    await waitFor(() => expect(getByText("Cafés")).toBeTruthy())
 
-    fireEvent.press(getByTestId("place-category-cafes"))
+    chooseCategory({ getByTestId, getByText }, "Bars & nightlife")
 
-    await waitFor(() =>
-      expect(getByTestId("place-category-cafes").props.accessibilityState).toMatchObject({
-        selected: false,
-      }),
-    )
+    await waitFor(() => expect(getByText("Bars & nightlife")).toBeTruthy())
+    expect(queryByText("Cafés")).toBeNull()
   })
 
   it("keeps what has been typed while the pin is moved", async () => {
@@ -304,17 +320,14 @@ describe("AddPlaceSheet", () => {
     const { getByTestId, getByText, rerender } = renderSheet()
 
     await waitFor(() => expect(getByTestId("place-name-input")).toBeTruthy())
-    fireEvent.changeText(getByTestId("place-name-input"), "Hope House")
-    fireEvent.press(getByTestId("place-category-cafes"))
+    fillInForm({ getByTestId, getByText })
 
     rerender(sheet({ location: { latitude: 13.5, longitude: -89.44 } }))
 
     await waitFor(() =>
       expect(getByTestId("place-name-input").props.value).toBe("Hope House"),
     )
-    expect(getByTestId("place-category-cafes").props.accessibilityState).toMatchObject({
-      selected: true,
-    })
+    expect(getByText("Cafés")).toBeTruthy()
     expect(getByText("13.500000, -89.440000")).toBeTruthy()
   })
 })

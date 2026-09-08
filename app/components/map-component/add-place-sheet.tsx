@@ -12,6 +12,7 @@ import {
 } from "@app/btcmap"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { DropdownComponent, DropdownOption } from "@app/components/card-screen/dropdown"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
@@ -76,12 +77,29 @@ export const AddPlaceSheet: React.FC<Props> = ({ location, onSubmit, onClose }) 
     setName(text)
     setError(null)
   }
-  const editCategory = (option: PlaceCategory) => {
-    setCategory((current) => (current === option ? null : option))
+  // The dropdown deals in plain strings, so what comes back is matched against
+  // the list it was built from rather than asserted to belong to it: a value
+  // from anywhere else is not a category and is dropped.
+  const editCategory = (value: string) => {
+    const chosen = SUBMITTABLE_PLACE_CATEGORIES.find((option) => option === value)
+    if (!chosen) return
+    setCategory(chosen)
     setError(null)
   }
 
   const shownLocation = sentLocation ?? location
+
+  // `other` is not among them: it is the bucket unrecognised pins fall into,
+  // not a description of a place, and a submission under it would tell BTC Map
+  // nothing.
+  const categoryOptions: DropdownOption[] = React.useMemo(
+    () =>
+      SUBMITTABLE_PLACE_CATEGORIES.map((option) => ({
+        value: option,
+        label: LL.MapScreen.category[option](),
+      })),
+    [LL],
+  )
 
   const submission = buildPlaceSubmission({ name, category, location })
   const isSubmitDisabled = !submission || isSubmitting
@@ -153,29 +171,19 @@ export const AddPlaceSheet: React.FC<Props> = ({ location, onSubmit, onClose }) 
 
         <View style={styles.field}>
           <Text style={styles.label}>{LL.MapScreen.placeCategory()}</Text>
-          {/* Short labels, so they are all on screen and one tap away. A
-              picker behind a row would hide the choice being made and cost
-              two taps to make it. `other` is not offered: it is a filter
-              bucket, not a description of a place. */}
-          <View style={styles.chips}>
-            {SUBMITTABLE_PLACE_CATEGORIES.map((option) => {
-              const isSelected = option === category
-              return (
-                <Pressable
-                  key={option}
-                  testID={`place-category-${option}`}
-                  style={[styles.chip, isSelected && styles.chipSelected]}
-                  onPress={() => editCategory(option)}
-                  accessibilityRole="button"
-                  accessibilityState={{ selected: isSelected }}
-                >
-                  <Text style={isSelected ? styles.chipTextSelected : styles.chipText}>
-                    {LL.MapScreen.category[option]()}
-                  </Text>
-                </Pressable>
-              )
-            })}
-          </View>
+          {/* A row that opens the fourteen, rather than fourteen chips laid
+              out at once. The chips were taller than everything else on the
+              form put together, which was affordable while this was a screen
+              of its own and is not now that it is half of one: the map is the
+              other half, and the button that sends the place has to stay on
+              the sheet with it. */}
+          <DropdownComponent
+            testID="place-category"
+            options={categoryOptions}
+            selectedValue={category ?? undefined}
+            onValueChange={editCategory}
+            placeholder={LL.MapScreen.placeCategoryHint()}
+          />
         </View>
 
         {/* Nothing here appears on the map on its own — saying so up front is
@@ -248,13 +256,16 @@ const useStyles = makeStyles(({ colors }) => ({
     fontSize: 14,
     color: colors.grey1,
   },
+  // These two are hand-rolled where the category row is the shared dropdown,
+  // so they take their measurements from it rather than the other way around —
+  // three stacked rows in one short form have to be one row three times.
   input: {
     fontSize: 16,
     color: colors.black,
     backgroundColor: colors.grey5,
-    borderRadius: 12,
-    minHeight: 48,
-    paddingHorizontal: 16,
+    borderRadius: 8,
+    minHeight: 60,
+    paddingHorizontal: 14,
     // Android gives inputs their own vertical padding on top of the row's.
     paddingVertical: 0,
   },
@@ -263,38 +274,14 @@ const useStyles = makeStyles(({ colors }) => ({
     alignItems: "center",
     columnGap: 10,
     backgroundColor: colors.grey5,
-    borderRadius: 12,
-    minHeight: 48,
-    paddingHorizontal: 16,
+    borderRadius: 8,
+    minHeight: 60,
+    paddingHorizontal: 14,
   },
   coordinates: {
     flex: 1,
-    fontSize: 15,
+    fontSize: 16,
     color: colors.black,
-  },
-  chips: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    columnGap: 8,
-    rowGap: 8,
-  },
-  chip: {
-    borderRadius: 18,
-    paddingHorizontal: 14,
-    paddingVertical: 9,
-    backgroundColor: colors.grey5,
-  },
-  chipSelected: {
-    backgroundColor: colors.primary,
-  },
-  chipText: {
-    fontSize: 14,
-    color: colors.black,
-  },
-  chipTextSelected: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: colors.white,
   },
   note: {
     flexDirection: "row",
