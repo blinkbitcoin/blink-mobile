@@ -1,17 +1,23 @@
 import React from "react"
 import { Linking, Share, StyleSheet } from "react-native"
-import type { ReactTestInstance } from "react-test-renderer"
 import { getAnimatedStyle } from "react-native-reanimated"
+import {
+  fireGestureHandler,
+  getByGestureTestId,
+} from "react-native-gesture-handler/jest-utils"
+import type { PanGesture } from "react-native-gesture-handler"
 import { act, render, fireEvent, waitFor, within } from "@testing-library/react-native"
 
 import { BtcMapPlace, BtcMapPlaceDetails } from "@app/btcmap"
 import { useBtcMapPlaceDetails } from "@app/btcmap/use-place-details"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
+import { BOTTOM_OVERHANG, PAN_TEST_ID } from "@app/components/bottom-sheet"
 import { PlaceSheet } from "@app/components/map-component/place-sheet"
 import { openExternalUrl } from "@app/utils/external"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
+import { animatedHeightOf, translateYOf } from "../../helpers/bottom-sheet"
 import { ContextForScreen } from "../../screens/helper"
 
 jest.mock("@app/btcmap/use-place-details", () => ({
@@ -58,15 +64,6 @@ const setDetails = (value: BtcMapPlaceDetails | null, extra = {}) => {
     ...extra,
   })
 }
-
-// The sheet is painted this much taller than the height its animation is
-// measured against, so its antialiased bottom edge falls below the screen —
-// see BOTTOM_OVERHANG in the component.
-const BOTTOM_OVERHANG = 1
-
-/** The height the sheet's offsets are expressed in, not the one it is drawn at. */
-const animatedHeightOf = (sheet: ReactTestInstance) =>
-  (StyleSheet.flatten(sheet.props.style).height as number) - BOTTOM_OVERHANG
 
 const renderSheet = (props: Partial<React.ComponentProps<typeof PlaceSheet>> = {}) =>
   render(
@@ -306,7 +303,65 @@ describe("PlaceSheet", () => {
     const { getByTestId, getByText } = renderSheet()
 
     await waitFor(() => expect(getByText("Satoshi Coffee")).toBeTruthy())
+    const sheet = getByTestId("place-sheet")
+
+    await act(async () => {
+      fireEvent(getByTestId("place-sheet-peek"), "layout", {
+        nativeEvent: { layout: { x: 0, y: 24, width: 300, height: 160 } },
+      })
+    })
+    await waitFor(() =>
+      expect(translateYOf(sheet)).toBe(animatedHeightOf(sheet) - (24 + 160)),
+    )
     expect(getByTestId("place-sheet-scroll").props.scrollEnabled).toBe(false)
+
+    // Pulled up past halfway, which is where it snaps to full height. The list
+    // is then what the drag is for and it takes over — the half of this the
+    // name promises.
+    await act(async () => {
+      fireGestureHandler<PanGesture>(getByGestureTestId(PAN_TEST_ID), [
+        { translationY: 0, velocityY: 0 },
+        { translationY: -900, velocityY: 0 },
+        { state: 5, translationY: -900, velocityY: 0 },
+      ])
+    })
+
+    await waitFor(() =>
+      expect(getByTestId("place-sheet-scroll").props.scrollEnabled).toBe(true),
+    )
+  })
+
+  it("does not drop back down when the header grows under it", async () => {
+    // Details land on the peek after the sheet has arrived — a card the place
+    // turns out to require, say — and the measurement that follows must not
+    // pull a sheet the user has already opened back to the peek under them.
+    const { getByTestId, getByText } = renderSheet()
+
+    await waitFor(() => expect(getByText("Satoshi Coffee")).toBeTruthy())
+    const sheet = getByTestId("place-sheet")
+
+    await act(async () => {
+      fireEvent(getByTestId("place-sheet-peek"), "layout", {
+        nativeEvent: { layout: { x: 0, y: 24, width: 300, height: 160 } },
+      })
+    })
+    await act(async () => {
+      fireGestureHandler<PanGesture>(getByGestureTestId(PAN_TEST_ID), [
+        { translationY: 0, velocityY: 0 },
+        { translationY: -900, velocityY: 0 },
+        { state: 5, translationY: -900, velocityY: 0 },
+      ])
+    })
+    await waitFor(() => expect(Math.abs(translateYOf(sheet))).toBeLessThan(1))
+
+    await act(async () => {
+      fireEvent(getByTestId("place-sheet-peek"), "layout", {
+        nativeEvent: { layout: { x: 0, y: 24, width: 300, height: 260 } },
+      })
+    })
+
+    // Still open, rather than sprung back to the taller peek.
+    expect(Math.abs(translateYOf(sheet))).toBeLessThan(1)
   })
 
   it("shows where and when in the block the lower position rests on", async () => {

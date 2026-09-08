@@ -34,15 +34,19 @@ import { AccountType } from "@app/types/wallet"
 import { reportError } from "@app/utils/error-logging"
 import { toastShow } from "@app/utils/toast"
 import { generateSecureRandomUUID } from "@app/utils/uuid"
-import { useFocusEffect } from "@react-navigation/native"
+import { useBottomTabBarStyle } from "@app/navigation/bottom-tab-bar-style"
+import { PrimaryStackParamList } from "@app/navigation/stack-param-lists"
+import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs"
+import { useFocusEffect, useNavigation } from "@react-navigation/native"
 import { isIOS } from "@rn-vui/base"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
-import { AddPlaceSheet } from "./add-place-sheet"
+import { AddPlacePanel } from "./add-place-panel"
 import { CategoryFilterSheet } from "./category-filter-sheet"
 import { ClusterMarker, ClusterMarkerData } from "./cluster-marker"
 import { Viewport, placeLabels } from "./label-collision"
 import LocationButtonCopy from "./location-button-copy"
+import { MAP_EDGE_GAP } from "./map-controls"
 import { MapSearchBar, searchBarBottom } from "./map-search-bar"
 import MapStyles from "./map-styles.json"
 import { OpenSettingsElement, OpenSettingsModal } from "./open-settings-modal"
@@ -69,6 +73,10 @@ const EMPTY_LABELS: ReadonlySet<number> = new Set()
 const SAVE_COORDS_DEBOUNCE_MS = 1000
 const FLY_TO_DURATION_MS = 350
 
+// Hoisted so the effect that sets it has one object to depend on rather than a
+// fresh one every run. See the tab bar effect below.
+const HIDDEN_TAB_BAR = { display: "none" } as const
+
 type Props = {
   userLocation: Region
   userCoords?: LatLng
@@ -88,6 +96,9 @@ export default function MapComponent({
     theme: { colors, mode: themeMode },
   } = useTheme()
   const insets = useSafeAreaInsets()
+  const navigation =
+    useNavigation<BottomTabNavigationProp<PrimaryStackParamList, "Map">>()
+  const tabBarStyle = useBottomTabBarStyle()
   const styles = useStyles({ topInset: insets.top })
   const client = useApolloClient()
   const { LL } = useI18nContext()
@@ -354,6 +365,23 @@ export default function MapComponent({
 
   const stopAddingPlace = React.useCallback(() => setAddingPlace(false), [])
 
+  // The panel runs to the bottom of the screen while a place is being added,
+  // covering the tab bar the way the place sheet's own window covers it. This
+  // one has no window on purpose — the map above it has to stay pannable while
+  // the form is filled in — so the bar is taken away rather than drawn over.
+  //
+  // Set on the way back too, rather than restored from a cleanup, and to the
+  // navigator's own style rather than to nothing: `setOptions` merges over
+  // `screenOptions` instead of falling back to them, and it outlives the effect
+  // that set it. A cleanup would leave this screen holding whichever style was
+  // current the moment the panel closed — switch to dark afterwards and every
+  // other tab's bar repaints from the navigator while the map's stays light.
+  // Owning the option on every run instead means the theme is followed for
+  // free, and nothing is written to a screen that has already been torn down.
+  React.useEffect(() => {
+    navigation.setOptions({ tabBarStyle: isAddingPlace ? HIDDEN_TAB_BAR : tabBarStyle })
+  }, [isAddingPlace, navigation, tabBarStyle])
+
   /**
    * Sends the place and answers the form with what to say about it.
    *
@@ -603,7 +631,7 @@ export default function MapComponent({
           typed — so the map gets all of itself back and a next attempt starts
           on an empty form. */}
       {isAddingPlace && (
-        <AddPlaceSheet
+        <AddPlacePanel
           location={center}
           onSubmit={handlePlaceSubmit}
           onClose={stopAddingPlace}
@@ -677,8 +705,8 @@ const useStyles = makeStyles(({ colors }, { topInset }: { topInset: number }) =>
   },
   addPlace: {
     position: "absolute",
-    left: 8,
-    bottom: 12,
+    left: MAP_EDGE_GAP,
+    bottom: MAP_EDGE_GAP,
     zIndex: 99,
     flexDirection: "row",
     alignItems: "center",

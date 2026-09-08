@@ -5,18 +5,10 @@ import { PermissionStatus, RESULTS } from "react-native-permissions"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
 import CenterLocationAndroid from "../../assets/icons/center-location-android.svg"
+import { MAP_EDGE_GAP } from "./map-controls"
 
 // Round, so it reads as a floating action over the map rather than a card.
 const BUTTON_SIZE = 44
-
-// Sits above the ODbL credit, which shares this corner. The gap is bigger than
-// the credit needs at default text size so that scaling it up — it is an
-// attribution we are obliged to keep legible — moves it behind nothing.
-//
-// Measured from the bottom of the map's own half of the screen, which is the
-// top of the add-place form whenever one is open — so nothing has to raise this
-// to keep it clear of one.
-const BOTTOM = 48
 
 type Props = {
   requestPermissions: () => void
@@ -48,10 +40,14 @@ export default function LocationButtonCopy({
 }
 
 const useStyles = makeStyles(({ colors }) => ({
+  // The map's bottom-right corner, on the same margin as every other control
+  // over it. The bottom is measured from the map's own half of the screen,
+  // which is the top of the add-place panel whenever one is open — so nothing
+  // has to raise this to keep it clear of one.
   button: {
     position: "absolute",
-    bottom: BOTTOM,
-    right: 8,
+    bottom: MAP_EDGE_GAP,
+    right: MAP_EDGE_GAP,
     zIndex: 99,
   },
   android: {
