@@ -1,5 +1,5 @@
 import React from "react"
-import { StyleSheet, Text, View } from "react-native"
+import { BackHandler, StyleSheet, Text, View } from "react-native"
 import type { ReactTestInstance } from "react-test-renderer"
 import { getAnimatedStyle } from "react-native-reanimated"
 import {
@@ -400,6 +400,38 @@ describe("BottomSheet", () => {
       // by exactly this, instead of being covered by it.
       expect(style.height).toBeUndefined()
       expect(style.flex).toBe(1)
+    })
+
+    it("closes on the Android back button, the way the modal one does", async () => {
+      const onClose = jest.fn()
+      const addListener = jest.spyOn(BackHandler, "addEventListener")
+      renderSheet({ presentation: "inline", onClose })
+
+      await waitFor(() => expect(addListener).toHaveBeenCalled())
+      const [, handler] = addListener.mock.calls[0]
+
+      // Back is the reflex for getting out of a form, and inline there is no
+      // `Modal` to take it. Unhandled it leaves the tab instead, which
+      // unmounts the sheet and throws away everything typed into it.
+      expect((handler as () => boolean)()).toBe(true)
+      expect(onClose).toHaveBeenCalled()
+
+      addListener.mockRestore()
+    })
+
+    it("gives the back button up once it is no longer visible", async () => {
+      const remove = jest.fn()
+      const addListener = jest
+        .spyOn(BackHandler, "addEventListener")
+        .mockReturnValue({ remove } as ReturnType<typeof BackHandler.addEventListener>)
+      const { unmount } = renderSheet({ presentation: "inline", onClose: jest.fn() })
+
+      await waitFor(() => expect(addListener).toHaveBeenCalled())
+      unmount()
+
+      // Otherwise the map behind it keeps answering back with a close.
+      expect(remove).toHaveBeenCalled()
+      addListener.mockRestore()
     })
 
     it("draws nothing at all when it is not visible", async () => {
