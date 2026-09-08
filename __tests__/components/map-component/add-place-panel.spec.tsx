@@ -82,12 +82,13 @@ describe("AddPlacePanel", () => {
     await waitFor(() => expect(getByText("13.500000, -89.440000")).toBeTruthy())
   })
 
-  it("submits where the pin is by then, not where it was when the form opened", async () => {
+  it("submits where the pin was by Continue, not where it was when the form opened", async () => {
     const { getByTestId, getByText, rerender } = renderSheet()
 
     await waitFor(() => expect(getByTestId("place-name-input")).toBeTruthy())
-    fillInForm({ getByTestId, getByText })
+    // Aimed while the first step is up, which is what the first step is for.
     rerender(sheet({ location: { latitude: 13.5, longitude: -89.44 } }))
+    fillInForm({ getByTestId, getByText })
     fireEvent.press(getByTestId("submit-place"))
 
     await waitFor(() =>
@@ -255,6 +256,54 @@ describe("AddPlacePanel", () => {
     fireEvent.press(getByTestId("submit-place"))
 
     await waitFor(() => expect(queryByTestId("place-submission-error")).toBeNull())
+  })
+
+  it("holds the pin still once Continue has been pressed", async () => {
+    // The map above stays pannable throughout, and the coordinate row is on the
+    // step behind this one. Without the freeze a brush of the map while
+    // reaching for a chip would send a place the user never read, with nothing
+    // on the panel disagreeing.
+    const { getByTestId, getByText, rerender } = renderSheet()
+
+    await waitFor(() => expect(getByTestId("place-name-input")).toBeTruthy())
+    fillInForm({ getByTestId, getByText })
+
+    rerender(sheet({ location: { latitude: 13.5, longitude: -89.44 } }))
+    fireEvent.press(getByTestId("submit-place"))
+
+    await waitFor(() =>
+      expect(onSubmit).toHaveBeenCalledWith({
+        name: "Hope House",
+        category: "cafes",
+        latitude: 13.496743,
+        longitude: -89.439462,
+      }),
+    )
+  })
+
+  it("lets the pin go again on the way back to the details", async () => {
+    // The row that shows it is on screen once more, so it follows the map
+    // again — and Continue is what commits the new one.
+    const { getByTestId, getByText, rerender } = renderSheet()
+
+    await waitFor(() => expect(getByTestId("place-name-input")).toBeTruthy())
+    fillInForm({ getByTestId, getByText })
+
+    fireEvent.press(getByTestId("back-to-place-details"))
+    rerender(sheet({ location: { latitude: 13.5, longitude: -89.44 } }))
+    await waitFor(() => expect(getByText("13.500000, -89.440000")).toBeTruthy())
+
+    fireEvent.press(getByTestId("continue-place"))
+    fireEvent.press(getByTestId("submit-place"))
+
+    await waitFor(() =>
+      expect(onSubmit).toHaveBeenCalledWith({
+        name: "Hope House",
+        category: "cafes",
+        latitude: 13.5,
+        longitude: -89.44,
+      }),
+    )
   })
 
   it("leaves the failure up when the map is merely panned", async () => {

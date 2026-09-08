@@ -20,8 +20,9 @@ import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 type Props = {
   /**
    * Where the pin is pointing right now — the centre of the map above, which
-   * moves as the map does. This is what gets submitted, so the row showing it
-   * and the request carry the same place.
+   * moves as the map does. The row showing it and the request carry the same
+   * place: this is what is submitted, taken as it stood when Continue was
+   * pressed rather than as it stands when Submit is.
    */
   location: LatLng
   /**
@@ -68,6 +69,15 @@ export const AddPlacePanel: React.FC<Props> = ({ location, onSubmit, onClose }) 
   // pin is aimed while these are typed — and the category is a fourteen-way
   // choice that wants the whole sheet to itself.
   const [step, setStep] = React.useState<"details" | "category">("details")
+  // The pin as it stood when Continue was pressed. The map above stays
+  // pannable the whole time this is open — that is the reason it is a panel —
+  // and the coordinate row is on the first step while the send is on the
+  // second, so without this a brush of the map while reaching for a chip would
+  // submit a place the user never saw, with nothing on the panel disagreeing.
+  // Continue means "this is the place", which is what splitting the two steps
+  // implies to whoever pressed it. Stepping back releases it, since the row
+  // that shows the pin is back on screen and following the map again.
+  const [pinnedLocation, setPinnedLocation] = React.useState<LatLng | null>(null)
   const [name, setName] = React.useState("")
   const [category, setCategory] = React.useState<PlaceCategory | null>(null)
   // Sending is a round trip. The guard keeps a second tap from firing a
@@ -93,7 +103,11 @@ export const AddPlacePanel: React.FC<Props> = ({ location, onSubmit, onClose }) 
     setError(null)
   }
 
-  const submission = buildPlaceSubmission({ name, category, location })
+  const submission = buildPlaceSubmission({
+    name,
+    category,
+    location: pinnedLocation ?? location,
+  })
   const isSubmitDisabled = !submission || isSubmitting
   // The name is the only thing the first step asks for that it can be missing:
   // the pin always points somewhere, so there is always a location.
@@ -104,6 +118,7 @@ export const AddPlacePanel: React.FC<Props> = ({ location, onSubmit, onClose }) 
   // the category to fix a typo would be its own annoyance.
   const goBack = () => {
     setStep("details")
+    setPinnedLocation(null)
     setError(null)
   }
 
@@ -170,7 +185,10 @@ export const AddPlacePanel: React.FC<Props> = ({ location, onSubmit, onClose }) 
             <GaloyPrimaryButton
               testID="continue-place"
               title={LL.common.continue()}
-              onPress={() => setStep("category")}
+              onPress={() => {
+                setPinnedLocation(location)
+                setStep("category")
+              }}
               disabled={!canContinue}
             />
           ) : (
