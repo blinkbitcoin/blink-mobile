@@ -7,7 +7,7 @@ import {
   getByGestureTestId,
 } from "react-native-gesture-handler/jest-utils"
 import type { PanGesture } from "react-native-gesture-handler"
-import { act, fireEvent, render, waitFor } from "@testing-library/react-native"
+import { act, fireEvent, render, waitFor, within } from "@testing-library/react-native"
 
 import { BOTTOM_OVERHANG, BottomSheet, PAN_TEST_ID } from "@app/components/bottom-sheet"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
@@ -178,5 +178,60 @@ describe("BottomSheet", () => {
     // window rather than on screen. That is how it behaved before the sheet was
     // shared and is left alone here; see the PR notes.
     await waitFor(() => expect(queryByText("content")).toBeNull())
+  })
+  it("holds a footer below the scroll, so a call to action stays on the sheet", async () => {
+    const { getByText, getByTestId } = renderSheet({
+      footer: <Text>Submit</Text>,
+      scrollTestID: "sheet-scroll",
+    })
+
+    await waitFor(() => expect(getByText("Submit")).toBeTruthy())
+    // Outside the scroll rather than at the end of it, so the content cannot
+    // push it off the sheet.
+    expect(within(getByTestId("sheet-scroll")).queryByText("Submit")).toBeNull()
+  })
+
+  describe("inline", () => {
+    it("puts up no scrim, so what it sits beside keeps its own touches", async () => {
+      const { getByText, queryByLabelText } = renderSheet({ presentation: "inline" })
+
+      await waitFor(() => expect(getByText("content")).toBeTruthy())
+      // The scrim is the only thing that presses to close, and it is what would
+      // be swallowing the panning of the map this sits beside.
+      expect(queryByLabelText("Close")).toBeNull()
+    })
+
+    it("is still dragged away the same way the modal one is", async () => {
+      const onClose = jest.fn()
+      renderSheet({ presentation: "inline", onClose })
+
+      await act(async () => {
+        fireGestureHandler<PanGesture>(getByGestureTestId(PAN_TEST_ID), [
+          { translationY: 0, velocityY: 0 },
+          { translationY: 200, velocityY: 0 },
+          { state: 5, translationY: 200, velocityY: 0 },
+        ])
+      })
+
+      await waitFor(() => expect(onClose).toHaveBeenCalled())
+    })
+
+    it("takes no height of its own, so its parent decides the split", async () => {
+      const { getByTestId } = renderSheet({ presentation: "inline" })
+
+      const sheet = await waitFor(() => getByTestId(SHEET_TEST_ID))
+      const style = StyleSheet.flatten(sheet.props.style)
+
+      // A `flex` share rather than a measured height: the map above it shrinks
+      // by exactly this, instead of being covered by it.
+      expect(style.height).toBeUndefined()
+      expect(style.flex).toBe(1)
+    })
+
+    it("draws nothing at all when it is not visible", async () => {
+      const { queryByText } = renderSheet({ presentation: "inline", isVisible: false })
+
+      await waitFor(() => expect(queryByText("content")).toBeNull())
+    })
   })
 })

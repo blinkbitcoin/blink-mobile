@@ -64,7 +64,21 @@ type Props = {
    * the window. Short of the whole thing on every current caller: what the
    * sheet is about stays partly visible behind it.
    */
-  heightRatio: number
+  heightRatio?: number
+  /**
+   * How the sheet is put on the screen.
+   *
+   * `"modal"` is a sheet in the usual sense: its own window, a scrim, and every
+   * touch on the screen belonging to it until it is dismissed.
+   *
+   * `"inline"` draws the same sheet in the layout it is placed in, with no
+   * window and no scrim, so what it sits beside keeps its own touches. It fills
+   * the slot its parent gives it — a `flex` share rather than `heightRatio` —
+   * which is what lets the surface above it shrink by exactly the sheet's
+   * height instead of being covered by it. Everything else is unchanged, the
+   * spring and the dismiss distance included, so the two read as one component.
+   */
+  presentation?: "modal" | "inline"
   /**
    * Held above the scroll and below the handle, so it stays put while the
    * content moves under it.
@@ -81,6 +95,12 @@ type Props = {
   restsOnHeader?: boolean
   headerStyle?: StyleProp<ViewStyle>
   headerTestID?: string
+  /**
+   * Held below the scroll, so a call to action stays on the sheet rather than
+   * under whatever the content has pushed off it.
+   */
+  footer?: React.ReactNode
+  footerStyle?: StyleProp<ViewStyle>
   children: React.ReactNode
   contentContainerStyle?: StyleProp<ViewStyle>
   scrollTestID?: string
@@ -100,20 +120,24 @@ type Props = {
  * That component reaches for React Native's `Modal` for the same reason and
  * gives up drag-to-dismiss to do it; this is what it would use instead.
  *
- * Not for anything that has to leave what is behind it usable. A sheet is a
- * modal window and takes every touch on the screen, so a form that has to be
- * filled in while what is behind it is still being manipulated — the map's
- * add-place form, which is aimed and described at the same time — belongs
- * beside that surface rather than on one of these.
+ * A form that has to be filled in while what is behind it is still being
+ * worked — the map's add-place form, whose pin is aimed by panning the map
+ * above it as the fields are typed — wants `presentation="inline"`. It gets
+ * the same entry, the same drag-to-dismiss and the same spring, and gives up
+ * only the window and the scrim, which are the two things that would take the
+ * panning away.
  */
 export const BottomSheet: React.FC<Props> = ({
   isVisible,
   onClose,
   heightRatio,
+  presentation = "modal",
   header,
   restsOnHeader = false,
   headerStyle,
   headerTestID,
+  footer,
+  footerStyle,
   children,
   contentContainerStyle,
   scrollTestID,
@@ -123,7 +147,16 @@ export const BottomSheet: React.FC<Props> = ({
   const styles = useStyles()
   const { height: windowHeight } = useWindowDimensions()
 
-  const sheetHeight = Math.round(windowHeight * heightRatio)
+  const isInline = presentation === "inline"
+
+  // Inline the sheet is given its height by the layout rather than taking a
+  // share of the window, so it has to be measured. Until that lands the window
+  // stands in for it, which only ever makes the entry start further below the
+  // screen than it needs to — never on screen, which is what would be visible.
+  const [measuredHeight, setMeasuredHeight] = React.useState(0)
+  const sheetHeight = isInline
+    ? measuredHeight || windowHeight
+    : Math.round(windowHeight * (heightRatio ?? 1))
 
   // Offset from the sheet's own top: 0 is fully open, `sheetHeight` is off the
   // bottom of the screen.
@@ -252,6 +285,61 @@ export const BottomSheet: React.FC<Props> = ({
     [offset, restOffset, sheetHeight],
   )
 
+  const sheet = (
+    <GestureDetector gesture={pan}>
+      <Animated.View
+        style={[
+          styles.sheet,
+          isInline
+            ? styles.sheetInline
+            : { height: sheetHeight + BOTTOM_OVERHANG, marginBottom: -BOTTOM_OVERHANG },
+          sheetStyle,
+        ]}
+        onLayout={
+          isInline
+            ? (event) => setMeasuredHeight(event.nativeEvent.layout.height)
+            : undefined
+        }
+        testID={testID}
+      >
+        <View style={styles.handle} />
+
+        {header !== undefined && (
+          <View
+            testID={headerTestID}
+            style={headerStyle}
+            onLayout={(event) => {
+              if (!restsOnHeader) return
+              const { y, height } = event.nativeEvent.layout
+              setHeaderBottom(y + height)
+            }}
+          >
+            {header}
+          </View>
+        )}
+
+        <Animated.ScrollView
+          testID={scrollTestID}
+          ref={scrollRef}
+          style={styles.scroll}
+          contentContainerStyle={contentContainerStyle}
+          showsVerticalScrollIndicator={false}
+          // Below full height the sheet itself takes the drag; a list that
+          // cannot be seen has nothing to scroll.
+          scrollEnabled={restsOnHeader ? isExpanded : true}
+        >
+          {children}
+        </Animated.ScrollView>
+
+        {footer !== undefined && <View style={footerStyle}>{footer}</View>}
+      </Animated.View>
+    </GestureDetector>
+  )
+
+  // Inline there is no window to open and no scrim to press: the sheet is drawn
+  // where it was placed, and everything around it keeps its own touches.
+  if (isInline) return isVisible ? sheet : null
+
   return (
     <Modal visible={isVisible} transparent animationType="none" onRequestClose={onClose}>
       {/* Gestures inside a Modal need their own root on Android — the one in
@@ -266,41 +354,7 @@ export const BottomSheet: React.FC<Props> = ({
           />
         </Animated.View>
 
-        <GestureDetector gesture={pan}>
-          <Animated.View
-            style={[styles.sheet, { height: sheetHeight + BOTTOM_OVERHANG }, sheetStyle]}
-            testID={testID}
-          >
-            <View style={styles.handle} />
-
-            {header !== undefined && (
-              <View
-                testID={headerTestID}
-                style={headerStyle}
-                onLayout={(event) => {
-                  if (!restsOnHeader) return
-                  const { y, height } = event.nativeEvent.layout
-                  setHeaderBottom(y + height)
-                }}
-              >
-                {header}
-              </View>
-            )}
-
-            <Animated.ScrollView
-              testID={scrollTestID}
-              ref={scrollRef}
-              style={styles.scroll}
-              contentContainerStyle={contentContainerStyle}
-              showsVerticalScrollIndicator={false}
-              // Below full height the sheet itself takes the drag; a list that
-              // cannot be seen has nothing to scroll.
-              scrollEnabled={restsOnHeader ? isExpanded : true}
-            >
-              {children}
-            </Animated.ScrollView>
-          </Animated.View>
-        </GestureDetector>
+        {sheet}
       </GestureHandlerRootView>
     </Modal>
   )
@@ -330,8 +384,11 @@ const useStyles = makeStyles(({ colors }) => ({
     borderBottomWidth: 0,
     borderColor: colors.grey4,
     paddingTop: 8,
-    // Cancels the extra height above, so only the seam moves off-screen.
-    marginBottom: -BOTTOM_OVERHANG,
+  },
+  // Fills the slot the layout gives it, so the surface above shrinks by exactly
+  // this sheet's height rather than being covered by it.
+  sheetInline: {
+    flex: 1,
   },
   handle: {
     alignSelf: "center",
