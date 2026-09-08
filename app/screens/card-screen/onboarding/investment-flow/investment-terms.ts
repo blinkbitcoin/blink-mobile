@@ -1,3 +1,6 @@
+import { SATS_PER_BTC } from "@app/hooks/use-price-conversion"
+import { formatUnixTimestampYMDHM } from "@app/utils/date"
+
 /**
  * The economics of one investment, derived from the single figure the user picks: what the
  * signer receives, and what they owe for it.
@@ -7,6 +10,17 @@ export type InvestmentTerms = {
   units: number
   pricePerUnitUsd: number
   preMoneyValuationUsd: number
+  /** The three below are absent until the price feed has answered. The agreement fixes a
+   *  rate the payment is then owed at, so a guessed one would be worse than none. */
+  btcUsdRate?: number
+  settlementBtc?: number
+  rateTimestamp?: string
+}
+
+/** What the agreement's BTC figures are quoted against: a rate, and the moment it held. */
+export type SettlementQuote = {
+  btcUsdRate: number
+  at: Date
 }
 
 /** One unit per dollar, which is what the flow's own copy states ("$10,000 Investment …
@@ -17,11 +31,50 @@ const PRICE_PER_UNIT_USD = 1
  *  and $100,000 buys 1%, so the whole company is $10M pre-money. */
 const PRE_MONEY_VALUATION_USD = 10_000_000
 
-export const resolveInvestmentTerms = (totalUsd: number): InvestmentTerms => ({
+/** So the figure the signer commits to is exact to the satoshi, not to whatever a float
+ *  happens to print. */
+const BTC_DECIMALS = 8
+
+/** Honduras keeps a fixed UTC-6 the year round, so the stamp is shifted by hand and then
+ *  rendered as UTC. Naming the zone instead would make this the first production caller to
+ *  pass one, which `formatUnixTimestampYMDHM` documents as test-only. */
+const HONDURAS_UTC_OFFSET_MS = -6 * 60 * 60 * 1000
+
+/**
+ * The app prices in satoshis; the agreement is written in bitcoin. Answers null rather
+ * than a zero or a NaN, so the caller has one thing to check before quoting a rate a
+ * signature will be bound to.
+ */
+export const resolveSettlementQuote = (
+  usdPerSat: string | null,
+  at: Date,
+): SettlementQuote | null => {
+  const btcUsdRate = Number(usdPerSat) * SATS_PER_BTC
+
+  return usdPerSat && btcUsdRate > 0 ? { btcUsdRate, at } : null
+}
+
+const formatHondurasTime = (at: Date): string =>
+  formatUnixTimestampYMDHM({
+    timestampSeconds: (at.getTime() + HONDURAS_UTC_OFFSET_MS) / 1000,
+    timezone: "UTC",
+  })
+
+export const resolveInvestmentTerms = (
+  totalUsd: number,
+  settlement: SettlementQuote | null = null,
+): InvestmentTerms => ({
   totalUsd,
   units: totalUsd / PRICE_PER_UNIT_USD,
   pricePerUnitUsd: PRICE_PER_UNIT_USD,
   preMoneyValuationUsd: PRE_MONEY_VALUATION_USD,
+  ...(settlement && settlement.btcUsdRate > 0
+    ? {
+        btcUsdRate: settlement.btcUsdRate,
+        settlementBtc: Number((totalUsd / settlement.btcUsdRate).toFixed(BTC_DECIMALS)),
+        rateTimestamp: formatHondurasTime(settlement.at),
+      }
+    : {}),
 })
 
 /** Whether the investor can pay for what they signed for, and what stands in the way. */
