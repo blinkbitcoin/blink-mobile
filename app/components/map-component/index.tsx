@@ -43,6 +43,7 @@ import { CategoryFilterSheet } from "./category-filter-sheet"
 import { ClusterMarker, ClusterMarkerData } from "./cluster-marker"
 import { Viewport, placeLabels } from "./label-collision"
 import LocationButtonCopy from "./location-button-copy"
+import { MAP_EDGE_GAP } from "./map-controls"
 import { MapSearchBar, searchBarBottom } from "./map-search-bar"
 import MapStyles from "./map-styles.json"
 import { OpenSettingsElement, OpenSettingsModal } from "./open-settings-modal"
@@ -677,8 +678,8 @@ const useStyles = makeStyles(({ colors }, { topInset }: { topInset: number }) =>
   },
   addPlace: {
     position: "absolute",
-    left: 8,
-    bottom: 12,
+    left: MAP_EDGE_GAP,
+    bottom: MAP_EDGE_GAP,
     zIndex: 99,
     flexDirection: "row",
     alignItems: "center",
