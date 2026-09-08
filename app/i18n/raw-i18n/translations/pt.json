@@ -2138,6 +2138,7 @@
         "placeName": "Nome",
         "placeNameHint": "Como o local se chama",
         "placeCategory": "Categoria",
+        "placeCategoryHint": "Escolha uma categoria",
         "placeLocation": "Localização",
         "changeLocation": "Alterar",
         "placeReviewNote": "Os locais novos vão para o BTC Map. A comunidade dele revisa e mantém tudo o que está no mapa.",

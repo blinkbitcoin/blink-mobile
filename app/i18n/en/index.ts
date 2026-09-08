@@ -2142,6 +2142,7 @@ const en: BaseTranslation = {
     placeName: "Name",
     placeNameHint: "What the place is called",
     placeCategory: "Category",
+    placeCategoryHint: "Choose a category",
     placeLocation: "Location",
     changeLocation: "Change",
     placeReviewNote:

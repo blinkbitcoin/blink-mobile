@@ -2138,6 +2138,7 @@
     "placeName": "Navn",
     "placeNameHint": "Hvad stedet hedder",
     "placeCategory": "Kategori",
+    "placeCategoryHint": "Vælg en kategori",
     "placeLocation": "Placering",
     "changeLocation": "Skift",
     "placeReviewNote": "Nye steder sendes til BTC Map. Fællesskabet dér gennemgår og vedligeholder alt på kortet.",

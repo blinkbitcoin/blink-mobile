@@ -12,6 +12,11 @@ import React from "react"
  * `backdrop` and `back-button`. A stand-in that dropped them would silently delete
  * that coverage from any spec adopting it.
  *
+ * onModalHide fires on the way out, once — the real one calls it when the closing
+ * animation finishes. `dropdown.tsx` is one of the components that does its work
+ * there, applying the tapped option only after the list is off the screen, so
+ * without this a spec would tap an option and watch nothing happen.
+ *
  * react-native is resolved through jest.requireActual rather than a top-level
  * import: a consuming spec that mocks react-native to stub Platform or Dimensions
  * would otherwise get its mocked View inside the modal body, changing the rendered
@@ -33,6 +38,7 @@ export type ModalMockProps = {
   isVisible?: boolean
   onBackdropPress?: () => void
   onBackButtonPress?: () => void
+  onModalHide?: () => void
 }
 
 export const ModalMock = ({
@@ -40,8 +46,18 @@ export const ModalMock = ({
   isVisible,
   onBackdropPress,
   onBackButtonPress,
-}: ModalMockProps) =>
-  isVisible
+  onModalHide,
+}: ModalMockProps) => {
+  // Only on the way out. Handlers are usually redefined every render, so firing
+  // this whenever the modal happens to be closed would call it on mount and
+  // again on every render of a screen that has never opened one.
+  const wasVisible = React.useRef(false)
+  React.useEffect(() => {
+    if (wasVisible.current && !isVisible) onModalHide?.()
+    wasVisible.current = Boolean(isVisible)
+  }, [isVisible, onModalHide])
+
+  return isVisible
     ? React.createElement(
         RN.View,
         { testID: "modal" },
@@ -56,6 +72,7 @@ export const ModalMock = ({
         children,
       )
     : null
+}
 
 ModalMock.displayName = "ModalMock"
 

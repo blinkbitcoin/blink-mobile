@@ -2138,6 +2138,7 @@
     "placeName": "ชื่อ",
     "placeNameHint": "สถานที่นี้ชื่ออะไร",
     "placeCategory": "หมวดหมู่",
+    "placeCategoryHint": "เลือกหมวดหมู่",
     "placeLocation": "ตำแหน่ง",
     "changeLocation": "เปลี่ยน",
     "placeReviewNote": "สถานที่ใหม่จะถูกส่งไปยัง BTC Map ชุมชนของ BTC Map เป็นผู้ตรวจสอบและดูแลทุกอย่างบนแผนที่",

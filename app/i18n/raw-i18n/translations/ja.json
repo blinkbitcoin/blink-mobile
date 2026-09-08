@@ -2138,6 +2138,7 @@
         "placeName": "名称",
         "placeNameHint": "その場所の名前",
         "placeCategory": "カテゴリー",
+        "placeCategoryHint": "カテゴリーを選択",
         "placeLocation": "位置",
         "changeLocation": "変更",
         "placeReviewNote": "新しい場所はBTC Mapに送信されます。マップ上のすべてはBTC Mapのコミュニティが確認・管理しています。",

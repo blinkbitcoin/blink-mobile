@@ -2138,6 +2138,7 @@
     "placeName": "Ad",
     "placeNameHint": "Buranın adı nedir",
     "placeCategory": "Kategori",
+    "placeCategoryHint": "Bir kategori seçin",
     "placeLocation": "Konum",
     "changeLocation": "Değiştir",
     "placeReviewNote": "Yeni yerler BTC Map'e gönderilir. Haritadaki her şeyi BTC Map topluluğu kontrol eder ve güncel tutar.",

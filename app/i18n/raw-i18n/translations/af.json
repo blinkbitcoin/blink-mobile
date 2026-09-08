@@ -2138,6 +2138,7 @@
     "placeName": "Naam",
     "placeNameHint": "Wat die plek genoem word",
     "placeCategory": "Kategorie",
+    "placeCategoryHint": "Kies 'n kategorie",
     "placeLocation": "Ligging",
     "changeLocation": "Verander",
     "placeReviewNote": "Nuwe plekke gaan na BTC Map. Sy gemeenskap ondersoek en onderhou alles op die kaart.",

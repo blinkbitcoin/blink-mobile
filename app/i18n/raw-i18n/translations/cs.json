@@ -2138,6 +2138,7 @@
     "placeName": "Název",
     "placeNameHint": "Jak se místo jmenuje",
     "placeCategory": "Kategorie",
+    "placeCategoryHint": "Vyberte kategorii",
     "placeLocation": "Poloha",
     "changeLocation": "Změnit",
     "placeReviewNote": "Nová místa se odesílají do BTC Map. Tamní komunita kontroluje a spravuje vše, co je na mapě.",

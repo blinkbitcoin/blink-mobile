@@ -2138,6 +2138,7 @@
     "placeName": "Tên",
     "placeNameHint": "Địa điểm này tên là gì",
     "placeCategory": "Danh mục",
+    "placeCategoryHint": "Chọn danh mục",
     "placeLocation": "Vị trí",
     "changeLocation": "Thay đổi",
     "placeReviewNote": "Địa điểm mới được gửi tới BTC Map. Cộng đồng của BTC Map kiểm tra và duy trì mọi thứ trên bản đồ.",

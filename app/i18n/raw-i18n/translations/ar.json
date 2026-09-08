@@ -2138,6 +2138,7 @@
     "placeName": "الاسم",
     "placeNameHint": "ما اسم هذا المكان",
     "placeCategory": "الفئة",
+    "placeCategoryHint": "اختر فئة",
     "placeLocation": "الموقع",
     "changeLocation": "تغيير",
     "placeReviewNote": "تُرسل الأماكن الجديدة إلى BTC Map. ويراجع مجتمعها كل ما على الخريطة ويحافظ عليه.",

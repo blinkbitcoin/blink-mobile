@@ -2138,6 +2138,7 @@
     "placeName": "Անվանում",
     "placeNameHint": "Ինչպես է կոչվում վայրը",
     "placeCategory": "Կատեգորիա",
+    "placeCategoryHint": "Ընտրեք կատեգորիա",
     "placeLocation": "Տեղադրություն",
     "changeLocation": "Փոխել",
     "placeReviewNote": "Նոր վայրերն ուղարկվում են BTC Map: Նրա համայնքը ստուգում և պահպանում է քարտեզի վրա եղած ամեն ինչ:",

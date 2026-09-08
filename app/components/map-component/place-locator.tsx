@@ -1,83 +1,40 @@
 import React from "react"
 import { View } from "react-native"
-import { useSafeAreaInsets } from "react-native-safe-area-context"
 
-import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
-import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { Text, makeStyles } from "@rn-vui/themed"
 
 import { PIN_HEIGHT, PinShape, usePinColor } from "./pin-shape"
 
-const BAR_HEIGHT = 50
-// Clear of the ODbL credit in the bottom-right corner, which the licence asks
-// stay readable and which this bar would otherwise sit on top of.
-const BAR_BOTTOM_GAP = 34
-
-/** Where the bar's top edge is, for anything that has to stay above it. */
-export const locatorBarTop = (bottomInset: number): number =>
-  bottomInset + BAR_BOTTOM_GAP + BAR_HEIGHT
-
-type Props = {
-  onConfirm: () => void
-  onCancel: () => void
-}
-
 /**
- * Placing the pin for a new place.
+ * The pin for a new place, and what to do with it.
  *
  * The pin does not move — the map does. It is drawn at the centre of the map
  * view and its tip is what the coordinates are read from, so where it points is
  * exactly the region's centre and there is nothing to measure or convert: pan
- * until the tip is over the door, then confirm.
+ * until the tip is over the door.
  *
- * Everything here is `box-none` above the bar, so the map keeps every pan and
- * pinch it had before this opened. The bar itself takes its own taps.
+ * Nothing here takes a touch. There is no control on it — the form below the
+ * map has them — and the map underneath keeps every pan and pinch it had
+ * before this opened.
  */
-export const PlaceLocator: React.FC<Props> = ({ onConfirm, onCancel }) => {
+export const PlaceLocator: React.FC = () => {
   const { LL } = useI18nContext()
-  const insets = useSafeAreaInsets()
-  const styles = useStyles({ bottomInset: insets.bottom })
+  const styles = useStyles()
   // The pin being aimed is never a boosted place — it is not a place at all yet.
   const pinColor = usePinColor(false)
 
   return (
-    <View style={styles.root} pointerEvents="box-none">
-      <View style={styles.crosshair} pointerEvents="none">
-        <View style={styles.hint}>
-          <Text style={styles.hintText}>{LL.MapScreen.placePinHint()}</Text>
-        </View>
-        <PinShape color={pinColor} />
+    <View testID="place-pin" style={styles.crosshair} pointerEvents="none">
+      <View style={styles.hint}>
+        <Text style={styles.hintText}>{LL.MapScreen.placePinHint()}</Text>
       </View>
-
-      <View style={styles.bar}>
-        <GaloySecondaryButton
-          testID="cancel-add-place"
-          title={LL.common.cancel()}
-          onPress={onCancel}
-          containerStyle={styles.cancelContainer}
-          buttonStyle={styles.cancelButton}
-        />
-
-        <GaloyPrimaryButton
-          testID="confirm-place-location"
-          title={LL.common.next()}
-          onPress={onConfirm}
-          containerStyle={styles.confirmContainer}
-        />
-      </View>
+      <PinShape color={pinColor} />
     </View>
   )
 }
 
-const useStyles = makeStyles(({ colors }, { bottomInset }: { bottomInset: number }) => ({
-  root: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-  },
+const useStyles = makeStyles(({ colors }) => ({
   // Full width so the hint above the pin has room to wrap, with the pin itself
   // centred inside it. The teardrop's point is its bottom edge, so lifting the
   // row by the pin's own height is what puts that point — rather than its
@@ -104,25 +61,5 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: { bottomInset: number
     fontSize: 13,
     color: colors.black,
     textAlign: "center",
-  },
-  bar: {
-    position: "absolute",
-    left: 12,
-    right: 12,
-    bottom: bottomInset + BAR_BOTTOM_GAP,
-    flexDirection: "row",
-    alignItems: "center",
-    columnGap: 12,
-  },
-  cancelContainer: {
-    flex: 1,
-  },
-  // The design-system secondary button is transparent; over a map it needs its
-  // own surface.
-  cancelButton: {
-    backgroundColor: colors.white,
-  },
-  confirmContainer: {
-    flex: 2,
   },
 }))
