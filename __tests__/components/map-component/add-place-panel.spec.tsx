@@ -357,6 +357,10 @@ describe("AddPlacePanel", () => {
     await waitFor(() => expect(getByTestId("place-submission-error")).toBeTruthy())
 
     fireEvent.press(getByTestId("back-to-place-details"))
+    // Read on the step that draws it: the error is only rendered on the step
+    // that sends, so being off the step is not on its own proof it was taken
+    // down. Coming back to the categories is where it would still be showing.
+    fireEvent.press(getByTestId("continue-place"))
     expect(queryByTestId("place-submission-error")).toBeNull()
   })
 

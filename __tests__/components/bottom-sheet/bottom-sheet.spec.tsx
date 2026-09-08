@@ -1,5 +1,5 @@
 import React from "react"
-import { BackHandler, StyleSheet, Text, View } from "react-native"
+import { BackHandler, Dimensions, StyleSheet, Text, View } from "react-native"
 import { getAnimatedStyle } from "react-native-reanimated"
 import {
   fireGestureHandler,
@@ -238,6 +238,26 @@ describe("BottomSheet", () => {
     // Outside the scroll rather than at the end of it, so the content cannot
     // push it off the sheet.
     expect(within(getByTestId("sheet-scroll")).queryByText("Submit")).toBeNull()
+  })
+
+  it("covers the share of the window it was asked for", async () => {
+    const { getByTestId } = renderSheet({ heightRatio: 0.6 })
+
+    const sheet = await waitFor(() => getByTestId(SHEET_TEST_ID))
+    const { height: windowHeight } = Dimensions.get("window")
+
+    // Short of the whole screen on every current caller: what the sheet is
+    // about stays partly visible behind it.
+    expect(animatedHeightOf(sheet)).toBe(Math.round(windowHeight * 0.6))
+  })
+
+  it("takes the whole window when it is not asked for a share of it", async () => {
+    const { getByTestId } = renderSheet({ heightRatio: undefined })
+
+    const sheet = await waitFor(() => getByTestId(SHEET_TEST_ID))
+    const { height: windowHeight } = Dimensions.get("window")
+
+    expect(animatedHeightOf(sheet)).toBe(windowHeight)
   })
 
   it("does not dismiss on a flick that only sent the list back to the top", async () => {
