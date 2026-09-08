@@ -1,5 +1,6 @@
 import React from "react"
 import {
+  BackHandler,
   Modal,
   Pressable,
   StyleProp,
@@ -220,6 +221,22 @@ export const BottomSheet: React.FC<Props> = ({
     offset,
     restsOnHeader,
   ])
+
+  // Android's hardware back is the reflex for getting out of a form, and it is
+  // the only exit besides the X once the tab bar is gone. The modal
+  // presentation hands it to `Modal`'s `onRequestClose`; inline there is no
+  // window to hand it to, and without this the navigator takes it instead —
+  // leaving the tab, unmounting the sheet, and throwing away whatever was
+  // being filled in with no prompt. Registered here rather than by the caller
+  // so the next inline sheet inherits it, and closing the same way the X does.
+  React.useEffect(() => {
+    if (!isInline || !isVisible) return undefined
+    const subscription = BackHandler.addEventListener("hardwareBackPress", () => {
+      onClose()
+      return true
+    })
+    return () => subscription.remove()
+  }, [isInline, isVisible, onClose])
 
   const pan = React.useMemo(
     () =>
