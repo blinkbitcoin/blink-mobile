@@ -138,7 +138,10 @@ export const AddPlacePanel: React.FC<Props> = ({ location, onSubmit, onClose }) 
               accessibilityLabel={LL.common.back()}
               hitSlop={12}
             >
-              <GaloyIcon name="arrow-left" size={20} color={colors.primary} />
+              {/* The foreground colour, not the accent: this reads as part of
+                  the title row it sits in rather than as an action of its
+                  own. White on the dark sheet, black on the light one. */}
+              <GaloyIcon name="arrow-left" size={20} color={colors.black} />
             </Pressable>
           )}
           <Text style={styles.title}>{LL.MapScreen.addPlaceTitle()}</Text>
