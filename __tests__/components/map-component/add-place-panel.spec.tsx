@@ -7,14 +7,6 @@ import { loadLocale } from "@app/i18n/i18n-util.sync"
 
 import { ContextForScreen } from "../../screens/helper"
 
-// The category dropdown puts its list in a react-native-modal, which renders
-// through a native host react-test-renderer never mounts. Without the stand-in
-// the options are unreachable and every category tap below would be pressing
-// nothing.
-jest.mock("react-native-modal", () =>
-  jest.requireActual("@mocks/react-native-modal-mock"),
-)
-
 const LOCATION = { latitude: 13.496743, longitude: -89.439462 }
 
 const onSubmit = jest.fn<Promise<string | null>, [unknown]>()
@@ -30,7 +22,8 @@ const sheet = (props: Partial<SheetProps> = {}) => (
 
 const renderSheet = (props: Partial<SheetProps> = {}) => render(sheet(props))
 
-type Queries = Pick<ReturnType<typeof renderSheet>, "getByTestId" | "getByText">
+/** Everything the helpers below touch: the form is reached by test id throughout. */
+type Queries = Pick<ReturnType<typeof renderSheet>, "getByTestId">
 
 // One tap: every category is a chip on the second step, so there is no list to
 // open first. The caller has to be on that step already.
@@ -83,12 +76,12 @@ describe("AddPlacePanel", () => {
   })
 
   it("submits where the pin was by Continue, not where it was when the form opened", async () => {
-    const { getByTestId, getByText, rerender } = renderSheet()
+    const { getByTestId, rerender } = renderSheet()
 
     await waitFor(() => expect(getByTestId("place-name-input")).toBeTruthy())
     // Aimed while the first step is up, which is what the first step is for.
     rerender(sheet({ location: { latitude: 13.5, longitude: -89.44 } }))
-    fillInForm({ getByTestId, getByText })
+    fillInForm({ getByTestId })
     fireEvent.press(getByTestId("submit-place"))
 
     await waitFor(() =>
@@ -125,7 +118,7 @@ describe("AddPlacePanel", () => {
     const { getByTestId } = renderSheet()
 
     await waitFor(() => expect(getByTestId("place-name-input")).toBeTruthy())
-    continueToCategories({ getByTestId, getByText: jest.fn() as never })
+    continueToCategories({ getByTestId })
     fireEvent.press(getByTestId("submit-place"))
 
     expect(onSubmit).not.toHaveBeenCalled()
@@ -136,7 +129,7 @@ describe("AddPlacePanel", () => {
     // a place — a submission under it would tell BTC Map nothing.
     const { getByTestId, queryByTestId } = renderSheet()
 
-    continueToCategories({ getByTestId, getByText: jest.fn() as never })
+    continueToCategories({ getByTestId })
 
     // Anchored on a category that is offered: without it the absence below
     // would also pass on a form that drew no chips at all.
@@ -147,9 +140,9 @@ describe("AddPlacePanel", () => {
   it("says on the button that there is still something missing", async () => {
     // Disabled and translucent is the whole explanation, so it has to reach a
     // screen reader as well as an eye.
-    const { getByTestId, getByText } = renderSheet()
+    const { getByTestId } = renderSheet()
 
-    continueToCategories({ getByTestId, getByText })
+    continueToCategories({ getByTestId })
 
     await waitFor(() =>
       expect(getByTestId("submit-place").props.accessibilityState).toMatchObject({
@@ -157,7 +150,7 @@ describe("AddPlacePanel", () => {
       }),
     )
 
-    chooseCategory({ getByTestId, getByText }, "cafes")
+    chooseCategory({ getByTestId }, "cafes")
 
     await waitFor(() =>
       expect(getByTestId("submit-place").props.accessibilityState).toMatchObject({
@@ -167,10 +160,10 @@ describe("AddPlacePanel", () => {
   })
 
   it("submits the place once it has a name, a category and a pin", async () => {
-    const { getByTestId, getByText } = renderSheet()
+    const { getByTestId } = renderSheet()
 
     await waitFor(() => expect(getByTestId("place-name-input")).toBeTruthy())
-    fillInForm({ getByTestId, getByText })
+    fillInForm({ getByTestId })
     fireEvent.press(getByTestId("submit-place"))
 
     await waitFor(() =>
@@ -193,10 +186,10 @@ describe("AddPlacePanel", () => {
           resolveSend = () => resolve(null)
         }),
     )
-    const { getByTestId, getByText } = renderSheet()
+    const { getByTestId } = renderSheet()
 
     await waitFor(() => expect(getByTestId("place-name-input")).toBeTruthy())
-    fillInForm({ getByTestId, getByText })
+    fillInForm({ getByTestId })
     fireEvent.press(getByTestId("submit-place"))
     fireEvent.press(getByTestId("submit-place"))
     fireEvent.press(getByTestId("submit-place"))
@@ -215,9 +208,9 @@ describe("AddPlacePanel", () => {
     // The row that showed it is on the details step, and the send is on the
     // categories one. Nothing freezes it during a send any more because there
     // is nothing on screen to freeze — see the sheet's own note.
-    const { getByTestId, getByText, queryByText } = renderSheet()
+    const { getByTestId, queryByText } = renderSheet()
 
-    continueToCategories({ getByTestId, getByText })
+    continueToCategories({ getByTestId })
 
     expect(queryByText("13.496743, -89.439462")).toBeNull()
   })
@@ -230,7 +223,7 @@ describe("AddPlacePanel", () => {
     const { getByTestId, getByText } = renderSheet()
 
     await waitFor(() => expect(getByTestId("place-name-input")).toBeTruthy())
-    fillInForm({ getByTestId, getByText })
+    fillInForm({ getByTestId })
     fireEvent.press(getByTestId("submit-place"))
 
     await waitFor(() =>
@@ -244,10 +237,10 @@ describe("AddPlacePanel", () => {
     // Leaving it up would have a place that has just been sent still reading as
     // one that could not be.
     onSubmit.mockResolvedValueOnce("Too many places sent today.")
-    const { getByTestId, getByText, queryByTestId } = renderSheet()
+    const { getByTestId, queryByTestId } = renderSheet()
 
     await waitFor(() => expect(getByTestId("place-name-input")).toBeTruthy())
-    fillInForm({ getByTestId, getByText })
+    fillInForm({ getByTestId })
     fireEvent.press(getByTestId("submit-place"))
 
     await waitFor(() => expect(getByTestId("place-submission-error")).toBeTruthy())
@@ -280,10 +273,10 @@ describe("AddPlacePanel", () => {
     // step behind this one. Without the freeze a brush of the map while
     // reaching for a chip would send a place the user never read, with nothing
     // on the panel disagreeing.
-    const { getByTestId, getByText, rerender } = renderSheet()
+    const { getByTestId, rerender } = renderSheet()
 
     await waitFor(() => expect(getByTestId("place-name-input")).toBeTruthy())
-    fillInForm({ getByTestId, getByText })
+    fillInForm({ getByTestId })
 
     rerender(sheet({ location: { latitude: 13.5, longitude: -89.44 } }))
     fireEvent.press(getByTestId("submit-place"))
@@ -304,7 +297,7 @@ describe("AddPlacePanel", () => {
     const { getByTestId, getByText, rerender } = renderSheet()
 
     await waitFor(() => expect(getByTestId("place-name-input")).toBeTruthy())
-    fillInForm({ getByTestId, getByText })
+    fillInForm({ getByTestId })
 
     fireEvent.press(getByTestId("back-to-place-details"))
     rerender(sheet({ location: { latitude: 13.5, longitude: -89.44 } }))
@@ -329,10 +322,10 @@ describe("AddPlacePanel", () => {
     // the same rule would let an idle nudge wipe a message before it has been
     // read. It goes on the next send instead.
     onSubmit.mockResolvedValue("Too many places sent today.")
-    const { getByTestId, getByText, rerender } = renderSheet()
+    const { getByTestId, rerender } = renderSheet()
 
     await waitFor(() => expect(getByTestId("place-name-input")).toBeTruthy())
-    fillInForm({ getByTestId, getByText })
+    fillInForm({ getByTestId })
     fireEvent.press(getByTestId("submit-place"))
 
     await waitFor(() => expect(getByTestId("place-submission-error")).toBeTruthy())
@@ -347,15 +340,15 @@ describe("AddPlacePanel", () => {
     // once the name or the category changes it is accusing a place that no
     // longer exists.
     onSubmit.mockResolvedValue("Too many places sent today.")
-    const { getByTestId, getByText, queryByTestId } = renderSheet()
+    const { getByTestId, queryByTestId } = renderSheet()
 
     await waitFor(() => expect(getByTestId("place-name-input")).toBeTruthy())
-    fillInForm({ getByTestId, getByText })
+    fillInForm({ getByTestId })
     fireEvent.press(getByTestId("submit-place"))
 
     await waitFor(() => expect(getByTestId("place-submission-error")).toBeTruthy())
 
-    chooseCategory({ getByTestId, getByText }, "bars")
+    chooseCategory({ getByTestId }, "bars")
     await waitFor(() => expect(queryByTestId("place-submission-error")).toBeNull())
 
     // And stepping back off the send takes it down too: it described a send
@@ -370,9 +363,9 @@ describe("AddPlacePanel", () => {
   it("lets a mis-tapped category be swapped for another", async () => {
     // Every chip stays on screen, so the answer being given is which one reads
     // as selected — and only one of them may.
-    const { getByTestId, getByText } = renderSheet()
+    const { getByTestId } = renderSheet()
 
-    continueToCategories({ getByTestId, getByText })
+    continueToCategories({ getByTestId })
     await waitFor(() => expect(getByTestId("place-category-cafes")).toBeTruthy())
     fireEvent.press(getByTestId("place-category-cafes"))
 
@@ -389,9 +382,9 @@ describe("AddPlacePanel", () => {
   it("takes a category back off when its own chip is tapped again", async () => {
     // There is no empty row to pick in a set of chips the way there is in a
     // list, so the chip that is on has to be the way back off it.
-    const { getByTestId, getByText } = renderSheet()
+    const { getByTestId } = renderSheet()
 
-    continueToCategories({ getByTestId, getByText })
+    continueToCategories({ getByTestId })
     fireEvent.press(getByTestId("place-category-cafes"))
 
     await waitFor(() => expect(getByTestId("submit-place")).not.toBeDisabled())
@@ -409,7 +402,7 @@ describe("AddPlacePanel", () => {
     const { getByTestId, getByText, rerender } = renderSheet()
 
     await waitFor(() => expect(getByTestId("place-name-input")).toBeTruthy())
-    fillInForm({ getByTestId, getByText })
+    fillInForm({ getByTestId })
 
     rerender(sheet({ location: { latitude: 13.5, longitude: -89.44 } }))
 
@@ -426,9 +419,9 @@ describe("AddPlacePanel", () => {
   it("goes back to the details without losing the category already chosen", async () => {
     // Coming back to fix a typo in the name should not cost the answer to the
     // question after it.
-    const { getByTestId, getByText } = renderSheet()
+    const { getByTestId } = renderSheet()
 
-    fillInForm({ getByTestId, getByText })
+    fillInForm({ getByTestId })
     fireEvent.press(getByTestId("back-to-place-details"))
 
     fireEvent.changeText(getByTestId("place-name-input"), "Hope House Café")
@@ -450,7 +443,7 @@ describe("AddPlacePanel", () => {
     expect(getByText("Suggest business")).toBeTruthy()
     expect(getByTestId("continue-place").props.accessibilityLabel).toBe("Continue")
 
-    continueToCategories({ getByTestId, getByText })
+    continueToCategories({ getByTestId })
 
     expect(getByTestId("submit-place").props.accessibilityLabel).toBe("Submit request")
   })

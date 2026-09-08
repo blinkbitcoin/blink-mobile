@@ -1,6 +1,5 @@
 import React from "react"
 import { BackHandler, StyleSheet, Text, View } from "react-native"
-import type { ReactTestInstance } from "react-test-renderer"
 import { getAnimatedStyle } from "react-native-reanimated"
 import {
   fireGestureHandler,
@@ -12,6 +11,7 @@ import { act, fireEvent, render, waitFor, within } from "@testing-library/react-
 import { BOTTOM_OVERHANG, BottomSheet, PAN_TEST_ID } from "@app/components/bottom-sheet"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
+import { animatedHeightOf, translateYOf } from "../../helpers/bottom-sheet"
 import { ContextForScreen } from "../../screens/helper"
 
 jest.mock("react-native-safe-area-context", () => ({
@@ -62,31 +62,29 @@ jest.mock("react-native-reanimated", () => ({
 
 const SHEET_TEST_ID = "sheet"
 
-/**
- * Where the sheet is right now. A spring is never exactly at rest, so anything
- * asserted against this wants a pixel of slack rather than an equality.
- */
-const translateYOf = (sheet: ReactTestInstance) =>
-  (getAnimatedStyle(sheet).transform as [{ translateY: number }])[0].translateY
+type SheetProps = React.ComponentProps<typeof BottomSheet>
 
-/** The height the sheet's offsets are expressed in, not the one it is drawn at. */
-const animatedHeightOf = (sheet: ReactTestInstance) =>
-  (StyleSheet.flatten(sheet.props.style).height as number) - BOTTOM_OVERHANG
+const renderSheet = (props: Partial<SheetProps> = {}) => {
+  // `heightRatio` belongs to the modal presentation alone — inline the layout
+  // gives the sheet its height — and the props are a union on `presentation`,
+  // so it is only defaulted where it means something. The cast is what a
+  // spread of a `Partial` over a discriminated union costs; the two shapes
+  // above it are the real ones.
+  const base = { testID: SHEET_TEST_ID, isVisible: true, onClose: jest.fn() }
+  const withDefaults = (
+    props.presentation === "inline"
+      ? { ...base, ...props }
+      : { ...base, heightRatio: 0.6, ...props }
+  ) as SheetProps
 
-const renderSheet = (props: Partial<React.ComponentProps<typeof BottomSheet>> = {}) =>
-  render(
+  return render(
     <ContextForScreen>
-      <BottomSheet
-        testID={SHEET_TEST_ID}
-        isVisible
-        onClose={jest.fn()}
-        heightRatio={0.6}
-        {...props}
-      >
+      <BottomSheet {...withDefaults}>
         <Text>content</Text>
       </BottomSheet>
     </ContextForScreen>,
   )
+}
 
 beforeEach(() => {
   jest.clearAllMocks()
