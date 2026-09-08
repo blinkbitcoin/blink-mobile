@@ -73,6 +73,10 @@ const EMPTY_LABELS: ReadonlySet<number> = new Set()
 const SAVE_COORDS_DEBOUNCE_MS = 1000
 const FLY_TO_DURATION_MS = 350
 
+// Hoisted so the effect that sets it has one object to depend on rather than a
+// fresh one every run. See the tab bar effect below.
+const HIDDEN_TAB_BAR = { display: "none" } as const
+
 type Props = {
   userLocation: Region
   userCoords?: LatLng
@@ -366,12 +370,16 @@ export default function MapComponent({
   // one has no window on purpose — the map above it has to stay pannable while
   // the form is filled in — so the bar is taken away rather than drawn over.
   //
-  // Restored to the navigator's own style rather than to nothing: `setOptions`
-  // merges over `screenOptions` instead of falling back to them.
+  // Set on the way back too, rather than restored from a cleanup, and to the
+  // navigator's own style rather than to nothing: `setOptions` merges over
+  // `screenOptions` instead of falling back to them, and it outlives the effect
+  // that set it. A cleanup would leave this screen holding whichever style was
+  // current the moment the panel closed — switch to dark afterwards and every
+  // other tab's bar repaints from the navigator while the map's stays light.
+  // Owning the option on every run instead means the theme is followed for
+  // free, and nothing is written to a screen that has already been torn down.
   React.useEffect(() => {
-    if (!isAddingPlace) return undefined
-    navigation.setOptions({ tabBarStyle: { display: "none" } })
-    return () => navigation.setOptions({ tabBarStyle })
+    navigation.setOptions({ tabBarStyle: isAddingPlace ? HIDDEN_TAB_BAR : tabBarStyle })
   }, [isAddingPlace, navigation, tabBarStyle])
 
   /**

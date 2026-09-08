@@ -216,6 +216,14 @@ jest.mock("@app/btcmap/use-place-submission", () => ({
   useSubmitBtcMapPlace: () => ({ submitPlace: mockSubmitPlace }),
 }))
 
+// Stands in for the navigator's own bar style. The real hook reads theme
+// colours, which cannot be flipped from a test; this can, which is how a
+// switch to dark while the map screen stays mounted is played out here.
+let mockTabBarStyle: unknown = { backgroundColor: "light" }
+jest.mock("@app/navigation/bottom-tab-bar-style", () => ({
+  useBottomTabBarStyle: () => mockTabBarStyle,
+}))
+
 const mockedPlaces = useBtcMapPlaces as jest.MockedFunction<typeof useBtcMapPlaces>
 const mockedNames = useBtcMapPlaceNames as jest.MockedFunction<typeof useBtcMapPlaceNames>
 const mockedGetUserRegion = getUserRegion as jest.MockedFunction<typeof getUserRegion>
@@ -263,6 +271,7 @@ const renderMap = (props: Partial<React.ComponentProps<typeof MapComponent>> = {
 
 beforeEach(() => {
   jest.clearAllMocks()
+  mockTabBarStyle = { backgroundColor: "light" }
   loadLocale("en")
   capturedSheetProps = undefined
   capturedSearchProps = undefined
@@ -1257,7 +1266,11 @@ describe("MapComponent add-place tab bar", () => {
     const { getByTestId } = renderMap()
 
     await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
-    expect(tabBarStyles()).toEqual([])
+    // The screen owns the option the whole time it is mounted rather than only
+    // while the panel is up — that is what keeps the bar following the theme
+    // afterwards — so what stands before the panel opens is the navigator's
+    // own style, not nothing.
+    expect(tabBarStyles().at(-1)).toEqual({ backgroundColor: "light" })
 
     fireEvent.press(getByTestId("open-add-place"))
 
@@ -1281,6 +1294,48 @@ describe("MapComponent add-place tab bar", () => {
       expect(restored).not.toEqual({ display: "none" })
       expect(restored).toBeTruthy()
     })
+  })
+
+  it("follows the theme afterwards rather than holding the one it closed in", async () => {
+    // `setOptions` beats `screenOptions` and lasts as long as the screen, so a
+    // bar put back from a cleanup keeps whatever style was current at that
+    // instant. Switch to dark in Settings afterwards and every other tab
+    // repaints from the navigator while the map's stays light.
+    const { getByTestId, rerender } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+    fireEvent.press(getByTestId("open-add-place"))
+    await waitFor(() => expect(tabBarStyles()).toContainEqual({ display: "none" }))
+    act(() => (capturedAddPlaceProps?.onClose as () => void)())
+
+    mockTabBarStyle = { backgroundColor: "dark" }
+    rerender(
+      <ContextForScreen>
+        <MapComponent
+          userLocation={REGION}
+          setPermissionsStatus={jest.fn()}
+          alertOnLocationError={jest.fn()}
+        />
+      </ContextForScreen>,
+    )
+
+    await waitFor(() =>
+      expect(tabBarStyles().at(-1)).toEqual({ backgroundColor: "dark" }),
+    )
+  })
+
+  it("writes nothing to the screen once it has been torn down mid-add", async () => {
+    const { getByTestId, unmount } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+    fireEvent.press(getByTestId("open-add-place"))
+    await waitFor(() => expect(tabBarStyles()).toContainEqual({ display: "none" }))
+
+    const written = mockSetOptions.mock.calls.length
+    unmount()
+
+    // Nothing on the way out: there is no screen left to put a bar back on.
+    expect(mockSetOptions.mock.calls).toHaveLength(written)
   })
 })
 
