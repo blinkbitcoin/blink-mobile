@@ -9,6 +9,8 @@ import { SignInvestScreen } from "@app/screens/card-screen/onboarding/investment
 import { ContextForScreen } from "../../../helper"
 
 const TEST_FORM_URL = "https://forms.example.test/investment-agreement"
+/** The amount the user picked two screens earlier, which the agreement is written from. */
+const SELECTED_AMOUNT_USD = 25000
 const TEST_ALLOWED_ORIGIN = "https://apps.example.test"
 
 /** The real palette, so a renamed or dropped colour fails here rather than shipping the
@@ -19,11 +21,22 @@ jest.mock("@app/utils/log-error", () => ({
   logError: jest.fn(),
 }))
 
+/** A round $100,000 per bitcoin, read through a getter so a test can render the screen
+ *  before the price feed has answered. */
+const mockUsdPerSat: { current: string | null } = { current: "0.00100000" }
+
+/** Partial: the module also exports SATS_PER_BTC, which the terms are quoted with. */
+jest.mock("@app/hooks/use-price-conversion", () => ({
+  ...jest.requireActual("@app/hooks/use-price-conversion"),
+  usePriceConversion: () => ({ usdPerSat: mockUsdPerSat.current }),
+}))
+
+/** Read through a getter so a test can arrive on the route with a different choice. */
+const mockRouteParams = { current: { selectedAmountUsd: SELECTED_AMOUNT_USD } }
+
 const mockNavigate = jest.fn()
 const mockReplace = jest.fn()
 const mockGoBack = jest.fn()
-
-const SELECTED_AMOUNT_USD = 25000
 
 jest.mock("@react-navigation/native", () => {
   const actualNav = jest.requireActual("@react-navigation/native")
@@ -34,7 +47,7 @@ jest.mock("@react-navigation/native", () => {
       replace: mockReplace,
       goBack: mockGoBack,
     }),
-    useRoute: () => ({ params: { selectedAmountUsd: SELECTED_AMOUNT_USD } }),
+    useRoute: () => ({ params: mockRouteParams.current }),
   }
 })
 
@@ -139,6 +152,8 @@ describe("SignInvestScreen", () => {
     jest.clearAllMocks()
     mockLastProps.current = null
     mockFormUrl.current = TEST_FORM_URL
+    mockRouteParams.current = { selectedAmountUsd: SELECTED_AMOUNT_USD }
+    mockUsdPerSat.current = "0.00100000"
   })
 
   it("renders without crashing", async () => {
@@ -153,16 +168,119 @@ describe("SignInvestScreen", () => {
     expect(getByText("Sign the agreement")).toBeTruthy()
   })
 
-  it("builds the source from the remote-config form url and the allowed origin", async () => {
-    await renderScreen()
+  /** DocuSign reads prefilled values off the fragment, not the query string. */
+  const prefillOf = (url: string): URLSearchParams =>
+    new URLSearchParams(new URL(url).hash.slice(1))
 
+  const startedSession = async (): Promise<{ url: string; allowedOrigin?: string }> => {
     const source = mockLastProps.current?.source as {
       start: () => Promise<{ url: string; allowedOrigin?: string }>
     }
-    const session = await source.start()
+    return source.start()
+  }
 
-    expect(session.url).toBe(TEST_FORM_URL)
+  it("builds the source from the remote-config form url and the allowed origin", async () => {
+    await renderScreen()
+
+    const session = await startedSession()
+
+    expect(session.url.startsWith(TEST_FORM_URL)).toBe(true)
     expect(session.allowedOrigin).toBe(TEST_ALLOWED_ORIGIN)
+  })
+
+  /**
+   * The user already chose the amount two screens back, so the form must not ask again:
+   * a different answer there would put an investment they never picked into a signed
+   * agreement.
+   */
+  it("prefills the agreement's figures from the amount the user chose", async () => {
+    await renderScreen()
+
+    const prefill = prefillOf((await startedSession()).url)
+
+    expect(prefill.get("total_subscription_usd")).toBe("25000")
+    expect(prefill.get("number_of_units")).toBe("25000")
+    expect(prefill.get("price_per_unit_usd")).toBe("1")
+    expect(prefill.get("pre_money_valuation_usd")).toBe("10000000")
+  })
+
+  /** The agreement is written from the figure the investor picked, so a form that always
+   *  carried the same one would document an investment nobody chose. */
+  it("carries a different choice through to the form", async () => {
+    mockRouteParams.current = { selectedAmountUsd: 1000 }
+
+    await renderScreen()
+
+    const prefill = prefillOf((await startedSession()).url)
+
+    expect(prefill.get("total_subscription_usd")).toBe("1000")
+    expect(prefill.get("number_of_units")).toBe("1000")
+  })
+
+  /** The agreement fixes the rate its payment is owed at, so the app quotes it rather than
+   *  asking an investor who has no way to know it. */
+  it("prefills the settlement figures from the app's own price", async () => {
+    await renderScreen()
+
+    const prefill = prefillOf((await startedSession()).url)
+
+    expect(prefill.get("btc_usd_rate")).toBe("100000")
+    expect(prefill.get("settlement_amount_btc")).toBe("0.25")
+    expect(prefill.get("rate_timestamp")).toMatch(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/)
+  })
+
+  /**
+   * The price feed polls. Following it would rewrite the url on every tick and restart the
+   * signing session, possibly mid-signature, and the agreement fixes ONE rate at one
+   * stamped moment anyway, so the first quote is the one that holds.
+   */
+  it("holds the first rate it quoted when the price moves", async () => {
+    const { rerender } = await renderScreen()
+
+    const firstSource = mockLastProps.current?.source
+    const firstPrefill = prefillOf((await startedSession()).url)
+
+    mockUsdPerSat.current = "0.00200000"
+
+    await act(async () => {
+      rerender(
+        <ContextForScreen>
+          <SignInvestScreen />
+        </ContextForScreen>,
+      )
+    })
+
+    expect(mockLastProps.current?.source).toBe(firstSource)
+    expect(prefillOf((await startedSession()).url).get("btc_usd_rate")).toBe(
+      firstPrefill.get("btc_usd_rate"),
+    )
+  })
+
+  /** An invented rate would be worse than none, so before the feed answers those three
+   *  figures are simply absent and the rest still travels. */
+  it("omits the settlement figures until the price feed answers", async () => {
+    mockUsdPerSat.current = null
+
+    await renderScreen()
+
+    const prefill = prefillOf((await startedSession()).url)
+
+    expect(prefill.get("btc_usd_rate")).toBeNull()
+    expect(prefill.get("settlement_amount_btc")).toBeNull()
+    expect(prefill.get("rate_timestamp")).toBeNull()
+    expect(prefill.get("total_subscription_usd")).toBe("25000")
+  })
+
+  /** Who the subscriber is stays theirs to answer: the app knows the money, not the
+   *  person, and personal data has no business riding in a URL. */
+  it("leaves the subscriber's own details out of the url", async () => {
+    await renderScreen()
+
+    const prefill = prefillOf((await startedSession()).url)
+
+    expect(prefill.get("full_legal_name")).toBeNull()
+    expect(prefill.get("country_of_residence")).toBeNull()
+    expect(prefill.get("email")).toBeNull()
   })
 
   it("keeps the same source across re-renders so the session is not restarted", async () => {
@@ -196,11 +314,11 @@ describe("SignInvestScreen", () => {
     })
 
     expect(mockLastProps.current?.source).not.toBe(firstSource)
-
-    const source = mockLastProps.current?.source as {
-      start: () => Promise<{ url: string }>
-    }
-    expect((await source.start()).url).toBe("https://forms.example.test/second-agreement")
+    expect(
+      (await startedSession()).url.startsWith(
+        "https://forms.example.test/second-agreement",
+      ),
+    ).toBe(true)
   })
 
   it("advances to the transfer step once the agreement is signed", async () => {
