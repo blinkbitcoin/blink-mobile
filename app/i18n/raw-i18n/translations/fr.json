@@ -2134,6 +2134,7 @@
         "clearAll": "Tout effacer",
         "addPlace": "Ajouter à la carte",
         "addPlaceTitle": "Ajouter un lieu",
+        "submitPlaceRequest": "Submit request",
         "placePinHint": "Déplacez la carte pour placer le repère sur le lieu",
         "placeName": "Nom",
         "placeNameHint": "Le nom du lieu",

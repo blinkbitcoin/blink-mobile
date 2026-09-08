@@ -2134,6 +2134,7 @@
         "clearAll": "すべて解除",
         "addPlace": "マップに追加",
         "addPlaceTitle": "場所を追加",
+        "submitPlaceRequest": "Submit request",
         "placePinHint": "マップを動かしてピンを場所に合わせてください",
         "placeName": "名称",
         "placeNameHint": "その場所の名前",

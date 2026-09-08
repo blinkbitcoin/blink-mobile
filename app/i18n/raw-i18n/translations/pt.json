@@ -2134,6 +2134,7 @@
         "clearAll": "Limpar tudo",
         "addPlace": "Adicionar ao mapa",
         "addPlaceTitle": "Adicionar um local",
+        "submitPlaceRequest": "Submit request",
         "placePinHint": "Mova o mapa para colocar o marcador sobre o local",
         "placeName": "Nome",
         "placeNameHint": "Como o local se chama",

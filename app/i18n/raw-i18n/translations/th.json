@@ -2134,6 +2134,7 @@
     "clearAll": "ล้างทั้งหมด",
     "addPlace": "เพิ่มลงแผนที่",
     "addPlaceTitle": "เพิ่มสถานที่",
+    "submitPlaceRequest": "Submit request",
     "placePinHint": "เลื่อนแผนที่เพื่อวางหมุดบนสถานที่",
     "placeName": "ชื่อ",
     "placeNameHint": "สถานที่นี้ชื่ออะไร",
