@@ -114,7 +114,10 @@ type Props = {
  * It owns the parts every bottom sheet in the app needs and none of them should
  * be spelling out for itself: the modal window and the gesture root Android
  * needs inside one, the scrim and its press-to-close, the pull handle, the
- * drag-to-dismiss, and the surface tokens.
+ * drag-to-dismiss, the hardware back, and the surface tokens.
+ *
+ * The silhouette in `useStyles` is the app's, not this component's invention —
+ * a caller wanting a different one is a question for design rather than a prop.
  *
  * Built here rather than taken from `@gorhom/bottom-sheet`, which is broken on
  * this stack — see the note in `amount-input-modal.tsx` for the issue links.
@@ -461,10 +464,16 @@ const useStyles = makeStyles(({ colors }) => ({
   backdropPress: {
     flex: 1,
   },
+  // The app's one bottom-sheet silhouette, and not a new one: a 20 radius, a
+  // 1px `grey4` outline with no bottom edge, and the handle below. It is what
+  // `place-sheet` and `amount-input-modal` were each drawing for themselves
+  // before there was one sheet to draw it once, and it is what Figma has. The
+  // category filter is the only surface it changes — that one had no outline —
+  // and it gains one deliberately rather than staying the odd one out.
   sheet: {
     backgroundColor: colors.white,
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
     borderWidth: 1,
     borderBottomWidth: 0,
     borderColor: colors.grey4,
@@ -477,9 +486,9 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   handle: {
     alignSelf: "center",
-    width: 26,
-    height: 3,
-    borderRadius: 999,
+    width: 40,
+    height: 4,
+    borderRadius: 2,
     backgroundColor: colors.grey3,
     marginBottom: 8,
   },
