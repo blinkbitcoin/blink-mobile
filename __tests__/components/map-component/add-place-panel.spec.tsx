@@ -1,4 +1,5 @@
 import React from "react"
+import type { ReactTestInstance } from "react-test-renderer"
 import { act, fireEvent, render, waitFor } from "@testing-library/react-native"
 
 import { AddPlacePanel } from "@app/components/map-component/add-place-panel"
@@ -31,17 +32,19 @@ const renderSheet = (props: Partial<SheetProps> = {}) => render(sheet(props))
 
 type Queries = Pick<ReturnType<typeof renderSheet>, "getByTestId" | "getByText">
 
-// Two taps now: the row opens the list, and the option is inside it. The
-// options carry no testIDs of their own, so they are picked the way they are
-// read — the label the dropdown was handed.
-const chooseCategory = ({ getByTestId, getByText }: Queries, label: string) => {
-  fireEvent.press(getByTestId("place-category"))
-  fireEvent.press(getByText(label))
+// One tap: every category is a chip on the form, so there is no list to open
+// first.
+const chooseCategory = ({ getByTestId }: Queries, category: string) => {
+  fireEvent.press(getByTestId(`place-category-${category}`))
 }
+
+/** Which chip is answering the question, read the way a screen reader reads it. */
+const isSelected = (chip: ReactTestInstance) =>
+  Boolean(chip.props.accessibilityState?.selected)
 
 const fillInForm = (queries: Queries) => {
   fireEvent.changeText(queries.getByTestId("place-name-input"), "Hope House")
-  chooseCategory(queries, "Cafés")
+  chooseCategory(queries, "cafes")
 }
 
 beforeEach(() => {
@@ -94,7 +97,7 @@ describe("AddPlacePanel", () => {
     const { getByTestId, getByText } = renderSheet()
 
     await waitFor(() => expect(getByTestId("submit-place")).toBeTruthy())
-    chooseCategory({ getByTestId, getByText }, "Cafés")
+    chooseCategory({ getByTestId, getByText }, "cafes")
     fireEvent.press(getByTestId("submit-place"))
 
     expect(onSubmit).not.toHaveBeenCalled()
@@ -113,14 +116,12 @@ describe("AddPlacePanel", () => {
   it("does not offer the catch-all category", () => {
     // "other" is a filter bucket for unrecognised icons, not a description of
     // a place — a submission under it would tell BTC Map nothing.
-    const { getByTestId, getByText, queryByText } = renderSheet()
-
-    fireEvent.press(getByTestId("place-category"))
+    const { getByTestId, queryByTestId } = renderSheet()
 
     // Anchored on a category that is offered: without it the absence below
-    // would also pass on a list that failed to open at all.
-    expect(getByText("Cafés")).toBeTruthy()
-    expect(queryByText("Other")).toBeNull()
+    // would also pass on a form that drew no chips at all.
+    expect(getByTestId("place-category-cafes")).toBeTruthy()
+    expect(queryByTestId("place-category-other")).toBeNull()
   })
 
   it("says on the button that there is still something missing", async () => {
@@ -294,24 +295,43 @@ describe("AddPlacePanel", () => {
     fireEvent.press(getByTestId("submit-place"))
     await waitFor(() => expect(getByTestId("place-submission-error")).toBeTruthy())
 
-    chooseCategory({ getByTestId, getByText }, "Bars & nightlife")
+    chooseCategory({ getByTestId, getByText }, "bars")
     await waitFor(() => expect(queryByTestId("place-submission-error")).toBeNull())
   })
 
   it("lets a mis-tapped category be swapped for another", async () => {
-    // The way out of a mis-tap: the row can be opened again, and what it shows
-    // is the answer being given, so it has to be the one last chosen.
-    const { getByTestId, getByText, queryByText } = renderSheet()
+    // Every chip stays on screen, so the answer being given is which one reads
+    // as selected — and only one of them may.
+    const { getByTestId } = renderSheet()
 
-    await waitFor(() => expect(getByTestId("place-category")).toBeTruthy())
-    chooseCategory({ getByTestId, getByText }, "Cafés")
+    await waitFor(() => expect(getByTestId("place-category-cafes")).toBeTruthy())
+    fireEvent.press(getByTestId("place-category-cafes"))
 
-    await waitFor(() => expect(getByText("Cafés")).toBeTruthy())
+    await waitFor(() =>
+      expect(isSelected(getByTestId("place-category-cafes"))).toBe(true),
+    )
 
-    chooseCategory({ getByTestId, getByText }, "Bars & nightlife")
+    fireEvent.press(getByTestId("place-category-bars"))
 
-    await waitFor(() => expect(getByText("Bars & nightlife")).toBeTruthy())
-    expect(queryByText("Cafés")).toBeNull()
+    await waitFor(() => expect(isSelected(getByTestId("place-category-bars"))).toBe(true))
+    expect(isSelected(getByTestId("place-category-cafes"))).toBe(false)
+  })
+
+  it("takes a category back off when its own chip is tapped again", async () => {
+    // There is no empty row to pick in a set of chips the way there is in a
+    // list, so the chip that is on has to be the way back off it.
+    const { getByTestId } = renderSheet()
+
+    fireEvent.changeText(getByTestId("place-name-input"), "Hope House")
+    fireEvent.press(getByTestId("place-category-cafes"))
+
+    await waitFor(() => expect(getByTestId("submit-place")).not.toBeDisabled())
+
+    fireEvent.press(getByTestId("place-category-cafes"))
+
+    expect(isSelected(getByTestId("place-category-cafes"))).toBe(false)
+    // And with no category there is nothing to send again.
+    await waitFor(() => expect(getByTestId("submit-place")).toBeDisabled())
   })
 
   it("keeps what has been typed while the pin is moved", async () => {
