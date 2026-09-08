@@ -258,6 +258,23 @@ describe("AddPlacePanel", () => {
     await waitFor(() => expect(queryByTestId("place-submission-error")).toBeNull())
   })
 
+  it("slides out on the X rather than vanishing from under the map", async () => {
+    const { getByTestId } = renderSheet()
+
+    await waitFor(() => expect(getByTestId("place-name-input")).toBeTruthy())
+    fireEvent.press(getByTestId("close-add-place"))
+
+    // Still on screen and still holding its share of the layout while the exit
+    // plays, which is exactly what a drag away gets. Reporting the close here
+    // would take the panel off in the frame the X was pressed and snap the map
+    // back to full height under it.
+    expect(getByTestId("add-place-panel")).toBeTruthy()
+    expect(onClose).not.toHaveBeenCalled()
+
+    // The sheet reports it once there is nothing left on screen to take away.
+    await waitFor(() => expect(onClose).toHaveBeenCalled())
+  })
+
   it("holds the pin still once Continue has been pressed", async () => {
     // The map above stays pannable throughout, and the coordinate row is on the
     // step behind this one. Without the freeze a brush of the map while
