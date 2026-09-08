@@ -3709,17 +3709,17 @@
         "title": "Hati ya Masharti",
         "equitySection": {
           "title": "Hisa katika Blink",
-          "investment": "Uwekezaji wa $10,000",
+          "investment": "Uwekezaji wa {amount: string}",
           "valuation": "Kwa thamani ya awali ya $10M",
-          "units": "Unapokea vitengo 10,000 ~0.1% vya Blink"
+          "units": "Unapokea vitengo {units: string} ~{percent: number}% vya Blink"
         },
         "buttonText": "Endelea kwa Kusaini"
       },
       "TransferInvest": {
         "title": "Hamisha uwekezaji wako",
         "paragraphs": {
-          "body1": "Umesaini makubaliano ya usajili kwa vitengo 10,000 katika Blink.",
-          "body2": "Ni wakati wa kuhamisha kiasi cha uwekezaji cha $10,000. Utalipa kwa Bitcoin."
+          "body1": "Umesaini makubaliano ya usajili kwa vitengo {units: string} katika Blink.",
+          "body2": "Ni wakati wa kuhamisha kiasi cha uwekezaji cha {amount: string}. Utalipa kwa Bitcoin."
         },
         "buttonText": "Endelea"
       },

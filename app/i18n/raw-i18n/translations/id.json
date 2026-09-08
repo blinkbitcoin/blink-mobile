@@ -3709,17 +3709,17 @@
         "title": "Lembar Ketentuan",
         "equitySection": {
           "title": "Ekuitas di Blink",
-          "investment": "Investasi $10,000",
+          "investment": "Investasi {amount: string}",
           "valuation": "Pada valuasi pre-money $10M",
-          "units": "Anda menerima 10,000 unit ~0.1% dari Blink"
+          "units": "Anda menerima {units: string} unit ~{percent: number}% dari Blink"
         },
         "buttonText": "Lanjut ke Penandatanganan"
       },
       "TransferInvest": {
         "title": "Transfer investasi Anda",
         "paragraphs": {
-          "body1": "Anda telah menandatangani perjanjian langganan untuk 10,000 unit di Blink.",
-          "body2": "Saatnya mentransfer jumlah investasi $10,000. Anda akan membayar dengan Bitcoin."
+          "body1": "Anda telah menandatangani perjanjian langganan untuk {units: string} unit di Blink.",
+          "body2": "Saatnya mentransfer jumlah investasi {amount: string}. Anda akan membayar dengan Bitcoin."
         },
         "buttonText": "Lanjutkan"
       },

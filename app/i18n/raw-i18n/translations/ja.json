@@ -3757,17 +3757,17 @@
                 "title": "条件概要書",
                 "equitySection": {
                     "title": "Blinkの株式",
-                    "investment": "10,000ドルの投資",
+                    "investment": "{amount: string}の投資",
                     "valuation": "プレマネー評価額1,000万ドル",
-                    "units": "10,000ユニット（Blinkの約0.1%）を受け取ります"
+                    "units": "{units: string}ユニット（Blinkの約{percent: number}%）を受け取ります"
                 },
                 "buttonText": "署名に進む"
             },
             "TransferInvest": {
                 "title": "投資額を送金してください",
                 "paragraphs": {
-                    "body1": "Blinkの10,000ユニットに対するサブスクリプション契約に署名しました。",
-                    "body2": "10,000ドルの投資額を送金する時です。ビットコインでお支払いいただきます。"
+                    "body1": "Blinkの{units: string}ユニットに対するサブスクリプション契約に署名しました。",
+                    "body2": "{amount: string}の投資額を送金する時です。ビットコインでお支払いいただきます。"
                 },
                 "buttonText": "続ける"
             },

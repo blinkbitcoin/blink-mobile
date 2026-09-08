@@ -3709,17 +3709,17 @@
         "title": "ورقة الشروط",
         "equitySection": {
           "title": "حصة في Blink",
-          "investment": "استثمار 10,000$",
+          "investment": "استثمار {amount: string}",
           "valuation": "بتقييم 10 مليون$ قبل التمويل",
-          "units": "تحصل على 10,000 وحدة ~0.1% من Blink"
+          "units": "تحصل على {units: string} وحدة ~{percent: number}% من Blink"
         },
         "buttonText": "المتابعة للتوقيع"
       },
       "TransferInvest": {
         "title": "حوّل استثمارك",
         "paragraphs": {
-          "body1": "لقد وقعت اتفاقية الاشتراك لـ 10,000 وحدة في Blink.",
-          "body2": "حان وقت تحويل مبلغ الاستثمار البالغ 10,000$. ستدفع بالبيتكوين."
+          "body1": "لقد وقعت اتفاقية الاشتراك لـ {units: string} وحدة في Blink.",
+          "body2": "حان وقت تحويل مبلغ الاستثمار البالغ {amount: string}. ستدفع بالبيتكوين."
         },
         "buttonText": "متابعة"
       },

@@ -3709,17 +3709,17 @@
         "title": "Termblad",
         "equitySection": {
           "title": "Egenkapital i Blink",
-          "investment": "$10,000 Investering",
+          "investment": "{amount: string} Investering",
           "valuation": "Ved $10M pre-money vurdering",
-          "units": "Du modtager 10,000 enheder ~0.1% af Blink"
+          "units": "Du modtager {units: string} enheder ~{percent: number}% af Blink"
         },
         "buttonText": "Fortsæt til Underskrift"
       },
       "TransferInvest": {
         "title": "Overfør din investering",
         "paragraphs": {
-          "body1": "Du har underskrevet tegningsaftalen for 10,000 enheder i Blink.",
-          "body2": "Det er tid til at overføre investeringsbeløbet på $10,000. Du betaler med Bitcoin."
+          "body1": "Du har underskrevet tegningsaftalen for {units: string} enheder i Blink.",
+          "body2": "Det er tid til at overføre investeringsbeløbet på {amount: string}. Du betaler med Bitcoin."
         },
         "buttonText": "Fortsæt"
       },

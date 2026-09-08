@@ -3880,17 +3880,17 @@ const en: BaseTranslation = {
         title: "Term Sheet",
         equitySection: {
           title: "Equity in Blink",
-          investment: "$10,000 Investment",
+          investment: "{amount: string} Investment",
           valuation: "At $10M pre-money valuation",
-          units: "You receive 10,000 units ~0.1% of Blink",
+          units: "You receive {units: string} units ~{percent: number}% of Blink",
         },
         buttonText: "Proceed to Sign",
       },
       TransferInvest: {
         title: "Transfer your investment",
         paragraphs: {
-          body1: "You have signed the subscription agreement for 10,000 units in Blink.",
-          body2: "Time to transfer the investment amount of $10,000. You will pay with Bitcoin.",
+          body1: "You have signed the subscription agreement for {units: string} units in Blink.",
+          body2: "Time to transfer the investment amount of {amount: string}. You will pay with Bitcoin.",
         },
         buttonText: "Continue",
       },

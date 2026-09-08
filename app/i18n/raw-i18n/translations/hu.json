@@ -3709,17 +3709,17 @@
         "title": "Feltételek",
         "equitySection": {
           "title": "Részesedés a Blinkben",
-          "investment": "$10,000 Befektetés",
+          "investment": "{amount: string} Befektetés",
           "valuation": "$10M pre-money értékelésnél",
-          "units": "10,000 egységet kapsz ~0,1%-ot a Blinkből"
+          "units": "{units: string} egységet kapsz ~{percent: number}%-ot a Blinkből"
         },
         "buttonText": "Tovább az Aláíráshoz"
       },
       "TransferInvest": {
         "title": "Utald át a befektetésedet",
         "paragraphs": {
-          "body1": "Aláírtad az előfizetési megállapodást 10,000 egységre a Blinkben.",
-          "body2": "Ideje átutalni a $10,000 befektetési összeget. Bitcoinnal fizetsz."
+          "body1": "Aláírtad az előfizetési megállapodást {units: string} egységre a Blinkben.",
+          "body2": "Ideje átutalni a {amount: string} befektetési összeget. Bitcoinnal fizetsz."
         },
         "buttonText": "Tovább"
       },

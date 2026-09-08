@@ -3709,17 +3709,17 @@
         "title": "Uvjeti",
         "equitySection": {
           "title": "Udio u Blinku",
-          "investment": "Ulaganje od $10,000",
+          "investment": "Ulaganje od {amount: string}",
           "valuation": "Uz pre-money procjenu od $10M",
-          "units": "Primate 10,000 jedinica ~0.1% Blinka"
+          "units": "Primate {units: string} jedinica ~{percent: number}% Blinka"
         },
         "buttonText": "Nastavi na Potpis"
       },
       "TransferInvest": {
         "title": "Prenesite svoje ulaganje",
         "paragraphs": {
-          "body1": "Potpisali ste ugovor o pretplati za 10,000 jedinica u Blinku.",
-          "body2": "Vrijeme je za prijenos iznosa ulaganja od $10,000. Platit ćete Bitcoinom."
+          "body1": "Potpisali ste ugovor o pretplati za {units: string} jedinica u Blinku.",
+          "body2": "Vrijeme je za prijenos iznosa ulaganja od {amount: string}. Platit ćete Bitcoinom."
         },
         "buttonText": "Nastavi"
       },

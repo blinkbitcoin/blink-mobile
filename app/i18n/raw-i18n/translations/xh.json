@@ -3709,17 +3709,17 @@
         "title": "Iphepha leMiqathango",
         "equitySection": {
           "title": "Isabelo kwiBlink",
-          "investment": "Utyalo-mali lwe-$10,000",
+          "investment": "Utyalo-mali lwe-{amount: string}",
           "valuation": "Ngoxabiso lwangaphambi kwemali lwe-$10M",
-          "units": "Ufumana iiyunithi ezili-10,000 ~0.1% yeBlink"
+          "units": "Ufumana iiyunithi ezili-{units: string} ~{percent: number}% yeBlink"
         },
         "buttonText": "Qhubeka ukuya kuSayina"
       },
       "TransferInvest": {
         "title": "Dlulisela utyalo-mali lwakho",
         "paragraphs": {
-          "body1": "Usayine isivumelwano sobhaliso lweeyunithi ezili-10,000 kwiBlink.",
-          "body2": "Lixesha lokudlulisela isixa sotyalo-mali se-$10,000. Uza kuhlawula ngeBitcoin."
+          "body1": "Usayine isivumelwano sobhaliso lweeyunithi ezili-{units: string} kwiBlink.",
+          "body2": "Lixesha lokudlulisela isixa sotyalo-mali se-{amount: string}. Uza kuhlawula ngeBitcoin."
         },
         "buttonText": "Qhubeka"
       },

@@ -3709,17 +3709,17 @@
         "title": "Bảng Điều khoản",
         "equitySection": {
           "title": "Cổ phần trong Blink",
-          "investment": "Đầu tư $10,000",
+          "investment": "Đầu tư {amount: string}",
           "valuation": "Ở định giá trước vốn $10M",
-          "units": "Bạn nhận được 10,000 đơn vị ~0,1% của Blink"
+          "units": "Bạn nhận được {units: string} đơn vị ~{percent: number}% của Blink"
         },
         "buttonText": "Tiến hành Ký"
       },
       "TransferInvest": {
         "title": "Chuyển khoản đầu tư của bạn",
         "paragraphs": {
-          "body1": "Bạn đã ký thỏa thuận đăng ký cho 10,000 đơn vị trong Blink.",
-          "body2": "Đã đến lúc chuyển khoản đầu tư $10,000. Bạn sẽ thanh toán bằng Bitcoin."
+          "body1": "Bạn đã ký thỏa thuận đăng ký cho {units: string} đơn vị trong Blink.",
+          "body2": "Đã đến lúc chuyển khoản đầu tư {amount: string}. Bạn sẽ thanh toán bằng Bitcoin."
         },
         "buttonText": "Tiếp tục"
       },

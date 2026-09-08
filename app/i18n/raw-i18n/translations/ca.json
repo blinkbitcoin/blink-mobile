@@ -3709,17 +3709,17 @@
         "title": "Full de Termes",
         "equitySection": {
           "title": "Participació a Blink",
-          "investment": "Inversió de $10,000",
+          "investment": "Inversió de {amount: string}",
           "valuation": "Amb valoració pre-money de $10M",
-          "units": "Reps 10,000 unitats ~0.1% de Blink"
+          "units": "Reps {units: string} unitats ~{percent: number}% de Blink"
         },
         "buttonText": "Procedir a Signar"
       },
       "TransferInvest": {
         "title": "Transfereix la teva inversió",
         "paragraphs": {
-          "body1": "Has signat l'acord de subscripció per 10,000 unitats a Blink.",
-          "body2": "És el moment de transferir l'import d'inversió de $10,000. Pagaràs amb Bitcoin."
+          "body1": "Has signat l'acord de subscripció per {units: string} unitats a Blink.",
+          "body2": "És el moment de transferir l'import d'inversió de {amount: string}. Pagaràs amb Bitcoin."
         },
         "buttonText": "Continuar"
       },

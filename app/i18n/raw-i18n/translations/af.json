@@ -3709,17 +3709,17 @@
         "title": "Termynstaat",
         "equitySection": {
           "title": "Aandeel in Blink",
-          "investment": "$10,000 Belegging",
+          "investment": "{amount: string} Belegging",
           "valuation": "Teen $10M pre-geld-waardasie",
-          "units": "Jy ontvang 10,000 eenhede ~0.1% van Blink"
+          "units": "Jy ontvang {units: string} eenhede ~{percent: number}% van Blink"
         },
         "buttonText": "Gaan voort om te Teken"
       },
       "TransferInvest": {
         "title": "Dra jou belegging oor",
         "paragraphs": {
-          "body1": "Jy het die intekeningsooreenkoms vir 10,000 eenhede in Blink onderteken.",
-          "body2": "Dit is tyd om die beleggingsbedrag van $10,000 oor te dra. Jy sal met Bitcoin betaal."
+          "body1": "Jy het die intekeningsooreenkoms vir {units: string} eenhede in Blink onderteken.",
+          "body2": "Dit is tyd om die beleggingsbedrag van {amount: string} oor te dra. Jy sal met Bitcoin betaal."
         },
         "buttonText": "Gaan voort"
       },

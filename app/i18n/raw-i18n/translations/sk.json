@@ -3709,17 +3709,17 @@
         "title": "Podmienky",
         "equitySection": {
           "title": "Podiel v Blink",
-          "investment": "Investícia $10,000",
+          "investment": "Investícia {amount: string}",
           "valuation": "Pri pre-money ocenení $10M",
-          "units": "Dostanete 10,000 jednotiek ~0,1% Blink"
+          "units": "Dostanete {units: string} jednotiek ~{percent: number}% Blink"
         },
         "buttonText": "Pokračovať k Podpisu"
       },
       "TransferInvest": {
         "title": "Preveďte svoju investíciu",
         "paragraphs": {
-          "body1": "Podpísali ste zmluvu o úpise 10,000 jednotiek v Blink.",
-          "body2": "Je čas previesť investičnú sumu $10,000. Zaplatíte Bitcoinom."
+          "body1": "Podpísali ste zmluvu o úpise {units: string} jednotiek v Blink.",
+          "body2": "Je čas previesť investičnú sumu {amount: string}. Zaplatíte Bitcoinom."
         },
         "buttonText": "Pokračovať"
       },

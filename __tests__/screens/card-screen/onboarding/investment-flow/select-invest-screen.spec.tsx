@@ -122,6 +122,8 @@ describe("SelectInvestScreen", () => {
       fireEvent.press(button)
     })
 
-    expect(mockNavigate).toHaveBeenCalledWith("cardOnboardingTermSheetScreen")
+    expect(mockNavigate).toHaveBeenCalledWith("cardOnboardingTermSheetScreen", {
+      selectedAmountUsd: 1000,
+    })
   })
 })

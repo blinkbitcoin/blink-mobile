@@ -3709,17 +3709,17 @@
         "title": "Termsheet",
         "equitySection": {
           "title": "Aandeel in Blink",
-          "investment": "$10.000 Investering",
+          "investment": "{amount: string} Investering",
           "valuation": "Bij $10M pre-money waardering",
-          "units": "Je ontvangt 10.000 eenheden ~0,1% van Blink"
+          "units": "Je ontvangt {units: string} eenheden ~{percent: number}% van Blink"
         },
         "buttonText": "Ga naar Ondertekening"
       },
       "TransferInvest": {
         "title": "Draag je investering over",
         "paragraphs": {
-          "body1": "Je hebt de inschrijvingsovereenkomst voor 10.000 eenheden in Blink ondertekend.",
-          "body2": "Tijd om het investeringsbedrag van $10.000 over te maken. Je betaalt met Bitcoin."
+          "body1": "Je hebt de inschrijvingsovereenkomst voor {units: string} eenheden in Blink ondertekend.",
+          "body2": "Tijd om het investeringsbedrag van {amount: string} over te maken. Je betaalt met Bitcoin."
         },
         "buttonText": "Doorgaan"
       },

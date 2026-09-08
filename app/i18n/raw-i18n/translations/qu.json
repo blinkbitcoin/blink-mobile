@@ -3709,17 +3709,17 @@
         "title": "Kamachikuy Qillqa",
         "equitySection": {
           "title": "Rakiy Blink-pi",
-          "investment": "$10,000 Invertiy",
+          "investment": "{amount: string} Invertiy",
           "valuation": "$10M pre-money chaninchaypi",
-          "units": "10,000 rakinkunata chaskiwaq ~0.1% Blink-manta"
+          "units": "{units: string} rakinkunata chaskiwaq ~{percent: number}% Blink-manta"
         },
         "buttonText": "Ñawpaqman Firmaman"
       },
       "TransferInvest": {
         "title": "Invertiyniykita apachiy",
         "paragraphs": {
-          "body1": "10,000 rakikunapaq suscripción rimanakuyta firmarqanki Blink-pi.",
-          "body2": "Kunanmi $10,000 invertiy qullqita apachinay pacha. Bitcoin-wan pagankí."
+          "body1": "{units: string} rakikunapaq suscripción rimanakuyta firmarqanki Blink-pi.",
+          "body2": "Kunanmi {amount: string} invertiy qullqita apachinay pacha. Bitcoin-wan pagankí."
         },
         "buttonText": "Ñawpaqman"
       },

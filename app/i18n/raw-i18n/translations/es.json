@@ -3757,17 +3757,17 @@
                 "title": "Hoja de Términos",
                 "equitySection": {
                     "title": "Participación en Blink",
-                    "investment": "Inversión de $10,000",
+                    "investment": "Inversión de {amount: string}",
                     "valuation": "Con valoración pre-money de $10M",
-                    "units": "Recibes 10,000 unidades ~0.1% de Blink"
+                    "units": "Recibes {units: string} unidades ~{percent: number}% de Blink"
                 },
                 "buttonText": "Proceder a Firmar"
             },
             "TransferInvest": {
                 "title": "Transfiere tu inversión",
                 "paragraphs": {
-                    "body1": "Has firmado el acuerdo de suscripción por 10,000 unidades en Blink.",
-                    "body2": "Es momento de transferir el monto de inversión de $10,000. Pagarás con Bitcoin."
+                    "body1": "Has firmado el acuerdo de suscripción por {units: string} unidades en Blink.",
+                    "body2": "Es momento de transferir el monto de inversión de {amount: string}. Pagarás con Bitcoin."
                 },
                 "buttonText": "Continuar"
             },

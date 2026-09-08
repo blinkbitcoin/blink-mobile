@@ -3757,17 +3757,17 @@
                 "title": "Termsheet",
                 "equitySection": {
                     "title": "Beteiligung an Blink",
-                    "investment": "$10.000 Investition",
+                    "investment": "{amount: string} Investition",
                     "valuation": "Bei $10M Pre-Money-Bewertung",
-                    "units": "Du erhältst 10.000 Einheiten ~0,1% von Blink"
+                    "units": "Du erhältst {units: string} Einheiten ~{percent: number}% von Blink"
                 },
                 "buttonText": "Weiter zur Unterschrift"
             },
             "TransferInvest": {
                 "title": "Übertrage deine Investition",
                 "paragraphs": {
-                    "body1": "Du hast die Zeichnungsvereinbarung über 10.000 Einheiten in Blink unterzeichnet.",
-                    "body2": "Es ist Zeit, den Investitionsbetrag von $10.000 zu überweisen. Du zahlst mit Bitcoin."
+                    "body1": "Du hast die Zeichnungsvereinbarung über {units: string} Einheiten in Blink unterzeichnet.",
+                    "body2": "Es ist Zeit, den Investitionsbetrag von {amount: string} zu überweisen. Du zahlst mit Bitcoin."
                 },
                 "buttonText": "Weiter"
             },

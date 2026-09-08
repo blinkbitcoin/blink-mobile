@@ -3709,17 +3709,17 @@
         "title": "Şartname",
         "equitySection": {
           "title": "Blink'te Pay",
-          "investment": "10.000 $ Yatırım",
+          "investment": "{amount: string} Yatırım",
           "valuation": "10M $ ön para değerlemesinde",
-          "units": "10.000 birim alırsınız ~Blink'in %0,1'i"
+          "units": "{units: string} birim alırsınız ~Blink'in %{percent: number}'i"
         },
         "buttonText": "İmzaya Geç"
       },
       "TransferInvest": {
         "title": "Yatırımınızı transfer edin",
         "paragraphs": {
-          "body1": "Blink'te 10.000 birim için abonelik sözleşmesini imzaladınız.",
-          "body2": "10.000 $ yatırım tutarını transfer etme zamanı. Bitcoin ile ödeyeceksiniz."
+          "body1": "Blink'te {units: string} birim için abonelik sözleşmesini imzaladınız.",
+          "body2": "{amount: string} yatırım tutarını transfer etme zamanı. Bitcoin ile ödeyeceksiniz."
         },
         "buttonText": "Devam Et"
       },

@@ -12349,17 +12349,20 @@ type RootTranslation = {
 					 */
 					title: string
 					/**
-					 * $​1​0​,​0​0​0​ ​I​n​v​e​s​t​m​e​n​t
+					 * {​a​m​o​u​n​t​}​ ​I​n​v​e​s​t​m​e​n​t
+					 * @param {string} amount
 					 */
-					investment: string
+					investment: RequiredParams<'amount'>
 					/**
 					 * A​t​ ​$​1​0​M​ ​p​r​e​-​m​o​n​e​y​ ​v​a​l​u​a​t​i​o​n
 					 */
 					valuation: string
 					/**
-					 * Y​o​u​ ​r​e​c​e​i​v​e​ ​1​0​,​0​0​0​ ​u​n​i​t​s​ ​~​0​.​1​%​ ​o​f​ ​B​l​i​n​k
+					 * Y​o​u​ ​r​e​c​e​i​v​e​ ​{​u​n​i​t​s​}​ ​u​n​i​t​s​ ​~​{​p​e​r​c​e​n​t​}​%​ ​o​f​ ​B​l​i​n​k
+					 * @param {number} percent
+					 * @param {string} units
 					 */
-					units: string
+					units: RequiredParams<'percent' | 'units'>
 				}
 				/**
 				 * P​r​o​c​e​e​d​ ​t​o​ ​S​i​g​n
@@ -12373,13 +12376,15 @@ type RootTranslation = {
 				title: string
 				paragraphs: {
 					/**
-					 * Y​o​u​ ​h​a​v​e​ ​s​i​g​n​e​d​ ​t​h​e​ ​s​u​b​s​c​r​i​p​t​i​o​n​ ​a​g​r​e​e​m​e​n​t​ ​f​o​r​ ​1​0​,​0​0​0​ ​u​n​i​t​s​ ​i​n​ ​B​l​i​n​k​.
+					 * Y​o​u​ ​h​a​v​e​ ​s​i​g​n​e​d​ ​t​h​e​ ​s​u​b​s​c​r​i​p​t​i​o​n​ ​a​g​r​e​e​m​e​n​t​ ​f​o​r​ ​{​u​n​i​t​s​}​ ​u​n​i​t​s​ ​i​n​ ​B​l​i​n​k​.
+					 * @param {string} units
 					 */
-					body1: string
+					body1: RequiredParams<'units'>
 					/**
-					 * T​i​m​e​ ​t​o​ ​t​r​a​n​s​f​e​r​ ​t​h​e​ ​i​n​v​e​s​t​m​e​n​t​ ​a​m​o​u​n​t​ ​o​f​ ​$​1​0​,​0​0​0​.​ ​Y​o​u​ ​w​i​l​l​ ​p​a​y​ ​w​i​t​h​ ​B​i​t​c​o​i​n​.
+					 * T​i​m​e​ ​t​o​ ​t​r​a​n​s​f​e​r​ ​t​h​e​ ​i​n​v​e​s​t​m​e​n​t​ ​a​m​o​u​n​t​ ​o​f​ ​{​a​m​o​u​n​t​}​.​ ​Y​o​u​ ​w​i​l​l​ ​p​a​y​ ​w​i​t​h​ ​B​i​t​c​o​i​n​.
+					 * @param {string} amount
 					 */
-					body2: string
+					body2: RequiredParams<'amount'>
 				}
 				/**
 				 * C​o​n​t​i​n​u​e
@@ -26027,17 +26032,17 @@ export type TranslationFunctions = {
 					 */
 					title: () => LocalizedString
 					/**
-					 * $10,000 Investment
+					 * {amount} Investment
 					 */
-					investment: () => LocalizedString
+					investment: (arg: { amount: string }) => LocalizedString
 					/**
 					 * At $10M pre-money valuation
 					 */
 					valuation: () => LocalizedString
 					/**
-					 * You receive 10,000 units ~0.1% of Blink
+					 * You receive {units} units ~{percent}% of Blink
 					 */
-					units: () => LocalizedString
+					units: (arg: { percent: number, units: string }) => LocalizedString
 				}
 				/**
 				 * Proceed to Sign
@@ -26051,13 +26056,13 @@ export type TranslationFunctions = {
 				title: () => LocalizedString
 				paragraphs: {
 					/**
-					 * You have signed the subscription agreement for 10,000 units in Blink.
+					 * You have signed the subscription agreement for {units} units in Blink.
 					 */
-					body1: () => LocalizedString
+					body1: (arg: { units: string }) => LocalizedString
 					/**
-					 * Time to transfer the investment amount of $10,000. You will pay with Bitcoin.
+					 * Time to transfer the investment amount of {amount}. You will pay with Bitcoin.
 					 */
-					body2: () => LocalizedString
+					body2: (arg: { amount: string }) => LocalizedString
 				}
 				/**
 				 * Continue

@@ -3709,17 +3709,17 @@
         "title": "Olupapula lw'Amateeka",
         "equitySection": {
           "title": "Ekitundu mu Blink",
-          "investment": "Okuteekawo $10,000",
+          "investment": "Okuteekawo {amount: string}",
           "valuation": "Ku muwendo gwa $10M nga temunnaba kufuna ssente",
-          "units": "Ofuna ebitundu 10,000 ~0.1% ebya Blink"
+          "units": "Ofuna ebitundu {units: string} ~{percent: number}% ebya Blink"
         },
         "buttonText": "Weyongere Okusayina"
       },
       "TransferInvest": {
         "title": "Sindika ebintu byo",
         "paragraphs": {
-          "body1": "Osaainye endagaano ey'okuwandiisa ebitundu 10,000 mu Blink.",
-          "body2": "Kiseera okusindika ssente z'okuteekawo eza $10,000. Olisasula ne Bitcoin."
+          "body1": "Osaainye endagaano ey'okuwandiisa ebitundu {units: string} mu Blink.",
+          "body2": "Kiseera okusindika ssente z'okuteekawo eza {amount: string}. Olisasula ne Bitcoin."
         },
         "buttonText": "Weyongere"
       },

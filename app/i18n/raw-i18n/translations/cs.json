@@ -3709,17 +3709,17 @@
         "title": "Termínový list",
         "equitySection": {
           "title": "Podíl v Blink",
-          "investment": "Investice $10,000",
+          "investment": "Investice {amount: string}",
           "valuation": "Při pre-money ocenění $10M",
-          "units": "Obdržíte 10,000 jednotek ~0.1% Blink"
+          "units": "Obdržíte {units: string} jednotek ~{percent: number}% Blink"
         },
         "buttonText": "Přejít k Podpisu"
       },
       "TransferInvest": {
         "title": "Převeďte svou investici",
         "paragraphs": {
-          "body1": "Podepsali jste smlouvu o úpisu 10,000 jednotek v Blink.",
-          "body2": "Je čas převést investiční částku $10,000. Zaplatíte Bitcoinem."
+          "body1": "Podepsali jste smlouvu o úpisu {units: string} jednotek v Blink.",
+          "body2": "Je čas převést investiční částku {amount: string}. Zaplatíte Bitcoinem."
         },
         "buttonText": "Pokračovat"
       },
