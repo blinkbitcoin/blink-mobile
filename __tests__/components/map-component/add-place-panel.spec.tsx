@@ -1,7 +1,7 @@
 import React from "react"
 import { act, fireEvent, render, waitFor } from "@testing-library/react-native"
 
-import { AddPlaceSheet } from "@app/components/map-component/add-place-sheet"
+import { AddPlacePanel } from "@app/components/map-component/add-place-panel"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
 import { ContextForScreen } from "../../screens/helper"
@@ -19,11 +19,11 @@ const LOCATION = { latitude: 13.496743, longitude: -89.439462 }
 const onSubmit = jest.fn<Promise<string | null>, [unknown]>()
 const onClose = jest.fn()
 
-type SheetProps = React.ComponentProps<typeof AddPlaceSheet>
+type SheetProps = React.ComponentProps<typeof AddPlacePanel>
 
 const sheet = (props: Partial<SheetProps> = {}) => (
   <ContextForScreen>
-    <AddPlaceSheet location={LOCATION} onSubmit={onSubmit} onClose={onClose} {...props} />
+    <AddPlacePanel location={LOCATION} onSubmit={onSubmit} onClose={onClose} {...props} />
   </ContextForScreen>
 )
 
@@ -50,7 +50,7 @@ beforeEach(() => {
   loadLocale("en")
 })
 
-describe("AddPlaceSheet", () => {
+describe("AddPlacePanel", () => {
   it("shows where the pin is pointing", async () => {
     // The form is the only place the coordinates are readable, so a pin left in
     // the wrong street can still be caught before it is submitted.

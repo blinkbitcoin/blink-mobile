@@ -101,10 +101,10 @@ jest.mock("@app/components/map-component/category-filter-sheet", () => ({
 let capturedAddPlaceProps: Record<string, unknown> | undefined
 let addPlaceMountCount = 0
 let isAddPlaceMounted = false
-jest.mock("@app/components/map-component/add-place-sheet", () => {
+jest.mock("@app/components/map-component/add-place-panel", () => {
   const ReactActual = jest.requireActual<typeof React>("react")
   return {
-    AddPlaceSheet: (props: Record<string, unknown>) => {
+    AddPlacePanel: (props: Record<string, unknown>) => {
       capturedAddPlaceProps = props
       ReactActual.useEffect(() => {
         addPlaceMountCount += 1
