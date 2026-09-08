@@ -35,7 +35,9 @@ export const SelectInvestScreen: React.FC = () => {
 
   const handleNext = () => {
     if (selectedLimit !== null) {
-      navigation.navigate("cardOnboardingTermSheetScreen")
+      navigation.navigate("cardOnboardingTermSheetScreen", {
+        selectedAmountUsd: selectedLimit,
+      })
     }
   }
 
