@@ -1,3 +1,6 @@
+import fs from "fs"
+import path from "path"
+
 import en from "@app/i18n/en"
 import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
@@ -5,10 +8,20 @@ import { loadLocale } from "@app/i18n/i18n-util.sync"
 loadLocale("en")
 const LL = i18nObject("en")
 
+const TRANSLATIONS_DIR = path.resolve(
+  __dirname,
+  "..",
+  "..",
+  "app",
+  "i18n",
+  "raw-i18n",
+  "translations",
+)
+
 type AnyTranslation = Record<string, unknown>
 
-const collectValues = (node: unknown, prefix = ""): string[] => {
-  if (typeof node === "string") return [`${prefix}: ${node}`]
+const collectValues = (node: unknown, prefix = ""): { path: string; value: string }[] => {
+  if (typeof node === "string") return [{ path: prefix, value: node }]
   if (node === null || typeof node !== "object") return []
   const obj = node as AnyTranslation
   return Object.keys(obj).flatMap((key) =>
@@ -16,17 +29,33 @@ const collectValues = (node: unknown, prefix = ""): string[] => {
   )
 }
 
-const backupScreen = (en as AnyTranslation).BackupScreen as AnyTranslation
-const cloudBackup = backupScreen.CloudBackup
-const backupMethod = backupScreen.BackupMethod as AnyTranslation
-const restoreScreen = (en as AnyTranslation).RestoreScreen
+/**
+ * Every user-facing string of the encrypted cloud backup flow, on both ends: the two
+ * steps of the backup screen and the restore screen that asks for the secret back.
+ * `BackupScreen.BackupMethod` is deliberately outside this set — see the last test.
+ */
+const encryptionFlow = (translation: AnyTranslation) => [
+  ...collectValues(
+    (translation.BackupScreen as AnyTranslation | undefined)?.CloudBackup,
+    "BackupScreen.CloudBackup",
+  ),
+  ...collectValues(translation.RestoreScreen, "RestoreScreen"),
+]
+
+const isPassword = ({ value }: { value: string }) => /password/i.test(value)
+
+const localeFiles = fs
+  .readdirSync(TRANSLATIONS_DIR)
+  .filter((name) => name.endsWith(".json"))
+  .sort()
 
 /**
- * The encryption secret is a passphrase, not a password: it is a BIP-39-style extra
- * phrase on top of the backup phrase, and calling it a "password" reads as an account
- * credential. These assert the values rather than the keys — the keys deliberately kept
- * their old names, so a test written against `LL...password()` would still pass if the
- * copy regressed.
+ * The secret that encrypts a cloud backup is a passphrase, not a password. The word is
+ * doing deliberate work: "password" invites the user to reuse an account credential,
+ * which is the one thing they must not do here, so the copy names something they have
+ * never been asked for before. These assert the values rather than the keys — the keys
+ * deliberately kept their old names, so a test written against `LL...password()` would
+ * still pass if the copy regressed.
  */
 describe("cloud backup encryption passphrase copy", () => {
   it("asks to add a passphrase rather than to encrypt with a password", () => {
@@ -72,13 +101,24 @@ describe("cloud backup encryption passphrase copy", () => {
     expect(LL.BackupScreen.CloudBackup.passwordTooShort()).toBe("Minimum 12 characters")
   })
 
-  it("never says 'password' anywhere in the backup or restore flow", () => {
-    const offenders = [
-      ...collectValues(cloudBackup, "BackupScreen.CloudBackup"),
-      ...collectValues(restoreScreen, "RestoreScreen"),
-    ].filter((entry) => /password/i.test(entry.split(": ").slice(1).join(": ")))
+  it("never says 'password' anywhere in the English backup or restore flow", () => {
+    expect(encryptionFlow(en as AnyTranslation).filter(isPassword)).toEqual([])
+  })
 
-    expect(offenders).toEqual([])
+  /**
+   * Each locale names the secret in its own language, which no English-language check can
+   * verify — those terms are reviewed by hand. What this does catch is the English word
+   * surviving in a translation, which is how the rename was missed outside `en` once
+   * already.
+   */
+  localeFiles.forEach((localeFile) => {
+    it(`does not leave the English word 'password' in ${localeFile}`, () => {
+      const parsed = JSON.parse(
+        fs.readFileSync(path.join(TRANSLATIONS_DIR, localeFile), "utf8"),
+      ) as AnyTranslation
+
+      expect(encryptionFlow(parsed).filter(isPassword)).toEqual([])
+    })
   })
 
   /**
@@ -86,11 +126,12 @@ describe("cloud backup encryption passphrase copy", () => {
    * autofill) as a destination. That is an actual password manager, so it keeps the word.
    */
   it("still calls the password manager a password manager", () => {
-    expect(backupMethod.passwordManager).toBe("Password manager")
-    expect(backupMethod.passwordManagerBackupSaved).toBe(
-      "Backup saved to password manager",
-    )
-    expect(backupMethod.passwordManagerUnavailable).toBe(
+    const backupMethod = (en as AnyTranslation).BackupScreen as AnyTranslation
+    const method = backupMethod.BackupMethod as AnyTranslation
+
+    expect(method.passwordManager).toBe("Password manager")
+    expect(method.passwordManagerBackupSaved).toBe("Backup saved to password manager")
+    expect(method.passwordManagerUnavailable).toBe(
       "No password manager available on this device. Use Drive backup or save your 12-word phrase manually.",
     )
   })
