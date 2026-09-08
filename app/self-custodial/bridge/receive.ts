@@ -26,6 +26,9 @@ export const createReceiveLightning = (
             amountSats: amount ? BigInt(amount.amount) : undefined,
             expirySecs,
             paymentHash: undefined,
+            /** 0.23 lets an invoice name a receiver other than this wallet; ours always
+             *  receives for itself, so the field stays unset. */
+            receiverIdentityPublicKey: undefined,
           }),
         }),
       )
