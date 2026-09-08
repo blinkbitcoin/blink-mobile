@@ -34,7 +34,10 @@ import { AccountType } from "@app/types/wallet"
 import { reportError } from "@app/utils/error-logging"
 import { toastShow } from "@app/utils/toast"
 import { generateSecureRandomUUID } from "@app/utils/uuid"
-import { useFocusEffect } from "@react-navigation/native"
+import { useBottomTabBarStyle } from "@app/navigation/bottom-tab-bar-style"
+import { PrimaryStackParamList } from "@app/navigation/stack-param-lists"
+import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs"
+import { useFocusEffect, useNavigation } from "@react-navigation/native"
 import { isIOS } from "@rn-vui/base"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
@@ -89,6 +92,9 @@ export default function MapComponent({
     theme: { colors, mode: themeMode },
   } = useTheme()
   const insets = useSafeAreaInsets()
+  const navigation =
+    useNavigation<BottomTabNavigationProp<PrimaryStackParamList, "Map">>()
+  const tabBarStyle = useBottomTabBarStyle()
   const styles = useStyles({ topInset: insets.top })
   const client = useApolloClient()
   const { LL } = useI18nContext()
@@ -354,6 +360,19 @@ export default function MapComponent({
   }, [])
 
   const stopAddingPlace = React.useCallback(() => setAddingPlace(false), [])
+
+  // The panel runs to the bottom of the screen while a place is being added,
+  // covering the tab bar the way the place sheet's own window covers it. This
+  // one has no window on purpose — the map above it has to stay pannable while
+  // the form is filled in — so the bar is taken away rather than drawn over.
+  //
+  // Restored to the navigator's own style rather than to nothing: `setOptions`
+  // merges over `screenOptions` instead of falling back to them.
+  React.useEffect(() => {
+    if (!isAddingPlace) return undefined
+    navigation.setOptions({ tabBarStyle: { display: "none" } })
+    return () => navigation.setOptions({ tabBarStyle })
+  }, [isAddingPlace, navigation, tabBarStyle])
 
   /**
    * Sends the place and answers the form with what to say about it.

@@ -14,6 +14,21 @@ import { ContextForScreen } from "../../screens/helper"
 
 const mockRefresh = jest.fn()
 
+// The map screen is a tab screen, and the add-place panel takes the tab bar
+// away while it is open. Only the navigation object can say whether it did, so
+// its `setOptions` is the one thing swapped out here.
+const mockSetOptions = jest.fn()
+jest.mock("@react-navigation/native", () => {
+  const actual = jest.requireActual<typeof import("@react-navigation/native")>(
+    "@react-navigation/native",
+  )
+  return {
+    __esModule: true,
+    ...actual,
+    useNavigation: () => ({ ...actual.useNavigation(), setOptions: mockSetOptions }),
+  }
+})
+
 jest.mock("@app/btcmap/use-places", () => ({ useBtcMapPlaces: jest.fn() }))
 
 jest.mock("@app/btcmap/use-place-names", () => ({ useBtcMapPlaceNames: jest.fn() }))
@@ -1226,6 +1241,46 @@ describe("MapComponent adding a place", () => {
     )
     expect(mockSubmitPlace).not.toHaveBeenCalled()
     expect(isAddPlaceMounted).toBe(true)
+  })
+})
+
+describe("MapComponent add-place tab bar", () => {
+  const tabBarStyles = () =>
+    mockSetOptions.mock.calls
+      .map(([options]) => (options as { tabBarStyle?: unknown }).tabBarStyle)
+      .filter((style) => style !== undefined)
+
+  it("takes the tab bar away while a place is being added", async () => {
+    // The panel has no window of its own — the map above it has to stay
+    // pannable — so covering the bar the way the place sheet's window does
+    // means hiding it rather than drawing over it.
+    const { getByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+    expect(tabBarStyles()).toEqual([])
+
+    fireEvent.press(getByTestId("open-add-place"))
+
+    await waitFor(() => expect(tabBarStyles()).toContainEqual({ display: "none" }))
+  })
+
+  it("puts the bar back with the navigator's own style, not with nothing", async () => {
+    // `setOptions` merges over the navigator's `screenOptions` rather than
+    // falling back to them, so restoring by clearing the key would leave an
+    // unstyled bar behind.
+    const { getByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+    fireEvent.press(getByTestId("open-add-place"))
+    await waitFor(() => expect(tabBarStyles()).toContainEqual({ display: "none" }))
+
+    act(() => (capturedAddPlaceProps?.onClose as () => void)())
+
+    await waitFor(() => {
+      const restored = tabBarStyles().at(-1)
+      expect(restored).not.toEqual({ display: "none" })
+      expect(restored).toBeTruthy()
+    })
   })
 })
 

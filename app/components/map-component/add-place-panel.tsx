@@ -1,5 +1,6 @@
 import React from "react"
 import { Pressable, TextInput, View } from "react-native"
+import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 import {
   LatLng,
@@ -59,7 +60,8 @@ export const AddPlacePanel: React.FC<Props> = ({ location, onSubmit, onClose }) 
     theme: { colors },
   } = useTheme()
   const { LL } = useI18nContext()
-  const styles = useStyles()
+  const insets = useSafeAreaInsets()
+  const styles = useStyles({ bottomInset: insets.bottom })
 
   // Which half of the question is being answered. Where the place is and what
   // it is called come first because they are what the map above is for — the
@@ -263,7 +265,7 @@ export const AddPlacePanel: React.FC<Props> = ({ location, onSubmit, onClose }) 
   )
 }
 
-const useStyles = makeStyles(({ colors }) => ({
+const useStyles = makeStyles(({ colors }, { bottomInset }: { bottomInset: number }) => ({
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -365,9 +367,9 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingHorizontal: 20,
     paddingTop: 12,
     // The app's standing gap between a call to action and the foot of what it
-    // sits on. No safe-area inset on top of it: the map screen is a tab screen,
-    // and the tab bar below is what already clears the home indicator.
-    paddingBottom: 20,
+    // sits on, plus the home indicator. The panel covers the tab bar while it
+    // is open, so there is nothing below it left to clear this.
+    paddingBottom: 20 + bottomInset,
     rowGap: 10,
   },
   // Above the button rather than by the fields: what failed is the send, and
