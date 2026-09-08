@@ -40,6 +40,12 @@ type Props = {
  * modal. A modal window would take every touch on the screen, and the map
  * above has to stay pannable for the whole time this is open.
  *
+ * A panel, and named for one. Every other surface over this map is a bottom
+ * sheet, and while this was called a sheet too it kept being read as one that
+ * had simply been built wrong — twice it was asked for the scrim and the
+ * drag-to-dismiss its siblings have, and both would cost the panning that is
+ * the reason it is not a sheet.
+ *
  * The name and the category are both required — see `buildPlaceSubmission` for
  * why the category is. Submit stays disabled rather than explaining itself
  * afterwards, since which of the two is missing is visible on the form.
@@ -48,7 +54,7 @@ type Props = {
  * be filled in alongside, and the pin usually wants placing before there is
  * anything to type.
  */
-export const AddPlaceSheet: React.FC<Props> = ({ location, onSubmit, onClose }) => {
+export const AddPlacePanel: React.FC<Props> = ({ location, onSubmit, onClose }) => {
   const {
     theme: { colors },
   } = useTheme()

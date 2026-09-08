@@ -38,7 +38,7 @@ import { useFocusEffect } from "@react-navigation/native"
 import { isIOS } from "@rn-vui/base"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
-import { AddPlaceSheet } from "./add-place-sheet"
+import { AddPlacePanel } from "./add-place-panel"
 import { CategoryFilterSheet } from "./category-filter-sheet"
 import { ClusterMarker, ClusterMarkerData } from "./cluster-marker"
 import { Viewport, placeLabels } from "./label-collision"
@@ -603,7 +603,7 @@ export default function MapComponent({
           typed — so the map gets all of itself back and a next attempt starts
           on an empty form. */}
       {isAddingPlace && (
-        <AddPlaceSheet
+        <AddPlacePanel
           location={center}
           onSubmit={handlePlaceSubmit}
           onClose={stopAddingPlace}
