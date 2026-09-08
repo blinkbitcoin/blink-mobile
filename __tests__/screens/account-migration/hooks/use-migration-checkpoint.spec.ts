@@ -4,6 +4,10 @@ import {
   useMigrationCheckpoint,
   MigrationCheckpoint,
 } from "@app/screens/account-migration/hooks"
+import {
+  StorageFailure,
+  type StorageWriteResult,
+} from "@app/utils/storage/storage-failure"
 
 const mockNavigate = jest.fn()
 const mockReplace = jest.fn()
@@ -112,8 +116,9 @@ describe("useMigrationCheckpoint", () => {
 
     await waitFor(() => expect(result.current.loading).toBe(false))
 
-    act(() => {
-      result.current.saveCheckpoint(MigrationCheckpoint.BackupMethod)
+    /** Awaited, because the hook now applies the step only once the write has landed. */
+    await act(async () => {
+      await result.current.saveCheckpoint(MigrationCheckpoint.BackupMethod)
     })
 
     expect(result.current.checkpoint).toBe(MigrationCheckpoint.BackupMethod)
@@ -129,8 +134,8 @@ describe("useMigrationCheckpoint", () => {
 
     await waitFor(() => expect(result.current.loading).toBe(false))
 
-    act(() => {
-      result.current.saveCheckpoint(MigrationCheckpoint.BackupMethod, {
+    await act(async () => {
+      await result.current.saveCheckpoint(MigrationCheckpoint.BackupMethod, {
         provisionedAccountId: "sc-account-1",
       })
     })
@@ -162,8 +167,8 @@ describe("useMigrationCheckpoint", () => {
 
     await waitFor(() => expect(result.current.loading).toBe(false))
 
-    act(() => {
-      result.current.saveCheckpoint(MigrationCheckpoint.BalancesOverview, {
+    await act(async () => {
+      await result.current.saveCheckpoint(MigrationCheckpoint.BalancesOverview, {
         provisionedAccountId: "sc-1",
         expectedReceiveSats: 21000,
       })
@@ -208,8 +213,8 @@ describe("useMigrationCheckpoint", () => {
 
     await waitFor(() => expect(result.current.loading).toBe(false))
 
-    act(() => {
-      result.current.saveCheckpoint(MigrationCheckpoint.BalancesOverview)
+    await act(async () => {
+      await result.current.saveCheckpoint(MigrationCheckpoint.BalancesOverview)
     })
 
     expect(mockSaveCheckpointToStorage).toHaveBeenCalledWith("migrationCheckpoint_main", {
@@ -297,47 +302,47 @@ describe("useMigrationCheckpoint", () => {
     expect(result.current.hasError).toBe(true)
   })
 
-  it("resolves true when the storage write succeeds", async () => {
+  it("resolves saved when the storage write succeeds", async () => {
     const { result } = renderHook(() => useMigrationCheckpoint())
     await waitFor(() => expect(result.current.loading).toBe(false))
 
-    let saved: boolean | undefined
+    let saveResult: StorageWriteResult | undefined
     await act(async () => {
-      saved = await result.current.saveCheckpoint(MigrationCheckpoint.BackupMethod)
+      saveResult = await result.current.saveCheckpoint(MigrationCheckpoint.BackupMethod)
     })
 
-    expect(saved).toBe(true)
+    expect(saveResult).toEqual({ isSaved: true, failure: null })
   })
 
-  it("reports the error and resolves false when saveCheckpointToStorage rejects", async () => {
+  it("reports the error and resolves not-saved when saveCheckpointToStorage rejects", async () => {
     mockSaveCheckpointToStorage.mockRejectedValue(new Error("disk full"))
 
     const { result } = renderHook(() => useMigrationCheckpoint())
     await waitFor(() => expect(result.current.loading).toBe(false))
 
-    let saved: boolean | undefined
+    let saveResult: StorageWriteResult | undefined
     await act(async () => {
-      saved = await result.current.saveCheckpoint(MigrationCheckpoint.BackupMethod)
+      saveResult = await result.current.saveCheckpoint(MigrationCheckpoint.BackupMethod)
     })
 
-    expect(saved).toBe(false)
+    expect(saveResult?.isSaved).toBe(false)
     expect(mockReportError).toHaveBeenCalledWith("Checkpoint save", expect.any(Error))
   })
 
-  it("refuses to save (resolves false) when the owner id has not resolved", async () => {
+  it("refuses to save (resolves not-saved) when the owner id has not resolved", async () => {
     mockOwnerId = null
 
     const { result } = renderHook(() => useMigrationCheckpoint())
     await waitFor(() => expect(result.current.loading).toBe(false))
 
-    let saved: boolean | undefined
+    let saveResult: StorageWriteResult | undefined
     await act(async () => {
-      saved = await result.current.saveCheckpoint(MigrationCheckpoint.BackupMethod)
+      saveResult = await result.current.saveCheckpoint(MigrationCheckpoint.BackupMethod)
     })
 
     /** A null-owner save would erase the stored owner + account id via mergeCheckpoint,
      *  wiping real progress; it must refuse instead of writing. */
-    expect(saved).toBe(false)
+    expect(saveResult).toEqual({ isSaved: false, failure: null })
     expect(mockSaveCheckpointToStorage).not.toHaveBeenCalled()
   })
 
@@ -720,8 +725,8 @@ describe("useMigrationCheckpoint", () => {
 
     await waitFor(() => expect(result.current.loading).toBe(false))
 
-    act(() => {
-      result.current.saveCheckpoint(MigrationCheckpoint.BackupAlerts)
+    await act(async () => {
+      await result.current.saveCheckpoint(MigrationCheckpoint.BackupAlerts)
     })
 
     expect(result.current.checkpoint).toBe(MigrationCheckpoint.BackupAlerts)
@@ -839,5 +844,68 @@ describe("useMigrationCheckpoint owner recovery", () => {
     await act(async () => {
       await expect(result.current.refetch()).resolves.toBeUndefined()
     })
+  })
+})
+
+/** What the hook admits to having stored. The optimistic update used to run before the
+ *  write, so a refused write left it reporting a step the disk never took. */
+describe("useMigrationCheckpoint write ordering", () => {
+  beforeEach(resetCheckpointMocks)
+
+  /** The kind travels with the refusal so the toast can name a full disk. */
+  it("names an out-of-space write so the caller can say so", async () => {
+    mockSaveCheckpointToStorage.mockRejectedValue(
+      new Error("database or disk is full (code 13 SQLITE_FULL)"),
+    )
+
+    const { result } = renderHook(() => useMigrationCheckpoint())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    let saveResult: StorageWriteResult | undefined
+    await act(async () => {
+      saveResult = await result.current.saveCheckpoint(MigrationCheckpoint.BackupMethod)
+    })
+
+    expect(saveResult).toEqual({ isSaved: false, failure: StorageFailure.OutOfSpace })
+  })
+
+  it("leaves the failure unnamed when the message says nothing", async () => {
+    mockSaveCheckpointToStorage.mockRejectedValue(new Error("Database Error"))
+
+    const { result } = renderHook(() => useMigrationCheckpoint())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    let saveResult: StorageWriteResult | undefined
+    await act(async () => {
+      saveResult = await result.current.saveCheckpoint(MigrationCheckpoint.BackupMethod)
+    })
+
+    expect(saveResult).toEqual({ isSaved: false, failure: StorageFailure.Unknown })
+  })
+
+  it("does not report a step the store refused to take", async () => {
+    mockSaveCheckpointToStorage.mockRejectedValue(new Error("disk full"))
+
+    const { result } = renderHook(() => useMigrationCheckpoint())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+    const checkpointBefore = result.current.checkpoint
+
+    await act(async () => {
+      await result.current.saveCheckpoint(MigrationCheckpoint.BalancesOverview)
+    })
+
+    expect(result.current.checkpoint).toBe(checkpointBefore)
+    expect(result.current.checkpoint).not.toBe(MigrationCheckpoint.BalancesOverview)
+  })
+
+  it("reports the step once the store has taken it", async () => {
+    const { result } = renderHook(() => useMigrationCheckpoint())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    await act(async () => {
+      await result.current.saveCheckpoint(MigrationCheckpoint.BalancesOverview)
+    })
+
+    expect(result.current.checkpoint).toBe(MigrationCheckpoint.BalancesOverview)
   })
 })
