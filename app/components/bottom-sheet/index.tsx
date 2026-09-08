@@ -162,6 +162,10 @@ export const BottomSheet: React.FC<Props> = ({
   // bottom of the screen.
   const offset = useSharedValue(sheetHeight)
   const dragStart = useSharedValue(0)
+  // How much of the drag in progress the scroll view took before the sheet
+  // started moving, and whether the scroll view still holds it. See the pan.
+  const scrolledTravel = useSharedValue(0)
+  const scrollTookDrag = useSharedValue(false)
   // The resting offset, once it has been measured. Until then the sheet stays
   // off-screen rather than guessing.
   const restOffset = useSharedValue(restsOnHeader ? sheetHeight : 0)
@@ -235,17 +239,38 @@ export const BottomSheet: React.FC<Props> = ({
         )
         .onBegin(() => {
           dragStart.value = offset.value
+          scrolledTravel.value = 0
+          scrollTookDrag.value = false
         })
         .onUpdate((event) => {
           // Fully open with the list scrolled down, a downward drag is the list
           // being scrolled back up, not the sheet being pulled shut.
           if (dragStart.value === 0 && scrollOffset.value > 0 && event.translationY > 0) {
+            // `translationY` keeps counting from where the finger went down,
+            // list or no list. Remembering how much of it the list took is what
+            // lets the sheet pick the drag up from where the finger was when
+            // the list ran out, rather than jumping the whole accumulated
+            // travel in the one frame the guard stops firing.
+            scrolledTravel.value = event.translationY
+            scrollTookDrag.value = true
             return
           }
-          offset.value = Math.max(0, dragStart.value + event.translationY)
+          const next = Math.max(
+            0,
+            dragStart.value + event.translationY - scrolledTravel.value,
+          )
+          // The sheet has taken the drag over from the list only once it moves.
+          if (next !== offset.value) scrollTookDrag.value = false
+          offset.value = next
         })
         .onEnd((event) => {
-          const projected = offset.value + event.velocityY * VELOCITY_PROJECTION
+          // A gesture the scroll view ate does not get to decide the sheet's
+          // fate: a flick back to the top of a long list releases at an
+          // ordinary 1,500-4,000 px/s, which projects far past the dismiss
+          // distance while the sheet itself has not moved at all.
+          const projected = scrollTookDrag.value
+            ? offset.value
+            : offset.value + event.velocityY * VELOCITY_PROJECTION
 
           if (projected > restOffset.value + DISMISS_DISTANCE) {
             offset.value = withTiming(
@@ -262,7 +287,17 @@ export const BottomSheet: React.FC<Props> = ({
           offset.value = withSpring(toFull ? 0 : restOffset.value, SPRING)
           runOnJS(setExpanded)(toFull)
         }),
-    [dragStart, offset, restOffset, scrollOffset, scrollRef, sheetHeight, onClose],
+    [
+      dragStart,
+      offset,
+      restOffset,
+      scrollOffset,
+      scrollRef,
+      scrolledTravel,
+      scrollTookDrag,
+      sheetHeight,
+      onClose,
+    ],
   )
 
   // Dependency arrays are passed explicitly rather than left to the Babel
