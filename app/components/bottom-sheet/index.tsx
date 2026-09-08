@@ -57,43 +57,14 @@ export const BOTTOM_OVERHANG = 1
 /** @see `bottom-sheet.spec` — the drag is only reachable from a test by name. */
 export const PAN_TEST_ID = "bottom-sheet-pan"
 
-type Props = {
+type SharedProps = {
   isVisible: boolean
   onClose: () => void
-  /**
-   * How much of the screen the sheet covers once fully open, as a fraction of
-   * the window. Short of the whole thing on every current caller: what the
-   * sheet is about stays partly visible behind it.
-   */
-  heightRatio?: number
-  /**
-   * How the sheet is put on the screen.
-   *
-   * `"modal"` is a sheet in the usual sense: its own window, a scrim, and every
-   * touch on the screen belonging to it until it is dismissed.
-   *
-   * `"inline"` draws the same sheet in the layout it is placed in, with no
-   * window and no scrim, so what it sits beside keeps its own touches. It fills
-   * the slot its parent gives it — a `flex` share rather than `heightRatio` —
-   * which is what lets the surface above it shrink by exactly the sheet's
-   * height instead of being covered by it. Everything else is unchanged, the
-   * spring and the dismiss distance included, so the two read as one component.
-   */
-  presentation?: "modal" | "inline"
   /**
    * Held above the scroll and below the handle, so it stays put while the
    * content moves under it.
    */
   header?: React.ReactNode
-  /**
-   * Rest at the header's measured bottom edge rather than fully open, so
-   * whatever the header turns out to be is exactly what shows when the sheet
-   * arrives. Dragging up rests it at full height.
-   *
-   * Without it the sheet has one resting position, fully open, and the header
-   * is simply a region that does not scroll.
-   */
-  restsOnHeader?: boolean
   headerStyle?: StyleProp<ViewStyle>
   headerTestID?: string
   /**
@@ -107,6 +78,50 @@ type Props = {
   scrollTestID?: string
   testID?: string
 }
+
+/**
+ * A sheet in the usual sense: its own window, a scrim, and every touch on the
+ * screen belonging to it until it is dismissed.
+ */
+type ModalProps = SharedProps & {
+  presentation?: "modal"
+  /**
+   * How much of the screen the sheet covers once fully open, as a fraction of
+   * the window. Short of the whole thing on every current caller: what the
+   * sheet is about stays partly visible behind it.
+   */
+  heightRatio?: number
+  /**
+   * Rest at the header's measured bottom edge rather than fully open, so
+   * whatever the header turns out to be is exactly what shows when the sheet
+   * arrives. Dragging up rests it at full height.
+   *
+   * Without it the sheet has one resting position, fully open, and the header
+   * is simply a region that does not scroll.
+   */
+  restsOnHeader?: boolean
+}
+
+/**
+ * The same sheet drawn in the layout it is placed in, with no window and no
+ * scrim, so what it sits beside keeps its own touches. Everything else is
+ * unchanged — the entry, the spring, the drag-to-dismiss, the dismiss distance
+ * and the hardware back — so the two read as one component.
+ *
+ * Its height is the slot its parent gives it, which is what lets the surface
+ * above shrink by exactly the sheet's height instead of being covered by it.
+ * That leaves `heightRatio` and `restsOnHeader` with nothing to mean here, so
+ * neither is accepted rather than being quietly ignored: `restsOnHeader` in
+ * particular would compute a rest offset against a flex-sized sheet and leave
+ * a gap in the layout.
+ */
+type InlineProps = SharedProps & {
+  presentation: "inline"
+  heightRatio?: never
+  restsOnHeader?: never
+}
+
+type Props = ModalProps | InlineProps
 
 /**
  * A sheet that rises from the bottom of the screen over what it is about.

@@ -1,6 +1,5 @@
 import React from "react"
 import { Linking, Share, StyleSheet } from "react-native"
-import type { ReactTestInstance } from "react-test-renderer"
 import { getAnimatedStyle } from "react-native-reanimated"
 import { act, render, fireEvent, waitFor, within } from "@testing-library/react-native"
 
@@ -8,10 +7,12 @@ import { BtcMapPlace, BtcMapPlaceDetails } from "@app/btcmap"
 import { useBtcMapPlaceDetails } from "@app/btcmap/use-place-details"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
+import { BOTTOM_OVERHANG } from "@app/components/bottom-sheet"
 import { PlaceSheet } from "@app/components/map-component/place-sheet"
 import { openExternalUrl } from "@app/utils/external"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
+import { animatedHeightOf } from "../../helpers/bottom-sheet"
 import { ContextForScreen } from "../../screens/helper"
 
 jest.mock("@app/btcmap/use-place-details", () => ({
@@ -58,15 +59,6 @@ const setDetails = (value: BtcMapPlaceDetails | null, extra = {}) => {
     ...extra,
   })
 }
-
-// The sheet is painted this much taller than the height its animation is
-// measured against, so its antialiased bottom edge falls below the screen —
-// see BOTTOM_OVERHANG in the component.
-const BOTTOM_OVERHANG = 1
-
-/** The height the sheet's offsets are expressed in, not the one it is drawn at. */
-const animatedHeightOf = (sheet: ReactTestInstance) =>
-  (StyleSheet.flatten(sheet.props.style).height as number) - BOTTOM_OVERHANG
 
 const renderSheet = (props: Partial<React.ComponentProps<typeof PlaceSheet>> = {}) =>
   render(
