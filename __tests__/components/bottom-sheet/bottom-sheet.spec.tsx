@@ -400,6 +400,9 @@ describe("BottomSheet", () => {
       // by exactly this, instead of being covered by it.
       expect(style.height).toBeUndefined()
       expect(style.flex).toBe(1)
+      // And it overhangs the screen's edge by the same pixel the modal case
+      // does, since the seam is the sheet's shape rather than its presentation.
+      expect(style.marginBottom).toBe(-BOTTOM_OVERHANG)
     })
 
     it("closes on the Android back button, the way the modal one does", async () => {

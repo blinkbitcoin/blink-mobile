@@ -481,8 +481,16 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   // Fills the slot the layout gives it, so the surface above shrinks by exactly
   // this sheet's height rather than being covered by it.
+  //
+  // The seam is the modal case's too — see `BOTTOM_OVERHANG`. It is a property
+  // of the sheet's shape rather than of its presentation, and inline the sheet
+  // sits on the screen's bottom edge with the tab bar taken away, so there is
+  // nothing beneath it to hide the half-lit pixel either. A negative bottom
+  // margin overflows the slot by exactly that much, which is the same trick
+  // the modal case plays with an explicit height.
   sheetInline: {
     flex: 1,
+    marginBottom: -BOTTOM_OVERHANG,
   },
   handle: {
     alignSelf: "center",
