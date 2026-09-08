@@ -11,13 +11,22 @@ import { defaultPersistentState } from "@app/store/persistent-state/state-migrat
 const mockSaveJson = jest.fn()
 const mockSaveString = jest.fn()
 const mockLoadString = jest.fn()
+const mockReadString = jest.fn()
 const mockGetAllKeys = jest.fn()
 
 jest.mock("@app/utils/storage", () => ({
   saveJson: (...args: unknown[]) => mockSaveJson(...args),
   saveString: (...args: unknown[]) => mockSaveString(...args),
   loadString: (...args: unknown[]) => mockLoadString(...args),
+  readString: (...args: unknown[]) => mockReadString(...args),
   getAllKeys: (...args: unknown[]) => mockGetAllKeys(...args),
+}))
+
+const mockSweepMnemonicMigration = jest.fn()
+// Scheduled off the boot path once the state has loaded; its own spec covers
+// what it does, and here it must not add reports to the ones under assertion.
+jest.mock("@app/self-custodial/storage/account-index", () => ({
+  sweepMnemonicMigration: (...args: unknown[]) => mockSweepMnemonicMigration(...args),
 }))
 
 const mockGetActiveToken = jest.fn()
@@ -101,9 +110,16 @@ const TestConsumer: React.FC = () => {
 const setupStorageMockDefaults = () => {
   jest.clearAllMocks()
   storedStrings.clear()
+  mockSweepMnemonicMigration.mockResolvedValue({ status: "ok", migrated: 0 })
   mockSaveJson.mockResolvedValue(undefined)
   mockSaveString.mockResolvedValue(true)
   mockLoadString.mockImplementation(async (key: string) => storedStrings.get(key) ?? null)
+  // The blob is read through readString so that an absent key and a failed
+  // read stay apart; the quarantine sweep still uses loadString.
+  mockReadString.mockImplementation(async (key: string) => {
+    const value = storedStrings.get(key)
+    return value === undefined ? { status: "absent" } : { status: "found", value }
+  })
   mockGetAllKeys.mockResolvedValue([])
   mockGetActiveToken.mockResolvedValue("")
   // Derived from getActiveToken so the plain fixtures keep working; tests that
@@ -122,7 +138,7 @@ describe("PersistentStateProvider", () => {
 
   it("renders nothing (null) while state is loading", async () => {
     // Never resolve — keeps the provider in loading state
-    mockLoadString.mockReturnValue(new Promise(() => {}))
+    mockReadString.mockReturnValue(new Promise(() => {}))
 
     render(
       <PersistentStateProvider>
@@ -979,6 +995,116 @@ describe("PersistentStateProvider unreadable blob handling", () => {
 
     expect(mockClearUninstallSurvivingCredentials).not.toHaveBeenCalled()
     expect(screen.getByTestId("token").props.children).toBe("live-session-token")
+  })
+
+  // The third case, and the one that costs the most to get wrong: the store
+  // could not answer at all. An absent blob wipes every credential that
+  // outlives an uninstall, mnemonics included, so a throwing read scored as
+  // absent would take a user's key material on a device nobody reinstalled.
+  describe("a read that failed", () => {
+    const readFailed = { status: "failed", err: new Error("storage unavailable") }
+
+    it("does not wipe the credentials a fresh install would clear", async () => {
+      mockReadString.mockResolvedValue(readFailed)
+
+      render(
+        <PersistentStateProvider>
+          <TestConsumer />
+        </PersistentStateProvider>,
+      )
+
+      await waitFor(() => {
+        expect(screen.getByTestId("token")).toBeTruthy()
+      })
+
+      expect(mockClearUninstallSurvivingCredentials).not.toHaveBeenCalled()
+    })
+
+    it("keeps the keychain session rather than booting signed out", async () => {
+      mockReadString.mockResolvedValue(readFailed)
+      mockGetActiveToken.mockResolvedValue("live-session-token")
+
+      render(
+        <PersistentStateProvider>
+          <TestConsumer />
+        </PersistentStateProvider>,
+      )
+
+      await waitFor(() => {
+        expect(screen.getByTestId("token")).toBeTruthy()
+      })
+
+      expect(screen.getByTestId("token").props.children).toBe("live-session-token")
+    })
+
+    it("reports the failure to crashlytics instead of passing for a fresh install", async () => {
+      mockReadString.mockResolvedValue(readFailed)
+
+      render(
+        <PersistentStateProvider>
+          <TestConsumer />
+        </PersistentStateProvider>,
+      )
+
+      await waitFor(() => {
+        expect(mockRecordError).toHaveBeenCalled()
+      })
+      expect(mockRecordError.mock.calls[0][0].message).toBe("storage unavailable")
+    })
+
+    it("names a rejection that is not an Error rather than reporting nothing", async () => {
+      mockReadString.mockResolvedValue({ status: "failed", err: "not even an error" })
+
+      render(
+        <PersistentStateProvider>
+          <TestConsumer />
+        </PersistentStateProvider>,
+      )
+
+      await waitFor(() => {
+        expect(mockRecordError).toHaveBeenCalled()
+      })
+      expect(mockRecordError.mock.calls[0][0].message).toBe(
+        "Persistent state read failed: not even an error",
+      )
+    })
+
+    it("quarantines nothing: there is no blob to describe", async () => {
+      mockReadString.mockResolvedValue(readFailed)
+
+      render(
+        <PersistentStateProvider>
+          <TestConsumer />
+        </PersistentStateProvider>,
+      )
+
+      await waitFor(() => {
+        expect(screen.getByTestId("token")).toBeTruthy()
+      })
+
+      expect(
+        mockSaveString.mock.calls.filter(([k]) =>
+          String(k).startsWith("persistentStateQuarantine."),
+        ),
+      ).toHaveLength(0)
+    })
+
+    it("still wipes on the absent key it is kept apart from", async () => {
+      // The guard must not cost the reinstall wipe its actual trigger.
+      mockReadString.mockResolvedValue({ status: "absent" })
+
+      render(
+        <PersistentStateProvider>
+          <TestConsumer />
+        </PersistentStateProvider>,
+      )
+
+      await waitFor(() => {
+        expect(screen.getByTestId("token")).toBeTruthy()
+      })
+
+      expect(mockClearUninstallSurvivingCredentials).toHaveBeenCalledTimes(1)
+    })
   })
 
   it("withholds the quarantine done-marker when the key listing fails", async () => {
