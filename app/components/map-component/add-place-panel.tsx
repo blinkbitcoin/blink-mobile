@@ -1,5 +1,5 @@
 import React from "react"
-import { Pressable, ScrollView, TextInput, View } from "react-native"
+import { Pressable, TextInput, View } from "react-native"
 
 import {
   LatLng,
@@ -12,7 +12,7 @@ import {
 } from "@app/btcmap"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
-import { DropdownComponent, DropdownOption } from "@app/components/card-screen/dropdown"
+import { BottomSheet } from "@app/components/bottom-sheet"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
@@ -83,29 +83,15 @@ export const AddPlacePanel: React.FC<Props> = ({ location, onSubmit, onClose }) 
     setName(text)
     setError(null)
   }
-  // The dropdown deals in plain strings, so what comes back is matched against
-  // the list it was built from rather than asserted to belong to it: a value
-  // from anywhere else is not a category and is dropped.
-  const editCategory = (value: string) => {
-    const chosen = SUBMITTABLE_PLACE_CATEGORIES.find((option) => option === value)
-    if (!chosen) return
-    setCategory(chosen)
+  // Tapping the chip that is already on takes it back off, so a category
+  // chosen by accident does not have to be replaced to be undone — there is no
+  // empty row to pick in a set of chips the way there is in a list.
+  const editCategory = (option: PlaceCategory) => {
+    setCategory((current) => (current === option ? null : option))
     setError(null)
   }
 
   const shownLocation = sentLocation ?? location
-
-  // `other` is not among them: it is the bucket unrecognised pins fall into,
-  // not a description of a place, and a submission under it would tell BTC Map
-  // nothing.
-  const categoryOptions: DropdownOption[] = React.useMemo(
-    () =>
-      SUBMITTABLE_PLACE_CATEGORIES.map((option) => ({
-        value: option,
-        label: LL.MapScreen.category[option](),
-      })),
-    [LL],
-  )
 
   const submission = buildPlaceSubmission({ name, category, location })
   const isSubmitDisabled = !submission || isSubmitting
@@ -128,113 +114,123 @@ export const AddPlacePanel: React.FC<Props> = ({ location, onSubmit, onClose }) 
   }
 
   return (
-    <View style={styles.sheet}>
-      <View style={styles.header}>
-        <Text style={styles.title}>{LL.MapScreen.addPlaceTitle()}</Text>
-        <Pressable
-          testID="close-add-place"
-          onPress={onClose}
-          accessibilityRole="button"
-          accessibilityLabel={LL.common.close()}
-          hitSlop={12}
-        >
-          <GaloyIcon name="close" size={20} color={colors.primary} />
-        </Pressable>
+    <BottomSheet
+      testID="add-place-panel"
+      isVisible
+      onClose={onClose}
+      presentation="inline"
+      headerStyle={styles.header}
+      contentContainerStyle={styles.content}
+      footerStyle={styles.footer}
+      header={
+        <>
+          <Text style={styles.title}>{LL.MapScreen.addPlaceTitle()}</Text>
+          <Pressable
+            testID="close-add-place"
+            onPress={onClose}
+            accessibilityRole="button"
+            accessibilityLabel={LL.common.close()}
+            hitSlop={12}
+          >
+            <GaloyIcon name="close" size={20} color={colors.primary} />
+          </Pressable>
+        </>
+      }
+      footer={
+        <>
+          {error ? (
+            <View style={styles.error} accessibilityLiveRegion="polite">
+              <GaloyIcon name="warning-circle" size={14} color={colors.error} />
+              <Text testID="place-submission-error" style={styles.errorText}>
+                {error}
+              </Text>
+            </View>
+          ) : null}
+          <GaloyPrimaryButton
+            testID="submit-place"
+            title={LL.common.submit()}
+            onPress={submit}
+            disabled={isSubmitDisabled}
+            loading={isSubmitting}
+          />
+        </>
+      }
+    >
+      <View style={styles.field}>
+        <Text style={styles.label}>{LL.MapScreen.placeLocation()}</Text>
+        {/* Read-only, and with nothing to tap: the map above is the control
+              for this row, and it is on screen. */}
+        <View style={styles.locationRow}>
+          <GaloyIcon name="map-pin" size={16} color={colors.grey1} />
+          <Text testID="place-coordinates" style={styles.coordinates} numberOfLines={1}>
+            {formatCoordinates(shownLocation)}
+          </Text>
+        </View>
       </View>
 
-      <ScrollView
-        contentContainerStyle={styles.content}
-        keyboardShouldPersistTaps="handled"
-        keyboardDismissMode="on-drag"
-      >
-        <View style={styles.field}>
-          <Text style={styles.label}>{LL.MapScreen.placeLocation()}</Text>
-          {/* Read-only, and with nothing to tap: the map above is the control
-              for this row, and it is on screen. */}
-          <View style={styles.locationRow}>
-            <GaloyIcon name="map-pin" size={16} color={colors.grey1} />
-            <Text testID="place-coordinates" style={styles.coordinates} numberOfLines={1}>
-              {formatCoordinates(shownLocation)}
-            </Text>
-          </View>
-        </View>
-
-        <View style={styles.field}>
-          <Text style={styles.label}>{LL.MapScreen.placeName()}</Text>
-          <TextInput
-            testID="place-name-input"
-            style={styles.input}
-            value={name}
-            onChangeText={editName}
-            placeholder={LL.MapScreen.placeNameHint()}
-            placeholderTextColor={colors.grey2}
-            maxLength={PLACE_NAME_MAX_LENGTH}
-            autoCorrect={false}
-            returnKeyType="done"
-            accessibilityLabel={LL.MapScreen.placeName()}
-          />
-        </View>
-
-        <View style={styles.field}>
-          <Text style={styles.label}>{LL.MapScreen.placeCategory()}</Text>
-          {/* A row that opens the fourteen, rather than fourteen chips laid
-              out at once. The chips were taller than everything else on the
-              form put together, which was affordable while this was a screen
-              of its own and is not now that it is half of one: the map is the
-              other half, and the button that sends the place has to stay on
-              the sheet with it. */}
-          <DropdownComponent
-            testID="place-category"
-            options={categoryOptions}
-            selectedValue={category ?? undefined}
-            onValueChange={editCategory}
-            placeholder={LL.MapScreen.placeCategoryHint()}
-          />
-        </View>
-
-        {/* Nothing here appears on the map on its own — saying so up front is
-            what keeps "I added my shop and it isn't there" from being a
-            surprise. */}
-        <View style={styles.note}>
-          <GaloyIcon name="info" size={16} color={colors.grey2} />
-          <Text style={styles.noteText}>{LL.MapScreen.placeReviewNote()}</Text>
-        </View>
-      </ScrollView>
-
-      <View style={styles.footer}>
-        {error ? (
-          <View style={styles.error} accessibilityLiveRegion="polite">
-            <GaloyIcon name="warning-circle" size={14} color={colors.error} />
-            <Text testID="place-submission-error" style={styles.errorText}>
-              {error}
-            </Text>
-          </View>
-        ) : null}
-        <GaloyPrimaryButton
-          testID="submit-place"
-          title={LL.common.submit()}
-          onPress={submit}
-          disabled={isSubmitDisabled}
-          loading={isSubmitting}
+      <View style={styles.field}>
+        <Text style={styles.label}>{LL.MapScreen.placeName()}</Text>
+        <TextInput
+          testID="place-name-input"
+          style={styles.input}
+          value={name}
+          onChangeText={editName}
+          placeholder={LL.MapScreen.placeNameHint()}
+          placeholderTextColor={colors.grey2}
+          maxLength={PLACE_NAME_MAX_LENGTH}
+          autoCorrect={false}
+          returnKeyType="done"
+          accessibilityLabel={LL.MapScreen.placeName()}
         />
       </View>
-    </View>
+
+      <View style={styles.field}>
+        <Text style={styles.label}>{LL.MapScreen.placeCategory()}</Text>
+        {/* All of them at once, rather than a row that opens a list. The
+              fourteen are short, familiar words and reading them is the fastest
+              way to find the one that fits — a list of the same fourteen hides
+              thirteen behind a tap and tells the user nothing they could not
+              already see. They are affordable here because the send button no
+              longer rides on the end of the form: it is held below the scroll,
+              so the chips can be as tall as they need and take the scroll with
+              them.
+
+              `other` is not among them: it is the bucket unrecognised pins fall
+              into, not a description of a place, and a submission under it
+              would tell BTC Map nothing. */}
+        <View style={styles.chips}>
+          {SUBMITTABLE_PLACE_CATEGORIES.map((option) => {
+            const isSelected = option === category
+            return (
+              <Pressable
+                key={option}
+                testID={`place-category-${option}`}
+                style={[styles.chip, isSelected && styles.chipSelected]}
+                onPress={() => editCategory(option)}
+                accessibilityRole="button"
+                accessibilityState={{ selected: isSelected }}
+              >
+                <Text style={isSelected ? styles.chipTextSelected : styles.chipText}>
+                  {LL.MapScreen.category[option]()}
+                </Text>
+              </Pressable>
+            )
+          })}
+        </View>
+      </View>
+
+      {/* Nothing here appears on the map on its own — saying so up front is
+            what keeps "I added my shop and it isn't there" from being a
+            surprise. */}
+      <View style={styles.note}>
+        <GaloyIcon name="info" size={16} color={colors.grey2} />
+        <Text style={styles.noteText}>{LL.MapScreen.placeReviewNote()}</Text>
+      </View>
+    </BottomSheet>
   )
 }
 
 const useStyles = makeStyles(({ colors }) => ({
-  // Half of what the map screen has, the map keeping the other half — see the
-  // sibling `flex: 1` on the map's own half in index.tsx. A share rather than a
-  // height so that the split survives the window shrinking under a keyboard.
-  sheet: {
-    flex: 1,
-    backgroundColor: colors.white,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    borderWidth: 1,
-    borderBottomWidth: 0,
-    borderColor: colors.grey4,
-  },
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -289,6 +285,35 @@ const useStyles = makeStyles(({ colors }) => ({
     fontSize: 16,
     color: colors.black,
   },
+  // Taken from `percentage-selector`, which is where the app already draws a
+  // one-of-many choice as chips: grey5 ground, the primary as the selected
+  // fill, and the label switching to white on it. Its row does not come with
+  // it — four chips share a row evenly, fourteen have to wrap — and neither
+  // does its `minWidth`, which would pad the short labels into ragged columns.
+  chips: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    columnGap: 8,
+    rowGap: 8,
+  },
+  chip: {
+    backgroundColor: colors.grey5,
+    borderRadius: 100,
+    alignItems: "center",
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+  },
+  chipSelected: {
+    backgroundColor: colors.primary,
+  },
+  chipText: {
+    color: colors.primary,
+    fontWeight: "bold",
+  },
+  chipTextSelected: {
+    color: colors.white,
+    fontWeight: "bold",
+  },
   note: {
     flexDirection: "row",
     alignItems: "flex-start",
@@ -300,14 +325,16 @@ const useStyles = makeStyles(({ colors }) => ({
     lineHeight: 18,
     color: colors.grey2,
   },
-  // Outside the scroll view: the button is the point of the sheet, so it stays
-  // on the sheet rather than under whatever the fields have pushed off it.
+  // Below the scroll rather than at the end of it — see the sheet's `footer` —
+  // so the fourteen chips can be as tall as they need without the button that
+  // sends the place going off the bottom with them.
   footer: {
     paddingHorizontal: 20,
     paddingTop: 12,
-    // No safe-area inset: the map screen is a tab screen, and the tab bar below
-    // it is what the home indicator is already cleared by.
-    paddingBottom: 12,
+    // The app's standing gap between a call to action and the foot of what it
+    // sits on. No safe-area inset on top of it: the map screen is a tab screen,
+    // and the tab bar below is what already clears the home indicator.
+    paddingBottom: 20,
     rowGap: 10,
   },
   // Above the button rather than by the fields: what failed is the send, and
