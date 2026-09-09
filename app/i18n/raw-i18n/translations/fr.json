@@ -3792,9 +3792,6 @@
                 },
                 "buttonText": "Procéder à la Signature"
             },
-            "SignInvest": {
-                "label": "Signer l'accord"
-            },
             "TransferInvest": {
                 "title": "Transférez votre investissement",
                 "paragraphs": {
