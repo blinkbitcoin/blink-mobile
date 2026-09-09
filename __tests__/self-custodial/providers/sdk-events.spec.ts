@@ -2,6 +2,8 @@ import { SdkEvent_Tags as SdkEventTags } from "@breeztech/breez-sdk-spark-react-
 
 import {
   extractPaymentId,
+  paymentEventKey,
+  paymentIdFromEventKey,
   REFRESH_EVENTS,
   PAYMENT_RECEIVED_EVENTS,
 } from "@app/self-custodial/providers/sdk-events"
@@ -79,6 +81,56 @@ describe("sdk-events", () => {
 
     it("returns null when inner is not an object", () => {
       expect(extractPaymentId({ tag: "Synced", inner: "string" })).toBeNull()
+    })
+  })
+
+  describe("paymentEventKey", () => {
+    it("keys the same payment id differently for Pending and Succeeded", () => {
+      // Settlement changes leaf state, so a Pending -> Succeeded transition
+      // must produce a distinct key or the bundle refresh never reschedules.
+      const pending = paymentEventKey({
+        tag: "PaymentPending",
+        inner: { payment: { id: "pay-123" } },
+      })
+      const succeeded = paymentEventKey({
+        tag: "PaymentSucceeded",
+        inner: { payment: { id: "pay-123" } },
+      })
+
+      expect(pending).toBe("PaymentPending:pay-123")
+      expect(succeeded).toBe("PaymentSucceeded:pay-123")
+      expect(pending).not.toBe(succeeded)
+    })
+
+    it("is stable for a duplicate delivery of the same event", () => {
+      const event = { tag: "PaymentSucceeded", inner: { payment: { id: "pay-1" } } }
+      expect(paymentEventKey(event)).toBe(paymentEventKey(event))
+    })
+
+    it("returns null when the event carries no payment", () => {
+      expect(paymentEventKey({ tag: "Synced" })).toBeNull()
+    })
+  })
+
+  describe("paymentIdFromEventKey", () => {
+    it("recovers the exact payment id even when the id itself contains ':'", () => {
+      // The key format is `${tag}:${id}`; splitting anywhere but the FIRST
+      // colon would corrupt ids like this one.
+      const id = "spark:tx:0123abc"
+      const key = paymentEventKey({ tag: "PaymentSucceeded", inner: { payment: { id } } })
+      expect(paymentIdFromEventKey(key)).toBe(id)
+    })
+
+    it("round-trips a plain id", () => {
+      const key = paymentEventKey({
+        tag: "PaymentPending",
+        inner: { payment: { id: "pay-1" } },
+      })
+      expect(paymentIdFromEventKey(key)).toBe("pay-1")
+    })
+
+    it("returns null for a null key", () => {
+      expect(paymentIdFromEventKey(null)).toBeNull()
     })
   })
 })

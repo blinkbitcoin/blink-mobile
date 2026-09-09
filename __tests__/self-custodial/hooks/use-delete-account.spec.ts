@@ -12,6 +12,12 @@ const mockDeleteMnemonicForAccount = jest.fn()
 const mockUnlink = jest.fn()
 const mockRemoveSelfCustodialAccountId = jest.fn()
 const mockRemoveBackupStateFor = jest.fn()
+const mockDeleteRecoveryBundleFile = jest.fn()
+const mockRemoveRecoveryBundleState = jest.fn()
+const mockRemoveRecoveryBundleSettings = jest.fn()
+const mockMarkAccountDeletedForRefresh = jest.fn()
+const mockUnmarkAccountDeletedForRefresh = jest.fn()
+const mockWaitForRefreshesToSettle = jest.fn()
 const mockReloadSelfCustodialAccounts = jest.fn()
 const mockSetActiveAccountId = jest.fn()
 const mockUpdateState = jest.fn()
@@ -46,6 +52,25 @@ jest.mock("@app/self-custodial/config", () => ({
 
 jest.mock("@app/self-custodial/providers/backup-state", () => ({
   removeBackupStateFor: (...args: unknown[]) => mockRemoveBackupStateFor(...args),
+}))
+
+jest.mock("@app/self-custodial/recovery-bundle/storage", () => ({
+  deleteRecoveryBundleFile: (...args: unknown[]) => mockDeleteRecoveryBundleFile(...args),
+  removeRecoveryBundleState: (...args: unknown[]) =>
+    mockRemoveRecoveryBundleState(...args),
+}))
+
+jest.mock("@app/self-custodial/recovery-bundle/settings", () => ({
+  removeRecoveryBundleSettings: (...args: unknown[]) =>
+    mockRemoveRecoveryBundleSettings(...args),
+}))
+
+jest.mock("@app/self-custodial/recovery-bundle/refresh", () => ({
+  markAccountDeletedForRefresh: (...args: unknown[]) =>
+    mockMarkAccountDeletedForRefresh(...args),
+  unmarkAccountDeletedForRefresh: (...args: unknown[]) =>
+    mockUnmarkAccountDeletedForRefresh(...args),
+  waitForRefreshesToSettle: (...args: unknown[]) => mockWaitForRefreshesToSettle(...args),
 }))
 
 jest.mock("@app/self-custodial/providers/wallet", () => ({
@@ -108,6 +133,10 @@ describe("useDeleteAccount", () => {
     mockUnlink.mockResolvedValue(undefined)
     mockRemoveSelfCustodialAccountId.mockResolvedValue(undefined)
     mockRemoveBackupStateFor.mockResolvedValue(undefined)
+    mockDeleteRecoveryBundleFile.mockResolvedValue(undefined)
+    mockRemoveRecoveryBundleState.mockResolvedValue(undefined)
+    mockRemoveRecoveryBundleSettings.mockResolvedValue(undefined)
+    mockWaitForRefreshesToSettle.mockResolvedValue(undefined)
     mockReloadSelfCustodialAccounts.mockResolvedValue(undefined)
   })
 
@@ -130,9 +159,81 @@ describe("useDeleteAccount", () => {
     expect(mockDeleteMnemonicForAccount).toHaveBeenCalledWith(TEST_SC_ACCOUNT_ID)
     expect(mockRemoveSelfCustodialAccountId).toHaveBeenCalledWith(TEST_SC_ACCOUNT_ID)
     expect(mockRemoveBackupStateFor).toHaveBeenCalledWith(TEST_SC_ACCOUNT_ID)
+    // Both networks are swept: the account may have been used on the other
+    // network under a different galoy instance.
+    for (const bundleNetwork of [mockSparkNetwork.Mainnet, mockSparkNetwork.Regtest]) {
+      expect(mockDeleteRecoveryBundleFile).toHaveBeenCalledWith(
+        TEST_SC_ACCOUNT_ID,
+        bundleNetwork,
+      )
+      expect(mockRemoveRecoveryBundleState).toHaveBeenCalledWith(
+        TEST_SC_ACCOUNT_ID,
+        bundleNetwork,
+      )
+    }
+    expect(mockRemoveRecoveryBundleSettings).toHaveBeenCalledWith(TEST_SC_ACCOUNT_ID)
     expect(mockUpdateState).toHaveBeenCalled()
     expect(outcome).toBe("logged-out")
     expect(result.current.state).toBe("idle")
+  })
+
+  it("marks the account deleted for in-flight refreshes before sweeping the bundle files", async () => {
+    const { result } = renderHook(() => useDeleteAccount())
+
+    await act(async () => {
+      await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
+    })
+
+    expect(mockMarkAccountDeletedForRefresh).toHaveBeenCalledWith(TEST_SC_ACCOUNT_ID)
+    // Marked before the sweep: a refresh persisting between the sweep and the
+    // marker would recreate the files it just removed.
+    const markOrder = mockMarkAccountDeletedForRefresh.mock.invocationCallOrder[0]
+    const sweepOrder = mockDeleteRecoveryBundleFile.mock.invocationCallOrder[0]
+    expect(markOrder).toBeLessThan(sweepOrder)
+  })
+
+  it("re-sweeps the bundle files after in-flight refreshes settle, without blocking the delete", async () => {
+    let settle: () => void = () => {}
+    mockWaitForRefreshesToSettle.mockReturnValue(
+      new Promise<void>((resolve) => {
+        settle = resolve
+      }),
+    )
+    const { result } = renderHook(() => useDeleteAccount())
+
+    let outcome: string | undefined
+    await act(async () => {
+      outcome = await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
+    })
+
+    // The delete completed while the in-flight refresh was still running:
+    // only the initial both-networks sweep has happened so far.
+    expect(outcome).toBe("logged-out")
+    expect(mockDeleteRecoveryBundleFile).toHaveBeenCalledTimes(2)
+
+    await act(async () => {
+      settle()
+      // Macrotask flush: the re-sweep awaits a promise chain per network.
+      await new Promise<void>((resolve) => {
+        setImmediate(resolve)
+      })
+    })
+
+    // A refresh that slipped past the marker check may have re-written the
+    // files after the first sweep; the post-settle re-sweep removes them.
+    expect(mockDeleteRecoveryBundleFile).toHaveBeenCalledTimes(4)
+    for (const bundleNetwork of [mockSparkNetwork.Mainnet, mockSparkNetwork.Regtest]) {
+      expect(mockRemoveRecoveryBundleState).toHaveBeenCalledWith(
+        TEST_SC_ACCOUNT_ID,
+        bundleNetwork,
+      )
+    }
+    // The deletion mark is dropped only after the re-sweep, keeping the
+    // module-level set bounded without reopening the persist window.
+    expect(mockUnmarkAccountDeletedForRefresh).toHaveBeenCalledWith(TEST_SC_ACCOUNT_ID)
+    const resweepOrder = mockDeleteRecoveryBundleFile.mock.invocationCallOrder[3]
+    const unmarkOrder = mockUnmarkAccountDeletedForRefresh.mock.invocationCallOrder[0]
+    expect(unmarkOrder).toBeGreaterThan(resweepOrder)
   })
 
   it("wipes the active network's storage directory, not a hardcoded one, when deleting on mainnet", async () => {
@@ -239,6 +340,24 @@ describe("useDeleteAccount", () => {
     expect(result.current.state).toBe("idle")
   })
 
+  it("does not fail the delete when recovery-bundle cleanup rejects (best-effort, logged)", async () => {
+    mockDeleteRecoveryBundleFile.mockRejectedValue(new Error("bundle unlink failed"))
+    const { result } = renderHook(() => useDeleteAccount())
+
+    let outcome: string | undefined
+    await act(async () => {
+      outcome = await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
+    })
+
+    expect(mockCrashlyticsLog).toHaveBeenCalledWith(
+      expect.stringContaining("recovery bundle cleanup failed"),
+    )
+    expect(outcome).toBe("logged-out")
+    expect(result.current.state).toBe("idle")
+    expect(result.current.error).toBeNull()
+    expect(mockRemoveSelfCustodialAccountId).toHaveBeenCalledWith(TEST_SC_ACCOUNT_ID)
+  })
+
   it("captures the error and returns undefined when deleteMnemonicForAccount fails", async () => {
     mockDeleteMnemonicForAccount.mockRejectedValue(new Error("storage error"))
     const { result } = renderHook(() => useDeleteAccount())
@@ -298,6 +417,24 @@ describe("useDeleteAccount", () => {
     const disconnectOrder = mockDisconnectSdk.mock.invocationCallOrder[0]
 
     expect(updateOrder).toBeLessThan(disconnectOrder)
+
+    // The updater passed to updateState must clear ONLY activeAccountId and
+    // carry every other persistent-state field through untouched.
+    const updater = mockUpdateState.mock.calls[0][0]
+    const previousState = {
+      schemaVersion: 7,
+      activeAccountId: TEST_SC_ACCOUNT_ID,
+      galoyInstance: { id: "Main" },
+      isAnalyticsEnabled: true,
+    }
+    expect(updater(previousState)).toEqual({
+      schemaVersion: 7,
+      activeAccountId: undefined,
+      galoyInstance: { id: "Main" },
+      isAnalyticsEnabled: true,
+    })
+    // Undefined persistent state passes through unchanged (no crash, no write).
+    expect(updater(undefined)).toBeUndefined()
   })
 
   it("switches to the custodial account BEFORE disconnecting (custodial-fallback path)", async () => {
