@@ -7789,15 +7789,15 @@ type RootTranslation = {
 		 */
 		feeTier: string
 		/**
-		 * F​a​s​t
+		 * P​r​i​o​r​i​t​y
 		 */
 		fast: string
 		/**
-		 * M​e​d​i​u​m
+		 * S​t​a​n​d​a​r​d
 		 */
 		medium: string
 		/**
-		 * S​l​o​w
+		 * E​c​o​n​o​m​y
 		 */
 		slow: string
 		/**
@@ -21408,15 +21408,15 @@ export type TranslationFunctions = {
 		 */
 		feeTier: () => LocalizedString
 		/**
-		 * Fast
+		 * Priority
 		 */
 		fast: () => LocalizedString
 		/**
-		 * Medium
+		 * Standard
 		 */
 		medium: () => LocalizedString
 		/**
-		 * Slow
+		 * Economy
 		 */
 		slow: () => LocalizedString
 		/**

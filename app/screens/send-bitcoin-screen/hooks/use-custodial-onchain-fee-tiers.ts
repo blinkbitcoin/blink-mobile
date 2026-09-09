@@ -33,7 +33,7 @@ export const PAYOUT_SPEED_BY_FEE_TIER: Record<FeeTierOption, PayoutSpeed> = {
 /**
  * Mirrors the broadcast windows the backend advertises for each payout queue
  * (`payoutSpeeds` in galoy-values): Priority ~10 minutes, Standard ~4 hours and
- * Flexible ~24 hours. Standard moved off bria's half-hour queue in blink-deployments#10052,
+ * Economy ~24 hours. Standard moved off bria's half-hour queue in blink-deployments#10052,
  * so anything shorter now under-promises. Self-custodial sends broadcast straight from the
  * SDK rather than through those queues, so they keep their own FEE_TIER_ETA_MINUTES.
  */
