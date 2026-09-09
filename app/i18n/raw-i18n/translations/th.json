@@ -3715,9 +3715,6 @@
         },
         "buttonText": "ดำเนินการลงนาม"
       },
-      "SignInvest": {
-        "label": "ลงนามในข้อตกลง"
-      },
       "TransferInvest": {
         "title": "โอนเงินลงทุนของคุณ",
         "paragraphs": {

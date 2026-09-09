@@ -3763,9 +3763,6 @@
                 },
                 "buttonText": "Weiter zur Unterschrift"
             },
-            "SignInvest": {
-                "label": "Vereinbarung unterzeichnen"
-            },
             "TransferInvest": {
                 "title": "Übertrage deine Investition",
                 "paragraphs": {
