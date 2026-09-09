@@ -3766,9 +3766,6 @@
                 },
                 "buttonText": "Procedi alla Firma"
             },
-            "SignInvest": {
-                "label": "Firma l'accordo"
-            },
             "TransferInvest": {
                 "title": "Trasferisci il tuo investimento",
                 "paragraphs": {
