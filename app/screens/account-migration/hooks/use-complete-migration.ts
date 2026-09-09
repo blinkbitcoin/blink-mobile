@@ -67,8 +67,10 @@ export const useCompleteMigration = () => {
     checkpoint,
     accountId,
     expectedReceiveSats,
+    sparkInvoice,
     checkpointOwnerId,
     loading,
+    saveCheckpoint,
     clearCheckpoint,
   } = useMigrationCheckpointState()
   const { clearPendingAccount } = usePendingMigrationAccounts()
@@ -200,6 +202,26 @@ export const useCompleteMigration = () => {
     ],
   )
 
+  /**
+   * Records the invoice the drain was actually requested against, on this screen's one
+   * checkpoint instance. It lives here rather than in the transfer hook so there is a
+   * single owner read behind it: two no-cache reads of the same id can disagree for a
+   * render after an account switch, and an invoice written against the wrong one would be
+   * invisible to every other reader.
+   *
+   * The step is re-saved as it stands, so this adds the invoice without moving where a
+   * resume lands. Answers false when the write did not land: without the invoice the gate
+   * has nothing to prove the receive with, so the flow takes its delayed-receive path
+   * rather than confirming on a weaker signal.
+   */
+  const recordMigrationSparkInvoice = useCallback(
+    async (invoice: string): Promise<boolean> => {
+      if (!checkpoint) return false
+      return saveCheckpoint(checkpoint, { sparkInvoice: invoice })
+    },
+    [checkpoint, saveCheckpoint],
+  )
+
   const completeMigration = useCallback(
     (args: CompleteMigrationArgs): Promise<MigrationCompletion> => {
       if (completionInFlight) return completionInFlight
@@ -227,6 +249,8 @@ export const useCompleteMigration = () => {
     migrationAccountId: accountId,
     /** What the receive gate waits for; null on checkpoints saved before the field existed. */
     migrationExpectedReceiveSats: expectedReceiveSats,
+    migrationSparkInvoice: sparkInvoice,
+    recordMigrationSparkInvoice,
     /** Read before the discard clears it, so a handover raised after the swap can still
      *  name the custodial account support has to close. */
     custodialAccountId: emptiedCustodialAccountId,

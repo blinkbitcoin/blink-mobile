@@ -40,6 +40,7 @@ export const useResumeCompletedMigration = (): void => {
   const {
     migrationAccountId,
     migrationExpectedReceiveSats,
+    migrationSparkInvoice,
     custodialAccountId,
     migrationLoading,
     completeMigration,
@@ -62,6 +63,7 @@ export const useResumeCompletedMigration = (): void => {
     useMigrationReceiveConfirmation({
       selfCustodialAccountId: migrationAccountId,
       expectedReceiveSats: migrationExpectedReceiveSats,
+      sparkInvoice: migrationSparkInvoice,
       skip: !isServerCompleted,
     })
 
