@@ -31,6 +31,12 @@ The app currently only builds for x86_64 simulators. Simulators prior to IOS 13.
 
 see [readme](docs/e2e-testing.md).
 
+## Agent skills (PR demos on an isolated simulator):
+
+Tested workflows for before/after screenshots and demo videos, embedded
+straight onto PRs — usable by Claude Code automatically or by hand via
+`make demo`. See the [skills readme](.claude/skills/README.md).
+
 ## Local development with libraries
 
 The mobile app uses the [galoy-client](https://github.com/GaloyMoney/galoy-client) for generic functions, such as parsing bitcoin transactions, lightning invoice, or managing translations across the different frontend of the Galoy stack. If you want to make changes to the galoy-client locally to test changes in the app e.g. you want to add a key to the translations file this is the steps you should take. Since the metro bundler [does not support](https://github.com/facebook/metro/issues/68) `yarn link`, we have to use [yalc](https://www.npmjs.com/package/yalc).
