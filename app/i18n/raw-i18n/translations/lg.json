@@ -2482,6 +2482,7 @@
     "darkDefault": "Endabika: y'ekizikiza, (Nga wekikoleddwa).",
     "lightDefault": "Endabika: y'ekitangaala, (Nga wekikoleddwa).",
     "csvTransactionsError": "Tesobola kufulumya ewaanyisa mu csv. Waliwo ekyitambudde obubi. Singa ensonga ekyaliwo nsaba otuutukirire tukuyambe.",
+    "csvTransactionsSaved": "Ebyakolebwa biterekeddwa mu fooluda yo eya Downloads.",
     "lnurlNoUsername": "Okukola endagiriro ya lnurl olina okusooka okuteekawo erinnya ly'omukozesa. Oyagala okuteekawo erinnya ly'omukozesa kati?",
     "copyClipboardLnurl": "Endagiriro ya Lnurl ewandukuddwa ku lutimbe",
     "defaultWallet": "Receive to",

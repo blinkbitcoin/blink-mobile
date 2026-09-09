@@ -67,7 +67,10 @@ jest.mock("@app/i18n/i18n-react", () => ({
   useI18nContext: () => ({
     LL: {
       common: { csvExport: () => "Export all transactions" },
-      SettingsScreen: { csvTransactionsError: () => "Export failed" },
+      SettingsScreen: {
+        csvTransactionsError: () => "Export failed",
+        csvTransactionsSaved: () => "Saved to Downloads",
+      },
     },
   }),
 }))
@@ -86,8 +89,8 @@ const pressRow = async () => {
 describe("ExportCsvSetting", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockCustodialExportCsv.mockResolvedValue(true)
-    mockSelfCustodialExportCsv.mockResolvedValue(true)
+    mockCustodialExportCsv.mockResolvedValue("shared")
+    mockSelfCustodialExportCsv.mockResolvedValue("shared")
     mockUseSelfCustodialWallet.mockReturnValue({ sdk: {} })
   })
 
@@ -126,6 +129,45 @@ describe("ExportCsvSetting", () => {
     render(<ExportCsvSetting />)
 
     expect(lastRowProps().loading).toBe(true)
+  })
+
+  it("confirms with a toast when the custodial export downloads to a file", async () => {
+    mockUseAccountRegistry.mockReturnValue({
+      activeAccount: { id: "c-1", type: AccountType.Custodial },
+    })
+    mockCustodialExportCsv.mockResolvedValue("saved")
+
+    render(<ExportCsvSetting />)
+    await pressRow()
+
+    expect(mockToastShow).toHaveBeenCalledWith(
+      expect.objectContaining({ message: "Saved to Downloads", type: "success" }),
+    )
+  })
+
+  it("confirms with a toast when the self-custodial export downloads to a file", async () => {
+    mockUseAccountRegistry.mockReturnValue({
+      activeAccount: { id: "sc-1", type: AccountType.SelfCustodial },
+    })
+    mockSelfCustodialExportCsv.mockResolvedValue("saved")
+
+    render(<ExportCsvSetting />)
+    await pressRow()
+
+    expect(mockToastShow).toHaveBeenCalledWith(
+      expect.objectContaining({ message: "Saved to Downloads", type: "success" }),
+    )
+  })
+
+  it("stays quiet when the export goes to the share sheet instead", async () => {
+    mockUseAccountRegistry.mockReturnValue({
+      activeAccount: { id: "c-1", type: AccountType.Custodial },
+    })
+
+    render(<ExportCsvSetting />)
+    await pressRow()
+
+    expect(mockToastShow).not.toHaveBeenCalled()
   })
 
   it("reports the error and toasts when the custodial export fails", async () => {

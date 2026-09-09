@@ -2482,6 +2482,7 @@
     "darkDefault": "Tilstand: mørk, (Standard).",
     "lightDefault": "Tilstand: lys, (Standard).",
     "csvTransactionsError": "Kunne ikke eksportere transaktioner til csv. Noget gik galt. Hvis problemet fortsætter, kontakt venligst support.",
+    "csvTransactionsSaved": "Transaktionerne er gemt i din Overførsler-mappe.",
     "lnurlNoUsername": "For at generere en LNURL-adresse skal du først vælge et brugernavn. Vil du vælge et brugernavn nu?",
     "copyClipboardLnurl": "LNURL-adresse er blevet kopieret til udklipsholderen",
     "defaultWallet": "Standardmodtagelse",

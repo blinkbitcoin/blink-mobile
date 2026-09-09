@@ -2482,6 +2482,7 @@
     "darkDefault": "Modus: donker, (Standaard).",
     "lightDefault": "Modus: donker, (Standaard).",
     "csvTransactionsError": "Kan transacties niet naar csv exporteren. Er is iets fout gegaan. Als het probleem zich blijft voordoen, neem dan contact op met de technische ondersteuning.",
+    "csvTransactionsSaved": "Transacties opgeslagen in je map Downloads.",
     "lnurlNoUsername": "Om een ln-url adres te genereren, moet u eerst een gebruikersnaam instellen. Wilt u nu een gebruikersnaam instellen?",
     "copyClipboardLnurl": "Het Ln-url adres is naar het klembord gekopieerd",
     "defaultWallet": "Standaard ontvangst",

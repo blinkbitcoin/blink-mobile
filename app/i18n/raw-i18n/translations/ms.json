@@ -2482,6 +2482,7 @@
     "darkDefault": "Mode: gelap, (ditetapkan).",
     "lightDefault": "Mode: lebih ringan, (ditetapkan).",
     "csvTransactionsError": "Tak dapat untuk eksport transaksi kepada fail csv. Ada berlaku masalah. Jika masalah ini berterusan, hubungi pasukan sokongan.",
+    "csvTransactionsSaved": "Transaksi disimpan ke folder Muat Turun anda.",
     "lnurlNoUsername": "Untuk menjana alamat lnurl anda mesti mempunyai ID pengguna. Nak tetapkan ID pengguna anda sekarang?",
     "copyClipboardLnurl": "Alamat Lnurl telah disalin dalam clipboard",
     "defaultWallet": "Penerimaan lalai",

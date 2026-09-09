@@ -88,7 +88,7 @@ describe("MigrationDownloadHistoryScreen", () => {
       continuePastHistory: mockContinuePastHistory,
       loading: false,
     })
-    mockExportCsv.mockResolvedValue(true)
+    mockExportCsv.mockResolvedValue("shared")
   })
 
   it("renders the clock hero, title, body and both actions", async () => {
@@ -160,7 +160,7 @@ describe("MigrationDownloadHistoryScreen", () => {
   })
 
   it("keeps the secondary action on Skip when the user dismisses the share sheet", async () => {
-    mockExportCsv.mockResolvedValue(false)
+    mockExportCsv.mockResolvedValue("cancelled")
     renderScreen()
     await flushEffects()
 
@@ -173,7 +173,7 @@ describe("MigrationDownloadHistoryScreen", () => {
   })
 
   it("allows retrying the download after a dismissed share sheet", async () => {
-    mockExportCsv.mockResolvedValue(false)
+    mockExportCsv.mockResolvedValue("cancelled")
     renderScreen()
     await flushEffects()
 
@@ -189,8 +189,8 @@ describe("MigrationDownloadHistoryScreen", () => {
   it("disables Skip while a download is in progress", async () => {
     let resolveExport: () => void = () => {}
     mockExportCsv.mockReturnValue(
-      new Promise<void>((resolve) => {
-        resolveExport = resolve
+      new Promise<string>((resolve) => {
+        resolveExport = () => resolve("cancelled")
       }),
     )
     renderScreen()
@@ -244,6 +244,44 @@ describe("MigrationDownloadHistoryScreen", () => {
 
     expect(isPrimaryDisabled()).toBe(true)
     expect(isSkipDisabled()).toBe(true)
+  })
+
+  it("confirms with a toast when the CSV downloads straight to a file", async () => {
+    mockExportCsv.mockResolvedValue("saved")
+    renderScreen()
+    await flushEffects()
+
+    pressDownload()
+
+    await waitFor(() => expect(screen.getByText(LL.common.continue())).toBeTruthy())
+    expect(mockToastShow).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: LL.SettingsScreen.csvTransactionsSaved(),
+        type: "success",
+      }),
+    )
+  })
+
+  it("stays quiet and swaps the CTA when the export goes to the share sheet", async () => {
+    renderScreen()
+    await flushEffects()
+
+    pressDownload()
+
+    await waitFor(() => expect(screen.getByText(LL.common.continue())).toBeTruthy())
+    expect(mockToastShow).not.toHaveBeenCalled()
+  })
+
+  it("keeps Download and Skip when there is nothing to export", async () => {
+    mockExportCsv.mockResolvedValue("empty")
+    renderScreen()
+    await flushEffects()
+
+    pressDownload()
+
+    await waitFor(() => expect(mockExportCsv).toHaveBeenCalled())
+    expect(screen.getByText(LL.common.skip())).toBeTruthy()
+    expect(screen.queryByText(LL.common.continue())).toBeNull()
   })
 
   /** Through the same routing as every other step, not the stored checkpoint directly: a

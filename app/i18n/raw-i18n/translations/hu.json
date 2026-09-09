@@ -2482,6 +2482,7 @@
     "darkDefault": "Mód: sötét, (Alapértelmezett).",
     "lightDefault": "Mód: világos, (Alapértelmezett).",
     "csvTransactionsError": "Nem sikerült az tranzakciók CSV fájlba exportálása. Valami hiba történt. Ha a probléma továbbra is fennáll, kérjük, lépj kapcsolatba az ügyfélszolgálattal.",
+    "csvTransactionsSaved": "A tranzakciók a Letöltések mappába lettek mentve.",
     "lnurlNoUsername": "Az LNURL cím létrehozásához először be kell állítanod egy felhasználónevet. Szeretnél most beállítani egy felhasználónevet?",
     "copyClipboardLnurl": "LNURL cím a vágólapra másolva",
     "defaultWallet": "Alapért. fogadás",

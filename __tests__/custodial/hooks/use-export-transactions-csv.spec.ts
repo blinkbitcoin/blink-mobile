@@ -1,7 +1,9 @@
 import { renderHook, act } from "@testing-library/react-native"
 import { Platform } from "react-native"
+import RNFS from "react-native-fs"
 
 import { useExportTransactionsCsv } from "@app/custodial/hooks/use-export-transactions-csv"
+import { CsvExportOutcome } from "@app/utils/export-csv-file"
 
 const CSV_BASE64 = "Y3N2LWNvbnRlbnQ="
 const DEFAULT_PLATFORM_OS = Platform.OS
@@ -54,27 +56,27 @@ describe("useExportTransactionsCsv", () => {
     )
   })
 
-  it("resolves true when the share sheet completes", async () => {
+  it("resolves shared when the share sheet completes", async () => {
     const { result } = renderHook(() => useExportTransactionsCsv())
 
-    let hasShared: boolean | undefined
+    let outcome: CsvExportOutcome | undefined
     await act(async () => {
-      hasShared = await result.current.exportCsv(["btc-1"])
+      outcome = await result.current.exportCsv(["btc-1"])
     })
 
-    expect(hasShared).toBe(true)
+    expect(outcome).toBe("shared")
   })
 
-  it("resolves false without rejecting when the user dismisses the share sheet", async () => {
+  it("resolves cancelled without rejecting when the user dismisses the share sheet", async () => {
     mockShareOpen.mockResolvedValue({ success: false, dismissedAction: true })
     const { result } = renderHook(() => useExportTransactionsCsv())
 
-    let hasShared: boolean | undefined
+    let outcome: CsvExportOutcome | undefined
     await act(async () => {
-      hasShared = await result.current.exportCsv(["btc-1"])
+      outcome = await result.current.exportCsv(["btc-1"])
     })
 
-    expect(hasShared).toBe(false)
+    expect(outcome).toBe("cancelled")
   })
 
   it("names the file with a single .csv extension on iOS", async () => {
@@ -90,17 +92,22 @@ describe("useExportTransactionsCsv", () => {
     )
   })
 
-  it("avoids a duplicate .csv extension on Android", async () => {
+  it("downloads to the Downloads folder instead of sharing on Android", async () => {
     Platform.OS = "android"
     const { result } = renderHook(() => useExportTransactionsCsv())
 
+    let outcome: CsvExportOutcome | undefined
     await act(async () => {
-      await result.current.exportCsv(["btc-1"])
+      outcome = await result.current.exportCsv(["btc-1"])
     })
 
-    expect(mockShareOpen).toHaveBeenCalledWith(
-      expect.objectContaining({ filename: "blink-transactions" }),
+    expect(outcome).toBe("saved")
+    expect(RNFS.writeFile).toHaveBeenCalledWith(
+      "/mock/downloads/blink-transactions.csv",
+      CSV_BASE64,
+      "base64",
     )
+    expect(mockShareOpen).not.toHaveBeenCalled()
   })
 
   it("throws and does not share when the CSV field is missing from the response", async () => {
@@ -111,18 +118,18 @@ describe("useExportTransactionsCsv", () => {
     expect(mockShareOpen).not.toHaveBeenCalled()
   })
 
-  it("resolves false without sharing when the backend returns an empty CSV", async () => {
+  it("resolves empty without sharing when the backend returns an empty CSV", async () => {
     mockFetchCsvTransactions.mockResolvedValue({
       data: { me: { defaultAccount: { csvTransactions: "" } } },
     })
     const { result } = renderHook(() => useExportTransactionsCsv())
 
-    let hasShared: boolean | undefined
+    let outcome: CsvExportOutcome | undefined
     await act(async () => {
-      hasShared = await result.current.exportCsv(["btc-1"])
+      outcome = await result.current.exportCsv(["btc-1"])
     })
 
-    expect(hasShared).toBe(false)
+    expect(outcome).toBe("empty")
     expect(mockShareOpen).not.toHaveBeenCalled()
   })
 

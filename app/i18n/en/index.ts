@@ -2583,6 +2583,7 @@ const en: BaseTranslation = {
     lightDefault: "Mode: light, (Default).",
     csvTransactionsError:
       "Unable to export transactions to csv. Something went wrong. If issue persists please contact support.",
+    csvTransactionsSaved: "Transactions saved to your Downloads folder.",
     lnurlNoUsername:
       "To generate an lnurl address you must first set a username.  Do you want to set a username now?",
     copyClipboardLnurl: "Lnurl address has been copied in the clipboard",

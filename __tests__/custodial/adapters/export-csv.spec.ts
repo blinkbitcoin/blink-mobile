@@ -1,9 +1,9 @@
 import { createCustodialExportCsv } from "@app/custodial/adapters/export-csv"
 
-const mockShareCsvBase64 = jest.fn()
+const mockExportCsvFile = jest.fn()
 
-jest.mock("@app/utils/share-csv", () => ({
-  shareCsvBase64: (...args: unknown[]) => mockShareCsvBase64(...args),
+jest.mock("@app/utils/export-csv-file", () => ({
+  exportCsvFile: (...args: unknown[]) => mockExportCsvFile(...args),
 }))
 
 const CSV_BASE64 = "Y3N2LWNvbnRlbnQ="
@@ -11,37 +11,44 @@ const CSV_BASE64 = "Y3N2LWNvbnRlbnQ="
 describe("createCustodialExportCsv", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockShareCsvBase64.mockResolvedValue(true)
+    mockExportCsvFile.mockResolvedValue("shared")
   })
 
-  it("fetches the CSV for the given wallets and shares it", async () => {
+  it("fetches the CSV for the given wallets and delivers it", async () => {
     const fetchCsv = jest.fn().mockResolvedValue(CSV_BASE64)
     const exportCsv = createCustodialExportCsv(fetchCsv)
 
-    await expect(exportCsv(["btc-1", "usd-1"])).resolves.toBe(true)
+    await expect(exportCsv(["btc-1", "usd-1"])).resolves.toBe("shared")
 
     expect(fetchCsv).toHaveBeenCalledWith(["btc-1", "usd-1"])
-    expect(mockShareCsvBase64).toHaveBeenCalledWith(CSV_BASE64)
+    expect(mockExportCsvFile).toHaveBeenCalledWith(CSV_BASE64)
   })
 
-  it("resolves false without sharing when the backend returns an empty CSV", async () => {
+  it("resolves empty without delivering when the backend returns an empty CSV", async () => {
     const exportCsv = createCustodialExportCsv(jest.fn().mockResolvedValue(""))
 
-    await expect(exportCsv(["btc-1"])).resolves.toBe(false)
-    expect(mockShareCsvBase64).not.toHaveBeenCalled()
+    await expect(exportCsv(["btc-1"])).resolves.toBe("empty")
+    expect(mockExportCsvFile).not.toHaveBeenCalled()
   })
 
-  it("throws without sharing when the CSV field is missing from the response", async () => {
+  it("throws without delivering when the CSV field is missing from the response", async () => {
     const exportCsv = createCustodialExportCsv(jest.fn().mockResolvedValue(undefined))
 
     await expect(exportCsv(["btc-1"])).rejects.toThrow()
-    expect(mockShareCsvBase64).not.toHaveBeenCalled()
+    expect(mockExportCsvFile).not.toHaveBeenCalled()
   })
 
-  it("passes a share-sheet dismissal through as false", async () => {
-    mockShareCsvBase64.mockResolvedValue(false)
+  it("passes an Android download through as saved", async () => {
+    mockExportCsvFile.mockResolvedValue("saved")
     const exportCsv = createCustodialExportCsv(jest.fn().mockResolvedValue(CSV_BASE64))
 
-    await expect(exportCsv(["btc-1"])).resolves.toBe(false)
+    await expect(exportCsv(["btc-1"])).resolves.toBe("saved")
+  })
+
+  it("passes a share-sheet dismissal through as cancelled", async () => {
+    mockExportCsvFile.mockResolvedValue("cancelled")
+    const exportCsv = createCustodialExportCsv(jest.fn().mockResolvedValue(CSV_BASE64))
+
+    await expect(exportCsv(["btc-1"])).resolves.toBe("cancelled")
   })
 })

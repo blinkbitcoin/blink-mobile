@@ -2482,6 +2482,7 @@
     "darkDefault": "Mod: karanlık, (Varsayılan).",
     "lightDefault": "Mod: ışık, (Varsayılan).",
     "csvTransactionsError": "İşlemler csv'ye aktarılamıyor. Bir şeyler yanlış gitti. Sorun devam ederse lütfen destek ekibiyle iletişime geçin.",
+    "csvTransactionsSaved": "İşlemler İndirilenler klasörüne kaydedildi.",
     "lnurlNoUsername": "Bir lnurl adresi oluşturmak için önce bir kullanıcı adı belirlemelisiniz. Şimdi bir kullanıcı adı belirlemek istiyor musunuz?",
     "copyClipboardLnurl": "Lnurl adresi panodan kopyalandı",
     "defaultWallet": "Varsayılan alım",

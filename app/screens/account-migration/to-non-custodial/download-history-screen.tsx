@@ -40,10 +40,19 @@ export const MigrationDownloadHistoryScreen: React.FC = () => {
   const handleDownload = useCallback(async () => {
     setIsDownloading(true)
     try {
-      /** A dismissed share sheet resolves false: not an error, but not a download
-       *  either, so the screen stays on Download + Skip. */
-      const hasShared = await exportCsv(walletIds)
-      if (hasShared) setHasDownloaded(true)
+      const outcome = await exportCsv(walletIds)
+      /** A download lands silently in the Downloads folder, so it needs a word to say so;
+       *  the share sheet is its own confirmation. */
+      if (outcome === "saved") {
+        toastShow({
+          message: LL.SettingsScreen.csvTransactionsSaved(),
+          type: "success",
+          LL,
+        })
+      }
+      /** A dismissed share sheet and an empty history are not downloads, so the screen
+       *  stays on Download + Skip and the export can be retried. */
+      if (outcome === "saved" || outcome === "shared") setHasDownloaded(true)
     } catch (err) {
       reportError("Migration transaction history export", err)
       toastShow({ message: LL.SettingsScreen.csvTransactionsError(), LL })

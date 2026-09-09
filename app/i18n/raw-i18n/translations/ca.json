@@ -2482,6 +2482,7 @@
     "darkDefault": "Mode: fosc, (predeterminat).",
     "lightDefault": "Mode: clar, (predeterminat).",
     "csvTransactionsError": "No es poden exportar transaccions a csv. Alguna cosa ha anat malament. Si el problema persisteix,  contacta amb el servei d'assistència.",
+    "csvTransactionsSaved": "S'han desat les transaccions a la carpeta de baixades.",
     "lnurlNoUsername": "Per generar una adreça lnurl primer has d'establir un nom d'usuari. Vols configurar un nom d'usuari ara?",
     "copyClipboardLnurl": "L'adreça Lnurl s'ha copiat al porta-retalls",
     "defaultWallet": "Rebre per defecte",

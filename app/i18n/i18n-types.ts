@@ -8143,6 +8143,10 @@ type RootTranslation = {
 		 */
 		csvTransactionsError: string
 		/**
+		 * T​r​a​n​s​a​c​t​i​o​n​s​ ​s​a​v​e​d​ ​t​o​ ​y​o​u​r​ ​D​o​w​n​l​o​a​d​s​ ​f​o​l​d​e​r​.
+		 */
+		csvTransactionsSaved: string
+		/**
 		 * T​o​ ​g​e​n​e​r​a​t​e​ ​a​n​ ​l​n​u​r​l​ ​a​d​d​r​e​s​s​ ​y​o​u​ ​m​u​s​t​ ​f​i​r​s​t​ ​s​e​t​ ​a​ ​u​s​e​r​n​a​m​e​.​ ​ ​D​o​ ​y​o​u​ ​w​a​n​t​ ​t​o​ ​s​e​t​ ​a​ ​u​s​e​r​n​a​m​e​ ​n​o​w​?
 		 */
 		lnurlNoUsername: string
@@ -22431,6 +22435,10 @@ export type TranslationFunctions = {
 		 * Unable to export transactions to csv. Something went wrong. If issue persists please contact support.
 		 */
 		csvTransactionsError: () => LocalizedString
+		/**
+		 * Transactions saved to your Downloads folder.
+		 */
+		csvTransactionsSaved: () => LocalizedString
 		/**
 		 * To generate an lnurl address you must first set a username.  Do you want to set a username now?
 		 */

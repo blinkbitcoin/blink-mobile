@@ -2482,6 +2482,7 @@
     "darkDefault": "Chaynamanta kaniy: tuta, (Chaynamanta kaniy).",
     "lightDefault": "Chaynamanta kaniy: qhapaq, (Chaynamanta kaniy).",
     "csvTransactionsError": "CSVpi kawsayniyta qillqata sutichinaqinmi chimpuyta mana kaniyta rikuchiy, kaymi kaniyta rikuyta munanki. Hinataqmi, ñuqaqa yachanakuyta sutichinaqinmi kaniyta rikuyta munanki, ñuqaqa kawsayniyta qillqata sutichinaqinmi kaniyta rikuyta munanki k'anchayta munayniyta kaniyta rikuchiykachkanki.",
+    "csvTransactionsSaved": "Transaccionkunaqa Descargas carpetaykiman waqaychasqañam.",
     "lnurlNoUsername": "Lnurl pacha sutichinaqinmi kaniyta rikuyta munanki, ñuqaqa yachanakuyta sutichinaqinmi kaniyta rikuchiykachkanki. Ñuqaqa yachanakuyta sutichinaqinmi kaniyta rikuchiykachkanki, kaymi kaniyta rikuyta munanki?",
     "copyClipboardLnurl": "Lnurl pacha sutichinaqinmi chimpuyta kaniyta rikuchiy",
     "defaultWallet": "Receive to",

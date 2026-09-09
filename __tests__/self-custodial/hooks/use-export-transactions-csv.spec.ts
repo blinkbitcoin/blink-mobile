@@ -7,6 +7,7 @@ import {
 } from "@breeztech/breez-sdk-spark-react-native"
 
 import { useExportSelfCustodialTransactionsCsv } from "@app/self-custodial/hooks/use-export-transactions-csv"
+import { CsvExportOutcome } from "@app/utils/export-csv-file"
 
 const mockShareOpen = jest.fn()
 
@@ -91,12 +92,12 @@ describe("useExportSelfCustodialTransactionsCsv", () => {
     mockUseSelfCustodialWallet.mockReturnValue({ sdk })
     const { result } = renderHook(() => useExportSelfCustodialTransactionsCsv())
 
-    let hasShared: boolean | undefined
+    let outcome: CsvExportOutcome | undefined
     await act(async () => {
-      hasShared = await result.current.exportCsv()
+      outcome = await result.current.exportCsv()
     })
 
-    expect(hasShared).toBe(true)
+    expect(outcome).toBe("shared")
     expect(mockShareOpen).toHaveBeenCalledWith(
       expect.objectContaining({
         title: "blink-transactions",
@@ -124,32 +125,32 @@ describe("useExportSelfCustodialTransactionsCsv", () => {
     expect(csv).not.toContain("unknown-token-1")
   })
 
-  it("resolves false without sharing when there is nothing to export", async () => {
+  it("resolves empty without sharing when there is nothing to export", async () => {
     const sdk = createSdkStub([failedSend])
     mockUseSelfCustodialWallet.mockReturnValue({ sdk })
     const { result } = renderHook(() => useExportSelfCustodialTransactionsCsv())
 
-    let hasShared: boolean | undefined
+    let outcome: CsvExportOutcome | undefined
     await act(async () => {
-      hasShared = await result.current.exportCsv()
+      outcome = await result.current.exportCsv()
     })
 
-    expect(hasShared).toBe(false)
+    expect(outcome).toBe("empty")
     expect(mockShareOpen).not.toHaveBeenCalled()
   })
 
-  it("resolves false without rejecting when the user dismisses the share sheet", async () => {
+  it("resolves cancelled without rejecting when the user dismisses the share sheet", async () => {
     mockShareOpen.mockResolvedValue({ success: false, dismissedAction: true })
     const sdk = createSdkStub([completedReceive])
     mockUseSelfCustodialWallet.mockReturnValue({ sdk })
     const { result } = renderHook(() => useExportSelfCustodialTransactionsCsv())
 
-    let hasShared: boolean | undefined
+    let outcome: CsvExportOutcome | undefined
     await act(async () => {
-      hasShared = await result.current.exportCsv()
+      outcome = await result.current.exportCsv()
     })
 
-    expect(hasShared).toBe(false)
+    expect(outcome).toBe("cancelled")
   })
 
   it("rejects without sharing when the SDK is not connected", async () => {
@@ -175,7 +176,7 @@ describe("useExportSelfCustodialTransactionsCsv", () => {
     mockUseSelfCustodialWallet.mockReturnValue({ sdk })
     const { result } = renderHook(() => useExportSelfCustodialTransactionsCsv())
 
-    let exportPromise: Promise<boolean> | undefined
+    let exportPromise: Promise<CsvExportOutcome> | undefined
     await act(async () => {
       exportPromise = result.current.exportCsv()
       /** Flush the CSV generation microtasks without awaiting the share result. */

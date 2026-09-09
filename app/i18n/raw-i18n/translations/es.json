@@ -2482,6 +2482,7 @@
         "darkDefault": "Modo: oscuro (predeterminado).",
         "lightDefault": "Modo: claro (predeterminado).",
         "csvTransactionsError": "No se pueden exportar transacciones a csv. Algo salió mal. Si el problema persiste, póngase en contacto con el soporte.",
+        "csvTransactionsSaved": "Transacciones guardadas en tu carpeta de Descargas.",
         "lnurlNoUsername": "Para generar una dirección lnurl primero debe establecer un nombre de usuario. ¿Desea establecer un nombre de usuario ahora?",
         "copyClipboardLnurl": "La dirección de Lnurl se ha copiado en el portapapeles",
         "defaultWallet": "Recibir por defecto",

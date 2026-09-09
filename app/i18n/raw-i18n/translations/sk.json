@@ -2482,6 +2482,7 @@
     "darkDefault": "Režim: tmavý (predvolený).",
     "lightDefault": "Režim: svetlý (predvolený).",
     "csvTransactionsError": "Nie je možné exportovať transakcie do formátu CSV. Niečo sa pokazilo. Ak problém pretrváva, kontaktujte podporu.",
+    "csvTransactionsSaved": "Transakcie boli uložené do priečinka Stiahnuté súbory.",
     "lnurlNoUsername": "Ak chcete vygenerovať adresu lnurl, musíte najprv nastaviť používateľské meno. Chcete ho teraz nastaviť?",
     "copyClipboardLnurl": "Lnurl adresa bola skopírovaná do schránky",
     "defaultWallet": "Predvolený príjem",

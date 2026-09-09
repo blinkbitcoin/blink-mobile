@@ -2482,6 +2482,7 @@
     "darkDefault": "Modus: donker, (verstek). ",
     "lightDefault": "Modus: lig, (verstek)",
     "csvTransactionsError": "Kan nie nou die transaksielys na csv uitvoer nie. Iets het verkeerd geloop. As die probleem voortduur, kontak asseblief ondersteuning. ",
+    "csvTransactionsSaved": "Transaksies is in jou Downloads-lêergids gestoor.",
     "lnurlNoUsername": "Om 'n LNURL-adres te genereer moet jy eers 'n gebruikersnaak kies. Wil jy dit nou doen? ",
     "copyClipboardLnurl": "LNURL-adres is na die klipbord oorgedra",
     "defaultWallet": "Verstek ontvangs",

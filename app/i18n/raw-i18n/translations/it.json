@@ -2482,6 +2482,7 @@
         "darkDefault": "Modalità: scuro (predefinito).",
         "lightDefault": "Modalità: luce (predefinita).",
         "csvTransactionsError": "Impossibile esportare le transazioni in csv. Qualcosa è andato storto. Se il problema persiste contattare l'assistenza.",
+        "csvTransactionsSaved": "Transazioni salvate nella cartella Download.",
         "lnurlNoUsername": "Per generare un indirizzo lnurl è necessario prima impostare un username. Vuoi impostare un username ora?",
         "copyClipboardLnurl": "L'indirizzo Lnurl è stato copiato negli appunti",
         "defaultWallet": "Ricezione predef.",
