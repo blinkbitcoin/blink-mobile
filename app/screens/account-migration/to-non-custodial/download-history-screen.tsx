@@ -36,13 +36,12 @@ export const MigrationDownloadHistoryScreen: React.FC = () => {
    *  optional step. Skip only waits on the routing's own reads, and a failed one answers
    *  the tap with a retry rather than holding the button off. */
   const isDownloadDisabled = isBusy || !areWalletsReady
-  const secondaryButtonTitle = hasDownloaded ? LL.common.continue() : LL.common.skip()
 
   const handleDownload = useCallback(async () => {
     setIsDownloading(true)
     try {
       /** A dismissed share sheet resolves false: not an error, but not a download
-       *  either, so the secondary action keeps reading Skip. */
+       *  either, so the screen stays on Download + Skip. */
       const hasShared = await exportCsv(walletIds)
       if (hasShared) setHasDownloaded(true)
     } catch (err) {
@@ -58,18 +57,26 @@ export const MigrationDownloadHistoryScreen: React.FC = () => {
       footer={
         <>
           <GaloyPrimaryButton
-            title={LL.AccountMigration.downloadHistoryDownloadCta()}
+            title={
+              hasDownloaded
+                ? LL.common.continue()
+                : LL.AccountMigration.downloadHistoryDownloadCta()
+            }
             loading={isDownloading}
-            disabled={isDownloadDisabled}
-            onPress={handleDownload}
+            disabled={hasDownloaded ? isBusy : isDownloadDisabled}
+            onPress={hasDownloaded ? continuePastHistory : handleDownload}
             {...testProps("migration-download-history-cta")}
           />
-          <GaloySecondaryButton
-            title={secondaryButtonTitle}
-            disabled={isBusy}
-            onPress={continuePastHistory}
-            {...testProps("migration-download-history-continue")}
-          />
+          {/** Once the history is downloaded the primary CTA is the way forward, so the
+           *  screen drops the secondary action rather than offering it twice. */}
+          {!hasDownloaded && (
+            <GaloySecondaryButton
+              title={LL.common.skip()}
+              disabled={isBusy}
+              onPress={continuePastHistory}
+              {...testProps("migration-download-history-continue")}
+            />
+          )}
         </>
       }
     >

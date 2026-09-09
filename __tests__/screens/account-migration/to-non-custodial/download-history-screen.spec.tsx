@@ -64,10 +64,16 @@ const renderScreen = () =>
 const pressDownload = () =>
   fireEvent.press(screen.getByText(LL.AccountMigration.downloadHistoryDownloadCta()))
 
-const pressSecondary = () =>
+const pressPrimary = () =>
+  fireEvent.press(screen.getByTestId("migration-download-history-cta"))
+
+const pressSkip = () =>
   fireEvent.press(screen.getByTestId("migration-download-history-continue"))
 
-const isContinueDisabled = () =>
+const isPrimaryDisabled = () =>
+  screen.getByTestId("migration-download-history-cta").props.accessibilityState?.disabled
+
+const isSkipDisabled = () =>
   screen.getByTestId("migration-download-history-continue").props.accessibilityState
     ?.disabled
 
@@ -98,10 +104,13 @@ describe("MigrationDownloadHistoryScreen", () => {
     expect(screen.getByText(LL.common.skip())).toBeTruthy()
   })
 
-  it("labels the secondary action Skip until the CSV is downloaded, then Continue", async () => {
+  it("swaps Download + Skip for a single Continue once the CSV is downloaded", async () => {
     renderScreen()
     await flushEffects()
 
+    expect(
+      screen.getByText(LL.AccountMigration.downloadHistoryDownloadCta()),
+    ).toBeTruthy()
     expect(screen.getByText(LL.common.skip())).toBeTruthy()
     expect(screen.queryByText(LL.common.continue())).toBeNull()
 
@@ -109,6 +118,22 @@ describe("MigrationDownloadHistoryScreen", () => {
 
     await waitFor(() => expect(screen.getByText(LL.common.continue())).toBeTruthy())
     expect(screen.queryByText(LL.common.skip())).toBeNull()
+    expect(
+      screen.queryByText(LL.AccountMigration.downloadHistoryDownloadCta()),
+    ).toBeNull()
+  })
+
+  it("continues the migration flow when the primary CTA is pressed after a download", async () => {
+    renderScreen()
+    await flushEffects()
+
+    pressDownload()
+    await waitFor(() => expect(screen.getByText(LL.common.continue())).toBeTruthy())
+
+    pressPrimary()
+
+    expect(mockContinuePastHistory).toHaveBeenCalledTimes(1)
+    expect(mockExportCsv).toHaveBeenCalledTimes(1)
   })
 
   it("downloads the CSV without leaving the screen", async () => {
@@ -147,7 +172,8 @@ describe("MigrationDownloadHistoryScreen", () => {
     expect(screen.queryByText(LL.common.continue())).toBeNull()
   })
 
-  it("allows downloading multiple times before continuing", async () => {
+  it("allows retrying the download after a dismissed share sheet", async () => {
+    mockExportCsv.mockResolvedValue(false)
     renderScreen()
     await flushEffects()
 
@@ -160,7 +186,7 @@ describe("MigrationDownloadHistoryScreen", () => {
     expect(mockNavigate).not.toHaveBeenCalled()
   })
 
-  it("disables Continue while a download is in progress", async () => {
+  it("disables Skip while a download is in progress", async () => {
     let resolveExport: () => void = () => {}
     mockExportCsv.mockReturnValue(
       new Promise<void>((resolve) => {
@@ -171,13 +197,13 @@ describe("MigrationDownloadHistoryScreen", () => {
     await flushEffects()
 
     pressDownload()
-    expect(isContinueDisabled()).toBe(true)
+    expect(isSkipDisabled()).toBe(true)
 
     await act(async () => {
       resolveExport()
     })
 
-    expect(isContinueDisabled()).toBe(false)
+    expect(isSkipDisabled()).toBe(false)
   })
 
   it("disables Download but keeps Skip available while the wallet balances load", async () => {
@@ -190,11 +216,8 @@ describe("MigrationDownloadHistoryScreen", () => {
     renderScreen()
     await flushEffects()
 
-    expect(
-      screen.getByTestId("migration-download-history-cta").props.accessibilityState
-        ?.disabled,
-    ).toBe(true)
-    expect(isContinueDisabled()).toBe(false)
+    expect(isPrimaryDisabled()).toBe(true)
+    expect(isSkipDisabled()).toBe(false)
   })
 
   it("keeps Download disabled but Skip available when the wallet query errors", async () => {
@@ -207,11 +230,8 @@ describe("MigrationDownloadHistoryScreen", () => {
     renderScreen()
     await flushEffects()
 
-    expect(
-      screen.getByTestId("migration-download-history-cta").props.accessibilityState
-        ?.disabled,
-    ).toBe(true)
-    expect(isContinueDisabled()).toBe(false)
+    expect(isPrimaryDisabled()).toBe(true)
+    expect(isSkipDisabled()).toBe(false)
   })
 
   it("disables both actions while the next step is still being resolved", async () => {
@@ -222,21 +242,18 @@ describe("MigrationDownloadHistoryScreen", () => {
     renderScreen()
     await flushEffects()
 
-    expect(
-      screen.getByTestId("migration-download-history-cta").props.accessibilityState
-        ?.disabled,
-    ).toBe(true)
-    expect(isContinueDisabled()).toBe(true)
+    expect(isPrimaryDisabled()).toBe(true)
+    expect(isSkipDisabled()).toBe(true)
   })
 
   /** Through the same routing as every other step, not the stored checkpoint directly: a
    *  commit point the server has since closed must restart from here, not land back on
    *  the commit screen. Where that routing goes is pinned in the next-step hook's spec. */
-  it("continues through the flow's routing when the secondary action is pressed", async () => {
+  it("continues through the flow's routing when Skip is pressed", async () => {
     renderScreen()
     await flushEffects()
 
-    pressSecondary()
+    pressSkip()
 
     expect(mockContinuePastHistory).toHaveBeenCalledTimes(1)
     expect(mockNavigate).not.toHaveBeenCalled()
