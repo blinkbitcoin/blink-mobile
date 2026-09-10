@@ -210,6 +210,13 @@ const DeveloperScreen: React.ComponentType | null = __DEV__
     require("../screens/developer-screen").DeveloperScreen
   : null
 
+/** Same lazy-require reasoning as `DeveloperScreen`: a throwaway harness that
+ *  must not reach a release bundle. */
+const BusyStateSandboxScreen: React.ComponentType | null = __DEV__
+  ? // eslint-disable-next-line @typescript-eslint/no-var-requires
+    require("../screens/developer-screen").BusyStateSandboxScreen
+  : null
+
 /** Built once so every navigator hands `headerLeft` the same function. Calling the factory
  *  inside a navigator's screenOptions would mint a new identity on each render, which stays
  *  invisible only while native-stack invokes headerLeft instead of rendering it as an
@@ -632,6 +639,15 @@ export const RootStack = () => {
           component={DeveloperScreen}
           options={{
             gestureEnabled: false,
+          }}
+        />
+      )}
+      {BusyStateSandboxScreen && (
+        <RootNavigator.Screen
+          name="busyStateSandbox"
+          component={BusyStateSandboxScreen}
+          options={{
+            title: "Busy state sandbox",
           }}
         />
       )}
