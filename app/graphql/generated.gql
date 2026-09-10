@@ -427,6 +427,20 @@ mutation lnInvoiceCreate($input: LnInvoiceCreateInput!) {
   }
 }
 
+mutation lnInvoiceCreateOnBehalfOfRecipient($input: LnInvoiceCreateOnBehalfOfRecipientInput!) {
+  lnInvoiceCreateOnBehalfOfRecipient(input: $input) {
+    errors {
+      message
+      __typename
+    }
+    invoice {
+      paymentRequest
+      __typename
+    }
+    __typename
+  }
+}
+
 mutation lnInvoiceFeeProbe($input: LnInvoiceFeeProbeInput!) {
   lnInvoiceFeeProbe(input: $input) {
     errors {

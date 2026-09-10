@@ -2,6 +2,7 @@ import {
   formatUnitCount,
   formatUsdAmount,
   resolveEquityPercent,
+  resolveInvestmentFunding,
   resolveInvestmentTerms,
 } from "@app/screens/card-screen/onboarding/investment-flow/investment-terms"
 import { MOCK_CREDIT_LIMIT_VALUES } from "@app/screens/card-screen/onboarding/onboarding-mock-data"
@@ -43,8 +44,46 @@ describe("the figures as they are written", () => {
     expect(formatUsdAmount(25000)).toBe("$25,000")
   })
 
+  /** A balance converted from satoshis lands on a fraction of a cent, and dollars do not
+   *  go that far. A whole amount still prints without a decimal point. */
+  it("cuts a converted balance to cents", () => {
+    expect(formatUsdAmount(3333.756)).toBe("$3,333.76")
+  })
+
   /** Units are a count, not money, and carry no currency of their own. */
   it("groups a unit count without a currency", () => {
     expect(formatUnitCount(25000)).toBe("25,000")
+  })
+})
+
+describe("resolveInvestmentFunding", () => {
+  it("names what is missing when the investor is short", () => {
+    expect(resolveInvestmentFunding({ balanceUsd: 3333, totalUsd: 25000 })).toEqual({
+      balanceUsd: 3333,
+      shortfallUsd: 21667,
+      hasEnoughBalance: false,
+    })
+  })
+
+  it("counts an exact balance as covered", () => {
+    expect(
+      resolveInvestmentFunding({ balanceUsd: 25000, totalUsd: 25000 }).hasEnoughBalance,
+    ).toBe(true)
+  })
+
+  /** Reported as nothing missing rather than as a negative sum, which the copy would
+   *  print with a minus in front of it. */
+  it("reports no shortfall when the balance is more than enough", () => {
+    expect(resolveInvestmentFunding({ balanceUsd: 30000, totalUsd: 25000 })).toEqual({
+      balanceUsd: 30000,
+      shortfallUsd: 0,
+      hasEnoughBalance: true,
+    })
+  })
+
+  it("counts an empty balance as the whole amount missing", () => {
+    expect(
+      resolveInvestmentFunding({ balanceUsd: 0, totalUsd: 25000 }).shortfallUsd,
+    ).toBe(25000)
   })
 })

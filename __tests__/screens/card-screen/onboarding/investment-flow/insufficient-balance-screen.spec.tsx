@@ -3,11 +3,6 @@ import { render, fireEvent, act } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
 import { InsufficientBalanceScreen } from "@app/screens/card-screen/onboarding/investment-flow"
-import {
-  MOCK_BITCOIN_BALANCE,
-  MOCK_INVESTMENT_AMOUNT,
-  MOCK_INVESTMENT_SHORTFALL,
-} from "@app/screens/card-screen/onboarding/onboarding-mock-data"
 import { ContextForScreen } from "../../../helper"
 
 jest.mock("@react-native-community/blur", () => ({
@@ -20,6 +15,12 @@ jest.mock("react-native-linear-gradient", () => ({
 
 const mockNavigate = jest.fn()
 
+/** The amount the investor picked, deliberately not the $10,000 the copy used to
+ *  hardcode: a screen that ignored the choice would still read correctly against that. */
+const SELECTED_AMOUNT_USD = 25000
+
+const mockRouteParams = { current: { selectedAmountUsd: SELECTED_AMOUNT_USD } }
+
 jest.mock("@react-navigation/native", () => {
   const actualNav = jest.requireActual("@react-navigation/native")
   return {
@@ -27,8 +28,27 @@ jest.mock("@react-navigation/native", () => {
     useNavigation: () => ({
       navigate: mockNavigate,
     }),
+    useRoute: () => ({ params: mockRouteParams.current }),
   }
 })
+
+/** The funding is what the wallets and the price feed answer; its own spec covers how it
+ *  is worked out, so what matters here is that the screen states what it is given. */
+const mockFunding = {
+  current: {
+    balanceUsd: 3333,
+    shortfallUsd: 21667,
+    hasEnoughBalance: false,
+    isLoading: false,
+  },
+}
+
+jest.mock(
+  "@app/screens/card-screen/onboarding/investment-flow/use-investment-funding",
+  () => ({
+    useInvestmentFunding: () => mockFunding.current,
+  }),
+)
 
 const renderScreen = async () => {
   const utils = render(
@@ -44,6 +64,13 @@ describe("InsufficientBalanceScreen", () => {
   beforeEach(() => {
     loadLocale("en")
     jest.clearAllMocks()
+    mockRouteParams.current = { selectedAmountUsd: SELECTED_AMOUNT_USD }
+    mockFunding.current = {
+      balanceUsd: 3333,
+      shortfallUsd: 21667,
+      hasEnoughBalance: false,
+      isLoading: false,
+    }
   })
 
   it("renders without crashing", async () => {
@@ -56,18 +83,37 @@ describe("InsufficientBalanceScreen", () => {
     expect(getByText("Insufficient balance")).toBeTruthy()
   })
 
-  it("shows the current Bitcoin balance", async () => {
+  it("states the balance the investor actually holds", async () => {
     const { getByText } = await renderScreen()
-    expect(
-      getByText(`You only have ${MOCK_BITCOIN_BALANCE} in your Bitcoin account.`),
-    ).toBeTruthy()
+    expect(getByText(/You only have \$3,333/)).toBeTruthy()
   })
 
-  it("shows the shortfall and the investment amount", async () => {
+  it("states the shortfall against the amount that was chosen", async () => {
     const { getByText } = await renderScreen()
     expect(
       getByText(
-        `Deposit more than ${MOCK_INVESTMENT_SHORTFALL} to your account to reach the investment amount of ${MOCK_INVESTMENT_AMOUNT}.`,
+        "Deposit more than $21,667 to your account to reach the investment amount of $25,000.",
+      ),
+    ).toBeTruthy()
+  })
+
+  /** The figures used to be fixed text, so a screen that ignored both the choice and the
+   *  wallets would still have passed every assertion above. */
+  it("follows a different balance and a different choice", async () => {
+    mockRouteParams.current = { selectedAmountUsd: 1000 }
+    mockFunding.current = {
+      balanceUsd: 250,
+      shortfallUsd: 750,
+      hasEnoughBalance: false,
+      isLoading: false,
+    }
+
+    const { getByText } = await renderScreen()
+
+    expect(getByText(/You only have \$250/)).toBeTruthy()
+    expect(
+      getByText(
+        "Deposit more than $750 to your account to reach the investment amount of $1,000.",
       ),
     ).toBeTruthy()
   })
