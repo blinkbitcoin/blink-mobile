@@ -24,32 +24,46 @@ export const resolveInvestmentTerms = (totalUsd: number): InvestmentTerms => ({
   preMoneyValuationUsd: PRE_MONEY_VALUATION_USD,
 })
 
-/** Whether the investor can pay for what they signed for, and what is missing if not. */
+/** Whether the investor can pay for what they signed for, and what stands in the way. */
 export type InvestmentFunding = {
+  /** The fullest single wallet, which is the one that has to cover the payment. */
   balanceUsd: number
   shortfallUsd: number
   hasEnoughBalance: boolean
+  /** Held between the two wallets, but not in either alone. */
+  isSplitAcrossWallets: boolean
 }
 
 /**
- * Measured in dollars, which is the currency the agreement is written in: the balance is
- * shown to the investor in whatever currency they chose to read it in, and that choice
- * has no bearing on whether the amount is covered.
+ * Measured against **one** wallet, not the two added together, because that is what a
+ * payment can draw on: the send flow spends from a single wallet, so an investor holding
+ * half the amount in each is turned away at it however healthy the total looks.
+ *
+ * Dollars, which is the currency the agreement is written in: the balance is shown to the
+ * investor in whatever currency they chose to read it in, and that choice has no bearing
+ * on whether the amount is covered.
  *
  * The shortfall never goes below zero, so a covered investment reads as nothing missing
  * rather than as a negative sum the copy would print with a minus.
  */
 export const resolveInvestmentFunding = ({
-  balanceUsd,
+  largestWalletUsd,
+  combinedUsd,
   totalUsd,
 }: {
-  balanceUsd: number
+  largestWalletUsd: number
+  combinedUsd: number
   totalUsd: number
-}): InvestmentFunding => ({
-  balanceUsd,
-  shortfallUsd: Math.max(totalUsd - balanceUsd, 0),
-  hasEnoughBalance: balanceUsd >= totalUsd,
-})
+}): InvestmentFunding => {
+  const hasEnoughBalance = largestWalletUsd >= totalUsd
+
+  return {
+    balanceUsd: largestWalletUsd,
+    shortfallUsd: Math.max(totalUsd - largestWalletUsd, 0),
+    hasEnoughBalance,
+    isSplitAcrossWallets: !hasEnoughBalance && combinedUsd >= totalUsd,
+  }
+}
 
 /** The share of the company the terms buy, which the term sheet states beside the units. */
 export const resolveEquityPercent = ({

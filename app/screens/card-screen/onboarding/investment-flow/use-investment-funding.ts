@@ -28,16 +28,21 @@ export const useInvestmentFunding = (
   const { convertMoneyAmount } = usePriceConversion()
   const { wallets, isReady } = useActiveWallet()
 
-  const balanceUsd = React.useMemo(() => {
-    if (!convertMoneyAmount) return 0
+  /** Each wallet on its own and the two together: a payment draws on one, so what the
+   *  fullest holds decides whether it can go through, and the sum only says whether
+   *  consolidating would be enough. */
+  const { largestWalletUsd, combinedUsd } = React.useMemo(() => {
+    if (!convertMoneyAmount) return { largestWalletUsd: 0, combinedUsd: 0 }
 
-    const cents = wallets.reduce(
-      (total, wallet) =>
-        total + convertMoneyAmount(wallet.balance, WalletCurrency.Usd).amount,
-      0,
+    const balances = wallets.map(
+      (wallet) =>
+        convertMoneyAmount(wallet.balance, WalletCurrency.Usd).amount / CENTS_PER_USD,
     )
 
-    return cents / CENTS_PER_USD
+    return {
+      largestWalletUsd: Math.max(0, ...balances),
+      combinedUsd: balances.reduce((total, balance) => total + balance, 0),
+    }
   }, [wallets, convertMoneyAmount])
 
   /**
@@ -59,7 +64,7 @@ export const useInvestmentFunding = (
   }, [totalUsd, convertMoneyAmount])
 
   return {
-    ...resolveInvestmentFunding({ balanceUsd, totalUsd }),
+    ...resolveInvestmentFunding({ largestWalletUsd, combinedUsd, totalUsd }),
     totalSats,
     isLoading: !convertMoneyAmount || !isReady,
   }

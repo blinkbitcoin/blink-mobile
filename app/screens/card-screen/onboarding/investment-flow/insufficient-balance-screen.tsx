@@ -34,46 +34,67 @@ export const InsufficientBalanceScreen: React.FC = () => {
     [selectedAmountUsd],
   )
 
-  const { balanceUsd, shortfallUsd } = useInvestmentFunding(terms.totalUsd)
+  const { balanceUsd, shortfallUsd, isSplitAcrossWallets } = useInvestmentFunding(
+    terms.totalUsd,
+  )
 
   const handleDeposit = () => {
     navigation.navigate("receiveBitcoin")
   }
 
+  const handleConvert = () => {
+    navigation.navigate("conversionDetails")
+  }
+
+  const copy = LL.CardFlow.Onboarding.InsufficientBalance
+
+  /**
+   * Two ways of not being able to pay, and they need opposite answers.
+   *
+   * Money is missing: deposit it. Money is there but sitting in both wallets, and a
+   * payment draws on one: converting is what makes it payable, and telling this investor
+   * to deposit would ask them for money they already have.
+   *
+   * The screen around them is the same, so only what it says and where its button leads
+   * are chosen here.
+   */
+  const shortfall = isSplitAcrossWallets
+    ? {
+        title: copy.splitFunds.title(),
+        paragraphs: [copy.splitFunds.body()],
+        actionTitle: LL.common.convert(),
+        onAction: handleConvert,
+      }
+    : {
+        title: copy.title(),
+        paragraphs: [
+          copy.paragraphs.body1({ bitcoinBalance: formatUsdAmount(balanceUsd) }),
+          copy.paragraphs.body2({
+            shortfall: formatUsdAmount(shortfallUsd),
+            investmentAmount: formatUsdAmount(terms.totalUsd),
+          }),
+          copy.paragraphs.body3(),
+        ],
+        actionTitle: copy.buttonText(),
+        onAction: handleDeposit,
+      }
+
   return (
     <Screen headerShown={false}>
       <CloseHeader testID="insufficient-balance-close" />
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
-        <IconHero
-          icon="info"
-          iconColor={colors.primary}
-          title={LL.CardFlow.Onboarding.InsufficientBalance.title()}
-        />
+        <IconHero icon="info" iconColor={colors.primary} title={shortfall.title} />
 
         <View style={styles.content}>
-          <Text type="p2" style={styles.bodyText}>
-            {LL.CardFlow.Onboarding.InsufficientBalance.paragraphs.body1({
-              bitcoinBalance: formatUsdAmount(balanceUsd),
-            })}
-          </Text>
-
-          <Text type="p2" style={styles.bodyText}>
-            {LL.CardFlow.Onboarding.InsufficientBalance.paragraphs.body2({
-              shortfall: formatUsdAmount(shortfallUsd),
-              investmentAmount: formatUsdAmount(terms.totalUsd),
-            })}
-          </Text>
-
-          <Text type="p2" style={styles.bodyText}>
-            {LL.CardFlow.Onboarding.InsufficientBalance.paragraphs.body3()}
-          </Text>
+          {shortfall.paragraphs.map((paragraph) => (
+            <Text key={paragraph} type="p2" style={styles.bodyText}>
+              {paragraph}
+            </Text>
+          ))}
         </View>
       </ScrollView>
       <View style={styles.buttonsContainer}>
-        <GaloyPrimaryButton
-          title={LL.CardFlow.Onboarding.InsufficientBalance.buttonText()}
-          onPress={handleDeposit}
-        />
+        <GaloyPrimaryButton title={shortfall.actionTitle} onPress={shortfall.onAction} />
       </View>
     </Screen>
   )
