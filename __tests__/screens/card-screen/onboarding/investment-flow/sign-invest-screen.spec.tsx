@@ -7,23 +7,31 @@ import { SignInvestScreen } from "@app/screens/card-screen/onboarding/investment
 
 import { ContextForScreen } from "../../../helper"
 
-const TEST_FORM_URL = "https://forms.example.test/investment-agreement"
 /** The amount the user picked two screens earlier, which the agreement is written from. */
 const SELECTED_AMOUNT_USD = 25000
-const TEST_ALLOWED_ORIGIN = "https://apps.example.test"
+
+/** What the backend answers with: the form's own address, carrying the short-lived
+ *  token that ties it to the instance it just minted. */
+const TEST_INSTANCE_URL = "https://forms.example.test/instance#instanceToken=abc"
 
 jest.mock("@app/utils/log-error", () => ({
   logError: jest.fn(),
 }))
 
-/** A round $100,000 per bitcoin, read through a getter so a test can render the screen
- *  before the price feed has answered. */
-const mockUsdPerSat: { current: string | null } = { current: "0.00100000" }
+/**
+ * The backend that mints the instance, which is what the screen has instead of a form
+ * url: the figures are computed and locked on its side, so the app hands it the amount
+ * and opens whatever it answers with.
+ */
+const mockMintOrigin = "http://mint.example.test"
+const mockMintSigningInstance = jest.fn()
 
-/** Partial: the module also exports SATS_PER_BTC, which the terms are quoted with. */
-jest.mock("@app/hooks/use-price-conversion", () => ({
-  ...jest.requireActual("@app/hooks/use-price-conversion"),
-  usePriceConversion: () => ({ usdPerSat: mockUsdPerSat.current }),
+/** Both are reached through a wrapper rather than handed over directly: the factory is
+ *  hoisted above the declarations above, so naming them here would read them before
+ *  they exist. */
+jest.mock("@app/screens/card-screen/onboarding/investment-flow/esign-mint", () => ({
+  resolveMintOrigin: (configured: string) => configured || mockMintOrigin,
+  mintSigningInstance: (...args: unknown[]) => mockMintSigningInstance(...args),
 }))
 
 /** Read through a getter so a test can arrive on the route with a different choice. */
@@ -43,28 +51,6 @@ jest.mock("@react-navigation/native", () => {
       goBack: mockGoBack,
     }),
     useRoute: () => ({ params: mockRouteParams.current }),
-  }
-})
-
-jest.mock("@app/config", () => {
-  const actual = jest.requireActual("@app/config")
-  return {
-    ...actual,
-    ESIGN_ALLOWED_ORIGIN: "https://apps.example.test",
-  }
-})
-
-/** Read through a getter so a test can render the screen with a different form published. */
-const mockFormUrl = { current: TEST_FORM_URL }
-
-jest.mock("@app/config/feature-flags-context", () => {
-  const actual = jest.requireActual("@app/config/feature-flags-context")
-  return {
-    ...actual,
-    useRemoteConfig: () => ({
-      ...actual.defaultRemoteConfig,
-      cardInvestmentEsignFormUrl: mockFormUrl.current,
-    }),
   }
 })
 
@@ -100,7 +86,7 @@ jest.mock("@blinkbitcoin/esign-react-native/webform", () => {
   const core = jest.requireActual("@blinkbitcoin/esign-core/webform")
 
   return {
-    createPublicUrlSource: core.createPublicUrlSource,
+    createWebFormsSource: core.createWebFormsSource,
     getErrorMessage: core.getErrorMessage,
     useESignature: (options: Record<string, unknown>) => {
       mockESign.options = options
@@ -138,10 +124,6 @@ const renderScreen = async () => {
   return utils
 }
 
-/** DocuSign reads prefilled values off the fragment, not the query string. */
-const prefillOf = (url: string): URLSearchParams =>
-  new URLSearchParams(new URL(url).hash.slice(1))
-
 const startedSession = async (): Promise<{ url: string; allowedOrigin?: string }> => {
   const source = mockESign.options?.source as {
     start: () => Promise<{ url: string; allowedOrigin?: string }>
@@ -160,9 +142,11 @@ describe("SignInvestScreen", () => {
     mockESign.isCheckingConnection = false
     mockESign.webViewProps = null
     mockESign.signSource = null
-    mockFormUrl.current = TEST_FORM_URL
     mockRouteParams.current = { selectedAmountUsd: SELECTED_AMOUNT_USD }
-    mockUsdPerSat.current = "0.00100000"
+    mockMintSigningInstance.mockResolvedValue({
+      url: TEST_INSTANCE_URL,
+      envelopeId: "instance-1",
+    })
   })
 
   it("renders without crashing", async () => {
@@ -189,83 +173,6 @@ describe("SignInvestScreen", () => {
     expect(mockESign.sign).not.toHaveBeenCalled()
   })
 
-  /**
-   * The form keeps the figures it opened with, so opening before the feed answers signs
-   * an agreement with no rate, no settlement and no stamp. Seen on device: the three
-   * fields arrived blank.
-   */
-  it("waits for the price before opening the form", async () => {
-    mockUsdPerSat.current = null
-
-    await renderScreen()
-
-    expect(mockESign.sign).not.toHaveBeenCalled()
-  })
-
-  it("opens the form as soon as the price answers", async () => {
-    mockUsdPerSat.current = null
-
-    const { rerender } = await renderScreen()
-
-    mockUsdPerSat.current = "0.00100000"
-
-    await act(async () => {
-      rerender(
-        <ContextForScreen>
-          <SignInvestScreen />
-        </ContextForScreen>,
-      )
-    })
-
-    expect(mockESign.sign).toHaveBeenCalledTimes(1)
-    expect(prefillOf((await startedSession()).url).get("btc_usd_rate")).toBe("100000")
-  })
-
-  /** A feed that never answers must not strand the step: the three BTC figures are
-   *  optional by design, so the agreement is still signable without them. */
-  it("opens the form without the price once the wait runs out", async () => {
-    jest.useFakeTimers()
-    mockUsdPerSat.current = null
-
-    try {
-      await renderScreen()
-
-      expect(mockESign.sign).not.toHaveBeenCalled()
-
-      await act(async () => {
-        jest.advanceTimersByTime(5000)
-      })
-
-      expect(mockESign.sign).toHaveBeenCalledTimes(1)
-      expect(prefillOf((await startedSession()).url).get("btc_usd_rate")).toBeNull()
-    } finally {
-      jest.useRealTimers()
-    }
-  })
-
-  /**
-   * The first call spends a moment checking connectivity, and a price arriving in that
-   * window rebuilds the source. Without a guard the effect fires again on the rebuilt
-   * source and two sessions start, the second landing on top of the first.
-   */
-  it("starts one session even when the price arrives mid-start", async () => {
-    mockUsdPerSat.current = null
-
-    const { rerender } = await renderScreen()
-
-    mockUsdPerSat.current = "0.00100000"
-
-    await act(async () => {
-      rerender(
-        <ContextForScreen>
-          <SignInvestScreen />
-        </ContextForScreen>,
-      )
-    })
-
-    expect(mockESign.sign).toHaveBeenCalledTimes(1)
-  })
-
   /** Leaving idle clears the guard, so the retry the failure screen offers is not a
    *  button that starts nothing. */
   it("starts again when a retry brings it back to idle", async () => {
@@ -290,108 +197,61 @@ describe("SignInvestScreen", () => {
     expect(mockESign.sign).toHaveBeenCalledTimes(1)
   })
 
-  it("builds the source from the remote-config form url and the allowed origin", async () => {
-    await renderScreen()
-
-    const session = await startedSession()
-
-    expect(session.url.startsWith(TEST_FORM_URL)).toBe(true)
-    expect(session.allowedOrigin).toBe(TEST_ALLOWED_ORIGIN)
-  })
-
   /**
-   * The user already chose the amount two screens back, so the form must not ask again:
-   * a different answer there would put an investment they never picked into a signed
-   * agreement.
+   * The user already chose the amount two screens back, so the mint must be told which
+   * one: the figures the agreement locks are computed from it, and asking the form again
+   * would let a signed document state an investment nobody picked.
    */
-  it("prefills the agreement's figures from the amount the user chose", async () => {
+  it("mints the instance for the amount the user chose", async () => {
     await renderScreen()
+    await startedSession()
 
-    const prefill = prefillOf((await startedSession()).url)
-
-    expect(prefill.get("total_subscription_usd")).toBe("25000")
-    expect(prefill.get("number_of_units")).toBe("25000")
-    expect(prefill.get("price_per_unit_usd")).toBe("1")
-    expect(prefill.get("pre_money_valuation_usd")).toBe("10000000")
-  })
-
-  /** The agreement is written from the figure the investor picked, so a form that always
-   *  carried the same one would document an investment nobody chose. */
-  it("carries a different choice through to the form", async () => {
-    mockRouteParams.current = { selectedAmountUsd: 1000 }
-
-    await renderScreen()
-
-    const prefill = prefillOf((await startedSession()).url)
-
-    expect(prefill.get("total_subscription_usd")).toBe("1000")
-    expect(prefill.get("number_of_units")).toBe("1000")
-  })
-
-  /** The agreement fixes the rate its payment is owed at, so the app quotes it rather than
-   *  asking an investor who has no way to know it. */
-  it("prefills the settlement figures from the app's own price", async () => {
-    await renderScreen()
-
-    const prefill = prefillOf((await startedSession()).url)
-
-    expect(prefill.get("btc_usd_rate")).toBe("100000")
-    expect(prefill.get("settlement_amount_btc")).toBe("0.25")
-    expect(prefill.get("rate_timestamp")).toMatch(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/)
-  })
-
-  /**
-   * The price feed polls. Following it would rewrite the url on every tick and restart the
-   * signing session, possibly mid-signature, and the agreement fixes ONE rate at one
-   * stamped moment anyway, so the first quote is the one that holds.
-   */
-  it("holds the first rate it quoted when the price moves", async () => {
-    const { rerender } = await renderScreen()
-
-    const firstSource = mockESign.options?.source
-    const firstPrefill = prefillOf((await startedSession()).url)
-
-    mockUsdPerSat.current = "0.00200000"
-
-    await act(async () => {
-      rerender(
-        <ContextForScreen>
-          <SignInvestScreen />
-        </ContextForScreen>,
-      )
-    })
-
-    expect(mockESign.options?.source).toBe(firstSource)
-    expect(prefillOf((await startedSession()).url).get("btc_usd_rate")).toBe(
-      firstPrefill.get("btc_usd_rate"),
+    expect(mockMintSigningInstance).toHaveBeenCalledWith(
+      mockMintOrigin,
+      SELECTED_AMOUNT_USD,
     )
   })
 
-  /** An invented rate would be worse than none, so before the feed answers those three
-   *  figures are simply absent and the rest still travels. */
-  it("omits the settlement figures until the price feed answers", async () => {
-    mockUsdPerSat.current = null
+  /** The agreement is written from the figure the investor picked, so a mint that always
+   *  asked for the same one would document an investment nobody chose. */
+  it("carries a different choice through to the mint", async () => {
+    mockRouteParams.current = { selectedAmountUsd: 1000 }
 
     await renderScreen()
+    await startedSession()
 
-    const prefill = prefillOf((await startedSession()).url)
-
-    expect(prefill.get("btc_usd_rate")).toBeNull()
-    expect(prefill.get("settlement_amount_btc")).toBeNull()
-    expect(prefill.get("rate_timestamp")).toBeNull()
-    expect(prefill.get("total_subscription_usd")).toBe("25000")
+    expect(mockMintSigningInstance).toHaveBeenCalledWith(mockMintOrigin, 1000)
   })
 
-  /** Who the subscriber is stays theirs to answer: the app knows the money, not the
-   *  person, and personal data has no business riding in a URL. */
-  it("leaves the subscriber's own details out of the url", async () => {
+  /**
+   * Where to call and how much: that is the whole request. Who the subscriber is stays
+   * theirs to answer, and the rate, the settlement and the stamp are the server's to
+   * decide - the app sending its own copy is what would let the signed document and the
+   * term sheet disagree.
+   */
+  it("sends the amount and nothing about the signer", async () => {
+    await renderScreen()
+    await startedSession()
+
+    expect(mockMintSigningInstance).toHaveBeenCalledTimes(1)
+    expect(mockMintSigningInstance.mock.calls[0]).toEqual([
+      mockMintOrigin,
+      SELECTED_AMOUNT_USD,
+    ])
+  })
+
+  it("opens the form the mint answered with", async () => {
     await renderScreen()
 
-    const prefill = prefillOf((await startedSession()).url)
+    expect((await startedSession()).url).toBe(TEST_INSTANCE_URL)
+  })
 
-    expect(prefill.get("full_legal_name")).toBeNull()
-    expect(prefill.get("country_of_residence")).toBeNull()
-    expect(prefill.get("email")).toBeNull()
+  /** The page that posts the signing outcome back is the bridge the mint serves, not
+   *  DocuSign's own host, so that is the origin the session expects it from. */
+  it("expects the signing events from the mint's own origin", async () => {
+    await renderScreen()
+
+    expect((await startedSession()).allowedOrigin).toBe(mockMintOrigin)
   })
 
   it("keeps the same source across re-renders so the session is not restarted", async () => {
@@ -410,11 +270,11 @@ describe("SignInvestScreen", () => {
     expect(mockESign.options?.source).toBe(firstSource)
   })
 
-  it("rebuilds the source when a different form is published", async () => {
+  it("rebuilds the source when the chosen amount changes", async () => {
     const { rerender } = await renderScreen()
 
     const firstSource = mockESign.options?.source
-    mockFormUrl.current = "https://forms.example.test/second-agreement"
+    mockRouteParams.current = { selectedAmountUsd: 1000 }
 
     await act(async () => {
       rerender(
@@ -425,17 +285,12 @@ describe("SignInvestScreen", () => {
     })
 
     expect(mockESign.options?.source).not.toBe(firstSource)
-    expect(
-      (await startedSession()).url.startsWith(
-        "https://forms.example.test/second-agreement",
-      ),
-    ).toBe(true)
   })
 
   describe("what the signer sees", () => {
     it("shows the form itself once the session is under way", async () => {
       mockESign.status = "signing"
-      mockESign.webViewProps = { source: { uri: TEST_FORM_URL } }
+      mockESign.webViewProps = { source: { uri: TEST_INSTANCE_URL } }
 
       const { getByTestId } = await renderScreen()
 
