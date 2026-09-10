@@ -8,7 +8,7 @@ interface SourceCodeTurboModule {
 
 // this is used for local development
 // will typically return localhost
-const scriptHostname = (): string => {
+export const scriptHostname = (): string => {
   const turboModule =
     TurboModuleRegistry.getEnforcing<SourceCodeTurboModule>("SourceCode")
   const turboScriptURL = turboModule?.getConstants?.()?.scriptURL
@@ -52,6 +52,7 @@ export type CustomInstance = {
   blockExplorer: string
   sparkExplorer: string
   fiatUrl: string
+  esignMintUrl: string
 }
 
 export type GaloyInstanceInput = StandardInstance | CustomInstance
@@ -68,6 +69,15 @@ export type GaloyInstance = {
   blockExplorer: string
   sparkExplorer: string
   fiatUrl: string
+  /**
+   * Where the backend that mints the investment agreement's signing form answers.
+   *
+   * THE URL GOES HERE, one per environment, once that backend is deployed. It is empty
+   * on every instance until then, because who runs it has not been decided: the figures
+   * the agreement locks are computed on its side, so the signing step has nothing to
+   * open while this is unset.
+   */
+  esignMintUrl: string
 }
 
 export const resolveGaloyInstanceOrDefault = (
@@ -117,6 +127,7 @@ export const GALOY_INSTANCES: readonly GaloyInstance[] = [
     blockExplorer: "https://mempool.space/tx/",
     sparkExplorer: SPARK_EXPLORER_TX_URL,
     fiatUrl: "https://fiat.blink.sv",
+    esignMintUrl: "",
   },
   {
     id: "Staging",
@@ -130,6 +141,7 @@ export const GALOY_INSTANCES: readonly GaloyInstance[] = [
     blockExplorer: "https://mempool.space/signet/tx/",
     sparkExplorer: SPARK_EXPLORER_TX_URL,
     fiatUrl: "https://fiat.staging.blink.sv",
+    esignMintUrl: "",
   },
   {
     id: "Local",
@@ -143,5 +155,6 @@ export const GALOY_INSTANCES: readonly GaloyInstance[] = [
     blockExplorer: "https://mempool.space/signet/tx/",
     sparkExplorer: SPARK_EXPLORER_TX_URL,
     fiatUrl: `http://${scriptHostname()}:3000`,
+    esignMintUrl: "",
   },
 ] as const
