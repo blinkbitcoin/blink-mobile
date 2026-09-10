@@ -7785,7 +7785,7 @@ type RootTranslation = {
 		 */
 		type: string
 		/**
-		 * T​r​a​n​s​a​c​t​i​o​n​ ​p​r​i​o​r​i​t​y
+		 * C​o​n​f​i​r​m​a​t​i​o​n​ ​s​p​e​e​d
 		 */
 		feeTier: string
 		/**
@@ -13466,21 +13466,6 @@ type RootTranslation = {
 		 * N​e​t​w​o​r​k​ ​f​e​e
 		 */
 		feeRate: string
-		/**
-		 * F​a​s​t​e​s​t​ ​(​~​{​s​a​t​s​}​ ​s​a​t​s​)​ ​~​1​0​ ​m​i​n
-		 * @param {unknown} sats
-		 */
-		feeRateFastest: RequiredParams<'sats'>
-		/**
-		 * N​o​r​m​a​l​ ​(​~​{​s​a​t​s​}​ ​s​a​t​s​)​ ​~​3​0​ ​m​i​n
-		 * @param {unknown} sats
-		 */
-		feeRateHalfHour: RequiredParams<'sats'>
-		/**
-		 * E​c​o​n​o​m​y​ ​(​~​{​s​a​t​s​}​ ​s​a​t​s​)​ ​~​6​0​ ​m​i​n
-		 * @param {unknown} sats
-		 */
-		feeRateHour: RequiredParams<'sats'>
 		/**
 		 * {​r​a​t​e​}​ ​s​a​t​/​v​B
 		 * @param {unknown} rate
@@ -21404,7 +21389,7 @@ export type TranslationFunctions = {
 		 */
 		type: () => LocalizedString
 		/**
-		 * Transaction priority
+		 * Confirmation speed
 		 */
 		feeTier: () => LocalizedString
 		/**
@@ -26978,18 +26963,6 @@ export type TranslationFunctions = {
 		 * Network fee
 		 */
 		feeRate: () => LocalizedString
-		/**
-		 * Fastest (~{sats} sats) ~10 min
-		 */
-		feeRateFastest: (arg: { sats: unknown }) => LocalizedString
-		/**
-		 * Normal (~{sats} sats) ~30 min
-		 */
-		feeRateHalfHour: (arg: { sats: unknown }) => LocalizedString
-		/**
-		 * Economy (~{sats} sats) ~60 min
-		 */
-		feeRateHour: (arg: { sats: unknown }) => LocalizedString
 		/**
 		 * {rate} sat/vB
 		 */
