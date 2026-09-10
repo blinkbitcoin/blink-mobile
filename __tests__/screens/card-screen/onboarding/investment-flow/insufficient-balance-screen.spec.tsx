@@ -44,6 +44,13 @@ const mockFunding = {
   },
 }
 
+const mockArmInvestmentConversion = jest.fn()
+
+jest.mock("@app/screens/conversion-flow/drain-conversion", () => ({
+  ...jest.requireActual("@app/screens/conversion-flow/drain-conversion"),
+  armInvestmentConversion: (...args: unknown[]) => mockArmInvestmentConversion(...args),
+}))
+
 jest.mock(
   "@app/screens/card-screen/onboarding/investment-flow/use-investment-funding",
   () => ({
@@ -169,6 +176,18 @@ describe("InsufficientBalanceScreen", () => {
       })
 
       expect(mockNavigate).toHaveBeenCalledWith("conversionDetails")
+    })
+
+    /** Without the arm the conversion ends on Home, and the investor has to walk the
+     *  flow again from the start, signature included. */
+    it("arms the return so the conversion comes back to this investment", async () => {
+      const { getByText } = await renderScreen()
+
+      await act(async () => {
+        fireEvent.press(getByText("Convert"))
+      })
+
+      expect(mockArmInvestmentConversion).toHaveBeenCalledWith(SELECTED_AMOUNT_USD)
     })
   })
 
