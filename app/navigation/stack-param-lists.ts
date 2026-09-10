@@ -269,8 +269,13 @@ export type RootStackParamList = {
   cardOnboardingWelcomeInvestScreen: undefined
   cardOnboardingSelectInvestScreen: undefined
   cardOnboardingTermSheetScreen: { selectedAmountUsd: number }
-  cardOnboardingTransferInvestScreen: { selectedAmountUsd: number }
-  cardOnboardingInsufficientBalanceScreen: undefined
+  cardOnboardingTransferInvestScreen: {
+    selectedAmountUsd: number
+    /** The satoshis the signed agreement names, carried from the signing step. It is what
+     *  the investor owes: the rate was fixed when they signed. */
+    settlementSats?: number
+  }
+  cardOnboardingInsufficientBalanceScreen: { selectedAmountUsd: number }
   cardOnboardingDepositPendingScreen: undefined
   cardOnboardingCompanyValuationScreen: undefined
   cardOnboardingPersonalInfoScreen: undefined
