@@ -6,7 +6,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import {
-  createPublicUrlSource,
+  createWebFormsSource,
   getErrorMessage,
   useESignature,
 } from "@blinkbitcoin/esign-react-native/webform"
@@ -14,36 +14,19 @@ import {
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { CloseHeader } from "@app/components/close-header"
 import { Screen } from "@app/components/screen"
-import { ESIGN_ALLOWED_ORIGIN } from "@app/config"
-import { useRemoteConfig } from "@app/config/feature-flags-context"
-import { usePriceConversion } from "@app/hooks/use-price-conversion"
+import { useAppConfig } from "@app/hooks/use-app-config"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { logError } from "@app/utils/log-error"
 
-import { buildESignFormUrl } from "./esign-form-url"
-import {
-  resolveInvestmentTerms,
-  resolveSettlementQuote,
-  type SettlementQuote,
-} from "./investment-terms"
+import { mintSigningInstance, resolveMintOrigin } from "./esign-mint"
+import { resolveInvestmentTerms } from "./investment-terms"
 
 type SignInvestRoute = RouteProp<RootStackParamList, "cardOnboardingSignInvestScreen">
 
 /** Offline is a status of its own, not an error, so it carries no code. This is the one
  *  the library words as a lost connection, which is what the signer is looking at. */
 const OFFLINE_MESSAGE_CODE = "NETWORK_ERROR"
-
-/**
- * How long the step waits on the price before opening the form without it.
- *
- * The form is opened with the figures as they stand at that moment and keeps them for the
- * rest of the session, so opening before the feed answers signs an agreement with no rate,
- * no settlement and no stamp. Long enough for a feed that is merely slow; short enough
- * that one which never answers does not strand the step, which the three figures being
- * optional is what allows.
- */
-const PRICE_GRACE_MS = 5000
 
 /**
  * The signing step between the Term Sheet and the transfer: the subscription
@@ -56,9 +39,10 @@ const PRICE_GRACE_MS = 5000
  * to sign on the Term Sheet, so a second "Sign Document" gate asks the same question
  * twice. The session starts as the screen opens and the form is what the signer sees.
  *
- * Needs cardInvestmentEsignFormUrl set in remote config: with no form to embed the
- * session cannot start and the step has no way forward, so the flow must not ship
- * without it.
+ * The form is minted by the backend rather than opened from a published url, which is
+ * what lets the agreement's figures arrive locked: values prefilled through a url cannot
+ * be made read only, so the signer could otherwise edit what they are agreeing to. The
+ * step has no way forward while that mint is unreachable.
  */
 export const SignInvestScreen: React.FC = () => {
   const styles = useStyles()
@@ -66,8 +50,9 @@ export const SignInvestScreen: React.FC = () => {
     theme: { colors },
   } = useTheme()
   const { LL } = useI18nContext()
-  const { cardInvestmentEsignFormUrl } = useRemoteConfig()
-  const { usdPerSat } = usePriceConversion()
+  const {
+    appConfig: { galoyInstance },
+  } = useAppConfig()
   const { selectedAmountUsd } = useRoute<SignInvestRoute>().params
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
@@ -92,34 +77,30 @@ export const SignInvestScreen: React.FC = () => {
     [],
   )
 
+  /** The instance's own backend, which also serves the page that posts the outcome back,
+   *  so it is both what mints the form and the origin those events are expected from. */
+  const mintOrigin = resolveMintOrigin(galoyInstance.esignMintUrl)
+
   /**
-   * Taken once, from the first price that answers, and then held for the rest of the visit.
+   * Rebuilt only when the chosen amount changes: a new source on every render would
+   * restart the signing session, possibly mid-signature.
    *
-   * The price feed polls, and following it would rewrite the form's url on every tick,
-   * restarting the signing session, possibly mid-signature. It would also be wrong on its
-   * own terms: the agreement fixes one rate, at one stamped moment, and owes the payment
-   * against that.
+   * The units are all the server is told, and the rest of the agreement's figures come
+   * back from it: the rate, what it settles to, and the moment it was quoted are the
+   * mint's to decide, so the document cannot say one thing while the app believes
+   * another.
    */
-  const [settlement, setSettlement] = React.useState<SettlementQuote | null>(null)
-  React.useEffect(() => {
-    if (settlement) return
-
-    const quote = resolveSettlementQuote(usdPerSat, new Date())
-    if (quote) setSettlement(quote)
-  }, [usdPerSat, settlement])
-
-  /** Rebuilt only when the form, the amount or the rate changes: a new source on every
-   *  render would restart the signing session. */
   const source = React.useMemo(
     () =>
-      createPublicUrlSource({
-        url: buildESignFormUrl(
-          cardInvestmentEsignFormUrl,
-          resolveInvestmentTerms(selectedAmountUsd, settlement),
-        ),
-        allowedOrigin: ESIGN_ALLOWED_ORIGIN,
+      createWebFormsSource({
+        allowedOrigin: mintOrigin,
+        createInstance: () =>
+          mintSigningInstance(
+            mintOrigin,
+            resolveInvestmentTerms(selectedAmountUsd).units,
+          ),
       }),
-    [cardInvestmentEsignFormUrl, selectedAmountUsd, settlement],
+    [selectedAmountUsd, mintOrigin],
   )
 
   const {
@@ -139,24 +120,14 @@ export const SignInvestScreen: React.FC = () => {
     onError: reportSigningError,
   })
 
-  const [hasWaitedForPrice, setHasWaitedForPrice] = React.useState(false)
-  React.useEffect(() => {
-    const timer = setTimeout(() => setHasWaitedForPrice(true), PRICE_GRACE_MS)
-
-    return () => clearTimeout(timer)
-  }, [])
-
-  const isPriceSettled = settlement !== null || hasWaitedForPrice
-
   /**
-   * Opens the form once the agreement's figures are settled. Idle is also where a retry
-   * and a recovered connection land, so each of those starts the session again without a
-   * second tap.
+   * Opens the form as the screen does. Idle is also where a retry and a recovered
+   * connection land, so each of those starts the session again without a second tap.
    *
    * Started once per stay in idle, which the flag is for: `sign` is rebuilt whenever the
-   * source is, and the price arriving while the first call is still checking connectivity
-   * would otherwise fire a second session on top of it. Leaving idle clears the flag, so
-   * the retry and the recovered connection still start one.
+   * source is, and starting twice would open a second session on top of the first.
+   * Leaving idle clears the flag, so the retry and the recovered connection still start
+   * one.
    */
   const hasStartedFromIdle = React.useRef(false)
   React.useEffect(() => {
@@ -165,11 +136,11 @@ export const SignInvestScreen: React.FC = () => {
       return
     }
 
-    if (!isPriceSettled || hasStartedFromIdle.current) return
+    if (hasStartedFromIdle.current) return
 
     hasStartedFromIdle.current = true
     sign()
-  }, [status, sign, isPriceSettled])
+  }, [status, sign])
 
   /** An expired session keeps its envelope, so it is restarted rather than retried: a
    *  retry would drop what the signer already filled in. */
