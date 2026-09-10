@@ -3,8 +3,6 @@ import {
   PaymentType as SdkPaymentType,
 } from "@breeztech/breez-sdk-spark-react-native"
 
-import { ConvertDirection } from "@app/types/payment"
-
 import { RailType, TelemetryConversionDirection, TelemetryDirection } from "./contract"
 
 /**
@@ -53,9 +51,20 @@ export const classifyDirection = (
   return null
 }
 
-export const classifyConversionDirection = (
-  direction: ConvertDirection,
-): TelemetryConversionDirection =>
-  direction === ConvertDirection.BtcToUsd
+/**
+ * Which way a swap went, from the two ends of the conversion rather than from what the
+ * caller asked for. A request is an intention; the settled record is what happened.
+ *
+ * `null` where both ends are the same kind of asset — a bitcoin-to-bitcoin or
+ * token-to-token movement is not a dollar swap, and guessing a direction for it would put
+ * a real count in the wrong bucket (FR-19).
+ */
+export const classifyConversionDirection = (sides: {
+  fromIsBitcoin: boolean
+  toIsBitcoin: boolean
+}): TelemetryConversionDirection | null => {
+  if (sides.fromIsBitcoin === sides.toIsBitcoin) return null
+  return sides.fromIsBitcoin
     ? TelemetryConversionDirection.BtcToUsd
     : TelemetryConversionDirection.UsdToBtc
+}

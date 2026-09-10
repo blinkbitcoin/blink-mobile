@@ -1,4 +1,9 @@
-import { PaymentStatus, type Payment } from "@breeztech/breez-sdk-spark-react-native"
+import {
+  ConversionStatus,
+  PaymentStatus,
+  type ConversionDetails,
+  type Payment,
+} from "@breeztech/breez-sdk-spark-react-native"
 
 import {
   captureTelemetryFact,
@@ -10,7 +15,6 @@ import {
   TelemetryEvent,
   WalletProvider,
 } from "@app/telemetry"
-import { ConvertDirection } from "@app/types/payment"
 
 /**
  * Producer scope: where the SDK's settlement record is projected onto the narrow
@@ -43,7 +47,63 @@ const safely = (what: string, run: () => void): void => {
 }
 
 /**
- * A settled self-custodial payment, in either direction (FR-10).
+ * `ConversionAsset.identifier` is documented as `None` for BTC/sats and a token identifier
+ * or contract address for everything else, so its absence is what marks the bitcoin end of
+ * a swap. Reading the ticker instead would tie the classification to a string the SDK is
+ * free to spell differently per chain.
+ */
+const isBitcoinSide = (asset: { identifier: string | undefined }): boolean =>
+  asset.identifier === undefined
+
+/**
+ * The overall direction of a swap, taken from the first leg's source and the last leg's
+ * destination. The SDK models a conversion as an ordered list — `[AMM, cross-chain]` for
+ * sends, the reverse for receives — so the ends of the list are the ends of the swap, and
+ * any intermediate asset is routing rather than intent.
+ */
+const conversionSidesOf = (
+  details: ConversionDetails,
+): { fromIsBitcoin: boolean; toIsBitcoin: boolean } | null => {
+  const legs = details.conversions
+  if (!legs?.length) return null
+
+  return {
+    fromIsBitcoin: isBitcoinSide(legs[0].from.asset),
+    toIsBitcoin: isBitcoinSide(legs[legs.length - 1].to.asset),
+  }
+}
+
+/**
+ * A completed dollar↔bitcoin swap (FR-12). Carries the direction and no amount: swap volume
+ * is gated on OD-2, which is a policy decision rather than an engineering task (FR-15).
+ *
+ * Gated on the *conversion's* status, not the payment's. A conversion's send leg can
+ * succeed while the swap as a whole is still in flight, and counting that as a settled swap
+ * is the overcount this event exists to avoid.
+ */
+const logConversionSettled = (payment: Payment, details: ConversionDetails): void => {
+  if (details.status !== ConversionStatus.Completed) return
+
+  const sides = conversionSidesOf(details)
+  if (!sides) return
+
+  const conversionDirection = classifyConversionDirection(sides)
+  if (!conversionDirection) return
+
+  captureTelemetryFact(
+    {
+      event: TelemetryEvent.ConversionSettled,
+      telemetryEventId: mintTelemetryEventId(),
+      walletProvider: WalletProvider.Spark,
+      conversionDirection,
+    },
+    payment.id ?? null,
+  )
+}
+
+/**
+ * A settled self-custodial payment, in either direction (FR-10), and the settled swaps that
+ * arrive on the same event.
  *
  * Called for **every** SDK-observed settled receive, not only those arriving at the
  * Lightning Address (FR-11): direct Spark transfers and plain BOLT11 invoices are in scope,
@@ -57,11 +117,14 @@ export const logPaymentSettled = (payment: Payment): void =>
     if (payment.status !== PaymentStatus.Completed) return
 
     /**
-     * A conversion's legs settle as ordinary token payments, so without this a swap would be
-     * counted twice — once by `conversion_settled` and again as a payment. The swap event is
-     * the one that describes what the user did.
+     * A conversion's legs settle as ordinary token payments, so counting one here as well
+     * would count a swap twice — once as a swap and again as a payment. The swap event is
+     * the one that describes what the user did, so this record becomes that instead.
      */
-    if (payment.conversionDetails) return
+    if (payment.conversionDetails) {
+      logConversionSettled(payment, payment.conversionDetails)
+      return
+    }
 
     const direction = classifyDirection(payment.paymentType)
     if (!direction) return
@@ -75,26 +138,6 @@ export const logPaymentSettled = (payment: Payment): void =>
         railType: classifyRail(payment.method),
       },
       payment.id ?? null,
-    )
-  })
-
-/**
- * A completed dollar↔bitcoin swap (FR-12). Carries the direction and no amount: swap volume
- * is gated on OD-2, which is a policy decision rather than an engineering task (FR-15).
- */
-export const logConversionSettled = (params: {
-  direction: ConvertDirection
-  sdkPaymentId: string | null
-}): void =>
-  safely("conversion_settled", () => {
-    captureTelemetryFact(
-      {
-        event: TelemetryEvent.ConversionSettled,
-        telemetryEventId: mintTelemetryEventId(),
-        walletProvider: WalletProvider.Spark,
-        conversionDirection: classifyConversionDirection(params.direction),
-      },
-      params.sdkPaymentId,
     )
   })
 

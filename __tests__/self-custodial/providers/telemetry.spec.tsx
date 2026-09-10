@@ -32,6 +32,7 @@ import { AccountMode } from "@app/types/account"
 import { AccountType } from "@app/types/wallet"
 
 const ACCOUNT_ID = "self-custodial-1"
+const OTHER_ACCOUNT_ID = "self-custodial-2"
 
 let mockActiveAccount: { id: string; type: AccountType } | undefined
 let mockSelfCustodialEntries: { id: string }[]
@@ -60,9 +61,10 @@ jest.mock("@app/self-custodial/hooks/use-spark-network", () => ({
 const mockFs = RNFS as unknown as { __resetMockFileSystem: () => void }
 
 const DIR = telemetryOutboxDirFor(ACCOUNT_ID, "regtest" as unknown as Network)
+const OTHER_DIR = telemetryOutboxDirFor(OTHER_ACCOUNT_ID, "regtest" as unknown as Network)
 
-const queuedRecord = () => ({
-  telemetryEventId: "3f2a1b4c-5d6e-4f70-8192-a3b4c5d6e7f8",
+const queuedRecord = (id = "3f2a1b4c-5d6e-4f70-8192-a3b4c5d6e7f8") => ({
+  telemetryEventId: id,
   event: TelemetryEvent.PaymentSettled,
   payload: {
     /* eslint-disable camelcase */
@@ -70,10 +72,10 @@ const queuedRecord = () => ({
     wallet_provider: WalletProvider.Spark,
     direction: TelemetryDirection.Send,
     rail_type: RailType.Lightning,
-    telemetry_event_id: "3f2a1b4c-5d6e-4f70-8192-a3b4c5d6e7f8",
+    telemetry_event_id: id,
     /* eslint-enable camelcase */
   },
-  sdkPaymentId: "sdk-1",
+  sdkPaymentId: `sdk-${id}`,
   queuedAt: Date.now(),
   state: OutboxState.Queued,
 })
@@ -139,6 +141,56 @@ describe("SelfCustodialTelemetryMount", () => {
     render(<SelfCustodialTelemetryMount />)
 
     await waitFor(() => expect(submit).toHaveBeenCalledTimes(1))
+  })
+
+  it("touches only the active account's queue when two accounts hold records", async () => {
+    // Mode is stored per account, so activating an incognito one must not reach across to
+    // an Enhanced account's queue — and draining the Enhanced one must not flush the other.
+    await createOutboxStore(DIR).enqueue(
+      queuedRecord("3f2a1b4c-5d6e-4f70-8192-a3b4c5d6e701"),
+    )
+    await createOutboxStore(OTHER_DIR).enqueue(
+      queuedRecord("3f2a1b4c-5d6e-4f70-8192-a3b4c5d6e702"),
+    )
+
+    mockActiveAccount = { id: OTHER_ACCOUNT_ID, type: AccountType.SelfCustodial }
+    mockSelfCustodialEntries = [{ id: ACCOUNT_ID }, { id: OTHER_ACCOUNT_ID }]
+    mockAccountMode = AccountMode.Anon
+
+    render(<SelfCustodialTelemetryMount />)
+
+    await waitFor(async () =>
+      expect(await createOutboxStore(OTHER_DIR).pending()).toEqual([]),
+    )
+    // The account that was never activated keeps its queue: its own mode has not changed.
+    expect(await createOutboxStore(DIR).pending()).toHaveLength(1)
+  })
+
+  it("keeps draining on a cadence, not only once on mount", async () => {
+    jest.useFakeTimers()
+    try {
+      const submit = jest.fn<Promise<TransportResult>, unknown[]>(() =>
+        Promise.resolve({ outcome: "acknowledged" }),
+      )
+      registerTelemetryTransport({
+        name: "test",
+        attachesPerEventIdentity: false,
+        submit,
+      })
+
+      render(<SelfCustodialTelemetryMount />)
+      await jest.advanceTimersByTimeAsync(0)
+      const onMount = submit.mock.calls.length
+
+      await createOutboxStore(DIR).enqueue(
+        queuedRecord("3f2a1b4c-5d6e-4f70-8192-a3b4c5d6e703"),
+      )
+      await jest.advanceTimersByTimeAsync(5 * 60 * 1000)
+
+      expect(submit.mock.calls.length).toBeGreaterThan(onMount)
+    } finally {
+      jest.useRealTimers()
+    }
   })
 
   it("leaves the mode Unresolved while no self-custodial account is active", async () => {

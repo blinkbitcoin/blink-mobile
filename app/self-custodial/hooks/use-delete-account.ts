@@ -6,7 +6,7 @@ import RNFS from "react-native-fs"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useHasCustodialAccount } from "@app/hooks/use-has-custodial-account"
 import { disconnectSdk } from "@app/self-custodial/bridge"
-import { storageDirFor } from "@app/self-custodial/config"
+import { storageDirFor, telemetryOutboxDirFor } from "@app/self-custodial/config"
 import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
 import { removeBackupStateFor } from "@app/self-custodial/providers/backup-state"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
@@ -83,6 +83,15 @@ export const useDeleteAccount = (): DeleteAccountResult => {
         await KeyStoreWrapper.deleteMnemonicForAccount(accountId)
         await RNFS.unlink(storageDirFor(accountId, network)).catch((err) => {
           crashlytics().log(`[self-custodial delete] storage dir unlink failed: ${err}`)
+        })
+        /**
+         * The telemetry outbox is a sibling of the wallet store, so it belongs to the same
+         * pairing: without this its queued records outlive the account that produced them.
+         * Nothing would ever sweep them either — the 72h TTL only runs while a store for
+         * that account is mounted, and a deleted account never mounts one again.
+         */
+        await RNFS.unlink(telemetryOutboxDirFor(accountId, network)).catch((err) => {
+          crashlytics().log(`[self-custodial delete] outbox dir unlink failed: ${err}`)
         })
         await removeSelfCustodialAccountId(accountId)
         await removeBackupStateFor(accountId)

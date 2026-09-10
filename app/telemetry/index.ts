@@ -1,10 +1,15 @@
 /* eslint-disable camelcase */
 import { EVENT_VERSION, TelemetryEvent, type TelemetryPayload } from "./contract"
-import { countUnroutedEvent, reportBoundaryFault } from "./diagnostics"
+import {
+  countUnroutedEvent,
+  getDiagnosticCounters,
+  logDiagnosticBreadcrumb,
+  reportBoundaryFault,
+} from "./diagnostics"
 import type { TelemetryFact } from "./fact"
 import { isEventPermitted } from "./mode"
-import { drainOutbox, type OutboxStore } from "./outbox"
-import { applyPrivacyPolicy } from "./policy"
+import { drainOutbox, getOutboxCounters, type OutboxStore } from "./outbox"
+import { applyPrivacyPolicy, getDroppedEventCounts } from "./policy"
 
 /**
  * The measurement boundary's only public surface (FR-1, NFR-P5).
@@ -92,9 +97,47 @@ export const captureTelemetryFact = (
   }
 }
 
+/**
+ * Everything the pipeline knows about its own losses, in one object (FR-68, CM-5).
+ *
+ * Eviction and expiry are the device-side share of FR-29's 2% budget; policy drops and
+ * unrouted events are defects rather than budgeted loss and should read zero. The numbers
+ * are held in module scope and would otherwise die with the process, which is what
+ * `reportTelemetryHealth` exists to prevent.
+ */
+export const getTelemetryHealth = (): Readonly<Record<string, number>> => ({
+  ...getDiagnosticCounters(),
+  ...getOutboxCounters(),
+  ...Object.fromEntries(
+    Object.entries(getDroppedEventCounts()).map(([key, count]) => [
+      `dropped_${key}`,
+      count,
+    ]),
+  ),
+})
+
+let lastReportedHealth = ""
+
+/** Only when something moved: an unchanged snapshot every drain would bury the one that
+ *  matters. Silent on a device required to emit zero, like every other diagnostic. */
+const reportTelemetryHealth = (): void => {
+  const snapshot = JSON.stringify(getTelemetryHealth())
+  if (snapshot === lastReportedHealth) return
+  /** Only a breadcrumb that actually left the device counts as reported. A suppressed one
+   *  recorded here would consume the slot and swallow the first report a device makes
+   *  after its mode becomes one that may report at all. */
+  if (logDiagnosticBreadcrumb(`[telemetry] ${snapshot}`)) lastReportedHealth = snapshot
+}
+
+export const resetTelemetryHealthReportingForTesting = (): void => {
+  lastReportedHealth = ""
+}
+
 /** Drains whichever store is mounted. Safe to call on any trigger; it is a no-op unless the
  *  mode permits draining and a transport is registered. */
 export const drainActiveOutbox = async (): Promise<void> => {
+  reportTelemetryHealth()
+
   const store = activeOutbox
   if (!store) return
   try {

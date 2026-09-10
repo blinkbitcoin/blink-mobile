@@ -4,20 +4,18 @@
 import { it } from "@jest/globals"
 
 import {
+  ConversionStatus,
   PaymentMethod,
   PaymentStatus,
   PaymentType as SdkPaymentType,
+  type ConversionDetails,
   type Payment,
 } from "@breeztech/breez-sdk-spark-react-native"
 import analytics from "@react-native-firebase/analytics"
 import RNFS from "react-native-fs"
 import Crypto from "react-native-quick-crypto"
 
-import {
-  logConversionSettled,
-  logPaymentSettled,
-  logReferralCompleted,
-} from "@app/self-custodial/measurement"
+import { logPaymentSettled, logReferralCompleted } from "@app/self-custodial/measurement"
 import { RailType, TelemetryDirection } from "@app/telemetry/contract"
 import {
   getDiagnosticCounters,
@@ -41,7 +39,6 @@ import {
   resetTelemetryTransportForTesting,
   type TransportResult,
 } from "@app/telemetry/transport"
-import { ConvertDirection } from "@app/types/payment"
 
 const setCollectionEnabled = analytics().setAnalyticsCollectionEnabled as jest.Mock
 const setUserId = analytics().setUserId as jest.Mock
@@ -71,6 +68,35 @@ const payment = (overrides: Partial<Payment> = {}): Payment =>
   }) as Payment
 
 const queued = (store: ReturnType<typeof createOutboxStore>) => store.pending()
+
+const side = (asset: "btc" | "usdb") => ({
+  chain: 0,
+  /** `identifier` is `None` for BTC/sats and a token identifier otherwise — the SDK's own
+   *  marker for which end of a swap is bitcoin. */
+  asset: {
+    ticker: asset.toUpperCase(),
+    identifier: asset === "btc" ? undefined : "usdb-id",
+    decimals: asset === "btc" ? 0 : 6,
+  },
+  amount: 1n,
+  fee: 0n,
+})
+
+const conversion = ({
+  status = ConversionStatus.Completed,
+  from = "btc" as "btc" | "usdb",
+  to = "usdb" as "btc" | "usdb",
+  legs,
+}: {
+  status?: ConversionStatus
+  from?: "btc" | "usdb"
+  to?: "btc" | "usdb"
+  legs?: unknown[]
+} = {}): ConversionDetails =>
+  ({
+    status,
+    conversions: legs ?? [{ provider: 0, status, from: side(from), to: side(to) }],
+  }) as unknown as ConversionDetails
 
 /** The gate owns the discard ordering; the provider is what registers it in the app. */
 const registerDiscard = (store: ReturnType<typeof createOutboxStore>) =>
@@ -119,7 +145,7 @@ describe("the telemetry privacy boundary", () => {
       await initializeTelemetryGate()
 
       logPaymentSettled(payment())
-      logConversionSettled({ direction: ConvertDirection.BtcToUsd, sdkPaymentId: "p" })
+      logPaymentSettled(payment({ id: "swap", conversionDetails: conversion() }))
       logReferralCompleted({ sdkPaymentId: "p" })
 
       expect(await queued(store)).toEqual([])
@@ -279,15 +305,87 @@ describe("the telemetry privacy boundary", () => {
       },
     )
 
-    it("skips a conversion leg so a swap is not counted twice", async () => {
+    it("counts a conversion leg as a swap rather than as a payment", async () => {
+      logPaymentSettled(payment({ id: "sdk-swap", conversionDetails: conversion() }))
+
+      const [record] = await queued(store)
+      expect(record.event).toBe("conversion_settled")
+      expect(record.payload.conversion_direction).toBe("btc_to_usd")
+      // The one record is the swap, so the payment leg was not counted alongside it.
+      expect(await queued(store)).toHaveLength(1)
+    })
+
+    it.each([
+      { from: "btc" as const, to: "usdb" as const, expected: "btc_to_usd" },
+      { from: "usdb" as const, to: "btc" as const, expected: "usd_to_btc" },
+    ])(
+      "reads $expected off the settled record's own ends",
+      async ({ from, to, expected }) => {
+        logPaymentSettled(
+          payment({ id: `sdk-${expected}`, conversionDetails: conversion({ from, to }) }),
+        )
+
+        const [record] = await queued(store)
+        expect(record.payload.conversion_direction).toBe(expected)
+      },
+    )
+
+    it("takes the direction from the ends of a multi-leg route, not an intermediate", async () => {
+      // The SDK models a send as [AMM, cross-chain], so a middle asset is routing rather
+      // than intent — reading leg zero's destination would classify the hop, not the swap.
+      const legs = [
+        {
+          provider: 0,
+          status: ConversionStatus.Completed,
+          from: side("usdb"),
+          to: side("usdb"),
+        },
+        {
+          provider: 0,
+          status: ConversionStatus.Completed,
+          from: side("usdb"),
+          to: side("btc"),
+        },
+      ]
       logPaymentSettled(
-        payment({ conversionDetails: {} as Payment["conversionDetails"] }),
+        payment({ id: "sdk-multi", conversionDetails: conversion({ legs }) }),
+      )
+
+      const [record] = await queued(store)
+      expect(record.payload.conversion_direction).toBe("usd_to_btc")
+    })
+
+    it("counts nothing for a swap whose send leg landed but whose conversion has not", async () => {
+      // The overcount this event exists to avoid: a send resolving is not a settled swap,
+      // and one counted here would stay counted when the conversion later fails.
+      logPaymentSettled(
+        payment({
+          id: "sdk-pending-swap",
+          conversionDetails: conversion({ status: ConversionStatus.Pending }),
+        }),
       )
       expect(await queued(store)).toEqual([])
 
-      // Anchor: the same payment without the conversion marker does land.
-      logPaymentSettled(payment({ id: "sdk-plain" }))
+      // Anchor: the same record with a completed conversion does land.
+      logPaymentSettled(payment({ id: "sdk-done-swap", conversionDetails: conversion() }))
       expect(await queued(store)).toHaveLength(1)
+    })
+
+    it("counts nothing for a swap it cannot place, rather than guessing a side", async () => {
+      logPaymentSettled(
+        payment({
+          id: "sdk-same-sided",
+          conversionDetails: conversion({ from: "usdb", to: "usdb" }),
+        }),
+      )
+      expect(await queued(store)).toEqual([])
+
+      logPaymentSettled(
+        payment({ id: "sdk-legless", conversionDetails: conversion({ legs: [] }) }),
+      )
+      expect(await queued(store)).toEqual([])
+
+      expect(await enhancedCaptures()).toBe(1)
     })
 
     it("ignores a payment that has not settled", async () => {

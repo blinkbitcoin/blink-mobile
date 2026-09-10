@@ -1,3 +1,5 @@
+import crashlytics from "@react-native-firebase/crashlytics"
+
 import { reportError } from "@app/utils/error-logging"
 
 /**
@@ -49,6 +51,23 @@ export const resetDiagnosticsForTesting = (): void => {
   counters.suppressedEvents = 0
   counters.unroutedEvents = 0
   counters.untransmittedFaults = 0
+}
+
+/**
+ * A breadcrumb, subject to the same rule as everything else here: nothing leaves an `Anon`
+ * or `Unresolved` device. On `Custodial` and `Enhanced` the spine permits boundary
+ * diagnostics through Crashlytics, which is what makes the FR-68 loss counters reachable
+ * from a real device rather than only from a debugger.
+ */
+export const logDiagnosticBreadcrumb = (message: string): boolean => {
+  if (!transmissible) return false
+  try {
+    crashlytics().log(message)
+    return true
+  } catch {
+    counters.untransmittedFaults += 1
+    return false
+  }
 }
 
 export const reportBoundaryFault = (what: string, err: unknown): void => {

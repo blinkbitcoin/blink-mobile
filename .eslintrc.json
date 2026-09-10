@@ -188,7 +188,7 @@
   },
   "overrides": [
     {
-      "files": ["app/telemetry/**"],
+      "files": ["app/telemetry/platform-analytics.ts"],
       "rules": {
         "no-restricted-imports": [
           "error",

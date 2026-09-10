@@ -26,7 +26,6 @@ import { centsToTokenBaseUnits, tokenBaseUnitsToCents } from "@app/utils/amounts
 import { toNumber } from "@app/utils/helper"
 
 import { MAX_SLIPPAGE_BPS, requireSparkTokenIdentifier } from "../config"
-import { logConversionSettled } from "../measurement"
 
 import { buildConversionType, fetchConversionLimits } from "./limits"
 import { fetchUsdbDecimals, findUsdbToken } from "./token-balance"
@@ -283,18 +282,14 @@ const executePrepared = async (
   params: ConvertParams,
 ): Promise<PaymentAdapterResult> => {
   try {
-    const response = await sdk.sendPayment(
-      SendPaymentRequest.create({ prepareResponse: prepared }),
-    )
     /**
-     * Direction only, never volume: swap amounts are gated on OD-2, a policy decision
-     * rather than an engineering one (FR-15). The payment id is passed as a local
-     * deduplication key and is not transmitted (FR-24).
+     * No telemetry here. `sendPayment` resolving is not a settled swap — the send leg can
+     * succeed while the conversion is still in flight, and a swap counted at this point
+     * would stay counted when it later fails. `conversion_settled` is emitted from the SDK
+     * settlement listener instead, where the conversion's own status is observable
+     * (AD-15: the listener is the sole emission point).
      */
-    logConversionSettled({
-      direction: params.direction,
-      sdkPaymentId: response?.payment?.id ?? null,
-    })
+    await sdk.sendPayment(SendPaymentRequest.create({ prepareResponse: prepared }))
     return { status: PaymentResultStatus.Success }
   } catch (err) {
     recordConvertError(err, params, "executePrepared")

@@ -14,6 +14,12 @@ import {
 } from "@app/telemetry/contract"
 import { resetDiagnosticsForTesting } from "@app/telemetry/diagnostics"
 import {
+  drainActiveOutbox,
+  getTelemetryHealth,
+  resetTelemetryHealthReportingForTesting,
+  setActiveOutbox,
+} from "@app/telemetry/index"
+import {
   onTelemetrySuppressed,
   resetTelemetryModeForTesting,
   resolveTelemetryMode,
@@ -37,6 +43,14 @@ import {
   resetTelemetryTransportForTesting,
   type TransportResult,
 } from "@app/telemetry/transport"
+
+// The shared crashlytics mock hands back a fresh object per call, so there is no stable
+// spy to read. Same local-mock pattern as use-delete-account.spec.ts.
+const mockCrashlyticsLog = jest.fn()
+jest.mock("@react-native-firebase/crashlytics", () => () => ({
+  log: (...args: unknown[]) => mockCrashlyticsLog(...args),
+  recordError: jest.fn(),
+}))
 
 const mockFs = RNFS as unknown as {
   __resetMockFileSystem: () => void
@@ -87,6 +101,13 @@ describe("the telemetry outbox", () => {
     resetTelemetryModeForTesting()
     resetTelemetryTransportForTesting()
     resetDiagnosticsForTesting()
+    resetTelemetryHealthReportingForTesting()
+    mockCrashlyticsLog.mockClear()
+    setActiveOutbox(null)
+  })
+
+  afterEach(() => {
+    setActiveOutbox(null)
   })
 
   describe("AD-6 — its own directory, and discard is an unlink of that directory alone", () => {
@@ -211,6 +232,64 @@ describe("the telemetry outbox", () => {
       await RNFS.writeFile(`${DIR}/p-corrupt.json`, "{ not json", "utf8")
 
       expect(await createOutboxStore(DIR).pending()).toEqual([])
+    })
+  })
+
+  describe("FR-68 — the loss the pipeline causes is reachable, not just counted", () => {
+    const breadcrumbs = () => mockCrashlyticsLog.mock.calls.flat()
+
+    it("aggregates every loss source into one snapshot", async () => {
+      const store = createOutboxStore(DIR)
+      await store.enqueue(record({ queuedAt: Date.now() - OUTBOX_TTL_MS - 1 }))
+      await store.pending()
+
+      expect(getTelemetryHealth()).toMatchObject({
+        expired: 1,
+        evicted: 0,
+        suppressedEvents: 0,
+        dropped_unknown_field: 0,
+      })
+    })
+
+    it("surfaces the snapshot from a device permitted to report", async () => {
+      setActiveOutbox(createOutboxStore(DIR))
+      await resolveTelemetryMode(TelemetryMode.Enhanced)
+
+      await drainActiveOutbox()
+
+      expect(breadcrumbs().some((line) => String(line).startsWith("[telemetry]"))).toBe(
+        true,
+      )
+    })
+
+    it("says nothing from a device required to emit zero (AD-13)", async () => {
+      setActiveOutbox(createOutboxStore(DIR))
+      await resolveTelemetryMode(TelemetryMode.Anon)
+
+      await drainActiveOutbox()
+      expect(breadcrumbs()).toEqual([])
+
+      // Anchor: the same call does report once the mode permits diagnostics, so the
+      // silence above is AD-13 and not a drain that never ran.
+      await resolveTelemetryMode(TelemetryMode.Enhanced)
+      await drainActiveOutbox()
+      expect(breadcrumbs().length).toBeGreaterThan(0)
+    })
+
+    it("repeats itself only when a number has moved", async () => {
+      const store = createOutboxStore(DIR)
+      setActiveOutbox(store)
+      await resolveTelemetryMode(TelemetryMode.Enhanced)
+
+      await drainActiveOutbox()
+      const first = breadcrumbs().length
+
+      await drainActiveOutbox()
+      expect(breadcrumbs()).toHaveLength(first)
+
+      await store.enqueue(record())
+      await drainActiveOutbox()
+      expect(breadcrumbs().length).toBeGreaterThan(first)
     })
   })
 
