@@ -12,7 +12,7 @@ import {
 } from "@app/screens/send-bitcoin-screen/payment-destination/index.types"
 import { PaymentDetail } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
 import { PaymentSendCompletedStatus } from "@app/screens/send-bitcoin-screen/use-send-payment"
-import { DrainConversionReturn } from "@app/screens/conversion-flow/drain-conversion"
+import { DrainConversionArm } from "@app/screens/conversion-flow/drain-conversion"
 import { AccountMode, AccountTypeMode, CreationBlockReason } from "@app/types/account"
 import { DisplayCurrency, MoneyAmount, WalletOrDisplayCurrency } from "@app/types/amounts"
 import { WalletDescriptor } from "@app/types/wallets"
@@ -125,13 +125,13 @@ export type RootStackParamList = {
     moneyAmount: MoneyAmount<WalletOrDisplayCurrency>
     /** Where a completed drain convert lands (back in its flow, not Home). Navigation-only,
      *  never a privilege: the region waiver comes from the armed flag, not this forgeable param. */
-    drainConversion?: DrainConversionReturn | null
+    drainConversion?: DrainConversionArm | null
   }
   conversionSuccess:
     | {
         /** Set when the conversion drained a balance for a flow, so the success screen
          *  returns there instead of Home. */
-        returnTo?: DrainConversionReturn
+        returnTo?: DrainConversionArm
       }
     | undefined
   sendBitcoinCompleted: {

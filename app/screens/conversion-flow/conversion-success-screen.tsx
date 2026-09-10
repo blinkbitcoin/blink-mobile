@@ -55,12 +55,24 @@ export const ConversionSuccessScreen = () => {
     /** A drain conversion resumes the flow that demanded it (migration entry, or the mode
      *  selection for the Anon switch); a standalone one returns to Home. */
     const continueAfterSuccess = () => {
-      if (returnTo === DrainConversionReturn.Migration) {
+      if (returnTo?.target === DrainConversionReturn.Migration) {
         navigation.replace("accountMigrationEntry")
         return
       }
-      if (returnTo === DrainConversionReturn.ModeSelection) {
+      if (returnTo?.target === DrainConversionReturn.ModeSelection) {
         navigation.dispatch(MODE_SELECTION_RETURN)
+        return
+      }
+      /** The investment step resumes on the figure it was left on, which the arm carried
+       *  through the conversion; without it there is no step to resume, only a screen
+       *  that would ask for an amount the investor already chose. */
+      if (
+        returnTo?.target === DrainConversionReturn.Investment &&
+        returnTo.selectedAmountUsd !== undefined
+      ) {
+        navigation.replace("cardOnboardingTransferInvestScreen", {
+          selectedAmountUsd: returnTo.selectedAmountUsd,
+        })
         return
       }
       navigation.popToTop()

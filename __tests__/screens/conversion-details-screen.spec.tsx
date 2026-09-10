@@ -14,6 +14,7 @@ import { ThemeProvider } from "@rn-vui/themed"
 
 import { ConversionDetailsScreen } from "@app/screens/conversion-flow/conversion-details-screen"
 import {
+  armInvestmentConversion,
   armMigrationConversion,
   resetDrainConversionArmed,
 } from "@app/screens/conversion-flow/drain-conversion"
@@ -1435,6 +1436,72 @@ describe("Migration conversion prefill", () => {
     expect(getByTestId("convert-50%").props.accessibilityState?.disabled).toBe(true)
     expect(getByTestId("convert-75%").props.accessibilityState?.disabled).toBe(true)
     expect(getByTestId("Key 5").props.accessibilityState?.disabled).toBe(true)
+  })
+
+  /**
+   * The investment arm opens on the full balance like the drains do, since putting the
+   * whole amount in one wallet is what the investor came to do.
+   */
+  it("prefills the whole balance when armed by the investment step", async () => {
+    armInvestmentConversion(500)
+    const Wrapper = createTestWrapper(buildMocks())
+
+    const { getByTestId } = render(
+      <Wrapper>
+        <ConversionDetailsScreen />
+      </Wrapper>,
+    )
+
+    await waitFor(() => {
+      expect(getByTestId("next-button")).toBeTruthy()
+    })
+
+    act(() => {
+      jest.advanceTimersByTime(1500)
+    })
+
+    await waitFor(
+      () => {
+        expect(getByTestId("convert-100%").props.accessibilityState?.selected).toBe(true)
+      },
+      { timeout: 3000 },
+    )
+  })
+
+  /**
+   * It is not a drain: nothing is being emptied to get past a gate. The investor may want
+   * the other direction or a smaller amount, and locking the controls the way a migration
+   * does would take that away.
+   */
+  it("leaves the amount controls open during an investment conversion", async () => {
+    armInvestmentConversion(500)
+    const Wrapper = createTestWrapper(buildMocks())
+
+    const { getByTestId } = render(
+      <Wrapper>
+        <ConversionDetailsScreen />
+      </Wrapper>,
+    )
+
+    await waitFor(() => {
+      expect(getByTestId("next-button")).toBeTruthy()
+    })
+
+    act(() => {
+      jest.advanceTimersByTime(1500)
+    })
+
+    await waitFor(
+      () => {
+        expect(getByTestId("convert-100%").props.accessibilityState?.selected).toBe(true)
+      },
+      { timeout: 3000 },
+    )
+
+    expect(getByTestId("wallet-toggle-button").props.accessibilityState?.disabled).toBe(
+      false,
+    )
+    expect(getByTestId("convert-25%").props.accessibilityState?.disabled).toBe(false)
   })
 })
 
