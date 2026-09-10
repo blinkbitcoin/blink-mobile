@@ -85,11 +85,12 @@ export type RootStackParamList = {
   liteDeviceAccount: {
     appCheckToken: string
   }
-  // Dev-only route: root-navigator registers it only when __DEV__ (lazy
-  // require there). navigate("developerScreen") still type-checks in release
+  // Dev-only routes: root-navigator registers them only when __DEV__ (lazy
+  // requires there). navigate("developerScreen") still type-checks in release
   // builds but is dropped as an unhandled action — gate any new call site
   // with __DEV__, or reuse useSecretMenuTrigger.
   developerScreen: undefined
+  busyStateSandbox: undefined
   login: {
     type: PhoneLoginInitiateType
     title?: string

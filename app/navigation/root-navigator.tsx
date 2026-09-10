@@ -214,6 +214,13 @@ const DeveloperScreen: React.ComponentType | null = __DEV__
     require("../screens/developer-screen").DeveloperScreen
   : null
 
+/** Same lazy-require reasoning as `DeveloperScreen`: a throwaway harness that
+ *  must not reach a release bundle. */
+const BusyStateSandboxScreen: React.ComponentType | null = __DEV__
+  ? // eslint-disable-next-line @typescript-eslint/no-var-requires
+    require("../screens/developer-screen").BusyStateSandboxScreen
+  : null
+
 /**
  * The swipe stays blocked for every entry: leaving by gesture is undirected, so the arrow is
  * the one deliberate way out, and only creation has anywhere to take it.
@@ -620,6 +627,15 @@ export const RootStack = () => {
           component={DeveloperScreen}
           options={{
             gestureEnabled: false,
+          }}
+        />
+      )}
+      {BusyStateSandboxScreen && (
+        <RootNavigator.Screen
+          name="busyStateSandbox"
+          component={BusyStateSandboxScreen}
+          options={{
+            title: "Busy state sandbox",
           }}
         />
       )}
