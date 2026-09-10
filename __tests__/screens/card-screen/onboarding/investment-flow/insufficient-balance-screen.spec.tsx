@@ -39,6 +39,7 @@ const mockFunding = {
     balanceUsd: 3333,
     shortfallUsd: 21667,
     hasEnoughBalance: false,
+    isSplitAcrossWallets: false,
     isLoading: false,
   },
 }
@@ -69,6 +70,7 @@ describe("InsufficientBalanceScreen", () => {
       balanceUsd: 3333,
       shortfallUsd: 21667,
       hasEnoughBalance: false,
+      isSplitAcrossWallets: false,
       isLoading: false,
     }
   })
@@ -105,6 +107,7 @@ describe("InsufficientBalanceScreen", () => {
       balanceUsd: 250,
       shortfallUsd: 750,
       hasEnoughBalance: false,
+      isSplitAcrossWallets: false,
       isLoading: false,
     }
 
@@ -126,6 +129,47 @@ describe("InsufficientBalanceScreen", () => {
   it("displays the deposit button", async () => {
     const { getByText } = await renderScreen()
     expect(getByText("Deposit")).toBeTruthy()
+  })
+
+  /**
+   * Held between the two wallets but not in either: telling this investor to deposit asks
+   * them for money they already have. Converting is what makes it payable.
+   */
+  describe("when the funds are only split across the wallets", () => {
+    beforeEach(() => {
+      mockFunding.current = {
+        balanceUsd: 370,
+        shortfallUsd: 130,
+        hasEnoughBalance: false,
+        isSplitAcrossWallets: true,
+        isLoading: false,
+      }
+    })
+
+    it("says the funds are split instead of asking for a deposit", async () => {
+      const { getByText, queryByText } = await renderScreen()
+
+      expect(getByText("Your funds are split")).toBeTruthy()
+      expect(queryByText("Insufficient balance")).toBeNull()
+      expect(queryByText(/Deposit more than/)).toBeNull()
+    })
+
+    it("offers to convert", async () => {
+      const { getByText, queryByText } = await renderScreen()
+
+      expect(getByText("Convert")).toBeTruthy()
+      expect(queryByText("Deposit")).toBeNull()
+    })
+
+    it("opens the conversion flow", async () => {
+      const { getByText } = await renderScreen()
+
+      await act(async () => {
+        fireEvent.press(getByText("Convert"))
+      })
+
+      expect(mockNavigate).toHaveBeenCalledWith("conversionDetails")
+    })
   })
 
   it("navigates to the receive screen when deposit is pressed", async () => {

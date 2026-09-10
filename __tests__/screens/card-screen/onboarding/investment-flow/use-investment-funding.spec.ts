@@ -44,9 +44,12 @@ describe("useInvestmentFunding", () => {
     mockActiveWallet.current = { wallets: [], isReady: true }
   })
 
-  /** The flow tells the investor the money may sit in either wallet, so the check has to
-   *  count both rather than the one they happen to be looking at. */
-  it("counts both wallets towards the investment", () => {
+  /**
+   * A payment draws on one wallet, so what the fullest one holds is what decides whether
+   * the investment can go through. Adding the two together said yes to an investor the
+   * send flow then turned away.
+   */
+  it("measures the investment against the fullest wallet, not the two added up", () => {
     mockActiveWallet.current = {
       wallets: [
         walletOf(WalletCurrency.Btc, 1_000_000), // $1,000
@@ -57,9 +60,37 @@ describe("useInvestmentFunding", () => {
 
     const { result } = renderHook(() => useInvestmentFunding(25000))
 
-    expect(result.current.balanceUsd).toBe(3500)
-    expect(result.current.shortfallUsd).toBe(21500)
+    expect(result.current.balanceUsd).toBe(2500)
+    expect(result.current.shortfallUsd).toBe(22500)
     expect(result.current.hasEnoughBalance).toBe(false)
+  })
+
+  /** Held between the two but not in either: the answer is to consolidate, not to
+   *  deposit, and the screen offers a different way out for each. */
+  it("marks a balance that is only split across the two wallets", () => {
+    mockActiveWallet.current = {
+      wallets: [
+        walletOf(WalletCurrency.Btc, 3_000_000), // $3,000
+        walletOf(WalletCurrency.Usd, 300_000), // $3,000
+      ],
+      isReady: true,
+    }
+
+    const { result } = renderHook(() => useInvestmentFunding(5000))
+
+    expect(result.current.hasEnoughBalance).toBe(false)
+    expect(result.current.isSplitAcrossWallets).toBe(true)
+  })
+
+  it("is not split when neither wallet nor both together are enough", () => {
+    mockActiveWallet.current = {
+      wallets: [walletOf(WalletCurrency.Usd, 100_000)],
+      isReady: true,
+    }
+
+    const { result } = renderHook(() => useInvestmentFunding(5000))
+
+    expect(result.current.isSplitAcrossWallets).toBe(false)
   })
 
   it("reports the investment covered once the wallets hold enough", () => {
