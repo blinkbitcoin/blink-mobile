@@ -2429,7 +2429,7 @@
         "recipient": "Recipient",
         "time": "Time",
         "type": "Type",
-        "feeTier": "Transaction priority",
+        "feeTier": "Confirmation speed",
         "fast": "Priority",
         "medium": "Standard",
         "slow": "Economy",

@@ -2467,7 +2467,7 @@
     "recipient": "Destinatar",
     "time": "Ora",
     "type": "Tip",
-    "feeTier": "Prioritatea tranzacției",
+    "feeTier": "Viteza de confirmare",
     "fast": "Prioritar",
     "medium": "Standard",
     "slow": "Economic",

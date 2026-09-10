@@ -2467,7 +2467,7 @@
         "recipient": "Destinatário",
         "time": "Hora",
         "type": "Tipo",
-        "feeTier": "Prioridade da transação",
+        "feeTier": "Velocidade de confirmação",
         "fast": "Prioritário",
         "medium": "Padrão",
         "slow": "Econômico",

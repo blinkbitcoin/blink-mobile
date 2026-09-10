@@ -2467,7 +2467,7 @@
     "recipient": "Destinatari",
     "time": "Hora",
     "type": "Tipus",
-    "feeTier": "Prioritat de la transacció",
+    "feeTier": "Velocitat de confirmació",
     "fast": "Prioritari",
     "medium": "Estàndard",
     "slow": "Econòmic",

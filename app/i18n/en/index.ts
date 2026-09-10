@@ -2516,15 +2516,13 @@ const en: BaseTranslation = {
     recipient: "Recipient",
     time: "Time",
     type: "Type",
-    feeTier: "Transaction priority",
+    feeTier: "Confirmation speed",
     /**
      * Shared by two rails with different windows: the custodial payout queues
      * (10m / 4h / 24h, CUSTODIAL_PAYOUT_ETA_MINUTES) and the self-custodial mempool fee
      * rates (10m / 30m / 60m, FEE_TIER_ETA_MINUTES). They name the relative speed within a
      * rail, not an absolute time — don't tune either one for a single rail's window without
-     * splitting the keys per domain first. The feeTier heading above reads "Transaction
-     * priority" directly over the "Priority" option; that repetition is known and left for
-     * design to settle.
+     * splitting the keys per domain first.
      */
     fast: "Priority",
     medium: "Standard",
