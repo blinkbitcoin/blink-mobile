@@ -133,6 +133,34 @@ const placeholderDrift = (localeFile: string, parsed: AnyTranslation): string[] 
   return Object.keys(sourceLeaves).filter(hasDrifted)
 }
 
+/**
+ * Words the on-chain fee tiers have been called in English before. A locale holding one of
+ * these is either an untranslated fallback left behind by a copy change (#3862) or a
+ * translation of naming the app has since dropped — both ship the old words to that
+ * locale's senders while `en` reads correctly. Key parity above already forbids omitting
+ * the keys, so a locale has to carry *something*; this says what it may not carry.
+ */
+const SUPERSEDED_TIER_NAMES = ["Fast", "Medium", "Slow", "Fastest", "Normal", "Flexible"]
+
+const TIER_KEYS = [
+  "SendBitcoinScreen.fast",
+  "SendBitcoinScreen.medium",
+  "SendBitcoinScreen.slow",
+]
+
+const supersededTierCopy = (parsed: AnyTranslation): string[] => {
+  const localeLeaves = collectLeaves(parsed)
+  return TIER_KEYS.filter((key) => {
+    const value = localeLeaves[key]
+    return (
+      typeof value === "string" &&
+      SUPERSEDED_TIER_NAMES.some(
+        (name) => name.toLowerCase() === value.trim().toLowerCase(),
+      )
+    )
+  })
+}
+
 const localeFiles = fs
   .readdirSync(TRANSLATIONS_DIR)
   .filter((name) => name.endsWith(".json"))
@@ -159,6 +187,12 @@ describe("locale parity", () => {
       // this.
       it("interpolates the same placeholders as the English source", () => {
         expect(placeholderDrift(localeFile, parsed)).toEqual([])
+      })
+
+      // A locale that kept its translation of "Fast"/"Medium"/"Slow" keeps shipping the
+      // queue-describing naming the on-chain tiers moved off, invisibly to `en`-only specs.
+      it("carries no superseded on-chain fee tier name", () => {
+        expect(supersededTierCopy(parsed)).toEqual([])
       })
     })
   })

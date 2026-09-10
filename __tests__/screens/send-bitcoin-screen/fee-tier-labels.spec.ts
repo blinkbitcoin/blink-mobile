@@ -8,13 +8,54 @@ import {
   buildZeroTiers,
 } from "@app/screens/send-bitcoin-screen/hooks/fee-tiers.types"
 import { CUSTODIAL_PAYOUT_ETA_MINUTES } from "@app/screens/send-bitcoin-screen/hooks/use-custodial-onchain-fee-tiers"
+import { FEE_TIER_ETA_MINUTES } from "@app/types/payment"
 
-jest.mock("react-native-fs", () => ({
-  DocumentDirectoryPath: "/test",
-}))
+/**
+ * The source file is typed as the loose BaseTranslation; the generated shape is the real
+ * one. Narrowed to the two sections this spec reads, so the reads below stay type-checked.
+ */
+const en = enBase as unknown as Pick<
+  Translations,
+  "SendBitcoinScreen" | "UnclaimedDeposit"
+>
+const sendScreen = en.SendBitcoinScreen
 
-/** The source file is typed as the loose BaseTranslation; the generated shape is the real one. */
-const en = enBase as unknown as Translations
+/**
+ * Both rails read their tier names from these three keys, so the label map here is the one
+ * `use-onchain-fee-tier-options.ts` and `unclaimed-deposits-screen.tsx` each build inline.
+ */
+const labels = {
+  [FeeTierOption.Fast]: sendScreen.fast,
+  [FeeTierOption.Medium]: sendScreen.medium,
+  [FeeTierOption.Slow]: sendScreen.slow,
+}
+
+/** Words these tiers have been called before. None of them may reach a screen again. */
+const SUPERSEDED_TIER_NAMES = [
+  "Fast",
+  "Medium",
+  "Slow",
+  "Fastest",
+  "Normal",
+  "Flexible",
+  "Half hour",
+]
+
+/** Whole-word so "Fast" does not match "Fastest" only by accident, and vice versa. */
+const survivingTierNames = (copy: string[]): string[] =>
+  SUPERSEDED_TIER_NAMES.filter((name) =>
+    copy.some((line) => new RegExp(`\\b${name}\\b`, "i").test(line)),
+  )
+
+const presentTiers = (etaMinutes: Record<FeeTierOption, number>) =>
+  buildFeeTierOptions({
+    tiers: buildZeroTiers(etaMinutes, FeeUnit.Sats),
+    labels,
+    formatFee: ({ feeAmount }) => `${feeAmount} sats`,
+    locale: "en",
+    // The names and the windows are what a tier reads as before any quote lands.
+    hasQuote: false,
+  })
 
 /**
  * The wiring specs mock both the copy and the ETAs, so nothing there would notice the tier
@@ -23,48 +64,74 @@ const en = enBase as unknown as Translations
  * rename or a re-timing has to be made here deliberately rather than in passing.
  */
 describe("on-chain fee tier presentation", () => {
-  const labels = {
-    [FeeTierOption.Fast]: en.SendBitcoinScreen.fast,
-    [FeeTierOption.Medium]: en.SendBitcoinScreen.medium,
-    [FeeTierOption.Slow]: en.SendBitcoinScreen.slow,
-  }
-
-  const buildOptions = () =>
-    buildFeeTierOptions({
-      tiers: buildZeroTiers(CUSTODIAL_PAYOUT_ETA_MINUTES, FeeUnit.Sats),
-      labels,
-      formatFee: ({ feeAmount }) => `${feeAmount} sats`,
-      locale: "en",
-      // The names and the windows are what a tier reads as before any quote lands.
-      hasQuote: false,
+  describe("custodial payout queues", () => {
+    it("promises Priority ~ 10m, Standard ~ 4h and Economy ~ 24h, in that order", () => {
+      expect(
+        presentTiers(CUSTODIAL_PAYOUT_ETA_MINUTES).map(({ label, detail }) => ({
+          label,
+          detail,
+        })),
+      ).toEqual([
+        { label: "Priority", detail: "~ 10m" },
+        { label: "Standard", detail: "~ 4h" },
+        { label: "Economy", detail: "~ 24h" },
+      ])
     })
 
-  it("names the tiers Priority, Standard and Economy, in that order", () => {
-    expect(buildOptions().map((option) => option.label)).toEqual([
-      "Priority",
-      "Standard",
-      "Economy",
-    ])
+    it("keeps the tier ids the payout speeds are keyed on", () => {
+      // The copy is free to change; these ids pick the backend queue, so they are not.
+      expect(presentTiers(CUSTODIAL_PAYOUT_ETA_MINUTES).map(({ id }) => id)).toEqual([
+        "fast",
+        "medium",
+        "slow",
+      ])
+    })
   })
 
-  it("promises ~ 10m, ~ 4h and ~ 24h against those names", () => {
-    expect(
-      buildOptions().map((option) => ({ label: option.label, detail: option.detail })),
-    ).toEqual([
-      { label: "Priority", detail: "~ 10m" },
-      { label: "Standard", detail: "~ 4h" },
-      { label: "Economy", detail: "~ 24h" },
-    ])
+  /**
+   * The self-custodial send and refund rails broadcast straight from the SDK against
+   * mempool's rates, so they share the names but not the windows. Nothing else in the suite
+   * reads FEE_TIER_ETA_MINUTES from source — re-timing a tier there was invisible.
+   */
+  describe("self-custodial mempool rates", () => {
+    it("promises Priority ~ 10m, Standard ~ 30m and Economy ~ 60m, in that order", () => {
+      expect(
+        presentTiers(FEE_TIER_ETA_MINUTES).map(({ label, detail }) => ({
+          label,
+          detail,
+        })),
+      ).toEqual([
+        { label: "Priority", detail: "~ 10m" },
+        { label: "Standard", detail: "~ 30m" },
+        { label: "Economy", detail: "~ 60m" },
+      ])
+    })
   })
 
-  it("keeps the tier ids the payout speeds are keyed on", () => {
-    // The copy is free to change; these ids pick the backend queue, so they are not.
-    expect(buildOptions().map((option) => option.id)).toEqual(["fast", "medium", "slow"])
-  })
+  describe("the copy around the tiers", () => {
+    it("leaves no superseded tier name standing in the on-chain copy", () => {
+      const onchainCopy = Object.values({
+        ...sendScreen,
+        ...en.UnclaimedDeposit,
+      }).filter((value): value is string => typeof value === "string")
 
-  it("leaves no superseded tier name in the on-chain copy", () => {
-    expect(Object.values(labels)).not.toContain("Fast")
-    expect(Object.values(labels)).not.toContain("Medium")
-    expect(Object.values(labels)).not.toContain("Slow")
+      expect(survivingTierNames(onchainCopy)).toEqual([])
+    })
+
+    it("does not head the selector with one of the option names", () => {
+      /**
+       * FeeTierSelector renders its title directly above the selected option's label, so a
+       * heading that borrows an option name reads as "Priority: Priority" on first render
+       * and as "Priority: Economy" once the cheapest tier is picked.
+       */
+      const heading = sendScreen.feeTier.toLowerCase()
+
+      const collisions = Object.values(labels).filter((label) => {
+        const name = label.toLowerCase()
+        return heading.includes(name) || name.includes(heading)
+      })
+
+      expect(collisions).toEqual([])
+    })
   })
 })
