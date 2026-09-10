@@ -320,7 +320,7 @@ export const DeveloperScreen: React.FC = () => {
                 title: "Welcome to become part of Blink",
                 body: "You are invited to participate in the Blink financing round. For Blink fans only.",
                 type: "deep-link",
-                deepLink: "card/onboarding-investment",
+                deepLink: "card/onboarding/investment",
               })
             }
           />
