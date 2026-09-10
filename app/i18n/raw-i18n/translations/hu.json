@@ -3681,6 +3681,65 @@
         "codingBackend": "...a backend kódolása",
         "buttonText": "Szuper"
       },
+      "WelcomeInvest": {
+        "welcomeMessage": {
+          "title": "Üdvözöljük, legyen a Blink része",
+          "paragraphs": {
+            "body1": "Mielőtt további forrásokat gyűjtünk professzionális befektetőktől, úgy döntöttünk, hogy meghívást küldünk a Blink családnak, szuperfelhasználóinknak és támogatóinknak. Miért hoznánk idegeneket, ha először olyasvalakit hívhatunk meg, mint te?",
+            "body2": "Ez egy személyes meghívó. Kérjük, ne továbbítsd és ne oszd meg nyilvánosan."
+          }
+        },
+        "buttonText": "Tovább"
+      },
+      "SelectInvest": {
+        "desiredCreditLimit": "Mennyit szeretnél befektetni?",
+        "percent": "~{percent: number}%-ért"
+      },
+      "CompanyValuation": {
+        "welcomeMessage": {
+          "title": "Cégértékelés",
+          "paragraphs": {
+            "body1": "Ebben a befektetési körben a Blink pre-money értékelése 10 millió dollár.",
+            "body2": "Magasabb áron is bevonhatnánk tőkét kockázati tőkebefektetőktől. Azonban hosszú távú kölcsönös előnyöket látunk a szuperfelhasználóinkkal való partnerségben. Ezért jobb feltételekkel kínáljuk neked ezt az ajánlatot."
+          }
+        },
+        "buttonText": "Értem"
+      },
+      "TermSheet": {
+        "title": "Feltételek",
+        "equitySection": {
+          "title": "Részesedés a Blinkben",
+          "investment": "{amount: string} Befektetés",
+          "valuation": "$10M pre-money értékelésnél",
+          "units": "{units: string} egységet kapsz ~{percent: number}%-ot a Blinkből"
+        },
+        "buttonText": "Tovább az Aláíráshoz"
+      },
+      "TransferInvest": {
+        "title": "Utald át a befektetésedet",
+        "paragraphs": {
+          "body1": "Aláírtad az előfizetési megállapodást {units: string} egységre a Blinkben.",
+          "body2": "Ideje átutalni a {amount: string} befektetési összeget. Bitcoinnal fizetsz."
+        },
+        "buttonText": "Tovább"
+      },
+      "InsufficientBalance": {
+        "title": "Nem elegendő egyenleg",
+        "paragraphs": {
+          "body1": "Csak {bitcoinBalance: string} van a Bitcoin-számládon.",
+          "body2": "Utalj be több mint {shortfall: string} összeget a számládra, hogy elérd a {investmentAmount: string} befektetési összeget.",
+          "body3": "Győződj meg róla, hogy a teljes összeg a számláid egyikén van; Bitcoin vagy dollár."
+        },
+        "buttonText": "Befizetés",
+        "splitFunds": {
+          "title": "A pénzed meg van osztva",
+          "body": "Van elég a befektetéshez, de meg van osztva a Bitcoin- és a Dollár-számlád között. Váltsd át, hogy a teljes összeg az egyiken legyen."
+        }
+      },
+      "DepositPending": {
+        "message": "Várakozás a befizetésed teljesülésére; kérjük, várj 2 megerősítésre a láncon.",
+        "buttonText": "Rendben"
+      },
       "PersonalInformation": {
         "title": "Utolsó lépés",
         "fields": {

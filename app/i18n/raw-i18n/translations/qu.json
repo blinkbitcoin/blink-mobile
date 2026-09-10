@@ -3681,6 +3681,65 @@
         "codingBackend": "...backend-ta programachkayku",
         "buttonText": "Allinmi"
       },
+      "WelcomeInvest": {
+        "welcomeMessage": {
+          "title": "Allin hamusqa Blink-pa huk rakiynin kanaykipaq",
+          "paragraphs": {
+            "body1": "Profesional inversionistakuna qullqita huñunaykumantaqa ñawpaqta Blink aylluta waqyayta munarqayku. Imaraykutaq mana riqsisqa runakunata pusamanchis ñawpaqta qan hina runata waqyaspa?",
+            "body2": "Kayqa sapalla waqyaymin. Ama kachaychu nitaq runakunaman quychu."
+          }
+        },
+        "buttonText": "Ñawpaqman"
+      },
+      "SelectInvest": {
+        "desiredCreditLimit": "Hayk'ata invertiy munawaq?",
+        "percent": "~{percent: number}%-paq"
+      },
+      "CompanyValuation": {
+        "welcomeMessage": {
+          "title": "Empresa chaninchaynin",
+          "paragraphs": {
+            "body1": "Kay inversión muyupi, Blink-pa pre-money chaninchaynin $10 millón.",
+            "body2": "VCkunamanta aswan chaniyuq preciowan qullqita huñuchiykuman. Ichaqa, superusuariukunawan llamk'aspa unay pachapaq iskayninchikpaq allin kaqkunata rikuschkaniku. Chayrayku, kay ufricimiyntuta aswan allin condicionkunawan qanpaq rikhurichischkaniku."
+          }
+        },
+        "buttonText": "Entiendeni"
+      },
+      "TermSheet": {
+        "title": "Kamachikuy Qillqa",
+        "equitySection": {
+          "title": "Rakiy Blink-pi",
+          "investment": "{amount: string} Invertiy",
+          "valuation": "$10M pre-money chaninchaypi",
+          "units": "{units: string} rakinkunata chaskiwaq ~{percent: number}% Blink-manta"
+        },
+        "buttonText": "Ñawpaqman Firmaman"
+      },
+      "TransferInvest": {
+        "title": "Invertiyniykita apachiy",
+        "paragraphs": {
+          "body1": "{units: string} rakikunapaq suscripción rimanakuyta firmarqanki Blink-pi.",
+          "body2": "Kunanmi {amount: string} invertiy qullqita apachinay pacha. Bitcoin-wan pagankí."
+        },
+        "buttonText": "Ñawpaqman"
+      },
+      "InsufficientBalance": {
+        "title": "Mana aypaq qullqi",
+        "paragraphs": {
+          "body1": "Bitcoin cuentaykipiqa {bitcoinBalance: string}llam kachkan.",
+          "body2": "{investmentAmount: string} inversión qullqiman chayanaykipaq, cuentaykiman {shortfall: string} nisqamanta astawan churay.",
+          "body3": "Tukuy qullqi huk cuentaykipi kananta yachay; Bitcoin utaq Dólar."
+        },
+        "buttonText": "Churay",
+        "splitFunds": {
+          "title": "Qullqiykiqa rakisqam kachkan",
+          "body": "Inversionta ruwanaykipaq aypanmi, ichaqa Bitcoin hinaspa Dólar cuentaykipi rakisqam kachkan. Tikray llapan qullqi huknillanpi kananpaq."
+        }
+      },
+      "DepositPending": {
+        "message": "Depositoyki hunt'akunankama suyachkanchik; iskay cadena-pi takyachiykama suyay.",
+        "buttonText": "Allinmi"
+      },
       "PersonalInformation": {
         "title": "Qhipa taki",
         "fields": {

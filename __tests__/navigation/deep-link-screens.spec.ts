@@ -38,4 +38,21 @@ describe("deep-linkable routes", () => {
     expect(routeNames).toContain("circlesDashboard")
     expect(routeNames).toContain("sendBitcoinDestination")
   })
+
+  /**
+   * A published path is a promise: the notification service emits these strings, and a
+   * rename lands as a dead link in the phone of anyone holding an older notification.
+   * They are also siblings of the rest of the card onboarding, and hang under it.
+   */
+  it("keeps the investment paths under the card onboarding tree", () => {
+    expect(DEEP_LINK_SCREENS.cardOnboardingWelcomeInvestScreen).toBe(
+      "card/onboarding/investment",
+    )
+    expect(DEEP_LINK_SCREENS.cardOnboardingTransferInvestScreen).toBe(
+      "card/onboarding/investment/transfer",
+    )
+    expect(DEEP_LINK_SCREENS.cardOnboardingDepositPendingScreen).toBe(
+      "card/onboarding/investment/deposit-pending",
+    )
+  })
 })

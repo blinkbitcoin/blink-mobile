@@ -34,3 +34,13 @@ export const MOCK_EXPECTED_MONTHLY_VOLUME_OPTIONS = [
   { value: "2,000 - 2,999", label: "$2,000 - $2,999" },
   { value: "3,000 or more", label: "$3,000 or more" },
 ]
+
+export const MOCK_CREDIT_LIMIT_VALUES = [
+  { value: 1000, percent: 0.01 },
+  { value: 2500, percent: 0.025 },
+  { value: 5000, percent: 0.05 },
+  { value: 10000, percent: 0.1 },
+  { value: 25000, percent: 0.25 },
+  { value: 50000, percent: 0.5 },
+  { value: 100000, percent: 1 },
+]

@@ -3681,6 +3681,65 @@
         "codingBackend": "...kódujeme backend",
         "buttonText": "Skvěle"
       },
+      "WelcomeInvest": {
+        "welcomeMessage": {
+          "title": "Vítejte, staňte se součástí Blink",
+          "paragraphs": {
+            "body1": "Než získáme další prostředky od profesionálních investorů, rozhodli jsme se rozšířit pozvánku rodině Blink, našim superuživatelům a podporovatelům. Proč přivádět cizince, když můžeme nejprve pozvat někoho jako jste vy?",
+            "body2": "Toto je osobní pozvánka. Prosím, nepřeposílejte ji ani ji nesdílejte veřejně."
+          }
+        },
+        "buttonText": "Pokračovat"
+      },
+      "SelectInvest": {
+        "desiredCreditLimit": "Kolik byste chtěli investovat?",
+        "percent": "za ~{percent: number}%"
+      },
+      "CompanyValuation": {
+        "welcomeMessage": {
+          "title": "Ocenění společnosti",
+          "paragraphs": {
+            "body1": "V tomto investičním kole je pre-money ocenění Blink 10 milionů dolarů.",
+            "body2": "Mohli bychom získat prostředky za vyšší cenu od rizikových kapitalistů. Nicméně vidíme dlouhodobé vzájemné výhody v partnerství s našimi superuživateli. Proto vám nabízíme tuto nabídku za lepších podmínek."
+          }
+        },
+        "buttonText": "Rozumím"
+      },
+      "TermSheet": {
+        "title": "Termínový list",
+        "equitySection": {
+          "title": "Podíl v Blink",
+          "investment": "Investice {amount: string}",
+          "valuation": "Při pre-money ocenění $10M",
+          "units": "Obdržíte {units: string} jednotek ~{percent: number}% Blink"
+        },
+        "buttonText": "Přejít k Podpisu"
+      },
+      "TransferInvest": {
+        "title": "Převeďte svou investici",
+        "paragraphs": {
+          "body1": "Podepsali jste smlouvu o úpisu {units: string} jednotek v Blink.",
+          "body2": "Je čas převést investiční částku {amount: string}. Zaplatíte Bitcoinem."
+        },
+        "buttonText": "Pokračovat"
+      },
+      "InsufficientBalance": {
+        "title": "Nedostatečný zůstatek",
+        "paragraphs": {
+          "body1": "Na svém bitcoinovém účtu máš pouze {bitcoinBalance: string}.",
+          "body2": "Vlož na svůj účet více než {shortfall: string}, abys dosáhl investiční částky {investmentAmount: string}.",
+          "body3": "Ujisti se, že je celá částka na jednom z tvých účtů; bitcoinovém, nebo dolarovém."
+        },
+        "buttonText": "Vložit",
+        "splitFunds": {
+          "title": "Vaše prostředky jsou rozdělené",
+          "body": "Máte dost na investici, ale je to rozdělené mezi bitcoinový a dolarový účet. Proveďte převod, aby celá částka byla na jednom z nich."
+        }
+      },
+      "DepositPending": {
+        "message": "Čeká se na vypořádání tvého vkladu; počkej prosím na 2 potvrzení v řetězci.",
+        "buttonText": "Dobře"
+      },
       "PersonalInformation": {
         "title": "Poslední krok",
         "fields": {

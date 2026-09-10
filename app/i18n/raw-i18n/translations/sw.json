@@ -3681,6 +3681,65 @@
         "codingBackend": "...kuandika msimbo wa nyuma",
         "buttonText": "Vizuri"
       },
+      "WelcomeInvest": {
+        "welcomeMessage": {
+          "title": "Karibu kuwa sehemu ya Blink",
+          "paragraphs": {
+            "body1": "Kabla ya kukusanya fedha zaidi kutoka kwa wawekezaji wa kitaalamu, tuliamua kutuma mwaliko kwa familia ya Blink, watumiaji wetu wakuu na wafuasi. Kwa nini kuleta wageni wakati tunaweza kwanza kumwalika mtu kama wewe?",
+            "body2": "Hii ni mwaliko wa kibinafsi. Tafadhali usisambaze au kushiriki hadharani."
+          }
+        },
+        "buttonText": "Endelea"
+      },
+      "SelectInvest": {
+        "desiredCreditLimit": "Ungependa kuwekeza kiasi gani?",
+        "percent": "kwa ~{percent: number}%"
+      },
+      "CompanyValuation": {
+        "welcomeMessage": {
+          "title": "Thamani ya kampuni",
+          "paragraphs": {
+            "body1": "Katika duru hii ya uwekezaji, thamani ya awali ya Blink ni dola milioni 10.",
+            "body2": "Tungeweza kukusanya fedha kwa bei ya juu zaidi kutoka kwa VCs. Hata hivyo, tunaona faida za pande zote za muda mrefu katika ushirikiano na watumiaji wetu wakuu. Kwa hivyo, tunakupa ofa hii kwa masharti bora zaidi."
+          }
+        },
+        "buttonText": "Nimeelewa"
+      },
+      "TermSheet": {
+        "title": "Hati ya Masharti",
+        "equitySection": {
+          "title": "Hisa katika Blink",
+          "investment": "Uwekezaji wa {amount: string}",
+          "valuation": "Kwa thamani ya awali ya $10M",
+          "units": "Unapokea vitengo {units: string} ~{percent: number}% vya Blink"
+        },
+        "buttonText": "Endelea kwa Kusaini"
+      },
+      "TransferInvest": {
+        "title": "Hamisha uwekezaji wako",
+        "paragraphs": {
+          "body1": "Umesaini makubaliano ya usajili kwa vitengo {units: string} katika Blink.",
+          "body2": "Ni wakati wa kuhamisha kiasi cha uwekezaji cha {amount: string}. Utalipa kwa Bitcoin."
+        },
+        "buttonText": "Endelea"
+      },
+      "InsufficientBalance": {
+        "title": "Salio halitoshi",
+        "paragraphs": {
+          "body1": "Una {bitcoinBalance: string} pekee katika akaunti yako ya Bitcoin.",
+          "body2": "Weka zaidi ya {shortfall: string} kwenye akaunti yako ili kufikia kiasi cha uwekezaji cha {investmentAmount: string}.",
+          "body3": "Hakikisha kiasi kamili kiko katika mojawapo ya akaunti zako; Bitcoin au Dola."
+        },
+        "buttonText": "Weka",
+        "splitFunds": {
+          "title": "Fedha zako zimegawanyika",
+          "body": "Una kiasi cha kutosha kuwekeza, lakini kimegawanyika kati ya akaunti yako ya Bitcoin na ya Dola. Badilisha ili kiasi chote kiwe kwenye moja."
+        }
+      },
+      "DepositPending": {
+        "message": "Inasubiri amana yako ikamilike; tafadhali subiri uthibitisho 2 kwenye mnyororo.",
+        "buttonText": "Sawa"
+      },
       "PersonalInformation": {
         "title": "Hatua ya mwisho",
         "fields": {

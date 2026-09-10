@@ -36,6 +36,7 @@ const CardMaxOverdraftUsdKey = "cardMaxOverdraftUsd"
 const CardLateRepaymentFeeUsdKey = "cardLateRepaymentFeeUsd"
 const ReplaceCardDeliveryConfigKey = "replaceCardDeliveryConfig"
 const SparkCompatibleWalletsUrlKey = "sparkCompatibleWalletsUrl"
+const CardInvestmentDepositBtcWalletIdKey = "cardInvestmentDepositBtcWalletId"
 const BackupNudgeBannerThresholdKey = "backupNudgeBannerThreshold"
 const BackupNudgeModalThresholdKey = "backupNudgeModalThreshold"
 const BackupNudgeModalCooldownMsKey = "backupNudgeModalCooldownMs"
@@ -103,6 +104,7 @@ type RemoteConfig = {
   [CardLateRepaymentFeeUsdKey]: number
   [ReplaceCardDeliveryConfigKey]: ReplaceCardDeliveryConfig
   [SparkCompatibleWalletsUrlKey]: string
+  [CardInvestmentDepositBtcWalletIdKey]: string
   [BackupNudgeBannerThresholdKey]: number
   [BackupNudgeModalThresholdKey]: number
   [BackupNudgeModalCooldownMsKey]: number
@@ -211,6 +213,10 @@ export const defaultRemoteConfig: RemoteConfig = {
   cardLateRepaymentFeeUsd: 25,
   replaceCardDeliveryConfig: defaultReplaceCardDeliveryConfig,
   sparkCompatibleWalletsUrl: "https://docs.spark.money/wallets/overview",
+  /** The receiving account's BITCOIN wallet, named by id so a rename cannot redirect the
+   *  money. A dollar wallet is refused by the API and reads as a failed invoice. Empty
+   *  until that account is decided, and the transfer step cannot pay while it is. */
+  cardInvestmentDepositBtcWalletId: "",
   backupNudgeBannerThreshold: 2100,
   backupNudgeModalThreshold: 21000,
   /** How long the self-custodial backup modal stays dismissed after the user closes it.
@@ -383,6 +389,10 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           .getValue(SparkCompatibleWalletsUrlKey)
           .asString()
 
+        const cardInvestmentDepositBtcWalletId = remoteConfigInstance()
+          .getValue(CardInvestmentDepositBtcWalletIdKey)
+          .asString()
+
         const backupNudgeBannerThreshold = remoteConfigInstance()
           .getValue(BackupNudgeBannerThresholdKey)
           .asNumber()
@@ -505,6 +515,7 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           cardLateRepaymentFeeUsd,
           replaceCardDeliveryConfig,
           sparkCompatibleWalletsUrl,
+          cardInvestmentDepositBtcWalletId,
           backupNudgeBannerThreshold,
           backupNudgeModalThreshold,
           backupNudgeModalCooldownMs,

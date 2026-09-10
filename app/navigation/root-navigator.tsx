@@ -122,6 +122,13 @@ import {
   WelcomeOnboardScreen,
   CardSubscriptionScreen,
   LoadingCardScreen,
+  WelcomeInvestScreen,
+  SelectInvestScreen,
+  TermSheetScreen,
+  TransferInvestScreen,
+  InsufficientBalanceScreen,
+  DepositPendingScreen,
+  CompanyValuationScreen,
   CardPersonalInformationScreen,
   CardAcknowledgementScreen,
   CardPreapprovedScreen,
@@ -260,6 +267,49 @@ const RedeemBitcoinDetailGated: React.FC<
 const ConversionDetailsGated = withOfflineGate(ConversionDetailsScreen)
 const ConversionConfirmationGated = withOfflineGate(ConversionConfirmationScreen)
 const UnclaimedDepositsGated = withOfflineGate(UnclaimedDepositsScreen)
+
+/** The card investment onboarding leg, kept out of RootStack so that function stays under
+ *  the max-lines-per-function limit. A fragment rather than a component: the navigator
+ *  reads its Screen children directly, and only fragments and groups are flattened. */
+const investmentOnboardingScreens = () => (
+  <>
+    <RootNavigator.Screen
+      name="cardOnboardingWelcomeInvestScreen"
+      component={WelcomeInvestScreen}
+      options={{ headerShown: false }}
+    />
+    <RootNavigator.Screen
+      name="cardOnboardingCompanyValuationScreen"
+      component={CompanyValuationScreen}
+      options={{ headerShown: false }}
+    />
+    <RootNavigator.Screen
+      name="cardOnboardingSelectInvestScreen"
+      component={SelectInvestScreen}
+      options={{ headerShown: false }}
+    />
+    <RootNavigator.Screen
+      name="cardOnboardingTermSheetScreen"
+      component={TermSheetScreen}
+      options={{ headerShown: false }}
+    />
+    <RootNavigator.Screen
+      name="cardOnboardingTransferInvestScreen"
+      component={TransferInvestScreen}
+      options={{ headerShown: false }}
+    />
+    <RootNavigator.Screen
+      name="cardOnboardingInsufficientBalanceScreen"
+      component={InsufficientBalanceScreen}
+      options={{ headerShown: false }}
+    />
+    <RootNavigator.Screen
+      name="cardOnboardingDepositPendingScreen"
+      component={DepositPendingScreen}
+      options={{ headerShown: false }}
+    />
+  </>
+)
 
 export const RootStack = () => {
   const styles = useStyles()
@@ -823,6 +873,7 @@ export const RootStack = () => {
           ...headerCloseControlOptions(),
         }}
       />
+      {investmentOnboardingScreens()}
       <RootNavigator.Screen
         name="cardOnboardingPersonalInfoScreen"
         component={CardPersonalInformationScreen}

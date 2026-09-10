@@ -62,6 +62,7 @@ const useStyles = makeStyles(({ colors }) => ({
     justifyContent: "center",
   },
   textContainer: {
+    alignSelf: "stretch",
     alignItems: "center",
     gap: 8,
   },
@@ -70,6 +71,7 @@ const useStyles = makeStyles(({ colors }) => ({
     lineHeight: 24,
     fontWeight: "700",
     textAlign: "center",
+    width: "100%",
   },
   subtitle: {
     fontSize: 16,
