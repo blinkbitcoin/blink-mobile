@@ -1,6 +1,6 @@
 import * as React from "react"
 import { ScrollView, View } from "react-native"
-import { useNavigation } from "@react-navigation/native"
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
@@ -11,11 +11,13 @@ import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
-import {
-  MOCK_BITCOIN_BALANCE,
-  MOCK_INVESTMENT_AMOUNT,
-  MOCK_INVESTMENT_SHORTFALL,
-} from "../onboarding-mock-data"
+import { formatUsdAmount, resolveInvestmentTerms } from "./investment-terms"
+import { useInvestmentFunding } from "./use-investment-funding"
+
+type InsufficientBalanceRoute = RouteProp<
+  RootStackParamList,
+  "cardOnboardingInsufficientBalanceScreen"
+>
 
 export const InsufficientBalanceScreen: React.FC = () => {
   const styles = useStyles()
@@ -24,7 +26,15 @@ export const InsufficientBalanceScreen: React.FC = () => {
   } = useTheme()
 
   const { LL } = useI18nContext()
+  const { selectedAmountUsd } = useRoute<InsufficientBalanceRoute>().params
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+
+  const terms = React.useMemo(
+    () => resolveInvestmentTerms(selectedAmountUsd),
+    [selectedAmountUsd],
+  )
+
+  const { balanceUsd, shortfallUsd } = useInvestmentFunding(terms.totalUsd)
 
   const handleDeposit = () => {
     navigation.navigate("receiveBitcoin")
@@ -43,14 +53,14 @@ export const InsufficientBalanceScreen: React.FC = () => {
         <View style={styles.content}>
           <Text type="p2" style={styles.bodyText}>
             {LL.CardFlow.Onboarding.InsufficientBalance.paragraphs.body1({
-              bitcoinBalance: MOCK_BITCOIN_BALANCE,
+              bitcoinBalance: formatUsdAmount(balanceUsd),
             })}
           </Text>
 
           <Text type="p2" style={styles.bodyText}>
             {LL.CardFlow.Onboarding.InsufficientBalance.paragraphs.body2({
-              shortfall: MOCK_INVESTMENT_SHORTFALL,
-              investmentAmount: MOCK_INVESTMENT_AMOUNT,
+              shortfall: formatUsdAmount(shortfallUsd),
+              investmentAmount: formatUsdAmount(terms.totalUsd),
             })}
           </Text>
 

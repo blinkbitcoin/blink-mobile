@@ -1,10 +1,4 @@
 // Mock/placeholder data — labels will come from backend when available
-export const MOCK_INVESTMENT_AMOUNT = "$10,000"
-
-export const MOCK_BITCOIN_BALANCE = "$3,333"
-
-export const MOCK_INVESTMENT_SHORTFALL = "$6,667"
-
 export const MOCK_OCCUPATION_OPTIONS = [
   { value: "15-1132", label: "Software Developers, Applications" },
   { value: "11-1021", label: "General and Operations Managers" },
