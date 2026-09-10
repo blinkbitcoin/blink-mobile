@@ -16,6 +16,7 @@ import { CloseHeader } from "@app/components/close-header"
 import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { armInvestmentConversion } from "@app/screens/conversion-flow/drain-conversion"
 
 import { formatUsdAmount } from "./investment-figures"
 import { resolveInvestmentTerms } from "./investment-terms"
@@ -73,7 +74,10 @@ export const InsufficientBalanceScreen: React.FC = () => {
     navigation.navigate("receiveBitcoin")
   }
 
+  /** Armed so the conversion returns here rather than to Home, and returns knowing which
+   *  investment it was for. */
   const handleConvert = () => {
+    armInvestmentConversion(terms.totalUsd)
     navigation.navigate("conversionDetails")
   }
 
