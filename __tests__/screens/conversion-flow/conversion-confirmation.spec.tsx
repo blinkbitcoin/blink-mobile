@@ -404,7 +404,7 @@ describe("conversion-confirmation-screen", () => {
           currency: WalletCurrency.Usd,
           currencyCode: WalletCurrency.Usd,
         },
-        drainConversion: "migration",
+        drainConversion: { target: "migration" },
       },
     } as const
 
@@ -429,7 +429,7 @@ describe("conversion-confirmation-screen", () => {
     const resetAction = dispatchMock.mock.calls[0][0]({ routes: [], index: 0 })
     expect(resetAction.payload.routes).toEqual([
       { name: "Primary" },
-      { name: "conversionSuccess", params: { returnTo: "migration" } },
+      { name: "conversionSuccess", params: { returnTo: { target: "migration" } } },
     ])
   })
 })
