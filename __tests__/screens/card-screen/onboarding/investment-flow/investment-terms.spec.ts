@@ -58,32 +58,99 @@ describe("the figures as they are written", () => {
 
 describe("resolveInvestmentFunding", () => {
   it("names what is missing when the investor is short", () => {
-    expect(resolveInvestmentFunding({ balanceUsd: 3333, totalUsd: 25000 })).toEqual({
+    expect(
+      resolveInvestmentFunding({
+        largestWalletUsd: 3333,
+        combinedUsd: 3333,
+        totalUsd: 25000,
+      }),
+    ).toEqual({
       balanceUsd: 3333,
       shortfallUsd: 21667,
       hasEnoughBalance: false,
+      isSplitAcrossWallets: false,
     })
   })
 
   it("counts an exact balance as covered", () => {
     expect(
-      resolveInvestmentFunding({ balanceUsd: 25000, totalUsd: 25000 }).hasEnoughBalance,
+      resolveInvestmentFunding({
+        largestWalletUsd: 25000,
+        combinedUsd: 25000,
+        totalUsd: 25000,
+      }).hasEnoughBalance,
     ).toBe(true)
   })
 
   /** Reported as nothing missing rather than as a negative sum, which the copy would
    *  print with a minus in front of it. */
   it("reports no shortfall when the balance is more than enough", () => {
-    expect(resolveInvestmentFunding({ balanceUsd: 30000, totalUsd: 25000 })).toEqual({
+    expect(
+      resolveInvestmentFunding({
+        largestWalletUsd: 30000,
+        combinedUsd: 30000,
+        totalUsd: 25000,
+      }),
+    ).toEqual({
       balanceUsd: 30000,
       shortfallUsd: 0,
       hasEnoughBalance: true,
+      isSplitAcrossWallets: false,
     })
   })
 
   it("counts an empty balance as the whole amount missing", () => {
     expect(
-      resolveInvestmentFunding({ balanceUsd: 0, totalUsd: 25000 }).shortfallUsd,
+      resolveInvestmentFunding({ largestWalletUsd: 0, combinedUsd: 0, totalUsd: 25000 })
+        .shortfallUsd,
     ).toBe(25000)
+  })
+
+  /**
+   * Seen on device: an investor holding $370 in dollars and $154 in bitcoin was told the
+   * investment was covered and then turned away by the send flow, which spends from one
+   * wallet. What one wallet holds is what decides it.
+   */
+  it("does not count two wallets added together as covered", () => {
+    const funding = resolveInvestmentFunding({
+      largestWalletUsd: 370,
+      combinedUsd: 524,
+      totalUsd: 500,
+    })
+
+    expect(funding.hasEnoughBalance).toBe(false)
+    expect(funding.shortfallUsd).toBe(130)
+  })
+
+  /** The same investor can pay after converting, which is a different answer from
+   *  needing to deposit, and the screen offers each in its own case. */
+  it("marks a balance that only needs consolidating", () => {
+    expect(
+      resolveInvestmentFunding({
+        largestWalletUsd: 370,
+        combinedUsd: 524,
+        totalUsd: 500,
+      }).isSplitAcrossWallets,
+    ).toBe(true)
+  })
+
+  it("is not split when neither wallet nor both together are enough", () => {
+    expect(
+      resolveInvestmentFunding({
+        largestWalletUsd: 100,
+        combinedUsd: 200,
+        totalUsd: 500,
+      }).isSplitAcrossWallets,
+    ).toBe(false)
+  })
+
+  it("is not split when one wallet already covers it", () => {
+    expect(
+      resolveInvestmentFunding({
+        largestWalletUsd: 500,
+        combinedUsd: 900,
+        totalUsd: 500,
+      }).isSplitAcrossWallets,
+    ).toBe(false)
   })
 })
