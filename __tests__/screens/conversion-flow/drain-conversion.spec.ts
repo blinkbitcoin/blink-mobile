@@ -2,6 +2,7 @@ import { renderHook } from "@testing-library/react-native"
 
 import {
   DrainConversionReturn,
+  armInvestmentConversion,
   armMigrationConversion,
   armModeSelectionConversion,
   resetDrainConversionArmed,
@@ -24,7 +25,7 @@ describe("drain conversion arming", () => {
 
     const { result } = renderHook(() => useConsumeDrainConversionArmed())
 
-    expect(result.current).toBe(DrainConversionReturn.Migration)
+    expect(result.current).toEqual({ target: DrainConversionReturn.Migration })
   })
 
   it("reads the mode-selection arm with its return destination", () => {
@@ -32,7 +33,22 @@ describe("drain conversion arming", () => {
 
     const { result } = renderHook(() => useConsumeDrainConversionArmed())
 
-    expect(result.current).toBe(DrainConversionReturn.ModeSelection)
+    expect(result.current).toEqual({ target: DrainConversionReturn.ModeSelection })
+  })
+
+  /**
+   * The investment step resumes on a figure the investor chose several screens earlier,
+   * which nothing downstream can work out, so the arm carries it through the conversion.
+   */
+  it("reads the investment arm with the amount it has to come back to", () => {
+    armInvestmentConversion(500)
+
+    const { result } = renderHook(() => useConsumeDrainConversionArmed())
+
+    expect(result.current).toEqual({
+      target: DrainConversionReturn.Investment,
+      selectedAmountUsd: 500,
+    })
   })
 
   /** The flag is one-shot: a later plain conversion never inherits a stale arm. */
@@ -53,7 +69,7 @@ describe("drain conversion arming", () => {
     const { result, rerender } = renderHook(() => useConsumeDrainConversionArmed())
     rerender({})
 
-    expect(result.current).toBe(DrainConversionReturn.ModeSelection)
+    expect(result.current).toEqual({ target: DrainConversionReturn.ModeSelection })
   })
 
   /** Teardown drops an arm this instance never consumed (the screen was reused, not remounted),

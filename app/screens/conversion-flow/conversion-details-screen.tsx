@@ -44,6 +44,7 @@ import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { useDollarBalanceRestrictionGuard } from "@app/hooks/use-dollar-balance-restriction-guard"
 import { useTransferBlockedGuard } from "@app/hooks/use-transfer-blocked-guard"
 import {
+  DrainConversionArm,
   DrainConversionReturn,
   useConsumeDrainConversionArmed,
 } from "@app/screens/conversion-flow/drain-conversion"
@@ -100,9 +101,20 @@ const ANIMATION_CONFIG = {
  *  drives it the same way tapping that chip does. */
 const FULL_BALANCE_PERCENTAGE = 100
 
+/**
+ * Whether this conversion is a drain: one that empties a balance to get past a gate.
+ *
+ * Only those two waive the region restriction, force the direction and lock the amount,
+ * because emptying the dollar balance is the whole point of them. The investment arm
+ * returns to its flow and nothing more: the investor still chooses what to convert and
+ * how much, and claims no waiver, so a restricted user cannot reach one through it.
+ */
+const isDraining = (arm: DrainConversionArm | null): boolean =>
+  arm !== null && arm.target !== DrainConversionReturn.Investment
+
 export const ConversionDetailsScreen = () => {
   const drainConversion = useConsumeDrainConversionArmed()
-  const isDrainConversion = drainConversion !== null
+  const isDrainConversion = isDraining(drainConversion)
 
   /** A drain conversion waives the region restriction that would otherwise bounce a
    *  restricted user home: emptying the dollar balance is the one way to migrate or to
@@ -147,13 +159,17 @@ const ConversionDetailsRegionPending = () => {
 }
 
 type ConversionDetailsScreenContentProps = {
-  drainConversion: DrainConversionReturn | null
+  drainConversion: DrainConversionArm | null
 }
 
 const ConversionDetailsScreenContent = ({
   drainConversion,
 }: ConversionDetailsScreenContentProps) => {
-  const isDrainConversion = drainConversion !== null
+  const isDrainConversion = isDraining(drainConversion)
+
+  /** Both arms open on the full balance, which is what either caller came to do: empty
+   *  the wallet, or put the whole amount in one place. */
+  const shouldPrefillFullBalance = drainConversion !== null
   const {
     theme: { colors },
   } = useTheme()
@@ -445,12 +461,12 @@ const ConversionDetailsScreenContent = ({
    *  confirm; reuses the chip path so it shows the spinner instead of flashing up from zero. */
   const hasPrefilledDrainAmountRef = useRef(false)
   useEffect(() => {
-    if (!isDrainConversion || hasPrefilledDrainAmountRef.current || !fromWallet) {
+    if (!shouldPrefillFullBalance || hasPrefilledDrainAmountRef.current || !fromWallet) {
       return
     }
     hasPrefilledDrainAmountRef.current = true
     applyBalancePercentage(FULL_BALANCE_PERCENTAGE)
-  }, [isDrainConversion, fromWallet, applyBalancePercentage])
+  }, [shouldPrefillFullBalance, fromWallet, applyBalancePercentage])
 
   const handleSetMoneyAmount = useCallback(
     (amount: MoneyAmount<WalletOrDisplayCurrency>) => setMoneyAmount(amount),
