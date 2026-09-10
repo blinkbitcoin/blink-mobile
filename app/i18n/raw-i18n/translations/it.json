@@ -3778,7 +3778,11 @@
                     "body2": "Deposita più di {shortfall: string} sul tuo conto per raggiungere l'importo dell'investimento di {investmentAmount: string}.",
                     "body3": "Assicurati che l'intero importo sia in uno dei tuoi conti; Bitcoin o dollaro."
                 },
-                "buttonText": "Deposita"
+                "buttonText": "Deposita",
+                "splitFunds": {
+                    "title": "I tuoi fondi sono divisi",
+                    "body": "Hai abbastanza per investire, ma è diviso tra i tuoi conti Bitcoin e Dollaro. Converti in modo che l'intero importo sia su uno solo."
+                }
             },
             "DepositPending": {
                 "message": "In attesa del regolamento del tuo deposito; attendi 2 conferme sulla catena.",

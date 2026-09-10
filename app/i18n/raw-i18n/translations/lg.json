@@ -3730,7 +3730,11 @@
           "body2": "Teekamu ssente ezisukka {shortfall: string} ku akkaawunti yo osobole okutuuka ku muwendo gw'okusiga ogwa {investmentAmount: string}.",
           "body3": "Kakasa nti omuwendo gwonna guli ku emu ku akkaawunti zo; Bitcoin oba Doola."
         },
-        "buttonText": "Teekamu ssente"
+        "buttonText": "Teekamu ssente",
+        "splitFunds": {
+          "title": "Ssente zo zaawukanye",
+          "body": "Olina ezimala okusiga, naye zaawukanye wakati wa akawunti ya Bitcoin ne ya Ddoola. Kyusa ssente zonna zibeere mu emu."
+        }
       },
       "DepositPending": {
         "message": "Tulindirira ssente zo okumalirizibwa; tusaba olinde okukakasibwa emirundi 2 ku lujegere.",

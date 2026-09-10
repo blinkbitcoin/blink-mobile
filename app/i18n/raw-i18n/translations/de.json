@@ -3778,7 +3778,11 @@
                     "body2": "Zahle mehr als {shortfall: string} auf dein Konto ein, um den Investitionsbetrag von {investmentAmount: string} zu erreichen.",
                     "body3": "Stelle sicher, dass sich der gesamte Betrag auf einem deiner Konten befindet; Bitcoin oder Dollar."
                 },
-                "buttonText": "Einzahlen"
+                "buttonText": "Einzahlen",
+                "splitFunds": {
+                    "title": "Dein Guthaben ist aufgeteilt",
+                    "body": "Du hast genug zum Investieren, aber es ist auf dein Bitcoin- und dein Dollar-Konto verteilt. Wandle um, damit der gesamte Betrag auf einem davon liegt."
+                }
             },
             "DepositPending": {
                 "message": "Warten auf die Abwicklung deiner Einzahlung; bitte warte auf 2 On-Chain-Bestätigungen.",

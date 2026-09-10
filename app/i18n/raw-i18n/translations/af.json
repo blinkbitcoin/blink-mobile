@@ -3730,7 +3730,11 @@
           "body2": "Deponeer meer as {shortfall: string} in jou rekening om die beleggingsbedrag van {investmentAmount: string} te bereik.",
           "body3": "Maak seker dat die volle bedrag in een van jou rekeninge is; Bitcoin of Dollar."
         },
-        "buttonText": "Deponeer"
+        "buttonText": "Deponeer",
+        "splitFunds": {
+          "title": "Jou fondse is verdeel",
+          "body": "Jy het genoeg om te belê, maar dit is versprei oor jou Bitcoin- en Dollar-rekeninge. Skakel om sodat die volle bedrag in een van hulle is."
+        }
       },
       "DepositPending": {
         "message": "Wag dat jou deposito afgehandel word; wag asseblief vir 2 kettingbevestigings.",

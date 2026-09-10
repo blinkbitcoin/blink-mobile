@@ -3730,7 +3730,11 @@
           "body2": "Stort meer dan {shortfall: string} op je rekening om het investeringsbedrag van {investmentAmount: string} te bereiken.",
           "body3": "Zorg ervoor dat het volledige bedrag op een van je rekeningen staat; Bitcoin of dollar."
         },
-        "buttonText": "Storten"
+        "buttonText": "Storten",
+        "splitFunds": {
+          "title": "Je saldo is verdeeld",
+          "body": "Je hebt genoeg om te investeren, maar het staat verdeeld over je Bitcoin- en Dollar-rekening. Converteer zodat het volledige bedrag op één ervan staat."
+        }
       },
       "DepositPending": {
         "message": "Wachten tot je storting is afgewikkeld; wacht op 2 bevestigingen op de keten.",

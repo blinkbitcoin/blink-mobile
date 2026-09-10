@@ -3730,7 +3730,11 @@
           "body2": "{investmentAmount: string} inversión qullqiman chayanaykipaq, cuentaykiman {shortfall: string} nisqamanta astawan churay.",
           "body3": "Tukuy qullqi huk cuentaykipi kananta yachay; Bitcoin utaq Dólar."
         },
-        "buttonText": "Churay"
+        "buttonText": "Churay",
+        "splitFunds": {
+          "title": "Qullqiykiqa rakisqam kachkan",
+          "body": "Inversionta ruwanaykipaq aypanmi, ichaqa Bitcoin hinaspa Dólar cuentaykipi rakisqam kachkan. Tikray llapan qullqi huknillanpi kananpaq."
+        }
       },
       "DepositPending": {
         "message": "Depositoyki hunt'akunankama suyachkanchik; iskay cadena-pi takyachiykama suyay.",

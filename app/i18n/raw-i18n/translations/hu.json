@@ -3730,7 +3730,11 @@
           "body2": "Utalj be több mint {shortfall: string} összeget a számládra, hogy elérd a {investmentAmount: string} befektetési összeget.",
           "body3": "Győződj meg róla, hogy a teljes összeg a számláid egyikén van; Bitcoin vagy dollár."
         },
-        "buttonText": "Befizetés"
+        "buttonText": "Befizetés",
+        "splitFunds": {
+          "title": "A pénzed meg van osztva",
+          "body": "Van elég a befektetéshez, de meg van osztva a Bitcoin- és a Dollár-számlád között. Váltsd át, hogy a teljes összeg az egyiken legyen."
+        }
       },
       "DepositPending": {
         "message": "Várakozás a befizetésed teljesülésére; kérjük, várj 2 megerősítésre a láncon.",

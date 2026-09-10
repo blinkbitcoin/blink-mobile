@@ -3730,7 +3730,11 @@
           "body2": "Faka ngaphezu kwe-{shortfall: string} kwiakhawunti yakho ukuze ufikelele kwimali yotyalo-mali eyi-{investmentAmount: string}.",
           "body3": "Qiniseka ukuba yonke imali ikwenye yeeakhawunti zakho; iBitcoin okanye iDollar."
         },
-        "buttonText": "Faka imali"
+        "buttonText": "Faka imali",
+        "splitFunds": {
+          "title": "Imali yakho yahlulahlulwe",
+          "body": "Unemali eyaneleyo yokutyala, kodwa yahlulwe phakathi kweeakhawunti zakho zeBitcoin neeDola. Guqula ukuze isixa sonke sibe kwenye kuzo."
+        }
       },
       "DepositPending": {
         "message": "Kulindwe ukuba idiphozithi yakho igqitywe; nceda ulinde iiqinisekiso ezi-2 kwitsheyini.",

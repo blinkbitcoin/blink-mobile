@@ -3730,7 +3730,11 @@
           "body2": "Diposita més de {shortfall: string} al teu compte per assolir l'import de la inversió de {investmentAmount: string}.",
           "body3": "Assegura't que l'import complet es trobi en algun dels teus comptes; Bitcoin o dòlar."
         },
-        "buttonText": "Diposita"
+        "buttonText": "Diposita",
+        "splitFunds": {
+          "title": "Els teus fons estan repartits",
+          "body": "Tens prou per invertir, però està repartit entre els comptes de Bitcoin i de Dòlar. Converteix perquè l'import complet quedi en un de sol."
+        }
       },
       "DepositPending": {
         "message": "Esperant que el teu dipòsit es liquidi; espera 2 confirmacions a la cadena.",

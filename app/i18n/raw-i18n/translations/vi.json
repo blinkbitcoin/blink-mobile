@@ -3730,7 +3730,11 @@
           "body2": "Hãy nạp hơn {shortfall: string} vào tài khoản của bạn để đạt đến số tiền đầu tư là {investmentAmount: string}.",
           "body3": "Hãy đảm bảo toàn bộ số tiền nằm trong một trong các tài khoản của bạn; Bitcoin hoặc Dollar."
         },
-        "buttonText": "Nạp tiền"
+        "buttonText": "Nạp tiền",
+        "splitFunds": {
+          "title": "Tiền của bạn đang bị chia nhỏ",
+          "body": "Bạn có đủ để đầu tư, nhưng số tiền đang nằm rải rác giữa tài khoản Bitcoin và tài khoản Đô la. Hãy chuyển đổi để toàn bộ số tiền nằm trong một tài khoản."
+        }
       },
       "DepositPending": {
         "message": "Đang chờ khoản tiền gửi của bạn được xử lý; vui lòng chờ 2 xác nhận trên chuỗi.",

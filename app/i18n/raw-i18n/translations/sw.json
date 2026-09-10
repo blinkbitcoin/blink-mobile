@@ -3730,7 +3730,11 @@
           "body2": "Weka zaidi ya {shortfall: string} kwenye akaunti yako ili kufikia kiasi cha uwekezaji cha {investmentAmount: string}.",
           "body3": "Hakikisha kiasi kamili kiko katika mojawapo ya akaunti zako; Bitcoin au Dola."
         },
-        "buttonText": "Weka"
+        "buttonText": "Weka",
+        "splitFunds": {
+          "title": "Fedha zako zimegawanyika",
+          "body": "Una kiasi cha kutosha kuwekeza, lakini kimegawanyika kati ya akaunti yako ya Bitcoin na ya Dola. Badilisha ili kiasi chote kiwe kwenye moja."
+        }
       },
       "DepositPending": {
         "message": "Inasubiri amana yako ikamilike; tafadhali subiri uthibitisho 2 kwenye mnyororo.",

@@ -3778,7 +3778,11 @@
                     "body2": "Deposita más de {shortfall: string} en tu cuenta para alcanzar el monto de inversión de {investmentAmount: string}.",
                     "body3": "Asegúrate de que el monto completo esté en una de tus cuentas; Bitcoin o dólar."
                 },
-                "buttonText": "Depositar"
+                "buttonText": "Depositar",
+                "splitFunds": {
+                    "title": "Tus fondos están repartidos",
+                    "body": "Tienes suficiente para invertir, pero está repartido entre tus cuentas de Bitcoin y de Dólar. Convierte para que el monto completo quede en una sola."
+                }
             },
             "DepositPending": {
                 "message": "Esperando a que se liquide tu depósito; espera 2 confirmaciones en la cadena.",

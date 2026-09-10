@@ -3730,7 +3730,11 @@
           "body2": "Uplati više od {shortfall: string} na svoj račun kako bi dosegnuo iznos ulaganja od {investmentAmount: string}.",
           "body3": "Provjeri da je cijeli iznos na jednom od tvojih računa; Bitcoin ili dolar."
         },
-        "buttonText": "Uplati"
+        "buttonText": "Uplati",
+        "splitFunds": {
+          "title": "Vaša sredstva su podijeljena",
+          "body": "Imate dovoljno za ulaganje, ali je podijeljeno između Bitcoin i Dolar računa. Pretvorite kako bi cijeli iznos bio na jednom od njih."
+        }
       },
       "DepositPending": {
         "message": "Čeka se namira tvog pologa; pričekaj 2 potvrde na lancu.",

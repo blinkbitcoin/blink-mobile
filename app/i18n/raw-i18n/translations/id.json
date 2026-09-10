@@ -3730,7 +3730,11 @@
           "body2": "Setor lebih dari {shortfall: string} ke akunmu untuk mencapai jumlah investasi sebesar {investmentAmount: string}.",
           "body3": "Pastikan seluruh jumlah berada di salah satu akunmu; Bitcoin atau Dolar."
         },
-        "buttonText": "Setor"
+        "buttonText": "Setor",
+        "splitFunds": {
+          "title": "Dana Anda terbagi",
+          "body": "Anda punya cukup untuk berinvestasi, tetapi tersebar di akun Bitcoin dan Dolar Anda. Konversikan agar seluruh jumlahnya ada di salah satunya."
+        }
       },
       "DepositPending": {
         "message": "Menunggu setoranmu diselesaikan; harap tunggu 2 konfirmasi di rantai.",

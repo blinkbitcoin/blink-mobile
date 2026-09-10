@@ -12417,6 +12417,16 @@ type RootTranslation = {
 				 * D​e​p​o​s​i​t
 				 */
 				buttonText: string
+				splitFunds: {
+					/**
+					 * Y​o​u​r​ ​f​u​n​d​s​ ​a​r​e​ ​s​p​l​i​t
+					 */
+					title: string
+					/**
+					 * Y​o​u​ ​h​a​v​e​ ​e​n​o​u​g​h​ ​t​o​ ​i​n​v​e​s​t​,​ ​b​u​t​ ​i​t​ ​i​s​ ​s​p​r​e​a​d​ ​a​c​r​o​s​s​ ​y​o​u​r​ ​B​i​t​c​o​i​n​ ​a​n​d​ ​D​o​l​l​a​r​ ​a​c​c​o​u​n​t​s​.​ ​C​o​n​v​e​r​t​ ​s​o​ ​t​h​e​ ​f​u​l​l​ ​a​m​o​u​n​t​ ​s​i​t​s​ ​i​n​ ​o​n​e​ ​o​f​ ​t​h​e​m​.
+					 */
+					body: string
+				}
 			}
 			DepositPending: {
 				/**
@@ -26092,6 +26102,16 @@ export type TranslationFunctions = {
 				 * Deposit
 				 */
 				buttonText: () => LocalizedString
+				splitFunds: {
+					/**
+					 * Your funds are split
+					 */
+					title: () => LocalizedString
+					/**
+					 * You have enough to invest, but it is spread across your Bitcoin and Dollar accounts. Convert so the full amount sits in one of them.
+					 */
+					body: () => LocalizedString
+				}
 			}
 			DepositPending: {
 				/**

@@ -3730,7 +3730,11 @@
           "body2": "Depune mai mult de {shortfall: string} în contul tău pentru a atinge suma de investiție de {investmentAmount: string}.",
           "body3": "Asigură-te că întreaga sumă se află în unul dintre conturile tale; Bitcoin sau dolar."
         },
-        "buttonText": "Depune"
+        "buttonText": "Depune",
+        "splitFunds": {
+          "title": "Fondurile tale sunt împărțite",
+          "body": "Ai destul pentru a investi, dar suma este împărțită între contul de Bitcoin și cel de Dolari. Convertește astfel încât întreaga sumă să fie într-unul singur."
+        }
       },
       "DepositPending": {
         "message": "Se așteaptă decontarea depozitului tău; te rugăm să aștepți 2 confirmări pe lanț.",

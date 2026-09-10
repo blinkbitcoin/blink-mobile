@@ -3730,7 +3730,11 @@
           "body2": "Deposit lebih daripada {shortfall: string} ke dalam akaun anda untuk mencapai jumlah pelaburan sebanyak {investmentAmount: string}.",
           "body3": "Pastikan jumlah penuh berada dalam salah satu akaun anda; Bitcoin atau Dolar."
         },
-        "buttonText": "Deposit"
+        "buttonText": "Deposit",
+        "splitFunds": {
+          "title": "Dana anda terbahagi",
+          "body": "Anda mempunyai cukup untuk melabur, tetapi ia terbahagi antara akaun Bitcoin dan Dolar anda. Tukarkan supaya jumlah penuh berada dalam salah satu daripadanya."
+        }
       },
       "DepositPending": {
         "message": "Menunggu deposit anda diselesaikan; sila tunggu 2 pengesahan pada rantai.",

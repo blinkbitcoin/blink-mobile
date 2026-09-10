@@ -3902,6 +3902,10 @@ const en: BaseTranslation = {
           body3: "Make sure that the full amount is in either of your accounts; Bitcoin or Dollar.",
         },
         buttonText: "Deposit",
+        splitFunds: {
+          title: "Your funds are split",
+          body: "You have enough to invest, but it is spread across your Bitcoin and Dollar accounts. Convert so the full amount sits in one of them.",
+        },
       },
       DepositPending: {
         message: "Waiting for your deposit to settle, please wait 2 on-chain confirmations",

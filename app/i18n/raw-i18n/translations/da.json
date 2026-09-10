@@ -3730,7 +3730,11 @@
           "body2": "Indbetal mere end {shortfall: string} på din konto for at nå investeringsbeløbet på {investmentAmount: string}.",
           "body3": "Sørg for, at hele beløbet står på en af dine konti; Bitcoin eller Dollar."
         },
-        "buttonText": "Indbetal"
+        "buttonText": "Indbetal",
+        "splitFunds": {
+          "title": "Dine midler er delt op",
+          "body": "Du har nok til at investere, men det er fordelt mellem din Bitcoin- og din Dollar-konto. Konvertér, så hele beløbet står på én af dem."
+        }
       },
       "DepositPending": {
         "message": "Venter på, at dit indskud afregnes; vent venligst på 2 bekræftelser på kæden.",
