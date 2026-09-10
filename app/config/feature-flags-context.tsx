@@ -54,7 +54,6 @@ const CardLateRepaymentFeeUsdKey = "cardLateRepaymentFeeUsd"
 const ReplaceCardDeliveryConfigKey = "replaceCardDeliveryConfig"
 const SparkCompatibleWalletsUrlKey = "sparkCompatibleWalletsUrl"
 const CardInvestmentDepositBtcWalletIdKey = "cardInvestmentDepositBtcWalletId"
-const CardInvestmentEsignFormUrlKey = "cardInvestmentEsignFormUrl"
 const BackupNudgeBannerThresholdKey = "backupNudgeBannerThreshold"
 const BackupNudgeModalThresholdKey = "backupNudgeModalThreshold"
 const BackupNudgeModalCooldownMsKey = "backupNudgeModalCooldownMs"
@@ -135,7 +134,6 @@ type RemoteConfig = {
   [ReplaceCardDeliveryConfigKey]: ReplaceCardDeliveryConfig
   [SparkCompatibleWalletsUrlKey]: string
   [CardInvestmentDepositBtcWalletIdKey]: string
-  [CardInvestmentEsignFormUrlKey]: string
   [BackupNudgeBannerThresholdKey]: number
   [BackupNudgeModalThresholdKey]: number
   [BackupNudgeModalCooldownMsKey]: number
@@ -270,9 +268,6 @@ export const defaultRemoteConfig: RemoteConfig = {
    *  money. A dollar wallet is refused by the API and reads as a failed invoice. Empty
    *  until that account is decided, and the transfer step cannot pay while it is. */
   cardInvestmentDepositBtcWalletId: "",
-  /** The published DocuSign Web Form the investment agreement is signed on. The
-   *  signing step has nothing to embed while it is empty. */
-  cardInvestmentEsignFormUrl: "",
   backupNudgeBannerThreshold: 2100,
   backupNudgeModalThreshold: 21000,
   /** How long the self-custodial backup modal stays dismissed after the user closes it.
@@ -592,11 +587,6 @@ const readRemoteConfig = (): RemoteConfig => {
     defaultRemoteConfig.cardInvestmentDepositBtcWalletId,
   )
 
-  const cardInvestmentEsignFormUrl = readString(
-    CardInvestmentEsignFormUrlKey,
-    defaultRemoteConfig.cardInvestmentEsignFormUrl,
-  )
-
   const backupNudgeBannerThreshold = readNumber(
     BackupNudgeBannerThresholdKey,
     defaultRemoteConfig.backupNudgeBannerThreshold,
@@ -756,7 +746,6 @@ const readRemoteConfig = (): RemoteConfig => {
     replaceCardDeliveryConfig,
     sparkCompatibleWalletsUrl,
     cardInvestmentDepositBtcWalletId,
-    cardInvestmentEsignFormUrl,
     backupNudgeBannerThreshold,
     backupNudgeModalThreshold,
     backupNudgeModalCooldownMs,
