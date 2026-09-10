@@ -77,7 +77,15 @@ type FeatureFlags = {
   deviceAccountEnabled: boolean
   nonCustodialEnabled: boolean
   stableBalanceEnabled: boolean
+  /** The fetch has settled, either way. Gates rendering, not trust. */
   remoteConfigReady: boolean
+  /**
+   * The fetch actually succeeded. Distinct from `remoteConfigReady` because every flag
+   * here falls back to a shipped default when the fetch throws, and a default read as an
+   * answer is a fail-open: `nonCustodialEnabled` defaults to `false`, which reads as
+   * "self-custody was turned off for this user" rather than "we could not ask".
+   */
+  remoteConfigTrusted: boolean
 }
 
 type RemoteConfig = {
@@ -249,6 +257,7 @@ const defaultFeatureFlags: FeatureFlags = {
   nonCustodialEnabled: false,
   stableBalanceEnabled: false,
   remoteConfigReady: false,
+  remoteConfigTrusted: false,
 }
 
 remoteConfigInstance().setDefaults({
@@ -288,6 +297,7 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
 
   const { currentLevel } = useLevel()
   const [remoteConfigReady, setRemoteConfigReady] = useState(false)
+  const [remoteConfigTrusted, setRemoteConfigTrusted] = useState(false)
   const rolloutLoggedRef = useRef(false)
 
   const {
@@ -525,6 +535,7 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           migrationDelayedRedirectEnabled,
           feeRatesConfig,
         })
+        setRemoteConfigTrusted(true)
       } catch (err) {
         logError({
           scope: "remote-config",
@@ -545,6 +556,7 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
     stableBalanceEnabled:
       remoteConfig.nonCustodialEnabled && remoteConfig.stableBalanceEnabled,
     remoteConfigReady,
+    remoteConfigTrusted,
   }
 
   useEffect(() => {

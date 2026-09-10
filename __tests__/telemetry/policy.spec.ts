@@ -4,18 +4,18 @@
 import { it } from "@jest/globals"
 
 import {
-  MeasurementEvent,
+  TelemetryEvent,
   RailType,
   TelemetryConversionDirection,
   TelemetryDirection,
   WalletProvider,
-} from "@app/self-custodial/measurement/contract"
+} from "@app/telemetry/contract"
 import {
   applyPrivacyPolicy,
   getDroppedEventCounts,
   PolicyRejection,
   resetDroppedEventCountsForTesting,
-} from "@app/self-custodial/measurement/policy"
+} from "@app/telemetry/policy"
 
 const VALID_EVENT_ID = "3f2a1b4c-5d6e-4f70-8192-a3b4c5d6e7f8"
 
@@ -67,11 +67,11 @@ describe("privacy policy stage", () => {
   describe("the happy path it is measured against", () => {
     it("permits each event carrying exactly its declared fields", () => {
       expect(
-        applyPrivacyPolicy(MeasurementEvent.PaymentSettled, validPaymentSettled()),
+        applyPrivacyPolicy(TelemetryEvent.PaymentSettled, validPaymentSettled()),
       ).toEqual({ permitted: true })
 
       expect(
-        applyPrivacyPolicy(MeasurementEvent.ConversionSettled, {
+        applyPrivacyPolicy(TelemetryEvent.ConversionSettled, {
           event_version: 1,
           wallet_provider: WalletProvider.Spark,
           conversion_direction: TelemetryConversionDirection.UsdToBtc,
@@ -80,7 +80,7 @@ describe("privacy policy stage", () => {
       ).toEqual({ permitted: true })
 
       expect(
-        applyPrivacyPolicy(MeasurementEvent.ReferralCompleted, {
+        applyPrivacyPolicy(TelemetryEvent.ReferralCompleted, {
           event_version: 1,
           wallet_provider: WalletProvider.Spark,
           telemetry_event_id: VALID_EVENT_ID,
@@ -89,7 +89,7 @@ describe("privacy policy stage", () => {
     })
 
     it("counts nothing as dropped while payloads are well formed", () => {
-      applyPrivacyPolicy(MeasurementEvent.PaymentSettled, validPaymentSettled())
+      applyPrivacyPolicy(TelemetryEvent.PaymentSettled, validPaymentSettled())
 
       expect(getDroppedEventCounts()).toEqual({
         [PolicyRejection.UnknownEvent]: 0,
@@ -104,7 +104,7 @@ describe("privacy policy stage", () => {
     it.each(PROHIBITED_FIELDS)(
       "rejects the prohibited field $field",
       ({ field, value }) => {
-        const verdict = applyPrivacyPolicy(MeasurementEvent.PaymentSettled, {
+        const verdict = applyPrivacyPolicy(TelemetryEvent.PaymentSettled, {
           ...validPaymentSettled(),
           [field]: value,
         })
@@ -118,7 +118,7 @@ describe("privacy policy stage", () => {
     )
 
     it("records the drop locally so a misbehaving classifier is visible", () => {
-      applyPrivacyPolicy(MeasurementEvent.PaymentSettled, {
+      applyPrivacyPolicy(TelemetryEvent.PaymentSettled, {
         ...validPaymentSettled(),
         pubkey: "02abc",
       })
@@ -136,7 +136,7 @@ describe("privacy policy stage", () => {
     it("rejects a field that is legitimate on a different event", () => {
       // conversion_direction is an approved field — but not on payment_settled, where it
       // has no business being and is therefore unexplained.
-      const verdict = applyPrivacyPolicy(MeasurementEvent.PaymentSettled, {
+      const verdict = applyPrivacyPolicy(TelemetryEvent.PaymentSettled, {
         ...validPaymentSettled(),
         conversion_direction: TelemetryConversionDirection.BtcToUsd,
       })
@@ -153,7 +153,7 @@ describe("privacy policy stage", () => {
     it("rejects a hashed identifier smuggled through telemetry_event_id", () => {
       // A sha256 of a pubkey. "It's hashed, so it's anonymous" is the intuition §5.5
       // exists to refuse: a stable transform of a stable identifier is still one.
-      const verdict = applyPrivacyPolicy(MeasurementEvent.PaymentSettled, {
+      const verdict = applyPrivacyPolicy(TelemetryEvent.PaymentSettled, {
         ...validPaymentSettled(),
         telemetry_event_id:
           "9b74c9897bac770ffc029102a200c5de3e59d2ceb9e0d7b25b1f0b1c1a1d4e5f",
@@ -169,7 +169,7 @@ describe("privacy policy stage", () => {
     it.each(DERIVED_EVENT_IDS)(
       "rejects $label in place of the random id",
       ({ value }) => {
-        const verdict = applyPrivacyPolicy(MeasurementEvent.PaymentSettled, {
+        const verdict = applyPrivacyPolicy(TelemetryEvent.PaymentSettled, {
           ...validPaymentSettled(),
           telemetry_event_id: value,
         })
@@ -182,7 +182,7 @@ describe("privacy policy stage", () => {
     )
 
     it("rejects a bucketed amount hidden in rail_type", () => {
-      const verdict = applyPrivacyPolicy(MeasurementEvent.PaymentSettled, {
+      const verdict = applyPrivacyPolicy(TelemetryEvent.PaymentSettled, {
         ...validPaymentSettled(),
         rail_type: "lightning_10k_to_100k",
       })
@@ -197,7 +197,7 @@ describe("privacy policy stage", () => {
     it.each(UNDECLARED_VALUES)(
       "rejects an undeclared value for $field",
       ({ field, value }) => {
-        const verdict = applyPrivacyPolicy(MeasurementEvent.PaymentSettled, {
+        const verdict = applyPrivacyPolicy(TelemetryEvent.PaymentSettled, {
           ...validPaymentSettled(),
           [field]: value,
         })
@@ -211,9 +211,9 @@ describe("privacy policy stage", () => {
     )
 
     it("rejects a fine rail split that FR-17 has not yet unblocked", () => {
-      // Guards CD-5: only three coarse rails may ship at P2, whatever the SDK starts
-      // reporting.
-      const verdict = applyPrivacyPolicy(MeasurementEvent.PaymentSettled, {
+      // Guards CD-5: the four coarse rails are the whole vocabulary at P2, whatever the
+      // SDK starts reporting.
+      const verdict = applyPrivacyPolicy(TelemetryEvent.PaymentSettled, {
         ...validPaymentSettled(),
         rail_type: "bolt11",
       })
@@ -229,7 +229,7 @@ describe("privacy policy stage", () => {
         const payload: Record<string, string | number> = validPaymentSettled()
         delete payload[field]
 
-        expect(applyPrivacyPolicy(MeasurementEvent.PaymentSettled, payload)).toEqual({
+        expect(applyPrivacyPolicy(TelemetryEvent.PaymentSettled, payload)).toEqual({
           permitted: false,
           rejection: PolicyRejection.MissingField,
           field,
@@ -239,7 +239,7 @@ describe("privacy policy stage", () => {
 
     it("rejects a non-integer event version", () => {
       expect(
-        applyPrivacyPolicy(MeasurementEvent.PaymentSettled, {
+        applyPrivacyPolicy(TelemetryEvent.PaymentSettled, {
           ...validPaymentSettled(),
           event_version: "v1",
         }),

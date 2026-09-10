@@ -247,12 +247,16 @@ export const useSdkLifecycle = (
         }
 
         /**
-         * Both directions are counted from here rather than from the send and receive call
-         * sites (FR-10, FR-11). The SDK is the only place that observes settlement itself:
-         * a send returns before it is final, and receives arrive with no call site at all —
-         * over the Lightning Address, a plain BOLT11 invoice, or a direct Spark transfer.
-         * The emitter is a no-op outside Enhanced mode and drops anything it cannot
-         * classify, so a repeat of this event costs a deduplicated row, never a wrong one.
+         * The sole emission point (AD-15). Both directions are counted from here rather
+         * than from the send and receive call sites (FR-10, FR-11): the SDK is the only
+         * place that observes settlement itself — a send returns before it is final, and
+         * receives arrive with no call site at all, over the Lightning Address, a plain
+         * BOLT11 invoice, or a direct Spark transfer. Nothing in the refresh path may emit;
+         * `refreshWallets` has three independent triggers and would count each settlement
+         * up to three times.
+         *
+         * The emitter is a no-op outside Enhanced mode, and the outbox keys on the SDK
+         * payment id, so a repeated callback costs nothing rather than a second count.
          */
         const settled = extractSettledPayment(event)
         if (settled) logPaymentSettled(settled)

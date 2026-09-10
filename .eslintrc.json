@@ -131,8 +131,19 @@
           {
             "name": "react-native-secure-key-store",
             "message": "Import the legacy key store only from app/utils/storage/legacy-key-store.ts, which re-arms the uninstall guard before every call. See blinkbitcoin/blink-wip#1160."
+          },
+          {
+            "name": "@react-native-firebase/analytics",
+            "message": "Reach analytics only through app/telemetry. Everything the app emits passes the privacy boundary's gate and policy first; a direct import is call site number 37, and FR-2 is a build-time fact rather than a review claim."
           }
         ]
+      }
+    ],
+    "no-restricted-syntax": [
+      "error",
+      {
+        "selector": "CallExpression[callee.property.name=/^(setUserId|setUserProperty|setUserProperties)$/]",
+        "message": "User-scoped analytics identity belongs in app/telemetry/platform-analytics.ts, which the mode gate can clear when a self-custodial account activates. Firebase merges it into every later event, so an uncleared identifier leaks into events no call site touched."
       }
     ],
     "no-return-assign": "error",
@@ -177,12 +188,86 @@
   },
   "overrides": [
     {
+      "files": ["app/telemetry/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "react-native-secure-key-store",
+                "message": "Import the legacy key store only from app/utils/storage/legacy-key-store.ts, which re-arms the uninstall guard before every call. See blinkbitcoin/blink-wip#1160."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["__tests__/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "react-native-secure-key-store",
+                "message": "Import the legacy key store only from app/utils/storage/legacy-key-store.ts, which re-arms the uninstall guard before every call. See blinkbitcoin/blink-wip#1160."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["app/telemetry/platform-analytics.ts"],
+      "rules": {
+        "no-restricted-syntax": "off"
+      }
+    },
+    {
       "files": [
         "app/utils/storage/legacy-key-store.ts",
         "app/utils/storage/secureStorage.ts"
       ],
       "rules": {
-        "no-restricted-imports": "off"
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "@react-native-firebase/analytics",
+                "message": "Reach analytics only through app/telemetry."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": [
+        "app/navigation/navigation-container-wrapper.tsx",
+        "app/screens/email-login-screen/email-login-validate.tsx",
+        "app/screens/get-started-screen/use-create-device-account.ts",
+        "app/screens/phone-auth-screen/phone-login-validation.tsx",
+        "app/screens/telegram-login-screen/telegram-auth.ts",
+        "app/screens/totp-screen/totp-login-validate.tsx",
+        "app/self-custodial/analytics.ts",
+        "app/utils/analytics.ts",
+        "app/utils/storage/secure-store-migration.ts"
+      ],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "react-native-secure-key-store",
+                "message": "Import the legacy key store only from app/utils/storage/legacy-key-store.ts, which re-arms the uninstall guard before every call. See blinkbitcoin/blink-wip#1160."
+              }
+            ]
+          }
+        ]
       }
     }
   ],
