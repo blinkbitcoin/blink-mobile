@@ -14,23 +14,48 @@ import { useEffect, useRef } from "react"
 export const DrainConversionReturn = {
   Migration: "migration",
   ModeSelection: "modeSelection",
+  Investment: "investment",
 } as const
 
 export type DrainConversionReturn =
   (typeof DrainConversionReturn)[keyof typeof DrainConversionReturn]
 
-let drainConversionArmed: DrainConversionReturn | null = null
+/**
+ * Where the conversion returns, and what the flow needs back to carry on.
+ *
+ * The two drains that empty a balance need nothing but the destination. The investment
+ * step resumes on a figure the investor chose several screens earlier, which no screen
+ * downstream can work out on its own, so the arm carries it.
+ */
+export type DrainConversionArm = {
+  target: DrainConversionReturn
+  /** Only the investment arm carries one. */
+  selectedAmountUsd?: number
+}
+
+let drainConversionArmed: DrainConversionArm | null = null
 
 export const armMigrationConversion = (): void => {
-  drainConversionArmed = DrainConversionReturn.Migration
+  drainConversionArmed = { target: DrainConversionReturn.Migration }
 }
 
 /** Same waiver, armed by the Anon-mode switch: its dollar balance must drain first. */
 export const armModeSelectionConversion = (): void => {
-  drainConversionArmed = DrainConversionReturn.ModeSelection
+  drainConversionArmed = { target: DrainConversionReturn.ModeSelection }
 }
 
-const consumeDrainConversionArmed = (): DrainConversionReturn | null => {
+/**
+ * Armed by the investment step when the money is held between both wallets: a payment
+ * draws on one, so the investor converts to put the whole amount in a single wallet and
+ * lands back on the step they left, for the amount they left it on.
+ *
+ * Not a drain: this converts what the investor chooses, and claims no waiver.
+ */
+export const armInvestmentConversion = (selectedAmountUsd: number): void => {
+  drainConversionArmed = { target: DrainConversionReturn.Investment, selectedAmountUsd }
+}
+
+const consumeDrainConversionArmed = (): DrainConversionArm | null => {
   const armed = drainConversionArmed
   drainConversionArmed = null
   return armed
@@ -53,8 +78,8 @@ export const resetDrainConversionArmed = (): void => {
  * the screen was reused instead of remounted, which would otherwise promote the next plain
  * conversion into a migration one.
  */
-export const useConsumeDrainConversionArmed = (): DrainConversionReturn | null => {
-  const consumedRef = useRef<{ value: DrainConversionReturn | null } | null>(null)
+export const useConsumeDrainConversionArmed = (): DrainConversionArm | null => {
+  const consumedRef = useRef<{ value: DrainConversionArm | null } | null>(null)
   if (consumedRef.current === null) {
     consumedRef.current = { value: consumeDrainConversionArmed() }
   }
