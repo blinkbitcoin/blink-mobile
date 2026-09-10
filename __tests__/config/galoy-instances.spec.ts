@@ -41,6 +41,7 @@ it("get a full object with Custom", () => {
     lnAddressHostname: "custom.com",
     blockExplorer: "https://mempool.space/tx/",
     sparkExplorer: "https://sparkscan.io/tx/",
+    esignMintUrl: "https://esign.custom.com",
   } as const
 
   const res = resolveGaloyInstanceOrDefault(CustomInstance)

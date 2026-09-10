@@ -4,6 +4,7 @@ import {
   resolveEquityPercent,
   resolveInvestmentFunding,
   resolveInvestmentTerms,
+  resolveSettlementQuote,
 } from "@app/screens/card-screen/onboarding/investment-flow/investment-terms"
 import { MOCK_CREDIT_LIMIT_VALUES } from "@app/screens/card-screen/onboarding/onboarding-mock-data"
 
@@ -23,6 +24,52 @@ describe("resolveInvestmentTerms", () => {
     expect(resolveInvestmentTerms(1000).preMoneyValuationUsd).toBe(10_000_000)
     expect(resolveInvestmentTerms(100000).preMoneyValuationUsd).toBe(10_000_000)
   })
+
+  describe("the settlement quote", () => {
+    /** 2026-09-07 15:09 UTC, which Honduras reads six hours earlier. */
+    const AT = new Date("2026-09-07T15:09:30.000Z")
+    const quote = { btcUsdRate: 100000, at: AT }
+
+    it("converts the total at the quoted rate", () => {
+      expect(resolveInvestmentTerms(25000, quote).settlementBtc).toBe(0.25)
+    })
+
+    /** The signer commits to a figure that has to be payable to the satoshi, not to
+     *  whatever a float happens to print. */
+    it("quotes the settlement to the satoshi", () => {
+      expect(
+        resolveInvestmentTerms(1000, { ...quote, btcUsdRate: 63333 }).settlementBtc,
+      ).toBe(0.01578956)
+    })
+
+    it("carries the rate it quoted against", () => {
+      expect(resolveInvestmentTerms(25000, quote).btcUsdRate).toBe(100000)
+    })
+
+    /** The document names the zone, and Honduras holds UTC-6 all year. */
+    it("stamps the rate in Honduras time", () => {
+      expect(resolveInvestmentTerms(25000, quote).rateTimestamp).toBe("2026-09-07 09:09")
+    })
+
+    /**
+     * The agreement fixes a rate its payment is then owed at, so an invented one would be
+     * worse than none: without a price the three BTC figures are simply absent.
+     */
+    it("leaves the btc figures out when there is no price", () => {
+      const terms = resolveInvestmentTerms(25000, null)
+
+      expect(terms.settlementBtc).toBeUndefined()
+      expect(terms.btcUsdRate).toBeUndefined()
+      expect(terms.rateTimestamp).toBeUndefined()
+    })
+
+    it("leaves them out rather than dividing by a zero rate", () => {
+      const terms = resolveInvestmentTerms(25000, { btcUsdRate: 0, at: AT })
+
+      expect(terms.settlementBtc).toBeUndefined()
+      expect(terms.btcUsdRate).toBeUndefined()
+    })
+  })
 })
 
 describe("resolveEquityPercent", () => {
@@ -36,6 +83,32 @@ describe("resolveEquityPercent", () => {
     MOCK_CREDIT_LIMIT_VALUES.forEach(({ value, percent }) => {
       expect(resolveEquityPercent(resolveInvestmentTerms(value))).toBeCloseTo(percent, 10)
     })
+  })
+})
+
+describe("resolveSettlementQuote", () => {
+  const AT = new Date("2026-09-07T15:09:30.000Z")
+
+  /** The app prices in satoshis; the agreement is written in bitcoin. */
+  it("reads a whole-bitcoin rate off the price per satoshi", () => {
+    expect(resolveSettlementQuote("0.00100000", AT)).toEqual({
+      btcUsdRate: 100000,
+      at: AT,
+    })
+  })
+
+  it("has nothing to quote before the price feed answers", () => {
+    expect(resolveSettlementQuote(null, AT)).toBeNull()
+  })
+
+  /** A zero would divide the settlement by zero, and a NaN would reach the document as
+   *  the string "NaN": neither may be quoted. */
+  it("refuses a zero price", () => {
+    expect(resolveSettlementQuote("0", AT)).toBeNull()
+  })
+
+  it("refuses a price that is not a number", () => {
+    expect(resolveSettlementQuote("not a price", AT)).toBeNull()
   })
 })
 
