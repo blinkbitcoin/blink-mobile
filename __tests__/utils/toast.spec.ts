@@ -72,6 +72,15 @@ describe("toastShow", () => {
     )
   })
 
+  it("shows the toast at the top of the screen", () => {
+    const showSpy = jest.spyOn(Toast, "show")
+
+    toastShow({ message: "Copied", LL: mockLL, type: "success" })
+
+    expect(showSpy).toHaveBeenCalledWith(expect.objectContaining({ position: "top" }))
+    expect(showSpy.mock.calls[0][0]).not.toHaveProperty("bottomOffset")
+  })
+
   it("resolves message function with translations", () => {
     const showSpy = jest.spyOn(Toast, "show")
 
