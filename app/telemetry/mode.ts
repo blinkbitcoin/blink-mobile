@@ -24,12 +24,18 @@ import {
  * every call behind the boundary, at which point that distinction collapses. The contract
  * enumerates three events; everything else is a non-contract event whatever emitted it.
  *
- * | mode       | contract events | non-contract events |
- * |------------|-----------------|---------------------|
- * | Custodial  | permitted       | permitted           |
- * | Enhanced   | permitted       | suppressed (FR-70)  |
- * | Anon       | suppressed      | suppressed          |
- * | Unresolved | suppressed      | suppressed          |
+ * | mode       | contract events | non-contract events | platform collection |
+ * |------------|-----------------|---------------------|---------------------|
+ * | Custodial  | permitted       | permitted           | on                  |
+ * | Enhanced   | permitted       | suppressed (FR-70)  | off                 |
+ * | Anon       | suppressed      | suppressed          | off                 |
+ * | Unresolved | suppressed      | suppressed          | off                 |
+ *
+ * The last column is where AD-9's 2026-09-11 re-amendment and this table part ways: CD-6
+ * would have Enhanced collection *on* so contract events could ride Firebase. That needs
+ * the SDK to suppress its automatic events while `logEvent()` stays live, and it cannot
+ * (Q13 — see `platform-analytics.ts`). So Enhanced contract events go to the outbox and
+ * the port, and Enhanced collection stays off. Same table, different transport.
  */
 
 export const TelemetryMode = {

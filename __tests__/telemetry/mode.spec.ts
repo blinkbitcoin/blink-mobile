@@ -138,6 +138,11 @@ describe("the collection gate", () => {
     )
 
     it("runs platform collection on Custodial alone", async () => {
+      // CD-6 (2026-09-11) would have Enhanced collection on so contract events could ride
+      // Firebase. That needs the SDK to suppress its automatic events while logEvent()
+      // stays live, and @react-native-firebase/analytics@23.3.1 offers no such switch
+      // (spine Q13, verified — see platform-analytics.ts). Enhanced therefore stays off,
+      // and this assertion is the FR-70 side of that answer.
       await resolveTelemetryMode(TelemetryMode.Custodial)
       expect(setCollectionEnabled).toHaveBeenLastCalledWith(true)
 
