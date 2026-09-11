@@ -134,7 +134,7 @@ describe("GaloyToast", () => {
           alignItems: "center",
           alignSelf: "stretch",
           gap: 12,
-          marginHorizontal: 14,
+          marginHorizontal: 20,
           paddingHorizontal: 12,
           paddingVertical: 14,
           borderWidth: 1,

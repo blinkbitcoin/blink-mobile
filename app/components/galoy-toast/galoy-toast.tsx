@@ -8,6 +8,7 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { GaloyIcon, IconNamesType } from "../atomic/galoy-icon"
 
 export const TOAST_TOP_OFFSET = 40
+export const TOAST_HORIZONTAL_INSET = 20
 
 type ToastType = "success" | "error" | "warning"
 
@@ -61,7 +62,7 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
-    marginHorizontal: 14,
+    marginHorizontal: TOAST_HORIZONTAL_INSET,
     paddingHorizontal: 12,
     paddingVertical: 14,
     borderWidth: 1,
