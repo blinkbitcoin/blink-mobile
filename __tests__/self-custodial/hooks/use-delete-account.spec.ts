@@ -40,8 +40,13 @@ jest.mock("@app/self-custodial/bridge", () => ({
 }))
 
 const mockStorageDirFor = jest.fn((id: string, _network: unknown) => `/tmp/${id}`)
+const mockTelemetryOutboxDirFor = jest.fn(
+  (id: string, _network: unknown) => `/tmp/outbox/${id}`,
+)
 jest.mock("@app/self-custodial/config", () => ({
   storageDirFor: (id: string, network: unknown) => mockStorageDirFor(id, network),
+  telemetryOutboxDirFor: (id: string, network: unknown) =>
+    mockTelemetryOutboxDirFor(id, network),
 }))
 
 jest.mock("@app/self-custodial/providers/backup-state", () => ({
@@ -147,6 +152,45 @@ describe("useDeleteAccount", () => {
       TEST_SC_ACCOUNT_ID,
       mockSparkNetwork.Mainnet,
     )
+  })
+
+  it("wipes the telemetry outbox alongside the wallet store", async () => {
+    // The outbox is a sibling of the wallet store, so it shares its deletion pairing.
+    // Left behind, its queued records outlive the account that produced them and nothing
+    // ever sweeps them: the 72h TTL only runs while a store for that account is mounted,
+    // and a deleted account never mounts one again.
+    const { result } = renderHook(() => useDeleteAccount())
+
+    await act(async () => {
+      await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
+    })
+
+    expect(mockTelemetryOutboxDirFor).toHaveBeenCalledWith(
+      TEST_SC_ACCOUNT_ID,
+      mockSparkNetwork.Regtest,
+    )
+    expect(mockUnlink).toHaveBeenCalledWith(`/tmp/outbox/${TEST_SC_ACCOUNT_ID}`)
+    // Anchor: the wallet store is still wiped too, so this is an addition rather than a
+    // swap of one directory for the other.
+    expect(mockUnlink).toHaveBeenCalledWith(`/tmp/${TEST_SC_ACCOUNT_ID}`)
+  })
+
+  it("finishes the delete when the outbox unlink fails", async () => {
+    // A missing outbox directory is the normal case for an account that never emitted.
+    mockUnlink.mockImplementation((path: string) =>
+      path.startsWith("/tmp/outbox/")
+        ? Promise.reject(new Error("ENOENT"))
+        : Promise.resolve(undefined),
+    )
+    const { result } = renderHook(() => useDeleteAccount())
+
+    let outcome: string | undefined
+    await act(async () => {
+      outcome = await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
+    })
+
+    expect(outcome).toBe("logged-out")
+    expect(mockRemoveSelfCustodialAccountId).toHaveBeenCalledWith(TEST_SC_ACCOUNT_ID)
   })
 
   it("switches to the custodial account and returns 'switched-to-custodial' when a custodial account exists", async () => {

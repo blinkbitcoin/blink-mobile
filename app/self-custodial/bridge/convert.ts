@@ -282,6 +282,13 @@ const executePrepared = async (
   params: ConvertParams,
 ): Promise<PaymentAdapterResult> => {
   try {
+    /**
+     * No telemetry here. `sendPayment` resolving is not a settled swap — the send leg can
+     * succeed while the conversion is still in flight, and a swap counted at this point
+     * would stay counted when it later fails. `conversion_settled` is emitted from the SDK
+     * settlement listener instead, where the conversion's own status is observable
+     * (AD-15: the listener is the sole emission point).
+     */
     await sdk.sendPayment(SendPaymentRequest.create({ prepareResponse: prepared }))
     return { status: PaymentResultStatus.Success }
   } catch (err) {

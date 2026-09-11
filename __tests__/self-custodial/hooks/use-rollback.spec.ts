@@ -5,6 +5,7 @@ import { useSelfCustodialRollback } from "@app/self-custodial/hooks/use-rollback
 
 let mockNonCustodialEnabled = true
 let mockRemoteConfigReady = true
+let mockRemoteConfigTrusted = true
 let mockHasCustodialAccount = true
 let mockGaloyAuthToken = ""
 
@@ -12,6 +13,7 @@ jest.mock("@app/config/feature-flags-context", () => ({
   useFeatureFlags: () => ({
     nonCustodialEnabled: mockNonCustodialEnabled,
     remoteConfigReady: mockRemoteConfigReady,
+    remoteConfigTrusted: mockRemoteConfigTrusted,
   }),
 }))
 
@@ -47,6 +49,7 @@ describe("useSelfCustodialRollback", () => {
     jest.clearAllMocks()
     mockNonCustodialEnabled = true
     mockRemoteConfigReady = true
+    mockRemoteConfigTrusted = true
     mockHasCustodialAccount = true
     mockGaloyAuthToken = "auth-token"
   })
@@ -77,6 +80,58 @@ describe("useSelfCustodialRollback", () => {
     )
 
     expect(mockSetActiveAccountId).not.toHaveBeenCalled()
+  })
+
+  describe("AD-9 — a failed remote config fetch is not an answer", () => {
+    it("does not roll back on the default flag when the fetch threw", () => {
+      // `remoteConfigReady` is set in a `finally` regardless of outcome, and
+      // `nonCustodialEnabled` defaults to false. Gating on readiness alone bounced a
+      // self-custodial user to custodial on any network blip — and, downstream, turned full
+      // analytics collection on for someone who last chose incognito.
+      mockNonCustodialEnabled = false
+      mockRemoteConfigTrusted = false
+
+      renderHook(() =>
+        useSelfCustodialRollback({
+          activeAccount: selfCustodialAccount,
+          accounts: [custodialAccount, selfCustodialAccount],
+          setActiveAccountId: mockSetActiveAccountId,
+        }),
+      )
+
+      expect(mockSetActiveAccountId).not.toHaveBeenCalled()
+    })
+
+    it("rolls back once the same answer arrives from a fetch that succeeded", () => {
+      mockNonCustodialEnabled = false
+      mockRemoteConfigTrusted = true
+
+      renderHook(() =>
+        useSelfCustodialRollback({
+          activeAccount: selfCustodialAccount,
+          accounts: [custodialAccount, selfCustodialAccount],
+          setActiveAccountId: mockSetActiveAccountId,
+        }),
+      )
+
+      expect(mockSetActiveAccountId).toHaveBeenCalledWith(custodialAccount.id)
+    })
+
+    it("shows no lockout screen on an untrusted config", () => {
+      mockNonCustodialEnabled = false
+      mockRemoteConfigTrusted = false
+      mockHasCustodialAccount = false
+
+      const { result } = renderHook(() =>
+        useSelfCustodialRollback({
+          activeAccount: selfCustodialAccount,
+          accounts: [selfCustodialAccount],
+          setActiveAccountId: mockSetActiveAccountId,
+        }),
+      )
+
+      expect(result.current.shouldShowUnavailable).toBe(false)
+    })
   })
 
   it("does not roll back when active account is custodial", () => {

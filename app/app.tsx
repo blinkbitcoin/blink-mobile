@@ -23,6 +23,7 @@ import { NotificationsProvider } from "./components/notifications/index"
 import { PushNotificationComponent } from "./components/push-notification"
 import { FeatureFlagContextProvider } from "./config/feature-flags-context"
 import { CustodialWalletProvider } from "./custodial/providers/wallet"
+import { initializeTelemetryGate } from "./telemetry"
 import {
   AccountModeSyncMount,
   AutoConvertListenerMount,
@@ -30,6 +31,7 @@ import {
 } from "./self-custodial/components"
 import { AutoConvertStatusProvider } from "./self-custodial/providers/auto-convert-status"
 import { BackupStateProvider } from "./self-custodial/providers/backup-state"
+import { SelfCustodialTelemetryMount } from "./self-custodial/providers/telemetry"
 import { SelfCustodialWalletProvider } from "./self-custodial/providers/wallet"
 import { GaloyClient } from "./graphql/client"
 import { NetworkErrorComponent } from "./graphql/network-error-component"
@@ -54,6 +56,19 @@ import { RestrictedRegionProvider } from "./components/restricted-region"
 const defaultLocale = detectDefaultLocale()
 loadLocale(defaultLocale)
 if (__DEV__) console.log(`Loaded default locale: ${defaultLocale}`)
+
+// Shut the analytics gate as early as any JavaScript can. Firebase persists the last value
+// of `setAnalyticsCollectionEnabled` across launches and that persisted value overrides
+// `firebase.json`, so a device that resolved Custodial last run starts this one collecting
+// — including automatic and screen-level events (FR-3).
+//
+// This narrows that window; it does not close it. Native automatic events (`session_start`,
+// `app_open`) fire when Firebase initialises, before the RN bridge runs a line of JS, so a
+// device whose mode has since changed to Anon can emit them once per cold start. Closing it
+// needs the disable to move native-side — persisting the last resolved mode somewhere
+// `AppDelegate` / `MainApplication` can read before Firebase starts. Until then it is a
+// stated residual for the metric contracts (FR-56), alongside the arrival-timing one.
+initializeTelemetryGate()
 
 /**
  * This is the root component of our app.
@@ -87,6 +102,7 @@ export const App = () => (
                                         <PushNotificationComponent />
                                         <AutoConvertListenerMount />
                                         <AccountModeSyncMount />
+                                        <SelfCustodialTelemetryMount />
                                         <DisplayCurrencyFromRegionMount />
                                         <RootStack />
                                         <NetworkErrorComponent />
