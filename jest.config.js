@@ -32,6 +32,13 @@ module.exports = {
     "^.+\\.svg$": "jest-transform-stub",
   },
   testRegex: "(/__tests__/.*\\.(test|spec))\\.(ts|tsx|js)$",
+  // Claude Code checks its worktrees out into .claude/worktrees, and each one
+  // is a full copy of the repo. Jest does not read .gitignore, so without this
+  // it crawls those copies: their specs run against whatever commit the worktree
+  // sits on, and every requireActual resolves a second copy of the module.
+  // testPathIgnorePatterns overrides a default, so keep node_modules in it.
+  testPathIgnorePatterns: ["/node_modules/", "/\\.claude/"],
+  modulePathIgnorePatterns: ["/\\.claude/"],
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
   rootDir: ".",
   resolver: "./node_modules/react-native-worklets/jest/resolver.js",
