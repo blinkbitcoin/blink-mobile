@@ -3,6 +3,8 @@ import path from "path"
 
 import en from "@app/i18n/en"
 
+import retiredTierCopy from "./retired-tier-copy.json"
+
 const TRANSLATIONS_DIR = path.resolve(
   __dirname,
   "..",
@@ -135,12 +137,31 @@ const placeholderDrift = (localeFile: string, parsed: AnyTranslation): string[] 
 
 /**
  * Words the on-chain fee tiers have been called in English before. A locale holding one of
- * these is either an untranslated fallback left behind by a copy change (#3862) or a
- * translation of naming the app has since dropped — both ship the old words to that
- * locale's senders while `en` reads correctly. Key parity above already forbids omitting
- * the keys, so a locale has to carry *something*; this says what it may not carry.
+ * these is an untranslated fallback left behind by a copy change (#3862) — it ships the
+ * old words to that locale's senders while `en` reads correctly. Key parity above already
+ * forbids omitting the keys, so a locale has to carry *something*; this says what it may
+ * not carry.
+ *
+ * This catches only the locales that never translated the tier at all. A locale that *did*
+ * translate it keeps a word no English list can predict — `es` held "Rápido", `de` held
+ * "Schnell", `ja` held "高速" — so the per-locale ledger below carries those.
  */
 const SUPERSEDED_TIER_NAMES = ["Fast", "Medium", "Slow", "Fastest", "Normal", "Flexible"]
+
+/**
+ * Per-locale tier copy this app has already retired, keyed by translation file. The
+ * invariant the tier keys actually need is cross-version — "when `en`'s tier copy changes,
+ * every locale's changes with it" — and a spec that only ever sees the working tree cannot
+ * observe a change. This approximates it with state: each rename appends that rename's
+ * outgoing strings here, and a locale whose current value is still one of its own retired
+ * ones is a locale the rename skipped.
+ *
+ * The ledger is append-only and grows by three entries per locale per rename, which is the
+ * point — the omission a reviewer would otherwise have to notice by reading 28 files shows
+ * up as a missing line in this diff. Seeded at `ef449120d` with the
+ * Fast / Medium / Slow generation.
+ */
+const RETIRED_TIER_COPY = retiredTierCopy as Record<string, string[]>
 
 const TIER_KEYS = [
   "SendBitcoinScreen.fast",
@@ -148,16 +169,18 @@ const TIER_KEYS = [
   "SendBitcoinScreen.slow",
 ]
 
-const supersededTierCopy = (parsed: AnyTranslation): string[] => {
+const normalize = (value: string): string => value.trim().toLowerCase()
+
+const supersededTierCopy = (localeFile: string, parsed: AnyTranslation): string[] => {
   const localeLeaves = collectLeaves(parsed)
+  const retired = [
+    ...SUPERSEDED_TIER_NAMES,
+    ...(RETIRED_TIER_COPY[localeFile] ?? []),
+  ].map(normalize)
+
   return TIER_KEYS.filter((key) => {
     const value = localeLeaves[key]
-    return (
-      typeof value === "string" &&
-      SUPERSEDED_TIER_NAMES.some(
-        (name) => name.toLowerCase() === value.trim().toLowerCase(),
-      )
-    )
+    return typeof value === "string" && retired.includes(normalize(value))
   })
 }
 
@@ -189,10 +212,16 @@ describe("locale parity", () => {
         expect(placeholderDrift(localeFile, parsed)).toEqual([])
       })
 
-      // A locale that kept its translation of "Fast"/"Medium"/"Slow" keeps shipping the
+      // A locale that kept its own translation of "Fast"/"Medium"/"Slow" keeps shipping the
       // queue-describing naming the on-chain tiers moved off, invisibly to `en`-only specs.
       it("carries no superseded on-chain fee tier name", () => {
-        expect(supersededTierCopy(parsed)).toEqual([])
+        expect(supersededTierCopy(localeFile, parsed)).toEqual([])
+      })
+
+      // Without this, a locale added after a rename can quietly opt out of the check above
+      // by never being listed — the ledger only guards the files it names.
+      it("is covered by the retired tier copy ledger", () => {
+        expect(Object.keys(RETIRED_TIER_COPY)).toContain(localeFile)
       })
     })
   })
