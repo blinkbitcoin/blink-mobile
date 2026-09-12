@@ -2422,7 +2422,7 @@
     "sdkGenericError": "Haiwezekani kukadiri ada. Tafadhali jaribu kiasi tofauti."
   },
   "SettingsScreen": {
-    "createAddress": "Weka anwani ya kupokea",
+    "createAddress": "Unda anwani ya Lightning",
     "addressDisabled": "(imezimwa)",
     "donationButton": "Kitufe cha kuchangia",
     "btcpayServer": "BTCPay Server",

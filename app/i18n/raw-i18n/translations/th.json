@@ -2422,7 +2422,7 @@
     "sdkGenericError": "ไม่สามารถประมาณค่าธรรมเนียมได้ กรุณาลองจำนวนอื่น"
   },
   "SettingsScreen": {
-    "createAddress": "ตั้งค่าที่อยู่รับเงิน",
+    "createAddress": "สร้างแอดเดรส Lightning",
     "addressDisabled": "(ปิดใช้งาน)",
     "donationButton": "ปุ่มบริจาค",
     "btcpayServer": "BTCPay Server",

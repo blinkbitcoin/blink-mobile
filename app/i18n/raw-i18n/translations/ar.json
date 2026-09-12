@@ -2422,7 +2422,7 @@
     "sdkGenericError": "تعذّر تقدير الرسوم. يرجى تجربة مبلغ مختلف."
   },
   "SettingsScreen": {
-    "createAddress": "تعيين عنوان الاستلام",
+    "createAddress": "إنشاء عنوان Lightning",
     "addressDisabled": "(معطّل)",
     "donationButton": "زر التبرع",
     "btcpayServer": "BTCPay Server",

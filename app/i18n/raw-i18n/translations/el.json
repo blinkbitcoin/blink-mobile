@@ -2422,7 +2422,7 @@
     "sdkGenericError": "Αδυναμία εκτίμησης τελών. Δοκιμάστε διαφορετικό ποσό."
   },
   "SettingsScreen": {
-    "createAddress": "Ορισμός διεύθυνσης λήψης",
+    "createAddress": "Δημιουργία διεύθυνσης Lightning",
     "addressDisabled": "(απενεργοποιημένο)",
     "donationButton": "Κουμπί δωρεάς",
     "btcpayServer": "BTCPay Server",

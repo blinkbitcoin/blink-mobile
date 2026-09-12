@@ -2422,7 +2422,7 @@
     "sdkGenericError": "Ayikwazi ukuqikelela iintlawulo. Nceda uzame imali eyahlukileyo."
   },
   "SettingsScreen": {
-    "createAddress": "Misela idilesi yokwamkela",
+    "createAddress": "Yenza idilesi ye-Lightning",
     "addressDisabled": "(icimile)",
     "donationButton": "Iqhosha lomnikelo",
     "btcpayServer": "BTCPay Server",

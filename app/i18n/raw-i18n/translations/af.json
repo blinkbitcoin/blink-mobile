@@ -2422,7 +2422,7 @@
     "sdkGenericError": "Kan nie fooie skat nie. Probeer asseblief 'n ander bedrag."
   },
   "SettingsScreen": {
-    "createAddress": "Stel ontvangadres in",
+    "createAddress": "Skep Lightning-adres",
     "addressDisabled": "(gedeaktiveer)",
     "donationButton": "Skenk-knoppie",
     "btcpayServer": "BTCPay Server",

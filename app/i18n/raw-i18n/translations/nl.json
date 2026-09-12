@@ -2422,7 +2422,7 @@
     "sdkGenericError": "Kan kosten niet schatten. Probeer een ander bedrag."
   },
   "SettingsScreen": {
-    "createAddress": "Ontvangstadres instellen",
+    "createAddress": "Lightning-adres aanmaken",
     "addressDisabled": "(uitgeschakeld)",
     "donationButton": "Doneerknop",
     "btcpayServer": "BTCPay Server",

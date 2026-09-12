@@ -2422,7 +2422,7 @@
     "sdkGenericError": "Nije moguće procijeniti naknade. Pokušajte s drugim iznosom."
   },
   "SettingsScreen": {
-    "createAddress": "Postavi adresu primanja",
+    "createAddress": "Stvori Lightning adresu",
     "addressDisabled": "(onemogućeno)",
     "donationButton": "Gumb za doniranje",
     "btcpayServer": "BTCPay Server",

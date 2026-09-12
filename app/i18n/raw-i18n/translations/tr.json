@@ -2422,7 +2422,7 @@
     "sdkGenericError": "Ücretler tahmin edilemiyor. Lütfen farklı bir tutar deneyin."
   },
   "SettingsScreen": {
-    "createAddress": "Alım adresi belirle",
+    "createAddress": "Lightning adresi oluştur",
     "addressDisabled": "(devre dışı)",
     "donationButton": "Bağış düğmesi",
     "btcpayServer": "BTCPay Server",

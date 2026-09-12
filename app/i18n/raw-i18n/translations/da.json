@@ -2422,7 +2422,7 @@
     "sdkGenericError": "Kan ikke estimere gebyrer. Prøv venligst et andet beløb."
   },
   "SettingsScreen": {
-    "createAddress": "Angiv modtageradresse",
+    "createAddress": "Opret Lightning-adresse",
     "addressDisabled": "(deaktiveret)",
     "donationButton": "Donér-knap",
     "btcpayServer": "BTCPay Server",

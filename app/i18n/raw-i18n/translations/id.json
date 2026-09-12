@@ -2422,7 +2422,7 @@
     "sdkGenericError": "Tidak dapat memperkirakan biaya. Coba jumlah yang berbeda."
   },
   "SettingsScreen": {
-    "createAddress": "Atur alamat penerimaan",
+    "createAddress": "Buat alamat Lightning",
     "addressDisabled": "(nonaktif)",
     "donationButton": "Tombol donasi",
     "btcpayServer": "BTCPay Server",
