@@ -125,9 +125,9 @@ jest.mock("@app/i18n/i18n-react", () => ({
     locale: "en",
     LL: {
       SendBitcoinScreen: {
-        fast: () => "Fast",
-        medium: () => "Medium",
-        slow: () => "Slow",
+        fast: () => "Priority",
+        medium: () => "Standard",
+        slow: () => "Economy",
         sdkInsufficientFunds: () => "Insufficient funds",
         sdkAmountTooLow: () => "Amount too low",
         sdkNetworkError: () => "Network error",
@@ -374,7 +374,7 @@ describe("useOnchainFeeTierOptions", () => {
     )
 
     // No "display" tag: the price is not there yet, so the raw wallet amount stands in.
-    expect(result.current.feeTierOptions[0].label).toBe("Fast (30 BTC)")
+    expect(result.current.feeTierOptions[0].label).toBe("Priority (30 BTC)")
   })
 
   it("formats self-custodial fees in sats even when the usd wallet is sending", () => {
@@ -391,7 +391,7 @@ describe("useOnchainFeeTierOptions", () => {
     )
 
     // The SDK quotes in sats regardless of wallet, so 30 must not be read as 30 cents.
-    expect(result.current.feeTierOptions[0].label).toBe("Fast (30 BTC display)")
+    expect(result.current.feeTierOptions[0].label).toBe("Priority (30 BTC display)")
   })
 
   it("blocks the send only when the self-custodial quote failed", () => {
@@ -878,9 +878,9 @@ describe("useOnchainFeeTierOptions", () => {
     )
 
     expect(result.current.feeTierOptions.map((o) => o.label)).toEqual([
-      "Fast (300 BTC display)",
-      "Medium (200 BTC display)",
-      "Slow (100 BTC display)",
+      "Priority (300 BTC display)",
+      "Standard (200 BTC display)",
+      "Economy (100 BTC display)",
     ])
   })
 })

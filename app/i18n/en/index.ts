@@ -2475,10 +2475,17 @@ const en: BaseTranslation = {
     recipient: "Recipient",
     time: "Time",
     type: "Type",
-    feeTier: "Transaction priority",
-    fast: "Fast",
-    medium: "Medium",
-    slow: "Slow",
+    feeTier: "Confirmation speed",
+    /**
+     * Shared by two rails with different windows: the custodial payout queues
+     * (10m / 4h / 24h, use-onchain-fee-tier-options.ts) and the self-custodial refund's
+     * mempool fee rates (10m / 30m / 60m, unclaimed-deposits-screen.tsx). They name the
+     * relative speed within a rail, not an absolute time — don't tune either one for a
+     * single rail's window without splitting the keys per domain first.
+     */
+    fast: "Priority",
+    medium: "Standard",
+    slow: "Economy",
     recommended: "Recommended",
     walletOffline: "Your wallet is offline. Please check your connection and try again.",
     sdkInsufficientFunds: "Not enough funds for this transaction.",
@@ -4235,9 +4242,6 @@ const en: BaseTranslation = {
     refundFailed: "Refund failed: {error}",
     refundAddress: "Bitcoin address for refund",
     feeRate: "Network fee",
-    feeRateFastest: "Fastest (~{sats} sats) ~10 min",
-    feeRateHalfHour: "Normal (~{sats} sats) ~30 min",
-    feeRateHour: "Economy (~{sats} sats) ~60 min",
     feeRateUnit: "{rate} sat/vB",
     feeRateUnavailable: "Couldn't load network fees. Please check your connection and try again.",
     refundNow: "Refund now",
