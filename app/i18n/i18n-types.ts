@@ -7996,7 +7996,7 @@ type RootTranslation = {
 		 */
 		posCopied: string
 		/**
-		 * C​r​e​a​t​e​ ​a​d​d​r​e​s​s
+		 * C​r​e​a​t​e​ ​L​i​g​h​t​n​i​n​g​ ​a​d​d​r​e​s​s
 		 */
 		createAddress: string
 		/**
@@ -21612,7 +21612,7 @@ export type TranslationFunctions = {
 		 */
 		posCopied: () => LocalizedString
 		/**
-		 * Create address
+		 * Create Lightning address
 		 */
 		createAddress: () => LocalizedString
 		/**

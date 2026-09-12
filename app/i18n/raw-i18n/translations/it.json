@@ -2437,7 +2437,7 @@
         "sdkGenericError": "Impossibile stimare le commissioni. Prova con un importo diverso."
     },
     "SettingsScreen": {
-        "createAddress": "Crea indirizzo",
+        "createAddress": "Crea indirizzo Lightning",
         "addressDisabled": "(disattivato)",
         "donationButton": "Pulsante Dona",
         "btcpayServer": "BTCPay Server",

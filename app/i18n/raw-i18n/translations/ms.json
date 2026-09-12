@@ -2437,7 +2437,7 @@
     "sdkGenericError": "Tidak dapat menganggarkan yuran. Sila cuba jumlah yang berbeza."
   },
   "SettingsScreen": {
-    "createAddress": "Cipta alamat",
+    "createAddress": "Cipta alamat Lightning",
     "addressDisabled": "(dilumpuhkan)",
     "donationButton": "Butang derma",
     "btcpayServer": "BTCPay Server",

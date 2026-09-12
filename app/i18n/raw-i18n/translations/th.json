@@ -2437,7 +2437,7 @@
     "sdkGenericError": "ไม่สามารถประมาณค่าธรรมเนียมได้ กรุณาลองจำนวนอื่น"
   },
   "SettingsScreen": {
-    "createAddress": "สร้างแอดเดรส",
+    "createAddress": "สร้างแอดเดรส Lightning",
     "addressDisabled": "(ปิดใช้งาน)",
     "donationButton": "ปุ่มบริจาค",
     "btcpayServer": "BTCPay Server",
