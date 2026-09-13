@@ -7934,7 +7934,7 @@ type RootTranslation = {
 		 */
 		type: string
 		/**
-		 * C​o​n​f​i​r​m​a​t​i​o​n​ ​s​p​e​e​d
+		 * T​r​a​n​s​a​c​t​i​o​n​ ​p​r​i​o​r​i​t​y
 		 */
 		feeTier: string
 		/**
@@ -22364,7 +22364,7 @@ export type TranslationFunctions = {
 		 */
 		type: () => LocalizedString
 		/**
-		 * Confirmation speed
+		 * Transaction priority
 		 */
 		feeTier: () => LocalizedString
 		/**

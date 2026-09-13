@@ -2516,7 +2516,7 @@ const en: BaseTranslation = {
     recipient: "Recipient",
     time: "Time",
     type: "Type",
-    feeTier: "Confirmation speed",
+    feeTier: "Transaction priority",
     /**
      * Shared by two rails with different windows: the custodial payout queues
      * (10m / 4h / 24h, CUSTODIAL_PAYOUT_ETA_MINUTES) and the self-custodial mempool fee
