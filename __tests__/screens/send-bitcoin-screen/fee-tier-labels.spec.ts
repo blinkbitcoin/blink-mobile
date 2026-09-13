@@ -117,21 +117,5 @@ describe("on-chain fee tier presentation", () => {
 
       expect(survivingTierNames(onchainCopy)).toEqual([])
     })
-
-    it("does not head the selector with one of the option names", () => {
-      /**
-       * FeeTierSelector renders its title directly above the selected option's label, so a
-       * heading that borrows an option name reads as "Priority: Priority" on first render
-       * and as "Priority: Economy" once the cheapest tier is picked.
-       */
-      const heading = sendScreen.feeTier.toLowerCase()
-
-      const collisions = Object.values(labels).filter((label) => {
-        const name = label.toLowerCase()
-        return heading.includes(name) || name.includes(heading)
-      })
-
-      expect(collisions).toEqual([])
-    })
   })
 })

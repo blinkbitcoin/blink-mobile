@@ -2391,7 +2391,7 @@
         "recipient": "Recipient",
         "time": "Time",
         "type": "Type",
-        "feeTier": "Confirmation speed",
+        "feeTier": "Transaction priority",
         "fast": "Priority",
         "medium": "Standard",
         "slow": "Economy",

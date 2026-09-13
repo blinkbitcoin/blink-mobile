@@ -2425,7 +2425,7 @@
         "recipient": "Empfänger",
         "time": "Uhrzeit",
         "type": "Typ",
-        "feeTier": "Bestätigungsgeschwindigkeit",
+        "feeTier": "Transaktionspriorität",
         "fast": "Priorität",
         "medium": "Standard",
         "slow": "Ökonomisch",

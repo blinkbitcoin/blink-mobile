@@ -2425,7 +2425,7 @@
     "recipient": "Người nhận",
     "time": "Thời gian",
     "type": "Loại",
-    "feeTier": "Tốc độ xác nhận",
+    "feeTier": "Độ ưu tiên giao dịch",
     "fast": "Ưu tiên",
     "medium": "Tiêu chuẩn",
     "slow": "Tiết kiệm",

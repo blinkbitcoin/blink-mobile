@@ -2425,7 +2425,7 @@
     "recipient": "Příjemce",
     "time": "Čas",
     "type": "Typ",
-    "feeTier": "Rychlost potvrzení",
+    "feeTier": "Priorita transakce",
     "fast": "Prioritní",
     "medium": "Standardní",
     "slow": "Ekonomický",

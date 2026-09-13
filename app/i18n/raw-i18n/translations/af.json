@@ -2425,7 +2425,7 @@
     "recipient": "Ontvanger",
     "time": "Tyd",
     "type": "Tipe",
-    "feeTier": "Bevestigingspoed",
+    "feeTier": "Transaksieprioriteit",
     "fast": "Prioriteit",
     "medium": "Standaard",
     "slow": "Ekonomies",
