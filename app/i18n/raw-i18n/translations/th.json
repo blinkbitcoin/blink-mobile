@@ -2383,6 +2383,7 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "ธุรกรรมจะถูกส่งไปยัง Mempool",
     "amount": "จำนวนเงิน",
+    "addAmount": "เพิ่มจำนวนเงิน",
     "amountExceed": "จำนวนมากกว่ายอดคงเหลือ {balance: string} ของคุณ",
     "amountExceedsLimit": "Amount exceeds your remaining daily limit of {limit: string}",
     "upgradeAccountToIncreaseLimit": "Upgrade your account to increase your limit",

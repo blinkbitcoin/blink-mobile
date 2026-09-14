@@ -2383,6 +2383,7 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Transaksi sepatutnya dihantar ke mempool",
     "amount": "Amaun",
+    "addAmount": "Tambah amaun",
     "amountExceed": "Amaun ini telah melebihi baki {balance: string}",
     "amountExceedsLimit": "Amaun ini telah melebihi baki transaksi harian {limit: string}",
     "upgradeAccountToIncreaseLimit": "Naik taraf akaun anda untuk tambahkan had",

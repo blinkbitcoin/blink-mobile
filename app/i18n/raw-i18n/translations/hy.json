@@ -2383,6 +2383,7 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Գործարքը պետք է ուղարկվի mempool",
     "amount": "Չափ",
+    "addAmount": "Ավելացնել գումար",
     "amountExceed": "Գումարի չափը գերազանցում է Ձեր {balance: string} հաշվեկշիռը",
     "amountExceedsLimit": "Գումարի չափը գերազանցում է {limit: string}ի Ձեր օրական սահմանաչափը",
     "upgradeAccountToIncreaseLimit": "Թարմացրեք Ձեր հաշիվը Ձեր սահմանաչափը բարձրացնելու համար",

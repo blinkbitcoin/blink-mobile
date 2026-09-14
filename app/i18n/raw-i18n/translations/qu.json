@@ -2383,6 +2383,7 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Ruwaynin mempool nisqaman apachisqa kanan kachkan",
     "amount": "Suma",
+    "addAmount": "Suma yapay",
     "amountExceed": "Mana kaniyta rikuchiy {balance: string}",
     "amountExceedsLimit": "Amount exceeds your remaining daily limit of {limit: string}",
     "upgradeAccountToIncreaseLimit": "Upgrade your account to increase your limit",

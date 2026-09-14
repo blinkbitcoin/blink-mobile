@@ -2383,6 +2383,7 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Tranzacția trebuie trimisă la mempool",
     "amount": "Suma",
+    "addAmount": "Adaugă suma",
     "amountExceed": "Suma depășește soldul de {balance: string}",
     "amountExceedsLimit": "Suma depășește limita zilnică rămasă de {limit: string}",
     "upgradeAccountToIncreaseLimit": "Faceți upgrade la cont pentru a vă crește limita",

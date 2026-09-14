@@ -2383,6 +2383,7 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Muamala unapaswa kuwasilishwa kwenye mempool",
     "amount": "Kiasi",
+    "addAmount": "Ongeza kiasi",
     "amountExceed": "Kiasi kimepitisha baki yako ya {balance: string}",
     "amountExceedsLimit": "Kiasi kinazidi kikomo chako cha kila siku kilichobaki cha {limit: string}",
     "upgradeAccountToIncreaseLimit": "Boresha akaunti yako ili kuongeza kikomo chako",
