@@ -279,7 +279,7 @@ it("SendScreen Details", async () => {
   await act(async () => {})
 })
 
-it("applies send amount when Set Amount is pressed", async () => {
+it("applies the amount typed on the in-screen keypad", async () => {
   loadLocale("en")
   const LL = i18nObject("en")
 
@@ -295,14 +295,8 @@ it("applies send amount when Set Amount is pressed", async () => {
   await flushAsync()
   await flushAsync()
 
-  fireEvent.press(screen.getByTestId("Amount Input Button"))
-  await flushAsync()
-
   fireEvent.press(screen.getByTestId("Key 1"))
   await flushAsync()
-
-  const setAmountButtons = screen.getAllByText(LL.AmountInputScreen.setAmount())
-  fireEvent.press(setAmountButtons[setAmountButtons.length - 1])
 
   await waitFor(() => {
     expect(screen.getByTestId(LL.common.next()).props.accessibilityState?.disabled).toBe(
@@ -598,13 +592,8 @@ describe("onchain fee tier gating", () => {
     )
     await screen.findByTestId("fee-tier-dropdown")
     await flushAsync()
-
-    fireEvent.press(screen.getByTestId("Amount Input Button"))
-    await flushAsync()
     fireEvent.press(screen.getByTestId("Key 1"))
     await flushAsync()
-    const setAmountButtons = screen.getAllByText(LL.AmountInputScreen.setAmount())
-    fireEvent.press(setAmountButtons[setAmountButtons.length - 1])
     await flushAsync()
 
     // The fee itself is formatted in the display currency, so only its presence is asserted.
@@ -631,13 +620,8 @@ describe("onchain fee tier gating", () => {
     )
     await screen.findByTestId("fee-tier-dropdown")
     await flushAsync()
-
-    fireEvent.press(screen.getByTestId("Amount Input Button"))
-    await flushAsync()
     fireEvent.press(screen.getByTestId("Key 1"))
     await flushAsync()
-    const setAmountButtons = screen.getAllByText(LL.AmountInputScreen.setAmount())
-    fireEvent.press(setAmountButtons[setAmountButtons.length - 1])
     await flushAsync()
 
     /**
@@ -669,13 +653,7 @@ describe("onchain fee tier gating", () => {
     )
     await screen.findByTestId("fee-tier-dropdown")
     await flushAsync()
-
-    fireEvent.press(screen.getByTestId("Amount Input Button"))
-    await flushAsync()
     fireEvent.press(screen.getByTestId("Key 1"))
-    await flushAsync()
-    const setAmountButtons = screen.getAllByText(LL.AmountInputScreen.setAmount())
-    fireEvent.press(setAmountButtons[setAmountButtons.length - 1])
 
     // Asserted before flushing: the quote goes out on this render and nothing is back yet.
     expect(screen.getByTestId(LL.common.next()).props.accessibilityState?.disabled).toBe(
@@ -708,17 +686,12 @@ describe("onchain fee tier gating", () => {
     )
     await screen.findByTestId("fee-tier-dropdown")
     await flushAsync()
-
-    fireEvent.press(screen.getByTestId("Amount Input Button"))
-    await flushAsync()
     // Against the mocked price 9,999 NGN is $99.99, well past the $5 left on the limit.
     fireEvent.press(screen.getByTestId("Key 9"))
     fireEvent.press(screen.getByTestId("Key 9"))
     fireEvent.press(screen.getByTestId("Key 9"))
     fireEvent.press(screen.getByTestId("Key 9"))
     await flushAsync()
-    const setAmountButtons = screen.getAllByText(LL.AmountInputScreen.setAmount())
-    fireEvent.press(setAmountButtons[setAmountButtons.length - 1])
     await flushAsync()
 
     // Matched by its opening words, since the allowance is formatted into the rest of it.

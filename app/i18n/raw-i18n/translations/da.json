@@ -2405,6 +2405,7 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Transaktionen skulle nu blive tilføjet til mempool",
     "amount": "Beløb",
+    "addAmount": "Tilføj beløb",
     "amountExceed": "Beløbet overstiger din saldo på {balance: string}",
     "amountExceedsLimit": "Beløbet overstiger din resterende daglige grænse på {limit: string}",
     "upgradeAccountToIncreaseLimit": "Opgrader din konto for at øge din grænse",
