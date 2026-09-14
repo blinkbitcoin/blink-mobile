@@ -387,8 +387,8 @@ export default function MapComponent({
    *
    * A failure is the form's to report rather than this screen's: it belongs
    * beside the button that would retry it, on the sheet that still holds
-   * everything that was typed. Success is a toast, since by then the sheet is
-   * gone and there is nothing left to say it on.
+   * everything that was typed. Success is a toast, since the panel closes
+   * itself on it and there is nothing left to say it on.
    *
    * Both awaits are long enough for the attempt underneath to be abandoned and
    * another one started, so what comes back is applied to the form only while
@@ -437,9 +437,10 @@ export default function MapComponent({
         })
 
         // Leaving the attempt open would let its next send arrive as an edit of
-        // the place BTC Map just took, so it closes. Only the attempt that sent
-        // it, though — a later one is another place's business.
-        if (addSessionRef.current === attempt) setAddingPlace(false)
+        // the place BTC Map just took, so it closes — by the panel, which
+        // slides out on the null and only then asks to be taken away, rather
+        // than by pulling it out from under itself here. An abandoned
+        // attempt's panel is already gone, so there is nothing to close.
         return null
       }
 

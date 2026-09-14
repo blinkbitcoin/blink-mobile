@@ -1,5 +1,5 @@
 import React from "react"
-import { Pressable, TextInput, View } from "react-native"
+import { AccessibilityInfo, Pressable, TextInput, View } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 import {
@@ -27,7 +27,8 @@ type Props = {
   location: LatLng
   /**
    * Sends the place. Resolves to why it did not go — a message ready to be
-   * read — or to null when it did.
+   * read — or to null when it did, on which the panel closes itself the way
+   * the X closes it.
    */
   onSubmit: (submission: PlaceSubmission) => Promise<string | null>
   onClose: () => void
@@ -132,11 +133,22 @@ export const AddPlacePanel: React.FC<Props> = ({ location, onSubmit, onClose }) 
     if (!submission || isSubmitting) return
     setSubmitting(true)
     setError(null)
+    let isSent = false
     try {
       const reason = await onSubmit(submission)
       setError(reason)
+      isSent = !reason
+      // `accessibilityLiveRegion` on the message is Android's alone, so without
+      // this a refusal reaches VoiceOver as a button that simply stayed put.
+      if (reason) AccessibilityInfo.announceForAccessibility(reason)
     } finally {
-      setSubmitting(false)
+      // Sent, it goes the way every other exit goes — slid out, then reported
+      // — rather than taken off the map in the frame the answer arrived. It
+      // stays sending as far as the button is concerned while it goes: the
+      // attempt is open until the slide-out reports, and a second tap in that
+      // window would reach BTC Map as an edit of the place it has just taken.
+      if (isSent) setOpen(false)
+      else setSubmitting(false)
     }
   }
 
