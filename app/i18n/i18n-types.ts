@@ -7738,6 +7738,10 @@ type RootTranslation = {
 		 */
 		amount: string
 		/**
+		 * A​d​d​ ​a​m​o​u​n​t
+		 */
+		addAmount: string
+		/**
 		 * A​m​o​u​n​t​ ​e​x​c​e​e​d​s​ ​y​o​u​r​ ​b​a​l​a​n​c​e​ ​o​f​ ​{​b​a​l​a​n​c​e​}
 		 * @param {string} balance
 		 */
@@ -22145,6 +22149,10 @@ export type TranslationFunctions = {
 		 * Amount
 		 */
 		amount: () => LocalizedString
+		/**
+		 * Add amount
+		 */
+		addAmount: () => LocalizedString
 		/**
 		 * Amount exceeds your balance of {balance}
 		 */
