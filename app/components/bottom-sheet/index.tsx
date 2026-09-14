@@ -43,7 +43,9 @@ const DISMISS_DISTANCE = 80
 const VELOCITY_PROJECTION = 0.15
 
 const SPRING = { damping: 20, stiffness: 220, mass: 0.6 }
-const CLOSE_DURATION_MS = 200
+
+/** @see `bottom-sheet.spec` — how long a test has to wait for the slide-out. */
+export const CLOSE_DURATION_MS = 200
 
 // The sheet's outer shape is a rounded path, so Android antialiases every edge
 // of it — including the straight bottom one. The top and sides hide that under
@@ -200,9 +202,33 @@ export const BottomSheet: React.FC<Props> = ({
   // dragged, it slides out; closed from a button, it vanishes in the same
   // frame and whatever it sat above snaps back to full height under it.
   const [isLeaving, setLeaving] = React.useState(false)
+  // Set in the render `isVisible` goes false in, not from the effect that
+  // starts the slide-out: effects run after the commit, so an effect-only flag
+  // leaves one committed frame with no sheet in it — a blink of the map at
+  // full height before the exit plays.
+  const [renderedVisible, setRenderedVisible] = React.useState(isVisible)
+  if (renderedVisible !== isVisible) {
+    setRenderedVisible(isVisible)
+    if (isInline && !isVisible) setLeaving(true)
+  }
   // Only leaving from being open is an exit. Mounting hidden — which every
   // modal caller does — is not something to animate out of, or to report.
   const wasVisible = React.useRef(isVisible)
+  // Set for the whole of a slide-out, whichever exit started it — including a
+  // drag, which leaves `isVisible` true until the caller hears about it. A
+  // shared value rather than state because the drag starts its exit on the UI
+  // thread.
+  const isDismissing = useSharedValue(false)
+
+  // The caller's `onClose` is read through a ref rather than depended on. Most
+  // callers pass a fresh arrow every render, and anything keyed on it — the
+  // exit, the visibility effect, the pan — would be rebuilt with it: a parent
+  // re-render landing inside the slide-out re-ran the visibility effect, whose
+  // spring cancelled the exit before it could report, and the sheet came back
+  // open under a user who had just dragged it away.
+  const onCloseRef = React.useRef(onClose)
+  onCloseRef.current = onClose
+  const reportClose = React.useCallback(() => onCloseRef.current(), [])
 
   const scrollRef = useAnimatedRef<Animated.ScrollView>()
   // Read straight off the scroll view, so the pan can tell a drag on a list
@@ -232,21 +258,25 @@ export const BottomSheet: React.FC<Props> = ({
   // the back button, a drag past the dismiss distance. It slides out first and
   // reports afterwards, so nothing disappears from the layout mid-animation.
   const leave = React.useCallback(() => {
-    setLeaving(true)
+    isDismissing.value = true
+    // Only the inline return reads it; a modal's window hides itself.
+    if (isInline) setLeaving(true)
     offset.value = withTiming(
       sheetHeight,
       { duration: CLOSE_DURATION_MS },
       (finished) => {
         if (!finished) return
-        runOnJS(setLeaving)(false)
         // Inline the caller has to take the sheet out of its own layout, so it
         // is told when there is nothing left on screen to take out. A modal
         // caller is the one that set `isVisible` false and its window hides
         // itself, so it is not told a second time.
-        if (isInline) runOnJS(onClose)()
+        if (isInline) {
+          runOnJS(setLeaving)(false)
+          runOnJS(reportClose)()
+        }
       },
     )
-  }, [isInline, offset, onClose, sheetHeight])
+  }, [isDismissing, isInline, offset, reportClose, sheetHeight])
 
   React.useEffect(() => {
     const hadBeenVisible = wasVisible.current
@@ -256,6 +286,16 @@ export const BottomSheet: React.FC<Props> = ({
       if (hadBeenVisible) leave()
       return
     }
+    // Shown again, possibly inside its own exit: the spring below cancels the
+    // slide-out before its completion can clear these, so they are cleared here
+    // or the sheet would stay held on screen through the next real close.
+    if (!hadBeenVisible) {
+      isDismissing.value = false
+      setLeaving(false)
+    }
+    // On its way out, nothing that changed has anything to say about where the
+    // sheet should rest.
+    if (isDismissing.value) return
     // Follow the measurement only while resting low. A header can grow after
     // the sheet has arrived — details landing on it — and a sheet the user has
     // already pulled up must not drop back down under them when that happens.
@@ -271,6 +311,7 @@ export const BottomSheet: React.FC<Props> = ({
     offset,
     restsOnHeader,
     leave,
+    isDismissing,
   ])
 
   // Android's hardware back is the reflex for getting out of a form, and it is
@@ -280,14 +321,23 @@ export const BottomSheet: React.FC<Props> = ({
   // leaving the tab, unmounting the sheet, and throwing away whatever was
   // being filled in with no prompt. Registered here rather than by the caller
   // so the next inline sheet inherits it, and closing the same way the X does.
+  //
+  // Held for as long as the sheet is drawn, the slide-out included: released
+  // at `isVisible` alone, a back press in those 200ms reached the navigator
+  // and left the tab. A press while already leaving is swallowed rather than
+  // restarting the exit from the top.
+  //
+  // Not `useHardwareBackGuard`: that one is scoped to the screen's focus, and
+  // this to the sheet being drawn — the narrower of the two, since a sheet is
+  // never on screen for a screen that is not.
   React.useEffect(() => {
-    if (!isInline || !isVisible) return undefined
+    if (!isInline || !(isVisible || isLeaving)) return undefined
     const subscription = BackHandler.addEventListener("hardwareBackPress", () => {
-      leave()
+      if (!isDismissing.value) leave()
       return true
     })
     return () => subscription.remove()
-  }, [isInline, isVisible, leave])
+  }, [isDismissing, isInline, isLeaving, isVisible, leave])
 
   const pan = React.useMemo(
     () =>
@@ -341,11 +391,12 @@ export const BottomSheet: React.FC<Props> = ({
             : offset.value + event.velocityY * VELOCITY_PROJECTION
 
           if (projected > restOffset.value + DISMISS_DISTANCE) {
+            isDismissing.value = true
             offset.value = withTiming(
               sheetHeight,
               { duration: CLOSE_DURATION_MS },
               (finished) => {
-                if (finished) runOnJS(onClose)()
+                if (finished) runOnJS(reportClose)()
               },
             )
             return
@@ -364,7 +415,8 @@ export const BottomSheet: React.FC<Props> = ({
       scrolledTravel,
       scrollTookDrag,
       sheetHeight,
-      onClose,
+      isDismissing,
+      reportClose,
     ],
   )
 
@@ -407,7 +459,7 @@ export const BottomSheet: React.FC<Props> = ({
       >
         <View style={styles.handle} />
 
-        {header !== undefined && (
+        {Boolean(header) && (
           <View
             testID={headerTestID}
             style={headerStyle}
@@ -434,7 +486,7 @@ export const BottomSheet: React.FC<Props> = ({
           {children}
         </Animated.ScrollView>
 
-        {footer !== undefined && <View style={footerStyle}>{footer}</View>}
+        {Boolean(footer) && <View style={footerStyle}>{footer}</View>}
       </Animated.View>
     </GestureDetector>
   )
