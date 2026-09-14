@@ -51,6 +51,7 @@ import { MapSearchBar, searchBarBottom } from "./map-search-bar"
 import MapStyles from "./map-styles.json"
 import { OpenSettingsElement, OpenSettingsModal } from "./open-settings-modal"
 import { truncateLabel } from "./marker-layout"
+import { PinnedPlaceMarker } from "./pinned-place-marker"
 import { PlaceLabelMarker } from "./place-label-marker"
 import { PlaceLocator } from "./place-locator"
 import { PlaceMarker } from "./place-marker"
@@ -142,6 +143,9 @@ export default function MapComponent({
   // Aiming the pin and saying what is under it are one step, on one screen: the
   // map keeps the top half and the form takes the bottom.
   const [isAddingPlace, setAddingPlace] = React.useState(false)
+  // Where the place being added was fixed by the panel's Continue, or null
+  // while the pin is still being aimed. See `PinnedPlaceMarker`.
+  const [pinnedLocation, setPinnedLocation] = React.useState<LatLng | null>(null)
   // Read by the submit handler after its awaits, when the attempt may have been
   // closed, and by the cluster handler, which has to stay a stable callback.
   // Synced in an effect rather than during render: writing a ref in the render
@@ -360,10 +364,14 @@ export default function MapComponent({
     addSessionRef.current += 1
     // The next attempt's id is minted on its first send — see the ref above.
     submissionIdRef.current = null
+    setPinnedLocation(null)
     setAddingPlace(true)
   }, [])
 
-  const stopAddingPlace = React.useCallback(() => setAddingPlace(false), [])
+  const stopAddingPlace = React.useCallback(() => {
+    setAddingPlace(false)
+    setPinnedLocation(null)
+  }, [])
 
   // The panel runs to the bottom of the screen while a place is being added,
   // covering the tab bar the way the place sheet's own window covers it. This
@@ -569,6 +577,9 @@ export default function MapComponent({
               />
             ) : null
           })}
+          {isAddingPlace && pinnedLocation && (
+            <PinnedPlaceMarker coordinate={pinnedLocation} />
+          )}
         </MapView>
 
         {/* Both are about reading the map, and neither belongs over a map that
@@ -596,7 +607,10 @@ export default function MapComponent({
           </>
         )}
 
-        {isAddingPlace && <PlaceLocator />}
+        {/* Aimed by panning until Continue, and a marker on the place after
+            it — the second step sends the coordinate Continue took, so a
+            crosshair still asking to be moved would be moving nothing. */}
+        {isAddingPlace && !pinnedLocation && <PlaceLocator />}
 
         {isLoading && !allPlaces.length && (
           <View style={styles.statusPill}>
@@ -637,6 +651,7 @@ export default function MapComponent({
           location={center}
           onSubmit={handlePlaceSubmit}
           onClose={stopAddingPlace}
+          onPin={setPinnedLocation}
         />
       )}
 
