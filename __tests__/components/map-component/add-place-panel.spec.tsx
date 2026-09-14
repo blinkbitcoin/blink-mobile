@@ -341,6 +341,20 @@ describe("AddPlacePanel", () => {
     )
   })
 
+  it("tells the map where the place was fixed, and when it is let go", async () => {
+    // The map draws the pin, and after Continue a crosshair asking to be moved
+    // would be moving nothing — so it has to hear when that happens.
+    const onPin = jest.fn()
+    const { getByTestId } = renderSheet({ onPin })
+
+    await waitFor(() => expect(getByTestId("place-name-input")).toBeTruthy())
+    continueToCategories({ getByTestId })
+    expect(onPin).toHaveBeenLastCalledWith(LOCATION)
+
+    fireEvent.press(getByTestId("back-to-place-details"))
+    expect(onPin).toHaveBeenLastCalledWith(null)
+  })
+
   it("lets the pin go again on the way back to the details", async () => {
     // The row that shows it is on screen once more, so it follows the map
     // again — and Continue is what commits the new one.
