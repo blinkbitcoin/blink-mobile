@@ -72,6 +72,15 @@ jest.mock("@app/hooks/use-active-wallet", () => ({
   useActiveWallet: () => ({ isSelfCustodial: false, wallets: [] }),
 }))
 
+const mockNoTransactions: unknown[] = []
+jest.mock("@app/self-custodial/hooks/use-self-custodial-transaction-fragments", () => ({
+  useSelfCustodialTransactionFragments: () => mockNoTransactions,
+}))
+
+jest.mock("@app/self-custodial/providers/wallet", () => ({
+  useSelfCustodialWallet: () => ({ allTransactions: mockNoTransactions }),
+}))
+
 const LLText = () => ""
 jest.mock("@app/i18n/i18n-react", () => ({
   useI18nContext: () => ({

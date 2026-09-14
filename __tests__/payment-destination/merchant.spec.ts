@@ -132,9 +132,9 @@ describe("merchant payment destinations", () => {
       displayCurrency: "USD",
     })
 
-    expect(requestPayServiceParamsMock).toHaveBeenCalledWith({
-      lnUrlOrAddress: merchant.lnurl,
-    })
+    expect(requestPayServiceParamsMock).toHaveBeenCalledWith(
+      expect.objectContaining({ lnUrlOrAddress: merchant.lnurl }),
+    )
     expect(isMerchantChoiceDestination(result)).toBe(false)
     expect(result).toEqual(
       expect.objectContaining({
@@ -208,5 +208,56 @@ describe("merchant payment destinations", () => {
       sdk,
     )
     expect(result).toBe(wrapped)
+  })
+
+  /**
+   * A till code issued by a Blink account is served on a domain the sender declares as
+   * its own. A custodial sender pays that over the ledger; a self-custodial one has no
+   * token for it, so the account lookup must not even be attempted.
+   */
+  it("does not route a merchant on a declared domain over the ledger for a self-custodial send", async () => {
+    const merchant = {
+      id: "blink-merchant",
+      lnurl: "shop@blink.sv",
+      category: "swap" as const,
+      title: "Shop",
+      description: "A shop paid through Blink",
+      companyName: "Shop",
+      termsUrl: "https://example.com/terms",
+    }
+    const accountDefaultWalletQuery = jest.fn().mockResolvedValue({
+      data: { accountDefaultWallet: { id: "recipient-wallet-id" } },
+    })
+    requestPayServiceParamsMock.mockResolvedValue({
+      callback: "https://example.com/callback",
+      fixed: true,
+      min: 0 as Satoshis,
+      max: 2000 as Satoshis,
+      domain: "blink.sv",
+      metadata: [["text/plain", "description"]],
+      metadataHash: "mocked_metadata_hash",
+      identifier: merchant.lnurl,
+      description: "mocked_description",
+      image: "",
+      commentAllowed: 0,
+      rawData: {},
+    })
+    mockWrapDestination.mockImplementation((destination) => destination)
+
+    const result = await resolveMerchantChoiceDestination({
+      merchant,
+      params: {
+        rawInput: merchant.lnurl,
+        myWalletIds: ["wallet-id"],
+        bitcoinNetwork: Network.Mainnet,
+        lnurlDomains: ["blink.sv"],
+        accountDefaultWalletQuery: accountDefaultWalletQuery as never,
+        displayCurrency: "USD",
+      },
+      sdk: { id: "spark-sdk" } as never,
+    })
+
+    expect(result.valid && result.validDestination.paymentType).toBe(PaymentType.Lnurl)
+    expect(accountDefaultWalletQuery).not.toHaveBeenCalled()
   })
 })

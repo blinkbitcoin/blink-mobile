@@ -1,8 +1,10 @@
 import { useCallback } from "react"
 
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
-import { useDollarBalanceRestricted } from "@app/hooks/use-dollar-balance-restricted"
+import { useDollarBalanceRestriction } from "@app/hooks/use-dollar-balance-restricted"
+import { useSelfCustodialAccountMode } from "@app/self-custodial/hooks/use-self-custodial-account-mode"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { AccountMode } from "@app/types/account"
 import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { AccountType } from "@app/types/wallet"
 import { AccountMigrationPreview, MigrationSupportReason } from "@app/types/migration"
@@ -35,7 +37,17 @@ const UNKNOWN_PREVIEW: AccountMigrationPreview = {
  * never converts dollars, so it can never promise the user any. `hasDollarBalance` gates
  * the commit screen, which sends any remaining dollars to convert before it arms.
  */
-export const useMigrationBalancesPreview = () => {
+type MigrationBalancesPreviewParams = {
+  /** The provisioned account and its load state come from the screen's checkpoint
+   *  instance: a second read here would refetch and let the mode lag the figures. */
+  provisionedAccountId: string | null
+  isProvisionedAccountLoading: boolean
+}
+
+export const useMigrationBalancesPreview = ({
+  provisionedAccountId,
+  isProvisionedAccountLoading,
+}: MigrationBalancesPreviewParams) => {
   const { LL } = useI18nContext()
   const LLOverview = LL.AccountMigration.balancesOverview
 
@@ -52,12 +64,34 @@ export const useMigrationBalancesPreview = () => {
     refetch: refetchBalances,
   } = useCustodialWalletBalances({ fetchPolicy: "cache-and-network" })
   const { formatMoneyAmount, moneyAmountToDisplayCurrencyString } = useDisplayCurrency()
-  const isNewDollarBalanceRestricted = useDollarBalanceRestricted(
-    AccountType.SelfCustodial,
-  )
-  const isCurrentDollarBalanceRestricted = useDollarBalanceRestricted(
-    AccountType.Custodial,
-  )
+  /** Both sides gate the dollar rows: rendering an unresolved region as unrestricted would
+   *  show the user a Dollar Balance the new account cannot hold and then swap it for "not
+   *  available" once the verdict lands, in the one step they cannot take back. The
+   *  self-custodial side waits on the IP lookup, which the still-custodial session has no
+   *  phone country to shortcut, so this is seconds and only the dollar rows may spend them. */
+  const {
+    isRestricted: isNewDollarBalanceRestricted,
+    isRegionPending: isNewDollarRegionPending,
+  } = useDollarBalanceRestriction(AccountType.SelfCustodial)
+  const {
+    isRestricted: isCurrentDollarBalanceRestricted,
+    isRegionPending: isCurrentDollarRegionPending,
+  } = useDollarBalanceRestriction(AccountType.Custodial)
+  const isDollarRegionPending = isNewDollarRegionPending || isCurrentDollarRegionPending
+  /** The chosen mode is keyed to the provisioned account (the active one is still
+   *  custodial here), so it must be read by id. */
+  const { getModeFor } = useSelfCustodialAccountMode()
+  const isNewAccountAnon = provisionedAccountId
+    ? getModeFor(provisionedAccountId) === AccountMode.Anon
+    : false
+  const isNewDollarBalanceUnavailable = isNewAccountAnon || isNewDollarBalanceRestricted
+  const newDollarUnavailableLabel = isNewAccountAnon
+    ? LL.StablesatsRestriction.anonModeWalletLabel()
+    : LLOverview.dollarBalanceNotAvailable()
+  /** A restricted balance still shows its amount (muted); the label only stands in when
+   *  there is nothing to show. */
+  const showsCurrentDollarLabel =
+    isCurrentDollarBalanceRestricted && usdBalanceCents === 0
 
   /** The server owns the fee, the de-minimis subsidy, and the resulting amount; the
    *  client renders the preview verbatim and never does the arithmetic itself. */
@@ -69,11 +103,17 @@ export const useMigrationBalancesPreview = () => {
     refetch: refetchPreview,
   } = useMigrationPreview()
 
-  /** Both sources gate the screen: the balances feed the current Dollar Balance, the
-   *  preview feeds every bitcoin figure, and neither may render before it is known. */
+  /** The balances feed the current Dollar Balance, the preview feeds every bitcoin figure,
+   *  and the checkpoint decides how the new Dollar row reads; none may render before it is
+   *  known.
+   *
+   *  The region is deliberately not among them: on the self-custodial side it comes from an
+   *  IP lookup walking its adapters, and gating the screen on it held every bitcoin figure
+   *  behind seconds of spinner on the last step before an irreversible migration. The caller
+   *  holds the dollar rows and Approve on `isDollarRegionPending` instead. */
   const hasPreview = preview !== null
-  const isLoading = isPreviewLoading || areBalancesLoading
-  const isReady = areBalancesReady && hasPreview
+  const isLoading = isPreviewLoading || areBalancesLoading || isProvisionedAccountLoading
+  const isReady = areBalancesReady && hasPreview && !isProvisionedAccountLoading
 
   /**
    * A query that never ran is not an answer. Both sources skip while nobody is
@@ -135,6 +175,10 @@ export const useMigrationBalancesPreview = () => {
 
   return {
     isReady,
+    /** Whether the dollar verdict is still outstanding. The bitcoin figures do not depend on
+     *  it, so it is reported apart from `isReady`: the caller holds the dollar rows and
+     *  Approve on this, and renders everything else at once. */
+    isDollarRegionPending,
     /** The raw figure for the checkpoint, named for what the checkpoint calls it rather
      *  than shadowing the preview field whose type it does not share. Null until ready, so
      *  a placeholder zero is never mistaken for a real zero-receive migration. */
@@ -152,14 +196,14 @@ export const useMigrationBalancesPreview = () => {
     newBitcoinFiat: fiatSuffix(
       moneyAmountToDisplayCurrencyString({ moneyAmount: newBtcAmount }),
     ),
-    currentDollarBalance: isCurrentDollarBalanceRestricted
+    currentDollarBalance: showsCurrentDollarLabel
       ? LLOverview.dollarBalanceNotAvailable()
       : formatMoneyAmount({ moneyAmount: toUsdMoneyAmount(usdBalanceCents) }),
     isCurrentDollarBalanceRestricted,
-    newDollarBalance: isNewDollarBalanceRestricted
-      ? LLOverview.dollarBalanceNotAvailable()
+    newDollarBalance: isNewDollarBalanceUnavailable
+      ? newDollarUnavailableLabel
       : formatMoneyAmount({ moneyAmount: toUsdMoneyAmount(0) }),
-    isNewDollarBalanceRestricted,
+    isNewDollarBalanceUnavailable,
     networkFeeLine: feeCoveredByBlink
       ? LLOverview.networkFeeCoveredByBlink({ fee: networkFee })
       : LLOverview.networkFee({ fee: networkFee }),

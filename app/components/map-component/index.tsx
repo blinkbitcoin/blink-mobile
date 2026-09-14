@@ -1,55 +1,233 @@
 import debounce from "lodash.debounce"
-import React, { useRef } from "react"
-import { View } from "react-native"
-import MapView, { MapMarker as MapMarkerType, Region } from "react-native-maps"
+import React from "react"
+import {
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  LayoutChangeEvent,
+  Pressable,
+  View,
+} from "react-native"
+import MapView, { Region } from "react-native-maps"
 import { PermissionStatus, RESULTS, request } from "react-native-permissions"
+import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 import { useApolloClient } from "@apollo/client"
+import {
+  BtcMapPlace,
+  LatLng,
+  PlaceCategory,
+  PlaceSubmission,
+  placesInCategories,
+  useBtcMapPlaceNames,
+  useBtcMapPlaces,
+  useSubmitBtcMapPlace,
+} from "@app/btcmap"
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
+import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { updateMapLastCoords } from "@app/graphql/client-only-query"
-import { BusinessMapMarkersQuery, MapMarker } from "@app/graphql/generated"
+import { useIsAuthed } from "@app/graphql/is-authed-context"
+import { useLevel } from "@app/graphql/level-context"
+import { useAccountRegistry } from "@app/hooks/use-account-registry"
+import { useI18nContext } from "@app/i18n/i18n-react"
 import { LOCATION_PERMISSION, getUserRegion } from "@app/screens/map-screen/functions"
+import { AccountType } from "@app/types/wallet"
+import { reportError } from "@app/utils/error-logging"
+import { toastShow } from "@app/utils/toast"
+import { generateSecureRandomUUID } from "@app/utils/uuid"
+import { useFocusEffect } from "@react-navigation/native"
 import { isIOS } from "@rn-vui/base"
-import { makeStyles, useTheme } from "@rn-vui/themed"
+import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
-import MapMarkerComponent from "../map-marker-component"
+import { AddPlaceSheet } from "./add-place-sheet"
+import { CategoryFilterSheet } from "./category-filter-sheet"
+import { ClusterMarker, ClusterMarkerData } from "./cluster-marker"
+import { Viewport, placeLabels } from "./label-collision"
 import LocationButtonCopy from "./location-button-copy"
+import { MapSearchBar, searchBarBottom } from "./map-search-bar"
 import MapStyles from "./map-styles.json"
 import { OpenSettingsElement, OpenSettingsModal } from "./open-settings-modal"
+import { truncateLabel } from "./marker-layout"
+import { PlaceLabelMarker } from "./place-label-marker"
+import { PlaceLocator } from "./place-locator"
+import { PlaceMarker } from "./place-marker"
+import { PlaceSearchModal } from "./place-search-modal"
+import { PlaceSheet } from "./place-sheet"
+import { usePlaceClusters } from "./use-place-clusters"
+import { longitudeDeltaForZoom, radiusKmForRegion, zoomForRegion } from "./viewport"
+
+// btcmap.org starts labelling its pins here too. Below it the pins are packed
+// tightly enough that names would overlap into noise.
+const LABEL_MIN_ZOOM = 15
+
+// Close enough that the pin is drawn on its own rather than swallowed by a
+// cluster — see CLUSTERING_DISABLED_ZOOM.
+const SEARCH_RESULT_ZOOM = 17
+
+// Nothing is labelled before the map has been laid out once, which is a frame.
+const EMPTY_LABELS: ReadonlySet<number> = new Set()
+
+const SAVE_COORDS_DEBOUNCE_MS = 1000
+const FLY_TO_DURATION_MS = 350
 
 type Props = {
-  data?: BusinessMapMarkersQuery
-  userLocation?: Region
+  userLocation: Region
+  userCoords?: LatLng
   permissionsStatus?: PermissionStatus
   setPermissionsStatus: (_: PermissionStatus) => void
-  handleMapPress: () => void
-  handleMarkerPress: (_: MapMarker) => void
-  focusedMarker: MapMarker | null
-  focusedMarkerRef: React.MutableRefObject<MapMarkerType | null>
-  handleCalloutPress: (_: MapMarker) => void
   alertOnLocationError: () => void
 }
 
 export default function MapComponent({
-  data,
   userLocation,
+  userCoords,
   permissionsStatus,
   setPermissionsStatus,
-  handleMapPress,
-  handleMarkerPress,
-  focusedMarker,
-  focusedMarkerRef,
-  handleCalloutPress,
   alertOnLocationError,
 }: Props) {
   const {
     theme: { colors, mode: themeMode },
   } = useTheme()
-  const styles = useStyles()
+  const insets = useSafeAreaInsets()
+  const styles = useStyles({ topInset: insets.top })
   const client = useApolloClient()
+  const { LL } = useI18nContext()
 
-  const mapViewRef = useRef<MapView>(null)
+  // Adding a place is a level-two custodial-account feature: the submission
+  // goes to BTC Map through our own backend, which needs a Blink session
+  // behind it and rejects anything below account level two.
+  // Which account is signed in comes from the registry rather than from
+  // `useActiveWallet().isSelfCustodial`, for two reasons. The registry has the
+  // answer before the self-custodial SDK has reported, so the button never
+  // flashes into view; and it leaves this component unsubscribed from both
+  // wallets, which a map wants — every balance that moves would otherwise
+  // re-render the whole screen, marker list included, to re-decide one button.
+  // The kill switch gates it too: emptying the pins while submissions keep
+  // flowing to the backend is the outcome `btcMapPlacesEnabled` exists to avoid.
+  const isAuthed = useIsAuthed()
+  const { activeAccount } = useAccountRegistry()
+  const isSelfCustodialAccount = activeAccount?.type === AccountType.SelfCustodial
+  const { isAtLeastLevelTwo } = useLevel()
+  const { btcMapPlacesEnabled } = useRemoteConfig()
+  // A dev build skips the gate so the flow can be walked through without a
+  // level-two custodial account behind it. `__DEV__` is inlined to false in
+  // release bundles, so this cannot open the button in a shipped app. The
+  // backend still refuses a submission the account is not entitled to make.
+  const canAddPlace =
+    __DEV__ ||
+    (isAuthed && !isSelfCustodialAccount && isAtLeastLevelTwo && btcMapPlacesEnabled)
+
+  const mapViewRef = React.useRef<MapView>(null)
   const openSettingsModalRef = React.useRef<OpenSettingsElement>(null)
   const isAndroidSecondPermissionRequest = React.useRef(false)
+
+  const [region, setRegion] = React.useState<Region>(userLocation)
+  // Seeded from the screen's mount-time fix, then kept current by every
+  // successful re-centre — granting permission from here has to start the
+  // opening-hours badge working without an app restart.
+  const [coords, setCoords] = React.useState<LatLng | undefined>(userCoords)
+  const [selectedPlace, setSelectedPlace] = React.useState<BtcMapPlace | null>(null)
+  const [isSearchOpen, setSearchOpen] = React.useState(false)
+  const [isFilterOpen, setFilterOpen] = React.useState(false)
+  // Aiming the pin and saying what is under it are one step, on one screen: the
+  // map keeps the top half and the form takes the bottom.
+  const [isAddingPlace, setAddingPlace] = React.useState(false)
+  // Read by the submit handler after its awaits, when the attempt may have been
+  // closed, and by the cluster handler, which has to stay a stable callback.
+  // Synced in an effect rather than during render: writing a ref in the render
+  // body is impure under concurrent rendering, and every reader runs after the
+  // commit.
+  const isAddingPlaceRef = React.useRef(isAddingPlace)
+  React.useEffect(() => {
+    isAddingPlaceRef.current = isAddingPlace
+  }, [isAddingPlace])
+  // Which attempt at adding a place is the current one. The submit handler
+  // reads it after its awaits, when what comes back may belong to an attempt
+  // that has since been abandoned and replaced.
+  //
+  // A ref rather than state, and written where the attempt starts rather than
+  // synced from a render: nothing on screen is drawn from it. What used to be
+  // drawn from it was the form's `key`, and the form is now unmounted outright
+  // when the attempt ends, which is what throws away what was typed.
+  const addSessionRef = React.useRef(0)
+  // The idempotency key of the attempt: the backend deduplicates submissions on
+  // it, so every retry of one attempt reuses it and a new attempt mints one.
+  // Null until the attempt's first send — minting one is async, because a UUID's
+  // randomness has to come from the platform CSPRNG (see `utils/uuid.ts`), and
+  // an attempt abandoned before submitting never needs one.
+  const submissionIdRef = React.useRef<string | null>(null)
+  // Empty means "everything", not "nothing" — see `placesInCategories`.
+  const [categories, setCategories] = React.useState<ReadonlySet<PlaceCategory>>(
+    () => new Set(),
+  )
+
+  const { places: allPlaces, isLoading, hasError, refresh } = useBtcMapPlaces()
+  const { submitPlace } = useSubmitBtcMapPlace()
+
+  // The map tab is never unmounted, so returning to it days later would
+  // otherwise show whatever was cached when the process started. `refresh` is a
+  // no-op unless the cache has actually aged out.
+  useFocusEffect(refresh)
+
+  // Memoised for the array identity as much as for the work: the clusterer
+  // rebuilds its index over all ~29k points whenever this changes, so panning
+  // must not hand it a fresh copy of the same list.
+  const visiblePlaces = React.useMemo(
+    () => placesInCategories(allPlaces, categories),
+    [allPlaces, categories],
+  )
+
+  const { places, clusters, regionForCluster } = usePlaceClusters(visiblePlaces, region)
+
+  const center = React.useMemo(
+    () => ({ latitude: region.latitude, longitude: region.longitude }),
+    [region.latitude, region.longitude],
+  )
+  const viewportRadiusKm = radiusKmForRegion(region)
+
+  // Names are not in the offline snapshot, so they are fetched for the viewport
+  // — and only once it is tight enough for labels to be legible.
+  const names = useBtcMapPlaceNames({
+    center,
+    radiusKm: viewportRadiusKm,
+    enabled: zoomForRegion(region) >= LABEL_MIN_ZOOM,
+  })
+
+  // The collision pass works in screen space, so it needs the size of the view
+  // the region is drawn into — the map's own, not the window's, since the tab
+  // bar below it is not map.
+  const [viewport, setViewport] = React.useState<Viewport | null>(null)
+  const handleLayout = React.useCallback(({ nativeEvent }: LayoutChangeEvent) => {
+    const { width, height } = nativeEvent.layout
+    // Same size, same object: this feeds a memo that re-runs the placement.
+    setViewport((current) =>
+      current && current.width === width && current.height === height
+        ? current
+        : { width, height },
+    )
+  }, [])
+
+  // Cut to the label's character budget once, here, so the collision pass and
+  // the views it admits are given the very same strings. Truncating in either
+  // place alone would have the boxes reserved in screen space describe a name
+  // nobody draws — too wide, and neighbours dropped for room never used.
+  const labelNames = React.useMemo(
+    () => new Map([...names].map(([id, name]) => [id, truncateLabel(name)])),
+    [names],
+  )
+
+  // Which names can be drawn without landing on one another.
+  //
+  // Recomputed only when the camera settles, because `region` is only written by
+  // `onRegionChangeComplete` — so the names on screen mid-gesture are the ones
+  // the last settled camera chose, and they resolve when the map comes to rest.
+  // btcmap.org's MapLibre layer redoes this every frame and fades the difference
+  // in; a fade is not available to us, since these are native marker views whose
+  // opacity cannot be animated without re-rasterising every one of them.
+  const labelledPlaceIds = React.useMemo(
+    () =>
+      viewport ? placeLabels(places, labelNames, { region, viewport }) : EMPTY_LABELS,
+    [places, labelNames, region, viewport],
+  )
 
   // toggle modal from inside modal component instead of here in the parent
   const toggleModal = React.useCallback(
@@ -70,10 +248,16 @@ export default function MapComponent({
   }
 
   const centerOnUser = async () => {
-    getUserRegion(async (region) => {
-      if (region && mapViewRef.current) {
-        mapViewRef.current.animateToRegion(region)
-      } else {
+    getUserRegion(async (userRegion) => {
+      if (userRegion) {
+        setCoords({
+          latitude: userRegion.latitude,
+          longitude: userRegion.longitude,
+        })
+      }
+      if (userRegion && mapViewRef.current) {
+        mapViewRef.current.animateToRegion(userRegion)
+      } else if (!userRegion) {
         alertOnLocationError()
       }
     })
@@ -102,68 +286,411 @@ export default function MapComponent({
     }
   }
 
-  const debouncedHandleRegionChange = React.useRef(
-    debounce((region: Region) => updateMapLastCoords(client, region), 1000, {
-      trailing: true,
-    }),
-  ).current
+  const saveCoords = React.useMemo(
+    () =>
+      debounce(
+        (lastRegion: Region) => updateMapLastCoords(client, lastRegion),
+        SAVE_COORDS_DEBOUNCE_MS,
+        { trailing: true },
+      ),
+    [client],
+  )
+
+  React.useEffect(() => () => saveCoords.cancel(), [saveCoords])
+
+  // Read by the cluster handler, so that panning does not hand every cluster a
+  // fresh callback and re-render the lot of them.
+  const regionRef = React.useRef(region)
+
+  // The camera is somewhere for the whole of a fling or a fly-to, not only once
+  // it stops, and confirming the pin reads this ref — so it follows the camera
+  // rather than its last resting place. Nothing but the ref: this fires every
+  // frame of a gesture, and re-rendering ~29k points' worth of markers on each
+  // of them is what `region` being written only on settle exists to avoid.
+  const handleRegionChange = React.useCallback((nextRegion: Region) => {
+    regionRef.current = nextRegion
+  }, [])
+
+  const handleRegionChangeComplete = React.useCallback(
+    (nextRegion: Region) => {
+      regionRef.current = nextRegion
+      setRegion(nextRegion)
+      saveCoords(nextRegion)
+    },
+    [saveCoords],
+  )
+
+  const handleClusterPress = React.useCallback(
+    (cluster: ClusterMarkerData) => {
+      // Same reason the pins go quiet below: while the pin is being placed the
+      // map is being aimed, and flying off to a cluster takes it off whatever
+      // was being aimed at. From the ref, so that this stays one callback.
+      if (isAddingPlaceRef.current) return
+      mapViewRef.current?.animateToRegion(
+        regionForCluster(cluster, regionRef.current),
+        FLY_TO_DURATION_MS,
+      )
+    },
+    [regionForCluster],
+  )
+
+  // While the pin is being placed, a tap on the map is aiming rather than
+  // asking about somewhere that is already on it, so the existing pins go quiet
+  // instead of opening a sheet over the thing being aimed.
+  const handlePlacePress = React.useCallback((place: BtcMapPlace) => {
+    // From the ref, like the cluster handler's: a callback keyed on the state
+    // would change identity whenever it flipped and re-render the markers.
+    if (isAddingPlaceRef.current) return
+    setSelectedPlace(place)
+  }, [])
+
+  const startAddingPlace = React.useCallback(() => {
+    setSelectedPlace(null)
+    addSessionRef.current += 1
+    // The next attempt's id is minted on its first send — see the ref above.
+    submissionIdRef.current = null
+    setAddingPlace(true)
+  }, [])
+
+  const stopAddingPlace = React.useCallback(() => setAddingPlace(false), [])
+
+  /**
+   * Sends the place and answers the form with what to say about it.
+   *
+   * A failure is the form's to report rather than this screen's: it belongs
+   * beside the button that would retry it, on the sheet that still holds
+   * everything that was typed. Success is a toast, since by then the sheet is
+   * gone and there is nothing left to say it on.
+   *
+   * Both awaits are long enough for the attempt underneath to be abandoned and
+   * another one started, so what comes back is applied to the form only while
+   * it still belongs to the attempt on screen. The success toast is the one
+   * exception: it announces a place BTC Map now has, which stays true whatever
+   * the form has done since.
+   */
+  const handlePlaceSubmit = React.useCallback(
+    async (submission: PlaceSubmission): Promise<string | null> => {
+      const attempt = addSessionRef.current
+
+      let submissionId = submissionIdRef.current
+      if (!submissionId) {
+        try {
+          submissionId = await generateSecureRandomUUID()
+        } catch (mintingError) {
+          // No id, no send: without the idempotency key the backend cannot
+          // deduplicate, so the place must not go out without one. What failed
+          // here is the device's CSPRNG, not the connection, so the form gets
+          // the generic error rather than connection advice — and the failure
+          // is a defect worth a non-fatal, not a silent catch.
+          reportError("mintBtcMapSubmissionId", mintingError)
+          return LL.errors.generic()
+        }
+        // Abandoned while the id was being minted. Nothing to send — and the id
+        // must not be left in the ref for the next attempt to pick up, since
+        // the backend deduplicates on it and would take the next place as an
+        // edit of this one.
+        if (addSessionRef.current !== attempt) return null
+        // No race to atomically avoid: the form's in-flight guard means only
+        // one send per attempt is ever between its first line and this one.
+        // eslint-disable-next-line require-atomic-updates
+        submissionIdRef.current = submissionId
+      }
+      const outcome = await submitPlace(submission, submissionId)
+
+      // Success is announced even when the attempt that sent it has since been
+      // abandoned: the place is on its way to BTC Map either way, and an
+      // unannounced success invites a resubmission under a new submissionId —
+      // which the backend can no longer deduplicate.
+      if (outcome.submitted) {
+        toastShow({
+          message: (translations) => translations.MapScreen.placeSubmitted(),
+          LL,
+          type: "success",
+        })
+
+        // Leaving the attempt open would let its next send arrive as an edit of
+        // the place BTC Map just took, so it closes. Only the attempt that sent
+        // it, though — a later one is another place's business.
+        if (addSessionRef.current === attempt) setAddingPlace(false)
+        return null
+      }
+
+      // A failure belongs to the form that sent it: a response for an attempt
+      // that is no longer the one on screen closes nothing and reports nothing
+      // over a later attempt.
+      if (!isAddingPlaceRef.current || addSessionRef.current !== attempt) {
+        return null
+      }
+
+      // The form stays open with the reason on it: what was typed is exactly
+      // what a retry should send, under the same submissionId. A refusal is
+      // about the place and a dropped request is about the connection, so they
+      // do not share a sentence — but neither of them borrows the backend's,
+      // which only ever comes back in English.
+      return outcome.refused
+        ? LL.MapScreen.placeRefused()
+        : LL.MapScreen.placeSubmissionFailed()
+    },
+    [LL, submitPlace],
+  )
+
+  const closeSheet = React.useCallback(() => setSelectedPlace(null), [])
+
+  // The sheet cannot open in the same breath as the search closes on iOS: both
+  // are native modals, and iOS silently drops one presented while another is
+  // still dismissing. So the picked place is parked here until the search
+  // modal reports its dismissal finished. Android's dialogs do not collide —
+  // and never report — so there the sheet opens directly instead.
+  const pendingSearchPlace = React.useRef<BtcMapPlace | null>(null)
+
+  const handleSearchDismiss = React.useCallback(() => {
+    const pending = pendingSearchPlace.current
+    pendingSearchPlace.current = null
+    if (pending) setSelectedPlace(pending)
+  }, [])
+
+  // A result is picked from a list that may be describing somewhere off screen,
+  // so the map goes to it before the sheet opens over it — otherwise closing the
+  // sheet leaves the user looking at wherever they were before.
+  const handleSearchSelect = React.useCallback((place: BtcMapPlace) => {
+    setSearchOpen(false)
+
+    const current = regionRef.current
+    const longitudeDelta = longitudeDeltaForZoom(SEARCH_RESULT_ZOOM)
+    mapViewRef.current?.animateToRegion(
+      {
+        latitude: place.latitude,
+        longitude: place.longitude,
+        longitudeDelta,
+        latitudeDelta:
+          longitudeDelta *
+          (current.latitudeDelta / Math.max(current.longitudeDelta, 1e-6)),
+      },
+      FLY_TO_DURATION_MS,
+    )
+
+    if (isIOS) {
+      pendingSearchPlace.current = place
+    } else {
+      setSelectedPlace(place)
+    }
+  }, [])
 
   return (
-    <View style={styles.viewContainer}>
-      <MapView
-        ref={mapViewRef}
-        style={styles.map}
-        showsUserLocation={permissionsStatus === RESULTS.GRANTED}
-        showsMyLocationButton={false}
-        initialRegion={userLocation}
-        customMapStyle={themeMode === "dark" ? MapStyles.dark : MapStyles.light}
-        onPress={handleMapPress}
-        onRegionChange={debouncedHandleRegionChange}
-        onMarkerSelect={(e) => {
-          // react-native-maps has a very annoying error on iOS
-          // When two markers are almost on top of each other onSelect will get called for a nearby Marker
-          // This improvement (not an optimal fix) checks to see if that error happened, and quickly reopens the correct callout
-          const matchingLat =
-            e.nativeEvent.coordinate.latitude ===
-            focusedMarker?.mapInfo.coordinates.latitude
-          const matchingLng =
-            e.nativeEvent.coordinate.longitude ===
-            focusedMarker?.mapInfo.coordinates.longitude
-          if (!matchingLat || !matchingLng) {
-            if (focusedMarkerRef.current) {
-              focusedMarkerRef.current.showCallout()
-            }
-          }
-        }}
-      >
-        {(data?.businessMapMarkers ?? []).map((item: MapMarker) => (
-          <MapMarkerComponent
-            key={item.username}
-            item={item}
-            color={colors._orange}
-            handleCalloutPress={handleCalloutPress}
-            handleMarkerPress={handleMarkerPress}
-          />
-        ))}
-      </MapView>
-      {permissionsStatus !== RESULTS.UNAVAILABLE &&
-        permissionsStatus !== RESULTS.LIMITED && (
-          <LocationButtonCopy
-            requestPermissions={requestLocationPermission}
-            permissionStatus={permissionsStatus}
-            centerOnUser={centerOnUser}
-          />
+    // Android resizes its own window for the keyboard; iOS does not, so this is
+    // what gives the two halves below a shorter screen to split there. They keep
+    // splitting it evenly, which is the point: typing takes room from the map as
+    // well as the form, so the pin being aimed stays in view while the name of
+    // what it is pointing at is typed. Only while there is a form — otherwise
+    // the search modal's own keyboard would resize the map behind it.
+    <KeyboardAvoidingView
+      style={styles.viewContainer}
+      behavior={isIOS && isAddingPlace ? "padding" : undefined}
+    >
+      <View style={styles.mapArea}>
+        <MapView
+          ref={mapViewRef}
+          style={styles.map}
+          onLayout={handleLayout}
+          showsUserLocation={permissionsStatus === RESULTS.GRANTED}
+          showsMyLocationButton={false}
+          initialRegion={userLocation}
+          // The basemap draws its own restaurants, shops and stations, which read
+          // as merchants we vouch for and bury the ones we do. Suppressing them
+          // takes both mechanisms: the style sheet is Google's and only reaches
+          // Android, while iOS renders Apple Maps, which ignores it and honours
+          // this prop instead.
+          showsPointsOfInterests={false}
+          customMapStyle={themeMode === "dark" ? MapStyles.dark : MapStyles.light}
+          onRegionChange={handleRegionChange}
+          onRegionChangeComplete={handleRegionChangeComplete}
+          moveOnMarkerPress={false}
+          rotateEnabled={false}
+          pitchEnabled={false}
+          toolbarEnabled={false}
+        >
+          {clusters.map((cluster) => (
+            <ClusterMarker
+              key={`cluster-${cluster.id}`}
+              cluster={cluster}
+              onPress={handleClusterPress}
+            />
+          ))}
+          {places.map((place) => (
+            <PlaceMarker key={place.id} place={place} onPress={handlePlacePress} />
+          ))}
+          {/* Separate markers, not children of the pins: a name arriving has to
+              mount something new rather than resize a pin that has already
+              rasterised — see place-marker.tsx.
+
+              Only the names that won a place in the collision pass are mounted.
+              A pin whose name lost still draws; it is the name that is dropped,
+              not the merchant. */}
+          {places.map((place) => {
+            const name = labelledPlaceIds.has(place.id)
+              ? labelNames.get(place.id)
+              : undefined
+            return name ? (
+              <PlaceLabelMarker
+                key={`label-${place.id}`}
+                place={place}
+                name={name}
+                onPress={handlePlacePress}
+              />
+            ) : null
+          })}
+        </MapView>
+
+        {/* Both are about reading the map, and neither belongs over a map that
+            is being used to point at something. */}
+        {!isAddingPlace && (
+          <>
+            <MapSearchBar
+              topInset={insets.top}
+              onSearchPress={() => setSearchOpen(true)}
+              onFilterPress={() => setFilterOpen(true)}
+              isFiltered={categories.size > 0}
+            />
+
+            {canAddPlace && (
+              <Pressable
+                testID="open-add-place"
+                style={styles.addPlace}
+                onPress={startAddingPlace}
+                accessibilityRole="button"
+              >
+                <GaloyIcon name="plus" size={16} color={colors.primary} />
+                <Text style={styles.addPlaceText}>{LL.MapScreen.addPlace()}</Text>
+              </Pressable>
+            )}
+          </>
         )}
+
+        {isAddingPlace && <PlaceLocator />}
+
+        {isLoading && !allPlaces.length && (
+          <View style={styles.statusPill}>
+            <ActivityIndicator size="small" color={colors.primary} />
+            <Text style={styles.statusText}>{LL.MapScreen.loadingPlaces()}</Text>
+          </View>
+        )}
+
+        {hasError && (
+          <Pressable style={styles.statusPill} onPress={refresh}>
+            <GaloyIcon name="warning" size={16} color={colors.error} />
+            <Text style={styles.statusText}>{LL.MapScreen.placesError()}</Text>
+            <Text style={styles.retryText}>{LL.common.tryAgain()}</Text>
+          </Pressable>
+        )}
+
+        {permissionsStatus !== RESULTS.UNAVAILABLE &&
+          permissionsStatus !== RESULTS.LIMITED && (
+            // Centring on yourself and then nudging the pin onto your own shop is
+            // the common way to place one, so this stays on the map throughout.
+            // It needs no lifting to clear the form: the form is the map's
+            // sibling rather than something over it, so the bottom this is
+            // measured from is already the top of the form.
+            <LocationButtonCopy
+              requestPermissions={requestLocationPermission}
+              permissionStatus={permissionsStatus}
+              centerOnUser={centerOnUser}
+            />
+          )}
+      </View>
+
+      {/* The other half of the screen, and the other half of the question. It
+          is unmounted when the attempt ends, which is what throws away what was
+          typed — so the map gets all of itself back and a next attempt starts
+          on an empty form. */}
+      {isAddingPlace && (
+        <AddPlaceSheet
+          location={center}
+          onSubmit={handlePlaceSubmit}
+          onClose={stopAddingPlace}
+        />
+      )}
+
       <OpenSettingsModal ref={openSettingsModalRef} />
-    </View>
+
+      <PlaceSearchModal
+        isVisible={isSearchOpen}
+        center={center}
+        userLocation={coords}
+        viewportRadiusKm={viewportRadiusKm}
+        categories={categories}
+        onSelect={handleSearchSelect}
+        onClose={() => setSearchOpen(false)}
+        onDismiss={handleSearchDismiss}
+      />
+
+      <CategoryFilterSheet
+        isVisible={isFilterOpen}
+        selected={categories}
+        onChange={setCategories}
+        onClose={() => setFilterOpen(false)}
+      />
+
+      <PlaceSheet place={selectedPlace} userLocation={coords} onClose={closeSheet} />
+    </KeyboardAvoidingView>
   )
 }
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles(({ colors }, { topInset }: { topInset: number }) => ({
   map: {
     height: "100%",
     width: "100%",
   },
 
   viewContainer: { flex: 1 },
+
+  // Everything drawn on the map is positioned inside this rather than over the
+  // whole screen, so that "the bottom of the map" means the top of the form
+  // while one is open and the bottom of the screen when none is. The pin's
+  // centre — which is the coordinate being submitted — comes out right for the
+  // same reason: it is the centre of the map view, whatever height that view
+  // currently has.
+  mapArea: { flex: 1 },
+
+  statusPill: {
+    position: "absolute",
+    // Under the search bar, which now owns the top edge of the map.
+    top: searchBarBottom(topInset) + 10,
+    alignSelf: "center",
+    flexDirection: "row",
+    alignItems: "center",
+    columnGap: 8,
+    backgroundColor: colors.white,
+    borderRadius: 20,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    maxWidth: "90%",
+  },
+  statusText: {
+    fontSize: 13,
+    color: colors.black,
+    flexShrink: 1,
+  },
+  retryText: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: colors.primary,
+  },
+  addPlace: {
+    position: "absolute",
+    left: 8,
+    bottom: 12,
+    zIndex: 99,
+    flexDirection: "row",
+    alignItems: "center",
+    columnGap: 6,
+    backgroundColor: colors.white,
+    borderRadius: 20,
+    paddingHorizontal: 14,
+    paddingVertical: 11,
+  },
+  addPlaceText: {
+    fontSize: 14,
+    fontWeight: "700",
+    color: colors.black,
+  },
 }))

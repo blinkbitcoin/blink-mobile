@@ -1,22 +1,24 @@
 type CustodialEligibilityInputs = {
+  /** Undefined when the location never resolved, which is itself a refusal. */
   country: string | undefined
-  detectionFailed: boolean
   accountCount: number
   custodialFirstSignupBlockedCountries: string[]
 }
 
-/** Pure compliance decision. Fails closed when the country is unresolved or came from a detection-failure fallback, since an untrusted location must not open signup. */
+/**
+ * Pure compliance decision. Fails closed on an unresolved country, since an untrusted
+ * location must not open signup, and otherwise refuses only a user's very first Blink
+ * account: someone who already holds one may open another from the same country.
+ */
 export const decideCustodialEligibility = ({
   country,
-  detectionFailed,
   accountCount,
   custodialFirstSignupBlockedCountries,
 }: CustodialEligibilityInputs): boolean => {
-  if (country === undefined || detectionFailed) return false
+  if (country === undefined) return false
 
   const isFirstSignup = accountCount === 0
-  const firstSignupBlocked = custodialFirstSignupBlockedCountries.includes(country)
-  if (isFirstSignup && firstSignupBlocked) return false
+  const isFirstSignupBlocked = custodialFirstSignupBlockedCountries.includes(country)
 
-  return true
+  return !(isFirstSignup && isFirstSignupBlocked)
 }

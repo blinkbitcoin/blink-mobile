@@ -1,14 +1,7 @@
-import { DefaultAccountId } from "@app/types/wallet"
-
+import { resolveActiveSelfCustodialId } from "./active-self-custodial-account"
 import { PersistentState } from "./state-migrations"
 
 type SelfCustodialDefaultCurrency = "BTC" | "USD"
-
-const resolveActiveSelfCustodialId = (state: PersistentState): string | null => {
-  const id = state.activeAccountId
-  if (!id || id === DefaultAccountId.Custodial) return null
-  return id
-}
 
 export const getSelfCustodialDefaultCurrency = (
   state: PersistentState,

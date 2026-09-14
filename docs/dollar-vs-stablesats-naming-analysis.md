@@ -98,12 +98,14 @@ For each string: the i18n key, the original text (before PR), Approach A (curren
 - **A (Dollar):** "Send up to USD 1,000 per day"
 - **B (Stablesats):** "Send up to USD 1,000 per day"
 - *Both approaches fix the currency format. No naming difference.*
+- *Amount superseded: the shipped copy reads USD 999 (SSF audit, blink-wip#739). The quotes above predate that fix.*
 
 ### 9. `GetStartedScreen.trialAccountLimits.dailyLimit`
 - **Original:** "$1000 daily transaction limit"
 - **A (Dollar):** "USD 1,000 daily transaction limit"
 - **B (Stablesats):** "USD 1,000 daily transaction limit"
 - *Both approaches fix the currency format. No naming difference.*
+- *Amount superseded: the shipped copy reads USD 999 (SSF audit, blink-wip#739). The quotes above predate that fix.*
 
 ### 10. `SetAccountModal.stablesatsTag`
 - **Original:** "Stablesats account for price stability"

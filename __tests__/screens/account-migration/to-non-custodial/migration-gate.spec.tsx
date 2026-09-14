@@ -154,10 +154,16 @@ jest.mock("@app/screens/account-migration/hooks/use-migration-lock", () => ({
 
 jest.mock("@app/hooks/use-transfer-blocked", () => ({
   useTransferBlocked: () => mockUseTransferBlocked(),
+  useTransferGated: () => mockUseTransferBlocked(),
 }))
 
 jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
   useDollarBalanceRestricted: () => mockUseDollarBalanceRestricted(),
+  useDollarBalanceGated: () => mockUseDollarBalanceRestricted(),
+  useDollarBalanceGate: () => ({
+    isGated: mockUseDollarBalanceRestricted(),
+    isRegionPending: false,
+  }),
 }))
 
 jest.mock("@app/graphql/generated", () => ({
@@ -179,7 +185,7 @@ jest.mock("@app/components/dollar-balance-migration-modal", () => ({
 }))
 
 const mockArmMigrationConversion = jest.fn()
-jest.mock("@app/screens/account-migration/hooks/use-migration-conversion", () => ({
+jest.mock("@app/screens/conversion-flow/drain-conversion", () => ({
   armMigrationConversion: () => mockArmMigrationConversion(),
 }))
 

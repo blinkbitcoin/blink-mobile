@@ -33,6 +33,15 @@ const TAG_TO_CODE: Record<SdkErrorTags, SelfCustodialErrorCode> = {
   [SdkErrorTags.StorageError]: SelfCustodialErrorCode.Generic,
   [SdkErrorTags.Signer]: SelfCustodialErrorCode.Generic,
   [SdkErrorTags.SparkError]: SelfCustodialErrorCode.Generic,
+  /** Optimization / unilateral-exit state conflicts (0.22): flows the app never starts,
+   *  so no user-facing refinement exists for them. */
+  [SdkErrorTags.OptimizationAlreadyRunning]: SelfCustodialErrorCode.Generic,
+  [SdkErrorTags.OptimizationCancelled]: SelfCustodialErrorCode.Generic,
+  [SdkErrorTags.FundingUtxoConflict]: SelfCustodialErrorCode.Generic,
+  /** Raised when the CPFP funding of a unilateral exit cannot cover its on-chain fees.
+   *  InsufficientFunds would read as an empty wallet, which is a different problem from
+   *  a fee reserve the user never chose. */
+  [SdkErrorTags.InsufficientCpfpFunds]: SelfCustodialErrorCode.Generic,
   [SdkErrorTags.Generic]: SelfCustodialErrorCode.Generic,
 }
 

@@ -5,8 +5,14 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { useMigrationCheckpointState } from "@app/screens/account-migration/hooks"
+import {
+  ChooseExperienceContinueRoute,
+  RootStackParamList,
+} from "@app/navigation/stack-param-lists"
+import {
+  MigrationCheckpoint,
+  useMigrationCheckpointState,
+} from "@app/screens/account-migration/hooks"
 import {
   BackupMethod,
   BackupStatus,
@@ -31,8 +37,11 @@ export const useCompleteBackup = () => {
   const { LL } = useI18nContext()
   const { isSelfCustodial } = useActiveWallet()
   const { backupState, setBackupCompleted } = useBackupState()
-  const { checkpoint: migrationCheckpoint, accountId: migrationAccountId } =
-    useMigrationCheckpointState()
+  const {
+    checkpoint: migrationCheckpoint,
+    accountId: migrationAccountId,
+    saveCheckpoint,
+  } = useMigrationCheckpointState()
 
   const isAlreadyBackedUp = backupState.status === BackupStatus.Completed
   /** Migration only applies on a custodial account; self-custodial backups are standalone. */
@@ -69,7 +78,18 @@ export const useCompleteBackup = () => {
           toastShow({ message: LL.errors.generic(), LL })
           return
         }
-        navigation.navigate("accountMigrationBalancesOverview")
+        /** Recorded so the stored step matches where the user actually stands, but never
+         *  gated on: the mode screen is not a commit point, so a resume routes to the
+         *  explainer whether or not this write lands. Blocking would only strand a user who
+         *  just finished their backup on a screen with nothing left to do. */
+        await saveCheckpoint(MigrationCheckpoint.ChooseExperience)
+
+        navigation.navigate("selfCustodialChooseExperience", {
+          onContinue: {
+            route: ChooseExperienceContinueRoute.BalancesOverview,
+            accountId: migrationAccountId,
+          },
+        })
         return
       }
 
@@ -83,6 +103,7 @@ export const useCompleteBackup = () => {
       navigation,
       isMigrating,
       migrationAccountId,
+      saveCheckpoint,
       isAlreadyBackedUp,
       setBackupCompleted,
       LL,

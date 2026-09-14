@@ -6,6 +6,7 @@ import { ThemeProvider, createTheme } from "@rn-vui/themed"
 
 import { dark, light } from "@app/rne-theme/colors"
 import { Delete } from "@app/screens/settings-screen/account/settings/delete"
+import { SwitchProfileOutcome } from "@app/hooks/use-switch-to-next-profile"
 
 const mockDeleteAccount = jest.fn()
 const mockSetAccountIsBeingDeleted = jest.fn()
@@ -42,6 +43,7 @@ jest.mock("@app/hooks", () => ({
 }))
 
 jest.mock("@app/hooks/use-switch-to-next-profile", () => ({
+  ...jest.requireActual("@app/hooks/use-switch-to-next-profile"),
   useSwitchToNextProfile: () => ({ switchToNextProfile: mockSwitchToNextProfile }),
 }))
 
@@ -159,7 +161,7 @@ describe("Delete", () => {
     mockDeleteAccount.mockResolvedValue({
       data: { accountDelete: { success: true, errors: [] } },
     })
-    mockSwitchToNextProfile.mockResolvedValue({ token: "next-token" })
+    mockSwitchToNextProfile.mockResolvedValue(SwitchProfileOutcome.Switched)
     jest
       .spyOn(Alert, "alert")
       .mockImplementation((title, body, buttons) =>
@@ -277,11 +279,35 @@ describe("Delete", () => {
     })
 
     it("signs out and returns to get-started when it was the last profile", async () => {
-      mockSwitchToNextProfile.mockResolvedValue(null)
+      mockSwitchToNextProfile.mockResolvedValue(SwitchProfileOutcome.NoOtherProfile)
       await openDeletionModal()
       await confirmDeletion()
 
-      expect(mockLogout).toHaveBeenCalledWith({ stateToDefault: true })
+      expect(mockLogout).toHaveBeenCalledWith({
+        stateToDefault: true,
+        preserveStoredCredentials: false,
+      })
+
+      await pressAlertButton(alertCalls.length - 1, "OK")
+
+      expect(mockReset).toHaveBeenCalledWith({
+        index: 0,
+        routes: [{ name: "getStarted" }],
+      })
+    })
+
+    /** The logout erases every saved session, so it must not run when
+     *  the store could not be read: the profiles it would delete are the ones
+     *  the read never saw. Everything else still signs out. */
+    it("keeps the saved profiles when the store is unreadable, and signs out of the rest", async () => {
+      mockSwitchToNextProfile.mockResolvedValue(SwitchProfileOutcome.ProfilesUnreadable)
+      await openDeletionModal()
+      await confirmDeletion()
+
+      expect(mockLogout).toHaveBeenCalledWith({
+        stateToDefault: true,
+        preserveStoredCredentials: true,
+      })
 
       await pressAlertButton(alertCalls.length - 1, "OK")
 

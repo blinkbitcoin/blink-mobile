@@ -6,6 +6,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { BLOCKED_COUNTRIES_FAQ_LINK } from "@app/config"
 import { useFeatureFlags } from "@app/config/feature-flags-context"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
@@ -30,7 +31,7 @@ export const AcceptTermsAndConditionsScreen: React.FC = () => {
     >()
 
   const route = useRoute<RouteProp<RootStackParamList, "acceptTermsAndConditions">>()
-  const { flow } = route.params || { flow: "phone" }
+  const { flow, mode } = route.params || { flow: "phone" }
   const { saveCheckpoint } = useMigrationCheckpoint()
 
   const { deviceAccountEnabled } = useFeatureFlags()
@@ -55,7 +56,7 @@ export const AcceptTermsAndConditionsScreen: React.FC = () => {
     }
 
     if (flow === "selfCustodial") {
-      navigation.navigate("selfCustodialWalletCreation")
+      navigation.navigate("selfCustodialWalletCreation", { mode })
       return
     }
 
@@ -93,11 +94,7 @@ export const AcceptTermsAndConditionsScreen: React.FC = () => {
         <View style={styles.textContainer}>
           <GaloySecondaryButton
             title={LL.AcceptTermsAndConditionsScreen.prohibitedCountry()}
-            onPress={() =>
-              InAppBrowser.open(
-                "https://faq.blink.sv/creating-a-blink-account/which-countries-are-unable-to-download-and-activate-blink",
-              )
-            }
+            onPress={() => InAppBrowser.open(BLOCKED_COUNTRIES_FAQ_LINK)}
           />
         </View>
 

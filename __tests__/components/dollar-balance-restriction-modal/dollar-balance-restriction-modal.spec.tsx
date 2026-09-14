@@ -5,18 +5,9 @@ import { ThemeProvider } from "@rn-vui/themed"
 import TypesafeI18n from "@app/i18n/i18n-react"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
-jest.mock("react-native-modal", () => {
-  const ReactNs = jest.requireActual<typeof import("react")>("react")
-  const RN = jest.requireActual<typeof import("react-native")>("react-native")
-  const MockModal = ({
-    children,
-    isVisible,
-  }: {
-    children: React.ReactNode
-    isVisible: boolean
-  }) => (isVisible ? ReactNs.createElement(RN.View, null, children) : null)
-  return { __esModule: true, default: MockModal }
-})
+jest.mock("react-native-modal", () =>
+  jest.requireActual("@mocks/react-native-modal-mock"),
+)
 
 import { DollarBalanceRestrictionModal } from "@app/components/dollar-balance-restriction-modal"
 

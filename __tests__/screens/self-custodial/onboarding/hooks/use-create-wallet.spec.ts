@@ -4,6 +4,7 @@ import {
   CreationStatus,
   useCreateWallet,
 } from "@app/screens/self-custodial/onboarding/hooks/use-create-wallet"
+import { AccountMode } from "@app/types/account"
 
 const mockProvision = jest.fn()
 const mockUpdateState = jest.fn()
@@ -101,6 +102,21 @@ describe("useCreateWallet", () => {
     expect(updater({ galoyAuthToken: "t" })).toEqual({
       galoyAuthToken: "t",
       activeAccountId: TEST_ACCOUNT_ID,
+    })
+  })
+
+  it("stores the chosen mode against the provisioned account on success", async () => {
+    const { result } = renderHook(() => useCreateWallet())
+
+    await act(async () => {
+      await result.current.create(AccountMode.Anon)
+    })
+
+    const updater = mockUpdateState.mock.calls[0][0]
+    expect(updater({ galoyAuthToken: "t" })).toEqual({
+      galoyAuthToken: "t",
+      activeAccountId: TEST_ACCOUNT_ID,
+      selfCustodialAccountModeByAccountId: { [TEST_ACCOUNT_ID]: AccountMode.Anon },
     })
   })
 

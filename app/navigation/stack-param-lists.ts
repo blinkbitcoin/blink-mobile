@@ -4,7 +4,7 @@ import { LNURLPaySuccessAction } from "lnurl-pay"
 import { IconNamesType } from "@app/components/atomic/galoy-icon"
 import { PhoneCodeChannelType, UserContact, WalletCurrency } from "@app/graphql/generated"
 import { EarnSectionType } from "@app/screens/earns-screen/sections"
-import { PhoneLoginInitiateType } from "@app/screens/phone-auth-screen"
+import { PhoneLoginInitiateType } from "@app/screens/phone-auth-screen/phone-login-initiate-type"
 import {
   PaymentDestination,
   MerchantChoice,
@@ -12,7 +12,8 @@ import {
 } from "@app/screens/send-bitcoin-screen/payment-destination/index.types"
 import { PaymentDetail } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
 import { PaymentSendCompletedStatus } from "@app/screens/send-bitcoin-screen/use-send-payment"
-import { AccountTypeMode } from "@app/types/account"
+import { DrainConversionReturn } from "@app/screens/conversion-flow/drain-conversion"
+import { AccountMode, AccountTypeMode, CreationBlockReason } from "@app/types/account"
 import { DisplayCurrency, MoneyAmount, WalletOrDisplayCurrency } from "@app/types/amounts"
 import { WalletDescriptor } from "@app/types/wallets"
 import { MigrationSupportOrigin, MigrationSupportReason } from "@app/types/migration"
@@ -27,11 +28,45 @@ export type PhraseStep = (typeof PhraseStep)[keyof typeof PhraseStep]
 export const isPhraseStep = (value: unknown): value is PhraseStep =>
   value === PhraseStep.First || value === PhraseStep.Second
 
+export const ChooseExperienceContinueRoute = {
+  AcceptTerms: "acceptTermsAndConditions",
+  BackupSuccess: "selfCustodialBackupSuccess",
+  BalancesOverview: "accountMigrationBalancesOverview",
+} as const
+export type ChooseExperienceContinueRoute =
+  (typeof ChooseExperienceContinueRoute)[keyof typeof ChooseExperienceContinueRoute]
+
+export const ChooseExperienceEntry = {
+  Settings: "settings",
+} as const
+export type ChooseExperienceEntry =
+  (typeof ChooseExperienceEntry)[keyof typeof ChooseExperienceEntry]
+
+/** The onward step the onboarding entries carry. Derived off the route params so the two
+ *  cannot drift, and null on the settings entry, which has no onward step at all. */
+export type ChooseExperienceContinue = Extract<
+  RootStackParamList["selfCustodialChooseExperience"],
+  { onContinue: unknown }
+>["onContinue"]
+
+/** Whether the mode screen can offer a way back. Creation arrives from the account type
+ *  screen with nothing provisioned yet, and settings opens it over a live session, so both
+ *  have somewhere coherent to return to. Restore and migration arrive after the account is
+ *  already activated, and only the screen ahead resets to Primary: going back there strands
+ *  a live account on an onboarding screen. */
+export const canGoBackFromChooseExperience = (
+  onContinue: ChooseExperienceContinue | null,
+): boolean => {
+  if (!onContinue) return true
+
+  return onContinue.route === ChooseExperienceContinueRoute.AcceptTerms
+}
+
 export type RootStackParamList = {
   getStarted: undefined
   accountTypeSelection: { mode: AccountTypeMode }
-  unsupportedRegion: undefined
-  selfCustodialWalletCreation: undefined
+  unsupportedRegion: { reason?: CreationBlockReason } | undefined
+  selfCustodialWalletCreation: { mode?: AccountMode } | undefined
   liteDeviceAccount: {
     appCheckToken: string
   }
@@ -53,7 +88,15 @@ export type RootStackParamList = {
     isPinEnabled: boolean
     isResume?: boolean
   }
-  pin: { screenPurpose: PinScreenPurpose; isResume?: boolean }
+  pin: {
+    screenPurpose: PinScreenPurpose
+    isResume?: boolean
+    /** ChallengePin only. Function params are non-serializable (the same accepted
+     *  trade-off as selectionScreen.onSelect) and are dropped on state rehydration,
+     *  so both stay optional and every call is optional-chained. */
+    onChallengeSuccess?: () => void
+    onChallengeFailure?: () => void
+  }
   Primary: undefined
   earnsSection: { section: EarnSectionType; isAvailable: boolean }
   earnsQuiz: { id: string; isAvailable: boolean }
@@ -80,15 +123,15 @@ export type RootStackParamList = {
   conversionConfirmation: {
     fromWalletCurrency: WalletCurrency
     moneyAmount: MoneyAmount<WalletOrDisplayCurrency>
-    /** Where a completed migration convert lands (back in the flow, not Home). Navigation-only,
+    /** Where a completed drain convert lands (back in its flow, not Home). Navigation-only,
      *  never a privilege: the region waiver comes from the armed flag, not this forgeable param. */
-    isMigrationConversion?: boolean
+    drainConversion?: DrainConversionReturn | null
   }
   conversionSuccess:
     | {
-        /** Set when the conversion was a migration step, so the success screen returns to the
-         *  migration flow instead of Home. */
-        returnToMigration?: boolean
+        /** Set when the conversion drained a balance for a flow, so the success screen
+         *  returns there instead of Home. */
+        returnTo?: DrainConversionReturn
       }
     | undefined
   sendBitcoinCompleted: {
@@ -165,7 +208,20 @@ export type RootStackParamList = {
   totpRegistrationInitiate: undefined
   totpRegistrationValidate: { totpRegistrationId: string }
   totpLoginValidate: { authToken: string }
-  webView: { url: string; initialTitle?: string; headerTitle?: string }
+  webView: {
+    url: string
+    initialTitle?: string
+    headerTitle?: string
+    /**
+     * DEV ONLY — bypasses the instance-origin allowlist of the WebView screen.
+     * Must only be set from the developer screen; the webView route is not
+     * deep-linkable, so the param cannot arrive from outside the app. That
+     * invariant is enforced by a test over DEEP_LINK_SCREENS in
+     * navigation-container-wrapper — adding a deep link for this route would
+     * make the bypass reachable from a crafted URL.
+     */
+    allowArbitraryUrl?: boolean
+  }
   fullOnboardingFlow: undefined
   notificationHistory: undefined
   onboarding: NavigatorScreenParams<OnboardingStackParamList>
@@ -226,6 +282,29 @@ export type RootStackParamList = {
     successMessage?: string
   }
   selfCustodialBackupSuccess: { reBackup?: boolean; message?: string } | undefined
+  /** The settings entry applies the choice to the active account and returns. The
+   *  onboarding entries declare their onward step: restore and migration pass the
+   *  account id (mode stored now); creation has none yet, so the mode rides to wallet
+   *  creation instead. */
+  selfCustodialChooseExperience:
+    | {
+        entry: typeof ChooseExperienceEntry.Settings
+        /** Set when returning from the drain conversion, so the switch resumes preselected. */
+        initialMode?: AccountMode
+      }
+    | {
+        onContinue:
+          | { route: typeof ChooseExperienceContinueRoute.AcceptTerms }
+          | {
+              route: typeof ChooseExperienceContinueRoute.BackupSuccess
+              accountId: string
+            }
+          | {
+              route: typeof ChooseExperienceContinueRoute.BalancesOverview
+              accountId: string
+            }
+      }
+  selfCustodialModeSwitchSuccess: { mode: AccountMode }
   accountMigrationEntry: undefined
   accountMigrationStart: undefined
   accountMigrationExplainer: undefined
@@ -297,4 +376,7 @@ export type PrimaryStackParamList = {
 
 export type NewAccountFlowParamsList = {
   flow: "phone" | "trial" | "selfCustodial" | "migration"
+  /** The self-custodial region mode chosen before terms, carried through to wallet
+   *  creation, which stores it against the account it provisions. */
+  mode?: AccountMode
 }

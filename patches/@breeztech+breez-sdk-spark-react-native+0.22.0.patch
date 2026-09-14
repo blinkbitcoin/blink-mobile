@@ -1,0 +1,31 @@
+diff --git a/node_modules/@breeztech/breez-sdk-spark-react-native/android/src/main/kotlin/com/breeztech/breezsdkspark/BreezSdkSparkPasskeyModule.kt b/node_modules/@breeztech/breez-sdk-spark-react-native/android/src/main/kotlin/com/breeztech/breezsdkspark/BreezSdkSparkPasskeyModule.kt
+index cfa2b99..e0f8231 100644
+--- a/node_modules/@breeztech/breez-sdk-spark-react-native/android/src/main/kotlin/com/breeztech/breezsdkspark/BreezSdkSparkPasskeyModule.kt
++++ b/node_modules/@breeztech/breez-sdk-spark-react-native/android/src/main/kotlin/com/breeztech/breezsdkspark/BreezSdkSparkPasskeyModule.kt
+@@ -78,7 +78,7 @@ class BreezSdkSparkPasskeyModule(
+         preferImmediatelyAvailableCredentials: Boolean?,
+         promise: Promise,
+     ) {
+-        val activity = currentActivity
++        val activity = reactContext.currentActivity
+         if (activity == null) {
+             promise.reject("ERR_NO_ACTIVITY", "No current activity available")
+             return
+@@ -147,7 +147,7 @@ class BreezSdkSparkPasskeyModule(
+      */
+     @ReactMethod
+     fun checkDomainAssociation(rpId: String, promise: Promise) {
+-        val activity = currentActivity
++        val activity = reactContext.currentActivity
+         if (activity == null) {
+             promise.reject("ERR_NO_ACTIVITY", "No current activity available")
+             return
+@@ -203,7 +203,7 @@ class BreezSdkSparkPasskeyModule(
+         registerSaltsArg: com.facebook.react.bridge.ReadableArray,
+         promise: Promise,
+     ) {
+-        val activity = currentActivity
++        val activity = reactContext.currentActivity
+         if (activity == null) {
+             promise.reject("ERR_NO_ACTIVITY", "No current activity available")
+             return

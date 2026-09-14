@@ -109,7 +109,7 @@ jest.mock("@app/screens/account-migration/hooks/use-self-custodial-disabled", ()
   useSelfCustodialDisabled: () => false,
 }))
 
-jest.mock("@app/screens/account-migration/hooks/use-migration-conversion", () => ({
+jest.mock("@app/screens/conversion-flow/drain-conversion", () => ({
   armMigrationConversion: jest.fn(),
 }))
 

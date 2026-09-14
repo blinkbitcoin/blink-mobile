@@ -15,18 +15,21 @@ import {
   Network,
   useBulletinsQuery,
 } from "@app/graphql/generated"
+import { HideAmountContextProvider } from "@app/graphql/hide-amount-context"
 import { IsAuthedContextProvider } from "@app/graphql/is-authed-context"
 import { mockCurrencyList } from "@app/graphql/mocks"
 import { ConvertDirection } from "@app/types/payment"
+import {
+  NormalizedTransaction,
+  PaymentType,
+  TransactionDirection,
+  TransactionStatus,
+} from "@app/types/transaction"
+import { WindDownStatus } from "@app/types/wind-down"
 
 let currentMocks: MockedResponse[] = []
 
-/** Mocked wholesale: the real module warns at load time when no API key is configured. */
-jest.mock("@app/utils/ip-country-lookup", () => ({
-  DEFAULT_ADAPTERS: [],
-  resolveIpCountryCode: jest.fn(async () => undefined),
-  resolveIpCountryCodeCached: jest.fn(async () => undefined),
-}))
+jest.mock("@app/utils/ip-country-lookup")
 
 jest.mock("@react-native-async-storage/async-storage", () => ({
   __esModule: true,
@@ -42,8 +45,9 @@ const mockBackupNudgeState = {
   shouldShowModal: false,
   shouldShowSettingsBanner: false,
   dismissBanner: jest.fn(),
+  dismissModal: jest.fn(),
 }
-jest.mock("@app/hooks/use-backup-nudge-state", () => ({
+jest.mock("@app/self-custodial/hooks/use-backup-nudge-state", () => ({
   useBackupNudgeState: () => mockBackupNudgeState,
 }))
 
@@ -81,7 +85,9 @@ const mockToggleBalanceMode = jest.fn()
 // eslint-disable-next-line prefer-const
 let mockBalanceModeValue: "btc" | "usd" = "usd"
 let mockDollarBalanceRestrictedOverride = false
+let mockRegionPendingOverride = false
 let mockTransferBlockedOverride = false
+let mockTransferRegionPendingOverride = false
 let mockDollarBalanceModalVisible = false
 
 jest.mock("@app/hooks/use-active-wallet", () => ({
@@ -123,7 +129,6 @@ jest.mock("@app/config/feature-flags-context", () => {
    */
   const remoteConfig: ReturnType<typeof actual.useRemoteConfig> = {
     ...actual.defaultRemoteConfig,
-    custodialDollarBalanceBlockedCountries: [],
     selfCustodialDollarBalanceBlockedCountries: [],
   }
   return {
@@ -137,15 +142,69 @@ jest.mock("@app/config/feature-flags-context", () => {
   }
 })
 
+let mockIsAnonMode = false
+
 jest.mock("@app/hooks/use-transfer-blocked", () => ({
   useTransferBlocked: () => mockTransferBlockedOverride,
-  useTransferBlockedSync: () => undefined,
+  useTransferGated: () => mockIsAnonMode || mockTransferBlockedOverride,
+  useTransferGate: () => ({
+    isGated: mockIsAnonMode || mockTransferBlockedOverride,
+    isRegionPending: mockTransferRegionPendingOverride,
+  }),
 }))
 
 jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
   useDollarBalanceRestricted: () => mockDollarBalanceRestrictedOverride,
-  useDollarBalanceRestrictionSync: () => undefined,
+  useDollarBalanceGated: () => mockIsAnonMode || mockDollarBalanceRestrictedOverride,
+  useDollarBalanceGate: () => ({
+    isGated: mockIsAnonMode || mockDollarBalanceRestrictedOverride,
+    isRegionPending: mockRegionPendingOverride,
+  }),
 }))
+
+jest.mock("@app/self-custodial/hooks/use-self-custodial-account-mode", () => ({
+  useSelfCustodialAccountMode: () => ({ isAnonMode: mockIsAnonMode }),
+}))
+
+const mockPromptEnhancedMode = jest.fn()
+let mockEnhancedModePromptVisible = false
+jest.mock("@app/components/enhanced-mode-prompt", () => ({
+  useEnhancedModePrompt: () => ({
+    promptEnhancedMode: mockPromptEnhancedMode,
+    isEnhancedModePromptVisible: mockEnhancedModePromptVisible,
+  }),
+}))
+
+/** The screen arms the upgrade prompt on a 1500ms timer; a little slack keeps the
+ *  test from racing the exact boundary. */
+const UPGRADE_MODAL_DELAY_WITH_SLACK_MS = 2000
+
+let mockIsRestrictedRegion = false
+let mockIsRestrictedRegionEvaluationPending = false
+let mockCanShowUpgradeModal = false
+const mockPresentRestrictedRegionModal = jest.fn()
+jest.mock("@app/components/restricted-region", () => ({
+  useRestrictedRegion: () => ({
+    isRestrictedRegion: mockIsRestrictedRegion,
+    isRestrictedRegionEvaluationPending: mockIsRestrictedRegionEvaluationPending,
+    isRestrictedRegionModalVisible: false,
+    presentRestrictedRegionModal: mockPresentRestrictedRegionModal,
+  }),
+}))
+
+const mockTrialAccountLimitsModal = jest.fn()
+jest.mock("@app/components/upgrade-account-modal", () => {
+  const ReactActual = jest.requireActual("react")
+  const { View } = jest.requireActual("react-native")
+  return {
+    TrialAccountLimitsModal: (props: { isVisible: boolean }) => {
+      mockTrialAccountLimitsModal(props)
+      return props.isVisible
+        ? ReactActual.createElement(View, { testID: "trial-account-limits-modal" })
+        : null
+    },
+  }
+})
 
 type ForcedConversionParams = {
   isRestricted: boolean
@@ -202,10 +261,12 @@ jest.mock("@app/components/migrate-now-modal", () => {
 })
 
 let mockReminderBulletinVisible = false
+let mockReminderBulletinPhase: WindDownStatus = WindDownStatus.PreCutoff
 
 jest.mock("@app/screens/account-migration/hooks/use-migration-reminder-bulletin", () => ({
   useMigrationReminderBulletin: () => ({
     isVisible: mockReminderBulletinVisible,
+    phase: mockReminderBulletinPhase,
     deadlineTimestamp: 1787003999,
     receiveDisabledTimestamp: 1785189600,
     timezone: "Europe/Paris",
@@ -312,6 +373,7 @@ jest.mock("@app/self-custodial/providers/wallet", () => ({
     mockSelfCustodialWalletOverride ?? {
       sdk: null,
       wallets: [],
+      allTransactions: [],
       status: "unavailable",
       isStableBalanceActive: false,
       lastReceivedPaymentId: null,
@@ -353,6 +415,14 @@ jest.mock("@app/hooks", () => {
         currency: "DisplayCurrency",
         currencyCode: "USD",
       }),
+    }),
+    /** Clears the cooldown so the auto-present path depends only on the guards
+     *  under test rather than on session bookkeeping. */
+    useAutoShowUpgradeModal: () => ({
+      canShowUpgradeModal: mockCanShowUpgradeModal,
+      lastShownUpgradeModalAt: null,
+      markShownUpgradeModal: jest.fn(),
+      resetUpgradeModal: jest.fn(),
     }),
   }
 })
@@ -794,10 +864,16 @@ const runRestrictionInvariantCase = async ({
     return
   }
 
-  await waitFor(() => expect(getByTestId("transfer")).toBeTruthy())
-  await flushEffects()
+  /** A gated button leaves the accessibility tree, so it is only reachable to a query
+   *  that includes hidden elements; the press still routes up to the gate. */
+  const findTransfer = () =>
+    expectButton === "disabled"
+      ? getByTestId("transfer", { includeHiddenElements: true })
+      : getByTestId("transfer")
 
-  fireEvent.press(getByTestId("transfer"))
+  await waitFor(() => expect(findTransfer()).toBeTruthy())
+  await flushEffects()
+  fireEvent.press(findTransfer())
 
   if (expectButton === "disabled") {
     expect(mockDollarBalanceModalVisible).toBe(true)
@@ -810,16 +886,27 @@ const runRestrictionInvariantCase = async ({
 
 const resetHomeScreenMocks = () => {
   currentMocks = []
+  /** Focus gates the badge auto-seen timers, so a suite that unfocuses the screen must
+   *  not decide what the next one sees. */
+  mockIsFocused = true
   mockActiveWalletOverride = null
   mockActiveAccountOverride = null
   mockDollarBalanceRestrictedOverride = false
+  mockRegionPendingOverride = false
+  mockTransferRegionPendingOverride = false
   mockMigratePromptVisible = false
+  mockEnhancedModePromptVisible = false
   mockCanReopen = false
   mockReceiveBlocked = false
   mockReminderBulletinVisible = false
+  mockReminderBulletinPhase = WindDownStatus.PreCutoff
   mockTransferBlockedOverride = false
   mockDollarBalanceModalVisible = false
   mockForcedConversionParams = null
+  mockIsAnonMode = false
+  mockIsRestrictedRegion = false
+  mockIsRestrictedRegionEvaluationPending = false
+  mockCanShowUpgradeModal = false
   jest.clearAllMocks()
   mockUseNonCustodialConversionLimits.mockReturnValue({
     limits: null,
@@ -828,6 +915,7 @@ const resetHomeScreenMocks = () => {
   })
 }
 
+// eslint-disable-next-line max-lines-per-function -- one screen's suite, sharing the mock reset above; splitting solely to meet the line cap would scatter cases that are read together
 describe("HomeScreen", () => {
   beforeEach(resetHomeScreenMocks)
 
@@ -1187,13 +1275,131 @@ describe("HomeScreen", () => {
 
     await flushEffects()
 
-    // Transfers are not blocked, so the button is rendered but disabled.
-    expect(getByTestId("transfer")).toBeTruthy()
+    // Transfers are not blocked, so the gate is rendered in the button's place.
+    expect(getByTestId("transfer", { includeHiddenElements: true })).toBeTruthy()
     expect(mockDollarBalanceModalVisible).toBe(false)
+
+    fireEvent.press(getByTestId("transfer", { includeHiddenElements: true }))
+
+    expect(mockDollarBalanceModalVisible).toBe(true)
+
+    mockActiveWalletOverride = null
+  })
+
+  it("opens the Enhanced Mode prompt from the disabled transfer button in Anon mode", async () => {
+    mockIsAnonMode = true
+    mockActiveWalletOverride = selfCustodialReadyWalletOverride(5000)
+    currentMocks = generateHomeMock({
+      level: AccountLevel.One,
+      network: Network.Mainnet,
+      btcBalance: 1000,
+      usdBalance: 5000,
+    })
+
+    const { getByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    expect(getByTestId("transfer", { includeHiddenElements: true })).toBeTruthy()
+
+    fireEvent.press(getByTestId("transfer", { includeHiddenElements: true }))
+
+    expect(mockPromptEnhancedMode).toHaveBeenCalledTimes(1)
+    expect(mockDollarBalanceModalVisible).toBe(false)
+
+    mockActiveWalletOverride = null
+  })
+
+  it("keeps the transfer button inert and unexplained while the region is still resolving", async () => {
+    mockRegionPendingOverride = true
+    mockActiveWalletOverride = selfCustodialReadyWalletOverride(5000)
+    currentMocks = generateHomeMock({
+      level: AccountLevel.One,
+      network: Network.Mainnet,
+      btcBalance: 1000,
+      usdBalance: 5000,
+    })
+
+    const { getByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    fireEvent.press(getByTestId("transfer", { includeHiddenElements: true }))
+
+    expect(mockNavigate).not.toHaveBeenCalledWith("conversionDetails")
+    expect(mockDollarBalanceModalVisible).toBe(false)
+    expect(mockPromptEnhancedMode).not.toHaveBeenCalled()
+
+    mockActiveWalletOverride = null
+  })
+
+  /**
+   * The region decides the dollar figure and nothing else, but one shared loader carried the
+   * whole header. A self-custodial user has no phone number, so the country comes from an IP
+   * lookup walking its adapters: holding everything on it meant seconds of spinners over a
+   * total, a username and a Bitcoin balance the app already had.
+   */
+  it("keeps the balance and the bitcoin row readable while the region is still resolving", async () => {
+    mockRegionPendingOverride = true
+    mockActiveWalletOverride = selfCustodialReadyWalletOverride(5000)
+    currentMocks = generateHomeMock({
+      level: AccountLevel.One,
+      network: Network.Mainnet,
+      btcBalance: 1000,
+      usdBalance: 5000,
+    })
+
+    const { getByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    expect(getByTestId("balance-value")).toBeTruthy()
+    expect(getByTestId("bitcoin-balance")).toBeTruthy()
+
+    mockActiveWalletOverride = null
+  })
+
+  it("enables the transfer button once the pending region resolves to no restriction", async () => {
+    mockRegionPendingOverride = true
+    mockActiveWalletOverride = selfCustodialReadyWalletOverride(5000)
+    currentMocks = generateHomeMock({
+      level: AccountLevel.One,
+      network: Network.Mainnet,
+      btcBalance: 1000,
+      usdBalance: 5000,
+    })
+
+    const { getByTestId, rerender } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    mockRegionPendingOverride = false
+    rerender(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
 
     fireEvent.press(getByTestId("transfer"))
 
-    expect(mockDollarBalanceModalVisible).toBe(true)
+    expect(mockNavigate).toHaveBeenCalledWith("conversionDetails")
 
     mockActiveWalletOverride = null
   })
@@ -1316,6 +1522,7 @@ describe("HomeScreen", () => {
       mockSelfCustodialWalletOverride = {
         sdk: { id: "fake-sdk" },
         wallets: selfCustodialWallets,
+        allTransactions: [],
         status: "ready",
         isStableBalanceActive: true,
         lastReceivedPaymentId: null,
@@ -1333,6 +1540,44 @@ describe("HomeScreen", () => {
       mockSelfCustodialWalletOverride = null
       mockFeatureFlagsOverride = null
       mockBalanceModeValue = "usd"
+    })
+
+    it("shows the unseen badge for a received self-custodial transaction", async () => {
+      const receivedTransaction: NormalizedTransaction = {
+        id: "sc-received-tx",
+        amount: { amount: 1000, currency: "BTC", currencyCode: "BTC" },
+        direction: TransactionDirection.Receive,
+        status: TransactionStatus.Completed,
+        timestamp: 1747691078,
+        paymentType: PaymentType.Lightning,
+      }
+
+      mockSelfCustodialWalletOverride = {
+        ...mockSelfCustodialWalletOverride,
+        allTransactions: [receivedTransaction],
+      }
+
+      const { findByLabelText } = render(
+        <ContextForScreen>
+          <HomeScreen />
+        </ContextForScreen>,
+      )
+
+      expect(await findByLabelText(/^\+/)).toBeTruthy()
+
+      await flushEffects()
+    })
+
+    it("shows no unseen badge when the self-custodial wallet has no transactions", async () => {
+      const { queryByLabelText } = render(
+        <ContextForScreen>
+          <HomeScreen />
+        </ContextForScreen>,
+      )
+
+      await flushEffects()
+
+      expect(queryByLabelText(/^\+/)).toBeNull()
     })
 
     it("shows the balance mode toggle when SB is enabled and active", async () => {
@@ -1418,6 +1663,8 @@ describe("HomeScreen", () => {
 
     beforeEach(() => {
       mockBackupNudgeModal.mockClear()
+      mockBackupNudgeState.dismissModal.mockClear()
+      mockBackupNudgeState.dismissBanner.mockClear()
       mockBackupNudgeState.shouldShowModal = false
       mockIsFocused = true
     })
@@ -1482,8 +1729,103 @@ describe("HomeScreen", () => {
 
       expect(lastIsVisible()).toBe(false)
     })
+
+    // #4156: closing the modal used to write the banner's dismissal key, which the
+    // modal never reads — so the prompt reopened on the same render and trapped users.
+    it("closes through the modal's own dismissal, not the banner's", async () => {
+      mockBackupNudgeState.shouldShowModal = true
+      mockIsFocused = true
+
+      render(
+        <ContextForScreen>
+          <HomeScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      const calls = mockBackupNudgeModal.mock.calls
+      calls[calls.length - 1][0].onClose()
+
+      expect(mockBackupNudgeState.dismissModal).toHaveBeenCalled()
+      expect(mockBackupNudgeState.dismissBanner).not.toHaveBeenCalled()
+    })
   })
 })
+describe("HomeScreen transfer-region gating", () => {
+  beforeEach(resetHomeScreenMocks)
+
+  const transferButtonMocks = () =>
+    generateHomeMock({
+      level: AccountLevel.Two,
+      network: Network.Mainnet,
+      btcBalance: 1000,
+      usdBalance: 0,
+    })
+
+  it("holds the transfer button off the row while the transfer region is pending", async () => {
+    mockTransferRegionPendingOverride = true
+    currentMocks = transferButtonMocks()
+
+    const { getByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    /** Reading the unresolved region as allowed would offer the button and then take it
+     *  away once the verdict lands in a transfer-blocked country. */
+    await waitFor(() => expect(() => getByTestId("transfer")).toThrow())
+    await flushEffects()
+  })
+
+  it("keeps the transfer button off the row when the pending region settles blocked", async () => {
+    mockTransferRegionPendingOverride = true
+    currentMocks = transferButtonMocks()
+
+    const { getByTestId, rerender } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await waitFor(() => expect(() => getByTestId("transfer")).toThrow())
+
+    mockTransferRegionPendingOverride = false
+    mockTransferBlockedOverride = true
+    rerender(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await waitFor(() => expect(() => getByTestId("transfer")).toThrow())
+    await flushEffects()
+  })
+
+  it("shows the transfer button once the pending region settles allowed", async () => {
+    mockTransferRegionPendingOverride = true
+    currentMocks = transferButtonMocks()
+
+    const { getByTestId, rerender } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await waitFor(() => expect(() => getByTestId("transfer")).toThrow())
+
+    mockTransferRegionPendingOverride = false
+    rerender(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await waitFor(() => expect(getByTestId("transfer")).toBeTruthy())
+    await flushEffects()
+  })
+})
+
 describe("HomeScreen self-custodial balance loading (#3852)", () => {
   beforeEach(resetHomeScreenMocks)
 
@@ -1641,6 +1983,7 @@ describe("HomeScreen wind-down states", () => {
     mockCanReopen = false
     mockReceiveBlocked = false
     mockReminderBulletinVisible = false
+    mockReminderBulletinPhase = WindDownStatus.PreCutoff
     mockTransferBlockedOverride = false
     mockDollarBalanceModalVisible = false
     jest.clearAllMocks()
@@ -1675,6 +2018,38 @@ describe("HomeScreen wind-down states", () => {
     await flushEffects()
 
     expect(queryByTestId("migrate-now-modal")).toBeNull()
+  })
+
+  /** Two native modals cannot present at once on iOS, so the Enhanced prompt has to
+   *  suppress the migrate-now push like every other home modal. */
+  it("lets the Enhanced prompt outrank the migrate-now prompt", async () => {
+    mockMigratePromptVisible = true
+    mockEnhancedModePromptVisible = true
+
+    const { queryByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    expect(queryByTestId("migrate-now-modal")).toBeNull()
+  })
+
+  it("shows the migrate-now prompt once the Enhanced prompt closes", async () => {
+    mockMigratePromptVisible = true
+    mockEnhancedModePromptVisible = false
+
+    const { queryByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    expect(queryByTestId("migrate-now-modal")).toBeTruthy()
   })
 
   it("lets the forced conversion outrank the migrate-now prompt", async () => {
@@ -1782,7 +2157,7 @@ describe("HomeScreen wind-down states", () => {
 
     expect(await findByTestId("migrate-now-modal")).toBeTruthy()
 
-    fireEvent.press(getByTestId("transfer"))
+    fireEvent.press(getByTestId("transfer", { includeHiddenElements: true }))
 
     expect(mockDollarBalanceModalVisible).toBe(true)
     expect(queryByTestId("migrate-now-modal")).toBeNull()
@@ -1803,7 +2178,7 @@ describe("HomeScreen wind-down states", () => {
 
     await flushEffects()
 
-    fireEvent.press(getByTestId("receive"))
+    fireEvent.press(getByTestId("receive", { includeHiddenElements: true }))
 
     expect(mockReopenMigratePrompt).toHaveBeenCalledTimes(1)
     expect(mockNavigate).not.toHaveBeenCalledWith("receiveBitcoin")
@@ -1843,6 +2218,56 @@ describe("HomeScreen wind-down states", () => {
     mockActiveWalletOverride = null
   })
 
+  const renderWithGatedDollarBalance = async () => {
+    mockDollarBalanceRestrictedOverride = true
+    // usdBalance stays 0 so the forced-conversion modal never auto-opens
+    currentMocks = generateHomeMock({
+      level: AccountLevel.Two,
+      network: Network.Mainnet,
+      btcBalance: 1000,
+      usdBalance: 0,
+    })
+
+    const view = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+    return view
+  }
+
+  /** The wind-down's only remedy has to be reachable from the surfaces the region gate
+   *  greys out, since a user hunting for it will try them: the compliance modal they used
+   *  to open is a title and a Close button, with nothing about the migration. The greyed
+   *  dollar row is the other entry point and shares this exact callback (`onGatedTap`),
+   *  whose wiring wallet-overview.spec covers. */
+  it("reopens the migrate-now prompt from the disabled transfer button", async () => {
+    mockCanReopen = true
+
+    const { getByTestId } = await renderWithGatedDollarBalance()
+
+    fireEvent.press(getByTestId("transfer", { includeHiddenElements: true }))
+
+    expect(mockReopenMigratePrompt).toHaveBeenCalledTimes(1)
+    expect(mockDollarBalanceModalVisible).toBe(false)
+    expect(mockNavigate).not.toHaveBeenCalledWith("conversionDetails")
+  })
+
+  /** The gate also greys these surfaces for regions with no wind-down at all, and those
+   *  accounts have no migration to be pushed into. */
+  it("keeps the region explanation when no migrate-now prompt can surface", async () => {
+    mockCanReopen = false
+
+    const { getByTestId } = await renderWithGatedDollarBalance()
+
+    fireEvent.press(getByTestId("transfer", { includeHiddenElements: true }))
+
+    expect(mockDollarBalanceModalVisible).toBe(true)
+    expect(mockReopenMigratePrompt).not.toHaveBeenCalled()
+  })
+
   it("shows the migration reminder bulletin in the pre-cutoff phase", async () => {
     mockReminderBulletinVisible = true
 
@@ -1857,7 +2282,39 @@ describe("HomeScreen wind-down states", () => {
     await flushEffects()
   })
 
-  it("keeps the reminder bulletin hidden outside the pre-cutoff phase", async () => {
+  /** The dashboard entry the dismissible migrate-now modal leaves behind once closed. */
+  it("keeps the migration reminder bulletin once receiving is disabled", async () => {
+    mockReminderBulletinVisible = true
+    mockReminderBulletinPhase = WindDownStatus.ReceiveDisabled
+
+    const { findByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    expect(await findByTestId("migration-reminder-bulletin")).toBeTruthy()
+
+    await flushEffects()
+  })
+
+  it("forwards the wind-down phase so the bulletin can pick its copy", async () => {
+    mockReminderBulletinVisible = true
+    mockReminderBulletinPhase = WindDownStatus.ReceiveDisabled
+
+    render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    const { phase } = mockMigrationReminderBulletin.mock.calls[0][0]
+    expect(phase).toBe(WindDownStatus.ReceiveDisabled)
+  })
+
+  it("keeps the reminder bulletin hidden in a phase that does not call for it", async () => {
     const { queryByTestId } = render(
       <ContextForScreen>
         <HomeScreen />
@@ -1888,7 +2345,12 @@ describe("HomeScreen wind-down states", () => {
 })
 
 describe("HomeScreen pending receive badge", () => {
-  beforeEach(resetHomeScreenMocks)
+  beforeEach(() => {
+    resetHomeScreenMocks()
+    // The unseen-tx badge only auto-dismisses on a focused screen, and it owns
+    // the same slot as the pending row — earlier suites leave this false.
+    mockIsFocused = true
+  })
 
   const mocksWithPendingDeposit = () =>
     generateHomeMock({
@@ -1899,47 +2361,23 @@ describe("HomeScreen pending receive badge", () => {
       pendingIncomingTransactions: [pendingOnchainReceiveTx],
     })
 
-  it("shows the pending amount beside the balance while a deposit is unconfirmed", async () => {
+  /** The pending row and the unseen-tx badge share one slot under the balance:
+   *  a freshly arrived receive is announced by the transient badge first, and
+   *  the pending row takes the slot back when that window closes — the hand-back
+   *  itself is pinned in use-badge-slot-content.spec, which can drive its
+   *  timers. */
+  it("yields the badge slot to the unseen-tx badge as the receive arrives", async () => {
     currentMocks = mocksWithPendingDeposit()
 
-    const { findByTestId } = render(
+    const { queryByTestId } = render(
       <ContextForScreen>
         <HomeScreen />
       </ContextForScreen>,
     )
 
-    expect(await findByTestId("balance-status-badge")).toBeTruthy()
-
     await flushEffects()
-  })
 
-  /** The regression in blink-wip#937: the only pending signal at the top was the
-   *  unseen-tx badge, which auto-dismisses after ~5s. The pending badge is
-   *  state-driven and must outlive that window. */
-  it("keeps the pending badge past the unseen-badge auto-dismiss window", async () => {
-    jest.useFakeTimers({ doNotFake: ["setImmediate"] })
-    try {
-      currentMocks = mocksWithPendingDeposit()
-
-      const { findByTestId, getByTestId } = render(
-        <ContextForScreen>
-          <HomeScreen />
-        </ContextForScreen>,
-      )
-
-      expect(await findByTestId("balance-status-badge")).toBeTruthy()
-
-      // 5s auto-seen delay + 180ms hide-to-mark gap + slack
-      act(() => {
-        jest.advanceTimersByTime(5_500)
-      })
-
-      expect(getByTestId("balance-status-badge")).toBeTruthy()
-
-      await flushEffects()
-    } finally {
-      jest.useRealTimers()
-    }
+    expect(queryByTestId("pending-receive-badge")).toBeNull()
   })
 
   it("hides the badge while nothing is pending", async () => {
@@ -1958,7 +2396,7 @@ describe("HomeScreen pending receive badge", () => {
 
     await flushEffects()
 
-    expect(queryByTestId("balance-status-badge")).toBeNull()
+    expect(queryByTestId("pending-receive-badge")).toBeNull()
   })
 
   describe("self-custodial", () => {
@@ -2003,6 +2441,27 @@ describe("HomeScreen pending receive badge", () => {
       mockPendingDepositsOverride = null
     })
 
+    /** The slot sits directly under the balance the placeholder replaces, so the deposit
+     *  amount must not spell out the figure the user just covered. */
+    it("hides the pending row while amounts are hidden", async () => {
+      mockActiveWalletOverride = selfCustodialWallet
+      mockPendingDepositsOverride = { deposits: [sparkDeposit("immature")] }
+
+      const { queryByTestId } = render(
+        <HideAmountContextProvider
+          value={{ hideAmount: true, toggleHideAmount: jest.fn() }}
+        >
+          <ContextForScreen>
+            <HomeScreen />
+          </ContextForScreen>
+        </HideAmountContextProvider>,
+      )
+
+      await flushEffects()
+
+      expect(queryByTestId("pending-receive-badge")).toBeNull()
+    })
+
     it("shows the badge for an immature (unconfirmed) Spark deposit", async () => {
       mockActiveWalletOverride = selfCustodialWallet
       mockPendingDepositsOverride = { deposits: [sparkDeposit("immature")] }
@@ -2013,9 +2472,39 @@ describe("HomeScreen pending receive badge", () => {
         </ContextForScreen>,
       )
 
-      expect(await findByTestId("balance-status-badge")).toBeTruthy()
+      expect(await findByTestId("pending-receive-badge")).toBeTruthy()
 
       await flushEffects()
+    })
+
+    /** The regression in blink-wip#937: the only pending signal at the top was
+     *  the unseen-tx badge, which auto-dismisses after ~5s. This row is
+     *  state-driven and must outlive that window. */
+    it("keeps the pending row past the unseen-badge auto-dismiss window", async () => {
+      jest.useFakeTimers({ doNotFake: ["setImmediate"] })
+      try {
+        mockActiveWalletOverride = selfCustodialWallet
+        mockPendingDepositsOverride = { deposits: [sparkDeposit("immature")] }
+
+        const { findByTestId, getByTestId } = render(
+          <ContextForScreen>
+            <HomeScreen />
+          </ContextForScreen>,
+        )
+
+        expect(await findByTestId("pending-receive-badge")).toBeTruthy()
+
+        // 5s auto-seen delay + 180ms hide-to-mark gap + slack
+        act(() => {
+          jest.advanceTimersByTime(30_000)
+        })
+
+        expect(getByTestId("pending-receive-badge")).toBeTruthy()
+
+        await flushEffects()
+      } finally {
+        jest.useRealTimers()
+      }
     })
 
     it("ignores custodial pending receives while the Spark SDK is still connecting", async () => {
@@ -2041,7 +2530,7 @@ describe("HomeScreen pending receive badge", () => {
 
       await flushEffects()
 
-      expect(queryByTestId("balance-status-badge")).toBeNull()
+      expect(queryByTestId("pending-receive-badge")).toBeNull()
     })
 
     it("opens the unclaimed-deposits screen when the immature-deposit pill is tapped", async () => {
@@ -2056,7 +2545,7 @@ describe("HomeScreen pending receive badge", () => {
         </ContextForScreen>,
       )
 
-      fireEvent.press(await findByTestId("balance-status-badge"))
+      fireEvent.press(await findByTestId("pending-receive-badge"))
 
       expect(mockNavigate).toHaveBeenCalledWith("unclaimedDepositsScreen")
 
@@ -2075,7 +2564,7 @@ describe("HomeScreen pending receive badge", () => {
 
       await flushEffects()
 
-      expect(queryByTestId("balance-status-badge")).toBeNull()
+      expect(queryByTestId("pending-receive-badge")).toBeNull()
     })
   })
 })
@@ -2137,6 +2626,7 @@ describe("HomeScreen pull-to-refresh", () => {
     mockSelfCustodialWalletOverride = {
       sdk: null,
       wallets: [],
+      allTransactions: [],
       status: "ready",
       isStableBalanceActive: false,
       lastReceivedPaymentId: null,
@@ -2349,5 +2839,200 @@ describe("useRemoteConfig mock completeness", () => {
     )
 
     expect(missingKeys).toEqual([])
+  })
+})
+
+describe("HomeScreen restricted region", () => {
+  beforeEach(resetHomeScreenMocks)
+
+  it("opens the restricted-region modal from the disabled transfer button when sanctioned", async () => {
+    mockIsRestrictedRegion = true
+    currentMocks = generateHomeMock({
+      level: AccountLevel.One,
+      network: Network.Mainnet,
+      btcBalance: 1000,
+      usdBalance: 5000,
+    })
+
+    const { getByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    expect(getByTestId("transfer", { includeHiddenElements: true })).toBeTruthy()
+
+    fireEvent.press(getByTestId("transfer", { includeHiddenElements: true }))
+
+    expect(mockPresentRestrictedRegionModal).toHaveBeenCalledTimes(1)
+    expect(mockPromptEnhancedMode).not.toHaveBeenCalled()
+    expect(mockDollarBalanceModalVisible).toBe(false)
+  })
+
+  /** Sanctions are the stricter layer: a sanctioned session must not be pushed into a
+   *  migration whose destination it may not be allowed to reach either. */
+  it("prefers the sanctions modal over the migrate-now nudge when both would apply", async () => {
+    mockIsRestrictedRegion = true
+    mockCanReopen = true
+    currentMocks = generateHomeMock({
+      level: AccountLevel.One,
+      network: Network.Mainnet,
+      btcBalance: 1000,
+      usdBalance: 0,
+    })
+
+    const { getByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    fireEvent.press(getByTestId("transfer", { includeHiddenElements: true }))
+
+    expect(mockPresentRestrictedRegionModal).toHaveBeenCalledTimes(1)
+    expect(mockReopenMigratePrompt).not.toHaveBeenCalled()
+  })
+
+  it("prefers the Enhanced prompt over the sanctions modal when both would apply", async () => {
+    mockIsAnonMode = true
+    mockIsRestrictedRegion = true
+    mockActiveWalletOverride = selfCustodialReadyWalletOverride(5000)
+    currentMocks = generateHomeMock({
+      level: AccountLevel.One,
+      network: Network.Mainnet,
+      btcBalance: 1000,
+      usdBalance: 5000,
+    })
+
+    const { getByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    fireEvent.press(getByTestId("transfer", { includeHiddenElements: true }))
+
+    expect(mockPromptEnhancedMode).toHaveBeenCalledTimes(1)
+    expect(mockPresentRestrictedRegionModal).not.toHaveBeenCalled()
+
+    mockActiveWalletOverride = null
+  })
+
+  it("suppresses the forced conversion while the region is sanctioned", async () => {
+    mockIsRestrictedRegion = true
+    mockDollarBalanceRestrictedOverride = true
+    mockActiveWalletOverride = selfCustodialReadyWalletOverride(5000)
+    currentMocks = generateHomeMock({
+      level: AccountLevel.One,
+      network: Network.Mainnet,
+      btcBalance: 1000,
+      usdBalance: 5000,
+    })
+
+    const { queryByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    expect(mockForcedConversionParams?.isRestricted).toBe(false)
+    expect(queryByTestId("sc-convert-modal")).toBeNull()
+
+    mockActiveWalletOverride = null
+  })
+})
+
+describe("HomeScreen sanctioned session", () => {
+  beforeEach(resetHomeScreenMocks)
+
+  const levelZeroWithBalance = () =>
+    generateHomeMock({
+      level: AccountLevel.Zero,
+      network: Network.Mainnet,
+      // Above the 2100-sat remote-config floor that arms the upgrade prompt
+      btcBalance: 5000,
+      usdBalance: 0,
+    })
+
+  const renderAndSettleUpgradeDelay = async () => {
+    const view = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+    /** The focus effect re-arms its timer whenever triggerUpgradeModal changes
+     *  identity, which it does as the queries resolve. Settle, advance, then
+     *  settle and advance again so the final timer is the one that fires. */
+    await flushEffects()
+    await act(async () => {
+      jest.advanceTimersByTime(UPGRADE_MODAL_DELAY_WITH_SLACK_MS)
+    })
+    await flushEffects()
+    await act(async () => {
+      jest.advanceTimersByTime(UPGRADE_MODAL_DELAY_WITH_SLACK_MS)
+    })
+    return view
+  }
+
+  beforeEach(() => {
+    jest.useFakeTimers({ doNotFake: ["setImmediate", "nextTick", "queueMicrotask"] })
+    mockCanShowUpgradeModal = true
+    currentMocks = levelZeroWithBalance()
+  })
+
+  afterEach(() => {
+    jest.useRealTimers()
+  })
+
+  /** Control for the two guards below: without it a broken setup would make them
+   *  pass for the wrong reason. */
+  it("auto-presents the trial upgrade modal on an unrestricted level-zero account", async () => {
+    const { queryByTestId } = await renderAndSettleUpgradeDelay()
+
+    expect(queryByTestId("trial-account-limits-modal")).toBeTruthy()
+  })
+
+  it("keeps the upgrade modal away while the region is restricted", async () => {
+    mockIsRestrictedRegion = true
+
+    const { queryByTestId } = await renderAndSettleUpgradeDelay()
+
+    expect(queryByTestId("trial-account-limits-modal")).toBeNull()
+  })
+
+  /** The late-verdict case: the splash cap can reveal Home before the lookup settles,
+   *  and a modal presented in that window would end up behind the full-screen block. */
+  it("keeps the upgrade modal away while the region verdict is still pending", async () => {
+    mockIsRestrictedRegionEvaluationPending = true
+
+    const { queryByTestId } = await renderAndSettleUpgradeDelay()
+
+    expect(queryByTestId("trial-account-limits-modal")).toBeNull()
+  })
+
+  it("suppresses the migrate-now prompt while the region is restricted", async () => {
+    mockMigratePromptVisible = true
+    mockIsRestrictedRegion = true
+
+    const { queryByTestId } = await renderAndSettleUpgradeDelay()
+
+    expect(queryByTestId("migrate-now-modal")).toBeNull()
+  })
+
+  it("suppresses the migrate-now prompt while the region verdict is still pending", async () => {
+    mockMigratePromptVisible = true
+    mockIsRestrictedRegionEvaluationPending = true
+
+    const { queryByTestId } = await renderAndSettleUpgradeDelay()
+
+    expect(queryByTestId("migrate-now-modal")).toBeNull()
   })
 })

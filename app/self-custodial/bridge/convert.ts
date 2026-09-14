@@ -1,5 +1,6 @@
 import {
   AmountAdjustmentReason,
+  PaymentRequest,
   PrepareSendPaymentRequest,
   PrepareSendPaymentResponse,
   ReceivePaymentMethod,
@@ -108,7 +109,7 @@ const prepareConversionWithDestination = async (
   )
   return sdk.prepareSendPayment(
     PrepareSendPaymentRequest.create({
-      paymentRequest,
+      paymentRequest: new PaymentRequest.Input({ input: paymentRequest }),
       amount: destinationAmount,
       tokenIdentifier,
       conversionOptions: buildConversionOptions(direction),

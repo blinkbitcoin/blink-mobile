@@ -195,7 +195,7 @@ export const toTransactionFragment = (
 }
 
 export const toTransactionFragments = (
-  txs: NormalizedTransaction[],
+  txs: readonly NormalizedTransaction[],
   display?: DisplayInfo,
   resolveDescription?: DescriptionResolver,
 ): TransactionFragment[] =>

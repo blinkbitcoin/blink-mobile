@@ -3,6 +3,7 @@ import { View, StyleProp, ViewStyle, TextStyle } from "react-native"
 
 import { makeStyles, useTheme, Text, Divider } from "@rn-vui/themed"
 
+import { DisabledFeature } from "@app/components/disabled-feature"
 import { testProps } from "@app/utils/testProps"
 
 type SettingsGroupProps = {
@@ -11,6 +12,8 @@ type SettingsGroupProps = {
   containerStyle?: StyleProp<ViewStyle>
   dividerStyle?: StyleProp<ViewStyle>
   titleStyle?: StyleProp<TextStyle>
+  disabled?: boolean
+  onDisabledPress?: () => void
 }
 
 export const SettingsGroup: React.FC<SettingsGroupProps> = ({
@@ -19,6 +22,8 @@ export const SettingsGroup: React.FC<SettingsGroupProps> = ({
   containerStyle,
   dividerStyle,
   titleStyle,
+  disabled = false,
+  onDisabledPress,
 }) => {
   const styles = useStyles()
   const {
@@ -37,14 +42,23 @@ export const SettingsGroup: React.FC<SettingsGroupProps> = ({
         </Text>
       )}
       <View style={[styles.groupCard, containerStyle]}>
-        {filteredItems.map((Element, index) => (
-          <View key={index}>
-            <Element />
-            {index < filteredItems.length - 1 && (
-              <Divider color={colors.grey4} style={[styles.divider, dividerStyle]} />
-            )}
-          </View>
-        ))}
+        <DisabledFeature
+          disabled={disabled}
+          onDisabledPress={onDisabledPress}
+          accessibilityLabel={name}
+        >
+          {filteredItems.map((Element, index) => {
+            const hasDividerBelow = index < filteredItems.length - 1
+            return (
+              <View key={index}>
+                <Element />
+                {hasDividerBelow && (
+                  <Divider color={colors.grey4} style={[styles.divider, dividerStyle]} />
+                )}
+              </View>
+            )
+          })}
+        </DisabledFeature>
       </View>
     </View>
   )

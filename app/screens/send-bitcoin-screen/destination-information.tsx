@@ -91,6 +91,10 @@ const destinationStateToInformation = (
             text: translate.SendBitcoinDestinationScreen.selfPaymentAdvice(),
           },
         }
+      case InvalidDestinationReason.LnurlServiceError:
+        return {
+          error: translate.SendBitcoinDestinationScreen.lnurlServiceError(),
+        }
       case InvalidDestinationReason.LnurlError ||
         InvalidDestinationReason.LnurlUnsupported:
         return {

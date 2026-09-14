@@ -1,4 +1,5 @@
 import React from "react"
+import { ActivityIndicator } from "react-native"
 import { render, fireEvent } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
@@ -140,6 +141,22 @@ describe("CloudBackupScreen", () => {
 
     fireEvent.press(getByText(LL.BackupScreen.CloudBackup.continueButton()))
     expect(mockHandleBackup).toHaveBeenCalled()
+  })
+
+  /** useCloudBackup reports loading while the phrase is still being read and the pubkey
+   *  derived. The hook refuses to run in that window; the screen's job is to show it, so the
+   *  user sees a spinner instead of a button that looks idle. */
+  it("shows the button in its loading state while the hook reports loading", async () => {
+    mockLoading = true
+
+    const view = render(
+      <ContextForScreen>
+        <CloudBackupScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    expect(view.UNSAFE_queryByType(ActivityIndicator)).toBeTruthy()
   })
 
   it("renders the Important InfoBanner with warning icon color", async () => {

@@ -45,7 +45,7 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
     useDisplayCurrency()
   const { convertMoneyAmount } = usePriceConversion()
 
-  const { fromWalletCurrency, moneyAmount, isMigrationConversion } = route.params
+  const { fromWalletCurrency, moneyAmount, drainConversion } = route.params
   const isAuthed = useIsAuthed()
   const { isSelfCustodial, wallets: activeWallets } = useActiveWallet()
 
@@ -99,7 +99,7 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
         { name: "Primary" },
         {
           name: "conversionSuccess",
-          ...(isMigrationConversion ? { params: { returnToMigration: true } } : {}),
+          ...(drainConversion ? { params: { returnTo: drainConversion } } : {}),
         },
       ]
       return CommonActions.reset({ ...state, routes, index: routes.length - 1 })

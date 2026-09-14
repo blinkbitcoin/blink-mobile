@@ -48,6 +48,11 @@ type SelfCustodialWalletContextValue = ActiveWalletState & {
   allTransactions: NormalizedTransaction[]
   retry: () => void
   sdk: BreezSdkInterface | null
+  /** The account the connected `sdk` belongs to, which is not always the active one: the
+   *  provider's teardown runs after its descendants' effects, so on the commit where the
+   *  user switches accounts a consumer sees the new active id beside the old connection.
+   *  Anything that signs with the SDK and records the result elsewhere has to compare. */
+  connectedAccountId: string | null
   lightningAddress: string | null
   isStableBalanceActive?: boolean
   lastReceivedPaymentId: string | null
@@ -68,6 +73,7 @@ const defaultState: SelfCustodialWalletContextValue = {
   accountType: AccountType.SelfCustodial,
   retry: () => {},
   sdk: null,
+  connectedAccountId: null,
   lightningAddress: null,
   lastReceivedPaymentId: null,
   hasMoreTransactions: false,
@@ -166,6 +172,7 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
       accountType: AccountType.SelfCustodial,
       retry,
       sdk,
+      connectedAccountId,
       lightningAddress,
       isStableBalanceActive,
       lastReceivedPaymentId,
@@ -182,6 +189,7 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
       status,
       retry,
       sdk,
+      connectedAccountId,
       lightningAddress,
       isStableBalanceActive,
       lastReceivedPaymentId,

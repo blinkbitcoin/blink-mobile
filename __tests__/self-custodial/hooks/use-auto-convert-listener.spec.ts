@@ -60,6 +60,11 @@ jest.mock("@app/hooks/use-price-conversion", () => ({
   usePriceConversion: () => mockUsePriceConversion(),
 }))
 
+let mockIsAnonMode = false
+jest.mock("@app/self-custodial/hooks/use-self-custodial-account-mode", () => ({
+  useSelfCustodialAccountMode: () => ({ isAnonMode: mockIsAnonMode }),
+}))
+
 const mockAddBounded = jest.fn()
 jest.mock("@app/utils/bounded-collections", () => {
   const actual = jest.requireActual("@app/utils/bounded-collections")
@@ -131,6 +136,7 @@ const makeRecord = (overrides: Partial<Record<string, unknown>> = {}) => ({
 })
 
 const setupDefaults = (sdk: ListenerSdk) => {
+  mockIsAnonMode = false
   mockUseSelfCustodialWallet.mockReturnValue({
     sdk,
     lastReceivedPaymentId: null,
@@ -201,6 +207,61 @@ describe("useAutoConvertListener — live trigger", () => {
     })
     expect(mockRemovePendingAutoConvert).toHaveBeenCalledWith("lnbc1dollar")
     expect(mockRefreshWallets).toHaveBeenCalledTimes(1)
+  })
+
+  it("ignores a received payment while Anon Mode is on", async () => {
+    const sdk = makeSdk({
+      getPayment: jest
+        .fn()
+        .mockResolvedValue({ payment: makeLightningPayment("lnbc1dollar", 5000n) }),
+    })
+    setupDefaults(sdk)
+    mockIsAnonMode = true
+    mockUseSelfCustodialWallet.mockReturnValue({
+      sdk,
+      lastReceivedPaymentId: "pid-lnbc1dollar",
+      isStableBalanceActive: false,
+      refreshWallets: mockRefreshWallets,
+    })
+    mockFindPendingAutoConvert.mockResolvedValue(
+      makeRecord({ paymentRequest: "lnbc1dollar" }),
+    )
+
+    renderHook(() => useAutoConvertListener())
+    await Promise.resolve()
+
+    expect(sdk.getPayment).not.toHaveBeenCalled()
+    expect(mockExecuteAutoConvert).not.toHaveBeenCalled()
+  })
+
+  it("processes the still-unhandled payment once Anon Mode turns off", async () => {
+    const sdk = makeSdk({
+      getPayment: jest
+        .fn()
+        .mockResolvedValue({ payment: makeLightningPayment("lnbc1dollar", 5000n) }),
+    })
+    setupDefaults(sdk)
+    mockIsAnonMode = true
+    mockUseSelfCustodialWallet.mockReturnValue({
+      sdk,
+      lastReceivedPaymentId: "pid-lnbc1dollar",
+      isStableBalanceActive: false,
+      refreshWallets: mockRefreshWallets,
+    })
+    mockFindPendingAutoConvert.mockResolvedValue(
+      makeRecord({ paymentRequest: "lnbc1dollar" }),
+    )
+
+    const { rerender } = renderHook(() => useAutoConvertListener())
+    await Promise.resolve()
+    expect(mockExecuteAutoConvert).not.toHaveBeenCalled()
+
+    mockIsAnonMode = false
+    rerender({})
+
+    await waitFor(() => {
+      expect(mockExecuteAutoConvert).toHaveBeenCalledTimes(1)
+    })
   })
 
   it("does not refresh wallets when the convert outcome is Failed", async () => {
@@ -647,6 +708,58 @@ describe("useAutoConvertListener — mount replay", () => {
       expect(mockExecuteAutoConvert).toHaveBeenCalledTimes(1)
     })
     expect(mockPruneExpiredAutoConverts).toHaveBeenCalledWith(expect.any(Number))
+  })
+
+  it("holds the replay while Anon Mode is on and runs it after leaving", async () => {
+    const sdk = makeSdk({
+      listPayments: jest.fn().mockResolvedValue({
+        payments: [makeLightningPayment("lnbc1pending")],
+      }),
+    })
+    setupDefaults(sdk)
+    mockIsAnonMode = true
+    mockListPendingAutoConverts.mockResolvedValue([
+      makeRecord({ paymentRequest: "lnbc1pending" }),
+    ])
+
+    const { rerender } = renderHook(() => useAutoConvertListener())
+    await Promise.resolve()
+    expect(mockListPendingAutoConverts).not.toHaveBeenCalled()
+
+    mockIsAnonMode = false
+    rerender({})
+
+    await waitFor(() => {
+      expect(mockExecuteAutoConvert).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  it("re-arms the replay after an Anon interval so every pending record is picked up", async () => {
+    const sdk = makeSdk({
+      listPayments: jest.fn().mockResolvedValue({
+        payments: [makeLightningPayment("lnbc1pending")],
+      }),
+    })
+    setupDefaults(sdk)
+    mockListPendingAutoConverts.mockResolvedValue([])
+
+    const { rerender } = renderHook(() => useAutoConvertListener())
+    await waitFor(() => {
+      expect(mockListPendingAutoConverts).toHaveBeenCalledTimes(1)
+    })
+
+    mockIsAnonMode = true
+    rerender({})
+
+    mockIsAnonMode = false
+    mockListPendingAutoConverts.mockResolvedValue([
+      makeRecord({ paymentRequest: "lnbc1pending" }),
+    ])
+    rerender({})
+
+    await waitFor(() => {
+      expect(mockExecuteAutoConvert).toHaveBeenCalledTimes(1)
+    })
   })
 
   it("skips a pending record whose Lightning payment isn't in the recent history", async () => {

@@ -188,8 +188,10 @@ dependencies {
 }
 
 
+// MaterialIcons is the icon set BTC Map tags its places with, and the map screen
+// renders those names directly on the pins.
 project.ext.vectoricons = [
-    iconFontNames: [ 'Ionicons.ttf' ]
+    iconFontNames: [ 'Ionicons.ttf', 'MaterialIcons.ttf' ]
 ]
 
 apply from: file("../../node_modules/react-native-vector-icons/fonts.gradle")

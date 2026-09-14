@@ -4,6 +4,7 @@ import React, {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react"
@@ -88,9 +89,20 @@ export const AccountRegistryProvider = ({ children }: { children: ReactNode }) =
   const [selfCustodialHydrating, setSelfCustodialHydrating] = useState(true)
   const [profilesHydrating, setProfilesHydrating] = useState(true)
 
+  // Consumers can call the reload below at any time, so a read that is still in
+  // flight may resolve after a newer one has already answered. Applying it then
+  // would clobber fresher entries with stale ones, so late answers are dropped.
+  const reloadRequestRef = useRef(0)
+
   const reloadSelfCustodialAccounts = useCallback(async () => {
+    const request = reloadRequestRef.current + 1
+    reloadRequestRef.current = request
+
     setSelfCustodialHydrating(true)
     const result = await listSelfCustodialAccounts()
+
+    if (reloadRequestRef.current !== request) return
+
     if (result.status === StorageReadStatus.Ok) {
       setSelfCustodialEntries(result.entries)
     }

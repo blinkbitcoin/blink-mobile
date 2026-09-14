@@ -34,8 +34,11 @@ export const parseDestination = async ({
   inputSource,
   displayCurrency,
   preferLnurlForInternalHandles,
+  canPayIntraledger = true,
 }: ParseDestinationParams): Promise<ParseDestinationResult> => {
   const destination = rawInput.trim()
+  /** Empty for a sender that cannot pay over the ledger, so no lnurl collapses to it. */
+  const intraledgerDomains = canPayIntraledger ? lnurlDomains : []
   const parsedDestination = parsePaymentDestination({
     destination,
     network: bitcoinNetwork as NetworkGaloyClient,
@@ -63,7 +66,7 @@ export const parseDestination = async ({
     if (merchant) {
       return resolveLnurlDestination({
         parsedLnurlDestination: merchantChoiceToLnurlDestination(merchant),
-        lnurlDomains,
+        lnurlDomains: intraledgerDomains,
         accountDefaultWalletQuery,
         myWalletIds,
       })
@@ -94,7 +97,7 @@ export const parseDestination = async ({
     case PaymentType.Lnurl: {
       return resolveLnurlDestination({
         parsedLnurlDestination: parsedDestination,
-        lnurlDomains,
+        lnurlDomains: intraledgerDomains,
         accountDefaultWalletQuery,
         myWalletIds,
       })
@@ -116,7 +119,7 @@ export const parseDestination = async ({
               lnurl,
               isMerchant: false,
             },
-            lnurlDomains,
+            lnurlDomains: intraledgerDomains,
             accountDefaultWalletQuery,
             myWalletIds,
           })

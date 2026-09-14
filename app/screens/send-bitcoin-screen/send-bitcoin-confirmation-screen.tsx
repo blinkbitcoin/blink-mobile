@@ -11,7 +11,6 @@ import { HiddenBalancePlaceholder } from "@app/components/hidden-balance-placeho
 import { PaymentDestinationDisplay } from "@app/components/payment-destination-display"
 import { Screen } from "@app/components/screen"
 import { WarningBanner } from "@app/components/warning-banner"
-import { HIDDEN_AMOUNT_PLACEHOLDER } from "@app/config"
 import { Transaction, WalletCurrency } from "@app/graphql/generated"
 import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { isIdempotencyConflict } from "@app/graphql/is-idempotency-conflict"
@@ -43,7 +42,11 @@ import { useSendBalances } from "./hooks/use-send-wallets"
 import { useVerifyPaymentSettled } from "./hooks/use-verify-payment-settled"
 import { PaymentSendExtraInfo } from "./payment-details/index.types"
 import useFee from "./use-fee"
-import { PaymentSendCompletedStatus, useSendPayment } from "./use-send-payment"
+import {
+  IDEMPOTENCY_KEY_UNAVAILABLE,
+  PaymentSendCompletedStatus,
+  useSendPayment,
+} from "./use-send-payment"
 import { useSaveLnAddressContact } from "./use-save-lnaddress-contact"
 import { ellipsizeMiddle } from "@app/utils/helper"
 
@@ -153,7 +156,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     loading: sendPaymentLoading,
     sendPayment,
     hasAttemptedSend,
-  } = useSendPayment(sendPaymentMutation)
+  } = useSendPayment(sendPaymentMutation, paymentDetail.idempotencyKeyRef)
 
   // Self-custodial fee failures carry a classified SDK code; custodial ones carry raw
   // GraphQL text that is not fit to show, so only the former replaces the generic string.
@@ -358,7 +361,11 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
           return
         }
 
-        setPaymentError(err.message || err.toString())
+        setPaymentError(
+          err.message === IDEMPOTENCY_KEY_UNAVAILABLE
+            ? LL.SendBitcoinConfirmationScreen.somethingWentWrong()
+            : err.message || err.toString(),
+        )
       }
     }
   }, [
@@ -405,7 +412,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     })
     if (!validAmount) {
       invalidAmountErrorMessage = LL.SendBitcoinScreen.amountExceed({
-        balance: hideAmount ? HIDDEN_AMOUNT_PLACEHOLDER : btcPrimaryText,
+        balance: btcPrimaryText,
       })
     }
   }
@@ -421,7 +428,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     })
     if (!validAmount) {
       invalidAmountErrorMessage = LL.SendBitcoinScreen.amountExceed({
-        balance: hideAmount ? HIDDEN_AMOUNT_PLACEHOLDER : usdPrimaryText,
+        balance: usdPrimaryText,
       })
     }
   }
@@ -503,26 +510,34 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
                 onLayout={onPillLayout(sendingWalletDescriptor.currency)}
               />
             </View>
-            <View style={styles.walletSelectorInfoContainer}>
-              <View style={styles.walletSelectorTypeTextContainer}>
-                {hideAmount ? (
-                  <HiddenBalancePlaceholder size="small" />
-                ) : sendingWalletDescriptor.currency === WalletCurrency.Btc ? (
-                  <Text style={styles.walletCurrencyText}>{btcPrimaryText}</Text>
-                ) : (
-                  <Text style={styles.walletCurrencyText}>{usdPrimaryText}</Text>
-                )}
-              </View>
-              {!hideAmount && (
-                <View style={styles.walletSelectorBalanceContainer}>
-                  {sendingWalletDescriptor.currency === WalletCurrency.Btc ? (
-                    <Text>{btcSecondaryText}</Text>
-                  ) : (
-                    <Text>{usdSecondaryText}</Text>
-                  )}
-                </View>
+            <View
+              style={
+                hideAmount
+                  ? styles.walletSelectorInfoContainerHidden
+                  : styles.walletSelectorInfoContainer
+              }
+            >
+              {hideAmount ? (
+                <HiddenBalancePlaceholder size="small" />
+              ) : (
+                <>
+                  <View style={styles.walletSelectorTypeTextContainer}>
+                    {sendingWalletDescriptor.currency === WalletCurrency.Btc ? (
+                      <Text style={styles.walletCurrencyText}>{btcPrimaryText}</Text>
+                    ) : (
+                      <Text style={styles.walletCurrencyText}>{usdPrimaryText}</Text>
+                    )}
+                  </View>
+                  <View style={styles.walletSelectorBalanceContainer}>
+                    {sendingWalletDescriptor.currency === WalletCurrency.Btc ? (
+                      <Text>{btcSecondaryText}</Text>
+                    ) : (
+                      <Text>{usdSecondaryText}</Text>
+                    )}
+                  </View>
+                  <View />
+                </>
               )}
-              <View />
             </View>
           </View>
         </View>
@@ -611,7 +626,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
                 loadingText={LL.SendBitcoinConfirmationScreen.slideConfirming()}
                 onSwipe={handleSendPayment}
                 disabled={
-                  !validAmount || hasAttemptedSend || feeUnavailable || dustNotEvaluable
+                  !validAmount || !sendPayment || feeUnavailable || dustNotEvaluable
                 }
               />
             </View>
@@ -661,6 +676,13 @@ const useStyles = makeStyles(({ colors }) => ({
   walletSelectorInfoContainer: {
     flex: 1,
     flexDirection: "column",
+  },
+  // The placeholder is a single 12pt row, so it cannot reuse the two-line
+  // layout above: walletSelectorTypeTextContainer is flex-end, which pins a
+  // lone child to the bottom of the column and drops it below the pill.
+  walletSelectorInfoContainerHidden: {
+    flex: 1,
+    justifyContent: "center",
   },
   walletSelectorTypeTextContainer: {
     flex: 1,

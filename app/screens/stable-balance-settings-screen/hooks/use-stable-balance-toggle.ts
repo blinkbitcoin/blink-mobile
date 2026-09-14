@@ -2,7 +2,7 @@ import { useCallback, useState } from "react"
 
 import type { BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
 
-import { useDollarBalanceRestricted } from "@app/hooks/use-dollar-balance-restricted"
+import { useDollarBalanceGate } from "@app/hooks/use-dollar-balance-restricted"
 import { logSelfCustodialStableBalanceActivated } from "@app/self-custodial/analytics"
 import { activateStableBalance } from "@app/self-custodial/bridge"
 import { SparkToken } from "@app/self-custodial/config"
@@ -21,6 +21,11 @@ type Params = {
 
 export type StableBalanceToggleControls = {
   busy: boolean
+  /** The region verdict has not landed, so an activation would be refused. Surfaced so the
+   *  screen can disable the switch instead of letting it flip on and snap back unexplained;
+   *  this screen is self-custodial-only, which is the group whose region resolves over the
+   *  network and can take seconds. */
+  isRegionPending: boolean
   displayValue: boolean
   switchKey: number
   apply: (activate: boolean) => Promise<void>
@@ -34,7 +39,7 @@ export const useStableBalanceToggle = ({
   refreshStableBalanceActive,
   LL,
 }: Params): StableBalanceToggleControls => {
-  const isDollarBalanceRestricted = useDollarBalanceRestricted()
+  const { isGated: isDollarBalanceGated, isRegionPending } = useDollarBalanceGate()
   const [busy, setBusy] = useState(false)
   const [pendingValue, setPendingValue] = useState<boolean | null>(null)
   const [switchKey, setSwitchKey] = useState(0)
@@ -48,13 +53,21 @@ export const useStableBalanceToggle = ({
       /** Activation is region-gated or a restricted user could loop fee-paying
        *  conversions: activate, auto-convert to the token, get force-converted back.
        *  Deactivation stays allowed so an already-active balance can be freed. */
-      const isActivationBlocked = activate && isDollarBalanceRestricted
+      const isActivationBlocked = activate && isDollarBalanceGated
       if (isActivationBlocked) {
         toastShow({
           message: (tr) => tr.DollarBalanceRestriction.modalTitle(),
           LL,
           type: "error",
         })
+        resyncSwitch()
+        return
+      }
+
+      /** No toast: the region has not accused the user yet, so it snaps back silently
+       *  rather than claim a restriction that may not hold. */
+      const isActivationUnresolved = activate && isRegionPending
+      if (isActivationUnresolved) {
         resyncSwitch()
         return
       }
@@ -91,7 +104,8 @@ export const useStableBalanceToggle = ({
     [
       sdk,
       busy,
-      isDollarBalanceRestricted,
+      isDollarBalanceGated,
+      isRegionPending,
       refreshStableBalanceActive,
       refreshWallets,
       LL,
@@ -101,6 +115,7 @@ export const useStableBalanceToggle = ({
 
   return {
     busy,
+    isRegionPending,
     displayValue: pendingValue ?? isStableBalanceActive,
     switchKey,
     apply,

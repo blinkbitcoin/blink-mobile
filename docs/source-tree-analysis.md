@@ -12,6 +12,7 @@ blink-mobile/
 ├── app/                          # Main application source
 │   ├── app.tsx                   # Root component with provider tree
 │   ├── assets/                   # Static assets
+│   ├── btcmap/                   # BTC Map merchant data, and adding a place to it
 │   │   ├── fonts/                # Custom fonts
 │   │   ├── icons/                # 44 SVG icons
 │   │   ├── icons-redesign/       # Redesigned icons
@@ -26,7 +27,7 @@ blink-mobile/
 │   │   ├── currency-keyboard/    # Custom currency input
 │   │   ├── galoy-theme-provider/ # Theme provider wrapper
 │   │   ├── galoy-toast/          # Toast notifications
-│   │   ├── map-component/        # Map display components
+│   │   ├── map-component/        # Map view, pins, clusters, place sheet
 │   │   ├── notifications/        # Push notification handling
 │   │   └── ...                   # 45+ more component dirs
 │   ├── config/                   # App configuration
@@ -176,3 +177,35 @@ The GraphQL directory contains the entire data layer:
 | `__tests__/` | Unit tests | Jest + Testing Library |
 | `e2e/detox/` | E2E tests | Detox |
 | `e2e/` (root) | E2E tests | WebDriverIO + Appium |
+
+## `app/btcmap/` — merchant data for the map
+
+The map screen's merchants come from [BTC Map](https://btcmap.org), the
+community-maintained OpenStreetMap overlay of places that accept bitcoin.
+Everything the app draws it reads from there. The one thing it sends back is a
+proposal for a place that is missing; nothing in the app edits or verifies a
+place that already exists.
+
+| File | Role |
+|------|------|
+| `config.ts` | Endpoints, page size, sync interval, cursor safety margins |
+| `api.ts` | CDN snapshot, incremental `updated_since` sync, per-place details |
+| `storage.ts` | The offline snapshot, chunked across AsyncStorage rows |
+| `use-places.ts` | Cache-first place list, gated on the `btcMapPlacesEnabled` kill switch |
+| `use-place-details.ts` | Per-place detail fetch, on tap |
+| `use-place-names.ts` | Names for the labels drawn under the pins, per settled viewport |
+| `use-place-search.ts` | Named places around the current view, for the search list |
+| `search.ts` | Accent-folded name matching and nearest-first ranking |
+| `categories.ts` | Icon → filter category buckets, and the filter itself |
+| `submission.ts` | Shape and validation for a place someone is adding, plus how its coordinates read |
+| `use-place-submission.ts` | The `btcMapPlaceSubmit` mutation, retried under one `submissionId` per attempt |
+| `opening-hours.ts` | Partial OSM `opening_hours` reader → open / closed / unknown |
+| `verification.ts` | Survey freshness and boost state |
+| `icons.ts`, `urls.ts`, `geo.ts` | Marker glyph resolution, link shaping, distance |
+
+The place list (~29k rows, ~2.4 MB serialised) is seeded from the CDN snapshot
+on a cold start and refreshed by an incremental API sync at most hourly. It is
+held in AsyncStorage in 5k-place chunks because Android's SQLite CursorWindow
+caps a single row at 2 MB. Details are fetched per place on tap — the API has no
+batch endpoint, and the snapshot deliberately carries only coordinates and an
+icon.

@@ -6,6 +6,7 @@ import { ThemeProvider } from "@rn-vui/themed"
 
 import { SecurityScreen } from "@app/screens/settings-screen/security-screen"
 import theme from "@app/rne-theme/theme"
+import { PinScreenPurpose } from "@app/utils/enum"
 import { PersistentStateContext } from "@app/store/persistent-state"
 import { PersistentState } from "@app/store/persistent-state/state-migrations"
 import { AccountType } from "@app/types/wallet"
@@ -18,6 +19,10 @@ const mockSettingsData = jest.fn()
 const mockUseFocusEffect = jest.fn()
 const mockGetIsBiometricsEnabled = jest.fn()
 const mockGetIsPinEnabled = jest.fn()
+const mockRemovePin = jest.fn()
+const mockSetIsBiometricsEnabled = jest.fn()
+const mockRemoveIsBiometricsEnabled = jest.fn()
+const mockClearPinFailureState = jest.fn()
 const mockEmailDelete = jest.fn()
 const mockRegistrationInitiate = jest.fn()
 const mockUpdateState = jest.fn()
@@ -74,6 +79,10 @@ jest.mock("react-native-reanimated", () => {
 jest.mock("@app/utils/biometricAuthentication", () => ({
   __esModule: true,
   default: {
+    /** The screen reads the probe's full answer: `isSensorAvailable` collapses
+     *  "no sensor" and "nothing enrolled" into one false, and those two get
+     *  different copy. */
+    readSensorAvailability: jest.fn().mockResolvedValue("unavailable"),
     isSensorAvailable: jest.fn().mockResolvedValue(false),
     authenticate: jest.fn(),
   },
@@ -84,7 +93,16 @@ jest.mock("@app/utils/storage/secureStorage", () => ({
   default: {
     getIsBiometricsEnabled: () => mockGetIsBiometricsEnabled(),
     getIsPinEnabled: () => mockGetIsPinEnabled(),
+    removePin: () => mockRemovePin(),
+    setIsBiometricsEnabled: () => mockSetIsBiometricsEnabled(),
+    removeIsBiometricsEnabled: () => mockRemoveIsBiometricsEnabled(),
+    clearPinFailureState: () => mockClearPinFailureState(),
   },
+}))
+
+const mockToastShow = jest.fn()
+jest.mock("@app/utils/toast", () => ({
+  toastShow: (...args: unknown[]) => mockToastShow(...args),
 }))
 
 jest.mock("@react-navigation/native", () => ({
@@ -115,6 +133,8 @@ jest.mock("@app/i18n/i18n-react", () => ({
       },
       SecurityScreen: {
         biometricTitle: () => "Biometric",
+        biometryNotAvailable: () => "Biometry not available",
+        biometryNotEnrolled: () => "Biometry not enrolled",
         biometricDescription: () => "Unlock with fingerprint or facial recognition.",
         hideBalanceTitle: () => "Always hide balance",
         pinTitle: () => "PIN code",
@@ -142,7 +162,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
 }))
 
 const baseState: PersistentState = {
-  schemaVersion: 16,
+  schemaVersion: 21,
   galoyInstance: { id: "Main" },
   galoyAuthToken: "",
 }
@@ -161,6 +181,7 @@ const Harness: React.FC<{ initialState: PersistentState }> = ({ initialState }) 
           setPersistentState((prev) => update(prev) ?? prev)
         },
         resetState: mockResetState,
+        clearToken: async () => {},
       }}
     >
       {/* eslint-disable @typescript-eslint/no-explicit-any */}
@@ -205,6 +226,10 @@ const applyDefaultMocks = () => {
   })
   mockGetIsBiometricsEnabled.mockResolvedValue(false)
   mockGetIsPinEnabled.mockResolvedValue(false)
+  mockRemovePin.mockResolvedValue(true)
+  mockSetIsBiometricsEnabled.mockResolvedValue(true)
+  mockRemoveIsBiometricsEnabled.mockResolvedValue(true)
+  mockClearPinFailureState.mockResolvedValue(true)
   mockEmailDelete.mockResolvedValue({ data: {} })
   mockRegistrationInitiate.mockResolvedValue({
     data: {
@@ -347,7 +372,7 @@ describe("SecurityScreen security score card", () => {
     const BiometricWrapper = jest.requireMock(
       "@app/utils/biometricAuthentication",
     ).default
-    BiometricWrapper.isSensorAvailable.mockResolvedValue(true)
+    BiometricWrapper.readSensorAvailability.mockResolvedValue("available")
 
     const { getByTestId } = renderScreen()
 
@@ -355,6 +380,178 @@ describe("SecurityScreen security score card", () => {
 
     await waitFor(() => expect(BiometricWrapper.authenticate).toHaveBeenCalled())
     expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  /** The signal is satisfied by biometrics OR a pin, so its action must not dead
+   *  end on a device that cannot do the first — it used to report a biometrics
+   *  error and leave the card with nothing the user could act on. */
+  describe("the app-lock signal when biometrics cannot be used", () => {
+    const biometrics = () =>
+      jest.requireMock("@app/utils/biometricAuthentication").default
+
+    it("opens the set-pin screen when there is no sensor", async () => {
+      biometrics().readSensorAvailability.mockResolvedValue("unavailable")
+
+      const { getByTestId } = renderScreen()
+
+      fireEvent.press(getByTestId("security-score-appLock"))
+
+      await waitFor(() =>
+        expect(mockNavigate).toHaveBeenCalledWith("pin", {
+          screenPurpose: PinScreenPurpose.SetPin,
+        }),
+      )
+      expect(biometrics().authenticate).not.toHaveBeenCalled()
+      expect(mockToastShow).not.toHaveBeenCalled()
+    })
+
+    it("opens the set-pin screen when the sensor has no enrolment", async () => {
+      biometrics().readSensorAvailability.mockResolvedValue("notEnrolled")
+
+      const { getByTestId } = renderScreen()
+
+      fireEvent.press(getByTestId("security-score-appLock"))
+
+      await waitFor(() =>
+        expect(mockNavigate).toHaveBeenCalledWith("pin", {
+          screenPurpose: PinScreenPurpose.SetPin,
+        }),
+      )
+      expect(mockToastShow).not.toHaveBeenCalled()
+    })
+
+    /** The way out the probe cannot see: the sensor works, the prompt opens, and
+     *  the user closes it. That is still a tap on "Set" with nothing to show for
+     *  it, so it is a dead end like any other. */
+    it("opens the set-pin screen when the OS prompt is cancelled", async () => {
+      biometrics().readSensorAvailability.mockResolvedValue("available")
+      biometrics().authenticate.mockImplementation(
+        (_description: string, _onSuccess: () => void, onFailure: () => void) =>
+          onFailure(),
+      )
+
+      const { getByTestId } = renderScreen()
+
+      fireEvent.press(getByTestId("security-score-appLock"))
+
+      await waitFor(() =>
+        expect(mockNavigate).toHaveBeenCalledWith("pin", {
+          screenPurpose: PinScreenPurpose.SetPin,
+        }),
+      )
+      expect(mockSetIsBiometricsEnabled).not.toHaveBeenCalled()
+    })
+
+    it("still records biometrics when the prompt is passed, rather than always routing to the pin", async () => {
+      biometrics().readSensorAvailability.mockResolvedValue("available")
+      biometrics().authenticate.mockImplementation(
+        (_description: string, onSuccess: () => void) => onSuccess(),
+      )
+
+      const { getByTestId } = renderScreen()
+
+      fireEvent.press(getByTestId("security-score-appLock"))
+
+      await waitFor(() => expect(mockSetIsBiometricsEnabled).toHaveBeenCalledTimes(1))
+      expect(mockNavigate).not.toHaveBeenCalled()
+    })
+  })
+
+  describe("the device toggles either action can reach", () => {
+    const biometrics = () =>
+      jest.requireMock("@app/utils/biometricAuthentication").default
+
+    it("records biometrics once the OS prompt is passed", async () => {
+      biometrics().readSensorAvailability.mockResolvedValue("available")
+      biometrics().authenticate.mockImplementation(
+        (_description: string, onSuccess: () => void) => onSuccess(),
+      )
+
+      const { getByTestId } = renderScreen()
+
+      fireEvent(getByTestId("biometrics-switch"), "valueChange", true)
+
+      await waitFor(() => expect(mockSetIsBiometricsEnabled).toHaveBeenCalledTimes(1))
+    })
+
+    it("records nothing when the OS prompt is cancelled", async () => {
+      biometrics().readSensorAvailability.mockResolvedValue("available")
+      biometrics().authenticate.mockImplementation(
+        (_description: string, _onSuccess: () => void, onFailure: () => void) =>
+          onFailure(),
+      )
+
+      const { getByTestId } = renderScreen()
+
+      fireEvent(getByTestId("biometrics-switch"), "valueChange", true)
+
+      await waitFor(() => expect(biometrics().authenticate).toHaveBeenCalledTimes(1))
+      /** Cancelling is not an error the user needs told about — they did it. */
+      expect(mockSetIsBiometricsEnabled).not.toHaveBeenCalled()
+      expect(mockToastShow).not.toHaveBeenCalled()
+      /** And it is not a reason to offer a pin either: the switch names
+       *  biometrics, so the two entry points part ways on exactly this. */
+      expect(mockNavigate).not.toHaveBeenCalled()
+    })
+
+    it("turns biometrics back off from the switch", async () => {
+      const { getByTestId } = renderScreen()
+
+      fireEvent(getByTestId("biometrics-switch"), "valueChange", false)
+
+      await waitFor(() => expect(mockRemoveIsBiometricsEnabled).toHaveBeenCalledTimes(1))
+      expect(biometrics().authenticate).not.toHaveBeenCalled()
+      expect(mockToastShow).not.toHaveBeenCalled()
+    })
+
+    it("opens the set-pin screen from the pin switch", () => {
+      const { getByTestId } = renderScreen()
+
+      fireEvent(getByTestId("pin-switch"), "valueChange", true)
+
+      expect(mockNavigate).toHaveBeenCalledWith("pin", {
+        screenPurpose: PinScreenPurpose.SetPin,
+      })
+    })
+  })
+
+  /** The counterpart: the switch names biometrics, so it must still say why they
+   *  cannot be turned on rather than quietly substituting a pin. */
+  describe("the biometrics switch when biometrics cannot be used", () => {
+    const biometrics = () =>
+      jest.requireMock("@app/utils/biometricAuthentication").default
+
+    const toastedMessage = () =>
+      mockToastShow.mock.calls[0][0].message({
+        SecurityScreen: {
+          biometryNotAvailable: () => "noSensor",
+          biometryNotEnrolled: () => "notEnrolled",
+        },
+      })
+
+    it("explains a missing sensor instead of opening the set-pin screen", async () => {
+      biometrics().readSensorAvailability.mockResolvedValue("unavailable")
+
+      const { getByTestId } = renderScreen()
+
+      fireEvent(getByTestId("biometrics-switch"), "valueChange", true)
+
+      await waitFor(() => expect(mockToastShow).toHaveBeenCalledTimes(1))
+      expect(toastedMessage()).toBe("noSensor")
+      expect(mockNavigate).not.toHaveBeenCalled()
+    })
+
+    it("explains a missing enrolment instead of opening the set-pin screen", async () => {
+      biometrics().readSensorAvailability.mockResolvedValue("notEnrolled")
+
+      const { getByTestId } = renderScreen()
+
+      fireEvent(getByTestId("biometrics-switch"), "valueChange", true)
+
+      await waitFor(() => expect(mockToastShow).toHaveBeenCalledTimes(1))
+      expect(toastedMessage()).toBe("notEnrolled")
+      expect(mockNavigate).not.toHaveBeenCalled()
+    })
   })
 
   it("turns hide balance on in place from its Set row", () => {
@@ -452,5 +649,44 @@ describe("SecurityScreen — always hide balance", () => {
       expect.objectContaining({ alwaysHideBalance: false }),
     )
     expect(hideBalanceChecked(getByTestId("always-hide-balance-switch"))).toBe(false)
+  })
+})
+
+describe("SecurityScreen — turning the PIN off", () => {
+  beforeEach(applyDefaultMocks)
+
+  const renderWithPinOn = async () => {
+    mockGetIsPinEnabled.mockResolvedValue(true)
+    const rendered = renderScreen()
+
+    await act(async () => {
+      focusCallbacks().forEach((callback) => callback())
+    })
+
+    return rendered
+  }
+
+  it("clears the lockout along with the PIN", async () => {
+    // Otherwise a lock outlives the PIN that produced it and greets the next
+    // PIN the user sets.
+    const { getByTestId } = await renderWithPinOn()
+
+    await act(async () => {
+      fireEvent(getByTestId("pin-switch"), "pressIn")
+    })
+
+    expect(mockRemovePin).toHaveBeenCalledTimes(1)
+    expect(mockClearPinFailureState).toHaveBeenCalledTimes(1)
+  })
+
+  it("leaves the lockout in place when the PIN itself could not be removed", async () => {
+    mockRemovePin.mockResolvedValue(false)
+    const { getByTestId } = await renderWithPinOn()
+
+    await act(async () => {
+      fireEvent(getByTestId("pin-switch"), "pressIn")
+    })
+
+    expect(mockClearPinFailureState).not.toHaveBeenCalled()
   })
 })

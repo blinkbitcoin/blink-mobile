@@ -1,4 +1,5 @@
 import React from "react"
+import { TouchableOpacity } from "react-native"
 import { render, fireEvent } from "@testing-library/react-native"
 
 import { BackupNudgeModal } from "@app/components/backup-nudge-modal"
@@ -127,7 +128,7 @@ describe("BackupNudgeModal", () => {
     expect(getByText("Secure wallet")).toBeTruthy()
   })
 
-  it("navigates to backup method screen and closes on button press", () => {
+  it("navigates to the backup method screen without dismissing on button press", () => {
     const onClose = jest.fn()
     const { getByTestId } = render(
       <BackupNudgeModal isVisible={true} onClose={onClose} />,
@@ -135,8 +136,23 @@ describe("BackupNudgeModal", () => {
 
     fireEvent.press(getByTestId("secure-button"))
 
-    expect(onClose).toHaveBeenCalledTimes(1)
     expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupMethod")
+    // Starting the backup flow is not finishing it: a user who backs out of the
+    // backup screen must be nudged again rather than get the cooldown.
+    expect(onClose).not.toHaveBeenCalled()
+  })
+
+  // The close affordance is CustomModal's own TouchableOpacity around a "close"
+  // GaloyIcon, which this suite mocks away - hence matching by type. This is the
+  // path the original bug report could not escape, so it stays covered here.
+  it("dismisses on close button press", () => {
+    const onClose = jest.fn()
+    const view = render(<BackupNudgeModal isVisible={true} onClose={onClose} />)
+
+    fireEvent.press(view.UNSAFE_getAllByType(TouchableOpacity)[0])
+
+    expect(onClose).toHaveBeenCalledTimes(1)
+    expect(mockNavigate).not.toHaveBeenCalled()
   })
 
   it("uses primary color for warning icon", () => {

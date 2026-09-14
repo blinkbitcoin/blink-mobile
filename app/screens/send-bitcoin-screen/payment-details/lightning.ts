@@ -43,6 +43,11 @@ export const createNoAmountLightningPaymentDetails = <T extends WalletCurrency>(
     senderSpecifiedMemo,
   } = params
 
+  // Same holder for every rebuild that leaves the money movement alone; see
+  // IdempotencyKeyRef. Setters that change the wire payload drop it instead.
+  const idempotencyKeyRef = params.idempotencyKeyRef ?? {}
+  const paramsWithKey = { ...params, idempotencyKeyRef }
+
   const memo = destinationSpecifiedMemo || senderSpecifiedMemo
   const settlementAmount = convertMoneyAmount(
     unitOfAccountAmount,
@@ -51,7 +56,7 @@ export const createNoAmountLightningPaymentDetails = <T extends WalletCurrency>(
 
   const setConvertMoneyAmount = (convertMoneyAmount: ConvertMoneyAmount) => {
     return createNoAmountLightningPaymentDetails({
-      ...params,
+      ...paramsWithKey,
       convertMoneyAmount,
     })
   }
@@ -176,6 +181,7 @@ export const createNoAmountLightningPaymentDetails = <T extends WalletCurrency>(
   const setAmount: SetAmount<T> = (newUnitOfAccountAmount) => {
     return createNoAmountLightningPaymentDetails({
       ...params,
+      idempotencyKeyRef: undefined,
       unitOfAccountAmount: newUnitOfAccountAmount,
     })
   }
@@ -185,7 +191,7 @@ export const createNoAmountLightningPaymentDetails = <T extends WalletCurrency>(
     : {
         setMemo: (newMemo) =>
           createNoAmountLightningPaymentDetails({
-            ...params,
+            ...paramsWithKey,
             senderSpecifiedMemo: newMemo,
           }),
 
@@ -197,11 +203,13 @@ export const createNoAmountLightningPaymentDetails = <T extends WalletCurrency>(
   ) => {
     return createNoAmountLightningPaymentDetails({
       ...params,
+      idempotencyKeyRef: undefined,
       sendingWalletDescriptor: newSendingWalletDescriptor,
     })
   }
 
   return {
+    idempotencyKeyRef,
     destination: paymentRequest,
     memo,
     convertMoneyAmount,
@@ -235,6 +243,11 @@ export const createAmountLightningPaymentDetails = <T extends WalletCurrency>(
     destinationSpecifiedMemo,
     senderSpecifiedMemo,
   } = params
+
+  // Same holder for every rebuild that leaves the money movement alone; see
+  // IdempotencyKeyRef. Setters that change the wire payload drop it instead.
+  const idempotencyKeyRef = params.idempotencyKeyRef ?? {}
+  const paramsWithKey = { ...params, idempotencyKeyRef }
 
   const memo = destinationSpecifiedMemo || senderSpecifiedMemo
   const settlementAmount = convertMoneyAmount(
@@ -330,7 +343,7 @@ export const createAmountLightningPaymentDetails = <T extends WalletCurrency>(
     : {
         setMemo: (newMemo) =>
           createAmountLightningPaymentDetails({
-            ...params,
+            ...paramsWithKey,
             senderSpecifiedMemo: newMemo,
           }),
 
@@ -339,7 +352,7 @@ export const createAmountLightningPaymentDetails = <T extends WalletCurrency>(
 
   const setConvertMoneyAmount = (newConvertMoneyAmount: ConvertMoneyAmount) => {
     return createAmountLightningPaymentDetails({
-      ...params,
+      ...paramsWithKey,
       convertMoneyAmount: newConvertMoneyAmount,
     })
   }
@@ -349,11 +362,13 @@ export const createAmountLightningPaymentDetails = <T extends WalletCurrency>(
   ) => {
     return createAmountLightningPaymentDetails({
       ...params,
+      idempotencyKeyRef: undefined,
       sendingWalletDescriptor: newSendingWalletDescriptor,
     })
   }
 
   return {
+    idempotencyKeyRef,
     destination: paymentRequest,
     destinationSpecifiedAmount: paymentRequestAmount,
     convertMoneyAmount,
@@ -400,6 +415,11 @@ export const createLnurlPaymentDetails = <T extends WalletCurrency>(
     successAction,
     isMerchant,
   } = params
+
+  // Same holder for every rebuild that leaves the money movement alone; see
+  // IdempotencyKeyRef. Setters that change the wire payload drop it instead.
+  const idempotencyKeyRef = params.idempotencyKeyRef ?? {}
+  const paramsWithKey = { ...params, idempotencyKeyRef }
 
   const destinationSpecifiedAmount =
     lnurlParams.max === lnurlParams.min ? toBtcMoneyAmount(lnurlParams.max) : undefined
@@ -449,6 +469,7 @@ export const createLnurlPaymentDetails = <T extends WalletCurrency>(
         setAmount: (newAmount: MoneyAmount<WalletOrDisplayCurrency>) => {
           return createLnurlPaymentDetails({
             ...params,
+            idempotencyKeyRef: undefined,
             paymentRequest: undefined,
             paymentRequestAmount: undefined,
             unitOfAccountAmount: newAmount,
@@ -459,7 +480,7 @@ export const createLnurlPaymentDetails = <T extends WalletCurrency>(
   const setMemo: PaymentDetailSetMemo<T> = {
     setMemo: (newMemo) =>
       createLnurlPaymentDetails({
-        ...params,
+        ...paramsWithKey,
         senderSpecifiedMemo: newMemo,
         destinationSpecifiedMemo: newMemo,
       }),
@@ -468,14 +489,14 @@ export const createLnurlPaymentDetails = <T extends WalletCurrency>(
 
   const setConvertMoneyAmount = (newConvertMoneyAmount: ConvertMoneyAmount) => {
     return createLnurlPaymentDetails({
-      ...params,
+      ...paramsWithKey,
       convertMoneyAmount: newConvertMoneyAmount,
     })
   }
 
   const setInvoice: SetInvoice<T> = ({ paymentRequest, paymentRequestAmount }) => {
     return createLnurlPaymentDetails({
-      ...params,
+      ...paramsWithKey,
       paymentRequest,
       paymentRequestAmount,
     })
@@ -483,7 +504,7 @@ export const createLnurlPaymentDetails = <T extends WalletCurrency>(
 
   const setSuccessAction: SetSuccessAction<T> = (newSuccessAction) => {
     return createLnurlPaymentDetails({
-      ...params,
+      ...paramsWithKey,
       successAction: newSuccessAction,
     })
   }
@@ -493,11 +514,13 @@ export const createLnurlPaymentDetails = <T extends WalletCurrency>(
   ) => {
     return createLnurlPaymentDetails({
       ...params,
+      idempotencyKeyRef: undefined,
       sendingWalletDescriptor: newSendingWalletDescriptor,
     })
   }
 
   return {
+    idempotencyKeyRef,
     lnurlParams,
     destinationSpecifiedAmount,
     sendingWalletDescriptor,

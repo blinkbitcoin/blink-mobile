@@ -1,7 +1,10 @@
 import { act, renderHook } from "@testing-library/react-native"
 
 import { MigrationLnAddressTransferStatus } from "@app/graphql/generated"
-import { useMigrationLnAddressTransfer } from "@app/screens/account-migration/hooks/use-migration-ln-address-transfer"
+import {
+  LN_ADDRESS_TRANSFER_TIMEOUT_MS,
+  useMigrationLnAddressTransfer,
+} from "@app/screens/account-migration/hooks/use-migration-ln-address-transfer"
 import { MigrationSdkStatus } from "@app/self-custodial/migration-transfer-request"
 
 import { flushEffects } from "../../../helpers/flush-effects"
@@ -368,6 +371,10 @@ describe("useMigrationLnAddressTransfer", () => {
 
     expect(result.current.isTransferred).toBe(true)
     expect(result.current.isRejected).toBe(false)
+    /** Every settled kind, not just the rejection: a superseded answer landing in any of
+     *  them would hand a completed re-point to support. */
+    expect(result.current.isAccountMissing).toBe(false)
+    expect(result.current.hasConnectionIssue).toBe(false)
   })
 
   /** The shared retry button fires every source; a completed re-point must not re-run the
@@ -381,6 +388,105 @@ describe("useMigrationLnAddressTransfer", () => {
     await flushEffects()
 
     expect(mockTransfer).toHaveBeenCalledTimes(1)
+  })
+
+  /**
+   * The SDK connect-and-sign can stall under its storage-dir lock without ever throwing,
+   * and an attempt that never answers reports nothing at all: the commit screen would hold
+   * Approve off for good with no message and no retry. The bounded wait turns that silence
+   * into the same recoverable offer a dropped connection gets.
+   */
+  it("offers the retry when the re-point stalls without ever answering", async () => {
+    jest.useFakeTimers()
+    try {
+      mockBuildProof.mockReturnValue(
+        new Promise(() => {
+          /** Never settles: the stall this bound exists for. */
+        }),
+      )
+      const { result } = renderTransfer()
+
+      await act(async () => {
+        jest.advanceTimersByTime(LN_ADDRESS_TRANSFER_TIMEOUT_MS)
+      })
+
+      expect(result.current.hasConnectionIssue).toBe(true)
+      expect(result.current.isRejected).toBe(false)
+      expect(result.current.isTransferred).toBe(false)
+      expect(mockReportError).toHaveBeenCalledWith(
+        "Migration ln-address stalled",
+        expect.any(Error),
+      )
+    } finally {
+      jest.useRealTimers()
+    }
+  })
+
+  /**
+   * The proof is built before `run`'s own try, so a keychain that throws rejects it. That
+   * is a settled failure a retry only replays, not a wait that ran out, and support must
+   * not be told the attempt stalled when it threw.
+   *
+   * A stall stays retryable however often it happens: the attempt may still be in the air,
+   * and the screen keeps its contact-support button on throughout, so a retry that cannot
+   * land is never the user's only way out.
+   */
+  it("hands a throw before the mutation to support rather than reporting a stall", async () => {
+    mockBuildProof.mockRejectedValue(new Error("keychain unavailable"))
+
+    const { result } = renderTransfer()
+    await flushEffects()
+
+    expect(result.current.isRejected).toBe(true)
+    expect(result.current.hasConnectionIssue).toBe(false)
+    expect(mockReportError).toHaveBeenCalledWith(
+      "Migration ln-address threw",
+      expect.any(Error),
+    )
+  })
+
+  /**
+   * An id that flickers null mid-flight re-runs the effect, which cannot fire again
+   * (the attempt number is already claimed). Dropping the in-flight answer too would
+   * leave every flag false for good: no transfer, no rejection, no retry offered, and
+   * Approve disabled with nothing on screen. The answer lands as long as the hook is
+   * mounted.
+   */
+  it("settles on the answer of an attempt whose ids flickered mid-flight", async () => {
+    let settleProof: (value: unknown) => void = () => undefined
+    mockBuildProof.mockReturnValue(
+      new Promise((resolve) => {
+        settleProof = resolve
+      }),
+    )
+    const { result, rerender } = renderHook(
+      ({ custodialAccountId }: { custodialAccountId: string | null }) =>
+        useMigrationLnAddressTransfer({
+          custodialAccountId,
+          selfCustodialAccountId: "sc-1",
+          skip: false,
+        }),
+      { initialProps: { custodialAccountId: "owner-1" as string | null } },
+    )
+
+    rerender({ custodialAccountId: null })
+    rerender({ custodialAccountId: "owner-1" })
+
+    settleProof(okProof)
+    await flushEffects()
+
+    expect(result.current.isTransferred).toBe(true)
+    expect(mockTransfer).toHaveBeenCalledTimes(1)
+  })
+
+  /** The bound is not a deadline the happy path races: an attempt that answers in time
+   *  settles on its own answer and never reports a stall. */
+  it("does not report a stall on an attempt that answered in time", async () => {
+    const { result } = renderTransfer()
+    await flushEffects()
+
+    expect(result.current.isTransferred).toBe(true)
+    expect(mockReportError).not.toHaveBeenCalled()
   })
 
   it("does not retry a settled rejection", async () => {

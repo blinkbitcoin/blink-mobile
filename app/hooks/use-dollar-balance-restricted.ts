@@ -1,122 +1,41 @@
-import { CountryCode } from "libphonenumber-js/mobile"
-import { useEffect } from "react"
-
-import { useRemoteConfig } from "@app/config/feature-flags-context"
-import { usePersistentStateContext } from "@app/store/persistent-state"
-import { PersistentState } from "@app/store/persistent-state/state-migrations"
-import {
-  getStableTokenRestricted,
-  withStableTokenRestricted,
-} from "@app/store/persistent-state/stable-token-restriction"
-import {
-  getStablesatsRestricted,
-  withStablesatsRestricted,
-} from "@app/store/persistent-state/stablesats-restriction"
 import { AccountType } from "@app/types/wallet"
 
-import useDeviceLocation, {
-  isBlockedCountry,
-  LocationSource,
-  useIpCountryCode,
-} from "./use-device-location"
-import { useActiveWallet } from "./use-active-wallet"
+import { useAccountRestrictions } from "./use-account-restrictions"
+import { useSelfCustodialAccountMode } from "@app/self-custodial/hooks/use-self-custodial-account-mode"
 
-type DollarBalanceRestrictionPolicy = {
-  blockedCountries: string[]
-  isPersisted: boolean
-  persist: (state: PersistentState) => PersistentState
+/** `isRestricted` needs a resolved country, so it never accuses an unrestricted user.
+ *  Surfaces hold on `isRegionPending` instead of reading the unresolved region as
+ *  unrestricted, which is what the removed latch used to cover at launch. */
+type DollarBalanceRestriction = {
+  isRestricted: boolean
+  isRegionPending: boolean
 }
 
-/**
- * Gating on accountType (not isSelfCustodial) keeps the restriction stable through the
- * self-custodial cold-start window while the SDK connects; passing `accountTypeOverride`
- * evaluates a specific account type's policy (e.g. predicting the self-custodial dollar
- * restriction from the still-custodial session during migration).
- */
-const useDollarBalanceRestrictionPolicy = (
+/** Region policy only (false in Anon, where no region resolves). Availability surfaces
+ *  must read useDollarBalanceGate instead. */
+export const useDollarBalanceRestriction = (
   accountTypeOverride?: AccountType,
-): DollarBalanceRestrictionPolicy => {
-  const { accountType: activeAccountType } = useActiveWallet()
-  const accountType = accountTypeOverride ?? activeAccountType
-  const {
-    custodialDollarBalanceBlockedCountries,
-    selfCustodialDollarBalanceBlockedCountries,
-  } = useRemoteConfig()
-  const { persistentState } = usePersistentStateContext()
+): DollarBalanceRestriction => {
+  const { dollarBalance, isSettled } = useAccountRestrictions(accountTypeOverride)
 
-  if (accountType === AccountType.SelfCustodial) {
-    return {
-      blockedCountries: selfCustodialDollarBalanceBlockedCountries,
-      isPersisted: getStableTokenRestricted(persistentState),
-      persist: withStableTokenRestricted,
-    }
-  }
-  return {
-    blockedCountries: custodialDollarBalanceBlockedCountries,
-    isPersisted: getStablesatsRestricted(persistentState),
-    persist: withStablesatsRestricted,
-  }
+  return { isRestricted: dollarBalance, isRegionPending: !isSettled }
 }
 
-/**
- * The country whose block-list decides the restriction. A self-custodial account has no
- * phone, so evaluating its policy resolves by IP; every other case reads the device's own
- * country. The IP wins whenever it resolves, but while predicting the self-custodial policy
- * from a still-custodial session an unreachable IP falls back to the session country, so a
- * failed IP lookup does not read as unrestricted and preview a dollar balance the account
- * cannot hold.
- */
-const useRestrictionRegion = (
-  accountTypeOverride?: AccountType,
-): CountryCode | undefined => {
-  const { countryCode: deviceCountryCode } = useDeviceLocation()
+export const useDollarBalanceRestricted = (accountTypeOverride?: AccountType): boolean =>
+  useDollarBalanceRestriction(accountTypeOverride).isRestricted
 
-  const isSelfCustodialPrediction = accountTypeOverride === AccountType.SelfCustodial
-  const ipCountryCode = useIpCountryCode(isSelfCustodialPrediction)
-
-  return isSelfCustodialPrediction
-    ? ipCountryCode ?? deviceCountryCode
-    : deviceCountryCode
+type DollarBalanceGate = {
+  isGated: boolean
+  isRegionPending: boolean
 }
 
-export const useDollarBalanceRestricted = (
-  accountTypeOverride?: AccountType,
-): boolean => {
-  const { blockedCountries, isPersisted } =
-    useDollarBalanceRestrictionPolicy(accountTypeOverride)
-  const { dollarRestrictionCacheEnabled } = useRemoteConfig()
-  const regionCountryCode = useRestrictionRegion(accountTypeOverride)
+/** The availability gate: Anon gates the dollar balance by itself, region otherwise. Anon
+ *  resolves no region, so nothing pends there: the mode gates on its own. */
+export const useDollarBalanceGate = (): DollarBalanceGate => {
+  const { isAnonMode } = useSelfCustodialAccountMode()
+  const { isRestricted, isRegionPending } = useDollarBalanceRestriction()
 
-  const isCachedRestriction = dollarRestrictionCacheEnabled && isPersisted
-
-  return isCachedRestriction || isBlockedCountry(regionCountryCode, blockedCountries)
+  return { isGated: isAnonMode || isRestricted, isRegionPending }
 }
 
-export const useDollarBalanceRestrictionSync = (): void => {
-  const { blockedCountries, isPersisted, persist } = useDollarBalanceRestrictionPolicy()
-  const { dollarRestrictionCacheEnabled } = useRemoteConfig()
-  const { countryCode, source } = useDeviceLocation()
-  const { updateState } = usePersistentStateContext()
-
-  const canPersistRestriction = dollarRestrictionCacheEnabled && !isPersisted
-  const primaryBlocked = isBlockedCountry(countryCode, blockedCountries)
-  const isPhoneSource = source === LocationSource.Phone
-
-  const shouldConsultIp = canPersistRestriction && isPhoneSource && !primaryBlocked
-
-  const ipCountryCode = useIpCountryCode(shouldConsultIp)
-
-  const shouldPersist =
-    canPersistRestriction &&
-    (primaryBlocked || isBlockedCountry(ipCountryCode, blockedCountries))
-
-  /**
-   * `persist` is in the deps on purpose: its identity flips with accountType, so
-   * a custodial-to-self-custodial switch in a blocked country re-fires this effect
-   * and writes the self-custodial flag too (anti-bypass double-write).
-   */
-  useEffect(() => {
-    if (!shouldPersist) return
-    updateState((state) => (state ? persist(state) : state))
-  }, [shouldPersist, persist, updateState])
-}
+export const useDollarBalanceGated = (): boolean => useDollarBalanceGate().isGated

@@ -18,6 +18,7 @@ const mockRecordError = jest.fn()
 const mockAddPendingAutoConvert = jest.fn()
 const mockFetchAutoConvertMinSats = jest.fn()
 const mockUseReceiveAssetMode = jest.fn()
+const mockLightningAddressGated = jest.fn()
 const mockPendingDeposits = jest.fn()
 const mockFormatMoneyAmount = jest.fn()
 
@@ -39,6 +40,10 @@ jest.mock("@app/self-custodial/auto-convert", () => ({
 
 jest.mock("@app/self-custodial/hooks/use-receive-asset-mode", () => ({
   useReceiveAssetMode: () => mockUseReceiveAssetMode(),
+}))
+
+jest.mock("@app/self-custodial/hooks/use-lightning-address-gate", () => ({
+  useLightningAddressGated: () => mockLightningAddressGated(),
 }))
 
 // The real hook subscribes to navigation focus, which a bare renderHook has no
@@ -87,6 +92,7 @@ describe("usePaymentRequest invoice regeneration", () => {
       addPendingAutoConvert: mockAddPendingAutoConvert,
       fetchAutoConvertMinSats: mockFetchAutoConvertMinSats,
       useReceiveAssetMode: mockUseReceiveAssetMode,
+      lightningAddressGated: mockLightningAddressGated,
       pendingDeposits: mockPendingDeposits,
       formatMoneyAmount: mockFormatMoneyAmount,
     })

@@ -124,6 +124,17 @@
     "no-plusplus": "error",
     "no-promise-executor-return": "error",
     "no-proto": "error",
+    "no-restricted-imports": [
+      "error",
+      {
+        "paths": [
+          {
+            "name": "react-native-secure-key-store",
+            "message": "Import the legacy key store only from app/utils/storage/legacy-key-store.ts, which re-arms the uninstall guard before every call. See blinkbitcoin/blink-wip#1160."
+          }
+        ]
+      }
+    ],
     "no-return-assign": "error",
     "no-return-await": "error",
     "no-script-url": "error",
@@ -164,6 +175,17 @@
     "jest/no-async-promise-executor": "off"
 
   },
+  "overrides": [
+    {
+      "files": [
+        "app/utils/storage/legacy-key-store.ts",
+        "app/utils/storage/secureStorage.ts"
+      ],
+      "rules": {
+        "no-restricted-imports": "off"
+      }
+    }
+  ],
   "settings": {
     "react": {
       "version": "detect"

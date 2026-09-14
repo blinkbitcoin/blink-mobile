@@ -1,9 +1,9 @@
 import { WalletCurrency } from "@app/graphql/generated"
-import type { SelfCustodialPaymentRequestState } from "@app/self-custodial/hooks/types"
+import type { ReceivePaymentRequestState } from "../payment/request-state.types"
 
 import { useOnChainAddress } from "./use-onchain-address"
 
-type RequestState = SelfCustodialPaymentRequestState
+type RequestState = ReceivePaymentRequestState
 
 export const useOnchainResolver = (
   isSelfCustodial: boolean,

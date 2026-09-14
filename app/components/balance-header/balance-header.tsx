@@ -10,16 +10,9 @@ import { BalanceMode } from "@app/hooks/use-balance-mode"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
 
-import { StatusPill, type StatusPillVariant } from "../status-pill"
-
 /** The 32pt balance sits directly under the fixed-size home header chrome;
  *  uncapped Dynamic Type makes it overrun the username row above. */
 const MAX_BALANCE_FONT_SIZE_MULTIPLIER = 1.4
-
-/** Long pending amounts must not push the balance off-center: the real pill and
- *  the centering ghost cap at the same width and shrink together, otherwise the
- *  double-width centering trick breaks asymmetrically. */
-const MAX_STATUS_PILL_WIDTH = 120
 
 const Loader = () => {
   const styles = useStyles()
@@ -37,19 +30,12 @@ const Loader = () => {
   )
 }
 
-export type StatusBadge = {
-  label: string
-  status: StatusPillVariant
-  onPress?: () => void
-}
-
 type Props = {
   loading: boolean
   formattedBalance?: string
   showStableBalanceToggle?: boolean
   mode?: BalanceMode
   onModeChange?: () => void
-  statusBadge?: StatusBadge
 }
 
 export const BalanceHeader: React.FC<Props> = ({
@@ -58,7 +44,6 @@ export const BalanceHeader: React.FC<Props> = ({
   showStableBalanceToggle,
   mode,
   onModeChange,
-  statusBadge,
 }) => {
   const styles = useStyles()
   const { LL } = useI18nContext()
@@ -71,8 +56,6 @@ export const BalanceHeader: React.FC<Props> = ({
       ? LL.StableBalance.balanceLabelBtc()
       : LL.StableBalance.balanceLabelUsd()
 
-  const showBadge = Boolean(statusBadge) && !loading && !hideAmount
-
   return (
     <View {...testProps("balance-header")} style={styles.balanceHeaderContainer}>
       {hideAmount ? (
@@ -82,14 +65,6 @@ export const BalanceHeader: React.FC<Props> = ({
       ) : (
         <TouchableOpacity onPress={toggleHideAmount}>
           <View style={styles.amountWrapper}>
-            {showBadge && statusBadge ? (
-              <StatusPill
-                label={statusBadge.label}
-                status={statusBadge.status}
-                ghost
-                style={styles.statusPillGhost}
-              />
-            ) : null}
             {loading ? (
               <Loader />
             ) : (
@@ -103,15 +78,6 @@ export const BalanceHeader: React.FC<Props> = ({
                 {formattedBalance}
               </Text>
             )}
-            {showBadge && statusBadge ? (
-              <StatusPill
-                label={statusBadge.label}
-                status={statusBadge.status}
-                onPress={statusBadge.onPress}
-                testID="balance-status-badge"
-                style={styles.statusPill}
-              />
-            ) : null}
           </View>
         </TouchableOpacity>
       )}
@@ -166,17 +132,5 @@ const useStyles = makeStyles(({ colors }) => ({
     fontWeight: "600",
     color: colors.grey2,
     letterSpacing: 0.6,
-  },
-  statusPill: {
-    marginLeft: 6,
-    marginTop: 2,
-    flexShrink: 1,
-    maxWidth: MAX_STATUS_PILL_WIDTH,
-  },
-  statusPillGhost: {
-    marginRight: 6,
-    marginTop: 2,
-    flexShrink: 1,
-    maxWidth: MAX_STATUS_PILL_WIDTH,
   },
 }))

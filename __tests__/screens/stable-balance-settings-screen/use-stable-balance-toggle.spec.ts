@@ -16,9 +16,15 @@ jest.mock("@app/self-custodial/bridge", () => ({
 }))
 
 let mockIsDollarBalanceRestricted = false
+let mockIsRegionPending = false
 
 jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
   useDollarBalanceRestricted: () => mockIsDollarBalanceRestricted,
+  useDollarBalanceGate: () => ({
+    isGated: mockIsDollarBalanceRestricted,
+    isRegionPending: mockIsRegionPending,
+  }),
+  useDollarBalanceGated: () => mockIsDollarBalanceRestricted,
 }))
 
 const mockLogActivated = jest.fn()
@@ -65,6 +71,7 @@ describe("useStableBalanceToggle", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockIsDollarBalanceRestricted = false
+    mockIsRegionPending = false
     mockActivateStableBalance.mockResolvedValue(undefined)
     mockDeactivateStableBalance.mockResolvedValue(undefined)
     mockRefreshWallets.mockResolvedValue(undefined)
@@ -110,6 +117,70 @@ describe("useStableBalanceToggle", () => {
     expect(blockedMessage(LL)).toBe("Dollar Balance is not available in your region")
     expect(result.current.switchKey).toBe(initialSwitchKey + 1)
     expect(mockRefreshWallets).not.toHaveBeenCalled()
+  })
+
+  it("refuses the activation while the region is still pending and snaps the switch back", async () => {
+    mockIsRegionPending = true
+    const { result } = renderToggle()
+    const initialSwitchKey = result.current.switchKey
+
+    await act(async () => {
+      await result.current.apply(true)
+    })
+
+    expect(mockActivateStableBalance).not.toHaveBeenCalled()
+    expect(result.current.switchKey).toBe(initialSwitchKey + 1)
+  })
+
+  /** The refusal above is silent by design, so the screen needs the pending state itself to
+   *  disable the control; without it the switch flips on and snaps back unexplained. */
+  it("surfaces the pending region so the screen can disable the switch", () => {
+    mockIsRegionPending = true
+
+    const { result } = renderToggle()
+
+    expect(result.current.isRegionPending).toBe(true)
+  })
+
+  it("reports no pending region once the verdict lands", () => {
+    mockIsRegionPending = false
+
+    const { result } = renderToggle()
+
+    expect(result.current.isRegionPending).toBe(false)
+  })
+
+  it("does not accuse the region while it is still pending", async () => {
+    mockIsRegionPending = true
+    const { result } = renderToggle()
+
+    await act(async () => {
+      await result.current.apply(true)
+    })
+
+    expect(mockToastShow).not.toHaveBeenCalled()
+  })
+
+  it("still allows deactivating while the region is pending", async () => {
+    mockIsRegionPending = true
+    const { result } = renderToggle({ isStableBalanceActive: true })
+
+    await act(async () => {
+      await result.current.apply(false)
+    })
+
+    expect(mockDeactivateStableBalance).toHaveBeenCalledTimes(1)
+  })
+
+  it("activates normally once the region settles unrestricted", async () => {
+    mockIsRegionPending = false
+    const { result } = renderToggle()
+
+    await act(async () => {
+      await result.current.apply(true)
+    })
+
+    expect(mockActivateStableBalance).toHaveBeenCalledTimes(1)
   })
 
   it("still allows deactivating while restricted, so an active balance can be freed", async () => {

@@ -1,12 +1,12 @@
 import { useEffect, useRef } from "react"
 
-import type { SelfCustodialPaymentRequestState } from "@app/self-custodial/hooks/types"
+import type { ReceivePaymentRequestState } from "../payment/request-state.types"
 import { getLightningAddress } from "@app/utils/pay-links"
 
 import { truncateMiddle } from "../payment/helpers"
 import { Invoice } from "../payment/index.types"
 
-type RequestState = SelfCustodialPaymentRequestState
+type RequestState = ReceivePaymentRequestState
 
 type DisplayPaymentRequestReturn = {
   displayPaymentRequest: string

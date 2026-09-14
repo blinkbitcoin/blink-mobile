@@ -1,22 +1,24 @@
 import * as React from "react"
 import { View } from "react-native"
-import { gql } from "@apollo/client"
-import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"
-import { UserContact, useUserContactUpdateAliasMutation } from "@app/graphql/generated"
+import { IconHero } from "@app/components/icon-hero"
+import { UserContact } from "@app/graphql/generated"
+import { useAppConfig } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { isIos } from "@app/utils/helper"
+import { getLightningAddress } from "@app/utils/pay-links"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
-import { makeStyles, Text, useTheme, Input } from "@rn-vui/themed"
+import { makeStyles, useTheme } from "@rn-vui/themed"
 
-import { CloseCross } from "../../../components/close-cross"
 import { Screen } from "../../../components/screen"
 import type {
   PeopleStackParamList,
   RootStackParamList,
 } from "../../../navigation/stack-param-lists"
 import { ContactTransactions } from "./contact-transactions"
+
+/** An address is one unbreakable thing: it is cut short rather than wrapped. */
+const ADDRESS_LINES = 1
 
 type ContactDetailProps = {
   route: RouteProp<PeopleStackParamList, "contactDetail">
@@ -31,20 +33,6 @@ type ContactDetailScreenProps = {
   contact: UserContact
 }
 
-gql`
-  mutation userContactUpdateAlias($input: UserContactUpdateAliasInput!) {
-    userContactUpdateAlias(input: $input) {
-      errors {
-        message
-      }
-      contact {
-        alias
-        id
-      }
-    }
-  }
-`
-
 export const ContactsDetailScreenJSX: React.FC<ContactDetailScreenProps> = ({
   contact,
 }) => {
@@ -56,51 +44,29 @@ export const ContactsDetailScreenJSX: React.FC<ContactDetailScreenProps> = ({
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList, "transactionHistory">>()
 
-  const [contactName, setContactName] = React.useState(contact.alias)
   const { LL } = useI18nContext()
+  const {
+    appConfig: {
+      galoyInstance: { lnAddressHostname },
+    },
+  } = useAppConfig()
 
-  // TODO: feature seems broken. need to fix.
-  const [userContactUpdateAlias] = useUserContactUpdateAliasMutation({})
-
-  const updateName = async () => {
-    // TODO: need optimistic updates
-    // FIXME this one doesn't work
-    if (contactName) {
-      await userContactUpdateAlias({
-        variables: { input: { username: contact.username, alias: contactName } },
-      })
-    }
-  }
+  /** An address is only built from a handle there is one: the helper would otherwise
+   *  hand the header a bare "@domain". */
+  const handle = contact.handle.trim()
+  const lightningAddress = handle ? getLightningAddress(lnAddressHostname, handle) : ""
 
   return (
-    <Screen headerShown={false}>
-      <View style={styles.aliasView}>
-        <GaloyIcon name="user" size={86} color={colors.black} />
-        <View style={styles.inputContainer}>
-          <Input
-            style={styles.alias}
-            inputStyle={styles.inputStyle}
-            inputContainerStyle={{ borderColor: colors.black }}
-            onChangeText={setContactName}
-            onSubmitEditing={updateName}
-            onBlur={updateName}
-            returnKeyType="done"
-          >
-            {contact.alias}
-          </Input>
-        </View>
-        <Text type="p1">{`${LL.common.username()}: ${contact.username}`}</Text>
-      </View>
-      <View style={styles.contactBodyContainer}>
-        <View style={styles.transactionsView}>
-          <Text style={styles.screenTitle}>
-            {LL.ContactDetailsScreen.title({
-              username: contact.alias || contact.username,
-            })}
-          </Text>
-          <ContactTransactions contactUsername={contact.username} />
-        </View>
-        <View style={styles.actionsContainer}>
+    <Screen>
+      <IconHero
+        icon="user"
+        iconColor={colors.black}
+        title={lightningAddress}
+        titleLines={ADDRESS_LINES}
+      />
+      <View style={styles.body}>
+        <ContactTransactions contact={contact} />
+        <View style={styles.sendContainer}>
           <GaloyIconButton
             name={"send"}
             size="large"
@@ -113,48 +79,19 @@ export const ContactsDetailScreenJSX: React.FC<ContactDetailScreenProps> = ({
           />
         </View>
       </View>
-
-      <CloseCross color={colors.black} onPress={navigation.goBack} />
     </Screen>
   )
 }
 
 const useStyles = makeStyles(() => ({
-  actionsContainer: {
-    margin: 12,
+  body: {
+    flex: 1,
+    gap: 14,
+    paddingHorizontal: 20,
+    paddingTop: 20,
   },
 
-  alias: {
-    fontSize: 36,
-  },
-
-  aliasView: {
+  sendContainer: {
     alignItems: "center",
-    paddingBottom: 6,
-    paddingTop: isIos ? 40 : 10,
-  },
-
-  contactBodyContainer: {
-    flex: 1,
-  },
-
-  inputContainer: {
-    flexDirection: "row",
-  },
-
-  inputStyle: {
-    textAlign: "center",
-    textDecorationLine: "underline",
-  },
-
-  screenTitle: {
-    fontSize: 18,
-    marginBottom: 12,
-    marginTop: 18,
-  },
-
-  transactionsView: {
-    flex: 1,
-    marginHorizontal: 30,
   },
 }))

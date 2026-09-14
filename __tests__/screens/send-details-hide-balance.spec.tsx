@@ -163,7 +163,10 @@ const intraledgerRoute = {
 
 const Intraledger = () => <SendBitcoinDetailsScreen route={intraledgerRoute} />
 
-describe("choose-wallet modal respects hide-balance", () => {
+// Hide-balance still applies to the details screen at a glance: the inline
+// "From" field stays masked. Opening the choose-wallet modal is the deliberate
+// act that reveals the amounts needed to pick a wallet. See issue #4125.
+describe("choose-wallet modal reveals amounts the inline field masks", () => {
   const renderScreen = (hideAmount: boolean) =>
     render(
       <ContextForScreen>
@@ -199,17 +202,49 @@ describe("choose-wallet modal respects hide-balance", () => {
     expect(screen.queryAllByTestId("hidden-balance-placeholder")).toHaveLength(0)
   })
 
-  it("does not render wallet amounts in the picker while hidden", async () => {
+  it("still shows wallet amounts in the picker while hide-balance is on", async () => {
     renderScreen(true)
     await openWalletPicker()
 
-    // one placeholder in the inline "From" selector + one per modal wallet row
-    expect(screen.getAllByTestId("hidden-balance-placeholder")).toHaveLength(3)
     expect(
-      within(screen.getByTestId(WalletCurrency.Btc)).queryAllByText(/\d/),
+      within(screen.getByTestId(WalletCurrency.Btc)).getAllByText(/\d/).length,
+    ).toBeGreaterThan(0)
+    expect(
+      within(screen.getByTestId(WalletCurrency.Usd)).getAllByText(/\d/).length,
+    ).toBeGreaterThan(0)
+    // Scoped to the modal rows: the inline "From" field is still mounted
+    // behind the modal and renders its placeholder there.
+    expect(
+      within(screen.getByTestId(WalletCurrency.Btc)).queryAllByTestId(
+        "hidden-balance-placeholder",
+      ),
     ).toHaveLength(0)
     expect(
-      within(screen.getByTestId(WalletCurrency.Usd)).queryAllByText(/\d/),
+      within(screen.getByTestId(WalletCurrency.Usd)).queryAllByTestId(
+        "hidden-balance-placeholder",
+      ),
     ).toHaveLength(0)
+  })
+
+  it("masks the balance in the inline From field while hide-balance is on", async () => {
+    renderScreen(true)
+    await flushAsync()
+    await flushAsync()
+
+    // Modal is closed, so the only placeholder on screen is the inline field.
+    expect(screen.queryAllByTestId("hidden-balance-placeholder")).toHaveLength(1)
+    expect(screen.queryByTestId(`${WalletCurrency.Btc} Wallet Balance`)).toBeNull()
+  })
+
+  it("shows the balance in the inline From field when balances are visible", async () => {
+    renderScreen(false)
+    await flushAsync()
+    await flushAsync()
+
+    expect(
+      within(screen.getByTestId(`${WalletCurrency.Btc} Wallet Balance`)).getAllByText(
+        /\d/,
+      ).length,
+    ).toBeGreaterThan(0)
   })
 })

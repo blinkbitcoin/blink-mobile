@@ -36,6 +36,7 @@ jest.mock("@app/utils/toast", () => ({
 }))
 
 let mockIdentityPubkey: string | null = "test-pubkey-1234"
+let mockDeriveRejects = false
 const mockLoadMnemonic = jest.fn()
 jest.mock("@app/screens/self-custodial/onboarding/hooks/use-wallet-mnemonic", () => ({
   useLoadWalletMnemonic: () => mockLoadMnemonic,
@@ -46,7 +47,15 @@ jest.mock("@app/self-custodial/hooks/use-spark-network", () => ({
 }))
 
 jest.mock("@app/self-custodial/bridge", () => ({
-  deriveWalletIdentityPubkey: () => mockIdentityPubkey,
+  deriveWalletIdentityPubkey: () =>
+    mockDeriveRejects
+      ? Promise.reject(new Error("signer unavailable"))
+      : Promise.resolve(mockIdentityPubkey),
+}))
+
+const mockReportError = jest.fn()
+jest.mock("@app/utils/error-logging", () => ({
+  reportError: (...args: unknown[]) => mockReportError(...args),
 }))
 
 const mockCompleteBackup = jest.fn()
@@ -91,6 +100,7 @@ describe("useBackupMethods", () => {
     jest.clearAllMocks()
     mockLoading = false
     mockIdentityPubkey = "test-pubkey-1234"
+    mockDeriveRejects = false
     mockLoadMnemonic.mockResolvedValue("youth indicate void")
     mockSelfCustodialEntries = [{ id: "self-custodial-1", lightningAddress: null }]
     Object.defineProperty(Platform, "OS", { configurable: true, value: originalPlatform })
@@ -145,6 +155,28 @@ describe("useBackupMethods", () => {
       expect(mockSave).not.toHaveBeenCalled()
       expect(mockToastShow).toHaveBeenCalledWith(
         expect.objectContaining({ message: "Failed to save backup" }),
+      )
+    })
+
+    /** Derivation became async in SDK 0.22; without the catch this rejection would surface
+     *  as an unhandled promise instead of the screen's own failure toast. */
+    it("bails out with a failure toast when the derivation rejects", async () => {
+      mockDeriveRejects = true
+      const { result } = renderHook(() => useBackupMethods())
+
+      await act(async () => {
+        await expect(result.current.handleCredentialBackup()).resolves.toBeUndefined()
+      })
+
+      expect(mockSave).not.toHaveBeenCalled()
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({ message: "Failed to save backup" }),
+      )
+      expect(mockNavigate).not.toHaveBeenCalled()
+      /** The toast tells the user; the report is what tells us which signer failed. */
+      expect(mockReportError).toHaveBeenCalledWith(
+        "deriveWalletIdentityPubkey",
+        expect.objectContaining({ message: "signer unavailable" }),
       )
     })
 

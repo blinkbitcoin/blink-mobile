@@ -62,17 +62,6 @@ describe("defaultRemoteConfig: compliance country lists", () => {
     expect(defaultRemoteConfig.selfCustodialTransferBlockedCountries).toHaveLength(27)
   })
 
-  it("custodialTransferBlockedCountries contains only uppercase ISO-3166 alpha-2 codes with no duplicates", () => {
-    assertCanonical(defaultRemoteConfig.custodialTransferBlockedCountries)
-  })
-
-  it("both account-type transfer blocks default to the same 27 EU member states", () => {
-    expect(defaultRemoteConfig.custodialTransferBlockedCountries).toEqual(
-      defaultRemoteConfig.selfCustodialTransferBlockedCountries,
-    )
-    expect(defaultRemoteConfig.custodialTransferBlockedCountries).toHaveLength(27)
-  })
-
   it("selfCustodialDollarBalanceBlockedCountries contains only uppercase ISO-3166 alpha-2 codes with no duplicates", () => {
     assertCanonical(defaultRemoteConfig.selfCustodialDollarBalanceBlockedCountries)
   })
@@ -81,18 +70,21 @@ describe("defaultRemoteConfig: compliance country lists", () => {
     expect(defaultRemoteConfig.selfCustodialDollarBalanceBlockedCountries).toEqual(["HK"])
   })
 
-  it("custodialCreationBlockedCountries contains only uppercase ISO-3166 alpha-2 codes with no duplicates", () => {
-    assertCanonical(defaultRemoteConfig.custodialCreationBlockedCountries)
-  })
-
   it("selfCustodialCreationBlockedCountries contains only uppercase ISO-3166 alpha-2 codes with no duplicates", () => {
     assertCanonical(defaultRemoteConfig.selfCustodialCreationBlockedCountries)
   })
 
-  it("creation blocks default to the comprehensively sanctioned regions plus Russia and Belarus, identically for both account types", () => {
-    const expected = ["CU", "IR", "KP", "SY", "RU", "BY"]
-    expect(defaultRemoteConfig.custodialCreationBlockedCountries).toEqual(expected)
-    expect(defaultRemoteConfig.selfCustodialCreationBlockedCountries).toEqual(expected)
+  /** The custodial creation block moved to the server's own deny list with blink#756, so
+   *  only the self-custodial half is still answered from a compiled-in default. */
+  it("the self-custodial creation block defaults to the comprehensively sanctioned regions plus Russia and Belarus", () => {
+    expect(defaultRemoteConfig.selfCustodialCreationBlockedCountries).toEqual([
+      "CU",
+      "IR",
+      "KP",
+      "SY",
+      "RU",
+      "BY",
+    ])
   })
 
   it("offboardOnlyCountries contains only uppercase ISO-3166 alpha-2 codes with no duplicates", () => {

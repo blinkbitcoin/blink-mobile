@@ -6,7 +6,8 @@
     "sourceMap": true,
     "baseUrl": "./",
     "paths": {
-      "@app/*": ["app/*"]
+      "@app/*": ["app/*"],
+      "@mocks/*": ["__mocks__/*"]
     },
     "types": [
       "node",
@@ -17,5 +18,5 @@
       "@types/jest"
     ]
   },
-  "include": ["app", "e2e", "__tests__"]
+  "include": ["app", "e2e", "__tests__", "__mocks__"]
 }

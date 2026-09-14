@@ -18,6 +18,7 @@ import { useAppConfig } from "@app/hooks"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { useLightningAddressGated } from "@app/self-custodial/hooks/use-lightning-address-gate"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { AccountType } from "@app/types/wallet"
 
@@ -35,6 +36,7 @@ export const AccountBannerVertical: React.FC = () => {
   const { currentLevel } = useLevel()
   const { activeAccount } = useAccountRegistry()
   const { lightningAddress: selfCustodialLightningAddress } = useSelfCustodialWallet()
+  const isLightningAddressGated = useLightningAddressGated()
   const isSelfCustodial = activeAccount?.type === AccountType.SelfCustodial
   const isUserLoggedIn = currentLevel !== AccountLevel.NonAuth
 
@@ -51,6 +53,13 @@ export const AccountBannerVertical: React.FC = () => {
   if (isSelfCustodial) {
     const subtitle = LL.SettingsScreen.nonCustodialAccount()
     const avatarChar = (selfCustodialLightningAddress ?? subtitle).charAt(0)
+    /** Labelled the same way as the settings row and the horizontal banner: an address
+     *  the account cannot be paid at must not read as one that works. */
+    const isAddressLabelledDisabled =
+      Boolean(selfCustodialLightningAddress) && isLightningAddressGated
+    const displayedAddress = isAddressLabelledDisabled
+      ? `${selfCustodialLightningAddress} ${LL.SettingsScreen.addressDisabled()}`
+      : selfCustodialLightningAddress
     return (
       <View style={styles.outer}>
         <Avatar
@@ -62,7 +71,7 @@ export const AccountBannerVertical: React.FC = () => {
         />
         <View style={styles.textContainer}>
           {selfCustodialLightningAddress ? (
-            <Text type="p2">{selfCustodialLightningAddress}</Text>
+            <Text type="p2">{displayedAddress}</Text>
           ) : null}
           <Text type="p2">{subtitle}</Text>
         </View>

@@ -54,6 +54,9 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => {
     connect: jest.fn(),
     defaultConfig: jest.fn().mockReturnValue({}),
     initLogging: jest.fn(),
+    PaymentRequest: {
+      Input: jest.fn().mockImplementation((inner: unknown) => ({ tag: "Input", inner })),
+    },
     PrepareSendPaymentRequest: {
       create: jest.fn((args: Record<string, unknown>) => args),
     },

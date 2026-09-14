@@ -25,7 +25,7 @@ import {
 } from "@app/screens/account-migration/hooks"
 import { useCustodialOwnerId } from "@app/screens/account-migration/hooks/use-custodial-owner-id"
 import { useEnsureMigrationStarted } from "@app/screens/account-migration/hooks/use-ensure-migration-started"
-import { armMigrationConversion } from "@app/screens/account-migration/hooks/use-migration-conversion"
+import { armMigrationConversion } from "@app/screens/conversion-flow/drain-conversion"
 import { useMigrationLnAddressTransfer } from "@app/screens/account-migration/hooks/use-migration-ln-address-transfer"
 import { useMigrationStatus } from "@app/screens/account-migration/hooks/use-migration-status"
 import { MigrationSupportOrigin, MigrationSupportReason } from "@app/types/migration"
@@ -46,15 +46,20 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
   } = useTheme()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
-  /** The commit screen must never present unknown balances as zeros: until the preview
-   *  is ready, its area holds a spinner and Approve stays off. */
-  const preview = useMigrationBalancesPreview()
-  const { openSupport } = useContactSupport()
   const {
     accountId: selfCustodialAccountId,
     loading: checkpointLoading,
+    hasError: hasCheckpointError,
+    refetch: refetchCheckpoint,
     saveCheckpoint,
   } = useMigrationCheckpoint()
+  /** The commit screen must never present unknown balances as zeros: until the preview
+   *  is ready, its area holds a spinner and Approve stays off. */
+  const preview = useMigrationBalancesPreview({
+    provisionedAccountId: selfCustodialAccountId,
+    isProvisionedAccountLoading: checkpointLoading,
+  })
+  const { openSupport } = useContactSupport()
   const isFocused = useIsFocused()
 
   /** The commit point has no return path: the gesture is disabled on the
@@ -85,7 +90,13 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
     skip: !preview.isReady || isMigrationFailed || hasDollarBalance,
   })
 
-  const { ownerId } = useCustodialOwnerId()
+  const {
+    ownerId,
+    loading: isOwnerIdLoading,
+    isSkipped: isOwnerIdSkipped,
+    hasError: hasOwnerIdError,
+    refetch: refetchOwnerId,
+  } = useCustodialOwnerId()
 
   /** The re-point runs here, only once the start is confirmed so a rejected start never
    *  moves the address irreversibly. It needs the custodial session the completion swap
@@ -130,6 +141,49 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
     ? MigrationSupportReason.LnAddressTransferFailed
     : null
   const lnAddressFailureReason = lnAddressMissingReason ?? lnAddressRejectedReason
+
+  /**
+   * The re-point fires for neither id, and reports nothing when it does not fire, so an id
+   * that has SETTLED missing is a settled failure rather than a wait: left as a wait it
+   * holds Approve off for good with no message and no retry, which is the dead end the
+   * commit screen has no way back out of. Judged only once the re-point is unblocked, so an
+   * id still loading behind a preview or a start in flight is never mistaken for a missing
+   * one.
+   */
+  const isCustodialOwnerMissing = !ownerId && !isOwnerIdLoading
+  const settledMissingIdReason = isCustodialOwnerMissing
+    ? MigrationSupportReason.CustodialOwnerMissing
+    : null
+
+  /**
+   * The provisioned account is held to a softer standard than the owner, and offered the
+   * retry rather than the handover: the checkpoint keys its id by an owner it resolves
+   * through its OWN instance of an uncached query, which can fail while this screen's
+   * instance is healthy, and a null read through that failure is indistinguishable here
+   * from a migration that never provisioned one. Support is one tap away throughout, so
+   * the retry costs a user who really has no account nothing but a press, where a handover
+   * would cost one whose lookup merely dropped their migration.
+   */
+  const isProvisionedAccountMissing = !selfCustodialAccountId && !checkpointLoading
+  /**
+   * The owner is judged missing only on an answer. A query that never ran (the session
+   * ended, or the active account is no longer the custodial one) and one that failed both
+   * report a null id without either being an answer, and reading that silence as a missing
+   * owner would hand a user to support over an expired token or a lost request, in the one
+   * step they cannot take back. The preview's own skip guard exists for exactly this.
+   */
+  const isOwnerIdUnanswered = isOwnerIdSkipped || hasOwnerIdError
+  /** And only while the re-point still needs them. Once the address has moved the ids have
+   *  done their work, and the session that carried them is about to be discarded by the
+   *  completion swap: judging them past that point would hand a finished re-point to
+   *  support. */
+  const areTransferIdsNeeded = !lnAddressTransfer.isTransferred
+  const isMissingOwnerJudgeable =
+    !isLnRepointBlocked && !isOwnerIdUnanswered && areTransferIdsNeeded
+  const missingOwnerFailureReason = isMissingOwnerJudgeable
+    ? settledMissingIdReason
+    : null
+
   /** A migration already failed server-side leads the handover: nothing else on this screen
    *  matters once the phase is FAILED. */
   const failedReason = isMigrationFailed ? MigrationSupportReason.TransferFailed : null
@@ -137,6 +191,7 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
     failedReason ??
     startFailureReason ??
     lnAddressFailureReason ??
+    missingOwnerFailureReason ??
     preview.unavailableReason
 
   const hasReportedHandoverRef = useRef(false)
@@ -170,26 +225,50 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
 
   /** Either source losing the network earns the same retry, and it refreshes both:
    *  figures without a started migration are as useless as the reverse. */
+  /** The id sources join the retry only while the re-point still needs them: past it they
+   *  hold nothing back, and the retry replaces Approve on this screen, so offering it then
+   *  would hide a commit the user is ready to make behind an error about nothing. */
+  const isIdSourceRetryable =
+    areTransferIdsNeeded &&
+    (hasOwnerIdError || hasCheckpointError || isProvisionedAccountMissing)
   const isRetryable =
     preview.isRetryable ||
     migrationStart.hasConnectionIssue ||
-    lnAddressTransfer.hasConnectionIssue
+    lnAddressTransfer.hasConnectionIssue ||
+    isIdSourceRetryable
 
   const { retry: retryPreview } = preview
   const { retry: retryMigrationStart } = migrationStart
   const { retry: retryLnAddressTransfer } = lnAddressTransfer
 
+  /** The owner and the checkpoint join the shared retry because the re-point cannot fire
+   *  without the ids they carry: refreshing everything else around a lookup that failed
+   *  would replay the same dead screen. Their rejections carry nothing the hooks' own state
+   *  does not already report, so they are swallowed like the preview's. */
   const handleRetry = useCallback(() => {
     retryPreview()
     retryMigrationStart()
     retryLnAddressTransfer()
-  }, [retryPreview, retryMigrationStart, retryLnAddressTransfer])
+    refetchOwnerId().catch(() => undefined)
+    refetchCheckpoint().catch(() => undefined)
+  }, [
+    retryPreview,
+    retryMigrationStart,
+    retryLnAddressTransfer,
+    refetchOwnerId,
+    refetchCheckpoint,
+  ])
 
   /** Approve commits against a server-side flow, so it stays off until the server has
    *  confirmed one exists and the lightning address has moved, not merely until the
-   *  figures render. */
+   *  figures render. The dollar verdict is held to the same bar: the figures may render
+   *  before it lands, but nothing irreversible may be approved against a dollar balance
+   *  the region has not ruled on. */
   const isApproveDisabled =
-    !preview.isReady || !migrationStart.isStarted || !lnAddressTransfer.isTransferred
+    !preview.isReady ||
+    preview.isDollarRegionPending ||
+    !migrationStart.isStarted ||
+    !lnAddressTransfer.isTransferred
 
   return (
     <Screen preset="fixed" headerShown={false}>
@@ -210,6 +289,7 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
               dollarLabel={LLOverview.currentDollarBalance()}
               dollarValue={preview.currentDollarBalance}
               isDollarValueMuted={preview.isCurrentDollarBalanceRestricted}
+              isDollarValuePending={preview.isDollarRegionPending}
             />
 
             <RichText text={preview.networkFeeLine} style={styles.networkFee} />
@@ -224,7 +304,8 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
               bitcoinFiat={preview.newBitcoinFiat}
               dollarLabel={LLOverview.newDollarBalance()}
               dollarValue={preview.newDollarBalance}
-              isDollarValueMuted={preview.isNewDollarBalanceRestricted}
+              isDollarValueMuted={preview.isNewDollarBalanceUnavailable}
+              isDollarValuePending={preview.isDollarRegionPending}
             />
           </ScrollView>
         ) : (

@@ -76,6 +76,10 @@ module.exports = {
       "|uuid" +
       "|@formatjs" +
       "|react-native-inappbrowser-reborn" +
+      // supercluster (and its kdbush dependency) ship ESM only; Metro handles
+      // that, Jest needs them transformed.
+      "|supercluster" +
+      "|kdbush" +
       ")/)",
   ],
 }

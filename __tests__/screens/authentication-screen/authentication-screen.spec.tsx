@@ -11,6 +11,8 @@ import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { RouteProp } from "@react-navigation/native"
 
 import { ContextForScreen, ContextForScreenWithTheme } from "../helper"
+import { recordAppError } from "@app/utils/error-reporting"
+
 import { flushEffects } from "../../helpers/flush-effects"
 
 /** The app loads the catalogue at boot; without it every label renders empty and the
@@ -51,11 +53,15 @@ jest.mock("@app/utils/biometricAuthentication", () => ({
 jest.mock("@app/utils/storage/secureStorage", () => ({
   __esModule: true,
   default: {
-    resetPinAttempts: jest.fn(),
+    clearPinFailureState: jest.fn().mockResolvedValue(true),
     setIsBiometricsEnabled: jest.fn(),
     /** Read by the account registry the screen renders under. */
     getSessionProfiles: jest.fn().mockResolvedValue([]),
   },
+}))
+
+jest.mock("@app/utils/error-reporting", () => ({
+  recordAppError: jest.fn(),
 }))
 
 jest.mock("@app/assets/logo/app-logo-dark.svg", () => "AppLogoDark")
@@ -103,6 +109,9 @@ const pressAlertButton = async (text: string) => {
 describe("AuthenticationScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    /** clearAllMocks keeps implementations, so a test that makes the clear fail
+     *  would otherwise leak that into every test after it. */
+    jest.mocked(KeyStoreWrapper).clearPinFailureState.mockResolvedValue(true)
     /** The OS prompt is stubbed as an immediate success so the unlock path runs. */
     mockedBiometrics.authenticate.mockImplementation(async (_description, onSuccess) => {
       onSuccess()
@@ -125,6 +134,35 @@ describe("AuthenticationScreen", () => {
     expect(mockSetAppUnlocked).toHaveBeenCalledTimes(1)
     expect(mockReplace).toHaveBeenCalledWith("Primary")
     expect(mockGoBack).not.toHaveBeenCalled()
+  })
+
+  it("clears the pin lockout before leaving, so biometrics doesn't strand a lock", async () => {
+    // Proving identity biometrically has to release the pin lockout, and the
+    // write has to land before we navigate away: a kill in that gap would
+    // leave the user locked out, one wrong digit from a forced logout.
+    renderScreen(false)
+    await flushEffects()
+
+    const clearOrder =
+      jest.mocked(KeyStoreWrapper).clearPinFailureState.mock.invocationCallOrder[0]
+    expect(clearOrder).toBeLessThan(mockSetAppUnlocked.mock.invocationCallOrder[0])
+  })
+
+  it("still unlocks, and reports, when the lockout state cannot be cleared", async () => {
+    // The clear is awaited, so a keystore fault sits between the user and their
+    // wallet. Refusing entry over it would punish someone who just proved who
+    // they are — but the leftover count is sticky, so it has to be reported.
+    jest.mocked(KeyStoreWrapper).clearPinFailureState.mockResolvedValue(false)
+
+    renderScreen(false)
+    await flushEffects()
+
+    expect(mockSetAppUnlocked).toHaveBeenCalledTimes(1)
+    expect(mockReplace).toHaveBeenCalledWith("Primary")
+    expect(recordAppError).toHaveBeenCalledWith(
+      expect.objectContaining({ message: "PIN lockout state could not be cleared" }),
+      expect.objectContaining({ alwaysRecord: true }),
+    )
   })
 
   it("treats a missing resume flag as a cold start", async () => {

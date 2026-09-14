@@ -16,6 +16,9 @@ type DollarBalanceMigrationModalProps = {
   /** Off where there is no way back but the conversion, e.g. the commit screen, so the only
    *  exit is Transfer. */
   showCloseIconButton?: boolean
+  /** Copy overrides so sibling drain flows (the Anon switch) reuse the same shell. */
+  title?: string
+  body?: string
 }
 
 export const DollarBalanceMigrationModal: React.FC<DollarBalanceMigrationModalProps> = ({
@@ -23,6 +26,8 @@ export const DollarBalanceMigrationModal: React.FC<DollarBalanceMigrationModalPr
   toggleModal,
   onTransfer,
   showCloseIconButton = true,
+  title,
+  body,
 }) => {
   const { LL } = useI18nContext()
   const styles = useStyles()
@@ -35,9 +40,11 @@ export const DollarBalanceMigrationModal: React.FC<DollarBalanceMigrationModalPr
       isVisible={isVisible}
       toggleModal={toggleModal}
       image={<GaloyIcon name="warning" size={80} color={colors.warning} />}
-      title={LL.AccountMigration.dollarBalanceModal.title()}
+      title={title ?? LL.AccountMigration.dollarBalanceModal.title()}
       body={
-        <Text style={styles.body}>{LL.AccountMigration.dollarBalanceModal.body()}</Text>
+        <Text style={styles.body}>
+          {body ?? LL.AccountMigration.dollarBalanceModal.body()}
+        </Text>
       }
       primaryButtonTitle={LL.common.transfer()}
       primaryButtonOnPress={onTransfer}

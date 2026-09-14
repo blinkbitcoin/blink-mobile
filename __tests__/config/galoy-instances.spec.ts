@@ -74,6 +74,36 @@ it("backfills fields missing from a persisted Custom instance with Main defaults
   expect(res.blockExplorer).toBe("https://mempool.space/tx/")
 })
 
+it("backfills fields persisted as blank strings on a Custom instance", () => {
+  // The developer screen seeds every URL input with "" when the current instance
+  // is not Custom and saves them verbatim. Keeping those blanks would override
+  // the Main defaults: an empty kycUrl/fiatUrl empties the WebView entry
+  // allowlist and locks KYC and buy/sell out behind a generic error.
+  const customInstanceWithBlanks = {
+    id: "Custom",
+    name: "Custom",
+    graphqlUri: "https://api.custom.com/graphql",
+    graphqlWsUri: "ws://ws.custom.com/graphql",
+    authUrl: "https://api.custom.com",
+    posUrl: "",
+    kycUrl: "",
+    fiatUrl: "   ",
+    lnAddressHostname: "custom.com",
+    blockExplorer: "https://mempool.space/tx/",
+    sparkExplorer: "https://sparkscan.io/tx/",
+  } as never
+
+  const res = resolveGaloyInstanceOrDefault(customInstanceWithBlanks)
+
+  expect(res.kycUrl).toBe(GALOY_INSTANCES[0].kycUrl)
+  expect(res.fiatUrl).toBe(GALOY_INSTANCES[0].fiatUrl)
+  expect(res.posUrl).toBe(GALOY_INSTANCES[0].posUrl)
+  // non-blank persisted values are still kept
+  expect(res.id).toBe("Custom")
+  expect(res.graphqlUri).toBe("https://api.custom.com/graphql")
+  expect(res.lnAddressHostname).toBe("custom.com")
+})
+
 it("backfills fields persisted as undefined on a Custom instance", () => {
   const customInstanceWithUndefined = {
     id: "Custom",

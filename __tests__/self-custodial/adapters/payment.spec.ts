@@ -14,6 +14,9 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
   InputType_Tags: { SparkAddress: "SparkAddress" },
   Network: { Mainnet: 0, Regtest: 1 },
   OnchainConfirmationSpeed: { Fast: 0, Medium: 1, Slow: 2 },
+  PaymentRequest: {
+    Input: jest.fn().mockImplementation((inner: unknown) => ({ tag: "Input", inner })),
+  },
   SdkError: { instanceOf: () => false },
   SdkError_Tags: {
     InsufficientFunds: "InsufficientFunds",

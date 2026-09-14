@@ -1,6 +1,8 @@
 import React from "react"
 import { fireEvent, render } from "@testing-library/react-native"
 
+import { flushEffects } from "../../helpers/flush-effects"
+
 import { GetStartedScreen } from "@app/screens/get-started-screen/get-started-screen"
 
 const mockNavigate = jest.fn()
@@ -8,8 +10,12 @@ const mockSetOptions = jest.fn()
 const mockCanGoBack = jest.fn(() => false)
 const mockUseFeatureFlags = jest.fn()
 const mockUseAccountTypeOptions = jest.fn()
-const mockIsCreationBlocked = jest.fn()
-const mockRegionLoading = jest.fn(() => false)
+const mockCheckBlockReason = jest.fn()
+const mockIsChecking = jest.fn(() => false)
+const mockIsFirstSignupRuleReady = jest.fn(() => true)
+const mockLogGetStartedAction = jest.fn()
+let mockInstanceId = "Main"
+let mockThemeMode = "dark"
 
 jest.mock("@react-navigation/native", () => ({
   useNavigation: () => ({
@@ -29,7 +35,7 @@ jest.mock("@app/config/feature-flags-context", () => ({
 
 jest.mock("@app/hooks", () => ({
   useAppConfig: () => ({
-    appConfig: { galoyInstance: { id: "Main" } },
+    appConfig: { galoyInstance: { id: mockInstanceId } },
   }),
 }))
 
@@ -42,8 +48,9 @@ jest.mock("@app/hooks/use-account-type-options", () => ({
 
 jest.mock("@app/hooks/use-creation-block", () => ({
   useCreationBlock: () => ({
-    isCreationBlocked: mockIsCreationBlocked,
-    loading: mockRegionLoading(),
+    checkBlockReason: mockCheckBlockReason,
+    isChecking: mockIsChecking(),
+    isFirstSignupRuleReady: mockIsFirstSignupRuleReady(),
   }),
 }))
 
@@ -52,8 +59,13 @@ jest.mock("@app/screens/get-started-screen/use-device-token", () => ({
   default: () => null,
 }))
 
+/** Pulled in through the phone-auth barrel, and it warns about API keys on import. */
+jest.mock("@app/utils/ip-country-lookup", () => ({
+  resolveIpCountryCodeCached: jest.fn(),
+}))
+
 jest.mock("@app/utils/analytics", () => ({
-  logGetStartedAction: jest.fn(),
+  logGetStartedAction: (...args: unknown[]) => mockLogGetStartedAction(...args),
 }))
 
 jest.mock("@app/i18n/i18n-react", () => ({
@@ -133,7 +145,7 @@ jest.mock("@rn-vui/themed", () => {
         fn({ colors: { primary: "#fc5805" } }),
     Text: ({ children }: { children: React.ReactNode }) =>
       ReactActual.createElement("Text", null, children),
-    useTheme: () => ({ theme: { mode: "dark" } }),
+    useTheme: () => ({ theme: { mode: mockThemeMode } }),
   }
 })
 
@@ -149,8 +161,11 @@ describe("GetStartedScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockCanGoBack.mockReturnValue(false)
-    mockIsCreationBlocked.mockReturnValue(false)
-    mockRegionLoading.mockReturnValue(false)
+    mockInstanceId = "Main"
+    mockThemeMode = "dark"
+    mockCheckBlockReason.mockResolvedValue(null)
+    mockIsChecking.mockReturnValue(false)
+    mockIsFirstSignupRuleReady.mockReturnValue(true)
     mockUseFeatureFlags.mockReturnValue({
       deviceAccountEnabled: false,
       nonCustodialEnabled: true,
@@ -159,7 +174,6 @@ describe("GetStartedScreen", () => {
       options: ["selfCustodial", "custodial"],
       defaultSelected: null,
       selfCustodialTemporarilyDisabled: false,
-      loading: false,
     })
   })
 
@@ -179,17 +193,62 @@ describe("GetStartedScreen", () => {
     expect(getByTestId("screen").props.headerShown).toBe(true)
   })
 
-  it("disables Create new account when no options are available", () => {
+  it("names the instance on every build but production", () => {
+    mockInstanceId = "Staging"
+
+    const { getByText } = render(<GetStartedScreen />)
+
+    expect(getByText("Staging")).toBeTruthy()
+  })
+
+  it("swaps the logo for the light one under a light theme", () => {
+    mockThemeMode = "light"
+
+    const rendered = render(<GetStartedScreen />)
+
+    expect(rendered.root.findAllByType("AppLogoLight" as never)).toHaveLength(1)
+  })
+
+  it("locates nobody, on landing or on pressing Create new account", async () => {
+    const { getByTestId } = render(<GetStartedScreen />)
+
+    fireEvent.press(getByTestId("create-account-button"))
+    await flushEffects()
+
+    // No account type has been chosen yet, so there is nothing to hold against a region.
+    expect(mockCheckBlockReason).not.toHaveBeenCalled()
+    expect(mockNavigate).toHaveBeenCalledWith("accountTypeSelection", { mode: "create" })
+  })
+
+  it("does not navigate when the check answers after the screen is gone", async () => {
     mockUseFeatureFlags.mockReturnValue({
       deviceAccountEnabled: false,
       nonCustodialEnabled: false,
     })
     mockUseAccountTypeOptions.mockReturnValue({
-      options: [],
-      defaultSelected: null,
+      options: ["custodial"],
+      defaultSelected: "custodial",
       selfCustodialTemporarilyDisabled: true,
-      loading: false,
     })
+    let resolveCheck: (reason: string | null) => void = () => undefined
+    mockCheckBlockReason.mockReturnValue(
+      new Promise<string | null>((resolve) => {
+        resolveCheck = resolve
+      }),
+    )
+
+    const { getByTestId, unmount } = render(<GetStartedScreen />)
+    fireEvent.press(getByTestId("create-account-button"))
+    unmount()
+
+    resolveCheck("region")
+    await flushEffects()
+
+    expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  it("disables Create new account while the check runs and ignores presses", () => {
+    mockIsChecking.mockReturnValue(true)
 
     const { getByTestId } = render(<GetStartedScreen />)
     const button = getByTestId("create-account-button")
@@ -200,48 +259,39 @@ describe("GetStartedScreen", () => {
     expect(mockNavigate).not.toHaveBeenCalled()
   })
 
-  it("disables Create new account while detecting the country and ignores presses", () => {
-    mockUseAccountTypeOptions.mockReturnValue({
-      options: [],
-      defaultSelected: null,
-      selfCustodialTemporarilyDisabled: false,
-      loading: true,
-    })
-
-    const { getByTestId } = render(<GetStartedScreen />)
-    const button = getByTestId("create-account-button")
-
-    expect(button.props.accessibilityState.disabled).toBe(true)
-
-    fireEvent.press(button)
-    expect(mockNavigate).not.toHaveBeenCalled()
-  })
-
-  it("routes to the selection screen when non-custodial is enabled and at least one option exists", () => {
+  it("routes to the selection screen when non-custodial is enabled and at least one option exists", async () => {
     const { getByTestId } = render(<GetStartedScreen />)
 
     fireEvent.press(getByTestId("create-account-button"))
+    await flushEffects()
 
     expect(mockNavigate).toHaveBeenCalledWith("accountTypeSelection", { mode: "create" })
   })
 
-  it("routes directly to self-custodial T&C when only the self-custodial option exists (e.g. US)", () => {
+  /** A single offered type is submitted here rather than on the account type screen, which
+   *  is the only other place wired to the mode screen. Skipping straight to terms provisions
+   *  the account with no mode, and nothing asks again. */
+  it("routes through the mode screen when only the self-custodial option exists (e.g. US)", async () => {
     mockUseAccountTypeOptions.mockReturnValue({
       options: ["selfCustodial"],
       defaultSelected: "selfCustodial",
       selfCustodialTemporarilyDisabled: false,
-      loading: false,
     })
 
     const { getByTestId } = render(<GetStartedScreen />)
     fireEvent.press(getByTestId("create-account-button"))
+    await flushEffects()
 
-    expect(mockNavigate).toHaveBeenCalledWith("acceptTermsAndConditions", {
-      flow: "selfCustodial",
+    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialChooseExperience", {
+      onContinue: { route: "acceptTermsAndConditions" },
     })
+    expect(mockNavigate).not.toHaveBeenCalledWith(
+      "acceptTermsAndConditions",
+      expect.anything(),
+    )
   })
 
-  it("routes directly to trial T&C when non-custodial is off but custodial is allowed", () => {
+  it("checks the only option there is, since pressing create is that choice", async () => {
     mockUseFeatureFlags.mockReturnValue({
       deviceAccountEnabled: false,
       nonCustodialEnabled: false,
@@ -250,42 +300,91 @@ describe("GetStartedScreen", () => {
       options: ["custodial"],
       defaultSelected: "custodial",
       selfCustodialTemporarilyDisabled: true,
-      loading: false,
+    })
+    mockCheckBlockReason.mockResolvedValue("firstCustodialSignup")
+
+    const { getByTestId } = render(<GetStartedScreen />)
+    fireEvent.press(getByTestId("create-account-button"))
+    await flushEffects()
+
+    // Saying the region is closed would overstate a refusal that still leaves an option.
+    expect(mockNavigate).toHaveBeenCalledWith("unsupportedRegion", {
+      reason: "firstCustodialSignup",
+    })
+  })
+
+  it("waits for the account count in the build that submits an option here", () => {
+    mockUseFeatureFlags.mockReturnValue({
+      deviceAccountEnabled: false,
+      nonCustodialEnabled: false,
+    })
+    mockUseAccountTypeOptions.mockReturnValue({
+      options: ["custodial"],
+      defaultSelected: "custodial",
+      selfCustodialTemporarilyDisabled: true,
+    })
+    mockIsFirstSignupRuleReady.mockReturnValue(false)
+
+    const { getByTestId } = render(<GetStartedScreen />)
+
+    // A registry mid-hydration reads as no accounts, which is what the rule counts.
+    expect(getByTestId("create-account-button").props.accessibilityState.disabled).toBe(
+      true,
+    )
+  })
+
+  it("waits on nothing when it has only a screen to navigate to", async () => {
+    mockIsFirstSignupRuleReady.mockReturnValue(false)
+
+    const { getByTestId } = render(<GetStartedScreen />)
+    fireEvent.press(getByTestId("create-account-button"))
+    await flushEffects()
+
+    // No option is submitted here, so no rule this screen evaluates has to settle first.
+    expect(getByTestId("create-account-button").props.accessibilityState.disabled).toBe(
+      false,
+    )
+    expect(mockNavigate).toHaveBeenCalledWith("accountTypeSelection", { mode: "create" })
+  })
+
+  it("routes directly to trial T&C when non-custodial is off but custodial is allowed", async () => {
+    mockUseFeatureFlags.mockReturnValue({
+      deviceAccountEnabled: false,
+      nonCustodialEnabled: false,
+    })
+    mockUseAccountTypeOptions.mockReturnValue({
+      options: ["custodial"],
+      defaultSelected: "custodial",
+      selfCustodialTemporarilyDisabled: true,
     })
 
     const { getByTestId } = render(<GetStartedScreen />)
     fireEvent.press(getByTestId("create-account-button"))
+    await flushEffects()
 
     expect(mockNavigate).toHaveBeenCalledWith("acceptTermsAndConditions", {
       flow: "trial",
     })
-  })
-
-  it("redirects to Unsupported region when every available option is region-blocked", () => {
-    mockIsCreationBlocked.mockReturnValue(true)
-
-    const { getByTestId } = render(<GetStartedScreen />)
-    fireEvent.press(getByTestId("create-account-button"))
-
-    expect(mockNavigate).toHaveBeenCalledWith("unsupportedRegion")
-    expect(mockNavigate).not.toHaveBeenCalledWith("accountTypeSelection", {
-      mode: "create",
-    })
-  })
-
-  it("proceeds to the selection screen when at least one option is not region-blocked", () => {
-    mockIsCreationBlocked.mockImplementation(
-      (option: string) => option === "selfCustodial",
+    /** The mode is a self-custodial concern: a custodial creation must not be diverted. */
+    expect(mockNavigate).not.toHaveBeenCalledWith(
+      "selfCustodialChooseExperience",
+      expect.anything(),
     )
+  })
+
+  it("leaves a closed region to the selection screen rather than pre-empting it", async () => {
+    mockCheckBlockReason.mockResolvedValue("region")
 
     const { getByTestId } = render(<GetStartedScreen />)
     fireEvent.press(getByTestId("create-account-button"))
+    await flushEffects()
 
+    // The refusal belongs to whichever option the user picks, which is not known here.
     expect(mockNavigate).toHaveBeenCalledWith("accountTypeSelection", { mode: "create" })
-    expect(mockNavigate).not.toHaveBeenCalledWith("unsupportedRegion")
+    expect(mockNavigate).not.toHaveBeenCalledWith("unsupportedRegion", expect.anything())
   })
 
-  it("redirects when the only available option is region-blocked (non-custodial off, custodial blocked)", () => {
+  it("does not count a refused press as the start of a signup", async () => {
     mockUseFeatureFlags.mockReturnValue({
       deviceAccountEnabled: false,
       nonCustodialEnabled: false,
@@ -294,29 +393,69 @@ describe("GetStartedScreen", () => {
       options: ["custodial"],
       defaultSelected: "custodial",
       selfCustodialTemporarilyDisabled: true,
-      loading: false,
     })
-    mockIsCreationBlocked.mockReturnValue(true)
+    mockCheckBlockReason.mockResolvedValue("region")
 
     const { getByTestId } = render(<GetStartedScreen />)
     fireEvent.press(getByTestId("create-account-button"))
+    await flushEffects()
 
-    expect(mockNavigate).toHaveBeenCalledWith("unsupportedRegion")
+    // Logging every refused retry would inflate the funnel against the terms that follow.
+    expect(mockLogGetStartedAction).not.toHaveBeenCalled()
+  })
+
+  it("counts the press once the option is allowed", async () => {
+    mockUseFeatureFlags.mockReturnValue({
+      deviceAccountEnabled: false,
+      nonCustodialEnabled: false,
+    })
+    mockUseAccountTypeOptions.mockReturnValue({
+      options: ["custodial"],
+      defaultSelected: "custodial",
+      selfCustodialTemporarilyDisabled: true,
+    })
+
+    const { getByTestId } = render(<GetStartedScreen />)
+    fireEvent.press(getByTestId("create-account-button"))
+    await flushEffects()
+
+    expect(mockLogGetStartedAction).toHaveBeenCalledWith({
+      action: "create_device_account",
+      createDeviceAccountEnabled: false,
+    })
+  })
+
+  it("counts the press that only navigates to the selection screen", async () => {
+    const { getByTestId } = render(<GetStartedScreen />)
+    fireEvent.press(getByTestId("create-account-button"))
+    await flushEffects()
+
+    expect(mockLogGetStartedAction).toHaveBeenCalledWith({
+      action: "create_device_account",
+      createDeviceAccountEnabled: false,
+    })
+  })
+
+  it("redirects when the only available option is region-blocked (non-custodial off, custodial blocked)", async () => {
+    mockUseFeatureFlags.mockReturnValue({
+      deviceAccountEnabled: false,
+      nonCustodialEnabled: false,
+    })
+    mockUseAccountTypeOptions.mockReturnValue({
+      options: ["custodial"],
+      defaultSelected: "custodial",
+      selfCustodialTemporarilyDisabled: true,
+    })
+    mockCheckBlockReason.mockResolvedValue("region")
+
+    const { getByTestId } = render(<GetStartedScreen />)
+    fireEvent.press(getByTestId("create-account-button"))
+    await flushEffects()
+
+    expect(mockNavigate).toHaveBeenCalledWith("unsupportedRegion", { reason: "region" })
     expect(mockNavigate).not.toHaveBeenCalledWith("acceptTermsAndConditions", {
       flow: "trial",
     })
-  })
-
-  it("disables Create new account while detecting the region and ignores presses", () => {
-    mockRegionLoading.mockReturnValue(true)
-
-    const { getByTestId } = render(<GetStartedScreen />)
-    const button = getByTestId("create-account-button")
-
-    expect(button.props.accessibilityState.disabled).toBe(true)
-
-    fireEvent.press(button)
-    expect(mockNavigate).not.toHaveBeenCalled()
   })
 
   it("routes Login to the selection screen with restore mode when non-custodial is enabled", () => {
@@ -336,7 +475,6 @@ describe("GetStartedScreen", () => {
       options: ["custodial"],
       defaultSelected: "custodial",
       selfCustodialTemporarilyDisabled: true,
-      loading: false,
     })
 
     const { getByTestId } = render(<GetStartedScreen />)

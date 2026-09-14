@@ -16,7 +16,7 @@ jest.mock("@apollo/client", () => ({
 }))
 
 const baseState: PersistentState = {
-  schemaVersion: 16,
+  schemaVersion: 21,
   galoyInstance: { id: "Main" },
   galoyAuthToken: "",
 }
@@ -47,6 +47,7 @@ const Harness: React.FC<{ initialState: PersistentState }> = ({ initialState }) 
         setPersistentState((prev) => update(prev) ?? prev)
       },
       resetState: jest.fn(),
+      clearToken: jest.fn().mockResolvedValue(undefined),
     }),
     [persistentState],
   )

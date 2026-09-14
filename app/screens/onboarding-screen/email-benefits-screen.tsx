@@ -51,7 +51,7 @@ export const EmailBenefitsScreen: React.FC<EmailBenefitsScreenProps> = ({ route 
       ]}
       primaryLabel={LL.OnboardingScreen.emailBenefits.primaryButton()}
       onPrimaryAction={handlePrimaryAction}
-      secondaryLabel={LL.UpgradeAccountModal.notNow()}
+      secondaryLabel={LL.common.notNow()}
       onSecondaryAction={handleSecondaryAction}
       iconName="email-add"
     />

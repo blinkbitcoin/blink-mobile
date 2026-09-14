@@ -9,7 +9,10 @@ import { toastShow } from "@app/utils/toast"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { useSwitchToNextProfile } from "@app/hooks/use-switch-to-next-profile"
+import {
+  SwitchProfileOutcome,
+  useSwitchToNextProfile,
+} from "@app/hooks/use-switch-to-next-profile"
 
 import { NetworkErrorCode } from "./error-code"
 import { useNetworkError } from "./network-error-context"
@@ -43,7 +46,10 @@ export const NetworkErrorComponent: React.FC = () => {
       if (!currentToken) {
         // Stale 401 from in-flight queries while the user is on self-custodial.
         if (isSelfCustodialActive) return
-        await logout()
+        // No active token right now says nothing about what is stored: a 401
+        // arriving mid-switch lands here, and erasing on it would take the
+        // account the user is switching to.
+        await logout({ preserveStoredCredentials: true })
         navigation.reset({
           index: 0,
           routes: [{ name: "getStarted" }],
@@ -59,17 +65,22 @@ export const NetworkErrorComponent: React.FC = () => {
         return
       }
 
-      const nextProfile = await switchToNextProfile(networkErrorToken)
-      if (nextProfile) {
+      const outcome = await switchToNextProfile(networkErrorToken)
+      if (outcome === SwitchProfileOutcome.Switched) {
         return
       }
 
       // Custodial session is dead but the user is on self-custodial; skip re-login modal.
       if (isSelfCustodialActive) return
 
+      // The logout below erases every saved session, which is only correct when
+      // we know there is none left. An unreadable store is ignorance, not that
+      // knowledge, so keep the list and sign out of everything else.
+      const isStoreUnreadable = outcome === SwitchProfileOutcome.ProfilesUnreadable
+
       if (!showedAlert) {
         setShowedAlert(true)
-        await logout()
+        await logout({ preserveStoredCredentials: isStoreUnreadable })
         Alert.alert(LL.common.reauth(), "", [
           {
             text: LL.common.ok(),
@@ -85,7 +96,10 @@ export const NetworkErrorComponent: React.FC = () => {
       }
     } catch (error) {
       console.error("Error handling token expiry:", error)
-      await logout()
+      // Same rule as above, and this branch knows even less: something threw
+      // mid-teardown, so the saved list stays rather than being erased on a
+      // guess. A stale entry costs one failed switch; erasing costs sessions.
+      await logout({ preserveStoredCredentials: true })
       navigation.reset({
         index: 0,
         routes: [{ name: "getStarted" }],

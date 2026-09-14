@@ -47,6 +47,14 @@ export type ParseDestinationParams = {
   inputSource?: InputSource
   displayCurrency?: string
   preferLnurlForInternalHandles?: boolean
+  /**
+   * `lnurlDomains` answers two questions at once: which hosts name one of our accounts,
+   * and which destinations are paid over the ledger. A self-custodial sender needs the
+   * first, so its own pay codes are recognised as naming an account, and cannot use the
+   * second, having no token for the intraledger mutation. Defaults to true, which is
+   * every caller that pays as a custodial account.
+   */
+  canPayIntraledger?: boolean
 }
 
 export const DestinationDirection = {
@@ -105,6 +113,7 @@ export const InvalidDestinationReason = {
   UsernameDoesNotExist: "UsernameDoesNotExist",
   SelfPayment: "SelfPayment",
   LnurlUnsupported: "LnurlUnsupported",
+  LnurlServiceError: "LnurlServiceError",
   LnurlError: "LnurlError",
   UnknownLightning: "UnknownLightning",
   UnknownOnchain: "UnknownOnchain",

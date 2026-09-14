@@ -63,9 +63,15 @@ export const DropdownComponent: React.FC<DropdownProps> = ({
 
   return (
     <>
+      {/* The row reads as its own text without the role — a screen reader is
+          told what the current answer is and not that it is standing on the
+          control for changing it. `expanded` is the other half of that: whether
+          the list this opens is already open. */}
       <TouchableWithoutFeedback
         onPress={isDisabled ? undefined : toggleModal}
         testID={testID}
+        accessibilityRole="button"
+        accessibilityState={{ disabled: isDisabled, expanded: isModalVisible }}
       >
         <View>
           <View style={[styles.fieldBackground, isDisabled && styles.disabled]}>

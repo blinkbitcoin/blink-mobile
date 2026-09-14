@@ -37,11 +37,29 @@ export type ConvertMoneyAmount = <W extends WalletOrDisplayCurrency>(
   toCurrency: W,
 ) => MoneyAmount<W>
 
+/**
+ * Carrier for the payment's X-Idempotency-Key. It is a mutable holder rather than a
+ * string so the key can be minted lazily, at send time, where a CSPRNG failure is
+ * catchable — while still being stable across every PaymentDetail rebuild that does not
+ * change the payment intent. The intent is the money movement itself: destination,
+ * settlement amount and source wallet. Setters that leave those three alone thread this
+ * same object through, so a user who backs out of the confirmation screen and re-enters
+ * retries under the original key and the backend can refuse the duplicate. Setters that
+ * change the wire payload drop it, so the next send mints a fresh key and a genuinely
+ * different payment is never deduped against the previous one.
+ *
+ * Mutating it from the send path is deliberate: the details screen keeps rebuilding the
+ * detail underneath the confirmation screen, and a plain string value could not carry a
+ * key minted after those rebuilds back to the intent. Do not "clean this up" into a value.
+ */
+export type IdempotencyKeyRef = { current?: string }
+
 export type BaseCreatePaymentDetailsParams<T extends WalletCurrency> = {
   convertMoneyAmount: ConvertMoneyAmount
   sendingWalletDescriptor: WalletDescriptor<T>
   destinationSpecifiedMemo?: string
   senderSpecifiedMemo?: string
+  idempotencyKeyRef?: IdempotencyKeyRef
 }
 
 export type SetSendingWalletDescriptor<T extends WalletCurrency> = (
@@ -137,6 +155,7 @@ type BasePaymentDetail<T extends WalletCurrency> = {
   canGetFee: boolean
   sendPaymentMutation?: SendPaymentMutation
   canSendPayment: boolean
+  idempotencyKeyRef?: IdempotencyKeyRef
   destinationSpecifiedAmount?: BtcMoneyAmount
   unitOfAccountAmount: MoneyAmount<WalletOrDisplayCurrency> // destinationSpecifiedAmount if the invoice has an amount, otherwise the amount that the user is denominating the payment in
   settlementAmount: WalletAmount<T> // the amount that will be subtracted from the sending wallet

@@ -33,6 +33,11 @@ export const createIntraledgerPaymentDetails = <T extends WalletCurrency>(
     destinationSpecifiedMemo,
   } = params
 
+  // Same holder for every rebuild that leaves the money movement alone; see
+  // IdempotencyKeyRef. Setters that change the wire payload drop it instead.
+  const idempotencyKeyRef = params.idempotencyKeyRef ?? {}
+  const paramsWithKey = { ...params, idempotencyKeyRef }
+
   const memo = destinationSpecifiedMemo || senderSpecifiedMemo
   const settlementAmount = convertMoneyAmount(
     unitOfAccountAmount,
@@ -114,7 +119,7 @@ export const createIntraledgerPaymentDetails = <T extends WalletCurrency>(
 
   const setConvertMoneyAmount = (newConvertMoneyAmount: ConvertMoneyAmount) => {
     return createIntraledgerPaymentDetails({
-      ...params,
+      ...paramsWithKey,
       convertMoneyAmount: newConvertMoneyAmount,
     })
   }
@@ -124,7 +129,7 @@ export const createIntraledgerPaymentDetails = <T extends WalletCurrency>(
     : {
         setMemo: (newMemo) =>
           createIntraledgerPaymentDetails({
-            ...params,
+            ...paramsWithKey,
             senderSpecifiedMemo: newMemo,
           }),
         canSetMemo: true,
@@ -133,6 +138,7 @@ export const createIntraledgerPaymentDetails = <T extends WalletCurrency>(
   const setAmount: SetAmount<T> = (newUnitOfAccountAmount) => {
     return createIntraledgerPaymentDetails({
       ...params,
+      idempotencyKeyRef: undefined,
       unitOfAccountAmount: newUnitOfAccountAmount,
     })
   }
@@ -142,6 +148,7 @@ export const createIntraledgerPaymentDetails = <T extends WalletCurrency>(
   ) => {
     return createIntraledgerPaymentDetails({
       ...params,
+      idempotencyKeyRef: undefined,
       sendingWalletDescriptor: newSendingWalletDescriptor,
     })
   }
@@ -159,6 +166,7 @@ export const createIntraledgerPaymentDetails = <T extends WalletCurrency>(
     setConvertMoneyAmount,
     setAmount,
     canSetAmount: true,
+    idempotencyKeyRef,
     ...setMemo,
     ...sendPaymentAndGetFee,
   } as const

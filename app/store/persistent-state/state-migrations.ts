@@ -1,4 +1,5 @@
 import { GALOY_INSTANCES, GaloyInstance, GaloyInstanceInput } from "@app/config"
+import { AccountMode } from "@app/types/account"
 import { DefaultAccountId } from "@app/types/wallet"
 
 type PersistentState_3 = {
@@ -162,8 +163,172 @@ type PersistentState_16 = {
   balanceHidden?: boolean
 }
 
-const migrate16ToCurrent = (state: PersistentState_16): Promise<PersistentState> =>
+type PersistentState_17 = {
+  schemaVersion: 17
+  galoyInstance: GaloyInstanceInput
+  galoyAuthToken: string
+  activeAccountId?: string
+  selfCustodialDefaultWalletCurrency?: "BTC" | "USD"
+  selfCustodialDefaultWalletCurrencyByAccountId?: Record<string, "BTC" | "USD">
+  selfCustodialDisplayCurrencyByAccountId?: Record<string, string>
+  selfCustodialLanguageByAccountId?: Record<string, string>
+  themeByAccountId?: Record<string, "system" | "light" | "dark">
+  defaultAccountModalShownByAccountId?: Record<string, boolean>
+  // Quiz progress for accounts the backend keeps no quiz record for (self-custodial).
+  completedQuizIdsByAccountId?: Record<string, string[]>
+  // "Always hide balance" setting. It used to live on the Apollo cache, which only
+  // restores when an auth token is present and is purged on logout, so the setting
+  // silently reset for self-custodial users.
+  alwaysHideBalance?: boolean
+  // The visibility the user last left the app in, consulted only when alwaysHideBalance
+  // is off. Device-wide, not per-account: hiding is about who can see the screen.
+  balanceHidden?: boolean
+}
+
+type PersistentState_18 = {
+  schemaVersion: 18
+  galoyInstance: GaloyInstanceInput
+  galoyAuthToken: string
+  activeAccountId?: string
+  selfCustodialDefaultWalletCurrency?: "BTC" | "USD"
+  selfCustodialDefaultWalletCurrencyByAccountId?: Record<string, "BTC" | "USD">
+  selfCustodialDisplayCurrencyByAccountId?: Record<string, string>
+  selfCustodialLanguageByAccountId?: Record<string, string>
+  themeByAccountId?: Record<string, "system" | "light" | "dark">
+  defaultAccountModalShownByAccountId?: Record<string, boolean>
+  // Quiz progress for accounts the backend keeps no quiz record for (self-custodial).
+  completedQuizIdsByAccountId?: Record<string, string[]>
+  // "Always hide balance" setting. It used to live on the Apollo cache, which only
+  // restores when an auth token is present and is purged on logout, so the setting
+  // silently reset for self-custodial users.
+  alwaysHideBalance?: boolean
+  // The visibility the user last left the app in, consulted only when alwaysHideBalance
+  // is off. Device-wide, not per-account: hiding is about who can see the screen.
+  balanceHidden?: boolean
+  selfCustodialAccountModeByAccountId?: Record<string, AccountMode>
+}
+
+type PersistentState_19 = {
+  schemaVersion: 19
+  galoyInstance: GaloyInstanceInput
+  galoyAuthToken: string
+  activeAccountId?: string
+  selfCustodialDefaultWalletCurrency?: "BTC" | "USD"
+  selfCustodialDefaultWalletCurrencyByAccountId?: Record<string, "BTC" | "USD">
+  selfCustodialDisplayCurrencyByAccountId?: Record<string, string>
+  selfCustodialLanguageByAccountId?: Record<string, string>
+  themeByAccountId?: Record<string, "system" | "light" | "dark">
+  defaultAccountModalShownByAccountId?: Record<string, boolean>
+  // Quiz progress for accounts the backend keeps no quiz record for (self-custodial).
+  completedQuizIdsByAccountId?: Record<string, string[]>
+  // "Always hide balance" setting. It used to live on the Apollo cache, which only
+  // restores when an auth token is present and is purged on logout, so the setting
+  // silently reset for self-custodial users.
+  alwaysHideBalance?: boolean
+  // The visibility the user last left the app in, consulted only when alwaysHideBalance
+  // is off. Device-wide, not per-account: hiding is about who can see the screen.
+  balanceHidden?: boolean
+  selfCustodialAccountModeByAccountId?: Record<string, AccountMode>
+  // Accounts whose Stable Balance was switched off by Anon Mode, not by the user.
+  stableBalanceAnonPausedByAccountId?: Record<string, boolean>
+}
+
+type PersistentState_20 = {
+  schemaVersion: 20
+  galoyInstance: GaloyInstanceInput
+  galoyAuthToken: string
+  activeAccountId?: string
+  selfCustodialDefaultWalletCurrency?: "BTC" | "USD"
+  selfCustodialDefaultWalletCurrencyByAccountId?: Record<string, "BTC" | "USD">
+  selfCustodialDisplayCurrencyByAccountId?: Record<string, string>
+  selfCustodialLanguageByAccountId?: Record<string, string>
+  themeByAccountId?: Record<string, "system" | "light" | "dark">
+  defaultAccountModalShownByAccountId?: Record<string, boolean>
+  // Quiz progress for accounts the backend keeps no quiz record for (self-custodial).
+  completedQuizIdsByAccountId?: Record<string, string[]>
+  // "Always hide balance" setting. It used to live on the Apollo cache, which only
+  // restores when an auth token is present and is purged on logout, so the setting
+  // silently reset for self-custodial users.
+  alwaysHideBalance?: boolean
+  // The visibility the user last left the app in, consulted only when alwaysHideBalance
+  // is off. Device-wide, not per-account: hiding is about who can see the screen.
+  balanceHidden?: boolean
+  selfCustodialAccountModeByAccountId?: Record<string, AccountMode>
+  // Accounts whose Stable Balance was switched off by Anon Mode, not by the user.
+  stableBalanceAnonPausedByAccountId?: Record<string, boolean>
+  // The mode the LNURL server last confirmed, so a mode is pushed once rather than on
+  // every launch: each Enhanced push costs the server a paid country lookup.
+  selfCustodialServerAccountModeByAccountId?: Record<string, AccountMode>
+}
+
+type PersistentState_21 = {
+  schemaVersion: 21
+  galoyInstance: GaloyInstanceInput
+  galoyAuthToken: string
+  activeAccountId?: string
+  selfCustodialDefaultWalletCurrency?: "BTC" | "USD"
+  selfCustodialDefaultWalletCurrencyByAccountId?: Record<string, "BTC" | "USD">
+  selfCustodialDisplayCurrencyByAccountId?: Record<string, string>
+  selfCustodialLanguageByAccountId?: Record<string, string>
+  themeByAccountId?: Record<string, "system" | "light" | "dark">
+  defaultAccountModalShownByAccountId?: Record<string, boolean>
+  // Quiz progress for accounts the backend keeps no quiz record for (self-custodial).
+  completedQuizIdsByAccountId?: Record<string, string[]>
+  // "Always hide balance" setting. It used to live on the Apollo cache, which only
+  // restores when an auth token is present and is purged on logout, so the setting
+  // silently reset for self-custodial users.
+  alwaysHideBalance?: boolean
+  // The visibility the user last left the app in, consulted only when alwaysHideBalance
+  // is off. Device-wide, not per-account: hiding is about who can see the screen.
+  balanceHidden?: boolean
+  selfCustodialAccountModeByAccountId?: Record<string, AccountMode>
+  // Accounts whose Stable Balance was switched off by Anon Mode, not by the user.
+  stableBalanceAnonPausedByAccountId?: Record<string, boolean>
+  // The mode the LNURL server last confirmed, so a mode is pushed once rather than on
+  // every launch: each Enhanced push costs the server a paid country lookup.
+  selfCustodialServerAccountModeByAccountId?: Record<string, AccountMode>
+  // Last transaction seen per currency, for accounts whose Apollo cache is never
+  // restored from disk (self-custodial). Custodial keeps this in the cache itself.
+  txLastSeenByAccountId?: Record<string, { btcId: string; usdId: string }>
+}
+
+const migrate21ToCurrent = (state: PersistentState_21): Promise<PersistentState> =>
   Promise.resolve(state)
+
+/** Adds the per-account self-custodial last-seen transaction; nothing to backfill. */
+const migrate20ToCurrent = (state: PersistentState_20): Promise<PersistentState> =>
+  migrate21ToCurrent({ ...state, schemaVersion: 21 })
+
+/** Adds the optional per-account server-confirmed mode. Deliberately not backfilled from
+ *  the local mode: an account that chose one before this version has never told the
+ *  server, so leaving it empty is what makes the first push happen. */
+const migrate19ToCurrent = (state: PersistentState_19): Promise<PersistentState> =>
+  migrate20ToCurrent({ ...state, schemaVersion: 20 })
+
+/** Adds the optional per-account Anon pause marker; nothing to backfill. */
+const migrate18ToCurrent = (state: PersistentState_18): Promise<PersistentState> =>
+  migrate19ToCurrent({ ...state, schemaVersion: 19 })
+
+/** Adds the optional per-account self-custodial region mode; nothing to backfill. */
+const migrate17ToCurrent = (state: PersistentState_17): Promise<PersistentState> =>
+  migrate18ToCurrent({ ...state, schemaVersion: 18 })
+
+/**
+ * Drops the four persisted region latches. A determined restriction must no longer
+ * outlive the session that set it, so the fields are discarded rather than carried
+ * forward: a user previously latched into a restricted region is re-evaluated live on
+ * the next launch, with no action on their part.
+ */
+const migrate16ToCurrent = (state: PersistentState_16): Promise<PersistentState> => {
+  const {
+    stablesatsRestrictedCustodial,
+    stableTokenTransferBlocked,
+    stablesatsTransferBlocked,
+    stableTokenRestricted,
+    ...withoutLatches
+  } = state
+  return migrate17ToCurrent({ ...withoutLatches, schemaVersion: 17 })
+}
 
 const migrate15ToCurrent = (state: PersistentState_15): Promise<PersistentState> =>
   migrate16ToCurrent({ ...state, schemaVersion: 16 })
@@ -294,6 +459,11 @@ type StateMigrations = {
   14: (state: PersistentState_14) => Promise<PersistentState>
   15: (state: PersistentState_15) => Promise<PersistentState>
   16: (state: PersistentState_16) => Promise<PersistentState>
+  17: (state: PersistentState_17) => Promise<PersistentState>
+  18: (state: PersistentState_18) => Promise<PersistentState>
+  19: (state: PersistentState_19) => Promise<PersistentState>
+  20: (state: PersistentState_20) => Promise<PersistentState>
+  21: (state: PersistentState_21) => Promise<PersistentState>
 }
 
 const stateMigrations: StateMigrations = {
@@ -311,12 +481,17 @@ const stateMigrations: StateMigrations = {
   14: migrate14ToCurrent,
   15: migrate15ToCurrent,
   16: migrate16ToCurrent,
+  17: migrate17ToCurrent,
+  18: migrate18ToCurrent,
+  19: migrate19ToCurrent,
+  20: migrate20ToCurrent,
+  21: migrate21ToCurrent,
 }
 
-export type PersistentState = PersistentState_16
+export type PersistentState = PersistentState_21
 
 export const defaultPersistentState: PersistentState = {
-  schemaVersion: 16,
+  schemaVersion: 21,
   galoyInstance: { id: "Main" },
   galoyAuthToken: "",
 }
@@ -340,11 +515,41 @@ export const migratePersistentState = async (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: any,
 ): Promise<MigrationResult> => {
-  if (!data || !(data.schemaVersion in stateMigrations)) {
+  if (!data) {
     return { status: MigrationStatus.NoData }
   }
-  const schemaVersion: 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 =
-    data.schemaVersion
+  if (!(data.schemaVersion in stateMigrations)) {
+    // A blob we can't read is not a fresh install — a downgrade from a future
+    // schema lands here. Failed keeps the keychain untouched and quarantines a
+    // redacted copy instead of destroying the session credential.
+    return {
+      status: MigrationStatus.Failed,
+      error: new Error(
+        `Unrecognized persistent state schemaVersion: ${String(data.schemaVersion)}`,
+      ),
+      rawData: data,
+    }
+  }
+  const schemaVersion:
+    | 3
+    | 4
+    | 5
+    | 6
+    | 7
+    | 8
+    | 9
+    | 10
+    | 11
+    | 12
+    | 13
+    | 14
+    | 15
+    | 16
+    | 17
+    | 18
+    | 19
+    | 20
+    | 21 = data.schemaVersion
   try {
     const migration = stateMigrations[schemaVersion]
     const state = await migration(data)

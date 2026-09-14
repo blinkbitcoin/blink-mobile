@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react"
-import { ActivityIndicator, Pressable, View } from "react-native"
+import { View } from "react-native"
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
-import { makeStyles, Text, useTheme } from "@rn-vui/themed"
+import { makeStyles, Text } from "@rn-vui/themed"
 
-import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { OptionCard, OptionCardGroup } from "@app/components/option-card-group"
 import { Screen } from "@app/components/screen"
 import {
   ACCOUNT_OPTION_TO_FLOW,
@@ -13,42 +13,53 @@ import {
   useAccountTypeOptions,
 } from "@app/hooks/use-account-type-options"
 import { useCreationBlock } from "@app/hooks/use-creation-block"
+import { useIsMounted } from "@app/hooks/use-is-mounted"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import {
+  ChooseExperienceContinueRoute,
+  RootStackParamList,
+} from "@app/navigation/stack-param-lists"
 import { AccountTypeMode } from "@app/types/account"
 import { testProps } from "@app/utils/testProps"
 
 import { PhoneLoginInitiateType } from "../phone-auth-screen"
 
+/** Ordered here rather than by the options list, so the cards keep a stable place. */
+const CARD_ORDER = [AccountOption.Custodial, AccountOption.SelfCustodial]
+
 export const AccountTypeSelectionScreen: React.FC = () => {
   const styles = useStyles()
-  const {
-    theme: { colors },
-  } = useTheme()
   const { LL } = useI18nContext()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const route = useRoute<RouteProp<RootStackParamList, "accountTypeSelection">>()
   const { mode } = route.params
   const isCreateMode = mode === AccountTypeMode.Create
-  const {
-    options,
-    defaultSelected,
-    selfCustodialTemporarilyDisabled,
-    loading: detectingCountry,
-  } = useAccountTypeOptions(mode)
-  const { isCreationBlocked, loading: detectingRegion } = useCreationBlock()
+  const { options, defaultSelected, selfCustodialTemporarilyDisabled } =
+    useAccountTypeOptions()
+  const { checkBlockReason, isChecking, isFirstSignupRuleReady } = useCreationBlock()
+  const isMounted = useIsMounted()
   const [selected, setSelected] = useState<AccountOption | null>(defaultSelected)
 
   useEffect(() => {
     if (defaultSelected && !selected) setSelected(defaultSelected)
   }, [defaultSelected, selected])
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     if (!selected) return
 
     if (isCreateMode) {
-      if (isCreationBlocked(selected)) {
-        navigation.navigate("unsupportedRegion")
+      /** Self-custodial is answered after the mode screen instead: Anon reads no location
+       *  at all, and the mode is not chosen yet. */
+      if (selected === AccountOption.SelfCustodial) {
+        navigation.navigate("selfCustodialChooseExperience", {
+          onContinue: { route: ChooseExperienceContinueRoute.AcceptTerms },
+        })
+        return
+      }
+      const blockReason = await checkBlockReason(selected)
+      if (!isMounted()) return
+      if (blockReason) {
+        navigation.navigate("unsupportedRegion", { reason: blockReason })
         return
       }
       navigation.navigate("acceptTermsAndConditions", {
@@ -67,11 +78,43 @@ export const AccountTypeSelectionScreen: React.FC = () => {
     navigation.navigate("selfCustodialRestoreMethod")
   }
 
-  const isSelected = (option: AccountOption) => selected === option
-  const showSelfCustodial = options.includes(AccountOption.SelfCustodial)
-  const showCustodial = options.includes(AccountOption.Custodial)
-  const isContinueDisabled =
-    !selected || detectingCountry || (isCreateMode && detectingRegion)
+  /** The account count behind `isFirstSignupRuleReady` is read by one path only: the
+   *  custodial creation, whose first-signup rule needs it. Restore navigates straight to
+   *  login or the restore method, and a self-custodial creation is answered after the mode
+   *  screen, so neither ever asks. Waiting on it in those modes disabled Continue over a
+   *  rule that was never going to be consulted, and the registry re-hydrates whenever the
+   *  active account changes, so the wait could return mid-session and swallow a press. */
+  const isFirstSignupRuleConsulted = isCreateMode && selected === AccountOption.Custodial
+  const isRuleStillHydrating = isFirstSignupRuleConsulted && !isFirstSignupRuleReady
+  const isContinueDisabled = !selected || isChecking || isRuleStillHydrating
+
+  /** A selection changed mid-check would leave the answer describing the option the user
+   *  moved away from, so the cards hold still until it lands. */
+  const handleSelect = (option: AccountOption) => {
+    if (isChecking) return
+    setSelected(option)
+  }
+
+  const cardsByOption: Record<AccountOption, OptionCard<AccountOption>> = {
+    [AccountOption.Custodial]: {
+      key: AccountOption.Custodial,
+      icon: "cloud",
+      title: LL.AccountTypeSelectionScreen.custodialLabel(),
+      description: LL.AccountTypeSelectionScreen.custodialDescription(),
+      testID: "custodial-option",
+    },
+    [AccountOption.SelfCustodial]: {
+      key: AccountOption.SelfCustodial,
+      icon: "key-outline",
+      title: LL.AccountTypeSelectionScreen.selfCustodialLabel(),
+      description: LL.AccountTypeSelectionScreen.selfCustodialDescription(),
+      testID: "self-custodial-option",
+    },
+  }
+
+  const cardOptions = CARD_ORDER.filter((option) => options.includes(option)).map(
+    (option) => cardsByOption[option],
+  )
 
   return (
     <Screen>
@@ -91,61 +134,11 @@ export const AccountTypeSelectionScreen: React.FC = () => {
             </View>
           )}
 
-          {detectingCountry ? (
-            <View style={styles.loaderContainer}>
-              <ActivityIndicator color={colors.primary} />
-            </View>
-          ) : (
-            <View style={styles.grid}>
-              {showCustodial && (
-                <Pressable
-                  style={[
-                    styles.card,
-                    isSelected(AccountOption.Custodial) && {
-                      borderColor: colors.primary,
-                      backgroundColor: colors.grey6,
-                    },
-                  ]}
-                  onPress={() => setSelected(AccountOption.Custodial)}
-                  {...testProps("custodial-option")}
-                >
-                  <View style={styles.iconContainer}>
-                    <GaloyIcon name="cloud" size={20} />
-                  </View>
-                  <Text style={styles.cardTitle}>
-                    {LL.AccountTypeSelectionScreen.custodialLabel()}
-                  </Text>
-                  <Text style={styles.cardDescription}>
-                    {LL.AccountTypeSelectionScreen.custodialDescription()}
-                  </Text>
-                </Pressable>
-              )}
-
-              {showSelfCustodial && (
-                <Pressable
-                  style={[
-                    styles.card,
-                    isSelected(AccountOption.SelfCustodial) && {
-                      borderColor: colors.primary,
-                      backgroundColor: colors.grey6,
-                    },
-                  ]}
-                  onPress={() => setSelected(AccountOption.SelfCustodial)}
-                  {...testProps("self-custodial-option")}
-                >
-                  <View style={styles.iconContainer}>
-                    <GaloyIcon name="key-outline" size={20} />
-                  </View>
-                  <Text style={styles.cardTitle}>
-                    {LL.AccountTypeSelectionScreen.selfCustodialLabel()}
-                  </Text>
-                  <Text style={styles.cardDescription}>
-                    {LL.AccountTypeSelectionScreen.selfCustodialDescription()}
-                  </Text>
-                </Pressable>
-              )}
-            </View>
-          )}
+          <OptionCardGroup
+            options={cardOptions}
+            selectedKey={selected}
+            onSelect={handleSelect}
+          />
         </View>
 
         <View style={styles.ctaContainer}>
@@ -156,6 +149,7 @@ export const AccountTypeSelectionScreen: React.FC = () => {
                 : LL.AccountTypeSelectionScreen.chooseMethod()
             }
             onPress={handleContinue}
+            loading={isChecking}
             disabled={isContinueDisabled}
             {...testProps("continue-button")}
           />
@@ -191,45 +185,6 @@ const useStyles = makeStyles(({ colors }) => ({
     fontSize: 13,
     lineHeight: 18,
     color: colors.grey1,
-    textAlign: "center",
-  },
-  loaderContainer: {
-    paddingVertical: 40,
-    alignItems: "center",
-  },
-  grid: {
-    flexDirection: "row",
-    gap: 10,
-  },
-  card: {
-    flex: 1,
-    maxWidth: "50%",
-    backgroundColor: colors.grey5,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "transparent",
-    paddingHorizontal: 14,
-    paddingVertical: 30,
-    alignItems: "center",
-    gap: 10,
-  },
-  iconContainer: {
-    width: 32,
-    height: 32,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  cardTitle: {
-    fontSize: 14,
-    fontWeight: "700",
-    lineHeight: 20,
-    color: colors.black,
-    textAlign: "center",
-  },
-  cardDescription: {
-    fontSize: 12,
-    lineHeight: 18,
-    color: colors.grey2,
     textAlign: "center",
   },
   ctaContainer: {

@@ -15,6 +15,11 @@ jest.mock("@app/self-custodial/hooks/use-auto-convert-listener", () => ({
   useAutoConvertListener: () => mockListener(),
 }))
 
+const mockAnonStableBalanceDeactivation = jest.fn()
+jest.mock("@app/self-custodial/hooks/use-anon-stable-balance-deactivation", () => ({
+  useAnonStableBalanceDeactivation: () => mockAnonStableBalanceDeactivation(),
+}))
+
 describe("AutoConvertListenerMount", () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -23,6 +28,11 @@ describe("AutoConvertListenerMount", () => {
   it("mounts the listener hook exactly once per render", () => {
     render(<AutoConvertListenerMount />)
     expect(mockListener).toHaveBeenCalledTimes(1)
+  })
+
+  it("mounts the Anon stable-balance deactivation hook exactly once per render", () => {
+    render(<AutoConvertListenerMount />)
+    expect(mockAnonStableBalanceDeactivation).toHaveBeenCalledTimes(1)
   })
 
   it("renders null so it contributes no UI to the tree", () => {

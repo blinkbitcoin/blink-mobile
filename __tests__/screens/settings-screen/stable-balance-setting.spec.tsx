@@ -18,6 +18,15 @@ jest.mock("@app/config/feature-flags-context", () => ({
   useFeatureFlags: () => mockUseFeatureFlags(),
 }))
 
+let mockIsAnonMode = false
+const mockPromptEnhancedMode = jest.fn()
+jest.mock("@app/self-custodial/hooks/use-self-custodial-account-mode", () => ({
+  useSelfCustodialAccountMode: () => ({ isAnonMode: mockIsAnonMode }),
+}))
+jest.mock("@app/components/enhanced-mode-prompt", () => ({
+  useEnhancedModePrompt: () => ({ promptEnhancedMode: mockPromptEnhancedMode }),
+}))
+
 jest.mock("@app/hooks/use-account-registry", () => ({
   useAccountRegistry: () => mockUseAccountRegistry(),
 }))
@@ -42,6 +51,7 @@ const renderRow = () =>
 describe("StableBalanceSetting", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockIsAnonMode = false
     mockUseFeatureFlags.mockReturnValue({
       nonCustodialEnabled: true,
       stableBalanceEnabled: true,
@@ -63,6 +73,18 @@ describe("StableBalanceSetting", () => {
     fireEvent.press(getByText("Stable Balance"))
 
     expect(mockNavigate).toHaveBeenCalledWith("stableBalanceSettings")
+  })
+
+  it("greys the row and offers the Enhanced prompt in Anon mode", () => {
+    mockIsAnonMode = true
+
+    const { getByLabelText } = renderRow()
+
+    /** The gated row leaves the accessibility tree; the gate stands in for it. */
+    fireEvent.press(getByLabelText("Stable Balance"))
+
+    expect(mockPromptEnhancedMode).toHaveBeenCalledTimes(1)
+    expect(mockNavigate).not.toHaveBeenCalled()
   })
 
   it("renders nothing when nonCustodialEnabled is false", () => {

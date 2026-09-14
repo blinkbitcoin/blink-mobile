@@ -4,6 +4,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { useSettingsScreenQuery } from "@app/graphql/generated"
+import { useLevel1DailyLimit } from "@app/hooks"
 import {
   OnboardingStackParamList,
   RootStackParamList,
@@ -19,6 +20,7 @@ export const WelcomeLevel1Screen: React.FC<WelcomeLevel1ScreenProps> = ({ route 
   const { LL } = useI18nContext()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { data, loading } = useSettingsScreenQuery()
+  const { limit } = useLevel1DailyLimit()
 
   const { onboarding } = route.params
 
@@ -46,7 +48,7 @@ export const WelcomeLevel1Screen: React.FC<WelcomeLevel1ScreenProps> = ({ route 
       title={LL.OnboardingScreen.welcomeLevel1.title()}
       descriptions={[
         LL.OnboardingScreen.welcomeLevel1.receiveBitcoinDescription(),
-        LL.OnboardingScreen.welcomeLevel1.dailyLimitDescription(),
+        LL.OnboardingScreen.welcomeLevel1.dailyLimitDescription({ limit }),
         LL.OnboardingScreen.welcomeLevel1.onchainDescription(),
       ]}
       primaryLabel={LL.common.next()}

@@ -1,9 +1,10 @@
-jest.mock("@app/hooks/use-backup-nudge-state", () => ({
+jest.mock("@app/self-custodial/hooks/use-backup-nudge-state", () => ({
   useBackupNudgeState: () => ({
     shouldShowBanner: false,
     shouldShowModal: false,
     shouldShowSettingsBanner: false,
     dismissBanner: jest.fn(),
+    dismissModal: jest.fn(),
   }),
 }))
 
@@ -196,11 +197,31 @@ jest.mock("@apollo/client", () => {
   }
 })
 
-/** Mocked wholesale: the real module warns at load time when no API key is configured. */
-jest.mock("@app/utils/ip-country-lookup", () => ({
-  DEFAULT_ADAPTERS: [],
-  resolveIpCountryCode: jest.fn(async () => undefined),
-  resolveIpCountryCodeCached: jest.fn(async () => undefined),
+jest.mock("@app/utils/ip-country-lookup")
+
+let mockIsAnonMode = false
+jest.mock("@app/self-custodial/hooks/use-self-custodial-account-mode", () => ({
+  useSelfCustodialAccountMode: () => ({ isAnonMode: mockIsAnonMode }),
+}))
+
+const mockPromptEnhancedMode = jest.fn()
+jest.mock("@app/components/enhanced-mode-prompt", () => ({
+  ...jest.requireActual("@app/components/enhanced-mode-prompt"),
+  useEnhancedModePrompt: () => ({
+    promptEnhancedMode: mockPromptEnhancedMode,
+    isEnhancedModePromptVisible: false,
+  }),
+}))
+
+let mockIsRestrictedRegion = false
+const mockPresentRestrictedRegionModal = jest.fn()
+jest.mock("@app/components/restricted-region", () => ({
+  ...jest.requireActual("@app/components/restricted-region"),
+  useRestrictedRegion: () => ({
+    isRestrictedRegion: mockIsRestrictedRegion,
+    isRestrictedRegionModalVisible: false,
+    presentRestrictedRegionModal: mockPresentRestrictedRegionModal,
+  }),
 }))
 
 /** The fake Apollo client above has no writeQuery, so the real updateCountryCode would throw and warn on every device-location render. */
@@ -319,6 +340,8 @@ describe("Settings Screen", () => {
     // clearAllMocks does not reset return values, so re-arm the default explicitly
     mockUseIsAuthed.mockReturnValue(true)
     mockAccountRegistryOverride.activeAccount = undefined
+    mockIsRestrictedRegion = false
+    mockIsAnonMode = false
     loadLocale("en")
     testState = createTestState()
   })
@@ -475,6 +498,53 @@ describe("Settings Screen", () => {
 
     const elements = await screen.findAllByText("test1@blink.sv")
     expect(elements.length).toBeGreaterThan(0)
+
+    await flushEffects()
+  })
+
+  it("shows the restricted-region banner while the region is restricted", async () => {
+    mockIsRestrictedRegion = true
+
+    render(
+      <ContextForScreen>
+        <LoggedInWithUsername mock={mocksWithUsername} />
+      </ContextForScreen>,
+    )
+
+    expect(await screen.findByTestId("restricted-region-banner")).toBeTruthy()
+
+    await flushEffects()
+  })
+
+  it("hides the restricted-region banner outside a restricted region", async () => {
+    render(
+      <ContextForScreen>
+        <LoggedInWithUsername mock={mocksWithUsername} />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    expect(screen.queryByTestId("restricted-region-banner")).toBeNull()
+  })
+
+  /** While sanctioned the group is gated behind DisabledFeature, which takes its
+   *  children out of the accessibility tree and stands in for them: the label only
+   *  resolves to a pressable while the gate is on. */
+  it("gates Ways to get paid behind the sanctions modal while restricted", async () => {
+    mockIsRestrictedRegion = true
+
+    render(
+      <ContextForScreen>
+        <LoggedInWithUsername mock={mocksWithUsername} />
+      </ContextForScreen>,
+    )
+
+    const gate = await screen.findByLabelText("Ways to get paid")
+    fireEvent.press(gate)
+
+    expect(mockPresentRestrictedRegionModal).toHaveBeenCalledTimes(1)
+    expect(mockPromptEnhancedMode).not.toHaveBeenCalled()
 
     await flushEffects()
   })
@@ -691,5 +761,54 @@ describe("Settings Screen", () => {
     )
 
     await flushEffects()
+  })
+})
+
+describe("Settings Screen Anon gating", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    loadLocale("en")
+    mockIsAnonMode = false
+    mockUseIsAuthed.mockReturnValue(true)
+  })
+
+  it("leaves the Ways-to-get-paid group open outside Anon mode", async () => {
+    render(
+      <ContextForScreen>
+        <SettingsScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    expect(screen.queryByLabelText("Ways to get paid")).toBeNull()
+  })
+
+  it("gates the Ways-to-get-paid group in Anon mode", async () => {
+    mockIsAnonMode = true
+
+    render(
+      <ContextForScreen>
+        <SettingsScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    /** The gated rows leave the accessibility tree; the gate stands in by name. */
+    expect(screen.getByLabelText("Ways to get paid")).toBeTruthy()
+  })
+
+  it("routes a tap on the gated group to the Enhanced prompt", async () => {
+    mockIsAnonMode = true
+
+    render(
+      <ContextForScreen>
+        <SettingsScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    fireEvent.press(screen.getByLabelText("Ways to get paid"))
+
+    expect(mockPromptEnhancedMode).toHaveBeenCalledTimes(1)
   })
 })

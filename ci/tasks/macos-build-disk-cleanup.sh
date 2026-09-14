@@ -4,10 +4,13 @@ set -euo pipefail
 
 MODE="${1:-check}"
 MIN_FREE_GB="${MIN_BUILD_FREE_GB:-${2:-30}}"
-HARD_MIN_FREE_GB="${MIN_BUILD_HARD_FREE_GB:-10}"
-XCODE_ARTIFACT_MAX_AGE_DAYS="${XCODE_ARTIFACT_MAX_AGE_DAYS:-14}"
-ROOT_DERIVED_DATA_MAX_GB="${ROOT_DERIVED_DATA_MAX_GB:-20}"
-BUILD_CACHE_MAX_GB="${BUILD_CACHE_MAX_GB:-5}"
+# Below this, "pre" fails the build outright instead of just warning: a build
+# that starts this tight on space reliably runs out of disk mid-compile
+# rather than failing fast, which wastes a ~13min build slot on top of it.
+HARD_MIN_FREE_GB="${MIN_BUILD_HARD_FREE_GB:-20}"
+XCODE_ARTIFACT_MAX_AGE_DAYS="${XCODE_ARTIFACT_MAX_AGE_DAYS:-2}"
+ROOT_DERIVED_DATA_MAX_GB="${ROOT_DERIVED_DATA_MAX_GB:-3}"
+BUILD_CACHE_MAX_GB="${BUILD_CACHE_MAX_GB:-1}"
 CI_ROOT="${CI_ROOT:-$(pwd)}"
 DISK_CHECK_PATH="${DISK_CHECK_PATH:-$CI_ROOT}"
 CONCOURSE_WORKDIR="${CONCOURSE_WORKDIR:-/Users/m1/concourse/workdir}"
@@ -209,6 +212,11 @@ cleanup_workspace_build_outputs() {
   remove_path "$CI_ROOT/repo/android/build"
   remove_path "$CI_ROOT/repo/ios/build"
   remove_path "$CI_ROOT/repo/ios/Blink.ipa"
+  # build.sh always runs `nix develop -c yarn install` before building, so
+  # node_modules is regenerated from scratch every run regardless of what was
+  # here before — safe to drop, and it was sitting at 7.5G unused between
+  # builds in the 2026-08-24 disk-full incident.
+  remove_path "$CI_ROOT/repo/node_modules"
 }
 
 cleanup_xcode_artifacts() {

@@ -1,5 +1,5 @@
 import React, { useEffect } from "react"
-import { ActivityIndicator, Dimensions, View, I18nManager } from "react-native"
+import { ActivityIndicator, I18nManager, useWindowDimensions, View } from "react-native"
 import { Gesture, GestureDetector } from "react-native-gesture-handler"
 import Animated, {
   Extrapolate,
@@ -18,8 +18,11 @@ import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon } from "../galoy-icon"
 
-const BUTTON_WIDTH = Dimensions.get("screen").width - 40
-const SWIPE_RANGE = BUTTON_WIDTH - 50
+/** The track spans the screen less the padding its callers put either side. */
+const TRACK_INSET = 40
+/** How far short of the track's end the travel stops. Not the handle's width, which is
+ *  60: this is the pre-existing figure, kept so the commit threshold does not move. */
+const TRAVEL_INSET = 50
 const isRTL = I18nManager.isRTL
 
 type SwipeButtonPropsType = {
@@ -40,7 +43,10 @@ const GaloySliderButton = ({
   const {
     theme: { colors },
   } = useTheme()
-  const styles = useStyles()
+  const { width: screenWidth } = useWindowDimensions()
+  const buttonWidth = screenWidth - TRACK_INSET
+  const swipeRange = buttonWidth - TRAVEL_INSET
+  const styles = useStyles({ buttonWidth })
 
   const X = useSharedValue(0)
 
@@ -56,12 +62,12 @@ const GaloySliderButton = ({
     .onUpdate((e) => {
       const newValue = Math.abs(e.translationX)
 
-      if (newValue >= 0 && newValue <= SWIPE_RANGE) {
+      if (newValue >= 0 && newValue <= swipeRange) {
         X.value = newValue
       }
     })
     .onEnd(() => {
-      if (X.value < SWIPE_RANGE * 0.6) {
+      if (X.value < swipeRange * 0.6) {
         X.value = withSpring(0)
       } else {
         runOnJS(onSwipe)()
@@ -72,8 +78,8 @@ const GaloySliderButton = ({
     swipeButton: useAnimatedStyle(() => {
       const translateX = interpolate(
         X.value,
-        [20, BUTTON_WIDTH],
-        [0, BUTTON_WIDTH],
+        [20, buttonWidth],
+        [0, buttonWidth],
         Extrapolation.CLAMP,
       )
 
@@ -84,23 +90,23 @@ const GaloySliderButton = ({
           },
         ],
       }
-    }, [X, isRTL]),
+    }, [X, isRTL, buttonWidth]),
     swipeText: useAnimatedStyle(() => {
       const translateX = interpolate(
         X.value,
-        [20, SWIPE_RANGE],
-        [0, BUTTON_WIDTH / 3],
+        [20, swipeRange],
+        [0, buttonWidth / 3],
         Extrapolate.CLAMP,
       )
       return {
-        opacity: interpolate(X.value, [0, BUTTON_WIDTH / 4], [1, 0], Extrapolate.CLAMP),
+        opacity: interpolate(X.value, [0, buttonWidth / 4], [1, 0], Extrapolate.CLAMP),
         transform: [
           {
             translateX: isRTL ? -translateX : translateX,
           },
         ],
       }
-    }, [X, isRTL]),
+    }, [X, isRTL, buttonWidth, swipeRange]),
   }
 
   return (
@@ -139,7 +145,7 @@ const GaloySliderButton = ({
   )
 }
 
-const useStyles = makeStyles(({ colors }) => ({
+const useStyles = makeStyles(({ colors }, { buttonWidth }: { buttonWidth: number }) => ({
   swipeButtonContainer: {
     height: 60,
     backgroundColor: colors.grey5,
@@ -149,7 +155,7 @@ const useStyles = makeStyles(({ colors }) => ({
     justifyContent: "center",
     alignItems: "center",
     flexDirection: "row",
-    width: BUTTON_WIDTH,
+    width: buttonWidth,
     position: "relative",
   },
   swipeButton: {

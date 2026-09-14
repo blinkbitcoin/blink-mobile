@@ -3,6 +3,7 @@ import { renderHook, act } from "@testing-library/react-hooks"
 import useDeviceLocation, {
   isBlockedCountry,
   useIpCountryCode,
+  useIpCountryLookup,
   usePhoneCountryCode,
 } from "@app/hooks/use-device-location"
 
@@ -16,9 +17,26 @@ jest.mock("libphonenumber-js/mobile", () => ({
 }))
 
 const mockResolveIpCountryCode = jest.fn()
+let mockLookupGeneration = 0
+let mockNotifyLookupReset: (() => void) | null = null
 jest.mock("@app/utils/ip-country-lookup", () => ({
   resolveIpCountryCodeCached: (...args: unknown[]) => mockResolveIpCountryCode(...args),
+  /** The hook subscribes to the session-start reset; `resetLookupGeneration` fires one. */
+  subscribeToIpCountryLookup: (listener: () => void) => {
+    mockNotifyLookupReset = listener
+    return () => {
+      mockNotifyLookupReset = null
+    }
+  },
+  getIpCountryLookupGeneration: () => mockLookupGeneration,
 }))
+
+/** Stands in for a session start dropping the shared lookup, which is what makes an
+ *  already-mounted consumer resolve again instead of keeping the last country. */
+const resetLookupGeneration = () => {
+  mockLookupGeneration += 1
+  mockNotifyLookupReset?.()
+}
 
 jest.mock("@app/utils/log-error", () => ({
   logError: (...args: unknown[]) => mockLogError(...args),
@@ -40,9 +58,15 @@ jest.mock("@app/graphql/generated", () => ({
   useSettingsScreenQuery: (...args: unknown[]) => mockUseSettingsScreenQuery(...args),
 }))
 
+let mockIsAnonMode = false
+jest.mock("@app/self-custodial/hooks/use-self-custodial-account-mode", () => ({
+  useSelfCustodialAccountMode: () => ({ isAnonMode: mockIsAnonMode }),
+}))
+
 describe("useDeviceLocation", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockIsAnonMode = false
     mockResolveIpCountryCode.mockResolvedValue(undefined)
     mockUseSettingsScreenQuery.mockReturnValue({ data: undefined })
     mockParsePhoneNumber.mockImplementation(
@@ -243,6 +267,148 @@ describe("useDeviceLocation", () => {
     expect(result.current.detectionFailed).toBe(true)
   })
 
+  describe("anon mode", () => {
+    it("resolves nothing and issues no lookup, even with a phone available", async () => {
+      mockIsAnonMode = true
+      mockUseCountryCodeQuery.mockReturnValue({
+        data: { countryCode: "SV" },
+        error: undefined,
+      })
+      mockUseSettingsScreenQuery.mockReturnValue({
+        data: { me: { phone: "+4915112345678" } },
+      })
+
+      const { result } = renderHook(() => useDeviceLocation())
+
+      await act(async () => {})
+
+      expect(result.current).toEqual({
+        countryCode: undefined,
+        loading: false,
+        detectionFailed: false,
+        source: undefined,
+      })
+      expect(mockResolveIpCountryCode).not.toHaveBeenCalled()
+      expect(mockParsePhoneNumber).not.toHaveBeenCalled()
+    })
+
+    it("does not run the IP fallback for a phone-less account", async () => {
+      mockIsAnonMode = true
+      mockUseCountryCodeQuery.mockReturnValue({
+        data: { countryCode: "SV" },
+        error: undefined,
+      })
+
+      renderHook(() => useDeviceLocation())
+
+      await act(async () => {})
+
+      expect(mockResolveIpCountryCode).not.toHaveBeenCalled()
+    })
+
+    it("stays inert on a query error", () => {
+      mockIsAnonMode = true
+      mockUseCountryCodeQuery.mockReturnValue({
+        data: undefined,
+        error: new Error("Apollo cache error"),
+      })
+
+      const { result } = renderHook(() => useDeviceLocation())
+
+      expect(result.current.loading).toBe(false)
+      expect(result.current.countryCode).toBeUndefined()
+      expect(result.current.detectionFailed).toBe(false)
+    })
+
+    it("detects normally for a custodial flow even while Anon is active", async () => {
+      mockIsAnonMode = true
+      mockUseCountryCodeQuery.mockReturnValue({
+        data: { countryCode: "SV" },
+        error: undefined,
+      })
+      mockResolveIpCountryCode.mockResolvedValue("DE")
+
+      const { result } = renderHook(() => useDeviceLocation({ isCustodialFlow: true }))
+
+      await act(async () => {})
+
+      expect(result.current.countryCode).toBe("DE")
+      expect(result.current.loading).toBe(false)
+      expect(mockResolveIpCountryCode).toHaveBeenCalled()
+    })
+
+    /** The in-flight answer must not land on a mode not allowed to know it. */
+    it("discards a lookup already in flight when Anon switches on", async () => {
+      let resolveLookup: (code: string) => void = () => undefined
+      mockResolveIpCountryCode.mockReturnValue(
+        new Promise<string>((resolve) => {
+          resolveLookup = resolve
+        }),
+      )
+      mockUseCountryCodeQuery.mockReturnValue({
+        data: { countryCode: "SV" },
+        error: undefined,
+      })
+
+      const { result, rerender } = renderHook(() => useDeviceLocation())
+
+      expect(result.current.loading).toBe(true)
+
+      mockIsAnonMode = true
+      rerender()
+
+      await act(async () => {
+        resolveLookup("DE")
+      })
+
+      expect(result.current.countryCode).toBeUndefined()
+      expect(result.current.loading).toBe(false)
+    })
+
+    it("re-arms loading for a fresh resolve when Anon switches off", async () => {
+      mockIsAnonMode = true
+      mockUseCountryCodeQuery.mockReturnValue({
+        data: { countryCode: "SV" },
+        error: undefined,
+      })
+      mockResolveIpCountryCode.mockResolvedValue("DE")
+
+      const { result, rerender } = renderHook(() => useDeviceLocation())
+
+      expect(result.current.loading).toBe(false)
+
+      mockIsAnonMode = false
+      rerender()
+
+      /** Not settled-without-a-country: the previous answer was discarded. */
+      expect(result.current.loading).toBe(true)
+
+      await act(async () => {})
+
+      expect(result.current.countryCode).toBe("DE")
+      expect(result.current.loading).toBe(false)
+    })
+
+    it("drops a country resolved before Anon switched on", async () => {
+      mockUseCountryCodeQuery.mockReturnValue({
+        data: { countryCode: "SV" },
+        error: undefined,
+      })
+      mockResolveIpCountryCode.mockResolvedValue("DE")
+
+      const { result, rerender } = renderHook(() => useDeviceLocation())
+
+      await act(async () => {})
+      expect(result.current.countryCode).toBe("DE")
+
+      mockIsAnonMode = true
+      rerender()
+
+      expect(result.current.countryCode).toBeUndefined()
+      expect(result.current.detectionFailed).toBe(false)
+    })
+  })
+
   it("marks detection failed on Apollo query error (falls back to SV)", () => {
     mockUseCountryCodeQuery.mockReturnValue({
       data: undefined,
@@ -280,6 +446,7 @@ describe("useDeviceLocation", () => {
 describe("useIpCountryCode", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockIsAnonMode = false
     mockResolveIpCountryCode.mockResolvedValue(undefined)
   })
 
@@ -312,9 +479,200 @@ describe("useIpCountryCode", () => {
   })
 })
 
+describe("useIpCountryLookup", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockIsAnonMode = false
+    mockResolveIpCountryCode.mockResolvedValue(undefined)
+  })
+
+  it("reports settled without a lookup while disabled", () => {
+    const { result } = renderHook(() => useIpCountryLookup(false))
+
+    expect(mockResolveIpCountryCode).not.toHaveBeenCalled()
+    expect(result.current).toEqual({ countryCode: undefined, isSettled: true })
+  })
+
+  it("reports settled without a lookup in Anon Mode", () => {
+    mockIsAnonMode = true
+
+    const { result } = renderHook(() => useIpCountryLookup(true))
+
+    expect(mockResolveIpCountryCode).not.toHaveBeenCalled()
+    expect(result.current).toEqual({ countryCode: undefined, isSettled: true })
+  })
+
+  it("stays unsettled while the lookup is in flight", () => {
+    mockResolveIpCountryCode.mockReturnValue(new Promise(() => {}))
+
+    const { result } = renderHook(() => useIpCountryLookup(true))
+
+    expect(result.current).toEqual({ countryCode: undefined, isSettled: false })
+  })
+
+  it("settles with the country when the lookup resolves", async () => {
+    mockResolveIpCountryCode.mockResolvedValue("HK")
+
+    const { result } = renderHook(() => useIpCountryLookup(true))
+
+    await act(async () => {})
+
+    expect(result.current).toEqual({ countryCode: "HK", isSettled: true })
+  })
+
+  it("settles without a country when every adapter fails", async () => {
+    mockResolveIpCountryCode.mockResolvedValue(undefined)
+
+    const { result } = renderHook(() => useIpCountryLookup(true))
+
+    await act(async () => {})
+
+    expect(result.current).toEqual({ countryCode: undefined, isSettled: true })
+  })
+
+  describe("a session-start reset", () => {
+    /**
+     * The reset exists to drop the previous session's answer. Reporting the old country as
+     * settled when the fresh lookup comes back empty is the cross-session latch it was added
+     * to remove, and the consumers that gate on `isSettled` cannot tell the two apart.
+     */
+    it("drops the previous country when the re-lookup finds none", async () => {
+      mockResolveIpCountryCode.mockResolvedValue("HK")
+      const { result } = renderHook(() => useIpCountryLookup(true))
+      await act(async () => {})
+      expect(result.current).toEqual({ countryCode: "HK", isSettled: true })
+
+      mockResolveIpCountryCode.mockResolvedValue(undefined)
+      await act(async () => {
+        resetLookupGeneration()
+      })
+
+      expect(result.current).toEqual({ countryCode: undefined, isSettled: true })
+    })
+
+    it("takes the new country when the re-lookup finds one", async () => {
+      mockResolveIpCountryCode.mockResolvedValue("HK")
+      const { result } = renderHook(() => useIpCountryLookup(true))
+      await act(async () => {})
+
+      mockResolveIpCountryCode.mockResolvedValue("SV")
+      await act(async () => {
+        resetLookupGeneration()
+      })
+
+      expect(result.current).toEqual({ countryCode: "SV", isSettled: true })
+    })
+
+    /** Unsettling is what makes the gates wait rather than answer from the old country. */
+    it("goes back to unsettled while the re-lookup is in flight", async () => {
+      mockResolveIpCountryCode.mockResolvedValue("HK")
+      const { result } = renderHook(() => useIpCountryLookup(true))
+      await act(async () => {})
+
+      mockResolveIpCountryCode.mockReturnValue(new Promise(() => {}))
+      act(() => {
+        resetLookupGeneration()
+      })
+
+      expect(result.current.isSettled).toBe(false)
+    })
+  })
+
+  it("discards a lookup still in flight when it gets disabled and relooks up on re-enable", async () => {
+    let resolveLookup: (code: string | undefined) => void = () => {}
+    mockResolveIpCountryCode.mockReturnValue(
+      new Promise((resolve) => {
+        resolveLookup = resolve
+      }),
+    )
+
+    const { result, rerender } = renderHook(
+      ({ enabled }: { enabled: boolean }) => useIpCountryLookup(enabled),
+      { initialProps: { enabled: true } },
+    )
+    rerender({ enabled: false })
+
+    await act(async () => {
+      resolveLookup("HK")
+    })
+
+    expect(result.current).toEqual({ countryCode: undefined, isSettled: true })
+    expect(mockResolveIpCountryCode).toHaveBeenCalledTimes(1)
+
+    mockResolveIpCountryCode.mockResolvedValue("DE")
+    rerender({ enabled: true })
+    await act(async () => {})
+
+    expect(mockResolveIpCountryCode).toHaveBeenCalledTimes(2)
+    expect(result.current).toEqual({ countryCode: "DE", isSettled: true })
+  })
+
+  it("stops reporting the country once the lookup disables", async () => {
+    mockResolveIpCountryCode.mockResolvedValue("KP")
+
+    const { result, rerender } = renderHook(
+      ({ enabled }: { enabled: boolean }) => useIpCountryLookup(enabled),
+      { initialProps: { enabled: true } },
+    )
+    await act(async () => {})
+    expect(result.current).toEqual({ countryCode: "KP", isSettled: true })
+
+    rerender({ enabled: false })
+
+    expect(result.current).toEqual({ countryCode: undefined, isSettled: true })
+  })
+
+  /** Anon overrides the caller, so no surface can leak a region through this hook. */
+  describe("anon mode", () => {
+    it("skips the lookup even when the caller enables it", async () => {
+      mockIsAnonMode = true
+      mockResolveIpCountryCode.mockResolvedValue("HK")
+
+      const { result } = renderHook(() => useIpCountryLookup(true))
+
+      await act(async () => {})
+
+      expect(result.current).toEqual({ countryCode: undefined, isSettled: true })
+      expect(mockResolveIpCountryCode).not.toHaveBeenCalled()
+    })
+
+    it("clears a country it had already resolved when Anon switches on", async () => {
+      mockResolveIpCountryCode.mockResolvedValue("HK")
+
+      const { result, rerender } = renderHook(() => useIpCountryLookup(true))
+
+      await act(async () => {})
+      expect(result.current.countryCode).toBe("HK")
+
+      mockIsAnonMode = true
+      rerender()
+
+      expect(result.current).toEqual({ countryCode: undefined, isSettled: true })
+    })
+
+    it("runs the lookup again once Anon switches off", async () => {
+      mockIsAnonMode = true
+      mockResolveIpCountryCode.mockResolvedValue("HK")
+
+      const { result, rerender } = renderHook(() => useIpCountryLookup(true))
+
+      await act(async () => {})
+      expect(mockResolveIpCountryCode).not.toHaveBeenCalled()
+
+      mockIsAnonMode = false
+      rerender()
+
+      await act(async () => {})
+
+      expect(result.current).toEqual({ countryCode: "HK", isSettled: true })
+    })
+  })
+})
+
 describe("usePhoneCountryCode", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockIsAnonMode = false
     mockUseSettingsScreenQuery.mockReturnValue({ data: undefined })
     mockParsePhoneNumber.mockImplementation(
       jest.requireActual("libphonenumber-js/mobile").parsePhoneNumber,
@@ -349,6 +707,18 @@ describe("usePhoneCountryCode", () => {
     const { result } = renderHook(() => usePhoneCountryCode())
 
     expect(result.current).toBeUndefined()
+  })
+
+  it("resolves nothing in Anon Mode even with a cached phone", () => {
+    mockIsAnonMode = true
+    mockUseSettingsScreenQuery.mockReturnValue({
+      data: { me: { phone: "+4915112345678" } },
+    })
+
+    const { result } = renderHook(() => usePhoneCountryCode())
+
+    expect(result.current).toBeUndefined()
+    expect(mockParsePhoneNumber).not.toHaveBeenCalled()
   })
 })
 

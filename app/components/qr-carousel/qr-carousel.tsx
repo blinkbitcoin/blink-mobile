@@ -44,11 +44,13 @@ const CarouselItem: React.FC<{
 export const QRCarousel = forwardRef<ICarouselInstance, QRCarouselProps>(
   ({ page0, page1, onSnap }, ref) => {
     const styles = useStyles()
-    const { width: screenWidth } = useWindowDimensions()
+    const { width: screenWidth, height: screenHeight } = useWindowDimensions()
 
+    /** Square, so it is bounded by the shorter edge rather than by the width: the two are
+     *  the same in portrait, and only the width overflows once the screen can rotate. */
     const qrContainerSize = useMemo(
-      () => Math.round(QR_TO_SCREEN_RATIO * screenWidth),
-      [screenWidth],
+      () => Math.round(QR_TO_SCREEN_RATIO * Math.min(screenWidth, screenHeight)),
+      [screenWidth, screenHeight],
     )
     const parallaxOffset = useMemo(
       () => Math.round(PARALLAX_TO_SCREEN_RATIO * screenWidth),

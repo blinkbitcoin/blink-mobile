@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react"
 
 import { WalletCurrency } from "@app/graphql/generated"
-import { useDollarBalanceRestricted } from "@app/hooks/use-dollar-balance-restricted"
+import { useDollarBalanceGate } from "@app/hooks/use-dollar-balance-restricted"
 import { usePersistentStateContext } from "@app/store/persistent-state"
 import { getSelfCustodialDefaultCurrency } from "@app/store/persistent-state/self-custodial-default-currency"
 
@@ -40,43 +40,46 @@ const resolveInitialMode = (
 export const useReceiveAssetMode = (): UseReceiveAssetModeResult => {
   const { isStableBalanceActive } = useSelfCustodialWallet()
   const { persistentState } = usePersistentStateContext()
-  const isDollarBalanceRestricted = useDollarBalanceRestricted()
+  const { isGated: isDollarBalanceGated, isRegionPending } = useDollarBalanceGate()
   const defaultCurrency = getSelfCustodialDefaultCurrency(persistentState)
 
   const [assetMode, setAssetMode] = useState<ReceiveAssetMode>(
     resolveInitialMode(
       isStableBalanceActive === true,
       defaultCurrency,
-      isDollarBalanceRestricted,
+      isDollarBalanceGated,
     ),
   )
 
   // The dollar-balance restriction locks receiving to Bitcoin; otherwise stable
   // balance becoming active re-aligns to Dollar.
   useEffect(() => {
-    if (isDollarBalanceRestricted) {
+    if (isDollarBalanceGated) {
       if (assetMode !== ReceiveAssetMode.Bitcoin) setAssetMode(ReceiveAssetMode.Bitcoin)
       return
     }
     if (isStableBalanceActive && assetMode !== ReceiveAssetMode.Dollar) {
       setAssetMode(ReceiveAssetMode.Dollar)
     }
-  }, [isDollarBalanceRestricted, isStableBalanceActive, assetMode])
+  }, [isDollarBalanceGated, isStableBalanceActive, assetMode])
 
   const availableModesForRail = useCallback(
     (rail: ReceiveRail): readonly ReceiveAssetMode[] => {
-      if (isDollarBalanceRestricted || rail === ReceiveRail.Onchain) return BITCOIN_ONLY
+      if (isDollarBalanceGated || rail === ReceiveRail.Onchain) return BITCOIN_ONLY
       if (isStableBalanceActive) return DOLLAR_ONLY
       return ALL_MODES
     },
-    [isDollarBalanceRestricted, isStableBalanceActive],
+    [isDollarBalanceGated, isStableBalanceActive],
   )
 
   return {
     assetMode,
     setAssetMode,
-    isToggleDisabled: isDollarBalanceRestricted || Boolean(isStableBalanceActive),
+    isToggleDisabled: isDollarBalanceGated || Boolean(isStableBalanceActive),
     availableModesForRail,
-    loading: isStableBalanceActive === undefined,
+    /** Also loading while the region resolves: the caller gates request generation on
+     *  this, so a restricted user never gets a Dollar request issued before the verdict
+     *  lands. */
+    loading: isStableBalanceActive === undefined || isRegionPending,
   }
 }

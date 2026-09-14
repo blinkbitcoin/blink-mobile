@@ -6,6 +6,8 @@ import { loadLocale } from "@app/i18n/i18n-util.sync"
 
 import { AcceptTermsAndConditionsScreen } from "@app/screens/accept-t-and-c/accept-t-and-c"
 import { MigrationCheckpoint } from "@app/screens/account-migration/hooks"
+import { AccountMode } from "@app/types/account"
+
 import { ContextForScreen } from "../helper"
 import { flushEffects } from "../../helpers/flush-effects"
 
@@ -13,11 +15,13 @@ loadLocale("en")
 const LL = i18nObject("en")
 
 const mockNavigate = jest.fn()
+let mockFlow = "migration"
+let mockMode: string | undefined
 
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
   useNavigation: () => ({ navigate: mockNavigate }),
-  useRoute: () => ({ params: { flow: "migration" } }),
+  useRoute: () => ({ params: { flow: mockFlow, mode: mockMode } }),
 }))
 
 const mockSaveCheckpoint = jest.fn()
@@ -61,6 +65,8 @@ describe("AcceptTermsAndConditionsScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockSaveCheckpoint.mockResolvedValue(true)
+    mockFlow = "migration"
+    mockMode = undefined
     loadLocale("en")
   })
 
@@ -107,5 +113,24 @@ describe("AcceptTermsAndConditionsScreen", () => {
     fireEvent.press(screen.getByText(LL.AcceptTermsAndConditionsScreen.accept()))
 
     expect(mockSaveCheckpoint).toHaveBeenCalledWith(MigrationCheckpoint.BackupMethod)
+  })
+
+  it("routes the self-custodial creation flow to wallet creation, forwarding the mode", async () => {
+    mockFlow = "selfCustodial"
+    mockMode = AccountMode.Enhanced
+    render(
+      <ContextForScreen>
+        <AcceptTermsAndConditionsScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    fireEvent.press(screen.getByText(LL.AcceptTermsAndConditionsScreen.accept()))
+
+    await waitFor(() =>
+      expect(mockNavigate).toHaveBeenCalledWith("selfCustodialWalletCreation", {
+        mode: AccountMode.Enhanced,
+      }),
+    )
   })
 })

@@ -72,6 +72,7 @@
     },
     "AuthenticationScreen": {
         "authenticationDescription": "Autenticati per continuare",
+        "authenticationRequired": "È richiesta l'autenticazione. Puoi impostare un codice PIN o la biometria nelle impostazioni di sicurezza.",
         "setUp": "Impostare l'Autenticazione Biometrica",
         "setUpAuthenticationDescription": "Usa dati biometrici per autenticare",
         "skip": "Salta",
@@ -2097,17 +2098,70 @@
             "sendingLimit": "Limite di invio giornaliero ridotto",
             "noOnchain": "Non è possibile ricevere bitcoin onchain",
             "recoveryOption": "Recupera i fondi tramite SMS o email",
-            "dailyLimit": "Limite giornaliero di transazioni di USD 1,000",
+            "dailyLimit": "Limite giornaliero di transazioni di USD {limit: string}",
             "onchainReceive": "Ricevi bitcoin on-chain"
         }
     },
     "MapScreen": {
         "navToSettingsTitle": "Autorizzazioni di posizione",
         "navToSettingsText": "Se desideri concedere a Blink i permessi di localizzazione, vai alle impostazioni e abilitali",
-        "payBusiness": "Paga questa attività",
         "openSettings": "Apri impostazioni",
         "title": "Mappa",
-        "error": "Oops. Qualcosa è andato storto durante il recupero della tua posizione"
+        "error": "Oops. Qualcosa è andato storto durante il recupero della tua posizione",
+        "attribution": "Luoghi da BTC Map, © contributori di OpenStreetMap",
+        "unnamedPlace": "Luogo senza nome",
+        "loadingPlaces": "Caricamento dei luoghi da BTC Map",
+        "placesError": "Impossibile caricare i luoghi da BTC Map",
+        "detailsError": "Impossibile caricare questo luogo",
+        "cannotOpenLink": "Nessuna app su questo telefono può aprire quel link",
+        "openNow": "Aperto ora",
+        "closedNow": "Chiuso",
+        "navigate": "Indicazioni",
+        "payMerchant": "Paga questo esercente",
+        "requiresApp": "Serve un'app specifica per pagare",
+        "boosted": "In evidenza",
+        "verifiedOn": "Verificato il {date: string}",
+        "lastVerifiedOn": "Ultima verifica il {date: string}",
+        "needsSurvey": "Questo luogo deve essere verificato",
+        "searchError": "Impossibile cercare in questa zona",
+        "clearSearch": "Cancella ricerca",
+        "nothingToShow": "Niente da mostrare",
+        "metersAway": "a {distance: string} metri",
+        "kilometersAway": "a {distance: string} km",
+        "filters": "Filtri",
+        "categories": "Categorie",
+        "selectAll": "Seleziona tutto",
+        "clearAll": "Cancella tutto",
+        "addPlace": "Aggiungi alla mappa",
+        "addPlaceTitle": "Aggiungi un luogo",
+        "placePinHint": "Sposta la mappa per mettere il segnaposto sul luogo",
+        "placeName": "Nome",
+        "placeNameHint": "Come si chiama il luogo",
+        "placeCategory": "Categoria",
+        "placeCategoryHint": "Scegli una categoria",
+        "placeLocation": "Posizione",
+        "changeLocation": "Modifica",
+        "placeReviewNote": "I nuovi luoghi vengono inviati a BTC Map. La sua comunità verifica e mantiene tutto ciò che è sulla mappa.",
+        "placeSubmitted": "Luogo inviato a BTC Map: grazie per averlo aggiunto",
+        "placeSubmissionFailed": "Impossibile inviare il luogo. Controlla la tua connessione e riprova.",
+        "placeRefused": "BTC Map non ha potuto accettare questo luogo. Non è stato aggiunto nulla alla mappa.",
+        "category": {
+            "restaurants": "Ristoranti",
+            "cafes": "Caffetterie",
+            "bakeries": "Panetterie e dolci",
+            "bars": "Bar e vita notturna",
+            "groceries": "Alimentari",
+            "shops": "Negozi",
+            "money": "Bancomat e cambio",
+            "lodging": "Hotel e alloggi",
+            "automotive": "Auto e carburante",
+            "health": "Salute",
+            "beauty": "Bellezza e benessere",
+            "services": "Servizi",
+            "sports": "Sport e outdoor",
+            "leisure": "Tempo libero e cultura",
+            "other": "Altro"
+        }
     },
     "HomeScreen": {
         "pendingReceiveBadge": "+{amount: string} in attesa",
@@ -2122,11 +2176,15 @@
     },
     "PinScreen": {
         "attemptsRemaining": "PIN errato. Hai {attemptsRemaining: number} tentativi rimanenti.",
+        "enterPin": "Inserisci il tuo codice PIN",
+        "lockoutUnavailable": "Impossibile registrare in modo sicuro il tentativo fallito. Eseguo log out.",
         "oneAttemptRemaining": "PIN errato. 1 tentativo rimasto.",
+        "pinUnreadable": "Impossibile verificare il PIN. Riprova.",
         "setPin": "Imposta il tuo codice PIN",
         "setPinFailedMatch": "I PIN non corrispondono - Imposta il tuo PIN",
         "storePinFailed": "Non è possibile salvare il tuo PIN.",
         "tooManyAttempts": "Troppi tentativi falliti. Eseguo log out.",
+        "tryAgainIn": "Riprova tra {seconds: number} s.",
         "verifyPin": "Verifica il tuo PIN"
     },
     "PriceHistoryScreen": {
@@ -2222,7 +2280,9 @@
     "ScanningQRCodeScreen": {
         "invalidContent": "Hai inserito:\n\n{found: string}\n\nQuesto non è un indirizzo Bitcoin valido o una Invoice Lightning",
         "expiredContent": "Abbiamo trovato:\n\n{found: string}\n\nQuesta fattura è scaduta",
+        "unresolvedContent": "Abbiamo trovato:\n\n{found: string}\n\nNon siamo riusciti a elaborare questo codice. Potrebbe essere scaduto oppure il servizio è temporaneamente non disponibile. Chiedi un nuovo codice o riprova più tardi.",
         "invalidTitle": "QR code non valido",
+        "unresolvedTitle": "Codice non disponibile",
         "openLinkTitle": "Apri Link",
         "confirmOpenLink": "Sei sicuro di voler aprire questo collegamento?",
         "noQrCode": "Non riesco a trovare un QR valido nell'immagine",
@@ -2297,6 +2357,7 @@
         "selfPaymentError": "{lnAddress: string} è il tuo indirizzo {bankName: string}.",
         "selfPaymentAdvice": "Se vuoi inviare denaro a un altro conto di tua proprietà, puoi utilizzare un'invoice, un indirizzo LN o un indirizzo BTC.",
         "lnAddressError": "Non riusciamo a raggiungere questo indirizzo Lightning. Se sei sicuro che esista, puoi riprovare più tardi.",
+        "lnurlServiceError": "Non siamo riusciti a elaborare questo codice. Potrebbe essere scaduto oppure il servizio è temporaneamente non disponibile.",
         "lnAddressAdvice": "Assicuratevi che sia scritto correttamente o chiedete al destinatario un'invoice o un indirizzo BTC.",
         "unknownLightning": "Non possiamo interpretare questo indirizzo Lightning. Per favore riprova.",
         "unknownOnchain": "Non possiamo interpretare questo indirizzo Bitcoin. Per favore riprova.",
@@ -2377,6 +2438,7 @@
     },
     "SettingsScreen": {
         "createAddress": "Crea indirizzo",
+        "addressDisabled": "(disattivato)",
         "donationButton": "Pulsante Dona",
         "btcpayServer": "BTCPay Server",
         "woocommerce": "WooCommerce",
@@ -2386,6 +2448,7 @@
         "apiAcess": "Accesso API",
         "apiDocumentation": "Documentazione API",
         "apiDashboard": "Accesso API e dashboard",
+        "mode": "Modalità",
         "pos": "Punto di vendita",
         "posCopied": "Il link del tuo punto vendita è stato copiato",
         "activated": "Attivato",
@@ -2456,7 +2519,7 @@
     "AccountScreen": {
         "fundsMoreThan5Dollars": "Il tuo account ha più di $ 5",
         "itsATrialAccount": "Gli account di prova hanno limiti di transazione ridotti e nessun metodo di recupero. Se perdi il telefono o disinstalli l'app, i tuoi fondi non saranno recuperabili.",
-        "accountBeingDeleted": "Il tuo account verrà eliminato, attendi...",
+        "accountBeingDeleted": "Il tuo account è in fase di chiusura, attendi...",
         "dangerZone": "Zona pericolosa",
         "phoneDeletedSuccessfully": "Telefono eliminato con successo",
         "phoneNumber": "Numero di telefono",
@@ -2518,7 +2581,28 @@
         "removedAccount": "Hai rimosso l'account {identifier: string}."
     },
     "StablesatsRestriction": {
-        "walletLabel": "non è disponibile nella tua regione"
+        "walletLabel": "non è disponibile nella tua regione",
+        "anonModeWalletLabel": "non disponibile in modalità Incognito"
+    },
+    "AnonModeConvertModal": {
+        "title": "Trasferisci prima il tuo saldo in dollari",
+        "body": "La modalità Incognito supporta solo il saldo Bitcoin. Trasferisci il tuo saldo in dollari sul saldo Bitcoin per passare."
+    },
+    "EnhancedModePrompt": {
+        "title": "Questa funzione richiede la modalità Enhanced",
+        "body": "Sei in modalità Incognito, Blink non conosce la tua regione, quindi alcune funzioni non sono disponibili. Passa a Enhanced per eseguire un controllo della posizione e sbloccare tutte le funzioni per la tua regione.",
+        "switchButton": "Passa a Enhanced"
+    },
+    "ModeSwitchSuccessScreen": {
+        "enhanced": "Passato alla modalità Enhanced\nnon custodita",
+        "anon": "Passato alla modalità Incognito\nnon custodita"
+    },
+    "RestrictedRegion": {
+        "title": "Rilevata regione soggetta a restrizioni",
+        "body": "La tua connessione sembra provenire da una regione soggetta a restrizioni. Blink non può fornire servizi da questa posizione. I tuoi saldi non sono interessati.",
+        "bodyReturn": "Quando lascerai questa regione, tutte le funzionalità torneranno alla normalità.",
+        "learnMore": "Scopri di più",
+        "contactSupport": "Contatta l'assistenza"
     },
     "DollarBalanceRestriction": {
         "modalTitle": "Il saldo in dollari non è disponibile nella tua regione"
@@ -2598,17 +2682,17 @@
         "receive": "Ricevi",
         "transfer": "Trasferisci",
         "lightning": "Lightning",
+        "lightningBelowThreshold": "Lightning sotto {threshold: string} SAT",
         "intraledger": "Intraledger",
-        "onchainPriority": "Onchain prioritario (al più presto)",
+        "onchainPriority": "Onchain prioritario (~10 min)",
         "onchainStandard": "Onchain standard (~4h)",
-        "onchainEconomy": "Onchain economico",
+        "onchainEconomy": "Onchain economico (~24h)",
         "lightningTransactions": "Transazioni Lightning",
         "onchainBelowThreshold": "Onchain sotto {threshold: string} SAT",
         "onchainAboveThreshold": "Onchain sopra {threshold: string} SAT",
         "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
         "transferFee": "Commissione di trasferimento",
         "noFee": "nessuna commissione",
-        "lightningSendFee": "{fee: string} + ~{routingFee: string} di commissione di routing",
         "fromApprox": "da ~{fee: string}",
         "satAmount": "{amount: string} SAT",
         "error": "Impossibile recuperare le commissioni al momento"
@@ -2644,7 +2728,6 @@
         "letsGo": "Andiamo!",
         "stayInTrialMode": "Rimani in modalità di prova",
         "upgradeToLevel": "Passa al Livello {level: number}",
-        "notNow": "Non ora",
         "setUpLevelAccount": "Configura account Livello {level: number}"
     },
     "SetAddressModal": {
@@ -2700,7 +2783,7 @@
             "mainTitle": "Benvenuto al Livello 1",
             "title": "Nuove funzionalità sbloccate per il tuo account:",
             "receiveBitcoinDescription": "Ricevi Bitcoin usando il tuo numero di telefono",
-            "dailyLimitDescription": "Invia fino a USD 1,000 al giorno",
+            "dailyLimitDescription": "Invia fino a USD {limit: string} al giorno",
             "onchainDescription": "Ricevi pagamenti on-chain"
         },
         "emailBenefits": {
@@ -2822,6 +2905,7 @@
         "bitcoinPrice": "Prezzo del Bitcoin",
         "btcAccount": "Conto Bitcoin",
         "cancel": "Cancella",
+        "notNow": "Non ora",
         "card": "Carta",
         "close": "Chiudi",
         "confirm": "Conferma",
@@ -2970,17 +3054,17 @@
         "defaultEmailSubject": "{bankName: string} - Supporto",
         "defaultSupportMessage": "Ciao! Ho bisogno di aiuto con {bankName: string}. Sto usando la versione {version: string} su {os: string}.",
         "emailCopied": "email {email: string} copiata negli appunti",
-        "deleteAccount": "Elimina account",
+        "deleteAccount": "Chiudi account",
         "delete": "Elimina",
-        "typeDelete": "Digitare \"{delete: string}\" per confermare l'eliminazione dell'account",
+        "typeDelete": "Digita \"{delete: string}\" per confermare la chiusura dell'account",
         "finalConfirmationAccountDeletionTitle": "Conferma finale richiesta",
-        "finalConfirmationAccountDeletionMessage": "Sei sicuro di voler eliminare il tuo account? Questa azione è irreversibile.",
-        "deleteAccountBalanceWarning": "L'eliminazione del tuo account ti farà perdere l'accesso al tuo saldo attuale. Vuoi procedere?",
-        "deleteAccountConfirmation": "Il tuo account è stato scritto per l'eliminazione.\n\nQuando il periodo di prova relativo ai requisiti normativi sarà terminato, i dati rimanenti relativi al tuo account saranno eliminati definitivamente.",
-        "deleteAccountFromPhone": "Ciao!, per favore cancella il mio account. Il mio numero di telefono è {phoneNumber: string}.",
+        "finalConfirmationAccountDeletionMessage": "Dopo la chiusura, non potrai più accedere al tuo account né utilizzarlo. Potremmo conservare alcuni dati come richiesto dalla legge e dai nostri obblighi di conservazione. Sei sicuro di voler chiudere il tuo account?",
+        "deleteAccountBalanceWarning": "La chiusura del tuo account ti farà perdere l'accesso al tuo saldo attuale. Sei sicuro di voler procedere?",
+        "deleteAccountConfirmation": "Il tuo account è stato chiuso.\n\nPotremmo conservare alcuni dati come richiesto dalla legge e dai nostri obblighi di conservazione.",
+        "deleteAccountFromPhone": "Ciao! Per favore chiudete il mio account. Il mio numero di telefono è {phoneNumber: string}.",
         "deleteAccountError": "Qualcosa è andato storto. Contatta {email: string} per ulteriore assistenza.",
         "bye": "Ciao!",
-        "deleteAccountWarning": "Attenzione: l'eliminazione dell'account è permanente!\nAssicurati che i wallet non contengano fondi prima di eliminare.\nL'account eliminato non può essere ripristinato."
+        "deleteAccountWarning": "Attenzione: la chiusura dell'account è permanente!\nAssicurati che i wallet non abbiano fondi prima della chiusura.\nUn account chiuso non può essere ripristinato.\nPotremmo conservare alcuni dati come richiesto dalla legge."
     },
     "lnurl": {
         "overLimit": "Non è possibile inviare più dell'importo massimo",
@@ -3414,8 +3498,7 @@
                 "pinChangedTitle": "PIN cambiato",
                 "pinChangedSubtitle": "Il tuo PIN è stato cambiato con successo.",
                 "pinChangedToast": "Il PIN è stato modificato con successo",
-                "biometricDescription": "Verifica la tua identità per cambiare il PIN",
-                "biometricRequired": "L'autenticazione biometrica è necessaria per cambiare il PIN."
+                "biometricDescription": "Verifica la tua identità per cambiare il PIN"
             }
         },
         "ReplaceCard": {
@@ -3757,6 +3840,7 @@
         "reminderBulletin": {
             "title": "Importante",
             "body": "Passa a un account non custodiale tramite la migrazione guidata, oppure preleva i tuoi fondi, entro il {date}. La ricezione si interrompe il {receiveStopsDate}.",
+            "bodyReceiveDisabled": "La ricezione si è interrotta. Passa a un account non custodiale tramite la migrazione guidata, oppure preleva i tuoi fondi, entro il {date}.",
             "migrateCta": "Migra"
         },
         "offboardBulletin": {
@@ -3847,9 +3931,22 @@
         "createFailed": "Impossibile creare il wallet. Riprova.",
         "selfCustodialDisabled": "La modalità non custodial è temporaneamente non disponibile."
     },
+    "ChooseExperienceScreen": {
+        "title": "Seleziona la modalità non custodita",
+        "subtitle": "La tua scelta determina quali funzioni sono disponibili. Puoi cambiare quando vuoi.",
+        "enhancedLabel": "Enhanced\nModalità",
+        "enhancedDescription": "Usiamo la tua regione per sbloccare servizi utili disponibili dove ti trovi.",
+        "anonLabel": "Incognito\nModalità",
+        "anonDescription": "Per la massima privacy. Meno funzioni.",
+        "continueButton": "Continua"
+    },
     "UnsupportedRegionScreen": {
         "title": "Regione non supportata",
-        "description": "Purtroppo non possiamo servire gli utenti dalla tua regione attuale."
+        "description": "Purtroppo non possiamo servire gli utenti dalla tua regione attuale.",
+        "custodialSignupDescription": "Purtroppo non possiamo creare nuovi account in custodia nella tua regione attuale. Puoi invece usare un account in autocustodia.",
+        "custodialSignupOnlyDescription": "Purtroppo non possiamo creare nuovi account in custodia nella tua regione attuale.",
+        "unknownRegionTitle": "Regione non determinata",
+        "unknownRegionDescription": "Non siamo riusciti a determinare la tua regione. Controlla la connessione e riprova."
     },
     "RestoreScreen": {
         "title": "Ripristina portafoglio",

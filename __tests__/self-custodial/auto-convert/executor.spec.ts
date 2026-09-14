@@ -26,6 +26,12 @@ jest.mock("@app/self-custodial/bridge/token-balance", () => ({
   fetchUsdbDecimals: (...args: unknown[]) => mockFetchDecimals(...args),
 }))
 
+const mockReportError = jest.fn()
+
+jest.mock("@app/utils/error-logging", () => ({
+  reportError: (...args: unknown[]) => mockReportError(...args),
+}))
+
 jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
   ConversionStatus: { Completed: "Completed", Pending: "Pending" },
   PaymentStatus: { Completed: "Completed", Pending: "Pending" },
@@ -179,7 +185,7 @@ describe("executeAutoConvert", () => {
         {
           conversionDetails: {
             status: "Completed",
-            from: { amount: 5000n },
+            conversions: [{ from: { amount: 5000n } }],
           },
           timestamp: 2000n, // seconds; paymentMs = 2_000_000
         },
@@ -199,7 +205,7 @@ describe("executeAutoConvert", () => {
         {
           conversionDetails: {
             status: "Completed",
-            from: { amount: 5000n },
+            conversions: [{ from: { amount: 5000n } }],
           },
           timestamp: 500n, // paymentMs = 500_000 < recordCreatedAtMs (1_000_000)
         },
@@ -217,7 +223,7 @@ describe("executeAutoConvert", () => {
         {
           conversionDetails: {
             status: "Completed",
-            from: { amount: 5200n }, // 4% off of 5000
+            conversions: [{ from: { amount: 5200n } }], // 4% off of 5000
           },
           timestamp: 2000n,
         },
@@ -236,7 +242,7 @@ describe("executeAutoConvert", () => {
         {
           conversionDetails: {
             status: "Completed",
-            from: { amount: 10_000n }, // 100% off
+            conversions: [{ from: { amount: 10_000n } }], // 100% off
           },
           timestamp: 2000n,
         },
@@ -244,6 +250,69 @@ describe("executeAutoConvert", () => {
       baseParams,
     )
 
+    expect(mockGetConversionQuote).toHaveBeenCalled()
+  })
+
+  /** 0.22 rebuilds the legs on retrieval, so a settled conversion can arrive with none.
+   *  Converting again spends the user's sats twice; skipping once costs nothing. */
+  it("treats a completed conversion with no legs as already converted, and reports it", async () => {
+    mockGetConversionQuote.mockResolvedValue(successQuote())
+
+    const outcome = await executeAutoConvert(
+      sdkWith([
+        {
+          id: "conv-legless",
+          conversionDetails: { status: "Completed", conversions: [] },
+          timestamp: 2000n,
+        },
+      ]),
+      baseParams,
+    )
+
+    expect(outcome).toEqual({ status: "already-converted" })
+    expect(mockGetConversionQuote).not.toHaveBeenCalled()
+    /** Declared expected: the payment id keeps the breadcrumb useful without opening a
+     *  separate non-fatal for every occurrence. */
+    expect(mockReportError).toHaveBeenCalledWith(
+      "hasAlreadyConverted",
+      expect.stringContaining("conv-legless"),
+      { expected: true },
+    )
+  })
+
+  it("still converts when the legless conversion predates the record", async () => {
+    mockGetConversionQuote.mockResolvedValue(successQuote())
+
+    const outcome = await executeAutoConvert(
+      sdkWith([
+        {
+          id: "conv-old",
+          conversionDetails: { status: "Completed", conversions: [] },
+          timestamp: 900n, // 900_000ms, before recordCreatedAtMs
+        },
+      ]),
+      baseParams,
+    )
+
+    expect(outcome).toEqual({ status: "converted" })
+    expect(mockGetConversionQuote).toHaveBeenCalled()
+  })
+
+  it("still converts when the legless conversion is already claimed by another receive", async () => {
+    mockGetConversionQuote.mockResolvedValue(successQuote())
+
+    const outcome = await executeAutoConvert(
+      sdkWith([
+        {
+          id: "conv-claimed",
+          conversionDetails: { status: "Completed", conversions: [] },
+          timestamp: 2000n,
+        },
+      ]),
+      { ...baseParams, claimedConversionIds: new Set(["conv-claimed"]) },
+    )
+
+    expect(outcome).toEqual({ status: "converted" })
     expect(mockGetConversionQuote).toHaveBeenCalled()
   })
 
@@ -315,7 +384,10 @@ describe("executeAutoConvert", () => {
       sdkWith([
         {
           id: "conv-paired-elsewhere",
-          conversionDetails: { status: "Completed", from: { amount: 5000n } },
+          conversionDetails: {
+            status: "Completed",
+            conversions: [{ from: { amount: 5000n } }],
+          },
           timestamp: 2000n,
         },
       ]),
@@ -331,12 +403,18 @@ describe("executeAutoConvert", () => {
       sdkWith([
         {
           id: "conv-paired-elsewhere",
-          conversionDetails: { status: "Completed", from: { amount: 5000n } },
+          conversionDetails: {
+            status: "Completed",
+            conversions: [{ from: { amount: 5000n } }],
+          },
           timestamp: 2000n,
         },
         {
           id: "conv-unclaimed",
-          conversionDetails: { status: "Completed", from: { amount: 5000n } },
+          conversionDetails: {
+            status: "Completed",
+            conversions: [{ from: { amount: 5000n } }],
+          },
           timestamp: 2000n,
         },
       ]),
@@ -363,7 +441,10 @@ describe("findRecentConversionId", () => {
       sdkWith([
         {
           id: "conv-1",
-          conversionDetails: { status: "Completed", from: { amount: 5000n } },
+          conversionDetails: {
+            status: "Completed",
+            conversions: [{ from: { amount: 5000n } }],
+          },
         },
       ]),
       { satsAmount: 5000, toleranceBps: 500, claimedConversionIds: new Set() },
@@ -372,16 +453,81 @@ describe("findRecentConversionId", () => {
     expect(id).toBe("conv-1")
   })
 
+  /** Pairing needs a real source amount, so unlike the spend-side gate this stays strict:
+   *  a legless conversion is not a usable pairing candidate. */
+  it("skips a completed conversion with no legs", async () => {
+    const id = await findRecentConversionId(
+      sdkWith([
+        {
+          id: "conv-legless",
+          conversionDetails: { status: "Completed", conversions: [] },
+        },
+      ]),
+      { satsAmount: 5000, toleranceBps: 500, claimedConversionIds: new Set() },
+    )
+
+    expect(id).toBeUndefined()
+  })
+
+  /** 0.22 rebuilds the legs on retrieval, so the array itself can be missing rather than
+   *  empty. Indexing it unguarded threw out of the find() predicate and abandoned the whole
+   *  scan, which left the later candidate unpaired and free to match the next receive. */
+  it("skips a conversion whose legs are missing entirely and keeps scanning", async () => {
+    const id = await findRecentConversionId(
+      sdkWith([
+        {
+          id: "conv-no-array",
+          conversionDetails: { status: "Completed" },
+        },
+        {
+          id: "conv-fresh",
+          conversionDetails: {
+            status: "Completed",
+            conversions: [{ from: { amount: 5000n } }],
+          },
+        },
+      ]),
+      { satsAmount: 5000, toleranceBps: 500, claimedConversionIds: new Set() },
+    )
+
+    expect(id).toBe("conv-fresh")
+  })
+
+  /** The AMM path this matcher serves is single-leg; a multi-hop route is matched on its
+   *  entry leg, so the sats we sent are compared against the first leg's source. */
+  it("matches a multi-leg conversion on its entry leg", async () => {
+    const id = await findRecentConversionId(
+      sdkWith([
+        {
+          id: "conv-multi",
+          conversionDetails: {
+            status: "Completed",
+            conversions: [{ from: { amount: 5000n } }, { from: { amount: 42n } }],
+          },
+        },
+      ]),
+      { satsAmount: 5000, toleranceBps: 500, claimedConversionIds: new Set() },
+    )
+
+    expect(id).toBe("conv-multi")
+  })
+
   it("skips conversions already claimed by another receive", async () => {
     const id = await findRecentConversionId(
       sdkWith([
         {
           id: "conv-claimed",
-          conversionDetails: { status: "Completed", from: { amount: 5000n } },
+          conversionDetails: {
+            status: "Completed",
+            conversions: [{ from: { amount: 5000n } }],
+          },
         },
         {
           id: "conv-fresh",
-          conversionDetails: { status: "Completed", from: { amount: 5000n } },
+          conversionDetails: {
+            status: "Completed",
+            conversions: [{ from: { amount: 5000n } }],
+          },
         },
       ]),
       {
@@ -400,11 +546,17 @@ describe("findRecentConversionId", () => {
         { id: "p-no-conversion", conversionDetails: undefined },
         {
           id: "p-pending",
-          conversionDetails: { status: "Pending", from: { amount: 5000n } },
+          conversionDetails: {
+            status: "Pending",
+            conversions: [{ from: { amount: 5000n } }],
+          },
         },
         {
           id: "conv-real",
-          conversionDetails: { status: "Completed", from: { amount: 5000n } },
+          conversionDetails: {
+            status: "Completed",
+            conversions: [{ from: { amount: 5000n } }],
+          },
         },
       ]),
       { satsAmount: 5000, toleranceBps: 500, claimedConversionIds: new Set() },
@@ -418,7 +570,10 @@ describe("findRecentConversionId", () => {
       sdkWith([
         {
           id: "conv-far",
-          conversionDetails: { status: "Completed", from: { amount: 10_000n } },
+          conversionDetails: {
+            status: "Completed",
+            conversions: [{ from: { amount: 10_000n } }],
+          },
         },
       ]),
       { satsAmount: 5000, toleranceBps: 500, claimedConversionIds: new Set() },

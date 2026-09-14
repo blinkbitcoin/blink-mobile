@@ -55,7 +55,7 @@ describe("EmailBenefitsScreen", () => {
     )
 
     expect(getByText(LL.OnboardingScreen.emailBenefits.primaryButton())).toBeTruthy()
-    expect(getByText(LL.UpgradeAccountModal.notNow())).toBeTruthy()
+    expect(getByText(LL.common.notNow())).toBeTruthy()
   })
 
   it("Triggers primary action and navigates to emailRegistrationInitiate", () => {
@@ -94,7 +94,7 @@ describe("EmailBenefitsScreen", () => {
       </ContextForScreen>,
     )
 
-    fireEvent.press(getByText(LL.UpgradeAccountModal.notNow()))
+    fireEvent.press(getByText(LL.common.notNow()))
 
     expect(mockNavigate).toHaveBeenCalledWith("onboarding", {
       screen: "supportScreen",
@@ -122,7 +122,7 @@ describe("EmailBenefitsScreen", () => {
       </ContextForScreen>,
     )
 
-    fireEvent.press(getByText(LL.UpgradeAccountModal.notNow()))
+    fireEvent.press(getByText(LL.common.notNow()))
 
     expect(mockNavigate).toHaveBeenCalledWith("onboarding", {
       screen: "lightningBenefits",

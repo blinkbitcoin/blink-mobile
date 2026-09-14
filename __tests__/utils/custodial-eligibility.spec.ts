@@ -2,7 +2,6 @@ import { decideCustodialEligibility } from "@app/utils/custodial-eligibility"
 
 const baseInputs = {
   country: "SV",
-  detectionFailed: false,
   accountCount: 0,
   custodialFirstSignupBlockedCountries: ["GB", "DE"],
 }
@@ -40,24 +39,19 @@ describe("decideCustodialEligibility", () => {
     })
   })
 
-  describe("detection failure (fallback country)", () => {
-    it("fails closed when the resolved country came from a detection-failure fallback, regardless of country", () => {
-      expect(
-        decideCustodialEligibility({
-          ...baseInputs,
-          country: "SV",
-          detectionFailed: true,
-        }),
-      ).toBe(false)
+  describe("an unreadable location", () => {
+    it("fails closed, since an untrusted location must not open signup", () => {
+      expect(decideCustodialEligibility({ ...baseInputs, country: undefined })).toBe(
+        false,
+      )
     })
 
-    it("fails closed even for an unblocked country with existing accounts when detection failed", () => {
+    it("fails closed even for a holder of existing accounts", () => {
       expect(
         decideCustodialEligibility({
           ...baseInputs,
-          country: "SV",
+          country: undefined,
           accountCount: 5,
-          detectionFailed: true,
         }),
       ).toBe(false)
     })

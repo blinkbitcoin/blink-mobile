@@ -54,9 +54,19 @@ jest.mock("@app/graphql/ln-update-context", () => ({
 const mockUseDollarBalanceRestricted = jest.fn(() => false)
 jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
   useDollarBalanceRestricted: () => mockUseDollarBalanceRestricted(),
+  useDollarBalanceGate: () => ({
+    isGated: mockUseDollarBalanceRestricted(),
+    isRegionPending: false,
+  }),
+  useDollarBalanceGated: () => mockUseDollarBalanceRestricted(),
 }))
 
-const mockUseDeviceLocation = jest.fn(() => ({ countryCode: "SV", loading: false }))
+const mockUseDeviceLocation = jest.fn(
+  (): { countryCode: string | undefined; loading: boolean } => ({
+    countryCode: "SV",
+    loading: false,
+  }),
+)
 jest.mock("@app/hooks/use-device-location", () => ({
   __esModule: true,
   default: () => mockUseDeviceLocation(),
@@ -297,5 +307,36 @@ describe("usePaymentRequest", () => {
     await flushEffects()
 
     expect(mockCreatePaymentRequestCreationData).not.toHaveBeenCalled()
+  })
+
+  /** The restriction reads false while the region is unresolved, so the pending hold is
+   *  the only thing standing between a restricted user and a dollar request issued on a
+   *  cold start straight into the receive screen. */
+  it("issues no dollar request while the region is pending, then falls back to bitcoin once it resolves restricted", async () => {
+    setupMocksWithPR()
+    mockUseWalletResolution.mockReturnValue({
+      ...mockWallets,
+      defaultWallet: { id: "usd-id", balance: 100, walletCurrency: WalletCurrency.Usd },
+    })
+    mockUseDeviceLocation.mockReturnValue({ countryCode: undefined, loading: true })
+    mockUseDollarBalanceRestricted.mockReturnValue(false)
+
+    const { rerender } = renderHook(() => usePaymentRequest())
+
+    await flushEffects()
+
+    expect(mockCreatePaymentRequestCreationData).not.toHaveBeenCalled()
+
+    mockUseDeviceLocation.mockReturnValue({ countryCode: "HK", loading: false })
+    mockUseDollarBalanceRestricted.mockReturnValue(true)
+    rerender()
+
+    await flushEffects()
+
+    expect(mockCreatePaymentRequestCreationData).toHaveBeenCalledWith(
+      expect.objectContaining({
+        defaultWalletDescriptor: { currency: WalletCurrency.Btc, id: "btc-id" },
+      }),
+    )
   })
 })

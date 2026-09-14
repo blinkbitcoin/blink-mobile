@@ -1,17 +1,16 @@
 import { DefaultAccountId } from "@app/types/wallet"
 
+import { resolveActiveSelfCustodialId } from "./active-self-custodial-account"
 import { PersistentState } from "./state-migrations"
 
-const resolveActiveSelfCustodialId = (state: PersistentState): string | null => {
-  const id = state.activeAccountId
-  if (!id || id === DefaultAccountId.Custodial) return null
-  return id
-}
-
-export const getSelfCustodialDisplayCurrency = (state: PersistentState): string => {
+/** Undefined when the account has never stored one, so a caller can tell an unanswered
+ *  preference from a deliberate "USD" and infer a default only in the first case. */
+export const getSelfCustodialDisplayCurrency = (
+  state: PersistentState,
+): string | undefined => {
   const id = resolveActiveSelfCustodialId(state)
-  if (!id) return "USD"
-  return state.selfCustodialDisplayCurrencyByAccountId?.[id] ?? "USD"
+  if (!id) return undefined
+  return state.selfCustodialDisplayCurrencyByAccountId?.[id]
 }
 
 export const withSelfCustodialDisplayCurrency = (

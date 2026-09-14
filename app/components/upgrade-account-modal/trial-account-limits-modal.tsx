@@ -3,10 +3,11 @@ import { View } from "react-native"
 import { LocalizedString } from "typesafe-i18n"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { useLevel1DailyLimit } from "@app/hooks"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import CustomModal from "@app/components/custom-modal/custom-modal"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { PhoneLoginInitiateType } from "@app/screens/phone-auth-screen"
+import { PhoneLoginInitiateType } from "@app/screens/phone-auth-screen/phone-login-initiate-type"
 
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
@@ -26,6 +27,7 @@ export const TrialAccountLimitsModal: React.FC<TrialAccountLimitsModalProps> = (
   beforeSubmit,
 }) => {
   const { LL } = useI18nContext()
+  const { limit } = useLevel1DailyLimit()
   const styles = useStyles()
   const {
     theme: { colors },
@@ -55,13 +57,15 @@ export const TrialAccountLimitsModal: React.FC<TrialAccountLimitsModalProps> = (
       body={
         <View style={styles.modalBody}>
           <LimitItem text={LL.GetStartedScreen.trialAccountLimits.recoveryOption()} />
-          <LimitItem text={LL.GetStartedScreen.trialAccountLimits.dailyLimit()} />
+          <LimitItem
+            text={LL.GetStartedScreen.trialAccountLimits.dailyLimit({ limit })}
+          />
           <LimitItem text={LL.GetStartedScreen.trialAccountLimits.onchainReceive()} />
         </View>
       }
       primaryButtonTitle={LL.UpgradeAccountModal.upgradeToLevel({ level: UPGRADE_TO })}
       primaryButtonOnPress={navigateToPhoneLogin}
-      secondaryButtonTitle={LL.UpgradeAccountModal.notNow()}
+      secondaryButtonTitle={LL.common.notNow()}
       secondaryButtonOnPress={closeModal}
     />
   )

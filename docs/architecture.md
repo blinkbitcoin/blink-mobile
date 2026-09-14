@@ -135,6 +135,37 @@ RootStack (Stack Navigator)
 | Persistent State | Settings, preferences | PersistentStateContext + AsyncStorage |
 | UI State | Loading, errors, modals | React Context + local state |
 | Feature Flags | Feature toggles | FeatureFlagContext |
+| Merchant Map | BTC Map places, held offline | `app/btcmap` + chunked AsyncStorage |
+
+### Merchant map data (`app/btcmap`)
+
+The map screen is the one feature that does not read from the Galoy backend. Its merchants
+come from [BTC Map](https://btcmap.org), the community-maintained OpenStreetMap overlay.
+Everything drawn is read from there; the only thing sent back is a proposal for a place
+that is missing, which BTC Map's own community then surveys — nothing in the app edits or
+verifies a place that already exists. This replaced the `businessMapMarkers` GraphQL query,
+so the map no longer shows Galoy-registered businesses as such and no longer routes to
+`sendBitcoinDestination` from a pin.
+
+| Concern | Approach |
+|---------|----------|
+| Cold start | One gzipped ~550 KB CDN snapshot (`cdn.static.btcmap.org`), not a paged API walk |
+| Staying current | `updated_since` delta against `api.btcmap.org/v4`, at most hourly, on focus and app resume |
+| Offline cache | ~2.4 MB of places chunked at 5k rows across AsyncStorage, meta row written last so a torn write reads as "no cache" |
+| Per-place detail | Fetched on tap; the snapshot holds only id, coordinates, icon and boost |
+| Labels | Fetched per settled viewport, on a ~1.1 km grid so the centre is not a location trail |
+| Search | One `places/search` call per opened search, on the same grid and radius-capped; typing then filters that list on-device, since the endpoint takes no text query |
+| Category filter | Buckets BTC Map's icon names (`btcmap/categories.ts`) — the only classification the offline snapshot carries, so filtering needs no network |
+| Clustering | supercluster, indexed over a box 3× the viewport rather than the whole feed. A filter change re-indexes hundreds of points instead of ~29k, which is the difference between a 1.2 s freeze and an unnoticed one |
+| Marker removal | Needs `patches/react-native-maps+1.27.2.patch`: `safeAddFeature` overwrote instead of inserting, so filtered-out pins stayed on the map forever. Pinned by `__tests__/patches/maps-marker-removal-patch.spec.ts` |
+| Untrusted input | Every OSM-sourced link is scheme-checked in `btcmap/urls.ts` before it reaches `Linking.openURL` |
+| Adding a place | Level-two custodial accounts only (`useIsAuthed()`, `isAtLeastLevelTwo`, and the registry's `activeAccount?.type` not `SelfCustodial`), and only while the `btcMapPlacesEnabled` kill switch is on, since the submission goes out through our backend on a Blink session. The account type comes from `useAccountRegistry` rather than `useActiveWallet`, which would subscribe the whole map to both wallet providers and re-render it on every balance change to re-decide one button. Pin first, then the form: the pin is drawn at the centre of the map view and never moves, so the region's centre is what it points at |
+| Sending a place | `btcmap/use-place-submission.ts` fires the `btcMapPlaceSubmit` mutation; `btcmap/submission.ts` shapes and validates the payload. A client-minted `submissionId` is the idempotency key: retries of one attempt reuse it, so a resent request updates the original submission rather than duplicating the place. The request carries the pin as it stood when submit was tapped, so the form's location row is locked while a send is in flight: a correction made in that window could not reach the request, and the place would land at the old spot with the map showing the new one. A failure is shown on the form itself rather than in a toast, which the form's native modal would be drawn over, and in the app's own language: a refusal and a dropped request each get a translated sentence, since the backend's own wording only comes back in English — the English wording and any unexpected failure go to Crashlytics instead, so support can still tell a rate limit from a duplicate |
+| Kill switch | `btcMapPlacesEnabled` in Remote Config empties the map and takes the add-place flow with it, without a release |
+
+Because the snapshot shares Android's AsyncStorage database with the persisted Apollo
+cache, `AsyncStorage_db_size_in_MB` is raised from the 6 MB default in
+`android/gradle.properties`.
 
 ## Authentication Flow
 
@@ -205,6 +236,7 @@ RootStack (Stack Navigator)
 | Firebase Remote Config | Feature flags |
 | Firebase App Check | Device attestation |
 | GeeTest | Captcha verification |
+| BTC Map | Merchant map data (ODbL-attributed), and proposals for places missing from it |
 
 ## Security Considerations
 

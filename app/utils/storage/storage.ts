@@ -30,6 +30,20 @@ export const saveString = async (key: string, value: string): Promise<boolean> =
 }
 
 /**
+ * Lists every key currently in storage, or null if the listing failed.
+ *
+ * Failure is NOT an empty list: a caller that treats "no keys" as "nothing left
+ * to do" would otherwise mark a sweep complete that never ran.
+ */
+export const getAllKeys = async (): Promise<readonly string[] | null> => {
+  try {
+    return await AsyncStorage.getAllKeys()
+  } catch {
+    return null
+  }
+}
+
+/**
  * Saves an object to storage, propagating the underlying write error instead of
  * swallowing it, so a caller whose flow must stop on a failed write can catch it.
  * Best-effort callers should catch and ignore.

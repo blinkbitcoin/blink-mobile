@@ -117,7 +117,7 @@ export const useRequestPhoneCodeLogin = (): UseRequestPhoneCodeReturn => {
 
   const { data, loading: loadingSupportedCountries } = useSupportedCountriesQuery()
   const { countryCode: detectedCountryCode, loading: loadingDetectedCountryCode } =
-    useDeviceLocation()
+    useDeviceLocation({ isCustodialFlow: true })
 
   const appCheckToken = useAppCheckToken({})
 
@@ -162,13 +162,14 @@ export const useRequestPhoneCodeLogin = (): UseRequestPhoneCodeReturn => {
     }
   }, [data?.globals, countryCode])
 
-  // setting default country code from IP
+  /** One-shot advance once detection settles, so a late re-settle cannot yank an
+   *  in-progress captcha or request back to the input step. */
   useEffect(() => {
-    if (detectedCountryCode) {
-      setCountryCode(detectedCountryCode)
-      setStatus(RequestPhoneCodeStatus.InputtingPhoneNumber)
-    }
-  }, [detectedCountryCode])
+    if (status !== RequestPhoneCodeStatus.LoadingCountryCode) return
+    if (loadingDetectedCountryCode) return
+    if (detectedCountryCode) setCountryCode(detectedCountryCode)
+    setStatus(RequestPhoneCodeStatus.InputtingPhoneNumber)
+  }, [status, detectedCountryCode, loadingDetectedCountryCode])
 
   // when phone number is submitted and either captcha is requested, or appcheck is used
   useEffect(() => {

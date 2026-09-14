@@ -1,6 +1,8 @@
 import React from "react"
 import { fireEvent, render } from "@testing-library/react-native"
 
+import { flushEffects } from "../../helpers/flush-effects"
+
 import { AccountTypeSelectionScreen } from "@app/screens/account-type-selection"
 
 const mockNavigate = jest.fn()
@@ -42,15 +44,18 @@ jest.mock("@app/hooks/use-account-type-options", () => ({
   AccountOption: { Custodial: "custodial", SelfCustodial: "selfCustodial" },
   AccountFlow: { Trial: "trial", SelfCustodial: "selfCustodial" },
   ACCOUNT_OPTION_TO_FLOW: { custodial: "trial", selfCustodial: "selfCustodial" },
-  useAccountTypeOptions: (mode: string) => mockUseAccountTypeOptions(mode),
+  useAccountTypeOptions: () => mockUseAccountTypeOptions(),
 }))
 
-const mockIsCreationBlocked = jest.fn()
-const mockRegionLoading = jest.fn(() => false)
+const mockCheckBlockReason = jest.fn()
+const mockIsChecking = jest.fn(() => false)
+const mockIsFirstSignupRuleReady = jest.fn(() => true)
+
 jest.mock("@app/hooks/use-creation-block", () => ({
   useCreationBlock: () => ({
-    isCreationBlocked: mockIsCreationBlocked,
-    loading: mockRegionLoading(),
+    checkBlockReason: mockCheckBlockReason,
+    isChecking: mockIsChecking(),
+    isFirstSignupRuleReady: mockIsFirstSignupRuleReady(),
   }),
 }))
 
@@ -107,21 +112,26 @@ jest.mock("@app/utils/testProps", () => ({
   testProps: (id: string) => ({ testID: id }),
 }))
 
-jest.mock("@app/screens/phone-auth-screen", () => ({
-  PhoneLoginInitiateType: { Login: "Login" },
-}))
+/**
+ * The screen only needs PhoneLoginInitiateType from the barrel, so the barrel is
+ * replaced by its leaf module: that keeps the real wire values while leaving the
+ * firebase app-check native module out of the test.
+ */
+jest.mock("@app/screens/phone-auth-screen", () =>
+  jest.requireActual("@app/screens/phone-auth-screen/phone-login-initiate-type"),
+)
 
 describe("AccountTypeSelectionScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockIsCreationBlocked.mockReturnValue(false)
-    mockRegionLoading.mockReturnValue(false)
+    mockCheckBlockReason.mockResolvedValue(null)
+    mockIsChecking.mockReturnValue(false)
+    mockIsFirstSignupRuleReady.mockReturnValue(true)
     mockMode.mockReturnValue("create")
     mockUseAccountTypeOptions.mockReturnValue({
       options: ["selfCustodial", "custodial"],
       defaultSelected: null,
       selfCustodialTemporarilyDisabled: false,
-      loading: false,
     })
   })
 
@@ -144,66 +154,73 @@ describe("AccountTypeSelectionScreen", () => {
     expect(getByText("Choose method")).toBeTruthy()
   })
 
-  it("navigates to T&C with selfCustodial flow when self-custodial selected in create mode", () => {
+  it("hands self-custodial to the mode choice without locating anyone", async () => {
+    mockCheckBlockReason.mockResolvedValue("region")
+
     const { getByTestId } = render(<AccountTypeSelectionScreen />)
 
     fireEvent.press(getByTestId("self-custodial-option"))
     fireEvent.press(getByTestId("continue-button"))
+    await flushEffects()
 
-    expect(mockNavigate).toHaveBeenCalledWith("acceptTermsAndConditions", {
-      flow: "selfCustodial",
+    // Anon must read nothing, and the mode is only chosen on the next screen.
+    expect(mockCheckBlockReason).not.toHaveBeenCalled()
+    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialChooseExperience", {
+      onContinue: { route: "acceptTermsAndConditions" },
     })
   })
 
-  it("navigates to T&C with trial flow when custodial selected in create mode", () => {
+  it("navigates to T&C with trial flow when custodial selected in create mode", async () => {
     const { getByTestId } = render(<AccountTypeSelectionScreen />)
 
     fireEvent.press(getByTestId("custodial-option"))
     fireEvent.press(getByTestId("continue-button"))
+    await flushEffects()
 
     expect(mockNavigate).toHaveBeenCalledWith("acceptTermsAndConditions", {
       flow: "trial",
     })
   })
 
-  it("redirects to Unsupported region when the selected option is blocked in create mode", () => {
-    mockIsCreationBlocked.mockReturnValue(true)
+  it("redirects to Unsupported region when custodial is refused in create mode", async () => {
+    mockCheckBlockReason.mockResolvedValue("region")
 
     const { getByTestId } = render(<AccountTypeSelectionScreen />)
 
     fireEvent.press(getByTestId("custodial-option"))
     fireEvent.press(getByTestId("continue-button"))
+    await flushEffects()
 
-    expect(mockNavigate).toHaveBeenCalledWith("unsupportedRegion")
+    expect(mockNavigate).toHaveBeenCalledWith("unsupportedRegion", { reason: "region" })
     expect(mockNavigate).not.toHaveBeenCalledWith("acceptTermsAndConditions", {
       flow: "trial",
     })
   })
 
-  it("proceeds with the available option when only the other option is region-blocked", () => {
-    mockIsCreationBlocked.mockImplementation((option: string) => option === "custodial")
+  it("asks only about the option the user picked", async () => {
+    mockCheckBlockReason.mockResolvedValue(null)
 
     const { getByTestId } = render(<AccountTypeSelectionScreen />)
 
-    fireEvent.press(getByTestId("self-custodial-option"))
+    fireEvent.press(getByTestId("custodial-option"))
     fireEvent.press(getByTestId("continue-button"))
+    await flushEffects()
 
-    expect(mockNavigate).toHaveBeenCalledWith("acceptTermsAndConditions", {
-      flow: "selfCustodial",
-    })
-    expect(mockNavigate).not.toHaveBeenCalledWith("unsupportedRegion")
+    expect(mockCheckBlockReason).toHaveBeenCalledTimes(1)
+    expect(mockCheckBlockReason).toHaveBeenCalledWith("custodial")
   })
 
-  it("does not redirect to Unsupported region in restore mode", () => {
-    mockIsCreationBlocked.mockReturnValue(true)
+  it("does not redirect to Unsupported region in restore mode", async () => {
+    mockCheckBlockReason.mockResolvedValue("region")
     mockMode.mockReturnValue("restore")
 
     const { getByTestId } = render(<AccountTypeSelectionScreen />)
 
     fireEvent.press(getByTestId("custodial-option"))
     fireEvent.press(getByTestId("continue-button"))
+    await flushEffects()
 
-    expect(mockNavigate).not.toHaveBeenCalledWith("unsupportedRegion")
+    expect(mockNavigate).not.toHaveBeenCalledWith("unsupportedRegion", expect.anything())
     expect(mockNavigate).toHaveBeenCalledWith("login", {
       type: "Login",
       title: undefined,
@@ -211,13 +228,14 @@ describe("AccountTypeSelectionScreen", () => {
     })
   })
 
-  it("navigates to login when custodial selected in restore mode", () => {
+  it("navigates to login when custodial selected in restore mode", async () => {
     mockMode.mockReturnValue("restore")
 
     const { getByTestId } = render(<AccountTypeSelectionScreen />)
 
     fireEvent.press(getByTestId("custodial-option"))
     fireEvent.press(getByTestId("continue-button"))
+    await flushEffects()
 
     expect(mockNavigate).toHaveBeenCalledWith("login", {
       type: "Login",
@@ -226,21 +244,23 @@ describe("AccountTypeSelectionScreen", () => {
     })
   })
 
-  it("navigates to restore method screen for self-custodial restore", () => {
+  it("navigates to restore method screen for self-custodial restore", async () => {
     mockMode.mockReturnValue("restore")
 
     const { getByTestId } = render(<AccountTypeSelectionScreen />)
 
     fireEvent.press(getByTestId("self-custodial-option"))
     fireEvent.press(getByTestId("continue-button"))
+    await flushEffects()
 
     expect(mockNavigate).toHaveBeenCalledWith("selfCustodialRestoreMethod")
   })
 
-  it("does not navigate when nothing selected", () => {
+  it("does not navigate when nothing selected", async () => {
     const { getByTestId } = render(<AccountTypeSelectionScreen />)
 
     fireEvent.press(getByTestId("continue-button"))
+    await flushEffects()
 
     expect(mockNavigate).not.toHaveBeenCalled()
   })
@@ -274,12 +294,86 @@ describe("AccountTypeSelectionScreen", () => {
     )
   })
 
-  it("hides custodial card when the country does not allow custodial", () => {
+  it("preselects the survivor when an option stops being offered", async () => {
+    const { getByTestId, rerender } = render(<AccountTypeSelectionScreen />)
+
+    // Remote config can turn self-custodial off after the screen is already up.
+    mockUseAccountTypeOptions.mockReturnValue({
+      options: ["custodial"],
+      defaultSelected: "custodial",
+      selfCustodialTemporarilyDisabled: true,
+    })
+    rerender(<AccountTypeSelectionScreen />)
+
+    fireEvent.press(getByTestId("continue-button"))
+    await flushEffects()
+
+    expect(mockCheckBlockReason).toHaveBeenCalledWith("custodial")
+  })
+
+  it("holds the cards still while a check is running", () => {
+    mockIsChecking.mockReturnValue(true)
+
+    const { getByTestId, getByText } = render(<AccountTypeSelectionScreen />)
+    fireEvent.press(getByTestId("custodial-option"))
+
+    // A selection changed mid-check would leave the answer describing the other option,
+    // so the button still asks the user to choose rather than offering to continue.
+    expect(getByText("Choose method")).toBeTruthy()
+  })
+
+  it("waits for the account count before it can refuse a first signup", () => {
+    mockIsFirstSignupRuleReady.mockReturnValue(false)
+
+    const { getByTestId } = render(<AccountTypeSelectionScreen />)
+    fireEvent.press(getByTestId("custodial-option"))
+
+    expect(getByTestId("continue-button").props.disabled).toBe(true)
+  })
+
+  /**
+   * The account count is read by the custodial creation alone. Restore navigates straight to
+   * login or the restore method, and a self-custodial creation is answered after the mode
+   * screen, so holding Continue in those modes waits on a rule that is never consulted. The
+   * registry also re-hydrates when the active account changes, which could bring the wait
+   * back mid-session and swallow a press.
+   */
+  it("does not wait for the account count in restore mode", () => {
+    mockIsFirstSignupRuleReady.mockReturnValue(false)
+    mockMode.mockReturnValue("restore")
+
+    const { getByTestId } = render(<AccountTypeSelectionScreen />)
+    fireEvent.press(getByTestId("custodial-option"))
+
+    expect(getByTestId("continue-button").props.disabled).toBe(false)
+  })
+
+  it("does not wait for the account count when restoring self-custodial", () => {
+    mockIsFirstSignupRuleReady.mockReturnValue(false)
+    mockMode.mockReturnValue("restore")
+
+    const { getByTestId } = render(<AccountTypeSelectionScreen />)
+    fireEvent.press(getByTestId("self-custodial-option"))
+
+    expect(getByTestId("continue-button").props.disabled).toBe(false)
+  })
+
+  /** A self-custodial creation is refused after the mode screen, if at all, so this screen
+   *  has nothing to hold it for. */
+  it("does not wait for the account count when creating self-custodial", () => {
+    mockIsFirstSignupRuleReady.mockReturnValue(false)
+
+    const { getByTestId } = render(<AccountTypeSelectionScreen />)
+    fireEvent.press(getByTestId("self-custodial-option"))
+
+    expect(getByTestId("continue-button").props.disabled).toBe(false)
+  })
+
+  it("renders only the cards the offered options name", () => {
     mockUseAccountTypeOptions.mockReturnValue({
       options: ["selfCustodial"],
       defaultSelected: "selfCustodial",
       selfCustodialTemporarilyDisabled: false,
-      loading: false,
     })
 
     const { queryByTestId } = render(<AccountTypeSelectionScreen />)
@@ -288,19 +382,19 @@ describe("AccountTypeSelectionScreen", () => {
     expect(queryByTestId("self-custodial-option")).toBeTruthy()
   })
 
-  it("pre-selects the only available option and enables the continue button", () => {
+  it("pre-selects the only available option and enables the continue button", async () => {
     mockUseAccountTypeOptions.mockReturnValue({
       options: ["selfCustodial"],
       defaultSelected: "selfCustodial",
       selfCustodialTemporarilyDisabled: false,
-      loading: false,
     })
 
     const { getByTestId } = render(<AccountTypeSelectionScreen />)
 
     fireEvent.press(getByTestId("continue-button"))
-    expect(mockNavigate).toHaveBeenCalledWith("acceptTermsAndConditions", {
-      flow: "selfCustodial",
+    await flushEffects()
+    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialChooseExperience", {
+      onContinue: { route: "acceptTermsAndConditions" },
     })
   })
 
@@ -309,7 +403,6 @@ describe("AccountTypeSelectionScreen", () => {
       options: ["custodial"],
       defaultSelected: "custodial",
       selfCustodialTemporarilyDisabled: true,
-      loading: false,
     })
 
     const { queryByTestId, getByTestId } = render(<AccountTypeSelectionScreen />)
@@ -319,28 +412,49 @@ describe("AccountTypeSelectionScreen", () => {
     expect(getByTestId("self-custodial-disabled-banner")).toBeTruthy()
   })
 
-  it("shows a loader and disables the continue button while detecting the country", () => {
-    mockUseAccountTypeOptions.mockReturnValue({
-      options: [],
-      defaultSelected: null,
-      selfCustodialTemporarilyDisabled: false,
-      loading: true,
-    })
+  it("does not navigate when the check answers after the screen is gone", async () => {
+    let resolveCheck: (reason: string | null) => void = () => undefined
+    mockCheckBlockReason.mockReturnValue(
+      new Promise<string | null>((resolve) => {
+        resolveCheck = resolve
+      }),
+    )
 
-    const { queryByTestId, getByTestId } = render(<AccountTypeSelectionScreen />)
-
-    expect(queryByTestId("custodial-option")).toBeNull()
-    expect(queryByTestId("self-custodial-option")).toBeNull()
+    const { getByTestId, unmount } = render(<AccountTypeSelectionScreen />)
+    fireEvent.press(getByTestId("custodial-option"))
     fireEvent.press(getByTestId("continue-button"))
+    unmount()
+
+    resolveCheck("region")
+    await flushEffects()
+
+    // Pushing a screen onto whatever the user moved to would be a jump they never asked for.
     expect(mockNavigate).not.toHaveBeenCalled()
   })
 
-  it("forwards the route mode argument to useAccountTypeOptions", () => {
+  it("holds the continue button while the check runs", async () => {
+    mockIsChecking.mockReturnValue(true)
+
+    const { getByTestId } = render(<AccountTypeSelectionScreen />)
+    fireEvent.press(getByTestId("continue-button"))
+    await flushEffects()
+
+    expect(mockCheckBlockReason).not.toHaveBeenCalled()
+    expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  it("leaves the creation rules out of a restore, which creates nothing", async () => {
     mockMode.mockReturnValue("restore")
+    mockCheckBlockReason.mockResolvedValue("region")
 
-    render(<AccountTypeSelectionScreen />)
+    const { getByTestId } = render(<AccountTypeSelectionScreen />)
+    fireEvent.press(getByTestId("custodial-option"))
+    fireEvent.press(getByTestId("continue-button"))
+    await flushEffects()
 
-    expect(mockUseAccountTypeOptions).toHaveBeenCalledWith("restore")
+    // A restore opens no account, so it never reads the connection nor is refused for it.
+    expect(mockCheckBlockReason).not.toHaveBeenCalled()
+    expect(mockNavigate).not.toHaveBeenCalledWith("unsupportedRegion", expect.anything())
   })
 
   it("renders both options on restore even when running from a country blocked for custodial creation", () => {
@@ -349,7 +463,6 @@ describe("AccountTypeSelectionScreen", () => {
       options: ["selfCustodial", "custodial"],
       defaultSelected: null,
       selfCustodialTemporarilyDisabled: false,
-      loading: false,
     })
 
     const { getByTestId } = render(<AccountTypeSelectionScreen />)

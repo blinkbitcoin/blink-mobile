@@ -15,7 +15,7 @@ import {
   type WalletBalance,
 } from "@app/graphql/wallets-utils"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
-import { useDollarBalanceRestricted } from "@app/hooks/use-dollar-balance-restricted"
+import { useDollarBalanceGate } from "@app/hooks/use-dollar-balance-restricted"
 import { usePersistentStateContext } from "@app/store/persistent-state"
 import { getSelfCustodialDefaultCurrency } from "@app/store/persistent-state/self-custodial-default-currency"
 import { type WalletState } from "@app/types/wallet"
@@ -55,7 +55,7 @@ export const useSendWallets = (): SendWallets => {
   const activeWallet = useActiveWallet()
   const { isSelfCustodial } = activeWallet
   const { persistentState } = usePersistentStateContext()
-  const isDollarBalanceRestricted = useDollarBalanceRestricted()
+  const { isGated: isDollarBalanceGated, isRegionPending } = useDollarBalanceGate()
 
   const { data, loading: custodialLoading } = useSendBitcoinDetailsScreenQuery({
     fetchPolicy: "cache-first",
@@ -79,19 +79,21 @@ export const useSendWallets = (): SendWallets => {
     )
     const preferred = getSelfCustodialDefaultCurrency(persistentState)
     const defaultWallet = preferred === WalletCurrency.Usd ? usd ?? btc : btc
+    const isSelfCustodialWalletLoading = !activeWallet.isReady || isRegionPending
     const result: SendWallets = {
       wallets: selfCustodialWallets,
       defaultWallet,
       btcWallet: btc,
       usdWallet: usd,
       network: unauthedData?.globals?.network,
-      loading: !activeWallet.isReady,
+      loading: isSelfCustodialWalletLoading,
       isSelfCustodial: true,
     }
-    return restrictToBitcoinWhenBlocked(result, isDollarBalanceRestricted)
+    return restrictToBitcoinWhenBlocked(result, isDollarBalanceGated)
   }
 
   const custodialWallets = data?.me?.defaultAccount?.wallets
+  const isCustodialWalletLoading = custodialLoading || isRegionPending
   const result: SendWallets = {
     wallets: custodialWallets,
     defaultWallet: getDefaultWallet(
@@ -101,10 +103,10 @@ export const useSendWallets = (): SendWallets => {
     btcWallet: getBtcWallet(custodialWallets),
     usdWallet: getUsdWallet(custodialWallets),
     network: data?.globals?.network ?? unauthedData?.globals?.network,
-    loading: custodialLoading,
+    loading: isCustodialWalletLoading,
     isSelfCustodial: false,
   }
-  return restrictToBitcoinWhenBlocked(result, isDollarBalanceRestricted)
+  return restrictToBitcoinWhenBlocked(result, isDollarBalanceGated)
 }
 
 export const useSendBalances = (): {

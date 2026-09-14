@@ -46,6 +46,8 @@ const en: BaseTranslation = {
   },
   AuthenticationScreen: {
     authenticationDescription: "Authenticate to continue",
+    authenticationRequired:
+      "Authentication is required. You can set up a PIN or biometrics in Security settings.",
     setUp: "Set up Biometric Authentication",
     setUpAuthenticationDescription: "Use biometric to authenticate",
     skip: "Skip",
@@ -2099,7 +2101,7 @@ const en: BaseTranslation = {
       sendingLimit: "Reduced daily sending limit",
       noOnchain: "No receiving bitcoin onchain",
       recoveryOption: "Recover funds by SMS or email",
-      dailyLimit: "USD 1,000 daily transaction limit",
+      dailyLimit: "USD {limit: string} daily transaction limit",
       onchainReceive: "Receive bitcoin onchain",
     },
   },
@@ -2107,10 +2109,70 @@ const en: BaseTranslation = {
     navToSettingsTitle: "Location permissions",
     navToSettingsText:
       "If you'd like to give Blink location permissions, please navigate to your settings and enable it there",
-    payBusiness: "Pay this business",
     openSettings: "Open settings",
     title: "Map",
     error: "Oops. Something went wrong while getting your location",
+    attribution: "Places from BTC Map, © OpenStreetMap contributors",
+    unnamedPlace: "Unnamed place",
+    loadingPlaces: "Loading places from BTC Map",
+    placesError: "Couldn't load places from BTC Map",
+    detailsError: "Couldn't load this place",
+    cannotOpenLink: "Nothing on this phone can open that link",
+    openNow: "Open now",
+    closedNow: "Closed",
+    navigate: "Navigate",
+    payMerchant: "Pay this merchant",
+    requiresApp: "Needs a specific app to pay",
+    boosted: "Boosted",
+    verifiedOn: "Verified {date: string}",
+    lastVerifiedOn: "Last verified {date: string}",
+    needsSurvey: "This location needs to be surveyed",
+    searchError: "Couldn't search this area",
+    clearSearch: "Clear search",
+    nothingToShow: "Nothing to show",
+    metersAway: "{distance: string} meters away",
+    kilometersAway: "{distance: string} km away",
+    filters: "Filters",
+    categories: "Categories",
+    selectAll: "Select all",
+    clearAll: "Clear all",
+    addPlace: "Add to map",
+    addPlaceTitle: "Add a place",
+    placePinHint: "Move the map to put the pin on the place",
+    placeName: "Name",
+    placeNameHint: "What the place is called",
+    placeCategory: "Category",
+    placeCategoryHint: "Choose a category",
+    placeLocation: "Location",
+    changeLocation: "Change",
+    placeReviewNote:
+      "New places go to BTC Map. Its community reviews and maintains everything on the map.",
+    placeSubmitted:
+      "Place sent to BTC Map — thanks for adding it. New places can take a while to appear on the map.",
+    placeSubmissionFailed:
+      "The place could not be sent. Check your connection and try again.",
+    // One sentence on purpose: the refusal's real reason (a rate limit, a level
+    // too low, a duplicate) is logged to Crashlytics — see use-place-submission.ts —
+    // and the form offers the likeliest one rather than a list.
+    placeRefused:
+      "BTC Map could not accept this place — it may already be on the map. Nothing was changed.",
+    category: {
+      restaurants: "Restaurants",
+      cafes: "Cafés",
+      bakeries: "Bakeries & sweets",
+      bars: "Bars & nightlife",
+      groceries: "Groceries",
+      shops: "Shops",
+      money: "ATMs & exchange",
+      lodging: "Hotels & lodging",
+      automotive: "Cars & fuel",
+      health: "Health",
+      beauty: "Beauty & wellness",
+      services: "Services",
+      sports: "Sports & outdoors",
+      leisure: "Leisure & culture",
+      other: "Other",
+    },
   },
   HomeScreen: {
     pendingReceiveBadge: "+{amount: string} pending",
@@ -2126,11 +2188,15 @@ const en: BaseTranslation = {
   },
   PinScreen: {
     attemptsRemaining: "Incorrect PIN. {attemptsRemaining: number} attempts remaining.",
+    enterPin: "Enter your PIN code",
+    lockoutUnavailable: "Couldn't record the failed attempt securely. Logging out.",
     oneAttemptRemaining: "Incorrect PIN. 1 attempt remaining.",
+    pinUnreadable: "Couldn't check your PIN. Please try again.",
     setPin: "Set your PIN code",
     setPinFailedMatch: "Pins didn't match - Set your PIN code",
     storePinFailed: "Unable to store your pin.",
     tooManyAttempts: "Too many failed attempts. Logging out.",
+    tryAgainIn: "Try again in {seconds: number}s.",
     verifyPin: "Verify your PIN code",
   },
   PriceHistoryScreen: {
@@ -2236,7 +2302,10 @@ const en: BaseTranslation = {
     invalidContent:
       "We found:\n\n{found: string}\n\nThis is not a valid Bitcoin address or Lightning invoice",
     expiredContent: "We found:\n\n{found: string}\n\nThis invoice has expired",
+    unresolvedContent:
+      "We found:\n\n{found: string}\n\nWe could not process this code. It may have expired, or the service may be temporarily unavailable. Ask for a new code or try again later.",
     invalidTitle: "Invalid QR Code",
+    unresolvedTitle: "Code Not Available",
     openLinkTitle: "Open Link",
     confirmOpenLink: "Are you sure you want to open this link?",
     noQrCode: "We could not find a QR code in the image",
@@ -2328,6 +2397,8 @@ const en: BaseTranslation = {
       "If you want to send money to another account that you own, you can use an invoice, LN or BTC address instead.",
     lnAddressError:
       "We can't reach this Lightning address. If you are sure it exists, you can try again later.",
+    lnurlServiceError:
+      "We could not process this code. It may have expired, or the service may be temporarily unavailable.",
     lnAddressAdvice:
       "Either make sure the spelling is right or ask the recipient for an invoice or BTC address instead.",
     unknownLightning: "We can't parse this Lightning address. Please try again.",
@@ -2459,9 +2530,11 @@ const en: BaseTranslation = {
     apiAcess: "API integration",
     apiDocumentation: "API documentation",
     apiDashboard: "API access and dashboard",
+    mode: "Mode",
     pos: "Point of Sale",
     posCopied: "Your point of sale link has been copied",
     createAddress: "Create address",
+    addressDisabled: "(disabled)",
     donationButton: "Donate Button",
     btcpayServer: "BTCPay Server",
     woocommerce: "WooCommerce",
@@ -2537,7 +2610,7 @@ const en: BaseTranslation = {
     fundsMoreThan5Dollars: "Your account has more than $5",
     itsATrialAccount:
       "Trial accounts have reduced transaction limits and no recovery method. If you lose your phone or uninstall the app, your funds will be unrecoverable.",
-    accountBeingDeleted: "Your account is being deleted, please wait...",
+    accountBeingDeleted: "Your account is being closed, please wait...",
     dangerZone: "Danger zone",
     phoneDeletedSuccessfully: "Phone deleted successfully",
     phoneNumber: "Phone Number",
@@ -2659,6 +2732,27 @@ const en: BaseTranslation = {
   },
   StablesatsRestriction: {
     walletLabel: "not available in your region",
+    anonModeWalletLabel: "not available in Incognito mode",
+  },
+  AnonModeConvertModal: {
+    title: "Transfer your Dollar Balance first",
+    body: "Incognito Mode supports the Bitcoin Balance only. Transfer your Dollar Balance to your Bitcoin Balance to switch.",
+  },
+  EnhancedModePrompt: {
+    title: "This feature requires Enhanced Mode",
+    body: "You're in Incognito Mode, Blink doesn't know your region, so some features aren't available. Switch to Enhanced to run a location check and unlock all features for your region.",
+    switchButton: "Switch to Enhanced",
+  },
+  ModeSwitchSuccessScreen: {
+    enhanced: "Switched to Enhanced\nNon-custodial Mode",
+    anon: "Switched to Incognito\nNon-custodial Mode",
+  },
+  RestrictedRegion: {
+    title: "Restricted region detected",
+    body: "Your connection appears to be from a restricted region. Blink cannot provide services from this location. Your balances are unaffected.",
+    bodyReturn: "Once you leave this region, all functionality will return to normal.",
+    learnMore: "Learn more",
+    contactSupport: "Contact support",
   },
   DollarBalanceRestriction: {
     modalTitle: "Dollar Balance is not available in your region",
@@ -2708,10 +2802,11 @@ const en: BaseTranslation = {
     receive: "Receive",
     transfer: "Transfer",
     lightning: "Lightning",
+    lightningBelowThreshold: "Lightning below {threshold: string} SAT",
     intraledger: "Intraledger",
-    onchainPriority: "Onchain priority (asap)",
-    onchainStandard: "Onchain standard (~4h)",
-    onchainEconomy: "Onchain economy",
+    onchainPriority: "Onchain Priority (~10m)",
+    onchainStandard: "Onchain Standard (~4h)",
+    onchainEconomy: "Onchain Economy (~24h)",
     lightningTransactions: "Lightning transactions",
     onchainBelowThreshold: "Onchain below {threshold: string} SAT",
     onchainAboveThreshold: "Onchain above {threshold: string} SAT",
@@ -2719,7 +2814,6 @@ const en: BaseTranslation = {
       "Onchain between {lower: string} and {upper: string} SAT",
     transferFee: "Transfer fee",
     noFee: "no fee",
-    lightningSendFee: "{fee: string} + ~{routingFee: string} routing fee",
     fromApprox: "from ~{fee: string}",
     satAmount: "{amount: string} SAT",
     error: "Unable to fetch fees at this time",
@@ -2755,7 +2849,6 @@ const en: BaseTranslation = {
     letsGo: "Let's go!",
     stayInTrialMode: "Stay in trial mode",
     upgradeToLevel: "Upgrade to Level {level: number}",
-    notNow: "Not now",
     setUpLevelAccount: "Set up Level {level: number} account",
   },
   SetAddressModal: {
@@ -2817,7 +2910,7 @@ const en: BaseTranslation = {
       mainTitle: "Welcome to Level 1",
       title: "New features unlocked for your account:",
       receiveBitcoinDescription: "Receive Bitcoin using your phone number",
-      dailyLimitDescription: "Send up to USD 1,000 per day",
+      dailyLimitDescription: "Send up to USD {limit: string} per day",
       onchainDescription: "Receive on-chain payments",
     },
     emailBenefits: {
@@ -2948,6 +3041,7 @@ const en: BaseTranslation = {
     btcAccount: "Bitcoin Balance",
     cancel: "Cancel",
     card: "Card",
+    notNow: "Not now",
     close: "Close",
     confirm: "Confirm",
     convert: "Convert",
@@ -3099,22 +3193,22 @@ const en: BaseTranslation = {
     defaultSupportMessage:
       "Hey there! I need some help with {bankName: string}, I'm using the version {version: string} on {os: string}.",
     emailCopied: "email {email: string} copied to clipboard",
-    deleteAccount: "Delete account",
+    deleteAccount: "Close account",
     delete: "delete",
-    typeDelete: 'Please type "{delete: string}" to confirm account deletion',
+    typeDelete: 'Please type "{delete: string}" to confirm account closure',
     finalConfirmationAccountDeletionTitle: "Final Confirmation Required",
     finalConfirmationAccountDeletionMessage:
-      "Are you sure you want to delete your account? This action is irreversible.",
+      "After closing, you won't be able to access or use your account. We may retain certain records as required by law and our retention obligations. Are you sure you want to close your account?",
     deleteAccountBalanceWarning:
-      "Deleting your account will cause you to lose access to your current balance. Are you sure you want to proceed?",
+      "Closing your account will cause you to lose access to your current balance. Are you sure you want to proceed?",
     deleteAccountConfirmation:
-      "Your account has been written for deletion.\n\nWhen the probation period related to regulatory requirement is over, the remaining data related to your account will be permanently deleted.",
+      "Your account has been closed.\n\nWe may retain certain records as required by law and our retention obligations.",
     deleteAccountFromPhone:
-      "Hey there!, please delete my account. My phone number is {phoneNumber: string}.",
+      "Hey there!, please close my account. My phone number is {phoneNumber: string}.",
     deleteAccountError:
       "Something went wrong. Contact {email: string} for further assistance.",
     bye: "Bye!",
-    deleteAccountWarning: "Attention: Account deletion is permanent!\nMake sure wallets have no funds before deleting.\nDeleted account cannot be reinstated.",
+    deleteAccountWarning: "Attention: Closing your account is permanent!\nMake sure wallets have no funds before closing.\nA closed account cannot be reinstated.\nWe may retain certain records as required by law.",
   },
   lnurl: {
     overLimit: "You can't send more than max amount",
@@ -3572,8 +3666,6 @@ const en: BaseTranslation = {
         enterNewPin: "Enter new PIN",
         enterNewPinSubtitle: "Please enter your new 4-digit PIN.",
         biometricDescription: "Verify your identity to change PIN",
-        biometricRequired:
-          "Biometric authentication is required to change your PIN.",
         pinChangedTitle: "PIN changed",
         pinChangedSubtitle: "Your PIN has been changed successfully.",
         pinChangedToast: "PIN has been changed successfully",
@@ -3986,6 +4078,8 @@ const en: BaseTranslation = {
     reminderBulletin: {
       title: "Important",
       body: "Move to a non-custodial account via guided migration, or withdraw, before {date: string}. Receiving stops {receiveStopsDate: string}.",
+      bodyReceiveDisabled:
+        "Receiving has stopped. Move to a non-custodial account via guided migration, or withdraw, before {date: string}.",
       migrateCta: "Migrate",
     },
     offboardBulletin: {
@@ -4033,9 +4127,27 @@ const en: BaseTranslation = {
       "Restore flow will be available in a future update.",
     createFailed: "Failed to create wallet. Please try again.",
   },
+  ChooseExperienceScreen: {
+    title: "Select non-custodial mode",
+    subtitle:
+      "Your choice decides which features are available. You can switch whenever you want.",
+    enhancedLabel: "Enhanced\nMode",
+    enhancedDescription:
+      "We use your region to unlock valuable services available where you are.",
+    anonLabel: "Incognito\nMode",
+    anonDescription: "For maximum privacy. Less features.",
+    continueButton: "Continue",
+  },
   UnsupportedRegionScreen: {
     title: "Unsupported region",
     description: "Unfortunately we can not serve users from your current region.",
+    custodialSignupDescription:
+      "Unfortunately we can not create new custodial accounts in your current region. You can use a self-custodial account instead.",
+    custodialSignupOnlyDescription:
+      "Unfortunately we can not create new custodial accounts in your current region.",
+    unknownRegionTitle: "Region not determined",
+    unknownRegionDescription:
+      "We could not determine your region. Please check your connection and try again.",
   },
   RestoreScreen: {
     title: "Restore wallet",

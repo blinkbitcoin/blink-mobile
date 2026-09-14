@@ -39,8 +39,15 @@ jest.mock("@react-native-firebase/crashlytics", () => ({
   default: () => ({ recordError: mockRecordError, log: jest.fn() }),
 }))
 
+const mockIsRegionPending = jest.fn(() => false)
+
 jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
   useDollarBalanceRestricted: () => false,
+  useDollarBalanceGate: () => ({
+    isGated: false,
+    isRegionPending: mockIsRegionPending(),
+  }),
+  useDollarBalanceGated: () => false,
 }))
 
 jest.mock("@app/utils/toast", () => ({
@@ -154,6 +161,7 @@ describe("StableBalanceSettingsScreen", () => {
     mockRefreshStableBalanceActive.mockResolvedValue(undefined)
     mockWallet.mockReturnValue(baseContext)
     mockToggleQuote.mockReturnValue(readyQuote)
+    mockIsRegionPending.mockReturnValue(false)
   })
 
   it("renders the settings title and description", () => {
@@ -181,6 +189,29 @@ describe("StableBalanceSettingsScreen", () => {
     const { getByText } = renderScreen()
 
     expect(getByText("Stable Balance")).toBeTruthy()
+  })
+
+  /**
+   * The toggle refuses an activation until the region resolves, and refuses it silently so
+   * it never accuses a user the region may yet clear. Disabling the control is what makes
+   * that wait legible: otherwise the switch flips on and snaps back with no explanation.
+   */
+  it("disables the switch while the region is still resolving", () => {
+    mockIsRegionPending.mockReturnValue(true)
+
+    const { getByTestId } = renderScreen()
+
+    expect(getByTestId("stable-balance-switch").props.accessibilityState.disabled).toBe(
+      true,
+    )
+  })
+
+  it("enables the switch once the region resolves", () => {
+    const { getByTestId } = renderScreen()
+
+    expect(getByTestId("stable-balance-switch").props.accessibilityState.disabled).toBe(
+      false,
+    )
   })
 
   it("activates directly when BTC balance is zero (no conversion needed)", async () => {

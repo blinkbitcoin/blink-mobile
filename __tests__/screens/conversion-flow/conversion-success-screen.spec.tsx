@@ -8,13 +8,18 @@ import { ContextForScreen } from "../helper"
 
 const mockPopToTop = jest.fn()
 const mockReplace = jest.fn()
-let mockRouteParams: { returnToMigration?: boolean } | undefined
+const mockDispatch = jest.fn()
+let mockRouteParams: { returnTo?: "migration" | "modeSelection" } | undefined
 
 jest.mock("@react-navigation/native", () => {
   const actualNav = jest.requireActual("@react-navigation/native")
   return {
     ...actualNav,
-    useNavigation: () => ({ popToTop: mockPopToTop, replace: mockReplace }),
+    useNavigation: () => ({
+      popToTop: mockPopToTop,
+      replace: mockReplace,
+      dispatch: mockDispatch,
+    }),
     useRoute: () => ({ params: mockRouteParams }),
   }
 })
@@ -52,7 +57,7 @@ describe("ConversionSuccessScreen", () => {
   })
 
   it("hands off to the migration entry for a migration conversion", () => {
-    mockRouteParams = { returnToMigration: true }
+    mockRouteParams = { returnTo: "migration" }
 
     renderScreen()
 
@@ -61,6 +66,35 @@ describe("ConversionSuccessScreen", () => {
     })
 
     expect(mockReplace).toHaveBeenCalledWith("accountMigrationEntry")
+    expect(mockPopToTop).not.toHaveBeenCalled()
+  })
+
+  it("rebuilds the settings path with Anon preselected for an Anon-switch conversion", () => {
+    mockRouteParams = { returnTo: "modeSelection" }
+
+    renderScreen()
+
+    act(() => {
+      jest.advanceTimersByTime(SUCCESS_DELAY)
+    })
+
+    expect(mockDispatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "RESET",
+        payload: expect.objectContaining({
+          index: 2,
+          routes: [
+            { name: "Primary" },
+            { name: "settings" },
+            {
+              name: "selfCustodialChooseExperience",
+              params: { entry: "settings", initialMode: "anon" },
+            },
+          ],
+        }),
+      }),
+    )
+    expect(mockReplace).not.toHaveBeenCalled()
     expect(mockPopToTop).not.toHaveBeenCalled()
   })
 

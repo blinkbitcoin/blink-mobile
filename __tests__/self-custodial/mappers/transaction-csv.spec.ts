@@ -355,7 +355,7 @@ describe("buildTransactionsCsv", () => {
     const autoConvertSend = {
       ...lightningSend,
       id: "auto-conv-1",
-      conversionDetails: { conversionId: "conv2" },
+      conversionDetails: { status: "Completed", conversions: [] },
     } as never as Payment
 
     const csv = buildTransactionsCsv([autoConvertSend], {

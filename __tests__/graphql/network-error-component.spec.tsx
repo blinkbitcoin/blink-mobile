@@ -39,6 +39,13 @@ const mockNavigation = {
   reset: mockReset,
 }
 
+const storeProfiles = (profiles: unknown[]) => {
+  ;(KeyStoreWrapper.readSessionProfiles as jest.Mock).mockResolvedValue({
+    status: "found",
+    profiles,
+  })
+}
+
 beforeEach(() => {
   jest.clearAllMocks()
   ;(useNetworkError as jest.Mock).mockReturnValue({
@@ -64,6 +71,7 @@ beforeEach(() => {
     saveToken: mockSaveToken,
   })
   ;(useNavigation as jest.Mock).mockReturnValue(mockNavigation)
+  storeProfiles([])
 
   jest.spyOn(Alert, "alert").mockImplementation((title, message, buttons) => {
     buttons?.[0]?.onPress?.()
@@ -122,7 +130,7 @@ describe("NetworkErrorComponent", () => {
   })
 
   it("handles InvalidAuthentication with multiple profiles - switches account", async () => {
-    ;(KeyStoreWrapper.getSessionProfiles as jest.Mock).mockResolvedValue([
+    storeProfiles([
       { token: "current-token", username: "user1" },
       { token: "other-token", username: "user2" },
     ])
@@ -158,9 +166,7 @@ describe("NetworkErrorComponent", () => {
   })
 
   it("handles InvalidAuthentication with one profile - shows alert and navigates to getStarted", async () => {
-    ;(KeyStoreWrapper.getSessionProfiles as jest.Mock).mockResolvedValue([
-      { token: "current-token", username: "user1" },
-    ])
+    storeProfiles([{ token: "current-token", username: "user1" }])
 
     const { rerender } = render(<NetworkErrorComponent />)
 
@@ -174,6 +180,8 @@ describe("NetworkErrorComponent", () => {
 
     await waitFor(() => {
       expect(Alert.alert).toHaveBeenCalled()
+      // Readable store, genuinely the last profile: the list goes with it.
+      expect(mockLogout).toHaveBeenCalledWith({ preserveStoredCredentials: false })
       expect(mockReset).toHaveBeenCalledWith({
         index: 0,
         routes: [{ name: "getStarted" }],
@@ -199,7 +207,9 @@ describe("NetworkErrorComponent", () => {
 
     await waitFor(
       () => {
-        expect(mockLogout).toHaveBeenCalledWith()
+        // A 401 with no active token can be a stale one arriving mid-switch,
+        // so what is stored stays put.
+        expect(mockLogout).toHaveBeenCalledWith({ preserveStoredCredentials: true })
         expect(mockReset).toHaveBeenCalledWith({
           index: 0,
           routes: [{ name: "getStarted" }],
@@ -262,13 +272,10 @@ describe("NetworkErrorComponent", () => {
   })
 
   it("falls back to logout on error during token expiry handling", async () => {
-    // The component logs the simulated storage failure via console.error;
-    // capture it so the expected error doesn't pollute CI logs (and assert it
-    // actually happened).
+    // The component logs the simulated failure via console.error; capture it so
+    // the expected error doesn't pollute CI logs (and assert it happened).
     const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {})
-    ;(KeyStoreWrapper.getSessionProfiles as jest.Mock).mockRejectedValue(
-      new Error("Storage error"),
-    )
+    mockLogout.mockRejectedValueOnce(new Error("Storage error"))
 
     const { rerender } = render(<NetworkErrorComponent />)
 
@@ -281,7 +288,8 @@ describe("NetworkErrorComponent", () => {
     rerender(<NetworkErrorComponent />)
 
     await waitFor(() => {
-      expect(mockLogout).toHaveBeenCalledWith()
+      // The teardown threw, so the saved list is kept rather than erased blind.
+      expect(mockLogout).toHaveBeenCalledWith({ preserveStoredCredentials: true })
       expect(mockReset).toHaveBeenCalledWith({
         index: 0,
         routes: [{ name: "getStarted" }],
@@ -293,5 +301,39 @@ describe("NetworkErrorComponent", () => {
       expect.objectContaining({ message: "Storage error" }),
     )
     consoleErrorSpy.mockRestore()
+  })
+
+  // The untokened logout erases every saved session. Reaching it because the
+  // store could not be read would delete the profiles the read never saw.
+  it("never runs the session-erasing logout when the profile store is unreadable", async () => {
+    ;(KeyStoreWrapper.readSessionProfiles as jest.Mock).mockResolvedValue({
+      status: "failed",
+      err: new Error("keystore locked"),
+    })
+
+    const { rerender } = render(<NetworkErrorComponent />)
+
+    ;(useNetworkError as jest.Mock).mockReturnValue({
+      networkError: { statusCode: 401 },
+      token: "current-token",
+      clearNetworkError: mockClearNetworkError,
+    })
+
+    rerender(<NetworkErrorComponent />)
+
+    await waitFor(() => {
+      expect(Alert.alert).toHaveBeenCalled()
+      expect(mockReset).toHaveBeenCalledWith({
+        index: 0,
+        routes: [{ name: "getStarted" }],
+      })
+    })
+    expect(mockLogout).toHaveBeenCalledWith({ preserveStoredCredentials: true })
+    // The dead session's own token was still deactivated.
+    expect(mockLogout).toHaveBeenCalledWith({
+      stateToDefault: false,
+      token: "current-token",
+      isValidToken: false,
+    })
   })
 })

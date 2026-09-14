@@ -48,10 +48,12 @@ jest.mock("@app/config/feature-flags-context", () => ({
   }),
 }))
 
+const mockReadQuery = jest.fn(() => null as unknown)
+
 jest.mock("@apollo/client", () => ({
   ...jest.requireActual("@apollo/client"),
   useApolloClient: () => ({
-    readQuery: jest.fn(() => null),
+    readQuery: mockReadQuery,
   }),
 }))
 
@@ -92,11 +94,74 @@ describe("useUnseenTxAmountBadge", () => {
     jest.clearAllMocks()
   })
 
+  it("falls back to the cached custodial transactions when none are provided", () => {
+    mockReadQuery.mockReturnValue({
+      me: {
+        defaultAccount: {
+          pendingIncomingTransactions: [tx({ id: "cached", createdAt: 9 })],
+          transactions: { edges: [] },
+        },
+      },
+    })
+
+    const { result } = renderHook(() =>
+      useUnseenTxAmountBadge({
+        transactions: [],
+        hasUnseenBtcTx: true,
+        hasUnseenUsdTx: false,
+      }),
+    )
+
+    expect(result.current.latestUnseenTx?.id).toBe("cached")
+  })
+
+  it("never reads the custodial cache for a self-custodial account", () => {
+    mockReadQuery.mockReturnValue({
+      me: {
+        defaultAccount: {
+          pendingIncomingTransactions: [tx({ id: "cached", createdAt: 9 })],
+          transactions: { edges: [] },
+        },
+      },
+    })
+
+    const { result } = renderHook(() =>
+      useUnseenTxAmountBadge({
+        transactions: [],
+        isSelfCustodial: true,
+        hasUnseenBtcTx: true,
+        hasUnseenUsdTx: false,
+      }),
+    )
+
+    expect(mockReadQuery).not.toHaveBeenCalled()
+    expect(result.current.latestUnseenTx).toBeUndefined()
+  })
+
   it("returns null when nothing unseen", () => {
     const { result } = renderHook(() =>
       useUnseenTxAmountBadge({
         transactions: [tx({ id: "a", createdAt: 1 })],
         hasUnseenBtcTx: false,
+        hasUnseenUsdTx: false,
+      }),
+    )
+
+    expect(result.current.latestUnseenTx).toBeUndefined()
+    expect(result.current.unseenAmountText).toBeNull()
+  })
+
+  /** The badge and the seen state share one eligibility predicate, so a transaction the
+   *  seen state never counts must not be the one the badge announces: a zero settlement
+   *  has no amount to show, and a fee reimbursement echoes a send already announced. */
+  it("announces nothing when the only unseen transactions are not announceable", () => {
+    const { result } = renderHook(() =>
+      useUnseenTxAmountBadge({
+        transactions: [
+          tx({ id: "zero", createdAt: 1, settlementAmount: 0 }),
+          tx({ id: "reimbursement", createdAt: 2, memo: "Fee Reimbursement" }),
+        ],
+        hasUnseenBtcTx: true,
         hasUnseenUsdTx: false,
       }),
     )
@@ -115,6 +180,41 @@ describe("useUnseenTxAmountBadge", () => {
     )
 
     expect(result.current.latestUnseenTx?.id).toBe("new")
+  })
+
+  it("keeps the most recent when the newest is not the last in the list", () => {
+    const { result } = renderHook(() =>
+      useUnseenTxAmountBadge({
+        transactions: [tx({ id: "new", createdAt: 2 }), tx({ id: "old", createdAt: 1 })],
+        hasUnseenBtcTx: true,
+        hasUnseenUsdTx: false,
+      }),
+    )
+
+    expect(result.current.latestUnseenTx?.id).toBe("new")
+  })
+
+  /** A transaction can be announceable and still have nothing printable: the badge shows a
+   *  figure, so without one there is no badge to show. */
+  it("announces no text when neither the display nor the raw amount can be formatted", () => {
+    const { result } = renderHook(() =>
+      useUnseenTxAmountBadge({
+        transactions: [
+          tx({
+            id: "unformattable",
+            createdAt: 1,
+            settlementAmount: null as unknown as number,
+            settlementDisplayAmount: null as unknown as string,
+            settlementDisplayCurrency: "",
+          }),
+        ],
+        hasUnseenBtcTx: true,
+        hasUnseenUsdTx: false,
+      }),
+    )
+
+    expect(result.current.latestUnseenTx?.id).toBe("unformattable")
+    expect(result.current.unseenAmountText).toBeNull()
   })
 
   it("ignores currencies without unseen txs", () => {
@@ -171,7 +271,7 @@ describe("useUnseenTxAmountBadge", () => {
     expect(sendResult.current.unseenAmountText).toBe("BTC 10")
   })
 
-  it("navigates to transactionDetail using latest tx id", () => {
+  it("navigates to transactionDetail for the transaction it is given", () => {
     const { result } = renderHook(() =>
       useUnseenTxAmountBadge({
         transactions: [tx({ id: "navigate-me", createdAt: 10 })],
@@ -180,10 +280,24 @@ describe("useUnseenTxAmountBadge", () => {
       }),
     )
 
-    result.current.handleUnseenBadgePress()
+    result.current.navigateToTransaction("navigate-me")
 
     expect(mockNavigate).toHaveBeenCalledWith("transactionDetail", {
       txid: "navigate-me",
     })
+  })
+
+  it("does not navigate without a transaction to open", () => {
+    const { result } = renderHook(() =>
+      useUnseenTxAmountBadge({
+        transactions: [],
+        hasUnseenBtcTx: false,
+        hasUnseenUsdTx: false,
+      }),
+    )
+
+    result.current.navigateToTransaction("")
+
+    expect(mockNavigate).not.toHaveBeenCalled()
   })
 })

@@ -1,0 +1,45 @@
+diff --git a/node_modules/react-native-maps/android/src/main/java/com/rnmaps/maps/MapView.java b/node_modules/react-native-maps/android/src/main/java/com/rnmaps/maps/MapView.java
+index ebf8780..63418f0 100644
+--- a/node_modules/react-native-maps/android/src/main/java/com/rnmaps/maps/MapView.java
++++ b/node_modules/react-native-maps/android/src/main/java/com/rnmaps/maps/MapView.java
+@@ -1166,24 +1166,34 @@ public class MapView extends com.google.android.gms.maps.MapView implements Goog
+     }
+ 
+     private void safeAddFeature(int index, MapFeature mapFeature){
++        // `features` mirrors this view's children one-for-one: `getFeatureCount`
++        // reports its size as the child count, `getFeatureAt` answers `getChildAt`,
++        // and `removeFeatureAt` calls `features.remove(index)`, which shifts.
++        // Adding therefore has to insert and shift too. It used to `set(index, …)`,
++        // which OVERWRITES: any insert that is not at the end silently dropped the
++        // feature already at that index — leaving its Google marker on the map with
++        // nothing left able to remove it, and every later index off by one, so
++        // subsequent removals took the wrong markers off. Visible as pins that
++        // linger after the set of markers changes without the camera moving.
++        // Upstream: https://github.com/react-native-maps/react-native-maps/issues/5977
+         if(paused || features.size() < index){
+             if (savedFeatures == null) {
+                 savedFeatures = new ArrayList<>();
+             }
+ 
+-            // Ensure the list is large enough to set at the given index
+-            while(savedFeatures.size() <= index){
++            // Ensure the list is long enough to insert at the given index
++            while(savedFeatures.size() < index){
+                 savedFeatures.add(null);
+             }
+-            savedFeatures.set(index, mapFeature);
++            savedFeatures.add(index, mapFeature);
+             return;
+         }
+ 
+-        // Ensure the list is large enough to set at the given index
+-        while(features.size() <= index){
++        // Ensure the list is long enough to insert at the given index
++        while(features.size() < index){
+             features.add(null);
+         }
+-        features.set(index, mapFeature);
++        features.add(index, mapFeature);
+     }
+ 
+     public void addFeature(View child, int index) {

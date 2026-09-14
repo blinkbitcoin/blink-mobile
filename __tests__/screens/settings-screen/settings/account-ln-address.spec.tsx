@@ -32,6 +32,11 @@ jest.mock("@app/self-custodial/providers/backup-state", () => ({
   useBackupState: () => ({ backupState: { status: mockBackupStatus, method: null } }),
 }))
 
+let mockIsAnonMode = false
+jest.mock("@app/self-custodial/hooks/use-self-custodial-account-mode", () => ({
+  useSelfCustodialAccountMode: () => ({ isAnonMode: mockIsAnonMode }),
+}))
+
 jest.mock("@app/components/atomic/galoy-icon", () => ({
   GaloyIcon: () => null,
 }))
@@ -69,6 +74,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
     LL: {
       SettingsScreen: {
         createAddress: () => "Create address",
+        addressDisabled: () => "(disabled)",
       },
       GaloyAddressScreen: { copiedLightningAddressToClipboard: () => "Copied" },
     },
@@ -86,6 +92,7 @@ describe("AccountLNAddress (self-custodial)", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockBackupStatus = "completed"
+    mockIsAnonMode = false
     mockSettingsScreenQuery.mockReturnValue({ data: undefined, loading: false })
     mockUseAccountRegistry.mockReturnValue({
       activeAccount: { id: "sc-1", type: AccountType.SelfCustodial },
@@ -106,6 +113,55 @@ describe("AccountLNAddress (self-custodial)", () => {
 
     expect(mockScModal.mock.calls.at(-1)?.[0]?.isVisible).toBe(true)
     expect(mockCopyToClipboard).not.toHaveBeenCalled()
+  })
+
+  /** Incognito cannot receive, so the row says so beside the address it still shows. */
+  it("marks the address disabled in Incognito", () => {
+    mockUseSelfCustodialWallet.mockReturnValue({ lightningAddress: SC_ADDRESS })
+    mockIsAnonMode = true
+
+    render(<AccountLNAddress />)
+
+    expect(lastRowProps().title).toBe(`${SC_ADDRESS} (disabled)`)
+  })
+
+  /** The suffix is a label, not part of the address: copying it would hand the user a
+   *  string no wallet can pay, so the disabled row offers no copy at all. */
+  it("never copies the disabled label in Incognito", () => {
+    mockUseSelfCustodialWallet.mockReturnValue({ lightningAddress: SC_ADDRESS })
+    mockIsAnonMode = true
+
+    render(<AccountLNAddress />)
+
+    expect(lastRowProps().rightIcon).toBeUndefined()
+
+    act(() => (lastRowProps().action as () => void)())
+
+    expect(mockCopyToClipboard).not.toHaveBeenCalled()
+  })
+
+  /** Nothing to disable, so the suffix must not turn the create prompt into a lie. */
+  it("leaves the create prompt untouched in Incognito when no address exists", () => {
+    mockUseSelfCustodialWallet.mockReturnValue({ lightningAddress: null })
+    mockIsAnonMode = true
+
+    render(<AccountLNAddress />)
+
+    expect(lastRowProps().title).toBe("Create address")
+  })
+
+  /** Registering an address is the very thing Incognito withholds: publishing one would
+   *  hand the LNURL server the identity the mode exists to keep back. */
+  it("refuses to open the registration modal in Incognito", () => {
+    mockUseSelfCustodialWallet.mockReturnValue({ lightningAddress: null })
+    mockIsAnonMode = true
+
+    render(<AccountLNAddress />)
+
+    act(() => (lastRowProps().action as () => void)())
+
+    expect(mockScModal.mock.calls.at(-1)?.[0]?.isVisible).toBe(false)
+    expect(mockBackupRequiredModal).not.toHaveBeenCalled()
   })
 
   it("shows the registered address and copies it on press", () => {

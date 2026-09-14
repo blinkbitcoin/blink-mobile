@@ -8,7 +8,6 @@ const mockFormatMoneyAmount = jest.fn(
   ({ moneyAmount }: { moneyAmount: { amount: number } }) =>
     `$${(moneyAmount.amount / 100).toFixed(2)}`,
 )
-const mockUseDollarBalanceRestricted = jest.fn()
 
 jest.mock("@app/hooks", () => ({
   usePriceConversion: () => ({ convertMoneyAmount: mockConvertMoneyAmount() }),
@@ -16,10 +15,6 @@ jest.mock("@app/hooks", () => ({
 
 jest.mock("@app/hooks/use-display-currency", () => ({
   useDisplayCurrency: () => ({ formatMoneyAmount: mockFormatMoneyAmount }),
-}))
-
-jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
-  useDollarBalanceRestricted: () => mockUseDollarBalanceRestricted(),
 }))
 
 const wallets = [
@@ -30,7 +25,21 @@ const wallets = [
 describe("useTotalBalance", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockUseDollarBalanceRestricted.mockReturnValue(false)
+  })
+
+  /** satsBalance feeds thresholds read without consulting isLoading (the backup nudge),
+   *  so it must not move when the region verdict lands. Nothing here reads the verdict,
+   *  which is what keeps it steady. */
+  it("keeps satsBalance steady across the region verdict", () => {
+    mockConvertMoneyAmount.mockReturnValue(({ amount }: { amount: number }) => ({
+      amount,
+      currency: "DisplayCurrency",
+      currencyCode: "USD",
+    }))
+
+    const { result } = renderHook(() => useTotalBalance(wallets))
+
+    expect(result.current.satsBalance).toBe(1_050_000)
   })
 
   it("flags isLoading=true while price conversion is bootstrapping (account-switch window)", () => {
@@ -54,43 +63,21 @@ describe("useTotalBalance", () => {
     expect(result.current.isLoading).toBe(false)
   })
 
-  describe("when stablesats is restricted", () => {
-    const buildConvertSpy = () =>
-      jest.fn(({ amount }: { amount: number }) => ({
-        amount,
-        currency: "DisplayCurrency",
-        currencyCode: "USD",
-      }))
+  it("always counts the USD contribution, restricted regions and Anon included", () => {
+    const convert = jest.fn(({ amount }: { amount: number }) => ({
+      amount,
+      currency: "DisplayCurrency",
+      currencyCode: "USD",
+    }))
+    mockConvertMoneyAmount.mockReturnValue(convert)
 
-    it("forces the USD wallet contribution to zero when computing the total", () => {
-      mockUseDollarBalanceRestricted.mockReturnValue(true)
-      const convert = buildConvertSpy()
-      mockConvertMoneyAmount.mockReturnValue(convert)
+    renderHook(() => useTotalBalance(wallets))
 
-      renderHook(() => useTotalBalance(wallets))
-
-      const usdCalls = convert.mock.calls.filter(
-        (args) => (args[0] as unknown as { currencyCode: string }).currencyCode === "USD",
-      )
-      expect(usdCalls.length).toBeGreaterThan(0)
-      expect(usdCalls[0][0]).toEqual(
-        expect.objectContaining({ amount: 0, currencyCode: "USD" }),
-      )
-    })
-
-    it("uses the actual USD balance when not restricted", () => {
-      mockUseDollarBalanceRestricted.mockReturnValue(false)
-      const convert = buildConvertSpy()
-      mockConvertMoneyAmount.mockReturnValue(convert)
-
-      renderHook(() => useTotalBalance(wallets))
-
-      const usdCalls = convert.mock.calls.filter(
-        (args) => (args[0] as unknown as { currencyCode: string }).currencyCode === "USD",
-      )
-      expect(usdCalls[0][0]).toEqual(
-        expect.objectContaining({ amount: 50_000, currencyCode: "USD" }),
-      )
-    })
+    const usdCalls = convert.mock.calls.filter(
+      (args) => (args[0] as unknown as { currencyCode: string }).currencyCode === "USD",
+    )
+    expect(usdCalls[0][0]).toEqual(
+      expect.objectContaining({ amount: 50_000, currencyCode: "USD" }),
+    )
   })
 })

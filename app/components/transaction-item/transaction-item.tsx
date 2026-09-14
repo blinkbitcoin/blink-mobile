@@ -316,6 +316,7 @@ const useStyles = makeStyles(({ colors }, props: UseStyleProps) => ({
     fontWeight: "400",
   },
   subtitle: {
+    color: colors.grey2,
     fontSize: 14,
     lineHeight: 20,
     fontWeight: "400",

@@ -1,15 +1,30 @@
 import {
   RegisterLightningAddressRequest,
   SyncWalletRequest,
-  defaultExternalSigner,
+  defaultExternalSigners,
   type BreezSdkInterface,
   type Network,
   type Payment,
 } from "@breeztech/breez-sdk-spark-react-native"
 
-/** defaultExternalSigner is typed as the bare ExternalSigner interface, which omits the
- *  uniffi lifecycle method, though the concrete object always carries it. */
+import { reportError } from "@app/utils/error-logging"
+
+/** defaultExternalSigners is typed with the bare signer interfaces, which omit the
+ *  uniffi lifecycle method, though the concrete objects always carry it. */
 type DisposableSigner = { uniffiDestroy: () => void }
+
+/** Both destroys run from a finally, where a throw would strand the signer that has not
+ *  been freed yet and replace the pubkey (or the original error) on the way out. */
+const destroySigner = (signer: object) => {
+  try {
+    ;(signer as DisposableSigner).uniffiDestroy()
+  } catch (err) {
+    /** Already freed, or a binding that no longer carries the uniffi lifecycle method.
+     *  Reported rather than swallowed: the second case leaves the seed-derived key material
+     *  resident in native memory until GC, which is what this call exists to prevent. */
+    reportError("destroySigner", err)
+  }
+}
 
 export const getWalletInfo = (sdk: BreezSdkInterface) =>
   sdk.getInfo({ ensureSynced: false })
@@ -18,19 +33,24 @@ export const getWalletInfo = (sdk: BreezSdkInterface) =>
  * Derives the wallet identity pubkey from the mnemonic without a connected SDK, matching
  * getWalletInfo().identityPubkey so the account is identifiable before the SDK connects.
  */
-export const deriveWalletIdentityPubkey = (
+export const deriveWalletIdentityPubkey = async (
   mnemonic: string,
   network: Network,
-): string => {
-  const signer = defaultExternalSigner(mnemonic, undefined, network, undefined)
-  /** The signer holds key material derived from the seed in native memory; free it as soon
-   *  as the pubkey is read instead of waiting for GC to run the destructor guard. */
+): Promise<string> => {
+  const { breezSigner, sparkSigner } = defaultExternalSigners(
+    mnemonic,
+    undefined,
+    network,
+    undefined,
+  )
+  /** The signers hold key material derived from the seed in native memory; free both as
+   *  soon as the pubkey is read instead of waiting for GC to run the destructor guards. */
   try {
-    const { bytes } = signer.identityPublicKey()
+    const { bytes } = await sparkSigner.getIdentityPublicKey()
     return Buffer.from(new Uint8Array(bytes)).toString("hex")
   } finally {
-    const disposableSigner = signer as unknown as DisposableSigner
-    disposableSigner.uniffiDestroy()
+    destroySigner(breezSigner)
+    destroySigner(sparkSigner)
   }
 }
 

@@ -18,11 +18,11 @@ import { TrialAccountLimitsModal } from "@app/components/upgrade-account-modal"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useNotificationPermission, usePriceConversion } from "@app/hooks"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
-import { useDollarBalanceRestricted } from "@app/hooks/use-dollar-balance-restricted"
+import { useDollarBalanceGated } from "@app/hooks/use-dollar-balance-restricted"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { usePaymentRequest as useSelfCustodialPaymentRequest } from "@app/self-custodial/hooks"
-import type { SelfCustodialPaymentRequestState } from "@app/self-custodial/hooks/types"
+import type { ReceivePaymentRequestState } from "./payment/request-state.types"
 import { ActiveWalletStatus } from "@app/types/wallet"
 import { testProps } from "@app/utils/testProps"
 
@@ -88,9 +88,9 @@ const ReceiveScreen = () => {
 }
 
 type ReceiveScreenContentProps = {
-  requestState: SelfCustodialPaymentRequestState
+  requestState: ReceivePaymentRequestState
   isSelfCustodial: boolean
-  selfCustodialRequest: SelfCustodialPaymentRequestState | null | undefined
+  selfCustodialRequest: ReceivePaymentRequestState | null | undefined
 }
 
 const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
@@ -104,7 +104,7 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
 
   useNotificationPermission()
 
-  const isDollarBalanceRestricted = useDollarBalanceRestricted()
+  const isDollarBalanceGated = useDollarBalanceGated()
 
   const [isTrialModalVisible, setIsTrialModalVisible] = useState(false)
   const openTrialModal = useCallback(() => setIsTrialModalVisible(true), [])
@@ -205,7 +205,7 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
 
   const canToggleWallet = isSelfCustodial
     ? !carousel.isOnChainPage && !selfCustodialRequest?.isAssetToggleDisabled
-    : !isDollarBalanceRestricted
+    : !isDollarBalanceGated
 
   return (
     <Screen

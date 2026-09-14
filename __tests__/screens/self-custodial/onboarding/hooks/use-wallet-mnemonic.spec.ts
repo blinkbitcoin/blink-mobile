@@ -1,8 +1,9 @@
-import { renderHook, waitFor } from "@testing-library/react-native"
+import { act, renderHook, waitFor } from "@testing-library/react-native"
 
 import {
   useWalletIdentity,
   useWalletMnemonic,
+  useWalletMnemonicState,
 } from "@app/screens/self-custodial/onboarding/hooks/use-wallet-mnemonic"
 import { AccountType } from "@app/types/wallet"
 
@@ -11,7 +12,12 @@ const mockUseActiveWallet = jest.fn()
 const mockUseAccountRegistry = jest.fn()
 const mockUseMigrationCheckpoint = jest.fn()
 const mockDeriveWalletIdentityPubkey = jest.fn()
+const mockReportError = jest.fn()
 const mockNetwork = "regtest"
+
+jest.mock("@app/utils/error-logging", () => ({
+  reportError: (...args: unknown[]) => mockReportError(...args),
+}))
 
 jest.mock("@app/utils/storage/secureStorage", () => ({
   __esModule: true,
@@ -63,12 +69,15 @@ describe("useWalletMnemonic", () => {
     mockUseMigrationCheckpoint.mockReturnValue({ accountId: null })
   })
 
-  it("returns empty string when no self-custodial account is active", () => {
+  it("returns empty string when no self-custodial account is active", async () => {
     setNoActiveAccount()
 
     const { result } = renderHook(() => useWalletMnemonic())
 
-    expect(result.current).toBe("")
+    await waitFor(() => {
+      expect(result.current).toBe("")
+    })
+    expect(mockGetMnemonicForAccount).not.toHaveBeenCalled()
   })
 
   it("loads mnemonic from keychain for the active account", async () => {
@@ -124,37 +133,182 @@ describe("useWalletMnemonic", () => {
   })
 })
 
+describe("useWalletMnemonicState", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockUseMigrationCheckpoint.mockReturnValue({ accountId: null })
+  })
+
+  it("reports loading until the keychain read settles", async () => {
+    setActiveSelfCustodial()
+    let resolveRead: (value: string) => void = () => {}
+    mockGetMnemonicForAccount.mockReturnValue(
+      new Promise<string>((resolve) => {
+        resolveRead = resolve
+      }),
+    )
+
+    const { result } = renderHook(() => useWalletMnemonicState())
+
+    expect(result.current).toEqual({ mnemonic: "", loading: true })
+
+    await act(async () => {
+      resolveRead("word1 word2 word3")
+    })
+
+    await waitFor(() => {
+      expect(result.current).toEqual({
+        mnemonic: "word1 word2 word3",
+        loading: false,
+      })
+    })
+  })
+
+  /** A stored-but-empty phrase must settle to loading:false, or consumers can never tell
+   *  it apart from a read still in flight and the CTA stays disabled forever. */
+  it("settles with loading false when no phrase is stored", async () => {
+    setActiveSelfCustodial()
+    mockGetMnemonicForAccount.mockResolvedValue(null)
+
+    const { result } = renderHook(() => useWalletMnemonicState())
+
+    await waitFor(() => {
+      expect(result.current).toEqual({ mnemonic: "", loading: false })
+    })
+  })
+
+  it("settles with loading false when there is no account to read", async () => {
+    setNoActiveAccount()
+
+    const { result } = renderHook(() => useWalletMnemonicState())
+
+    await waitFor(() => {
+      expect(result.current).toEqual({ mnemonic: "", loading: false })
+    })
+    expect(mockGetMnemonicForAccount).not.toHaveBeenCalled()
+  })
+
+  it("settles with loading false when the keychain read rejects", async () => {
+    setActiveSelfCustodial()
+    mockGetMnemonicForAccount.mockRejectedValue(new Error("keychain locked"))
+
+    const { result } = renderHook(() => useWalletMnemonicState())
+
+    await waitFor(() => {
+      expect(result.current).toEqual({ mnemonic: "", loading: false })
+    })
+  })
+})
+
 describe("useWalletIdentity", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockDeriveWalletIdentityPubkey.mockReturnValue("derived-pubkey")
+    mockDeriveWalletIdentityPubkey.mockResolvedValue("derived-pubkey")
   })
 
-  it("derives the identity pubkey from the mnemonic", () => {
+  it("derives the identity pubkey from the mnemonic, reporting loading until it settles", async () => {
     const { result } = renderHook(() => useWalletIdentity("youth indicate void"))
 
-    expect(result.current).toBe("derived-pubkey")
+    expect(result.current).toEqual({ pubkey: "", loading: true })
+
+    await waitFor(() =>
+      expect(result.current).toEqual({ pubkey: "derived-pubkey", loading: false }),
+    )
     expect(mockDeriveWalletIdentityPubkey).toHaveBeenCalledWith(
       "youth indicate void",
       mockNetwork,
     )
   })
 
-  it("returns an empty string and skips derivation while the mnemonic is empty", () => {
+  it("returns an empty pubkey and skips derivation while the mnemonic is empty", () => {
     const { result } = renderHook(() => useWalletIdentity(""))
 
-    expect(result.current).toBe("")
+    expect(result.current).toEqual({ pubkey: "", loading: false })
     expect(mockDeriveWalletIdentityPubkey).not.toHaveBeenCalled()
   })
 
-  it("memoizes the derivation across renders with the same mnemonic", () => {
+  it("settles to an empty pubkey when derivation rejects, and reports it", async () => {
+    const derivationError = new Error("signer failed")
+    mockDeriveWalletIdentityPubkey.mockRejectedValue(derivationError)
+
+    const { result } = renderHook(() => useWalletIdentity("youth indicate void"))
+
+    await waitFor(() => expect(result.current).toEqual({ pubkey: "", loading: false }))
+    expect(mockReportError).toHaveBeenCalledWith(
+      "deriveWalletIdentityPubkey",
+      derivationError,
+    )
+  })
+
+  /** The window this closes: with `loading` stored by the effect, the render that swaps the
+   *  phrase still reported loading:false next to the previous wallet's pubkey, so a backup
+   *  started in that frame wrote wallet B's phrase under wallet A's identity. */
+  it("never pairs a phrase with the pubkey of the previous one", async () => {
     const { result, rerender } = renderHook(
       ({ m }: { m: string }) => useWalletIdentity(m),
       { initialProps: { m: "youth indicate void" } },
     )
+    await waitFor(() =>
+      expect(result.current).toEqual({ pubkey: "derived-pubkey", loading: false }),
+    )
+
+    mockDeriveWalletIdentityPubkey.mockReturnValue(new Promise(() => {}))
+    rerender({ m: "other mnemonic words" })
+
+    expect(result.current).toEqual({ pubkey: "", loading: true })
+  })
+
+  it("keeps the same object identity across renders that change nothing", async () => {
+    const { result, rerender } = renderHook(
+      ({ m }: { m: string }) => useWalletIdentity(m),
+      { initialProps: { m: "youth indicate void" } },
+    )
+    await waitFor(() => expect(result.current.pubkey).toBe("derived-pubkey"))
+    const settled = result.current
+
     rerender({ m: "youth indicate void" })
 
-    expect(result.current).toBe("derived-pubkey")
+    expect(result.current).toBe(settled)
+  })
+
+  it("derives once per mnemonic and re-derives when it changes", async () => {
+    const { result, rerender } = renderHook(
+      ({ m }: { m: string }) => useWalletIdentity(m),
+      { initialProps: { m: "youth indicate void" } },
+    )
+    await waitFor(() => expect(result.current.pubkey).toBe("derived-pubkey"))
+    rerender({ m: "youth indicate void" })
+
     expect(mockDeriveWalletIdentityPubkey).toHaveBeenCalledTimes(1)
+
+    mockDeriveWalletIdentityPubkey.mockResolvedValue("other-pubkey")
+    rerender({ m: "other mnemonic words" })
+
+    await waitFor(() => expect(result.current.pubkey).toBe("other-pubkey"))
+    expect(mockDeriveWalletIdentityPubkey).toHaveBeenCalledTimes(2)
+  })
+
+  it("does not set state when unmounted before the derivation resolves", async () => {
+    let resolveDerivation: (pubkey: string) => void = () => {}
+    mockDeriveWalletIdentityPubkey.mockReturnValue(
+      new Promise((resolve) => {
+        resolveDerivation = resolve
+      }),
+    )
+    const consoleError = jest.spyOn(console, "error").mockImplementation(() => {})
+
+    try {
+      const { unmount } = renderHook(() => useWalletIdentity("youth indicate void"))
+      unmount()
+      resolveDerivation("derived-pubkey")
+
+      /** Flush the microtask queue; a state write after unmount would surface as a
+       *  React act()/update warning through console.error. */
+      await new Promise(process.nextTick)
+
+      expect(consoleError).not.toHaveBeenCalled()
+    } finally {
+      consoleError.mockRestore()
+    }
   })
 })

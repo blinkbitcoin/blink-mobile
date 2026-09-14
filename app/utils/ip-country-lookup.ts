@@ -92,19 +92,71 @@ export const resolveIpCountryCode = async (
 }
 
 /**
- * One shared lookup per app session: the device's country rarely changes
- * mid-session and several screens mount hooks that need it, so the external
- * services are hit once instead of once per mount. A failed lookup is not
- * cached, so a later mount can retry (e.g. the app started offline).
+ * One shared lookup per session: the device's country rarely changes within one, and
+ * several screens mount hooks that need it, so the external services are hit once
+ * instead of once per mount. A failed lookup is not cached, so a later mount can retry
+ * (e.g. the app started offline).
+ *
+ * A session is not the JS process. The region a session runs under is the one its
+ * connection resolves to, so this is dropped whenever a new session starts
+ * (`resetIpCountryLookup`) and the next consumer resolves afresh. Held for the process
+ * instead, a user who changed network would keep the country they launched on until they
+ * killed the app.
  */
 let sharedLookup: Promise<CountryCode | undefined> | null = null
 
+/**
+ * Bumped by every reset. Hooks read it so a reset re-runs their effect: clearing the
+ * promise alone only serves consumers that mount afterwards, and a screen already on
+ * display would keep the country it resolved a session ago.
+ */
+let lookupGeneration = 0
+
+const generationSubscribers = new Set<() => void>()
+
+/** `useSyncExternalStore` pair, so a reset re-renders the hooks reading the country
+ *  rather than only affecting whatever mounts next. */
+export const subscribeToIpCountryLookup = (onChange: () => void): (() => void) => {
+  generationSubscribers.add(onChange)
+  return () => {
+    generationSubscribers.delete(onChange)
+  }
+}
+
+export const getIpCountryLookupGeneration = (): number => lookupGeneration
+
+/**
+ * Drops the shared lookup so the next consumer resolves against the current connection.
+ * Called at each session start; it issues no request of its own, so a mode that resolves
+ * nothing (Anon) stays unaffected.
+ */
+export const resetIpCountryLookup = (): void => {
+  sharedLookup = null
+  lookupGeneration += 1
+  generationSubscribers.forEach((onChange) => onChange())
+}
+
 export const resolveIpCountryCodeCached = (): Promise<CountryCode | undefined> => {
   if (!sharedLookup) {
-    sharedLookup = resolveIpCountryCode().then((countryCode) => {
-      if (!countryCode) sharedLookup = null
-      return countryCode
-    })
+    /** Captured so a lookup still in flight when a reset lands cannot clear the promise
+     *  its successor installed, which would spend another round of rate-limited calls. */
+    const generation = lookupGeneration
+    const clearIfCurrent = () => {
+      if (generation === lookupGeneration) sharedLookup = null
+    }
+
+    sharedLookup = resolveIpCountryCode()
+      .then((countryCode) => {
+        if (!countryCode) clearIfCurrent()
+        return countryCode
+      })
+      /** resolveIpCountryCode only rejects if error reporting itself throws, but a
+       *  rejection must never stay cached: consumers gate UI on this promise settling,
+       *  and a cached rejection would poison every later mount for the whole session. */
+      .catch(() => {
+        clearIfCurrent()
+        return undefined
+      })
   }
   return sharedLookup
 }

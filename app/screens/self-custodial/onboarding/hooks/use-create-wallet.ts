@@ -9,6 +9,8 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useProvisionSelfCustodialAccount } from "@app/self-custodial/hooks/use-provision-self-custodial-account"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { usePersistentStateContext } from "@app/store/persistent-state"
+import { withSelfCustodialAccountMode } from "@app/store/persistent-state/self-custodial-account-mode"
+import { AccountMode } from "@app/types/account"
 import { reportError } from "@app/utils/error-logging"
 import { toastShow } from "@app/utils/toast"
 
@@ -29,26 +31,34 @@ export const useCreateWallet = () => {
   const [status, setStatus] = useState<CreationStatus>(CreationStatus.Idle)
   const guard = useInFlightGuard()
 
-  const create = useCallback(async () => {
-    await guard.run(async () => {
-      setStatus(CreationStatus.Creating)
-      try {
-        const accountId = await provision()
-        reinitSdk()
-        updateState((prev) => {
-          if (!prev) return prev
-          return { ...prev, activeAccountId: accountId }
-        })
-        navigation.dispatch(
-          CommonActions.reset({ index: 0, routes: [{ name: "Primary" }] }),
-        )
-      } catch (err) {
-        reportError("Wallet creation", err)
-        setStatus(CreationStatus.Error)
-        toastShow({ message: LL.AccountTypeSelectionScreen.createFailed(), LL })
-      }
-    })
-  }, [guard, navigation, updateState, reinitSdk, provision, LL])
+  const create = useCallback(
+    async (mode?: AccountMode) => {
+      await guard.run(async () => {
+        setStatus(CreationStatus.Creating)
+        try {
+          const accountId = await provision()
+          reinitSdk()
+          /** The mode was chosen before the account existed; store it against the freshly
+           *  provisioned id alongside making it active, in a single write. */
+          updateState((prev) => {
+            if (!prev) return prev
+            const withActive = { ...prev, activeAccountId: accountId }
+            return mode
+              ? withSelfCustodialAccountMode(withActive, accountId, mode)
+              : withActive
+          })
+          navigation.dispatch(
+            CommonActions.reset({ index: 0, routes: [{ name: "Primary" }] }),
+          )
+        } catch (err) {
+          reportError("Wallet creation", err)
+          setStatus(CreationStatus.Error)
+          toastShow({ message: LL.AccountTypeSelectionScreen.createFailed(), LL })
+        }
+      })
+    },
+    [guard, navigation, updateState, reinitSdk, provision, LL],
+  )
 
   return { status, create }
 }

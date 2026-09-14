@@ -40,6 +40,7 @@ jest.mock("@app/graphql/generated", () => {
 })
 
 jest.mock("@app/self-custodial/config", () => ({
+  ...jest.requireActual("@app/self-custodial/config"),
   networkLabelFor: (network: number) =>
     network === mockSparkNetwork.Mainnet ? "mainnet" : "regtest",
 }))
@@ -142,7 +143,7 @@ describe("useScanContext", () => {
       expect(result.current.bitcoinNetwork).toBe("regtest")
     })
 
-    it("exposes lnurlDomains as [] (intraledger lookup disabled)", () => {
+    it("exposes the network's own domains, address domain first", () => {
       mockActiveWallet.mockReturnValue({
         isSelfCustodial: true,
         wallets: [
@@ -152,7 +153,10 @@ describe("useScanContext", () => {
 
       const { result } = renderHook(() => useScanContext())
 
-      expect(result.current.lnurlDomains).toEqual([])
+      expect(result.current.lnurlDomains).toEqual([
+        "staging.blink.sv",
+        "pay.staging.blink.sv",
+      ])
     })
 
     it("ignores the custodial GraphQL query when self-custodial is active", () => {

@@ -1,6 +1,6 @@
 import * as React from "react"
 import { useState } from "react"
-import { Dimensions, Text, View, Alert } from "react-native"
+import { Text, useWindowDimensions, View, Alert } from "react-native"
 import { TouchableOpacity } from "react-native-gesture-handler"
 import { useSharedValue } from "react-native-reanimated"
 import Carousel from "react-native-reanimated-carousel"
@@ -23,8 +23,6 @@ import {
   getCardsFromSection,
   getQuizQuestionsContent,
 } from "./helpers"
-
-const { width: screenWidth } = Dimensions.get("window")
 
 export type QuizQuestion = {
   id: string
@@ -53,9 +51,7 @@ export type QuizSectionContent = {
   content: QuizQuestionContent[]
 }
 
-const svgWidth = screenWidth
-
-const useStyles = makeStyles(({ colors }) => ({
+const useStyles = makeStyles(({ colors }, { screenWidth }: { screenWidth: number }) => ({
   container: {
     alignItems: "center",
     flex: 1,
@@ -80,7 +76,7 @@ const useStyles = makeStyles(({ colors }) => ({
   item: {
     backgroundColor: colors._lightBlue,
     borderRadius: 16,
-    width: svgWidth,
+    width: screenWidth,
   },
 
   itemTitle: {
@@ -164,7 +160,8 @@ export const EarnSection = ({ route }: Props) => {
   const {
     theme: { colors },
   } = useTheme()
-  const styles = useStyles()
+  const { width: screenWidth } = useWindowDimensions()
+  const styles = useStyles({ screenWidth })
 
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList, "earnsSection">>()
@@ -245,7 +242,7 @@ export const EarnSection = ({ route }: Props) => {
             disabled={!item.enabled}
           >
             <View style={styles.svgContainer}>
-              {SVGs({ name: item.id, width: svgWidth })}
+              {SVGs({ name: item.id, width: screenWidth })}
             </View>
           </TouchableOpacity>
           <View>

@@ -1,16 +1,20 @@
 import * as React from "react"
-import { SectionList, Text, View } from "react-native"
+import { ActivityIndicator, SectionList, StyleSheet, Text, View } from "react-native"
 
 import { gql } from "@apollo/client"
 import {
   MemoizedTransactionItem,
   TRANSACTION_LIST_WINDOW_SIZE,
 } from "@app/components/transaction-item"
-import { useTransactionListForContactQuery } from "@app/graphql/generated"
+import { UserContact, useTransactionListForContactQuery } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { groupTransactionsByDate } from "@app/graphql/transactions"
+import { useAccountRegistry } from "@app/hooks/use-account-registry"
+import { useContactTransactions } from "@app/hooks/use-contact-transactions"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { makeStyles } from "@rn-vui/themed"
+import { useSelfCustodialTransactionFragments } from "@app/self-custodial/hooks/use-self-custodial-transaction-fragments"
+import { AccountType } from "@app/types/wallet"
+import { makeStyles, useTheme } from "@rn-vui/themed"
 
 import { toastShow } from "../../../utils/toast"
 
@@ -34,37 +38,105 @@ gql`
 `
 
 type Props = {
-  contactUsername: string
+  contact: UserContact
 }
 
 const keyExtractor = (item: { id: string }) => item.id
 
+const GROUP_RADIUS = 8
+
+/** The date group reads as one card, so only its outer rows carry the corners. */
+const groupStyles = StyleSheet.create({
+  firstRow: {
+    borderTopLeftRadius: GROUP_RADIUS,
+    borderTopRightRadius: GROUP_RADIUS,
+    overflow: "hidden",
+  },
+  lastRow: {
+    borderBottomLeftRadius: GROUP_RADIUS,
+    borderBottomRightRadius: GROUP_RADIUS,
+    overflow: "hidden",
+  },
+})
+
 // Rows here are deliberately not pressable: this list only shows the history
 // with one contact, it does not navigate into a transaction.
-const renderItem = ({ item }: { item: { id: string } }) => (
-  <MemoizedTransactionItem txid={item.id} />
-)
+const renderItem = ({
+  item,
+  index,
+  section,
+}: {
+  item: { id: string }
+  index: number
+  section: { data: readonly { id: string }[] }
+}) => {
+  const isFirst = index === 0
+  const isLast = index === section.data.length - 1
 
-export const ContactTransactions = ({ contactUsername }: Props) => {
+  return (
+    <View style={[isFirst && groupStyles.firstRow, isLast && groupStyles.lastRow]}>
+      <MemoizedTransactionItem
+        txid={item.id}
+        subtitle
+        isFirst={isFirst}
+        isLast={isLast}
+      />
+    </View>
+  )
+}
+
+export const ContactTransactions = ({ contact }: Props) => {
   const styles = useStyles()
+  const {
+    theme: { colors },
+  } = useTheme()
   const { LL, locale } = useI18nContext()
   const isAuthed = useIsAuthed()
+  const { activeAccount } = useAccountRegistry()
+  const isSelfCustodial = activeAccount?.type === AccountType.SelfCustodial
 
-  const { error, data, fetchMore } = useTransactionListForContactQuery({
-    variables: { username: contactUsername },
-    skip: !isAuthed,
+  /**
+   * The adapter matches payments by counterparty address, which is what `username` holds
+   * for a self-custodial contact, so it never has to resolve a contact list to answer.
+   */
+  const {
+    transactions: selfCustodialTransactions,
+    isLoading: isLoadingSelfCustodial,
+    hasError: hasSelfCustodialError,
+    loadMore: loadMoreSelfCustodial,
+  } = useContactTransactions(contact.handle, isSelfCustodial)
+
+  const shouldSkipContactQuery = !isAuthed || isSelfCustodial
+
+  /**
+   * The custodial query resolves through `me`, which a self-custodial account has no
+   * session for, so it is skipped and the contact adapter answers instead.
+   */
+  const {
+    error,
+    data,
+    fetchMore,
+    loading: custodialLoading,
+  } = useTransactionListForContactQuery({
+    /** The argument is a `Username` scalar, so this stays on the deprecated field even
+     *  though the adapter above is keyed by `handle`. */
+    variables: { username: contact.username },
+    skip: shouldSkipContactQuery,
   })
 
-  const transactions = data?.me?.contactByUsername?.transactions
+  const selfCustodialTxs = useSelfCustodialTransactionFragments(selfCustodialTransactions)
+  const custodialTransactions = data?.me?.contactByUsername?.transactions
+
+  const custodialTxs = React.useMemo(
+    () => custodialTransactions?.edges?.map((edge) => edge.node) ?? [],
+    [custodialTransactions],
+  )
+
+  const txs = isSelfCustodial ? selfCustodialTxs : custodialTxs
 
   const sections = React.useMemo(
-    () =>
-      groupTransactionsByDate({
-        txs: transactions?.edges?.map((edge) => edge.node) ?? [],
-        LL,
-        locale,
-      }),
-    [transactions, LL, locale],
+    () => groupTransactionsByDate({ txs, LL, locale }),
+    [txs, LL, locale],
   )
 
   // Declared above the early returns below to keep hook order stable.
@@ -77,45 +149,77 @@ export const ContactTransactions = ({ contactUsername }: Props) => {
     [styles.sectionHeaderContainer, styles.sectionHeaderText],
   )
 
-  if (error) {
-    toastShow({
-      message: (translations) => translations.common.transactionsError(),
-      LL,
-    })
-    return <></>
-  }
-
-  if (!transactions) {
-    return <></>
-  }
-
   const fetchNextTransactionsPage = () => {
-    const pageInfo = transactions?.pageInfo
+    if (isSelfCustodial) {
+      loadMoreSelfCustodial()
+      return
+    }
 
-    if (pageInfo.hasNextPage) {
+    const pageInfo = custodialTransactions?.pageInfo
+
+    if (pageInfo?.hasNextPage) {
       fetchMore({
         variables: {
-          username: contactUsername,
+          username: contact.username,
           after: pageInfo.endCursor,
         },
       })
     }
   }
 
+  const hasTransactionsError = Boolean(error) || hasSelfCustodialError
+
+  /**
+   * In an effect rather than the render body: the flag stays raised until the next read,
+   * so any unrelated re-render while it is up would queue a second toast for a failure
+   * the reader was already told about.
+   */
+  React.useEffect(() => {
+    if (!hasTransactionsError) return
+
+    toastShow({
+      message: (translations) => translations.common.transactionsError(),
+      LL,
+    })
+  }, [hasTransactionsError, LL])
+
+  /**
+   * The failure is told through the toast, so the list itself has nothing to say — but it
+   * still holds its space, or the send button would climb the screen on the one contact
+   * whose history could not be read.
+   */
+  if (hasTransactionsError)
+    return <View style={styles.screen} testID="contact-transactions-unavailable" />
+
+  /**
+   * Until the query answers there is nothing to say about this contact, so the custodial
+   * list spins rather than claiming it has no transactions. An absent `data` counts as
+   * still loading, but only while the query is actually running: a skipped one never
+   * answers, and would otherwise spin forever.
+   */
+  const isCustodialQueryRunning = !shouldSkipContactQuery
+  const isLoadingCustodial = isCustodialQueryRunning && (custodialLoading || !data)
+  const isLoadingTransactions = isLoadingSelfCustodial || isLoadingCustodial
+
+  const ListEmptyContent = isLoadingTransactions ? (
+    <View style={styles.activityIndicatorView} testID="contact-transactions-loading">
+      <ActivityIndicator size="large" color={colors.primary} />
+    </View>
+  ) : (
+    <View style={styles.noTransactionView} testID="contact-no-transactions">
+      <Text style={styles.noTransactionText}>{LL.TransactionScreen.noTransaction()}</Text>
+    </View>
+  )
+
   return (
     <View style={styles.screen}>
       <SectionList
+        testID="contact-transactions-list"
         renderItem={renderItem}
         initialNumToRender={20}
         windowSize={TRANSACTION_LIST_WINDOW_SIZE}
         renderSectionHeader={renderSectionHeader}
-        ListEmptyComponent={
-          <View style={styles.noTransactionView}>
-            <Text style={styles.noTransactionText}>
-              {LL.TransactionScreen.noTransaction()}
-            </Text>
-          </View>
-        }
+        ListEmptyComponent={ListEmptyContent}
         sections={sections}
         keyExtractor={keyExtractor}
         onEndReached={fetchNextTransactionsPage}
@@ -126,33 +230,39 @@ export const ContactTransactions = ({ contactUsername }: Props) => {
 }
 
 const useStyles = makeStyles(({ colors }) => ({
+  activityIndicatorView: {
+    alignItems: "center",
+    justifyContent: "center",
+    marginVertical: 48,
+  },
+
   noTransactionText: {
     fontSize: 24,
   },
 
   noTransactionView: {
     alignItems: "center",
-    flex: 1,
     marginVertical: 48,
   },
 
+  /**
+   * Takes the space between the header and the send button whatever the history holds, so
+   * the button keeps its place at the bottom instead of riding up under a short list.
+   */
   screen: {
     flex: 1,
-    borderRadius: 10,
-    borderColor: colors.grey4,
-    borderWidth: 2,
-    overflow: "hidden",
   },
 
   sectionHeaderContainer: {
-    backgroundColor: colors.grey5,
     flexDirection: "row",
     justifyContent: "space-between",
-    padding: 10,
+    paddingBottom: 3,
+    paddingTop: 10,
   },
 
   sectionHeaderText: {
     color: colors.black,
-    fontSize: 18,
+    fontSize: 14,
+    lineHeight: 20,
   },
 }))

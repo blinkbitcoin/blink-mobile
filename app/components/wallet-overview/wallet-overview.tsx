@@ -4,12 +4,14 @@ import { Pressable, View } from "react-native"
 
 import { gql } from "@apollo/client"
 import { DisabledFeature } from "@app/components/disabled-feature"
+import { useRestrictedRegion } from "@app/components/restricted-region"
 import { useWalletOverviewScreenQuery, WalletCurrency } from "@app/graphql/generated"
 import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { getBtcWallet, getUsdWallet, WalletBalance } from "@app/graphql/wallets-utils"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
-import { useDollarBalanceRestricted } from "@app/hooks/use-dollar-balance-restricted"
+import { useDollarBalanceGate } from "@app/hooks/use-dollar-balance-restricted"
+import { useSelfCustodialAccountMode } from "@app/self-custodial/hooks/use-self-custodial-account-mode"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { testProps } from "@app/utils/testProps"
@@ -61,7 +63,7 @@ gql`
 type Props = {
   loading: boolean
   setIsStablesatModalVisible: (value: boolean) => void
-  onRestrictedTap?: () => void
+  onGatedTap?: () => void
   wallets?: readonly WalletBalance[]
   hasCard?: boolean
   cardLastFour?: string | null
@@ -72,17 +74,23 @@ type Props = {
 const WalletOverview: React.FC<Props> = ({
   loading,
   setIsStablesatModalVisible,
-  onRestrictedTap,
+  onGatedTap,
   wallets,
   hasCard = false,
   cardLastFour,
   showBtcNotification = false,
   showUsdNotification = false,
 }) => {
-  const isDollarBalanceRestricted = useDollarBalanceRestricted()
+  const { isGated: isDollarBalanceGated, isRegionPending } = useDollarBalanceGate()
+  const { isRestrictedRegion } = useRestrictedRegion()
+  const isDollarRowUnavailable = isDollarBalanceGated || isRestrictedRegion
+  const { isAnonMode } = useSelfCustodialAccountMode()
   const { hideAmount, toggleHideAmount } = useHideAmount()
 
   const { LL } = useI18nContext()
+  const unavailableLabel = isAnonMode
+    ? LL.StablesatsRestriction.anonModeWalletLabel()
+    : LL.StablesatsRestriction.walletLabel()
   const isAuthed = useIsAuthed()
   const {
     theme: { colors },
@@ -101,6 +109,11 @@ const WalletOverview: React.FC<Props> = ({
   const hasWallets = wallets && wallets.length > 0
   const { data } = useWalletOverviewScreenQuery({ skip: !isAuthed || hasWallets })
   const resolvedWallets = hasWallets ? wallets : data?.me?.defaultAccount?.wallets
+
+  const hasUsdBalance = (getUsdWallet(resolvedWallets)?.balance ?? 0) > 0
+  /** A gated balance still shows its amount (the row stays disabled); the label only
+   *  stands in when there is nothing to show. */
+  const showsUnavailableLabel = isDollarRowUnavailable && !hasUsdBalance
 
   if (isAuthed || hasWallets) {
     const btcWallet = getBtcWallet(resolvedWallets)
@@ -143,6 +156,18 @@ const WalletOverview: React.FC<Props> = ({
   const maskedCardNumber = showCardLastFour
     ? `${CARD_NUMBER_MASK} ${cardLastFour}`
     : CARD_NUMBER_MASK
+
+  /** The dollar row rides the same loader while the region resolves, and stays inert
+   *  meanwhile: reading the unresolved region as unrestricted is what showed a restricted
+   *  user their balance at launch. The explanation waits too, since it would be wrong for
+   *  a user who turns out to be unrestricted. */
+  const isDollarBalanceLoading = loading || isRegionPending
+  const isDollarRowInert = isDollarRowUnavailable || isRegionPending
+  const onDollarGatedPress = isRegionPending ? undefined : onGatedTap
+  /** Carries the reason, since gating the row hides the label that states it. */
+  const dollarRowAccessibilityLabel = isDollarRowUnavailable
+    ? `${LL.common.dollar()}, ${unavailableLabel}`
+    : LL.common.dollar()
 
   return (
     <View style={styles.container}>
@@ -201,8 +226,9 @@ const WalletOverview: React.FC<Props> = ({
       <View style={styles.separator} />
 
       <DisabledFeature
-        disabled={isDollarBalanceRestricted}
-        onDisabledPress={onRestrictedTap}
+        disabled={isDollarRowInert}
+        onDisabledPress={onDollarGatedPress}
+        accessibilityLabel={dollarRowAccessibilityLabel}
       >
         <Pressable
           onPressIn={() => setPressedUsd(true)}
@@ -228,13 +254,12 @@ const WalletOverview: React.FC<Props> = ({
                 <GaloyIcon color={colors.grey1} name="question" size={18} />
               </Pressable>
             </View>
-            {loading ? (
+            {isDollarBalanceLoading ? (
               <Loader />
-            ) : isDollarBalanceRestricted ? (
+            ) : showsUnavailableLabel ? (
               <View style={[styles.hideableArea, styles.restrictionLabel]}>
                 <Text type="p2" style={styles.restrictionLabelText}>
-                  {/* Shared across custodial and self-custodial restricted accounts: the copy is identical, so both reuse the Stablesats key. */}
-                  {LL.StablesatsRestriction.walletLabel()}
+                  {unavailableLabel}
                 </Text>
               </View>
             ) : (

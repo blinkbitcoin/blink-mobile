@@ -6,6 +6,8 @@ import { act, fireEvent, render, screen } from "@testing-library/react-native"
 import { DisplayCurrency, toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { ConvertAmountAdjustment } from "@app/types/payment"
 import { WalletCurrency } from "@app/graphql/generated"
+import { IDEMPOTENCY_KEY_UNAVAILABLE } from "@app/screens/send-bitcoin-screen/use-send-payment"
+import { HideAmountContextProvider } from "@app/graphql/hide-amount-context"
 import * as PaymentDetails from "@app/screens/send-bitcoin-screen/payment-details/intraledger"
 import { ConvertMoneyAmount } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
 import * as PaymentDetailsLightning from "@app/screens/send-bitcoin-screen/payment-details/lightning"
@@ -181,7 +183,11 @@ jest.mock("@app/screens/send-bitcoin-screen/use-save-lnaddress-contact", () => (
 
 const sendPaymentMock = jest.fn()
 const mockUseSendPayment = jest.fn()
+// Spread the real module: the screen also imports IDEMPOTENCY_KEY_UNAVAILABLE from here,
+// and a wholesale mock would make that constant undefined, silently disabling the
+// comparison the error-mapping test exercises.
 jest.mock("@app/screens/send-bitcoin-screen/use-send-payment", () => ({
+  ...jest.requireActual("@app/screens/send-bitcoin-screen/use-send-payment"),
   useSendPayment: () => mockUseSendPayment(),
 }))
 
@@ -232,6 +238,15 @@ jest.mock("@react-navigation/native", () => ({
     setOptions: jest.fn(),
   }),
 }))
+
+// The placeholder renders bare Views without a testID; stub it so the specs
+// can query for it. hideAmount defaults to false, so the other specs in this
+// file never render it.
+jest.mock("@app/components/hidden-balance-placeholder/hidden-balance-placeholder", () => {
+  const { View } = jest.requireActual("react-native")
+  const MockHiddenBalancePlaceholder = () => <View testID="hidden-balance-placeholder" />
+  return { HiddenBalancePlaceholder: MockHiddenBalancePlaceholder }
+})
 
 jest.mock("@app/components/atomic/galoy-slider-button/galoy-slider-button", () => {
   type Props = {
@@ -919,11 +934,40 @@ describe("SendBitcoinConfirmationScreen — skipBalanceCheck matrix", () => {
     expect(screen.getByTestId("slider").props.accessibilityState.disabled).toBe(false)
   })
 
-  it("(isSendingMax=false, hasAttemptedSend=true) over balance — slider disabled + no error", async () => {
+  it("(isSendingMax=false, hasAttemptedSend=true) over balance — no error, and a retry is still offered", async () => {
+    // hasAttemptedSend is sticky: it suppresses the balance check because the backend may
+    // already have debited the wallet. It no longer gates the slider — whether another
+    // attempt is allowed is expressed solely by sendPayment, so an ambiguous failure can
+    // be retried under the same idempotency key.
     mockUseSendPayment.mockReturnValue({
       loading: false,
       hasAttemptedSend: true,
       sendPayment: sendPaymentMock,
+    })
+
+    render(
+      <ContextForScreen>
+        <Intraledger route={buildUsdSettlementRoute(1100)} />
+      </ContextForScreen>,
+    )
+
+    await act(
+      () =>
+        new Promise((resolve) => {
+          setTimeout(resolve, 10)
+        }),
+    )
+
+    expect(screen.queryByText(/exceeds your balance/i)).toBeNull()
+    expect(screen.getByTestId("slider").props.accessibilityState.disabled).toBe(false)
+  })
+
+  it("(hasAttemptedSend=true, sendPayment withheld) over balance — slider disabled + no error", async () => {
+    // The hook withholds sendPayment while a send is in flight or terminally settled.
+    mockUseSendPayment.mockReturnValue({
+      loading: false,
+      hasAttemptedSend: true,
+      sendPayment: undefined,
     })
 
     render(
@@ -1212,5 +1256,92 @@ describe("SendBitcoinConfirmationScreen — 409 idempotency conflict recovery", 
 
     expect(verifyPaymentSettledMock).not.toHaveBeenCalled()
     expect(screen.getByText("insufficient balance")).toBeTruthy()
+  })
+
+  it("shows a generic error when the CSPRNG cannot mint an idempotency key", async () => {
+    // The hook rejects with a sentinel rather than a raw Nitro string; the screen must
+    // translate it instead of showing the user "idempotency-key-unavailable".
+    sendPaymentMock.mockRejectedValueOnce(new Error(IDEMPOTENCY_KEY_UNAVAILABLE))
+
+    render(
+      <ContextForScreen>
+        <LightningLnURL route={buildLnurlRoute()} />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("slider"))
+    })
+
+    expect(screen.queryByText(IDEMPOTENCY_KEY_UNAVAILABLE)).toBeNull()
+    expect(verifyPaymentSettledMock).not.toHaveBeenCalled()
+  })
+
+  it("keeps the slider armed after an ambiguous throw, so the user can retry", async () => {
+    // A non-409 throw is the ambiguous case: the request may have landed. The hook
+    // reopens sendPayment under the same key (pinned in the hook spec); the screen's half
+    // of the contract is that the slider is gated by sendPayment alone, never by
+    // hasAttemptedSend, so a second swipe actually fires.
+    sendPaymentMock
+      .mockRejectedValueOnce(new Error("network died"))
+      .mockResolvedValueOnce({ status: "SUCCESS", extraInfo: {} })
+
+    render(
+      <ContextForScreen>
+        <LightningLnURL route={buildLnurlRoute()} />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("slider"))
+    })
+
+    expect(screen.getByText("network died")).toBeTruthy()
+    expect(verifyPaymentSettledMock).not.toHaveBeenCalled()
+    expect(screen.getByTestId("slider").props.accessibilityState.disabled).toBe(false)
+
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("slider"))
+    })
+
+    expect(sendPaymentMock).toHaveBeenCalledTimes(2)
+  })
+})
+
+// The confirmation screen is a resting screen, not a picker: nothing on it
+// has to be compared against a balance, so hide-balance applies here the way
+// it does on the home screen. The amount being authorised stays readable.
+describe("hide balance", () => {
+  const renderWithHideAmount = (hideAmount: boolean) =>
+    render(
+      <ContextForScreen>
+        <HideAmountContextProvider value={{ hideAmount, toggleHideAmount: jest.fn() }}>
+          <Intraledger route={route} />
+        </HideAmountContextProvider>
+      </ContextForScreen>,
+    )
+
+  it("masks the From balance while hide-balance is on", async () => {
+    renderWithHideAmount(true)
+    await flushEffects()
+
+    // Exactly one placeholder: the From block. A second would mean the
+    // amount or fee field had been masked too, which is not the intent.
+    expect(screen.queryAllByTestId("hidden-balance-placeholder")).toHaveLength(1)
+  })
+
+  it("leaves the amount being sent readable while hide-balance is on", async () => {
+    renderWithHideAmount(true)
+    await flushEffects()
+
+    const { children } = await screen.findByLabelText("Successful Fee")
+    expect(children).toEqual(["₦0 ($0.00)"])
+  })
+
+  it("shows the From balance when balances are visible", async () => {
+    renderWithHideAmount(false)
+    await flushEffects()
+
+    expect(screen.queryAllByTestId("hidden-balance-placeholder")).toHaveLength(0)
   })
 })

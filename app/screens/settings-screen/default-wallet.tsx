@@ -1,5 +1,5 @@
 import * as React from "react"
-import { View, TouchableOpacity } from "react-native"
+import { View, ActivityIndicator, TouchableOpacity } from "react-native"
 
 import { gql } from "@apollo/client"
 import { Divider, Text, makeStyles, useTheme, ListItem, Icon } from "@rn-vui/themed"
@@ -221,8 +221,35 @@ const SelfCustodialDefaultWallet: React.FC = () => {
 }
 
 export const DefaultWalletScreen: React.FC = () => {
-  if (useDollarBalanceRestrictionGuard()) return null
+  const { isGated, isRegionPending } = useDollarBalanceRestrictionGuard()
+
+  /** A refusal is already navigating the user away, so there is nothing to render. */
+  if (isGated) return null
+
+  /** The wait is not a refusal: rendering the picker before the verdict would offer a
+   *  dollar default the region may be about to withdraw. */
+  if (isRegionPending) return <DefaultWalletRegionPending />
+
   return <DefaultWalletScreenContent />
+}
+
+const DefaultWalletRegionPending: React.FC = () => {
+  const styles = useStyles()
+  const {
+    theme: { colors },
+  } = useTheme()
+
+  return (
+    <Screen preset="fixed">
+      <View style={styles.regionPendingContainer}>
+        <ActivityIndicator
+          size="large"
+          color={colors.primary}
+          {...testProps("default-wallet-region-pending")}
+        />
+      </View>
+    </Screen>
+  )
 }
 
 const DefaultWalletScreenContent: React.FC = () => {
@@ -237,6 +264,11 @@ const DefaultWalletScreenContent: React.FC = () => {
 }
 
 const useStyles = makeStyles(({ colors }) => ({
+  regionPendingContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   walletsContainer: {
     marginHorizontal: 16,
     marginTop: 16,

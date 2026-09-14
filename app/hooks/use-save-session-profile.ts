@@ -5,7 +5,7 @@ import { updateDeviceSessionCount } from "@app/graphql/client-only-query"
 import { useGetUsernamesLazyQuery } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { reportError } from "@app/utils/error-logging"
-import KeyStoreWrapper from "@app/utils/storage/secureStorage"
+import KeyStoreWrapper, { SessionProfilesRead } from "@app/utils/storage/secureStorage"
 
 import { usePersistentStateContext } from "../store/persistent-state"
 import { DefaultAccountId } from "../types/wallet"
@@ -85,6 +85,18 @@ export const useSaveSessionProfile = () => {
     [blinkUserText, hostName],
   )
 
+  /**
+   * The stored profiles, reported as found, absent or failed. Callers that
+   * write the list back must not treat a failed read as an empty store:
+   * profiles carry their sessions' tokens, so a list rewritten from an assumed
+   * emptiness signs every other saved account out.
+   */
+  const readProfiles = useCallback(async (): Promise<SessionProfilesRead> => {
+    const read = await KeyStoreWrapper.readSessionProfiles()
+    if (read.status === "failed") reportError("read session profiles", read.err)
+    return read
+  }, [])
+
   const saveProfile = useCallback(
     async (token: string): Promise<void> => {
       if (!token) return
@@ -95,7 +107,8 @@ export const useSaveSessionProfile = () => {
         return { ...prev, activeAccountId: DefaultAccountId.Custodial }
       })
 
-      const profiles = await KeyStoreWrapper.getSessionProfiles()
+      const read = await readProfiles()
+      const profiles = read.status === "found" ? read.profiles : []
 
       // A profile stored without accountId was saved while defaultAccount was
       // still missing; fall through and re-fetch so this login heals it
@@ -107,6 +120,10 @@ export const useSaveSessionProfile = () => {
 
       resetUpgradeModal()
       updateDeviceSessionCount(client, { reset: true })
+
+      // Only the write is skipped when the store could not be read: the login
+      // above stands, and the resets belong to it rather than to the list.
+      if (read.status === "failed") return
 
       const others = profiles.filter((p) => p.token !== token)
       const exists =
@@ -125,11 +142,25 @@ export const useSaveSessionProfile = () => {
 
       await KeyStoreWrapper.saveSessionProfiles(updatedProfiles)
     },
-    [saveToken, updateState, tryFetchUserProps, fetchUsername, resetUpgradeModal, client],
+    [
+      saveToken,
+      updateState,
+      readProfiles,
+      tryFetchUserProps,
+      fetchUsername,
+      resetUpgradeModal,
+      client,
+    ],
   )
 
   const updateCurrentProfile = useCallback(async (): Promise<void> => {
-    const profiles = await KeyStoreWrapper.getSessionProfiles()
+    // This method only rewrites entries that already exist, so anything but a
+    // list in hand means there is nothing to update — and writing one back
+    // would be indistinguishable from a wipe.
+    const read = await readProfiles()
+    if (read.status !== "found") return
+    const profiles = read.profiles
+
     const currentProfile = await tryFetchUserProps({ token: currentToken, fetchUsername })
     if (!currentProfile) return
     const updatedProfiles = profiles.map((p) => {
@@ -139,7 +170,7 @@ export const useSaveSessionProfile = () => {
       return sameAccount || p.token === currentProfile.token ? currentProfile : p
     })
     await KeyStoreWrapper.saveSessionProfiles(updatedProfiles)
-  }, [fetchUsername, tryFetchUserProps, currentToken])
+  }, [readProfiles, fetchUsername, tryFetchUserProps, currentToken])
 
   return {
     saveProfile,

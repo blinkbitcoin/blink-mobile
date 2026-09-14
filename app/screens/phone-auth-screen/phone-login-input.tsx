@@ -19,6 +19,7 @@ import type { InputRef } from "@app/types/themed-input"
 
 import { Screen } from "../../components/screen"
 import { PhoneChannelButton } from "./phone-channel-buttons"
+import { PhoneLoginInitiateType } from "./phone-login-initiate-type"
 import type { PhoneValidationStackParamList } from "../../navigation/stack-param-lists"
 import {
   ErrorType,
@@ -53,6 +54,11 @@ const useStyles = makeStyles(({ colors }) => ({
   },
 
   codeTextStyle: {},
+  /** No `flex` here on purpose: the phone field beside it already takes the row's free
+   *  space, so growing this button too would split the row in half and leave the number
+   *  too narrow to read. A flag and a calling code come to a little under `minWidth` at
+   *  the default text size, so in practice the floor is the width, and what it buys is a
+   *  button that does not twitch between a "+1" and a "+503". */
   countryPickerButtonStyle: {
     minWidth: 110,
     borderColor: colors.primary5,
@@ -62,7 +68,6 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    flex: 1,
   },
   bottom: {
     flex: 1,
@@ -95,15 +100,7 @@ const useStyles = makeStyles(({ colors }) => ({
   loadingView: { flex: 1, justifyContent: "center", alignItems: "center" },
 }))
 
-export const PhoneLoginInitiateType = {
-  Login: "Login",
-  CreateAccount: "CreateAccount",
-} as const
-
 const DisableCountriesForAccountCreation = [""]
-
-export type PhoneLoginInitiateType =
-  (typeof PhoneLoginInitiateType)[keyof typeof PhoneLoginInitiateType]
 type PhoneLoginInitiateScreenProps = {
   route: RouteProp<PhoneValidationStackParamList, "phoneLoginInitiate">
 }

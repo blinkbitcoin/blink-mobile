@@ -5,7 +5,12 @@ import {
   LnUrlPayServiceResponse,
 } from "lnurl-pay"
 import React, { useEffect, useState } from "react"
-import { TouchableOpacity, TouchableWithoutFeedback, View } from "react-native"
+import {
+  ActivityIndicator,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
+} from "react-native"
 import ReactNativeModal from "react-native-modal"
 import { gql } from "@apollo/client"
 import { AmountInput } from "@app/components/amount-input/amount-input"
@@ -127,8 +132,15 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
 
   const { hideAmount } = useHideAmount()
 
-  const { wallets, defaultWallet, btcWallet, usdWallet, network, isSelfCustodial } =
-    useSendWallets()
+  const {
+    wallets,
+    defaultWallet,
+    btcWallet,
+    usdWallet,
+    network,
+    isSelfCustodial,
+    loading: isWalletListPending,
+  } = useSendWallets()
 
   const { formatMoneyAmount } = useDisplayCurrency()
   const { LL } = useI18nContext()
@@ -201,7 +213,13 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
   // we set the default values when the screen loads
   // this only run once (doesn't re-run after paymentDetail is set)
   useEffect(() => {
-    if (paymentDetail || !defaultWallet || !_convertMoneyAmount) {
+    /**
+     * The wallet list is not final until the region resolves: a restricted verdict drops the
+     * dollar wallet from it. Seeding before that picks a `defaultWallet` the verdict is about
+     * to withdraw, and this effect never runs again once `paymentDetail` is set, so the
+     * screen would go on sending from a wallet it no longer offers.
+     */
+    if (paymentDetail || !defaultWallet || !_convertMoneyAmount || isWalletListPending) {
       return
     }
 
@@ -227,6 +245,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     defaultWallet,
     btcWallet,
     zeroDisplayAmount,
+    isWalletListPending,
   ])
 
   const alertHighFees = shouldWarnAboutHighFee({
@@ -235,6 +254,22 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     selectedTierFee,
     hasFeeQuote,
   })
+
+  /** Held rather than blanked: the seeding above waits for the region, so without this the
+   *  user sits on an empty screen for as long as the country takes to resolve. */
+  if (isWalletListPending) {
+    return (
+      <Screen>
+        <View style={styles.walletListPendingContainer}>
+          <ActivityIndicator
+            size="large"
+            color={colors.primary}
+            {...testProps("send-wallet-list-pending")}
+          />
+        </View>
+      </Screen>
+    )
+  }
 
   if (!paymentDetail) {
     return <></>
@@ -339,34 +374,22 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
                     onLayout={onPillLayout(wallet.walletCurrency)}
                   />
                 </View>
-                <View
-                  style={
-                    hideAmount
-                      ? styles.walletSelectorInfoContainerHidden
-                      : styles.walletSelectorInfoContainer
-                  }
-                >
-                  {hideAmount ? (
-                    <HiddenBalancePlaceholder size="small" />
-                  ) : (
-                    <>
-                      <View style={styles.walletSelectorTypeTextContainer}>
-                        {wallet.walletCurrency === WalletCurrency.Btc ? (
-                          <Text style={styles.walletCurrencyText}>{btcPrimaryText}</Text>
-                        ) : (
-                          <Text style={styles.walletCurrencyText}>{usdPrimaryText}</Text>
-                        )}
-                      </View>
-                      <View style={styles.walletSelectorBalanceContainer}>
-                        {wallet.walletCurrency === WalletCurrency.Btc ? (
-                          <Text>{btcSecondaryText}</Text>
-                        ) : (
-                          <Text>{usdSecondaryText}</Text>
-                        )}
-                      </View>
-                      <View />
-                    </>
-                  )}
+                <View style={styles.walletSelectorInfoContainer}>
+                  <View style={styles.walletSelectorTypeTextContainer}>
+                    {wallet.walletCurrency === WalletCurrency.Btc ? (
+                      <Text style={styles.walletCurrencyText}>{btcPrimaryText}</Text>
+                    ) : (
+                      <Text style={styles.walletCurrencyText}>{usdPrimaryText}</Text>
+                    )}
+                  </View>
+                  <View style={styles.walletSelectorBalanceContainer}>
+                    {wallet.walletCurrency === WalletCurrency.Btc ? (
+                      <Text>{btcSecondaryText}</Text>
+                    ) : (
+                      <Text>{usdSecondaryText}</Text>
+                    )}
+                  </View>
+                  <View />
                 </View>
               </View>
             </TouchableWithoutFeedback>
@@ -671,6 +694,11 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
 export default SendBitcoinDetailsScreen
 
 const useStyles = makeStyles(({ colors }) => ({
+  walletListPendingContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   sendBitcoinAmountContainer: {
     flex: 1,
   },

@@ -4,6 +4,7 @@ import {
   MigrationStatus,
   type PersistentState,
 } from "@app/store/persistent-state/state-migrations"
+import { AccountMode } from "@app/types/account"
 
 // Backwards-compat shim for the existing happy-path tests: prior signature
 // returned the migrated state directly, falling back to defaults. New API
@@ -23,7 +24,7 @@ describe("state-migrations schema 10", () => {
 
     const result = await migrateAndGetPersistentState(state6)
 
-    expect(result.schemaVersion).toBe(16)
+    expect(result.schemaVersion).toBe(21)
     expect(result.galoyAuthToken).toBe("test-token")
     expect(result.galoyInstance).toEqual({ id: "Main" })
     expect(result.activeAccountId).toBeUndefined()
@@ -39,7 +40,7 @@ describe("state-migrations schema 10", () => {
 
     const result = await migrateAndGetPersistentState(state7)
 
-    expect(result.schemaVersion).toBe(16)
+    expect(result.schemaVersion).toBe(21)
     expect(result.activeAccountId).toBe("custodial-default")
   })
 
@@ -52,7 +53,7 @@ describe("state-migrations schema 10", () => {
 
     const result = await migrateAndGetPersistentState(state5)
 
-    expect(result.schemaVersion).toBe(16)
+    expect(result.schemaVersion).toBe(21)
     expect(result.galoyAuthToken).toBe("old-token")
     expect(result.activeAccountId).toBeUndefined()
   })
@@ -68,7 +69,7 @@ describe("state-migrations schema 10", () => {
 
     const result = await migrateAndGetPersistentState(state9)
 
-    expect(result.schemaVersion).toBe(16)
+    expect(result.schemaVersion).toBe(21)
     expect(result.selfCustodialDefaultWalletCurrency).toBeUndefined()
     expect(result.selfCustodialDefaultWalletCurrencyByAccountId).toEqual({
       "self-custodial-id": "USD",
@@ -89,7 +90,7 @@ describe("state-migrations schema 10", () => {
 
     const result = await migrateAndGetPersistentState(state10)
 
-    expect(result.schemaVersion).toBe(16)
+    expect(result.schemaVersion).toBe(21)
     expect(result.selfCustodialDefaultWalletCurrencyByAccountId).toEqual({
       "self-custodial-id-1": "USD",
       "self-custodial-id-2": "BTC",
@@ -105,7 +106,7 @@ describe("state-migrations schema 10", () => {
 
     const result = await migrateAndGetPersistentState(state10)
 
-    expect(result.schemaVersion).toBe(16)
+    expect(result.schemaVersion).toBe(21)
     expect(result.selfCustodialDisplayCurrencyByAccountId).toBeUndefined()
     expect(result.selfCustodialLanguageByAccountId).toBeUndefined()
   })
@@ -128,7 +129,7 @@ describe("state-migrations schema 10", () => {
 
     const result = await migrateAndGetPersistentState(state12)
 
-    expect(result.schemaVersion).toBe(16)
+    expect(result.schemaVersion).toBe(21)
     expect(result.selfCustodialDisplayCurrencyByAccountId).toEqual({
       "self-custodial-id-1": "EUR",
       "self-custodial-id-2": "JPY",
@@ -153,7 +154,7 @@ describe("state-migrations schema 10", () => {
 
     const result = await migrateAndGetPersistentState(state12)
 
-    expect(result.schemaVersion).toBe(16)
+    expect(result.schemaVersion).toBe(21)
     expect(result.themeByAccountId).toEqual({
       "self-custodial-id-1": "dark",
       "self-custodial-id-2": "light",
@@ -174,30 +175,57 @@ describe("state-migrations schema 10", () => {
 
     const result = await migrateAndGetPersistentState(state13)
 
-    expect(result.schemaVersion).toBe(16)
+    expect(result.schemaVersion).toBe(21)
     expect(result.defaultAccountModalShownByAccountId).toEqual({
       "self-custodial-id-1": true,
       "self-custodial-id-2": false,
     })
   })
 
-  it("migrates a v14 state to current preserving stablesatsRestrictedCustodial", async () => {
+  it("drops the four persisted region latches when migrating v14 to current", async () => {
     const state14 = {
       schemaVersion: 14,
       galoyInstance: { id: "Main" },
       galoyAuthToken: "token",
       stablesatsRestrictedCustodial: true,
+      stableTokenRestricted: true,
+      stablesatsTransferBlocked: true,
+      stableTokenTransferBlocked: true,
     }
 
     const result = await migrateAndGetPersistentState(state14)
 
-    expect(result.schemaVersion).toBe(16)
-    expect(result.stablesatsRestrictedCustodial).toBe(true)
+    expect(result.schemaVersion).toBe(21)
+    expect(result).not.toHaveProperty("stablesatsRestrictedCustodial")
+    expect(result).not.toHaveProperty("stableTokenRestricted")
+    expect(result).not.toHaveProperty("stablesatsTransferBlocked")
+    expect(result).not.toHaveProperty("stableTokenTransferBlocked")
   })
 
-  it("v15 identity migration preserves completedQuizIdsByAccountId untouched", async () => {
+  it("preserves completedQuizIdsByAccountId while dropping the v15 latches", async () => {
     const state15 = {
       schemaVersion: 15,
+      galoyInstance: { id: "Main" },
+      galoyAuthToken: "token",
+      activeAccountId: "self-custodial-id-1",
+      stablesatsRestrictedCustodial: true,
+      completedQuizIdsByAccountId: {
+        "self-custodial-id-1": ["whatIsBitcoin", "sat"],
+      },
+    }
+
+    const result = await migrateAndGetPersistentState(state15)
+
+    expect(result.schemaVersion).toBe(21)
+    expect(result).not.toHaveProperty("stablesatsRestrictedCustodial")
+    expect(result.completedQuizIdsByAccountId).toEqual({
+      "self-custodial-id-1": ["whatIsBitcoin", "sat"],
+    })
+  })
+
+  it("carries completedQuizIdsByAccountId through the v16 latch drop untouched", async () => {
+    const state16 = {
+      schemaVersion: 16,
       galoyInstance: { id: "Main" },
       galoyAuthToken: "token",
       activeAccountId: "self-custodial-id-1",
@@ -206,9 +234,9 @@ describe("state-migrations schema 10", () => {
       },
     }
 
-    const result = await migrateAndGetPersistentState(state15)
+    const result = await migrateAndGetPersistentState(state16)
 
-    expect(result.schemaVersion).toBe(16)
+    expect(result.schemaVersion).toBe(21)
     expect(result.completedQuizIdsByAccountId).toEqual({
       "self-custodial-id-1": ["whatIsBitcoin", "sat"],
     })
@@ -223,12 +251,12 @@ describe("state-migrations schema 10", () => {
 
     const result = await migrateAndGetPersistentState(state15)
 
-    expect(result.schemaVersion).toBe(16)
+    expect(result.schemaVersion).toBe(21)
     expect(result.alwaysHideBalance).toBeUndefined()
     expect(result.balanceHidden).toBeUndefined()
   })
 
-  it("v16 identity migration preserves the balance visibility fields untouched", async () => {
+  it("carries the balance visibility fields through the v16 latch drop untouched", async () => {
     const state16 = {
       schemaVersion: 16,
       galoyInstance: { id: "Main" },
@@ -239,9 +267,83 @@ describe("state-migrations schema 10", () => {
 
     const result = await migrateAndGetPersistentState(state16)
 
-    expect(result.schemaVersion).toBe(16)
+    expect(result.schemaVersion).toBe(21)
     expect(result.alwaysHideBalance).toBe(true)
     expect(result.balanceHidden).toBe(true)
+  })
+
+  it("drops the four persisted region latches when migrating v16 to current", async () => {
+    const state16 = {
+      schemaVersion: 16,
+      galoyInstance: { id: "Main" },
+      galoyAuthToken: "token",
+      stablesatsRestrictedCustodial: true,
+      stableTokenRestricted: true,
+      stablesatsTransferBlocked: true,
+      stableTokenTransferBlocked: true,
+    }
+
+    const result = await migrateAndGetPersistentState(state16)
+
+    expect(result.schemaVersion).toBe(21)
+    expect(result).not.toHaveProperty("stablesatsRestrictedCustodial")
+    expect(result).not.toHaveProperty("stableTokenRestricted")
+    expect(result).not.toHaveProperty("stablesatsTransferBlocked")
+    expect(result).not.toHaveProperty("stableTokenTransferBlocked")
+  })
+
+  it("carries a whole v18 state to current, bumping only the schema version", async () => {
+    const state18 = {
+      schemaVersion: 18,
+      galoyInstance: { id: "Main" },
+      galoyAuthToken: "token",
+      activeAccountId: "self-custodial-id-1",
+      alwaysHideBalance: true,
+      balanceHidden: false,
+      completedQuizIdsByAccountId: {
+        "self-custodial-id-1": ["whatIsBitcoin", "sat"],
+      },
+      selfCustodialAccountModeByAccountId: {
+        "self-custodial-id-1": AccountMode.Enhanced,
+      },
+    }
+
+    const result = await migrateAndGetPersistentState(state18)
+
+    expect(result).toEqual({ ...state18, schemaVersion: 21 })
+  })
+
+  it("leaves txLastSeenByAccountId undefined when migrating from v20", async () => {
+    const state20 = {
+      schemaVersion: 20,
+      galoyInstance: { id: "Main" },
+      galoyAuthToken: "token",
+      activeAccountId: "self-custodial-id-1",
+    }
+
+    const result = await migrateAndGetPersistentState(state20)
+
+    expect(result.schemaVersion).toBe(21)
+    expect(result.txLastSeenByAccountId).toBeUndefined()
+  })
+
+  it("v21 identity migration preserves txLastSeenByAccountId untouched", async () => {
+    const state21 = {
+      schemaVersion: 21,
+      galoyInstance: { id: "Main" },
+      galoyAuthToken: "token",
+      activeAccountId: "self-custodial-id-1",
+      txLastSeenByAccountId: {
+        "self-custodial-id-1": { btcId: "btc-1", usdId: "usd-1" },
+      },
+    }
+
+    const result = await migrateAndGetPersistentState(state21)
+
+    expect(result.schemaVersion).toBe(21)
+    expect(result.txLastSeenByAccountId).toEqual({
+      "self-custodial-id-1": { btcId: "btc-1", usdId: "usd-1" },
+    })
   })
 
   it("leaves completedQuizIdsByAccountId undefined when migrating from v14", async () => {
@@ -253,11 +355,11 @@ describe("state-migrations schema 10", () => {
 
     const result = await migrateAndGetPersistentState(state14)
 
-    expect(result.schemaVersion).toBe(16)
+    expect(result.schemaVersion).toBe(21)
     expect(result.completedQuizIdsByAccountId).toBeUndefined()
   })
 
-  it("leaves stablesatsRestrictedCustodial undefined when migrating from v13", async () => {
+  it("carries no latch fields forward when migrating from a pre-latch v13 state", async () => {
     const state13 = {
       schemaVersion: 13,
       galoyInstance: { id: "Main" },
@@ -266,8 +368,106 @@ describe("state-migrations schema 10", () => {
 
     const result = await migrateAndGetPersistentState(state13)
 
-    expect(result.schemaVersion).toBe(16)
-    expect(result.stablesatsRestrictedCustodial).toBeUndefined()
+    expect(result.schemaVersion).toBe(21)
+    expect(result).not.toHaveProperty("stablesatsRestrictedCustodial")
+  })
+
+  it("migrates a v16 state to current, leaving the account mode undefined", async () => {
+    const state16 = {
+      schemaVersion: 16,
+      galoyInstance: { id: "Main" },
+      galoyAuthToken: "token",
+      activeAccountId: "self-custodial-id-1",
+    }
+
+    const result = await migrateAndGetPersistentState(state16)
+
+    expect(result.schemaVersion).toBe(21)
+    expect(result.selfCustodialAccountModeByAccountId).toBeUndefined()
+  })
+
+  it("migrates a v18 state to current leaving the Anon pause marker unset", async () => {
+    const state18 = {
+      schemaVersion: 18,
+      galoyInstance: { id: "Main" },
+      galoyAuthToken: "token",
+      activeAccountId: "self-custodial-id-1",
+      selfCustodialAccountModeByAccountId: { "self-custodial-id-1": "anon" },
+    }
+
+    const result = await migrateAndGetPersistentState(state18)
+
+    expect(result.schemaVersion).toBe(21)
+    expect(result.selfCustodialAccountModeByAccountId).toEqual({
+      "self-custodial-id-1": "anon",
+    })
+    expect(result.stableBalanceAnonPausedByAccountId).toBeUndefined()
+  })
+
+  it("carries a v19 state to current, preserving the stored account modes", async () => {
+    const state19 = {
+      schemaVersion: 19,
+      galoyInstance: { id: "Main" },
+      galoyAuthToken: "token",
+      activeAccountId: "self-custodial-id-1",
+      selfCustodialAccountModeByAccountId: {
+        "self-custodial-id-1": "anon",
+        "self-custodial-id-2": "enhanced",
+      },
+      completedQuizIdsByAccountId: {
+        "self-custodial-id-1": ["whatIsBitcoin", "sat"],
+      },
+    }
+
+    const result = await migrateAndGetPersistentState(state19)
+
+    expect(result.schemaVersion).toBe(21)
+    expect(result.selfCustodialAccountModeByAccountId).toEqual({
+      "self-custodial-id-1": "anon",
+      "self-custodial-id-2": "enhanced",
+    })
+    expect(result.completedQuizIdsByAccountId).toEqual({
+      "self-custodial-id-1": ["whatIsBitcoin", "sat"],
+    })
+  })
+
+  /** Deliberately not backfilled from the chosen mode: an account that picked one before
+   *  this version has never told the server, and claiming otherwise would suppress the
+   *  push it is still owed. */
+  it("migrates a v19 state to current leaving the server-confirmed mode unset", async () => {
+    const state19 = {
+      schemaVersion: 19,
+      galoyInstance: { id: "Main" },
+      galoyAuthToken: "token",
+      activeAccountId: "self-custodial-id-1",
+      selfCustodialAccountModeByAccountId: {
+        "self-custodial-id-1": AccountMode.Enhanced,
+      },
+    }
+
+    const result = await migrateAndGetPersistentState(state19)
+
+    expect(result.selfCustodialServerAccountModeByAccountId).toBeUndefined()
+  })
+
+  it("carries a whole v20 state to current, bumping only the schema version", async () => {
+    const state20 = {
+      schemaVersion: 20,
+      galoyInstance: { id: "Main" },
+      galoyAuthToken: "token",
+      activeAccountId: "self-custodial-id-1",
+      selfCustodialAccountModeByAccountId: {
+        "self-custodial-id-1": AccountMode.Anon,
+      },
+      selfCustodialServerAccountModeByAccountId: {
+        "self-custodial-id-1": AccountMode.Enhanced,
+      },
+      stableBalanceAnonPausedByAccountId: { "self-custodial-id-1": true },
+    }
+
+    const result = await migrateAndGetPersistentState(state20)
+
+    expect(result).toEqual({ ...state20, schemaVersion: 21 })
   })
 
   it("returns default state for invalid data", async () => {
@@ -306,7 +506,7 @@ describe("state-migrations schema 10", () => {
 
     const result = await migrateAndGetPersistentState(state4)
 
-    expect(result.schemaVersion).toBe(16)
+    expect(result.schemaVersion).toBe(21)
     expect(result.galoyAuthToken).toBe("token-v4")
     expect(result.galoyInstance).toEqual({ id: "Main" })
     expect(result.activeAccountId).toBeUndefined()
@@ -336,14 +536,14 @@ describe("state-migrations schema 10", () => {
 
     const result = await migrateAndGetPersistentState(state3)
 
-    expect(result.schemaVersion).toBe(16)
+    expect(result.schemaVersion).toBe(21)
     expect(result.galoyAuthToken).toBe("token-v3")
     expect(result.galoyInstance).toEqual({ id: "Main" })
     expect(result.activeAccountId).toBeUndefined()
   })
 
   it("default state has the current schema version", () => {
-    expect(defaultPersistentState.schemaVersion).toBe(16)
+    expect(defaultPersistentState.schemaVersion).toBe(21)
     expect(defaultPersistentState.activeAccountId).toBeUndefined()
     expect(
       defaultPersistentState.selfCustodialDefaultWalletCurrencyByAccountId,
@@ -361,7 +561,7 @@ describe("state-migrations schema 10", () => {
 
     const result = await migrateAndGetPersistentState(state8)
 
-    expect(result.schemaVersion).toBe(16)
+    expect(result.schemaVersion).toBe(21)
     expect(result.selfCustodialDefaultWalletCurrency).toBeUndefined()
     expect(result.selfCustodialDefaultWalletCurrencyByAccountId).toEqual({
       "self-custodial-id": "USD",
@@ -380,7 +580,7 @@ describe("state-migrations schema 10", () => {
 
     const result = await migrateAndGetPersistentState(state8)
 
-    expect(result.schemaVersion).toBe(16)
+    expect(result.schemaVersion).toBe(21)
     expect(result.selfCustodialDefaultWalletCurrency).toBeUndefined()
     expect(result.selfCustodialDefaultWalletCurrencyByAccountId).toEqual({
       "self-custodial-id": "BTC",
@@ -396,7 +596,7 @@ describe("state-migrations schema 10", () => {
 
     const result = await migrateAndGetPersistentState(state8)
 
-    expect(result.schemaVersion).toBe(16)
+    expect(result.schemaVersion).toBe(21)
     expect(result.selfCustodialDefaultWalletCurrency).toBeUndefined()
     expect(result.selfCustodialDefaultWalletCurrencyByAccountId).toBeUndefined()
   })
@@ -411,7 +611,7 @@ describe("state-migrations schema 10", () => {
 
     const result = await migrateAndGetPersistentState(state9)
 
-    expect(result.schemaVersion).toBe(16)
+    expect(result.schemaVersion).toBe(21)
     expect(result.selfCustodialDefaultWalletCurrency).toBeUndefined()
     expect(result.selfCustodialDefaultWalletCurrencyByAccountId).toBeUndefined()
   })
@@ -427,7 +627,7 @@ describe("state-migrations schema 10", () => {
 
     const result = await migrateAndGetPersistentState(state10)
 
-    expect(result.schemaVersion).toBe(16)
+    expect(result.schemaVersion).toBe(21)
     expect(result.selfCustodialDefaultWalletCurrency).toBeUndefined()
     expect(result.selfCustodialDefaultWalletCurrencyByAccountId).toBeUndefined()
   })
@@ -447,7 +647,7 @@ describe("state-migrations schema 10", () => {
 
     const result = await migrateAndGetPersistentState(state10)
 
-    expect(result.schemaVersion).toBe(16)
+    expect(result.schemaVersion).toBe(21)
     expect(result.selfCustodialDefaultWalletCurrency).toBeUndefined()
     expect(result.selfCustodialDefaultWalletCurrencyByAccountId).toEqual({
       "self-custodial-id-1": "BTC",
@@ -478,14 +678,27 @@ describe("state-migrations schema 10", () => {
       }
     })
 
-    it("returns status='no-data' for an unknown schemaVersion (no error, no rawData payload)", async () => {
-      const result = await migratePersistentState({ schemaVersion: 999 })
-      expect(result).toEqual({ status: MigrationStatus.NoData })
+    it("returns status='failed', not 'no-data', for an unrecognized schemaVersion", async () => {
+      // A blob we can't read is not a fresh install: a downgrade from a future
+      // schema must not be treated as a reinstall (which wipes the keychain).
+      const futureBlob = { schemaVersion: 999, galoyInstance: { id: "Main" } }
+      const result = await migratePersistentState(futureBlob)
+
+      expect(result.status).toBe(MigrationStatus.Failed)
+      if (result.status === MigrationStatus.Failed) {
+        expect(result.error.message).toContain("schemaVersion")
+        // rawData must travel with the failure so the caller can quarantine it
+        expect(result.rawData).toBe(futureBlob)
+      }
     })
 
-    it("returns status='no-data' for null input", async () => {
-      const result = await migratePersistentState(null)
-      expect(result).toEqual({ status: MigrationStatus.NoData })
+    it("returns status='no-data' only for a genuinely absent blob", async () => {
+      expect(await migratePersistentState(null)).toEqual({
+        status: MigrationStatus.NoData,
+      })
+      expect(await migratePersistentState(undefined)).toEqual({
+        status: MigrationStatus.NoData,
+      })
     })
 
     it("wraps a non-Error rejection into an Error when a migration throws a primitive", async () => {

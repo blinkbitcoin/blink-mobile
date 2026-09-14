@@ -6,6 +6,7 @@ import { updateDeviceSessionCount } from "@app/graphql/client-only-query"
 import BiometricWrapper from "@app/utils/biometricAuthentication"
 import { AuthenticationScreenPurpose, PinScreenPurpose } from "@app/utils/enum"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
+import type { SecureExists } from "@app/utils/storage/secure-store"
 
 import { ContextForScreen } from "../helper"
 import { flushEffects } from "../../helpers/flush-effects"
@@ -38,8 +39,8 @@ jest.mock("@app/utils/biometricAuthentication", () => ({
 jest.mock("@app/utils/storage/secureStorage", () => ({
   __esModule: true,
   default: {
-    getIsPinEnabled: jest.fn(),
-    getIsBiometricsEnabled: jest.fn(),
+    readIsPinEnabled: jest.fn(),
+    readIsBiometricsEnabled: jest.fn(),
     /** Read by the account registry the screen renders under. */
     getSessionProfiles: jest.fn().mockResolvedValue([]),
   },
@@ -47,6 +48,10 @@ jest.mock("@app/utils/storage/secureStorage", () => ({
 
 const mockedKeyStore = jest.mocked(KeyStoreWrapper)
 const mockedBiometrics = jest.mocked(BiometricWrapper)
+
+/** The screen fails closed, so a lock is "off" only on a definite `no`. */
+const enablement = (isEnabled: boolean): SecureExists =>
+  isEnabled ? { status: "yes" } : { status: "no" }
 
 const renderScreen = () =>
   render(
@@ -64,8 +69,8 @@ const setLock = ({
   biometrics: boolean
   sensor?: boolean
 }) => {
-  mockedKeyStore.getIsPinEnabled.mockResolvedValue(pin)
-  mockedKeyStore.getIsBiometricsEnabled.mockResolvedValue(biometrics)
+  mockedKeyStore.readIsPinEnabled.mockResolvedValue(enablement(pin))
+  mockedKeyStore.readIsBiometricsEnabled.mockResolvedValue(enablement(biometrics))
   mockedBiometrics.isSensorAvailable.mockResolvedValue(sensor)
 }
 
@@ -74,6 +79,30 @@ describe("AuthenticationCheckScreen", () => {
     jest.clearAllMocks()
     mockRouteParams = undefined
     setLock({ pin: true, biometrics: false })
+  })
+
+  /** A storage fault must send the user to a lock they can pass, never past a
+   *  lock they cannot see. */
+  it("routes to the screen that has a way out when the store cannot say whether a lock is set", async () => {
+    mockedKeyStore.readIsPinEnabled.mockResolvedValue({
+      status: "failed",
+      err: new Error("keystore locked"),
+    })
+    mockedKeyStore.readIsBiometricsEnabled.mockResolvedValue({
+      status: "failed",
+      err: new Error("keystore locked"),
+    })
+    mockedBiometrics.isSensorAvailable.mockResolvedValue(false)
+
+    renderScreen()
+    await flushEffects()
+
+    // Never the bare keypad: it would compare against a secret it cannot read
+    // either, and it offers no logout.
+    expect(mockReplace).toHaveBeenCalledWith(
+      "authentication",
+      expect.objectContaining({ isPinEnabled: true }),
+    )
   })
 
   describe("carrying the resume flag to the unlock screen", () => {

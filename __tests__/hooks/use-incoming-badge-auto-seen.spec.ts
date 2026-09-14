@@ -1,12 +1,35 @@
 import { renderHook, act } from "@testing-library/react-hooks"
 
-import { WalletCurrency } from "@app/graphql/generated"
+import {
+  TxDirection,
+  WalletCurrency,
+  type TransactionFragment,
+} from "@app/graphql/generated"
 import { useIncomingBadgeAutoSeen } from "@app/components/unseen-tx-amount-badge/use-incoming-badge-auto-seen"
+
+const EXIT_ANIMATION_MS = 180
+
+const tx = (overrides: Partial<TransactionFragment>): TransactionFragment =>
+  ({
+    __typename: "Transaction",
+    id: "txid",
+    status: "SUCCESS",
+    createdAt: 0,
+    direction: TxDirection.Receive,
+    settlementAmount: 123,
+    settlementFee: 0,
+    settlementDisplayFee: "",
+    settlementCurrency: WalletCurrency.Btc,
+    settlementDisplayAmount: "",
+    settlementDisplayCurrency: "",
+    ...overrides,
+  }) as TransactionFragment
 
 type AutoSeenProps = {
   isFocused: boolean
   isOutgoing: boolean | undefined
-  unseenCurrency: WalletCurrency | undefined
+  tx?: TransactionFragment
+  amountText: string | null
   delayMs?: number
   markTxSeen: (currency: WalletCurrency) => void
 }
@@ -23,192 +46,199 @@ describe("useIncomingBadgeAutoSeen", () => {
   const defaultProps = {
     isFocused: true,
     isOutgoing: false,
-    unseenCurrency: WalletCurrency.Btc,
+    tx: tx({}),
+    amountText: "+BTC 123",
     delayMs: 5000,
     markTxSeen: jest.fn(),
   }
 
-  it("calls markTxSeen after the delay + exit animation when focused with an incoming tx", () => {
-    const markTxSeen = jest.fn()
-    renderHook(() => useIncomingBadgeAutoSeen({ ...defaultProps, markTxSeen }))
-
-    expect(markTxSeen).not.toHaveBeenCalled()
-
-    act(() => {
-      jest.advanceTimersByTime(5000)
-    })
-
-    expect(markTxSeen).not.toHaveBeenCalled()
-
-    act(() => {
-      jest.advanceTimersByTime(180)
-    })
-
-    expect(markTxSeen).toHaveBeenCalledWith(WalletCurrency.Btc)
-    expect(markTxSeen).toHaveBeenCalledTimes(1)
-  })
-
-  it("returns visible=false before markTxSeen to allow exit animation", () => {
+  it("marks the transaction seen as soon as the badge is announced", () => {
     const markTxSeen = jest.fn()
     const { result } = renderHook(() =>
       useIncomingBadgeAutoSeen({ ...defaultProps, markTxSeen }),
     )
 
-    expect(result.current).toBe(true)
+    expect(markTxSeen).toHaveBeenCalledWith(WalletCurrency.Btc)
+    expect(markTxSeen).toHaveBeenCalledTimes(1)
+    expect(result.current.visible).toBe(true)
+  })
+
+  it("keeps the announcement while the badge is on screen and releases it after the exit animation", () => {
+    const markTxSeen = jest.fn()
+    const { result } = renderHook(() =>
+      useIncomingBadgeAutoSeen({ ...defaultProps, markTxSeen }),
+    )
+
+    expect(result.current.announcement).toEqual({
+      txId: "txid",
+      currency: WalletCurrency.Btc,
+      amountText: "+BTC 123",
+    })
 
     act(() => {
       jest.advanceTimersByTime(5000)
     })
 
-    expect(result.current).toBe(false)
-    expect(markTxSeen).not.toHaveBeenCalled()
+    expect(result.current.visible).toBe(false)
+    expect(result.current.announcement).not.toBeNull()
 
     act(() => {
-      jest.advanceTimersByTime(180)
+      jest.advanceTimersByTime(EXIT_ANIMATION_MS)
+    })
+
+    expect(result.current.announcement).toBeNull()
+  })
+
+  it("holds what it announced after the transaction stops being unseen", () => {
+    const markTxSeen = jest.fn()
+    const { result, rerender } = renderHook(
+      (props: AutoSeenProps) => useIncomingBadgeAutoSeen(props),
+      { initialProps: { ...defaultProps, markTxSeen } as AutoSeenProps },
+    )
+
+    /** What marking seen does to the caller: there is no unseen transaction left to
+     *  derive the badge from, and the badge still has to finish its display. */
+    rerender({
+      ...defaultProps,
+      tx: undefined,
+      amountText: null,
+      isOutgoing: undefined,
+      markTxSeen,
+    })
+
+    expect(result.current.visible).toBe(true)
+    expect(result.current.announcement?.amountText).toBe("+BTC 123")
+    expect(result.current.announcement?.txId).toBe("txid")
+  })
+
+  it("announces the same transaction only once", () => {
+    const markTxSeen = jest.fn()
+    const { rerender } = renderHook(
+      (props: AutoSeenProps) => useIncomingBadgeAutoSeen(props),
+      { initialProps: { ...defaultProps, markTxSeen } as AutoSeenProps },
+    )
+
+    rerender({ ...defaultProps, tx: tx({}), markTxSeen })
+    rerender({ ...defaultProps, tx: tx({}), markTxSeen })
+
+    act(() => {
+      jest.advanceTimersByTime(5000 + EXIT_ANIMATION_MS)
     })
 
     expect(markTxSeen).toHaveBeenCalledTimes(1)
   })
 
-  it("does not fire for outgoing transactions", () => {
+  it("announces a later transaction that arrives after the first one", () => {
     const markTxSeen = jest.fn()
-    renderHook(() =>
-      useIncomingBadgeAutoSeen({ ...defaultProps, isOutgoing: true, markTxSeen }),
+    const { result, rerender } = renderHook(
+      (props: AutoSeenProps) => useIncomingBadgeAutoSeen(props),
+      { initialProps: { ...defaultProps, markTxSeen } as AutoSeenProps },
     )
 
     act(() => {
-      jest.advanceTimersByTime(10000)
+      jest.advanceTimersByTime(5000)
+    })
+    act(() => {
+      jest.advanceTimersByTime(EXIT_ANIMATION_MS)
     })
 
-    expect(markTxSeen).not.toHaveBeenCalled()
+    rerender({
+      ...defaultProps,
+      tx: tx({ id: "txid-2", settlementCurrency: WalletCurrency.Usd }),
+      amountText: "+USD 5",
+      markTxSeen,
+    })
+
+    expect(markTxSeen).toHaveBeenLastCalledWith(WalletCurrency.Usd)
+    expect(markTxSeen).toHaveBeenCalledTimes(2)
+    expect(result.current.announcement?.txId).toBe("txid-2")
   })
 
-  it("does not fire when isOutgoing is undefined", () => {
+  it("does not overwrite a badge that is still on screen", () => {
+    const markTxSeen = jest.fn()
+    const { result, rerender } = renderHook(
+      (props: AutoSeenProps) => useIncomingBadgeAutoSeen(props),
+      { initialProps: { ...defaultProps, markTxSeen } as AutoSeenProps },
+    )
+
+    /** What marking the first one seen does when both wallets have something unseen: the
+     *  second currency becomes the newest unseen transaction right away. */
+    rerender({
+      ...defaultProps,
+      tx: tx({ id: "txid-2", settlementCurrency: WalletCurrency.Usd }),
+      amountText: "+USD 5",
+      markTxSeen,
+    })
+
+    expect(result.current.announcement?.txId).toBe("txid")
+    expect(markTxSeen).toHaveBeenCalledTimes(1)
+
+    act(() => {
+      jest.advanceTimersByTime(5000)
+    })
+    act(() => {
+      jest.advanceTimersByTime(EXIT_ANIMATION_MS)
+    })
+
+    expect(result.current.announcement?.txId).toBe("txid-2")
+    expect(markTxSeen).toHaveBeenLastCalledWith(WalletCurrency.Usd)
+  })
+
+  it("does not announce outgoing transactions", () => {
+    const markTxSeen = jest.fn()
+    const { result } = renderHook(() =>
+      useIncomingBadgeAutoSeen({ ...defaultProps, isOutgoing: true, markTxSeen }),
+    )
+
+    expect(markTxSeen).not.toHaveBeenCalled()
+    expect(result.current.announcement).toBeNull()
+  })
+
+  it("does not announce when isOutgoing is undefined", () => {
     const markTxSeen = jest.fn()
     renderHook(() =>
       useIncomingBadgeAutoSeen({ ...defaultProps, isOutgoing: undefined, markTxSeen }),
     )
 
-    act(() => {
-      jest.advanceTimersByTime(10000)
-    })
-
     expect(markTxSeen).not.toHaveBeenCalled()
   })
 
-  it("does not fire when screen is not focused", () => {
+  it("does not announce when the screen is not focused", () => {
     const markTxSeen = jest.fn()
     renderHook(() =>
       useIncomingBadgeAutoSeen({ ...defaultProps, isFocused: false, markTxSeen }),
     )
 
-    act(() => {
-      jest.advanceTimersByTime(10000)
-    })
-
     expect(markTxSeen).not.toHaveBeenCalled()
   })
 
-  it("does not fire when unseenCurrency is undefined", () => {
+  it("does not announce without a transaction", () => {
     const markTxSeen = jest.fn()
     renderHook(() =>
-      useIncomingBadgeAutoSeen({
-        ...defaultProps,
-        unseenCurrency: undefined,
-        markTxSeen,
-      }),
+      useIncomingBadgeAutoSeen({ ...defaultProps, tx: undefined, markTxSeen }),
     )
-
-    act(() => {
-      jest.advanceTimersByTime(10000)
-    })
 
     expect(markTxSeen).not.toHaveBeenCalled()
   })
 
-  it("clears the timer when screen loses focus before delay", () => {
+  it("does not announce before the amount can be formatted", () => {
     const markTxSeen = jest.fn()
-    const { rerender } = renderHook(
+    const { result, rerender } = renderHook(
       (props: AutoSeenProps) => useIncomingBadgeAutoSeen(props),
-      { initialProps: { ...defaultProps, markTxSeen } as AutoSeenProps },
+      {
+        initialProps: { ...defaultProps, amountText: null, markTxSeen } as AutoSeenProps,
+      },
     )
-
-    act(() => {
-      jest.advanceTimersByTime(3000)
-    })
 
     expect(markTxSeen).not.toHaveBeenCalled()
 
-    rerender({ ...defaultProps, isFocused: false, markTxSeen })
-
-    act(() => {
-      jest.advanceTimersByTime(5000)
-    })
-
-    expect(markTxSeen).not.toHaveBeenCalled()
-  })
-
-  it("does not re-schedule for the same currency on rerender", () => {
-    const markTxSeen = jest.fn()
-    const { rerender } = renderHook(
-      (props: AutoSeenProps) => useIncomingBadgeAutoSeen(props),
-      { initialProps: { ...defaultProps, markTxSeen } as AutoSeenProps },
-    )
-
-    // Rerender with same props shouldn't reset the timer
     rerender({ ...defaultProps, markTxSeen })
-    rerender({ ...defaultProps, markTxSeen })
-
-    act(() => {
-      jest.advanceTimersByTime(5180)
-    })
-
-    expect(markTxSeen).toHaveBeenCalledTimes(1)
-  })
-
-  it("schedules a new timer when currency changes", () => {
-    const markTxSeen = jest.fn()
-    const { rerender } = renderHook(
-      (props: AutoSeenProps) => useIncomingBadgeAutoSeen(props),
-      { initialProps: { ...defaultProps, markTxSeen } as AutoSeenProps },
-    )
-
-    act(() => {
-      jest.advanceTimersByTime(5180)
-    })
 
     expect(markTxSeen).toHaveBeenCalledWith(WalletCurrency.Btc)
-
-    rerender({ ...defaultProps, unseenCurrency: WalletCurrency.Usd, markTxSeen })
-
-    act(() => {
-      jest.advanceTimersByTime(5180)
-    })
-
-    expect(markTxSeen).toHaveBeenCalledWith(WalletCurrency.Usd)
-    expect(markTxSeen).toHaveBeenCalledTimes(2)
+    expect(result.current.announcement?.amountText).toBe("+BTC 123")
   })
 
-  it("respects custom delayMs", () => {
-    const markTxSeen = jest.fn()
-    renderHook(() =>
-      useIncomingBadgeAutoSeen({ ...defaultProps, delayMs: 2000, markTxSeen }),
-    )
-
-    act(() => {
-      jest.advanceTimersByTime(1999)
-    })
-
-    expect(markTxSeen).not.toHaveBeenCalled()
-
-    act(() => {
-      jest.advanceTimersByTime(181)
-    })
-
-    expect(markTxSeen).toHaveBeenCalledTimes(1)
-  })
-
-  it("fires when screen regains focus after being unfocused", () => {
+  it("announces when the screen regains focus", () => {
     const markTxSeen = jest.fn()
     const { rerender } = renderHook(
       (props: AutoSeenProps) => useIncomingBadgeAutoSeen(props),
@@ -225,10 +255,25 @@ describe("useIncomingBadgeAutoSeen", () => {
 
     rerender({ ...defaultProps, isFocused: true, markTxSeen })
 
+    expect(markTxSeen).toHaveBeenCalledWith(WalletCurrency.Btc)
+  })
+
+  it("respects a custom delayMs for how long the badge stays up", () => {
+    const markTxSeen = jest.fn()
+    const { result } = renderHook(() =>
+      useIncomingBadgeAutoSeen({ ...defaultProps, delayMs: 2000, markTxSeen }),
+    )
+
     act(() => {
-      jest.advanceTimersByTime(5180)
+      jest.advanceTimersByTime(1999)
     })
 
-    expect(markTxSeen).toHaveBeenCalledWith(WalletCurrency.Btc)
+    expect(result.current.visible).toBe(true)
+
+    act(() => {
+      jest.advanceTimersByTime(1)
+    })
+
+    expect(result.current.visible).toBe(false)
   })
 })

@@ -1,11 +1,9 @@
 import React from "react"
-import { StyleSheet } from "react-native"
 import { fireEvent, render, within } from "@testing-library/react-native"
 import { ThemeProvider } from "@rn-vui/themed"
 
 import theme from "@app/rne-theme/theme"
 import { BalanceMode } from "@app/hooks/use-balance-mode"
-import { StatusPill } from "@app/components/status-pill"
 
 import { BalanceHeader } from "@app/components/balance-header/balance-header"
 
@@ -123,69 +121,5 @@ describe("BalanceHeader", () => {
 
     const placeholder = getByTestId("hidden-balance-placeholder")
     expect(within(placeholder).queryByText(/./)).toBeNull()
-  })
-
-  it("does not render the status badge by default", () => {
-    const { queryByTestId } = renderHeader()
-
-    expect(queryByTestId("balance-status-badge")).toBeNull()
-  })
-
-  it("renders the status badge with the given label and status when provided", () => {
-    const { getByTestId, getByText } = renderHeader({
-      statusBadge: { label: "STALE", status: "warning" },
-    })
-
-    expect(getByTestId("balance-status-badge")).toBeTruthy()
-    expect(getByText("STALE")).toBeTruthy()
-  })
-
-  it("does not render the status badge while loading (avoids flicker during initial load)", () => {
-    const { queryByTestId } = renderHeader({
-      statusBadge: { label: "STALE", status: "warning" },
-      loading: true,
-    })
-
-    expect(queryByTestId("balance-status-badge")).toBeNull()
-  })
-
-  it("caps and shrinks the real pill and the centering ghost identically", () => {
-    // eslint-disable-next-line camelcase -- testing-library exposes this API verbatim
-    const { UNSAFE_getAllByType } = renderHeader({
-      statusBadge: { label: "+$1,234,567.89 pending", status: "warning" },
-    })
-
-    const pills = UNSAFE_getAllByType(StatusPill)
-    expect(pills).toHaveLength(2)
-
-    const [ghostStyle, realStyle] = pills.map((pill) =>
-      StyleSheet.flatten(pill.props.style),
-    )
-    expect(ghostStyle.flexShrink).toBe(1)
-    expect(realStyle.flexShrink).toBe(1)
-    expect(ghostStyle.maxWidth).toBeDefined()
-    expect(ghostStyle.maxWidth).toBe(realStyle.maxWidth)
-  })
-
-  it("forwards the badge onPress so the pill can carry an action", () => {
-    const onPress = jest.fn()
-    const { getByTestId } = renderHeader({
-      statusBadge: { label: "+$1.00 pending", status: "warning", onPress },
-    })
-
-    fireEvent.press(getByTestId("balance-status-badge"))
-
-    expect(onPress).toHaveBeenCalledTimes(1)
-    expect(mockToggleHideAmount).not.toHaveBeenCalled()
-  })
-
-  it("does not render the status badge while amounts are hidden", () => {
-    mockHideAmount = true
-
-    const { queryByTestId } = renderHeader({
-      statusBadge: { label: "+$1.00 pending", status: "warning" },
-    })
-
-    expect(queryByTestId("balance-status-badge")).toBeNull()
   })
 })

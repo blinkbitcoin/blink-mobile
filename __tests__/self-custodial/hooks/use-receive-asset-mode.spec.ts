@@ -4,14 +4,14 @@ import { useReceiveAssetMode } from "@app/self-custodial/hooks/use-receive-asset
 
 const mockSelfCustodialWallet = jest.fn()
 const mockPersistentState = jest.fn()
-const mockUseDollarBalanceRestricted = jest.fn()
+const mockUseDollarBalanceGate = jest.fn()
 
 jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () => mockSelfCustodialWallet(),
 }))
 
 jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
-  useDollarBalanceRestricted: () => mockUseDollarBalanceRestricted(),
+  useDollarBalanceGate: () => mockUseDollarBalanceGate(),
 }))
 
 jest.mock("@app/store/persistent-state", () => ({
@@ -25,7 +25,10 @@ describe("useReceiveAssetMode", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockPersistentState.mockReturnValue({})
-    mockUseDollarBalanceRestricted.mockReturnValue(false)
+    mockUseDollarBalanceGate.mockReturnValue({
+      isGated: false,
+      isRegionPending: false,
+    })
   })
 
   describe("initial state", () => {
@@ -120,6 +123,73 @@ describe("useReceiveAssetMode", () => {
     })
   })
 
+  describe("while the region is still resolving", () => {
+    beforeEach(() => {
+      mockUseDollarBalanceGate.mockReturnValue({
+        isGated: false,
+        isRegionPending: true,
+      })
+    })
+
+    /** The caller gates request generation on `loading`, so an unresolved region must not
+     *  read as settled and let a Dollar request out before the verdict lands. */
+    it("stays loading even once the stable-balance setting has resolved", () => {
+      mockSelfCustodialWallet.mockReturnValue({ isStableBalanceActive: false })
+
+      const { result } = renderHook(() => useReceiveAssetMode())
+
+      expect(result.current.loading).toBe(true)
+    })
+
+    it("keeps the Dollar default rather than seeding Bitcoin from the unresolved region", () => {
+      mockSelfCustodialWallet.mockReturnValue({ isStableBalanceActive: false })
+      mockPersistentState.mockReturnValue({
+        activeAccountId: "self-custodial-id",
+        selfCustodialDefaultWalletCurrencyByAccountId: { "self-custodial-id": "USD" },
+      })
+
+      const { result } = renderHook(() => useReceiveAssetMode())
+
+      expect(result.current.assetMode).toBe("dollar")
+    })
+
+    it("stops loading and locks to Bitcoin once the region resolves to a restriction", () => {
+      mockSelfCustodialWallet.mockReturnValue({ isStableBalanceActive: false })
+      mockPersistentState.mockReturnValue({
+        activeAccountId: "self-custodial-id",
+        selfCustodialDefaultWalletCurrencyByAccountId: { "self-custodial-id": "USD" },
+      })
+      const { result, rerender } = renderHook(() => useReceiveAssetMode())
+
+      mockUseDollarBalanceGate.mockReturnValue({
+        isGated: true,
+        isRegionPending: false,
+      })
+      rerender({})
+
+      expect(result.current.loading).toBe(false)
+      expect(result.current.assetMode).toBe("bitcoin")
+    })
+
+    it("stops loading and keeps the Dollar default once the region resolves unrestricted", () => {
+      mockSelfCustodialWallet.mockReturnValue({ isStableBalanceActive: false })
+      mockPersistentState.mockReturnValue({
+        activeAccountId: "self-custodial-id",
+        selfCustodialDefaultWalletCurrencyByAccountId: { "self-custodial-id": "USD" },
+      })
+      const { result, rerender } = renderHook(() => useReceiveAssetMode())
+
+      mockUseDollarBalanceGate.mockReturnValue({
+        isGated: false,
+        isRegionPending: false,
+      })
+      rerender({})
+
+      expect(result.current.loading).toBe(false)
+      expect(result.current.assetMode).toBe("dollar")
+    })
+  })
+
   describe("loading flag (boot window)", () => {
     it("is true while isStableBalanceActive is undefined and assetMode placeholder is Bitcoin", () => {
       mockSelfCustodialWallet.mockReturnValue({ isStableBalanceActive: undefined })
@@ -208,7 +278,10 @@ describe("useReceiveAssetMode", () => {
 
   describe("dollar-balance restriction", () => {
     it("locks to Bitcoin and disables the toggle even when the preference is Dollar", () => {
-      mockUseDollarBalanceRestricted.mockReturnValue(true)
+      mockUseDollarBalanceGate.mockReturnValue({
+        isGated: true,
+        isRegionPending: false,
+      })
       mockSelfCustodialWallet.mockReturnValue({ isStableBalanceActive: false })
       mockPersistentState.mockReturnValue({
         activeAccountId: "self-custodial-id",
@@ -220,7 +293,10 @@ describe("useReceiveAssetMode", () => {
     })
 
     it("locks to Bitcoin even when stable balance is active", () => {
-      mockUseDollarBalanceRestricted.mockReturnValue(true)
+      mockUseDollarBalanceGate.mockReturnValue({
+        isGated: true,
+        isRegionPending: false,
+      })
       mockSelfCustodialWallet.mockReturnValue({ isStableBalanceActive: true })
       const { result } = renderHook(() => useReceiveAssetMode())
       expect(result.current.assetMode).toBe("bitcoin")
@@ -228,7 +304,10 @@ describe("useReceiveAssetMode", () => {
     })
 
     it("exposes only Bitcoin on the Lightning rail", () => {
-      mockUseDollarBalanceRestricted.mockReturnValue(true)
+      mockUseDollarBalanceGate.mockReturnValue({
+        isGated: true,
+        isRegionPending: false,
+      })
       mockSelfCustodialWallet.mockReturnValue({ isStableBalanceActive: false })
       const { result } = renderHook(() => useReceiveAssetMode())
       expect(result.current.availableModesForRail("lightning")).toEqual(["bitcoin"])
@@ -239,7 +318,10 @@ describe("useReceiveAssetMode", () => {
       const { result, rerender } = renderHook(() => useReceiveAssetMode())
       expect(result.current.assetMode).toBe("dollar")
 
-      mockUseDollarBalanceRestricted.mockReturnValue(true)
+      mockUseDollarBalanceGate.mockReturnValue({
+        isGated: true,
+        isRegionPending: false,
+      })
       rerender({})
 
       expect(result.current.assetMode).toBe("bitcoin")

@@ -1,11 +1,11 @@
 import * as React from "react"
 import {
   Alert,
-  Dimensions,
   Linking,
   Platform,
   Pressable,
   StyleSheet,
+  useWindowDimensions,
   View,
 } from "react-native"
 import { launchImageLibrary } from "react-native-image-picker"
@@ -13,6 +13,7 @@ import Svg, { Circle } from "react-native-svg"
 import { Camera, CameraType } from "react-native-camera-kit"
 import { check, request, PERMISSIONS, RESULTS } from "react-native-permissions"
 import RNQRGenerator from "rn-qr-generator"
+import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 import { gql } from "@apollo/client"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
@@ -46,8 +47,12 @@ import { testProps } from "@app/utils/testProps"
 
 import { resolveDestination } from "./payment-destination/resolve-destination"
 
-const { width: screenWidth } = Dimensions.get("window")
-const { height: screenHeight } = Dimensions.get("window")
+/** Gaps kept between the scanner's own controls and whatever the system draws over the
+ *  window. From Android 15 the window runs edge to edge, so the status bar and the
+ *  navigation or gesture bar sit on top of the camera preview rather than beside it, and
+ *  a control placed at a fixed offset from the window edge lands underneath them. */
+const CLOSE_BUTTON_GAP = 16
+const BOTTOM_CONTROLS_GAP = 24
 
 /**
  * Longest side the picker is allowed to hand back. The QR decoder holds the decoded
@@ -108,6 +113,7 @@ export const ScanningQRCodeScreen: React.FC = () => {
   })
 
   const { LL } = useI18nContext()
+  const insets = useSafeAreaInsets()
   const { displayCurrency } = useDisplayCurrency()
   const { sdk } = useSelfCustodialWallet()
   const sparkNetwork = useSparkNetwork()
@@ -226,6 +232,20 @@ export const ScanningQRCodeScreen: React.FC = () => {
               ],
             )
             break
+          case "LnurlServiceError":
+            Alert.alert(
+              LL.ScanningQRCodeScreen.unresolvedTitle(),
+              LL.ScanningQRCodeScreen.unresolvedContent({
+                found: data.toString(),
+              }),
+              [
+                {
+                  text: LL.common.ok(),
+                  onPress: () => setPending(false),
+                },
+              ],
+            )
+            break
           case "UnknownDestination":
             if (isValidHttpUrl(data.toString())) {
               Alert.alert(
@@ -316,7 +336,11 @@ export const ScanningQRCodeScreen: React.FC = () => {
     [scannedCache, processInvoice],
   )
 
-  const styles = useStyles()
+  const { width, height } = useWindowDimensions()
+  /** The viewfinder is square, so it is bounded by the shorter edge. Sizing it off
+   *  the width put its horizontal borders off-screen once the screen could rotate. */
+  const shortestEdge = Math.min(width, height)
+  const styles = useStyles({ width, shortestEdge })
 
   const handleInvoicePaste = async () => {
     try {
@@ -424,6 +448,8 @@ export const ScanningQRCodeScreen: React.FC = () => {
    *  so opening it would read as a dead button. Dimming says the same thing the guard
    *  does, before the user spends a trip through the gallery on it. */
   const galleryIconStyle = pending ? styles.iconGaleryPending : styles.iconGalery
+  const closeInsetStyle = { marginTop: insets.top + CLOSE_BUTTON_GAP }
+  const bottomControlsInsetStyle = { bottom: insets.bottom + BOTTOM_CONTROLS_GAP }
 
   return (
     <Screen unsafe>
@@ -443,14 +469,14 @@ export const ScanningQRCodeScreen: React.FC = () => {
           <View style={styles.rectangle} />
         </View>
         <Pressable onPress={navigation.goBack}>
-          <View style={styles.close}>
+          <View style={[styles.close, closeInsetStyle]}>
             <Svg viewBox="0 0 100 100">
               <Circle cx={50} cy={50} r={50} fill={colors._white} opacity={0.5} />
             </Svg>
             <GaloyIcon name="close" size={64} style={styles.iconClose} />
           </View>
         </Pressable>
-        <View style={styles.openGallery}>
+        <View style={[styles.openGallery, bottomControlsInsetStyle]}>
           <Pressable
             {...testProps("open-gallery")}
             disabled={pending}
@@ -478,57 +504,57 @@ export const ScanningQRCodeScreen: React.FC = () => {
   )
 }
 
-const useStyles = makeStyles(({ colors }) => ({
-  close: {
-    alignSelf: "flex-end",
-    height: 64,
-    marginRight: 16,
-    marginTop: 40,
-    width: 64,
-  },
+const useStyles = makeStyles(
+  ({ colors }, { width, shortestEdge }: { width: number; shortestEdge: number }) => ({
+    close: {
+      alignSelf: "flex-end",
+      height: 64,
+      marginRight: 16,
+      width: 64,
+    },
 
-  openGallery: {
-    height: 128,
-    left: 32,
-    position: "absolute",
-    top: screenHeight - 96,
-    width: screenWidth,
-  },
+    openGallery: {
+      height: 64,
+      left: 32,
+      position: "absolute",
+      width,
+    },
 
-  rectangle: {
-    borderColor: colors.primary,
-    borderWidth: 2,
-    height: screenWidth * 0.75,
-    width: screenWidth * 0.75,
-  },
+    rectangle: {
+      borderColor: colors.primary,
+      borderWidth: 2,
+      height: shortestEdge * 0.75,
+      width: shortestEdge * 0.75,
+    },
 
-  rectangleContainer: {
-    alignItems: "center",
-    bottom: 0,
-    justifyContent: "center",
-    left: 0,
-    position: "absolute",
-    right: 0,
-    top: 0,
-  },
+    rectangleContainer: {
+      alignItems: "center",
+      bottom: 0,
+      justifyContent: "center",
+      left: 0,
+      position: "absolute",
+      right: 0,
+      top: 0,
+    },
 
-  iconClose: { position: "absolute", top: -2, color: colors._black },
+    iconClose: { position: "absolute", top: -2, color: colors._black },
 
-  iconGalery: { opacity: 0.8 },
+    iconGalery: { opacity: 0.8 },
 
-  iconGaleryPending: { opacity: 0.4 },
+    iconGaleryPending: { opacity: 0.4 },
 
-  iconClipboard: { opacity: 0.8, position: "absolute", bottom: "5%", right: "15%" },
+    iconClipboard: { opacity: 0.8, position: "absolute", bottom: "5%", right: "15%" },
 
-  permissionMissing: {
-    alignItems: "center",
-    flex: 1,
-    justifyContent: "center",
-    rowGap: 32,
-  },
+    permissionMissing: {
+      alignItems: "center",
+      flex: 1,
+      justifyContent: "center",
+      rowGap: 32,
+    },
 
-  permissionMissingText: {
-    width: "80%",
-    textAlign: "center",
-  },
-}))
+    permissionMissingText: {
+      width: "80%",
+      textAlign: "center",
+    },
+  }),
+)

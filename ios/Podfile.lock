@@ -9,7 +9,7 @@ PODS:
     - GoogleUtilities/Environment (~> 8.0)
     - GoogleUtilities/UserDefaults (~> 8.0)
     - PromisesObjC (~> 2.4)
-  - BreezSdkSparkReactNative (0.15.0):
+  - BreezSdkSparkReactNative (0.22.0):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -3233,7 +3233,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   AppAuth: 1c1a8afa7e12f2ec3a294d9882dfa5ab7d3cb063
   AppCheckCore: cc8fd0a3a230ddd401f326489c99990b013f0c4f
-  BreezSdkSparkReactNative: dc779fe799955a8349c0d9b7eaa0b122e0213ef2
+  BreezSdkSparkReactNative: a6f93818d201430b82e0ac62b22b8b415a5524b2
   BVLinearGradient: cb006ba232a1f3e4f341bb62c42d1098c284da70
   FBLazyVector: 473b935415b82ae4f7f9aa9d5b3378491143ccbf
   Firebase: 26f6f8d460603af3df970ad505b16b15f5e2e9a1

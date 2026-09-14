@@ -31,7 +31,11 @@ type SaveCheckpointOptions = {
  * resume state without instantiating a navigator-bound hook.
  */
 export const useMigrationCheckpointState = () => {
-  const { ownerId, loading: ownerLoading } = useCustodialOwnerId()
+  const {
+    ownerId,
+    loading: ownerLoading,
+    refetch: refetchOwnerId,
+  } = useCustodialOwnerId()
   const [stored, setStored] = useState<StoredCheckpoint | null>(null)
   const [loading, setLoading] = useState(true)
   const [hasError, setHasError] = useState(false)
@@ -67,6 +71,15 @@ export const useMigrationCheckpointState = () => {
         }),
     [storageKey],
   )
+
+  /** The owner query joins the reload because the ids below are keyed by it, and this hook
+   *  resolves it on its OWN uncached instance: it can fail while a caller's separate
+   *  instance is healthy, and then every id reads null with nothing but the storage read to
+   *  retry. Reloading storage alone would replay that same null forever. Swallowed like the
+   *  load, so the caller keeps one promise that resolves whatever failed. */
+  const reload = useCallback(async (): Promise<void> => {
+    await Promise.all([load(), refetchOwnerId().catch(() => undefined)])
+  }, [load, refetchOwnerId])
 
   const reloadCheckpoint = useCallback(() => {
     isFocusedRef.current = true
@@ -158,7 +171,7 @@ export const useMigrationCheckpointState = () => {
     hasError,
     /** Imperative reload for retry screens. Leaves the focus flag alone on purpose: a
      *  retry resolving after blur still drops its update, same as the focus reload. */
-    refetch: load,
+    refetch: reload,
     saveCheckpoint,
     clearCheckpoint,
     hasResumableCheckpoint,

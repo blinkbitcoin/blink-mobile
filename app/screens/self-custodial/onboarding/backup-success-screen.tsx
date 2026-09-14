@@ -45,7 +45,7 @@ export const BackupSuccessScreen: React.FC = () => {
   const message = customMessage ?? fallbackMessage
 
   return (
-    <Screen preset="fixed">
+    <Screen preset="fixed" headerShown={false}>
       <SuccessScreenLayout onAnimationComplete={handleAnimationComplete}>
         <Text style={styles.message}>{message}</Text>
       </SuccessScreenLayout>

@@ -21,6 +21,9 @@ export const getInviteLink = (_username: string | null | undefined) => {
 
 export const BLINK_DOMAIN = "blink.sv"
 
+export const BLOCKED_COUNTRIES_FAQ_LINK =
+  "https://faq.blink.sv/creating-a-blink-account/which-countries-are-unable-to-download-and-activate-blink"
+
 export const getCloudBackupFilenamePrefix = (network: string) =>
   `blink-spark-backup-${network.toLowerCase()}-`
 
@@ -29,6 +32,5 @@ export const getCloudBackupFilename = (network: string, walletIdentifier: string
 
 export const BLINK_DEEP_LINK_PREFIX = "blink:/"
 export const TELEGRAM_CALLBACK_PATH = "auth/passport-callback"
-export const HIDDEN_AMOUNT_PLACEHOLDER = "****"
 export const APPROXIMATE_PREFIX = "~"
 export const MASK_CHAR = "•"
