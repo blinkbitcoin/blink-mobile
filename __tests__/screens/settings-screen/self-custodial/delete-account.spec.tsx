@@ -14,6 +14,15 @@ jest.mock("@react-navigation/native", () => ({
   CommonActions: { reset: (args: unknown) => ({ type: "reset", payload: args }) },
 }))
 
+const mockSetAccountIsBeingDeleted = jest.fn()
+jest.mock("@app/screens/settings-screen/account/account-delete-context", () => ({
+  useAccountDeleteContext: () => ({
+    setAccountIsBeingDeleted: mockSetAccountIsBeingDeleted,
+  }),
+}))
+
+jest.mock("@app/utils/toast", () => ({ toastShow: jest.fn() }))
+
 jest.mock("@rn-vui/themed", () => {
   const colors: Record<string, string> = {
     grey5: "#f5f5f5",
@@ -34,16 +43,6 @@ jest.mock("@rn-vui/themed", () => {
         fn({ colors }, params),
     Text: ({ children, ...props }: { children: React.ReactNode }) =>
       React.createElement("Text", props, children),
-    Overlay: ({
-      isVisible,
-      children,
-    }: {
-      isVisible: boolean
-      children: React.ReactNode
-    }) =>
-      isVisible
-        ? React.createElement("View", { testID: "deleting-overlay" }, children)
-        : null,
     useTheme: () => ({ theme: { colors, mode: "light" } }),
   }
 })
@@ -89,6 +88,7 @@ const lastConfirmProps: {
   isVisible?: boolean
   onClose?: () => void
   onConfirm?: () => void | Promise<void>
+  onModalHide?: () => void | Promise<void>
 } = {}
 jest.mock(
   "@app/screens/settings-screen/self-custodial/delete-account-confirm-modal",
@@ -97,10 +97,12 @@ jest.mock(
       isVisible: boolean
       onClose: () => void
       onConfirm: () => void | Promise<void>
+      onModalHide?: () => void | Promise<void>
     }) => {
       lastConfirmProps.isVisible = props.isVisible
       lastConfirmProps.onClose = props.onClose
       lastConfirmProps.onConfirm = props.onConfirm
+      lastConfirmProps.onModalHide = props.onModalHide
       return props.isVisible
         ? React.createElement("View", { testID: "confirm-modal" })
         : null
@@ -150,7 +152,11 @@ jest.mock("@app/hooks/use-account-registry", () => ({
 jest.mock("@app/i18n/i18n-react", () => ({
   useI18nContext: () => ({
     LL: {
-      AccountScreen: { pleaseWait: () => "Please wait" },
+      ProfileScreen: {
+        removedAccount: ({ identifier }: { identifier: string }) =>
+          `You removed account ${identifier}.`,
+      },
+      common: { anonymousUser: () => "Anon user" },
       SelfCustodialDelete: {
         dangerZoneImportantTitle: () => "Important",
         dangerZoneBulletReinstated: () => "Deleted account cannot be reinstated",
@@ -252,7 +258,7 @@ describe("DeleteAccount", () => {
     expect(queryByTestId("warning-modal")).toBeNull()
   })
 
-  it("confirm onConfirm calls deleteWallet and closes the modal", async () => {
+  it("confirm closes the modal and removes the account once the modal has hidden", async () => {
     mockUseSelfCustodialWallet.mockReturnValue({
       wallets: [emptyWallet("btc", "BTC"), emptyWallet("usd", "USD")],
     })
@@ -265,8 +271,38 @@ describe("DeleteAccount", () => {
     })
     rerender(<DeleteAccount />)
 
+    expect(queryByTestId("confirm-modal")).toBeNull()
+    expect(mockDeleteWallet).not.toHaveBeenCalled()
+
+    await act(async () => {
+      await lastConfirmProps.onModalHide?.()
+    })
+
     expect(mockDeleteWallet).toHaveBeenCalledTimes(1)
     expect(mockDeleteWallet).toHaveBeenCalledWith(TEST_SC_ACCOUNT_ID)
-    expect(queryByTestId("confirm-modal")).toBeNull()
+  })
+
+  it("locks the screen under the removed account's name, read before the switch", async () => {
+    mockUseSelfCustodialWallet.mockReturnValue({
+      lightningAddress: "alice@breez.tips",
+      wallets: [emptyWallet("btc", "BTC"), emptyWallet("usd", "USD")],
+    })
+
+    const { getByTestId, rerender } = render(<DeleteAccount />)
+    fireEvent.press(getByTestId("danger-zone-delete-button"))
+    await act(async () => {
+      await lastConfirmProps.onConfirm?.()
+    })
+
+    mockUseSelfCustodialWallet.mockReturnValue({
+      lightningAddress: "satoshin21@breez.tips",
+      wallets: [],
+    })
+    rerender(<DeleteAccount />)
+    await act(async () => {
+      await lastConfirmProps.onModalHide?.()
+    })
+
+    expect(mockSetAccountIsBeingDeleted).toHaveBeenCalledWith(true, "alice")
   })
 })

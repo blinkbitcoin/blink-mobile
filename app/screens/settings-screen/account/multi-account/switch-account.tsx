@@ -11,6 +11,7 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { usePendingMigrationAccounts } from "@app/screens/account-migration/hooks"
 
 import { ProfileRow } from "../../self-custodial/profile-row"
+import { AccountDeleteContextProvider } from "../account-delete-context"
 
 import { ProfileScreen } from "./profile"
 import { fetchProfiles } from "./utils"
@@ -65,31 +66,33 @@ export const SwitchAccount: React.FC = () => {
   }
 
   return (
-    <Screen keyboardShouldPersistTaps="handled">
-      <ScrollView contentContainerStyle={styles.outer}>
-        {profiles.map((profile, index) => (
-          <ProfileScreen
-            key={profile.accountId || profile.userId || index}
-            {...profile}
-            isFirstItem={index === 0}
-            nextProfileToken={nextProfileToken}
+    <AccountDeleteContextProvider>
+      <Screen keyboardShouldPersistTaps="handled">
+        <ScrollView contentContainerStyle={styles.outer}>
+          {profiles.map((profile, index) => (
+            <ProfileScreen
+              key={profile.accountId || profile.userId || index}
+              {...profile}
+              isFirstItem={index === 0}
+              nextProfileToken={nextProfileToken}
+            />
+          ))}
+          {visibleSelfCustodialEntries.map((entry, index) => (
+            <ProfileRow
+              key={entry.id}
+              entry={entry}
+              isFirstItem={profiles.length === 0 && index === 0}
+            />
+          ))}
+        </ScrollView>
+        <View style={styles.buttonsContainer}>
+          <GaloyPrimaryButton
+            onPress={handleAddNew}
+            title={LL.ProfileScreen.addAccount()}
           />
-        ))}
-        {visibleSelfCustodialEntries.map((entry, index) => (
-          <ProfileRow
-            key={entry.id}
-            entry={entry}
-            isFirstItem={profiles.length === 0 && index === 0}
-          />
-        ))}
-      </ScrollView>
-      <View style={styles.buttonsContainer}>
-        <GaloyPrimaryButton
-          onPress={handleAddNew}
-          title={LL.ProfileScreen.addAccount()}
-        />
-      </View>
-    </Screen>
+        </View>
+      </Screen>
+    </AccountDeleteContextProvider>
   )
 }
 
