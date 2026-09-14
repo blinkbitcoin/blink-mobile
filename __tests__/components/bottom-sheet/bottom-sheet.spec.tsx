@@ -8,7 +8,12 @@ import {
 import type { PanGesture } from "react-native-gesture-handler"
 import { act, fireEvent, render, waitFor, within } from "@testing-library/react-native"
 
-import { BOTTOM_OVERHANG, BottomSheet, PAN_TEST_ID } from "@app/components/bottom-sheet"
+import {
+  BOTTOM_OVERHANG,
+  BottomSheet,
+  CLOSE_DURATION_MS,
+  PAN_TEST_ID,
+} from "@app/components/bottom-sheet"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
 import { animatedHeightOf, translateYOf } from "../../helpers/bottom-sheet"
@@ -51,9 +56,6 @@ const settle = () =>
     })
   })
 
-/** Matches the sheet's own, which it does not export. */
-const CLOSE_DURATION_MS = 200
-
 jest.mock("react-native-reanimated", () => ({
   __esModule: true,
   ...jest.requireActual("react-native-reanimated"),
@@ -64,7 +66,7 @@ const SHEET_TEST_ID = "sheet"
 
 type SheetProps = React.ComponentProps<typeof BottomSheet>
 
-const renderSheet = (props: Partial<SheetProps> = {}) => {
+const sheetElement = (props: Partial<SheetProps> = {}) => {
   // `heightRatio` belongs to the modal presentation alone — inline the layout
   // gives the sheet its height — and the props are a union on `presentation`,
   // so it is only defaulted where it means something. The cast is what a
@@ -77,14 +79,25 @@ const renderSheet = (props: Partial<SheetProps> = {}) => {
       : { ...base, heightRatio: 0.6, ...props }
   ) as SheetProps
 
-  return render(
+  return (
     <ContextForScreen>
       <BottomSheet {...withDefaults}>
         <Text>content</Text>
       </BottomSheet>
-    </ContextForScreen>,
+    </ContextForScreen>
   )
 }
+
+const renderSheet = (props: Partial<SheetProps> = {}) => render(sheetElement(props))
+
+const dragAway = () =>
+  act(async () => {
+    fireGestureHandler<PanGesture>(getByGestureTestId(PAN_TEST_ID), [
+      { translationY: 0, velocityY: 0 },
+      { translationY: 200, velocityY: 0 },
+      { state: 5, translationY: 200, velocityY: 0 },
+    ])
+  })
 
 beforeEach(() => {
   jest.clearAllMocks()
@@ -383,6 +396,26 @@ describe("BottomSheet", () => {
     expect(getByTestId("sheet-scroll").props.scrollEnabled).toBe(true)
   })
 
+  it("still closes when its parent re-renders during the slide-out", async () => {
+    // The category filter hands the sheet a fresh `onClose` arrow on every
+    // render of the map, and the map re-renders whenever places refresh or the
+    // region settles. One of those landing inside the 200ms slide-out used to
+    // re-spring the sheet open and swallow the dismissal.
+    const onClose = jest.fn()
+    const { getByTestId, rerender } = renderSheet({ onClose: () => onClose() })
+    const sheet = await waitFor(() => getByTestId(SHEET_TEST_ID))
+    await waitFor(() => expect(translateYOf(sheet)).toBe(0))
+
+    await dragAway()
+    rerender(sheetElement({ onClose: () => onClose() }))
+    await settle()
+
+    expect(onClose).toHaveBeenCalledTimes(1)
+    expect(getAnimatedStyle(sheet)).toMatchObject({
+      transform: [{ translateY: animatedHeightOf(sheet) }],
+    })
+  })
+
   describe("inline", () => {
     it("puts up no scrim, so what it sits beside keeps its own touches", async () => {
       const { getByText, queryByLabelText } = renderSheet({ presentation: "inline" })
@@ -450,13 +483,63 @@ describe("BottomSheet", () => {
       const addListener = jest
         .spyOn(BackHandler, "addEventListener")
         .mockReturnValue({ remove } as ReturnType<typeof BackHandler.addEventListener>)
-      const { unmount } = renderSheet({ presentation: "inline", onClose: jest.fn() })
+      const { rerender } = renderSheet({ presentation: "inline" })
 
       await waitFor(() => expect(addListener).toHaveBeenCalled())
-      unmount()
+      rerender(sheetElement({ presentation: "inline", isVisible: false }))
+      await settle()
 
-      // Otherwise the map behind it keeps answering back with a close.
+      // Hidden rather than unmounted: otherwise the map behind it keeps
+      // answering back with a close.
       expect(remove).toHaveBeenCalled()
+      addListener.mockRestore()
+    })
+
+    it("keeps answering back for as long as its slide-out is on screen", async () => {
+      const onClose = jest.fn()
+      const addListener = jest.spyOn(BackHandler, "addEventListener")
+      const { rerender, getByText } = renderSheet({ presentation: "inline", onClose })
+      await waitFor(() => expect(addListener).toHaveBeenCalled())
+
+      // Closed from the X: `isVisible` goes, the sheet stays drawn while it
+      // slides out, and a back press in that window must not reach the
+      // navigator and leave the tab.
+      rerender(sheetElement({ presentation: "inline", isVisible: false, onClose }))
+      expect(getByText("content")).toBeTruthy()
+
+      const [, handler] = addListener.mock.calls[addListener.mock.calls.length - 1]
+      let handled = false
+      await act(async () => {
+        handled = (handler as () => boolean)()
+      })
+      await settle()
+
+      expect(handled).toBe(true)
+      // Swallowed rather than restarting the exit, so it reports the once.
+      expect(onClose).toHaveBeenCalledTimes(1)
+      addListener.mockRestore()
+    })
+
+    it("is a whole sheet again when shown during its own exit", async () => {
+      const onClose = jest.fn()
+      const addListener = jest.spyOn(BackHandler, "addEventListener")
+      const { rerender } = renderSheet({ presentation: "inline", onClose })
+      await waitFor(() => expect(addListener).toHaveBeenCalled())
+
+      // Hidden and shown again before the slide-out can finish, which cancels
+      // it — and with it the completion that would have reset the exit.
+      rerender(sheetElement({ presentation: "inline", isVisible: false, onClose }))
+      rerender(sheetElement({ presentation: "inline", isVisible: true, onClose }))
+      await settle()
+      expect(onClose).not.toHaveBeenCalled()
+
+      // Still answering back with a close, rather than swallowing it as though
+      // it were still on its way out.
+      const [, handler] = addListener.mock.calls[addListener.mock.calls.length - 1]
+      await act(async () => {
+        ;(handler as () => boolean)()
+      })
+      await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1))
       addListener.mockRestore()
     })
 

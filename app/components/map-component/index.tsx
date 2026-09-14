@@ -462,6 +462,7 @@ export default function MapComponent({
   )
 
   const closeSheet = React.useCallback(() => setSelectedPlace(null), [])
+  const closeFilter = React.useCallback(() => setFilterOpen(false), [])
 
   // The sheet cannot open in the same breath as the search closes on iOS: both
   // are native modals, and iOS silently drops one presented while another is
@@ -654,7 +655,7 @@ export default function MapComponent({
         isVisible={isFilterOpen}
         selected={categories}
         onChange={setCategories}
-        onClose={() => setFilterOpen(false)}
+        onClose={closeFilter}
       />
 
       <PlaceSheet place={selectedPlace} userLocation={coords} onClose={closeSheet} />
