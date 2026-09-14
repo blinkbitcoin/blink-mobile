@@ -1,5 +1,6 @@
 import React from "react"
 import type { ReactTestInstance } from "react-test-renderer"
+import { AccessibilityInfo } from "react-native"
 import { fireEvent, render, waitFor } from "@testing-library/react-native"
 
 import { AddPlacePanel } from "@app/components/map-component/add-place-panel"
@@ -179,11 +180,13 @@ describe("AddPlacePanel", () => {
   it("sends once no matter how often submit is tapped while a send is in flight", async () => {
     // The send is a network round trip; without the guard each tap would fire
     // its own mutation and stack its own toast.
+    // Answered with a failure, since that is the answer the button comes back
+    // from — a sent place takes the panel away with the button still locked.
     let resolveSend: (() => void) | undefined
     onSubmit.mockImplementation(
       () =>
         new Promise<string | null>((resolve) => {
-          resolveSend = () => resolve(null)
+          resolveSend = () => resolve("Too many places sent today.")
         }),
     )
     const { getByTestId } = renderSheet()
@@ -249,6 +252,53 @@ describe("AddPlacePanel", () => {
     fireEvent.press(getByTestId("submit-place"))
 
     await waitFor(() => expect(queryByTestId("place-submission-error")).toBeNull())
+  })
+
+  it("slides out once the place has gone, the same way the X takes it", async () => {
+    const { getByTestId } = renderSheet()
+
+    await waitFor(() => expect(getByTestId("place-name-input")).toBeTruthy())
+    fillInForm({ getByTestId })
+    fireEvent.press(getByTestId("submit-place"))
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1))
+
+    // Still on screen while the exit plays, rather than taken off the map in
+    // the frame the answer arrived.
+    expect(getByTestId("add-place-panel")).toBeTruthy()
+    expect(onClose).not.toHaveBeenCalled()
+
+    await waitFor(() => expect(onClose).toHaveBeenCalled())
+  })
+
+  it("does not send the place again while it slides out", async () => {
+    // The attempt is open until the slide-out reports, so a second send in
+    // that window would reuse the submission id — which BTC Map takes as an
+    // edit of the place it has just accepted.
+    const { getByTestId } = renderSheet()
+
+    await waitFor(() => expect(getByTestId("place-name-input")).toBeTruthy())
+    fillInForm({ getByTestId })
+    fireEvent.press(getByTestId("submit-place"))
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1))
+    fireEvent.press(getByTestId("submit-place"))
+
+    await waitFor(() => expect(onClose).toHaveBeenCalled())
+    expect(onSubmit).toHaveBeenCalledTimes(1)
+  })
+
+  it("reads a failure out on both platforms, not just Android's live region", async () => {
+    const announce = jest.spyOn(AccessibilityInfo, "announceForAccessibility")
+    onSubmit.mockResolvedValue("Too many places sent today.")
+    const { getByTestId } = renderSheet()
+
+    await waitFor(() => expect(getByTestId("place-name-input")).toBeTruthy())
+    fillInForm({ getByTestId })
+    fireEvent.press(getByTestId("submit-place"))
+
+    await waitFor(() =>
+      expect(announce).toHaveBeenCalledWith("Too many places sent today."),
+    )
+    announce.mockRestore()
   })
 
   it("slides out on the X rather than vanishing from under the map", async () => {
