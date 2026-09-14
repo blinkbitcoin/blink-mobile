@@ -999,6 +999,13 @@ describe("MapComponent adding a place", () => {
         expect.objectContaining({ type: "success" }),
       ),
     )
+    // Closed by the form, which slides out on the null and then asks to be
+    // taken away — not pulled out from under it here, in the frame the answer
+    // arrived.
+    expect(isAddPlaceMounted).toBe(true)
+    act(() => {
+      ;(capturedAddPlaceProps?.onClose as () => void)()
+    })
     await waitFor(() => expect(isAddPlaceMounted).toBe(false))
   })
 
@@ -1215,14 +1222,21 @@ describe("MapComponent adding a place", () => {
     // still on it.
     expect(getByTestId("place-pin")).toBeTruthy()
 
+    const sent: { reason?: string | null } = {}
     await act(async () => {
       land?.({ submitted: true })
-      await inFlight
+      sent.reason = await inFlight
     })
 
     expect(mockToastShow).toHaveBeenCalledWith(
       expect.objectContaining({ type: "success" }),
     )
+    // The null is what tells the form to slide out; its close is what ends
+    // the attempt and takes the pin with it.
+    expect(sent.reason).toBeNull()
+    act(() => {
+      ;(capturedAddPlaceProps?.onClose as () => void)()
+    })
     await waitFor(() => expect(queryByTestId("place-pin")).toBeNull())
     expect(isAddPlaceMounted).toBe(false)
   })
