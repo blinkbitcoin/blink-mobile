@@ -33,6 +33,12 @@ type Props = {
    */
   onSubmit: (submission: PlaceSubmission) => Promise<string | null>
   onClose: () => void
+  /**
+   * Told when Continue fixes the place's location, and told `null` when Back
+   * releases it. From then on the map is no longer the control for where the
+   * place is, so it has to stop presenting itself as one.
+   */
+  onPin?: (location: LatLng | null) => void
 }
 
 /**
@@ -58,7 +64,12 @@ type Props = {
  * be filled in alongside, and the pin usually wants placing before there is
  * anything to type.
  */
-export const AddPlacePanel: React.FC<Props> = ({ location, onSubmit, onClose }) => {
+export const AddPlacePanel: React.FC<Props> = ({
+  location,
+  onSubmit,
+  onClose,
+  onPin,
+}) => {
   const {
     theme: { colors },
   } = useTheme()
@@ -127,6 +138,7 @@ export const AddPlacePanel: React.FC<Props> = ({ location, onSubmit, onClose }) 
   const goBack = () => {
     setStep("details")
     setPinnedLocation(null)
+    onPin?.(null)
     setError(null)
   }
 
@@ -206,6 +218,7 @@ export const AddPlacePanel: React.FC<Props> = ({ location, onSubmit, onClose }) 
               title={LL.common.continue()}
               onPress={() => {
                 setPinnedLocation(location)
+                onPin?.(location)
                 setStep("category")
               }}
               disabled={!canContinue}

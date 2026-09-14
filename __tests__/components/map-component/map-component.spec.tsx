@@ -881,6 +881,51 @@ describe("MapComponent adding a place", () => {
     )
   })
 
+  it("fixes the pin to the place once the form has taken its location", async () => {
+    // The second step sends the coordinate Continue took. A crosshair at the
+    // map's centre, still asking to be moved, would follow a pan to a door that
+    // is not the one being sent — so the pin becomes a marker on the place.
+    const { getByTestId, queryByTestId, queryByText } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+    fireEvent.press(getByTestId("open-add-place"))
+    await waitFor(() => expect(getByTestId("place-pin")).toBeTruthy())
+    expect(queryByTestId("pinned-place-pin")).toBeNull()
+
+    const onPin = capturedAddPlaceProps?.onPin as (location: unknown) => void
+    act(() => onPin({ latitude: REGION.latitude, longitude: REGION.longitude }))
+
+    await waitFor(() => expect(getByTestId("pinned-place-pin")).toBeTruthy())
+    expect(queryByTestId("place-pin")).toBeNull()
+    expect(queryByText("Move the map to put the pin on the place")).toBeNull()
+
+    // Back on the details the map is the control for the pin again.
+    act(() => onPin(null))
+    await waitFor(() => expect(getByTestId("place-pin")).toBeTruthy())
+    expect(queryByTestId("pinned-place-pin")).toBeNull()
+  })
+
+  it("aims the pin afresh on the next attempt, not where the last one fixed it", async () => {
+    const { getByTestId, queryByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+    fireEvent.press(getByTestId("open-add-place"))
+    await waitFor(() => expect(isAddPlaceMounted).toBe(true))
+    act(() =>
+      (capturedAddPlaceProps?.onPin as (location: unknown) => void)({
+        latitude: REGION.latitude,
+        longitude: REGION.longitude,
+      }),
+    )
+    act(() => {
+      ;(capturedAddPlaceProps?.onClose as () => void)()
+    })
+
+    fireEvent.press(getByTestId("open-add-place"))
+    await waitFor(() => expect(getByTestId("place-pin")).toBeTruthy())
+    expect(queryByTestId("pinned-place-pin")).toBeNull()
+  })
+
   it("abandons the whole thing on cancel", async () => {
     const { getByTestId, queryByTestId } = renderMap()
 
