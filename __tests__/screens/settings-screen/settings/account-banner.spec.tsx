@@ -19,6 +19,22 @@ jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () => mockUseSelfCustodialWallet(),
 }))
 
+jest.mock("@app/self-custodial/hooks/use-self-custodial-account-mode", () => ({
+  useSelfCustodialAccountMode: () => ({ isAnonMode: false }),
+}))
+
+jest.mock("@app/components/enhanced-mode-prompt", () => ({
+  useEnhancedModePrompt: () => ({ promptEnhancedMode: jest.fn() }),
+}))
+
+jest.mock("@app/components/restricted-region", () => ({
+  useRestrictedRegion: () => ({
+    isRestrictedRegion: false,
+    isRestrictedRegionModalVisible: false,
+    presentRestrictedRegionModal: jest.fn(),
+  }),
+}))
+
 const mockCopyToClipboard = jest.fn()
 jest.mock("@app/hooks", () => ({
   useAppConfig: () => ({
