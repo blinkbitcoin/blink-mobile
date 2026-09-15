@@ -2384,6 +2384,7 @@
     "willBeSentToMempoolBy": "Transakciu je potrebné odoslať do mempoolu",
     "amount": "Suma",
     "addAmount": "Pridať sumu",
+    "lowFunds": "Nedostatok prostriedkov",
     "amountExceed": "Suma prekračuje váš zostatok vo výške {balance: string}",
     "amountExceedsLimit": "Suma prekračuje váš zostávajúci denný limit {limit: string}",
     "upgradeAccountToIncreaseLimit": "Upgradujte si účet a zvýšte svoj limit",

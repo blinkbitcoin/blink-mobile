@@ -2384,6 +2384,7 @@
     "willBeSentToMempoolBy": "يجب إرسال المعاملة إلى mempool",
     "amount": "الكمية",
     "addAmount": "أضف المبلغ",
+    "lowFunds": "أموال غير كافية",
     "amountExceed": "المقدار أعلى من ميزانيتك التي تبلغ {balance: string}",
     "amountExceedsLimit": "Amount exceeds your remaining daily limit of {limit: string}",
     "upgradeAccountToIncreaseLimit": "Upgrade your account to increase your limit",

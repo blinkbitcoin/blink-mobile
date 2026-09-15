@@ -1,4 +1,5 @@
 import React from "react"
+import { StyleSheet } from "react-native"
 
 import { act, fireEvent, render, screen, within } from "@testing-library/react-native"
 import { i18nObject } from "@app/i18n/i18n-util"
@@ -299,6 +300,23 @@ describe("free amount", () => {
       { amount: btcWallet.balance, currency: "BTC", currencyCode: "BTC" },
       false,
     )
+  })
+
+  /** ₦22 is past the bitcoin balance against the mocked price (see the switch spec below). */
+  it("reads Low funds and outlines the wallet when the amount exceeds its balance", async () => {
+    renderScreen(intraledgerDestination())
+    await settle()
+    const cardBorder = () =>
+      StyleSheet.flatten(screen.getByTestId("choose-wallet-to-send-from").props.style)
+        .borderColor
+
+    const borderBefore = cardBorder()
+    typeKeys("2", "2")
+    await settle()
+
+    expect(within(nextButton()).getByText(LL.SendBitcoinScreen.lowFunds())).toBeTruthy()
+    expect(isNextDisabled()).toBe(true)
+    expect(cardBorder()).not.toBe(borderBefore)
   })
 
   /** Against the mocked price ₦22 is about 91,600 sats but only $0.22: past the bitcoin

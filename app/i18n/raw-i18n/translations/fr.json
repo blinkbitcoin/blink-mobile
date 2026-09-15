@@ -2384,6 +2384,7 @@
         "willBeSentToMempoolBy": "La transaction devrait être soumise au mempool",
         "amount": "Montant",
         "addAmount": "Ajouter un montant",
+        "lowFunds": "Fonds insuffisants",
         "amountExceed": "Le montant excède votre solde de {balance: string}",
         "amountExceedsLimit": "Le montant excède le restant de votre limite journalière qui est de {limit: string}",
         "upgradeAccountToIncreaseLimit": "Mettre à jour votre compte pour augmenter votre limite",
