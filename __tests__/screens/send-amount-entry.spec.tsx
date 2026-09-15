@@ -440,11 +440,6 @@ describe("fixed amount", () => {
 })
 
 /**
- * The summary replaced the choose-wallet picker, the one place hide-balance let the send
- * flow reveal an amount (#4125), so it keeps the picker's rule rather than the old inline
- * field's mask: the balance is what the user switches wallets and picks a percentage by.
- */
-/**
  * The balance line is in the wallet's own currency; a second line, in the display currency,
  * shows only when that differs. A dollar wallet with USD as the display currency is therefore
  * one line, centred in a card that keeps its two-line height.
@@ -489,6 +484,11 @@ describe("wallet summary balance lines", () => {
   })
 })
 
+/**
+ * The summary replaced the choose-wallet picker, the one place hide-balance let the send
+ * flow reveal an amount (#4125), so it keeps the picker's rule rather than the old inline
+ * field's mask: the balance is what the user switches wallets and picks a percentage by.
+ */
 describe("wallet summary under hide-balance", () => {
   const expectBalanceShown = () =>
     expect(
