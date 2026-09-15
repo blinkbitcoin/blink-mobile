@@ -8,6 +8,7 @@ import {
   createGetFeeOnchain,
   createSendMutation,
   createSendMutationOnchain,
+  findLostSend,
 } from "@app/self-custodial/payment-details/send-helpers"
 import { SelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
 import { ConvertAmountAdjustment } from "@app/types/payment"
@@ -43,6 +44,8 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => {
       Bolt11Invoice: "Bolt11Invoice",
     },
     OnchainConfirmationSpeed: { Fast: 0, Medium: 1, Slow: 2 },
+    PaymentStatus: { Completed: 0, Pending: 1, Failed: 2 },
+    PaymentType: { Send: 0, Receive: 1 },
     Seed: { Mnemonic: jest.fn().mockImplementation((args: unknown) => args) },
     StableBalanceActiveLabel: {
       Set: jest.fn().mockImplementation((args: unknown) => ({ tag: "Set", inner: args })),
@@ -84,9 +87,12 @@ jest.mock("@react-native-firebase/crashlytics", () => () => ({
   log: jest.fn(),
 }))
 
+const mockListPayments = jest.fn()
+
 const mockSdk = {
   prepareSendPayment: (...args: unknown[]) => mockPrepareSendPayment(...args),
   sendPayment: (...args: unknown[]) => mockSendPayment(...args),
+  listPayments: (...args: unknown[]) => mockListPayments(...args),
 } as never
 
 const sdkError = (tag: string, inner?: readonly [string]) => ({ tag, inner })
@@ -712,5 +718,127 @@ describe("createSendMutationOnchain", () => {
 
     expect(result.status).toBe(PaymentSendResult.Failure)
     expect(result.errors?.[0].message).toBe(SelfCustodialErrorCode.NetworkError)
+  })
+})
+
+describe("findLostSend", () => {
+  const COMPLETED = 0
+  const PENDING = 1
+  const FAILED = 2
+  const STARTED_AT_MS = 1_747_691_078_000
+
+  const sent = (id: string, status: number, to = "friend") => ({ id, status, to })
+  const toFriend = (payment: { to?: string }) => payment.to === "friend"
+
+  /** Answers the wallet's listing once per attempt, in order. */
+  const walletAnswers = (...pages: Array<Array<ReturnType<typeof sent>>>) => {
+    pages.forEach((payments) => mockListPayments.mockResolvedValueOnce({ payments }))
+  }
+
+  const lookup = () =>
+    findLostSend({ sdk: mockSdk, startedAtMs: STARTED_AT_MS, matches: toFriend })
+
+  /** Runs the lookup to its end, releasing each wait between attempts. */
+  const settle = async <T>(pending: Promise<T>): Promise<T> => {
+    for (let i = 0; i < 3; i += 1) {
+      await Promise.resolve()
+      await jest.advanceTimersByTimeAsync(2000)
+    }
+    return pending
+  }
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    jest.useFakeTimers()
+  })
+
+  afterEach(() => {
+    jest.useRealTimers()
+  })
+
+  /** The wallet stamps the payment, so the window opens a little before the attempt's
+   *  own clock; only what was sent from this wallet is asked for. */
+  it("asks for outgoing payments from just before the attempt", async () => {
+    walletAnswers([sent("p1", COMPLETED)])
+
+    await settle(lookup())
+
+    expect(mockListPayments).toHaveBeenCalledWith(
+      expect.objectContaining({
+        typeFilter: [0],
+        fromTimestamp: BigInt(1_747_691_078 - 5),
+        limit: 20,
+        sortAscending: false,
+      }),
+    )
+  })
+
+  it("returns the completed payment to the destination on the first look", async () => {
+    walletAnswers([sent("other", COMPLETED, "someone-else"), sent("p1", COMPLETED)])
+
+    const found = await settle(lookup())
+
+    expect(found?.id).toBe("p1")
+    expect(mockListPayments).toHaveBeenCalledTimes(1)
+  })
+
+  it("returns a pending payment when that is all the wallet shows", async () => {
+    walletAnswers([sent("p1", PENDING)])
+
+    const found = await settle(lookup())
+
+    expect(found?.id).toBe("p1")
+  })
+
+  it("prefers a completed payment over a pending one for the same attempt", async () => {
+    walletAnswers([sent("in-flight", PENDING), sent("done", COMPLETED)])
+
+    const found = await settle(lookup())
+
+    expect(found?.id).toBe("done")
+  })
+
+  /** A failed payment is not the attempt landing; it is exactly what makes a retry safe. */
+  it("passes over a failed payment", async () => {
+    walletAnswers([sent("p1", FAILED)], [sent("p1", FAILED)], [sent("p1", FAILED)])
+
+    const found = await settle(lookup())
+
+    expect(found).toBeUndefined()
+  })
+
+  /** The payment can land in the history a moment after the call that dispatched it
+   *  gave up, so the wallet is asked again, spaced out, before giving up. */
+  it("asks again after a wait when the first look shows nothing", async () => {
+    walletAnswers([], [sent("p1", COMPLETED)])
+
+    const pending = lookup()
+    await Promise.resolve()
+    expect(mockListPayments).toHaveBeenCalledTimes(1)
+
+    const found = await settle(pending)
+
+    expect(found?.id).toBe("p1")
+    expect(mockListPayments).toHaveBeenCalledTimes(2)
+  })
+
+  it("gives up after three looks that show nothing", async () => {
+    walletAnswers([], [], [])
+
+    const found = await settle(lookup())
+
+    expect(found).toBeUndefined()
+    expect(mockListPayments).toHaveBeenCalledTimes(3)
+  })
+
+  /** A history that cannot be read is not proof the payment was never made. */
+  it("treats a listing that throws as nothing found and asks again", async () => {
+    mockListPayments.mockRejectedValueOnce(new Error("sdk offline"))
+    walletAnswers([sent("p1", COMPLETED)])
+
+    const found = await settle(lookup())
+
+    expect(found?.id).toBe("p1")
+    expect(mockRecordError).toHaveBeenCalled()
   })
 })
