@@ -22,8 +22,8 @@ import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon } from "../galoy-icon"
 
-const TRACK_HEIGHT = 50
-const HANDLE_SIZE = 50
+const TRACK_HEIGHT = 60
+const HANDLE_SIZE = 60
 /** Share of the travel the handle must cover before the send commits. */
 const COMMIT_THRESHOLD = 0.7
 /** Share of the travel after which the handle starts fading out. */
@@ -198,7 +198,7 @@ const GaloySliderButton = ({
           {...testProps("slider")}
         >
           <GaloyIcon
-            size={26}
+            size={30}
             name={isRTL ? "arrow-left" : "arrow-right"}
             color={colors._white}
           />
