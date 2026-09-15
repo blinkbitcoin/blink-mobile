@@ -4,19 +4,18 @@ import { WalletCurrency } from "@app/graphql/generated"
 import { usePriceConversion } from "@app/hooks"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { toUsdMoneyAmount } from "@app/types/amounts"
+import { toMajorUnit, toMinorUnit } from "@app/utils/helper"
 
 import { type InvestmentFunding, resolveInvestmentFunding } from "./investment-terms"
-
-/** Wallet balances are integers in their currency's minor unit; the agreement is written
- *  in whole dollars. */
-const CENTS_PER_USD = 100
 
 /**
  * What the investor holds against what they signed for.
  *
  * The fullest wallet decides, because a payment draws on one; the two added together
- * only say whether consolidating would be enough. Reads through the active account, so
- * it answers for a custodial and a self-custodial investor alike.
+ * only say whether consolidating would be enough. Read through the active account, so
+ * it answers for a custodial and a self-custodial investor alike. Balances arrive in
+ * cents and the agreement is written in whole dollars, so they are converted at the
+ * edge and the rule reasons in dollars.
  *
  * While it is loading the balance reads as zero, which would say the investment is not
  * covered when it may well be. Callers wait rather than act on that: the flag is what
@@ -43,8 +42,9 @@ export const useInvestmentFunding = (
     if (!convertMoneyAmount) return empty
 
     return wallets.reduce((funding, wallet) => {
-      const balanceUsd =
-        convertMoneyAmount(wallet.balance, WalletCurrency.Usd).amount / CENTS_PER_USD
+      const balanceUsd = toMajorUnit(
+        convertMoneyAmount(wallet.balance, WalletCurrency.Usd).amount,
+      )
       const isFullest = balanceUsd > funding.largestWalletUsd
       return {
         largestWalletUsd: isFullest ? balanceUsd : funding.largestWalletUsd,
@@ -83,7 +83,7 @@ export const useInvestmentSats = (totalUsd: number): number => {
     if (!convertMoneyAmount) return 0
 
     return convertMoneyAmount(
-      toUsdMoneyAmount(totalUsd * CENTS_PER_USD),
+      toUsdMoneyAmount(toMinorUnit(String(totalUsd))),
       WalletCurrency.Btc,
     ).amount
   }, [totalUsd, convertMoneyAmount])
