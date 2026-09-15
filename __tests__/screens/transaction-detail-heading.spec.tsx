@@ -127,7 +127,7 @@ describe("TransactionDetailScreen heading", () => {
   beforeEach(() => jest.clearAllMocks())
 
   const cases: Array<{ name: string; tx: unknown; copy: string }> = [
-    { name: "spend", tx: lightningSend, copy: "You spent" },
+    { name: "send", tx: lightningSend, copy: "You sent" },
     {
       name: "receive",
       tx: { ...lightningSend, direction: "RECEIVE", settlementAmount: 23 },
