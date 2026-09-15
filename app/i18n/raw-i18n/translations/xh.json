@@ -2673,7 +2673,7 @@
   "TransactionDetailScreen": {
     "paid": "Ihlawulwe ukuya/ukusuka",
     "received": "Ufumene",
-    "spent": "Uchithe",
+    "sent": "Uthumele",
     "sending": "Iyathumela",
     "receivingAccount": "Ukufumana iAkhawunti",
     "sendingAccount": "Ukuthumela iAkhawunti",
