@@ -39,7 +39,7 @@ const INVOICE_EXPIRY_MINUTES = "30"
  */
 const INVOICE_MEMO = "Blink Private subscription"
 
-export type MintedInvoice = {
+type MintedInvoice = {
   paymentRequest: string
 }
 

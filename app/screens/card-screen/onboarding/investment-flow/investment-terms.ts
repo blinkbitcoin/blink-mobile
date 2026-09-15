@@ -73,7 +73,7 @@ export const resolveInvestmentTerms = (
   units: totalUsd / PRICE_PER_UNIT_USD,
   pricePerUnitUsd: PRICE_PER_UNIT_USD,
   preMoneyValuationUsd: PRE_MONEY_VALUATION_USD,
-  ...(settlement && settlement.btcUsdRate > 0
+  ...(settlement
     ? {
         btcUsdRate: settlement.btcUsdRate,
         settlementBtc: Number((totalUsd / settlement.btcUsdRate).toFixed(BTC_DECIMALS)),
