@@ -2664,7 +2664,7 @@
   "TransactionDetailScreen": {
     "paid": "Πληρωμή προς/από",
     "received": "Έχετε λάβει",
-    "spent": "Έχετε ξοδέψει",
+    "sent": "Έχετε στείλει",
     "sending": "Αποστολή",
     "receivingAccount": "Λογαριασμός λήψης",
     "sendingAccount": "Λογαριασμός Αποστολής",

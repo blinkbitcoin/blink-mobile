@@ -2664,7 +2664,7 @@
     "TransactionDetailScreen": {
         "paid": "送金先/送金元",
         "received": "受金完了",
-        "spent": "送金完了",
+        "sent": "送金完了",
         "sending": "送信中",
         "receivingAccount": "受金ウォレット",
         "sendingAccount": "送金ウォレット",

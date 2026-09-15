@@ -2664,7 +2664,7 @@
   "TransactionDetailScreen": {
     "paid": "Trả tiền cho/từ",
     "received": "Bạn đã nhận",
-    "spent": "Bạn đã chi",
+    "sent": "Bạn đã gửi",
     "sending": "Đang gửi",
     "receivingAccount": "Số dư nhận",
     "sendingAccount": "Số dư gửi",

@@ -2664,7 +2664,7 @@
   "TransactionDetailScreen": {
     "paid": "Dibayar ke/dari",
     "received": "Anda menerima",
-    "spent": "Anda menghabiskan",
+    "sent": "Anda mengirim",
     "sending": "Mengirim",
     "receivingAccount": "Akun Penerima",
     "sendingAccount": "Akun Pengirim",

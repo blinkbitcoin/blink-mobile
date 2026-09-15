@@ -2664,7 +2664,7 @@
   "TransactionDetailScreen": {
     "paid": "Ödendi/Ödedi",
     "received": "Size geldi",
-    "spent": "Harcadınız",
+    "sent": "Gönderdiniz",
     "sending": "Gönderiliyor",
     "receivingAccount": "Alıcı Bakiye",
     "sendingAccount": "Gönderen Bakiye",

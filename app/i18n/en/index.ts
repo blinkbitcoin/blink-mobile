@@ -2782,7 +2782,7 @@ const en: BaseTranslation = {
   TransactionDetailScreen: {
     paid: "Paid to/from",
     received: "You received",
-    spent: "You spent",
+    sent: "You sent",
     sending: "Sending",
     receivingAccount: "Receiving Balance",
     sendingAccount: "Sending Balance",

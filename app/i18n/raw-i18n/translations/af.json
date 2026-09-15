@@ -2664,7 +2664,7 @@
   "TransactionDetailScreen": {
     "paid": "Betaal aan/van",
     "received": "Jy het ontvang",
-    "spent": "Jy het spandeer",
+    "sent": "Jy het gestuur",
     "sending": "Besig om te stuur",
     "receivingAccount": "Rekening waarin onvang word",
     "sendingAccount": "Rekening waaruit gestuur word",

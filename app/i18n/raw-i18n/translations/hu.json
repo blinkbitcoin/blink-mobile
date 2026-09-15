@@ -2664,7 +2664,7 @@
   "TransactionDetailScreen": {
     "paid": "Kifizetve/kiutalva",
     "received": "Fogadott",
-    "spent": "Elköltött",
+    "sent": "Elküldött",
     "sending": "Küld",
     "receivingAccount": "Fogadó egyenleg",
     "sendingAccount": "Küldő egyenleg",

@@ -8784,9 +8784,9 @@ type RootTranslation = {
 		 */
 		received: string
 		/**
-		 * Y​o​u​ ​s​p​e​n​t
+		 * Y​o​u​ ​s​e​n​t
 		 */
-		spent: string
+		sent: string
 		/**
 		 * S​e​n​d​i​n​g
 		 */
@@ -22386,9 +22386,9 @@ export type TranslationFunctions = {
 		 */
 		received: () => LocalizedString
 		/**
-		 * You spent
+		 * You sent
 		 */
-		spent: () => LocalizedString
+		sent: () => LocalizedString
 		/**
 		 * Sending
 		 */

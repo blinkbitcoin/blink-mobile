@@ -2664,7 +2664,7 @@
   "TransactionDetailScreen": {
     "paid": "Վճարվեց ստացողին/ուղարկողից",
     "received": "Դուք ստացաք",
-    "spent": "Դուք ծախսեցիք",
+    "sent": "Դուք ուղարկեցիք",
     "sending": "Ուղարկվում է",
     "receivingAccount": "Ստացողի հաշիվ",
     "sendingAccount": "Ողւարկողի հաշիվ",

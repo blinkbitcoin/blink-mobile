@@ -2664,7 +2664,7 @@
     "TransactionDetailScreen": {
         "paid": "Pago de/para",
         "received": "Você recebeu",
-        "spent": "Você gastou",
+        "sent": "Você enviou",
         "sending": "Enviando",
         "receivingAccount": "Saldo de Recebimento",
         "sendingAccount": "Saldo de Envio",
