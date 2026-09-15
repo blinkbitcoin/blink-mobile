@@ -2383,6 +2383,8 @@
     "SendBitcoinScreen": {
         "willBeSentToMempoolBy": "トランザクションはメモリプールに送信されます",
         "amount": "金額",
+        "addAmount": "金額を追加",
+        "lowFunds": "残高不足",
         "amountExceed": "限度額が{balance: string}を超えています",
         "amountExceedsLimit": "1日の残りの限度額{limit: string}を超えています",
         "upgradeAccountToIncreaseLimit": "ウォレットをアップグレードして限度額を増やす",

@@ -65,12 +65,18 @@ export const PercentageSelector: React.FC<PercentageSelectorProps> = ({
             accessibilityLabel={testIdPrefix}
             accessibilityState={{ selected: isSelected, disabled: isDisabled }}
           >
-            {loading ? (
-              <ActivityIndicator color={colors.primary} />
-            ) : (
-              <Text style={[styles.chipText, isSelected && styles.chipTextSelected]}>
-                {p}%
-              </Text>
+            {/* The label keeps its space under the spinner so the chip doesn't resize. */}
+            <Text
+              style={[
+                styles.chipText,
+                isSelected && styles.chipTextSelected,
+                loading && styles.chipTextHidden,
+              ]}
+            >
+              {p}%
+            </Text>
+            {loading && (
+              <ActivityIndicator style={styles.spinner} color={colors.primary} />
             )}
           </TouchableOpacity>
         )
@@ -82,17 +88,19 @@ export const PercentageSelector: React.FC<PercentageSelectorProps> = ({
 const useStyles = makeStyles(({ colors }) => ({
   row: {
     flexDirection: "row",
-    justifyContent: "space-around",
+    flexWrap: "wrap",
+    justifyContent: "center",
     alignItems: "center",
+    gap: 10,
     width: "100%",
   },
   chip: {
     backgroundColor: colors.grey5,
-    borderRadius: 100,
+    borderRadius: 20,
     alignItems: "center",
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    minWidth: 64,
+    justifyContent: "center",
+    paddingVertical: 6,
+    paddingHorizontal: 14,
   },
   chipSelected: {
     backgroundColor: colors.primary,
@@ -102,7 +110,19 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   chipText: {
     color: colors.primary,
-    fontWeight: "bold",
+    fontFamily: "SourceSansPro-Bold",
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  chipTextHidden: {
+    opacity: 0,
+  },
+  spinner: {
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
   },
   chipTextSelected: {
     color: colors.white,

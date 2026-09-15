@@ -2383,6 +2383,8 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Η συναλλαγή πρέπει να υποβληθεί στη mempool",
     "amount": "Ποσό",
+    "addAmount": "Προσθήκη ποσού",
+    "lowFunds": "Ανεπαρκές υπόλοιπο",
     "amountExceed": "Το ποσό υπερβαίνει το υπόλοιπό σας {balance: string}",
     "amountExceedsLimit": "Το ποσό υπερβαίνει το εναπομένον όριο των {limit: string}",
     "upgradeAccountToIncreaseLimit": "Αναβαθμίστε τον λογαριασμό σας για να αυξήσετε το όριο σας ",

@@ -367,7 +367,8 @@ export const RootStack = () => {
       <RootNavigator.Screen
         name="sendBitcoinDetails"
         component={SendBitcoinDetailsGated}
-        options={{ title: LL.SendBitcoinScreen.title() }}
+        // The screen leads with its own send icon and destination, so the bar stays bare.
+        options={{ title: "" }}
       />
       <RootNavigator.Screen
         name="merchantSelection"

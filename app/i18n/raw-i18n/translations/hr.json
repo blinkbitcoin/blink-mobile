@@ -2383,6 +2383,8 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Transakcija bi trebala biti poslana u mempool",
     "amount": "Iznos",
+    "addAmount": "Dodaj iznos",
+    "lowFunds": "Nedovoljno sredstava",
     "amountExceed": "Iznos premašuje vaš saldo od {balance: string}",
     "amountExceedsLimit": "Iznos premašuje vaše preostalo dnevno ograničenje od {limit: string}",
     "upgradeAccountToIncreaseLimit": "Nadogradite svoj račun kako biste povećali svoje ograničenje",

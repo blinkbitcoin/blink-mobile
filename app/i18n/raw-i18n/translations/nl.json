@@ -2383,6 +2383,8 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Transactie wordt naar de mempool verzonden",
     "amount": "Bedrag",
+    "addAmount": "Bedrag toevoegen",
+    "lowFunds": "Onvoldoende saldo",
     "amountExceed": "Bedrag overschrijdt uw saldo van {balance: string}",
     "amountExceedsLimit": "Bedrag overschrijdt uw resterende dagelijkse limiet van {limit: string}",
     "upgradeAccountToIncreaseLimit": "Upgrade uw account om uw limiet te verhogen",

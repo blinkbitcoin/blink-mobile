@@ -2383,6 +2383,8 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Transakce by měla být odeslána do mempoolu",
     "amount": "Částka",
+    "addAmount": "Přidat částku",
+    "lowFunds": "Nedostatek prostředků",
     "amountExceed": "Částka přesahuje váš zůstatek ve výši {balance: string}",
     "amountExceedsLimit": "Částka přesahuje váš zbývající denní limit {limit: string}",
     "upgradeAccountToIncreaseLimit": "Upgradujte svůj účet a zvyšte svůj limit",

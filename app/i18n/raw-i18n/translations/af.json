@@ -2383,6 +2383,8 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Transaksie behoort aan mempool voorgelê te word",
     "amount": "Bedrag",
+    "addAmount": "Voeg bedrag by",
+    "lowFunds": "Nie genoeg fondse",
     "amountExceed": "Bedrag oorskry jou saldo van {balance: string}",
     "amountExceedsLimit": "Bedrag oorskry jou oorblywende daaglikse limiet van {limit: string}",
     "upgradeAccountToIncreaseLimit": "Opgradeer jou rekening om jou limiet te verhoog",

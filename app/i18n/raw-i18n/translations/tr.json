@@ -2383,6 +2383,8 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "İşlem mempool'a gönderilmelidir",
     "amount": "Miktar",
+    "addAmount": "Tutar ekle",
+    "lowFunds": "Yetersiz bakiye",
     "amountExceed": "Göndermek istediğin miktar, bakiyenin {balance: string} üstünde.",
     "amountExceedsLimit": "Tutar, kalan günlük {limit: string} limitinizi aşıyor",
     "upgradeAccountToIncreaseLimit": "Limitinizi artırmak için hesabınızı yükseltin",

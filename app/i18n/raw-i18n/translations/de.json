@@ -2383,6 +2383,8 @@
     "SendBitcoinScreen": {
         "willBeSentToMempoolBy": "Transaktion sollte an den Mempool übermittelt werden",
         "amount": "Betrag",
+        "addAmount": "Betrag hinzufügen",
+        "lowFunds": "Nicht genügend Guthaben",
         "amountExceed": "Der Betrag übersteigt dein Guthaben von {balance: string}",
         "amountExceedsLimit": "Der Betrag übersteigt dein verbleibendes tägliches Limit von {limit: string}",
         "upgradeAccountToIncreaseLimit": "Upgrade deinen Account, um dein Limit zu erhöhen",

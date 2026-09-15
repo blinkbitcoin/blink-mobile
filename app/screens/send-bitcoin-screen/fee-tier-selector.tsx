@@ -44,12 +44,15 @@ export const FeeTierSelector = <T extends string>({
 
   return (
     <>
-      <Text style={styles.title}>{title}</Text>
       <TouchableWithoutFeedback
         onPress={() => setModalVisible(true)}
         {...testProps("fee-tier-dropdown")}
       >
+        {/* Sized like the note field below it (NoteInput, not big), so the two rows match. */}
         <View style={styles.fieldBackground}>
+          <Text style={styles.title} numberOfLines={1}>
+            {title}
+          </Text>
           <View style={styles.content}>
             <Text style={styles.selectedLabel}>{selectedOption?.label}</Text>
             {Boolean(selectedOption?.detail) && (
@@ -64,7 +67,7 @@ export const FeeTierSelector = <T extends string>({
                 {...testProps("fee-tier-spinner")}
               />
             ) : (
-              <GaloyIcon name="caret-down" size={24} color={colors.primary} />
+              <GaloyIcon name="caret-down" size={16} color={colors.primary} />
             )}
           </View>
         </View>
@@ -116,30 +119,35 @@ export const FeeTierSelector = <T extends string>({
 const useStyles = makeStyles(({ colors }) => ({
   title: {
     fontSize: 14,
-    fontWeight: "600",
+    lineHeight: 20,
     color: colors.black,
-    marginBottom: 6,
+    flexShrink: 1,
   },
   fieldBackground: {
     flexDirection: "row",
     backgroundColor: colors.grey5,
     borderRadius: 10,
     alignItems: "center",
-    paddingHorizontal: 14,
-    paddingVertical: 12,
+    columnGap: 12,
+    minHeight: 50,
+    paddingHorizontal: 10,
   },
   content: {
     flex: 1,
+    alignItems: "flex-end",
   },
   selectedLabel: {
-    fontSize: 16,
-    fontWeight: "600",
+    fontFamily: "SourceSansPro-Bold",
+    fontSize: 14,
+    lineHeight: 20,
     color: colors.black,
+    textAlign: "right",
   },
   selectedDetail: {
-    fontSize: 13,
+    fontSize: 12,
+    lineHeight: 18,
     color: colors.grey2,
-    marginTop: 2,
+    textAlign: "right",
   },
   iconContainer: {
     justifyContent: "center",
