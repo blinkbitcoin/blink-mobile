@@ -6,7 +6,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import {
-  createWebFormsSource,
+  createHostedFormSource,
   getErrorMessage,
   useESignature,
 } from "@blinkbitcoin/esign-react-native/webform"
@@ -14,13 +14,15 @@ import {
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { CloseHeader } from "@app/components/close-header"
 import { Screen } from "@app/components/screen"
+import { useRemoteConfig } from "@app/config/feature-flags-context"
+import { usePriceConversion } from "@app/hooks/use-price-conversion"
 import { useAppConfig } from "@app/hooks/use-app-config"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { logError } from "@app/utils/log-error"
 
 import { mintSigningInstance, resolveMintOrigin } from "./esign-mint"
-import { resolveInvestmentTerms } from "./investment-terms"
+import { mintInvestmentAgreement } from "./investment-agreement"
 
 type SignInvestRoute = RouteProp<RootStackParamList, "cardOnboardingSignInvestScreen">
 
@@ -29,8 +31,8 @@ type SignInvestRoute = RouteProp<RootStackParamList, "cardOnboardingSignInvestSc
 const OFFLINE_MESSAGE_CODE = "NETWORK_ERROR"
 
 /**
- * The signing step between the Term Sheet and the transfer: the subscription
- * agreement is signed on a published DocuSign Web Form embedded here. Signing
+ * The signing step between the Term Sheet and the transfer: the agreement is minted from
+ * its DocuSign templates and signed on the documents themselves, embedded here. Signing
  * advances to the transfer step; cancelling or declining returns to the Term Sheet,
  * which is where the signer chose to start. A failure stays put, so the retry below
  * is reachable.
@@ -39,10 +41,10 @@ const OFFLINE_MESSAGE_CODE = "NETWORK_ERROR"
  * to sign on the Term Sheet, so a second "Sign Document" gate asks the same question
  * twice. The session starts as the screen opens and the form is what the signer sees.
  *
- * The form is minted by the backend rather than opened from a published url, which is
- * what lets the agreement's figures arrive locked: values prefilled through a url cannot
- * be made read only, so the signer could otherwise edit what they are agreeing to. The
- * step has no way forward while that mint is unreachable.
+ * The envelope is minted by the e-sign service rather than opened from a published url,
+ * which is what lets the agreement's values arrive locked: values prefilled through a url
+ * cannot be made read only, so the signer could otherwise edit what they are agreeing
+ * to. The step has no way forward while that service is unreachable.
  */
 export const SignInvestScreen: React.FC = () => {
   const styles = useStyles()
@@ -51,15 +53,47 @@ export const SignInvestScreen: React.FC = () => {
   } = useTheme()
   const { LL } = useI18nContext()
   const {
-    appConfig: { galoyInstance },
+    appConfig: { galoyInstance, token },
   } = useAppConfig()
+  const { cardInvestmentAgreementPrefill } = useRemoteConfig()
+  const { usdPerSat } = usePriceConversion()
   const { selectedAmountUsd } = useRoute<SignInvestRoute>().params
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+
+  /**
+   * The satoshis the minted agreement settles at, kept from the mint so the transfer step
+   * bills exactly the figure the signed document names.
+   *
+   * A ref rather than state: the signing source is rebuilt whenever what it closes over
+   * changes, and a state update here would restart the session the moment the document
+   * opened. It is written before the signer can reach the end, so it is set by the time
+   * the outcome lands.
+   */
+  const settlementSats = React.useRef<number | undefined>(undefined)
+
+  /**
+   * What the mint reads the moment it runs, kept out of the source's dependencies for the
+   * same reason: the price ticks every few seconds, and a source rebuilt on each tick
+   * would restart the session mid-signature. The rate is read as the document is minted,
+   * which is the stamped moment the agreement names.
+   */
+  const mintInputs = React.useRef({
+    token,
+    fields: cardInvestmentAgreementPrefill,
+    usdPerSat,
+  })
+  React.useEffect(() => {
+    mintInputs.current = { token, fields: cardInvestmentAgreementPrefill, usdPerSat }
+  }, [token, cardInvestmentAgreementPrefill, usdPerSat])
 
   /** Replaces rather than pushes: the agreement cannot be unsigned, so leaving this
    *  screen behind would let a back swipe land on a finished session with no way on. */
   const goToTransfer = React.useCallback(
-    () => navigation.replace("cardOnboardingTransferInvestScreen", { selectedAmountUsd }),
+    () =>
+      navigation.replace("cardOnboardingTransferInvestScreen", {
+        selectedAmountUsd,
+        settlementSats: settlementSats.current,
+      }),
     [navigation, selectedAmountUsd],
   )
 
@@ -77,28 +111,43 @@ export const SignInvestScreen: React.FC = () => {
     [],
   )
 
-  /** The instance's own backend, which also serves the page that posts the outcome back,
-   *  so it is both what mints the form and the origin those events are expected from. */
+  /** The service's own origin, which also serves the page that posts the outcome back,
+   *  so it is both what mints the envelope and the origin those events come from. */
   const mintOrigin = resolveMintOrigin(galoyInstance.esignMintUrl)
 
   /**
-   * Rebuilt only when the chosen amount changes: a new source on every render would
-   * restart the signing session, possibly mid-signature.
+   * Rebuilt only when the chosen amount or the service changes: a new source on every
+   * render would restart the signing session, possibly mid-signature.
    *
-   * The units are all the server is told, and the rest of the agreement's figures come
-   * back from it: the rate, what it settles to, and the moment it was quoted are the
-   * mint's to decide, so the document cannot say one thing while the app believes
-   * another.
+   * The document is written from what the app knows at that moment: the figures from the
+   * chosen amount at the price just read, and the host's fields from remote config. A
+   * price that has not answered yet or a signer the host has not named cannot be minted
+   * around, so each is reported and the retry asks again.
    */
   const source = React.useMemo(
     () =>
-      createWebFormsSource({
+      createHostedFormSource({
         allowedOrigin: mintOrigin,
-        createInstance: () =>
-          mintSigningInstance(
-            mintOrigin,
-            resolveInvestmentTerms(selectedAmountUsd).units,
-          ),
+        createInstance: async () => {
+          const { token: session, fields, usdPerSat: price } = mintInputs.current
+
+          const agreement = await mintInvestmentAgreement({
+            totalUsd: selectedAmountUsd,
+            usdPerSat: price,
+            fields,
+            mint: (recipient, prefill) =>
+              mintSigningInstance({
+                origin: mintOrigin,
+                token: session,
+                recipient,
+                prefill,
+              }),
+          })
+
+          settlementSats.current = agreement.settlementSats
+
+          return agreement.minted
+        },
       }),
     [selectedAmountUsd, mintOrigin],
   )
@@ -120,9 +169,14 @@ export const SignInvestScreen: React.FC = () => {
     onError: reportSigningError,
   })
 
+  /** The agreement cannot be minted before the price feed has answered, so a cold open
+   *  waits on the spinner for it rather than failing the session it is about to start. */
+  const isPriceQuoted = usdPerSat !== null
+
   /**
-   * Opens the form as the screen does. Idle is also where a retry and a recovered
-   * connection land, so each of those starts the session again without a second tap.
+   * Opens the document as the screen does, once the price is in. Idle is also where a
+   * retry and a recovered connection land, so each of those starts the session again
+   * without a second tap.
    *
    * Started once per stay in idle, which the flag is for: `sign` is rebuilt whenever the
    * source is, and starting twice would open a second session on top of the first.
@@ -136,11 +190,11 @@ export const SignInvestScreen: React.FC = () => {
       return
     }
 
-    if (hasStartedFromIdle.current) return
+    if (hasStartedFromIdle.current || !isPriceQuoted) return
 
     hasStartedFromIdle.current = true
     sign()
-  }, [status, sign])
+  }, [status, sign, isPriceQuoted])
 
   /** An expired session keeps its envelope, so it is restarted rather than retried: a
    *  retry would drop what the signer already filled in. */
