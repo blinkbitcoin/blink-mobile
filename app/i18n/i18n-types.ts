@@ -12321,7 +12321,7 @@ type RootTranslation = {
 				/**
 				 * H​o​w​ ​m​u​c​h​ ​w​o​u​l​d​ ​y​o​u​ ​l​i​k​e​ ​t​o​ ​i​n​v​e​s​t​?
 				 */
-				desiredCreditLimit: string
+				title: string
 				/**
 				 * f​o​r​ ​~​{​p​e​r​c​e​n​t​}​%
 				 * @param {number} percent
@@ -26036,7 +26036,7 @@ export type TranslationFunctions = {
 				/**
 				 * How much would you like to invest?
 				 */
-				desiredCreditLimit: () => LocalizedString
+				title: () => LocalizedString
 				/**
 				 * for ~{percent}%
 				 */

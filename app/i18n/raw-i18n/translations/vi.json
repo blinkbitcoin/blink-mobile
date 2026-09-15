@@ -3695,7 +3695,7 @@
         "buttonText": "Tiếp tục"
       },
       "SelectInvest": {
-        "desiredCreditLimit": "Bạn muốn đầu tư bao nhiêu?",
+        "title": "Bạn muốn đầu tư bao nhiêu?",
         "percent": "cho ~{percent: number}%"
       },
       "CompanyValuation": {

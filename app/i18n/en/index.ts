@@ -3867,7 +3867,7 @@ const en: BaseTranslation = {
         buttonText: "Continue",
       },
       SelectInvest: {
-        desiredCreditLimit: "How much would you like to invest?",
+        title: "How much would you like to invest?",
         percent: "for ~{percent: number}%",
       },
       CompanyValuation: {

@@ -3695,7 +3695,7 @@
         "buttonText": "Qhubeka"
       },
       "SelectInvest": {
-        "desiredCreditLimit": "Ungathanda ukutyala malini?",
+        "title": "Ungathanda ukutyala malini?",
         "percent": "nge-~{percent: number}%"
       },
       "CompanyValuation": {
