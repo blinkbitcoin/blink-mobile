@@ -13,7 +13,6 @@ import { radius } from "@app/rne-theme/radius"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { testProps } from "@app/utils/testProps"
 import { fonts } from "@app/rne-theme/fonts"
-import { groupTitleGap } from "@app/rne-theme/tokens"
 
 type OptionItem<T extends string> = {
   id: T
@@ -47,12 +46,15 @@ export const FeeTierSelector = <T extends string>({
 
   return (
     <>
-      <Text style={styles.title}>{title}</Text>
       <TouchableWithoutFeedback
         onPress={() => setModalVisible(true)}
         {...testProps("fee-tier-dropdown")}
       >
+        {/* Sized like the note field below it (NoteInput, not big), so the two rows match. */}
         <View style={styles.fieldBackground}>
+          <Text style={styles.title} numberOfLines={1}>
+            {title}
+          </Text>
           <View style={styles.content}>
             <Text style={styles.selectedLabel}>{selectedOption?.label}</Text>
             {Boolean(selectedOption?.detail) && (
@@ -67,7 +69,7 @@ export const FeeTierSelector = <T extends string>({
                 {...testProps("fee-tier-spinner")}
               />
             ) : (
-              <GaloyIcon name="caret-down" size={24} color={colors.accent} />
+              <GaloyIcon name="caret-down" size={16} color={colors.accent} />
             )}
           </View>
         </View>
@@ -119,30 +121,36 @@ export const FeeTierSelector = <T extends string>({
 const useStyles = makeStyles(({ colors }) => ({
   title: {
     fontSize: 14,
+    lineHeight: 20,
     fontFamily: fonts.bold,
     color: colors.textSecondary,
-    marginBottom: groupTitleGap,
+    flexShrink: 1,
   },
   fieldBackground: {
     flexDirection: "row",
     backgroundColor: colors.surfaceInteractive,
     borderRadius: radius.default,
     alignItems: "center",
-    paddingHorizontal: 14,
-    paddingVertical: 12,
+    columnGap: 12,
+    minHeight: 50,
+    paddingHorizontal: 10,
   },
   content: {
     flex: 1,
+    alignItems: "flex-end",
   },
   selectedLabel: {
-    fontSize: 16,
     fontFamily: fonts.bold,
+    fontSize: 14,
+    lineHeight: 20,
     color: colors.textOnBackground,
+    textAlign: "right",
   },
   selectedDetail: {
-    fontSize: 13,
+    fontSize: 12,
+    lineHeight: 18,
     color: colors.textMuted,
-    marginTop: 2,
+    textAlign: "right",
   },
   iconContainer: {
     justifyContent: "center",
