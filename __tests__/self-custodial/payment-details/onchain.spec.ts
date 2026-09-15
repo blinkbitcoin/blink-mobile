@@ -117,4 +117,30 @@ describe("createSelfCustodialOnchainPaymentDetails", () => {
     const updated = detail.setConvertMoneyAmount(newConvert)
     expect(updated.convertMoneyAmount).toBe(newConvert)
   })
+
+  describe("feeTier", () => {
+    it("exposes the Medium default the SDK wrapper sends on", () => {
+      const detail = createSelfCustodialOnchainPaymentDetails(createParams())
+      expect(detail.feeTier).toBe("medium")
+    })
+
+    it("exposes the tier it was built for, so review can show it", () => {
+      const detail = createSelfCustodialOnchainPaymentDetails(
+        createParams({ feeTier: "slow" }),
+      )
+      expect(detail.feeTier).toBe("slow")
+    })
+
+    it("keeps the tier through setAmount", () => {
+      const detail = createSelfCustodialOnchainPaymentDetails(
+        createParams({ feeTier: "fast" }),
+      )
+      const updated = detail.setAmount?.({
+        amount: 2000,
+        currency: WalletCurrency.Btc,
+        currencyCode: WalletCurrency.Btc,
+      })
+      expect(updated?.feeTier).toBe("fast")
+    })
+  })
 })
