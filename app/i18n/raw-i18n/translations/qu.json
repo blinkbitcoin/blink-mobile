@@ -2341,7 +2341,11 @@
     "slideToConfirm": "Aysay chiqapchanapaq",
     "slideConfirming": "Chiqapchashanku...",
     "copiedDestination": "Mayman rinanta clipboard nisqaman churasqa",
-    "lightningRecommended": "¡Hatun comisión! Lightning nisqata yuyaychayku.",
+    "lightningRecommended": "Hatun comisión. Lightning nisqata yuyaychayku.",
+    "sending": "Apachishaspa",
+    "fromBalance": "Saldomanta",
+    "details": "Detalles",
+    "changeAmount": "Sumata tikray",
     "usdRemainderSweep": "Puchurqan {remaining: string} ({remainingSats: string}) Bitcoin-man tikrachisqa kanqa. USD pisi: {minimum: string}."
   },
   "SendBitcoinDestinationScreen": {

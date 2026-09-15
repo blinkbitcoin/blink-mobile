@@ -2385,7 +2385,11 @@ const en: BaseTranslation = {
       tryingAgain: "Trying again",
     },
     copiedDestination: "Copied destination to clipboard",
-    lightningRecommended: "High fee! We recommend Lightning.",
+    lightningRecommended: "High fee. We recommend Lightning.",
+    sending: "Sending",
+    fromBalance: "From Balance",
+    details: "Details",
+    changeAmount: "Change amount",
     usdRemainderSweep:
       "Remaining {remaining: string} ({remainingSats: string}) will be converted to Bitcoin. USD minimum: {minimum: string}.",
   },

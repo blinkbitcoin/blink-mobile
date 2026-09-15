@@ -2341,7 +2341,11 @@
     "slideToConfirm": "เลื่อนเพื่อยืนยัน",
     "slideConfirming": "กำลังยืนยัน...",
     "copiedDestination": "คัดลอกปลายทางไปยังคลิปบอร์ดแล้ว",
-    "lightningRecommended": "ค่าธรรมเนียมสูง! แนะนำให้ใช้ Lightning",
+    "lightningRecommended": "ค่าธรรมเนียมสูง แนะนำให้ใช้ Lightning",
+    "sending": "กำลังส่ง",
+    "fromBalance": "จากยอดคงเหลือ",
+    "details": "รายละเอียด",
+    "changeAmount": "เปลี่ยนจำนวนเงิน",
     "usdRemainderSweep": "ยอดคงเหลือ {remaining: string} ({remainingSats: string}) จะถูกแปลงเป็น Bitcoin ขั้นต่ำของ USD: {minimum: string}"
   },
   "SendBitcoinDestinationScreen": {

@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from "react"
 import { Animated, Easing, Pressable, View } from "react-native"
 import { makeStyles, Text } from "@rn-vui/themed"
 
+import { HiddenBalancePlaceholder } from "@app/components/hidden-balance-placeholder/hidden-balance-placeholder"
 import { WalletSwitch } from "@app/components/wallet-switch"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -22,8 +23,13 @@ type SendWalletSummaryProps = {
   /** Outlines the card in the error colour when the amount can't be sent from this wallet. */
   hasError?: boolean
   /** Absent when there is no other wallet to switch to (the region withholds the dollar
-   *  wallet), which leaves the summary as a plain read-out. */
+   *  wallet) or on review, which leaves the summary as a plain read-out on the grey7 static
+   *  surface. */
   onSwitch?: () => void
+  /** Draws the placeholder instead of the balances. */
+  isBalanceHidden?: boolean
+  /** Present while the balance is hidden on a read-only summary: tapping the card shows it. */
+  onReveal?: () => void
 }
 
 export const SendWalletSummary: React.FC<SendWalletSummaryProps> = ({
@@ -32,6 +38,8 @@ export const SendWalletSummary: React.FC<SendWalletSummaryProps> = ({
   balanceSecondary,
   hasError = false,
   onSwitch,
+  isBalanceHidden = false,
+  onReveal,
 }) => {
   const styles = useStyles()
   const { LL } = useI18nContext()
@@ -63,6 +71,8 @@ export const SendWalletSummary: React.FC<SendWalletSummaryProps> = ({
     ],
   }
 
+  const onPress = onSwitch ?? onReveal
+
   const walletName =
     currency === WalletCurrency.Btc ? LL.common.bitcoin() : LL.common.dollar()
 
@@ -71,13 +81,16 @@ export const SendWalletSummary: React.FC<SendWalletSummaryProps> = ({
       {...testProps(SEND_WALLET_SUMMARY_TEST_ID)}
       style={({ pressed }) => [
         styles.card,
+        !onSwitch && styles.cardInactive,
         hasError && styles.cardError,
         pressed && onSwitch && styles.cardPressed,
       ]}
-      onPress={onSwitch}
-      disabled={!onSwitch}
-      accessibilityRole={onSwitch ? "button" : undefined}
-      accessibilityLabel={`${walletName}, ${balancePrimary}`}
+      onPress={onPress}
+      disabled={!onPress}
+      accessibilityRole={onPress ? "button" : undefined}
+      accessibilityLabel={
+        isBalanceHidden ? walletName : `${walletName}, ${balancePrimary}`
+      }
     >
       <View style={styles.balances}>
         {/* An invisible two-line copy sets the height, so the card is the same size with or
@@ -96,13 +109,17 @@ export const SendWalletSummary: React.FC<SendWalletSummaryProps> = ({
           style={[styles.balancesVisible, balancesAnimatedStyle]}
           testID={SEND_WALLET_LINES_TEST_ID}
         >
-          <Text
-            style={styles.balancePrimary}
-            {...testProps(`${currency} Wallet Balance`)}
-          >
-            {balancePrimary}
-          </Text>
-          {balanceSecondary ? (
+          {isBalanceHidden ? (
+            <HiddenBalancePlaceholder size="small" />
+          ) : (
+            <Text
+              style={styles.balancePrimary}
+              {...testProps(`${currency} Wallet Balance`)}
+            >
+              {balancePrimary}
+            </Text>
+          )}
+          {balanceSecondary && !isBalanceHidden ? (
             <Text
               style={styles.balanceSecondary}
               {...testProps(SEND_WALLET_SECONDARY_TEST_ID)}
@@ -131,6 +148,9 @@ const useStyles = makeStyles(({ colors }) => ({
     borderColor: colors.transparent,
     paddingHorizontal: 14,
     paddingVertical: 14,
+  },
+  cardInactive: {
+    backgroundColor: colors.grey7,
   },
   cardError: {
     borderColor: colors.error,

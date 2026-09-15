@@ -2341,7 +2341,11 @@
     "slideToConfirm": "Vuốt để Xác nhận",
     "slideConfirming": "Đang xác nhận...",
     "copiedDestination": "Đã sao chép địa chỉ đích vào bộ nhớ tạm",
-    "lightningRecommended": "Phí cao! Chúng tôi khuyên bạn nên dùng Lightning.",
+    "lightningRecommended": "Phí cao. Chúng tôi khuyên bạn nên dùng Lightning.",
+    "sending": "Đang gửi",
+    "fromBalance": "Từ số dư",
+    "details": "Chi tiết",
+    "changeAmount": "Đổi số tiền",
     "usdRemainderSweep": "Số dư còn lại {remaining: string} ({remainingSats: string}) sẽ được chuyển đổi thành Bitcoin. Tối thiểu USD: {minimum: string}."
   },
   "SendBitcoinDestinationScreen": {

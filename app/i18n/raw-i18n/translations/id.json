@@ -2341,7 +2341,11 @@
     "slideToConfirm": "Geser untuk Konfirmasi",
     "slideConfirming": "Mengkonfirmasi...",
     "copiedDestination": "Tujuan disalin ke papan klip",
-    "lightningRecommended": "Biaya tinggi! Kami merekomendasikan Lightning.",
+    "lightningRecommended": "Biaya tinggi. Kami merekomendasikan Lightning.",
+    "sending": "Mengirim",
+    "fromBalance": "Dari Saldo",
+    "details": "Detail",
+    "changeAmount": "Ubah jumlah",
     "usdRemainderSweep": "Sisa {remaining: string} ({remainingSats: string}) akan dikonversi ke Bitcoin. Minimum USD: {minimum: string}."
   },
   "SendBitcoinDestinationScreen": {

@@ -7497,9 +7497,25 @@ type RootTranslation = {
 		 */
 		copiedDestination: string
 		/**
-		 * H​i​g​h​ ​f​e​e​!​ ​W​e​ ​r​e​c​o​m​m​e​n​d​ ​L​i​g​h​t​n​i​n​g​.
+		 * H​i​g​h​ ​f​e​e​.​ ​W​e​ ​r​e​c​o​m​m​e​n​d​ ​L​i​g​h​t​n​i​n​g​.
 		 */
 		lightningRecommended: string
+		/**
+		 * S​e​n​d​i​n​g
+		 */
+		sending: string
+		/**
+		 * F​r​o​m​ ​B​a​l​a​n​c​e
+		 */
+		fromBalance: string
+		/**
+		 * D​e​t​a​i​l​s
+		 */
+		details: string
+		/**
+		 * C​h​a​n​g​e​ ​a​m​o​u​n​t
+		 */
+		changeAmount: string
 		/**
 		 * R​e​m​a​i​n​i​n​g​ ​{​r​e​m​a​i​n​i​n​g​}​ ​(​{​r​e​m​a​i​n​i​n​g​S​a​t​s​}​)​ ​w​i​l​l​ ​b​e​ ​c​o​n​v​e​r​t​e​d​ ​t​o​ ​B​i​t​c​o​i​n​.​ ​U​S​D​ ​m​i​n​i​m​u​m​:​ ​{​m​i​n​i​m​u​m​}​.
 		 * @param {string} minimum
@@ -21194,9 +21210,25 @@ export type TranslationFunctions = {
 		 */
 		copiedDestination: () => LocalizedString
 		/**
-		 * High fee! We recommend Lightning.
+		 * High fee. We recommend Lightning.
 		 */
 		lightningRecommended: () => LocalizedString
+		/**
+		 * Sending
+		 */
+		sending: () => LocalizedString
+		/**
+		 * From Balance
+		 */
+		fromBalance: () => LocalizedString
+		/**
+		 * Details
+		 */
+		details: () => LocalizedString
+		/**
+		 * Change amount
+		 */
+		changeAmount: () => LocalizedString
 		/**
 		 * Remaining {remaining} ({remainingSats}) will be converted to Bitcoin. USD minimum: {minimum}.
 		 */

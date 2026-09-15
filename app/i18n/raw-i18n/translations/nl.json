@@ -2341,7 +2341,11 @@
     "slideToConfirm": "Veeg om te bevestigen",
     "slideConfirming": "Bevestigen...",
     "copiedDestination": "Bestemming naar het klembord gekopieerd",
-    "lightningRecommended": "Hoge kosten! We raden Lightning aan.",
+    "lightningRecommended": "Hoge kosten. We raden Lightning aan.",
+    "sending": "Verzenden",
+    "fromBalance": "Van saldo",
+    "details": "Details",
+    "changeAmount": "Bedrag wijzigen",
     "usdRemainderSweep": "Resterend saldo {remaining: string} ({remainingSats: string}) wordt omgezet naar Bitcoin. USD-minimum: {minimum: string}."
   },
   "SendBitcoinDestinationScreen": {

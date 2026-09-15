@@ -2341,7 +2341,11 @@
     "slideToConfirm": "Seereza Okukakasa",
     "slideConfirming": "Okukakasa",
     "copiedDestination": "Gy'eziraga wawanduukuluddwa ku lutimbe",
-    "lightningRecommended": "Ebisale ebingi! Tukukubiriza okukozesa Lightning.",
+    "lightningRecommended": "Ebisale ebingi. Tukukubiriza okukozesa Lightning.",
+    "sending": "Okusindika",
+    "fromBalance": "Okuva ku Balance",
+    "details": "Ebisingawo",
+    "changeAmount": "Kyusa omuwendo",
     "usdRemainderSweep": "Ekisigaddewo {remaining: string} ({remainingSats: string}) kijja kufuulibwa Bitcoin. Ekitundu ekisembayo eky'USD: {minimum: string}."
   },
   "SendBitcoinDestinationScreen": {

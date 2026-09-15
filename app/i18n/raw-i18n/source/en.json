@@ -2306,8 +2306,26 @@
         "paymentAlreadyAttempted": "Payment already attempted.\n\nIf you want to send this payment again, start from scratch.",
         "slideToConfirm": "Slide to Confirm",
         "slideConfirming": "Confirming...",
+        "slideToSend": "Slide to send",
+        "calculatingFee": "Calculating fee…",
+        "sendProgress": {
+            "reviewing": "Reviewing",
+            "signing": "Signing",
+            "findingRoute": "Finding route",
+            "broadcasting": "Broadcasting",
+            "checkingDelivery": "Checking delivery",
+            "retrying": "Re-trying",
+            "almostThere": "Almost there",
+            "anyTimeNow": "Any time now",
+            "ohOh": "Oh oh",
+            "tryingAgain": "Trying again"
+        },
         "copiedDestination": "Copied destination to clipboard",
-        "lightningRecommended": "High fee! We recommend Lightning.",
+        "lightningRecommended": "High fee. We recommend Lightning.",
+        "sending": "Sending",
+        "fromBalance": "From Balance",
+        "details": "Details",
+        "changeAmount": "Change amount",
         "usdRemainderSweep": "Remaining {remaining: string} ({remainingSats: string}) will be converted to Bitcoin. USD minimum: {minimum: string}."
     },
     "SendBitcoinDestinationScreen": {

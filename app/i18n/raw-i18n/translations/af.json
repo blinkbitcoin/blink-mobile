@@ -2341,7 +2341,11 @@
     "slideToConfirm": "Gly om te bevestig",
     "slideConfirming": "Besig om te bevestig...",
     "copiedDestination": "Bestemming na knipbord oorgedra",
-    "lightningRecommended": "Hoë fooi! Ons beveel Lightning aan.",
+    "lightningRecommended": "Hoë fooi. Ons beveel Lightning aan.",
+    "sending": "Besig om te stuur",
+    "fromBalance": "Van Balans",
+    "details": "Besonderhede",
+    "changeAmount": "Verander bedrag",
     "usdRemainderSweep": "Oorblywende {remaining: string} ({remainingSats: string}) sal na Bitcoin omgeskakel word. USD-minimum: {minimum: string}."
   },
   "SendBitcoinDestinationScreen": {

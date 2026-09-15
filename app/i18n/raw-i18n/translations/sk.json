@@ -2341,7 +2341,11 @@
     "slideToConfirm": "Posunutím potvrďte",
     "slideConfirming": "Potvrdzovanie...",
     "copiedDestination": "Cieľ bol skopírovaný do schránky",
-    "lightningRecommended": "Vysoký poplatok! Odporúčame Lightning.",
+    "lightningRecommended": "Vysoký poplatok. Odporúčame Lightning.",
+    "sending": "Odosielanie",
+    "fromBalance": "Zo zostatku",
+    "details": "Podrobnosti",
+    "changeAmount": "Zmeniť sumu",
     "usdRemainderSweep": "Zostávajúcich {remaining: string} ({remainingSats: string}) bude prevedených na Bitcoin. Minimum v USD: {minimum: string}."
   },
   "SendBitcoinDestinationScreen": {
