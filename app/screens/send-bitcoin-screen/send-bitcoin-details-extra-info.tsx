@@ -45,7 +45,7 @@ export const SendBitcoinDetailsExtraInfo = ({
   const styles = useStyles()
 
   if (errorMessage) {
-    return <GaloyErrorBox errorMessage={errorMessage} />
+    return <GaloyErrorBox errorMessage={errorMessage} filled={false} />
   }
 
   if (amountStatus.validAmount) {
@@ -57,6 +57,7 @@ export const SendBitcoinDetailsExtraInfo = ({
       return (
         <>
           <GaloyErrorBox
+            filled={false}
             errorMessage={LL.SendBitcoinScreen.amountExceedsLimit({
               limit: formatMoneyAmount({
                 moneyAmount: amountStatus.remainingLimit,
@@ -86,6 +87,7 @@ export const SendBitcoinDetailsExtraInfo = ({
     case AmountInvalidReason.InsufficientBalance:
       return (
         <GaloyErrorBox
+          filled={false}
           errorMessage={LL.SendBitcoinScreen.amountExceed({
             balance: formatMoneyAmount({ moneyAmount: amountStatus.balance }),
           })}
@@ -100,6 +102,7 @@ const useStyles = makeStyles(() => {
   return {
     upgradeAccountText: {
       marginTop: 5,
+      textAlign: "center",
       textDecorationLine: "underline",
     },
   }
