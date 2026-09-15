@@ -1,7 +1,9 @@
 import {
   OnchainConfirmationSpeed,
+  PaymentStatus,
   type BreezSdkInterface,
   type ConversionOptions,
+  type Payment,
 } from "@breeztech/breez-sdk-spark-react-native"
 
 import { PaymentSendResult, WalletCurrency } from "@app/graphql/generated"
@@ -13,6 +15,7 @@ import { FeeTierOption } from "@app/screens/send-bitcoin-screen/hooks/fee-tiers.
 import { toBtcMoneyAmount, type WalletAmount } from "@app/types/amounts"
 import { ConvertAmountAdjustment } from "@app/types/payment"
 import { reportError } from "@app/utils/error-logging"
+import { sleep } from "@app/utils/sleep"
 
 /** GetFee result plus the SDK dust adjustment, kept behind the self-custodial port so the shared GetFee contract stays free of it. */
 export type SelfCustodialFeeResult<T extends WalletCurrency> = Awaited<
@@ -25,6 +28,7 @@ import {
   executeSend,
   extractLightningFee,
   extractOnchainFees,
+  listSentPaymentsSince,
   mapAmountAdjustment,
   prepareSend,
 } from "../bridge"
@@ -160,4 +164,60 @@ export const createSendMutationOnchain = (
       }
     }
   }
+}
+
+/**
+ * How a send whose outcome the SDK lost is looked for before it is treated as never made.
+ *
+ * The SDK's own guidance for a payment that throws after dispatch ("Retrying after a
+ * failure that leaves the outcome unknown may pay twice … look for the payment before
+ * sending it again"): the wallet is asked a few times, spaced out, because the payment
+ * can land in the history a moment after the call that dispatched it gave up. The window
+ * starts a little before the attempt's own clock, since the wallet stamps the payment.
+ */
+const LOST_SEND_ATTEMPTS = 3
+const LOST_SEND_DELAY_MS = 2000
+const LOST_SEND_LOOKBACK_SECONDS = 5
+const LOST_SEND_PAGE_SIZE = 20
+
+type FindLostSendParams = {
+  sdk: BreezSdkInterface
+  /** When the attempt was dispatched, in milliseconds. */
+  startedAtMs: number
+  /** Whether a payment in the history is the one this attempt was for. */
+  matches: (payment: Payment) => boolean
+}
+
+/**
+ * The payment an attempt made in spite of throwing, or undefined when the wallet shows
+ * none: only then is the send safe to try again. A completed payment outranks a pending
+ * one for the same attempt; a failed one is not the attempt landing, so it is passed over.
+ * A history that cannot be read counts as nothing found, and the next attempt asks again.
+ */
+export const findLostSend = async ({
+  sdk,
+  startedAtMs,
+  matches,
+}: FindLostSendParams): Promise<Payment | undefined> => {
+  const since = BigInt(Math.floor(startedAtMs / 1000) - LOST_SEND_LOOKBACK_SECONDS)
+
+  for (let attempt = 1; attempt <= LOST_SEND_ATTEMPTS; attempt += 1) {
+    let candidates: Payment[] = []
+    try {
+      const { payments } = await listSentPaymentsSince(sdk, since, LOST_SEND_PAGE_SIZE)
+      candidates = payments.filter(matches)
+    } catch (err) {
+      reportError("Self-custodial lost send lookup", err)
+    }
+
+    const completed = candidates.find(({ status }) => status === PaymentStatus.Completed)
+    const pending = candidates.find(({ status }) => status === PaymentStatus.Pending)
+    const found = completed ?? pending
+    if (found) return found
+
+    const isLastAttempt = attempt === LOST_SEND_ATTEMPTS
+    if (!isLastAttempt) await sleep(LOST_SEND_DELAY_MS)
+  }
+
+  return undefined
 }
