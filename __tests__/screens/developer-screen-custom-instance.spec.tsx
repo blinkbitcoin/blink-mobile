@@ -189,7 +189,7 @@ describe("DeveloperScreen custom instance save", () => {
         blockExplorer: "https://mempool.space/tx/",
         sparkExplorer: SPARK_EXPLORER_TX_URL,
         /** Not configurable from this screen yet, and empty is what the standard
-         *  instances carry: the e-sign mint has no address on any environment. */
+         *  instances carry: the e-sign service has no address on any environment. */
         esignMintUrl: "",
       },
       token: "",
