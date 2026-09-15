@@ -63,7 +63,7 @@ describe("Send: Intraledger using Username - BTC Amount", () => {
       .withTimeout(timeout * 10)
     await tx.tap()
 
-    await verifyTextPresent(LL.TransactionDetailScreen.spent())
+    await verifyTextPresent(LL.TransactionDetailScreen.sent())
     await verifyTextPresent("-$0.02")
 
     await tap(by.id("close"))
@@ -111,7 +111,7 @@ describe("Send: Intraledger using Username - USD Amount", () => {
       .withTimeout(timeout * 10)
     await tx.tap()
 
-    await verifyTextPresent(LL.TransactionDetailScreen.spent())
+    await verifyTextPresent(LL.TransactionDetailScreen.sent())
     await verifyTextPresent("-$0.02")
 
     await tap(by.id("close"))
@@ -152,7 +152,7 @@ describe("Send: Intraledger using LN Invoice", () => {
       .withTimeout(timeout * 10)
     await tx.tap()
 
-    await verifyTextPresent(LL.TransactionDetailScreen.spent())
+    await verifyTextPresent(LL.TransactionDetailScreen.sent())
     await verifyTextPresent("-$0.02")
 
     await tap(by.id("close"))
@@ -189,7 +189,7 @@ describe("Send: to External LN Invoice", () => {
       .withTimeout(timeout * 10)
     await tx.tap()
 
-    await verifyTextPresent(LL.TransactionDetailScreen.spent())
+    await verifyTextPresent(LL.TransactionDetailScreen.sent())
 
     await tap(by.id("close"))
     await waitForHomeScreen(LL)
@@ -226,7 +226,7 @@ describe("Send: to Onchain Address", () => {
     await tx.tap()
 
     // can take a bit of time for tx to be confirmed
-    await verifyTextPresent(LL.TransactionDetailScreen.spent(), timeout * 30)
+    await verifyTextPresent(LL.TransactionDetailScreen.sent(), timeout * 30)
 
     await tap(by.id("close"))
     await waitForHomeScreen(LL)
