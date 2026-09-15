@@ -60,9 +60,54 @@ jest.mock("@app/hooks/use-account-registry", () => ({
   }),
 }))
 
+const mockDisplayCurrency = { current: "NGN" }
+
+/**
+ * The shared GraphQL mocks quote prices in NGN only, and the price hook drops a quote whose
+ * denominator isn't the display currency. With USD as the display currency the specs use a
+ * fixed converter instead: one sat is 0.024 cents, and the display currency is the dollar.
+ */
+const mockUsdCentsPerUnit: Record<string, number> = {
+  BTC: 0.024,
+  USD: 1,
+  DisplayCurrency: 1,
+}
+
+jest.mock("@app/hooks/use-price-conversion", () => {
+  const actual = jest.requireActual("@app/hooks/use-price-conversion")
+  const convert = (
+    moneyAmount: { amount: number; currency: string },
+    toCurrency: string,
+    round: (value: number) => number = Math.round,
+  ) => ({
+    amount:
+      moneyAmount.currency === toCurrency
+        ? moneyAmount.amount
+        : round(
+            (moneyAmount.amount * mockUsdCentsPerUnit[moneyAmount.currency]) /
+              mockUsdCentsPerUnit[toCurrency],
+          ),
+    currency: toCurrency,
+    currencyCode: toCurrency === "DisplayCurrency" ? "USD" : toCurrency,
+  })
+  const { createToDisplayAmount } = jest.requireActual("@app/types/amounts")
+  const usdConverters = {
+    convertMoneyAmount: convert,
+    convertMoneyAmountWithRounding: convert,
+    displayCurrency: "USD",
+    toDisplayMoneyAmount: createToDisplayAmount("USD"),
+    usdPerSat: "0.00024000",
+  }
+  return {
+    ...actual,
+    usePriceConversion: () =>
+      mockDisplayCurrency.current === "USD" ? usdConverters : actual.usePriceConversion(),
+  }
+})
+
 jest.mock("@app/hooks/use-effective-display-currency", () => ({
   useEffectiveDisplayCurrency: () => ({
-    displayCurrency: "NGN",
+    displayCurrency: mockDisplayCurrency.current,
     setDisplayCurrency: jest.fn(),
     loading: false,
   }),
@@ -125,6 +170,7 @@ const LL = i18nObject("en")
 beforeEach(() => {
   loadLocale("en")
   mockSetAmount.mockClear()
+  mockDisplayCurrency.current = "NGN"
 })
 
 const mockSetAmount = jest.fn()
@@ -380,6 +426,51 @@ describe("fixed amount", () => {
  * flow reveal an amount (#4125), so it keeps the picker's rule rather than the old inline
  * field's mask: the balance is what the user switches wallets and picks a percentage by.
  */
+/**
+ * The balance line is in the wallet's own currency; a second line, in the display currency,
+ * shows only when that differs. A dollar wallet with USD as the display currency is therefore
+ * one line, centred in a card that keeps its two-line height.
+ */
+describe("wallet summary balance lines", () => {
+  const secondLine = () => screen.queryByTestId("send-wallet-balance-secondary")
+
+  const switchToDollar = async () => {
+    fireEvent.press(screen.getByTestId("choose-wallet-to-send-from"))
+    await settle()
+    expect(screen.getByTestId(`${WalletCurrency.Usd} Wallet Balance`)).toBeTruthy()
+  }
+
+  it("shows bitcoin as sats over its display-currency value", async () => {
+    mockDisplayCurrency.current = "USD"
+    renderScreen(intraledgerDestination())
+    await settle()
+
+    expect(
+      within(screen.getByTestId(`${WalletCurrency.Btc} Wallet Balance`)).getByText(/SAT/),
+    ).toBeTruthy()
+    expect(within(secondLine()!).getByText(/^~ \$/)).toBeTruthy()
+  })
+
+  it("shows the dollar wallet as one line when the display currency is USD", async () => {
+    mockDisplayCurrency.current = "USD"
+    renderScreen(intraledgerDestination())
+    await settle()
+
+    await switchToDollar()
+
+    expect(secondLine()).toBeNull()
+  })
+
+  it("adds the display-currency value under the dollar balance otherwise", async () => {
+    renderScreen(intraledgerDestination())
+    await settle()
+
+    await switchToDollar()
+
+    expect(within(secondLine()!).getByText(/^~ ₦/)).toBeTruthy()
+  })
+})
+
 describe("wallet summary under hide-balance", () => {
   const expectBalanceShown = () =>
     expect(
