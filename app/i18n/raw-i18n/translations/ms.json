@@ -3695,7 +3695,7 @@
         "buttonText": "Teruskan"
       },
       "SelectInvest": {
-        "desiredCreditLimit": "Berapa banyak yang anda ingin laburkan?",
+        "title": "Berapa banyak yang anda ingin laburkan?",
         "percent": "untuk ~{percent: number}%"
       },
       "CompanyValuation": {

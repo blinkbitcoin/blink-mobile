@@ -3695,7 +3695,7 @@
         "buttonText": "Tovább"
       },
       "SelectInvest": {
-        "desiredCreditLimit": "Mennyit szeretnél befektetni?",
+        "title": "Mennyit szeretnél befektetni?",
         "percent": "~{percent: number}%-ért"
       },
       "CompanyValuation": {
