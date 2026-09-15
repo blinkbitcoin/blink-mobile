@@ -3695,7 +3695,7 @@
         "buttonText": "Continuă"
       },
       "SelectInvest": {
-        "desiredCreditLimit": "Cât ai dori să investești?",
+        "title": "Cât ai dori să investești?",
         "percent": "pentru ~{percent: number}%"
       },
       "CompanyValuation": {

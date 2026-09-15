@@ -3743,7 +3743,7 @@
                 "buttonText": "Continuer"
             },
             "SelectInvest": {
-                "desiredCreditLimit": "Combien aimeriez-vous investir ?",
+                "title": "Combien aimeriez-vous investir ?",
                 "percent": "pour ~{percent: number}%"
             },
             "CompanyValuation": {

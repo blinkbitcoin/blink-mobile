@@ -3695,7 +3695,7 @@
         "buttonText": "Devam Et"
       },
       "SelectInvest": {
-        "desiredCreditLimit": "Ne kadar yatırım yapmak istersiniz?",
+        "title": "Ne kadar yatırım yapmak istersiniz?",
         "percent": "~{percent: number}% için"
       },
       "CompanyValuation": {

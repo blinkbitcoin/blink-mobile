@@ -3695,7 +3695,7 @@
         "buttonText": "Doorgaan"
       },
       "SelectInvest": {
-        "desiredCreditLimit": "Hoeveel wil je investeren?",
+        "title": "Hoeveel wil je investeren?",
         "percent": "voor ~{percent: number}%"
       },
       "CompanyValuation": {

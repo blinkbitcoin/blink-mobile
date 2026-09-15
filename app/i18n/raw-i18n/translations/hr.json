@@ -3695,7 +3695,7 @@
         "buttonText": "Nastavi"
       },
       "SelectInvest": {
-        "desiredCreditLimit": "Koliko biste željeli uložiti?",
+        "title": "Koliko biste željeli uložiti?",
         "percent": "za ~{percent: number}%"
       },
       "CompanyValuation": {
