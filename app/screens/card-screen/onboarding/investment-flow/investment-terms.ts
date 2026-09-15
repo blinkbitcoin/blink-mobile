@@ -33,7 +33,7 @@ const PRE_MONEY_VALUATION_USD = 10_000_000
 
 /** So the figure the signer commits to is exact to the satoshi, not to whatever a float
  *  happens to print. */
-const BTC_DECIMALS = 8
+export const BTC_DECIMALS = 8
 
 /** Honduras keeps a fixed UTC-6 the year round, so the stamp is shifted by hand and then
  *  rendered as UTC. Naming the zone instead would make this the first production caller to

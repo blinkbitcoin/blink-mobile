@@ -202,7 +202,7 @@ export const DeveloperScreen: React.FC = () => {
           name: "Custom", // TODO: make configurable
           blockExplorer: "https://mempool.space/tx/", // TODO make configurable
           sparkExplorer: SPARK_EXPLORER_TX_URL,
-          esignMintUrl: "", // TODO make configurable once that backend is deployed
+          esignMintUrl: "", // TODO make configurable
         },
         token: newToken || "",
       })
