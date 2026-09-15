@@ -146,7 +146,7 @@ const placeholderDrift = (localeFile: string, parsed: AnyTranslation): string[] 
  * translate it keeps a word no English list can predict — `es` held "Rápido", `de` held
  * "Schnell", `ja` held "高速" — so the per-locale ledger below carries those.
  */
-const SUPERSEDED_TIER_NAMES = ["Fast", "Medium", "Slow", "Fastest", "Normal", "Flexible"]
+const SUPERSEDED_TIER_NAMES = ["Fast", "Medium", "Slow", "Fastest", "Normal"]
 
 /**
  * Per-locale tier copy this app has already retired, keyed by translation file. The

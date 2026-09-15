@@ -31,15 +31,7 @@ const labels = {
 }
 
 /** Words these tiers have been called before. None of them may reach a screen again. */
-const SUPERSEDED_TIER_NAMES = [
-  "Fast",
-  "Medium",
-  "Slow",
-  "Fastest",
-  "Normal",
-  "Flexible",
-  "Half hour",
-]
+const SUPERSEDED_TIER_NAMES = ["Fast", "Medium", "Slow", "Fastest", "Normal", "Half hour"]
 
 /** Whole-word so "Fast" does not match "Fastest" only by accident, and vice versa. */
 const survivingTierNames = (copy: string[]): string[] =>
