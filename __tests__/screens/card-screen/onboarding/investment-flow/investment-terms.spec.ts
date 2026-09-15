@@ -1,4 +1,5 @@
 import {
+  INVESTMENT_OPTIONS,
   formatUnitCount,
   formatUsdAmount,
   resolveEquityPercent,
@@ -6,7 +7,6 @@ import {
   resolveInvestmentTerms,
   resolveSettlementQuote,
 } from "@app/screens/card-screen/onboarding/investment-flow/investment-terms"
-import { MOCK_CREDIT_LIMIT_VALUES } from "@app/screens/card-screen/onboarding/onboarding-mock-data"
 
 describe("resolveInvestmentTerms", () => {
   it("keeps the chosen amount as the total", () => {
@@ -89,11 +89,9 @@ describe("resolveEquityPercent", () => {
       [100000, 1],
     ])
 
-    expect(MOCK_CREDIT_LIMIT_VALUES).toEqual([...advertised.keys()])
-    MOCK_CREDIT_LIMIT_VALUES.forEach((value) => {
-      expect(resolveEquityPercent(resolveInvestmentTerms(value))).toBe(
-        advertised.get(value),
-      )
+    expect(INVESTMENT_OPTIONS).toEqual([...advertised.keys()])
+    INVESTMENT_OPTIONS.forEach((usd) => {
+      expect(resolveEquityPercent(resolveInvestmentTerms(usd))).toBe(advertised.get(usd))
     })
   })
 })

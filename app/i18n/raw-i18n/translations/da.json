@@ -3721,7 +3721,7 @@
         "buttonText": "Fortsæt"
       },
       "SelectInvest": {
-        "desiredCreditLimit": "Hvor meget vil du gerne investere?",
+        "title": "Hvor meget vil du gerne investere?",
         "percent": "for ~{percent: number}%"
       },
       "CompanyValuation": {

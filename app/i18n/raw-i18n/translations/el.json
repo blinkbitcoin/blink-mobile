@@ -3721,7 +3721,7 @@
         "buttonText": "Συνέχεια"
       },
       "SelectInvest": {
-        "desiredCreditLimit": "Πόσο θα θέλατε να επενδύσετε;",
+        "title": "Πόσο θα θέλατε να επενδύσετε;",
         "percent": "για ~{percent: number}%"
       },
       "CompanyValuation": {

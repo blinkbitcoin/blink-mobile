@@ -31,6 +31,11 @@ const PRICE_PER_UNIT_USD = 1
  *  and $100,000 buys 1%, so the whole company is $10M pre-money. */
 const PRE_MONEY_VALUATION_USD = 10_000_000
 
+/** The amounts on offer, in dollars. The share of the company each buys is not written
+ *  beside them: it follows from the valuation above through `resolveEquityPercent`, the
+ *  same way the term sheet states it, so the two screens cannot describe different deals. */
+export const INVESTMENT_OPTIONS = [1000, 2500, 5000, 10000, 25000, 50000, 100000]
+
 /** So the figure the signer commits to is exact to the satoshi, not to whatever a float
  *  happens to print. */
 export const BTC_DECIMALS = 8
