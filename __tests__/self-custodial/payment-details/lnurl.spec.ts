@@ -149,6 +149,85 @@ describe("createSelfCustodialLnurlPaymentDetails", () => {
     expect(detail.setSuccessAction).toBeDefined()
   })
 
+  /** The shared screen contract calls setInvoice after fetching a Bolt11; the SDK fetches
+   *  its own inside prepare, so the detail comes back unchanged rather than swapped. */
+  it("keeps the same lnurl detail through setInvoice", () => {
+    const detail = createSelfCustodialLnurlPaymentDetails(createParams())
+    if (detail.paymentType !== PaymentType.Lnurl) throw new Error("expected lnurl")
+
+    const afterInvoice = detail.setInvoice({} as never)
+
+    expect(afterInvoice.paymentType).toBe(PaymentType.Lnurl)
+    expect(afterInvoice.destination).toBe(detail.destination)
+    expect(afterInvoice.sendingWalletDescriptor).toEqual(detail.sendingWalletDescriptor)
+  })
+
+  it("carries a success action set after the fact", () => {
+    const detail = createSelfCustodialLnurlPaymentDetails(createParams())
+    if (detail.paymentType !== PaymentType.Lnurl) throw new Error("expected lnurl")
+    const successAction = {
+      tag: "message",
+      message: "Thanks!",
+      description: null,
+      url: null,
+      ciphertext: null,
+      iv: null,
+      decipher: () => null,
+    } as const
+
+    const withAction = detail.setSuccessAction(successAction)
+
+    if (withAction.paymentType !== PaymentType.Lnurl) throw new Error("expected lnurl")
+    expect(withAction.successAction).toBe(successAction)
+  })
+
+  it("recomputes the settlement amount with a replaced converter", () => {
+    const detail = createSelfCustodialLnurlPaymentDetails(createParams())
+    const doubled: typeof convertMoneyAmount = jest.fn((amount, target) => ({
+      amount: amount.amount * 2,
+      currency: target,
+      currencyCode: target,
+    }))
+
+    const reconverted = detail.setConvertMoneyAmount(doubled)
+
+    expect(reconverted.settlementAmount).toEqual(
+      expect.objectContaining({ amount: 3000, currency: WalletCurrency.Btc }),
+    )
+  })
+
+  it("can neither quote nor send while the amount is zero", () => {
+    const detail = createSelfCustodialLnurlPaymentDetails(
+      createParams({
+        unitOfAccountAmount: {
+          amount: 0,
+          currency: WalletCurrency.Btc,
+          currencyCode: WalletCurrency.Btc,
+        },
+      }),
+    )
+
+    expect(detail.canSendPayment).toBe(false)
+    expect(detail.canGetFee).toBe(false)
+  })
+
+  /** The SDK's pay request wants a string for the domain; the lnurl-pay library leaves it
+   *  unset when the response named none. */
+  it("hands the SDK an empty domain when the lnurl params carry none", async () => {
+    mockPrepareLnurl.mockResolvedValue({})
+    const detail = createSelfCustodialLnurlPaymentDetails(
+      createParams({ lnurlParams: baseLnurlParams({ domain: undefined }) }),
+    )
+    if (!detail.canGetFee) throw new Error("expected canGetFee")
+
+    await detail.getFee({} as never)
+
+    expect(mockPrepareLnurl).toHaveBeenCalledWith(
+      expect.any(Object),
+      expect.objectContaining({ payRequest: expect.objectContaining({ domain: "" }) }),
+    )
+  })
+
   describe("amount handling", () => {
     it("locks the amount when min === max (destination-specified amount)", () => {
       const detail = createSelfCustodialLnurlPaymentDetails(
@@ -451,6 +530,7 @@ describe("createSelfCustodialLnurlPaymentDetails", () => {
       expect(result.status).toBe(PaymentSendResult.Success)
       expect(result.extraInfo?.successAction?.tag).toBe("message")
       expect(result.extraInfo?.successAction?.message).toBe("Thanks!")
+      expect(result.extraInfo?.successAction?.decipher("any-preimage")).toBeNull()
     })
 
     it("converts a URL successAction to the lnurl-pay shape", async () => {
@@ -468,6 +548,7 @@ describe("createSelfCustodialLnurlPaymentDetails", () => {
       expect(result.extraInfo?.successAction?.tag).toBe("url")
       expect(result.extraInfo?.successAction?.url).toBe("https://r.example/1")
       expect(result.extraInfo?.successAction?.description).toBe("Receipt")
+      expect(result.extraInfo?.successAction?.decipher("any-preimage")).toBeNull()
     })
 
     it("carries the decrypted plaintext on `message` (not via decipher) for AES Decrypted", async () => {
