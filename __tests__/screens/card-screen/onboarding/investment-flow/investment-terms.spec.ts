@@ -199,9 +199,8 @@ describe("resolveInvestmentFunding", () => {
   })
 
   /**
-   * Seen on device: an investor holding $370 in dollars and $154 in bitcoin was told the
-   * investment was covered and then turned away by the send flow, which spends from one
-   * wallet. What one wallet holds is what decides it.
+   * An investor holding $370 in dollars and $154 in bitcoin does not hold $500 in any
+   * wallet, and the send flow spends from one. What one wallet holds is what decides it.
    */
   it("does not count two wallets added together as covered", () => {
     const funding = resolveInvestmentFunding({
