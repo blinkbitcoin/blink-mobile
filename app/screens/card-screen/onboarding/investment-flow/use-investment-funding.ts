@@ -64,18 +64,17 @@ export const useInvestmentFunding = (
 }
 
 /**
- * What the investment comes to in satoshis at today's price, which is what an invoice is
- * written in. Zero until the price feed answers.
+ * What the investment comes to in satoshis at today's price. Zero until the price feed
+ * answers.
+ *
+ * A fallback, not the figure to bill: the agreement fixes a rate at a stamped moment and
+ * names the bitcoin owed against it, and the signing step carries that figure forward.
+ * This stands in only when none was carried, since converting again at today's price
+ * charges something the signer never agreed to.
  *
  * Its own hook, apart from the balance check, so each reads as the one rule it is: what
  * the investor holds is one question, what the invoice is written for is another, and
  * only the step that writes the invoice asks both.
- *
- * TEMPORARY, and the one figure here that should not be the app's to work out: the
- * agreement fixes a rate at a stamped moment and names the bitcoin owed against it, so
- * the amount charged has to be that one. Converting again at today's price would charge
- * something the signer never agreed to. It stands in until the mint returns the terms it
- * computed.
  */
 export const useInvestmentSats = (totalUsd: number): number => {
   const { convertMoneyAmount } = usePriceConversion()

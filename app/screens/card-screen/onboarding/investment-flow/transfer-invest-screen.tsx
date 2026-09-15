@@ -47,12 +47,13 @@ export const TransferInvestScreen: React.FC = () => {
   const [hasInvoiceFailed, setHasInvoiceFailed] = React.useState(false)
 
   /**
-   * What the invoice is written for: the satoshis the agreement itself names.
+   * What the invoice is written for: the satoshis the agreement itself names, carried
+   * here from the step that minted it.
    *
-   * The rate was fixed when the investor signed, so converting the dollars again now
-   * would charge a different amount of bitcoin than the document says - less if the price
-   * rose, more if it fell. The conversion below only stands in while the signing step has
-   * no figure to carry, which is until the mint returns the terms it computed.
+   * The rate was fixed when the agreement was minted, so converting the dollars again now
+   * would charge a different amount of bitcoin than the document says: less if the price
+   * rose, more if it fell. The conversion only stands in when no figure was carried, so
+   * the investor is still billed rather than sent on with nothing.
    */
   const owedSats = settlementSats ?? totalSats
 

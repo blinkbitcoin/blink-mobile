@@ -70,12 +70,12 @@ export type GaloyInstance = {
   sparkExplorer: string
   fiatUrl: string
   /**
-   * Where the backend that mints the investment agreement's signing form answers.
+   * The origin of the e-sign service that mints the investment agreement's signing
+   * session and serves the page its outcome comes back through.
    *
-   * THE URL GOES HERE, one per environment, once that backend is deployed. It is empty
-   * on every instance until then, because who runs it has not been decided: the figures
-   * the agreement locks are computed on its side, so the signing step has nothing to
-   * open while this is unset.
+   * One per environment, set once that service is deployed there. Empty until then: the
+   * signing step has nothing to open while this is unset, and a debug build falls back
+   * to a service on the developer's own machine.
    */
   esignMintUrl: string
 }
