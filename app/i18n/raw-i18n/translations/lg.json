@@ -3730,7 +3730,7 @@
         "buttonText": "Weyongere"
       },
       "SelectInvest": {
-        "desiredCreditLimit": "Ssente mmeka z'oyagala okuteekawo?",
+        "title": "Ssente mmeka z'oyagala okuteekawo?",
         "percent": "ku ~{percent: number}%"
       },
       "CompanyValuation": {

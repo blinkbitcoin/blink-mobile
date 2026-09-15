@@ -3730,7 +3730,7 @@
         "buttonText": "Pokračovať"
       },
       "SelectInvest": {
-        "desiredCreditLimit": "Koľko by ste chceli investovať?",
+        "title": "Koľko by ste chceli investovať?",
         "percent": "za ~{percent: number}%"
       },
       "CompanyValuation": {
