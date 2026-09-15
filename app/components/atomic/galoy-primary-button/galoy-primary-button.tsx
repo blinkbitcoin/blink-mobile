@@ -30,9 +30,9 @@ export const GaloyPrimaryButton: FC<PropsWithChildren<ButtonProps>> = (props) =>
 
 const useStyles = makeStyles(({ colors }) => ({
   titleStyle: {
+    fontFamily: "SourceSansPro-Bold",
     fontSize: 20,
     lineHeight: 24,
-    fontWeight: "700",
     color: colors.textOnAccent,
   },
   disabledTitleStyle: {

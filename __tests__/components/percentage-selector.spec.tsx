@@ -1,6 +1,6 @@
 import React from "react"
-import { StyleSheet, Text as ReactNativeText } from "react-native"
-import { render, fireEvent } from "@testing-library/react-native"
+import { ActivityIndicator, StyleSheet, Text as ReactNativeText } from "react-native"
+import { render, fireEvent, screen } from "@testing-library/react-native"
 
 import { PercentageSelector } from "@app/components/percentage-selector/percentage-selector"
 
@@ -165,7 +165,9 @@ describe("PercentageSelector", () => {
     )
 
     expect(getByTestId("test-75%")).toBeTruthy()
-    expect(queryByText("75%")).toBeNull()
+    // The label stays mounted under the spinner so the chip keeps its width, but hidden.
+    expect(StyleSheet.flatten(queryByText("75%")?.props.style).opacity).toBe(0)
+    expect(screen.UNSAFE_getByType(ActivityIndicator)).toBeTruthy()
   })
 
   it("shows percentage text when not loading", () => {

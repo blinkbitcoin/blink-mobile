@@ -58,7 +58,7 @@ export const NoteInput: React.FC<NoteInputProps> = ({
           ref={textInputRef}
         />
         <TouchableOpacity style={styles.noteIconContainer} onPress={focusTextInput}>
-          <GaloyIcon name={"note"} size={iconSize} color={colors.accent} />
+          <GaloyIcon name={"pencil"} size={iconSize} color={colors.accent} />
         </TouchableOpacity>
       </View>
     </View>

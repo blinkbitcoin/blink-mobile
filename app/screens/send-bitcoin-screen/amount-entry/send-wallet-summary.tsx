@@ -1,9 +1,8 @@
 import React, { useEffect, useRef } from "react"
-import { Animated, Easing, Pressable, View } from "react-native"
-import { makeStyles, Text, useTheme } from "@rn-vui/themed"
+import { Animated, Easing, Pressable } from "react-native"
+import { makeStyles, Text } from "@rn-vui/themed"
 
-import { CurrencyPill } from "@app/components/atomic/currency-pill"
-import { GaloyIcon } from "@app/components/atomic/galoy-icon"
+import { WalletSwitch } from "@app/components/wallet-switch"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
@@ -17,6 +16,8 @@ type SendWalletSummaryProps = {
   currency: WalletCurrency
   balancePrimary: string
   balanceSecondary?: string
+  /** Outlines the card in the error colour when the amount can't be sent from this wallet. */
+  hasError?: boolean
   /** Absent when there is no other wallet to switch to (the region withholds the dollar
    *  wallet), which leaves the summary as a plain read-out. */
   onSwitch?: () => void
@@ -26,12 +27,10 @@ export const SendWalletSummary: React.FC<SendWalletSummaryProps> = ({
   currency,
   balancePrimary,
   balanceSecondary,
+  hasError = false,
   onSwitch,
 }) => {
   const styles = useStyles()
-  const {
-    theme: { colors },
-  } = useTheme()
   const { LL } = useI18nContext()
 
   const progress = useRef(new Animated.Value(1)).current
@@ -49,7 +48,7 @@ export const SendWalletSummary: React.FC<SendWalletSummaryProps> = ({
     }).start()
   }, [currency, progress])
 
-  const animatedStyle = {
+  const balancesAnimatedStyle = {
     opacity: progress,
     transform: [
       {
@@ -67,62 +66,63 @@ export const SendWalletSummary: React.FC<SendWalletSummaryProps> = ({
   return (
     <Pressable
       {...testProps(SEND_WALLET_SUMMARY_TEST_ID)}
-      style={({ pressed }) => [styles.card, pressed && onSwitch && styles.cardPressed]}
+      style={({ pressed }) => [
+        styles.card,
+        hasError && styles.cardError,
+        pressed && onSwitch && styles.cardPressed,
+      ]}
       onPress={onSwitch}
       disabled={!onSwitch}
       accessibilityRole={onSwitch ? "button" : undefined}
       accessibilityLabel={`${walletName}, ${balancePrimary}`}
     >
-      <Animated.View style={[styles.balances, animatedStyle]}>
-        <Text
-          type="p2"
-          bold
-          style={styles.balancePrimary}
-          {...testProps(`${currency} Wallet Balance`)}
-        >
+      <Animated.View style={[styles.balances, balancesAnimatedStyle]}>
+        <Text style={styles.balancePrimary} {...testProps(`${currency} Wallet Balance`)}>
           {balancePrimary}
         </Text>
         {balanceSecondary ? (
-          <Text type="p4" color={colors.grey2}>
-            {balanceSecondary}
-          </Text>
+          <Text style={styles.balanceSecondary}>{balanceSecondary}</Text>
         ) : null}
       </Animated.View>
-      <View style={styles.trailing}>
-        {onSwitch ? <GaloyIcon name="refresh" size={16} color={colors.grey2} /> : null}
-        <Animated.View style={animatedStyle}>
-          <CurrencyPill currency={currency} containerSize="medium" />
-        </Animated.View>
-      </View>
+      <WalletSwitch currency={currency} canToggle={Boolean(onSwitch)} />
     </Pressable>
   )
 }
 
 const useStyles = makeStyles(({ colors }) => ({
+  /** Matches the receive screen's amount row, so the card is the same height whether or not
+   *  the wallet has a second denomination to show. */
   card: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
+    columnGap: 20,
+    minHeight: 67,
     backgroundColor: colors.grey5,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: "transparent",
+    borderColor: colors.transparent,
     paddingHorizontal: 14,
-    paddingVertical: 12,
+    paddingVertical: 14,
+  },
+  cardError: {
+    borderColor: colors.error,
   },
   cardPressed: {
-    backgroundColor: colors.grey4,
+    backgroundColor: colors.grey6,
   },
   balances: {
     flex: 1,
-    flexShrink: 1,
+    justifyContent: "center",
   },
   balancePrimary: {
-    flexShrink: 1,
+    fontFamily: "SourceSansPro-Bold",
+    fontSize: 16,
+    lineHeight: 22,
+    color: colors.black,
   },
-  trailing: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
+  balanceSecondary: {
+    fontSize: 12,
+    lineHeight: 18,
+    color: colors.black,
   },
 }))

@@ -52,7 +52,11 @@ import { SendAmountHeader } from "./amount-entry/send-amount-header"
 import { SendWalletSummary } from "./amount-entry/send-wallet-summary"
 import { useSendAmountPad } from "./amount-entry/use-send-amount-pad"
 import { ConfirmFeesModal } from "./confirm-fees-modal"
-import { isValidAmount, withConvertMoneyAmount } from "./payment-details"
+import {
+  AmountInvalidReason,
+  isValidAmount,
+  withConvertMoneyAmount,
+} from "./payment-details"
 import { PaymentDetail } from "./payment-details/index.types"
 import { SendBitcoinDetailsExtraInfo } from "./send-bitcoin-details-extra-info"
 
@@ -526,10 +530,23 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     )
 
   const hasAmount = paymentDetail.unitOfAccountAmount.amount > 0
-  const nextButtonTitle =
-    paymentDetail.canSetAmount && !hasAmount
-      ? LL.SendBitcoinScreen.addAmount()
-      : LL.common.next()
+  const isLowFunds =
+    !amountStatus.validAmount &&
+    amountStatus.invalidReason === AmountInvalidReason.InsufficientBalance
+
+  /** The wallet card is outlined when the amount is what's wrong for this wallet: over its
+   *  balance or limit, or outside the LNURL bounds. Fee and fetch errors leave it alone. */
+  const isAmountError =
+    Boolean(lnurlBoundsErrorMessage) ||
+    (!amountStatus.validAmount &&
+      (amountStatus.invalidReason === AmountInvalidReason.InsufficientBalance ||
+        amountStatus.invalidReason === AmountInvalidReason.InsufficientLimit))
+
+  const nextButtonTitle = (() => {
+    if (paymentDetail.canSetAmount && !hasAmount) return LL.SendBitcoinScreen.addAmount()
+    if (isLowFunds) return LL.SendBitcoinScreen.lowFunds()
+    return LL.common.next()
+  })()
 
   return (
     <Screen preset="fixed" keyboardOffset="navigationHeader">
@@ -553,10 +570,32 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
           secondaryAmount={
             secondaryAmount && formatMoneyAmount({ moneyAmount: secondaryAmount })
           }
+          primaryCurrency={primaryCurrency}
           onSwapCurrency={paymentDetail.canSetAmount ? swapTypedCurrency : undefined}
           onCopyDestination={handleCopyToClipboard}
         />
         <View style={styles.fields}>
+          {/* The one error slot sits right above the wallet card it is usually about. */}
+          <View style={styles.walletWithError}>
+            <SendBitcoinDetailsExtraInfo
+              errorMessage={extraInfoErrorMessage}
+              amountStatus={amountStatus}
+              currentLevel={currentLevel}
+            />
+            <SendWalletSummary
+              currency={walletCurrency}
+              balancePrimary={formatMoneyAmount({ moneyAmount: sendingWalletBalance })}
+              balanceSecondary={
+                walletBalanceSecondary &&
+                formatMoneyAmount({
+                  moneyAmount: walletBalanceSecondary,
+                  isApproximate: true,
+                })
+              }
+              hasError={isAmountError}
+              onSwitch={switchWallet || undefined}
+            />
+          </View>
           {isOnchain && (
             <FeeTierSelector
               title={LL.SendBitcoinScreen.feeTier()}
@@ -566,18 +605,6 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
               loading={isQuotingFees}
             />
           )}
-          <SendWalletSummary
-            currency={walletCurrency}
-            balancePrimary={formatMoneyAmount({ moneyAmount: sendingWalletBalance })}
-            balanceSecondary={
-              walletBalanceSecondary &&
-              formatMoneyAmount({
-                moneyAmount: walletBalanceSecondary,
-                isApproximate: true,
-              })
-            }
-            onSwitch={switchWallet || undefined}
-          />
           <NoteInput
             onChangeText={(text) =>
               paymentDetail.setMemo && setPaymentDetail(paymentDetail.setMemo(text))
@@ -585,11 +612,8 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
             value={paymentDetail.memo || ""}
             editable={paymentDetail.canSetMemo}
             big={false}
-          />
-          <SendBitcoinDetailsExtraInfo
-            errorMessage={extraInfoErrorMessage}
-            amountStatus={amountStatus}
-            currentLevel={currentLevel}
+            iconSize={16}
+            fontSize={14}
           />
         </View>
       </ScrollView>
@@ -603,11 +627,13 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
               onSelect={selectPercent}
               testIdPrefix="send"
             />
-            <CurrencyKeyboard
-              onPress={amountPad.onKeyPress}
-              disabledKeys={amountPad.disabledKeys}
-              safeMode
-            />
+            <View style={styles.keyboard}>
+              <CurrencyKeyboard
+                onPress={amountPad.onKeyPress}
+                disabledKeys={amountPad.disabledKeys}
+                safeMode
+              />
+            </View>
           </>
         )}
         <GaloyPrimaryButton
@@ -633,20 +659,27 @@ const useStyles = makeStyles(() => ({
   scroll: {
     flex: 1,
   },
+  /** Spacing follows the Figma frame: 14 between blocks, 20 at the sides, the hero flush
+   *  with the header and the free space falling between it and the wallet card. */
   scrollContent: {
     flexGrow: 1,
     justifyContent: "space-between",
-    gap: 24,
+    rowGap: 14,
     paddingHorizontal: 20,
-    paddingTop: 8,
-    paddingBottom: 12,
   },
   fields: {
-    gap: 12,
+    rowGap: 14,
+  },
+  walletWithError: {
+    rowGap: 5,
   },
   bottom: {
-    gap: 12,
+    rowGap: 14,
+    paddingTop: 14,
     paddingHorizontal: 20,
-    paddingBottom: 12,
+    paddingBottom: 20,
+  },
+  keyboard: {
+    marginVertical: 10,
   },
 }))
