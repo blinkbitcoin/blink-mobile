@@ -1,11 +1,11 @@
 import React from "react"
-import { TouchableOpacity, Text } from "react-native"
+import { StyleSheet, TouchableOpacity, Text } from "react-native"
 import { Satoshis } from "lnurl-pay"
 import { act, fireEvent, render, screen } from "@testing-library/react-native"
 
 import { DisplayCurrency, toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { ConvertAmountAdjustment } from "@app/types/payment"
-import { WalletCurrency } from "@app/graphql/generated"
+import { PayoutSpeed, WalletCurrency } from "@app/graphql/generated"
 import { IDEMPOTENCY_KEY_UNAVAILABLE } from "@app/screens/send-bitcoin-screen/use-send-payment"
 import { HideAmountContextProvider } from "@app/graphql/hide-amount-context"
 import * as PaymentDetails from "@app/screens/send-bitcoin-screen/payment-details/intraledger"
@@ -18,6 +18,12 @@ import { SelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
 import * as colors from "@app/rne-theme/colors"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { RouteProp } from "@react-navigation/native"
+import { INFO_SECTION_OUTLINE_TEST_ID } from "@app/components/card-screen/info-section"
+import { FeeTierOption } from "@app/screens/send-bitcoin-screen/hooks/fee-tiers.types"
+import {
+  SEND_REVIEW_PRIMARY_TEST_ID,
+  SEND_REVIEW_SECONDARY_TEST_ID,
+} from "@app/screens/send-bitcoin-screen/review/send-review-hero"
 
 import { flushEffects } from "../helpers/flush-effects"
 import { ContextForScreen } from "./helper"
@@ -233,12 +239,13 @@ jest.mock("@app/hooks/use-active-wallet", () => ({
 }))
 
 const navigationDispatchMock = jest.fn()
+const navigationGoBackMock = jest.fn()
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
   useNavigation: () => ({
     dispatch: navigationDispatchMock,
     navigate: jest.fn(),
-    goBack: jest.fn(),
+    goBack: navigationGoBackMock,
     setOptions: jest.fn(),
   }),
 }))
@@ -251,6 +258,11 @@ jest.mock("@app/components/hidden-balance-placeholder/hidden-balance-placeholder
   const MockHiddenBalancePlaceholder = () => <View testID="hidden-balance-placeholder" />
   return { HiddenBalancePlaceholder: MockHiddenBalancePlaceholder }
 })
+
+const copyToClipboardMock = jest.fn()
+jest.mock("@app/hooks/use-clipboard", () => ({
+  useClipboard: () => ({ copyToClipboard: copyToClipboardMock }),
+}))
 
 const mockSliderProps = jest.fn()
 jest.mock("@app/components/atomic/galoy-slider-button/galoy-slider-button", () => {
@@ -374,7 +386,7 @@ describe("SendBitcoinConfirmationScreen", () => {
     )
 
     expect(screen.getByText(lnurl)).toBeTruthy()
-    expect(screen.getByText("$0.05 (₦100)")).toBeTruthy()
+    expect(screen.getByTestId(SEND_REVIEW_PRIMARY_TEST_ID).props.children).toBe("₦100")
     expect(screen.getByTestId("slider")).toBeTruthy()
     expect(screen.getByText(LL.SendBitcoinConfirmationScreen.slideToSend())).toBeTruthy()
   })
@@ -1541,5 +1553,291 @@ describe("SendBitcoinConfirmationScreen — slide to send", () => {
       progress.ohOh(),
       progress.tryingAgain(),
     ])
+  })
+})
+
+describe("SendBitcoinConfirmationScreen — review layout", () => {
+  let LL: ReturnType<typeof i18nObject>
+
+  const btcBalance = (balance: number) =>
+    mockUseSendBalances.mockReturnValue({
+      btcWallet: { id: "btc-wallet-id", balance, walletCurrency: WalletCurrency.Btc },
+      usdWallet: {
+        id: "usd-wallet-id",
+        balance: 10000,
+        walletCurrency: WalletCurrency.Usd,
+      },
+    })
+
+  const btcFee = (amount: number) =>
+    mockUseFee.mockReturnValue({
+      status: "set",
+      amount: { amount, currency: WalletCurrency.Btc, currencyCode: "BTC" },
+    })
+
+  /** An on-chain send built on the intraledger detail: review only reads these fields. */
+  const buildOnchainRoute = (
+    sats: number,
+    extra: { payoutSpeed?: PayoutSpeed; feeTier?: FeeTierOption } = {},
+  ) => {
+    const base = buildBtcSettlementRoute(sats)
+    return {
+      ...base,
+      params: {
+        paymentDetail: {
+          ...base.params.paymentDetail,
+          paymentType: "onchain",
+          destination: "bc1q6pwejxkd0gfr2m7fvs4yh3nh5ul7zc8smg9fq4aw",
+          ...extra,
+        },
+      },
+    } as unknown as ReturnType<typeof buildBtcSettlementRoute>
+  }
+
+  const renderReview = async (
+    paymentRoute: ReturnType<typeof buildBtcSettlementRoute>,
+    hideAmount = false,
+    toggleHideAmount = jest.fn(),
+  ) => {
+    render(
+      <ContextForScreen>
+        <HideAmountContextProvider value={{ hideAmount, toggleHideAmount }}>
+          <Intraledger route={paymentRoute} />
+        </HideAmountContextProvider>
+      </ContextForScreen>,
+    )
+    await flushEffects()
+  }
+
+  const outlineColor = () => {
+    const outline = screen.queryByTestId(INFO_SECTION_OUTLINE_TEST_ID)
+    return outline ? StyleSheet.flatten(outline.props.style).borderColor : undefined
+  }
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockUseNonCustodialConversionLimits.mockReturnValue(undefined)
+    loadLocale("en")
+    LL = i18nObject("en")
+    mockUseSendPayment.mockReturnValue({
+      loading: false,
+      hasAttemptedSend: false,
+      sendPayment: sendPaymentMock,
+    })
+    btcBalance(500000)
+    btcFee(0)
+  })
+
+  describe("sections", () => {
+    it("renders the hero, Destination, From Balance and Details in that order", async () => {
+      await renderReview(buildBtcSettlementRoute(1000))
+
+      const json = JSON.stringify(screen.toJSON())
+      const positions = [
+        LL.SendBitcoinConfirmationScreen.sending(),
+        `${LL.SendBitcoinScreen.destination()}`,
+        LL.SendBitcoinConfirmationScreen.fromBalance(),
+        LL.SendBitcoinConfirmationScreen.details(),
+      ].map((text) => json.indexOf(`"${text}"`))
+
+      expect(positions.every((position) => position >= 0)).toBe(true)
+      expect([...positions].sort((a, b) => a - b)).toEqual(positions)
+    })
+
+    it("shows the same amounts in the hero that it hands to the completed screen", async () => {
+      sendPaymentMock.mockResolvedValueOnce({ status: "SUCCESS" })
+      await renderReview(buildBtcSettlementRoute(1000))
+
+      const primary = screen.getByTestId(SEND_REVIEW_PRIMARY_TEST_ID).props.children
+      const secondary = screen.getByTestId(SEND_REVIEW_SECONDARY_TEST_ID).props.children
+
+      await act(async () => {
+        fireEvent.press(screen.getByTestId("slider"))
+      })
+
+      const reducer = navigationDispatchMock.mock.calls
+        .map(([action]) => action)
+        .find((action) => typeof action === "function")
+      const reset = reducer({ index: 0, routes: [] }) as {
+        payload: { routes: { name: string; params: Record<string, unknown> }[] }
+      }
+      const completed = reset.payload.routes.find(
+        (entry) => entry.name === "sendBitcoinCompleted",
+      )
+      expect(completed?.params.currencyAmount).toBe(primary)
+      expect(completed?.params.satAmount).toBe(secondary)
+    })
+
+    it("copies the destination when the Destination field is pressed", async () => {
+      await renderReview(buildBtcSettlementRoute(1000))
+
+      fireEvent.press(screen.getByTestId("send-review-copy-destination"))
+
+      expect(copyToClipboardMock).toHaveBeenCalledWith(
+        expect.objectContaining({ content: "test" }),
+      )
+    })
+
+    it("paints the Details card on the static grey7 surface", async () => {
+      await renderReview(buildBtcSettlementRoute(1000))
+
+      const feeLabel = screen.getByText(LL.SendBitcoinConfirmationScreen.feeLabel())
+      let node = feeLabel.parent
+      let background: string | undefined
+      while (node && !background) {
+        background = StyleSheet.flatten(node.props.style)?.backgroundColor
+        node = node.parent
+      }
+      expect(background).toBe(colors.light.grey7)
+    })
+  })
+
+  describe("Details rows", () => {
+    it("shows a spinner in the Fee row while the fee loads", async () => {
+      mockUseFee.mockReturnValue({ status: "loading" })
+      await renderReview(buildBtcSettlementRoute(1000))
+
+      expect(
+        screen.getByLabelText(`${LL.SendBitcoinConfirmationScreen.feeLabel()} loading`),
+      ).toBeTruthy()
+      expect(screen.queryByLabelText("Successful Fee")).toBeNull()
+    })
+
+    it("shows the fee error in red and outlines the card red when the quote fails", async () => {
+      mockUseFee.mockReturnValue({ status: "error" })
+      await renderReview(buildBtcSettlementRoute(1000))
+
+      const feeError = screen.getByText(LL.common.feeError())
+      expect(StyleSheet.flatten(feeError.props.style).color).toBe(colors.light.error)
+      expect(outlineColor()).toBe(colors.light.error)
+    })
+
+    it("marks a maximum fee with * and explains it under the card, in grey", async () => {
+      mockUseFee.mockReturnValue({
+        status: "error",
+        amount: { amount: 10, currency: WalletCurrency.Btc, currencyCode: "BTC" },
+      })
+      await renderReview(buildBtcSettlementRoute(1000))
+
+      expect(screen.getByText(/ \*$/)).toBeTruthy()
+      const footnote = screen.getByText(
+        `*${LL.SendBitcoinConfirmationScreen.maxFeeSelected()}`,
+      )
+      expect(StyleSheet.flatten(footnote.props.style).color).toBe(colors.light.grey2)
+      expect(outlineColor()).toBeUndefined()
+    })
+
+    it("adds a Note row only when the payment carries a note", async () => {
+      const base = buildBtcSettlementRoute(1000)
+      await renderReview({
+        ...base,
+        params: { paymentDetail: { ...base.params.paymentDetail, memo: "Dinner" } },
+      })
+
+      expect(screen.getByText(LL.common.note())).toBeTruthy()
+      expect(screen.getByText("Dinner")).toBeTruthy()
+    })
+
+    it("has no Note row without a note", async () => {
+      await renderReview(buildBtcSettlementRoute(1000))
+
+      expect(screen.queryByText(LL.common.note())).toBeNull()
+    })
+
+    it("shows the custodial payout speed as the Transaction priority on-chain", async () => {
+      await renderReview(buildOnchainRoute(1000, { payoutSpeed: PayoutSpeed.Slow }))
+
+      expect(screen.getByText(LL.SendBitcoinScreen.feeTier())).toBeTruthy()
+      expect(screen.getByText(`${LL.SendBitcoinScreen.slow()} ~ 24h`)).toBeTruthy()
+    })
+
+    it("shows the self-custodial fee tier as the Transaction priority on-chain", async () => {
+      await renderReview(buildOnchainRoute(1000, { feeTier: FeeTierOption.Medium }))
+
+      expect(screen.getByText(`${LL.SendBitcoinScreen.medium()} ~ 30m`)).toBeTruthy()
+    })
+
+    it("has no Transaction priority row off-chain", async () => {
+      await renderReview(buildBtcSettlementRoute(1000))
+
+      expect(screen.queryByText(LL.SendBitcoinScreen.feeTier())).toBeNull()
+    })
+  })
+
+  describe("notices under Details", () => {
+    it("outlines the card red, explains the shortfall and offers Change amount when the total exceeds the balance", async () => {
+      btcBalance(1050)
+      btcFee(100)
+      await renderReview(buildBtcSettlementRoute(1000))
+
+      expect(outlineColor()).toBe(colors.light.error)
+      expect(screen.getByText(/Total exceeds your balance/)).toBeTruthy()
+      expect(lastSliderProps().disabled).toBe(true)
+
+      fireEvent.press(screen.getByText(LL.SendBitcoinConfirmationScreen.changeAmount()))
+      expect(navigationGoBackMock).toHaveBeenCalledTimes(1)
+    })
+
+    it("outlines the card in the warning colour and wraps the high-fee advice on-chain", async () => {
+      btcFee(100)
+      await renderReview(buildOnchainRoute(1000, { payoutSpeed: PayoutSpeed.Fast }))
+
+      expect(outlineColor()).toBe(colors.light.warning)
+      const advice = screen.getByText(
+        LL.SendBitcoinConfirmationScreen.lightningRecommended(),
+      )
+      expect(advice.props.numberOfLines).toBeUndefined()
+      expect(lastSliderProps().disabled).toBe(false)
+    })
+
+    it("lets the blocking low-funds error win over the high-fee advice", async () => {
+      btcBalance(1050)
+      btcFee(100)
+      await renderReview(buildOnchainRoute(1000, { payoutSpeed: PayoutSpeed.Fast }))
+
+      expect(outlineColor()).toBe(colors.light.error)
+      expect(screen.getByText(/Total exceeds your balance/)).toBeTruthy()
+      expect(
+        screen.queryByText(LL.SendBitcoinConfirmationScreen.lightningRecommended()),
+      ).toBeNull()
+    })
+
+    it("shows a send failure under the card without outlining it or offering Change amount", async () => {
+      sendPaymentMock.mockRejectedValueOnce(new Error("route not found"))
+      await renderReview(buildBtcSettlementRoute(1000))
+
+      await act(async () => {
+        fireEvent.press(screen.getByTestId("slider"))
+      })
+
+      expect(screen.getByText("route not found")).toBeTruthy()
+      expect(outlineColor()).toBeUndefined()
+      expect(
+        screen.queryByText(LL.SendBitcoinConfirmationScreen.changeAmount()),
+      ).toBeNull()
+    })
+  })
+
+  describe("hidden balance", () => {
+    it("reveals the From Balance on a tap without touching the hide-balance setting", async () => {
+      const toggleHideAmount = jest.fn()
+      await renderReview(buildBtcSettlementRoute(1000), true, toggleHideAmount)
+      expect(screen.getByTestId("hidden-balance-placeholder")).toBeTruthy()
+
+      fireEvent.press(screen.getByTestId("choose-wallet-to-send-from"))
+
+      expect(screen.queryByTestId("hidden-balance-placeholder")).toBeNull()
+      expect(screen.getByTestId(`${WalletCurrency.Btc} Wallet Balance`)).toBeTruthy()
+      expect(toggleHideAmount).not.toHaveBeenCalled()
+    })
+
+    it("offers no tap on the wallet card while balances are visible", async () => {
+      await renderReview(buildBtcSettlementRoute(1000))
+
+      expect(
+        screen.getByTestId("choose-wallet-to-send-from").props.accessibilityState
+          ?.disabled,
+      ).toBe(true)
+    })
   })
 })
