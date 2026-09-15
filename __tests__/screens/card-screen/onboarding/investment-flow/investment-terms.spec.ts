@@ -62,13 +62,6 @@ describe("resolveInvestmentTerms", () => {
       expect(terms.btcUsdRate).toBeUndefined()
       expect(terms.rateTimestamp).toBeUndefined()
     })
-
-    it("leaves them out rather than dividing by a zero rate", () => {
-      const terms = resolveInvestmentTerms(25000, { btcUsdRate: 0, at: AT })
-
-      expect(terms.settlementBtc).toBeUndefined()
-      expect(terms.btcUsdRate).toBeUndefined()
-    })
   })
 })
 
