@@ -5,6 +5,7 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useAppConfig } from "@app/hooks"
+import { ellipsizeMiddle } from "@app/utils/helper"
 import { testProps } from "@app/utils/testProps"
 
 import { PaymentDetail } from "../payment-details/index.types"
@@ -19,6 +20,29 @@ const SECONDARY_LINE_HEIGHT = 24
 /** How far each line's centre travels to reach the other's. */
 const SWAP_DISTANCE = PRIMARY_LINE_HEIGHT / 2 + SECONDARY_LINE_HEIGHT / 2
 const SWAP_ANIMATION_MS = 220
+
+/** Raw addresses and invoices keep their first 10 and last 8 characters
+ *  ("bc1q6pwejx...mg9fq4aw"); readable handles stay whole. */
+const RAW_DESTINATION_START = 10
+const RAW_DESTINATION_END = 8
+
+export const formatDestination = ({
+  destination,
+  paymentType,
+  lnAddressHostname,
+}: {
+  destination: string
+  paymentType: PaymentDetail<WalletCurrency>["paymentType"]
+  lnAddressHostname: string
+}) => {
+  if (paymentType === "intraledger") return `${destination}@${lnAddressHostname}`
+  if (paymentType === "lnurl") return destination
+  return ellipsizeMiddle(destination, {
+    maxLength: RAW_DESTINATION_START + RAW_DESTINATION_END + 3,
+    maxResultLeft: RAW_DESTINATION_START,
+    maxResultRight: RAW_DESTINATION_END,
+  })
+}
 
 type SendAmountHeaderProps = {
   destination: string
@@ -79,8 +103,11 @@ export const SendAmountHeader: React.FC<SendAmountHeaderProps> = ({
     ],
   })
 
-  const destinationText =
-    paymentType === "intraledger" ? `${destination}@${lnAddressHostname}` : destination
+  const destinationText = formatDestination({
+    destination,
+    paymentType,
+    lnAddressHostname,
+  })
 
   return (
     <View style={styles.container}>

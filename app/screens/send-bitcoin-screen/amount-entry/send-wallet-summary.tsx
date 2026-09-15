@@ -80,9 +80,15 @@ export const SendWalletSummary: React.FC<SendWalletSummaryProps> = ({
         <Text style={styles.balancePrimary} {...testProps(`${currency} Wallet Balance`)}>
           {balancePrimary}
         </Text>
-        {balanceSecondary ? (
-          <Text style={styles.balanceSecondary}>{balanceSecondary}</Text>
-        ) : null}
+        {/* Always laid out, blank when the wallet has no second denomination (a dollar
+            wallet in USD), so the card is the same height in both states at any text size. */}
+        <Text
+          style={[styles.balanceSecondary, !balanceSecondary && styles.hidden]}
+          accessibilityElementsHidden={!balanceSecondary}
+          importantForAccessibility={balanceSecondary ? "auto" : "no-hide-descendants"}
+        >
+          {balanceSecondary || " "}
+        </Text>
       </Animated.View>
       <WalletSwitch currency={currency} canToggle={Boolean(onSwitch)} />
     </Pressable>
@@ -119,6 +125,9 @@ const useStyles = makeStyles(({ colors }) => ({
     fontSize: 16,
     lineHeight: 22,
     color: colors.black,
+  },
+  hidden: {
+    opacity: 0,
   },
   balanceSecondary: {
     fontSize: 12,

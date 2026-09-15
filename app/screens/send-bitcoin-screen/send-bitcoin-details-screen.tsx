@@ -627,6 +627,9 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
           </>
         )}
         <GaloyPrimaryButton
+          // Remounted per label: on Android an in-place change kept the width measured for the
+          // previous label, so "Next" → "Add amount" was clipped to "Add".
+          key={nextButtonTitle}
           onPress={goToNextScreen || undefined}
           loading={isLoadingLnurl}
           disabled={isNextDisabled}
