@@ -51,6 +51,8 @@ type SendAmountHeaderProps = {
   secondaryAmount?: string
   /** Identifies which currency leads; a change swaps the two lines into place. */
   primaryCurrency: string
+  /** No amount entered yet: both lines are muted until the sender types one. */
+  isEmpty?: boolean
   /** Present while the amount is typed on the keypad: swaps which currency the keys enter. */
   onSwapCurrency?: () => void
   onCopyDestination: () => void
@@ -62,6 +64,7 @@ export const SendAmountHeader: React.FC<SendAmountHeaderProps> = ({
   primaryAmount,
   secondaryAmount,
   primaryCurrency,
+  isEmpty = false,
   onSwapCurrency,
   onCopyDestination,
 }) => {
@@ -134,6 +137,7 @@ export const SendAmountHeader: React.FC<SendAmountHeaderProps> = ({
           <Animated.Text
             style={[
               styles.primaryAmount,
+              isEmpty && styles.primaryAmountEmpty,
               swapStyle(SWAP_DISTANCE, SECONDARY_FONT_SIZE / PRIMARY_FONT_SIZE),
             ]}
             adjustsFontSizeToFit
@@ -146,6 +150,7 @@ export const SendAmountHeader: React.FC<SendAmountHeaderProps> = ({
             <Animated.Text
               style={[
                 styles.secondaryAmount,
+                isEmpty && styles.secondaryAmountEmpty,
                 swapStyle(-SWAP_DISTANCE, PRIMARY_FONT_SIZE / SECONDARY_FONT_SIZE),
               ]}
               numberOfLines={1}
@@ -191,5 +196,11 @@ const useStyles = makeStyles(({ colors }) => ({
     lineHeight: SECONDARY_LINE_HEIGHT,
     color: colors.grey2,
     textAlign: "center",
+  },
+  primaryAmountEmpty: {
+    color: colors.grey2,
+  },
+  secondaryAmountEmpty: {
+    color: colors.grey3,
   },
 }))

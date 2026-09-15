@@ -561,6 +561,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
             secondaryAmount && formatMoneyAmount({ moneyAmount: secondaryAmount })
           }
           primaryCurrency={primaryCurrency}
+          isEmpty={paymentDetail.canSetAmount && !hasAmount}
           onSwapCurrency={paymentDetail.canSetAmount ? swapTypedCurrency : undefined}
           onCopyDestination={handleCopyToClipboard}
         />
@@ -609,7 +610,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
       </ScrollView>
       <View style={styles.bottom}>
         {paymentDetail.canSetAmount && (
-          <>
+          <View style={styles.pad}>
             <PercentageSelector
               isLocked={false}
               loadingPercent={null}
@@ -617,20 +618,19 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
               onSelect={selectPercent}
               testIdPrefix="send"
             />
-            <View style={styles.keyboard}>
-              <CurrencyKeyboard
-                onPress={amountPad.onKeyPress}
-                disabledKeys={amountPad.disabledKeys}
-                safeMode
-              />
-            </View>
-          </>
+            <CurrencyKeyboard
+              onPress={amountPad.onKeyPress}
+              disabledKeys={amountPad.disabledKeys}
+              safeMode
+            />
+          </View>
         )}
         <GaloyPrimaryButton
           onPress={goToNextScreen || undefined}
           loading={isLoadingLnurl}
           disabled={isNextDisabled}
           title={nextButtonTitle}
+          containerStyle={styles.next}
           {...testProps(LL.common.next())}
         />
       </View>
@@ -664,12 +664,15 @@ const useStyles = makeStyles(() => ({
     rowGap: 5,
   },
   bottom: {
-    rowGap: 14,
-    paddingTop: 14,
     paddingHorizontal: 20,
     paddingBottom: 20,
   },
-  keyboard: {
-    marginVertical: 10,
+  pad: {
+    rowGap: 14,
+    paddingTop: 14,
+  },
+  /** A constant 20 above the CTA, whether the keypad or the note field sits over it. */
+  next: {
+    marginTop: 20,
   },
 }))

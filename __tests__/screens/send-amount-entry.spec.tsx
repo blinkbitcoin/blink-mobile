@@ -308,6 +308,24 @@ describe("free amount", () => {
     expect(isNextDisabled()).toBe(false)
   })
 
+  it("mutes both amount lines until an amount is typed", async () => {
+    renderScreen(intraledgerDestination())
+    await settle()
+    const colorOf = (testID: string) =>
+      StyleSheet.flatten(screen.getByTestId(testID).props.style).color
+
+    const emptyPrimary = colorOf("send-amount-primary")
+    const emptySecondary = colorOf("send-amount-secondary")
+    typeKeys("1")
+    await settle()
+
+    // Empty reads grey2 over grey3; active steps each line up one, so the typed
+    // secondary takes the grey the empty primary had.
+    expect(emptyPrimary).not.toBe(emptySecondary)
+    expect(colorOf("send-amount-secondary")).toBe(emptyPrimary)
+    expect(colorOf("send-amount-primary")).not.toBe(emptyPrimary)
+  })
+
   it("sets the chip's share of the selected wallet's balance", async () => {
     renderScreen(intraledgerDestination())
     await settle()
