@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react"
-import { Animated, Easing, Pressable } from "react-native"
+import { Animated, Easing, Pressable, View } from "react-native"
 import { makeStyles, Text } from "@rn-vui/themed"
 
 import { WalletSwitch } from "@app/components/wallet-switch"
@@ -8,6 +8,9 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
 
 export const SEND_WALLET_SUMMARY_TEST_ID = "choose-wallet-to-send-from"
+export const SEND_WALLET_SECONDARY_TEST_ID = "send-wallet-balance-secondary"
+export const SEND_WALLET_SIZER_TEST_ID = "send-wallet-balance-sizer"
+export const SEND_WALLET_LINES_TEST_ID = "send-wallet-balance-lines"
 
 const SWITCH_ANIMATION_MS = 180
 const SWITCH_OFFSET = 8
@@ -76,20 +79,39 @@ export const SendWalletSummary: React.FC<SendWalletSummaryProps> = ({
       accessibilityRole={onSwitch ? "button" : undefined}
       accessibilityLabel={`${walletName}, ${balancePrimary}`}
     >
-      <Animated.View style={[styles.balances, balancesAnimatedStyle]}>
-        <Text style={styles.balancePrimary} {...testProps(`${currency} Wallet Balance`)}>
-          {balancePrimary}
-        </Text>
-        {/* Always laid out, blank when the wallet has no second denomination (a dollar
-            wallet in USD), so the card is the same height in both states at any text size. */}
-        <Text
-          style={[styles.balanceSecondary, !balanceSecondary && styles.hidden]}
-          accessibilityElementsHidden={!balanceSecondary}
-          importantForAccessibility={balanceSecondary ? "auto" : "no-hide-descendants"}
+      <View style={styles.balances}>
+        {/* An invisible two-line copy sets the height, so the card is the same size with or
+            without a second denomination and still grows with the system text size. */}
+        <View
+          style={styles.sizer}
+          testID={SEND_WALLET_SIZER_TEST_ID}
+          accessibilityElementsHidden
+          importantForAccessibility="no-hide-descendants"
         >
-          {balanceSecondary || " "}
-        </Text>
-      </Animated.View>
+          <Text style={styles.balancePrimary}>{balancePrimary}</Text>
+          <Text style={styles.balanceSecondary}> </Text>
+        </View>
+        {/* The visible lines sit over it, centred: a dollar wallet shown in USD is one line. */}
+        <Animated.View
+          style={[styles.balancesVisible, balancesAnimatedStyle]}
+          testID={SEND_WALLET_LINES_TEST_ID}
+        >
+          <Text
+            style={styles.balancePrimary}
+            {...testProps(`${currency} Wallet Balance`)}
+          >
+            {balancePrimary}
+          </Text>
+          {balanceSecondary ? (
+            <Text
+              style={styles.balanceSecondary}
+              {...testProps(SEND_WALLET_SECONDARY_TEST_ID)}
+            >
+              {balanceSecondary}
+            </Text>
+          ) : null}
+        </Animated.View>
+      </View>
       <WalletSwitch currency={currency} canToggle={Boolean(onSwitch)} />
     </Pressable>
   )
@@ -118,6 +140,16 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   balances: {
     flex: 1,
+  },
+  sizer: {
+    opacity: 0,
+  },
+  balancesVisible: {
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
     justifyContent: "center",
   },
   balancePrimary: {
@@ -125,9 +157,6 @@ const useStyles = makeStyles(({ colors }) => ({
     fontSize: 16,
     lineHeight: 22,
     color: colors.black,
-  },
-  hidden: {
-    opacity: 0,
   },
   balanceSecondary: {
     fontSize: 12,

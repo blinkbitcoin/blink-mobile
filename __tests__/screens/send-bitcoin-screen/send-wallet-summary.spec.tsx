@@ -5,7 +5,12 @@ import { ThemeProvider } from "@rn-vui/themed"
 
 import { WalletCurrency } from "@app/graphql/generated"
 import theme from "@app/rne-theme/theme"
-import { SendWalletSummary } from "@app/screens/send-bitcoin-screen/amount-entry/send-wallet-summary"
+import {
+  SEND_WALLET_LINES_TEST_ID,
+  SEND_WALLET_SECONDARY_TEST_ID,
+  SEND_WALLET_SIZER_TEST_ID,
+  SendWalletSummary,
+} from "@app/screens/send-bitcoin-screen/amount-entry/send-wallet-summary"
 
 jest.mock("@app/components/wallet-switch", () => ({
   WalletSwitch: () => null,
@@ -17,8 +22,6 @@ jest.mock("@app/i18n/i18n-react", () => ({
   }),
 }))
 
-const CARD = "choose-wallet-to-send-from"
-
 const bitcoinCard = (
   <ThemeProvider theme={theme}>
     <SendWalletSummary
@@ -29,34 +32,47 @@ const bitcoinCard = (
   </ThemeProvider>
 )
 
-const dollarCardWithoutSecondary = (
+/** A dollar wallet with USD as the display currency: no second denomination. */
+const dollarCardInUsd = (
   <ThemeProvider theme={theme}>
     <SendWalletSummary currency={WalletCurrency.Usd} balancePrimary="$0.57" />
   </ThemeProvider>
 )
 
-const balanceLines = () => within(screen.getByTestId(CARD)).UNSAFE_queryAllByType(Text)
+const primaryLine = (currency: WalletCurrency) =>
+  screen.getByTestId(`${currency} Wallet Balance`)
 
-/**
- * A dollar wallet shown in USD has no second denomination. The card still lays that line out
- * (hidden) so it is the same height whichever wallet is selected, at any text size.
- */
 describe("SendWalletSummary", () => {
-  it("lays out the second line even when there is no second denomination", () => {
+  it("shows the display-currency value under the balance when there is one", () => {
     render(bitcoinCard)
-    const withSecondary = balanceLines().length
 
-    screen.rerender(dollarCardWithoutSecondary)
-
-    const lines = balanceLines()
-    expect(lines).toHaveLength(withSecondary)
-    expect(StyleSheet.flatten(lines[lines.length - 1].props.style).opacity).toBe(0)
+    expect(screen.getByTestId(SEND_WALLET_SECONDARY_TEST_ID)).toBeTruthy()
   })
 
-  it("shows the second line when there is one", () => {
-    render(bitcoinCard)
+  it("shows a single line when there is no second denomination", () => {
+    render(dollarCardInUsd)
 
-    const line = screen.getByText("~ $0.57")
-    expect(StyleSheet.flatten(line.props.style).opacity).toBeUndefined()
+    expect(primaryLine(WalletCurrency.Usd)).toBeTruthy()
+    expect(screen.queryByTestId(SEND_WALLET_SECONDARY_TEST_ID)).toBeNull()
+  })
+
+  /**
+   * The visible lines are centred over a hidden two-line copy, so the single line sits in the
+   * middle of a card that is exactly as tall as the two-line one, at any text size.
+   */
+  it("keeps the two-line height and centres the single line", () => {
+    render(dollarCardInUsd)
+
+    const hiddenCopy = screen.getByTestId(SEND_WALLET_SIZER_TEST_ID, {
+      includeHiddenElements: true,
+    })
+    expect(StyleSheet.flatten(hiddenCopy.props.style).opacity).toBe(0)
+    expect(within(hiddenCopy).UNSAFE_queryAllByType(Text)).toHaveLength(2)
+
+    const visibleStyle = StyleSheet.flatten(
+      screen.getByTestId(SEND_WALLET_LINES_TEST_ID).props.style,
+    )
+    expect(visibleStyle.position).toBe("absolute")
+    expect(visibleStyle.justifyContent).toBe("center")
   })
 })
