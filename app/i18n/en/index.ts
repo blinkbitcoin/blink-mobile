@@ -2450,6 +2450,7 @@ const en: BaseTranslation = {
     willBeSentToMempoolBy: "Transaction should be submitted to mempool",
     amount: "Amount",
     addAmount: "Add amount",
+    lowFunds: "Low funds",
     amountExceed: "Amount exceeds your balance of {balance: string}",
     amountExceedsLimit: "Amount exceeds your remaining daily limit of {limit: string}",
     upgradeAccountToIncreaseLimit: "Upgrade your account to increase your limit",

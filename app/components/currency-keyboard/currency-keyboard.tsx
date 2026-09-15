@@ -145,9 +145,9 @@ const useStyles = makeStyles(({ colors }) => ({
     backgroundColor: colors.surfaceInteractive,
   },
   keyText: {
-    fontSize: 26,
     fontFamily: fonts.bold,
-    lineHeight: 30,
+    fontSize: 28,
+    lineHeight: 32,
     textAlign: "center",
   },
   backspaceIcon: {
