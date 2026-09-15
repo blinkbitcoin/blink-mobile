@@ -22,7 +22,7 @@ jest.mock("react-native-reanimated", () => ({
 }))
 
 const TRACK_WIDTH = 350
-const HANDLE_SIZE = 50
+const HANDLE_SIZE = 60
 const TRAVEL = TRACK_WIDTH - HANDLE_SIZE
 
 type Props = Partial<React.ComponentProps<typeof GaloySliderButton>>
@@ -42,7 +42,7 @@ const renderSlider = async (props: Props = {}) => {
     </ContextForScreen>,
   )
   fireEvent(screen.getByTestId(SLIDER_TRACK_TEST_ID), "layout", {
-    nativeEvent: { layout: { width: TRACK_WIDTH, height: 50, x: 0, y: 0 } },
+    nativeEvent: { layout: { width: TRACK_WIDTH, height: 60, x: 0, y: 0 } },
   })
   // Gesture handler queues config updates on the setImmediate it bound at import,
   // before fake timers were installed, so wait a real tick for the new width to land.
