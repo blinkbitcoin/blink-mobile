@@ -195,6 +195,14 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
     feePolicy: isUsdSend ? FeePolicy.FeesIncluded : undefined,
   }
 
+  /**
+   * The SDK refuses an idempotency key on any payment with a token leg. A dollar send
+   * converts USDB on the way out, and that transfer has no idempotency hook, so a key
+   * has the whole payment rejected as invalid input before anything is sent. The key is
+   * still generated and carried above so a bitcoin send's retries stay deduplicated.
+   */
+  const sendIdempotencyKey = isUsdSend ? undefined : idempotencyKey
+
   const sendPaymentAndGetFee: PaymentDetailSendPaymentGetFee<T> = settlementAmount.amount
     ? {
         canSendPayment: true,
@@ -211,7 +219,7 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
         sendPaymentMutation: async () => {
           try {
             const prepared = await prepareLnurl(sdk, prepareOptions)
-            const result = await executeLnurl(sdk, prepared, idempotencyKey)
+            const result = await executeLnurl(sdk, prepared, sendIdempotencyKey)
             return {
               status: PaymentSendResult.Success,
               transaction: { createdAt: Number(result.payment.timestamp) },

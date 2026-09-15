@@ -610,7 +610,7 @@ describe("createSelfCustodialLnurlPaymentDetails", () => {
       randomUUIDMock.mockRestore()
     })
 
-    it("forwards a defined idempotency key to executeLnurl on every send", async () => {
+    it("forwards a defined idempotency key to executeLnurl on a bitcoin send", async () => {
       mockPrepareLnurl.mockResolvedValue({ feeSats: BigInt(0) })
       mockExecuteLnurl.mockResolvedValue({
         payment: { id: "p1" },
@@ -625,6 +625,34 @@ describe("createSelfCustodialLnurlPaymentDetails", () => {
       const idempotencyKey = mockExecuteLnurl.mock.calls[0][2]
       expect(typeof idempotencyKey).toBe("string")
       expect(idempotencyKey.length).toBeGreaterThan(0)
+    })
+
+    /**
+     * The SDK rejects a key on any payment with a token leg, and a dollar send converts
+     * USDB on the way out, so with a key every dollar send failed as invalid input.
+     */
+    it("sends from the dollar wallet without a key, which the SDK refuses on a conversion", async () => {
+      mockPrepareLnurl.mockResolvedValue({ feeSats: BigInt(0) })
+      mockExecuteLnurl.mockResolvedValue({
+        payment: { id: "p1" },
+        successAction: undefined,
+      })
+      const detail = createSelfCustodialLnurlPaymentDetails(
+        createParams({
+          sendingWalletDescriptor: { id: "w-usd", currency: WalletCurrency.Usd },
+          unitOfAccountAmount: {
+            amount: 100,
+            currency: WalletCurrency.Usd,
+            currencyCode: "USD",
+          },
+        }),
+      )
+      if (!detail.canSendPayment) throw new Error("expected canSendPayment")
+
+      await detail.sendPaymentMutation({} as never)
+
+      expect(mockExecuteLnurl).toHaveBeenCalledTimes(1)
+      expect(mockExecuteLnurl.mock.calls[0][2]).toBeUndefined()
     })
 
     it("reuses the same idempotency key across retries within the same paymentDetail", async () => {
