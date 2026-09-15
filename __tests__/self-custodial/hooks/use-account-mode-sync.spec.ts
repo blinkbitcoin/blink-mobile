@@ -14,7 +14,7 @@ jest.mock("@app/self-custodial/lnurl-server-mode", () => ({
 }))
 
 let mockPersistentState: PersistentState = {
-  schemaVersion: 21,
+  schemaVersion: 22,
   galoyInstance: { id: "Main" },
   galoyAuthToken: "",
   activeAccountId: "sc-1",
@@ -69,7 +69,7 @@ describe("useAccountModeSync", () => {
     mockSdk = sdk
     mockConnectedAccountId = "sc-1"
     mockPersistentState = {
-      schemaVersion: 21,
+      schemaVersion: 22,
       galoyInstance: { id: "Main" },
       galoyAuthToken: "",
       activeAccountId: "sc-1",
@@ -202,23 +202,19 @@ describe("useAccountModeSync", () => {
       expect(getSelfCustodialServerAccountMode(state, "sc-1")).toBe(AccountMode.Anon)
     })
 
-    it("settles on Enhanced when the server holds none", async () => {
+    /**
+     * AD-25. This recovery path used to write Enhanced when the server held no mode — the
+     * fail-open the whole mode design exists to prevent, in the one file the earlier
+     * drafts did not read. A null answer now settles nothing: the account stays mode-less
+     * until the user picks, and nothing downstream reads a default as a choice.
+     */
+    it("settles nothing when the server holds none", async () => {
       renderHook(() => useAccountModeSync())
 
       await waitFor(() => expect(mockUpdateState).toHaveBeenCalledTimes(1))
 
       const state = mockUpdateState.mock.calls[0][0](mockPersistentState)
-      expect(getSelfCustodialAccountMode(state)).toBe(AccountMode.Enhanced)
-    })
-
-    /** Left unconfirmed on purpose: the server never said Enhanced, so it is still owed
-     *  that push. */
-    it("leaves an assumed Enhanced unconfirmed so the push still happens", async () => {
-      renderHook(() => useAccountModeSync())
-
-      await waitFor(() => expect(mockUpdateState).toHaveBeenCalledTimes(1))
-
-      const state = mockUpdateState.mock.calls[0][0](mockPersistentState)
+      expect(getSelfCustodialAccountMode(state)).toBeNull()
       expect(getSelfCustodialServerAccountMode(state, "sc-1")).toBeNull()
     })
 

@@ -1,5 +1,6 @@
 import crashlytics from "@react-native-firebase/crashlytics"
 
+import { mayTransmitDiagnostics } from "@app/telemetry"
 import { RecordAppErrorOptions, recordAppError } from "@app/utils/error-reporting"
 
 export const recordErrorOnce = (
@@ -33,19 +34,29 @@ const toSdkLogLevel = (level: string): SdkLogLevel =>
 // so each distinct message shape records at most one non-fatal per session.
 const sdkErrorDedupKey = (msg: string): string => msg.replace(/\d+/g, "#").slice(0, 200)
 
+/**
+ * SDK log lines leave the device only from a `Custodial` or `Enhanced` one (AD-13, ruled
+ * onto this file by AD-30). An SDK line routinely carries payment ids and amounts, and a
+ * Crashlytics breadcrumb or non-fatal is a transmission with a device-stable installation
+ * id on it — from an `Anon` or `Unresolved` device that is the telemetry NFR-P1 says must
+ * be zero, whatever product sends it. The console still gets everything, so a device in
+ * hand can be debugged; what changes is what a device out of hand sends home.
+ */
 const logDispatch: Record<SdkLogLevel, (msg: string) => void> = {
   [SdkLogLevel.Debug]: (msg) => console.debug(msg),
   [SdkLogLevel.Info]: (msg) => {
     console.debug(msg)
-    crashlytics().log(msg)
+    if (mayTransmitDiagnostics()) crashlytics().log(msg)
   },
   [SdkLogLevel.Warn]: (msg) => {
     console.warn(msg)
-    crashlytics().log(msg)
+    if (mayTransmitDiagnostics()) crashlytics().log(msg)
   },
   [SdkLogLevel.Error]: (msg) => {
     console.error(msg)
-    recordAppError(new Error(msg), { dedupKey: sdkErrorDedupKey(msg) })
+    if (mayTransmitDiagnostics()) {
+      recordAppError(new Error(msg), { dedupKey: sdkErrorDedupKey(msg) })
+    }
   },
 }
 

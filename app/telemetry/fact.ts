@@ -1,5 +1,6 @@
 import {
   TelemetryEvent,
+  type BackupMethod,
   type RailType,
   type TelemetryConversionDirection,
   type TelemetryDirection,
@@ -19,34 +20,53 @@ import {
  * The hazard is prohibited data in *producer* scope, so the projection is the producer's
  * job — see `app/self-custodial/measurement.ts` — and this type is its enforcement. That
  * is also what makes NFR-P5 true: a reviewer can enumerate everything capable of leaving
- * the device by reading this file.
+ * the device by reading this file and `contract.ts`.
+ *
+ * Q10, answered: one fact type, a discriminated union with one variant per contract row.
+ * The legacy events (AD-24) and the loss event (AD-31) fit it without a second type — each
+ * variant's keys are the camelCase spelling of its row's parameters, and a test holds the
+ * two in lockstep.
  */
+
+type Common = {
+  telemetryEventId: TelemetryEventId
+  walletProvider: WalletProvider
+}
+
 export type TelemetryFact =
-  | {
+  | (Common & {
       event: typeof TelemetryEvent.PaymentSettled
-      telemetryEventId: TelemetryEventId
-      walletProvider: WalletProvider
       direction: TelemetryDirection
       railType: RailType
-    }
-  | {
+    })
+  | (Common & {
       event: typeof TelemetryEvent.ConversionSettled
-      telemetryEventId: TelemetryEventId
-      walletProvider: WalletProvider
       conversionDirection: TelemetryConversionDirection
-    }
-  | {
-      event: typeof TelemetryEvent.ReferralCompleted
-      telemetryEventId: TelemetryEventId
-      walletProvider: WalletProvider
-    }
+    })
+  | (Common & { event: typeof TelemetryEvent.ReferralCompleted })
+  | (Common & {
+      event: typeof TelemetryEvent.BackupCompleted
+      backupMethod: BackupMethod
+    })
+  | (Common & { event: typeof TelemetryEvent.RestoreCompleted })
+  | (Common & {
+      event: typeof TelemetryEvent.StableBalanceActivated
+      label: "USDB"
+    })
+  | (Common & {
+      event: typeof TelemetryEvent.RolloutExposed
+      nonCustodialEnabled: boolean
+      stableBalanceEnabled: boolean
+      hasCustodialAccount: boolean
+    })
+  | (Common & {
+      event: typeof TelemetryEvent.LossReported
+      expired: number
+      evicted: number
+      rejected: number
+      parseFailed: number
+    })
 
-/** The union's key set, flattened — what a test asserts against the §5.3 allowlist. */
-export const TELEMETRY_FACT_KEYS: readonly string[] = [
-  "event",
-  "telemetryEventId",
-  "walletProvider",
-  "direction",
-  "railType",
-  "conversionDirection",
-]
+/** camelCase → the contract's snake_case wire name. `parseFailed` → `parse_failed`. */
+export const wireNameOf = (key: string): string =>
+  key.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`)

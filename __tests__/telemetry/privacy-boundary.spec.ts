@@ -15,12 +15,20 @@ import analytics from "@react-native-firebase/analytics"
 import RNFS from "react-native-fs"
 import Crypto from "react-native-quick-crypto"
 
+import {
+  logSelfCustodialBackupCompleted,
+  logSelfCustodialRolloutExposed,
+} from "@app/self-custodial/analytics"
 import { logPaymentSettled, logReferralCompleted } from "@app/self-custodial/measurement"
 import { RailType, TelemetryDirection } from "@app/telemetry/contract"
 import {
   getDiagnosticCounters,
   resetDiagnosticsForTesting,
 } from "@app/telemetry/diagnostics"
+import {
+  resetEnablementForTesting,
+  setTelemetryRolloutEnabled,
+} from "@app/telemetry/enablement"
 import { setActiveOutbox } from "@app/telemetry/index"
 import {
   initializeTelemetryGate,
@@ -29,7 +37,7 @@ import {
   resolveTelemetryMode,
   TelemetryMode,
 } from "@app/telemetry/mode"
-import { drainOutbox } from "@app/telemetry/outbox/drain"
+import { drainOutbox, resetDrainStateForTesting } from "@app/telemetry/outbox/drain"
 import {
   createOutboxStore,
   resetOutboxCountersForTesting,
@@ -37,10 +45,11 @@ import {
 import {
   registerTelemetryTransport,
   resetTelemetryTransportForTesting,
-  type TransportResult,
+  type SubmitResult,
 } from "@app/telemetry/transport"
 
 const setCollectionEnabled = analytics().setAnalyticsCollectionEnabled as jest.Mock
+const logEvent = analytics().logEvent as jest.Mock
 const setUserId = analytics().setUserId as jest.Mock
 const randomUUID = Crypto.randomUUID as jest.Mock
 
@@ -123,6 +132,9 @@ describe("the telemetry privacy boundary", () => {
     resetTelemetryTransportForTesting()
     resetOutboxCountersForTesting()
     resetDiagnosticsForTesting()
+    resetDrainStateForTesting()
+    resetEnablementForTesting()
+    setTelemetryRolloutEnabled(true)
 
     store = createOutboxStore(DIR_A)
     setActiveOutbox(store)
@@ -229,12 +241,13 @@ describe("the telemetry privacy boundary", () => {
       await settle()
 
       const submit = jest
-        .fn<Promise<TransportResult>, unknown[]>()
-        .mockResolvedValueOnce({ outcome: "unavailable" })
-        .mockResolvedValue({ outcome: "acknowledged" })
+        .fn<Promise<SubmitResult>, unknown[]>()
+        .mockResolvedValueOnce({ kind: "retryable", retryAfterMs: 0 })
+        .mockResolvedValue({ kind: "acknowledged", ackedAt: 1 })
       registerTelemetryTransport({
         name: "flaky",
-        attachesPerEventIdentity: false,
+        ackSemantics: "application",
+        attachesNoImplicitIdentity: true,
         submit,
       })
 
@@ -245,10 +258,81 @@ describe("the telemetry privacy boundary", () => {
 
       expect(await queued(store)).toEqual([])
       const ids = submit.mock.calls.map(
-        ([, payload]) => (payload as Record<string, string>).telemetry_event_id,
+        ([payload]) =>
+          (payload as { params: Record<string, string> }).params.telemetry_event_id,
       )
       expect(ids).toHaveLength(2)
       expect(new Set(ids).size).toBe(1)
+    })
+  })
+
+  describe("CD-7 — the carrier is chosen from the mode, never by the producer", () => {
+    it("hands a Custodial contract event to GA4 and files nothing in the outbox", async () => {
+      await resolveTelemetryMode(TelemetryMode.Custodial)
+
+      logSelfCustodialRolloutExposed({
+        nonCustodialEnabled: true,
+        stableBalanceEnabled: false,
+        hasCustodialAccount: true,
+      })
+
+      expect(logEvent).toHaveBeenCalledWith(
+        "self_custodial_rollout_exposed",
+        expect.objectContaining({
+          wallet_provider: "custodial",
+          non_custodial_enabled: true,
+          stable_balance_enabled: false,
+          has_custodial_account: true,
+        }),
+      )
+      expect(await queued(store)).toEqual([])
+    })
+
+    it("files an Enhanced contract event in the outbox and never calls GA4", async () => {
+      await resolveTelemetryMode(TelemetryMode.Enhanced)
+
+      logPaymentSettled(payment())
+
+      expect(logEvent).not.toHaveBeenCalled()
+      expect(await queued(store)).toHaveLength(1)
+    })
+
+    it("attaches no identifier to what GA4 is handed beyond the contract's own fields", async () => {
+      await resolveTelemetryMode(TelemetryMode.Custodial)
+
+      logSelfCustodialBackupCompleted({ backupMethod: "manual" })
+
+      const [, params] = logEvent.mock.calls[0]
+      expect(Object.keys(params).sort()).toEqual([
+        "backup_method",
+        "event_version",
+        "telemetry_event_id",
+        "wallet_provider",
+      ])
+    })
+  })
+
+  describe("AD-24 — the legacy events are gated by their row, pending review", () => {
+    it("suppresses a legacy event on Enhanced because its row does not admit it yet", async () => {
+      await resolveTelemetryMode(TelemetryMode.Enhanced)
+
+      logSelfCustodialBackupCompleted({ backupMethod: "manual" })
+
+      expect(await queued(store)).toEqual([])
+      expect(logEvent).not.toHaveBeenCalled()
+      expect(getDiagnosticCounters().suppressedEvents).toBe(1)
+
+      // Anchor: a settlement on the same device does land, so the silence is the row's.
+      expect(await enhancedCaptures()).toBe(1)
+    })
+
+    it("emits nothing at all while no mode is resolved", async () => {
+      await initializeTelemetryGate()
+
+      logSelfCustodialBackupCompleted({ backupMethod: "keychain" })
+
+      expect(logEvent).not.toHaveBeenCalled()
+      expect(await queued(store)).toEqual([])
     })
   })
 

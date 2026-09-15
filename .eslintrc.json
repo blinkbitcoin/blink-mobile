@@ -142,8 +142,8 @@
     "no-restricted-syntax": [
       "error",
       {
-        "selector": "CallExpression[callee.property.name=/^(setUserId|setUserProperty|setUserProperties)$/]",
-        "message": "User-scoped analytics identity belongs in app/telemetry/platform-analytics.ts, which the mode gate can clear when a self-custodial account activates. Firebase merges it into every later event, so an uncleared identifier leaks into events no call site touched."
+        "selector": "CallExpression[callee.property.name=/^(setUserId|setUserProperty|setUserProperties|setAnalyticsCollectionEnabled)$/]",
+        "message": "User-scoped analytics identity and the collection switch belong in app/telemetry/platform-analytics.ts, where the mode gate controls them. Firebase merges identity into every later event, and a screen that toggles collection bypasses the gate entirely (AD-16, AD-29)."
       }
     ],
     "no-return-assign": "error",
@@ -252,7 +252,6 @@
         "app/screens/phone-auth-screen/phone-login-validation.tsx",
         "app/screens/telegram-login-screen/telegram-auth.ts",
         "app/screens/totp-screen/totp-login-validate.tsx",
-        "app/self-custodial/analytics.ts",
         "app/utils/analytics.ts",
         "app/utils/storage/secure-store-migration.ts"
       ],

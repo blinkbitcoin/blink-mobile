@@ -1,9 +1,11 @@
-import { isContractEvent } from "./contract"
+import { contractRowFor, type EmittingMode } from "./contract"
 import {
   countSuppressedEvent,
+  recordModeResolutionLatency,
   reportBoundaryFault,
   setDiagnosticsTransmissible,
 } from "./diagnostics"
+import { isTelemetryEnabled } from "./enablement"
 import {
   clearCustodialAnalyticsIdentity,
   setPlatformCollectionEnabled,
@@ -19,10 +21,12 @@ import {
  * for an account that never answered, and gating on it would invert FR-6, whose whole
  * content is that failure must never fall back to enabled.
  *
- * The gate is two-dimensional: **mode × whether the event is in the contract** (FR-70).
- * The axis is deliberately not "boundary-emitted versus platform-automatic" — FR-2 puts
- * every call behind the boundary, at which point that distinction collapses. The contract
- * enumerates three events; everything else is a non-contract event whatever emitted it.
+ * The gate is two-dimensional: **mode × the contract row's `modes` column** (FR-70,
+ * AD-24). The axis is deliberately not "boundary-emitted versus platform-automatic" — FR-2
+ * puts every call behind the boundary, at which point that distinction collapses. An event
+ * with a row is permitted where the row says; everything else is a non-contract event
+ * whatever emitted it, permitted on Custodial alone. For the three settlement events the
+ * table reads:
  *
  * | mode       | contract events | non-contract events | platform collection |
  * |------------|-----------------|---------------------|---------------------|
@@ -57,10 +61,22 @@ export const ActiveAccountKind = {
 
 export type ActiveAccountKind = (typeof ActiveAccountKind)[keyof typeof ActiveAccountKind]
 
+export type SelfCustodialModeAnswer = "enhanced" | "anon" | null
+
 export type TelemetryModeInputs = {
   activeAccount: ActiveAccountKind
-  /** The active self-custodial account's stored mode. `null` means it never answered. */
-  selfCustodialMode: "enhanced" | "anon" | null
+  /**
+   * AD-25's three named inputs, for the active self-custodial account:
+   *
+   *  - `persistedMode` — what this device holds, chosen on this device or recovered onto
+   *    it. After AD-25 it is never a default: a null server answer no longer writes
+   *    Enhanced into it.
+   *  - `serverMode` — the LNURL server's last answer, as the sync hook recorded it.
+   *  - neither — the account has never held a mode anywhere this device can see, or the
+   *    hook's request is still in flight.
+   */
+  persistedMode: SelfCustodialModeAnswer
+  serverMode: SelfCustodialModeAnswer
   /** Whether the remote config behind the self-custody rollout was actually fetched. */
   remoteConfigTrusted: boolean
   /** Whether this device holds a self-custodial account at all. */
@@ -70,14 +86,22 @@ export type TelemetryModeInputs = {
 /**
  * Pure, and the whole of the default-deny rule.
  *
- * Two cases earn their comments. A self-custodial account with **no stored mode** resolves
- * `Unresolved`, not `Enhanced`: the settings row reads an unset mode as Enhanced so it has
- * something to display, but §5.7 asks for a *positive* resolution and "we never asked, so
- * we assumed consent" is not one. Such an account stays silent until `useAccountModeSync`
- * recovers its real mode from the LNURL server.
+ * For a self-custodial account the two mode inputs combine with **deny winning in both
+ * directions**. AD-25 states the precedence as *server > persisted > none*; read literally
+ * that would resolve Enhanced during the window after a user switches to incognito here
+ * and before the push lands, while the server's stale answer still says Enhanced — the
+ * exact window a switch is meant to close. So an Anon from either input is Anon; Enhanced
+ * needs a positive Enhanced from either and no Anon from the other; and nothing from
+ * either — never asked, in flight, or the server holding no mode — is `Unresolved`. The
+ * server still overrides a stale persisted Enhanced with Anon, which is the multi-device
+ * case the precedence exists for.
  *
- * And a custodial account active on an **untrusted** remote config resolves `Unresolved`
- * if the device holds a self-custodial account at all. The rollout flag defaults to `off`,
+ * A **null server answer is Unresolved, never Enhanced.** The settings row reads an unset
+ * mode as Enhanced so it has something to display; §5.7 asks for a *positive* resolution,
+ * and "we never asked, so we assumed consent" is not one.
+ *
+ * A custodial account active on an **untrusted** remote config resolves `Unresolved` if
+ * the device holds a self-custodial account at all. The rollout flag defaults to `off`,
  * `remoteConfigReady` is set in a `finally` regardless of whether the fetch threw, and
  * `useSelfCustodialRollback` swaps the active account to a custodial fallback on that
  * default — so a failed fetch could otherwise turn full platform collection on for someone
@@ -86,13 +110,16 @@ export type TelemetryModeInputs = {
  */
 export const deriveTelemetryMode = ({
   activeAccount,
-  selfCustodialMode,
+  persistedMode,
+  serverMode,
   remoteConfigTrusted,
   hasSelfCustodialAccount,
 }: TelemetryModeInputs): TelemetryMode => {
   if (activeAccount === ActiveAccountKind.SelfCustodial) {
-    if (selfCustodialMode === "enhanced") return TelemetryMode.Enhanced
-    if (selfCustodialMode === "anon") return TelemetryMode.Anon
+    if (persistedMode === "anon" || serverMode === "anon") return TelemetryMode.Anon
+    if (persistedMode === "enhanced" || serverMode === "enhanced") {
+      return TelemetryMode.Enhanced
+    }
     return TelemetryMode.Unresolved
   }
 
@@ -161,6 +188,12 @@ const applyMode = async (mode: TelemetryMode): Promise<void> => {
 export const resolveTelemetryMode = (mode: TelemetryMode): Promise<void> => {
   if (mode === currentMode) return applying
 
+  /** AD-30: how long the device sat in `Unresolved` after the gate was initialised. */
+  if (currentMode === TelemetryMode.Unresolved && initialisedAt !== null) {
+    recordModeResolutionLatency(Date.now() - initialisedAt)
+    initialisedAt = null
+  }
+
   currentMode = mode
   setDiagnosticsTransmissible(!isSuppressedMode(mode))
 
@@ -174,8 +207,11 @@ export const resolveTelemetryMode = (mode: TelemetryMode): Promise<void> => {
  * Custodial last run starts this one collecting — and the window before the real mode
  * resolves is exactly when a user who has since switched to incognito would leak.
  */
+let initialisedAt: number | null = null
+
 export const initializeTelemetryGate = (): Promise<void> => {
   currentMode = TelemetryMode.Unresolved
+  initialisedAt = Date.now()
   setDiagnosticsTransmissible(false)
   applying = applying.then(() => applyMode(TelemetryMode.Unresolved))
   return applying
@@ -199,21 +235,32 @@ export const whenModeSettled = (): Promise<void> => applying
  * which is why `TelemetryFact` needs no origin field.
  */
 export const isEventPermitted = (event: string): boolean => {
-  const permitted = isContractEvent(event)
-    ? currentMode === TelemetryMode.Custodial || currentMode === TelemetryMode.Enhanced
-    : currentMode === TelemetryMode.Custodial
-
+  const permitted = isTelemetryEnabled() && isEventPermittedInMode(event, currentMode)
   if (!permitted) countSuppressedEvent()
   return permitted
+}
+
+/**
+ * The second axis, read off the contract row's `modes` column (AD-24). A contract event is
+ * permitted where its row says so; a non-contract event — anything not in the table,
+ * whatever emitted it — is permitted on Custodial alone (FR-70). Neither `Anon` nor
+ * `Unresolved` appears in any row, so they permit nothing.
+ */
+const isEventPermittedInMode = (event: string, mode: TelemetryMode): boolean => {
+  const row = contractRowFor(event)
+  if (!row) return mode === TelemetryMode.Custodial
+  return row.modes.includes(mode as EmittingMode)
 }
 
 /** The drain is gated too, not just capture (AD-5). An account can queue events, switch to
  *  incognito while inactive and flush them on next activation — which is flush-then-discard
  *  by the back door, and FR-5 prohibits it outright. */
-export const isDrainPermitted = (): boolean => currentMode === TelemetryMode.Enhanced
+export const isDrainPermitted = (): boolean =>
+  isTelemetryEnabled() && currentMode === TelemetryMode.Enhanced
 
 export const resetTelemetryModeForTesting = (): void => {
   currentMode = TelemetryMode.Unresolved
+  initialisedAt = null
   applying = Promise.resolve()
   suppressionListeners.clear()
   setDiagnosticsTransmissible(false)

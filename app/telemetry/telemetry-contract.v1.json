@@ -1,0 +1,250 @@
+{
+  "contractVersion": 1,
+  "generatedFrom": "app/telemetry/contract.ts",
+  "events": [
+    {
+      "name": "payment_settled",
+      "version": 1,
+      "modes": [
+        "custodial",
+        "enhanced"
+      ],
+      "params": {
+        "event_version": {
+          "kind": "schema_version"
+        },
+        "wallet_provider": {
+          "kind": "enum",
+          "values": [
+            "custodial",
+            "spark"
+          ]
+        },
+        "telemetry_event_id": {
+          "kind": "uuid_v4"
+        },
+        "direction": {
+          "kind": "enum",
+          "values": [
+            "send",
+            "receive"
+          ]
+        },
+        "rail_type": {
+          "kind": "enum",
+          "values": [
+            "lightning",
+            "spark",
+            "onchain",
+            "unknown"
+          ]
+        }
+      }
+    },
+    {
+      "name": "conversion_settled",
+      "version": 1,
+      "modes": [
+        "custodial",
+        "enhanced"
+      ],
+      "params": {
+        "event_version": {
+          "kind": "schema_version"
+        },
+        "wallet_provider": {
+          "kind": "enum",
+          "values": [
+            "custodial",
+            "spark"
+          ]
+        },
+        "telemetry_event_id": {
+          "kind": "uuid_v4"
+        },
+        "conversion_direction": {
+          "kind": "enum",
+          "values": [
+            "usd_to_btc",
+            "btc_to_usd"
+          ]
+        }
+      }
+    },
+    {
+      "name": "referral_completed",
+      "version": 1,
+      "modes": [
+        "custodial",
+        "enhanced"
+      ],
+      "params": {
+        "event_version": {
+          "kind": "schema_version"
+        },
+        "wallet_provider": {
+          "kind": "enum",
+          "values": [
+            "custodial",
+            "spark"
+          ]
+        },
+        "telemetry_event_id": {
+          "kind": "uuid_v4"
+        }
+      }
+    },
+    {
+      "name": "self_custodial_backup_completed",
+      "version": 1,
+      "modes": [
+        "custodial"
+      ],
+      "params": {
+        "event_version": {
+          "kind": "schema_version"
+        },
+        "wallet_provider": {
+          "kind": "enum",
+          "values": [
+            "custodial",
+            "spark"
+          ]
+        },
+        "telemetry_event_id": {
+          "kind": "uuid_v4"
+        },
+        "backup_method": {
+          "kind": "enum",
+          "values": [
+            "manual",
+            "google_drive",
+            "icloud",
+            "keychain"
+          ]
+        }
+      },
+      "review": "AD-24: pending privacy review; Custodial-only until it passes"
+    },
+    {
+      "name": "self_custodial_restore_completed",
+      "version": 1,
+      "modes": [
+        "custodial"
+      ],
+      "params": {
+        "event_version": {
+          "kind": "schema_version"
+        },
+        "wallet_provider": {
+          "kind": "enum",
+          "values": [
+            "custodial",
+            "spark"
+          ]
+        },
+        "telemetry_event_id": {
+          "kind": "uuid_v4"
+        }
+      },
+      "review": "AD-24: pending privacy review; Custodial-only until it passes"
+    },
+    {
+      "name": "self_custodial_stable_balance_activated",
+      "version": 1,
+      "modes": [
+        "custodial"
+      ],
+      "params": {
+        "event_version": {
+          "kind": "schema_version"
+        },
+        "wallet_provider": {
+          "kind": "enum",
+          "values": [
+            "custodial",
+            "spark"
+          ]
+        },
+        "telemetry_event_id": {
+          "kind": "uuid_v4"
+        },
+        "label": {
+          "kind": "enum",
+          "values": [
+            "USDB"
+          ]
+        }
+      },
+      "review": "AD-24: pending privacy review; Custodial-only until it passes"
+    },
+    {
+      "name": "self_custodial_rollout_exposed",
+      "version": 1,
+      "modes": [
+        "custodial"
+      ],
+      "params": {
+        "event_version": {
+          "kind": "schema_version"
+        },
+        "wallet_provider": {
+          "kind": "enum",
+          "values": [
+            "custodial",
+            "spark"
+          ]
+        },
+        "telemetry_event_id": {
+          "kind": "uuid_v4"
+        },
+        "non_custodial_enabled": {
+          "kind": "boolean"
+        },
+        "stable_balance_enabled": {
+          "kind": "boolean"
+        },
+        "has_custodial_account": {
+          "kind": "boolean"
+        }
+      },
+      "review": "AD-24: pending privacy review; Custodial-only until it passes"
+    },
+    {
+      "name": "telemetry_loss_reported",
+      "version": 1,
+      "modes": [
+        "custodial",
+        "enhanced"
+      ],
+      "params": {
+        "event_version": {
+          "kind": "schema_version"
+        },
+        "wallet_provider": {
+          "kind": "enum",
+          "values": [
+            "custodial",
+            "spark"
+          ]
+        },
+        "telemetry_event_id": {
+          "kind": "uuid_v4"
+        },
+        "expired": {
+          "kind": "count"
+        },
+        "evicted": {
+          "kind": "count"
+        },
+        "rejected": {
+          "kind": "count"
+        },
+        "parse_failed": {
+          "kind": "count"
+        }
+      },
+      "review": "AD-31: accepted 2026-09-14 subject to FR-18 / NFR-P8 privacy review, because it adds an event to a closed allowlist"
+    }
+  ]
+}

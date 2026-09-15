@@ -1,7 +1,10 @@
-import React, { useEffect } from "react"
+import React, { useCallback, useEffect } from "react"
+import { AppState } from "react-native"
 
 import { useFeatureFlags } from "@app/config/feature-flags-context"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
+import { usePersistentStateContext } from "@app/store/persistent-state"
+import { getSelfCustodialServerAccountMode } from "@app/store/persistent-state/self-custodial-server-account-mode"
 import {
   ActiveAccountKind,
   createOutboxStore,
@@ -9,17 +12,26 @@ import {
   drainActiveOutbox,
   onTelemetrySuppressed,
   resolveTelemetryMode,
+  restoreKillSwitch,
   setActiveOutbox,
+  setEmissionListener,
+  setTelemetryRolloutEnabled,
+  TelemetryMode,
+  type SelfCustodialModeAnswer,
 } from "@app/telemetry"
+import { onKillSwitchEngaged } from "@app/telemetry/enablement"
 import { AccountMode } from "@app/types/account"
-import { AccountType } from "@app/types/wallet"
+import { AccountType, ActiveWalletStatus } from "@app/types/wallet"
 
 import { telemetryOutboxDirFor } from "../config"
 import { useSelfCustodialAccountMode } from "../hooks/use-self-custodial-account-mode"
 import { useSparkNetwork } from "../hooks/use-spark-network"
 
+import { useSelfCustodialWallet } from "./wallet"
+
 /**
- * Owns the outbox and the drain (AD-14), and resolves the mode that gates both.
+ * Owns the outbox and the drain (AD-14), resolves the mode that gates both (AD-25), and
+ * holds the two switches in front of the gate (AD-28, AD-30).
  *
  * It lives here rather than in `useSdkLifecycle` because that hook is already 370 lines
  * carrying three refresh triggers and a reconnect loop, and privacy-critical logic landing
@@ -28,22 +40,61 @@ import { useSparkNetwork } from "../hooks/use-spark-network"
  *
  * The ordering here is load-bearing, and it is the FR-5 rule in code:
  *
- *  1. the store for the newly active account is mounted **first**, and its discard is
- *     registered with the gate;
+ *  1. the store for the newly active account is mounted **first**, its discard is
+ *     registered with the gate, and any discard the previous run left unfinished — the
+ *     `.discard` marker, or a queue under a mode that may not hold one — is finished now
+ *     (AD-26);
  *  2. only then is the mode resolved, so an account that switched to incognito while it was
  *     inactive has its queue discarded on activation — before anything can drain it. That
  *     path is flush-then-discard by the back door, and it is the one AD-5 exists to close.
+ *
+ * The drain's triggers are exactly AD-26's three — SDK connect, a successful emission, and
+ * app foreground — and it never subscribes to the 10 s connectivity poll. Each trigger
+ * asks first whether the SDK is connected for this account and the wallet is online; the
+ * mode gate and the switches are the drain's own to check.
  */
 export const SelfCustodialTelemetryMount: React.FC = () => {
   const { activeAccount, selfCustodialEntries } = useAccountRegistry()
   const { accountMode } = useSelfCustodialAccountMode()
-  const { remoteConfigTrusted } = useFeatureFlags()
+  const { persistentState, updateState } = usePersistentStateContext()
+  const { remoteConfigTrusted, telemetryEnabled } = useFeatureFlags()
+  const { connectedAccountId, status } = useSelfCustodialWallet()
   const network = useSparkNetwork()
 
   const accountType = activeAccount?.type
   const accountId =
     accountType === AccountType.SelfCustodial ? activeAccount?.id ?? null : null
   const hasSelfCustodialAccount = selfCustodialEntries.length > 0
+
+  const serverMode = accountId
+    ? getSelfCustodialServerAccountMode(persistentState, accountId)
+    : null
+
+  const mode = deriveTelemetryMode({
+    activeAccount: toActiveAccountKind(accountType),
+    persistedMode: toModeAnswer(accountMode),
+    serverMode: toModeAnswer(serverMode),
+    remoteConfigTrusted,
+    hasSelfCustodialAccount,
+  })
+
+  /** AD-28 / AD-30: both switches sit in front of the gate, and both default to off. */
+  const killSwitchEngaged = persistentState.telemetryKillSwitchEngaged === true
+  useEffect(() => {
+    restoreKillSwitch(killSwitchEngaged)
+  }, [killSwitchEngaged])
+
+  useEffect(() => {
+    setTelemetryRolloutEnabled(telemetryEnabled)
+  }, [telemetryEnabled])
+
+  useEffect(
+    () =>
+      onKillSwitchEngaged(() => {
+        updateState((prev) => prev && { ...prev, telemetryKillSwitchEngaged: true })
+      }),
+    [updateState],
+  )
 
   useEffect(() => {
     if (!accountId) {
@@ -53,46 +104,68 @@ export const SelfCustodialTelemetryMount: React.FC = () => {
 
     const store = createOutboxStore(telemetryOutboxDirFor(accountId, network))
     setActiveOutbox(store)
-
-    /** Idempotent, and re-run on every activation: neither `unlink` nor a per-file delete
-     *  is atomic, so a discard interrupted last session is finished now (AD-6). */
     const unsubscribe = onTelemetrySuppressed(() => store.discardAll())
+
+    /**
+     * AD-26: finish what the last run started. Neither RNFS primitive is atomic, so a
+     * discard that died halfway leaves records behind — and its marker. A queue under a
+     * mode that may not hold one is discarded here too, whether or not a marker exists:
+     * `resolveTelemetryMode` is a no-op when the mode has not changed, so a cold start
+     * straight into `Unresolved` would otherwise never fire the suppression listener.
+     */
+    store
+      .hasPendingDiscard()
+      .then((pending) => {
+        if (pending || isSuppressedMode(mode)) return store.discardAll()
+        return undefined
+      })
+      .catch(() => undefined)
 
     return () => {
       unsubscribe()
       setActiveOutbox(null)
     }
+    // The mode is read once, at mount, on purpose: a later change reaches the store
+    // through the suppression listener registered above.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [accountId, network])
 
   useEffect(() => {
-    resolveTelemetryMode(
-      deriveTelemetryMode({
-        activeAccount: toActiveAccountKind(accountType),
-        selfCustodialMode: toSelfCustodialMode(accountMode),
-        remoteConfigTrusted,
-        hasSelfCustodialAccount,
-      }),
-    )
-  }, [accountType, accountMode, remoteConfigTrusted, hasSelfCustodialAccount])
+    resolveTelemetryMode(mode)
+  }, [mode])
 
-  useEffect(() => {
-    if (!accountId) return
+  const sdkConnectedForAccount = Boolean(accountId) && connectedAccountId === accountId
+  const walletOnline = status !== ActiveWalletStatus.Offline
 
+  const drainIfAble = useCallback(() => {
+    if (!sdkConnectedForAccount || !walletOnline) return
     drainActiveOutbox()
-    const timer = setInterval(() => {
-      drainActiveOutbox()
-    }, DRAIN_INTERVAL_MS)
+  }, [sdkConnectedForAccount, walletOnline])
 
-    return () => clearInterval(timer)
-  }, [accountId, accountMode])
+  /** Trigger 1: SDK connect. */
+  useEffect(() => {
+    drainIfAble()
+  }, [drainIfAble])
+
+  /** Trigger 2: a successful emission. */
+  useEffect(() => {
+    setEmissionListener(drainIfAble)
+    return () => setEmissionListener(null)
+  }, [drainIfAble])
+
+  /** Trigger 3: app foreground. */
+  useEffect(() => {
+    const subscription = AppState.addEventListener("change", (next) => {
+      if (next === "active") drainIfAble()
+    })
+    return () => subscription.remove()
+  }, [drainIfAble])
 
   return null
 }
 
-/** Long enough that the drain is not a proxy for what the user is doing, short enough to
- *  meet SM-6's ≤24h freshness with room to spare. The submission order and spacing inside a
- *  drain are randomised by the drain itself (AD-22). */
-const DRAIN_INTERVAL_MS = 5 * 60 * 1000
+const isSuppressedMode = (mode: TelemetryMode): boolean =>
+  mode === TelemetryMode.Anon || mode === TelemetryMode.Unresolved
 
 const toActiveAccountKind = (type: AccountType | undefined): ActiveAccountKind => {
   if (type === AccountType.SelfCustodial) return ActiveAccountKind.SelfCustodial
@@ -100,7 +173,7 @@ const toActiveAccountKind = (type: AccountType | undefined): ActiveAccountKind =
   return ActiveAccountKind.None
 }
 
-const toSelfCustodialMode = (mode: AccountMode | null): "enhanced" | "anon" | null => {
+const toModeAnswer = (mode: AccountMode | null): SelfCustodialModeAnswer => {
   if (mode === AccountMode.Enhanced) return "enhanced"
   if (mode === AccountMode.Anon) return "anon"
   return null

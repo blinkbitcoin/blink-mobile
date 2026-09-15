@@ -1,36 +1,60 @@
 import RNFS from "react-native-fs"
 
+import { eventVersionOf } from "../contract"
 import { reportBoundaryFault } from "../diagnostics"
 
+import {
+  OUTBOX_MAX_RECORDS,
+  OUTBOX_SCHEMA_VERSIONS_TOLERATED,
+  OUTBOX_TTL_MS,
+} from "./config"
 import { dedupKeyFor, OutboxState, parseOutboxRecord, type OutboxRecord } from "./record"
 
 /**
- * The outbox store (AD-6, AD-18): a dedicated directory, one per `(accountId, network)`,
- * **sibling to the wallet store and never inside it**. `storageDirFor` is the Breez wallet
- * directory, and its only existing pairing with `unlink` is account deletion — discarding
- * an outbox against that path would destroy live wallet state.
+ * The outbox store (AD-6, AD-18, AD-26): a dedicated directory, one per `(accountId,
+ * network)`, **sibling to the wallet store and never inside it**. `storageDirFor` is the
+ * Breez wallet directory, and its only existing pairing with `unlink` is account deletion —
+ * discarding an outbox against that path would destroy live wallet state.
  *
  * AsyncStorage is not used either: discard there is a `getAllKeys` prefix sweep, which is
- * the partial-delete failure this store exists to avoid. Neither primitive is atomic, so
- * discard is idempotent and re-run on activation.
+ * the partial-delete failure this store exists to avoid.
  *
- * One file per record, named by its dedup key, so a second callback for the same settlement
- * finds the file present and writes nothing.
+ * Layout:
+ *
+ *   <dir>/<dedup-key>.json      one file per record
+ *   <dir>/<dedup-key>.json.tmp  a write in progress; never read back
+ *   <dir>/loss.json             the unreported loss counters (AD-31)
+ *   <dir>/.discard              a discard in progress (AD-26)
+ *
+ * Every record is written to a temp name and renamed into place, so a crash mid-write
+ * leaves a `.tmp` the reader ignores rather than a half-record it has to guess at. AD-26
+ * names files by `telemetryEventId`; they are named by the **dedup key** instead — the SDK
+ * payment id where there is one — because that is what makes `enqueue` idempotent per
+ * settlement: the second callback for a payment finds its file present and writes nothing,
+ * so the id it minted never exists. Naming by `telemetryEventId` would need a second index
+ * to achieve the same, and the spine's own Identifiers row says the id is minted *once per
+ * payment*; the file name is the mechanism that makes "once" true.
  */
-
-export const OUTBOX_MAX_RECORDS = 500
-export const OUTBOX_TTL_MS = 72 * 60 * 60 * 1000
 
 /**
- * Loss counters (FR-68). Each source is separate because CM-5 must tell them apart: one is
- * age, one is pressure, one is the receiver's refusal. `expired` and `evicted` together are
- * the device-side share of FR-29's 2% budget, which AD-17 allocates as ≤1%.
+ * Loss counters (FR-68, AD-31). Each source is separate because CM-5 must tell them apart:
+ * one is age, one is pressure, one is the receiver's refusal, one is a record this build
+ * could not read. `expired` and `evicted` together are the device-side share of FR-29's 2%
+ * budget, which AD-17 allocates as ≤1%.
  *
- * The capacity above is sized backwards from that: at a handful of settlements a day, a 72h
- * window holds tens of records, so 500 leaves roughly two orders of magnitude of headroom
- * and **any** non-zero eviction count is a defect signal rather than noise. The precise
- * alerting threshold is Q8, open with data.
+ * The persisted copy in `loss.json` is the *unreported* loss: incremented on the event,
+ * and reduced only when a `telemetry_loss_reported` carrying those counts is acknowledged.
+ * The in-memory copy below is the lifetime total for this process, for diagnostics.
  */
+export type LossCounters = {
+  expired: number
+  evicted: number
+  rejected: number
+  parseFailed: number
+}
+
+const EMPTY_LOSS: LossCounters = { expired: 0, evicted: 0, rejected: 0, parseFailed: 0 }
+
 const counters = {
   enqueued: 0,
   deduplicated: 0,
@@ -38,6 +62,7 @@ const counters = {
   expired: 0,
   acknowledged: 0,
   rejected: 0,
+  parseFailed: 0,
   discarded: 0,
 }
 
@@ -58,22 +83,43 @@ const bump = (key: keyof typeof counters, by = 1): void => {
 export type OutboxStore = {
   readonly directory: string
   enqueue: (record: OutboxRecord) => Promise<void>
-  /** Everything still deliverable, expired records swept out first. */
+  /** Everything still deliverable, expired and unreadable records swept out first. */
   pending: () => Promise<OutboxRecord[]>
+  depth: () => Promise<number>
   markSubmitted: (record: OutboxRecord) => Promise<void>
   acknowledge: (record: OutboxRecord) => Promise<void>
   reject: (record: OutboxRecord) => Promise<void>
   requeue: (record: OutboxRecord) => Promise<void>
+  /** The loss not yet carried off the device by a `telemetry_loss_reported` (AD-31). */
+  unreportedLoss: () => Promise<LossCounters>
+  /** Called once the report carrying `reported` is acknowledged. */
+  settleReportedLoss: (reported: LossCounters) => Promise<void>
   /** FR-5. Idempotent: safe to re-run on activation after a half-finished delete. */
   discardAll: () => Promise<void>
+  /** AD-26: a `.discard` marker survived the last discard, so it did not finish. */
+  hasPendingDiscard: () => Promise<boolean>
 }
+
+const LOSS_FILE = "loss.json"
+const DISCARD_MARKER = ".discard"
+const TEMP_SUFFIX = ".tmp"
 
 const fileFor = (directory: string, record: OutboxRecord): string =>
   `${directory}/${dedupKeyFor(record)}.json`
 
+/**
+ * Temp-and-rename (AD-26). `RNFS.moveFile` is a rename on the same volume, so the reader
+ * sees either the whole record or no record — never the front half of one.
+ */
+const writeAtomically = async (path: string, contents: string): Promise<void> => {
+  const temp = `${path}${TEMP_SUFFIX}`
+  await RNFS.writeFile(temp, contents, "utf8")
+  await RNFS.moveFile(temp, path)
+}
+
 const write = async (directory: string, record: OutboxRecord): Promise<void> => {
   await RNFS.mkdir(directory)
-  await RNFS.writeFile(fileFor(directory, record), JSON.stringify(record), "utf8")
+  await writeAtomically(fileFor(directory, record), JSON.stringify(record))
 }
 
 const remove = async (path: string): Promise<void> => {
@@ -86,17 +132,26 @@ const remove = async (path: string): Promise<void> => {
 
 type StoredRecord = { record: OutboxRecord; path: string }
 
+const isRecordFile = (name: string): boolean =>
+  name.endsWith(".json") && name !== LOSS_FILE
+
+/** Reads every record file, deleting and counting the ones this build cannot parse. */
 const readAll = async (directory: string): Promise<StoredRecord[]> => {
   if (!(await RNFS.exists(directory))) return []
 
   const entries = await RNFS.readDir(directory)
   const stored: StoredRecord[] = []
 
-  for (const entry of entries.filter((file) => file.name.endsWith(".json"))) {
+  for (const entry of entries.filter((file) => isRecordFile(file.name))) {
     try {
       const record = parseOutboxRecord(await RNFS.readFile(entry.path, "utf8"))
-      if (record) stored.push({ record, path: entry.path })
-      else await remove(entry.path)
+      if (record) {
+        stored.push({ record, path: entry.path })
+      } else {
+        await remove(entry.path)
+        bump("parseFailed")
+        await addLoss(directory, "parseFailed", 1)
+      }
     } catch (err) {
       reportBoundaryFault("outbox read", err)
     }
@@ -104,6 +159,43 @@ const readAll = async (directory: string): Promise<StoredRecord[]> => {
 
   return stored
 }
+
+const readLoss = async (directory: string): Promise<LossCounters> => {
+  try {
+    const raw = await RNFS.readFile(`${directory}/${LOSS_FILE}`, "utf8")
+    const parsed: unknown = JSON.parse(raw)
+    if (!parsed || typeof parsed !== "object") return { ...EMPTY_LOSS }
+    const loss = parsed as Partial<LossCounters>
+    const count = (value: unknown): number =>
+      typeof value === "number" && Number.isInteger(value) && value >= 0 ? value : 0
+    return {
+      expired: count(loss.expired),
+      evicted: count(loss.evicted),
+      rejected: count(loss.rejected),
+      parseFailed: count(loss.parseFailed),
+    }
+  } catch {
+    return { ...EMPTY_LOSS }
+  }
+}
+
+const writeLoss = async (directory: string, loss: LossCounters): Promise<void> => {
+  await RNFS.mkdir(directory)
+  await writeAtomically(`${directory}/${LOSS_FILE}`, JSON.stringify(loss))
+}
+
+const addLoss = async (
+  directory: string,
+  key: keyof LossCounters,
+  by: number,
+): Promise<void> => {
+  const loss = await readLoss(directory)
+  await writeLoss(directory, { ...loss, [key]: loss[key] + by })
+}
+
+/** A record written under a contract version the relay no longer accepts (AD-30). */
+const isTooOld = (record: OutboxRecord): boolean =>
+  record.version < eventVersionOf(record.event) - OUTBOX_SCHEMA_VERSIONS_TOLERATED
 
 export const createOutboxStore = (directory: string): OutboxStore => {
   /** Serialised, because two settlements arriving together would otherwise both read a
@@ -120,13 +212,18 @@ export const createOutboxStore = (directory: string): OutboxStore => {
     const cutoff = Date.now() - OUTBOX_TTL_MS
 
     const live: StoredRecord[] = []
+    let expired = 0
     for (const entry of stored) {
-      if (entry.record.queuedAt <= cutoff) {
+      if (entry.record.queuedAt <= cutoff || isTooOld(entry.record)) {
         await remove(entry.path)
-        bump("expired")
+        expired += 1
       } else {
         live.push(entry)
       }
+    }
+    if (expired > 0) {
+      bump("expired", expired)
+      await addLoss(directory, "expired", expired)
     }
 
     /** Oldest-first, so eviction under pressure drops what is closest to expiring anyway.
@@ -153,7 +250,10 @@ export const createOutboxStore = (directory: string): OutboxStore => {
     const overflow = live.length + 1 - OUTBOX_MAX_RECORDS
     for (let i = 0; i < overflow; i += 1) {
       await remove(live[i].path)
-      bump("evicted")
+    }
+    if (overflow > 0) {
+      bump("evicted", overflow)
+      await addLoss(directory, "evicted", overflow)
     }
 
     await write(directory, record)
@@ -164,12 +264,35 @@ export const createOutboxStore = (directory: string): OutboxStore => {
     await write(directory, { ...record, state })
   }
 
+  const markerPath = `${directory}/${DISCARD_MARKER}`
+
+  /**
+   * FR-5, made re-runnable (AD-26). Neither RNFS primitive is atomic, so a discard that
+   * dies halfway leaves some records behind with nothing to say a discard was under way.
+   * The marker is written first and removed last: if it is there on the next activation,
+   * the discard did not finish and is run again before anything else touches the queue.
+   */
+  const discardAll = async (): Promise<void> => {
+    const stored = await readAll(directory)
+    try {
+      await RNFS.mkdir(directory)
+      await RNFS.writeFile(markerPath, String(Date.now()), "utf8")
+      await RNFS.unlink(directory)
+    } catch {
+      /** Never created, or already unlinked by a previous attempt. */
+    }
+    await remove(markerPath)
+    bump("discarded", stored.length)
+  }
+
   return {
     directory,
 
     enqueue: (record) => serialise(() => enqueue(record)),
 
     pending: () => serialise(async () => (await sweep()).map((entry) => entry.record)),
+
+    depth: () => serialise(async () => (await readAll(directory)).length),
 
     markSubmitted: (record) => serialise(() => transition(record, OutboxState.Submitted)),
 
@@ -185,17 +308,24 @@ export const createOutboxStore = (directory: string): OutboxStore => {
       serialise(async () => {
         await remove(fileFor(directory, record))
         bump("rejected")
+        await addLoss(directory, "rejected", 1)
       }),
 
-    discardAll: () =>
+    unreportedLoss: () => serialise(() => readLoss(directory)),
+
+    settleReportedLoss: (reported) =>
       serialise(async () => {
-        const stored = await readAll(directory)
-        try {
-          await RNFS.unlink(directory)
-        } catch {
-          /** Never created, or already unlinked by a previous attempt. */
-        }
-        bump("discarded", stored.length)
+        const loss = await readLoss(directory)
+        await writeLoss(directory, {
+          expired: Math.max(0, loss.expired - reported.expired),
+          evicted: Math.max(0, loss.evicted - reported.evicted),
+          rejected: Math.max(0, loss.rejected - reported.rejected),
+          parseFailed: Math.max(0, loss.parseFailed - reported.parseFailed),
+        })
       }),
+
+    discardAll: () => serialise(discardAll),
+
+    hasPendingDiscard: () => serialise(() => RNFS.exists(markerPath)),
   }
 }

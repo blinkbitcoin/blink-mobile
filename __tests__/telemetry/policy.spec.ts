@@ -68,7 +68,7 @@ describe("privacy policy stage", () => {
     it("permits each event carrying exactly its declared fields", () => {
       expect(
         applyPrivacyPolicy(TelemetryEvent.PaymentSettled, validPaymentSettled()),
-      ).toEqual({ permitted: true })
+      ).toMatchObject({ permitted: true })
 
       expect(
         applyPrivacyPolicy(TelemetryEvent.ConversionSettled, {
@@ -77,7 +77,7 @@ describe("privacy policy stage", () => {
           conversion_direction: TelemetryConversionDirection.UsdToBtc,
           telemetry_event_id: VALID_EVENT_ID,
         }),
-      ).toEqual({ permitted: true })
+      ).toMatchObject({ permitted: true })
 
       expect(
         applyPrivacyPolicy(TelemetryEvent.ReferralCompleted, {
@@ -85,7 +85,7 @@ describe("privacy policy stage", () => {
           wallet_provider: WalletProvider.Spark,
           telemetry_event_id: VALID_EVENT_ID,
         }),
-      ).toEqual({ permitted: true })
+      ).toMatchObject({ permitted: true })
     })
 
     it("counts nothing as dropped while payloads are well formed", () => {

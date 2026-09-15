@@ -70,6 +70,20 @@ const readDir = (path) => {
   )
 }
 
+// A rename: the destination appears whole or not at all, which is what the outbox's
+// temp-and-rename write relies on.
+const moveFile = (from, to) => {
+  const source = normalize(from)
+  if (!files.has(source)) {
+    return Promise.reject(new Error(`ENOENT: no such file, rename '${source}'`))
+  }
+  const target = normalize(to)
+  return mkdir(parentOf(target)).then(() => {
+    files.set(target, files.get(source))
+    files.delete(source)
+  })
+}
+
 const unlink = (path) => {
   const target = normalize(path)
   const removedFile = files.delete(target)
@@ -105,6 +119,7 @@ module.exports = {
   writeFile,
   readFile,
   readDir,
+  moveFile,
   unlink,
   // Test seam: the store is module-scoped, so a suite that writes must be able to start
   // from an empty disk.

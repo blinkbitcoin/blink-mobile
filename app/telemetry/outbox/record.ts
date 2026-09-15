@@ -30,6 +30,8 @@ export type OutboxRecord = {
   /** The dedup key the reporting layer groups on (FR-26). */
   telemetryEventId: string
   event: TelemetryEvent
+  /** The contract version the record was written under, for AD-30's n−1 tolerance. */
+  version: number
   /** Exactly what the policy stage approved — the adapter is handed this, and nothing else. */
   payload: TelemetryPayload
   /**
@@ -62,7 +64,10 @@ const isPayload = (value: unknown): value is TelemetryPayload =>
   Boolean(value) &&
   typeof value === "object" &&
   Object.values(value as object).every(
-    (entry) => typeof entry === "string" || typeof entry === "number",
+    (entry) =>
+      typeof entry === "string" ||
+      typeof entry === "number" ||
+      typeof entry === "boolean",
   )
 
 /** A record written by an older build, a truncated write or a half-finished delete all look
@@ -80,6 +85,8 @@ export const parseOutboxRecord = (raw: string): OutboxRecord | null => {
     return {
       telemetryEventId: candidate.telemetryEventId,
       event: candidate.event,
+      /** A record from before the version field existed was written under version 1. */
+      version: typeof candidate.version === "number" ? candidate.version : 1,
       payload: candidate.payload,
       sdkPaymentId:
         typeof candidate.sdkPaymentId === "string" ? candidate.sdkPaymentId : null,

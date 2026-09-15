@@ -34,6 +34,13 @@ const counters = {
    *  count means an emitter is running outside the account context it belongs to. */
   unroutedEvents: 0,
   untransmittedFaults: 0,
+  /** AD-30's "is it draining?" answers, from the last drain that ran. */
+  lastDrainDurationMs: 0,
+  lastDrainDepth: 0,
+  drainRejected: 0,
+  drainRetryable: 0,
+  /** Milliseconds from the boundary being initialised to the first resolved mode. */
+  modeResolutionLatencyMs: 0,
 }
 
 export const countSuppressedEvent = (): void => {
@@ -44,13 +51,34 @@ export const countUnroutedEvent = (): void => {
   counters.unroutedEvents += 1
 }
 
+export const recordDrainStats = (stats: {
+  durationMs: number
+  depth: number
+  rejected: number
+  retryable: number
+}): void => {
+  counters.lastDrainDurationMs = stats.durationMs
+  counters.lastDrainDepth = stats.depth
+  counters.drainRejected += stats.rejected
+  counters.drainRetryable += stats.retryable
+}
+
+export const recordModeResolutionLatency = (ms: number): void => {
+  counters.modeResolutionLatencyMs = ms
+}
+
 export const getDiagnosticCounters = (): Readonly<typeof counters> => ({ ...counters })
+
+/** Whether anything at all may leave this device right now (AD-13). Exposed so code
+ *  outside the boundary that talks to Crashlytics — the SDK log forwarder — obeys the same
+ *  rule (AD-30). */
+export const mayTransmitDiagnostics = (): boolean => transmissible
 
 export const resetDiagnosticsForTesting = (): void => {
   transmissible = false
-  counters.suppressedEvents = 0
-  counters.unroutedEvents = 0
-  counters.untransmittedFaults = 0
+  for (const key of Object.keys(counters) as (keyof typeof counters)[]) {
+    counters[key] = 0
+  }
 }
 
 /**

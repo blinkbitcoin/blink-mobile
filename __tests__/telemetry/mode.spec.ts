@@ -5,7 +5,18 @@ import { it } from "@jest/globals"
 import analytics from "@react-native-firebase/analytics"
 
 import { TelemetryEvent } from "@app/telemetry/contract"
-import { resetDiagnosticsForTesting } from "@app/telemetry/diagnostics"
+import {
+  getDiagnosticCounters,
+  resetDiagnosticsForTesting,
+} from "@app/telemetry/diagnostics"
+import {
+  applyServerKillSwitch,
+  isTelemetryEnabled,
+  onKillSwitchEngaged,
+  resetEnablementForTesting,
+  restoreKillSwitch,
+  setTelemetryRolloutEnabled,
+} from "@app/telemetry/enablement"
 import {
   ActiveAccountKind,
   deriveTelemetryMode,
@@ -17,35 +28,42 @@ import {
   resetTelemetryModeForTesting,
   resolveTelemetryMode,
   TelemetryMode,
+  type TelemetryModeInputs,
 } from "@app/telemetry/mode"
 
 const setCollectionEnabled = analytics().setAnalyticsCollectionEnabled as jest.Mock
 const setUserId = analytics().setUserId as jest.Mock
 
-const inputs = (overrides: Partial<Parameters<typeof deriveTelemetryMode>[0]> = {}) => ({
+const inputs = (overrides: Partial<TelemetryModeInputs> = {}): TelemetryModeInputs => ({
   activeAccount: ActiveAccountKind.SelfCustodial,
-  selfCustodialMode: null,
+  persistedMode: null,
+  serverMode: null,
   remoteConfigTrusted: true,
   hasSelfCustodialAccount: true,
   ...overrides,
 })
 
-describe("deriveTelemetryMode", () => {
+describe("deriveTelemetryMode (AD-5, AD-25)", () => {
   it.each([
     {
-      case: "an Enhanced self-custodial account",
-      given: inputs({ selfCustodialMode: "enhanced" as const }),
+      case: "Enhanced chosen on this device, server silent",
+      given: inputs({ persistedMode: "enhanced" }),
       expected: TelemetryMode.Enhanced,
     },
     {
-      case: "an incognito self-custodial account",
-      given: inputs({ selfCustodialMode: "anon" as const }),
+      case: "Enhanced held by the server, nothing persisted yet",
+      given: inputs({ serverMode: "enhanced" }),
+      expected: TelemetryMode.Enhanced,
+    },
+    {
+      case: "incognito chosen on this device",
+      given: inputs({ persistedMode: "anon" }),
       expected: TelemetryMode.Anon,
     },
     {
-      case: "a self-custodial account that never chose a mode",
-      given: inputs({ selfCustodialMode: null }),
-      expected: TelemetryMode.Unresolved,
+      case: "incognito held by the server",
+      given: inputs({ serverMode: "anon" }),
+      expected: TelemetryMode.Anon,
     },
     {
       case: "a custodial account on a trusted config",
@@ -62,18 +80,28 @@ describe("deriveTelemetryMode", () => {
   })
 
   describe("FR-6 — failure never falls back to enabled", () => {
-    it("refuses to read an unset mode as Enhanced", () => {
-      // The settings row does exactly this so it has something to display. §5.7 asks for a
-      // positive resolution, and "we never asked, so we assumed consent" is not one.
-      expect(deriveTelemetryMode(inputs({ selfCustodialMode: null }))).not.toBe(
-        TelemetryMode.Enhanced,
-      )
+    it("resolves an account with no mode anywhere as Unresolved, never Enhanced", () => {
+      // In flight, never asked, or the server holding no mode: the same answer. The
+      // settings row reads an unset mode as Enhanced so it has something to display; §5.7
+      // asks for a positive resolution, and "we never asked" is not one.
+      expect(deriveTelemetryMode(inputs())).toBe(TelemetryMode.Unresolved)
+    })
+
+    it("lets the server's Anon override a stale persisted Enhanced (multi-device)", () => {
+      expect(
+        deriveTelemetryMode(inputs({ persistedMode: "enhanced", serverMode: "anon" })),
+      ).toBe(TelemetryMode.Anon)
+    })
+
+    it("lets a local switch to Anon win over the server's stale Enhanced", () => {
+      // The window between choosing incognito here and the push landing. AD-25's literal
+      // precedence would read Enhanced from the stale server answer; deny wins instead.
+      expect(
+        deriveTelemetryMode(inputs({ persistedMode: "anon", serverMode: "enhanced" })),
+      ).toBe(TelemetryMode.Anon)
     })
 
     it("does not resolve Custodial off an untrusted remote config (AD-9)", () => {
-      // `nonCustodialEnabled` defaults to false and `remoteConfigReady` is set in a
-      // `finally`, so a failed fetch used to bounce a self-custodial user to custodial —
-      // and full platform collection on with them.
       expect(
         deriveTelemetryMode(
           inputs({
@@ -86,8 +114,6 @@ describe("deriveTelemetryMode", () => {
     })
 
     it("keeps custodial analytics for a device that has no self-custodial account", () => {
-      // Nothing to have been rolled back from, so the untrusted config changes nothing —
-      // the PRD leaves custodial behaviour alone beyond relabelling.
       expect(
         deriveTelemetryMode(
           inputs({
@@ -106,6 +132,8 @@ describe("the collection gate", () => {
     jest.clearAllMocks()
     resetTelemetryModeForTesting()
     resetDiagnosticsForTesting()
+    resetEnablementForTesting()
+    setTelemetryRolloutEnabled(true)
   })
 
   it("starts closed, and stays closed until a mode is resolved", async () => {
@@ -116,33 +144,38 @@ describe("the collection gate", () => {
     expect(setCollectionEnabled).not.toHaveBeenCalledWith(true)
   })
 
-  describe("FR-70 — the gate is mode × contract membership", () => {
-    const contractEvent = TelemetryEvent.PaymentSettled
-    const platformEvent = "screen_view"
+  describe("FR-70 / AD-24 — the gate is mode × the row's `modes` column", () => {
+    const settlement = TelemetryEvent.PaymentSettled
+    const legacy = TelemetryEvent.BackupCompleted
+    const platform = "screen_view"
 
     it.each([
-      { mode: TelemetryMode.Custodial, contract: true, platform: true },
-      { mode: TelemetryMode.Enhanced, contract: true, platform: false },
-      { mode: TelemetryMode.Anon, contract: false, platform: false },
-      { mode: TelemetryMode.Unresolved, contract: false, platform: false },
+      { mode: TelemetryMode.Custodial, settlement: true, legacy: true, platform: true },
+      { mode: TelemetryMode.Enhanced, settlement: true, legacy: false, platform: false },
+      { mode: TelemetryMode.Anon, settlement: false, legacy: false, platform: false },
+      {
+        mode: TelemetryMode.Unresolved,
+        settlement: false,
+        legacy: false,
+        platform: false,
+      },
     ])(
-      "$mode permits contract events: $contract, non-contract events: $platform",
-      async ({ mode, contract, platform }) => {
+      "$mode — settlement: $settlement, legacy pending review: $legacy, non-contract: $platform",
+      async ({ mode, ...expected }) => {
         await resolveTelemetryMode(mode)
 
         expect({
-          contract: isEventPermitted(contractEvent),
-          platform: isEventPermitted(platformEvent),
-        }).toEqual({ contract, platform })
+          settlement: isEventPermitted(settlement),
+          legacy: isEventPermitted(legacy),
+          platform: isEventPermitted(platform),
+        }).toEqual(expected)
       },
     )
 
     it("runs platform collection on Custodial alone", async () => {
-      // CD-6 (2026-09-11) would have Enhanced collection on so contract events could ride
-      // Firebase. That needs the SDK to suppress its automatic events while logEvent()
-      // stays live, and @react-native-firebase/analytics@23.3.1 offers no such switch
-      // (spine Q13, verified — see platform-analytics.ts). Enhanced therefore stays off,
-      // and this assertion is the FR-70 side of that answer.
+      // CD-7. The 09-11 attempt to keep Enhanced on Firebase failed on Q13: the SDK cannot
+      // suppress its reserved automatic events while logEvent() is live (verified against
+      // @react-native-firebase/analytics@23.3.1 — see platform-analytics.ts).
       await resolveTelemetryMode(TelemetryMode.Custodial)
       expect(setCollectionEnabled).toHaveBeenLastCalledWith(true)
 
@@ -154,6 +187,59 @@ describe("the collection gate", () => {
 
       await resolveTelemetryMode(TelemetryMode.Unresolved)
       expect(setCollectionEnabled).toHaveBeenLastCalledWith(false)
+    })
+  })
+
+  describe("AD-28 / AD-30 — the two switches sit in front of the gate", () => {
+    it("permits nothing until the rollout flag is on", async () => {
+      resetEnablementForTesting()
+      await resolveTelemetryMode(TelemetryMode.Enhanced)
+
+      expect(isTelemetryEnabled()).toBe(false)
+      expect(isEventPermitted(TelemetryEvent.PaymentSettled)).toBe(false)
+      expect(isDrainPermitted()).toBe(false)
+
+      // Anchor: the same mode permits once the flag turns on.
+      setTelemetryRolloutEnabled(true)
+      expect(isEventPermitted(TelemetryEvent.PaymentSettled)).toBe(true)
+      expect(isDrainPermitted()).toBe(true)
+    })
+
+    it("engages the kill switch on a server `false` and never disengages it", async () => {
+      await resolveTelemetryMode(TelemetryMode.Enhanced)
+      const engaged = jest.fn()
+      onKillSwitchEngaged(engaged)
+
+      expect(applyServerKillSwitch(true)).toBe(false)
+      expect(isEventPermitted(TelemetryEvent.PaymentSettled)).toBe(true)
+
+      expect(applyServerKillSwitch(false)).toBe(true)
+      expect(engaged).toHaveBeenCalledTimes(1)
+      expect(isEventPermitted(TelemetryEvent.PaymentSettled)).toBe(false)
+      expect(isDrainPermitted()).toBe(false)
+
+      // One-directional: a later `true` changes nothing, and the listener does not refire.
+      expect(applyServerKillSwitch(true)).toBe(true)
+      expect(isEventPermitted(TelemetryEvent.PaymentSettled)).toBe(false)
+      expect(engaged).toHaveBeenCalledTimes(1)
+    })
+
+    it("restores an engaged switch from persistence without a fetch", async () => {
+      await resolveTelemetryMode(TelemetryMode.Enhanced)
+      restoreKillSwitch(true)
+
+      expect(isEventPermitted(TelemetryEvent.PaymentSettled)).toBe(false)
+      restoreKillSwitch(false)
+      expect(isEventPermitted(TelemetryEvent.PaymentSettled)).toBe(false)
+    })
+
+    it("counts what the switches suppress, locally", async () => {
+      await resolveTelemetryMode(TelemetryMode.Enhanced)
+      applyServerKillSwitch(false)
+
+      isEventPermitted(TelemetryEvent.PaymentSettled)
+
+      expect(getDiagnosticCounters().suppressedEvents).toBe(1)
     })
   })
 
@@ -219,8 +305,6 @@ describe("the collection gate", () => {
       await resolveTelemetryMode(TelemetryMode.Enhanced)
       expect(discard).not.toHaveBeenCalled()
 
-      // Anchor: the same listener does fire when the gate actually closes, so the silence
-      // above is the transition's doing and not a dead registration.
       await resolveTelemetryMode(TelemetryMode.Anon)
       expect(discard).toHaveBeenCalledTimes(1)
     })
@@ -229,7 +313,6 @@ describe("the collection gate", () => {
       resolveTelemetryMode(TelemetryMode.Enhanced)
       expect(isEventPermitted(TelemetryEvent.PaymentSettled)).toBe(true)
 
-      // No await: the directory unlink is still in flight.
       resolveTelemetryMode(TelemetryMode.Anon)
 
       expect(isEventPermitted(TelemetryEvent.PaymentSettled)).toBe(false)
@@ -255,6 +338,15 @@ describe("the collection gate", () => {
     ])("permits draining under $mode: $permitted", async ({ mode, permitted }) => {
       await resolveTelemetryMode(mode)
       expect(isDrainPermitted()).toBe(permitted)
+    })
+  })
+
+  describe("AD-30 — mode-resolution latency is measured", () => {
+    it("records how long the device sat in Unresolved after initialisation", async () => {
+      await initializeTelemetryGate()
+      await resolveTelemetryMode(TelemetryMode.Enhanced)
+
+      expect(getDiagnosticCounters().modeResolutionLatencyMs).toBeGreaterThanOrEqual(0)
     })
   })
 })

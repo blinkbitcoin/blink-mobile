@@ -1,6 +1,7 @@
 import React from "react"
+import { AppState } from "react-native"
 
-import { render, waitFor } from "@testing-library/react-native"
+import { act, render, waitFor } from "@testing-library/react-native"
 import { Network } from "@breeztech/breez-sdk-spark-react-native"
 import RNFS from "react-native-fs"
 
@@ -11,13 +12,21 @@ import {
   TelemetryDirection,
   TelemetryEvent,
   WalletProvider,
+  type ContractPayload,
 } from "@app/telemetry/contract"
 import { resetDiagnosticsForTesting } from "@app/telemetry/diagnostics"
+import {
+  applyServerKillSwitch,
+  isTelemetryEnabled,
+  resetEnablementForTesting,
+} from "@app/telemetry/enablement"
+import { captureTelemetryFact, setActiveOutbox } from "@app/telemetry/index"
 import {
   getTelemetryMode,
   resetTelemetryModeForTesting,
   TelemetryMode,
 } from "@app/telemetry/mode"
+import { resetDrainStateForTesting } from "@app/telemetry/outbox/drain"
 import { OutboxState } from "@app/telemetry/outbox/record"
 import {
   createOutboxStore,
@@ -26,10 +35,10 @@ import {
 import {
   registerTelemetryTransport,
   resetTelemetryTransportForTesting,
-  type TransportResult,
+  type SubmitResult,
 } from "@app/telemetry/transport"
 import { AccountMode } from "@app/types/account"
-import { AccountType } from "@app/types/wallet"
+import { AccountType, ActiveWalletStatus } from "@app/types/wallet"
 
 const ACCOUNT_ID = "self-custodial-1"
 const OTHER_ACCOUNT_ID = "self-custodial-2"
@@ -37,7 +46,13 @@ const OTHER_ACCOUNT_ID = "self-custodial-2"
 let mockActiveAccount: { id: string; type: AccountType } | undefined
 let mockSelfCustodialEntries: { id: string }[]
 let mockAccountMode: AccountMode | null
+let mockServerModes: Record<string, AccountMode>
 let mockRemoteConfigTrusted: boolean
+let mockTelemetryEnabled: boolean
+let mockKillSwitchEngaged: boolean | undefined
+let mockConnectedAccountId: string | null
+let mockWalletStatus: ActiveWalletStatus
+const mockUpdateState = jest.fn()
 
 jest.mock("@app/hooks/use-account-registry", () => ({
   useAccountRegistry: () => ({
@@ -50,8 +65,28 @@ jest.mock("@app/self-custodial/hooks/use-self-custodial-account-mode", () => ({
   useSelfCustodialAccountMode: () => ({ accountMode: mockAccountMode }),
 }))
 
+jest.mock("@app/store/persistent-state", () => ({
+  usePersistentStateContext: () => ({
+    persistentState: {
+      selfCustodialServerAccountModeByAccountId: mockServerModes,
+      telemetryKillSwitchEngaged: mockKillSwitchEngaged,
+    },
+    updateState: mockUpdateState,
+  }),
+}))
+
 jest.mock("@app/config/feature-flags-context", () => ({
-  useFeatureFlags: () => ({ remoteConfigTrusted: mockRemoteConfigTrusted }),
+  useFeatureFlags: () => ({
+    remoteConfigTrusted: mockRemoteConfigTrusted,
+    telemetryEnabled: mockTelemetryEnabled,
+  }),
+}))
+
+jest.mock("@app/self-custodial/providers/wallet", () => ({
+  useSelfCustodialWallet: () => ({
+    connectedAccountId: mockConnectedAccountId,
+    status: mockWalletStatus,
+  }),
 }))
 
 jest.mock("@app/self-custodial/hooks/use-spark-network", () => ({
@@ -66,6 +101,7 @@ const OTHER_DIR = telemetryOutboxDirFor(OTHER_ACCOUNT_ID, "regtest" as unknown a
 const queuedRecord = (id = "3f2a1b4c-5d6e-4f70-8192-a3b4c5d6e7f8") => ({
   telemetryEventId: id,
   event: TelemetryEvent.PaymentSettled,
+  version: 1,
   payload: {
     /* eslint-disable camelcase */
     event_version: 1,
@@ -80,6 +116,19 @@ const queuedRecord = (id = "3f2a1b4c-5d6e-4f70-8192-a3b4c5d6e7f8") => ({
   state: OutboxState.Queued,
 })
 
+const ackingTransport = () => {
+  const submit = jest.fn<Promise<SubmitResult>, [ContractPayload]>(() =>
+    Promise.resolve({ kind: "acknowledged", ackedAt: 1 }),
+  )
+  registerTelemetryTransport({
+    name: "test",
+    ackSemantics: "application",
+    attachesNoImplicitIdentity: true,
+    submit,
+  })
+  return submit
+}
+
 describe("SelfCustodialTelemetryMount", () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -88,109 +137,226 @@ describe("SelfCustodialTelemetryMount", () => {
     resetTelemetryTransportForTesting()
     resetOutboxCountersForTesting()
     resetDiagnosticsForTesting()
+    resetDrainStateForTesting()
+    resetEnablementForTesting()
+    setActiveOutbox(null)
 
     mockActiveAccount = { id: ACCOUNT_ID, type: AccountType.SelfCustodial }
     mockSelfCustodialEntries = [{ id: ACCOUNT_ID }]
     mockAccountMode = AccountMode.Enhanced
+    mockServerModes = {}
     mockRemoteConfigTrusted = true
+    mockTelemetryEnabled = true
+    mockKillSwitchEngaged = undefined
+    mockConnectedAccountId = ACCOUNT_ID
+    mockWalletStatus = ActiveWalletStatus.Ready
   })
 
-  it("resolves the mode of whichever account is active", async () => {
-    render(<SelfCustodialTelemetryMount />)
-
-    await waitFor(() => expect(getTelemetryMode()).toBe(TelemetryMode.Enhanced))
+  afterEach(() => {
+    setActiveOutbox(null)
   })
 
-  it("resolves an unset mode as Unresolved, not Enhanced", async () => {
-    mockAccountMode = null
+  describe("AD-25 — three inputs, deny wins", () => {
+    it("resolves the mode of whichever account is active", async () => {
+      render(<SelfCustodialTelemetryMount />)
 
-    render(<SelfCustodialTelemetryMount />)
+      await waitFor(() => expect(getTelemetryMode()).toBe(TelemetryMode.Enhanced))
+    })
 
-    await waitFor(() => expect(getTelemetryMode()).toBe(TelemetryMode.Unresolved))
-  })
-
-  it("discards a queue left by an account that switched to incognito while inactive", async () => {
-    // The FR-5 back door: queue under Enhanced, switch mode elsewhere, come back. If the
-    // drain ran before the mode resolved, those events would flush on activation — which is
-    // flush-then-discard with extra steps.
-    await createOutboxStore(DIR).enqueue(queuedRecord())
-    mockAccountMode = AccountMode.Anon
-
-    const submit = jest.fn<Promise<TransportResult>, unknown[]>(() =>
-      Promise.resolve({ outcome: "acknowledged" }),
-    )
-    registerTelemetryTransport({ name: "test", attachesPerEventIdentity: false, submit })
-
-    render(<SelfCustodialTelemetryMount />)
-
-    await waitFor(() => expect(getTelemetryMode()).toBe(TelemetryMode.Anon))
-    await waitFor(async () => expect(await createOutboxStore(DIR).pending()).toEqual([]))
-    expect(submit).not.toHaveBeenCalled()
-  })
-
-  it("drains that same queue when the account is still Enhanced", async () => {
-    // Anchor for the case above: the discard is the mode's doing, not a store that was
-    // never mounted or a transport that was never registered.
-    await createOutboxStore(DIR).enqueue(queuedRecord())
-
-    const submit = jest.fn<Promise<TransportResult>, unknown[]>(() =>
-      Promise.resolve({ outcome: "acknowledged" }),
-    )
-    registerTelemetryTransport({ name: "test", attachesPerEventIdentity: false, submit })
-
-    render(<SelfCustodialTelemetryMount />)
-
-    await waitFor(() => expect(submit).toHaveBeenCalledTimes(1))
-  })
-
-  it("touches only the active account's queue when two accounts hold records", async () => {
-    // Mode is stored per account, so activating an incognito one must not reach across to
-    // an Enhanced account's queue — and draining the Enhanced one must not flush the other.
-    await createOutboxStore(DIR).enqueue(
-      queuedRecord("3f2a1b4c-5d6e-4f70-8192-a3b4c5d6e701"),
-    )
-    await createOutboxStore(OTHER_DIR).enqueue(
-      queuedRecord("3f2a1b4c-5d6e-4f70-8192-a3b4c5d6e702"),
-    )
-
-    mockActiveAccount = { id: OTHER_ACCOUNT_ID, type: AccountType.SelfCustodial }
-    mockSelfCustodialEntries = [{ id: ACCOUNT_ID }, { id: OTHER_ACCOUNT_ID }]
-    mockAccountMode = AccountMode.Anon
-
-    render(<SelfCustodialTelemetryMount />)
-
-    await waitFor(async () =>
-      expect(await createOutboxStore(OTHER_DIR).pending()).toEqual([]),
-    )
-    // The account that was never activated keeps its queue: its own mode has not changed.
-    expect(await createOutboxStore(DIR).pending()).toHaveLength(1)
-  })
-
-  it("keeps draining on a cadence, not only once on mount", async () => {
-    jest.useFakeTimers()
-    try {
-      const submit = jest.fn<Promise<TransportResult>, unknown[]>(() =>
-        Promise.resolve({ outcome: "acknowledged" }),
-      )
-      registerTelemetryTransport({
-        name: "test",
-        attachesPerEventIdentity: false,
-        submit,
-      })
+    it("resolves an account with no mode anywhere as Unresolved, not Enhanced", async () => {
+      mockAccountMode = null
 
       render(<SelfCustodialTelemetryMount />)
-      await jest.advanceTimersByTimeAsync(0)
-      const onMount = submit.mock.calls.length
 
-      await createOutboxStore(DIR).enqueue(
-        queuedRecord("3f2a1b4c-5d6e-4f70-8192-a3b4c5d6e703"),
+      await waitFor(() => expect(getTelemetryMode()).toBe(TelemetryMode.Unresolved))
+    })
+
+    it("lets the server's Anon override what this device persisted", async () => {
+      mockAccountMode = AccountMode.Enhanced
+      mockServerModes = { [ACCOUNT_ID]: AccountMode.Anon }
+
+      render(<SelfCustodialTelemetryMount />)
+
+      await waitFor(() => expect(getTelemetryMode()).toBe(TelemetryMode.Anon))
+    })
+
+    it("resolves Enhanced from the server alone, before this device has persisted it", async () => {
+      mockAccountMode = null
+      mockServerModes = { [ACCOUNT_ID]: AccountMode.Enhanced }
+
+      render(<SelfCustodialTelemetryMount />)
+
+      await waitFor(() => expect(getTelemetryMode()).toBe(TelemetryMode.Enhanced))
+    })
+  })
+
+  describe("FR-5 / AD-26 — discard on activation, and finish what the last run started", () => {
+    it("discards a queue left by an account that switched to incognito while inactive", async () => {
+      await createOutboxStore(DIR).enqueue(queuedRecord())
+      mockAccountMode = AccountMode.Anon
+      const submit = ackingTransport()
+
+      render(<SelfCustodialTelemetryMount />)
+
+      await waitFor(() => expect(getTelemetryMode()).toBe(TelemetryMode.Anon))
+      await waitFor(async () =>
+        expect(await createOutboxStore(DIR).pending()).toEqual([]),
       )
-      await jest.advanceTimersByTimeAsync(5 * 60 * 1000)
+      expect(submit).not.toHaveBeenCalled()
+    })
 
-      expect(submit.mock.calls.length).toBeGreaterThan(onMount)
-    } finally {
-      jest.useRealTimers()
-    }
+    it("discards a queue on a cold start straight into Unresolved", async () => {
+      // No mode transition fires the suppression listener here — the gate starts
+      // Unresolved and stays there — so the activation check has to do it.
+      await createOutboxStore(DIR).enqueue(queuedRecord())
+      mockAccountMode = null
+
+      render(<SelfCustodialTelemetryMount />)
+
+      await waitFor(async () =>
+        expect(await createOutboxStore(DIR).pending()).toEqual([]),
+      )
+    })
+
+    it("re-runs a discard the last run left a marker for, even under Enhanced", async () => {
+      const store = createOutboxStore(DIR)
+      await store.enqueue(queuedRecord())
+      await RNFS.writeFile(`${DIR}/.discard`, "1", "utf8")
+
+      render(<SelfCustodialTelemetryMount />)
+
+      await waitFor(async () => expect(await store.hasPendingDiscard()).toBe(false))
+      expect(await store.pending()).toEqual([])
+    })
+
+    it("drains that same queue when the account is still Enhanced", async () => {
+      await createOutboxStore(DIR).enqueue(queuedRecord())
+      const submit = ackingTransport()
+
+      render(<SelfCustodialTelemetryMount />)
+
+      await waitFor(() => expect(submit).toHaveBeenCalledTimes(1))
+    })
+
+    it("touches only the active account's queue when two accounts hold records", async () => {
+      await createOutboxStore(DIR).enqueue(
+        queuedRecord("3f2a1b4c-5d6e-4f70-8192-a3b4c5d6e701"),
+      )
+      await createOutboxStore(OTHER_DIR).enqueue(
+        queuedRecord("3f2a1b4c-5d6e-4f70-8192-a3b4c5d6e702"),
+      )
+      mockActiveAccount = { id: OTHER_ACCOUNT_ID, type: AccountType.SelfCustodial }
+      mockConnectedAccountId = OTHER_ACCOUNT_ID
+      mockSelfCustodialEntries = [{ id: ACCOUNT_ID }, { id: OTHER_ACCOUNT_ID }]
+      mockAccountMode = AccountMode.Anon
+
+      render(<SelfCustodialTelemetryMount />)
+
+      await waitFor(async () =>
+        expect(await createOutboxStore(OTHER_DIR).pending()).toEqual([]),
+      )
+      expect(await createOutboxStore(DIR).pending()).toHaveLength(1)
+    })
+  })
+
+  describe("AD-26 — the drain's triggers are SDK connect, emission and foreground", () => {
+    it("does not drain while the SDK is connected for a different account", async () => {
+      await createOutboxStore(DIR).enqueue(queuedRecord())
+      const submit = ackingTransport()
+      mockConnectedAccountId = OTHER_ACCOUNT_ID
+
+      render(<SelfCustodialTelemetryMount />)
+      await waitFor(() => expect(getTelemetryMode()).toBe(TelemetryMode.Enhanced))
+
+      expect(submit).not.toHaveBeenCalled()
+    })
+
+    it("does not drain while the wallet is offline", async () => {
+      await createOutboxStore(DIR).enqueue(queuedRecord())
+      const submit = ackingTransport()
+      mockWalletStatus = ActiveWalletStatus.Offline
+
+      render(<SelfCustodialTelemetryMount />)
+      await waitFor(() => expect(getTelemetryMode()).toBe(TelemetryMode.Enhanced))
+
+      expect(submit).not.toHaveBeenCalled()
+    })
+
+    it("drains on a successful emission", async () => {
+      const submit = ackingTransport()
+      render(<SelfCustodialTelemetryMount />)
+      await waitFor(() => expect(getTelemetryMode()).toBe(TelemetryMode.Enhanced))
+      resetDrainStateForTesting()
+
+      act(() => {
+        captureTelemetryFact(
+          {
+            event: TelemetryEvent.ReferralCompleted,
+            telemetryEventId: "3f2a1b4c-5d6e-4f70-8192-a3b4c5d6e7f9",
+            walletProvider: WalletProvider.Spark,
+          },
+          null,
+        )
+      })
+
+      await waitFor(() => expect(submit).toHaveBeenCalledTimes(1))
+    })
+
+    it("drains when the app comes to the foreground", async () => {
+      const submit = ackingTransport()
+      const addEventListener = AppState.addEventListener as jest.Mock
+
+      render(<SelfCustodialTelemetryMount />)
+      await waitFor(() => expect(getTelemetryMode()).toBe(TelemetryMode.Enhanced))
+      await createOutboxStore(DIR).enqueue(queuedRecord())
+      resetDrainStateForTesting()
+
+      // The preset's AppState mock records the handler; fire it as the OS would.
+      const handlers = addEventListener.mock.calls
+        .filter(([type]) => type === "change")
+        .map(([, handler]) => handler as (state: string) => void)
+      expect(handlers.length).toBeGreaterThan(0)
+      act(() => {
+        for (const handler of handlers) handler("active")
+      })
+
+      await waitFor(() => expect(submit).toHaveBeenCalledTimes(1))
+    })
+  })
+
+  describe("AD-28 / AD-30 — the switches", () => {
+    it("restores a persisted kill switch, so nothing emits without a fetch", async () => {
+      mockKillSwitchEngaged = true
+
+      render(<SelfCustodialTelemetryMount />)
+      await waitFor(() => expect(getTelemetryMode()).toBe(TelemetryMode.Enhanced))
+
+      expect(isTelemetryEnabled()).toBe(false)
+    })
+
+    it("persists the switch the moment the server engages it", async () => {
+      render(<SelfCustodialTelemetryMount />)
+      await waitFor(() => expect(isTelemetryEnabled()).toBe(true))
+
+      act(() => {
+        applyServerKillSwitch(false)
+      })
+
+      expect(mockUpdateState).toHaveBeenCalled()
+      const updater = mockUpdateState.mock.calls.at(-1)?.[0]
+      expect(updater({ schemaVersion: 22 })).toMatchObject({
+        telemetryKillSwitchEngaged: true,
+      })
+    })
+
+    it("keeps everything off until the rollout flag is on", async () => {
+      mockTelemetryEnabled = false
+
+      render(<SelfCustodialTelemetryMount />)
+      await waitFor(() => expect(getTelemetryMode()).toBe(TelemetryMode.Enhanced))
+
+      expect(isTelemetryEnabled()).toBe(false)
+    })
   })
 
   it("leaves the mode Unresolved while no self-custodial account is active", async () => {

@@ -23,7 +23,11 @@ import { NotificationsProvider } from "./components/notifications/index"
 import { PushNotificationComponent } from "./components/push-notification"
 import { FeatureFlagContextProvider } from "./config/feature-flags-context"
 import { CustodialWalletProvider } from "./custodial/providers/wallet"
-import { initializeTelemetryGate } from "./telemetry"
+import {
+  initializeTelemetryGate,
+  localOnlyTransport,
+  registerTelemetryTransport,
+} from "./telemetry"
 import {
   AccountModeSyncMount,
   AutoConvertListenerMount,
@@ -69,6 +73,11 @@ if (__DEV__) console.log(`Loaded default locale: ${defaultLocale}`)
 // `AppDelegate` / `MainApplication` can read before Firebase starts. Until then it is a
 // stated residual for the metric contracts (FR-56), alongside the arrival-timing one.
 initializeTelemetryGate()
+
+// The null adapter (AD-27) stands behind the port until OD-1 is signed: it acknowledges
+// and keeps what it was handed in a ring buffer the developer screen can read. Nothing
+// leaves the device, and the whole pipeline is exercisable end to end without it.
+registerTelemetryTransport(localOnlyTransport)
 
 /**
  * This is the root component of our app.
