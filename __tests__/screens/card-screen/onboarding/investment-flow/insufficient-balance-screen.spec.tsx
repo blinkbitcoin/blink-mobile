@@ -222,8 +222,8 @@ describe("InsufficientBalanceScreen", () => {
     ).toBeTruthy()
   })
 
-  /** The figures used to be fixed text, so a screen that ignored both the choice and the
-   *  wallets would still have passed every assertion above. */
+  /** A screen that ignored the choice or the wallets would still pass every assertion
+   *  above, so both are varied here. */
   it("follows a different balance and a different choice", async () => {
     mockRouteParams.current = { selectedAmountUsd: 1000 }
     mockFunding.current = {
