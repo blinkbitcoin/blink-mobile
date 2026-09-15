@@ -3695,7 +3695,7 @@
         "buttonText": "Gaan voort"
       },
       "SelectInvest": {
-        "desiredCreditLimit": "Hoeveel wil jy belê?",
+        "title": "Hoeveel wil jy belê?",
         "percent": "vir ~{percent: number}%"
       },
       "CompanyValuation": {

@@ -3743,7 +3743,7 @@
                 "buttonText": "続ける"
             },
             "SelectInvest": {
-                "desiredCreditLimit": "いくら投資したいですか？",
+                "title": "いくら投資したいですか？",
                 "percent": "約{percent: number}%に相当"
             },
             "CompanyValuation": {

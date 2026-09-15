@@ -3695,7 +3695,7 @@
         "buttonText": "ดำเนินการต่อ"
       },
       "SelectInvest": {
-        "desiredCreditLimit": "คุณต้องการลงทุนเท่าไหร่?",
+        "title": "คุณต้องการลงทุนเท่าไหร่?",
         "percent": "สำหรับ ~{percent: number}%"
       },
       "CompanyValuation": {

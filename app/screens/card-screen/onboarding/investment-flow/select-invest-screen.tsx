@@ -11,9 +11,9 @@ import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
-import { MOCK_CREDIT_LIMIT_VALUES } from "../onboarding-mock-data"
 import {
   formatUsdAmount,
+  INVESTMENT_OPTIONS,
   resolveEquityPercent,
   resolveInvestmentTerms,
 } from "./investment-terms"
@@ -28,29 +28,27 @@ export const SelectInvestScreen: React.FC = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   /** Each amount beside the share it buys, derived the way the term sheet derives it. */
-  const CREDIT_LIMITS = React.useMemo(
+  const options = React.useMemo(
     () =>
-      MOCK_CREDIT_LIMIT_VALUES.map((value) => ({
-        value,
-        amount: formatUsdAmount(value),
-        percent: LL.CardFlow.Onboarding.SelectInvest.percent({
-          percent: resolveEquityPercent(resolveInvestmentTerms(value)),
+      INVESTMENT_OPTIONS.map((usd) => ({
+        usd,
+        amount: formatUsdAmount(usd),
+        equity: LL.CardFlow.Onboarding.SelectInvest.percent({
+          percent: resolveEquityPercent(resolveInvestmentTerms(usd)),
         }),
       })),
     [LL],
   )
 
-  const [selectedLimit, setSelectedLimit] = React.useState<number | null>(null)
+  const [selectedAmountUsd, setSelectedAmountUsd] = React.useState<number | null>(null)
 
   const handleNext = () => {
-    if (selectedLimit !== null) {
-      navigation.navigate("cardOnboardingTermSheetScreen", {
-        selectedAmountUsd: selectedLimit,
-      })
+    if (selectedAmountUsd !== null) {
+      navigation.navigate("cardOnboardingTermSheetScreen", { selectedAmountUsd })
     }
   }
 
-  const isContinueDisabled = selectedLimit === null
+  const isContinueDisabled = selectedAmountUsd === null
 
   return (
     <Screen headerShown={false}>
@@ -59,25 +57,25 @@ export const SelectInvestScreen: React.FC = () => {
         <IconHero
           icon="btc-outline"
           iconColor={colors.primary}
-          title={LL.CardFlow.Onboarding.SelectInvest.desiredCreditLimit()}
+          title={LL.CardFlow.Onboarding.SelectInvest.title()}
         />
 
-        <View style={styles.limitsContainer}>
-          {CREDIT_LIMITS.map((item, index) => {
-            const isSelected = selectedLimit === item.value
-            const isNotLastItem = index < CREDIT_LIMITS.length - 1
+        <View style={styles.optionsContainer}>
+          {options.map((option, index) => {
+            const isSelected = selectedAmountUsd === option.usd
+            const isNotLastItem = index < options.length - 1
             return (
               <TouchableOpacity
-                key={item.value}
-                style={[styles.limitOption, isSelected && styles.limitOptionSelected]}
+                key={option.usd}
+                style={[styles.option, isSelected && styles.optionSelected]}
                 accessibilityRole="radio"
                 accessibilityState={{ selected: isSelected }}
-                onPress={() => setSelectedLimit(item.value)}
+                onPress={() => setSelectedAmountUsd(option.usd)}
               >
-                <Text type="p2" style={styles.limitText}>
-                  {item.amount} {item.percent}
+                <Text type="p2" style={styles.optionText}>
+                  {option.amount} {option.equity}
                 </Text>
-                {isNotLastItem && <View style={styles.limitSeparator} />}
+                {isNotLastItem && <View style={styles.optionSeparator} />}
               </TouchableOpacity>
             )
           })}
@@ -103,11 +101,11 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingBottom: 20,
     paddingTop: 40,
   },
-  limitsContainer: {
+  optionsContainer: {
     width: "100%",
     marginTop: 20,
   },
-  limitOption: {
+  option: {
     position: "relative",
     width: "100%",
     /** Grows rather than clips: a fixed height cuts the longer labels off at large
@@ -119,12 +117,12 @@ const useStyles = makeStyles(({ colors }) => ({
     overflow: "hidden",
     justifyContent: "center",
   },
-  limitOptionSelected: {
+  optionSelected: {
     borderColor: colors.primary,
     backgroundColor: colors.grey6,
     borderRadius: 8,
   },
-  limitSeparator: {
+  optionSeparator: {
     width: "97%",
     height: 1,
     backgroundColor: colors.grey4,
@@ -132,7 +130,7 @@ const useStyles = makeStyles(({ colors }) => ({
     bottom: 0,
     alignSelf: "center",
   },
-  limitText: {
+  optionText: {
     color: colors.grey0,
     paddingLeft: 10,
   },

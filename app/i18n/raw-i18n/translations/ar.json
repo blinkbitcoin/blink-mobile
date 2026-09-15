@@ -3695,7 +3695,7 @@
         "buttonText": "متابعة"
       },
       "SelectInvest": {
-        "desiredCreditLimit": "كم تود أن تستثمر؟",
+        "title": "كم تود أن تستثمر؟",
         "percent": "مقابل ~{percent: number}%"
       },
       "CompanyValuation": {

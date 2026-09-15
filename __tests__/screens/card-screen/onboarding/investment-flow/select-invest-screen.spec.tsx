@@ -55,7 +55,7 @@ describe("SelectInvestScreen", () => {
     expect(getByText("How much would you like to invest?")).toBeTruthy()
   })
 
-  it("displays credit limit options", async () => {
+  it("displays the investment options", async () => {
     const { getByText } = render(
       <ContextForScreen>
         <SelectInvestScreen />

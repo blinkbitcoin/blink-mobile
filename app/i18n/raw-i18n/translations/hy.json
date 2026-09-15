@@ -3695,7 +3695,7 @@
         "buttonText": "Շարունակել"
       },
       "SelectInvest": {
-        "desiredCreditLimit": "Որքա՞ն կցանկանայիք ներդնել։",
+        "title": "Որքա՞ն կցանկանայիք ներդնել։",
         "percent": "~{percent: number}% դիմաց"
       },
       "CompanyValuation": {
