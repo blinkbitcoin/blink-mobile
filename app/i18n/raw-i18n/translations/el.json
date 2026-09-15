@@ -2375,7 +2375,11 @@
       "tryingAgain": "Δοκιμάζουμε ξανά"
     },
     "copiedDestination": "Αντιγραφή προορισμού στο πρόχειρο",
-    "lightningRecommended": "Υψηλή τέλη! Συνιστούμε το Lightning.",
+    "lightningRecommended": "Υψηλή τέλη. Συνιστούμε το Lightning.",
+    "sending": "Αποστολή",
+    "fromBalance": "Από το υπόλοιπο",
+    "details": "Λεπτομέρειες",
+    "changeAmount": "Αλλαγή ποσού",
     "usdRemainderSweep": "Υπόλοιπο {remaining: string} ({remainingSats: string}) θα μετατραπεί σε Bitcoin. Ελάχιστο USD: {minimum: string}."
   },
   "SendBitcoinDestinationScreen": {

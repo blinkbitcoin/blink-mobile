@@ -2375,7 +2375,11 @@
       "tryingAgain": "Cuba sekali lagi"
     },
     "copiedDestination": "Destinasi telah disalin ke clipboard",
-    "lightningRecommended": "Yuran tinggi! Kami mengesyorkan Lightning.",
+    "lightningRecommended": "Yuran tinggi. Kami mengesyorkan Lightning.",
+    "sending": "Menghantar",
+    "fromBalance": "Daripada Baki",
+    "details": "Butiran",
+    "changeAmount": "Tukar amaun",
     "usdRemainderSweep": "Baki {remaining: string} ({remainingSats: string}) akan ditukar kepada Bitcoin. Minimum USD: {minimum: string}."
   },
   "SendBitcoinDestinationScreen": {

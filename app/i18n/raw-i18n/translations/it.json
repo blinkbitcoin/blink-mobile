@@ -2375,7 +2375,11 @@
             "tryingAgain": "Riproviamo"
         },
         "copiedDestination": "Destinazione copiata negli appunti",
-        "lightningRecommended": "Tariffa elevata! Consigliamo Lightning",
+        "lightningRecommended": "Tariffa elevata. Consigliamo Lightning",
+        "sending": "Invio",
+        "fromBalance": "Dal saldo",
+        "details": "Dettagli",
+        "changeAmount": "Modifica importo",
         "usdRemainderSweep": "Saldo rimanente {remaining: string} ({remainingSats: string}) sarà convertito in Bitcoin. Minimo USD: {minimum: string}."
     },
     "SendBitcoinDestinationScreen": {

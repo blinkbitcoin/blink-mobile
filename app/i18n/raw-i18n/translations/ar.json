@@ -2375,7 +2375,11 @@
       "tryingAgain": "نحاول مرة أخرى"
     },
     "copiedDestination": "تم نسخ الوجهة إلى الحافظة",
-    "lightningRecommended": "رسوم مرتفعة! نوصي باستخدام Lightning.",
+    "lightningRecommended": "رسوم مرتفعة. نوصي باستخدام Lightning.",
+    "sending": "جارٍ الإرسال",
+    "fromBalance": "من الرصيد",
+    "details": "التفاصيل",
+    "changeAmount": "تغيير المبلغ",
     "usdRemainderSweep": "الرصيد المتبقي {remaining: string} ({remainingSats: string}) سيتم تحويله إلى بيتكوين. الحد الأدنى للدولار الأمريكي: {minimum: string}."
   },
   "SendBitcoinDestinationScreen": {

@@ -2375,7 +2375,11 @@
             "tryingAgain": "Erneuter Versuch"
         },
         "copiedDestination": "Ziel in die Zwischenablage kopiert",
-        "lightningRecommended": "Hohe Gebühr! Wir empfehlen Lightning.",
+        "lightningRecommended": "Hohe Gebühr. Wir empfehlen Lightning.",
+        "sending": "Wird gesendet",
+        "fromBalance": "Vom Guthaben",
+        "details": "Details",
+        "changeAmount": "Betrag ändern",
         "usdRemainderSweep": "Restbetrag {remaining: string} ({remainingSats: string}) wird in Bitcoin umgewandelt. USD-Mindestbetrag: {minimum: string}."
     },
     "SendBitcoinDestinationScreen": {

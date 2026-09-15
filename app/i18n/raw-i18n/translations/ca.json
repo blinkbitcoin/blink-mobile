@@ -2375,7 +2375,11 @@
       "tryingAgain": "Tornant-ho a provar"
     },
     "copiedDestination": "Destinació copiada al porta-retalls",
-    "lightningRecommended": "Comissió alta! Recomanem utilitzar Lightning.",
+    "lightningRecommended": "Comissió alta. Recomanem utilitzar Lightning.",
+    "sending": "Enviant",
+    "fromBalance": "Des del saldo",
+    "details": "Detalls",
+    "changeAmount": "Canvia l'import",
     "usdRemainderSweep": "Resta {remaining: string} ({remainingSats: string}) i es convertirà a Bitcoin. Mínim d'USD: {minimum: string}."
   },
   "SendBitcoinDestinationScreen": {

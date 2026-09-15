@@ -2375,7 +2375,11 @@
       "tryingAgain": "Tekrar deniyoruz"
     },
     "copiedDestination": "Hedefi panoya kopyalama",
-    "lightningRecommended": "Yüksek komisyon! Lightning kullanmanızı öneriyoruz.",
+    "lightningRecommended": "Yüksek komisyon. Lightning kullanmanızı öneriyoruz.",
+    "sending": "Gönderiliyor",
+    "fromBalance": "Bakiyeden",
+    "details": "Detaylar",
+    "changeAmount": "Tutarı değiştir",
     "usdRemainderSweep": "Kalan {remaining: string} ({remainingSats: string}) Bitcoin'e dönüştürülecek. USD minimumu: {minimum: string}."
   },
   "SendBitcoinDestinationScreen": {

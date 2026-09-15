@@ -2375,7 +2375,11 @@
       "tryingAgain": "Újra próbáljuk"
     },
     "copiedDestination": "Címzett a vágólapra másolva",
-    "lightningRecommended": "Magas díj! Lightning használata ajánlott.",
+    "lightningRecommended": "Magas díj. Lightning használata ajánlott.",
+    "sending": "Küldés",
+    "fromBalance": "Egyenlegről",
+    "details": "Részletek",
+    "changeAmount": "Összeg módosítása",
     "usdRemainderSweep": "A fennmaradó {remaining: string} ({remainingSats: string}) Bitcoinra lesz váltva. USD minimum: {minimum: string}."
   },
   "SendBitcoinDestinationScreen": {
