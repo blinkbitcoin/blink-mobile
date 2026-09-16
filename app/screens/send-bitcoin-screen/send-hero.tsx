@@ -24,16 +24,29 @@ const ICON_SIZE = 32
  * other — only its scale changes.
  */
 const AMOUNT_SIZE = {
-  active: { primary: 26, secondary: 18 },
+  active: { secondary: 18 },
   inactive: { primary: 20, secondary: 14 },
 } as const
 const LINE_HEIGHT = {
-  active: { primary: 34, secondary: 24 },
+  active: { secondary: 24 },
   inactive: { primary: 24, secondary: 20 },
 } as const
 
-/** How far each line's centre travels to reach the other's. */
-const SWAP_DISTANCE = (LINE_HEIGHT.active.primary + LINE_HEIGHT.active.secondary) / 2
+/**
+ * While the amount is typed it starts large and steps down a pixel per digit, so a long
+ * amount still fits on one line: 32 for an empty or one-digit amount, 24 from nine digits
+ * (100,000,000) on.
+ */
+const ENTRY_AMOUNT_SIZE = { max: 32, min: 24 } as const
+const ENTRY_LINE_HEIGHT_OFFSET = 2
+
+export const entryAmountFontSize = (amount: string, isEmpty: boolean): number => {
+  if (isEmpty) return ENTRY_AMOUNT_SIZE.max
+  const digits = amount.replace(/\D/g, "").length
+  const size = ENTRY_AMOUNT_SIZE.max - Math.max(digits - 1, 0)
+  return Math.max(size, ENTRY_AMOUNT_SIZE.min)
+}
+
 const SWAP_ANIMATION_MS = 220
 
 type SendHeroProps = {
@@ -72,6 +85,20 @@ export const SendHero: React.FC<SendHeroProps> = ({
     theme: { colors },
   } = useTheme()
 
+  const entryPrimarySize = entryAmountFontSize(primaryAmount, isEmpty)
+  const primarySize = active
+    ? {
+        fontSize: entryPrimarySize,
+        lineHeight: entryPrimarySize + ENTRY_LINE_HEIGHT_OFFSET,
+      }
+    : {
+        fontSize: AMOUNT_SIZE.inactive.primary,
+        lineHeight: LINE_HEIGHT.inactive.primary,
+      }
+  /** How far each line's centre travels to reach the other's. */
+  const swapDistance = (primarySize.lineHeight + LINE_HEIGHT.active.secondary) / 2
+  const sizeRatio = AMOUNT_SIZE.active.secondary / primarySize.fontSize
+
   const swap = useSharedValue(1)
   const previousPrimaryCurrency = useSharedValue(primaryCurrency)
 
@@ -89,31 +116,21 @@ export const SendHero: React.FC<SendHeroProps> = ({
   const primaryStyle = useAnimatedStyle(
     () => ({
       transform: [
-        { translateY: SWAP_DISTANCE * (1 - swap.value) },
-        {
-          scale:
-            1 -
-            (1 - AMOUNT_SIZE.active.secondary / AMOUNT_SIZE.active.primary) *
-              (1 - swap.value),
-        },
+        { translateY: swapDistance * (1 - swap.value) },
+        { scale: 1 - (1 - sizeRatio) * (1 - swap.value) },
       ],
     }),
-    [swap],
+    [swap, swapDistance, sizeRatio],
   )
 
   const secondaryStyle = useAnimatedStyle(
     () => ({
       transform: [
-        { translateY: -SWAP_DISTANCE * (1 - swap.value) },
-        {
-          scale:
-            1 +
-            (AMOUNT_SIZE.active.primary / AMOUNT_SIZE.active.secondary - 1) *
-              (1 - swap.value),
-        },
+        { translateY: -swapDistance * (1 - swap.value) },
+        { scale: 1 + (1 / sizeRatio - 1) * (1 - swap.value) },
       ],
     }),
-    [swap],
+    [swap, swapDistance, sizeRatio],
   )
 
   const size = active ? "active" : "inactive"
@@ -142,8 +159,7 @@ export const SendHero: React.FC<SendHeroProps> = ({
         style={[
           styles.amount,
           {
-            fontSize: AMOUNT_SIZE[size].primary,
-            lineHeight: LINE_HEIGHT[size].primary,
+            ...primarySize,
             color: isEmpty ? colors.grey2 : colors.black,
           },
           active && primaryStyle,
