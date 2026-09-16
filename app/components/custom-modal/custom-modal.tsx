@@ -1,11 +1,5 @@
 import React, { ReactNode } from "react"
-import {
-  Platform,
-  View,
-  TouchableOpacity,
-  StyleSheet,
-  DimensionValue,
-} from "react-native"
+import { View, TouchableOpacity, StyleSheet, DimensionValue } from "react-native"
 import { ScrollView } from "react-native-gesture-handler"
 import Modal from "react-native-modal"
 
@@ -190,7 +184,7 @@ const useStyles = makeStyles(({ colors }, props: UseStylesProps) => ({
   },
   modalTitleText: {
     fontSize: props.titleFontSize ?? 24,
-    fontWeight: Platform.OS === "ios" ? "600" : "700",
+    fontWeight: "700",
     lineHeight: 32,
     maxWidth: props.titleMaxWidth || "80%",
     textAlign: props.titleTextAlignment || "center",

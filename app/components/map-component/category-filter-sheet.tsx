@@ -163,7 +163,7 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: { bottomInset: number
   },
   title: {
     fontSize: 20,
-    fontWeight: "600",
+    fontWeight: "700",
     color: colors.black,
   },
   action: {

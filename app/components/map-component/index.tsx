@@ -672,7 +672,7 @@ const useStyles = makeStyles(({ colors }, { topInset }: { topInset: number }) =>
   },
   retryText: {
     fontSize: 13,
-    fontWeight: "600",
+    fontWeight: "700",
     color: colors.primary,
   },
   addPlace: {

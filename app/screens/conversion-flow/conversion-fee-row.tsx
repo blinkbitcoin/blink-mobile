@@ -47,7 +47,7 @@ const useStyles = makeStyles(({ colors }) => ({
   label: {
     color: colors.grey2,
     fontSize: 14,
-    fontWeight: "600",
+    fontWeight: "700",
   },
   value: {
     color: colors.grey1,

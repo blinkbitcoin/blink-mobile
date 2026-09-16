@@ -87,7 +87,7 @@ const useStyles = makeStyles((_, props: GaloyTertiaryButtonProps) => ({
     lineHeight: 20,
     textAlign: "center",
     fontSize: 14,
-    fontWeight: props.clear ? "bold" : "600",
+    fontWeight: "700",
     opacity: props.disabled ? 0.7 : 1,
   },
 

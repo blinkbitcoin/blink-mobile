@@ -159,7 +159,7 @@ const useStyles = makeStyles(({ colors }) => ({
     gap: 16,
   },
   title: {
-    fontWeight: "600",
+    fontWeight: "700",
   },
   description: {
     color: colors.grey2,
@@ -178,7 +178,7 @@ const useStyles = makeStyles(({ colors }) => ({
     gap: 2,
   },
   rowTitle: {
-    fontWeight: "600",
+    fontWeight: "700",
   },
   rowHint: {
     color: colors.grey2,

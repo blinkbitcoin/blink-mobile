@@ -47,7 +47,7 @@ const useStyles = makeStyles(({ colors }, { size }: StyleProps) => ({
     color: colors.primary,
     fontSize: size * 0.65,
     fontFamily: "Source Sans Pro",
-    fontWeight: "600",
+    fontWeight: "700",
     lineHeight: size * 0.87,
   },
 }))

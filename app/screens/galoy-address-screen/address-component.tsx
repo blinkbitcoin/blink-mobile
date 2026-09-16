@@ -145,7 +145,7 @@ const useStyles = makeStyles(({ colors }) => ({
     textDecorationLine: "underline",
     fontSize: 14,
     lineHeight: 18,
-    fontWeight: "600",
+    fontWeight: "700",
   },
   iconsContainer: {
     display: "flex",

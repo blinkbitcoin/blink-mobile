@@ -656,7 +656,7 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: StyleProps) => ({
   name: {
     flex: 1,
     fontSize: 20,
-    fontWeight: "600",
+    fontWeight: "700",
     color: colors.black,
   },
   nameSkeleton: {
@@ -686,17 +686,17 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: StyleProps) => ({
   },
   badgeOpen: {
     fontSize: 12,
-    fontWeight: "600",
+    fontWeight: "700",
     color: colors._green,
   },
   badgeClosed: {
     fontSize: 12,
-    fontWeight: "600",
+    fontWeight: "700",
     color: colors.error,
   },
   badgeBoosted: {
     fontSize: 12,
-    fontWeight: "600",
+    fontWeight: "700",
     color: colors.primary,
   },
   verification: {
@@ -765,7 +765,7 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: StyleProps) => ({
   },
   retryText: {
     fontSize: 13,
-    fontWeight: "600",
+    fontWeight: "700",
     color: colors.primary,
   },
   skeletonBlock: {
