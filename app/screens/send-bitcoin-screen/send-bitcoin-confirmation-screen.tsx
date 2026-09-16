@@ -4,8 +4,8 @@ import { PanGestureHandler } from "react-native-gesture-handler"
 import ReactNativeHapticFeedback from "react-native-haptic-feedback"
 
 import { gql } from "@apollo/client"
+import { Chip } from "@app/components/atomic/chip"
 import { GaloyErrorBox } from "@app/components/atomic/galoy-error-box"
-import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import GaloySliderButton from "@app/components/atomic/galoy-slider-button/galoy-slider-button"
 import { InfoSection } from "@app/components/card-screen"
 import { Screen } from "@app/components/screen"
@@ -37,6 +37,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { SendWalletSummary } from "./amount-entry/send-wallet-summary"
+import { isAmountFixableError } from "./amount-fixable-error"
 import { formatEta } from "./fee-tier-options"
 import { FeeTierOption } from "./hooks/fee-tiers.types"
 import {
@@ -124,7 +125,15 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
 
   const btcPrimaryText = formatMoneyAmount({ moneyAmount: btcBalanceMoneyAmount })
   const usdPrimaryText = formatMoneyAmount({ moneyAmount: usdBalanceMoneyAmount })
-  const [paymentError, setPaymentError] = useState<string | undefined>(undefined)
+  const [paymentFailure, setPaymentFailure] = useState<
+    { message: string; canChangeAmount: boolean } | undefined
+  >(undefined)
+  const paymentError = paymentFailure?.message
+  const setPaymentError = React.useCallback(
+    (message: string, raw?: string) =>
+      setPaymentFailure({ message, canChangeAmount: isAmountFixableError(raw) }),
+    [],
+  )
   const [isVerifying, setIsVerifying] = useState(false)
   const verifyPaymentSettled = useVerifyPaymentSettled()
   const { LL, locale } = useI18nContext()
@@ -333,6 +342,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
       setPaymentError(
         translateSdkError(errorsMessage) ||
           LL.SendBitcoinConfirmationScreen.somethingWentWrong(),
+        errorsMessage,
       )
       ReactNativeHapticFeedback.trigger("notificationError", {
         ignoreAndroidSystemSettings: true,
@@ -387,6 +397,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
           err.message === IDEMPOTENCY_KEY_UNAVAILABLE
             ? LL.SendBitcoinConfirmationScreen.somethingWentWrong()
             : err.message || err.toString(),
+          err.message,
         )
       }
     }
@@ -499,7 +510,8 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   const isMaxFee = fee.status === "error" && Boolean(fee.amount)
   const isFeeFailed = fee.status === "error" && !fee.amount
 
-  const feeValue = isFeeFailed ? feeErrorText : `${feeDisplayText}${isMaxFee ? " *" : ""}`
+  // A failed quote leaves the row blank; its reason goes under the card with the other errors.
+  const feeValue = isFeeFailed ? "—" : `${feeDisplayText}${isMaxFee ? " *" : ""}`
 
   const detailItems = [
     ...(priorityTier && priorityEtaMinutes !== undefined
@@ -513,7 +525,6 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     {
       label: LL.SendBitcoinConfirmationScreen.feeLabel(),
       value: feeValue,
-      valueColor: isFeeFailed ? colors.error : undefined,
       loading: isFeeLoading,
       valueTestId: fee.status === "set" ? "Successful Fee" : undefined,
     },
@@ -522,7 +533,14 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
 
   /** One slot under the card, first match wins: what blocks the send (red) before the
    *  high-fee advisory (warning). */
-  const blockingError = paymentError || invalidAmountErrorMessage
+  const blockingError =
+    paymentError || invalidAmountErrorMessage || (isFeeFailed ? feeErrorText : "")
+  // Offered only when the error on show is about the amount; a network or invoice failure
+  // is not fixed by going back to change it.
+  const canChangeAmount = paymentFailure
+    ? paymentFailure.canChangeAmount
+    : Boolean(invalidAmountErrorMessage) ||
+      (isFeeFailed && isAmountFixableError(feeErrorCode))
   const detailsOutline =
     invalidAmountErrorMessage || isFeeFailed
       ? colors.error
@@ -570,10 +588,11 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
           {blockingError ? (
             <View style={styles.errorWithAction}>
               <GaloyErrorBox errorMessage={blockingError} filled={false} />
-              {invalidAmountErrorMessage && !paymentError ? (
-                <GaloySecondaryButton
-                  title={LL.SendBitcoinConfirmationScreen.changeAmount()}
+              {canChangeAmount ? (
+                <Chip
+                  label={LL.SendBitcoinConfirmationScreen.changeAmount()}
                   onPress={() => navigation.goBack()}
+                  style={styles.changeAmountChip}
                 />
               ) : null}
             </View>
@@ -644,7 +663,10 @@ const useStyles = makeStyles(({ colors }) => ({
     rowGap: 7,
   },
   errorWithAction: {
-    rowGap: 4,
+    rowGap: 12,
+  },
+  changeAmountChip: {
+    alignSelf: "center",
   },
   footnote: {
     color: colors.grey2,
