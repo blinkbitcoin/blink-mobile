@@ -3716,7 +3716,7 @@
           "valuation": "Pada penilaian pra-wang $10M",
           "units": "Anda menerima {units: string} unit ~{percent: number}% daripada Blink"
         },
-        "buttonText": "Teruskan ke Tandatangan"
+        "buttonText": "Teruskan ke tandatangan"
       },
       "TransferInvest": {
         "title": "Pindahkan pelaburan anda",

@@ -3712,11 +3712,11 @@
         "title": "Termblad",
         "equitySection": {
           "title": "Egenkapital i Blink",
-          "investment": "{amount: string} Investering",
+          "investment": "{amount: string} investering",
           "valuation": "Ved $10M pre-money vurdering",
           "units": "Du modtager {units: string} enheder ~{percent: number}% af Blink"
         },
-        "buttonText": "Fortsæt til Underskrift"
+        "buttonText": "Fortsæt til underskrift"
       },
       "TransferInvest": {
         "title": "Overfør din investering",

@@ -3716,7 +3716,7 @@
           "valuation": "Při pre-money ocenění $10M",
           "units": "Obdržíte {units: string} jednotek ~{percent: number}% Blink"
         },
-        "buttonText": "Přejít k Podpisu"
+        "buttonText": "Přejít k podpisu"
       },
       "TransferInvest": {
         "title": "Převeďte svou investici",
