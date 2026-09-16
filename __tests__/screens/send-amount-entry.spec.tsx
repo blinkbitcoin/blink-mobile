@@ -314,16 +314,16 @@ describe("free amount", () => {
     const colorOf = (testID: string) =>
       StyleSheet.flatten(screen.getByTestId(testID).props.style).color
 
-    const emptyPrimary = colorOf("send-amount-primary")
-    const emptySecondary = colorOf("send-amount-secondary")
+    const emptyPrimary = colorOf("send-hero-amount-primary")
+    const emptySecondary = colorOf("send-hero-amount-secondary")
     typeKeys("1")
     await settle()
 
     // Empty reads grey2 over grey3; active steps each line up one, so the typed
     // secondary takes the grey the empty primary had.
     expect(emptyPrimary).not.toBe(emptySecondary)
-    expect(colorOf("send-amount-secondary")).toBe(emptyPrimary)
-    expect(colorOf("send-amount-primary")).not.toBe(emptyPrimary)
+    expect(colorOf("send-hero-amount-secondary")).toBe(emptyPrimary)
+    expect(colorOf("send-hero-amount-primary")).not.toBe(emptyPrimary)
   })
 
   it("sets the chip's share of the selected wallet's balance", async () => {
@@ -424,12 +424,14 @@ describe("fixed amount", () => {
   it("keeps the invoice amount and re-checks it when the wallet switches", async () => {
     renderScreen(invoiceDestination)
     await settle()
-    const amountBefore = screen.getByTestId("send-amount-primary").props.children
+    const amountBefore = screen.getByTestId("send-hero-amount-primary").props.children
 
     fireEvent.press(screen.getByTestId("choose-wallet-to-send-from"))
     await settle()
 
-    expect(screen.getByTestId("send-amount-primary").props.children).toBe(amountBefore)
+    expect(screen.getByTestId("send-hero-amount-primary").props.children).toBe(
+      amountBefore,
+    )
     expect(screen.getByTestId(`${WalletCurrency.Usd} Wallet Balance`)).toBeTruthy()
     expect(
       screen.queryByText(

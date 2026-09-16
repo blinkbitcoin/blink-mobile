@@ -30,6 +30,15 @@ export const PAYOUT_SPEED_BY_FEE_TIER: Record<FeeTierOption, PayoutSpeed> = {
   [FeeTierOption.Slow]: PayoutSpeed.Slow,
 }
 
+/** The inverse: a custodial payment detail carries the speed, and the review row names the
+ *  tier it stands for. */
+export const feeTierFromPayoutSpeed = (
+  payoutSpeed: PayoutSpeed | undefined,
+): FeeTierOption | undefined =>
+  (Object.keys(PAYOUT_SPEED_BY_FEE_TIER) as FeeTierOption[]).find(
+    (tier) => PAYOUT_SPEED_BY_FEE_TIER[tier] === payoutSpeed,
+  )
+
 /**
  * Mirrors the broadcast windows the backend advertises for each payout queue
  * (`payoutSpeeds` in galoy-values): Priority ~10 minutes, Standard ~4 hours and

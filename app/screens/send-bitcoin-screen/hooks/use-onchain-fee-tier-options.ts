@@ -16,6 +16,7 @@ import { ConvertMoneyAmount, type PaymentDetail } from "../payment-details/index
 import { type FeeTierInfo, FeeTierOption, FeeUnit } from "./fee-tiers.types"
 import { useCustodialFeeRail, useSelfCustodialFeeRail } from "./use-fee-rail"
 import { PAYOUT_SPEED_BY_FEE_TIER } from "./use-custodial-onchain-fee-tiers"
+import { useFeeTierLabels } from "./use-fee-tier-labels"
 
 /**
  * Read off the tier rather than guessed from the rail, so a cents fee can never be handed
@@ -47,7 +48,8 @@ export const useOnchainFeeTierOptions = ({
 }: FeeTierOptionsParams) => {
   const { sdk } = useSelfCustodialWallet()
   const { formatMoneyAmount, moneyAmountToDisplayCurrencyString } = useDisplayCurrency()
-  const { LL, locale } = useI18nContext()
+  const { locale } = useI18nContext()
+  const feeTierLabels = useFeeTierLabels()
   /**
    * Held as "nothing picked yet" rather than seeded with a default, because isSelfCustodial
    * reads false until the wallet finishes initializing. Deriving the fallback on each render
@@ -86,11 +88,7 @@ export const useOnchainFeeTierOptions = ({
   const feeTierOptions = buildFeeTierOptions({
     hasQuote: feeRail.hasQuote,
     tiers: feeRail.tiers,
-    labels: {
-      [FeeTierOption.Fast]: LL.SendBitcoinScreen.fast(),
-      [FeeTierOption.Medium]: LL.SendBitcoinScreen.medium(),
-      [FeeTierOption.Slow]: LL.SendBitcoinScreen.slow(),
-    },
+    labels: feeTierLabels,
     /**
      * Display currency, like the confirmation screen; the wallet amount only stands in
      * while the price is still loading.

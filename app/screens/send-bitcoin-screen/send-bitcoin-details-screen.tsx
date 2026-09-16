@@ -8,6 +8,7 @@ import React, { useCallback, useEffect, useState } from "react"
 import { ActivityIndicator, ScrollView, View } from "react-native"
 import { gql } from "@apollo/client"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { useNumberPad } from "@app/components/amount-input-screen/use-number-pad"
 import { CurrencyKeyboard } from "@app/components/currency-keyboard"
 import { NoteInput } from "@app/components/note-input"
 import { PercentageSelector } from "@app/components/percentage-selector"
@@ -27,7 +28,7 @@ import {
 import { NavigationProp, RouteProp, useNavigation } from "@react-navigation/native"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
-import { useClipboard, usePriceConversion } from "@app/hooks"
+import { useAppConfig, useClipboard, usePriceConversion } from "@app/hooks"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -48,10 +49,10 @@ import { useOnchainFeeTierOptions } from "./hooks/use-onchain-fee-tier-options"
 import { useSendWallets } from "./hooks/use-send-wallets"
 
 import { testProps } from "../../utils/testProps"
-import { SendAmountHeader } from "./amount-entry/send-amount-header"
 import { SendWalletSummary } from "./amount-entry/send-wallet-summary"
-import { useSendAmountPad } from "./amount-entry/use-send-amount-pad"
 import { ConfirmFeesModal } from "./confirm-fees-modal"
+import { formatDestination } from "./format-destination"
+import { SendHero } from "./send-hero"
 import { AmountInvalidReason, isValidAmount } from "./payment-details"
 import { PaymentDetail } from "./payment-details/index.types"
 import { SendBitcoinDetailsExtraInfo } from "./send-bitcoin-details-extra-info"
@@ -137,6 +138,11 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     useDisplayCurrency()
   const { LL } = useI18nContext()
   const { copyToClipboard } = useClipboard()
+  const {
+    appConfig: {
+      galoyInstance: { lnAddressHostname },
+    },
+  } = useAppConfig()
   const [isLoadingLnurl, setIsLoadingLnurl] = useState(false)
   const [modalHighFeesVisible, setModalHighFeesVisible] = useState(false)
   const [selectedPercent, setSelectedPercent] = useState<number | null>(null)
@@ -194,7 +200,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     )
   }, [])
 
-  const amountPad = useSendAmountPad({
+  const amountPad = useNumberPad({
     walletCurrency:
       paymentDetail?.sendingWalletDescriptor.currency ??
       defaultWallet?.walletCurrency ??
@@ -553,9 +559,13 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
       >
-        <SendAmountHeader
-          destination={paymentDetail.destination}
-          paymentType={paymentDetail.paymentType}
+        <SendHero
+          active
+          caption={formatDestination({
+            destination: paymentDetail.destination,
+            paymentType: paymentDetail.paymentType,
+            lnAddressHostname,
+          })}
           primaryAmount={primaryAmountText}
           secondaryAmount={
             secondaryAmount && formatMoneyAmount({ moneyAmount: secondaryAmount })
@@ -563,7 +573,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
           primaryCurrency={primaryCurrency}
           isEmpty={paymentDetail.canSetAmount && !hasAmount}
           onSwapCurrency={paymentDetail.canSetAmount ? swapTypedCurrency : undefined}
-          onCopyDestination={handleCopyToClipboard}
+          onCaptionLongPress={handleCopyToClipboard}
         />
         <View style={styles.fields}>
           {/* The one error slot sits right above the wallet card it is usually about. */}
