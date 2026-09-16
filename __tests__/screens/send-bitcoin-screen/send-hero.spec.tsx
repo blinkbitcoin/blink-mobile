@@ -69,39 +69,40 @@ describe("SendHero", () => {
     renderHero({ active: true, secondaryAmount: "746 SAT" })
 
     expect(style(screen.getByTestId(SEND_HERO_PRIMARY_TEST_ID))).toEqual(
-      expect.objectContaining({ fontSize: 30, lineHeight: 32 }),
+      expect.objectContaining({ fontSize: 33, lineHeight: 35 }),
     )
     expect(style(screen.getByTestId(SEND_HERO_SECONDARY_TEST_ID))).toEqual(
       expect.objectContaining({ fontSize: 18, lineHeight: 24 }),
     )
   })
 
-  it("draws an empty entry amount at 32 on 34", () => {
+  it("draws an empty entry amount at 36 on 38", () => {
     renderHero({ active: true, isEmpty: true, primaryAmount: "$0.00" })
 
     expect(style(screen.getByTestId(SEND_HERO_PRIMARY_TEST_ID))).toEqual(
-      expect.objectContaining({ fontSize: 32, lineHeight: 34 }),
+      expect.objectContaining({ fontSize: 36, lineHeight: 38 }),
     )
   })
 
-  it("stops shrinking the entry amount at 24 on 26 from nine digits", () => {
+  it("stops shrinking the entry amount at 22 on 24 from ten digits", () => {
     renderHero({ active: true, primaryAmount: "1,000,000,000 SAT" })
 
     expect(style(screen.getByTestId(SEND_HERO_PRIMARY_TEST_ID))).toEqual(
-      expect.objectContaining({ fontSize: 24, lineHeight: 26 }),
+      expect.objectContaining({ fontSize: 22, lineHeight: 24 }),
     )
   })
 
   describe("entryAmountFontSize", () => {
     const cases: Array<[amount: string, isEmpty: boolean, expected: number]> = [
-      ["$0", false, 32],
-      ["$0.00", true, 32],
-      ["$5", false, 32],
-      ["$12", false, 31],
-      ["1,234 SAT", false, 29],
+      ["$0", false, 36],
+      ["$0.00", true, 36],
+      ["$5", false, 36],
+      ["$12", false, 34],
+      ["1,234 SAT", false, 31],
       ["12,345,678 SAT", false, 25],
       ["100,000,000 SAT", false, 24],
-      ["$1,234,567,890.12", false, 24],
+      ["1,000,000,000 SAT", false, 22],
+      ["$1,234,567,890.12", false, 22],
     ]
 
     cases.forEach(([amount, isEmpty, expected]) => {
