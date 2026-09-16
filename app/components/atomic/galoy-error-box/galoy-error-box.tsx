@@ -8,7 +8,7 @@ import { GaloyIcon } from "../galoy-icon"
 type GaloyErrorBoxProps = {
   errorMessage: string
   noIcon?: boolean
-  /** The unfilled variant is a bare centred line, for an error that sits right above the
+  /** The unfilled variant is a bare left-aligned line, for an error that sits right above the
    *  field it is about (which carries the red outline) rather than in a box of its own. */
   filled?: boolean
 }
@@ -26,7 +26,14 @@ export const GaloyErrorBox: React.FC<GaloyErrorBoxProps> = ({
   if (!filled) {
     return (
       <View style={styles.unfilledContainer}>
-        {!noIcon && <GaloyIcon name="info" size={16} color={colors.error} />}
+        {!noIcon && (
+          <GaloyIcon
+            name="info"
+            size={16}
+            color={colors.error}
+            style={styles.unfilledIcon}
+          />
+        )}
         <Text style={styles.unfilledText} type="p3" color={colors.error}>
           {errorMessage}
         </Text>
@@ -64,14 +71,17 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   unfilledContainer: {
     flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: "flex-start",
+    justifyContent: "flex-start",
     columnGap: 8,
     paddingVertical: 3,
   },
+  unfilledIcon: {
+    marginTop: 2,
+  },
   unfilledText: {
     flexShrink: 1,
-    textAlign: "center",
+    textAlign: "left",
     lineHeight: 20,
   },
 }))
