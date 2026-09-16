@@ -374,9 +374,19 @@ export const PersistentStateProvider: React.FC<PropsWithChildren> = ({ children 
     [],
   )
 
+  /**
+   * Everything starts over on logout except the card investments signed for: they are
+   * filed by server account id, so nothing of them can reach another user, and a signed
+   * agreement outlives the session that signed it.
+   */
   const resetState = React.useCallback(() => {
     hasModified.current = true
-    setPersistentState(defaultPersistentState)
+    setPersistentState((prev) => ({
+      ...defaultPersistentState,
+      ...(prev?.cardInvestmentByAccountId
+        ? { cardInvestmentByAccountId: prev.cardInvestmentByAccountId }
+        : {}),
+    }))
   }, [])
 
   const clearToken = React.useCallback(async () => {

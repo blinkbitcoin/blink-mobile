@@ -158,7 +158,7 @@ describe("useRestoreWallet", () => {
    */
   describe("the mode a restored wallet comes back with", () => {
     const baseState: PersistentState = {
-      schemaVersion: 21,
+      schemaVersion: 22,
       galoyInstance: { id: "Main" },
       galoyAuthToken: "",
       activeAccountId: TEST_ACCOUNT_ID,
