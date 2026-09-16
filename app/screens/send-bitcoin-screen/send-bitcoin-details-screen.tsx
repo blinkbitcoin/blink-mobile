@@ -635,6 +635,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
             big={false}
             iconSize={16}
             fontSize={14}
+            style={styles.noteField}
           />
         </View>
       </ScrollView>
@@ -692,6 +693,14 @@ const useStyles = makeStyles(() => ({
   },
   walletWithError: {
     rowGap: 5,
+  },
+  /** Same height as the priority row above it, as drawn. */
+  noteField: {
+    minHeight: 42,
+    borderRadius: 8,
+    paddingVertical: 8,
+    paddingLeft: 14,
+    paddingRight: 10,
   },
   bottom: {
     paddingHorizontal: 20,

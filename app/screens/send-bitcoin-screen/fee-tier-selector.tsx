@@ -106,6 +106,8 @@ const useStyles = makeStyles(({ colors }) => ({
     columnGap: 12,
     backgroundColor: colors.grey5,
     borderRadius: 8,
+    /** Matches the note field below; the padding lets it grow with the font scale. */
+    minHeight: 42,
     paddingVertical: 8,
     paddingHorizontal: 14,
   },
