@@ -1,5 +1,12 @@
 import React, { useRef } from "react"
-import { View, TextInput, StyleProp, ViewStyle, TouchableOpacity } from "react-native"
+import {
+  Pressable,
+  View,
+  TextInput,
+  StyleProp,
+  ViewStyle,
+  TouchableOpacity,
+} from "react-native"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
@@ -41,7 +48,8 @@ export const NoteInput: React.FC<NoteInputProps> = ({
     }
   }
   return (
-    <View style={[styles.fieldBackground, style]}>
+    // The whole field focuses the input, since the input itself is only one line tall.
+    <Pressable style={[styles.fieldBackground, style]} onPress={focusTextInput}>
       <View style={styles.noteContainer}>
         <TextInput
           {...testProps("add-note")}
@@ -60,7 +68,7 @@ export const NoteInput: React.FC<NoteInputProps> = ({
           <GaloyIcon name={"pencil"} size={iconSize} color={colors.primary} />
         </TouchableOpacity>
       </View>
-    </View>
+    </Pressable>
   )
 }
 
@@ -98,6 +106,8 @@ const useStyles = makeStyles(
       color: colors.black,
       fontWeight: "400",
       lineHeight: 20,
+      /** No platform padding, so the field's min height and font scale set its size. */
+      paddingVertical: 0,
     },
   }),
 )
