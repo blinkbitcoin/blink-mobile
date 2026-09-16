@@ -18,6 +18,7 @@ import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { WalletCurrency } from "@app/graphql/generated"
 import { SATS_PER_BTC, usePriceConversion } from "@app/hooks/use-price-conversion"
 import { useAppConfig } from "@app/hooks/use-app-config"
+import { useCardInvestmentProgress } from "@app/hooks/use-card-investment-progress"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { toBtcMoneyAmount } from "@app/types/amounts"
@@ -120,6 +121,7 @@ export const SignInvestScreen: React.FC = () => {
   const { convertMoneyAmount } = usePriceConversion()
   const { selectedAmountUsd } = useRoute<SignInvestRoute>().params
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+  const { start: startCardInvestment, isAccountResolved } = useCardInvestmentProgress()
 
   /**
    * The satoshis the minted agreement settles at, kept from the mint so the transfer step
@@ -154,16 +156,17 @@ export const SignInvestScreen: React.FC = () => {
     mintInputs.current = { token, fields: cardInvestmentAgreementPrefill, usdCentsPerBtc }
   }, [token, cardInvestmentAgreementPrefill, usdCentsPerBtc])
 
-  /** Replaces rather than pushes: the agreement cannot be unsigned, so leaving this
-   *  screen behind would let a back swipe land on a finished session with no way on. */
-  const goToTransfer = React.useCallback(
-    () =>
-      navigation.replace("cardOnboardingTransferInvestScreen", {
-        selectedAmountUsd,
-        settlementSats: settlementSats.current,
-      }),
-    [navigation, selectedAmountUsd],
-  )
+  /**
+   * Replaces rather than pushes: the agreement cannot be unsigned, so leaving this screen
+   * behind would let a back swipe land on a finished session with no way on. The same
+   * moment records the investment, so the home can steer the investor back to paying it
+   * if they leave before they do.
+   */
+  const goToTransfer = React.useCallback(() => {
+    const investment = { selectedAmountUsd, settlementSats: settlementSats.current }
+    startCardInvestment(investment)
+    navigation.replace("cardOnboardingTransferInvestScreen", investment)
+  }, [navigation, selectedAmountUsd, startCardInvestment])
 
   /**
    * A signer who declines is sent back, and the session returns to idle as they go.
@@ -244,17 +247,21 @@ export const SignInvestScreen: React.FC = () => {
     onError: reportSigningError,
   })
 
-  /** The agreement cannot be minted before the price feed has answered, so a cold open
-   *  waits on the spinner for it rather than failing the session it is about to start. */
+  /** The agreement cannot be minted before the price feed has answered, and it must not
+   *  be signed before the investment can be recorded against the account, or the home
+   *  would never steer the investor back to paying it. A cold open waits on the spinner
+   *  for both rather than failing the session it is about to start. */
   const isPriceQuoted = usdCentsPerBtc !== null
+  const canStartSigning = isPriceQuoted && isAccountResolved
 
   /**
-   * Whether that wait has gone on too long. While it is waiting a timer runs; once the
-   * price is in, or the session has moved on, the flag drops so a later wait starts
-   * fresh. Trying again drops it too, which starts the timer over: the feed answers on
-   * its own once the device is back, and the session then starts without another tap.
+   * Whether that wait has gone on too long. While it is waiting a timer runs; once both
+   * are in, or the session has moved on, the flag drops so a later wait starts fresh.
+   * Trying again drops it too, which starts the timer over: the feed and the account
+   * answer on their own once the device is back, and the session then starts without
+   * another tap.
    */
-  const isWaitingToStart = status === "idle" && !isPriceQuoted
+  const isWaitingToStart = status === "idle" && !canStartSigning
   const [hasGivenUpWaiting, setHasGivenUpWaiting] = React.useState(false)
   React.useEffect(() => {
     if (!isWaitingToStart) {
@@ -283,11 +290,11 @@ export const SignInvestScreen: React.FC = () => {
       return
     }
 
-    if (hasStartedFromIdle.current || isLeaving.current || !isPriceQuoted) return
+    if (hasStartedFromIdle.current || isLeaving.current || !canStartSigning) return
 
     hasStartedFromIdle.current = true
     sign()
-  }, [status, sign, isPriceQuoted])
+  }, [status, sign, canStartSigning])
 
   /**
    * Whether the signing page has drawn its interface. Until it has, this step's own

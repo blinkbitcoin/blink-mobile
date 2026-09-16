@@ -102,6 +102,20 @@ jest.mock("@app/screens/card-screen/onboarding/investment-flow/esign-mint", () =
   mintSigningInstance: (...args: unknown[]) => mockMintSigningInstance(...args),
 }))
 
+/** The record the home reads to steer the investor back to paying; its own spec covers
+ *  the store, so what matters here is that signing writes it, with what. */
+const mockStartCardInvestment = jest.fn()
+/** Whether the account the record is filed under is known; a custodial session can
+ *  still be asking the server on a cold open. */
+const mockIsAccountResolved = { current: true }
+
+jest.mock("@app/hooks/use-card-investment-progress", () => ({
+  useCardInvestmentProgress: () => ({
+    start: (...args: unknown[]) => mockStartCardInvestment(...args),
+    isAccountResolved: mockIsAccountResolved.current,
+  }),
+}))
+
 /** Read through a getter so a test can arrive on the route with a different choice. */
 const mockRouteParams = { current: { selectedAmountUsd: SELECTED_AMOUNT_USD } }
 
@@ -229,6 +243,7 @@ describe("SignInvestScreen", () => {
     mockRouteParams.current = { selectedAmountUsd: SELECTED_AMOUNT_USD }
     mockHostFields.current = HOST_FIELDS
     mockUsdCentsPerBtc.current = USD_CENTS_PER_BTC
+    mockIsAccountResolved.current = true
     mockMintSigningInstance.mockResolvedValue({
       url: TEST_INSTANCE_URL,
       envelopeId: TEST_ENVELOPE_ID,
@@ -418,6 +433,38 @@ describe("SignInvestScreen", () => {
       expect(queryByText(/Connection lost/)).toBeNull()
       expect(mockESign.sign).toHaveBeenCalledTimes(1)
     })
+
+    /** The account is waited for the same way, and its absence ends the same way. */
+    it("gives up on the account the same way it gives up on the price", async () => {
+      mockUsdPerSat.current = USD_PER_SAT
+      mockIsAccountResolved.current = false
+
+      const { getByText } = await renderScreen()
+      await waitOut()
+
+      expect(getByText(/Connection lost/)).toBeTruthy()
+      expect(mockESign.sign).not.toHaveBeenCalled()
+    })
+  })
+
+  /** Signing writes the investment against the account; with nowhere to file it the home
+   *  would never steer the investor back to paying, so the session waits for the account
+   *  the same way it waits for the price. */
+  it("waits until the investment can be filed before starting the session", async () => {
+    mockIsAccountResolved.current = false
+
+    const { rerender } = await renderScreen()
+    expect(mockESign.sign).not.toHaveBeenCalled()
+
+    mockIsAccountResolved.current = true
+    rerender(
+      <ContextForScreen>
+        <SignInvestScreen />
+      </ContextForScreen>,
+    )
+    await act(async () => {})
+
+    expect(mockESign.sign).toHaveBeenCalledTimes(1)
   })
 
   /**
@@ -757,6 +804,25 @@ describe("SignInvestScreen", () => {
       })
       expect(mockNavigate).not.toHaveBeenCalled()
       expect(mockGoBack).not.toHaveBeenCalled()
+    })
+
+    /** Signing is the commitment worth following up on, so this is the moment the home
+     *  starts steering the investor back to the payment, with the same figures the
+     *  transfer step is handed. */
+    it("records the signed investment as it moves on", async () => {
+      await renderScreen()
+      await startedSession()
+      expect(mockStartCardInvestment).not.toHaveBeenCalled()
+
+      await act(async () => {
+        callbackOf("onComplete")()
+      })
+
+      expect(mockStartCardInvestment).toHaveBeenCalledTimes(1)
+      expect(mockStartCardInvestment).toHaveBeenCalledWith({
+        selectedAmountUsd: SELECTED_AMOUNT_USD,
+        settlementSats: SETTLEMENT_SATS,
+      })
     })
 
     /** With no figure to carry, the transfer step falls back to its own conversion, so
