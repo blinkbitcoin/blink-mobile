@@ -3748,6 +3748,24 @@
         "message": "Čeka se namira tvog pologa; pričekaj 2 potvrde na lancu.",
         "buttonText": "U redu"
       },
+      "HomeBulletin": {
+          "insufficient": {
+              "title": "Nedovoljan saldo",
+              "body": "Da bi dovršio ulaganje, uplati preostali iznos."
+          },
+          "depositPending": {
+              "title": "Pričekaj",
+              "body": "Čekamo namiru tvog pologa."
+          },
+          "ready": {
+              "title": "Dovrši svoje ulaganje",
+              "body": "Sada imaš dovoljno sredstava za dovršetak ulaganja."
+          },
+          "shareholder": {
+              "title": "Dobro došao kao dioničar Blinka!",
+              "body": "Javit ćemo ti čim tvoja Blink Card bude spremna."
+          }
+      },
       "PersonalInformation": {
         "title": "Posljednji korak",
         "fields": {

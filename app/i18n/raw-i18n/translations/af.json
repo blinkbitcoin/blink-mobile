@@ -3748,6 +3748,24 @@
         "message": "Wag dat jou deposito afgehandel word; wag asseblief vir 2 kettingbevestigings.",
         "buttonText": "OK"
       },
+      "HomeBulletin": {
+          "insufficient": {
+              "title": "Onvoldoende saldo",
+              "body": "Om jou belegging te voltooi, deponeer die oorblywende bedrag."
+          },
+          "depositPending": {
+              "title": "Wag 'n bietjie",
+              "body": "Ons wag dat jou deposito afgehandel word."
+          },
+          "ready": {
+              "title": "Voltooi jou belegging",
+              "body": "Jy het nou genoeg fondse om die belegging te voltooi."
+          },
+          "shareholder": {
+              "title": "Welkom as Blink-aandeelhouer!",
+              "body": "Ons laat weet jou sodra jou Blink Card gereed is."
+          }
+      },
       "PersonalInformation": {
         "title": "Laaste stap",
         "fields": {

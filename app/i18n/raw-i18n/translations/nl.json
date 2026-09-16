@@ -3748,6 +3748,24 @@
         "message": "Wachten tot je storting is afgewikkeld; wacht op 2 bevestigingen op de keten.",
         "buttonText": "Oké"
       },
+      "HomeBulletin": {
+          "insufficient": {
+              "title": "Onvoldoende saldo",
+              "body": "Stort het resterende bedrag om je investering af te ronden."
+          },
+          "depositPending": {
+              "title": "Even geduld",
+              "body": "We wachten tot je storting is afgewikkeld."
+          },
+          "ready": {
+              "title": "Rond je investering af",
+              "body": "Je hebt nu genoeg saldo om de investering af te ronden."
+          },
+          "shareholder": {
+              "title": "Welkom als aandeelhouder van Blink!",
+              "body": "We laten het je weten zodra je Blink Card klaar is."
+          }
+      },
       "PersonalInformation": {
         "title": "Laatste stap",
         "fields": {

@@ -3795,6 +3795,24 @@
             "DepositPending": {
                 "message": "Warten auf die Abwicklung deiner Einzahlung; bitte warte auf 2 On-Chain-Bestätigungen.",
                 "buttonText": "Okay"
+            },
+            "HomeBulletin": {
+                "insufficient": {
+                    "title": "Unzureichendes Guthaben",
+                    "body": "Um deine Investition abzuschließen, zahle den Restbetrag ein."
+                },
+                "depositPending": {
+                    "title": "Einen Moment",
+                    "body": "Wir warten auf die Abwicklung deiner Einzahlung."
+                },
+                "ready": {
+                    "title": "Schließe deine Investition ab",
+                    "body": "Du hast jetzt genug Guthaben, um die Investition abzuschließen."
+                },
+                "shareholder": {
+                    "title": "Willkommen als Blink-Aktionär!",
+                    "body": "Wir melden uns, sobald deine Blink Card bereit ist."
+                }
             }
         }
     },
