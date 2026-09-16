@@ -1,13 +1,15 @@
 import { renderHook } from "@testing-library/react-native"
 
+import { RestrictionVerdict, RestrictionVerdictStatus } from "@app/types/account"
 import { AccountType } from "@app/types/wallet"
 
 const mockUseDeviceLocation = jest.fn()
 const mockUseRemoteConfig = jest.fn()
 let mockRemoteConfigReady = true
 const mockUseActiveWallet = jest.fn()
-const mockUseCustodialRestrictionsQuery = jest.fn()
-let mockIsAuthed = true
+let mockCustodialVerdict: RestrictionVerdict = {
+  status: RestrictionVerdictStatus.Pending,
+}
 
 jest.mock("@app/utils/ip-country-lookup")
 
@@ -34,31 +36,28 @@ jest.mock("@app/hooks/use-account-registry", () => ({
   useAccountRegistry: () => ({ loading: false }),
 }))
 
-jest.mock("@app/graphql/is-authed-context", () => ({
-  useIsAuthed: () => mockIsAuthed,
-}))
-
-jest.mock("@app/graphql/generated", () => ({
-  ...jest.requireActual("@app/graphql/generated"),
-  useCustodialRestrictionsQuery: (options: unknown) =>
-    mockUseCustodialRestrictionsQuery(options),
+jest.mock("@app/custodial/providers/restrictions", () => ({
+  ...jest.requireActual("@app/custodial/providers/restrictions"),
+  useCustodialRestrictions: () => ({
+    verdict: mockCustodialVerdict,
+  }),
 }))
 
 import { useTransferGate, useTransferGated } from "@app/hooks/use-transfer-blocked"
 
 /** The server's answer, for the custodial cases. Self-custodial is the setup default and
- *  never reaches the query. */
-const serverAnswers = (transfer: boolean, loading = false) =>
-  mockUseCustodialRestrictionsQuery.mockReturnValue({
-    data: { custodialRestrictions: { dollarBalance: false, transfer } },
-    loading,
-  })
+ *  never reads the verdict. */
+const serverAnswers = (transfer: boolean) => {
+  mockCustodialVerdict = {
+    status: RestrictionVerdictStatus.Served,
+    restrictions: { dollarBalance: false, transfer },
+  }
+}
 
 const setup = (): void => {
   jest.clearAllMocks()
   mockRemoteConfigReady = true
   mockIsAnonMode = false
-  mockIsAuthed = true
   mockUseDeviceLocation.mockReturnValue({ countryCode: undefined, source: undefined })
   mockUseRemoteConfig.mockReturnValue({
     selfCustodialDollarBalanceBlockedCountries: [],
@@ -112,10 +111,10 @@ describe("useTransferGated — region policy", () => {
     expect(read()).toBe(false)
   })
 
-  it("gates a custodial account the server did not answer for", () => {
-    // No region determined, no gated feature — UnknownRegionPolicy = FAIL_CLOSED.
+  it("gates a custodial account once asking has stopped working", () => {
+    // No region determined, no gated feature: UnknownRegionPolicy = FAIL_CLOSED.
     mockUseActiveWallet.mockReturnValue({ accountType: AccountType.Custodial })
-    mockUseCustodialRestrictionsQuery.mockReturnValue({ data: undefined, loading: false })
+    mockCustodialVerdict = { status: RestrictionVerdictStatus.Unknown }
 
     expect(read()).toBe(true)
   })
@@ -170,7 +169,7 @@ describe("useTransferGated — region policy", () => {
 
     it("pends a custodial account while the server has not answered", () => {
       mockUseActiveWallet.mockReturnValue({ accountType: AccountType.Custodial })
-      serverAnswers(false, true)
+      mockCustodialVerdict = { status: RestrictionVerdictStatus.Pending }
 
       expect(readGate()).toEqual({ isGated: false, isRegionPending: true })
     })

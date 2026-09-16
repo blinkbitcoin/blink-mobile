@@ -85,6 +85,7 @@ const mockToggleBalanceMode = jest.fn()
 // eslint-disable-next-line prefer-const
 let mockBalanceModeValue: "btc" | "usd" = "usd"
 let mockDollarBalanceRestrictedOverride = false
+let mockDollarRegionDeterminedOverride = true
 let mockRegionPendingOverride = false
 let mockTransferBlockedOverride = false
 let mockTransferRegionPendingOverride = false
@@ -154,7 +155,11 @@ jest.mock("@app/hooks/use-transfer-blocked", () => ({
 }))
 
 jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
-  useDollarBalanceRestricted: () => mockDollarBalanceRestrictedOverride,
+  useDollarBalanceRestriction: () => ({
+    isRestricted: mockDollarBalanceRestrictedOverride,
+    isRegionPending: mockRegionPendingOverride,
+    isRegionDetermined: mockDollarRegionDeterminedOverride,
+  }),
   useDollarBalanceGated: () => mockIsAnonMode || mockDollarBalanceRestrictedOverride,
   useDollarBalanceGate: () => ({
     isGated: mockIsAnonMode || mockDollarBalanceRestrictedOverride,
@@ -892,6 +897,7 @@ const resetHomeScreenMocks = () => {
   mockActiveWalletOverride = null
   mockActiveAccountOverride = null
   mockDollarBalanceRestrictedOverride = false
+  mockDollarRegionDeterminedOverride = true
   mockRegionPendingOverride = false
   mockTransferRegionPendingOverride = false
   mockMigratePromptVisible = false
@@ -1034,6 +1040,28 @@ describe("HomeScreen", () => {
     expect(queryByTestId("sc-convert-modal")).toBeNull()
 
     await flushEffects()
+  })
+
+  it("does not force the conversion when only an unknown region restricts the account", async () => {
+    mockDollarBalanceRestrictedOverride = true
+    mockDollarRegionDeterminedOverride = false
+    currentMocks = generateHomeMock({
+      level: AccountLevel.One,
+      network: Network.Mainnet,
+      btcBalance: 1000,
+      usdBalance: 5000,
+    })
+
+    const { queryByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    expect(mockForcedConversionParams?.isRestricted).toBe(false)
+    expect(queryByTestId("convert-modal")).toBeNull()
   })
 
   it("does not auto-open the convert modal when the restricted account has no Dollar balance", async () => {

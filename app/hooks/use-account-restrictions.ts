@@ -1,11 +1,12 @@
-import { useEffect, useState } from "react"
-
 import { CountryCode } from "libphonenumber-js/mobile"
 
-import { gql } from "@apollo/client"
 import { useFeatureFlags, useRemoteConfig } from "@app/config/feature-flags-context"
-import { useCustodialRestrictionsQuery } from "@app/graphql/generated"
-import { useIsAuthed } from "@app/graphql/is-authed-context"
+import { useCustodialRestrictions } from "@app/custodial/providers/restrictions"
+import {
+  Restrictions,
+  RestrictionVerdict,
+  RestrictionVerdictStatus,
+} from "@app/types/account"
 import { AccountType } from "@app/types/wallet"
 
 import useDeviceLocation, {
@@ -15,27 +16,15 @@ import useDeviceLocation, {
 import { useAccountRegistry } from "./use-account-registry"
 import { useActiveWallet } from "./use-active-wallet"
 
-gql`
-  query custodialRestrictions {
-    custodialRestrictions {
-      dollarBalance
-      transfer
-    }
-  }
-`
-
-/**
- * What an account may not do where it is. The custodial half is the server's own answer;
- * the field names are its.
- */
-export type Restrictions = {
-  dollarBalance: boolean
-  transfer: boolean
-}
-
 export type AccountRestrictions = Restrictions & {
   /** True once waiting is pointless: the verdict is in, or nothing is left to resolve. */
   isSettled: boolean
+  /**
+   * True only when a region decided the verdict: the server answered, or the device
+   * resolved a country. An unanswered question still gates by policy but proves nothing
+   * about where the user is, so an action taken on the user's funds requires this.
+   */
+  isRegionDetermined: boolean
 }
 
 type BlockedCountries = {
@@ -57,12 +46,6 @@ const RESTRICTED_UNKNOWN_REGION: Restrictions = Object.freeze({
   transfer: true,
 })
 
-/** A request that never arrived carries no verdict, but FAIL_CLOSED still has to govern
- *  once asking has genuinely stopped working, so the retries are bounded rather than
- *  endless. Backed off so a server that is down is not hammered by every mounted consumer. */
-const RESTRICTION_RETRY_LIMIT = 3
-const RESTRICTION_RETRY_BASE_DELAY_MS = 1000
-
 /**
  * Pure so the policy can be read without a render, and so both custody types answer to the
  * same rule with only their lists differing. An unresolved country restricts nothing, which
@@ -75,6 +58,31 @@ const toRestrictions = (
   dollarBalance: isBlockedCountry(countryCode, blockedCountries.dollarBalance),
   transfer: isBlockedCountry(countryCode, blockedCountries.transfer),
 })
+
+/**
+ * The custodial half is the server's own answer. A session with no Blink account only
+ * settles once the registry has named the account, since until then it reads as
+ * custodial-unauthed whatever the account really is.
+ */
+const fromCustodialVerdict = (
+  verdict: RestrictionVerdict,
+  isRegistryHydrating: boolean,
+): AccountRestrictions => {
+  switch (verdict.status) {
+    case RestrictionVerdictStatus.NoAccount:
+      return {
+        ...UNRESTRICTED,
+        isSettled: !isRegistryHydrating,
+        isRegionDetermined: false,
+      }
+    case RestrictionVerdictStatus.Pending:
+      return { ...UNRESTRICTED, isSettled: false, isRegionDetermined: false }
+    case RestrictionVerdictStatus.Served:
+      return { ...verdict.restrictions, isSettled: true, isRegionDetermined: true }
+    case RestrictionVerdictStatus.Unknown:
+      return { ...RESTRICTED_UNKNOWN_REGION, isSettled: true, isRegionDetermined: false }
+  }
+}
 
 type RestrictionRegion = {
   countryCode: CountryCode | undefined
@@ -128,12 +136,12 @@ export const useAccountRestrictions = (
     selfCustodialTransferBlockedCountries,
   } = useRemoteConfig()
   const { remoteConfigReady } = useFeatureFlags()
-  const isAuthed = useIsAuthed()
   /** `useActiveWallet` answers Custodial while the registry hydrates, so a self-custodial
    *  device reads as an unauthed custodial one for those first renders. Reporting settled
    *  there would offer the dollar balance and the transfer button, then withdraw both once
    *  the real account lands. */
   const { loading: isRegistryHydrating } = useAccountRegistry()
+  const { verdict: custodialVerdict } = useCustodialRestrictions()
 
   const isSelfCustodial =
     (accountTypeOverride ?? activeAccountType) === AccountType.SelfCustodial
@@ -142,86 +150,19 @@ export const useAccountRestrictions = (
     isSelfCustodialPrediction,
   )
 
-  /**
-   * The server picks the country this answers for by account level (verified phone for a
-   * level 1-2 account, request IP for level 0), so the client never chooses between
-   * sources. It speaks only for a Blink account, so a session without one asks nothing.
-   */
-  const isQueryEnabled = !isSelfCustodial && isAuthed
-  const {
-    data,
-    loading: isQueryLoading,
-    error: queryError,
-    refetch,
-  } = useCustodialRestrictionsQuery({
-    skip: !isQueryEnabled,
-    /** The verdict follows the account's current standing, and the app re-asks on
-     *  foreground, so a cached answer would outlive the session that earned it. */
-    fetchPolicy: "no-cache",
-  })
-
-  const [retryCount, setRetryCount] = useState(0)
-  const hasRetriesLeft = retryCount < RESTRICTION_RETRY_LIMIT
-
-  /**
-   * A dropped request and a served "no verdict" are not the same answer, and only the
-   * second one is the server speaking. Nothing else re-issues this query inside a session
-   * (`no-cache` leaves nothing to re-read, and the only refetch is on foreground), so
-   * without this a single lost request would hold its failure until the user backgrounded
-   * the app and came back.
-   */
-  useEffect(() => {
-    if (!queryError) {
-      setRetryCount(0)
-      return undefined
-    }
-    if (!hasRetriesLeft) return undefined
-    const timer = setTimeout(
-      () => {
-        setRetryCount((count) => count + 1)
-        refetch().catch(() => undefined)
-      },
-      RESTRICTION_RETRY_BASE_DELAY_MS * 2 ** retryCount,
-    )
-    return () => clearTimeout(timer)
-  }, [queryError, hasRetriesLeft, retryCount, refetch])
+  if (!isSelfCustodial) return fromCustodialVerdict(custodialVerdict, isRegistryHydrating)
 
   /** A self-custodial wallet has no Blink account behind it, so no server verdict covers
-   *  it and it keeps its own lists. */
+   *  it and it keeps its own lists. An empty list mid-fetch would read as a country nothing
+   *  restricts, so the fetch is part of the wait rather than a verdict of its own. */
   const selfCustodialBlockedCountries: BlockedCountries = {
     dollarBalance: selfCustodialDollarBalanceBlockedCountries,
     transfer: selfCustodialTransferBlockedCountries,
   }
 
-  if (isSelfCustodial) {
-    /** An empty list mid-fetch would read as a country nothing restricts, so the fetch is
-     *  part of the wait rather than a verdict of its own. */
-    return {
-      ...toRestrictions(countryCode, selfCustodialBlockedCountries),
-      isSettled: !isRegionPending && remoteConfigReady,
-    }
-  }
-
-  /** A session with no Blink account has no custodial verdict to receive, so nothing is
-   *  gated. It only settles once the registry has named the account, since until then
-   *  this reads as custodial-unauthed whatever the account really is. */
-  if (!isQueryEnabled) return { ...UNRESTRICTED, isSettled: !isRegistryHydrating }
-
-  /** Held rather than judged while the answer is in flight: the surfaces read
-   *  `isRegionPending` and wait, so this value is never shown. */
-  if (isQueryLoading) return { ...UNRESTRICTED, isSettled: false }
-
-  /** Still being asked, so still unanswered: the surfaces wait exactly as they do for a
-   *  slow reply rather than being told the region is unknown. FAIL_CLOSED applies below,
-   *  once the retries are spent and asking has stopped working. */
-  const isRetryPending = Boolean(queryError) && hasRetriesLeft
-  if (isRetryPending) return { ...UNRESTRICTED, isSettled: false }
-
-  const restrictions = data?.custodialRestrictions ?? RESTRICTED_UNKNOWN_REGION
-
   return {
-    dollarBalance: restrictions.dollarBalance,
-    transfer: restrictions.transfer,
-    isSettled: true,
+    ...toRestrictions(countryCode, selfCustodialBlockedCountries),
+    isSettled: !isRegionPending && remoteConfigReady,
+    isRegionDetermined: countryCode !== undefined,
   }
 }

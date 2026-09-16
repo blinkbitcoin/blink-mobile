@@ -52,7 +52,7 @@ import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useDefaultAccountModalShown } from "@app/hooks/use-default-account-modal-shown"
 import {
   useDollarBalanceGate,
-  useDollarBalanceRestricted,
+  useDollarBalanceRestriction,
 } from "@app/hooks/use-dollar-balance-restricted"
 import { useDollarBalanceForcedConversion } from "@app/hooks/use-dollar-balance-forced-conversion"
 import { useEnhancedModePrompt } from "@app/components/enhanced-mode-prompt"
@@ -427,7 +427,10 @@ export const HomeScreen: React.FC = () => {
   const [isUpgradeModalVisible, setIsUpgradeModalVisible] = React.useState(false)
   const [isRestrictionModalVisible, setIsRestrictionModalVisible] = React.useState(false)
   /** Region-only: the forced-conversion escape must not fire in Anon Mode. */
-  const isDollarBalanceRestricted = useDollarBalanceRestricted()
+  const {
+    isRestricted: isDollarBalanceRestricted,
+    isRegionDetermined: isDollarBalanceRegionDetermined,
+  } = useDollarBalanceRestriction()
   const { isGated: isDollarBalanceGated, isRegionPending } = useDollarBalanceGate()
   const { isAnonMode } = useSelfCustodialAccountMode()
   const { promptEnhancedMode, isEnhancedModePromptVisible } = useEnhancedModePrompt()
@@ -486,8 +489,11 @@ export const HomeScreen: React.FC = () => {
     : stableTokenConversionMinimum
 
   /** The sanctions block outranks the forced conversion: a sanctioned session must not
-   *  auto-present the convert modal over the restriction surfaces. */
-  const isForcedConversionEligible = isDollarBalanceRestricted && !isRestrictedRegion
+   *  auto-present the convert modal over the restriction surfaces. The conversion also
+   *  empties the user's dollar balance, so it waits for a region that actually decided the
+   *  restriction: an unanswered question may gate the balance but cannot justify that. */
+  const isForcedConversionEligible =
+    isDollarBalanceRestricted && isDollarBalanceRegionDetermined && !isRestrictedRegion
   const { isConvertModalVisible, closeConvertModal } = useDollarBalanceForcedConversion({
     accountId: activeAccount?.id,
     isRestricted: isForcedConversionEligible,

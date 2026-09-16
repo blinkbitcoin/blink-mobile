@@ -9,6 +9,8 @@ import { useSelfCustodialAccountMode } from "@app/self-custodial/hooks/use-self-
 type DollarBalanceRestriction = {
   isRestricted: boolean
   isRegionPending: boolean
+  /** False when the restriction stands only because the region is unknown. */
+  isRegionDetermined: boolean
 }
 
 /** Region policy only (false in Anon, where no region resolves). Availability surfaces
@@ -16,13 +18,11 @@ type DollarBalanceRestriction = {
 export const useDollarBalanceRestriction = (
   accountTypeOverride?: AccountType,
 ): DollarBalanceRestriction => {
-  const { dollarBalance, isSettled } = useAccountRestrictions(accountTypeOverride)
+  const { dollarBalance, isSettled, isRegionDetermined } =
+    useAccountRestrictions(accountTypeOverride)
 
-  return { isRestricted: dollarBalance, isRegionPending: !isSettled }
+  return { isRestricted: dollarBalance, isRegionPending: !isSettled, isRegionDetermined }
 }
-
-export const useDollarBalanceRestricted = (accountTypeOverride?: AccountType): boolean =>
-  useDollarBalanceRestriction(accountTypeOverride).isRestricted
 
 type DollarBalanceGate = {
   isGated: boolean
