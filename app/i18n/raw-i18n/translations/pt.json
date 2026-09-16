@@ -3806,6 +3806,24 @@
             "DepositPending": {
                 "message": "Aguardando a liquidação do seu depósito; aguarde 2 confirmações na cadeia.",
                 "buttonText": "Ok"
+            },
+            "HomeBulletin": {
+                "insufficient": {
+                    "title": "Saldo insuficiente",
+                    "body": "Para concluir seu investimento, deposite o valor restante."
+                },
+                "depositPending": {
+                    "title": "Aguarde um momento",
+                    "body": "Estamos aguardando a liquidação do seu depósito."
+                },
+                "ready": {
+                    "title": "Conclua seu investimento",
+                    "body": "Agora você tem fundos suficientes para concluir o investimento."
+                },
+                "shareholder": {
+                    "title": "Bem-vindo como acionista da Blink!",
+                    "body": "Avisaremos assim que seu Blink Card estiver pronto."
+                }
             }
         }
     },
