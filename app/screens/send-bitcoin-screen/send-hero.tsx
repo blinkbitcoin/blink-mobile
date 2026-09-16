@@ -33,18 +33,24 @@ const LINE_HEIGHT = {
 } as const
 
 /**
- * While the amount is typed it starts large and steps down a pixel per digit, so a long
- * amount still fits on one line: 32 for an empty or one-digit amount, 24 from nine digits
- * (100,000,000) on.
+ * While the amount is typed it starts large and steps down evenly with each digit, so a long
+ * amount still fits on one line: 36 for an empty or one-digit amount, 22 from ten digits
+ * (1,000,000,000) on.
  */
-const ENTRY_AMOUNT_SIZE = { max: 32, min: 24 } as const
+const ENTRY_AMOUNT_SIZE = { max: 36, min: 22 } as const
+const ENTRY_AMOUNT_MIN_SIZE_DIGITS = 10
 const ENTRY_LINE_HEIGHT_OFFSET = 2
 
 export const entryAmountFontSize = (amount: string, isEmpty: boolean): number => {
   if (isEmpty) return ENTRY_AMOUNT_SIZE.max
   const digits = amount.replace(/\D/g, "").length
-  const size = ENTRY_AMOUNT_SIZE.max - Math.max(digits - 1, 0)
-  return Math.max(size, ENTRY_AMOUNT_SIZE.min)
+  const progress = Math.min(
+    Math.max(digits - 1, 0) / (ENTRY_AMOUNT_MIN_SIZE_DIGITS - 1),
+    1,
+  )
+  return Math.round(
+    ENTRY_AMOUNT_SIZE.max - (ENTRY_AMOUNT_SIZE.max - ENTRY_AMOUNT_SIZE.min) * progress,
+  )
 }
 
 const SWAP_ANIMATION_MS = 220
