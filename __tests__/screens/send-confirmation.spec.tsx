@@ -21,9 +21,9 @@ import { RouteProp } from "@react-navigation/native"
 import { INFO_SECTION_OUTLINE_TEST_ID } from "@app/components/card-screen/info-section"
 import { FeeTierOption } from "@app/screens/send-bitcoin-screen/hooks/fee-tiers.types"
 import {
-  SEND_REVIEW_PRIMARY_TEST_ID,
-  SEND_REVIEW_SECONDARY_TEST_ID,
-} from "@app/screens/send-bitcoin-screen/review/send-review-hero"
+  SEND_HERO_PRIMARY_TEST_ID,
+  SEND_HERO_SECONDARY_TEST_ID,
+} from "@app/screens/send-bitcoin-screen/send-hero"
 
 import { flushEffects } from "../helpers/flush-effects"
 import { ContextForScreen } from "./helper"
@@ -386,7 +386,7 @@ describe("SendBitcoinConfirmationScreen", () => {
     )
 
     expect(screen.getByText(lnurl)).toBeTruthy()
-    expect(screen.getByTestId(SEND_REVIEW_PRIMARY_TEST_ID).props.children).toBe("₦100")
+    expect(screen.getByTestId(SEND_HERO_PRIMARY_TEST_ID).props.children).toBe("₦100")
     expect(screen.getByTestId("slider")).toBeTruthy()
     expect(screen.getByText(LL.SendBitcoinConfirmationScreen.slideToSend())).toBeTruthy()
   })
@@ -1638,7 +1638,9 @@ describe("SendBitcoinConfirmationScreen — review layout", () => {
         `${LL.SendBitcoinScreen.destination()}`,
         LL.SendBitcoinConfirmationScreen.fromBalance(),
         LL.SendBitcoinConfirmationScreen.details(),
-      ].map((text) => json.indexOf(`"${text}"`))
+        // The destination label carries its payment type ("Destination - Intraledger"), so
+        // each section is found by the start of its string rather than the whole of it.
+      ].map((text) => json.indexOf(`"${text}`))
 
       expect(positions.every((position) => position >= 0)).toBe(true)
       expect([...positions].sort((a, b) => a - b)).toEqual(positions)
@@ -1648,8 +1650,8 @@ describe("SendBitcoinConfirmationScreen — review layout", () => {
       sendPaymentMock.mockResolvedValueOnce({ status: "SUCCESS" })
       await renderReview(buildBtcSettlementRoute(1000))
 
-      const primary = screen.getByTestId(SEND_REVIEW_PRIMARY_TEST_ID).props.children
-      const secondary = screen.getByTestId(SEND_REVIEW_SECONDARY_TEST_ID).props.children
+      const primary = screen.getByTestId(SEND_HERO_PRIMARY_TEST_ID).props.children
+      const secondary = screen.getByTestId(SEND_HERO_SECONDARY_TEST_ID).props.children
 
       await act(async () => {
         fireEvent.press(screen.getByTestId("slider"))

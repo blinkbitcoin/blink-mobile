@@ -86,10 +86,26 @@ describe("SendWalletSummary", () => {
     const cardStyle = () =>
       StyleSheet.flatten(screen.getByTestId("choose-wallet-to-send-from").props.style)
 
-    it("uses the grey7 static surface when it can't switch wallets", () => {
-      render(bitcoinCard)
+    /** Review asks for the settled surface; amount entry keeps the active one even where
+     *  the region leaves it nothing to switch to. */
+    it("uses the grey7 static surface when it is inactive", () => {
+      render(
+        <ThemeProvider theme={theme}>
+          <SendWalletSummary
+            currency={WalletCurrency.Btc}
+            balancePrimary="741 SAT"
+            inactive
+          />
+        </ThemeProvider>,
+      )
 
       expect(cardStyle().backgroundColor).toBe(light.grey7)
+    })
+
+    it("keeps the grey5 surface when it is active but has no wallet to switch to", () => {
+      render(bitcoinCard)
+
+      expect(cardStyle().backgroundColor).toBe(light.grey5)
     })
 
     it("uses the grey5 surface when it can switch wallets", () => {

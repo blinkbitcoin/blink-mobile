@@ -13,7 +13,7 @@ import { WarningBanner } from "@app/components/warning-banner"
 import { Transaction, WalletCurrency } from "@app/graphql/generated"
 import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { isIdempotencyConflict } from "@app/graphql/is-idempotency-conflict"
-import { useClipboard, useDisplayCurrency } from "@app/hooks"
+import { useAppConfig, useClipboard, useDisplayCurrency } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import {
@@ -41,11 +41,12 @@ import { formatEta } from "./fee-tier-options"
 import { FeeTierOption } from "./hooks/fee-tiers.types"
 import {
   CUSTODIAL_PAYOUT_ETA_MINUTES,
-  PAYOUT_SPEED_BY_FEE_TIER,
+  feeTierFromPayoutSpeed,
 } from "./hooks/use-custodial-onchain-fee-tiers"
+import { useFeeTierLabels } from "./hooks/use-fee-tier-labels"
 import { ETA_MINUTES } from "./hooks/use-onchain-fee-tiers"
 import { SendReviewDestination } from "./review/send-review-destination"
-import { SendReviewHero } from "./review/send-review-hero"
+import { SendHero } from "./send-hero"
 import { useSendBalances } from "./hooks/use-send-wallets"
 import { useVerifyPaymentSettled } from "./hooks/use-verify-payment-settled"
 import { PaymentSendExtraInfo } from "./payment-details/index.types"
@@ -56,7 +57,7 @@ import {
   useSendPayment,
 } from "./use-send-payment"
 import { useSaveLnAddressContact } from "./use-save-lnaddress-contact"
-import { ellipsizeMiddle } from "@app/utils/helper"
+import { formatDestination } from "./format-destination"
 
 gql`
   query sendBitcoinConfirmationScreen {
@@ -129,6 +130,12 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   const { LL, locale } = useI18nContext()
   const translateSdkError = useTranslateSdkError()
   const { copyToClipboard } = useClipboard()
+  const feeTierLabels = useFeeTierLabels()
+  const {
+    appConfig: {
+      galoyInstance: { lnAddressHostname },
+    },
+  } = useAppConfig()
 
   const fee = useFee(getFee)
 
@@ -257,14 +264,11 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
               satAmount,
               currencyFeeAmount,
               satFeeAmount,
-              destination:
-                paymentDetail?.paymentType === "intraledger"
-                  ? destination
-                  : ellipsizeMiddle(destination, {
-                      maxLength: 50,
-                      maxResultLeft: 13,
-                      maxResultRight: 8,
-                    }),
+              destination: formatDestination({
+                destination,
+                paymentType,
+                lnAddressHostname,
+              }),
               paymentType: paymentDetail?.paymentType,
               createdAt: transaction?.createdAt,
             },
@@ -285,6 +289,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
       navigation,
       paymentType,
       destination,
+      lnAddressHostname,
       paymentDetail,
       note,
       currencyAmount,
@@ -484,19 +489,11 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
    *  has its own broadcast windows. */
   const priorityTier: FeeTierOption | undefined =
     paymentType === "onchain"
-      ? paymentDetail.feeTier ??
-        (Object.keys(PAYOUT_SPEED_BY_FEE_TIER) as FeeTierOption[]).find(
-          (tier) => PAYOUT_SPEED_BY_FEE_TIER[tier] === paymentDetail.payoutSpeed,
-        )
+      ? paymentDetail.feeTier ?? feeTierFromPayoutSpeed(paymentDetail.payoutSpeed)
       : undefined
   const priorityEtaMinutes =
     priorityTier &&
     (paymentDetail.feeTier ? ETA_MINUTES : CUSTODIAL_PAYOUT_ETA_MINUTES)[priorityTier]
-  const priorityLabels: Record<FeeTierOption, string> = {
-    [FeeTierOption.Fast]: LL.SendBitcoinScreen.fast(),
-    [FeeTierOption.Medium]: LL.SendBitcoinScreen.medium(),
-    [FeeTierOption.Slow]: LL.SendBitcoinScreen.slow(),
-  }
 
   const isFeeLoading = fee.status === "loading" || fee.status === "unset"
   const isMaxFee = fee.status === "error" && Boolean(fee.amount)
@@ -509,7 +506,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
       ? [
           {
             label: LL.SendBitcoinScreen.feeTier(),
-            value: `${priorityLabels[priorityTier]} ~ ${formatEta(priorityEtaMinutes, locale)}`,
+            value: `${feeTierLabels[priorityTier]} ~ ${formatEta(priorityEtaMinutes, locale)}`,
           },
         ]
       : []),
@@ -536,7 +533,8 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   return (
     <Screen preset="fixed" keyboardOffset="navigationHeader">
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
-        <SendReviewHero
+        <SendHero
+          caption={LL.SendBitcoinConfirmationScreen.sending()}
           primaryAmount={currencyAmount}
           secondaryAmount={secondaryAmount ? satAmount : undefined}
         />
@@ -548,6 +546,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
         <View style={styles.group}>
           <Text type="p3">{LL.SendBitcoinConfirmationScreen.fromBalance()}</Text>
           <SendWalletSummary
+            inactive
             currency={sendingWalletDescriptor.currency}
             isBalanceHidden={isBalanceHidden}
             onReveal={isBalanceHidden ? () => setIsBalanceRevealed(true) : undefined}
