@@ -13,13 +13,19 @@ type WalletSwitchProps = {
   currency: WalletCurrency
   /** Hides the swap icon (keeping its space) where there is no other wallet to switch to. */
   canToggle: boolean
+  /** Drops the icon and its space entirely, for a read-out that is not a switch at all. */
+  hasSwapIcon?: boolean
 }
 
 /**
  * The swap icon and wallet pill of a Bitcoin/Dollar switch. Both pills take the width of the
  * wider label, so the switch keeps its size in either state; the icon spins on each switch.
  */
-export const WalletSwitch: React.FC<WalletSwitchProps> = ({ currency, canToggle }) => {
+export const WalletSwitch: React.FC<WalletSwitchProps> = ({
+  currency,
+  canToggle,
+  hasSwapIcon = true,
+}) => {
   const styles = useStyles()
   const {
     theme: { colors },
@@ -39,9 +45,11 @@ export const WalletSwitch: React.FC<WalletSwitchProps> = ({ currency, canToggle 
 
   return (
     <View style={styles.container}>
-      <Animated.View style={[spinStyle, !canToggle && styles.iconHidden]}>
-        <GaloyIcon name="refresh" size={16} color={colors.grey1} />
-      </Animated.View>
+      {hasSwapIcon ? (
+        <Animated.View style={[spinStyle, !canToggle && styles.iconHidden]}>
+          <GaloyIcon name="refresh" size={16} color={colors.grey1} />
+        </Animated.View>
+      ) : null}
       <CurrencyPill
         currency={currency}
         containerSize="medium"

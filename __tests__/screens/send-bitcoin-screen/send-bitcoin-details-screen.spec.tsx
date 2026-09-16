@@ -130,11 +130,11 @@ const AMOUNT_PAD = {
   toggleCurrency: jest.fn(),
 }
 
-jest.mock("@app/screens/send-bitcoin-screen/amount-entry/use-send-amount-pad", () => ({
-  useSendAmountPad: () => AMOUNT_PAD,
+jest.mock("@app/components/amount-input-screen/use-number-pad", () => ({
+  useNumberPad: () => AMOUNT_PAD,
 }))
-jest.mock("@app/screens/send-bitcoin-screen/amount-entry/send-amount-header", () => ({
-  SendAmountHeader: () => null,
+jest.mock("@app/screens/send-bitcoin-screen/send-hero", () => ({
+  SendHero: () => null,
 }))
 jest.mock("@app/screens/send-bitcoin-screen/amount-entry/send-wallet-summary", () => ({
   SendWalletSummary: () => null,
@@ -199,6 +199,7 @@ describe("SendBitcoinDetailsScreen region gate", () => {
     mockCreatePaymentDetail.mockReturnValue({
       canSetAmount: false,
       paymentType: "lightning",
+      destination: "lnbc1sendbitcoindetailsscreenspec",
       sendingWalletDescriptor: { id: BTC_WALLET.id, currency: "BTC" },
       unitOfAccountAmount: { amount: 1000, currency: "BTC", currencyCode: "BTC" },
       convertMoneyAmount: jest.fn(),

@@ -3,6 +3,7 @@ import React, { FC, PropsWithChildren } from "react"
 import { testProps } from "@app/utils/testProps"
 import { TouchableHighlight } from "@app/utils/touchable-wrapper"
 import { Button, ButtonProps, makeStyles, useTheme } from "@rn-vui/themed"
+import { fonts } from "@app/rne-theme/fonts"
 
 export const GaloyPrimaryButton: FC<PropsWithChildren<ButtonProps>> = (props) => {
   const styles = useStyles()
@@ -31,7 +32,7 @@ export const GaloyPrimaryButton: FC<PropsWithChildren<ButtonProps>> = (props) =>
 const useStyles = makeStyles(({ colors }) => ({
   titleStyle: {
     flexGrow: 1,
-    fontFamily: "SourceSansPro-Bold",
+    fontFamily: fonts.bold,
     fontSize: 20,
     lineHeight: 24,
     color: colors.white,

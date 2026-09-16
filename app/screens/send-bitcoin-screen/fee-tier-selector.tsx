@@ -11,6 +11,7 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { testProps } from "@app/utils/testProps"
+import { fonts } from "@app/rne-theme/fonts"
 
 type OptionItem<T extends string> = {
   id: T
@@ -137,7 +138,7 @@ const useStyles = makeStyles(({ colors }) => ({
     alignItems: "flex-end",
   },
   selectedLabel: {
-    fontFamily: "SourceSansPro-Bold",
+    fontFamily: fonts.bold,
     fontSize: 14,
     lineHeight: 20,
     color: colors.black,

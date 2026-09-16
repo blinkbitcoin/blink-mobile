@@ -2,9 +2,18 @@ import { useCallback, useMemo, useState } from "react"
 import { useApolloClient } from "@apollo/client"
 
 import {
+  PreferredAmountCurrency,
+  savePreferredAmountCurrency,
+} from "@app/graphql/client-only-query"
+import { usePreferredAmountCurrencyQuery, WalletCurrency } from "@app/graphql/generated"
+import { useDisplayCurrency } from "@app/hooks/use-display-currency"
+import { ConvertMoneyAmount } from "@app/screens/send-bitcoin-screen/payment-details"
+import { DisplayCurrency, MoneyAmount, WalletOrDisplayCurrency } from "@app/types/amounts"
+
+import {
   moneyAmountToNumberPadReducerState,
   numberPadNumberToMoneyAmount,
-} from "@app/components/amount-input-screen/number-pad-amount"
+} from "./number-pad-amount"
 import {
   formatNumberPadNumber,
   getDisabledKeys,
@@ -12,18 +21,9 @@ import {
   NumberPadReducerState,
   numberPadReducer,
   NumberPadReducerActionType,
-} from "@app/components/amount-input-screen/number-pad-reducer"
-import {
-  PreferredAmountCurrency,
-  savePreferredAmountCurrency,
-} from "@app/graphql/client-only-query"
-import { usePreferredAmountCurrencyQuery, WalletCurrency } from "@app/graphql/generated"
-import { useDisplayCurrency } from "@app/hooks/use-display-currency"
-import { DisplayCurrency, MoneyAmount, WalletOrDisplayCurrency } from "@app/types/amounts"
+} from "./number-pad-reducer"
 
-import { ConvertMoneyAmount } from "../payment-details"
-
-type UseSendAmountPadArgs = {
+type UseNumberPadArgs = {
   walletCurrency: WalletCurrency
   /** Undefined until prices load; the pad still takes keys, it just can't mirror amounts. */
   convertMoneyAmount?: ConvertMoneyAmount
@@ -31,21 +31,25 @@ type UseSendAmountPadArgs = {
 }
 
 /**
- * The in-screen keypad of the send amount step. It holds only what the user typed; the
- * payment detail stays the amount of record, so a percent chip can hand it an exact wallet
- * amount while the pad shows that amount rounded to the currency being typed in.
+ * The state behind an in-screen number pad: what the user has typed, which currency they
+ * are typing in, and which keys are live. It holds only the typed value — the screen's own
+ * amount stays the amount of record, so a percent chip can hand it an exact wallet amount
+ * while the pad shows that amount rounded to the currency being typed in.
+ *
+ * The canonical pad: every screen with a keypad should drive `CurrencyKeyboard` from this
+ * hook, so a key behaves the same wherever it is pressed.
  */
-export const useSendAmountPad = ({
+export const useNumberPad = ({
   walletCurrency,
   convertMoneyAmount,
   onAmountChange,
-}: UseSendAmountPadArgs) => {
+}: UseNumberPadArgs) => {
   const client = useApolloClient()
   const { currencyInfo } = useDisplayCurrency()
   const { data: preferredData } = usePreferredAmountCurrencyQuery()
 
   const [padState, setPadState] = useState<NumberPadReducerState>(() => {
-    /** Typed in the currency the user last chose on the amount modal this replaces. */
+    /** Typed in the currency the user last chose, wherever they last chose it. */
     const currency: WalletOrDisplayCurrency =
       preferredData?.preferredAmountCurrency === PreferredAmountCurrency.Default
         ? walletCurrency
