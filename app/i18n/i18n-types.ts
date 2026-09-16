@@ -12505,7 +12505,7 @@ type RootTranslation = {
 					 */
 					title: string
 					/**
-					 * {​a​m​o​u​n​t​}​ ​I​n​v​e​s​t​m​e​n​t
+					 * {​a​m​o​u​n​t​}​ ​i​n​v​e​s​t​m​e​n​t
 					 * @param {string} amount
 					 */
 					investment: RequiredParams<'amount'>
@@ -12521,7 +12521,7 @@ type RootTranslation = {
 					units: RequiredParams<'percent' | 'units'>
 				}
 				/**
-				 * P​r​o​c​e​e​d​ ​t​o​ ​S​i​g​n
+				 * P​r​o​c​e​e​d​ ​t​o​ ​s​i​g​n
 				 */
 				buttonText: string
 			}
@@ -26799,7 +26799,7 @@ export type TranslationFunctions = {
 					 */
 					title: () => LocalizedString
 					/**
-					 * {amount} Investment
+					 * {amount} investment
 					 */
 					investment: (arg: { amount: string }) => LocalizedString
 					/**
@@ -26812,7 +26812,7 @@ export type TranslationFunctions = {
 					units: (arg: { percent: number, units: string }) => LocalizedString
 				}
 				/**
-				 * Proceed to Sign
+				 * Proceed to sign
 				 */
 				buttonText: () => LocalizedString
 			}
