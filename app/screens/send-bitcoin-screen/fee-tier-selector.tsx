@@ -1,10 +1,5 @@
 import React, { useState } from "react"
-import {
-  ActivityIndicator,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  View,
-} from "react-native"
+import { TouchableOpacity, TouchableWithoutFeedback, View } from "react-native"
 import ReactNativeModal from "react-native-modal"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
@@ -25,8 +20,6 @@ type FeeTierSelectorProps<T extends string> = {
   options: OptionItem<T>[]
   selected: T
   onSelect: (id: T) => void
-  /** Shows a spinner in place of the caret while the fees are being quoted. */
-  loading?: boolean
 }
 
 export const FeeTierSelector = <T extends string>({
@@ -34,7 +27,6 @@ export const FeeTierSelector = <T extends string>({
   options,
   selected,
   onSelect,
-  loading = false,
 }: FeeTierSelectorProps<T>): React.ReactElement => {
   const styles = useStyles()
   const {
@@ -43,35 +35,20 @@ export const FeeTierSelector = <T extends string>({
   const [isModalVisible, setModalVisible] = useState(false)
 
   const selectedOption = options.find((o) => o.id === selected)
+  const selectedValue = [selectedOption?.label, selectedOption?.detail]
+    .filter(Boolean)
+    .join(" ")
 
   return (
     <>
+      {/* The whole row is the tap target, so it carries no chevron. */}
       <TouchableWithoutFeedback
         onPress={() => setModalVisible(true)}
         {...testProps("fee-tier-dropdown")}
       >
-        {/* Sized like the note field below it (NoteInput, not big), so the two rows match. */}
-        <View style={styles.fieldBackground}>
-          <Text style={styles.title} numberOfLines={1}>
-            {title}
-          </Text>
-          <View style={styles.content}>
-            <Text style={styles.selectedLabel}>{selectedOption?.label}</Text>
-            {Boolean(selectedOption?.detail) && (
-              <Text style={styles.selectedDetail}>{selectedOption?.detail}</Text>
-            )}
-          </View>
-          <View style={styles.iconContainer}>
-            {loading ? (
-              <ActivityIndicator
-                size="small"
-                color={colors.accent}
-                {...testProps("fee-tier-spinner")}
-              />
-            ) : (
-              <GaloyIcon name="caret-down" size={16} color={colors.accent} />
-            )}
-          </View>
+        <View style={styles.row}>
+          <Text style={styles.title}>{title}</Text>
+          <Text style={styles.value}>{selectedValue}</Text>
         </View>
       </TouchableWithoutFeedback>
 
@@ -85,7 +62,7 @@ export const FeeTierSelector = <T extends string>({
         onBackdropPress={() => setModalVisible(false)}
         onBackButtonPress={() => setModalVisible(false)}
       >
-        <View>
+        <View style={styles.options}>
           {options.map((option) => {
             const isSelected = option.id === selected
 
@@ -106,7 +83,7 @@ export const FeeTierSelector = <T extends string>({
                     )}
                   </View>
                   {isSelected && (
-                    <GaloyIcon name="check" size={16} color={colors.accent} />
+                    <GaloyIcon name="check-circle" size={16} color={colors._green} />
                   )}
                 </View>
               </TouchableOpacity>
@@ -119,69 +96,61 @@ export const FeeTierSelector = <T extends string>({
 }
 
 const useStyles = makeStyles(({ colors }) => ({
-  title: {
-    fontSize: 14,
-    lineHeight: 20,
-    fontFamily: fonts.bold,
-    color: colors.textSecondary,
-    flexShrink: 1,
-  },
-  fieldBackground: {
+  row: {
     flexDirection: "row",
-    backgroundColor: colors.surfaceInteractive,
-    borderRadius: radius.default,
+    justifyContent: "space-between",
     alignItems: "center",
     columnGap: 12,
-    minHeight: 50,
-    paddingHorizontal: 10,
+    backgroundColor: colors.surfaceInteractive,
+    borderRadius: radius.default,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
   },
-  content: {
-    flex: 1,
-    alignItems: "flex-end",
+  title: {
+    flexShrink: 1,
+    fontSize: 14,
+    lineHeight: 20,
+    color: colors.black,
   },
-  selectedLabel: {
+  /** Shrinks and wraps alongside the heading, so a long locale never cuts the ETA off. */
+  value: {
+    flexShrink: 1,
     fontFamily: fonts.bold,
     fontSize: 14,
     lineHeight: 20,
-    color: colors.textOnBackground,
+    color: colors.black,
     textAlign: "right",
-  },
-  selectedDetail: {
-    fontSize: 12,
-    lineHeight: 18,
-    color: colors.textMuted,
-    textAlign: "right",
-  },
-  iconContainer: {
-    justifyContent: "center",
-    alignItems: "center",
   },
   modal: {
     marginBottom: "70%",
   },
+  options: {
+    rowGap: 10,
+  },
   optionRow: {
     flexDirection: "row",
+    alignItems: "center",
+    columnGap: 14,
     backgroundColor: colors.surfaceInteractive,
     borderRadius: radius.default,
-    alignItems: "center",
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    marginBottom: 8,
+    paddingVertical: 14,
+    paddingLeft: 14,
+    paddingRight: 10,
   },
   optionRowSelected: {
-    backgroundColor: colors.neutral,
+    backgroundColor: colors.grey4,
   },
   optionContent: {
     flex: 1,
   },
   optionLabel: {
-    fontSize: 15,
-    fontFamily: fonts.bold,
-    color: colors.textOnBackground,
+    fontSize: 14,
+    lineHeight: 20,
+    color: colors.black,
   },
   optionDetail: {
-    fontSize: 13,
-    color: colors.textMuted,
-    marginTop: 2,
+    fontSize: 14,
+    lineHeight: 20,
+    color: colors.grey2,
   },
 }))
