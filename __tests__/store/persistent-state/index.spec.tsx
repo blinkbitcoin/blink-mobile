@@ -358,6 +358,40 @@ describe("PersistentStateProvider", () => {
     })
   })
 
+  /** A signed agreement outlives the session that signed it, and the map is filed by
+   *  server account id, so nothing of it can reach another user. */
+  it("keeps the card investments signed for when resetState starts the rest over", async () => {
+    const investment = { selectedAmountUsd: 25000, settlementSats: 31_704_000 }
+    setPersistedBlob({
+      ...scrubbedBlob,
+      cardInvestmentByAccountId: { "account-1": investment },
+    })
+    mockGetActiveToken.mockResolvedValue("some-token")
+
+    render(
+      <PersistentStateProvider>
+        <TestConsumer />
+      </PersistentStateProvider>,
+    )
+    await waitFor(() => {
+      expect(screen.getByTestId("token")).toBeTruthy()
+    })
+
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("reset-btn"))
+    })
+
+    await waitFor(() => {
+      expect(mockSaveJson).toHaveBeenCalledWith(
+        "persistentState",
+        expect.objectContaining({
+          ...defaultStateWithoutToken,
+          cardInvestmentByAccountId: { "account-1": investment },
+        }),
+      )
+    })
+  })
+
   it("reports a failed save to crashlytics instead of crashing, keeping the update in memory", async () => {
     setPersistedBlob(scrubbedBlob)
     mockGetActiveToken.mockResolvedValue("old-token")
