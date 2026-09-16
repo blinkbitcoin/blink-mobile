@@ -67,6 +67,23 @@ describe("useBackoffRetry", () => {
     expect(retry).toHaveBeenCalledTimes(3)
   })
 
+  it("reports whether each retry was scheduled", () => {
+    const { result } = renderHook(() => useBackoffRetry([1000]))
+    const scheduled: boolean[] = []
+
+    act(() => {
+      scheduled.push(result.current.schedule(jest.fn()))
+    })
+    act(() => {
+      jest.advanceTimersByTime(1000)
+    })
+    act(() => {
+      scheduled.push(result.current.schedule(jest.fn()))
+    })
+
+    expect(scheduled).toEqual([true, false])
+  })
+
   it("becomes a no-op after the delay sequence is exhausted", () => {
     const retry = jest.fn()
     const { result } = renderHook(() => useBackoffRetry(DELAYS))

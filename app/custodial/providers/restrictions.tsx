@@ -15,6 +15,7 @@ import {
 } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
+import { useBackoffRetry } from "@app/hooks/use-backoff-retry"
 import { RestrictionVerdict, RestrictionVerdictStatus } from "@app/types/account"
 import { AccountType } from "@app/types/wallet"
 import { logError } from "@app/utils/log-error"
@@ -28,11 +29,9 @@ gql`
   }
 `
 
-/** Failed retries after which the verdict stops pending and reads Unknown. Asking goes on. */
-const RESTRICTION_RETRY_LIMIT = 3
-const RESTRICTION_RETRY_BASE_DELAY_MS = 1000
-/** Caps the backoff so a connection that comes back is not left waiting long for its answer. */
-const RESTRICTION_RETRY_MAX_DELAY_MS = 60_000
+/** Backed off so a server that is down is not hammered, and bounded: once they are spent
+ *  the verdict reads Unknown, and the app asks again on foreground and on pull to refresh. */
+const RESTRICTION_RETRY_DELAYS_MS: readonly number[] = [1000, 2000, 4000]
 
 const LOG_SCOPE = "custodial-restrictions"
 
@@ -72,18 +71,12 @@ const toReportedError = (error: ApolloError | undefined): Error => {
   return reportedError
 }
 
-const toRetryDelay = (failedRetries: number): number =>
-  Math.min(
-    RESTRICTION_RETRY_BASE_DELAY_MS * 2 ** failedRetries,
-    RESTRICTION_RETRY_MAX_DELAY_MS,
-  )
-
 type VerdictInputs = {
   isEnabled: boolean
   data: CustodialRestrictionsQuery | undefined
   loading: boolean
   error: ApolloError | undefined
-  failedRetries: number
+  haveRetriesRunOut: boolean
 }
 
 const toVerdict = ({
@@ -91,7 +84,7 @@ const toVerdict = ({
   data,
   loading,
   error,
-  failedRetries,
+  haveRetriesRunOut,
 }: VerdictInputs): RestrictionVerdict => {
   if (!isEnabled) return NO_ACCOUNT
   if (loading) return PENDING
@@ -103,52 +96,56 @@ const toVerdict = ({
     }
   }
   const hasError = Boolean(error)
-  const hasRetriesLeft = failedRetries < RESTRICTION_RETRY_LIMIT
-  const isStillRetrying = hasError && hasRetriesLeft
+  const isStillRetrying = hasError && !haveRetriesRunOut
   if (isStillRetrying) return PENDING
   return UNKNOWN
 }
 
 /**
- * A failure is counted only once the retry that met it has come back, never when the retry
- * is sent: counting sends let the limit run out while the last retry was still in flight,
- * which read a slow answer as no answer. The next retry is scheduled only by that count, so
- * retries never overlap, and one that returns after the question was already answered or
- * dropped counts for nothing.
+ * Retries only a question that has no answer yet: a served verdict survives a failed
+ * refetch, so asking again then would only repeat the failure. Each retry is scheduled once
+ * the previous one has come back failed, so the last one is never given up on while it is
+ * still in flight, and one that returns after the question was answered or dropped counts
+ * for nothing.
  */
 const useRetryUntilAnswered = (
-  error: ApolloError | undefined,
+  isUnanswered: boolean,
   refetch: () => Promise<unknown>,
-): number => {
-  const [failedRetries, setFailedRetries] = useState(0)
-  const retryGenerationRef = useRef(0)
+): boolean => {
+  const { schedule, reset } = useBackoffRetry(RESTRICTION_RETRY_DELAYS_MS)
+  const [haveRetriesRunOut, setHaveRetriesRunOut] = useState(false)
 
   useEffect(() => {
-    if (!error) {
-      retryGenerationRef.current += 1
-      setFailedRetries(0)
+    if (!isUnanswered) {
+      reset()
+      setHaveRetriesRunOut(false)
       return undefined
     }
 
-    const timer = setTimeout(() => {
-      const generation = retryGenerationRef.current
-      refetch().catch(() => {
-        if (generation !== retryGenerationRef.current) return
-        setFailedRetries((count) => count + 1)
+    let isQuestionOpen = true
+    const retryOrGiveUp = () => {
+      const isRetryScheduled = schedule(() => {
+        refetch().catch(() => {
+          if (isQuestionOpen) retryOrGiveUp()
+        })
       })
-    }, toRetryDelay(failedRetries))
+      if (!isRetryScheduled) setHaveRetriesRunOut(true)
+    }
+    retryOrGiveUp()
 
-    return () => clearTimeout(timer)
-  }, [error, failedRetries, refetch])
+    return () => {
+      isQuestionOpen = false
+    }
+  }, [isUnanswered, refetch, reset, schedule])
 
-  return failedRetries
+  return haveRetriesRunOut
 }
 
 /**
  * The server's restriction verdict for the active custodial account, asked for once and
  * shared by every surface, so they can never disagree and a retry loop never runs per
- * consumer. It keeps asking while the answer is missing: a request that did not come back
- * says nothing about the region, so it is reported as Unknown and never as restricted.
+ * consumer. A request that did not come back says nothing about the region, so once the
+ * retries are spent it is reported as Unknown and never as restricted.
  */
 export const CustodialRestrictionsProvider: React.FC<React.PropsWithChildren> = ({
   children,
@@ -167,11 +164,14 @@ export const CustodialRestrictionsProvider: React.FC<React.PropsWithChildren> = 
     fetchPolicy: "no-cache",
   })
 
-  const failedRetries = useRetryUntilAnswered(error, refetch)
+  const hasFailed = Boolean(error)
+  const hasAnswer = Boolean(data)
+  const isUnanswered = hasFailed && !hasAnswer
+  const haveRetriesRunOut = useRetryUntilAnswered(isUnanswered, refetch)
 
   const verdict = useMemo(
-    () => toVerdict({ isEnabled, data, loading, error, failedRetries }),
-    [isEnabled, data, loading, error, failedRetries],
+    () => toVerdict({ isEnabled, data, loading, error, haveRetriesRunOut }),
+    [isEnabled, data, loading, error, haveRetriesRunOut],
   )
 
   const isUnknown = verdict.status === RestrictionVerdictStatus.Unknown
@@ -184,12 +184,8 @@ export const CustodialRestrictionsProvider: React.FC<React.PropsWithChildren> = 
     }
     if (hasReportedUnknownRef.current) return
     hasReportedUnknownRef.current = true
-    logError({
-      scope: LOG_SCOPE,
-      error: toReportedError(error),
-      context: { failedRetries },
-    })
-  }, [isUnknown, error, failedRetries])
+    logError({ scope: LOG_SCOPE, error: toReportedError(error) })
+  }, [isUnknown, error])
 
   const refetchVerdict = useCallback(async () => {
     if (!isEnabled) return

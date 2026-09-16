@@ -10,6 +10,7 @@ import {
   Observable,
 } from "@apollo/client"
 import { CustodialRestrictionsProvider } from "@app/custodial/providers/restrictions"
+import { CustodialRestrictionsDocument } from "@app/graphql/generated"
 import { useDollarBalanceRestriction } from "@app/hooks/use-dollar-balance-restricted"
 import { AccountType } from "@app/types/wallet"
 
@@ -89,7 +90,10 @@ const renderRestriction = (accountTypeOverride?: AccountType) => {
       <CustodialRestrictionsProvider>{children}</CustodialRestrictionsProvider>
     </ApolloProvider>
   )
-  return renderHook(() => useDollarBalanceRestriction(accountTypeOverride), { wrapper })
+  return {
+    ...renderHook(() => useDollarBalanceRestriction(accountTypeOverride), { wrapper }),
+    client,
+  }
 }
 
 const advance = async (ms: number): Promise<void> => {
@@ -145,10 +149,10 @@ describe("useDollarBalanceRestriction over the shared custodial verdict", () => 
     })
   })
 
-  it("lifts the restriction without a restart once the server answers", async () => {
+  it("lifts the restriction without a restart once returning to the app gets an answer", async () => {
     replies = [dropRequest, dropRequest, dropRequest, dropRequest, answer(false)]
 
-    const { result } = renderRestriction()
+    const { result, client } = renderRestriction()
     await flushEffects()
     await advance(1000)
     await advance(2000)
@@ -156,7 +160,11 @@ describe("useDollarBalanceRestriction over the shared custodial verdict", () => 
 
     expect(result.current.isRegionDetermined).toBe(false)
 
-    await advance(8000)
+    await act(async () => {
+      await client
+        .refetchQueries({ include: [CustodialRestrictionsDocument] })
+        .catch(() => undefined)
+    })
 
     expect(result.current).toEqual({
       isRestricted: false,

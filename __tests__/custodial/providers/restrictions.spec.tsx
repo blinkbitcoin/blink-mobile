@@ -209,7 +209,7 @@ describe("CustodialRestrictionsProvider", () => {
       expect(requestCount).toBe(1)
     })
 
-    it("keeps a served verdict when a later request fails", async () => {
+    it("keeps a served verdict when a later request fails, without retrying it", async () => {
       replies = [answer(false, false), dropRequest]
 
       const { result, client } = renderVerdict()
@@ -217,6 +217,7 @@ describe("CustodialRestrictionsProvider", () => {
       await act(() => refetchOnForeground(client))
       await advance(60_000)
 
+      expect(requestCount).toBe(2)
       expect(result.current.verdict).toEqual({
         status: RestrictionVerdictStatus.Served,
         restrictions: { dollarBalance: false, transfer: false },
@@ -235,7 +236,6 @@ describe("CustodialRestrictionsProvider", () => {
       expect(mockLogError).toHaveBeenCalledWith({
         scope: "custodial-restrictions",
         error: new Error("restrictions query settled without a verdict"),
-        context: { failedRetries: 0 },
       })
     })
   })
@@ -311,21 +311,17 @@ describe("CustodialRestrictionsProvider", () => {
     })
 
     it("reports Unknown once, however long it lasts", async () => {
-      replies = Array.from({ length: 6 }, () => dropRequest)
+      replies = [dropRequest, dropRequest, dropRequest, dropRequest, refuseRequest]
 
-      renderVerdict()
+      const { client } = renderVerdict()
       await flushEffects()
       await failThreeRetries()
-      await advance(8000)
-      await advance(16_000)
+      await act(() => refetchOnForeground(client))
 
-      expect(requestCount).toBe(6)
+      expect(requestCount).toBe(5)
       expect(mockLogError).toHaveBeenCalledTimes(1)
       expect(mockLogError).toHaveBeenCalledWith(
-        expect.objectContaining({
-          scope: "custodial-restrictions",
-          context: { failedRetries: 3 },
-        }),
+        expect.objectContaining({ scope: "custodial-restrictions" }),
       )
     })
 
@@ -344,16 +340,29 @@ describe("CustodialRestrictionsProvider", () => {
       })
     })
 
-    it("keeps asking after Unknown and takes the answer when it comes", async () => {
+    it("stops asking once the retries are spent", async () => {
+      replies = [dropRequest, dropRequest, dropRequest, dropRequest]
+
+      renderVerdict()
+      await flushEffects()
+      await failThreeRetries()
+      for (let minute = 0; minute < 10; minute += 1) {
+        await advance(60_000)
+      }
+
+      expect(requestCount).toBe(4)
+    })
+
+    it("takes the answer the next foreground brings after Unknown", async () => {
       replies = [dropRequest, dropRequest, dropRequest, dropRequest, answer(false, true)]
 
-      const { result } = renderVerdict()
+      const { result, client } = renderVerdict()
       await flushEffects()
       await failThreeRetries()
 
       expect(result.current.verdict).toEqual({ status: RestrictionVerdictStatus.Unknown })
 
-      await advance(8000)
+      await act(() => refetchOnForeground(client))
 
       expect(result.current.verdict).toEqual({
         status: RestrictionVerdictStatus.Served,
@@ -361,25 +370,29 @@ describe("CustodialRestrictionsProvider", () => {
       })
     })
 
-    it("waits no longer than the cap between retries", async () => {
-      replies = Array.from({ length: 9 }, () => dropRequest)
+    it("waits longer before each retry", async () => {
+      replies = [dropRequest, dropRequest, dropRequest, dropRequest]
 
       renderVerdict()
       await flushEffects()
-      for (const backoff of [1000, 2000, 4000, 8000, 16_000, 32_000]) {
-        await advance(backoff)
-      }
 
-      expect(requestCount).toBe(7)
-
-      await advance(59_999)
-      expect(requestCount).toBe(7)
-
+      await advance(999)
+      expect(requestCount).toBe(1)
       await advance(1)
-      expect(requestCount).toBe(8)
+      expect(requestCount).toBe(2)
+
+      await advance(1999)
+      expect(requestCount).toBe(2)
+      await advance(1)
+      expect(requestCount).toBe(3)
+
+      await advance(3999)
+      expect(requestCount).toBe(3)
+      await advance(1)
+      expect(requestCount).toBe(4)
     })
 
-    it("counts nothing from a retry that returns after the question was dropped", async () => {
+    it("ignores a retry that returns after the question was dropped", async () => {
       replies = [dropRequest, holdRequest]
 
       const { result, rerender } = renderVerdict({ queryDeduplication: false })
