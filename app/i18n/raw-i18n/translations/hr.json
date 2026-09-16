@@ -3716,7 +3716,7 @@
           "valuation": "Uz pre-money procjenu od $10M",
           "units": "Primate {units: string} jedinica ~{percent: number}% Blinka"
         },
-        "buttonText": "Nastavi na Potpis"
+        "buttonText": "Nastavi na potpis"
       },
       "TransferInvest": {
         "title": "Prenesite svoje ulaganje",

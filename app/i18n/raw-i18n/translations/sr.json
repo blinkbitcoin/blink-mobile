@@ -3716,7 +3716,7 @@
           "valuation": "Уз пре-мани процену од $10М",
           "units": "Добијате {units: string} јединица ~{percent: number}% Блинка"
         },
-        "buttonText": "Наставите на Потпис"
+        "buttonText": "Наставите на потпис"
       },
       "TransferInvest": {
         "title": "Пренесите своје улагање",

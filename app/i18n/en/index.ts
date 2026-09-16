@@ -3884,11 +3884,11 @@ const en: BaseTranslation = {
         title: "Term Sheet",
         equitySection: {
           title: "Equity in Blink",
-          investment: "{amount: string} Investment",
+          investment: "{amount: string} investment",
           valuation: "At $10M pre-money valuation",
           units: "You receive {units: string} units ~{percent: number}% of Blink",
         },
-        buttonText: "Proceed to Sign",
+        buttonText: "Proceed to sign",
       },
       TransferInvest: {
         title: "Transfer your investment",

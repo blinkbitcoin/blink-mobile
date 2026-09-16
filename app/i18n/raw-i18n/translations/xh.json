@@ -3716,7 +3716,7 @@
           "valuation": "Ngoxabiso lwangaphambi kwemali lwe-$10M",
           "units": "Ufumana iiyunithi ezili-{units: string} ~{percent: number}% yeBlink"
         },
-        "buttonText": "Qhubeka ukuya kuSayina"
+        "buttonText": "Qhubeka ukuya kusayina"
       },
       "TransferInvest": {
         "title": "Dlulisela utyalo-mali lwakho",

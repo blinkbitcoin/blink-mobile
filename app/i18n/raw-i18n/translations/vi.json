@@ -3716,7 +3716,7 @@
           "valuation": "Ở định giá trước vốn $10M",
           "units": "Bạn nhận được {units: string} đơn vị ~{percent: number}% của Blink"
         },
-        "buttonText": "Tiến hành Ký"
+        "buttonText": "Tiến hành ký"
       },
       "TransferInvest": {
         "title": "Chuyển khoản đầu tư của bạn",

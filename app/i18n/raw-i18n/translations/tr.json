@@ -3712,11 +3712,11 @@
         "title": "Şartname",
         "equitySection": {
           "title": "Blink'te Pay",
-          "investment": "{amount: string} Yatırım",
+          "investment": "{amount: string} yatırım",
           "valuation": "10M $ ön para değerlemesinde",
           "units": "{units: string} birim alırsınız ~Blink'in %{percent: number}'i"
         },
-        "buttonText": "İmzaya Geç"
+        "buttonText": "İmzaya geç"
       },
       "TransferInvest": {
         "title": "Yatırımınızı transfer edin",

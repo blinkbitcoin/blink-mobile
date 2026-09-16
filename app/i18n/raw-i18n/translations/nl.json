@@ -3712,11 +3712,11 @@
         "title": "Termsheet",
         "equitySection": {
           "title": "Aandeel in Blink",
-          "investment": "{amount: string} Investering",
+          "investment": "{amount: string} investering",
           "valuation": "Bij $10M pre-money waardering",
           "units": "Je ontvangt {units: string} eenheden ~{percent: number}% van Blink"
         },
-        "buttonText": "Ga naar Ondertekening"
+        "buttonText": "Ga naar ondertekening"
       },
       "TransferInvest": {
         "title": "Draag je investering over",
