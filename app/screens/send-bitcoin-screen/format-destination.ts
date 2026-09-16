@@ -9,9 +9,9 @@ const RAW_DESTINATION_START = 10
 const RAW_DESTINATION_END = 8
 
 /**
- * How a destination reads across the whole send flow — amount entry, review and the
- * completed screen all shorten it the same way, so the string never changes shape between
- * the screen the sender confirms and the one they end on.
+ * How a destination reads on amount entry and the completed screen, which shorten it the
+ * same way. Review's destination field fills its width instead and only borrows the
+ * username host from here.
  */
 export const formatDestination = ({
   destination,

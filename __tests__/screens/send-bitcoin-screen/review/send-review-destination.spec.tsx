@@ -76,6 +76,17 @@ describe("SendReviewDestination", () => {
     )
   })
 
+  /** The field shortens it natively at its own width, so the text node gets it whole. */
+  it("hands a raw address to the field whole, to shorten in the middle", () => {
+    const address = "bc1pnu7735ce8vd9dknqyy2mnq0cq5g7yv8aqhmpyl6rnmgk0xz6qq9qtqasq6n3"
+    renderDestination("onchain", address)
+
+    const value = screen.getByTestId(SEND_REVIEW_DESTINATION_TEST_ID)
+    expect(value.props.children).toBe(address)
+    expect(value.props.numberOfLines).toBe(1)
+    expect(value.props.ellipsizeMode).toBe("middle")
+  })
+
   it("draws the destination in the foreground colour", () => {
     renderDestination("intraledger")
 
