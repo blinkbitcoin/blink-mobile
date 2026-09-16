@@ -11,6 +11,7 @@ import {
   SEND_HERO_PRIMARY_TEST_ID,
   SEND_HERO_SECONDARY_TEST_ID,
   SendHero,
+  entryAmountFontSize,
 } from "@app/screens/send-bitcoin-screen/send-hero"
 
 const style = (node: ReactTestInstance) => StyleSheet.flatten(node.props.style)
@@ -68,11 +69,46 @@ describe("SendHero", () => {
     renderHero({ active: true, secondaryAmount: "746 SAT" })
 
     expect(style(screen.getByTestId(SEND_HERO_PRIMARY_TEST_ID))).toEqual(
-      expect.objectContaining({ fontSize: 26, lineHeight: 34 }),
+      expect.objectContaining({ fontSize: 30, lineHeight: 32 }),
     )
     expect(style(screen.getByTestId(SEND_HERO_SECONDARY_TEST_ID))).toEqual(
       expect.objectContaining({ fontSize: 18, lineHeight: 24 }),
     )
+  })
+
+  it("draws an empty entry amount at 32 on 34", () => {
+    renderHero({ active: true, isEmpty: true, primaryAmount: "$0.00" })
+
+    expect(style(screen.getByTestId(SEND_HERO_PRIMARY_TEST_ID))).toEqual(
+      expect.objectContaining({ fontSize: 32, lineHeight: 34 }),
+    )
+  })
+
+  it("stops shrinking the entry amount at 24 on 26 from nine digits", () => {
+    renderHero({ active: true, primaryAmount: "1,000,000,000 SAT" })
+
+    expect(style(screen.getByTestId(SEND_HERO_PRIMARY_TEST_ID))).toEqual(
+      expect.objectContaining({ fontSize: 24, lineHeight: 26 }),
+    )
+  })
+
+  describe("entryAmountFontSize", () => {
+    const cases: Array<[amount: string, isEmpty: boolean, expected: number]> = [
+      ["$0", false, 32],
+      ["$0.00", true, 32],
+      ["$5", false, 32],
+      ["$12", false, 31],
+      ["1,234 SAT", false, 29],
+      ["12,345,678 SAT", false, 25],
+      ["100,000,000 SAT", false, 24],
+      ["$1,234,567,890.12", false, 24],
+    ]
+
+    cases.forEach(([amount, isEmpty, expected]) => {
+      it(`sizes ${amount} (empty: ${isEmpty}) at ${expected}`, () => {
+        expect(entryAmountFontSize(amount, isEmpty)).toBe(expected)
+      })
+    })
   })
 
   it("mutes both lines while the amount is still empty", () => {
