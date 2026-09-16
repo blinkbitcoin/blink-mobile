@@ -18,6 +18,7 @@ import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { WalletCurrency } from "@app/graphql/generated"
 import { SATS_PER_BTC, usePriceConversion } from "@app/hooks/use-price-conversion"
 import { useAppConfig } from "@app/hooks/use-app-config"
+import { useCardInvestmentProgress } from "@app/hooks/use-card-investment-progress"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { TranslationFunctions } from "@app/i18n/i18n-types"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -195,6 +196,7 @@ export const SignInvestScreen: React.FC = () => {
   const { convertMoneyAmount } = usePriceConversion()
   const { selectedAmountUsd } = useRoute<SignInvestRoute>().params
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+  const { start: startCardInvestment, isAccountResolved } = useCardInvestmentProgress()
 
   /**
    * What the latest mint left behind, kept from the mint so the transfer step bills
@@ -245,7 +247,8 @@ export const SignInvestScreen: React.FC = () => {
    * screen behind would let a back swipe land on a finished session with no way on.
    * The figure carried is the one minted with the envelope that was signed; when the
    * library names the envelope and it is not that one, nothing is carried and the step
-   * does not move on.
+   * does not move on. The same moment records the investment, so the home can steer
+   * the investor back to paying it if they leave before they do.
    */
   const goToTransfer = React.useCallback(
     (result: { envelopeId?: string }) => {
@@ -264,12 +267,11 @@ export const SignInvestScreen: React.FC = () => {
         return
       }
 
-      navigation.replace("cardOnboardingTransferInvestScreen", {
-        selectedAmountUsd,
-        settlementSats: minted?.settlementSats,
-      })
+      const investment = { selectedAmountUsd, settlementSats: minted?.settlementSats }
+      startCardInvestment(investment)
+      navigation.replace("cardOnboardingTransferInvestScreen", investment)
     },
-    [navigation, selectedAmountUsd],
+    [navigation, selectedAmountUsd, startCardInvestment],
   )
 
   /**
@@ -372,17 +374,21 @@ export const SignInvestScreen: React.FC = () => {
     onError: reportSigningError,
   })
 
-  /** The agreement cannot be minted before the price feed has answered, so a cold open
-   *  waits on the spinner for it rather than failing the session it is about to start. */
+  /** The agreement cannot be minted before the price feed has answered, and it must not
+   *  be signed before the investment can be recorded against the account, or the home
+   *  would never steer the investor back to paying it. A cold open waits on the spinner
+   *  for both rather than failing the session it is about to start. */
   const isPriceQuoted = usdCentsPerBtc !== null
+  const isReadyToMint = isPriceQuoted && isAccountResolved
 
   /**
-   * Whether that wait has gone on too long. While it is waiting a timer runs; once the
-   * price is in, or the session has moved on, the flag drops so a later wait starts
-   * fresh. Trying again drops it too, which starts the timer over: the feed answers on
-   * its own once the device is back, and the session then starts without another tap.
+   * Whether that wait has gone on too long. While it is waiting a timer runs; once both
+   * are in, or the session has moved on, the flag drops so a later wait starts fresh.
+   * Trying again drops it too, which starts the timer over: the feed and the account
+   * answer on their own once the device is back, and the session then starts without
+   * another tap.
    */
-  const isWaitingToStart = status === "idle" && !isPriceQuoted
+  const isWaitingToStart = status === "idle" && !isReadyToMint
   const [hasGivenUpWaiting, setHasGivenUpWaiting] = React.useState(false)
   React.useEffect(() => {
     if (!isWaitingToStart) {
@@ -406,7 +412,7 @@ export const SignInvestScreen: React.FC = () => {
    * telling the signer that another envelope was signed: that is a tap to try again,
    * not a session to open on its own.
    */
-  const canStartSigning = isPriceQuoted && isSigningAvailable && !hasSignedOtherEnvelope
+  const canStartSigning = isReadyToMint && isSigningAvailable && !hasSignedOtherEnvelope
   const hasStartedFromIdle = React.useRef(false)
   React.useEffect(() => {
     if (status !== "idle") {
