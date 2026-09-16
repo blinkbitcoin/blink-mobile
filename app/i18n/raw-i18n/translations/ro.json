@@ -3716,7 +3716,7 @@
           "valuation": "La o evaluare pre-money de $10M",
           "units": "Primești {units: string} de unități ~{percent: number}% din Blink"
         },
-        "buttonText": "Continuă la Semnătură"
+        "buttonText": "Continuă la semnătură"
       },
       "TransferInvest": {
         "title": "Transferă-ți investiția",

@@ -3764,7 +3764,7 @@
                     "valuation": "Com avaliação pré-money de $10M",
                     "units": "Você recebe {units: string} unidades ~{percent: number}% do Blink"
                 },
-                "buttonText": "Prosseguir para Assinatura"
+                "buttonText": "Prosseguir para assinatura"
             },
             "TransferInvest": {
                 "title": "Transfira seu investimento",

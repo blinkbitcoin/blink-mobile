@@ -3712,11 +3712,11 @@
         "title": "Kamachikuy Qillqa",
         "equitySection": {
           "title": "Rakiy Blink-pi",
-          "investment": "{amount: string} Invertiy",
+          "investment": "{amount: string} invertiy",
           "valuation": "$10M pre-money chaninchaypi",
           "units": "{units: string} rakinkunata chaskiwaq ~{percent: number}% Blink-manta"
         },
-        "buttonText": "Ñawpaqman Firmaman"
+        "buttonText": "Ñawpaqman firmaman"
       },
       "TransferInvest": {
         "title": "Invertiyniykita apachiy",
