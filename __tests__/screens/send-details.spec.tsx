@@ -511,7 +511,9 @@ describe("onchain fee tier gating", () => {
     await flushAsync()
 
     // A zeroed placeholder must never read as a fee somebody quoted.
-    expect(screen.getByText(LL.SendBitcoinScreen.fast())).toBeTruthy()
+    expect(
+      screen.getByText(new RegExp(`^${LL.SendBitcoinScreen.fast()} ~ `)),
+    ).toBeTruthy()
     expect(screen.queryByText(`${LL.SendBitcoinScreen.fast()} (0 sats)`)).toBeNull()
   })
 
@@ -531,10 +533,12 @@ describe("onchain fee tier gating", () => {
     fireEvent.press(screen.getByTestId("fee-tier-slow"))
     await flushAsync()
 
-    expect(screen.getAllByText(LL.SendBitcoinScreen.slow()).length).toBeGreaterThan(0)
+    expect(
+      screen.getByText(new RegExp(`^${LL.SendBitcoinScreen.slow()} ~ `)),
+    ).toBeTruthy()
   })
 
-  it("carries the quoted fee into the tier label", async () => {
+  it("keeps the quoted fee off the priority row", async () => {
     loadLocale("en")
     const LL = i18nObject("en")
 
@@ -549,12 +553,19 @@ describe("onchain fee tier gating", () => {
     await flushAsync()
     await flushAsync()
 
-    // The fee itself is formatted in the display currency, so only its presence is asserted.
+    // The fee shows on review only, so a landed quote leaves the row at name and ETA.
     await waitFor(() => {
       expect(
-        screen.getByText(new RegExp(`^${LL.SendBitcoinScreen.fast()} \\(`)),
-      ).toBeTruthy()
+        screen.getByTestId(LL.common.next()).props.accessibilityState?.disabled,
+      ).toBe(false)
     })
+    expect(
+      screen.getByText(new RegExp(`^${LL.SendBitcoinScreen.fast()} ~ `)),
+    ).toBeTruthy()
+    fireEvent.press(screen.getByTestId("fee-tier-dropdown"))
+    expect(
+      screen.queryByText(new RegExp(`^${LL.SendBitcoinScreen.fast()} \\(`)),
+    ).toBeNull()
     expect(screen.queryByText(LL.common.feeError())).toBeNull()
     expect(screen.getByTestId(LL.common.next()).props.accessibilityState?.disabled).toBe(
       false,
