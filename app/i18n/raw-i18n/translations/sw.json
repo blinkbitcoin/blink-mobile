@@ -3716,7 +3716,7 @@
           "valuation": "Kwa thamani ya awali ya $10M",
           "units": "Unapokea vitengo {units: string} ~{percent: number}% vya Blink"
         },
-        "buttonText": "Endelea kwa Kusaini"
+        "buttonText": "Endelea kwa kusaini"
       },
       "TransferInvest": {
         "title": "Hamisha uwekezaji wako",

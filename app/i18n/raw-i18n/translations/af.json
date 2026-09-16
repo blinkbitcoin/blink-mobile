@@ -3712,11 +3712,11 @@
         "title": "Termynstaat",
         "equitySection": {
           "title": "Aandeel in Blink",
-          "investment": "{amount: string} Belegging",
+          "investment": "{amount: string} belegging",
           "valuation": "Teen $10M pre-geld-waardasie",
           "units": "Jy ontvang {units: string} eenhede ~{percent: number}% van Blink"
         },
-        "buttonText": "Gaan voort om te Teken"
+        "buttonText": "Gaan voort om te teken"
       },
       "TransferInvest": {
         "title": "Dra jou belegging oor",

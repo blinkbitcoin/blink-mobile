@@ -3712,11 +3712,11 @@
         "title": "Feltételek",
         "equitySection": {
           "title": "Részesedés a Blinkben",
-          "investment": "{amount: string} Befektetés",
+          "investment": "{amount: string} befektetés",
           "valuation": "$10M pre-money értékelésnél",
           "units": "{units: string} egységet kapsz ~{percent: number}%-ot a Blinkből"
         },
-        "buttonText": "Tovább az Aláíráshoz"
+        "buttonText": "Tovább az aláíráshoz"
       },
       "TransferInvest": {
         "title": "Utald át a befektetésedet",

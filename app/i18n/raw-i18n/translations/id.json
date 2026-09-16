@@ -3716,7 +3716,7 @@
           "valuation": "Pada valuasi pre-money $10M",
           "units": "Anda menerima {units: string} unit ~{percent: number}% dari Blink"
         },
-        "buttonText": "Lanjut ke Penandatanganan"
+        "buttonText": "Lanjut ke penandatanganan"
       },
       "TransferInvest": {
         "title": "Transfer investasi Anda",

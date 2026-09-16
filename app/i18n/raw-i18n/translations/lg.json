@@ -3716,7 +3716,7 @@
           "valuation": "Ku muwendo gwa $10M nga temunnaba kufuna ssente",
           "units": "Ofuna ebitundu {units: string} ~{percent: number}% ebya Blink"
         },
-        "buttonText": "Weyongere Okusayina"
+        "buttonText": "Weyongere okusayina"
       },
       "TransferInvest": {
         "title": "Sindika ebintu byo",
