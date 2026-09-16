@@ -38,8 +38,12 @@ export const FeeTierSelector = <T extends string>({
     .filter(Boolean)
     .join(" ")
 
+  /**
+   * One root, because the modal keeps a wrapper view mounted while hidden: returned as a
+   * sibling, it would take its own slot in the parent's gap and double the space below.
+   */
   return (
-    <>
+    <View>
       {/* The whole row is the tap target, so it carries no chevron. */}
       <TouchableWithoutFeedback
         onPress={() => setModalVisible(true)}
@@ -90,7 +94,7 @@ export const FeeTierSelector = <T extends string>({
           })}
         </View>
       </ReactNativeModal>
-    </>
+    </View>
   )
 }
 
