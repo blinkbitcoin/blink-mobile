@@ -1,6 +1,6 @@
 import { renderHook, act } from "@testing-library/react-native"
 
-import { useBackoffRetry } from "@app/self-custodial/hooks/use-backoff-retry"
+import { useBackoffRetry } from "@app/hooks/use-backoff-retry"
 
 const DELAYS = [1000, 3000, 9000] as const
 
