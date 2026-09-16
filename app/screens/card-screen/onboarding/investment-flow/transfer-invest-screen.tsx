@@ -9,13 +9,17 @@ import { IconHero } from "@app/components/icon-hero"
 import { CloseHeader } from "@app/components/close-header"
 import { Screen } from "@app/components/screen"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
+import {
+  armCardInvestmentPayment,
+  useCardInvestmentProgress,
+} from "@app/hooks/use-card-investment-progress"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
 import { formatUnitCount, formatUsdAmount } from "./investment-figures"
 import { resolveInvestmentTerms } from "./investment-terms"
 import { useInvestmentFunding, useInvestmentSats } from "./use-investment-funding"
-import { useInvestmentInvoice } from "./use-investment-invoice"
+import { isInvoiceReusable, useInvestmentInvoice } from "./use-investment-invoice"
 
 type TransferInvestRoute = RouteProp<
   RootStackParamList,
@@ -42,19 +46,21 @@ export const TransferInvestScreen: React.FC = () => {
     terms.totalUsd,
   )
   const totalSats = useInvestmentSats(terms.totalUsd)
+  const { progress, recordInvoice } = useCardInvestmentProgress()
   const { requestInvoice, isRequesting } = useInvestmentInvoice()
   const [hasInvoiceFailed, setHasInvoiceFailed] = React.useState(false)
 
   /**
    * What the invoice is written for: the satoshis the agreement itself names, carried
-   * here from the step that minted it.
+   * here from the step that minted it, or read back from the signed record when the
+   * route came without them (a return from the home, or from a conversion).
    *
    * The rate was fixed when the agreement was minted, so converting the dollars again now
    * would charge a different amount of bitcoin than the document says: less if the price
-   * rose, more if it fell. The conversion only stands in when no figure was carried, so
-   * the investor is still billed rather than sent on with nothing.
+   * rose, more if it fell. The conversion only stands in when no figure exists anywhere,
+   * so the investor is still billed rather than sent on with nothing.
    */
-  const owedSats = settlementSats ?? totalSats
+  const owedSats = settlementSats ?? progress?.settlementSats ?? totalSats
 
   /**
    * Where the money goes, or the shortfall screen when there is not enough to send.
@@ -74,17 +80,42 @@ export const TransferInvestScreen: React.FC = () => {
     }
 
     setHasInvoiceFailed(false)
-    const minted = await requestInvoice(cardInvestmentDepositBtcWalletId, owedSats)
+    const paymentRequest = await resolvePaymentRequest()
 
-    if (!minted) {
+    /** The investor may have closed the step while the invoice was being issued; a send
+     *  flow opened over whatever they moved on to, armed to record the investment, would
+     *  be neither expected nor safe. */
+    if (!navigation.isFocused()) return
+
+    if (!paymentRequest) {
       setHasInvoiceFailed(true)
       return
     }
 
+    armCardInvestmentPayment(paymentRequest)
     navigation.navigate("sendBitcoinDestination", {
-      payment: minted.paymentRequest,
+      payment: paymentRequest,
       sendingWalletId: balanceWalletId,
     })
+  }
+
+  /**
+   * The invoice to pay: the one already issued for this investment while it can still be
+   * paid, a fresh one otherwise. A payment that went through without the receipt ever
+   * recording it (the app killed with the payment in flight) leaves the home asking for
+   * the money again; paying the same invoice then meets a claim the recipient has already
+   * settled, where a fresh one would be paid a second time.
+   */
+  async function resolvePaymentRequest(): Promise<string | null> {
+    const issued = progress?.invoice
+    if (issued && isInvoiceReusable(issued.issuedAt, Date.now())) {
+      return issued.paymentRequest
+    }
+
+    const minted = await requestInvoice(cardInvestmentDepositBtcWalletId, owedSats)
+    if (!minted) return null
+    recordInvoice(minted.paymentRequest)
+    return minted.paymentRequest
   }
 
   /**
