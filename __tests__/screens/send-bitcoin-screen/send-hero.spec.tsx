@@ -69,7 +69,7 @@ describe("SendHero", () => {
     renderHero({ active: true, secondaryAmount: "746 SAT" })
 
     expect(style(screen.getByTestId(SEND_HERO_PRIMARY_TEST_ID))).toEqual(
-      expect.objectContaining({ fontSize: 33, lineHeight: 35 }),
+      expect.objectContaining({ fontSize: 36, lineHeight: 38 }),
     )
     expect(style(screen.getByTestId(SEND_HERO_SECONDARY_TEST_ID))).toEqual(
       expect.objectContaining({ fontSize: 18, lineHeight: 24 }),
@@ -97,10 +97,11 @@ describe("SendHero", () => {
       ["$0", false, 36],
       ["$0.00", true, 36],
       ["$5", false, 36],
-      ["$12", false, 34],
-      ["1,234 SAT", false, 31],
-      ["12,345,678 SAT", false, 25],
-      ["100,000,000 SAT", false, 24],
+      ["$12", false, 36],
+      ["12,345 SAT", false, 36],
+      ["123,456 SAT", false, 33],
+      ["12,345,678 SAT", false, 28],
+      ["100,000,000 SAT", false, 25],
       ["1,000,000,000 SAT", false, 22],
       ["$1,234,567,890.12", false, 22],
     ]
