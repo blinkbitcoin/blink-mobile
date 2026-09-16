@@ -239,6 +239,10 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
           paymentDetail.paymentType === "lnurl" ? paymentDetail.isMerchant : undefined,
       })
 
+      /** Only a lightning payment settles an invoice as such; the receipt is told which,
+       *  unshortened, so whatever asked for that payment can recognise its own. */
+      const settledPaymentRequest = paymentType === "lightning" ? destination : undefined
+
       navigation.dispatch((state) => {
         const routes = [
           { name: "Primary" },
@@ -264,6 +268,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
                     }),
               paymentType: paymentDetail?.paymentType,
               createdAt: transaction?.createdAt,
+              paymentRequest: settledPaymentRequest,
             },
           },
         ]
