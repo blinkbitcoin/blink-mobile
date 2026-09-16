@@ -551,11 +551,13 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   return (
     <Screen preset="fixed" keyboardOffset="navigationHeader">
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
-        <SendHero
-          caption={LL.SendBitcoinConfirmationScreen.sending()}
-          primaryAmount={currencyAmount}
-          secondaryAmount={secondaryAmount ? satAmount : undefined}
-        />
+        <View style={styles.hero}>
+          <SendHero
+            caption={LL.SendBitcoinConfirmationScreen.sending()}
+            primaryAmount={currencyAmount}
+            secondaryAmount={secondaryAmount ? satAmount : undefined}
+          />
+        </View>
         <SendReviewDestination
           destination={destination}
           paymentType={paymentType}
@@ -652,12 +654,16 @@ const useStyles = makeStyles(({ colors }) => ({
   scroll: {
     flex: 1,
   },
-  /** Figma's body column: 14 between blocks, 20 at the sides, 10 under the header. */
+  /** Figma's body column: 14 between blocks, 20 at the sides, the hero flush with the
+   *  header. */
   scrollContent: {
     rowGap: 14,
     paddingHorizontal: 20,
-    paddingTop: 10,
     paddingBottom: 20,
+  },
+  /** Holds the amounts 10 further off the destination than the blocks below sit apart. */
+  hero: {
+    paddingBottom: 10,
   },
   group: {
     rowGap: 7,
