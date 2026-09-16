@@ -6,6 +6,7 @@ import { radius } from "@app/rne-theme/radius"
 import { testProps } from "@app/utils/testProps"
 import { GaloyIcon } from "../atomic/galoy-icon"
 import { Key as KeyType } from "../amount-input-screen/number-pad-reducer"
+import { fonts } from "@app/rne-theme/fonts"
 
 const KEY_ROW_PREFIX = "row-"
 const KEY_TEST_ID_PREFIX = "Key"
@@ -144,7 +145,7 @@ const useStyles = makeStyles(({ colors }) => ({
     backgroundColor: colors.surfaceInteractive,
   },
   keyText: {
-    fontFamily: "SourceSansPro-Bold",
+    fontFamily: fonts.bold,
     fontSize: 28,
     lineHeight: 32,
     textAlign: "center",
