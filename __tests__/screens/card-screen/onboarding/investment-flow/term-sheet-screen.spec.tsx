@@ -72,7 +72,7 @@ describe("TermSheetScreen", () => {
 
     await act(async () => {})
 
-    expect(getByText("$25,000 Investment")).toBeTruthy()
+    expect(getByText("$25,000 investment")).toBeTruthy()
     expect(getByText("You receive 25,000 units ~0.25% of Blink")).toBeTruthy()
   })
 
@@ -89,7 +89,7 @@ describe("TermSheetScreen", () => {
 
     await act(async () => {})
 
-    expect(getByText("$1,000 Investment")).toBeTruthy()
+    expect(getByText("$1,000 investment")).toBeTruthy()
     expect(getByText("You receive 1,000 units ~0.01% of Blink")).toBeTruthy()
   })
 
@@ -115,7 +115,7 @@ describe("TermSheetScreen", () => {
 
     await act(async () => {})
 
-    expect(getByText("Proceed to Sign")).toBeTruthy()
+    expect(getByText("Proceed to sign")).toBeTruthy()
   })
 
   it("navigates to the signing step on button press", async () => {
@@ -127,7 +127,7 @@ describe("TermSheetScreen", () => {
 
     await act(async () => {})
 
-    const button = getByText("Proceed to Sign")
+    const button = getByText("Proceed to sign")
     await act(async () => {
       fireEvent.press(button)
     })

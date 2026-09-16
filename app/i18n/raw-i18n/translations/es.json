@@ -3790,7 +3790,7 @@
                     "valuation": "Con valoración pre-money de $10M",
                     "units": "Recibes {units: string} unidades ~{percent: number}% de Blink"
                 },
-                "buttonText": "Proceder a Firmar"
+                "buttonText": "Proceder a firmar"
             },
             "TransferInvest": {
                 "title": "Transfiere tu inversión",
