@@ -2,6 +2,7 @@ import { GALOY_INSTANCES, GaloyInstance, GaloyInstanceInput } from "@app/config"
 import { type StoredFiatCurrencies } from "./self-custodial-fiat-currencies"
 import { type StoredFiatRates } from "./self-custodial-fiat-rates"
 import { AccountMode } from "@app/types/account"
+import { CardInvestmentProgress } from "@app/types/card-investment"
 import { DefaultAccountId } from "@app/types/wallet"
 
 type PersistentState_3 = {
@@ -311,8 +312,20 @@ type PersistentState_23 = Omit<PersistentState_22, "schemaVersion"> & {
   selfCustodialFiatCurrencies?: StoredFiatCurrencies
 }
 
-const migrate23ToCurrent = (state: PersistentState_23): Promise<PersistentState> =>
+type PersistentState_24 = Omit<PersistentState_23, "schemaVersion"> & {
+  schemaVersion: 24
+  // The card investment an account signed for and has not finished paying, kept on
+  // device because no backend records it yet: the home reads it to nag until the
+  // money is sent, and to welcome once it is.
+  cardInvestmentByAccountId?: Record<string, CardInvestmentProgress>
+}
+
+const migrate24ToCurrent = (state: PersistentState_24): Promise<PersistentState> =>
   Promise.resolve(state)
+
+/** Adds the per-account card investment in progress; nothing to backfill. */
+const migrate23ToCurrent = (state: PersistentState_23): Promise<PersistentState> =>
+  migrate24ToCurrent({ ...state, schemaVersion: 24 })
 
 /** Adds the optional device-wide currency metadata; nothing to backfill. */
 const migrate22ToCurrent = (state: PersistentState_22): Promise<PersistentState> =>
@@ -494,6 +507,7 @@ type StateMigrations = {
   21: (state: PersistentState_21) => Promise<PersistentState>
   22: (state: PersistentState_22) => Promise<PersistentState>
   23: (state: PersistentState_23) => Promise<PersistentState>
+  24: (state: PersistentState_24) => Promise<PersistentState>
 }
 
 const stateMigrations: StateMigrations = {
@@ -518,12 +532,13 @@ const stateMigrations: StateMigrations = {
   21: migrate21ToCurrent,
   22: migrate22ToCurrent,
   23: migrate23ToCurrent,
+  24: migrate24ToCurrent,
 }
 
-export type PersistentState = PersistentState_23
+export type PersistentState = PersistentState_24
 
 export const defaultPersistentState: PersistentState = {
-  schemaVersion: 23,
+  schemaVersion: 24,
   galoyInstance: { id: "Main" },
   galoyAuthToken: "",
 }
@@ -583,7 +598,8 @@ export const migratePersistentState = async (
     | 20
     | 21
     | 22
-    | 23 = data.schemaVersion
+    | 23
+    | 24 = data.schemaVersion
   try {
     const migration = stateMigrations[schemaVersion]
     const state = await migration(data)
