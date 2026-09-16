@@ -30,9 +30,37 @@ const mockDepositWalletId = { current: "wallet-invest" }
 /** The invoice the recipient's account answers with, carrying the amount inside it. */
 const mockRequestInvoice = jest.fn()
 
+/** The one-shot flag the receipt reads to record the payment against the investment;
+ *  its own spec covers the flag, so what matters here is when this step sets it. */
+const mockArmCardInvestmentPayment = jest.fn()
+
+/** The signed record, which carries the settlement figure when the route does not. */
+const mockCardInvestmentProgress: {
+  current: {
+    selectedAmountUsd: number
+    settlementSats?: number
+    invoice?: { paymentRequest: string; issuedAt: number }
+  } | null
+} = { current: null }
+const mockRecordInvoice = jest.fn()
+
+jest.mock("@app/hooks/use-card-investment-progress", () => ({
+  armCardInvestmentPayment: (...args: unknown[]) => mockArmCardInvestmentPayment(...args),
+  useCardInvestmentProgress: () => ({
+    progress: mockCardInvestmentProgress.current,
+    recordInvoice: (...args: unknown[]) => mockRecordInvoice(...args),
+  }),
+}))
+
+/** Whether the step is still in front when the invoice comes back. */
+const mockIsFocused = { current: true }
+
 jest.mock(
   "@app/screens/card-screen/onboarding/investment-flow/use-investment-invoice",
   () => ({
+    ...jest.requireActual(
+      "@app/screens/card-screen/onboarding/investment-flow/use-investment-invoice",
+    ),
     useInvestmentInvoice: () => ({
       requestInvoice: (...args: unknown[]) => mockRequestInvoice(...args),
       isRequesting: false,
@@ -85,6 +113,7 @@ jest.mock("@react-navigation/native", () => {
     ...actualNav,
     useNavigation: () => ({
       navigate: mockNavigate,
+      isFocused: () => mockIsFocused.current,
     }),
     useRoute: () => ({ params: mockRouteParams.current }),
   }
@@ -95,6 +124,8 @@ describe("TransferInvestScreen", () => {
     loadLocale("en")
     mockRouteParams.current = { selectedAmountUsd: SELECTED_AMOUNT_USD }
     mockDepositWalletId.current = "wallet-invest"
+    mockCardInvestmentProgress.current = null
+    mockIsFocused.current = true
     mockRequestInvoice.mockResolvedValue({ paymentRequest: "lnbc-invoice" })
     mockFunding.current = {
       balanceUsd: 0,
@@ -228,6 +259,8 @@ describe("TransferInvestScreen", () => {
     })
 
     expect(mockRequestInvoice).toHaveBeenCalledWith("wallet-invest", 31_704_000)
+    expect(mockArmCardInvestmentPayment).toHaveBeenCalledTimes(1)
+    expect(mockArmCardInvestmentPayment).toHaveBeenCalledWith("lnbc-invoice")
     expect(mockNavigate).toHaveBeenCalledWith("sendBitcoinDestination", {
       payment: "lnbc-invoice",
       sendingWalletId: undefined,
@@ -451,6 +484,201 @@ describe("TransferInvestScreen", () => {
 
     expect(mockNavigate).toHaveBeenCalledWith("cardOnboardingInsufficientBalanceScreen", {
       selectedAmountUsd: SELECTED_AMOUNT_USD,
+    })
+  })
+
+  /** Nothing to pay against: an arm left set here would record the investor's next
+   *  payment, whatever it is for, as the investment. */
+  it("does not arm the payment when no invoice came back", async () => {
+    mockFunding.current = {
+      balanceUsd: SELECTED_AMOUNT_USD,
+      shortfallUsd: 0,
+      hasEnoughBalance: true,
+      totalSats: 31_704_000,
+      isLoading: false,
+    }
+    mockRequestInvoice.mockResolvedValue(null)
+
+    const { getByText } = render(
+      <ContextForScreen>
+        <TransferInvestScreen />
+      </ContextForScreen>,
+    )
+    await act(async () => {})
+
+    await act(async () => {
+      fireEvent.press(getByText("Continue"))
+    })
+
+    expect(mockArmCardInvestmentPayment).not.toHaveBeenCalled()
+  })
+
+  it("does not arm the payment on the way to the shortfall screen", async () => {
+    const { getByText } = render(
+      <ContextForScreen>
+        <TransferInvestScreen />
+      </ContextForScreen>,
+    )
+    await act(async () => {})
+
+    await act(async () => {
+      fireEvent.press(getByText("Continue"))
+    })
+
+    expect(mockArmCardInvestmentPayment).not.toHaveBeenCalled()
+  })
+
+  /** The route lost the figure (a return from the home, or from a conversion), but the
+   *  signed record still has it: the invoice is written for what the document names. */
+  it("bills the recorded satoshis when the route carries none", async () => {
+    mockRouteParams.current = { selectedAmountUsd: SELECTED_AMOUNT_USD }
+    mockCardInvestmentProgress.current = {
+      selectedAmountUsd: SELECTED_AMOUNT_USD,
+      settlementSats: 12_682_228,
+    }
+    mockFunding.current = {
+      balanceUsd: SELECTED_AMOUNT_USD,
+      shortfallUsd: 0,
+      hasEnoughBalance: true,
+      totalSats: 31_704_000,
+      isLoading: false,
+    }
+
+    const { getByText } = render(
+      <ContextForScreen>
+        <TransferInvestScreen />
+      </ContextForScreen>,
+    )
+    await act(async () => {})
+
+    await act(async () => {
+      fireEvent.press(getByText("Continue"))
+    })
+
+    expect(mockRequestInvoice).toHaveBeenCalledWith("wallet-invest", 12_682_228)
+  })
+
+  /** The investor closed the step while the invoice was being issued: opening the send
+   *  flow over whatever they moved on to, armed to record the investment, would be
+   *  neither expected nor safe. */
+  it("neither arms nor opens the send flow when the step was left mid-request", async () => {
+    mockFunding.current = {
+      balanceUsd: SELECTED_AMOUNT_USD,
+      shortfallUsd: 0,
+      hasEnoughBalance: true,
+      totalSats: 31_704_000,
+      isLoading: false,
+    }
+    let releaseInvoice: (value: { paymentRequest: string }) => void = () => {}
+    mockRequestInvoice.mockReturnValue(
+      new Promise((resolve) => {
+        releaseInvoice = resolve
+      }),
+    )
+
+    const { getByText } = render(
+      <ContextForScreen>
+        <TransferInvestScreen />
+      </ContextForScreen>,
+    )
+    await act(async () => {})
+
+    await act(async () => {
+      fireEvent.press(getByText("Continue"))
+    })
+    mockIsFocused.current = false
+    await act(async () => {
+      releaseInvoice({ paymentRequest: "lnbc-invoice" })
+    })
+
+    expect(mockArmCardInvestmentPayment).not.toHaveBeenCalled()
+    expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  describe("the invoice it pays", () => {
+    const NOW_MS = 1_757_800_000_000
+    const covered = () => {
+      mockFunding.current = {
+        balanceUsd: SELECTED_AMOUNT_USD,
+        shortfallUsd: 0,
+        hasEnoughBalance: true,
+        totalSats: 31_704_000,
+        isLoading: false,
+      }
+    }
+    let nowSpy: jest.SpyInstance
+
+    beforeEach(() => {
+      covered()
+      nowSpy = jest.spyOn(Date, "now").mockReturnValue(NOW_MS)
+    })
+
+    afterEach(() => {
+      nowSpy.mockRestore()
+    })
+
+    const pressContinue = async () => {
+      const { getByText } = render(
+        <ContextForScreen>
+          <TransferInvestScreen />
+        </ContextForScreen>,
+      )
+      await act(async () => {})
+      await act(async () => {
+        fireEvent.press(getByText("Continue"))
+      })
+    }
+
+    it("records the invoice it was issued, so a return pays the same claim", async () => {
+      await pressContinue()
+
+      expect(mockRecordInvoice).toHaveBeenCalledWith("lnbc-invoice")
+    })
+
+    /** A payment that went through without the receipt recording it leaves the home
+     *  asking again; paying the same invoice meets a claim already settled, where a
+     *  fresh one would be paid a second time. */
+    it("pays the invoice already issued while it can still be paid, without minting", async () => {
+      mockCardInvestmentProgress.current = {
+        selectedAmountUsd: SELECTED_AMOUNT_USD,
+        invoice: {
+          paymentRequest: "lnbc-issued-before",
+          issuedAt: NOW_MS - 20 * 60 * 1000,
+        },
+      }
+
+      await pressContinue()
+
+      expect(mockRequestInvoice).not.toHaveBeenCalled()
+      expect(mockRecordInvoice).not.toHaveBeenCalled()
+      expect(mockArmCardInvestmentPayment).toHaveBeenCalledWith("lnbc-issued-before")
+      expect(mockNavigate).toHaveBeenCalledWith("sendBitcoinDestination", {
+        payment: "lnbc-issued-before",
+      })
+    })
+
+    it("mints afresh once the issued invoice is too old to pay in time", async () => {
+      mockCardInvestmentProgress.current = {
+        selectedAmountUsd: SELECTED_AMOUNT_USD,
+        invoice: {
+          paymentRequest: "lnbc-issued-before",
+          issuedAt: NOW_MS - 26 * 60 * 1000,
+        },
+      }
+
+      await pressContinue()
+
+      expect(mockRequestInvoice).toHaveBeenCalledWith("wallet-invest", 31_704_000)
+      expect(mockRecordInvoice).toHaveBeenCalledWith("lnbc-invoice")
+      expect(mockArmCardInvestmentPayment).toHaveBeenCalledWith("lnbc-invoice")
+    })
+
+    it("records nothing when no invoice came back", async () => {
+      mockRequestInvoice.mockResolvedValue(null)
+
+      await pressContinue()
+
+      expect(mockRecordInvoice).not.toHaveBeenCalled()
     })
   })
 })
