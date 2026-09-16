@@ -1705,12 +1705,15 @@ describe("SendBitcoinConfirmationScreen — review layout", () => {
       expect(screen.queryByLabelText("Successful Fee")).toBeNull()
     })
 
-    it("shows the fee error in red and outlines the card red when the quote fails", async () => {
+    it("shows the fee error under the card, not in the Fee row, and outlines the card red when the quote fails", async () => {
       mockUseFee.mockReturnValue({ status: "error" })
       await renderReview(buildBtcSettlementRoute(1000))
 
-      const feeError = screen.getByText(LL.common.feeError())
-      expect(StyleSheet.flatten(feeError.props.style).color).toBe(colors.light.error)
+      const json = JSON.stringify(screen.toJSON())
+      expect(json.indexOf(`"${LL.common.feeError()}"`)).toBeGreaterThan(
+        json.indexOf(`"${LL.SendBitcoinConfirmationScreen.feeLabel()}"`),
+      )
+      expect(screen.getByText("—")).toBeTruthy()
       expect(outlineColor()).toBe(colors.light.error)
     })
 
@@ -1817,6 +1820,57 @@ describe("SendBitcoinConfirmationScreen — review layout", () => {
       expect(
         screen.queryByText(LL.SendBitcoinConfirmationScreen.changeAmount()),
       ).toBeNull()
+    })
+
+    it("offers Change amount when the fee quote fails because the amount is below the minimum", async () => {
+      mockUseFee.mockReturnValue({
+        status: "error",
+        errors: [
+          {
+            __typename: "GraphQLApplicationError",
+            message: SelfCustodialErrorCode.BelowMinimum,
+          },
+        ],
+      })
+      await renderReview(buildBtcSettlementRoute(1000))
+
+      expect(screen.getByText(LL.SelfCustodialError.belowMinimum())).toBeTruthy()
+      fireEvent.press(screen.getByText(LL.SendBitcoinConfirmationScreen.changeAmount()))
+      expect(navigationGoBackMock).toHaveBeenCalledTimes(1)
+    })
+
+    it("does not offer Change amount when the fee quote fails on the network", async () => {
+      mockUseFee.mockReturnValue({
+        status: "error",
+        errors: [
+          {
+            __typename: "GraphQLApplicationError",
+            message: SelfCustodialErrorCode.NetworkError,
+          },
+        ],
+      })
+      await renderReview(buildBtcSettlementRoute(1000))
+
+      expect(screen.getByText(LL.SelfCustodialError.networkError())).toBeTruthy()
+      expect(
+        screen.queryByText(LL.SendBitcoinConfirmationScreen.changeAmount()),
+      ).toBeNull()
+    })
+
+    it("offers Change amount when the send fails over the 24 hour limit", async () => {
+      sendPaymentMock.mockResolvedValueOnce({
+        status: "FAILURE",
+        errorsMessage: "Cannot transfer more than $1000.00 in 24 hours",
+      })
+      await renderReview(buildBtcSettlementRoute(1000))
+
+      await act(async () => {
+        fireEvent.press(screen.getByTestId("slider"))
+      })
+
+      expect(screen.getByText(/Cannot transfer more than/)).toBeTruthy()
+      fireEvent.press(screen.getByText(LL.SendBitcoinConfirmationScreen.changeAmount()))
+      expect(navigationGoBackMock).toHaveBeenCalledTimes(1)
     })
   })
 
