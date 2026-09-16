@@ -18,7 +18,9 @@ type SendReviewDestinationProps = {
 }
 
 /** The destination, as the card flow's `ActionField`: a labelled value with one action.
- *  The action is copy, and the whole field is the button, not just the icon. */
+ *  The action is copy, and the whole field is the button, not just the icon.
+ *  A raw address or invoice goes in whole and shortens in the middle at whatever width the
+ *  field has, as the old confirmation screen did, rather than at a fixed character count. */
 export const SendReviewDestination: React.FC<SendReviewDestinationProps> = ({
   destination,
   paymentType,
@@ -42,7 +44,11 @@ export const SendReviewDestination: React.FC<SendReviewDestinationProps> = ({
   return (
     <ActionField
       label={`${LL.SendBitcoinScreen.destination()} - ${typeLabel}`}
-      value={formatDestination({ destination, paymentType, lnAddressHostname })}
+      value={
+        paymentType === "intraledger"
+          ? formatDestination({ destination, paymentType, lnAddressHostname })
+          : destination
+      }
       icon="copy-paste"
       iconSize={16}
       numberOfLines={1}
