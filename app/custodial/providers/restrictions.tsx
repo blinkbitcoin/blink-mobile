@@ -90,7 +90,9 @@ const toVerdict = ({
       restrictions: { dollarBalance, transfer },
     }
   }
-  const isStillRetrying = Boolean(error) && failedRetries < RESTRICTION_RETRY_LIMIT
+  const hasError = Boolean(error)
+  const hasRetriesLeft = failedRetries < RESTRICTION_RETRY_LIMIT
+  const isStillRetrying = hasError && hasRetriesLeft
   if (isStillRetrying) return PENDING
   return UNKNOWN
 }
@@ -143,7 +145,8 @@ export const CustodialRestrictionsProvider: React.FC<React.PropsWithChildren> = 
   const isAuthed = useIsAuthed()
   /** Gating on accountType (not isSelfCustodial) keeps the question stable through the
    *  self-custodial cold-start window while the SDK connects. */
-  const isEnabled = isAuthed && accountType !== AccountType.SelfCustodial
+  const isSelfCustodialAccount = accountType === AccountType.SelfCustodial
+  const isEnabled = isAuthed && !isSelfCustodialAccount
 
   const { data, loading, error, refetch } = useCustodialRestrictionsQuery({
     skip: !isEnabled,
