@@ -48,6 +48,7 @@ import { SelfCustodialInfoBulletin } from "@app/components/self-custodial-info-b
 import { TwoFactorNudgeCard } from "@app/custodial/components/two-factor-nudge-card"
 import { TwoFactorReminderBulletin } from "@app/custodial/components/two-factor-reminder-bulletin"
 import { TwoFactorSessionModal } from "@app/custodial/components/two-factor-session-modal"
+import { CardInvestmentBulletin } from "@app/components/card-investment-bulletin"
 import { BackupNudgeModal } from "@app/components/backup-nudge-modal"
 import { NetworkStatusBanner } from "@app/components/network-status-banner"
 import { useHideAmount } from "@app/graphql/hide-amount-context"
@@ -84,6 +85,7 @@ import { StaleCloudBundleBulletin } from "@app/self-custodial/components/stale-c
 import { useStaleCloudBundleBulletin } from "@app/self-custodial/hooks/use-stale-cloud-bundle-bulletin"
 import { useTwoFactorEnforcement } from "@app/custodial/providers/two-factor-enforcement"
 import { useTwoFactorSessionPrompt } from "@app/screens/home-screen/hooks/use-two-factor-session-prompt"
+import { useCardInvestmentBulletin } from "@app/screens/card-screen/onboarding/investment-flow/use-card-investment-bulletin"
 import { getErrorMessages } from "@app/graphql/utils"
 import { getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
 import { useCardData } from "@app/screens/card-screen/hooks/use-card-data"
@@ -394,6 +396,13 @@ export const HomeScreen: React.FC = () => {
   /** Fetched once here and shared with the UnclaimedDepositBanner below, so the
    *  pending row and that banner can never disagree about the same deposits. */
   const { deposits, refetch: refetchPendingDeposits } = usePendingDeposits()
+
+  /** A deposit on its way in, whichever custody type it lands in: the investment
+   *  bulletin says so instead of asking for one the investor already made. */
+  const hasPendingCustodialReceive = (pendingIncomingTransactions?.length ?? 0) > 0
+  const hasPendingSelfCustodialDeposit = deposits.length > 0
+  const hasPendingDeposit = hasPendingCustodialReceive || hasPendingSelfCustodialDeposit
+  const cardInvestmentBulletin = useCardInvestmentBulletin({ hasPendingDeposit })
 
   /** Pending deposits stay visible under the balance until confirmed —
    *  unlike the unseen-tx badge sharing that slot, which auto-dismisses
@@ -1051,6 +1060,13 @@ export const HomeScreen: React.FC = () => {
         )}
         {shouldShowStaleCloudBundleBulletin && (
           <StaleCloudBundleBulletin onDismiss={dismissStaleCloudBundleBulletin} />
+        )}
+        {cardInvestmentBulletin && (
+          <CardInvestmentBulletin
+            kind={cardInvestmentBulletin.kind}
+            progress={cardInvestmentBulletin.progress}
+            onDismiss={cardInvestmentBulletin.dismiss}
+          />
         )}
         <BulletinsCard loading={bulletinsLoading} bulletins={bulletins} />
         <AppUpdate />
