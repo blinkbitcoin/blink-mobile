@@ -1,11 +1,18 @@
-import React, { useEffect, useRef } from "react"
-import { Animated, Easing, Pressable, View } from "react-native"
+import React, { useEffect } from "react"
+import { Pressable, View } from "react-native"
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated"
 import { makeStyles, Text } from "@rn-vui/themed"
 
 import { HiddenBalancePlaceholder } from "@app/components/hidden-balance-placeholder/hidden-balance-placeholder"
 import { WalletSwitch } from "@app/components/wallet-switch"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { fonts } from "@app/rne-theme/fonts"
 import { testProps } from "@app/utils/testProps"
 
 export const SEND_WALLET_SUMMARY_TEST_ID = "choose-wallet-to-send-from"
@@ -23,9 +30,11 @@ type SendWalletSummaryProps = {
   /** Outlines the card in the error colour when the amount can't be sent from this wallet. */
   hasError?: boolean
   /** Absent when there is no other wallet to switch to (the region withholds the dollar
-   *  wallet) or on review, which leaves the summary as a plain read-out on the grey7 static
-   *  surface. */
+   *  wallet), which leaves the summary as a plain read-out on the active surface. */
   onSwitch?: () => void
+  /** A settled read-out rather than a control: the static grey7 surface, and no swap icon
+   *  at all (rather than the reserved space an unavailable switch keeps). */
+  inactive?: boolean
   /** Draws the placeholder instead of the balances. */
   isBalanceHidden?: boolean
   /** Present while the balance is hidden on a read-only summary: tapping the card shows it. */
@@ -38,38 +47,33 @@ export const SendWalletSummary: React.FC<SendWalletSummaryProps> = ({
   balanceSecondary,
   hasError = false,
   onSwitch,
+  inactive = false,
   isBalanceHidden = false,
   onReveal,
 }) => {
   const styles = useStyles()
   const { LL } = useI18nContext()
 
-  const progress = useRef(new Animated.Value(1)).current
-  const previousCurrency = useRef(currency)
+  const progress = useSharedValue(1)
+  const previousCurrency = useSharedValue(currency)
 
   useEffect(() => {
-    if (previousCurrency.current === currency) return
-    previousCurrency.current = currency
-    progress.setValue(0)
-    Animated.timing(progress, {
-      toValue: 1,
+    if (previousCurrency.value === currency) return
+    previousCurrency.value = currency
+    progress.value = 0
+    progress.value = withTiming(1, {
       duration: SWITCH_ANIMATION_MS,
       easing: Easing.out(Easing.quad),
-      useNativeDriver: true,
-    }).start()
-  }, [currency, progress])
+    })
+  }, [currency, progress, previousCurrency])
 
-  const balancesAnimatedStyle = {
-    opacity: progress,
-    transform: [
-      {
-        translateY: progress.interpolate({
-          inputRange: [0, 1],
-          outputRange: [SWITCH_OFFSET, 0],
-        }),
-      },
-    ],
-  }
+  const balancesAnimatedStyle = useAnimatedStyle(
+    () => ({
+      opacity: progress.value,
+      transform: [{ translateY: SWITCH_OFFSET * (1 - progress.value) }],
+    }),
+    [progress],
+  )
 
   const onPress = onSwitch ?? onReveal
 
@@ -81,7 +85,7 @@ export const SendWalletSummary: React.FC<SendWalletSummaryProps> = ({
       {...testProps(SEND_WALLET_SUMMARY_TEST_ID)}
       style={({ pressed }) => [
         styles.card,
-        !onSwitch && styles.cardInactive,
+        inactive && styles.cardInactive,
         hasError && styles.cardError,
         pressed && onSwitch && styles.cardPressed,
       ]}
@@ -129,7 +133,11 @@ export const SendWalletSummary: React.FC<SendWalletSummaryProps> = ({
           ) : null}
         </Animated.View>
       </View>
-      <WalletSwitch currency={currency} canToggle={Boolean(onSwitch)} />
+      <WalletSwitch
+        currency={currency}
+        canToggle={Boolean(onSwitch)}
+        hasSwapIcon={!inactive}
+      />
     </Pressable>
   )
 }
@@ -173,7 +181,7 @@ const useStyles = makeStyles(({ colors }) => ({
     justifyContent: "center",
   },
   balancePrimary: {
-    fontFamily: "SourceSansPro-Bold",
+    fontFamily: fonts.bold,
     fontSize: 16,
     lineHeight: 22,
     color: colors.black,

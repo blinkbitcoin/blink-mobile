@@ -1,4 +1,4 @@
-import { formatDestination } from "@app/screens/send-bitcoin-screen/amount-entry/send-amount-header"
+import { formatDestination } from "@app/screens/send-bitcoin-screen/format-destination"
 
 const HOST = "blink.sv"
 
