@@ -10,7 +10,12 @@ import GaloySliderButton from "@app/components/atomic/galoy-slider-button/galoy-
 import { InfoSection } from "@app/components/card-screen"
 import { Screen } from "@app/components/screen"
 import { WarningBanner } from "@app/components/warning-banner"
-import { Transaction, WalletCurrency } from "@app/graphql/generated"
+import { PreferredAmountCurrency } from "@app/graphql/client-only-query"
+import {
+  Transaction,
+  usePreferredAmountCurrencyQuery,
+  WalletCurrency,
+} from "@app/graphql/generated"
 import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { isIdempotencyConflict } from "@app/graphql/is-idempotency-conflict"
 import { useAppConfig, useClipboard, useDisplayCurrency } from "@app/hooks"
@@ -117,6 +122,13 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   } = useDisplayCurrency()
   const saveLnAddressContact = useSaveLnAddressContact()
 
+  /** A typed amount reads back in the currency the sender last swapped the keypad to; a
+   *  fixed amount leads with the display currency, as amount entry does. */
+  const { data: preferredData } = usePreferredAmountCurrencyQuery()
+  const leadsWithWalletCurrency =
+    paymentDetail.canSetAmount &&
+    preferredData?.preferredAmountCurrency === PreferredAmountCurrency.Default
+
   const { btcWallet, usdWallet } = useSendBalances()
 
   const btcBalanceMoneyAmount = toBtcMoneyAmount(btcWallet?.balance)
@@ -203,9 +215,14 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   satFeeAmount = feeErrorText
   if (fee.amount) {
     const feeDisplayAmount = paymentDetail.convertMoneyAmount(fee.amount, DisplayCurrency)
+    const feeWalletAmount = paymentDetail.convertMoneyAmount(
+      fee.amount,
+      sendingWalletDescriptor.currency,
+    )
     feeDisplayText = formatDisplayAndWalletAmount({
+      primaryAmount: leadsWithWalletCurrency ? feeWalletAmount : feeDisplayAmount,
       displayAmount: feeDisplayAmount,
-      walletAmount: fee.amount,
+      walletAmount: feeWalletAmount,
     })
 
     currencyFeeAmount = formatMoneyAmount({
@@ -239,6 +256,19 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
 
   const satAmount = formatMoneyAmount({
     moneyAmount: secondaryAmount ?? ZeroUsdMoneyAmount,
+  })
+
+  /** The hero pairs the display currency with the sending wallet's, the pair the keypad
+   *  swaps between, led by whichever the sender typed in. */
+  const heroWalletAmount = paymentDetail.convertMoneyAmount(
+    settlementAmount,
+    sendingWalletDescriptor.currency,
+  )
+  const heroPrimaryAmount = leadsWithWalletCurrency ? heroWalletAmount : displayAmount
+  const heroSecondaryAmount = getSecondaryAmountIfCurrencyIsDifferent({
+    primaryAmount: heroPrimaryAmount,
+    walletAmount: heroWalletAmount,
+    displayAmount,
   })
 
   const navigateToCompleted = React.useCallback(
@@ -554,8 +584,11 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
         <View style={styles.hero}>
           <SendHero
             caption={LL.SendBitcoinConfirmationScreen.sending()}
-            primaryAmount={currencyAmount}
-            secondaryAmount={secondaryAmount ? satAmount : undefined}
+            primaryAmount={formatMoneyAmount({ moneyAmount: heroPrimaryAmount })}
+            secondaryAmount={
+              heroSecondaryAmount &&
+              formatMoneyAmount({ moneyAmount: heroSecondaryAmount })
+            }
           />
         </View>
         <SendReviewDestination

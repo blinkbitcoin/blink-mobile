@@ -5,6 +5,7 @@ import { act, fireEvent, render, screen } from "@testing-library/react-native"
 
 import { DisplayCurrency, toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { ConvertAmountAdjustment } from "@app/types/payment"
+import { PreferredAmountCurrency } from "@app/graphql/client-only-query"
 import { PayoutSpeed, WalletCurrency } from "@app/graphql/generated"
 import { IDEMPOTENCY_KEY_UNAVAILABLE } from "@app/screens/send-bitcoin-screen/use-send-payment"
 import { HideAmountContextProvider } from "@app/graphql/hide-amount-context"
@@ -72,8 +73,17 @@ jest.mock("@app/hooks/use-effective-display-currency", () => ({
   }),
 }))
 
+/** The currency the sender last swapped the amount-entry keypad to; unset leads with the
+ *  display currency. */
+const mockPreferredAmountCurrency: { current?: string } = {}
+
 jest.mock("@app/graphql/generated", () => ({
   ...jest.requireActual("@app/graphql/generated"),
+  usePreferredAmountCurrencyQuery: () => ({
+    data: mockPreferredAmountCurrency.current
+      ? { preferredAmountCurrency: mockPreferredAmountCurrency.current }
+      : undefined,
+  }),
   useSendBitcoinConfirmationScreenQuery: jest.fn(() => ({
     data: {
       me: {
@@ -1871,6 +1881,72 @@ describe("SendBitcoinConfirmationScreen — review layout", () => {
       expect(screen.getByText(/Cannot transfer more than/)).toBeTruthy()
       fireEvent.press(screen.getByText(LL.SendBitcoinConfirmationScreen.changeAmount()))
       expect(navigationGoBackMock).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe("amount currency", () => {
+    const heroLines = () => [
+      screen.getByTestId(SEND_HERO_PRIMARY_TEST_ID).props.children,
+      screen.queryByTestId(SEND_HERO_SECONDARY_TEST_ID)?.props.children,
+    ]
+    const feeRow = () =>
+      [screen.getByLabelText("Successful Fee").props.children].flat().join("")
+
+    afterEach(() => {
+      mockPreferredAmountCurrency.current = undefined
+    })
+
+    it("leads the hero and Fee row with the display currency by default", async () => {
+      btcFee(50)
+      await renderReview(buildBtcSettlementRoute(1000))
+
+      expect(heroLines()).toEqual(["₦10", "1,000 SAT"])
+      expect(feeRow()).toBe("₦1 (50 SAT)")
+    })
+
+    it("leads the hero and Fee row with sats when the sender typed in sats", async () => {
+      mockPreferredAmountCurrency.current = PreferredAmountCurrency.Default
+      btcFee(50)
+      await renderReview(buildBtcSettlementRoute(1000))
+
+      expect(heroLines()).toEqual(["1,000 SAT", "₦10"])
+      expect(feeRow()).toBe("50 SAT (₦1)")
+    })
+
+    it("pairs the display currency with dollars, not sats, for a dollar wallet", async () => {
+      mockUseSendBalances.mockReturnValue({
+        btcWallet: {
+          id: "btc-wallet-id",
+          balance: 0,
+          walletCurrency: WalletCurrency.Btc,
+        },
+        usdWallet: {
+          id: "usd-wallet-id",
+          balance: 10000,
+          walletCurrency: WalletCurrency.Usd,
+        },
+      })
+      mockPreferredAmountCurrency.current = PreferredAmountCurrency.Default
+      btcFee(50)
+      await renderReview(buildUsdSettlementRoute(999))
+
+      expect(heroLines()).toEqual(["$9.99", "₦10"])
+      expect(feeRow()).toBe("$0.01 (₦1)")
+    })
+
+    it("leads a fixed amount with the display currency whatever the sender last typed in", async () => {
+      mockPreferredAmountCurrency.current = PreferredAmountCurrency.Default
+      btcFee(50)
+      const base = buildBtcSettlementRoute(1000)
+      await renderReview({
+        ...base,
+        params: {
+          paymentDetail: { ...base.params.paymentDetail, canSetAmount: false },
+        },
+      } as unknown as ReturnType<typeof buildBtcSettlementRoute>)
+
+      expect(heroLines()).toEqual(["₦10", "1,000 SAT"])
+      expect(feeRow()).toBe("₦1 (50 SAT)")
     })
   })
 

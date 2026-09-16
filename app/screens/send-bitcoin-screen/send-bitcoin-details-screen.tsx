@@ -508,16 +508,21 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
   const walletCurrency = sendingWalletDescriptor.currency
 
   /** Keypad sends type in one currency and show the other beneath it; a fixed amount leads
-   *  with the invoice's own denomination. */
+   *  with the display currency, as review does. */
   const primaryAmountText = paymentDetail.canSetAmount
     ? amountPad.hasTyped
       ? amountPad.typedAmountText
       : formatMoneyAmount({ moneyAmount: amountPad.padAmount })
-    : formatMoneyAmount({ moneyAmount: paymentDetail.unitOfAccountAmount })
+    : formatMoneyAmount({
+        moneyAmount: convertMoneyAmount(
+          paymentDetail.unitOfAccountAmount,
+          DisplayCurrency,
+        ),
+      })
 
   const primaryCurrency = paymentDetail.canSetAmount
     ? amountPad.padCurrency
-    : paymentDetail.unitOfAccountAmount.currency
+    : DisplayCurrency
 
   const secondaryAmount = getSecondaryAmountIfCurrencyIsDifferent({
     primaryAmount: { ...paymentDetail.unitOfAccountAmount, currency: primaryCurrency },
