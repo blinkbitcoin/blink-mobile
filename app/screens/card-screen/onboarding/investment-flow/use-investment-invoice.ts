@@ -25,7 +25,18 @@ gql`
  * read the agreement's figures against the amount and confirm, short enough that an
  * abandoned attempt does not leave a payable claim on the account for the rest of the day.
  */
-const INVOICE_EXPIRY_MINUTES = "30"
+const INVOICE_EXPIRY_MINUTES = 30
+
+/**
+ * How long after issue an invoice is still handed back to be paid, rather than replaced:
+ * its life, less a margin for the payment itself to go through before it expires.
+ */
+const INVOICE_REUSE_MARGIN_MINUTES = 5
+const INVOICE_REUSE_WINDOW_MS =
+  (INVOICE_EXPIRY_MINUTES - INVOICE_REUSE_MARGIN_MINUTES) * 60 * 1000
+
+export const isInvoiceReusable = (issuedAt: number, now: number): boolean =>
+  now - issuedAt < INVOICE_REUSE_WINDOW_MS
 
 /**
  * What the investment is for, written on the invoice so it reads as a subscription in
@@ -73,7 +84,7 @@ export const useInvestmentInvoice = (): {
               recipientWalletId,
               amount: satoshis,
               memo: INVOICE_MEMO,
-              expiresIn: INVOICE_EXPIRY_MINUTES,
+              expiresIn: String(INVOICE_EXPIRY_MINUTES),
             },
           },
         })
