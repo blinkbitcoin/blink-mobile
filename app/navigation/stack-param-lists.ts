@@ -147,6 +147,9 @@ export type RootStackParamList = {
     destination?: string
     paymentType?: string
     createdAt?: number
+    /** The invoice this payment settled, when it was a lightning one, as it was handed to
+     *  the send flow: whatever asked for that payment can recognise its own by it. */
+    paymentRequest?: string
   }
   setLightningAddress: { onboarding?: boolean }
   language: undefined

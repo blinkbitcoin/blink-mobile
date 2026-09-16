@@ -524,10 +524,62 @@ describe("SendBitcoinConfirmationScreen", () => {
         const routes = action.payload?.routes ?? action.routes ?? []
         const completed = routes.find((r) => r.name === "sendBitcoinCompleted")
         if (completed)
-          return completed.params as { successAction?: unknown; note?: unknown }
+          return completed.params as {
+            successAction?: unknown
+            note?: unknown
+            paymentRequest?: unknown
+          }
       }
       throw new Error("sendBitcoinCompleted route was not dispatched")
     }
+
+    /** Whatever asked for a lightning payment recognises its own by the invoice, so the
+     *  receipt is told which one it settled, unshortened. */
+    it("hands the completed screen the invoice a lightning payment settled", async () => {
+      const bolt11Invoice = "lnbc1m1psh8d8zpp5qk3z7t..."
+      const { createAmountLightningPaymentDetails } = PaymentDetailsLightning
+      const paymentDetailBolt11 = createAmountLightningPaymentDetails<WalletCurrency>({
+        paymentRequest: bolt11Invoice,
+        paymentRequestAmount: { currency: "BTC", currencyCode: "BTC", amount: 10000 },
+        convertMoneyAmount: convertMoneyAmountMock,
+        sendingWalletDescriptor: btcSendingWalletDescriptor,
+      })
+      const routeBolt11 = {
+        key: "sendBitcoinConfirmationScreen",
+        name: "sendBitcoinConfirmation",
+        params: { paymentDetail: paymentDetailBolt11 },
+      } as const
+
+      sendPaymentMock.mockResolvedValueOnce({ status: "SUCCESS", extraInfo: {} })
+
+      render(
+        <ContextForScreen>
+          <LightningLnURL route={routeBolt11} />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {
+        fireEvent.press(screen.getByTestId("slider"))
+      })
+
+      expect(findCompletedRouteParams().paymentRequest).toBe(bolt11Invoice)
+    })
+
+    it("names no invoice on the completed screen for a payment that had none", async () => {
+      sendPaymentMock.mockResolvedValueOnce({ status: "SUCCESS", extraInfo: {} })
+
+      render(
+        <ContextForScreen>
+          <Intraledger route={route} />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {
+        fireEvent.press(screen.getByTestId("slider"))
+      })
+
+      expect(findCompletedRouteParams().paymentRequest).toBeUndefined()
+    })
 
     it("forwards extraInfo.successAction to the completed screen when present", async () => {
       const extraInfoSuccessAction = {
