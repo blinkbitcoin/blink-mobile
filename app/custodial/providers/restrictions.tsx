@@ -14,7 +14,7 @@ import {
   useCustodialRestrictionsQuery,
 } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
-import { useActiveWallet } from "@app/hooks/use-active-wallet"
+import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useBackoffRetry } from "@app/hooks/use-backoff-retry"
 import { RestrictionVerdict, RestrictionVerdictStatus } from "@app/types/account"
 import { AccountType } from "@app/types/wallet"
@@ -150,11 +150,12 @@ const useRetryUntilAnswered = (
 export const CustodialRestrictionsProvider: React.FC<React.PropsWithChildren> = ({
   children,
 }) => {
-  const { accountType } = useActiveWallet()
+  const { activeAccount } = useAccountRegistry()
   const isAuthed = useIsAuthed()
-  /** Gating on accountType (not isSelfCustodial) keeps the question stable through the
-   *  self-custodial cold-start window while the SDK connects. */
-  const isSelfCustodialAccount = accountType === AccountType.SelfCustodial
+  /** The account's registered type, not the wallet state: it holds steady through the
+   *  self-custodial cold-start window while the SDK connects, and a balance update does not
+   *  re-render the provider every surface reads from. */
+  const isSelfCustodialAccount = activeAccount?.type === AccountType.SelfCustodial
   const isEnabled = isAuthed && !isSelfCustodialAccount
 
   const { data, loading, error, refetch } = useCustodialRestrictionsQuery({

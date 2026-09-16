@@ -32,9 +32,11 @@ jest.mock("@app/graphql/is-authed-context", () => ({
   useIsAuthed: () => mockIsAuthed,
 }))
 
-let mockAccountType: AccountType = "custodial" as AccountType
-jest.mock("@app/hooks/use-active-wallet", () => ({
-  useActiveWallet: () => ({ accountType: mockAccountType }),
+let mockAccountType: AccountType | undefined = "custodial" as AccountType
+jest.mock("@app/hooks/use-account-registry", () => ({
+  useAccountRegistry: () => ({
+    activeAccount: mockAccountType ? { type: mockAccountType } : undefined,
+  }),
 }))
 
 type RequestObserver = {
@@ -176,6 +178,20 @@ describe("CustodialRestrictionsProvider", () => {
         status: RestrictionVerdictStatus.NoAccount,
       })
       expect(requestCount).toBe(0)
+    })
+
+    it("asks for an authed session whose account the registry has not named yet", async () => {
+      mockAccountType = undefined
+      replies = [answer(false, false)]
+
+      const { result } = renderVerdict()
+      await flushEffects()
+
+      expect(requestCount).toBe(1)
+      expect(result.current.verdict).toEqual({
+        status: RestrictionVerdictStatus.Served,
+        restrictions: { dollarBalance: false, transfer: false },
+      })
     })
 
     it("waits, rather than answering, outside the provider", async () => {
