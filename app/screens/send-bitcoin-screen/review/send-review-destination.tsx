@@ -1,15 +1,15 @@
 import React from "react"
-import { TouchableOpacity, View } from "react-native"
-import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
-import { GaloyIcon } from "@app/components/atomic/galoy-icon"
+import { ActionField } from "@app/components/action-field"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useAppConfig } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { testProps } from "@app/utils/testProps"
 
-import { formatDestination } from "../amount-entry/send-amount-header"
+import { formatDestination } from "../format-destination"
 import { PaymentDetail } from "../payment-details/index.types"
+
+export const SEND_REVIEW_DESTINATION_TEST_ID = "send-review-destination"
+export const SEND_REVIEW_COPY_TEST_ID = "send-review-copy-destination"
 
 type SendReviewDestinationProps = {
   destination: string
@@ -17,15 +17,13 @@ type SendReviewDestinationProps = {
   onCopy: () => void
 }
 
+/** The destination, as the card flow's `ActionField`: a labelled value with one action.
+ *  The action is copy, and the whole field is the button, not just the icon. */
 export const SendReviewDestination: React.FC<SendReviewDestinationProps> = ({
   destination,
   paymentType,
   onCopy,
 }) => {
-  const styles = useStyles()
-  const {
-    theme: { colors },
-  } = useTheme()
   const { LL } = useI18nContext()
   const {
     appConfig: {
@@ -42,48 +40,15 @@ export const SendReviewDestination: React.FC<SendReviewDestinationProps> = ({
   }[paymentType]
 
   return (
-    <View style={styles.container}>
-      <Text type="p3">
-        {LL.SendBitcoinScreen.destination()} - {typeLabel}
-      </Text>
-      {/* The whole field copies, not just the icon. */}
-      <TouchableOpacity
-        style={styles.field}
-        onPress={onCopy}
-        accessibilityRole="button"
-        {...testProps("send-review-copy-destination")}
-      >
-        <Text
-          type="p3"
-          style={styles.value}
-          numberOfLines={1}
-          ellipsizeMode="middle"
-          {...testProps("send-review-destination")}
-        >
-          {formatDestination({ destination, paymentType, lnAddressHostname })}
-        </Text>
-        <GaloyIcon name="copy-paste" size={16} color={colors.primary} />
-      </TouchableOpacity>
-    </View>
+    <ActionField
+      label={`${LL.SendBitcoinScreen.destination()} - ${typeLabel}`}
+      value={formatDestination({ destination, paymentType, lnAddressHostname })}
+      icon="copy-paste"
+      iconSize={16}
+      numberOfLines={1}
+      onAction={onCopy}
+      testID={SEND_REVIEW_COPY_TEST_ID}
+      valueTestID={SEND_REVIEW_DESTINATION_TEST_ID}
+    />
   )
 }
-
-const useStyles = makeStyles(({ colors }) => ({
-  container: {
-    rowGap: 7,
-  },
-  field: {
-    flexDirection: "row",
-    alignItems: "center",
-    columnGap: 12,
-    minHeight: 50,
-    paddingHorizontal: 14,
-    paddingVertical: 5,
-    borderRadius: 12,
-    backgroundColor: colors.grey5,
-  },
-  value: {
-    flex: 1,
-    color: colors.black,
-  },
-}))

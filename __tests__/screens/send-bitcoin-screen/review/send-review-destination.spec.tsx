@@ -7,7 +7,11 @@ import { WalletCurrency } from "@app/graphql/generated"
 import { light } from "@app/rne-theme/colors"
 import theme from "@app/rne-theme/theme"
 import { PaymentDetail } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
-import { SendReviewDestination } from "@app/screens/send-bitcoin-screen/review/send-review-destination"
+import {
+  SEND_REVIEW_COPY_TEST_ID,
+  SEND_REVIEW_DESTINATION_TEST_ID,
+  SendReviewDestination,
+} from "@app/screens/send-bitcoin-screen/review/send-review-destination"
 
 jest.mock("@app/hooks", () => ({
   useAppConfig: () => ({
@@ -67,7 +71,7 @@ describe("SendReviewDestination", () => {
   it("appends the host to a Blink username", () => {
     renderDestination("intraledger")
 
-    expect(screen.getByTestId("send-review-destination").props.children).toBe(
+    expect(screen.getByTestId(SEND_REVIEW_DESTINATION_TEST_ID).props.children).toBe(
       "andrejstack@blink.sv",
     )
   })
@@ -76,7 +80,8 @@ describe("SendReviewDestination", () => {
     renderDestination("intraledger")
 
     expect(
-      StyleSheet.flatten(screen.getByTestId("send-review-destination").props.style).color,
+      StyleSheet.flatten(screen.getByTestId(SEND_REVIEW_DESTINATION_TEST_ID).props.style)
+        .color,
     ).toBe(light.black)
   })
 
@@ -85,8 +90,8 @@ describe("SendReviewDestination", () => {
     const onCopy = jest.fn()
     renderDestination("intraledger", "andrejstack", onCopy)
 
-    const field = screen.getByTestId("send-review-copy-destination")
-    expect(within(field).getByTestId("send-review-destination")).toBeTruthy()
+    const field = screen.getByTestId(SEND_REVIEW_COPY_TEST_ID)
+    expect(within(field).getByTestId(SEND_REVIEW_DESTINATION_TEST_ID)).toBeTruthy()
     expect(within(field).getByTestId("icon-copy-paste")).toBeTruthy()
 
     fireEvent.press(field)
