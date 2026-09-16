@@ -4,6 +4,7 @@ import { act, renderHook } from "@testing-library/react-native"
 
 import {
   ApolloClient,
+  ApolloError,
   ApolloLink,
   ApolloProvider,
   FetchResult,
@@ -326,6 +327,21 @@ describe("CustodialRestrictionsProvider", () => {
           context: { failedRetries: 3 },
         }),
       )
+    })
+
+    it("reports a copy of the query's error, which logError would otherwise rewrite", async () => {
+      replies = [dropRequest, dropRequest, dropRequest, dropRequest]
+
+      renderVerdict()
+      await flushEffects()
+      await failThreeRetries()
+
+      const [{ error: reportedError }] = mockLogError.mock.calls[0]
+      expect(reportedError).not.toBeInstanceOf(ApolloError)
+      expect(reportedError).toMatchObject({
+        name: "ApolloError",
+        message: "Network request failed",
+      })
     })
 
     it("keeps asking after Unknown and takes the answer when it comes", async () => {

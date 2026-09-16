@@ -60,6 +60,18 @@ const CustodialRestrictionsContext = createContext<CustodialRestrictionsContextT
 export const useCustodialRestrictions = (): CustodialRestrictionsContextType =>
   useContext(CustodialRestrictionsContext)
 
+/**
+ * logError rewrites the message of the error it records, and Apollo keeps the query's own
+ * error in its result, so a copy is reported instead. The name and message carry over,
+ * since they are what decides how the report is classified.
+ */
+const toReportedError = (error: ApolloError | undefined): Error => {
+  if (!error) return new Error("restrictions query settled without a verdict")
+  const reportedError = new Error(error.message)
+  reportedError.name = error.name
+  return reportedError
+}
+
 const toRetryDelay = (failedRetries: number): number =>
   Math.min(
     RESTRICTION_RETRY_BASE_DELAY_MS * 2 ** failedRetries,
@@ -174,7 +186,7 @@ export const CustodialRestrictionsProvider: React.FC<React.PropsWithChildren> = 
     hasReportedUnknownRef.current = true
     logError({
       scope: LOG_SCOPE,
-      error: error ?? new Error("restrictions query settled without a verdict"),
+      error: toReportedError(error),
       context: { failedRetries },
     })
   }, [isUnknown, error, failedRetries])
