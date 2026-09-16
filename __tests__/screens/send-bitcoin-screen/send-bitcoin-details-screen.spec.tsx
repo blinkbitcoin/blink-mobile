@@ -147,17 +147,17 @@ const AMOUNT_PAD = {
   toggleCurrency: jest.fn(),
 }
 
-const mockUseSendAmountPad = jest.fn(
+const mockUseNumberPad = jest.fn(
   (_args: { onAmountChange: (amount: unknown) => void }) => AMOUNT_PAD,
 )
-jest.mock("@app/screens/send-bitcoin-screen/amount-entry/use-send-amount-pad", () => ({
-  useSendAmountPad: (args: { onAmountChange: (amount: unknown) => void }) =>
-    mockUseSendAmountPad(args),
+jest.mock("@app/components/amount-input-screen/use-number-pad", () => ({
+  useNumberPad: (args: { onAmountChange: (amount: unknown) => void }) =>
+    mockUseNumberPad(args),
 }))
 jest.mock("@app/components/currency-keyboard", () => ({ CurrencyKeyboard: () => null }))
 jest.mock("@app/components/percentage-selector", () => ({ PercentageSelector: () => null }))
-jest.mock("@app/screens/send-bitcoin-screen/amount-entry/send-amount-header", () => ({
-  SendAmountHeader: () => null,
+jest.mock("@app/screens/send-bitcoin-screen/send-hero", () => ({
+  SendHero: () => null,
 }))
 jest.mock("@app/screens/send-bitcoin-screen/amount-entry/send-wallet-summary", () => ({
   SendWalletSummary: () => null,
@@ -231,6 +231,7 @@ describe("SendBitcoinDetailsScreen region gate", () => {
     mockCreatePaymentDetail.mockReturnValue({
       canSetAmount: false,
       paymentType: "lightning",
+      destination: "lnbc1sendbitcoindetailsscreenspec",
       sendingWalletDescriptor: { id: BTC_WALLET.id, currency: "BTC" },
       unitOfAccountAmount: { amount: 1000, currency: "BTC", currencyCode: "BTC" },
       convertMoneyAmount: jest.fn(),
@@ -349,7 +350,7 @@ describe("SendBitcoinDetailsScreen when a rate arrives after an amount was typed
   ).convertMoneyAmount
 
   const lastOnAmountChange = () => {
-    const { calls } = mockUseSendAmountPad.mock
+    const { calls } = mockUseNumberPad.mock
     return calls[calls.length - 1][0].onAmountChange
   }
 
