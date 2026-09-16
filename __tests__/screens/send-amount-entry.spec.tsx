@@ -5,6 +5,7 @@ import { act, fireEvent, render, screen, within } from "@testing-library/react-n
 import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
+import { PreferredAmountCurrency } from "@app/graphql/client-only-query"
 import { WalletCurrency } from "@app/graphql/generated"
 import { HideAmountContextProvider } from "@app/graphql/hide-amount-context"
 import SendBitcoinDetailsScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-details-screen"
@@ -61,6 +62,26 @@ jest.mock("@app/hooks/use-account-registry", () => ({
 }))
 
 const mockDisplayCurrency = { current: "NGN" }
+
+/** The currency the sender last swapped the keypad to, shared with review; unset leads with
+ *  the display currency. */
+const mockPreferredAmountCurrency: { current?: string } = {}
+const mockSavePreferredAmountCurrency = jest.fn()
+
+jest.mock("@app/graphql/generated", () => ({
+  ...jest.requireActual("@app/graphql/generated"),
+  usePreferredAmountCurrencyQuery: () => ({
+    data: mockPreferredAmountCurrency.current
+      ? { preferredAmountCurrency: mockPreferredAmountCurrency.current }
+      : undefined,
+  }),
+}))
+
+jest.mock("@app/graphql/client-only-query", () => ({
+  ...jest.requireActual("@app/graphql/client-only-query"),
+  savePreferredAmountCurrency: (_client: unknown, currency: string) =>
+    mockSavePreferredAmountCurrency(currency),
+}))
 
 /**
  * The shared GraphQL mocks quote prices in NGN only, and the price hook drops a quote whose
@@ -170,7 +191,9 @@ const LL = i18nObject("en")
 beforeEach(() => {
   loadLocale("en")
   mockSetAmount.mockClear()
+  mockSavePreferredAmountCurrency.mockClear()
   mockDisplayCurrency.current = "NGN"
+  mockPreferredAmountCurrency.current = undefined
 })
 
 const mockSetAmount = jest.fn()
@@ -438,6 +461,57 @@ describe("fixed amount", () => {
         new RegExp(`^${LL.SendBitcoinScreen.amountExceed({ balance: "" }).trim()}`),
       ),
     ).toBeNull()
+  })
+})
+
+describe("amount currency", () => {
+  const heroLines = () => [
+    screen.getByTestId("send-hero-amount-primary").props.children,
+    screen.queryByTestId("send-hero-amount-secondary")?.props.children,
+  ]
+
+  it("types in the display currency when the sender has not chosen one", async () => {
+    renderScreen(intraledgerDestination())
+    await settle()
+
+    expect(heroLines()[0]).toMatch(/^₦/)
+  })
+
+  it("types in sats when the sender last chose sats", async () => {
+    mockPreferredAmountCurrency.current = PreferredAmountCurrency.Default
+    renderScreen(intraledgerDestination())
+    await settle()
+
+    expect(heroLines()[0]).toMatch(/ SAT$/)
+  })
+
+  it("saves each swap as the currency review and the next send lead with", async () => {
+    renderScreen(intraledgerDestination())
+    await settle()
+
+    fireEvent.press(screen.getByTestId("send-hero-amount-primary"))
+    await settle()
+    expect(mockSavePreferredAmountCurrency).toHaveBeenLastCalledWith(
+      PreferredAmountCurrency.Default,
+    )
+    expect(heroLines()[0]).toMatch(/ SAT$/)
+
+    fireEvent.press(screen.getByTestId("send-hero-amount-primary"))
+    await settle()
+    expect(mockSavePreferredAmountCurrency).toHaveBeenLastCalledWith(
+      PreferredAmountCurrency.Display,
+    )
+    expect(heroLines()[0]).toMatch(/^₦/)
+  })
+
+  it("leads a fixed amount with the display currency whatever the sender last typed in", async () => {
+    mockPreferredAmountCurrency.current = PreferredAmountCurrency.Default
+    renderScreen(invoiceDestination)
+    await settle()
+
+    const [primary, secondary] = heroLines()
+    expect(primary).toMatch(/^₦/)
+    expect(secondary).toBe("1,000 SAT")
   })
 })
 
