@@ -105,7 +105,7 @@ const useStyles = makeStyles(({ colors, mode }) => ({
     maxWidth: LABEL_MAX_WIDTH,
     fontSize: LABEL_FONT_SIZE,
     lineHeight: LABEL_LINE_HEIGHT,
-    fontWeight: "600",
+    fontWeight: "700",
     color: colors.black,
     // Beside the pin, not under it: the text grows away from the pin rather
     // than to both sides of it.

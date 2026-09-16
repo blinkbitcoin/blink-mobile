@@ -241,7 +241,7 @@ const useStyles = makeStyles(({ colors }) => ({
   title: {
     flex: 1,
     fontSize: 20,
-    fontWeight: "600",
+    fontWeight: "700",
     color: colors.black,
   },
   content: {

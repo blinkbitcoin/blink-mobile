@@ -265,7 +265,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   fieldLabel: {
     fontSize: 13,
-    fontWeight: "600",
+    fontWeight: "700",
     color: colors.grey2,
     marginBottom: 8,
   },

@@ -116,7 +116,7 @@ export const FeeTierSelector = <T extends string>({
 const useStyles = makeStyles(({ colors }) => ({
   title: {
     fontSize: 14,
-    fontWeight: "600",
+    fontWeight: "700",
     color: colors.black,
     marginBottom: 6,
   },
@@ -133,7 +133,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   selectedLabel: {
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: "700",
     color: colors.black,
   },
   selectedDetail: {
@@ -165,7 +165,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   optionLabel: {
     fontSize: 15,
-    fontWeight: "600",
+    fontWeight: "700",
     color: colors.black,
   },
   optionDetail: {

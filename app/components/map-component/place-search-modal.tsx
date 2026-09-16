@@ -286,7 +286,7 @@ const useStyles = makeStyles(({ colors }, { topInset, bottomInset }: StyleProps)
   },
   retry: {
     fontSize: 14,
-    fontWeight: "600",
+    fontWeight: "700",
     color: colors.primary,
   },
 }))

@@ -78,7 +78,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   increaseLimitsText: {
     color: colors.primary,
-    fontWeight: "600",
+    fontWeight: "700",
     fontSize: 15,
     textDecorationLine: "underline",
   },

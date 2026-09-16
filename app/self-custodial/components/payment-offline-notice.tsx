@@ -59,7 +59,7 @@ const useStyles = makeStyles(() => ({
   },
   title: {
     textAlign: "center",
-    fontWeight: "600",
+    fontWeight: "700",
   },
   description: {
     textAlign: "center",
