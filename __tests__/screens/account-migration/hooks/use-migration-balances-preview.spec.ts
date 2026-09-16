@@ -35,7 +35,6 @@ jest.mock("@app/self-custodial/hooks/use-self-custodial-account-mode", () => ({
 }))
 
 jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
-  useDollarBalanceRestricted: () => false,
   useDollarBalanceRestriction: () => ({ isRestricted: false, isRegionPending: false }),
 }))
 

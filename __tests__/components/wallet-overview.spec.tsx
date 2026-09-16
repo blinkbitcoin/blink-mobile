@@ -24,7 +24,6 @@ jest.mock("@react-navigation/native", () => {
 const mockIsRestricted = jest.fn()
 let mockIsRegionPending = false
 jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
-  useDollarBalanceRestricted: () => mockIsRestricted(),
   useDollarBalanceGated: () => mockIsAnonMode || mockIsRestricted(),
   useDollarBalanceGate: () => ({
     isGated: mockIsAnonMode || mockIsRestricted(),
