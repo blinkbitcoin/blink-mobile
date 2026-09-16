@@ -171,6 +171,17 @@ jest.mock("@app/self-custodial/hooks/use-self-custodial-account-mode", () => ({
   useSelfCustodialAccountMode: () => ({ isAnonMode: mockIsAnonMode }),
 }))
 
+const mockRefetchCustodialRestrictions = jest.fn()
+jest.mock("@app/custodial/providers/restrictions", () => ({
+  ...jest.requireActual("@app/custodial/providers/restrictions"),
+  useCustodialRestrictions: () => ({
+    verdict: {
+      status: jest.requireActual("@app/types/account").RestrictionVerdictStatus.Pending,
+    },
+    refetch: mockRefetchCustodialRestrictions,
+  }),
+}))
+
 const mockPromptEnhancedMode = jest.fn()
 let mockEnhancedModePromptVisible = false
 jest.mock("@app/components/enhanced-mode-prompt", () => ({
@@ -2618,6 +2629,23 @@ describe("HomeScreen pull-to-refresh", () => {
     await flushEffects()
 
     expect(UNSAFE_getByType(RefreshControl).props.refreshing).toBe(false)
+  })
+
+  it("asks the server for the account's restrictions again on a pull", async () => {
+    mockRefetchCustodialRestrictions.mockResolvedValue(undefined)
+    // eslint-disable-next-line camelcase -- testing-library exposes this API verbatim
+    const { UNSAFE_getByType } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    await act(async () => {
+      await UNSAFE_getByType(RefreshControl).props.onRefresh()
+    })
+
+    expect(mockRefetchCustodialRestrictions).toHaveBeenCalledTimes(1)
   })
 
   it("spins only for the duration of a user-initiated refresh", async () => {

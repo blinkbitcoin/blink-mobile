@@ -177,10 +177,11 @@ describe("CustodialRestrictionsProvider", () => {
       expect(requestCount).toBe(0)
     })
 
-    it("waits, rather than answering, outside the provider", () => {
+    it("waits, rather than answering, outside the provider", async () => {
       const { result } = renderHook(() => useCustodialRestrictions())
 
       expect(result.current.verdict).toEqual({ status: RestrictionVerdictStatus.Pending })
+      await expect(result.current.refetch()).resolves.toBeUndefined()
     })
   })
 
@@ -393,6 +394,43 @@ describe("CustodialRestrictionsProvider", () => {
       await failThreeRetries()
 
       expect(result.current.verdict).toEqual({ status: RestrictionVerdictStatus.Pending })
+    })
+  })
+
+  describe("refetch", () => {
+    it("asks again at once and takes the new verdict", async () => {
+      replies = [answer(true, true), answer(false, false)]
+
+      const { result } = renderVerdict()
+      await flushEffects()
+      await act(() => result.current.refetch())
+
+      expect(requestCount).toBe(2)
+      expect(result.current.verdict).toEqual({
+        status: RestrictionVerdictStatus.Served,
+        restrictions: { dollarBalance: false, transfer: false },
+      })
+    })
+
+    it("asks nothing without an account to ask about", async () => {
+      mockIsAuthed = false
+
+      const { result } = renderVerdict()
+      await flushEffects()
+      await act(() => result.current.refetch())
+
+      expect(requestCount).toBe(0)
+    })
+
+    it("never rejects when the request fails", async () => {
+      replies = [dropRequest, dropRequest]
+
+      const { result } = renderVerdict()
+      await flushEffects()
+
+      await act(async () => {
+        await expect(result.current.refetch()).resolves.toBeUndefined()
+      })
     })
   })
 })

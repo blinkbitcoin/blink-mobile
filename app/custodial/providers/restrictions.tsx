@@ -1,5 +1,6 @@
 import React, {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -47,10 +48,13 @@ const UNKNOWN: RestrictionVerdict = Object.freeze({
 
 type CustodialRestrictionsContextType = {
   verdict: RestrictionVerdict
+  /** Asks again now, for a user who pulled to refresh. Never rejects. */
+  refetch: () => Promise<void>
 }
 
 const CustodialRestrictionsContext = createContext<CustodialRestrictionsContextType>({
   verdict: PENDING,
+  refetch: async () => {},
 })
 
 export const useCustodialRestrictions = (): CustodialRestrictionsContextType =>
@@ -172,7 +176,18 @@ export const CustodialRestrictionsProvider: React.FC<React.PropsWithChildren> = 
     })
   }, [isUnknown, error, failedRetries])
 
-  const contextValue = useMemo(() => ({ verdict }), [verdict])
+  const refetchVerdict = useCallback(async () => {
+    if (!isEnabled) return
+    await refetch().then(
+      () => undefined,
+      () => undefined,
+    )
+  }, [isEnabled, refetch])
+
+  const contextValue = useMemo(
+    () => ({ verdict, refetch: refetchVerdict }),
+    [verdict, refetchVerdict],
+  )
 
   return (
     <CustodialRestrictionsContext.Provider value={contextValue}>

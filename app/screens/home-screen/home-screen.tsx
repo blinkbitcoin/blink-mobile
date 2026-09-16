@@ -54,6 +54,7 @@ import {
   useDollarBalanceGate,
   useDollarBalanceRestriction,
 } from "@app/hooks/use-dollar-balance-restricted"
+import { useCustodialRestrictions } from "@app/custodial/providers/restrictions"
 import { useDollarBalanceForcedConversion } from "@app/hooks/use-dollar-balance-forced-conversion"
 import { useEnhancedModePrompt } from "@app/components/enhanced-mode-prompt"
 import { useRestrictedRegion } from "@app/components/restricted-region"
@@ -432,6 +433,7 @@ export const HomeScreen: React.FC = () => {
     isRegionDetermined: isDollarBalanceRegionDetermined,
   } = useDollarBalanceRestriction()
   const { isGated: isDollarBalanceGated, isRegionPending } = useDollarBalanceGate()
+  const { refetch: refetchCustodialRestrictions } = useCustodialRestrictions()
   const { isAnonMode } = useSelfCustodialAccountMode()
   const { promptEnhancedMode, isEnhancedModePromptVisible } = useEnhancedModePrompt()
   const {
@@ -604,6 +606,7 @@ export const HomeScreen: React.FC = () => {
       refetchAuthed(),
       refetchUnauthed(),
       refetchBulletins(),
+      refetchCustodialRestrictions(),
     ])
     // Triggers the upgrade trial account modal after refetch
     triggerUpgradeModal()
@@ -614,6 +617,7 @@ export const HomeScreen: React.FC = () => {
     refetchPendingDeposits,
     refetchAuthed,
     refetchBulletins,
+    refetchCustodialRestrictions,
     refetchRealtimePrice,
     refetchUnauthed,
     triggerUpgradeModal,
