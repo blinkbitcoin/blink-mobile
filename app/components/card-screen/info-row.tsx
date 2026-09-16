@@ -68,9 +68,13 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
+    columnGap: 12,
   },
+  /** The label keeps its own width (up to half the row) and the value takes the rest, so a
+   *  short label like "Note" doesn't squeeze an address in the value until it breaks. */
   label: {
-    flex: 1,
+    flexShrink: 0,
+    maxWidth: "50%",
     color: colors.grey2,
     fontSize: 14,
     fontFamily: "Source Sans Pro",
