@@ -3759,6 +3759,24 @@
         "message": "Menunggu setoranmu diselesaikan; harap tunggu 2 konfirmasi di rantai.",
         "buttonText": "Oke"
       },
+      "HomeBulletin": {
+          "insufficient": {
+              "title": "Saldo tidak mencukupi",
+              "body": "Untuk menyelesaikan investasimu, setorkan sisa jumlahnya."
+          },
+          "depositPending": {
+              "title": "Tunggu sebentar",
+              "body": "Kami sedang menunggu setoranmu diselesaikan."
+          },
+          "ready": {
+              "title": "Selesaikan investasimu",
+              "body": "Kini kamu memiliki dana yang cukup untuk menyelesaikan investasi."
+          },
+          "shareholder": {
+              "title": "Selamat datang sebagai pemegang saham Blink!",
+              "body": "Kami akan memberitahumu segera setelah Blink Card-mu siap."
+          }
+      },
       "PersonalInformation": {
         "title": "Langkah terakhir",
         "fields": {

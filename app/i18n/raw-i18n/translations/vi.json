@@ -3759,6 +3759,24 @@
         "message": "Đang chờ khoản tiền gửi của bạn được xử lý; vui lòng chờ 2 xác nhận trên chuỗi.",
         "buttonText": "Được"
       },
+      "HomeBulletin": {
+          "insufficient": {
+              "title": "Số dư không đủ",
+              "body": "Để hoàn tất khoản đầu tư, hãy nạp số tiền còn thiếu."
+          },
+          "depositPending": {
+              "title": "Vui lòng chờ",
+              "body": "Chúng tôi đang chờ khoản tiền gửi của bạn được xử lý."
+          },
+          "ready": {
+              "title": "Hoàn tất khoản đầu tư của bạn",
+              "body": "Bạn đã có đủ tiền để hoàn tất khoản đầu tư."
+          },
+          "shareholder": {
+              "title": "Chào mừng bạn trở thành cổ đông của Blink!",
+              "body": "Chúng tôi sẽ thông báo ngay khi Blink Card của bạn sẵn sàng."
+          }
+      },
       "PersonalInformation": {
         "title": "Bước cuối cùng",
         "fields": {

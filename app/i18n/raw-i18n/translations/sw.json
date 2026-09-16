@@ -3759,6 +3759,24 @@
         "message": "Inasubiri amana yako ikamilike; tafadhali subiri uthibitisho 2 kwenye mnyororo.",
         "buttonText": "Sawa"
       },
+      "HomeBulletin": {
+          "insufficient": {
+              "title": "Salio halitoshi",
+              "body": "Ili kukamilisha uwekezaji wako, weka kiasi kilichosalia."
+          },
+          "depositPending": {
+              "title": "Subiri kidogo",
+              "body": "Tunasubiri amana yako ikamilike."
+          },
+          "ready": {
+              "title": "Kamilisha uwekezaji wako",
+              "body": "Sasa una fedha za kutosha kukamilisha uwekezaji."
+          },
+          "shareholder": {
+              "title": "Karibu kama mwanahisa wa Blink!",
+              "body": "Tutakujulisha mara tu Blink Card yako itakapokuwa tayari."
+          }
+      },
       "PersonalInformation": {
         "title": "Hatua ya mwisho",
         "fields": {

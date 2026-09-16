@@ -3806,6 +3806,24 @@
             "DepositPending": {
                 "message": "入金の確定を待っています。チェーン上での承認が2回完了するまでお待ちください。",
                 "buttonText": "OK"
+            },
+            "HomeBulletin": {
+                "insufficient": {
+                    "title": "残高不足",
+                    "body": "投資を完了するには、残りの金額を入金してください。"
+                },
+                "depositPending": {
+                    "title": "少々お待ちください",
+                    "body": "入金の確定を待っています。"
+                },
+                "ready": {
+                    "title": "投資を完了しましょう",
+                    "body": "投資を完了するのに十分な資金が揃いました。"
+                },
+                "shareholder": {
+                    "title": "Blinkの株主へようこそ！",
+                    "body": "Blink Cardの準備ができ次第お知らせします。"
+                }
             }
         }
     },
