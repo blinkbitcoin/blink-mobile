@@ -1,5 +1,12 @@
 import React, { useRef } from "react"
-import { View, TextInput, StyleProp, ViewStyle, TouchableOpacity } from "react-native"
+import {
+  Pressable,
+  View,
+  TextInput,
+  StyleProp,
+  ViewStyle,
+  TouchableOpacity,
+} from "react-native"
 import { MAX_FONT_SIZE_MULTIPLIER } from "@app/rne-theme/text-scaling"
 
 import { radius } from "@app/rne-theme/radius"
@@ -44,7 +51,8 @@ export const NoteInput: React.FC<NoteInputProps> = ({
     }
   }
   return (
-    <View style={[styles.fieldBackground, style]}>
+    // The whole field focuses the input, since the input itself is only one line tall.
+    <Pressable style={[styles.fieldBackground, style]} onPress={focusTextInput}>
       <View style={styles.noteContainer}>
         <TextInput
           maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
@@ -64,7 +72,7 @@ export const NoteInput: React.FC<NoteInputProps> = ({
           <GaloyIcon name={"pencil"} size={iconSize} color={colors.accent} />
         </TouchableOpacity>
       </View>
-    </View>
+    </Pressable>
   )
 }
 
@@ -102,6 +110,8 @@ const useStyles = makeStyles(
       color: colors.textOnBackground,
       fontFamily: fonts.regular,
       lineHeight: 20,
+      /** No platform padding, so the field's min height and font scale set its size. */
+      paddingVertical: 0,
     },
   }),
 )
