@@ -1,6 +1,9 @@
 import { renderHook } from "@testing-library/react-native"
 
-import { useInvestmentInvoice } from "@app/screens/card-screen/onboarding/investment-flow/use-investment-invoice"
+import {
+  isInvoiceReusable,
+  useInvestmentInvoice,
+} from "@app/screens/card-screen/onboarding/investment-flow/use-investment-invoice"
 
 const mockCreateInvoice = jest.fn()
 const mockReportError = jest.fn()
@@ -119,5 +122,22 @@ describe("useInvestmentInvoice", () => {
       "investment-invoice",
       new Error("network request failed"),
     )
+  })
+})
+
+describe("isInvoiceReusable", () => {
+  const ISSUED_AT = 1_757_800_000_000
+  const MINUTE_MS = 60 * 1000
+
+  /** The invoice lives thirty minutes; it is handed back only while a payment started
+   *  now can still land inside that, so the last five minutes are left alone. */
+  it("hands the invoice back while enough of its life is left to pay it", () => {
+    expect(isInvoiceReusable(ISSUED_AT, ISSUED_AT)).toBe(true)
+    expect(isInvoiceReusable(ISSUED_AT, ISSUED_AT + 24 * MINUTE_MS)).toBe(true)
+  })
+
+  it("has it reissued once it is too old to pay in time", () => {
+    expect(isInvoiceReusable(ISSUED_AT, ISSUED_AT + 25 * MINUTE_MS)).toBe(false)
+    expect(isInvoiceReusable(ISSUED_AT, ISSUED_AT + 31 * MINUTE_MS)).toBe(false)
   })
 })
