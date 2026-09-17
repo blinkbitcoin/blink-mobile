@@ -3724,7 +3724,8 @@
           "body1": "Blink'te {units: string} birim için abonelik sözleşmesini imzaladınız.",
           "body2": "{amount: string} yatırım tutarını transfer etme zamanı. Bitcoin ile ödeyeceksiniz."
         },
-        "buttonText": "Devam Et"
+        "buttonText": "Devam Et",
+        "paymentsUnavailable": "Yatırım ödemeleri henüz açık değil. Lütfen daha sonra tekrar dene."
       },
       "InsufficientBalance": {
         "title": "Yetersiz bakiye",

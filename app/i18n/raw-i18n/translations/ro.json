@@ -3724,7 +3724,8 @@
           "body1": "Ai semnat acordul de subscriere pentru {units: string} de unități în Blink.",
           "body2": "E timpul să transferi suma de investiție de {amount: string}. Vei plăti cu Bitcoin."
         },
-        "buttonText": "Continuă"
+        "buttonText": "Continuă",
+        "paymentsUnavailable": "Plățile pentru investiție nu sunt încă deschise. Te rugăm să încerci din nou mai târziu."
       },
       "InsufficientBalance": {
         "title": "Sold insuficient",

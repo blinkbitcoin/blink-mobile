@@ -3772,7 +3772,8 @@
                     "body1": "Du hast die Zeichnungsvereinbarung über {units: string} Einheiten in Blink unterzeichnet.",
                     "body2": "Es ist Zeit, den Investitionsbetrag von {amount: string} zu überweisen. Du zahlst mit Bitcoin."
                 },
-                "buttonText": "Weiter"
+                "buttonText": "Weiter",
+                "paymentsUnavailable": "Zahlungen für die Investition sind noch nicht möglich. Bitte versuche es später noch einmal."
             },
             "InsufficientBalance": {
                 "title": "Unzureichendes Guthaben",

@@ -3724,7 +3724,8 @@
           "body1": "Aláírtad az előfizetési megállapodást {units: string} egységre a Blinkben.",
           "body2": "Ideje átutalni a {amount: string} befektetési összeget. Bitcoinnal fizetsz."
         },
-        "buttonText": "Tovább"
+        "buttonText": "Tovább",
+        "paymentsUnavailable": "A befektetési befizetések még nem indultak el. Kérlek, próbáld újra később."
       },
       "InsufficientBalance": {
         "title": "Nem elegendő egyenleg",

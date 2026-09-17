@@ -3724,7 +3724,8 @@
           "body1": "{units: string} rakikunapaq suscripción rimanakuyta firmarqanki Blink-pi.",
           "body2": "Kunanmi {amount: string} invertiy qullqita apachinay pacha. Bitcoin-wan pagankí."
         },
-        "buttonText": "Ñawpaqman"
+        "buttonText": "Ñawpaqman",
+        "paymentsUnavailable": "Invertiy pagaykunaqa manaraqmi kichasqachu. Ama hina kaspa, qhipaman yapamanta ruwaykuy."
       },
       "InsufficientBalance": {
         "title": "Mana aypaq qullqi",

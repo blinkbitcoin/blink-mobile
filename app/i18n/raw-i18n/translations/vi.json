@@ -3724,7 +3724,8 @@
           "body1": "Bạn đã ký thỏa thuận đăng ký cho {units: string} đơn vị trong Blink.",
           "body2": "Đã đến lúc chuyển khoản đầu tư {amount: string}. Bạn sẽ thanh toán bằng Bitcoin."
         },
-        "buttonText": "Tiếp tục"
+        "buttonText": "Tiếp tục",
+        "paymentsUnavailable": "Thanh toán đầu tư chưa mở. Vui lòng thử lại sau."
       },
       "InsufficientBalance": {
         "title": "Số dư không đủ",

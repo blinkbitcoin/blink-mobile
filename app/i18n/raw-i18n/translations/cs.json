@@ -3724,7 +3724,8 @@
           "body1": "Podepsali jste smlouvu o úpisu {units: string} jednotek v Blink.",
           "body2": "Je čas převést investiční částku {amount: string}. Zaplatíte Bitcoinem."
         },
-        "buttonText": "Pokračovat"
+        "buttonText": "Pokračovat",
+        "paymentsUnavailable": "Platby za investici zatím nejsou otevřené. Zkus to prosím později."
       },
       "InsufficientBalance": {
         "title": "Nedostatečný zůstatek",

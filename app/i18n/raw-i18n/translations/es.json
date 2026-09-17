@@ -3772,7 +3772,8 @@
                     "body1": "Has firmado el acuerdo de suscripción por {units: string} unidades en Blink.",
                     "body2": "Es momento de transferir el monto de inversión de {amount: string}. Pagarás con Bitcoin."
                 },
-                "buttonText": "Continuar"
+                "buttonText": "Continuar",
+                "paymentsUnavailable": "Los pagos de la inversión aún no están habilitados. Inténtalo de nuevo más tarde."
             },
             "InsufficientBalance": {
                 "title": "Saldo insuficiente",

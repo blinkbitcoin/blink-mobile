@@ -12402,6 +12402,10 @@ type RootTranslation = {
 				 * C​o​n​t​i​n​u​e
 				 */
 				buttonText: string
+				/**
+				 * I​n​v​e​s​t​m​e​n​t​ ​p​a​y​m​e​n​t​s​ ​a​r​e​ ​n​o​t​ ​o​p​e​n​ ​y​e​t​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​ ​l​a​t​e​r​.
+				 */
+				paymentsUnavailable: string
 			}
 			InsufficientBalance: {
 				/**
@@ -26102,6 +26106,10 @@ export type TranslationFunctions = {
 				 * Continue
 				 */
 				buttonText: () => LocalizedString
+				/**
+				 * Investment payments are not open yet. Please try again later.
+				 */
+				paymentsUnavailable: () => LocalizedString
 			}
 			InsufficientBalance: {
 				/**

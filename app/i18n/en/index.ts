@@ -3897,6 +3897,7 @@ const en: BaseTranslation = {
           body2: "Time to transfer the investment amount of {amount: string}. You will pay with Bitcoin.",
         },
         buttonText: "Continue",
+        paymentsUnavailable: "Investment payments are not open yet. Please try again later.",
       },
       InsufficientBalance: {
         title: "Insufficient balance",

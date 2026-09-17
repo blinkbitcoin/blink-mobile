@@ -3724,7 +3724,8 @@
           "body1": "Anda telah menandatangani perjanjian langganan untuk {units: string} unit di Blink.",
           "body2": "Saatnya mentransfer jumlah investasi {amount: string}. Anda akan membayar dengan Bitcoin."
         },
-        "buttonText": "Lanjutkan"
+        "buttonText": "Lanjutkan",
+        "paymentsUnavailable": "Pembayaran investasi belum dibuka. Silakan coba lagi nanti."
       },
       "InsufficientBalance": {
         "title": "Saldo tidak mencukupi",

@@ -3772,7 +3772,8 @@
                     "body1": "Blinkの{units: string}ユニットに対するサブスクリプション契約に署名しました。",
                     "body2": "{amount: string}の投資額を送金する時です。ビットコインでお支払いいただきます。"
                 },
-                "buttonText": "続ける"
+                "buttonText": "続ける",
+                "paymentsUnavailable": "投資の支払いはまだ受け付けていません。後でもう一度お試しください。"
             },
             "InsufficientBalance": {
                 "title": "残高が不足しています",
