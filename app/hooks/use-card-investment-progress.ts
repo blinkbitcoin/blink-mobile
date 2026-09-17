@@ -10,7 +10,10 @@ import {
   withoutCardInvestment,
 } from "@app/store/persistent-state/card-investment"
 import { AccountType } from "@app/types/wallet"
-import { CardInvestmentProgress } from "@app/types/card-investment"
+import {
+  CardInvestmentProgress,
+  isSignedCardInvestment,
+} from "@app/types/card-investment"
 
 import { useAccountRegistry } from "./use-account-registry"
 
@@ -52,10 +55,17 @@ type CardInvestmentStart = Pick<
 >
 
 type CardInvestmentProgressState = {
+  /** The signed investment, or null while none is: an invitation alone is not one. */
   progress: CardInvestmentProgress | null
+  /** Whether the investor opened the invitation and has not signed yet; the home holds
+   *  the way back into the flow open while this is so. */
+  isInvited: boolean
   /** Whether the account the record is filed under is known yet; until it is, nothing
    *  can be recorded, so a step that must record should wait on this. */
   isAccountResolved: boolean
+  /** Records that the invitation was opened, unless the account already holds a record:
+   *  a return to the first screen must not erase an agreement already signed. */
+  markInvited: () => void
   /** Records the signed agreement; the home nags about its payment from here on. */
   start: (investment: CardInvestmentStart) => void
   /** Records the invoice the transfer step was issued, to be paid rather than reissued
@@ -68,9 +78,10 @@ type CardInvestmentProgressState = {
 }
 
 /**
- * The active account's card investment in progress, and the three moments that move it:
- * signing, paying, and closing the welcome that follows. Read and written through the
- * persisted state so the home, the signing step and the send flow all see the same record.
+ * The active account's card investment in progress, and the four moments that move it:
+ * opening the invitation, signing, paying, and closing the welcome that follows. Read
+ * and written through the persisted state so the home, the flow's screens and the send
+ * flow all see the same record.
  *
  * With no account id resolved yet there is nothing to read and nowhere to write, so the
  * moments are dropped rather than filed under a guess.
@@ -78,7 +89,18 @@ type CardInvestmentProgressState = {
 export const useCardInvestmentProgress = (): CardInvestmentProgressState => {
   const { persistentState, updateState } = usePersistentStateContext()
   const accountId = useCardInvestmentAccountId()
-  const progress = accountId ? getCardInvestment(persistentState, accountId) : null
+  const record = accountId ? getCardInvestment(persistentState, accountId) : null
+  const progress = record && isSignedCardInvestment(record) ? record : null
+  const isInvited = record !== null && progress === null
+
+  const markInvited = useCallback(() => {
+    if (!accountId) return
+    updateState((state) => {
+      if (!state) return state
+      if (getCardInvestment(state, accountId)) return state
+      return withCardInvestment(state, accountId, { invitedAt: Date.now() })
+    })
+  }, [accountId, updateState])
 
   const start = useCallback(
     (investment: CardInvestmentStart) => {
@@ -88,15 +110,15 @@ export const useCardInvestmentProgress = (): CardInvestmentProgressState => {
     [accountId, updateState],
   )
 
-  /** Nothing signed means nothing to add to: an invoice or a payment with no investment
-   *  behind it leaves the record as it is rather than inventing one. */
+  /** Nothing signed means nothing to add to: an invoice or a payment with no signed
+   *  investment behind it leaves the record as it is rather than inventing one. */
   const amend = useCallback(
     (change: (current: CardInvestmentProgress) => CardInvestmentProgress) => {
       if (!accountId) return
       updateState((state) => {
         if (!state) return state
         const current = getCardInvestment(state, accountId)
-        if (!current) return state
+        if (!current || !isSignedCardInvestment(current)) return state
         return withCardInvestment(state, accountId, change(current))
       })
     },
@@ -124,7 +146,9 @@ export const useCardInvestmentProgress = (): CardInvestmentProgressState => {
 
   return {
     progress,
+    isInvited,
     isAccountResolved: accountId !== null,
+    markInvited,
     start,
     recordInvoice,
     markPaid,

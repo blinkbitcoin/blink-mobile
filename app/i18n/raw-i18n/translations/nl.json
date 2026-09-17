@@ -3749,6 +3749,9 @@
         "buttonText": "Oké"
       },
       "HomeBulletin": {
+          "invited": {
+              "body": "Je bent uitgenodigd om deel te nemen aan de financieringsronde van Blink. Alleen voor Blink-fans."
+          },
           "insufficient": {
               "title": "Onvoldoende saldo",
               "body": "Stort het resterende bedrag om je investering af te ronden."

@@ -3797,6 +3797,9 @@
                 "buttonText": "OK"
             },
             "HomeBulletin": {
+                "invited": {
+                    "body": "Blinkの資金調達ラウンドへの参加にご招待します。Blinkファン限定です。"
+                },
                 "insufficient": {
                     "title": "残高不足",
                     "body": "投資を完了するには、残りの金額を入金してください。"

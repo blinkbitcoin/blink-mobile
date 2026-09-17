@@ -3749,6 +3749,9 @@
         "buttonText": "U redu"
       },
       "HomeBulletin": {
+          "invited": {
+              "body": "Pozvan si sudjelovati u Blinkovom krugu financiranja. Samo za Blink obožavatelje."
+          },
           "insufficient": {
               "title": "Nedovoljan saldo",
               "body": "Da bi dovršio ulaganje, uplati preostali iznos."

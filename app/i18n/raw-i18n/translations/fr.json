@@ -3797,6 +3797,9 @@
                 "buttonText": "D'accord"
             },
             "HomeBulletin": {
+                "invited": {
+                    "body": "Tu es invité à participer au tour de financement de Blink. Réservé aux fans de Blink."
+                },
                 "insufficient": {
                     "title": "Solde insuffisant",
                     "body": "Pour finaliser ton investissement, dépose le montant restant."

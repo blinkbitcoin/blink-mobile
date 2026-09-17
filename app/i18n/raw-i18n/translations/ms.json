@@ -3749,6 +3749,9 @@
         "buttonText": "OK"
       },
       "HomeBulletin": {
+          "invited": {
+              "body": "Anda dijemput untuk menyertai pusingan pembiayaan Blink. Khas untuk peminat Blink sahaja."
+          },
           "insufficient": {
               "title": "Baki tidak mencukupi",
               "body": "Untuk melengkapkan pelaburan anda, depositkan baki jumlah."

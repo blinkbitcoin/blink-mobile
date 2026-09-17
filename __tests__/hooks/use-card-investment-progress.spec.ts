@@ -7,7 +7,7 @@ import {
   useConsumeCardInvestmentPayment,
 } from "@app/hooks/use-card-investment-progress"
 import { PersistentState } from "@app/store/persistent-state/state-migrations"
-import { CardInvestmentProgress } from "@app/types/card-investment"
+import { CardInvestmentRecord } from "@app/types/card-investment"
 import { AccountType } from "@app/types/wallet"
 
 const mockUpdateState = jest.fn()
@@ -44,6 +44,7 @@ const CUSTODIAL_ID = "custodial-account-1"
 const OTHER_CUSTODIAL_ID = "custodial-account-2"
 const INVESTMENT = { selectedAmountUsd: 25000, settlementSats: 31_704_000 }
 const NOW = 1_757_800_000_000
+const INVITATION = { invitedAt: NOW - 60_000 }
 
 const baseState: PersistentState = {
   schemaVersion: 22,
@@ -51,7 +52,7 @@ const baseState: PersistentState = {
   galoyAuthToken: "",
 }
 
-const stateWith = (entries: Record<string, CardInvestmentProgress>): PersistentState => ({
+const stateWith = (entries: Record<string, CardInvestmentRecord>): PersistentState => ({
   ...baseState,
   cardInvestmentByAccountId: entries,
 })
@@ -133,6 +134,7 @@ describe("useCardInvestmentProgress", () => {
 
       const { result } = renderHook(() => useCardInvestmentProgress())
       act(() => {
+        result.current.markInvited()
         result.current.start(INVESTMENT)
         result.current.recordInvoice("lnbc25m1investment")
         result.current.markPaid()
@@ -140,6 +142,7 @@ describe("useCardInvestmentProgress", () => {
       })
 
       expect(result.current.progress).toBeNull()
+      expect(result.current.isInvited).toBe(false)
       expect(mockUpdateState).not.toHaveBeenCalled()
     })
 
@@ -181,10 +184,72 @@ describe("useCardInvestmentProgress", () => {
     })
   })
 
-  it("has no progress while nothing was signed", () => {
+  it("has no progress and no invitation while nothing was opened", () => {
     const { result } = renderHook(() => useCardInvestmentProgress())
 
     expect(result.current.progress).toBeNull()
+    expect(result.current.isInvited).toBe(false)
+  })
+
+  /** An invitation is not an investment: nothing about a payment can be derived from it. */
+  it("reads an opened invitation as invited, with no progress", () => {
+    mockPersistentState = stateWith({ [SELF_CUSTODIAL_ID]: INVITATION })
+
+    const { result } = renderHook(() => useCardInvestmentProgress())
+
+    expect(result.current.isInvited).toBe(true)
+    expect(result.current.progress).toBeNull()
+  })
+
+  it("is no longer invited once the agreement is signed", () => {
+    mockPersistentState = stateWith({ [SELF_CUSTODIAL_ID]: INVESTMENT })
+
+    const { result } = renderHook(() => useCardInvestmentProgress())
+
+    expect(result.current.isInvited).toBe(false)
+  })
+
+  describe("markInvited", () => {
+    it("records the opened invitation for the active account", () => {
+      const { result } = renderHook(() => useCardInvestmentProgress())
+
+      act(() => result.current.markInvited())
+
+      expect(applyLastUpdate(baseState)?.cardInvestmentByAccountId).toEqual({
+        [SELF_CUSTODIAL_ID]: { invitedAt: NOW },
+      })
+    })
+
+    /** The first screen is reached again on every return to the flow; the moment the
+     *  invitation was first opened is the one that counts. */
+    it("keeps the invitation already recorded", () => {
+      const invited = stateWith({ [SELF_CUSTODIAL_ID]: INVITATION })
+      mockPersistentState = invited
+      const { result } = renderHook(() => useCardInvestmentProgress())
+
+      act(() => result.current.markInvited())
+
+      expect(applyLastUpdate(invited)).toBe(invited)
+    })
+
+    /** Coming back to the first screen after signing must not erase the agreement. */
+    it("never overwrites a signed investment", () => {
+      const signed = stateWith({ [SELF_CUSTODIAL_ID]: INVESTMENT })
+      mockPersistentState = signed
+      const { result } = renderHook(() => useCardInvestmentProgress())
+
+      act(() => result.current.markInvited())
+
+      expect(applyLastUpdate(signed)).toBe(signed)
+    })
+
+    it("leaves an unloaded store alone", () => {
+      const { result } = renderHook(() => useCardInvestmentProgress())
+
+      act(() => result.current.markInvited())
+
+      expect(applyLastUpdate(undefined)).toBeUndefined()
+    })
   })
 
   describe("start", () => {
@@ -194,6 +259,18 @@ describe("useCardInvestmentProgress", () => {
       act(() => result.current.start(INVESTMENT))
 
       expect(applyLastUpdate(baseState)?.cardInvestmentByAccountId).toEqual({
+        [SELF_CUSTODIAL_ID]: INVESTMENT,
+      })
+    })
+
+    it("replaces the invitation with the investment signed on it", () => {
+      const invited = stateWith({ [SELF_CUSTODIAL_ID]: INVITATION })
+      mockPersistentState = invited
+      const { result } = renderHook(() => useCardInvestmentProgress())
+
+      act(() => result.current.start(INVESTMENT))
+
+      expect(applyLastUpdate(invited)?.cardInvestmentByAccountId).toEqual({
         [SELF_CUSTODIAL_ID]: INVESTMENT,
       })
     })
@@ -227,6 +304,16 @@ describe("useCardInvestmentProgress", () => {
       act(() => result.current.markPaid())
 
       expect(applyLastUpdate(baseState)).toBe(baseState)
+    })
+
+    it("changes nothing on an invitation not yet signed", () => {
+      const invited = stateWith({ [SELF_CUSTODIAL_ID]: INVITATION })
+      mockPersistentState = invited
+      const { result } = renderHook(() => useCardInvestmentProgress())
+
+      act(() => result.current.markPaid())
+
+      expect(applyLastUpdate(invited)).toBe(invited)
     })
 
     it("leaves an unloaded store alone", () => {
@@ -267,8 +354,8 @@ describe("useCardInvestmentProgress", () => {
       act(() => result.current.recordInvoice("lnbc1new"))
 
       expect(
-        applyLastUpdate(signed)?.cardInvestmentByAccountId?.[SELF_CUSTODIAL_ID].invoice,
-      ).toEqual({ paymentRequest: "lnbc1new", issuedAt: NOW })
+        applyLastUpdate(signed)?.cardInvestmentByAccountId?.[SELF_CUSTODIAL_ID],
+      ).toEqual({ ...INVESTMENT, invoice: { paymentRequest: "lnbc1new", issuedAt: NOW } })
     })
 
     /** An invoice with no investment behind it is not this record's to invent. */
@@ -278,6 +365,16 @@ describe("useCardInvestmentProgress", () => {
       act(() => result.current.recordInvoice("lnbc25m1investment"))
 
       expect(applyLastUpdate(baseState)).toBe(baseState)
+    })
+
+    it("changes nothing on an invitation not yet signed", () => {
+      const invited = stateWith({ [SELF_CUSTODIAL_ID]: INVITATION })
+      mockPersistentState = invited
+      const { result } = renderHook(() => useCardInvestmentProgress())
+
+      act(() => result.current.recordInvoice("lnbc25m1investment"))
+
+      expect(applyLastUpdate(invited)).toBe(invited)
     })
   })
 
@@ -303,6 +400,16 @@ describe("useCardInvestmentProgress", () => {
   })
 
   describe("clear", () => {
+    it("forgets the active account's invitation", () => {
+      const invited = stateWith({ [SELF_CUSTODIAL_ID]: INVITATION })
+      mockPersistentState = invited
+      const { result } = renderHook(() => useCardInvestmentProgress())
+
+      act(() => result.current.clear())
+
+      expect(applyLastUpdate(invited)?.cardInvestmentByAccountId).toEqual({})
+    })
+
     it("forgets the active account's investment", () => {
       const signed = stateWith({ [SELF_CUSTODIAL_ID]: INVESTMENT })
       mockPersistentState = signed
@@ -328,6 +435,7 @@ describe("useCardInvestmentProgress", () => {
 
     rerender({})
 
+    expect(result.current.markInvited).toBe(first.markInvited)
     expect(result.current.start).toBe(first.start)
     expect(result.current.recordInvoice).toBe(first.recordInvoice)
     expect(result.current.markPaid).toBe(first.markPaid)

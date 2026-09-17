@@ -989,11 +989,7 @@ export const HomeScreen: React.FC = () => {
           <SelfCustodialInfoBulletin onDismiss={dismissSelfCustodialInfoBulletin} />
         )}
         {cardInvestmentBulletin && (
-          <CardInvestmentBulletin
-            kind={cardInvestmentBulletin.kind}
-            progress={cardInvestmentBulletin.progress}
-            onDismiss={cardInvestmentBulletin.dismiss}
-          />
+          <CardInvestmentBulletin bulletin={cardInvestmentBulletin} />
         )}
         <BulletinsCard loading={bulletinsLoading} bulletins={bulletins} />
         <AppUpdate />

@@ -3749,6 +3749,9 @@
         "buttonText": "D'acord"
       },
       "HomeBulletin": {
+          "invited": {
+              "body": "Estàs convidat a participar en la ronda de finançament de Blink. Només per a fans de Blink."
+          },
           "insufficient": {
               "title": "Saldo insuficient",
               "body": "Per completar la teva inversió, diposita l'import restant."

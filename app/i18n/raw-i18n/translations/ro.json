@@ -3749,6 +3749,9 @@
         "buttonText": "OK"
       },
       "HomeBulletin": {
+          "invited": {
+              "body": "Ești invitat să participi la runda de finanțare Blink. Doar pentru fanii Blink."
+          },
           "insufficient": {
               "title": "Sold insuficient",
               "body": "Pentru a-ți finaliza investiția, depune suma rămasă."

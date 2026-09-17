@@ -2,7 +2,10 @@ import React from "react"
 import { render, fireEvent, act } from "@testing-library/react-native"
 
 import { CardInvestmentBulletin } from "@app/components/card-investment-bulletin"
-import { CardInvestmentBulletinKind } from "@app/types/card-investment"
+import {
+  CardInvestmentBulletinKind,
+  SignedCardInvestmentBulletinKind,
+} from "@app/types/card-investment"
 
 const mockNavigate = jest.fn()
 
@@ -52,6 +55,9 @@ jest.mock("@app/i18n/i18n-react", () => ({
       common: { continue: () => "Continue", convert: () => "Convert" },
       CardFlow: {
         Onboarding: {
+          WelcomeInvest: {
+            welcomeMessage: { title: () => "Welcome to become part of Blink" },
+          },
           InsufficientBalance: {
             buttonText: () => "Deposit",
             splitFunds: {
@@ -60,6 +66,10 @@ jest.mock("@app/i18n/i18n-react", () => ({
             },
           },
           HomeBulletin: {
+            invited: {
+              body: () =>
+                "You are invited to participate in the Blink financing round. For Blink fans only.",
+            },
             insufficient: {
               title: () => "Insufficient balance",
               body: () => "To complete your investment, deposit the remaining amount.",
@@ -85,12 +95,50 @@ jest.mock("@app/i18n/i18n-react", () => ({
 
 const PROGRESS = { selectedAmountUsd: 25000, settlementSats: 31_704_000 }
 
-const renderBulletin = (kind: CardInvestmentBulletinKind, onDismiss = jest.fn()) =>
-  render(<CardInvestmentBulletin kind={kind} progress={PROGRESS} onDismiss={onDismiss} />)
+const renderBulletin = (kind: SignedCardInvestmentBulletinKind, dismiss = jest.fn()) =>
+  render(<CardInvestmentBulletin bulletin={{ kind, progress: PROGRESS, dismiss }} />)
+
+const renderInvitation = () =>
+  render(
+    <CardInvestmentBulletin
+      bulletin={{
+        kind: CardInvestmentBulletinKind.Invited,
+        progress: null,
+        dismiss: jest.fn(),
+      }}
+    />,
+  )
 
 describe("CardInvestmentBulletin", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+  })
+
+  describe("invited", () => {
+    /** The server's own invitation card is gone once tapped; this one restates it with
+     *  nothing to press but the card, and no way to close it, until the agreement is signed. */
+    it("restates the invitation with nothing to press but the card", () => {
+      const { getByText, queryByTestId } = renderInvitation()
+
+      expect(getByText("Welcome to become part of Blink")).toBeTruthy()
+      expect(
+        getByText(
+          "You are invited to participate in the Blink financing round. For Blink fans only.",
+        ),
+      ).toBeTruthy()
+      expect(queryByTestId("cta-button")).toBeNull()
+      expect(queryByTestId("dismiss-button")).toBeNull()
+    })
+
+    it("opens the flow from its first screen when the card is tapped", async () => {
+      const { getByText } = renderInvitation()
+
+      await act(async () => {
+        fireEvent.press(getByText("Welcome to become part of Blink"))
+      })
+
+      expect(mockNavigate).toHaveBeenCalledWith("cardOnboardingWelcomeInvestScreen")
+    })
   })
 
   describe("insufficient balance", () => {

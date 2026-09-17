@@ -3749,6 +3749,9 @@
         "buttonText": "Kulungile"
       },
       "HomeBulletin": {
+          "invited": {
+              "body": "Umenyiwe ukuba uthathe inxaxheba kumjikelo wenkxaso-mali weBlink. Ngabalandeli beBlink kuphela."
+          },
           "insufficient": {
               "title": "Ibhalansi ayonelanga",
               "body": "Ukugqiba utyalo-mali lwakho, faka imali eseleyo."

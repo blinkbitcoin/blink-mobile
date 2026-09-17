@@ -3749,6 +3749,9 @@
         "buttonText": "Kale"
       },
       "HomeBulletin": {
+          "invited": {
+              "body": "Oyitiddwa okwetaba mu mulundi gwa Blink ogw'okufuna ensimbi. Gwa bawagizi ba Blink bokka."
+          },
           "insufficient": {
               "title": "Ssente tezimala",
               "body": "Okumaliriza okusiga kwo, teekamu ssente ezisigaddewo."

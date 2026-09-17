@@ -1,6 +1,6 @@
 import { GALOY_INSTANCES, GaloyInstance, GaloyInstanceInput } from "@app/config"
 import { AccountMode } from "@app/types/account"
-import { CardInvestmentProgress } from "@app/types/card-investment"
+import { CardInvestmentRecord } from "@app/types/card-investment"
 import { DefaultAccountId } from "@app/types/wallet"
 
 type PersistentState_3 = {
@@ -322,10 +322,10 @@ type PersistentState_22 = {
   // Last transaction seen per currency, for accounts whose Apollo cache is never
   // restored from disk (self-custodial). Custodial keeps this in the cache itself.
   txLastSeenByAccountId?: Record<string, { btcId: string; usdId: string }>
-  // The card investment an account signed for and has not finished paying, kept on
+  // The card investment an account opened or signed for and has not finished, kept on
   // device because no backend records it yet: the home reads it to nag until the
   // money is sent, and to welcome once it is.
-  cardInvestmentByAccountId?: Record<string, CardInvestmentProgress>
+  cardInvestmentByAccountId?: Record<string, CardInvestmentRecord>
 }
 
 const migrate22ToCurrent = (state: PersistentState_22): Promise<PersistentState> =>

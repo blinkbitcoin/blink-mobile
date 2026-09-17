@@ -7,15 +7,13 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import {
   CardInvestmentBulletinKind,
   CardInvestmentBulletinState,
+  SignedCardInvestmentBulletinKind,
 } from "@app/types/card-investment"
 
 import { NotificationCardUI } from "../notifications/notification-card-ui"
 
-type CardInvestmentBulletinProps = Pick<
-  CardInvestmentBulletinState,
-  "kind" | "progress"
-> & {
-  onDismiss: () => void
+type CardInvestmentBulletinProps = {
+  bulletin: CardInvestmentBulletinState
 }
 
 type BulletinContent = {
@@ -27,21 +25,33 @@ type BulletinContent = {
 }
 
 /**
- * The home card that walks a signed investor back to the payment, and welcomes them once
- * it is made. Each state reuses the flow's own step for what it asks: the shortfall
- * screen already decides between depositing and converting, and the transfer step
- * already bills the figure the agreement names, so the card opens those rather than
- * restating their decisions.
+ * The home card that holds the invitation open, walks a signed investor back to the
+ * payment, and welcomes them once it is made. Each state reuses the flow's own step for
+ * what it asks: the shortfall screen already decides between depositing and converting,
+ * and the transfer step already bills the figure the agreement names, so the card opens
+ * those rather than restating their decisions.
  */
 export const CardInvestmentBulletin: React.FC<CardInvestmentBulletinProps> = ({
-  kind,
-  progress,
-  onDismiss,
+  bulletin,
 }) => {
   const { LL } = useI18nContext()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const copy = LL.CardFlow.Onboarding.HomeBulletin
   const shortfallCopy = LL.CardFlow.Onboarding.InsufficientBalance
+
+  /** The server's invitation card, restated: it is gone once tapped, and this one takes
+   *  its place at the start of the flow until the agreement is signed. */
+  if (bulletin.kind === CardInvestmentBulletinKind.Invited) {
+    return (
+      <NotificationCardUI
+        title={LL.CardFlow.Onboarding.WelcomeInvest.welcomeMessage.title()}
+        text={copy.invited.body()}
+        action={async () => navigation.navigate("cardOnboardingWelcomeInvestScreen")}
+      />
+    )
+  }
+
+  const { progress } = bulletin
 
   /** Both shortfalls open the same step, which restates the figures and offers the
    *  matching remedy; the card only names which remedy that is. */
@@ -51,7 +61,7 @@ export const CardInvestmentBulletin: React.FC<CardInvestmentBulletinProps> = ({
     })
 
   /** Thunks, so only the card being shown resolves its copy. */
-  const contentFor: Record<CardInvestmentBulletinKind, () => BulletinContent> = {
+  const contentFor: Record<SignedCardInvestmentBulletinKind, () => BulletinContent> = {
     [CardInvestmentBulletinKind.Insufficient]: () => ({
       title: copy.insufficient.title(),
       text: copy.insufficient.body(),
@@ -82,9 +92,9 @@ export const CardInvestmentBulletin: React.FC<CardInvestmentBulletinProps> = ({
     [CardInvestmentBulletinKind.Shareholder]: () => ({
       title: copy.shareholder.title(),
       text: copy.shareholder.body(),
-      dismissAction: onDismiss,
+      dismissAction: bulletin.dismiss,
     }),
   }
 
-  return <NotificationCardUI {...contentFor[kind]()} />
+  return <NotificationCardUI {...contentFor[bulletin.kind]()} />
 }

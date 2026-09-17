@@ -3749,6 +3749,9 @@
         "buttonText": "حسنًا"
       },
       "HomeBulletin": {
+          "invited": {
+              "body": "أنت مدعو للمشاركة في جولة تمويل Blink. لمحبي Blink فقط."
+          },
           "insufficient": {
               "title": "الرصيد غير كافٍ",
               "body": "لإكمال استثمارك، أودِع المبلغ المتبقي."

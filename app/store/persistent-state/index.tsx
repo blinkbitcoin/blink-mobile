@@ -375,9 +375,9 @@ export const PersistentStateProvider: React.FC<PropsWithChildren> = ({ children 
   )
 
   /**
-   * Everything starts over on logout except the card investments signed for: they are
-   * filed by server account id, so nothing of them can reach another user, and a signed
-   * agreement outlives the session that signed it.
+   * Everything starts over on logout except the card investment records: they are filed
+   * by server account id, so nothing of them can reach another user, and both an opened
+   * invitation and a signed agreement outlive the session they happened in.
    */
   const resetState = React.useCallback(() => {
     hasModified.current = true

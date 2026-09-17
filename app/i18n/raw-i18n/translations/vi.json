@@ -3749,6 +3749,9 @@
         "buttonText": "Được"
       },
       "HomeBulletin": {
+          "invited": {
+              "body": "Bạn được mời tham gia vòng gọi vốn của Blink. Chỉ dành cho người hâm mộ Blink."
+          },
           "insufficient": {
               "title": "Số dư không đủ",
               "body": "Để hoàn tất khoản đầu tư, hãy nạp số tiền còn thiếu."

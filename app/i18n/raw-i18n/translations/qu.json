@@ -3749,6 +3749,9 @@
         "buttonText": "Allinmi"
       },
       "HomeBulletin": {
+          "invited": {
+              "body": "Blinkpa qullqi huñuy muyuyninpi yanapakunaykipaq invitasqa kanki. Blink munaqkunallapaq."
+          },
           "insufficient": {
               "title": "Mana aypaq qullqi",
               "body": "Inversiónniykita tukunaykipaq, puchuq qullqita churay."

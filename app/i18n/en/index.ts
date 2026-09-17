@@ -3921,6 +3921,9 @@ const en: BaseTranslation = {
         buttonText: "Okay",
       },
       HomeBulletin: {
+        invited: {
+          body: "You are invited to participate in the Blink financing round. For Blink fans only.",
+        },
         insufficient: {
           title: "Insufficient balance",
           body: "To complete your investment, deposit the remaining amount.",

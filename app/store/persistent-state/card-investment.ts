@@ -1,14 +1,21 @@
-import { CardInvestmentProgress } from "@app/types/card-investment"
+import { CardInvestmentRecord, isSignedCardInvestment } from "@app/types/card-investment"
 
 import { PersistentState } from "./state-migrations"
 
-/** Nothing can be derived from a record without an amount the select screen could have
- *  produced, and a bulletin built on one would nag with nowhere to go. */
-const hasPayableAmount = (progress: CardInvestmentProgress): boolean =>
-  Number.isFinite(progress.selectedAmountUsd) && progress.selectedAmountUsd > 0
+/**
+ * Nothing can be derived from a signed record without an amount the select screen could
+ * have produced, or from an invitation without a moment it was opened at; a bulletin
+ * built on either would nag with nowhere to go.
+ */
+const isSound = (record: CardInvestmentRecord): boolean => {
+  if (isSignedCardInvestment(record)) {
+    return Number.isFinite(record.selectedAmountUsd) && record.selectedAmountUsd > 0
+  }
+  return Number.isFinite(record?.invitedAt)
+}
 
 /**
- * The card investment one account signed for and has not closed out, or null.
+ * The card investment one account opened or signed for and has not closed out, or null.
  *
  * Keyed by the account's own id, handed in by the caller, rather than by the store's
  * active-account slot: every custodial profile on a device shares that slot, and a
@@ -18,20 +25,20 @@ const hasPayableAmount = (progress: CardInvestmentProgress): boolean =>
 export const getCardInvestment = (
   state: PersistentState,
   accountId: string,
-): CardInvestmentProgress | null => {
-  const progress = state.cardInvestmentByAccountId?.[accountId]
-  return progress && hasPayableAmount(progress) ? progress : null
+): CardInvestmentRecord | null => {
+  const record = state.cardInvestmentByAccountId?.[accountId]
+  return record && isSound(record) ? record : null
 }
 
 export const withCardInvestment = (
   state: PersistentState,
   accountId: string,
-  progress: CardInvestmentProgress,
+  record: CardInvestmentRecord,
 ): PersistentState => ({
   ...state,
   cardInvestmentByAccountId: {
     ...state.cardInvestmentByAccountId,
-    [accountId]: progress,
+    [accountId]: record,
   },
 })
 

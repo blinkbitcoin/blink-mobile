@@ -8,6 +8,7 @@ import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { IconHero } from "@app/components/icon-hero"
 import { CloseHeader } from "@app/components/close-header"
 import { Screen } from "@app/components/screen"
+import { useCardInvestmentProgress } from "@app/hooks/use-card-investment-progress"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
@@ -19,6 +20,18 @@ export const WelcomeInvestScreen: React.FC = () => {
 
   const { LL } = useI18nContext()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+  const { isAccountResolved, markInvited } = useCardInvestmentProgress()
+
+  /**
+   * Opening this screen is what records the invitation, whichever way it was opened: the
+   * server's own invitation card is gone the moment it is tapped, and the home needs a
+   * record to hold a way back into the flow for an investor who leaves before signing.
+   * Recorded once the account it is filed under is known, and never over an agreement
+   * already signed.
+   */
+  React.useEffect(() => {
+    if (isAccountResolved) markInvited()
+  }, [isAccountResolved, markInvited])
 
   const handleNext = () => {
     navigation.navigate("cardOnboardingCompanyValuationScreen")

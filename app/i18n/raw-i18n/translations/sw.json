@@ -3749,6 +3749,9 @@
         "buttonText": "Sawa"
       },
       "HomeBulletin": {
+          "invited": {
+              "body": "Umealikwa kushiriki katika duru ya ufadhili ya Blink. Kwa mashabiki wa Blink pekee."
+          },
           "insufficient": {
               "title": "Salio halitoshi",
               "body": "Ili kukamilisha uwekezaji wako, weka kiasi kilichosalia."

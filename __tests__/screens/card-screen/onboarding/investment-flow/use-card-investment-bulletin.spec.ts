@@ -11,9 +11,14 @@ import {
 
 const mockClear = jest.fn()
 const mockProgress: { current: CardInvestmentProgress | null } = { current: null }
+const mockIsInvited = { current: false }
 
 jest.mock("@app/hooks/use-card-investment-progress", () => ({
-  useCardInvestmentProgress: () => ({ progress: mockProgress.current, clear: mockClear }),
+  useCardInvestmentProgress: () => ({
+    progress: mockProgress.current,
+    isInvited: mockIsInvited.current,
+    clear: mockClear,
+  }),
 }))
 
 /** Its own spec covers how the balance is measured; here only the answer matters. */
@@ -39,6 +44,7 @@ const resolve = (
 ) =>
   resolveCardInvestmentBulletin({
     progress: SIGNED,
+    isInvited: false,
     hasEnoughBalance: false,
     isSplitAcrossWallets: false,
     isFundingLoading: false,
@@ -48,8 +54,25 @@ const resolve = (
   })
 
 describe("resolveCardInvestmentBulletin", () => {
-  it("says nothing when no investment was signed", () => {
+  it("says nothing when the invitation was never opened", () => {
     expect(resolve({ progress: null })).toBeNull()
+  })
+
+  /** The way back into a flow left before signing, whatever the balance says. */
+  it("holds the invitation open until the agreement is signed", () => {
+    expect(resolve({ progress: null, isInvited: true })?.kind).toBe(
+      CardInvestmentBulletinKind.Invited,
+    )
+    expect(
+      resolve({ progress: null, isInvited: true, isFundingLoading: true })?.kind,
+    ).toBe(CardInvestmentBulletinKind.Invited)
+    expect(
+      resolve({ progress: null, isInvited: true, hasEnoughBalance: true })?.kind,
+    ).toBe(CardInvestmentBulletinKind.Invited)
+  })
+
+  it("carries no investment with the invitation", () => {
+    expect(resolve({ progress: null, isInvited: true })?.progress).toBeNull()
   })
 
   it("welcomes the investor once the investment is paid, whatever the balance", () => {
@@ -123,7 +146,19 @@ describe("useCardInvestmentBulletin", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockProgress.current = SIGNED
+    mockIsInvited.current = false
     mockUseInvestmentFunding.mockReturnValue(funding())
+  })
+
+  it("answers Invited while the invitation is open and nothing is signed", () => {
+    mockProgress.current = null
+    mockIsInvited.current = true
+
+    const { result } = renderHook(() =>
+      useCardInvestmentBulletin({ hasPendingDeposit: false }),
+    )
+
+    expect(result.current?.kind).toBe(CardInvestmentBulletinKind.Invited)
   })
 
   it("measures the balance against the amount the investor signed for", () => {

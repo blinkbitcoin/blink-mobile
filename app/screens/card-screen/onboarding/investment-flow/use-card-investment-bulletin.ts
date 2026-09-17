@@ -9,6 +9,7 @@ import { useInvestmentFunding } from "./use-investment-funding"
 
 type ResolveCardInvestmentBulletinParams = {
   progress: CardInvestmentProgress | null
+  isInvited: boolean
   hasEnoughBalance: boolean
   isSplitAcrossWallets: boolean
   isFundingLoading: boolean
@@ -18,20 +19,25 @@ type ResolveCardInvestmentBulletinParams = {
 
 /**
  * Pure so the order of precedence can be read on its own: the payment settles it, then
- * the balance, then a deposit in flight. Money already held outranks money on its way,
- * whether it sits in one wallet or is spread over both, because it is what the investor
- * can act on now. Nothing is said while the balance is unknown, since a zero mid-load
- * would nag an investor who is covered.
+ * the balance, then a deposit in flight; an invitation only speaks while nothing is
+ * signed. Money already held outranks money on its way, whether it sits in one wallet
+ * or is spread over both, because it is what the investor can act on now. Nothing is
+ * said while the balance is unknown, since a zero mid-load would nag an investor who is
+ * covered.
  */
 export const resolveCardInvestmentBulletin = ({
   progress,
+  isInvited,
   hasEnoughBalance,
   isSplitAcrossWallets,
   isFundingLoading,
   hasPendingDeposit,
   dismiss,
 }: ResolveCardInvestmentBulletinParams): CardInvestmentBulletinState | null => {
-  if (!progress) return null
+  if (!progress) {
+    if (!isInvited) return null
+    return { kind: CardInvestmentBulletinKind.Invited, progress: null, dismiss }
+  }
   if (progress.paidAt) {
     return { kind: CardInvestmentBulletinKind.Shareholder, progress, dismiss }
   }
@@ -62,7 +68,7 @@ type UseCardInvestmentBulletinParams = {
 export const useCardInvestmentBulletin = ({
   hasPendingDeposit,
 }: UseCardInvestmentBulletinParams): CardInvestmentBulletinState | null => {
-  const { progress, clear } = useCardInvestmentProgress()
+  const { progress, isInvited, clear } = useCardInvestmentProgress()
   /** Hooks cannot be skipped, so with nothing signed the balance is measured against
    *  zero and the answer discarded; the measurement is a memo over data the home
    *  already holds. */
@@ -72,6 +78,7 @@ export const useCardInvestmentBulletin = ({
 
   return resolveCardInvestmentBulletin({
     progress,
+    isInvited,
     hasEnoughBalance,
     isSplitAcrossWallets,
     isFundingLoading: isLoading,

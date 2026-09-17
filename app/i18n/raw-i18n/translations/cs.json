@@ -3749,6 +3749,9 @@
         "buttonText": "Dobře"
       },
       "HomeBulletin": {
+          "invited": {
+              "body": "Jsi pozván k účasti na investičním kole Blinku. Pouze pro fanoušky Blinku."
+          },
           "insufficient": {
               "title": "Nedostatečný zůstatek",
               "body": "Pro dokončení investice vlož zbývající částku."

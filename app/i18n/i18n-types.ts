@@ -12466,6 +12466,12 @@ type RootTranslation = {
 				buttonText: string
 			}
 			HomeBulletin: {
+				invited: {
+					/**
+					 * Y​o​u​ ​a​r​e​ ​i​n​v​i​t​e​d​ ​t​o​ ​p​a​r​t​i​c​i​p​a​t​e​ ​i​n​ ​t​h​e​ ​B​l​i​n​k​ ​f​i​n​a​n​c​i​n​g​ ​r​o​u​n​d​.​ ​F​o​r​ ​B​l​i​n​k​ ​f​a​n​s​ ​o​n​l​y​.
+					 */
+					body: string
+				}
 				insufficient: {
 					/**
 					 * I​n​s​u​f​f​i​c​i​e​n​t​ ​b​a​l​a​n​c​e
@@ -26219,6 +26225,12 @@ export type TranslationFunctions = {
 				buttonText: () => LocalizedString
 			}
 			HomeBulletin: {
+				invited: {
+					/**
+					 * You are invited to participate in the Blink financing round. For Blink fans only.
+					 */
+					body: () => LocalizedString
+				}
 				insufficient: {
 					/**
 					 * Insufficient balance

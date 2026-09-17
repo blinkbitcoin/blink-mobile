@@ -3749,6 +3749,9 @@
         "buttonText": "Tamam"
       },
       "HomeBulletin": {
+          "invited": {
+              "body": "Blink finansman turuna katılmaya davetlisin. Sadece Blink hayranları için."
+          },
           "insufficient": {
               "title": "Yetersiz bakiye",
               "body": "Yatırımını tamamlamak için kalan tutarı yatır."

@@ -3749,6 +3749,9 @@
         "buttonText": "Oke"
       },
       "HomeBulletin": {
+          "invited": {
+              "body": "Kamu diundang untuk ikut serta dalam putaran pendanaan Blink. Khusus penggemar Blink."
+          },
           "insufficient": {
               "title": "Saldo tidak mencukupi",
               "body": "Untuk menyelesaikan investasimu, setorkan sisa jumlahnya."

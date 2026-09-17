@@ -2144,7 +2144,7 @@ describe("CardInvestmentBulletin gating", () => {
     await flushEffects()
 
     expect(mockCardInvestmentBulletin).toHaveBeenCalledWith(
-      expect.objectContaining({ kind: "ready", progress: SIGNED, onDismiss: dismiss }),
+      expect.objectContaining({ bulletin: { kind: "ready", progress: SIGNED, dismiss } }),
     )
   })
 

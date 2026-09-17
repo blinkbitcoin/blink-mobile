@@ -3797,6 +3797,9 @@
                 "buttonText": "Ok"
             },
             "HomeBulletin": {
+                "invited": {
+                    "body": "Você está convidado a participar da rodada de financiamento da Blink. Somente para fãs da Blink."
+                },
                 "insufficient": {
                     "title": "Saldo insuficiente",
                     "body": "Para concluir seu investimento, deposite o valor restante."
