@@ -12,7 +12,6 @@ export {
   listAllPayments,
   listPayments,
   getUserSettings,
-  syncSelfCustodialWallet,
   getLightningAddress,
   checkLightningAddressAvailable,
   registerLightningAddress,
