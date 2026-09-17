@@ -12540,7 +12540,7 @@ type RootTranslation = {
 					 */
 					title: string
 					/**
-					 * W​e​ ​w​i​l​l​ ​l​e​t​ ​y​o​u​ ​k​n​o​w​ ​a​s​ ​s​o​o​n​ ​a​s​ ​y​o​u​r​ ​B​l​i​n​k​ ​C​a​r​d​ ​i​s​ ​r​e​a​d​y​.
+					 * W​e​ ​w​i​l​l​ ​l​e​t​ ​y​o​u​ ​k​n​o​w​ ​a​s​ ​s​o​o​n​ ​a​s​ ​y​o​u​r​ ​B​l​i​n​k​ ​V​i​s​a​ ​C​a​r​d​ ​i​s​ ​r​e​a​d​y​.
 					 */
 					body: string
 				}
@@ -26331,7 +26331,7 @@ export type TranslationFunctions = {
 					 */
 					title: () => LocalizedString
 					/**
-					 * We will let you know as soon as your Blink Card is ready.
+					 * We will let you know as soon as your Blink Visa Card is ready.
 					 */
 					body: () => LocalizedString
 				}
