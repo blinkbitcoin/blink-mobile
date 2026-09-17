@@ -17,6 +17,7 @@ const mockReportError = jest.fn()
 const mockClassifySdkError = jest.fn()
 
 jest.mock("@app/self-custodial/bridge", () => ({
+  ...jest.requireActual("@app/self-custodial/bridge"),
   initSdk: (args: unknown) => mockInitSdk(args),
   disconnectSdk: (sdk: unknown) => mockDisconnectSdk(sdk),
   getWalletInfo: (sdk: unknown) => mockGetWalletInfo(sdk),

@@ -1,5 +1,4 @@
 import {
-  ReceivePaymentMethod,
   ReceivePaymentRequest,
   type BreezSdkInterface,
   type Network,
@@ -8,7 +7,7 @@ import {
 import { reportError } from "@app/utils/error-logging"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
-import { disconnectSdk, getWalletInfo, initSdk } from "./bridge"
+import { bolt11ReceiveMethod, disconnectSdk, getWalletInfo, initSdk } from "./bridge"
 import { storageDirFor } from "./config"
 import { classifySdkError, SelfCustodialErrorCode } from "./sdk-error"
 
@@ -173,12 +172,10 @@ export const buildMigrationTransferRequest = (
       getWalletInfo(sdk),
       sdk.receivePayment(
         ReceivePaymentRequest.create({
-          paymentMethod: new ReceivePaymentMethod.Bolt11Invoice({
+          paymentMethod: bolt11ReceiveMethod({
             description: "",
             amountSats: undefined,
             expirySecs: MIGRATION_INVOICE_EXPIRY_SECONDS,
-            paymentHash: undefined,
-            receiverIdentityPublicKey: undefined,
           }),
         }),
       ),

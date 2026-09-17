@@ -14,6 +14,30 @@ const receiveError = (message: string) => ({
   errors: [{ message }] as PaymentError[],
 })
 
+type Bolt11ReceiveOptions = {
+  description: string
+  amountSats: bigint | undefined
+  expirySecs: number | undefined
+}
+
+/**
+ * Every BOLT11 invoice this app mints pays the wallet that minted it, so the
+ * receiver an invoice can name is never set, and the SDK generates the payment
+ * hash itself.
+ */
+export const bolt11ReceiveMethod = ({
+  description,
+  amountSats,
+  expirySecs,
+}: Bolt11ReceiveOptions) =>
+  new ReceivePaymentMethod.Bolt11Invoice({
+    description,
+    amountSats,
+    expirySecs,
+    paymentHash: undefined,
+    receiverIdentityPublicKey: undefined,
+  })
+
 export const createReceiveLightning = (
   sdk: BreezSdkInterface,
 ): ReceiveLightningAdapter => {
@@ -21,14 +45,10 @@ export const createReceiveLightning = (
     try {
       const response = await sdk.receivePayment(
         ReceivePaymentRequest.create({
-          paymentMethod: new ReceivePaymentMethod.Bolt11Invoice({
+          paymentMethod: bolt11ReceiveMethod({
             description: memo ?? "",
             amountSats: amount ? BigInt(amount.amount) : undefined,
             expirySecs,
-            paymentHash: undefined,
-            /** 0.23 lets an invoice name a receiver other than this wallet; ours always
-             *  receives for itself, so the field stays unset. */
-            receiverIdentityPublicKey: undefined,
           }),
         }),
       )
