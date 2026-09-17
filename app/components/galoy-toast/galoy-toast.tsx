@@ -7,10 +7,10 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon, IconNamesType } from "../atomic/galoy-icon"
 
-export const TOAST_TOP_OFFSET = 40
-export const TOAST_HORIZONTAL_INSET = 20
+const TOAST_TOP_OFFSET = 40
+const TOAST_HORIZONTAL_INSET = 20
 
-type ToastType = "success" | "error" | "warning"
+export type ToastType = "success" | "error" | "warning"
 
 const icons: Record<ToastType, IconNamesType> = {
   success: "check-circle",
@@ -24,13 +24,12 @@ const ToastRow = ({ type, text1, text2 }: ToastRowProps) => {
   const {
     theme: { colors },
   } = useTheme()
-  const styles = useStyles()
-
   const accent = {
     success: colors._green,
     error: colors.red,
     warning: colors.warning,
   }[type]
+  const styles = useStyles({ accent })
 
   return (
     // The title is not drawn, the icon and colour carry the type, so it is
@@ -40,7 +39,7 @@ const ToastRow = ({ type, text1, text2 }: ToastRowProps) => {
       accessible
       accessibilityRole="alert"
       accessibilityLabel={[text1, text2].filter(Boolean).join(". ")}
-      style={[styles.container, { borderColor: accent }]}
+      style={styles.container}
     >
       <GaloyIcon name={icons[type]} size={18} color={accent} />
       <Text style={styles.text}>{text2 || text1}</Text>
@@ -66,7 +65,7 @@ export const GaloyToast = () => {
   return <Toast config={toastConfig} topOffset={top + TOAST_TOP_OFFSET} />
 }
 
-const useStyles = makeStyles(({ colors }) => ({
+const useStyles = makeStyles(({ colors }, { accent }: { accent: string }) => ({
   container: {
     alignSelf: "stretch",
     flexDirection: "row",
@@ -77,6 +76,7 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingVertical: 14,
     borderWidth: 1,
     borderRadius: 8,
+    borderColor: accent,
     backgroundColor: colors.grey7,
   },
   text: {
