@@ -207,9 +207,15 @@ export const SignInvestScreen: React.FC = () => {
         {/* The embedded form paints its own white surface edge to edge, so without a
             gap it butts straight up against the close control. The other screens in
             the flow have their own top spacing and need none. */}
+        {/* The signing page asks the browser for the signer's location, and Android's
+            WebView answers by prompting for the system permission on every visit. The
+            location is DocuSign's optional audit extra, not something the signature
+            needs, and the account has no brand file to switch the request off, so the
+            WebView declines it before it reaches the signer. iOS has no such switch. */}
         <View style={styles.content}>
           <WebView
             {...webViewProps}
+            geolocationEnabled={false}
             style={styles.webview}
             testID="sign-invest-webview"
           />

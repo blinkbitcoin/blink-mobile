@@ -390,6 +390,17 @@ describe("SignInvestScreen", () => {
       expect(getByTestId("sign-invest-webview")).toBeTruthy()
     })
 
+    /** The signing page asks for the signer's location, which Android's WebView turns
+     *  into a system permission prompt on every visit; the signature does not need it. */
+    it("does not let the signing page ask for the signer's location", async () => {
+      mockESign.status = "signing"
+      mockESign.webViewProps = { source: { uri: TEST_INSTANCE_URL } }
+
+      const { getByTestId } = await renderScreen()
+
+      expect(getByTestId("sign-invest-webview").props.geolocationEnabled).toBe(false)
+    })
+
     it("waits on a spinner while the session is being opened", async () => {
       mockESign.status = "loading"
 
