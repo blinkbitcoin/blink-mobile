@@ -505,7 +505,17 @@ export const BottomSheet: React.FC<Props> = ({
   if (isInline) return isVisible || isLeaving ? sheet : null
 
   return (
-    <Modal visible={isVisible} transparent animationType="none" onRequestClose={onClose}>
+    // Drawn under the status and navigation bars on Android too, as on iOS. Without it the
+    // window stops above the navigation bar, and a caller padding by the root safe-area
+    // inset (`insets.bottom`, the app's convention) counts the bar twice.
+    <Modal
+      visible={isVisible}
+      transparent
+      animationType="none"
+      statusBarTranslucent
+      navigationBarTranslucent
+      onRequestClose={onClose}
+    >
       {/* Gestures inside a Modal need their own root on Android — the one in
           app.tsx does not reach into a separate window. */}
       <GestureHandlerRootView style={styles.root}>
