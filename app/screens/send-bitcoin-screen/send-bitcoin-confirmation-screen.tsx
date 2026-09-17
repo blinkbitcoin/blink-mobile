@@ -489,6 +489,8 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
             ? LL.SendBitcoinConfirmationScreen.somethingWentWrong()
             : err.message || err.toString(),
           err.message,
+          // A throw leaves the outcome unknown: the request may have landed.
+          errorMsgActionFor(err.message, "unconfirmed"),
         )
       }
     }
@@ -502,6 +504,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     navigateToCompleted,
     verifyPaymentSettled,
     translateSdkError,
+    errorMsgActionFor,
   ])
 
   let validAmount = true
