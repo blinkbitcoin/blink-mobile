@@ -367,6 +367,17 @@ describe("AppStateWrapper", () => {
       expect(refetchedOperations()).not.toContain("regionCheck")
     })
 
+    /** The restrictions verdict retries in one bounded burst; the return to the
+     *  foreground is one of the two paths that ask again once the burst is spent. */
+    it("re-asks for the account's restrictions when a signed-in user returns", async () => {
+      renderWrapper()
+      await flushEffects()
+
+      await leaveAndReturn(1)
+
+      expect(refetchedOperations()).toContain("custodialRestrictions")
+    })
+
     it("refetches nothing account-bound for a signed-out user", async () => {
       mockIsAuthed = false
       renderWrapper()

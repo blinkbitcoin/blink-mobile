@@ -92,14 +92,22 @@ const scriptedLink = new ApolloLink(
     }),
 )
 
+type RenderOptions = {
+  queryDeduplication?: boolean
+  /** Stands for the cache a previous session persisted and this launch restored. */
+  cache?: InMemoryCache
+}
+
+const createClient = (queryDeduplication: boolean, cache: InMemoryCache) =>
+  new ApolloClient({ link: scriptedLink, cache, queryDeduplication })
+
 /** Deduplication off keeps a stale request apart from the next one for the same query, so
  *  the two can come back independently. */
-const renderVerdict = ({ queryDeduplication = true } = {}) => {
-  const client = new ApolloClient({
-    link: scriptedLink,
-    cache: new InMemoryCache(),
-    queryDeduplication,
-  })
+const renderVerdict = ({
+  queryDeduplication = true,
+  cache = new InMemoryCache(),
+}: RenderOptions = {}) => {
+  let client = createClient(queryDeduplication, cache)
   const seenStatuses: RestrictionVerdictStatus[] = []
   const wrapper = ({ children }: { children: React.ReactNode }) => (
     <ApolloProvider client={client}>
@@ -114,7 +122,15 @@ const renderVerdict = ({ queryDeduplication = true } = {}) => {
     },
     { wrapper },
   )
-  return { ...rendered, client, seenStatuses }
+  /** What login and logout really do: GaloyClient builds a new client, with a cache of
+   *  its own, under the same mounted provider. */
+  const swapClient = () => {
+    client = createClient(queryDeduplication, new InMemoryCache())
+    rendered.rerender({})
+  }
+  /** Read, never captured: after a swap the client the provider uses is a different one. */
+  const getClient = () => client
+  return { ...rendered, getClient, seenStatuses, swapClient }
 }
 
 /** The same re-ask the app issues on returning to the foreground. */
@@ -225,12 +241,39 @@ describe("CustodialRestrictionsProvider", () => {
       expect(requestCount).toBe(1)
     })
 
+    /** The cache is restored from the previous session on launch, and the verdict follows
+     *  the account's current standing, so a cached answer must never stand in for the
+     *  server's. */
+    it("asks the server rather than reading a verdict a previous session cached", async () => {
+      const cache = new InMemoryCache()
+      cache.writeQuery({
+        query: CustodialRestrictionsDocument,
+        data: {
+          custodialRestrictions: {
+            __typename: "CustodialRestrictions",
+            dollarBalance: true,
+            transfer: true,
+          },
+        },
+      })
+      replies = [answer(false, false)]
+
+      const { result } = renderVerdict({ cache })
+      await flushEffects()
+
+      expect(requestCount).toBe(1)
+      expect(result.current.verdict).toEqual({
+        status: RestrictionVerdictStatus.Served,
+        restrictions: { dollarBalance: false, transfer: false },
+      })
+    })
+
     it("keeps a served verdict when a later request fails, without retrying it", async () => {
       replies = [answer(false, false), dropRequest]
 
-      const { result, client } = renderVerdict()
+      const { result, getClient } = renderVerdict()
       await flushEffects()
-      await act(() => refetchOnForeground(client))
+      await act(() => refetchOnForeground(getClient()))
       await advance(60_000)
 
       expect(requestCount).toBe(2)
@@ -329,10 +372,10 @@ describe("CustodialRestrictionsProvider", () => {
     it("reports Unknown once, however long it lasts", async () => {
       replies = [dropRequest, dropRequest, dropRequest, dropRequest, refuseRequest]
 
-      const { client } = renderVerdict()
+      const { getClient } = renderVerdict()
       await flushEffects()
       await failThreeRetries()
-      await act(() => refetchOnForeground(client))
+      await act(() => refetchOnForeground(getClient()))
 
       expect(requestCount).toBe(5)
       expect(mockLogError).toHaveBeenCalledTimes(1)
@@ -372,13 +415,13 @@ describe("CustodialRestrictionsProvider", () => {
     it("takes the answer the next foreground brings after Unknown", async () => {
       replies = [dropRequest, dropRequest, dropRequest, dropRequest, answer(false, true)]
 
-      const { result, client } = renderVerdict()
+      const { result, getClient } = renderVerdict()
       await flushEffects()
       await failThreeRetries()
 
       expect(result.current.verdict).toEqual({ status: RestrictionVerdictStatus.Unknown })
 
-      await act(() => refetchOnForeground(client))
+      await act(() => refetchOnForeground(getClient()))
 
       expect(result.current.verdict).toEqual({
         status: RestrictionVerdictStatus.Served,
@@ -442,6 +485,51 @@ describe("CustodialRestrictionsProvider", () => {
     })
   })
 
+  describe("a new client for a new session", () => {
+    it("asks afresh, with a full retry budget, after Unknown", async () => {
+      replies = [dropRequest, dropRequest, dropRequest, dropRequest]
+
+      const { result, swapClient } = renderVerdict()
+      await flushEffects()
+      await failThreeRetries()
+
+      expect(result.current.verdict).toEqual({ status: RestrictionVerdictStatus.Unknown })
+
+      replies = [dropRequest, dropRequest, dropRequest, answer(false, true)]
+      swapClient()
+      await flushEffects()
+      await failThreeRetries()
+
+      expect(requestCount).toBe(8)
+      expect(result.current.verdict).toEqual({
+        status: RestrictionVerdictStatus.Served,
+        restrictions: { dollarBalance: false, transfer: true },
+      })
+    })
+
+    it("does not carry a served verdict onto a client whose first request fails", async () => {
+      replies = [answer(true, true), dropRequest, holdRequest]
+
+      const { result, seenStatuses, swapClient } = renderVerdict()
+      await flushEffects()
+
+      expect(result.current.verdict).toMatchObject({
+        status: RestrictionVerdictStatus.Served,
+      })
+
+      const seenBeforeSwap = seenStatuses.length
+      swapClient()
+      await flushEffects()
+      await advance(1000)
+
+      expect(requestCount).toBe(3)
+      expect(seenStatuses.slice(seenBeforeSwap)).not.toContain(
+        RestrictionVerdictStatus.Served,
+      )
+      expect(result.current.verdict).toEqual({ status: RestrictionVerdictStatus.Pending })
+    })
+  })
+
   describe("refetch", () => {
     it("asks again at once and takes the new verdict", async () => {
       replies = [answer(true, true), answer(false, false)]
@@ -476,6 +564,48 @@ describe("CustodialRestrictionsProvider", () => {
       await act(async () => {
         await expect(result.current.refetch()).resolves.toBeUndefined()
       })
+    })
+
+    it("settles Served on a pull that succeeds mid-backoff and cancels the retries", async () => {
+      replies = [dropRequest, answer(false, false)]
+
+      const { result } = renderVerdict()
+      await flushEffects()
+      await advance(500)
+      await act(() => result.current.refetch())
+
+      expect(requestCount).toBe(2)
+      expect(result.current.verdict).toEqual({
+        status: RestrictionVerdictStatus.Served,
+        restrictions: { dollarBalance: false, transfer: false },
+      })
+
+      await advance(60_000)
+
+      expect(requestCount).toBe(2)
+    })
+
+    it("neither spends nor cancels a retry on a pull that fails mid-backoff", async () => {
+      replies = [dropRequest, dropRequest, dropRequest, dropRequest, dropRequest]
+
+      const { result } = renderVerdict()
+      await flushEffects()
+      await advance(500)
+      await act(() => result.current.refetch())
+
+      expect(requestCount).toBe(2)
+      expect(result.current.verdict).toEqual({ status: RestrictionVerdictStatus.Pending })
+
+      /** The first retry fires when it was always going to, half a second on. */
+      await advance(500)
+
+      expect(requestCount).toBe(3)
+
+      await advance(2000)
+      await advance(4000)
+
+      expect(requestCount).toBe(5)
+      expect(result.current.verdict).toEqual({ status: RestrictionVerdictStatus.Unknown })
     })
   })
 })
