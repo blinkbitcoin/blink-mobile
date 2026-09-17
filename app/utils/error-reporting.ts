@@ -34,6 +34,8 @@ import {
  *    starting is exactly what must not leave it, on this launch or after a later switch.
  *  - `permitted` — transmitted, and the held buffer is released first.
  *
+ * Automatic crash collection follows the same disposition — see `applyCrashCollection`.
+ *
  * Dedup keys follow the `<area>-<what>` convention (e.g. `spark-token-decimals-missing`).
  */
 
@@ -134,12 +136,74 @@ export const recordAppError = (error: Error, options?: RecordAppErrorOptions): v
  * belong to an incognito wallet, whatever mode it is switched to later.
  */
 onDiagnosticsDispositionChanged((disposition) => {
+  applyCrashCollection(disposition)
   if (disposition === DiagnosticsDisposition.Unresolved) return
   const held = heldWhileUnresolved
   heldWhileUnresolved = []
   if (disposition === DiagnosticsDisposition.Denied) return
   for (const { error, options } of held) transmit(error, options)
 })
+
+/**
+ * Whether the SDK was collecting when this process started, read once and before this
+ * session writes anything: the SDK's own getter follows the last `set` in a session, and
+ * what matters here is the state the native side actually initialised with.
+ */
+let collectedAtLaunch: boolean | null = null
+
+const wasCollectingAtLaunch = (): boolean => {
+  if (collectedAtLaunch === null) {
+    try {
+      collectedAtLaunch = crashlytics().isCrashlyticsCollectionEnabled
+    } catch {
+      collectedAtLaunch = false
+    }
+  }
+  return collectedAtLaunch
+}
+
+/**
+ * Automatic crash collection under the same rule as the explicit paths (AD-13, NFR-P1;
+ * the third review's MEDIUM). A fatal crash report carries the same installation id a
+ * non-fatal does, so gating one and not the other would leave the larger channel open.
+ *
+ * What the SDK allows shapes how the rule is enforced. `setCrashlyticsCollectionEnabled`
+ * persists a preference that the native init provider applies at the *next* launch; it
+ * does not change the running process (verified against
+ * `@react-native-firebase/crashlytics@23.3.1`, where the JS call writes the preference
+ * and nothing else). So the rule holds across launches rather than within one:
+ *
+ *  - `permitted` writes the preference true; `denied` writes it false. `unresolved`
+ *    writes nothing: it is the start of every launch, and the previous session's answer
+ *    stands until this one has its own.
+ *  - A crash ends its session, so the preference at the next launch is the disposition
+ *    the crash happened under. Permitted: collection is on at init and the SDK uploads
+ *    the report before any JavaScript runs. Denied: collection is off at init, the SDK
+ *    holds the report on disk, and the first disposition of the new session — whichever
+ *    it is — deletes it, because a report the SDK held back was recorded under a denial.
+ *  - Fresh installs start off (`firebase.json`), so a device that has never resolved a
+ *    disposition records nothing.
+ *
+ * Residuals, stated: a crash in a session that never resolved, on a device whose previous
+ * session was permitted, is uploaded under that session's disposition; and a custodial
+ * device's very first session records no crashes, since the preference that turns
+ * collection on is written during it and applied after it.
+ *
+ * Nothing here may throw: a missing native module at start-up is a real failure mode, and
+ * the disposition update this rides on must complete regardless.
+ */
+const applyCrashCollection = (disposition: DiagnosticsDisposition): void => {
+  if (disposition === DiagnosticsDisposition.Unresolved) return
+  try {
+    const collecting = wasCollectingAtLaunch()
+    const client = crashlytics()
+    const permitted = disposition === DiagnosticsDisposition.Permitted
+    client.setCrashlyticsCollectionEnabled(permitted).catch(() => undefined)
+    if (!collecting) client.deleteUnsentReports().catch(() => undefined)
+  } catch (err) {
+    if (__DEV__) console.warn("[error-reporting] crash collection not applied", err)
+  }
+}
 
 /**
  * A breadcrumb, under the same rule. Code that used to call `crashlytics().log()`
@@ -167,4 +231,5 @@ export const crashForTesting = (): void => {
 export const resetErrorReportingForTesting = (): void => {
   recordedDedupKeys.clear()
   heldWhileUnresolved = []
+  collectedAtLaunch = null
 }

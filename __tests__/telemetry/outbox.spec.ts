@@ -28,6 +28,7 @@ import {
   setActiveOutbox,
 } from "@app/telemetry/index"
 import {
+  isDrainPermitted,
   onTelemetrySuppressed,
   resetTelemetryModeForTesting,
   resolveTelemetryMode,
@@ -113,6 +114,11 @@ const transportReturning = (result: SubmitResult | (() => SubmitResult)) => {
 }
 
 const acked = (): SubmitResult => ({ kind: "acknowledged", ackedAt: Date.now() })
+/** One macrotask, so a held submit has been reached before the test moves the mode. */
+const settled = (): Promise<void> =>
+  new Promise((resolve) => {
+    setImmediate(resolve)
+  })
 const instantly = { delay: () => Promise.resolve() }
 
 const resetEverything = () => {
@@ -276,11 +282,54 @@ describe("the telemetry outbox", () => {
       write.mockRestore()
 
       // No marker on disk, and the records are still there — but the store remembers.
-      expect(await store.hasPendingDiscard()).toBe(false)
+      expect(mockFs.__mockFilePaths()).not.toContain(`${DIR}/.discard`)
+      expect(await store.hasPendingDiscard()).toBe(true)
       await expect(store.pending()).rejects.toThrow("did not finish")
       unlink.mockRestore()
 
       expect(await store.pending()).toEqual([])
+    })
+
+    /**
+     * The third review's MEDIUM: the discard's signals must exist before its first
+     * filesystem call can fail, or a failure there leaves the pre-suppression records
+     * readable by the next grant.
+     */
+    it("discards even when the directory's first exists() rejects", async () => {
+      const store = createOutboxStore(DIR)
+      await store.enqueue(record())
+      const exists = jest.spyOn(RNFS, "exists").mockRejectedValueOnce(new Error("EIO"))
+
+      await store.discardAll()
+      exists.mockRestore()
+
+      expect(await store.pending()).toEqual([])
+      expect(await store.hasPendingDiscard()).toBe(false)
+    })
+
+    it("discards even when the directory cannot be enumerated", async () => {
+      const store = createOutboxStore(DIR)
+      await store.enqueue(record())
+      const readDir = jest.spyOn(RNFS, "readDir").mockRejectedValue(new Error("EIO"))
+
+      await store.discardAll()
+      readDir.mockRestore()
+
+      expect(await store.pending()).toEqual([])
+      expect(getOutboxCounters().discarded).toBe(0) // uncountable, but gone
+    })
+
+    it("keeps the owed signal when the filesystem fails throughout, and finishes on the next read", async () => {
+      const store = createOutboxStore(DIR)
+      await store.enqueue(record())
+      const exists = jest.spyOn(RNFS, "exists").mockRejectedValue(new Error("EIO"))
+
+      await expect(store.discardAll()).rejects.toThrow()
+      expect(await store.hasPendingDiscard()).toBe(true)
+      exists.mockRestore()
+
+      expect(await store.pending()).toEqual([])
+      expect(await store.hasPendingDiscard()).toBe(false)
     })
 
     it("does not drain what a failed discard left behind, even under Enhanced", async () => {
@@ -350,7 +399,7 @@ describe("the telemetry outbox", () => {
       const store = createOutboxStore(DIR)
       const first = record({ sdkPaymentId: "sdk-replayed" })
       await store.enqueue(first)
-      await store.acknowledge(first)
+      await store.acknowledge(first, store.lease())
       expect(await store.pending()).toEqual([])
 
       await store.enqueue(record({ sdkPaymentId: "sdk-replayed" }))
@@ -363,7 +412,7 @@ describe("the telemetry outbox", () => {
       const first = record({ sdkPaymentId: "sdk-replayed-later" })
       const before = createOutboxStore(DIR)
       await before.enqueue(first)
-      await before.acknowledge(first)
+      await before.acknowledge(first, before.lease())
 
       const after = createOutboxStore(DIR)
       await after.enqueue(record({ sdkPaymentId: "sdk-replayed-later" }))
@@ -379,7 +428,7 @@ describe("the telemetry outbox", () => {
       await store.enqueue(first)
       const unlink = jest.spyOn(RNFS, "unlink").mockRejectedValue(new Error("EIO"))
 
-      await store.acknowledge(first)
+      await store.acknowledge(first, store.lease())
       unlink.mockRestore()
 
       const paths = mockFs.__mockFilePaths().filter((path) => path.startsWith(DIR))
@@ -392,7 +441,7 @@ describe("the telemetry outbox", () => {
       const before = createOutboxStore(DIR)
       await before.enqueue(first)
       const unlink = jest.spyOn(RNFS, "unlink").mockRejectedValue(new Error("EIO"))
-      await before.acknowledge(first)
+      await before.acknowledge(first, before.lease())
       unlink.mockRestore()
 
       // The process died; the store is recreated. The record file is still there.
@@ -417,7 +466,7 @@ describe("the telemetry outbox", () => {
             : realWrite(path, ...rest),
         )
 
-      await expect(store.acknowledge(first)).rejects.toThrow("ENOSPC")
+      await expect(store.acknowledge(first, store.lease())).rejects.toThrow("ENOSPC")
       write.mockRestore()
 
       // Still queued under its original id; a replay is deduplicated against it.
@@ -436,7 +485,10 @@ describe("the telemetry outbox", () => {
       await one.enqueue(a)
       await two.enqueue(b)
 
-      await Promise.all([one.acknowledge(a), two.acknowledge(b)])
+      await Promise.all([
+        one.acknowledge(a, one.lease()),
+        two.acknowledge(b, two.lease()),
+      ])
 
       await one.enqueue(record({ sdkPaymentId: "sdk-instance-a" }))
       await two.enqueue(record({ sdkPaymentId: "sdk-instance-b" }))
@@ -448,7 +500,7 @@ describe("the telemetry outbox", () => {
       const store = createOutboxStore(DIR)
       const first = record({ sdkPaymentId: "sdk-ancient" })
       await store.enqueue(first)
-      await store.acknowledge(first)
+      await store.acknowledge(first, store.lease())
       const clock = jest
         .spyOn(Date, "now")
         .mockReturnValue(Date.now() + OUTBOX_TTL_MS + 1_000)
@@ -538,7 +590,7 @@ describe("the telemetry outbox", () => {
       const store = createOutboxStore(DIR)
       const original = record()
       await store.enqueue(original)
-      await store.markSubmitted(original)
+      await store.markSubmitted(original, store.lease())
 
       const [recovered] = await createOutboxStore(DIR).pending()
       expect(recovered.telemetryEventId).toBe(original.telemetryEventId)
@@ -568,6 +620,14 @@ describe("the telemetry outbox", () => {
       expect(transport.ackSemantics).toBe("application")
       expect(transport.attachesNoImplicitIdentity).toBe(true)
     })
+  })
+})
+
+describe("the telemetry outbox — the drain", () => {
+  beforeEach(resetEverything)
+
+  afterEach(() => {
+    setActiveOutbox(null)
   })
 
   describe("the drain", () => {
@@ -847,9 +907,10 @@ describe("the telemetry outbox", () => {
 
         const store = {
           ...base,
-          markSubmitted: async (r: OutboxRecord) => {
-            await base.markSubmitted(r)
+          markSubmitted: async (r: OutboxRecord, lease: number) => {
+            const applied = await base.markSubmitted(r, lease)
             resolveTelemetryMode(TelemetryMode.Anon)
+            return applied
           },
         }
 
@@ -876,6 +937,179 @@ describe("the telemetry outbox", () => {
         await drainOutbox(store, instantly)
 
         expect(submit).toHaveBeenCalledTimes(1)
+      })
+    })
+
+    describe("a result that arrives after the queue it came from was discarded", () => {
+      /**
+       * The third review's HIGH. The submit is held open; the mode switches to incognito
+       * and the discard runs to completion; only then does the transport answer. Whatever
+       * it answers, nothing may be written: not the record (`retryable`), not its loss
+       * (`rejected`), not its tombstone (`acknowledged`, `handed_off`). Any of those
+       * would recreate the directory, and a later grant would drain what the switch
+       * destroyed (FR-5).
+       */
+      const results: Record<string, () => SubmitResult> = {
+        retryable: () => ({ kind: "retryable" }),
+        rejected: () => ({ kind: "rejected", reason: "schema" }),
+        acknowledged: acked,
+        handed_off: () => ({ kind: "handed_off" }),
+      }
+
+      const holdSubmit = () => {
+        let answer: (result: SubmitResult) => void = () => undefined
+        const submit = jest.fn(
+          () =>
+            new Promise<SubmitResult>((resolve) => {
+              answer = resolve
+            }),
+        )
+        registerTelemetryTransport({
+          name: "test",
+          ackSemantics: "application",
+          attachesNoImplicitIdentity: true,
+          submit,
+        })
+        return { submit, answer: (result: SubmitResult) => answer(result) }
+      }
+
+      const filesUnder = () =>
+        mockFs.__mockFilePaths().filter((path) => path.startsWith(DIR))
+
+      it.each(Object.keys(results))(
+        "writes nothing back on a %s that lands after Enhanced → Anon discarded the queue",
+        async (kind) => {
+          const store = createOutboxStore(DIR)
+          const { submit, answer } = holdSubmit()
+          await resolveTelemetryMode(TelemetryMode.Enhanced)
+          const original = record({ sdkPaymentId: "sdk-in-flight" })
+          await store.enqueue(original)
+          onTelemetrySuppressed(() => store.discardAll())
+
+          const drain = drainOutbox(store, instantly)
+          await settled()
+          expect(submit).toHaveBeenCalledTimes(1)
+
+          await resolveTelemetryMode(TelemetryMode.Anon) // the discard has completed
+          expect(filesUnder()).toEqual([])
+          answer(results[kind]())
+          await drain
+
+          expect(await store.pending()).toEqual([])
+          expect(filesUnder()).toEqual([])
+          expect(getOutboxCounters().staleWrites).toBeGreaterThanOrEqual(1)
+        },
+      )
+
+      it.each(Object.keys(results))(
+        "writes nothing back on a %s even when the mode is Enhanced again by the time it lands",
+        async (kind) => {
+          // A mode check alone cannot catch this: Enhanced → Anon → Enhanced has completed
+          // and the current mode says yes. The generation says no.
+          const store = createOutboxStore(DIR)
+          const { submit, answer } = holdSubmit()
+          await resolveTelemetryMode(TelemetryMode.Enhanced)
+          await store.enqueue(record({ sdkPaymentId: "sdk-in-flight" }))
+          onTelemetrySuppressed(() => store.discardAll())
+
+          const drain = drainOutbox(store, instantly)
+          await settled()
+          expect(submit).toHaveBeenCalledTimes(1)
+
+          await resolveTelemetryMode(TelemetryMode.Anon)
+          await resolveTelemetryMode(TelemetryMode.Enhanced)
+          expect(isDrainPermitted()).toBe(true)
+          answer(results[kind]())
+          await drain
+
+          expect(await store.pending()).toEqual([])
+          expect(filesUnder()).toEqual([])
+        },
+      )
+
+      it("does not mark the next record submitted either — the loop stops", async () => {
+        const store = createOutboxStore(DIR)
+        const { submit, answer } = holdSubmit()
+        await resolveTelemetryMode(TelemetryMode.Enhanced)
+        await enqueueAll(store, 3)
+        onTelemetrySuppressed(() => store.discardAll())
+
+        const drain = drainOutbox(store, instantly)
+        await settled()
+        await resolveTelemetryMode(TelemetryMode.Anon)
+        await resolveTelemetryMode(TelemetryMode.Enhanced)
+        answer(acked())
+        await drain
+
+        expect(submit).toHaveBeenCalledTimes(1)
+        expect(filesUnder()).toEqual([])
+      })
+
+      it("takes its lease before the read, so a discard between the two leaves the lease stale", async () => {
+        // The store hands back the records and *then* a discard is requested — the
+        // window between `lease()` and `pending()` resolving. The records are real, the
+        // queue they came from is already condemned, and nothing may be written back.
+        const base = createOutboxStore(DIR)
+        const submit = transportReturning(acked)
+        await resolveTelemetryMode(TelemetryMode.Enhanced)
+        await base.enqueue(record())
+        const store = {
+          ...base,
+          pending: async () => {
+            const records = await base.pending()
+            base.discardAll().catch(() => undefined)
+            return records
+          },
+        }
+
+        await drainOutbox(store, instantly)
+
+        // Not submitted either: a record whose queue was condemned before it was marked
+        // is a withheld event, and sending it is the flush FR-5 forbids.
+        expect(submit).not.toHaveBeenCalled()
+        expect(filesUnder()).toEqual([])
+        expect(getOutboxCounters().staleWrites).toBeGreaterThanOrEqual(1)
+      })
+
+      it("does not let a stale retryable's backoff delay the successor queue", async () => {
+        const store = createOutboxStore(DIR)
+        const { submit, answer } = holdSubmit()
+        await resolveTelemetryMode(TelemetryMode.Enhanced)
+        await store.enqueue(record({ sdkPaymentId: "sdk-first-queue" }))
+        onTelemetrySuppressed(() => store.discardAll())
+
+        const drain = drainOutbox(store, instantly)
+        await settled()
+        await resolveTelemetryMode(TelemetryMode.Anon)
+        await resolveTelemetryMode(TelemetryMode.Enhanced)
+        answer({ kind: "retryable", retryAfterMs: 60_000 })
+        await drain
+
+        // A new queue under the new grant drains at once; the old queue's "not now" was
+        // never applied, so neither is its backoff.
+        submit.mockImplementation(() => Promise.resolve(acked()))
+        await store.enqueue(record({ sdkPaymentId: "sdk-second-queue" }))
+        await drainOutbox(store, instantly)
+
+        expect(submit).toHaveBeenCalledTimes(2)
+        expect(await store.pending()).toEqual([])
+      })
+
+      it("still applies a result whose queue was not discarded (anchor)", async () => {
+        const store = createOutboxStore(DIR)
+        const { submit, answer } = holdSubmit()
+        await resolveTelemetryMode(TelemetryMode.Enhanced)
+        await store.enqueue(record({ sdkPaymentId: "sdk-in-flight" }))
+
+        const drain = drainOutbox(store, instantly)
+        await settled()
+        expect(submit).toHaveBeenCalledTimes(1)
+        answer({ kind: "retryable" })
+        await drain
+
+        const [pending] = await store.pending()
+        expect(pending.state).toBe(OutboxState.Queued)
+        expect(getOutboxCounters().staleWrites).toBe(0)
       })
     })
   })

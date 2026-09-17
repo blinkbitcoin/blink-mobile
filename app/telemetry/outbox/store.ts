@@ -59,6 +59,8 @@ export type LossCounters = {
 const EMPTY_LOSS: LossCounters = { expired: 0, evicted: 0, rejected: 0, parseFailed: 0 }
 
 const counters = {
+  /** Writes refused because a discard had run since the drain read the queue (AD-26). */
+  staleWrites: 0,
   enqueued: 0,
   deduplicated: 0,
   evicted: 0,
@@ -83,17 +85,37 @@ const queueByDirectory = new Map<string, Promise<unknown>>()
 
 /** Directories with a discard begun in this process and not yet verified finished. The
  *  on-disk marker is the signal that survives a restart; this is the one that survives a
- *  marker that could not be written. */
+ *  marker that could not be written. Entered synchronously, the moment a discard is
+ *  asked for, before any filesystem operation can fail. */
 const discardOwed = new Set<string>()
 
-/** Counters and the per-directory module state — the serial queues and the owed
- *  discards — so a suite that resets the mock disk starts from nothing on this side too. */
+/**
+ * The queue's generation, per directory: bumped synchronously by every discard. A drain
+ * takes a lease on it before it reads the queue and presents the lease with every write
+ * that follows; a write whose lease is stale is refused. This is what stops a transport
+ * result that was in flight while the mode switched — and while the discard ran to
+ * completion — from writing the record, its loss or its tombstone into the successor of
+ * a queue that no longer exists (the third review's HIGH). A mode check cannot do this
+ * job: Enhanced → Anon → Enhanced can complete before the response returns, and the
+ * current mode then says yes.
+ */
+const generationByDirectory = new Map<string, number>()
+
+export type OutboxLease = number
+
+const generationOf = (directory: string): number =>
+  generationByDirectory.get(directory) ?? 0
+
+/** Counters and the per-directory module state — the serial queues, the owed discards
+ *  and the generations — so a suite that resets the mock disk starts from nothing on
+ *  this side too. */
 export const resetOutboxCountersForTesting = (): void => {
   for (const key of Object.keys(counters) as (keyof typeof counters)[]) {
     counters[key] = 0
   }
   queueByDirectory.clear()
   discardOwed.clear()
+  generationByDirectory.clear()
 }
 
 const bump = (key: keyof typeof counters, by = 1): void => {
@@ -106,17 +128,25 @@ export type OutboxStore = {
   /** Everything still deliverable, expired and unreadable records swept out first. */
   pending: () => Promise<OutboxRecord[]>
   depth: () => Promise<number>
-  markSubmitted: (record: OutboxRecord) => Promise<void>
-  acknowledge: (record: OutboxRecord) => Promise<void>
-  reject: (record: OutboxRecord) => Promise<void>
-  requeue: (record: OutboxRecord) => Promise<void>
+  /**
+   * A lease on the queue as it is right now, taken *before* `pending()` so a discard
+   * that lands between the two leaves the lease stale rather than the read fresh. Every
+   * write below that follows a read presents it, and resolves `false` — nothing written —
+   * when a discard has run since.
+   */
+  lease: () => OutboxLease
+  markSubmitted: (record: OutboxRecord, lease: OutboxLease) => Promise<boolean>
+  acknowledge: (record: OutboxRecord, lease: OutboxLease) => Promise<boolean>
+  reject: (record: OutboxRecord, lease: OutboxLease) => Promise<boolean>
+  requeue: (record: OutboxRecord, lease: OutboxLease) => Promise<boolean>
   /** The loss not yet carried off the device by a `telemetry_loss_reported` (AD-31). */
   unreportedLoss: () => Promise<LossCounters>
   /** Called once the report carrying `reported` is acknowledged. */
-  settleReportedLoss: (reported: LossCounters) => Promise<void>
-  /** FR-5. Idempotent: safe to re-run on activation after a half-finished delete. */
+  settleReportedLoss: (reported: LossCounters, lease: OutboxLease) => Promise<boolean>
+  /** FR-5. Idempotent: safe to re-run on activation after a half-finished delete. The
+   *  queue's generation moves the instant this is called, before anything touches disk. */
   discardAll: () => Promise<void>
-  /** AD-26: a `.discard` marker survived the last discard, so it did not finish. */
+  /** AD-26: a discard begun here or in a previous run did not finish. */
   hasPendingDiscard: () => Promise<boolean>
 }
 
@@ -306,8 +336,20 @@ export const createOutboxStore = (directory: string): OutboxStore => {
    */
   const finishPendingDiscard = async (): Promise<void> => {
     if (!discardOwed.has(directory) && !(await RNFS.exists(markerPath))) return
+    const stored = await countForDiscard()
     await unlinkDirectory()
     discardOwed.delete(directory)
+    bump("discarded", stored)
+  }
+
+  /** Best effort, for the health counter only: a directory that cannot be enumerated is
+   *  still discarded. */
+  const countForDiscard = async (): Promise<number> => {
+    try {
+      return (await readAll(directory)).length
+    } catch {
+      return 0
+    }
   }
 
   const sweep = async (): Promise<StoredRecord[]> => {
@@ -377,26 +419,43 @@ export const createOutboxStore = (directory: string): OutboxStore => {
   }
 
   /**
-   * FR-5, made re-runnable (AD-26). The marker is written first, so a discard that dies
-   * halfway is recognisable on the next activation — and by every read in between — and
-   * is run again before anything else touches the queue. Nothing to discard is not a
-   * failure; a directory that survives the unlink is, and the error carries the marker
-   * with it for the next attempt.
+   * FR-5, made re-runnable (AD-26). The signals come first and the filesystem second:
+   * the generation and the owed set move synchronously in the caller (see `discardAll`
+   * below), the durable marker is written before anything is enumerated, and only then
+   * is the directory counted — best effort — and unlinked. A read that fails before the
+   * signal existed would otherwise leave nothing to say a discard was ever due, and the
+   * next grant would drain the records the switch required destroyed (the third review's
+   * MEDIUM). Nothing to discard is not a failure; a directory that survives the unlink
+   * is, and the error carries the marker and the owed entry with it for the next attempt.
    */
-  const discardAll = async (): Promise<void> => {
-    if (!(await RNFS.exists(directory))) return
-    const stored = await readAll(directory)
-    discardOwed.add(directory)
+  const runDiscard = async (): Promise<void> => {
+    if (!(await RNFS.exists(directory).catch(() => true))) {
+      discardOwed.delete(directory)
+      return
+    }
     try {
       await RNFS.writeFile(markerPath, String(Date.now()), "utf8")
     } catch {
       /** A marker that cannot be written must not stop the unlink; the in-memory owed
        *  set covers this process, and the mode itself covers the next launch. */
     }
+    const stored = await countForDiscard()
     await unlinkDirectory()
     discardOwed.delete(directory)
-    bump("discarded", stored.length)
+    bump("discarded", stored)
   }
+
+  /** Refuses a write whose lease predates a discard. Nothing is written; the caller
+   *  learns the queue it was working from is gone. */
+  const leased = (lease: OutboxLease, run: () => Promise<void>): Promise<boolean> =>
+    serialise(async () => {
+      if (lease !== generationOf(directory)) {
+        bump("staleWrites")
+        return false
+      }
+      await run()
+      return true
+    })
 
   return {
     directory,
@@ -411,24 +470,28 @@ export const createOutboxStore = (directory: string): OutboxStore => {
         return (await readAll(directory)).length
       }),
 
-    markSubmitted: (record) => serialise(() => transition(record, OutboxState.Submitted)),
+    lease: () => generationOf(directory),
 
-    requeue: (record) => serialise(() => transition(record, OutboxState.Queued)),
+    markSubmitted: (record, lease) =>
+      leased(lease, () => transition(record, OutboxState.Submitted)),
+
+    requeue: (record, lease) =>
+      leased(lease, () => transition(record, OutboxState.Queued)),
 
     /** Tombstone first, file second. The other order has a window — a crash between the
      *  two — in which neither survives, and the SDK's next replay mints a second
      *  `telemetry_event_id` for a settlement already delivered. This order's window leaves
      *  both, and the sweep removes the file without resubmitting it. */
-    acknowledge: (record) =>
-      serialise(async () => {
+    acknowledge: (record, lease) =>
+      leased(lease, async () => {
         if (record.sdkPaymentId !== null)
           await addTombstone(directory, record.sdkPaymentId)
         await remove(fileFor(directory, record))
         bump("acknowledged")
       }),
 
-    reject: (record) =>
-      serialise(async () => {
+    reject: (record, lease) =>
+      leased(lease, async () => {
         await remove(fileFor(directory, record))
         bump("rejected")
         await addLoss(directory, "rejected", 1)
@@ -436,8 +499,8 @@ export const createOutboxStore = (directory: string): OutboxStore => {
 
     unreportedLoss: () => serialise(() => readLoss(directory)),
 
-    settleReportedLoss: (reported) =>
-      serialise(async () => {
+    settleReportedLoss: (reported, lease) =>
+      leased(lease, async () => {
         const loss = await readLoss(directory)
         await writeLoss(directory, {
           expired: Math.max(0, loss.expired - reported.expired),
@@ -447,8 +510,15 @@ export const createOutboxStore = (directory: string): OutboxStore => {
         })
       }),
 
-    discardAll: () => serialise(discardAll),
+    discardAll: () => {
+      /** Synchronous, ahead of the serialised body and of any filesystem call: from this
+       *  instant every outstanding lease is stale and every read owes the discard. */
+      generationByDirectory.set(directory, generationOf(directory) + 1)
+      discardOwed.add(directory)
+      return serialise(runDiscard)
+    },
 
-    hasPendingDiscard: () => serialise(() => RNFS.exists(markerPath)),
+    hasPendingDiscard: () =>
+      serialise(async () => discardOwed.has(directory) || RNFS.exists(markerPath)),
   }
 }

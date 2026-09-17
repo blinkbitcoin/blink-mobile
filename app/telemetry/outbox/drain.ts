@@ -123,6 +123,17 @@ const runDrain = async (
     if (hasAnyLoss(loss) && !alreadyQueued) reportLoss(loss)
   }
 
+  /**
+   * The lease is taken before the read, so a discard landing between the two leaves the
+   * lease stale rather than the read fresh. Every write from here on presents it. A
+   * transport result that arrives after a discard — the mode switched while the submit
+   * was in flight, and the discard ran to completion — must not write the record back,
+   * nor its loss, nor its tombstone: the directory it would recreate is the successor of
+   * a queue the switch destroyed, and a later grant would drain it (FR-5). The mode is
+   * not enough to tell, because Enhanced → Anon → Enhanced can complete before the
+   * response returns; the generation is.
+   */
+  const lease = store.lease()
   const records = shuffle(await store.pending())
 
   for (const record of records) {
@@ -130,7 +141,8 @@ const runDrain = async (
      *  and the discard it triggers must not race a submission already in flight. */
     if (!isDrainPermitted()) break
 
-    await store.markSubmitted(record)
+    /** A stale lease here means the queue these records came from is gone. */
+    if (!(await store.markSubmitted(record, lease))) break
 
     /**
      * Checked again here, not just at the top of the iteration: `markSubmitted` is a
@@ -147,15 +159,15 @@ const runDrain = async (
     if (result.kind === "acknowledged" || result.kind === "handed_off") {
       /** `handed_off` collapses `submitted → acknowledged` into one transition (FR-64).
        *  Whether such an adapter may be selected at all is AD-17's call, not the drain's. */
-      await store.acknowledge(record)
+      if (!(await store.acknowledge(record, lease))) break
       const carried = lossCarriedBy(record)
-      if (carried) await store.settleReportedLoss(carried)
+      if (carried) await store.settleReportedLoss(carried, lease)
       backoffByStore.delete(store.directory)
     } else if (result.kind === "rejected") {
-      await store.reject(record)
+      if (!(await store.reject(record, lease))) break
       rejected += 1
     } else {
-      await store.requeue(record)
+      if (!(await store.requeue(record, lease))) break
       retryable += 1
       const previous = backoffByStore.get(store.directory)
       const delayMs = Math.min(

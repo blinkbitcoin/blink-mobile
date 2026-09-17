@@ -148,6 +148,10 @@
       {
         "selector": "CallExpression[callee.property.name=/^(setUserId|setUserProperty|setUserProperties|setAnalyticsCollectionEnabled)$/]",
         "message": "User-scoped analytics identity and the collection switch belong in app/telemetry/platform-analytics.ts, where the mode gate controls them. Firebase merges identity into every later event, and a screen that toggles collection bypasses the gate entirely (AD-16, AD-29)."
+      },
+      {
+        "selector": "CallExpression[callee.property.name=/^(setCrashlyticsCollectionEnabled|deleteUnsentReports|sendUnsentReports)$/]",
+        "message": "Crash collection follows the telemetry disposition, and only app/utils/error-reporting.ts applies it (AD-13). A call anywhere else can turn collection on for a device that must emit zero."
       }
     ],
     "no-return-assign": "error",
@@ -207,6 +211,18 @@
                 "message": "Reach analytics only through app/telemetry."
               }
             ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["app/utils/error-reporting.ts"],
+      "rules": {
+        "no-restricted-syntax": [
+          "error",
+          {
+            "selector": "CallExpression[callee.property.name=/^(setUserId|setUserProperty|setUserProperties|setAnalyticsCollectionEnabled)$/]",
+            "message": "User-scoped analytics identity and the collection switch belong in app/telemetry/platform-analytics.ts (AD-16, AD-29)."
           }
         ]
       }

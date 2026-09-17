@@ -43,6 +43,20 @@ const bansAnalyticsImport = (rule: ResolvedRule | undefined): boolean =>
 const bansCrashlyticsImport = (rule: ResolvedRule | undefined): boolean =>
   bansImportOf("@react-native-firebase/crashlytics", rule)
 
+const bansCrashCollectionControls = (rule: ResolvedRule | undefined): boolean => {
+  if (!Array.isArray(rule)) return false
+  const [, ...restrictions] = rule as [unknown, ...{ selector?: string }[]]
+  return restrictions.some(
+    (restriction) =>
+      typeof restriction?.selector === "string" &&
+      [
+        "setCrashlyticsCollectionEnabled",
+        "deleteUnsentReports",
+        "sendUnsentReports",
+      ].every((name) => restriction.selector?.includes(name)),
+  )
+}
+
 const bansIdentityAndCollectionCalls = (rule: ResolvedRule | undefined): boolean => {
   if (!Array.isArray(rule)) return false
   const [, ...restrictions] = rule as [unknown, ...{ selector?: string }[]]
@@ -139,6 +153,22 @@ describe("AD-29 — the two rules hold in the resolved ESLint config", () => {
 
     expect(lifted).toEqual([])
   }, 120_000)
+
+  it("lets crash collection be switched from the sink only, and the sink still cannot touch analytics identity", async () => {
+    const sink = await resolvedRulesFor("app/utils/error-reporting.ts")
+    expect(bansCrashCollectionControls(sink["no-restricted-syntax"])).toBe(false)
+    expect(bansIdentityAndCollectionCalls(sink["no-restricted-syntax"])).toBe(true)
+
+    for (const file of [
+      "app/telemetry/diagnostics.ts",
+      "app/telemetry/mode.ts",
+      "app/screens/developer-screen/developer-screen.tsx",
+      "app/self-custodial/logging.ts",
+    ]) {
+      const rules = await resolvedRulesFor(file)
+      expect(bansCrashCollectionControls(rules["no-restricted-syntax"])).toBe(true)
+    }
+  })
 
   it("bans it in particular where the second review found direct calls", async () => {
     for (const file of [

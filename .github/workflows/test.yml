@@ -3,9 +3,24 @@ on:
   pull_request:
     branches: [main]
 jobs:
-  check-code:
-    name: Tests
+  # Two shards on two small runners, each a single in-band process over half the
+  # suites. One process over all 729 suites crept to ~3.9 GB against its 4 GB heap
+  # cap and took 19 of the job's 20 minutes: ts-jest carries a full type program
+  # (ts-auto-mock needs the checker), and it grows with every file the process has
+  # seen, so both memory and time are superlinear in a single process and roughly
+  # linear when split. A shard's live set is ~2.3 GB; under a 3 GB cap it peaks at
+  # ~2.6 GB and runs in ~3 minutes on one core (a 4 GB cap only let the heap idle
+  # higher, and was slower). Not `--maxWorkers=2` on one runner: two type programs
+  # did not fit the box, and the forced GC that made worker recycling measurable
+  # costs over a second per file on a slow core — that configuration timed out on
+  # the runner. No `--expose-gc` here for the same reason.
+  test-shard:
+    name: Tests (shard ${{ matrix.shard }} of 2)
     runs-on: [self-hosted, blink, small]
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2]
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -25,23 +40,23 @@ jobs:
       # Flake handling happens at test granularity now: jest retries individual
       # failing tests in CI (see jest.setup-after-env.ts) and logs each retried
       # error, instead of silently re-running the whole job.
-      #
-      # Two recycled workers, not one in-band process. In band, one Node process
-      # carried all 729 suites: its heap crept to ~3.9 GB against the 4 GB cap and
-      # the run took 19 of the job's 20 minutes, so any growth in the suite tipped
-      # it into heap exhaustion. A worker is checked after every file and replaced
-      # once its heap exceeds the idle limit; --expose-gc with --logHeapUsage makes
-      # jest collect before that check, so the limit measures the live set (a
-      # fresh worker starts near 1 GB for this suite and a single file can add
-      # ~400 MB) rather than uncollected garbage. The per-process cap leaves a
-      # file's worth of headroom above the limit; a 2 GB cap was seen to kill a
-      # worker. Measured: ~4 minutes, peak 1.8 GB live per worker, one recycle.
-      # Worst case is two workers at the cap, ~6 GB, so this assumes the small
-      # runner has more than that; the old single process needed ~4.5 GB.
-      - run: yarn test --maxWorkers=2 --workerIdleMemoryLimit=1536MB --logHeapUsage
+      - run: yarn test --runInBand --shard=${{ matrix.shard }}/2
         env:
-          NODE_OPTIONS: --max-old-space-size=3072 --expose-gc
+          NODE_OPTIONS: --max-old-space-size=3072
         timeout-minutes: 20
+  # The required check keeps its name. It fails unless every shard succeeded — a
+  # skipped or cancelled shard is not a pass.
+  check-code:
+    name: Tests
+    needs: test-shard
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          if [ "${{ needs.test-shard.result }}" != "success" ]; then
+            echo "test shards: ${{ needs.test-shard.result }}" >&2
+            exit 1
+          fi
   android-unit-test:
     name: Android unit tests
     # GH-hosted: ships the Android SDK and JDK toolchains the Gradle build
