@@ -84,7 +84,8 @@ jest.mock("@app/i18n/i18n-react", () => ({
             },
             shareholder: {
               title: () => "Welcome as Blink shareholder!",
-              body: () => "We will let you know as soon as your Blink Visa Card is ready.",
+              body: () =>
+                "We will let you know as soon as your Blink Visa Card is ready.",
             },
           },
         },
