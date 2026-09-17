@@ -2470,7 +2470,7 @@
         "feeTier": "Transaktionspriorität",
         "fast": "Priorität",
         "medium": "Standard",
-        "slow": "Ökonomisch",
+        "slow": "Sparsam",
         "recommended": "Empfohlen",
         "walletOffline": "Deine Wallet ist offline. Bitte überprüfe deine Verbindung und versuche es erneut.",
         "sdkInsufficientFunds": "Nicht genügend Guthaben für diese Transaktion.",
