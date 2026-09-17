@@ -3724,7 +3724,8 @@
           "body1": "Osaainye endagaano ey'okuwandiisa ebitundu {units: string} mu Blink.",
           "body2": "Kiseera okusindika ssente z'okuteekawo eza {amount: string}. Olisasula ne Bitcoin."
         },
-        "buttonText": "Weyongere"
+        "buttonText": "Weyongere",
+        "paymentsUnavailable": "Okusasula kw'okuteekawo tekunnaggulwawo. Ddamu ogezeeko oluvannyuma."
       },
       "InsufficientBalance": {
         "title": "Ssente tezimala",

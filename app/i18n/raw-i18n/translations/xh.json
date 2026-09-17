@@ -3724,7 +3724,8 @@
           "body1": "Usayine isivumelwano sobhaliso lweeyunithi ezili-{units: string} kwiBlink.",
           "body2": "Lixesha lokudlulisela isixa sotyalo-mali se-{amount: string}. Uza kuhlawula ngeBitcoin."
         },
-        "buttonText": "Qhubeka"
+        "buttonText": "Qhubeka",
+        "paymentsUnavailable": "Iintlawulo zotyalo-mali azikavulwa okwangoku. Nceda uzame kwakhona kamva."
       },
       "InsufficientBalance": {
         "title": "Ibhalansi ayonelanga",

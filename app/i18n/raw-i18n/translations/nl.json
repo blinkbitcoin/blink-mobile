@@ -3724,7 +3724,8 @@
           "body1": "Je hebt de inschrijvingsovereenkomst voor {units: string} eenheden in Blink ondertekend.",
           "body2": "Tijd om het investeringsbedrag van {amount: string} over te maken. Je betaalt met Bitcoin."
         },
-        "buttonText": "Doorgaan"
+        "buttonText": "Doorgaan",
+        "paymentsUnavailable": "Betalingen voor de investering zijn nog niet open. Probeer het later opnieuw."
       },
       "InsufficientBalance": {
         "title": "Onvoldoende saldo",

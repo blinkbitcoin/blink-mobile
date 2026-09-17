@@ -3724,7 +3724,8 @@
           "body1": "Du har underskrevet tegningsaftalen for {units: string} enheder i Blink.",
           "body2": "Det er tid til at overføre investeringsbeløbet på {amount: string}. Du betaler med Bitcoin."
         },
-        "buttonText": "Fortsæt"
+        "buttonText": "Fortsæt",
+        "paymentsUnavailable": "Betalinger for investeringen er ikke åbne endnu. Prøv venligst igen senere."
       },
       "InsufficientBalance": {
         "title": "Utilstrækkelig saldo",

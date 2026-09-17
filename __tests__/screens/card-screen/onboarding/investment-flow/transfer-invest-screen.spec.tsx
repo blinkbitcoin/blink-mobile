@@ -312,8 +312,10 @@ describe("TransferInvestScreen", () => {
   })
 
   /** With the money ready and nowhere to send it, the send flow would open on an empty
-   *  destination. The shortfall path needs no address, so it stays reachable. */
-  it("holds the send when no deposit address is configured", async () => {
+   *  destination. The shortfall path needs no address, so it stays reachable. The
+   *  investor is told why the button holds, or a grey button over their own money reads
+   *  as the app being broken. */
+  it("holds the send and says why when no deposit address is configured", async () => {
     mockDepositWalletId.current = ""
     mockFunding.current = {
       balanceUsd: SELECTED_AMOUNT_USD,
@@ -336,6 +338,25 @@ describe("TransferInvestScreen", () => {
     })
 
     expect(mockNavigate).not.toHaveBeenCalled()
+    expect(
+      getByText("Investment payments are not open yet. Please try again later."),
+    ).toBeTruthy()
+  })
+
+  it("says nothing about payments while the investor is short", async () => {
+    mockDepositWalletId.current = ""
+
+    const { queryByText } = render(
+      <ContextForScreen>
+        <TransferInvestScreen />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {})
+
+    expect(
+      queryByText("Investment payments are not open yet. Please try again later."),
+    ).toBeNull()
   })
 
   it("still reaches the shortfall screen with no deposit address configured", async () => {

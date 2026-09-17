@@ -3724,7 +3724,8 @@
           "body1": "Umesaini makubaliano ya usajili kwa vitengo {units: string} katika Blink.",
           "body2": "Ni wakati wa kuhamisha kiasi cha uwekezaji cha {amount: string}. Utalipa kwa Bitcoin."
         },
-        "buttonText": "Endelea"
+        "buttonText": "Endelea",
+        "paymentsUnavailable": "Malipo ya uwekezaji bado hayajafunguliwa. Tafadhali jaribu tena baadaye."
       },
       "InsufficientBalance": {
         "title": "Salio halitoshi",

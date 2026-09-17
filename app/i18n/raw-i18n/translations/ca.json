@@ -3724,7 +3724,8 @@
           "body1": "Has signat l'acord de subscripció per {units: string} unitats a Blink.",
           "body2": "És el moment de transferir l'import d'inversió de {amount: string}. Pagaràs amb Bitcoin."
         },
-        "buttonText": "Continuar"
+        "buttonText": "Continuar",
+        "paymentsUnavailable": "Els pagaments de la inversió encara no estan oberts. Torna-ho a provar més tard."
       },
       "InsufficientBalance": {
         "title": "Saldo insuficient",

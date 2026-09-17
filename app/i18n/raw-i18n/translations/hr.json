@@ -3724,7 +3724,8 @@
           "body1": "Potpisali ste ugovor o pretplati za {units: string} jedinica u Blinku.",
           "body2": "Vrijeme je za prijenos iznosa ulaganja od {amount: string}. Platit ćete Bitcoinom."
         },
-        "buttonText": "Nastavi"
+        "buttonText": "Nastavi",
+        "paymentsUnavailable": "Uplate za ulaganje još nisu otvorene. Pokušaj ponovno kasnije."
       },
       "InsufficientBalance": {
         "title": "Nedovoljno sredstava",

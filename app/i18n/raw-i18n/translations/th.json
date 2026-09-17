@@ -3724,7 +3724,8 @@
           "body1": "คุณได้ลงนามในข้อตกลงการจองซื้อ {units: string} หน่วยใน Blink",
           "body2": "ถึงเวลาโอนเงินลงทุน {amount: string} คุณจะชำระด้วย Bitcoin"
         },
-        "buttonText": "ดำเนินการต่อ"
+        "buttonText": "ดำเนินการต่อ",
+        "paymentsUnavailable": "ยังไม่เปิดรับการชำระเงินลงทุน โปรดลองอีกครั้งในภายหลัง"
       },
       "InsufficientBalance": {
         "title": "ยอดเงินไม่เพียงพอ",

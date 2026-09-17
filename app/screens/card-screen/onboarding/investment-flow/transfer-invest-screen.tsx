@@ -85,7 +85,8 @@ export const TransferInvestScreen: React.FC = () => {
    * Pressing before the balance is known would send the investor to the shortfall screen
    * on a balance of zero. Pressing with the money ready but no wallet configured would
    * ask for an invoice from nowhere; the shortfall path needs none, so it stays reachable
-   * either way.
+   * either way. The missing wallet is said out loud: a button that stays grey with the
+   * money in place, and nothing to explain it, reads as the app being broken.
    */
   const isMissingDepositWallet = hasEnoughBalance && !cardInvestmentDepositBtcWalletId
   const isContinueDisabled = isLoading || isMissingDepositWallet
@@ -119,6 +120,12 @@ export const TransferInvestScreen: React.FC = () => {
           {hasInvoiceFailed ? (
             <Text type="p2" style={styles.errorText}>
               {LL.ReceiveScreen.error()}
+            </Text>
+          ) : null}
+
+          {isMissingDepositWallet ? (
+            <Text type="p2" style={styles.errorText}>
+              {LL.CardFlow.Onboarding.TransferInvest.paymentsUnavailable()}
             </Text>
           ) : null}
         </View>

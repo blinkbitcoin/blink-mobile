@@ -3724,7 +3724,8 @@
           "body1": "لقد وقعت اتفاقية الاشتراك لـ {units: string} وحدة في Blink.",
           "body2": "حان وقت تحويل مبلغ الاستثمار البالغ {amount: string}. ستدفع بالبيتكوين."
         },
-        "buttonText": "متابعة"
+        "buttonText": "متابعة",
+        "paymentsUnavailable": "مدفوعات الاستثمار غير متاحة بعد. يُرجى المحاولة لاحقاً."
       },
       "InsufficientBalance": {
         "title": "رصيد غير كافٍ",
