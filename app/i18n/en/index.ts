@@ -3938,7 +3938,7 @@ const en: BaseTranslation = {
         },
         shareholder: {
           title: "Welcome as Blink shareholder!",
-          body: "We will let you know as soon as your Blink Card is ready.",
+          body: "We will let you know as soon as your Blink Visa Card is ready.",
         },
       },
       PersonalInformation: {
