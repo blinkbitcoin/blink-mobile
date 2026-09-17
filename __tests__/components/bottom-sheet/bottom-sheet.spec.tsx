@@ -1,5 +1,5 @@
 import React from "react"
-import { BackHandler, Dimensions, StyleSheet, Text, View } from "react-native"
+import { BackHandler, Dimensions, Modal, StyleSheet, Text, View } from "react-native"
 import { getAnimatedStyle } from "react-native-reanimated"
 import {
   fireGestureHandler,
@@ -140,6 +140,16 @@ describe("BottomSheet", () => {
     fireEvent.press(getByLabelText("Close"))
 
     expect(onClose).toHaveBeenCalled()
+  })
+
+  it("draws its window under the status and navigation bars, so insets.bottom is counted once", async () => {
+    const view = renderSheet()
+
+    // On Android a modal window otherwise stops above the navigation bar, and a caller
+    // padding by the root safe-area inset puts its call to action a whole bar too high.
+    const modal = await waitFor(() => view.UNSAFE_getByType(Modal))
+    expect(modal.props.statusBarTranslucent).toBe(true)
+    expect(modal.props.navigationBarTranslucent).toBe(true)
   })
 
   it("closes when it is dragged down past the dismiss distance", async () => {
