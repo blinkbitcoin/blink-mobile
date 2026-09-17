@@ -83,7 +83,11 @@ jest.mock("@app/i18n/i18n-react", () => ({
   }),
 }))
 
-const PROGRESS = { selectedAmountUsd: 25000, settlementSats: 31_704_000 }
+const PROGRESS = {
+  selectedAmountUsd: 25000,
+  settlementSats: 31_704_000,
+  signedAt: 1_757_700_000_000,
+}
 
 const renderBulletin = (kind: CardInvestmentBulletinKind, onDismiss = jest.fn()) =>
   render(<CardInvestmentBulletin kind={kind} progress={PROGRESS} onDismiss={onDismiss} />)
