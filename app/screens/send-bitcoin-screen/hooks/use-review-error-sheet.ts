@@ -2,7 +2,7 @@ import { useMemo } from "react"
 
 import { isSelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
 
-import type { ErrorMsgAction } from "../error-msg-action"
+import type { ErrorMsgAction, FailureOutcome } from "../error-msg-action"
 import { useDismissibleErrorMsg } from "./use-dismissible-error-msg"
 import { useReviewExits } from "./use-review-exits"
 
@@ -14,10 +14,7 @@ type Args = {
   isFeeFailed: boolean
   feeErrorCode: string | undefined
   feeErrorText: string
-  errorMsgActionFor: (
-    raw: string | undefined,
-    options?: { hasSent?: boolean },
-  ) => ErrorMsgAction
+  errorMsgActionFor: (raw: string | undefined, outcome?: FailureOutcome) => ErrorMsgAction
 }
 
 /**
@@ -41,7 +38,7 @@ export const useReviewErrorSheet = ({
       isFeeFailed && isSelfCustodialErrorCode(feeErrorCode)
         ? {
             message: feeErrorText,
-            action: errorMsgActionFor(feeErrorCode, { hasSent: false }),
+            action: errorMsgActionFor(feeErrorCode, "notSent"),
           }
         : undefined,
     [isFeeFailed, feeErrorCode, feeErrorText, errorMsgActionFor],

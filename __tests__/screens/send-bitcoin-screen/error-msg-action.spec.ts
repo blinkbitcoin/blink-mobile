@@ -5,7 +5,7 @@ import {
 import { IDEMPOTENCY_KEY_UNAVAILABLE } from "@app/screens/send-bitcoin-screen/use-send-payment"
 import { SelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
 
-const base = { canSetAmount: true, isSelfCustodial: false, hasSent: true }
+const base = { canSetAmount: true, isSelfCustodial: false, outcome: "failed" } as const
 
 type Case = [
   name: string,
@@ -20,7 +20,13 @@ const cases: Case[] = [
     "changeAmount",
   ],
   ["custodial other failure", { raw: "Unable to find a route for payment." }, "tryAgain"],
-  ["custodial thrown request", { raw: "network died" }, "tryAgain"],
+  ["custodial failure the backend reported", { raw: "network died" }, "tryAgain"],
+  ["custodial thrown request", { raw: "network died", outcome: "unconfirmed" }, "home"],
+  [
+    "custodial throw before a key existed",
+    { raw: IDEMPOTENCY_KEY_UNAVAILABLE, outcome: "unconfirmed" },
+    "tryAgain",
+  ],
   [
     "self-custodial amount code after a send",
     { raw: SelfCustodialErrorCode.InsufficientFunds, isSelfCustodial: true },
@@ -42,7 +48,7 @@ const cases: Case[] = [
   ],
   [
     "self-custodial missing idempotency key, nothing sent",
-    { raw: IDEMPOTENCY_KEY_UNAVAILABLE, isSelfCustodial: true },
+    { raw: IDEMPOTENCY_KEY_UNAVAILABLE, isSelfCustodial: true, outcome: "unconfirmed" },
     "tryAgain",
   ],
   [
@@ -57,12 +63,12 @@ const cases: Case[] = [
   ],
   [
     "self-custodial thrown request",
-    { raw: "network died", isSelfCustodial: true },
+    { raw: "network died", isSelfCustodial: true, outcome: "unconfirmed" },
     "home",
   ],
   [
     "self-custodial generic failure before a send (fee quote)",
-    { raw: SelfCustodialErrorCode.Generic, isSelfCustodial: true, hasSent: false },
+    { raw: SelfCustodialErrorCode.Generic, isSelfCustodial: true, outcome: "notSent" },
     "tryAgain",
   ],
 ]

@@ -2255,6 +2255,14 @@ describe("SendBitcoinConfirmationScreen — error message sheet", () => {
       ).toBeNull()
     })
 
+    it("goes Home for a custodial send that threw, since it may have landed (S9, N21)", async () => {
+      sendPaymentMock.mockRejectedValueOnce(new Error("network died"))
+      await renderReview(route)
+      await slide()
+
+      expect(sheetButton(LL.SendBitcoinConfirmationScreen.home())).toBeTruthy()
+    })
+
     it("goes Home for a self-custodial send that threw, since it may have landed (S9)", async () => {
       asSelfCustodial()
       sendPaymentMock.mockRejectedValueOnce(new Error("network died"))

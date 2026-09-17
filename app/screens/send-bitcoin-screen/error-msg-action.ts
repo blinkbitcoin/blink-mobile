@@ -17,17 +17,24 @@ import { IDEMPOTENCY_KEY_UNAVAILABLE } from "./use-send-payment"
  */
 export type ErrorMsgAction = "changeAmount" | "tryAgain" | "home"
 
+/**
+ * What is known about the payment when it failed:
+ * - `notSent`: it failed before a send, like the fee quote
+ * - `failed`: the send answered with a failure
+ * - `unconfirmed`: the send threw, so the request may have landed
+ */
+export type FailureOutcome = "notSent" | "failed" | "unconfirmed"
+
 type FailureContext = {
   /** The raw failure: a self-custodial error code, or custodial message text. */
   raw: string | undefined
   canSetAmount: boolean
   isSelfCustodial: boolean
-  /** False for a failure before the send, like the fee quote: nothing can land. */
-  hasSent: boolean
+  outcome: FailureOutcome
 }
 
-/** Self-custodial failures the SDK raises before anything is sent. */
-const SELF_CUSTODIAL_NOTHING_SENT: ReadonlySet<string> = new Set([
+/** Failures raised before anything is sent, whatever the send reported. */
+const NOTHING_SENT: ReadonlySet<string> = new Set([
   SelfCustodialErrorCode.InsufficientFunds,
   SelfCustodialErrorCode.BelowMinimum,
   SelfCustodialErrorCode.InvalidInput,
@@ -38,20 +45,23 @@ const SELF_CUSTODIAL_NOTHING_SENT: ReadonlySet<string> = new Set([
  * The action for a failure the user can't fix on review.
  *
  * If a new amount can be expected to fix it, the sheet offers Change amount. Otherwise it
- * offers Try again, unless the failure came after a self-custodial send that may still
- * land: those go Home on every rail. Try again starts a new payment with a new
- * idempotency key, so no rail dedupes it against the first (#1273 N21, senior devs).
- * Custodial failures come back as `FAILURE`, which means nothing was paid.
+ * offers Try again when nothing can have been paid, and Home when the payment may still
+ * land. Try again starts a new payment with a new idempotency key, so no rail dedupes
+ * it against the first (#1273 N21, senior devs).
+ *
+ * A custodial `FAILURE` means nothing was paid. A self-custodial failure isn't trusted
+ * that far unless its code says the SDK stopped before sending, and a send that threw
+ * may have landed on either rail.
  */
 export const errorMsgAction = ({
   raw,
   canSetAmount,
   isSelfCustodial,
-  hasSent,
+  outcome,
 }: FailureContext): ErrorMsgAction => {
   if (canSetAmount && isAmountFixableError(raw)) return "changeAmount"
-  if (!hasSent || !isSelfCustodial) return "tryAgain"
-  if (raw && SELF_CUSTODIAL_NOTHING_SENT.has(raw)) return "tryAgain"
+  if (outcome === "notSent" || (raw && NOTHING_SENT.has(raw))) return "tryAgain"
+  if (outcome === "failed" && !isSelfCustodial) return "tryAgain"
   return "home"
 }
 
@@ -61,8 +71,8 @@ export const useErrorMsgAction = (paymentDetail: PaymentDetail<WalletCurrency>) 
   const { canSetAmount } = paymentDetail
 
   return useCallback(
-    (raw: string | undefined, { hasSent = true }: { hasSent?: boolean } = {}) =>
-      errorMsgAction({ raw, canSetAmount, isSelfCustodial, hasSent }),
+    (raw: string | undefined, outcome: FailureOutcome = "failed") =>
+      errorMsgAction({ raw, canSetAmount, isSelfCustodial, outcome }),
     [canSetAmount, isSelfCustodial],
   )
 }
