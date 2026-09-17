@@ -74,7 +74,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
             },
             shareholder: {
               title: () => "Welcome as Blink shareholder!",
-              body: () => "We will let you know as soon as your Blink Card is ready.",
+              body: () => "We will let you know as soon as your Blink Visa Card is ready.",
             },
           },
         },
@@ -223,7 +223,7 @@ describe("CardInvestmentBulletin", () => {
 
       expect(getByText("Welcome as Blink shareholder!")).toBeTruthy()
       expect(
-        getByText("We will let you know as soon as your Blink Card is ready."),
+        getByText("We will let you know as soon as your Blink Visa Card is ready."),
       ).toBeTruthy()
       expect(getByTestId("dismiss-button")).toBeTruthy()
       expect(queryByTestId("cta-button")).toBeNull()
