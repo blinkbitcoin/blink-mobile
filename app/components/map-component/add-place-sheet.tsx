@@ -14,6 +14,7 @@ import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { DropdownComponent, DropdownOption } from "@app/components/card-screen/dropdown"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { fonts } from "@app/rne-theme/fonts"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
 type Props = {
@@ -241,7 +242,7 @@ const useStyles = makeStyles(({ colors }) => ({
   title: {
     flex: 1,
     fontSize: 20,
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     color: colors.black,
   },
   content: {

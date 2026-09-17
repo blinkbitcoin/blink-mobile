@@ -12,6 +12,7 @@ import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { DepositStatus } from "@app/types/payment"
 import { testProps } from "@app/utils/testProps"
+import { fonts } from "@app/rne-theme/fonts"
 
 import { buildFeeTierOptions } from "../send-bitcoin-screen/fee-tier-options"
 import { FeeTierOption } from "../send-bitcoin-screen/hooks/fee-tiers.types"
@@ -265,7 +266,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   fieldLabel: {
     fontSize: 13,
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     color: colors.grey2,
     marginBottom: 8,
   },

@@ -2,6 +2,7 @@ import React from "react"
 import { Pressable, PressableProps, StyleProp, View, ViewStyle } from "react-native"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
+import { fonts } from "@app/rne-theme/fonts"
 
 export type GaloyTertiaryButtonProps = {
   outline?: boolean
@@ -87,7 +88,7 @@ const useStyles = makeStyles((_, props: GaloyTertiaryButtonProps) => ({
     lineHeight: 20,
     textAlign: "center",
     fontSize: 14,
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     opacity: props.disabled ? 0.7 : 1,
   },
 
