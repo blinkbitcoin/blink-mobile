@@ -338,6 +338,81 @@ describe("SignInvestScreen", () => {
     expect(mockESign.sign).toHaveBeenCalledTimes(1)
   })
 
+  describe("when the price does not come", () => {
+    const START_WAIT_TIMEOUT_MS = 15_000
+
+    beforeEach(() => {
+      jest.useFakeTimers()
+      mockUsdPerSat.current = null
+    })
+
+    afterEach(() => {
+      jest.useRealTimers()
+    })
+
+    const waitOut = async () => {
+      await act(async () => {
+        jest.advanceTimersByTime(START_WAIT_TIMEOUT_MS)
+      })
+    }
+
+    /** A spinner with no end and no button is a dead end; a feed silent this long
+     *  means the device is most likely offline, which is what the signer is told. */
+    it("gives up after a while and says the connection was lost", async () => {
+      const { getByText, queryByTestId } = await renderScreen()
+      await waitOut()
+
+      expect(getByText(/Connection lost/)).toBeTruthy()
+      expect(getByText("Try Again")).toBeTruthy()
+      expect(queryByTestId("sign-invest-loading")).toBeNull()
+      expect(mockESign.sign).not.toHaveBeenCalled()
+    })
+
+    it("waits again, for as long as before, when the signer tries again", async () => {
+      const { getByText, getByTestId, queryByText } = await renderScreen()
+      await waitOut()
+
+      await act(async () => {
+        fireEvent.press(getByText("Try Again"))
+      })
+      expect(getByTestId("sign-invest-loading")).toBeTruthy()
+
+      await act(async () => {
+        jest.advanceTimersByTime(START_WAIT_TIMEOUT_MS - 1)
+      })
+      expect(queryByText(/Connection lost/)).toBeNull()
+
+      await act(async () => {
+        jest.advanceTimersByTime(1)
+      })
+      expect(getByText(/Connection lost/)).toBeTruthy()
+    })
+
+    /** The feed answers on its own once the device is back; the session starts then,
+     *  without another tap, whichever screen the signer was looking at. */
+    it("starts the session as soon as the price arrives, even after giving up", async () => {
+      const { rerender, queryByText } = await renderScreen()
+      await waitOut()
+
+      mockUsdPerSat.current = USD_PER_SAT
+      await rerenderScreen(rerender)
+
+      expect(mockESign.sign).toHaveBeenCalledTimes(1)
+      expect(queryByText(/Connection lost/)).toBeNull()
+    })
+
+    it("does not give up once the price has arrived in time", async () => {
+      const { rerender, queryByText } = await renderScreen()
+
+      mockUsdPerSat.current = USD_PER_SAT
+      await rerenderScreen(rerender)
+      await waitOut()
+
+      expect(queryByText(/Connection lost/)).toBeNull()
+      expect(mockESign.sign).toHaveBeenCalledTimes(1)
+    })
+  })
+
   /**
    * The price ticks every few seconds. A source rebuilt on each tick would restart the
    * session mid-signature, so the rate is read as the document is minted, which is also
