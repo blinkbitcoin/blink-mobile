@@ -1,18 +1,24 @@
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useRef, useState } from "react"
 
 /**
- * An error message sheet's visibility: shown while there is a message, until
- * the user dismisses it. Dismissed stays dismissed for as long as the message
- * holds, and a new one after it clears opens the sheet again.
+ * An error message sheet's visibility: shown while there is an error, until the user
+ * dismisses it. Errors are told apart by identity, so a dismissed sheet stays closed
+ * while the same error holds, and any new error opens it again, even with the same text.
+ *
+ * `shown` is the last error there was, so a sheet whose error has just cleared keeps its
+ * content while it slides out.
  */
-export const useDismissibleErrorMsg = (message: string | undefined) => {
-  const [isDismissed, setDismissed] = useState(false)
+export const useDismissibleErrorMsg = <T extends object>(error: T | undefined) => {
+  const [dismissedError, setDismissedError] = useState<T>()
+  const lastError = useRef(error)
+  if (error) lastError.current = error
 
-  useEffect(() => {
-    if (!message) setDismissed(false)
-  }, [message])
+  const dismiss = useCallback(() => setDismissedError(error), [error])
 
-  const dismiss = useCallback(() => setDismissed(true), [])
-
-  return { message, isVisible: Boolean(message) && !isDismissed, dismiss }
+  return {
+    error,
+    shown: lastError.current,
+    isVisible: Boolean(error) && error !== dismissedError,
+    dismiss,
+  }
 }

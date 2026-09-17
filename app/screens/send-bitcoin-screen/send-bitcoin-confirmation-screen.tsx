@@ -62,8 +62,8 @@ import { SendReviewDestination } from "./review/send-review-destination"
 import { useSentTransition } from "./review/use-sent-transition"
 import { SendHero } from "./send-hero"
 import { useSendBalances } from "./hooks/use-send-wallets"
-import { useDismissibleErrorMsg } from "./hooks/use-dismissible-error-msg"
-import { useReviewExits } from "./hooks/use-review-exits"
+import { ErrorMsgAction, useErrorMsgAction } from "./error-msg-action"
+import { useReviewErrorSheet } from "./hooks/use-review-error-sheet"
 import { useVerifyPaymentSettled } from "./hooks/use-verify-payment-settled"
 import { PaymentSendExtraInfo } from "./payment-details/index.types"
 import useFee from "./use-fee"
@@ -148,13 +148,20 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   const btcPrimaryText = formatMoneyAmount({ moneyAmount: btcBalanceMoneyAmount })
   const usdPrimaryText = formatMoneyAmount({ moneyAmount: usdBalanceMoneyAmount })
   const [paymentFailure, setPaymentFailure] = useState<
-    { message: string; canChangeAmount: boolean } | undefined
+    { message: string; canChangeAmount: boolean; action: ErrorMsgAction } | undefined
   >(undefined)
   const paymentError = paymentFailure?.message
+  const errorMsgActionFor = useErrorMsgAction(paymentDetail)
+  /** Every send failure shows inline and opens the error message sheet on top. An
+   *  explicit `action` is for failures whose outcome the raw text doesn't carry. */
   const setPaymentError = React.useCallback(
-    (message: string, raw?: string) =>
-      setPaymentFailure({ message, canChangeAmount: isAmountFixableError(raw) }),
-    [],
+    (message: string, raw?: string, action?: ErrorMsgAction) =>
+      setPaymentFailure({
+        message,
+        canChangeAmount: isAmountFixableError(raw),
+        action: action ?? errorMsgActionFor(raw),
+      }),
+    [errorMsgActionFor],
   )
   const [isVerifying, setIsVerifying] = useState(false)
   const verifyPaymentSettled = useVerifyPaymentSettled()
@@ -425,7 +432,11 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
       }
 
       if (status === "ALREADY_PAID") {
-        setPaymentError(LL.SendBitcoinConfirmationScreen.invoiceAlreadyPaid())
+        setPaymentError(
+          LL.SendBitcoinConfirmationScreen.invoiceAlreadyPaid(),
+          undefined,
+          "home",
+        )
         ReactNativeHapticFeedback.trigger("notificationError", {
           ignoreAndroidSystemSettings: true,
         })
@@ -479,7 +490,12 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
             }
           }
 
-          setPaymentError(LL.SendBitcoinConfirmationScreen.paymentAlreadyAttempted())
+          // It may still land, so nothing here may start it again (#1273 N14).
+          setPaymentError(
+            LL.SendBitcoinConfirmationScreen.paymentAlreadyAttempted(),
+            undefined,
+            "home",
+          )
           ReactNativeHapticFeedback.trigger("notificationError", {
             ignoreAndroidSystemSettings: true,
           })
@@ -603,14 +619,13 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   const isMaxFee = fee.status === "error" && Boolean(fee.amount)
   const isFeeFailed = fee.status === "error" && !fee.amount
 
-  // A classified SDK failure on the quote is something the user can't fix on review, so
-  // the error message sheet (#1278 R2) opens on top of the inline error, which stays.
-  // Nothing has been sent yet, so neither of its actions can pay twice: Change amount when
-  // a new amount can fix it, otherwise Try again from the first step.
-  const reviewExits = useReviewExits()
-  const feeErrorMsg = useDismissibleErrorMsg(
-    isFeeFailed && isSelfCustodialErrorCode(feeErrorCode) ? feeErrorText : undefined,
-  )
+  const errorSheet = useReviewErrorSheet({
+    paymentFailure,
+    isFeeFailed,
+    feeErrorCode,
+    feeErrorText,
+    errorMsgActionFor,
+  })
 
   // A failed quote leaves the row blank; its reason goes under the card with the other errors.
   const feeValue = isFeeFailed ? "—" : `${feeDisplayText}${isMaxFee ? " *" : ""}`
@@ -724,7 +739,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
                   {canChangeAmount ? (
                     <Chip
                       label={LL.SendBitcoinConfirmationScreen.changeAmount()}
-                      onPress={reviewExits.changeAmount}
+                      onPress={errorSheet.changeAmount}
                       style={styles.changeAmountChip}
                     />
                   ) : null}
@@ -794,20 +809,12 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
         ) : null}
       </View>
       <ErrorMsgBottomSheet
-        isVisible={feeErrorMsg.isVisible}
-        onClose={feeErrorMsg.dismiss}
+        isVisible={errorSheet.isVisible}
+        onClose={errorSheet.dismiss}
         title={LL.SendBitcoinScreen.problemSheetTitle()}
-        body={feeErrorMsg.message ?? ""}
-        {...(isAmountFixableError(feeErrorCode) && paymentDetail.canSetAmount
-          ? {
-              primaryLabel: LL.SendBitcoinConfirmationScreen.changeAmount(),
-              onPrimaryPress: reviewExits.changeAmount,
-            }
-          : {
-              primaryLabel: LL.SendBitcoinConfirmationScreen.tryAgain(),
-              onPrimaryPress: reviewExits.startOver,
-            })}
-        testID="fee-error-msg-bottom-sheet"
+        body={errorSheet.message}
+        {...errorSheet.button}
+        testID="review-error-msg-bottom-sheet"
       />
     </Screen>
   )

@@ -1,8 +1,11 @@
 import { useCallback } from "react"
 
+import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { CommonActions, StackActions, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
+
+import type { ErrorMsgAction } from "../error-msg-action"
 
 /** Every screen a send can pass through before review, in any order it was reached. */
 const SEND_FLOW_ROUTES: ReadonlySet<string> = new Set([
@@ -14,11 +17,12 @@ const SEND_FLOW_ROUTES: ReadonlySet<string> = new Set([
 ])
 
 /**
- * The two ways out of review when an error stops the send (blink-wip#1278, ruling
- * 2026-09-17). Nothing has been sent when either is offered.
+ * The ways out of review when an error stops the send (blink-wip#1278, provisional
+ * ruling 2026-09-17), and the sheet action for each.
  */
 export const useReviewExits = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+  const { LL } = useI18nContext()
 
   /** Back to amount entry with the amount cleared; destination, wallet and note stay. */
   const changeAmount = useCallback(() => {
@@ -49,5 +53,34 @@ export const useReviewExits = () => {
     })
   }, [navigation])
 
-  return { changeAmount, startOver }
+  const goHome = useCallback(
+    () => navigation.dispatch(StackActions.popToTop()),
+    [navigation],
+  )
+
+  /** The error message sheet's button for an action. */
+  const actionButton = useCallback(
+    (action: ErrorMsgAction) => {
+      switch (action) {
+        case "changeAmount":
+          return {
+            primaryLabel: LL.SendBitcoinConfirmationScreen.changeAmount(),
+            onPrimaryPress: changeAmount,
+          }
+        case "tryAgain":
+          return {
+            primaryLabel: LL.SendBitcoinConfirmationScreen.tryAgain(),
+            onPrimaryPress: startOver,
+          }
+        case "home":
+          return {
+            primaryLabel: LL.SendBitcoinConfirmationScreen.home(),
+            onPrimaryPress: goHome,
+          }
+      }
+    },
+    [LL, changeAmount, startOver, goHome],
+  )
+
+  return { changeAmount, startOver, goHome, actionButton }
 }

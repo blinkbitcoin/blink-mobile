@@ -2393,6 +2393,7 @@ const en: BaseTranslation = {
     details: "Details",
     changeAmount: "Change amount",
     tryAgain: "Try again",
+    home: "Home",
     usdRemainderSweep:
       "Remaining {remaining: string} ({remainingSats: string}) will be converted to Bitcoin. USD minimum: {minimum: string}.",
   },
