@@ -15,6 +15,7 @@ import { Transaction, WalletCurrency } from "@app/graphql/generated"
 import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { isIdempotencyConflict } from "@app/graphql/is-idempotency-conflict"
 import { useClipboard, useDisplayCurrency } from "@app/hooks"
+import { isCardInvestmentPaymentArmed } from "@app/hooks/use-card-investment-progress"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import {
@@ -306,6 +307,20 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
       }
 
       if (status === "ALREADY_PAID") {
+        /**
+         * The card investment's own invoice exists for that investment alone, so "already
+         * paid" on it means the money already landed against the agreement, whoever paid
+         * it; in practice an earlier attempt from this device that the app closed on
+         * before its receipt was recorded. Refusing here would leave the home asking for
+         * the money again, and the next attempt would mint and pay a second invoice; the
+         * receipt records it as settled instead. Custodial only: the self-custodial
+         * adapter reports a settled invoice as a plain failure.
+         */
+        if (paymentType === "lightning" && isCardInvestmentPaymentArmed(destination)) {
+          await navigateToCompleted({ status: "SUCCESS" })
+          return
+        }
+
         setPaymentError(LL.SendBitcoinConfirmationScreen.invoiceAlreadyPaid())
         ReactNativeHapticFeedback.trigger("notificationError", {
           ignoreAndroidSystemSettings: true,
@@ -376,6 +391,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   }, [
     LL,
     paymentDetail,
+    paymentType,
     sendPayment,
     setPaymentError,
     sendingWalletDescriptor,
