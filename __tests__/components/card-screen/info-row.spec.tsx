@@ -168,7 +168,7 @@ describe("InfoRow", () => {
       ).toBe("400")
     })
 
-    it("keeps the label bold by default", () => {
+    it("uses the bold label style by default", () => {
       const { getByText } = render(<InfoRow {...defaultProps} />)
 
       expect(StyleSheet.flatten(getByText("Test Label").props.style).fontWeight).toBe(

@@ -1,9 +1,10 @@
 /**
- * The app's two type faces, by their PostScript names.
+ * The Source Sans Pro faces the theme uses, by name.
  *
- * Android has no family called "Source Sans Pro" and falls back to Roboto for it, and it
- * synthesises a weight rather than reaching for the bold face when `fontWeight` is set. So
- * bold text names the bold file and leaves the weight alone.
+ * Android loads a `fontFamily` from `fonts/<name>.ttf`, or `<name>_bold.ttf` for a weight of
+ * 700 or more, and falls back to Roboto when that file is missing; it has no family called
+ * "Source Sans Pro". iOS matches the name to the bundled face. So bold text names the bold
+ * face and, on Android, sets no weight.
  */
 export const fonts = {
   regular: "SourceSansPro-Regular",

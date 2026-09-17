@@ -73,7 +73,7 @@ describe("font weights", () => {
    * you migrate one.
    */
   it("adds no bold weight to text styled by the themed Text", () => {
-    const KNOWN_BOLD_WEIGHTS = 94
+    const KNOWN_BOLD_WEIGHTS = 93
 
     const boldWeights = sourceFiles(APP_DIR)
       .map((file) => readFileSync(file, "utf8"))
