@@ -208,10 +208,20 @@ const TIER_WORD_AGREEMENT: Record<string, Record<string, string>> = {
   "el.json:SendBitcoinScreen.slow": { οικονομική: "οικονομικό" },
 }
 
+const ONCHAIN_MARKERS = ["I-Onchain", "Onchain", "オンチェーン"]
+
+// The marker sits at one end of the label, so it is sliced off that end once rather
+// than removed wherever it appears.
+const withoutOnchainMarker = (value: string): string => {
+  const marker = ONCHAIN_MARKERS.find((m) => value.startsWith(m) || value.endsWith(m))
+  if (!marker) return value
+  return value.startsWith(marker)
+    ? value.slice(marker.length)
+    : value.slice(0, -marker.length)
+}
+
 const bareTierWord = (value: string, locale: string): string =>
-  value
-    .replace(/\s*\([^)]*\)\s*$/, "")
-    .replace(/(I-)?Onchain|オンチェーン/g, "")
+  withoutOnchainMarker(value.replace(/\s*\([^)]*\)\s*$/, "").trim())
     .trim()
     .toLocaleLowerCase(locale)
 
