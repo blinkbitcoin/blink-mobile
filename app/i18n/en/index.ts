@@ -2455,6 +2455,8 @@ const en: BaseTranslation = {
     amountExceed: "Amount exceeds your balance of {balance: string}",
     amountExceedsLimit: "Amount exceeds your remaining daily limit of {limit: string}",
     problemSheetTitle: "A small problem",
+    recipientUnreachableTitle: "Couldn't reach the recipient",
+    recipientWrongAmountTitle: "Recipient sent the wrong amount",
     upgradeAccountToIncreaseLimit: "Upgrade your account to increase your limit",
     amountIsRequired: "Amount is required",
     cost: "Cost",

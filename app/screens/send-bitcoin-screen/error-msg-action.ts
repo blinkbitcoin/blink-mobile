@@ -22,8 +22,6 @@ type FailureContext = {
   raw: string | undefined
   canSetAmount: boolean
   isSelfCustodial: boolean
-  /** A self-custodial rail where starting again can't pay twice. */
-  isRetrySafe: boolean
   /** False for a failure before the send, like the fee quote: nothing can land. */
   hasSent: boolean
 }
@@ -41,18 +39,18 @@ const SELF_CUSTODIAL_NOTHING_SENT: ReadonlySet<string> = new Set([
  *
  * If a new amount can be expected to fix it, the sheet offers Change amount. Otherwise it
  * offers Try again, unless the failure came after a self-custodial send that may still
- * land on a rail where starting again could pay twice (#1273 N18); those go Home.
+ * land: those go Home on every rail. Try again starts a new payment with a new
+ * idempotency key, so no rail dedupes it against the first (#1273 N21, senior devs).
  * Custodial failures come back as `FAILURE`, which means nothing was paid.
  */
 export const errorMsgAction = ({
   raw,
   canSetAmount,
   isSelfCustodial,
-  isRetrySafe,
   hasSent,
 }: FailureContext): ErrorMsgAction => {
   if (canSetAmount && isAmountFixableError(raw)) return "changeAmount"
-  if (!hasSent || !isSelfCustodial || isRetrySafe) return "tryAgain"
+  if (!hasSent || !isSelfCustodial) return "tryAgain"
   if (raw && SELF_CUSTODIAL_NOTHING_SENT.has(raw)) return "tryAgain"
   return "home"
 }
@@ -60,15 +58,11 @@ export const errorMsgAction = ({
 /** `errorMsgAction` bound to the payment on review. */
 export const useErrorMsgAction = (paymentDetail: PaymentDetail<WalletCurrency>) => {
   const { isSelfCustodial } = useActiveWallet()
-  // #1273 N18: only the Bitcoin wallet to a Lightning address carries one key end to end.
-  const isRetrySafe =
-    paymentDetail.paymentType === "lnurl" &&
-    paymentDetail.sendingWalletDescriptor.currency === WalletCurrency.Btc
   const { canSetAmount } = paymentDetail
 
   return useCallback(
     (raw: string | undefined, { hasSent = true }: { hasSent?: boolean } = {}) =>
-      errorMsgAction({ raw, canSetAmount, isSelfCustodial, isRetrySafe, hasSent }),
-    [canSetAmount, isSelfCustodial, isRetrySafe],
+      errorMsgAction({ raw, canSetAmount, isSelfCustodial, hasSent }),
+    [canSetAmount, isSelfCustodial],
   )
 }

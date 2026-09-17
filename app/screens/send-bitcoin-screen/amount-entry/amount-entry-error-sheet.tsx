@@ -6,7 +6,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { useDismissibleErrorMsg } from "../hooks/use-dismissible-error-msg"
 
 /** An invoice request on Next that failed: `canRetry` is false when retrying is unsafe. */
-export type LnurlInvoiceError = { message: string; canRetry: boolean }
+export type LnurlInvoiceError = { title: string; message: string; canRetry: boolean }
 
 type Props = {
   lnurlError: LnurlInvoiceError | undefined
@@ -19,8 +19,8 @@ type Props = {
 /**
  * The error message sheet on amount entry (blink-wip#1275), opened on top of the inline
  * error, which stays. Rulings 2026-09-17:
- * - L1/L2, the recipient didn't answer: Try again repeats Next
- * - L3, the recipient sent an invoice for the wrong amount: Close only
+ * - L1/L2, "Couldn't reach the recipient": Try again repeats Next
+ * - L3, "Recipient sent the wrong amount": Close only
  * - A3, over the daily limit: Change amount empties the amount here. It opens by itself on
  *   crossing the limit, stays closed while the amount stays over, and opens again on the
  *   next crossing
@@ -39,9 +39,11 @@ export const AmountEntryErrorSheet: React.FC<Props> = ({
     [limitMessage],
   )
 
-  const sheet = useDismissibleErrorMsg<{ message: string; canRetry?: boolean }>(
-    lnurlError ?? limitError,
-  )
+  const sheet = useDismissibleErrorMsg<{
+    title?: string
+    message: string
+    canRetry?: boolean
+  }>(lnurlError ?? limitError)
   const shown = sheet.shown
 
   const button = (() => {
@@ -70,7 +72,7 @@ export const AmountEntryErrorSheet: React.FC<Props> = ({
     <ErrorMsgBottomSheet
       isVisible={sheet.isVisible}
       onClose={sheet.dismiss}
-      title={LL.SendBitcoinScreen.problemSheetTitle()}
+      title={shown?.title ?? LL.SendBitcoinScreen.problemSheetTitle()}
       body={shown?.message ?? ""}
       {...button}
       testID="amount-entry-error-msg-bottom-sheet"

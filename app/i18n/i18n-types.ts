@@ -7717,6 +7717,14 @@ type RootTranslation = {
 		 */
 		problemSheetTitle: string
 		/**
+		 * C​o​u​l​d​n​'​t​ ​r​e​a​c​h​ ​t​h​e​ ​r​e​c​i​p​i​e​n​t
+		 */
+		recipientUnreachableTitle: string
+		/**
+		 * R​e​c​i​p​i​e​n​t​ ​s​e​n​t​ ​t​h​e​ ​w​r​o​n​g​ ​a​m​o​u​n​t
+		 */
+		recipientWrongAmountTitle: string
+		/**
 		 * U​p​g​r​a​d​e​ ​y​o​u​r​ ​a​c​c​o​u​n​t​ ​t​o​ ​i​n​c​r​e​a​s​e​ ​y​o​u​r​ ​l​i​m​i​t
 		 */
 		upgradeAccountToIncreaseLimit: string
@@ -21429,6 +21437,14 @@ export type TranslationFunctions = {
 		 * A small problem
 		 */
 		problemSheetTitle: () => LocalizedString
+		/**
+		 * Couldn't reach the recipient
+		 */
+		recipientUnreachableTitle: () => LocalizedString
+		/**
+		 * Recipient sent the wrong amount
+		 */
+		recipientWrongAmountTitle: () => LocalizedString
 		/**
 		 * Upgrade your account to increase your limit
 		 */

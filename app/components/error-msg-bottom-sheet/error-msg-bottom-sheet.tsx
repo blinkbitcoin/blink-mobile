@@ -1,6 +1,6 @@
 import React from "react"
 import { View } from "react-native"
-import { SafeAreaView } from "react-native-safe-area-context"
+import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { BottomSheet } from "@app/components/bottom-sheet"
@@ -35,7 +35,8 @@ export const ErrorMsgBottomSheet: React.FC<ErrorMsgBottomSheetProps> = ({
   onPrimaryPress,
   testID,
 }) => {
-  const styles = useStyles()
+  const { bottom } = useSafeAreaInsets()
+  const styles = useStyles({ bottom })
   const {
     theme: { colors },
   } = useTheme()
@@ -48,20 +49,15 @@ export const ErrorMsgBottomSheet: React.FC<ErrorMsgBottomSheetProps> = ({
       expandable={false}
       testID={testID}
       header={
-        // Measured in the sheet's own window rather than read from the app root: on
-        // Android the modal window already stops above the navigation bar, and the
-        // root inset would count it twice.
-        <SafeAreaView edges={["bottom"]}>
-          <View style={styles.content}>
-            <IconHero
-              icon="warning"
-              iconColor={colors.warning}
-              title={title}
-              subtitle={body}
-            />
-            <GaloyPrimaryButton title={primaryLabel} onPress={onPrimaryPress} />
-          </View>
-        </SafeAreaView>
+        <View style={styles.content}>
+          <IconHero
+            icon="warning"
+            iconColor={colors.warning}
+            title={title}
+            subtitle={body}
+          />
+          <GaloyPrimaryButton title={primaryLabel} onPress={onPrimaryPress} />
+        </View>
       }
     >
       {null}
@@ -69,11 +65,11 @@ export const ErrorMsgBottomSheet: React.FC<ErrorMsgBottomSheetProps> = ({
   )
 }
 
-const useStyles = makeStyles(() => ({
-  // Figma: button group 10 above the CTA, 20 below it, 20 at the sides.
+const useStyles = makeStyles((_, { bottom }: { bottom: number }) => ({
+  // Figma: 20 at the sides and 20 under the CTA, above the home indicator.
   content: {
     paddingHorizontal: 20,
-    paddingBottom: 20,
+    paddingBottom: bottom + 20,
     gap: 24,
   },
 }))

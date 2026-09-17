@@ -447,6 +447,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
           if (!lnurlParams) {
             setIsLoadingLnurl(false)
             setLnurlError({
+              title: LL.SendBitcoinScreen.recipientUnreachableTitle(),
               message: LL.SendBitcoinScreen.failedToFetchLnurlInvoice(),
               canRetry: true,
             })
@@ -479,6 +480,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
           ) {
             // Paying it would send the wrong amount, so there is no retry (L3).
             setLnurlError({
+              title: LL.SendBitcoinScreen.recipientWrongAmountTitle(),
               message: LL.SendBitcoinScreen.lnurlInvoiceIncorrectAmount(),
               canRetry: false,
             })
@@ -496,6 +498,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
           setIsLoadingLnurl(false)
           reportError("send-bitcoin-details", error)
           setLnurlError({
+            title: LL.SendBitcoinScreen.recipientUnreachableTitle(),
             message: LL.SendBitcoinScreen.failedToFetchLnurlInvoice(),
             canRetry: true,
           })
