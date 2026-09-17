@@ -705,6 +705,10 @@ describe("the telemetry outbox", () => {
     })
 
     it("evicts oldest-first at capacity, and counts it apart from expiry", async () => {
+      // The clock is frozen: the oldest record sits just inside the TTL, and the 500
+      // enqueues below each sweep the whole directory — slow enough on a CI runner that
+      // a live clock let the record expire before it could be evicted.
+      const clock = jest.spyOn(Date, "now").mockReturnValue(1_700_000_000_000)
       const store = createOutboxStore(DIR)
       const oldest = record({ queuedAt: Date.now() - OUTBOX_TTL_MS + 1_000 })
       await store.enqueue(oldest)
@@ -715,6 +719,7 @@ describe("the telemetry outbox", () => {
       await store.enqueue(record({ queuedAt: Date.now() }))
 
       const pending = await store.pending()
+      clock.mockRestore()
       expect(pending).toHaveLength(OUTBOX_MAX_RECORDS)
       expect(pending.map((r) => r.telemetryEventId)).not.toContain(
         oldest.telemetryEventId,
