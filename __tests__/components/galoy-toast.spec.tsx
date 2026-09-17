@@ -2,10 +2,11 @@ import React from "react"
 import { StyleSheet, TextStyle } from "react-native"
 import { ReactTestInstance } from "react-test-renderer"
 import { render } from "@testing-library/react-native"
+import { createTheme, ThemeProvider } from "@rn-vui/themed"
 
 import { GaloyToast } from "@app/components/galoy-toast/galoy-toast"
 import { dark, light } from "@app/rne-theme/colors"
-import { ContextForScreenWithTheme } from "../screens/helper"
+import theme from "@app/rne-theme/theme"
 
 type ToastRenderer = (params: { text1?: string; text2?: string }) => React.ReactNode
 
@@ -51,9 +52,11 @@ const MESSAGE = "Address copied"
 const renderToast = (type: string, mode: "light" | "dark" = "dark") => {
   render(<GaloyToast />)
   return render(
-    <ContextForScreenWithTheme mode={mode}>
+    // The production theme, so its Text config (font family, type scale weights)
+    // applies exactly as it does in the app.
+    <ThemeProvider theme={createTheme({ ...theme, mode })}>
       {mockToastProps.config?.[type]({ text1: "Title", text2: MESSAGE })}
-    </ContextForScreenWithTheme>,
+    </ThemeProvider>,
   )
 }
 
@@ -115,6 +118,18 @@ describe("GaloyToast", () => {
         const { getByText } = renderToast(type)
 
         expect(getByText(MESSAGE).props.numberOfLines).toBeUndefined()
+      })
+
+      it("wraps a long message inside the row instead of running past the border", () => {
+        const { getByText } = renderToast(type)
+
+        expect(flatStyle(getByText(MESSAGE)).flex).toBe(1)
+      })
+
+      it("drops Android font padding so the message centres on the icon", () => {
+        const { getByText } = renderToast(type)
+
+        expect(flatStyle(getByText(MESSAGE)).includeFontPadding).toBe(false)
       })
 
       it(`uses the ${icon} icon at 18, in the accent colour`, () => {
