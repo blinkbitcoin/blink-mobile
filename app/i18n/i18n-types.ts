@@ -7525,6 +7525,10 @@ type RootTranslation = {
 		 */
 		changeAmount: string
 		/**
+		 * T​r​y​ ​a​g​a​i​n
+		 */
+		tryAgain: string
+		/**
 		 * R​e​m​a​i​n​i​n​g​ ​{​r​e​m​a​i​n​i​n​g​}​ ​(​{​r​e​m​a​i​n​i​n​g​S​a​t​s​}​)​ ​w​i​l​l​ ​b​e​ ​c​o​n​v​e​r​t​e​d​ ​t​o​ ​B​i​t​c​o​i​n​.​ ​U​S​D​ ​m​i​n​i​m​u​m​:​ ​{​m​i​n​i​m​u​m​}​.
 		 * @param {string} minimum
 		 * @param {string} remaining
@@ -21249,6 +21253,10 @@ export type TranslationFunctions = {
 		 * Change amount
 		 */
 		changeAmount: () => LocalizedString
+		/**
+		 * Try again
+		 */
+		tryAgain: () => LocalizedString
 		/**
 		 * Remaining {remaining} ({remainingSats}) will be converted to Bitcoin. USD minimum: {minimum}.
 		 */

@@ -63,6 +63,7 @@ import { useSentTransition } from "./review/use-sent-transition"
 import { SendHero } from "./send-hero"
 import { useSendBalances } from "./hooks/use-send-wallets"
 import { useDismissibleErrorMsg } from "./hooks/use-dismissible-error-msg"
+import { useReviewExits } from "./hooks/use-review-exits"
 import { useVerifyPaymentSettled } from "./hooks/use-verify-payment-settled"
 import { PaymentSendExtraInfo } from "./payment-details/index.types"
 import useFee from "./use-fee"
@@ -603,8 +604,10 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   const isFeeFailed = fee.status === "error" && !fee.amount
 
   // A classified SDK failure on the quote is something the user can't fix on review, so
-  // the error message sheet (#1275 R2) opens on top of the inline error, which stays.
-  // Nothing has been sent yet, so changing the amount is safe on every rail.
+  // the error message sheet (#1278 R2) opens on top of the inline error, which stays.
+  // Nothing has been sent yet, so neither of its actions can pay twice: Change amount when
+  // a new amount can fix it, otherwise Try again from the first step.
+  const reviewExits = useReviewExits()
   const feeErrorMsg = useDismissibleErrorMsg(
     isFeeFailed && isSelfCustodialErrorCode(feeErrorCode) ? feeErrorText : undefined,
   )
@@ -721,7 +724,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
                   {canChangeAmount ? (
                     <Chip
                       label={LL.SendBitcoinConfirmationScreen.changeAmount()}
-                      onPress={() => navigation.goBack()}
+                      onPress={reviewExits.changeAmount}
                       style={styles.changeAmountChip}
                     />
                   ) : null}
@@ -795,11 +798,15 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
         onClose={feeErrorMsg.dismiss}
         title={LL.SendBitcoinScreen.problemSheetTitle()}
         body={feeErrorMsg.message ?? ""}
-        primaryLabel={LL.SendBitcoinConfirmationScreen.changeAmount()}
-        onPrimaryPress={() => {
-          feeErrorMsg.dismiss()
-          navigation.goBack()
-        }}
+        {...(isAmountFixableError(feeErrorCode) && paymentDetail.canSetAmount
+          ? {
+              primaryLabel: LL.SendBitcoinConfirmationScreen.changeAmount(),
+              onPrimaryPress: reviewExits.changeAmount,
+            }
+          : {
+              primaryLabel: LL.SendBitcoinConfirmationScreen.tryAgain(),
+              onPrimaryPress: reviewExits.startOver,
+            })}
         testID="fee-error-msg-bottom-sheet"
       />
     </Screen>

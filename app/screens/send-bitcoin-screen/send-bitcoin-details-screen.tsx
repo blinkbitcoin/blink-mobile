@@ -150,7 +150,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
 
   const { convertMoneyAmount: _convertMoneyAmount } = usePriceConversion()
   const { zeroDisplayAmount } = useDisplayCurrency()
-  const { paymentDestination } = route.params
+  const { paymentDestination, resetAmountAt } = route.params
 
   const [paymentDetail, setPaymentDetail] =
     useState<PaymentDetail<WalletCurrency> | null>(null)
@@ -219,6 +219,16 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     convertMoneyAmount: paymentDetail?.convertMoneyAmount ?? _convertMoneyAmount,
     onAmountChange: setAmount,
   })
+
+  // Review's "Change amount" comes back with a fresh `resetAmountAt`: the amount starts
+  // from zero, and the destination, wallet and note stay. The back arrow sends none.
+  const handledResetAt = React.useRef(resetAmountAt)
+  useEffect(() => {
+    if (!resetAmountAt || handledResetAt.current === resetAmountAt) return
+    handledResetAt.current = resetAmountAt
+    setAmount(zeroDisplayAmount)
+    amountPad.showAmount(zeroDisplayAmount)
+  }, [resetAmountAt, setAmount, zeroDisplayAmount, amountPad])
 
   // we are caching the _convertMoneyAmount when the screen loads.
   // this is because the _convertMoneyAmount can change while the user is on this screen
