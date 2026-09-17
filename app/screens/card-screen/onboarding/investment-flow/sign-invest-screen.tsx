@@ -35,6 +35,7 @@ import {
   mintInvestmentAgreement,
   ROUTE_MISSING_CODE,
 } from "./investment-agreement"
+import { resetToTransferStep } from "./transfer-invest-screen"
 
 type SignInvestRoute = RouteProp<RootStackParamList, "cardOnboardingSignInvestScreen">
 
@@ -243,12 +244,13 @@ export const SignInvestScreen: React.FC = () => {
   const [hasSignedOtherEnvelope, setHasSignedOtherEnvelope] = React.useState(false)
 
   /**
-   * Replaces rather than pushes: the agreement cannot be unsigned, so leaving this
-   * screen behind would let a back swipe land on a finished session with no way on.
-   * The figure carried is the one minted with the envelope that was signed; when the
-   * library names the envelope and it is not that one, nothing is carried and the step
-   * does not move on. The same moment records the investment, so the home can steer
-   * the investor back to paying it if they leave before they do.
+   * Rebuilds the stack as the home and the transfer step: the agreement cannot be
+   * unsigned, and every screen of the flow left underneath, from the welcome to this
+   * one, is a way to sign it a second time. The figure carried is the one minted with
+   * the envelope that was signed; when the library names the envelope and it is not
+   * that one, nothing is carried and the step does not move on. The same moment
+   * records the investment, so the home's bulletin can steer the investor back to
+   * paying it if they leave first.
    */
   const goToTransfer = React.useCallback(
     (result: { envelopeId?: string }) => {
@@ -269,7 +271,7 @@ export const SignInvestScreen: React.FC = () => {
 
       const investment = { selectedAmountUsd, settlementSats: minted?.settlementSats }
       startCardInvestment(investment)
-      navigation.replace("cardOnboardingTransferInvestScreen", investment)
+      navigation.dispatch(resetToTransferStep(investment))
     },
     [navigation, selectedAmountUsd, startCardInvestment],
   )
