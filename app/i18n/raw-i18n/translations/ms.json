@@ -2581,7 +2581,8 @@
   },
   "StablesatsRestriction": {
     "walletLabel": "tidak tersedia di rantau anda",
-    "anonModeWalletLabel": "tidak tersedia dalam mod Incognito"
+    "anonModeWalletLabel": "tidak tersedia dalam mod Incognito",
+    "unknownRegionWalletLabel": "ketersediaan tidak dapat disemak, tarik ke bawah untuk cuba lagi"
   },
   "AnonModeConvertModal": {
     "title": "Pindahkan baki Dolar anda dahulu",
@@ -2604,7 +2605,9 @@
     "contactSupport": "Hubungi sokongan"
   },
   "DollarBalanceRestriction": {
-    "modalTitle": "Baki dolar tidak tersedia di rantau anda"
+    "modalTitle": "Baki dolar tidak tersedia di rantau anda",
+    "unknownRegionModalTitle": "Tidak dapat menyemak ketersediaan baki dolar",
+    "unknownRegionModalBody": "Kami tidak dapat menyemak sama ada baki dolar tersedia untuk anda. Tarik ke bawah pada skrin utama untuk cuba lagi."
   },
   "ConvertDollarToBitcoinModal": {
     "title": "Baki dolar tidak tersedia di rantau anda",

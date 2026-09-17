@@ -8633,6 +8633,10 @@ type RootTranslation = {
 		 * n​o​t​ ​a​v​a​i​l​a​b​l​e​ ​i​n​ ​I​n​c​o​g​n​i​t​o​ ​m​o​d​e
 		 */
 		anonModeWalletLabel: string
+		/**
+		 * c​o​u​l​d​n​'​t​ ​c​h​e​c​k​ ​a​v​a​i​l​a​b​i​l​i​t​y​,​ ​p​u​l​l​ ​d​o​w​n​ ​t​o​ ​r​e​t​r​y
+		 */
+		unknownRegionWalletLabel: string
 	}
 	AnonModeConvertModal: {
 		/**
@@ -8697,6 +8701,14 @@ type RootTranslation = {
 		 * D​o​l​l​a​r​ ​B​a​l​a​n​c​e​ ​i​s​ ​n​o​t​ ​a​v​a​i​l​a​b​l​e​ ​i​n​ ​y​o​u​r​ ​r​e​g​i​o​n
 		 */
 		modalTitle: string
+		/**
+		 * C​o​u​l​d​n​'​t​ ​c​h​e​c​k​ ​D​o​l​l​a​r​ ​B​a​l​a​n​c​e​ ​a​v​a​i​l​a​b​i​l​i​t​y
+		 */
+		unknownRegionModalTitle: string
+		/**
+		 * W​e​ ​c​o​u​l​d​n​'​t​ ​c​h​e​c​k​ ​w​h​e​t​h​e​r​ ​t​h​e​ ​D​o​l​l​a​r​ ​B​a​l​a​n​c​e​ ​i​s​ ​a​v​a​i​l​a​b​l​e​ ​t​o​ ​y​o​u​.​ ​P​u​l​l​ ​d​o​w​n​ ​o​n​ ​t​h​e​ ​h​o​m​e​ ​s​c​r​e​e​n​ ​t​o​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		unknownRegionModalBody: string
 	}
 	ConvertDollarToBitcoinModal: {
 		/**
@@ -22239,6 +22251,10 @@ export type TranslationFunctions = {
 		 * not available in Incognito mode
 		 */
 		anonModeWalletLabel: () => LocalizedString
+		/**
+		 * couldn't check availability, pull down to retry
+		 */
+		unknownRegionWalletLabel: () => LocalizedString
 	}
 	AnonModeConvertModal: {
 		/**
@@ -22303,6 +22319,14 @@ export type TranslationFunctions = {
 		 * Dollar Balance is not available in your region
 		 */
 		modalTitle: () => LocalizedString
+		/**
+		 * Couldn't check Dollar Balance availability
+		 */
+		unknownRegionModalTitle: () => LocalizedString
+		/**
+		 * We couldn't check whether the Dollar Balance is available to you. Pull down on the home screen to try again.
+		 */
+		unknownRegionModalBody: () => LocalizedString
 	}
 	ConvertDollarToBitcoinModal: {
 		/**

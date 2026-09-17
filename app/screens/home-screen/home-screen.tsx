@@ -93,6 +93,7 @@ import {
   useSettingsScreenQuery,
   WalletCurrency,
 } from "@app/graphql/generated"
+import { GateReason } from "@app/types/account"
 import { AccountType } from "@app/types/wallet"
 import { useLevel } from "@app/graphql/level-context"
 
@@ -432,7 +433,13 @@ export const HomeScreen: React.FC = () => {
     isRestricted: isDollarBalanceRestricted,
     isRegionDetermined: isDollarBalanceRegionDetermined,
   } = useDollarBalanceRestriction()
-  const { isGated: isDollarBalanceGated, isRegionPending } = useDollarBalanceGate()
+  const {
+    isGated: isDollarBalanceGated,
+    isRegionPending,
+    reason: dollarBalanceGateReason,
+  } = useDollarBalanceGate()
+  const isDollarBalanceRegionUnknown =
+    dollarBalanceGateReason === GateReason.UnknownRegion
   const { refetch: refetchCustodialRestrictions } = useCustodialRestrictions()
   const { isAnonMode } = useSelfCustodialAccountMode()
   const { promptEnhancedMode, isEnhancedModePromptVisible } = useEnhancedModePrompt()

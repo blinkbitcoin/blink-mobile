@@ -3,6 +3,7 @@ import { CountryCode } from "libphonenumber-js/mobile"
 import { useFeatureFlags, useRemoteConfig } from "@app/config/feature-flags-context"
 import { useCustodialRestrictions } from "@app/custodial/providers/restrictions"
 import {
+  GateReason,
   Restrictions,
   RestrictionVerdict,
   RestrictionVerdictStatus,
@@ -30,6 +31,27 @@ export type AccountRestrictions = Restrictions & {
 type BlockedCountries = {
   dollarBalance: string[]
   transfer: string[]
+}
+
+type GateReasonInputs = {
+  isAnonMode: boolean
+  isRestricted: boolean
+  isRegionDetermined: boolean
+}
+
+/**
+ * The one reading of a closed gate, shared by every feature gate so no surface derives it
+ * on its own. Anon comes first because it resolves no region, so neither region reason can
+ * apply to it; a restriction with no determined region behind it is the unanswered query.
+ */
+export const toGateReason = ({
+  isAnonMode,
+  isRestricted,
+  isRegionDetermined,
+}: GateReasonInputs): GateReason | null => {
+  if (isAnonMode) return GateReason.Anon
+  if (!isRestricted) return null
+  return isRegionDetermined ? GateReason.Region : GateReason.UnknownRegion
 }
 
 /** What a session with no Blink account behind it answers to: there is nothing to gate. */

@@ -18,6 +18,7 @@ import {
 import { HideAmountContextProvider } from "@app/graphql/hide-amount-context"
 import { IsAuthedContextProvider } from "@app/graphql/is-authed-context"
 import { mockCurrencyList } from "@app/graphql/mocks"
+import { GateReason } from "@app/types/account"
 import { ConvertDirection } from "@app/types/payment"
 import {
   NormalizedTransaction,
@@ -90,6 +91,7 @@ let mockRegionPendingOverride = false
 let mockTransferBlockedOverride = false
 let mockTransferRegionPendingOverride = false
 let mockDollarBalanceModalVisible = false
+let mockDollarBalanceModalRegionUnknown = false
 
 jest.mock("@app/hooks/use-active-wallet", () => ({
   useActiveWallet: () =>
@@ -164,8 +166,16 @@ jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
   useDollarBalanceGate: () => ({
     isGated: mockIsAnonMode || mockDollarBalanceRestrictedOverride,
     isRegionPending: mockRegionPendingOverride,
+    reason: mockDollarGateReason(),
   }),
 }))
+
+/** The gate's own reading of a closed gate, mirrored so the modal's copy can be asserted. */
+const mockDollarGateReason = (): GateReason | null => {
+  if (mockIsAnonMode) return GateReason.Anon
+  if (!mockDollarBalanceRestrictedOverride) return null
+  return mockDollarRegionDeterminedOverride ? GateReason.Region : GateReason.UnknownRegion
+}
 
 jest.mock("@app/self-custodial/hooks/use-self-custodial-account-mode", () => ({
   useSelfCustodialAccountMode: () => ({ isAnonMode: mockIsAnonMode }),
@@ -331,8 +341,15 @@ jest.mock("@app/components/dollar-balance-restriction-modal", () => {
   const ReactActual = jest.requireActual("react")
   const { Text } = jest.requireActual("react-native")
   return {
-    DollarBalanceRestrictionModal: ({ isVisible }: { isVisible: boolean }) => {
+    DollarBalanceRestrictionModal: ({
+      isVisible,
+      isRegionUnknown,
+    }: {
+      isVisible: boolean
+      isRegionUnknown: boolean
+    }) => {
       mockDollarBalanceModalVisible = isVisible
+      mockDollarBalanceModalRegionUnknown = isRegionUnknown
       return ReactActual.createElement(
         Text,
         { testID: "dollar-balance-restriction-modal" },
@@ -919,6 +936,7 @@ const resetHomeScreenMocks = () => {
   mockReminderBulletinPhase = WindDownStatus.PreCutoff
   mockTransferBlockedOverride = false
   mockDollarBalanceModalVisible = false
+  mockDollarBalanceModalRegionUnknown = false
   mockForcedConversionParams = null
   mockIsAnonMode = false
   mockIsRestrictedRegion = false
@@ -1073,6 +1091,56 @@ describe("HomeScreen", () => {
 
     expect(mockForcedConversionParams?.isRestricted).toBe(false)
     expect(queryByTestId("convert-modal")).toBeNull()
+  })
+
+  /** The disabled Transfer button is the user's way into the explanation. When the gate
+   *  closed without a region behind it, the explanation must say the check failed, not
+   *  that the region is restricted. */
+  it("opens the restriction modal as an unanswered check when only an unknown region gates", async () => {
+    mockDollarBalanceRestrictedOverride = true
+    mockDollarRegionDeterminedOverride = false
+    currentMocks = generateHomeMock({
+      level: AccountLevel.One,
+      network: Network.Mainnet,
+      btcBalance: 1000,
+      usdBalance: 0,
+    })
+
+    const { getByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    fireEvent.press(getByTestId("transfer", { includeHiddenElements: true }))
+    await flushEffects()
+
+    expect(mockDollarBalanceModalVisible).toBe(true)
+    expect(mockDollarBalanceModalRegionUnknown).toBe(true)
+  })
+
+  it("opens the restriction modal as a decided region when the server restricted it", async () => {
+    mockDollarBalanceRestrictedOverride = true
+    currentMocks = generateHomeMock({
+      level: AccountLevel.One,
+      network: Network.Mainnet,
+      btcBalance: 1000,
+      usdBalance: 0,
+    })
+
+    const { getByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    fireEvent.press(getByTestId("transfer", { includeHiddenElements: true }))
+    await flushEffects()
+
+    expect(mockDollarBalanceModalVisible).toBe(true)
+    expect(mockDollarBalanceModalRegionUnknown).toBe(false)
   })
 
   it("does not auto-open the convert modal when the restricted account has no Dollar balance", async () => {

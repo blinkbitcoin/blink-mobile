@@ -2581,7 +2581,8 @@
   },
   "StablesatsRestriction": {
     "walletLabel": "nu este disponibil în regiunea ta",
-    "anonModeWalletLabel": "indisponibil în modul Incognito"
+    "anonModeWalletLabel": "indisponibil în modul Incognito",
+    "unknownRegionWalletLabel": "disponibilitatea nu a putut fi verificată, trage în jos pentru a reîncerca"
   },
   "AnonModeConvertModal": {
     "title": "Transferă mai întâi soldul tău în dolari",
@@ -2604,7 +2605,9 @@
     "contactSupport": "Contactează asistența"
   },
   "DollarBalanceRestriction": {
-    "modalTitle": "Soldul în dolari nu este disponibil în regiunea ta"
+    "modalTitle": "Soldul în dolari nu este disponibil în regiunea ta",
+    "unknownRegionModalTitle": "Nu s-a putut verifica disponibilitatea soldului în dolari",
+    "unknownRegionModalBody": "Nu am putut verifica dacă soldul în dolari este disponibil pentru tine. Trage în jos pe ecranul principal pentru a reîncerca."
   },
   "ConvertDollarToBitcoinModal": {
     "title": "Soldul în dolari nu este disponibil în regiunea ta",

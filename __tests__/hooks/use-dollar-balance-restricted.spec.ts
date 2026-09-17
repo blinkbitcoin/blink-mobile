@@ -1,6 +1,10 @@
 import { renderHook } from "@testing-library/react-native"
 
-import { RestrictionVerdict, RestrictionVerdictStatus } from "@app/types/account"
+import {
+  GateReason,
+  RestrictionVerdict,
+  RestrictionVerdictStatus,
+} from "@app/types/account"
 import { AccountType } from "@app/types/wallet"
 
 const mockUseDeviceLocation = jest.fn()
@@ -229,6 +233,46 @@ describe("useDollarBalanceRestriction", () => {
     })
   })
 
+  /** The surface's copy reads the reason, so a gate closed by an unanswered query must
+   *  never be told apart from a decided one by the surface itself. */
+  describe("useDollarBalanceGate reason", () => {
+    const readReason = () =>
+      renderHook(() => useDollarBalanceGate()).result.current.reason
+
+    beforeEach(() => setup(AccountType.Custodial))
+
+    it("names Anon when the mode gates on its own", () => {
+      setup(AccountType.SelfCustodial)
+      mockIsAnonMode = true
+
+      expect(readReason()).toBe(GateReason.Anon)
+    })
+
+    it("names the region when the server decided the restriction", () => {
+      serverAnswers(true)
+
+      expect(readReason()).toBe(GateReason.Region)
+    })
+
+    it("names the unknown region when asking has stopped working", () => {
+      serverUnreachable()
+
+      expect(readReason()).toBe(GateReason.UnknownRegion)
+    })
+
+    it("names nothing while the verdict is still resolving", () => {
+      serverPending()
+
+      expect(readReason()).toBeNull()
+    })
+
+    it("names nothing once the server clears the balance", () => {
+      serverAnswers(false)
+
+      expect(readReason()).toBeNull()
+    })
+  })
+
   describe("while the verdict is still resolving", () => {
     beforeEach(() => setup(AccountType.Custodial))
 
@@ -292,6 +336,7 @@ describe("useDollarBalanceRestriction", () => {
       expect(renderHook(() => useDollarBalanceGate()).result.current).toEqual({
         isGated: true,
         isRegionPending: false,
+        reason: GateReason.Anon,
       })
     })
   })

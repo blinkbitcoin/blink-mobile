@@ -1,6 +1,7 @@
+import { GateReason } from "@app/types/account"
 import { AccountType } from "@app/types/wallet"
 
-import { useAccountRestrictions } from "./use-account-restrictions"
+import { toGateReason, useAccountRestrictions } from "./use-account-restrictions"
 import { useSelfCustodialAccountMode } from "@app/self-custodial/hooks/use-self-custodial-account-mode"
 
 /** `isRestricted` needs a resolved country, so it never accuses an unrestricted user.
@@ -27,15 +28,22 @@ export const useDollarBalanceRestriction = (
 type DollarBalanceGate = {
   isGated: boolean
   isRegionPending: boolean
+  /** Why the gate is closed, null while it is open. The surface's copy reads this. */
+  reason: GateReason | null
 }
 
 /** The availability gate: Anon gates the dollar balance by itself, region otherwise. Anon
  *  resolves no region, so nothing pends there: the mode gates on its own. */
 export const useDollarBalanceGate = (): DollarBalanceGate => {
   const { isAnonMode } = useSelfCustodialAccountMode()
-  const { isRestricted, isRegionPending } = useDollarBalanceRestriction()
+  const { isRestricted, isRegionPending, isRegionDetermined } =
+    useDollarBalanceRestriction()
 
-  return { isGated: isAnonMode || isRestricted, isRegionPending }
+  return {
+    isGated: isAnonMode || isRestricted,
+    isRegionPending,
+    reason: toGateReason({ isAnonMode, isRestricted, isRegionDetermined }),
+  }
 }
 
 export const useDollarBalanceGated = (): boolean => useDollarBalanceGate().isGated

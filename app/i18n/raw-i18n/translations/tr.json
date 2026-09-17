@@ -2581,7 +2581,8 @@
   },
   "StablesatsRestriction": {
     "walletLabel": "bölgenizde kullanılamıyor",
-    "anonModeWalletLabel": "Incognito modunda kullanılamaz"
+    "anonModeWalletLabel": "Incognito modunda kullanılamaz",
+    "unknownRegionWalletLabel": "kullanılabilirlik kontrol edilemedi, yeniden denemek için aşağı çekin"
   },
   "AnonModeConvertModal": {
     "title": "Önce Dolar bakiyeni aktar",
@@ -2604,7 +2605,9 @@
     "contactSupport": "Destekle iletişime geçin"
   },
   "DollarBalanceRestriction": {
-    "modalTitle": "Dolar bakiyesi bölgenizde kullanılamıyor"
+    "modalTitle": "Dolar bakiyesi bölgenizde kullanılamıyor",
+    "unknownRegionModalTitle": "Dolar bakiyesinin kullanılabilirliği kontrol edilemedi",
+    "unknownRegionModalBody": "Dolar bakiyesinin sizin için kullanılabilir olup olmadığını kontrol edemedik. Yeniden denemek için ana ekranı aşağı çekin."
   },
   "ConvertDollarToBitcoinModal": {
     "title": "Dolar bakiyesi bölgenizde kullanılamıyor",

@@ -1,6 +1,10 @@
 import { renderHook } from "@testing-library/react-native"
 
-import { RestrictionVerdict, RestrictionVerdictStatus } from "@app/types/account"
+import {
+  GateReason,
+  RestrictionVerdict,
+  RestrictionVerdictStatus,
+} from "@app/types/account"
 import { AccountType } from "@app/types/wallet"
 
 const mockUseDeviceLocation = jest.fn()
@@ -144,19 +148,23 @@ describe("useTransferGated — region policy", () => {
     it("reports the region as pending without claiming a gate", () => {
       mockUseDeviceLocation.mockReturnValue({ countryCode: undefined, loading: true })
 
-      expect(readGate()).toEqual({ isGated: false, isRegionPending: true })
+      expect(readGate()).toEqual({ isGated: false, isRegionPending: true, reason: null })
     })
 
     it("gates once the region resolves to a blocked country", () => {
       mockUseDeviceLocation.mockReturnValue({ countryCode: "FR", loading: false })
 
-      expect(readGate()).toEqual({ isGated: true, isRegionPending: false })
+      expect(readGate()).toEqual({
+        isGated: true,
+        isRegionPending: false,
+        reason: GateReason.Region,
+      })
     })
 
     it("settles ungated once the region resolves to an allowed country", () => {
       mockUseDeviceLocation.mockReturnValue({ countryCode: "AR", loading: false })
 
-      expect(readGate()).toEqual({ isGated: false, isRegionPending: false })
+      expect(readGate()).toEqual({ isGated: false, isRegionPending: false, reason: null })
     })
 
     /** Anon gates on the mode alone, so no region resolves and nothing pends. */
@@ -164,14 +172,41 @@ describe("useTransferGated — region policy", () => {
       mockIsAnonMode = true
       mockUseDeviceLocation.mockReturnValue({ countryCode: undefined, loading: false })
 
-      expect(readGate()).toEqual({ isGated: true, isRegionPending: false })
+      expect(readGate()).toEqual({
+        isGated: true,
+        isRegionPending: false,
+        reason: GateReason.Anon,
+      })
     })
 
     it("pends a custodial account while the server has not answered", () => {
       mockUseActiveWallet.mockReturnValue({ accountType: AccountType.Custodial })
       mockCustodialVerdict = { status: RestrictionVerdictStatus.Pending }
 
-      expect(readGate()).toEqual({ isGated: false, isRegionPending: true })
+      expect(readGate()).toEqual({ isGated: false, isRegionPending: true, reason: null })
+    })
+
+    it("names the region once the server decides the block", () => {
+      mockUseActiveWallet.mockReturnValue({ accountType: AccountType.Custodial })
+      serverAnswers(true)
+
+      expect(readGate()).toEqual({
+        isGated: true,
+        isRegionPending: false,
+        reason: GateReason.Region,
+      })
+    })
+
+    /** The gate closes by policy, but the surface must not read it as a decided region. */
+    it("names the unknown region once asking has stopped working", () => {
+      mockUseActiveWallet.mockReturnValue({ accountType: AccountType.Custodial })
+      mockCustodialVerdict = { status: RestrictionVerdictStatus.Unknown }
+
+      expect(readGate()).toEqual({
+        isGated: true,
+        isRegionPending: false,
+        reason: GateReason.UnknownRegion,
+      })
     })
   })
 

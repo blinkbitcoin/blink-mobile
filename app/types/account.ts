@@ -69,3 +69,17 @@ export type RestrictionVerdict =
   | { status: typeof RestrictionVerdictStatus.Pending }
   | { status: typeof RestrictionVerdictStatus.Served; restrictions: Restrictions }
   | { status: typeof RestrictionVerdictStatus.Unknown }
+
+/**
+ * Why an availability gate is closed, for the surface that has to say so. `UnknownRegion`
+ * is the one that is not a decision: the region was never determined, so the feature is
+ * withheld by policy while nothing about where the user is has been established. Copy
+ * that reads it as a restriction accuses a user nobody restricted.
+ */
+export const GateReason = {
+  Anon: "anon",
+  Region: "region",
+  UnknownRegion: "unknownRegion",
+} as const
+
+export type GateReason = (typeof GateReason)[keyof typeof GateReason]
