@@ -12,6 +12,7 @@ import { makeStyles, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { IconHero } from "@app/components/icon-hero"
+import { SuccessBadge } from "@app/components/success-badge"
 import { fonts } from "@app/rne-theme/fonts"
 import { testProps } from "@app/utils/testProps"
 
@@ -69,6 +70,14 @@ const CAPTION_LINE_HEIGHT = { review: 18, sent: 22 } as const
 const SENT_AMOUNT_SIZE = { secondary: 16 } as const
 const SENT_LINE_HEIGHT = { secondary: 22 } as const
 
+/** Figma's sent badge sits in a 72 frame, 20 off the caption, where the send glyph has a
+ *  44 frame 10 off it. */
+const ICON_FRAME_SIZE = { review: 44, sent: 72 } as const
+const SENT_ICON_EXTRA_GAP = 10
+const SENT_BADGE_SIZE = 49
+/** The badge starts drawing while the hero is still on its way to the middle. */
+const SENT_BADGE_DELAY_MS = 150
+
 /** The sent amount takes amount entry's scale, so it lands at the size it was typed at. */
 const sentPrimaryFontSize = (amount: string): number => entryAmountFontSize(amount, false)
 
@@ -81,6 +90,9 @@ export const sentHeroGrowth = ({
   primaryAmount: string
   hasSecondaryAmount: boolean
 }): number =>
+  ICON_FRAME_SIZE.sent -
+  ICON_FRAME_SIZE.review +
+  SENT_ICON_EXTRA_GAP +
   CAPTION_LINE_HEIGHT.sent -
   CAPTION_LINE_HEIGHT.review +
   sentPrimaryFontSize(primaryAmount) +
@@ -109,6 +121,8 @@ type SendHeroProps = {
   onCaptionLongPress?: () => void
   /** 0 on review, 1 once sent: grows the lines and turns the icon green. Settled only. */
   sentProgress?: SharedValue<number>
+  /** The payment has landed: the sent badge mounts and draws itself in. */
+  isSent?: boolean
 }
 
 export const SendHero: React.FC<SendHeroProps> = ({
@@ -121,6 +135,7 @@ export const SendHero: React.FC<SendHeroProps> = ({
   onSwapCurrency,
   onCaptionLongPress,
   sentProgress,
+  isSent = false,
 }) => {
   const styles = useStyles()
   const {
@@ -225,9 +240,20 @@ export const SendHero: React.FC<SendHeroProps> = ({
     [sent],
   )
 
-  /** The orange glyph and the green one cross-fade rather than tweening the colour, which
-   *  the SVG glyph cannot take on the UI thread. */
-  const sentIconStyle = useAnimatedStyle(() => ({ opacity: sent.value }), [sent])
+  /** The send glyph fades as the frame grows round it, and the badge draws itself in its
+   *  place. */
+  const sentIconFrameStyle = useAnimatedStyle(() => {
+    const frame = interpolate(
+      sent.value,
+      [0, 1],
+      [ICON_FRAME_SIZE.review, ICON_FRAME_SIZE.sent],
+    )
+    return {
+      width: frame,
+      height: frame,
+      marginBottom: interpolate(sent.value, [0, 1], [0, SENT_ICON_EXTRA_GAP]),
+    }
+  }, [sent])
   const sendingIconStyle = useAnimatedStyle(() => ({ opacity: 1 - sent.value }), [sent])
   const isMorphing = Boolean(sentProgress) && !active
 
@@ -293,9 +319,11 @@ export const SendHero: React.FC<SendHeroProps> = ({
       <Animated.View style={sendingIconStyle}>
         <GaloyIcon name="send" size={ICON_SIZE} color={colors.primary} />
       </Animated.View>
-      <Animated.View style={[styles.iconOverlay, sentIconStyle]}>
-        <GaloyIcon name="send" size={ICON_SIZE} color={colors._green} />
-      </Animated.View>
+      {isSent ? (
+        <View style={styles.badgeOverlay}>
+          <SuccessBadge size={SENT_BADGE_SIZE} delay={SENT_BADGE_DELAY_MS} />
+        </View>
+      ) : null}
     </View>
   ) : (
     "send"
@@ -308,6 +336,7 @@ export const SendHero: React.FC<SendHeroProps> = ({
       iconSize={ICON_SIZE}
       hasIconBackground={false}
       compact
+      iconFrameStyle={isMorphing ? sentIconFrameStyle : undefined}
       caption={captionNode}
       title={amounts}
     />
@@ -326,10 +355,11 @@ const useStyles = makeStyles(({ colors }) => ({
     width: ICON_SIZE,
     height: ICON_SIZE,
   },
-  iconOverlay: {
+  /** Centred on the glyph's box, which the badge outgrows. */
+  badgeOverlay: {
     position: "absolute",
-    top: 0,
-    left: 0,
+    top: (ICON_SIZE - SENT_BADGE_SIZE) / 2,
+    left: (ICON_SIZE - SENT_BADGE_SIZE) / 2,
   },
   amount: {
     fontFamily: fonts.bold,
