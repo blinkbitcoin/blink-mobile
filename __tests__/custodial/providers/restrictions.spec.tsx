@@ -286,7 +286,7 @@ describe("CustodialRestrictionsProvider", () => {
       })
     })
 
-    it("reads Unknown, without retrying, when the server answers with no verdict", async () => {
+    it("reads Unknown, without a backoff retry, when the server answers with no verdict", async () => {
       replies = [answerWithoutVerdict]
 
       const { result } = renderVerdict()
@@ -474,6 +474,33 @@ describe("CustodialRestrictionsProvider", () => {
       expect(requestCount).toBe(5)
     })
 
+    it("folds a foreground re-ask into a poll that is still on its way", async () => {
+      replies = [dropRequest, dropRequest, dropRequest, dropRequest, holdRequest]
+
+      const { result, getClient } = renderVerdict()
+      await flushEffects()
+      await failThreeRetries()
+      await advance(60_000)
+
+      expect(requestCount).toBe(5)
+
+      /** Not awaited: it settles with the held request it joined. */
+      const foregroundReask = refetchOnForeground(getClient())
+      await flushEffects()
+
+      expect(requestCount).toBe(5)
+
+      act(() => {
+        answer(false, false)(heldRequests[0])
+      })
+      await act(() => foregroundReask)
+
+      expect(result.current.verdict).toEqual({
+        status: RestrictionVerdictStatus.Served,
+        restrictions: { dollarBalance: false, transfer: false },
+      })
+    })
+
     it("skips the poll while the app is in the background", async () => {
       replies = [dropRequest, dropRequest, dropRequest, dropRequest, dropRequest]
 
@@ -497,7 +524,10 @@ describe("CustodialRestrictionsProvider", () => {
       expect(requestCount).toBe(5)
     })
 
-    it("stops polling when the account it asked about is gone", async () => {
+    /** Documents Apollo's side of the hand-off, not the provider's cleanup: a query parked
+     *  in standby skips every poll tick on its own. The cleanup is guarded by "keeps polling
+     *  while Unknown and stops the moment an answer lands", which fails without it. */
+    it("polls nothing once the account it asked about is gone", async () => {
       replies = [dropRequest, dropRequest, dropRequest, dropRequest]
 
       const { rerender } = renderVerdict()
