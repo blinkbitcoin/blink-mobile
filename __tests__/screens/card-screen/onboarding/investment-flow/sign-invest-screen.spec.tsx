@@ -120,8 +120,17 @@ jest.mock("@app/hooks/use-card-investment-progress", () => ({
 const mockRouteParams = { current: { selectedAmountUsd: SELECTED_AMOUNT_USD } }
 
 const mockNavigate = jest.fn()
-const mockReplace = jest.fn()
+const mockDispatch = jest.fn()
 const mockGoBack = jest.fn()
+
+/** The routes a stack reset dispatched, so a test can say where the signer lands. */
+const resetRoutes = () => {
+  const action = mockDispatch.mock.calls[0]?.[0] as
+    | { type?: string; payload?: { index?: number; routes?: unknown[] } }
+    | undefined
+  expect(action?.type).toBe("RESET")
+  return action?.payload
+}
 
 jest.mock("@react-navigation/native", () => {
   const actualNav = jest.requireActual("@react-navigation/native")
@@ -129,7 +138,7 @@ jest.mock("@react-navigation/native", () => {
     ...actualNav,
     useNavigation: () => ({
       navigate: mockNavigate,
-      replace: mockReplace,
+      dispatch: mockDispatch,
       goBack: mockGoBack,
     }),
     useRoute: () => ({ params: mockRouteParams.current }),
@@ -436,7 +445,7 @@ describe("SignInvestScreen", () => {
 
     /** The account is waited for the same way, and its absence ends the same way. */
     it("gives up on the account the same way it gives up on the price", async () => {
-      mockUsdPerSat.current = USD_PER_SAT
+      mockUsdCentsPerBtc.current = USD_CENTS_PER_BTC
       mockIsAccountResolved.current = false
 
       const { getByText } = await renderScreen()
@@ -788,9 +797,11 @@ describe("SignInvestScreen", () => {
     /**
      * Carries the agreement's own figure forward, which is the whole reason the signing
      * step asks for it: the transfer step bills that, and converting the dollars again at
-     * a later price would charge something the signed document does not state.
+     * a later price would charge something the signed document does not state. The stack
+     * is rebuilt as the home and that step: every screen of the flow left underneath is
+     * a way to sign a second agreement, and back belongs on the home.
      */
-    it("advances to the transfer step once the agreement is signed", async () => {
+    it("advances to the transfer step once signed, with nothing of the flow left underneath", async () => {
       await renderScreen()
       await startedSession()
 
@@ -798,9 +809,18 @@ describe("SignInvestScreen", () => {
         callbackOf("onComplete")()
       })
 
-      expect(mockReplace).toHaveBeenCalledWith("cardOnboardingTransferInvestScreen", {
-        selectedAmountUsd: SELECTED_AMOUNT_USD,
-        settlementSats: SETTLEMENT_SATS,
+      expect(resetRoutes()).toEqual({
+        index: 1,
+        routes: [
+          { name: "Primary" },
+          {
+            name: "cardOnboardingTransferInvestScreen",
+            params: {
+              selectedAmountUsd: SELECTED_AMOUNT_USD,
+              settlementSats: SETTLEMENT_SATS,
+            },
+          },
+        ],
       })
       expect(mockNavigate).not.toHaveBeenCalled()
       expect(mockGoBack).not.toHaveBeenCalled()
@@ -834,9 +854,9 @@ describe("SignInvestScreen", () => {
         callbackOf("onComplete")()
       })
 
-      expect(mockReplace).toHaveBeenCalledWith("cardOnboardingTransferInvestScreen", {
-        selectedAmountUsd: SELECTED_AMOUNT_USD,
-        settlementSats: undefined,
+      expect(resetRoutes()?.routes?.[1]).toEqual({
+        name: "cardOnboardingTransferInvestScreen",
+        params: { selectedAmountUsd: SELECTED_AMOUNT_USD, settlementSats: undefined },
       })
     })
 
@@ -848,7 +868,7 @@ describe("SignInvestScreen", () => {
       })
 
       expect(mockGoBack).toHaveBeenCalledTimes(1)
-      expect(mockReplace).not.toHaveBeenCalled()
+      expect(mockDispatch).not.toHaveBeenCalled()
     })
 
     /** Declining lands the session back in idle, where the document is opened from; a
@@ -881,7 +901,7 @@ describe("SignInvestScreen", () => {
 
       expect(mockGoBack).not.toHaveBeenCalled()
       expect(mockNavigate).not.toHaveBeenCalled()
-      expect(mockReplace).not.toHaveBeenCalled()
+      expect(mockDispatch).not.toHaveBeenCalled()
     })
 
     /** The one failure the step words itself: whoever fills the host's fields reads, in

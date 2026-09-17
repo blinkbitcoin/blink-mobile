@@ -29,6 +29,7 @@ import {
   mintInvestmentAgreement,
   SIGNER_NOT_CONFIGURED_CODE,
 } from "./investment-agreement"
+import { resetToTransferStep } from "./transfer-invest-screen"
 
 type SignInvestRoute = RouteProp<RootStackParamList, "cardOnboardingSignInvestScreen">
 
@@ -157,15 +158,15 @@ export const SignInvestScreen: React.FC = () => {
   }, [token, cardInvestmentAgreementPrefill, usdCentsPerBtc])
 
   /**
-   * Replaces rather than pushes: the agreement cannot be unsigned, so leaving this screen
-   * behind would let a back swipe land on a finished session with no way on. The same
-   * moment records the investment, so the home can steer the investor back to paying it
-   * if they leave before they do.
+   * Rebuilds the stack as the home and the transfer step: the agreement cannot be
+   * unsigned, and every screen of the flow left underneath, from the welcome to this
+   * one, is a way to sign it a second time. The same moment records the investment, so
+   * the home's bulletin can steer the investor back to paying it if they leave first.
    */
   const goToTransfer = React.useCallback(() => {
     const investment = { selectedAmountUsd, settlementSats: settlementSats.current }
     startCardInvestment(investment)
-    navigation.replace("cardOnboardingTransferInvestScreen", investment)
+    navigation.dispatch(resetToTransferStep(investment))
   }, [navigation, selectedAmountUsd, startCardInvestment])
 
   /**

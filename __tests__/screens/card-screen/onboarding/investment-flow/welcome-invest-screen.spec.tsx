@@ -14,14 +14,20 @@ jest.mock("react-native-linear-gradient", () => ({
 }))
 
 const mockNavigate = jest.fn()
+const mockDispatch = jest.fn()
 
 /** The record the home reads to hold the invitation open; its own spec covers the
- *  record, so what matters here is when this screen writes it. */
+ *  record, so what matters here is when this screen writes it, and where it sends an
+ *  investor the record says has moved on. */
 const mockMarkInvited = jest.fn()
 const mockIsAccountResolved = { current: true }
+const mockProgress: {
+  current: { selectedAmountUsd: number; settlementSats?: number; paidAt?: number } | null
+} = { current: null }
 
 jest.mock("@app/hooks/use-card-investment-progress", () => ({
   useCardInvestmentProgress: () => ({
+    progress: mockProgress.current,
     isAccountResolved: mockIsAccountResolved.current,
     markInvited: mockMarkInvited,
   }),
@@ -33,15 +39,111 @@ jest.mock("@react-navigation/native", () => {
     ...actualNav,
     useNavigation: () => ({
       navigate: mockNavigate,
+      dispatch: mockDispatch,
     }),
   }
 })
+
+const SIGNED = { selectedAmountUsd: 25000, settlementSats: 31_704_000 }
 
 describe("WelcomeInvestScreen", () => {
   beforeEach(() => {
     loadLocale("en")
     mockIsAccountResolved.current = true
+    mockProgress.current = null
     jest.clearAllMocks()
+  })
+
+  /** Every way into the flow lands here, and the screens beyond would let an investor
+   *  who already signed sign a second agreement. */
+  describe("for an investor who already signed", () => {
+    it("resumes at the payment, with the figures the signing recorded", async () => {
+      mockProgress.current = SIGNED
+
+      render(
+        <ContextForScreen>
+          <WelcomeInvestScreen />
+        </ContextForScreen>,
+      )
+      await act(async () => {})
+
+      expect(mockDispatch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: "RESET",
+          payload: {
+            index: 1,
+            routes: [
+              { name: "Primary" },
+              {
+                name: "cardOnboardingTransferInvestScreen",
+                params: {
+                  selectedAmountUsd: SIGNED.selectedAmountUsd,
+                  settlementSats: SIGNED.settlementSats,
+                },
+              },
+            ],
+          },
+        }),
+      )
+    })
+
+    it("sends a paid investor back to the home, where the welcome is", async () => {
+      mockProgress.current = { ...SIGNED, paidAt: 1_757_800_000_000 }
+
+      render(
+        <ContextForScreen>
+          <WelcomeInvestScreen />
+        </ContextForScreen>,
+      )
+      await act(async () => {})
+
+      expect(mockDispatch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: "RESET",
+          payload: { index: 0, routes: [{ name: "Primary" }] },
+        }),
+      )
+    })
+
+    it("stays put for an investor who has not signed", async () => {
+      render(
+        <ContextForScreen>
+          <WelcomeInvestScreen />
+        </ContextForScreen>,
+      )
+      await act(async () => {})
+
+      expect(mockDispatch).not.toHaveBeenCalled()
+    })
+
+    /** A tap before the record can be read would push the next screen over a welcome
+     *  that is about to send the investor elsewhere. */
+    it("holds Continue until the account the record is filed under is known", async () => {
+      mockIsAccountResolved.current = false
+
+      const { getByText, rerender } = render(
+        <ContextForScreen>
+          <WelcomeInvestScreen />
+        </ContextForScreen>,
+      )
+      await act(async () => {})
+      await act(async () => {
+        fireEvent.press(getByText("Continue"))
+      })
+      expect(mockNavigate).not.toHaveBeenCalled()
+
+      mockIsAccountResolved.current = true
+      rerender(
+        <ContextForScreen>
+          <WelcomeInvestScreen />
+        </ContextForScreen>,
+      )
+      await act(async () => {})
+      await act(async () => {
+        fireEvent.press(getByText("Continue"))
+      })
+      expect(mockNavigate).toHaveBeenCalledWith("cardOnboardingCompanyValuationScreen")
+    })
   })
 
   /** Opening this screen is what records the invitation, whichever way it was opened,

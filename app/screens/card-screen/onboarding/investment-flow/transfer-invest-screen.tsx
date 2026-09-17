@@ -1,6 +1,11 @@
 import * as React from "react"
 import { ScrollView, View } from "react-native"
-import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
+import {
+  CommonActions,
+  RouteProp,
+  useNavigation,
+  useRoute,
+} from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
@@ -28,6 +33,21 @@ type TransferInvestRoute = RouteProp<
   RootStackParamList,
   "cardOnboardingTransferInvestScreen"
 >
+
+/**
+ * The stack an investor who has signed lands on: the home and this step, nothing else.
+ * Every screen of the flow left underneath would be a way to sign a second agreement,
+ * and back from here belongs on the home, where the bulletin points at the payment.
+ * Built here, by the step it leads to, so the signing step and every re-entry into the
+ * flow rebuild the same stack.
+ */
+export const resetToTransferStep = (
+  params: RootStackParamList["cardOnboardingTransferInvestScreen"],
+) =>
+  CommonActions.reset({
+    index: 1,
+    routes: [{ name: "Primary" }, { name: "cardOnboardingTransferInvestScreen", params }],
+  })
 
 export const TransferInvestScreen: React.FC = () => {
   const styles = useStyles()

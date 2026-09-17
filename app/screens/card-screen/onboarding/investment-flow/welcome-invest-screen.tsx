@@ -1,6 +1,6 @@
 import * as React from "react"
 import { ScrollView, View } from "react-native"
-import { useNavigation } from "@react-navigation/native"
+import { CommonActions, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
@@ -12,6 +12,8 @@ import { useCardInvestmentProgress } from "@app/hooks/use-card-investment-progre
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
+import { resetToTransferStep } from "./transfer-invest-screen"
+
 export const WelcomeInvestScreen: React.FC = () => {
   const styles = useStyles()
   const {
@@ -20,7 +22,7 @@ export const WelcomeInvestScreen: React.FC = () => {
 
   const { LL } = useI18nContext()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-  const { isAccountResolved, markInvited } = useCardInvestmentProgress()
+  const { progress, isAccountResolved, markInvited } = useCardInvestmentProgress()
 
   /**
    * Opening this screen is what records the invitation, whichever way it was opened: the
@@ -33,9 +35,36 @@ export const WelcomeInvestScreen: React.FC = () => {
     if (isAccountResolved) markInvited()
   }, [isAccountResolved, markInvited])
 
+  /**
+   * An investor who already signed is not walked through the flow again: every way in,
+   * the home's cards, a link, a notification, lands here, and the screens beyond would
+   * let them sign a second agreement. A signed investment resumes at its payment, on the
+   * same stack the signing step leaves, whatever was open underneath; a paid one goes
+   * back to the home, where its welcome is.
+   */
+  React.useEffect(() => {
+    if (!progress) return
+    if (progress.paidAt) {
+      navigation.dispatch(
+        CommonActions.reset({ index: 0, routes: [{ name: "Primary" }] }),
+      )
+      return
+    }
+    navigation.dispatch(
+      resetToTransferStep({
+        selectedAmountUsd: progress.selectedAmountUsd,
+        settlementSats: progress.settlementSats,
+      }),
+    )
+  }, [progress, navigation])
+
   const handleNext = () => {
     navigation.navigate("cardOnboardingCompanyValuationScreen")
   }
+
+  /** Until the account is known the record cannot be read, and a tap in that window
+   *  would push the next screen over a welcome about to send the investor elsewhere. */
+  const isContinueDisabled = !isAccountResolved
 
   return (
     <Screen headerShown={false}>
@@ -60,6 +89,7 @@ export const WelcomeInvestScreen: React.FC = () => {
       <View style={styles.buttonsContainer}>
         <GaloyPrimaryButton
           title={LL.CardFlow.Onboarding.WelcomeInvest.buttonText()}
+          disabled={isContinueDisabled}
           onPress={handleNext}
         />
       </View>
