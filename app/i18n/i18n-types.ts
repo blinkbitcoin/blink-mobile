@@ -7705,6 +7705,10 @@ type RootTranslation = {
 		 */
 		amountExceedsLimit: RequiredParams<'limit'>
 		/**
+		 * A​ ​s​m​a​l​l​ ​p​r​o​b​l​e​m
+		 */
+		problemSheetTitle: string
+		/**
 		 * U​p​g​r​a​d​e​ ​y​o​u​r​ ​a​c​c​o​u​n​t​ ​t​o​ ​i​n​c​r​e​a​s​e​ ​y​o​u​r​ ​l​i​m​i​t
 		 */
 		upgradeAccountToIncreaseLimit: string
@@ -21405,6 +21409,10 @@ export type TranslationFunctions = {
 		 * Amount exceeds your remaining daily limit of {limit}
 		 */
 		amountExceedsLimit: (arg: { limit: string }) => LocalizedString
+		/**
+		 * A small problem
+		 */
+		problemSheetTitle: () => LocalizedString
 		/**
 		 * Upgrade your account to increase your limit
 		 */

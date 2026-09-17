@@ -2452,6 +2452,7 @@ const en: BaseTranslation = {
     lowFunds: "Low funds",
     amountExceed: "Amount exceeds your balance of {balance: string}",
     amountExceedsLimit: "Amount exceeds your remaining daily limit of {limit: string}",
+    problemSheetTitle: "A small problem",
     upgradeAccountToIncreaseLimit: "Upgrade your account to increase your limit",
     amountIsRequired: "Amount is required",
     cost: "Cost",
