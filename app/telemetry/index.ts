@@ -5,6 +5,7 @@ import {
   type TelemetryPayload,
 } from "./contract"
 import {
+  countMislabelledEvent,
   countUnroutedEvent,
   getDiagnosticCounters,
   logDiagnosticBreadcrumb,
@@ -87,6 +88,18 @@ export const captureTelemetryFact = (
 ): void => {
   try {
     if (!isEventPermitted(fact.event)) return
+
+    /**
+     * AD-20, enforced rather than assumed. `walletProvider` is written by the producer at
+     * emission; the carrier is chosen here from the mode. If the two disagree, a settlement
+     * callback has raced an account switch — a Spark-labelled fact arriving after the mode
+     * resolved Custodial would otherwise be handed to GA4 with `user_pseudo_id` on it. A
+     * mismatched fact is dropped and counted; it is never re-labelled.
+     */
+    if (fact.walletProvider !== currentWalletProvider()) {
+      countMislabelledEvent()
+      return
+    }
 
     const payload = toPayload(fact)
     const verdict = applyPrivacyPolicy(fact.event, payload)

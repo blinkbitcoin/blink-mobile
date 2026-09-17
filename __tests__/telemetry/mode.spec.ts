@@ -31,8 +31,14 @@ import {
   type TelemetryModeInputs,
 } from "@app/telemetry/mode"
 
+import {
+  resetPlatformIdentityForTesting,
+  setCustodialAnalyticsIdentity,
+} from "@app/telemetry/platform-analytics"
+
 const setCollectionEnabled = analytics().setAnalyticsCollectionEnabled as jest.Mock
 const setUserId = analytics().setUserId as jest.Mock
+const setUserProperties = analytics().setUserProperties as jest.Mock
 
 const inputs = (overrides: Partial<TelemetryModeInputs> = {}): TelemetryModeInputs => ({
   activeAccount: ActiveAccountKind.SelfCustodial,
@@ -133,6 +139,7 @@ describe("the collection gate", () => {
     resetTelemetryModeForTesting()
     resetDiagnosticsForTesting()
     resetEnablementForTesting()
+    resetPlatformIdentityForTesting()
     setTelemetryRolloutEnabled(true)
   })
 
@@ -251,6 +258,70 @@ describe("the collection gate", () => {
       await resolveTelemetryMode(TelemetryMode.Enhanced)
 
       expect(setUserId).toHaveBeenCalledWith(null)
+    })
+
+    it("clears every user property, not only the id", async () => {
+      await resolveTelemetryMode(TelemetryMode.Custodial)
+      setCustodialAnalyticsIdentity({ properties: { hasUsername: "true", extra: "x" } })
+      setUserProperties.mockClear()
+
+      await resolveTelemetryMode(TelemetryMode.Anon)
+
+      const [cleared] = setUserProperties.mock.calls.at(-1) ?? [{}]
+      expect(cleared).toMatchObject({
+        hasUsername: null,
+        network: null,
+        accountLevel: null,
+        galoyInstance: null,
+        extra: null,
+      })
+    })
+
+    it("refuses an identity write that lands after the switch away from Custodial", async () => {
+      // The container's effects run on GraphQL, config and level changes, any of which can
+      // fire after a self-custodial account activates. Clearing once is not enough; the
+      // setter has to say no.
+      await resolveTelemetryMode(TelemetryMode.Custodial)
+      await resolveTelemetryMode(TelemetryMode.Enhanced)
+      setUserId.mockClear()
+      setUserProperties.mockClear()
+
+      setCustodialAnalyticsIdentity({
+        userId: "ledger-id",
+        properties: { network: "mainnet" },
+      })
+
+      expect(setUserId).not.toHaveBeenCalled()
+      expect(setUserProperties).not.toHaveBeenCalled()
+    })
+
+    it("refuses the write the instant the mode moves, before the queued clear runs", async () => {
+      await resolveTelemetryMode(TelemetryMode.Custodial) // permission granted and settled
+      resolveTelemetryMode(TelemetryMode.Anon) // not awaited: the clear is still queued
+      setUserId.mockClear()
+
+      setCustodialAnalyticsIdentity({ userId: "ledger-id" })
+
+      expect(setUserId).not.toHaveBeenCalled()
+    })
+
+    it.each([{ mode: TelemetryMode.Unresolved }, { mode: TelemetryMode.Anon }])(
+      "refuses identity writes under $mode",
+      async ({ mode }) => {
+        await resolveTelemetryMode(mode)
+
+        setCustodialAnalyticsIdentity({ userId: "ledger-id" })
+
+        expect(setUserId).not.toHaveBeenCalledWith("ledger-id")
+      },
+    )
+
+    it("accepts identity writes while the session is custodial (anchor)", async () => {
+      await resolveTelemetryMode(TelemetryMode.Custodial)
+
+      setCustodialAnalyticsIdentity({ userId: "ledger-id" })
+
+      expect(setUserId).toHaveBeenCalledWith("ledger-id")
     })
 
     it("leaves it alone while the session stays custodial", async () => {

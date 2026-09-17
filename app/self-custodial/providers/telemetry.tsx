@@ -23,9 +23,10 @@ import { onKillSwitchEngaged } from "@app/telemetry/enablement"
 import { AccountMode } from "@app/types/account"
 import { AccountType, ActiveWalletStatus } from "@app/types/wallet"
 
-import { telemetryOutboxDirFor } from "../config"
+import { lnurlServerUrlFor, telemetryOutboxDirFor } from "../config"
 import { useSelfCustodialAccountMode } from "../hooks/use-self-custodial-account-mode"
 import { useSparkNetwork } from "../hooks/use-spark-network"
+import { refreshTelemetryKillSwitch } from "../lnurl-telemetry-config"
 
 import { useSelfCustodialWallet } from "./wallet"
 
@@ -52,6 +53,13 @@ import { useSelfCustodialWallet } from "./wallet"
  * app foreground — and it never subscribes to the 10 s connectivity poll. Each trigger
  * asks first whether the SDK is connected for this account and the wallet is online; the
  * mode gate and the switches are the drain's own to check.
+ *
+ * Two more things ride the same lifecycle. The kill switch is refreshed from its
+ * Blink-controlled channel on activation and foreground, from devices that may report
+ * (AD-28) — which is what makes it reachable for an account that settled its mode long
+ * ago and never calls `/recover` again. And every self-custodial account's outbox is swept
+ * on mount, not only the active one's, so a queue left behind by an account that is never
+ * activated again still expires on FR-25's schedule rather than sitting on disk.
  */
 export const SelfCustodialTelemetryMount: React.FC = () => {
   const { activeAccount, selfCustodialEntries } = useAccountRegistry()
@@ -95,6 +103,16 @@ export const SelfCustodialTelemetryMount: React.FC = () => {
       }),
     [updateState],
   )
+
+  /** FR-25: the TTL applies to every account's queue, active or not. `pending()` sweeps. */
+  const knownAccountIds = selfCustodialEntries.map((entry) => entry.id).join(",")
+  useEffect(() => {
+    for (const id of knownAccountIds.split(",").filter(Boolean)) {
+      createOutboxStore(telemetryOutboxDirFor(id, network))
+        .pending()
+        .catch(() => undefined)
+    }
+  }, [knownAccountIds, network])
 
   useEffect(() => {
     if (!accountId) {
@@ -153,13 +171,24 @@ export const SelfCustodialTelemetryMount: React.FC = () => {
     return () => setEmissionListener(null)
   }, [drainIfAble])
 
-  /** Trigger 3: app foreground. */
+  const mayReport = mode === TelemetryMode.Custodial || mode === TelemetryMode.Enhanced
+  const lnurlServerUrl = lnurlServerUrlFor(network)
+
+  /** AD-28: the switch is fetched on activation, from a device that may report. Nothing
+   *  is fetched from an Anon or Unresolved device — a request is a transmission too. */
+  useEffect(() => {
+    if (mayReport) refreshTelemetryKillSwitch(lnurlServerUrl)
+  }, [mayReport, lnurlServerUrl])
+
+  /** Trigger 3: app foreground — for the drain, and for the switch. */
   useEffect(() => {
     const subscription = AppState.addEventListener("change", (next) => {
-      if (next === "active") drainIfAble()
+      if (next !== "active") return
+      if (mayReport) refreshTelemetryKillSwitch(lnurlServerUrl)
+      drainIfAble()
     })
     return () => subscription.remove()
-  }, [drainIfAble])
+  }, [drainIfAble, mayReport, lnurlServerUrl])
 
   return null
 }

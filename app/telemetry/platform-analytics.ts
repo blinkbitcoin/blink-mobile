@@ -57,10 +57,38 @@ export type CustodialIdentity = {
   properties?: Record<string, string | null>
 }
 
+/**
+ * Pushed by `mode.ts` on every transition. A setter that checked the mode itself would
+ * need to import it, and `mode.ts` already imports this file; a flag keeps the graph a
+ * tree and the default at deny.
+ */
+let identityPermitted = false
+
+export const setCustodialIdentityPermitted = (permitted: boolean): void => {
+  identityPermitted = permitted
+}
+
+/**
+ * Every user-property key the custodial container has ever set, so a clear can reach all
+ * of them. Firebase persists user properties natively across sessions, so the fixed list
+ * covers keys a previous launch set that this process has not seen; the live set covers
+ * anything added since.
+ */
+const KNOWN_USER_PROPERTIES = ["hasUsername", "network", "accountLevel", "galoyInstance"]
+const propertiesSetThisSession = new Set<string>(KNOWN_USER_PROPERTIES)
+
+/**
+ * A no-op unless the resolved mode is positively `Custodial`. The container that calls
+ * this runs its effects on GraphQL, config and level changes, any of which can land after
+ * a switch to a self-custodial account — and Firebase would then merge the ledger id into
+ * every subsequent event. Clearing once at the transition is not enough on its own; the
+ * setter has to refuse.
+ */
 export const setCustodialAnalyticsIdentity = ({
   userId,
   properties,
 }: CustodialIdentity): void => {
+  if (!identityPermitted) return
   const client = analytics()
   if (userId !== undefined) {
     client.setUserId(userId).catch((err) => {
@@ -68,20 +96,32 @@ export const setCustodialAnalyticsIdentity = ({
     })
   }
   if (properties) {
+    for (const key of Object.keys(properties)) propertiesSetThisSession.add(key)
     client.setUserProperties(properties).catch((err) => {
       reportBoundaryFault("set analytics user properties", err)
     })
   }
 }
 
-/** Clears every user-scoped identifier the platform SDK would otherwise carry forward.
- *  Called whenever the resolved mode stops being `Custodial`. */
+/** Clears every user-scoped identifier the platform SDK would otherwise carry forward —
+ *  the user id and every user property — whenever the resolved mode stops being
+ *  `Custodial`. */
 export const clearCustodialAnalyticsIdentity = (): void => {
-  analytics()
-    .setUserId(null)
-    .catch((err) => {
-      reportBoundaryFault("clear analytics user id", err)
-    })
+  const client = analytics()
+  client.setUserId(null).catch((err) => {
+    reportBoundaryFault("clear analytics user id", err)
+  })
+  const cleared: Record<string, null> = {}
+  for (const key of propertiesSetThisSession) cleared[key] = null
+  client.setUserProperties(cleared).catch((err) => {
+    reportBoundaryFault("clear analytics user properties", err)
+  })
+}
+
+export const resetPlatformIdentityForTesting = (): void => {
+  identityPermitted = false
+  propertiesSetThisSession.clear()
+  for (const key of KNOWN_USER_PROPERTIES) propertiesSetThisSession.add(key)
 }
 
 /**

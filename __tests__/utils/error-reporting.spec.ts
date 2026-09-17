@@ -1,8 +1,12 @@
+import { setDiagnosticsTransmissible } from "@app/telemetry/transmissibility"
+import { reportError } from "@app/utils/error-logging"
 import {
   ErrorReportClass,
   classifyError,
   isConnectivityError,
+  logBreadcrumb,
   recordAppError,
+  resetErrorReportingForTesting,
   toError,
 } from "@app/utils/error-reporting"
 
@@ -18,6 +22,9 @@ const loadFreshErrorReportingModule = () => {
   let mod: typeof import("@app/utils/error-reporting") | undefined
   jest.isolateModules(() => {
     mod = require("@app/utils/error-reporting")
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const gate: typeof import("@app/telemetry/transmissibility") = require("@app/telemetry/transmissibility")
+    gate.setDiagnosticsTransmissible(true)
   })
   return mod!
 }
@@ -133,6 +140,8 @@ describe("toError", () => {
 describe("recordAppError", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    resetErrorReportingForTesting()
+    setDiagnosticsTransmissible(true)
   })
 
   it("records a defect and leaves a [defect] breadcrumb", () => {
@@ -194,5 +203,75 @@ describe("recordAppError", () => {
 
     expect(mockRecordError).toHaveBeenCalledTimes(1)
     expect(mockRecordError.mock.calls[0][0].message).toBe("real defect")
+  })
+})
+
+/**
+ * AD-13 / AD-30 / NFR-P1. Every non-fatal and breadcrumb in the app funnels through this
+ * sink, so this is where "nothing leaves an incognito or unresolved device" is enforced
+ * for error reporting — including the `reportError()` sites in the SDK lifecycle hook that
+ * do not go through `logSdkEvent`.
+ */
+describe("recordAppError — the zero-transmission gate", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    resetErrorReportingForTesting()
+    setDiagnosticsTransmissible(false)
+  })
+
+  it("holds a non-fatal while the device may not report, and sends nothing", () => {
+    reportError("SDK init", new Error("init failed for account"))
+
+    expect(mockLog).not.toHaveBeenCalled()
+    expect(mockRecordError).not.toHaveBeenCalled()
+  })
+
+  it("holds a breadcrumb the same way", () => {
+    logBreadcrumb("[self-custodial delete] storage dir unlink failed")
+
+    expect(mockLog).not.toHaveBeenCalled()
+  })
+
+  it("releases what it held once the device turns out to be one that may report", () => {
+    // A custodial user's start-up failure, raised before the mode resolved. It reaches
+    // Crashlytics a few hundred milliseconds late rather than never.
+    reportError("remote config", new Error("fetchAndActivate failed"))
+    expect(mockRecordError).not.toHaveBeenCalled()
+
+    setDiagnosticsTransmissible(true)
+
+    expect(mockRecordError).toHaveBeenCalledWith(
+      expect.objectContaining({ message: "fetchAndActivate failed" }),
+    )
+  })
+
+  it("drops what it held when the device resolves to one that may not report", () => {
+    // Raised while Unresolved; then the account resolves Anon. The mode gate withdraws
+    // again — the value was already false, but the withdrawal is a transition into a mode
+    // that may not report, and what was held belongs to that device now.
+    reportError("SDK init", new Error("init failed for account"))
+    setDiagnosticsTransmissible(false)
+
+    // A later switch to Enhanced grants — and must find nothing waiting.
+    setDiagnosticsTransmissible(true)
+
+    expect(mockRecordError).not.toHaveBeenCalled()
+    expect(mockLog).not.toHaveBeenCalled()
+  })
+
+  it("bounds what it holds", () => {
+    for (let i = 0; i < 40; i += 1) reportError("loop", new Error(`spam ${i}`))
+
+    setDiagnosticsTransmissible(true)
+
+    expect(mockRecordError.mock.calls.length).toBeLessThanOrEqual(20)
+  })
+
+  it("transmits immediately once the device may report (anchor)", () => {
+    setDiagnosticsTransmissible(true)
+
+    reportError("SDK init", new Error("init failed for account"))
+
+    expect(mockRecordError).toHaveBeenCalledTimes(1)
   })
 })

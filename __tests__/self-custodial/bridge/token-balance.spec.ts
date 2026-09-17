@@ -21,6 +21,11 @@ const loadFreshModule = () => {
   let mod: typeof import("@app/self-custodial/bridge/token-balance") | undefined
   jest.isolateModules(() => {
     mod = require("@app/self-custodial/bridge/token-balance")
+    // A fresh module graph has a fresh, closed diagnostic gate; open it as the global
+    // setup does for the shared graph.
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const gate: typeof import("@app/telemetry/transmissibility") = require("@app/telemetry/transmissibility")
+    gate.setDiagnosticsTransmissible(true)
   })
   return mod!
 }

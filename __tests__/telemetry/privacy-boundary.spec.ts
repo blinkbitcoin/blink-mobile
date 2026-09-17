@@ -312,6 +312,21 @@ describe("the telemetry privacy boundary", () => {
     })
   })
 
+  describe("AD-20 — a fact whose provider disagrees with the mode is a race, not a row", () => {
+    it("drops a Spark-labelled settlement that arrives after the mode resolved Custodial", async () => {
+      // The listener's callback lands after an account switch: the fact says spark, the
+      // carrier for Custodial is GA4. Handing it over would put a self-custodial event on
+      // GA4 with user_pseudo_id attached, under the wrong label.
+      await resolveTelemetryMode(TelemetryMode.Custodial)
+
+      logPaymentSettled(payment({ id: "sdk-late" }))
+
+      expect(logEvent).not.toHaveBeenCalled()
+      expect(await queued(store)).toEqual([])
+      expect(getDiagnosticCounters().mislabelledEvents).toBe(1)
+    })
+  })
+
   describe("AD-24 — the legacy events are gated by their row, pending review", () => {
     it("suppresses a legacy event on Enhanced because its row does not admit it yet", async () => {
       await resolveTelemetryMode(TelemetryMode.Enhanced)

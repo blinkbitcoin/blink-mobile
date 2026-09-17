@@ -30,13 +30,17 @@ type ResolvedRule = [severity: string | number, ...options: unknown[]] | string 
 const severityOf = (rule: ResolvedRule | undefined): string | number | undefined =>
   Array.isArray(rule) ? rule[0] : rule
 
-const bansAnalyticsImport = (rule: ResolvedRule | undefined): boolean => {
+const bansImportOf = (name: string, rule: ResolvedRule | undefined): boolean => {
   if (!Array.isArray(rule)) return false
   const [, options] = rule as [unknown, { paths?: { name: string }[] } | undefined]
-  return Boolean(
-    options?.paths?.some((path) => path.name === "@react-native-firebase/analytics"),
-  )
+  return Boolean(options?.paths?.some((path) => path.name === name))
 }
+
+const bansAnalyticsImport = (rule: ResolvedRule | undefined): boolean =>
+  bansImportOf("@react-native-firebase/analytics", rule)
+
+const bansCrashlyticsImport = (rule: ResolvedRule | undefined): boolean =>
+  bansImportOf("@react-native-firebase/crashlytics", rule)
 
 const bansIdentityAndCollectionCalls = (rule: ResolvedRule | undefined): boolean => {
   if (!Array.isArray(rule)) return false
@@ -78,12 +82,33 @@ describe("AD-29 — the two rules hold in the resolved ESLint config", () => {
       expect(severityOf(rules["no-restricted-imports"])).not.toBe("off")
       expect(severityOf(rules["no-restricted-imports"])).not.toBe(0)
       expect(bansAnalyticsImport(rules["no-restricted-imports"])).toBe(true)
+      expect(bansCrashlyticsImport(rules["no-restricted-imports"])).toBe(true)
 
       expect(severityOf(rules["no-restricted-syntax"])).not.toBe("off")
       expect(severityOf(rules["no-restricted-syntax"])).not.toBe(0)
       expect(bansIdentityAndCollectionCalls(rules["no-restricted-syntax"])).toBe(true)
     },
   )
+
+  it("lets Crashlytics be reached only from the sink and the boundary's diagnostics", async () => {
+    // AD-13 / AD-30: every non-fatal and breadcrumb in the app funnels through one gated
+    // sink. The ban is what makes "every self-custodial error path" a property of the
+    // build rather than of a grep.
+    for (const file of ["app/utils/error-reporting.ts", "app/telemetry/diagnostics.ts"]) {
+      const rules = await resolvedRulesFor(file)
+      expect(bansCrashlyticsImport(rules["no-restricted-imports"])).toBe(false)
+      expect(bansAnalyticsImport(rules["no-restricted-imports"])).toBe(true)
+    }
+    for (const file of [
+      "app/self-custodial/logging.ts",
+      "app/self-custodial/hooks/use-delete-account.ts",
+      "app/self-custodial/hooks/use-sdk-lifecycle.ts",
+      "app/self-custodial/bridge/convert.ts",
+    ]) {
+      const rules = await resolvedRulesFor(file)
+      expect(bansCrashlyticsImport(rules["no-restricted-imports"])).toBe(true)
+    }
+  })
 
   it("exempts exactly one file from both, and it is the boundary's platform seam", async () => {
     const rules = await resolvedRulesFor("app/telemetry/platform-analytics.ts")

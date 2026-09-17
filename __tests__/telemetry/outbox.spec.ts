@@ -115,25 +115,27 @@ const transportReturning = (result: SubmitResult | (() => SubmitResult)) => {
 const acked = (): SubmitResult => ({ kind: "acknowledged", ackedAt: Date.now() })
 const instantly = { delay: () => Promise.resolve() }
 
+const resetEverything = () => {
+  minted = 0
+  // clearAllMocks only clears call records; the shared mock returns one constant id,
+  // which would fold every unkeyed record onto a single file and hide a double report.
+  randomUUID.mockReset()
+  randomUUID.mockImplementation(() => uuid(90 + (uuidSeed += 1)))
+  mockFs.__resetMockFileSystem()
+  resetOutboxCountersForTesting()
+  resetTelemetryModeForTesting()
+  resetTelemetryTransportForTesting()
+  resetDiagnosticsForTesting()
+  resetTelemetryHealthReportingForTesting()
+  resetDrainStateForTesting()
+  resetEnablementForTesting()
+  setTelemetryRolloutEnabled(true)
+  mockCrashlyticsLog.mockClear()
+  setActiveOutbox(null)
+}
+
 describe("the telemetry outbox", () => {
-  beforeEach(() => {
-    minted = 0
-    // clearAllMocks only clears call records; the shared mock returns one constant id,
-    // which would fold every unkeyed record onto a single file and hide a double report.
-    randomUUID.mockReset()
-    randomUUID.mockImplementation(() => uuid(90 + (uuidSeed += 1)))
-    mockFs.__resetMockFileSystem()
-    resetOutboxCountersForTesting()
-    resetTelemetryModeForTesting()
-    resetTelemetryTransportForTesting()
-    resetDiagnosticsForTesting()
-    resetTelemetryHealthReportingForTesting()
-    resetDrainStateForTesting()
-    resetEnablementForTesting()
-    setTelemetryRolloutEnabled(true)
-    mockCrashlyticsLog.mockClear()
-    setActiveOutbox(null)
-  })
+  beforeEach(resetEverything)
 
   afterEach(() => {
     setActiveOutbox(null)
@@ -257,6 +259,50 @@ describe("the telemetry outbox", () => {
       await store.enqueue(record({ sdkPaymentId: null }))
 
       expect(await store.pending()).toHaveLength(2)
+    })
+
+    it("still refuses a replay after the record was acknowledged and cleaned", async () => {
+      // The SDK can re-deliver a settlement after the record that carried it is gone — a
+      // resync after a restart, a listener re-attached. A fresh id at that point is a row
+      // the warehouse cannot collapse, so the acknowledged payment id is kept as a
+      // tombstone for the TTL.
+      const store = createOutboxStore(DIR)
+      const first = record({ sdkPaymentId: "sdk-replayed" })
+      await store.enqueue(first)
+      await store.acknowledge(first)
+      expect(await store.pending()).toEqual([])
+
+      await store.enqueue(record({ sdkPaymentId: "sdk-replayed" }))
+
+      expect(await store.pending()).toEqual([])
+      expect(getOutboxCounters().deduplicated).toBe(1)
+    })
+
+    it("keeps that refusal across a store recreated after a restart", async () => {
+      const first = record({ sdkPaymentId: "sdk-replayed-later" })
+      const before = createOutboxStore(DIR)
+      await before.enqueue(first)
+      await before.acknowledge(first)
+
+      const after = createOutboxStore(DIR)
+      await after.enqueue(record({ sdkPaymentId: "sdk-replayed-later" }))
+
+      expect(await after.pending()).toEqual([])
+    })
+
+    it("forgets a tombstone once it is older than the TTL", async () => {
+      const store = createOutboxStore(DIR)
+      const first = record({ sdkPaymentId: "sdk-ancient" })
+      await store.enqueue(first)
+      await store.acknowledge(first)
+      const clock = jest
+        .spyOn(Date, "now")
+        .mockReturnValue(Date.now() + OUTBOX_TTL_MS + 1_000)
+
+      await store.enqueue(record({ sdkPaymentId: "sdk-ancient" }))
+
+      clock.mockRestore()
+      expect(await createOutboxStore(DIR).pending()).toHaveLength(1)
     })
 
     it("never writes the SDK payment id into a payload (FR-24)", async () => {
@@ -635,6 +681,28 @@ describe("the telemetry outbox", () => {
         expect(await store.pending()).toEqual([])
       })
 
+      it("does not submit a record whose mode closed during the write before it", async () => {
+        // `markSubmitted` is a disk write. A switch to incognito during that await closes
+        // the gate synchronously while the iteration is already past its first check; a
+        // submit after that is the one event FR-5's discard cannot unsend.
+        const base = createOutboxStore(DIR)
+        const submit = transportReturning(acked)
+        await resolveTelemetryMode(TelemetryMode.Enhanced)
+        await base.enqueue(record())
+
+        const store = {
+          ...base,
+          markSubmitted: async (r: OutboxRecord) => {
+            await base.markSubmitted(r)
+            resolveTelemetryMode(TelemetryMode.Anon)
+          },
+        }
+
+        await drainOutbox(store, instantly)
+
+        expect(submit).not.toHaveBeenCalled()
+      })
+
       it("stops mid-drain when the mode changes under it", async () => {
         const store = createOutboxStore(DIR)
         const submit = jest.fn(async () => {
@@ -655,6 +723,14 @@ describe("the telemetry outbox", () => {
         expect(submit).toHaveBeenCalledTimes(1)
       })
     })
+  })
+})
+
+describe("the telemetry outbox — loss and health", () => {
+  beforeEach(resetEverything)
+
+  afterEach(() => {
+    setActiveOutbox(null)
   })
 
   describe("AD-31 — loss is a pipeline: counted, reported once per drain, settled on ack", () => {

@@ -24,6 +24,8 @@ import { dedupKeyFor, OutboxState, parseOutboxRecord, type OutboxRecord } from "
  *   <dir>/<dedup-key>.json      one file per record
  *   <dir>/<dedup-key>.json.tmp  a write in progress; never read back
  *   <dir>/loss.json             the unreported loss counters (AD-31)
+ *   <dir>/acked.json            tombstones: SDK payment ids already delivered, so a
+ *                               replay after cleanup cannot mint a second id
  *   <dir>/.discard              a discard in progress (AD-26)
  *
  * Every record is written to a temp name and renamed into place, so a crash mid-write
@@ -101,8 +103,20 @@ export type OutboxStore = {
 }
 
 const LOSS_FILE = "loss.json"
+const ACKED_FILE = "acked.json"
 const DISCARD_MARKER = ".discard"
 const TEMP_SUFFIX = ".tmp"
+
+/**
+ * Deduplication does not end when an acknowledged record is deleted (A2.3, FR-26). The SDK
+ * can re-deliver a settlement after the record that carried it has been cleaned — a resync
+ * after a restart, a listener re-attached — and a fresh `telemetry_event_id` at that point
+ * is a row the warehouse cannot collapse. So the SDK payment id of every acknowledged
+ * record is kept as a tombstone for the TTL, and `enqueue` refuses a key it has seen.
+ * Bounded and pruned by age, so a busy device cannot grow it forever.
+ */
+const TOMBSTONES_MAX = 2_000
+type Tombstones = Record<string, number>
 
 const fileFor = (directory: string, record: OutboxRecord): string =>
   `${directory}/${dedupKeyFor(record)}.json`
@@ -133,7 +147,7 @@ const remove = async (path: string): Promise<void> => {
 type StoredRecord = { record: OutboxRecord; path: string }
 
 const isRecordFile = (name: string): boolean =>
-  name.endsWith(".json") && name !== LOSS_FILE
+  name.endsWith(".json") && name !== LOSS_FILE && name !== ACKED_FILE
 
 /** Reads every record file, deleting and counting the ones this build cannot parse. */
 const readAll = async (directory: string): Promise<StoredRecord[]> => {
@@ -193,6 +207,40 @@ const addLoss = async (
   await writeLoss(directory, { ...loss, [key]: loss[key] + by })
 }
 
+const readTombstones = async (directory: string): Promise<Tombstones> => {
+  try {
+    const parsed: unknown = JSON.parse(
+      await RNFS.readFile(`${directory}/${ACKED_FILE}`, "utf8"),
+    )
+    if (!parsed || typeof parsed !== "object") return {}
+    const cutoff = Date.now() - OUTBOX_TTL_MS
+    const live: Tombstones = {}
+    for (const [key, at] of Object.entries(parsed as Record<string, unknown>)) {
+      if (typeof at === "number" && at > cutoff) live[key] = at
+    }
+    return live
+  } catch {
+    return {}
+  }
+}
+
+const writeTombstones = async (
+  directory: string,
+  tombstones: Tombstones,
+): Promise<void> => {
+  const entries = Object.entries(tombstones).sort(([, a], [, b]) => b - a)
+  await RNFS.mkdir(directory)
+  await writeAtomically(
+    `${directory}/${ACKED_FILE}`,
+    JSON.stringify(Object.fromEntries(entries.slice(0, TOMBSTONES_MAX))),
+  )
+}
+
+const addTombstone = async (directory: string, sdkPaymentId: string): Promise<void> => {
+  const tombstones = await readTombstones(directory)
+  await writeTombstones(directory, { ...tombstones, [sdkPaymentId]: Date.now() })
+}
+
 /** A record written under a contract version the relay no longer accepts (AD-30). */
 const isTooOld = (record: OutboxRecord): boolean =>
   record.version < eventVersionOf(record.event) - OUTBOX_SCHEMA_VERSIONS_TOLERATED
@@ -236,15 +284,15 @@ export const createOutboxStore = (directory: string): OutboxStore => {
   const enqueue = async (record: OutboxRecord): Promise<void> => {
     const live = await sweep()
 
-    if (
-      live.some(
-        (entry) =>
-          entry.record.sdkPaymentId === record.sdkPaymentId &&
-          record.sdkPaymentId !== null,
+    if (record.sdkPaymentId !== null) {
+      const queuedAlready = live.some(
+        (entry) => entry.record.sdkPaymentId === record.sdkPaymentId,
       )
-    ) {
-      bump("deduplicated")
-      return
+      const deliveredAlready = record.sdkPaymentId in (await readTombstones(directory))
+      if (queuedAlready || deliveredAlready) {
+        bump("deduplicated")
+        return
+      }
     }
 
     const overflow = live.length + 1 - OUTBOX_MAX_RECORDS
@@ -301,6 +349,8 @@ export const createOutboxStore = (directory: string): OutboxStore => {
     acknowledge: (record) =>
       serialise(async () => {
         await remove(fileFor(directory, record))
+        if (record.sdkPaymentId !== null)
+          await addTombstone(directory, record.sdkPaymentId)
         bump("acknowledged")
       }),
 

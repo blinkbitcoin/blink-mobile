@@ -2,6 +2,8 @@ import crashlytics from "@react-native-firebase/crashlytics"
 
 import { reportError } from "@app/utils/error-logging"
 
+import { mayTransmitDiagnostics, setDiagnosticsTransmissible } from "./transmissibility"
+
 /**
  * Fault reporting for the boundary, and the only place it decides whether a diagnostic may
  * leave the device.
@@ -11,16 +13,12 @@ import { reportError } from "@app/utils/error-logging"
  * telemetry boundary, sent from a device that is required to emit zero, is the leak the
  * suppression exists to prevent, routed around the analytics disable by our own topology.
  *
- * Transmissibility is pushed here by `mode.ts` on every transition rather than pulled from
- * it, which keeps this module free of a cycle and leaves the default at **false**: a
- * failure to resolve a mode leaves diagnostics silent, like everything else.
+ * The flag itself lives in `transmissibility.ts`, which imports nothing, so the app-wide
+ * Crashlytics sink in `app/utils/error-reporting.ts` can read the same value without a
+ * cycle. `mode.ts` pushes it on every transition; the default is **false**.
  */
 
-let transmissible = false
-
-export const setDiagnosticsTransmissible = (next: boolean): void => {
-  transmissible = next
-}
+export { mayTransmitDiagnostics, setDiagnosticsTransmissible }
 
 /**
  * Counts of everything the boundary declined to do, held locally and never transmitted
@@ -33,6 +31,9 @@ const counters = {
   /** Permitted, but with no store mounted to file them against. Should be zero; a non-zero
    *  count means an emitter is running outside the account context it belongs to. */
   unroutedEvents: 0,
+  /** A fact whose `walletProvider` disagreed with the mode at capture: a settlement callback
+   *  that raced an account switch. Dropped rather than re-labelled (AD-20). */
+  mislabelledEvents: 0,
   untransmittedFaults: 0,
   /** AD-30's "is it draining?" answers, from the last drain that ran. */
   lastDrainDurationMs: 0,
@@ -49,6 +50,10 @@ export const countSuppressedEvent = (): void => {
 
 export const countUnroutedEvent = (): void => {
   counters.unroutedEvents += 1
+}
+
+export const countMislabelledEvent = (): void => {
+  counters.mislabelledEvents += 1
 }
 
 export const recordDrainStats = (stats: {
@@ -69,13 +74,8 @@ export const recordModeResolutionLatency = (ms: number): void => {
 
 export const getDiagnosticCounters = (): Readonly<typeof counters> => ({ ...counters })
 
-/** Whether anything at all may leave this device right now (AD-13). Exposed so code
- *  outside the boundary that talks to Crashlytics — the SDK log forwarder — obeys the same
- *  rule (AD-30). */
-export const mayTransmitDiagnostics = (): boolean => transmissible
-
 export const resetDiagnosticsForTesting = (): void => {
-  transmissible = false
+  setDiagnosticsTransmissible(false)
   for (const key of Object.keys(counters) as (keyof typeof counters)[]) {
     counters[key] = 0
   }
@@ -88,7 +88,7 @@ export const resetDiagnosticsForTesting = (): void => {
  * from a real device rather than only from a debugger.
  */
 export const logDiagnosticBreadcrumb = (message: string): boolean => {
-  if (!transmissible) return false
+  if (!mayTransmitDiagnostics()) return false
   try {
     crashlytics().log(message)
     return true
@@ -99,7 +99,7 @@ export const logDiagnosticBreadcrumb = (message: string): boolean => {
 }
 
 export const reportBoundaryFault = (what: string, err: unknown): void => {
-  if (!transmissible) {
+  if (!mayTransmitDiagnostics()) {
     counters.untransmittedFaults += 1
     return
   }

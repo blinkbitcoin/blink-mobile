@@ -2,12 +2,12 @@ import { useCallback, useEffect, useRef, useState } from "react"
 import { AppState } from "react-native"
 
 import { type BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
-import crashlytics from "@react-native-firebase/crashlytics"
 
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { type NormalizedTransaction } from "@app/types/transaction"
 import { ActiveWalletStatus, type WalletState } from "@app/types/wallet"
 import { reportError } from "@app/utils/error-logging"
+import { logBreadcrumb } from "@app/utils/error-reporting"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 import { withTimeout } from "@app/utils/with-timeout"
 
@@ -163,7 +163,7 @@ export const useSdkLifecycle = (
           if (OFFLINE_EXEMPT_STATUSES.includes(prev)) return prev
           if (onlineState === OnlineState.Offline) return ActiveWalletStatus.Offline
           if (onlineState === OnlineState.Unknown) {
-            crashlytics().log(
+            logBreadcrumb(
               `[SparkSDK] connectivity check failed; preserving previous status`,
             )
             if (prev === ActiveWalletStatus.Loading) return ActiveWalletStatus.Error

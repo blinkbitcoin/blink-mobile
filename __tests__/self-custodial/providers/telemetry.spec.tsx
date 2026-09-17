@@ -93,6 +93,11 @@ jest.mock("@app/self-custodial/hooks/use-spark-network", () => ({
   useSparkNetwork: () => "regtest",
 }))
 
+const mockRefreshKillSwitch = jest.fn((_serverUrl: string) => Promise.resolve())
+jest.mock("@app/self-custodial/lnurl-telemetry-config", () => ({
+  refreshTelemetryKillSwitch: (serverUrl: string) => mockRefreshKillSwitch(serverUrl),
+}))
+
 const mockFs = RNFS as unknown as { __resetMockFileSystem: () => void }
 
 const DIR = telemetryOutboxDirFor(ACCOUNT_ID, "regtest" as unknown as Network)
@@ -321,6 +326,70 @@ describe("SelfCustodialTelemetryMount", () => {
       })
 
       await waitFor(() => expect(submit).toHaveBeenCalledTimes(1))
+    })
+  })
+
+  describe("AD-28 — the kill switch reaches an account that settled its mode long ago", () => {
+    it("refreshes the switch on activation of an established Enhanced account", async () => {
+      // No /recover call ever happens for this account: its mode is persisted and
+      // confirmed. The switch has to arrive some other way, on a schedule the device
+      // actually keeps.
+      mockServerModes = { [ACCOUNT_ID]: AccountMode.Enhanced }
+
+      render(<SelfCustodialTelemetryMount />)
+
+      await waitFor(() => expect(mockRefreshKillSwitch).toHaveBeenCalledTimes(1))
+      expect(mockRefreshKillSwitch).toHaveBeenCalledWith("https://staging.blink.sv")
+    })
+
+    it("refreshes it again when the app comes to the foreground", async () => {
+      render(<SelfCustodialTelemetryMount />)
+      await waitFor(() => expect(mockRefreshKillSwitch).toHaveBeenCalledTimes(1))
+
+      const handlers = (AppState.addEventListener as jest.Mock).mock.calls
+        .filter(([type]) => type === "change")
+        .map(([, handler]) => handler as (state: string) => void)
+      act(() => {
+        for (const handler of handlers) handler("active")
+      })
+
+      await waitFor(() =>
+        expect(mockRefreshKillSwitch.mock.calls.length).toBeGreaterThan(1),
+      )
+    })
+
+    it("never fetches from an incognito device — a request is a transmission too", async () => {
+      mockAccountMode = AccountMode.Anon
+
+      render(<SelfCustodialTelemetryMount />)
+      await waitFor(() => expect(getTelemetryMode()).toBe(TelemetryMode.Anon))
+
+      expect(mockRefreshKillSwitch).not.toHaveBeenCalled()
+    })
+
+    it("never fetches while the mode is unresolved", async () => {
+      mockAccountMode = null
+
+      render(<SelfCustodialTelemetryMount />)
+      await waitFor(() => expect(getTelemetryMode()).toBe(TelemetryMode.Unresolved))
+
+      expect(mockRefreshKillSwitch).not.toHaveBeenCalled()
+    })
+  })
+
+  describe("FR-25 — every account's queue expires, active or not", () => {
+    it("sweeps an inactive account's expired records on mount", async () => {
+      await createOutboxStore(OTHER_DIR).enqueue({
+        ...queuedRecord("3f2a1b4c-5d6e-4f70-8192-a3b4c5d6e7a1"),
+        queuedAt: Date.now() - 73 * 60 * 60 * 1000,
+      })
+      mockSelfCustodialEntries = [{ id: ACCOUNT_ID }, { id: OTHER_ACCOUNT_ID }]
+
+      render(<SelfCustodialTelemetryMount />)
+
+      await waitFor(async () =>
+        expect(await createOutboxStore(OTHER_DIR).depth()).toBe(0),
+      )
     })
   })
 

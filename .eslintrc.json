@@ -135,6 +135,10 @@
           {
             "name": "@react-native-firebase/analytics",
             "message": "Reach analytics only through app/telemetry. Everything the app emits passes the privacy boundary's gate and policy first; a direct import is call site number 37, and FR-2 is a build-time fact rather than a review claim."
+          },
+          {
+            "name": "@react-native-firebase/crashlytics",
+            "message": "Reach Crashlytics only through app/utils/error-reporting (recordAppError, logBreadcrumb). That sink holds every non-fatal and breadcrumb until the telemetry mode says the device may report (AD-13, AD-30); a direct import bypasses it."
           }
         ]
       }
@@ -188,6 +192,26 @@
   },
   "overrides": [
     {
+      "files": ["app/utils/error-reporting.ts", "app/telemetry/diagnostics.ts"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "react-native-secure-key-store",
+                "message": "Import the legacy key store only from app/utils/storage/legacy-key-store.ts, which re-arms the uninstall guard before every call. See blinkbitcoin/blink-wip#1160."
+              },
+              {
+                "name": "@react-native-firebase/analytics",
+                "message": "Reach analytics only through app/telemetry."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
       "files": ["app/telemetry/platform-analytics.ts"],
       "rules": {
         "no-restricted-imports": [
@@ -197,6 +221,10 @@
               {
                 "name": "react-native-secure-key-store",
                 "message": "Import the legacy key store only from app/utils/storage/legacy-key-store.ts, which re-arms the uninstall guard before every call. See blinkbitcoin/blink-wip#1160."
+              },
+              {
+                "name": "@react-native-firebase/crashlytics",
+                "message": "Reach Crashlytics only through app/utils/error-reporting."
               }
             ]
           }
@@ -238,6 +266,10 @@
               {
                 "name": "@react-native-firebase/analytics",
                 "message": "Reach analytics only through app/telemetry."
+              },
+              {
+                "name": "@react-native-firebase/crashlytics",
+                "message": "Reach Crashlytics only through app/utils/error-reporting."
               }
             ]
           }
@@ -263,6 +295,30 @@
               {
                 "name": "react-native-secure-key-store",
                 "message": "Import the legacy key store only from app/utils/storage/legacy-key-store.ts, which re-arms the uninstall guard before every call. See blinkbitcoin/blink-wip#1160."
+              },
+              {
+                "name": "@react-native-firebase/crashlytics",
+                "message": "Reach Crashlytics only through app/utils/error-reporting."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["app/app.tsx", "app/graphql/hooks/use-apollo-rebuild-lifecycle.ts", "app/screens/developer-screen/developer-screen.tsx", "app/screens/people-screen/circles/use-circles-card.tsx", "app/screens/send-bitcoin-screen/merchant-selection-screen.tsx", "app/screens/send-bitcoin-screen/use-save-lnaddress-contact.ts", "app/screens/settings-screen/api/api-key-secret-reveal.tsx"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "react-native-secure-key-store",
+                "message": "Import the legacy key store only from app/utils/storage/legacy-key-store.ts, which re-arms the uninstall guard before every call. See blinkbitcoin/blink-wip#1160."
+              },
+              {
+                "name": "@react-native-firebase/analytics",
+                "message": "Reach analytics only through app/telemetry."
               }
             ]
           }

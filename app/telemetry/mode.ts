@@ -8,6 +8,7 @@ import {
 import { isTelemetryEnabled } from "./enablement"
 import {
   clearCustodialAnalyticsIdentity,
+  setCustodialIdentityPermitted,
   setPlatformCollectionEnabled,
 } from "./platform-analytics"
 
@@ -174,6 +175,9 @@ const applyMode = async (mode: TelemetryMode): Promise<void> => {
    */
   if (isSuppressedMode(mode)) await notifySuppressed()
 
+  /** Permission is withdrawn *before* the clear, so a container effect landing between
+   *  the two cannot re-set what was just cleared. */
+  setCustodialIdentityPermitted(mode === TelemetryMode.Custodial)
   if (mode !== TelemetryMode.Custodial) clearCustodialAnalyticsIdentity()
   setPlatformCollectionEnabled(mode === TelemetryMode.Custodial)
 }
@@ -196,6 +200,9 @@ export const resolveTelemetryMode = (mode: TelemetryMode): Promise<void> => {
 
   currentMode = mode
   setDiagnosticsTransmissible(!isSuppressedMode(mode))
+  /** Withdrawn synchronously, ahead of the queued side effects: the set is refused from
+   *  this instant even if the clear is still waiting behind a discard. */
+  if (mode !== TelemetryMode.Custodial) setCustodialIdentityPermitted(false)
 
   applying = applying.then(() => applyMode(mode))
   return applying
@@ -264,4 +271,5 @@ export const resetTelemetryModeForTesting = (): void => {
   applying = Promise.resolve()
   suppressionListeners.clear()
   setDiagnosticsTransmissible(false)
+  setCustodialIdentityPermitted(false)
 }

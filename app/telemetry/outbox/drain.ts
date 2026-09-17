@@ -131,6 +131,17 @@ const runDrain = async (
     if (!isDrainPermitted()) break
 
     await store.markSubmitted(record)
+
+    /**
+     * Checked again here, not just at the top of the iteration: `markSubmitted` is a
+     * disk write, and a switch to incognito during that await closes the gate
+     * synchronously while this iteration is already past its first check. A submit
+     * after that would be the one event FR-5's discard cannot unsend. The record is
+     * left `submitted`; the discard the switch queued unlinks it behind us, and if it
+     * somehow survives it returns to `queued` at the next startup.
+     */
+    if (!isDrainPermitted()) break
+
     const result = await transport.submit(toContractPayload(record))
 
     if (result.kind === "acknowledged" || result.kind === "handed_off") {

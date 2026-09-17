@@ -12,6 +12,11 @@ const loadFreshLogErrorModule = () => {
   let mod: typeof import("@app/utils/log-error") | undefined
   jest.isolateModules(() => {
     mod = require("@app/utils/log-error")
+    // A fresh module graph has a fresh, closed diagnostic gate; open it as the global
+    // setup does for the shared graph.
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const gate: typeof import("@app/telemetry/transmissibility") = require("@app/telemetry/transmissibility")
+    gate.setDiagnosticsTransmissible(true)
   })
   return mod!
 }

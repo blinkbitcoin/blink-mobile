@@ -1,6 +1,5 @@
 import { useCallback, useState } from "react"
 
-import crashlytics from "@react-native-firebase/crashlytics"
 import RNFS from "react-native-fs"
 
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
@@ -14,6 +13,7 @@ import { removeSelfCustodialAccountId } from "@app/self-custodial/storage/accoun
 import { usePersistentStateContext } from "@app/store/persistent-state"
 import { AccountType, DefaultAccountId } from "@app/types/wallet"
 import { reportError } from "@app/utils/error-logging"
+import { logBreadcrumb } from "@app/utils/error-reporting"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
 type DeleteState = "idle" | "deleting" | "error"
@@ -76,13 +76,13 @@ export const useDeleteAccount = (): DeleteAccountResult => {
 
         if (isActive && sdk) {
           await disconnectSdk(sdk).catch((err) => {
-            crashlytics().log(`[self-custodial delete] disconnect failed: ${err}`)
+            logBreadcrumb(`[self-custodial delete] disconnect failed: ${err}`)
           })
         }
 
         await KeyStoreWrapper.deleteMnemonicForAccount(accountId)
         await RNFS.unlink(storageDirFor(accountId, network)).catch((err) => {
-          crashlytics().log(`[self-custodial delete] storage dir unlink failed: ${err}`)
+          logBreadcrumb(`[self-custodial delete] storage dir unlink failed: ${err}`)
         })
         /**
          * The telemetry outbox is a sibling of the wallet store, so it belongs to the same
@@ -91,7 +91,7 @@ export const useDeleteAccount = (): DeleteAccountResult => {
          * that account is mounted, and a deleted account never mounts one again.
          */
         await RNFS.unlink(telemetryOutboxDirFor(accountId, network)).catch((err) => {
-          crashlytics().log(`[self-custodial delete] outbox dir unlink failed: ${err}`)
+          logBreadcrumb(`[self-custodial delete] outbox dir unlink failed: ${err}`)
         })
         await removeSelfCustodialAccountId(accountId)
         await removeBackupStateFor(accountId)

@@ -63,15 +63,15 @@ if (__DEV__) console.log(`Loaded default locale: ${defaultLocale}`)
 
 // Shut the analytics gate as early as any JavaScript can. Firebase persists the last value
 // of `setAnalyticsCollectionEnabled` across launches and that persisted value overrides
-// `firebase.json`, so a device that resolved Custodial last run starts this one collecting
-// — including automatic and screen-level events (FR-3).
+// `firebase.json`, so a device that resolved Custodial last run would otherwise start this
+// one collecting — including automatic and screen-level events (FR-3).
 //
-// This narrows that window; it does not close it. Native automatic events (`session_start`,
-// `app_open`) fire when Firebase initialises, before the RN bridge runs a line of JS, so a
-// device whose mode has since changed to Anon can emit them once per cold start. Closing it
-// needs the disable to move native-side — persisting the last resolved mode somewhere
-// `AppDelegate` / `MainApplication` can read before Firebase starts. Until then it is a
-// stated residual for the metric contracts (FR-56), alongside the arrival-timing one.
+// The window before JS runs is closed natively: MainApplication.kt and AppDelegate.mm turn
+// collection off at process start, before the first Activity resumes / the app becomes
+// active, which is where `session_start` is logged. This call is the JS half of the same
+// default; the mode gate re-enables collection only once the mode resolves Custodial.
+// Residual, stated: an `app_update` logged at SDK initialisation, before Application
+// start, on the one launch after an upgrade of a device that last ran custodial.
 initializeTelemetryGate()
 
 // The null adapter (AD-27) stands behind the port until OD-1 is signed: it acknowledges
