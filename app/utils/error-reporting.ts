@@ -1,3 +1,5 @@
+import { NativeModules } from "react-native"
+
 import crashlytics from "@react-native-firebase/crashlytics"
 
 import {
@@ -145,61 +147,46 @@ onDiagnosticsDispositionChanged((disposition) => {
 })
 
 /**
- * Whether the SDK was collecting when this process started, read once and before this
- * session writes anything: the SDK's own getter follows the last `set` in a session, and
- * what matters here is the state the native side actually initialised with.
- */
-let collectedAtLaunch: boolean | null = null
-
-const wasCollectingAtLaunch = (): boolean => {
-  if (collectedAtLaunch === null) {
-    try {
-      collectedAtLaunch = crashlytics().isCrashlyticsCollectionEnabled
-    } catch {
-      collectedAtLaunch = false
-    }
-  }
-  return collectedAtLaunch
-}
-
-/**
  * Automatic crash collection under the same rule as the explicit paths (AD-13, NFR-P1;
- * the third review's MEDIUM). A fatal crash report carries the same installation id a
+ * the third and fourth reviews). A fatal crash report carries the same installation id a
  * non-fatal does, so gating one and not the other would leave the larger channel open.
  *
- * What the SDK allows shapes how the rule is enforced. `setCrashlyticsCollectionEnabled`
- * persists a preference that the native init provider applies at the *next* launch; it
- * does not change the running process (verified against
- * `@react-native-firebase/crashlytics@23.3.1`, where the JS call writes the preference
- * and nothing else). So the rule holds across launches rather than within one:
+ * Two SDK facts shape this. React Native Firebase's `setCrashlyticsCollectionEnabled`
+ * persists a preference the native init provider applies at the *next* launch and does
+ * not change the running process (verified against `@react-native-firebase/crashlytics@
+ * 23.3.1`); and Crashlytics records a crash even while collection is off — it only
+ * withholds the upload until the next launch. So the switch is native: the
+ * `CrashCollection` module (MainApplication.kt / AppDelegate.mm) changes the running
+ * process, deletes held reports on a denial, and records the disposition as *provenance*
+ * for the next launch, which starts collection only if the previous session ended
+ * permitted and deletes what it holds otherwise. The RNFB preference is kept in step so
+ * its own gate on `log()` and `recordError()` agrees.
  *
- *  - `permitted` writes the preference true; `denied` writes it false. `unresolved`
- *    writes nothing: it is the start of every launch, and the previous session's answer
- *    stands until this one has its own.
- *  - A crash ends its session, so the preference at the next launch is the disposition
- *    the crash happened under. Permitted: collection is on at init and the SDK uploads
- *    the report before any JavaScript runs. Denied: collection is off at init, the SDK
- *    holds the report on disk, and the first disposition of the new session — whichever
- *    it is — deletes it, because a report the SDK held back was recorded under a denial.
- *  - Fresh installs start off (`firebase.json`), so a device that has never resolved a
- *    disposition records nothing.
- *
- * Residuals, stated: a crash in a session that never resolved, on a device whose previous
- * session was permitted, is uploaded under that session's disposition; and a custodial
- * device's very first session records no crashes, since the preference that turns
- * collection on is written during it and applied after it.
+ * `unresolved` writes nothing: it is the start of every launch, and the native side has
+ * already set this session to unresolved. A crash before resolution is therefore never
+ * uploaded — including on a device whose previous session was permitted — at the cost of
+ * a custodial device's start-up crashes before the mode resolves, and of a fresh install's
+ * first session. Both are stated residuals of this rule, not of its implementation.
  *
  * Nothing here may throw: a missing native module at start-up is a real failure mode, and
  * the disposition update this rides on must complete regardless.
  */
 const applyCrashCollection = (disposition: DiagnosticsDisposition): void => {
   if (disposition === DiagnosticsDisposition.Unresolved) return
+  const permitted = disposition === DiagnosticsDisposition.Permitted
   try {
-    const collecting = wasCollectingAtLaunch()
-    const client = crashlytics()
-    const permitted = disposition === DiagnosticsDisposition.Permitted
-    client.setCrashlyticsCollectionEnabled(permitted).catch(() => undefined)
-    if (!collecting) client.deleteUnsentReports().catch(() => undefined)
+    crashlytics()
+      .setCrashlyticsCollectionEnabled(permitted)
+      .catch(() => undefined)
+  } catch (err) {
+    if (__DEV__)
+      console.warn("[error-reporting] crash collection preference not written", err)
+  }
+  try {
+    const native = NativeModules.CrashCollection as
+      | { setCrashCollectionDisposition: (permitted: boolean) => void }
+      | undefined
+    native?.setCrashCollectionDisposition(permitted)
   } catch (err) {
     if (__DEV__) console.warn("[error-reporting] crash collection not applied", err)
   }
@@ -231,5 +218,4 @@ export const crashForTesting = (): void => {
 export const resetErrorReportingForTesting = (): void => {
   recordedDedupKeys.clear()
   heldWhileUnresolved = []
-  collectedAtLaunch = null
 }

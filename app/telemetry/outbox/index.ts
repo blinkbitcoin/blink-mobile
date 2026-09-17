@@ -10,6 +10,7 @@ export {
   createOutboxStore,
   getOutboxCounters,
   resetOutboxCountersForTesting,
+  sweepCondemnedOutboxes,
   type LossCounters,
   type OutboxCounters,
   type OutboxStore,

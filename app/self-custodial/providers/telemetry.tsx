@@ -8,6 +8,7 @@ import { getSelfCustodialServerAccountMode } from "@app/store/persistent-state/s
 import {
   ActiveAccountKind,
   createOutboxStore,
+  sweepCondemnedOutboxes,
   deriveTelemetryMode,
   drainActiveOutbox,
   onTelemetrySuppressed,
@@ -23,7 +24,11 @@ import { onKillSwitchEngaged } from "@app/telemetry/enablement"
 import { AccountMode } from "@app/types/account"
 import { AccountType, ActiveWalletStatus } from "@app/types/wallet"
 
-import { lnurlServerUrlFor, telemetryOutboxDirFor } from "../config"
+import {
+  lnurlServerUrlFor,
+  telemetryOutboxDirFor,
+  telemetryOutboxParentDirFor,
+} from "../config"
 import { useSelfCustodialAccountMode } from "../hooks/use-self-custodial-account-mode"
 import { useSparkNetwork } from "../hooks/use-spark-network"
 import { refreshTelemetryKillSwitch } from "../lnurl-telemetry-config"
@@ -118,6 +123,13 @@ export const SelfCustodialTelemetryMount: React.FC = () => {
         .catch(() => undefined)
     }
   }, [inactiveAccountIds, network])
+
+  /** What discards and retirements could not remove — a condemned queue whose unlink
+   *  failed, a tombstone whose directory is gone — including those of accounts that no
+   *  longer exist and so will never mount a store again. */
+  useEffect(() => {
+    sweepCondemnedOutboxes(telemetryOutboxParentDirFor(network)).catch(() => undefined)
+  }, [network])
 
   useEffect(() => {
     if (!accountId) {

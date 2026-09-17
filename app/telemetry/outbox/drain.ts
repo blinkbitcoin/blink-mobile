@@ -151,8 +151,14 @@ const runDrain = async (
      * after that would be the one event FR-5's discard cannot unsend. The record is
      * left `submitted`; the discard the switch queued unlinks it behind us, and if it
      * somehow survives it returns to `queued` at the next startup.
+     *
+     * And the lease, synchronously, in the same breath: Enhanced → Anon → Enhanced can
+     * complete inside that one write, leaving the mode saying yes while the queue this
+     * record came from has already been condemned. The result of such a submit would be
+     * refused as stale, but the event would have left the device (the fourth review's
+     * MEDIUM). The generation is what knows; the mode does not.
      */
-    if (!isDrainPermitted()) break
+    if (!isDrainPermitted() || store.lease() !== lease) break
 
     const result = await transport.submit(toContractPayload(record))
 

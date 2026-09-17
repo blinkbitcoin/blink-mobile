@@ -21,6 +21,7 @@ class MainApplication : Application(), ReactApplication {
             PackageList(this).packages.apply {
               // Packages that cannot be autolinked yet can be added manually here, for example:
               // add(MyReactNativePackage())
+              add(CrashCollectionPackage())
             }
 
         override fun getJSMainModuleName(): String = "index"
@@ -45,6 +46,10 @@ class MainApplication : Application(), ReactApplication {
     // positively resolved as custodial. This runs before the first Activity resumes,
     // which is where the automatic session events are logged.
     FirebaseAnalytics.getInstance(this).setAnalyticsCollectionEnabled(false)
+    // Crash collection follows the same rule, one launch behind by the SDK's nature: the
+    // previous session's disposition decides whether the reports it left may go, and this
+    // session starts unresolved until the boundary says otherwise. See CrashCollectionPolicy.
+    CrashCollection.applyLaunch(this)
     SoLoader.init(this, OpenSourceMergedSoMapping)
     if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {
       // If you opted-in for the New Architecture, we load the native entry point for this app.

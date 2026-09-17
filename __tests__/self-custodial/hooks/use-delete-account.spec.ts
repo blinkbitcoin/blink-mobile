@@ -86,6 +86,16 @@ jest.mock("react-native-fs", () => ({
   unlink: (...args: unknown[]) => mockUnlink(...args),
 }))
 
+/** The outbox is retired through its store, never unlinked here (see the hook). */
+const mockRetire = jest.fn(() => Promise.resolve())
+const mockCreateOutboxStore = jest.fn((directory: string) => ({
+  directory,
+  retire: () => mockRetire(),
+}))
+jest.mock("@app/telemetry", () => ({
+  createOutboxStore: (directory: string) => mockCreateOutboxStore(directory),
+}))
+
 const mockSdk = { id: "sdk" }
 
 const activeSelfCustodialAccount = {
@@ -154,11 +164,14 @@ describe("useDeleteAccount", () => {
     )
   })
 
-  it("wipes the telemetry outbox alongside the wallet store", async () => {
+  it("retires the telemetry outbox through its store, alongside the wallet store", async () => {
     // The outbox is a sibling of the wallet store, so it shares its deletion pairing.
     // Left behind, its queued records outlive the account that produced them and nothing
     // ever sweeps them: the 72h TTL only runs while a store for that account is mounted,
-    // and a deleted account never mounts one again.
+    // and a deleted account never mounts one again. And it is retired through the store
+    // rather than unlinked: a bare unlink neither moves the queue's generation nor
+    // serialises with a drain, so a transport result in flight would write the deleted
+    // account's queue back (the fourth review's HIGH).
     const { result } = renderHook(() => useDeleteAccount())
 
     await act(async () => {
@@ -169,19 +182,20 @@ describe("useDeleteAccount", () => {
       TEST_SC_ACCOUNT_ID,
       mockSparkNetwork.Regtest,
     )
-    expect(mockUnlink).toHaveBeenCalledWith(`/tmp/outbox/${TEST_SC_ACCOUNT_ID}`)
-    // Anchor: the wallet store is still wiped too, so this is an addition rather than a
+    expect(mockCreateOutboxStore).toHaveBeenCalledWith(
+      `/tmp/outbox/${TEST_SC_ACCOUNT_ID}`,
+    )
+    expect(mockRetire).toHaveBeenCalledTimes(1)
+    expect(mockUnlink).not.toHaveBeenCalledWith(`/tmp/outbox/${TEST_SC_ACCOUNT_ID}`)
+    // Anchor: the wallet store is still wiped, so this is an addition rather than a
     // swap of one directory for the other.
     expect(mockUnlink).toHaveBeenCalledWith(`/tmp/${TEST_SC_ACCOUNT_ID}`)
   })
 
-  it("finishes the delete when the outbox unlink fails", async () => {
-    // A missing outbox directory is the normal case for an account that never emitted.
-    mockUnlink.mockImplementation((path: string) =>
-      path.startsWith("/tmp/outbox/")
-        ? Promise.reject(new Error("ENOENT"))
-        : Promise.resolve(undefined),
-    )
+  it("finishes the delete when the outbox retirement fails", async () => {
+    // The retirement leaves its own durable signal for the provider's parent sweep; the
+    // account must still go.
+    mockRetire.mockRejectedValueOnce(new Error("telemetry outbox discard did not finish"))
     const { result } = renderHook(() => useDeleteAccount())
 
     let outcome: string | undefined

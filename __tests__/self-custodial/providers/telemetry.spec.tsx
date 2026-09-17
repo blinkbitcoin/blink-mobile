@@ -223,15 +223,31 @@ describe("SelfCustodialTelemetryMount", () => {
       )
     })
 
-    it("re-runs a discard the last run left a marker for, even under Enhanced", async () => {
+    it("re-runs a discard the last run left a tombstone for, even under Enhanced", async () => {
       const store = createOutboxStore(DIR)
       await store.enqueue(queuedRecord())
-      await RNFS.writeFile(`${DIR}/.discard`, "1", "utf8")
+      await RNFS.writeFile(`${DIR}.discard`, "1", "utf8")
 
       render(<SelfCustodialTelemetryMount />)
 
       await waitFor(async () => expect(await store.hasPendingDiscard()).toBe(false))
       expect(await store.pending()).toEqual([])
+    })
+
+    it("sweeps, on mount, what a deleted account's retirement could not remove", async () => {
+      // No store will ever be created for a deleted account again, so its leftovers are
+      // the parent sweep's to remove: a condemned queue whose unlink failed, and a
+      // tombstone whose directory is gone.
+      const parent = DIR.slice(0, DIR.lastIndexOf("/"))
+      await RNFS.writeFile(`${parent}/gone-account.condemned-1/p-x.json`, "{}", "utf8")
+      await RNFS.writeFile(`${parent}/gone-account.discard`, "1", "utf8")
+
+      render(<SelfCustodialTelemetryMount />)
+
+      await waitFor(async () => {
+        expect(await RNFS.exists(`${parent}/gone-account.condemned-1`)).toBe(false)
+      })
+      expect(await RNFS.exists(`${parent}/gone-account.discard`)).toBe(false)
     })
 
     it("drains that same queue when the account is still Enhanced", async () => {

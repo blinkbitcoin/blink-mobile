@@ -2,6 +2,8 @@
 // and has no `.each`. Same workaround as __tests__/screens/send-destination.spec.tsx.
 import { it } from "@jest/globals"
 
+import { NativeModules } from "react-native"
+
 import {
   DiagnosticsModeInput,
   resetTransmissibilityForTesting,
@@ -22,20 +24,18 @@ import {
 const mockLog = jest.fn()
 const mockRecordError = jest.fn()
 const mockSetCollectionEnabled = jest.fn((_enabled: boolean) => Promise.resolve(null))
-const mockDeleteUnsentReports = jest.fn(() => Promise.resolve())
-/** What the native side initialised with this launch; the JS getter reads it once. */
-let mockCollectedAtLaunch = true
+const mockNativeSetDisposition = jest.fn((_permitted: boolean) => undefined)
 
 jest.mock("@react-native-firebase/crashlytics", () => () => ({
   log: (...args: string[]) => mockLog(...args),
   recordError: (...args: Error[]) => mockRecordError(...args),
-  get isCrashlyticsCollectionEnabled() {
-    return mockCollectedAtLaunch
-  },
   setCrashlyticsCollectionEnabled: (enabled: boolean) =>
     mockSetCollectionEnabled(enabled),
-  deleteUnsentReports: () => mockDeleteUnsentReports(),
 }))
+NativeModules.CrashCollection = {
+  setCrashCollectionDisposition: (permitted: boolean) =>
+    mockNativeSetDisposition(permitted),
+}
 
 const loadFreshErrorReportingModule = () => {
   let mod: typeof import("@app/utils/error-reporting") | undefined
@@ -356,78 +356,55 @@ describe("recordAppError — the zero-transmission gate", () => {
   })
 
   describe("automatic crash collection follows the disposition (AD-13, NFR-P1)", () => {
-    // The SDK applies the preference at the next launch, so the rule is enforced across
-    // launches: what a session writes is what the next one starts with.
-    beforeEach(() => {
-      mockCollectedAtLaunch = true
-    })
-
-    it("switches the persisted preference on for a device that may report", () => {
+    // The switch that changes the running process is native (CrashCollection, both
+    // platforms); it also records the provenance the next launch decides by. The RNFB
+    // preference is kept in step so its own gate on log()/recordError() agrees.
+    it("turns collection on natively, and in the RNFB preference, for a device that may report", () => {
       setDiagnosticsModeInput(DiagnosticsModeInput.Custodial)
 
+      expect(mockNativeSetDisposition).toHaveBeenLastCalledWith(true)
       expect(mockSetCollectionEnabled).toHaveBeenLastCalledWith(true)
     })
 
-    it("switches it off for a device that must emit zero", () => {
+    it("turns it off for a device that must emit zero", () => {
       setDiagnosticsModeInput(DiagnosticsModeInput.Denied)
 
+      expect(mockNativeSetDisposition).toHaveBeenLastCalledWith(false)
       expect(mockSetCollectionEnabled).toHaveBeenLastCalledWith(false)
     })
 
-    it("switches it off when the kill switch engages on an Enhanced device", () => {
+    it("turns it off when the kill switch engages on an Enhanced device", () => {
       setDiagnosticsModeInput(DiagnosticsModeInput.SelfCustodial)
-      expect(mockSetCollectionEnabled).toHaveBeenLastCalledWith(true)
+      expect(mockNativeSetDisposition).toHaveBeenLastCalledWith(true)
 
       setSelfCustodialDiagnosticsShutdown(true)
 
-      expect(mockSetCollectionEnabled).toHaveBeenLastCalledWith(false)
+      expect(mockNativeSetDisposition).toHaveBeenLastCalledWith(false)
     })
 
-    it("touches nothing on the way into unresolved — the last answer stands", () => {
+    it("touches nothing on the way into unresolved — the native launch default stands", () => {
       setDiagnosticsModeInput(DiagnosticsModeInput.Custodial)
+      mockNativeSetDisposition.mockClear()
       mockSetCollectionEnabled.mockClear()
-      mockDeleteUnsentReports.mockClear()
 
       setDiagnosticsModeInput(DiagnosticsModeInput.Unresolved)
 
+      expect(mockNativeSetDisposition).not.toHaveBeenCalled()
       expect(mockSetCollectionEnabled).not.toHaveBeenCalled()
-      expect(mockDeleteUnsentReports).not.toHaveBeenCalled()
     })
 
-    it.each([
-      { input: DiagnosticsModeInput.Custodial, label: "permitted" },
-      { input: DiagnosticsModeInput.Denied, label: "denied" },
-    ])(
-      "deletes the reports the SDK held back when collection was off at launch, resolving $label",
-      ({ input }) => {
-        // Off at launch means the previous session ended denied, so any report on disk was
-        // recorded under a denial — including a crash later in that session, which the
-        // native side still recorded because the preference only applies at init.
-        mockCollectedAtLaunch = false
+    it("lets the disposition change complete when the native module is absent", () => {
+      const saved = NativeModules.CrashCollection
+      delete NativeModules.CrashCollection
 
-        setDiagnosticsModeInput(input)
-
-        expect(mockDeleteUnsentReports).toHaveBeenCalledTimes(1)
-      },
-    )
-
-    it("deletes nothing when collection was on at launch — those reports were already sent under a permitted session", () => {
-      setDiagnosticsModeInput(DiagnosticsModeInput.Denied)
-
-      expect(mockDeleteUnsentReports).not.toHaveBeenCalled()
-    })
-
-    it("reads the launch state before its own first write, not after", () => {
-      mockCollectedAtLaunch = false
       setDiagnosticsModeInput(DiagnosticsModeInput.Custodial)
-      mockCollectedAtLaunch = true // the SDK's getter now follows the set above
+      reportError("SDK init", new Error("still reported"))
 
-      setDiagnosticsModeInput(DiagnosticsModeInput.Denied)
-
-      expect(mockDeleteUnsentReports).toHaveBeenCalledTimes(2)
+      NativeModules.CrashCollection = saved
+      expect(mockRecordError).toHaveBeenCalledTimes(1)
     })
 
-    it("lets the disposition change complete when the SDK is unavailable", () => {
+    it("lets it complete when the SDK throws", () => {
       mockSetCollectionEnabled.mockImplementationOnce(() => {
         throw new Error("native module not linked")
       })
@@ -436,6 +413,7 @@ describe("recordAppError — the zero-transmission gate", () => {
       reportError("SDK init", new Error("still reported"))
 
       expect(mockRecordError).toHaveBeenCalledTimes(1)
+      expect(mockNativeSetDisposition).toHaveBeenLastCalledWith(true)
     })
   })
 

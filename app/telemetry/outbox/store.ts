@@ -26,8 +26,10 @@ import { dedupKeyFor, OutboxState, parseOutboxRecord, type OutboxRecord } from "
  *   <dir>/loss.json             the unreported loss counters (AD-31)
  *   <dir>/acked.json            tombstones: SDK payment ids already delivered, so a
  *                               replay after cleanup cannot mint a second id
- *   <dir>/.discard              a discard in progress (AD-26): while it exists, nothing
- *                               in the directory is readable as a queue
+ *   <dir>.condemned-<ts>        a queue renamed out of its path by a discard (AD-26): never
+ *                               read again, removed when it can be
+ *   <dir>.discard               a discard that could not rename: while this sibling file
+ *                               exists, nothing in the directory is readable as a queue
  *
  * Every record is written to a temp name and renamed into place, so a crash mid-write
  * leaves a `.tmp` the reader ignores rather than a half-record it has to guess at. AD-26
@@ -61,6 +63,8 @@ const EMPTY_LOSS: LossCounters = { expired: 0, evicted: 0, rejected: 0, parseFai
 const counters = {
   /** Writes refused because a discard had run since the drain read the queue (AD-26). */
   staleWrites: 0,
+  /** Enqueues refused because the account was deleted in this process (AD-6). */
+  retiredWrites: 0,
   enqueued: 0,
   deduplicated: 0,
   evicted: 0,
@@ -90,6 +94,14 @@ const queueByDirectory = new Map<string, Promise<unknown>>()
 const discardOwed = new Set<string>()
 
 /**
+ * Directories retired with their account (AD-6 pairing). Permanent for the process: a
+ * settlement for a deleted account cannot enqueue, whatever the mode says, and a store
+ * created later for the same path — the same wallet restored in the same session —
+ * inherits the refusal and counts what it refuses, until the next launch.
+ */
+const retiredDirectories = new Set<string>()
+
+/**
  * The queue's generation, per directory: bumped synchronously by every discard. A drain
  * takes a lease on it before it reads the queue and presents the lease with every write
  * that follows; a write whose lease is stale is refused. This is what stops a transport
@@ -116,6 +128,7 @@ export const resetOutboxCountersForTesting = (): void => {
   queueByDirectory.clear()
   discardOwed.clear()
   generationByDirectory.clear()
+  retiredDirectories.clear()
 }
 
 const bump = (key: keyof typeof counters, by = 1): void => {
@@ -146,13 +159,22 @@ export type OutboxStore = {
   /** FR-5. Idempotent: safe to re-run on activation after a half-finished delete. The
    *  queue's generation moves the instant this is called, before anything touches disk. */
   discardAll: () => Promise<void>
+  /**
+   * The account is gone (AD-6): a discard, and then the path refuses to be a queue again
+   * for the rest of the process. Account deletion must come here rather than unlink the
+   * directory itself — a bare unlink neither moves the generation nor serialises, so a
+   * transport result in flight would write the deleted account's queue back.
+   */
+  retire: () => Promise<void>
   /** AD-26: a discard begun here or in a previous run did not finish. */
   hasPendingDiscard: () => Promise<boolean>
 }
 
 const LOSS_FILE = "loss.json"
 const ACKED_FILE = "acked.json"
-const DISCARD_MARKER = ".discard"
+/** Siblings of the directory, in its parent — outside the thing being removed. */
+const CONDEMNED_INFIX = ".condemned-"
+const DISCARD_TOMBSTONE_SUFFIX = ".discard"
 const TEMP_SUFFIX = ".tmp"
 
 /**
@@ -289,6 +311,36 @@ const addTombstone = async (directory: string, sdkPaymentId: string): Promise<vo
   await writeTombstones(directory, { ...tombstones, [sdkPaymentId]: Date.now() })
 }
 
+/**
+ * Removes what discards leave behind in a parent directory: condemned queues whose
+ * unlink failed, and tombstones whose directory is gone. Called on mount for the whole
+ * outbox parent, so a queue retired with a *deleted* account — one no store will ever be
+ * created for again — still gets cleaned up (the fourth review's HIGH). A tombstone whose
+ * directory still exists is a discard that never finished; it is finished here.
+ */
+export const sweepCondemnedOutboxes = async (parent: string): Promise<void> => {
+  let entries: { name: string; path: string }[]
+  try {
+    entries = await RNFS.readDir(parent)
+  } catch {
+    return
+  }
+  for (const entry of entries) {
+    if (entry.name.includes(CONDEMNED_INFIX)) {
+      await RNFS.unlink(entry.path).catch(() => undefined)
+    } else if (entry.name.endsWith(DISCARD_TOMBSTONE_SUFFIX)) {
+      const directory = entry.path.slice(0, -DISCARD_TOMBSTONE_SUFFIX.length)
+      if (await RNFS.exists(directory).catch(() => true)) {
+        await createOutboxStore(directory)
+          .discardAll()
+          .catch(() => undefined)
+      } else {
+        await RNFS.unlink(entry.path).catch(() => undefined)
+      }
+    }
+  }
+}
+
 /** A record written under a contract version the relay no longer accepts (AD-30). */
 const isTooOld = (record: OutboxRecord): boolean =>
   record.version < eventVersionOf(record.event) - OUTBOX_SCHEMA_VERSIONS_TOLERATED
@@ -306,17 +358,37 @@ const serialiseOn = <T>(directory: string, run: () => Promise<T>): Promise<T> =>
 export const createOutboxStore = (directory: string): OutboxStore => {
   const serialise = <T>(run: () => Promise<T>): Promise<T> => serialiseOn(directory, run)
 
-  const markerPath = `${directory}/${DISCARD_MARKER}`
+  const tombstonePath = `${directory}${DISCARD_TOMBSTONE_SUFFIX}`
 
   /**
-   * Unlinks the directory, marker and all, and checks that it is gone. Neither RNFS
-   * primitive is atomic: an unlink that fails partway leaves records behind, and the
-   * marker with them. The marker lives *inside* the directory on purpose — a successful
-   * unlink takes it away, and nothing else ever removes it — so a marker still present
-   * means a discard that did not finish, and the throw here leaves it there for the next
-   * attempt (the second review's MEDIUM 1).
+   * Makes the queue unreadable, durably. The primary means is a rename: one atomic
+   * operation moves the whole directory out of its path, so a process that dies the
+   * instant after finds no queue at all — and a condemned directory is never read as
+   * one, only removed. When the rename itself fails the signal goes *next to* the
+   * directory instead of inside it: a tombstone file in the parent, which a failing
+   * unlink cannot take with it, and which a restart still sees (the fourth review's
+   * MEDIUM). Only a directory that survives every one of these throws, and then the
+   * in-memory owed entry keeps refusing reads for the rest of the process.
    */
-  const unlinkDirectory = async (): Promise<void> => {
+  const condemn = async (): Promise<void> => {
+    const condemned = `${directory}${CONDEMNED_INFIX}${Date.now()}`
+    let renamed = false
+    try {
+      await RNFS.moveFile(directory, condemned)
+      renamed = true
+    } catch {
+      /** Absent, or the rename refused — decided below. */
+    }
+    if (renamed) {
+      await RNFS.unlink(condemned).catch(() => undefined)
+      await RNFS.unlink(tombstonePath).catch(() => undefined)
+      return
+    }
+    try {
+      await RNFS.writeFile(tombstonePath, String(Date.now()), "utf8")
+    } catch {
+      /** Best effort: the unlink is still attempted, and the check decides. */
+    }
     try {
       await RNFS.unlink(directory)
     } catch {
@@ -325,19 +397,20 @@ export const createOutboxStore = (directory: string): OutboxStore => {
     if (await RNFS.exists(directory)) {
       throw new Error("telemetry outbox discard did not finish")
     }
+    await RNFS.unlink(tombstonePath).catch(() => undefined)
   }
 
   /**
    * Every read of the queue finishes a pending discard first, or fails. A discard that
    * died leaves records behind that the mode switch required destroyed; returning them
    * from `pending()` would hand them to the next drain (FR-5 by the back door), and
-   * writing next to them would bury the marker under fresh records. So they are never
-   * readable: either the unlink completes now, or the store refuses the read.
+   * writing next to them would bury the signal under fresh records. So they are never
+   * readable: either the removal completes now, or the store refuses the read.
    */
   const finishPendingDiscard = async (): Promise<void> => {
-    if (!discardOwed.has(directory) && !(await RNFS.exists(markerPath))) return
+    if (!discardOwed.has(directory) && !(await RNFS.exists(tombstonePath))) return
     const stored = await countForDiscard()
-    await unlinkDirectory()
+    await condemn()
     discardOwed.delete(directory)
     bump("discarded", stored)
   }
@@ -388,6 +461,10 @@ export const createOutboxStore = (directory: string): OutboxStore => {
   }
 
   const enqueue = async (record: OutboxRecord): Promise<void> => {
+    if (retiredDirectories.has(directory)) {
+      bump("retiredWrites")
+      return
+    }
     const live = await sweep()
 
     if (record.sdkPaymentId !== null) {
@@ -421,28 +498,29 @@ export const createOutboxStore = (directory: string): OutboxStore => {
   /**
    * FR-5, made re-runnable (AD-26). The signals come first and the filesystem second:
    * the generation and the owed set move synchronously in the caller (see `discardAll`
-   * below), the durable marker is written before anything is enumerated, and only then
-   * is the directory counted — best effort — and unlinked. A read that fails before the
-   * signal existed would otherwise leave nothing to say a discard was ever due, and the
-   * next grant would drain the records the switch required destroyed (the third review's
-   * MEDIUM). Nothing to discard is not a failure; a directory that survives the unlink
-   * is, and the error carries the marker and the owed entry with it for the next attempt.
+   * below), the directory is counted — best effort — and then condemned. A read that
+   * fails before the signal existed would otherwise leave nothing to say a discard was
+   * ever due, and the next grant would drain the records the switch required destroyed
+   * (the third review's MEDIUM). Nothing to discard is not a failure; a directory that
+   * survives is, and the error carries the owed entry with it for the next attempt.
    */
   const runDiscard = async (): Promise<void> => {
     if (!(await RNFS.exists(directory).catch(() => true))) {
+      await RNFS.unlink(tombstonePath).catch(() => undefined)
       discardOwed.delete(directory)
       return
     }
-    try {
-      await RNFS.writeFile(markerPath, String(Date.now()), "utf8")
-    } catch {
-      /** A marker that cannot be written must not stop the unlink; the in-memory owed
-       *  set covers this process, and the mode itself covers the next launch. */
-    }
     const stored = await countForDiscard()
-    await unlinkDirectory()
+    await condemn()
     discardOwed.delete(directory)
     bump("discarded", stored)
+  }
+
+  /** Synchronous, ahead of the serialised body and of any filesystem call: from this
+   *  instant every outstanding lease is stale and every read owes the discard. */
+  const beginDiscard = (): void => {
+    generationByDirectory.set(directory, generationOf(directory) + 1)
+    discardOwed.add(directory)
   }
 
   /** Refuses a write whose lease predates a discard. Nothing is written; the caller
@@ -511,14 +589,17 @@ export const createOutboxStore = (directory: string): OutboxStore => {
       }),
 
     discardAll: () => {
-      /** Synchronous, ahead of the serialised body and of any filesystem call: from this
-       *  instant every outstanding lease is stale and every read owes the discard. */
-      generationByDirectory.set(directory, generationOf(directory) + 1)
-      discardOwed.add(directory)
+      beginDiscard()
+      return serialise(runDiscard)
+    },
+
+    retire: () => {
+      retiredDirectories.add(directory)
+      beginDiscard()
       return serialise(runDiscard)
     },
 
     hasPendingDiscard: () =>
-      serialise(async () => discardOwed.has(directory) || RNFS.exists(markerPath)),
+      serialise(async () => discardOwed.has(directory) || RNFS.exists(tombstonePath)),
   }
 }

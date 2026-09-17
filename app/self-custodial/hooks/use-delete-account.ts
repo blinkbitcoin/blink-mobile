@@ -11,6 +11,7 @@ import { removeBackupStateFor } from "@app/self-custodial/providers/backup-state
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { removeSelfCustodialAccountId } from "@app/self-custodial/storage/account-index"
 import { usePersistentStateContext } from "@app/store/persistent-state"
+import { createOutboxStore } from "@app/telemetry"
 import { AccountType, DefaultAccountId } from "@app/types/wallet"
 import { reportError } from "@app/utils/error-logging"
 import { logBreadcrumb } from "@app/utils/error-reporting"
@@ -89,10 +90,18 @@ export const useDeleteAccount = (): DeleteAccountResult => {
          * pairing: without this its queued records outlive the account that produced them.
          * Nothing would ever sweep them either — the 72h TTL only runs while a store for
          * that account is mounted, and a deleted account never mounts one again.
+         *
+         * Retired through the store, never unlinked here: a bare unlink neither moves the
+         * queue's generation nor serialises with a drain, so a transport result still in
+         * flight for this account would write its record back into a directory the
+         * account no longer owns. A retirement that cannot finish leaves a durable signal
+         * next to the directory, and the provider's parent sweep finishes it later.
          */
-        await RNFS.unlink(telemetryOutboxDirFor(accountId, network)).catch((err) => {
-          logBreadcrumb(`[self-custodial delete] outbox dir unlink failed: ${err}`)
-        })
+        await createOutboxStore(telemetryOutboxDirFor(accountId, network))
+          .retire()
+          .catch((err) => {
+            logBreadcrumb(`[self-custodial delete] outbox retire failed: ${err}`)
+          })
         await removeSelfCustodialAccountId(accountId)
         await removeBackupStateFor(accountId)
         await reloadSelfCustodialAccounts()

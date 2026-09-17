@@ -49,6 +49,7 @@ import {
   createOutboxStore,
   getOutboxCounters,
   resetOutboxCountersForTesting,
+  sweepCondemnedOutboxes,
   type LossCounters,
 } from "@app/telemetry/outbox/store"
 import {
@@ -196,105 +197,195 @@ describe("the telemetry outbox", () => {
       await expect(createOutboxStore(DIR).discardAll()).resolves.toBeUndefined()
     })
 
-    it("leaves no marker after a discard that finished", async () => {
+    const PARENT = DIR.slice(0, DIR.lastIndexOf("/"))
+    const entriesInParent = () =>
+      [...new Set(mockFs.__mockFilePaths().map((path) => path.slice(PARENT.length + 1)))]
+        .map((rest) => rest.split("/")[0])
+        .filter((name, index, all) => all.indexOf(name) === index)
+
+    it("condemns the queue by renaming it out of its path, and leaves nothing behind", async () => {
       const store = createOutboxStore(DIR)
       await store.enqueue(record())
 
       await store.discardAll()
 
       expect(await store.hasPendingDiscard()).toBe(false)
+      expect(mockFs.__mockFilePaths().filter((path) => path.startsWith(PARENT))).toEqual(
+        [],
+      )
     })
 
-    /** Only the directory unlink fails; everything else — the marker's own unlink
-     *  included — runs against the real mock. The earlier version of this test failed
-     *  both, which hid the split outcome the second review's MEDIUM 1 describes. */
-    const failDirectoryUnlink = () => {
+    /**
+     * Failure injection, one primitive at a time, everything else against the real mock.
+     * The rename is the primary means of condemning a queue; a failing rename falls back
+     * to a tombstone *next to* the directory and an unlink in place.
+     */
+    const failRename = () => {
+      const realMove = RNFS.moveFile
+      return jest
+        .spyOn(RNFS, "moveFile")
+        .mockImplementation((from, to) =>
+          String(from) === DIR ? Promise.reject(new Error("EXDEV")) : realMove(from, to),
+        )
+    }
+    const failDirectoryUnlink = (target = DIR) => {
       const realUnlink = RNFS.unlink
       return jest
         .spyOn(RNFS, "unlink")
         .mockImplementation((path) =>
-          String(path) === DIR ? Promise.reject(new Error("EBUSY")) : realUnlink(path),
+          String(path) === target ? Promise.reject(new Error("EBUSY")) : realUnlink(path),
+        )
+    }
+    const failTombstoneWrite = () => {
+      const realWrite = RNFS.writeFile
+      return jest
+        .spyOn(RNFS, "writeFile")
+        .mockImplementation((path, ...rest) =>
+          String(path) === `${DIR}.discard`
+            ? Promise.reject(new Error("ENOSPC"))
+            : realWrite(path, ...rest),
         )
     }
 
-    it("keeps its marker when the directory survives the unlink, so the next run knows (AD-26)", async () => {
+    it("leaves a tombstone beside the directory when neither the rename nor the unlink succeeds (AD-26)", async () => {
       const store = createOutboxStore(DIR)
       await store.enqueue(record())
+      const rename = failRename()
       const unlink = failDirectoryUnlink()
 
       await expect(store.discardAll()).rejects.toThrow("did not finish")
+      rename.mockRestore()
       unlink.mockRestore()
 
+      expect(mockFs.__mockFilePaths()).toContain(`${DIR}.discard`)
       expect(await store.hasPendingDiscard()).toBe(true)
       expect(getOutboxCounters().discarded).toBe(0)
     })
 
-    it("never hands out records behind a marker — a discard that did not finish is finished first, or the read fails", async () => {
+    it("never hands out records behind a tombstone — a discard that did not finish is finished first, or the read fails", async () => {
       // The Anon transition required these destroyed. Returning them from `pending()` to
       // a later Enhanced drain would be FR-5 by the back door.
       const store = createOutboxStore(DIR)
       await store.enqueue(record())
+      const rename = failRename()
       const unlink = failDirectoryUnlink()
       await store.discardAll().catch(() => undefined)
 
       await expect(store.pending()).rejects.toThrow("did not finish")
       await expect(store.depth()).rejects.toThrow("did not finish")
+      rename.mockRestore()
       unlink.mockRestore()
 
-      // The unlink works again: the next read finishes the discard, and the queue is empty.
+      // The filesystem works again: the next read finishes the discard, and the queue is empty.
       expect(await store.pending()).toEqual([])
       expect(await store.hasPendingDiscard()).toBe(false)
-      expect(mockFs.__mockFilePaths().filter((path) => path.startsWith(DIR))).toEqual([])
+      expect(mockFs.__mockFilePaths().filter((path) => path.startsWith(PARENT))).toEqual(
+        [],
+      )
     })
 
-    it("still unlinks when the marker itself cannot be written", async () => {
+    it("survives a restart: the tombstone is what a new process reads, and it refuses the queue", async () => {
+      // The fourth review's MEDIUM. The owed entry and the generation die with the
+      // process; the signal beside the directory does not.
+      const before = createOutboxStore(DIR)
+      await resolveTelemetryMode(TelemetryMode.Enhanced)
+      await before.enqueue(record())
+      const rename = failRename()
+      const unlink = failDirectoryUnlink()
+      await before.discardAll().catch(() => undefined)
+      expect(mockFs.__mockFilePaths()).toContain(`${DIR}.discard`)
+
+      // Process death: module state gone, disk as it was — still failing.
+      resetOutboxCountersForTesting()
+      resetDrainStateForTesting()
+      const after = createOutboxStore(DIR)
+      const submit = transportReturning(acked)
+      await expect(after.pending()).rejects.toThrow("did not finish")
+      await drainOutbox(after, instantly).catch(() => undefined)
+      expect(submit).not.toHaveBeenCalled()
+
+      // And once the filesystem cooperates, the discard finishes rather than the records returning.
+      rename.mockRestore()
+      unlink.mockRestore()
+      expect(await after.pending()).toEqual([])
+      await drainOutbox(after, instantly)
+      expect(submit).not.toHaveBeenCalled()
+    })
+
+    it("still removes the directory in place when the rename and the tombstone both fail", async () => {
       const store = createOutboxStore(DIR)
       await store.enqueue(record())
-      const realWrite = RNFS.writeFile
-      const write = jest
-        .spyOn(RNFS, "writeFile")
-        .mockImplementation((path, ...rest) =>
-          String(path).endsWith(".discard")
-            ? Promise.reject(new Error("ENOSPC"))
-            : realWrite(path, ...rest),
-        )
+      const rename = failRename()
+      const write = failTombstoneWrite()
 
       await store.discardAll()
+      rename.mockRestore()
       write.mockRestore()
 
       expect(await store.pending()).toEqual([])
       expect(getOutboxCounters().discarded).toBe(1)
     })
 
-    it("keeps refusing reads for the rest of the process when neither the marker nor the unlink succeeded", async () => {
+    it("keeps refusing reads for the rest of the process when every primitive fails", async () => {
       const store = createOutboxStore(DIR)
       await store.enqueue(record())
-      const realWrite = RNFS.writeFile
-      const write = jest
-        .spyOn(RNFS, "writeFile")
-        .mockImplementation((path, ...rest) =>
-          String(path).endsWith(".discard")
-            ? Promise.reject(new Error("ENOSPC"))
-            : realWrite(path, ...rest),
-        )
+      const rename = failRename()
+      const write = failTombstoneWrite()
       const unlink = failDirectoryUnlink()
       await store.discardAll().catch(() => undefined)
       write.mockRestore()
 
-      // No marker on disk, and the records are still there — but the store remembers.
-      expect(mockFs.__mockFilePaths()).not.toContain(`${DIR}/.discard`)
+      // Nothing on disk says so — but the store remembers.
+      expect(mockFs.__mockFilePaths()).not.toContain(`${DIR}.discard`)
       expect(await store.hasPendingDiscard()).toBe(true)
       await expect(store.pending()).rejects.toThrow("did not finish")
+      rename.mockRestore()
       unlink.mockRestore()
 
       expect(await store.pending()).toEqual([])
     })
 
-    /**
-     * The third review's MEDIUM: the discard's signals must exist before its first
-     * filesystem call can fail, or a failure there leaves the pre-suppression records
-     * readable by the next grant.
-     */
+    it("leaves a condemned queue for the parent sweep when its removal fails, and the sweep removes it", async () => {
+      const store = createOutboxStore(DIR)
+      await store.enqueue(record())
+      const realUnlink = RNFS.unlink
+      const unlink = jest
+        .spyOn(RNFS, "unlink")
+        .mockImplementation((path) =>
+          String(path).includes(".condemned-")
+            ? Promise.reject(new Error("EBUSY"))
+            : realUnlink(path),
+        )
+
+      await store.discardAll()
+      unlink.mockRestore()
+
+      // Unreadable as a queue already; the leftover is hygiene.
+      expect(await store.pending()).toEqual([])
+      expect(entriesInParent().some((name) => name.includes(".condemned-"))).toBe(true)
+
+      await sweepCondemnedOutboxes(PARENT)
+
+      expect(entriesInParent().some((name) => name.includes(".condemned-"))).toBe(false)
+    })
+
+    it("finishes, from the parent sweep, a discard whose tombstone outlived the process", async () => {
+      const store = createOutboxStore(DIR)
+      await store.enqueue(record())
+      const rename = failRename()
+      const unlink = failDirectoryUnlink()
+      await store.discardAll().catch(() => undefined)
+      rename.mockRestore()
+      unlink.mockRestore()
+      resetOutboxCountersForTesting() // a new process, no store for this account
+
+      await sweepCondemnedOutboxes(PARENT)
+
+      expect(mockFs.__mockFilePaths().filter((path) => path.startsWith(PARENT))).toEqual(
+        [],
+      )
+    })
+
     it("discards even when the directory's first exists() rejects", async () => {
       const store = createOutboxStore(DIR)
       await store.enqueue(record())
@@ -323,10 +414,12 @@ describe("the telemetry outbox", () => {
       const store = createOutboxStore(DIR)
       await store.enqueue(record())
       const exists = jest.spyOn(RNFS, "exists").mockRejectedValue(new Error("EIO"))
+      const rename = failRename()
 
       await expect(store.discardAll()).rejects.toThrow()
       expect(await store.hasPendingDiscard()).toBe(true)
       exists.mockRestore()
+      rename.mockRestore()
 
       expect(await store.pending()).toEqual([])
       expect(await store.hasPendingDiscard()).toBe(false)
@@ -335,28 +428,30 @@ describe("the telemetry outbox", () => {
     it("does not drain what a failed discard left behind, even under Enhanced", async () => {
       const store = createOutboxStore(DIR)
       await store.enqueue(record())
+      const rename = failRename()
       const unlink = failDirectoryUnlink()
       await store.discardAll().catch(() => undefined)
       const submit = transportReturning(acked)
       await resolveTelemetryMode(TelemetryMode.Enhanced)
 
       await drainOutbox(store, instantly).catch(() => undefined)
+      rename.mockRestore()
       unlink.mockRestore()
 
       expect(submit).not.toHaveBeenCalled()
     })
 
-    it("reports a marker the last run left behind, so the discard is re-run (AD-26)", async () => {
-      // A discard that died between writing the marker and finishing the unlink.
+    it("reads a tombstone the last run left beside the directory, and re-runs the discard (AD-26)", async () => {
       const store = createOutboxStore(DIR)
       await store.enqueue(record())
-      await RNFS.writeFile(`${DIR}/.discard`, "1", "utf8")
+      await RNFS.writeFile(`${DIR}.discard`, "1", "utf8")
 
       expect(await store.hasPendingDiscard()).toBe(true)
 
       await store.discardAll()
       expect(await store.hasPendingDiscard()).toBe(false)
       expect(await store.pending()).toEqual([])
+      expect(mockFs.__mockFilePaths()).not.toContain(`${DIR}.discard`)
     })
 
     it("counts what the discard threw away", async () => {
@@ -1026,6 +1121,101 @@ describe("the telemetry outbox — the drain", () => {
           expect(filesUnder()).toEqual([])
         },
       )
+
+      it.each(Object.keys(results))(
+        "writes nothing back on a %s that lands after the account was deleted — the mode never moved",
+        async (kind) => {
+          // The fourth review's HIGH: deletion retires the queue through the store, so the
+          // generation moves even though the mode still says Enhanced.
+          const store = createOutboxStore(DIR)
+          const { submit, answer } = holdSubmit()
+          await resolveTelemetryMode(TelemetryMode.Enhanced)
+          await store.enqueue(record({ sdkPaymentId: "sdk-deleted-account" }))
+
+          const drain = drainOutbox(store, instantly)
+          await settled()
+          expect(submit).toHaveBeenCalledTimes(1)
+
+          await store.retire()
+          expect(filesUnder()).toEqual([])
+          answer(results[kind]())
+          await drain
+
+          expect(filesUnder()).toEqual([])
+          expect(getOutboxCounters().staleWrites).toBeGreaterThanOrEqual(1)
+        },
+      )
+
+      it("refuses an enqueue after retirement, and a store recreated for the path in the same process refuses too", async () => {
+        const store = createOutboxStore(DIR)
+        await resolveTelemetryMode(TelemetryMode.Enhanced)
+        await store.enqueue(record())
+        await store.retire()
+
+        await store.enqueue(record({ sdkPaymentId: "sdk-after-retire" }))
+        await createOutboxStore(DIR).enqueue(
+          record({ sdkPaymentId: "sdk-after-retire-2" }),
+        )
+
+        expect(filesUnder()).toEqual([])
+        expect(getOutboxCounters().retiredWrites).toBe(2)
+      })
+
+      it("retires across instances: one store retires while another's drain is in flight", async () => {
+        const draining = createOutboxStore(DIR)
+        const deleting = createOutboxStore(DIR)
+        const { submit, answer } = holdSubmit()
+        await resolveTelemetryMode(TelemetryMode.Enhanced)
+        await draining.enqueue(record({ sdkPaymentId: "sdk-shared-dir" }))
+
+        const drain = drainOutbox(draining, instantly)
+        await settled()
+        expect(submit).toHaveBeenCalledTimes(1)
+        await deleting.retire()
+        answer({ kind: "retryable" })
+        await drain
+
+        expect(filesUnder()).toEqual([])
+        expect(await draining.pending()).toEqual([])
+      })
+
+      it("refuses an enqueue that races the retirement, whichever side of it lands", async () => {
+        const store = createOutboxStore(DIR)
+        await resolveTelemetryMode(TelemetryMode.Enhanced)
+        await store.enqueue(record({ sdkPaymentId: "sdk-before" }))
+
+        const retirement = store.retire()
+        const racing = store.enqueue(record({ sdkPaymentId: "sdk-racing" }))
+        await Promise.all([retirement, racing])
+
+        expect(filesUnder()).toEqual([])
+      })
+
+      it("does not submit when Enhanced → Anon → Enhanced completes inside markSubmitted's write", async () => {
+        // The fourth review's MEDIUM: the second mode check says yes again, the queue is
+        // already condemned, and the result would be refused — but the event would have
+        // left. The lease is checked in the same breath as the mode, before the submit.
+        const base = createOutboxStore(DIR)
+        const submit = transportReturning(acked)
+        await resolveTelemetryMode(TelemetryMode.Enhanced)
+        await base.enqueue(record())
+        onTelemetrySuppressed(() => base.discardAll())
+        const store = {
+          ...base,
+          markSubmitted: async (r: OutboxRecord, lease: number) => {
+            const applied = base.markSubmitted(r, lease)
+            await resolveTelemetryMode(TelemetryMode.Anon)
+            await resolveTelemetryMode(TelemetryMode.Enhanced)
+            return applied
+          },
+        }
+
+        await drainOutbox(store, instantly)
+
+        expect(isDrainPermitted()).toBe(true)
+        expect(submit).not.toHaveBeenCalled()
+        expect(filesUnder()).toEqual([])
+      })
 
       it("does not mark the next record submitted either — the loop stops", async () => {
         const store = createOutboxStore(DIR)

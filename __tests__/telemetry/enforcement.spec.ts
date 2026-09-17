@@ -53,6 +53,7 @@ const bansCrashCollectionControls = (rule: ResolvedRule | undefined): boolean =>
         "setCrashlyticsCollectionEnabled",
         "deleteUnsentReports",
         "sendUnsentReports",
+        "setCrashCollectionDisposition",
       ].every((name) => restriction.selector?.includes(name)),
   )
 }

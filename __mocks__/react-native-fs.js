@@ -71,16 +71,35 @@ const readDir = (path) => {
 }
 
 // A rename: the destination appears whole or not at all, which is what the outbox's
-// temp-and-rename write relies on.
+// temp-and-rename write relies on. Directories move as a tree, as rename(2) does on
+// both platforms — the outbox condemns a queue by renaming it out of its path.
 const moveFile = (from, to) => {
   const source = normalize(from)
-  if (!files.has(source)) {
+  const target = normalize(to)
+  if (files.has(source)) {
+    return mkdir(parentOf(target)).then(() => {
+      files.set(target, files.get(source))
+      files.delete(source)
+    })
+  }
+  const isDirectory =
+    directories.has(source) || [...files.keys()].some((f) => f.startsWith(`${source}/`))
+  if (!isDirectory) {
     return Promise.reject(new Error(`ENOENT: no such file, rename '${source}'`))
   }
-  const target = normalize(to)
   return mkdir(parentOf(target)).then(() => {
-    files.set(target, files.get(source))
-    files.delete(source)
+    for (const file of [...files.keys()]) {
+      if (file.startsWith(`${source}/`)) {
+        files.set(`${target}${file.slice(source.length)}`, files.get(file))
+        files.delete(file)
+      }
+    }
+    for (const dir of [...directories]) {
+      if (dir === source || dir.startsWith(`${source}/`)) {
+        directories.delete(dir)
+        directories.add(`${target}${dir.slice(source.length)}`)
+      }
+    }
   })
 }
 

@@ -267,6 +267,7 @@ export {
   getOutboxCounters,
   OUTBOX_MAX_RECORDS,
   OUTBOX_TTL_MS,
+  sweepCondemnedOutboxes,
 } from "./outbox"
 export { getDroppedEventCounts } from "./policy"
 export { setCustodialAnalyticsIdentity } from "./platform-analytics"
