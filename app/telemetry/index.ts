@@ -13,7 +13,12 @@ import {
 } from "./diagnostics"
 import { mintTelemetryEventId } from "./event-id"
 import { wireNameOf, type TelemetryFact } from "./fact"
-import { getTelemetryMode, isEventPermitted, TelemetryMode } from "./mode"
+import {
+  getTelemetryMode,
+  isDrainPermitted,
+  isEventPermitted,
+  TelemetryMode,
+} from "./mode"
 import {
   drainOutbox,
   getOutboxCounters,
@@ -86,6 +91,21 @@ export const captureTelemetryFact = (
   fact: TelemetryFact,
   sdkPaymentId: string | null = null,
 ): void => {
+  captureInto(activeOutbox, fact, sdkPaymentId)
+}
+
+/**
+ * The capture pipeline with its destination named. `captureTelemetryFact` names the
+ * mounted store; the drain's loss report names the store it is draining, which is not
+ * always the same one — an account switch during a drain in flight would otherwise file
+ * account A's loss into account B's queue, or drop it, and A would re-report the same
+ * counts on every later drain.
+ */
+const captureInto = (
+  target: OutboxStore | null,
+  fact: TelemetryFact,
+  sdkPaymentId: string | null,
+): void => {
   try {
     if (!isEventPermitted(fact.event)) return
 
@@ -112,7 +132,7 @@ export const captureTelemetryFact = (
       return
     }
 
-    const store = activeOutbox
+    const store = target
     if (!store) {
       countUnroutedEvent()
       return
@@ -182,20 +202,26 @@ export const resetTelemetryHealthReportingForTesting = (): void => {
 /**
  * AD-31: the loss the outbox has accumulated leaves the device as a contract event, through
  * the same gate and policy as everything else — so an `Anon` device never reports, and a
- * `walletProvider` rides on it like on any other row.
+ * `walletProvider` rides on it like on any other row. It is filed into the store being
+ * drained, and only while that store's drain is still permitted: a loss report is a Spark
+ * device's, and after a switch to a custodial account it must neither go to GA4 nor into
+ * another account's queue.
  */
-const reportLoss = (loss: LossCounters): void => {
-  const walletProvider = currentWalletProvider()
-  if (!walletProvider) return
-  captureTelemetryFact({
-    event: TelemetryEvent.LossReported,
-    telemetryEventId: mintTelemetryEventId(),
-    walletProvider,
-    expired: loss.expired,
-    evicted: loss.evicted,
-    rejected: loss.rejected,
-    parseFailed: loss.parseFailed,
-  })
+const reportLossInto = (store: OutboxStore, loss: LossCounters): void => {
+  if (!isDrainPermitted() || store !== activeOutbox) return
+  captureInto(
+    store,
+    {
+      event: TelemetryEvent.LossReported,
+      telemetryEventId: mintTelemetryEventId(),
+      walletProvider: WalletProvider.Spark,
+      expired: loss.expired,
+      evicted: loss.evicted,
+      rejected: loss.rejected,
+      parseFailed: loss.parseFailed,
+    },
+    null,
+  )
 }
 
 /** Drains whichever store is mounted. Safe to call on any trigger; it is a no-op unless the
@@ -206,7 +232,7 @@ export const drainActiveOutbox = async (): Promise<void> => {
   const store = activeOutbox
   if (!store) return
   try {
-    await drainOutbox(store, { reportLoss })
+    await drainOutbox(store, { reportLoss: (loss) => reportLossInto(store, loss) })
   } catch (err) {
     reportBoundaryFault("outbox drain", err)
   }

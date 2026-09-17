@@ -23,11 +23,16 @@ const TELEMETRY_CONFIG_TIMEOUT_MS = 5_000
 
 let lastFetchedAt = 0
 
-export const refreshTelemetryKillSwitch = async (serverUrl: string): Promise<void> => {
-  const now = Date.now()
-  if (now - lastFetchedAt < TELEMETRY_CONFIG_MIN_INTERVAL_MS) return
-  lastFetchedAt = now
+/** The request in flight, if any, so two triggers landing together share one. */
+let inFlight: Promise<void> | null = null
 
+/**
+ * Only an answer starts the interval. A device that was offline for the attempt asks again
+ * on its next trigger rather than sitting out fifteen minutes: a kill switch that cannot be
+ * retried promptly is the failure AD-28 exists to prevent. A 404 is an answer — not served
+ * yet is not a reason to keep asking.
+ */
+const fetchOnce = async (serverUrl: string, startedAt: number): Promise<void> => {
   const controller = new AbortController()
   const timeout = setTimeout(() => controller.abort(), TELEMETRY_CONFIG_TIMEOUT_MS)
   try {
@@ -36,15 +41,32 @@ export const refreshTelemetryKillSwitch = async (serverUrl: string): Promise<voi
       headers: { Accept: "application/json" },
       signal: controller.signal,
     })
+    markAnswered(startedAt)
     if (!response.ok) return
     applyLnurlTelemetryFlag(await response.json())
   } catch {
-    /** Unreachable, or not served yet. The last persisted value stands. */
+    /** Unreachable. The last persisted value stands, and the next trigger asks again. */
   } finally {
     clearTimeout(timeout)
   }
 }
 
+const markAnswered = (at: number): void => {
+  lastFetchedAt = at
+}
+
+export const refreshTelemetryKillSwitch = (serverUrl: string): Promise<void> => {
+  if (inFlight) return inFlight
+  const now = Date.now()
+  if (now - lastFetchedAt < TELEMETRY_CONFIG_MIN_INTERVAL_MS) return Promise.resolve()
+  const request = fetchOnce(serverUrl, now).finally(() => {
+    inFlight = null
+  })
+  inFlight = request
+  return request
+}
+
 export const resetTelemetryConfigForTesting = (): void => {
   lastFetchedAt = 0
+  inFlight = null
 }

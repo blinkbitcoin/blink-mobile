@@ -113,3 +113,9 @@ import {
 } from "./app/telemetry/transmissibility"
 
 setDiagnosticsModeInput(DiagnosticsModeInput.Custodial)
+// And again before every test, so a test that closed the gate — by resolving a mode, or by
+// resetting the boundary — leaves the next one with the default rather than its leftovers.
+// Suites that manage the gate themselves do so in their own hooks, which run after this.
+beforeEach(() => {
+  setDiagnosticsModeInput(DiagnosticsModeInput.Custodial)
+})

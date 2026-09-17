@@ -103,7 +103,8 @@ export type TelemetryModeInputs = {
  * and "we never asked, so we assumed consent" is not one.
  *
  * A custodial account active on an **untrusted** remote config resolves `Unresolved` if
- * the device holds a self-custodial account at all. The rollout flag defaults to `off`,
+ * the device holds a self-custodial account at all; so does a device with no active
+ * account that holds one. The rollout flag defaults to `off`,
  * `remoteConfigReady` is set in a `finally` regardless of whether the fetch threw, and
  * `useSelfCustodialRollback` swaps the active account to a custodial fallback on that
  * default — so a failed fetch could otherwise turn full platform collection on for someone
@@ -130,6 +131,18 @@ export const deriveTelemetryMode = ({
     return TelemetryMode.Unresolved
   }
 
+  /**
+   * No account at all — a fresh install, or a logged-out device. With no self-custodial
+   * account on the device either, this is the custodial product's visitor: the acquisition
+   * funnel is custodial analytics, a crash on the login screen is a custodial crash, nothing
+   * here has chosen anything, and nothing on the device could have been rolled back from —
+   * the escape hatch the custodial branch takes, for the same reason. Left `Unresolved`,
+   * nothing in a pre-auth session could ever resolve it: the funnel would be dropped and
+   * the sink would hold sign-up crashes for an answer that never came. A device that does
+   * hold a self-custodial account stays unresolved until one is active — an incognito
+   * wallet's device must not collect between accounts.
+   */
+  if (!hasSelfCustodialAccount) return TelemetryMode.Custodial
   return TelemetryMode.Unresolved
 }
 
@@ -237,8 +250,19 @@ export const resolveTelemetryMode = (mode: TelemetryMode): Promise<void> => {
   currentMode = mode
   closeSynchronously(mode)
 
-  applying = applying.then(() => applyMode(mode))
+  applying = applying.then(() => applyMode(mode)).catch(settleFault)
   return applying
+}
+
+/**
+ * The transition chain must always settle. A transition that threw — a platform seam
+ * failing synchronously, a listener that rejected past `notifySuppressed`'s own guard —
+ * would otherwise leave `applying` rejected for the rest of the process: every later
+ * `whenModeSettled()` would reject, no drain would ever run, and the reopen that follows
+ * the next Custodial resolution would never be reached.
+ */
+const settleFault = (err: unknown): void => {
+  reportBoundaryFault("mode transition", err)
 }
 
 /**
@@ -252,8 +276,13 @@ let initialisedAt: number | null = null
 export const initializeTelemetryGate = (): Promise<void> => {
   currentMode = TelemetryMode.Unresolved
   initialisedAt = Date.now()
-  closeSynchronously(TelemetryMode.Unresolved)
-  applying = applying.then(() => applyMode(TelemetryMode.Unresolved))
+  /** Runs at module scope in app.tsx, during bundle evaluation: nothing here may throw. */
+  try {
+    closeSynchronously(TelemetryMode.Unresolved)
+  } catch (err) {
+    settleFault(err)
+  }
+  applying = applying.then(() => applyMode(TelemetryMode.Unresolved)).catch(settleFault)
   return applying
 }
 

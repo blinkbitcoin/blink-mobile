@@ -3,6 +3,7 @@
 // and has no `.each`. Same workaround as __tests__/screens/send-destination.spec.tsx.
 import { it } from "@jest/globals"
 
+import analytics from "@react-native-firebase/analytics"
 import RNFS from "react-native-fs"
 import Crypto from "react-native-quick-crypto"
 
@@ -41,6 +42,7 @@ import {
 } from "@app/telemetry/outbox/config"
 import { drainOutbox, resetDrainStateForTesting } from "@app/telemetry/outbox/drain"
 import {
+  dedupKeyFor,
   OutboxState,
   parseOutboxRecord,
   type OutboxRecord,
@@ -80,6 +82,10 @@ const DIR = "/mock/documents/blink-telemetry-outbox-regtest/account-1"
 let minted = 0
 const uuid = (n: number) =>
   `3f2a1b4c-5d6e-4f70-8192-a3b4c5d6e7${String(n).padStart(2, "0")}`
+
+/** The file a keyed record lives in — the key is a digest of the payment id. */
+const fileOf = (sdkPaymentId: string): string =>
+  `${DIR}/${dedupKeyFor({ sdkPaymentId, telemetryEventId: "" })}.json`
 
 const record = (overrides: Partial<OutboxRecord> = {}): OutboxRecord => {
   minted += 1
@@ -197,13 +203,13 @@ describe("the telemetry outbox", () => {
       // A death inside a rewrite — after the old file was removed, before the new one was
       // moved into place — leaves only the temp name, and it is the whole record.
       const crashed = record({ state: OutboxState.Submitted })
-      await RNFS.writeFile(`${DIR}/p-crashed.json.tmp`, JSON.stringify(crashed), "utf8")
+      await RNFS.writeFile(`${fileOf("crashed")}.tmp`, JSON.stringify(crashed), "utf8")
 
       const [pending] = await createOutboxStore(DIR).pending()
 
       expect(pending.telemetryEventId).toBe(crashed.telemetryEventId)
-      expect(mockFs.__mockFilePaths()).toContain(`${DIR}/p-crashed.json`)
-      expect(mockFs.__mockFilePaths()).not.toContain(`${DIR}/p-crashed.json.tmp`)
+      expect(mockFs.__mockFilePaths()).toContain(fileOf("crashed"))
+      expect(mockFs.__mockFilePaths()).not.toContain(`${fileOf("crashed")}.tmp`)
     })
 
     it("ignores and removes a temp file beside its final — a rewrite that never finished", async () => {
@@ -211,7 +217,7 @@ describe("the telemetry outbox", () => {
       const kept = record({ sdkPaymentId: "sdk-kept" })
       await store.enqueue(kept)
       await RNFS.writeFile(
-        `${DIR}/p-sdk-kept.json.tmp`,
+        `${fileOf("sdk-kept")}.tmp`,
         JSON.stringify({ ...kept, state: OutboxState.Submitted }),
         "utf8",
       )
@@ -219,11 +225,11 @@ describe("the telemetry outbox", () => {
       const [pending] = await store.pending()
 
       expect(pending.state).toBe(OutboxState.Queued)
-      expect(mockFs.__mockFilePaths()).not.toContain(`${DIR}/p-sdk-kept.json.tmp`)
+      expect(mockFs.__mockFilePaths()).not.toContain(`${fileOf("sdk-kept")}.tmp`)
     })
 
     it("counts a temp file it cannot parse as parse_failed — a death mid-write", async () => {
-      await RNFS.writeFile(`${DIR}/p-torn.json.tmp`, '{"telemetryEventId":"3f2a', "utf8")
+      await RNFS.writeFile(`${fileOf("torn")}.tmp`, '{"telemetryEventId":"3f2a', "utf8")
 
       expect(await createOutboxStore(DIR).pending()).toEqual([])
       expect(getOutboxCounters().parseFailed).toBe(1)
@@ -525,6 +531,20 @@ describe("the telemetry outbox", () => {
       expect(getOutboxCounters().deduplicated).toBe(1)
     })
 
+    it("keeps two payments distinct however alike their ids — the filename is a digest", async () => {
+      // Sanitise-and-truncate let ids sharing a normalised prefix collide on one filename,
+      // where the second overwrote the first with no counter moved.
+      const store = createOutboxStore(DIR)
+      const prefix = "x".repeat(130)
+      await store.enqueue(record({ sdkPaymentId: `${prefix}-a` }))
+      await store.enqueue(record({ sdkPaymentId: `${prefix}-b` }))
+      await store.enqueue(record({ sdkPaymentId: "a/b" }))
+      await store.enqueue(record({ sdkPaymentId: "a_b" }))
+
+      expect(await store.pending()).toHaveLength(4)
+      expect(getOutboxCounters()).toMatchObject({ enqueued: 4, deduplicated: 0 })
+    })
+
     it("keeps unkeyed events distinct, because they cannot be deduplicated", async () => {
       const store = createOutboxStore(DIR)
       await store.enqueue(record({ sdkPaymentId: null }))
@@ -575,7 +595,7 @@ describe("the telemetry outbox", () => {
 
       const paths = mockFs.__mockFilePaths().filter((path) => path.startsWith(DIR))
       expect(paths).toContain(`${DIR}/acked.json`)
-      expect(paths).toContain(`${DIR}/p-sdk-crash-mid-ack.json`)
+      expect(paths).toContain(fileOf("sdk-crash-mid-ack"))
     })
 
     it("removes a record whose tombstone exists without resubmitting it, and still refuses its replay", async () => {
@@ -592,7 +612,7 @@ describe("the telemetry outbox", () => {
       await after.enqueue(record({ sdkPaymentId: "sdk-crash-mid-ack" }))
 
       expect(await after.pending()).toEqual([])
-      expect(mockFs.__mockFilePaths()).not.toContain(`${DIR}/p-sdk-crash-mid-ack.json`)
+      expect(mockFs.__mockFilePaths()).not.toContain(fileOf("sdk-crash-mid-ack"))
     })
 
     it("keeps the record when the tombstone cannot be written, so nothing is delivered twice under a new id", async () => {
@@ -729,15 +749,15 @@ describe("the telemetry outbox", () => {
     })
 
     it("counts a record it cannot read as parse_failed and deletes it", async () => {
-      await RNFS.writeFile(`${DIR}/p-corrupt.json`, "{ not json", "utf8")
+      await RNFS.writeFile(fileOf("corrupt"), "{ not json", "utf8")
 
       const store = createOutboxStore(DIR)
       expect(await store.pending()).toEqual([])
       expect(getOutboxCounters().parseFailed).toBe(1)
       expect(await store.unreportedLoss()).toMatchObject({ parseFailed: 1 })
-      expect(
-        mockFs.__mockFilePaths().some((path) => path.endsWith("p-corrupt.json")),
-      ).toBe(false)
+      expect(mockFs.__mockFilePaths().some((path) => path === fileOf("corrupt"))).toBe(
+        false,
+      )
     })
   })
 
@@ -1441,6 +1461,58 @@ describe("the telemetry outbox — loss and health", () => {
         rejected: 0,
         parseFailed: 0,
       } satisfies LossCounters)
+    })
+
+    it("files the loss report into the queue being drained, not whichever is mounted by then", async () => {
+      // A switch to another Enhanced account during a drain in flight: the draining
+      // store's loss must not land in the newly mounted account's queue, and the counters
+      // must stay on the device until that account's own next drain reports them.
+      const draining = createOutboxStore(DIR)
+      const other = createOutboxStore(`${DIR.slice(0, DIR.lastIndexOf("/"))}/account-2`)
+      setActiveOutbox(draining)
+      const submit = transportReturning(acked)
+      await resolveTelemetryMode(TelemetryMode.Enhanced)
+      await draining.enqueue(record({ queuedAt: Date.now() - OUTBOX_TTL_MS - 1 }))
+      await draining.pending()
+
+      // The drain reads the loss, then the switch lands before it files the report.
+      const unreported = draining.unreportedLoss.bind(draining)
+      draining.unreportedLoss = async () => {
+        const loss = await unreported()
+        setActiveOutbox(other)
+        return loss
+      }
+      await drainActiveOutbox()
+
+      expect(lossSeen(submit)).toEqual([])
+      expect(await other.pending()).toEqual([])
+      expect(await draining.unreportedLoss()).toMatchObject({ expired: 1 })
+    })
+
+    it("does not hand the loss report to GA4 when the switch was to a custodial account", async () => {
+      const draining = createOutboxStore(DIR)
+      setActiveOutbox(draining)
+      const submit = transportReturning(acked)
+      const logEvent = analytics().logEvent as jest.Mock
+      await resolveTelemetryMode(TelemetryMode.Enhanced)
+      await draining.enqueue(record({ queuedAt: Date.now() - OUTBOX_TTL_MS - 1 }))
+      await draining.pending()
+      const unreported = draining.unreportedLoss.bind(draining)
+      draining.unreportedLoss = async () => {
+        const loss = await unreported()
+        setActiveOutbox(null)
+        await resolveTelemetryMode(TelemetryMode.Custodial)
+        return loss
+      }
+
+      await drainActiveOutbox()
+
+      expect(lossSeen(submit)).toEqual([])
+      expect(logEvent).not.toHaveBeenCalledWith(
+        TelemetryEvent.LossReported,
+        expect.anything(),
+      )
+      expect(await draining.unreportedLoss()).toMatchObject({ expired: 1 })
     })
 
     it("reports nothing when there is no loss to report", async () => {

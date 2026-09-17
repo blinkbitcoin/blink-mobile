@@ -160,6 +160,13 @@ const BOTH_MODES: readonly EmittingMode[] = [
  * (AD-24). Until a row passes, it is restricted to `Custodial` — the outcome AD-24 names
  * for a row that fails — so their status on Enhanced is a contract fact rather than a side
  * effect of FR-70's collection toggle. Admitting one is a one-word change to its `modes`.
+ *
+ * What that means in practice, stated so nobody expects otherwise: `rollout_exposed` fires
+ * from the feature-flags context on every device and so is emitted from custodial and
+ * pre-account ones; the other three fire only inside self-custodial flows with that account
+ * already active, so until their rows are admitted they are emitted from nowhere. That is
+ * the park, not an accident — on `main` they went to GA4 from a self-custodial device, which
+ * is the emission the review exists to decide on.
  */
 const PENDING_AD24_REVIEW =
   "AD-24: pending privacy review; Custodial-only until it passes"

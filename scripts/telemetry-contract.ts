@@ -24,9 +24,7 @@ export const renderContractArtifact = (): string =>
         name: row.event,
         version: row.version,
         modes: row.modes,
-        params: Object.fromEntries(
-          Object.entries(row.params).map(([name, domain]) => [name, domain]),
-        ),
+        params: row.params,
         ...(row.review ? { review: row.review } : {}),
       })),
     },

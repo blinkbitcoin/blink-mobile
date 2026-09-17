@@ -41,6 +41,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
     LL: {
       SettingsScreen: {
         mode: () => "Mode",
+        modeNotSet: () => "Not set",
       },
     },
   }),

@@ -2449,6 +2449,7 @@
     "apiDocumentation": "Ebiwandiiko bya API",
     "apiDashboard": "Okuyingira mu API ne dashiboodi",
     "mode": "Modu",
+    "modeNotSet": "Not set",
     "pos": "Ekifo we Batunda",
     "posCopied": "Ennyunga ku kifo kyo eky'okutunda ekoppeddwa",
     "activated": "Ekoleddwa",

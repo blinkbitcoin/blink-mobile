@@ -77,4 +77,44 @@ describe("refreshTelemetryKillSwitch (AD-28)", () => {
 
     expect(fetchMock).toHaveBeenCalledTimes(1)
   })
+
+  it("treats a 404 as an answer — not served yet is not a reason to keep asking", async () => {
+    fetchMock.mockReturnValue(respond(404))
+
+    await refreshTelemetryKillSwitch(SERVER)
+    await refreshTelemetryKillSwitch(SERVER)
+
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+  })
+
+  it("asks again on the next trigger when the fetch itself failed, and engages then", async () => {
+    // A device offline for the attempt must not sit out the interval: a kill switch that
+    // cannot be retried promptly is the failure AD-28 exists to prevent.
+    fetchMock
+      .mockRejectedValueOnce(new Error("network down"))
+      .mockReturnValue(respond(200, { telemetry_enabled: false }))
+
+    await refreshTelemetryKillSwitch(SERVER)
+    expect(isKillSwitchEngaged()).toBe(false)
+    await refreshTelemetryKillSwitch(SERVER)
+
+    expect(fetchMock).toHaveBeenCalledTimes(2)
+    expect(isKillSwitchEngaged()).toBe(true)
+  })
+
+  it("makes one request when two triggers land while one is in flight", async () => {
+    let answer: (response: Response) => void = () => undefined
+    fetchMock.mockReturnValue(
+      new Promise<Response>((resolve) => {
+        answer = resolve
+      }),
+    )
+
+    const first = refreshTelemetryKillSwitch(SERVER)
+    const second = refreshTelemetryKillSwitch(SERVER)
+    answer(await respond(200, { telemetry_enabled: true }))
+    await Promise.all([first, second])
+
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+  })
 })

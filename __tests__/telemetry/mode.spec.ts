@@ -33,6 +33,7 @@ import {
   resetTelemetryModeForTesting,
   resolveTelemetryMode,
   TelemetryMode,
+  whenModeSettled,
   type TelemetryModeInputs,
 } from "@app/telemetry/mode"
 
@@ -82,8 +83,33 @@ describe("deriveTelemetryMode (AD-5, AD-25)", () => {
       expected: TelemetryMode.Custodial,
     },
     {
-      case: "no account at all",
-      given: inputs({ activeAccount: ActiveAccountKind.None }),
+      // A fresh install, or a logged-out device: the custodial product's visitor. The
+      // acquisition funnel and sign-up crashes are custodial telemetry, and there is nothing
+      // on the device that could have been rolled back from.
+      case: "no account at all, and none on the device",
+      given: inputs({
+        activeAccount: ActiveAccountKind.None,
+        hasSelfCustodialAccount: false,
+      }),
+      expected: TelemetryMode.Custodial,
+    },
+    {
+      case: "no account at all, on an untrusted remote config, and none on the device",
+      given: inputs({
+        activeAccount: ActiveAccountKind.None,
+        hasSelfCustodialAccount: false,
+        remoteConfigTrusted: false,
+      }),
+      expected: TelemetryMode.Custodial,
+    },
+    {
+      // Between accounts on a device that holds a self-custodial wallet — possibly an
+      // incognito one. Nothing collects until one is active.
+      case: "no active account, but a self-custodial one on the device",
+      given: inputs({
+        activeAccount: ActiveAccountKind.None,
+        hasSelfCustodialAccount: true,
+      }),
       expected: TelemetryMode.Unresolved,
     },
   ])("resolves $case as $expected", ({ given, expected }) => {
@@ -435,6 +461,58 @@ describe("the collection gate", () => {
       await resolveTelemetryMode(TelemetryMode.Custodial)
 
       expect(setUserId).not.toHaveBeenCalled()
+    })
+  })
+
+  describe("the platform seam never throws — a missing native module is a fault, not a white screen", () => {
+    // `analytics()` throws synchronously when the native module is not linked, and the
+    // gate is initialised at module scope during bundle evaluation.
+    // The mock module's default export is the `analytics()` factory; the seam calls it on
+    // every use, so a throwing factory is exactly the unlinked-native-module failure.
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const analyticsModule = require("@react-native-firebase/analytics") as {
+      default: () => unknown
+    }
+    const notLinked = () =>
+      jest.spyOn(analyticsModule, "default").mockImplementation(() => {
+        throw new Error(
+          "You attempted to use a Firebase module that's not installed natively",
+        )
+      })
+
+    it("initialises the gate and resolves modes without throwing", async () => {
+      const spy = notLinked()
+
+      await expect(initializeTelemetryGate()).resolves.toBeUndefined()
+      await expect(resolveTelemetryMode(TelemetryMode.Custodial)).resolves.toBeUndefined()
+      await expect(resolveTelemetryMode(TelemetryMode.Anon)).resolves.toBeUndefined()
+      await expect(whenModeSettled()).resolves.toBeUndefined()
+
+      spy.mockRestore()
+      expect(getDiagnosticCounters().untransmittedFaults).toBeGreaterThan(0)
+    })
+
+    it("keeps transitioning once the SDK works again — the chain is never left rejected", async () => {
+      const spy = notLinked()
+      await initializeTelemetryGate()
+      await resolveTelemetryMode(TelemetryMode.Custodial)
+      spy.mockRestore()
+      setCollectionEnabled.mockClear()
+
+      await resolveTelemetryMode(TelemetryMode.Anon)
+      await resolveTelemetryMode(TelemetryMode.Custodial)
+
+      expect(setCollectionEnabled).toHaveBeenLastCalledWith(true)
+    })
+
+    it("survives a suppression listener that rejects, and still reopens later", async () => {
+      onTelemetrySuppressed(() => Promise.reject(new Error("unlink exploded")))
+      await resolveTelemetryMode(TelemetryMode.Enhanced)
+
+      await expect(resolveTelemetryMode(TelemetryMode.Anon)).resolves.toBeUndefined()
+      await resolveTelemetryMode(TelemetryMode.Custodial)
+
+      expect(setCollectionEnabled).toHaveBeenLastCalledWith(true)
     })
   })
 

@@ -105,15 +105,22 @@ const HELD_ERRORS_MAX = 20
 type HeldError = { error: Error; options?: RecordAppErrorOptions }
 let heldWhileUnresolved: HeldError[] = []
 
+/** `crashlytics()` throws synchronously when the native module is not linked. The sink
+ *  is called from places that must not fail — the boundary's own fault reporter among
+ *  them — so it never lets that out. */
 const transmit = (error: Error, options?: RecordAppErrorOptions): void => {
   const errorClass = classifyError(error, options)
-  crashlytics().log(`[${errorClass}] ${error.message}`)
-  if (errorClass !== ErrorReportClass.Defect) return
-  if (options?.dedupKey) {
-    if (recordedDedupKeys.has(options.dedupKey)) return
-    recordedDedupKeys.add(options.dedupKey)
+  try {
+    crashlytics().log(`[${errorClass}] ${error.message}`)
+    if (errorClass !== ErrorReportClass.Defect) return
+    if (options?.dedupKey) {
+      if (recordedDedupKeys.has(options.dedupKey)) return
+      recordedDedupKeys.add(options.dedupKey)
+    }
+    crashlytics().recordError(error)
+  } catch (err) {
+    if (__DEV__) console.warn("[error-reporting] not transmitted", err)
   }
-  crashlytics().recordError(error)
 }
 
 export const recordAppError = (error: Error, options?: RecordAppErrorOptions): void => {
@@ -201,13 +208,18 @@ export const logBreadcrumb = (message: string): void => {
     if (__DEV__) console.debug(`[breadcrumb withheld] ${message}`)
     return
   }
-  crashlytics().log(message)
+  try {
+    crashlytics().log(message)
+  } catch (err) {
+    if (__DEV__) console.warn("[error-reporting] breadcrumb not transmitted", err)
+  }
 }
 
 /**
  * The developer screen's crash test: a deliberate native crash to prove the pipeline
- * end to end, on a device in hand. Development builds only — in a release build this is
- * a no-op, so the one caller needs no exemption from the import ban.
+ * end to end, on a device in hand. The caller already sits inside a `__DEV__` branch; the
+ * guard here is belt and braces, so that no future caller can ship a crash in a release
+ * build by forgetting its own.
  */
 export const crashForTesting = (): void => {
   if (!__DEV__) return

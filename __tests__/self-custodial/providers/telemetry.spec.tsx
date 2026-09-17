@@ -3,6 +3,7 @@ import { AppState } from "react-native"
 
 import { act, render, waitFor } from "@testing-library/react-native"
 import { Network } from "@breeztech/breez-sdk-spark-react-native"
+import analytics from "@react-native-firebase/analytics"
 import RNFS from "react-native-fs"
 
 import { telemetryOutboxDirFor } from "@app/self-custodial/config"
@@ -37,8 +38,14 @@ import {
   resetTelemetryTransportForTesting,
   type SubmitResult,
 } from "@app/telemetry/transport"
+import {
+  DiagnosticsDisposition,
+  getDiagnosticsDisposition,
+} from "@app/telemetry/transmissibility"
 import { AccountMode } from "@app/types/account"
 import { AccountType, ActiveWalletStatus } from "@app/types/wallet"
+
+const setCollectionEnabled = analytics().setAnalyticsCollectionEnabled as jest.Mock
 
 const ACCOUNT_ID = "self-custodial-1"
 const OTHER_ACCOUNT_ID = "self-custodial-2"
@@ -463,5 +470,31 @@ describe("SelfCustodialTelemetryMount", () => {
     render(<SelfCustodialTelemetryMount />)
 
     await waitFor(() => expect(getTelemetryMode()).toBe(TelemetryMode.Unresolved))
+  })
+
+  describe("a device with no account at all", () => {
+    it("resolves Custodial when it holds no self-custodial account — the funnel and its crashes are custodial telemetry", async () => {
+      // A fresh install, or a logged-out device. Left Unresolved, nothing in a pre-auth
+      // session could ever resolve it: the acquisition funnel's platform events would be
+      // dropped and the sink would hold sign-up crashes for an answer that never came.
+      mockActiveAccount = undefined
+      mockSelfCustodialEntries = []
+
+      render(<SelfCustodialTelemetryMount />)
+
+      await waitFor(() => expect(getTelemetryMode()).toBe(TelemetryMode.Custodial))
+      expect(setCollectionEnabled).toHaveBeenLastCalledWith(true)
+      expect(getDiagnosticsDisposition()).toBe(DiagnosticsDisposition.Permitted)
+    })
+
+    it("stays Unresolved between accounts when a self-custodial one is on the device", async () => {
+      mockActiveAccount = undefined
+      mockSelfCustodialEntries = [{ id: ACCOUNT_ID }]
+
+      render(<SelfCustodialTelemetryMount />)
+
+      await waitFor(() => expect(getTelemetryMode()).toBe(TelemetryMode.Unresolved))
+      expect(setCollectionEnabled).not.toHaveBeenCalledWith(true)
+    })
   })
 })

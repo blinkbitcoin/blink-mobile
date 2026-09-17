@@ -244,7 +244,8 @@
               }
             ]
           }
-        ]
+        ],
+        "no-restricted-syntax": "off"
       }
     },
     {
@@ -261,12 +262,6 @@
             ]
           }
         ]
-      }
-    },
-    {
-      "files": ["app/telemetry/platform-analytics.ts"],
-      "rules": {
-        "no-restricted-syntax": "off"
       }
     },
     {

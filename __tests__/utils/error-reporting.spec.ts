@@ -26,12 +26,22 @@ const mockRecordError = jest.fn()
 const mockSetCollectionEnabled = jest.fn((_enabled: boolean) => Promise.resolve(null))
 const mockNativeSetDisposition = jest.fn((_permitted: boolean) => undefined)
 
-jest.mock("@react-native-firebase/crashlytics", () => () => ({
-  log: (...args: string[]) => mockLog(...args),
-  recordError: (...args: Error[]) => mockRecordError(...args),
-  setCrashlyticsCollectionEnabled: (enabled: boolean) =>
-    mockSetCollectionEnabled(enabled),
-}))
+/** RNFB's `crashlytics()` throws synchronously when the native module is not linked. */
+let mockCrashlyticsUnlinked = false
+
+jest.mock("@react-native-firebase/crashlytics", () => () => {
+  if (mockCrashlyticsUnlinked) {
+    throw new Error(
+      "You attempted to use a Firebase module that's not installed natively",
+    )
+  }
+  return {
+    log: (...args: string[]) => mockLog(...args),
+    recordError: (...args: Error[]) => mockRecordError(...args),
+    setCrashlyticsCollectionEnabled: (enabled: boolean) =>
+      mockSetCollectionEnabled(enabled),
+  }
+})
 NativeModules.CrashCollection = {
   setCrashCollectionDisposition: (permitted: boolean) =>
     mockNativeSetDisposition(permitted),
@@ -414,6 +424,31 @@ describe("recordAppError — the zero-transmission gate", () => {
 
       expect(mockRecordError).toHaveBeenCalledTimes(1)
       expect(mockNativeSetDisposition).toHaveBeenLastCalledWith(true)
+    })
+  })
+
+  describe("never throws when the native module is not linked", () => {
+    // The sink is what the boundary's own fault reporter calls, and it runs at start-up
+    // under the mode gate's initialisation; a synchronous throw from `crashlytics()` here
+    // would surface at module scope during bundle evaluation.
+    beforeEach(() => {
+      mockCrashlyticsUnlinked = true
+    })
+    afterEach(() => {
+      mockCrashlyticsUnlinked = false
+    })
+
+    it("reports and breadcrumbs quietly while permitted", () => {
+      setDiagnosticsModeInput(DiagnosticsModeInput.Custodial)
+
+      expect(() => reportError("SDK init", new Error("defect"))).not.toThrow()
+      expect(() => logBreadcrumb("[SparkSDK] line")).not.toThrow()
+    })
+
+    it("releases the held buffer quietly on a grant", () => {
+      reportError("remote config", new Error("held"))
+
+      expect(() => setDiagnosticsModeInput(DiagnosticsModeInput.Custodial)).not.toThrow()
     })
   })
 

@@ -37,12 +37,30 @@ import { reportBoundaryFault } from "./diagnostics"
  * The accepted cost is stated in the PRD: the board's app-instance tile and
  * platform-derived geography become custodial-only from P2.
  */
-export const setPlatformCollectionEnabled = (enabled: boolean): void => {
-  analytics()
-    .setAnalyticsCollectionEnabled(enabled)
-    .catch((err) => {
-      reportBoundaryFault("platform collection toggle", err)
+/**
+ * Every call to the SDK goes through here, and the seam never throws. `analytics()` throws
+ * *synchronously* when the native module is not linked, and the gate is initialised at
+ * module scope during bundle evaluation — an unhandled throw there is a white screen with
+ * no way back (the sixth review's second blocker). A fault is reported and the caller
+ * carries on, the treatment `captureTelemetryFact` already gets for the same reason.
+ */
+const withAnalytics = (
+  what: string,
+  use: (client: ReturnType<typeof analytics>) => Promise<unknown>,
+): void => {
+  try {
+    use(analytics()).catch((err) => {
+      reportBoundaryFault(what, err)
     })
+  } catch (err) {
+    reportBoundaryFault(what, err)
+  }
+}
+
+export const setPlatformCollectionEnabled = (enabled: boolean): void => {
+  withAnalytics("platform collection toggle", (client) =>
+    client.setAnalyticsCollectionEnabled(enabled),
+  )
 }
 
 /**
@@ -117,17 +135,14 @@ export const setCustodialAnalyticsIdentity = ({
 }
 
 const push = ({ userId, properties }: CustodialIdentity): void => {
-  const client = analytics()
   if (userId !== undefined) {
-    client.setUserId(userId).catch((err) => {
-      reportBoundaryFault("set analytics user id", err)
-    })
+    withAnalytics("set analytics user id", (client) => client.setUserId(userId))
   }
   if (properties) {
     for (const key of Object.keys(properties)) propertiesSetThisSession.add(key)
-    client.setUserProperties(properties).catch((err) => {
-      reportBoundaryFault("set analytics user properties", err)
-    })
+    withAnalytics("set analytics user properties", (client) =>
+      client.setUserProperties(properties),
+    )
   }
 }
 
@@ -135,15 +150,12 @@ const push = ({ userId, properties }: CustodialIdentity): void => {
  *  the user id and every user property — whenever the resolved mode stops being
  *  `Custodial`. */
 export const clearCustodialAnalyticsIdentity = (): void => {
-  const client = analytics()
-  client.setUserId(null).catch((err) => {
-    reportBoundaryFault("clear analytics user id", err)
-  })
+  withAnalytics("clear analytics user id", (client) => client.setUserId(null))
   const cleared: Record<string, null> = {}
   for (const key of propertiesSetThisSession) cleared[key] = null
-  client.setUserProperties(cleared).catch((err) => {
-    reportBoundaryFault("clear analytics user properties", err)
-  })
+  withAnalytics("clear analytics user properties", (client) =>
+    client.setUserProperties(cleared),
+  )
 }
 
 export const resetPlatformIdentityForTesting = (): void => {
@@ -162,9 +174,5 @@ export const logPlatformEvent = (
   event: string,
   params: Readonly<Record<string, string | number | boolean>>,
 ): void => {
-  analytics()
-    .logEvent(event, params)
-    .catch((err) => {
-      reportBoundaryFault(`platform log: ${event}`, err)
-    })
+  withAnalytics(`platform log: ${event}`, (client) => client.logEvent(event, params))
 }

@@ -1,3 +1,5 @@
+import { sha256 } from "js-sha256"
+
 import type { TelemetryEvent, TelemetryPayload } from "../contract"
 
 /**
@@ -51,13 +53,19 @@ export type OutboxRecord = {
  * there and writes nothing, so the id it would have carried never exists. An event with no
  * payment to key on falls back to its own id and is therefore unkeyed — inventing a key
  * out of payment data to make it look deduplicable is exactly the derivation §5.5 forbids.
+ *
+ * The payment id is hashed, not sanitised: a sanitise-and-truncate let two ids that share
+ * a normalised prefix pass the raw-id check in `enqueue` and then land on one filename,
+ * where the second silently overwrote the first with no counter moved. A digest is a fixed
+ * length, filename-safe, and collision-free for any ids the SDK could mint; that it also
+ * keeps the payment id itself out of the directory listing is a bonus, not the reason.
  */
 export const dedupKeyFor = (record: {
   sdkPaymentId: string | null
   telemetryEventId: string
 }): string =>
   record.sdkPaymentId
-    ? `p-${record.sdkPaymentId.replace(/[^A-Za-z0-9_-]/g, "_").slice(0, 120)}`
+    ? `p-${sha256(record.sdkPaymentId)}`
     : `e-${record.telemetryEventId}`
 
 const isPayload = (value: unknown): value is TelemetryPayload =>
