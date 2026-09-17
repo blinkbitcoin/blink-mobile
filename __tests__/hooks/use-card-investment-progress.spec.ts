@@ -42,8 +42,13 @@ jest.mock("@app/graphql/generated", () => ({
 const SELF_CUSTODIAL_ID = "self-custodial-1"
 const CUSTODIAL_ID = "custodial-account-1"
 const OTHER_CUSTODIAL_ID = "custodial-account-2"
-const INVESTMENT = { selectedAmountUsd: 25000, settlementSats: 31_704_000 }
 const NOW = 1_757_800_000_000
+const A_DAY_MS = 24 * 60 * 60 * 1000
+const INVESTMENT = {
+  selectedAmountUsd: 25000,
+  settlementSats: 31_704_000,
+  signedAt: NOW - 60_000,
+}
 const INVITATION = { invitedAt: NOW - 60_000 }
 
 const baseState: PersistentState = {
@@ -73,6 +78,9 @@ const custodialSession = (answer: string | null | { me: unknown } = CUSTODIAL_ID
 }
 
 /** Runs the functional updater the hook handed to the store against a given state. */
+/** What the signing step hands over; the hook stamps the moment itself. */
+const SIGNING = { selectedAmountUsd: 25000, settlementSats: 31_704_000 }
+
 const applyLastUpdate = (state: PersistentState | undefined) => {
   const updater = mockUpdateState.mock.calls[mockUpdateState.mock.calls.length - 1][0]
   expect(typeof updater).toBe("function")
@@ -135,7 +143,7 @@ describe("useCardInvestmentProgress", () => {
       const { result } = renderHook(() => useCardInvestmentProgress())
       act(() => {
         result.current.markInvited()
-        result.current.start(INVESTMENT)
+        result.current.start(SIGNING)
         result.current.recordInvoice("lnbc25m1investment")
         result.current.markPaid()
         result.current.clear()
@@ -209,6 +217,23 @@ describe("useCardInvestmentProgress", () => {
     expect(result.current.isInvited).toBe(false)
   })
 
+  /** A day on, the agreement and its payment link have lapsed; the home starts over. */
+  it("reads a record a day old as nothing", () => {
+    mockPersistentState = stateWith({
+      [SELF_CUSTODIAL_ID]: { ...INVESTMENT, signedAt: NOW - A_DAY_MS },
+    })
+    expect(
+      renderHook(() => useCardInvestmentProgress()).result.current.progress,
+    ).toBeNull()
+
+    mockPersistentState = stateWith({
+      [SELF_CUSTODIAL_ID]: { invitedAt: NOW - A_DAY_MS },
+    })
+    expect(renderHook(() => useCardInvestmentProgress()).result.current.isInvited).toBe(
+      false,
+    )
+  })
+
   describe("markInvited", () => {
     it("records the opened invitation for the active account", () => {
       const { result } = renderHook(() => useCardInvestmentProgress())
@@ -250,16 +275,30 @@ describe("useCardInvestmentProgress", () => {
 
       expect(applyLastUpdate(undefined)).toBeUndefined()
     })
+
+    it("opens a fresh invitation over a record that has lapsed", () => {
+      const lapsed = stateWith({
+        [SELF_CUSTODIAL_ID]: { ...INVESTMENT, signedAt: NOW - A_DAY_MS },
+      })
+      mockPersistentState = lapsed
+      const { result } = renderHook(() => useCardInvestmentProgress())
+
+      act(() => result.current.markInvited())
+
+      expect(applyLastUpdate(lapsed)?.cardInvestmentByAccountId).toEqual({
+        [SELF_CUSTODIAL_ID]: { invitedAt: NOW },
+      })
+    })
   })
 
   describe("start", () => {
-    it("records the signed investment for the active account", () => {
+    it("records the signed investment for the active account, stamped now", () => {
       const { result } = renderHook(() => useCardInvestmentProgress())
 
-      act(() => result.current.start(INVESTMENT))
+      act(() => result.current.start(SIGNING))
 
       expect(applyLastUpdate(baseState)?.cardInvestmentByAccountId).toEqual({
-        [SELF_CUSTODIAL_ID]: INVESTMENT,
+        [SELF_CUSTODIAL_ID]: { ...SIGNING, signedAt: NOW },
       })
     })
 
@@ -268,17 +307,17 @@ describe("useCardInvestmentProgress", () => {
       mockPersistentState = invited
       const { result } = renderHook(() => useCardInvestmentProgress())
 
-      act(() => result.current.start(INVESTMENT))
+      act(() => result.current.start(SIGNING))
 
       expect(applyLastUpdate(invited)?.cardInvestmentByAccountId).toEqual({
-        [SELF_CUSTODIAL_ID]: INVESTMENT,
+        [SELF_CUSTODIAL_ID]: { ...SIGNING, signedAt: NOW },
       })
     })
 
     it("leaves an unloaded store alone", () => {
       const { result } = renderHook(() => useCardInvestmentProgress())
 
-      act(() => result.current.start(INVESTMENT))
+      act(() => result.current.start(SIGNING))
 
       expect(applyLastUpdate(undefined)).toBeUndefined()
     })

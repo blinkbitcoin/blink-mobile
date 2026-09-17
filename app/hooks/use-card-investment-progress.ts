@@ -66,7 +66,8 @@ type CardInvestmentProgressState = {
   /** Records that the invitation was opened, unless the account already holds a record:
    *  a return to the first screen must not erase an agreement already signed. */
   markInvited: () => void
-  /** Records the signed agreement; the home nags about its payment from here on. */
+  /** Records the signed agreement, stamped with the moment; the home nags about its
+   *  payment from here on. */
   start: (investment: CardInvestmentStart) => void
   /** Records the invoice the transfer step was issued, to be paid rather than reissued
    *  on a return while it can still be paid. */
@@ -89,7 +90,9 @@ type CardInvestmentProgressState = {
 export const useCardInvestmentProgress = (): CardInvestmentProgressState => {
   const { persistentState, updateState } = usePersistentStateContext()
   const accountId = useCardInvestmentAccountId()
-  const record = accountId ? getCardInvestment(persistentState, accountId) : null
+  const record = accountId
+    ? getCardInvestment(persistentState, accountId, Date.now())
+    : null
   const progress = record && isSignedCardInvestment(record) ? record : null
   const isInvited = record !== null && progress === null
 
@@ -97,15 +100,20 @@ export const useCardInvestmentProgress = (): CardInvestmentProgressState => {
     if (!accountId) return
     updateState((state) => {
       if (!state) return state
-      if (getCardInvestment(state, accountId)) return state
-      return withCardInvestment(state, accountId, { invitedAt: Date.now() })
+      const now = Date.now()
+      if (getCardInvestment(state, accountId, now)) return state
+      return withCardInvestment(state, accountId, { invitedAt: now })
     })
   }, [accountId, updateState])
 
   const start = useCallback(
     (investment: CardInvestmentStart) => {
       if (!accountId) return
-      updateState((state) => state && withCardInvestment(state, accountId, investment))
+      updateState(
+        (state) =>
+          state &&
+          withCardInvestment(state, accountId, { ...investment, signedAt: Date.now() }),
+      )
     },
     [accountId, updateState],
   )
@@ -117,7 +125,7 @@ export const useCardInvestmentProgress = (): CardInvestmentProgressState => {
       if (!accountId) return
       updateState((state) => {
         if (!state) return state
-        const current = getCardInvestment(state, accountId)
+        const current = getCardInvestment(state, accountId, Date.now())
         if (!current || !isSignedCardInvestment(current)) return state
         return withCardInvestment(state, accountId, change(current))
       })
