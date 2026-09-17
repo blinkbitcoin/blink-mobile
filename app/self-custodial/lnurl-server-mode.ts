@@ -1,9 +1,9 @@
 import { type BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
 
-import { applyServerKillSwitch } from "@app/telemetry"
 import { AccountMode } from "@app/types/account"
 
 import { getWalletInfo } from "./bridge/wallet"
+import { applyLnurlTelemetryFlag } from "./lnurl-telemetry-flag"
 
 /** The server refuses a request whose timestamp is further than this from its own clock,
  *  so a stalled request is dropped rather than sent to be rejected. */
@@ -60,7 +60,7 @@ export const setLnurlServerMode = async ({
 
   /** The switch rides every response the wallet already parses (AD-28), this one too. */
   try {
-    applyLnurlTelemetryFlag((await response.json()) as LnurlServerModeBody)
+    applyLnurlTelemetryFlag(await response.json())
   } catch {
     /** The mode landed; a body this build cannot read changes nothing. */
   }
@@ -102,21 +102,9 @@ export const recoverLnurlServerMode = async ({
   return toAccountMode(body.mode)
 }
 
+/** The mode, plus AD-28's flag — see `lnurl-telemetry-flag.ts`, which parses that half. */
 type LnurlServerModeBody = {
   mode?: string | null
-  /**
-   * AD-28's kill switch, riding a Blink-controlled response the wallet already parses so
-   * it cannot share Remote Config's failure mode. **[ASSUMPTION — the field name and the
-   * response that carries it are backend-owned and not yet served.]** `false` engages the
-   * switch; `true` and absence change nothing, because it is one-directional.
-   */
-  telemetry_enabled?: boolean // eslint-disable-line camelcase
-}
-
-const applyLnurlTelemetryFlag = (body: LnurlServerModeBody): void => {
-  if (typeof body.telemetry_enabled === "boolean") {
-    applyServerKillSwitch(body.telemetry_enabled)
-  }
 }
 
 /** Unknown values read as "no mode": a variant this app does not know cannot be honored,

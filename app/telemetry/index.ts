@@ -253,6 +253,7 @@ export {
   initializeTelemetryGate,
   isDrainPermitted,
   isEventPermitted,
+  isSuppressedMode,
   onTelemetrySuppressed,
   resolveTelemetryMode,
   TelemetryMode,

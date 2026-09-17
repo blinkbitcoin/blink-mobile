@@ -69,10 +69,14 @@ describe("AccountModeSetting", () => {
     expect(toJSON()).toBeNull()
   })
 
-  it("reads the Enhanced default for an account that has not chosen a mode", () => {
-    const { getByText } = renderRow()
+  it("says an account that has not chosen a mode has none — it does not read as Enhanced", () => {
+    // Nothing is assumed for an account without a mode (AD-25): it is not pushed as
+    // Enhanced and does not behave as Enhanced, so the row must not say it is. The row is
+    // still the path into choosing.
+    const { getByText, queryByText } = renderRow()
 
-    fireEvent.press(getByText("Mode: Enhanced"))
+    expect(queryByText("Mode: Enhanced")).toBeNull()
+    fireEvent.press(getByText("Mode: Not set"))
 
     expect(mockNavigate).toHaveBeenCalledWith("selfCustodialChooseExperience", {
       entry: "settings",

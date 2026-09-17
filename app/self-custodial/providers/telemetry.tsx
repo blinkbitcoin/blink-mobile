@@ -11,6 +11,7 @@ import {
   sweepCondemnedOutboxes,
   deriveTelemetryMode,
   drainActiveOutbox,
+  isSuppressedMode,
   onTelemetrySuppressed,
   resolveTelemetryMode,
   restoreKillSwitch,
@@ -188,30 +189,29 @@ export const SelfCustodialTelemetryMount: React.FC = () => {
     return () => setEmissionListener(null)
   }, [drainIfAble])
 
-  const mayReport = mode === TelemetryMode.Custodial || mode === TelemetryMode.Enhanced
+  /** The switch is the self-custodial pipeline's (NFR-O4), so only an Enhanced device
+   *  asks for it: a custodial-only device has nothing it could roll back, and an Anon or
+   *  Unresolved one must not make the request at all — a request is a transmission too. */
+  const asksForKillSwitch = mode === TelemetryMode.Enhanced
   const lnurlServerUrl = lnurlServerUrlFor(network)
 
-  /** AD-28: the switch is fetched on activation, from a device that may report. Nothing
-   *  is fetched from an Anon or Unresolved device — a request is a transmission too. */
+  /** AD-28: the switch is fetched on activation. */
   useEffect(() => {
-    if (mayReport) refreshTelemetryKillSwitch(lnurlServerUrl)
-  }, [mayReport, lnurlServerUrl])
+    if (asksForKillSwitch) refreshTelemetryKillSwitch(lnurlServerUrl)
+  }, [asksForKillSwitch, lnurlServerUrl])
 
   /** Trigger 3: app foreground — for the drain, and for the switch. */
   useEffect(() => {
     const subscription = AppState.addEventListener("change", (next) => {
       if (next !== "active") return
-      if (mayReport) refreshTelemetryKillSwitch(lnurlServerUrl)
+      if (asksForKillSwitch) refreshTelemetryKillSwitch(lnurlServerUrl)
       drainIfAble()
     })
     return () => subscription.remove()
-  }, [drainIfAble, mayReport, lnurlServerUrl])
+  }, [drainIfAble, asksForKillSwitch, lnurlServerUrl])
 
   return null
 }
-
-const isSuppressedMode = (mode: TelemetryMode): boolean =>
-  mode === TelemetryMode.Anon || mode === TelemetryMode.Unresolved
 
 const toActiveAccountKind = (type: AccountType | undefined): ActiveAccountKind => {
   if (type === AccountType.SelfCustodial) return ActiveAccountKind.SelfCustodial

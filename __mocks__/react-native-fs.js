@@ -73,9 +73,18 @@ const readDir = (path) => {
 // A rename: the destination appears whole or not at all, which is what the outbox's
 // temp-and-rename write relies on. Directories move as a tree, as rename(2) does on
 // both platforms — the outbox condemns a queue by renaming it out of its path.
+//
+// An existing destination is refused, as iOS refuses it: react-native-fs's moveFile is
+// NSFileManager moveItemAtPath:toPath:, which fails when the destination exists, while
+// Android's File.renameTo overwrites. Code that passes here works on both.
 const moveFile = (from, to) => {
   const source = normalize(from)
   const target = normalize(to)
+  if (files.has(target) || directories.has(target)) {
+    return Promise.reject(
+      new Error(`EEXIST: destination exists, rename '${source}' -> '${target}'`),
+    )
+  }
   if (files.has(source)) {
     return mkdir(parentOf(target)).then(() => {
       files.set(target, files.get(source))

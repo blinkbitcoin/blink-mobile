@@ -61,11 +61,30 @@ export type CustodialIdentity = {
  * Pushed by `mode.ts` on every transition. A setter that checked the mode itself would
  * need to import it, and `mode.ts` already imports this file; a flag keeps the graph a
  * tree and the default at deny.
+ *
+ * A grant *replays* what the container last asked for. Its effects run on the first
+ * commit — the ledger id straight out of the persisted Apollo cache, the instance name
+ * from config — and never again while those values stand, while permission arrives only
+ * once the mode has resolved and its queued side effects have run. Refusing those calls
+ * without remembering them shipped every custodial event of the session without a
+ * `user_id` (the fifth review's second blocker).
  */
 let identityPermitted = false
 
+/** What the container last asked for, whether or not it could be applied at the time. */
+let requested: { userId?: string | null; properties: Record<string, string | null> } = {
+  properties: {},
+}
+
 export const setCustodialIdentityPermitted = (permitted: boolean): void => {
   identityPermitted = permitted
+  if (!permitted) return
+  const { userId, properties } = requested
+  if (userId === undefined && Object.keys(properties).length === 0) return
+  push({
+    userId,
+    properties: Object.keys(properties).length > 0 ? properties : undefined,
+  })
 }
 
 /**
@@ -78,17 +97,26 @@ const KNOWN_USER_PROPERTIES = ["hasUsername", "network", "accountLevel", "galoyI
 const propertiesSetThisSession = new Set<string>(KNOWN_USER_PROPERTIES)
 
 /**
- * A no-op unless the resolved mode is positively `Custodial`. The container that calls
- * this runs its effects on GraphQL, config and level changes, any of which can land after
- * a switch to a self-custodial account — and Firebase would then merge the ledger id into
- * every subsequent event. Clearing once at the transition is not enough on its own; the
- * setter has to refuse.
+ * Applied only while the resolved mode is positively `Custodial`; remembered always. The
+ * container that calls this runs its effects on GraphQL, config and level changes, any of
+ * which can land after a switch to a self-custodial account — and Firebase would then
+ * merge the ledger id into every subsequent event. Clearing once at the transition is not
+ * enough on its own; the setter has to refuse. What it refuses it keeps, so the grant
+ * that follows the mode's resolution can apply it (see `setCustodialIdentityPermitted`).
  */
 export const setCustodialAnalyticsIdentity = ({
   userId,
   properties,
 }: CustodialIdentity): void => {
+  requested = {
+    userId: userId === undefined ? requested.userId : userId,
+    properties: { ...requested.properties, ...properties },
+  }
   if (!identityPermitted) return
+  push({ userId, properties })
+}
+
+const push = ({ userId, properties }: CustodialIdentity): void => {
   const client = analytics()
   if (userId !== undefined) {
     client.setUserId(userId).catch((err) => {
@@ -120,6 +148,7 @@ export const clearCustodialAnalyticsIdentity = (): void => {
 
 export const resetPlatformIdentityForTesting = (): void => {
   identityPermitted = false
+  requested = { properties: {} }
   propertiesSetThisSession.clear()
   for (const key of KNOWN_USER_PROPERTIES) propertiesSetThisSession.add(key)
 }

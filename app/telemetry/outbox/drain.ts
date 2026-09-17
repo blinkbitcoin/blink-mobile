@@ -113,16 +113,6 @@ const runDrain = async (
   let rejected = 0
   let retryable = 0
 
-  /** AD-31: the loss report rides the same queue as everything else, so it is gated,
-   *  shuffled, deduplicated and acknowledged like any other record. */
-  if (reportLoss) {
-    const loss = await store.unreportedLoss()
-    const alreadyQueued = (await store.pending()).some(
-      (record) => record.event === TelemetryEvent.LossReported,
-    )
-    if (hasAnyLoss(loss) && !alreadyQueued) reportLoss(loss)
-  }
-
   /**
    * The lease is taken before the read, so a discard landing between the two leaves the
    * lease stale rather than the read fresh. Every write from here on presents it. A
@@ -134,7 +124,23 @@ const runDrain = async (
    * response returns; the generation is.
    */
   const lease = store.lease()
-  const records = shuffle(await store.pending())
+  let queued = await store.pending()
+
+  /** AD-31: the loss report rides the same queue as everything else, so it is gated,
+   *  shuffled, deduplicated and acknowledged like any other record. The queue is read
+   *  again only when a report was just filed, so that it rides this drain. */
+  if (reportLoss) {
+    const loss = await store.unreportedLoss()
+    const alreadyQueued = queued.some(
+      (record) => record.event === TelemetryEvent.LossReported,
+    )
+    if (hasAnyLoss(loss) && !alreadyQueued) {
+      reportLoss(loss)
+      queued = await store.pending()
+    }
+  }
+
+  const records = shuffle(queued)
 
   for (const record of records) {
     /** Re-checked between submissions: a mode switch mid-drain must stop the next one,
@@ -175,10 +181,14 @@ const runDrain = async (
     } else {
       if (!(await store.requeue(record, lease))) break
       retryable += 1
+      /** Doubles only while the previous refusal is still fresh — its window has not
+       *  been over for longer than it lasted. A refusal after a day offline is a new
+       *  first refusal, not the next step of one that ended yesterday. */
       const previous = backoffByStore.get(store.directory)
+      const fresh = previous && now() < previous.nextAllowedAt + previous.delayMs
       const delayMs = Math.min(
         DRAIN_BACKOFF_MAX_MS,
-        previous ? previous.delayMs * 2 : DRAIN_BACKOFF_INITIAL_MS,
+        fresh ? previous.delayMs * 2 : DRAIN_BACKOFF_INITIAL_MS,
       )
       backoffByStore.set(store.directory, {
         delayMs,

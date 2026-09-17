@@ -1,6 +1,9 @@
 import { renderHook, waitFor } from "@testing-library/react-native"
 
-import { useAccountModeSync } from "@app/self-custodial/hooks/use-account-mode-sync"
+import {
+  resetAccountModeSyncForTesting,
+  useAccountModeSync,
+} from "@app/self-custodial/hooks/use-account-mode-sync"
 import { getSelfCustodialAccountMode } from "@app/store/persistent-state/self-custodial-account-mode"
 import { getSelfCustodialServerAccountMode } from "@app/store/persistent-state/self-custodial-server-account-mode"
 import { PersistentState } from "@app/store/persistent-state/state-migrations"
@@ -64,6 +67,7 @@ const withConfirmedMode = (mode: AccountMode) => {
 
 describe("useAccountModeSync", () => {
   beforeEach(() => {
+    resetAccountModeSyncForTesting()
     jest.clearAllMocks()
     mockAccountMode = AccountMode.Enhanced
     mockSdk = sdk
@@ -216,6 +220,21 @@ describe("useAccountModeSync", () => {
       const state = mockUpdateState.mock.calls[0][0](mockPersistentState)
       expect(getSelfCustodialAccountMode(state)).toBeNull()
       expect(getSelfCustodialServerAccountMode(state, "sc-1")).toBeNull()
+    })
+
+    it("asks once per launch when the server holds none, not on every SDK reconnect", async () => {
+      // A null answer settles nothing, so without this the account would be asked about
+      // again each time the SDK reconnected — for an account that never chose.
+      const { rerender } = renderHook(() => useAccountModeSync())
+      await waitFor(() => expect(mockRecoverLnurlServerMode).toHaveBeenCalledTimes(1))
+
+      mockSdk = { ...sdk }
+      rerender(undefined)
+      await new Promise((resolve) => {
+        setImmediate(resolve)
+      })
+
+      expect(mockRecoverLnurlServerMode).toHaveBeenCalledTimes(1)
     })
 
     it("pushes nothing while the mode is still unknown", async () => {

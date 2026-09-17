@@ -1,4 +1,4 @@
-import { applyServerKillSwitch } from "@app/telemetry"
+import { applyLnurlTelemetryFlag } from "./lnurl-telemetry-flag"
 
 /**
  * The kill switch's channel (AD-28, NFR-O4): a Blink-controlled response that established
@@ -23,10 +23,6 @@ const TELEMETRY_CONFIG_TIMEOUT_MS = 5_000
 
 let lastFetchedAt = 0
 
-type TelemetryConfigBody = {
-  telemetry_enabled?: boolean // eslint-disable-line camelcase
-}
-
 export const refreshTelemetryKillSwitch = async (serverUrl: string): Promise<void> => {
   const now = Date.now()
   if (now - lastFetchedAt < TELEMETRY_CONFIG_MIN_INTERVAL_MS) return
@@ -41,10 +37,7 @@ export const refreshTelemetryKillSwitch = async (serverUrl: string): Promise<voi
       signal: controller.signal,
     })
     if (!response.ok) return
-    const body = (await response.json()) as TelemetryConfigBody
-    if (typeof body.telemetry_enabled === "boolean") {
-      applyServerKillSwitch(body.telemetry_enabled)
-    }
+    applyLnurlTelemetryFlag(await response.json())
   } catch {
     /** Unreachable, or not served yet. The last persisted value stands. */
   } finally {

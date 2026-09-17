@@ -27,6 +27,10 @@ export const ACCOUNT_MODE_NAMES: Record<AccountMode, string> = {
   [AccountMode.Anon]: "Incognito",
 }
 
+/** An account that has never chosen, on any device the app can see (AD-25). Nothing is
+ *  assumed on its behalf — not Enhanced, and not the label that says so. */
+export const ACCOUNT_MODE_UNSET_NAME = "Not set"
+
 /**
  * Why account creation was refused, which decides what the unsupported-region screen
  * offers: a whole region closed to us leaves nothing, while only the first Blink account

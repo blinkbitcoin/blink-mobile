@@ -203,7 +203,7 @@ describe("the collection gate", () => {
   })
 
   describe("AD-28 / AD-30 — the two switches sit in front of the gate", () => {
-    it("permits nothing until the rollout flag is on", async () => {
+    it("permits nothing from an Enhanced device until the rollout flag is on", async () => {
       resetEnablementForTesting()
       await resolveTelemetryMode(TelemetryMode.Enhanced)
 
@@ -215,6 +215,22 @@ describe("the collection gate", () => {
       setTelemetryRolloutEnabled(true)
       expect(isEventPermitted(TelemetryEvent.PaymentSettled)).toBe(true)
       expect(isDrainPermitted()).toBe(true)
+    })
+
+    it("leaves the custodial contract events alone whatever the switches say — they predate P2", async () => {
+      resetEnablementForTesting()
+      applyServerKillSwitch(false)
+      await resolveTelemetryMode(TelemetryMode.Custodial)
+
+      for (const event of [
+        TelemetryEvent.BackupCompleted,
+        TelemetryEvent.RestoreCompleted,
+        TelemetryEvent.StableBalanceActivated,
+        TelemetryEvent.RolloutExposed,
+        TelemetryEvent.PaymentSettled,
+      ]) {
+        expect(isEventPermitted(event)).toBe(true)
+      }
     })
 
     it("engages the kill switch on a server `false` and never disengages it", async () => {
@@ -363,6 +379,49 @@ describe("the collection gate", () => {
         expect(setUserId).not.toHaveBeenCalledWith("ledger-id")
       },
     )
+
+    it("applies the identity the container asked for before the mode resolved, once it does", async () => {
+      // The fifth review's second blocker. The container's effects run on the first
+      // commit — the ledger id out of the persisted cache, the instance name from config —
+      // and do not run again while those values stand; permission arrives later, once the
+      // mode has resolved and its queued side effects have run.
+      setCustodialAnalyticsIdentity({ userId: "ledger-id" })
+      setCustodialAnalyticsIdentity({ properties: { galoyInstance: "Blink" } })
+      setCustodialAnalyticsIdentity({ properties: { hasUsername: "true" } })
+      expect(setUserId).not.toHaveBeenCalledWith("ledger-id")
+
+      await resolveTelemetryMode(TelemetryMode.Custodial)
+
+      expect(setUserId).toHaveBeenCalledWith("ledger-id")
+      expect(setUserProperties).toHaveBeenCalledWith(
+        expect.objectContaining({ galoyInstance: "Blink", hasUsername: "true" }),
+      )
+    })
+
+    it("applies it again after a round trip through a self-custodial account", async () => {
+      await resolveTelemetryMode(TelemetryMode.Custodial)
+      setCustodialAnalyticsIdentity({
+        userId: "ledger-id",
+        properties: { network: "mainnet" },
+      })
+      await resolveTelemetryMode(TelemetryMode.Enhanced)
+      setUserId.mockClear()
+      setUserProperties.mockClear()
+
+      await resolveTelemetryMode(TelemetryMode.Custodial)
+
+      expect(setUserId).toHaveBeenLastCalledWith("ledger-id")
+      expect(setUserProperties).toHaveBeenLastCalledWith(
+        expect.objectContaining({ network: "mainnet" }),
+      )
+    })
+
+    it("replays nothing on a grant when nothing was ever asked for", async () => {
+      await resolveTelemetryMode(TelemetryMode.Custodial)
+
+      expect(setUserId).not.toHaveBeenCalled()
+      expect(setUserProperties).not.toHaveBeenCalled()
+    })
 
     it("accepts identity writes while the session is custodial (anchor)", async () => {
       await resolveTelemetryMode(TelemetryMode.Custodial)

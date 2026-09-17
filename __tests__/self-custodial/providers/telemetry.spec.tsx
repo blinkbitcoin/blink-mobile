@@ -391,6 +391,18 @@ describe("SelfCustodialTelemetryMount", () => {
 
       expect(mockRefreshKillSwitch).not.toHaveBeenCalled()
     })
+
+    it("never fetches from a custodial device — the switch is the self-custodial pipeline's", async () => {
+      // A device with no self-custodial account has nothing the switch could roll back,
+      // and no business calling the LNURL server on every foreground.
+      mockActiveAccount = { id: "custodial-default", type: AccountType.Custodial }
+      mockSelfCustodialEntries = []
+
+      render(<SelfCustodialTelemetryMount />)
+      await waitFor(() => expect(getTelemetryMode()).toBe(TelemetryMode.Custodial))
+
+      expect(mockRefreshKillSwitch).not.toHaveBeenCalled()
+    })
   })
 
   describe("FR-25 — every account's queue expires, active or not", () => {

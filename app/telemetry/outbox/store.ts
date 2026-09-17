@@ -191,21 +191,6 @@ type Tombstones = Record<string, number>
 const fileFor = (directory: string, record: OutboxRecord): string =>
   `${directory}/${dedupKeyFor(record)}.json`
 
-/**
- * Temp-and-rename (AD-26). `RNFS.moveFile` is a rename on the same volume, so the reader
- * sees either the whole record or no record — never the front half of one.
- */
-const writeAtomically = async (path: string, contents: string): Promise<void> => {
-  const temp = `${path}${TEMP_SUFFIX}`
-  await RNFS.writeFile(temp, contents, "utf8")
-  await RNFS.moveFile(temp, path)
-}
-
-const write = async (directory: string, record: OutboxRecord): Promise<void> => {
-  await RNFS.mkdir(directory)
-  await writeAtomically(fileFor(directory, record), JSON.stringify(record))
-}
-
 const remove = async (path: string): Promise<void> => {
   try {
     await RNFS.unlink(path)
@@ -214,23 +199,71 @@ const remove = async (path: string): Promise<void> => {
   }
 }
 
+/**
+ * Temp-and-rename (AD-26). `RNFS.moveFile` is a rename on the same volume, so a reader
+ * never sees the front half of a file. What it is *not*, on iOS, is a replace:
+ * `NSFileManager moveItemAtPath:toPath:` refuses an existing destination (Android's
+ * `renameTo` overwrites), so a rewrite — a state transition, the loss counters, the
+ * tombstones — removes the destination before the move. The window between the two is
+ * covered by the readers: a `.tmp` whose final file is missing is read *as* the file, so
+ * a process that dies inside the window loses nothing, and a `.tmp` beside a present
+ * final is a write that never finished, ignored and cleaned on the next sweep.
+ */
+const writeAtomically = async (path: string, contents: string): Promise<void> => {
+  const temp = `${path}${TEMP_SUFFIX}`
+  await RNFS.writeFile(temp, contents, "utf8")
+  await remove(path)
+  await RNFS.moveFile(temp, path)
+}
+
+/** The file, or the complete `.tmp` a death inside `writeAtomically` left in its place. */
+const readFileOrTemp = async (path: string): Promise<string> => {
+  try {
+    return await RNFS.readFile(path, "utf8")
+  } catch (err) {
+    if (await RNFS.exists(`${path}${TEMP_SUFFIX}`)) {
+      return RNFS.readFile(`${path}${TEMP_SUFFIX}`, "utf8")
+    }
+    throw err
+  }
+}
+
+const write = async (directory: string, record: OutboxRecord): Promise<void> => {
+  await RNFS.mkdir(directory)
+  await writeAtomically(fileFor(directory, record), JSON.stringify(record))
+}
+
 type StoredRecord = { record: OutboxRecord; path: string }
 
 const isRecordFile = (name: string): boolean =>
   name.endsWith(".json") && name !== LOSS_FILE && name !== ACKED_FILE
 
-/** Reads every record file, deleting and counting the ones this build cannot parse. */
+/**
+ * Reads every record file, deleting and counting the ones this build cannot parse. A
+ * `.tmp` with no final file beside it is a record too — the one a death inside a rewrite
+ * would otherwise have lost; a `.tmp` beside its final is a write that never finished and
+ * is removed.
+ */
 const readAll = async (directory: string): Promise<StoredRecord[]> => {
   if (!(await RNFS.exists(directory))) return []
 
   const entries = await RNFS.readDir(directory)
+  const names = new Set(entries.map((entry) => entry.name))
   const stored: StoredRecord[] = []
 
-  for (const entry of entries.filter((file) => isRecordFile(file.name))) {
+  const readOne = async (entry: { name: string; path: string }): Promise<void> => {
+    const isTemp = entry.name.endsWith(`.json${TEMP_SUFFIX}`)
+    const finalName = isTemp ? entry.name.slice(0, -TEMP_SUFFIX.length) : entry.name
+    if (!isRecordFile(finalName)) return
+    if (isTemp && names.has(finalName)) {
+      await remove(entry.path)
+      return
+    }
     try {
       const record = parseOutboxRecord(await RNFS.readFile(entry.path, "utf8"))
       if (record) {
-        stored.push({ record, path: entry.path })
+        stored.push({ record, path: `${directory}/${finalName}` })
+        if (isTemp) await RNFS.moveFile(entry.path, `${directory}/${finalName}`)
       } else {
         await remove(entry.path)
         bump("parseFailed")
@@ -240,13 +273,14 @@ const readAll = async (directory: string): Promise<StoredRecord[]> => {
       reportBoundaryFault("outbox read", err)
     }
   }
+  for (const entry of entries) await readOne(entry)
 
   return stored
 }
 
 const readLoss = async (directory: string): Promise<LossCounters> => {
   try {
-    const raw = await RNFS.readFile(`${directory}/${LOSS_FILE}`, "utf8")
+    const raw = await readFileOrTemp(`${directory}/${LOSS_FILE}`)
     const parsed: unknown = JSON.parse(raw)
     if (!parsed || typeof parsed !== "object") return { ...EMPTY_LOSS }
     const loss = parsed as Partial<LossCounters>
@@ -279,9 +313,7 @@ const addLoss = async (
 
 const readTombstones = async (directory: string): Promise<Tombstones> => {
   try {
-    const parsed: unknown = JSON.parse(
-      await RNFS.readFile(`${directory}/${ACKED_FILE}`, "utf8"),
-    )
+    const parsed: unknown = JSON.parse(await readFileOrTemp(`${directory}/${ACKED_FILE}`))
     if (!parsed || typeof parsed !== "object") return {}
     const cutoff = Date.now() - OUTBOX_TTL_MS
     const live: Tombstones = {}
@@ -425,7 +457,7 @@ export const createOutboxStore = (directory: string): OutboxStore => {
     }
   }
 
-  const sweep = async (): Promise<StoredRecord[]> => {
+  const sweep = async (): Promise<{ live: StoredRecord[]; tombstones: Tombstones }> => {
     await finishPendingDiscard()
     const stored = await readAll(directory)
     const cutoff = Date.now() - OUTBOX_TTL_MS
@@ -457,7 +489,7 @@ export const createOutboxStore = (directory: string): OutboxStore => {
      *  Eviction removes records from the queue and never reorders what is submitted, so
      *  AD-22's ordering rule does not reach it. */
     live.sort((a, b) => a.record.queuedAt - b.record.queuedAt)
-    return live
+    return { live, tombstones }
   }
 
   const enqueue = async (record: OutboxRecord): Promise<void> => {
@@ -465,13 +497,13 @@ export const createOutboxStore = (directory: string): OutboxStore => {
       bump("retiredWrites")
       return
     }
-    const live = await sweep()
+    const { live, tombstones } = await sweep()
 
     if (record.sdkPaymentId !== null) {
       const queuedAlready = live.some(
         (entry) => entry.record.sdkPaymentId === record.sdkPaymentId,
       )
-      const deliveredAlready = record.sdkPaymentId in (await readTombstones(directory))
+      const deliveredAlready = record.sdkPaymentId in tombstones
       if (queuedAlready || deliveredAlready) {
         bump("deduplicated")
         return
@@ -540,7 +572,8 @@ export const createOutboxStore = (directory: string): OutboxStore => {
 
     enqueue: (record) => serialise(() => enqueue(record)),
 
-    pending: () => serialise(async () => (await sweep()).map((entry) => entry.record)),
+    pending: () =>
+      serialise(async () => (await sweep()).live.map((entry) => entry.record)),
 
     depth: () =>
       serialise(async () => {

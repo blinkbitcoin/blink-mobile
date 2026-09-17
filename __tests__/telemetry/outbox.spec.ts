@@ -175,11 +175,58 @@ describe("the telemetry outbox", () => {
       moveFile.mockRestore()
     })
 
-    it("never reads a temp file back as a record", async () => {
-      // A crash between write and rename leaves the temp name; the reader must not see it.
-      await RNFS.writeFile(`${DIR}/p-crashed.json.tmp`, JSON.stringify(record()), "utf8")
+    it("rewrites a record's state where the rename refuses an existing destination, as iOS does", async () => {
+      // react-native-fs's moveFile is NSFileManager moveItemAtPath:toPath: on iOS, which
+      // fails when the destination exists; the mock refuses the same way. A rewrite that
+      // relied on rename-over-existing would fail on the drain's first markSubmitted and
+      // the outbox would never drain on iOS.
+      const store = createOutboxStore(DIR)
+      const first = record()
+      await store.enqueue(first)
+
+      await store.markSubmitted(first, store.lease())
+      await store.requeue(first, store.lease())
+      await store.acknowledge(first, store.lease())
+      await store.acknowledge(record({ sdkPaymentId: "sdk-second" }), store.lease())
+
+      expect(await store.pending()).toEqual([])
+      expect(mockFs.__mockFilePaths()).toContain(`${DIR}/acked.json`)
+    })
+
+    it("reads a complete temp file as the record when its final file is missing", async () => {
+      // A death inside a rewrite — after the old file was removed, before the new one was
+      // moved into place — leaves only the temp name, and it is the whole record.
+      const crashed = record({ state: OutboxState.Submitted })
+      await RNFS.writeFile(`${DIR}/p-crashed.json.tmp`, JSON.stringify(crashed), "utf8")
+
+      const [pending] = await createOutboxStore(DIR).pending()
+
+      expect(pending.telemetryEventId).toBe(crashed.telemetryEventId)
+      expect(mockFs.__mockFilePaths()).toContain(`${DIR}/p-crashed.json`)
+      expect(mockFs.__mockFilePaths()).not.toContain(`${DIR}/p-crashed.json.tmp`)
+    })
+
+    it("ignores and removes a temp file beside its final — a rewrite that never finished", async () => {
+      const store = createOutboxStore(DIR)
+      const kept = record({ sdkPaymentId: "sdk-kept" })
+      await store.enqueue(kept)
+      await RNFS.writeFile(
+        `${DIR}/p-sdk-kept.json.tmp`,
+        JSON.stringify({ ...kept, state: OutboxState.Submitted }),
+        "utf8",
+      )
+
+      const [pending] = await store.pending()
+
+      expect(pending.state).toBe(OutboxState.Queued)
+      expect(mockFs.__mockFilePaths()).not.toContain(`${DIR}/p-sdk-kept.json.tmp`)
+    })
+
+    it("counts a temp file it cannot parse as parse_failed — a death mid-write", async () => {
+      await RNFS.writeFile(`${DIR}/p-torn.json.tmp`, '{"telemetryEventId":"3f2a', "utf8")
 
       expect(await createOutboxStore(DIR).pending()).toEqual([])
+      expect(getOutboxCounters().parseFailed).toBe(1)
     })
 
     it("empties on discard, and is idempotent (FR-5)", async () => {
@@ -591,6 +638,21 @@ describe("the telemetry outbox", () => {
       expect(getOutboxCounters().deduplicated).toBe(2)
     })
 
+    it("honours tombstones a death mid-rewrite left in the temp file", async () => {
+      // The rewrite removed acked.json and died before moving the new one into place.
+      await RNFS.writeFile(
+        `${DIR}/acked.json.tmp`,
+        JSON.stringify({ "sdk-from-temp": Date.now() }),
+        "utf8",
+      )
+      const store = createOutboxStore(DIR)
+
+      await store.enqueue(record({ sdkPaymentId: "sdk-from-temp" }))
+
+      expect(await store.pending()).toEqual([])
+      expect(getOutboxCounters().deduplicated).toBe(1)
+    })
+
     it("forgets a tombstone once it is older than the TTL", async () => {
       const store = createOutboxStore(DIR)
       const first = record({ sdkPaymentId: "sdk-ancient" })
@@ -870,6 +932,36 @@ describe("the telemetry outbox — the drain", () => {
         clock += DRAIN_BACKOFF_INITIAL_MS + 1
         await drainOutbox(store, { ...instantly, now })
         expect(submit.mock.calls.length).toBeGreaterThanOrEqual(4)
+      })
+
+      it("doubles while the refusals are fresh, and starts over after a long quiet spell", async () => {
+        const store = createOutboxStore(DIR)
+        const submit = transportReturning({ kind: "retryable" })
+        await resolveTelemetryMode(TelemetryMode.Enhanced)
+        await store.enqueue(record())
+        let clock = 1_000_000
+        const now = () => clock
+
+        // Two refusals in quick succession: 5 s, then 10 s.
+        await drainOutbox(store, { ...instantly, now })
+        clock += DRAIN_BACKOFF_INITIAL_MS + 1
+        await drainOutbox(store, { ...instantly, now })
+        expect(submit).toHaveBeenCalledTimes(2)
+        clock += DRAIN_BACKOFF_INITIAL_MS + 1
+        await drainOutbox(store, { ...instantly, now })
+        expect(submit).toHaveBeenCalledTimes(2) // 10 s window, not yet over
+        clock += DRAIN_BACKOFF_INITIAL_MS
+        await drainOutbox(store, { ...instantly, now })
+        expect(submit).toHaveBeenCalledTimes(3)
+
+        // A day offline. The next refusal is a first refusal: 5 s, not the 40 s the
+        // doubling would otherwise have reached.
+        clock += 24 * 60 * 60 * 1000
+        await drainOutbox(store, { ...instantly, now })
+        expect(submit).toHaveBeenCalledTimes(4)
+        clock += DRAIN_BACKOFF_INITIAL_MS + 1
+        await drainOutbox(store, { ...instantly, now })
+        expect(submit).toHaveBeenCalledTimes(5)
       })
 
       it("runs one drain per account at a time — a second trigger joins the first", async () => {

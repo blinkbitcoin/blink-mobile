@@ -133,7 +133,7 @@ export const deriveTelemetryMode = ({
   return TelemetryMode.Unresolved
 }
 
-const isSuppressedMode = (mode: TelemetryMode): boolean =>
+export const isSuppressedMode = (mode: TelemetryMode): boolean =>
   mode === TelemetryMode.Anon || mode === TelemetryMode.Unresolved
 
 /** What the mode alone says about diagnostics; the kill switch has its own say for
@@ -273,9 +273,18 @@ export const whenModeSettled = (): Promise<void> => applying
 /**
  * AD-5's gate. Reads the event **name** against the contract before a payload exists,
  * which is why `TelemetryFact` needs no origin field.
+ *
+ * The two switches (AD-28, AD-30) sit in front of the *self-custodial* pipeline only. P2
+ * is what ships behind the rollout flag and what NFR-O4's kill switch rolls back; the
+ * custodial contract events — `backup_completed`, `restore_completed`,
+ * `stable_balance_activated`, `rollout_exposed` — predate it and ride GA4 as they did
+ * before the boundary existed. Gating them on a flag that defaults to off would silence
+ * the self-custody rollout's own control group until the ramp reached each device.
  */
 export const isEventPermitted = (event: string): boolean => {
-  const permitted = isTelemetryEnabled() && isEventPermittedInMode(event, currentMode)
+  const permitted =
+    isEventPermittedInMode(event, currentMode) &&
+    (currentMode !== TelemetryMode.Enhanced || isTelemetryEnabled())
   if (!permitted) countSuppressedEvent()
   return permitted
 }
