@@ -141,7 +141,7 @@ export const GALOY_INSTANCES: readonly GaloyInstance[] = [
     blockExplorer: "https://mempool.space/signet/tx/",
     sparkExplorer: SPARK_EXPLORER_TX_URL,
     fiatUrl: "https://fiat.staging.blink.sv",
-    esignMintUrl: "",
+    esignMintUrl: "https://esign.staging.blinkbtc.com",
   },
   {
     id: "Local",
