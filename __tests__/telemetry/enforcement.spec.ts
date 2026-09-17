@@ -2,6 +2,7 @@
 // and has no `.each`. Same workaround as __tests__/screens/send-destination.spec.tsx.
 import { it } from "@jest/globals"
 
+import { readdirSync } from "node:fs"
 import { resolve } from "node:path"
 
 // No @types/eslint in the dev tree, and adding a dependency for one assertion is not
@@ -57,6 +58,20 @@ const bansIdentityAndCollectionCalls = (rule: ResolvedRule | undefined): boolean
   )
 }
 
+const sourceFilesUnder = (dir: string): string[] => {
+  const out: string[] = []
+  const walk = (current: string) => {
+    for (const entry of readdirSync(resolve(ROOT, current), { withFileTypes: true })) {
+      const path = `${current}/${entry.name}`
+      if (entry.isDirectory()) walk(path)
+      else if (/\.(ts|tsx)$/.test(entry.name) && !entry.name.endsWith(".d.ts"))
+        out.push(path)
+    }
+  }
+  walk(dir)
+  return out
+}
+
 const resolvedRulesFor = async (file: string) => {
   const config = (await eslint.calculateConfigForFile(resolve(ROOT, file))) as {
     rules: Record<string, ResolvedRule>
@@ -90,20 +105,52 @@ describe("AD-29 — the two rules hold in the resolved ESLint config", () => {
     },
   )
 
-  it("lets Crashlytics be reached only from the sink and the boundary's diagnostics", async () => {
-    // AD-13 / AD-30: every non-fatal and breadcrumb in the app funnels through one gated
-    // sink. The ban is what makes "every self-custodial error path" a property of the
-    // build rather than of a grep.
-    for (const file of ["app/utils/error-reporting.ts", "app/telemetry/diagnostics.ts"]) {
+  /**
+   * AD-13 / AD-30: every non-fatal and breadcrumb in the app funnels through one gated
+   * sink. The ban is what makes "every error path" a property of the build rather than of
+   * a grep — so the exemption list is enumerated here in full, and every other file under
+   * `app/` is checked, not a sample. Adding a file to the exemption means changing this
+   * list in the same commit, in review.
+   */
+  const CRASHLYTICS_IMPORTERS = [
+    "app/utils/error-reporting.ts",
+    "app/telemetry/diagnostics.ts",
+  ]
+
+  it("lets Crashlytics be reached from the sink and the boundary's diagnostics only", async () => {
+    for (const file of CRASHLYTICS_IMPORTERS) {
       const rules = await resolvedRulesFor(file)
       expect(bansCrashlyticsImport(rules["no-restricted-imports"])).toBe(false)
       expect(bansAnalyticsImport(rules["no-restricted-imports"])).toBe(true)
     }
+  })
+
+  it("bans the Crashlytics import from every other file under app/", async () => {
+    const files = sourceFilesUnder("app").filter(
+      (file) => !CRASHLYTICS_IMPORTERS.includes(file),
+    )
+    expect(files.length).toBeGreaterThan(1_000)
+
+    const lifted: string[] = []
+    for (const file of files) {
+      const rules = await resolvedRulesFor(file)
+      if (!bansCrashlyticsImport(rules["no-restricted-imports"])) lifted.push(file)
+    }
+
+    expect(lifted).toEqual([])
+  }, 120_000)
+
+  it("bans it in particular where the second review found direct calls", async () => {
     for (const file of [
+      "app/app.tsx",
+      "app/graphql/hooks/use-apollo-rebuild-lifecycle.ts",
+      "app/screens/developer-screen/developer-screen.tsx",
+      "app/screens/people-screen/circles/use-circles-card.tsx",
+      "app/screens/send-bitcoin-screen/merchant-selection-screen.tsx",
+      "app/screens/send-bitcoin-screen/use-save-lnaddress-contact.ts",
+      "app/screens/settings-screen/api/api-key-secret-reveal.tsx",
       "app/self-custodial/logging.ts",
       "app/self-custodial/hooks/use-delete-account.ts",
-      "app/self-custodial/hooks/use-sdk-lifecycle.ts",
-      "app/self-custodial/bridge/convert.ts",
     ]) {
       const rules = await resolvedRulesFor(file)
       expect(bansCrashlyticsImport(rules["no-restricted-imports"])).toBe(true)

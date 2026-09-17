@@ -4,6 +4,7 @@ import {
   recoverLnurlServerMode,
   setLnurlServerMode,
 } from "@app/self-custodial/lnurl-server-mode"
+import { isKillSwitchEngaged, resetEnablementForTesting } from "@app/telemetry/enablement"
 import { AccountMode } from "@app/types/account"
 
 const mockGetWalletInfo = jest.fn()
@@ -30,6 +31,7 @@ const lastRequest = () => {
 
 beforeEach(() => {
   jest.clearAllMocks()
+  resetEnablementForTesting()
   jest.useFakeTimers()
   jest.setSystemTime(NOW_SECONDS * 1000)
   global.fetch = mockFetch as unknown as typeof fetch
@@ -99,6 +101,33 @@ describe("setLnurlServerMode", () => {
 
     await expect(setup()).rejects.toThrow("network down")
   })
+
+  /* eslint-disable camelcase */
+  it("engages the kill switch when the mode response says telemetry is off (AD-28)", async () => {
+    mockFetch.mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: () => Promise.resolve({ mode: "enhanced", telemetry_enabled: false }),
+    })
+
+    await setup()
+
+    expect(isKillSwitchEngaged()).toBe(true)
+  })
+
+  it("leaves the switch alone on a `true`, and on a response with no readable body", async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      status: 200,
+      json: () => Promise.resolve({ mode: "enhanced", telemetry_enabled: true }),
+    })
+    await setup()
+    mockFetch.mockResolvedValueOnce({ ok: true, status: 200 })
+    await expect(setup()).resolves.toBeUndefined()
+
+    expect(isKillSwitchEngaged()).toBe(false)
+  })
+  /* eslint-enable camelcase */
 
   it("does not sign anything when the wallet cannot state its pubkey", async () => {
     mockGetWalletInfo.mockRejectedValue(new Error("sdk not connected"))
@@ -227,6 +256,19 @@ describe("recoverLnurlServerMode", () => {
   })
 
   /** Distinguishable from "no mode": a refusal must not read as an answer. */
+  it("engages the kill switch when the recover response says telemetry is off (AD-28)", async () => {
+    mockFetch.mockResolvedValue({
+      ok: true,
+      status: 200,
+      // eslint-disable-next-line camelcase
+      json: () => Promise.resolve({ mode: "anon", telemetry_enabled: false }),
+    })
+
+    await expect(recover()).resolves.toBe(AccountMode.Anon)
+
+    expect(isKillSwitchEngaged()).toBe(true)
+  })
+
   it("throws when the server refuses the recover", async () => {
     mockFetch.mockResolvedValue({ ok: false, status: 400 })
 

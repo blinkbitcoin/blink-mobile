@@ -1,9 +1,10 @@
 import { contractRowFor, type EmittingMode } from "./contract"
 import {
   countSuppressedEvent,
+  DiagnosticsModeInput,
   recordModeResolutionLatency,
   reportBoundaryFault,
-  setDiagnosticsTransmissible,
+  setDiagnosticsModeInput,
 } from "./diagnostics"
 import { isTelemetryEnabled } from "./enablement"
 import {
@@ -135,12 +136,28 @@ export const deriveTelemetryMode = ({
 const isSuppressedMode = (mode: TelemetryMode): boolean =>
   mode === TelemetryMode.Anon || mode === TelemetryMode.Unresolved
 
+/** What the mode alone says about diagnostics; the kill switch has its own say for
+ *  `Enhanced`, and the derivation lives in `transmissibility.ts` (AD-13, NFR-O4). */
+const diagnosticsInputFor = (mode: TelemetryMode): DiagnosticsModeInput => {
+  switch (mode) {
+    case TelemetryMode.Custodial:
+      return DiagnosticsModeInput.Custodial
+    case TelemetryMode.Enhanced:
+      return DiagnosticsModeInput.SelfCustodial
+    case TelemetryMode.Anon:
+      return DiagnosticsModeInput.Denied
+    case TelemetryMode.Unresolved:
+      return DiagnosticsModeInput.Unresolved
+  }
+}
+
 let currentMode: TelemetryMode = TelemetryMode.Unresolved
 
 /**
  * Runs when the gate closes so anything holding un-sent events can drop them. The outbox
- * registers here rather than being called directly, because the discard-then-disable
- * ordering (FR-4, FR-5) is the gate's to enforce and not the outbox's to remember.
+ * registers here rather than being called directly, because "closed before discarded,
+ * and never reopened over a discard" (FR-4, FR-5) is the gate's to enforce and not the
+ * outbox's to remember.
  */
 type SuppressionListener = () => void | Promise<void>
 const suppressionListeners = new Set<SuppressionListener>()
@@ -168,18 +185,37 @@ const notifySuppressed = async (): Promise<void> => {
  *  discard with the enable that follows the next one. */
 let applying: Promise<void> = Promise.resolve()
 
+/**
+ * Everything that closes, closes here and now — synchronously, in the same tick the mode
+ * moves, ahead of anything queued behind a discard. Leaving `Custodial` for any reason
+ * turns platform collection off, withdraws the identity permission and clears the
+ * identity the SDK would otherwise merge into its next event. A discard is a directory
+ * unlink and can be slow; collection staying on for its duration would let the SDK's
+ * automatic events and the FR-2 backlog's direct calls transmit from a device whose mode
+ * has already closed (the second review's MEDIUM 2).
+ */
+const closeSynchronously = (mode: TelemetryMode): void => {
+  setDiagnosticsModeInput(diagnosticsInputFor(mode))
+  if (mode === TelemetryMode.Custodial) return
+  setCustodialIdentityPermitted(false)
+  clearCustodialAnalyticsIdentity()
+  setPlatformCollectionEnabled(false)
+}
+
+/**
+ * The queued half: the discard, and the one thing that *opens*. Opening waits its turn
+ * behind every discard queued before it (FR-4, FR-5: never flush, and never re-enable
+ * over a queue that is still being destroyed), and it happens only if `Custodial` is
+ * still the current mode when its turn comes — a `Custodial` resolved and immediately
+ * overtaken by `Anon` must not reopen collection on the way through.
+ */
 const applyMode = async (mode: TelemetryMode): Promise<void> => {
-  /**
-   * Discard first, then disable. The order is the whole of FR-4 and FR-5: flushing what is
-   * queued before closing the gate would upload exactly the events the switch withheld.
-   */
   if (isSuppressedMode(mode)) await notifySuppressed()
 
-  /** Permission is withdrawn *before* the clear, so a container effect landing between
-   *  the two cannot re-set what was just cleared. */
-  setCustodialIdentityPermitted(mode === TelemetryMode.Custodial)
-  if (mode !== TelemetryMode.Custodial) clearCustodialAnalyticsIdentity()
-  setPlatformCollectionEnabled(mode === TelemetryMode.Custodial)
+  if (mode === TelemetryMode.Custodial && currentMode === TelemetryMode.Custodial) {
+    setCustodialIdentityPermitted(true)
+    setPlatformCollectionEnabled(true)
+  }
 }
 
 /**
@@ -199,10 +235,7 @@ export const resolveTelemetryMode = (mode: TelemetryMode): Promise<void> => {
   }
 
   currentMode = mode
-  setDiagnosticsTransmissible(!isSuppressedMode(mode))
-  /** Withdrawn synchronously, ahead of the queued side effects: the set is refused from
-   *  this instant even if the clear is still waiting behind a discard. */
-  if (mode !== TelemetryMode.Custodial) setCustodialIdentityPermitted(false)
+  closeSynchronously(mode)
 
   applying = applying.then(() => applyMode(mode))
   return applying
@@ -219,7 +252,7 @@ let initialisedAt: number | null = null
 export const initializeTelemetryGate = (): Promise<void> => {
   currentMode = TelemetryMode.Unresolved
   initialisedAt = Date.now()
-  setDiagnosticsTransmissible(false)
+  closeSynchronously(TelemetryMode.Unresolved)
   applying = applying.then(() => applyMode(TelemetryMode.Unresolved))
   return applying
 }
@@ -270,6 +303,6 @@ export const resetTelemetryModeForTesting = (): void => {
   initialisedAt = null
   applying = Promise.resolve()
   suppressionListeners.clear()
-  setDiagnosticsTransmissible(false)
+  setDiagnosticsModeInput(DiagnosticsModeInput.Unresolved)
   setCustodialIdentityPermitted(false)
 }

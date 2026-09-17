@@ -3,6 +3,10 @@ import { PaymentType } from "@blinkbitcoin/blink-client"
 
 import { ContactType } from "@app/graphql/generated"
 import { useSaveLnAddressContact } from "@app/screens/send-bitcoin-screen/use-save-lnaddress-contact"
+import {
+  DiagnosticsModeInput,
+  setDiagnosticsModeInput,
+} from "@app/telemetry/transmissibility"
 
 const mockContactCreate = jest.fn()
 const mockBridgeFindOrCreateContact = jest.fn()
@@ -33,6 +37,10 @@ jest.mock("@react-native-firebase/crashlytics", () => () => ({
 }))
 
 describe("useSaveLnAddressContact", () => {
+  afterEach(() => {
+    setDiagnosticsModeInput(DiagnosticsModeInput.Custodial)
+  })
+
   beforeEach(() => {
     jest.clearAllMocks()
     mockIsSelfCustodial = false
@@ -123,7 +131,7 @@ describe("useSaveLnAddressContact", () => {
       expect(mockContactCreate).not.toHaveBeenCalled()
     })
 
-    it("returns saved=false with the handle and logs to crashlytics when bridgeFindOrCreateContact rejects (silent swallow)", async () => {
+    it("returns saved=false with the handle and leaves a breadcrumb — without the address — when bridgeFindOrCreateContact rejects", async () => {
       mockIsSelfCustodial = true
       mockSdk = { id: "sdk" }
       mockBridgeFindOrCreateContact.mockRejectedValue(new Error("contact upsert failed"))
@@ -137,10 +145,35 @@ describe("useSaveLnAddressContact", () => {
       })
 
       expect(response).toEqual({ saved: false, handle: "alice@spark.tips" })
+      // The failure is diagnosable without the counterparty's address, and the address
+      // next to a Crashlytics installation id would be a linkage (§5.3).
       expect(mockCrashlyticsLog).toHaveBeenCalledWith(
+        expect.stringContaining("contact upsert failed"),
+      )
+      expect(mockCrashlyticsLog).not.toHaveBeenCalledWith(
         expect.stringContaining("alice@spark.tips"),
       )
       expect(mockContactCreate).not.toHaveBeenCalled()
+    })
+
+    it("sends no breadcrumb at all from an incognito device (AD-13)", async () => {
+      // The breadcrumb goes through the app's one Crashlytics sink, and the sink holds
+      // the zero-transmission rule: from a device that may not report, nothing leaves.
+      setDiagnosticsModeInput(DiagnosticsModeInput.Denied)
+      mockIsSelfCustodial = true
+      mockSdk = { id: "sdk" }
+      mockBridgeFindOrCreateContact.mockRejectedValue(new Error("contact upsert failed"))
+
+      const { result } = renderHook(() => useSaveLnAddressContact())
+
+      const response = await result.current({
+        paymentType: PaymentType.Lnurl,
+        destination: "alice@spark.tips",
+        isMerchant: false,
+      })
+
+      expect(response).toEqual({ saved: false, handle: "alice@spark.tips" })
+      expect(mockCrashlyticsLog).not.toHaveBeenCalled()
     })
 
     it("returns saved=false without a handle when sdk is null (no bridge call, no Apollo fallback)", async () => {

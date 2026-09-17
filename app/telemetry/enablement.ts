@@ -20,6 +20,8 @@
  * stop draining and expire on their own schedule, counted like any other expiry.
  */
 
+import { setSelfCustodialDiagnosticsShutdown } from "./transmissibility"
+
 let rolloutEnabled = false
 let killSwitchEngaged = false
 
@@ -38,9 +40,22 @@ export const setTelemetryRolloutEnabled = (enabled: boolean): void => {
   rolloutEnabled = enabled
 }
 
+/**
+ * NFR-O4 is "self-custodial telemetry collection stops", and on a self-custodial device
+ * every transmission is that collection — the boundary's events, the drain, and the
+ * Crashlytics non-fatals and breadcrumbs too, since a breadcrumb carrying an SDK line is
+ * as much a channel as an event. So engaging the switch also closes the diagnostic
+ * disposition for `Enhanced`. Custodial is untouched: its crash reporting predates the
+ * programme the switch rolls back.
+ */
+const engage = (): void => {
+  killSwitchEngaged = true
+  setSelfCustodialDiagnosticsShutdown(true)
+}
+
 /** Restores the persisted engaged state on launch. Never disengages. */
 export const restoreKillSwitch = (engaged: boolean): void => {
-  killSwitchEngaged = killSwitchEngaged || engaged
+  if (engaged && !killSwitchEngaged) engage()
 }
 
 /** Applies what the server said. `true` means "keep going", which changes nothing —
@@ -48,7 +63,7 @@ export const restoreKillSwitch = (engaged: boolean): void => {
  *  caller can persist it. */
 export const applyServerKillSwitch = (telemetryEnabled: boolean): boolean => {
   if (!telemetryEnabled && !killSwitchEngaged) {
-    killSwitchEngaged = true
+    engage()
     for (const listener of killSwitchListeners) listener()
   }
   return killSwitchEngaged
@@ -62,4 +77,5 @@ export const resetEnablementForTesting = (): void => {
   rolloutEnabled = false
   killSwitchEngaged = false
   killSwitchListeners.clear()
+  setSelfCustodialDiagnosticsShutdown(false)
 }

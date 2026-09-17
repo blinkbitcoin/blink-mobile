@@ -1,9 +1,8 @@
 import { useEffect, useRef } from "react"
 
 import { ApolloClient, NormalizedCacheObject } from "@apollo/client"
-import crashlytics from "@react-native-firebase/crashlytics"
-
 import { reportError } from "@app/utils/error-logging"
+import { logBreadcrumb } from "@app/utils/error-reporting"
 
 type RegisterActiveClient = (client: ApolloClient<NormalizedCacheObject>) => void
 
@@ -13,7 +12,7 @@ const handleRebuild = (
   nextTokenPresent: boolean,
 ): void => {
   if (!previousClient) return
-  crashlytics().log(`Apollo client rebuild: token present=${nextTokenPresent}`)
+  logBreadcrumb(`Apollo client rebuild: token present=${nextTokenPresent}`)
   try {
     previousClient.stop()
   } catch (err) {

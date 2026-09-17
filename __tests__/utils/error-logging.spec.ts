@@ -16,7 +16,7 @@ const loadFreshErrorLoggingModule = () => {
     // setup does for the shared graph, so this test still exercises the dedup path.
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const gate: typeof import("@app/telemetry/transmissibility") = require("@app/telemetry/transmissibility")
-    gate.setDiagnosticsTransmissible(true)
+    gate.setDiagnosticsModeInput(gate.DiagnosticsModeInput.Custodial)
   })
   return mod!
 }

@@ -304,26 +304,6 @@
           }
         ]
       }
-    },
-    {
-      "files": ["app/app.tsx", "app/graphql/hooks/use-apollo-rebuild-lifecycle.ts", "app/screens/developer-screen/developer-screen.tsx", "app/screens/people-screen/circles/use-circles-card.tsx", "app/screens/send-bitcoin-screen/merchant-selection-screen.tsx", "app/screens/send-bitcoin-screen/use-save-lnaddress-contact.ts", "app/screens/settings-screen/api/api-key-secret-reveal.tsx"],
-      "rules": {
-        "no-restricted-imports": [
-          "error",
-          {
-            "paths": [
-              {
-                "name": "react-native-secure-key-store",
-                "message": "Import the legacy key store only from app/utils/storage/legacy-key-store.ts, which re-arms the uninstall guard before every call. See blinkbitcoin/blink-wip#1160."
-              },
-              {
-                "name": "@react-native-firebase/analytics",
-                "message": "Reach analytics only through app/telemetry."
-              }
-            ]
-          }
-        ]
-      }
     }
   ],
   "settings": {

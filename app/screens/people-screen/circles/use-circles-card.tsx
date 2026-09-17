@@ -12,7 +12,7 @@ import { useCirclesQuery, WelcomeProfile } from "@app/graphql/generated"
 import { useAppConfig } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import theme from "@app/rne-theme/theme"
-import crashlytics from "@react-native-firebase/crashlytics"
+import { logBreadcrumb } from "@app/utils/error-reporting"
 import { makeStyles, Text, ThemeProvider, useTheme } from "@rn-vui/themed"
 
 export const useCirclesCard = () => {
@@ -72,7 +72,7 @@ export const useCirclesCard = () => {
 
       await Share.open(shareOptions)
     } catch (error) {
-      crashlytics().log("User didn't share")
+      logBreadcrumb("User didn't share")
     }
   }
 

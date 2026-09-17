@@ -1,8 +1,9 @@
 import crashlytics from "@react-native-firebase/crashlytics"
 
 import {
-  mayTransmitDiagnostics,
-  onTransmissibilityChanged,
+  DiagnosticsDisposition,
+  getDiagnosticsDisposition,
+  onDiagnosticsDispositionChanged,
 } from "@app/telemetry/transmissibility"
 
 /**
@@ -15,15 +16,23 @@ import {
  *
  * It is also where the privacy contract's zero-transmission rule is applied to error
  * reporting (AD-13, AD-30, NFR-P1). Nothing leaves a device whose telemetry mode is
- * `Anon` or `Unresolved`: a non-fatal or a breadcrumb carries a device-stable Crashlytics
- * installation id, and from an incognito device that is telemetry whatever product sends
- * it. Gating here rather than at the 119 call sites is what makes the rule structural —
- * a call site cannot forget it, and call site 120 inherits it.
+ * `Anon` or `Unresolved`, or a self-custodial device under the kill switch: a non-fatal
+ * or a breadcrumb carries a device-stable Crashlytics installation id, and from such a
+ * device that is telemetry whatever product sends it. Gating here rather than at the 119
+ * call sites is what makes the rule structural — a call site cannot forget it, and call
+ * site 120 inherits it. The ESLint ban on `@react-native-firebase/crashlytics` outside
+ * this file and the boundary's diagnostics is what keeps 120 from importing around it.
  *
- * What is held back is not thrown away blindly. Errors raised before the mode resolves
- * are buffered, and released the moment the device turns out to be one that may report
- * — so a custodial user's start-up failures still reach Crashlytics, a few hundred
- * milliseconds late. A device that resolves incognito drops the buffer unsent.
+ * The disposition has three states and the sink treats each differently:
+ *
+ *  - `unresolved` — the device has not said what it is. An error is *held*, bounded, so
+ *    a custodial user's start-up failure still reaches Crashlytics, a few hundred
+ *    milliseconds late. Breadcrumbs are not held; they are context for a report, and a
+ *    report raised later carries its own.
+ *  - `denied` — the device must emit zero. An error is *dropped*, and so is anything
+ *    still held from before the answer came: what an incognito wallet raised while
+ *    starting is exactly what must not leave it, on this launch or after a later switch.
+ *  - `permitted` — transmitted, and the held buffer is released first.
  *
  * Dedup keys follow the `<area>-<what>` convention (e.g. `spark-token-decimals-missing`).
  */
@@ -104,37 +113,55 @@ const transmit = (error: Error, options?: RecordAppErrorOptions): void => {
 }
 
 export const recordAppError = (error: Error, options?: RecordAppErrorOptions): void => {
-  if (!mayTransmitDiagnostics()) {
-    if (__DEV__) console.debug(`[held] ${error.message}`)
-    heldWhileUnresolved.push({ error, options })
-    if (heldWhileUnresolved.length > HELD_ERRORS_MAX) heldWhileUnresolved.shift()
-    return
+  switch (getDiagnosticsDisposition()) {
+    case DiagnosticsDisposition.Permitted:
+      transmit(error, options)
+      return
+    case DiagnosticsDisposition.Unresolved:
+      if (__DEV__) console.debug(`[held] ${error.message}`)
+      heldWhileUnresolved.push({ error, options })
+      if (heldWhileUnresolved.length > HELD_ERRORS_MAX) heldWhileUnresolved.shift()
+      return
+    case DiagnosticsDisposition.Denied:
+      if (__DEV__) console.debug(`[dropped] ${error.message}`)
   }
-  transmit(error, options)
 }
 
 /**
- * On every mode transition. A device that may now report releases what it held; a device
- * that may not drops it — the errors an incognito wallet raised while starting are exactly
- * what must not leave it.
+ * On every change of disposition. A device that may now report releases what it held; a
+ * device that may not drops it. `denied` clears the buffer even when nothing was ever
+ * released: the errors an incognito wallet raised while its mode was still unresolved
+ * belong to an incognito wallet, whatever mode it is switched to later.
  */
-onTransmissibilityChanged((transmissible) => {
+onDiagnosticsDispositionChanged((disposition) => {
+  if (disposition === DiagnosticsDisposition.Unresolved) return
   const held = heldWhileUnresolved
   heldWhileUnresolved = []
-  if (!transmissible) return
+  if (disposition === DiagnosticsDisposition.Denied) return
   for (const { error, options } of held) transmit(error, options)
 })
 
 /**
- * A breadcrumb, under the same rule. Self-custodial code that used to call
- * `crashlytics().log()` directly goes through here so it cannot bypass the gate.
+ * A breadcrumb, under the same rule. Code that used to call `crashlytics().log()`
+ * directly goes through here so it cannot bypass the gate.
  */
 export const logBreadcrumb = (message: string): void => {
-  if (!mayTransmitDiagnostics()) {
-    if (__DEV__) console.debug(`[held-breadcrumb] ${message}`)
+  if (getDiagnosticsDisposition() !== DiagnosticsDisposition.Permitted) {
+    if (__DEV__) console.debug(`[breadcrumb withheld] ${message}`)
     return
   }
   crashlytics().log(message)
+}
+
+/**
+ * The developer screen's crash test: a deliberate native crash to prove the pipeline
+ * end to end, on a device in hand. Development builds only — in a release build this is
+ * a no-op, so the one caller needs no exemption from the import ban.
+ */
+export const crashForTesting = (): void => {
+  if (!__DEV__) return
+  crashlytics().log("Testing crash")
+  crashlytics().crash()
 }
 
 export const resetErrorReportingForTesting = (): void => {

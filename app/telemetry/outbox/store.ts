@@ -26,7 +26,8 @@ import { dedupKeyFor, OutboxState, parseOutboxRecord, type OutboxRecord } from "
  *   <dir>/loss.json             the unreported loss counters (AD-31)
  *   <dir>/acked.json            tombstones: SDK payment ids already delivered, so a
  *                               replay after cleanup cannot mint a second id
- *   <dir>/.discard              a discard in progress (AD-26)
+ *   <dir>/.discard              a discard in progress (AD-26): while it exists, nothing
+ *                               in the directory is readable as a queue
  *
  * Every record is written to a temp name and renamed into place, so a crash mid-write
  * leaves a `.tmp` the reader ignores rather than a half-record it has to guess at. AD-26
@@ -72,10 +73,27 @@ export type OutboxCounters = Readonly<typeof counters>
 
 export const getOutboxCounters = (): OutboxCounters => ({ ...counters })
 
+/**
+ * Serialised per *directory*, not per instance: two settlements arriving together would
+ * otherwise both read a below-capacity directory and both write, and two instances over
+ * the same directory — the provider's active store and the FR-25 sweep's — would race
+ * each other's read-modify-write of the loss counters and the tombstones.
+ */
+const queueByDirectory = new Map<string, Promise<unknown>>()
+
+/** Directories with a discard begun in this process and not yet verified finished. The
+ *  on-disk marker is the signal that survives a restart; this is the one that survives a
+ *  marker that could not be written. */
+const discardOwed = new Set<string>()
+
+/** Counters and the per-directory module state — the serial queues and the owed
+ *  discards — so a suite that resets the mock disk starts from nothing on this side too. */
 export const resetOutboxCountersForTesting = (): void => {
   for (const key of Object.keys(counters) as (keyof typeof counters)[]) {
     counters[key] = 0
   }
+  queueByDirectory.clear()
+  discardOwed.clear()
 }
 
 const bump = (key: keyof typeof counters, by = 1): void => {
@@ -245,19 +263,58 @@ const addTombstone = async (directory: string, sdkPaymentId: string): Promise<vo
 const isTooOld = (record: OutboxRecord): boolean =>
   record.version < eventVersionOf(record.event) - OUTBOX_SCHEMA_VERSIONS_TOLERATED
 
+const serialiseOn = <T>(directory: string, run: () => Promise<T>): Promise<T> => {
+  const queue = queueByDirectory.get(directory) ?? Promise.resolve()
+  const next = queue.then(run, run)
+  queueByDirectory.set(
+    directory,
+    next.catch(() => undefined),
+  )
+  return next
+}
+
 export const createOutboxStore = (directory: string): OutboxStore => {
-  /** Serialised, because two settlements arriving together would otherwise both read a
-   *  below-capacity directory and both write. */
-  let queue: Promise<unknown> = Promise.resolve()
-  const serialise = <T>(run: () => Promise<T>): Promise<T> => {
-    const next = queue.then(run, run)
-    queue = next.catch(() => undefined)
-    return next
+  const serialise = <T>(run: () => Promise<T>): Promise<T> => serialiseOn(directory, run)
+
+  const markerPath = `${directory}/${DISCARD_MARKER}`
+
+  /**
+   * Unlinks the directory, marker and all, and checks that it is gone. Neither RNFS
+   * primitive is atomic: an unlink that fails partway leaves records behind, and the
+   * marker with them. The marker lives *inside* the directory on purpose — a successful
+   * unlink takes it away, and nothing else ever removes it — so a marker still present
+   * means a discard that did not finish, and the throw here leaves it there for the next
+   * attempt (the second review's MEDIUM 1).
+   */
+  const unlinkDirectory = async (): Promise<void> => {
+    try {
+      await RNFS.unlink(directory)
+    } catch {
+      /** Already gone, or failed partway — the check below decides which. */
+    }
+    if (await RNFS.exists(directory)) {
+      throw new Error("telemetry outbox discard did not finish")
+    }
+  }
+
+  /**
+   * Every read of the queue finishes a pending discard first, or fails. A discard that
+   * died leaves records behind that the mode switch required destroyed; returning them
+   * from `pending()` would hand them to the next drain (FR-5 by the back door), and
+   * writing next to them would bury the marker under fresh records. So they are never
+   * readable: either the unlink completes now, or the store refuses the read.
+   */
+  const finishPendingDiscard = async (): Promise<void> => {
+    if (!discardOwed.has(directory) && !(await RNFS.exists(markerPath))) return
+    await unlinkDirectory()
+    discardOwed.delete(directory)
   }
 
   const sweep = async (): Promise<StoredRecord[]> => {
+    await finishPendingDiscard()
     const stored = await readAll(directory)
     const cutoff = Date.now() - OUTBOX_TTL_MS
+    const tombstones = await readTombstones(directory)
 
     const live: StoredRecord[] = []
     let expired = 0
@@ -265,6 +322,13 @@ export const createOutboxStore = (directory: string): OutboxStore => {
       if (entry.record.queuedAt <= cutoff || isTooOld(entry.record)) {
         await remove(entry.path)
         expired += 1
+      } else if (
+        entry.record.sdkPaymentId !== null &&
+        entry.record.sdkPaymentId in tombstones
+      ) {
+        /** Acknowledged, and the process died before its file was removed: the tombstone
+         *  is written first, so this is a record already delivered — not one to resubmit. */
+        await remove(entry.path)
       } else {
         live.push(entry)
       }
@@ -312,24 +376,25 @@ export const createOutboxStore = (directory: string): OutboxStore => {
     await write(directory, { ...record, state })
   }
 
-  const markerPath = `${directory}/${DISCARD_MARKER}`
-
   /**
-   * FR-5, made re-runnable (AD-26). Neither RNFS primitive is atomic, so a discard that
-   * dies halfway leaves some records behind with nothing to say a discard was under way.
-   * The marker is written first and removed last: if it is there on the next activation,
-   * the discard did not finish and is run again before anything else touches the queue.
+   * FR-5, made re-runnable (AD-26). The marker is written first, so a discard that dies
+   * halfway is recognisable on the next activation — and by every read in between — and
+   * is run again before anything else touches the queue. Nothing to discard is not a
+   * failure; a directory that survives the unlink is, and the error carries the marker
+   * with it for the next attempt.
    */
   const discardAll = async (): Promise<void> => {
+    if (!(await RNFS.exists(directory))) return
     const stored = await readAll(directory)
+    discardOwed.add(directory)
     try {
-      await RNFS.mkdir(directory)
       await RNFS.writeFile(markerPath, String(Date.now()), "utf8")
-      await RNFS.unlink(directory)
     } catch {
-      /** Never created, or already unlinked by a previous attempt. */
+      /** A marker that cannot be written must not stop the unlink; the in-memory owed
+       *  set covers this process, and the mode itself covers the next launch. */
     }
-    await remove(markerPath)
+    await unlinkDirectory()
+    discardOwed.delete(directory)
     bump("discarded", stored.length)
   }
 
@@ -340,17 +405,25 @@ export const createOutboxStore = (directory: string): OutboxStore => {
 
     pending: () => serialise(async () => (await sweep()).map((entry) => entry.record)),
 
-    depth: () => serialise(async () => (await readAll(directory)).length),
+    depth: () =>
+      serialise(async () => {
+        await finishPendingDiscard()
+        return (await readAll(directory)).length
+      }),
 
     markSubmitted: (record) => serialise(() => transition(record, OutboxState.Submitted)),
 
     requeue: (record) => serialise(() => transition(record, OutboxState.Queued)),
 
+    /** Tombstone first, file second. The other order has a window — a crash between the
+     *  two — in which neither survives, and the SDK's next replay mints a second
+     *  `telemetry_event_id` for a settlement already delivered. This order's window leaves
+     *  both, and the sweep removes the file without resubmitting it. */
     acknowledge: (record) =>
       serialise(async () => {
-        await remove(fileFor(directory, record))
         if (record.sdkPaymentId !== null)
           await addTombstone(directory, record.sdkPaymentId)
+        await remove(fileFor(directory, record))
         bump("acknowledged")
       }),
 

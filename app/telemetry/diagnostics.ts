@@ -2,7 +2,12 @@ import crashlytics from "@react-native-firebase/crashlytics"
 
 import { reportError } from "@app/utils/error-logging"
 
-import { mayTransmitDiagnostics, setDiagnosticsTransmissible } from "./transmissibility"
+import {
+  DiagnosticsModeInput,
+  mayTransmitDiagnostics,
+  resetTransmissibilityForTesting,
+  setDiagnosticsModeInput,
+} from "./transmissibility"
 
 /**
  * Fault reporting for the boundary, and the only place it decides whether a diagnostic may
@@ -13,12 +18,13 @@ import { mayTransmitDiagnostics, setDiagnosticsTransmissible } from "./transmiss
  * telemetry boundary, sent from a device that is required to emit zero, is the leak the
  * suppression exists to prevent, routed around the analytics disable by our own topology.
  *
- * The flag itself lives in `transmissibility.ts`, which imports nothing, so the app-wide
- * Crashlytics sink in `app/utils/error-reporting.ts` can read the same value without a
- * cycle. `mode.ts` pushes it on every transition; the default is **false**.
+ * The disposition itself lives in `transmissibility.ts`, which imports nothing, so the
+ * app-wide Crashlytics sink in `app/utils/error-reporting.ts` can read the same value
+ * without a cycle. `mode.ts` and `enablement.ts` push its inputs; the default is
+ * **unresolved**, under which nothing is transmitted.
  */
 
-export { mayTransmitDiagnostics, setDiagnosticsTransmissible }
+export { DiagnosticsModeInput, mayTransmitDiagnostics, setDiagnosticsModeInput }
 
 /**
  * Counts of everything the boundary declined to do, held locally and never transmitted
@@ -75,7 +81,7 @@ export const recordModeResolutionLatency = (ms: number): void => {
 export const getDiagnosticCounters = (): Readonly<typeof counters> => ({ ...counters })
 
 export const resetDiagnosticsForTesting = (): void => {
-  setDiagnosticsTransmissible(false)
+  resetTransmissibilityForTesting()
   for (const key of Object.keys(counters) as (keyof typeof counters)[]) {
     counters[key] = 0
   }

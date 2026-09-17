@@ -25,9 +25,22 @@ jobs:
       # Flake handling happens at test granularity now: jest retries individual
       # failing tests in CI (see jest.setup-after-env.ts) and logs each retried
       # error, instead of silently re-running the whole job.
-      - run: yarn test
+      #
+      # Two recycled workers, not one in-band process. In band, one Node process
+      # carried all 729 suites: its heap crept to ~3.9 GB against the 4 GB cap and
+      # the run took 19 of the job's 20 minutes, so any growth in the suite tipped
+      # it into heap exhaustion. A worker is checked after every file and replaced
+      # once its heap exceeds the idle limit; --expose-gc with --logHeapUsage makes
+      # jest collect before that check, so the limit measures the live set (a
+      # fresh worker starts near 1 GB for this suite and a single file can add
+      # ~400 MB) rather than uncollected garbage. The per-process cap leaves a
+      # file's worth of headroom above the limit; a 2 GB cap was seen to kill a
+      # worker. Measured: ~4 minutes, peak 1.8 GB live per worker, one recycle.
+      # Worst case is two workers at the cap, ~6 GB, so this assumes the small
+      # runner has more than that; the old single process needed ~4.5 GB.
+      - run: yarn test --maxWorkers=2 --workerIdleMemoryLimit=1536MB --logHeapUsage
         env:
-          NODE_OPTIONS: --max-old-space-size=4096
+          NODE_OPTIONS: --max-old-space-size=3072 --expose-gc
         timeout-minutes: 20
   android-unit-test:
     name: Android unit tests

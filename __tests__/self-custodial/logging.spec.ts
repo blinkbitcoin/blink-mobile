@@ -4,9 +4,11 @@ import {
   logSdkEvent,
 } from "@app/self-custodial/logging"
 import {
+  DiagnosticsModeInput,
   resetDiagnosticsForTesting,
-  setDiagnosticsTransmissible,
+  setDiagnosticsModeInput,
 } from "@app/telemetry/diagnostics"
+import { resetErrorReportingForTesting } from "@app/utils/error-reporting"
 
 const mockLog = jest.fn()
 const mockRecordError = jest.fn()
@@ -26,7 +28,7 @@ const loadFreshLoggingModule = () => {
     mod = require("@app/self-custodial/logging")
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const diagnostics: typeof import("@app/telemetry/diagnostics") = require("@app/telemetry/diagnostics")
-    diagnostics.setDiagnosticsTransmissible(true)
+    diagnostics.setDiagnosticsModeInput(diagnostics.DiagnosticsModeInput.Custodial)
   })
   return mod!
 }
@@ -35,7 +37,8 @@ describe("logSdkEvent", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     resetDiagnosticsForTesting()
-    setDiagnosticsTransmissible(true)
+    resetErrorReportingForTesting()
+    setDiagnosticsModeInput(DiagnosticsModeInput.Custodial)
     jest.spyOn(console, "debug").mockImplementation()
     jest.spyOn(console, "warn").mockImplementation()
     jest.spyOn(console, "error").mockImplementation()
@@ -112,6 +115,9 @@ describe("AD-13 / AD-30 — SDK log lines leave only a device permitted to repor
   beforeEach(() => {
     jest.clearAllMocks()
     resetDiagnosticsForTesting()
+    resetErrorReportingForTesting()
+    /** An incognito device: the disposition the sink drops under, not holds under. */
+    setDiagnosticsModeInput(DiagnosticsModeInput.Denied)
     jest.spyOn(console, "debug").mockImplementation()
     jest.spyOn(console, "warn").mockImplementation()
     jest.spyOn(console, "error").mockImplementation()
@@ -140,8 +146,32 @@ describe("AD-13 / AD-30 — SDK log lines leave only a device permitted to repor
     expect(mockLog).not.toHaveBeenCalled()
   })
 
+  it("does not carry an incognito device's error lines out on a later switch to Enhanced", () => {
+    // The second review's HIGH 2, at the SDK path: an error raised while the device was
+    // incognito is dropped, not held, so a later grant has nothing to release.
+    logSdkEvent(SdkLogLevel.Error, "incognito-era defect line")
+
+    setDiagnosticsModeInput(DiagnosticsModeInput.SelfCustodial)
+
+    expect(mockRecordError).not.toHaveBeenCalled()
+    expect(mockLog).not.toHaveBeenCalled()
+  })
+
+  it("holds an error line raised before the mode resolved, and releases it to a custodial device", () => {
+    setDiagnosticsModeInput(DiagnosticsModeInput.Unresolved)
+    logSdkEvent(SdkLogLevel.Error, "start-up defect line")
+    expect(mockRecordError).not.toHaveBeenCalled()
+
+    setDiagnosticsModeInput(DiagnosticsModeInput.Custodial)
+
+    expect(mockRecordError).toHaveBeenCalledTimes(1)
+    expect(mockRecordError.mock.calls[0][0].message).toBe(
+      "[SparkSDK] start-up defect line",
+    )
+  })
+
   it("transmits again once the boundary opens (anchor)", () => {
-    setDiagnosticsTransmissible(true)
+    setDiagnosticsModeInput(DiagnosticsModeInput.Custodial)
 
     logSdkEvent(SdkLogLevel.Info, "sdk initialized")
 
@@ -153,7 +183,8 @@ describe("createSdkLogListener", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     resetDiagnosticsForTesting()
-    setDiagnosticsTransmissible(true)
+    resetErrorReportingForTesting()
+    setDiagnosticsModeInput(DiagnosticsModeInput.Custodial)
     jest.spyOn(console, "debug").mockImplementation()
     jest.spyOn(console, "warn").mockImplementation()
     jest.spyOn(console, "error").mockImplementation()

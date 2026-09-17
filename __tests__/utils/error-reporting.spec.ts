@@ -1,4 +1,9 @@
-import { setDiagnosticsTransmissible } from "@app/telemetry/transmissibility"
+import {
+  DiagnosticsModeInput,
+  resetTransmissibilityForTesting,
+  setDiagnosticsModeInput,
+  setSelfCustodialDiagnosticsShutdown,
+} from "@app/telemetry/transmissibility"
 import { reportError } from "@app/utils/error-logging"
 import {
   ErrorReportClass,
@@ -24,7 +29,7 @@ const loadFreshErrorReportingModule = () => {
     mod = require("@app/utils/error-reporting")
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const gate: typeof import("@app/telemetry/transmissibility") = require("@app/telemetry/transmissibility")
-    gate.setDiagnosticsTransmissible(true)
+    gate.setDiagnosticsModeInput(gate.DiagnosticsModeInput.Custodial)
   })
   return mod!
 }
@@ -141,7 +146,7 @@ describe("recordAppError", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     resetErrorReportingForTesting()
-    setDiagnosticsTransmissible(true)
+    setDiagnosticsModeInput(DiagnosticsModeInput.Custodial)
   })
 
   it("records a defect and leaves a [defect] breadcrumb", () => {
@@ -210,68 +215,149 @@ describe("recordAppError", () => {
  * AD-13 / AD-30 / NFR-P1. Every non-fatal and breadcrumb in the app funnels through this
  * sink, so this is where "nothing leaves an incognito or unresolved device" is enforced
  * for error reporting — including the `reportError()` sites in the SDK lifecycle hook that
- * do not go through `logSdkEvent`.
+ * do not go through `logSdkEvent`, and the screens that used to reach Crashlytics directly.
+ *
+ * The disposition has three states, and the sink must tell the two closed ones apart:
+ * `unresolved` holds, `denied` drops. A sink that held under both would carry an incognito
+ * device's errors out on a later switch to Enhanced (the second review's HIGH 2).
  */
 describe("recordAppError — the zero-transmission gate", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     resetErrorReportingForTesting()
-    setDiagnosticsTransmissible(false)
+    resetTransmissibilityForTesting()
   })
 
-  it("holds a non-fatal while the device may not report, and sends nothing", () => {
-    reportError("SDK init", new Error("init failed for account"))
+  describe("while the device has not resolved", () => {
+    it("holds a non-fatal, and sends nothing", () => {
+      reportError("SDK init", new Error("init failed for account"))
 
-    expect(mockLog).not.toHaveBeenCalled()
-    expect(mockRecordError).not.toHaveBeenCalled()
+      expect(mockLog).not.toHaveBeenCalled()
+      expect(mockRecordError).not.toHaveBeenCalled()
+    })
+
+    it("withholds a breadcrumb outright — context for a report that will carry its own", () => {
+      logBreadcrumb("[self-custodial delete] storage dir unlink failed")
+
+      setDiagnosticsModeInput(DiagnosticsModeInput.Custodial)
+
+      expect(mockLog).not.toHaveBeenCalled()
+    })
+
+    it("releases what it held once the device turns out to be custodial", () => {
+      // A custodial user's start-up failure, raised before the mode resolved. It reaches
+      // Crashlytics a few hundred milliseconds late rather than never.
+      reportError("remote config", new Error("fetchAndActivate failed"))
+      expect(mockRecordError).not.toHaveBeenCalled()
+
+      setDiagnosticsModeInput(DiagnosticsModeInput.Custodial)
+
+      expect(mockRecordError).toHaveBeenCalledWith(
+        expect.objectContaining({ message: "fetchAndActivate failed" }),
+      )
+    })
+
+    it("releases what it held once the device turns out to be Enhanced", () => {
+      reportError("SDK init", new Error("init failed for account"))
+
+      setDiagnosticsModeInput(DiagnosticsModeInput.SelfCustodial)
+
+      expect(mockRecordError).toHaveBeenCalledTimes(1)
+    })
+
+    it("drops what it held when the device resolves incognito, and a later grant finds nothing", () => {
+      reportError("SDK init", new Error("init failed for account"))
+
+      setDiagnosticsModeInput(DiagnosticsModeInput.Denied)
+      setDiagnosticsModeInput(DiagnosticsModeInput.SelfCustodial)
+
+      expect(mockRecordError).not.toHaveBeenCalled()
+      expect(mockLog).not.toHaveBeenCalled()
+    })
+
+    it("bounds what it holds", () => {
+      for (let i = 0; i < 40; i += 1) reportError("loop", new Error(`spam ${i}`))
+
+      setDiagnosticsModeInput(DiagnosticsModeInput.Custodial)
+
+      expect(mockRecordError.mock.calls.length).toBeLessThanOrEqual(20)
+    })
   })
 
-  it("holds a breadcrumb the same way", () => {
-    logBreadcrumb("[self-custodial delete] storage dir unlink failed")
+  describe("while the device is one that must emit zero", () => {
+    beforeEach(() => {
+      setDiagnosticsModeInput(DiagnosticsModeInput.Denied)
+    })
 
-    expect(mockLog).not.toHaveBeenCalled()
-  })
+    it("drops a non-fatal rather than holding it", () => {
+      reportError("SDK init", new Error("init failed for account"))
 
-  it("releases what it held once the device turns out to be one that may report", () => {
-    // A custodial user's start-up failure, raised before the mode resolved. It reaches
-    // Crashlytics a few hundred milliseconds late rather than never.
-    reportError("remote config", new Error("fetchAndActivate failed"))
-    expect(mockRecordError).not.toHaveBeenCalled()
+      expect(mockLog).not.toHaveBeenCalled()
+      expect(mockRecordError).not.toHaveBeenCalled()
+    })
 
-    setDiagnosticsTransmissible(true)
+    it("drops a breadcrumb", () => {
+      logBreadcrumb("[SparkSDK] payment received: 21000 sat")
 
-    expect(mockRecordError).toHaveBeenCalledWith(
-      expect.objectContaining({ message: "fetchAndActivate failed" }),
-    )
-  })
+      expect(mockLog).not.toHaveBeenCalled()
+    })
 
-  it("drops what it held when the device resolves to one that may not report", () => {
-    // Raised while Unresolved; then the account resolves Anon. The mode gate withdraws
-    // again — the value was already false, but the withdrawal is a transition into a mode
-    // that may not report, and what was held belongs to that device now.
-    reportError("SDK init", new Error("init failed for account"))
-    setDiagnosticsTransmissible(false)
+    it("does not upload an incognito-era error after the account switches to Enhanced", () => {
+      // The orchestrator's probe: denied → record → permitted. The error belongs to the
+      // device as it was when it was raised, and nothing about a later switch changes that.
+      reportError("SDK init", new Error("raised while incognito"))
 
-    // A later switch to Enhanced grants — and must find nothing waiting.
-    setDiagnosticsTransmissible(true)
+      setDiagnosticsModeInput(DiagnosticsModeInput.SelfCustodial)
 
-    expect(mockRecordError).not.toHaveBeenCalled()
-    expect(mockLog).not.toHaveBeenCalled()
-  })
+      expect(mockRecordError).not.toHaveBeenCalled()
+      expect(mockLog).not.toHaveBeenCalled()
+    })
 
-  it("bounds what it holds", () => {
-    for (let i = 0; i < 40; i += 1) reportError("loop", new Error(`spam ${i}`))
+    it("does not upload it after a switch to custodial either", () => {
+      reportError("SDK init", new Error("raised while incognito"))
 
-    setDiagnosticsTransmissible(true)
+      setDiagnosticsModeInput(DiagnosticsModeInput.Custodial)
 
-    expect(mockRecordError.mock.calls.length).toBeLessThanOrEqual(20)
+      expect(mockRecordError).not.toHaveBeenCalled()
+    })
+
+    it("holds again only what is raised after the device goes back to unresolved", () => {
+      reportError("SDK init", new Error("raised while incognito"))
+      setDiagnosticsModeInput(DiagnosticsModeInput.Unresolved)
+      reportError("SDK init", new Error("raised while unresolved"))
+
+      setDiagnosticsModeInput(DiagnosticsModeInput.Custodial)
+
+      expect(mockRecordError).toHaveBeenCalledTimes(1)
+      expect(mockRecordError.mock.calls[0][0].message).toBe("raised while unresolved")
+    })
   })
 
   it("transmits immediately once the device may report (anchor)", () => {
-    setDiagnosticsTransmissible(true)
+    setDiagnosticsModeInput(DiagnosticsModeInput.Custodial)
 
     reportError("SDK init", new Error("init failed for account"))
 
     expect(mockRecordError).toHaveBeenCalledTimes(1)
+  })
+
+  it("keeps custodial reporting open whatever the self-custodial kill switch says", () => {
+    setDiagnosticsModeInput(DiagnosticsModeInput.Custodial)
+    setSelfCustodialDiagnosticsShutdown(true)
+
+    reportError("SDK init", new Error("custodial defect"))
+
+    expect(mockRecordError).toHaveBeenCalledTimes(1)
+  })
+
+  it("closes Enhanced reporting the moment the kill switch engages (NFR-O4)", () => {
+    setDiagnosticsModeInput(DiagnosticsModeInput.SelfCustodial)
+    setSelfCustodialDiagnosticsShutdown(true)
+
+    reportError("SDK init", new Error("enhanced defect"))
+    logBreadcrumb("[SparkSDK] payment received: 21000 sat")
+
+    expect(mockRecordError).not.toHaveBeenCalled()
+    expect(mockLog).not.toHaveBeenCalled()
   })
 })

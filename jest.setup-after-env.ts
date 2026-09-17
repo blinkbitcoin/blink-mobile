@@ -101,12 +101,15 @@ afterAll(() => {
 })
 
 // The privacy boundary's diagnostic gate (app/telemetry/transmissibility.ts) defaults to
-// closed: nothing reaches Crashlytics until the telemetry mode has positively resolved as
-// custodial or Enhanced. Production earns that default; a test that merely asserts "this
-// failure is recorded" should not have to know the boundary exists. So every test file
-// starts with the gate open, as a custodial device would have it after resolution. The
-// suites that exercise the gate itself — error-reporting, logging, the telemetry
+// unresolved: nothing reaches Crashlytics until the telemetry mode has positively resolved
+// as custodial or Enhanced. Production earns that default; a test that merely asserts
+// "this failure is recorded" should not have to know the boundary exists. So every test
+// file starts with the gate open, as a custodial device would have it after resolution.
+// The suites that exercise the gate itself — error-reporting, logging, the telemetry
 // boundary — close it explicitly in their own setup.
-import { setDiagnosticsTransmissible } from "./app/telemetry/transmissibility"
+import {
+  DiagnosticsModeInput,
+  setDiagnosticsModeInput,
+} from "./app/telemetry/transmissibility"
 
-setDiagnosticsTransmissible(true)
+setDiagnosticsModeInput(DiagnosticsModeInput.Custodial)

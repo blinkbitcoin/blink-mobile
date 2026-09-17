@@ -199,21 +199,102 @@ describe("the telemetry outbox", () => {
       expect(await store.hasPendingDiscard()).toBe(false)
     })
 
-    it("leaves its marker in place when the unlink dies, so the next run knows (AD-26)", async () => {
-      const store = createOutboxStore(DIR)
-      await store.enqueue(record())
-      const unlink = jest
+    /** Only the directory unlink fails; everything else — the marker's own unlink
+     *  included — runs against the real mock. The earlier version of this test failed
+     *  both, which hid the split outcome the second review's MEDIUM 1 describes. */
+    const failDirectoryUnlink = () => {
+      const realUnlink = RNFS.unlink
+      return jest
         .spyOn(RNFS, "unlink")
         .mockImplementation((path) =>
-          String(path) === DIR
-            ? Promise.reject(new Error("EBUSY"))
-            : Promise.reject(new Error("ENOENT")),
+          String(path) === DIR ? Promise.reject(new Error("EBUSY")) : realUnlink(path),
         )
+    }
 
-      await store.discardAll()
+    it("keeps its marker when the directory survives the unlink, so the next run knows (AD-26)", async () => {
+      const store = createOutboxStore(DIR)
+      await store.enqueue(record())
+      const unlink = failDirectoryUnlink()
+
+      await expect(store.discardAll()).rejects.toThrow("did not finish")
       unlink.mockRestore()
 
       expect(await store.hasPendingDiscard()).toBe(true)
+      expect(getOutboxCounters().discarded).toBe(0)
+    })
+
+    it("never hands out records behind a marker — a discard that did not finish is finished first, or the read fails", async () => {
+      // The Anon transition required these destroyed. Returning them from `pending()` to
+      // a later Enhanced drain would be FR-5 by the back door.
+      const store = createOutboxStore(DIR)
+      await store.enqueue(record())
+      const unlink = failDirectoryUnlink()
+      await store.discardAll().catch(() => undefined)
+
+      await expect(store.pending()).rejects.toThrow("did not finish")
+      await expect(store.depth()).rejects.toThrow("did not finish")
+      unlink.mockRestore()
+
+      // The unlink works again: the next read finishes the discard, and the queue is empty.
+      expect(await store.pending()).toEqual([])
+      expect(await store.hasPendingDiscard()).toBe(false)
+      expect(mockFs.__mockFilePaths().filter((path) => path.startsWith(DIR))).toEqual([])
+    })
+
+    it("still unlinks when the marker itself cannot be written", async () => {
+      const store = createOutboxStore(DIR)
+      await store.enqueue(record())
+      const realWrite = RNFS.writeFile
+      const write = jest
+        .spyOn(RNFS, "writeFile")
+        .mockImplementation((path, ...rest) =>
+          String(path).endsWith(".discard")
+            ? Promise.reject(new Error("ENOSPC"))
+            : realWrite(path, ...rest),
+        )
+
+      await store.discardAll()
+      write.mockRestore()
+
+      expect(await store.pending()).toEqual([])
+      expect(getOutboxCounters().discarded).toBe(1)
+    })
+
+    it("keeps refusing reads for the rest of the process when neither the marker nor the unlink succeeded", async () => {
+      const store = createOutboxStore(DIR)
+      await store.enqueue(record())
+      const realWrite = RNFS.writeFile
+      const write = jest
+        .spyOn(RNFS, "writeFile")
+        .mockImplementation((path, ...rest) =>
+          String(path).endsWith(".discard")
+            ? Promise.reject(new Error("ENOSPC"))
+            : realWrite(path, ...rest),
+        )
+      const unlink = failDirectoryUnlink()
+      await store.discardAll().catch(() => undefined)
+      write.mockRestore()
+
+      // No marker on disk, and the records are still there — but the store remembers.
+      expect(await store.hasPendingDiscard()).toBe(false)
+      await expect(store.pending()).rejects.toThrow("did not finish")
+      unlink.mockRestore()
+
+      expect(await store.pending()).toEqual([])
+    })
+
+    it("does not drain what a failed discard left behind, even under Enhanced", async () => {
+      const store = createOutboxStore(DIR)
+      await store.enqueue(record())
+      const unlink = failDirectoryUnlink()
+      await store.discardAll().catch(() => undefined)
+      const submit = transportReturning(acked)
+      await resolveTelemetryMode(TelemetryMode.Enhanced)
+
+      await drainOutbox(store, instantly).catch(() => undefined)
+      unlink.mockRestore()
+
+      expect(submit).not.toHaveBeenCalled()
     })
 
     it("reports a marker the last run left behind, so the discard is re-run (AD-26)", async () => {
@@ -290,6 +371,79 @@ describe("the telemetry outbox", () => {
       expect(await after.pending()).toEqual([])
     })
 
+    it("writes the tombstone before it removes the record, so a crash between the two leaves both", async () => {
+      // The other order has a window in which neither survives, and the next replay
+      // mints a second `telemetry_event_id` for a settlement already delivered.
+      const store = createOutboxStore(DIR)
+      const first = record({ sdkPaymentId: "sdk-crash-mid-ack" })
+      await store.enqueue(first)
+      const unlink = jest.spyOn(RNFS, "unlink").mockRejectedValue(new Error("EIO"))
+
+      await store.acknowledge(first)
+      unlink.mockRestore()
+
+      const paths = mockFs.__mockFilePaths().filter((path) => path.startsWith(DIR))
+      expect(paths).toContain(`${DIR}/acked.json`)
+      expect(paths).toContain(`${DIR}/p-sdk-crash-mid-ack.json`)
+    })
+
+    it("removes a record whose tombstone exists without resubmitting it, and still refuses its replay", async () => {
+      const first = record({ sdkPaymentId: "sdk-crash-mid-ack" })
+      const before = createOutboxStore(DIR)
+      await before.enqueue(first)
+      const unlink = jest.spyOn(RNFS, "unlink").mockRejectedValue(new Error("EIO"))
+      await before.acknowledge(first)
+      unlink.mockRestore()
+
+      // The process died; the store is recreated. The record file is still there.
+      const after = createOutboxStore(DIR)
+      expect(await after.pending()).toEqual([])
+      await after.enqueue(record({ sdkPaymentId: "sdk-crash-mid-ack" }))
+
+      expect(await after.pending()).toEqual([])
+      expect(mockFs.__mockFilePaths()).not.toContain(`${DIR}/p-sdk-crash-mid-ack.json`)
+    })
+
+    it("keeps the record when the tombstone cannot be written, so nothing is delivered twice under a new id", async () => {
+      const store = createOutboxStore(DIR)
+      const first = record({ sdkPaymentId: "sdk-no-tombstone" })
+      await store.enqueue(first)
+      const realWrite = RNFS.writeFile
+      const write = jest
+        .spyOn(RNFS, "writeFile")
+        .mockImplementation((path, ...rest) =>
+          String(path).includes("acked.json")
+            ? Promise.reject(new Error("ENOSPC"))
+            : realWrite(path, ...rest),
+        )
+
+      await expect(store.acknowledge(first)).rejects.toThrow("ENOSPC")
+      write.mockRestore()
+
+      // Still queued under its original id; a replay is deduplicated against it.
+      await store.enqueue(record({ sdkPaymentId: "sdk-no-tombstone" }))
+      const pending = await store.pending()
+      expect(pending).toHaveLength(1)
+      expect(pending[0].telemetryEventId).toBe(first.telemetryEventId)
+    })
+
+    it("serialises two instances over the same directory, so neither loses the other's tombstones", async () => {
+      // The provider's active store and the FR-25 sweep can both exist for one directory.
+      const one = createOutboxStore(DIR)
+      const two = createOutboxStore(DIR)
+      const a = record({ sdkPaymentId: "sdk-instance-a" })
+      const b = record({ sdkPaymentId: "sdk-instance-b" })
+      await one.enqueue(a)
+      await two.enqueue(b)
+
+      await Promise.all([one.acknowledge(a), two.acknowledge(b)])
+
+      await one.enqueue(record({ sdkPaymentId: "sdk-instance-a" }))
+      await two.enqueue(record({ sdkPaymentId: "sdk-instance-b" }))
+      expect(await createOutboxStore(DIR).pending()).toEqual([])
+      expect(getOutboxCounters().deduplicated).toBe(2)
+    })
+
     it("forgets a tombstone once it is older than the TTL", async () => {
       const store = createOutboxStore(DIR)
       const first = record({ sdkPaymentId: "sdk-ancient" })
@@ -301,8 +455,9 @@ describe("the telemetry outbox", () => {
 
       await store.enqueue(record({ sdkPaymentId: "sdk-ancient" }))
 
+      const pending = await createOutboxStore(DIR).pending()
       clock.mockRestore()
-      expect(await createOutboxStore(DIR).pending()).toHaveLength(1)
+      expect(pending).toHaveLength(1)
     })
 
     it("never writes the SDK payment id into a payload (FR-24)", async () => {

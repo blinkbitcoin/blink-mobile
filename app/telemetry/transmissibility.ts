@@ -1,42 +1,112 @@
 /**
- * Whether anything at all may leave this device right now (AD-13, AD-30).
+ * Whether anything at all may leave this device right now (AD-13, AD-30, NFR-O4).
  *
- * One flag, no imports, so both ends of the app can read it without a cycle: the
+ * One derivation, no imports, so both ends of the app can read it without a cycle: the
  * boundary's own diagnostics on one side, and the app-wide Crashlytics sink in
- * `app/utils/error-reporting.ts` on the other. `mode.ts` pushes the value on every
- * transition; the default is **false**, so a failure to resolve a mode leaves every
- * diagnostic silent, like everything else.
+ * `app/utils/error-reporting.ts` on the other. `mode.ts` pushes the mode's answer on
+ * every transition and `enablement.ts` pushes the kill switch's; the disposition is
+ * derived here from the two, so there is exactly one place that says what a device may
+ * send and no caller combines the inputs itself.
  *
- * True on `Custodial` and `Enhanced`. False on `Anon` and `Unresolved` — an incognito
- * device emits zero telemetry of any kind (NFR-P1), and a Crashlytics non-fatal or
- * breadcrumb is a transmission with a device-stable installation id on it.
+ * Three states, not two, because "may not transmit" means two different things and the
+ * sink must treat them differently (the second review's HIGH 2):
+ *
+ *  - `unresolved` — the device has not yet said which kind it is. An error raised now
+ *    may belong to a custodial user whose start-up failure ought to reach Crashlytics, so
+ *    the sink *holds* it, bounded, until the answer arrives.
+ *  - `denied` — the device is one that must emit zero: `Anon`, or a self-custodial
+ *    device under the kill switch. What is raised now is *dropped*, and so is anything
+ *    still held: a later switch to Enhanced must not carry incognito-era errors out.
+ *  - `permitted` — `Custodial`, or `Enhanced` with the kill switch disengaged.
+ *
+ * The default is `unresolved`, so a failure to resolve a mode leaves every diagnostic
+ * silent, like everything else.
  */
 
-let transmissible = false
+export const DiagnosticsDisposition = {
+  Unresolved: "unresolved",
+  Denied: "denied",
+  Permitted: "permitted",
+} as const
 
-type Listener = (transmissible: boolean) => void
+export type DiagnosticsDisposition =
+  (typeof DiagnosticsDisposition)[keyof typeof DiagnosticsDisposition]
+
+/**
+ * What the resolved mode says on its own. `SelfCustodial` is `Enhanced`: permitted by
+ * mode, but subject to the switch below. `Custodial` is not — the switch is NFR-O4's
+ * rollback of *self-custodial* collection, and custodial crash reporting predates it.
+ */
+export const DiagnosticsModeInput = {
+  Unresolved: "unresolved",
+  Denied: "denied",
+  Custodial: "custodial",
+  SelfCustodial: "self-custodial",
+} as const
+
+export type DiagnosticsModeInput =
+  (typeof DiagnosticsModeInput)[keyof typeof DiagnosticsModeInput]
+
+let modeInput: DiagnosticsModeInput = DiagnosticsModeInput.Unresolved
+/** AD-28: engaged means every self-custodial transmission stops, diagnostics included. */
+let selfCustodialShutdown = false
+
+let disposition: DiagnosticsDisposition = DiagnosticsDisposition.Unresolved
+
+type Listener = (disposition: DiagnosticsDisposition) => void
 const listeners = new Set<Listener>()
 
 /** The sink subscribes so it can release what it held once a device may report, or drop
  *  it once the device turns out to be one that may not. */
-export const onTransmissibilityChanged = (listener: Listener): (() => void) => {
+export const onDiagnosticsDispositionChanged = (listener: Listener): (() => void) => {
   listeners.add(listener)
   return () => {
     listeners.delete(listener)
   }
 }
 
-/**
- * A withdrawal always notifies, even when the value was already false: the transition
- * `Unresolved → Anon` changes nothing about what may leave, but it does settle that what
- * was held while unresolved belongs to an incognito device, and the sink must drop it
- * rather than keep it for a grant that may come after a later switch to Enhanced.
- */
-export const setDiagnosticsTransmissible = (next: boolean): void => {
-  const changed = next !== transmissible
-  transmissible = next
-  if (!changed && next) return
+const derive = (): DiagnosticsDisposition => {
+  switch (modeInput) {
+    case DiagnosticsModeInput.Unresolved:
+      return DiagnosticsDisposition.Unresolved
+    case DiagnosticsModeInput.Denied:
+      return DiagnosticsDisposition.Denied
+    case DiagnosticsModeInput.Custodial:
+      return DiagnosticsDisposition.Permitted
+    case DiagnosticsModeInput.SelfCustodial:
+      return selfCustodialShutdown
+        ? DiagnosticsDisposition.Denied
+        : DiagnosticsDisposition.Permitted
+  }
+}
+
+const recompute = (): void => {
+  const next = derive()
+  if (next === disposition) return
+  disposition = next
   for (const listener of listeners) listener(next)
 }
 
-export const mayTransmitDiagnostics = (): boolean => transmissible
+export const setDiagnosticsModeInput = (input: DiagnosticsModeInput): void => {
+  modeInput = input
+  recompute()
+}
+
+export const setSelfCustodialDiagnosticsShutdown = (engaged: boolean): void => {
+  selfCustodialShutdown = engaged
+  recompute()
+}
+
+export const getDiagnosticsDisposition = (): DiagnosticsDisposition => disposition
+
+export const mayTransmitDiagnostics = (): boolean =>
+  disposition === DiagnosticsDisposition.Permitted
+
+/** Back to the start-up state. Listeners are module-load registrations — the sink's,
+ *  chiefly — and survive, so a test that resets and then transitions still exercises
+ *  the release and the drop. */
+export const resetTransmissibilityForTesting = (): void => {
+  modeInput = DiagnosticsModeInput.Unresolved
+  selfCustodialShutdown = false
+  disposition = DiagnosticsDisposition.Unresolved
+}

@@ -104,15 +104,20 @@ export const SelfCustodialTelemetryMount: React.FC = () => {
     [updateState],
   )
 
-  /** FR-25: the TTL applies to every account's queue, active or not. `pending()` sweeps. */
-  const knownAccountIds = selfCustodialEntries.map((entry) => entry.id).join(",")
+  /** FR-25: the TTL applies to every account's queue, active or not. `pending()` sweeps.
+   *  The active account's own store sweeps on every drain, so it is left out here; the
+   *  store serialises by directory anyway, so even an overlap could not race it. */
+  const inactiveAccountIds = selfCustodialEntries
+    .map((entry) => entry.id)
+    .filter((id) => id !== accountId)
+    .join(",")
   useEffect(() => {
-    for (const id of knownAccountIds.split(",").filter(Boolean)) {
+    for (const id of inactiveAccountIds.split(",").filter(Boolean)) {
       createOutboxStore(telemetryOutboxDirFor(id, network))
         .pending()
         .catch(() => undefined)
     }
-  }, [knownAccountIds, network])
+  }, [inactiveAccountIds, network])
 
   useEffect(() => {
     if (!accountId) {

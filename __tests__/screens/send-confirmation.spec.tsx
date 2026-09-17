@@ -788,9 +788,9 @@ describe("SendBitcoinConfirmationScreen — USD remainder sweep warning", () => 
       </ContextForScreen>,
     )
 
-    await flushEffects()
-
-    expect(screen.getByText(usdRemainderSweepMatcher)).toBeTruthy()
+    // The warning arrives after the fee quote's effect chain settles, which under a
+    // loaded worker can take more than the one tick `flushEffects` gives it.
+    expect(await screen.findByText(usdRemainderSweepMatcher)).toBeTruthy()
   })
 
   it("does NOT render the warning when there is no amountAdjustment in the fee quote", async () => {

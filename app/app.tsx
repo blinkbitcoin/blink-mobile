@@ -15,7 +15,6 @@ import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-c
 import "react-native-url-polyfill/auto"
 
 import "@react-native-firebase/app"
-import "@react-native-firebase/crashlytics"
 
 import { GaloyThemeProvider } from "./components/galoy-theme-provider"
 import { GaloyToast } from "./components/galoy-toast"

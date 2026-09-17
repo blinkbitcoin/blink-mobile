@@ -23,7 +23,7 @@ const loadFreshNotificationsModule = () => {
     // setup does for the shared graph.
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const gate: typeof import("@app/telemetry/transmissibility") = require("@app/telemetry/transmissibility")
-    gate.setDiagnosticsTransmissible(true)
+    gate.setDiagnosticsModeInput(gate.DiagnosticsModeInput.Custodial)
   })
   return mod!
 }

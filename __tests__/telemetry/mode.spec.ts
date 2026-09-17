@@ -7,8 +7,13 @@ import analytics from "@react-native-firebase/analytics"
 import { TelemetryEvent } from "@app/telemetry/contract"
 import {
   getDiagnosticCounters,
+  mayTransmitDiagnostics,
   resetDiagnosticsForTesting,
 } from "@app/telemetry/diagnostics"
+import {
+  DiagnosticsDisposition,
+  getDiagnosticsDisposition,
+} from "@app/telemetry/transmissibility"
 import {
   applyServerKillSwitch,
   isTelemetryEnabled,
@@ -248,6 +253,49 @@ describe("the collection gate", () => {
 
       expect(getDiagnosticCounters().suppressedEvents).toBe(1)
     })
+
+    it.each([
+      { mode: TelemetryMode.Custodial, disposition: DiagnosticsDisposition.Permitted },
+      { mode: TelemetryMode.Enhanced, disposition: DiagnosticsDisposition.Permitted },
+      { mode: TelemetryMode.Anon, disposition: DiagnosticsDisposition.Denied },
+      { mode: TelemetryMode.Unresolved, disposition: DiagnosticsDisposition.Unresolved },
+    ])(
+      "resolving $mode sets the diagnostic disposition to $disposition (AD-13)",
+      async ({ mode, disposition }) => {
+        // Anon is *denied*, not merely unresolved: the sink holds under one and drops under
+        // the other, and an incognito device's errors must never be held for a later grant.
+        await resolveTelemetryMode(TelemetryMode.Enhanced)
+        await resolveTelemetryMode(mode)
+
+        expect(getDiagnosticsDisposition()).toBe(disposition)
+      },
+    )
+
+    it("silences an Enhanced device's diagnostics when the switch engages (NFR-O4)", async () => {
+      // "Self-custodial telemetry collection stops" is every transmission a self-custodial
+      // device makes: the boundary's events, the drain, and Crashlytics too.
+      await resolveTelemetryMode(TelemetryMode.Enhanced)
+      expect(mayTransmitDiagnostics()).toBe(true)
+
+      applyServerKillSwitch(false)
+
+      expect(mayTransmitDiagnostics()).toBe(false)
+      expect(isDrainPermitted()).toBe(false)
+    })
+
+    it("silences them from launch when the switch is restored from persistence", async () => {
+      restoreKillSwitch(true)
+      await resolveTelemetryMode(TelemetryMode.Enhanced)
+
+      expect(mayTransmitDiagnostics()).toBe(false)
+    })
+
+    it("leaves a custodial device's diagnostics alone — the switch is self-custodial rollback", async () => {
+      applyServerKillSwitch(false)
+      await resolveTelemetryMode(TelemetryMode.Custodial)
+
+      expect(mayTransmitDiagnostics()).toBe(true)
+    })
   })
 
   describe("AD-16 — no user-scoped identity survives into a self-custodial session", () => {
@@ -331,42 +379,61 @@ describe("the collection gate", () => {
     })
   })
 
-  describe("FR-4 / FR-5 — discard, never flush then discard", () => {
-    it("discards before it disables collection", async () => {
-      const order: string[] = []
-      onTelemetrySuppressed(() => {
-        order.push("discard")
+  describe("FR-4 / FR-5 — closed before the discard, never reopened over one", () => {
+    /** A discard held open by the test: the unlink is a disk operation and can be slow. */
+    const suspendedDiscard = () => {
+      let release: () => void = () => undefined
+      const finished = new Promise<void>((resolve) => {
+        release = resolve
       })
-      setCollectionEnabled.mockImplementation(() => {
-        order.push("disable")
-        return Promise.resolve()
-      })
+      onTelemetrySuppressed(() => finished)
+      return { release }
+    }
 
-      await resolveTelemetryMode(TelemetryMode.Enhanced)
-      order.length = 0
+    it("closes collection and identity the instant the mode leaves Custodial, while the discard is still running", async () => {
+      await resolveTelemetryMode(TelemetryMode.Custodial)
+      const discard = suspendedDiscard()
+      setCollectionEnabled.mockClear()
+      setUserId.mockClear()
 
-      await resolveTelemetryMode(TelemetryMode.Anon)
+      const transition = resolveTelemetryMode(TelemetryMode.Anon)
 
-      expect(order).toEqual(["discard", "disable"])
+      // Synchronously — nothing awaited yet, and the discard has not finished.
+      expect(setCollectionEnabled).toHaveBeenLastCalledWith(false)
+      expect(setUserId).toHaveBeenCalledWith(null)
+      expect(isEventPermitted(TelemetryEvent.PaymentSettled)).toBe(false)
+
+      discard.release()
+      await transition
     })
 
-    it("waits for an async discard before disabling", async () => {
-      const order: string[] = []
-      onTelemetrySuppressed(async () => {
-        await Promise.resolve()
-        order.push("discard")
-      })
-      setCollectionEnabled.mockImplementation(() => {
-        order.push("disable")
-        return Promise.resolve()
-      })
+    it("does not reopen collection until a pending discard has finished", async () => {
+      await resolveTelemetryMode(TelemetryMode.Custodial)
+      const discard = suspendedDiscard()
+      resolveTelemetryMode(TelemetryMode.Anon)
+      setCollectionEnabled.mockClear()
 
+      const reopened = resolveTelemetryMode(TelemetryMode.Custodial)
+      await Promise.resolve()
+      await Promise.resolve()
+
+      expect(setCollectionEnabled).not.toHaveBeenCalledWith(true)
+
+      discard.release()
+      await reopened
+
+      expect(setCollectionEnabled).toHaveBeenLastCalledWith(true)
+    })
+
+    it("never reopens for a Custodial that was overtaken by Anon before its turn", async () => {
       await resolveTelemetryMode(TelemetryMode.Enhanced)
-      order.length = 0
+      setCollectionEnabled.mockClear()
 
+      resolveTelemetryMode(TelemetryMode.Custodial)
       await resolveTelemetryMode(TelemetryMode.Anon)
 
-      expect(order).toEqual(["discard", "disable"])
+      expect(setCollectionEnabled).not.toHaveBeenCalledWith(true)
+      expect(setCollectionEnabled).toHaveBeenLastCalledWith(false)
     })
 
     it("does not notify listeners on the way into a collecting mode", async () => {

@@ -20,8 +20,8 @@ import { useBetaQuery, useDebugScreenQuery, useLevelQuery } from "@app/graphql/g
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useAppConfig } from "@app/hooks/use-app-config"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { crashForTesting } from "@app/utils/error-reporting"
 import Clipboard from "@react-native-clipboard/clipboard"
-import crashlytics from "@react-native-firebase/crashlytics"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { Button, Text, makeStyles } from "@rn-vui/themed"
@@ -259,10 +259,7 @@ export const DeveloperScreen: React.FC = () => {
               <Button
                 title="Crash test"
                 containerStyle={styles.button}
-                onPress={() => {
-                  crashlytics().log("Testing crash")
-                  crashlytics().crash()
-                }}
+                onPress={crashForTesting}
               />
             </>
           )}

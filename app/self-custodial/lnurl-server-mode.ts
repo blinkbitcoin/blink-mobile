@@ -57,6 +57,13 @@ export const setLnurlServerMode = async ({
   if (!response.ok) {
     throw new Error(`LNURL server refused mode '${mode}' with ${response.status}`)
   }
+
+  /** The switch rides every response the wallet already parses (AD-28), this one too. */
+  try {
+    applyLnurlTelemetryFlag((await response.json()) as LnurlServerModeBody)
+  } catch {
+    /** The mode landed; a body this build cannot read changes nothing. */
+  }
 }
 
 /**
