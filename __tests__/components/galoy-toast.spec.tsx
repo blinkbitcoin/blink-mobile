@@ -49,13 +49,17 @@ jest.mock("@app/components/atomic/galoy-icon", () => {
 
 const MESSAGE = "Address copied"
 
-const renderToast = (type: string, mode: "light" | "dark" = "dark") => {
+const renderToast = (
+  type: string,
+  mode: "light" | "dark" = "dark",
+  params: { text1?: string; text2?: string } = { text1: "Title", text2: MESSAGE },
+) => {
   render(<GaloyToast />)
   return render(
     // The production theme, so its Text config (font family, type scale weights)
     // applies exactly as it does in the app.
     <ThemeProvider theme={createTheme({ ...theme, mode })}>
-      {mockToastProps.config?.[type]({ text1: "Title", text2: MESSAGE })}
+      {mockToastProps.config?.[type](params)}
     </ThemeProvider>,
   )
 }
@@ -112,6 +116,25 @@ describe("GaloyToast", () => {
         expect(getByTestId(`toast-${type}`)).toBeTruthy()
         expect(getByText(MESSAGE)).toBeTruthy()
         expect(queryByText("Title")).toBeNull()
+      })
+
+      it("announces the title and message as one alert", () => {
+        const { getByTestId } = renderToast(type)
+        const row = getByTestId(`toast-${type}`)
+
+        expect(row.props.accessible).toBe(true)
+        expect(row.props.accessibilityRole).toBe("alert")
+        expect(row.props.accessibilityLabel).toBe(`Title. ${MESSAGE}`)
+      })
+
+      it("shows the title when the message is empty", () => {
+        const { getByTestId, getByText } = renderToast(type, "dark", {
+          text1: "Title",
+          text2: "",
+        })
+
+        expect(getByText("Title")).toBeTruthy()
+        expect(getByTestId(`toast-${type}`).props.accessibilityLabel).toBe("Title")
       })
 
       it("shows the whole message without a line limit", () => {
