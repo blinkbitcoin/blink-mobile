@@ -10,6 +10,9 @@ import { join, relative } from "path"
 const REPO_ROOT = join(__dirname, "..", "..")
 const APP_DIR = join(REPO_ROOT, "app")
 const SEMIBOLD = /fontWeight:[^,\n]*["']600["']|fontWeight:\s*600\b|SemiBold/
+const THEMED_TEXT_IMPORT =
+  /import\s*(?:type\s*)?\{[^}]*\bText\b[^}]*\}\s*from\s*["']@rn-vui\/themed["']/
+const BOLD_WEIGHT = /fontWeight:[^,\n]*(["'](bold|[7-9]00)["']|\b[7-9]00\b)/
 
 const sourceFiles = (dir: string): string[] =>
   readdirSync(dir).flatMap((name) => {
@@ -29,5 +32,23 @@ describe("font weights", () => {
     )
 
     expect(offenders).toEqual([])
+  })
+
+  /**
+   * The themed `Text` names a Source Sans Pro face. A weight of 700 or more on top of it
+   * makes Android look for `<face>_bold.ttf`, which does not exist, and draw Roboto Bold;
+   * bold text uses `fontFamily: fonts.bold` instead. The rules below predate that and are
+   * migrated over time, so this only fails when a new one is added. Lower the count when
+   * you migrate one.
+   */
+  it("adds no bold weight to text styled by the themed Text", () => {
+    const KNOWN_BOLD_WEIGHTS = 94
+
+    const boldWeights = sourceFiles(APP_DIR)
+      .map((file) => readFileSync(file, "utf8"))
+      .filter((source) => THEMED_TEXT_IMPORT.test(source))
+      .flatMap((source) => source.split("\n").filter((line) => BOLD_WEIGHT.test(line)))
+
+    expect(boldWeights.length).toBeLessThanOrEqual(KNOWN_BOLD_WEIGHTS)
   })
 })

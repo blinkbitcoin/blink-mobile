@@ -3,6 +3,7 @@ import { Linking, Pressable, Share, View } from "react-native"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { useClipboard } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { fonts } from "@app/rne-theme/fonts"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 const addressTypes = {
@@ -145,7 +146,7 @@ const useStyles = makeStyles(({ colors }) => ({
     textDecorationLine: "underline",
     fontSize: 14,
     lineHeight: 18,
-    fontWeight: "700",
+    fontFamily: fonts.bold,
   },
   iconsContainer: {
     display: "flex",

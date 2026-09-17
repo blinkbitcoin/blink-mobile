@@ -4,6 +4,7 @@ import { ActivityIndicator, View } from "react-native"
 import { makeStyles, Text } from "@rn-vui/themed"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { fonts } from "@app/rne-theme/fonts"
 
 type Props = {
   feeText: string
@@ -47,7 +48,7 @@ const useStyles = makeStyles(({ colors }) => ({
   label: {
     color: colors.grey2,
     fontSize: 14,
-    fontWeight: "700",
+    fontFamily: fonts.bold,
   },
   value: {
     color: colors.grey1,
