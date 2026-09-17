@@ -2,10 +2,12 @@ import { WalletCurrency } from "@app/graphql/generated"
 import { PaymentType } from "@blinkbitcoin/blink-client"
 
 import { wrapDestination } from "@app/self-custodial/payment-details/wrap-destination"
+import { PaymentType as SelfCustodialPaymentType } from "@app/types/transaction"
 
 const mockCreateLightning = jest.fn().mockReturnValue({ paymentType: "lightning" })
 const mockCreateOnchain = jest.fn().mockReturnValue({ paymentType: "onchain" })
 const mockCreateLnurl = jest.fn().mockReturnValue({ paymentType: "lnurl" })
+const mockCreateSpark = jest.fn().mockReturnValue({ paymentType: "spark" })
 
 jest.mock("@app/self-custodial/payment-details/lightning", () => ({
   createSelfCustodialLightningPaymentDetails: (...args: unknown[]) =>
@@ -20,6 +22,11 @@ jest.mock("@app/self-custodial/payment-details/onchain", () => ({
 jest.mock("@app/self-custodial/payment-details/lnurl", () => ({
   createSelfCustodialLnurlPaymentDetails: (...args: unknown[]) =>
     mockCreateLnurl(...args),
+}))
+
+jest.mock("@app/self-custodial/payment-details/spark", () => ({
+  createSelfCustodialSparkPaymentDetails: (...args: unknown[]) =>
+    mockCreateSpark(...args),
 }))
 
 const mockSdk = {} as never
@@ -117,10 +124,24 @@ describe("wrapDestination", () => {
     )
   })
 
+  it("passes the invoice's memo on as the destination-specified memo", () => {
+    const result = createValidResult(PaymentType.Lightning, {
+      paymentRequest: "lnbc1...",
+      amount: 1000,
+      memo: "synthetic invoice memo",
+    })
+
+    const wrapped = wrapDestination(result, mockSdk)
+    callCreatePaymentDetail(wrapped)
+
+    expect(mockCreateLightning).toHaveBeenCalledWith(
+      expect.objectContaining({ destinationSpecifiedMemo: "synthetic invoice memo" }),
+    )
+  })
+
   it("wraps Lightning with no amount as hasAmount=false", () => {
     const result = createValidResult(PaymentType.Lightning, {
       paymentRequest: "lnbc1...",
-      amount: undefined,
     })
 
     const wrapped = wrapDestination(result, mockSdk)
@@ -134,42 +155,37 @@ describe("wrapDestination", () => {
     )
   })
 
-  it("keeps a millisatoshi remainder as the invoice's fixed amount, unrounded", () => {
-    const result = createValidResult(PaymentType.Lightning, {
-      paymentRequest: "lnbc12676440p1examplefixtureonly",
-      amount: 1267.644,
-    })
+  const FIXED_INVOICE_AMOUNTS = [
+    { invoiceSats: 1267.644, debitedSats: 1268 },
+    { invoiceSats: 1.499, debitedSats: 2 },
+    { invoiceSats: 1.001, debitedSats: 2 },
+    { invoiceSats: 0.999, debitedSats: 1 },
+    { invoiceSats: 0.5, debitedSats: 1 },
+    { invoiceSats: 0.001, debitedSats: 1 },
+    { invoiceSats: 1268, debitedSats: 1268 },
+  ]
 
-    const wrapped = wrapDestination(result, mockSdk)
-    callCreatePaymentDetail(wrapped)
+  FIXED_INVOICE_AMOUNTS.forEach(({ invoiceSats, debitedSats }) => {
+    it(`rounds a fixed invoice of ${invoiceSats} sats up to the ${debitedSats} sats the SDK debits`, () => {
+      const result = createValidResult(PaymentType.Lightning, {
+        paymentRequest: "lnbc1examplefixtureonly",
+        amount: invoiceSats,
+      })
 
-    expect(mockCreateLightning).toHaveBeenCalledWith(
-      expect.objectContaining({
-        paymentRequest: "lnbc12676440p1examplefixtureonly",
-        hasAmount: true,
-        unitOfAccountAmount: expect.objectContaining({
-          amount: 1267.644,
-          currency: WalletCurrency.Btc,
+      const wrapped = wrapDestination(result, mockSdk)
+      callCreatePaymentDetail(wrapped)
+
+      expect(mockCreateLightning).toHaveBeenCalledWith(
+        expect.objectContaining({
+          paymentRequest: "lnbc1examplefixtureonly",
+          hasAmount: true,
+          unitOfAccountAmount: expect.objectContaining({
+            amount: debitedSats,
+            currency: WalletCurrency.Btc,
+          }),
         }),
-      }),
-    )
-  })
-
-  it("treats an invoice worth less than one satoshi as fixed, not amountless", () => {
-    const result = createValidResult(PaymentType.Lightning, {
-      paymentRequest: "lnbc10p1examplefixtureonly",
-      amount: 0.001,
+      )
     })
-
-    const wrapped = wrapDestination(result, mockSdk)
-    callCreatePaymentDetail(wrapped)
-
-    expect(mockCreateLightning).toHaveBeenCalledWith(
-      expect.objectContaining({
-        hasAmount: true,
-        unitOfAccountAmount: expect.objectContaining({ amount: 0.001 }),
-      }),
-    )
   })
 
   it("wraps Lnurl destination through the self-custodial lnurl detail (not the lightning detail)", () => {
@@ -239,6 +255,24 @@ describe("wrapDestination", () => {
     expect(mockCreateLnurl).toHaveBeenCalledWith(
       expect.objectContaining({ isMerchant: true }),
     )
+  })
+
+  it("wraps a Spark destination with no amount of its own", () => {
+    const result = createValidResult(SelfCustodialPaymentType.Spark as never, {
+      address: "sp1qabcdefghijklmn",
+    })
+
+    const wrapped = wrapDestination(result, mockSdk)
+    callCreatePaymentDetail(wrapped)
+
+    expect(mockCreateSpark).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sdk: mockSdk,
+        address: "sp1qabcdefghijklmn",
+        unitOfAccountAmount: expect.objectContaining({ amount: 0 }),
+      }),
+    )
+    expect(mockCreateLightning).not.toHaveBeenCalled()
   })
 
   it("wraps Onchain destination", () => {

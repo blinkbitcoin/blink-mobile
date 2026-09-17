@@ -1,52 +1,53 @@
-/* eslint-disable camelcase */
+import { renderHook } from "@testing-library/react-hooks"
 import { encode, sign } from "bolt11"
 import { Network as SparkNetwork } from "@breeztech/breez-sdk-spark-react-native"
 
 import { Network, PaymentSendResult, WalletCurrency } from "@app/graphql/generated"
+import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { isSendDestination } from "@app/screens/send-bitcoin-screen/payment-destination/index.types"
 import { resolveDestination } from "@app/screens/send-bitcoin-screen/payment-destination/resolve-destination"
 import { type ConvertMoneyAmount } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
 import { SelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
-
-jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
-  AmountAdjustmentReason: {
-    FlooredToMinLimit: "FlooredToMinLimit",
-    IncreasedToAvoidDust: "IncreasedToAvoidDust",
-  },
-  BitcoinNetwork: { Bitcoin: 0, Regtest: 4 },
-  ConversionType: {
-    FromBitcoin: jest.fn().mockImplementation(() => ({ tag: "FromBitcoin" })),
-    ToBitcoin: jest
-      .fn()
-      .mockImplementation((inner: unknown) => ({ tag: "ToBitcoin", inner })),
-  },
-  InputType_Tags: { SparkAddress: "SparkAddress" },
-  Network: { Mainnet: 0, Regtest: 1 },
-  OnchainConfirmationSpeed: { Fast: 0, Medium: 1, Slow: 2 },
-  PaymentRequest: {
-    Input: jest.fn().mockImplementation((inner: unknown) => ({ tag: "Input", inner })),
-  },
-  PrepareSendPaymentRequest: { create: (p: Record<string, unknown>) => p },
-  SdkError: { instanceOf: () => false },
-  SdkError_Tags: {},
-  SendPaymentMethod_Tags: {
-    BitcoinAddress: "BitcoinAddress",
-    Bolt11Invoice: "Bolt11Invoice",
-  },
-  SendPaymentOptions: {
-    BitcoinAddress: jest
-      .fn()
-      .mockImplementation((inner: unknown) => ({ tag: "BitcoinAddress", inner })),
-    Bolt11Invoice: jest
-      .fn()
-      .mockImplementation((inner: unknown) => ({ tag: "Bolt11Invoice", inner })),
-  },
-  SendPaymentRequest: { create: (p: Record<string, unknown>) => p },
-}))
+import {
+  DisplayCurrency,
+  type MoneyAmount,
+  type WalletOrDisplayCurrency,
+} from "@app/types/amounts"
 
 jest.mock("@app/self-custodial/config", () => ({
   ...jest.requireActual("@app/self-custodial/config"),
   requireSparkTokenIdentifier: () => "usdb-token-id",
+}))
+
+jest.mock("@app/graphql/generated", () => ({
+  ...jest.requireActual("@app/graphql/generated"),
+  useCurrencyListQuery: () => ({
+    data: { currencyList: [{ id: "USD", symbol: "$", fractionDigits: 2 }] },
+  }),
+}))
+
+jest.mock("@app/graphql/is-authed-context", () => ({
+  ...jest.requireActual("@app/graphql/is-authed-context"),
+  useIsAuthed: () => true,
+}))
+
+jest.mock("@app/hooks/use-price-conversion", () => ({
+  ...jest.requireActual("@app/hooks/use-price-conversion"),
+  usePriceConversion: () => ({
+    displayCurrency: "USD",
+    toDisplayMoneyAmount: (amount: number) => ({
+      amount,
+      currency: DisplayCurrency,
+      currencyCode: "USD",
+    }),
+  }),
+}))
+
+jest.mock("@app/i18n/i18n-react", () => ({
+  ...jest.requireActual("@app/i18n/i18n-react"),
+  useI18nContext: () => ({
+    LL: { common: { currencySyncIssue: () => "Currency sync issue" } },
+  }),
 }))
 
 const mockRecordError = jest.fn()
@@ -66,7 +67,7 @@ const sdk = {
 
 const SYNTHETIC_NODE_PRIVATE_KEY = "11".repeat(32)
 const SYNTHETIC_PAYMENT_HASH = "ab".repeat(32)
-const CENTS_PER_SAT = 0.1
+const CENTS_PER_SAT = 1
 const LIGHTNING_FEE_SATS = 7
 
 const fixedInvoice = (millisatoshis: number): string => {
@@ -115,6 +116,11 @@ const paymentDetailFor = async (invoice: string, currency: WalletCurrency) => {
   })
 }
 
+const shownOnScreen = (moneyAmount: MoneyAmount<WalletOrDisplayCurrency>): string => {
+  const { result } = renderHook(() => useDisplayCurrency())
+  return result.current.formatMoneyAmount({ moneyAmount })
+}
+
 const lightningQuote = {
   paymentMethod: {
     tag: "Bolt11Invoice",
@@ -132,13 +138,37 @@ const preparedWithoutAmount = (invoice: string) => ({
   conversionOptions: undefined,
 })
 
+const sdkRefusal = (reason: string) =>
+  Object.assign(new Error(reason), { tag: "InvalidInput", inner: [reason] })
+
 const FIXED_AMOUNTS = [
-  { millisatoshis: 1_267_644, sats: 1267.644, shape: "a millisatoshi remainder" },
-  { millisatoshis: 1_001, sats: 1.001, shape: "one millisatoshi over a satoshi" },
-  { millisatoshis: 999, sats: 0.999, shape: "one millisatoshi under a satoshi" },
-  { millisatoshis: 500, sats: 0.5, shape: "half a satoshi" },
-  { millisatoshis: 1, sats: 0.001, shape: "a single millisatoshi" },
-  { millisatoshis: 1_268_000, sats: 1268, shape: "whole satoshis" },
+  {
+    millisatoshis: 1_267_644,
+    debitedSats: 1268,
+    shown: "1,268 SAT",
+    shape: "a remainder",
+  },
+  {
+    millisatoshis: 1_499,
+    debitedSats: 2,
+    shown: "2 SAT",
+    shape: "under half a satoshi over",
+  },
+  {
+    millisatoshis: 1_001,
+    debitedSats: 2,
+    shown: "2 SAT",
+    shape: "one millisatoshi over",
+  },
+  { millisatoshis: 999, debitedSats: 1, shown: "1 SAT", shape: "one millisatoshi under" },
+  { millisatoshis: 500, debitedSats: 1, shown: "1 SAT", shape: "half a satoshi" },
+  { millisatoshis: 1, debitedSats: 1, shown: "1 SAT", shape: "a single millisatoshi" },
+  {
+    millisatoshis: 1_268_000,
+    debitedSats: 1268,
+    shown: "1,268 SAT",
+    shape: "whole sats",
+  },
 ]
 
 describe("paying a fixed-amount BOLT11 invoice from a self-custodial wallet", () => {
@@ -148,17 +178,26 @@ describe("paying a fixed-amount BOLT11 invoice from a self-custodial wallet", ()
     mockSendPayment.mockResolvedValue(undefined)
   })
 
-  FIXED_AMOUNTS.forEach(({ millisatoshis, sats, shape }) => {
+  FIXED_AMOUNTS.forEach(({ millisatoshis, debitedSats, shown, shape }) => {
     describe(`an invoice for ${millisatoshis} msat (${shape})`, () => {
-      it("resolves to a fixed amount of exactly the invoice's sats, with no rounding", async () => {
+      it("resolves to the whole sats the SDK debits, rounded up and not editable", async () => {
         const invoice = fixedInvoice(millisatoshis)
 
         const detail = await paymentDetailFor(invoice, WalletCurrency.Btc)
 
         expect(detail.destination).toBe(invoice)
         expect(detail.canSetAmount).toBe(false)
-        expect(detail.destinationSpecifiedAmount?.amount).toBe(sats)
-        expect(detail.settlementAmount.amount).toBe(sats)
+        expect(detail.destinationSpecifiedAmount?.amount).toBe(debitedSats)
+        expect(detail.settlementAmount.amount).toBe(debitedSats)
+      })
+
+      it("shows on screen exactly the sats the SDK debits", async () => {
+        const detail = await paymentDetailFor(
+          fixedInvoice(millisatoshis),
+          WalletCurrency.Btc,
+        )
+
+        expect(shownOnScreen(detail.settlementAmount)).toBe(shown)
       })
 
       it("asks the SDK to quote the invoice itself, with no amount of its own", async () => {
@@ -199,9 +238,8 @@ describe("paying a fixed-amount BOLT11 invoice from a self-custodial wallet", ()
   })
 
   describe("an invoice with a millisatoshi remainder paid from a USD wallet", () => {
-    const invoice = fixedInvoice(1_267_644)
-
     it("converts to bitcoin but still leaves the amount to the invoice", async () => {
+      const invoice = fixedInvoice(1_267_644)
       const detail = await paymentDetailFor(invoice, WalletCurrency.Usd)
       if (!detail.canGetFee) throw new Error("expected a fee quote to be available")
 
@@ -220,29 +258,29 @@ describe("paying a fixed-amount BOLT11 invoice from a self-custodial wallet", ()
       })
     })
 
-    it("settles in whole cents while the invoice keeps its millisatoshis", async () => {
-      const detail = await paymentDetailFor(invoice, WalletCurrency.Usd)
+    it("settles in cents from the rounded-up sats, not from the raw millisatoshis", async () => {
+      const detail = await paymentDetailFor(fixedInvoice(1_499), WalletCurrency.Usd)
 
+      expect(detail.destinationSpecifiedAmount?.amount).toBe(2)
       expect(detail.settlementAmount).toEqual({
-        amount: 127,
+        amount: 2,
         currency: WalletCurrency.Usd,
         currencyCode: WalletCurrency.Usd,
       })
-      expect(detail.destinationSpecifiedAmount?.amount).toBe(1267.644)
     })
   })
 
-  describe("when the SDK refuses to quote an invoice with a millisatoshi remainder", () => {
-    const invoice = fixedInvoice(1_267_644)
+  describe("when the SDK refuses the invoice's amount", () => {
+    const refusal = sdkRefusal(
+      "Requested amount (1269 sats) does not match invoice amount (1268 sats)",
+    )
 
     beforeEach(() => {
-      mockPrepareSendPayment.mockRejectedValue(
-        new Error("synthetic refusal: prepared amount is below the invoice amount"),
-      )
+      mockPrepareSendPayment.mockRejectedValue(refusal)
     })
 
-    it("gives the confirmation screen a classified error instead of a fee", async () => {
-      const detail = await paymentDetailFor(invoice, WalletCurrency.Btc)
+    it("gives the confirmation screen the invalid-input code instead of a fee", async () => {
+      const detail = await paymentDetailFor(fixedInvoice(1_267_644), WalletCurrency.Btc)
       if (!detail.canGetFee) throw new Error("expected a fee quote to be available")
 
       const result = await detail.getFee({} as never)
@@ -251,31 +289,28 @@ describe("paying a fixed-amount BOLT11 invoice from a self-custodial wallet", ()
       expect(result.errors).toEqual([
         {
           __typename: "GraphQLApplicationError",
-          message: SelfCustodialErrorCode.Generic,
+          message: SelfCustodialErrorCode.InvalidInput,
         },
       ])
     })
 
     it("records the refusal as a non-fatal so a regression shows up in crash reports", async () => {
-      const detail = await paymentDetailFor(invoice, WalletCurrency.Btc)
+      const detail = await paymentDetailFor(fixedInvoice(1_267_644), WalletCurrency.Btc)
       if (!detail.canGetFee) throw new Error("expected a fee quote to be available")
 
       await detail.getFee({} as never)
 
-      expect(mockRecordError).toHaveBeenCalledWith(
-        expect.objectContaining({
-          message: "synthetic refusal: prepared amount is below the invoice amount",
-        }),
-      )
+      expect(mockRecordError).toHaveBeenCalledWith(refusal)
     })
 
     it("never reaches the send", async () => {
-      const detail = await paymentDetailFor(invoice, WalletCurrency.Btc)
+      const detail = await paymentDetailFor(fixedInvoice(1_267_644), WalletCurrency.Btc)
       if (!detail.canSendPayment) throw new Error("expected the payment to be sendable")
 
       const result = await detail.sendPaymentMutation({} as never)
 
       expect(result.status).toBe(PaymentSendResult.Failure)
+      expect(result.errors?.[0]?.message).toBe(SelfCustodialErrorCode.InvalidInput)
       expect(mockSendPayment).not.toHaveBeenCalled()
     })
   })
