@@ -1,4 +1,5 @@
 import {
+  CARD_INVESTMENT_LIFETIME_MS,
   getCardInvestment,
   withCardInvestment,
   withoutCardInvestment,
@@ -8,12 +9,19 @@ import { defaultPersistentState } from "@app/store/persistent-state/state-migrat
 const ACCOUNT_ID = "account-1"
 const OTHER_ACCOUNT_ID = "account-2"
 
-const INVESTMENT = { selectedAmountUsd: 25000, settlementSats: 31_704_000 }
-const OTHER_INVESTMENT = { selectedAmountUsd: 1000 }
+const NOW = 1_757_800_000_000
+const AN_HOUR_MS = 60 * 60 * 1000
+
+const INVESTMENT = {
+  selectedAmountUsd: 25000,
+  settlementSats: 31_704_000,
+  signedAt: NOW - AN_HOUR_MS,
+}
+const OTHER_INVESTMENT = { selectedAmountUsd: 1000, signedAt: NOW - AN_HOUR_MS }
 
 describe("getCardInvestment", () => {
   it("is null when the account never signed for one", () => {
-    expect(getCardInvestment(defaultPersistentState, ACCOUNT_ID)).toBeNull()
+    expect(getCardInvestment(defaultPersistentState, ACCOUNT_ID, NOW)).toBeNull()
   })
 
   it("reads the entry stored for the given account", () => {
@@ -25,7 +33,7 @@ describe("getCardInvestment", () => {
       },
     }
 
-    expect(getCardInvestment(state, ACCOUNT_ID)).toEqual(INVESTMENT)
+    expect(getCardInvestment(state, ACCOUNT_ID, NOW)).toEqual(INVESTMENT)
   })
 
   /** A record the select screen could never have produced is not trusted: a bulletin
@@ -33,13 +41,71 @@ describe("getCardInvestment", () => {
   it("reads nothing from a record without a usable amount", () => {
     const stateWith = (selectedAmountUsd: number) => ({
       ...defaultPersistentState,
-      cardInvestmentByAccountId: { [ACCOUNT_ID]: { selectedAmountUsd } },
+      cardInvestmentByAccountId: {
+        [ACCOUNT_ID]: { selectedAmountUsd, signedAt: NOW - AN_HOUR_MS },
+      },
     })
 
-    expect(getCardInvestment(stateWith(0), ACCOUNT_ID)).toBeNull()
-    expect(getCardInvestment(stateWith(-1), ACCOUNT_ID)).toBeNull()
-    expect(getCardInvestment(stateWith(Number.NaN), ACCOUNT_ID)).toBeNull()
-    expect(getCardInvestment(stateWith(1000), ACCOUNT_ID)?.selectedAmountUsd).toBe(1000)
+    expect(getCardInvestment(stateWith(0), ACCOUNT_ID, NOW)).toBeNull()
+    expect(getCardInvestment(stateWith(-1), ACCOUNT_ID, NOW)).toBeNull()
+    expect(getCardInvestment(stateWith(Number.NaN), ACCOUNT_ID, NOW)).toBeNull()
+    expect(getCardInvestment(stateWith(1000), ACCOUNT_ID, NOW)).toEqual({
+      selectedAmountUsd: 1000,
+      signedAt: NOW - AN_HOUR_MS,
+    })
+  })
+
+  it("reads nothing from a signed record without a moment it was signed at", () => {
+    const state = {
+      ...defaultPersistentState,
+      cardInvestmentByAccountId: {
+        [ACCOUNT_ID]: { selectedAmountUsd: 1000, signedAt: Number.NaN },
+      },
+    }
+
+    expect(getCardInvestment(state, ACCOUNT_ID, NOW)).toBeNull()
+  })
+
+  /** The agreement and the link to pay it are good for a day; a record older than that
+   *  would point at a step whose document has lapsed, so it lapses with it. */
+  describe("a day after its latest moment", () => {
+    const stateWith = (record: object) => ({
+      ...defaultPersistentState,
+      cardInvestmentByAccountId: { [ACCOUNT_ID]: record as typeof INVESTMENT },
+    })
+    const justBefore = NOW + CARD_INVESTMENT_LIFETIME_MS - AN_HOUR_MS - 1
+    const onTheDot = NOW + CARD_INVESTMENT_LIFETIME_MS - AN_HOUR_MS
+
+    it("reads a signed investment until then, and nothing after", () => {
+      expect(getCardInvestment(stateWith(INVESTMENT), ACCOUNT_ID, justBefore)).toEqual(
+        INVESTMENT,
+      )
+      expect(getCardInvestment(stateWith(INVESTMENT), ACCOUNT_ID, onTheDot)).toBeNull()
+    })
+
+    /** The payment is a later moment than the signature, so the welcome is counted
+     *  from it rather than lapsing with the signature it followed. */
+    it("counts a paid investment from the payment, not the signature", () => {
+      const paid = { ...INVESTMENT, paidAt: NOW }
+
+      expect(getCardInvestment(stateWith(paid), ACCOUNT_ID, onTheDot)).toEqual(paid)
+      expect(
+        getCardInvestment(stateWith(paid), ACCOUNT_ID, NOW + CARD_INVESTMENT_LIFETIME_MS),
+      ).toBeNull()
+    })
+  })
+
+  /** The record comes off disk; whatever is there must be read as nothing, not thrown on. */
+  it("reads nothing from an entry that is not a record at all", () => {
+    const stateWith = (entry: unknown) => ({
+      ...defaultPersistentState,
+      cardInvestmentByAccountId: { [ACCOUNT_ID]: entry as typeof INVESTMENT },
+    })
+
+    expect(getCardInvestment(stateWith("signed"), ACCOUNT_ID, NOW)).toBeNull()
+    expect(getCardInvestment(stateWith(1), ACCOUNT_ID, NOW)).toBeNull()
+    expect(getCardInvestment(stateWith(null), ACCOUNT_ID, NOW)).toBeNull()
+    expect(getCardInvestment(stateWith({}), ACCOUNT_ID, NOW)).toBeNull()
   })
 
   /** One investor's investment must never show on another's home. */
@@ -49,7 +115,7 @@ describe("getCardInvestment", () => {
       cardInvestmentByAccountId: { [OTHER_ACCOUNT_ID]: OTHER_INVESTMENT },
     }
 
-    expect(getCardInvestment(state, ACCOUNT_ID)).toBeNull()
+    expect(getCardInvestment(state, ACCOUNT_ID, NOW)).toBeNull()
   })
 })
 
@@ -73,7 +139,7 @@ describe("withCardInvestment", () => {
 
     const next = withCardInvestment(state, ACCOUNT_ID, INVESTMENT)
 
-    expect(getCardInvestment(next, ACCOUNT_ID)).toEqual(INVESTMENT)
+    expect(getCardInvestment(next, ACCOUNT_ID, NOW)).toEqual(INVESTMENT)
   })
 
   it("does not mutate the state it was given", () => {
@@ -100,7 +166,7 @@ describe("withoutCardInvestment", () => {
     expect(next.cardInvestmentByAccountId).toEqual({
       [OTHER_ACCOUNT_ID]: OTHER_INVESTMENT,
     })
-    expect(getCardInvestment(next, ACCOUNT_ID)).toBeNull()
+    expect(getCardInvestment(next, ACCOUNT_ID, NOW)).toBeNull()
   })
 
   /** Returning the same object lets a functional updater skip a write nothing changed. */
