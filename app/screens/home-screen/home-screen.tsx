@@ -601,12 +601,16 @@ export const HomeScreen: React.FC = () => {
 
     if (!isAuthed) return
 
+    /** Asked again but not awaited: the verdict feeds nothing the pull shows, so the
+     *  spinner has no reason to wait on it, and a stalled socket on this request (the
+     *  link has no timeout) must not pin the spinner the balances already released. */
+    refetchCustodialRestrictions().catch(() => undefined)
+
     await Promise.all([
       refetchRealtimePrice(),
       refetchAuthed(),
       refetchUnauthed(),
       refetchBulletins(),
-      refetchCustodialRestrictions(),
     ])
     // Triggers the upgrade trial account modal after refetch
     triggerUpgradeModal()
@@ -818,6 +822,7 @@ export const HomeScreen: React.FC = () => {
       <DollarBalanceRestrictionModal
         isVisible={isRestrictionModalVisible}
         toggleModal={closeRestrictionModal}
+        isRegionUnknown={isDollarBalanceRegionUnknown}
       />
       {custodialConvertWallets && (
         <UsdConvertToBtcModal

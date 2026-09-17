@@ -2648,6 +2648,26 @@ describe("HomeScreen pull-to-refresh", () => {
     expect(mockRefetchCustodialRestrictions).toHaveBeenCalledTimes(1)
   })
 
+  /** The restrictions request has no transport timeout, so the pull must not wait on
+   *  it: the verdict lands whenever it lands. */
+  it("retracts the spinner without waiting for the restrictions verdict", async () => {
+    mockRefetchCustodialRestrictions.mockReturnValueOnce(new Promise(() => {}))
+    // eslint-disable-next-line camelcase -- testing-library exposes this API verbatim
+    const { UNSAFE_getByType } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    await act(async () => {
+      await UNSAFE_getByType(RefreshControl).props.onRefresh()
+    })
+
+    expect(mockRefetchCustodialRestrictions).toHaveBeenCalledTimes(1)
+    expect(UNSAFE_getByType(RefreshControl).props.refreshing).toBe(false)
+  })
+
   it("spins only for the duration of a user-initiated refresh", async () => {
     // eslint-disable-next-line camelcase -- testing-library exposes this API verbatim
     const { UNSAFE_getByType } = render(
