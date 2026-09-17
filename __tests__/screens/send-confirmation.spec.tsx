@@ -26,6 +26,10 @@ import type { useNonCustodialConversionLimits } from "@app/self-custodial/hooks/
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { RouteProp } from "@react-navigation/native"
 import { light } from "@app/rne-theme/colors"
+import {
+  armCardInvestmentPayment,
+  consumeCardInvestmentPayment,
+} from "@app/hooks/use-card-investment-progress"
 
 import { surfaceColor } from "../helpers/surface-color"
 import { waitForStableRender } from "../helpers/wait-for-stable-render"
@@ -658,6 +662,66 @@ describe("SendBitcoinConfirmationScreen", () => {
       })
 
       expect(findCompletedRouteParams().paymentRequest).toBe(bolt11Invoice)
+    })
+
+    describe("an invoice the recipient says is already paid", () => {
+      const bolt11Invoice = "lnbc1m1psh8d8zpp5investment..."
+
+      const renderBolt11 = () => {
+        const { createAmountLightningPaymentDetails } = PaymentDetailsLightning
+        const paymentDetailBolt11 = createAmountLightningPaymentDetails<WalletCurrency>({
+          paymentRequest: bolt11Invoice,
+          paymentRequestAmount: { currency: "BTC", currencyCode: "BTC", amount: 10000 },
+          convertMoneyAmount: convertMoneyAmountMock,
+          sendingWalletDescriptor: btcSendingWalletDescriptor,
+        })
+        const routeBolt11 = {
+          key: "sendBitcoinConfirmationScreen",
+          name: "sendBitcoinConfirmation",
+          params: { paymentDetail: paymentDetailBolt11 },
+        } as const
+
+        return render(
+          <ContextForScreen>
+            <LightningLnURL route={routeBolt11} />
+          </ContextForScreen>,
+        )
+      }
+
+      /** The arm is module state and only spending it clears it. */
+      afterEach(() => {
+        armCardInvestmentPayment("lnbc1throwaway")
+        consumeCardInvestmentPayment("lnbc1throwaway")
+      })
+
+      /** The card investment's invoice is private to that investment, so "already
+       *  paid" on it means an earlier attempt from this device went through without
+       *  its receipt; refusing would have the home ask for the money again, and the
+       *  next attempt pay a second invoice. */
+      it("is taken to the receipt as settled when it is the card investment's", async () => {
+        armCardInvestmentPayment(bolt11Invoice)
+        sendPaymentMock.mockResolvedValueOnce({ status: "ALREADY_PAID" })
+
+        renderBolt11()
+        await act(async () => {
+          fireEvent.press(screen.getByTestId("slider"))
+        })
+
+        expect(findCompletedRouteParams().paymentRequest).toBe(bolt11Invoice)
+        expect(screen.queryByText("This invoice has already been paid")).toBeNull()
+      })
+
+      it("is refused, as before, for any other invoice", async () => {
+        sendPaymentMock.mockResolvedValueOnce({ status: "ALREADY_PAID" })
+
+        renderBolt11()
+        await act(async () => {
+          fireEvent.press(screen.getByTestId("slider"))
+        })
+
+        expect(screen.getByText("This invoice has already been paid")).toBeTruthy()
+        expect(() => findCompletedRouteParams()).toThrow()
+      })
     })
 
     it("names no invoice on the completed screen for a payment that had none", async () => {

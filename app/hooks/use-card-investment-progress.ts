@@ -162,6 +162,17 @@ export const armCardInvestmentPayment = (paymentRequest: string): void => {
 }
 
 /**
+ * Whether the invoice is the armed one, without spending the arm: for the step that has
+ * to decide what an answer about that invoice means before any receipt is shown.
+ */
+export const isCardInvestmentPaymentArmed = (
+  paymentRequest: string | undefined,
+): boolean =>
+  armedCardInvestmentInvoice !== null &&
+  paymentRequest !== undefined &&
+  sameInvoice(armedCardInvestmentInvoice, paymentRequest)
+
+/**
  * Whether the settled invoice is the armed one, clearing the arm when it is so one arm
  * records at most one payment. Another invoice leaves the arm alone: the investment's
  * own payment may still follow.
