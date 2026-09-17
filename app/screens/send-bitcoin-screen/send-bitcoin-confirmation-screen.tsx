@@ -9,6 +9,8 @@ import { gql } from "@apollo/client"
 import { Chip } from "@app/components/atomic/chip"
 import { HeaderBackButtonWithTheme } from "@app/components/header-back-control/header-back-control"
 import { GaloyErrorBox } from "@app/components/atomic/galoy-error-box"
+import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import GaloySliderButton from "@app/components/atomic/galoy-slider-button/galoy-slider-button"
 import { InfoSection } from "@app/components/card-screen"
 import { Screen } from "@app/components/screen"
@@ -293,8 +295,31 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     glowProgress,
     detailsStyle,
     heroStyle,
+    actionsStyle,
     playSent,
   } = sentTransition
+
+  /** The receipt a landed payment opens from Sent, kept until the sender asks for it. */
+  const sentReceiptRef = React.useRef<RootStackParamList["sendBitcoinCompleted"]>(undefined)
+
+  const resetToCompleted = React.useCallback(
+    (params: RootStackParamList["sendBitcoinCompleted"]) =>
+      navigation.dispatch((state) => {
+        const routes = [{ name: "Primary" }, { name: "sendBitcoinCompleted", params }]
+        return CommonActions.reset({
+          ...state,
+          routes,
+          index: routes.length - 1,
+        })
+      }),
+    [navigation],
+  )
+
+  const handleOpenReceipt = React.useCallback(() => {
+    if (sentReceiptRef.current) resetToCompleted(sentReceiptRef.current)
+  }, [resetToCompleted])
+
+  const handleClose = React.useCallback(() => navigation.popToTop(), [navigation])
 
   const navigateToCompleted = React.useCallback(
     async ({
@@ -313,64 +338,53 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
           paymentDetail.paymentType === "lnurl" ? paymentDetail.isMerchant : undefined,
       })
 
-      /** A payment that landed plays Sent in place before the receipt; the receipt then
-       *  skips its own success icon. Pending keeps today's screen until its design lands. */
       const isSuccess = status === "SUCCESS"
+      const params: RootStackParamList["sendBitcoinCompleted"] = {
+        arrivalAtMempoolEstimate: extraInfo?.arrivalAtMempoolEstimate,
+        status,
+        successAction: extraInfo?.successAction ?? paymentDetail?.successAction,
+        preimage: extraInfo?.preimage ?? undefined,
+        note,
+        currencyAmount,
+        satAmount,
+        currencyFeeAmount,
+        satFeeAmount,
+        destination: formatDestination({
+          destination,
+          paymentType,
+          lnAddressHostname,
+        }),
+        paymentType: paymentDetail?.paymentType,
+        createdAt: transaction?.createdAt,
+        hasShownSuccess: isSuccess,
+      }
+
+      /** A payment that landed plays Sent in place and holds there until the sender opens
+       *  the receipt or closes; the receipt then skips its own success icon. Pending keeps
+       *  today's screen until its design lands. */
       if (isSuccess) {
         ReactNativeHapticFeedback.trigger("notificationSuccess", {
           ignoreAndroidSystemSettings: true,
         })
-        const isStillOnReview = await playSent({
+        sentReceiptRef.current = params
+        await playSent({
           primaryAmount: heroPrimaryText,
           hasSecondaryAmount: Boolean(heroSecondaryText),
         })
-        if (!isStillOnReview) return
+        return
       }
 
-      navigation.dispatch((state) => {
-        const routes = [
-          { name: "Primary" },
-          {
-            name: "sendBitcoinCompleted",
-            params: {
-              arrivalAtMempoolEstimate: extraInfo?.arrivalAtMempoolEstimate,
-              status,
-              successAction: extraInfo?.successAction ?? paymentDetail?.successAction,
-              preimage: extraInfo?.preimage,
-              note,
-              currencyAmount,
-              satAmount,
-              currencyFeeAmount,
-              satFeeAmount,
-              destination: formatDestination({
-                destination,
-                paymentType,
-                lnAddressHostname,
-              }),
-              paymentType: paymentDetail?.paymentType,
-              createdAt: transaction?.createdAt,
-              hasShownSuccess: isSuccess,
-            },
-          },
-        ]
-        return CommonActions.reset({
-          ...state,
-          routes,
-          index: routes.length - 1,
-        })
+      resetToCompleted(params)
+      ReactNativeHapticFeedback.trigger("notificationSuccess", {
+        ignoreAndroidSystemSettings: true,
       })
-      if (!isSuccess) {
-        ReactNativeHapticFeedback.trigger("notificationSuccess", {
-          ignoreAndroidSystemSettings: true,
-        })
-      }
     },
     [
       playSent,
+      resetToCompleted,
       heroPrimaryText,
       heroSecondaryText,
       saveLnAddressContact,
-      navigation,
       paymentType,
       destination,
       lnAddressHostname,
@@ -654,6 +668,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
                 primaryAmount={heroPrimaryText}
                 secondaryAmount={heroSecondaryText}
                 sentProgress={heroProgress}
+                isSent={isSent}
               />
             </Animated.View>
           </View>
@@ -753,6 +768,17 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
             />
           </Animated.View>
         </PanGestureHandler>
+        {isSent ? (
+          <Animated.View
+            style={[styles.sentActions, { bottom: bottomInset }, actionsStyle]}
+          >
+            <GaloyPrimaryButton
+              title={LL.SendBitcoinConfirmationScreen.receipt()}
+              onPress={handleOpenReceipt}
+            />
+            <GaloySecondaryButton title={LL.common.close()} onPress={handleClose} />
+          </Animated.View>
+        ) : null}
       </View>
     </Screen>
   )
@@ -806,6 +832,16 @@ const useStyles = makeStyles(({ colors }) => ({
     color: colors.grey2,
   },
   sliderContainer: {
+    paddingHorizontal: 20,
+    paddingTop: 10,
+    paddingBottom: 20,
+  },
+  /** Figma's button group, laid over the slot the slider dissolves out of. */
+  sentActions: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    rowGap: 10,
     paddingHorizontal: 20,
     paddingTop: 10,
     paddingBottom: 20,

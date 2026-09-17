@@ -7509,6 +7509,10 @@ type RootTranslation = {
 		 */
 		sent: string
 		/**
+		 * R​e​c​e​i​p​t
+		 */
+		receipt: string
+		/**
 		 * F​r​o​m​ ​B​a​l​a​n​c​e
 		 */
 		fromBalance: string
@@ -21225,6 +21229,10 @@ export type TranslationFunctions = {
 		 * Sent
 		 */
 		sent: () => LocalizedString
+		/**
+		 * Receipt
+		 */
+		receipt: () => LocalizedString
 		/**
 		 * From Balance
 		 */

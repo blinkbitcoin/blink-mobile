@@ -2388,6 +2388,7 @@ const en: BaseTranslation = {
     lightningRecommended: "High fee. We recommend Lightning.",
     sending: "Sending",
     sent: "Sent",
+    receipt: "Receipt",
     fromBalance: "From Balance",
     details: "Details",
     changeAmount: "Change amount",
