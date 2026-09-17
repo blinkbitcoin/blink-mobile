@@ -3,6 +3,7 @@ import { act, renderHook } from "@testing-library/react-native"
 import {
   armCardInvestmentPayment,
   consumeCardInvestmentPayment,
+  isCardInvestmentPaymentArmed,
   useCardInvestmentProgress,
   useConsumeCardInvestmentPayment,
 } from "@app/hooks/use-card-investment-progress"
@@ -526,6 +527,19 @@ describe("card investment payment arm", () => {
   it("recognises the invoice whichever case the send flow hands it back in", () => {
     armCardInvestmentPayment(INVOICE.toUpperCase())
 
+    expect(consumeCardInvestmentPayment(INVOICE)).toBe(true)
+  })
+
+  /** A step deciding what an answer about the invoice means must be able to ask
+   *  without spending the arm the receipt still needs. */
+  it("can be asked about without being spent", () => {
+    expect(isCardInvestmentPaymentArmed(INVOICE)).toBe(false)
+
+    armCardInvestmentPayment(INVOICE)
+
+    expect(isCardInvestmentPaymentArmed(INVOICE.toUpperCase())).toBe(true)
+    expect(isCardInvestmentPaymentArmed(OTHER_INVOICE)).toBe(false)
+    expect(isCardInvestmentPaymentArmed(undefined)).toBe(false)
     expect(consumeCardInvestmentPayment(INVOICE)).toBe(true)
   })
 
