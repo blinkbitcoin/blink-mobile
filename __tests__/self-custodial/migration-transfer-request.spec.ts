@@ -119,7 +119,8 @@ describe("buildMigrationTransferRequest", () => {
 
     await buildRequest()
 
-    expect(mockReceivePayment).toHaveBeenCalledWith({
+    expect(mockReceivePayment).toHaveBeenCalledTimes(1)
+    expect(mockReceivePayment.mock.calls[0][0]).toStrictEqual({
       paymentMethod: {
         tag: "Bolt11Invoice",
         inner: {
@@ -127,6 +128,7 @@ describe("buildMigrationTransferRequest", () => {
           amountSats: undefined,
           expirySecs: 24 * 60 * 60,
           paymentHash: undefined,
+          receiverIdentityPublicKey: undefined,
         },
       },
     })

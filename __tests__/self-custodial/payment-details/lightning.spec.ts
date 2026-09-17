@@ -292,4 +292,74 @@ describe("createSelfCustodialLightningPaymentDetails", () => {
     const prepareParams = mockCreateSendMutation.mock.calls[0][0]
     expect(prepareParams.conversionOptions).toBeUndefined()
   })
+
+  describe("with a fixed invoice whose amount is not whole satoshis", () => {
+    const btcAmount = (amount: number) => ({
+      amount,
+      currency: WalletCurrency.Btc,
+      currencyCode: WalletCurrency.Btc,
+    })
+    const convertSameCurrency = jest.fn((amount) => amount)
+
+    it("leaves the amount to the invoice for both the fee quote and the send", () => {
+      createSelfCustodialLightningPaymentDetails(
+        createParams({
+          unitOfAccountAmount: btcAmount(1267.644),
+          hasAmount: true,
+          convertMoneyAmount: convertSameCurrency,
+        }),
+      )
+
+      expect(mockCreateGetFee.mock.calls[0][0].amount).toBeUndefined()
+      expect(mockCreateSendMutation.mock.calls[0][0].amount).toBeUndefined()
+    })
+
+    it("keeps the millisatoshi remainder on the amounts the screen shows", () => {
+      const detail = createSelfCustodialLightningPaymentDetails(
+        createParams({
+          unitOfAccountAmount: btcAmount(1267.644),
+          hasAmount: true,
+          convertMoneyAmount: convertSameCurrency,
+        }),
+      )
+
+      expect(detail.destinationSpecifiedAmount?.amount).toBe(1267.644)
+      expect(detail.settlementAmount.amount).toBe(1267.644)
+    })
+
+    it("can quote and send an invoice worth less than one satoshi", () => {
+      const detail = createSelfCustodialLightningPaymentDetails(
+        createParams({
+          unitOfAccountAmount: btcAmount(0.5),
+          hasAmount: true,
+          convertMoneyAmount: convertSameCurrency,
+        }),
+      )
+
+      expect(detail.canGetFee).toBe(true)
+      expect(detail.canSendPayment).toBe(true)
+      expect(mockCreateSendMutation.mock.calls[0][0].amount).toBeUndefined()
+    })
+
+    it("leaves the amount to the invoice when a USD wallet pays it", () => {
+      const convertMoneyAmount = jest.fn((amount, target) =>
+        target === WalletCurrency.Usd
+          ? { amount: 127, currency: target, currencyCode: target }
+          : amount,
+      )
+
+      createSelfCustodialLightningPaymentDetails(
+        createParams({
+          unitOfAccountAmount: btcAmount(1267.644),
+          hasAmount: true,
+          sendingWalletDescriptor: { id: "w-usd", currency: WalletCurrency.Usd },
+          convertMoneyAmount,
+        }),
+      )
+
+      const prepareParams = mockCreateSendMutation.mock.calls[0][0]
+      expect(prepareParams.amount).toBeUndefined()
+      expect(prepareParams.conversionOptions).toBeDefined()
+    })
+  })
 })

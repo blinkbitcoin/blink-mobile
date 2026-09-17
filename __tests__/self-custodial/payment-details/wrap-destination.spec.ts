@@ -117,6 +117,61 @@ describe("wrapDestination", () => {
     )
   })
 
+  it("wraps Lightning with no amount as hasAmount=false", () => {
+    const result = createValidResult(PaymentType.Lightning, {
+      paymentRequest: "lnbc1...",
+      amount: undefined,
+    })
+
+    const wrapped = wrapDestination(result, mockSdk)
+    callCreatePaymentDetail(wrapped)
+
+    expect(mockCreateLightning).toHaveBeenCalledWith(
+      expect.objectContaining({
+        hasAmount: false,
+        unitOfAccountAmount: expect.objectContaining({ amount: 0 }),
+      }),
+    )
+  })
+
+  it("keeps a millisatoshi remainder as the invoice's fixed amount, unrounded", () => {
+    const result = createValidResult(PaymentType.Lightning, {
+      paymentRequest: "lnbc12676440p1examplefixtureonly",
+      amount: 1267.644,
+    })
+
+    const wrapped = wrapDestination(result, mockSdk)
+    callCreatePaymentDetail(wrapped)
+
+    expect(mockCreateLightning).toHaveBeenCalledWith(
+      expect.objectContaining({
+        paymentRequest: "lnbc12676440p1examplefixtureonly",
+        hasAmount: true,
+        unitOfAccountAmount: expect.objectContaining({
+          amount: 1267.644,
+          currency: WalletCurrency.Btc,
+        }),
+      }),
+    )
+  })
+
+  it("treats an invoice worth less than one satoshi as fixed, not amountless", () => {
+    const result = createValidResult(PaymentType.Lightning, {
+      paymentRequest: "lnbc10p1examplefixtureonly",
+      amount: 0.001,
+    })
+
+    const wrapped = wrapDestination(result, mockSdk)
+    callCreatePaymentDetail(wrapped)
+
+    expect(mockCreateLightning).toHaveBeenCalledWith(
+      expect.objectContaining({
+        hasAmount: true,
+        unitOfAccountAmount: expect.objectContaining({ amount: 0.001 }),
+      }),
+    )
+  })
+
   it("wraps Lnurl destination through the self-custodial lnurl detail (not the lightning detail)", () => {
     const result = createValidResult(PaymentType.Lnurl, {
       lnurl: "lnurl1...",
