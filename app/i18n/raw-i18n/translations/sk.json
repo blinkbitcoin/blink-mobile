@@ -2453,8 +2453,8 @@
     "posCopied": "Váš Terminál PoS bol skopírovaný",
     "activated": "Aktivované",
     "addressScreen": "Spôsoby, ako dostať zaplatené",
-    "nonCustodialAccount": "Nezverenecký účet",
-    "custodialAccount": "Zverenecký účet",
+    "nonCustodialAccount": "Non-custodial účet",
+    "custodialAccount": "Custodial účet",
     "tapUserName": "Klepnutím nastavte používateľské meno",
     "notifications": "Notifikácie",
     "title": "Nastavenia",
@@ -3987,7 +3987,7 @@
     "backupNow": "Back up wallet"
   },
   "NonCustodialInfoBulletin": {
-    "title": "Toto je nezverenecký účet",
+    "title": "Toto je non-custodial účet",
     "body": "Ak sa chcete dozvedieť viac, prečítajte si náš blogový príspevok",
     "cta": "Čítať"
   },
