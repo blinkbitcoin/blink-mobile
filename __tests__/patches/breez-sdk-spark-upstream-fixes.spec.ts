@@ -6,6 +6,11 @@ import { join } from "path"
  * code: the millisatoshi rounding lives in the SDK's Rust, and the Activity
  * lookup in its Android module, so no JS test can reach either. The artifacts
  * under test are the vendored package, so source-coupling here is intentional.
+ *
+ * The version floor is not derived from the package: upstream commit a5b204508
+ * ("Round Bolt11 invoice amounts up to whole sats") adds `invoice_amount_sats` to
+ * `crates/breez-sdk/core/src/sdk/payments/prepare/bolt11.rs`, and 0.23.0 is the
+ * first tag containing it. On a bump, re-check that function still rounds up.
  */
 
 const REPO_ROOT = join(__dirname, "..", "..")
@@ -31,7 +36,7 @@ const passkeyModuleSource = (): string =>
   )
 
 describe("Breez SDK Spark upstream fixes", () => {
-  it("installs a release that rounds a fixed invoice's millisatoshis up when preparing a send", () => {
+  it("installs 0.23.0 or later, the first release carrying the invoice rounding fix", () => {
     expect(
       isAtLeast(installedVersion(), FIRST_VERSION_ROUNDING_INVOICE_MILLISATS_UP),
     ).toBe(true)
