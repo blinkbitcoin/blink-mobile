@@ -29,6 +29,7 @@ jest.mock(
 const SIGNED: CardInvestmentProgress = {
   selectedAmountUsd: 25000,
   settlementSats: 31_704_000,
+  signedAt: 1_757_700_000_000,
 }
 const PAID: CardInvestmentProgress = { ...SIGNED, paidAt: 1_757_800_000_000 }
 
