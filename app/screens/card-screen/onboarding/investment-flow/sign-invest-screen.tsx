@@ -200,6 +200,20 @@ export const SignInvestScreen: React.FC = () => {
    *  retry would drop what the signer already filled in. */
   const recoverFromFailure = isSessionExpired ? restart : retry
 
+  /** The one spinner this step shows, whether the session is being opened or the
+   *  document is still on its way. */
+  const spinner = (
+    <ActivityIndicator size="large" color={colors.primary} testID="sign-invest-loading" />
+  )
+
+  /**
+   * Shown by the WebView while the signing page loads, in place of its own indicator:
+   * the library asks the WebView to start in its loading state, and left to itself the
+   * WebView draws a second, different spinner right after this step's own. The signer
+   * sees one spinner from the tap to the document.
+   */
+  const renderLoading = () => <View style={styles.pageLoading}>{spinner}</View>
+
   if (status === "signing" && webViewProps) {
     return (
       <Screen headerShown={false}>
@@ -216,6 +230,7 @@ export const SignInvestScreen: React.FC = () => {
           <WebView
             {...webViewProps}
             geolocationEnabled={false}
+            renderLoading={renderLoading}
             style={styles.webview}
             testID="sign-invest-webview"
           />
@@ -268,13 +283,7 @@ export const SignInvestScreen: React.FC = () => {
     )
   }
 
-  return centredOnScreen(
-    <ActivityIndicator
-      size="large"
-      color={colors.primary}
-      testID="sign-invest-loading"
-    />,
-  )
+  return centredOnScreen(spinner)
 }
 
 const useStyles = makeStyles(({ colors }) => ({
@@ -284,6 +293,15 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   webview: {
     flex: 1,
+  },
+  /** Fills the WebView's loading overlay with the screen's own surface, so the page's
+   *  load reads as this step still waiting rather than as a white flash. */
+  pageLoading: {
+    flex: 1,
+    width: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: colors.white,
   },
   centered: {
     flex: 1,
