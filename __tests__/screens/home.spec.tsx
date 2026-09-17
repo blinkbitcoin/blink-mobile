@@ -140,7 +140,7 @@ jest.mock("@app/custodial/components/two-factor-session-modal", () => ({
  *  only expected to render what the hook answers, and to tell it about pending deposits. */
 type MockCardInvestmentBulletin = {
   kind: string
-  progress: { selectedAmountUsd: number; settlementSats?: number }
+  progress: { selectedAmountUsd: number; settlementSats?: number; signedAt: number }
   dismiss: () => void
 }
 const mockCardInvestmentBulletinState: { current: MockCardInvestmentBulletin | null } = {
@@ -2402,7 +2402,11 @@ describe("TwoFactorSessionModal wiring", () => {
 })
 
 describe("CardInvestmentBulletin gating", () => {
-  const SIGNED = { selectedAmountUsd: 25000, settlementSats: 31_704_000 }
+  const SIGNED = {
+    selectedAmountUsd: 25000,
+    settlementSats: 31_704_000,
+    signedAt: 1_757_700_000_000,
+  }
 
   beforeEach(() => {
     currentMocks = []

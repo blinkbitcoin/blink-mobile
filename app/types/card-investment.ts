@@ -3,11 +3,15 @@
  * until the investor closes the welcome that follows the payment.
  *
  * Kept on device because no backend records the investment yet: the home reads it to
- * steer the investor back to the payment, and to welcome them once it is made.
+ * steer the investor back to the payment, and to welcome them once it is made. Kept for
+ * a day from its latest moment, the same life the agreement and its payment link are
+ * given; after that it is read as nothing.
  */
 export type CardInvestmentProgress = {
   /** The amount the investor chose, which every later step derives its figures from. */
   selectedAmountUsd: number
+  /** When the agreement was signed, in milliseconds. */
+  signedAt: number
   /** The satoshis the signed agreement settles at, when the mint named them. */
   settlementSats?: number
   /** When the payment went through; absent while it is still owed. */
