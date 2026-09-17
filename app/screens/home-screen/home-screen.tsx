@@ -550,9 +550,10 @@ export const HomeScreen: React.FC = () => {
   const closeRestrictionModal = () => setIsRestrictionModalVisible(false)
   /** Anon outranks the region explanation (its remedy is switching modes), and the
    *  sanctions block outranks the compliance one (it is the stricter layer). The wind-down
-   *  nudge outranks the compliance modal in turn: that modal is a dead end (a title and a
-   *  Close), while an account whose custodial service is ending has one remedy, and both
-   *  gated surfaces are entry points a user hunting for it will try. `canReopen` is exactly
+   *  nudge outranks the compliance modal in turn, even its unknown-region variant with a
+   *  retry remedy: an account whose custodial service is ending has one remedy that
+   *  matters more, both gated surfaces are entry points a user hunting for it will try,
+   *  and the row's label still carries the retry advice on its own. `canReopen` is exactly
    *  "the migrate-now nudge can surface", so a region-gated account with no wind-down, or
    *  one whose self-custodial stack is off, still gets the compliance explanation. */
   const onGatedDollarTap = () => {

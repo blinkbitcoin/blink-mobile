@@ -34,10 +34,10 @@ gql`
 /**
  * Backed off so a server that is down is not hammered, and bounded. These delays sit on
  * top of the transport's own retries: the client's `RetryLink` makes up to five attempts
- * per request, the four resends spaced by a jittered, doubling delay of up to 600 ms, so
- * every attempt here is a burst of up to five on the wire and the whole budget is spent in
- * about 25 s on average and 45 s at worst. Once it is spent the verdict reads Unknown, and
- * the slow lane below takes over.
+ * per request, the four resends spaced by a jittered delay that starts at up to 600 ms
+ * and doubles each time, so every attempt here is a burst of up to five on the wire and
+ * the whole budget is spent in about 25 s on average and 45 s at worst. Once it is spent
+ * the verdict reads Unknown, and the slow lane below takes over.
  */
 const RESTRICTION_RETRY_DELAYS_MS: readonly number[] = [1000, 2000, 4000]
 

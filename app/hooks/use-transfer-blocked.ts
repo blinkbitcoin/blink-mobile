@@ -10,7 +10,8 @@ import { useSelfCustodialAccountMode } from "@app/self-custodial/hooks/use-self-
 type TransferGate = {
   isGated: boolean
   isRegionPending: boolean
-  /** Why the gate is closed, null while it is open. The surface's copy reads this. */
+  /** Why the gate is closed, null while it is open. No transfer surface renders copy from
+   *  it yet (the guard resets navigation instead); it is here so both gates answer alike. */
   reason: GateReason | null
 }
 
