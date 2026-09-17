@@ -13,6 +13,7 @@ import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import GaloySliderButton from "@app/components/atomic/galoy-slider-button/galoy-slider-button"
 import { InfoSection } from "@app/components/card-screen"
+import { ErrorMsgBottomSheet } from "@app/components/error-msg-bottom-sheet"
 import { Screen } from "@app/components/screen"
 import { SuccessGlow } from "@app/components/success-glow"
 import { WarningBanner } from "@app/components/warning-banner"
@@ -42,6 +43,7 @@ import {
   ZeroUsdMoneyAmount,
 } from "@app/types/amounts"
 import { useSendDustWarning, useTranslateSdkError } from "@app/self-custodial/hooks"
+import { isSelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
 import { logPaymentAttempt, logPaymentResult } from "@app/utils/analytics"
 import { reportError } from "@app/utils/error-logging"
 import { CommonActions, RouteProp, useNavigation } from "@react-navigation/native"
@@ -62,6 +64,7 @@ import { SendReviewDestination } from "./review/send-review-destination"
 import { useSentTransition } from "./review/use-sent-transition"
 import { SendHero } from "./send-hero"
 import { useSendBalances } from "./hooks/use-send-wallets"
+import { useDismissibleErrorMsg } from "./hooks/use-dismissible-error-msg"
 import { useVerifyPaymentSettled } from "./hooks/use-verify-payment-settled"
 import { PaymentSendExtraInfo } from "./payment-details/index.types"
 import { useReviewFeeText } from "./review/use-review-fee-text"
@@ -583,6 +586,18 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   const isMaxFee = fee.status === "error" && Boolean(fee.amount)
   const isFeeFailed = fee.status === "error" && !fee.amount
 
+  // A classified SDK failure on the quote is something the user can't fix on review, so
+  // the error message sheet (#1275 R2) opens on top of the inline error, which stays.
+  // Nothing has been sent yet, so changing the amount is safe on every rail.
+  const feeQuoteError = React.useMemo(
+    () =>
+      isFeeFailed && isSelfCustodialErrorCode(feeErrorCode)
+        ? { message: feeErrorText }
+        : undefined,
+    [isFeeFailed, feeErrorCode, feeErrorText],
+  )
+  const feeErrorMsg = useDismissibleErrorMsg(feeQuoteError)
+
   // A failed quote leaves the row blank; its reason goes under the card with the other errors.
   const feeValue = isFeeFailed ? "—" : `${feeDisplayText}${isMaxFee ? " *" : ""}`
 
@@ -773,6 +788,18 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
           </Animated.View>
         ) : null}
       </View>
+      <ErrorMsgBottomSheet
+        isVisible={feeErrorMsg.isVisible}
+        onClose={feeErrorMsg.dismiss}
+        title={LL.SendBitcoinScreen.problemSheetTitle()}
+        body={feeErrorMsg.shown?.message ?? ""}
+        primaryLabel={LL.SendBitcoinConfirmationScreen.changeAmount()}
+        onPrimaryPress={() => {
+          feeErrorMsg.dismiss()
+          navigation.goBack()
+        }}
+        testID="fee-error-msg-bottom-sheet"
+      />
     </Screen>
   )
 }
