@@ -12,11 +12,10 @@ import { useNavigation } from "@react-navigation/native"
 
 import { sentHeroGrowth } from "../send-hero"
 
-/** #1136 timeline: the details and hero start together, and the glow follows a beat later
- *  so it blooms behind a hero that is already on its way. */
+/** #1136 timeline: the details, the hero and the glow all start the moment the payment
+ *  lands. */
 const DETAILS_FADE_MS = 300
 const HERO_MOVE_MS = 500
-const GLOW_DELAY_MS = 200
 const GLOW_BLOOM_MS = 600
 /** The actions arrive once the hero has settled in the middle. */
 const ACTIONS_DELAY_MS = HERO_MOVE_MS
@@ -114,10 +113,10 @@ export const useSentTransition = () => {
         duration: HERO_MOVE_MS,
         easing: Easing.inOut(Easing.cubic),
       })
-      glowProgress.value = withDelay(
-        GLOW_DELAY_MS,
-        withTiming(1, { duration: GLOW_BLOOM_MS, easing: Easing.out(Easing.quad) }),
-      )
+      glowProgress.value = withTiming(1, {
+        duration: GLOW_BLOOM_MS,
+        easing: Easing.out(Easing.quad),
+      })
       actionsProgress.value = withDelay(
         ACTIONS_DELAY_MS,
         withTiming(1, { duration: ACTIONS_FADE_MS, easing: Easing.out(Easing.quad) }),
