@@ -401,6 +401,21 @@ describe("SignInvestScreen", () => {
       expect(getByTestId("sign-invest-webview").props.geolocationEnabled).toBe(false)
     })
 
+    /** The library starts the WebView in its loading state, and the WebView's own
+     *  indicator would be a second spinner right after this step's; the page's load is
+     *  shown under the step's own spinner instead. */
+    it("shows its own spinner while the signing page loads, not the WebView's", async () => {
+      mockESign.status = "signing"
+      mockESign.webViewProps = { source: { uri: TEST_INSTANCE_URL } }
+
+      const { getByTestId } = await renderScreen()
+      const { renderLoading } = getByTestId("sign-invest-webview").props
+
+      const loading = render(renderLoading())
+
+      expect(loading.getByTestId("sign-invest-loading")).toBeTruthy()
+    })
+
     it("waits on a spinner while the session is being opened", async () => {
       mockESign.status = "loading"
 
