@@ -8,7 +8,9 @@ import { GaloyIcon, IconNamesType } from "../atomic/galoy-icon"
 const ICON_FRAME_SIZE = 44
 
 type IconHeroProps = {
-  icon: IconNamesType
+  /** A glyph name, or the caller's own node when the glyph is animated (the send flow's
+   *  sent morph). */
+  icon: IconNamesType | React.ReactElement
   iconColor: string
   /** A plain heading, or the caller's own nodes when the heading is animated or sized by
    *  the screen (the send flow's amounts). */
@@ -51,7 +53,11 @@ export const IconHero: React.FC<IconHeroProps> = ({
   return (
     <View style={[styles.container, compact && styles.containerCompact]}>
       <View style={[styles.iconContainer, hasIconBackground && styles.iconBackground]}>
-        <GaloyIcon name={icon} size={iconSize} color={iconColor} />
+        {typeof icon === "string" ? (
+          <GaloyIcon name={icon} size={iconSize} color={iconColor} />
+        ) : (
+          icon
+        )}
       </View>
       <View style={[styles.textContainer, compact && styles.textContainerCompact]}>
         {caption}

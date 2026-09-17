@@ -2405,6 +2405,7 @@ const en: BaseTranslation = {
     copiedDestination: "Copied destination to clipboard",
     lightningRecommended: "High fee. We recommend Lightning.",
     sending: "Sending",
+    sent: "Sent",
     fromBalance: "From Balance",
     details: "Details",
     changeAmount: "Change amount",

@@ -1,13 +1,16 @@
 import React, { useEffect } from "react"
-import { Pressable } from "react-native"
+import { Pressable, View } from "react-native"
 import Animated, {
   Easing,
+  interpolate,
+  SharedValue,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
 } from "react-native-reanimated"
-import { makeStyles, Text, useTheme } from "@rn-vui/themed"
+import { makeStyles, useTheme } from "@rn-vui/themed"
 
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { IconHero } from "@app/components/icon-hero"
 import { useAccessibilityAnnouncement } from "@app/hooks/use-accessibility-announcement"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -60,6 +63,34 @@ export const entryAmountFontSize = (amount: string, isEmpty: boolean): number =>
 
 const SWAP_ANIMATION_MS = 220
 
+/**
+ * Once the payment is sent the settled read-out grows into the centred Sent hero: each line
+ * runs from its review size to its sent size as `sentProgress` goes from 0 to 1.
+ */
+const CAPTION_SIZE = { review: 12, sent: 16 } as const
+const CAPTION_LINE_HEIGHT = { review: 18, sent: 22 } as const
+const SENT_AMOUNT_SIZE = { secondary: 16 } as const
+const SENT_LINE_HEIGHT = { secondary: 22 } as const
+
+/** The sent amount takes amount entry's scale, so it lands at the size it was typed at. */
+const sentPrimaryFontSize = (amount: string): number => entryAmountFontSize(amount, false)
+
+/** How much taller the hero stands once sent, so a caller centring it can allow for the
+ *  growth. Every line holds to one, so the growth is exact. */
+export const sentHeroGrowth = ({
+  primaryAmount,
+  hasSecondaryAmount,
+}: {
+  primaryAmount: string
+  hasSecondaryAmount: boolean
+}): number =>
+  CAPTION_LINE_HEIGHT.sent -
+  CAPTION_LINE_HEIGHT.review +
+  sentPrimaryFontSize(primaryAmount) +
+  ENTRY_LINE_HEIGHT_OFFSET -
+  LINE_HEIGHT.inactive.primary +
+  (hasSecondaryAmount ? SENT_LINE_HEIGHT.secondary - LINE_HEIGHT.inactive.secondary : 0)
+
 type SendHeroProps = {
   /** The line above the amount: the destination while entering it, what the screen is
    *  doing once it is settled. */
@@ -79,6 +110,8 @@ type SendHeroProps = {
   onSwapCurrency?: () => void
   /** Long press on the caption, where the caption is a destination worth copying. */
   onCaptionLongPress?: () => void
+  /** 0 on review, 1 once sent: grows the lines and turns the icon green. Settled only. */
+  sentProgress?: SharedValue<number>
 }
 
 export const SendHero: React.FC<SendHeroProps> = ({
@@ -90,6 +123,7 @@ export const SendHero: React.FC<SendHeroProps> = ({
   isEmpty = false,
   onSwapCurrency,
   onCaptionLongPress,
+  sentProgress,
 }) => {
   const styles = useStyles()
   const {
@@ -155,6 +189,60 @@ export const SendHero: React.FC<SendHeroProps> = ({
 
   const size = active ? "active" : "inactive"
 
+  const noProgress = useSharedValue(0)
+  const sent = sentProgress ?? noProgress
+
+  const sentCaptionStyle = useAnimatedStyle(
+    () => ({
+      fontSize: interpolate(sent.value, [0, 1], [CAPTION_SIZE.review, CAPTION_SIZE.sent]),
+      lineHeight: interpolate(
+        sent.value,
+        [0, 1],
+        [CAPTION_LINE_HEIGHT.review, CAPTION_LINE_HEIGHT.sent],
+      ),
+    }),
+    [sent],
+  )
+
+  const sentPrimarySize = sentPrimaryFontSize(primaryAmount)
+  const sentPrimaryStyle = useAnimatedStyle(
+    () => ({
+      fontSize: interpolate(
+        sent.value,
+        [0, 1],
+        [AMOUNT_SIZE.inactive.primary, sentPrimarySize],
+      ),
+      lineHeight: interpolate(
+        sent.value,
+        [0, 1],
+        [LINE_HEIGHT.inactive.primary, sentPrimarySize + ENTRY_LINE_HEIGHT_OFFSET],
+      ),
+    }),
+    [sent, sentPrimarySize],
+  )
+
+  const sentSecondaryStyle = useAnimatedStyle(
+    () => ({
+      fontSize: interpolate(
+        sent.value,
+        [0, 1],
+        [AMOUNT_SIZE.inactive.secondary, SENT_AMOUNT_SIZE.secondary],
+      ),
+      lineHeight: interpolate(
+        sent.value,
+        [0, 1],
+        [LINE_HEIGHT.inactive.secondary, SENT_LINE_HEIGHT.secondary],
+      ),
+    }),
+    [sent],
+  )
+
+  /** The orange glyph and the green one cross-fade rather than tweening the colour, which
+   *  the SVG glyph cannot take on the UI thread. */
+  const sentIconStyle = useAnimatedStyle(() => ({ opacity: sent.value }), [sent])
+  const sendingIconStyle = useAnimatedStyle(() => ({ opacity: 1 - sent.value }), [sent])
+  const isMorphing = Boolean(sentProgress) && !active
+
   const captionNode = (
     <Pressable
       onLongPress={onCaptionLongPress}
@@ -168,15 +256,14 @@ export const SendHero: React.FC<SendHeroProps> = ({
       }
       onAccessibilityAction={onCaptionLongPress}
     >
-      <Text
-        type="p4"
+      <Animated.Text
         numberOfLines={1}
         ellipsizeMode="middle"
-        style={styles.caption}
+        style={[styles.caption, isMorphing && sentCaptionStyle]}
         testID={SEND_HERO_CAPTION_TEST_ID}
       >
         {caption}
-      </Text>
+      </Animated.Text>
     </Pressable>
   )
 
@@ -200,6 +287,7 @@ export const SendHero: React.FC<SendHeroProps> = ({
             color: isEmpty ? colors.textMuted : colors.textOnBackground,
           },
           active && primaryStyle,
+          isMorphing && sentPrimaryStyle,
         ]}
         adjustsFontSizeToFit
         numberOfLines={1}
@@ -222,6 +310,7 @@ export const SendHero: React.FC<SendHeroProps> = ({
             },
             !active && styles.settledSecondary,
             active && secondaryStyle,
+            isMorphing && sentSecondaryStyle,
           ]}
           numberOfLines={1}
           testID={SEND_HERO_SECONDARY_TEST_ID}
@@ -232,9 +321,22 @@ export const SendHero: React.FC<SendHeroProps> = ({
     </Pressable>
   )
 
+  const icon = isMorphing ? (
+    <View style={styles.iconStack}>
+      <Animated.View style={sendingIconStyle}>
+        <GaloyIcon name="send" size={ICON_SIZE} color={colors.accent} />
+      </Animated.View>
+      <Animated.View style={[styles.iconOverlay, sentIconStyle]}>
+        <GaloyIcon name="send" size={ICON_SIZE} color={colors._green} />
+      </Animated.View>
+    </View>
+  ) : (
+    "send"
+  )
+
   return (
     <IconHero
-      icon="send"
+      icon={icon}
       iconColor={colors.accent}
       iconSize={ICON_SIZE}
       hasIconBackground={false}
@@ -247,8 +349,20 @@ export const SendHero: React.FC<SendHeroProps> = ({
 
 const useStyles = makeStyles(({ colors }) => ({
   caption: {
+    fontFamily: fonts.regular,
+    fontSize: CAPTION_SIZE.review,
+    lineHeight: CAPTION_LINE_HEIGHT.review,
     textAlign: "center",
     color: colors.textOnBackground,
+  },
+  iconStack: {
+    width: ICON_SIZE,
+    height: ICON_SIZE,
+  },
+  iconOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
   },
   amount: {
     fontFamily: fonts.bold,
