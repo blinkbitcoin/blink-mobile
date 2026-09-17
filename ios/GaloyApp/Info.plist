@@ -97,8 +97,6 @@
 		<string>SourceSansPro-BoldItalic.ttf</string>
 		<string>SourceSansPro-Italic.ttf</string>
 		<string>SourceSansPro-Regular.ttf</string>
-		<string>SourceSansPro-SemiBold.ttf</string>
-		<string>SourceSansPro-SemiBoldItalic.ttf</string>
 		<string>DMSans-Bold.ttf</string>
 	</array>
 	<key>UIBackgroundModes</key>
