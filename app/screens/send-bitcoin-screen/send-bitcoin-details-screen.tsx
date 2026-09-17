@@ -166,7 +166,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
   const { convertMoneyAmount: _convertMoneyAmount, displayCurrency } =
     usePriceConversion()
   const { zeroDisplayAmount } = useDisplayCurrency()
-  const { paymentDestination, sendingWalletId } = route.params
+  const { paymentDestination, sendingWalletId, resetAmountAt } = route.params
 
   /** The wallet the caller judged able to pay, when it named one the flow offers; the
    *  flow's own default otherwise. */
@@ -246,6 +246,16 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     setAmount(zeroDisplayAmount)
     amountPad.showAmount(zeroDisplayAmount)
   }
+
+  // Review's "Change amount" comes back with a fresh `resetAmountAt`: the amount starts
+  // from zero, and the destination, wallet and note stay. The back arrow sends none.
+  const handledResetAt = useRef(resetAmountAt)
+  useEffect(() => {
+    if (!resetAmountAt || handledResetAt.current === resetAmountAt) return
+    handledResetAt.current = resetAmountAt
+    setAmount(zeroDisplayAmount)
+    amountPad.showAmount(zeroDisplayAmount)
+  }, [resetAmountAt, setAmount, zeroDisplayAmount, amountPad])
 
   /** Keeps the payment detail on the current rate. A change of display currency, which is
    *  what sats-only mode starting or ending is, also moves the amount already typed. */
