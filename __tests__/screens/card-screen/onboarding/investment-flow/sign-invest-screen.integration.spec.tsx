@@ -75,7 +75,7 @@ jest.mock("@react-native-community/netinfo", () => {
 })
 
 const mockNavigate = jest.fn()
-const mockReplace = jest.fn()
+const mockDispatch = jest.fn()
 const mockGoBack = jest.fn()
 jest.mock("@react-navigation/native", () => {
   const actualNav = jest.requireActual("@react-navigation/native")
@@ -83,7 +83,7 @@ jest.mock("@react-navigation/native", () => {
     ...actualNav,
     useNavigation: () => ({
       navigate: mockNavigate,
-      replace: mockReplace,
+      dispatch: mockDispatch,
       goBack: mockGoBack,
     }),
     useRoute: () => ({ params: { selectedAmountUsd: SELECTED_AMOUNT_USD } }),
@@ -152,15 +152,29 @@ describe("SignInvestScreen on the library's own state machine", () => {
     const page = await signingPage(utils)
 
     await postOutcome(page, "signing_complete")
-    expect(mockReplace).not.toHaveBeenCalled()
+    expect(mockDispatch).not.toHaveBeenCalled()
     await act(async () => {
       jest.advanceTimersByTime(SUCCESS_DELAY_MS)
     })
 
-    expect(mockReplace).toHaveBeenCalledWith("cardOnboardingTransferInvestScreen", {
-      selectedAmountUsd: SELECTED_AMOUNT_USD,
-      settlementSats: SETTLEMENT_SATS,
-    })
+    expect(mockDispatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "RESET",
+        payload: {
+          index: 1,
+          routes: [
+            { name: "Primary" },
+            {
+              name: "cardOnboardingTransferInvestScreen",
+              params: {
+                selectedAmountUsd: SELECTED_AMOUNT_USD,
+                settlementSats: SETTLEMENT_SATS,
+              },
+            },
+          ],
+        },
+      }),
+    )
   })
 
   /** A page reached through a link inside the document posts a completion nobody
@@ -182,7 +196,7 @@ describe("SignInvestScreen on the library's own state machine", () => {
       jest.advanceTimersByTime(SUCCESS_DELAY_MS)
     })
 
-    expect(mockReplace).not.toHaveBeenCalled()
+    expect(mockDispatch).not.toHaveBeenCalled()
     expect(
       utils.getByTestId("sign-invest-webview", { includeHiddenElements: true }),
     ).toBeTruthy()
