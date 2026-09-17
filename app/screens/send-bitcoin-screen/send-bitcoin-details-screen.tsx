@@ -54,7 +54,10 @@ import { useOnchainFeeTierOptions } from "./hooks/use-onchain-fee-tier-options"
 import { useSendWallets } from "./hooks/use-send-wallets"
 
 import { testProps } from "../../utils/testProps"
-import { AmountEntryErrorSheet } from "./amount-entry/amount-entry-error-sheet"
+import {
+  AmountEntryErrorSheet,
+  LnurlInvoiceError,
+} from "./amount-entry/amount-entry-error-sheet"
 import { SendWalletSummary } from "./amount-entry/send-wallet-summary"
 import { ConfirmFeesModal } from "./confirm-fees-modal"
 import { formatDestination } from "./format-destination"
@@ -223,7 +226,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
       paymentDetail.paymentType !== "intraledger",
   })
 
-  const [asyncErrorMessage, setAsyncErrorMessage] = useState("")
+  const [lnurlError, setLnurlError] = useState<LnurlInvoiceError>()
 
   const setAmount = useCallback((moneyAmount: MoneyAmount<WalletOrDisplayCurrency>) => {
     setSelectedPercent(null)
@@ -241,21 +244,21 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     onAmountChange: setAmount,
   })
 
-  /** "Change amount" from the error sheet: back to zero, destination, wallet and note kept. */
+  /** "Change amount", from review or from this screen's error sheet: back to zero, with the
+   *  destination, wallet and note kept. */
   const clearAmount = () => {
     setAmount(zeroDisplayAmount)
     amountPad.showAmount(zeroDisplayAmount)
   }
 
-  // Review's "Change amount" comes back with a fresh `resetAmountAt`: the amount starts
-  // from zero, and the destination, wallet and note stay. The back arrow sends none.
+  // Review's "Change amount" comes back with a fresh `resetAmountAt`. The back arrow
+  // sends none, so it returns with the amount as it was.
   const handledResetAt = useRef(resetAmountAt)
   useEffect(() => {
     if (!resetAmountAt || handledResetAt.current === resetAmountAt) return
     handledResetAt.current = resetAmountAt
-    setAmount(zeroDisplayAmount)
-    amountPad.showAmount(zeroDisplayAmount)
-  }, [resetAmountAt, setAmount, zeroDisplayAmount, amountPad])
+    clearAmount()
+  }, [resetAmountAt, clearAmount])
 
   /** Keeps the payment detail on the current rate. A change of display currency, which is
    *  what sats-only mode starting or ending is, also moves the amount already typed. */
@@ -457,6 +460,8 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
       let paymentDetailForConfirmation: PaymentDetail<WalletCurrency> = paymentDetail
 
       if (paymentDetail.paymentType === "lnurl" && !paymentDetail.sendPaymentMutation) {
+        // A new request clears the last one's error, so a retry that fails opens the sheet again.
+        setLnurlError(undefined)
         try {
           setIsLoadingLnurl(true)
 
@@ -472,7 +477,11 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
           // not be the callback it pays.
           if (!lnurlParams) {
             setIsLoadingLnurl(false)
-            setAsyncErrorMessage(LL.SendBitcoinScreen.failedToFetchLnurlInvoice())
+            setLnurlError({
+              title: LL.SendBitcoinScreen.recipientUnreachableTitle(),
+              message: LL.SendBitcoinScreen.failedToFetchLnurlInvoice(),
+              canRetry: true,
+            })
             return
           }
 
@@ -500,7 +509,12 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
           if (
             Math.round(Number(decodedInvoice.millisatoshis) / 1000) !== btcAmount.amount
           ) {
-            setAsyncErrorMessage(LL.SendBitcoinScreen.lnurlInvoiceIncorrectAmount())
+            // Paying it would send the wrong amount, so there is no retry (L3).
+            setLnurlError({
+              title: LL.SendBitcoinScreen.recipientWrongAmountTitle(),
+              message: LL.SendBitcoinScreen.lnurlInvoiceIncorrectAmount(),
+              canRetry: false,
+            })
             return
           }
 
@@ -514,7 +528,11 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
         } catch (error) {
           setIsLoadingLnurl(false)
           reportError("send-bitcoin-details", error)
-          setAsyncErrorMessage(LL.SendBitcoinScreen.failedToFetchLnurlInvoice())
+          setLnurlError({
+            title: LL.SendBitcoinScreen.recipientUnreachableTitle(),
+            message: LL.SendBitcoinScreen.failedToFetchLnurlInvoice(),
+            canRetry: true,
+          })
           return
         }
       }
@@ -552,7 +570,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
    * act on, so a fee error only takes the box once the amount is valid.
    */
   const extraInfoErrorMessage =
-    asyncErrorMessage ||
+    lnurlError?.message ||
     lnurlBoundsErrorMessage ||
     (amountStatus.validAmount ? feeTierErrorMessage : undefined)
 
@@ -630,7 +648,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
       edges={isKeyboardVisible ? ["left", "right"] : ["left", "right", "bottom"]}
     >
       <AmountEntryErrorSheet
-        lnurlError={undefined}
+        lnurlError={lnurlError}
         limitMessage={
           !amountStatus.validAmount &&
           amountStatus.invalidReason === AmountInvalidReason.InsufficientLimit
