@@ -73,8 +73,8 @@ export const App = () => (
             <GaloyThemeProvider>
               <FeatureFlagContextProvider>
                 <CustodialWalletProvider>
-                  <SelfCustodialWalletProvider>
-                    <CustodialRestrictionsProvider>
+                  <CustodialRestrictionsProvider>
+                    <SelfCustodialWalletProvider>
                       <BackupStateProvider>
                         <AutoConvertStatusProvider>
                           <ActionsProvider>
@@ -104,8 +104,8 @@ export const App = () => (
                           </ActionsProvider>
                         </AutoConvertStatusProvider>
                       </BackupStateProvider>
-                    </CustodialRestrictionsProvider>
-                  </SelfCustodialWalletProvider>
+                    </SelfCustodialWalletProvider>
+                  </CustodialRestrictionsProvider>
                 </CustodialWalletProvider>
               </FeatureFlagContextProvider>
             </GaloyThemeProvider>

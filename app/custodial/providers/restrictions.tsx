@@ -29,8 +29,15 @@ gql`
   }
 `
 
-/** Backed off so a server that is down is not hammered, and bounded: once they are spent
- *  the verdict reads Unknown, and the app asks again on foreground and on pull to refresh. */
+/**
+ * Backed off so a server that is down is not hammered, and bounded. These delays sit on
+ * top of the transport's own retries: the client's `RetryLink` makes up to five attempts
+ * per request, the four resends spaced by a jittered, doubling delay of up to 600 ms, so
+ * every attempt here is a burst of up to five on the wire and the whole budget is spent in
+ * about 25 s on average and 45 s at worst. Once it is spent the verdict reads Unknown and
+ * stays there on purpose: nothing polls and nothing listens for connectivity, so only the
+ * next foreground and the next pull to refresh ask again.
+ */
 const RESTRICTION_RETRY_DELAYS_MS: readonly number[] = [1000, 2000, 4000]
 
 const LOG_SCOPE = "custodial-restrictions"
@@ -190,10 +197,7 @@ export const CustodialRestrictionsProvider: React.FC<React.PropsWithChildren> = 
 
   const refetchVerdict = useCallback(async () => {
     if (!isEnabled) return
-    await refetch().then(
-      () => undefined,
-      () => undefined,
-    )
+    await refetch().catch(() => undefined)
   }, [isEnabled, refetch])
 
   const contextValue = useMemo(
