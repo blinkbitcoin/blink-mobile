@@ -8,7 +8,6 @@ import {
   withTiming,
 } from "react-native-reanimated"
 
-import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useNavigation } from "@react-navigation/native"
 
 import { sentHeroGrowth } from "../send-hero"
@@ -19,6 +18,9 @@ const DETAILS_FADE_MS = 300
 const HERO_MOVE_MS = 500
 const GLOW_DELAY_MS = 200
 const GLOW_BLOOM_MS = 600
+/** The actions arrive once the hero has settled in the middle. */
+const ACTIONS_DELAY_MS = HERO_MOVE_MS
+const ACTIONS_FADE_MS = 300
 
 type Frame = { x: number; y: number; width: number; height: number }
 
@@ -31,21 +33,15 @@ const measureInWindow = (view: View | null): Promise<Frame | undefined> =>
     view.measureInWindow((...[x, y, width, height]) => resolve({ x, y, width, height }))
   })
 
-const wait = (ms: number) =>
-  new Promise<void>((resolve) => {
-    setTimeout(resolve, ms)
-  })
-
 export type SentGlowFrame = { centerX: number; centerY: number; radius: number }
 
 /**
  * Review turns into the Sent screen in place: the details and slider dissolve, the hero
  * travels to the middle of the screen as it grows, and a glow blooms behind it. The Sent
- * state then holds for the remote-configured success duration before the receipt.
+ * state then holds until the sender opens the receipt or closes.
  */
 export const useSentTransition = () => {
   const navigation = useNavigation()
-  const { successIconDuration } = useRemoteConfig()
 
   const stageRef = useRef<View>(null)
   const heroRef = useRef<View>(null)
@@ -57,10 +53,15 @@ export const useSentTransition = () => {
   const detailsProgress = useSharedValue(0)
   const glowProgress = useSharedValue(0)
   const heroTravel = useSharedValue(0)
+  const actionsProgress = useSharedValue(0)
 
   const detailsStyle = useAnimatedStyle(
     () => ({ opacity: 1 - detailsProgress.value }),
     [detailsProgress],
+  )
+  const actionsStyle = useAnimatedStyle(
+    () => ({ opacity: actionsProgress.value }),
+    [actionsProgress],
   )
   const heroStyle = useAnimatedStyle(
     () => ({ transform: [{ translateY: heroTravel.value * heroProgress.value }] }),
@@ -75,15 +76,6 @@ export const useSentTransition = () => {
     return () => subscription.remove()
   }, [isSent, navigation])
 
-  const isMounted = useRef(true)
-  useEffect(
-    () => () => {
-      isMounted.current = false
-    },
-    [],
-  )
-
-  /** Resolves once the Sent state has held for its full duration. */
   const playSent = useCallback(
     async ({
       primaryAmount,
@@ -126,11 +118,12 @@ export const useSentTransition = () => {
         GLOW_DELAY_MS,
         withTiming(1, { duration: GLOW_BLOOM_MS, easing: Easing.out(Easing.quad) }),
       )
-
-      await wait(GLOW_DELAY_MS + GLOW_BLOOM_MS + successIconDuration)
-      return isMounted.current
+      actionsProgress.value = withDelay(
+        ACTIONS_DELAY_MS,
+        withTiming(1, { duration: ACTIONS_FADE_MS, easing: Easing.out(Easing.quad) }),
+      )
     },
-    [successIconDuration, heroTravel, detailsProgress, heroProgress, glowProgress],
+    [heroTravel, detailsProgress, heroProgress, glowProgress, actionsProgress],
   )
 
   return {
@@ -142,6 +135,7 @@ export const useSentTransition = () => {
     glowProgress,
     detailsStyle,
     heroStyle,
+    actionsStyle,
     playSent,
   }
 }
