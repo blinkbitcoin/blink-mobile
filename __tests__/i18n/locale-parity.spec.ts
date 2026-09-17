@@ -184,6 +184,52 @@ const supersededTierCopy = (localeFile: string, parsed: AnyTranslation): string[
   })
 }
 
+/**
+ * The same three tiers are named twice: in the send selector and in Settings → Fee rates,
+ * where #4228 wraps them as "Onchain <tier> (~<window>)". The two screens have to use one
+ * word per tier, so each Settings row is reduced to its bare tier word — the "Onchain"
+ * marker (`I-Onchain` in `xh`, オンチェーン in `ja`, trailing in `ar`) and the window
+ * dropped — and compared with the selector's word.
+ */
+const TIER_WORD_PAIRS: [selectorKey: string, settingsKey: string][] = [
+  ["SendBitcoinScreen.fast", "FeeRatesScreen.onchainPriority"],
+  ["SendBitcoinScreen.medium", "FeeRatesScreen.onchainStandard"],
+  ["SendBitcoinScreen.slow", "FeeRatesScreen.onchainEconomy"],
+]
+
+/**
+ * Where a language inflects the tier word for what it qualifies, the two screens can
+ * legitimately differ in the ending only. Keyed `<file>:<selectorKey>`, the value is the
+ * Settings form the selector form is accepted against.
+ */
+const TIER_WORD_AGREEMENT: Record<string, Record<string, string>> = {
+  // The selector agrees with a feminine noun, the Settings row with a neuter one.
+  "el.json:SendBitcoinScreen.medium": { κανονική: "κανονικό" },
+  "el.json:SendBitcoinScreen.slow": { οικονομική: "οικονομικό" },
+}
+
+const bareTierWord = (value: string, locale: string): string =>
+  value
+    .replace(/\s*\([^)]*\)\s*$/, "")
+    .replace(/(I-)?Onchain|オンチェーン/g, "")
+    .trim()
+    .toLocaleLowerCase(locale)
+
+const tierWordMismatches = (localeFile: string, parsed: AnyTranslation): string[] => {
+  const localeLeaves = collectLeaves(parsed)
+  const locale = localeFile.replace(/\.json$/, "")
+
+  return TIER_WORD_PAIRS.filter(([selectorKey, settingsKey]) => {
+    const selector = bareTierWord(String(localeLeaves[selectorKey]), locale)
+    const settings = bareTierWord(String(localeLeaves[settingsKey]), locale)
+    const agreed = TIER_WORD_AGREEMENT[`${localeFile}:${selectorKey}`]?.[selector]
+    return (agreed ?? selector) !== settings
+  }).map(
+    ([selectorKey, settingsKey]) =>
+      `${selectorKey} "${localeLeaves[selectorKey]}" vs ${settingsKey} "${localeLeaves[settingsKey]}"`,
+  )
+}
+
 const localeFiles = fs
   .readdirSync(TRANSLATIONS_DIR)
   .filter((name) => name.endsWith(".json"))
@@ -216,6 +262,10 @@ describe("locale parity", () => {
       // queue-describing naming the on-chain tiers moved off, invisibly to `en`-only specs.
       it("carries no superseded on-chain fee tier name", () => {
         expect(supersededTierCopy(localeFile, parsed)).toEqual([])
+      })
+
+      it("names the on-chain fee tiers the same in the send selector and Settings", () => {
+        expect(tierWordMismatches(localeFile, parsed)).toEqual([])
       })
 
       // Without this, a locale added after a rename can quietly opt out of the check above

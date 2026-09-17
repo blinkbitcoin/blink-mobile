@@ -2428,7 +2428,7 @@
     "feeTier": "Prioritas transaksi",
     "fast": "Prioritas",
     "medium": "Standar",
-    "slow": "Ekonomi",
+    "slow": "Ekonomis",
     "recommended": "Direkomendasikan",
     "walletOffline": "Dompet Anda sedang offline. Silakan periksa koneksi Anda dan coba lagi.",
     "sdkInsufficientFunds": "Dana tidak cukup untuk transaksi ini.",
