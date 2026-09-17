@@ -18,7 +18,9 @@ const icons: Record<ToastType, IconNamesType> = {
   warning: "warning",
 }
 
-const ToastRow = ({ type, text2 }: { type: ToastType; text2?: string }) => {
+type ToastRowProps = { type: ToastType; text1?: string; text2?: string }
+
+const ToastRow = ({ type, text1, text2 }: ToastRowProps) => {
   const {
     theme: { colors },
   } = useTheme()
@@ -31,22 +33,30 @@ const ToastRow = ({ type, text2 }: { type: ToastType; text2?: string }) => {
   }[type]
 
   return (
-    <View testID={`toast-${type}`} style={[styles.container, { borderColor: accent }]}>
+    // The title is not drawn, the icon and colour carry the type, so it is
+    // announced instead, and shown only when there is no message to show.
+    <View
+      testID={`toast-${type}`}
+      accessible
+      accessibilityRole="alert"
+      accessibilityLabel={[text1, text2].filter(Boolean).join(". ")}
+      style={[styles.container, { borderColor: accent }]}
+    >
       <GaloyIcon name={icons[type]} size={18} color={accent} />
-      <Text style={styles.text}>{text2}</Text>
+      <Text style={styles.text}>{text2 || text1}</Text>
     </View>
   )
 }
 
 const toastConfig = {
-  success: ({ text2 }: ToastConfigParams<unknown>) => (
-    <ToastRow type="success" text2={text2} />
+  success: ({ text1, text2 }: ToastConfigParams<unknown>) => (
+    <ToastRow type="success" text1={text1} text2={text2} />
   ),
-  error: ({ text2 }: ToastConfigParams<unknown>) => (
-    <ToastRow type="error" text2={text2} />
+  error: ({ text1, text2 }: ToastConfigParams<unknown>) => (
+    <ToastRow type="error" text1={text1} text2={text2} />
   ),
-  warning: ({ text2 }: ToastConfigParams<unknown>) => (
-    <ToastRow type="warning" text2={text2} />
+  warning: ({ text1, text2 }: ToastConfigParams<unknown>) => (
+    <ToastRow type="warning" text1={text1} text2={text2} />
   ),
 }
 
