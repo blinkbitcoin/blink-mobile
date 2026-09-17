@@ -2,14 +2,17 @@ import { readdirSync, readFileSync, statSync } from "fs"
 import { join, relative } from "path"
 
 /**
- * Bold in the app is 700. A 600 weight renders SemiBold on iOS and the same synthesised
- * bold as 700 on Android, so the two platforms drift apart. The artifact under test is
- * the style source, so source-coupling here is intentional.
+ * Bold in the app is 700 and there is no SemiBold face. On iOS a 600 weight draws a
+ * SemiBold face; on Android a weight under 700 loads the regular file, so the same text
+ * is not bold at all. The artifact under test is the style source, so source-coupling
+ * here is intentional.
  */
 
 const REPO_ROOT = join(__dirname, "..", "..")
 const APP_DIR = join(REPO_ROOT, "app")
-const SEMIBOLD = /fontWeight:[^,\n]*["']600["']|fontWeight:\s*600\b|SemiBold/
+// A 600 or "semibold" weight, or a SemiBold face named in a string. Comments may say SemiBold.
+const SEMIBOLD =
+  /fontWeight:[^,\n]*(["'`](600|semibold)["'`]|\b600\b)|["'`][^"'`\n]*SemiBold[^"'`\n]*["'`]/i
 const THEMED_TEXT_IMPORT =
   /import\s*(?:type\s*)?\{[^}]*\bText\b[^}]*\}\s*from\s*["']@rn-vui\/themed["']/
 const BOLD_WEIGHT = /fontWeight:[^,\n]*(["'](bold|[7-9]00)["']|\b[7-9]00\b)/
@@ -22,6 +25,34 @@ const sourceFiles = (dir: string): string[] =>
   })
 
 describe("font weights", () => {
+  const flagged = [
+    'fontWeight: "600",',
+    "fontWeight: '600',",
+    "fontWeight: 600,",
+    'fontWeight: "600" as const,',
+    'fontWeight: clear ? "bold" : "600",',
+    "fontWeight: `600`,",
+    'fontWeight: "semibold",',
+    'fontFamily: "SourceSansPro-SemiBold",',
+  ]
+  flagged.forEach((line) => {
+    it(`flags ${line}`, () => {
+      expect(SEMIBOLD.test(line)).toBe(true)
+    })
+  })
+
+  const allowed = [
+    'fontWeight: "700",',
+    'fontFamily: "SourceSansPro-Bold",',
+    "// was SemiBold before #1304",
+    "// semibold system face",
+  ]
+  allowed.forEach((line) => {
+    it(`allows ${line}`, () => {
+      expect(SEMIBOLD.test(line)).toBe(false)
+    })
+  })
+
   it("never sets a 600 (SemiBold) weight in app code", () => {
     const offenders = sourceFiles(APP_DIR).flatMap((file) =>
       readFileSync(file, "utf8")
