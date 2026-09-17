@@ -1,14 +1,18 @@
 import React, { useState } from "react"
-import { ScrollView, View } from "react-native"
+import { Platform, ScrollView, View } from "react-native"
 import { PanGestureHandler } from "react-native-gesture-handler"
 import ReactNativeHapticFeedback from "react-native-haptic-feedback"
+import Animated from "react-native-reanimated"
+import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 import { gql } from "@apollo/client"
 import { Chip } from "@app/components/atomic/chip"
+import { HeaderBackButtonWithTheme } from "@app/components/header-back-control/header-back-control"
 import { GaloyErrorBox } from "@app/components/atomic/galoy-error-box"
 import GaloySliderButton from "@app/components/atomic/galoy-slider-button/galoy-slider-button"
 import { InfoSection } from "@app/components/card-screen"
 import { Screen } from "@app/components/screen"
+import { SuccessGlow } from "@app/components/success-glow"
 import { WarningBanner } from "@app/components/warning-banner"
 import { PreferredAmountCurrency } from "@app/graphql/client-only-query"
 import {
@@ -52,6 +56,7 @@ import {
 import { useFeeTierLabels } from "./hooks/use-fee-tier-labels"
 import { ETA_MINUTES } from "./hooks/use-onchain-fee-tiers"
 import { SendReviewDestination } from "./review/send-review-destination"
+import { useSentTransition } from "./review/use-sent-transition"
 import { SendHero } from "./send-hero"
 import { useSendBalances } from "./hooks/use-send-wallets"
 import { useVerifyPaymentSettled } from "./hooks/use-verify-payment-settled"
@@ -159,6 +164,11 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   } = useAppConfig()
 
   const fee = useFee(getFee)
+
+  const sentTransition = useSentTransition()
+  /** Review is headerless and runs edge to edge, so the Sent glow can fill the whole
+   *  screen; the stage pads the content back clear of the system bars. */
+  const { top: topInset, bottom: bottomInset } = useSafeAreaInsets()
 
   const settledFee = fee.status === "set" ? fee : undefined
 
@@ -270,6 +280,21 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     walletAmount: heroWalletAmount,
     displayAmount,
   })
+  const heroPrimaryText = formatMoneyAmount({ moneyAmount: heroPrimaryAmount })
+  const heroSecondaryText =
+    heroSecondaryAmount && formatMoneyAmount({ moneyAmount: heroSecondaryAmount })
+
+  const {
+    stageRef,
+    heroRef,
+    isSent,
+    glowFrame,
+    heroProgress,
+    glowProgress,
+    detailsStyle,
+    heroStyle,
+    playSent,
+  } = sentTransition
 
   const navigateToCompleted = React.useCallback(
     async ({
@@ -287,6 +312,20 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
         isMerchant:
           paymentDetail.paymentType === "lnurl" ? paymentDetail.isMerchant : undefined,
       })
+
+      /** A payment that landed plays Sent in place before the receipt; the receipt then
+       *  skips its own success icon. Pending keeps today's screen until its design lands. */
+      const isSuccess = status === "SUCCESS"
+      if (isSuccess) {
+        ReactNativeHapticFeedback.trigger("notificationSuccess", {
+          ignoreAndroidSystemSettings: true,
+        })
+        const isStillOnReview = await playSent({
+          primaryAmount: heroPrimaryText,
+          hasSecondaryAmount: Boolean(heroSecondaryText),
+        })
+        if (!isStillOnReview) return
+      }
 
       navigation.dispatch((state) => {
         const routes = [
@@ -310,6 +349,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
               }),
               paymentType: paymentDetail?.paymentType,
               createdAt: transaction?.createdAt,
+              hasShownSuccess: isSuccess,
             },
           },
         ]
@@ -319,11 +359,16 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
           index: routes.length - 1,
         })
       })
-      ReactNativeHapticFeedback.trigger("notificationSuccess", {
-        ignoreAndroidSystemSettings: true,
-      })
+      if (!isSuccess) {
+        ReactNativeHapticFeedback.trigger("notificationSuccess", {
+          ignoreAndroidSystemSettings: true,
+        })
+      }
     },
     [
+      playSent,
+      heroPrimaryText,
+      heroSecondaryText,
       saveLnAddressContact,
       navigation,
       paymentType,
@@ -579,104 +624,136 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
         : undefined
 
   return (
-    <Screen preset="fixed" keyboardOffset="navigationHeader">
-      <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
-        <View style={styles.hero}>
-          <SendHero
-            caption={LL.SendBitcoinConfirmationScreen.sending()}
-            primaryAmount={formatMoneyAmount({ moneyAmount: heroPrimaryAmount })}
-            secondaryAmount={
-              heroSecondaryAmount &&
-              formatMoneyAmount({ moneyAmount: heroSecondaryAmount })
-            }
-          />
-        </View>
-        <SendReviewDestination
-          destination={destination}
-          paymentType={paymentType}
-          onCopy={handleCopyToClipboard}
-        />
-        <View style={styles.group}>
-          <Text type="p3">{LL.SendBitcoinConfirmationScreen.fromBalance()}</Text>
-          <SendWalletSummary
-            inactive
-            currency={sendingWalletDescriptor.currency}
-            isBalanceHidden={isBalanceHidden}
-            onReveal={isBalanceHidden ? () => setIsBalanceRevealed(true) : undefined}
-            balancePrimary={formatMoneyAmount({ moneyAmount: sendingWalletBalance })}
-            balanceSecondary={
-              walletBalanceSecondary &&
-              formatMoneyAmount({
-                moneyAmount: walletBalanceSecondary,
-                isApproximate: true,
-              })
-            }
-          />
-        </View>
-        <View style={styles.group}>
-          <InfoSection
-            title={LL.SendBitcoinConfirmationScreen.details()}
-            items={detailItems}
-            outlineColor={detailsOutline}
-            inactive
-          />
-          {blockingError ? (
-            <View style={styles.errorWithAction}>
-              <GaloyErrorBox errorMessage={blockingError} filled={false} />
-              {canChangeAmount ? (
-                <Chip
-                  label={LL.SendBitcoinConfirmationScreen.changeAmount()}
-                  onPress={() => navigation.goBack()}
-                  style={styles.changeAmountChip}
-                />
+    <Screen preset="fixed" keyboardOffset="navigationHeader" edges={["left", "right"]}>
+      <View
+        ref={stageRef}
+        style={[styles.stage, { paddingTop: topInset, paddingBottom: bottomInset }]}
+        collapsable={false}
+      >
+        {glowFrame ? <SuccessGlow progress={glowProgress} {...glowFrame} /> : null}
+        {/* The header row stands in for the native header and dissolves with the details. */}
+        <Animated.View
+          style={[styles.headerRow, detailsStyle]}
+          pointerEvents={isSent ? "none" : "auto"}
+        >
+          <HeaderBackButtonWithTheme />
+        </Animated.View>
+        <ScrollView
+          style={styles.scroll}
+          contentContainerStyle={styles.scrollContent}
+          scrollEnabled={!isSent}
+        >
+          <View style={styles.hero}>
+            <Animated.View ref={heroRef} style={heroStyle} collapsable={false}>
+              <SendHero
+                caption={
+                  isSent
+                    ? LL.SendBitcoinConfirmationScreen.sent()
+                    : LL.SendBitcoinConfirmationScreen.sending()
+                }
+                primaryAmount={heroPrimaryText}
+                secondaryAmount={heroSecondaryText}
+                sentProgress={heroProgress}
+              />
+            </Animated.View>
+          </View>
+          <Animated.View
+            style={[styles.details, detailsStyle]}
+            pointerEvents={isSent ? "none" : "auto"}
+          >
+            <SendReviewDestination
+              destination={destination}
+              paymentType={paymentType}
+              onCopy={handleCopyToClipboard}
+            />
+            <View style={styles.group}>
+              <Text type="p3">{LL.SendBitcoinConfirmationScreen.fromBalance()}</Text>
+              <SendWalletSummary
+                inactive
+                currency={sendingWalletDescriptor.currency}
+                isBalanceHidden={isBalanceHidden}
+                onReveal={isBalanceHidden ? () => setIsBalanceRevealed(true) : undefined}
+                balancePrimary={formatMoneyAmount({ moneyAmount: sendingWalletBalance })}
+                balanceSecondary={
+                  walletBalanceSecondary &&
+                  formatMoneyAmount({
+                    moneyAmount: walletBalanceSecondary,
+                    isApproximate: true,
+                  })
+                }
+              />
+            </View>
+            <View style={styles.group}>
+              <InfoSection
+                title={LL.SendBitcoinConfirmationScreen.details()}
+                items={detailItems}
+                outlineColor={detailsOutline}
+                inactive
+              />
+              {blockingError ? (
+                <View style={styles.errorWithAction}>
+                  <GaloyErrorBox errorMessage={blockingError} filled={false} />
+                  {canChangeAmount ? (
+                    <Chip
+                      label={LL.SendBitcoinConfirmationScreen.changeAmount()}
+                      onPress={() => navigation.goBack()}
+                      style={styles.changeAmountChip}
+                    />
+                  ) : null}
+                </View>
+              ) : isLightningRecommended ? (
+                <WarningBanner>
+                  {LL.SendBitcoinConfirmationScreen.lightningRecommended()}
+                </WarningBanner>
+              ) : null}
+              {isMaxFee ? (
+                <Text type="p3" style={styles.footnote}>
+                  {"*" + LL.SendBitcoinConfirmationScreen.maxFeeSelected()}
+                </Text>
+              ) : null}
+              {dustWarning.status === "visible" ? (
+                <WarningBanner>
+                  {LL.SendBitcoinConfirmationScreen.usdRemainderSweep({
+                    remaining: formatMoneyAmount({ moneyAmount: dustWarning.remaining }),
+                    remainingSats: formatMoneyAmount({
+                      moneyAmount: dustWarning.remainingSats,
+                    }),
+                    minimum: formatMoneyAmount({ moneyAmount: dustWarning.minimum }),
+                  })}
+                </WarningBanner>
               ) : null}
             </View>
-          ) : isLightningRecommended ? (
-            <WarningBanner>
-              {LL.SendBitcoinConfirmationScreen.lightningRecommended()}
-            </WarningBanner>
-          ) : null}
-          {isMaxFee ? (
-            <Text type="p3" style={styles.footnote}>
-              {"*" + LL.SendBitcoinConfirmationScreen.maxFeeSelected()}
-            </Text>
-          ) : null}
-          {dustWarning.status === "visible" ? (
-            <WarningBanner>
-              {LL.SendBitcoinConfirmationScreen.usdRemainderSweep({
-                remaining: formatMoneyAmount({ moneyAmount: dustWarning.remaining }),
-                remainingSats: formatMoneyAmount({
-                  moneyAmount: dustWarning.remainingSats,
-                }),
-                minimum: formatMoneyAmount({ moneyAmount: dustWarning.minimum }),
-              })}
-            </WarningBanner>
-          ) : null}
-        </View>
-      </ScrollView>
-      {/* disable slide gestures in area around the slider button */}
-      <PanGestureHandler>
-        <View style={styles.sliderContainer}>
-          <GaloySliderButton
-            isLoading={sendPaymentLoading || isVerifying}
-            initialText={LL.SendBitcoinConfirmationScreen.slideToSend()}
-            loadingText={LL.SendBitcoinConfirmationScreen.sendProgress.reviewing()}
-            busyLabels={sendProgressLabels}
-            disabledText={
-              isCalculating
-                ? LL.SendBitcoinConfirmationScreen.calculatingFee()
-                : undefined
-            }
-            accentColor={
-              sendingWalletDescriptor.currency === WalletCurrency.Usd
-                ? colors._green
-                : colors.primary
-            }
-            onSwipe={handleSendPayment}
-            disabled={!validAmount || !sendPayment || feeUnavailable || dustNotEvaluable}
-          />
-        </View>
-      </PanGestureHandler>
+          </Animated.View>
+        </ScrollView>
+        {/* disable slide gestures in area around the slider button */}
+        <PanGestureHandler>
+          <Animated.View
+            style={[styles.sliderContainer, detailsStyle]}
+            pointerEvents={isSent ? "none" : "auto"}
+          >
+            <GaloySliderButton
+              isLoading={sendPaymentLoading || isVerifying}
+              initialText={LL.SendBitcoinConfirmationScreen.slideToSend()}
+              loadingText={LL.SendBitcoinConfirmationScreen.sendProgress.reviewing()}
+              busyLabels={sendProgressLabels}
+              disabledText={
+                isCalculating
+                  ? LL.SendBitcoinConfirmationScreen.calculatingFee()
+                  : undefined
+              }
+              accentColor={
+                sendingWalletDescriptor.currency === WalletCurrency.Usd
+                  ? colors._green
+                  : colors.primary
+              }
+              onSwipe={handleSendPayment}
+              disabled={
+                !validAmount || !sendPayment || feeUnavailable || dustNotEvaluable
+              }
+            />
+          </Animated.View>
+        </PanGestureHandler>
+      </View>
     </Screen>
   )
 }
@@ -684,6 +761,20 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
 export default SendBitcoinConfirmationScreen
 
 const useStyles = makeStyles(({ colors }) => ({
+  /** The whole screen, header and system bars included; clips the glow as it blooms past
+   *  the edges. */
+  stage: {
+    flex: 1,
+    overflow: "hidden",
+  },
+  /** Matches the native header it replaces: 56 high on Android, 44 on iOS, with the
+   *  native leading inset the back button's own correction expects. */
+  headerRow: {
+    height: Platform.OS === "android" ? 56 : 44,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: Platform.OS === "android" ? 16 : 8,
+  },
   scroll: {
     flex: 1,
   },
@@ -697,6 +788,10 @@ const useStyles = makeStyles(({ colors }) => ({
   /** Holds the amounts 10 further off the destination than the blocks below sit apart. */
   hero: {
     paddingBottom: 10,
+  },
+  /** Everything under the hero, which dissolves as one once the payment lands. */
+  details: {
+    rowGap: 14,
   },
   group: {
     rowGap: 7,
