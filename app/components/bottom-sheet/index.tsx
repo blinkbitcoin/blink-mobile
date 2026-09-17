@@ -102,6 +102,12 @@ type ModalProps = SharedProps & {
    * is simply a region that does not scroll.
    */
   restsOnHeader?: boolean
+  /**
+   * With `restsOnHeader`, whether dragging up takes the sheet to full height.
+   * Off for a sheet whose header is all there is, like a short error message,
+   * so it can only be dragged down.
+   */
+  expandable?: boolean
 }
 
 /**
@@ -121,6 +127,7 @@ type InlineProps = SharedProps & {
   presentation: "inline"
   heightRatio?: never
   restsOnHeader?: never
+  expandable?: never
 }
 
 type Props = ModalProps | InlineProps
@@ -155,6 +162,7 @@ export const BottomSheet: React.FC<Props> = ({
   presentation = "modal",
   header,
   restsOnHeader = false,
+  expandable = true,
   headerStyle,
   headerTestID,
   footer,
@@ -374,7 +382,7 @@ export const BottomSheet: React.FC<Props> = ({
             return
           }
           const next = Math.max(
-            0,
+            expandable ? 0 : restOffset.value,
             dragStart.value + event.translationY - scrolledTravel.value,
           )
           // The sheet has taken the drag over from the list only once it moves.
@@ -402,12 +410,13 @@ export const BottomSheet: React.FC<Props> = ({
             return
           }
 
-          const toFull = projected < restOffset.value / 2
+          const toFull = expandable && projected < restOffset.value / 2
           offset.value = withSpring(toFull ? 0 : restOffset.value, SPRING)
           runOnJS(setExpanded)(toFull)
         }),
     [
       dragStart,
+      expandable,
       offset,
       restOffset,
       scrollOffset,

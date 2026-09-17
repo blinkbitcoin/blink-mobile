@@ -396,6 +396,67 @@ describe("BottomSheet", () => {
     expect(getByTestId("sheet-scroll").props.scrollEnabled).toBe(true)
   })
 
+  it("stays at rest on a drag up when it is not expandable, however hard it is thrown", async () => {
+    const { getByTestId } = renderSheet({
+      restsOnHeader: true,
+      expandable: false,
+      header: <Text>title</Text>,
+      headerTestID: "sheet-header",
+      scrollTestID: "sheet-scroll",
+    })
+
+    const sheet = await waitFor(() => getByTestId(SHEET_TEST_ID))
+    const sheetHeight = animatedHeightOf(sheet)
+
+    await act(async () => {
+      fireEvent(getByTestId("sheet-header"), "layout", {
+        nativeEvent: { layout: { x: 0, y: 24, width: 300, height: 120 } },
+      })
+    })
+    const restOffset = sheetHeight - (24 + 120)
+    await waitFor(() =>
+      expect(getAnimatedStyle(sheet)).toMatchObject({
+        transform: [{ translateY: restOffset }],
+      }),
+    )
+
+    // The same throw that expands an expandable sheet, dragged well past halfway.
+    await act(async () => {
+      fireGestureHandler<PanGesture>(getByGestureTestId(PAN_TEST_ID), [
+        { translationY: 0, velocityY: 0 },
+        { translationY: -200, velocityY: -3000 },
+        { state: 5, translationY: -200, velocityY: -3000 },
+      ])
+    })
+    await settle()
+
+    expect(translateYOf(sheet)).toBeCloseTo(restOffset, 0)
+    expect(getByTestId("sheet-scroll").props.scrollEnabled).toBe(false)
+  })
+
+  it("still dismisses on a drag down when it is not expandable", async () => {
+    const onClose = jest.fn()
+    const { getByTestId } = renderSheet({
+      restsOnHeader: true,
+      expandable: false,
+      header: <Text>title</Text>,
+      headerTestID: "sheet-header",
+      onClose,
+    })
+
+    await waitFor(() => getByTestId(SHEET_TEST_ID))
+    await act(async () => {
+      fireEvent(getByTestId("sheet-header"), "layout", {
+        nativeEvent: { layout: { x: 0, y: 24, width: 300, height: 120 } },
+      })
+    })
+
+    await dragAway()
+    await settle()
+
+    expect(onClose).toHaveBeenCalledTimes(1)
+  })
+
   it("still closes when its parent re-renders during the slide-out", async () => {
     // The category filter hands the sheet a fresh `onClose` arrow on every
     // render of the map, and the map re-renders whenever places refresh or the
