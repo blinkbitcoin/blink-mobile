@@ -1,6 +1,6 @@
 import * as React from "react"
 import { ActivityIndicator, View } from "react-native"
-import { WebView } from "react-native-webview"
+import { WebView, WebViewMessageEvent } from "react-native-webview"
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
@@ -29,6 +29,55 @@ type SignInvestRoute = RouteProp<RootStackParamList, "cardOnboardingSignInvestSc
 /** Offline is a status of its own, not an error, so it carries no code. This is the one
  *  the library words as a lost connection, which is what the signer is looking at. */
 const OFFLINE_MESSAGE_CODE = "NETWORK_ERROR"
+
+/** What the script below posts once the signing page has drawn something. */
+const PAGE_READY_MESSAGE = "blink-signing-page-ready"
+
+/** How long the page is given to draw before it is shown regardless, so a page that
+ *  never reports (one that draws inside a frame the script does not run in, or never
+ *  gets visible text) is not hidden behind the spinner for good. */
+const PAGE_READY_TIMEOUT_MS = 20_000
+
+/** How often the script below looks, and how many looks it gives up after: the same
+ *  span as the timeout, so no copy keeps measuring a page that was shown long ago. */
+const PAGE_READY_POLL_MS = 250
+const PAGE_READY_POLL_LIMIT = PAGE_READY_TIMEOUT_MS / PAGE_READY_POLL_MS
+
+/**
+ * Runs inside the signing page and reports the moment it has visible content.
+ *
+ * The page is DocuSign's own app: it lands as an empty shell, spins on its own indicator
+ * for a few seconds, then draws its interface at once. The first visible text is that
+ * moment, and it is what lets this step keep its own spinner up until then rather than
+ * hand the signer a second, different one. Measured against the page as it is today:
+ * the shell and the redirects it arrives through carry no text at all until the
+ * interface is drawn. The WebView runs this on every page it loads, so it polls rather
+ * than assumes; each copy stops once it has reported, or once the step would have
+ * uncovered the page anyway.
+ */
+const REPORT_PAGE_READY_SCRIPT = `
+  (function () {
+    var looks = 0;
+    var tick = setInterval(function () {
+      looks += 1;
+      var body = document.body;
+      var hasDrawn = body && body.innerText && body.innerText.trim();
+      if (!hasDrawn && looks < ${PAGE_READY_POLL_LIMIT}) return;
+      clearInterval(tick);
+      if (!hasDrawn) return;
+      window.ReactNativeWebView.postMessage(JSON.stringify({ type: "${PAGE_READY_MESSAGE}" }));
+    }, ${PAGE_READY_POLL_MS});
+  })();
+  true;
+`
+
+const isPageReadyMessage = (data: string): boolean => {
+  try {
+    return JSON.parse(data)?.type === PAGE_READY_MESSAGE
+  } catch {
+    return false
+  }
+}
 
 /**
  * The signing step between the Term Sheet and the transfer: the agreement is minted from
@@ -200,21 +249,43 @@ export const SignInvestScreen: React.FC = () => {
    *  retry would drop what the signer already filled in. */
   const recoverFromFailure = isSessionExpired ? restart : retry
 
+  /**
+   * Whether the signing page has drawn its interface. Until it has, this step's own
+   * spinner covers the WebView: the page spins on an indicator of its own for a few
+   * seconds after it loads, and the signer would otherwise see two spinners in a row.
+   * The WebView's own loading indicator is switched off for the same reason: it only
+   * lasts until the page has loaded, which comes seconds before it has drawn. Cleared
+   * whenever the session leaves the signing state, so a restarted session is covered
+   * again while its page draws; uncovered after a timeout regardless.
+   */
+  const [isPageReady, setIsPageReady] = React.useState(false)
+  const isSigning = status === "signing"
+  React.useEffect(() => {
+    if (!isSigning) {
+      setIsPageReady(false)
+      return
+    }
+    const uncover = setTimeout(() => setIsPageReady(true), PAGE_READY_TIMEOUT_MS)
+    return () => clearTimeout(uncover)
+  }, [isSigning])
+
   /** The one spinner this step shows, whether the session is being opened or the
-   *  document is still on its way. */
+   *  page is still drawing. */
   const spinner = (
     <ActivityIndicator size="large" color={colors.primary} testID="sign-invest-loading" />
   )
 
-  /**
-   * Shown by the WebView while the signing page loads, in place of its own indicator:
-   * the library asks the WebView to start in its loading state, and left to itself the
-   * WebView draws a second, different spinner right after this step's own. The signer
-   * sees one spinner from the tap to the document.
-   */
-  const renderLoading = () => <View style={styles.pageLoading}>{spinner}</View>
-
   if (status === "signing" && webViewProps) {
+    /** The page's own report is this step's to read; every other message is the
+     *  library's, which is how the outcome of the signing reaches it. */
+    const handleWebViewMessage = (event: WebViewMessageEvent) => {
+      if (isPageReadyMessage(event.nativeEvent.data)) {
+        setIsPageReady(true)
+        return
+      }
+      webViewProps.onMessage?.(event)
+    }
+
     return (
       <Screen headerShown={false}>
         <CloseHeader testID="sign-invest-close" />
@@ -226,14 +297,21 @@ export const SignInvestScreen: React.FC = () => {
             location is DocuSign's optional audit extra, not something the signature
             needs, and the account has no brand file to switch the request off, so the
             WebView declines it before it reaches the signer. iOS has no such switch. */}
+        {/* While covered, the page is kept out of the accessibility tree too, so a
+            screen reader cannot land on a form the signer cannot yet see. */}
         <View style={styles.content}>
           <WebView
             {...webViewProps}
+            startInLoadingState={false}
             geolocationEnabled={false}
-            renderLoading={renderLoading}
+            injectedJavaScript={REPORT_PAGE_READY_SCRIPT}
+            onMessage={handleWebViewMessage}
+            importantForAccessibility={isPageReady ? "auto" : "no-hide-descendants"}
+            accessibilityElementsHidden={!isPageReady}
             style={styles.webview}
             testID="sign-invest-webview"
           />
+          {!isPageReady && <View style={styles.pageCover}>{spinner}</View>}
         </View>
       </Screen>
     )
@@ -294,11 +372,14 @@ const useStyles = makeStyles(({ colors }) => ({
   webview: {
     flex: 1,
   },
-  /** Fills the WebView's loading overlay with the screen's own surface, so the page's
-   *  load reads as this step still waiting rather than as a white flash. */
-  pageLoading: {
-    flex: 1,
-    width: "100%",
+  /** Sits over the WebView on the screen's own surface while the page draws, so the
+   *  wait reads as this step still working rather than as the page's own spinner. */
+  pageCover: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: colors.white,
