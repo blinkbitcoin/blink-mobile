@@ -1,4 +1,5 @@
 import React from "react"
+import { AppState } from "react-native"
 import { GraphQLError } from "graphql"
 import { act, renderHook } from "@testing-library/react-native"
 
@@ -159,6 +160,8 @@ const failThreeRetries = async (): Promise<void> => {
 describe("CustodialRestrictionsProvider", () => {
   beforeEach(() => {
     jest.useFakeTimers({ doNotFake: ["nextTick", "setImmediate", "queueMicrotask"] })
+    /** The jest mock leaves the app state undefined; the poll only runs in the foreground. */
+    AppState.currentState = "active"
     mockIsAuthed = true
     mockAccountType = AccountType.Custodial
     replies = []
@@ -288,7 +291,8 @@ describe("CustodialRestrictionsProvider", () => {
 
       const { result } = renderVerdict()
       await flushEffects()
-      await advance(60_000)
+      /** Everything the backoff could owe, and short of the poll's first tick. */
+      await advance(59_999)
 
       expect(result.current.verdict).toEqual({ status: RestrictionVerdictStatus.Unknown })
       expect(requestCount).toBe(1)
@@ -399,13 +403,111 @@ describe("CustodialRestrictionsProvider", () => {
       })
     })
 
-    it("stops asking once the retries are spent", async () => {
+    it("hands over from the backoff to a once-a-minute poll once the retries are spent", async () => {
       replies = [dropRequest, dropRequest, dropRequest, dropRequest]
 
       renderVerdict()
       await flushEffects()
       await failThreeRetries()
+
+      expect(requestCount).toBe(4)
+
+      await advance(59_999)
+
+      expect(requestCount).toBe(4)
+
+      await advance(1)
+
+      expect(requestCount).toBe(5)
+    })
+
+    it("keeps polling while Unknown and stops the moment an answer lands", async () => {
+      replies = [
+        dropRequest,
+        dropRequest,
+        dropRequest,
+        dropRequest,
+        dropRequest,
+        answer(false, true),
+      ]
+
+      const { result, seenStatuses } = renderVerdict()
+      await flushEffects()
+      await failThreeRetries()
+      await advance(60_000)
+
+      expect(requestCount).toBe(5)
+      expect(result.current.verdict).toEqual({ status: RestrictionVerdictStatus.Unknown })
+
+      await advance(60_000)
+
+      expect(requestCount).toBe(6)
+      expect(result.current.verdict).toEqual({
+        status: RestrictionVerdictStatus.Served,
+        restrictions: { dollarBalance: false, transfer: true },
+      })
+
       for (let minute = 0; minute < 10; minute += 1) {
+        await advance(60_000)
+      }
+
+      expect(requestCount).toBe(6)
+      /** A poll must not read as a new question: nothing pends while it runs. */
+      expect(seenStatuses.lastIndexOf(RestrictionVerdictStatus.Pending)).toBeLessThan(
+        seenStatuses.indexOf(RestrictionVerdictStatus.Unknown),
+      )
+      expect(mockLogError).toHaveBeenCalledTimes(1)
+    })
+
+    it("does not stack a poll on a poll that is still on its way", async () => {
+      replies = [dropRequest, dropRequest, dropRequest, dropRequest, holdRequest]
+
+      renderVerdict()
+      await flushEffects()
+      await failThreeRetries()
+      await advance(60_000)
+
+      expect(requestCount).toBe(5)
+
+      await advance(60_000)
+
+      expect(requestCount).toBe(5)
+    })
+
+    it("skips the poll while the app is in the background", async () => {
+      replies = [dropRequest, dropRequest, dropRequest, dropRequest, dropRequest]
+
+      renderVerdict()
+      await flushEffects()
+      await failThreeRetries()
+
+      AppState.currentState = "background"
+      try {
+        for (let minute = 0; minute < 3; minute += 1) {
+          await advance(60_000)
+        }
+
+        expect(requestCount).toBe(4)
+      } finally {
+        AppState.currentState = "active"
+      }
+
+      await advance(60_000)
+
+      expect(requestCount).toBe(5)
+    })
+
+    it("stops polling when the account it asked about is gone", async () => {
+      replies = [dropRequest, dropRequest, dropRequest, dropRequest]
+
+      const { rerender } = renderVerdict()
+      await flushEffects()
+      await failThreeRetries()
+
+      mockIsAuthed = false
+      rerender({})
+      await flushEffects()
+      for (let minute = 0; minute < 3; minute += 1) {
         await advance(60_000)
       }
 

@@ -8,6 +8,8 @@ import React, {
   useState,
 } from "react"
 
+import { AppState } from "react-native"
+
 import { ApolloError, gql } from "@apollo/client"
 import {
   CustodialRestrictionsQuery,
@@ -34,11 +36,24 @@ gql`
  * top of the transport's own retries: the client's `RetryLink` makes up to five attempts
  * per request, the four resends spaced by a jittered, doubling delay of up to 600 ms, so
  * every attempt here is a burst of up to five on the wire and the whole budget is spent in
- * about 25 s on average and 45 s at worst. Once it is spent the verdict reads Unknown and
- * stays there on purpose: nothing polls and nothing listens for connectivity, so only the
- * next foreground and the next pull to refresh ask again.
+ * about 25 s on average and 45 s at worst. Once it is spent the verdict reads Unknown, and
+ * the slow lane below takes over.
  */
 const RESTRICTION_RETRY_DELAYS_MS: readonly number[] = [1000, 2000, 4000]
+
+/**
+ * The slow lane for an Unknown verdict. The app has no connectivity listener, so without
+ * this a user sitting on the home screen when signal returns would keep reading the
+ * unanswered state until they pulled or switched apps. One poll a minute, each a request
+ * like any other on the transport above, only while the verdict is Unknown, and off the
+ * moment it is anything else. A poll on a `no-cache` query stays `no-cache`, and it does
+ * not flip `loading`, so nothing pends while it runs.
+ */
+const UNKNOWN_VERDICT_POLL_INTERVAL_MS = 60 * 1000
+
+/** Android keeps JavaScript timers running in the background, and a device nobody is
+ *  looking at owes the server nothing; the return to the foreground re-asks anyway. */
+const isAppInBackground = (): boolean => AppState.currentState !== "active"
 
 const LOG_SCOPE = "custodial-restrictions"
 
@@ -165,12 +180,14 @@ export const CustodialRestrictionsProvider: React.FC<React.PropsWithChildren> = 
   const isSelfCustodialAccount = activeAccount?.type === AccountType.SelfCustodial
   const isEnabled = isAuthed && !isSelfCustodialAccount
 
-  const { data, loading, error, refetch } = useCustodialRestrictionsQuery({
-    skip: !isEnabled,
-    /** The verdict follows the account's current standing, and the app re-asks on
-     *  foreground, so a cached answer would outlive the session that earned it. */
-    fetchPolicy: "no-cache",
-  })
+  const { data, loading, error, refetch, startPolling, stopPolling } =
+    useCustodialRestrictionsQuery({
+      skip: !isEnabled,
+      /** The verdict follows the account's current standing, and the app re-asks on
+       *  foreground, so a cached answer would outlive the session that earned it. */
+      fetchPolicy: "no-cache",
+      skipPollAttempt: isAppInBackground,
+    })
 
   const hasFailed = Boolean(error)
   const hasAnswer = Boolean(data)
@@ -183,6 +200,13 @@ export const CustodialRestrictionsProvider: React.FC<React.PropsWithChildren> = 
   )
 
   const isUnknown = verdict.status === RestrictionVerdictStatus.Unknown
+
+  useEffect(() => {
+    if (!isUnknown) return undefined
+    startPolling(UNKNOWN_VERDICT_POLL_INTERVAL_MS)
+    return () => stopPolling()
+  }, [isUnknown, startPolling, stopPolling])
+
   const hasReportedUnknownRef = useRef(false)
 
   useEffect(() => {
