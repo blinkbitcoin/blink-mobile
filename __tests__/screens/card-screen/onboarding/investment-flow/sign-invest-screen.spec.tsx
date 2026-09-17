@@ -1,5 +1,6 @@
 import React from "react"
 import { render, fireEvent, act } from "@testing-library/react-native"
+import type { ReactTestInstance } from "react-test-renderer"
 
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { logError } from "@app/utils/log-error"
@@ -387,7 +388,9 @@ describe("SignInvestScreen", () => {
 
       const { getByTestId } = await renderScreen()
 
-      expect(getByTestId("sign-invest-webview")).toBeTruthy()
+      expect(
+        getByTestId("sign-invest-webview", { includeHiddenElements: true }),
+      ).toBeTruthy()
     })
 
     /** The signing page asks for the signer's location, which Android's WebView turns
@@ -398,22 +401,166 @@ describe("SignInvestScreen", () => {
 
       const { getByTestId } = await renderScreen()
 
-      expect(getByTestId("sign-invest-webview").props.geolocationEnabled).toBe(false)
+      expect(
+        getByTestId("sign-invest-webview", { includeHiddenElements: true }).props
+          .geolocationEnabled,
+      ).toBe(false)
     })
 
-    /** The library starts the WebView in its loading state, and the WebView's own
-     *  indicator would be a second spinner right after this step's; the page's load is
-     *  shown under the step's own spinner instead. */
-    it("shows its own spinner while the signing page loads, not the WebView's", async () => {
-      mockESign.status = "signing"
-      mockESign.webViewProps = { source: { uri: TEST_INSTANCE_URL } }
+    /** The WebView is hidden from accessibility while covered, and the queries skip
+     *  hidden elements unless told otherwise. */
+    describe("while the signing page draws", () => {
+      const PAGE_READY = JSON.stringify({ type: "blink-signing-page-ready" })
+      const PAGE_READY_TIMEOUT_MS = 20_000
 
-      const { getByTestId } = await renderScreen()
-      const { renderLoading } = getByTestId("sign-invest-webview").props
+      const signing = () => {
+        mockESign.status = "signing"
+        mockESign.webViewProps = {
+          source: { uri: TEST_INSTANCE_URL },
+          onMessage: jest.fn(),
+          startInLoadingState: true,
+        }
+      }
 
-      const loading = render(renderLoading())
+      const postFromPage = async (webview: ReactTestInstance, data: string) => {
+        await act(async () => {
+          webview.props.onMessage({ nativeEvent: { data } })
+        })
+      }
 
-      expect(loading.getByTestId("sign-invest-loading")).toBeTruthy()
+      afterEach(() => {
+        jest.useRealTimers()
+      })
+
+      /** The page spins on an indicator of its own for seconds after it has loaded, so
+       *  the WebView's own loading state ends too early to stand in for the wait. */
+      it("covers the page with the step's own spinner, not the WebView's", async () => {
+        signing()
+
+        const { getByTestId } = await renderScreen()
+        const webview = getByTestId("sign-invest-webview", {
+          includeHiddenElements: true,
+        })
+
+        expect(getByTestId("sign-invest-loading")).toBeTruthy()
+        expect(webview.props.startInLoadingState).toBe(false)
+        expect(webview.props.injectedJavaScript).toContain("blink-signing-page-ready")
+      })
+
+      it("uncovers the page once it reports that it has drawn", async () => {
+        signing()
+
+        const { getByTestId, queryByTestId } = await renderScreen()
+        await postFromPage(
+          getByTestId("sign-invest-webview", { includeHiddenElements: true }),
+          PAGE_READY,
+        )
+
+        expect(queryByTestId("sign-invest-loading")).toBeNull()
+        expect(
+          getByTestId("sign-invest-webview", { includeHiddenElements: true }).props
+            .accessibilityElementsHidden,
+        ).toBe(false)
+      })
+
+      /** The report is the step's own signal, not one of the signing outcomes the
+       *  library reads; handing it over would have the library warn about it. */
+      it("keeps the page's report to itself", async () => {
+        signing()
+
+        const { getByTestId } = await renderScreen()
+        await postFromPage(
+          getByTestId("sign-invest-webview", { includeHiddenElements: true }),
+          PAGE_READY,
+        )
+
+        expect(mockESign.webViewProps?.onMessage).not.toHaveBeenCalled()
+      })
+
+      it("keeps a screen reader off the page while it is covered", async () => {
+        signing()
+
+        const { getByTestId } = await renderScreen()
+        const webview = getByTestId("sign-invest-webview", {
+          includeHiddenElements: true,
+        })
+
+        expect(webview.props.accessibilityElementsHidden).toBe(true)
+        expect(webview.props.importantForAccessibility).toBe("no-hide-descendants")
+      })
+
+      /** The outcome of the signing reaches the library through the same channel. */
+      it("hands every other message to the library untouched", async () => {
+        signing()
+        const { getByTestId } = await renderScreen()
+        const webview = getByTestId("sign-invest-webview", {
+          includeHiddenElements: true,
+        })
+
+        await postFromPage(webview, JSON.stringify({ type: "complete" }))
+        await postFromPage(webview, "not json")
+
+        expect(mockESign.webViewProps?.onMessage).toHaveBeenCalledTimes(2)
+        expect(mockESign.webViewProps?.onMessage).toHaveBeenCalledWith({
+          nativeEvent: { data: "not json" },
+        })
+      })
+
+      it("uncovers the page after a while even if it never reports", async () => {
+        jest.useFakeTimers()
+        signing()
+
+        const { queryByTestId } = await renderScreen()
+        expect(queryByTestId("sign-invest-loading")).toBeTruthy()
+        await act(async () => {
+          jest.advanceTimersByTime(PAGE_READY_TIMEOUT_MS)
+        })
+
+        expect(queryByTestId("sign-invest-loading")).toBeNull()
+      })
+
+      /** A session that fails and restarts gets the full wait for its new page: the
+       *  clock started for the first page must not uncover the second one early. */
+      it("starts the wait over for a restarted session", async () => {
+        jest.useFakeTimers()
+        signing()
+        const { queryByTestId, rerender } = await renderScreen()
+        await act(async () => {
+          jest.advanceTimersByTime(PAGE_READY_TIMEOUT_MS / 2)
+        })
+
+        mockESign.status = "error"
+        await rerenderScreen(rerender)
+        signing()
+        await rerenderScreen(rerender)
+        await act(async () => {
+          jest.advanceTimersByTime(PAGE_READY_TIMEOUT_MS - 1)
+        })
+        expect(queryByTestId("sign-invest-loading")).toBeTruthy()
+
+        await act(async () => {
+          jest.advanceTimersByTime(1)
+        })
+        expect(queryByTestId("sign-invest-loading")).toBeNull()
+      })
+
+      /** A restarted session draws its page anew, and is covered anew while it does. */
+      it("covers a new session's page again", async () => {
+        signing()
+        const { getByTestId, queryByTestId, rerender } = await renderScreen()
+        await postFromPage(
+          getByTestId("sign-invest-webview", { includeHiddenElements: true }),
+          PAGE_READY,
+        )
+        expect(queryByTestId("sign-invest-loading")).toBeNull()
+
+        mockESign.status = "loading"
+        await rerenderScreen(rerender)
+        signing()
+        await rerenderScreen(rerender)
+
+        expect(getByTestId("sign-invest-loading")).toBeTruthy()
+      })
     })
 
     it("waits on a spinner while the session is being opened", async () => {
@@ -422,7 +569,9 @@ describe("SignInvestScreen", () => {
       const { getByTestId, queryByTestId } = await renderScreen()
 
       expect(getByTestId("sign-invest-loading")).toBeTruthy()
-      expect(queryByTestId("sign-invest-webview")).toBeNull()
+      expect(
+        queryByTestId("sign-invest-webview", { includeHiddenElements: true }),
+      ).toBeNull()
     })
 
     /** The library holds the success state briefly before it calls onComplete, and an
