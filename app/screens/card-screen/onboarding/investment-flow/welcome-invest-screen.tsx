@@ -10,9 +10,10 @@ import { CloseHeader } from "@app/components/close-header"
 import { Screen } from "@app/components/screen"
 import { useCardInvestmentProgress } from "@app/hooks/use-card-investment-progress"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { RESET_TO_HOME } from "@app/navigation/reset-to-home"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
-import { RESET_TO_HOME, resetToTransferStep } from "./transfer-invest-screen"
+import { resetToTransferStep } from "./transfer-invest-screen"
 
 export const WelcomeInvestScreen: React.FC = () => {
   const styles = useStyles()

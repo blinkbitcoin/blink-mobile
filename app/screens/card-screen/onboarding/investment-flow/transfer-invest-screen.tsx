@@ -19,6 +19,7 @@ import {
   useCardInvestmentProgress,
 } from "@app/hooks/use-card-investment-progress"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { RESET_TO_HOME } from "@app/navigation/reset-to-home"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
 import { formatUnitCount, formatUsdAmount } from "./investment-figures"
@@ -45,12 +46,6 @@ export const resetToTransferStep = (
     index: 1,
     routes: [{ name: "Primary" }, { name: "cardOnboardingTransferInvestScreen", params }],
   })
-
-/** Out of the flow altogether, with nothing of it left to go back to. */
-export const RESET_TO_HOME = CommonActions.reset({
-  index: 0,
-  routes: [{ name: "Primary" }],
-})
 
 export const TransferInvestScreen: React.FC = () => {
   const styles = useStyles()
