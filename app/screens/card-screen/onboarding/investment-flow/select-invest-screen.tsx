@@ -70,6 +70,8 @@ export const SelectInvestScreen: React.FC = () => {
               <TouchableOpacity
                 key={item.value}
                 style={[styles.limitOption, isSelected && styles.limitOptionSelected]}
+                accessibilityRole="radio"
+                accessibilityState={{ selected: isSelected }}
                 onPress={() => setSelectedLimit(item.value)}
               >
                 <Text type="p2" style={styles.limitText}>
