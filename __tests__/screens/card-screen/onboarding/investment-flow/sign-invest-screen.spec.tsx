@@ -18,9 +18,9 @@ const MINT_ORIGIN = "https://esign.example.test"
 /** The session the service verifies before it mints. */
 const SESSION_TOKEN = "session-token"
 
-/** A round rate the figures can be checked against by hand: $100,000 per bitcoin, so
- *  $25,000 settles at a quarter of a bitcoin. */
-const USD_PER_SAT = "0.00100000"
+/** A round rate the figures can be checked against by hand, in the cents the price feed
+ *  is read in: $100,000 per bitcoin, so $25,000 settles at a quarter of a bitcoin. */
+const USD_CENTS_PER_BTC = 10_000_000
 const SETTLEMENT_SATS = 25_000_000
 
 /** What the service answers with: the envelope's signing url and its id. */
@@ -57,7 +57,7 @@ jest.mock("@app/hooks/use-app-config", () => {
 /** Read through holders so a test can change what the host named or what the price feed
  *  answers, without the screen being rebuilt around it. */
 const mockHostFields = { current: HOST_FIELDS as Record<string, string> }
-const mockUsdPerSat = { current: USD_PER_SAT as string | null }
+const mockUsdCentsPerBtc = { current: USD_CENTS_PER_BTC as number | null }
 
 jest.mock("@app/config/feature-flags-context", () => {
   const actual = jest.requireActual("@app/config/feature-flags-context")
@@ -71,10 +71,27 @@ jest.mock("@app/config/feature-flags-context", () => {
   }
 })
 
-jest.mock("@app/hooks/use-price-conversion", () => ({
-  ...jest.requireActual("@app/hooks/use-price-conversion"),
-  usePriceConversion: () => ({ usdPerSat: mockUsdPerSat.current }),
-}))
+/** The converter is absent until the feed answers, as in the real hook; once it has, it
+ *  prices whatever satoshis it is handed at the holder's rate, so the figures below only
+ *  come out right when the screen asks for exactly one bitcoin. */
+jest.mock("@app/hooks/use-price-conversion", () => {
+  const actual = jest.requireActual("@app/hooks/use-price-conversion")
+  const priceInCents = (satoshis: number) =>
+    Math.round((satoshis * (mockUsdCentsPerBtc.current ?? 0)) / actual.SATS_PER_BTC)
+
+  return {
+    ...actual,
+    usePriceConversion: () => ({
+      convertMoneyAmount:
+        mockUsdCentsPerBtc.current === null
+          ? undefined
+          : ({ amount }: { amount: number }) => ({
+              amount: priceInCents(amount),
+              currency: "USD",
+            }),
+    }),
+  }
+})
 
 /** The call to the service, which is what the screen has instead of a form url: it hands
  *  over the signer and the values and opens whatever the service answers with. */
@@ -211,7 +228,7 @@ describe("SignInvestScreen", () => {
     mockESign.signSource = null
     mockRouteParams.current = { selectedAmountUsd: SELECTED_AMOUNT_USD }
     mockHostFields.current = HOST_FIELDS
-    mockUsdPerSat.current = USD_PER_SAT
+    mockUsdCentsPerBtc.current = USD_CENTS_PER_BTC
     mockMintSigningInstance.mockResolvedValue({
       url: TEST_INSTANCE_URL,
       envelopeId: TEST_ENVELOPE_ID,
@@ -315,14 +332,14 @@ describe("SignInvestScreen", () => {
    *  minted without it: the spinner waits for the price rather than failing the session
    *  it is about to start, and starts as soon as it is in. */
   it("waits for the price before starting the session", async () => {
-    mockUsdPerSat.current = null
+    mockUsdCentsPerBtc.current = null
 
     const { rerender, getByTestId } = await renderScreen()
 
     expect(mockESign.sign).not.toHaveBeenCalled()
     expect(getByTestId("sign-invest-loading")).toBeTruthy()
 
-    mockUsdPerSat.current = USD_PER_SAT
+    mockUsdCentsPerBtc.current = USD_CENTS_PER_BTC
     await rerenderScreen(rerender)
 
     expect(mockESign.sign).toHaveBeenCalledTimes(1)
@@ -333,7 +350,7 @@ describe("SignInvestScreen", () => {
 
     beforeEach(() => {
       jest.useFakeTimers()
-      mockUsdPerSat.current = null
+      mockUsdCentsPerBtc.current = null
     })
 
     afterEach(() => {
@@ -384,7 +401,7 @@ describe("SignInvestScreen", () => {
       const { rerender, queryByText } = await renderScreen()
       await waitOut()
 
-      mockUsdPerSat.current = USD_PER_SAT
+      mockUsdCentsPerBtc.current = USD_CENTS_PER_BTC
       await rerenderScreen(rerender)
 
       expect(mockESign.sign).toHaveBeenCalledTimes(1)
@@ -394,7 +411,7 @@ describe("SignInvestScreen", () => {
     it("does not give up once the price has arrived in time", async () => {
       const { rerender, queryByText } = await renderScreen()
 
-      mockUsdPerSat.current = USD_PER_SAT
+      mockUsdCentsPerBtc.current = USD_CENTS_PER_BTC
       await rerenderScreen(rerender)
       await waitOut()
 
@@ -412,7 +429,7 @@ describe("SignInvestScreen", () => {
     const { rerender } = await renderScreen()
     const firstSource = mockESign.options?.source
 
-    mockUsdPerSat.current = "0.00200000"
+    mockUsdCentsPerBtc.current = 20_000_000
     await rerenderScreen(rerender)
 
     expect(mockESign.options?.source).toBe(firstSource)
