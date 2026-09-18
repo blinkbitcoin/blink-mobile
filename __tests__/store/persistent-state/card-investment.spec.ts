@@ -91,6 +91,27 @@ describe("getCardInvestment", () => {
       expect(getCardInvestment(stateWith(INVESTMENT), ACCOUNT_ID, onTheDot)).toBeNull()
     })
 
+    /** An invoice issued near the end of the day is paid after it; a record that lapsed
+     *  in between would leave that payment with nothing to be recorded on, so the invoice
+     *  is a moment of its own. */
+    it("counts an investment with an invoice from the invoice, not the signature", () => {
+      const invoiced = {
+        ...INVESTMENT,
+        invoice: { paymentRequest: "lnbc1investment", issuedAt: NOW },
+      }
+
+      expect(getCardInvestment(stateWith(invoiced), ACCOUNT_ID, onTheDot)).toEqual(
+        invoiced,
+      )
+      expect(
+        getCardInvestment(
+          stateWith(invoiced),
+          ACCOUNT_ID,
+          NOW + CARD_INVESTMENT_LIFETIME_MS,
+        ),
+      ).toBeNull()
+    })
+
     /** The payment is a later moment than the signature, so the welcome is counted
      *  from it rather than lapsing with the signature it followed. */
     it("counts a paid investment from the payment, not the signature", () => {
