@@ -1,6 +1,9 @@
 const mockGetItem = jest.fn()
 const mockSetItem = jest.fn()
 const mockGetMnemonicForAccount = jest.fn()
+const mockReadMnemonicWithStatus = jest.fn()
+const mockGetMnemonicNetworkForAccount = jest.fn()
+const mockRememberMnemonicAccount = jest.fn()
 
 jest.mock("@react-native-async-storage/async-storage", () => ({
   __esModule: true,
@@ -14,6 +17,10 @@ jest.mock("@app/utils/storage/secureStorage", () => ({
   __esModule: true,
   default: {
     getMnemonicForAccount: (...args: unknown[]) => mockGetMnemonicForAccount(...args),
+    readMnemonicWithStatus: (...args: unknown[]) => mockReadMnemonicWithStatus(...args),
+    getMnemonicNetworkForAccount: (...args: unknown[]) =>
+      mockGetMnemonicNetworkForAccount(...args),
+    rememberMnemonicAccount: (...args: unknown[]) => mockRememberMnemonicAccount(...args),
   },
 }))
 
@@ -30,6 +37,7 @@ import {
   StorageReadStatus,
   removeSelfCustodialAccountId,
   setSelfCustodialLightningAddress,
+  sweepMnemonicMigration,
   type SelfCustodialAccountEntry,
 } from "@app/self-custodial/storage/account-index"
 
@@ -57,6 +65,9 @@ describe("self-custodial account-index", () => {
     jest.clearAllMocks()
     mockSetItem.mockResolvedValue(undefined)
     mockGetItem.mockResolvedValue(null)
+    mockReadMnemonicWithStatus.mockResolvedValue({ status: "absent" })
+    mockGetMnemonicNetworkForAccount.mockResolvedValue(null)
+    mockRememberMnemonicAccount.mockResolvedValue(undefined)
   })
 
   describe("listSelfCustodialAccounts", () => {
@@ -301,8 +312,8 @@ describe("self-custodial account-index", () => {
     })
 
     it("returns ok with the matching id on exact whitespace", async () => {
-      mockGetMnemonicForAccount.mockImplementation((id: string) =>
-        Promise.resolve(id === "a2" ? STORED : "other words"),
+      mockReadMnemonicWithStatus.mockImplementation((id: string) =>
+        Promise.resolve({ status: "found", value: id === "a2" ? STORED : "other words" }),
       )
 
       const result = await findSelfCustodialAccountByMnemonic(STORED)
@@ -311,8 +322,8 @@ describe("self-custodial account-index", () => {
     })
 
     it("matches on input with leading and trailing whitespace", async () => {
-      mockGetMnemonicForAccount.mockImplementation((id: string) =>
-        Promise.resolve(id === "a2" ? STORED : "other words"),
+      mockReadMnemonicWithStatus.mockImplementation((id: string) =>
+        Promise.resolve({ status: "found", value: id === "a2" ? STORED : "other words" }),
       )
 
       const result = await findSelfCustodialAccountByMnemonic(`  ${STORED}  `)
@@ -321,8 +332,8 @@ describe("self-custodial account-index", () => {
     })
 
     it("matches on input with collapsed-runs of internal whitespace (tabs, multi-space)", async () => {
-      mockGetMnemonicForAccount.mockImplementation((id: string) =>
-        Promise.resolve(id === "a2" ? STORED : "other words"),
+      mockReadMnemonicWithStatus.mockImplementation((id: string) =>
+        Promise.resolve({ status: "found", value: id === "a2" ? STORED : "other words" }),
       )
 
       const noisy = STORED.replace(/ /g, "  \t  ")
@@ -333,8 +344,11 @@ describe("self-custodial account-index", () => {
 
     it("matches when the stored value itself has noisy whitespace (legacy data)", async () => {
       const storedNoisy = `\t\t${STORED.replace(/ /g, "    ")}\n`
-      mockGetMnemonicForAccount.mockImplementation((id: string) =>
-        Promise.resolve(id === "a2" ? storedNoisy : "other words"),
+      mockReadMnemonicWithStatus.mockImplementation((id: string) =>
+        Promise.resolve({
+          status: "found",
+          value: id === "a2" ? storedNoisy : "other words",
+        }),
       )
 
       const result = await findSelfCustodialAccountByMnemonic(STORED)
@@ -343,7 +357,10 @@ describe("self-custodial account-index", () => {
     })
 
     it("returns ok with id=null when no entry has the matching mnemonic", async () => {
-      mockGetMnemonicForAccount.mockResolvedValue("totally different words")
+      mockReadMnemonicWithStatus.mockResolvedValue({
+        status: "found",
+        value: "totally different words",
+      })
 
       const result = await findSelfCustodialAccountByMnemonic(STORED)
 
@@ -351,7 +368,7 @@ describe("self-custodial account-index", () => {
     })
 
     it("returns ok with id=null when an entry has no stored mnemonic", async () => {
-      mockGetMnemonicForAccount.mockResolvedValue(null)
+      mockReadMnemonicWithStatus.mockResolvedValue({ status: "absent" })
 
       const result = await findSelfCustodialAccountByMnemonic(STORED)
 
@@ -369,7 +386,94 @@ describe("self-custodial account-index", () => {
         expect(result.error.message).toContain("AsyncStorage unavailable")
       }
       expect(mockRecordError).toHaveBeenCalledTimes(1)
-      expect(mockGetMnemonicForAccount).not.toHaveBeenCalled()
+      expect(mockReadMnemonicWithStatus).not.toHaveBeenCalled()
+    })
+
+    /**
+     * A keystore that cannot answer is not "this is a different account".
+     * Scored that way, restoring a wallet already on the device reports no
+     * match and the caller creates a second account for the same seed.
+     */
+    it("returns read-failed when a mnemonic read fails, never 'no match'", async () => {
+      mockReadMnemonicWithStatus.mockResolvedValue({
+        status: "failed",
+        err: new Error("keystore unavailable"),
+      })
+
+      const result = await findSelfCustodialAccountByMnemonic(STORED)
+
+      expect(result.status).toBe(StorageReadStatus.ReadFailed)
+    })
+  })
+
+  describe("sweepMnemonicMigration", () => {
+    it("reads every account in the index, so an unopened one still migrates", async () => {
+      setIndex([
+        { id: "a1", lightningAddress: null },
+        { id: "a2", lightningAddress: null },
+      ])
+      mockReadMnemonicWithStatus.mockResolvedValue({ status: "found", value: "words" })
+
+      const result = await sweepMnemonicMigration()
+
+      expect(result).toEqual({ status: "ok", migrated: 2 })
+      expect(mockReadMnemonicWithStatus).toHaveBeenCalledWith("a1")
+      expect(mockReadMnemonicWithStatus).toHaveBeenCalledWith("a2")
+      // The network marker migrates on the same pass.
+      expect(mockGetMnemonicNetworkForAccount).toHaveBeenCalledWith("a1")
+      expect(mockGetMnemonicNetworkForAccount).toHaveBeenCalledWith("a2")
+      // An upgrading install records its accounts here or nowhere: the wipe
+      // has no other way to learn about a mnemonic it never wrote.
+      expect(mockRememberMnemonicAccount).toHaveBeenCalledWith("a1")
+      expect(mockRememberMnemonicAccount).toHaveBeenCalledWith("a2")
+    })
+
+    it("carries on past an account it cannot read, and reports it", async () => {
+      setIndex([
+        { id: "a1", lightningAddress: null },
+        { id: "a2", lightningAddress: null },
+      ])
+      mockReadMnemonicWithStatus.mockImplementation((id: string) =>
+        id === "a1"
+          ? Promise.resolve({ status: "failed", err: new Error("locked") })
+          : Promise.resolve({ status: "found", value: "words" }),
+      )
+
+      const result = await sweepMnemonicMigration()
+
+      expect(result).toEqual({ status: "incomplete", failures: 1 })
+      // The account behind the failure is still swept.
+      expect(mockReadMnemonicWithStatus).toHaveBeenCalledWith("a2")
+      // The unreadable one is never recorded: the wipe must not be pointed at
+      // a slot nothing confirmed.
+      expect(mockRememberMnemonicAccount).not.toHaveBeenCalledWith("a1")
+      expect(mockRecordError).toHaveBeenCalled()
+    })
+
+    it("is a no-op on a fresh install", async () => {
+      const result = await sweepMnemonicMigration()
+
+      expect(result).toEqual({ status: "ok", migrated: 0 })
+      expect(mockReadMnemonicWithStatus).not.toHaveBeenCalled()
+    })
+
+    it("reports incomplete when the index itself cannot be read", async () => {
+      mockGetItem.mockRejectedValueOnce(new Error("AsyncStorage unavailable"))
+
+      const result = await sweepMnemonicMigration()
+
+      expect(result).toEqual({ status: "incomplete", failures: 0 })
+      expect(mockReadMnemonicWithStatus).not.toHaveBeenCalled()
+    })
+
+    it("gives the same answer on a second run", async () => {
+      setIndex([{ id: "a1", lightningAddress: null }])
+      mockReadMnemonicWithStatus.mockResolvedValue({ status: "found", value: "words" })
+
+      const first = await sweepMnemonicMigration()
+      const second = await sweepMnemonicMigration()
+
+      expect(second).toEqual(first)
     })
   })
 })
