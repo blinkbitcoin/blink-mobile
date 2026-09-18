@@ -2409,10 +2409,11 @@
     "title": "Send Bitcoin",
     "failedToFetchLnurlInvoice": "Fejl ved hentning af LNURL faktura",
     "lnurlInvoiceIncorrectAmount": "LNURL-serveren svarede med en faktura med en forkert beløbsangivelse.",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "Advarsel om højt gebyr!",
-      "content": "Dit gebyr er mere end 50% større end det beløb, der sendes. Er du sikker på, at du ønsker at fortsætte?\n\nFor at reducere gebyrer, bed modtageren om at acceptere betaling via Lightning.",
-      "confirmButton": "Jeg er 100% sikker"
+      "body": "Dit gebyr er 50 % eller mere af det beløb, du sender. Er du sikker på, at du vil fortsætte?",
+      "cancelPayment": "Annuller betaling",
+      "acceptFee": "Accepter gebyr på {fee: string}"
     },
     "copiedDestination": "Copied destination to clipboard",
     "pendingPayment": "The payment has been sent, but hasn't confirmed yet.\n\nIt's possible the payment will not confirm, in which case the funds will be returned to your account.",

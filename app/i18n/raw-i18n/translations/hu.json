@@ -2409,10 +2409,11 @@
     "title": "Bitcoin küldése",
     "failedToFetchLnurlInvoice": "Nem sikerült lekérni az LNURL fizetési kérelmet",
     "lnurlInvoiceIncorrectAmount": "Az LNURL szerver helytelen összegű fizetési kérelemmel válaszolt.",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "Magas díj figyelmeztetés!",
-      "content": "A díjad több, mint 50%kal nagyobb, mint az elküldött összeg. Biztos vagy benne, hogy folytatod?\n\nA díjak csökkentése érdekében kérd meg a címzettet, hogy fogadja a tranzakciót Lightning hálózaton.",
-      "confirmButton": "Biztos vagyok benne."
+      "body": "A díj a küldött összeg 50%-a vagy több. Biztosan folytatod?",
+      "cancelPayment": "Fizetés megszakítása",
+      "acceptFee": "{fee: string} díj elfogadása"
     },
     "copiedDestination": "Címzett a vágólapra másolva.",
     "pendingPayment": "A fizetés elküldve, de még nem érkezett visszaigazolás.\n\n Visszaigazolás hiányában a pénz visszakerül a számládra.",

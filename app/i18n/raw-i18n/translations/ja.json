@@ -2409,10 +2409,11 @@
         "title": "ビットコインを送金する",
         "failedToFetchLnurlInvoice": "lnurlインボイスの取得に失敗しました",
         "lnurlInvoiceIncorrectAmount": "lnurlサーバーが不正な金額のインボイスで応答しました。",
-        "confirmFeesModal": {
+        "highFeeSheet": {
             "title": "手数料が高額です！",
-            "content": "手数料が送金額の50%を超えています。本当に続行しますか？\n\n手数料を削減するには、受取人にLightningでの取引を依頼してください",
-            "confirmButton": "100%間違いありません"
+            "body": "手数料が送金額の50%以上です。続行してもよろしいですか？",
+            "cancelPayment": "支払いをキャンセル",
+            "acceptFee": "手数料{fee: string}を承認"
         },
         "copiedDestination": "送信先をクリップボードにコピーしました",
         "pendingPayment": "支払いは送信されましたが、まだ確認されていません。\n\n支払いが確認されない場合、資金はアカウントに返金されます。",

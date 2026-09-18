@@ -140,8 +140,8 @@ jest.mock("@app/screens/send-bitcoin-screen/amount-entry/send-wallet-summary", (
   SendWalletSummary: () => null,
 }))
 jest.mock("@app/components/note-input", () => ({ NoteInput: () => null }))
-jest.mock("@app/screens/send-bitcoin-screen/confirm-fees-modal", () => ({
-  ConfirmFeesModal: () => null,
+jest.mock("@app/screens/send-bitcoin-screen/high-fee-sheet", () => ({
+  HighFeeSheet: () => null,
 }))
 jest.mock("@app/screens/send-bitcoin-screen/send-bitcoin-details-extra-info", () => ({
   SendBitcoinDetailsExtraInfo: () => null,

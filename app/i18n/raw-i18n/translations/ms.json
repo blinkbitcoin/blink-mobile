@@ -2409,10 +2409,11 @@
     "title": "Hantar bitcoin",
     "failedToFetchLnurlInvoice": "Gagal untuk dapatkan invois lnurl ",
     "lnurlInvoiceIncorrectAmount": "Server lnurl telah beri respon invois tersebut salah amaunnya",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "Amaran yuran tinggi!",
-      "content": "Yuran anda melebihi 50% daripada jumlah yang dihantar. Adakah anda pasti mahu meneruskan?\n\nUntuk mengurangkan yuran, minta penerima menerima transaksi melalui Lightning",
-      "confirmButton": "Saya 100% pasti"
+      "body": "Cas anda ialah 50% atau lebih daripada jumlah yang anda hantar. Adakah anda pasti mahu meneruskan?",
+      "cancelPayment": "Batalkan pembayaran",
+      "acceptFee": "Terima cas {fee: string}"
     },
     "copiedDestination": "Destinasi telah disalin ke clipboard",
     "pendingPayment": "Bayaran telah dihantar, tetapi belum disahkan lagi.\n\nKemungkinan bayaran tidak akan disahkan, dan dalam kes itu dana akan dikembalikan ke akaun anda.",

@@ -2409,10 +2409,11 @@
     "title": "Gửi Bitcoin",
     "failedToFetchLnurlInvoice": "Không lấy được hóa đơn lnurl",
     "lnurlInvoiceIncorrectAmount": "Máy chủ LNURL phản hồi với một hóa đơn có số tiền không chính xác.",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "Cảnh báo phí cao!",
-      "content": "Phí của bạn lớn hơn 50% so với số tiền gửi. Bạn có chắc muốn tiếp tục không?\n\nĐể giảm phí, hãy yêu cầu người nhận chấp nhận giao dịch qua Lightning",
-      "confirmButton": "Tôi chắc chắn 100%"
+      "body": "Phí của bạn bằng 50% trở lên so với số tiền bạn gửi. Bạn có chắc muốn tiếp tục không?",
+      "cancelPayment": "Hủy thanh toán",
+      "acceptFee": "Chấp nhận phí {fee: string}"
     },
     "copiedDestination": "Đã sao chép địa chỉ đích vào bộ nhớ tạm",
     "pendingPayment": "Khoản thanh toán đã được gửi nhưng chưa được xác nhận.\n\nCó thể khoản thanh toán sẽ không được xác nhận, trong trường hợp đó tiền sẽ được trả lại tài khoản của bạn.",

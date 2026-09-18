@@ -58,6 +58,7 @@ import {
 } from "./hooks/use-custodial-onchain-fee-tiers"
 import { useFeeTierLabels } from "./hooks/use-fee-tier-labels"
 import { ETA_MINUTES } from "./hooks/use-onchain-fee-tiers"
+import { ReviewHighFeeSheet } from "./review/review-high-fee-sheet"
 import { SendReviewDestination } from "./review/send-review-destination"
 import { useSentTransition } from "./review/use-sent-transition"
 import { SendHero } from "./send-hero"
@@ -818,6 +819,12 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
         body={errorSheet.message}
         {...errorSheet.button}
         testID="review-error-msg-bottom-sheet"
+      />
+      <ReviewHighFeeSheet
+        paymentDetail={paymentDetail}
+        fee={fee}
+        feeText={currencyFeeAmount}
+        isBlocked={Boolean(blockingError) || errorSheet.isVisible || hasAttemptedSend}
       />
     </Screen>
   )

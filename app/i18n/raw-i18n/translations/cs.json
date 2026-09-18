@@ -2409,10 +2409,11 @@
     "title": "Odeslat Bitcoin",
     "failedToFetchLnurlInvoice": "Nepodařilo se načíst lnurl fakturu",
     "lnurlInvoiceIncorrectAmount": "Server lnurl odpověděl fakturou s nesprávnou částkou.",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "Upozornění na vysoký poplatek!",
-      "content": "Váš poplatek je více než o 50 % vyšší než odesílaná částka. Opravdu chcete pokračovat?\n\nPro snížení poplatků požádejte příjemce, aby přijal transakci přes Lightning",
-      "confirmButton": "Jsem si 100% jistý/á"
+      "body": "Váš poplatek je 50 % nebo více z odesílané částky. Opravdu chcete pokračovat?",
+      "cancelPayment": "Zrušit platbu",
+      "acceptFee": "Přijmout poplatek {fee: string}"
     },
     "copiedDestination": "Cíl zkopírován do schránky",
     "pendingPayment": "Platba byla odeslána, ale dosud nebyla potvrzena.\n\nJe možné, že platba nebude potvrzena a v takovém případě budou prostředky vráceny na váš účet.",

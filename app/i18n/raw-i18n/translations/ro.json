@@ -2409,10 +2409,11 @@
     "title": "Trimite Bitcoin",
     "failedToFetchLnurlInvoice": "Nu s-a reușit preluarea facturii lnurl",
     "lnurlInvoiceIncorrectAmount": "Serverul lnurl a răspuns cu o factură cu o sumă incorectă.",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "Alertă de taxă mare!",
-      "content": "Taxa este cu peste 50% mai mare decât suma trimisă. Sunteți sigur că doriți să continuați?\n\nPentru a reduce taxele, cereți destinatarului să accepte tranzacția via Lightning",
-      "confirmButton": "Sunt 100% sigur"
+      "body": "Taxa ta este de 50% sau mai mult din suma pe care o trimiți. Sigur vrei să continui?",
+      "cancelPayment": "Anulează plata",
+      "acceptFee": "Acceptă taxa de {fee: string}"
     },
     "copiedDestination": "Destinație copiată în clipboard",
     "pendingPayment": "Plata a fost trimisă, dar nu s-a confirmată încă.\n\nEste posibil ca plata să nu se confirme, caz în care fondurile vor fi returnate în contul dvs.",

@@ -2396,10 +2396,11 @@
         "title": "Send Bitcoin",
         "failedToFetchLnurlInvoice": "Failed to fetch lnurl invoice",
         "lnurlInvoiceIncorrectAmount": "The lnurl server responded with an invoice with an incorrect amount.",
-        "confirmFeesModal": {
+        "highFeeSheet": {
             "title": "High fee alert!",
-            "content": "Your fee is more than 50% bigger than the amount sent. Are you sure you want to proceed?\n\nTo reduce fees, ask the receiver to accept transaction via Lightning",
-            "confirmButton": "I'm 100% sure"
+            "body": "Your fee is 50% or more of the amount you're sending. Are you sure you want to proceed?",
+            "cancelPayment": "Cancel payment",
+            "acceptFee": "Accept {fee: string} fee"
         },
         "copiedDestination": "Copied destination to clipboard",
         "pendingPayment": "The payment has been sent, but hasn't confirmed yet.\n\nIt's possible the payment will not confirm, in which case the funds will be returned to your account.",

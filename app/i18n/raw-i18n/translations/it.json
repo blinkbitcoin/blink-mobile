@@ -2409,10 +2409,11 @@
         "title": "Invia Bitcoin",
         "failedToFetchLnurlInvoice": "Impossibile recuperare l'invoice lnurl",
         "lnurlInvoiceIncorrectAmount": "Il server lnurl ha risposto con un'invoice di importo errato.",
-        "confirmFeesModal": {
+        "highFeeSheet": {
             "title": "Attenzione: tariffe elevate!",
-            "content": "La tua commissione è superiore del 50% rispetto all'importo inviato. Vuoi procedere?\n\nPer ridurre le commissioni, chiedi al destinatario di accettare la transazione tramite Lightning",
-            "confirmButton": "Sono sicuro al 100%"
+            "body": "La commissione è pari o superiore al 50% dell'importo che invii. Vuoi davvero procedere?",
+            "cancelPayment": "Annulla pagamento",
+            "acceptFee": "Accetta commissione di {fee: string}"
         },
         "copiedDestination": "Destinazione copiata negli apDestinazione copiata negli appuntipunti",
         "pendingPayment": "Il pagamento è stato inviato, ma non è ancora stato confermato.\n\nÈ possibile che il pagamento non venga confermato, nel qual caso i fondi verranno restituiti al tuo account.",

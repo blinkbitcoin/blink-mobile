@@ -2409,10 +2409,11 @@
     "title": "Šalji Bitcoin",
     "failedToFetchLnurlInvoice": "Nije uspjelo dohvaćanje lnurl fakture",
     "lnurlInvoiceIncorrectAmount": "lnurl poslužitelj je odgovorio fakturom s netočnim iznosom.",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "Upozorenje o visokoj naknadi!",
-      "content": "Vaša naknada je više od 50% veća od poslanog iznosa. Jeste li sigurni da želite nastaviti?\n\nZa smanjenje naknada, zamolite primatelja da prihvati transakciju putem Lightninga",
-      "confirmButton": "100% sam siguran/na"
+      "body": "Vaša naknada iznosi 50 % ili više iznosa koji šaljete. Jeste li sigurni da želite nastaviti?",
+      "cancelPayment": "Otkaži plaćanje",
+      "acceptFee": "Prihvati naknadu od {fee: string}"
     },
     "copiedDestination": "Odredište kopirano u međuspremnik",
     "pendingPayment": "Plaćanje je poslano, ali još nije potvrđeno.\n\nMoguće je da plaćanje neće biti potvrđeno, u tom slučaju sredstva će biti vraćena na vaš račun.",

@@ -2409,10 +2409,11 @@
         "title": "Sende Bitcoin",
         "failedToFetchLnurlInvoice": "LNURL Invoice konnte nicht abgerufen werden",
         "lnurlInvoiceIncorrectAmount": "Der LNURL-Server hat mit einer Zahlungsaufforderung mit einem abweichenden Betrag geantwortet.",
-        "confirmFeesModal": {
+        "highFeeSheet": {
             "title": "Hochgebührenalarm!",
-            "content": "Ihre Gebühr ist mehr als 50% höher als der zu überweisende Betrag. Sind Sie sicher, dass Sie fortfahren möchten?\n\nUm die Gebühren zu reduzieren, bitten Sie den Empfänger, die Transaktion per Lightning zu akzeptieren",
-            "confirmButton": "Ich bin mir 100% sicher"
+            "body": "Deine Gebühr beträgt 50 % oder mehr des Betrags, den du sendest. Möchtest du wirklich fortfahren?",
+            "cancelPayment": "Zahlung abbrechen",
+            "acceptFee": "Gebühr von {fee: string} akzeptieren"
         },
         "copiedDestination": "Ziel in die Zwischenablage kopiert",
         "pendingPayment": "Die Zahlung wurde abgeschickt, aber noch nicht bestätigt.\n\nEs ist möglich, dass die Zahlung nicht bestätigt wird. In diesem Fall wird das Geld auf Ihr Konto zurückgebucht.",

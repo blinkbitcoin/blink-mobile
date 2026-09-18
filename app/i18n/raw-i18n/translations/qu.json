@@ -2409,10 +2409,11 @@
     "title": "Bitcoin kawsayniyta qillqata sutichinaqinmi kaniyta rikuchiy",
     "failedToFetchLnurlInvoice": "Lnurl kawsayniyta qillqata sutichinaqinmi chimpuyta mana kaniyta rikuchiy.",
     "lnurlInvoiceIncorrectAmount": "Lnurl serverpi kawsayniyta qillqata sutichqinmi, ñuqaqa ch'usaqiy kawsayniyta qillqata sutichinaqinmi kaniyta rikuyta munanpi, chaynamanta k'anchaypi mana kaniyta rikuchiy.",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "¡Hatun comisión willakuy!",
-      "content": "Comisiónniyki apachisqa yupaymanta 50% aswan hatunmi. ¿Chiqaptachu qatipayta munankí?\n\nComisionkunata pisiyachinapaq, chaskiqta Lightning nisqapi chaskikunanta mañay",
-      "confirmButton": "100% seguro kashani"
+      "body": "Comisiónniyki kachanqa 50% utaq aswan kachasqayki qullqimanta. ¿Chiqachu purichiyta munanki?",
+      "cancelPayment": "Pagota t'akuy",
+      "acceptFee": "{fee: string} comisiónta chaskiy"
     },
     "copiedDestination": "Mayman rinanta clipboard nisqaman churasqa",
     "pendingPayment": "Pagota apachisqaña, ichaqa manaraq chiqapchasqachu.\n\nPagoqa mana chiqapchakuyta atinmanchu, chaypiqa qullqiqa cuentaykiman kutinqa.",

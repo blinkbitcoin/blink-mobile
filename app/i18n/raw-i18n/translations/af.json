@@ -2409,10 +2409,11 @@
     "title": "Stuur Bitcoin",
     "failedToFetchLnurlInvoice": "Kon nie LNURL-faktuur verkry nie",
     "lnurlInvoiceIncorrectAmount": "Die LNURL-bediener het reageer met 'n faktuur vir 'n verkeerde bedrag. ",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "Hoë fooi-waarskuwing!",
-      "content": "Jou fooi is meer as 50% groter as die bedrag wat gestuur is. Is jy seker jy wil voortgaan?\n\nOm fooie te verminder, vra die ontvanger om transaksie via Lightning te aanvaar",
-      "confirmButton": "Ek is 100% seker"
+      "body": "Jou fooi is 50% of meer van die bedrag wat jy stuur. Is jy seker jy wil voortgaan?",
+      "cancelPayment": "Kanselleer betaling",
+      "acceptFee": "Aanvaar {fee: string} fooi"
     },
     "copiedDestination": "Bestemming na knipbord oorgedra",
     "pendingPayment": "Die betaling is gestuur, maar is nog nie bevestig nie.\n\nDit is moontlik dat die betaling nie sal bevestig nie, in welke geval die fondse na jou rekening teruggestuur sal word.",

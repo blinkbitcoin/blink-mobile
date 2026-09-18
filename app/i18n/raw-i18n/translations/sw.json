@@ -2409,10 +2409,11 @@
     "title": "Tuma Bitcoin",
     "failedToFetchLnurlInvoice": "Imeshindwa kupata ankara ya malipo ya lnurl",
     "lnurlInvoiceIncorrectAmount": "Seva ya lnurl ilijibu na ankara ya malipo yenye kiasi batili",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "Onyo la ada kubwa!",
-      "content": "Ada yako ni zaidi ya 50% zaidi ya kiasi kilichotumwa. Una uhakika unataka kuendelea?\n\nIli kupunguza ada, omba mpokeaji akubali muamala kupitia Lightning",
-      "confirmButton": "Nina uhakika 100%"
+      "body": "Ada yako ni 50% au zaidi ya kiasi unachotuma. Una uhakika unataka kuendelea?",
+      "cancelPayment": "Ghairi malipo",
+      "acceptFee": "Kubali ada ya {fee: string}"
     },
     "copiedDestination": "Imeakiliwa marudio kwenye ubao wa kunakili",
     "pendingPayment": "Ada kubwa! Tunapendekeza Umeme.\n\nInawezekana malipo hayatathibitisha, katika hali ambayo pesa zitarejeshwa kwenye akaunti yako.",

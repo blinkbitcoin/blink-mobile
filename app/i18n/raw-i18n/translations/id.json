@@ -2409,10 +2409,11 @@
     "title": "Kirim Bitcoin",
     "failedToFetchLnurlInvoice": "Gagal mengambil faktur lnurl",
     "lnurlInvoiceIncorrectAmount": "Server lnurl merespons dengan faktur dengan jumlah yang salah.",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "Peringatan biaya tinggi!",
-      "content": "Biaya Anda lebih dari 50% lebih besar dari jumlah yang dikirim. Apakah Anda yakin ingin melanjutkan?\n\nUntuk mengurangi biaya, mintalah penerima menerima transaksi melalui Lightning.",
-      "confirmButton": "Saya 100% yakin"
+      "body": "Biaya Anda 50% atau lebih dari jumlah yang Anda kirim. Yakin ingin melanjutkan?",
+      "cancelPayment": "Batalkan pembayaran",
+      "acceptFee": "Terima biaya {fee: string}"
     },
     "copiedDestination": "Tujuan disalin ke papan klip",
     "pendingPayment": "Pembayaran telah dikirim, tetapi belum dikonfirmasi.\n\nAda kemungkinan pembayaran tidak akan dikonfirmasi, dalam hal ini dana akan dikembalikan ke akun Anda.",
