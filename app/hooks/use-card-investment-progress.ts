@@ -70,9 +70,11 @@ type CardInvestmentProgressState = {
   /** Whether the active account can take part at all: the investment is paid from a
    *  custodial balance, so a self-custodial account is sent back wherever it enters. */
   isEligible: boolean
-  /** Whether the account the record is filed under is known yet; until it is, nothing
-   *  can be recorded, so a step that must record should wait on this. Never, for an
-   *  account that cannot take part. */
+  /** The account the record is filed under, once known: what a payment is filed under
+   *  too, so the receiving ledger can tell whose it is. */
+  accountId: string | null
+  /** Whether that account is known yet; until it is, nothing can be recorded, so a step
+   *  that must record should wait on this. Never, for an account that cannot take part. */
   isAccountResolved: boolean
   /** Records that the invitation was opened, unless the account already holds a record:
    *  a return to the first screen must not erase an agreement already signed. */
@@ -167,6 +169,7 @@ export const useCardInvestmentProgress = (): CardInvestmentProgressState => {
     progress,
     isInvited,
     isEligible,
+    accountId,
     isAccountResolved: accountId !== null,
     markInvited,
     start,

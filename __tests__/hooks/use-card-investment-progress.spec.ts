@@ -438,11 +438,11 @@ describe("useCardInvestmentProgress", () => {
     })
   })
 
-  describe("isAccountResolved", () => {
-    it("is true once the account the record is filed under is known", () => {
-      expect(
-        renderHook(() => useCardInvestmentProgress()).result.current.isAccountResolved,
-      ).toBe(true)
+  describe("the account the record is filed under", () => {
+    it("is the custodial account's server id, once known", () => {
+      const { result } = renderHook(() => useCardInvestmentProgress())
+      expect(result.current.accountId).toBe(CUSTODIAL_ID)
+      expect(result.current.isAccountResolved).toBe(true)
 
       custodialSession()
       expect(
@@ -450,12 +450,12 @@ describe("useCardInvestmentProgress", () => {
       ).toBe(true)
     })
 
-    it("is false while the custodial id is unknown", () => {
+    it("is unknown while the custodial id has not been served", () => {
       custodialSession(null)
 
-      expect(
-        renderHook(() => useCardInvestmentProgress()).result.current.isAccountResolved,
-      ).toBe(false)
+      const { result } = renderHook(() => useCardInvestmentProgress())
+      expect(result.current.accountId).toBeNull()
+      expect(result.current.isAccountResolved).toBe(false)
     })
   })
 
