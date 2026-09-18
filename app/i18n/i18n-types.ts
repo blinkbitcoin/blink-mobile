@@ -7443,6 +7443,56 @@ type RootTranslation = {
 		 */
 		slideConfirming: string
 		/**
+		 * S​l​i​d​e​ ​t​o​ ​s​e​n​d
+		 */
+		slideToSend: string
+		/**
+		 * C​a​l​c​u​l​a​t​i​n​g​ ​f​e​e​…
+		 */
+		calculatingFee: string
+		sendProgress: {
+			/**
+			 * R​e​v​i​e​w​i​n​g
+			 */
+			reviewing: string
+			/**
+			 * S​i​g​n​i​n​g
+			 */
+			signing: string
+			/**
+			 * F​i​n​d​i​n​g​ ​r​o​u​t​e
+			 */
+			findingRoute: string
+			/**
+			 * B​r​o​a​d​c​a​s​t​i​n​g
+			 */
+			broadcasting: string
+			/**
+			 * C​h​e​c​k​i​n​g​ ​d​e​l​i​v​e​r​y
+			 */
+			checkingDelivery: string
+			/**
+			 * R​e​-​t​r​y​i​n​g
+			 */
+			retrying: string
+			/**
+			 * A​l​m​o​s​t​ ​t​h​e​r​e
+			 */
+			almostThere: string
+			/**
+			 * A​n​y​ ​t​i​m​e​ ​n​o​w
+			 */
+			anyTimeNow: string
+			/**
+			 * O​h​ ​o​h
+			 */
+			ohOh: string
+			/**
+			 * T​r​y​i​n​g​ ​a​g​a​i​n
+			 */
+			tryingAgain: string
+		}
+		/**
 		 * C​o​p​i​e​d​ ​d​e​s​t​i​n​a​t​i​o​n​ ​t​o​ ​c​l​i​p​b​o​a​r​d
 		 */
 		copiedDestination: string
@@ -21093,6 +21143,56 @@ export type TranslationFunctions = {
 		 * Confirming...
 		 */
 		slideConfirming: () => LocalizedString
+		/**
+		 * Slide to send
+		 */
+		slideToSend: () => LocalizedString
+		/**
+		 * Calculating fee…
+		 */
+		calculatingFee: () => LocalizedString
+		sendProgress: {
+			/**
+			 * Reviewing
+			 */
+			reviewing: () => LocalizedString
+			/**
+			 * Signing
+			 */
+			signing: () => LocalizedString
+			/**
+			 * Finding route
+			 */
+			findingRoute: () => LocalizedString
+			/**
+			 * Broadcasting
+			 */
+			broadcasting: () => LocalizedString
+			/**
+			 * Checking delivery
+			 */
+			checkingDelivery: () => LocalizedString
+			/**
+			 * Re-trying
+			 */
+			retrying: () => LocalizedString
+			/**
+			 * Almost there
+			 */
+			almostThere: () => LocalizedString
+			/**
+			 * Any time now
+			 */
+			anyTimeNow: () => LocalizedString
+			/**
+			 * Oh oh
+			 */
+			ohOh: () => LocalizedString
+			/**
+			 * Trying again
+			 */
+			tryingAgain: () => LocalizedString
+		}
 		/**
 		 * Copied destination to clipboard
 		 */
