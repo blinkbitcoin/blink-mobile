@@ -1,5 +1,6 @@
 import { useMemo } from "react"
 
+import { useErrorHaptic } from "@app/hooks/use-error-haptic"
 import { isSelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
 
 import type { ErrorMsgAction, FailureOutcome } from "../error-msg-action"
@@ -22,7 +23,8 @@ type Args = {
  *
  * A send failure takes the sheet. Otherwise a self-custodial fee quote that failed with a
  * classified code does (R2): nothing has been sent then, so its action can never pay twice.
- * Custodial fee failures carry raw text and stay inline.
+ * Custodial fee failures carry raw text and stay inline, yet block the send just the same,
+ * so they get the error haptic the sheet gives the rest.
  */
 export const useReviewErrorSheet = ({
   paymentFailure,
@@ -45,6 +47,9 @@ export const useReviewErrorSheet = ({
   )
 
   const sheet = useDismissibleErrorMsg(paymentFailure ?? feeError)
+  useErrorHaptic(
+    isFeeFailed && !isSelfCustodialErrorCode(feeErrorCode) ? feeErrorText : undefined,
+  )
 
   // The sheet stays mounted and only toggles `isVisible`, as `BottomSheet` expects. With
   // no error it is hidden, so the fallbacks are never on screen.
