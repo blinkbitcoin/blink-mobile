@@ -15,7 +15,7 @@ import { Transaction, WalletCurrency } from "@app/graphql/generated"
 import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { isIdempotencyConflict } from "@app/graphql/is-idempotency-conflict"
 import { useClipboard, useDisplayCurrency } from "@app/hooks"
-import { isCardInvestmentPaymentArmed } from "@app/hooks/use-card-investment-progress"
+import { useCardInvestmentProgress } from "@app/hooks/use-card-investment-progress"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import {
@@ -126,6 +126,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   const [paymentError, setPaymentError] = useState<string | undefined>(undefined)
   const [isVerifying, setIsVerifying] = useState(false)
   const verifyPaymentSettled = useVerifyPaymentSettled()
+  const { isInvestmentInvoice } = useCardInvestmentProgress()
   const { LL } = useI18nContext()
   const translateSdkError = useTranslateSdkError()
   const { copyToClipboard } = useClipboard()
@@ -341,7 +342,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
          * wallet, so an earlier attempt paid from the other wallet costs the poll's few
          * seconds before the receipt; the attempt's own result was logged above.
          */
-        if (paymentType === "lightning" && isCardInvestmentPaymentArmed(destination)) {
+        if (paymentType === "lightning" && isInvestmentInvoice(destination)) {
           const settled = await lookUpSettlement(destination)
           const receipt = settled
             ? { status: settled.status, transaction: { createdAt: settled.createdAt } }
@@ -418,6 +419,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     destination,
     navigateToCompleted,
     lookUpSettlement,
+    isInvestmentInvoice,
     translateSdkError,
   ])
 
