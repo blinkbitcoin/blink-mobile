@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react"
+import React, { useCallback, useEffect, useRef } from "react"
 import { makeStyles, Text } from "@rn-vui/themed"
 import { Pressable, View } from "react-native"
 
@@ -10,6 +10,7 @@ import { fonts } from "@app/rne-theme/fonts"
 
 const KEY_ROW_PREFIX = "row-"
 const KEY_TEST_ID_PREFIX = "Key"
+const BACKSPACE_REPEAT_MS = 300
 
 type CurrencyKeyboardProps = {
   /** Returns whether the press changed the amount: a refused key stays silent. */
@@ -70,42 +71,46 @@ const Key = ({
   const styles = useStyles()
   const isBackspace = numberPadKey === KeyType.Backspace
 
-  const [timerId, setTimerId] = useState<NodeJS.Timeout | null>(null)
+  /** Latest handler, not the one from the render the hold began in: a pad's handler closes
+   *  over its current amount, so a stale one would re-apply the same deletion every tick. */
+  const handleKeyPressRef = useRef(handleKeyPress)
+  handleKeyPressRef.current = handleKeyPress
+  const repeatTimer = useRef<ReturnType<typeof setInterval> | null>(null)
   /** One haptic per gesture: a held backspace deletes repeatedly but buzzes once. */
   const hasTapped = useRef(false)
 
+  const stopRepeat = useCallback(() => {
+    if (!repeatTimer.current) return
+    clearInterval(repeatTimer.current)
+    repeatTimer.current = null
+  }, [])
+
   const press = (key: KeyType) => {
-    const accepted = handleKeyPress(key)
+    const accepted = handleKeyPressRef.current(key)
     if (accepted && !hasTapped.current) {
       hasTapped.current = true
       haptics.tap()
     }
+    return accepted
   }
 
   const handlePressIn = (key: KeyType) => {
     hasTapped.current = false
     if (safeMode) return
     if (key !== KeyType.Backspace) return
-    const id = setInterval(() => {
-      press(key)
-    }, 300)
-    setTimerId(id)
+    stopRepeat()
+    /** A refused tick means the amount is empty: stop rather than tick against nothing. */
+    repeatTimer.current = setInterval(() => {
+      if (!press(key)) stopRepeat()
+    }, BACKSPACE_REPEAT_MS)
   }
 
-  const handleBackSpacePressOut = () => {
-    if (timerId) {
-      clearInterval(timerId)
-      setTimerId(null)
-    }
-  }
-
+  /** A key disabled mid-hold may never see its press-out. */
   useEffect(() => {
-    return () => {
-      if (timerId) {
-        clearInterval(timerId)
-      }
-    }
-  }, [timerId])
+    if (disabled) stopRepeat()
+  }, [disabled, stopRepeat])
+
+  useEffect(() => stopRepeat, [stopRepeat])
 
   return (
     <Pressable
@@ -117,7 +122,7 @@ const Key = ({
       ]}
       onPressIn={() => handlePressIn(numberPadKey)}
       onPress={() => press(numberPadKey)}
-      onPressOut={handleBackSpacePressOut}
+      onPressOut={stopRepeat}
       {...testProps(`${KEY_TEST_ID_PREFIX} ${numberPadKey}`)}
     >
       {isBackspace ? (
