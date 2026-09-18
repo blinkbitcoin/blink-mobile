@@ -1,5 +1,10 @@
 import { renderHook } from "@testing-library/react-native"
 
+import {
+  GateReason,
+  RestrictionVerdict,
+  RestrictionVerdictStatus,
+} from "@app/types/account"
 import { AccountType } from "@app/types/wallet"
 
 const mockUseDeviceLocation = jest.fn()
@@ -7,8 +12,9 @@ const mockUseRemoteConfig = jest.fn()
 let mockRemoteConfigReady = true
 const mockUseActiveWallet = jest.fn()
 const mockUseIpCountryLookup = jest.fn()
-const mockUseCustodialRestrictionsQuery = jest.fn()
-let mockIsAuthed = true
+let mockCustodialVerdict: RestrictionVerdict = {
+  status: RestrictionVerdictStatus.Pending,
+}
 
 jest.mock("@app/utils/ip-country-lookup")
 
@@ -36,20 +42,16 @@ jest.mock("@app/hooks/use-account-registry", () => ({
   useAccountRegistry: () => ({ loading: false }),
 }))
 
-jest.mock("@app/graphql/is-authed-context", () => ({
-  useIsAuthed: () => mockIsAuthed,
-}))
-
-jest.mock("@app/graphql/generated", () => ({
-  ...jest.requireActual("@app/graphql/generated"),
-  useCustodialRestrictionsQuery: (options: unknown) =>
-    mockUseCustodialRestrictionsQuery(options),
+jest.mock("@app/custodial/providers/restrictions", () => ({
+  ...jest.requireActual("@app/custodial/providers/restrictions"),
+  useCustodialRestrictions: () => ({
+    verdict: mockCustodialVerdict,
+  }),
 }))
 
 import {
   useDollarBalanceGate,
   useDollarBalanceGated,
-  useDollarBalanceRestricted,
   useDollarBalanceRestriction,
 } from "@app/hooks/use-dollar-balance-restricted"
 
@@ -64,23 +66,30 @@ const setIpLookup = (countryCode: string | undefined, isSettled = true): void =>
 }
 
 /** The server's answer, which is what a custodial account is judged by. */
-const serverAnswers = (dollarBalance: boolean, loading = false): void => {
-  mockUseCustodialRestrictionsQuery.mockReturnValue({
-    data: { custodialRestrictions: { dollarBalance, transfer: false } },
-    loading,
-  })
+const serverAnswers = (dollarBalance: boolean): void => {
+  mockCustodialVerdict = {
+    status: RestrictionVerdictStatus.Served,
+    restrictions: { dollarBalance, transfer: false },
+  }
 }
 
-/** No answer at all: an unreachable server, or a session with no account to ask about. */
-const serverSilent = (loading = false): void => {
-  mockUseCustodialRestrictionsQuery.mockReturnValue({ data: undefined, loading })
+const serverPending = (): void => {
+  mockCustodialVerdict = { status: RestrictionVerdictStatus.Pending }
+}
+
+/** Asking has stopped working: the retries failed and no answer came back. */
+const serverUnreachable = (): void => {
+  mockCustodialVerdict = { status: RestrictionVerdictStatus.Unknown }
+}
+
+const noAccountToAsk = (): void => {
+  mockCustodialVerdict = { status: RestrictionVerdictStatus.NoAccount }
 }
 
 const setup = (accountType: AccountType): void => {
   jest.clearAllMocks()
   mockRemoteConfigReady = true
   mockIsAnonMode = false
-  mockIsAuthed = true
   mockUseDeviceLocation.mockReturnValue({ countryCode: undefined, source: undefined })
   mockUseRemoteConfig.mockReturnValue(remoteConfig)
   mockUseActiveWallet.mockReturnValue({ accountType })
@@ -88,12 +97,13 @@ const setup = (accountType: AccountType): void => {
   serverAnswers(false)
 }
 
-const read = () => renderHook(() => useDollarBalanceRestricted()).result.current
+const read = () =>
+  renderHook(() => useDollarBalanceRestriction()).result.current.isRestricted
 
 const readRestriction = (accountTypeOverride?: AccountType) =>
   renderHook(() => useDollarBalanceRestriction(accountTypeOverride)).result.current
 
-describe("useDollarBalanceRestricted", () => {
+describe("useDollarBalanceRestriction", () => {
   describe("custodial", () => {
     beforeEach(() => setup(AccountType.Custodial))
 
@@ -114,15 +124,14 @@ describe("useDollarBalanceRestricted", () => {
       expect(read()).toBe(false)
     })
 
-    it("is restricted when the server gave no answer", () => {
-      // No region determined, no gated feature — UnknownRegionPolicy = FAIL_CLOSED.
-      serverSilent()
+    it("is restricted when asking has stopped working", () => {
+      // No region determined, no gated feature: UnknownRegionPolicy = FAIL_CLOSED.
+      serverUnreachable()
       expect(read()).toBe(true)
     })
 
     it("is not restricted without an account to ask about", () => {
-      mockIsAuthed = false
-      serverSilent()
+      noAccountToAsk()
       expect(read()).toBe(false)
     })
   })
@@ -163,7 +172,8 @@ describe("useDollarBalanceRestricted", () => {
     beforeEach(() => setup(AccountType.Custodial))
 
     const readOverride = (accountType: AccountType) =>
-      renderHook(() => useDollarBalanceRestricted(accountType)).result.current
+      renderHook(() => useDollarBalanceRestriction(accountType)).result.current
+        .isRestricted
 
     it("predicts the self-custodial restriction from the IP, not the session phone", () => {
       mockUseDeviceLocation.mockReturnValue({ countryCode: "HK" })
@@ -223,31 +233,87 @@ describe("useDollarBalanceRestricted", () => {
     })
   })
 
+  /** The surface's copy reads the reason, so a gate closed by an unanswered query must
+   *  never be told apart from a decided one by the surface itself. */
+  describe("useDollarBalanceGate reason", () => {
+    const readReason = () =>
+      renderHook(() => useDollarBalanceGate()).result.current.reason
+
+    beforeEach(() => setup(AccountType.Custodial))
+
+    it("names Anon when the mode gates on its own", () => {
+      setup(AccountType.SelfCustodial)
+      mockIsAnonMode = true
+
+      expect(readReason()).toBe(GateReason.Anon)
+    })
+
+    it("names the region when the server decided the restriction", () => {
+      serverAnswers(true)
+
+      expect(readReason()).toBe(GateReason.Region)
+    })
+
+    it("names the unknown region when asking has stopped working", () => {
+      serverUnreachable()
+
+      expect(readReason()).toBe(GateReason.UnknownRegion)
+    })
+
+    it("names nothing while the verdict is still resolving", () => {
+      serverPending()
+
+      expect(readReason()).toBeNull()
+    })
+
+    it("names nothing once the server clears the balance", () => {
+      serverAnswers(false)
+
+      expect(readReason()).toBeNull()
+    })
+  })
+
   describe("while the verdict is still resolving", () => {
     beforeEach(() => setup(AccountType.Custodial))
 
     it("reports the region as pending without claiming a restriction", () => {
-      serverAnswers(false, true)
+      serverPending()
 
-      expect(readRestriction()).toEqual({ isRestricted: false, isRegionPending: true })
+      expect(readRestriction()).toEqual({
+        isRestricted: false,
+        isRegionPending: true,
+        isRegionDetermined: false,
+      })
     })
 
     it("restricts once the server answers that it is blocked", () => {
       serverAnswers(true)
 
-      expect(readRestriction()).toEqual({ isRestricted: true, isRegionPending: false })
+      expect(readRestriction()).toEqual({
+        isRestricted: true,
+        isRegionPending: false,
+        isRegionDetermined: true,
+      })
     })
 
     it("settles unrestricted once the server clears it", () => {
       serverAnswers(false)
 
-      expect(readRestriction()).toEqual({ isRestricted: false, isRegionPending: false })
+      expect(readRestriction()).toEqual({
+        isRestricted: false,
+        isRegionPending: false,
+        isRegionDetermined: true,
+      })
     })
 
-    it("settles restricted on an unreachable server rather than holding for good", () => {
-      serverSilent()
+    it("settles restricted on an unreachable server, with the region still undetermined", () => {
+      serverUnreachable()
 
-      expect(readRestriction()).toEqual({ isRestricted: true, isRegionPending: false })
+      expect(readRestriction()).toEqual({
+        isRestricted: true,
+        isRegionPending: false,
+        isRegionDetermined: false,
+      })
     })
 
     it("settles the self-custodial prediction on the IP even while the device keeps loading", () => {
@@ -257,6 +323,7 @@ describe("useDollarBalanceRestricted", () => {
       expect(readRestriction(AccountType.SelfCustodial)).toEqual({
         isRestricted: true,
         isRegionPending: false,
+        isRegionDetermined: true,
       })
     })
 
@@ -269,6 +336,7 @@ describe("useDollarBalanceRestricted", () => {
       expect(renderHook(() => useDollarBalanceGate()).result.current).toEqual({
         isGated: true,
         isRegionPending: false,
+        reason: GateReason.Anon,
       })
     })
   })
@@ -283,6 +351,7 @@ describe("useDollarBalanceRestricted", () => {
       expect(readRestriction(AccountType.SelfCustodial)).toEqual({
         isRestricted: false,
         isRegionPending: true,
+        isRegionDetermined: true,
       })
     })
 
@@ -293,6 +362,7 @@ describe("useDollarBalanceRestricted", () => {
       expect(readRestriction(AccountType.SelfCustodial)).toEqual({
         isRestricted: true,
         isRegionPending: false,
+        isRegionDetermined: true,
       })
     })
 
@@ -303,6 +373,7 @@ describe("useDollarBalanceRestricted", () => {
       expect(readRestriction(AccountType.SelfCustodial)).toEqual({
         isRestricted: true,
         isRegionPending: false,
+        isRegionDetermined: true,
       })
     })
 
@@ -310,7 +381,11 @@ describe("useDollarBalanceRestricted", () => {
       mockUseDeviceLocation.mockReturnValue({ countryCode: "US", loading: false })
       setIpLookup(undefined, false)
 
-      expect(readRestriction()).toEqual({ isRestricted: false, isRegionPending: false })
+      expect(readRestriction()).toEqual({
+        isRestricted: false,
+        isRegionPending: false,
+        isRegionDetermined: true,
+      })
     })
   })
 
@@ -333,7 +408,11 @@ describe("useDollarBalanceRestricted", () => {
       mockUseActiveWallet.mockReturnValue({ accountType: AccountType.Custodial })
       mockRemoteConfigReady = false
 
-      expect(readRestriction()).toEqual({ isRestricted: false, isRegionPending: false })
+      expect(readRestriction()).toEqual({
+        isRestricted: false,
+        isRegionPending: false,
+        isRegionDetermined: true,
+      })
     })
   })
 })

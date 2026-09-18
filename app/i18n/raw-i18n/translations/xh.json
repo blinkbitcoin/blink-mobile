@@ -2581,7 +2581,8 @@
   },
   "StablesatsRestriction": {
     "walletLabel": "ayifumaneki kummandla wakho",
-    "anonModeWalletLabel": "ayifumaneki kwimo ye-Incognito"
+    "anonModeWalletLabel": "ayifumaneki kwimo ye-Incognito",
+    "unknownRegionWalletLabel": "ukufumaneka akukwazanga kujongwa, tsala ezantsi ukuze uzame kwakhona"
   },
   "AnonModeConvertModal": {
     "title": "Qala udlulisele ibhalansi yakho yeDola",
@@ -2604,7 +2605,9 @@
     "contactSupport": "Qhagamshelana nenkxaso"
   },
   "DollarBalanceRestriction": {
-    "modalTitle": "Ibhalansi yedola ayifumaneki kummandla wakho"
+    "modalTitle": "Ibhalansi yedola ayifumaneki kummandla wakho",
+    "unknownRegionModalTitle": "Akukwazekanga ukujonga ukufumaneka kwebhalansi yedola",
+    "unknownRegionModalBody": "Asikwazanga ukujonga ukuba ibhalansi yedola iyafumaneka na kuwe. Tsala ezantsi kwiskrini sasekhaya ukuze uzame kwakhona."
   },
   "ConvertDollarToBitcoinModal": {
     "title": "Ibhalansi yedola ayifumaneki kummandla wakho",

@@ -2581,7 +2581,8 @@
   },
   "StablesatsRestriction": {
     "walletLabel": "mana kapunchu suyuykipi",
-    "anonModeWalletLabel": "mana Incognito modopi kanchu"
+    "anonModeWalletLabel": "mana Incognito modopi kanchu",
+    "unknownRegionWalletLabel": "manam kasqanta qhawayta atikurqanchu, uraman aysay yapamanta yanaykunaykipaq"
   },
   "AnonModeConvertModal": {
     "title": "Ñawpaqta Dolar qullqiykita astay",
@@ -2604,7 +2605,9 @@
     "contactSupport": "Yanapaqwan rimanakuy"
   },
   "DollarBalanceRestriction": {
-    "modalTitle": "Dólar saldoqa mana kapunchu suyuykipi"
+    "modalTitle": "Dólar saldoqa mana kapunchu suyuykipi",
+    "unknownRegionModalTitle": "Manam dólar saldo kasqanta qhawayta atikurqanchu",
+    "unknownRegionModalBody": "Manam qhawayta atirqanchu dólar saldo qampaq kasqanta. Qallariy pantallapi uraman aysay yapamanta yanaykunaykipaq."
   },
   "ConvertDollarToBitcoinModal": {
     "title": "Dólar saldoqa mana kapunchu suyuykipi",

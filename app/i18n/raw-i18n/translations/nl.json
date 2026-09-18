@@ -2581,7 +2581,8 @@
   },
   "StablesatsRestriction": {
     "walletLabel": "niet beschikbaar in jouw regio",
-    "anonModeWalletLabel": "niet beschikbaar in Incognito-modus"
+    "anonModeWalletLabel": "niet beschikbaar in Incognito-modus",
+    "unknownRegionWalletLabel": "beschikbaarheid kon niet worden gecontroleerd, trek omlaag om opnieuw te proberen"
   },
   "AnonModeConvertModal": {
     "title": "Zet eerst je dollarsaldo over",
@@ -2604,7 +2605,9 @@
     "contactSupport": "Contact opnemen met support"
   },
   "DollarBalanceRestriction": {
-    "modalTitle": "Dollar-saldo is niet beschikbaar in jouw regio"
+    "modalTitle": "Dollar-saldo is niet beschikbaar in jouw regio",
+    "unknownRegionModalTitle": "Kon de beschikbaarheid van het Dollar-saldo niet controleren",
+    "unknownRegionModalBody": "We konden niet controleren of het Dollar-saldo voor jou beschikbaar is. Trek het startscherm omlaag om het opnieuw te proberen."
   },
   "ConvertDollarToBitcoinModal": {
     "title": "Dollar-saldo is niet beschikbaar in jouw regio",

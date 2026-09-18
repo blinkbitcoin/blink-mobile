@@ -2581,7 +2581,8 @@
     },
     "StablesatsRestriction": {
         "walletLabel": "あなたの地域ではご利用いただけません",
-        "anonModeWalletLabel": "Incognito モードでは利用できません"
+        "anonModeWalletLabel": "Incognito モードでは利用できません",
+        "unknownRegionWalletLabel": "利用可否を確認できませんでした。下に引いて再試行してください"
     },
     "AnonModeConvertModal": {
         "title": "まずドル残高を移してください",
@@ -2604,7 +2605,9 @@
         "contactSupport": "サポートに問い合わせる"
     },
     "DollarBalanceRestriction": {
-        "modalTitle": "ドル残高はあなたの地域ではご利用いただけません"
+        "modalTitle": "ドル残高はあなたの地域ではご利用いただけません",
+        "unknownRegionModalTitle": "ドル残高の利用可否を確認できませんでした",
+        "unknownRegionModalBody": "ドル残高がご利用いただけるかどうかを確認できませんでした。ホーム画面を下に引いて、もう一度お試しください。"
     },
     "ConvertDollarToBitcoinModal": {
         "title": "ドル残高はあなたの地域ではご利用いただけません",

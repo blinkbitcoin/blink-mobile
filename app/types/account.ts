@@ -41,3 +41,45 @@ export const CreationBlockReason = {
 
 export type CreationBlockReason =
   (typeof CreationBlockReason)[keyof typeof CreationBlockReason]
+
+/** What an account may not do where it is. The field names are the server's. */
+export type Restrictions = {
+  dollarBalance: boolean
+  transfer: boolean
+}
+
+/**
+ * Where the server's restriction verdict stands. A request that never came back is not an
+ * answer, so it is kept apart from one: `Unknown` means asking has stopped working for now,
+ * never that the server restricted anything.
+ */
+export const RestrictionVerdictStatus = {
+  /** No Blink account is behind the session, so there is nobody to ask about. */
+  NoAccount: "noAccount",
+  Pending: "pending",
+  Served: "served",
+  Unknown: "unknown",
+} as const
+
+export type RestrictionVerdictStatus =
+  (typeof RestrictionVerdictStatus)[keyof typeof RestrictionVerdictStatus]
+
+export type RestrictionVerdict =
+  | { status: typeof RestrictionVerdictStatus.NoAccount }
+  | { status: typeof RestrictionVerdictStatus.Pending }
+  | { status: typeof RestrictionVerdictStatus.Served; restrictions: Restrictions }
+  | { status: typeof RestrictionVerdictStatus.Unknown }
+
+/**
+ * Why an availability gate is closed, for the surface that has to say so. `UnknownRegion`
+ * is the one that is not a decision: the region was never determined, so the feature is
+ * withheld by policy while nothing about where the user is has been established. Copy
+ * that reads it as a restriction accuses a user nobody restricted.
+ */
+export const GateReason = {
+  Anon: "anon",
+  Region: "region",
+  UnknownRegion: "unknownRegion",
+} as const
+
+export type GateReason = (typeof GateReason)[keyof typeof GateReason]

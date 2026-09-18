@@ -2581,7 +2581,8 @@
     },
     "StablesatsRestriction": {
         "walletLabel": "in deiner Region nicht verfügbar",
-        "anonModeWalletLabel": "im Incognito-Modus nicht verfügbar"
+        "anonModeWalletLabel": "im Incognito-Modus nicht verfügbar",
+        "unknownRegionWalletLabel": "Verfügbarkeit konnte nicht geprüft werden, zum Wiederholen nach unten ziehen"
     },
     "AnonModeConvertModal": {
         "title": "Übertrage zuerst dein Dollar-Guthaben",
@@ -2604,7 +2605,9 @@
         "contactSupport": "Support kontaktieren"
     },
     "DollarBalanceRestriction": {
-        "modalTitle": "Dollar-Guthaben ist in deiner Region nicht verfügbar"
+        "modalTitle": "Dollar-Guthaben ist in deiner Region nicht verfügbar",
+        "unknownRegionModalTitle": "Verfügbarkeit des Dollar-Guthabens konnte nicht geprüft werden",
+        "unknownRegionModalBody": "Wir konnten nicht prüfen, ob das Dollar-Guthaben für dich verfügbar ist. Ziehe den Startbildschirm nach unten, um es erneut zu versuchen."
     },
     "ConvertDollarToBitcoinModal": {
         "title": "Dollar-Guthaben ist in deiner Region nicht verfügbar",

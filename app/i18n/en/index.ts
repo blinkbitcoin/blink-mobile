@@ -2732,6 +2732,7 @@ const en: BaseTranslation = {
   StablesatsRestriction: {
     walletLabel: "not available in your region",
     anonModeWalletLabel: "not available in Incognito mode",
+    unknownRegionWalletLabel: "couldn't check availability, pull down to retry",
   },
   AnonModeConvertModal: {
     title: "Transfer your Dollar Balance first",
@@ -2755,6 +2756,9 @@ const en: BaseTranslation = {
   },
   DollarBalanceRestriction: {
     modalTitle: "Dollar Balance is not available in your region",
+    unknownRegionModalTitle: "Couldn't check Dollar Balance availability",
+    unknownRegionModalBody:
+      "We couldn't check whether the Dollar Balance is available to you. Pull down on the home screen to try again.",
   },
   ConvertDollarToBitcoinModal: {
     title: "Dollar Balance is not available in your region",

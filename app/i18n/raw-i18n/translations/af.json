@@ -2581,7 +2581,8 @@
   },
   "StablesatsRestriction": {
     "walletLabel": "nie beskikbaar in jou streek nie",
-    "anonModeWalletLabel": "nie beskikbaar in Incognito-modus nie"
+    "anonModeWalletLabel": "nie beskikbaar in Incognito-modus nie",
+    "unknownRegionWalletLabel": "beskikbaarheid kon nie nagegaan word nie, trek af om weer te probeer"
   },
   "AnonModeConvertModal": {
     "title": "Dra eers jou Dollar-saldo oor",
@@ -2604,7 +2605,9 @@
     "contactSupport": "Kontak ondersteuning"
   },
   "DollarBalanceRestriction": {
-    "modalTitle": "Dollar-saldo is nie beskikbaar in jou streek nie"
+    "modalTitle": "Dollar-saldo is nie beskikbaar in jou streek nie",
+    "unknownRegionModalTitle": "Kon nie Dollar-saldo se beskikbaarheid nagaan nie",
+    "unknownRegionModalBody": "Ons kon nie nagaan of die Dollar-saldo vir jou beskikbaar is nie. Trek af op die tuisskerm om weer te probeer."
   },
   "ConvertDollarToBitcoinModal": {
     "title": "Dollar-saldo is nie beskikbaar in jou streek nie",

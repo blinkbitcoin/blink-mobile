@@ -2581,7 +2581,8 @@
   },
   "StablesatsRestriction": {
     "walletLabel": "հասանելի չէ ձեր տարածաշրջանում",
-    "anonModeWalletLabel": "հասանելի չէ Incognito ռեժիմում"
+    "anonModeWalletLabel": "հասանելի չէ Incognito ռեժիմում",
+    "unknownRegionWalletLabel": "հասանելիությունը հնարավոր չեղավ ստուգել, քաշեք ներքև՝ կրկին փորձելու համար"
   },
   "AnonModeConvertModal": {
     "title": "Նախ փոխանցեք ձեր դոլարային մնացորդը",
@@ -2604,7 +2605,9 @@
     "contactSupport": "Կապվել աջակցության հետ"
   },
   "DollarBalanceRestriction": {
-    "modalTitle": "Դոլարային մնացորդը հասանելի չէ ձեր տարածաշրջանում"
+    "modalTitle": "Դոլարային մնացորդը հասանելի չէ ձեր տարածաշրջանում",
+    "unknownRegionModalTitle": "Հնարավոր չեղավ ստուգել դոլարային մնացորդի հասանելիությունը",
+    "unknownRegionModalBody": "Մենք չկարողացանք ստուգել՝ արդյոք դոլարային մնացորդը հասանելի է ձեզ։ Քաշեք ներքև գլխավոր էկրանին՝ կրկին փորձելու համար։"
   },
   "ConvertDollarToBitcoinModal": {
     "title": "Դոլարային մնացորդը հասանելի չէ ձեր տարածաշրջանում",

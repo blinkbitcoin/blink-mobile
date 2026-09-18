@@ -2581,7 +2581,8 @@
   },
   "StablesatsRestriction": {
     "walletLabel": "teriiwo mu kitundu kyo",
-    "anonModeWalletLabel": "tekiriiwo mu modu ya Incognito"
+    "anonModeWalletLabel": "tekiriiwo mu modu ya Incognito",
+    "unknownRegionWalletLabel": "tetusobodde kukebera oba kiriwo, sika wansi okuddamu okugezaako"
   },
   "AnonModeConvertModal": {
     "title": "Sooka okyuse ssente zo eza Doola",
@@ -2604,7 +2605,9 @@
     "contactSupport": "Tuukirira abayambi"
   },
   "DollarBalanceRestriction": {
-    "modalTitle": "Bbalansi ya doola teriiwo mu kitundu kyo"
+    "modalTitle": "Bbalansi ya doola teriiwo mu kitundu kyo",
+    "unknownRegionModalTitle": "Tetusobodde kukebera oba bbalansi ya doola eriwo",
+    "unknownRegionModalBody": "Tetusobodde kukebera oba bbalansi ya doola eriwo gy'oli. Sika wansi ku sikulini enkulu okuddamu okugezaako."
   },
   "ConvertDollarToBitcoinModal": {
     "title": "Bbalansi ya doola teriiwo mu kitundu kyo",

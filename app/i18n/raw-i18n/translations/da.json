@@ -2581,7 +2581,8 @@
   },
   "StablesatsRestriction": {
     "walletLabel": "ikke tilgængelig i din region",
-    "anonModeWalletLabel": "ikke tilgængelig i Incognito-tilstand"
+    "anonModeWalletLabel": "ikke tilgængelig i Incognito-tilstand",
+    "unknownRegionWalletLabel": "tilgængelighed kunne ikke tjekkes, træk ned for at prøve igen"
   },
   "AnonModeConvertModal": {
     "title": "Overfør først din dollarsaldo",
@@ -2604,7 +2605,9 @@
     "contactSupport": "Kontakt support"
   },
   "DollarBalanceRestriction": {
-    "modalTitle": "Dollar-saldo er ikke tilgængelig i din region"
+    "modalTitle": "Dollar-saldo er ikke tilgængelig i din region",
+    "unknownRegionModalTitle": "Kunne ikke tjekke Dollar-saldoens tilgængelighed",
+    "unknownRegionModalBody": "Vi kunne ikke tjekke, om Dollar-saldoen er tilgængelig for dig. Træk ned på startskærmen for at prøve igen."
   },
   "ConvertDollarToBitcoinModal": {
     "title": "Dollar-saldo er ikke tilgængelig i din region",

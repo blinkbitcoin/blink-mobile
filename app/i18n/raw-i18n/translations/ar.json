@@ -2581,7 +2581,8 @@
   },
   "StablesatsRestriction": {
     "walletLabel": "غير متاح في منطقتك",
-    "anonModeWalletLabel": "غير متاح في وضع Incognito"
+    "anonModeWalletLabel": "غير متاح في وضع Incognito",
+    "unknownRegionWalletLabel": "تعذّر التحقق من التوفر، اسحب للأسفل لإعادة المحاولة"
   },
   "AnonModeConvertModal": {
     "title": "حوّل رصيدك بالدولار أولًا",
@@ -2604,7 +2605,9 @@
     "contactSupport": "تواصل مع الدعم"
   },
   "DollarBalanceRestriction": {
-    "modalTitle": "رصيد الدولار غير متاح في منطقتك"
+    "modalTitle": "رصيد الدولار غير متاح في منطقتك",
+    "unknownRegionModalTitle": "تعذّر التحقق من توفر رصيد الدولار",
+    "unknownRegionModalBody": "لم نتمكن من التحقق مما إذا كان رصيد الدولار متاحًا لك. اسحب للأسفل في الشاشة الرئيسية لإعادة المحاولة."
   },
   "ConvertDollarToBitcoinModal": {
     "title": "رصيد الدولار غير متاح في منطقتك",

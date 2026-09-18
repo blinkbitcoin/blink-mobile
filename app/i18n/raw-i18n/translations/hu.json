@@ -2581,7 +2581,8 @@
   },
   "StablesatsRestriction": {
     "walletLabel": "nem érhető el a régiódban",
-    "anonModeWalletLabel": "Incognito módban nem érhető el"
+    "anonModeWalletLabel": "Incognito módban nem érhető el",
+    "unknownRegionWalletLabel": "az elérhetőséget nem sikerült ellenőrizni, húzd le az újrapróbáláshoz"
   },
   "AnonModeConvertModal": {
     "title": "Először utald át a dolláregyenleged",
@@ -2604,7 +2605,9 @@
     "contactSupport": "Kapcsolatfelvétel az ügyfélszolgálattal"
   },
   "DollarBalanceRestriction": {
-    "modalTitle": "A dolláregyenleg nem érhető el a régiódban"
+    "modalTitle": "A dolláregyenleg nem érhető el a régiódban",
+    "unknownRegionModalTitle": "A dolláregyenleg elérhetőségét nem sikerült ellenőrizni",
+    "unknownRegionModalBody": "Nem tudtuk ellenőrizni, hogy a dolláregyenleg elérhető-e számodra. Húzd le a kezdőképernyőt az újrapróbáláshoz."
   },
   "ConvertDollarToBitcoinModal": {
     "title": "A dolláregyenleg nem érhető el a régiódban",
