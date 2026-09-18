@@ -11,8 +11,6 @@ import type useFee from "../use-fee"
 type Props = {
   paymentDetail: PaymentDetail<WalletCurrency>
   fee: ReturnType<typeof useFee>
-  /** The fee in the display currency. */
-  feeText: string
   /** Something blocks the send, or it is under way: either is told before a warning. */
   isBlocked: boolean
 }
@@ -26,7 +24,6 @@ type Props = {
 export const ReviewHighFeeSheet: React.FC<Props> = ({
   paymentDetail: { paymentType, settlementAmount, convertMoneyAmount },
   fee,
-  feeText,
   isBlocked,
 }) => {
   const sheet = useDismissibleErrorMsg(
@@ -40,7 +37,6 @@ export const ReviewHighFeeSheet: React.FC<Props> = ({
   return (
     <HighFeeSheet
       isVisible={sheet.isVisible && !isBlocked}
-      fee={feeText}
       onAccept={sheet.dismiss}
       onClose={sheet.dismiss}
     />
