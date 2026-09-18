@@ -93,8 +93,7 @@ describe("useCardInvestmentProgress", () => {
     jest.clearAllMocks()
     mockPersistentState = { ...baseState }
     mockIsAuthed.current = true
-    mockCardInvestmentAccountQuery.mockReturnValue({ data: undefined })
-    selfCustodialSession()
+    custodialSession()
     jest.spyOn(Date, "now").mockReturnValue(NOW)
   })
 
@@ -103,15 +102,35 @@ describe("useCardInvestmentProgress", () => {
   })
 
   describe("which account the investment is filed under", () => {
-    it("files a self-custodial account under its own id, without asking the server", () => {
+    /** The investment is paid from a custodial balance, so a self-custodial account
+     *  has no part in it: nothing is read for it, nothing is written, and the server
+     *  is not asked for an id. */
+    it("has no part for a self-custodial account, whatever the store holds", () => {
+      selfCustodialSession()
       mockPersistentState = stateWith({ [SELF_CUSTODIAL_ID]: INVESTMENT })
 
       const { result } = renderHook(() => useCardInvestmentProgress())
+      act(() => {
+        result.current.markInvited()
+        result.current.start(SIGNING)
+        result.current.markPaid()
+        result.current.clear()
+      })
 
-      expect(result.current.progress).toEqual(INVESTMENT)
+      expect(result.current.isEligible).toBe(false)
+      expect(result.current.isAccountResolved).toBe(false)
+      expect(result.current.progress).toBeNull()
+      expect(result.current.isInvited).toBe(false)
+      expect(mockUpdateState).not.toHaveBeenCalled()
       expect(mockCardInvestmentAccountQuery).toHaveBeenCalledWith(
         expect.objectContaining({ skip: true }),
       )
+    })
+
+    it("lets a custodial account take part", () => {
+      expect(
+        renderHook(() => useCardInvestmentProgress()).result.current.isEligible,
+      ).toBe(true)
     })
 
     it("files a custodial account under its server id", () => {
@@ -202,7 +221,7 @@ describe("useCardInvestmentProgress", () => {
 
   /** An invitation is not an investment: nothing about a payment can be derived from it. */
   it("reads an opened invitation as invited, with no progress", () => {
-    mockPersistentState = stateWith({ [SELF_CUSTODIAL_ID]: INVITATION })
+    mockPersistentState = stateWith({ [CUSTODIAL_ID]: INVITATION })
 
     const { result } = renderHook(() => useCardInvestmentProgress())
 
@@ -211,7 +230,7 @@ describe("useCardInvestmentProgress", () => {
   })
 
   it("is no longer invited once the agreement is signed", () => {
-    mockPersistentState = stateWith({ [SELF_CUSTODIAL_ID]: INVESTMENT })
+    mockPersistentState = stateWith({ [CUSTODIAL_ID]: INVESTMENT })
 
     const { result } = renderHook(() => useCardInvestmentProgress())
 
@@ -221,14 +240,14 @@ describe("useCardInvestmentProgress", () => {
   /** A day on, the agreement and its payment link have lapsed; the home starts over. */
   it("reads a record a day old as nothing", () => {
     mockPersistentState = stateWith({
-      [SELF_CUSTODIAL_ID]: { ...INVESTMENT, signedAt: NOW - A_DAY_MS },
+      [CUSTODIAL_ID]: { ...INVESTMENT, signedAt: NOW - A_DAY_MS },
     })
     expect(
       renderHook(() => useCardInvestmentProgress()).result.current.progress,
     ).toBeNull()
 
     mockPersistentState = stateWith({
-      [SELF_CUSTODIAL_ID]: { invitedAt: NOW - A_DAY_MS },
+      [CUSTODIAL_ID]: { invitedAt: NOW - A_DAY_MS },
     })
     expect(renderHook(() => useCardInvestmentProgress()).result.current.isInvited).toBe(
       false,
@@ -242,14 +261,14 @@ describe("useCardInvestmentProgress", () => {
       act(() => result.current.markInvited())
 
       expect(applyLastUpdate(baseState)?.cardInvestmentByAccountId).toEqual({
-        [SELF_CUSTODIAL_ID]: { invitedAt: NOW },
+        [CUSTODIAL_ID]: { invitedAt: NOW },
       })
     })
 
     /** The first screen is reached again on every return to the flow; the moment the
      *  invitation was first opened is the one that counts. */
     it("keeps the invitation already recorded", () => {
-      const invited = stateWith({ [SELF_CUSTODIAL_ID]: INVITATION })
+      const invited = stateWith({ [CUSTODIAL_ID]: INVITATION })
       mockPersistentState = invited
       const { result } = renderHook(() => useCardInvestmentProgress())
 
@@ -260,7 +279,7 @@ describe("useCardInvestmentProgress", () => {
 
     /** Coming back to the first screen after signing must not erase the agreement. */
     it("never overwrites a signed investment", () => {
-      const signed = stateWith({ [SELF_CUSTODIAL_ID]: INVESTMENT })
+      const signed = stateWith({ [CUSTODIAL_ID]: INVESTMENT })
       mockPersistentState = signed
       const { result } = renderHook(() => useCardInvestmentProgress())
 
@@ -279,7 +298,7 @@ describe("useCardInvestmentProgress", () => {
 
     it("opens a fresh invitation over a record that has lapsed", () => {
       const lapsed = stateWith({
-        [SELF_CUSTODIAL_ID]: { ...INVESTMENT, signedAt: NOW - A_DAY_MS },
+        [CUSTODIAL_ID]: { ...INVESTMENT, signedAt: NOW - A_DAY_MS },
       })
       mockPersistentState = lapsed
       const { result } = renderHook(() => useCardInvestmentProgress())
@@ -287,7 +306,7 @@ describe("useCardInvestmentProgress", () => {
       act(() => result.current.markInvited())
 
       expect(applyLastUpdate(lapsed)?.cardInvestmentByAccountId).toEqual({
-        [SELF_CUSTODIAL_ID]: { invitedAt: NOW },
+        [CUSTODIAL_ID]: { invitedAt: NOW },
       })
     })
   })
@@ -299,19 +318,19 @@ describe("useCardInvestmentProgress", () => {
       act(() => result.current.start(SIGNING))
 
       expect(applyLastUpdate(baseState)?.cardInvestmentByAccountId).toEqual({
-        [SELF_CUSTODIAL_ID]: { ...SIGNING, signedAt: NOW },
+        [CUSTODIAL_ID]: { ...SIGNING, signedAt: NOW },
       })
     })
 
     it("replaces the invitation with the investment signed on it", () => {
-      const invited = stateWith({ [SELF_CUSTODIAL_ID]: INVITATION })
+      const invited = stateWith({ [CUSTODIAL_ID]: INVITATION })
       mockPersistentState = invited
       const { result } = renderHook(() => useCardInvestmentProgress())
 
       act(() => result.current.start(SIGNING))
 
       expect(applyLastUpdate(invited)?.cardInvestmentByAccountId).toEqual({
-        [SELF_CUSTODIAL_ID]: { ...SIGNING, signedAt: NOW },
+        [CUSTODIAL_ID]: { ...SIGNING, signedAt: NOW },
       })
     })
 
@@ -326,14 +345,14 @@ describe("useCardInvestmentProgress", () => {
 
   describe("markPaid", () => {
     it("stamps the payment on the signed investment", () => {
-      const signed = stateWith({ [SELF_CUSTODIAL_ID]: INVESTMENT })
+      const signed = stateWith({ [CUSTODIAL_ID]: INVESTMENT })
       mockPersistentState = signed
       const { result } = renderHook(() => useCardInvestmentProgress())
 
       act(() => result.current.markPaid())
 
       expect(applyLastUpdate(signed)?.cardInvestmentByAccountId).toEqual({
-        [SELF_CUSTODIAL_ID]: { ...INVESTMENT, paidAt: NOW },
+        [CUSTODIAL_ID]: { ...INVESTMENT, paidAt: NOW },
       })
     })
 
@@ -347,7 +366,7 @@ describe("useCardInvestmentProgress", () => {
     })
 
     it("changes nothing on an invitation not yet signed", () => {
-      const invited = stateWith({ [SELF_CUSTODIAL_ID]: INVITATION })
+      const invited = stateWith({ [CUSTODIAL_ID]: INVITATION })
       mockPersistentState = invited
       const { result } = renderHook(() => useCardInvestmentProgress())
 
@@ -367,14 +386,14 @@ describe("useCardInvestmentProgress", () => {
 
   describe("recordInvoice", () => {
     it("stamps the issued invoice on the signed investment", () => {
-      const signed = stateWith({ [SELF_CUSTODIAL_ID]: INVESTMENT })
+      const signed = stateWith({ [CUSTODIAL_ID]: INVESTMENT })
       mockPersistentState = signed
       const { result } = renderHook(() => useCardInvestmentProgress())
 
       act(() => result.current.recordInvoice("lnbc25m1investment"))
 
       expect(applyLastUpdate(signed)?.cardInvestmentByAccountId).toEqual({
-        [SELF_CUSTODIAL_ID]: {
+        [CUSTODIAL_ID]: {
           ...INVESTMENT,
           invoice: { paymentRequest: "lnbc25m1investment", issuedAt: NOW },
         },
@@ -383,7 +402,7 @@ describe("useCardInvestmentProgress", () => {
 
     it("replaces the invoice issued before", () => {
       const signed = stateWith({
-        [SELF_CUSTODIAL_ID]: {
+        [CUSTODIAL_ID]: {
           ...INVESTMENT,
           invoice: { paymentRequest: "lnbc1old", issuedAt: NOW - 1 },
         },
@@ -393,9 +412,10 @@ describe("useCardInvestmentProgress", () => {
 
       act(() => result.current.recordInvoice("lnbc1new"))
 
-      expect(
-        applyLastUpdate(signed)?.cardInvestmentByAccountId?.[SELF_CUSTODIAL_ID],
-      ).toEqual({ ...INVESTMENT, invoice: { paymentRequest: "lnbc1new", issuedAt: NOW } })
+      expect(applyLastUpdate(signed)?.cardInvestmentByAccountId?.[CUSTODIAL_ID]).toEqual({
+        ...INVESTMENT,
+        invoice: { paymentRequest: "lnbc1new", issuedAt: NOW },
+      })
     })
 
     /** An invoice with no investment behind it is not this record's to invent. */
@@ -408,7 +428,7 @@ describe("useCardInvestmentProgress", () => {
     })
 
     it("changes nothing on an invitation not yet signed", () => {
-      const invited = stateWith({ [SELF_CUSTODIAL_ID]: INVITATION })
+      const invited = stateWith({ [CUSTODIAL_ID]: INVITATION })
       mockPersistentState = invited
       const { result } = renderHook(() => useCardInvestmentProgress())
 
@@ -441,7 +461,7 @@ describe("useCardInvestmentProgress", () => {
 
   describe("clear", () => {
     it("forgets the active account's invitation", () => {
-      const invited = stateWith({ [SELF_CUSTODIAL_ID]: INVITATION })
+      const invited = stateWith({ [CUSTODIAL_ID]: INVITATION })
       mockPersistentState = invited
       const { result } = renderHook(() => useCardInvestmentProgress())
 
@@ -451,7 +471,7 @@ describe("useCardInvestmentProgress", () => {
     })
 
     it("forgets the active account's investment", () => {
-      const signed = stateWith({ [SELF_CUSTODIAL_ID]: INVESTMENT })
+      const signed = stateWith({ [CUSTODIAL_ID]: INVESTMENT })
       mockPersistentState = signed
       const { result } = renderHook(() => useCardInvestmentProgress())
 

@@ -1,6 +1,6 @@
 import * as React from "react"
 import { ScrollView, View } from "react-native"
-import { CommonActions, useNavigation } from "@react-navigation/native"
+import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
@@ -12,7 +12,7 @@ import { useCardInvestmentProgress } from "@app/hooks/use-card-investment-progre
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
-import { resetToTransferStep } from "./transfer-invest-screen"
+import { RESET_TO_HOME, resetToTransferStep } from "./transfer-invest-screen"
 
 export const WelcomeInvestScreen: React.FC = () => {
   const styles = useStyles()
@@ -22,7 +22,14 @@ export const WelcomeInvestScreen: React.FC = () => {
 
   const { LL } = useI18nContext()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-  const { progress, isAccountResolved, markInvited } = useCardInvestmentProgress()
+  const { progress, isEligible, isAccountResolved, markInvited } =
+    useCardInvestmentProgress()
+
+  /** The investment is paid from a custodial balance; a self-custodial account that
+   *  arrives here, by a link or a notification, has no part in it and is sent home. */
+  React.useEffect(() => {
+    if (!isEligible) navigation.dispatch(RESET_TO_HOME)
+  }, [isEligible, navigation])
 
   /**
    * Opening this screen is what records the invitation, whichever way it was opened: the
@@ -45,9 +52,7 @@ export const WelcomeInvestScreen: React.FC = () => {
   React.useEffect(() => {
     if (!progress) return
     if (progress.paidAt) {
-      navigation.dispatch(
-        CommonActions.reset({ index: 0, routes: [{ name: "Primary" }] }),
-      )
+      navigation.dispatch(RESET_TO_HOME)
       return
     }
     navigation.dispatch(
