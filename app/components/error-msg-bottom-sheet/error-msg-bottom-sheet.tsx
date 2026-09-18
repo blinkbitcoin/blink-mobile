@@ -3,6 +3,7 @@ import { View } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { BottomSheet } from "@app/components/bottom-sheet"
 import { IconHero } from "@app/components/icon-hero"
 import { makeStyles, useTheme } from "@rn-vui/themed"
@@ -14,13 +15,16 @@ type ErrorMsgBottomSheetProps = {
   body: string
   primaryLabel: string
   onPrimaryPress: () => void
+  /** A second way on, under the action, for a warning the user may accept. */
+  secondaryLabel?: string
+  onSecondaryPress?: () => void
   testID?: string
 }
 
 /**
  * Figma's `error-msg-bottom-sheet` (Send 3.0, blink-wip#1275): something the
  * user can't fix on the screen they are on, told as a title, a body and the one
- * action that resolves it. It sits on top of the screen's inline error rather
+ * action that resolves it. A warning the user may accept adds that as a secondary action. It sits on top of the screen's inline error rather
  * than replacing it, so the error is still there once the sheet is dismissed.
  *
  * It rests on its content and doesn't expand: messages are short. Swiping it
@@ -33,6 +37,8 @@ export const ErrorMsgBottomSheet: React.FC<ErrorMsgBottomSheetProps> = ({
   body,
   primaryLabel,
   onPrimaryPress,
+  secondaryLabel,
+  onSecondaryPress,
   testID,
 }) => {
   const { bottom } = useSafeAreaInsets()
@@ -56,7 +62,12 @@ export const ErrorMsgBottomSheet: React.FC<ErrorMsgBottomSheetProps> = ({
             title={title}
             subtitle={body}
           />
-          <GaloyPrimaryButton title={primaryLabel} onPress={onPrimaryPress} />
+          <View style={styles.actions}>
+            <GaloyPrimaryButton title={primaryLabel} onPress={onPrimaryPress} />
+            {secondaryLabel && onSecondaryPress ? (
+              <GaloySecondaryButton title={secondaryLabel} onPress={onSecondaryPress} />
+            ) : null}
+          </View>
         </View>
       }
     >
@@ -71,5 +82,8 @@ const useStyles = makeStyles((_, { bottom }: { bottom: number }) => ({
     paddingHorizontal: 20,
     paddingBottom: bottom + 20,
     gap: 24,
+  },
+  actions: {
+    gap: 10,
   },
 }))

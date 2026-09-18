@@ -70,6 +70,26 @@ describe("ErrorMsgBottomSheet", () => {
     expect(onPrimaryPress).not.toHaveBeenCalled()
   })
 
+  it("offers no second action unless one is given", () => {
+    renderSheet()
+
+    expect(screen.queryByText("Accept $2.89 fee")).toBeNull()
+  })
+
+  it("runs the secondary action on its own, without the primary or a close", () => {
+    const onSecondaryPress = jest.fn()
+    const { onClose, onPrimaryPress } = renderSheet({
+      secondaryLabel: "Accept $2.89 fee",
+      onSecondaryPress,
+    })
+
+    fireEvent.press(screen.getByText("Accept $2.89 fee"))
+
+    expect(onSecondaryPress).toHaveBeenCalledTimes(1)
+    expect(onPrimaryPress).not.toHaveBeenCalled()
+    expect(onClose).not.toHaveBeenCalled()
+  })
+
   it("draws nothing while hidden", () => {
     renderSheet({ isVisible: false })
 
