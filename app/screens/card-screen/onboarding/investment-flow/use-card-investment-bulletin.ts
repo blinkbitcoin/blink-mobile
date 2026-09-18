@@ -74,6 +74,7 @@ export const useCardInvestmentBulletin = ({
    *  already holds. */
   const { hasEnoughBalance, isSplitAcrossWallets, isLoading } = useInvestmentFunding(
     progress?.selectedAmountUsd ?? 0,
+    progress?.settlementSats,
   )
 
   return resolveCardInvestmentBulletin({

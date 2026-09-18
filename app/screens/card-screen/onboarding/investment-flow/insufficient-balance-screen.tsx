@@ -14,6 +14,7 @@ import { WalletCurrency } from "@app/graphql/generated"
 import { IconHero } from "@app/components/icon-hero"
 import { CloseHeader } from "@app/components/close-header"
 import { Screen } from "@app/components/screen"
+import { useCardInvestmentProgress } from "@app/hooks/use-card-investment-progress"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { armInvestmentConversion } from "@app/screens/conversion-flow/drain-conversion"
@@ -41,6 +42,9 @@ export const InsufficientBalanceScreen: React.FC = () => {
     [selectedAmountUsd],
   )
 
+  /** Measured against the satoshis the agreement names once it is signed, so this
+   *  screen and the step that sent the investor here never disagree. */
+  const { progress } = useCardInvestmentProgress()
   const {
     balanceUsd,
     balanceCurrency,
@@ -48,13 +52,13 @@ export const InsufficientBalanceScreen: React.FC = () => {
     hasEnoughBalance,
     isSplitAcrossWallets,
     isLoading,
-  } = useInvestmentFunding(terms.totalUsd)
+  } = useInvestmentFunding(terms.totalUsd, progress?.settlementSats)
 
   /**
    * The balance is read live, so a deposit landing while this screen is up, or right
    * after the investor comes back from making one, turns the shortfall into nothing
-   * missing. There is nothing left to say here then: the screen closes and the step
-   * underneath, which is where the investor was sent from, takes over with the money
+   * missing. There is nothing left to say here then: the screen closes and whatever is
+   * underneath, the transfer step or the home with its card, takes over with the money
    * in place.
    *
    * Only while this screen is the one in front. The deposit usually lands while the

@@ -27,7 +27,8 @@ const mockUseInvestmentFunding = jest.fn()
 jest.mock(
   "@app/screens/card-screen/onboarding/investment-flow/use-investment-funding",
   () => ({
-    useInvestmentFunding: (totalUsd: number) => mockUseInvestmentFunding(totalUsd),
+    useInvestmentFunding: (totalUsd: number, settlementSats?: number) =>
+      mockUseInvestmentFunding(totalUsd, settlementSats),
   }),
 )
 
@@ -162,10 +163,13 @@ describe("useCardInvestmentBulletin", () => {
     expect(result.current?.kind).toBe(CardInvestmentBulletinKind.Invited)
   })
 
-  it("measures the balance against the amount the investor signed for", () => {
+  it("measures the balance against what the investor signed for, satoshis included", () => {
     renderHook(() => useCardInvestmentBulletin({ hasPendingDeposit: false }))
 
-    expect(mockUseInvestmentFunding).toHaveBeenCalledWith(SIGNED.selectedAmountUsd)
+    expect(mockUseInvestmentFunding).toHaveBeenCalledWith(
+      SIGNED.selectedAmountUsd,
+      SIGNED.settlementSats,
+    )
   })
 
   /** Hooks cannot be skipped, so with nothing signed the balance is measured against
@@ -177,7 +181,7 @@ describe("useCardInvestmentBulletin", () => {
       useCardInvestmentBulletin({ hasPendingDeposit: true }),
     )
 
-    expect(mockUseInvestmentFunding).toHaveBeenCalledWith(0)
+    expect(mockUseInvestmentFunding).toHaveBeenCalledWith(0, undefined)
     expect(result.current).toBeNull()
   })
 
