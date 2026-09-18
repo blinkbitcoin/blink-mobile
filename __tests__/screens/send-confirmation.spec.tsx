@@ -790,7 +790,11 @@ describe("SendBitcoinConfirmationScreen — USD remainder sweep warning", () => 
 
     await flushEffects()
 
-    expect(screen.getByText(usdRemainderSweepMatcher)).toBeTruthy()
+    /** The warning follows the fee quote, which lands after the first flush on a slow
+     *  runner; waiting on it keeps the case from reading the screen too early. */
+    await waitFor(() => {
+      expect(screen.getByText(usdRemainderSweepMatcher)).toBeTruthy()
+    })
   })
 
   it("does NOT render the warning when there is no amountAdjustment in the fee quote", async () => {
@@ -1325,9 +1329,12 @@ describe("hide balance", () => {
     renderWithHideAmount(true)
     await flushEffects()
 
-    // Exactly one placeholder: the From block. A second would mean the
-    // amount or fee field had been masked too, which is not the intent.
-    expect(screen.queryAllByTestId("hidden-balance-placeholder")).toHaveLength(1)
+    /** Exactly one placeholder: the From block. A second would mean the amount or fee
+     *  field had been masked too, which is not the intent. Waited on for the same
+     *  reason as the fee below: the rows settle after the first flush. */
+    await waitFor(() => {
+      expect(screen.queryAllByTestId("hidden-balance-placeholder")).toHaveLength(1)
+    })
   })
 
   it("leaves the amount being sent readable while hide-balance is on", async () => {
@@ -1346,6 +1353,8 @@ describe("hide balance", () => {
     renderWithHideAmount(false)
     await flushEffects()
 
-    expect(screen.queryAllByTestId("hidden-balance-placeholder")).toHaveLength(0)
+    await waitFor(() => {
+      expect(screen.queryAllByTestId("hidden-balance-placeholder")).toHaveLength(0)
+    })
   })
 })
