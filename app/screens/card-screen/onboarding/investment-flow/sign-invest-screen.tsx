@@ -15,10 +15,12 @@ import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { CloseHeader } from "@app/components/close-header"
 import { Screen } from "@app/components/screen"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
-import { usePriceConversion } from "@app/hooks/use-price-conversion"
+import { WalletCurrency } from "@app/graphql/generated"
+import { SATS_PER_BTC, usePriceConversion } from "@app/hooks/use-price-conversion"
 import { useAppConfig } from "@app/hooks/use-app-config"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { toBtcMoneyAmount } from "@app/types/amounts"
 import { logError } from "@app/utils/log-error"
 
 import { mintSigningInstance, resolveMintOrigin } from "./esign-mint"
@@ -112,7 +114,7 @@ export const SignInvestScreen: React.FC = () => {
     appConfig: { galoyInstance, token },
   } = useAppConfig()
   const { cardInvestmentAgreementPrefill } = useRemoteConfig()
-  const { usdPerSat } = usePriceConversion()
+  const { convertMoneyAmount } = usePriceConversion()
   const { selectedAmountUsd } = useRoute<SignInvestRoute>().params
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
@@ -130,17 +132,24 @@ export const SignInvestScreen: React.FC = () => {
   /**
    * What the mint reads the moment it runs, kept out of the source's dependencies for the
    * same reason: the price ticks every few seconds, and a source rebuilt on each tick
+  /** The price of one bitcoin in whole cents, or null while the feed has not answered:
+   *  the rate the agreement states, taken with its cents rather than as the per-satoshi
+   *  figure the hook also offers, which only holds whole dollars. */
+  const usdCentsPerBtc = convertMoneyAmount
+    ? convertMoneyAmount(toBtcMoneyAmount(SATS_PER_BTC), WalletCurrency.Usd).amount
+    : null
+
    * would restart the session mid-signature. The rate is read as the document is minted,
    * which is the stamped moment the agreement names.
    */
   const mintInputs = React.useRef({
     token,
     fields: cardInvestmentAgreementPrefill,
-    usdPerSat,
+    usdCentsPerBtc,
   })
   React.useEffect(() => {
-    mintInputs.current = { token, fields: cardInvestmentAgreementPrefill, usdPerSat }
-  }, [token, cardInvestmentAgreementPrefill, usdPerSat])
+    mintInputs.current = { token, fields: cardInvestmentAgreementPrefill, usdCentsPerBtc }
+  }, [token, cardInvestmentAgreementPrefill, usdCentsPerBtc])
 
   /** Replaces rather than pushes: the agreement cannot be unsigned, so leaving this
    *  screen behind would let a back swipe land on a finished session with no way on. */
@@ -194,11 +203,11 @@ export const SignInvestScreen: React.FC = () => {
     () =>
       createHostedFormSource({
         createInstance: async () => {
-          const { token: session, fields, usdPerSat: price } = mintInputs.current
+          const { token: session, fields, usdCentsPerBtc: price } = mintInputs.current
 
           const agreement = await mintInvestmentAgreement({
             totalUsd: selectedAmountUsd,
-            usdPerSat: price,
+            usdCentsPerBtc: price,
             fields,
             mint: (recipient, prefill) =>
               mintSigningInstance({
@@ -234,7 +243,7 @@ export const SignInvestScreen: React.FC = () => {
 
   /** The agreement cannot be minted before the price feed has answered, so a cold open
    *  waits on the spinner for it rather than failing the session it is about to start. */
-  const isPriceQuoted = usdPerSat !== null
+  const isPriceQuoted = usdCentsPerBtc !== null
 
   /**
    * Whether that wait has gone on too long. While it is waiting a timer runs; once the
