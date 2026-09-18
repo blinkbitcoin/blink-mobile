@@ -288,6 +288,12 @@ export const SignInvestScreen: React.FC = () => {
   React.useEffect(() => {
     if (!isSigning) {
       setIsPageReady(false)
+  /** While covered, the page is kept out of the accessibility tree too, so a screen
+   *  reader cannot land on a form the signer cannot yet see. Android and iOS each have
+   *  their own prop for it. */
+  const isPageCovered = !isPageReady
+  const webViewAccessibilityImportance = isPageCovered ? "no-hide-descendants" : "auto"
+
       return
     }
     const uncover = setTimeout(() => setIsPageReady(true), PAGE_READY_TIMEOUT_MS)
@@ -322,8 +328,6 @@ export const SignInvestScreen: React.FC = () => {
             location is DocuSign's optional audit extra, not something the signature
             needs, and the account has no brand file to switch the request off, so the
             WebView declines it before it reaches the signer. iOS has no such switch. */}
-        {/* While covered, the page is kept out of the accessibility tree too, so a
-            screen reader cannot land on a form the signer cannot yet see. */}
         <View style={styles.content}>
           <WebView
             {...webViewProps}
@@ -331,12 +335,12 @@ export const SignInvestScreen: React.FC = () => {
             geolocationEnabled={false}
             injectedJavaScript={REPORT_PAGE_READY_SCRIPT}
             onMessage={handleWebViewMessage}
-            importantForAccessibility={isPageReady ? "auto" : "no-hide-descendants"}
-            accessibilityElementsHidden={!isPageReady}
+            importantForAccessibility={webViewAccessibilityImportance}
+            accessibilityElementsHidden={isPageCovered}
             style={styles.webview}
             testID="sign-invest-webview"
           />
-          {!isPageReady && <View style={styles.pageCover}>{spinner}</View>}
+          {isPageCovered && <View style={styles.pageCover}>{spinner}</View>}
         </View>
       </Screen>
     )
