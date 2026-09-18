@@ -1,11 +1,12 @@
 import React from "react"
-import { Platform, StyleProp, StyleSheet, ViewStyle } from "react-native"
+import { Image, Platform, StyleProp, StyleSheet, ViewStyle } from "react-native"
 import { fireEvent, render, waitFor } from "@testing-library/react-native"
 import { ThemeProvider } from "@rn-vui/themed"
 
 import theme from "@app/rne-theme/theme"
 import {
   headerBackControl,
+  HeaderBackButtonWithTheme,
   InvisibleBackButton,
 } from "@app/components/header-back-control/header-back-control"
 
@@ -132,6 +133,25 @@ describe("headerBackControl", () => {
 
     // HeaderBackButton builds its accessibility label from the one the header supplies.
     expect(getByLabelText("Settings, back")).toBeTruthy()
+  })
+
+  /* A headerless screen (send review) renders the button bare, with no headerTintColor
+   * from a native header. HeaderBackButton then passes an undefined tint to its icon,
+   * which drops the icon's own default and draws the raw black glyph. */
+  it("tints the arrow with the theme foreground when rendered outside a header", () => {
+    const rendered = renderHeaderLeft(<HeaderBackButtonWithTheme />)
+
+    expect(rendered.UNSAFE_getByType(Image).props.tintColor).toBe(
+      theme.lightColors?.black,
+    )
+  })
+
+  it("keeps the tint a header supplies", () => {
+    const rendered = renderHeaderLeft(
+      headerBackControl()({ ...headerProps, tintColor: "#123456" }),
+    )
+
+    expect(rendered.UNSAFE_getByType(Image).props.tintColor).toBe("#123456")
   })
 
   it("renders the invisible placeholder when going back is not allowed", () => {
