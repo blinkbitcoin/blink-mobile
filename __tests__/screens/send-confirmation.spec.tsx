@@ -532,6 +532,8 @@ describe("SendBitcoinConfirmationScreen", () => {
             successAction?: unknown
             note?: unknown
             paymentRequest?: unknown
+            status?: unknown
+            createdAt?: unknown
           }
       }
       throw new Error("sendBitcoinCompleted route was not dispatched")
@@ -606,14 +608,45 @@ describe("SendBitcoinConfirmationScreen", () => {
       it("is taken to the receipt as settled when it is the card investment's", async () => {
         armCardInvestmentPayment(bolt11Invoice)
         sendPaymentMock.mockResolvedValueOnce({ status: "ALREADY_PAID" })
+        verifyPaymentSettledMock.mockResolvedValueOnce({
+          status: "SUCCESS",
+          createdAt: 1700000000,
+        })
 
         renderBolt11()
         await act(async () => {
           fireEvent.press(screen.getByTestId("slider"))
         })
 
-        expect(findCompletedRouteParams().paymentRequest).toBe(bolt11Invoice)
+        /** The ledger's own account of the settlement, not an assumed one. */
+        expect(verifyPaymentSettledMock).toHaveBeenCalledWith({
+          walletId: btcSendingWalletDescriptor.id,
+          paymentRequest: bolt11Invoice,
+        })
+        const params = findCompletedRouteParams()
+        expect(params.paymentRequest).toBe(bolt11Invoice)
+        expect(params.status).toBe("SUCCESS")
+        expect(params.createdAt).toBe(1700000000)
         expect(screen.queryByText("This invoice has already been paid")).toBeNull()
+      })
+
+      /** When the ledger cannot say, the receipt is still reached: refusing would leave
+       *  the home asking for money that has already gone. */
+      it("still reaches the receipt when the ledger cannot confirm the settlement", async () => {
+        armCardInvestmentPayment(bolt11Invoice)
+        sendPaymentMock.mockResolvedValueOnce({ status: "ALREADY_PAID" })
+        verifyPaymentSettledMock.mockResolvedValueOnce(undefined)
+
+        renderBolt11()
+        await act(async () => {
+          fireEvent.press(screen.getByTestId("slider"))
+        })
+
+        expect(verifyPaymentSettledMock).toHaveBeenCalledTimes(1)
+        const params = findCompletedRouteParams()
+        expect(params.paymentRequest).toBe(bolt11Invoice)
+        expect(params.status).toBe("SUCCESS")
+        expect(params.createdAt).toBeUndefined()
       })
 
       it("is refused, as before, for any other invoice", async () => {
