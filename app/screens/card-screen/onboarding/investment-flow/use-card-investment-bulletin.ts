@@ -49,8 +49,8 @@ export const resolveCardInvestmentBulletin = ({
 }
 
 type UseCardInvestmentBulletinParams = {
-  /** Whether a deposit into the account is still confirming. The home already knows,
-   *  for both custody types, so it is handed in rather than fetched a second time. */
+  /** Whether a deposit into the custodial account is still confirming. The home already
+   *  knows, so it is handed in rather than fetched a second time. */
   hasPendingDeposit: boolean
 }
 
