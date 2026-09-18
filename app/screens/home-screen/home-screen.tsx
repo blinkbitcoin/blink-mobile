@@ -362,12 +362,13 @@ export const HomeScreen: React.FC = () => {
    *  pending row and that banner can never disagree about the same deposits. */
   const { deposits, refetch: refetchPendingDeposits } = usePendingDeposits()
 
-  /** A deposit on its way in, whichever custody type it lands in: the investment
-   *  bulletin says so instead of asking for one the investor already made. */
+  /** A deposit on its way into the custodial account: the investment bulletin says so
+   *  instead of asking for one the investor already made. Only custodial, since the
+   *  investment is paid from a custodial balance and the bulletin exists for none other. */
   const hasPendingCustodialReceive = (pendingIncomingTransactions?.length ?? 0) > 0
-  const hasPendingSelfCustodialDeposit = deposits.length > 0
-  const hasPendingDeposit = hasPendingCustodialReceive || hasPendingSelfCustodialDeposit
-  const cardInvestmentBulletin = useCardInvestmentBulletin({ hasPendingDeposit })
+  const cardInvestmentBulletin = useCardInvestmentBulletin({
+    hasPendingDeposit: hasPendingCustodialReceive,
+  })
 
   /** Pending deposits stay visible under the balance until confirmed —
    *  unlike the unseen-tx badge sharing that slot, which auto-dismisses
