@@ -2413,7 +2413,7 @@
       "title": "Waarschuwing: hoge kosten!",
       "body": "Je kosten zijn 50% of meer van het bedrag dat je verstuurt. Weet je zeker dat je wilt doorgaan?",
       "cancelPayment": "Betaling annuleren",
-      "acceptFee": "Accepteer {fee: string} kosten"
+      "acceptFee": "Accepteer kosten"
     },
     "copiedDestination": "Bestemming naar het klembord gekopieerd",
     "pendingPayment": "De betaling is verzonden, maar nog niet bevestigd.\n\nHet is mogelijk dat de betaling niet wordt bevestigd, in dat geval worden de fondsen teruggestort naar je account.",

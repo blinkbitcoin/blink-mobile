@@ -2382,7 +2382,7 @@ describe("SendBitcoinConfirmationScreen — high-fee sheet (blink-wip#1323)", ()
   }
 
   const highFeeSheet = () => screen.queryByTestId(HIGH_FEE_SHEET_TEST_ID)
-  const sheetButton = (label: string | RegExp) =>
+  const sheetButton = (label: string) =>
     within(screen.getByTestId(HIGH_FEE_SHEET_TEST_ID)).getByText(label)
 
   beforeEach(() => {
@@ -2422,7 +2422,7 @@ describe("SendBitcoinConfirmationScreen — high-fee sheet (blink-wip#1323)", ()
 
     expect(highFeeSheet()).toBeTruthy()
     expect(sheetButton(LL.SendBitcoinScreen.highFeeSheet.title())).toBeTruthy()
-    expect(sheetButton(/^Accept .+ fee$/)).toBeTruthy()
+    expect(sheetButton(LL.SendBitcoinScreen.highFeeSheet.acceptFee())).toBeTruthy()
   })
 
   it("opens on a self-custodial Lightning send too", async () => {
@@ -2459,7 +2459,7 @@ describe("SendBitcoinConfirmationScreen — high-fee sheet (blink-wip#1323)", ()
     await renderReview()
 
     await act(async () => {
-      fireEvent.press(sheetButton(/^Accept .+ fee$/))
+      fireEvent.press(sheetButton(LL.SendBitcoinScreen.highFeeSheet.acceptFee()))
     })
     await flushEffects()
 

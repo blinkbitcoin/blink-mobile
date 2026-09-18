@@ -2413,7 +2413,7 @@
       "title": "Hoë fooi-waarskuwing!",
       "body": "Jou fooi is 50% of meer van die bedrag wat jy stuur. Is jy seker jy wil voortgaan?",
       "cancelPayment": "Kanselleer betaling",
-      "acceptFee": "Aanvaar {fee: string} fooi"
+      "acceptFee": "Aanvaar fooi"
     },
     "copiedDestination": "Bestemming na knipbord oorgedra",
     "pendingPayment": "Die betaling is gestuur, maar is nog nie bevestig nie.\n\nDit is moontlik dat die betaling nie sal bevestig nie, in welke geval die fondse na jou rekening teruggestuur sal word.",

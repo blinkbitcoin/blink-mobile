@@ -2413,7 +2413,7 @@
       "title": "Onyo la ada kubwa!",
       "body": "Ada yako ni 50% au zaidi ya kiasi unachotuma. Una uhakika unataka kuendelea?",
       "cancelPayment": "Ghairi malipo",
-      "acceptFee": "Kubali ada ya {fee: string}"
+      "acceptFee": "Kubali ada"
     },
     "copiedDestination": "Imeakiliwa marudio kwenye ubao wa kunakili",
     "pendingPayment": "Ada kubwa! Tunapendekeza Umeme.\n\nInawezekana malipo hayatathibitisha, katika hali ambayo pesa zitarejeshwa kwenye akaunti yako.",

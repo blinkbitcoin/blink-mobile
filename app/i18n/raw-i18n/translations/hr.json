@@ -2413,7 +2413,7 @@
       "title": "Upozorenje o visokoj naknadi!",
       "body": "Vaša naknada iznosi 50 % ili više iznosa koji šaljete. Jeste li sigurni da želite nastaviti?",
       "cancelPayment": "Otkaži plaćanje",
-      "acceptFee": "Prihvati naknadu od {fee: string}"
+      "acceptFee": "Prihvati naknadu"
     },
     "copiedDestination": "Odredište kopirano u međuspremnik",
     "pendingPayment": "Plaćanje je poslano, ali još nije potvrđeno.\n\nMoguće je da plaćanje neće biti potvrđeno, u tom slučaju sredstva će biti vraćena na vaš račun.",

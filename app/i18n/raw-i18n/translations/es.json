@@ -2413,7 +2413,7 @@
             "title": "Alerta de tarifa alta!",
             "body": "Tu tarifa es el 50% o más del monto que envías. ¿Seguro que quieres continuar?",
             "cancelPayment": "Cancelar pago",
-            "acceptFee": "Aceptar tarifa de {fee: string}"
+            "acceptFee": "Aceptar tarifa"
         },
         "copiedDestination": "Destino copiado al portapapeles",
         "pendingPayment": "El pago ha sido enviado, pero aún no se ha confirmado.\n\nEs posible que el pago no se confirme, en cuyo caso los fondos se devolverán a su cuenta.\nBETA",

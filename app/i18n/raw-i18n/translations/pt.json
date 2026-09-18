@@ -2413,7 +2413,7 @@
             "title": "Alerta de taxa alta!",
             "body": "Sua taxa é 50% ou mais do valor que você está enviando. Tem certeza de que deseja continuar?",
             "cancelPayment": "Cancelar pagamento",
-            "acceptFee": "Aceitar taxa de {fee: string}"
+            "acceptFee": "Aceitar taxa"
         },
         "copiedDestination": "Copiado destino para a área de transferência",
         "pendingPayment": "O pagamento foi enviado, mas ainda não foi confirmado.\n\nÉ possível que o pagamento não seja confirmado, caso em que os fundos serão devolvidos à sua conta.",

@@ -2413,7 +2413,7 @@
       "title": "Yüksek ücret uyarısı!",
       "body": "Ücretiniz gönderdiğiniz tutarın %50'si veya daha fazlası. Devam etmek istediğinizden emin misiniz?",
       "cancelPayment": "Ödemeyi iptal et",
-      "acceptFee": "{fee: string} ücreti kabul et"
+      "acceptFee": "Ücreti kabul et"
     },
     "copiedDestination": "Hedefi panoya kopyalama",
     "pendingPayment": "Ödeme gönderildi, ancak henüz onaylanmadı.\n\nÖdemenin onaylanmaması mümkündür, bu durumda para hesabınıza iade edilecektir.",

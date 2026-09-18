@@ -52,6 +52,14 @@ describe("isHighFee", () => {
     expect(judge(10)).toBe(false)
   })
 
+  it("never warns about a send under 100 sats, whatever its fee", () => {
+    expect(judge(60, 99)).toBe(false)
+  })
+
+  it("warns from 100 sats up", () => {
+    expect(judge(50, 100)).toBe(true)
+  })
+
   it("never warns about a free send", () => {
     expect(judge(0, 0)).toBe(false)
   })

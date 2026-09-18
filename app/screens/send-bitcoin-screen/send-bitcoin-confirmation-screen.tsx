@@ -823,7 +823,6 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
       <ReviewHighFeeSheet
         paymentDetail={paymentDetail}
         fee={fee}
-        feeText={currencyFeeAmount}
         isBlocked={Boolean(blockingError) || errorSheet.isVisible || hasAttemptedSend}
       />
     </Screen>

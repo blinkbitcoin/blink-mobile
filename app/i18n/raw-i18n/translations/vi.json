@@ -2413,7 +2413,7 @@
       "title": "Cảnh báo phí cao!",
       "body": "Phí của bạn bằng 50% trở lên so với số tiền bạn gửi. Bạn có chắc muốn tiếp tục không?",
       "cancelPayment": "Hủy thanh toán",
-      "acceptFee": "Chấp nhận phí {fee: string}"
+      "acceptFee": "Chấp nhận phí"
     },
     "copiedDestination": "Đã sao chép địa chỉ đích vào bộ nhớ tạm",
     "pendingPayment": "Khoản thanh toán đã được gửi nhưng chưa được xác nhận.\n\nCó thể khoản thanh toán sẽ không được xác nhận, trong trường hợp đó tiền sẽ được trả lại tài khoản của bạn.",

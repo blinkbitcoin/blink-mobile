@@ -2413,7 +2413,7 @@
             "title": "Attenzione: tariffe elevate!",
             "body": "La commissione è pari o superiore al 50% dell'importo che invii. Vuoi davvero procedere?",
             "cancelPayment": "Annulla pagamento",
-            "acceptFee": "Accetta commissione di {fee: string}"
+            "acceptFee": "Accetta commissione"
         },
         "copiedDestination": "Destinazione copiata negli apDestinazione copiata negli appuntipunti",
         "pendingPayment": "Il pagamento è stato inviato, ma non è ancora stato confermato.\n\nÈ possibile che il pagamento non venga confermato, nel qual caso i fondi verranno restituiti al tuo account.",

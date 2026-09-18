@@ -2413,7 +2413,7 @@
       "title": "Magas díj figyelmeztetés!",
       "body": "A díj a küldött összeg 50%-a vagy több. Biztosan folytatod?",
       "cancelPayment": "Fizetés megszakítása",
-      "acceptFee": "{fee: string} díj elfogadása"
+      "acceptFee": "Díj elfogadása"
     },
     "copiedDestination": "Címzett a vágólapra másolva.",
     "pendingPayment": "A fizetés elküldve, de még nem érkezett visszaigazolás.\n\n Visszaigazolás hiányában a pénz visszakerül a számládra.",

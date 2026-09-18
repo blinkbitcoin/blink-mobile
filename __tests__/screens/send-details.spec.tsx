@@ -974,11 +974,12 @@ describe("high-fee sheet (blink-wip#1323)", () => {
   })
 
   it("continues to review once the fee is accepted", async () => {
+    const LL = i18nObject("en")
     await pressNextOnHighFeeSend()
 
     const sheet = within(await screen.findByTestId(HIGH_FEE_SHEET_TEST_ID))
     await act(async () => {
-      fireEvent.press(sheet.getByText(/^Accept .+ fee$/))
+      fireEvent.press(sheet.getByText(LL.SendBitcoinScreen.highFeeSheet.acceptFee()))
     })
 
     expect(mockNavigate).toHaveBeenCalledWith(

@@ -2482,7 +2482,7 @@ const en: BaseTranslation = {
       title: "High fee alert!",
       body: "Your fee is 50% or more of the amount you're sending. Are you sure you want to proceed?",
       cancelPayment: "Cancel payment",
-      acceptFee: "Accept {fee: string} fee",
+      acceptFee: "Accept fee",
     },
     copiedDestination: "Copied destination to clipboard",
     pendingPayment:

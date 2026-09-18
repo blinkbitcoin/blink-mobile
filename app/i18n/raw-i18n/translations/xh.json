@@ -2413,7 +2413,7 @@
       "title": "Isilumkiso semirhumo ephezulu!",
       "body": "Umrhumo wakho ungama-50% okanye ngaphezulu kwesixa osithumelayo. Uqinisekile ukuba ufuna ukuqhubeka?",
       "cancelPayment": "Rhoxisa intlawulo",
-      "acceptFee": "Yamkela umrhumo we-{fee: string}"
+      "acceptFee": "Yamkela umrhumo"
     },
     "copiedDestination": "Ikopishwe indawo ekuya kuyo kwibhodi eqhotyoshwayo",
     "pendingPayment": "Intlawulo ithunyelwe, kodwa ayikaqinisekiswa okwangoku.\n\nKunokwenzeka ukuba intlawulo ayiqinisekiswa, kwimeko enjalo imali iya kubuyiselwa kwi-akhawunti yakho.",

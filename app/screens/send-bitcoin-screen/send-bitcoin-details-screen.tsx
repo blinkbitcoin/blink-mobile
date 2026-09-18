@@ -611,9 +611,6 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
       />
       <HighFeeSheet
         isVisible={isHighFeeSheetVisible}
-        fee={formatMoneyAmount({
-          moneyAmount: convertMoneyAmount(selectedTierFee, DisplayCurrency),
-        })}
         onAccept={() => {
           setIsHighFeeSheetVisible(false)
           navigation.navigate("sendBitcoinConfirmation", { paymentDetail })

@@ -2413,7 +2413,7 @@
             "title": "Hochgebührenalarm!",
             "body": "Deine Gebühr beträgt 50 % oder mehr des Betrags, den du sendest. Möchtest du wirklich fortfahren?",
             "cancelPayment": "Zahlung abbrechen",
-            "acceptFee": "Gebühr von {fee: string} akzeptieren"
+            "acceptFee": "Gebühr akzeptieren"
         },
         "copiedDestination": "Ziel in die Zwischenablage kopiert",
         "pendingPayment": "Die Zahlung wurde abgeschickt, aber noch nicht bestätigt.\n\nEs ist möglich, dass die Zahlung nicht bestätigt wird. In diesem Fall wird das Geld auf Ihr Konto zurückgebucht.",

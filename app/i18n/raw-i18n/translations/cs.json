@@ -2413,7 +2413,7 @@
       "title": "Upozornění na vysoký poplatek!",
       "body": "Váš poplatek je 50 % nebo více z odesílané částky. Opravdu chcete pokračovat?",
       "cancelPayment": "Zrušit platbu",
-      "acceptFee": "Přijmout poplatek {fee: string}"
+      "acceptFee": "Přijmout poplatek"
     },
     "copiedDestination": "Cíl zkopírován do schránky",
     "pendingPayment": "Platba byla odeslána, ale dosud nebyla potvrzena.\n\nJe možné, že platba nebude potvrzena a v takovém případě budou prostředky vráceny na váš účet.",

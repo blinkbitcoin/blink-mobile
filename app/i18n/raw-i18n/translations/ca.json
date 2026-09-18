@@ -2413,7 +2413,7 @@
       "title": "Alerta d'altes comissions !",
       "body": "La teva comissió és el 50% o més de l'import que envies. Segur que vols continuar?",
       "cancelPayment": "Cancel·la el pagament",
-      "acceptFee": "Accepta la comissió de {fee: string}"
+      "acceptFee": "Accepta la comissió"
     },
     "copiedDestination": "Destinació copiada al porta-retalls",
     "pendingPayment": "El pagament s'ha enviat, però encara no s'ha confirmat.\n\nÉs possible que el pagament no es confirmi, en aquest cas els fons es retornaran al teu compte.",

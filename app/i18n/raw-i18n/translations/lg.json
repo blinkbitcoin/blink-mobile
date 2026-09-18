@@ -2413,7 +2413,7 @@
       "title": "Okulabula ku bisale ebingi!",
       "body": "Ssente z'osasula ziri 50% oba okusingawo ku ssente z'oweereza. Okakasa nti oyagala okugenda mu maaso?",
       "cancelPayment": "Sazaamu okusasula",
-      "acceptFee": "Kkiriza sente {fee: string}"
+      "acceptFee": "Kkiriza sente"
     },
     "copiedDestination": "Gy'eziraga wawanduukuluddwa ku lutimbe",
     "pendingPayment": "Ensasula eno eweerezeddwa, naye tennaba kukakasa.\n\nKisoboka okusasula tekujja kukakasa, mu mbeera eyo ssente zijja kuddizibwa ku akawunti yo.",

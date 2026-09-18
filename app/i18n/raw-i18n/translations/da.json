@@ -2413,7 +2413,7 @@
       "title": "Advarsel om højt gebyr!",
       "body": "Dit gebyr er 50 % eller mere af det beløb, du sender. Er du sikker på, at du vil fortsætte?",
       "cancelPayment": "Annuller betaling",
-      "acceptFee": "Accepter gebyr på {fee: string}"
+      "acceptFee": "Accepter gebyr"
     },
     "copiedDestination": "Copied destination to clipboard",
     "pendingPayment": "The payment has been sent, but hasn't confirmed yet.\n\nIt's possible the payment will not confirm, in which case the funds will be returned to your account.",

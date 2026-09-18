@@ -2413,7 +2413,7 @@
       "title": "¡Hatun comisión willakuy!",
       "body": "Comisiónniyki kachanqa 50% utaq aswan kachasqayki qullqimanta. ¿Chiqachu purichiyta munanki?",
       "cancelPayment": "Pagota t'akuy",
-      "acceptFee": "{fee: string} comisiónta chaskiy"
+      "acceptFee": "Comisiónta chaskiy"
     },
     "copiedDestination": "Mayman rinanta clipboard nisqaman churasqa",
     "pendingPayment": "Pagota apachisqaña, ichaqa manaraq chiqapchasqachu.\n\nPagoqa mana chiqapchakuyta atinmanchu, chaypiqa qullqiqa cuentaykiman kutinqa.",

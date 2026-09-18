@@ -2413,7 +2413,7 @@
             "title": "Alerte frais élevés !",
             "body": "Vos frais représentent 50 % ou plus du montant envoyé. Voulez-vous vraiment continuer ?",
             "cancelPayment": "Annuler le paiement",
-            "acceptFee": "Accepter {fee: string} de frais"
+            "acceptFee": "Accepter les frais"
         },
         "copiedDestination": "Destination copiée dans le presse-papiers",
         "pendingPayment": "Le paiement a été envoyé, mais n'a pas encore été confirmé.\n\nIl est possible que le paiement ne soit pas confirmé, auquel cas les fonds seront restitués à votre compte.",

@@ -7814,10 +7814,9 @@ type RootTranslation = {
 			 */
 			cancelPayment: string
 			/**
-			 * A​c​c​e​p​t​ ​{​f​e​e​}​ ​f​e​e
-			 * @param {string} fee
+			 * A​c​c​e​p​t​ ​f​e​e
 			 */
-			acceptFee: RequiredParams<'fee'>
+			acceptFee: string
 		}
 		/**
 		 * C​o​p​i​e​d​ ​d​e​s​t​i​n​a​t​i​o​n​ ​t​o​ ​c​l​i​p​b​o​a​r​d
@@ -21538,9 +21537,9 @@ export type TranslationFunctions = {
 			 */
 			cancelPayment: () => LocalizedString
 			/**
-			 * Accept {fee} fee
+			 * Accept fee
 			 */
-			acceptFee: (arg: { fee: string }) => LocalizedString
+			acceptFee: () => LocalizedString
 		}
 		/**
 		 * Copied destination to clipboard

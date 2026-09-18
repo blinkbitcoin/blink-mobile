@@ -2413,7 +2413,7 @@
       "title": "Peringatan biaya tinggi!",
       "body": "Biaya Anda 50% atau lebih dari jumlah yang Anda kirim. Yakin ingin melanjutkan?",
       "cancelPayment": "Batalkan pembayaran",
-      "acceptFee": "Terima biaya {fee: string}"
+      "acceptFee": "Terima biaya"
     },
     "copiedDestination": "Tujuan disalin ke papan klip",
     "pendingPayment": "Pembayaran telah dikirim, tetapi belum dikonfirmasi.\n\nAda kemungkinan pembayaran tidak akan dikonfirmasi, dalam hal ini dana akan dikembalikan ke akun Anda.",

@@ -2413,7 +2413,7 @@
       "title": "Upozornenie na vysoké poplatky!",
       "body": "Váš poplatok je 50 % alebo viac z odosielanej sumy. Naozaj chcete pokračovať?",
       "cancelPayment": "Zrušiť platbu",
-      "acceptFee": "Prijať poplatok {fee: string}"
+      "acceptFee": "Prijať poplatok"
     },
     "copiedDestination": "Cieľ bol skopírovaný do schránky",
     "pendingPayment": "Platba bola odoslaná, ale ešte nie je potvrdená.\n\nJe možné, že platba nebude potvrdená, v takom prípade budú prostriedky vrátené na váš účet.",

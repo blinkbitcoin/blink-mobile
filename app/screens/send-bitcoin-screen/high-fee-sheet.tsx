@@ -7,8 +7,6 @@ import { useReviewExits } from "./hooks/use-review-exits"
 
 type Props = {
   isVisible: boolean
-  /** The fee in the display currency, as the accept button names it. */
-  fee: string
   onAccept: () => void
   onClose: () => void
 }
@@ -18,7 +16,7 @@ type Props = {
  * is the primary action, since a fee that size is more likely a mistake than a choice
  * (#2799), and it starts the send over with nothing entered.
  */
-export const HighFeeSheet: React.FC<Props> = ({ isVisible, fee, onAccept, onClose }) => {
+export const HighFeeSheet: React.FC<Props> = ({ isVisible, onAccept, onClose }) => {
   const { LL } = useI18nContext()
   const { startOver } = useReviewExits()
 
@@ -30,7 +28,7 @@ export const HighFeeSheet: React.FC<Props> = ({ isVisible, fee, onAccept, onClos
       body={LL.SendBitcoinScreen.highFeeSheet.body()}
       primaryLabel={LL.SendBitcoinScreen.highFeeSheet.cancelPayment()}
       onPrimaryPress={startOver}
-      secondaryLabel={LL.SendBitcoinScreen.highFeeSheet.acceptFee({ fee })}
+      secondaryLabel={LL.SendBitcoinScreen.highFeeSheet.acceptFee()}
       onSecondaryPress={onAccept}
       testID="high-fee-sheet"
     />
