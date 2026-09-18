@@ -3727,6 +3727,9 @@
         "buttonText": "Ñawpaqman",
         "paymentsUnavailable": "Invertiy pagaykunaqa manaraqmi kichasqachu. Ama hina kaspa, qhipaman yapamanta ruwaykuy."
       },
+      "SignInvest": {
+        "signerNotConfigured": "Firmaqqa manaraqmi churasqachu. Aplicacionta yapamanta qallariy hinaspa yapamanta ruwaykuy."
+      },
       "InsufficientBalance": {
         "title": "Mana aypaq qullqi",
         "paragraphs": {

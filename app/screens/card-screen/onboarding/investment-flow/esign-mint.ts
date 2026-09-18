@@ -66,12 +66,20 @@ type MintAnswer = {
   error?: string
 }
 
-/** The failure the answer stands for, under the code the signing component reads. */
-const failureOf = (status: number, reason: string): Error => {
-  if (status === REFUSED_STATUS) return signingRefusal(reason)
-  if (status === UNAUTHORIZED_STATUS) return signingUnauthorized(reason)
+/**
+ * The failure the answer stands for, under the code the signing component reads. A
+ * refusal is worth reading only when the service said why; a bare 400 is as opaque as
+ * any other failure, so it gets the retry copy rather than "HTTP 400" on the screen.
+ */
+const failureOf = (
+  status: number,
+  reason: string | undefined,
+  fallback: string,
+): Error => {
+  if (status === UNAUTHORIZED_STATUS) return signingUnauthorized(reason ?? fallback)
+  if (status === REFUSED_STATUS && reason) return signingRefusal(reason)
 
-  return signingFailure(reason)
+  return signingFailure(reason ?? fallback)
 }
 
 export const mintSigningInstance = async ({
@@ -106,7 +114,8 @@ export const mintSigningInstance = async ({
     return { url: answer.url, envelopeId: answer.envelopeId }
   }
 
-  const reason = response.ok ? EMPTY_ANSWER_REASON : `HTTP ${response.status}`
+  /** An empty reason is no reason: the status is what the log needs then. */
+  const fallback = response.ok ? EMPTY_ANSWER_REASON : `HTTP ${response.status}`
 
-  throw failureOf(response.status, answer?.error ?? reason)
+  throw failureOf(response.status, answer?.error || undefined, fallback)
 }

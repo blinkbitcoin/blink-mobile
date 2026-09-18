@@ -3727,6 +3727,9 @@
         "buttonText": "Շարունակել",
         "paymentsUnavailable": "Ներդրման վճարումները դեռ բաց չեն։ Խնդրում ենք փորձել ավելի ուշ։"
       },
+      "SignInvest": {
+        "signerNotConfigured": "Ստորագրողը դեռ սահմանված չէ։ Վերագործարկեք հավելվածը և փորձեք կրկին։"
+      },
       "InsufficientBalance": {
         "title": "Անբավարար մնացորդ",
         "paragraphs": {

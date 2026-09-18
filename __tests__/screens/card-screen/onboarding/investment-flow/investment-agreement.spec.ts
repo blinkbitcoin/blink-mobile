@@ -149,11 +149,11 @@ describe("mintInvestmentAgreement", () => {
   })
 
   /** An envelope cannot be addressed to nobody, and a placeholder would put a made-up
-   *  name on a legal document. The reason is one to read rather than retry, so it reaches
-   *  the signer under the code the component words with the message. */
+   *  name on a legal document. It fails under its own code, which the step words in the
+   *  signer's language, so whoever fills the host's fields reads what is missing. */
   it("does not mint while the host has not named the signer in full", async () => {
     const refused = {
-      code: "VALIDATION_ERROR",
+      code: "SIGNER_NOT_CONFIGURED",
       message: expect.stringContaining("signer"),
     }
 

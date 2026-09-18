@@ -3727,6 +3727,9 @@
         "buttonText": "Настави",
         "paymentsUnavailable": "Уплате за улагање још нису отворене. Покушај поново касније."
       },
+      "SignInvest": {
+        "signerNotConfigured": "Потписник још није подешен. Поново покрени апликацију и покушај поново."
+      },
       "InsufficientBalance": {
         "title": "Недовољан салдо",
         "paragraphs": {
