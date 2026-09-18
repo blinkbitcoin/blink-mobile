@@ -2479,7 +2479,9 @@ describe("CardInvestmentBulletin gating", () => {
     })
   })
 
-  it("tells the hook a deposit is pending when a self-custodial deposit is unclaimed", async () => {
+  /** The bulletin is for custodial accounts alone, so a self-custodial deposit is not a
+   *  pending deposit it could act on. */
+  it("does not tell the hook about a self-custodial deposit", async () => {
     mockActiveWalletOverride = {
       wallets: [],
       status: "ready",
@@ -2496,7 +2498,7 @@ describe("CardInvestmentBulletin gating", () => {
     await flushEffects()
 
     expect(mockUseCardInvestmentBulletin).toHaveBeenLastCalledWith({
-      hasPendingDeposit: true,
+      hasPendingDeposit: false,
     })
   })
 })
