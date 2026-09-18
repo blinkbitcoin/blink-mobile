@@ -194,6 +194,48 @@ describe("useInvestmentFunding", () => {
   })
 
   /**
+   * Once signed, the debt is the satoshis the agreement names, fixed at that moment's
+   * rate; the dollars the investor chose no longer describe it. With bitcoin down since,
+   * a wallet holding exactly those satoshis is worth less than the chosen dollars and
+   * still pays the invoice in full.
+   */
+  it("counts a wallet holding the signed satoshis as covered, whatever they are worth now", () => {
+    /** Signed at $125,000 per bitcoin: $25,000 came to 20,000,000 sats, worth $20,000 at
+     *  today's $100,000. */
+    const signedSats = 20_000_000
+    offered(walletOf(WalletCurrency.Btc, signedSats))
+
+    const { result } = renderHook(() => useInvestmentFunding(25000, signedSats))
+
+    expect(result.current.hasEnoughBalance).toBe(true)
+    expect(result.current.balanceUsd).toBe(20000)
+    expect(result.current.shortfallUsd).toBe(0)
+  })
+
+  /** With bitcoin up since signing, the chosen dollars no longer buy the satoshis owed,
+   *  and a payment attempted on them would fail. */
+  it("counts the chosen dollars as short once they no longer buy the signed satoshis", () => {
+    /** Signed at $80,000 per bitcoin: $25,000 came to 31,250,000 sats, worth $31,250 at
+     *  today's $100,000. */
+    const signedSats = 31_250_000
+    offered(walletOf(WalletCurrency.Usd, 2_500_000))
+
+    const { result } = renderHook(() => useInvestmentFunding(25000, signedSats))
+
+    expect(result.current.hasEnoughBalance).toBe(false)
+    expect(result.current.shortfallUsd).toBe(6250)
+  })
+
+  it("measures against the chosen dollars while nothing is signed", () => {
+    offered(walletOf(WalletCurrency.Usd, 2_500_000))
+
+    const { result } = renderHook(() => useInvestmentFunding(25000, undefined))
+
+    expect(result.current.hasEnoughBalance).toBe(true)
+    expect(result.current.shortfallUsd).toBe(0)
+  })
+
+  /**
    * Before the price answers the balance reads as zero, which would say the investment is
    * not covered when it may well be. The flag is what keeps a caller from acting on it.
    */
