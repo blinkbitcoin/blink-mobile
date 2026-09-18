@@ -68,7 +68,8 @@ export const TransferInvestScreen: React.FC = () => {
   )
 
   const { cardInvestmentDepositBtcWalletId } = useRemoteConfig()
-  const { progress, recordInvoice, isEligible } = useCardInvestmentProgress()
+  const { progress, recordInvoice, isEligible, accountId, isAccountResolved } =
+    useCardInvestmentProgress()
   /** The satoshis the agreement names, from the route or the signed record: the debt
    *  the balance is measured against, and the figure the invoice is written for. */
   const signedSats = settlementSats ?? progress?.settlementSats
@@ -149,7 +150,10 @@ export const TransferInvestScreen: React.FC = () => {
       return issued.paymentRequest
     }
 
-    const minted = await requestInvoice(cardInvestmentDepositBtcWalletId, owedSats)
+    const minted = await requestInvoice(cardInvestmentDepositBtcWalletId, owedSats, {
+      accountId,
+      amountUsd: selectedAmountUsd,
+    })
     if (!minted) return null
     recordInvoice(minted.paymentRequest)
     return minted.paymentRequest
@@ -160,10 +164,13 @@ export const TransferInvestScreen: React.FC = () => {
    * on a balance of zero. Pressing with the money ready but no wallet configured would
    * ask for an invoice from nowhere; the shortfall path needs none, so it stays reachable
    * either way. The missing wallet is said out loud: a button that stays grey with the
-   * money in place, and nothing to explain it, reads as the app being broken.
+   * money in place, and nothing to explain it, reads as the app being broken. The paying
+   * account is waited on the same way, and only on the send path, since the invoice is
+   * filed under it; the home has usually read it already, so the wait is the cache's.
    */
   const isMissingDepositWallet = hasEnoughBalance && !cardInvestmentDepositBtcWalletId
-  const isContinueDisabled = isLoading || isMissingDepositWallet
+  const isMissingPayerAccount = hasEnoughBalance && !isAccountResolved
+  const isContinueDisabled = isLoading || isMissingDepositWallet || isMissingPayerAccount
 
   return (
     <Screen headerShown={false}>

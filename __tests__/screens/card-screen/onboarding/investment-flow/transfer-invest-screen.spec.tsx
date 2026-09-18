@@ -45,6 +45,9 @@ const mockCardInvestmentProgress: {
 const mockRecordInvoice = jest.fn()
 /** Whether the active account can take part: false for a self-custodial one. */
 const mockIsEligible = { current: true }
+/** The account the invoice is filed under; null while the home has not resolved it. */
+const ACCOUNT_ID = "0f1e2d3c-4b5a-4968-8776-655443322110"
+const mockAccountId: { current: string | null } = { current: ACCOUNT_ID }
 
 jest.mock("@app/hooks/use-card-investment-progress", () => ({
   armCardInvestmentPayment: (...args: unknown[]) => mockArmCardInvestmentPayment(...args),
@@ -52,6 +55,8 @@ jest.mock("@app/hooks/use-card-investment-progress", () => ({
     progress: mockCardInvestmentProgress.current,
     recordInvoice: (...args: unknown[]) => mockRecordInvoice(...args),
     isEligible: mockIsEligible.current,
+    accountId: mockAccountId.current,
+    isAccountResolved: mockAccountId.current !== null,
   }),
 }))
 
@@ -138,6 +143,7 @@ describe("TransferInvestScreen", () => {
     mockCardInvestmentProgress.current = null
     mockIsFocused.current = true
     mockIsEligible.current = true
+    mockAccountId.current = ACCOUNT_ID
     mockRequestInvoice.mockResolvedValue({ paymentRequest: "lnbc-invoice" })
     mockFunding.current = {
       balanceUsd: 0,
@@ -310,7 +316,10 @@ describe("TransferInvestScreen", () => {
       fireEvent.press(getByText("Continue"))
     })
 
-    expect(mockRequestInvoice).toHaveBeenCalledWith("wallet-invest", 31_704_000)
+    expect(mockRequestInvoice).toHaveBeenCalledWith("wallet-invest", 31_704_000, {
+      accountId: ACCOUNT_ID,
+      amountUsd: SELECTED_AMOUNT_USD,
+    })
     expect(mockArmCardInvestmentPayment).toHaveBeenCalledTimes(1)
     expect(mockArmCardInvestmentPayment).toHaveBeenCalledWith("lnbc-invoice")
     expect(mockNavigate).toHaveBeenCalledWith("sendBitcoinDestination", {
@@ -379,7 +388,10 @@ describe("TransferInvestScreen", () => {
       fireEvent.press(getByText("Continue"))
     })
 
-    expect(mockRequestInvoice).toHaveBeenCalledWith("wallet-invest", 12_682_228)
+    expect(mockRequestInvoice).toHaveBeenCalledWith("wallet-invest", 12_682_228, {
+      accountId: ACCOUNT_ID,
+      amountUsd: SELECTED_AMOUNT_USD,
+    })
   })
 
   /** Opening the send flow on nothing would leave the investor on an empty destination
@@ -442,6 +454,55 @@ describe("TransferInvestScreen", () => {
     expect(queryByText(/Failed to generate invoice/)).toBeNull()
     expect(mockNavigate).toHaveBeenCalledWith("sendBitcoinDestination", {
       payment: "lnbc-invoice",
+    })
+  })
+
+  /** The invoice is filed under the paying account; with the money ready and the account
+   *  not yet read from the cache, the step waits rather than minting an unfiled one. */
+  it("holds the send while the paying account is still unknown", async () => {
+    mockAccountId.current = null
+    mockFunding.current = {
+      balanceUsd: SELECTED_AMOUNT_USD,
+      shortfallUsd: 0,
+      hasEnoughBalance: true,
+      totalSats: 31_704_000,
+      isLoading: false,
+    }
+
+    const { getByText } = render(
+      <ContextForScreen>
+        <TransferInvestScreen />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {})
+
+    await act(async () => {
+      fireEvent.press(getByText("Continue"))
+    })
+
+    expect(mockRequestInvoice).not.toHaveBeenCalled()
+    expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  /** The shortfall path files nothing, so an unknown account must not close it. */
+  it("still reaches the shortfall screen while the paying account is unknown", async () => {
+    mockAccountId.current = null
+
+    const { getByText } = render(
+      <ContextForScreen>
+        <TransferInvestScreen />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {})
+
+    await act(async () => {
+      fireEvent.press(getByText("Continue"))
+    })
+
+    expect(mockNavigate).toHaveBeenCalledWith("cardOnboardingInsufficientBalanceScreen", {
+      selectedAmountUsd: SELECTED_AMOUNT_USD,
     })
   })
 
@@ -642,7 +703,10 @@ describe("TransferInvestScreen", () => {
       fireEvent.press(getByText("Continue"))
     })
 
-    expect(mockRequestInvoice).toHaveBeenCalledWith("wallet-invest", 12_682_228)
+    expect(mockRequestInvoice).toHaveBeenCalledWith("wallet-invest", 12_682_228, {
+      accountId: ACCOUNT_ID,
+      amountUsd: SELECTED_AMOUNT_USD,
+    })
   })
 
   /** The investor closed the step while the invoice was being issued: opening the send
@@ -755,7 +819,10 @@ describe("TransferInvestScreen", () => {
 
       await pressContinue()
 
-      expect(mockRequestInvoice).toHaveBeenCalledWith("wallet-invest", 31_704_000)
+      expect(mockRequestInvoice).toHaveBeenCalledWith("wallet-invest", 31_704_000, {
+        accountId: ACCOUNT_ID,
+        amountUsd: SELECTED_AMOUNT_USD,
+      })
       expect(mockRecordInvoice).toHaveBeenCalledWith("lnbc-invoice")
       expect(mockArmCardInvestmentPayment).toHaveBeenCalledWith("lnbc-invoice")
     })
