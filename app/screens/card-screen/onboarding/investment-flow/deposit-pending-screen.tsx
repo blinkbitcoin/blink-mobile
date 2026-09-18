@@ -1,8 +1,7 @@
 import React from "react"
-import { Text } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
-import { makeStyles, useTheme } from "@rn-vui/themed"
+import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { CloseHeader } from "@app/components/close-header"
@@ -39,7 +38,7 @@ export const DepositPendingScreen: React.FC = () => {
           />
         }
       >
-        <Text style={styles.message}>
+        <Text type="p1" style={styles.message}>
           {LL.CardFlow.Onboarding.DepositPending.message()}
         </Text>
       </StatusScreenLayout>
@@ -49,9 +48,6 @@ export const DepositPendingScreen: React.FC = () => {
 
 const useStyles = makeStyles(({ colors }) => ({
   message: {
-    fontSize: 18,
-    lineHeight: 24,
-    fontWeight: "400",
     color: colors.black,
     textAlign: "center",
   },
