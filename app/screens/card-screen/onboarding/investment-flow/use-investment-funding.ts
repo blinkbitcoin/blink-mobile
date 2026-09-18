@@ -14,8 +14,8 @@ const CENTS_PER_USD = 100
 /**
  * What the investor holds against what they signed for.
  *
- * Both wallets count, which is what the flow tells them: the money may sit in either, and
- * the transfer is one payment for the whole amount. Reads through the active account, so
+ * The fullest wallet decides, because a payment draws on one; the two added together
+ * only say whether consolidating would be enough. Reads through the active account, so
  * it answers for a custodial and a self-custodial investor alike.
  *
  * While it is loading the balance reads as zero, which would say the investment is not
@@ -32,10 +32,8 @@ export const useInvestmentFunding = (
   const { convertMoneyAmount } = usePriceConversion()
   const { wallets, isReady } = useActiveWallet()
 
-  /** Each wallet on its own and the two together: a payment draws on one, so what the
-   *  fullest holds decides whether it can go through, and the sum only says whether
-   *  consolidating would be enough. With nothing held the bitcoin wallet is named, as
-   *  the one a deposit lands in. */
+  /** The fullest wallet, which one it is, and the two together. With nothing held the
+   *  bitcoin wallet is named, as the one a deposit lands in. */
   const { largestWalletUsd, largestWalletCurrency, combinedUsd } = React.useMemo(() => {
     const empty: {
       largestWalletUsd: number
@@ -69,9 +67,9 @@ export const useInvestmentFunding = (
  * What the investment comes to in satoshis at today's price, which is what an invoice is
  * written in. Zero until the price feed answers.
  *
- * Its own hook, apart from the balance check: only the step that writes the invoice needs
- * it, and the screens that merely measure the balance should not pay for a conversion
- * they discard.
+ * Its own hook, apart from the balance check, so each reads as the one rule it is: what
+ * the investor holds is one question, what the invoice is written for is another, and
+ * only the step that writes the invoice asks both.
  *
  * TEMPORARY, and the one figure here that should not be the app's to work out: the
  * agreement fixes a rate at a stamped moment and names the bitcoin owed against it, so
