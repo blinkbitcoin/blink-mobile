@@ -51,16 +51,31 @@ describe("resolveEquityPercent", () => {
   })
 })
 
+describe("resolveInvestmentFunding at the split boundary", () => {
+  /** The investor who converts exactly what they are short holds, between the two
+   *  wallets, exactly the amount: that is split, not short. */
+  it("counts the two wallets adding up to exactly the amount as split", () => {
+    expect(
+      resolveInvestmentFunding({
+        largestWalletUsd: 3000,
+        combinedUsd: 5000,
+        totalUsd: 5000,
+      }).isSplitAcrossWallets,
+    ).toBe(true)
+  })
+})
+
 describe("the figures as they are written", () => {
   it("groups an amount the way the select screen groups its options", () => {
     expect(formatUsdAmount(25000)).toBe("$25,000")
     expect(formatUsdAmount(100000)).toBe("$100,000")
   })
 
-  /** A balance converted from satoshis lands on a fraction of a cent, and dollars do not
-   *  go that far. A whole amount still prints without a decimal point. */
-  it("cuts a converted balance to cents", () => {
-    expect(formatUsdAmount(3333.756)).toBe("$3,333.76")
+  /** The shortfall is the amount less the balance, and that subtraction leaves a
+   *  floating-point tail; dollars stop at the cent. A whole amount still prints without
+   *  a decimal point. */
+  it("cuts a figure to cents", () => {
+    expect(formatUsdAmount(25000 - 3333.76)).toBe("$21,666.24")
   })
 
   /** Units are a count, not money, and carry no currency of their own. */

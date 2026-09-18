@@ -286,6 +286,41 @@ describe("TransferInvestScreen", () => {
     expect(getByText(/Failed to generate invoice/)).toBeTruthy()
   })
 
+  /** A failure line left over from a first try would sit under a second try that is on
+   *  its way to the send flow. */
+  it("clears the failure line when a second try goes through", async () => {
+    mockRequestInvoice
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce({ paymentRequest: "lnbc-invoice" })
+    mockFunding.current = {
+      balanceUsd: SELECTED_AMOUNT_USD,
+      shortfallUsd: 0,
+      hasEnoughBalance: true,
+      totalSats: 31_704_000,
+      isLoading: false,
+    }
+
+    const { getByText, queryByText } = render(
+      <ContextForScreen>
+        <TransferInvestScreen />
+      </ContextForScreen>,
+    )
+    await act(async () => {})
+
+    await act(async () => {
+      fireEvent.press(getByText("Continue"))
+    })
+    expect(getByText(/Failed to generate invoice/)).toBeTruthy()
+
+    await act(async () => {
+      fireEvent.press(getByText("Continue"))
+    })
+    expect(queryByText(/Failed to generate invoice/)).toBeNull()
+    expect(mockNavigate).toHaveBeenCalledWith("sendBitcoinDestination", {
+      payment: "lnbc-invoice",
+    })
+  })
+
   /** Acting on a balance that has not arrived would tell an investor with the money that
    *  they are short. */
   it("does nothing while the balance is still loading", async () => {
