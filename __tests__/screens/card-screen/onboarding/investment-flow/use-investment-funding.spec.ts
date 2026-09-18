@@ -1,7 +1,10 @@
 import { renderHook } from "@testing-library/react-native"
 
 import { WalletCurrency } from "@app/graphql/generated"
-import { useInvestmentFunding } from "@app/screens/card-screen/onboarding/investment-flow/use-investment-funding"
+import {
+  useInvestmentFunding,
+  useInvestmentSats,
+} from "@app/screens/card-screen/onboarding/investment-flow/use-investment-funding"
 
 /** A round $100,000 per bitcoin: a satoshi is a tenth of a cent, which keeps the sums
  *  below readable. Wallet amounts are integers in their currency's minor unit. */
@@ -154,5 +157,34 @@ describe("useInvestmentFunding", () => {
     const { result } = renderHook(() => useInvestmentFunding(25000))
 
     expect(result.current.isLoading).toBe(true)
+  })
+})
+
+describe("useInvestmentSats", () => {
+  beforeEach(() => {
+    mockConvert.current = (moneyAmount) => ({ amount: centsFor(moneyAmount) })
+  })
+
+  /** An invoice is written in satoshis, so the chosen dollars are converted once, at
+   *  today's price, for the step that writes it. */
+  it("converts the chosen dollars to satoshis at today's price", () => {
+    mockConvert.current = (moneyAmount) => ({
+      amount:
+        moneyAmount.currency === WalletCurrency.Usd
+          ? moneyAmount.amount * SATS_PER_CENT
+          : moneyAmount.amount,
+    })
+
+    const { result } = renderHook(() => useInvestmentSats(25000))
+
+    expect(result.current).toBe(25_000_000)
+  })
+
+  it("is zero until the price feed answers", () => {
+    mockConvert.current = null
+
+    const { result } = renderHook(() => useInvestmentSats(25000))
+
+    expect(result.current).toBe(0)
   })
 })

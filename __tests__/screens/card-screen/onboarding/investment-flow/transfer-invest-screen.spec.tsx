@@ -67,6 +67,7 @@ jest.mock(
   "@app/screens/card-screen/onboarding/investment-flow/use-investment-funding",
   () => ({
     useInvestmentFunding: () => mockFunding.current,
+    useInvestmentSats: () => mockFunding.current.totalSats,
   }),
 )
 
