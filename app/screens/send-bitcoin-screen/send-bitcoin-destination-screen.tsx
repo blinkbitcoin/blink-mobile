@@ -1006,13 +1006,19 @@ const PhoneInputSection: React.FC<PhoneInputSectionProps> = ({
       return
 
     const { rawPhoneNumber } = defaultPhoneInputInfo
-    const rawInput = `+${defaultPhoneInputInfo?.countryCallingCode}${rawPhoneNumber}`
+    const parsedPhone = parseValidPhone(rawPhoneNumber)
+    // Prefer the parser's normalized E.164 number so a national number typed
+    // with a trunk prefix (e.g. France's "06...") isn't sent as "+3306..."
+    const rawInput =
+      parsedPhone && parsedPhone.isValid()
+        ? parsedPhone.number
+        : `+${defaultPhoneInputInfo?.countryCallingCode}${rawPhoneNumber}`
 
     handleChangeText(rawInput)
     updateMatchingContacts(rawPhoneNumber)
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [defaultPhoneInputInfo, handleChangeText, updateMatchingContacts])
+  }, [defaultPhoneInputInfo, handleChangeText, updateMatchingContacts, parseValidPhone])
 
   useEffect(() => {
     if (!rawPhoneNumber) return
