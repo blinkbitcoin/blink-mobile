@@ -17,7 +17,7 @@ import {
   formatUsdAmount,
   resolveInvestmentTerms,
 } from "./investment-terms"
-import { useInvestmentFunding } from "./use-investment-funding"
+import { useInvestmentFunding, useInvestmentSats } from "./use-investment-funding"
 import { useInvestmentInvoice } from "./use-investment-invoice"
 
 type TransferInvestRoute = RouteProp<
@@ -41,7 +41,8 @@ export const TransferInvestScreen: React.FC = () => {
   )
 
   const { cardInvestmentDepositBtcWalletId } = useRemoteConfig()
-  const { hasEnoughBalance, isLoading, totalSats } = useInvestmentFunding(terms.totalUsd)
+  const { hasEnoughBalance, isLoading } = useInvestmentFunding(terms.totalUsd)
+  const totalSats = useInvestmentSats(terms.totalUsd)
   const { requestInvoice, isRequesting } = useInvestmentInvoice()
   const [hasInvoiceFailed, setHasInvoiceFailed] = React.useState(false)
 

@@ -27,7 +27,6 @@ export const useInvestmentFunding = (
 ): InvestmentFunding & {
   /** The wallet the balance is read from, so the shortfall can be named after it. */
   balanceCurrency: WalletCurrency
-  totalSats: number
   isLoading: boolean
 } => {
   const { convertMoneyAmount } = usePriceConversion()
@@ -59,16 +58,31 @@ export const useInvestmentFunding = (
     }, empty)
   }, [wallets, convertMoneyAmount])
 
-  /**
-   * What the investment comes to in satoshis, which is what an invoice is written in.
-   *
-   * TEMPORARY, and the one figure here that should not be the app's to work out: the
-   * agreement fixes a rate at a stamped moment and names the bitcoin owed against it, so
-   * the amount charged has to be that one. Converting again at today's price would charge
-   * something the signer never agreed to. It stands in until the mint returns the terms
-   * it computed.
-   */
-  const totalSats = React.useMemo(() => {
+  return {
+    ...resolveInvestmentFunding({ largestWalletUsd, combinedUsd, totalUsd }),
+    balanceCurrency: largestWalletCurrency,
+    isLoading: !convertMoneyAmount || !isReady,
+  }
+}
+
+/**
+ * What the investment comes to in satoshis at today's price, which is what an invoice is
+ * written in. Zero until the price feed answers.
+ *
+ * Its own hook, apart from the balance check: only the step that writes the invoice needs
+ * it, and the screens that merely measure the balance should not pay for a conversion
+ * they discard.
+ *
+ * TEMPORARY, and the one figure here that should not be the app's to work out: the
+ * agreement fixes a rate at a stamped moment and names the bitcoin owed against it, so
+ * the amount charged has to be that one. Converting again at today's price would charge
+ * something the signer never agreed to. It stands in until the mint returns the terms it
+ * computed.
+ */
+export const useInvestmentSats = (totalUsd: number): number => {
+  const { convertMoneyAmount } = usePriceConversion()
+
+  return React.useMemo(() => {
     if (!convertMoneyAmount) return 0
 
     return convertMoneyAmount(
@@ -76,11 +90,4 @@ export const useInvestmentFunding = (
       WalletCurrency.Btc,
     ).amount
   }, [totalUsd, convertMoneyAmount])
-
-  return {
-    ...resolveInvestmentFunding({ largestWalletUsd, combinedUsd, totalUsd }),
-    balanceCurrency: largestWalletCurrency,
-    totalSats,
-    isLoading: !convertMoneyAmount || !isReady,
-  }
 }
