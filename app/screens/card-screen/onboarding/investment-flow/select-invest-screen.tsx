@@ -12,6 +12,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
 import { MOCK_CREDIT_LIMIT_VALUES } from "../onboarding-mock-data"
+import { resolveEquityPercent, resolveInvestmentTerms } from "./investment-terms"
 
 export const SelectInvestScreen: React.FC = () => {
   const styles = useStyles()
@@ -22,11 +23,14 @@ export const SelectInvestScreen: React.FC = () => {
   const { LL } = useI18nContext()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
+  /** Each amount beside the share it buys, derived the way the term sheet derives it. */
   const CREDIT_LIMITS = React.useMemo(
     () =>
-      MOCK_CREDIT_LIMIT_VALUES.map((item) => ({
-        value: item.value,
-        percent: `${LL.CardFlow.Onboarding.SelectInvest.percent({ percent: item.percent })}`,
+      MOCK_CREDIT_LIMIT_VALUES.map((value) => ({
+        value,
+        percent: LL.CardFlow.Onboarding.SelectInvest.percent({
+          percent: resolveEquityPercent(resolveInvestmentTerms(value)),
+        }),
       })),
     [LL],
   )

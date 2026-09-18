@@ -69,6 +69,22 @@ describe("SelectInvestScreen", () => {
     expect(getByText(/\$5,000/)).toBeTruthy()
   })
 
+  /** The share beside each amount is derived from the valuation, the way the term sheet
+   *  derives it, so the two screens cannot describe different deals. */
+  it("states beside each amount the share of the company it buys", async () => {
+    const { getByText } = render(
+      <ContextForScreen>
+        <SelectInvestScreen />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {})
+
+    expect(getByText(/\$1,000 for ~0\.01%/)).toBeTruthy()
+    expect(getByText(/\$10,000 for ~0\.1%/)).toBeTruthy()
+    expect(getByText(/\$100,000 for ~1%/)).toBeTruthy()
+  })
+
   it("button is disabled initially", async () => {
     const { getByText } = render(
       <ContextForScreen>
