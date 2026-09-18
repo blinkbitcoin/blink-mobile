@@ -36,19 +36,13 @@ import {
   ROUTE_MISSING_CODE,
 } from "./investment-agreement"
 import { resetToTransferStep } from "./transfer-invest-screen"
+import { useGivenUpWaiting } from "./use-given-up-waiting"
 
 type SignInvestRoute = RouteProp<RootStackParamList, "cardOnboardingSignInvestScreen">
 
 /** The code the library files a mint refused for a reason the signer should read under;
  *  its message is the service's own words, and the one case the copy is not the app's. */
 const REFUSAL_CODE = "VALIDATION_ERROR"
-
-/**
- * How long a cold open waits for the price feed before it stops waiting and says so. A
- * spinner with no end and no button is a dead end; a feed that has not answered in this
- * long means the device is most likely offline, which is what the signer is then told.
- */
-const START_WAIT_TIMEOUT_MS = 15_000
 
 /** What the script below posts once the signing page has drawn something. */
 const PAGE_READY_MESSAGE = "blink-signing-page-ready"
@@ -383,24 +377,11 @@ export const SignInvestScreen: React.FC = () => {
   const isPriceQuoted = usdCentsPerBtc !== null
   const isReadyToMint = isPriceQuoted && isAccountResolved
 
-  /**
-   * Whether that wait has gone on too long. While it is waiting a timer runs; once both
-   * are in, or the session has moved on, the flag drops so a later wait starts fresh.
-   * Trying again drops it too, which starts the timer over: the feed and the account
-   * answer on their own once the device is back, and the session then starts without
-   * another tap.
-   */
+  /** A cold open waits for the price and the account; once both are in, or the session
+   *  has moved on, the wait is over, and the session then starts without another tap. */
   const isWaitingToStart = status === "idle" && !isReadyToMint
-  const [hasGivenUpWaiting, setHasGivenUpWaiting] = React.useState(false)
-  React.useEffect(() => {
-    if (!isWaitingToStart) {
-      setHasGivenUpWaiting(false)
-      return
-    }
-    if (hasGivenUpWaiting) return
-    const giveUp = setTimeout(() => setHasGivenUpWaiting(true), START_WAIT_TIMEOUT_MS)
-    return () => clearTimeout(giveUp)
-  }, [isWaitingToStart, hasGivenUpWaiting])
+  const { hasGivenUp: hasGivenUpWaiting, startOver: waitAgain } =
+    useGivenUpWaiting(isWaitingToStart)
 
   /**
    * Opens the document as the screen does, once the price is in. Idle is also where a
@@ -619,10 +600,7 @@ export const SignInvestScreen: React.FC = () => {
     return centredOnScreen(
       failure(
         copy.errors.networkError(),
-        <GaloyPrimaryButton
-          title={LL.common.tryAgain()}
-          onPress={() => setHasGivenUpWaiting(false)}
-        />,
+        <GaloyPrimaryButton title={LL.common.tryAgain()} onPress={waitAgain} />,
       ),
     )
   }

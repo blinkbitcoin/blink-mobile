@@ -15,6 +15,7 @@ import {
   REPORT_PAGE_READY_SCRIPT,
   SignInvestScreen,
 } from "@app/screens/card-screen/onboarding/investment-flow/sign-invest-screen"
+import { WAIT_TIMEOUT_MS } from "@app/screens/card-screen/onboarding/investment-flow/use-given-up-waiting"
 
 import { ContextForScreen } from "../../../helper"
 
@@ -403,7 +404,7 @@ describe("SignInvestScreen", () => {
   })
 
   describe("when the price does not come", () => {
-    const START_WAIT_TIMEOUT_MS = 15_000
+    const START_WAIT_TIMEOUT_MS = WAIT_TIMEOUT_MS
 
     beforeEach(() => {
       jest.useFakeTimers()
