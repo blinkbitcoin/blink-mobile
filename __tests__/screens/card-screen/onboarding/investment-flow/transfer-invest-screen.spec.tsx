@@ -30,10 +30,6 @@ const mockDepositWalletId = { current: "wallet-invest" }
 /** The invoice the recipient's account answers with, carrying the amount inside it. */
 const mockRequestInvoice = jest.fn()
 
-/** The one-shot flag the receipt reads to record the payment against the investment;
- *  its own spec covers the flag, so what matters here is when this step sets it. */
-const mockArmCardInvestmentPayment = jest.fn()
-
 /** The signed record, which carries the settlement figure when the route does not. */
 const mockCardInvestmentProgress: {
   current: {
@@ -51,7 +47,6 @@ const ACCOUNT_ID = "0f1e2d3c-4b5a-4968-8776-655443322110"
 const mockAccountId: { current: string | null } = { current: ACCOUNT_ID }
 
 jest.mock("@app/hooks/use-card-investment-progress", () => ({
-  armCardInvestmentPayment: (...args: unknown[]) => mockArmCardInvestmentPayment(...args),
   useCardInvestmentProgress: () => ({
     progress: mockCardInvestmentProgress.current,
     recordInvoice: (...args: unknown[]) => mockRecordInvoice(...args),
@@ -404,8 +399,6 @@ describe("TransferInvestScreen", () => {
       accountId: ACCOUNT_ID,
       amountUsd: SELECTED_AMOUNT_USD,
     })
-    expect(mockArmCardInvestmentPayment).toHaveBeenCalledTimes(1)
-    expect(mockArmCardInvestmentPayment).toHaveBeenCalledWith("lnbc-invoice")
     expect(mockNavigate).toHaveBeenCalledWith("sendBitcoinDestination", {
       payment: "lnbc-invoice",
       sendingWalletId: undefined,
@@ -684,47 +677,6 @@ describe("TransferInvestScreen", () => {
     })
   })
 
-  /** Nothing to pay against: an arm left set here would record the investor's next
-   *  payment, whatever it is for, as the investment. */
-  it("does not arm the payment when no invoice came back", async () => {
-    mockFunding.current = {
-      balanceUsd: SELECTED_AMOUNT_USD,
-      shortfallUsd: 0,
-      hasEnoughBalance: true,
-      totalSats: 31_704_000,
-      isLoading: false,
-    }
-    mockRequestInvoice.mockResolvedValue(null)
-
-    const { getByText } = render(
-      <ContextForScreen>
-        <TransferInvestScreen />
-      </ContextForScreen>,
-    )
-    await act(async () => {})
-
-    await act(async () => {
-      fireEvent.press(getByText("Continue"))
-    })
-
-    expect(mockArmCardInvestmentPayment).not.toHaveBeenCalled()
-  })
-
-  it("does not arm the payment on the way to the shortfall screen", async () => {
-    const { getByText } = render(
-      <ContextForScreen>
-        <TransferInvestScreen />
-      </ContextForScreen>,
-    )
-    await act(async () => {})
-
-    await act(async () => {
-      fireEvent.press(getByText("Continue"))
-    })
-
-    expect(mockArmCardInvestmentPayment).not.toHaveBeenCalled()
-  })
-
   /** Once signed, the debt is the satoshis the agreement names; the balance is measured
    *  against those, at today's price, rather than against the dollars chosen. */
   it("measures the balance against the satoshis the agreement names", async () => {
@@ -796,9 +748,8 @@ describe("TransferInvestScreen", () => {
   })
 
   /** The investor closed the step while the invoice was being issued: opening the send
-   *  flow over whatever they moved on to, armed to record the investment, would be
-   *  neither expected nor safe. */
-  it("neither arms nor opens the send flow when the step was left mid-request", async () => {
+   *  flow over whatever they moved on to would be neither expected nor safe. */
+  it("does not open the send flow when the step was left mid-request", async () => {
     mockFunding.current = {
       balanceUsd: SELECTED_AMOUNT_USD,
       shortfallUsd: 0,
@@ -828,7 +779,6 @@ describe("TransferInvestScreen", () => {
       releaseInvoice({ paymentRequest: "lnbc-invoice" })
     })
 
-    expect(mockArmCardInvestmentPayment).not.toHaveBeenCalled()
     expect(mockNavigate).not.toHaveBeenCalled()
   })
 
@@ -889,7 +839,6 @@ describe("TransferInvestScreen", () => {
 
       expect(mockRequestInvoice).not.toHaveBeenCalled()
       expect(mockRecordInvoice).not.toHaveBeenCalled()
-      expect(mockArmCardInvestmentPayment).toHaveBeenCalledWith("lnbc-issued-before")
       expect(mockNavigate).toHaveBeenCalledWith("sendBitcoinDestination", {
         payment: "lnbc-issued-before",
       })
@@ -912,7 +861,6 @@ describe("TransferInvestScreen", () => {
         amountUsd: SELECTED_AMOUNT_USD,
       })
       expect(mockRecordInvoice).toHaveBeenCalledWith("lnbc-invoice")
-      expect(mockArmCardInvestmentPayment).toHaveBeenCalledWith("lnbc-invoice")
     })
 
     it("records nothing when no invoice came back", async () => {
