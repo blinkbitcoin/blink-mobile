@@ -8,7 +8,7 @@ import { CurrencyKeyboard } from "@app/components/currency-keyboard"
 
 export type AmountInputScreenUIProps = {
   errorMessage?: string
-  onKeyPress: (key: Key) => void
+  onKeyPress: (key: Key) => boolean
   disabledKeys?: ReadonlySet<Key>
   disabled?: boolean
 }

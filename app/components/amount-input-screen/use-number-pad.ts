@@ -74,14 +74,17 @@ export const useNumberPad = ({
     [currencyInfo],
   )
 
+  /** Returns whether the key was accepted, so the keypad can skip a refused key's haptic. */
   const onKeyPress = useCallback(
     (key: Key) => {
       const next = numberPadReducer(padState, {
         action: NumberPadReducerActionType.HandleKeyPress,
         payload: { key },
       })
+      if (next === padState) return false
       setPadState(next)
       onAmountChange(toMoneyAmount(next))
+      return true
     },
     [padState, onAmountChange, toMoneyAmount],
   )
