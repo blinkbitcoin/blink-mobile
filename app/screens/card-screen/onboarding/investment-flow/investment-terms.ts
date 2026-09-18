@@ -40,10 +40,10 @@ export const INVESTMENT_OPTIONS = [1000, 2500, 5000, 10000, 25000, 50000, 100000
  *  happens to print. */
 export const BTC_DECIMALS = 8
 
-/** Honduras keeps a fixed UTC-6 the year round, so the stamp is shifted by hand and then
- *  rendered as UTC. Naming the zone instead would make this the first production caller to
- *  pass one, which `formatUnixTimestampYMDHM` documents as test-only. */
-const HONDURAS_UTC_OFFSET_MS = -6 * 60 * 60 * 1000
+/** The zone the agreement is dated in: the host's, which the document names. Passed
+ *  to the formatter by name so the clock is not shifted by hand, and so the stamp stays
+ *  right should the zone ever observe daylight saving again. */
+const AGREEMENT_TIMEZONE = "America/Tegucigalpa"
 
 /**
  * The app prices in satoshis; the agreement is written in bitcoin. Answers null rather
@@ -59,10 +59,10 @@ export const resolveSettlementQuote = (
   return usdPerSat && btcUsdRate > 0 ? { btcUsdRate, at } : null
 }
 
-const formatHondurasTime = (at: Date): string =>
+const formatAgreementTime = (at: Date): string =>
   formatUnixTimestampYMDHM({
-    timestampSeconds: (at.getTime() + HONDURAS_UTC_OFFSET_MS) / 1000,
-    timezone: "UTC",
+    timestampSeconds: at.getTime() / 1000,
+    timezone: AGREEMENT_TIMEZONE,
   })
 
 export const resolveInvestmentTerms = (
@@ -77,7 +77,7 @@ export const resolveInvestmentTerms = (
     ? {
         btcUsdRate: settlement.btcUsdRate,
         settlementBtc: Number((totalUsd / settlement.btcUsdRate).toFixed(BTC_DECIMALS)),
-        rateTimestamp: formatHondurasTime(settlement.at),
+        rateTimestamp: formatAgreementTime(settlement.at),
       }
     : {}),
 })
