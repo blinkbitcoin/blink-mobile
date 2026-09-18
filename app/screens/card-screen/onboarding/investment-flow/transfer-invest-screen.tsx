@@ -14,10 +14,7 @@ import { IconHero } from "@app/components/icon-hero"
 import { CloseHeader } from "@app/components/close-header"
 import { Screen } from "@app/components/screen"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
-import {
-  armCardInvestmentPayment,
-  useCardInvestmentProgress,
-} from "@app/hooks/use-card-investment-progress"
+import { useCardInvestmentProgress } from "@app/hooks/use-card-investment-progress"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RESET_TO_HOME } from "@app/navigation/reset-to-home"
 import { isCardInvestmentCurrent } from "@app/store/persistent-state/card-investment"
@@ -130,8 +127,7 @@ export const TransferInvestScreen: React.FC = () => {
     const paymentRequest = await resolvePaymentRequest()
 
     /** The investor may have closed the step while the invoice was being issued; a send
-     *  flow opened over whatever they moved on to, armed to record the investment, would
-     *  be neither expected nor safe. */
+     *  flow opened over whatever they moved on to would be neither expected nor safe. */
     if (!navigation.isFocused()) return
 
     if (!paymentRequest) {
@@ -139,7 +135,6 @@ export const TransferInvestScreen: React.FC = () => {
       return
     }
 
-    armCardInvestmentPayment(paymentRequest)
     navigation.navigate("sendBitcoinDestination", { payment: paymentRequest })
   }
 

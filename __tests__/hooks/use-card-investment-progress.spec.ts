@@ -1,12 +1,6 @@
 import { act, renderHook } from "@testing-library/react-native"
 
-import {
-  armCardInvestmentPayment,
-  consumeCardInvestmentPayment,
-  isCardInvestmentPaymentArmed,
-  useCardInvestmentProgress,
-  useConsumeCardInvestmentPayment,
-} from "@app/hooks/use-card-investment-progress"
+import { useCardInvestmentProgress } from "@app/hooks/use-card-investment-progress"
 import { PersistentState } from "@app/store/persistent-state/state-migrations"
 import { CardInvestmentRecord } from "@app/types/card-investment"
 import { AccountType } from "@app/types/wallet"
@@ -29,13 +23,13 @@ jest.mock("@app/hooks/use-account-registry", () => ({
 }))
 
 const mockIsAuthed = { current: true }
-const mockRefetchAccount = jest.fn(() => Promise.resolve())
 jest.mock("@app/graphql/is-authed-context", () => ({
   useIsAuthed: () => mockIsAuthed.current,
 }))
 
 /** The custodial account's server id, as the cache the home filled answers it. */
 const mockCardInvestmentAccountQuery = jest.fn()
+const mockRefetchAccount = jest.fn(() => Promise.resolve())
 jest.mock("@app/graphql/generated", () => ({
   useCardInvestmentAccountQuery: (options: unknown) =>
     mockCardInvestmentAccountQuery(options),
@@ -357,6 +351,20 @@ describe("useCardInvestmentProgress", () => {
       })
     })
 
+    /** The moment is one the record's day is counted from; a second receipt for the
+     *  same invoice must not move it. */
+    it("keeps the first mark on an investment already paid", () => {
+      const paid = stateWith({ [CUSTODIAL_ID]: { ...INVESTMENT, paidAt: NOW - 1000 } })
+      mockPersistentState = paid
+      const { result } = renderHook(() => useCardInvestmentProgress())
+
+      act(() => result.current.markPaid())
+
+      expect(applyLastUpdate(paid)?.cardInvestmentByAccountId).toEqual({
+        [CUSTODIAL_ID]: { ...INVESTMENT, paidAt: NOW - 1000 },
+      })
+    })
+
     /** A payment with no investment behind it is not this record's to invent. */
     it("changes nothing when nothing was signed", () => {
       const { result } = renderHook(() => useCardInvestmentProgress())
@@ -439,14 +447,6 @@ describe("useCardInvestmentProgress", () => {
     })
   })
 
-  describe("the account the record is filed under", () => {
-    it("is the custodial account's server id, once known", () => {
-      const { result } = renderHook(() => useCardInvestmentProgress())
-      expect(result.current.accountId).toBe(CUSTODIAL_ID)
-      expect(result.current.isAccountResolved).toBe(true)
-
-      custodialSession()
-      expect(
   describe("asking for the account again", () => {
     it("refetches the account query", () => {
       const { result } = renderHook(() => useCardInvestmentProgress())
@@ -471,6 +471,14 @@ describe("useCardInvestmentProgress", () => {
     })
   })
 
+  describe("the account the record is filed under", () => {
+    it("is the custodial account's server id, once known", () => {
+      const { result } = renderHook(() => useCardInvestmentProgress())
+      expect(result.current.accountId).toBe(CUSTODIAL_ID)
+      expect(result.current.isAccountResolved).toBe(true)
+
+      custodialSession()
+      expect(
         renderHook(() => useCardInvestmentProgress()).result.current.isAccountResolved,
       ).toBe(true)
     })
@@ -528,106 +536,58 @@ describe("useCardInvestmentProgress", () => {
   })
 })
 
-describe("card investment payment arm", () => {
+describe("isInvestmentInvoice", () => {
   const INVOICE = "lnbc25m1investment"
-  const OTHER_INVOICE = "lnbc1someoneelse"
+  const ISSUED = { ...INVESTMENT, invoice: { paymentRequest: INVOICE, issuedAt: NOW } }
 
-  /** The arm is module state and only spending it clears it, so each test starts from
-   *  nothing armed by arming a throwaway invoice and spending that. */
-  afterEach(() => {
-    armCardInvestmentPayment("lnbc1throwaway")
-    consumeCardInvestmentPayment("lnbc1throwaway")
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockIsAuthed.current = true
+    custodialSession()
+    jest.spyOn(Date, "now").mockReturnValue(NOW)
   })
 
-  it("is not armed until the transfer step arms it", () => {
-    expect(consumeCardInvestmentPayment(INVOICE)).toBe(false)
+  /** The send flow pays the invoice like any other; the record is how the receipt and
+   *  the confirmation tell the investment's payment from the rest. */
+  it("recognises the invoice recorded for the investment", () => {
+    mockPersistentState = stateWith({ [CUSTODIAL_ID]: ISSUED })
+
+    const { result } = renderHook(() => useCardInvestmentProgress())
+
+    expect(result.current.isInvestmentInvoice(INVOICE)).toBe(true)
   })
 
-  /** One arm records at most one payment: the receipt that spends it leaves nothing for
-   *  the next payment, whatever that one is for. */
-  it("is spent by the receipt that settles the armed invoice", () => {
-    armCardInvestmentPayment(INVOICE)
+  /** Bolt11 is case-insensitive and the send flow may hand it back in either. */
+  it("recognises it whatever the case it comes back in", () => {
+    mockPersistentState = stateWith({ [CUSTODIAL_ID]: ISSUED })
 
-    expect(consumeCardInvestmentPayment(INVOICE)).toBe(true)
-    expect(consumeCardInvestmentPayment(INVOICE)).toBe(false)
+    const { result } = renderHook(() => useCardInvestmentProgress())
+
+    expect(result.current.isInvestmentInvoice(INVOICE.toUpperCase())).toBe(true)
   })
 
-  /** The send flow stays open to other destinations while the transfer step sits
-   *  underneath; a payment to anyone else in that window is not the investment, and
-   *  the investment's own payment may still follow. */
-  it("is neither spent nor dropped by a receipt for another invoice", () => {
-    armCardInvestmentPayment(INVOICE)
+  /** A payment to anyone else, made from the send flow left open over the transfer
+   *  step, is not the investment. */
+  it("does not recognise another invoice", () => {
+    mockPersistentState = stateWith({ [CUSTODIAL_ID]: ISSUED })
 
-    expect(consumeCardInvestmentPayment(OTHER_INVOICE)).toBe(false)
-    expect(consumeCardInvestmentPayment(INVOICE)).toBe(true)
+    const { result } = renderHook(() => useCardInvestmentProgress())
+
+    expect(result.current.isInvestmentInvoice("lnbc1someoneelse")).toBe(false)
+    expect(result.current.isInvestmentInvoice(undefined)).toBe(false)
   })
 
-  it("ignores a receipt that names no invoice", () => {
-    armCardInvestmentPayment(INVOICE)
+  it("recognises nothing while no invoice is recorded", () => {
+    mockPersistentState = stateWith({ [CUSTODIAL_ID]: INVESTMENT })
 
-    expect(consumeCardInvestmentPayment(undefined)).toBe(false)
-    expect(consumeCardInvestmentPayment(INVOICE)).toBe(true)
+    const { result } = renderHook(() => useCardInvestmentProgress())
+
+    expect(result.current.isInvestmentInvoice(INVOICE)).toBe(false)
   })
 
-  it("recognises the invoice whichever case the send flow hands it back in", () => {
-    armCardInvestmentPayment(INVOICE.toUpperCase())
+  it("recognises nothing for an account with no record", () => {
+    const { result } = renderHook(() => useCardInvestmentProgress())
 
-    expect(consumeCardInvestmentPayment(INVOICE)).toBe(true)
-  })
-
-  /** A step deciding what an answer about the invoice means must be able to ask
-   *  without spending the arm the receipt still needs. */
-  it("can be asked about without being spent", () => {
-    expect(isCardInvestmentPaymentArmed(INVOICE)).toBe(false)
-
-    armCardInvestmentPayment(INVOICE)
-
-    expect(isCardInvestmentPaymentArmed(INVOICE.toUpperCase())).toBe(true)
-    expect(isCardInvestmentPaymentArmed(OTHER_INVOICE)).toBe(false)
-    expect(isCardInvestmentPaymentArmed(undefined)).toBe(false)
-    expect(consumeCardInvestmentPayment(INVOICE)).toBe(true)
-  })
-
-  describe("useConsumeCardInvestmentPayment", () => {
-    it("answers false when nothing armed the payment", () => {
-      const { result } = renderHook(() => useConsumeCardInvestmentPayment(INVOICE))
-
-      expect(result.current).toBe(false)
-    })
-
-    it("answers false for a receipt that settled nothing armed", () => {
-      armCardInvestmentPayment(INVOICE)
-
-      const { result } = renderHook(() => useConsumeCardInvestmentPayment(OTHER_INVOICE))
-
-      expect(result.current).toBe(false)
-      expect(consumeCardInvestmentPayment(INVOICE)).toBe(true)
-    })
-
-    /** Spent on the first render and held: a later render must not read the arm again,
-     *  or one set in the meantime would be credited to this receipt. */
-    it("spends the arm once and keeps the answer for its lifetime", () => {
-      armCardInvestmentPayment(INVOICE)
-
-      const { result, rerender } = renderHook(() =>
-        useConsumeCardInvestmentPayment(INVOICE),
-      )
-      armCardInvestmentPayment(INVOICE)
-      rerender({})
-
-      expect(result.current).toBe(true)
-      expect(consumeCardInvestmentPayment(INVOICE)).toBe(true)
-    })
-
-    it("does not credit a receipt with an arm set after it first rendered", () => {
-      const { result, rerender } = renderHook(() =>
-        useConsumeCardInvestmentPayment(INVOICE),
-      )
-      armCardInvestmentPayment(INVOICE)
-      rerender({})
-
-      expect(result.current).toBe(false)
-      expect(consumeCardInvestmentPayment(INVOICE)).toBe(true)
-    })
+    expect(result.current.isInvestmentInvoice(INVOICE)).toBe(false)
   })
 })
