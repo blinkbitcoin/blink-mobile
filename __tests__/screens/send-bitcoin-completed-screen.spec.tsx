@@ -17,11 +17,6 @@ import { IsAuthedContextProvider } from "@app/graphql/is-authed-context"
 import mocks from "@app/graphql/mocks"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import SendBitcoinCompletedScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-completed-screen"
-import {
-  armCardInvestmentPayment,
-  consumeCardInvestmentPayment,
-} from "@app/hooks/use-card-investment-progress"
-
 import { ContextForScreen, ContextForScreenWithTheme } from "./helper"
 import { AppStateStatus, Linking, View, ViewStyle } from "react-native"
 import { light, dark } from "@app/rne-theme/colors"
@@ -77,12 +72,24 @@ jest.mock("@react-navigation/native", () => {
   }
 })
 
-/** The arm the transfer step sets is the real one, so the receipt is exercised against
- *  the module it ships with; only the persisted record behind `markPaid` is stood in. */
-const mockMarkCardInvestmentPaid = jest.fn()
+/** The investment's record, as the hook reads it: which invoice is the investment's,
+ *  and whether it is already marked paid. Its own spec covers the record; what matters
+ *  here is when this screen marks it. */
+const mockCardInvestment: { current: { paidAt?: number } | null } = { current: null }
+const mockIsInvestmentInvoice = jest.fn((_paymentRequest?: string) => false)
+const mockMarkCardInvestmentPaid = jest.fn(() => {
+  mockCardInvestment.current = {
+    ...mockCardInvestment.current,
+    paidAt: 1_757_800_000_000,
+  }
+})
 jest.mock("@app/hooks/use-card-investment-progress", () => ({
-  ...jest.requireActual("@app/hooks/use-card-investment-progress"),
-  useCardInvestmentProgress: () => ({ markPaid: mockMarkCardInvestmentPaid }),
+  useCardInvestmentProgress: () => ({
+    progress: mockCardInvestment.current,
+    markPaid: mockMarkCardInvestmentPaid,
+    isInvestmentInvoice: (paymentRequest?: string) =>
+      mockIsInvestmentInvoice(paymentRequest),
+  }),
 }))
 
 let mockAppStateCurrentState: AppStateStatus = "active"
@@ -977,27 +984,28 @@ describe("SendBitcoinCompletedScreen", () => {
 })
 
 describe("SendBitcoinCompletedScreen card investment payment", () => {
-  /** The arm is module state and only spending it clears it, so each test starts from
-   *  nothing armed by arming a throwaway invoice and spending that. */
-  const spendWhateverIsArmed = () => {
-    armCardInvestmentPayment("lnbc1throwaway")
-    consumeCardInvestmentPayment("lnbc1throwaway")
+  /** The record holds the investment's invoice and, once paid, its mark. */
+  const recordedInvestment = () => {
+    mockCardInvestment.current = {}
+    mockIsInvestmentInvoice.mockImplementation(
+      (paymentRequest?: string) => paymentRequest === INVESTMENT_INVOICE,
+    )
   }
 
   beforeEach(() => {
     jest.clearAllMocks()
     mockIsFocused.mockReturnValue(true)
     loadLocale("en")
-    spendWhateverIsArmed()
+    mockCardInvestment.current = null
+    mockIsInvestmentInvoice.mockImplementation(() => false)
   })
 
   afterEach(() => {
     jest.clearAllTimers()
-    spendWhateverIsArmed()
   })
 
-  it("records the investment as paid when this receipt settles the armed invoice", async () => {
-    armCardInvestmentPayment(INVESTMENT_INVOICE)
+  it("records the investment as paid when this receipt settles its invoice", async () => {
+    recordedInvestment()
 
     render(
       <ContextForScreen>
@@ -1006,13 +1014,14 @@ describe("SendBitcoinCompletedScreen card investment payment", () => {
     )
     await waitFor(() => screen.findByTestId("Success Text"))
 
+    expect(mockIsInvestmentInvoice).toHaveBeenCalledWith(INVESTMENT_INVOICE)
     expect(mockMarkCardInvestmentPaid).toHaveBeenCalledTimes(1)
   })
 
   /** The wallet has taken the payment; holding the record until it settles would have
    *  the home ask for the money again while it is in flight. */
   it("records it on a pending payment as well", async () => {
-    armCardInvestmentPayment(INVESTMENT_INVOICE)
+    recordedInvestment()
 
     render(
       <ContextForScreen>
@@ -1025,10 +1034,9 @@ describe("SendBitcoinCompletedScreen card investment payment", () => {
   })
 
   /** The investor backed into the send flow's destination step and paid someone else
-   *  while the transfer step still sat underneath: that payment is not the investment,
-   *  and the arm stays for the investment's own. */
-  it("records nothing, and keeps the arm, for a receipt that settled another invoice", async () => {
-    armCardInvestmentPayment(INVESTMENT_INVOICE)
+   *  while the transfer step still sat underneath: that payment is not the investment. */
+  it("records nothing for a receipt that settled another invoice", async () => {
+    recordedInvestment()
 
     render(
       <ContextForScreen>
@@ -1038,11 +1046,10 @@ describe("SendBitcoinCompletedScreen card investment payment", () => {
     await waitFor(() => screen.findByTestId("Success Text"))
 
     expect(mockMarkCardInvestmentPaid).not.toHaveBeenCalled()
-    expect(consumeCardInvestmentPayment(INVESTMENT_INVOICE)).toBe(true)
   })
 
   it("records nothing for a receipt that names no invoice", async () => {
-    armCardInvestmentPayment(INVESTMENT_INVOICE)
+    recordedInvestment()
 
     render(
       <ContextForScreen>
@@ -1051,14 +1058,28 @@ describe("SendBitcoinCompletedScreen card investment payment", () => {
     )
     await waitFor(() => screen.findByTestId("Success Text"))
 
+    expect(mockIsInvestmentInvoice).toHaveBeenCalledWith(undefined)
     expect(mockMarkCardInvestmentPaid).not.toHaveBeenCalled()
   })
 
-  /** Spent on the first render and held: a re-render must neither read the arm again
-   *  nor record the payment a second time, and an arm set later belongs to a later
-   *  receipt. */
-  it("spends the arm once for the life of the receipt", async () => {
-    armCardInvestmentPayment(INVESTMENT_INVOICE)
+  /** A second receipt for the same invoice, the retry that met "already paid", must not
+   *  move the mark: the mark itself is what says the payment is on record. */
+  it("records nothing for an investment already marked paid", async () => {
+    recordedInvestment()
+    mockCardInvestment.current = { paidAt: 1_757_700_000_000 }
+
+    render(
+      <ContextForScreen>
+        <InvestmentPaid />
+      </ContextForScreen>,
+    )
+    await waitFor(() => screen.findByTestId("Success Text"))
+
+    expect(mockMarkCardInvestmentPaid).not.toHaveBeenCalled()
+  })
+
+  it("records the payment once for the life of the receipt", async () => {
+    recordedInvestment()
 
     const { rerender } = render(
       <ContextForScreen>
@@ -1066,9 +1087,7 @@ describe("SendBitcoinCompletedScreen card investment payment", () => {
       </ContextForScreen>,
     )
     await waitFor(() => screen.findByTestId("Success Text"))
-    expect(consumeCardInvestmentPayment(INVESTMENT_INVOICE)).toBe(false)
 
-    armCardInvestmentPayment(INVESTMENT_INVOICE)
     rerender(
       <ContextForScreen>
         <InvestmentPaid />
@@ -1077,10 +1096,9 @@ describe("SendBitcoinCompletedScreen card investment payment", () => {
     await waitFor(() => screen.findByTestId("Success Text"))
 
     expect(mockMarkCardInvestmentPaid).toHaveBeenCalledTimes(1)
-    expect(consumeCardInvestmentPayment(INVESTMENT_INVOICE)).toBe(true)
   })
 
-  it("records nothing for a payment the transfer step did not arm", async () => {
+  it("records nothing when no investment invoice is on record", async () => {
     render(
       <ContextForScreen>
         <InvestmentPaid />

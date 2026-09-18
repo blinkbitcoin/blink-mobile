@@ -17,10 +17,16 @@ import SendBitcoinConfirmationScreen from "@app/screens/send-bitcoin-screen/send
 import { SelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { RouteProp } from "@react-navigation/native"
-import {
-  armCardInvestmentPayment,
-  consumeCardInvestmentPayment,
-} from "@app/hooks/use-card-investment-progress"
+
+/** Which invoice the investment's record names; null while none is recorded. */
+const mockInvestmentInvoice: { current: string | null } = { current: null }
+jest.mock("@app/hooks/use-card-investment-progress", () => ({
+  useCardInvestmentProgress: () => ({
+    isInvestmentInvoice: (paymentRequest?: string) =>
+      mockInvestmentInvoice.current !== null &&
+      paymentRequest === mockInvestmentInvoice.current,
+  }),
+}))
 
 import { flushEffects } from "../helpers/flush-effects"
 import { ContextForScreen } from "./helper"
@@ -595,10 +601,8 @@ describe("SendBitcoinConfirmationScreen", () => {
         )
       }
 
-      /** The arm is module state and only spending it clears it. */
       afterEach(() => {
-        armCardInvestmentPayment("lnbc1throwaway")
-        consumeCardInvestmentPayment("lnbc1throwaway")
+        mockInvestmentInvoice.current = null
       })
 
       /** The card investment's invoice is private to that investment, so "already
@@ -606,7 +610,7 @@ describe("SendBitcoinConfirmationScreen", () => {
        *  its receipt; refusing would have the home ask for the money again, and the
        *  next attempt pay a second invoice. */
       it("is taken to the receipt as settled when it is the card investment's", async () => {
-        armCardInvestmentPayment(bolt11Invoice)
+        mockInvestmentInvoice.current = bolt11Invoice
         sendPaymentMock.mockResolvedValueOnce({ status: "ALREADY_PAID" })
         verifyPaymentSettledMock.mockResolvedValueOnce({
           status: "SUCCESS",
@@ -633,7 +637,7 @@ describe("SendBitcoinConfirmationScreen", () => {
       /** When the ledger cannot say, the receipt is still reached: refusing would leave
        *  the home asking for money that has already gone. */
       it("still reaches the receipt when the ledger cannot confirm the settlement", async () => {
-        armCardInvestmentPayment(bolt11Invoice)
+        mockInvestmentInvoice.current = bolt11Invoice
         sendPaymentMock.mockResolvedValueOnce({ status: "ALREADY_PAID" })
         verifyPaymentSettledMock.mockResolvedValueOnce(undefined)
 
