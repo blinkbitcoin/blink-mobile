@@ -3,20 +3,43 @@ import { PaymentType } from "@blinkbitcoin/blink-client"
 import { WalletCurrency } from "@app/graphql/generated"
 import { type WalletAmount } from "@app/types/amounts"
 
-import type { PaymentDetail } from "../payment-details/index.types"
+import type { ConvertMoneyAmount, PaymentDetail } from "../payment-details/index.types"
 
-/** Warn once the fee climbs past half of what is being sent. */
+/** Warn once the fee reaches half of what is being sent. */
 const RATIO_FEES_TO_AMOUNT = 2
+
+type HighFeeParams = {
+  fee: WalletAmount<WalletCurrency>
+  /** What the recipient gets, fee excluded. */
+  amount: WalletAmount<WalletCurrency>
+  convertMoneyAmount: ConvertMoneyAmount
+}
+
+/**
+ * Whether the fee is 50% or more of the amount sent (blink-wip#1323), on any rail. Both
+ * are weighed in sats, so a cents fee is not rounded against a cents amount. A free send
+ * is never high, whatever the amount.
+ */
+export const isHighFee = ({ fee, amount, convertMoneyAmount }: HighFeeParams) => {
+  const feeInSats = convertMoneyAmount(fee, WalletCurrency.Btc)
+  if (feeInSats.amount <= 0) return false
+
+  const sendingInSats = convertMoneyAmount(amount, WalletCurrency.Btc)
+
+  return feeInSats.amount * RATIO_FEES_TO_AMOUNT >= sendingInSats.amount
+}
 
 type OnchainFeeAlertParams = {
   paymentDetail: PaymentDetail<WalletCurrency> | null
-  isSelfCustodial: boolean
   /** The fee the selector is showing for the picked tier, in the sending wallet's unit. */
   selectedTierFee: WalletAmount<WalletCurrency>
   hasFeeQuote: boolean
 }
 
 /**
+ * The on-chain warning on amount entry, where the picked tier's fee is already quoted.
+ * Lightning's fee is only known on review, so it is judged there.
+ *
  * Reads the fee the selector already quoted rather than probing a going rate of its own.
  * The three tiers arrive together, so switching speed leaves no window where the warning
  * judges one queue by another's rate, and the payment is measured by its own fee rather
@@ -24,22 +47,15 @@ type OnchainFeeAlertParams = {
  */
 export const shouldWarnAboutHighFee = ({
   paymentDetail,
-  isSelfCustodial,
   selectedTierFee,
   hasFeeQuote,
 }: OnchainFeeAlertParams) => {
-  const isOnchain = paymentDetail?.paymentType === PaymentType.Onchain
-  const isCustodialOnchain = !isSelfCustodial && isOnchain
-
   // Nothing quoted is nothing to judge: the fee on hand is a zeroed placeholder.
-  if (!isCustodialOnchain || !hasFeeQuote) return false
+  if (paymentDetail?.paymentType !== PaymentType.Onchain || !hasFeeQuote) return false
 
-  const { convertMoneyAmount } = paymentDetail
-  const feeInSats = convertMoneyAmount(selectedTierFee, WalletCurrency.Btc)
-  const sendingInSats = convertMoneyAmount(
-    paymentDetail.settlementAmount,
-    WalletCurrency.Btc,
-  )
-
-  return sendingInSats.amount < feeInSats.amount * RATIO_FEES_TO_AMOUNT
+  return isHighFee({
+    fee: selectedTierFee,
+    amount: paymentDetail.settlementAmount,
+    convertMoneyAmount: paymentDetail.convertMoneyAmount,
+  })
 }

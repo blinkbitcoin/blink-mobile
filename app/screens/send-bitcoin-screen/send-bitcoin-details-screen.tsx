@@ -60,8 +60,8 @@ import {
   LnurlInvoiceError,
 } from "./amount-entry/amount-entry-error-sheet"
 import { SendWalletSummary } from "./amount-entry/send-wallet-summary"
-import { ConfirmFeesModal } from "./confirm-fees-modal"
 import { formatDestination } from "./format-destination"
+import { HighFeeSheet } from "./high-fee-sheet"
 import { SendHero } from "./send-hero"
 import {
   AmountInvalidReason,
@@ -164,7 +164,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     },
   } = useAppConfig()
   const [isLoadingLnurl, setIsLoadingLnurl] = useState(false)
-  const [modalHighFeesVisible, setModalHighFeesVisible] = useState(false)
+  const [isHighFeeSheetVisible, setIsHighFeeSheetVisible] = useState(false)
   const [selectedPercent, setSelectedPercent] = useState<number | null>(null)
 
   const { convertMoneyAmount: _convertMoneyAmount, displayCurrency } =
@@ -189,6 +189,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     isQuotingFeesForNext,
     isOnchain,
     quoteFeesForNext,
+    selectedTierFee,
   } = useOnchainFeeTierOptions({
     paymentDetail,
     isSelfCustodial,
@@ -541,11 +542,11 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
       if (paymentDetailForConfirmation.sendPaymentMutation) {
         const alertHighFees = shouldWarnAboutHighFee({
           paymentDetail,
-          isSelfCustodial,
-          ...feeQuote,
+          selectedTierFee: feeQuote.selectedTierFee,
+          hasFeeQuote: feeQuote.hasFeeQuote,
         })
         if (alertHighFees) {
-          setModalHighFeesVisible(true)
+          setIsHighFeeSheetVisible(true)
         } else {
           navigation.navigate("sendBitcoinConfirmation", {
             paymentDetail: paymentDetailForConfirmation,
@@ -669,13 +670,16 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
         error={lnurlBoundsErrorMessage || (isLowFunds ? "lowFunds" : undefined)}
         kind="reject"
       />
-      <ConfirmFeesModal
-        action={() => {
-          setModalHighFeesVisible(false)
+      <HighFeeSheet
+        isVisible={isHighFeeSheetVisible}
+        fee={formatMoneyAmount({
+          moneyAmount: convertMoneyAmount(selectedTierFee, DisplayCurrency),
+        })}
+        onAccept={() => {
+          setIsHighFeeSheetVisible(false)
           navigation.navigate("sendBitcoinConfirmation", { paymentDetail })
         }}
-        isVisible={modalHighFeesVisible}
-        cancel={() => setModalHighFeesVisible(false)}
+        onClose={() => setIsHighFeeSheetVisible(false)}
       />
       <ScrollView
         ref={scrollRef}
