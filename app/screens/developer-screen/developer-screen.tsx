@@ -28,6 +28,7 @@ import { Button, Text, makeStyles } from "@rn-vui/themed"
 
 import { Screen } from "@app/components/screen"
 import { usePriceConversion, useSaveSessionProfile } from "@app/hooks"
+import { useI18nContext } from "@app/i18n/i18n-react"
 import useLogout from "../../hooks/use-logout"
 import { addDeviceToken } from "../../utils/notifications"
 import { testProps } from "../../utils/testProps"
@@ -48,6 +49,7 @@ const usingHermes = typeof HermesInternal === "object" && HermesInternal !== nul
 
 export const DeveloperScreen: React.FC = () => {
   const styles = useStyles()
+  const { LL } = useI18nContext()
   const client = useApolloClient()
   const { usdPerSat } = usePriceConversion()
   const { logout } = useLogout()
@@ -317,7 +319,9 @@ export const DeveloperScreen: React.FC = () => {
             onPress={() =>
               testBulletinsStore.add({
                 id: `test-deeplink-invest-${Date.now()}`,
-                title: "Welcome to become part of Blink",
+                /** The title the flow's first screen shows, read from the same place so
+                 *  the test card cannot drift from it. */
+                title: LL.CardFlow.Onboarding.WelcomeInvest.welcomeMessage.title(),
                 body: "You are invited to participate in the Blink financing round. For Blink fans only.",
                 type: "deep-link",
                 deepLink: "card/onboarding/investment",
