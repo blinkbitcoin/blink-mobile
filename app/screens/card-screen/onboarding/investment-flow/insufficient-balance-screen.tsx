@@ -1,5 +1,5 @@
 import * as React from "react"
-import { ScrollView, View } from "react-native"
+import { ActivityIndicator, ScrollView, View } from "react-native"
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
@@ -35,8 +35,26 @@ export const InsufficientBalanceScreen: React.FC = () => {
     [selectedAmountUsd],
   )
 
-  const { balanceUsd, balanceCurrency, shortfallUsd, isSplitAcrossWallets } =
-    useInvestmentFunding(terms.totalUsd)
+  const {
+    balanceUsd,
+    balanceCurrency,
+    shortfallUsd,
+    hasEnoughBalance,
+    isSplitAcrossWallets,
+    isLoading,
+  } = useInvestmentFunding(terms.totalUsd)
+
+  /**
+   * The balance is read live, so a deposit landing while this screen is up, or right
+   * after the investor comes back from making one, turns the shortfall into nothing
+   * missing. There is nothing left to say here then: the screen closes and the step
+   * underneath, which is where the investor was sent from, takes over with the money
+   * in place.
+   */
+  const isCovered = !isLoading && hasEnoughBalance
+  React.useEffect(() => {
+    if (isCovered) navigation.goBack()
+  }, [isCovered, navigation])
 
   const handleDeposit = () => {
     navigation.navigate("receiveBitcoin")
@@ -93,16 +111,31 @@ export const InsufficientBalanceScreen: React.FC = () => {
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
         <IconHero icon="info" iconColor={colors.primary} title={shortfall.title} />
 
+        {/* Until the price feed answers the balance reads as zero, and the figures
+            would say the investor holds nothing and owes it all; the spinner stands in
+            for them, and the button waits with it. */}
         <View style={styles.content}>
-          {shortfall.paragraphs.map((paragraph) => (
-            <Text key={paragraph} type="p2" style={styles.bodyText}>
-              {paragraph}
-            </Text>
-          ))}
+          {isLoading ? (
+            <ActivityIndicator
+              size="large"
+              color={colors.primary}
+              testID="insufficient-balance-loading"
+            />
+          ) : (
+            shortfall.paragraphs.map((paragraph) => (
+              <Text key={paragraph} type="p2" style={styles.bodyText}>
+                {paragraph}
+              </Text>
+            ))
+          )}
         </View>
       </ScrollView>
       <View style={styles.buttonsContainer}>
-        <GaloyPrimaryButton title={shortfall.actionTitle} onPress={shortfall.onAction} />
+        <GaloyPrimaryButton
+          title={shortfall.actionTitle}
+          disabled={isLoading}
+          onPress={shortfall.onAction}
+        />
       </View>
     </Screen>
   )
