@@ -3762,6 +3762,9 @@
         "buttonText": "Endelea",
         "paymentsUnavailable": "Malipo ya uwekezaji bado hayajafunguliwa. Tafadhali jaribu tena baadaye."
       },
+      "SignInvest": {
+        "signerNotConfigured": "Mtia saini bado hajawekwa. Anzisha upya programu na ujaribu tena."
+      },
       "InsufficientBalance": {
         "title": "Salio halitoshi",
         "paragraphs": {
