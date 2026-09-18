@@ -35,12 +35,7 @@ export const MOCK_EXPECTED_MONTHLY_VOLUME_OPTIONS = [
   { value: "3,000 or more", label: "$3,000 or more" },
 ]
 
-export const MOCK_CREDIT_LIMIT_VALUES = [
-  { value: 1000, percent: 0.01 },
-  { value: 2500, percent: 0.025 },
-  { value: 5000, percent: 0.05 },
-  { value: 10000, percent: 0.1 },
-  { value: 25000, percent: 0.25 },
-  { value: 50000, percent: 0.5 },
-  { value: 100000, percent: 1 },
-]
+/** The amounts on offer, in dollars. The share of the company each buys is not written
+ *  here: it follows from the valuation in `investment-terms`, the same way the term
+ *  sheet states it, so the two screens cannot describe different deals. */
+export const MOCK_CREDIT_LIMIT_VALUES = [1000, 2500, 5000, 10000, 25000, 50000, 100000]

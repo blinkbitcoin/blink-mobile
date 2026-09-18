@@ -27,14 +27,26 @@ describe("resolveInvestmentTerms", () => {
 
 describe("resolveEquityPercent", () => {
   /**
-   * The select screen offers each amount alongside the equity it buys, and the term sheet
-   * restates that equity for the one the investor picked. Those two have to agree, or the
-   * two screens describe different deals, so the percentage derived here is checked against
-   * the one every option advertises.
+   * The select screen and the term sheet both derive the share from here, so this is the
+   * one place the advertised figures are pinned: $1,000 buys 0.01% and $100,000 buys 1%
+   * of a $10M company. A change to the valuation shows up here first, on purpose.
    */
-  it("agrees with the equity percentage each option advertises", () => {
-    MOCK_CREDIT_LIMIT_VALUES.forEach(({ value, percent }) => {
-      expect(resolveEquityPercent(resolveInvestmentTerms(value))).toBeCloseTo(percent, 10)
+  it("states the share each amount on offer buys", () => {
+    const advertised = new Map([
+      [1000, 0.01],
+      [2500, 0.025],
+      [5000, 0.05],
+      [10000, 0.1],
+      [25000, 0.25],
+      [50000, 0.5],
+      [100000, 1],
+    ])
+
+    expect(MOCK_CREDIT_LIMIT_VALUES).toEqual([...advertised.keys()])
+    MOCK_CREDIT_LIMIT_VALUES.forEach((value) => {
+      expect(resolveEquityPercent(resolveInvestmentTerms(value))).toBe(
+        advertised.get(value),
+      )
     })
   })
 })
