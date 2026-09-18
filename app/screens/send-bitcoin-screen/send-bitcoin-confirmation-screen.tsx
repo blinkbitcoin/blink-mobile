@@ -1,7 +1,6 @@
 import React, { useState } from "react"
 import { Platform, ScrollView, View } from "react-native"
 import { PanGestureHandler } from "react-native-gesture-handler"
-import ReactNativeHapticFeedback from "react-native-haptic-feedback"
 import Animated from "react-native-reanimated"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 
@@ -45,6 +44,7 @@ import {
 import { useSendDustWarning, useTranslateSdkError } from "@app/self-custodial/hooks"
 import { logPaymentAttempt, logPaymentResult } from "@app/utils/analytics"
 import { reportError } from "@app/utils/error-logging"
+import { haptics } from "@app/utils/haptics"
 import { CommonActions, RouteProp, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
@@ -355,9 +355,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
        *  the receipt or closes; the receipt then skips its own success icon. Pending keeps
        *  today's screen until its design lands. */
       if (isSuccess) {
-        ReactNativeHapticFeedback.trigger("notificationSuccess", {
-          ignoreAndroidSystemSettings: true,
-        })
+        haptics.success()
         sentReceiptRef.current = params
         const sent = playSent({
           primaryAmount: heroPrimaryText,
@@ -370,6 +368,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
 
       /** Pending is not a success: no success haptic, and no Sent. */
       resetToCompleted(params)
+      haptics.success()
       saveContact()
     },
     [
@@ -419,9 +418,6 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
           undefined,
           "home",
         )
-        ReactNativeHapticFeedback.trigger("notificationError", {
-          ignoreAndroidSystemSettings: true,
-        })
         return
       }
 
@@ -430,9 +426,6 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
           LL.SendBitcoinConfirmationScreen.somethingWentWrong(),
         errorsMessage,
       )
-      ReactNativeHapticFeedback.trigger("notificationError", {
-        ignoreAndroidSystemSettings: true,
-      })
     } catch (err) {
       if (err instanceof Error) {
         reportError("send-bitcoin-confirmation", err)
@@ -478,9 +471,6 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
             undefined,
             "home",
           )
-          ReactNativeHapticFeedback.trigger("notificationError", {
-            ignoreAndroidSystemSettings: true,
-          })
           return
         }
 
