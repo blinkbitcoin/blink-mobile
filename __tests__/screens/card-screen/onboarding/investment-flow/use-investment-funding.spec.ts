@@ -125,6 +125,37 @@ describe("useInvestmentFunding", () => {
     expect(result.current.shortfallUsd).toBe(0)
   })
 
+  /** One wallet only: nothing can be split, and the fullest is the whole. */
+  it("reads an account with one wallet as never split", () => {
+    mockActiveWallet.current = {
+      wallets: [walletOf(WalletCurrency.Btc, 3_000_000)], // $3,000
+      isReady: true,
+    }
+
+    const { result } = renderHook(() => useInvestmentFunding(5000))
+
+    expect(result.current.balanceUsd).toBe(3000)
+    expect(result.current.balanceCurrency).toBe(WalletCurrency.Btc)
+    expect(result.current.isSplitAcrossWallets).toBe(false)
+  })
+
+  /** Two wallets holding the same amount: the first one listed is the one named, which
+   *  is as good as any, and this pins that it is stable rather than arbitrary. */
+  it("names the first of two equal wallets", () => {
+    mockActiveWallet.current = {
+      wallets: [
+        walletOf(WalletCurrency.Usd, 250_000), // $2,500
+        walletOf(WalletCurrency.Btc, 2_500_000), // $2,500
+      ],
+      isReady: true,
+    }
+
+    const { result } = renderHook(() => useInvestmentFunding(25000))
+
+    expect(result.current.balanceUsd).toBe(2500)
+    expect(result.current.balanceCurrency).toBe(WalletCurrency.Usd)
+  })
+
   /** With nothing held the bitcoin wallet is named, as the one a deposit lands in. */
   it("answers an empty account as nothing held, in the bitcoin wallet", () => {
     const { result } = renderHook(() => useInvestmentFunding(25000))
