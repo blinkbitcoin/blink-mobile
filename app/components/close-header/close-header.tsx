@@ -12,6 +12,9 @@ import { testProps } from "@app/utils/testProps"
 type CloseHeaderProps = {
   /** Where the control leads. Defaults to leaving the flow for the home tabs. */
   onClose?: () => void
+  /** Draws the row without the control, for a screen that must not be left: the row
+   *  keeps its height, so the screen holds the same layout as one that offers the exit. */
+  isHidden?: boolean
   testID: string
 }
 
@@ -22,12 +25,13 @@ type CloseHeaderProps = {
  * The header route positions its items by the native bar's own rules, which differ
  * per platform and cannot be matched to a screen's padding. Owning the row is what
  * lets a flow sit its close control on the same margin as everything else on the
- * screen, and it is why the account-migration flow already draws its own.
- *
- * The row keeps its height with no control in it, so a screen that hides the exit
- * holds the same layout as one that offers it.
+ * screen. The account migration and the card investment both draw theirs with this.
  */
-export const CloseHeader: React.FC<CloseHeaderProps> = ({ onClose, testID }) => {
+export const CloseHeader: React.FC<CloseHeaderProps> = ({
+  onClose,
+  isHidden = false,
+  testID,
+}) => {
   const styles = useStyles()
   const {
     theme: { colors },
@@ -38,13 +42,15 @@ export const CloseHeader: React.FC<CloseHeaderProps> = ({ onClose, testID }) => 
 
   return (
     <View style={styles.header}>
-      <GaloyIconButton
-        name="close"
-        size="medium"
-        backgroundColor={colors.grey5}
-        onPress={onClose ?? leaveFlow}
-        {...testProps(testID)}
-      />
+      {isHidden ? null : (
+        <GaloyIconButton
+          name="close"
+          size="medium"
+          backgroundColor={colors.grey5}
+          onPress={onClose ?? leaveFlow}
+          {...testProps(testID)}
+        />
+      )}
     </View>
   )
 }
