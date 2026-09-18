@@ -3730,7 +3730,8 @@
       "InsufficientBalance": {
         "title": "Sold insuficient",
         "paragraphs": {
-          "body1": "Ai doar {bitcoinBalance: string} în contul tău de Bitcoin.",
+          "balanceBitcoin": "Ai doar {balance: string} în contul tău de Bitcoin.",
+          "balanceDollar": "Ai doar {balance: string} în contul tău de Dolar.",
           "body2": "Depune mai mult de {shortfall: string} în contul tău pentru a atinge suma de investiție de {investmentAmount: string}.",
           "body3": "Asigură-te că întreaga sumă se află în unul dintre conturile tale; Bitcoin sau dolar."
         },

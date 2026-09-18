@@ -24,25 +24,39 @@ const CENTS_PER_USD = 100
  */
 export const useInvestmentFunding = (
   totalUsd: number,
-): InvestmentFunding & { totalSats: number; isLoading: boolean } => {
+): InvestmentFunding & {
+  /** The wallet the balance is read from, so the shortfall can be named after it. */
+  balanceCurrency: WalletCurrency
+  totalSats: number
+  isLoading: boolean
+} => {
   const { convertMoneyAmount } = usePriceConversion()
   const { wallets, isReady } = useActiveWallet()
 
   /** Each wallet on its own and the two together: a payment draws on one, so what the
    *  fullest holds decides whether it can go through, and the sum only says whether
-   *  consolidating would be enough. */
-  const { largestWalletUsd, combinedUsd } = React.useMemo(() => {
-    if (!convertMoneyAmount) return { largestWalletUsd: 0, combinedUsd: 0 }
+   *  consolidating would be enough. With nothing held the bitcoin wallet is named, as
+   *  the one a deposit lands in. */
+  const { largestWalletUsd, largestWalletCurrency, combinedUsd } = React.useMemo(() => {
+    const empty: {
+      largestWalletUsd: number
+      largestWalletCurrency: WalletCurrency
+      combinedUsd: number
+    } = { largestWalletUsd: 0, largestWalletCurrency: WalletCurrency.Btc, combinedUsd: 0 }
+    if (!convertMoneyAmount) return empty
 
-    const balances = wallets.map(
-      (wallet) =>
-        convertMoneyAmount(wallet.balance, WalletCurrency.Usd).amount / CENTS_PER_USD,
-    )
-
-    return {
-      largestWalletUsd: Math.max(0, ...balances),
-      combinedUsd: balances.reduce((total, balance) => total + balance, 0),
-    }
+    return wallets.reduce((funding, wallet) => {
+      const balanceUsd =
+        convertMoneyAmount(wallet.balance, WalletCurrency.Usd).amount / CENTS_PER_USD
+      const isFullest = balanceUsd > funding.largestWalletUsd
+      return {
+        largestWalletUsd: isFullest ? balanceUsd : funding.largestWalletUsd,
+        largestWalletCurrency: isFullest
+          ? wallet.walletCurrency
+          : funding.largestWalletCurrency,
+        combinedUsd: funding.combinedUsd + balanceUsd,
+      }
+    }, empty)
   }, [wallets, convertMoneyAmount])
 
   /**
@@ -65,6 +79,7 @@ export const useInvestmentFunding = (
 
   return {
     ...resolveInvestmentFunding({ largestWalletUsd, combinedUsd, totalUsd }),
+    balanceCurrency: largestWalletCurrency,
     totalSats,
     isLoading: !convertMoneyAmount || !isReady,
   }

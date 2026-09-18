@@ -3730,7 +3730,8 @@
       "InsufficientBalance": {
         "title": "Số dư không đủ",
         "paragraphs": {
-          "body1": "Bạn chỉ có {bitcoinBalance: string} trong tài khoản Bitcoin của mình.",
+          "balanceBitcoin": "Bạn chỉ có {balance: string} trong tài khoản Bitcoin của mình.",
+          "balanceDollar": "Bạn chỉ có {balance: string} trong tài khoản Đô la của mình.",
           "body2": "Hãy nạp hơn {shortfall: string} vào tài khoản của bạn để đạt đến số tiền đầu tư là {investmentAmount: string}.",
           "body3": "Hãy đảm bảo toàn bộ số tiền nằm trong một trong các tài khoản của bạn; Bitcoin hoặc Dollar."
         },

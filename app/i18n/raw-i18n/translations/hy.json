@@ -3730,7 +3730,8 @@
       "InsufficientBalance": {
         "title": "Անբավարար մնացորդ",
         "paragraphs": {
-          "body1": "Դու քո Bitcoin հաշվին ունես ընդամենը {bitcoinBalance: string}։",
+          "balanceBitcoin": "Դու քո Bitcoin հաշվին ունես ընդամենը {balance: string}։",
+          "balanceDollar": "Դու քո Դոլար հաշվին ունես ընդամենը {balance: string}։",
           "body2": "Ավելացրու քո հաշվին ավելի քան {shortfall: string}՝ {investmentAmount: string} ներդրման գումարին հասնելու համար։",
           "body3": "Համոզվիր, որ ամբողջ գումարը քո հաշիվներից մեկում է՝ Bitcoin կամ դոլար։"
         },

@@ -3730,7 +3730,8 @@
       "InsufficientBalance": {
         "title": "Mana aypaq qullqi",
         "paragraphs": {
-          "body1": "Bitcoin cuentaykipiqa {bitcoinBalance: string}llam kachkan.",
+          "balanceBitcoin": "Bitcoin cuentaykipiqa {balance: string}llam kachkan.",
+          "balanceDollar": "Dólar cuentaykipiqa {balance: string}llam kachkan.",
           "body2": "{investmentAmount: string} inversión qullqiman chayanaykipaq, cuentaykiman {shortfall: string} nisqamanta astawan churay.",
           "body3": "Tukuy qullqi huk cuentaykipi kananta yachay; Bitcoin utaq Dólar."
         },

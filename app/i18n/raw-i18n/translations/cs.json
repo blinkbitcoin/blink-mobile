@@ -3730,7 +3730,8 @@
       "InsufficientBalance": {
         "title": "Nedostatečný zůstatek",
         "paragraphs": {
-          "body1": "Na svém bitcoinovém účtu máš pouze {bitcoinBalance: string}.",
+          "balanceBitcoin": "Na svém bitcoinovém účtu máš pouze {balance: string}.",
+          "balanceDollar": "Na svém dolarovém účtu máš pouze {balance: string}.",
           "body2": "Vlož na svůj účet více než {shortfall: string}, abys dosáhl investiční částky {investmentAmount: string}.",
           "body3": "Ujisti se, že je celá částka na jednom z tvých účtů; bitcoinovém, nebo dolarovém."
         },

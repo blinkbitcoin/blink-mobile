@@ -61,8 +61,25 @@ describe("useInvestmentFunding", () => {
     const { result } = renderHook(() => useInvestmentFunding(25000))
 
     expect(result.current.balanceUsd).toBe(2500)
+    expect(result.current.balanceCurrency).toBe(WalletCurrency.Usd)
     expect(result.current.shortfallUsd).toBe(22500)
     expect(result.current.hasEnoughBalance).toBe(false)
+  })
+
+  /** The shortfall names the wallet the balance came from, so it has to say which. */
+  it("names the bitcoin wallet when that is the fullest", () => {
+    mockActiveWallet.current = {
+      wallets: [
+        walletOf(WalletCurrency.Btc, 30_000_000), // $30,000
+        walletOf(WalletCurrency.Usd, 250_000), // $2,500
+      ],
+      isReady: true,
+    }
+
+    const { result } = renderHook(() => useInvestmentFunding(50000))
+
+    expect(result.current.balanceUsd).toBe(30000)
+    expect(result.current.balanceCurrency).toBe(WalletCurrency.Btc)
   })
 
   /** Held between the two but not in either: the answer is to consolidate, not to
@@ -105,10 +122,12 @@ describe("useInvestmentFunding", () => {
     expect(result.current.shortfallUsd).toBe(0)
   })
 
-  it("answers an empty account as nothing held", () => {
+  /** With nothing held the bitcoin wallet is named, as the one a deposit lands in. */
+  it("answers an empty account as nothing held, in the bitcoin wallet", () => {
     const { result } = renderHook(() => useInvestmentFunding(25000))
 
     expect(result.current.balanceUsd).toBe(0)
+    expect(result.current.balanceCurrency).toBe(WalletCurrency.Btc)
     expect(result.current.isLoading).toBe(false)
   })
 

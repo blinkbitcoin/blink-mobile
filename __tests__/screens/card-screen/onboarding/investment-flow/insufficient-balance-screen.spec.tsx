@@ -1,6 +1,7 @@
 import React from "react"
 import { render, fireEvent, act } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
+import { WalletCurrency } from "@app/graphql/generated"
 
 import { InsufficientBalanceScreen } from "@app/screens/card-screen/onboarding/investment-flow"
 import { ContextForScreen } from "../../../helper"
@@ -37,6 +38,7 @@ jest.mock("@react-navigation/native", () => {
 const mockFunding = {
   current: {
     balanceUsd: 3333,
+    balanceCurrency: WalletCurrency.Btc as WalletCurrency,
     shortfallUsd: 21667,
     hasEnoughBalance: false,
     isSplitAcrossWallets: false,
@@ -68,6 +70,7 @@ describe("InsufficientBalanceScreen", () => {
     mockRouteParams.current = { selectedAmountUsd: SELECTED_AMOUNT_USD }
     mockFunding.current = {
       balanceUsd: 3333,
+      balanceCurrency: WalletCurrency.Btc,
       shortfallUsd: 21667,
       hasEnoughBalance: false,
       isSplitAcrossWallets: false,
@@ -83,6 +86,22 @@ describe("InsufficientBalanceScreen", () => {
   it("displays the insufficient balance title", async () => {
     const { getByText } = await renderScreen()
     expect(getByText("Insufficient balance")).toBeTruthy()
+  })
+
+  /** The balance shown is the fullest wallet's; a dollar balance called a bitcoin one
+   *  would be a lie, so the sentence names the wallet it came from. */
+  it("names the dollar wallet when that is where the balance is", async () => {
+    mockFunding.current = { ...mockFunding.current, balanceCurrency: WalletCurrency.Usd }
+
+    const { getByText, queryByText } = render(
+      <ContextForScreen>
+        <InsufficientBalanceScreen />
+      </ContextForScreen>,
+    )
+    await act(async () => {})
+
+    expect(getByText("You only have $3,333 in your Dollar account.")).toBeTruthy()
+    expect(queryByText(/Bitcoin account/)).toBeNull()
   })
 
   it("states the balance the investor actually holds", async () => {
@@ -105,6 +124,7 @@ describe("InsufficientBalanceScreen", () => {
     mockRouteParams.current = { selectedAmountUsd: 1000 }
     mockFunding.current = {
       balanceUsd: 250,
+      balanceCurrency: WalletCurrency.Btc,
       shortfallUsd: 750,
       hasEnoughBalance: false,
       isSplitAcrossWallets: false,
@@ -139,6 +159,7 @@ describe("InsufficientBalanceScreen", () => {
     beforeEach(() => {
       mockFunding.current = {
         balanceUsd: 370,
+        balanceCurrency: WalletCurrency.Btc,
         shortfallUsd: 130,
         hasEnoughBalance: false,
         isSplitAcrossWallets: true,

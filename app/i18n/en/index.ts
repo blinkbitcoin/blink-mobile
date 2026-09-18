@@ -3902,7 +3902,8 @@ const en: BaseTranslation = {
       InsufficientBalance: {
         title: "Insufficient balance",
         paragraphs: {
-          body1: "You only have {bitcoinBalance: string} in your Bitcoin account.",
+          balanceBitcoin: "You only have {balance: string} in your Bitcoin account.",
+          balanceDollar: "You only have {balance: string} in your Dollar account.",
           body2: "Deposit more than {shortfall: string} to your account to reach the investment amount of {investmentAmount: string}.",
           body3: "Make sure that the full amount is in either of your accounts; Bitcoin or Dollar.",
         },

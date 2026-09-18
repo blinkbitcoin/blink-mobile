@@ -3730,7 +3730,8 @@
       "InsufficientBalance": {
         "title": "رصيد غير كافٍ",
         "paragraphs": {
-          "body1": "لديك {bitcoinBalance: string} فقط في حساب البيتكوين الخاص بك.",
+          "balanceBitcoin": "لديك {balance: string} فقط في حساب البيتكوين الخاص بك.",
+          "balanceDollar": "لديك {balance: string} فقط في حساب الدولار الخاص بك.",
           "body2": "أودِع أكثر من {shortfall: string} في حسابك للوصول إلى مبلغ الاستثمار وهو {investmentAmount: string}.",
           "body3": "تأكد من وجود المبلغ الكامل في أحد حسابيك؛ البيتكوين أو الدولار."
         },
