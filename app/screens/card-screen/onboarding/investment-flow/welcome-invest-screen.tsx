@@ -3,6 +3,7 @@ import { ScrollView, View } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
+import { getErrorMessage } from "@blinkbitcoin/esign-react-native/webform"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { IconHero } from "@app/components/icon-hero"
@@ -14,6 +15,7 @@ import { RESET_TO_HOME } from "@app/navigation/reset-to-home"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
 import { resetToTransferStep } from "./transfer-invest-screen"
+import { LOST_CONNECTION_CODE, useGivenUpWaiting } from "./use-given-up-waiting"
 
 export const WelcomeInvestScreen: React.FC = () => {
   const styles = useStyles()
@@ -23,7 +25,7 @@ export const WelcomeInvestScreen: React.FC = () => {
 
   const { LL } = useI18nContext()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-  const { progress, isEligible, isAccountResolved, markInvited } =
+  const { progress, isEligible, isAccountResolved, markInvited, refetchAccount } =
     useCardInvestmentProgress()
 
   /** The investment is paid from a custodial balance; a self-custodial account that
@@ -68,9 +70,26 @@ export const WelcomeInvestScreen: React.FC = () => {
     navigation.navigate("cardOnboardingCompanyValuationScreen")
   }
 
-  /** Until the account is known the record cannot be read, and a tap in that window
-   *  would push the next screen over a welcome about to send the investor elsewhere. */
-  const isContinueDisabled = !isAccountResolved
+  /**
+   * Until the account is known the record cannot be read, and a tap in that window
+   * would push the next screen over a welcome about to send the investor elsewhere. The
+   * account is usually in the cache already; when it is not and does not come, the wait
+   * ends the way the signing step's does, with the reason and a way to ask again, since
+   * a fetch that failed offline is not retried on its own.
+   */
+  const isWaitingForAccount = isEligible && !isAccountResolved
+  const { hasGivenUp: hasGivenUpWaiting, startOver: waitAgain } =
+    useGivenUpWaiting(isWaitingForAccount)
+  const askForAccountAgain = () => {
+    refetchAccount()
+    waitAgain()
+  }
+  const isWaitingOut = isWaitingForAccount && !hasGivenUpWaiting
+  const isContinueDisabled = !isEligible || isWaitingOut
+  const continueTitle = hasGivenUpWaiting
+    ? LL.common.tryAgain()
+    : LL.CardFlow.Onboarding.WelcomeInvest.buttonText()
+  const handleContinue = hasGivenUpWaiting ? askForAccountAgain : handleNext
 
   return (
     <Screen headerShown={false}>
@@ -90,20 +109,26 @@ export const WelcomeInvestScreen: React.FC = () => {
           <Text type="p2" style={styles.bodyText}>
             {LL.CardFlow.Onboarding.WelcomeInvest.welcomeMessage.paragraphs.body2()}
           </Text>
+
+          {hasGivenUpWaiting ? (
+            <Text type="p2" style={styles.errorText}>
+              {getErrorMessage(LOST_CONNECTION_CODE)}
+            </Text>
+          ) : null}
         </View>
       </ScrollView>
       <View style={styles.buttonsContainer}>
         <GaloyPrimaryButton
-          title={LL.CardFlow.Onboarding.WelcomeInvest.buttonText()}
+          title={continueTitle}
           disabled={isContinueDisabled}
-          onPress={handleNext}
+          onPress={handleContinue}
         />
       </View>
     </Screen>
   )
 }
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles(({ colors }) => ({
   scrollView: {
     flex: 1,
   },
@@ -117,6 +142,12 @@ const useStyles = makeStyles(() => ({
     gap: 22,
   },
   bodyText: {
+    lineHeight: 22,
+    textAlign: "left",
+    width: "100%",
+  },
+  errorText: {
+    color: colors.error,
     lineHeight: 22,
     textAlign: "left",
     width: "100%",

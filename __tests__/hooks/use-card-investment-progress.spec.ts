@@ -29,6 +29,7 @@ jest.mock("@app/hooks/use-account-registry", () => ({
 }))
 
 const mockIsAuthed = { current: true }
+const mockRefetchAccount = jest.fn(() => Promise.resolve())
 jest.mock("@app/graphql/is-authed-context", () => ({
   useIsAuthed: () => mockIsAuthed.current,
 }))
@@ -75,7 +76,7 @@ const custodialSession = (answer: string | null | { me: unknown } = CUSTODIAL_ID
     typeof answer === "string"
       ? { me: { id: "user", defaultAccount: { id: answer } } }
       : answer ?? undefined
-  mockCardInvestmentAccountQuery.mockReturnValue({ data })
+  mockCardInvestmentAccountQuery.mockReturnValue({ data, refetch: mockRefetchAccount })
 }
 
 /** Runs the functional updater the hook handed to the store against a given state. */
@@ -446,6 +447,30 @@ describe("useCardInvestmentProgress", () => {
 
       custodialSession()
       expect(
+  describe("asking for the account again", () => {
+    it("refetches the account query", () => {
+      const { result } = renderHook(() => useCardInvestmentProgress())
+
+      act(() => {
+        result.current.refetchAccount()
+      })
+
+      expect(mockRefetchAccount).toHaveBeenCalledTimes(1)
+    })
+
+    /** Offline, the refetch rejects; the step that asked must not be taken down by it. */
+    it("swallows a refetch that fails", async () => {
+      mockRefetchAccount.mockRejectedValueOnce(new Error("offline"))
+      const { result } = renderHook(() => useCardInvestmentProgress())
+
+      await act(async () => {
+        result.current.refetchAccount()
+      })
+
+      expect(mockRefetchAccount).toHaveBeenCalledTimes(1)
+    })
+  })
+
         renderHook(() => useCardInvestmentProgress()).result.current.isAccountResolved,
       ).toBe(true)
     })

@@ -40,19 +40,26 @@ gql`
 const useCardInvestmentAccount = (): {
   accountId: string | null
   isEligible: boolean
+  refetchAccount: () => void
 } => {
   const { activeAccount } = useAccountRegistry()
   const isAuthed = useIsAuthed()
   const isEligible = activeAccount?.type !== AccountType.SelfCustodial
 
   /** Served from the cache the home already filled; only a fresh session fetches. */
-  const { data } = useCardInvestmentAccountQuery({
+  const { data, refetch } = useCardInvestmentAccountQuery({
     skip: !isEligible || !isAuthed,
     fetchPolicy: "cache-first",
   })
 
-  if (!isEligible) return { accountId: null, isEligible }
-  return { accountId: data?.me?.defaultAccount?.id ?? null, isEligible }
+  /** For the step that has waited on the id too long: a fetch that failed, offline, is
+   *  not retried on its own, so the tap that says "try again" asks for it again. */
+  const refetchAccount = useCallback(() => {
+    refetch().catch(() => undefined)
+  }, [refetch])
+
+  if (!isEligible) return { accountId: null, isEligible, refetchAccount }
+  return { accountId: data?.me?.defaultAccount?.id ?? null, isEligible, refetchAccount }
 }
 
 /** What the signing step knows when the agreement is signed. */
@@ -76,6 +83,8 @@ type CardInvestmentProgressState = {
   /** Whether that account is known yet; until it is, nothing can be recorded, so a step
    *  that must record should wait on this. Never, for an account that cannot take part. */
   isAccountResolved: boolean
+  /** Asks the server for the account again, for a step whose wait on it has run out. */
+  refetchAccount: () => void
   /** Records that the invitation was opened, unless the account already holds a record:
    *  a return to the first screen must not erase an agreement already signed. */
   markInvited: () => void
@@ -102,7 +111,7 @@ type CardInvestmentProgressState = {
  */
 export const useCardInvestmentProgress = (): CardInvestmentProgressState => {
   const { persistentState, updateState } = usePersistentStateContext()
-  const { accountId, isEligible } = useCardInvestmentAccount()
+  const { accountId, isEligible, refetchAccount } = useCardInvestmentAccount()
   const record = accountId
     ? getCardInvestment(persistentState, accountId, Date.now())
     : null
@@ -191,6 +200,7 @@ export const useCardInvestmentProgress = (): CardInvestmentProgressState => {
  * params describe the payment, not why it is being made. An arm left behind by an
  * investor who backed out of the send flow is harmless: only a payment of that very
  * invoice can spend it, and that payment is the investment.
+    refetchAccount,
  */
 let armedCardInvestmentInvoice: string | null = null
 
