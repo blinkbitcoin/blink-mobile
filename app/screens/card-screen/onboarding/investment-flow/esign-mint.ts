@@ -17,6 +17,7 @@ import {
   signingFailure,
   signingRefusal,
   signingUnauthorized,
+  signingUnreachable,
 } from "./investment-agreement"
 
 /** Where the service mints envelopes; it serves the return-url bridge beside it. */
@@ -83,6 +84,9 @@ export const mintSigningInstance = async ({
     throw signingFailure("no e-sign service is configured for this environment")
   }
 
+  /** A request that never gets an answer (no network, no route to the service) rejects
+   *  with a bare error the component would word as a failed mint; naming it a lost
+   *  connection gets the signer the copy that says what to do about it. */
   const response = await fetch(`${origin}${ENVELOPE_INSTANCE_PATH}`, {
     method: "POST",
     headers: {
@@ -90,6 +94,8 @@ export const mintSigningInstance = async ({
       "authorization": `Bearer ${token}`,
     },
     body: JSON.stringify({ recipient, prefill }),
+  }).catch((error: unknown) => {
+    throw signingUnreachable(error instanceof Error ? error.message : String(error))
   })
 
   /** A port that answers with something other than JSON is still a failed mint, and
