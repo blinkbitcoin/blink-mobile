@@ -49,8 +49,8 @@ const USD_DECIMALS = 2
 /**
  * The one code the signing component words with the message it was handed, for a mint
  * refused for a reason the signer should read: a missing signer, a request the service
- * would not take. Under any other code the component replaces the message with its own
- * generic copy, which would leave the signer tapping retry against a wall.
+ * would not take. Under any other code it knows, the component replaces the message with
+ * its own copy, which would leave the signer tapping retry against a wall.
  */
 const REFUSAL_CODE = "VALIDATION_ERROR"
 
@@ -63,6 +63,10 @@ const FAILURE_CODE = "ENVELOPE_CREATION_FAILED"
 /** The service could not be reached at all, which the component words as a lost
  *  connection rather than as a mint that failed. */
 const UNREACHABLE_CODE = "NETWORK_ERROR"
+
+/** The host has not named the signer. Not a code the component knows: the step words
+ *  it itself, translated, so whoever is filling the host's fields reads what is missing. */
+export const SIGNER_NOT_CONFIGURED_CODE = "SIGNER_NOT_CONFIGURED"
 
 /** The rejection carries a `code` because that is what the signing component reads to
  *  decide the wording; without one it falls back to a code that discards the message. */
@@ -77,6 +81,8 @@ export const signingFailure = (message: string): Error =>
   signingError(message, FAILURE_CODE)
 export const signingUnreachable = (message: string): Error =>
   signingError(message, UNREACHABLE_CODE)
+const signingUnconfigured = (message: string): Error =>
+  signingError(message, SIGNER_NOT_CONFIGURED_CODE)
 
 /** A value written onto the document, which the signer cannot change. */
 type LockedValue = { value: string; locked: true }
@@ -164,7 +170,8 @@ type MintInvestmentAgreementInput = {
 /**
  * Mints the agreement from what the app knows at this moment. A price that has not
  * answered yet is a failure the retry can cure, so it is filed under the component's own
- * copy; a signer the host has not named is a refusal the signer should read.
+ * copy; a signer the host has not named is a setup the step words itself, in the
+ * signer's language, since it is the one failure whoever configures the host meets first.
  *
  * The settlement is what this call computed and asked the service to write, so the
  * transfer step bills the figure the document names. That holds while the deployment
@@ -193,7 +200,7 @@ export const mintInvestmentAgreement = async ({
   const recipient = resolveAgreementSigner(fields)
 
   if (!recipient) {
-    throw signingRefusal("the agreement's signer is not configured")
+    throw signingUnconfigured("the agreement's signer is not configured")
   }
 
   const minted = await mint(recipient, resolveAgreementPrefill(terms, fields))

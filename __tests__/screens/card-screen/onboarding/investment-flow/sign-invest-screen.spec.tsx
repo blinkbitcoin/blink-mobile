@@ -785,6 +785,22 @@ describe("SignInvestScreen", () => {
       expect(mockReplace).not.toHaveBeenCalled()
     })
 
+    /** Declining lands the session back in idle, where the document is opened from; a
+     *  signer who just said no must not get a fresh envelope, nor the page again. */
+    it("does not open another session after the signer declines", async () => {
+      mockESign.status = "signing"
+      const { rerender } = await renderScreen()
+
+      await act(async () => {
+        callbackOf("onCancel")()
+      })
+      mockESign.status = "idle"
+      await rerenderScreen(rerender)
+
+      expect(mockGoBack).toHaveBeenCalledTimes(1)
+      expect(mockESign.sign).not.toHaveBeenCalled()
+    })
+
     /** The retry lives on this screen, so navigating away on a failure would take it
      *  with it. Leaving is the close button's job. */
     it("stays on the step when signing fails", async () => {
@@ -802,20 +818,21 @@ describe("SignInvestScreen", () => {
       expect(mockReplace).not.toHaveBeenCalled()
     })
 
-    /** Declining lands the session back in idle, where the document is opened from; a
-     *  signer who just said no must not get a fresh envelope, nor the page again. */
-    it("does not open another session after the signer declines", async () => {
-      mockESign.status = "signing"
-      const { rerender } = await renderScreen()
+    /** The one failure the step words itself: whoever fills the host's fields reads, in
+     *  their language, that the signer is missing rather than a raw internal sentence. */
+    it("says in the app's own words that the signer is not set up", async () => {
+      mockESign.status = "error"
+      mockESign.error = {
+        code: "SIGNER_NOT_CONFIGURED",
+        message: "the agreement's signer is not configured",
+      }
 
-      await act(async () => {
-        callbackOf("onCancel")()
-      })
-      mockESign.status = "idle"
-      await rerenderScreen(rerender)
+      const { getByText, queryByText } = await renderScreen()
 
-      expect(mockGoBack).toHaveBeenCalledTimes(1)
-      expect(mockESign.sign).not.toHaveBeenCalled()
+      expect(
+        getByText("Signer not set up yet. Restart the app and try again."),
+      ).toBeTruthy()
+      expect(queryByText("the agreement's signer is not configured")).toBeNull()
     })
 
     it("reports the failure with its error code", async () => {
