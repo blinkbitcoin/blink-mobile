@@ -44,11 +44,38 @@ export const isInvoiceReusable = (issuedAt: number, now: number): boolean =>
  *
  * English whatever the investor's language, because it is a record rather than a piece
  * of interface: the same payment has to read the same way in the books no matter whose
- * phone it came from. The signer's name belongs beside it and is missing on purpose:
- * the agreement holds it, the app does not, and inventing one from the paying account
- * could name someone other than who signed.
+ * phone it came from. It names no one on purpose: the agreement holds the signer's name,
+ * and inventing one from the paying account could name someone other than who signed.
+ * Who paid, and for which amount, is filed under the invoice's external id instead.
  */
 const INVOICE_MEMO = "Blink Private subscription"
+
+/**
+ * Whose payment it is and for what: the paying account and the amount signed for, so
+ * the receiving ledger can tie each payment to its subscriber without reading memos.
+ * The account is null while it is still unknown, and no invoice is minted then: a
+ * payment filed under nobody is the one thing the id exists to prevent.
+ */
+type InvoiceSubscriber = {
+  accountId: string | null
+  amountUsd: number
+}
+
+/**
+ * Letters, digits, underscore and hyphen, up to a hundred of them, is what the ledger
+ * accepts as an external id; the account id is a lowercase uuid and the amount one of
+ * the flow's whole-dollar options, so the two joined by underscores fit as they are.
+ *
+ * Stamped with the moment, because the ledger keeps the id unique per receiving
+ * account and never drops an unpaid invoice: the same investor minting again for the
+ * same amount, after letting the first invoice age past reuse, would otherwise be
+ * refused for good. Account and amount stay in front, as the part worth searching by.
+ */
+const resolveInvoiceExternalId = (
+  accountId: string,
+  amountUsd: number,
+  mintedAt: number,
+): string => `investment_${accountId}_${amountUsd}_${mintedAt}`
 
 type MintedInvoice = {
   paymentRequest: string
@@ -70,13 +97,26 @@ export const useInvestmentInvoice = (): {
   requestInvoice: (
     recipientWalletId: string,
     satoshis: number,
+    subscriber: InvoiceSubscriber,
   ) => Promise<MintedInvoice | null>
   isRequesting: boolean
 } => {
   const [createInvoice, { loading }] = useLnInvoiceCreateOnBehalfOfRecipientMutation()
 
   const requestInvoice = React.useCallback(
-    async (recipientWalletId: string, satoshis: number) => {
+    async (
+      recipientWalletId: string,
+      satoshis: number,
+      subscriber: InvoiceSubscriber,
+    ) => {
+      if (!subscriber.accountId) {
+        reportError(
+          "investment-invoice",
+          new Error("no account to file the investment payment under"),
+        )
+        return null
+      }
+
       try {
         const { data } = await createInvoice({
           variables: {
@@ -84,6 +124,11 @@ export const useInvestmentInvoice = (): {
               recipientWalletId,
               amount: satoshis,
               memo: INVOICE_MEMO,
+              externalId: resolveInvoiceExternalId(
+                subscriber.accountId,
+                subscriber.amountUsd,
+                Date.now(),
+              ),
               expiresIn: String(INVOICE_EXPIRY_MINUTES),
             },
           },

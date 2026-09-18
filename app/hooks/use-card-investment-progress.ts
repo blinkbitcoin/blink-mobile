@@ -63,9 +63,11 @@ type CardInvestmentProgressState = {
   /** Whether the active account can take part at all: the investment is paid from a
    *  custodial balance, so a self-custodial account is sent back wherever it enters. */
   isEligible: boolean
-  /** Whether the account the record is filed under is known yet; until it is, nothing
-   *  can be recorded, so a step that must record should wait on this. Never, for an
-   *  account that cannot take part. */
+  /** The account the record is filed under, once known: what a payment is filed under
+   *  too, so the receiving ledger can tell whose it is. */
+  accountId: string | null
+  /** Whether that account is known yet; until it is, nothing can be recorded, so a step
+   *  that must record should wait on this. Never, for an account that cannot take part. */
   isAccountResolved: boolean
   /** Records the signed agreement, stamped with the moment; the home nags about its
    *  payment from here on. */
@@ -143,6 +145,7 @@ export const useCardInvestmentProgress = (): CardInvestmentProgressState => {
   return {
     progress,
     isEligible,
+    accountId,
     isAccountResolved: accountId !== null,
     start,
     recordInvoice,
