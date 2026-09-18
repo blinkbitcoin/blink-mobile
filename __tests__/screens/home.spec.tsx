@@ -18,6 +18,7 @@ import {
 import { HideAmountContextProvider } from "@app/graphql/hide-amount-context"
 import { IsAuthedContextProvider } from "@app/graphql/is-authed-context"
 import { mockCurrencyList } from "@app/graphql/mocks"
+import { GateReason } from "@app/types/account"
 import { ConvertDirection } from "@app/types/payment"
 import {
   NormalizedTransaction,
@@ -85,10 +86,12 @@ const mockToggleBalanceMode = jest.fn()
 // eslint-disable-next-line prefer-const
 let mockBalanceModeValue: "btc" | "usd" = "usd"
 let mockDollarBalanceRestrictedOverride = false
+let mockDollarRegionDeterminedOverride = true
 let mockRegionPendingOverride = false
 let mockTransferBlockedOverride = false
 let mockTransferRegionPendingOverride = false
 let mockDollarBalanceModalVisible = false
+let mockDollarBalanceModalRegionUnknown = false
 
 jest.mock("@app/hooks/use-active-wallet", () => ({
   useActiveWallet: () =>
@@ -154,16 +157,39 @@ jest.mock("@app/hooks/use-transfer-blocked", () => ({
 }))
 
 jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
-  useDollarBalanceRestricted: () => mockDollarBalanceRestrictedOverride,
+  useDollarBalanceRestriction: () => ({
+    isRestricted: mockDollarBalanceRestrictedOverride,
+    isRegionPending: mockRegionPendingOverride,
+    isRegionDetermined: mockDollarRegionDeterminedOverride,
+  }),
   useDollarBalanceGated: () => mockIsAnonMode || mockDollarBalanceRestrictedOverride,
   useDollarBalanceGate: () => ({
     isGated: mockIsAnonMode || mockDollarBalanceRestrictedOverride,
     isRegionPending: mockRegionPendingOverride,
+    reason: mockDollarGateReason(),
   }),
 }))
 
+/** The gate's own reading of a closed gate, mirrored so the modal's copy can be asserted. */
+const mockDollarGateReason = (): GateReason | null => {
+  if (mockIsAnonMode) return GateReason.Anon
+  if (!mockDollarBalanceRestrictedOverride) return null
+  return mockDollarRegionDeterminedOverride ? GateReason.Region : GateReason.UnknownRegion
+}
+
 jest.mock("@app/self-custodial/hooks/use-self-custodial-account-mode", () => ({
   useSelfCustodialAccountMode: () => ({ isAnonMode: mockIsAnonMode }),
+}))
+
+const mockRefetchCustodialRestrictions = jest.fn()
+jest.mock("@app/custodial/providers/restrictions", () => ({
+  ...jest.requireActual("@app/custodial/providers/restrictions"),
+  useCustodialRestrictions: () => ({
+    verdict: {
+      status: jest.requireActual("@app/types/account").RestrictionVerdictStatus.Pending,
+    },
+    refetch: mockRefetchCustodialRestrictions,
+  }),
 }))
 
 const mockPromptEnhancedMode = jest.fn()
@@ -315,8 +341,15 @@ jest.mock("@app/components/dollar-balance-restriction-modal", () => {
   const ReactActual = jest.requireActual("react")
   const { Text } = jest.requireActual("react-native")
   return {
-    DollarBalanceRestrictionModal: ({ isVisible }: { isVisible: boolean }) => {
+    DollarBalanceRestrictionModal: ({
+      isVisible,
+      isRegionUnknown,
+    }: {
+      isVisible: boolean
+      isRegionUnknown: boolean
+    }) => {
       mockDollarBalanceModalVisible = isVisible
+      mockDollarBalanceModalRegionUnknown = isRegionUnknown
       return ReactActual.createElement(
         Text,
         { testID: "dollar-balance-restriction-modal" },
@@ -892,6 +925,7 @@ const resetHomeScreenMocks = () => {
   mockActiveWalletOverride = null
   mockActiveAccountOverride = null
   mockDollarBalanceRestrictedOverride = false
+  mockDollarRegionDeterminedOverride = true
   mockRegionPendingOverride = false
   mockTransferRegionPendingOverride = false
   mockMigratePromptVisible = false
@@ -902,6 +936,7 @@ const resetHomeScreenMocks = () => {
   mockReminderBulletinPhase = WindDownStatus.PreCutoff
   mockTransferBlockedOverride = false
   mockDollarBalanceModalVisible = false
+  mockDollarBalanceModalRegionUnknown = false
   mockForcedConversionParams = null
   mockIsAnonMode = false
   mockIsRestrictedRegion = false
@@ -1034,6 +1069,78 @@ describe("HomeScreen", () => {
     expect(queryByTestId("sc-convert-modal")).toBeNull()
 
     await flushEffects()
+  })
+
+  it("does not force the conversion when only an unknown region restricts the account", async () => {
+    mockDollarBalanceRestrictedOverride = true
+    mockDollarRegionDeterminedOverride = false
+    currentMocks = generateHomeMock({
+      level: AccountLevel.One,
+      network: Network.Mainnet,
+      btcBalance: 1000,
+      usdBalance: 5000,
+    })
+
+    const { queryByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    expect(mockForcedConversionParams?.isRestricted).toBe(false)
+    expect(queryByTestId("convert-modal")).toBeNull()
+  })
+
+  /** The disabled Transfer button is the user's way into the explanation. When the gate
+   *  closed without a region behind it, the explanation must say the check failed, not
+   *  that the region is restricted. */
+  it("opens the restriction modal as an unanswered check when only an unknown region gates", async () => {
+    mockDollarBalanceRestrictedOverride = true
+    mockDollarRegionDeterminedOverride = false
+    currentMocks = generateHomeMock({
+      level: AccountLevel.One,
+      network: Network.Mainnet,
+      btcBalance: 1000,
+      usdBalance: 0,
+    })
+
+    const { getByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    fireEvent.press(getByTestId("transfer", { includeHiddenElements: true }))
+    await flushEffects()
+
+    expect(mockDollarBalanceModalVisible).toBe(true)
+    expect(mockDollarBalanceModalRegionUnknown).toBe(true)
+  })
+
+  it("opens the restriction modal as a decided region when the server restricted it", async () => {
+    mockDollarBalanceRestrictedOverride = true
+    currentMocks = generateHomeMock({
+      level: AccountLevel.One,
+      network: Network.Mainnet,
+      btcBalance: 1000,
+      usdBalance: 0,
+    })
+
+    const { getByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    fireEvent.press(getByTestId("transfer", { includeHiddenElements: true }))
+    await flushEffects()
+
+    expect(mockDollarBalanceModalVisible).toBe(true)
+    expect(mockDollarBalanceModalRegionUnknown).toBe(false)
   })
 
   it("does not auto-open the convert modal when the restricted account has no Dollar balance", async () => {
@@ -2589,6 +2696,43 @@ describe("HomeScreen pull-to-refresh", () => {
 
     await flushEffects()
 
+    expect(UNSAFE_getByType(RefreshControl).props.refreshing).toBe(false)
+  })
+
+  it("asks the server for the account's restrictions again on a pull", async () => {
+    mockRefetchCustodialRestrictions.mockResolvedValue(undefined)
+    // eslint-disable-next-line camelcase -- testing-library exposes this API verbatim
+    const { UNSAFE_getByType } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    await act(async () => {
+      await UNSAFE_getByType(RefreshControl).props.onRefresh()
+    })
+
+    expect(mockRefetchCustodialRestrictions).toHaveBeenCalledTimes(1)
+  })
+
+  /** The restrictions request has no transport timeout, so the pull must not wait on
+   *  it: the verdict lands whenever it lands. */
+  it("retracts the spinner without waiting for the restrictions verdict", async () => {
+    mockRefetchCustodialRestrictions.mockReturnValueOnce(new Promise(() => {}))
+    // eslint-disable-next-line camelcase -- testing-library exposes this API verbatim
+    const { UNSAFE_getByType } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    await act(async () => {
+      await UNSAFE_getByType(RefreshControl).props.onRefresh()
+    })
+
+    expect(mockRefetchCustodialRestrictions).toHaveBeenCalledTimes(1)
     expect(UNSAFE_getByType(RefreshControl).props.refreshing).toBe(false)
   })
 

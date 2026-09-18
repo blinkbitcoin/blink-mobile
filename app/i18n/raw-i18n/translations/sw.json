@@ -2582,7 +2582,8 @@
   },
   "StablesatsRestriction": {
     "walletLabel": "haipatikani katika eneo lako",
-    "anonModeWalletLabel": "haipatikani katika hali ya Incognito"
+    "anonModeWalletLabel": "haipatikani katika hali ya Incognito",
+    "unknownRegionWalletLabel": "haikuwezekana kukagua upatikanaji, vuta chini ili kujaribu tena"
   },
   "AnonModeConvertModal": {
     "title": "Hamisha kwanza salio lako la Dola",
@@ -2605,7 +2606,9 @@
     "contactSupport": "Wasiliana na usaidizi"
   },
   "DollarBalanceRestriction": {
-    "modalTitle": "Salio la dola haipatikani katika eneo lako"
+    "modalTitle": "Salio la dola haipatikani katika eneo lako",
+    "unknownRegionModalTitle": "Haikuwezekana kukagua upatikanaji wa salio la dola",
+    "unknownRegionModalBody": "Hatukuweza kukagua kama salio la dola linapatikana kwako. Vuta chini kwenye skrini ya mwanzo ili kujaribu tena."
   },
   "ConvertDollarToBitcoinModal": {
     "title": "Salio la dola haipatikani katika eneo lako",

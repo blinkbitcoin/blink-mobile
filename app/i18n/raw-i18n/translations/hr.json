@@ -2582,7 +2582,8 @@
   },
   "StablesatsRestriction": {
     "walletLabel": "nije dostupan u vašoj regiji",
-    "anonModeWalletLabel": "nije dostupno u Incognito načinu"
+    "anonModeWalletLabel": "nije dostupno u Incognito načinu",
+    "unknownRegionWalletLabel": "dostupnost nije bilo moguće provjeriti, povucite prema dolje za ponovni pokušaj"
   },
   "AnonModeConvertModal": {
     "title": "Najprije prenesite svoj dolarski saldo",
@@ -2605,7 +2606,9 @@
     "contactSupport": "Kontaktirajte podršku"
   },
   "DollarBalanceRestriction": {
-    "modalTitle": "Dolarski saldo nije dostupan u vašoj regiji"
+    "modalTitle": "Dolarski saldo nije dostupan u vašoj regiji",
+    "unknownRegionModalTitle": "Nije bilo moguće provjeriti dostupnost dolarskog salda",
+    "unknownRegionModalBody": "Nismo mogli provjeriti je li vam dolarski saldo dostupan. Povucite prema dolje na početnom zaslonu za ponovni pokušaj."
   },
   "ConvertDollarToBitcoinModal": {
     "title": "Dolarski saldo nije dostupan u vašoj regiji",

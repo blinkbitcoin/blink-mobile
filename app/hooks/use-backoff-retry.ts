@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useRef } from "react"
 
 type BackoffRetry = {
-  schedule: (retry: () => void) => void
+  /** False once the delays are spent, so a caller can tell a retry that is coming from
+   *  one that never will. */
+  schedule: (retry: () => void) => boolean
   reset: () => void
 }
 
@@ -18,7 +20,7 @@ export const useBackoffRetry = (delaysMs: readonly number[]): BackoffRetry => {
   const schedule = useCallback(
     (retry: () => void) => {
       const delay = delaysMs[attemptRef.current]
-      if (delay === undefined) return
+      if (delay === undefined) return false
       attemptRef.current += 1
 
       if (timerRef.current) clearTimeout(timerRef.current)
@@ -26,6 +28,7 @@ export const useBackoffRetry = (delaysMs: readonly number[]): BackoffRetry => {
         timerRef.current = null
         retry()
       }, delay)
+      return true
     },
     [delaysMs],
   )

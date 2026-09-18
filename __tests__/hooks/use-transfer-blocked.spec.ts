@@ -1,13 +1,19 @@
 import { renderHook } from "@testing-library/react-native"
 
+import {
+  GateReason,
+  RestrictionVerdict,
+  RestrictionVerdictStatus,
+} from "@app/types/account"
 import { AccountType } from "@app/types/wallet"
 
 const mockUseDeviceLocation = jest.fn()
 const mockUseRemoteConfig = jest.fn()
 let mockRemoteConfigReady = true
 const mockUseActiveWallet = jest.fn()
-const mockUseCustodialRestrictionsQuery = jest.fn()
-let mockIsAuthed = true
+let mockCustodialVerdict: RestrictionVerdict = {
+  status: RestrictionVerdictStatus.Pending,
+}
 
 jest.mock("@app/utils/ip-country-lookup")
 
@@ -34,31 +40,28 @@ jest.mock("@app/hooks/use-account-registry", () => ({
   useAccountRegistry: () => ({ loading: false }),
 }))
 
-jest.mock("@app/graphql/is-authed-context", () => ({
-  useIsAuthed: () => mockIsAuthed,
-}))
-
-jest.mock("@app/graphql/generated", () => ({
-  ...jest.requireActual("@app/graphql/generated"),
-  useCustodialRestrictionsQuery: (options: unknown) =>
-    mockUseCustodialRestrictionsQuery(options),
+jest.mock("@app/custodial/providers/restrictions", () => ({
+  ...jest.requireActual("@app/custodial/providers/restrictions"),
+  useCustodialRestrictions: () => ({
+    verdict: mockCustodialVerdict,
+  }),
 }))
 
 import { useTransferGate, useTransferGated } from "@app/hooks/use-transfer-blocked"
 
 /** The server's answer, for the custodial cases. Self-custodial is the setup default and
- *  never reaches the query. */
-const serverAnswers = (transfer: boolean, loading = false) =>
-  mockUseCustodialRestrictionsQuery.mockReturnValue({
-    data: { custodialRestrictions: { dollarBalance: false, transfer } },
-    loading,
-  })
+ *  never reads the verdict. */
+const serverAnswers = (transfer: boolean) => {
+  mockCustodialVerdict = {
+    status: RestrictionVerdictStatus.Served,
+    restrictions: { dollarBalance: false, transfer },
+  }
+}
 
 const setup = (): void => {
   jest.clearAllMocks()
   mockRemoteConfigReady = true
   mockIsAnonMode = false
-  mockIsAuthed = true
   mockUseDeviceLocation.mockReturnValue({ countryCode: undefined, source: undefined })
   mockUseRemoteConfig.mockReturnValue({
     selfCustodialDollarBalanceBlockedCountries: [],
@@ -112,10 +115,10 @@ describe("useTransferGated — region policy", () => {
     expect(read()).toBe(false)
   })
 
-  it("gates a custodial account the server did not answer for", () => {
-    // No region determined, no gated feature — UnknownRegionPolicy = FAIL_CLOSED.
+  it("gates a custodial account once asking has stopped working", () => {
+    // No region determined, no gated feature: UnknownRegionPolicy = FAIL_CLOSED.
     mockUseActiveWallet.mockReturnValue({ accountType: AccountType.Custodial })
-    mockUseCustodialRestrictionsQuery.mockReturnValue({ data: undefined, loading: false })
+    mockCustodialVerdict = { status: RestrictionVerdictStatus.Unknown }
 
     expect(read()).toBe(true)
   })
@@ -145,19 +148,23 @@ describe("useTransferGated — region policy", () => {
     it("reports the region as pending without claiming a gate", () => {
       mockUseDeviceLocation.mockReturnValue({ countryCode: undefined, loading: true })
 
-      expect(readGate()).toEqual({ isGated: false, isRegionPending: true })
+      expect(readGate()).toEqual({ isGated: false, isRegionPending: true, reason: null })
     })
 
     it("gates once the region resolves to a blocked country", () => {
       mockUseDeviceLocation.mockReturnValue({ countryCode: "FR", loading: false })
 
-      expect(readGate()).toEqual({ isGated: true, isRegionPending: false })
+      expect(readGate()).toEqual({
+        isGated: true,
+        isRegionPending: false,
+        reason: GateReason.Region,
+      })
     })
 
     it("settles ungated once the region resolves to an allowed country", () => {
       mockUseDeviceLocation.mockReturnValue({ countryCode: "AR", loading: false })
 
-      expect(readGate()).toEqual({ isGated: false, isRegionPending: false })
+      expect(readGate()).toEqual({ isGated: false, isRegionPending: false, reason: null })
     })
 
     /** Anon gates on the mode alone, so no region resolves and nothing pends. */
@@ -165,14 +172,41 @@ describe("useTransferGated — region policy", () => {
       mockIsAnonMode = true
       mockUseDeviceLocation.mockReturnValue({ countryCode: undefined, loading: false })
 
-      expect(readGate()).toEqual({ isGated: true, isRegionPending: false })
+      expect(readGate()).toEqual({
+        isGated: true,
+        isRegionPending: false,
+        reason: GateReason.Anon,
+      })
     })
 
     it("pends a custodial account while the server has not answered", () => {
       mockUseActiveWallet.mockReturnValue({ accountType: AccountType.Custodial })
-      serverAnswers(false, true)
+      mockCustodialVerdict = { status: RestrictionVerdictStatus.Pending }
 
-      expect(readGate()).toEqual({ isGated: false, isRegionPending: true })
+      expect(readGate()).toEqual({ isGated: false, isRegionPending: true, reason: null })
+    })
+
+    it("names the region once the server decides the block", () => {
+      mockUseActiveWallet.mockReturnValue({ accountType: AccountType.Custodial })
+      serverAnswers(true)
+
+      expect(readGate()).toEqual({
+        isGated: true,
+        isRegionPending: false,
+        reason: GateReason.Region,
+      })
+    })
+
+    /** The gate closes by policy, but the surface must not read it as a decided region. */
+    it("names the unknown region once asking has stopped working", () => {
+      mockUseActiveWallet.mockReturnValue({ accountType: AccountType.Custodial })
+      mockCustodialVerdict = { status: RestrictionVerdictStatus.Unknown }
+
+      expect(readGate()).toEqual({
+        isGated: true,
+        isRegionPending: false,
+        reason: GateReason.UnknownRegion,
+      })
     })
   })
 

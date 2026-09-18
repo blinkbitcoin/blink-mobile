@@ -2582,7 +2582,8 @@
   },
   "StablesatsRestriction": {
     "walletLabel": "není ve vašem regionu k dispozici",
-    "anonModeWalletLabel": "není k dispozici v režimu Incognito"
+    "anonModeWalletLabel": "není k dispozici v režimu Incognito",
+    "unknownRegionWalletLabel": "dostupnost se nepodařilo ověřit, potažením dolů to zkuste znovu"
   },
   "AnonModeConvertModal": {
     "title": "Nejprve převeďte svůj dolarový zůstatek",
@@ -2605,7 +2606,9 @@
     "contactSupport": "Kontaktovat podporu"
   },
   "DollarBalanceRestriction": {
-    "modalTitle": "Dolarový zůstatek není ve vašem regionu k dispozici"
+    "modalTitle": "Dolarový zůstatek není ve vašem regionu k dispozici",
+    "unknownRegionModalTitle": "Dostupnost dolarového zůstatku se nepodařilo ověřit",
+    "unknownRegionModalBody": "Nepodařilo se nám ověřit, zda je pro vás dolarový zůstatek k dispozici. Potažením dolů na domovské obrazovce to zkuste znovu."
   },
   "ConvertDollarToBitcoinModal": {
     "title": "Dolarový zůstatek není ve vašem regionu k dispozici",

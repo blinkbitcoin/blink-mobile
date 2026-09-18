@@ -52,8 +52,9 @@ import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useDefaultAccountModalShown } from "@app/hooks/use-default-account-modal-shown"
 import {
   useDollarBalanceGate,
-  useDollarBalanceRestricted,
+  useDollarBalanceRestriction,
 } from "@app/hooks/use-dollar-balance-restricted"
+import { useCustodialRestrictions } from "@app/custodial/providers/restrictions"
 import { useDollarBalanceForcedConversion } from "@app/hooks/use-dollar-balance-forced-conversion"
 import { useEnhancedModePrompt } from "@app/components/enhanced-mode-prompt"
 import { useRestrictedRegion } from "@app/components/restricted-region"
@@ -92,6 +93,7 @@ import {
   useSettingsScreenQuery,
   WalletCurrency,
 } from "@app/graphql/generated"
+import { GateReason } from "@app/types/account"
 import { AccountType } from "@app/types/wallet"
 import { useLevel } from "@app/graphql/level-context"
 
@@ -427,8 +429,18 @@ export const HomeScreen: React.FC = () => {
   const [isUpgradeModalVisible, setIsUpgradeModalVisible] = React.useState(false)
   const [isRestrictionModalVisible, setIsRestrictionModalVisible] = React.useState(false)
   /** Region-only: the forced-conversion escape must not fire in Anon Mode. */
-  const isDollarBalanceRestricted = useDollarBalanceRestricted()
-  const { isGated: isDollarBalanceGated, isRegionPending } = useDollarBalanceGate()
+  const {
+    isRestricted: isDollarBalanceRestricted,
+    isRegionDetermined: isDollarBalanceRegionDetermined,
+  } = useDollarBalanceRestriction()
+  const {
+    isGated: isDollarBalanceGated,
+    isRegionPending,
+    reason: dollarBalanceGateReason,
+  } = useDollarBalanceGate()
+  const isDollarBalanceRegionUnknown =
+    dollarBalanceGateReason === GateReason.UnknownRegion
+  const { refetch: refetchCustodialRestrictions } = useCustodialRestrictions()
   const { isAnonMode } = useSelfCustodialAccountMode()
   const { promptEnhancedMode, isEnhancedModePromptVisible } = useEnhancedModePrompt()
   const {
@@ -486,8 +498,11 @@ export const HomeScreen: React.FC = () => {
     : stableTokenConversionMinimum
 
   /** The sanctions block outranks the forced conversion: a sanctioned session must not
-   *  auto-present the convert modal over the restriction surfaces. */
-  const isForcedConversionEligible = isDollarBalanceRestricted && !isRestrictedRegion
+   *  auto-present the convert modal over the restriction surfaces. The conversion also
+   *  empties the user's dollar balance, so it waits for a region that actually decided the
+   *  restriction: an unanswered question may gate the balance but cannot justify that. */
+  const isForcedConversionEligible =
+    isDollarBalanceRestricted && isDollarBalanceRegionDetermined && !isRestrictedRegion
   const { isConvertModalVisible, closeConvertModal } = useDollarBalanceForcedConversion({
     accountId: activeAccount?.id,
     isRestricted: isForcedConversionEligible,
@@ -535,9 +550,10 @@ export const HomeScreen: React.FC = () => {
   const closeRestrictionModal = () => setIsRestrictionModalVisible(false)
   /** Anon outranks the region explanation (its remedy is switching modes), and the
    *  sanctions block outranks the compliance one (it is the stricter layer). The wind-down
-   *  nudge outranks the compliance modal in turn: that modal is a dead end (a title and a
-   *  Close), while an account whose custodial service is ending has one remedy, and both
-   *  gated surfaces are entry points a user hunting for it will try. `canReopen` is exactly
+   *  nudge outranks the compliance modal in turn, even its unknown-region variant with a
+   *  retry remedy: an account whose custodial service is ending has one remedy that
+   *  matters more, both gated surfaces are entry points a user hunting for it will try,
+   *  and the row's label still carries the retry advice on its own. `canReopen` is exactly
    *  "the migrate-now nudge can surface", so a region-gated account with no wind-down, or
    *  one whose self-custodial stack is off, still gets the compliance explanation. */
   const onGatedDollarTap = () => {
@@ -593,6 +609,11 @@ export const HomeScreen: React.FC = () => {
 
     if (!isAuthed) return
 
+    /** Asked again but not awaited: the verdict feeds nothing the pull shows, so the
+     *  spinner has no reason to wait on it, and a stalled socket on this request (the
+     *  link has no timeout) must not pin the spinner the balances already released. */
+    refetchCustodialRestrictions().catch(() => undefined)
+
     await Promise.all([
       refetchRealtimePrice(),
       refetchAuthed(),
@@ -608,6 +629,7 @@ export const HomeScreen: React.FC = () => {
     refetchPendingDeposits,
     refetchAuthed,
     refetchBulletins,
+    refetchCustodialRestrictions,
     refetchRealtimePrice,
     refetchUnauthed,
     triggerUpgradeModal,
@@ -808,6 +830,7 @@ export const HomeScreen: React.FC = () => {
       <DollarBalanceRestrictionModal
         isVisible={isRestrictionModalVisible}
         toggleModal={closeRestrictionModal}
+        isRegionUnknown={isDollarBalanceRegionUnknown}
       />
       {custodialConvertWallets && (
         <UsdConvertToBtcModal

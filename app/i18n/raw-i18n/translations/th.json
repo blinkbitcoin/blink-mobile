@@ -2582,7 +2582,8 @@
   },
   "StablesatsRestriction": {
     "walletLabel": "ไม่พร้อมใช้งานในภูมิภาคของคุณ",
-    "anonModeWalletLabel": "ไม่พร้อมใช้งานในโหมด Incognito"
+    "anonModeWalletLabel": "ไม่พร้อมใช้งานในโหมด Incognito",
+    "unknownRegionWalletLabel": "ไม่สามารถตรวจสอบความพร้อมใช้งานได้ ดึงลงเพื่อลองอีกครั้ง"
   },
   "AnonModeConvertModal": {
     "title": "โอนยอดคงเหลือดอลลาร์ของคุณก่อน",
@@ -2605,7 +2606,9 @@
     "contactSupport": "ติดต่อฝ่ายสนับสนุน"
   },
   "DollarBalanceRestriction": {
-    "modalTitle": "ยอดเงินดอลลาร์ไม่พร้อมใช้งานในภูมิภาคของคุณ"
+    "modalTitle": "ยอดเงินดอลลาร์ไม่พร้อมใช้งานในภูมิภาคของคุณ",
+    "unknownRegionModalTitle": "ไม่สามารถตรวจสอบความพร้อมใช้งานของยอดเงินดอลลาร์ได้",
+    "unknownRegionModalBody": "เราไม่สามารถตรวจสอบได้ว่ายอดเงินดอลลาร์พร้อมใช้งานสำหรับคุณหรือไม่ ดึงลงที่หน้าจอหลักเพื่อลองอีกครั้ง"
   },
   "ConvertDollarToBitcoinModal": {
     "title": "ยอดเงินดอลลาร์ไม่พร้อมใช้งานในภูมิภาคของคุณ",

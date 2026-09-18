@@ -2582,7 +2582,8 @@
   },
   "StablesatsRestriction": {
     "walletLabel": "no està disponible a la teva regió",
-    "anonModeWalletLabel": "no disponible en mode Incognito"
+    "anonModeWalletLabel": "no disponible en mode Incognito",
+    "unknownRegionWalletLabel": "no s'ha pogut comprovar la disponibilitat, llisca avall per tornar-ho a provar"
   },
   "AnonModeConvertModal": {
     "title": "Transfereix primer el teu saldo en dòlars",
@@ -2605,7 +2606,9 @@
     "contactSupport": "Contacta amb el suport"
   },
   "DollarBalanceRestriction": {
-    "modalTitle": "El saldo en dòlars no està disponible a la teva regió"
+    "modalTitle": "El saldo en dòlars no està disponible a la teva regió",
+    "unknownRegionModalTitle": "No s'ha pogut comprovar la disponibilitat del saldo en dòlars",
+    "unknownRegionModalBody": "No hem pogut comprovar si el saldo en dòlars està disponible per a tu. Llisca avall a la pantalla d'inici per tornar-ho a provar."
   },
   "ConvertDollarToBitcoinModal": {
     "title": "El saldo en dòlars no està disponible a la teva regió",

@@ -2582,7 +2582,8 @@
   },
   "StablesatsRestriction": {
     "walletLabel": "không khả dụng tại khu vực của bạn",
-    "anonModeWalletLabel": "không khả dụng ở chế độ Incognito"
+    "anonModeWalletLabel": "không khả dụng ở chế độ Incognito",
+    "unknownRegionWalletLabel": "không thể kiểm tra tình trạng khả dụng, kéo xuống để thử lại"
   },
   "AnonModeConvertModal": {
     "title": "Hãy chuyển số dư Đô la của bạn trước",
@@ -2605,7 +2606,9 @@
     "contactSupport": "Liên hệ hỗ trợ"
   },
   "DollarBalanceRestriction": {
-    "modalTitle": "Số dư đô la không khả dụng tại khu vực của bạn"
+    "modalTitle": "Số dư đô la không khả dụng tại khu vực của bạn",
+    "unknownRegionModalTitle": "Không thể kiểm tra tình trạng khả dụng của số dư đô la",
+    "unknownRegionModalBody": "Chúng tôi không thể kiểm tra liệu số dư đô la có khả dụng với bạn hay không. Kéo xuống trên màn hình chính để thử lại."
   },
   "ConvertDollarToBitcoinModal": {
     "title": "Số dư đô la không khả dụng tại khu vực của bạn",

@@ -2582,7 +2582,8 @@
   },
   "StablesatsRestriction": {
     "walletLabel": "tidak tersedia di wilayah Anda",
-    "anonModeWalletLabel": "tidak tersedia dalam mode Incognito"
+    "anonModeWalletLabel": "tidak tersedia dalam mode Incognito",
+    "unknownRegionWalletLabel": "ketersediaan tidak dapat diperiksa, tarik ke bawah untuk mencoba lagi"
   },
   "AnonModeConvertModal": {
     "title": "Transfer saldo Dolar Anda terlebih dahulu",
@@ -2605,7 +2606,9 @@
     "contactSupport": "Hubungi dukungan"
   },
   "DollarBalanceRestriction": {
-    "modalTitle": "Saldo dolar tidak tersedia di wilayah Anda"
+    "modalTitle": "Saldo dolar tidak tersedia di wilayah Anda",
+    "unknownRegionModalTitle": "Tidak dapat memeriksa ketersediaan saldo dolar",
+    "unknownRegionModalBody": "Kami tidak dapat memeriksa apakah saldo dolar tersedia untuk Anda. Tarik ke bawah di layar beranda untuk mencoba lagi."
   },
   "ConvertDollarToBitcoinModal": {
     "title": "Saldo dolar tidak tersedia di wilayah Anda",

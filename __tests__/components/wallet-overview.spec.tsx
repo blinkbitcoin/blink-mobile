@@ -7,6 +7,7 @@ import { WalletCurrency } from "@app/graphql/generated"
 import { HideAmountContextProvider } from "@app/graphql/hide-amount-context"
 import { IsAuthedContextProvider } from "@app/graphql/is-authed-context"
 import { WalletBalance } from "@app/graphql/wallets-utils"
+import { GateReason } from "@app/types/account"
 import { ContextForScreen } from "../screens/helper"
 import { flushEffects } from "../helpers/flush-effects"
 
@@ -23,12 +24,19 @@ jest.mock("@react-navigation/native", () => {
 
 const mockIsRestricted = jest.fn()
 let mockIsRegionPending = false
+let mockIsRegionDetermined = true
+/** The gate's own reading of a closed gate, mirrored so the label can be asserted per reason. */
+const mockGateReason = (): GateReason | null => {
+  if (mockIsAnonMode) return GateReason.Anon
+  if (!mockIsRestricted()) return null
+  return mockIsRegionDetermined ? GateReason.Region : GateReason.UnknownRegion
+}
 jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
-  useDollarBalanceRestricted: () => mockIsRestricted(),
   useDollarBalanceGated: () => mockIsAnonMode || mockIsRestricted(),
   useDollarBalanceGate: () => ({
     isGated: mockIsAnonMode || mockIsRestricted(),
     isRegionPending: mockIsRegionPending,
+    reason: mockGateReason(),
   }),
 }))
 
@@ -42,9 +50,6 @@ jest.mock("@app/components/restricted-region", () => ({
 }))
 
 let mockIsAnonMode = false
-jest.mock("@app/self-custodial/hooks/use-self-custodial-account-mode", () => ({
-  useSelfCustodialAccountMode: () => ({ isAnonMode: mockIsAnonMode }),
-}))
 
 const mockDisplayCurrency = jest.fn()
 jest.mock("@app/hooks/use-display-currency", () => ({
@@ -108,6 +113,7 @@ describe("WalletOverview", () => {
     jest.clearAllMocks()
     mockIsAnonMode = false
     mockIsRegionPending = false
+    mockIsRegionDetermined = true
     mockIsRestrictedRegion = false
     mockIsRestricted.mockReturnValue(false)
     mockDisplayCurrency.mockReturnValue("USD")
@@ -221,6 +227,53 @@ describe("WalletOverview", () => {
       expect(
         getByText("not available in your region", { includeHiddenElements: true }),
       ).toBeTruthy()
+    })
+
+    /** An unanswered query gates the row by policy but decided nothing about the region,
+     *  so the label says the check failed and how to ask again, never "your region". */
+    it("shows the retry label, not the region one, when asking has stopped working", async () => {
+      mockIsRestricted.mockReturnValue(true)
+      mockIsRegionDetermined = false
+      const emptyUsdWallets: readonly WalletBalance[] = [
+        { id: "btc-id", walletCurrency: WalletCurrency.Btc, balance: 174726 },
+        { id: "usd-id", walletCurrency: WalletCurrency.Usd, balance: 0 },
+      ]
+
+      const { getByText, queryByText } = renderOverview({
+        wallets: emptyUsdWallets,
+        onGatedTap: jest.fn(),
+      })
+      await flushEffects()
+
+      expect(
+        getByText("couldn't check availability, pull down to retry", {
+          includeHiddenElements: true,
+        }),
+      ).toBeTruthy()
+      expect(queryByText("not available in your region")).toBeNull()
+    })
+
+    /** A sanctioned row opens the sanctions modal on tap, so no pull can reopen it: the
+     *  region label stands even while the compliance query is unanswered. */
+    it("keeps the region label in a restricted region even when asking has stopped working", async () => {
+      mockIsRestrictedRegion = true
+      mockIsRestricted.mockReturnValue(true)
+      mockIsRegionDetermined = false
+      const emptyUsdWallets: readonly WalletBalance[] = [
+        { id: "btc-id", walletCurrency: WalletCurrency.Btc, balance: 174726 },
+        { id: "usd-id", walletCurrency: WalletCurrency.Usd, balance: 0 },
+      ]
+
+      const { getByText, queryByText } = renderOverview({
+        wallets: emptyUsdWallets,
+        onGatedTap: jest.fn(),
+      })
+      await flushEffects()
+
+      expect(
+        getByText("not available in your region", { includeHiddenElements: true }),
+      ).toBeTruthy()
+      expect(queryByText("couldn't check availability, pull down to retry")).toBeNull()
     })
 
     it("shows the Incognito mode label when the mode is Anon and the balance is empty", async () => {

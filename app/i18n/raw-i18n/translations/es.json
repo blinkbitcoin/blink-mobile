@@ -2582,7 +2582,8 @@
     },
     "StablesatsRestriction": {
         "walletLabel": "no está disponible en tu región",
-        "anonModeWalletLabel": "no disponible en modo Incognito"
+        "anonModeWalletLabel": "no disponible en modo Incognito",
+        "unknownRegionWalletLabel": "no se pudo comprobar la disponibilidad, desliza hacia abajo para reintentar"
     },
     "AnonModeConvertModal": {
         "title": "Transfiere primero tu saldo en dólares",
@@ -2605,7 +2606,9 @@
         "contactSupport": "Contactar a soporte"
     },
     "DollarBalanceRestriction": {
-        "modalTitle": "El saldo en dólares no está disponible en tu región"
+        "modalTitle": "El saldo en dólares no está disponible en tu región",
+        "unknownRegionModalTitle": "No se pudo comprobar la disponibilidad del saldo en dólares",
+        "unknownRegionModalBody": "No pudimos comprobar si el saldo en dólares está disponible para ti. Desliza hacia abajo en la pantalla de inicio para intentarlo de nuevo."
     },
     "ConvertDollarToBitcoinModal": {
         "title": "El saldo en dólares no está disponible en tu región",
