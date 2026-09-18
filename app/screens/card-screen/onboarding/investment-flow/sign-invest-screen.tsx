@@ -167,8 +167,9 @@ export const SignInvestScreen: React.FC = () => {
     [],
   )
 
-  /** The service's own origin, which also serves the page that posts the outcome back,
-   *  so it is both what mints the envelope and the origin those events come from. */
+  /** The service's own origin, which is what mints the envelope. It also serves the
+   *  page that posts the outcome back, but a WebView message carries no origin, so the
+   *  library cannot check it on this platform and the session is not told one. */
   const mintOrigin = resolveMintOrigin(galoyInstance.esignMintUrl)
 
   /**
@@ -183,7 +184,6 @@ export const SignInvestScreen: React.FC = () => {
   const source = React.useMemo(
     () =>
       createHostedFormSource({
-        allowedOrigin: mintOrigin,
         createInstance: async () => {
           const { token: session, fields, usdPerSat: price } = mintInputs.current
 
@@ -282,17 +282,17 @@ export const SignInvestScreen: React.FC = () => {
   React.useEffect(() => {
     if (!isSigning) {
       setIsPageReady(false)
-  /** While covered, the page is kept out of the accessibility tree too, so a screen
-   *  reader cannot land on a form the signer cannot yet see. Android and iOS each have
-   *  their own prop for it. */
-  const isPageCovered = !isPageReady
-  const webViewAccessibilityImportance = isPageCovered ? "no-hide-descendants" : "auto"
-
       return
     }
     const uncover = setTimeout(() => setIsPageReady(true), PAGE_READY_TIMEOUT_MS)
     return () => clearTimeout(uncover)
   }, [isSigning])
+
+  /** While covered, the page is kept out of the accessibility tree too, so a screen
+   *  reader cannot land on a form the signer cannot yet see. Android and iOS each have
+   *  their own prop for it. */
+  const isPageCovered = !isPageReady
+  const webViewAccessibilityImportance = isPageCovered ? "no-hide-descendants" : "auto"
 
   /** The one spinner this step shows, whether the session is being opened or the
    *  page is still drawing. */

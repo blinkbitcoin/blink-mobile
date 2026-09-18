@@ -28,8 +28,9 @@ const ENVELOPE_INSTANCE_PATH = "/envelope/instance"
 const LOCAL_MINT_ORIGIN = `http://${scriptHostname()}:4100`
 
 /**
- * The origin serving the mint, which also serves the page the signing outcome comes back
- * through, so one origin covers both the call and the events the signing page posts.
+ * The origin serving the mint. It also serves the page the signing outcome comes back
+ * through, though on this platform the events that page posts are not checked against
+ * it, so the origin is only what the call is made to.
  *
  * While no instance names one, a debug build falls back to a service on the developer's
  * own machine, which is what lets the flow be exercised before the service is deployed.
