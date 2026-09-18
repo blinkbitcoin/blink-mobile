@@ -32,7 +32,7 @@ const useStyles = makeStyles(({ colors }) => ({
   titleStyle: {
     fontSize: 20,
     lineHeight: 24,
-    fontWeight: "600",
+    fontWeight: "700",
     color: colors.white,
   },
   disabledTitleStyle: {

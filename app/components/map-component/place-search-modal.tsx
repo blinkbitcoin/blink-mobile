@@ -20,6 +20,7 @@ import {
 } from "@app/btcmap"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { fonts } from "@app/rne-theme/fonts"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
 // Long enough that a common word still reaches past the shop next door, short
@@ -286,7 +287,7 @@ const useStyles = makeStyles(({ colors }, { topInset, bottomInset }: StyleProps)
   },
   retry: {
     fontSize: 14,
-    fontWeight: "600",
+    fontFamily: fonts.bold,
     color: colors.primary,
   },
 }))
