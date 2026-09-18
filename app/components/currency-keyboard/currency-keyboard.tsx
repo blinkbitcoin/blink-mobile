@@ -1,9 +1,10 @@
-import React, { Ref, useEffect, useState } from "react"
+import React, { Ref, useEffect, useRef, useState } from "react"
 import { makeStyles, Text } from "@rn-vui/themed"
 import { Pressable, View } from "react-native"
 
-import { radius } from "@app/rne-theme/radius"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { radius } from "@app/rne-theme/radius"
+import { haptics } from "@app/utils/haptics"
 import { testProps } from "@app/utils/testProps"
 import { GaloyIcon } from "../atomic/galoy-icon"
 import { Key as KeyType } from "../amount-input-screen/number-pad-reducer"
@@ -13,7 +14,8 @@ const KEY_ROW_PREFIX = "row-"
 const KEY_TEST_ID_PREFIX = "Key"
 
 type CurrencyKeyboardProps = {
-  onPress: (pressed: KeyType) => void
+  /** Returns whether the press changed the amount: a refused key stays silent. */
+  onPress: (pressed: KeyType) => boolean
   safeMode?: boolean
   disabledKeys?: ReadonlySet<KeyType>
   disabled?: boolean
@@ -68,7 +70,7 @@ const Key = ({
   pressableRef,
 }: {
   numberPadKey: KeyType
-  handleKeyPress: (key: KeyType) => void
+  handleKeyPress: (key: KeyType) => boolean
   safeMode?: boolean
   disabled?: boolean
   pressableRef?: Ref<View>
@@ -78,12 +80,23 @@ const Key = ({
   const isBackspace = numberPadKey === KeyType.Backspace
 
   const [timerId, setTimerId] = useState<NodeJS.Timeout | null>(null)
+  /** One haptic per gesture: a held backspace deletes repeatedly but buzzes once. */
+  const hasTapped = useRef(false)
 
-  const handleBackSpacePressIn = (key: KeyType) => {
+  const press = (key: KeyType) => {
+    const accepted = handleKeyPress(key)
+    if (accepted && !hasTapped.current) {
+      hasTapped.current = true
+      haptics.tap()
+    }
+  }
+
+  const handlePressIn = (key: KeyType) => {
+    hasTapped.current = false
     if (safeMode) return
     if (key !== KeyType.Backspace) return
     const id = setInterval(() => {
-      handleKeyPress(key)
+      press(key)
     }, 300)
     setTimerId(id)
   }
@@ -112,8 +125,8 @@ const Key = ({
         disabled && styles.keyDisabled,
         pressed && styles.keyPressedBg,
       ]}
-      onPressIn={() => handleBackSpacePressIn(numberPadKey)}
-      onPress={() => handleKeyPress(numberPadKey)}
+      onPressIn={() => handlePressIn(numberPadKey)}
+      onPress={() => press(numberPadKey)}
       onPressOut={handleBackSpacePressOut}
       {...testProps(`${KEY_TEST_ID_PREFIX} ${numberPadKey}`)}
       accessibilityRole="button"
