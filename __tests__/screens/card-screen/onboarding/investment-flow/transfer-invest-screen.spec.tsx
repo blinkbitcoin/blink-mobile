@@ -43,14 +43,19 @@ const mockCardInvestmentProgress: {
   } | null
 } = { current: null }
 const mockRecordInvoice = jest.fn()
+/** Whether the active account can take part: false for a self-custodial one. */
+const mockIsEligible = { current: true }
 
 jest.mock("@app/hooks/use-card-investment-progress", () => ({
   armCardInvestmentPayment: (...args: unknown[]) => mockArmCardInvestmentPayment(...args),
   useCardInvestmentProgress: () => ({
     progress: mockCardInvestmentProgress.current,
     recordInvoice: (...args: unknown[]) => mockRecordInvoice(...args),
+    isEligible: mockIsEligible.current,
   }),
 }))
+
+const mockDispatch = jest.fn()
 
 /** Whether the step is still in front when the invoice comes back. */
 const mockIsFocused = { current: true }
@@ -113,6 +118,7 @@ jest.mock("@react-navigation/native", () => {
     ...actualNav,
     useNavigation: () => ({
       navigate: mockNavigate,
+      dispatch: mockDispatch,
       isFocused: () => mockIsFocused.current,
     }),
     useRoute: () => ({ params: mockRouteParams.current }),
@@ -126,6 +132,7 @@ describe("TransferInvestScreen", () => {
     mockDepositWalletId.current = "wallet-invest"
     mockCardInvestmentProgress.current = null
     mockIsFocused.current = true
+    mockIsEligible.current = true
     mockRequestInvoice.mockResolvedValue({ paymentRequest: "lnbc-invoice" })
     mockFunding.current = {
       balanceUsd: 0,
@@ -135,6 +142,46 @@ describe("TransferInvestScreen", () => {
       isLoading: false,
     }
     jest.clearAllMocks()
+  })
+
+  /** The step can be reached by link with an amount in it, and would issue an invoice
+   *  for that amount with no agreement behind it; an account that cannot take part in
+   *  the investment is sent home before it can, and never asked for one. */
+  it("sends a self-custodial account home instead of issuing an invoice", async () => {
+    mockIsEligible.current = false
+    mockFunding.current = {
+      balanceUsd: SELECTED_AMOUNT_USD,
+      shortfallUsd: 0,
+      hasEnoughBalance: true,
+      totalSats: 31_704_000,
+      isLoading: false,
+    }
+
+    render(
+      <ContextForScreen>
+        <TransferInvestScreen />
+      </ContextForScreen>,
+    )
+    await act(async () => {})
+
+    expect(mockDispatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "RESET",
+        payload: { index: 0, routes: [{ name: "Primary" }] },
+      }),
+    )
+    expect(mockRequestInvoice).not.toHaveBeenCalled()
+  })
+
+  it("keeps a custodial account on the step", async () => {
+    render(
+      <ContextForScreen>
+        <TransferInvestScreen />
+      </ContextForScreen>,
+    )
+    await act(async () => {})
+
+    expect(mockDispatch).not.toHaveBeenCalled()
   })
 
   it("renders without crashing", async () => {
