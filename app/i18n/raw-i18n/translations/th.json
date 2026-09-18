@@ -2409,10 +2409,11 @@
     "title": "ส่งบิตคอยน์",
     "failedToFetchLnurlInvoice": "ไม่สามารถดึง lnurl invoice มาได้",
     "lnurlInvoiceIncorrectAmount": "เซิร์ฟเวอร์ lnurl ตอบสนองกับ invoice ด้วยจำนวนเงินที่ไม่ถูกต้อง",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "แจ้งเตือนค่าธรรมเนียมสูง!",
-      "content": "ค่าธรรมเนียมของคุณสูงกว่าจำนวนที่ส่งมากกว่า 50% คุณแน่ใจหรือไม่ว่าต้องการดำเนินการต่อ?\n\nเพื่อลดค่าธรรมเนียม ให้ขอให้ผู้รับยอมรับธุรกรรมผ่าน Lightning",
-      "confirmButton": "ฉันมั่นใจ 100%"
+      "body": "ค่าธรรมเนียมของคุณเท่ากับ 50% หรือมากกว่าของจำนวนที่คุณส่ง แน่ใจหรือไม่ว่าต้องการดำเนินการต่อ?",
+      "cancelPayment": "ยกเลิกการชำระเงิน",
+      "acceptFee": "ยอมรับค่าธรรมเนียม"
     },
     "copiedDestination": "คัดลอกปลายทางไปยังคลิปบอร์ดแล้ว",
     "pendingPayment": "การชำระเงินถูกส่งแล้ว แต่ยังไม่ได้รับการยืนยัน\n\nอาจเป็นไปได้ว่าการชำระเงินจะไม่ได้รับการยืนยัน ในกรณีนั้นเงินจะถูกคืนสู่บัญชีของคุณ",
@@ -2432,9 +2433,9 @@
     "time": "เวลา",
     "type": "ประเภท",
     "feeTier": "ลำดับความสำคัญของธุรกรรม",
-    "fast": "เร็ว",
-    "medium": "ปานกลาง",
-    "slow": "ช้า",
+    "fast": "ด่วน",
+    "medium": "มาตรฐาน",
+    "slow": "ประหยัด",
     "recommended": "แนะนำ",
     "walletOffline": "กระเป๋าเงินของคุณออฟไลน์ กรุณาตรวจสอบการเชื่อมต่อและลองอีกครั้ง",
     "sdkInsufficientFunds": "ยอดเงินไม่เพียงพอสำหรับธุรกรรมนี้",
@@ -4085,9 +4086,6 @@
     "refundFailed": "Refund failed: {error}",
     "refundAddress": "Bitcoin address for refund",
     "feeRate": "Network fee",
-    "feeRateFastest": "Fastest (~{sats} sats) ~10 min",
-    "feeRateHalfHour": "Normal (~{sats} sats) ~30 min",
-    "feeRateHour": "Economy (~{sats} sats) ~60 min",
     "feeRateUnit": "{rate} sat/vB",
     "feeRateUnavailable": "ไม่สามารถโหลดค่าธรรมเนียมเครือข่ายได้ โปรดตรวจสอบการเชื่อมต่อและลองอีกครั้ง",
     "refundNow": "คืนเงินตอนนี้",

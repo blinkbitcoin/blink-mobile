@@ -2409,10 +2409,11 @@
     "title": "Odeslat Bitcoin",
     "failedToFetchLnurlInvoice": "Nepodařilo se načíst lnurl fakturu",
     "lnurlInvoiceIncorrectAmount": "Server lnurl odpověděl fakturou s nesprávnou částkou.",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "Upozornění na vysoký poplatek!",
-      "content": "Váš poplatek je více než o 50 % vyšší než odesílaná částka. Opravdu chcete pokračovat?\n\nPro snížení poplatků požádejte příjemce, aby přijal transakci přes Lightning",
-      "confirmButton": "Jsem si 100% jistý/á"
+      "body": "Váš poplatek je 50 % nebo více z odesílané částky. Opravdu chcete pokračovat?",
+      "cancelPayment": "Zrušit platbu",
+      "acceptFee": "Přijmout poplatek"
     },
     "copiedDestination": "Cíl zkopírován do schránky",
     "pendingPayment": "Platba byla odeslána, ale dosud nebyla potvrzena.\n\nJe možné, že platba nebude potvrzena a v takovém případě budou prostředky vráceny na váš účet.",
@@ -2432,9 +2433,9 @@
     "time": "Čas",
     "type": "Typ",
     "feeTier": "Priorita transakce",
-    "fast": "Rychlý",
-    "medium": "Střední",
-    "slow": "Pomalý",
+    "fast": "Prioritní",
+    "medium": "Standardní",
+    "slow": "Ekonomický",
     "recommended": "Doporučeno",
     "walletOffline": "Vaše peněženka je offline. Zkontrolujte prosím připojení a zkuste to znovu.",
     "sdkInsufficientFunds": "Nedostatek prostředků pro tuto transakci.",
@@ -4085,9 +4086,6 @@
     "refundFailed": "Refund failed: {error}",
     "refundAddress": "Bitcoin address for refund",
     "feeRate": "Network fee",
-    "feeRateFastest": "Fastest (~{sats} sats) ~10 min",
-    "feeRateHalfHour": "Normal (~{sats} sats) ~30 min",
-    "feeRateHour": "Economy (~{sats} sats) ~60 min",
     "feeRateUnit": "{rate} sat/vB",
     "feeRateUnavailable": "Nepodařilo se načíst síťové poplatky. Zkontrolujte připojení a zkuste to znovu.",
     "refundNow": "Vrátit nyní",

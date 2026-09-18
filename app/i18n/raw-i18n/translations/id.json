@@ -2409,10 +2409,11 @@
     "title": "Kirim Bitcoin",
     "failedToFetchLnurlInvoice": "Gagal mengambil faktur lnurl",
     "lnurlInvoiceIncorrectAmount": "Server lnurl merespons dengan faktur dengan jumlah yang salah.",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "Peringatan biaya tinggi!",
-      "content": "Biaya Anda lebih dari 50% lebih besar dari jumlah yang dikirim. Apakah Anda yakin ingin melanjutkan?\n\nUntuk mengurangi biaya, mintalah penerima menerima transaksi melalui Lightning.",
-      "confirmButton": "Saya 100% yakin"
+      "body": "Biaya Anda 50% atau lebih dari jumlah yang Anda kirim. Yakin ingin melanjutkan?",
+      "cancelPayment": "Batalkan pembayaran",
+      "acceptFee": "Terima biaya"
     },
     "copiedDestination": "Tujuan disalin ke papan klip",
     "pendingPayment": "Pembayaran telah dikirim, tetapi belum dikonfirmasi.\n\nAda kemungkinan pembayaran tidak akan dikonfirmasi, dalam hal ini dana akan dikembalikan ke akun Anda.",
@@ -2432,9 +2433,9 @@
     "time": "Waktu",
     "type": "Jenis",
     "feeTier": "Prioritas transaksi",
-    "fast": "Cepat",
-    "medium": "Sedang",
-    "slow": "Lambat",
+    "fast": "Prioritas",
+    "medium": "Standar",
+    "slow": "Ekonomis",
     "recommended": "Direkomendasikan",
     "walletOffline": "Dompet Anda sedang offline. Silakan periksa koneksi Anda dan coba lagi.",
     "sdkInsufficientFunds": "Dana tidak cukup untuk transaksi ini.",
@@ -4085,9 +4086,6 @@
     "refundFailed": "Refund failed: {error}",
     "refundAddress": "Bitcoin address for refund",
     "feeRate": "Network fee",
-    "feeRateFastest": "Fastest (~{sats} sats) ~10 min",
-    "feeRateHalfHour": "Normal (~{sats} sats) ~30 min",
-    "feeRateHour": "Economy (~{sats} sats) ~60 min",
     "feeRateUnit": "{rate} sat/vB",
     "feeRateUnavailable": "Tidak dapat memuat biaya jaringan. Periksa koneksi Anda dan coba lagi.",
     "refundNow": "Kembalikan sekarang",

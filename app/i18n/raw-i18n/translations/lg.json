@@ -2409,10 +2409,11 @@
     "title": "Sindika Bitcoin",
     "failedToFetchLnurlInvoice": "Tulemereddwa okufuna yinivoyisi ya lnurl",
     "lnurlInvoiceIncorrectAmount": "Server ya lnurl yazzeemu ne yinivoyisi n'omuwendo ogutali mutuufu.",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "Okulabula ku bisale ebingi!",
-      "content": "Ssente zo zisukka ebitundu 50% okusinga ssente eziweerezeddwa. Okakasa nti oyagala kugenda mu maaso?\n\nOkukendeeza ku bisale, saba oyo afuna ssente akkirize okutunda ng’oyita mu Lightning",
-      "confirmButton": "Nkakasa ebitundu 100%"
+      "body": "Ssente z'osasula ziri 50% oba okusingawo ku ssente z'oweereza. Okakasa nti oyagala okugenda mu maaso?",
+      "cancelPayment": "Sazaamu okusasula",
+      "acceptFee": "Kkiriza sente"
     },
     "copiedDestination": "Gy'eziraga wawanduukuluddwa ku lutimbe",
     "pendingPayment": "Ensasula eno eweerezeddwa, naye tennaba kukakasa.\n\nKisoboka okusasula tekujja kukakasa, mu mbeera eyo ssente zijja kuddizibwa ku akawunti yo.",
@@ -2432,9 +2433,9 @@
     "time": "Obudde",
     "type": "Ekika",
     "feeTier": "Obukulu bw'entambula",
-    "fast": "Mangu",
-    "medium": "Wakati",
-    "slow": "Mpola",
+    "fast": "Eyasooka",
+    "medium": "Eya bulijjo",
+    "slow": "Ey'omuwendo omutono",
     "recommended": "Kirungi",
     "walletOffline": "Wallet yo eri offline. Kebera ennyukuta yo oddemu ogezeko.",
     "sdkInsufficientFunds": "Ssente tezimala ku mulimu guno.",
@@ -4085,9 +4086,6 @@
     "refundFailed": "Refund failed: {error}",
     "refundAddress": "Bitcoin address for refund",
     "feeRate": "Network fee",
-    "feeRateFastest": "Fastest (~{sats} sats) ~10 min",
-    "feeRateHalfHour": "Normal (~{sats} sats) ~30 min",
-    "feeRateHour": "Economy (~{sats} sats) ~60 min",
     "feeRateUnit": "{rate} sat/vB",
     "feeRateUnavailable": "Tewasobola kutikka ssente z'omukutu. Kebera enkolagana yo era oddemu okugezaako.",
     "refundNow": "Zzaayo kati",

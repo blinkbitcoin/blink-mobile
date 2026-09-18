@@ -2409,10 +2409,11 @@
     "title": "Bitcoin kawsayniyta qillqata sutichinaqinmi kaniyta rikuchiy",
     "failedToFetchLnurlInvoice": "Lnurl kawsayniyta qillqata sutichinaqinmi chimpuyta mana kaniyta rikuchiy.",
     "lnurlInvoiceIncorrectAmount": "Lnurl serverpi kawsayniyta qillqata sutichqinmi, ñuqaqa ch'usaqiy kawsayniyta qillqata sutichinaqinmi kaniyta rikuyta munanpi, chaynamanta k'anchaypi mana kaniyta rikuchiy.",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "¡Hatun comisión willakuy!",
-      "content": "Comisiónniyki apachisqa yupaymanta 50% aswan hatunmi. ¿Chiqaptachu qatipayta munankí?\n\nComisionkunata pisiyachinapaq, chaskiqta Lightning nisqapi chaskikunanta mañay",
-      "confirmButton": "100% seguro kashani"
+      "body": "Comisiónniyki kachanqa 50% utaq aswan kachasqayki qullqimanta. ¿Chiqachu purichiyta munanki?",
+      "cancelPayment": "Pagota t'akuy",
+      "acceptFee": "Comisiónta chaskiy"
     },
     "copiedDestination": "Mayman rinanta clipboard nisqaman churasqa",
     "pendingPayment": "Pagota apachisqaña, ichaqa manaraq chiqapchasqachu.\n\nPagoqa mana chiqapchakuyta atinmanchu, chaypiqa qullqiqa cuentaykiman kutinqa.",
@@ -2432,9 +2433,9 @@
     "time": "Pacha",
     "type": "Laya",
     "feeTier": "Apachiypa ñawpaqnin",
-    "fast": "Usqhay",
-    "medium": "Chawpi",
-    "slow": "Allillamanta",
+    "fast": "Ñawpaq",
+    "medium": "Sapsi",
+    "slow": "Pisi chaniyuq",
     "recommended": "Allin",
     "walletOffline": "Qullqi wasi offline kachkan. Ama hina t'inkisqaykita qhaway hinaspa wakmanta ñit'iy.",
     "sdkInsufficientFunds": "Mana kaniyuqchu kay ruwaykunapaq.",
@@ -4085,9 +4086,6 @@
     "refundFailed": "Refund failed: {error}",
     "refundAddress": "Bitcoin address for refund",
     "feeRate": "Network fee",
-    "feeRateFastest": "Fastest (~{sats} sats) ~10 min",
-    "feeRateHalfHour": "Normal (~{sats} sats) ~30 min",
-    "feeRateHour": "Economy (~{sats} sats) ~60 min",
     "feeRateUnit": "{rate} sat/vB",
     "feeRateUnavailable": "Mana atikurqachu red kustukunata wakichiyta. Tinkichakuyta qhaway, kutispa ruway.",
     "refundNow": "Kunan kutichiy",

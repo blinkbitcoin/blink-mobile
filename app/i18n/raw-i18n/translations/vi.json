@@ -2409,10 +2409,11 @@
     "title": "Gửi Bitcoin",
     "failedToFetchLnurlInvoice": "Không lấy được hóa đơn lnurl",
     "lnurlInvoiceIncorrectAmount": "Máy chủ LNURL phản hồi với một hóa đơn có số tiền không chính xác.",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "Cảnh báo phí cao!",
-      "content": "Phí của bạn lớn hơn 50% so với số tiền gửi. Bạn có chắc muốn tiếp tục không?\n\nĐể giảm phí, hãy yêu cầu người nhận chấp nhận giao dịch qua Lightning",
-      "confirmButton": "Tôi chắc chắn 100%"
+      "body": "Phí của bạn bằng 50% trở lên so với số tiền bạn gửi. Bạn có chắc muốn tiếp tục không?",
+      "cancelPayment": "Hủy thanh toán",
+      "acceptFee": "Chấp nhận phí"
     },
     "copiedDestination": "Đã sao chép địa chỉ đích vào bộ nhớ tạm",
     "pendingPayment": "Khoản thanh toán đã được gửi nhưng chưa được xác nhận.\n\nCó thể khoản thanh toán sẽ không được xác nhận, trong trường hợp đó tiền sẽ được trả lại tài khoản của bạn.",
@@ -2432,9 +2433,9 @@
     "time": "Thời gian",
     "type": "Loại",
     "feeTier": "Độ ưu tiên giao dịch",
-    "fast": "Nhanh",
-    "medium": "Trung bình",
-    "slow": "Chậm",
+    "fast": "Ưu tiên",
+    "medium": "Tiêu chuẩn",
+    "slow": "Tiết kiệm",
     "recommended": "Đề xuất",
     "walletOffline": "Ví của bạn đang ngoại tuyến. Vui lòng kiểm tra kết nối và thử lại.",
     "sdkInsufficientFunds": "Không đủ số dư cho giao dịch này.",
@@ -4085,9 +4086,6 @@
     "refundFailed": "Refund failed: {error}",
     "refundAddress": "Bitcoin address for refund",
     "feeRate": "Network fee",
-    "feeRateFastest": "Fastest (~{sats} sats) ~10 min",
-    "feeRateHalfHour": "Normal (~{sats} sats) ~30 min",
-    "feeRateHour": "Economy (~{sats} sats) ~60 min",
     "feeRateUnit": "{rate} sat/vB",
     "feeRateUnavailable": "Không thể tải phí mạng. Vui lòng kiểm tra kết nối và thử lại.",
     "refundNow": "Hoàn tiền ngay",

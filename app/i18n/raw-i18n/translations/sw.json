@@ -2409,10 +2409,11 @@
     "title": "Tuma Bitcoin",
     "failedToFetchLnurlInvoice": "Imeshindwa kupata ankara ya malipo ya lnurl",
     "lnurlInvoiceIncorrectAmount": "Seva ya lnurl ilijibu na ankara ya malipo yenye kiasi batili",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "Onyo la ada kubwa!",
-      "content": "Ada yako ni zaidi ya 50% zaidi ya kiasi kilichotumwa. Una uhakika unataka kuendelea?\n\nIli kupunguza ada, omba mpokeaji akubali muamala kupitia Lightning",
-      "confirmButton": "Nina uhakika 100%"
+      "body": "Ada yako ni 50% au zaidi ya kiasi unachotuma. Una uhakika unataka kuendelea?",
+      "cancelPayment": "Ghairi malipo",
+      "acceptFee": "Kubali ada"
     },
     "copiedDestination": "Imeakiliwa marudio kwenye ubao wa kunakili",
     "pendingPayment": "Ada kubwa! Tunapendekeza Umeme.\n\nInawezekana malipo hayatathibitisha, katika hali ambayo pesa zitarejeshwa kwenye akaunti yako.",
@@ -2432,9 +2433,9 @@
     "time": "Muda",
     "type": "Aina",
     "feeTier": "Kipaumbele cha muamala",
-    "fast": "Haraka",
-    "medium": "Wastani",
-    "slow": "Polepole",
+    "fast": "Kipaumbele",
+    "medium": "Kawaida",
+    "slow": "Nafuu",
     "recommended": "Inapendekezwa",
     "walletOffline": "Pochi yako haiko mtandaoni. Tafadhali angalia muunganisho wako na ujaribu tena.",
     "sdkInsufficientFunds": "Fedha hazitoshi kwa muamala huu.",
@@ -4085,9 +4086,6 @@
     "refundFailed": "Refund failed: {error}",
     "refundAddress": "Bitcoin address for refund",
     "feeRate": "Network fee",
-    "feeRateFastest": "Fastest (~{sats} sats) ~10 min",
-    "feeRateHalfHour": "Normal (~{sats} sats) ~30 min",
-    "feeRateHour": "Economy (~{sats} sats) ~60 min",
     "feeRateUnit": "{rate} sat/vB",
     "feeRateUnavailable": "Imeshindwa kupakia ada za mtandao. Tafadhali angalia muunganisho wako na ujaribu tena.",
     "refundNow": "Rudisha sasa",

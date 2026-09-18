@@ -2344,3 +2344,167 @@ describe("SendBitcoinConfirmationScreen — error message sheet", () => {
     })
   })
 })
+
+describe("SendBitcoinConfirmationScreen — high-fee sheet (blink-wip#1323)", () => {
+  const HIGH_FEE_SHEET_TEST_ID = "high-fee-sheet"
+  let LL: ReturnType<typeof i18nObject>
+
+  /** $100.00 to a Lightning address, settled in cents. */
+  const lightningRoute = {
+    key: "sendBitcoinConfirmationScreen",
+    name: "sendBitcoinConfirmation",
+    params: {
+      paymentDetail:
+        PaymentDetailsLightning.createLnurlPaymentDetails(defaultLightningParams),
+    },
+  } as const
+
+  const onchainRoute = {
+    ...lightningRoute,
+    params: {
+      paymentDetail: { ...lightningRoute.params.paymentDetail, paymentType: "onchain" },
+    },
+  } as unknown as typeof lightningRoute
+
+  const quoteFee = (cents: number) =>
+    mockUseFee.mockReturnValue({
+      status: "set",
+      amount: { amount: cents, currency: WalletCurrency.Usd, currencyCode: "USD" },
+    })
+
+  const renderReview = async (paymentRoute = lightningRoute) => {
+    render(
+      <ContextForScreen>
+        <Intraledger route={paymentRoute as never} />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+  }
+
+  const highFeeSheet = () => screen.queryByTestId(HIGH_FEE_SHEET_TEST_ID)
+  const sheetButton = (label: string) =>
+    within(screen.getByTestId(HIGH_FEE_SHEET_TEST_ID)).getByText(label)
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    loadLocale("en")
+    LL = i18nObject("en")
+    useActiveWalletMock.mockReturnValue({
+      isSelfCustodial: false,
+      isReady: true,
+      needsBackendAuth: false,
+      wallets: [],
+      status: "ready",
+      accountType: "Custodial",
+    })
+    mockUseSendPayment.mockReturnValue({
+      loading: false,
+      hasAttemptedSend: false,
+      sendPayment: sendPaymentMock,
+    })
+    mockUseSendBalances.mockReturnValue({
+      btcWallet: {
+        id: "btc-wallet-id",
+        balance: 500000,
+        walletCurrency: WalletCurrency.Btc,
+      },
+      usdWallet: {
+        id: "usd-wallet-id",
+        balance: 1000000,
+        walletCurrency: WalletCurrency.Usd,
+      },
+    })
+  })
+
+  it("opens once a Lightning fee of half the amount lands", async () => {
+    quoteFee(5000)
+    await renderReview()
+
+    expect(highFeeSheet()).toBeTruthy()
+    expect(sheetButton(LL.SendBitcoinScreen.highFeeSheet.title())).toBeTruthy()
+    expect(sheetButton(LL.SendBitcoinScreen.highFeeSheet.acceptFee())).toBeTruthy()
+  })
+
+  it("opens on a self-custodial Lightning send too", async () => {
+    useActiveWalletMock.mockReturnValue({
+      isSelfCustodial: true,
+      isReady: true,
+      needsBackendAuth: false,
+      wallets: [],
+      status: "ready",
+      accountType: "SelfCustodial",
+    })
+    quoteFee(5000)
+    await renderReview()
+
+    expect(highFeeSheet()).toBeTruthy()
+  })
+
+  it("stays closed while the fee is under half the amount", async () => {
+    quoteFee(4999)
+    await renderReview()
+
+    expect(highFeeSheet()).toBeNull()
+  })
+
+  it("leaves an on-chain send alone, since amount entry already warned", async () => {
+    quoteFee(5000)
+    await renderReview(onchainRoute)
+
+    expect(highFeeSheet()).toBeNull()
+  })
+
+  it("closes on Accept and leaves the slider free to send", async () => {
+    quoteFee(5000)
+    await renderReview()
+
+    await act(async () => {
+      fireEvent.press(sheetButton(LL.SendBitcoinScreen.highFeeSheet.acceptFee()))
+    })
+    await flushEffects()
+
+    expect(highFeeSheet()).toBeNull()
+    expect(lastSliderProps()?.disabled).toBe(false)
+  })
+
+  it("starts the send over on Cancel payment", async () => {
+    quoteFee(5000)
+    await renderReview()
+
+    fireEvent.press(sheetButton(LL.SendBitcoinScreen.highFeeSheet.cancelPayment()))
+
+    const reducer = navigationDispatchMock.mock.calls
+      .map(([action]) => action)
+      .find((action) => typeof action === "function")
+    const action = reducer({
+      index: 2,
+      routes: ["Primary", "sendBitcoinDetails", "sendBitcoinConfirmation"].map(
+        (name) => ({ key: `${name}-key`, name }),
+      ),
+    })
+    expect(action.payload.routes.map(({ name }: { name: string }) => name)).toEqual([
+      "Primary",
+      "sendBitcoinDestination",
+    ])
+  })
+
+  it("gives way to what blocks the send", async () => {
+    // $100.00 plus a $50.00 fee is more than the wallet holds.
+    mockUseSendBalances.mockReturnValue({
+      btcWallet: {
+        id: "btc-wallet-id",
+        balance: 12000,
+        walletCurrency: WalletCurrency.Btc,
+      },
+      usdWallet: {
+        id: "usd-wallet-id",
+        balance: 12000,
+        walletCurrency: WalletCurrency.Usd,
+      },
+    })
+    quoteFee(5000)
+    await renderReview()
+
+    expect(highFeeSheet()).toBeNull()
+  })
+})

@@ -2409,10 +2409,11 @@
         "title": "ビットコインを送金する",
         "failedToFetchLnurlInvoice": "lnurlインボイスの取得に失敗しました",
         "lnurlInvoiceIncorrectAmount": "lnurlサーバーが不正な金額のインボイスで応答しました。",
-        "confirmFeesModal": {
+        "highFeeSheet": {
             "title": "手数料が高額です！",
-            "content": "手数料が送金額の50%を超えています。本当に続行しますか？\n\n手数料を削減するには、受取人にLightningでの取引を依頼してください",
-            "confirmButton": "100%間違いありません"
+            "body": "手数料が送金額の50%以上です。続行してもよろしいですか？",
+            "cancelPayment": "支払いをキャンセル",
+            "acceptFee": "手数料を承認"
         },
         "copiedDestination": "送信先をクリップボードにコピーしました",
         "pendingPayment": "支払いは送信されましたが、まだ確認されていません。\n\n支払いが確認されない場合、資金はアカウントに返金されます。",
@@ -2432,9 +2433,9 @@
         "time": "時間",
         "type": "種類",
         "feeTier": "取引の優先度",
-        "fast": "高速",
-        "medium": "中速",
-        "slow": "低速",
+        "fast": "優先",
+        "medium": "標準",
+        "slow": "節約",
         "recommended": "推奨",
         "walletOffline": "ウォレットがオフラインです。接続を確認してもう一度お試しください。",
         "sdkInsufficientFunds": "この取引に十分な残高がありません。",
@@ -4085,9 +4086,6 @@
         "refundFailed": "払い戻し失敗: {error}",
         "refundAddress": "払い戻し用Bitcoinアドレス",
         "feeRate": "ネットワーク手数料",
-        "feeRateFastest": "最速 (~{sats} sats) ~10分",
-        "feeRateHalfHour": "通常 (~{sats} sats) ~30分",
-        "feeRateHour": "エコノミー (~{sats} sats) ~60分",
         "feeRateUnit": "{rate} sat/vB",
         "feeRateUnavailable": "ネットワーク手数料を読み込めませんでした。接続を確認してもう一度お試しください。",
         "refundNow": "今すぐ払い戻し",

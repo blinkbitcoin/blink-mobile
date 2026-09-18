@@ -2409,10 +2409,11 @@
         "title": "Enviar Bitcoin",
         "failedToFetchLnurlInvoice": "Error al obtener la factura de lnurl",
         "lnurlInvoiceIncorrectAmount": "El servidor lnurl ha enviado una factura con un importe incorrecto.",
-        "confirmFeesModal": {
+        "highFeeSheet": {
             "title": "Alerta de tarifa alta!",
-            "content": "Tu tarifa es un 50% más grande que la cantidad enviada. ¿Estás seguro de que quieres continuar?\n\nPara reducir la tarifa, pide al receptor que acepte la transacción a través de Lightning.",
-            "confirmButton": "Estoy 100% seguro"
+            "body": "Tu tarifa es el 50% o más del monto que envías. ¿Seguro que quieres continuar?",
+            "cancelPayment": "Cancelar pago",
+            "acceptFee": "Aceptar tarifa"
         },
         "copiedDestination": "Destino copiado al portapapeles",
         "pendingPayment": "El pago ha sido enviado, pero aún no se ha confirmado.\n\nEs posible que el pago no se confirme, en cuyo caso los fondos se devolverán a su cuenta.\nBETA",
@@ -2432,9 +2433,9 @@
         "time": "Hora",
         "type": "Tipo",
         "feeTier": "Prioridad de la transacción",
-        "fast": "Rápido",
-        "medium": "Medio",
-        "slow": "Lento",
+        "fast": "Prioritario",
+        "medium": "Estándar",
+        "slow": "Económico",
         "recommended": "Recomendado",
         "walletOffline": "Tu billetera está sin conexión. Por favor verifica tu conexión e intenta de nuevo.",
         "sdkInsufficientFunds": "Fondos insuficientes para esta transacción.",
@@ -4085,9 +4086,6 @@
         "refundFailed": "Reembolso fallido: {error}",
         "refundAddress": "Dirección Bitcoin para reembolso",
         "feeRate": "Comisión de red",
-        "feeRateFastest": "Más rápido (~{sats} sats) ~10 min",
-        "feeRateHalfHour": "Normal (~{sats} sats) ~30 min",
-        "feeRateHour": "Económico (~{sats} sats) ~60 min",
         "feeRateUnit": "{rate} sat/vB",
         "feeRateUnavailable": "No se pudieron cargar las tarifas de red. Verifica tu conexión e inténtalo de nuevo.",
         "refundNow": "Reembolsar ahora",

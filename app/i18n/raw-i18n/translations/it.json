@@ -2409,10 +2409,11 @@
         "title": "Invia Bitcoin",
         "failedToFetchLnurlInvoice": "Impossibile recuperare l'invoice lnurl",
         "lnurlInvoiceIncorrectAmount": "Il server lnurl ha risposto con un'invoice di importo errato.",
-        "confirmFeesModal": {
+        "highFeeSheet": {
             "title": "Attenzione: tariffe elevate!",
-            "content": "La tua commissione è superiore del 50% rispetto all'importo inviato. Vuoi procedere?\n\nPer ridurre le commissioni, chiedi al destinatario di accettare la transazione tramite Lightning",
-            "confirmButton": "Sono sicuro al 100%"
+            "body": "La commissione è pari o superiore al 50% dell'importo che invii. Vuoi davvero procedere?",
+            "cancelPayment": "Annulla pagamento",
+            "acceptFee": "Accetta commissione"
         },
         "copiedDestination": "Destinazione copiata negli apDestinazione copiata negli appuntipunti",
         "pendingPayment": "Il pagamento è stato inviato, ma non è ancora stato confermato.\n\nÈ possibile che il pagamento non venga confermato, nel qual caso i fondi verranno restituiti al tuo account.",
@@ -2432,9 +2433,9 @@
         "time": "Ora",
         "type": "Tipo",
         "feeTier": "Priorità della transazione",
-        "fast": "Veloce",
-        "medium": "Medio",
-        "slow": "Lento",
+        "fast": "Prioritario",
+        "medium": "Standard",
+        "slow": "Economico",
         "recommended": "Consigliato",
         "walletOffline": "Il tuo portafoglio è offline. Controlla la connessione e riprova.",
         "sdkInsufficientFunds": "Fondi insufficienti per questa transazione.",
@@ -4085,9 +4086,6 @@
         "refundFailed": "Refund failed: {error}",
         "refundAddress": "Bitcoin address for refund",
         "feeRate": "Network fee",
-        "feeRateFastest": "Fastest (~{sats} sats) ~10 min",
-        "feeRateHalfHour": "Normal (~{sats} sats) ~30 min",
-        "feeRateHour": "Economy (~{sats} sats) ~60 min",
         "feeRateUnit": "{rate} sat/vB",
         "feeRateUnavailable": "Impossibile caricare le commissioni di rete. Controlla la connessione e riprova.",
         "refundNow": "Rimborsa ora",

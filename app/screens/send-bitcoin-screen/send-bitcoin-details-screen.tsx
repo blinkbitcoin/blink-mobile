@@ -45,7 +45,7 @@ import {
 import { reportError } from "@app/utils/error-logging"
 
 import { FeeTierSelector } from "./fee-tier-selector"
-import { shouldWarnAboutHighFee } from "./hooks/onchain-fee-alert"
+import { shouldWarnAboutHighFee } from "./hooks/high-fee-alert"
 import { useFeeTierLabels } from "./hooks/use-fee-tier-labels"
 import { useOnchainFeeTierOptions } from "./hooks/use-onchain-fee-tier-options"
 import { useSendWallets } from "./hooks/use-send-wallets"
@@ -56,8 +56,8 @@ import {
   LnurlInvoiceError,
 } from "./amount-entry/amount-entry-error-sheet"
 import { SendWalletSummary } from "./amount-entry/send-wallet-summary"
-import { ConfirmFeesModal } from "./confirm-fees-modal"
 import { formatDestination } from "./format-destination"
+import { HighFeeSheet } from "./high-fee-sheet"
 import { SendHero } from "./send-hero"
 import { AmountInvalidReason, isValidAmount } from "./payment-details"
 import { PaymentDetail } from "./payment-details/index.types"
@@ -150,7 +150,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     },
   } = useAppConfig()
   const [isLoadingLnurl, setIsLoadingLnurl] = useState(false)
-  const [modalHighFeesVisible, setModalHighFeesVisible] = useState(false)
+  const [isHighFeeSheetVisible, setIsHighFeeSheetVisible] = useState(false)
   const [selectedPercent, setSelectedPercent] = useState<number | null>(null)
 
   const { convertMoneyAmount: _convertMoneyAmount } = usePriceConversion()
@@ -295,7 +295,6 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
 
   const alertHighFees = shouldWarnAboutHighFee({
     paymentDetail,
-    isSelfCustodial,
     selectedTierFee,
     hasFeeQuote,
   })
@@ -509,7 +508,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
 
       if (paymentDetailForConfirmation.sendPaymentMutation) {
         if (alertHighFees) {
-          setModalHighFeesVisible(true)
+          setIsHighFeeSheetVisible(true)
         } else {
           navigation.navigate("sendBitcoinConfirmation", {
             paymentDetail: paymentDetailForConfirmation,
@@ -617,13 +616,13 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
         error={lnurlBoundsErrorMessage || (isLowFunds ? "lowFunds" : undefined)}
         kind="reject"
       />
-      <ConfirmFeesModal
-        action={() => {
-          setModalHighFeesVisible(false)
+      <HighFeeSheet
+        isVisible={isHighFeeSheetVisible}
+        onAccept={() => {
+          setIsHighFeeSheetVisible(false)
           navigation.navigate("sendBitcoinConfirmation", { paymentDetail })
         }}
-        isVisible={modalHighFeesVisible}
-        cancel={() => setModalHighFeesVisible(false)}
+        onClose={() => setIsHighFeeSheetVisible(false)}
       />
       <ScrollView
         style={styles.scroll}

@@ -2409,10 +2409,11 @@
         "title": "Envoyer des bitcoins",
         "failedToFetchLnurlInvoice": "Échec de la récupération de la facture lnurl",
         "lnurlInvoiceIncorrectAmount": "Le serveur lnurl a répondu avec une facture contenant un montant incorrect",
-        "confirmFeesModal": {
+        "highFeeSheet": {
             "title": "Alerte frais élevés !",
-            "content": "Vos frais représentent plus de 50 % du montant envoyé. Êtes-vous sûr de vouloir continuer ?\n\nPour réduire les frais, demandez au destinataire d'accepter la transaction via Lightning",
-            "confirmButton": "J'en suis sûr à 100 %"
+            "body": "Vos frais représentent 50 % ou plus du montant envoyé. Voulez-vous vraiment continuer ?",
+            "cancelPayment": "Annuler le paiement",
+            "acceptFee": "Accepter les frais"
         },
         "copiedDestination": "Destination copiée dans le presse-papiers",
         "pendingPayment": "Le paiement a été envoyé, mais n'a pas encore été confirmé.\n\nIl est possible que le paiement ne soit pas confirmé, auquel cas les fonds seront restitués à votre compte.",
@@ -2432,9 +2433,9 @@
         "time": "Heure",
         "type": "Type",
         "feeTier": "Priorité de la transaction",
-        "fast": "Rapide",
-        "medium": "Moyen",
-        "slow": "Lent",
+        "fast": "Prioritaire",
+        "medium": "Standard",
+        "slow": "Économique",
         "recommended": "Recommandé",
         "walletOffline": "Votre portefeuille est hors ligne. Veuillez vérifier votre connexion et réessayer.",
         "sdkInsufficientFunds": "Fonds insuffisants pour cette transaction.",
@@ -4085,9 +4086,6 @@
         "refundFailed": "Remboursement échoué : {error}",
         "refundAddress": "Adresse Bitcoin pour le remboursement",
         "feeRate": "Frais de réseau",
-        "feeRateFastest": "Plus rapide (~{sats} sats) ~10 min",
-        "feeRateHalfHour": "Normal (~{sats} sats) ~30 min",
-        "feeRateHour": "Économique (~{sats} sats) ~60 min",
         "feeRateUnit": "{rate} sat/vB",
         "feeRateUnavailable": "Impossible de charger les frais réseau. Vérifiez votre connexion et réessayez.",
         "refundNow": "Rembourser maintenant",
