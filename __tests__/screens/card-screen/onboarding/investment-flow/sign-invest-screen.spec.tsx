@@ -122,7 +122,6 @@ const mockESign = {
   sign: jest.fn(),
   cancel: jest.fn(),
   retry: jest.fn(),
-  restart: jest.fn(),
   checkConnection: jest.fn(),
   /** Mirrors the real hook, where `sign` is rebuilt whenever the source is: a stand-in
    *  that handed back one stable function would hide the double start a rebuilt source
@@ -155,7 +154,6 @@ jest.mock("@blinkbitcoin/esign-react-native/webform", () => {
         sign: mockESign.signForSource,
         cancel: mockESign.cancel,
         retry: mockESign.retry,
-        restart: mockESign.restart,
         checkConnection: mockESign.checkConnection,
       }
     },
@@ -708,12 +706,11 @@ describe("SignInvestScreen", () => {
       })
 
       expect(mockESign.retry).toHaveBeenCalledTimes(1)
-      expect(mockESign.restart).not.toHaveBeenCalled()
     })
 
-    /** An expired session keeps its envelope, so it is restarted rather than retried:
-     *  a retry would drop what the signer already filled in. */
-    it("restarts an expired session instead of retrying it", async () => {
+    /** The hosted-form source mints a fresh envelope on every start and offers no way to
+     *  reopen an old one, so an expired session is retried like any other failure. */
+    it("retries an expired session the same way", async () => {
       mockESign.status = "error"
       mockESign.error = { code: "SESSION_EXPIRED", message: "expired" }
       mockESign.isSessionExpired = true
@@ -724,8 +721,7 @@ describe("SignInvestScreen", () => {
         fireEvent.press(getByText("Try Again"))
       })
 
-      expect(mockESign.restart).toHaveBeenCalledTimes(1)
-      expect(mockESign.retry).not.toHaveBeenCalled()
+      expect(mockESign.retry).toHaveBeenCalledTimes(1)
     })
   })
 
