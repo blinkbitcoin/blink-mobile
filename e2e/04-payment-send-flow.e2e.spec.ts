@@ -41,7 +41,7 @@ describe("Lightning address flow", () => {
   })
 
   it("Checks if on the SendBitcoinDetails screen", async () => {
-    await waitTillPressableDisplayed("Amount Input Button")
+    await waitTillPressableDisplayed("Key 1")
   })
 
   it("Go back", async () => {
@@ -81,7 +81,7 @@ describe("Lnurl Pay Flow", () => {
   })
 
   it("Checks if on the SendBitcoinDetails screen", async () => {
-    await waitTillPressableDisplayed("Amount Input Button")
+    await waitTillPressableDisplayed("Key 1")
   })
 
   it("Go back", async () => {
@@ -165,7 +165,7 @@ describe("Lightning Payments Flow", () => {
   })
 
   it("Add amount", async () => {
-    await addSmallAmount(LL)
+    await addSmallAmount()
   })
 
   it("Click Next again", async () => {
@@ -178,7 +178,7 @@ describe("Lightning Payments Flow", () => {
   })
 
   it("Slides to confirm payment and navigate to move money screen", async () => {
-    await swipeButton(LL.SendBitcoinConfirmationScreen.slideToConfirm())
+    await swipeButton(LL.SendBitcoinConfirmationScreen.slideToSend())
     await waitTillOnHomeScreen()
   })
 })

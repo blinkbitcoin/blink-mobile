@@ -2341,7 +2341,11 @@
     "slideToConfirm": "Slide to Confirm",
     "slideConfirming": "Confirming...",
     "copiedDestination": "Copied destination to clipboard",
-    "lightningRecommended": "High fee! We recommend Lightning.",
+    "lightningRecommended": "High fee. We recommend Lightning.",
+    "sending": "Sender",
+    "fromBalance": "Fra saldo",
+    "details": "Detaljer",
+    "changeAmount": "Skift beløb",
     "usdRemainderSweep": "Resterende {remaining: string} ({remainingSats: string}) konverteres til Bitcoin. USD-minimum: {minimum: string}."
   },
   "SendBitcoinDestinationScreen": {
@@ -2383,6 +2387,8 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Transaktionen skulle nu blive tilføjet til mempool",
     "amount": "Beløb",
+    "addAmount": "Tilføj beløb",
+    "lowFunds": "Ikke nok midler",
     "amountExceed": "Beløbet overstiger din saldo på {balance: string}",
     "amountExceedsLimit": "Beløbet overstiger din resterende daglige grænse på {limit: string}",
     "upgradeAccountToIncreaseLimit": "Opgrader din konto for at øge din grænse",
@@ -2403,10 +2409,11 @@
     "title": "Send Bitcoin",
     "failedToFetchLnurlInvoice": "Fejl ved hentning af LNURL faktura",
     "lnurlInvoiceIncorrectAmount": "LNURL-serveren svarede med en faktura med en forkert beløbsangivelse.",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "Advarsel om højt gebyr!",
-      "content": "Dit gebyr er mere end 50% større end det beløb, der sendes. Er du sikker på, at du ønsker at fortsætte?\n\nFor at reducere gebyrer, bed modtageren om at acceptere betaling via Lightning.",
-      "confirmButton": "Jeg er 100% sikker"
+      "body": "Dit gebyr er 50 % eller mere af det beløb, du sender. Er du sikker på, at du vil fortsætte?",
+      "cancelPayment": "Annuller betaling",
+      "acceptFee": "Accepter gebyr"
     },
     "copiedDestination": "Copied destination to clipboard",
     "pendingPayment": "The payment has been sent, but hasn't confirmed yet.\n\nIt's possible the payment will not confirm, in which case the funds will be returned to your account.",
@@ -2426,9 +2433,9 @@
     "time": "Tidspunkt",
     "type": "Type",
     "feeTier": "Transaktionsprioritet",
-    "fast": "Hurtig",
-    "medium": "Medium",
-    "slow": "Langsom",
+    "fast": "Prioritet",
+    "medium": "Standard",
+    "slow": "Økonomi",
     "recommended": "Anbefalet",
     "walletOffline": "Din tegnebog er offline. Tjek venligst din forbindelse og prøv igen.",
     "sdkInsufficientFunds": "Ikke nok midler til denne transaktion.",
@@ -4082,9 +4089,6 @@
     "refundFailed": "Refund failed: {error}",
     "refundAddress": "Bitcoin address for refund",
     "feeRate": "Network fee",
-    "feeRateFastest": "Fastest (~{sats} sats) ~10 min",
-    "feeRateHalfHour": "Normal (~{sats} sats) ~30 min",
-    "feeRateHour": "Economy (~{sats} sats) ~60 min",
     "feeRateUnit": "{rate} sat/vB",
     "feeRateUnavailable": "Kunne ikke indlæse netværksgebyrer. Tjek din forbindelse og prøv igen.",
     "refundNow": "Refunder nu",

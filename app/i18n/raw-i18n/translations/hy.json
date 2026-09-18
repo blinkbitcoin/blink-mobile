@@ -2342,6 +2342,10 @@
     "slideConfirming": "Հաստատվում է...",
     "copiedDestination": "Նպատակակետը պատծենվել է ջամանակավոր շտեմարանում",
     "lightningRecommended": "Բարձր միջնորդավճար։ Խորհուրդ ենք տալիս Lightning-ը։",
+    "sending": "Ուղարկվում է",
+    "fromBalance": "Հաշվեկշռից",
+    "details": "Մանրամասներ",
+    "changeAmount": "Փոխել գումարը",
     "usdRemainderSweep": "Մնացած {remaining: string} ({remainingSats: string}) կփոխարկվի Bitcoin-ի։ USD-ի նվազագույնը՝ {minimum: string}։"
   },
   "SendBitcoinDestinationScreen": {
@@ -2383,6 +2387,8 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Գործարքը պետք է ուղարկվի mempool",
     "amount": "Չափ",
+    "addAmount": "Ավելացնել գումար",
+    "lowFunds": "Բավարար միջոցներ չկան",
     "amountExceed": "Գումարի չափը գերազանցում է Ձեր {balance: string} հաշվեկշիռը",
     "amountExceedsLimit": "Գումարի չափը գերազանցում է {limit: string}ի Ձեր օրական սահմանաչափը",
     "upgradeAccountToIncreaseLimit": "Թարմացրեք Ձեր հաշիվը Ձեր սահմանաչափը բարձրացնելու համար",
@@ -2403,10 +2409,11 @@
     "title": "Ուղարկել Բիթքոյն",
     "failedToFetchLnurlInvoice": "Չհաջողվեց ստանալ Inurl վճարման հարցումը",
     "lnurlInvoiceIncorrectAmount": "Inurl սերվերը պատասխանել է սխալ չափի գումարով վճարման հարցմամբ:",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "Բարձր միջնորդավճարի զգուշացում։",
-      "content": "Ձեր միջնորդավճարը 50%-ից ավելի է՝ քան ուղարկվող գումարը։ Վստահ՞ եք՝ որ ցանկանում եք շարունակել։\n\nՄիջնորդավճարները նվազեցնելու համար խնդրեք ստացողին՝ ընդունել գործարքը Lightning-ով",
-      "confirmButton": "Հաստատ եմ 100%-ով"
+      "body": "Ձեր վճարը ուղարկվող գումարի 50%-ն է կամ ավելին։ Համոզվա՞ծ եք, որ ցանկանում եք շարունակել։",
+      "cancelPayment": "Չեղարկել վճարումը",
+      "acceptFee": "Ընդունել վճարը"
     },
     "copiedDestination": "Նպատակակետը պատծենվել է ջամանակավոր շտեմարանում",
     "pendingPayment": "Վճարումը ուղարկվել է՝ բայց դեռ չի հաստատվել։\n\nՀնարավոր է՝ որ վճարումը չհաստատվի՝ և միջոցները կվերադարձվեն ձեր հաշվին։",
@@ -2426,9 +2433,9 @@
     "time": "Ժամանակ",
     "type": "Տեսակ",
     "feeTier": "Գործարքի առաջնահերթություն",
-    "fast": "Արագ",
-    "medium": "Միջին",
-    "slow": "Դանդաղ",
+    "fast": "Առաջնահերթ",
+    "medium": "Ստանդարտ",
+    "slow": "Խնայողական",
     "recommended": "Առաջարկվող",
     "walletOffline": "Ձեր դրամապանակն անցանց է։ Խնդրում ենք ստուգել կապը և նորից փորձել։",
     "sdkInsufficientFunds": "Այս գործարքի համար բավարար միջոցներ չկան։",
@@ -4082,9 +4089,6 @@
     "refundFailed": "Վերադարձը ձախողվեց՝ {error}",
     "refundAddress": "Bitcoin հասցե վերադարձի համար",
     "feeRate": "Ցանցի վճար",
-    "feeRateFastest": "Ամենաարագ (~{sats} sats) ~10 րոպե",
-    "feeRateHalfHour": "Ստանդարտ (~{sats} sats) ~30 րոպե",
-    "feeRateHour": "Տնտեսող (~{sats} sats) ~60 րոպե",
     "feeRateUnit": "{rate} sat/vB",
     "feeRateUnavailable": "Չհաջողվեց բեռնել ցանցի վճարները: Ստուգեք միացումը և կրկին փորձեք:",
     "refundNow": "Վերադարձնել հիմա",

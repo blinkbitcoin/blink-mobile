@@ -2341,7 +2341,11 @@
     "slideToConfirm": "Posunutím potvrďte",
     "slideConfirming": "Potvrdzovanie...",
     "copiedDestination": "Cieľ bol skopírovaný do schránky",
-    "lightningRecommended": "Vysoký poplatok! Odporúčame Lightning.",
+    "lightningRecommended": "Vysoký poplatok. Odporúčame Lightning.",
+    "sending": "Odosielanie",
+    "fromBalance": "Zo zostatku",
+    "details": "Podrobnosti",
+    "changeAmount": "Zmeniť sumu",
     "usdRemainderSweep": "Zostávajúcich {remaining: string} ({remainingSats: string}) bude prevedených na Bitcoin. Minimum v USD: {minimum: string}."
   },
   "SendBitcoinDestinationScreen": {
@@ -2383,6 +2387,8 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Transakciu je potrebné odoslať do mempoolu",
     "amount": "Suma",
+    "addAmount": "Pridať sumu",
+    "lowFunds": "Nedostatok prostriedkov",
     "amountExceed": "Suma prekračuje váš zostatok vo výške {balance: string}",
     "amountExceedsLimit": "Suma prekračuje váš zostávajúci denný limit {limit: string}",
     "upgradeAccountToIncreaseLimit": "Upgradujte si účet a zvýšte svoj limit",
@@ -2403,10 +2409,11 @@
     "title": "Odoslať Bitcoin",
     "failedToFetchLnurlInvoice": "Nepodarilo sa načítať lnurl faktúru",
     "lnurlInvoiceIncorrectAmount": "Server lnurl odpovedal faktúrou s nesprávnou sumou.",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "Upozornenie na vysoké poplatky!",
-      "content": "Váš poplatok je o viac ako 50 % vyšší ako odoslaná suma. Naozaj chcete pokračovať?\n\nAk chcete znížiť poplatky, požiadajte príjemcu, aby prijal transakciu cez Lightning",
-      "confirmButton": "Som si 100% istý."
+      "body": "Váš poplatok je 50 % alebo viac z odosielanej sumy. Naozaj chcete pokračovať?",
+      "cancelPayment": "Zrušiť platbu",
+      "acceptFee": "Prijať poplatok"
     },
     "copiedDestination": "Cieľ bol skopírovaný do schránky",
     "pendingPayment": "Platba bola odoslaná, ale ešte nie je potvrdená.\n\nJe možné, že platba nebude potvrdená, v takom prípade budú prostriedky vrátené na váš účet.",
@@ -2426,9 +2433,9 @@
     "time": "Čas",
     "type": "Typ",
     "feeTier": "Priorita transakcie",
-    "fast": "Rýchly",
-    "medium": "Stredný",
-    "slow": "Pomalý",
+    "fast": "Prioritný",
+    "medium": "Štandardný",
+    "slow": "Ekonomický",
     "recommended": "Odporúčané",
     "walletOffline": "Vaša peňaženka je offline. Skontrolujte pripojenie a skúste to znova.",
     "sdkInsufficientFunds": "Nedostatok prostriedkov pre túto transakciu.",
@@ -4082,9 +4089,6 @@
     "refundFailed": "Refund failed: {error}",
     "refundAddress": "Bitcoin address for refund",
     "feeRate": "Network fee",
-    "feeRateFastest": "Fastest (~{sats} sats) ~10 min",
-    "feeRateHalfHour": "Normal (~{sats} sats) ~30 min",
-    "feeRateHour": "Economy (~{sats} sats) ~60 min",
     "feeRateUnit": "{rate} sat/vB",
     "feeRateUnavailable": "Nepodarilo sa načítať sieťové poplatky. Skontroluj pripojenie a skús to znova.",
     "refundNow": "Vrátiť teraz",

@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "r
 import { APPROXIMATE_PREFIX } from "@app/config"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useDebouncedEffect } from "@app/hooks/use-debounce"
-import { CurrencyInfo, useDisplayCurrency } from "@app/hooks/use-display-currency"
+import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { ConvertMoneyAmount } from "@app/screens/send-bitcoin-screen/payment-details"
 import {
@@ -14,11 +14,10 @@ import {
 import {
   formatNumberPadNumber,
   getDisabledKeys,
+  isKeyAccepted,
   Key,
-  NumberPadNumber,
   numberPadReducer,
   NumberPadReducerActionType,
-  NumberPadReducerState,
 } from "@app/components/amount-input-screen/number-pad-reducer"
 import {
   greaterThan,
@@ -28,6 +27,10 @@ import {
 } from "@app/types/amounts"
 
 import { AmountInputScreenUI } from "./amount-input-screen-ui"
+import {
+  moneyAmountToNumberPadReducerState,
+  numberPadNumberToMoneyAmount,
+} from "@app/components/amount-input-screen/number-pad-amount"
 
 export type AmountInputScreenProps = {
   inputValues: InputValues
@@ -50,67 +53,6 @@ export enum ConvertInputType {
   FROM = "fromInput",
   TO = "toInput",
   CURRENCY = "currencyInput",
-}
-
-const numberPadNumberToMoneyAmount = ({
-  numberPadNumber,
-  currency,
-  currencyInfo,
-}: {
-  numberPadNumber: NumberPadNumber
-  currency: WalletOrDisplayCurrency
-  currencyInfo: Record<WalletOrDisplayCurrency, CurrencyInfo>
-}): MoneyAmount<WalletOrDisplayCurrency> => {
-  const { majorAmount, minorAmount } = numberPadNumber
-  const { minorUnitToMajorUnitOffset, currencyCode } = currencyInfo[currency]
-  const majorInMinor = Math.pow(10, minorUnitToMajorUnitOffset) * Number(majorAmount)
-  const slicedMinor = minorAmount.slice(0, minorUnitToMajorUnitOffset)
-  const missing = minorUnitToMajorUnitOffset - slicedMinor.length
-  const amount = majorInMinor + Number(minorAmount) * Math.pow(10, missing)
-  return { amount, currency, currencyCode }
-}
-
-const moneyAmountToNumberPadReducerState = ({
-  moneyAmount,
-  currencyInfo,
-}: {
-  moneyAmount: MoneyAmount<WalletOrDisplayCurrency>
-  currencyInfo: ReturnType<typeof useDisplayCurrency>["currencyInfo"]
-}): NumberPadReducerState => {
-  const amountString = moneyAmount.amount.toString()
-  const { minorUnitToMajorUnitOffset, showFractionDigits } =
-    currencyInfo[moneyAmount.currency]
-
-  let numberPadNumber: NumberPadNumber
-
-  if (amountString === "0") {
-    numberPadNumber = { majorAmount: "", minorAmount: "", hasDecimal: false }
-  } else if (amountString.length <= minorUnitToMajorUnitOffset) {
-    numberPadNumber = {
-      majorAmount: "0",
-      minorAmount: showFractionDigits
-        ? amountString.padStart(minorUnitToMajorUnitOffset, "0")
-        : "",
-      hasDecimal: showFractionDigits,
-    }
-  } else {
-    numberPadNumber = {
-      majorAmount: amountString.slice(
-        0,
-        amountString.length - minorUnitToMajorUnitOffset,
-      ),
-      minorAmount: showFractionDigits
-        ? amountString.slice(amountString.length - minorUnitToMajorUnitOffset)
-        : "",
-      hasDecimal: showFractionDigits && minorUnitToMajorUnitOffset > 0,
-    }
-  }
-
-  return {
-    numberPadNumber,
-    numberOfDecimalsAllowed: showFractionDigits ? minorUnitToMajorUnitOffset : 0,
-    currency: moneyAmount.currency,
-  }
 }
 
 const snapshotKey = (values: InputValues) => {
@@ -184,13 +126,15 @@ export const AmountInputScreen: React.FC<AmountInputScreenProps> = ({
 
   const handleKeyPress = useCallback(
     (key: Key) => {
+      if (!isKeyAccepted(numberPadState, key)) return false
       startTyping()
       dispatchNumberPadAction({
         action: NumberPadReducerActionType.HandleKeyPress,
         payload: { key },
       })
+      return true
     },
-    [startTyping],
+    [startTyping, numberPadState],
   )
 
   const setNumberPadAmount = useCallback(

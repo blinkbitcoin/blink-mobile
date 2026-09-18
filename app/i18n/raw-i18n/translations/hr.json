@@ -2341,7 +2341,11 @@
     "slideToConfirm": "Povucite za potvrdu",
     "slideConfirming": "Potvrđivanje...",
     "copiedDestination": "Odredište kopirano u međuspremnik",
-    "lightningRecommended": "Visoka naknada! Preporučujemo Lightning.",
+    "lightningRecommended": "Visoka naknada. Preporučujemo Lightning.",
+    "sending": "Slanje",
+    "fromBalance": "Sa salda",
+    "details": "Detalji",
+    "changeAmount": "Promijeni iznos",
     "usdRemainderSweep": "Preostalo {remaining: string} ({remainingSats: string}) bit će pretvoreno u Bitcoin. Minimum u USD: {minimum: string}."
   },
   "SendBitcoinDestinationScreen": {
@@ -2383,6 +2387,8 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Transakcija bi trebala biti poslana u mempool",
     "amount": "Iznos",
+    "addAmount": "Dodaj iznos",
+    "lowFunds": "Nedovoljno sredstava",
     "amountExceed": "Iznos premašuje vaš saldo od {balance: string}",
     "amountExceedsLimit": "Iznos premašuje vaše preostalo dnevno ograničenje od {limit: string}",
     "upgradeAccountToIncreaseLimit": "Nadogradite svoj račun kako biste povećali svoje ograničenje",
@@ -2403,10 +2409,11 @@
     "title": "Šalji Bitcoin",
     "failedToFetchLnurlInvoice": "Nije uspjelo dohvaćanje lnurl fakture",
     "lnurlInvoiceIncorrectAmount": "lnurl poslužitelj je odgovorio fakturom s netočnim iznosom.",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "Upozorenje o visokoj naknadi!",
-      "content": "Vaša naknada je više od 50% veća od poslanog iznosa. Jeste li sigurni da želite nastaviti?\n\nZa smanjenje naknada, zamolite primatelja da prihvati transakciju putem Lightninga",
-      "confirmButton": "100% sam siguran/na"
+      "body": "Vaša naknada iznosi 50 % ili više iznosa koji šaljete. Jeste li sigurni da želite nastaviti?",
+      "cancelPayment": "Otkaži plaćanje",
+      "acceptFee": "Prihvati naknadu"
     },
     "copiedDestination": "Odredište kopirano u međuspremnik",
     "pendingPayment": "Plaćanje je poslano, ali još nije potvrđeno.\n\nMoguće je da plaćanje neće biti potvrđeno, u tom slučaju sredstva će biti vraćena na vaš račun.",
@@ -2426,9 +2433,9 @@
     "time": "Vrijeme",
     "type": "Vrsta",
     "feeTier": "Prioritet transakcije",
-    "fast": "Brzo",
-    "medium": "Srednje",
-    "slow": "Sporo",
+    "fast": "Prioritetno",
+    "medium": "Standardno",
+    "slow": "Ekonomično",
     "recommended": "Preporučeno",
     "walletOffline": "Vaš novčanik je offline. Provjerite vezu i pokušajte ponovo.",
     "sdkInsufficientFunds": "Nedovoljno sredstava za ovu transakciju.",
@@ -4082,9 +4089,6 @@
     "refundFailed": "Refund failed: {error}",
     "refundAddress": "Bitcoin address for refund",
     "feeRate": "Network fee",
-    "feeRateFastest": "Fastest (~{sats} sats) ~10 min",
-    "feeRateHalfHour": "Normal (~{sats} sats) ~30 min",
-    "feeRateHour": "Economy (~{sats} sats) ~60 min",
     "feeRateUnit": "{rate} sat/vB",
     "feeRateUnavailable": "Nije moguće učitati mrežne naknade. Provjerite vezu i pokušajte ponovno.",
     "refundNow": "Povrat sada",

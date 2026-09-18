@@ -2341,7 +2341,11 @@
         "slideToConfirm": "Deslize para Confirmar",
         "slideConfirming": "Confirmando...",
         "copiedDestination": "Copiado destino para a área de transferência",
-        "lightningRecommended": "Alta taxa! Recomendamos Lightning.",
+        "lightningRecommended": "Alta taxa. Recomendamos Lightning.",
+        "sending": "Enviando",
+        "fromBalance": "Do saldo",
+        "details": "Detalhes",
+        "changeAmount": "Alterar valor",
         "usdRemainderSweep": "Saldo restante {remaining: string} ({remainingSats: string}) será convertido em Bitcoin. Mínimo em USD: {minimum: string}."
     },
     "SendBitcoinDestinationScreen": {
@@ -2383,6 +2387,8 @@
     "SendBitcoinScreen": {
         "willBeSentToMempoolBy": "A transação deve ser enviada para o mempool.",
         "amount": "quantidade",
+        "addAmount": "Adicione um valor",
+        "lowFunds": "Saldo insuficiente",
         "amountExceed": "O valor excede seu saldo de {balance: string}",
         "amountExceedsLimit": "O valor excede seu limite diário restante de {limit: string}",
         "upgradeAccountToIncreaseLimit": "Atualize a sua conta para aumentar o seu limite",
@@ -2403,10 +2409,11 @@
         "title": "Enviar Bitcoin",
         "failedToFetchLnurlInvoice": "Falha ao buscar a fatura lnurl",
         "lnurlInvoiceIncorrectAmount": "O server lnurl respondeu com uma invoice de valor incorreto",
-        "confirmFeesModal": {
+        "highFeeSheet": {
             "title": "Alerta de taxa alta!",
-            "content": "Sua taxa é mais de 50% maior do que o valor enviado. Tem certeza de que deseja prosseguir?\n\nPara reduzir as taxas, peça ao destinatário para aceitar a transação via Lightning.",
-            "confirmButton": "Tenho 100% de certeza"
+            "body": "Sua taxa é 50% ou mais do valor que você está enviando. Tem certeza de que deseja continuar?",
+            "cancelPayment": "Cancelar pagamento",
+            "acceptFee": "Aceitar taxa"
         },
         "copiedDestination": "Copiado destino para a área de transferência",
         "pendingPayment": "O pagamento foi enviado, mas ainda não foi confirmado.\n\nÉ possível que o pagamento não seja confirmado, caso em que os fundos serão devolvidos à sua conta.",
@@ -2426,9 +2433,9 @@
         "time": "Hora",
         "type": "Tipo",
         "feeTier": "Prioridade da transação",
-        "fast": "Rápido",
-        "medium": "Médio",
-        "slow": "Lento",
+        "fast": "Prioritário",
+        "medium": "Padrão",
+        "slow": "Econômico",
         "recommended": "Recomendado",
         "walletOffline": "Sua carteira está offline. Verifique sua conexão e tente novamente.",
         "sdkInsufficientFunds": "Saldo insuficiente para esta transação.",
@@ -4082,9 +4089,6 @@
         "refundFailed": "Reembolso falhou: {error}",
         "refundAddress": "Endereço Bitcoin para reembolso",
         "feeRate": "Taxa de rede",
-        "feeRateFastest": "Mais rápido (~{sats} sats) ~10 min",
-        "feeRateHalfHour": "Normal (~{sats} sats) ~30 min",
-        "feeRateHour": "Econômico (~{sats} sats) ~60 min",
         "feeRateUnit": "{rate} sat/vB",
         "feeRateUnavailable": "Não foi possível carregar as taxas de rede. Verifique a conexão e tente novamente.",
         "refundNow": "Reembolsar agora",

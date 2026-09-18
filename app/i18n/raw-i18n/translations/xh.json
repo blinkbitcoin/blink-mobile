@@ -2341,7 +2341,11 @@
     "slideToConfirm": "Slaydisha ukuqinisekisa",
     "slideConfirming": "Iyaqinisekisa...",
     "copiedDestination": "Ikopishwe indawo ekuya kuyo kwibhodi eqhotyoshwayo",
-    "lightningRecommended": "Imirhumo iphezulu! Sincoma i-Lightning.",
+    "lightningRecommended": "Imirhumo iphezulu. Sincoma i-Lightning.",
+    "sending": "Iyathumela",
+    "fromBalance": "Ukusuka kwiBhalansi",
+    "details": "Iinkcukacha",
+    "changeAmount": "Tshintsha isixa",
     "usdRemainderSweep": "Iseleyo {remaining: string} ({remainingSats: string}) iya kuguqulelwa kwiBitcoin. USD ephantsi kakhulu: {minimum: string}."
   },
   "SendBitcoinDestinationScreen": {
@@ -2383,6 +2387,8 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Intlawulo kufuneka ithunyelwe kwi-mempool",
     "amount": "Isixa",
+    "addAmount": "Yongeza isixa",
+    "lowFunds": "Imali ayonelanga",
     "amountExceed": "Imali idlula ibhalansi yakho {balance: string}",
     "amountExceedsLimit": "Amount exceeds your remaining daily limit of {limit: string}",
     "upgradeAccountToIncreaseLimit": "Upgrade your account to increase your limit",
@@ -2403,10 +2409,11 @@
     "title": "Thumela iBitcoin",
     "failedToFetchLnurlInvoice": "Ayiphumelelanga ukulanda i-invoyisi ye-lnurl",
     "lnurlInvoiceIncorrectAmount": "Iseva ye-lnurl iphendule nge-invoyisi ngexabiso elingachanekanga.",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "Isilumkiso semirhumo ephezulu!",
-      "content": "Imirhumo yakho ingaphezulu nge-50% kunesixa esithunyelweyo. Uqinisekile ukuba ufuna ukuqhubeka?\n\nUkunciphisa imirhumo, cela umamkeli ukuba amkele intlawulo nge-Lightning",
-      "confirmButton": "Ndiqinisekile 100%"
+      "body": "Umrhumo wakho ungama-50% okanye ngaphezulu kwesixa osithumelayo. Uqinisekile ukuba ufuna ukuqhubeka?",
+      "cancelPayment": "Rhoxisa intlawulo",
+      "acceptFee": "Yamkela umrhumo"
     },
     "copiedDestination": "Ikopishwe indawo ekuya kuyo kwibhodi eqhotyoshwayo",
     "pendingPayment": "Intlawulo ithunyelwe, kodwa ayikaqinisekiswa okwangoku.\n\nKunokwenzeka ukuba intlawulo ayiqinisekiswa, kwimeko enjalo imali iya kubuyiselwa kwi-akhawunti yakho.",
@@ -2426,9 +2433,9 @@
     "time": "Ixesha",
     "type": "Uhlobo",
     "feeTier": "Ukubaluleka kwentengiselwano",
-    "fast": "Ngokukhawuleza",
-    "medium": "Phakathi",
-    "slow": "Ngokucothayo",
+    "fast": "Ephambili",
+    "medium": "Eqhelekileyo",
+    "slow": "Elondolozayo",
     "recommended": "Okucetyiswayo",
     "walletOffline": "Isipaji sakho asikho kwi-intanethi. Nceda ujonge unxibelelwano lwakho uze uzame kwakhona.",
     "sdkInsufficientFunds": "Imali ayonelanga kulo msebenzi.",
@@ -4082,9 +4089,6 @@
     "refundFailed": "Refund failed: {error}",
     "refundAddress": "Bitcoin address for refund",
     "feeRate": "Network fee",
-    "feeRateFastest": "Fastest (~{sats} sats) ~10 min",
-    "feeRateHalfHour": "Normal (~{sats} sats) ~30 min",
-    "feeRateHour": "Economy (~{sats} sats) ~60 min",
     "feeRateUnit": "{rate} sat/vB",
     "feeRateUnavailable": "Akukwazanga ukulayisha iimali zothungelwano. Nceda jonga uqhagamshelwano lwakho uzame kwakhona.",
     "refundNow": "Buyisela ngoku",

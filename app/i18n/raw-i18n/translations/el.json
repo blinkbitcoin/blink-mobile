@@ -2341,7 +2341,11 @@
     "slideToConfirm": "Σύρετε για επιβεβαίωση",
     "slideConfirming": "Επιβεβαίωση...",
     "copiedDestination": "Αντιγραφή προορισμού στο πρόχειρο",
-    "lightningRecommended": "Υψηλή τέλη! Συνιστούμε το Lightning.",
+    "lightningRecommended": "Υψηλή τέλη. Συνιστούμε το Lightning.",
+    "sending": "Αποστολή",
+    "fromBalance": "Από το υπόλοιπο",
+    "details": "Λεπτομέρειες",
+    "changeAmount": "Αλλαγή ποσού",
     "usdRemainderSweep": "Υπόλοιπο {remaining: string} ({remainingSats: string}) θα μετατραπεί σε Bitcoin. Ελάχιστο USD: {minimum: string}."
   },
   "SendBitcoinDestinationScreen": {
@@ -2383,6 +2387,8 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Η συναλλαγή πρέπει να υποβληθεί στη mempool",
     "amount": "Ποσό",
+    "addAmount": "Προσθήκη ποσού",
+    "lowFunds": "Ανεπαρκές υπόλοιπο",
     "amountExceed": "Το ποσό υπερβαίνει το υπόλοιπό σας {balance: string}",
     "amountExceedsLimit": "Το ποσό υπερβαίνει το εναπομένον όριο των {limit: string}",
     "upgradeAccountToIncreaseLimit": "Αναβαθμίστε τον λογαριασμό σας για να αυξήσετε το όριο σας ",
@@ -2403,10 +2409,11 @@
     "title": "Αποστολή Bitcoin",
     "failedToFetchLnurlInvoice": "Απέτυχε η λήψη τιμολογίου lnurl",
     "lnurlInvoiceIncorrectAmount": "Ο διακομιστής lnurl απάντησε με ένα τιμολόγιο με λανθασμένο ποσό.",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "Συναγερμός υψηλών τελών! ",
-      "content": "Τα τέλη σας είναι περισσότερα από το 50% του ποσού που στάλθηκε. Είστε σίγουροι ότι θέλετε να προχωρήσετε;\n\nΓια να μειώσετε τα τέλη, ζητήστε από τον παραλήπτη να αποδεχτεί τη συναλλαγή μέσω Lightning",
-      "confirmButton": "Είμαι 100% σίγουρος/η"
+      "body": "Τα τέλη σας είναι το 50% ή περισσότερο του ποσού που στέλνετε. Είστε σίγουροι ότι θέλετε να συνεχίσετε;",
+      "cancelPayment": "Ακύρωση πληρωμής",
+      "acceptFee": "Αποδοχή τελών"
     },
     "copiedDestination": "Αντιγραφή προορισμού στο πρόχειρο",
     "pendingPayment": "Η πληρωμή έχει σταλεί, αλλά δεν έχει επιβεβαιωθεί ακόμη.\n\nΕίναι πιθανό η πληρωμή να μην επιβεβαιωθεί, οπότε τα χρήματα θα επιστραφούν στο λογαριασμό σας.",
@@ -2426,9 +2433,9 @@
     "time": "Ώρα",
     "type": "Τύπος",
     "feeTier": "Προτεραιότητα συναλλαγής",
-    "fast": "Γρήγορη",
-    "medium": "Μεσαία",
-    "slow": "Αργή",
+    "fast": "Προτεραιότητα",
+    "medium": "Κανονική",
+    "slow": "Οικονομική",
     "recommended": "Συνιστάται",
     "walletOffline": "Το πορτοφόλι σας είναι εκτός σύνδεσης. Ελέγξτε τη σύνδεσή σας και δοκιμάστε ξανά.",
     "sdkInsufficientFunds": "Ανεπαρκές υπόλοιπο για αυτήν τη συναλλαγή.",
@@ -4082,9 +4089,6 @@
     "refundFailed": "Refund failed: {error}",
     "refundAddress": "Bitcoin address for refund",
     "feeRate": "Network fee",
-    "feeRateFastest": "Fastest (~{sats} sats) ~10 min",
-    "feeRateHalfHour": "Normal (~{sats} sats) ~30 min",
-    "feeRateHour": "Economy (~{sats} sats) ~60 min",
     "feeRateUnit": "{rate} sat/vB",
     "feeRateUnavailable": "Δεν ήταν δυνατή η φόρτωση των τελών δικτύου. Ελέγξτε τη σύνδεσή σας και δοκιμάστε ξανά.",
     "refundNow": "Επιστροφή τώρα",
