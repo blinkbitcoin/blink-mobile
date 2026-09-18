@@ -1,7 +1,7 @@
 import { renderHook } from "@testing-library/react-native"
 
 import { WalletCurrency } from "@app/graphql/generated"
-import { shouldWarnAboutHighFee } from "@app/screens/send-bitcoin-screen/hooks/onchain-fee-alert"
+import { shouldWarnAboutHighFee } from "@app/screens/send-bitcoin-screen/hooks/high-fee-alert"
 import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import type { PaymentDetail } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
 

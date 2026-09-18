@@ -50,7 +50,7 @@ import { isIos } from "@app/utils/helper"
 
 import { feeTierLabels } from "./fee-tier-options"
 import { FeeTierSelector } from "./fee-tier-selector"
-import { shouldWarnAboutHighFee } from "./hooks/onchain-fee-alert"
+import { shouldWarnAboutHighFee } from "./hooks/high-fee-alert"
 import { useOnchainFeeTierOptions } from "./hooks/use-onchain-fee-tier-options"
 import { useSendWallets } from "./hooks/use-send-wallets"
 
