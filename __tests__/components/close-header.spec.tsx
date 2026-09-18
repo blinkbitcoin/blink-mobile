@@ -49,6 +49,17 @@ describe("CloseHeader", () => {
     expect(mockNavigate).toHaveBeenCalledWith("Primary")
   })
 
+  /** A screen that must not be left still holds the same layout as one that can be. */
+  it("draws the row without the control when hidden", async () => {
+    const { queryByTestId, toJSON } = await renderHeader({
+      testID: "flow-close",
+      isHidden: true,
+    })
+
+    expect(queryByTestId("flow-close")).toBeNull()
+    expect(toJSON()).toBeTruthy()
+  })
+
   it("calls the handler instead when one is given", async () => {
     const onClose = jest.fn()
     const { getByTestId } = await renderHeader({ testID: "flow-close", onClose })
