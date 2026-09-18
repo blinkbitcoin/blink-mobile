@@ -3,7 +3,7 @@ import { render, fireEvent, act } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
 import { SelectInvestScreen } from "@app/screens/card-screen/onboarding/investment-flow/select-invest-screen"
-import { ContextForScreen } from "../../../helper"
+import { ContextForScreen, findPressableParent } from "../../../helper"
 
 jest.mock("@react-native-community/blur", () => ({
   BlurView: "BlurView",
@@ -102,21 +102,29 @@ describe("SelectInvestScreen", () => {
     expect(mockNavigate).not.toHaveBeenCalled()
   })
 
-  it("selects an option on press", async () => {
+  /** The chosen row says so, and only one row at a time. */
+  it("marks the pressed option as selected, and moves the mark with the next press", async () => {
     const { getByText } = render(
       <ContextForScreen>
         <SelectInvestScreen />
       </ContextForScreen>,
     )
-
     await act(async () => {})
+    const first = findPressableParent(getByText(/\$1,000/))
+    const second = findPressableParent(getByText(/\$2,500/))
+    expect(first.props.accessibilityState.selected).toBe(false)
 
-    const option = getByText(/\$1,000/)
     await act(async () => {
-      fireEvent.press(option)
+      fireEvent.press(first)
     })
+    expect(first.props.accessibilityState.selected).toBe(true)
+    expect(second.props.accessibilityState.selected).toBe(false)
 
-    expect(option).toBeTruthy()
+    await act(async () => {
+      fireEvent.press(second)
+    })
+    expect(first.props.accessibilityState.selected).toBe(false)
+    expect(second.props.accessibilityState.selected).toBe(true)
   })
 
   it("navigates to term sheet screen when option selected and button pressed", async () => {
